@@ -145,9 +145,9 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   dynamic_ambient.Set (0,0,0);
   ambient_version = 0;
 
+#ifdef CS_USE_NEW_RENDERER
   dynDomain = 0;
 
-#ifdef CS_USE_NEW_RENDERER
   g3d = CS_QUERY_REGISTRY (factory->object_reg, iGraphics3D);
   buffers_version = (uint)-1;
 #endif
@@ -520,6 +520,7 @@ void csGenmeshMeshObject::SetupObject ()
     if (!mater) mater = factory->GetMaterialWrapper ();
     material_needs_visit = mater->IsVisitRequired ();
 
+#ifdef CS_USE_NEW_RENDERER
     if (dynDomain == 0)
       dynDomain = new csShaderVariableContext ();
 
@@ -534,6 +535,7 @@ void csGenmeshMeshObject::SetupObject ()
     sv->SetAccessor (&factory->shaderVarAccessor);
     sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::color_name);
     sv->SetAccessor (&factory->shaderVarAccessor);
+#endif // CS_USE_NEW_RENDERER
   }
 }
 

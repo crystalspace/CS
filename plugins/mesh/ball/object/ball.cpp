@@ -655,6 +655,7 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
 }
 #endif
 
+#ifdef CS_USE_NEW_RENDERER
 void csBallMeshObject::UpdateBufferSV()
 {
   csShaderVariable *sv;
@@ -684,6 +685,7 @@ void csBallMeshObject::UpdateBufferSV()
     sv->SetValue (GetRenderBuffer(index_name));
   }
 }
+#endif // CS_USE_NEW_RENDERER
 
 csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num)
 {

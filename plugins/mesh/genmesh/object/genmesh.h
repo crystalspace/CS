@@ -712,6 +712,7 @@ public:
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
   //------------------ iShaderVariableAccessor implementation ------------
+#ifdef CS_USE_NEW_RENDERER
   class ShaderVariableAccessor : public iShaderVariableAccessor
   {
   public:
@@ -727,6 +728,7 @@ public:
   friend class ShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);
+#endif // CS_USE_NEW_RENDERER
 };
 
 /**

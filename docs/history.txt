@@ -7,9 +7,11 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 15-Dec-2003
-        - Matze reworked some jam rules so that subdirs are more robust now.
-          This should also fix some msvcgen problems on jam.
+	- Matze reworked some jam rules so that subdirs are more robust now.
+	  This should also fix some msvcgen problems on jam.
 	- Marten commited the merged branch NEW_SHADERSYS back into HEAD
+	- Anders Stenberg fixed some problems with Marten's branch merge. (Ball & 
+	  Genmesh wouldn't compile in OR.)
 14-Dec-2003
 	- Eric Sunshine added --with[out]-python and --with[out]-perl options
 	  to configure.ac to allow users to disable these modules if desired.
