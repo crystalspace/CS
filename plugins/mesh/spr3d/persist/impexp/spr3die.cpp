@@ -1,7 +1,0 @@
-
-#include "cssysdef.h"
-
-CS_IMPLEMENT_PLUGIN
-
-SCF_EXPORT_CLASS_TABLE (spr3die)
-SCF_EXPORT_CLASS_TABLE_END
