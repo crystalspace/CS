@@ -13,6 +13,10 @@ contain objects that represent geometry. In this discussion we will limit
 ourselves to mesh objects of the @dfn{Thing} type since things implement
 @dfn{portals}.
 
+A sector is in principle an infinite area of space. But usually the
+sector has logical bounds which are made from some mesh object. In this
+discussion we will use the thing mesh object to make sector boundaries.
+
 You can define multiple sectors and connect them together by using
 portals in one or more of the things.
 

@@ -233,21 +233,18 @@ points forward.
 
 @production{sector-name, @nonterm{name}}@*
 @production{light-name, @nonterm{name}}@*
-@production{thing-name, @nonterm{name}}@*
-@production{thingtpl-name, @nonterm{name}}@*
-@production{plane-name, @nonterm{name}}@*
 @production{col-name, @nonterm{name}}@*
-@production{script-name, @nonterm{name}}@*
 @production{texture-name, @nonterm{name}}@*
 @production{material-name, @nonterm{name}}@*
-@production{polygon-name, @nonterm{name}}@*
 @production{mesh-name, @nonterm{name}}@*
 @production{meshfact-name, @nonterm{name}}@*
 @production{library-name, @nonterm{name}}@*
 @production{file-name, @nonterm{name}}
+@production{region-name, @nonterm{name}}
+@production{plugin-name, @nonterm{name}}
+@production{plugin-shortname, @nonterm{name}}
 
 @subsubheading Attributes and Numbers
-@production{max-textures-nr, @nonterm{pos-integer}}@*
 @production{radius, @nonterm{pos-number}}@*
 @production{texture-length, @nonterm{pos-number}}@*
 @production{height-nr, @nonterm{number}}@*
@@ -257,9 +254,8 @@ points forward.
 @production{keyname, @nonterm{string}}@*
 @production{keyvalue, @nonterm{string}}
 
-@subsubheading @sc{bsp} Tree
-@production{bsp, @token{BSP} @LP{} @RP{}}@*
-@production{statbsp, @token{STATBSP} @LP{} @RP{}}
+@subsubheading Visibility Culling
+@production{culler, @token{CULLER} @LP{} @RP{}}
 
 @subsubheading Key
 @production{key,
@@ -269,12 +265,6 @@ points forward.
 @production{tex-lighting,
     @token{TEXTURE_LIGHTING} @LP{} @nonterm{yes-no} @RP{}}@*
 @production{lighting, @token{LIGHTING} @LP{} @nonterm{yes-no} @RP{}}
-
-@subsubheading Rooms
-@production{dim, @token{DIM}
-    @LP{} @nonterm{x} @COMMA{} @nonterm{y} @COMMA{} @nonterm{z} @RP{}}@*
-@production{height, @token{HEIGHT} @LP{} @nonterm{height-nr} @RP{}}@*
-@production{floor-height, @token{FLOOR_HEIGHT} @LP{} @nonterm{height-nr} @RP{}}
 
 @subsubheading Fog
 @production{density, @nonterm{number}}@*
@@ -341,138 +331,11 @@ points forward.
 @production{matrix,
     @token{MATRIX} @LP{} [ @nonterm{matrix-type} @dots{} ] @RP{}}
 
-@subsubheading Planes
-@production{plane-desc-comp, @nonterm{plane-orig}}@*
-    @prodnext{@nonterm{plane-first-len}}@*
-    @prodnext{@nonterm{plane-first}}@*
-    @prodnext{@nonterm{plane-second-len}}@*
-    @prodnext{@nonterm{plane-second}}@*
-    @prodnext{@nonterm{matrix}}@*
-    @prodnext{@nonterm{vector}}@*
-    @prodnext{@nonterm{plane-uvec}}@*
-    @prodnext{@nonterm{plane-vvec}}@*
-@production{plane-desc, @token{PLANE} @nonterm{plane-name}
-    @LP{} [ @nonterm{plane-desc-comp} @dots{} ] @RP{}}
-
-@subsubheading Texturing: Planes and Polygons
-@production{plane-orig,
-    @token{ORIG} @LP{} @nonterm{vector-3d} | @nonterm{vertex-idx} @RP{}}@*
-@production{plane-first,
-    @token{FIRST} @LP{} @nonterm{vector-3d} | @nonterm{vertex-idx} @RP{}}@*
-@production{plane-second,
-    @token{SECOND} @LP{} @nonterm{vector-3d} | @nonterm{vertex-idx} @RP{}}@*
-@production{plane-first-len,
-    @token{FIRST_LEN} @LP{} @nonterm{texture-length} @RP{}}@*
-@production{plane-second-len,
-    @token{SECOND_LEN} @LP{} @nonterm{texture-length} @RP{}}@*
-@production{plane-uvec, @token{UVEC} @LP{} @nonterm{vector-3d} @RP{}}@*
-@production{plane-vvec, @token{VVEC} @LP{} @nonterm{vector-3d} @RP{}}@*
-@production{uv-shift,
-    @token{UV_SHIFT} @LP{} @nonterm{texture-coordinate} @RP{}}@*
-@production{txt-uv,
-    @token{UV} @LP{}
-    	@nonterm{vertex-idx} @nonterm{texture-coordinate}
-    	@nonterm{vertex-idx} @nonterm{texture-coordinate}
-    	@nonterm{vertex-idx} @nonterm{texture-coordinate}
-    @RP{}}@*
-@production{polytext-comp, @nonterm{plane-orig}}@*
-    @prodnext{@nonterm{plane-first-len}}@*
-    @prodnext{@nonterm{plane-first}}@*
-    @prodnext{@nonterm{plane-second-len}}@*
-    @prodnext{@nonterm{plane-second}}@*
-    @prodnext{@nonterm{matrix}}@*
-    @prodnext{@nonterm{vector}}@*
-    @prodnext{@nonterm{texlen}}@*
-    @prodnext{@nonterm{plane}}@*
-    @prodnext{@nonterm{plane-uvec}}@*
-    @prodnext{@nonterm{plane-vvec}}@*
-    @prodnext{@nonterm{uv-shift}}@*
-    @prodnext{@nonterm{txt-uv}}@*
-@production{polygon-texture,
-    @token{TEXTURE} @LP{} [ @nonterm{polytext-comp} @dots{} ] @RP{}}
-
-@subsubheading Texturing: Bezier Patches
-@production{beziertext-comp, @nonterm{plane-orig}}@*
-    @prodnext{@nonterm{plane-first-len}}@*
-    @prodnext{@nonterm{plane-first}}@*
-    @prodnext{@nonterm{plane-second-len}}@*
-    @prodnext{@nonterm{plane-second}}@*
-    @prodnext{@nonterm{matrix}}@*
-    @prodnext{@nonterm{vector}}@*
-    @prodnext{@nonterm{texlen}}@*
-    @prodnext{@nonterm{uv-shift}}@*
-    @prodnext{@nonterm{plane-uvec}}@*
-    @prodnext{@nonterm{plane-vvec}}@*
-@production{bezier-texture,
-    @token{TEXTURE} @LP{} [ @nonterm{beziertext-comp} @dots{} ] @RP{}}
-
-@subsubheading Portals
-@production{portal, @token{PORTAL} @LP{} @nonterm{sector-name} @RP{}}
-
-@production{after-vector, @token{W} @LP{} @nonterm{vector-3d} @RP{}}@*
-@production{warp-mirror, @token{MIRROR} @LP{} @RP{}}@*
-@production{warp-static, @token{STATIC} @LP{} @RP{}}@*
-@production{portal-clip, @token{CLIP} @LP{} @RP{}}@*
-@production{portal-zfill, @token{ZFILL} @LP{} @RP{}}@*
-@production{warp-comp, @nonterm{matrix}}@*
-    @prodnext{@nonterm{vector}}@*
-    @prodnext{@nonterm{after-vector}}@*
-    @prodnext{@nonterm{warp-mirror}}@*
-    @prodnext{@nonterm{warp-static}}@*
-    @prodnext{@nonterm{portal-clip}}@*
-    @prodnext{@nonterm{portal-zfill}}@*
-@production{warp, @token{WARP} @LP{} [ @nonterm{warp-comp} @dots{} ] @RP{}}
-
 @production{move-comp, @nonterm{matrix} | @nonterm{vector}}@*
 @production{move2, @token{MOVE} @LP{} [ @nonterm{move-comp} @dots{} ] @RP{}}@*
 @production{move, @token{MOVE} @LP{} @nonterm{matrix} @nonterm{vector} @RP{}}@*
 @production{hardmove,
     @token{HARDMOVE} @LP{} [ @nonterm{move-comp} @dots{} ] @RP{}}
-
-@subsubheading Rooms
-@production{floor, @token{FLOOR} @LP{}}@*
-    @prodwrap{@LP{} @nonterm{coordinate} @RP{}}@*
-    @prodwrap{@LP{} @nonterm{coordinate} @RP{}}@*
-    @prodwrap{@LP{} @nonterm{coordinate} @RP{}}@*
-    @prodwrap{@LP{} @nonterm{coordinate} @RP{} @RP{}}@*
-@production{ceiling, @token{CEILING} @LP{}}@*
-    @prodwrap{@LP{} @nonterm{coordinate} @RP{}}@*
-    @prodwrap{@LP{} @nonterm{coordinate} @RP{}}@*
-    @prodwrap{@LP{} @nonterm{coordinate} @RP{}}@*
-    @prodwrap{@LP{} @nonterm{coordinate} @RP{} @RP{}}@*
-@production{floor-ceil, @token{FLOOR_CEILING} @LP{}}@*
-    @prodwrap{@LP{} @nonterm{coordinate} @RP{}}@*
-    @prodwrap{@LP{} @nonterm{coordinate} @RP{}}@*
-    @prodwrap{@LP{} @nonterm{coordinate} @RP{}}@*
-    @prodwrap{@LP{} @nonterm{coordinate} @RP{} @RP{}}
-
-@subsubheading Circle of Vertices
-@noindent
-This command is a short-cut for specifying some vertices in a circular
-pattern.  Internally it is exactly the same as using the @samp{VERTEX
-(@dots{})} expression multiple times for the points around a circle.
-
-@production{radiusx, @nonterm{number}}@*
-@production{radiusy, @nonterm{number}}@*
-@production{radiusz, @nonterm{number}}@*
-@production{num-verts, @nonterm{integer}}@*
-@production{circle, @token{CIRCLE} @LP{} @nonterm{coordinate} @token{:}
-    @nonterm{radiusx} @COMMA{} @nonterm{radiusy} @COMMA{} @nonterm{radiusz}
-    @COMMA{} @nonterm{num-verts} @RP{}}
-
-@subsubheading Sky Dome (Half Sphere)
-@noindent
-A skydome is a short-cut for creating a complex half-sphere with gouraud
-shaded triangles.  Note that you need to generate the first circle of vertices
-using the @samp{CIRCLE} macro.
-
-@production{skydome-radius, @token{RADIUS} @LP{} @nonterm{radius} @RP{}}@*
-@production{skydome-vertices,
-    @token{VERTICES} @LP{} @nonterm{vertex-index} @dots{} @RP{}}@*
-@production{skydome-comp, @nonterm{skydome-radius} | @nonterm{skydome-vertices}
-    | @nonterm{lighting}}@*
-@production{skydome,
-    @token{SKYDOME} @LP{} [ @nonterm{skydome-comp} @dots{} ] @RP{}}
 
 @subsubheading Lights
 @production{dynamic-flag, @token{0} | @token{1}}@*
@@ -494,85 +357,13 @@ using the @samp{CIRCLE} macro.
 @production{light, @token{LIGHT} @nonterm{light-name}
     @LP{} @nonterm{light-oldsyntax} | @nonterm{light-newsyntax} @RP{}}
 
-@subsubheading Bezier Curve
-@production{bezier-comp, @nonterm{texnr} | @nonterm{material} |
-    @nonterm{bezier-texture} | @nonterm{vertices}}@*
-@production{bezier,
-    @token{BEZIER} @LP{} [ @nonterm{bezier-comp} @dots{} ] @RP{}}
-
-@subsubheading Polygons
-@noindent
-The list of vertices is a list of vertex indices.  These indices are relative
-to the list of vertices of the parent object (a Sector, Thing, or Thing
-Template).  The first vertex in the parent object has index 0.  The vertices
-of a polygon must be defined in clock-wise ordering as seen from a position
-from where you want the polygon to be visible.
-
-@production{vertices,
-    @token{VERTICES} @LP{} @nonterm{vertex-index} @dots{} @RP{}}
-
-@production{uva-scale, @nonterm{number}}@*
-@production{uva-offset, @nonterm{number}}@*
-@production{uva-spec, @nonterm{angle} @COMMA{} @nonterm{uva-scale} @COMMA{}
-    @nonterm{uva-offset}}@*
-@production{uva, @token{UVA} @LP{} @nonterm{uva-spec} @dots{} @RP{}}@*
-@production{uv, @token{UV} @LP{} @nonterm{texture-coordinate} @dots{} @RP{}}
-
-@production{colors, @token{COLORS} @LP{} @nonterm{color} @dots{} @RP{}}@*
-@production{gouraud, @token{GOURAUD} @LP{} @RP{}}@*
-@production{flatcol, @token{FLATCOL} @LP{} @nonterm{color} @RP{}}
-
-@production{cosfact, @token{COSFACT} @LP{} @nonterm{number} @RP{}}@*
-@production{colldet, @token{COLLDET} @LP{} @nonterm{yes-no} @RP{}}
-
-@production{shading-comp,
-    @token{NONE} | @token{FLAT} | @token{GOURAUD} | @token{LIGHTMAP}}@*
-@production{shading, @token{SHADING} @LP{} @nonterm{shading-comp} @RP{}}
-
-@production{polygon-comp, @nonterm{texnr}}@*
-    @prodnext{@nonterm{material}}@*
-    @prodnext{@nonterm{lighting}}@*
-    @prodnext{@nonterm{portal}}@*
-    @prodnext{@nonterm{warp}}@*
-    @prodnext{@nonterm{polygon-texture}}@*
-    @prodnext{@nonterm{vertices}}@*
-    @prodnext{@nonterm{alpha}}@*
-    @prodnext{@nonterm{fog}}@*
-    @prodnext{@nonterm{uv}}@*
-    @prodnext{@nonterm{uva}}@*
-    @prodnext{@nonterm{colors}}@*
-    @prodnext{@nonterm{cosfact}}@*
-    @prodnext{@nonterm{gouraud}}@*
-    @prodnext{@nonterm{flatcol}}@*
-    @prodnext{@nonterm{mixmode}}@*
-    @prodnext{@nonterm{colldet}}@*
-    @prodnext{@nonterm{shading}}@*
-@production{polygon, @token{POLYGON} @nonterm{polygon-name}
-    @LP{} [ @nonterm{polygon-comp} @dots{} ] @RP{}}
-
-@subsubheading Polygon Templates
-@production{polygon-tpl-comp, @nonterm{texnr}}@*
-    @prodnext{@nonterm{material}}@*
-    @prodnext{@nonterm{lighting}}@*
-    @prodnext{@nonterm{polygon-texture}}@*
-    @prodnext{@nonterm{vertices}}@*
-    @prodnext{@nonterm{gouraud}}@*
-    @prodnext{@nonterm{flatcol}}@*
-    @prodnext{@nonterm{colldet}}@*
-    @prodnext{@nonterm{shading}}@*
-    @prodnext{@nonterm{colors}}@*
-@production{polygon-template, @token{POLYGON} @nonterm{polygon-name}
-    @LP{} [ @nonterm{polygon-tpl-comp} @dots{} ] @RP{}}
-
 @subsubheading Collection Objects
-@production{col-thing, @token{THING} @LP{} @nonterm{thing-name} @RP{}}@*
 @production{col-mesh, @token{MESH} @LP{} @nonterm{mesh-name} @RP{}}@*
 @production{col-collection,
     @token{COLLECTION} @LP{} @nonterm{col-name} @RP{}}@*
 @production{col-light, @token{LIGHT} @LP{} @nonterm{light-name} @RP{}}@*
 @production{col-sector, @token{SECTOR} @LP{} @nonterm{sector-name} @RP{}}@*
-@production{collection-comp, @nonterm{col-thing}}@*
-    @prodnext{@nonterm{col-collection}}@*
+@production{collection-comp, @nonterm{col-collection}}@*
     @prodnext{@nonterm{col-light}}@*
     @prodnext{@nonterm{col-sector}}@*
     @prodnext{@nonterm{col-mesh}}@*
@@ -644,163 +435,23 @@ from where you want the polygon to be visible.
 @production{meshfact, @token{MESHOBJ} @nonterm{meshfact-name}
     @LP{} [ @nonterm{meshfact-comp} @dots{} ] @RP{}}@*
 
-@subsubheading Things and Objects
-@production{moveable, @token{MOVEABLE} @LP{} @RP{}}@*
-@production{detail, @token{DETAIL} @LP{} @RP{}}@*
-@production{convex, @token{CONVEX} @LP{} @RP{}}@*
-@production{template, @token{TEMPLATE} @LP{} @nonterm{thingtpl-name} @RP{}}@*
-@production{tex-select,
-    @token{MAT_SET_SELECT} @LP{} @nonterm{mat-set-name} @RP{}}@*
-@production{thing-camera, @token{CAMERA} @LP{} @RP{}}
-
-@production{thing-comp, @nonterm{vertex}}@*
-    @prodnext{@nonterm{polygon}}@*
-    @prodnext{@nonterm{texnr}}@*
-    @prodnext{@nonterm{material}}@*
-    @prodnext{@nonterm{texlen}}@*
-    @prodnext{@nonterm{key}}@*
-    @prodnext{@nonterm{bsp}}@*
-    @prodnext{@nonterm{move2}}@*
-    @prodnext{@nonterm{hardmove}}@*
-    @prodnext{@nonterm{template}}@*
-    @prodnext{@nonterm{fog-desc}}@*
-    @prodnext{@nonterm{moveable}}@*
-    @prodnext{@nonterm{detail}}@*
-    @prodnext{@nonterm{convex}}@*
-    @prodnext{@nonterm{circle}}@*
-    @prodnext{@nonterm{bezier}}@*
-    @prodnext{@nonterm{tex-select}}@*
-    @prodnext{@nonterm{thing-camera}}@*
-@production{thing, @token{THING} @nonterm{thing-name}
-    @LP{} [ @nonterm{thing-comp} @dots{} ] @RP{}}@*
-@production{sky, @token{SKY} @nonterm{thing-name}
-    @LP{} [ @nonterm{thing-comp} @dots{} ] @RP{}}
-
-@production{sixface-comp, @nonterm{move2}}@*
-    @prodnext{@nonterm{texture-scale}}@*
-    @prodnext{@nonterm{texture}}@*
-    @prodnext{@nonterm{ceil-texture}}@*
-    @prodnext{@nonterm{dim}}@*
-    @prodnext{@nonterm{height}}@*
-    @prodnext{@nonterm{floor-height}}@*
-    @prodnext{@nonterm{floor-ceil}}@*
-    @prodnext{@nonterm{floor-texture}}@*
-    @prodnext{@nonterm{floor}}@*
-    @prodnext{@nonterm{ceiling}}@*
-    @prodnext{@nonterm{moveable}}@*
-    @prodnext{@nonterm{detail}}@*
-    @prodnext{@nonterm{fog-desc}}@*
-    @prodnext{@nonterm{convex}}@*
-@production{sixface, @token{SIXFACE} @nonterm{thing-name}
-    @LP{} [ @nonterm{sixface-comp} @dots{} ] @RP{}}
-
-@subsubheading Thing and Object Templates
-@production{curve-center,
-    @token{CURVECENTER} @LP{} @nonterm{coordinate} @RP{}}@*
-@production{curve-scale, @token{CURVESCALE} @LP{} @nonterm{number} @RP{}}@*
-@production{curve-control, @token{CURVECONTROL}
-    @LP{} @nonterm{coordinate} @token{:} @nonterm{texture-coordinate} @RP{}}@*
-@production{template-file, @token{FILE} @LP{} @nonterm{file-name} @RP{}}@*
-@production{thing-tpl-comp, @nonterm{vertex}}@*
-    @prodnext{@nonterm{polygon-template}}@*
-    @prodnext{@nonterm{texnr}}@*
-    @prodnext{@nonterm{material}}@*
-    @prodnext{@nonterm{texlen}}@*
-    @prodnext{@nonterm{move}}@*
-    @prodnext{@nonterm{fog-desc}}@*
-    @prodnext{@nonterm{circle}}@*
-    @prodnext{@nonterm{bezier}}@*
-    @prodnext{@nonterm{curve-center}}@*
-    @prodnext{@nonterm{curve-scale}}@*
-    @prodnext{@nonterm{curve-control}}@*
-    @prodnext{@nonterm{template-file}}@*
-@production{thing-template, @token{THING} @nonterm{thingtpl-name}
-    @LP{} [ @nonterm{thing-tpl-comp} @dots{} ] @RP{}}
-
-@production{sixface-tpl-comp, @nonterm{move}}@*
-    @prodnext{@nonterm{texture-scale}}@*
-    @prodnext{@nonterm{texture}}@*
-    @prodnext{@nonterm{ceil-texture}}@*
-    @prodnext{@nonterm{dim}}@*
-    @prodnext{@nonterm{height}}@*
-    @prodnext{@nonterm{floor-height}}@*
-    @prodnext{@nonterm{floor-ceil}}@*
-    @prodnext{@nonterm{floor-texture}}@*
-    @prodnext{@nonterm{floor}}@*
-    @prodnext{@nonterm{ceiling}}@*
-    @prodnext{@nonterm{fog-desc}}@*
-@production{sixface-template, @token{SIXFACE} @nonterm{thingtpl-name}
-    @LP{} [ @nonterm{sixface-tpl-comp} @dots{} ] @RP{}}
-
 @subsubheading Nodes
 @production{position, @token{POSITION} @LP{} @nonterm{coordinate} @RP{}}@*
 @production{node-comp, @nonterm{position} | @nonterm{key}}@*
 @production{node, @token{NODE} @LP{} [ @nonterm{node-comp} @dots{} ] @RP{}}
 
-@subsubheading Sectors and Rooms
-@production{tex-comp, @nonterm{texture} | @nonterm{plane} | @nonterm{texlen}}@*
-@production{tex, @token{TEX} @LP{} [ @nonterm{tex-comp} @dots{} ] @RP{}}
-
-@production{portal-poly, @token{POLYGON} @LP{} @nonterm{polygon-name} @RP{}}@*
-@production{portal-sector, @token{SECTOR} @LP{} @nonterm{sector-name} @RP{}}@*
-@production{room-portal-comp, @nonterm{portal-poly} | @nonterm{portal-sector} |
-    @nonterm{alpha} | @nonterm{warp}}@*
-@production{room-portal,
-    @token{PORTAL} @LP{} [ @nonterm{room-portal-comp} @dots{} ] @RP{}}
-
-@production{split-direction, @token{VER} | @token{HOR}}@*
-@production{split-list, @nonterm{number-list}}@*
-@production{split, @token{SPLIT} @LP{} @nonterm{polygon-name} @COMMA{}
-    @nonterm{split-direction} @LP{} @nonterm{split-list} @RP{} @RP{}}
+@subsubheading Sectors
 
 @production{sector-comp, @nonterm{vertex}}@*
-    @prodnext{@nonterm{polygon}}@*
-    @prodnext{@nonterm{texnr}}@*
-    @prodnext{@nonterm{material}}@*
-    @prodnext{@nonterm{texlen}}@*
-    @prodnext{@nonterm{bsp}}@*
-    @prodnext{@nonterm{statbsp}}@*
-    @prodnext{@nonterm{thing}}@*
-    @prodnext{@nonterm{hardmove}}@*
-    @prodnext{@nonterm{sixface}}@*
+    @prodnext{@nonterm{culler}}@*
     @prodnext{@nonterm{light}}@*
     @prodnext{@nonterm{mesh}}@*
     @prodnext{@nonterm{fog-desc}}@*
     @prodnext{@nonterm{circle}}@*
-    @prodnext{@nonterm{skydome}}@*
     @prodnext{@nonterm{key}}@*
     @prodnext{@nonterm{node}}@*
-    @prodnext{@nonterm{partsys}}@*
-    @prodnext{@nonterm{sky}}@*
 @production{sector, @token{SECTOR} @nonterm{sector-name}
     @LP{} [ @nonterm{sector-comp} @dots{} ] @RP{}}
-
-@production{room-comp, @nonterm{tex-lighting}}@*
-    @prodnext{@nonterm{texture-scale}}@*
-    @prodnext{@nonterm{texture}}@*
-    @prodnext{@nonterm{tex}}@*
-    @prodnext{@nonterm{ceil-texture}}@*
-    @prodnext{@nonterm{floor-texture}}@*
-    @prodnext{@nonterm{light}}@*
-    @prodnext{@nonterm{dim}}@*
-    @prodnext{@nonterm{height}}@*
-    @prodnext{@nonterm{floor-height}}@*
-    @prodnext{@nonterm{floor-ceil}}@*
-    @prodnext{@nonterm{floor}}@*
-    @prodnext{@nonterm{ceiling}}@*
-    @prodnext{@nonterm{sixface}}@*
-    @prodnext{@nonterm{thing}}@*
-    @prodnext{@nonterm{room-portal}}@*
-    @prodnext{@nonterm{split}}@*
-    @prodnext{@nonterm{partsys}}@*
-    @prodnext{@nonterm{sky}}@*
-    @prodnext{@nonterm{bsp}}@*
-    @prodnext{@nonterm{statbsp}}@*
-    @prodnext{@nonterm{move}}@*
-    @prodnext{@nonterm{mesh}}@*
-    @prodnext{@nonterm{fog-desc}}@*
-@production{room, @token{ROOM} @nonterm{sector-name}
-    @LP{} [ @nonterm{room-comp} @dots{} ] @RP{}}
 
 @subsubheading Texture List
 @production{textures-comp, @nonterm{texture-desc}}@*
@@ -822,8 +473,8 @@ materials will be merged into the global texture list.  You should define a
 internal list first.  For usage of @samp{MAT_SET} see the description of
 @samp{THING}.
 
-@production{tex-set-name, @nonterm{name}}@*
-@production{texture-set,
+@production{mat-set-name, @nonterm{name}}@*
+@production{material-set,
     @token{MAT_SET} @nonterm{mat-set-name} @LP{} @nonterm{materials} @RP{}}
 
 @subsubheading Library
@@ -834,36 +485,53 @@ internal list first.  For usage of @samp{MAT_SET} see the description of
 @production{start, @token{START}
     @LP{} @nonterm{sector-name} @COMMA{} @nonterm{coordinate} @RP{}}
 
-@subsubheading Skeletal Animation
-@production{euler, @token{EULER} @LP{} @nonterm{vector-3d} @RP{}}
+@subsubheading For Loader Plug-Ins
+@production{plugin-spec, @token{PLUGIN}
+    @LP{} ( @nonterm{plugin-name} | @nonterm{plugin-shortname} ) @RP{}}
+@production{plugin-params, @token{PARAMS} @LP{} @dots{} @RP{} }
+@production{plugin-comp, @token{PLUGIN} @nonterm{plugin-shortname}
+    @LP{} @nonterm{plugin-name} @RP{}
+@production{plugins, @token{PLUGINS}
+    @LP{} [ @nonterm{plugin-comp} @dots{} ] @RP{}
 
-@production{anim-comp, @nonterm{euler}}@*
-    @prodnext{@nonterm{quaternion}}@*
-    @prodnext{@nonterm{matrix}}@*
-@production{motion-anim,
-    @token{ANIM} @LP{} [ @nonterm{anim-comp} ] @RP{}}
+@subsubheading Add-ons
+@production{addon-comp, @nonterm{plugin-spec}}@*
+    @prodnext{@nonterm{plugin-params}}@*
+@production{addon, @token{ADDON}
+    @LP{} [ @nonterm{addon-comp} @dots{} ] @RP{}}
 
-@production{anim-index, @nonterm{pos-integer}}@*
-@production{link, @token{LINK} @nonterm{bone-name} @LP{} @nonterm{anim-index} @RP{}}@*
-@production{motion-frame,
-    @token{FRAME} @nonterm{motion-time} @LP{} [ @nonterm{link} @dots{} ] @RP{}}
+@subsubheading Sounds
+@production{sound-file, @token{FILE} @LP{} @nonterm{file-name} @RP{}
+@production{sound, @token{SOUND} [ @nonterm{file-name} ]
+    @LP{} [ @nonterm{sound-file} ] @RP{}}
+@production{sounds, @token{SOUNDS}
+    @LP{} [ @nonterm{sound} @dots{} ] @RP{}}
 
-@production{motion-comp, @nonterm{motion-anim}}@*
-    @prodnext{@nonterm{motion-frame}}@*
-@production{animation, @token{MOTION} @nonterm{motion-name}
-    @LP{} [ @nonterm{motion-comp} @dots{} ] @RP{}}
+@subsubheading Current Region
+@production{region, @token{REGION} @LP{} [ @nonterm{region-name} ] @RP{}}
+
+@subsubheading Render Priorities
+@production{rendpri-value, @nonterm{integer}}
+@production{rendpri-setting, @token{BACK2FRONT}}@*
+    @prodnext{@token{FRONT2BACK}}@*
+    @prodnext{@token{NONE}}@*
+@production{rendpri-comp, @token{PRIORITY}
+    @LP{} @nonterm{rendpri-value} @COMMA{} @nonterm{rendpri-setting} @RP{} }
+@production{renderpriorities, @token{RENDERPRIORITIES}
+    @LP{} [ @nonterm{rendpri-comp} @dots{} ] @RP{} }
 
 @subsubheading World
 @production{world-comp, @nonterm{textures}}@*
     @prodnext{@nonterm{materials}}@*
     @prodnext{@nonterm{library}}@*
-    @prodnext{@nonterm{animation}}@*
+    @prodnext{@nonterm{addon}}@*
+    @prodnext{@nonterm{material-set}}@*
+    @prodnext{@nonterm{sounds}}@*
+    @prodnext{@nonterm{region}}@*
+    @prodnext{@nonterm{renderpriorities}}@*
+    @prodnext{@nonterm{plugins}}@*
     @prodnext{@nonterm{sector}}@*
-    @prodnext{@nonterm{room}}@*
-    @prodnext{@nonterm{thing-template}}@*
-    @prodnext{@nonterm{sixface-template}}@*
     @prodnext{@nonterm{meshfact}}@*
-    @prodnext{@nonterm{plane-desc}}@*
     @prodnext{@nonterm{collection}}@*
     @prodnext{@nonterm{start}}@*
     @prodnext{@nonterm{key}}@*
@@ -871,7 +539,7 @@ internal list first.  For usage of @samp{MAT_SET} see the description of
 
 @subsubheading Library File
 @production{library-comp, @nonterm{textures} | @nonterm{materials} |
-    @nonterm{thing-template} | @nonterm{meshfact}}@*
+    @nonterm{meshfact}}@*
 @production{library,
     @token{LIBRARY} @LP{} [ @nonterm{library-comp} @dots{} ] @RP{}}
 

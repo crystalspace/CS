@@ -6,6 +6,13 @@ The history order is reversed so that new features are at the top.
 	  useful sections in the documentation.
 	- Fixed a few errors throughout the mesh object documentation.
 	- Fully updated the 'thing mesh object' documentation.
+	- Some smaller documentation updates.
+	- Removed everything from the parser documentation that is no
+	  longer valid. The parser documentation also doesn't try to explain
+	  anything related the loading of mesh objects. For this you should
+	  go to the mesh object chapter. This does not mean that the parser
+	  documentation is already up-to-date though. But it is more accurate
+	  now. Also started added some of the new things to the documentation.
 	- Matze fixed console for win32 mingw and cygwin - they just don't need
 	  one.
 21-Nov-2001

@@ -10,11 +10,6 @@ the @ref{Portal Engine}.  This section describes the compenents of the world
 independent from the file format, so it is also useful if you want to build a
 world from within your program.
 
-Some objects appear in the map file but are not described here, like the
-@dfn{skydome}.  Rather than being core components of the world as described
-here, such objects are shortcuts for creating complex structures out of the
-core components.
-
 The world is built up from the following objects:
 
 @itemize @bullet
@@ -24,12 +19,15 @@ The world is built up from the following objects:
 that can contain several geometrical objects. As opposed to earlier
 versions of Crystal Space a sector does not itself represent geometry.
 Instead all geometry in a sector is made from @dfn{Mesh Objects}.
+Theoretically a sector is infinite although in practice it is usually
+logically bounded by sector walls or a sky object.
 
 @item
 @dfn{Mesh Objects}. See the mesh object section for more specific information
 about them (@pxref{MeshObject}). Mesh objects represent geometry in some
 sector. Everything you can see (walls, actors, particle systems, ...) is
-represented by some kind of mesh object.
+represented by some kind of mesh object. This is a very important concept
+in the Crystal Space engine.
 
 @item
 @dfn{Mesh Object Factories}. Mesh object factories are objects that
@@ -66,7 +64,8 @@ easier for level designers and also to make levels as portable as possible
 between different Crystal Space games.  @xref{Keylist Standards}.
 
 @item
-@dfn{Nodes}. A node represents a point in space.
+@dfn{Nodes}. A node represents a point in space. The engine itself will not
+use nodes but a game can use them to represent game specific data.
 @end itemize
 
 The @dfn{Thing Mesh Object} is probably the most important mesh object
@@ -109,3 +108,4 @@ The following classnames are standardized:
 
 @noindent
 @@@@@@FIXME: @emph{Write this.}
+
