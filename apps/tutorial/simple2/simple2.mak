@@ -32,7 +32,7 @@ SIMPLE2.EXE = simple2$(EXE)
 INC.SIMPLE2 = $(wildcard apps/tutorial/simple2/*.h)
 SRC.SIMPLE2 = $(wildcard apps/tutorial/simple2/*.cpp)
 OBJ.SIMPLE2 = $(addprefix $(OUT),$(notdir $(SRC.SIMPLE2:.cpp=$O)))
-DEP.SIMPLE2 = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
+DEP.SIMPLE2 = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.SIMPLE2 = $(foreach d,$(DEP.SIMPLE2),$($d.LIB))
 
 #TO_INSTALL.EXE += $(SIMPLE2.EXE)

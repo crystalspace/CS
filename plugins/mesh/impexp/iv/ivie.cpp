@@ -34,7 +34,7 @@ public:
   csModelConverterIV (iBase *pBase);
 
   /// destructor
-  ~csModelConverterIV ();
+  virtual ~csModelConverterIV ();
 
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount() const;

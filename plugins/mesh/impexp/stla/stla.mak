@@ -4,7 +4,7 @@ DESCRIPTION.stlaie = STLA Import/Export plug-in
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make stlaie        Make the $(DESCRIPTION.stlaie)$"
+  $(NEWLINE)echo $"  make stlaie       Make the $(DESCRIPTION.stlaie)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#

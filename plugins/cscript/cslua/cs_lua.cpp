@@ -112,6 +112,7 @@ int cspace_initialize(lua_State *L);
 
 #include "isys/system.h"
 #include "isys/plugin.h"
+#include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "iengine/camera.h"
 #include "iengine/campos.h"

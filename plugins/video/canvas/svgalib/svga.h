@@ -25,7 +25,7 @@
 #include <vgamouse.h>
 
 #include "video/canvas/common/graph2d.h"
-#include "isys/event.h"
+#include "iutil/event.h"
 
 /// SVGALIB version.
 class csGraphics2DSVGALib : public csGraphics2D, public iEventPlug

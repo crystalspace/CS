@@ -26,22 +26,17 @@
 #include "csutil/csstrvec.h"
 #include "csutil/csobjvec.h"
 #include "csutil/typedvec.h"
-#include "cssys/csinput.h"
-#include "cssys/csevcord.h"
 #include "isys/system.h"
 #include "isys/vfs.h"
-#include "isys/event.h"
 #include "isys/plugin.h"
 #include "iutil/config.h"
 #include "iutil/objreg.h"
-
-class csKeyboardDriver;
-class csMouseDriver;
 
 struct iGraphics3D;
 struct iGraphics2D;
 struct iConfig;
 struct iConfigManager;
+struct iEventQueue;
 
 /**
  * This is the interface to operating system.<p>
@@ -71,8 +66,6 @@ private:
     iPlugin *Plugin;
     // The class ID of the plugin, and their functionality ID
     char *ClassID, *FuncID;
-    // The mask of events this plugin wants to see
-    unsigned int EventMask;
 
     // Construct the object that represents a plugin
     csPlugin (iPlugin *iObject, const char *iClassID, const char *iFuncID);
@@ -94,7 +87,8 @@ private:
       if (Mode == 0)
         return ((csPlugin *)Item)->Plugin == Key ? 0 : 1;
       else
-        return ((csPlugin *)Item)->FuncID ? strcmp (((csPlugin *)Item)->FuncID, (char *)Key)
+        return ((csPlugin *)Item)->FuncID
+	     ? strcmp (((csPlugin *)Item)->FuncID, (char *)Key)
              : ((csPlugin *)Item)->FuncID == Key ? 0 : 1;
     }
     // Overrided Get() to avoid typecasts
@@ -117,7 +111,8 @@ private:
     bool Value;				// If Type is CSVAR_BOOL
     iConfig *Config;
 
-    csPluginOption (const char *iName, csVariantType iType, int iID, bool iValue, iConfig* iConfig)
+    csPluginOption (const char *iName, csVariantType iType, int iID,
+      bool iValue, iConfig* iConfig)
     {
       Name = csStrNew (iName);
       Type = iType;
@@ -132,75 +127,6 @@ private:
     }
   };
 
-  /*
-   * A private class which implements the iEventOutlet interface.
-   */
-  class csEventOutlet : public iEventOutlet
-  {
-    // The mask of events to allow from this plug
-    unsigned EnableMask;
-    // The event plug object
-    iEventPlug *Plug;
-    // The system driver
-    csSystemDriver *System;
-  public:
-    SCF_DECLARE_IBASE;
-
-    // Initialize the outlet
-    csEventOutlet (iEventPlug *iPlug, csSystemDriver *iSys);
-    // Destroy the outlet
-    virtual ~csEventOutlet ();
-
-    // Create a event object on behalf of the system driver.
-    virtual iEvent *CreateEvent ();
-    // Put a previously created event into system event queue.
-    virtual void PutEvent (iEvent *Event);
-    // Put a keyboard event into event queue.
-    virtual void Key (int iKey, int iChar, bool iDown);
-    // Put a mouse event into event queue.
-    virtual void Mouse (int iButton, bool iDown, int x, int y);
-    // Put a joystick event into event queue.
-    virtual void Joystick (int iNumber, int iButton, bool iDown, int x, int y);
-    // Put a broadcast event into event queue.
-    virtual void Broadcast (int iCode, void *iInfo);
-    // Broadcast a event to all plugins
-    virtual void ImmediateBroadcast (int iCode, void *iInfo);
-  };
-  friend class csEventOutlet;
-
-  /*
-   * The array of all allocated event outlets.
-   */
-  class csEventOutletsVector : public csVector
-  {
-  public:
-    csEventOutletsVector () : csVector (16, 16)
-    { }
-    virtual ~csEventOutletsVector ()
-    { DeleteAll (); }
-    virtual bool FreeItem (csSome Item)
-    { delete (csEventOutlet *)Item; return true; }
-    csEventOutlet *Get (int idx)
-    { return (csEventOutlet *)csVector::Get (idx); }
-  } EventOutlets;
-
-  /*
-   * The array of all allocated event cords.
-   */
-  class csEventCordsVector : public csVector
-  {
-  public:
-    csEventCordsVector () : csVector (16, 16)
-    { }
-    virtual ~csEventCordsVector ()
-    { DeleteAll (); }
-    virtual bool FreeItem (csSome Item)
-    { delete (csEventCord *)Item; return true; }
-    csEventCord *Get (int idx)
-    { return (csEventCord *)csVector::Get (idx); }
-    int Find (int Category, int SubCategory);
-  } EventCords;
-
   // Query all options supported by given plugin and place into OptionList
   void QueryOptions (iPlugin *iObject);
 
@@ -208,8 +134,10 @@ private:
   csTicks ElapsedTime, CurrentTime;
   
 private:
-  /// The Virtual File System object
+  // The Virtual File System object
   iVFS *VFS;
+  // Shared event queue.
+  iEventQueue* EventQueue;
 
 public:
   /// Print something to the reporter.
@@ -220,18 +148,12 @@ public:
   /// The list of all plug-ins
   csPluginsVector Plugins;
 
-  /// The event queue
-  csEventQueue EventQueue;
-  /// Keyboard driver
-  csKeyboardDriver Keyboard;
-  /// Mouse driver
-  csMouseDriver Mouse;
-  /// Joystick driver
-  csJoystickDriver Joystick;
   /// Set to non-zero to exit csSystemDriver::Loop()
   bool Shutdown;
+
   /// Debugging level (0 = no debug, 1 = normal debug, 2 = verbose debug)
   int debug_level;
+
   /// List of all options for all plug-in modules.
   CS_DECLARE_TYPED_VECTOR (csOptionVector, csPluginOption) OptionList;
 
@@ -241,7 +163,8 @@ public:
   virtual ~csSystemDriver ();
 
   /// This is usually called right after object creation.
-  virtual bool Initialize (int argc, const char* const argv[], const char *iConfigName);
+  virtual bool Initialize (int argc, const char* const argv[],
+    const char *iConfigName);
 
   /**
    * Send cscmdSystemOpen message to all loaded plugins.
@@ -270,8 +193,8 @@ public:
    */
   virtual void NextFrame ();
 
-  /// Pass a single event to all plugins until one eats it
-  virtual bool HandleEvent (iEvent &Event);
+  /// Handle an event.
+  virtual bool HandleEvent(iEvent&);
 
   /// Sleep for given number of 1/1000 seconds (very inacurate)
   virtual void Sleep (int /*SleepTime*/) {}
@@ -287,8 +210,8 @@ public:
   /// A shortcut for requesting to load a plugin (before Initialize())
   void RequestPlugin (const char *iPluginName);
 
-  // @@@ The following (and some of the above) should all move to the
-  // specific implementation of the plugin manager when we have that.
+// @@@ The following (and some of the above) should all move to the
+// specific implementation of the plugin manager when we have that.
 
 private:
   /// Load a plugin and initialize it.
@@ -348,25 +271,6 @@ public:
   virtual void GetElapsedTime (csTicks &oElapsedTime, csTicks &oCurrentTime)
   { oElapsedTime = ElapsedTime; oCurrentTime = CurrentTime; }
 
-  /// Register the plugin to receive specific events
-  virtual bool CallOnEvents (iPlugin *iObject, unsigned int iEventMask);
-  /// Query current state for given key
-  virtual bool GetKeyState (int key);
-  /// Query current state for given mouse button (0..9)
-  virtual bool GetMouseButton (int button);
-  /// Query current (last known) mouse position
-  virtual void GetMousePosition (int &x, int &y);
-  /// Query current state for given joystick button (1..CS_MAX_JOYSTICK_BUTTONS)
-  virtual bool GetJoystickButton (int number, int button);
-  /// Query last known joystick position
-  virtual void GetJoystickPosition (int number, int &x, int &y);
-  /// Register an event plug and return a new outlet
-  virtual iEventOutlet *CreateEventOutlet (iEventPlug *iObject);
-  /// Get an event cord for the given category/subcategory.
-  virtual iEventCord *GetEventCord(int Category, int Subcategory);
-  /// Get a public event outlet for posting just a single event and such.
-  virtual iEventOutlet *GetSystemEventOutlet ();
-
   //------------------------------------------------------------------
 
   class ObjectRegistry : public iObjectRegistry
@@ -374,9 +278,13 @@ public:
   private:
     csVector registry;
     csVector tags;
+    // True when this object is being cleared; prevents external changes.
+    bool clearing;
 
   public:
-    virtual ~ObjectRegistry ();
+    ObjectRegistry() : clearing(false) {}
+    virtual ~ObjectRegistry() {} // Client must explicitly call Clear().
+    void Clear();
 
     SCF_DECLARE_EMBEDDED_IBASE (csSystemDriver);
     virtual bool Register (iBase* obj, char const* tag = NULL);
@@ -430,6 +338,15 @@ public:
     }
   } scfiPluginManager;
   friend class PluginManager;
+
+  //------------------------------------------------------------------
+
+  struct eiPlugin : public iPlugin
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSystemDriver);
+    virtual bool Initialize (iObjectRegistry*) {}
+    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
+  } scfiPlugin;
 };
 
 /// CS version of printf
@@ -448,6 +365,5 @@ extern csTicks csGetTicks ();
  * some initialization tasks still need this.
  */
 extern bool csGetInstallPath (char *oInstallPath, size_t iBufferSize);
-
 
 #endif // __CS_SYSTEM_H__

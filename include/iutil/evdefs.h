@@ -24,8 +24,8 @@
 
 */
 
-#ifndef __ISYS_EVDEFS_H__
-#define __ISYS_EVDEFS_H__
+#ifndef __IUTIL_EVDEFS_H__
+#define __IUTIL_EVDEFS_H__
 
 /// System Events: take care not to define more than 32 event types
 enum
@@ -50,17 +50,17 @@ enum
 
 /*
  * Event masks.<p>
- * The event masks can be used by plugins to tell the system driver
- * (via iSystem::CallOnEvents) which kinds of events they want to receive
- * at their HandleEvent() entry. If a plugin registers to receive
- * CSMASK_Nothing events it is always called once per frame,
- * so that plugin can do some per-frame processing.
+ * The event masks can be used by plugins to tell an event queue, via
+ * iEventQueue::RegisterListener, which kinds of events they want to receive at
+ * their HandleEvent() entry.  If a plugin registers to receive CSMASK_Nothing
+ * events it is always called once per frame, so that plugin can do some
+ * per-frame processing.
  */
 /**
- * Empty event. If a plugin registers to receive this kind of events
- * (iSystem::CallOnEvents (CSMASK_Nothing, ...) this has a special meaning:
- * the plugin will be called at the start of every frame and at the end
- * of every frame with an csevBroadcast event with the Event.Command.Code
+ * Empty event.  If a plugin registers to receive this kind of events via
+ * iEventQueue::RegisterListener(plugin, CSMASK_Nothing) this has a special
+ * meaning: the plugin will be called at the start of every frame and at the
+ * end of every frame with an csevBroadcast event with the Event.Command.Code
  * equal to either cscmdPreProcess or cscmdPostProcess.
  */
 #define CSMASK_Nothing		(1 << csevNothing)
@@ -359,4 +359,4 @@ enum
   cscmdPostProcess
 };
 
-#endif // __ISYS_EVDEFS_H__
+#endif // __IUTIL_EVDEFS_H__

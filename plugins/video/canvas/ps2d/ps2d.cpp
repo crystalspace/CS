@@ -18,7 +18,8 @@
 
 #include <stdarg.h>
 #include "cssysdef.h"
-#include "video/canvas/ps2d/ps2d.h"
+#include "ps2d.h"
+#include "iutil/eventq.h"
 #include "isys/system.h"
 
 #include "SDL/SDL.h"
@@ -60,11 +61,14 @@ bool csGraphics2Dps2::Initialize (iObjectRegistry *object_reg)
 {
   if (!csGraphics2D::Initialize (object_reg))
     return false;
-  // Tell system driver to call us on every frame
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
-  // Create the event outlet
-  EventOutlet = sys->CreateEventOutlet (this);
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+  {
+    // Tell event queue to call us on every frame
+    q->RegisterListener (&scfiPlugin, CSMASK_Nothing);
+    // Create the event outlet
+    EventOutlet = q->CreateEventOutlet (this);
+  }
   return true;
 }
 

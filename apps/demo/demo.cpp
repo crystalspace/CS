@@ -50,7 +50,9 @@
 #include "imesh/object.h"
 #include "imap/reader.h"
 #include "isys/plugin.h"
+#include "iutil/event.h"
 #include "iutil/objreg.h"
+#include "iutil/csinput.h"
 #include "igraphic/imageio.h"
 #include "ivaria/reporter.h"
 #include "qsqrt.h"
@@ -100,6 +102,7 @@ Demo::Demo ()
   myG3D = NULL;
   myG2D = NULL;
   myVFS = NULL;
+  kbd = NULL;
   myConsole = NULL;
 
   message[0] = 0;
@@ -112,6 +115,7 @@ Demo::~Demo ()
   if (myG3D) myG3D->DecRef ();
   if (myG2D) myG2D->DecRef ();
   if (myVFS) myVFS->DecRef ();
+  if (kbd) kbd->DecRef ();
   if (myConsole) myConsole->DecRef ();
   delete seqmgr;
 }
@@ -775,6 +779,14 @@ bool Demo::Initialize (int argc, const char* const argv[],
     return false;
   }
 
+  kbd = CS_QUERY_REGISTRY(object_reg, iKeyboardDriver);
+  if (!kbd)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No keyboard driver!");
+    abort ();
+  }
+  kbd->IncRef();
+
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Load the engine plugin.
@@ -940,17 +952,17 @@ void Demo::NextFrame ()
   if (map_enabled < MAP_EDIT)
   {
     float speed = (elapsed_time / 1000.) * (0.03 * 20);
-    if (GetKeyState (CSKEY_RIGHT))
+    if (kbd->GetKeyState (CSKEY_RIGHT))
       camtrans.RotateThis (VEC_ROT_RIGHT, speed);
-    if (GetKeyState (CSKEY_LEFT))
+    if (kbd->GetKeyState (CSKEY_LEFT))
       camtrans.RotateThis (VEC_ROT_LEFT, speed);
-    if (GetKeyState (CSKEY_PGUP))
+    if (kbd->GetKeyState (CSKEY_PGUP))
       camtrans.RotateThis (VEC_TILT_UP, speed);
-    if (GetKeyState (CSKEY_PGDN))
+    if (kbd->GetKeyState (CSKEY_PGDN))
       camtrans.RotateThis (VEC_TILT_DOWN, speed);
-    if (GetKeyState (CSKEY_UP))
+    if (kbd->GetKeyState (CSKEY_UP))
       view->GetCamera ()->Move (VEC_FORWARD * 400.0f * speed);
-    if (GetKeyState (CSKEY_DOWN))
+    if (kbd->GetKeyState (CSKEY_DOWN))
       view->GetCamera ()->Move (VEC_BACKWARD * 400.0f * speed);
   }
 

@@ -18,86 +18,126 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/system.h"
-#include "cssys/csevent.h"
-#include "cssys/csevcord.h"
+#include "csutil/evoutlet.h"
+#include "csutil/csevent.h"
+#include "csutil/cseventq.h"
+#include "csutil/csevcord.h"
+#include "cssys/system.h" // @@@ Needed for csGetTicks(); remove later.
+#include "iutil/csinput.h"
 
-SCF_IMPLEMENT_IBASE (csSystemDriver::csEventOutlet)
+SCF_IMPLEMENT_IBASE (csEventOutlet)
   SCF_IMPLEMENTS_INTERFACE (iEventOutlet)
 SCF_IMPLEMENT_IBASE_END
 
-csSystemDriver::csEventOutlet::csEventOutlet (iEventPlug *iPlug, csSystemDriver *iSys)
+csEventOutlet::csEventOutlet(iEventPlug* p,csEventQueue* q,iObjectRegistry* r):
+  EnableMask((unsigned int)(-1)), Plug(p), Queue(q), Registry(r),
+  KeyboardDriver(0), MouseDriver(0), JoystickDriver(0)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  Plug = iPlug;
-  EnableMask = unsigned (-1);
-  System = iSys;
 }
 
-csSystemDriver::csEventOutlet::~csEventOutlet ()
+csEventOutlet::~csEventOutlet ()
 {
-  int idx = System->EventOutlets.Find (this);
+  int idx = Queue->EventOutlets.Find (this);
   if (idx >= 0)
   {
-    System->EventOutlets [idx] = NULL;
-    System->EventOutlets.Delete (idx);
+    Queue->EventOutlets [idx] = NULL;
+    Queue->EventOutlets.Delete (idx);
   }
+  if (KeyboardDriver != 0)
+    KeyboardDriver->DecRef();
+  if (MouseDriver != 0)
+    MouseDriver->DecRef();
+  if (JoystickDriver != 0)
+    JoystickDriver->DecRef();
 }
 
-iEvent *csSystemDriver::csEventOutlet::CreateEvent ()
+#define DRIVER_GETTER(X) \
+i##X##Driver* csEventOutlet::Get##X##Driver() \
+{ \
+  if (X##Driver == 0) \
+  { \
+    X##Driver = CS_QUERY_REGISTRY(Registry, i##X##Driver); \
+    if (X##Driver != 0) \
+      X##Driver->IncRef(); \
+  } \
+  return X##Driver; \
+}
+DRIVER_GETTER(Keyboard)
+DRIVER_GETTER(Mouse)
+DRIVER_GETTER(Joystick)
+#undef DRIVER_GETTER
+
+iEvent *csEventOutlet::CreateEvent ()
 {
   return new csEvent ();
 }
 
-void csSystemDriver::csEventOutlet::PutEvent (iEvent *Event)
+void csEventOutlet::Post (iEvent *Event)
 {
   if ((1 << Event->Type) & EnableMask)
   {
     // Check for a pertinent event cord
-    csEventCord *cord = (csEventCord *)System->GetEventCord (Event->Category, Event->SubCategory);
-
-    // Return if the event is not to be handled by the system queue
-    if (cord && cord->PutEvent (Event))
-      return;
-    System->EventQueue.Put (Event);
+    csEventCord *cord = (csEventCord*)
+      Queue->GetEventCord (Event->Category, Event->SubCategory);
+    // If the cord does not handle the event, then place it in the queue.
+    if (!cord || !cord->Post (Event))
+      Queue->Post (Event);
+    else
+      delete Event;
   }
   else
     delete Event;
 }
 
-void csSystemDriver::csEventOutlet::Key (int iKey, int iChar, bool iDown)
+void csEventOutlet::Key (int iKey, int iChar, bool iDown)
 {
   if ((iKey || iChar) && (EnableMask & CSEVTYPE_Keyboard))
-    System->Keyboard.DoKey (iKey, iChar, iDown);
+  {
+    iKeyboardDriver* k = GetKeyboardDriver();
+    if (k != 0)
+      k->DoKey (iKey, iChar, iDown);
+  }
 }
 
-void csSystemDriver::csEventOutlet::Mouse (int iButton, bool iDown, int x, int y)
+void csEventOutlet::Mouse (int iButton, bool iDown, int x, int y)
 {
   if (EnableMask & CSEVTYPE_Mouse)
-    if (iButton == 0)
-      System->Mouse.DoMotion (x, y);
-    else
-      System->Mouse.DoButton (iButton, iDown, x, y);
+  {
+    iMouseDriver* m = GetMouseDriver();
+    if (m != 0)
+    {
+      if (iButton == 0)
+        m->DoMotion (x, y);
+      else
+        m->DoButton (iButton, iDown, x, y);
+    }
+  }
 }
 
-void csSystemDriver::csEventOutlet::Joystick (int iNumber, int iButton,
+void csEventOutlet::Joystick (int iNumber, int iButton,
   bool iDown, int x, int y)
 {
   if (EnableMask & CSEVTYPE_Joystick)
-    if (iButton == 0)
-      System->Joystick.DoMotion (iNumber, x, y);
-    else
-      System->Joystick.DoButton (iNumber, iButton, iDown, x, y);
+  {
+    iJoystickDriver* j = GetJoystickDriver();
+    if (j != 0)
+    {
+      if (iButton == 0)
+        j->DoMotion (iNumber, x, y);
+      else
+        j->DoButton (iNumber, iButton, iDown, x, y);
+    }
+  }
 }
 
-void csSystemDriver::csEventOutlet::Broadcast (int iCode, void *iInfo)
+void csEventOutlet::Broadcast (int iCode, void *iInfo)
 {
-  System->EventQueue.Put (new csEvent (csGetTicks (), csevBroadcast,
-    iCode, iInfo));
+  Queue->Post (new csEvent (csGetTicks (), csevBroadcast, iCode, iInfo));
 }
 
-void csSystemDriver::csEventOutlet::ImmediateBroadcast (int iCode, void *iInfo)
+void csEventOutlet::ImmediateBroadcast (int iCode, void *iInfo)
 {
   csEvent Event (csGetTicks (), csevBroadcast, iCode, iInfo);
-  System->HandleEvent (Event);
+  Queue->Dispatch (Event);
 }

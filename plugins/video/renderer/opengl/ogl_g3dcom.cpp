@@ -34,6 +34,8 @@
 #include "ogl_txtmgr.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include "isys/system.h"
@@ -220,8 +222,9 @@ bool csGraphics3DOGLCommon::Initialize (iObjectRegistry* p)
   object_reg = p;
   CS_ASSERT (object_reg != NULL);
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
   return true;
 }
 

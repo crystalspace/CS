@@ -17,48 +17,24 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_EVCORD__
-#define __CS_EVCORD__
+#ifndef __CS_CSEVCORD__
+#define __CS_CSEVCORD__
 
 #include "csutil/scf.h"
-#include "isys/event.h"
-
+#include "iutil/event.h"
 struct iPlugin;
+class csEventOutlet;
 
 class csEventCord : public iEventCord
 {
-public:
-  SCF_DECLARE_IBASE;
-
-  /// Create an event cord for a given category/subcategory
-  csEventCord(int category, int subcategory);
-
-  /// Insert a plugin into the event cord
-  virtual int Insert(iPlugin *plugin, int priority);
-
-  /// Remove a plugin from the event cord
-  virtual void Remove(iPlugin *plugin);
-
-  /// Get whether events are passed to the system event queue
-  virtual bool GetPass () const;
-
-  /// Set whether events are passed to the system event queue
-  virtual void SetPass (bool pass);
-
-  /**
-   * For the system driver to post events to the cord.
-   * Should not be used directly.
-   */
-  bool PutEvent (iEvent *event);
-
-  /// The category and subcategory of this events on this cord
-  const int category, subcategory;
-
 protected:
-  /// Pass events to the system queue?
+  // Pass events to the system queue?
   volatile bool pass;
 
-  /// Linked list of plugins
+  // The category and subcategory of this events on this cord
+  int category, subcategory;
+
+  // Linked list of plugins
   struct PluginData
   {
     iPlugin *plugin;
@@ -66,18 +42,44 @@ protected:
     PluginData *next;
   };
 
-  /// The cord itself
+  // The cord itself
   PluginData *plugins;
 
-  /// Protection against multiple threads accessing the same cord
+  // Protection against multiple threads accessing the same cord
   volatile int SpinLock;
 
-  /// Lock the queue for modifications: NESTED CALLS TO LOCK/UNLOCK NOT ALLOWED!
-  inline void Lock ()
-  { while (SpinLock) ; SpinLock++; }
-  /// Unlock the queue
-  inline void Unlock ()
-  { SpinLock--; }
+  // Lock the queue for modifications: NESTED CALLS TO LOCK/UNLOCK NOT ALLOWED!
+  inline void Lock() { while (SpinLock) {} SpinLock++; }
+  // Unlock the queue
+  inline void Unlock() { SpinLock--; }
+
+  // iEventOutlet places events into cords.
+  friend class csEventOutlet;
+  bool Post(iEvent*);
+
+public:
+  SCF_DECLARE_IBASE;
+
+  /// Create an event cord for a given category/subcategory
+  csEventCord(int category, int subcategory);
+
+  /// Insert a plugin into the event cord
+  virtual int Insert(iPlugin*, int priority);
+
+  /// Remove a plugin from the event cord
+  virtual void Remove(iPlugin*);
+
+  /// Get whether events are passed to the system event queue
+  virtual bool GetPass() const { return pass; }
+
+  /// Set whether events are passed to the system event queue
+  virtual void SetPass(bool flag) { pass = flag; }
+
+  /// Get the category of this cord.
+  virtual int GetCategory() const { return category; }
+
+  // Get the subcategory of this cord.
+  virtual int GetSubcategory() const { return subcategory; }
 };
 
-#endif // ! __CS_EVCORD__
+#endif // ! __CS_CSEVCORD__

@@ -20,9 +20,9 @@
 #define __CS_CSBE_H__
 
 #include "csutil/scf.h"
-#include "cssys/csinput.h"
+#include "csutil/csinput.h"
 #include "cssys/system.h"
-#include "isys/event.h"
+#include "iutil/event.h"
 #include "ivideo/graph2d.h" // csMouseCursorID
 #include <Handler.h>
 #include <MessageQueue.h>

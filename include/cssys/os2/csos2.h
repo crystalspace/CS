@@ -20,7 +20,7 @@
 #ifndef __CSOS2_H__
 #define __CSOS2_H__
 
-#include "cssys/csinput.h"
+#include "csutil/csinput.h"
 #include "cssys/system.h"
 #include "cssys/os2/os2help.h"
 

@@ -19,22 +19,23 @@
 #include <stdarg.h>
 
 #include "cssysdef.h"
-#include "cssys/system.h"
-#include "qint.h"
+#include "inf_g3d.h"
+#include "inf_txt.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
-#include "video/renderer/inf/inf_g3d.h"
-#include "video/renderer/inf/inf_txt.h"
+#include "cssys/system.h"
+#include "imesh/thing/lightmap.h"	//@@@
+#include "imesh/thing/polygon.h"	//@@@
+#include "isys/plugin.h"
+#include "isys/system.h"
 #include "iutil/cfgfile.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "isys/system.h"
-#include "isys/plugin.h"
-#include "isys/event.h"
 #include "ivideo/graph2d.h"
-#include "imesh/thing/polygon.h"	//@@@
-#include "imesh/thing/lightmap.h"	//@@@
+#include "qint.h"
 
 ///---------------------------------------------------------------------------
 
@@ -115,9 +116,9 @@ csGraphics3DInfinite::~csGraphics3DInfinite ()
   if (G2D) G2D->DecRef ();
 }
 
-bool csGraphics3DInfinite::Initialize (iObjectRegistry *object_reg)
+bool csGraphics3DInfinite::Initialize (iObjectRegistry *r)
 {
-  csGraphics3DInfinite::object_reg = object_reg;
+  object_reg = r;
 
   config.AddConfig(object_reg, "/config/inf3d.cfg");
 
@@ -131,8 +132,10 @@ bool csGraphics3DInfinite::Initialize (iObjectRegistry *object_reg)
 
   texman = new csTextureManagerInfinite (object_reg, G2D, config);
   vbufmgr = new csPolArrayVertexBufferManager (object_reg);
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
+
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
 
   return true;
 }

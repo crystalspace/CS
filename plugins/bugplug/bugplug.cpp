@@ -31,7 +31,7 @@
 #include "shadow.h"
 #include "isys/system.h"
 #include "isys/vfs.h"
-#include "isys/event.h"
+#include "iutil/event.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
@@ -49,6 +49,7 @@
 #include "iengine/movable.h"
 #include "iengine/camera.h"
 #include "isys/plugin.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "qint.h"
 
@@ -131,11 +132,10 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
 {
   csBugPlug::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  if (!sys->CallOnEvents (this, CSMASK_Nothing|CSMASK_KeyUp|CSMASK_KeyDown|
-  	CSMASK_MouseUp|CSMASK_MouseDown))
-    return false;
-
+  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  if (q != 0)
+    q->RegisterListener (this, CSMASK_Nothing|CSMASK_KeyUp|CSMASK_KeyDown|
+  	CSMASK_MouseUp|CSMASK_MouseDown);
   return true;
 }
 

@@ -31,6 +31,7 @@ struct iDynLight;
 struct iCollideSystem;
 struct iFont;
 struct iLoader;
+struct iKeyboardDriver;
 
 enum TextAlignmentModes {ALIGN_LEFT,ALIGN_RIGHT,ALIGN_CENTER};
 
@@ -38,7 +39,7 @@ class Phyztest : public SysSystemDriver
 {
   typedef SysSystemDriver superclass;
 public:
-  iFont *courierFont;
+  iFont* courierFont;
   int write_colour;
   iSector* room;
   iView* view;
@@ -47,9 +48,10 @@ public:
   float angle;
   int motion_flags;
   iCollideSystem* cdsys;
-  iLoader *LevelLoader;
-  iGraphics2D *myG2D;
-  iGraphics3D *myG3D;
+  iLoader* LevelLoader;
+  iGraphics2D* myG2D;
+  iGraphics3D* myG3D;
+  iKeyboardDriver* kbd;
 
   void WriteShadow (int align, int x, int y, int fg, char *str,...);
   void Write (int align, int x, int y, int fg, int bg, char *str,...);
@@ -65,6 +67,4 @@ public:
   void Report (int severity, const char* msg, ...);
 };
 
-
 #endif // PHYZTEST_H
-

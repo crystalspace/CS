@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SARRAY_H__
-#define __SARRAY_H__
+#ifndef __CSUTIL_INTARRAY_H__
+#define __CSUTIL_INTARRAY_H__
 
 #include "csutil/garray.h"
 
@@ -42,4 +42,4 @@ public:
   static csIntArray *CreateIdentityMapping (int n, int offset = 0);
 };
 
-#endif // __SARRAY_H__
+#endif // __CSUTIL_INTARRAY_H__

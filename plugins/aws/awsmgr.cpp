@@ -27,7 +27,7 @@ bool
 awsManager::Initialize(iObjectRegistry *object_reg)
 {   
   awsManager::object_reg = object_reg;
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+//   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
     
   printf("aws-debug: getting preference manager.\n");  
   iAwsPrefs *prefs =  SCF_CREATE_INSTANCE ("crystalspace.window.preferencemanager", iAwsPrefs);
@@ -152,8 +152,8 @@ awsManager::SetDefaultContext(iEngine* engine, iTextureManager* txtmgr)
    
     if (engine!=NULL)
     {
-      iTextureWrapper *tw = engine->GetTextureList()->NewTexture(canvas.GetTextureWrapper()->GetTextureHandle());
-      iMaterialWrapper *canvasMat = engine->CreateMaterial("awsCanvasMat", tw);
+//       iTextureWrapper *tw = engine->GetTextureList()->NewTexture(canvas.GetTextureWrapper()->GetTextureHandle());
+//       iMaterialWrapper *canvasMat = engine->CreateMaterial("awsCanvasMat", tw);
     }
     
     DefaultContextInitialized=true;
@@ -274,7 +274,7 @@ awsManager::Redraw()
    
    /******* The following code is only executed if there is something to redraw *************/
    
-   awsWindow *curwin=top, *oldwin;
+   awsWindow *curwin=top, *oldwin = 0;
    
    // check to see if any part of this window needs redrawn
    while(curwin)
@@ -467,10 +467,6 @@ awsManager::awsCanvas::awsCanvas ()
    
 }
 
-awsManager::awsCanvas::~awsCanvas ()
-{
-}
- 
 void 
 awsManager::awsCanvas::Animate (csTicks current_time)
 {

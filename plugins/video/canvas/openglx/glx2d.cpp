@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "video/canvas/openglx/glx2d.h"
 #include "csutil/scf.h"
-#include "cssys/csinput.h"
+#include "csutil/csinput.h"
 #include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
 #include "isys/system.h"
@@ -27,6 +27,7 @@
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "iutil/cfgfile.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 
@@ -105,9 +106,10 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
   // The texture manager only needs to know this:
   pfmt.PalEntries = 0;
 
-  iSystem* sys = CS_GET_SYSTEM (object_reg);
   // Create the event outlet
-  EventOutlet = sys->CreateEventOutlet (this);
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    EventOutlet = q->CreateEventOutlet (this);
 
   return true;
 }

@@ -19,10 +19,11 @@
 #include <stdarg.h>
 
 #include "cssysdef.h"
-#include "csgeom/math3d.h"
 #include "cssys/system.h"
 #include "cssys/win32/win32.h"
 #include "iutil/cfgmgr.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 
@@ -446,7 +447,9 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   Win32Helper* winhelper = new Win32Helper (this);
   scfiObjectRegistry.Register (winhelper, "SystemHelper");
 
-  EventOutlet = CreateEventOutlet (this);
+  iEventQueue* q = CS_QUERY_REGISTRY((&scfiObjectRegistry), iEventQueue);
+  if (q != 0)
+    EventOutlet = q->CreateEventOutlet (this);
 }
 
 SysSystemDriver::~SysSystemDriver ()

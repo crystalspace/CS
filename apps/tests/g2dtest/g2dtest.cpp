@@ -35,6 +35,8 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/fontserv.h"
 #include "iutil/cmdline.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 
 CS_IMPLEMENT_APPLICATION
@@ -78,6 +80,8 @@ class G2DTestSystemDriver : public SysSystemDriver
   bool SwitchBB;
   // Current font
   iFont *font;
+  // Event Outlet
+  iEventOutlet* EventOutlet;
 
 public:
   iGraphics2D *myG2D;
@@ -119,13 +123,22 @@ G2DTestSystemDriver::G2DTestSystemDriver () : SysSystemDriver ()
   font = NULL;
   pfmt_init = false;
 
+  iEventQueue* q = CS_QUERY_REGISTRY((&scfiObjectRegistry), iEventQueue);
+  if (q != 0)
+  {
+    EventOutlet = q->GetEventOutlet();
+    EventOutlet->IncRef();
+  }
+
   RequestPlugin ("crystalspace.kernel.vfs:VFS");
 }
 
 G2DTestSystemDriver::~G2DTestSystemDriver ()
 {
-  if (font)
-    font->DecRef ();
+  if (EventOutlet != 0)
+    EventOutlet->DecRef();
+  if (font != 0)
+    font->DecRef();
 }
 
 void G2DTestSystemDriver::EnterState (appState newstate, int arg)
@@ -178,7 +191,7 @@ void G2DTestSystemDriver::NextFrame ()
 
   if (state_sptr == 0)
   {
-    GetSystemEventOutlet ()->Broadcast (cscmdQuit);
+    EventOutlet->Broadcast (cscmdQuit);
     return;
   }
 
@@ -837,6 +850,14 @@ int main (int argc, char *argv[])
   }
 
   if (!System.Open ())
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.g2dtest",
+        "Unable to open drivers!");
+    return -1;
+  }
+
+  if (!System.myG2D.Open ())
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.g2dtest",

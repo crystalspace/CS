@@ -59,6 +59,7 @@ struct iSoundRender;
 struct iMotionManager;
 struct iModelConverter;
 struct iCrossBuilder;
+struct iKeyboardDriver;
 
 // type information
 
@@ -140,6 +141,7 @@ class WalkTest : public SysSystemDriver
 public:
   iObjectRegistry* object_reg;
   iPluginManager* plugin_mgr;
+  iKeyboardDriver* kbd;
 
   int FrameWidth, FrameHeight;
 

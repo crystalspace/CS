@@ -27,8 +27,9 @@
 #include "isound/renderer.h"
 #include "iutil/cfgfile.h"
 #include "iutil/objreg.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "ivaria/reporter.h"
-#include "isys/event.h"
 #include "wodrv.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -65,11 +66,12 @@ csSoundDriverWaveOut::~csSoundDriverWaveOut()
 {
 }
 
-bool csSoundDriverWaveOut::Initialize (iObjectRegistry *object_reg)
+bool csSoundDriverWaveOut::Initialize (iObjectRegistry *r)
 {
-  csSoundDriverWaveOut::object_reg = object_reg;
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->CallOnEvents(&scfiPlugin, csevCommand | csevBroadcast);
+  object_reg = r;
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->RegisterListener(&scfiPlugin, CSMASK_Command | CSMASK_Broadcast);
   Config.AddConfig(object_reg, "/config/sound.cfg");
   return true;
 }
@@ -284,12 +286,13 @@ void csSoundDriverWaveOut::SoundProc(LPWAVEHDR OldHeader) {
     // data is sent to the output device in the background.
     MMRESULT result = waveOutWrite(WaveOut, lpWaveHdr, sizeof(WAVEHDR)); 
     if (result != MMSYSERR_NOERROR) {
-      Report (CS_REPORTER_SEVERITY_WARNING, "cannot write sound block to wave-out "
-        "(%s).", GetMMError(result));
+      Report (CS_REPORTER_SEVERITY_WARNING,
+        "Cannot write sound block to wave-out (%s).", GetMMError(result));
 
       result = waveOutUnprepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
-      if (result != MMSYSERR_NOERROR) Report(CS_REPORTER_SEVERITY_WARNING, "cannot "
-        "unprepare sound block (%s).", GetMMError(result));
+      if (result != MMSYSERR_NOERROR)
+        Report(CS_REPORTER_SEVERITY_WARNING,
+	  "Cannot unprepare sound block (%s).", GetMMError(result));
       GlobalUnlock(Block->DataHandle);
       GlobalFree(Block->DataHandle);
       delete Block;

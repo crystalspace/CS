@@ -39,7 +39,7 @@ struct iPlugin : public iBase
   virtual bool Initialize (iObjectRegistry *object_reg) = 0;
   /**
    * This is plugin's event handler. Plugin should register first
-   * with the system driver (using iSystem::CallOnEvents method)
+   * with an event queue, using iEventQueue::RegisterListener() method,
    * before he'll receive any events. The handler should return true
    * if the event has been handled indeed (and thus to not pass it further).
    * The default implementation of HandleEvent does nothing.
@@ -67,7 +67,7 @@ struct iPlugin : public iBase
  * [Plugins]
  * VideoDriver = crystal.graphics3d.software
  * </pre>
- * "VideoDriver" is functionality identifier, and "crystal.graphics3d.software"
+ * "VideoDriver" is functionality identifier and "crystal.graphics3d.software"
  * is SCF class ID. No two plugins can have same functionality ID. When you
  * load a plugin with System::RequestPlugin() you can define functionality ID
  * after a double colon:
@@ -127,7 +127,7 @@ struct iPlugin : public iBase
  * for some basic interface, say iBase or iPlugin.
  */
 #define CS_QUERY_PLUGIN_ID(Object,FuncID,Interface)			\
-  (Interface *)((Object)->QueryPlugin (FuncID, #Interface, VERSION_##Interface))
+  (Interface*)((Object)->QueryPlugin (FuncID, #Interface, VERSION_##Interface))
 
 /**
  * Find a plugin by his class ID and functionality ID. First the plugin
@@ -140,7 +140,8 @@ struct iPlugin : public iBase
  * say iBase or iPlugin.
  */
 #define CS_QUERY_PLUGIN_CLASS(Object,ClassID,FuncID,Interface)		\
-  (Interface *)((Object)->QueryPlugin (ClassID, FuncID, #Interface, VERSION_##Interface))
+  (Interface *)((Object)->QueryPlugin					\
+  (ClassID, FuncID, #Interface, VERSION_##Interface))
 
 /**
  * Tell plugin manager driver to load a plugin.
@@ -149,7 +150,8 @@ struct iPlugin : public iBase
  * `Interface' is a interface name (iGraphics2D, iVFS and so on).
  */
 #define CS_LOAD_PLUGIN(Object,ClassID,FuncID,Interface)			\
-  (Interface *)((Object)->LoadPlugin (ClassID, FuncID, #Interface, VERSION_##Interface))
+  (Interface *)((Object)->LoadPlugin					\
+  (ClassID, FuncID, #Interface, VERSION_##Interface))
 
 /**
  * Same as CS_LOAD_PLUGIN but don't bother asking for a interface.
@@ -188,4 +190,3 @@ struct iPluginManager : public iBase
 };
 
 #endif // __ISYS_PLUGIN_H__
-

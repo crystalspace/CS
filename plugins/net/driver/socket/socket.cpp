@@ -21,8 +21,9 @@
 #include "cssysdef.h"
 #include "socket.h"
 #include "isys/system.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
-#include "isys/event.h"
 #include "csutil/util.h"
 
 #define CS_NET_LISTEN_QUEUE_SIZE 5
@@ -233,8 +234,9 @@ void csSocketDriver::Close()
 bool csSocketDriver::eiPlugin::Initialize(iObjectRegistry* object_reg)
 {
   scfParent->object_reg = object_reg;
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->CallOnEvents(this, CSMASK_Command | CSMASK_Broadcast);
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->RegisterListener(this, CSMASK_Command | CSMASK_Broadcast);
   return true;
 }
 

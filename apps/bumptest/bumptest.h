@@ -34,6 +34,7 @@ struct iView;
 struct iEngine;
 struct iDynLight;
 struct iMaterialWrapper;
+struct iKeyboardDriver;
 class csProcBump;
 
 class BumpTest : public SysSystemDriver
@@ -48,6 +49,7 @@ private:
   iMaterialWrapper* matBump;
   iLoader *LevelLoader;
   iGraphics3D *myG3D;
+  iKeyboardDriver* kbd;
 
   float animli;
   bool going_right;

@@ -25,6 +25,7 @@
 struct iEngine;
 struct iLoader;
 struct iGraphics3D;
+struct iKeyboardDriver;
 struct iSector;
 struct iView;
 struct iTextureHandle;
@@ -37,6 +38,7 @@ private:
   iEngine* engine;
   iLoader* loader;
   iGraphics3D* g3d;
+  iKeyboardDriver* kbd;
   iSector* room;
   iView* view;
   csEngineProcTex* ProcTexture;

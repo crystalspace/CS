@@ -27,14 +27,15 @@
 #include "csutil/util.h"
 #include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
-#include "cssys/csevent.h"
+#include "csutil/csevent.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivaria/reporter.h"
-#include "isys/evdefs.h"
 #include "isys/system.h"
 #include "isys/plugin.h"
+#include "iutil/evdefs.h"
+#include "iutil/eventq.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/objreg.h"
 
@@ -152,8 +153,9 @@ bool csSimpleConsole::Initialize (iObjectRegistry *object_reg)
   CursorTime = csGetTicks ();
 
   // We want to see broadcast events
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
 
   return true;
 }

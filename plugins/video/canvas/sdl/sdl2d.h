@@ -22,7 +22,7 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "isys/event.h"
+#include "iutil/event.h"
 
 #include <SDL.h>
 #include <SDL_mutex.h>

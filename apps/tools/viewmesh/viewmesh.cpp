@@ -23,8 +23,10 @@
 #include "cstool/initapp.h"
 #include "viewmesh.h"
 #include "isys/plugin.h"
-#include "iutil/objreg.h"
 #include "iutil/cmdline.h"
+#include "iutil/event.h"
+#include "iutil/objreg.h"
+#include "iutil/csinput.h"
 #include "iengine/sector.h"
 #include "iengine/engine.h"
 #include "iengine/camera.h"
@@ -59,6 +61,7 @@ ViewMesh::ViewMesh ()
   engine = NULL;
   loader = NULL;
   g3d = NULL;
+  kbd = NULL;
 }
 
 ViewMesh::~ViewMesh ()
@@ -67,6 +70,7 @@ ViewMesh::~ViewMesh ()
   if (engine) engine->DecRef ();
   if (loader) loader->DecRef();
   if (g3d) g3d->DecRef ();
+  if (kbd) kbd->DecRef ();
 }
 
 void ViewMesh::Report (int severity, const char* msg, ...)
@@ -100,7 +104,7 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
   
   if (!csInitializeApplication (object_reg))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "couldn't init app! (plugins missing?)");
+    Report(CS_REPORTER_SEVERITY_ERROR,"couldn't init app! (plugins missing?)");
     return false;
   }
 
@@ -128,6 +132,14 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     abort ();
   }
+
+  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  if (!kbd)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver plugin!");
+    abort ();
+  }
+  kbd->IncRef();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   iGraphics2D* g2d = g3d->GetDriver2D ();
@@ -281,8 +293,8 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
   	  meshfilename);
     if (imeshfact == NULL)
     {
-      Report (CS_REPORTER_SEVERITY_ERROR, "Error loading mesh object factory '%s'!",
-      	meshfilename);
+      Report (CS_REPORTER_SEVERITY_ERROR,
+        "Error loading mesh object factory '%s'!", meshfilename);
       Cleanup ();
       exit (1);
     }
@@ -333,17 +345,17 @@ void ViewMesh::NextFrame ()
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
 
   iCamera* c = view->GetCamera();
-  if (GetKeyState (CSKEY_RIGHT))
+  if (kbd->GetKeyState (CSKEY_RIGHT))
     c->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
-  if (GetKeyState (CSKEY_LEFT))
+  if (kbd->GetKeyState (CSKEY_LEFT))
     c->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
-  if (GetKeyState (CSKEY_PGUP))
+  if (kbd->GetKeyState (CSKEY_PGUP))
     c->GetTransform ().RotateThis (VEC_TILT_UP, speed);
-  if (GetKeyState (CSKEY_PGDN))
+  if (kbd->GetKeyState (CSKEY_PGDN))
     c->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
-  if (GetKeyState (CSKEY_UP))
+  if (kbd->GetKeyState (CSKEY_UP))
     c->Move (VEC_FORWARD * 4 * speed);
-  if (GetKeyState (CSKEY_DOWN))
+  if (kbd->GetKeyState (CSKEY_DOWN))
     c->Move (VEC_BACKWARD * 4 * speed);
 
   // Tell 3D driver we're going to display 3D things.
@@ -373,11 +385,11 @@ int main (int argc, char* argv[])
   // We want at least the minimal set of plugins
   System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
   //@@@ WHY IS THE FONTSERVER NEEDED FOR OPENGL AND NOT FOR SOFTWARE???
-  System->RequestPlugin ("crystalspace.font.server.default:FontServer");
-  System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
-  System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-  System->RequestPlugin ("crystalspace.engine.3d:Engine");
-  System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
+  System->RequestPlugin("crystalspace.font.server.default:FontServer");
+  System->RequestPlugin("crystalspace.graphic.image.io.multiplex:ImageLoader");
+  System->RequestPlugin("crystalspace.graphics3d.software:VideoDriver");
+  System->RequestPlugin("crystalspace.engine.3d:Engine");
+  System->RequestPlugin("crystalspace.level.loader:LevelLoader");
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.

@@ -30,6 +30,8 @@
 #include "cssys/system.h"
 #include "cssys/be/csbe.h"
 #include "csutil/util.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 
 SCF_IMPLEMENT_IBASE_EXT(SysSystemDriver)
   SCF_IMPLEMENTS_INTERFACE(iEventPlug)
@@ -129,7 +131,10 @@ bool SysSystemDriver::Initialize (int argc, char const* const argv[],
   if (strlen(path) > 0)
     chdir(path);
 
-  event_outlet = CreateEventOutlet(this);
+  iEventQueue* q = CS_QUERY_EVENT((&scfiObjectRegistry), iEventQueue);
+  if (q != 0)
+    event_outlet = q->CreateEventOutlet(this);
+
   if (be_app == 0)			// *2*
     (void)new BApplication("application/x-vnd.xsware-crystal");
   be_app->AddHandler(this);		// *3*

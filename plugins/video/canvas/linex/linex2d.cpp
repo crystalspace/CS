@@ -18,17 +18,18 @@
 
 #include <stdarg.h>
 #include "cssysdef.h"
-#include "csutil/scf.h"
-#include "csutil/csstring.h"
-#include "video/canvas/linex/linex2d.h"
+#include "linex2d.h"
 #include "csgeom/csrect.h"
+#include "csutil/cfgacc.h"
+#include "csutil/csstring.h"
+#include "csutil/scf.h"
+#include "isys/plugin.h"
 #include "isys/system.h"
 #include "iutil/cfgmgr.h"
-#include "csutil/cfgacc.h"
 #include "iutil/cmdline.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "isys/plugin.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -111,12 +112,14 @@ bool csGraphics2DLineXLib::Initialize (iObjectRegistry *object_reg)
   FontServer = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.font.server.linex2d",
     CS_FUNCID_FONTSERVER, iFontServer);
 
-  // Tell system driver to call us on broadcast events
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
-
-  // Create the event outlet
-  EventOutlet = sys->CreateEventOutlet (this);
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+  {
+    // Tell event queue to call us on broadcast events
+    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
+    // Create the event outlet
+    EventOutlet = q->CreateEventOutlet (this);
+  }
   return true;
 }
 

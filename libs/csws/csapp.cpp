@@ -25,7 +25,7 @@
 #include "csutil/csstrvec.h"
 #include "csutil/scanstr.h"
 #include "csutil/csstring.h"
-#include "cssys/cseventq.h"
+#include "csutil/cseventq.h"
 #include "csws/cslistbx.h"
 #include "csws/csmenu.h"
 #include "csws/cswindow.h"
@@ -34,12 +34,14 @@
 #include "csws/cswsutil.h"
 #include "csws/csskin.h"
 #include "csws/cswsaux.h"
+#include "isys/plugin.h"
 #include "isys/system.h"
 #include "isys/vfs.h"
 #include "ivideo/txtmgr.h"
-#include "isys/event.h"
-#include "isys/plugin.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
+#include "iutil/csinput.h"
 #include "igraphic/imageio.h"
 #include "ivaria/reporter.h"
 
@@ -61,12 +63,14 @@ bool csApp::csAppPlugin::Initialize (iObjectRegistry *object_reg)
   app->VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
   if (!app->VFS) return false;
 
-  // Get system event outlet for faster access
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  app->EventOutlet = sys->GetSystemEventOutlet ();
-
-  // We want ALL the events! :)
-  return sys->CallOnEvents (this, unsigned (-1));
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+  {
+    app->EventOutlet = q->GetEventOutlet();
+    // We want ALL the events! :)
+    q->RegisterListener (this, (unsigned int)(~0));
+  }
+  return true;
 }
 
 bool csApp::csAppPlugin::HandleEvent (iEvent &Event)
@@ -91,7 +95,7 @@ bool csApp::csAppPlugin::HandleEvent (iEvent &Event)
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//-- csApp -//--
 
-csApp::csApp (iObjectRegistry *object_reg, csSkin &Skin)
+csApp::csApp (iObjectRegistry *r, csSkin &Skin)
   : csComponent (NULL)
 {
   Mouse = new csMouse(this);
@@ -109,9 +113,16 @@ csApp::csApp (iObjectRegistry *object_reg, csSkin &Skin)
   DefaultFont = NULL;
   InFrame = false;
   ImageLoader = NULL;
-  csApp::object_reg = object_reg;
+  object_reg = r;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   LastMouseContainer = NULL;
+
+  KeyboardDriver = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  if (KeyboardDriver != 0)
+    KeyboardDriver->IncRef();
+  MouseDriver = CS_QUERY_REGISTRY (object_reg, iMouseDriver);
+  if (MouseDriver != 0)
+    MouseDriver->IncRef();
 
   OldMouseCursorID = csmcNone;
   MouseCursorID = csmcArrow;
@@ -140,6 +151,11 @@ csApp::~csApp ()
   // Free the resources allocated by the skin
   if (skin)
     skin->Deinitialize ();
+
+  if (KeyboardDriver != 0)
+    KeyboardDriver->DecRef();
+  if (MouseDriver != 0)
+    MouseDriver->DecRef();
 
   if (VFS)
     VFS->DecRef ();
@@ -667,9 +683,8 @@ bool csApp::HandleEvent (iEvent &Event)
     return true;
 
   // Handle 'window list' event
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
   if ((Event.Type == csevMouseDown)
-   && (((sys->GetMouseButton (1) && sys->GetMouseButton (2)))
+   && (((MouseDriver->GetLastButton (1) && MouseDriver->GetLastButton (2)))
     || (Event.Mouse.Button == 3)))
   {
     WindowList ();
@@ -720,8 +735,7 @@ void csApp::Draw ()
 
 bool csApp::GetKeyState (int iKey)
 {
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  return sys->GetKeyState (iKey);
+  return KeyboardDriver->GetKeyState (iKey);
 }
 
 void csApp::Insert (csComponent *comp)

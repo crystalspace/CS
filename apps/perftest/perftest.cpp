@@ -31,6 +31,7 @@
 #include "igraphic/imageio.h"
 #include "igraphic/image.h"
 #include "iutil/cmdline.h"
+#include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "isys/plugin.h"
 #include "ivaria/reporter.h"

@@ -37,7 +37,9 @@
 #include "imesh/partsys.h"
 #include "imesh/fountain.h"
 #include "isys/plugin.h"
+#include "iutil/event.h"
 #include "iutil/objreg.h"
+#include "iutil/csinput.h"
 #include "ivaria/reporter.h"
 #include "genmaze.h"
 
@@ -55,19 +57,23 @@ IsoTest::IsoTest ()
   light = NULL;
   myG2D = NULL;
   myG3D = NULL;
+  kbd = NULL;
+  mouse = NULL;
   lastclick.Set(0,0,0);
   walking = false;
 }
 
 IsoTest::~IsoTest ()
 {
-  if(view) view->DecRef();
-  if (myG2D) myG2D->DecRef ();
-  if (myG3D) myG3D->DecRef ();
-  if(world) world->DecRef();
-  if(engine) engine->DecRef();
-  if(font) font->DecRef();
-  if(light) light->DecRef();
+  if (view) view->DecRef();
+  if (myG2D) myG2D->DecRef();
+  if (myG3D) myG3D->DecRef();
+  if (kbd) kbd->DecRef();
+  if (mouse) mouse->DecRef();
+  if (world) world->DecRef();
+  if (engine) engine->DecRef();
+  if (font) font->DecRef();
+  if (light) light->DecRef();
 }
 
 void IsoTest::Report (int severity, const char* msg, ...)
@@ -149,6 +155,22 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics2D plugin!");
     abort ();
   }
+
+  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  if (!kbd)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver!");
+    abort ();
+  }
+  kbd->IncRef();
+
+  mouse = CS_QUERY_REGISTRY (object_reg, iMouseDriver);
+  if (!mouse)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iMouseDriver!");
+    abort ();
+  }
+  mouse->IncRef();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = myG2D->GetNativeWindow ();
@@ -625,19 +647,19 @@ void IsoTest::NextFrame ()
   // according to keyboard state
   float speed = (elapsed_time / 1000.) * (0.10 * 20);
   csVector3 playermotion(0,0,0);
-  if (GetKeyState (CSKEY_RIGHT)) playermotion += csVector3(0,0,speed);
-  if (GetKeyState (CSKEY_LEFT)) playermotion += csVector3(0,0,-speed);
-  if (GetKeyState (CSKEY_PGUP)) playermotion += csVector3(0,speed,0);
-  if (GetKeyState (CSKEY_PGDN)) playermotion += csVector3(0,-speed,0);
-  if (GetKeyState (CSKEY_UP)) playermotion += csVector3(-speed,0,0);
-  if (GetKeyState (CSKEY_DOWN)) playermotion += csVector3(speed,0,0);
+  if (kbd->GetKeyState (CSKEY_RIGHT)) playermotion += csVector3(0,0,speed);
+  if (kbd->GetKeyState (CSKEY_LEFT)) playermotion += csVector3(0,0,-speed);
+  if (kbd->GetKeyState (CSKEY_PGUP)) playermotion += csVector3(0,speed,0);
+  if (kbd->GetKeyState (CSKEY_PGDN)) playermotion += csVector3(0,-speed,0);
+  if (kbd->GetKeyState (CSKEY_UP)) playermotion += csVector3(-speed,0,0);
+  if (kbd->GetKeyState (CSKEY_DOWN)) playermotion += csVector3(speed,0,0);
   if(!playermotion.IsZero()) // keyboard stops player movement by mouse
     walking = false;
-  if (GetMouseButton(1))
+  if (mouse->GetLastButton(1))
   {
     walking = true;
-    int mousex, mousey; 
-    GetMousePosition(mousex, mousey);
+    int mousex = mouse->GetLastX();
+    int mousey = mouse->GetLastY();
     // y is up in camera view
     csVector2 screenpos(mousex, myG3D->GetHeight() - mousey);
     view->S2W(screenpos, lastclick);

@@ -62,16 +62,17 @@ class csSchedulePart;
  * in the NextFrame() method, you must call the TimePassed(elapsed_time)
  * function.
  *
- * This class is useful for callbacks in 3D virtual worlds, but the
- * callbacks can have some jitter due to framerates. For mission-critical
- * hardware IO calls (like controlling a floppy drive or controlling the UART)
- * this jitter will be too big. In those cases use interrupt-driven callbacks,
- * and place the controlling code in the SystemDriver, since this type of
- * use is typically OS/platform dependent. However, although this class cannot
- * give callbacks inside a single frame, it will behave as best as possible
- * using callbacks every frame.
+ * This class is useful for callbacks in 3D virtual worlds, but the callbacks
+ * can have some jitter due to framerates.  For mission-critical hardware IO
+ * calls (like controlling a floppy drive or controlling the UART) this jitter
+ * will be too big.  In those cases use interrupt-driven callbacks, and place
+ * the controlling code in some platform-specific implementation file, since
+ * this type of use is typically platform-dependent.  However, although this
+ * class cannot give callbacks inside a single frame, it will behave as best as
+ * possible using callbacks every frame.
  */
-class csSchedule {
+class csSchedule
+{
 private:
   // first part of the scheduled callbacks
   csSchedulePart *first;
@@ -131,30 +132,6 @@ public:
    *     schedule->RemoveCallback(this);
    */
   void RemoveCallback(void *arg);
-
 };
-
-/*
-  This class is used internally by the csSchedule class.
-  It stores the callback information.
-  The parts are linked, during use, in time-sequence, with the
-  first one to call at the front. In this manner, only the
-  first part has to be examined during each frame.
-*/
-class csSchedulePart {
-public:
-  /// function to call
-  void (*callback)(void*);
-  /// argument to pass to function
-  void *arg;
-  /// period in msec. (period 0 means a single-shot callback)
-  int period;
-
-  /// how many msec after the previous part this part should be called
-  int after;
-  /// next part in the linked time-sequence-sorted list 
-  csSchedulePart *next;
-};
-
 
 #endif // __CS_SCHEDULE_H__

@@ -20,7 +20,7 @@
 #define __X2D_H__
 
 #include "video/canvas/common/graph2d.h"
-#include "isys/event.h"
+#include "iutil/event.h"
 #include "ivideo/xwindow.h"
 #include "ivideo/xextshm.h"
 

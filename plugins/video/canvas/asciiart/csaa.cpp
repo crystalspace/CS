@@ -21,16 +21,15 @@
 #include <stdarg.h>
 #include <limits.h>
 #include "cssysdef.h"
-#include "csutil/scf.h"
+#include "csaa.h"
 #include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
 #include "isys/system.h"
-#include "isys/event.h"
 #include "iutil/cfgfile.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "qint.h"
-
-#include "csaa.h"
 
 //---------------------------------------------------------- csGraphics2DAA ---
 
@@ -129,8 +128,9 @@ bool csGraphics2DAA::Initialize (iObjectRegistry *object_reg)
   pfmt.BlueMask   = 0xff;
   pfmt.complete ();
 
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys = System->CreateEventOutlet (this);
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q = System->CreateEventOutlet (this);
   return true;
 }
 

@@ -127,7 +127,7 @@ ifeq ($(MAKESECTION),targets)
 
 # Rule for creating directories.
 $(DIR.LIBREF): $(OUTBASE)
-	$(MKDIR)
+	-$(MKDIR)
 
 # Rule to synthesize SRC.LIBREF.
 $(SRC.LIBREF): $(DEP.LIBREF.EXTRA) $(DIR.LIBREF)

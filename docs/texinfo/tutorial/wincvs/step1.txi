@@ -18,9 +18,11 @@ can be obtained from the WinCVS website:
 
 @emph{Note}: The secure shell (@sc{ssh}) software is only required by
 developers who have been granted write-access to the Crystal Space @sc{cvs}
-repository by either Jorrit Tyberghein
-(@email{jorrit.tyberghein@@uz.kuleuven.ac.be}) or Eric Sunshine
-(@email{sunshine@@sunshineco.com}), the Crystal Space project administrators.
+repository by one of the project administrators.  The administrators are:
+
+@noindent
+Jorrit Tyberghein (@email{jorrit.tyberghein@@uz.kuleuven.ac.be})@*
+Eric Sunshine (@email{sunshine@@sunshineco.com})
 
 Secure Shell software comes in a variety of forms and increasingly via some
 open source @sc{ssh} projects.  However, for use with WinCVS, many Crystal
@@ -28,4 +30,11 @@ Space developers and myself have found one particular version which works well.
 The package @file{ssh-1.2.14-win32.exe} can be downloaded by using the
 following @sc{url}:
 
+@ifnottex
 @uref{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/ssh-1.2.14-win32.exe}
+@end ifnottex
+@iftex
+@noindent
+@code{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/}@*
+@code{ssh-1.2.14-win32.exe}
+@end iftex

@@ -19,7 +19,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/csevent.h"
+#include "csutil/csevent.h"
 
 SCF_IMPLEMENT_IBASE (csEvent)
   SCF_IMPLEMENTS_INTERFACE (iEvent)
@@ -30,7 +30,7 @@ csEvent::csEvent ()
   SCF_CONSTRUCT_IBASE (NULL);
 }
 
-csEvent::csEvent (csTicks iTime, int eType, int kCode, int kChar, int kModifiers)
+csEvent::csEvent (csTicks iTime,int eType,int kCode,int kChar,int kModifiers)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   Time = iTime;

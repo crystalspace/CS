@@ -21,8 +21,9 @@
 #include "cssysdef.h"
 #include "svga.h"
 #include "csgeom/csrect.h"
-#include "cssys/csinput.h"
+#include "csutil/csinput.h"
 #include "isys/system.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 
@@ -148,12 +149,14 @@ bool csGraphics2DSVGALib::Initialize (iObjectRegistry *object_reg)
   memset (mouse_button , 0, sizeof (mouse_button));
   memset (keydown, 0, sizeof (keydown));
 
-  // Tell system driver to call us on every frame
-  iSystem* sys = CS_GET_SYSTEM (object_reg);
-  sys->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
-  // Create the event outlet
-  EventOutlet = sys->CreateEventOutlet (this);
-
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+  {
+    // Tell event queue to call us on every frame
+    q->RegisterListener (&scfiPlugin, CSMASK_Nothing);
+    // Create the event outlet
+    EventOutlet = q->CreateEventOutlet (this);
+  }
   return true;
 }
 

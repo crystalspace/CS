@@ -19,14 +19,15 @@
 #include <string.h>
 #define CS_SYSDEF_PROVIDE_PATH
 #include "cssysdef.h"
+#include "sequence.h"
 #include "cssys/system.h"
 #include "csutil/scf.h"
-#include "sequence.h"
-#include "isys/system.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "isys/vfs.h"
-#include "isys/event.h"
+#include "isys/system.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -185,12 +186,12 @@ csSequenceManager::~csSequenceManager ()
   main_sequence->DecRef ();
 }
 
-bool csSequenceManager::Initialize (iObjectRegistry *object_reg)
+bool csSequenceManager::Initialize (iObjectRegistry *r)
 {
-  csSequenceManager::object_reg = object_reg;
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@ Temporary
-  if (!sys->CallOnEvents (&scfiPlugin, CSMASK_Nothing))
-    return false;
+  object_reg = r;
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->RegisterListener (&scfiPlugin, CSMASK_Nothing);
   return true;
 }
 

@@ -22,7 +22,9 @@
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
 #include "simple2.h"
+#include "iutil/event.h"
 #include "iutil/objreg.h"
+#include "iutil/csinput.h"
 #include "iengine/sector.h"
 #include "iengine/engine.h"
 #include "iengine/camera.h"
@@ -56,6 +58,7 @@ Simple::Simple ()
   engine = NULL;
   loader = NULL;
   g3d = NULL;
+  kbd = NULL;
 }
 
 Simple::~Simple ()
@@ -64,6 +67,7 @@ Simple::~Simple ()
   if (engine) engine->DecRef ();
   if (loader) loader->DecRef();
   if (g3d) g3d->DecRef ();
+  if (kbd) kbd->DecRef ();
 }
 
 void Cleanup ()
@@ -115,6 +119,16 @@ bool Simple::Initialize (int argc, const char* const argv[],
     	"No iGraphics3D plugin!");
     exit (1);
   }
+
+  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  if (!kbd)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple1",
+    	"No iKeyboardDriver plugin!");
+    exit (1);
+  }
+  kbd->IncRef();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ())
@@ -306,17 +320,17 @@ void Simple::NextFrame ()
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
 
   iCamera* c = view->GetCamera();
-  if (GetKeyState (CSKEY_RIGHT))
+  if (kbd->GetKeyState (CSKEY_RIGHT))
     c->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
-  if (GetKeyState (CSKEY_LEFT))
+  if (kbd->GetKeyState (CSKEY_LEFT))
     c->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
-  if (GetKeyState (CSKEY_PGUP))
+  if (kbd->GetKeyState (CSKEY_PGUP))
     c->GetTransform ().RotateThis (VEC_TILT_UP, speed);
-  if (GetKeyState (CSKEY_PGDN))
+  if (kbd->GetKeyState (CSKEY_PGDN))
     c->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
-  if (GetKeyState (CSKEY_UP))
+  if (kbd->GetKeyState (CSKEY_UP))
     c->Move (VEC_FORWARD * 4 * speed);
-  if (GetKeyState (CSKEY_DOWN))
+  if (kbd->GetKeyState (CSKEY_DOWN))
     c->Move (VEC_BACKWARD * 4 * speed);
 
   // Tell 3D driver we're going to display 3D things.

@@ -40,6 +40,8 @@
 #include "isys/vfs.h"
 #include "isys/plugin.h"
 #include "iutil/cfgmgr.h"
+#include "iutil/event.h"
+#include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "inetwork/driver.h"
 #include "ivideo/graph3d.h"
@@ -63,7 +65,6 @@
 #include "iengine/camera.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
-#include "iutil/object.h"
 #include "imap/parser.h"
 #include "ivaria/reporter.h"
 

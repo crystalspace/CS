@@ -1,6 +1,7 @@
 /*
     Crystal Space input library
     Copyright (C) 1998,2000 by Jorrit Tyberghein
+    Copyright (C) 2001 by Eric Sunshine <sunshine@sunshineco.com>
     Written by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -19,9 +20,12 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/system.h"
-#include "cssys/csinput.h"
-#include "isys/system.h"
+#include "csutil/cfgacc.h"
+#include "csutil/csevent.h"
+#include "csutil/csinput.h"
+#include "cssys/system.h" // @@@ For csGetTicks(); remove later.
+#include "iutil/eventq.h"
+#include "iutil/objreg.h"
 
 // This array defines first 32..128 character codes with SHIFT key applied
 char ShiftedKey [128-32] =
@@ -34,13 +38,75 @@ char ShiftedKey [128-32] =
 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '{', '|', '}', '~', 127
 };
 
+//--//--//--//--//--//--//--//--//--//--//--//--//--/> Input driver <--//--//--
+
+SCF_IMPLEMENT_IBASE (csInputDriver::FocusListener)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_IBASE_END
+
+csInputDriver::csInputDriver(iObjectRegistry* r) : Registry(r), Queue(0)
+{
+  Listener.Parent = this;
+  StartListening();
+}
+
+csInputDriver::~csInputDriver()
+{
+  // Force a refetch of Queue in order to double check its validity since, at
+  // shutdown time, the event queue might already have been destroyed.
+  Queue = 0;
+  GetEventQueue();
+  StopListening();
+}
+
+iEventQueue* csInputDriver::GetEventQueue()
+{
+  if (Queue == 0)
+    Queue = CS_QUERY_REGISTRY(Registry, iEventQueue);
+  return Queue;
+}
+
+void csInputDriver::StartListening()
+{
+  if (Queue == 0 && GetEventQueue() != 0) // Not already registered.
+    Queue->RegisterListener(&Listener, CSMASK_Command);
+}
+
+void csInputDriver::StopListening()
+{
+  if (Queue != 0) // Already registered.
+    Queue->RemoveListener(&Listener);
+}
+
+void csInputDriver::Post(iEvent* e)
+{
+  StartListening(); // If this failed at construction, try again.
+  if (Queue != 0)
+    Queue->Post(e);
+  else
+    e->DecRef();
+}
+
+bool csInputDriver::FocusListener::HandleEvent(iEvent& e)
+{
+  bool const mine = (e.Type == csevBroadcast && 
+    e.Command.Code == cscmdFocusChanged && !e.Command.Info);
+  if (mine) // Application lost focus.
+    Parent->LostFocus();
+  return mine;
+}
+
 //--//--//--//--//--//--//--//--//--//--//--//--//--/> Keyboard driver <--//--/
 
-csKeyboardDriver::csKeyboardDriver (csSystemDriver *system) :
-  KeyState (256 + (CSKEY_LAST - CSKEY_FIRST + 1))
+SCF_IMPLEMENT_IBASE(csKeyboardDriver)
+  SCF_IMPLEMENTS_INTERFACE(iKeyboardDriver)
+SCF_IMPLEMENT_IBASE_END
+
+csKeyboardDriver::csKeyboardDriver (iObjectRegistry* r) :
+  csInputDriver(r), KeyState (256 + (CSKEY_LAST - CSKEY_FIRST + 1))
 {
-  System = system;
-  KeyState.Reset ();
+  SCF_CONSTRUCT_IBASE(0);
+  KeyState.Reset();
 }
 
 void csKeyboardDriver::Reset ()
@@ -57,8 +123,8 @@ void csKeyboardDriver::DoKey (int iKey, int iChar, bool iDown)
   SetKeyState (iKey, iDown);
 
   smask |= (GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
-         | (GetKeyState (CSKEY_CTRL) ? CSMASK_CTRL : 0)
-         | (GetKeyState (CSKEY_ALT) ? CSMASK_ALT : 0);
+        |  (GetKeyState (CSKEY_CTRL ) ? CSMASK_CTRL  : 0)
+        |  (GetKeyState (CSKEY_ALT  ) ? CSMASK_ALT   : 0);
 
   if (iChar < 0)
   {
@@ -72,14 +138,17 @@ void csKeyboardDriver::DoKey (int iKey, int iChar, bool iDown)
       iChar = (iKey >= 32 && iKey <= 255) ? iKey : 0;
   }
 
-  System->EventQueue.Put (new csEvent (csGetTicks (),
+  Post(new csEvent (csGetTicks (),
     iDown ? csevKeyDown : csevKeyUp, iKey, iChar, smask));
 }
 
 void csKeyboardDriver::SetKeyState (int iKey, bool iDown)
 {
   int idx = (iKey < 256) ? iKey : (256 + iKey - CSKEY_FIRST);
-  if (iDown) KeyState.Set (idx); else KeyState.Reset (idx);
+  if (iDown)
+    KeyState.Set (idx);
+  else
+    KeyState.Reset (idx);
 }
 
 bool csKeyboardDriver::GetKeyState (int iKey)
@@ -90,23 +159,39 @@ bool csKeyboardDriver::GetKeyState (int iKey)
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--> Mouse driver <--//--/
 
-csTicks csMouseDriver::DoubleClickTime;
-size_t csMouseDriver::DoubleClickDist;
+SCF_IMPLEMENT_IBASE(csMouseDriver)
+  SCF_IMPLEMENTS_INTERFACE(iMouseDriver)
+SCF_IMPLEMENT_IBASE_END
 
-csMouseDriver::csMouseDriver (csSystemDriver *system)
+csMouseDriver::csMouseDriver (iObjectRegistry* r) :
+  csInputDriver(r), Keyboard(0)
 {
-  System = system;
+  SCF_CONSTRUCT_IBASE(0);
+
   LastX = LastY = 0;
   memset (&Button, 0, sizeof (Button));
+  Reset();
+
+  csConfigAccess cfg;
+  cfg.AddConfig(Registry, "/config/mouse.cfg");
+  SetDoubleClickTime (
+    cfg->GetInt ("MouseDriver.DoubleClickTime", 300),
+    cfg->GetInt ("MouseDriver.DoubleClickDist", 2));
 }
 
 void csMouseDriver::Reset ()
 {
-  int i;
-  for (i = 0; i < CS_MAX_MOUSE_BUTTONS; i++)
+  for (int i = 0; i < CS_MAX_MOUSE_BUTTONS; i++)
     if (Button[i])
       DoButton (i + 1, false, LastX, LastY);
   LastClickButton = -1;
+}
+
+iKeyboardDriver* csMouseDriver::GetKeyboardDriver()
+{
+  if (Keyboard == 0)
+    Keyboard = CS_QUERY_REGISTRY(Registry, iKeyboardDriver);
+  return Keyboard;
 }
 
 void csMouseDriver::DoButton (int button, bool down, int x, int y)
@@ -117,22 +202,23 @@ void csMouseDriver::DoButton (int button, bool down, int x, int y)
   if (button <= 0 || button >= CS_MAX_MOUSE_BUTTONS)
     return;
 
-  int smask = (System->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
-            | (System->GetKeyState (CSKEY_ALT)   ? CSMASK_ALT   : 0)
-            | (System->GetKeyState (CSKEY_CTRL)  ? CSMASK_CTRL  : 0);
+  iKeyboardDriver* k = GetKeyboardDriver();
+  int smask = (k->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
+            | (k->GetKeyState (CSKEY_ALT  ) ? CSMASK_ALT   : 0)
+            | (k->GetKeyState (CSKEY_CTRL ) ? CSMASK_CTRL  : 0);
 
   Button [button - 1] = down;
 
   csTicks evtime = csGetTicks ();
-  System->EventQueue.Put (new csEvent (evtime,
-    down ? csevMouseDown : csevMouseUp, x, y, button, smask));
+  Post(new csEvent
+    (evtime, down ? csevMouseDown : csevMouseUp, x, y, button, smask));
 
   if ((button == LastClickButton)
    && (evtime - LastClickTime <= DoubleClickTime)
    && (unsigned (ABS (x - LastClickX)) <= DoubleClickDist)
    && (unsigned (ABS (y - LastClickY)) <= DoubleClickDist))
   {
-    System->EventQueue.Put (new csEvent (evtime,
+    Post(new csEvent(evtime,
       down ? csevMouseDoubleClick : csevMouseClick, x, y, button, smask));
     // Don't allow for sequential double click events
     if (down)
@@ -152,15 +238,13 @@ void csMouseDriver::DoMotion (int x, int y)
 {
   if (x != LastX || y != LastY)
   {
-    int smask = (System->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
-              | (System->GetKeyState (CSKEY_ALT)   ? CSMASK_ALT   : 0)
-              | (System->GetKeyState (CSKEY_CTRL)  ? CSMASK_CTRL  : 0);
-
+    iKeyboardDriver* k = GetKeyboardDriver();
+    int smask = (k->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
+              | (k->GetKeyState (CSKEY_ALT  ) ? CSMASK_ALT   : 0)
+              | (k->GetKeyState (CSKEY_CTRL ) ? CSMASK_CTRL  : 0);
     LastX = x;
     LastY = y;
-
-    System->EventQueue.Put (new csEvent (csGetTicks (), csevMouseMove,
-      x, y, 0, smask));
+    Post(new csEvent (csGetTicks (), csevMouseMove, x, y, 0, smask));
   }
 }
 
@@ -172,9 +256,14 @@ void csMouseDriver::SetDoubleClickTime (int iTime, size_t iDist)
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--/> Joystick driver <--//--/
 
-csJoystickDriver::csJoystickDriver (csSystemDriver *system)
+SCF_IMPLEMENT_IBASE(csJoystickDriver)
+  SCF_IMPLEMENTS_INTERFACE(iJoystickDriver)
+SCF_IMPLEMENT_IBASE_END
+
+csJoystickDriver::csJoystickDriver (iObjectRegistry* r) :
+  csInputDriver(r), Keyboard(0)
 {
-  System = system;
+  SCF_CONSTRUCT_IBASE(0);
   memset (&Button, 0, sizeof (Button));
   memset (&LastX, sizeof (LastX), 0);
   memset (&LastY, sizeof (LastY), 0);
@@ -182,11 +271,17 @@ csJoystickDriver::csJoystickDriver (csSystemDriver *system)
 
 void csJoystickDriver::Reset ()
 {
-  int i, j;
-  for (i = 0; i < CS_MAX_JOYSTICK_COUNT; i++)
-    for (j = 0; j < CS_MAX_JOYSTICK_BUTTONS; j++)
+  for (int i = 0; i < CS_MAX_JOYSTICK_COUNT; i++)
+    for (int j = 0; j < CS_MAX_JOYSTICK_BUTTONS; j++)
       if (Button [i][j])
         DoButton (i + 1, j + 1, false, LastX [i], LastY [i]);
+}
+
+iKeyboardDriver* csJoystickDriver::GetKeyboardDriver()
+{
+  if (Keyboard == 0)
+    Keyboard = CS_QUERY_REGISTRY(Registry, iKeyboardDriver);
+  return Keyboard;
 }
 
 void csJoystickDriver::DoButton (int number, int button, bool down,
@@ -201,12 +296,13 @@ void csJoystickDriver::DoButton (int number, int button, bool down,
   if (button <= 0 || button > CS_MAX_JOYSTICK_BUTTONS)
     return;
 
-  int smask = (System->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
-            | (System->GetKeyState (CSKEY_ALT)   ? CSMASK_ALT   : 0)
-            | (System->GetKeyState (CSKEY_CTRL)  ? CSMASK_CTRL  : 0);
+  iKeyboardDriver* k = GetKeyboardDriver();
+  int smask = (k->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
+            | (k->GetKeyState (CSKEY_ALT)   ? CSMASK_ALT   : 0)
+            | (k->GetKeyState (CSKEY_CTRL)  ? CSMASK_CTRL  : 0);
 
   Button [number - 1] [button - 1] = down;
-  System->EventQueue.Put (new csEvent (csGetTicks (),
+  Post(new csEvent (csGetTicks (),
     down ? csevJoystickDown : csevJoystickUp, number, x, y, button, smask));
 }
 
@@ -217,14 +313,12 @@ void csJoystickDriver::DoMotion (int number, int x, int y)
 
   if (x != LastX [number - 1] || y != LastY [number - 1])
   {
-    int smask = (System->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
-              | (System->GetKeyState (CSKEY_ALT)   ? CSMASK_ALT   : 0)
-              | (System->GetKeyState (CSKEY_CTRL)  ? CSMASK_CTRL  : 0);
-
+    iKeyboardDriver* k = GetKeyboardDriver();
+    int smask = (k->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
+              | (k->GetKeyState (CSKEY_ALT)   ? CSMASK_ALT   : 0)
+              | (k->GetKeyState (CSKEY_CTRL)  ? CSMASK_CTRL  : 0);
     LastX [number - 1] = x;
     LastY [number - 1] = y;
-
-    System->EventQueue.Put (new csEvent (csGetTicks (), csevJoystickMove,
-      number, x, y, 0, smask));
+    Post(new csEvent(csGetTicks(), csevJoystickMove, number, x, y, 0, smask));
   }
 }

@@ -31,7 +31,7 @@ awsSigSrc::UnregisterSlot(iAwsSlot *slot, unsigned long signal)
 
     while(entry)
     {
-       SlotSignalMap *ssm = static_cast<SlotSignalMap *>(entry);
+       SlotSignalMap *ssm = STATIC_CAST(SlotSignalMap*,entry);
 
        if (ssm->signal == signal && ssm->slot == slot)
        {
@@ -55,7 +55,7 @@ awsSigSrc::Broadcast(unsigned long signal)
 
  while(entry)
  {
-    SlotSignalMap *ssm = static_cast<SlotSignalMap *>(entry);
+    SlotSignalMap *ssm = STATIC_CAST(SlotSignalMap*,entry);
 
     if (ssm->signal == signal)
         ssm->slot->Emit(*this, signal);
@@ -94,7 +94,6 @@ awsSlot::Disconnect(iAwsSigSrc &source, unsigned long signal)
 void 
 awsSlot::Emit(iBase &source, unsigned long signal)
 {
-    if (sink && Slot) 
+    if (sink != 0 && Slot != 0) 
       (sink->*Slot)(source, signal);
 }
-

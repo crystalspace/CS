@@ -20,8 +20,9 @@
 #define __CFGACC_H__
 
 #include "csutil/csvector.h"
-#include "isys/system.h"
+#include "iutil/cfgmgr.h"
 struct iConfigFile;
+struct iObjectRegistry;
 
 /**
  * This is a simple convenience class that can be used to deal with the

@@ -29,6 +29,7 @@ struct iSector;
 struct iView;
 struct iFont;
 struct iFile;
+struct iKeyboardDriver;
 struct iImageLoader;
 struct iLoaderPlugin;
 struct iMeshWrapper;
@@ -47,6 +48,7 @@ public:
   iGraphics3D *myG3D;
   iGraphics2D *myG2D;
   iVFS *myVFS;
+  iKeyboardDriver* kbd;
   iConsoleOutput *myConsole;
 
   DemoSequenceManager* seqmgr;

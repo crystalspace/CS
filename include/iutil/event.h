@@ -17,10 +17,10 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISYS_EVENT_H__
-#define __ISYS_EVENT_H__
+#ifndef __IUTIL_EVENT_H__
+#define __IUTIL_EVENT_H__
 
-#include "isys/evdefs.h"
+#include "iutil/evdefs.h"
 #include "csutil/scf.h"
 
 struct iPlugin;
@@ -110,9 +110,9 @@ struct iEvent : public iBase
  * the possibly duplicate messages that are coming from different event
  * plugs (for example two different plugs may both intercept the keyboard
  * and generate duplicate keydown events).<p>
- * Events are put into the system event queue, from where they are sent to
+ * Events are put into the event queue, from where they are sent to
  * applications and plugins.
- * Event cords bypass the system queue for specific command event categories
+ * Event cords bypass the queue for specific command event categories
  * and deliver events immediately in a prioritizied chain to specific plugins
  * which request the categories.
  */
@@ -123,7 +123,7 @@ SCF_VERSION (iEventPlug, 0, 0, 1);
  * Event plug interface, also referred as "event source".<p>
  * This interface should be implemented by any plugin that wants to be able
  * to generate events and to put them into system event queue. The plugin
- * registers itself with the system driver as a event source, and gets a
+ * registers itself with an event queue as an event source, and gets a
  * pointer to a new iEventOutlet object which manages event the event flow
  * from this particular event source.
  */
@@ -142,7 +142,7 @@ struct iEventPlug : public iBase
   /**
    * Query how strong the plug's wish to generate certain class of events is.
    * The plug with the strongest wish wins. The argument is one of CSEVTYPE_XXX
-   * values (but never a combination of several ORed together).<p>
+   * values (but never a combination of several OR'ed together).<p>
    * The typical value is somewhere around 100; the event plugs which are
    * sometimes implemented inside the system drivers (such as for Windows
    * and DJGPP) usually have the priority 100.
@@ -159,14 +159,14 @@ struct iEventPlug : public iBase
   virtual void EnableEvents (unsigned /*iType*/, bool /*iEnable*/) {}
 };
 
-SCF_VERSION (iEventOutlet, 0, 0, 1);
+SCF_VERSION (iEventOutlet, 0, 1, 0);
 
 /**
  * The iEventOutlet is the interface to an object that is provided by
- * system driver to every event plug when it registers itself. Any event
+ * an event queue to every event plug when it registers itself. Any event
  * plug will interact with event outlet to put events into system queue
  * and so on.<p>
- * The system driver is responsible for detecting potentially conflicting
+ * The event queue is responsible for detecting potentially conflicting
  * situations when several event plugs may generate a event from same
  * original event (e.g. a key press will cause several keydown events
  * coming from several event source plugins). In this case the event
@@ -178,22 +178,22 @@ SCF_VERSION (iEventOutlet, 0, 0, 1);
 struct iEventOutlet : public iBase
 {
   /**
-   * Create a event object on behalf of the system driver.<p>
-   * A general function for generating virtually any type of event.
-   * Since events should be created inside the system driver plugin,
-   * you should generate first a event object (through CreateEvent
-   * method) then you fill it whatever you like and finally you
-   * insert it into the event queue with the PutEvent method.
+   * Create a event object on behalf of the event queue.<p>
+   * A general function for generating virtually any type of event.  Since all
+   * events for a particular event queue should be created from the same heap,
+   * you should generate first a event object (through CreateEvent method) then
+   * you fill it whatever you like and finally you insert it into the event
+   * queue with the Post() method.
    */
-  virtual iEvent *CreateEvent () = 0;
+  virtual iEvent* CreateEvent () = 0;
 
   /**
    * Put a previously created event into system event queue.<p>
    * <b>NOTE:</b> YOU SHOULD PASS HERE ONLY OBJECTS THAT WERE CREATED
-   * VIA CreateEvent FUNCTION! IF YOU PASS ARBITRARY EVENTS CREATED
+   * VIA CreateEvent() FUNCTION! IF YOU PASS ARBITRARY EVENTS CREATED
    * BY YOUR PROGRAM/PLUGIN IN SOME ENVIRONMENTS IT WILL CRASH!
    */
-  virtual void PutEvent (iEvent *Event) = 0;
+  virtual void Post (iEvent*) = 0;
 
   /**
    * Put a keyboard event into event queue.<p>
@@ -261,45 +261,47 @@ struct iEventOutlet : public iBase
   virtual void ImmediateBroadcast (int iCode, void *iInfo) = 0;
 };
 
-SCF_VERSION (iEventCord, 0, 0, 1);
+SCF_VERSION (iEventCord, 0, 0, 2);
 
 /**
- * The iEventCord is an interface provided by the system driver to
+ * The iEventCord is an interface provided by an event queue to
  * any plugins wanting to receive some subclasses of events ASAP
- * in a specified priority, bypassing system event queue.
- * It can optionally pass events onto the system queue, as well.
+ * in a specified priority, bypassing the queue itself.
+ * Events may also optionally be sent to the normal event queue itself
+ * if none of the plugins in the cord handle the event.
  */
 struct iEventCord
 {
   /**
-   * Insert a plugin into the queue.  The priority defines
-   * when it will receive the event with respect to other
-   * registered plugins.  Plugins with the same priority are
-   * handled in a first-come first-served fashion.  This is 
-   * significant since returning true from HandleEvent will
-   * stop further event processing.
+   * Insert a plugin into the cord.  The priority defines when it will receive
+   * the event with respect to other registered plugins.  Plugins with the same
+   * priority are handled in a first-come first-served fashion.  This is
+   * significant since returning true from HandleEvent() will stop further
+   * event processing.
    */
-  virtual int Insert (iPlugin *plugin, int priority) = 0;
+  virtual int Insert (iPlugin*, int priority) = 0;
 
   /**
-   * Remove a plugin from the queue.
+   * Remove a plugin from the cord.
    */
-  virtual void Remove (iPlugin *plugin) = 0;
+  virtual void Remove (iPlugin*) = 0;
 
   /**
-   * Returns true if events are passed on to the
-   * system queue after all plugins in the local
-   * queue have processed (and returned false).
+   * Returns true if events are passed on to the owning event queue if all
+   * plugins in the cord return false from HandleEvent().
    */
   virtual bool GetPass () const = 0;
 
   /**
-   * Sets whether events are passed to the system
-   * queue after the local queue have been processed
-   * and all returned false.  This could cause the 
-   * event to be processed twice under some circumstances.
+   * Sets whether events are passed along to the owning event queue if all
+   * plugins in the cord return false from HandleEvent().
    */
-  virtual void SetPass (bool pass) = 0;
+  virtual void SetPass (bool) = 0;
+
+  /// Get the category of this cord.
+  virtual int GetCategory() const = 0;
+  // Get the subcategory of this cord.
+  virtual int GetSubcategory() const = 0;
 };
 
-#endif // __ISYS_EVENT_H__
+#endif // __IUTIL_EVENT_H__

@@ -2,6 +2,7 @@
 #include "awsprefs.h"
 #include "awscomp.h"
 #include "awsslot.h"
+#include "iutil/event.h"
 
 #include <stdio.h>
 

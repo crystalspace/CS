@@ -37,7 +37,7 @@ public:
   csModelConverterPOV (iBase *pBase);
 
   /// destructor
-  ~csModelConverterPOV ();
+  virtual ~csModelConverterPOV ();
 
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount() const;

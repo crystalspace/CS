@@ -32,8 +32,9 @@
 
 #include "cssysdef.h"
 #include "cssys/djgpp/djgpp.h"
-#include "isys/system.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
+#include "isys/system.h"
 #include "inputq.h"
 #include "djkeysys.h"
 #include "djmousys.h"
@@ -62,7 +63,7 @@ static unsigned short ScanCodeToChar[128] =
   0,        0,        0,        0,        0,        0,        0,        0       // 78..7F
 };
 
-//================================================================== System ====
+//================================================================= System ====
 
 SCF_IMPLEMENT_IBASE_EXT (SysSystemDriver)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
@@ -74,7 +75,8 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   if (sizeof (event_queue [0]) != 12)
   {
     printf ("ERROR! Your compiler does not handle packed structures!\n");
-    printf ("sizeof (event_queue [0]) == %d instead of 12!\n", sizeof (event_queue [0]));
+    printf ("sizeof (event_queue [0]) == %d instead of 12!\n",
+      sizeof (event_queue [0]));
     exit (-1);
   }
 
@@ -88,7 +90,9 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   DosHelper* doshelper = new DosHelper (this);
   scfiObjectRegistry.Register (doshelper, "SystemHelper");
 
-  EventOutlet = CreateEventOutlet (this);
+  iEventQueue* q = CS_QUERY_REGISTRY((&scfiObjectRegistry), iEventQueue);
+  if (q != 0)
+    EventOutlet = q->CreateEventOutlet (this);
 }
 
 SysSystemDriver::~SysSystemDriver ()
@@ -152,9 +156,9 @@ bool SysSystemDriver::Open ()
   KH.chain (0);
   KeyboardOpened = true;
 
-  iConfigManager* Config = CS_QUERY_REGISTRY (GetObjectRegistry (),
-  	iConfigManager);
-  SensivityFactor = Config->GetFloat ("MouseDriver.MouseSensivity", 1.0);
+  csConfigAccess cfg;
+  cfg.AddConfig(GetObjectRegistry(), "/config/mouse.cfg");
+  SensivityFactor = cfg->GetFloat ("MouseDriver.MouseSensivity", 1.0);
 
   if (MH.install ())
     return false;
@@ -279,4 +283,3 @@ void DosHelper::DoEnablePrintf (bool en)
 {
   sys->DoEnablePrintf (en);
 }
-

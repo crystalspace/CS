@@ -28,6 +28,7 @@ class csView;
 struct iSector;
 struct iEngine;
 struct iLoader;
+struct iKeyboardDriver;
 
 class PySimple : public SysSystemDriver
 {
@@ -36,8 +37,9 @@ public:
   csView* view;
   iEngine* engine;
   int motion_flags;
-  iLoader *LevelLoader;
-  iGraphics3D *myG3D;
+  iLoader* LevelLoader;
+  iGraphics3D* myG3D;
+  iKeyboardDriver* kbd;
 
 public:
   PySimple ();

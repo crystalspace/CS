@@ -23,7 +23,7 @@
 #include "csws/csapp.h"
 #include "csws/cswsutil.h"
 #include "csws/cswsaux.h"
-#include "cssys/csinput.h"
+#include "csutil/csinput.h"
 
 // Spin box texture name
 #define SPINBOX_TEXTURE_NAME		"csws::SpinBox"

@@ -19,22 +19,19 @@
 
 #include "cssysdef.h"
 #include "csutil/scf.h"
-#include "cssys/system.h"
-#include "cssys/csevcord.h"
+#include "csutil/csevcord.h"
 #include "isys/plugin.h"
-#include "isys/event.h"
 
-SCF_IMPLEMENT_IBASE (csEventCord)
-  SCF_IMPLEMENTS_INTERFACE (iEventCord)
+SCF_IMPLEMENT_IBASE(csEventCord)
+  SCF_IMPLEMENTS_INTERFACE(iEventCord)
 SCF_IMPLEMENT_IBASE_END
 
-csEventCord::csEventCord (int Category, int Subcategory) : category (Category), 
-  subcategory (Subcategory)
+csEventCord::csEventCord(int cat, int subcat) :
+  category(cat), subcategory(subcat)
 {
   plugins = NULL;
-  // By default, do not pass events to the system driver
-  // except Category/Subcategory zero
-  pass = (Category == 0) && (Subcategory == 0);
+  // By default, only pass along category 0, subcategory 0 events to the queue.
+  pass = (category == 0 && subcategory == 0);
   SpinLock = 0;
 }
 
@@ -50,7 +47,7 @@ int csEventCord::Insert(iPlugin *plugin, int priority)
     PluginData *last = NULL, *curr = plugins;
     while (curr)
     {
-      if (priority>curr->priority)
+      if (priority > curr->priority)
         break;
       last = curr;
       curr = curr->next;
@@ -109,17 +106,7 @@ void csEventCord::Remove (iPlugin *plugin)
   Unlock ();
 }
 
-bool csEventCord::GetPass () const
-{
-  return pass;
-}
-
-void csEventCord::SetPass (bool Pass)
-{
-  pass = Pass;
-}
-
-bool csEventCord::PutEvent (iEvent *event)
+bool csEventCord::Post (iEvent *event)
 {
   Lock ();
 
@@ -128,25 +115,16 @@ bool csEventCord::PutEvent (iEvent *event)
   while (cur)
   {
     if (cur->plugin->HandleEvent (*event))
+    {
+      Unlock ();
       return true;
+    }
     cur = cur->next;
   }
 
   Unlock ();
 
-  // If we pass events to the system driver, then we return 
+  // If we pass events along to the queue, then we return 
   // false so it will process the event.
   return !pass;
-}
-
-int csSystemDriver::csEventCordsVector::Find (int Category, int SubCategory)
-{
-  int i;
-  for (i = 0; i < Length (); i++)
-  {
-    csEventCord *cord = Get (i);
-    if (cord->category == Category && cord->subcategory == SubCategory)
-      return i;
-  }
-  return -1;
 }

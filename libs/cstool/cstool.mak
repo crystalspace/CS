@@ -1,5 +1,5 @@
 # Library description
-DESCRIPTION.cstool = Crystal Space Tool Library
+DESCRIPTION.cstool = Crystal Space tool Library
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)

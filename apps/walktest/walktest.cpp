@@ -60,7 +60,9 @@
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "imap/parser.h"
+#include "iutil/event.h"
 #include "iutil/objreg.h"
+#include "iutil/csinput.h"
 #include "isys/plugin.h"
 #include "isound/wrapper.h"
 #include "imesh/terrfunc.h"
@@ -116,6 +118,7 @@ WalkTest::WalkTest () :
   LevelLoader = NULL;
   ModelConverter = NULL;
   CrossBuilder = NULL;
+  kbd = NULL;
   anim_sky = NULL;
   anim_dirlight = NULL;
   anim_dynlight = NULL;
@@ -212,6 +215,7 @@ WalkTest::~WalkTest ()
   if (perf_stats) perf_stats->DecRef ();
   if (Engine) Engine->DecRef ();
   if (LevelLoader) LevelLoader->DecRef();
+  if (kbd) kbd->DecRef();
 }
 
 void WalkTest::Report (int severity, const char* msg, ...)
@@ -461,9 +465,9 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
     int alt,shift,ctrl;
     float speed = 1;
 
-    alt = GetKeyState (CSKEY_ALT);
-    ctrl = GetKeyState (CSKEY_CTRL);
-    shift = GetKeyState (CSKEY_SHIFT);
+    alt = kbd->GetKeyState (CSKEY_ALT);
+    ctrl = kbd->GetKeyState (CSKEY_CTRL);
+    shift = kbd->GetKeyState (CSKEY_SHIFT);
     if (ctrl)
       speed = .5;
     if (shift)
@@ -1253,6 +1257,14 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iVFS plugin!");
     return false;
   }
+
+  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  if (!kbd)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver!");
+    return false;
+  }
+  kbd->IncRef();
 
   myConsole = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
   mySound = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_SOUND, iSoundRender);

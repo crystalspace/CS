@@ -24,10 +24,11 @@
 #include "csgfx/inv_cmap.h"
 #include "csgfx/quantize.h"
 #include "csutil/scanstr.h"
-#include "isys/event.h"
+#include "iutil/cfgfile.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "isys/system.h"
 #include "igraphic/image.h"
-#include "iutil/cfgfile.h"
 #include "ivaria/reporter.h"
 #include "qint.h"
 #include "protex3d.h"
@@ -787,8 +788,9 @@ void csTextureManagerSoftware::SetPalette ()
     G2D->SetRGB (i, r, g, b);
   }
 
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->GetSystemEventOutlet ()->ImmediateBroadcast (cscmdPaletteChanged, this);
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->GetEventOutlet()->ImmediateBroadcast (cscmdPaletteChanged, this);
 }
 
 void csTextureManagerSoftware::Reprepare8BitProcs ()

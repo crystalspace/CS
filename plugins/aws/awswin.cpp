@@ -293,7 +293,7 @@ void
 awsWindow::OnDraw(csRect clip)
 {
   iGraphics2D *g2d = WindowManager()->G2D();
-  iGraphics3D *g3d = WindowManager()->G3D();
+//iGraphics3D *g3d = WindowManager()->G3D();
 
   /******************************************
    * When drawing the window, we have to take 
@@ -306,13 +306,13 @@ awsWindow::OnDraw(csRect clip)
    **************************************************/
 
 
-  int hi    = WindowManager()->GetPrefMgr()->GetColor(AC_HIGHLIGHT),
-      hi2   = WindowManager()->GetPrefMgr()->GetColor(AC_HIGHLIGHT2),
-      lo    = WindowManager()->GetPrefMgr()->GetColor(AC_SHADOW),
-      lo2   = WindowManager()->GetPrefMgr()->GetColor(AC_SHADOW2),
-      fill  = WindowManager()->GetPrefMgr()->GetColor(AC_FILL),
-      black = WindowManager()->GetPrefMgr()->GetColor(AC_BLACK),
-      white = WindowManager()->GetPrefMgr()->GetColor(AC_WHITE);
+  int hi    = WindowManager()->GetPrefMgr()->GetColor(AC_HIGHLIGHT);
+  int hi2   = WindowManager()->GetPrefMgr()->GetColor(AC_HIGHLIGHT2);
+  int lo    = WindowManager()->GetPrefMgr()->GetColor(AC_SHADOW);
+  int lo2   = WindowManager()->GetPrefMgr()->GetColor(AC_SHADOW2);
+  int fill  = WindowManager()->GetPrefMgr()->GetColor(AC_FILL);
+  int black = WindowManager()->GetPrefMgr()->GetColor(AC_BLACK);
+//int white = WindowManager()->GetPrefMgr()->GetColor(AC_WHITE);
 
   int tw, th, toff;
 
@@ -440,4 +440,3 @@ awsWindow::OnDraw(csRect clip)
   }
 
 }
-

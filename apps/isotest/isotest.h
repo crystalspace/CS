@@ -33,6 +33,8 @@ struct iIsoLight;
 struct iLoader;
 struct iFont;
 struct iMaterialWrapper;
+struct iKeyboardDriver;
+struct iMouseDriver;
 
 class IsoTest : public SysSystemDriver
 {
@@ -44,9 +46,14 @@ private:
   iIsoWorld *world;
   /// view on the world, the 'camera'
   iIsoView *view;
-  /// G2D and G3D plugin
+  /// G2D plugin
   iGraphics2D *myG2D;
+  /// G3D plugin
   iGraphics3D *myG3D;
+  /// Generic keyboard driver
+  iKeyboardDriver* kbd;
+  /// Generic mouse driver
+  iMouseDriver* mouse;
 
   /// the font for text display
   iFont *font;

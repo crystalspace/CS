@@ -24,6 +24,7 @@
 
 #include "cssys/next/NeXTAssistant.h"
 #include "cssys/next/NeXTSystemDriver.h"
+#include "iutil/event.h"
 #include "isys/system.h"
 typedef void* NeXTDelegateHandle;
 

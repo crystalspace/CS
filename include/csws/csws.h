@@ -99,9 +99,9 @@ struct iEvent;
 #include "csgeom/csrect.h"		// Rectangle class
 #include "csutil/csvector.h"		// Vector of objects
 #include "csutil/csstrvec.h"		// Vector of string objects
-#include "cssys/csevent.h"		// Event class
-#include "cssys/cseventq.h"		// Event Queue class
-#include "cssys/csinput.h"		// Keyboard codes
+#include "csutil/csevent.h"		// Event class
+#include "csutil/cseventq.h"		// Event Queue class
+#include "csutil/csinput.h"		// Keyboard codes
 #include "cstool/cspixmap.h"		// 2D sprites
 #include "csgfxppl.h"			// Graphics pipeline
 #include "cskeyacc.h"			// Keyboard accelerator class

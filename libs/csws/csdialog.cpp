@@ -18,10 +18,11 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/csinput.h"
+#include "csutil/csinput.h"
 #include "csws/cswindow.h"
 #include "csws/csdialog.h"
 #include "csws/csskin.h"
+#include "iutil/event.h"
 
 #define SKIN ((csDialogSkin *)skinslice)
 

@@ -17,27 +17,28 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/util.h"
+#include "igraphic/imageio.h"
+#include "imesh/object.h"
 #include "isoengin.h"
-#include "isoworld.h"
-#include "isoview.h"
-#include "isospr.h"
-#include "isomesh.h"
 #include "isolight.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/txtmgr.h"
-#include "isys/evdefs.h"
-#include "isys/event.h"
+#include "isomesh.h"
+#include "isospr.h"
+#include "isoview.h"
+#include "isoworld.h"
+#include "isys/plugin.h"
 #include "isys/system.h"
 #include "isys/vfs.h"
 #include "iutil/cfgmgr.h"
-#include "csutil/util.h"
+#include "iutil/evdefs.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/object.h"
-#include "igraphic/imageio.h"
-#include "imesh/object.h"
-#include "isys/plugin.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/txtmgr.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -96,9 +97,9 @@ bool csIsoEngine::Initialize (iObjectRegistry* p)
 {
   object_reg = p;
   // Tell system driver that we want to handle broadcast events
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  if (!sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast))
-    return false;
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
   return true;
 }
 

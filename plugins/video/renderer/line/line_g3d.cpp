@@ -20,22 +20,23 @@
 
 #define CS_SYSDEF_PROVIDE_SOFTWARE2D
 #include "cssysdef.h"
-#include "qint.h"
+#include "line_g3d.h"
+#include "line_txt.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
-#include "line_g3d.h"
-#include "line_txt.h"
+#include "imesh/thing/lightmap.h"	//@@@
+#include "imesh/thing/polygon.h"	//@@@
+#include "isys/plugin.h"
+#include "isys/system.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "isys/system.h"
-#include "isys/plugin.h"
-#include "isys/event.h"
 #include "ivideo/graph2d.h"
-#include "imesh/thing/polygon.h"	//@@@
-#include "imesh/thing/lightmap.h"	//@@@
+#include "qint.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -107,9 +108,9 @@ csGraphics3DLine::~csGraphics3DLine ()
     G2D->DecRef ();
 }
 
-bool csGraphics3DLine::Initialize (iObjectRegistry *object_reg)
+bool csGraphics3DLine::Initialize (iObjectRegistry *r)
 {
-  csGraphics3DLine::object_reg = object_reg;
+  object_reg = r;
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
@@ -128,8 +129,10 @@ bool csGraphics3DLine::Initialize (iObjectRegistry *object_reg)
 
   texman = new csTextureManagerLine (object_reg, G2D, config);
   vbufmgr = new csPolArrayVertexBufferManager (object_reg);
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
+
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
 
   return true;
 }

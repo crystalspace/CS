@@ -24,10 +24,11 @@
 #include "cssysdef.h"
 #include "isys/system.h"
 #include "iutil/cfgfile.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "isound/driver.h"
 #include "isound/data.h"
-#include "isys/event.h"
 #include "isys/plugin.h"
 #include "ivaria/reporter.h"
 
@@ -82,15 +83,16 @@ void csSoundRenderSoftware::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-bool csSoundRenderSoftware::Initialize (iObjectRegistry *object_reg)
+bool csSoundRenderSoftware::Initialize (iObjectRegistry *r)
 {
   // copy the system pointer
-  csSoundRenderSoftware::object_reg = object_reg;
+  object_reg = r;
 
   // set event callback
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->CallOnEvents(&scfiPlugin,
-    CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->RegisterListener(&scfiPlugin,
+      CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
 
   // read the config file
   Config.AddConfig(object_reg, "/config/sound.cfg");

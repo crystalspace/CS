@@ -20,7 +20,7 @@
 #ifndef __CSEVENT_H__
 #define __CSEVENT_H__
 
-#include "isys/event.h"
+#include "iutil/event.h"
 
 /**
  * This class represents a system event.<p>
@@ -35,16 +35,16 @@ public:
   csEvent ();
 
   /// Create a keyboard event object
-  csEvent (csTicks eTime, int eType, int kCode, int kChar, int kModifiers);
+  csEvent (csTicks, int type, int kcode, int kchar, int modifiers);
 
   /// Create a mouse event object
-  csEvent (csTicks eTime, int eType, int mx, int my, int mButton, int mModifiers);
+  csEvent (csTicks, int type, int x, int y, int button, int modifiers);
 
   /// Create a joystick event object
-  csEvent (csTicks eTime, int eType, int jn, int jx, int jy, int jButton, int jModifiers);
+  csEvent (csTicks, int type, int n, int x, int y, int button, int modifiers);
 
   /// Create a command event object
-  csEvent (csTicks eTime, int eType, int cCode, void *cInfo = NULL);
+  csEvent (csTicks, int type, int code, void* info = NULL);
 
   /// Destructor
   virtual ~csEvent ();

@@ -29,6 +29,7 @@
 struct iSector;
 struct iView;
 struct iEngine;
+struct iKeyboardDriver;
 struct iObjectRegistry;
 struct iPluginManager;
 
@@ -45,6 +46,7 @@ private:
   iVideoStream *pVStream;
   iLoader *LevelLoader;
   iGraphics3D *myG3D;
+  iKeyboardDriver* kbd;
 
   bool InitProcDemo ();
 

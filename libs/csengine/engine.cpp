@@ -54,10 +54,11 @@
 #include "ivideo/halo.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/graph3d.h"
-#include "isys/event.h"
+#include "iutil/event.h"
 #include "isys/plugin.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/databuff.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "imap/reader.h"
 #include "imesh/lighting.h"
@@ -550,10 +551,10 @@ bool csEngine::Initialize (iObjectRegistry* object_reg)
   // Reporter is optional.
   Reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
 
-  // Tell system driver that we want to handle broadcast events
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  if (!sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast))
-    return false;
+  // Tell event queue that we want to handle broadcast events
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
   
   csConfigAccess cfg (object_reg, "/config/engine.cfg");
   ReadConfig (cfg);

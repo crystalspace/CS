@@ -34,7 +34,7 @@ public:
   csModelConverterDXF (iBase *pBase);
 
   /// destructor
-  ~csModelConverterDXF ();
+  virtual ~csModelConverterDXF ();
 
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount() const;

@@ -21,7 +21,8 @@
 #define __CSDIVE_H__
 
 #include "video/canvas/common/graph2d.h"
-#include "isys/event.h"
+#include "iutil/event.h"
+struct iKeyboardDriver;
 
 // avoid including os2.h
 class diveWindow;
@@ -66,8 +67,10 @@ class csGraphics2DOS2DIVE : public csGraphics2D, public iEventPlug
   int WindowX, WindowY;
   /// Window width and height
   int WindowWidth, WindowHeight;
-  // The event outlet
+  /// The event outlet
   iEventOutlet *EventOutlet;
+  /// Generic keyboard driver.
+  iKeyboardDriver* KeyboardDriver;
 
 public:
   SCF_DECLARE_IBASE_EXT(csGraphics2D);

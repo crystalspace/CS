@@ -26,7 +26,6 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/material.h"
-#include "isys/event.h"
 #include "isys/vfs.h"
 #include "csgeom/csrect.h"
 #include "csutil/csstring.h"
@@ -34,6 +33,8 @@
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "isys/plugin.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -116,10 +117,10 @@ bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
 
   ImageLoader = NULL;
 
-  // Tell system driver that we want to handle broadcast events
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  if (!sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast))
-    return false;
+  // Tell event queue that we want to handle broadcast events
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
 
   int x, y, w, h;
   base->PerformExtension("GetPos", &x, &y, &w, &h);

@@ -28,7 +28,7 @@
 #include "ivideo/natwin.h"
 #include "ivideo/txtmgr.h"
 #include "ivaria/conout.h"
-#include "isys/event.h"
+#include "iutil/event.h"
 #include "iutil/strvec.h"
 #include "cswseng.h"
 #include "iengine/camera.h"

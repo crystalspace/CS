@@ -35,14 +35,13 @@
 #include <Gestalt.h>
 #include <SIOUX.h>
 #include "cssysdef.h"
-#include "cstypes.h"
-#include "csgeom/math3d.h"
-#include "cssys/system.h"
 #include "cssys/sysdriv.h"
 #include "IMacGraphics.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "isys/plugin.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 
 #if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
@@ -220,7 +219,9 @@ SysSystemDriver::SysSystemDriver()
         }
     }
 #endif
-    EventOutlet = CreateEventOutlet (this);
+    iEventQueue* q = CS_QUERY_REGISTRY((&scfiObjectRegistry), iEventQueue);
+    if (q != 0)
+      EventOutlet = q->CreateEventOutlet (this);
 }
 
 

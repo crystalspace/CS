@@ -24,7 +24,7 @@
 #include <allegro.h>
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "isys/event.h"
+#include "iutil/event.h"
 
 /**
  * Allegro 2D graphics driver.

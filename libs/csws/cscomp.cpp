@@ -24,7 +24,7 @@
 #define CS_SYSDEF_PROVIDE_CASE
 #include "cssysdef.h"
 #include "cstool/cspixmap.h"
-#include "cssys/csinput.h"
+#include "csutil/csinput.h"
 #include "qint.h"
 #include "ivideo/graph2d.h"
 #include "csws/cscomp.h"

@@ -19,7 +19,7 @@
 //-----------------------------------------------------------------------------
 #include "NeXTDelegate.h"
 #include "NeXTMenu.h"
-#include "isys/evdefs.h"
+#include "iutil/evdefs.h"
 #include "volatile.h"		// OS_NEXT_OPENSTEP, OS_NEXT_MACOSXS
 #include <stdio.h>
 #import <AppKit/NSApplication.h>

@@ -18,7 +18,29 @@
 
 #include "cssysdef.h"
 #include "csutil/schedule.h"
-#include "cssys/system.h"
+
+//----- csSchedulePart ------------------------------------------
+
+/*
+  This class is used internally by the csSchedule class.  It stores the
+  callback information.  The parts are linked, during use, in time-sequence,
+  with the first one to call at the front.  In this manner, only the first part
+  has to be examined during each frame.
+*/
+class csSchedulePart
+{
+public:
+  /// function to call
+  void (*callback)(void*);
+  /// argument to pass to function
+  void *arg;
+  /// period in msec. (period 0 means a single-shot callback)
+  int period;
+  /// how many msec after the previous part this part should be called
+  int after;
+  /// next part in the linked time-sequence-sorted list 
+  csSchedulePart *next;
+};
 
 //----- csSchedule ----------------------------------------------
 

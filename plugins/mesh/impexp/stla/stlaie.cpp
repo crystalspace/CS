@@ -34,7 +34,7 @@ public:
   csModelConverterSTLA (iBase *pBase);
 
   /// destructor
-  ~csModelConverterSTLA ();
+  virtual ~csModelConverterSTLA ();
 
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount() const;

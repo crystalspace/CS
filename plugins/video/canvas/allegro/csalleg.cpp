@@ -21,12 +21,13 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "csalleg.h"
-#include "cssys/csinput.h"
+#include "csutil/csinput.h"
 #include "csgeom/csrect.h"
 #include "csutil/csstring.h"
 #include "isys/system.h"
 #include "allegro.h"
 #include "cssys/djgpp/doshelp.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 
 static unsigned short ScanCodeToChar [128] =
@@ -126,9 +127,13 @@ bool csGraphics2DAlleg::Initialize (iObjectRegistry *object_reg)
 
   Font = 0;
   Memory = NULL;
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
-  EventOutlet = sys->CreateEventOutlet (this);
+
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+  {
+    q->RegisterListener (&scfiPlugin, CSMASK_Nothing);
+    EventOutlet = q->CreateEventOutlet (this);
+  }
   return true;
 }
 

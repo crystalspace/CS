@@ -31,7 +31,7 @@
 #include <objbase.h>
 
 #include "cssys/system.h"
-#include "cssys/csinput.h"
+#include "csutil/csinput.h"
 
 class SysSystemDriver;
 

@@ -1241,11 +1241,9 @@ void csTerrFuncObject::RecomputeLighting (int lod, int bx, int by)
   if (dirlight_number != block.dirlight_numbers[lod])
   {
     block.dirlight_numbers[lod] = dirlight_number;
-    G3DTriangleMesh* m = &block.mesh[lod];
     csColor* vtcols = block.mesh_colors[lod];
     csVector3* norms = block.normals[lod];
-    int i;
-    for (i = 0 ; i < block.num_mesh_vertices[lod] ; i++, vtcols++)
+    for (int i = 0 ; i < block.num_mesh_vertices[lod] ; i++, vtcols++)
     {
       float l = dirlight * *(norms++);
       if (l <= 0)

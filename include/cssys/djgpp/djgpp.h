@@ -22,7 +22,7 @@
 #ifndef DJGPP_H
 #define DJGPP_H
 
-#include "cssys/csinput.h"
+#include "csutil/csinput.h"
 #include "cssys/system.h"
 #include "cssys/djgpp/doshelp.h"
 

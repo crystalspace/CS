@@ -22,7 +22,8 @@
 #include "ogl_proctexback.h"
 #include "ogl_g3dcom.h"
 #include "csgeom/polyclip.h"
-#include "isys/event.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 
 #if defined(CS_OPENGL_PATH)
@@ -49,8 +50,12 @@ csOpenGLProcBackBuffer::~csOpenGLProcBackBuffer ()
   lightmap_cache = NULL;
   m_fogtexturehandle = 0;
   delete [] buffer;
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->GetSystemEventOutlet ()->Broadcast (cscmdContextClose, (void*)G2D);
+  if (object_reg != 0)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    if (q != 0)
+      q->GetEventOutlet ()->Broadcast (cscmdContextClose, (void*)G2D);
+  }
 }
 
 void csOpenGLProcBackBuffer::Close ()

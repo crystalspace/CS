@@ -22,7 +22,7 @@
 #include "csws/csiline.h"
 #include "csws/cstimer.h"
 #include "csws/csapp.h"
-#include "cssys/csinput.h"
+#include "csutil/csinput.h"
 
 // Cursor flashing period in milliseconds
 #define CURSOR_FLASHING_INTERVAL	333

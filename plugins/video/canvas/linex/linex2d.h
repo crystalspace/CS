@@ -21,7 +21,7 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "isys/event.h"
+#include "iutil/event.h"
 #include "isys/plugin.h"
 #include "ivideo/xwindow.h"
 

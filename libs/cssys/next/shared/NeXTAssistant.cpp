@@ -22,6 +22,8 @@
 #include "NeXTAssistant.h"
 #include "NeXTDelegate.h"
 #include "csutil/cfgacc.h"
+#include "iutil/eventq.h"
+#include "iutil/objreg.h"
 
 typedef void* NeXTAssistantHandle;
 #define NSD_PROTO(RET,FUNC) extern "C" RET NeXTAssistant_##FUNC
@@ -44,7 +46,14 @@ NeXTAssistant::NeXTAssistant(NeXTSystemDriver* p) : system(p)
   SCF_CONSTRUCT_IBASE(0);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventPlug);
   controller = NeXTDelegate_startup(this);
-  event_outlet = system->CreateEventOutlet(&scfiEventPlug);
+
+  iObjectRegistry* r = system->GetObjectRegistry();
+  if (r != 0)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY(r, iEventQueue);
+    if (q != 0)
+      event_outlet = q->CreateEventOutlet(&scfiEventPlug);
+  }
 }
 
 

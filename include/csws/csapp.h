@@ -30,14 +30,16 @@
 #include "cshints.h"
 #include "csmouse.h"
 #include "csgfxppl.h"
-#include "cssys/cseventq.h"
+#include "csutil/cseventq.h"
 #include "csutil/csstrvec.h"
 #include "csutil/cfgacc.h"
 #include "isys/plugin.h"
-#include "isys/event.h"
+#include "iutil/event.h"
 
 class csSkin;
 struct iImageIO;
+struct iKeyboardDriver;
+struct iMouseDriver;
 struct iObjectRegistry;
 struct iPluginManager;
 
@@ -136,6 +138,10 @@ public:
   iFontServer *FontServer;
   /// The image loader
   iImageIO *ImageLoader;
+  /// Keyboard driver
+  iKeyboardDriver* KeyboardDriver;
+  /// Mouse driver
+  iMouseDriver* MouseDriver;
   /// Application's adaptive palette
   int Pal [cs_Color_Last];
   /// The component that captured the mouse
@@ -183,8 +189,8 @@ public:
   { return EventOutlet->CreateEvent (); }
 
   /// Add a previously created event to event queue
-  void PutEvent (iEvent *Event)
-  { EventOutlet->PutEvent (Event); }
+  void Post (iEvent *Event)
+  { EventOutlet->Post (Event); }
 
   /// Shut down the program
   void ShutDown ();

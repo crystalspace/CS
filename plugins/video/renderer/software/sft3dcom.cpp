@@ -35,9 +35,10 @@
 #include "sft3dcom.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "isys/event.h"
 
 #if defined (DO_MMX)
 #  include "video/renderer/software/i386/cpuid.h"
@@ -295,8 +296,9 @@ csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
 bool csGraphics3DSoftwareCommon::Initialize (iObjectRegistry* p)
 {
   object_reg = p;
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
   return true;
 }
 

@@ -23,7 +23,7 @@
 #include "ivaria/script.h"
 #include "isys/plugin.h"
 #include "isys/system.h"
-#include "cssys/csinput.h"
+#include "csutil/csinput.h"
 #include "csutil/csvector.h"
 
 class csPython : public iScript {

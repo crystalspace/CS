@@ -28,9 +28,10 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "isys/plugin.h"
-#include "isys/event.h"
 
 SCF_IMPLEMENT_IBASE(csGraphics2D)
   SCF_IMPLEMENTS_INTERFACE(iGraphics2D)
@@ -77,10 +78,10 @@ csGraphics2D::csGraphics2D (iBase* parent)
   AllowResizing = false;
 }
 
-bool csGraphics2D::Initialize (iObjectRegistry* object_reg)
+bool csGraphics2D::Initialize (iObjectRegistry* r)
 {
   CS_ASSERT (object_reg != NULL);
-  csGraphics2D::object_reg = object_reg;
+  object_reg = r;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   // Get the system parameters
   config.AddConfig (object_reg, "/config/video.cfg");
@@ -118,8 +119,9 @@ bool csGraphics2D::Initialize (iObjectRegistry* object_reg)
     Palette [i].blue = 0;
   }
 
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
 
   return true;
 }

@@ -26,10 +26,11 @@
 #include "csutil/cfgacc.h"
 #include "video/canvas/common/scancode.h"
 #include "video/canvas/common/os2-keys.h"
-#include "isys/system.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
+#include "iutil/csinput.h"
 #include "cssys/os2/os2help.h"
 
 // shit ...
@@ -51,8 +52,8 @@ SCF_EXPORT_CLASS_TABLE (glos2)
 SCF_EXPORT_CLASS_TABLE_END
 
 csGraphics2DOS2GL::csGraphics2DOS2GL (iBase *iParent) :
-  csGraphics2DGLCommon (iParent),
-  HardwareCursor (true), WindowX (INT_MIN), WindowY (INT_MIN)
+  csGraphics2DGLCommon (iParent), HardwareCursor (true),
+  WindowX (INT_MIN), WindowY (INT_MIN), KeyboardDriver (NULL)
 {
   // Initialize module handle
 #ifdef CS_STATIC_LINKED
@@ -84,6 +85,8 @@ csGraphics2DOS2GL::~csGraphics2DOS2GL (void)
   Close ();
   // Deallocate OpenGL resources
   gdGLDeinitialize ();
+  if (KeyboardDriver != 0)
+    KeyboardDriver->DecRef();
 }
 
 bool csGraphics2DOS2GL::Initialize (iObjectRegistry *object_reg)
@@ -136,7 +139,13 @@ bool csGraphics2DOS2GL::Initialize (iObjectRegistry *object_reg)
   if (cmdline->GetOption ("nosysmouse"))
     HardwareCursor = false;
 
-  EventOutlet = sys->CreateEventOutlet (this);
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    EventOutlet = q->CreateEventOutlet (this);
+
+  KeyboardDriver = CS_QUERY_REGISTRY(object_reg, iKeyboardDriver);
+  if (KeyboardDriver != 0)
+    KeyboardDriver->IncRef();
 
   return true;
 }
@@ -395,8 +404,7 @@ void csGraphics2DOS2GL::KeyboardHandlerStub (void *Self, unsigned char ScanCode,
   if (KeyCode == CSKEY_ENTER) CharCode = CSKEY_ENTER;
 
   // WM_CHAR does not support Ctrl+# ...
-  iSystem* sys = CS_GET_SYSTEM (This->object_reg);	//@@@
-  if (sys->GetKeyState (CSKEY_CTRL) && !CharCode
+  if (KeyboardDriver->GetKeyState (CSKEY_CTRL) && !CharCode
    && (KeyCode > 96) && (KeyCode < 127))
     CharCode = KeyCode - 96;
 

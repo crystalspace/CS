@@ -22,7 +22,8 @@
 #include "csutil/util.h"
 #include "ivaria/conout.h"
 #include "isys/system.h"
-#include "isys/event.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -79,8 +80,8 @@ csConsoleInput::~csConsoleInput ()
 
 bool csConsoleInput::Initialize (iObjectRegistry *object_reg)
 {
-  // It is not necessary to call System->CallOnEvents since application
-  // will usually pass events to us directly.
+  // It is not necessary to call iEventQueue::RegisterListener() since
+  // application will usually pass events to us directly.
   (void)object_reg;
   return true;
 }

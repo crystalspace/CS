@@ -20,17 +20,17 @@
 #define XK_XKB_KEYS
 #include <stdarg.h>
 #include "cssysdef.h"
-#include "csutil/scf.h"
-#include "iutil/objreg.h"
-#include "iutil/cfgmgr.h"
-#include "csutil/cfgacc.h"
-#include "iutil/cmdline.h"
-#include "ivaria/reporter.h"
-#include "isys/system.h"
-#include "isys/event.h"
 #include "xwindow.h"
 #include "csgeom/csrect.h"
-
+#include "csutil/cfgacc.h"
+#include "csutil/scf.h"
+#include "isys/system.h"
+#include "iutil/cfgmgr.h"
+#include "iutil/cmdline.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include "video/canvas/common/scancode.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -124,16 +124,16 @@ bool csXWindow::Initialize (iObjectRegistry *object_reg)
 
   memset (MouseCursor, 0, sizeof (MouseCursor));
 
-  iSystem* sys = CS_GET_SYSTEM (object_reg);
   // Create the event outlet
-  EventOutlet = sys->CreateEventOutlet (this);
-
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    EventOutlet = q->CreateEventOutlet (this);
 
   int opcode, first_event, first_error;
   if (XQueryExtension (dpy, CS_XEXT_XF86VM, 
 		       &opcode, &first_event, &first_error))
   {
-    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY(object_reg, iPluginManager);
     xf86vm = CS_LOAD_PLUGIN (plugin_mgr, 
 			     CS_XEXT_XF86VM_SCF_ID, NULL, iXExtF86VM);
   }
@@ -278,7 +278,7 @@ bool csXWindow::Open ()
 
   // Create a empty mouse cursor
   char zero = 0;
-  EmptyPixmap = XCreatePixmapFromBitmapData (dpy, ctx_win, &zero, 1, 1, 0, 0, 1);
+  EmptyPixmap = XCreatePixmapFromBitmapData(dpy, ctx_win, &zero, 1,1,0,0,1);
   XColor Black;
   memset (&Black, 0, sizeof (Black));
   EmptyMouseCursor = XCreatePixmapCursor (dpy, EmptyPixmap, EmptyPixmap,
@@ -317,9 +317,10 @@ bool csXWindow::Open ()
   // (e.g. Window Maker) it will be unable to resize the window at all.
   Canvas->AllowResize (false);
 
-  iSystem* sys = CS_GET_SYSTEM (object_reg);
-  // Tell system driver to call us on every frame
-  sys->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
+  // Tell event queue to call us on every frame
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg);
+  if (q != 0)
+    q->RegisterListener (&scfiPlugin, CSMASK_Nothing);
 
   if (xf86vm)
   {
@@ -460,8 +461,8 @@ bool csXWindow::HandleEvent (iEvent &Event)
    && (Event.Command.Code == cscmdCommandLineHelp))
   {
     printf ("Options for X-Window Plugin:\n");
-    printf ("  -[no]sysmouse      use/don't use system mouse cursor (default=%s)\n",
-      do_hwmouse ? "use" : "don't");
+    printf ("  -[no]sysmouse      use/don't use system mouse cursor "
+      "(default=%s)\n", do_hwmouse ? "use" : "don't");
     return true;
   }
 
@@ -506,7 +507,8 @@ bool csXWindow::HandleEvent (iEvent &Event)
         // Neat trick: look in event queue if we have KeyPress events ahead
 	// with same keycode. If this is the case, discard the KeyUp event
 	// in favour of KeyDown since this is most (sure?) an autorepeat
-        XCheckIfEvent (event.xkey.display, &event, CheckKeyPress, (XPointer)&event);
+        XCheckIfEvent (event.xkey.display, &event, CheckKeyPress,
+	  (XPointer)&event);
         down = (event.type == KeyPress);
         charcount = XLookupString ((XKeyEvent *)&event, charcode,
 				   sizeof (charcode), &key, NULL);
@@ -613,7 +615,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
           default:            key = (key <= 127) ? ScanCodeToChar [key] : 0;
         }
         if (key)
-          EventOutlet->Key (key, charcount == 1 ? uint8 (charcode [0]) : 0, down);
+          EventOutlet->Key(key, charcount == 1 ? uint8(charcode[0]) : 0, down);
         break;
       case FocusIn:
 	{
@@ -685,5 +687,3 @@ bool csXWindow::SetMouseCursor (csMouseCursorID iShape)
     return (iShape == csmcNone);
   } /* endif */
 }
-
-

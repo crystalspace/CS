@@ -35,7 +35,8 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivaria/conout.h"
-#include "isys/event.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "isys/plugin.h"
 #include "imesh/object.h"
@@ -310,7 +311,11 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
   }
 
   if (!strcasecmp (cmd, "quit"))
-    Sys->GetSystemEventOutlet ()->Broadcast (cscmdQuit);
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY(csCommandProcessor::object_reg, iEventQueue);
+    if (q != 0)
+      q->GetEventOutlet()->Broadcast (cscmdQuit);
+  }
   else if (!strcasecmp (cmd, "help"))
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "-*- General commands -*-");

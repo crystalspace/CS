@@ -26,15 +26,15 @@
 #include "csutil/scf.h"
 #include "isys/system.h"
 #include "iutil/cfgfile.h"
-#include "isys/event.h"
-#include "ivaria/reporter.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 #include "sndrdr.h"
 #include "sndlstn.h"
 #include "sndsrc.h"
 #include "sndhdl.h"
-//#include "../common/convmeth.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -63,12 +63,13 @@ csSoundRenderEAX::csSoundRenderEAX(iBase *piBase)
   object_reg = NULL;
 }
 
-bool csSoundRenderEAX::Initialize(iObjectRegistry *object_reg)
+bool csSoundRenderEAX::Initialize(iObjectRegistry *r)
 {
-  csSoundRenderEAX::object_reg = object_reg;
-  iSystem* sys = CS_GET_SYSTEM (object_reg);
-  sys->CallOnEvents(&scfiPlugin,
-    CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
+  object_reg = r;
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->RegisterListener(&scfiPlugin,
+      CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
   LoadFormat.Bits = -1;
   LoadFormat.Freq = -1;
   LoadFormat.Channels = -1;

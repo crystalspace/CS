@@ -20,7 +20,7 @@
 #define __UNIX_H__
 
 #include "csutil/scf.h"
-#include "cssys/csinput.h"
+#include "csutil/csinput.h"
 #include "cssys/system.h"
 #include "ivideo/graph2d.h"
 

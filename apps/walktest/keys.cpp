@@ -23,7 +23,6 @@
 #include "infmaze.h"
 #include "hugeroom.h"
 #include "command.h"
-#include "ivaria/view.h"
 #include "imesh/thing/polygon.h"
 #include "csutil/scanstr.h"
 #include "csutil/dataobj.h"
@@ -38,6 +37,9 @@
 #include "isound/wrapper.h"
 #include "isound/data.h"
 #include "ivaria/reporter.h"
+#include "ivaria/view.h"
+#include "iutil/event.h"
+#include "iutil/csinput.h"
 
 #include "csengine/wirefrm.h"
 
@@ -303,7 +305,7 @@ void WalkTest::step (float speed,int keep_old)
     }
   }
 
-  float max_speed = cfg_walk_maxspeed * (Keyboard.GetKeyState (CSKEY_SHIFT) ? 2 : 1);
+  float max_speed = cfg_walk_maxspeed * (kbd->GetKeyState (CSKEY_SHIFT) ? 2 : 1);
 
   while ((cur_time - start_time) >= 100)
   {
@@ -349,7 +351,7 @@ void WalkTest::rotate (float speed,int keep_old)
     }
   }
 
-  float max_speed = cfg_rotate_maxspeed * (Keyboard.GetKeyState (CSKEY_SHIFT) ? 2 : 1);
+  float max_speed = cfg_rotate_maxspeed * (kbd->GetKeyState (CSKEY_SHIFT) ? 2 : 1);
 
   while ((cur_time - start_time) >= 100)
   {

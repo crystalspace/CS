@@ -34,7 +34,7 @@ public:
   csModelConverterHRC (iBase *pBase);
 
   /// destructor
-  ~csModelConverterHRC ();
+  virtual ~csModelConverterHRC ();
 
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount() const;

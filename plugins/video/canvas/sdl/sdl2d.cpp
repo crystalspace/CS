@@ -20,12 +20,11 @@
 #include <stdarg.h>
 
 #include "cssysdef.h"
-#include "csutil/scf.h"
-#include "video/canvas/sdl/sdl2d.h"
-#include "cssys/unix/unix.h"
+#include "sdl2d.h"
 #include "csgeom/csrect.h"
-#include "cssys/csinput.h"
+#include "csutil/csinput.h"
 #include "isys/system.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 
@@ -379,12 +378,14 @@ bool csGraphics2DSDL::Open()
 
   pfmt.complete ();
   Clear(0);
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
 
-  if (!EventOutlet)
-    EventOutlet = sys->CreateEventOutlet (this);
-
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+  {
+    q->RegisterListener (&scfiPlugin, CSMASK_Nothing);
+    if (!EventOutlet)
+      EventOutlet = q->CreateEventOutlet (this);
+  }
   return true;
 }
 

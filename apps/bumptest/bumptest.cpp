@@ -58,7 +58,9 @@
 #include "imesh/object.h"
 #include "imesh/lighting.h"
 #include "isys/plugin.h"
+#include "iutil/event.h"
 #include "iutil/objreg.h"
+#include "iutil/csinput.h"
 
 //------------------------------------------------- We need the 3D engine -----
 
@@ -81,6 +83,7 @@ BumpTest::BumpTest ()
   animli = 0.0;
   going_right = true;
   myG3D = NULL;
+  kbd = NULL;
 }
 
 BumpTest::~BumpTest ()
@@ -90,6 +93,7 @@ BumpTest::~BumpTest ()
   delete prBump;
   if (LevelLoader) LevelLoader->DecRef();
   if (myG3D) myG3D->DecRef ();
+  if (kbd) kbd->DecRef ();
 }
 
 void BumpTest::Report (int severity, const char* msg, ...)
@@ -363,6 +367,14 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
     abort ();
   }
 
+  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  if (!kbd)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver plugin!");
+    abort ();
+  }
+  kbd->IncRef();
+
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = myG3D->GetDriver2D ()->GetNativeWindow ();
   if (nw) nw->SetTitle ("Bumptest Crystal Space Application");
@@ -517,17 +529,17 @@ void BumpTest::NextFrame ()
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.) * (0.03 * 20);
 
-  if (GetKeyState (CSKEY_RIGHT))
+  if (kbd->GetKeyState (CSKEY_RIGHT))
     view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
-  if (GetKeyState (CSKEY_LEFT))
+  if (kbd->GetKeyState (CSKEY_LEFT))
     view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
-  if (GetKeyState (CSKEY_PGUP))
+  if (kbd->GetKeyState (CSKEY_PGUP))
     view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_UP, speed);
-  if (GetKeyState (CSKEY_PGDN))
+  if (kbd->GetKeyState (CSKEY_PGDN))
     view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
-  if (GetKeyState (CSKEY_UP))
+  if (kbd->GetKeyState (CSKEY_UP))
     view->GetCamera ()->Move (VEC_FORWARD * 4.0f * speed);
-  if (GetKeyState (CSKEY_DOWN))
+  if (kbd->GetKeyState (CSKEY_DOWN))
     view->GetCamera ()->Move (VEC_BACKWARD * 4.0f * speed);
 
   // Move the -dynamic light around.

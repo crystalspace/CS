@@ -20,18 +20,19 @@
 #define CS_SYSDEF_PROVIDE_PATH
 #include "cssysdef.h"
 #include "cssys/system.h"
-#include "csver.h"
 #include "csutil/scf.h"
+#include "csver.h"
 #include "perfstat.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/graph2d.h"
+#include "iengine/engine.h"
+#include "isys/plugin.h"
 #include "isys/system.h"
 #include "isys/vfs.h"
-#include "isys/event.h"
-#include "isys/plugin.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "iengine/engine.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -83,15 +84,14 @@ bool csPerfStats::Initialize (iObjectRegistry *object_reg)
 {
   csPerfStats::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  if (!sys->CallOnEvents (&scfiPlugin, CSMASK_Nothing))
-    return false;
+  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  if (q != 0)
+    q->RegisterListener (&scfiPlugin, CSMASK_Nothing);
   sub_section = super_section = NULL;
   // default resolution
   resolution = 500;
   name = NULL;
   head_section = this;
-
   return true;
 }
 

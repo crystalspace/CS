@@ -25,15 +25,17 @@
 #include "cssysdef.h"
 #include "cssys/system.h"
 #include "cssys/sysdriv.h"
-#include "cssys/csinput.h"
 #include "cssys/csshlib.h"
-#include "csgeom/csrect.h"
-#include "csutil/prfxcfg.h"
-#include "csutil/util.h"
+#include "csutil/csevent.h"
+#include "csutil/cseventq.h"
+#include "csutil/csinput.h"
 #include "csutil/cfgfile.h"
 #include "csutil/cfgmgr.h"
 #include "csutil/cfgacc.h"
 #include "csutil/cmdline.h"
+#include "csutil/prfxcfg.h"
+#include "csutil/util.h"
+#include "iutil/eventq.h"
 #include "isys/plugin.h"
 #include "isys/vfs.h"
 #include "ivaria/conout.h"
@@ -61,7 +63,7 @@ void csSystemDriver::ReportSys (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-//------------------------------------------------------- csPlugin class -----//
+//------------------------------------------------------ csPlugin class -----//
 
 csSystemDriver::csPlugin::csPlugin (iPlugin *iObject, const char *iClassID,
   const char *iFuncID)
@@ -69,7 +71,6 @@ csSystemDriver::csPlugin::csPlugin (iPlugin *iObject, const char *iClassID,
   Plugin = iObject;
   ClassID = csStrNew (iClassID);
   FuncID = csStrNew (iFuncID);
-  EventMask = 0;
 }
 
 csSystemDriver::csPlugin::~csPlugin ()
@@ -79,7 +80,7 @@ csSystemDriver::csPlugin::~csPlugin ()
   Plugin->DecRef ();
 }
 
-//----------------------- A private class used to keep a list of plugins -----//
+//---------------------- A private class used to keep a list of plugins -----//
 
 struct csPluginLoadRec
 {
@@ -103,7 +104,8 @@ public:
   virtual bool FreeItem (csSome Item)
   { delete (csPluginLoadRec *)Item; return true; }
 private:
-  bool RecurseSort (csSystemDriver *iSys, int row, char *order, char *loop, bool *matrix);
+  bool RecurseSort (csSystemDriver*, int row, char *order, char *loop,
+    bool *matrix);
 };
 
 /**
@@ -151,13 +153,13 @@ private:
  * Thus, the above table will be traversed this way (to the left is the
  * load list, to the right is the loop detection list):
  * <pre><ol>
- *   <li> []                                     [iEngine]
- *   <li> []                                     [iEngine,iVFS]
- *   <li> [iVFS]                                 [iEngine]
- *   <li> [iVFS]                                 [iEngine,iGraphics3D]
- *   <li> [iVFS]                                 [iEngine,iGraphics3D,iGraphics2D]
- *   <li> [iVFS,iGraphics2D]                     [iEngine,iGraphics3D]
- *   <li> [iVFS,iGraphics2D,iGraphics3D]         [iEngine]
+ *   <li> []                                  [iEngine]
+ *   <li> []                                  [iEngine,iVFS]
+ *   <li> [iVFS]                              [iEngine]
+ *   <li> [iVFS]                              [iEngine,iGraphics3D]
+ *   <li> [iVFS]                              [iEngine,iGraphics3D,iGraphics2D]
+ *   <li> [iVFS,iGraphics2D]                  [iEngine,iGraphics3D]
+ *   <li> [iVFS,iGraphics2D,iGraphics3D]      [iEngine]
  *   <li> [iVFS,iGraphics2D,iGraphics3D,iEngine] []
  * </ol></pre>
  * In this example we traversed all plugins in one go. If we didn't, we
@@ -166,7 +168,7 @@ private:
  */
 bool csPluginList::Sort (csSystemDriver *iSys)
 {
-  int row, col, len = Length ();
+  int row, len = Length ();
 
   // We'll use char for speed reasons
   if (len > 255)
@@ -198,7 +200,7 @@ bool csPluginList::Sort (csSystemDriver *iSys)
       if (!sl)
         break;
       bool wildcard = tmp [sl - 1] == '.';
-      for (col = 0; col < len; col++)
+      for (int col = 0; col < len; col++)
         if ((col != row)
          && (wildcard ? strncmp (tmp, Get (col).ClassID, sl) :
              strcmp (tmp, Get (col).ClassID)) == 0)
@@ -241,8 +243,7 @@ bool csPluginList::RecurseSort (csSystemDriver *iSys, int row, char *order,
   bool error = false;
   char *loopp = strchr (loop, 0);
   *loopp++ = row + 1; *loopp = 0;
-  int col;
-  for (col = 0; col < len; col++)
+  for (int col = 0; col < len; col++)
     if (*dep++)
     {
       // If the plugin is already loaded, skip
@@ -255,8 +256,7 @@ bool csPluginList::RecurseSort (csSystemDriver *iSys, int row, char *order,
         iSys->ReportSys (CS_REPORTER_SEVERITY_ERROR,
 		"PLUGIN LOADER: Cyclic dependency detected!\n");
         int startx = int (already - loop);
-		int x;
-        for (x = startx; loop [x]; x++)
+        for (int x = startx; loop [x]; x++)
           iSys->ReportSys (CS_REPORTER_SEVERITY_ERROR, "   %s %s\n",
             x == startx ? "+->" : loop [x + 1] ? "| |" : "<-+",
             Get (loop [x] - 1).ClassID);
@@ -266,7 +266,7 @@ bool csPluginList::RecurseSort (csSystemDriver *iSys, int row, char *order,
 
       bool recurse_error = !RecurseSort (iSys, col, order, loop, matrix);
 
-      // Drop recursive loop dependency since it has been already moved to order
+      // Drop recursive loop dependency since it has already been ordered.
       *loopp = 0;
 
       if (recurse_error)
@@ -283,10 +283,13 @@ bool csPluginList::RecurseSort (csSystemDriver *iSys, int row, char *order,
   return !error;
 }
 
-//---------------------------------------------------- The System Driver -----//
+//--------------------------------------------------- The System Driver -----//
 
 SCF_IMPLEMENT_IBASE (csSystemDriver)
   SCF_IMPLEMENTS_INTERFACE (iSystem)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectRegistry)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPluginManager)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::ObjectRegistry)
@@ -297,25 +300,26 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::PluginManager)
   SCF_IMPLEMENTS_INTERFACE (iPluginManager)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csSystemDriver::csSystemDriver () : Plugins (8, 8), EventQueue (),
-  OptionList (16, 16)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::eiPlugin)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csSystemDriver::csSystemDriver () :
+  VFS(0), EventQueue(0), Plugins (8, 8), OptionList (16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectRegistry);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPluginManager);
-
-  Keyboard.SetSystemDriver (this);
-  Mouse.SetSystemDriver    (this);
-  Joystick.SetSystemDriver (this);
-
-  // Create the default system event outlet
-  EventOutlets.Push (new csEventOutlet (NULL, this));
-
-  VFS = NULL;
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
 
   debug_level = 0;
   Shutdown = false;
   CurrentTime = csTicks (-1);
+
+  // Register the shared event queue.
+  iEventQueue* q = new csEventQueue(&scfiObjectRegistry);
+  scfiObjectRegistry.Register(q, "crystalspace.event.queue");
+  q->DecRef();
 
   scfiObjectRegistry.Register (&scfiPluginManager, "PluginManager");
   iCommandLineParser* cmdline = new csCommandLineParser ();
@@ -363,19 +367,29 @@ csSystemDriver::~csSystemDriver ()
   if (VFS) VFS->DecRef ();
 
   // Free all plugins.
-  int i;
-  for (i = 0; i < Plugins.Length(); i++)
+  for (int i = 0; i < Plugins.Length(); i++)
       UnloadPlugin((iPlugin *)Plugins.Get(i));
      
-  // Free the system event outlet
-  EventOutlets.DeleteAll ();
+  if (EventQueue != 0)
+    EventQueue->DecRef();
 
-  iSCF::SCF->Finish ();
+  // Explicitly clear the object registry before its destruction since some
+  // objects being cleared from it may need to query it for other objects, and
+  // such queries can fail (depending upon the compiler) if they are made while
+  // the registry itself it being destroyed.  Furthermore, such objects may may
+  // SCF queries as they are destroyed, so this must occur before SCF is
+  // finalized (see below).
+  scfiObjectRegistry.Clear();
+
+  iSCF::SCF->Finish();
 }
 
 bool csSystemDriver::Initialize (int argc, const char* const argv[],
   const char *iConfigName)
 {
+  EventQueue = CS_QUERY_REGISTRY((&scfiObjectRegistry), iEventQueue);
+  EventQueue->IncRef();
+
   // @@@ This is ugly.  We need a better, more generalized way of doing this.
   // Hard-coding the name of the VFS plugin (crytalspace.kernel.vfs) is bad.
   // Then later ensuring that we skip over this same plugin when requested
@@ -424,6 +438,18 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
     }
   }
   
+  // Register some generic pseudo-plugins.  (Some day these should probably
+  // become real plugins.)
+  iKeyboardDriver* k = new csKeyboardDriver(&scfiObjectRegistry);
+  iMouseDriver*    m = new csMouseDriver   (&scfiObjectRegistry);
+  iJoystickDriver* j = new csJoystickDriver(&scfiObjectRegistry);
+  scfiObjectRegistry.Register(k, "crystalspace.driver.input.generic.keyboard");
+  scfiObjectRegistry.Register(m, "crystalspace.driver.input.generic.mouse"   );
+  scfiObjectRegistry.Register(j, "crystalspace.driver.input.generic.joystick");
+  j->DecRef();
+  m->DecRef();
+  k->DecRef();
+
   // Collect all options from command line
   iCommandLineParser* CommandLine = CS_QUERY_REGISTRY ((&scfiObjectRegistry),
   	iCommandLineParser);
@@ -523,9 +549,14 @@ bool csSystemDriver::Open ()
 {
   ReportSys (CS_REPORTER_SEVERITY_DEBUG, "*** Opening the drivers now!\n");
 
+  // Start listening for events.  This class is interested in cscmdQuit, but
+  // subclasses may be interested in any event, so listen for all types except
+  // for the special one which sends cscmdPreProcess/cscmdPostProcess.
+  EventQueue->RegisterListener(&scfiPlugin, ~CSMASK_Nothing);
+
   // Now pass the open event to all plugins
   csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemOpen);
-  HandleEvent (Event);
+  EventQueue->Dispatch (Event);
 
   return true;
 }
@@ -536,46 +567,21 @@ void csSystemDriver::Close ()
 
   // Warn all plugins the system is going down
   csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemClose);
-  HandleEvent (Event);
+  EventQueue->Dispatch (Event);
+
+  // Stop listening for events.
+  EventQueue->RemoveListener(&scfiPlugin);
 }
 
 void csSystemDriver::NextFrame ()
 {
-  int i;
-
   // Update elapsed time first
   csTicks cur_time = csGetTicks ();
   ElapsedTime = (CurrentTime == csTicks (-1)) ? 0 : cur_time - CurrentTime;
   CurrentTime = cur_time;
 
-  // See if any plugin wants to be called every frame
-  for (i = 0; i < Plugins.Length (); i++)
-  {
-    csPlugin *plugin = Plugins.Get (i);
-    if (plugin->EventMask & CSMASK_Nothing)
-    {
-      csEvent Event (csGetTicks (), csevBroadcast, cscmdPreProcess);
-      plugin->Plugin->HandleEvent (Event);
-    }
-  }
-
-  iEvent *ev;
-  while ((ev = EventQueue.Get ()))
-  {
-    HandleEvent (*ev);
-    ev->DecRef ();
-  }
-
-  // If a plugin has set CSMASK_Nothing, it receives cscmdPostProcess events too
-  for (i = 0; i < Plugins.Length (); i++)
-  {
-    csPlugin *plugin = Plugins.Get (i);
-    if (plugin->EventMask & CSMASK_Nothing)
-    {
-      csEvent Event (csGetTicks (), csevBroadcast, cscmdPostProcess);
-      plugin->Plugin->HandleEvent (Event);
-    }
-  }
+  // Process the event queue.
+  EventQueue->Process();
 }
 
 void csSystemDriver::Loop ()
@@ -584,37 +590,13 @@ void csSystemDriver::Loop ()
     NextFrame ();
 }
 
-bool csSystemDriver::HandleEvent (iEvent&Event)
+bool csSystemDriver::HandleEvent (iEvent& e)
 {
-  if (Event.Type == csevBroadcast)
-    switch (Event.Command.Code)
-    {
-      case cscmdQuit:
-        Shutdown = true;
-        break;
-      case cscmdFocusChanged:
-        // If user switches away from our application, reset
-        // keyboard/mouse/joystick state
-        if (!Event.Command.Info)
-        {
-          Keyboard.Reset ();
-          Mouse.Reset ();
-          Joystick.Reset ();
-        }
-        break;
-    }
-
-  int evmask = 1 << Event.Type;
-  bool canstop = !(Event.Flags & CSEF_BROADCAST);
-  int i;
-  for (i = 0; i < Plugins.Length (); i++)
+  if (e.Type == csevBroadcast && e.Command.Code == cscmdQuit)
   {
-    csPlugin *plugin = Plugins.Get (i);
-    if (plugin->EventMask & evmask)
-      if (plugin->Plugin->HandleEvent (Event) && canstop)
-        return true;
+    Shutdown = true;
+    return true;
   }
-
   return false;
 }
 
@@ -625,17 +607,11 @@ void csSystemDriver::SetSystemDefaults (iConfigManager *Config)
   cfg.AddConfig(&scfiObjectRegistry, "/config/system.cfg");
 
   // Now analyze command line
-  const char *val;
-
   iCommandLineParser* CommandLine = CS_QUERY_REGISTRY ((&scfiObjectRegistry),
   	iCommandLineParser);
-
+  const char *val;
   if ((val = CommandLine->GetOption ("debug")))
     debug_level = atoi(val);
-
-  Mouse.SetDoubleClickTime (
-    Config->GetInt ("MouseDriver.DoubleClickTime", 300),
-    Config->GetInt ("MouseDriver.DoubleClickDist", 2));
 }
 
 iConfigFile *csSystemDriver::OpenUserConfig(const char *ApplicationID,
@@ -643,14 +619,12 @@ iConfigFile *csSystemDriver::OpenUserConfig(const char *ApplicationID,
 {
   // the default implementation does not make a difference between different
   // users. It always uses /config/user.cfg, with the application ID as prefix.
-
   return new csPrefixConfig("/config/user.cfg", VFS, ApplicationID, Alias);
 }
 
 void csSystemDriver::Help (iConfig* Config)
 {
-  int i;
-  for (i = 0; ; i++)
+  for (int i = 0; ; i++)
   {
     csOptionDescription option;
     if (!Config->GetOptionDescription (i, &option))
@@ -692,8 +666,7 @@ void csSystemDriver::Help (iConfig* Config)
 void csSystemDriver::Help ()
 {
   csEvent HelpEvent (csGetTicks (), csevBroadcast, cscmdCommandLineHelp);
-  int i;
-  for (i = 0; i < Plugins.Length (); i++)
+  for (int i = 0; i < Plugins.Length (); i++)
   {
     csPlugin *plugin = Plugins.Get (i);
     iConfig *Config = SCF_QUERY_INTERFACE (plugin->Plugin, iConfig);
@@ -709,12 +682,13 @@ void csSystemDriver::Help ()
   }
 
   //@@@???
-  printf ("General options:\n");
-  printf ("  -help              this help\n");
-  printf ("  -video=<s>         the 3D rendering driver (opengl, software, ...)\n");
-  printf ("  -canvas=<s>        the 2D canvas driver (asciiart, x2d, ...)\n");
-  printf ("  -plugin=<s>        load the plugin after all others\n");
-  printf ("  -debug=<n>         set debug level (default=%d)\n", debug_level);
+  printf (
+"General options:\n"
+"  -help              this help\n"
+"  -video=<s>         the 3D rendering driver (opengl, software, ...)\n"
+"  -canvas=<s>        the 2D canvas driver (asciiart, x2d, ...)\n"
+"  -plugin=<s>        load the plugin after all others\n"
+"  -debug=<n>         set debug level (default=%d)\n", debug_level);
 }
 
 void csSystemDriver::QueryOptions (iPlugin *iObject)
@@ -726,8 +700,7 @@ void csSystemDriver::QueryOptions (iPlugin *iObject)
   if (Config)
   {
     int on = OptionList.Length ();
-	int i;
-    for (i = 0 ; ; i++)
+    for (int i = 0 ; ; i++)
     {
       csOptionDescription option;
       if (!Config->GetOptionDescription (i, &option))
@@ -789,7 +762,7 @@ void csSystemDriver::RequestPlugin (const char *iPluginName)
   CommandLine->AddOption ("plugin", iPluginName);
 }
 
-//--------------------------------- iSystem interface for csSystemDriver -----//
+//-------------------------------- iSystem interface for csSystemDriver -----//
 
 iBase *csSystemDriver::LoadPlugin (const char *iClassID, const char *iFuncID,
   const char *iInterface, int iVersion)
@@ -855,8 +828,7 @@ iBase* csSystemDriver::GetPlugin (int idx)
 iBase *csSystemDriver::QueryPlugin (const char *iInterface, int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
-  int i;
-  for (i = 0; i < Plugins.Length (); i++)
+  for (int i = 0; i < Plugins.Length (); i++)
   {
     iBase *ret =
       (iBase *)Plugins.Get (i)->Plugin->QueryInterface (ifID, iVersion);
@@ -866,8 +838,8 @@ iBase *csSystemDriver::QueryPlugin (const char *iInterface, int iVersion)
   return NULL;
 }
 
-iBase *csSystemDriver::QueryPlugin (const char *iFuncID, const char *iInterface,
-  int iVersion)
+iBase *csSystemDriver::QueryPlugin (
+  const char *iFuncID, const char *iInterface, int iVersion)
 {
   int idx = Plugins.FindKey (iFuncID, 1);
   if (idx < 0)
@@ -880,9 +852,8 @@ iBase *csSystemDriver::QueryPlugin (const char *iFuncID, const char *iInterface,
 iBase *csSystemDriver::QueryPlugin (const char* iClassID, const char *iFuncID, 
 				    const char *iInterface, int iVersion)
 {
-  int i;
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
-  for (i = 0 ; i < Plugins.Length () ; i++)
+  for (int i = 0 ; i < Plugins.Length () ; i++)
   {
     csPlugin* pl = Plugins.Get (i);
     if (pl->ClassID && pl->FuncID)
@@ -890,7 +861,7 @@ iBase *csSystemDriver::QueryPlugin (const char* iClassID, const char *iFuncID,
       {
 	if (pl->FuncID == iFuncID || !strcmp (pl->FuncID, iFuncID))
 	{
-	  return (iBase *)Plugins.Get (i)->Plugin->QueryInterface (ifID, iVersion);
+	  return (iBase*)Plugins.Get(i)->Plugin->QueryInterface(ifID,iVersion);
 	}
       }
   }
@@ -906,8 +877,7 @@ bool csSystemDriver::UnloadPlugin (iPlugin *iObject)
   iConfig *config = SCF_QUERY_INTERFACE (iObject, iConfig);
   if (config)
   {
-	int i;
-    for (i = OptionList.Length () - 1; i >= 0; i--) 
+    for (int i = OptionList.Length () - 1; i >= 0; i--) 
     {
       csPluginOption *pio = (csPluginOption *)OptionList.Get (i);
       if (pio->Config == config)
@@ -929,108 +899,56 @@ bool csSystemDriver::UnloadPlugin (iPlugin *iObject)
   return Plugins.Delete (idx);
 }
 
-bool csSystemDriver::CallOnEvents (iPlugin *iObject, unsigned int iEventMask)
-{
-  int idx = Plugins.FindKey (iObject);
-  if (idx < 0)
-    return false;
-
-  csPlugin *plugin = Plugins.Get (idx);
-  plugin->EventMask = iEventMask;
-  return true;
-}
-
-bool csSystemDriver::GetKeyState (int key)
-{
-  return Keyboard.GetKeyState (key);
-}
-
-bool csSystemDriver::GetMouseButton (int button)
-{
-  return Mouse.GetLastButton (button);
-}
-
-void csSystemDriver::GetMousePosition (int &x, int &y)
-{
-  x = Mouse.GetLastX ();
-  y = Mouse.GetLastY ();
-}
-
-bool csSystemDriver::GetJoystickButton (int number, int button)
-{
-  return Joystick.GetLastButton (number, button);
-}
-
-void csSystemDriver::GetJoystickPosition (int number, int &x, int &y)
-{
-  x = Joystick.GetLastX (number);
-  y = Joystick.GetLastY (number);
-}
-
-iEventOutlet *csSystemDriver::CreateEventOutlet (iEventPlug *iObject)
-{
-  if (!iObject)
-    return NULL;
-
-  csEventOutlet *outlet = new csEventOutlet (iObject, this);
-  EventOutlets.Push (outlet);
-  return outlet;
-}
-
-iEventCord *csSystemDriver::GetEventCord (int Category, int Subcategory)
-{
-  int idx = EventCords.Find (Category, Subcategory);
-  if (idx != -1) 
-    return EventCords.Get (idx);
-  else
-  {
-    csEventCord *cord = new csEventCord (Category, Subcategory);
-    EventCords.Push (cord);
-    return cord;
-  }
-}
-
-iEventOutlet *csSystemDriver::GetSystemEventOutlet ()
-{
-  return EventOutlets.Get (0);
-}
-
 //---------------------------------------------------------------------------
 
-csSystemDriver::ObjectRegistry::~ObjectRegistry ()
+void csSystemDriver::ObjectRegistry::Clear()
 {
-  int i;
-  for (i = 0 ; i < registry.Length () ; i++)
+  clearing = true;
+  for (int i = registry.Length() - 1; i >= 0; i--)
   {
-    //iBase* b = (iBase*)registry[i];
-    //b->DecRef ();	// @@@ Enable as soon as object reg moves out system
+    // Take special care to ensure that this object is no longer on the list
+    // before calling DecRef(), since we don't want some other object asking
+    // for it during its own destruction.
+    iBase* b = (iBase*)registry[i];
     char* t = (char*)tags[i];
+    registry.Delete(i); // Remove from list before DecRef().
+    tags.Delete(i);
+    b->DecRef();
     delete[] t;
   }
+  clearing = false;
 }
 
 bool csSystemDriver::ObjectRegistry::Register (iBase* obj, char const* tag)
 {
-  registry.Push (obj);
-  tags.Push ((void*)(tag ? csStrNew (tag) : NULL));
+  if (!clearing)
+  {
+    obj->IncRef();
+    registry.Push(obj);
+    tags.Push(tag ? csStrNew(tag) : 0);
+    return true;
+    }
   return false;
 }
 
 void csSystemDriver::ObjectRegistry::Unregister (iBase* obj, char const* tag)
 {
-  int i;
-  for (i = 0 ; i < registry.Length () ; i++)
+  if (!clearing)
   {
-    iBase* b = (iBase*)registry[i];
-    if (b == obj)
+    for (int i = registry.Length() - 1; i >= 0; i--)
     {
-      char* t = (char*)tags[i];
-      if ((t == NULL && tag == NULL) ||
-          (t != NULL && tag != NULL && !strcmp (tag, t)))
+      iBase* b = (iBase*)registry[i];
+      if (b == obj)
       {
-        delete[] t;
-        //b->DecRef ();	// @@@ Enable as soon as object reg moves out system
-	if (tag != NULL) return;	// Continue if tag == NULL
+        char* t = (char*)tags[i];
+        if ((t == 0 && tag == 0) || (t != 0 && tag != 0 && !strcmp (tag, t)))
+        {
+          delete[] t;
+          b->DecRef();
+	  registry.Delete(i);
+	  if (tag != 0) // For a tagged object, we're done.
+	    break;
+        }
       }
     }
   }
@@ -1038,24 +956,19 @@ void csSystemDriver::ObjectRegistry::Unregister (iBase* obj, char const* tag)
 
 iBase* csSystemDriver::ObjectRegistry::Get (char const* tag)
 {
-  int i;
-  for (i = 0 ; i < registry.Length () ; i++)
+  for (int i = registry.Length() - 1; i >= 0; i--)
   {
     char* t = (char*)tags[i];
     if (t && !strcmp (tag, t))
-    {
-      iBase* b = (iBase*)registry[i];
-      return b;
-    }
+      return (iBase*)registry[i];
   }
-  return NULL;
+  return 0;
 }
 
 iBase* csSystemDriver::ObjectRegistry::Get (scfInterfaceID id, int version)
 {
-  int i;
-  iBase* found_one = NULL;
-  for (i = 0 ; i < registry.Length () ; i++)
+  iBase* found_one = 0;
+  for (int i = registry.Length() - 1; i >= 0; i--)
   {
     iBase* b = (iBase*)registry[i];
     iBase* interf = (iBase*)(b->QueryInterface (id, version));
@@ -1063,12 +976,11 @@ iBase* csSystemDriver::ObjectRegistry::Get (scfInterfaceID id, int version)
     {
       interf->DecRef ();
       char* t = (char*)tags[i];
-      if (!t) return interf;
-      else found_one = interf;
+      if (!t)
+        return interf;
+      else
+        found_one = interf;
     }
   }
   return found_one;
 }
-
-//---------------------------------------------------------------------------
-

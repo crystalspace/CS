@@ -19,10 +19,8 @@
 #include "cssysdef.h"
 #include "cssys/system.h"
 #include "apps/phyztest/phyztest.h"
-
 #include "csengine/engine.h"
 #include "cstool/initapp.h"
-
 #include "iengine/camera.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
@@ -30,9 +28,10 @@
 #include "imesh/thing/thing.h"
 #include "ivaria/polymesh.h"
 #include "ivaria/reporter.h"
+#include "iutil/event.h"
 #include "iutil/objreg.h"
+#include "iutil/csinput.h"
 #include "isys/plugin.h"
-
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
@@ -41,7 +40,6 @@
 #include "imap/parser.h"
 #include "cstool/collider.h"
 #include "cstool/csview.h"
-
 #include "csphyzik/phyziks.h"
 #include "csgeom/math3d.h"
 #include "csengine/meshobj.h"
@@ -137,6 +135,7 @@ Phyztest::Phyztest ()
   LevelLoader = NULL;
   myG2D = NULL;
   myG3D = NULL;
+  kbd = NULL;
 }
 
 Phyztest::~Phyztest ()
@@ -148,6 +147,7 @@ Phyztest::~Phyztest ()
   SCF_DEC_REF (myG2D);
   SCF_DEC_REF (myG3D);
   SCF_DEC_REF (engine);
+  SCF_DEC_REF (kbd);
 }
 
 void Phyztest::Report (int severity, const char* msg, ...)
@@ -214,6 +214,14 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
     Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
     abort ();
   }
+
+  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  if (!kbd)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver!");
+    abort ();
+  }
+  kbd->IncRef();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ())
@@ -371,21 +379,21 @@ void Phyztest::NextFrame ()
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.) * (0.03 * 20);
 
-  if (GetKeyState (CSKEY_RIGHT))
+  if (kbd->GetKeyState (CSKEY_RIGHT))
     view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
-  if (GetKeyState (CSKEY_LEFT))
+  if (kbd->GetKeyState (CSKEY_LEFT))
     view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
-  if (GetKeyState (CSKEY_PGUP))
+  if (kbd->GetKeyState (CSKEY_PGUP))
     view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_UP, speed);
-  if (GetKeyState (CSKEY_PGDN))
+  if (kbd->GetKeyState (CSKEY_PGDN))
     view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
-  if (GetKeyState (CSKEY_UP))
+  if (kbd->GetKeyState (CSKEY_UP))
     view->GetCamera ()->Move (VEC_FORWARD * 4.0f * speed);
-  if (GetKeyState (CSKEY_DOWN))
+  if (kbd->GetKeyState (CSKEY_DOWN))
     view->GetCamera ()->Move (VEC_BACKWARD * 4.0f * speed);
 
   // add a chain
-  if (GetKeyState (CSKEY_DEL) && !chain_added )
+  if (kbd->GetKeyState (CSKEY_DEL) && !chain_added )
   {
     // Report (CS_REPORTER_SEVERITY_DEBUG, "adding chain");
     // use box template
@@ -444,7 +452,7 @@ void Phyztest::NextFrame ()
 
   // simple mass on a spring demo
 
-  if ( GetKeyState (CSKEY_TAB))
+  if ( kbd->GetKeyState (CSKEY_TAB))
   {
     if  ( bot == NULL )
     {
@@ -504,7 +512,7 @@ void Phyztest::NextFrame ()
   csRigidSpaceTimeObj::evolve_system( 0, 0.25*elapsed_time / 1000.0, &phyz_world, engine );
 
   // Add a boost
-  if (rb_bot && GetKeyState (CSKEY_ENTER))
+  if (rb_bot && kbd->GetKeyState (CSKEY_ENTER))
       rb_bot->apply_impulse (ctVector3 (0,1,0), ctVector3 (0,10,0));
 
   // evolve the physics world by time step.  

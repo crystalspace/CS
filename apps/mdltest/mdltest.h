@@ -16,14 +16,16 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SIMPLE1_H__
-#define __SIMPLE1_H__
+#ifndef __MDLTEST_H__
+#define __MDLTEST_H__
 
 #include <stdarg.h>
 #include "cssys/sysdriv.h"
+#include "imesh/mdldata.h"
 
 struct iEngine;
 struct iGraphics3D;
+struct iKeyboardDriver;
 struct iLoader;
 struct iSector;
 struct iView;
@@ -44,6 +46,7 @@ private:
   iCrossBuilder* crossbuilder;
   iModelConverter* converter;
   iVFS *vfs;
+  iKeyboardDriver* kbd;
  
 public:
   Simple ();
@@ -61,4 +64,4 @@ public:
   iMaterialWrapper *LoadTexture (const char *Name, const char *Filename);
 };
 
-#endif // __SIMPLE1_H__
+#endif // __MDLTEST_H__

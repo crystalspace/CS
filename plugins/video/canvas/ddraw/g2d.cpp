@@ -24,7 +24,7 @@
 #include "csgeom/csrect.h"
 #include "csutil/util.h"
 #include "isys/system.h"
-#include "isys/event.h"
+#include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include "cssys/win32/winhelp.h"

@@ -18,19 +18,19 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/scf.h"
+#include "ogl_proctexsoft.h"
 #include "ogl_txtcache.h"
 #include "ogl_txtmgr.h"
-#include "ogl_proctexsoft.h"
 #include "ogl_g3dcom.h"
+#include "imesh/thing/polygon.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 #include "isys/system.h"
+#include "ivaria/reporter.h"
 #include "ivideo/sproctxt.h"
 #include "ivideo/txtmgr.h"
-#include "imesh/thing/polygon.h"
-#include "isys/event.h"
-#include "isys/plugin.h"
-#include "iutil/objreg.h"
-#include "ivaria/reporter.h"
 
 #if defined(CS_OPENGL_PATH)
 #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
@@ -192,8 +192,12 @@ csOpenGLProcSoftware::~csOpenGLProcSoftware ()
       last = last->next_soft_tex;
     last->next_soft_tex = next_soft_tex;
   }
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->GetSystemEventOutlet ()->Broadcast (cscmdContextClose, (void*)dummy_g2d);
+  if (object_reg != 0)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    if (q != 0)
+      q->GetEventOutlet()->Broadcast(cscmdContextClose,(void*)dummy_g2d);
+  }
   dummy_g2d->DecRef ();
 }
 

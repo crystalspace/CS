@@ -29,9 +29,10 @@
 #include "isys/system.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/fontserv.h"
-#include "cssys/csevent.h"
+#include "csutil/csevent.h"
 #include "csgeom/csrect.h"
 #include "csutil/csstring.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "isys/plugin.h"
 
@@ -110,8 +111,9 @@ bool csConsoleOutput::Initialize (iObjectRegistry *object_reg)
   flash_time = csGetTicks ();
 
   // We want to see broadcast events
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
   return true;
 }
 

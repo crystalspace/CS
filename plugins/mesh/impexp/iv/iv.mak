@@ -4,7 +4,7 @@ DESCRIPTION.ivie = IV Import/Export plug-in
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make ivie        Make the $(DESCRIPTION.ivie)$"
+  $(NEWLINE)echo $"  make ivie         Make the $(DESCRIPTION.ivie)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#

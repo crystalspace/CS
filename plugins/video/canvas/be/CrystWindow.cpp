@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "cssysdef.h"
-#include "isys/event.h"
+#include "iutil/event.h"
 #include "ivideo/graph2d.h"
 #include "isys/system.h"
 #include "CrystWindow.h"

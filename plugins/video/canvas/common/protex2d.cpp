@@ -21,14 +21,15 @@
 #include "protex2d.h"
 #include "csgeom/csrect.h"
 #include "isys/system.h"
-#include "isys/event.h"
-#include "isys/plugin.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
+#include "isys/plugin.h"
 
-csProcTextureSoft2D::csProcTextureSoft2D (iObjectRegistry *object_reg)
+csProcTextureSoft2D::csProcTextureSoft2D (iObjectRegistry *r)
 	: csGraphics2D (NULL)
 {
-  csProcTextureSoft2D::object_reg = object_reg;
+  object_reg = r;
   image_buffer = NULL;
   destroy_memory = false;
 }
@@ -150,8 +151,9 @@ void csProcTextureSoft2D::Close ()
   // These arrays are shared with the texture, the texture will destroy them.
   Palette = NULL;
   csGraphics2D::Close ();
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->GetSystemEventOutlet ()->Broadcast (cscmdContextClose, this);
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->GetEventOutlet()->Broadcast (cscmdContextClose, this);
 }
 
 void csProcTextureSoft2D::Print (csRect *area)

@@ -23,6 +23,7 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/openglcommon/glcommon2d.h"
+struct iKeyboardDriver;
 
 // avoid including os2.h
 class glWindow;
@@ -57,9 +58,10 @@ class csGraphics2DOS2GL : public csGraphics2DGLCommon
   bool HardwareCursor;
   /// Allow window resize?
   bool AllowResize;
-
   /// Window position in percents
   int WindowX, WindowY;
+  /// Generic keyboard driver
+  iKeyboardDriver* KeyboardDriver;
 
 public:
   csGraphics2DOS2GL (iBase *iParent);

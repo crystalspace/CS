@@ -19,15 +19,15 @@
 
 #include <stdarg.h>
 #include "cssysdef.h"
-#include "csutil/scf.h"
+#include "x2d.h"
 #include "csgeom/csrect.h"
+#include "csutil/cfgacc.h"
 #include "isys/system.h"
 #include "iutil/cfgmgr.h"
-#include "csutil/cfgacc.h"
 #include "iutil/cmdline.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "x2d.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -127,12 +127,14 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
     }
   }
 
-  // Tell system driver to call us on broadcast messages
-  iSystem* sys = CS_GET_SYSTEM (object_reg);
-  sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
-  // Create the event outlet
-  EventOutlet = sys->CreateEventOutlet (this);
-
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+  {
+    // Tell event queue to call us on broadcast messages
+    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
+    // Create the event outlet
+    EventOutlet = q->CreateEventOutlet (this);
+  }
   return true;
 }
 

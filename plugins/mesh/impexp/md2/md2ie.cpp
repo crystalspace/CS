@@ -298,7 +298,6 @@ iModelData *csModelConverterMD2::Load (UByte *Buffer, ULong Size)
     in.Read (FrameName, SIZEOF_MD2FRAMENAME);
 
     // read in vertex coordinate data for the frame
-    float *raw_vertexcoords = new float[3*Header.VertexCount];
     in.Read (readbuffer, 4*Header.VertexCount);
 
     iModelDataVertices *VertexFrame = new csModelDataVertices ();

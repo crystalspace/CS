@@ -1,8 +1,8 @@
 /*
   Crystal Space Windowing System: Event manager
   Copyright (C) 1998 by Jorrit Tyberghein
-  Written by Andrew Zabolotny <bit@freya.etu.ru>
-  Minor fixes added by Olivier Langlois <olanglois@sympatico.ca>
+  Copyright (C) 2001 by Eric Sunshine <sunshine@sunshineco.com>
+  Partially written by Andrew Zabolotny <bit@freya.etu.ru>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -21,23 +21,32 @@
 
 #include <stddef.h>
 #include "cssysdef.h"
-#include "cssys/cseventq.h"
+#include "csutil/cseventq.h"
+#include "cssys/system.h" // @@@ For csGetTicks(); remove later.
 
-csEventQueue::csEventQueue (size_t iLength)
-  : EventQueue (NULL), Length (0), SpinLock (0)
+SCF_IMPLEMENT_IBASE (csEventQueue)
+  SCF_IMPLEMENTS_INTERFACE (iEventQueue)
+SCF_IMPLEMENT_IBASE_END
+
+csEventQueue::csEventQueue (iObjectRegistry* r, size_t iLength) :
+  Registry(r), EventQueue(0), evqHead(0), evqTail(0), Length(0), SpinLock(0)
 {
-  evqHead = evqTail = 0;
+  SCF_CONSTRUCT_IBASE (0);
   Resize (iLength);
+  // Create the default event outlet.
+  EventOutlets.Push (new csEventOutlet (0, this, Registry));
 }
 
 csEventQueue::~csEventQueue ()
 {
-  Clear ();
+  Clear();
   if (EventQueue)
     delete[] EventQueue;
+  for (int i = Listeners.Length() - 1; i >= 0; i--)
+    Listeners[i].object->DecRef();
 }
 
-void csEventQueue::Put (iEvent *Event)
+void csEventQueue::Post (iEvent *Event)
 {
 again:
   Lock ();
@@ -45,10 +54,10 @@ again:
   if (newHead == Length)
     newHead = 0;
 
-  if (newHead == evqTail)	// Queue full?
+  if (newHead == evqTail) // Queue full?
   {
     Unlock ();
-    Resize (Length * 2);	// Normally queue should not be more than half full
+    Resize (Length * 2); // Normally queue should not be more than half full.
     goto again;
   } /* endif */
 
@@ -59,25 +68,24 @@ again:
 
 iEvent *csEventQueue::Get ()
 {
-  if (IsEmpty ())
-    return NULL;
-  else
+  iEvent* ev = 0;
+  if (!IsEmpty ())
   {
     Lock ();
     size_t oldTail = evqTail++;
     if (evqTail == Length)
       evqTail = 0;
-    iEvent *ev = (iEvent *)EventQueue [oldTail];
+    ev = (iEvent*)EventQueue [oldTail];
     Unlock ();
-    return ev;
   } /* endif */
+  return ev;
 }
 
 void csEventQueue::Clear ()
 {
-  iEvent *ev;
+  iEvent* ev;
   while ((ev = Get()) != NULL)
-    { delete ev; }
+    ev->DecRef();
 }
 
 void csEventQueue::Resize (size_t iLength)
@@ -85,10 +93,13 @@ void csEventQueue::Resize (size_t iLength)
   if (iLength <= 0)
     iLength = DEF_EVENT_QUEUE_LENGTH;
 
-  if (iLength == Length)
-    return;
-
   Lock ();
+  if (iLength == Length)
+  {
+    Unlock ();
+    return;
+  }
+
   // Remember old event queue and allocate a new one
   volatile iEvent **oldEventQueue = EventQueue;
   EventQueue = (volatile iEvent**) new iEvent *[iLength];
@@ -112,4 +123,124 @@ void csEventQueue::Resize (size_t iLength)
 
   delete[] oldEventQueue;
   Unlock ();
+}
+
+void csEventQueue::Notify(iEvent& e) const
+{
+  for (int i = Listeners.Length() - 1; i >= 0; i--)
+  {
+    Listener const& listener = Listeners[i];
+    if ((listener.trigger & CSMASK_Nothing) != 0)
+      listener.object->HandleEvent(e);
+  }
+}
+
+void csEventQueue::Process()
+{
+  csEvent notification(csGetTicks(), csevBroadcast, cscmdPreProcess);
+  Notify(notification);
+
+  iEvent* ev;
+  while ((ev = Get()) != 0)
+  {
+    Dispatch(*ev);
+    ev->DecRef();
+  }
+
+  notification.Command.Code = cscmdPostProcess;
+  Notify(notification);
+}
+
+void csEventQueue::Dispatch(iEvent& e)
+{
+  int const evmask = 1 << e.Type;
+  bool const canstop = ((e.Flags & CSEF_BROADCAST) == 0);
+  for (int i = 0, n = Listeners.Length(); i < n; i++)
+  {
+    Listener const& l = Listeners[i];
+    if ((l.trigger & evmask) != 0 && l.object->HandleEvent(e) && canstop)
+      break;
+  }
+}
+
+int csEventQueue::FindListener(iPlugin* listener) const
+{
+  for (int i = Listeners.Length() - 1; i >= 0; i--)
+  {
+    Listener const& l = Listeners[i];
+    if (l.object == listener)
+      return i;
+  }
+  return -1;
+}
+
+void csEventQueue::RegisterListener(iPlugin* listener, unsigned int trigger)
+{
+  int const n = FindListener(listener);
+  if (n >= 0)
+    Listeners[n].trigger = trigger;
+  else
+  {
+    Listener l = { listener, trigger };
+    Listeners.Push(l);
+    listener->IncRef();
+  }
+}
+
+void csEventQueue::RemoveListener(iPlugin* listener)
+{
+  int const n = FindListener(listener);
+  if (n >= 0)
+  {
+    Listeners[n].object->DecRef();
+    Listeners.Delete(n);
+  }
+}
+
+void csEventQueue::ChangeListenerTrigger(iPlugin* l, unsigned int trigger)
+{
+  int const n = FindListener(l);
+  if (n >= 0)
+    Listeners[n].trigger = trigger;
+}
+
+iEventOutlet* csEventQueue::CreateEventOutlet (iEventPlug* plug)
+{
+  csEventOutlet* outlet = 0;
+  if (plug != 0)
+  {
+    outlet = new csEventOutlet(plug, this, Registry);
+    EventOutlets.Push (outlet);
+  }
+  return outlet;
+}
+
+iEventOutlet* csEventQueue::GetEventOutlet()
+{
+  return EventOutlets.Get(0);
+}
+
+iEventCord* csEventQueue::GetEventCord (int cat, int subcat)
+{
+  csEventCord* cord;
+  int const n = EventCords.Find (cat, subcat);
+  if (n >= 0) 
+    cord = EventCords.Get(n);
+  else
+  {
+    cord = new csEventCord (cat, subcat);
+    EventCords.Push (cord);
+  }
+  return cord;
+}
+
+int csEventQueue::EventCordsVector::Find (int cat, int subcat)
+{
+  for (int i = Length() - 1; i >= 0; i--)
+  {
+    csEventCord *cord = Get(i);
+    if (cat == cord->GetCategory() && subcat == cord->GetSubcategory())
+      return i;
+  }
+  return -1;
 }

@@ -1,7 +1,7 @@
 /*
     Crystal Space 3D engine: Event Queue interface
     Copyright (C) 1998 by Andrew Zabolotny <bit@freya.etu.ru>
-    Minor fixes added by Olivier Langlois <olanglois@sympatico.ca>
+    Copyright (C) 2001 by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,54 +21,125 @@
 #ifndef __CSEVENTQ_H__
 #define __CSEVENTQ_H__
 
-#include "cssys/csevent.h"
+#include "csutil/csevent.h"
+#include "csutil/csevcord.h"
+#include "csutil/csvector.h"
+#include "csutil/evoutlet.h"
+#include "csutil/garray.h"
+#include "iutil/eventq.h"
+struct iObjectRegistry;
 
 // Default event queue size: the queue will automatically grow
 // when the queue will overflow.
 #define DEF_EVENT_QUEUE_LENGTH  256
 
 /**
- * This class represents a general system event queue.
- * The system driver contains an object of this class.
+ * This class represents a general event queue.  See the documentation of
+ * iEventQueue for a detailed description of each method.  One instance of this
+ * class is usually shared via iObjectRegistry.
  * <p>
- * The implemented event queue is limited thread-safe. There are some
+ * The implemented event queue is limited thread-safe.  There are some
  * primitive spinlocks acquired/released in critical sections.
  */
-class csEventQueue
+class csEventQueue : public iEventQueue
 {
-  /// The queue itself
-  volatile iEvent **EventQueue;
-  /// Queue head and tail pointers
+  friend class csEventOutlet;
+private:
+  struct Listener
+  {
+    iPlugin* object;
+    unsigned int trigger;
+  };
+  CS_TYPEDEF_GROWING_ARRAY(ListenerVector, Listener);
+
+  // The array of all allocated event outlets.
+  class EventOutletsVector : public csVector
+  {
+  public:
+    EventOutletsVector () : csVector (16, 16) {}
+    virtual ~EventOutletsVector () { DeleteAll (); }
+    virtual bool FreeItem (csSome Item)
+      { delete (csEventOutlet *)Item; return true; }
+    csEventOutlet *Get (int idx)
+      { return (csEventOutlet *)csVector::Get (idx); }
+  };
+
+  // The array of all allocated event cords.
+  class EventCordsVector : public csVector
+  {
+  public:
+    EventCordsVector () : csVector (16, 16) {}
+    virtual ~EventCordsVector () { DeleteAll (); }
+    virtual bool FreeItem (csSome Item)
+      { delete (csEventCord *)Item; return true; }
+    csEventCord *Get (int idx)
+      { return (csEventCord *)csVector::Get (idx); }
+    int Find (int Category, int SubCategory);
+  };
+
+  // Shared-object registry
+  iObjectRegistry* Registry;
+  // The queue itself
+  volatile iEvent** EventQueue;
+  // Queue head and tail pointers
   volatile size_t evqHead, evqTail;
-  /// The maximum queue length
+  // The maximum queue length
   volatile size_t Length;
-  /// Protection against multiple threads accessing same event queue
+  // Protection against multiple threads accessing same event queue
   volatile int SpinLock;
+  // Registered listeners.
+  ListenerVector Listeners;
+  // Array of allocated event outlets.
+  EventOutletsVector EventOutlets;
+  // Array of allocated event cords.
+  EventCordsVector EventCords;
+
+  // Enlarge the queue size.
+  void Resize(size_t iLength);
+  // Lock the queue for modifications: NESTED CALLS TO LOCK/UNLOCK NOT ALLOWED!
+  inline void Lock() { while (SpinLock) {} SpinLock++; }
+  // Unlock the queue
+  inline void Unlock() { SpinLock--; }
+  // Find a particular listener index; return -1 if listener is not registered.
+  int FindListener(iPlugin*) const;
+  // Notify listeners of CSMASK_Nothing.
+  void Notify(iEvent&) const;
 
 public:
-  /// Initializes the event queue
-  csEventQueue (size_t iLength = DEF_EVENT_QUEUE_LENGTH);
+  SCF_DECLARE_IBASE;
+
+  /// Initialize the event queue
+  csEventQueue(iObjectRegistry*, size_t iLength = DEF_EVENT_QUEUE_LENGTH);
   /// Destroy an event queue object
-  virtual ~csEventQueue ();
+  virtual ~csEventQueue();
 
-  /// Put a event into queue
-  void Put (iEvent *Event);
+  /// Process the event queue.  Calls Dispatch() once for each contained event.
+  virtual void Process();
+  /// Dispatch a single event from the queue; normally called by Process().
+  virtual void Dispatch(iEvent&);
+
+  /// Register a listener for specific events.
+  virtual void RegisterListener(iPlugin*, unsigned int trigger);
+  /// Unregister a listener.
+  virtual void RemoveListener(iPlugin*);
+  /// Change a listener's trigger.
+  virtual void ChangeListenerTrigger(iPlugin*, unsigned int trigger);
+
+  /// Register an event plug and return a new outlet.
+  virtual iEventOutlet* CreateEventOutlet(iEventPlug*);
+  /// Get a public event outlet for posting just an event.
+  virtual iEventOutlet* GetEventOutlet();
+  /// Get the event cord for a given category and subcategory.
+  virtual iEventCord* GetEventCord (int Category, int Subcategory);
+
+  /// Place an event into queue.
+  virtual void Post(iEvent*);
   /// Get next event from queue or NULL
-  iEvent *Get ();
+  virtual iEvent* Get();
   /// Clear event queue
-  void Clear ();
-  /// Query if queue is empty
-  bool IsEmpty () { return evqHead == evqTail; }
-
-private:
-  /// Enlarge the queue size.
-  void Resize (size_t iLength);
-  /// Lock the queue for modifications: NESTED CALLS TO LOCK/UNLOCK NOT ALLOWED!
-  inline void Lock ()
-  { while (SpinLock) {} SpinLock++; }
-  /// Unlock the queue
-  inline void Unlock ()
-  { SpinLock--; }
+  virtual void Clear();
+  /// Query if queue is empty (@@@ Not thread safe!)
+  virtual bool IsEmpty() { return evqHead == evqTail; }
 };
 
 #endif // __CSEVENTQ_H__

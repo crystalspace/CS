@@ -38,6 +38,7 @@ struct iFont;
 struct iMeshWrapper;
 struct iMaterialWrapper;
 struct iLoader;
+struct iKeyboardDriver;
 
 class DemoSky : public SysSystemDriver
 {
@@ -51,6 +52,7 @@ private:
   iLoader *LevelLoader;
   iGraphics2D *myG2D;
   iGraphics3D *myG3D;
+  iKeyboardDriver* kbd;
 
   /// the flock of birds
   Flock *flock;

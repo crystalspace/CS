@@ -24,7 +24,7 @@
 #include <stdarg.h>
 #include "csutil/scf.h"
 #include "isys/plugin.h"
-#include "isys/event.h"
+#include "iutil/event.h"
 #include "ivideo/xwindow.h"
 #include "ivideo/xextf86vm.h"
 #include "ivideo/graph2d.h"

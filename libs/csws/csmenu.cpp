@@ -25,7 +25,7 @@
 #include "csws/csmenu.h"
 #include "csws/csapp.h"
 #include "csws/cswsaux.h"
-#include "cssys/csinput.h"
+#include "csutil/csinput.h"
 
 // Menu texture name
 #define MENU_TEXTURE_NAME       "csws::Menu"

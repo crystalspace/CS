@@ -24,12 +24,13 @@
 #include "NeXTFrameBuffer15.h"
 #include "NeXTFrameBuffer32.h"
 #include "csutil/cfgacc.h"
+#include "isys/system.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "isys/event.h"
-#include "isys/system.h"
 #include "csver.h"
 
 #define NeXT_REPORTER_ID "crystalspace.canvas.next"
@@ -73,8 +74,9 @@ bool NeXTDriver2D::Initialize(iObjectRegistry* r)
     assistant = CS_QUERY_REGISTRY(r, iNeXTAssistant);
     CS_ASSERT(assistant != 0);
     assistant->IncRef();
-    iSystem* sys = CS_GET_SYSTEM(r);
-    sys->CallOnEvents(&scfiPlugin, CSMASK_Broadcast);
+    iEventQueue* q = CS_QUERY_REGISTRY(r, iEventQueue);
+    if (q != 0)
+      q->RegisterListener(&scfiPlugin, CSMASK_Broadcast);
     controller = NeXTDelegate2D_new(this);
     ok = init_driver(get_desired_depth());
   }
@@ -198,8 +200,9 @@ void NeXTDriver2D::setup_rgb_32()
 //-----------------------------------------------------------------------------
 void NeXTDriver2D::user_close()
 {
-  iSystem* sys = CS_GET_SYSTEM(object_reg);
-  sys->GetSystemEventOutlet()->Broadcast(cscmdContextClose,(iGraphics2D*)this);
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->GetEventOutlet()->Broadcast(cscmdContextClose, (iGraphics2D*)this);
   assistant->request_shutdown();
 }
 

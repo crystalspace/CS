@@ -25,10 +25,11 @@
 #include "csutil/cfgacc.h"
 #include "video/canvas/common/scancode.h"
 #include "video/canvas/common/os2-keys.h"
-#include "isys/system.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
+#include "iutil/csinput.h"
 #include "csdive.h"
 #include "libDIVE.h"
 #include "libDIVEprv.h"
@@ -103,6 +104,8 @@ csGraphics2DOS2DIVE::~csGraphics2DOS2DIVE ()
   gdDiveDeinitialize ();
   if (EventOutlet)
     EventOutlet->DecRef ();
+  if (KeyboardDriver)
+    KeyboardDriver->DecRef ();
 }
 
 bool csGraphics2DOS2DIVE::Initialize (iObjectRegistry* object_reg)
@@ -158,7 +161,13 @@ bool csGraphics2DOS2DIVE::Initialize (iObjectRegistry* object_reg)
   if (cmdline->GetOption ("sysmouse")) HardwareCursor = true;
   if (cmdline->GetOption ("nosysmouse")) HardwareCursor = false;
 
-  EventOutlet = sys->CreateEventOutlet (this);
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    EventOutlet = q->CreateEventOutlet (this);
+
+  KeyboardDriver = CS_QUERY_REGISTRY(object_reg, iKeyboardDriver);
+  if (KeyboardDriver != 0)
+    KeyboardDriver->IncRef ();
 
   return true;
 }
@@ -651,8 +660,7 @@ void csGraphics2DOS2DIVE::KeyboardHandlerStub (void *Self, unsigned char ScanCod
   if (KeyCode == CSKEY_ENTER) CharCode = CSKEY_ENTER;
 
   // WM_CHAR does not support Ctrl+# ...
-  iSystem* sys = CS_GET_SYSTEM (This->object_reg);	//@@@
-  if (sys->GetKeyState (CSKEY_CTRL) && !CharCode
+  if (KeyboardDriver->GetKeyState (CSKEY_CTRL) && !CharCode
    && (KeyCode > 96) && (KeyCode < 127))
     CharCode = KeyCode - 96;
 

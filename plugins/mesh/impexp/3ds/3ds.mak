@@ -4,7 +4,7 @@ DESCRIPTION.ie3ds = Model Import/Export 3ds plug-in
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make ie3ds       Make the $(DESCRIPTION.ie3ds)$"
+  $(NEWLINE)echo $"  make ie3ds        Make the $(DESCRIPTION.ie3ds)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#

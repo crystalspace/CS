@@ -25,8 +25,9 @@
 #include "csgfx/quantize.h"
 #include "csutil/scanstr.h"
 #include "iutil/cfgfile.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
-#include "isys/event.h"
 #include "isys/system.h"
 #include "igraphic/image.h"
 
@@ -502,10 +503,10 @@ void csTextureManagerLine::SetPalette ()
   if (!truecolor && !palette_ok)
     compute_palette ();
 
-  int i;
-  for (i = 0; i < 256; i++)
+  for (int i = 0; i < 256; i++)
     G2D->SetRGB (i, cmap [i].red, cmap [i].green, cmap [i].blue);
 
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->GetSystemEventOutlet ()->ImmediateBroadcast (cscmdPaletteChanged, this);
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->GetEventOutlet()->ImmediateBroadcast (cscmdPaletteChanged, this);
 }

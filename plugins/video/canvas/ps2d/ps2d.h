@@ -20,7 +20,7 @@
 #define __CS_PS2D_H__
 
 #include "video/canvas/common/graph2d.h"
-#include "isys/event.h"
+#include "iutil/event.h"
 
 class csGraphics2Dps2 : public csGraphics2D, public iEventPlug
 {
