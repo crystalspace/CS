@@ -172,15 +172,34 @@ void csSpriteTemplate::AddVertices (int num)
     CHK (delete[] vertices[frame]);
     vertices[frame] = new_vertices;
   }
+
+  CHK (int* ttn = new int [num_texels + num]);
+  if (texel_to_normal != NULL)
+  {
+    for (vertex = 0; vertex < num_texels; vertex++)
+      ttn [vertex] = texel_to_normal [vertex];
+    CHK (delete[] texel_to_normal);
+  }
+  texel_to_normal = ttn;
+
+  CHK (int* ttv = new int [num_texels + num]);
+  if (texel_to_vertex != NULL)
+  {
+    for (vertex = 0; vertex < num_texels; vertex++)
+      ttv [vertex] = texel_to_vertex [vertex];
+    CHK (delete[] texel_to_vertex);
+  }
+  texel_to_vertex = ttv;
+
   for (vertex = 0; vertex < num; vertex++)
   {
     texel_to_normal [num_texels + num] = num_normals + num;
     texel_to_vertex [num_texels + num] = num_vertices + num;
   }
+
   num_normals  += num;
   num_texels   += num;
   num_vertices += num;
-
 }
 
 void csSpriteTemplate::AddTriangle (int a, int b, int c)
