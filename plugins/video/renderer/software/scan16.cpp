@@ -970,6 +970,7 @@ void csScan_16_draw_pi_scanline_tex_gouraud_zuse_565 (void *dest, int len,
 
 //------------------------------------------------------------------
 
+/*
 #ifndef NO_draw_pi_scanline_transp_gouraud_555
 
 #define PI_SCANFUNC csScan_16_draw_pi_scanline_transp_gouraud_555
@@ -979,7 +980,7 @@ void csScan_16_draw_pi_scanline_tex_gouraud_zuse_565 (void *dest, int len,
 #define COLORKEY
 #define BPP16
 #include "scanpi.inc"
-
+*/
 /*
 void csScan_16_draw_pi_scanline_transp_gouraud_555 (void *dest, int len, long *zbuff, long u, long du,
   long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
@@ -1014,10 +1015,10 @@ void csScan_16_draw_pi_scanline_transp_gouraud_555 (void *dest, int len, long *z
 }
 */
 
-#endif // NO_draw_pi_scanline_transp_gouraud_555
+//#endif // NO_draw_pi_scanline_transp_gouraud_555
 
 //------------------------------------------------------------------
-
+/*
 #ifndef NO_draw_pi_scanline_transp_gouraud_565
 
 #define PI_SCANFUNC csScan_16_draw_pi_scanline_transp_gouraud_565
@@ -1027,7 +1028,7 @@ void csScan_16_draw_pi_scanline_transp_gouraud_555 (void *dest, int len, long *z
 #define COLORKEY
 #define BPP16
 #include "scanpi.inc"
-
+*/
 /*
 void csScan_16_draw_pi_scanline_transp_gouraud_565 (void *dest, int len, long *zbuff, long u, long du,
   long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
@@ -1062,7 +1063,123 @@ void csScan_16_draw_pi_scanline_transp_gouraud_565 (void *dest, int len, long *z
 }
 */
 
-#endif // NO_draw_pi_scanline_transp_gouraud_565
+//#endif // NO_draw_pi_scanline_transp_gouraud_565
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pifx_scanline_zfil_555
+
+#define PI_SCANFUNC csScan_16_draw_pifx_scanline_zfil_555
+#define ZFILL
+#define GOURAUD
+#define COLOR555
+#define BPP16
+#define USEEFFECTS
+#include "scanpi.inc"
+
+#endif
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pifx_scanline_zfil_565
+
+#define PI_SCANFUNC csScan_16_draw_pifx_scanline_zfil_565
+#define ZFILL
+#define GOURAUD
+#define COLOR565
+#define BPP16
+#define USEEFFECTS
+#include "scanpi.inc"
+
+#endif
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pifx_scanline_zuse_555
+
+#define PI_SCANFUNC csScan_16_draw_pifx_scanline_zuse_555
+#define ZUSE
+#define GOURAUD
+#define COLOR555
+#define BPP16
+#define USEEFFECTS
+#include "scanpi.inc"
+
+#endif
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pifx_scanline_zuse_565
+
+#define PI_SCANFUNC csScan_16_draw_pifx_scanline_zuse_565
+#define ZUSE
+#define GOURAUD
+#define COLOR565
+#define BPP16
+#define USEEFFECTS
+#include "scanpi.inc"
+
+#endif
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pifx_scanline_transp_zfil_555
+
+#define PI_SCANFUNC csScan_16_draw_pifx_scanline_transp_zfil_555
+#define ZFILL
+#define GOURAUD
+#define COLOR555
+#define COLORKEY
+#define BPP16
+#define USEEFFECTS
+#include "scanpi.inc"
+
+#endif
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pifx_scanline_transp_zfil_565
+
+#define PI_SCANFUNC csScan_16_draw_pifx_scanline_transp_zfil_565
+#define ZFILL
+#define GOURAUD
+#define COLOR565
+#define COLORKEY
+#define BPP16
+#define USEEFFECTS
+#include "scanpi.inc"
+
+#endif
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pifx_scanline_transp_zuse_555
+
+#define PI_SCANFUNC csScan_16_draw_pifx_scanline_transp_zuse_555
+#define ZUSE
+#define GOURAUD
+#define COLOR555
+#define COLORKEY
+#define BPP16
+#define USEEFFECTS
+#include "scanpi.inc"
+
+#endif
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pifx_scanline_transp_zuse_565
+
+#define PI_SCANFUNC csScan_16_draw_pifx_scanline_transp_zuse_565
+#define ZUSE
+#define GOURAUD
+#define COLOR565
+#define COLORKEY
+#define BPP16
+#define USEEFFECTS
+#include "scanpi.inc"
+
+#endif
 
 //------------------------------------------------------------------
 

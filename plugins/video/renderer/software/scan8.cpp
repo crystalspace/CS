@@ -660,3 +660,16 @@ void csScan_8_draw_pi_scanline_tex_zfil (void *dest, int len,
 }
 
 #endif // NO_draw_pi_scanline_tex_zfil
+
+void csScan_8_draw_pifx_scanline_dummy
+  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
+   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
+   ULong r, ULong g, ULong b, long dr, long dg, long db,
+   UByte* BlendingTable)
+{
+   (void) dest;(void) len;(void) zbuff;
+   (void) u;(void) du;(void) v;(void) dv;(void) z;(void) dz;
+   (void) *bitmap;(void) bitmap_log2w;
+   (void) r; (void) g; (void) b; (void) dr; (void) dg; (void) db;
+   (void) BlendingTable;
+}

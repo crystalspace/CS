@@ -50,57 +50,72 @@
  *
  *  SCANPROC{Persp}{Gouraud}_{Source_{Smode_}}{Zmode_}
  *
- *  Persp	= PI for perspective-incorrect routines
- *  Gouraud	= G for Gouraud-shading routines
- *  Source	= TEX for non-lightmapped textures
- *		  MAP for lightmapped textures
- *		  FLAT for flat-shaded
- *		  FOG for drawing fog
- *  SMode	= KEY for "key-color" source pixel removal
- *		  FILT for filtered texture (possibly bi-linear)
- *		  GOURAUD for Gouraud-shading applied to the texture
- *  Zmode	= ZUSE for polys that are tested against Z-buffer (and fills)
- *		  ZFIL for polys that just fills Z-buffer without testing
+ *  Persp       = PI for perspective-incorrect routines
+ *  Gouraud     = G for Gouraud-shading routines
+ *  Source      = TEX for non-lightmapped textures
+ *                MAP for lightmapped textures
+ *                FLAT for flat-shaded
+ *                FOG for drawing fog
+ *  SMode       = KEY for "key-color" source pixel removal
+ *                FILT for filtered texture (possibly bi-linear)
+ *                GOURAUD for Gouraud-shading applied to the texture
+ *  Zmode       = ZUSE for polys that are tested against Z-buffer (and fills)
+ *                ZFIL for polys that just fills Z-buffer without testing
  *
  *  Example:
- *	SCANPROC_TEX_ZFIL_PRIV
- *		scanline procedure for drawing a non-lightmapped texture
- *		with Z-fill and with a private palette table
+ *      SCANPROC_TEX_ZFIL_PRIV
+ *              scanline procedure for drawing a non-lightmapped texture
+ *              with Z-fill and with a private palette table
  *  Note:
- *	For easier runtime decisions odd indices use Z buffer
- *	while even indices fills Z-buffer (if appropiate)
+ *      For easier runtime decisions odd indices use Z buffer
+ *      while even indices fills Z-buffer (if appropiate)
  */
-#define SCANPROC_FLAT_ZFIL		0x00
-#define SCANPROC_FLAT_ZUSE		0x01
-#define SCANPROC_TEX_ZFIL		0x02
-#define SCANPROC_TEX_ZUSE		0x03
-#define SCANPROC_MAP_ZFIL		0x04
-#define SCANPROC_MAP_ZUSE		0x05
-#define SCANPROC_MAP_FILT_ZFIL		0x06
-#define SCANPROC_MAP_FILT_ZUSE		0x07
-#define SCANPROC_TEX_KEY_ZFIL		0x08
-#define SCANPROC_TEX_KEY_ZUSE		0x09
-#define SCANPROC_MAP_KEY_ZFIL		0x0A
-#define SCANPROC_MAP_KEY_ZUSE		0x0B
+#define SCANPROC_FLAT_ZFIL              0x00
+#define SCANPROC_FLAT_ZUSE              0x01
+#define SCANPROC_TEX_ZFIL               0x02
+#define SCANPROC_TEX_ZUSE               0x03
+#define SCANPROC_MAP_ZFIL               0x04
+#define SCANPROC_MAP_ZUSE               0x05
+#define SCANPROC_MAP_FILT_ZFIL          0x06
+#define SCANPROC_MAP_FILT_ZUSE          0x07
+#define SCANPROC_TEX_KEY_ZFIL           0x08
+#define SCANPROC_TEX_KEY_ZUSE           0x09
+#define SCANPROC_MAP_KEY_ZFIL           0x0A
+#define SCANPROC_MAP_KEY_ZUSE           0x0B
 // these do not have "zuse" counterparts
-#define SCANPROC_ZFIL			0x10
-#define SCANPROC_FOG			0x11
-#define SCANPROC_FOG_VIEW		0x12
-#define SCANPROC_FOG_PLANE		0x13
+#define SCANPROC_ZFIL                   0x10
+#define SCANPROC_FOG                    0x11
+#define SCANPROC_FOG_VIEW               0x12
+#define SCANPROC_FOG_PLANE              0x13
 
-#define SCANPROCPI_FLAT_ZFIL		0x00
-#define SCANPROCPI_FLAT_ZUSE		0x01
-#define SCANPROCPI_TEX_ZFIL		0x02
-#define SCANPROCPI_TEX_ZUSE		0x03
+#define SCANPROCPI_FLAT_ZFIL            0x00
+#define SCANPROCPI_FLAT_ZUSE            0x01
+#define SCANPROCPI_TEX_ZFIL             0x02
+#define SCANPROCPI_TEX_ZUSE             0x03
 
 // Gouraud-shaded PI routines should have same indices
 // as their non-Gouraud counterparts
-#define SCANPROCPI_FLAT_GOURAUD_ZFIL	0x00
-#define SCANPROCPI_FLAT_GOURAUD_ZUSE	0x01
-#define SCANPROCPI_TEX_GOURAUD_ZFIL	0x02
-#define SCANPROCPI_TEX_GOURAUD_ZUSE	0x03
+#define SCANPROCPI_FLAT_GOURAUD_ZFIL    0x00
+#define SCANPROCPI_FLAT_GOURAUD_ZUSE    0x01
+#define SCANPROCPI_TEX_GOURAUD_ZFIL     0x02
+#define SCANPROCPI_TEX_GOURAUD_ZUSE     0x03
 
-//---------------------------------------------------------------------------
+//Pointers to scanline drawing with effects.
+#define SCANPROCPIFX_ZUSE               0x00
+#define SCANPROCPIFX_ZFIL               0x01
+#define SCANPROCPIFX_TRANSP_ZUSE        0x02
+#define SCANPROCPIFX_TRANSP_ZFIL        0x03
+
+#define BLENDTABLE_COPY                 0x00
+#define BLENDTABLE_ADD                  0x01
+#define BLENDTABLE_MULTIPLY             0x02
+#define BLENDTABLE_MULTIPLY2            0x03
+#define BLENDTABLE_ALPHA25              0x04
+#define BLENDTABLE_ALPHA50              0x05
+#define BLENDTABLE_ALPHA75              0x06
+#define BLENDTABLE_ALPHA100             0x07
+
+///---------------------------------------------------------------------------
 
 IMPLEMENT_UNKNOWN (csGraphics3DSoftware)
 
@@ -242,6 +257,7 @@ void csGraphics3DSoftware::ScanSetup ()
   memset (&ScanProc, 0, sizeof (ScanProc));
   memset (&ScanProcPI, 0, sizeof (ScanProcPI));
   memset (&ScanProcPIG, 0, sizeof (ScanProcPIG));
+  memset (&ScanProcPIFX, 0, sizeof (ScanProcPIFX));
   ScanProc_Alpha = NULL;
 
   bool PrivTex = (txtmgr->txtMode == TXT_PRIVATE);
@@ -312,6 +328,11 @@ void csGraphics3DSoftware::ScanSetup ()
 
       if (do_transp)
         ScanProc_Alpha = ScanProc_8_Alpha;
+
+      ScanProcPIFX[SCANPROCPIFX_ZUSE]        = csScan_8_draw_pifx_scanline_dummy;
+      ScanProcPIFX[SCANPROCPIFX_ZFIL]        = csScan_8_draw_pifx_scanline_dummy;
+      ScanProcPIFX[SCANPROCPIFX_TRANSP_ZUSE] = csScan_8_draw_pifx_scanline_dummy;
+      ScanProcPIFX[SCANPROCPIFX_TRANSP_ZFIL] = csScan_8_draw_pifx_scanline_dummy;
       break;
 
     case 2:
@@ -386,6 +407,19 @@ void csGraphics3DSoftware::ScanSetup ()
           csScan_16_draw_pi_scanline_tex_gouraud_zuse_565;
       } /* endif */
 
+      ScanProcPIFX[SCANPROCPIFX_ZUSE] = (pfmt.GreenBits == 5) ?
+          csScan_16_draw_pifx_scanline_zuse_555 :
+          csScan_16_draw_pifx_scanline_zuse_565;
+      ScanProcPIFX[SCANPROCPIFX_ZFIL] = (pfmt.GreenBits == 5) ?
+          csScan_16_draw_pifx_scanline_zfil_555 :
+          csScan_16_draw_pifx_scanline_zfil_565;
+      ScanProcPIFX[SCANPROCPIFX_TRANSP_ZUSE] = (pfmt.GreenBits == 5) ?
+          csScan_16_draw_pifx_scanline_transp_zuse_555 :
+          csScan_16_draw_pifx_scanline_transp_zuse_565;
+      ScanProcPIFX[SCANPROCPIFX_TRANSP_ZFIL] = (pfmt.GreenBits == 5) ?
+          csScan_16_draw_pifx_scanline_transp_zfil_555 :
+          csScan_16_draw_pifx_scanline_transp_zfil_565;
+
       if (do_transp)
         ScanProc_Alpha = ScanProc_16_Alpha;
       break;
@@ -433,10 +467,50 @@ void csGraphics3DSoftware::ScanSetup ()
         ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZUSE] = csScan_32_draw_pi_scanline_tex_gouraud_zuse;
       } /* endif */
 
+      ScanProcPIFX[SCANPROCPIFX_ZUSE]        = csScan_32_draw_pifx_scanline_zuse;
+      ScanProcPIFX[SCANPROCPIFX_ZFIL]        = csScan_32_draw_pifx_scanline_zfil;
+      ScanProcPIFX[SCANPROCPIFX_TRANSP_ZUSE] = csScan_32_draw_pifx_scanline_transp_zuse;
+      ScanProcPIFX[SCANPROCPIFX_TRANSP_ZFIL] = csScan_32_draw_pifx_scanline_transp_zfil;
+
       if (do_transp)
         ScanProc_Alpha = ScanProc_32_Alpha;
       break;
   } /* endswitch */
+
+  int MaxColorcomponent = 64; //(pfmt.PixelBytes == 4) ? 256 : 32;
+  
+  //For DrawPolygonFX we will need to do some blending of textures with current
+  //screen content. 
+  for (int i = 0; i<8; i++)
+  {
+    m_BlendingTable[i] = new UByte[MaxColorcomponent*MaxColorcomponent];
+  }
+
+  for (int src = 0; src<MaxColorcomponent; src++)
+  {
+    for (int dest = 0; dest<MaxColorcomponent; dest++)
+    {
+      //The index in the table is a combintation of src pixel and dest pixel
+      int index = dest * MaxColorcomponent + src;
+
+      //Calculate all the available blendingmodes supported.
+      m_BlendingTable[BLENDTABLE_COPY     ][index] =  src;
+      m_BlendingTable[BLENDTABLE_ADD      ][index] =  dest + src;
+      m_BlendingTable[BLENDTABLE_MULTIPLY ][index] = (dest * src)/MaxColorcomponent;
+      m_BlendingTable[BLENDTABLE_MULTIPLY2][index] = (dest * src * 2)/MaxColorcomponent;
+      m_BlendingTable[BLENDTABLE_ALPHA25  ][index] =  dest/4 + (src*3)/4;
+      m_BlendingTable[BLENDTABLE_ALPHA50  ][index] =  dest/2 + src/2;
+      m_BlendingTable[BLENDTABLE_ALPHA75  ][index] = (dest*3)/4 + src/4;
+      m_BlendingTable[BLENDTABLE_ALPHA100 ][index] =  dest;
+
+      for (i = 0; i<8; i++)
+      {
+        if (m_BlendingTable[i][index] >= MaxColorcomponent) 
+          m_BlendingTable[i][index] = MaxColorcomponent-1;
+      }
+    }
+  }
+
 }
 
 csDrawScanline* csGraphics3DSoftware::ScanProc_8_Alpha
@@ -865,7 +939,7 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
     scan_index++;
   csDrawScanline* dscan = ScanProc [scan_index];
   if (!dscan)
-    goto finish;			// Nothing to do.
+    goto finish;                        // Nothing to do.
 
   // Scan both sides of the polygon at once.
   // We start with two pointers at the top (as seen in y-inverted
@@ -1210,7 +1284,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
     scan_index++;
   if (!dscan)
     if ((scan_index < 0) || !(dscan = ScanProc [scan_index]))
-      goto finish;		// nothing to do
+      goto finish;              // nothing to do
 
   // If sub-texture optimization is enabled we will convert the 2D screen polygon
   // to texture space and then triangulate this texture polygon to cache all
@@ -1749,11 +1823,15 @@ static struct
   float th;
   unsigned char *bm;
   int shf_w;
+  bool transparent;
   bool textured;
   bool do_gouraud;
+  DPFXMixMode mixmode;
+  UByte* BlendingTable;
   float r, g, b;
-  csDrawPIScanline* drawline;
+  csDrawPIScanline*        drawline;
   csDrawPIScanlineGouraud* drawline_gouraud;
+  csDrawPIScanlineFX*      drawline_fx;
 } pqinfo;
 
 STDMETHODIMP csGraphics3DSoftware::StartPolygonQuick (ITextureHandle* handle,
@@ -2162,21 +2240,25 @@ finish:
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::StartPolygonFX(ITextureHandle* /*handle*/, 
-                                                  DPFXMixMode /*mode*/, bool /*gouraud*/)
+STDMETHODIMP csGraphics3DSoftware::StartPolygonFX(ITextureHandle* handle, 
+                                                  DPFXMixMode mode, 
+                                                  float alpha,
+                                                  bool gouraud)
 {
-#if 0
-  //The following code definitely is a MESS: I just copied it from StartPolygonQuick, and did some
-  //changes to allow drawing of transparent textures. (ColorKeying)
-  //This urgently needs some cleanup! - Thomas Hieber, June, 20th, 1999
+  pqinfo.do_gouraud = gouraud;
+  pqinfo.mixmode    = mode;
 
   csTextureMMSoftware* txt_mm;
   csTexture* txt_unl;
   pqinfo.textured = true;
-  if (!do_lighting) gouraud = false;
-  if (!do_textured) pqinfo.textured = false;
-  if (!handle) pqinfo.textured = false;
-  pqinfo.do_gouraud = gouraud || !handle;
+
+  if (mode == FX_Copy && !pqinfo.transparent)
+  {
+    if (!do_lighting) gouraud = false;
+    if (!do_textured) pqinfo.textured = false;
+    if (!handle) pqinfo.textured = false;
+    pqinfo.do_gouraud = gouraud || !handle;
+  }
 
   int itw, ith;
 
@@ -2189,160 +2271,478 @@ STDMETHODIMP csGraphics3DSoftware::StartPolygonFX(ITextureHandle* /*handle*/,
     ith = txt_unl->get_height ();
     pqinfo.shf_w = txt_unl->get_w_shift ();
 
-    pqinfo.tw = (float)itw; 
-    pqinfo.th = (float)ith; 
-    pqinfo.twfp = QInt16 (pqinfo.tw);
-    pqinfo.thfp = QInt16 (pqinfo.th);
+    pqinfo.tw          = (float)itw;
+    pqinfo.th          = (float)ith;
+    pqinfo.twfp        = QInt16 (pqinfo.tw);
+    pqinfo.thfp        = QInt16 (pqinfo.th);
+    pqinfo.transparent = txt_mm->get_transparent();
   }
-
-  IGraphicsInfo* piGI;
 
   Scan.AlphaMask = txtmgr->alpha_mask;
   Scan.PaletteTable = txtmgr->lt_pal->pal_to_true;
 
-  pqinfo.redFact = (1<<pfmt.RedBits)-1; // 32 for 555, 64 for 565, and 256 for 888 mode.
-  pqinfo.greenFact = (1<<pfmt.GreenBits)-1;
-  pqinfo.blueFact = (1<<pfmt.BlueBits)-1;
+  pqinfo.redFact = (1 << pfmt.RedBits) - 1;
+  pqinfo.greenFact = (1 << pfmt.GreenBits) - 1;
+  pqinfo.blueFact = (1 << pfmt.BlueBits) - 1;
 
   // Select draw scanline routine
-  pqinfo.drawline = NULL;
-  pqinfo.drawline_gouraud = NULL;
+  int scan_index = pqinfo.textured ? SCANPROCPI_TEX_ZFIL : SCANPROCPI_FLAT_ZFIL;
+  if (z_buf_mode == ZBuf_Use)
+    scan_index++;
+  pqinfo.drawline = ScanProcPI [scan_index];
+  pqinfo.drawline_gouraud = ScanProcPIG [scan_index];
+  if (!pqinfo.drawline_gouraud)
+    pqinfo.do_gouraud = false;
 
-  if (pqinfo.pixelbytes == 2)
+  scan_index = (z_buf_mode == ZBuf_Use) ? SCANPROCPIFX_ZUSE : SCANPROCPIFX_ZFIL;
+  if (pqinfo.transparent) scan_index += 0x02;
+  pqinfo.drawline_fx = ScanProcPIFX[scan_index];
+
+  switch (mode)
   {
-    if (!pqinfo.textured)
-    {
-      if (pqinfo.do_gouraud)
+    case FX_Add:
+      pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_ADD];
+      break;
+    case FX_Multiply:
+      pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_MULTIPLY];
+      break;
+    case FX_Multiply2:
+      pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_MULTIPLY2];
+      break;
+    case FX_Alpha:
+      if (alpha<0.05) 
       {
-        if (z_buf_mode == ZBuf_Use)
-          if (pqinfo.greenBits == 5)
-            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_flat_gouraud_555;
-          else
-            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_flat_gouraud_565;
-        else
-          if (pqinfo.greenBits == 5)
-            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_flat_gouraud_zfill_555;
-          else
-            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_flat_gouraud_zfill_565;
+        pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_COPY];
       }
-      else
+      else if (alpha<0.375)
       {
-        if (z_buf_mode == ZBuf_Use)
-          pqinfo.drawline = Scan16::draw_pi_scanline_flat;
-        else
-          pqinfo.drawline = Scan16::draw_pi_scanline_flat_zfill;
+        pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_ALPHA25];
       }
-    }
-    else
-    {
-      if (gouraud)
+      else if (alpha<0.625)
       {
-        if (z_buf_mode == ZBuf_Use)
-          if (pqinfo.greenBits == 5)
-            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_transp_gouraud_555;
-            //pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouraud_555;
-          else
-            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_transp_gouraud_565;
-            //pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouraud_565;
-        else
-          if (pqinfo.greenBits == 5)
-            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_transp_gouraud_555;
-            //pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouraud_zfill_555;
-          else
-            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_transp_gouraud_565;
-            //pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouraud_zfill_565;
+        pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_ALPHA50];
       }
-      else
+      else if (alpha<0.95)
       {
-        if (z_buf_mode == ZBuf_Use)
-        {
-#         if defined(DO_MMX) && !defined(NO_ASSEMBLER)
-            // if (cpu_mmx && do_mmx)
-            // drawline = Scan16::mmx_draw_pi_scanline;
-            // else
-#         endif
-          pqinfo.drawline = Scan16::draw_pi_scanline;
-        }
-        else
-          pqinfo.drawline = Scan16::draw_pi_scanline_zfill;
+        pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_ALPHA75];
       }
-    }
+      else 
+      {
+        pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_ALPHA100];
+      }
+      break;
+    case FX_Copy:
+    default:
+      pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_COPY];
+      //pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_ADD];
+      break;
   }
-  else if (pqinfo.pixelbytes == 4)
-  {
-    if (!pqinfo.textured)
-    {
-      if (pqinfo.do_gouraud)
-      {
-        if (z_buf_mode == ZBuf_Use)
-          pqinfo.drawline_gouraud = Scan32::draw_pi_scanline_flat_gouraud;
-        else
-          pqinfo.drawline_gouraud = Scan32::draw_pi_scanline_flat_gouraud_zfill;
-      }
-      else
-      {
-        if (z_buf_mode == ZBuf_Use)
-          pqinfo.drawline = Scan32::draw_pi_scanline_flat;
-        else
-          pqinfo.drawline = Scan32::draw_pi_scanline_flat_zfill;
-      }
-    }
-    else
-    {
-      if (gouraud)
-      {
-        if (z_buf_mode == ZBuf_Use)
-          pqinfo.drawline_gouraud = Scan32::draw_pi_scanline_gouraud;
-        else
-          pqinfo.drawline_gouraud = Scan32::draw_pi_scanline_gouraud_zfill;
-      }
-      else
-      {
-        if (z_buf_mode == ZBuf_Use)
-          pqinfo.drawline = Scan32::draw_pi_scanline;
-        else
-          pqinfo.drawline = Scan32::draw_pi_scanline_zfill;
-      }
-    }
-  }
-  else
-  {
-    if (!handle) return S_OK;   // Not implemented yet@@@
-    if (z_buf_mode == ZBuf_Use)
-    {
-#     if defined(DO_MMX) && !defined(NO_ASSEMBLER)
-      if (cpu_mmx && do_mmx)
-        pqinfo.drawline = Scan::mmx_draw_pi_scanline;
-      else
-#     endif
-      pqinfo.drawline = Scan::draw_pi_scanline;
-    }
-    else
-      pqinfo.drawline = Scan::draw_pi_scanline_zfill;
-  }
-#endif
+
   return S_OK;
 }
 
 STDMETHODIMP csGraphics3DSoftware::FinishPolygonFX()
 {
-  //This implementation is pretty wrong, but at least, it will show something on the screen
-  return FinishPolygonQuick();
+  return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX(G3DPolygonDPFX& poly, 
-                                                 bool /*gouraud*/)
+STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX(G3DPolygonDPFX& poly)
 {
-  //This implementation is pretty wrong, but at least, it will show something on the screen
-  G3DPolygonDPQ newpoly;
-  for (int i=0; i<poly.num; i++)
+  int i;
+  bool gouraud  = pqinfo.do_gouraud;
+  bool textured = pqinfo.textured;
+
+  if (!pqinfo.drawline && !pqinfo.drawline_gouraud)
+    return S_OK;
+
+  float flat_r, flat_g, flat_b;
+  if (poly.txt_handle)
+    flat_r = flat_g = flat_b = 1;
+  else
   {
-    newpoly.vertices[i] = poly.vertices[i];
+    flat_r = poly.vertices[0].r;
+    flat_g = poly.vertices[0].g;
+    flat_b = poly.vertices[0].b;
   }
-  newpoly.num        = poly.num;
-  newpoly.inv_aspect = poly.inv_aspect;
-  newpoly.txt_handle = poly.txt_handle;
-  return DrawPolygonQuick(newpoly);
+
+  //-----
+  // Get the values from the polygon for more conveniant local access.
+  // Also look for the top-most and bottom-most vertices.
+  //-----
+  float uu[64], vv[64], iz[64];
+  float rr[64], gg[64], bb[64];
+  int top, bot;
+  float top_y = -99999;
+  float bot_y = 99999;
+  top = bot = 0;                        // avoid GCC complains
+  for (i = 0 ; i < poly.num ; i++)
+  {
+    uu[i] = pqinfo.tw * poly.vertices [i].u;
+    vv[i] = pqinfo.th * poly.vertices [i].v;
+    iz[i] = poly.vertices [i].z;
+    rr[i] = pqinfo.redFact * (flat_r * poly.vertices [i].r);
+    gg[i] = pqinfo.greenFact * (flat_g * poly.vertices [i].g);
+    bb[i] = pqinfo.blueFact * (flat_b * poly.vertices [i].b);
+    if (poly.vertices [i].sy > top_y)
+    {
+      top_y = poly.vertices [i].sy;
+      top = i;
+    }
+    if (poly.vertices [i].sy < bot_y)
+    {
+      bot_y = poly.vertices [i].sy;
+      bot = i;
+    }
+  }
+
+  //-----
+  // Calculate constant du,dv,dz.
+  //
+  //          (At-Ct)*(By-Cy) - (Bt-Ct)*(Ay-Cy)
+  //  dt/dx = ---------------------------------
+  //          (Ax-Cx)*(By-Cy) - (Bx-Cx)*(Ay-Cy)
+  //-----
+
+  int last;
+  float dd = 0;
+  for (last = 2; last < poly.num; last++)
+  {
+    dd = (poly.vertices [0].sx - poly.vertices [last].sx) *
+         (poly.vertices [1].sy - poly.vertices [last].sy) -
+         (poly.vertices [1].sx - poly.vertices [last].sx) *
+         (poly.vertices [0].sy - poly.vertices [last].sy);
+    if (dd < 0)
+      break;
+  }
+
+  // Rejection of back-faced polygons
+  if ((last == poly.num) || (dd == 0))
+    return S_OK;
+
+  float inv_dd = 1 / dd;
+  int du = 0, dv = 0;
+  if (textured)
+  {
+    float uu0 = pqinfo.tw * poly.vertices [0].u;
+    float uu1 = pqinfo.tw * poly.vertices [1].u;
+    float uu2 = pqinfo.tw * poly.vertices [last].u;
+    du = QInt16 (((uu0 - uu2) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                - (uu1 - uu2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
+    float vv0 = pqinfo.th * poly.vertices [0].v;
+    float vv1 = pqinfo.th * poly.vertices [1].v;
+    float vv2 = pqinfo.th * poly.vertices [last].v;
+    dv = QInt16 (((vv0 - vv2) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                - (vv1 - vv2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
+  }
+  float iz0 = poly.vertices [0].z;
+  float iz1 = poly.vertices [1].z;
+  float iz2 = poly.vertices [last].z;
+  int dz = QInt24 (((iz0 - iz2) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                  - (iz1 - iz2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
+  long dr = 0, dg = 0, db = 0;
+  if (gouraud)
+  {
+    float rr0 = pqinfo.redFact * (flat_r * poly.vertices [0].r);
+    float rr1 = pqinfo.redFact * (flat_r * poly.vertices [1].r);
+    float rr2 = pqinfo.redFact * (flat_r * poly.vertices [last].r);
+    dr = QInt16 (((rr0 - rr2) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                - (rr1 - rr2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
+    float gg0 = pqinfo.greenFact * (flat_g * poly.vertices [0].g);
+    float gg1 = pqinfo.greenFact * (flat_g * poly.vertices [1].g);
+    float gg2 = pqinfo.greenFact * (flat_g * poly.vertices [last].g);
+    dg = QInt16 (((gg0 - gg2) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                - (gg1 - gg2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
+    float bb0 = pqinfo.blueFact * (flat_b * poly.vertices [0].b);
+    float bb1 = pqinfo.blueFact * (flat_b * poly.vertices [1].b);
+    float bb2 = pqinfo.blueFact * (flat_b * poly.vertices [last].b);
+    db = QInt16 (((bb0 - bb2) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                - (bb1 - bb2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
+  }
+
+  //-----
+  // Scan from top to bottom.
+  // scanL1-scanL2 is the left segment to scan.
+  // scanR1-scanR2 is the right segment to scan.
+  //-----
+  int scanL1, scanL2 = top;
+  int scanR1, scanR2 = top;
+
+  int xL = 0, xR = 0, dxdyL = 0, dxdyR = 0;
+  int uL = 0, vL = 0, zL = 0, rL = 0, gL = 0, bL = 0;
+  int dudyL = 0, dvdyL = 0, dzdyL = 0, drdyL = 0, dgdyL = 0, dbdyL = 0;
+
+  int sy, fyL, fyR;
+  sy = fyL = fyR = QRound (poly.vertices [top].sy);
+
+  //-----
+  // The loop.
+  //-----
+  for ( ; ; )
+  {
+    //-----
+    // We have reached the next segment. Recalculate the slopes.
+    //-----
+    bool leave;
+    do
+    {
+      leave = true;
+      if (sy <= fyR)
+      {
+        //-----
+        // Right side needs to be advanced.
+        //-----
+        // Check first if polygon has been finished
+        if (scanR2 == bot)
+          goto finish;
+        scanR1 = scanR2;
+        scanR2 = (scanR2 + 1) % poly.num;
+
+        // Do we have a flat bottom?
+        //@@@ this looks like it needs to be rethought -- A.Z.
+        if (fabs (poly.vertices [scanR2].sy - poly.vertices [top].sy) < EPS)
+          continue;
+
+        fyR = QRound (poly.vertices [scanR2].sy);
+        float dyR = poly.vertices [scanR1].sy - poly.vertices [scanR2].sy;
+        if (dyR > 0)
+        {
+          xR = QInt16 (poly.vertices [scanR1].sx);
+          dxdyR = QInt16 ((poly.vertices [scanR2].sx - poly.vertices [scanR1].sx) / dyR);
+          // horizontal pixel correction
+          xR += QRound (dxdyR * (poly.vertices [scanR1].sy -
+            ((float)QRound (poly.vertices [scanR1].sy) - 0.5)));
+        } /* endif */
+        leave = false;
+      } /* endif */
+      if (sy <= fyL)
+      {
+        //-----
+        // Left side needs to be advanced.
+        //-----
+        if (scanL2 == bot)
+          goto finish;
+        scanL1 = scanL2;
+        scanL2 = (scanL2 - 1 + poly.num) % poly.num;
+
+        // Do we have a flat bottom?
+        //@@@ this looks like it needs to be rethought -- A.Z.
+        if (fabs (poly.vertices [scanL2].sy - poly.vertices [top].sy) < EPS)
+          continue;
+
+        fyL = QRound (poly.vertices [scanL2].sy);
+        float dyL = poly.vertices [scanL1].sy - poly.vertices [scanL2].sy;
+        if (dyL > 0)
+        {
+          float inv_dyL = 1/dyL;
+          dxdyL = QInt16 ((poly.vertices [scanL2].sx - poly.vertices [scanL1].sx) * inv_dyL);
+          if (textured)
+          {
+            dudyL = QInt16 ((uu[scanL2] - uu[scanL1]) * inv_dyL);
+            dvdyL = QInt16 ((vv[scanL2] - vv[scanL1]) * inv_dyL);
+          }
+          dzdyL = QInt24 ((iz[scanL2] - iz[scanL1]) * inv_dyL);
+          if (gouraud)
+          {
+            drdyL = QInt16 ((rr[scanL2] - rr[scanL1]) * inv_dyL);
+            dgdyL = QInt16 ((gg[scanL2] - gg[scanL1]) * inv_dyL);
+            dbdyL = QInt16 ((bb[scanL2] - bb[scanL1]) * inv_dyL);
+          }
+          xL = QInt16 (poly.vertices [scanL1].sx);
+
+          // horizontal pixel correction
+          float deltaY = poly.vertices [scanL1].sy - ((float)sy - 0.5);
+          float deltaX = (dxdyL / 65536.) * deltaY;
+          xL += QInt16 (deltaX);
+
+          // apply sub-pixel accuracy factor
+          float Factor;
+          if (poly.vertices [scanL2].sx != poly.vertices [scanL1].sx)
+            Factor = deltaX / (poly.vertices [scanL2].sx - poly.vertices [scanL1].sx);
+          else
+            Factor = 0;
+
+          if (textured)
+          {
+            uL = QInt16 (uu [scanL1] + (uu [scanL2] - uu [scanL1]) * Factor);
+            vL = QInt16 (vv [scanL1] + (vv [scanL2] - vv [scanL1]) * Factor);
+          }
+          zL = QInt24 (iz [scanL1] + (iz [scanL2] - iz [scanL1]) * Factor);
+          if (gouraud)
+          {
+            rL = QInt16 (rr [scanL1] + (rr [scanL2] - rr [scanL1]) * Factor);
+            gL = QInt16 (gg [scanL1] + (gg [scanL2] - gg [scanL1]) * Factor);
+            bL = QInt16 (bb [scanL1] + (bb [scanL2] - bb [scanL1]) * Factor);
+          }
+        } /* endif */
+        leave = false;
+      } /* endif */
+    } while (!leave); /* enddo */
+
+    //-----
+    // Now draw a trapezoid.
+    //-----
+    int fin_y;
+    if (fyL > fyR)
+      fin_y = fyL;
+    else
+      fin_y = fyR;
+
+    int screenY = height - 1 - sy;
+    if (!textured)
+    {
+      while (sy > fin_y)
+      {
+        if ((sy & 1) != do_interlaced)
+        {
+          //-----
+          // Draw one scanline.
+          //-----
+          int xl = round16 (xL);
+          int xr = round16 (xR);
+
+          if (xr > xl)
+          {
+            register unsigned long *zbuff = z_buffer + width * screenY + xl;
+            unsigned char* pixel_at = line_table[screenY] + (xl << pixel_shift);
+
+            if (pqinfo.mixmode == FX_Copy && !pqinfo.transparent)
+            {
+              if (gouraud)
+                pqinfo.drawline_gouraud (pixel_at, xr-xl, zbuff, 0, 0,
+                      0, 0, zL, dz, NULL, 0, rL, gL, bL, dr, dg, db);
+              else
+                pqinfo.drawline (pixel_at, xr - xl, zbuff, 0, 0,
+                        0, 0, zL, dz, NULL, 0);
+            }
+            else
+            {
+              if (gouraud)
+              {
+                pqinfo.drawline_fx (pixel_at, xr-xl, zbuff, 0, 0,
+                      0, 0, zL, dz, NULL, 0, 
+                      rL, gL, bL, dr, dg, db,
+                      pqinfo.BlendingTable);
+              }
+              else
+              {
+                pqinfo.drawline_fx (pixel_at, xr-xl, zbuff, 0, 0,
+                      0, 0, zL, dz, NULL, 0, 
+                      pqinfo.redFact << 16, 
+                      pqinfo.greenFact << 16, 
+                      pqinfo.blueFact << 16, 
+                      0, 0, 0, 
+                      pqinfo.BlendingTable);
+              }
+            }
+          } /* endif */
+        }
+
+        xL += dxdyL; xR += dxdyR; zL += dzdyL;// zR += dzdyR;
+
+        if(gouraud)
+          rL += drdyL, gL += dgdyL, bL += dbdyL;
+
+        sy--;
+        screenY++;
+      }
+    }
+    else
+    {
+      while (sy > fin_y)
+      {
+        if ((sy & 1) != do_interlaced)
+        {
+          //-----
+          // Draw one scanline.
+          //-----
+          int xl = round16 (xL);
+          int xr = round16 (xR);
+
+          if (xr > xl)
+          {
+            register unsigned long *zbuff = z_buffer + width * screenY + xl;
+
+            int l=xr-xl;
+            // Check for texture overflows
+            int uu = uL, vv = vL;
+            int duu = du, dvv = dv;
+            if (uu < 0) uu = 0; if (uu > pqinfo.twfp) uu = pqinfo.twfp;
+            if (vv < 0) vv = 0; if (vv > pqinfo.thfp) vv = pqinfo.thfp;
+
+            int tmpu = uu + du * l;
+            int tmpv = vv + dv * l;
+            if (tmpu < 0 || tmpu > pqinfo.twfp)
+            {
+              if (tmpu < 0) tmpu = 0; if (tmpu > pqinfo.twfp) tmpu = pqinfo.twfp;
+              duu = (tmpu - uu) / l;
+            }
+            if (tmpv < 0 || tmpv > pqinfo.thfp)
+            {
+              if (tmpv < 0) tmpv = 0; if (tmpv > pqinfo.thfp) tmpv = pqinfo.thfp;
+              dvv = (tmpv - vv) / l;
+            }
+
+            unsigned char *pixel_at = line_table [screenY] + (xl << pixel_shift);
+
+            if (pqinfo.mixmode == FX_Copy && !pqinfo.transparent)
+            {
+              if (gouraud)
+                pqinfo.drawline_gouraud (pixel_at, xr - xl, zbuff, uu, duu,
+                      vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w, rL, gL, bL, dr, dg, db);
+              else
+                pqinfo.drawline (pixel_at, xr - xl, zbuff, uu, duu,
+                      vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w);
+            }
+            else
+            {
+              if (gouraud)
+              {
+                pqinfo.drawline_fx (pixel_at, xr - xl, zbuff, uu, duu,
+                      vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w, 
+                      rL, gL, bL, dr, dg, db, 
+                      pqinfo.BlendingTable);
+              }
+              else
+              {
+                pqinfo.drawline_fx (pixel_at, xr - xl, zbuff, uu, duu,
+                      vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w, 
+                      pqinfo.redFact << 16, 
+                      pqinfo.greenFact << 16, 
+                      pqinfo.blueFact << 16, 
+                      0, 0, 0, 
+                      pqinfo.BlendingTable);
+              }
+            }
+          }
+        }
+
+        xL += dxdyL; xR += dxdyR;
+        uL += dudyL; vL += dvdyL; zL += dzdyL;
+        if (gouraud)
+          rL += drdyL, gL += dgdyL, bL += dbdyL;
+
+        sy--;
+        screenY++;
+      }
+    }
+  }
+
+finish:
+  if (rstate_edges)
+  {
+    int white = txtmgr->white ();
+
+    for (i = 0; i < poly.num; i++)
+    {
+      int next = (i == poly.num - 1 ? 0 : i + 1);
+      m_piG2D->DrawLine (QRound (poly.vertices [i].sx),
+                         height - 1 - QRound (poly.vertices [i].sy),
+                         QRound (poly.vertices [next].sx),
+                         height - 1 - QRound (poly.vertices [next].sy), white);
+    } /* endfor */
+  }
+
+  return S_OK;
 };
 
 STDMETHODIMP csGraphics3DSoftware::CacheTexture (IPolygonTexture* texture)
@@ -3258,7 +3658,7 @@ STDMETHODIMP IXConfig3DSoft::GetOption (int id, csVariant* value)
     default: return E_FAIL;
   }
   return S_OK;
-}
+}                                
 
 STDMETHODIMP IXConfig3DSoft::GetNumberOptions (int& num)
 {

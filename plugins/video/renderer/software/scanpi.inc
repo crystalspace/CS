@@ -17,6 +17,7 @@
   #ifdef COLOR555
     #define REDSHIFT     10
     #define REDBITS       5
+    #define REDMASK    0x1f
     #define GREENSHIFT    5
     #define GREENBITS     5
     #define GREENMASK  0x1f  
@@ -27,6 +28,7 @@
   #ifdef COLOR565
     #define REDSHIFT     11
     #define REDBITS       5
+    #define REDMASK    0x1f
     #define GREENSHIFT    5
     #define GREENBITS     6
     #define GREENMASK  0x3f  
@@ -40,6 +42,7 @@
 
   #define REDSHIFT     16
   #define REDBITS       8
+  #define REDMASK    0xff
   #define GREENSHIFT    8
   #define GREENBITS     8
   #define GREENMASK  0xff  
@@ -67,11 +70,18 @@
 //             but don't test it.
 //ZUSE:        define, if you want full z-buffer support (set and test). This
 //             can not be combined with ZFILL, but you can omit both.
+//USEEFFECTS   Use the optional blending table to determine, what color the new
+//             Pixel is supposed to have. This is depending on the original
+//             Color on screen and the color of the new pixel. This must be
+//             combined with GOURAUD!
 void PI_SCANFUNC (void *dest, int len,
   unsigned long *zbuff, long u, long du, long v, long dv,
   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w
 #ifdef GOURAUD
   ,ULong r, ULong g, ULong b, long dr, long dg, long db
+#endif
+#ifdef USEEFFECTS
+  ,UByte* BlendingTable
 #endif
   )
 {
@@ -80,7 +90,11 @@ void PI_SCANFUNC (void *dest, int len,
   BITTYPE tex;
 
 #ifdef GOURAUD
-  ULong r1, g1, b1; //was int
+  ULong r1, g1, b1; 
+#endif
+
+#ifdef USEEFFECTS
+  ULong r2, g2, b2; 
 #endif
 
   while (_dest < _destend)
@@ -129,6 +143,33 @@ void PI_SCANFUNC (void *dest, int len,
             g1 = (g1*g) >> (16+GREENBITS);
             b1 = (b1*b) >> (16+BLUEBITS);
           #endif
+          // Now r1, g1 and b1 contain the color of the new pixel on screen
+          #ifdef USEEFFECTS
+            BITTYPE Screen = *_dest;
+            r2 =  Screen >> REDSHIFT    & REDMASK;
+            g2 = (Screen >> GREENSHIFT) & GREENMASK;
+            b2 =  Screen  & BLUEMASK;
+            //Now r2, g2 and b2 contain the color of the old pixel on screen
+            #ifdef BPP16
+              //r1 = 0x10;
+              //g1 = 0x20;
+              //b1 = 0x10;
+
+              r1 = BlendingTable[r1*2+r2*128]/2;
+              #ifdef COLOR555
+              g1 = BlendingTable[g1*2+g2*128]/2;
+              #else
+              g1 = BlendingTable[g1+g2*64];
+              #endif
+              b1 = BlendingTable[b1*2+b2*128]/2;
+            #else
+              //32Bit Blending Mode
+              r1 = BlendingTable[(r1>>2)+(r2>>2)*64]<<2;
+              g1 = BlendingTable[(g1>>2)+(g2>>2)*64]<<2;
+              b1 = BlendingTable[(b1>>2)+(b2>>2)*64]<<2;
+            #endif
+            //Now r1, g1 and b1 now contain a blend between old and new pixel.
+          #endif
           tex = (r1<<REDSHIFT) | (g1<<GREENSHIFT) | b1;
         #endif
 
@@ -158,3 +199,4 @@ void PI_SCANFUNC (void *dest, int len,
 #undef FLAT
 #undef BPP16
 #undef BPP32
+#undef USEEFFECTS

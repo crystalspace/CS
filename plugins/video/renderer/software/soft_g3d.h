@@ -70,7 +70,7 @@ private:
 
 ///
 class csGraphics3DSoftware : public IGraphics3D,
-			     public IHaloRasterizer
+                             public IHaloRasterizer
 {
 private:
   /// Z buffer for software renderer only. Hardware rendering uses own Z buffer.
@@ -140,6 +140,11 @@ private:
   csDrawPIScanline* ScanProcPI [4];
   /// draw_pi_scanline_gouraud_xxx routines
   csDrawPIScanlineGouraud* ScanProcPIG [4];
+  /// draw_pi_scanline_fx_xxx routines
+  csDrawPIScanlineFX* ScanProcPIFX[4];
+
+  UByte* m_BlendingTable[8];
+
   /// The routine for getting the address of needed scanline_xxx_alpha
   csDrawScanline* (*ScanProc_Alpha) (csGraphics3DSoftware *This, int alpha);
 
@@ -270,10 +275,10 @@ public:
    * will have been added before the first front-facing polygon.
    * fogtype can be:
    * <ul>
-   *	<li>CS_FOG_FRONT:	a front-facing polygon
-   *	<li>CS_FOG_BACK:	a back-facing polygon
-   *	<li>CS_FOG_VIEW:	the view-plane
-   *	<li>CS_FOG_PLANE:	used in planed fog mode
+   *    <li>CS_FOG_FRONT:       a front-facing polygon
+   *    <li>CS_FOG_BACK:        a back-facing polygon
+   *    <li>CS_FOG_VIEW:        the view-plane
+   *    <li>CS_FOG_PLANE:       used in planed fog mode
    * </ul>
    */
   STDMETHODIMP AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
@@ -298,13 +303,13 @@ public:
   STDMETHODIMP DrawPolygonQuick (G3DPolygonDPQ& poly);
 
   /// Start a series of DrawPolygonFX
-  STDMETHODIMP StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouraud);
+  STDMETHODIMP StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, float alpha, bool gouraud);
 
   /// Finish a series of DrawPolygonFX
   STDMETHODIMP FinishPolygonFX();
 
   /// Draw a polygon with special effects.
-  STDMETHODIMP DrawPolygonFX    (G3DPolygonDPFX& poly, bool gouraud);
+  STDMETHODIMP DrawPolygonFX    (G3DPolygonDPFX& poly);
 
   /// Give a texture to csGraphics3DSoftware to cache it.
   STDMETHODIMP CacheTexture (IPolygonTexture* texture);

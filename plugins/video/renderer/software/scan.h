@@ -160,10 +160,17 @@ typedef void (csDrawScanline)
 typedef void (csDrawPIScanline)
   (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
    unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w);
+/// The interface definition for all draw_pi_scanline_XXX_gouraud_XXX routines
 typedef void (csDrawPIScanlineGouraud)
   (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
    unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
    ULong r, ULong g, ULong b, long dr, long dg, long db);
+/// The interface definition for all draw_pi_scanline_XXX_fx_XXX routines
+typedef void (csDrawPIScanlineFX)
+  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
+   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
+   ULong r, ULong g, ULong b, long dr, long dg, long db,
+   UByte* BlendingTable);
 
 //---//---//---//---//---//---//---//---//---//---//---//---//- Routines //---//
 
@@ -173,94 +180,60 @@ extern "C" void csScan_InitDraw (csGraphics3DSoftware* g3d,
 /// Dump debugging information about last polygon
 extern "C" void csScan_dump (csGraphics3DSoftware* pG3D);
 /// Pixel-depth independent routine
-extern "C" void csScan_draw_scanline_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_draw_scanline_zfil;
 
 //---//---//---//---//---//---//---//---//---//-- 8-bit drawing routines //---//
 
 /// Draw one horizontal scanline with no texture mapping and fill Z buffer
-extern "C" void csScan_8_draw_scanline_flat_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_8_draw_scanline_flat_zfil;
 /// Draw one horizontal scanline with no texture mapping (but use Z buffer).
-extern "C" void csScan_8_draw_scanline_flat_zuse
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_8_draw_scanline_flat_zuse;
 /// Draw one horizontal scanline (no lighting).
-extern "C" void csScan_8_draw_scanline_tex_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_8_draw_scanline_tex_zfil;
 /// Draw one horizontal scanline (no lighting, private mode).
-extern "C" void csScan_8_draw_scanline_tex_priv_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_8_draw_scanline_tex_priv_zfil;
 /// Draw one horizontal scanline (Z buffer and no lighting).
-extern "C" void csScan_8_draw_scanline_tex_zuse
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_8_draw_scanline_tex_zuse;
 /// Draw one horizontal scanline (Z buffer and no lighting, private mode).
-extern "C" void csScan_8_draw_scanline_tex_priv_zuse
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_8_draw_scanline_tex_priv_zuse;
 /// Draw one horizontal scanline (lighting).
-extern "C" void csScan_8_draw_scanline_map_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_8_draw_scanline_map_zfil;
 /// Draw one horizontal scanline (Z buffer and lighting).
-extern "C" void csScan_8_draw_scanline_map_zuse
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_8_draw_scanline_map_zuse;
 /// Draw one horizontal scanline (lighting and filtering).
-extern "C" void csScan_8_draw_scanline_map_filt_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_8_draw_scanline_map_filt_zfil;
 /// Draw one horizontal scanline (transparent and no lighting).
-extern "C" void csScan_8_draw_scanline_tex_key_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_8_draw_scanline_tex_key_zfil;
 /// Draw one horizontal scanline (transparent and no lighting, private mode).
-extern "C" void csScan_8_draw_scanline_tex_priv_key_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_8_draw_scanline_tex_priv_key_zfil;
 /// Draw one horizontal scanline (transparent with lighting).
-extern "C" void csScan_8_draw_scanline_map_key_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_8_draw_scanline_map_key_zfil;
 
 /// Draw one horizontal scanline for fog.
-extern "C" void csScan_8_draw_scanline_fog
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_8_draw_scanline_fog;
 
 /// Draw one horizontal scanline (lighting and alpha transparency).
-extern "C" void csScan_8_draw_scanline_map_alpha1
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_8_draw_scanline_map_alpha1;
 /// Draw one horizontal scanline (lighting and alpha transparency).
-extern "C" void csScan_8_draw_scanline_map_alpha2
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_8_draw_scanline_map_alpha2;
 
 /// Draw one horizontal scanline (lighting and uniform lighting).
-extern "C" void csScan_8_draw_scanline_map_light
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_8_draw_scanline_map_light;
 /// Draw one horizontal scanline (Z buffer, lighting and uniform lighting).
-extern "C" void csScan_8_draw_scanline_map_light_zuse
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_8_draw_scanline_map_light_zuse;
 
 #ifdef DO_MMX
 /// Draw one horizontal scanline (lighting) using MMX
-extern "C" void csScan_8_mmx_draw_scanline_map_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_8_mmx_draw_scanline_map_zfil;
 /// Draw one horizontal scanline (no lighting) using MMX
-extern "C" void csScan_8_mmx_draw_scanline_tex_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_8_mmx_draw_scanline_tex_zfil;
 #endif
+
+/**
+  * empty dummyfunction to avoid crashs when calling the nondefined versions 
+  * in the 8 Bit renderer.
+  */
+extern "C" csDrawPIScanlineFX      csScan_8_draw_pifx_scanline_dummy;
 
 /*
  * The following methods are used by DrawPolygonQuick() and do not require
@@ -279,97 +252,53 @@ extern "C" csDrawPIScanline csScan_8_mmx_draw_pi_scanline_tex_zuse;
 //---//---//---//---//---//---//---//---//---//- 16-bit drawing routines //---//
 
 /// Draw one horizontal scanline (no texture mapping).
-extern "C" void csScan_16_draw_scanline_flat_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_draw_scanline_flat_zfil;
 /// Draw one horizontal scanline (Z buffer and no texture mapping).
-extern "C" void csScan_16_draw_scanline_flat_zuse
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_draw_scanline_flat_zuse;
 /// Draw one horizontal scanline (no lighting).
-extern "C" void csScan_16_draw_scanline_tex_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_draw_scanline_tex_zfil;
 /// Draw one horizontal scanline (no lighting, private mode).
-extern "C" void csScan_16_draw_scanline_tex_priv_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_draw_scanline_tex_priv_zfil;
 /// Draw one horizontal scanline (Z buffer and no lighting).
-extern "C" void csScan_16_draw_scanline_tex_zuse
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_draw_scanline_tex_zuse;
 /// Draw one horizontal scanline (no lighting, private mode).
-extern "C" void csScan_16_draw_scanline_tex_priv_zuse
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_draw_scanline_tex_priv_zuse;
 /// Draw one horizontal scanline (lighting).
-extern "C" void csScan_16_draw_scanline_map_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_draw_scanline_map_zfil;
 /// Draw one horizontal scanline (Z buffer and lighting).
-extern "C" void csScan_16_draw_scanline_map_zuse
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_draw_scanline_map_zuse;
 /// Draw one horizontal scanline (lighting and filtering).
-extern "C" void csScan_16_draw_scanline_map_filt_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_draw_scanline_map_filt_zfil;
 /// Draw one horizontal scanline (lighting and more filtering).
-extern "C" void csScan_16_draw_scanline_map_filt2_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_draw_scanline_map_filt2_zfil;
 /// Draw one horizontal scanline (transparent with lighting).
-extern "C" void csScan_16_draw_scanline_map_key_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_draw_scanline_map_key_zfil;
 
 /// Draw one horizontal scanline for fog.
-extern "C" void csScan_16_draw_scanline_fog_555
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_draw_scanline_fog_555;
 /// Draw one horizontal scanline for fog.
-extern "C" void csScan_16_draw_scanline_fog_565
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_draw_scanline_fog_565;
 /// Draw one horizontal scanline for fog assuming the camera is in fog.
-extern "C" void csScan_16_draw_scanline_fog_view_555
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_draw_scanline_fog_view_555;
 /// Draw one horizontal scanline for fog assuming the camera is in fog.
-extern "C" void csScan_16_draw_scanline_fog_view_565
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_draw_scanline_fog_view_565;
 /// Draw a fogged horizontal scanline (no texture)
-extern "C" void csScan_16_draw_scanline_fog_plane_555
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_draw_scanline_fog_plane_555;
 /// Draw a fogged horizontal scanline (no texture)
-extern "C" void csScan_16_draw_scanline_fog_plane_565
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_draw_scanline_fog_plane_565;
 
 /// Draw one horizontal scanline (lighting and alpha transparency).
-extern "C" void csScan_16_draw_scanline_map_alpha50
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_draw_scanline_map_alpha50;
 /// Draw one horizontal scanline (lighting and alpha transparency). General case.
-extern "C" void csScan_16_draw_scanline_map_alpha_555
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_draw_scanline_map_alpha_555;
 /// Draw one horizontal scanline (lighting and alpha transparency). General case.
-extern "C" void csScan_16_draw_scanline_map_alpha_565
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_draw_scanline_map_alpha_565;
 
 #ifdef DO_MMX
 /// Draw one horizontal scanline (lighting) using MMX
-extern "C" void csScan_16_mmx_draw_scanline_map_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_mmx_draw_scanline_map_zfil;
 /// Draw one horizontal scanline (no lighting).
-extern "C" void csScan_16_mmx_draw_scanline_tex_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_16_mmx_draw_scanline_tex_zfil;
 #endif
 
 
@@ -408,59 +337,50 @@ extern "C" csDrawPIScanlineGouraud csScan_16_draw_pi_scanline_flat_gouraud_zuse_
 /// Draw a single-color Gouraud-shaded polygon in 5-6-5 pixel format
 extern "C" csDrawPIScanlineGouraud csScan_16_draw_pi_scanline_flat_gouraud_zuse_565;
 
-extern "C" csDrawPIScanlineGouraud csScan_16_draw_pi_scanline_transp_gouraud_565;
-
-extern "C" csDrawPIScanlineGouraud csScan_16_draw_pi_scanline_transp_gouraud_555;
+/// Draw a perspective-incorrect polygon scanline with various effects Z fill only
+extern "C" csDrawPIScanlineFX csScan_16_draw_pifx_scanline_zfil_555;
+/// Draw a perspective-incorrect polygon scanline with various effects Z fill only
+extern "C" csDrawPIScanlineFX csScan_16_draw_pifx_scanline_zfil_565;
+/// Draw a perspective-incorrect polygon scanline with various effects
+extern "C" csDrawPIScanlineFX csScan_16_draw_pifx_scanline_zuse_555;
+/// Draw a perspective-incorrect polygon scanline with various effects
+extern "C" csDrawPIScanlineFX csScan_16_draw_pifx_scanline_zuse_565;
+/// Draw a perspective-incorrect polygon scanline with various effects Z fill only (colorkeying)
+extern "C" csDrawPIScanlineFX csScan_16_draw_pifx_scanline_transp_zfil_555;
+/// Draw a perspective-incorrect polygon scanline with various effects Z fill only (colorkeying)
+extern "C" csDrawPIScanlineFX csScan_16_draw_pifx_scanline_transp_zfil_565;
+/// Draw a perspective-incorrect polygon scanline with various effects (colorkeying)
+extern "C" csDrawPIScanlineFX csScan_16_draw_pifx_scanline_transp_zuse_555;
+/// Draw a perspective-incorrect polygon scanline with various effects (colorkeying)
+extern "C" csDrawPIScanlineFX csScan_16_draw_pifx_scanline_transp_zuse_565;
 
 //---//---//---//---//---//---//---//---//---//- 32-bit scanline drawers //---//
 
 /// Draw one horizontal scanline (no texture mapping).
-extern "C" void csScan_32_draw_scanline_flat_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_32_draw_scanline_flat_zfil;
 /// Draw one horizontal scanline (Z buffer and no texture mapping).
-extern "C" void csScan_32_draw_scanline_flat_zuse
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_32_draw_scanline_flat_zuse;
 /// Draw one horizontal scanline (no lighting).
-extern "C" void csScan_32_draw_scanline_tex_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_32_draw_scanline_tex_zfil;
 /// Draw one horizontal scanline (Z buffer and no lighting).
-extern "C" void csScan_32_draw_scanline_tex_zuse
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_32_draw_scanline_tex_zuse;
 /// Draw one horizontal scanline (lighting).
-extern "C" void csScan_32_draw_scanline_map_zfil
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_32_draw_scanline_map_zfil;
 /// Draw one horizontal scanline (Z buffer and lighting).
-extern "C" void csScan_32_draw_scanline_map_zuse
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_32_draw_scanline_map_zuse;
 
 
 /// Draw one horizontal scanline for fog.
-extern "C" void csScan_32_draw_scanline_fog
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_32_draw_scanline_fog;
 /// Draw one horizontal scanline for fog assuming the camera is in fog.
-extern "C" void csScan_32_draw_scanline_fog_view
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_32_draw_scanline_fog_view;
 /// Draw a fogged horizontal scanline (no texture)
-extern "C" void csScan_32_draw_scanline_fog_plane
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_32_draw_scanline_fog_plane;
 
 /// Draw one horizontal scanline (lighting and alpha transparency).
-extern "C" void csScan_32_draw_scanline_map_alpha50
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_32_draw_scanline_map_alpha50;
 /// Draw one horizontal scanline (lighting and alpha transparency). General case.
-extern "C" void csScan_32_draw_scanline_map_alpha
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+extern "C" csDrawScanline csScan_32_draw_scanline_map_alpha;
 
 /// Draw a perspective-incorrect flat shaded polygon scanline with Z-fill
 extern "C" csDrawPIScanline        csScan_32_draw_pi_scanline_flat_zfil;
@@ -485,5 +405,17 @@ extern "C" csDrawPIScanlineGouraud csScan_32_draw_pi_scanline_tex_gouraud_zfil;
 
 /// Draw a perspective-incorrect texture mapped polygon scanline with gouraud shading. Z fill only
 extern "C" csDrawPIScanlineGouraud csScan_32_draw_pi_scanline_tex_gouraud_zuse;
+
+/// Draw a perspective-incorrect polygon scanline with various effects Z fill only
+extern "C" csDrawPIScanlineFX csScan_32_draw_pifx_scanline_zfil;
+
+/// Draw a perspective-incorrect polygon scanline with various effects
+extern "C" csDrawPIScanlineFX csScan_32_draw_pifx_scanline_zuse;
+
+/// Draw a perspective-incorrect polygon scanline with various effects Z fill (colorkeying)
+extern "C" csDrawPIScanlineFX csScan_32_draw_pifx_scanline_transp_zfil;
+
+/// Draw a perspective-incorrect polygon scanline with various effects (colorkeying)
+extern "C" csDrawPIScanlineFX csScan_32_draw_pifx_scanline_transp_zuse;
 
 #endif // __SCAN_H__

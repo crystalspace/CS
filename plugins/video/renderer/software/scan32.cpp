@@ -618,6 +618,62 @@ void csScan_32_draw_pi_scanline_flat_zuse (void *dest, int len,
 
 //------------------------------------------------------------------
 
+#ifndef NO_draw_pifx_scanline_zfil
+
+#define PI_SCANFUNC csScan_32_draw_pifx_scanline_zfil
+#define ZFILL
+#define GOURAUD
+#define BPP32
+#define USEEFFECTS
+#include "scanpi.inc"
+
+#endif
+
+//------------------------------------------------------------------
+
+
+#ifndef NO_draw_pifx_scanline_zuse
+
+#define PI_SCANFUNC csScan_32_draw_pifx_scanline_zuse
+#define ZUSE
+#define GOURAUD
+#define BPP32
+#define USEEFFECTS
+#include "scanpi.inc"
+
+#endif
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pifx_scanline_transp_zfil
+
+#define PI_SCANFUNC csScan_32_draw_pifx_scanline_transp_zfil
+#define ZFILL
+#define GOURAUD
+#define COLORKEY
+#define BPP32
+#define USEEFFECTS
+#include "scanpi.inc"
+
+#endif
+
+//------------------------------------------------------------------
+
+
+#ifndef NO_draw_pifx_scanline_transp_zuse
+
+#define PI_SCANFUNC csScan_32_draw_pifx_scanline_transp_zuse
+#define ZUSE
+#define GOURAUD
+#define COLORKEY
+#define BPP32
+#define USEEFFECTS
+#include "scanpi.inc"
+
+#endif
+
+//------------------------------------------------------------------
+
 #ifndef NO_draw_scanline_map_alpha50
 
 #undef SCANFUNC
