@@ -5938,6 +5938,8 @@ package cspace::iGeneralMeshCommonState;
 *IsShadowCasting = *cspacec::iGeneralMeshCommonState_IsShadowCasting;
 *SetShadowReceiving = *cspacec::iGeneralMeshCommonState_SetShadowReceiving;
 *IsShadowReceiving = *cspacec::iGeneralMeshCommonState_IsShadowReceiving;
+*AddRenderBuffer = *cspacec::iGeneralMeshCommonState_AddRenderBuffer;
+*RemoveRenderBuffer = *cspacec::iGeneralMeshCommonState_RemoveRenderBuffer;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -5970,6 +5972,8 @@ package cspace::iGeneralMeshState;
 %ITERATORS = ();
 *SetAnimationControl = *cspacec::iGeneralMeshState_SetAnimationControl;
 *GetAnimationControl = *cspacec::iGeneralMeshState_GetAnimationControl;
+*ClearSubMeshes = *cspacec::iGeneralMeshState_ClearSubMeshes;
+*AddSubMesh = *cspacec::iGeneralMeshState_AddSubMesh;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -6013,9 +6017,6 @@ package cspace::iGeneralFactoryState;
 *IsBack2Front = *cspacec::iGeneralFactoryState_IsBack2Front;
 *SetAnimationControlFactory = *cspacec::iGeneralFactoryState_SetAnimationControlFactory;
 *GetAnimationControlFactory = *cspacec::iGeneralFactoryState_GetAnimationControlFactory;
-*AddRenderBuffer = *cspacec::iGeneralFactoryState_AddRenderBuffer;
-*SetRenderBufferComponent = *cspacec::iGeneralFactoryState_SetRenderBufferComponent;
-*SetRenderBuffer = *cspacec::iGeneralFactoryState_SetRenderBuffer;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -7176,6 +7177,7 @@ package cspace::iThingFactoryState;
 *GetNormals = *cspacec::iThingFactoryState_GetNormals;
 *GetCosinusFactor = *cspacec::iThingFactoryState_GetCosinusFactor;
 *SetCosinusFactor = *cspacec::iThingFactoryState_SetCosinusFactor;
+*AddPolygonRenderBuffer = *cspacec::iThingFactoryState_AddPolygonRenderBuffer;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
