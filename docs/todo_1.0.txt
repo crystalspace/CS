@@ -40,11 +40,11 @@ Bugs to fix:
 	[V]  In isometric engine (isotest) + OpenGL some of the mesh
 	     objects (like the particle systems) are clipped wrong to the
 	     floor.
-	[F]  Gouraud shaded polygons are not supported well. There are
-	     two problems: first you can only define triangles that
-	     are gouraud shaded and not polygons in general. And secondly
-	     lighting is not cached for gouraud shaded polygons.
+	[F]  Gouraud shaded polygons are not supported well: you can only
+	     define triangles that are gouraud shaded and not polygons in
+	     general.
 	     [Bug 202768]
+	[F]  Lighting is not cached for gouraud shaded polygons.
 	     [Bug 202780]
 	[V]  Investigate if skeletal sprites work nicely with the
 	     visibility culling system.
