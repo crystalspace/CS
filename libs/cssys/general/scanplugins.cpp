@@ -48,7 +48,7 @@ csRef<iStrVector> csScanPluginsDir (const char* dir,
   
   plugins.AttachNew (new scfStrVector ());
   metadata.DeleteAll ();
-  
+    
   struct dirent* de;
   DIR* dh = opendir(dir);
   if (dh != 0)
@@ -62,10 +62,27 @@ csRef<iStrVector> csScanPluginsDir (const char* dir,
         {
 	  csString scffilepath;
 	  scffilepath << dir << PATH_SEPARATOR << de->d_name;
-	  csPhysicalFile file(scffilepath, "rb");
-	  csTinyDocumentSystem docsys;
-	  csRef<iDocument> doc = docsys.CreateDocument();
-	  char const* errmsg = doc->Parse(&file);
+	  //csPhysicalFile file(scffilepath, "rb");
+
+          FILE* file = fopen(scffilepath , "rb");          
+
+          // fopen HACK: in Lin
+
+          fseek( file , 0 , SEEK_END );
+          int i = ftell( file );
+          fseek( file , 0 , SEEK_SET );
+          //null-terminated
+          char*  Buffer = new char [ i+1 ];
+          Buffer[ i ]='\0';
+          fread( Buffer , 1 , i , file );                
+
+          // End of fopen HACK          
+
+	  //csTinyDocumentSystem docsys;
+          csRef<iDocumentSystem> docsys (csPtr<iDocumentSystem> (new csTinyDocumentSystem ()));
+
+	  csRef<iDocument> doc = docsys->CreateDocument();
+	  char const* errmsg = doc->Parse( Buffer );
 	  if (errmsg == 0)
 	  {
 	    metadata.Push (doc);
