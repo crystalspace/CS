@@ -783,7 +783,7 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   // the buffer size could be potentially tweaked for better performance
   m_VertexCache.Initialize(m_lpd3dDevice2, 32);
   // set to false if we want to revert on "older" PolygonFX (supports fogging)
-  m_bBatchPolygonFX = true;
+  m_bBatchPolygonFX = false; //true;
 
   return true;
 }
@@ -1669,12 +1669,12 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
     csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)handle->GetPrivateObject ();
     m_pTextureCache->Add (handle);
 
-  pTexData = txt_mm->GetHighColorCacheData ();
-  m_textured = true;
+    pTexData = txt_mm->GetHighColorCacheData ();
+    m_textured = true;
   }
   else
   {
-  m_textured = false;
+    m_textured = false;
   }
 
   // PolygonFXs dont use multitexturing
@@ -1771,9 +1771,9 @@ void csGraphics3DDirect3DDx6::DrawPolygonFX(G3DPolygonDPFX& poly)
     flat_r = poly.flat_color_r; 
     flat_g = poly.flat_color_g;
     flat_b = poly.flat_color_b;
-  CLAMP(flat_r, 1.0f);
-  CLAMP(flat_g, 1.0f);
-  CLAMP(flat_b, 1.0f);
+    CLAMP(flat_r, 1.0f);
+    CLAMP(flat_g, 1.0f);
+    CLAMP(flat_b, 1.0f);
 
     if (!m_gouraud)
     FlatColor = D3DRGBA_(flat_r, flat_g, flat_b, m_alpha);
@@ -1788,34 +1788,36 @@ void csGraphics3DDirect3DDx6::DrawPolygonFX(G3DPolygonDPFX& poly)
     vx.sz = SCALE_FACTOR / poly.vertices[i].z;
     vx.rhw = poly.vertices[i].z;
     if (m_gouraud)
-  {
-    float r, g, b;
-    r = poly.vertices[i].r;
-    CLAMP(r, 1.0f);
-    g = poly.vertices[i].g;
-    CLAMP(g, 1.0f);
-    b = poly.vertices[i].b;
-    CLAMP(b, 1.0f);
-      vx.color = D3DRGBA_(r, g, b, m_alpha);
-  }
-    else
-  {
-    if (!m_textured)
-      vx.color = FlatColor;
-      else
     {
       float r, g, b;
-      r = flat_r * poly.vertices[i].r;
+      r = poly.vertices[i].r;
       CLAMP(r, 1.0f);
-      g = flat_r * poly.vertices[i].g;
+      g = poly.vertices[i].g;
       CLAMP(g, 1.0f);
-      b = flat_r * poly.vertices[i].b;
+      b = poly.vertices[i].b;
       CLAMP(b, 1.0f);
-        vx.color = D3DRGBA_(r, g, b, m_alpha);
+      vx.color = D3DRGBA_(r, g, b, m_alpha);
     }
-  }
+    else
+    {
+      if (!m_textured)
+      {
+        vx.color = FlatColor;
+      }
+      else
+      {
+        float r, g, b;
+        r = flat_r * poly.vertices[i].r;
+        CLAMP(r, 1.0f);
+        g = flat_r * poly.vertices[i].g;
+        CLAMP(g, 1.0f);
+        b = flat_r * poly.vertices[i].b;
+        CLAMP(b, 1.0f);
+        vx.color = D3DRGBA_(r, g, b, m_alpha);
+      }
+    }
 
-  vx.specular = RGBA_MAKE(0, 0, 0, 0);
+    vx.specular = RGBA_MAKE(0, 0, 0, 0);
     vx.tu = poly.vertices[i].u;
     vx.tv = poly.vertices[i].v;
 
@@ -1853,9 +1855,9 @@ void csGraphics3DDirect3DDx6::DrawPolygonFX(G3DPolygonDPFX& poly)
       vx.sz = SCALE_FACTOR / poly.vertices[i].z;
       vx.rhw = poly.vertices[i].z;
 
-    float I = poly.fog_info[i].intensity;
-    CLAMPG(I, 1.0f);
-    I = 1.0f - I;      
+      float I = poly.fog_info[i].intensity;
+      CLAMPG(I, 1.0f);
+      I = 1.0f - I;      
 
       float r = poly.fog_info[i].r > 1.0f ? 1.0f : poly.fog_info[i].r;
       float g = poly.fog_info[i].g > 1.0f ? 1.0f : poly.fog_info[i].g;
@@ -1872,11 +1874,11 @@ void csGraphics3DDirect3DDx6::DrawPolygonFX(G3DPolygonDPFX& poly)
 
     VERIFY_RESULT( m_lpd3dDevice2->End(0), DD_OK );
 
-  m_States.PopAlphaBlendEnable();
-  m_States.PopZFunc();
-  m_States.PopDstBlend();
-  m_States.PopSrcBlend();
-  m_States.PopTexture(0);
+    m_States.PopAlphaBlendEnable();
+    m_States.PopZFunc();
+    m_States.PopDstBlend();
+    m_States.PopSrcBlend();
+    m_States.PopTexture(0);
   }
 }
 
