@@ -279,6 +279,8 @@ void csIsoSprite::SetGrid(iIsoGrid *grid)
 
 void csIsoSprite::SetAllColors(const csColor& color)
 {
+  CS_ASSERT (poly.GetNumVertices () == colors.GetNumVertices ());
+  CS_ASSERT (poly.GetNumVertices () == static_colors.GetNumVertices ());
   for(int i=0; i<poly.GetNumVertices(); i++)
   {
     colors[i].Set(color.red, color.green, color.blue);
@@ -287,6 +289,8 @@ void csIsoSprite::SetAllColors(const csColor& color)
 
 void csIsoSprite::AddToVertexColor(int i, const csColor& color)
 {
+  CS_ASSERT (poly.GetNumVertices () == colors.GetNumVertices ());
+  CS_ASSERT (i >= 0 && i < colors.GetNumVertices ());
   colors[i].x += color.red; 
   if(colors[i].x>1.0f) colors[i].x=1.0f;
   else if(colors[i].x < 0.0f) colors[i].x = 0.0f;
@@ -316,6 +320,8 @@ void csIsoSprite::SetAllStaticColors(const csColor& color)
 
 void csIsoSprite::AddToVertexStaticColor(int i, const csColor& color)
 {
+  CS_ASSERT (poly.GetNumVertices () == static_colors.GetNumVertices ());
+  CS_ASSERT (i >= 0 && i < static_colors.GetNumVertices ());
   static_colors[i].x += color.red; 
   if(static_colors[i].x>1.0f) static_colors[i].x=1.0f;
   else if(static_colors[i].x < 0.0f) static_colors[i].x = 0.0f;
