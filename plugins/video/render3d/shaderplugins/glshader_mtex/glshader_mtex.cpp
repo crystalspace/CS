@@ -163,7 +163,7 @@ void csShaderGLMTEX::BuildTokenHash()
   xmltokens.Register("primary color", GL_PRIMARY_COLOR);
   xmltokens.Register("texture", GL_TEXTURE);
   xmltokens.Register("constant color", GL_CONSTANT_ARB);
-  xmltokens.Register("pervious layer", GL_PREVIOUS_ARB);
+  xmltokens.Register("previous layer", GL_PREVIOUS_ARB);
   
   xmltokens.Register("color", GL_SRC_COLOR);
   xmltokens.Register("invertcolor", GL_ONE_MINUS_SRC_COLOR);
@@ -492,7 +492,7 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
         else if (ext->CS_GL_ARB_texture_env_dot3 || ext->CS_GL_EXT_texture_env_dot3)
           glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, layer->colorp );
 
-	glTexEnvfv(GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, layer->scale_rgb);
+	glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, layer->scale_rgb[0]);
 
         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, layer->alphasource[0]);
         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, layer->alphamod[0]);
@@ -519,15 +519,12 @@ void csShaderGLMTEX::Deactivate(iShaderPass* current, csRenderMesh* mesh)
 {
   if(!validProgram) return;
 
-  for(int i = 0; i < MIN(maxlayers, texlayers.Length()); ++i)
+  for(int i = MIN(maxlayers, texlayers.Length()); i >= 0 ; --i)
   {
     ext->glActiveTextureARB (GL_TEXTURE0_ARB+i);
     ext->glClientActiveTextureARB (GL_TEXTURE0_ARB+i);
-    if (i>0)
-    {
-      statecache->Disable_GL_TEXTURE_2D (i);
-      statecache->SetTexture (GL_TEXTURE_2D, -1, i); //should not be necessary
-    }
+    statecache->Disable_GL_TEXTURE_2D (i);
+    statecache->SetTexture (GL_TEXTURE_2D, -1, i); //should not be necessary
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
   }
 }
