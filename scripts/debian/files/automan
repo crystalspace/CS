@@ -222,6 +222,7 @@ do
 			esac
 			echo "Generating man for $bin	section ($SECTION)	package $PACKAGE"
 			cd $CURDIR
+			export CRYSTAL=$CURDIR/CS
 			case $bin in
 				vsh|zoo)
 					export TYPE="No option"

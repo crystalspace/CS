@@ -2,7 +2,8 @@ crystalspace (0.93-1) unstable; urgency=low
 
   * First upload (CLoses: bug#120691)
   * Fix cs-config from Loic Dachary
-  # Cleanup in rules and createmenus
+  * Cleanup in rules and createmenus
+  * Added Missing .cfg files from Loic
 
  -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
 

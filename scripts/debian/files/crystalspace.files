@@ -13,6 +13,8 @@ usr/lib/crystalspace/data/config/opengl.cfg
 usr/lib/crystalspace/data/config/simpcon.cfg
 usr/lib/crystalspace/data/config/soft3d.cfg
 usr/lib/crystalspace/data/config/sound.cfg
+usr/lib/crystalspace/data/config/csbumptest.cfg
+usr/lib/crystalspace/data/config/csdemo.cfg
 usr/lib/crystalspace/lib/*.so
 usr/lib/crystalspace/scf.cfg
 usr/lib/crystalspace/mouse.cfg
