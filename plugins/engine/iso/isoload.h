@@ -156,7 +156,7 @@ public:
   iSyntaxService* Syntax;
 
   csIsoLoader(iBase *p);
-  ~csIsoLoader();
+  virtual ~csIsoLoader();
   
   bool Initialize(iObjectRegistry *object_Reg);
 

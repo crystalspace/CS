@@ -69,8 +69,6 @@
 
 // ---------- Plugin Stuff -------------
 
-CS_IMPLEMENT_PLUGIN
-
 SCF_IMPLEMENT_IBASE(csIsoLoader);
   SCF_IMPLEMENTS_INTERFACE(iIsoLoader);
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent);
