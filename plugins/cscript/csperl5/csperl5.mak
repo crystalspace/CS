@@ -124,13 +124,14 @@ $(PERLXSI.O): $(PERLXSI.C)
 	$(DO.COMPILE.C) $(PERL5.CFLAGS)
 
 ifeq (,$(SWIGBIN))
-  SWIGBIN = swig
-endif
-
+$(SWIG.PERL5.PM) $(SWIG.PERL5.C):
+	@echo $"ERROR: Swig 1.3.14 or newer, not detected$" >&2
+else
 $(SWIG.PERL5.PM) $(SWIG.PERL5.C):
 	-$(SWIGBIN) -perl5 -c++ -v -shadow -Iinclude \
 	-module $(SWIG.MOD) -o $(SWIG.PERL5.C) $(SWIG.I)
 	$(MV) $(SRCDIR)/plugins/cscript/csperl5/$(SWIG.MOD).pm $(SWIG.PERL5.PM)
+endif
 
 $(SWIG.PERL5.CPP): $(SWIG.PERL5.C)
 

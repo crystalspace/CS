@@ -14,6 +14,9 @@ The history order is reversed so that new features are at the top.
 	- Oktal replaced a couple of `unsigned int's with `socklen_t's where
 	  appropriate in the cssocket plugin. This was causing errors on
 	  Windows where socklen_t is defined as a signed int.
+	- Oktal added a test to the csperl5 makefile, so it will only attempt
+	  to rebuild the Swig-generated files if the required version of Swig
+	  was detected by configure.
 10-May-2003
 	- Philip Wyett eliminated the 88 double to float conversion compiler
           warnings in gtreeldr.cpp under MSVC 6.
