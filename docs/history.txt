@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+24-Jul-2003
+    - Reed Hedges made some minor updates to the AWS "Quick Start" section and 
+      API Changes appendix for the recent changes to AWS (15-Jul-2003).
 23-Jul-2003
     - Eric Sunshine fixed memory trashing bugs in Win32 implmentation of
       csLoadLibrary().  When composing its error messages, it was
@@ -40,7 +43,7 @@ The history order is reversed so that new features are at the top.
       software renderer for higher processors like P4 (e.g. family 15,
       which resulted in "1586 CPU detected" message).
 22-Jul-2003
-        - Philip Wyett fixed inconsistent swig -I flag in make build and
+    - Philip Wyett fixed inconsistent swig -I flag in make build and
       aligning it with jam build.  cs_pyth.cpp will now be identical
       whether make or jam built.
     - Keith Fulton added /apps/tools/partedit particle system editor.  This
@@ -78,7 +81,7 @@ The history order is reversed so that new features are at the top.
       the MSC compiler also accepts "-I" style parameters.
 21-Jul-2003
     - Oktal added missing doxygen comment at the top of csSymbolTable.
-        - Philip Wyett removed CVS conflict data from gl_render3d.cpp.
+    - Philip Wyett removed CVS conflict data from gl_render3d.cpp.
     - Jorrit removed a comment about csPDelArray<T> being deprecated from
       the documentation.  csArray<T> nor csRefArray<T> can provide the
       functionality given by csPDelArray<T>.
@@ -168,8 +171,8 @@ The history order is reversed so that new features are at the top.
       room (flarge) no longer work properly.  Need to further investigate
       for a good fix.
 17-Jul-2003
-        - Philip Wyett fixed broken glrender3d makefile. OBJ.GLRENDER3D should
-          have had OUT.GLRENDER3D not DIR.GLRENDER3D.
+    - Philip Wyett fixed broken glrender3d makefile. OBJ.GLRENDER3D should
+      have had OUT.GLRENDER3D not DIR.GLRENDER3D.
     - Jorrit committed a patch from Anders Reggestad to the spiral particle
       system.  Here is his log: This is more or less a complete rewrite of
       the not working spiral system thats currently in CS.  The old system
@@ -181,7 +184,7 @@ The history order is reversed so that new features are at the top.
       explotion system).  Added some new parameters to control the look of
       the system.  Anders was also so nice to update the documentation for
       his changes.  If only everyone would do that!
-        - Philip Wyett fixed rlsstencil makefile and rlsstencil.csplugin is now
+    - Philip Wyett fixed rlsstencil makefile and rlsstencil.csplugin is now
       cleaned correctly.
     - Oktal fixed the compile errors in the new renderer shader variable
       system, and recommitted it. The API is in place but not fully
@@ -212,9 +215,9 @@ The history order is reversed so that new features are at the top.
       (Pretty much just a hack to use a copy of the old renderer. No 
       makefiles included, so someone who knows what they're doing should 
       create some.)
-        - Philip Wyett changed an ASSERT () call to CS_ASSERT () in
-          'gl_renderbuffer.h'.
-        - Philip Wyett added a note to disable 'Video.OpenGL.Caps.Stencil' in
+    - Philip Wyett changed an ASSERT () call to CS_ASSERT () in
+     'gl_renderbuffer.h'.
+    - Philip Wyett added a note to disable 'Video.OpenGL.Caps.Stencil' in
       'opengl.cfg' if not supported by the users hardware or they are
       experiencing crashes.  Also added the ATI Radeon (r100) owners
       running Linux (DRI) as a known case where this should be done.

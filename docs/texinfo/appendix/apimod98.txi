@@ -314,3 +314,9 @@ Changed the following iterators to conform to the following iterator standard:
 @code{csNodeIterator}
 @end itemize
 
+
+@subheading Changes to AWS
+
+@code{iAWS::CreateCustomCanvas} was removed.  To set up the AWS with a cavas,
+use @code{iAWS::SetupCanvas} instead. 
+

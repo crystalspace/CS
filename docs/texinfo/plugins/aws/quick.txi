@@ -14,14 +14,18 @@ aws = CS_LOAD_PLUGIN(plugin_mgr,
   "crystalspace.window.alternatemanager", iAws);
 @end example
 
+Where @code{aws} is type @code{iAws*} (or @code{csRef<iAws>}).
+
 @item
-Create the @sc{aws} canvas.
+Setup the @sc{aws} canvas.
 
 @example
-awsCanvas = aws->CreateCustomCanvas (myG2D, myG3D);
-aws->SetFlag (AWSF_AlwaysRedrawWindows);
-aws->SetCanvas (awsCanvas);
+awsCanvas = aws->SetupCanvas (0, myG2D, myG3D);
+@c Needed? aws->SetFlag (AWSF_AlwaysRedrawWindows);
 @end example
+
+Where @code{myG2D} and @code{myG3D} are your @code{iGraphics2D} and 
+@code{iGraphics3D} cavas objects, respectively.
 
 @item
 Load definition files.
