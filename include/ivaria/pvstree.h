@@ -61,6 +61,13 @@ struct iStaticPVSTree : public iBase
   virtual const csBox3& GetBoundingBox () const = 0;
 
   /**
+   * Return true if the bounding box of the PVS is set. False
+   * otherwise. The PVScalc tool will use that information to know
+   * if it should manually calculate the bounding box.
+   */
+  virtual bool IsBoundingBoxSet () const = 0;
+
+  /**
    * After building the KDtree this function must be called to make
    * sure all node bounding boxes are ok.
    */

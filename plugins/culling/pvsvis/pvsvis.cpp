@@ -197,7 +197,6 @@ bool csPVSVis::Initialize (iObjectRegistry *object_reg)
 
   pvstree.SetObjectRegistry (object_reg);
   pvstree.SetPVSVis (this);
-  pvstree.SetBoundingBox (csBox3 (-100, -100, -100, 100, 100, 100));
   return true;
 }
 
@@ -246,8 +245,6 @@ const char* csPVSVis::ParseCullerParameters (iDocumentNode* node)
       return "Unrecognized parameter for the PVS visibility culler!";
     }
   }
-  if (!box_was_given)
-    return "The PVS visibility culler requires an outer <box>!";
 
   return 0;
 }

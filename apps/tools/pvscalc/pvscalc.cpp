@@ -1601,10 +1601,17 @@ void PVSCalcSector::Calculate ()
   	sector->QueryObject ()->GetName ());
   fflush (stdout);
 
-  const csBox3& bbox = pvstree->GetBoundingBox ();
-  parent->ReportInfo ("Total box (from culler) %g,%g,%g  %g,%g,%g",
+  if (pvstree->IsBoundingBoxSet ())
+  {
+    const csBox3& bbox = pvstree->GetBoundingBox ();
+    parent->ReportInfo ("Total box (from culler) %g,%g,%g  %g,%g,%g",
   	bbox.MinX (), bbox.MinY (), bbox.MinZ (),
   	bbox.MaxX (), bbox.MaxY (), bbox.MaxZ ());
+  }
+  else
+  {
+    parent->ReportInfo ("Box in culler is not specified!");
+  }
 
   size_t i;
   csBox3 allbox, staticbox;
@@ -1619,6 +1626,11 @@ void PVSCalcSector::Calculate ()
     CollectGeometry (m, allbox, staticbox,
 	allcount, staticcount,
 	allpcount, staticpcount);
+  }
+  // Set the box if it is missing.
+  if (!pvstree->IsBoundingBoxSet ())
+  {
+    pvstree->SetBoundingBox (allbox);
   }
 
   // Now we add all polygons that were added with meta information.

@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Mar-2005
+	- Jorrit changed pvsvis so that the required bounding box is now
+	  optional. PVSCalc will calculate the missing bounding box if needed
+	  and the box is now saved with the cached PVS data.
 19-Mar-2005
 	- Erroroman fixed a bug in genmesh skelanimation exporter
 	- Erroroman added texture "ugly_woman.jpg" to flarge skeleton model.

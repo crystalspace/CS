@@ -126,6 +126,7 @@ private:
 
   // Bounding box of the root.
   csBox3 root_box;
+  bool root_box_set;
 
   // Create a node and assign an id to it.
   csStaticPVSNode* CreateNode ();
@@ -241,6 +242,10 @@ public:
   virtual const csBox3& GetBoundingBox () const
   {
     return root_box;
+  }
+  virtual bool IsBoundingBoxSet () const
+  {
+    return root_box_set;
   }
   virtual void UpdateBoundingBoxes ();
 

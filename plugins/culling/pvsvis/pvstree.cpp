@@ -152,6 +152,7 @@ csStaticPVSTree::csStaticPVSTree ()
 {
   SCF_CONSTRUCT_IBASE (0);
   root = 0;
+  root_box_set = false;
 }
 
 csStaticPVSTree::~csStaticPVSTree ()
@@ -255,6 +256,7 @@ bool csStaticPVSTree::WriteOut ()
 {
   size_t total_len =
   	4 +	// marker
+	4 * 8 +	// bounding box
 	CalculateSize (root);
   csDataBuffer* buf = new csDataBuffer (total_len);
 
@@ -262,7 +264,15 @@ bool csStaticPVSTree::WriteOut ()
   *data++ = 'P';
   *data++ = 'V';
   *data++ = 'S';
-  *data++ = '1';
+  *data++ = '2';
+
+  csSetLittleEndianFloat32 (data, root_box.MinX ()); data += 4;
+  csSetLittleEndianFloat32 (data, root_box.MinY ()); data += 4;
+  csSetLittleEndianFloat32 (data, root_box.MinZ ()); data += 4;
+  csSetLittleEndianFloat32 (data, root_box.MaxX ()); data += 4;
+  csSetLittleEndianFloat32 (data, root_box.MaxY ()); data += 4;
+  csSetLittleEndianFloat32 (data, root_box.MaxZ ()); data += 4;
+
   WriteOut (data, root);
 
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
@@ -330,8 +340,17 @@ const char* csStaticPVSTree::ReadPVS (iDataBuffer* buf)
     return "File marker invalid! Probably not a PVS file!";
   if (*data++ != 'S')
     return "File marker invalid! Probably not a PVS file!";
-  if (*data++ != '1')
+  if (*data++ != '2')
     return "File marker invalid! Could be wrong version of PVS file!";
+
+  csVector3 bmin, bmax;
+  bmin.x = csGetLittleEndianFloat32 (data); data += 4;
+  bmin.y = csGetLittleEndianFloat32 (data); data += 4;
+  bmin.z = csGetLittleEndianFloat32 (data); data += 4;
+  bmax.x = csGetLittleEndianFloat32 (data); data += 4;
+  bmax.y = csGetLittleEndianFloat32 (data); data += 4;
+  bmax.z = csGetLittleEndianFloat32 (data); data += 4;
+  root_box.Set (bmin, bmax);
 
   const char* err = ReadPVS (data, root);
   if (err) return err;
@@ -437,6 +456,7 @@ void csStaticPVSTree::UpdateBoundingBoxes ()
 void csStaticPVSTree::SetBoundingBox (const csBox3& bbox)
 {
   root_box = bbox;
+  root_box_set = true;
   if (root)
     root->PropagateBBox (root_box);
 }
