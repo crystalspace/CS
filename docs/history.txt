@@ -13,6 +13,13 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+11-Nov-1999
+	- Eric Sunshine fixed a "pure virtual method called" crasher at
+	  application termination time.  This bug appeared with the
+	  introduction of SCF.
+	- Eric Sunshine renamed csTextureManager class in MazeD to
+	  mzTextureManager in order to avoid symbolic conflict with
+	  csTextureManager in the 3D software renderer.
 10-Nov-1999
 	- Eric Sunshine performed the SCF conversion on the Win32 system-
 	  driver.  Both Thomas Hieber and Brandon Ehle made attempts to get
@@ -30,14 +37,14 @@ Short-term cleanups that need to be done:
 	- Fixes to terrain for big-endian.
 	- Fixes to WalkTest makefile for new SCF system.
 	- Fixes to Unix port and X2D driver. Not fully functional yet but
-	  at least it compiles now. There is still a crash at startup related
-	  to multiple inheritance and bad casting.
+	  at least it compiles now.  There are a couple of initialization
+	  order bugs.
 	- Changes to MazeD from Andrew Zabolotny:
 	   - Full-blown light editing capability.
 	   - Started to implement texture manager.
 	   - Lots of fixes.
-	- Andrew also added the REAL files for SCF which Eric
-	  reverse engineered.
+	- Andrew also added the REAL files for SCF which Eric reverse
+	  engineered recently after Andrew forgot to check them into CVS.
 	- Andrew added a new scftutor app and a few fixes for Unix.
 	- Fixed bug in sofware texture manager which COULD in some cases
 	  cause startup to fail miserably.
@@ -62,7 +69,7 @@ Short-term cleanups that need to be done:
 	  $(DRVHELP) became $(PLUGINHELP).  The 'plugin' pseudo-target now
 	  includes all drivers, as well as other non-driver plug-in modules.
 	- Eric Sunshine fixed the csPython makefile so that it only adds
-	  "cspython" the makefile's list of targets if haspythn.sh has
+	  "cspython" to the makefile's list of targets if haspythn.sh has
 	  determined that Python is installed.
 8-Nov-1999
 	- New fixes to terrain loading from Alex Pfaffe. There is now
