@@ -35,7 +35,7 @@ public:
 class csRigidSpaceTimeObj : public csSpaceTimeObj
 {
 public:
-  friend ctLameCollisionCatastrophe;
+  friend class ctLameCollisionCatastrophe;
 
 	static csRigidSpaceTimeObj *space_time_continuum[ MAX_SPACE_TIME_NUM ];
 	static long continuum_end;
