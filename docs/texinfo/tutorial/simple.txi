@@ -146,7 +146,7 @@ In the source file @file{simple.cpp} we place the following:
 CS_IMPLEMENT_APPLICATION
 
 // The global pointer to simple
-Simple *simple;
+Simple* simple = 0;
 
 Simple::Simple (iObjectRegistry* object_reg)
 @{
@@ -262,13 +262,12 @@ int main (int argc, char* argv[])
   if (!object_reg) return -1;
 
   simple = new Simple (object_reg);
-
   if (simple->Initialize ())
     simple->Start ();
-
   delete simple;
-  csInitializer::DestroyApplication (object_reg);
+  simple = 0;
 
+  csInitializer::DestroyApplication (object_reg);
   return 0;
 @}
 @end example
@@ -391,7 +390,7 @@ bool Simple::HandleEvent (iEvent& ev)
 
 bool Simple::SimpleEventHandler (iEvent& ev)
 @{
-  return simple->HandleEvent (ev);
+  return simple ? simple->HandleEvent (ev) : false;
 @}
 @end example
 
@@ -695,13 +694,13 @@ bool Simple::HandleEvent (iEvent& ev)
 @{
   if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   @{
-    simple->SetupFrame ();
+    SetupFrame ();
     return true;
   @}
   else if (ev.Type == csevBroadcast &&
     ev.Command.Code == cscmdFinalProcess)
   @{
-    simple->FinishFrame ();
+    FinishFrame ();
     return true;
   @}
   else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
