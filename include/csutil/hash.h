@@ -231,7 +231,7 @@ public:
   }
 
   /// Returns whether at least one element matches the given key.
-  bool In (const K& key) const
+  bool Contains (const K& key) const
   {
     const csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
@@ -239,9 +239,16 @@ public:
     for (size_t i = 0; i < len; ++i)
       if (KeyHandler::CompareKeys (values[i].key, key)) 
 	return true;
-
     return false;
   }
+
+  /**
+   * Returns whether at least one element matches the given key.
+   * \remarks This is rigidly equivalent to Contains(key), but may be
+   *   considered more idiomatic by some.
+   */
+  bool In (const K& key) const
+  { return Contains(key); }
 
   /**
    * Get a pointer to the first element matching the given key, 
@@ -617,8 +624,8 @@ public:
    */
   void Add (const T& object)
   {
-    if (In (object)) return;
-    AddNoTest (object);
+    if (!Contains (object))
+      AddNoTest (object);
   }
 
   /**
@@ -635,10 +642,18 @@ public:
   /**
    * Test if an object is in this set.
    */
-  bool In (const T& object) const
+  bool Contains (const T& object) const
   {
-    return map.In (object);
+    return map.Contains (object);
   }
+
+  /**
+   * Test if an object is in this set.
+   * \remarks This is rigidly equivalent to Contains(object), but may be
+   *   considered more idiomatic by some.
+   */
+  bool In (const T& object) const
+  { return Contains(object); }
 
   /**
    * Delete all elements in the set.
@@ -677,6 +692,5 @@ public:
     return GlobalIterator(this);
   }
 };
-
 
 #endif

@@ -25,6 +25,10 @@ chronological order.
 	  `set' object and don't care about assigning an ID to the string.
 	- Eric Sunshine converted csConfigManagerIterator to use csHash<>
 	  rather than the deprecated csHashMap.
+	- Eric Sunshine added csHash<>::Contains() and csSet<>::Contains().
+	  Equivalent functionality was already provided by In(), but Contains()
+	  may be considered more idiomatic by some, and provides better API
+	  consistency with other containers.
 29-Mar-2005
 	- Jorrit disabled the new `clearWithBox' rule in gldrivers.xml
 	  because it breaks screen clearing on his nVidia card. If this is
