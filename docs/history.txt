@@ -1,5 +1,13 @@
 The history order has been reversed so that new features are at the top.
 
+23-Nov-2000
+	- Martin Geisse did some clean-up work for dnapp.
+	- Martin also fixed a bug in csIniFile which crashed when the
+	  first line of the INI file was empty.
+	- Wouter Wijngaards added support for keycolor to csImage.
+22-Nov-2000
+	- Martin Geisse made dnapp a console application and fixed a
+	  minor bug in it.
 21-Nov-2000
 	- Eric Sunshine made the following changes to the Texinfo
 	  documentation:
@@ -14,12 +22,23 @@ The history order has been reversed so that new features are at the top.
 	      contrib/porting.txi, and apps/overview.txi.
 	    - Cleaned up a few other minor issues.
 20-Nov-2000
+	- Michael Dale Long removed last remnants of impulse code from
+	  CrystalClear and also some dead CC plugins.
 	- Eric Sunshine removed a bunch of files left over in the 'concepts'
 	  directory after Martin moved them to 'plugins/engine'.
 	- Eric Sunshine removed a duplicate @menu block from
 	  plugins/chapter.txi.
 	- Eric Sunshine fixed a bunch of Texinfo mark-up errors in win32.txi
 	  and sound.txi.
+	- Martin Geisse finished restructuring the docs by removing
+	  the anatomy chapter.
+	- Andrew Zabolotny fixed (once again) halo drawing for 32-bit
+	  modes. Now only 64 levels of alpha map are used (vs 128 levels
+	  before); this has absolutely no impact on 8- and 16- bit modes,
+	  and very little impact on 32 bit modes (in fact, I wasn't able
+	  to note any difference). Instead, it does not overflow now (after
+	  my previous changes which have fixed the case when one of R,G,B
+	  was bigger than 1.0d some other was less than 1.0).
 19-Nov-2000
 	- Martin Geisse did various documentation updates:
 	    - Moved sections from the 'concepts' and 'anatomy' chapters of
