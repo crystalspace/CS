@@ -88,6 +88,11 @@
 #endif
 #endif
 
+// In CS, we ignore Cygwin's graphical offerings and use the Windows versions.
+#if defined(__CYGWIN__) && !defined(_WIN32)
+#define _WIN32
+#endif
+
 /*
  * End system-specific stuff.
  **********************************************************************/
