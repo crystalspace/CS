@@ -12,6 +12,8 @@ chronological order.
 	  problems with the embedded structures.
 	- Eric Sunshine fixed bug in bfdplugins.cpp.  csGetPluginMetaData()
 	  was leaking `buf' if errors occurred.
+	- Jorrit added iBallState, iGeneralFactoryState, and iGeneralMeshState
+	  to include/ivaria/cspace.i so the python plugin supports them.
 	- Eric Sunshine upgraded Doxygen comments for cscmdPreProcess,
 	  csProcess, cscmdPostProcess, or cscmdFinalProcess so that they
 	  mention that CSMASK_FrameProcess is needed to receive these

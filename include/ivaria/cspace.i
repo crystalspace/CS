@@ -122,6 +122,7 @@
 %define APPLY_FOR_EACH_INTERFACE
 	INTERFACE_APPLY(iAudioStream)
 	INTERFACE_APPLY(iBase)
+	INTERFACE_APPLY(iBallState)
 	INTERFACE_APPLY(iBinaryLoaderPlugin)
 	INTERFACE_APPLY(iBodyGroup)
 	INTERFACE_APPLY(iCamera)
@@ -149,6 +150,8 @@
 	INTERFACE_APPLY(iFontServer)
 	INTERFACE_APPLY(iFrustumView)
 	INTERFACE_APPLY(iFrustumViewUserdata)
+	INTERFACE_APPLY(iGeneralFactoryState)
+	INTERFACE_APPLY(iGeneralMeshState)
 	INTERFACE_APPLY(iGraphics3D)
 	INTERFACE_APPLY(iGraphics2D)
 	INTERFACE_APPLY(iHalo)
@@ -724,6 +727,8 @@ TYPEMAP_OUT_csWrapPtr
 %include "imesh/object.h"
 %include "imesh/sprite2d.h"
 %include "imesh/sprite3d.h"
+%include "imesh/ball.h"
+%include "imesh/genmesh.h"
 %include "imesh/thing/thing.h"
 %include "imesh/thing/lightmap.h"
 %include "imesh/thing/polygon.h"
