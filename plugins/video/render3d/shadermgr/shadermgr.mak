@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/shadermgr
+vpath %.cpp plugins/video/render3d/shadermgr
 
 ifeq ($(USE_PLUGINS),yes)
   SHADERMGR = $(OUTDLL)/shadermgr$(DLL)
