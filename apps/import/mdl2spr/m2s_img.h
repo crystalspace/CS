@@ -30,7 +30,9 @@ protected:
   csRGBpixel Palette[256];
   int Width, Height, Size;
 public:
+  SCF_DECLARE_IBASE;
   SkinImage(void* Data, const void* Pal, int w, int h);
+  virtual ~SkinImage () { SCF_DESTRUCT_IBASE(); }
   virtual void *GetImageData ();
   virtual int GetWidth ();
   virtual int GetHeight ();
@@ -50,7 +52,6 @@ public:
   virtual void GetKeycolor (int &r, int &g, int &b) { r=0;g=0;b=0; }
   virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength);
   virtual int HasMipmaps() { return 0;}
-  SCF_DECLARE_IBASE;
 };
 
 #endif // __M2S_IMG_H__

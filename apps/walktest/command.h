@@ -65,7 +65,7 @@ public:
   {
     SCF_DECLARE_IBASE;
     PerformCallback () { SCF_CONSTRUCT_IBASE (0); }
-    virtual ~PerformCallback () { }
+    virtual ~PerformCallback () { SCF_DESTRUCT_IBASE(); }
     virtual void Execute (const char* cmd);
   };
 

@@ -116,7 +116,7 @@ struct PlayerGridChange : public iGridChangeCallback
   IsoTest* app;
   SCF_DECLARE_IBASE;
   PlayerGridChange () { SCF_CONSTRUCT_IBASE (0); }
-  virtual ~PlayerGridChange() { }
+  virtual ~PlayerGridChange() { SCF_DESTRUCT_IBASE(); }
   virtual void GridChange (iIsoSprite* spr);
 };
 

@@ -39,13 +39,12 @@ struct iMeshWrapper;
  */
 class StandardOp : public iSequenceOperation
 {
-protected:
-  virtual ~StandardOp () { }
-
 public:
-  StandardOp () { SCF_CONSTRUCT_IBASE (0); }
   SCF_DECLARE_IBASE;
+  StandardOp () { SCF_CONSTRUCT_IBASE (0); }
   virtual void CleanupSequences () { }
+protected:
+  virtual ~StandardOp () { SCF_DESTRUCT_IBASE(); }
 };
 
 /**

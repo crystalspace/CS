@@ -216,6 +216,7 @@ struct ModalData : public iBase
   csWindow* d;
   SCF_DECLARE_IBASE;
   ModalData () { SCF_CONSTRUCT_IBASE (0); }
+  virtual ~ModalData () { SCF_DESTRUCT_IBASE (); }
 };
 
 SCF_IMPLEMENT_IBASE (ModalData)

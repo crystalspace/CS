@@ -38,6 +38,7 @@ class CustomComponentFactory : public awsEmbeddedComponentFactory
 {
 public:
   CustomComponentFactory(iAws *manager);
+  virtual ~CustomComponentFactory();
 
   SCF_DECLARE_IBASE;
 

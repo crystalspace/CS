@@ -106,8 +106,9 @@ struct InfPortalCS : public iPortalCallback
   int x1, y1, z1;
   int x2, y2, z2;
 
-  InfPortalCS ();
   SCF_DECLARE_IBASE;
+  InfPortalCS ();
+  virtual ~InfPortalCS ();
   virtual bool Traverse (iPortal* portal, iBase* context);
 };
 

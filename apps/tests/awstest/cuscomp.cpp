@@ -34,7 +34,10 @@ CustomComponent::CustomComponent ()
   SCF_CONSTRUCT_IBASE (0);
 }
 
-CustomComponent::~CustomComponent () {}
+CustomComponent::~CustomComponent ()
+{
+  SCF_DESTRUCT_IBASE ();
+}
 
 bool CustomComponent::Setup(iAws *manager, iAwsComponentNode *settings)
 {
@@ -88,6 +91,11 @@ CustomComponentFactory::CustomComponentFactory (iAws* manager) : awsEmbeddedComp
 {
   SCF_CONSTRUCT_IBASE(0);
   Register ("Demo Component");
+}
+
+CustomComponentFactory::~CustomComponentFactory ()
+{
+  SCF_DESTRUCT_IBASE();
 }
 
 iAwsComponent* CustomComponentFactory::Create ()

@@ -49,7 +49,7 @@ public:
   /// Constructs a new progress meter.
   csCsLightProgressMeter (int total = 100);
   /// Destroys the progress meter.
-  virtual ~csCsLightProgressMeter () {}
+  virtual ~csCsLightProgressMeter ();
 
   SCF_DECLARE_IBASE;
 

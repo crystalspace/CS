@@ -59,6 +59,11 @@ csCsLightProgressMeter::csCsLightProgressMeter (int n)
   SCF_CONSTRUCT_IBASE (0);
 }
 
+csCsLightProgressMeter::~csCsLightProgressMeter()
+{
+  SCF_DESTRUCT_IBASE ();
+}
+
 void csCsLightProgressMeter::SetProgressDescription (const char* id,
 	const char* description, ...)
 {

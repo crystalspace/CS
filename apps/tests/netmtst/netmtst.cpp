@@ -48,10 +48,9 @@ class SendPacket : public iNetworkPacket
   public:
   SCF_DECLARE_IBASE;
   SendPacket ()
-  {
-    SCF_CONSTRUCT_IBASE (0);
-  }
-  virtual ~SendPacket () {}
+  { SCF_CONSTRUCT_IBASE (0); }
+  virtual ~SendPacket ()
+  { SCF_DESTRUCT_IBASE (); }
 
   void SetData (char d []) { data = d; }
 
@@ -82,7 +81,8 @@ class RecvPacket : public iNetworkPacket
     SCF_CONSTRUCT_IBASE (0);
     position = 0;
   }
-  virtual ~RecvPacket () {}
+  virtual ~RecvPacket ()
+  { SCF_DESTRUCT_IBASE(); }
 
   const int8* GetData () { return data; }
 

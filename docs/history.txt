@@ -43,6 +43,8 @@ chronological order.
 	- Jorrit fixed the exact visibility culler in Dynavis again so that
 	  you can now also freeze the Dynavis culling result instead
 	  of the exact culling result.
+	- Eric Sunshine added SCF_DESTRUCT_IBASE() invocations for each of the
+	  corresponding SCF_CONSTRUCT_IBASE() invocations in CS/apps.
 2-Nov-2003
 	- Eric Sunshine performed project-wide spelling corrections:
 	    seperate    --> separate

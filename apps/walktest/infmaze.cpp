@@ -203,6 +203,11 @@ InfPortalCS::InfPortalCS ()
   lviews = 0;
 }
 
+InfPortalCS::~InfPortalCS ()
+{
+  SCF_DESTRUCT_IBASE ();
+}
+
 bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
 {
   csRef<iFrustumView> fv;

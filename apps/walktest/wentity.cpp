@@ -36,6 +36,7 @@ SCF_IMPLEMENT_IBASE_EXT_END
 struct AnimPortalCallback : public iPortalCallback
 {
   AnimPortalCallback ();
+  virtual ~AnimPortalCallback ();
   csAnimatedPortal* animportal;
   SCF_DECLARE_IBASE;
   virtual bool Traverse (iPortal* portal, iBase* context);
@@ -48,6 +49,11 @@ SCF_IMPLEMENT_IBASE_END
 AnimPortalCallback::AnimPortalCallback ()
 {
   SCF_CONSTRUCT_IBASE (0);
+}
+
+AnimPortalCallback::~AnimPortalCallback ()
+{
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool AnimPortalCallback::Traverse (iPortal*, iBase* )

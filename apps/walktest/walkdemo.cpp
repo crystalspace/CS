@@ -513,6 +513,7 @@ struct AnimSkelTree : public iMeshDrawCallback
 {
   SCF_DECLARE_IBASE;
   AnimSkelTree ();
+  virtual ~AnimSkelTree ();
   virtual bool BeforeDrawing (iMeshWrapper* spr, iRenderView* rview);
 };
 
@@ -524,6 +525,11 @@ SCF_IMPLEMENT_IBASE_END
 AnimSkelTree::AnimSkelTree ()
 {
   SCF_CONSTRUCT_IBASE (0);
+}
+
+AnimSkelTree::~AnimSkelTree ()
+{
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool AnimSkelTree::BeforeDrawing (iMeshWrapper* spr, iRenderView* /*rview*/)
@@ -750,6 +756,7 @@ struct AnimSkelGhost : public iMeshDrawCallback
 {
   SCF_DECLARE_IBASE;
   AnimSkelGhost ();
+  virtual ~AnimSkelGhost ();
   virtual bool BeforeDrawing (iMeshWrapper* spr, iRenderView* rview);
 };
 
@@ -761,6 +768,11 @@ SCF_IMPLEMENT_IBASE_END
 AnimSkelGhost::AnimSkelGhost ()
 {
   SCF_CONSTRUCT_IBASE (0);
+}
+
+AnimSkelGhost::~AnimSkelGhost ()
+{
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool AnimSkelGhost::BeforeDrawing (iMeshWrapper* spr, iRenderView* /*rview*/)
