@@ -688,7 +688,8 @@ bool csEngine::Initialize (iSystem* sys)
   // Tell system driver that we want to handle broadcast events
   if (!System->CallOnEvents (this, CSMASK_Broadcast))
     return false;
-
+  
+  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/engine.cfg");
   ReadConfig ();
 
   return true;
