@@ -7,19 +7,17 @@ The history order is reversed so that new features are at the top.
 	- Oktal separated a multiple-argument %ignore directive into several
 	  single-argument ones, in perlpre.i, in order to support older
 	  versions of Swig.
-	- Jorrit made the <moveable/> option no longer required (it is
-	  now deprecated). The thing mesh object plugin will not automatically
-	  detect if it is needed to switch to moveable or not. So setting
-	  this is no longer required.
+	- Jorrit made the <moveable/> option no longer required (it is now
+	  deprecated).  The thing mesh object plugin will not automatically
+	  detect if it is needed to switch to moveable or not.  So setting this
+	  is no longer required.
 	- Jorrit removed <moveable/> output from map2cs.
 	- Jorrit removed mention of <moveable/> from documentation.
-	- Jorrit fixed a bug in DeferUpdateLighting(). It was not correctly
-	  transforming the bounding box of the object to world space.
 15-Jun-2003
-        - Boyan added property "Image" that can be set in AWS component "Image 
+        - Boyan added property "Image" that can be set in AWS component "Image
 	  View".
-	- Oktal rearranged the documentation of the scripting language stuff
-	  in the manual, and added Perl docs.
+	- Oktal rearranged the documentation of the scripting language stuff in
+	  the manual, and added Perl docs.
 	- Oktal moved from cspace.i to pythpre.i the rename directive of
 	  iDataBuffer::operator*() to iDataBuffer::asString(), and added a
 	  Perl-specific wrapper for that method to perlpost.i.
@@ -28,18 +26,18 @@ The history order is reversed so that new features are at the top.
 	- Jorrit changed a comment for ThreadedLoadMapFile() to indicate that
 	  it doesn't work yet.
 	- Marten added the class csProcessorCapabilities to allow CS to query
-	  processorspecific extensions and information. Some functions in this
-	  class is processorspecific and some parts compilerdependant so we must
-	  protect certain areas with #defines
+	  processorspecific extensions and information.  Some functions in this
+	  class is processorspecific and some parts compilerdependant so we
+	  must protect certain areas with #defines
 	- Marten made these changes to dynavis
 	    - Added a fix to csVisibilityObjectHistory to make it set reason on
-	      initializationtime. This fix a bug where bugplug/dynavis segfault 
-	      when trying to use the linedrawing debugging in dynavis.
+	      initializationtime.  This fix a bug where bugplug/dynavis
+	      segfault when trying to use the linedrawing debugging in dynavis.
 	    - Made the inner XOR-filling loop in csCoverageTile::Flush use MMX
-	      on machines which support MMX. The loop is written twice, once in
-	      MSVC and once in GCC inline assembly. The reason for this is speed.
-	      It could have been written in NASM as a separate function, but the 
-	      overhead for the functioncall is too big.
+	      on machines which support MMX.  The loop is written twice, once
+	      in MSVC and once in GCC inline assembly.  The reason for this is
+	      speed.  It could have been written in NASM as a separate
+	      function, but the overhead for the functioncall is too big.
 	- res added a work around for a static linking problem to static.mak.
 	- res renamed csScanPluginsDir() to csScanPluginDir(), added
 	  csScanPluginDirs(), and implemented a general csGetPluginMetadata().
