@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+30-Jan-2003
+	- Matthias Braun made plugin makefiles using the CFLAGS from external
+	  libraries (3ds, mikmod, ogg/vorbis, openal, ode plugins)
+
 29-Jan-2003
 	- Matthias Braun fixed ogg loader crash when sound hasn't been
 	  initialized.
