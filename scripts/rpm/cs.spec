@@ -88,7 +88,6 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/csgfx/*.h
 %{prefix}/include/igeom/*.h
 %{prefix}/include/imesh/*.h
-%{prefix}/include/imesh/thing/*.h
 %{prefix}/include/iutil/*.h
 %{prefix}/include/csgeom/*.h
 %{prefix}/include/cstool/*.h
@@ -109,6 +108,9 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/igraphic/*.h
 
 %changelog
+* Sat Feb 28 2004 Philip Wyett <philip@wyett.net>
+- Removed reference to 'include/imesh/thing/ dir.
+
 * Tue Feb 10 2004 Eric Sunshine <sunshine@users.sourceforge.net>
 - Unification and clean up of package descriptions.
 

@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Feb-2004
+        - Philip Wyett removed reference to 'include/imesh/thing' dir from
+          CS spec file.
 27-Feb-2004
 	- Jorrit enabled the Dynavis write queue again since it appears to
 	  be giving better fps in most cases. Perhaps we need to come up with
