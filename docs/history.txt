@@ -14,6 +14,10 @@ Short-term cleanups that need to be done:
 
 27-Jan-2000
 	- Update to some docs from Wyatt Miler.
+	- Andrew Zabolotny improved the test for endianess.
+	- Added 'delsprite' console command to delete a sprite.
+	- Improved new Line3D renderer a bit (double buffering and
+	  faster key handling). Also cleaned up all unneeded stuff.
 26-Jan-2000
 	- Michael Dale Long added DeleteAt() to csString to delete a range
 	  of characters within a csString.

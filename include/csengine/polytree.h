@@ -28,6 +28,7 @@ class csPolygonTree;
 class csPolygonTreeNode;
 class csPolygonStub;
 class csPolyTreeObject;
+class Dumper;
 
 
 #define NODE_OCTREE 1
@@ -53,6 +54,8 @@ typedef bool (csTreeCullFunc)(csPolygonTree* tree, csPolygonTreeNode* node,
  */
 class csPolygonTreeNode
 {
+  friend class Dumper;
+
 protected:
   /**
    * A linked list for all polygons stubs that are added
@@ -120,6 +123,8 @@ public:
  */
 class csPolygonTree
 {
+  friend class Dumper;
+
 protected:
   /// The root of the tree.
   csPolygonTreeNode* root;

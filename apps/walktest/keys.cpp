@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -25,7 +25,9 @@
 #include "walktest/hugeroom.h"
 #include "apps/support/command.h"
 #include "cstools/simpcons.h"
+#include "csengine/dumper.h"
 #include "csengine/camera.h"
+#include "csengine/octree.h"
 #include "csengine/world.h"
 #include "csengine/csview.h"
 #include "csengine/wirefrm.h"
@@ -1041,7 +1043,7 @@ static bool CommandHandler (char *cmd, char *arg)
     Sys->Printf (MSG_CONSOLE, " fps, perftest, capture, coordshow, zbuf, freelook\n");
     Sys->Printf (MSG_CONSOLE, " map, fire, debug0, debug1, debug2, edges, p_alpha, s_fog\n");
     Sys->Printf (MSG_CONSOLE, " snd_play, snd_volume, do_gravity, cbuffer, quadtree, covtree\n");
-    Sys->Printf (MSG_CONSOLE, " addbot, delbot, loadsprite, addsprite, addskel, addghost\n");
+    Sys->Printf (MSG_CONSOLE, " addbot, delbot, loadsprite, addsprite, delsprite, addskel, addghost\n");
     Sys->Printf (MSG_CONSOLE, " step_forward, step_backward, strafe_left, strafe_right\n");
     Sys->Printf (MSG_CONSOLE, " look_up, look_down, rotate_left, rotate_right, jump, move3d\n");
     Sys->Printf (MSG_CONSOLE, " i_forward, i_backward, i_left, i_right, i_up, i_down\n");
@@ -1175,7 +1177,13 @@ static bool CommandHandler (char *cmd, char *arg)
     perf_test ();
   else if (!strcasecmp (cmd, "debug0"))
   {
-    Sys->Printf (MSG_CONSOLE, "No debug0 implementation in this version.\n");
+    csCamera* c = Sys->view->GetCamera ();
+    if (c->GetSector ()->GetStaticTree ())
+    {
+      csOctree* octree = (csOctree*)(c->GetSector ()->GetStaticTree ());
+      Dumper::dump_stubs (octree);
+    }
+    //Sys->Printf (MSG_CONSOLE, "No debug0 implementation in this version.\n");
   }
   else if (!strcasecmp (cmd, "debug1"))
   {
@@ -1375,6 +1383,21 @@ static bool CommandHandler (char *cmd, char *arg)
     if (arg) ScanStr (arg, "%s,%f", name, &size);
     else { *name = 0; size = 1; }
     add_sprite (name, name, Sys->view->GetCamera ()->GetSector (), Sys->view->GetCamera ()->GetOrigin (), size);
+  }
+  else if (!strcasecmp (cmd, "delsprite"))
+  {
+    char name[100];
+    if (arg)
+    {
+      ScanStr (arg, "%s", name);
+      csObject* obj = Sys->view->GetWorld ()->sprites.FindByName (name);
+      if (obj)
+        Sys->view->GetWorld ()->RemoveSprite ((csSprite3D*)obj);
+      else
+        CsPrintf (MSG_CONSOLE, "Can't find sprite with that name!\n");
+    }
+    else
+      CsPrintf (MSG_CONSOLE, "Missing sprite name!\n");
   }
   else if (!strcasecmp (cmd, "addskel"))
   {

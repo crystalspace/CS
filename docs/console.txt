@@ -569,6 +569,10 @@ Action:  Add a sprite from a template already in memory.
 	 factor for the sprite. The sprite is put at the current
 	 location.
 
+Command: delsprite
+Type:    general command
+Action:  Delete a sprite from the world with the given name.
+
 Command: addskel
 Type:    general command
 Action:  Add a skeletal tree (demonstration). The first argument is the

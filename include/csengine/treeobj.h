@@ -28,6 +28,7 @@ class csPolygonStubPool;
 class csPolygonInt;
 class csPolyTreeObject;
 class csPolygonTreeNode;
+class Dumper;
 
 /**
  * A polygon stub. For a given tree object there can be
@@ -39,6 +40,7 @@ class csPolygonStub
   friend class csPolyTreeObject;
   friend class csPolygonTreeNode;
   friend class csPolygonStubPool;
+  friend class Dumper;
 
 private:
   // Linked list in every tree node.
@@ -90,6 +92,8 @@ public:
  */
 class csPolygonStubPool
 {
+  friend class Dumper;
+
 private:
   struct PoolObj
   {

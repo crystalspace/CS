@@ -331,6 +331,7 @@ bool csGraphics2DLineXLib::BeginDraw ()
 
 void csGraphics2DLineXLib::Print (csRect *area)
 {
+  usleep (5000);
   if (nr_segments)
   {
     XSetForeground (dpy, gc_back, seg_color);

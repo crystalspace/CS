@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -26,6 +26,7 @@ class csPlane;
 class csBox;
 class csCamera;
 class csPolyTxtPlane;
+class csPolygonStub;
 class csPolygon2D;
 class csPolygon3D;
 class csPolygonSet;
@@ -36,6 +37,8 @@ class csSpriteTemplate;
 class csSprite3D;
 class csBspTree;
 class csBspNode;
+class csOctree;
+class csOctreeNode;
 class csPolygonClipper;
 class csFrustrum;
 class csPoly2DPool;
@@ -56,6 +59,11 @@ private:
   static void dump (csBspTree* tree, csBspNode* node, int indent);
   static void dump (csQuadtreeNode* node, char* buf, int bufdim,
   	int depth, int x1, int y1, int x2, int y2);
+  static void dump_stubs (csPolygonStub* stub, char* name, int level);
+  static void dump_stubs (csBspNode* bnode, char* name, int level);
+  static void dump_stubs (csOctreeNode* onode, char* name, int level);
+  static bool check_stubs (csOctreeNode* node);
+  static bool check_stubs (csBspNode* node);
 
 public:
   static void dump (csMatrix3* m, char* name);
@@ -80,6 +88,7 @@ public:
   static void dump (csLightPatchPool* pool, char* name);
   static void dump (csQuadcube* cube);
   static void dump (csQuadtree* tree);
+  static void dump_stubs (csOctree* octree);
 };
 
 #endif

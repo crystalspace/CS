@@ -24,6 +24,7 @@
 #include "csgeom/frustrum.h"
 #include "csengine/dumper.h"
 #include "csengine/bsp.h"
+#include "csengine/octree.h"
 #include "csengine/quadtree.h"
 #include "csengine/quadcube.h"
 #include "csengine/sysitf.h"
@@ -458,4 +459,92 @@ void Dumper::dump (csQuadtree* tree)
 
   CHK (delete [] buf);
 }
+
+char* spaces (int nr)
+{
+  static char spc[200];
+  spc[0] = 0;
+  int i;
+  for (i = 0 ; i < nr ; i++) spc[i] = ' ';
+  spc[nr] = 0;
+  return spc;
+}
+
+bool Dumper::check_stubs (csBspNode* node)
+{
+  if (!node) return false;
+  if (node->first_stub || node->todo_stubs) return true;
+  if (check_stubs (node->front)) return true;
+  if (check_stubs (node->back)) return true;
+  return false;
+}
+
+bool Dumper::check_stubs (csOctreeNode* node)
+{
+  if (!node) return false;
+  if (node->first_stub || node->todo_stubs) return true;
+  if (check_stubs ((csOctreeNode*)node->children[0])) return true;
+  if (check_stubs ((csOctreeNode*)node->children[1])) return true;
+  if (check_stubs ((csOctreeNode*)node->children[2])) return true;
+  if (check_stubs ((csOctreeNode*)node->children[3])) return true;
+  if (check_stubs ((csOctreeNode*)node->children[4])) return true;
+  if (check_stubs ((csOctreeNode*)node->children[5])) return true;
+  if (check_stubs ((csOctreeNode*)node->children[6])) return true;
+  if (check_stubs ((csOctreeNode*)node->children[7])) return true;
+  if (node->minibsp && check_stubs ((csBspNode*)node->minibsp->root)) return true;
+  return false;
+}
+
+void Dumper::dump_stubs (csPolygonStub* stub, char* name, int level)
+{
+  while (stub)
+  {
+    CsPrintf (MSG_DEBUG_0, "%s %s num_poly=%d this=%08lx obj=%08lx\n",
+    	spaces (level), name, stub->GetNumPolygons (),
+    	stub, stub->object);
+    stub = stub->next_tree;
+  }
+}
+
+void Dumper::dump_stubs (csBspNode* bnode, char* name, int level)
+{
+  if (!bnode) return;
+  CsPrintf (MSG_DEBUG_0, "%s bnode(%s)\n", spaces (level), name);
+  if (!check_stubs (bnode)) { CsPrintf (MSG_DEBUG_0, "%s  ..\n", spaces (level)); return; }
+  dump_stubs (bnode->first_stub, "stub", level+1);
+  dump_stubs (bnode->todo_stubs, "todo", level+1);
+  dump_stubs (bnode->front, "front", level+1);
+  dump_stubs (bnode->back, "back", level+1);
+}
+void Dumper::dump_stubs (csOctreeNode* onode, char* name, int level)
+{
+  if (!onode) return;
+  CsPrintf (MSG_DEBUG_0, "%s onode(%s) (%f,%f,%f)\n", spaces (level),
+  	name,
+  	onode->bbox.MaxX () - onode->bbox.MinX (),
+  	onode->bbox.MaxY () - onode->bbox.MinY (),
+  	onode->bbox.MaxZ () - onode->bbox.MinZ ());
+  if (!check_stubs (onode)) { CsPrintf (MSG_DEBUG_0, "%s  ..\n", spaces (level)); return; }
+  dump_stubs (onode->first_stub, "stub", level+1);
+  dump_stubs (onode->todo_stubs, "todo", level+1);
+  if (onode->minibsp) dump_stubs ((csBspNode*)(onode->minibsp->root),
+  	"root", level+1);
+  int i;
+  dump_stubs ((csOctreeNode*)onode->children[0], "0", level+1);
+  dump_stubs ((csOctreeNode*)onode->children[1], "1", level+1);
+  dump_stubs ((csOctreeNode*)onode->children[2], "2", level+1);
+  dump_stubs ((csOctreeNode*)onode->children[3], "3", level+1);
+  dump_stubs ((csOctreeNode*)onode->children[4], "4", level+1);
+  dump_stubs ((csOctreeNode*)onode->children[5], "5", level+1);
+  dump_stubs ((csOctreeNode*)onode->children[6], "6", level+1);
+  dump_stubs ((csOctreeNode*)onode->children[7], "7", level+1);
+}
+
+void Dumper::dump_stubs (csOctree* octree)
+{
+  csPolyTreeObject::stub_pool.Dump ();
+  CsPrintf (MSG_DEBUG_0, "Dump octree\n");
+  dump_stubs ((csOctreeNode*)octree->root, "root", 0);
+}
+
 
