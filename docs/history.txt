@@ -10,6 +10,10 @@ The history order has been reversed so that new features are at the top.
 	      $ignore[] and $indexfile[] arrays.
 	    - Now much more strict about canonicalization of filenames prior
 	      to matching.
+	- Eric Sunshine made the following changes to the CS Jump Start page
+	  at http://crystal.sourceforge.net/.
+	    - Added link for online CVS browsing.
+	    - Aesthetic improvements.
 4-Sep-2000
 	- Brandon Ehle did some maintenance to the Python scripting stuff.
 	  Need to wait for next SWIG release for everything to fall in place.
