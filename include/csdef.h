@@ -28,7 +28,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#if defined(CS_HAS_CMATH_H)
+#include <cmath>
+#else
 #include <math.h>
+#endif
 #include <time.h>
 #include <signal.h>
 #include <errno.h>

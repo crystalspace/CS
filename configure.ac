@@ -213,11 +213,17 @@ AS_IF([test -n "$NASM"],
 #------------------------------------------------------------------------------
 # Check for typical required libraries (libm, libmx, libdl, libnsl).
 #------------------------------------------------------------------------------
+AC_LANG_PUSH([C++])
+AC_CHECK_HEADER([cmath], [CS_HEADER_PROPERTY([CS_HAS_CMATH_H])])
+AC_LANG_POP([C++])
+
 AC_DEFUN([CS_CHECK_COMMON_LIBS],
     [AC_LANG_PUSH([C])
     AC_CHECK_LIB([m], [pow], [cs_cv_libm_libs=-lm], [cs_cv_libm_libs=])
+    AC_LANG_PUSH([C++])
     AC_CHECK_LIB([m], [cosf], [cs_cv_libm_libs=-lm])
     AC_CHECK_LIB([mx], [cosf])
+    AC_LANG_POP([C++])
     AC_CHECK_LIB([dl], [dlopen], [cs_cv_libdl_libs=-ldl], [cs_cv_libdl_libs=])
     AC_CHECK_LIB([nsl], [gethostbyname])
     AC_LANG_POP([C])])

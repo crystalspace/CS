@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Jul-2004
+	- Eric Sunshine made the following changes:
+	    - The cosf() check in configure.ac is now run with the C++ compiler
+	      rather than the C compiler.  This allows cosf() to be detected
+	      when it is a C++ compiler built-in, thus giving positive results
+	      more frequently (such as with older MacOS/X, which previously
+	      failed the test).
+	    - Added a <cmath> configure.ac check.  If present, then it is
+	      included by csdef.h before faking up cosf() and friends (if
+	      needed).  This works around potential problem where the faked-up
+	      functions could cause errors in <cmath> if it was later included.
 28-Jul-2004
 	- Erotoman added MEL script for exporting Maya models
 	- Eric Sunshine fixed csjava/Jamfile so that it constructs the
