@@ -17,6 +17,7 @@ chronological order.
 	    - Removed the unmaintained and hardly used ddraw8 canvas plugin.
 	    - Updated win32/csosdefs.h to provide the LONG_PTR type on older
 	      Platform SDKs.
+	- Troy in odedynam set limit of geoms array to 1 for rigidbodies
 18-Aug-2003
 	- Jorrit fixed a bug with destruction of hierarchical factories.
 	  The problem was that it was trying to remove objects from
