@@ -130,12 +130,12 @@ void csShadowBlock::AddRelevantShadows (
       {
         csShadowFrustum *copycsf = new csShadowFrustum (*csf);
         copycsf->Transform (trans);
-	IntAddShadow (copycsf);
+        IntAddShadow (copycsf);
       }
       else
       {
         csf->IncRef ();
-	IntAddShadow (csf);
+        IntAddShadow (csf);
       }
     }
   }
@@ -205,7 +205,7 @@ void csShadowBlock::AddUniqueRelevantShadows (csShadowBlockList *source)
       if (i >= cnt)
       {
         csf->IncRef ();
-	IntAddShadow (csf);
+        IntAddShadow (csf);
       }
     }
   }

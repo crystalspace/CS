@@ -219,8 +219,8 @@ void csCamera::SetFOVAngle (float a, int width)
 
 void csCamera::ComputeAngle (int width)
 {
-  float rview_fov = (float)GetFOV () / 2.0f;
-  float disp_width = (float)width / 2.0f;
+  float rview_fov = (float)GetFOV () * 0.5f;
+  float disp_width = (float)width * 0.5f;
   float inv_disp_radius = qisqrt (
       rview_fov * rview_fov + disp_width * disp_width);
   fov_angle = 2.0f * (float)acos (disp_width * inv_disp_radius) * (360.0f / TWO_PI);
@@ -228,8 +228,8 @@ void csCamera::ComputeAngle (int width)
 
 void csCamera::ComputeDefaultAngle (int width)
 {
-  float rview_fov = (float)GetDefaultFOV () / 2.0f;
-  float disp_width = (float)width / 2.0f;
+  float rview_fov = (float)GetDefaultFOV () * 0.5f;
+  float disp_width = (float)width * 0.5f;
   float inv_disp_radius = qisqrt (
       rview_fov * rview_fov + disp_width * disp_width);
   default_fov_angle = 2.0f * (float)acos (disp_width * inv_disp_radius)

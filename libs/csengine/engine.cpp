@@ -1569,7 +1569,8 @@ iStatLight *csEngine::FindLight (const char *name, bool regionOnly) const
   (void)regionOnly;
 
   // @@@### regionOnly
-  for (int i = 0; i < sectors.Length (); i++)
+  int i;
+  for (i = 0; i < sectors.Length (); i++)
   {
     iLight *l = sectors[i]->GetLights ()->FindByName (name);
     if (l)
@@ -2893,9 +2894,9 @@ iClipper2D *csEngine::GetTopLevelClipper () const
 
 void csEngine::SetAmbientLight (const csColor &c)
 {
-  csLight::ambient_red = int (c.red * 255);
-  csLight::ambient_green = int (c.green * 255);
-  csLight::ambient_blue = int (c.blue * 255.0);
+  csLight::ambient_red = int (c.red * 255.0f);
+  csLight::ambient_green = int (c.green * 255.0f);
+  csLight::ambient_blue = int (c.blue * 255.0f);
 }
 
 void csEngine::GetAmbientLight (csColor &c) const
