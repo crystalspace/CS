@@ -40,13 +40,12 @@ csSoundRenderNull::csSoundRenderNull(ISystem* piSystem) : m_pListener(NULL)
 {
   m_piSystem = piSystem;
 
-  m_pListener = new csSoundListenerNull ();
+  CHK (m_pListener = new csSoundListenerNull ());
 }
 
 csSoundRenderNull::~csSoundRenderNull()
 {
-  if(m_pListener)
-    delete m_pListener;
+  CHK (delete m_pListener);
 }
 
 STDMETHODIMP csSoundRenderNull::GetListener(ISoundListener ** ppv )
@@ -62,7 +61,7 @@ STDMETHODIMP csSoundRenderNull::GetListener(ISoundListener ** ppv )
 
 STDMETHODIMP csSoundRenderNull::CreateSource(ISoundSource ** ppv, csSoundBuffer* /*snd*/)
 {
-  csSoundSourceNull* pNew = new csSoundSourceNull ();
+  CHK (csSoundSourceNull* pNew = new csSoundSourceNull ());
   if (!pNew)
   {
     *ppv = 0;

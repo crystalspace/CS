@@ -23,9 +23,6 @@
 #include <strings.h>
 #include <ctype.h>
 #include "sysdef.h"
-#include "cssys/common/system.h"
-
-extern csSystemDriver *System;
 
 #ifdef MEM_CHECK_EXTENSIVE
 #  undef MEM_CHECK_FILL
@@ -69,7 +66,7 @@ void* operator new (size_t s)
   }
   else
   {
-    System->Printf (MSG_STDOUT, "WARNING! Memory was allocated without CHK (%d bytes)!\n", s);
+    printf ("WARNING! Memory was allocated without CHK (%d bytes)!\n", s);
     me->file = NULL;
   }
   if (entries) entries->prev = me;
@@ -86,17 +83,17 @@ void dump_memory (const char* p, size_t len)
   const char* op = p;
   for (i = 0 ; i < (int)len ; i++)
   {
-    System->Printf (MSG_STDOUT, "%c", isprint (*p) ? *p : '.');
+    printf ("%c", isprint (*p) ? *p : '.');
     p++;
   }
   p = op;
-  System->Printf (MSG_STDOUT, "    ");
+  printf ("    ");
   for (i = 0 ; i < (int)len ; i++)
   {
-    System->Printf (MSG_STDOUT, "%02x ", *p);
+    printf ("%02x ", *p);
     p++;
   }
-  System->Printf (MSG_STDOUT, "\n");
+  printf ("\n");
 }
 
 void operator delete (void* p)
@@ -117,12 +114,12 @@ void operator delete (void* p)
 #ifdef MEM_CHECK_EXTENSIVE
   if (e && e->freed)
   {
-    System->Printf (MSG_STDOUT, "ERROR! Block was already freed earlier!\n");
-    System->Printf (MSG_STDOUT, "       Error discovered while freeing memory at %s:%d.\n",
+    printf ("ERROR! Block was already freed earlier!\n");
+    printf ("       Error discovered while freeing memory at %s:%d.\n",
     	MemLine != -1 ? MemFile : "", MemLine);
-    System->Printf (MSG_STDOUT, "       Block was originally allocated at %s:%d.\n",
+    printf ("       Block was originally allocated at %s:%d.\n",
     	e->line != -1 ? e->file : "", e->line);
-    System->Printf (MSG_STDOUT, "       Block was first freed at %s:%d.\n",
+    printf ("       Block was first freed at %s:%d.\n",
     	e->free_line != -1 ? e->free_file : "", e->free_line);
     mem_lock--;
     return;
@@ -134,24 +131,24 @@ void operator delete (void* p)
     pp = ((char*)p)-WALL_SIZE;
     if (strncmp (pp, BEFOREWALL_STR, WALL_SIZE))
     {
-      System->Printf (MSG_STDOUT, "ERROR! Memory was overwritten before block allocated at %s:%d with size %d!\n",
+      printf ("ERROR! Memory was overwritten before block allocated at %s:%d with size %d!\n",
       	e->file ? e->file : "", e->line, e->size);
-      System->Printf (MSG_STDOUT, "       Overwritten with: ");
+      printf ("       Overwritten with: ");
       dump_memory (pp, WALL_SIZE);
-      System->Printf (MSG_STDOUT, "       Should be       : ");
+      printf ("       Should be       : ");
       dump_memory (BEFOREWALL_STR, WALL_SIZE);
-      System->Printf (MSG_STDOUT, "       Error discovered while freeing memory at %s:%d.\n",
+      printf ("       Error discovered while freeing memory at %s:%d.\n",
     	MemLine != -1 ? MemFile : "", MemLine);
     }
     if (strncmp (pp+e->size+WALL_SIZE, AFTERWALL_STR, WALL_SIZE))
     {
-      System->Printf (MSG_STDOUT, "ERROR! Memory was overwritten after block allocated at %s:%d with size %d!\n",
+      printf ("ERROR! Memory was overwritten after block allocated at %s:%d with size %d!\n",
       	e->file ? e->file : "", e->line, e->size);
-      System->Printf (MSG_STDOUT, "       Overwritten with: ");
+      printf ("       Overwritten with: ");
       dump_memory (pp+e->size+WALL_SIZE, WALL_SIZE);
-      System->Printf (MSG_STDOUT, "       Should be       : ");
+      printf ("       Should be       : ");
       dump_memory (AFTERWALL_STR, WALL_SIZE);
-      System->Printf (MSG_STDOUT, "       Error discovered while freeing memory at %s:%d.\n",
+      printf ("       Error discovered while freeing memory at %s:%d.\n",
     	MemLine != -1 ? MemFile : "", MemLine);
     }
 
@@ -189,8 +186,8 @@ void operator delete (void* p)
   }
   else
   {
-    System->Printf (MSG_STDOUT, "ERROR! Trying to free something that is not allocated!\n");
-    System->Printf (MSG_STDOUT, "       Error discovered while freeing memory at %s:%d.\n",
+    printf ("ERROR! Trying to free something that is not allocated!\n");
+    printf ("       Error discovered while freeing memory at %s:%d.\n",
     	MemLine != -1 ? MemFile : "", MemLine);
   }
   mem_lock--;
@@ -214,13 +211,13 @@ void check_mem ()
         int how_many = MIN (fill_count, strlen (fill_str));
         if (memcmp (fill, fill_str, how_many))
         {
-          System->Printf (MSG_STDOUT, "ERROR! Memory was overwritten after block allocated at %s:%d with size %d was freed!\n",
+          printf ("ERROR! Memory was overwritten after block allocated at %s:%d with size %d was freed!\n",
       	    e->file ? e->file : "", e->line, e->size);
-          System->Printf (MSG_STDOUT, "       Overwritten with: ");
+          printf ("       Overwritten with: ");
           dump_memory (fill, 16);
-          System->Printf (MSG_STDOUT, "       Should have been: ");
+          printf ("       Should have been: ");
           dump_memory (fill_str, 16);
-          System->Printf (MSG_STDOUT, "       Block was first freed at %s:%d.\n",
+          printf ("       Block was first freed at %s:%d.\n",
     	    e->free_line != -1 ? e->free_file : "", e->free_line);
 	  break;
         } /* endif */
@@ -241,15 +238,15 @@ class X { public: ~X () { dump_mem_list (); check_mem (); } } x;
 
 void dump_mem_list ()
 {
-  System->Printf (MSG_STDOUT, "------------------- memory block list -------------------\n");
+  printf ("------------------- memory block list -------------------\n");
   MemEntryA *cur = entries;
   while (cur)
   {
     if (!cur->freed)
-      System->Printf (MSG_STDOUT, "%08lX (%ld)  %s:%d\n", (unsigned long)cur->p, cur->size, cur->file, cur->line);
+      printf ("%08lX (%ld)  %s:%d\n", (unsigned long)cur->p, cur->size, cur->file, cur->line);
     cur = cur->next;
   } /* endwhile */
-  System->Printf (MSG_STDOUT, "---------------- end of memory block list ---------------\n");
+  printf ("---------------- end of memory block list ---------------\n");
   fflush (stdout);
 }
 

@@ -130,7 +130,7 @@ STDMETHODIMP csNetworkDriverNullFactory::CreateInstance (REFIID riid, ISystem* p
     return E_UNEXPECTED;
   }
 
-  csNetworkDriverNull* pNew = new csNetworkDriverNull (piSystem);
+  CHK (csNetworkDriverNull* pNew = new csNetworkDriverNull (piSystem));
   if (!pNew)
   {
     *ppv = 0;

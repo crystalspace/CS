@@ -96,7 +96,7 @@ csCrossBuild_SpriteTemplateFactory::~csCrossBuild_SpriteTemplateFactory()
 /// full sprite template builder
 csBase *csCrossBuild_SpriteTemplateFactory::CrossBuild(converter &buildsource)
 {
-  csSpriteTemplate *newtemplate = new csSpriteTemplate();
+  CHK (csSpriteTemplate *newtemplate = new csSpriteTemplate());
   CrossBuild ((csBase*)newtemplate, buildsource);
   newtemplate->GenerateLOD ();
   return newtemplate;
@@ -204,7 +204,7 @@ csSpriteTemplate *ivconbuild_Quake2csSpriteTemplate(Archive &pakarchive)
   sprintf(tempfilename,"%s.md2",tempfilenamebase);
   FILE *tempfile = fopen(tempfilename,"wb");
   fwrite(modelrawdata,modeldatasize,1,tempfile);
-  delete [] modelrawdata;
+  CHK (delete [] modelrawdata);
 
   converter modeldata;
   modeldata.ivcon(tempfilename);
@@ -248,7 +248,7 @@ csTextureHandle *ivconload_Quake2Textures(csWorld *world,Archive &pakarchive,cha
       char *tempfilename = tmpnam(NULL);
       FILE *tempfile = fopen(tempfilename,"wb");
       fwrite(skinrawdata,skindatasize,1,tempfile);
-      delete [] skinrawdata;
+      CHK (delete [] skinrawdata);
       fclose(tempfile);
 
       // convert to a gif which we CAN read
@@ -279,11 +279,11 @@ csTextureHandle *ivconload_Quake2Textures(csWorld *world,Archive &pakarchive,cha
 
       if (prefixstring)
       {
-        char *prefixedname = new char[strlen(filename)+strlen(prefixstring)+1];
+        CHK (char *prefixedname = new char[strlen(filename)+strlen(prefixstring)+1]);
         strcpy(prefixedname,prefixstring);
 	strcat(prefixedname,filename);
 	csNameObject::AddName(*defaulttexture,prefixedname);
-	delete[] prefixedname;
+	CHK (delete[] prefixedname);
       }
 	csNameObject::AddName(*defaulttexture,filename);
 
@@ -343,7 +343,7 @@ csCrossBuild_ThingTemplateFactory::~csCrossBuild_ThingTemplateFactory()
 /// full thing template builder
 csBase *csCrossBuild_ThingTemplateFactory::CrossBuild(converter &buildsource)
 {
-  csThingTemplate *newtemplate = new csThingTemplate();
+  CHK (csThingTemplate *newtemplate = new csThingTemplate());
   CrossBuild ((csBase*)newtemplate, buildsource);
   return newtemplate;
 }
@@ -386,7 +386,6 @@ void csCrossBuild_ThingTemplateFactory::Build_TriangleMesh(csThingTemplate& mesh
     int a = buildsource.face[0][triangleindex];
     int b = buildsource.face[1][triangleindex];
     int c = buildsource.face[2][triangleindex];
-    ptemp->UseGouraud ();
     ptemp->AddVertex (a);
     ptemp->AddVertex (b);
     ptemp->AddVertex (c);
