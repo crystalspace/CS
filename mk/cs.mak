@@ -186,8 +186,17 @@ all: $(OUTDIRS)
 
 dep: $(OUTBASE) $(OUTOS)
 
+# @@@ FIXME: The Perl file we clean up here is generated at project
+# configuration time.  It is really the responsibility of csperl5.mak to clean
+# up these files, but that module is not enabled by default, which means that
+# the makefile is not loaded.  The proper solution is to enable csperl5.mak
+# automatically if the configuration script detects a working Perl
+# installation, however the module is still broken on a number of platforms, so
+# automatically enabling it is not a good idea.  Consequently, as an interim
+# solution, we clean up those files here.
 distclean: clean
 	-$(RM) config.mak include/volatile.h
+	-$(RM) include/cssys/csperlxs.c
 
 clean:
 	-$(RMDIR) $(OUTBASE)
