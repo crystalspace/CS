@@ -235,7 +235,7 @@ a new region.
 
 In @code{iLoader} the functions @code{LoadMapFile()} and
 @code{ThreadedLoadMapFile()} now expect an optional pointer to a region
-instead of a boolean to use the current region.
+in addition with a boolean to restrict searching to that region.
 
 In addition to all these changes the @samp{region} keyword in XML is no
 longer supported.
