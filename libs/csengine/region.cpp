@@ -346,9 +346,19 @@ iSector *csRegion::Region::FindSector (const char *iName)
 
 iMeshWrapper *csRegion::Region::FindMeshObject (const char *Name)
 {
-  if (strchr (Name, ':'))
+  char* p = strchr (Name, ':');
+  if (p)
   {
-    //@@@@@@@@@@@@@@@@@ TODO!!!
+    char* cname = csStrNew (Name);
+    char* p2 = strchr (cname, ':');
+    *p2 = 0;
+    csRef<iMeshWrapper> m (CS_GET_NAMED_CHILD_OBJECT (
+        scfParent, iMeshWrapper, cname));
+    delete[] cname;
+    if (m)
+    {
+      return m->GetChildren ()->FindByName (p+1);
+    }
     return NULL;
   }
   else

@@ -5,6 +5,9 @@ The history order is reversed so that new features are at the top.
 	  of transforming all vertices only the vertices in the root are
 	  transformed and also the transforms of all children of the root.
 	  This has not been tested though.
+	- Implemented the missing feature for locating a mesh that is a child
+	  of a hierarchical mesh parent (using the ':' notation). This worked
+	  in the default case but not within regions.
 28-Nov-2002
 	- Eric Sunshine disabled the "experimental" render3d project by default
 	  for MSVC users since its many compilation problems were causing
