@@ -4,16 +4,16 @@
 @cindex Windows, Building
 
 Compiling Crystal Space with @emph{Microsoft Developer Studio 5}
-or the stand alone version of @emph{Microsoft Visual C++ 5} with
-additionally Service Pack (@sc{sp}) 3 installed.is not strictly
-supported. However, some of the Crystal Space developers fairly
-successfully compile most if not all of the Crystal Space codebase. Please
+or the standalone version of @emph{Microsoft Visual C++ 5} with 
+Service Pack (@sc{sp}) 3 additionally installed is not strictly
+supported. However, some of the Crystal Space developers have fairly
+successfully compiled most, if not all, of the Crystal Space codebase. Please
 read the following sections and @sc{faq} carefully.
 
 @subsubheading Getting Extra Help
 
 If you need help with Crystal Space and Visual C++ or just Crystal Space in
-general.  You can subscribe and then post a message to the Crystal Space
+general, you can subscribe and then post a message to the Crystal Space
 mailing list.  To subscribe see the following site and fill in the form:
 
 @uref{http://lists.sourceforge.net/lists/listinfo/crystal-main}
@@ -26,7 +26,7 @@ following:
 @subsubheading Required/Optional External Libraries and Software
 
 All the following libraries and Software Development Kits (@sc{sdk}) unless
-stated are not required.  However, if you choose not to install them, at
+stated are @emph{not} required.  However, if you chose not to install them, at
 compile time you must follow the documented instructions of how to unload these
 projects from the Crystal Space build process.
 
@@ -44,14 +44,14 @@ Space, i.e. @file{zlib.dll}, @file{libjpeg.dll}, @file{png.dll} and
 or
 @uref{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/msvc_libs_0.19.zip}
 
-Once you have downloaded the msvc_libs package, extract it too your @file{CS\}
+Once you have downloaded the msvc_libs package, extract it to your @file{CS\}
 root directory.
 
 @subsubheading OpenGL
 
 The required headers and library files for compiling the Crystal Space OpenGL
 related plugins, are included within the Visual C++ 5 distribution.
-However, optionally you can also install and use Silicon Graphics own OpenGL
+However, optionally you can also install and use Silicon Graphics' own OpenGL
 Software Development Kit (@sc{sdk}) for Windows.  If you wish to do this, it
 can be obtained from:
 
@@ -65,9 +65,8 @@ Kit (@sc{sdk}) on your system.
 
 @itemize @bullet
 @item
-DirectX 5.0 or higher is required.  With this, you get sound output and
-non-accelerated graphics.
-package.
+DirectX 5.0 or higher is required.  With this, you get the sound output and
+non-accelerated graphics package.
 
 @item
 DirectX 6.1 or higher (including DirectX 8a) allows hardware-accelerated 3D
@@ -78,7 +77,7 @@ Visual C++ 5 does @emph{not} come with any DirectX @sc{sdk} as part of it's
 distribution, so you will need to download at least one version of the
 DirectX @sc{sdk} and install it on your system. *** TODO ***
 
-To enable you to build Crystal Space to it optimum @sc{d3d} support, you must
+To enable you to build Crystal Space to its optimum @sc{d3d} support, you must
 download the latest DirectX Software Development Kit (@sc{sdk}), which can be
 obtained from:
 
@@ -86,7 +85,7 @@ obtained from:
 
 If you are unable to accomplish the 100+Mb (For the full @sc{sdk}) or 43Mb (For
 the Visual-C only parts of the @sc{sdk}) download of the DirectX 8a @sc{sdk}
-from the link above.  You can obtain cut down older versions (6 & 7 with no
+from the link above, you can obtain the cut down older versions (6 & 7 with no
 documents or example code) of the DirectX @sc{sdk}'s from the following
 website:
 
