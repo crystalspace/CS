@@ -1,6 +1,0 @@
-SubDir TOP plugins sound driver ;
-
-SubInclude TOP plugins sound driver coreaudio ;
-SubInclude TOP plugins sound driver oss ;
-SubInclude TOP plugins sound driver alsa ;
-SubInclude TOP plugins sound driver waveoutsd ;

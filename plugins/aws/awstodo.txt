@@ -1,5 +1,0 @@
-- the multiproctex iGraphics2D() can only handle basic drawing functions.
-  iGraphics3D() can only do pixmap drawing.
-  doesn't work with palettes.
-
-  those features aren't (really) needed yet, but should be implemented sometime in the future.

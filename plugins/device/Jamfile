@@ -1,3 +1,0 @@
-SubDir TOP plugins device ;
-
-SubInclude TOP plugins device joystick ;

@@ -1,3 +1,0 @@
-SubDir TOP plugins motion standard persist ;
-
-SubInclude TOP plugins motion standard persist standard ;

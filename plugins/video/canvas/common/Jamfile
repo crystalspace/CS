@@ -1,7 +1,0 @@
-SubDir TOP plugins video canvas common ;
-
-Library canvascommon
-	: [ Wildcard *.cpp *.h ]
-	: noinstall ;
-
-LibDepends canvascommon : cstool csgfx csgeom csutil ;

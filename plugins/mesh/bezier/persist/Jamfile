@@ -1,3 +1,0 @@
-SubDir TOP plugins mesh bezier persist ;
-
-SubInclude TOP plugins mesh bezier persist standard ;

@@ -1,8 +1,0 @@
-SubDir TOP plugins collide opcode ;
-
-Help opcode : "OPCODE collision detection plug-in" ;
-
-Plugin opcode
-	: [ Wildcard *.cpp *.h ]
-;
-LinkWith opcode : csgeom csutil ;

@@ -1,3 +1,0 @@
-SubDir TOP data shader ;
-
-InstallData [ Wildcard *.avp *.fvp *.xml ] : shader ;

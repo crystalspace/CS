@@ -1,8 +1,0 @@
-SubDir TOP plugins video cursor ;
-
-Help cscursor : "Custom cursor plugin" ;
-
-Plugin cscursor
-	: [ Wildcard *.cpp *.h ]
-;
-LinkWith cscursor : cstool csutil ;

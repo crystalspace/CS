@@ -1,7 +1,0 @@
-SubDir TOP plugins mesh partgen ;
-
-Library partgen
-	: [ Wildcard *.cpp *.h ]
-	: noinstall
-;
-

@@ -1,7 +1,0 @@
-@c -*-texinfo-*-
-@node HOWTO Using Procedural Textures, , HOWTO Recording Movies, HOWTO
-@subsection Using Procedural Textures
-@cindex Using procedural textures
-
-For example code, @ref{ProcTextures}.
-

@@ -1,4 +1,0 @@
-SubDir TOP plugins mesh cloth ;
-
-SubInclude TOP plugins mesh cloth object ;
-SubInclude TOP plugins mesh cloth persist ;

@@ -1,3 +1,0 @@
-SubDir TOP scripts python ;
-
-InstallData [ Wildcard *.py ] : python ;

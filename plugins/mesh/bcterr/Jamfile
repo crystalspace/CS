@@ -1,4 +1,0 @@
-SubDir TOP plugins mesh bcterr ;
-
-SubInclude TOP plugins mesh bcterr object ;
-SubInclude TOP plugins mesh bcterr persist ;

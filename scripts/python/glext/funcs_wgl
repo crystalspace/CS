@@ -1,5 +1,0 @@
-  // %Name%
-#ifdef _WIN32
-%Functions%
-#endif // _WIN32
-

@@ -1,9 +1,0 @@
-SubDir TOP plugins picogui server ;
-
-if $(PGSERVER.AVAILABLE) = "yes"
-{
-  Help pgserver : "Crystal Space PicoGUI Server Plugin" ;
-  Plugin pgserver : [ Wildcard *.cpp *.h ] ;
-  LinkWith pgserver : csutil csgeom cstool csgfx ;
-  ExternalLibs pgserver : PGSERVER ;
-}

@@ -1,6 +1,0 @@
-// %Name%
-#ifdef _WIN32
-%Tokens%
-%FunctionTypes%
-#endif
-
