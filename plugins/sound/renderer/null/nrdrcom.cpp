@@ -52,14 +52,14 @@ void SoundRenderNullUnregister ()
 
 // This is the name of the DLL. Make sure to change this if you change the DLL name!
 // DAN: this might have to be changed for each OS, cuz each OS has a different extension for DLLs.
-#ifdef OS_WIN32
+#if defined (OS_WIN32)
 #define DLL_NAME "SoundRenderNull.dll"
 #elif defined (OS_OS2)
 #define DLL_NAME "sndrdrn.dll"
 #elif defined (OS_MACOS)
 #define DLL_NAME "sndrdrn.shlb"
 #elif defined (OS_NEXT)
-#define DLL_NAME "sndrdrn.dl"
+#define DLL_NAME "sndrdrn.dylib"
 #else
 #define DLL_NAME "sndrdrn.so"
 #endif

@@ -52,12 +52,12 @@ void NetSocksUnregister ()
 #else
 
 // This is the name of the DLL
-#ifdef OS_WIN32
+#if defined (OS_WIN32)
 #define DLL_NAME "NetworkDriverSockets.dll"
 #elif defined (OS_OS2)
 #define DLL_NAME "netdrvs.dll"
 #elif defined (OS_NEXT)
-#define DLL_NAME "netdrvs.dl"
+#define DLL_NAME "netdrvs.dylib"
 #else
 #define DLL_NAME "netdrvs.so"
 #endif

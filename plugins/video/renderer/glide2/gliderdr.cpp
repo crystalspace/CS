@@ -20,15 +20,18 @@
 #include "cscom/com.h"
 #include "cs3d/glide2/g3dglide.h"
 
-#ifdef OS_LINUX
-#define DLL_NAME "Glide2xRender.so"
-#define IS_DEFAULT
-#elif OS_WIN32
+#if defined (OS_WIN32)
 #define DLL_NAME "Glide2xRender.dll"
-#elif OS_BE
-#define DLL_NAME "Glide2xRender.so"
-#elif OS_MACOS
+#elif defined (OS_MACOS)
 #define DLL_NAME "Glide2xRender.shlb"
+#elif defined (OS_NEXT)
+#define DLL_NAME "Glide2xRender.dylib"
+#else
+#define DLL_NAME "Glide2xRender.so"
+#endif
+
+#if defined (OS_LINUX)
+#define IS_DEFAULT
 #endif
 
 extern const CLSID CLSID_Glide2xGraphics3D;

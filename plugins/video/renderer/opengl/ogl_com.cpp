@@ -48,12 +48,14 @@ void OpenGLRenderUnregister ()
 #else
 
 // This is the name of the DLL
-#ifdef OS_WIN32
+#if defined (OS_WIN32)
 #define DLL_NAME "OpenGLRender.dll"
 #elif defined (OS_OS2)
 #define DLL_NAME "glrender.dll"
 #elif defined (OS_MACOS)
 #define DLL_NAME "OpenGLRender.shlb"
+#elif defined (OS_NEXT)
+#define DLL_NAME "glrender.dylib"
 #else
 #define DLL_NAME "glrender.so"
 #endif
