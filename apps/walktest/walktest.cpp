@@ -43,8 +43,6 @@
 #include "csscript/csscript.h"
 #include "csscript/intscri.h"
 
-// Being is no more
-//#include "csengine/being.h"
 #include "csengine/cdobj.h"
 #include "csengine/collider.h"
 
@@ -1595,9 +1593,6 @@ int main (int argc, char* argv[])
   // frame by frame.
   if (Sys->auto_script)
     Command::start_script (Sys->auto_script);
-
-  // Remember the number of static sprites for lighting
-  Sys->static_sprites = Sys->view->GetWorld ()->sprites.Length ();
 
   //TestFrustrum ();
   // The main loop.

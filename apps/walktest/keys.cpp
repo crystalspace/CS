@@ -29,6 +29,8 @@
 #include "csengine/csview.h"
 #include "csengine/wirefrm.h"
 #include "csengine/cssprite.h"
+#include "csengine/skeleton.h"
+#include "csengine/triangle.h"
 #include "csengine/polygon.h"
 #include "csengine/light.h"
 #include "csengine/sector.h"
@@ -38,6 +40,7 @@
 #include "csobject/dataobj.h"
 #include "cssndldr/common/sndbuf.h"
 #include "csparser/sndbufo.h"
+#include "csparser/csloader.h"
 #include "csscript/csscript.h"
 #include "isndsrc.h"
 #include "isndlstn.h"
@@ -107,13 +110,17 @@ void RandomColor (float& r, float& g, float& b)
   }
 }
 
+void light_sprite (csSprite3D* sprite, csSector* where, csVector3 const& pos)
+{
+  csLight *lights [10];
+  int num_lights = Sys->world->GetNearbyLights (where, pos, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 10);
+  sprite->UpdateLighting (lights, num_lights);
+}
+
 void move_sprite (csSprite3D* sprite, csSector* where, csVector3 const& pos)
 {
   sprite->SetMove (pos);
   sprite->MoveToSector (where);
-  csLight *lights [10];
-  int num_lights = Sys->world->GetNearbyLights (where, pos, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 10);
-  sprite->UpdateLighting (lights, num_lights);
 }
 
 void add_sprite (char* name, csSector* where, csVector3 const& pos, float size)
@@ -135,7 +142,7 @@ void add_sprite (char* name, csSector* where, csVector3 const& pos, float size)
   CHK (csDataObject* sprdata = new csDataObject ((void*)1));
   spr->ObjAdd (sprdata);
 
-  move_sprite (spr, where, pos);
+  light_sprite (spr, where, pos);
 }
 
 void add_bot (float size, csSector* where, csVector3 const& pos, float dyn_radius)
@@ -178,13 +185,174 @@ void HandleSprite (csSprite3D* spr)
   }
 }
 
+void add_limbs (csSpriteTemplate* tmpl, csFrame* frame, csSkeletonLimb* parent, int& vertex_idx,
+	int prev_par_idx, int maxdepth, int width, int recursion)
+{
+  int par_vertex_idx = vertex_idx;
+  parent->AddVertex (vertex_idx++);
+  parent->AddVertex (vertex_idx++);
+  parent->AddVertex (vertex_idx++);
+  parent->AddVertex (vertex_idx++);
+  parent->AddVertex (vertex_idx++);
+  parent->AddVertex (vertex_idx++);
+  if (tmpl->GetNumVertices ()+6 >= frame->GetMaxVertices ())
+  {
+    int more = 6;
+    tmpl->SetNumVertices (tmpl->GetNumVertices ()+more);
+    frame->AddVertex (more);
+  }
+  frame->SetVertex (par_vertex_idx+0, -.05, 0, -.05); frame->SetTexel (par_vertex_idx+0, 0, 0);
+  frame->SetVertex (par_vertex_idx+1, .05, 0, -.05); frame->SetTexel (par_vertex_idx+1, .99, 0);
+  frame->SetVertex (par_vertex_idx+2, 0, 0, .05); frame->SetTexel (par_vertex_idx+2, 0, .99);
+  frame->SetVertex (par_vertex_idx+3, -.05, .45, -.05); frame->SetTexel (par_vertex_idx+3, .99, .99);
+  frame->SetVertex (par_vertex_idx+4, .05, .45, -.05); frame->SetTexel (par_vertex_idx+4, 0, 0);
+  frame->SetVertex (par_vertex_idx+5, 0, .45, .05); frame->SetTexel (par_vertex_idx+5, .99, 0);
+  if (recursion > 0)
+  {
+    // Create connection triangles with previous set
+    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+3, prev_par_idx+5, par_vertex_idx+0);
+    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+5, par_vertex_idx+2, par_vertex_idx+0);
+    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+4, par_vertex_idx+1, par_vertex_idx+2);
+    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+5, prev_par_idx+4, par_vertex_idx+2);
+    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+4, par_vertex_idx+0, par_vertex_idx+1);
+    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+4, prev_par_idx+3, par_vertex_idx+0);
+  }
+  // Create base triangles
+  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+0, par_vertex_idx+5, par_vertex_idx+3);
+  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+0, par_vertex_idx+2, par_vertex_idx+5);
+  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+2, par_vertex_idx+4, par_vertex_idx+5);
+  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+2, par_vertex_idx+1, par_vertex_idx+4);
+  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+1, par_vertex_idx+3, par_vertex_idx+4);
+  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+1, par_vertex_idx+0, par_vertex_idx+3);
+
+  if (recursion >= maxdepth) return;
+  csSkeletonConnection* con;
+  int i;
+  for (i = 0 ; i < width ; i++)
+  {
+    CHK (con = new csSkeletonConnection ());
+    parent->AddChild (con);
+    add_limbs (tmpl, frame, con, vertex_idx, par_vertex_idx, maxdepth, width, recursion+1);
+  }
+}
+
+csSkeleton* create_skeltree (csSpriteTemplate* tmpl, csFrame* frame, int& vertex_idx,
+	int maxdepth, int width)
+{
+  CHK (csSkeleton* skel = new csSkeleton ());
+  add_limbs (tmpl, frame, skel, vertex_idx, 0, maxdepth, width, 0);
+  return skel;
+}
+
+void add_skeleton_sprite (csSector* where, csVector3 const& pos, int depth, int width)
+{
+  char skelname[50];
+  sprintf (skelname, "__skeltree__%d,%d\n", depth, width);
+  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (skelname, true);
+  if (!tmpl)
+  {
+    CHK (tmpl = new csSpriteTemplate ());
+    csNameObject::AddName (*tmpl, skelname);
+    Sys->world->sprite_templates.Push (tmpl);
+    tmpl->SetTexture (Sys->world->GetTextures (), "white.gif");
+    int vertex_idx = 0;
+    csFrame* fr = tmpl->AddFrame ();
+    fr->SetName ("f");
+    csSpriteAction* act = tmpl->AddAction ();
+    act->SetName ("a");
+    act->AddFrame (fr, 100);
+    tmpl->SetSkeleton (create_skeltree (tmpl, fr, vertex_idx, depth, width));
+    tmpl->GenerateLOD ();
+  }
+  csSprite3D* spr = tmpl->NewSprite ();
+  csNameObject::AddName (*spr, "__testSkel__");
+  Sys->view->GetWorld ()->sprites.Push (spr);
+  spr->MoveToSector (where);
+  spr->SetMove (pos - csVector3 (0, Sys->cfg_body_height, 0));
+  csMatrix3 m; m.Identity ();
+  spr->SetTransform (m);
+  light_sprite (spr, where, pos);
+}
+
+class SkelSpriteInfo : public csObject
+{
+public:
+  float z_angle_base;
+  float z_angle;
+  float x_angle_base;
+  float x_angle;
+  float y_angle;
+  float dx;
+  float dz;
+  float dy;
+  CSOBJTYPE;
+};
+
+CSOBJTYPE_IMPL (SkelSpriteInfo, csObject);
+
+void animate_skeleton (csSkeletonLimbState* limb)
+{
+  csSkeletonConnectionState* con = (csSkeletonConnectionState*)limb->GetChildren ();
+  while (con)
+  {
+    SkelSpriteInfo* o = (SkelSpriteInfo*)con->GetObj (SkelSpriteInfo::Type ());
+    if (!o)
+    {
+      CHK (o = new SkelSpriteInfo ());
+      if ((rand () >> 3) & 0x1)
+      {
+        o->x_angle_base = (((float)((rand () >> 3)&0xff)) / 255.) * .4 -.2;
+        o->x_angle = 0;
+        o->dx = (rand () & 0x4) ? .005 : -.005;
+        o->z_angle_base = (((float)((rand () >> 3)&0xff)) / 255.) * 1.2 -.6;
+        o->z_angle = 0;
+        o->dz = (rand () & 0x4) ? .02 : -.02;
+      }
+      else
+      {
+        o->z_angle_base = (((float)((rand () >> 3)&0xff)) / 255.) * .4 -.2;
+        o->z_angle = 0;
+        o->dz = (rand () & 0x4) ? .005 : -.005;
+        o->x_angle_base = (((float)((rand () >> 3)&0xff)) / 255.) * 1.2 -.6;
+        o->x_angle = 0;
+        o->dx = (rand () & 0x4) ? .02 : -.02;
+      }
+      o->y_angle = 0;
+      o->dy = (rand () & 0x4) ? .04 : -.04;
+      con->ObjAdd (o);
+    }
+    o->x_angle += o->dx;
+    if (o->x_angle > .1 || o->x_angle < -.1) o->dx = -o->dx;
+    o->z_angle += o->dz;
+    if (o->z_angle > .1 || o->z_angle < -.1) o->dz = -o->dz;
+    o->y_angle += o->dy;
+    if (o->y_angle > .3 || o->y_angle < -.3) o->dy = -o->dy;
+
+    // @@@ Don't use the code below in a real-time environment.
+    // This is only demo code and HIGHLY inefficient.
+    csMatrix3 tr = csMatrix3::GetYRotation (o->y_angle) *
+    	csMatrix3::GetZRotation (o->z_angle + o->z_angle_base) *
+	csMatrix3::GetXRotation (o->x_angle + o->x_angle_base);
+    csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
+    con->SetTransformation (trans);
+    animate_skeleton (con);
+    con = (csSkeletonConnectionState*)(con->GetNext ());
+  }
+}
+
 void light_statics ()
 {
   csWorld *w = Sys->view->GetWorld ();
-  for (int i = 0; i < Sys->static_sprites; i++)
+  for (int i = 0 ; i < w->sprites.Length () ; i++)
   {
     csSprite3D *spr = (csSprite3D *)w->sprites [i];
-    move_sprite (spr, (csSector*)(spr->sectors[0]), spr->GetW2TTranslation ());
+    csSkeletonState* sk_state = spr->GetSkeletonState ();
+    if (sk_state)
+    {
+      const char* name = csNameObject::GetName (*spr);
+      if (!strcmp (name, "__testSkel__")) animate_skeleton (sk_state);
+    }
+    light_sprite (spr, (csSector*)(spr->sectors[0]), spr->GetW2TTranslation ());
   }
 }
 
@@ -481,8 +649,9 @@ static bool CommandHandler (char *cmd, char *arg)
     Sys->Printf (MSG_CONSOLE, " bind, fclear, addlight, dellight, dellights\n");
     Sys->Printf (MSG_CONSOLE, " picklight, droplight, colldet, stats, hi, frustrum\n");
     Sys->Printf (MSG_CONSOLE, " fps, perftest, capture, coordshow, zbuf, freelook\n");
-    Sys->Printf (MSG_CONSOLE, " map, fire, debug0, debug1, debug2, edges, p_alpha\n");
-    Sys->Printf (MSG_CONSOLE, " addbot, delbot, addsprite, snd_play, snd_volume, s_fog, do_gravity\n");
+    Sys->Printf (MSG_CONSOLE, " map, fire, debug0, debug1, debug2, edges, p_alpha, s_fog\n");
+    Sys->Printf (MSG_CONSOLE, " snd_play, snd_volume, do_gravity\n");
+    Sys->Printf (MSG_CONSOLE, " addbot, delbot, addsprite, addskel\n");
     Sys->Printf (MSG_CONSOLE, " step_forward, step_backward, strafe_left, strafe_right\n");
     Sys->Printf (MSG_CONSOLE, " look_up, look_down, rotate_left, rotate_right, jump, move3d\n");
     Sys->Printf (MSG_CONSOLE, " i_forward, i_backward, i_left, i_right, i_up, i_down\n");
@@ -805,6 +974,14 @@ static bool CommandHandler (char *cmd, char *arg)
     if (arg) ScanStr (arg, "%s,%f", name, &size);
     else { *name = 0; size = 1; }
     add_sprite (name, Sys->view->GetCamera ()->GetSector (), Sys->view->GetCamera ()->GetOrigin (), size);
+  }
+  else if (!strcasecmp (cmd, "addskel"))
+  {
+    int depth, width;
+    if (arg) ScanStr (arg, "%d,%d", &depth, &width);
+    else { depth = 3; width = 3; }
+    add_skeleton_sprite (Sys->view->GetCamera ()->GetSector (), Sys->view->GetCamera ()->GetOrigin (),
+    	depth, width);
   }
   else if (!strcasecmp (cmd, "addbot"))
   {

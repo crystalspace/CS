@@ -169,9 +169,6 @@ public:
   bool on_ground;
   bool inverse_mouse;
 
-  /// number of static sprites (defined in world file)
-  int static_sprites;
-
 public:
   ///
   WalkTest ();
