@@ -37,13 +37,13 @@ struct iClothFactoryState;
 
 class           Constraint {
   public:
-    uint v0;
-    uint            v1;
+    int             v0;
+    int             v1;
     float           L0;
 
                     Constraint() {
     };
-    Constraint(uint i0, uint i1) {
+    Constraint(int i0, int i1) {
 	v0 = i0;
 	v1 = i1;
 	// printf( " CREATING constrain between %u and %u... \n",i0,i1);
@@ -61,7 +61,7 @@ class           Constraint {
 
 class           Cloth {
   public:
-    csVector3 * shift;
+    csVector3      *shift;
     csBox3         *object_bbox;
     csVector3       gravity;
 
@@ -107,7 +107,7 @@ class           Integrator {
     Cloth * cloth_object;
     csVector3      *vertices;
     csBitArray     *ConstrainedVertices;
-    uint            nverts;
+    int            nverts;
 #if defined (DYNAMIC_CONSTRAINT)
     csBasicVector  *fields;
     csBasicVector  *shear_fields;
@@ -158,7 +158,7 @@ class           Integrator {
       shear_rigidity      = 0.8;
       dt      = 0.07;
       time    = 0.0;
-      uint            i;
+      int            i;
       velocities = new csVector3[nverts];
       forces = new csVector3[nverts];
 #if defined(AMPC_PROVOT)
@@ -229,7 +229,7 @@ inline void     ComputeInitial()
 #if defined(AMPC_PROVOT)
       	ComputeFields();
 	ComputeShearFields();
-	uint            i;
+	int            i;
 	cloth_object->object_bbox->StartBoundingBox(*(cloth_object->shift) + vertices[0]);
 	for (i = 0; i < nverts; i++)
          {
@@ -419,7 +419,7 @@ inline void     ApplyShearProvotConstraint()
 
 inline void     Compute() 
     {
-	uint            i;
+	int            i;
 #if defined(EULER_PROVOT)
 	time += dt;
 	ComputeFields();
