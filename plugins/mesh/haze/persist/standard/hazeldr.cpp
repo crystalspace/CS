@@ -325,37 +325,8 @@ static void WriteHull(csString& str, iHazeHull *hull)
   printf ("Unknown hazehull type, cannot writedown!\n");
 }
 
-void csHazeFactorySaver::WriteDown (iBase* obj, iFile *file)
+void csHazeFactorySaver::WriteDown (iBase*, iFile*)
 {
-  csString str;
-  csRef<iHazeFactoryState> hazestate (
-  	SCF_QUERY_INTERFACE (obj, iHazeFactoryState));
-  char buf[MAXLINE];
-
-  if(hazestate->GetMixMode() != CS_FX_COPY)
-  {
-    str.Append (synldr->MixmodeToText (hazestate->GetMixMode(), 0, true));
-  }
-  sprintf(buf, "MATERIAL (%s)\n", hazestate->GetMaterialWrapper()->
-    QueryObject()->GetName());
-  str.Append(buf);
-
-  sprintf(buf, "ORIGIN (%f,%f,%f)\n", hazestate->GetOrigin().x,
-    hazestate->GetOrigin().y, hazestate->GetOrigin().z);
-  str.Append(buf);
-  sprintf(buf, "DIRECTIONAL (%f,%f,%f)\n", hazestate->GetDirectional().x,
-    hazestate->GetDirectional().y, hazestate->GetDirectional().z);
-  str.Append(buf);
-
-  int i;
-  for(i=0; i<hazestate->GetLayerCount(); i++)
-  {
-    sprintf(buf, "LAYER (%f ", hazestate->GetLayerScale(i) );
-    WriteHull(str, hazestate->GetLayerHull(i));
-    str.Append(" )\n");
-  }
-
-  file->Write ((const char*)str, str.Length ());
 }
 
 //---------------------------------------------------------------------------
@@ -490,40 +461,7 @@ bool csHazeSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csHazeSaver::WriteDown (iBase* obj, iFile *file)
+void csHazeSaver::WriteDown (iBase*, iFile*)
 {
-  csString str;
-  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
-  csRef<iHazeState> state (SCF_QUERY_INTERFACE (obj, iHazeState));
-  char buf[MAXLINE];
-  char name[MAXLINE];
-
-  csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
-  sprintf(buf, "FACTORY ('%s')\n", name);
-  str.Append(buf);
-
-  if(state->GetMixMode() != CS_FX_COPY)
-  {
-    str.Append (synldr->MixmodeToText (state->GetMixMode(), 0, true));
-  }
-  sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
-    QueryObject()->GetName());
-  str.Append(buf);
-
-  sprintf(buf, "ORIGIN (%f,%f,%f)\n", state->GetOrigin().x,
-    state->GetOrigin().y, state->GetOrigin().z);
-  str.Append(buf);
-  sprintf(buf, "DIRECTIONAL (%f,%f,%f)\n", state->GetDirectional().x,
-    state->GetDirectional().y, state->GetDirectional().z);
-  str.Append(buf);
-
-  int i;
-  for(i=0; i<state->GetLayerCount(); i++)
-  {
-    sprintf(buf, "LAYER (%f ", state->GetLayerScale(i) );
-    WriteHull(str, state->GetLayerHull(i));
-    str.Append(" )\n");
-  }
-
-  file->Write ((const char*)str, str.Length ());
 }
+

@@ -328,44 +328,7 @@ bool csRainSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csRainSaver::WriteDown (iBase* obj, iFile *file)
+void csRainSaver::WriteDown (iBase*, iFile*)
 {
-  csString str;
-  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
-  csRef<iRainState> state (SCF_QUERY_INTERFACE (obj, iRainState));
-  char buf[MAXLINE];
-  char name[MAXLINE];
-
-  csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
-  sprintf(buf, "FACTORY ('%s')\n", name);
-  str.Append(buf);
-
-  if (state->GetMixMode() != CS_FX_COPY)
-  {
-    str.Append (synldr->MixmodeToText (state->GetMixMode(), 0, true));
-  }
-
-  sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
-    QueryObject ()->GetName());
-  str.Append(buf);
-  sprintf(buf, "COLOR (%g, %g, %g)\n", state->GetColor().red,
-    state->GetColor().green, state->GetColor().blue);
-  str.Append(buf);
-  printf(buf, "NUMBER (%d)\n", state->GetParticleCount());
-  str.Append(buf);
-  sprintf(buf, "LIGHTING (%s)\n", state->GetLighting()?"true":"false");
-  str.Append(buf);
-  float sx = 0.0, sy = 0.0;
-  state->GetDropSize(sx, sy);
-  sprintf(buf, "DROPSIZE (%g, %g)\n", sx, sy);
-  str.Append(buf);
-  printf(buf, "FALLSPEED (%g, %g, %g)\n", state->GetFallSpeed().x,
-    state->GetFallSpeed().y, state->GetFallSpeed().z);
-  str.Append(buf);
-  csVector3 minbox, maxbox;
-  state->GetBox(minbox, maxbox);
-  printf(buf, "BOX (%g,%g,%g, %g,%g,%g)\n", minbox.x, minbox.y, minbox.z,
-    maxbox.x, maxbox.y, maxbox.z);
-
-  file->Write ((const char*)str, str.Length ());
 }
+

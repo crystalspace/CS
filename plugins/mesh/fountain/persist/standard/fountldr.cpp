@@ -351,55 +351,8 @@ bool csFountainSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csFountainSaver::WriteDown (iBase* obj, iFile *file)
+void csFountainSaver::WriteDown (iBase*, iFile*)
 {
-  csString str;
-  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
-  csRef<iParticleState> partstate (SCF_QUERY_INTERFACE (obj, iParticleState));
-  csRef<iFountainState> state (SCF_QUERY_INTERFACE (obj, iFountainState));
-  char buf[MAXLINE];
-  char name[MAXLINE];
-
-  csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
-  sprintf(buf, "FACTORY ('%s')\n", name);
-  str.Append(buf);
-
-  if(partstate->GetMixMode() != CS_FX_COPY)
-  {
-    str.Append (synldr->MixmodeToText(partstate->GetMixMode(), 2, true));
-  }
-  sprintf(buf, "MATERIAL (%s)\n", partstate->GetMaterialWrapper()->
-    QueryObject ()->GetName());
-  str.Append(buf);
-  sprintf(buf, "COLOR (%g, %g, %g)\n", partstate->GetColor().red,
-    partstate->GetColor().green, partstate->GetColor().blue);
-  str.Append(buf);
-  printf(buf, "NUMBER (%d)\n", state->GetParticleCount());
-  str.Append(buf);
-  sprintf(buf, "LIGHTING (%s)\n", state->GetLighting()?"true":"false");
-  str.Append(buf);
-  sprintf(buf, "ORIGIN (%g, %g, %g)\n", state->GetOrigin().x,
-    state->GetOrigin().y, state->GetOrigin().z);
-  str.Append(buf);
-  float sx = 0.0, sy = 0.0;
-  state->GetDropSize(sx, sy);
-  sprintf(buf, "DROPSIZE (%g, %g)\n", sx, sy);
-  str.Append(buf);
-  sprintf(buf, "ACCEL (%g, %g, %g)\n", state->GetAcceleration().x,
-    state->GetAcceleration().y, state->GetAcceleration().z);
-  str.Append(buf);
-  sprintf(buf, "SPEED (%g)\n", state->GetSpeed());
-  str.Append(buf);
-  sprintf(buf, "OPENING (%g)\n", state->GetOpening());
-  str.Append(buf);
-  sprintf(buf, "AZIMUTH (%g)\n", state->GetAzimuth());
-  str.Append(buf);
-  sprintf(buf, "ELEVATION (%g)\n", state->GetElevation());
-  str.Append(buf);
-  sprintf(buf, "FALLTIME (%g)\n", state->GetFallTime());
-  str.Append(buf);
-
-  file->Write ((const char*)str, str.Length ());
 }
 
 //---------------------------------------------------------------------------

@@ -520,7 +520,7 @@ void csSprite3DFactorySaver::SaveSkeleton (iSkeletonLimb* limb,
   str.Append(")\n");
 
   str.Append("TRANSFORM (");
-  str.Append (synldr->MatrixToText (con->GetTransformation().GetO2T(), 1, true));
+  //str.Append (synldr->MatrixToText (con->GetTransformation().GetO2T(), 1, true));
   sprintf(buf, " V(%g,%g,%g))", con->GetTransformation().GetO2TTranslation().x,
     con->GetTransformation().GetO2TTranslation().y,
     con->GetTransformation().GetO2TTranslation().z);
@@ -537,89 +537,8 @@ void csSprite3DFactorySaver::SaveSkeleton (iSkeletonLimb* limb,
   }
 }
 
-void csSprite3DFactorySaver::WriteDown (iBase* obj, iFile * file)
+void csSprite3DFactorySaver::WriteDown (iBase*, iFile*)
 {
-  csString str;
-  csRef<iSprite3DFactoryState> state (
-    SCF_QUERY_INTERFACE (obj, iSprite3DFactoryState));
-  char buf[MAXLINE];
-
-  sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
-    QueryObject ()->GetName());
-  str.Append(buf);
-
-  int i,j;
-  for(i=0; i<state->GetFrameCount(); i++)
-  {
-    iSpriteFrame* frame = state->GetFrame(i);
-    sprintf(buf, "FRAME '%s' (\n", frame->GetName());
-    str.Append(buf);
-    int anm_idx = frame->GetAnmIndex ();
-    int tex_idx = frame->GetTexIndex ();
-    for(j=0; j<state->GetVertexCount(); j++)
-    {
-      sprintf(buf, "  V(%g,%g,%g:%g,%g)\n", state->GetVertex(anm_idx, j).x,
-        state->GetVertex(anm_idx, j).y, state->GetVertex(anm_idx, j).z,
-	state->GetTexel(tex_idx, j).x, state->GetTexel(tex_idx, j).y);
-      str.Append(buf);
-    }
-    str.Append(")\n");
-  }
-
-  for(i=0; i<state->GetActionCount(); i++)
-  {
-    iSpriteAction* action = state->GetAction(i);
-    sprintf(buf, "ACTION '%s' (", action->GetName());
-    str.Append(buf);
-    for(j=0; j<action->GetFrameCount(); j++)
-    {
-      sprintf(buf, " F(%s,%d)", action->GetFrame(j)->GetName(),
-        action->GetFrameDelay(j));
-      str.Append(buf);
-    }
-    str.Append(")\n");
-  }
-
-  for(i=0; i<state->GetTriangleCount(); i++)
-  {
-    sprintf(buf, "TRIANGLE (%d,%d,%d)\n", state->GetTriangle(i).a,
-      state->GetTriangle(i).b, state->GetTriangle(i).c);
-    str.Append(buf);
-  }
-
-  for(i=0; i<state->GetSocketCount(); i++)
-  {
-    sprintf(buf, "SOCKET '%s' (%d)\n", 
-      state->GetSocket(i)->GetName(),
-      state->GetSocket(i)->GetTriangleIndex());
-    str.Append(buf);
-  }
-
-  iSkeleton *skeleton = state->GetSkeleton();
-  if(skeleton)
-  {
-    csRef<iSkeletonLimb> skellimb (
-    	SCF_QUERY_INTERFACE (skeleton, iSkeletonLimb));
-    iSkeletonLimb* skelp = skellimb;
-    while(skelp)
-    {
-      sprintf(buf, "SKELETON '%s' (\n", skelp->GetName());
-      str.Append(buf);
-      SaveSkeleton(skelp, str);
-      str.Append(")\n");
-      skelp = skelp->GetNextSibling();
-    }
-  }
-
-  /// @@@ Cannot retrieve smoothing information.
-  /// SMOOTH()
-  /// SMOOTH(baseframenr)
-  /// or a list of SMOOTH(basenr, framenr);
-
-  sprintf(buf, "TWEEN (%s)\n", state->IsTweeningEnabled()?"true":"false");
-  str.Append(buf);
-
-  file->Write ((const char*)str, str.Length ());
 }
 
 //---------------------------------------------------------------------------
@@ -866,41 +785,7 @@ bool csSprite3DSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csSprite3DSaver::WriteDown (iBase* obj, iFile *file)
+void csSprite3DSaver::WriteDown (iBase*, iFile*)
 {
-  csString str;
-  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
-  csRef<iSprite3DState> state (SCF_QUERY_INTERFACE (obj, iSprite3DState));
-
-  csRef<iMeshObject> meshobj (SCF_QUERY_INTERFACE (obj, iMeshObject));
-  csRef<iSprite3DFactoryState> factstate (SCF_QUERY_INTERFACE (
-    meshobj->GetFactory(), iSprite3DFactoryState));
-  char buf[MAXLINE];
-  char name[MAXLINE];
-
-  csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
-  sprintf(buf, "FACTORY ('%s')\n", name);
-  str.Append(buf);
-
-  if(state->GetMixMode() != CS_FX_COPY)
-  {
-    str.Append (synldr->MixmodeToText (state->GetMixMode(), 0, true));
-  }
-  if(state->GetMaterialWrapper() != factstate->GetMaterialWrapper())
-  {
-    sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
-      QueryObject ()->GetName());
-    str.Append(buf);
-  }
-  sprintf(buf, "LIGHTING (%s)\n", state->IsLighting ()?"true":"false");
-  str.Append(buf);
-  sprintf(buf, "TWEEN (%s)\n", state->IsTweeningEnabled()?"true":"false");
-  str.Append(buf);
-  if(state->GetCurAction())
-  {
-    sprintf(buf, "ACTION (%s)\n", state->GetCurAction()->GetName());
-    str.Append(buf);
-  }
-  file->Write ((const char*)str, str.Length ());
 }
 

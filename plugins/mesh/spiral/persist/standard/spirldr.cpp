@@ -290,36 +290,7 @@ bool csSpiralSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csSpiralSaver::WriteDown (iBase* obj, iFile *file)
+void csSpiralSaver::WriteDown (iBase*, iFile*)
 {
-  csString str;
-  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
-  csRef<iParticleState> partstate (SCF_QUERY_INTERFACE (obj, iParticleState));
-  csRef<iSpiralState> state (SCF_QUERY_INTERFACE (obj, iSpiralState));
-  char buf[MAXLINE];
-  char name[MAXLINE];
-
-  csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
-  sprintf(buf, "FACTORY ('%s')\n", name);
-  str.Append(buf);
-
-  if(partstate->GetMixMode() != CS_FX_COPY)
-  {
-    str.Append (synldr->MixmodeToText (partstate->GetMixMode(), 0, true));
-  }
-
-  sprintf(buf, "MATERIAL (%s)\n", partstate->GetMaterialWrapper()->
-    QueryObject ()->GetName());
-  str.Append(buf);
-  sprintf(buf, "COLOR (%g, %g, %g)\n", partstate->GetColor().red,
-    partstate->GetColor().green, partstate->GetColor().blue);
-  str.Append(buf);
-  printf(buf, "NUMBER (%d)\n", state->GetParticleCount());
-  str.Append(buf);
-  printf(buf, "SOURCE (%g, %g, %g)\n", state->GetSource().x,
-    state->GetSource().y, state->GetSource().z);
-  str.Append(buf);
-
-  file->Write ((const char*)str, str.Length ());
 }
 

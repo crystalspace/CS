@@ -303,27 +303,10 @@ bool csSprite2DFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-#define MAXLINE 100 /* max number of chars per line... */
-
-void csSprite2DFactorySaver::WriteDown (iBase* obj, iFile * file)
+void csSprite2DFactorySaver::WriteDown (iBase*, iFile*)
 {
-  csString str;
-  csRef<iSprite2DFactoryState> state (
-    SCF_QUERY_INTERFACE (obj, iSprite2DFactoryState));
-  char buf[MAXLINE];
-
-  sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
-    QueryObject ()->GetName());
-  str.Append(buf);
-  if(state->GetMixMode() != CS_FX_COPY)
-  {
-    str.Append (synldr->MixmodeToText (state->GetMixMode(), 0, true));
-  }
-  sprintf(buf, "LIGHTING (%s)\n", state->HasLighting()?"true":"false");
-  str.Append(buf);
-
-  file->Write ((const char*)str, str.Length ());
 }
+
 //---------------------------------------------------------------------------
 
 csSprite2DLoader::csSprite2DLoader (iBase* pParent)
@@ -505,56 +488,7 @@ bool csSprite2DSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csSprite2DSaver::WriteDown (iBase* obj, iFile *file)
+void csSprite2DSaver::WriteDown (iBase*, iFile*)
 {
-  csString str;
-  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
-  csRef<iSprite2DState> state (SCF_QUERY_INTERFACE (obj, iSprite2DState));
-  char buf[MAXLINE];
-  char name[MAXLINE];
-
-  csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
-  sprintf(buf, "FACTORY ('%s')\n", name);
-  str.Append(buf);
-
-  sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
-    QueryObject ()->GetName());
-  str.Append(buf);
-  sprintf(buf, "LIGHTING (%s)\n", state->HasLighting()?"true":"false");
-  str.Append(buf);
-  if(state->GetMixMode() != CS_FX_COPY)
-  {
-    str.Append (synldr->MixmodeToText (state->GetMixMode(), 0, true));
-  }
-
-  csColoredVertices& vs = state->GetVertices();
-  int i;
-  str.Append("VERTICES(");
-  for(i=0; vs.Length(); i++)
-  {
-    sprintf(buf, "%g,%g%s", vs[i].pos.x, vs[i].pos.y,
-      (i==vs.Length()-1)?"":", ");
-    str.Append(buf);
-  }
-  str.Append(")\n");
-
-  str.Append("UV(");
-  for(i=0; vs.Length(); i++)
-  {
-    sprintf(buf, "%g,%g%s", vs[i].u, vs[i].v, (i==vs.Length()-1)?"":", ");
-    str.Append(buf);
-  }
-  str.Append(")\n");
-
-  str.Append("COLORS(");
-  for(i=0; vs.Length(); i++)
-  {
-    sprintf(buf, "%g,%g,%g%s", vs[i].color_init.red, vs[i].color_init.green,
-      vs[i].color_init.blue, (i==vs.Length()-1)?"":", ");
-    str.Append(buf);
-  }
-  str.Append(")\n");
-
-  file->Write ((const char*)str, str.Length ());
 }
 

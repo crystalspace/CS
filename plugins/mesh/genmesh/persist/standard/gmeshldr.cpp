@@ -630,6 +630,5 @@ bool csGeneralMeshSaver::Initialize (iObjectRegistry* object_reg)
 
 void csGeneralMeshSaver::WriteDown (iBase*, iFile*)
 {
-  // @@@ Not implemented!
 }
 

@@ -52,7 +52,7 @@ struct iDocumentNode;
 #define CSTEX_UV_SHIFT 8 
 /** @} */
 
-SCF_VERSION (iSyntaxService, 1, 1, 4);
+SCF_VERSION (iSyntaxService, 1, 2, 0);
 
 /**
  * This component provides services for other loaders to easily parse
@@ -60,54 +60,6 @@ SCF_VERSION (iSyntaxService, 1, 1, 4);
  */
 struct iSyntaxService : public iBase
 {
-  /**
-   * Transform the matrix into its textual representation.
-   * <ul>
-   * <li>indent: is the number of leading spaces every line is prefixed with.
-   * <li>newline: signals whether to append a newline to the result.
-   * </ul>
-   */
-  virtual const char* MatrixToText (const csMatrix3 &m, int indent,
-  	bool newline=true) = 0;
-
-  /**
-   * Transform the vector into its textual representation.
-   * <ul>
-   * <li>indent: is the number of leading spaces every line is prefixed with.
-   * <li>vname: is the vector specifier like VECTOR, V, W, etc.
-   * <li>newline: signals whether to append a newline to the result.
-   * </ul>
-   */
-  virtual const char* VectorToText (const char *vname, const csVector3 &v,
-  	int indent, bool newline=true) = 0;
-  virtual const char* VectorToText (const char *vname,
-  	float x, float y, float z, int indent, bool newline=true) = 0;
-  virtual const char* VectorToText (const char *vname, const csVector2 &v,
-  	int indent, bool newline=true) = 0;
-  virtual const char* VectorToText (const char *vname, float x, float y,
-  	int indent, bool newline=true) = 0;
-
-  /**
-   * Transform the boolean into its textual representation.
-   * <ul>
-   * <li>indent: is the number of leading spaces every line is prefixed with.
-   * <li>vname: is the vector specifier like LIGHTING, MIPMAP, etc.
-   * <li>newline: signals whether to append a newline to the result.
-   * </ul>
-   */
-  virtual const char* BoolToText (const char *vname, bool b, int indent,
-    bool newline=true) = 0;
-
-  /**
-   * Transform the mixmode into its textual representation.
-   * <ul>
-   * <li>indent: is the number of leading spaces every line is prefixed with.
-   * <li>newline: signals whether to append a newline to the result.
-   * </ul>
-   */
-  virtual const char* MixmodeToText (uint mixmode, int indent,
-  	bool newline=true) = 0;
-
   /**
    * Parse the value of this node and return a boolean depending
    * on this value. The following mapping happens (case insensitive):

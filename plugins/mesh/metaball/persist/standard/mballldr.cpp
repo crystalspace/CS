@@ -388,57 +388,7 @@ bool csMetaBallSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csMetaBallSaver::WriteDown (iBase* obj, iFile *file)
+void csMetaBallSaver::WriteDown (iBase*, iFile*)
 {
-  csString str;
-  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
-  csRef<iMeshObject> mesh (SCF_QUERY_INTERFACE(obj, iMeshObject));
-  if(!mesh)
-  {
-    printf("Error: non-mesh given to %s.\n",
-      fact->QueryDescription () );
-    return;
-  }
-  csRef<iMetaBallState> state (SCF_QUERY_INTERFACE(obj, iMetaBallState));
-  if(!state)
-  {
-    printf("Error: invalid mesh given to %s.\n",
-      fact->QueryDescription () );
-    return;
-  }
-
-  char buf[MAXLINE];
-  char name[MAXLINE];
-  csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
-  sprintf(buf, "FACTORY ('%s')\n", name);
-  str.Append(buf);
-  if(state->GetMixMode() != CS_FX_COPY)
-  {
-    str.Append (synldr->MixmodeToText (state->GetMixMode(), 0, true));
-  }
-
-  // Mesh information
-  MetaParameters *mp = state->GetParameters();
-  sprintf(buf, "NUMBER (%d)\n", state->GetMetaBallCount());
-  str.Append(buf);
-  sprintf(buf, "ISO_LEVEL (%f)\n",mp->iso_level );
-  str.Append(buf);
-  sprintf(buf, "CHARGE (%f)\n", mp->charge);
-  str.Append(buf);
-  sprintf(buf, "MATERIAL (%s)\n", state->GetMaterial()->
-    QueryObject ()->GetName());
-  str.Append(buf);
-  sprintf(buf, "LIGHTING(%s)\n",(state->IsLighting())? "true" : "false");
-  str.Append (buf);
-  sprintf(buf, "NUMBER (%d)\n", state->GetMetaBallCount());
-  str.Append(buf);
-  sprintf(buf, "RATE (%f)\n",mp->rate);
-  str.Append(buf);
-  sprintf(buf, "TRUE_MAP (%s)\n",(state->GetQualityEnvironmentMapping())?"true":"false");
-  str.Append(buf);
-  sprintf(buf, "TEX_SCALE (%f)\n",state->GetEnvironmentMappingFactor());
-  str.Append(buf);
-
-  file->Write ((const char*)str, str.Length ());
 }
 

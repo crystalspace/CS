@@ -347,58 +347,7 @@ bool csFireSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csFireSaver::WriteDown (iBase* obj, iFile *file)
+void csFireSaver::WriteDown (iBase*, iFile*)
 {
-  csString str;
-  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
-  csRef<iParticleState> partstate (SCF_QUERY_INTERFACE (obj, iParticleState));
-  csRef<iFireState> state (SCF_QUERY_INTERFACE (obj, iFireState));
-  char buf[MAXLINE];
-  char name[MAXLINE];
-
-  csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
-  sprintf(buf, "FACTORY ('%s')\n", name);
-  str.Append(buf);
-
-  if(partstate->GetMixMode() != CS_FX_COPY)
-  {									
-    str.Append (synldr->MixmodeToText (partstate->GetMixMode(), 2, true));
-  }
-  sprintf(buf, "MATERIAL (%s)\n", partstate->GetMaterialWrapper()->
-    QueryObject ()->GetName());
-  str.Append(buf);
-  sprintf(buf, "COLOR (%g, %g, %g)\n", partstate->GetColor().red,
-    partstate->GetColor().green, partstate->GetColor().blue);
-  str.Append(buf);
-
-  printf(buf, "NUMBER (%d)\n", state->GetParticleCount());
-  str.Append(buf);
-  sprintf(buf, "LIGHTING (%s)\n", state->GetLighting()?"true":"false");
-  str.Append(buf);
-  sprintf(buf, "ORIGINBOX (%g,%g,%g, %g,%g,%g)\n",
-    state->GetOrigin ().MinX (),
-    state->GetOrigin ().MinY (),
-    state->GetOrigin ().MinZ (),
-    state->GetOrigin ().MaxX (),
-    state->GetOrigin ().MaxY (),
-    state->GetOrigin ().MaxZ ());
-  str.Append(buf);
-  sprintf(buf, "DIRECTION (%g,%g,%g)\n",
-    state->GetDirection ().x,
-    state->GetDirection ().y,
-    state->GetDirection ().z);
-  str.Append(buf);
-  sprintf(buf, "SWIRL (%g)\n", state->GetSwirl());
-  str.Append(buf);
-  sprintf(buf, "TOTALTIME (%g)\n", state->GetTotalTime());
-  str.Append(buf);
-  sprintf(buf, "COLORSCALE (%g)\n", state->GetColorScale());
-  str.Append(buf);
-  float sx = 0.0, sy = 0.0;
-  state->GetDropSize(sx, sy);
-  sprintf(buf, "DROPSIZE (%g, %g)\n", sx, sy);
-  str.Append(buf);
-
-  file->Write ((const char*)str, str.Length ());
 }
 

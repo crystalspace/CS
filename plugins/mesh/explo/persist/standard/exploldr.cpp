@@ -343,59 +343,8 @@ bool csExplosionSaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE	    80
 
-void csExplosionSaver::WriteDown (iBase* obj, iFile *file)
+void csExplosionSaver::WriteDown (iBase*, iFile*)
 {
-  csString str;
-  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
-  csRef<iParticleState> partstate (SCF_QUERY_INTERFACE (obj, iParticleState));
-  csRef<iExplosionState> explostate (
-  	SCF_QUERY_INTERFACE (obj, iExplosionState));
-  char buf[MAXLINE];
-  char name[MAXLINE];
-
-  csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
-  sprintf(buf, "FACTORY ('%s')\n", name);
-  str.Append(buf);
-
-  if(partstate->GetMixMode() != CS_FX_COPY)
-  {
-    str.Append (synldr->MixmodeToText (partstate->GetMixMode(), 2, true));
-  }
-  sprintf(buf, "MATERIAL (%s)\n", partstate->GetMaterialWrapper()->
-    QueryObject ()->GetName());
-  str.Append(buf);
-  sprintf(buf, "COLOR (%g, %g, %g)\n", partstate->GetColor().red,
-    partstate->GetColor().green, partstate->GetColor().blue);
-  str.Append(buf);
-
-  sprintf(buf, "CENTER (%g, %g, %g)\n", explostate->GetCenter().x,
-    explostate->GetCenter().y, explostate->GetCenter().z);
-  str.Append(buf);
-  sprintf(buf, "PUSH (%g, %g, %g)\n", explostate->GetPush().x,
-    explostate->GetPush().y, explostate->GetPush().z);
-  str.Append(buf);
-  sprintf(buf, "SPREADPOS (%g)\n", explostate->GetSpreadPos());
-  str.Append(buf);
-  sprintf(buf, "SPREADSPEED (%g)\n", explostate->GetSpreadSpeed());
-  str.Append(buf);
-  sprintf(buf, "SPREADACCEL (%g)\n", explostate->GetSpreadAcceleration());
-  str.Append(buf);
-  sprintf(buf, "NUMBER (%d)\n", explostate->GetParticleCount());
-  str.Append(buf);
-  sprintf(buf, "NRSIDES (%d)\n", explostate->GetNrSides());
-  str.Append(buf);
-  sprintf(buf, "PARTRADIUS (%g)\n", explostate->GetPartRadius());
-  str.Append(buf);
-  sprintf(buf, "LIGHTING (%s)\n", explostate->GetLighting()?"true":"false");
-  str.Append(buf);
-  csTicks fade_time = 0;
-  if(explostate->GetFadeSprites(fade_time))
-  {
-    sprintf(buf, "FADE (%d)\n", (int)fade_time);
-    str.Append(buf);
-  }
-
-  file->Write ((const char*)str, str.Length ());
 }
 
 //---------------------------------------------------------------------------

@@ -44,9 +44,6 @@ struct iMeshObjectType;
 class csTextSyntaxService : public iSyntaxService
 {
 protected:
-  float list[30];
-  int num;
-  csString text;
   iObjectRegistry* object_reg;
   csRef<iMeshObjectType> thing_type;
   csRef<iReporter> reporter;
@@ -63,27 +60,6 @@ public:
   virtual ~csTextSyntaxService ();
 
   bool Initialize (iObjectRegistry* object_reg);
-
-  virtual const char* MatrixToText (
-  	const csMatrix3 &m, int indent, bool newline=true);
-  virtual const char* VectorToText (
-  	const char *vname, const csVector3 &v, int indent,
-				    bool newline=true);
-  virtual const char* VectorToText (
-  	const char *vname, float x, float y, float z, int indent,
-	bool newline=true);
-  virtual const char* VectorToText (
-  	const char *vname, const csVector2 &v, int indent,
-	bool newline=true);
-  virtual const char* VectorToText (
-  	const char *vname, float x, float y, int indent,
-	bool newline=true);
-
-  virtual const char* BoolToText (
-  	const char *vname, bool b, int indent, bool newline=true);
-
-  virtual const char* MixmodeToText (
-  	uint mixmode, int indent, bool newline = true);
 
   virtual bool ParseBool (iDocumentNode* node, bool& result, bool def_result);
   virtual bool ParseMatrix (iDocumentNode* node, csMatrix3 &m);

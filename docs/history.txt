@@ -18,6 +18,12 @@ The history order is reversed so that new features are at the top.
 	  possible slow-down if not accelerated.
 	- VfsArchiveCache (in VFS plugin) uses csPDelArray<T> instead
 	  of csVector.
+	- Removed all the ToText() routines in iSyntaxService. They are not
+	  useful anymore with the new XML format and they prevent the
+	  syntax services plugin from being totally thread-safe.
+	- Removed all broken implementations of the WriteDown() functions
+	  in the mesh savers. These need to be reimplemented using
+	  XML.
 17-Apr-2003
 	- Fixed a bug in the common polygon buffer implementation where it
 	  was incrementing the ref count on poly_texture without testing if
