@@ -74,7 +74,7 @@ SCF_VERSION (iMaterial, 0, 0, 6);
  * plays same role related to iMaterialHandle as iImage plays
  * related to iTextureHandle.
  */
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_NEW_RENDERER
 struct iMaterial : public iBase
 #else
 struct iMaterial : public iShaderBranch

@@ -23,6 +23,7 @@ The history order is reversed so that new features are at the top.
 	- Oktal fixed the compile errors in the new renderer shader variable
 	  system, and recommitted it. The API is in place but not fully
 	  implemented.
+	- Oktal fixed bug in material.h: #ifdef instead of #ifndef.
 16-Jul-2003
 	- Anders Stenberg made the following new renderer additions and fixes:
 	  - Made AWS work. (Added some stub functions to comply with interface 
