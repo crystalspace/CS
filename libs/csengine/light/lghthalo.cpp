@@ -37,13 +37,13 @@
 
 //--------------------------------------------------------------+ csHalo +---//
 
-IMPLEMENT_IBASE (csHalo)
-  IMPLEMENTS_INTERFACE (iBaseHalo)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csHalo)
+  SCF_IMPLEMENTS_INTERFACE (iBaseHalo)
+SCF_IMPLEMENT_IBASE_END
 
 csHalo::csHalo (csHaloType iType)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   Intensity = 0;
   Type = iType;
 }
@@ -54,18 +54,18 @@ csHalo::~csHalo ()
 
 //---------------------------------------------------------+ csCrossHalo +---//
 
-IMPLEMENT_IBASE_EXT (csCrossHalo)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iCrossHalo)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csCrossHalo)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iCrossHalo)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csCrossHalo::CrossHalo)
-  IMPLEMENTS_INTERFACE (iCrossHalo)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csCrossHalo::CrossHalo)
+  SCF_IMPLEMENTS_INTERFACE (iCrossHalo)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csCrossHalo::csCrossHalo (float intensity_factor, float cross_factor)
   : csHalo (cshtCross)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiCrossHalo);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCrossHalo);
   IntensityFactor = intensity_factor;
   CrossFactor = cross_factor;
 }
@@ -77,18 +77,18 @@ uint8 *csCrossHalo::Generate (int Size)
 
 //----------------------------------------------------------+ csNovaHalo +---//
 
-IMPLEMENT_IBASE_EXT (csNovaHalo)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iNovaHalo)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csNovaHalo)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iNovaHalo)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csNovaHalo::NovaHalo)
-  IMPLEMENTS_INTERFACE (iNovaHalo)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csNovaHalo::NovaHalo)
+  SCF_IMPLEMENTS_INTERFACE (iNovaHalo)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csNovaHalo::csNovaHalo (int seed, int num_spokes, float roundness)
   : csHalo (cshtNova)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiNovaHalo);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiNovaHalo);
   Seed = seed;
   NumSpokes = num_spokes;
   Roundness = roundness;
@@ -101,18 +101,18 @@ uint8 *csNovaHalo::Generate (int Size)
 
 //---------------------------------------------------------+ csFlareHalo +---//
 
-IMPLEMENT_IBASE_EXT (csFlareHalo)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iFlareHalo)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csFlareHalo)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iFlareHalo)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csFlareHalo::FlareHalo)
-  IMPLEMENTS_INTERFACE (iFlareHalo)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csFlareHalo::FlareHalo)
+  SCF_IMPLEMENTS_INTERFACE (iFlareHalo)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csFlareHalo::csFlareHalo ()
   : csHalo (cshtFlare)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiFlareHalo);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiFlareHalo);
   components = NULL;
   last = NULL;
 }

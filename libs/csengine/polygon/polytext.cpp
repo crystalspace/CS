@@ -252,13 +252,13 @@ float csPolyTexture::cfg_cosinus_factor = 0;
 #define lightcell_size	csLightMap::lightcell_size
 #define lightcell_shift	csLightMap::lightcell_shift
 
-IMPLEMENT_IBASE (csPolyTexture)
-  IMPLEMENTS_INTERFACE (iPolygonTexture)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csPolyTexture)
+  SCF_IMPLEMENTS_INTERFACE (iPolygonTexture)
+SCF_IMPLEMENT_IBASE_END
 
 csPolyTexture::csPolyTexture ()
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   lm = NULL;
   cache_data [0] = cache_data [1] = cache_data [2] = cache_data [3] = NULL;
   polygon = NULL;
@@ -506,7 +506,7 @@ static void __add_PutPixel (int x, int y, float area, void *arg)
   if (x >= cm->width || y >= cm->height || x < 0 || y < 0)
   {
 #ifdef CS_DEBUG
-    CsPrintf(MSG_INTERNAL_ERROR, "Array bound error in file %s, line %d\n",
+    CsPrintf(CS_MSG_INTERNAL_ERROR, "Array bound error in file %s, line %d\n",
       __FILE__, __LINE__);
 #endif
     return;
@@ -521,7 +521,7 @@ static void __add_DrawBox (int x, int y, int w, int h, void *arg)
       x + w > cm->width || y + h > cm->height || w < 0 || h < 0)
   {
 #ifdef CS_DEBUG
-    CsPrintf(MSG_INTERNAL_ERROR, "Array bound error in file %s, line %d\n",
+    CsPrintf(CS_MSG_INTERNAL_ERROR, "Array bound error in file %s, line %d\n",
       __FILE__, __LINE__);
 #endif
     return;
@@ -542,7 +542,7 @@ static void __sub_PutPixel (int x, int y, float area, void *arg)
   if (x >= cm->width || y >= cm->height || x < 0 || y < 0)
   {
 #ifdef CS_DEBUG
-    CsPrintf(MSG_INTERNAL_ERROR, "Array bound error in file %s, line %d\n",
+    CsPrintf(CS_MSG_INTERNAL_ERROR, "Array bound error in file %s, line %d\n",
       __FILE__, __LINE__);
 #endif
     return;
@@ -557,7 +557,7 @@ static void __sub_DrawBox (int x, int y, int w, int h, void *arg)
       x + w > cm->width || y + h > cm->height || w < 0 || h < 0)
   {
 #ifdef CS_DEBUG
-    CsPrintf(MSG_INTERNAL_ERROR, "Array bound error in file %s, line %d\n",
+    CsPrintf(CS_MSG_INTERNAL_ERROR, "Array bound error in file %s, line %d\n",
       __FILE__, __LINE__);
 #endif
     return;
@@ -1117,7 +1117,7 @@ void csPolyTexture::GetTextureBox (float& fMinU, float& fMinV, float& fMaxU, flo
 
 void csPolyTexture::SetPolygon (csPolygon3D* p)
 {
-  ipolygon = QUERY_INTERFACE (p, iPolygon3D);
+  ipolygon = SCF_QUERY_INTERFACE (p, iPolygon3D);
   ipolygon->DecRef ();
   polygon = p;
 }

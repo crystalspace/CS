@@ -135,13 +135,13 @@
 // Apply dithering while converting to 8-bits?
 bool csImage_dither = false;
 
-IMPLEMENT_IBASE (csImageFile)
-  IMPLEMENTS_INTERFACE (iImage)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csImageFile)
+  SCF_IMPLEMENTS_INTERFACE (iImage)
+SCF_IMPLEMENT_IBASE_END
 
 csImageFile::csImageFile (int iFormat)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   Image = NULL;
   Palette = NULL;
   fName = NULL;

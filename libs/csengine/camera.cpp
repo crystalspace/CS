@@ -24,14 +24,14 @@
 #include "csengine/sector.h"
 #include "csengine/engine.h"
 
-IMPLEMENT_IBASE (csCamera)
-  IMPLEMENTS_INTERFACE (iBase)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iCamera)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csCamera)
+  SCF_IMPLEMENTS_INTERFACE (iBase)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iCamera)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csCamera::Camera)
-  IMPLEMENTS_INTERFACE (iCamera)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csCamera::Camera)
+  SCF_IMPLEMENTS_INTERFACE (iCamera)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 int csCamera::default_aspect = 0;
 float csCamera::default_inv_aspect = 0;
@@ -40,8 +40,8 @@ long csCamera::cur_cameranr = 0;
 
 csCamera::csCamera () : csOrthoTransform()
 {
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiCamera);
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCamera);
   mirror = false;
   sector = NULL;
   aspect = default_aspect;
@@ -57,16 +57,16 @@ csCamera::csCamera () : csOrthoTransform()
 csCamera::csCamera (csCamera* c) : csOrthoTransform ()
 {
   *this = *c;
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiCamera);
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCamera);
   cameranr = cur_cameranr++;
 }
 
 csCamera::csCamera (const csCamera& c) : csOrthoTransform (), iBase ()
 {
   *this = c;
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiCamera);
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCamera);
   cameranr = cur_cameranr++;
 }
 

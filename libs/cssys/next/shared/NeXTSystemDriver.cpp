@@ -35,13 +35,13 @@ typedef void* NeXTSystemHandle;
 #define STR_DEFAULT } else {
 #define STR_SWITCH_END }}
 
-IMPLEMENT_IBASE_EXT(NeXTSystemDriver)
-  IMPLEMENTS_EMBEDDED_INTERFACE(iEventPlug)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT(NeXTSystemDriver)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventPlug)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE(NeXTSystemDriver::NeXTSystemEventPlug)
-  IMPLEMENTS_INTERFACE(iEventPlug)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE(NeXTSystemDriver::NeXTSystemEventPlug)
+  SCF_IMPLEMENTS_INTERFACE(iEventPlug)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 //-----------------------------------------------------------------------------
 // Constructor
@@ -49,7 +49,7 @@ IMPLEMENT_EMBEDDED_IBASE_END
 NeXTSystemDriver::NeXTSystemDriver() :
   csSystemDriver(), controller(0), event_outlet(0)
 {
-  CONSTRUCT_EMBEDDED_IBASE(scfiEventPlug);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventPlug);
   printf("Crystal Space for " CS_PLATFORM_NAME " " CS_VERSION "\nPorted to "
     CS_PLATFORM_NAME " by Eric Sunshine <sunshine@sunshineco.com>\n\n");
 }

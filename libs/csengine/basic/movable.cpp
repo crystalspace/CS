@@ -28,20 +28,20 @@
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csMovable)
-  IMPLEMENTS_INTERFACE (iBase)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iMovable)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csMovable)
+  SCF_IMPLEMENTS_INTERFACE (iBase)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMovable)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csMovable::eiMovable)
-  IMPLEMENTS_INTERFACE (iMovable)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMovable::eiMovable)
+  SCF_IMPLEMENTS_INTERFACE (iMovable)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 
 csMovable::csMovable ()
 {
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiMovable);
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMovable);
   parent = NULL;
   iparent = NULL;
   updatenr = 0;
@@ -66,10 +66,10 @@ csMovable::~csMovable ()
 void csMovable::SetParent (csMovable* parent)
 {
   //@@@ (see comment above)
-  //iMovable* ipar = QUERY_INTERFACE_SAFE (parent, iMovable);
+  //iMovable* ipar = SCF_QUERY_INTERFACE_SAFE (parent, iMovable);
   //if (iparent) iparent->DecRef ();
   //iparent = ipar;
-  iparent = QUERY_INTERFACE_SAFE (parent, iMovable);
+  iparent = SCF_QUERY_INTERFACE_SAFE (parent, iMovable);
   if (iparent) iparent->DecRef ();
 
   csMovable::parent = parent;
@@ -108,7 +108,7 @@ void csMovable::ClearSectors ()
 {
   if (parent == NULL)
   {
-    iMeshWrapper* sp = QUERY_INTERFACE_FAST (object, iMeshWrapper);
+    iMeshWrapper* sp = SCF_QUERY_INTERFACE_FAST (object, iMeshWrapper);
     if (sp)
     {
       sp->GetPrivateObject ()->RemoveFromSectors ();
@@ -116,7 +116,7 @@ void csMovable::ClearSectors ()
     }
     else
     {
-      iCollection* col = QUERY_INTERFACE_FAST (object, iCollection);
+      iCollection* col = SCF_QUERY_INTERFACE_FAST (object, iCollection);
       if (col)
       {
         ((csCollection::Collection*)col)->scfParent->RemoveFromSectors ();
@@ -133,7 +133,7 @@ void csMovable::AddSector (csSector* sector)
   if (parent == NULL)
   {
     sectors.Push (sector);
-    iMeshWrapper* sp = QUERY_INTERFACE_FAST (object, iMeshWrapper);
+    iMeshWrapper* sp = SCF_QUERY_INTERFACE_FAST (object, iMeshWrapper);
     if (sp)
     {
       sp->GetPrivateObject ()->MoveToSector (sector);
@@ -141,7 +141,7 @@ void csMovable::AddSector (csSector* sector)
     }
     else
     {
-      iCollection* col = QUERY_INTERFACE_FAST (object, iCollection);
+      iCollection* col = SCF_QUERY_INTERFACE_FAST (object, iCollection);
       if (col)
       {
         ((csCollection::Collection*)col)->scfParent->MoveToSector (sector);
@@ -169,7 +169,7 @@ void csMovable::RemoveListener (iMovableListener* listener)
 void csMovable::UpdateMove ()
 {
   updatenr++;
-  iMeshWrapper* sp = QUERY_INTERFACE_FAST (object, iMeshWrapper);
+  iMeshWrapper* sp = SCF_QUERY_INTERFACE_FAST (object, iMeshWrapper);
   if (sp)
   {
     sp->GetPrivateObject ()->UpdateMove ();
@@ -177,7 +177,7 @@ void csMovable::UpdateMove ()
   }
   else
   {
-    iCollection* col = QUERY_INTERFACE_FAST (object, iCollection);
+    iCollection* col = SCF_QUERY_INTERFACE_FAST (object, iCollection);
     if (col)
     {
       ((csCollection::Collection*)col)->scfParent->UpdateMove ();

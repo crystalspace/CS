@@ -122,7 +122,7 @@ void csMouse::NewPointer (const char *id, const char *posdef)
   for (cID = 0; ; cID++)
     if (!cursor_ids [cID])
     {
-      app->printf (MSG_WARNING, "WARNING: Unkown mouse cursor id (%s)\n", id);
+      app->printf (CS_MSG_WARNING, "WARNING: Unkown mouse cursor id (%s)\n", id);
       return;
     }
     else if (!strcmp (id, cursor_ids [cID]))

@@ -41,19 +41,19 @@
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//- csAppPlugIn //--
 
-IMPLEMENT_IBASE (csApp::csAppPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csApp::csAppPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
 csApp::csAppPlugIn::csAppPlugIn (csApp *iParent)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   app = iParent;
 }
 
 bool csApp::csAppPlugIn::Initialize (iSystem *System)
 {
-  app->VFS = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
+  app->VFS = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
   if (!app->VFS) return false;
 
   // Get system event outlet for faster access
@@ -163,13 +163,13 @@ bool csApp::Initialize ()
 
   config.AddConfig(System, "/config/csws.cfg");
 
-  FontServer = QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iFontServer);
+  FontServer = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iFontServer);
   DefaultFont = FontServer->LoadFont (CSFONT_COURIER);
   DefaultFontSize = 8;
 
-  ImageLoader = QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageIO);
+  ImageLoader = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageIO);
   if (!ImageLoader)
-    System->Printf (MSG_WARNING,
+    System->Printf (CS_MSG_WARNING,
       "No image loader. Loading images will fail.\n");
 
   // Now initialize all skin slices
@@ -359,7 +359,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
       else if (!strcasecmp (tmp + 7, "no"))
         iFlags &= ~CS_TEXTURE_DITHER;
       else
-        printf (MSG_WARNING, "Texture `%s': invalid MIPMAP() value, 'yes' or 'no' expected\n", iTexName);
+        printf (CS_MSG_WARNING, "Texture `%s': invalid MIPMAP() value, 'yes' or 'no' expected\n", iTexName);
     }
     else if (!strncmp (tmp, "Mipmap:", 7))
     {
@@ -368,11 +368,11 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
       else if (!strcasecmp (tmp + 7, "no"))
         iFlags |= CS_TEXTURE_NOMIPMAPS;
       else
-        printf (MSG_WARNING, "Texture `%s': invalid MIPMAP() value, 'yes' or 'no' expected\n", iTexName);
+        printf (CS_MSG_WARNING, "Texture `%s': invalid MIPMAP() value, 'yes' or 'no' expected\n", iTexName);
     }
     else
     {
-      printf (MSG_WARNING, "Texture `%s': Unknown texture parameter: '%s'\n", iTexName, parm);
+      printf (CS_MSG_WARNING, "Texture `%s': Unknown texture parameter: '%s'\n", iTexName, parm);
       delete [] filename;
       return false;
     }
@@ -380,7 +380,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
 
   if (!filename)
   {
-    printf (MSG_WARNING, "Texture `%s': No file name defined!\n", iTexName);
+    printf (CS_MSG_WARNING, "Texture `%s': No file name defined!\n", iTexName);
     return false;
   }
 
@@ -388,7 +388,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   iDataBuffer *fbuffer = VFS->ReadFile (filename);
   if (!fbuffer || !fbuffer->GetSize ())
   {
-    printf (MSG_WARNING, "Cannot read image file \"%s\" from VFS\n", filename);
+    printf (CS_MSG_WARNING, "Cannot read image file \"%s\" from VFS\n", filename);
     delete [] filename;
     return false;
   }
@@ -539,7 +539,7 @@ void csApp::FinishFrame ()
 
 bool csApp::PreHandleEvent (iEvent &Event)
 {
-  if (MouseOwner && IS_MOUSE_EVENT (Event))
+  if (MouseOwner && CS_IS_MOUSE_EVENT (Event))
   {
     // Bring mouse coordinates to child coordinate system
     int dX = 0, dY = 0;
@@ -551,7 +551,7 @@ bool csApp::PreHandleEvent (iEvent &Event)
     Event.Mouse.y += dY;
     return ret;
   }
-  else if (KeyboardOwner && IS_KEYBOARD_EVENT (Event))
+  else if (KeyboardOwner && CS_IS_KEYBOARD_EVENT (Event))
     return KeyboardOwner->PreHandleEvent (Event);
   else if (FocusOwner)
     return FocusOwner->PreHandleEvent (Event);
@@ -561,7 +561,7 @@ bool csApp::PreHandleEvent (iEvent &Event)
 
 bool csApp::PostHandleEvent (iEvent &Event)
 {
-  if (MouseOwner && IS_MOUSE_EVENT (Event))
+  if (MouseOwner && CS_IS_MOUSE_EVENT (Event))
   {
     // Bring mouse coordinates to child coordinate system
     int dX = 0, dY = 0;
@@ -573,7 +573,7 @@ bool csApp::PostHandleEvent (iEvent &Event)
     Event.Mouse.y += dY;
     return ret;
   }
-  else if (KeyboardOwner && IS_KEYBOARD_EVENT (Event))
+  else if (KeyboardOwner && CS_IS_KEYBOARD_EVENT (Event))
     return KeyboardOwner->PostHandleEvent (Event);
   else if (FocusOwner)
     return FocusOwner->PostHandleEvent (Event);
@@ -618,23 +618,23 @@ bool csApp::HandleEvent (iEvent &Event)
 
   // If a component captured the mouse,
   // forward all mouse (and keyboard) events to it
-  if (MouseOwner && (IS_MOUSE_EVENT (Event) || IS_KEYBOARD_EVENT (Event)))
+  if (MouseOwner && (CS_IS_MOUSE_EVENT (Event) || CS_IS_KEYBOARD_EVENT (Event)))
   {
-    if (IS_MOUSE_EVENT (Event))
+    if (CS_IS_MOUSE_EVENT (Event))
       MouseOwner->GlobalToLocal (Event.Mouse.x, Event.Mouse.y);
     return MouseOwner->HandleEvent (Event);
   } /* endif */
 
   // If a component captured the keyboard, forward all keyboard events to it
-  if (KeyboardOwner && IS_KEYBOARD_EVENT (Event))
+  if (KeyboardOwner && CS_IS_KEYBOARD_EVENT (Event))
   {
     return KeyboardOwner->HandleEvent (Event);
   } /* endif */
 
   // If a component captured events, forward all focused events to it
-  if (FocusOwner && (IS_MOUSE_EVENT (Event) || IS_KEYBOARD_EVENT (Event)))
+  if (FocusOwner && (CS_IS_MOUSE_EVENT (Event) || CS_IS_KEYBOARD_EVENT (Event)))
   {
-    if (IS_MOUSE_EVENT (Event))
+    if (CS_IS_MOUSE_EVENT (Event))
       FocusOwner->GlobalToLocal (Event.Mouse.x, Event.Mouse.y);
     return FocusOwner->HandleEvent (Event);
   } /* endif */

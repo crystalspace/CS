@@ -348,7 +348,7 @@ bool csTreeItem::HandleEvent (iEvent &Event)
   // First of all, give a chance to our children to handle the event
   bool ourmev = false;
   bool passdown = false;
-  if (IS_MOUSE_EVENT (Event))
+  if (CS_IS_MOUSE_EVENT (Event))
   {
     int w, h;
     SuggestSize (w, h);
@@ -357,7 +357,7 @@ bool csTreeItem::HandleEvent (iEvent &Event)
       || ((Event.Mouse.y > h) && (Event.Mouse.x > hChildrenOffset)))
       passdown = true;
   }
-  else if (IS_KEYBOARD_EVENT (Event))
+  else if (CS_IS_KEYBOARD_EVENT (Event))
     passdown = true;
   if (passdown && csComponent::HandleEvent (Event))
     return true;

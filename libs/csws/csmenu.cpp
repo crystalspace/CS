@@ -196,7 +196,7 @@ bool csMenuItem::HandleEvent (iEvent &Event)
   if (focused
    && focused->GetState (CSS_VISIBLE))
   {
-    if (IS_MOUSE_EVENT (Event))
+    if (CS_IS_MOUSE_EVENT (Event))
     {
       int dX = focused->bound.xmin, dY = focused->bound.ymin;
 
@@ -207,7 +207,7 @@ bool csMenuItem::HandleEvent (iEvent &Event)
       Event.Mouse.y += dY;
       if (ret)
         return true;
-    } else if (IS_KEYBOARD_EVENT (Event))
+    } else if (CS_IS_KEYBOARD_EVENT (Event))
     {
       if (focused->HandleEvent (Event))
         return true;
@@ -611,13 +611,13 @@ bool csMenu::CurrentHandleEvent (iEvent &Event)
   if (current)
   {
     int dX = current->bound.xmin, dY = current->bound.ymin;
-    if (IS_MOUSE_EVENT (Event))
+    if (CS_IS_MOUSE_EVENT (Event))
     {
       Event.Mouse.x -= dX;
       Event.Mouse.y -= dY;
     } /* endif */
     ret = current->HandleEvent (Event);
-    if (IS_MOUSE_EVENT (Event))
+    if (CS_IS_MOUSE_EVENT (Event))
     {
       Event.Mouse.x += dX;
       Event.Mouse.y += dY;

@@ -24,9 +24,9 @@
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 
-IMPLEMENT_IBASE (csMaterial)
-  IMPLEMENTS_INTERFACE (iMaterial)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csMaterial)
+  SCF_IMPLEMENTS_INTERFACE (iMaterial)
+SCF_IMPLEMENT_IBASE_END
 
 csMaterial::csMaterial () :
   texture(NULL),
@@ -35,7 +35,7 @@ csMaterial::csMaterial () :
   ambient(CS_DEFMAT_AMBIENT),
   reflection(CS_DEFMAT_REFLECTION)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   flat_color.Set (255, 255, 255); // Default state is white, flat-shaded.
 }
 
@@ -46,7 +46,7 @@ csMaterial::csMaterial (iTextureWrapper* w) :
   ambient(CS_DEFMAT_AMBIENT),
   reflection(CS_DEFMAT_REFLECTION)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   flat_color.Set (255, 255, 255); // Default state is white, flat-shaded.
   if (texture)
     texture->IncRef ();
@@ -125,19 +125,19 @@ void csMaterial::GetReflection (float &oDiffuse, float &oAmbient,
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE_EXT (csMaterialWrapper)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iMaterialWrapper)
-  IMPLEMENTS_INTERFACE (csMaterialWrapper)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csMaterialWrapper)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMaterialWrapper)
+  SCF_IMPLEMENTS_INTERFACE (csMaterialWrapper)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csMaterialWrapper::MaterialWrapper)
-  IMPLEMENTS_INTERFACE (iMaterialWrapper)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMaterialWrapper::MaterialWrapper)
+  SCF_IMPLEMENTS_INTERFACE (iMaterialWrapper)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csMaterialWrapper::csMaterialWrapper (iMaterial* m) :
   csObject (), handle (NULL)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
   material = m;
   material->IncRef ();
 
@@ -148,7 +148,7 @@ csMaterialWrapper::csMaterialWrapper (iMaterial* m) :
 csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) :
   csObject (), material (NULL)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
 
   handle = ith;
   handle->IncRef ();
@@ -203,18 +203,18 @@ void csMaterialWrapper::Visit ()
 
 //------------------------------------------------------ csMaterialList -----//
 
-IMPLEMENT_IBASE (csMaterialList)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iMaterialList)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csMaterialList)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMaterialList)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csMaterialList::MaterialList)
-  IMPLEMENTS_INTERFACE (iMaterialList)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMaterialList::MaterialList)
+  SCF_IMPLEMENTS_INTERFACE (iMaterialList)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csMaterialList::csMaterialList () : csNamedObjVector (16, 16)
 {
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiMaterialList);
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialList);
 }
 
 csMaterialList::~csMaterialList ()

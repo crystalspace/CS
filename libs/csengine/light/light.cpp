@@ -38,18 +38,18 @@ int csLight::ambient_green = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_blue = DEFAULT_LIGHT_LEVEL;
 unsigned long csLight::last_light_id = 0;
 
-IMPLEMENT_IBASE_EXT (csLight)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iLight)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csLight)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLight)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csLight::Light)
-  IMPLEMENTS_INTERFACE (iLight)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csLight::Light)
+  SCF_IMPLEMENTS_INTERFACE (iLight)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csLight::csLight (float x, float y, float z, float d,
   float red, float green, float blue) : csObject()
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiLight);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLight);
   light_id = last_light_id++;
   center.x = x;
   center.y = y;
@@ -175,7 +175,7 @@ iCrossHalo* csLight::Light::CreateCrossHalo (float intensity, float cross)
 {
   csCrossHalo* halo = new csCrossHalo (intensity, cross);
   scfParent->SetHalo (halo);
-  iCrossHalo* ihalo = QUERY_INTERFACE (halo, iCrossHalo);
+  iCrossHalo* ihalo = SCF_QUERY_INTERFACE (halo, iCrossHalo);
   ihalo->DecRef ();
   return ihalo;
 }
@@ -185,7 +185,7 @@ iNovaHalo* csLight::Light::CreateNovaHalo (int seed, int num_spokes,
 {
   csNovaHalo* halo = new csNovaHalo (seed, num_spokes, roundness);
   scfParent->SetHalo (halo);
-  iNovaHalo* ihalo = QUERY_INTERFACE (halo, iNovaHalo);
+  iNovaHalo* ihalo = SCF_QUERY_INTERFACE (halo, iNovaHalo);
   ihalo->DecRef ();
   return ihalo;
 }
@@ -194,7 +194,7 @@ iFlareHalo* csLight::Light::CreateFlareHalo ()
 {
   csFlareHalo* halo = new csFlareHalo ();
   scfParent->SetHalo (halo);
-  iFlareHalo* ihalo = QUERY_INTERFACE (halo, iFlareHalo);
+  iFlareHalo* ihalo = SCF_QUERY_INTERFACE (halo, iFlareHalo);
   ihalo->DecRef ();
   return ihalo;
 }
@@ -202,19 +202,19 @@ iFlareHalo* csLight::Light::CreateFlareHalo ()
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE_EXT (csStatLight)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iStatLight)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csStatLight)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iStatLight)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csStatLight::eiStaticLight)
-  IMPLEMENTS_INTERFACE (iStatLight)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csStatLight::eiStaticLight)
+  SCF_IMPLEMENTS_INTERFACE (iStatLight)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csStatLight::csStatLight (float x, float y, float z, float dist,
   float red, float green, float blue, bool dynamic)
   : csLight (x, y, z, dist, red, green, blue)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiStatLight);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiStatLight);
   csStatLight::dynamic = dynamic;
   lightmaps = NULL;
   num_lightmap = 0;
@@ -240,7 +240,7 @@ void curve_light_func (csObject* obj, csFrustumView* lview)
 
 void csStatLight::CalculateLighting ()
 {
-  //CsPrintf (MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
+  //CsPrintf (CS_MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
   csFrustumView lview;
   csFrustumContext* ctxt = lview.GetFrustumContext ();
   csLightingInfo& linfo = ctxt->GetLightingInfo ();
@@ -262,7 +262,7 @@ void csStatLight::CalculateLighting ()
 
 void csStatLight::CalculateLighting (iMeshWrapper* th)
 {
-  //CsPrintf (MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
+  //CsPrintf (CS_MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
   csFrustumView lview;
   csFrustumContext* ctxt = lview.GetFrustumContext ();
   csLightingInfo& linfo = ctxt->GetLightingInfo ();
@@ -282,7 +282,7 @@ void csStatLight::CalculateLighting (iMeshWrapper* th)
   // @@@ Engine should not know about iThingState!!!
   if (th)
   {
-    iThingState* thing_state = QUERY_INTERFACE (th->GetMeshObject (),
+    iThingState* thing_state = SCF_QUERY_INTERFACE (th->GetMeshObject (),
   	  iThingState);
     if (thing_state)
     {
@@ -336,7 +336,7 @@ void csStatLight::RegisterLightMap (csLightMap* lmap)
   lightmaps[num_lightmap++] = lmap;
   if (num_lightmap >= MAX_NUM_LIGHTMAP)
   {
-    CsPrintf (MSG_WARNING, "Overflow number of lightmaps for dynamic light!\n");
+    CsPrintf (CS_MSG_WARNING, "Overflow number of lightmaps for dynamic light!\n");
   }
 }
 
@@ -397,19 +397,19 @@ void csLightPatch::Initialize (int n)
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE_EXT (csDynLight)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iDynLight)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csDynLight)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iDynLight)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csDynLight::eiDynLight)
-  IMPLEMENTS_INTERFACE (iDynLight)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csDynLight::eiDynLight)
+  SCF_IMPLEMENTS_INTERFACE (iDynLight)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csDynLight::csDynLight (float x, float y, float z, float dist,
   float red, float green, float blue)
   : csLight (x, y, z, dist, red, green, blue)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiDynLight);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDynLight);
   lightpatches = NULL;
 }
 

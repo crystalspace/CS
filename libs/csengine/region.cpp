@@ -35,18 +35,18 @@
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csRegion)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iRegion)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csRegion)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRegion)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csRegion::Region)
-  IMPLEMENTS_INTERFACE (iRegion)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csRegion::Region)
+  SCF_IMPLEMENTS_INTERFACE (iRegion)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csRegion::csRegion (csEngine* e) : csObject ()
 {
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiRegion);
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRegion);
   engine = e;
 }
 
@@ -87,9 +87,9 @@ void csRegion::Region::DeleteAll ()
     if (copy[i])
     {
       iObject* obj = (iObject*)copy[i];
-      iCollection* o = QUERY_INTERFACE_FAST (obj, iCollection);
+      iCollection* o = SCF_QUERY_INTERFACE_FAST (obj, iCollection);
       if (!o) continue;
-      o->DecRef ();	// Remove the ref from QUERY_INTERFACE_FAST above.
+      o->DecRef ();	// Remove the ref from SCF_QUERY_INTERFACE_FAST above.
       scfParent->engine->RemoveCollection (
       	((csCollection::Collection*)o)->scfParent);
       scfParent->ObjRemove (obj);	// Remove from this region.
@@ -100,9 +100,9 @@ void csRegion::Region::DeleteAll ()
     if (copy[i])
     {
       iObject* obj = (iObject*)copy[i];
-      iMeshWrapper* o = QUERY_INTERFACE_FAST (obj, iMeshWrapper);
+      iMeshWrapper* o = SCF_QUERY_INTERFACE_FAST (obj, iMeshWrapper);
       if (!o) continue;
-      o->DecRef ();	// Remove ref from QUERY_INTERFACE_FAST.
+      o->DecRef ();	// Remove ref from SCF_QUERY_INTERFACE_FAST.
       scfParent->engine->RemoveMesh (o);
 
       scfParent->ObjRemove (obj);	// Remove from this region.
@@ -113,9 +113,9 @@ void csRegion::Region::DeleteAll ()
     if (copy[i])
     {
       iObject* obj = (iObject*)copy[i];
-      iMeshFactoryWrapper* o = QUERY_INTERFACE_FAST (obj, iMeshFactoryWrapper);
+      iMeshFactoryWrapper* o = SCF_QUERY_INTERFACE_FAST (obj, iMeshFactoryWrapper);
       if (!o) continue;
-      o->DecRef ();	// Remove ref from QUERY_INTERFACE_FAST.
+      o->DecRef ();	// Remove ref from SCF_QUERY_INTERFACE_FAST.
       scfParent->engine->mesh_factories.Delete (
         scfParent->engine->mesh_factories.Find (o->GetPrivateObject ()));
       scfParent->ObjRemove (obj);	// Remove from this region.
@@ -126,9 +126,9 @@ void csRegion::Region::DeleteAll ()
     if (copy[i])
     {
       iObject* obj = (iObject*)copy[i];
-      iCurveTemplate* o = QUERY_INTERFACE_FAST (obj, iCurveTemplate);
+      iCurveTemplate* o = SCF_QUERY_INTERFACE_FAST (obj, iCurveTemplate);
       if (!o) continue;
-      o->DecRef ();	// Remove ref from QUERY_INTERFACE_FAST.
+      o->DecRef ();	// Remove ref from SCF_QUERY_INTERFACE_FAST.
       scfParent->engine->curve_templates.Delete (
         scfParent->engine->curve_templates.Find (
 	  ((csCurveTemplate::CurveTemplate*)o)->scfParent));
@@ -140,9 +140,9 @@ void csRegion::Region::DeleteAll ()
     if (copy[i])
     {
       iObject* obj = (iObject*)copy[i];
-      iSector* o = QUERY_INTERFACE_FAST (obj, iSector);
+      iSector* o = SCF_QUERY_INTERFACE_FAST (obj, iSector);
       if (!o) continue;
-      o->DecRef ();	// Remove ref from QUERY_INTERFACE_FAST.
+      o->DecRef ();	// Remove ref from SCF_QUERY_INTERFACE_FAST.
       o->GetPrivateObject ()->CleanupReferences ();
       int idx = scfParent->engine->sectors.Find (o->GetPrivateObject ());
       if (idx != -1)
@@ -157,9 +157,9 @@ void csRegion::Region::DeleteAll ()
     if (copy[i])
     {
       iObject* obj = (iObject*)copy[i];
-      iMaterialWrapper* o = QUERY_INTERFACE_FAST (obj, iMaterialWrapper);
+      iMaterialWrapper* o = SCF_QUERY_INTERFACE_FAST (obj, iMaterialWrapper);
       if (!o) continue;
-      o->DecRef ();	// Remove ref from QUERY_INTERFACE_FAST.
+      o->DecRef ();	// Remove ref from SCF_QUERY_INTERFACE_FAST.
       int idx = scfParent->engine->GetMaterials ()->Find (
       	o->GetPrivateObject ());
       if (idx != -1)
@@ -174,9 +174,9 @@ void csRegion::Region::DeleteAll ()
     if (copy[i])
     {
       iObject* obj = (iObject*)copy[i];
-      iTextureWrapper* o = QUERY_INTERFACE_FAST (obj, iTextureWrapper);
+      iTextureWrapper* o = SCF_QUERY_INTERFACE_FAST (obj, iTextureWrapper);
       if (!o) continue;
-      o->DecRef ();	// Remove ref from QUERY_INTERFACE_FAST.
+      o->DecRef ();	// Remove ref from SCF_QUERY_INTERFACE_FAST.
       int idx = scfParent->engine->GetTextures ()->Find (
       	o->GetPrivateObject ());
       if (idx != -1)
@@ -191,9 +191,9 @@ void csRegion::Region::DeleteAll ()
     if (copy[i])
     {
       iObject* obj = (iObject*)copy[i];
-      iCameraPosition* o = QUERY_INTERFACE_FAST (obj, iCameraPosition);
+      iCameraPosition* o = SCF_QUERY_INTERFACE_FAST (obj, iCameraPosition);
       if (!o) continue;
-      o->DecRef ();	// Remove ref from QUERY_INTERFACE_FAST.
+      o->DecRef ();	// Remove ref from SCF_QUERY_INTERFACE_FAST.
       int idx = scfParent->engine->camera_positions.Find (
         ((csCameraPosition::CameraPosition*)o)->scfParent);
       if (idx != -1)
@@ -208,9 +208,9 @@ void csRegion::Region::DeleteAll ()
     if (copy[i])
     {
       iObject* obj = (iObject*)copy[i];
-      iPolyTxtPlane* o = QUERY_INTERFACE_FAST (obj, iPolyTxtPlane);
+      iPolyTxtPlane* o = SCF_QUERY_INTERFACE_FAST (obj, iPolyTxtPlane);
       if (!o) continue;
-      o->DecRef ();	// Remove ref from QUERY_INTERFACE_FAST.
+      o->DecRef ();	// Remove ref from SCF_QUERY_INTERFACE_FAST.
       int idx = scfParent->engine->planes.Find (o->GetPrivateObject ());
       o->DecRef ();
       if (idx != -1)
@@ -226,7 +226,7 @@ void csRegion::Region::DeleteAll ()
     if (copy[i])
     {
       iObject* o = (iObject*)copy[i];
-      CsPrintf (MSG_INTERNAL_ERROR, "\
+      CsPrintf (CS_MSG_INTERNAL_ERROR, "\
 There is still an object in the array after deleting region contents!\n\
 Object name is '%s'\n",
 	o->GetName () ? o->GetName () : "<NoName>");
@@ -247,7 +247,7 @@ bool csRegion::Region::PrepareTextures ()
   	!iter->IsFinished () ; iter->Next())
     {
       iTextureWrapper* csth =
-        QUERY_INTERFACE_FAST (iter->GetObject (), iTextureWrapper);
+        SCF_QUERY_INTERFACE_FAST (iter->GetObject (), iTextureWrapper);
       if (csth)
       {
         if (!csth->GetTextureHandle ())
@@ -265,7 +265,7 @@ bool csRegion::Region::PrepareTextures ()
   	!iter->IsFinished () ; iter->Next())
     {
       iTextureWrapper* csth =
-        QUERY_INTERFACE_FAST (iter->GetObject (), iTextureWrapper);
+        SCF_QUERY_INTERFACE_FAST (iter->GetObject (), iTextureWrapper);
       if (csth)
       {
         csth->GetTextureHandle ()->Prepare ();
@@ -281,7 +281,7 @@ bool csRegion::Region::PrepareTextures ()
   	!iter->IsFinished () ; iter->Next())
     {
       iMaterialWrapper* csmh =
-        QUERY_INTERFACE_FAST (iter->GetObject (), iMaterialWrapper);
+        SCF_QUERY_INTERFACE_FAST (iter->GetObject (), iMaterialWrapper);
       if (csmh)
       {
         if (!csmh->GetMaterialHandle ())
@@ -299,7 +299,7 @@ bool csRegion::Region::PrepareTextures ()
   	!iter->IsFinished () ; iter->Next())
     {
       iMaterialWrapper* csmh =
-        QUERY_INTERFACE_FAST (iter->GetObject (), iMaterialWrapper);
+        SCF_QUERY_INTERFACE_FAST (iter->GetObject (), iMaterialWrapper);
       if (csmh)
       {
         csmh->GetMaterialHandle ()->Prepare ();

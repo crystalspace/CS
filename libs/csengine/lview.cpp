@@ -27,9 +27,9 @@
 #include "iengine/camera.h"
 #include "iengine/sector.h"
 
-IMPLEMENT_IBASE (csFrustumView)
-  IMPLEMENTS_INTERFACE (iFrustumView)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csFrustumView)
+  SCF_IMPLEMENTS_INTERFACE (iFrustumView)
+SCF_IMPLEMENT_IBASE_END
 
 csFrustumView::csFrustumView () :
 	node_func (NULL),
@@ -41,7 +41,7 @@ csFrustumView::csFrustumView () :
 	callback_data (NULL),
 	ctxt (NULL)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   ctxt = new csFrustumContext ();
   csShadowBlockList* sbl = new csShadowBlockList ();
   ctxt->SetShadows ((iShadowBlockList*)sbl, false);
@@ -102,16 +102,16 @@ void csFrustumView::RestoreFrustumContext (csFrustumContext* original)
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csShadowBlock)
-  IMPLEMENTS_INTERFACE (iShadowBlock)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csShadowBlock)
+  SCF_IMPLEMENTS_INTERFACE (iShadowBlock)
+SCF_IMPLEMENT_IBASE_END
 
 csShadowBlock::csShadowBlock (iSector* sect, int draw_busy,
 	int max_shadows, int delta) :
 		next (NULL), prev (NULL),
 		shadows (max_shadows, delta)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   sector = sect;
   csShadowBlock::draw_busy = draw_busy;
 }
@@ -120,7 +120,7 @@ csShadowBlock::csShadowBlock (int max_shadows, int delta) :
 	next (NULL), prev (NULL),
 	shadows (max_shadows, delta)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   sector = NULL;
   draw_busy = -1;
 }
@@ -246,13 +246,13 @@ void csShadowBlock::UnlinkShadow (int idx)
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csShadowBlockList)
-  IMPLEMENTS_INTERFACE (iShadowBlockList)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csShadowBlockList)
+  SCF_IMPLEMENTS_INTERFACE (iShadowBlockList)
+SCF_IMPLEMENT_IBASE_END
 
 csShadowBlockList::csShadowBlockList () : first (NULL), last (NULL)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 iShadowBlock* csShadowBlockList::NewShadowBlock (iSector* sector,
@@ -281,14 +281,14 @@ csShadowFrustum::csShadowFrustum (const csShadowFrustum& orig)
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csShadowIterator)
-  IMPLEMENTS_INTERFACE (iShadowIterator)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csShadowIterator)
+  SCF_IMPLEMENTS_INTERFACE (iShadowIterator)
+SCF_IMPLEMENT_IBASE_END
 
 csShadowIterator::csShadowIterator (csShadowBlock* cur, bool onlycur,
 	int dir)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   csShadowIterator::cur = cur;
   csShadowIterator::onlycur = onlycur;
   csShadowIterator::dir = dir;

@@ -27,15 +27,15 @@
 #include "igeom/clip2d.h"
 #include "iengine/camera.h"
 
-IMPLEMENT_IBASE (csRenderView)
-  IMPLEMENTS_INTERFACE (iRenderView)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csRenderView)
+  SCF_IMPLEMENTS_INTERFACE (iRenderView)
+SCF_IMPLEMENT_IBASE_END
 
 csRenderView::csRenderView () :
     ctxt (NULL), iengine (NULL), g3d (NULL), g2d (NULL),
     callback (NULL)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
 }
@@ -44,7 +44,7 @@ csRenderView::csRenderView (iCamera* c) :
     ctxt (NULL), iengine (NULL), g3d (NULL), g2d (NULL),
     callback (NULL)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
   c->IncRef ();
@@ -56,7 +56,7 @@ csRenderView::csRenderView (iCamera* c, iClipper2D* v, iGraphics3D* ig3d,
     ctxt (NULL), iengine (NULL), g3d (ig3d), g2d (ig2d),
     callback (NULL)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
   c->IncRef ();

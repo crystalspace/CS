@@ -23,12 +23,12 @@
 #include "csengine/engine.h"
 #include "csengine/light.h"
 
-IMPLEMENT_IBASE_EXT_QUERY (csTerrainWrapper)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iTerrainWrapper)
-IMPLEMENT_IBASE_EXT_QUERY_END
+SCF_IMPLEMENT_IBASE_EXT_QUERY (csTerrainWrapper)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iTerrainWrapper)
+SCF_IMPLEMENT_IBASE_EXT_QUERY_END
 
-IMPLEMENT_IBASE_EXT_INCREF(csTerrainWrapper)
-IMPLEMENT_IBASE_EXT_GETREFCOUNT(csTerrainWrapper)
+SCF_IMPLEMENT_IBASE_EXT_INCREF(csTerrainWrapper)
+SCF_IMPLEMENT_IBASE_EXT_GETREFCOUNT(csTerrainWrapper)
 
 // We implement a custom DecRef() in order to work around a shortcoming of the
 // NextStep compiler.  The UnlinkTerrain(this) invocation which appears here
@@ -54,14 +54,14 @@ void csTerrainWrapper::DecRef()
   __scf_superclass::DecRef();
 }
 
-IMPLEMENT_EMBEDDED_IBASE (csTerrainWrapper::TerrainWrapper)
-  IMPLEMENTS_INTERFACE (iTerrainWrapper)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainWrapper::TerrainWrapper)
+  SCF_IMPLEMENTS_INTERFACE (iTerrainWrapper)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csTerrainWrapper::csTerrainWrapper( iEngine *pEng, iTerrainObject *pTerr )
 	: csObject ()
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiTerrainWrapper);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTerrainWrapper);
   csTerrainWrapper::pEngine = pEng;
   csTerrainWrapper::pTerrObj = pTerr;
   pTerr->IncRef ();
@@ -72,7 +72,7 @@ csTerrainWrapper::csTerrainWrapper( iEngine *pEng, iTerrainObject *pTerr )
 csTerrainWrapper::csTerrainWrapper( iEngine *pEng )
 	: csObject ()
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiTerrainWrapper);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTerrainWrapper);
   csTerrainWrapper::pEngine = pEng;
   csTerrainWrapper::pTerrObj = NULL;
   pFactory = NULL;
@@ -140,25 +140,25 @@ void csTerrainWrapper::UpdateLighting( iLight** lights, int iNumLights )
 
 //--------------------------------------------------------------------------
 
-IMPLEMENT_IBASE_EXT (csTerrainFactoryWrapper)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iTerrainFactoryWrapper)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csTerrainFactoryWrapper)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iTerrainFactoryWrapper)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csTerrainFactoryWrapper::TerrainFactoryWrapper)
-  IMPLEMENTS_INTERFACE (iTerrainFactoryWrapper)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainFactoryWrapper::TerrainFactoryWrapper)
+  SCF_IMPLEMENTS_INTERFACE (iTerrainFactoryWrapper)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csTerrainFactoryWrapper::csTerrainFactoryWrapper (
   iTerrainObjectFactory *pFactory)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiTerrainFactoryWrapper);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTerrainFactoryWrapper);
   csTerrainFactoryWrapper::pTerrFact = pFactory;
   pTerrFact->IncRef ();
 }
 
 csTerrainFactoryWrapper::csTerrainFactoryWrapper ()
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiTerrainFactoryWrapper);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTerrainFactoryWrapper);
   csTerrainFactoryWrapper::pTerrFact = NULL;
 }
 

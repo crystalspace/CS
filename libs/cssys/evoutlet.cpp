@@ -22,13 +22,13 @@
 #include "cssys/csevent.h"
 #include "cssys/csevcord.h"
 
-IMPLEMENT_IBASE (csSystemDriver::csEventOutlet)
-  IMPLEMENTS_INTERFACE (iEventOutlet)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSystemDriver::csEventOutlet)
+  SCF_IMPLEMENTS_INTERFACE (iEventOutlet)
+SCF_IMPLEMENT_IBASE_END
 
 csSystemDriver::csEventOutlet::csEventOutlet (iEventPlug *iPlug, csSystemDriver *iSys)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   Plug = iPlug;
   EnableMask = unsigned (-1);
   System = iSys;

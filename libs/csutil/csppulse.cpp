@@ -24,7 +24,7 @@ static char const ANIMATION[] = "-\\|/";
 int const ANIMATION_COUNT = sizeof(ANIMATION) / sizeof(ANIMATION[0]) - 1;
 
 csProgressPulse::csProgressPulse(iSystem* s) :
-    sys(s), type(MSG_INITIALIZATION), state(0), drawn(false) {}
+    sys(s), type(CS_MSG_INITIALIZATION), state(0), drawn(false) {}
 
 csProgressPulse::~csProgressPulse()
 {

@@ -21,18 +21,18 @@
 #include "cssysdef.h"
 #include "cssys/csevent.h"
 
-IMPLEMENT_IBASE (csEvent)
-  IMPLEMENTS_INTERFACE (iEvent)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csEvent)
+  SCF_IMPLEMENTS_INTERFACE (iEvent)
+SCF_IMPLEMENT_IBASE_END
 
 csEvent::csEvent ()
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 csEvent::csEvent (cs_time iTime, int eType, int kCode, int kChar, int kModifiers)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   Time = iTime;
   Type = eType;
   Category = SubCategory = Flags = 0;
@@ -44,7 +44,7 @@ csEvent::csEvent (cs_time iTime, int eType, int kCode, int kChar, int kModifiers
 csEvent::csEvent (cs_time iTime, int eType, int mx, int my,
   int mButton, int mModifiers)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   Time = iTime;
   Type = eType;
   Category = SubCategory = Flags = 0;
@@ -57,7 +57,7 @@ csEvent::csEvent (cs_time iTime, int eType, int mx, int my,
 csEvent::csEvent (cs_time iTime, int eType, int jn, int jx, int jy,
   int jButton, int jModifiers)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   Time = iTime;
   Type = eType;
   Category = SubCategory = Flags = 0;
@@ -70,7 +70,7 @@ csEvent::csEvent (cs_time iTime, int eType, int jn, int jx, int jy,
 
 csEvent::csEvent (cs_time iTime, int eType, int cCode, void *cInfo)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   Time = iTime;
   Type = eType;
   Category = SubCategory = Flags = 0;

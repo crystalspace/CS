@@ -24,18 +24,18 @@
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE_EXT (csPolyTxtPlane)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iPolyTxtPlane)
-  IMPLEMENTS_INTERFACE (csPolyTxtPlane);
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csPolyTxtPlane)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolyTxtPlane)
+  SCF_IMPLEMENTS_INTERFACE (csPolyTxtPlane);
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csPolyTxtPlane::PolyTxtPlane)
-  IMPLEMENTS_INTERFACE (iPolyTxtPlane)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csPolyTxtPlane::PolyTxtPlane)
+  SCF_IMPLEMENTS_INTERFACE (iPolyTxtPlane)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csPolyTxtPlane::csPolyTxtPlane () : csObject ()
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiPolyTxtPlane);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolyTxtPlane);
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 

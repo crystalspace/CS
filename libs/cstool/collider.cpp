@@ -23,9 +23,9 @@
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE_EXT (csColliderWrapper)
-  IMPLEMENTS_INTERFACE (csColliderWrapper)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csColliderWrapper)
+  SCF_IMPLEMENTS_INTERFACE (csColliderWrapper)
+SCF_IMPLEMENT_IBASE_EXT_END
 
 csColliderWrapper::csColliderWrapper (csObject& parent,
 	iCollideSystem* collide_system,

@@ -633,31 +633,31 @@ void csOctree::Statistics ()
   int avg_bsp_leaves = num_bsp_trees ? tot_bsp_leaves / num_bsp_trees : 0;
   int avg_max_depth = num_bsp_trees ? tot_max_depth / num_bsp_trees : 0;
   int avg_tot_poly = num_bsp_trees ? tot_tot_poly / num_bsp_trees : 0;
-  CsPrintf (MSG_INITIALIZATION, "  oct_nodes=%d max_oct_depth=%d num_bsp_trees=%d\n",
+  CsPrintf (CS_MSG_INITIALIZATION, "  oct_nodes=%d max_oct_depth=%d num_bsp_trees=%d\n",
   	num_oct_nodes, max_oct_depth, num_bsp_trees);
-  CsPrintf (MSG_INITIALIZATION, "  bsp nodes: tot=%d avg=%d min=%d max=%d\n",
+  CsPrintf (CS_MSG_INITIALIZATION, "  bsp nodes: tot=%d avg=%d min=%d max=%d\n",
   	tot_bsp_nodes, avg_bsp_nodes, min_bsp_nodes, max_bsp_nodes);
-  CsPrintf (MSG_INITIALIZATION, "  bsp leaves: tot=%d avg=%d min=%d max=%d\n",
+  CsPrintf (CS_MSG_INITIALIZATION, "  bsp leaves: tot=%d avg=%d min=%d max=%d\n",
   	tot_bsp_leaves, avg_bsp_leaves, min_bsp_leaves, max_bsp_leaves);
-  CsPrintf (MSG_INITIALIZATION, "  bsp max depth: tot=%d avg=%d min=%d max=%d\n",
+  CsPrintf (CS_MSG_INITIALIZATION, "  bsp max depth: tot=%d avg=%d min=%d max=%d\n",
   	tot_max_depth, avg_max_depth, min_max_depth, max_max_depth);
-  CsPrintf (MSG_INITIALIZATION, "  bsp tot poly: tot=%d avg=%d min=%d max=%d\n",
+  CsPrintf (CS_MSG_INITIALIZATION, "  bsp tot poly: tot=%d avg=%d min=%d max=%d\n",
   	tot_tot_poly, avg_tot_poly, min_tot_poly, max_tot_poly);
 
   // Gather statistics about PVS.
   int avg_pvs_vis_nodes = num_pvs_leaves ? tot_pvs_vis_nodes / num_pvs_leaves : 0;
   int avg_pvs_vis_poly = num_pvs_leaves ? tot_pvs_vis_poly / num_pvs_leaves : 0;
   int tot_polygons = ((csOctreeNode*)root)->CountPolygons ();
-  CsPrintf (MSG_INITIALIZATION, "  pvs vis nodes: tot=%d avg=%d min=%d max=%d\n",
+  CsPrintf (CS_MSG_INITIALIZATION, "  pvs vis nodes: tot=%d avg=%d min=%d max=%d\n",
   	tot_pvs_vis_nodes, avg_pvs_vis_nodes, min_pvs_vis_nodes, max_pvs_vis_nodes);
-  CsPrintf (MSG_INITIALIZATION, "  pvs vis poly: avg=%d%% min=%d%% max=%d%%\n",
+  CsPrintf (CS_MSG_INITIALIZATION, "  pvs vis poly: avg=%d%% min=%d%% max=%d%%\n",
   	avg_pvs_vis_poly * 100 / tot_polygons,
   	min_pvs_vis_poly * 100 / tot_polygons,
   	max_pvs_vis_poly * 100 / tot_polygons);
   if (best_pvs_node)
   {
     const csVector3 center = best_pvs_node->GetCenter ();
-    CsPrintf (MSG_INITIALIZATION, "  best pvs node at %f,%f,%f\n",
+    CsPrintf (CS_MSG_INITIALIZATION, "  best pvs node at %f,%f,%f\n",
     	center.x, center.y, center.z);
   }
 }
@@ -774,7 +774,7 @@ void csOctree::Cache (csOctreeNode* node, iFile* cf)
 void csOctree::Cache (iVFS* vfs, const char* name)
 {
   csMemFile m;
-  iFile* mf = QUERY_INTERFACE((&m), iFile);
+  iFile* mf = SCF_QUERY_INTERFACE((&m), iFile);
   WriteString (mf, "OCTR", 4);
   WriteLong (mf, 100002); // Version number.
   WriteBox3 (mf, bbox);
@@ -791,7 +791,7 @@ bool csOctree::ReadFromCache (iFile* cf, csOctreeNode* node,
 {
   if (ReadLong (cf) != num)
   {
-    CsPrintf (MSG_WARNING, "Octree does not match with loaded level!\n");
+    CsPrintf (CS_MSG_WARNING, "Octree does not match with loaded level!\n");
     return false;
   }
 
@@ -865,7 +865,7 @@ bool csOctree::ReadFromCache (iFile* cf, csOctreeNode* node,
       int j;
       for (j = i ; j < 8 ; j++)
         delete [] polys[j];
-      CsPrintf (MSG_WARNING, "Corrupt cached octree! Wrong node number!\n");
+      CsPrintf (CS_MSG_WARNING, "Corrupt cached octree! Wrong node number!\n");
       return false;
     }
     // Even if there are no polygons in the node we create
@@ -896,7 +896,7 @@ bool csOctree::ReadFromCache (iFile* cf, csOctreeNode* node,
   // Read and ignore the 255 that should be here.
   if (ReadByte (cf) != 255)
   {
-    CsPrintf (MSG_WARNING, "Cached octree corrupt! Expected end marker!\n");
+    CsPrintf (CS_MSG_WARNING, "Cached octree corrupt! Expected end marker!\n");
     return false;
   }
   return true;
@@ -911,7 +911,7 @@ bool csOctree::ReadFromCache (iVFS* vfs, const char* name,
   ReadString (cf, buf, 4);
   if (strncmp (buf, "OCTR", 4))
   {
-    CsPrintf (MSG_WARNING, "Cached octree '%s' not valid! Will be ignored.\n",
+    CsPrintf (CS_MSG_WARNING, "Cached octree '%s' not valid! Will be ignored.\n",
     	name);
     cf->DecRef ();
     return false;	// Bad format!
@@ -919,7 +919,7 @@ bool csOctree::ReadFromCache (iVFS* vfs, const char* name,
   long format_version = ReadLong (cf);
   if (format_version != 100002)
   {
-    CsPrintf (MSG_WARNING, "Mismatched format version. Expected %ld, got %ld!\n",
+    CsPrintf (CS_MSG_WARNING, "Mismatched format version. Expected %ld, got %ld!\n",
     	100002, format_version);
     cf->DecRef ();
     return false;

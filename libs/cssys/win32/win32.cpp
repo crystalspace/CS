@@ -413,10 +413,10 @@ DWORD WINAPI s_threadroutine (LPVOID param)
 #undef CHK_FAILED
 #endif // DO_DINPUT_KEYBOARD
 
-IMPLEMENT_IBASE_EXT (SysSystemDriver)
-  IMPLEMENTS_INTERFACE (iWin32SystemDriver)
-  IMPLEMENTS_INTERFACE (iEventPlug)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (SysSystemDriver)
+  SCF_IMPLEMENTS_INTERFACE (iWin32SystemDriver)
+  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+SCF_IMPLEMENT_IBASE_EXT_END
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
@@ -766,7 +766,7 @@ void SysSystemDriver::SetSystemDefaults (iConfigManager *Config)
 void SysSystemDriver::Help ()
 {
   csSystemDriver::Help();
-  Printf (MSG_STDOUT, "  -[no]console       Create a debug console (default = %s)\n",
+  Printf (CS_MSG_STDOUT, "  -[no]console       Create a debug console (default = %s)\n",
     need_console ? "yes" : "no");
 }
 

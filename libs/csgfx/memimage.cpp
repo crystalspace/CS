@@ -23,7 +23,7 @@
 csImageMemory::csImageMemory (int width, int height)
   : csImageFile (CS_IMGFMT_TRUECOLOR)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   Width = width;
   Height = height;
   Image = (void*) new csRGBpixel[Width*Height];
@@ -34,7 +34,7 @@ csImageMemory::csImageMemory (int width, int height)
 csImageMemory::csImageMemory (int width, int height, csRGBpixel *buffer, bool destroy)
   : csImageFile (CS_IMGFMT_TRUECOLOR)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   Width = width;
   Height = height;
   Image = buffer;

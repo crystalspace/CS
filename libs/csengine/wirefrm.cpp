@@ -178,7 +178,7 @@ void csWfPolygon::SetVertex (int i, csVector3& v)
 {
   if (i >= num_vertices)
   {
-    CsPrintf (MSG_INTERNAL_ERROR, "Bad vertex number %d in csWfPolygon::set_vertex!\n", i);
+    CsPrintf (CS_MSG_INTERNAL_ERROR, "Bad vertex number %d in csWfPolygon::set_vertex!\n", i);
     fatal_exit (0, false);
   }
   vertices[i] = v;

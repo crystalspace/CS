@@ -24,9 +24,9 @@
 #include "isys/plugin.h"
 #include "isys/event.h"
 
-IMPLEMENT_IBASE (csEventCord)
-  IMPLEMENTS_INTERFACE (iEventCord)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csEventCord)
+  SCF_IMPLEMENTS_INTERFACE (iEventCord)
+SCF_IMPLEMENT_IBASE_END
 
 csEventCord::csEventCord (int Category, int Subcategory) : category (Category), 
   subcategory (Subcategory)

@@ -25,14 +25,14 @@
 #include "ivideo/graph3d.h"
 #include "iengine/rview.h"
 
-IMPLEMENT_IBASE_EXT_QUERY (csMeshWrapper)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iMeshWrapper)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iVisibilityObject)
-  IMPLEMENTS_INTERFACE (csMeshWrapper)
-IMPLEMENT_IBASE_EXT_QUERY_END
+SCF_IMPLEMENT_IBASE_EXT_QUERY (csMeshWrapper)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMeshWrapper)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVisibilityObject)
+  SCF_IMPLEMENTS_INTERFACE (csMeshWrapper)
+SCF_IMPLEMENT_IBASE_EXT_QUERY_END
 
-IMPLEMENT_IBASE_EXT_INCREF(csMeshWrapper)
-IMPLEMENT_IBASE_EXT_GETREFCOUNT(csMeshWrapper)
+SCF_IMPLEMENT_IBASE_EXT_INCREF(csMeshWrapper)
+SCF_IMPLEMENT_IBASE_EXT_GETREFCOUNT(csMeshWrapper)
 
 // We implement a custom DecRef() in order to work around a shortcoming of the
 // NextStep compiler.  The UnlinkMesh(this) invocation which appears here used
@@ -65,19 +65,19 @@ void csMeshWrapper::DecRef()
   __scf_superclass::DecRef();
 }
 
-IMPLEMENT_EMBEDDED_IBASE (csMeshWrapper::MeshWrapper)
-  IMPLEMENTS_INTERFACE (iMeshWrapper)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshWrapper::MeshWrapper)
+  SCF_IMPLEMENTS_INTERFACE (iMeshWrapper)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csMeshWrapper::VisObject)
-  IMPLEMENTS_INTERFACE (iVisibilityObject)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshWrapper::VisObject)
+  SCF_IMPLEMENTS_INTERFACE (iVisibilityObject)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
 	: csObject ()
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
-  CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityObject);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityObject);
 
   movable.scfParent = this;
   defered_num_lights = 0;
@@ -88,7 +88,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   parent = theParent;
   movable.SetObject (this);
 
-  iMeshWrapper *sparent = QUERY_INTERFACE_FAST (parent, iMeshWrapper);
+  iMeshWrapper *sparent = SCF_QUERY_INTERFACE_FAST (parent, iMeshWrapper);
   if (sparent)
   {
     movable.SetParent(
@@ -108,8 +108,8 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
 csMeshWrapper::csMeshWrapper (csObject* theParent)
 	: csObject ()
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
-  CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityObject);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityObject);
 
   movable.scfParent = this;
   defered_num_lights = 0;
@@ -120,7 +120,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
   parent = theParent;
   movable.SetObject (this);
 
-  iMeshWrapper *sparent = QUERY_INTERFACE_FAST (parent, iMeshWrapper);
+  iMeshWrapper *sparent = SCF_QUERY_INTERFACE_FAST (parent, iMeshWrapper);
   if (sparent)
   {
     movable.SetParent(
@@ -164,7 +164,7 @@ void csMeshWrapper::MoveToSector (csSector* s)
   // Only add this mesh to a sector if the parent is the engine.
   // Otherwise we have a hierarchical object and in that case
   // the parent object controls this.
-  iEngine *e = QUERY_INTERFACE_FAST (parent, iEngine);
+  iEngine *e = SCF_QUERY_INTERFACE_FAST (parent, iEngine);
   if (e)
   {
     s->AddMesh (this);
@@ -174,7 +174,7 @@ void csMeshWrapper::MoveToSector (csSector* s)
 
 void csMeshWrapper::RemoveFromSectors ()
 {
-  iEngine *e = QUERY_INTERFACE_FAST (parent, iEngine);
+  iEngine *e = SCF_QUERY_INTERFACE_FAST (parent, iEngine);
   if (!e) return;
   int i;
   const csVector& sectors = movable.GetSectors ();
@@ -190,7 +190,7 @@ void csMeshWrapper::RemoveFromSectors ()
 void csMeshWrapper::SetRenderPriority (long rp)
 {
   render_priority = rp;
-  iEngine *e = QUERY_INTERFACE_FAST (parent, iEngine);
+  iEngine *e = SCF_QUERY_INTERFACE_FAST (parent, iEngine);
   if (!e) return;
   int i;
   const csVector& sectors = movable.GetSectors ();
@@ -433,7 +433,7 @@ void csMeshWrapper::MeshWrapper::AddChild (iMeshWrapper* child)
 
   if (par)
   {
-    iEngine *engine = QUERY_INTERFACE_FAST (par, iEngine);
+    iEngine *engine = SCF_QUERY_INTERFACE_FAST (par, iEngine);
     if (engine)
     {
       engine->GetCsEngine ()->RemoveMesh (c);
@@ -496,25 +496,25 @@ float csMeshWrapper::MeshWrapper::GetScreenBoundingBox (iCamera* camera,
 
 //--------------------------------------------------------------------------
 
-IMPLEMENT_IBASE_EXT (csMeshFactoryWrapper)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iMeshFactoryWrapper)
-  IMPLEMENTS_INTERFACE (csMeshFactoryWrapper)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csMeshFactoryWrapper)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMeshFactoryWrapper)
+  SCF_IMPLEMENTS_INTERFACE (csMeshFactoryWrapper)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csMeshFactoryWrapper::MeshFactoryWrapper)
-  IMPLEMENTS_INTERFACE (iMeshFactoryWrapper)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshFactoryWrapper::MeshFactoryWrapper)
+  SCF_IMPLEMENTS_INTERFACE (iMeshFactoryWrapper)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csMeshFactoryWrapper::csMeshFactoryWrapper (iMeshObjectFactory* meshFact)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
   csMeshFactoryWrapper::meshFact = meshFact;
   meshFact->IncRef ();
 }
 
 csMeshFactoryWrapper::csMeshFactoryWrapper ()
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
   csMeshFactoryWrapper::meshFact = NULL;
 }
 

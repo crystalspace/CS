@@ -58,24 +58,24 @@ bool csSector::do_radiosity = false;
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE_EXT (csSector)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iReferencedObject)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iSector)
-  IMPLEMENTS_INTERFACE (csSector);
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csSector)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iReferencedObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSector)
+  SCF_IMPLEMENTS_INTERFACE (csSector);
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSector::eiSector)
-  IMPLEMENTS_INTERFACE (iSector)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSector::eiSector)
+  SCF_IMPLEMENTS_INTERFACE (iSector)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSector::ReferencedObject)
-  IMPLEMENTS_INTERFACE (iReferencedObject)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSector::ReferencedObject)
+  SCF_IMPLEMENTS_INTERFACE (iReferencedObject)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSector::csSector (csEngine* engine) : csObject ()
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiSector);
-  CONSTRUCT_EMBEDDED_IBASE (scfiReferencedObject);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSector);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiReferencedObject);
   csSector::engine = engine;
   culler_mesh = NULL;
   culler = NULL;
@@ -146,7 +146,7 @@ void csSector::AddMesh (csMeshWrapper* mesh)
 
   if (culler)
   {
-    iVisibilityObject* vo = QUERY_INTERFACE (mesh, iVisibilityObject);
+    iVisibilityObject* vo = SCF_QUERY_INTERFACE (mesh, iVisibilityObject);
     vo->DecRef ();
     culler->RegisterVisObject (vo);
   }
@@ -175,7 +175,7 @@ void csSector::UnlinkMesh (csMeshWrapper* mesh)
     meshes.Delete (idx);
     if (culler)
     {
-      iVisibilityObject* vo = QUERY_INTERFACE (mesh, iVisibilityObject);
+      iVisibilityObject* vo = SCF_QUERY_INTERFACE (mesh, iVisibilityObject);
       vo->DecRef ();
       culler->UnregisterVisObject (vo);
     }
@@ -331,7 +331,7 @@ void csSector::UseCuller (const char* meshname)
   if (culler_mesh) return;
   culler_mesh = GetMesh (meshname);
   if (!culler_mesh) return;
-  culler = QUERY_INTERFACE (culler_mesh->GetMeshObject (), iVisibilityCuller);
+  culler = SCF_QUERY_INTERFACE (culler_mesh->GetMeshObject (), iVisibilityCuller);
   if (!culler) return;
   culler->Setup ();
 
@@ -343,12 +343,12 @@ void csSector::UseCuller (const char* meshname)
     csMeshWrapper* th = (csMeshWrapper*)meshes[i];
     th->GetMovable ().UpdateMove ();
 
-    iVisibilityObject* vo = QUERY_INTERFACE (th, iVisibilityObject);
+    iVisibilityObject* vo = SCF_QUERY_INTERFACE (th, iVisibilityObject);
     vo->DecRef ();
     culler->RegisterVisObject (vo);
   }
   
-  CsPrintf (MSG_INITIALIZATION, "DONE!\n");
+  CsPrintf (CS_MSG_INITIALIZATION, "DONE!\n");
 }
 
 csPolygon3D* csSector::HitBeam (const csVector3& start, const csVector3& end,
@@ -482,7 +482,7 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
     if (mesh != culler_mesh)
     {
       // @@@ UGLY!!!
-      iThingState* ith = QUERY_INTERFACE (mesh->GetMeshObject (), iThingState);
+      iThingState* ith = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iThingState);
       if (ith)
       {
         csThing* sp = (csThing*)(ith->GetPrivateObject ());
@@ -522,7 +522,7 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
     // culler_mesh has option CS_THING_MOVE_NEVER so
     // object space == world space.
     // @@@ UGLY!!! We need another abstraction for this.
-    iThingState* ith = QUERY_INTERFACE (
+    iThingState* ith = SCF_QUERY_INTERFACE (
     	culler_mesh->GetMeshObject (), iThingState);
     csThing* sp = (csThing*)(ith->GetPrivateObject ());
     ith->DecRef ();
@@ -1083,7 +1083,7 @@ void csSector::RealCheckFrustum (iFrustumView* lview)
 	csMeshWrapper* mesh = (csMeshWrapper*)o;
 	// @@@ should not be known in engine.
 	// @@@ UGLY
-	iThingState* ithing = QUERY_INTERFACE (
+	iThingState* ithing = SCF_QUERY_INTERFACE (
 		mesh->GetMeshObject (), iThingState);
 	if (ithing)
 	{
@@ -1106,7 +1106,7 @@ void csSector::RealCheckFrustum (iFrustumView* lview)
       csMeshWrapper* mesh = (csMeshWrapper*)o;
       // @@@ should not be known in engine.
       // @@@ UGLY
-      iThingState* ithing = QUERY_INTERFACE (
+      iThingState* ithing = SCF_QUERY_INTERFACE (
       	mesh->GetMeshObject (), iThingState);
       if (ithing)
       {

@@ -32,13 +32,13 @@ DECLARE_TYPED_VECTOR_NODELETE (csObjectContainer, iObject);
 class csObjectIterator : public iObjectIterator
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csObject *Object;
   int Position;
 
   csObjectIterator (csObject *obj) : Object (obj)
   {
-    CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (NULL);
     Object->IncRef ();
     Reset ();
   }
@@ -92,19 +92,19 @@ public:
   }
 };
 
-IMPLEMENT_IBASE (csObjectIterator)
-  IMPLEMENTS_INTERFACE (iObjectIterator)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csObjectIterator)
+  SCF_IMPLEMENTS_INTERFACE (iObjectIterator)
+SCF_IMPLEMENT_IBASE_END
 
 /*** csObject itself ***/
 
-IMPLEMENT_IBASE (csObject)
-  IMPLEMENTS_INTERFACE (iObject)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csObject)
+  SCF_IMPLEMENTS_INTERFACE (iObject)
+SCF_IMPLEMENT_IBASE_END
 
 csObject::csObject (iBase* pParent) : Children (NULL), Name (NULL)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
   static CS_ID id = 0;
   csid = id++;
   ParentObject = NULL;
@@ -266,10 +266,10 @@ iObjectIterator *csObject::GetIterator ()
 
 //------------------- miscelaneous simple classes derived from csObject -----//
 
-IMPLEMENT_IBASE_EXT (csDataObject)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iDataObject)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csDataObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iDataObject)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csDataObject::DataObject)
-  IMPLEMENTS_INTERFACE (iDataObject)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csDataObject::DataObject)
+  SCF_IMPLEMENTS_INTERFACE (iDataObject)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END

@@ -21,9 +21,9 @@
 #include "csutil/databuf.h"
 #include <stdlib.h>
 
-IMPLEMENT_IBASE (csMemFile)
-  IMPLEMENTS_INTERFACE (iFile)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csMemFile)
+  SCF_IMPLEMENTS_INTERFACE (iFile)
+SCF_IMPLEMENT_IBASE_END
 
 const char* csMemFile::GetName() { return "#csMemFile"; }
 const char* csMemFile::GetData() const { return buffer; }
@@ -35,15 +35,15 @@ void csMemFile::SetPos(size_t p) { cursor = p < size ? p : size; }
 
 csMemFile::csMemFile() :
   disposition(DISPOSITION_DELETE), buffer(0), capacity(0), size(0), cursor(0)
-  { CONSTRUCT_IBASE(0); }
+  { SCF_CONSTRUCT_IBASE(0); }
 
 csMemFile::csMemFile(const char* p, size_t s) :
   disposition(DISPOSITION_IGNORE), buffer((char*)p), capacity(s), size(s),
-  cursor(0) { CONSTRUCT_IBASE(0); }
+  cursor(0) { SCF_CONSTRUCT_IBASE(0); }
 
 csMemFile::csMemFile(char* p, size_t s, Disposition d) :
   disposition(d), buffer(p), capacity(s), size(s), cursor(0)
-  { CONSTRUCT_IBASE(0); }
+  { SCF_CONSTRUCT_IBASE(0); }
 
 csMemFile::~csMemFile()
 {

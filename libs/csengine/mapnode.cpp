@@ -24,17 +24,17 @@
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE_EXT (csMapNode)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iMapNode)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csMapNode)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMapNode)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csMapNode::MapNode)
-  IMPLEMENTS_INTERFACE (iMapNode)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMapNode::MapNode)
+  SCF_IMPLEMENTS_INTERFACE (iMapNode)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csMapNode::csMapNode (const char* Name) : m_pSector(NULL), m_Position(0, 0, 0)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiMapNode);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMapNode);
   SetName (Name);
 }
 
@@ -98,7 +98,7 @@ void csNodeIterator::Reset (iSector *pSector, const char *classname)
 
   Iterator = pSector->QueryObject ()->GetIterator ();
   Classname = classname;
-  CurrentNode = QUERY_INTERFACE (Iterator->GetObject (), iMapNode);
+  CurrentNode = SCF_QUERY_INTERFACE (Iterator->GetObject (), iMapNode);
 
   SkipWrongClassname ();
 }
@@ -143,5 +143,5 @@ void csNodeIterator::NextNode ()
   if (Iterator->IsFinished ())
     CurrentNode = NULL;
   else
-    CurrentNode = QUERY_INTERFACE (Iterator->GetObject (), iMapNode);
+    CurrentNode = SCF_QUERY_INTERFACE (Iterator->GetObject (), iMapNode);
 }

@@ -63,17 +63,17 @@ static unsigned short ScanCodeToChar[128] =
 
 //================================================================== System ====
 
-IMPLEMENT_IBASE_EXT (SysSystemDriver)
-  IMPLEMENTS_INTERFACE (iEventPlug)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (SysSystemDriver)
+  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+SCF_IMPLEMENT_IBASE_EXT_END
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
   // Sanity check
   if (sizeof (event_queue [0]) != 12)
   {
-    Printf (MSG_FATAL_ERROR, "ERROR! Your compiler does not handle packed structures!\n");
-    Printf (MSG_FATAL_ERROR, "sizeof (event_queue [0]) == %d instead of 12!\n", sizeof (event_queue [0]));
+    Printf (CS_MSG_FATAL_ERROR, "ERROR! Your compiler does not handle packed structures!\n");
+    Printf (CS_MSG_FATAL_ERROR, "sizeof (event_queue [0]) == %d instead of 12!\n", sizeof (event_queue [0]));
     exit (-1);
   }
 

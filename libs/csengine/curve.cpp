@@ -34,28 +34,28 @@ unsigned long csCurve::last_curve_id = 0;
 // Initialize the cache for Bezier curves
 static csBezier2 bezierCache;
 
-IMPLEMENT_IBASE_EXT (csCurve)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iCurve)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csCurve)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iCurve)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csCurve::Curve)
-  IMPLEMENTS_INTERFACE (iCurve)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csCurve::Curve)
+  SCF_IMPLEMENTS_INTERFACE (iCurve)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_IBASE_EXT (csCurveTemplate)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iCurveTemplate)
-  IMPLEMENTS_INTERFACE (csCurveTemplate)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csCurveTemplate)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iCurveTemplate)
+  SCF_IMPLEMENTS_INTERFACE (csCurveTemplate)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csCurveTemplate::CurveTemplate)
-  IMPLEMENTS_INTERFACE (iCurveTemplate)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csCurveTemplate::CurveTemplate)
+  SCF_IMPLEMENTS_INTERFACE (iCurveTemplate)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 // Should not be necessary, but without this buggy NextStep compiler
 // incorrectly calls csObject::QueryInterface() rather than correctly calling
 // csCurveTemplate::QueryInterface().
-IMPLEMENT_IBASE_EXT(csBezierTemplate)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT(csBezierTemplate)
+SCF_IMPLEMENT_IBASE_EXT_END
 
 csCurveTesselated::csCurveTesselated (int num_v, int num_t)
 {
@@ -873,7 +873,7 @@ csCurve::csCurve (csCurveTemplate* parent_tmpl) : csObject (),
     _o2w (NULL), _uv2World (NULL), _uv2Normal (NULL), parent (NULL),
     lightmap (NULL), lightmap_up_to_date (false)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiCurve);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCurve);
   curve_id = last_curve_id++;
 } 
 
@@ -894,7 +894,7 @@ iMaterialWrapper* csCurve::Curve::GetMaterial ()
 
 csCurveTemplate::csCurveTemplate () : csObject ()
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiCurveTemplate);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCurveTemplate);
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 

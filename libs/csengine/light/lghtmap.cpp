@@ -69,13 +69,13 @@ void csShadowMap::CopyLightMap (csShadowMap *source, int size)
 int csLightMap::lightcell_size = 16;
 int csLightMap::lightcell_shift = 4;
 
-IMPLEMENT_IBASE (csLightMap)
-  IMPLEMENTS_INTERFACE (iLightMap)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csLightMap)
+  SCF_IMPLEMENTS_INTERFACE (iLightMap)
+SCF_IMPLEMENT_IBASE_END
 
 csLightMap::csLightMap ()
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   first_smap = NULL;
   cachedata = NULL;
   delayed_light_info = NULL;
@@ -116,7 +116,7 @@ csShadowMap *csLightMap::NewShadowMap (csLight* light, int w, int h)
 
   smap->Alloc (light, w, h);
 
-  iStatLight *slight = QUERY_INTERFACE_FAST (light, iStatLight);
+  iStatLight *slight = SCF_QUERY_INTERFACE_FAST (light, iStatLight);
   slight->GetPrivateObject ()->RegisterLightMap (this);
   slight->DecRef ();
 
@@ -329,7 +329,7 @@ bool csLightMap::ReadFromCache (int id, int w, int h,
     }
     else
     {
-      CsPrintf (MSG_WARNING, "Warning! Light (%ld) not found!\n", ls.light_id);
+      CsPrintf (CS_MSG_WARNING, "Warning! Light (%ld) not found!\n", ls.light_id);
     }
     d += lm_size;
   }

@@ -89,9 +89,9 @@ extern bool gInputUseMouse;
 extern ISpElementReference gInputElements[];
 #endif
 
-IMPLEMENT_IBASE_EXT (SysSystemDriver)
-  IMPLEMENTS_INTERFACE (iEventPlug)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (SysSystemDriver)
+  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+SCF_IMPLEMENT_IBASE_EXT_END
 
 SysSystemDriver::SysSystemDriver()
                  : csSystemDriver ()
@@ -275,10 +275,10 @@ void SysSystemDriver::Alert(const char* s)
     iGraphics2D *   theG2D = NULL;
     iMacGraphics *  theiG2D = NULL;
 
-    theG2D = QUERY_PLUGIN( this, iGraphics2D );
+    theG2D = CS_QUERY_PLUGIN( this, iGraphics2D );
 
     if ( theG2D ) {
-        theiG2D = QUERY_INTERFACE(theG2D, iMacGraphics);
+        theiG2D = SCF_QUERY_INTERFACE(theG2D, iMacGraphics);
     }
 
     if ( theiG2D ) {
@@ -308,10 +308,10 @@ void SysSystemDriver::Warn(const char* s)
     iGraphics2D *   theG2D = NULL;
     iMacGraphics *  theiG2D = NULL;
 
-    theG2D = QUERY_PLUGIN( this, iGraphics2D );
+    theG2D = CS_QUERY_PLUGIN( this, iGraphics2D );
 
     if ( theG2D ) {
-        theiG2D = QUERY_INTERFACE(theG2D, iMacGraphics);
+        theiG2D = SCF_QUERY_INTERFACE(theG2D, iMacGraphics);
     }
 
     if ( theiG2D ) {
@@ -434,10 +434,10 @@ void SysSystemDriver::Loop ()
   EventLoopTimerRef theTimer = NULL;
 #endif
 
-  mG2D = QUERY_PLUGIN( this, iGraphics2D );
+  mG2D = CS_QUERY_PLUGIN( this, iGraphics2D );
 
   if ( mG2D ) {
-    mIG2D = QUERY_INTERFACE(mG2D, iMacGraphics);
+    mIG2D = SCF_QUERY_INTERFACE(mG2D, iMacGraphics);
   }
 
   if (mIG2D) {

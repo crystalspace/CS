@@ -20,9 +20,9 @@
 #include "cssysdef.h"
 #include "csutil/databuf.h"
 
-IMPLEMENT_IBASE (csDataBuffer)
-  IMPLEMENTS_INTERFACE (iDataBuffer);
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csDataBuffer)
+  SCF_IMPLEMENTS_INTERFACE (iDataBuffer);
+SCF_IMPLEMENT_IBASE_END
 
 csDataBuffer::~csDataBuffer ()
 {

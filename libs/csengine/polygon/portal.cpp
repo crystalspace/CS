@@ -31,18 +31,18 @@
 #include "iengine/rview.h"
 #include "iengine/fview.h"
 
-IMPLEMENT_IBASE_EXT (csPortal)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iPortal)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csPortal)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPortal)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csPortal::Portal)
-  IMPLEMENTS_INTERFACE (iPortal)
-  IMPLEMENTS_INTERFACE (iReference)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csPortal::Portal)
+  SCF_IMPLEMENTS_INTERFACE (iPortal)
+  SCF_IMPLEMENTS_INTERFACE (iReference)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csPortal::csPortal ()
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiPortal);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPortal);
   filter_texture = NULL;
   filter_r = 1;
   filter_g = 1;
@@ -65,7 +65,7 @@ csPortal::~csPortal ()
 iReferencedObject* csPortal::GetReferencedObject () const
 {
   if (!sector) return NULL;
-  iReferencedObject* refobj = QUERY_INTERFACE (sector, iReferencedObject);
+  iReferencedObject* refobj = SCF_QUERY_INTERFACE (sector, iReferencedObject);
   refobj->DecRef ();
   return refobj;
 }
@@ -78,7 +78,7 @@ void csPortal::SetReferencedObject (iReferencedObject* b)
   }
   else
   {
-    iSector* s = QUERY_INTERFACE (b, iSector);
+    iSector* s = SCF_QUERY_INTERFACE (b, iSector);
     CS_ASSERT (s != NULL);
     SetSector (s);
     s->DecRef ();
@@ -97,7 +97,7 @@ void csPortal::SetSector (iSector* s)
     if (sector)
     {
       // First unlink from the previous sector.
-      iReferencedObject* refobj = QUERY_INTERFACE (sector, iReferencedObject);
+      iReferencedObject* refobj = SCF_QUERY_INTERFACE (sector, iReferencedObject);
       CS_ASSERT (refobj != NULL);
       refobj->RemoveReference (&scfiPortal);
       refobj->DecRef ();
@@ -106,7 +106,7 @@ void csPortal::SetSector (iSector* s)
     if (sector)
     {
       // Link to the new sector.
-      iReferencedObject* refobj = QUERY_INTERFACE (sector, iReferencedObject);
+      iReferencedObject* refobj = SCF_QUERY_INTERFACE (sector, iReferencedObject);
       CS_ASSERT (refobj != NULL);
       refobj->AddReference (&scfiPortal);
       refobj->DecRef ();

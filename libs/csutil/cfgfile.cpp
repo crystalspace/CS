@@ -185,7 +185,7 @@ const char *csConfigNode::GetComment() const
 class csConfigIterator : public iConfigIterator
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Returns the configuration object for this iterator.
   virtual iConfigFile *GetConfigFile() const;
@@ -236,13 +236,13 @@ private:
   bool Prev ();
 };
 
-IMPLEMENT_IBASE(csConfigIterator);
-  IMPLEMENTS_INTERFACE(iConfigIterator);
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csConfigIterator);
+  SCF_IMPLEMENTS_INTERFACE(iConfigIterator);
+SCF_IMPLEMENT_IBASE_END;
 
 csConfigIterator::csConfigIterator(csConfigFile *c, const char *sub)
 {
-  CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_IBASE(NULL);
   Config = c;
   Node = Config->FirstNode;
   Subsection = csStrNew(sub);
@@ -346,19 +346,19 @@ const char *csConfigIterator::GetComment() const
 
 /* configuation object */
 
-IMPLEMENT_IBASE(csConfigFile);
-  IMPLEMENTS_INTERFACE(iConfigFile);
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csConfigFile);
+  SCF_IMPLEMENTS_INTERFACE(iConfigFile);
+SCF_IMPLEMENT_IBASE_END;
 
 csConfigFile::csConfigFile(iBase *pBase)
 {
   csConfigFile (NULL, NULL);
-  CONSTRUCT_IBASE (pBase);
+  SCF_CONSTRUCT_IBASE (pBase);
 }
 
 csConfigFile::csConfigFile(const char *file, iVFS *vfs)
 {
-  CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_IBASE(NULL);
 
   // create the first and last nodes
   FirstNode = new csConfigNode(NULL);

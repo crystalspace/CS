@@ -162,9 +162,9 @@ void csHint::Draw ()
 
 bool csHint::PreHandleEvent (iEvent &Event)
 {
-  if (IS_MOUSE_EVENT (Event)
-   || IS_JOYSTICK_EVENT (Event)
-   || IS_KEYBOARD_EVENT (Event))
+  if (CS_IS_MOUSE_EVENT (Event)
+   || CS_IS_JOYSTICK_EVENT (Event)
+   || CS_IS_KEYBOARD_EVENT (Event))
     Close ();
   return false;
 }

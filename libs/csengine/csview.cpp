@@ -27,14 +27,14 @@
 #include "iengine/sector.h"
 #include "iengine/engine.h"
 
-IMPLEMENT_IBASE (csView)
-  IMPLEMENTS_INTERFACE (iView)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csView)
+  SCF_IMPLEMENTS_INTERFACE (iView)
+SCF_IMPLEMENT_IBASE_END
 
 csView::csView (iEngine *e, iGraphics3D* ig3d) :
   Engine (e), G3D (ig3d), RectView (NULL), PolyView (NULL), Clipper (NULL)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
 
   G3D->IncRef ();
   Engine->IncRef ();

@@ -26,19 +26,19 @@
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE_EXT (csTextureWrapper)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iTextureWrapper)
-  IMPLEMENTS_INTERFACE (csTextureWrapper)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csTextureWrapper)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iTextureWrapper)
+  SCF_IMPLEMENTS_INTERFACE (csTextureWrapper)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csTextureWrapper::TextureWrapper)
-  IMPLEMENTS_INTERFACE (iTextureWrapper)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csTextureWrapper::TextureWrapper)
+  SCF_IMPLEMENTS_INTERFACE (iTextureWrapper)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csTextureWrapper::csTextureWrapper (iImage* Image) :
   csObject (), handle (NULL), flags (CS_TEXTURE_3D), use_callback (NULL)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
 
   (image = Image)->IncRef ();
   UpdateKeyColorFromImage ();
@@ -50,7 +50,7 @@ csTextureWrapper::csTextureWrapper (iImage* Image) :
 csTextureWrapper::csTextureWrapper (iTextureHandle *ith) :
   csObject (), image (NULL), use_callback (NULL)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
 
   (handle = ith)->IncRef ();
   flags = ith->GetFlags ();
@@ -125,7 +125,7 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
     int Height = image->GetHeight ();
 
     if (!csIsPowerOf2 (Width) || !csIsPowerOf2 (Height))
-      CsPrintf (MSG_WARNING,
+      CsPrintf (CS_MSG_WARNING,
         "Inefficient texture image '%s' dimensions!\n"
         "The width (%d) and height (%d) should be a power of two.\n",
         GetName (), Width, Height);
@@ -167,18 +167,18 @@ void csTextureWrapper::TextureWrapper::Visit ()
 
 //------------------------------------------------------- csTextureList -----//
 
-IMPLEMENT_IBASE (csTextureList)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iTextureList)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csTextureList)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iTextureList)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csTextureList::TextureList)
-  IMPLEMENTS_INTERFACE (iTextureList)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csTextureList::TextureList)
+  SCF_IMPLEMENTS_INTERFACE (iTextureList)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csTextureList::csTextureList () : csNamedObjVector (16, 16)
 {
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiTextureList);
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureList);
 }
 
 csTextureList::~csTextureList ()

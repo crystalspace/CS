@@ -38,7 +38,7 @@ void csDefaultWindowSkin::Initialize (csApp *iApp, csSkin *Parent)
     ButtonTex->IncRef ();
   else
   {
-    iApp->printf (MSG_FATAL_ERROR,
+    iApp->printf (CS_MSG_FATAL_ERROR,
       "Cannot find texture %s for default window skin\n", TITLEBAR_TEXTURE_NAME);
     fatal_exit (0, false);
   }

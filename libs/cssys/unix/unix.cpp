@@ -79,7 +79,7 @@ bool SysSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
       return true;
     }
     /// no install location can be found
-    Printf(MSG_FATAL_ERROR, "Fatal: No Crystal Space install detected.\n");
+    Printf(CS_MSG_FATAL_ERROR, "Fatal: No Crystal Space install detected.\n");
     strncpy (oInstallPath, "/usr/local/crystal/", iBufferSize);
     return true;
   }

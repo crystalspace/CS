@@ -20,9 +20,9 @@
 #include "cssysdef.h"
 #include "csutil/scfstr.h"
 
-IMPLEMENT_IBASE (scfString)
-  IMPLEMENTS_INTERFACE (iString)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (scfString)
+  SCF_IMPLEMENTS_INTERFACE (iString)
+SCF_IMPLEMENT_IBASE_END
 
 void scfString::SetCapacity (size_t NewSize)
 { s.SetCapacity (NewSize); }

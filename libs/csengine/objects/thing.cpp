@@ -49,50 +49,50 @@ long csThing::current_light_frame_number = 0;
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE_EXT (csThing)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iThingState)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iLightingInfo)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iVisibilityCuller)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iMeshObject)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iMeshObjectFactory)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csThing)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iThingState)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLightingInfo)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVisibilityCuller)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMeshObjectFactory)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csThing::ThingState)
-  IMPLEMENTS_INTERFACE (iThingState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::ThingState)
+  SCF_IMPLEMENTS_INTERFACE (iThingState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csThing::LightingInfo)
-  IMPLEMENTS_INTERFACE (iLightingInfo)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::LightingInfo)
+  SCF_IMPLEMENTS_INTERFACE (iLightingInfo)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE(csThing::PolyMesh)
-  IMPLEMENTS_INTERFACE(iPolygonMesh)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE(csThing::PolyMesh)
+  SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE(csThing::VisCull)
-  IMPLEMENTS_INTERFACE(iVisibilityCuller)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE(csThing::VisCull)
+  SCF_IMPLEMENTS_INTERFACE(iVisibilityCuller)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE(csThing::MeshObject)
-  IMPLEMENTS_INTERFACE(iMeshObject)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE(csThing::MeshObject)
+  SCF_IMPLEMENTS_INTERFACE(iMeshObject)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE(csThing::MeshObjectFactory)
-  IMPLEMENTS_INTERFACE(iMeshObjectFactory)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE(csThing::MeshObjectFactory)
+  SCF_IMPLEMENTS_INTERFACE(iMeshObjectFactory)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 int csThing::last_thing_id = 0;
 
 csThing::csThing (iBase* parent) : csObject (parent),
 	polygons (64, 64), curves (16, 16)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiThingState);
-  CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
-  CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
-  CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityCuller);
-  CONSTRUCT_EMBEDDED_IBASE (scfiMeshObject);
-  CONSTRUCT_EMBEDDED_IBASE (scfiMeshObjectFactory);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityCuller);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObject);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObjectFactory);
 
   last_thing_id++;
   thing_id = last_thing_id;
@@ -471,7 +471,7 @@ void csThing::BuildStaticTree (int mode)
   if (!csEngine::do_force_revis && w->VFS->Exists ((const char*)str))
   {
     recalc_octree = false;
-    CsPrintf (MSG_INITIALIZATION, "Loading bsp/octree...\n");
+    CsPrintf (CS_MSG_INITIALIZATION, "Loading bsp/octree...\n");
     recalc_octree = !((csOctree*)static_tree)->ReadFromCache (
     	w->VFS, (const char*)str, GetPolygonArray ().GetArray (),
 	GetPolygonArray ().Length ());
@@ -483,19 +483,19 @@ void csThing::BuildStaticTree (int mode)
   }
   if (recalc_octree)
   {
-    CsPrintf (MSG_INITIALIZATION, "Calculate bsp/octree...\n");
+    CsPrintf (CS_MSG_INITIALIZATION, "Calculate bsp/octree...\n");
     static_tree->Build (GetPolygonArray ());
-    CsPrintf (MSG_INITIALIZATION, "Caching bsp/octree...\n");
+    CsPrintf (CS_MSG_INITIALIZATION, "Caching bsp/octree...\n");
     ((csOctree*)static_tree)->Cache (w->VFS, (const char*)str);
   }
-  CsPrintf (MSG_INITIALIZATION, "Compress vertices...\n");
+  CsPrintf (CS_MSG_INITIALIZATION, "Compress vertices...\n");
   CompressVertices ();
-  CsPrintf (MSG_INITIALIZATION, "Build vertex tables...\n");
+  CsPrintf (CS_MSG_INITIALIZATION, "Build vertex tables...\n");
   ((csOctree*)static_tree)->BuildVertexTables ();
 
   static_tree->Statistics ();
 
-  CsPrintf (MSG_INITIALIZATION, "DONE!\n");
+  CsPrintf (CS_MSG_INITIALIZATION, "DONE!\n");
 }
 
 csPolygonInt* csThing::GetPolygonInt (int idx)
@@ -1337,7 +1337,7 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
     mesh.use_vertex_color = gouraud;
     if (mesh.mat_handle == NULL)
     {
-      CsPrintf (MSG_STDOUT, "Warning! Curve without material!\n");
+      CsPrintf (CS_MSG_STDOUT, "Warning! Curve without material!\n");
       continue;
     }
     rview->CalculateFogMesh (obj_cam, mesh);
@@ -1536,16 +1536,16 @@ struct csPolygonVisInfo : public iBase
   csPolygon2DQueue* poly_queue;
   csPolygonVisInfo (int num);
   virtual ~csPolygonVisInfo () { delete poly_queue; }
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 };
 
-IMPLEMENT_IBASE (csPolygonVisInfo)
-  IMPLEMENTS_INTERFACE (iBase)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csPolygonVisInfo)
+  SCF_IMPLEMENTS_INTERFACE (iBase)
+SCF_IMPLEMENT_IBASE_END
 
 csPolygonVisInfo::csPolygonVisInfo (int num)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   poly_queue = new csPolygon2DQueue (num);
 }
 
@@ -1780,7 +1780,7 @@ void csThing::RegisterVisObject (iVisibilityObject* visobj)
 {
   csVisObjInfo* vinf = new csVisObjInfo ();
   vinf->visobj = visobj;
-  iShadowCaster* shadcast = QUERY_INTERFACE (visobj, iShadowCaster);
+  iShadowCaster* shadcast = SCF_QUERY_INTERFACE (visobj, iShadowCaster);
   if (shadcast) shadcast->DecRef ();
   vinf->shadcast = shadcast;
   vinf->bbox = new csPolyTreeBBox ();
@@ -1866,7 +1866,7 @@ bool csThing::VisTest (iRenderView* irview)
       CheckVisUpdate (vinf);
       iVisibilityObject* vo = vinf->visobj;
 
-      iMeshWrapper* mw = QUERY_INTERFACE_FAST (vo, iMeshWrapper);
+      iMeshWrapper* mw = SCF_QUERY_INTERFACE_FAST (vo, iMeshWrapper);
       mw->DecRef ();
       if (mw->GetMeshObject () == &scfiMeshObject)
       {
@@ -2003,7 +2003,7 @@ static void* CheckFrustumPolygonsFB (csThing* thing,
       // A BSP polygon. Used for testing visibility of things.
       csBspPolygon* bsppol = (csBspPolygon*)polygon[i];
       csVisObjInfo* obj = bsppol->GetOriginator ();
-      iThingState* ith = QUERY_INTERFACE (obj->visobj, iThingState);
+      iThingState* ith = SCF_QUERY_INTERFACE (obj->visobj, iThingState);
       if (ith)
       {
         ith->DecRef ();
@@ -2182,7 +2182,7 @@ void csThing::CastShadows (iFrustumView* fview)
     csMeshWrapper* mesh = (csMeshWrapper*)o;
     // @@@ should not be known in engine.
     // @@@ UGLY
-    iThingState* ithing = QUERY_INTERFACE (mesh->GetMeshObject (), iThingState);
+    iThingState* ithing = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iThingState);
     if (ithing)
     {
       csThing* sp = (csThing*)(ithing->GetPrivateObject ());
@@ -2332,7 +2332,7 @@ void csThing::MergeTemplate (iThingState* tpl,
   curves_center = tpl->GetCurvesCenter ();
   curves_scale = tpl->GetCurvesScale ();
   //@@@ TEMPORARY
-  iThingState* ith = QUERY_INTERFACE (tpl, iThingState);
+  iThingState* ith = SCF_QUERY_INTERFACE (tpl, iThingState);
   ParentTemplate = (csThing*)(ith->GetPrivateObject ());
   ith->DecRef ();
 
@@ -2429,7 +2429,7 @@ iPolygon3D *csThing::ThingState::CreatePolygon (const char *iName)
   csPolygon3D *p = new csPolygon3D ((csMaterialWrapper *)NULL);
   if (iName) p->SetName (iName);
   scfParent->AddPolygon (p);
-  iPolygon3D *ip = QUERY_INTERFACE (p, iPolygon3D);
+  iPolygon3D *ip = SCF_QUERY_INTERFACE (p, iPolygon3D);
   p->DecRef ();
   return ip;
 }
@@ -2453,21 +2453,21 @@ iMeshObject* csThing::MeshObjectFactory::NewInstance ()
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csThingObjectType)
-  IMPLEMENTS_INTERFACE (iMeshObjectType)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csThingObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csThingObjectType)
+SCF_IMPLEMENT_FACTORY (csThingObjectType)
 
-EXPORT_CLASS_TABLE (thing)
-  EXPORT_CLASS (csThingObjectType, "crystalspace.mesh.object.thing",
+SCF_EXPORT_CLASS_TABLE (thing)
+  SCF_EXPORT_CLASS (csThingObjectType, "crystalspace.mesh.object.thing",
     "Crystal Space Thing Mesh Type")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csThingObjectType::csThingObjectType (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csThingObjectType::~csThingObjectType ()
@@ -2484,7 +2484,7 @@ bool csThingObjectType::Initialize (iSystem* pSystem)
 iMeshObjectFactory* csThingObjectType::NewFactory ()
 {
   csThing* cm = new csThing (this);
-  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;
 }

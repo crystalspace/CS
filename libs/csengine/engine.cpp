@@ -256,7 +256,7 @@ iObject* csObjectIt::Fetch ()
       do
       {
         iObject* rc = cur_object;
-	iDynLight *dl = QUERY_INTERFACE_FAST (rc, iDynLight);
+	iDynLight *dl = SCF_QUERY_INTERFACE_FAST (rc, iDynLight);
 	if (!dl) cur_object = NULL;
 	else
 	{
@@ -299,7 +299,7 @@ iObject* csObjectIt::Fetch ()
       {
         iObject* rc = cur_sector->GetLight (cur_idx)->scfiLight.QueryObject ();
         cur_idx++;
-	iStatLight* sl = QUERY_INTERFACE_FAST (rc, iStatLight);
+	iStatLight* sl = SCF_QUERY_INTERFACE_FAST (rc, iStatLight);
 	if (sl)
 	{
           float r = sl->QueryLight ()->GetRadius () + radius;
@@ -349,33 +349,33 @@ bool csEngine::do_not_force_revis = false;
 bool csEngine::do_force_revis = false;
 bool csEngine::do_rad_debug = false;
 
-IMPLEMENT_IBASE (csEngine)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iEngine)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csEngine)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iEngine)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csEngine::iObjectInterface)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csEngine::iObjectInterface)
   void *itf = csObject::QueryInterface (iInterfaceID, iVersion);
   if (itf) return itf;
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_FACTORY (csEngine)
+SCF_IMPLEMENT_FACTORY (csEngine)
 
-EXPORT_CLASS_TABLE (engine)
-  EXPORT_CLASS_DEP (csEngine, "crystalspace.engine.core",
+SCF_EXPORT_CLASS_TABLE (engine)
+  SCF_EXPORT_CLASS_DEP (csEngine, "crystalspace.engine.core",
     "Crystal Space 3D Engine",
       "crystalspace.kernel., "
       "crystalspace.graphics3d., "
       "crystalspace.graphic.image.io.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csEngine::csEngine (iBase *iParent) : camera_positions (16, 16)
 {
-  CONSTRUCT_IBASE (iParent);
-  CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
-  CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+  SCF_CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
   engine_mode = CS_ENGINE_AUTODETECT;
   first_dyn_lights = NULL;
   System = NULL;
@@ -389,7 +389,7 @@ csEngine::csEngine (iBase *iParent) : camera_positions (16, 16)
   cbufcube = NULL;
   current_camera = NULL;
   current_engine = this;
-  current_iengine = QUERY_INTERFACE (this, iEngine);
+  current_iengine = SCF_QUERY_INTERFACE (this, iEngine);
   current_iengine->DecRef ();
   use_pvs = false;
   use_pvs_only = false;
@@ -452,18 +452,18 @@ bool csEngine::Initialize (iSystem* sys)
 
   System = sys;
 
-  if (!(G3D = QUERY_PLUGIN_ID (sys, CS_FUNCID_VIDEO, iGraphics3D)))
+  if (!(G3D = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_VIDEO, iGraphics3D)))
     return false;
 
-  if (!(VFS = QUERY_PLUGIN_ID (sys, CS_FUNCID_VFS, iVFS)))
+  if (!(VFS = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_VFS, iVFS)))
     return false;
 
   G2D = G3D->GetDriver2D ();
 
   // don't check for failure; the engine can work without the image loader
-  ImageLoader = QUERY_PLUGIN_ID (sys, CS_FUNCID_IMGLOADER, iImageIO);
+  ImageLoader = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_IMGLOADER, iImageIO);
   if (!ImageLoader)
-    CsPrintf (MSG_WARNING, "No image loader. Loading images will fail.\n");
+    CsPrintf (CS_MSG_WARNING, "No image loader. Loading images will fail.\n");
 
   // Tell system driver that we want to handle broadcast events
   if (!System->CallOnEvents (this, CSMASK_Broadcast))
@@ -704,12 +704,12 @@ void csEngine::ResolveEngineMode ()
     if (switch_f2b >= 10)
     {
       engine_mode = CS_ENGINE_FRONT2BACK;
-      CsPrintf (MSG_CONSOLE, "Engine is using front2back mode\n");
+      CsPrintf (CS_MSG_CONSOLE, "Engine is using front2back mode\n");
     }
     else
     {
       engine_mode = CS_ENGINE_BACK2FRONT;
-      CsPrintf (MSG_CONSOLE, "Engine is using back2front mode\n");
+      CsPrintf (CS_MSG_CONSOLE, "Engine is using back2front mode\n");
     }
   }
 }
@@ -884,17 +884,17 @@ void csEngine::ShineLights (csRegion* region)
         current.radiosity, current.cosinus_factor,
         current.lightmap_size);
       VFS->WriteFile ("precalc_info", data, strlen (data));
-      CsPrintf (MSG_INITIALIZATION, "Lightmap data is not up to date (reason: %s).\n", reason);
+      CsPrintf (CS_MSG_INITIALIZATION, "Lightmap data is not up to date (reason: %s).\n", reason);
       do_force_relight = true;
     }
   }
 
   if (do_force_relight)
   {
-    CsPrintf (MSG_INITIALIZATION, "Recalculation of lightmaps forced.\n");
-    CsPrintf (MSG_INITIALIZATION, "  Pseudo-radiosity system %s.\n",
+    CsPrintf (CS_MSG_INITIALIZATION, "Recalculation of lightmaps forced.\n");
+    CsPrintf (CS_MSG_INITIALIZATION, "  Pseudo-radiosity system %s.\n",
       csSector::do_radiosity ? "enabled" : "disabled");
-    CsPrintf (MSG_INITIALIZATION,
+    CsPrintf (CS_MSG_INITIALIZATION,
       "  Maximum number of visits per sector = %d.\n",
       csSector::cfg_reflections);
   }
@@ -924,7 +924,7 @@ void csEngine::ShineLights (csRegion* region)
 
   if (do_relight)
   {
-    CsPrintf (MSG_INITIALIZATION, "Initializing lighting (%d meshes):\n  ",
+    CsPrintf (CS_MSG_INITIALIZATION, "Initializing lighting (%d meshes):\n  ",
       num_meshes);
     meter.SetTotal (num_meshes);
     meter.Restart ();
@@ -934,7 +934,7 @@ void csEngine::ShineLights (csRegion* region)
     csMeshWrapper* s = (csMeshWrapper*)meshes[sn];
     if (!region || region->IsInRegion (s))
     {
-      iLightingInfo* linfo = QUERY_INTERFACE (s->GetMeshObject (),
+      iLightingInfo* linfo = SCF_QUERY_INTERFACE (s->GetMeshObject (),
       	iLightingInfo);
       if (linfo)
       {
@@ -952,7 +952,7 @@ void csEngine::ShineLights (csRegion* region)
   start = System->GetTime ();
   if (do_relight)
   {
-    CsPrintf (MSG_INITIALIZATION, "\nShining lights (%d lights):\n  ",
+    CsPrintf (CS_MSG_INITIALIZATION, "\nShining lights (%d lights):\n  ",
       light_count);
     meter.SetTotal (light_count);
     meter.Restart ();
@@ -965,7 +965,7 @@ void csEngine::ShineLights (csRegion* region)
   }
   stop = System->GetTime ();
   if (do_relight)
-    CsPrintf (MSG_INITIALIZATION, "\n(%.4f seconds)",
+    CsPrintf (CS_MSG_INITIALIZATION, "\n(%.4f seconds)",
       (float)(stop-start)/1000.);
 
   // Render radiosity
@@ -984,13 +984,13 @@ void csEngine::ShineLights (csRegion* region)
     }
     stop = System->GetTime ();
     if (do_relight)
-      CsPrintf (MSG_INITIALIZATION, "(%.4f seconds)",
+      CsPrintf (CS_MSG_INITIALIZATION, "(%.4f seconds)",
       	(float)(stop-start)/1000.);
   }
 
   if (do_relight)
   {
-    CsPrintf (MSG_INITIALIZATION, "\nCaching lighting (%d meshes):\n  ",
+    CsPrintf (CS_MSG_INITIALIZATION, "\nCaching lighting (%d meshes):\n  ",
     	num_meshes);
     meter.SetTotal (num_meshes);
     meter.Restart ();
@@ -1000,7 +1000,7 @@ void csEngine::ShineLights (csRegion* region)
     csMeshWrapper* s = (csMeshWrapper*)meshes[sn];
     if (!region || region->IsInRegion (s))
     {
-      iLightingInfo* linfo = QUERY_INTERFACE (s->GetMeshObject (),
+      iLightingInfo* linfo = SCF_QUERY_INTERFACE (s->GetMeshObject (),
       	iLightingInfo);
       if (linfo)
       {
@@ -1016,11 +1016,11 @@ void csEngine::ShineLights (csRegion* region)
   csThing::current_light_frame_number++;
 
   if (do_relight)
-    CsPrintf (MSG_INITIALIZATION, "\nUpdating VFS...\n");
+    CsPrintf (CS_MSG_INITIALIZATION, "\nUpdating VFS...\n");
   if (!VFS->Sync ())
-    CsPrintf (MSG_WARNING, "WARNING: error updating lighttable cache!\n");
+    CsPrintf (CS_MSG_WARNING, "WARNING: error updating lighttable cache!\n");
   if (do_relight)
-    CsPrintf (MSG_INITIALIZATION, "DONE!\n");
+    CsPrintf (CS_MSG_INITIALIZATION, "DONE!\n");
 
   delete lit;
 }
@@ -1050,14 +1050,14 @@ bool csEngine::CheckConsistency ()
 
   csPolygon3D* p;
 
-  CsPrintf (MSG_INITIALIZATION, "Validating world...\n");
+  CsPrintf (CS_MSG_INITIALIZATION, "Validating world...\n");
   pit->Restart ();
   while ((p = pit->Fetch ()) != NULL)
   {
     if (p->GetVertexCount () < 3)
     {
-      CsPrintf (MSG_WARNING, "  Polygon with only %d vertices! (id=%d)\n", p->GetVertexCount (), p->GetID ());
-      CsPrintf (MSG_DEBUG_0, "============ Polygon with only %d vertices (id=%d)!\n", p->GetVertexCount (), p->GetID ());
+      CsPrintf (CS_MSG_WARNING, "  Polygon with only %d vertices! (id=%d)\n", p->GetVertexCount (), p->GetID ());
+      CsPrintf (CS_MSG_DEBUG_0, "============ Polygon with only %d vertices (id=%d)!\n", p->GetVertexCount (), p->GetID ());
       //Dumper::dump (p);
       error = true;
     }
@@ -1084,8 +1084,8 @@ bool csEngine::CheckConsistency ()
         {
           if (ABS (pl.Classify (p->Vobj (i))) > EPSILON)
 	  {
-            CsPrintf (MSG_WARNING, "  Non-coplanar polygon! (id=%d)\n", p->GetID ());
-            CsPrintf (MSG_DEBUG_0, "============ Non-coplanar polygon (id=%d)!\n", p->GetID ());
+            CsPrintf (CS_MSG_WARNING, "  Non-coplanar polygon! (id=%d)\n", p->GetID ());
+            CsPrintf (CS_MSG_DEBUG_0, "============ Non-coplanar polygon (id=%d)!\n", p->GetID ());
             //Dumper::dump (p);
             error = true;
 	    break;
@@ -1096,7 +1096,7 @@ bool csEngine::CheckConsistency ()
   }
 
   delete pit;
-  CsPrintf (MSG_INITIALIZATION, "DONE\n");
+  CsPrintf (CS_MSG_INITIALIZATION, "DONE\n");
   return error;
 #endif
   return false;
@@ -1433,13 +1433,13 @@ struct LightAndDist
 class csLightArray : public iBase
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   
   LightAndDist* array;
   // Size is the physical size of the array. num_lights is the number of lights in it.
   int size, num_lights;
 
-  csLightArray () : array (NULL), size (0), num_lights (0) { CONSTRUCT_IBASE(NULL); }
+  csLightArray () : array (NULL), size (0), num_lights (0) { SCF_CONSTRUCT_IBASE(NULL); }
   virtual ~csLightArray () { delete [] array; }
   void Reset () { num_lights = 0; }
   void AddLight (iLight* l, float sqdist)
@@ -1462,9 +1462,9 @@ public:
   iLight* GetLight (int i) { return array[i].light; }
 };
 
-IMPLEMENT_IBASE(csLightArray)
- IMPLEMENTS_INTERFACE (iBase)
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csLightArray)
+ SCF_IMPLEMENTS_INTERFACE (iBase)
+SCF_IMPLEMENT_IBASE_END;
 
 int compare_light (const void* p1, const void* p2)
 {
@@ -1511,7 +1511,7 @@ int csEngine::GetNearbyLights (csSector* sector, const csVector3& pos, ULong fla
         sqdist = csSquaredDist::PointPoint (pos, dl->GetCenter ());
         if (sqdist < dl->GetSquaredRadius ())
 	{
-	  iLight* il = QUERY_INTERFACE (dl, iLight);
+	  iLight* il = SCF_QUERY_INTERFACE (dl, iLight);
 	  light_array->AddLight (il, sqdist);
 	  il->DecRef ();
 	}
@@ -1529,7 +1529,7 @@ int csEngine::GetNearbyLights (csSector* sector, const csVector3& pos, ULong fla
       sqdist = csSquaredDist::PointPoint (pos, sl->GetCenter ());
       if (sqdist < sl->GetSquaredRadius ())
       {
-	iLight* il = QUERY_INTERFACE (sl, iLight);
+	iLight* il = SCF_QUERY_INTERFACE (sl, iLight);
         light_array->AddLight (il, sqdist);
 	il->DecRef ();
       }
@@ -1638,7 +1638,7 @@ bool csEngine::DeleteLibrary (const char *iName)
     for (iObjectIterator *iter = lib->GetIterator ();		\
          !iter->IsFinished (); iter->Next ())			\
     {								\
-      type *x = QUERY_INTERFACE_FAST (iter->GetObject (), type);\
+      type *x = SCF_QUERY_INTERFACE_FAST (iter->GetObject (), type);\
       int idx = vector.Find (x);				\
       if (idx >= 0) vector.Delete (idx);			\
       /* x->DecRef (); */					\
@@ -1658,7 +1658,7 @@ bool csEngine::DeleteLibrary (const char *iName)
   for (iObjectIterator *iter = lib->GetIterator ();		\
        !iter->IsFinished (); iter->Next ())			\
   {								\
-    type *x = QUERY_INTERFACE_FAST (iter->GetObject (), type);	\
+    type *x = SCF_QUERY_INTERFACE_FAST (iter->GetObject (), type);	\
     int idx = vector.Find (x);					\
     if (idx >= 0) { x->DecRef (); vector [idx] = 0; }		\
     x->DecRef ();						\
@@ -1695,7 +1695,7 @@ iTextureWrapper* csEngine::CreateTexture (const char *iName, const char *iFileNa
   if (!data || !data->GetSize ())
   {
     if (data) data->DecRef ();
-    CsPrintf (MSG_WARNING, "Cannot read image file \"%s\" from VFS\n",
+    CsPrintf (CS_MSG_WARNING, "Cannot read image file \"%s\" from VFS\n",
       iFileName);
     return NULL;
   }
@@ -1706,7 +1706,7 @@ iTextureWrapper* csEngine::CreateTexture (const char *iName, const char *iFileNa
 
   if (!ifile)
   {
-    CsPrintf (MSG_WARNING, "Unknown image file format: \"%s\"\n", iFileName);
+    CsPrintf (CS_MSG_WARNING, "Unknown image file format: \"%s\"\n", iFileName);
     return NULL;
   }
 
@@ -1780,7 +1780,7 @@ iMeshWrapper* csEngine::CreateSectorWallsMesh (csSector* sector,
 {
   iMeshObjectType* thing_type = GetThingType ();
   iMeshObjectFactory* thing_fact = thing_type->NewFactory ();
-  iMeshObject* thing_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
+  iMeshObject* thing_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
 
   csMeshWrapper* thing_wrap = new csMeshWrapper (&scfiObject, thing_obj);
@@ -1794,7 +1794,7 @@ iMeshWrapper* csEngine::CreateSectorWallsMesh (csSector* sector,
   thing_wrap->SetZBufMode (CS_ZBUF_FILL);
   thing_wrap->SetRenderPriority (GetWallRenderPriority ());
 
-  iMeshWrapper* mesh_wrap = QUERY_INTERFACE (thing_wrap, iMeshWrapper);
+  iMeshWrapper* mesh_wrap = SCF_QUERY_INTERFACE (thing_wrap, iMeshWrapper);
   mesh_wrap->DecRef ();
   return mesh_wrap;
 }
@@ -1808,7 +1808,7 @@ iMeshWrapper* csEngine::CreateSectorWallsMesh (iSector* sector,
 iSector* csEngine::CreateSector (const char *iName, bool link)
 {
   csSector* sector = CreateCsSector (iName, link);
-  iSector *s = QUERY_INTERFACE (sector, iSector);
+  iSector *s = SCF_QUERY_INTERFACE (sector, iSector);
   s->DecRef ();
   return s;
 }
@@ -1862,7 +1862,7 @@ iMeshWrapper *csEngine::FindMeshObject (const char *iName, bool regionOnly)
   else
     mesh = (csMeshWrapper*)meshes.FindByName (iName);
   if (!mesh) return NULL;
-  iMeshWrapper* imesh = QUERY_INTERFACE (mesh, iMeshWrapper);
+  iMeshWrapper* imesh = SCF_QUERY_INTERFACE (mesh, iMeshWrapper);
   imesh->DecRef ();
   return imesh;
 }
@@ -1892,7 +1892,7 @@ iTerrainWrapper *csEngine::FindTerrainObject (const char *iName,
   if (!pTerrain)
     return NULL;
 
-  iTerrainWrapper* iTerrain = QUERY_INTERFACE( pTerrain, iTerrainWrapper );
+  iTerrainWrapper* iTerrain = SCF_QUERY_INTERFACE( pTerrain, iTerrainWrapper );
   iTerrain->DecRef ();
   return iTerrain;
 }
@@ -1915,7 +1915,7 @@ iMaterial* csEngine::CreateBaseMaterial (iTextureWrapper* txt)
 {
   csMaterial* mat = new csMaterial ();
   if (txt) mat->SetTextureWrapper (txt);
-  iMaterial* imat = QUERY_INTERFACE (mat, iMaterial);
+  iMaterial* imat = SCF_QUERY_INTERFACE (mat, iMaterial);
   imat->DecRef ();
   return imat;
 }
@@ -1931,7 +1931,7 @@ iMaterial* csEngine::CreateBaseMaterial (iTextureWrapper* txt,
     mat->AddTextureLayer (wrappers[i], layers[i].mode,
     	layers[i].uscale, layers[i].vscale, layers[i].ushift, layers[i].vshift);
   }
-  iMaterial* imat = QUERY_INTERFACE (mat, iMaterial);
+  iMaterial* imat = SCF_QUERY_INTERFACE (mat, iMaterial);
   imat->DecRef ();
   return imat;
 }
@@ -2032,7 +2032,7 @@ iCollection* csEngine::CreateCollection (const char* iName)
 iView* csEngine::CreateView (iGraphics3D* g3d)
 {
   csView* view = new csView (this, g3d);
-  iView* iview = QUERY_INTERFACE (view, iView);
+  iView* iview = SCF_QUERY_INTERFACE (view, iView);
   iview->DecRef ();
   return iview;
 }
@@ -2044,7 +2044,7 @@ iStatLight* csEngine::CreateLight (const char* name,
   csStatLight* light = new csStatLight (pos.x, pos.y, pos.z, radius,
   	color.red, color.green, color.blue, pseudoDyn);
   if (name) light->SetName (name);
-  iStatLight* il = QUERY_INTERFACE (light, iStatLight);
+  iStatLight* il = SCF_QUERY_INTERFACE (light, iStatLight);
   il->DecRef ();
   return il;
 }
@@ -2055,7 +2055,7 @@ iDynLight* csEngine::CreateDynLight (const csVector3& pos, float radius,
   csDynLight* light = new csDynLight (pos.x, pos.y, pos.z, radius,
   	color.red, color.green, color.blue);
   AddDynLight (light);
-  iDynLight* il = QUERY_INTERFACE (light, iDynLight);
+  iDynLight* il = SCF_QUERY_INTERFACE (light, iDynLight);
   il->DecRef ();
   return il;
 }
@@ -2074,9 +2074,9 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* classId,
     if (factwrap != NULL) return factwrap;
   }
 
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, classId, "MeshObj",
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (System, classId, "MeshObj",
   	iMeshObjectType);
-  if (!type) type = LOAD_PLUGIN (System, classId, "MeshObj", iMeshObjectType);
+  if (!type) type = CS_LOAD_PLUGIN (System, classId, "MeshObj", iMeshObjectType);
   if (!type) return NULL;
   iMeshObjectFactory* fact = type->NewFactory ();
   if (!fact) return NULL;
@@ -2148,10 +2148,10 @@ iMeshFactoryWrapper* csEngine::LoadMeshFactory (
 	const char* loaderClassId,
 	iDataBuffer* input)
 {
-  iLoaderPlugIn* plug = QUERY_PLUGIN_CLASS (System, loaderClassId, "MeshLdr",
+  iLoaderPlugIn* plug = CS_QUERY_PLUGIN_CLASS (System, loaderClassId, "MeshLdr",
   	iLoaderPlugIn);
   if (!plug)
-    plug = LOAD_PLUGIN (System, loaderClassId, "MeshLdr", iLoaderPlugIn);
+    plug = CS_LOAD_PLUGIN (System, loaderClassId, "MeshLdr", iLoaderPlugIn);
   if (!plug)
     return NULL;
 
@@ -2171,10 +2171,10 @@ iMeshWrapper* csEngine::LoadMeshObject (
 	const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos)
 {
-  iLoaderPlugIn* plug = QUERY_PLUGIN_CLASS (System, loaderClassId, "MeshLdr",
+  iLoaderPlugIn* plug = CS_QUERY_PLUGIN_CLASS (System, loaderClassId, "MeshLdr",
   	iLoaderPlugIn);
   if (!plug)
-    plug = LOAD_PLUGIN (System, loaderClassId, "MeshLdr", iLoaderPlugIn);
+    plug = CS_LOAD_PLUGIN (System, loaderClassId, "MeshLdr", iLoaderPlugIn);
   if (!plug)
     return NULL;
 
@@ -2188,7 +2188,7 @@ iMeshWrapper* csEngine::LoadMeshObject (
     meshwrap->GetMovable ().SetPosition (pos);
     meshwrap->GetMovable ().UpdateMove ();
   }
-  iMeshWrapper* imw = QUERY_INTERFACE (meshwrap, iMeshWrapper);
+  iMeshWrapper* imw = SCF_QUERY_INTERFACE (meshwrap, iMeshWrapper);
   imw->DecRef ();
 
   char* buf = **input;
@@ -2265,9 +2265,9 @@ iTerrainFactoryWrapper* csEngine::CreateTerrainFactory (const char* pClassId,
       return iFactWrap;
   }
   
-  iTerrainObjectType *iType = QUERY_PLUGIN_CLASS (System, pClassId, "TerrainObj", iTerrainObjectType );
+  iTerrainObjectType *iType = CS_QUERY_PLUGIN_CLASS (System, pClassId, "TerrainObj", iTerrainObjectType );
   if( !iType )
-    iType = LOAD_PLUGIN( System, pClassId, "TerrainObj", iTerrainObjectType );
+    iType = CS_LOAD_PLUGIN( System, pClassId, "TerrainObj", iTerrainObjectType );
   if( !iType )
     return NULL;
 
@@ -2374,7 +2374,7 @@ iCurveTemplate* csEngine::CreateBezierTemplate (const char* name)
   csBezierTemplate* ptemplate = new csBezierTemplate ();
   if (name) ptemplate->SetName (name);
   curve_templates.Push (ptemplate);
-  iCurveTemplate* itmpl = QUERY_INTERFACE (ptemplate, iCurveTemplate);
+  iCurveTemplate* itmpl = SCF_QUERY_INTERFACE (ptemplate, iCurveTemplate);
   itmpl->DecRef ();
   return itmpl;
 }
@@ -2388,7 +2388,7 @@ iCurveTemplate* csEngine::FindCurveTemplate (const char *iName,
   else
     pl = (csCurveTemplate*)curve_templates.FindByName (iName);
   if (!pl) return NULL;
-  iCurveTemplate* itmpl = QUERY_INTERFACE (pl, iCurveTemplate);
+  iCurveTemplate* itmpl = SCF_QUERY_INTERFACE (pl, iCurveTemplate);
   itmpl->DecRef ();
   return itmpl;
 }
@@ -2519,7 +2519,7 @@ iClipper2D* csEngine::GetTopLevelClipper () const
 iMapNode* csEngine::CreateMapNode (const char* name)
 {
   csMapNode* mn = new csMapNode (name);
-  iMapNode* imn = QUERY_INTERFACE (mn, iMapNode);
+  iMapNode* imn = SCF_QUERY_INTERFACE (mn, iMapNode);
   imn->DecRef ();
   return imn;
 }

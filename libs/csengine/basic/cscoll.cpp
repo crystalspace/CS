@@ -22,20 +22,20 @@
 #include "csengine/engine.h"
 #include "csengine/sector.h"
 
-IMPLEMENT_IBASE (csCollection)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iCollection)
-  IMPLEMENTS_INTERFACE (csCollection)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csCollection)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iCollection)
+  SCF_IMPLEMENTS_INTERFACE (csCollection)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csCollection::Collection)
-  IMPLEMENTS_INTERFACE (iCollection)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csCollection::Collection)
+  SCF_IMPLEMENTS_INTERFACE (iCollection)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csCollection::csCollection (csEngine* engine) :
   csObject(), objects (8,8), movable ()
 {
-  CONSTRUCT_IBASE(NULL);
-  CONSTRUCT_EMBEDDED_IBASE(scfiCollection);
+  SCF_CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiCollection);
 
   movable.SetObject (this);
   csCollection::engine = engine;

@@ -39,7 +39,7 @@ static class csSCF *PrivateSCF = NULL;
 class csSCF : public iSCF
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// The global table of all known interface names
   csStringSet InterfaceRegistry;
@@ -185,7 +185,7 @@ int scfLibraryVector::CompareKey (csSome Item, csConstSome Key, int) const
 class scfFactory : public iFactory
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   // Class identifier
   char *ClassID;
@@ -239,7 +239,7 @@ public:
 scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   const char *iDepend)
 {
-  // Don't use CONSTRUCT_IBASE (NULL) since it will call IncRef()
+  // Don't use SCF_CONSTRUCT_IBASE (NULL) since it will call IncRef()
   scfRefCount = 0; scfParent = NULL;
   ClassID = csStrNew (iClassID);
   ClassInfo = NULL;
@@ -256,7 +256,7 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
 
 scfFactory::scfFactory (const scfClassInfo *iClassInfo)
 {
-  // Don't use CONSTRUCT_IBASE (NULL) since it will call IncRef()
+  // Don't use SCF_CONSTRUCT_IBASE (NULL) since it will call IncRef()
   scfRefCount = 0; scfParent = NULL;
   ClassID = csStrNew (iClassInfo->ClassID);
   ClassInfo = iClassInfo;
@@ -333,7 +333,7 @@ int scfFactory::GetRefCount ()
 
 void *scfFactory::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)
 {
-  IMPLEMENTS_INTERFACE (iFactory);
+  SCF_IMPLEMENTS_INTERFACE (iFactory);
   return NULL;
 }
 
@@ -381,9 +381,9 @@ const char *scfFactory::QueryClassID ()
 
 //------------------------------------ Implementation of csSCF functions ----//
 
-IMPLEMENT_IBASE (csSCF);
-  IMPLEMENTS_INTERFACE (iSCF);
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE (csSCF);
+  SCF_IMPLEMENTS_INTERFACE (iSCF);
+SCF_IMPLEMENT_IBASE_END;
 
 void scfInitialize (iConfigFile *iConfig)
 {
@@ -586,5 +586,5 @@ iStrVector* csSCF::QueryClassList (char const* pattern)
         v->Push(csStrNew(s));
     }
   }
-  return QUERY_INTERFACE(v, iStrVector);
+  return SCF_QUERY_INTERFACE(v, iStrVector);
 }

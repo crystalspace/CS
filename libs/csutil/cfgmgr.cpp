@@ -75,7 +75,7 @@ private:
   char *Subsection;
   csHashMap Iterated;
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   void ClearIterated() {
     csHashIterator it (&Iterated);
@@ -101,7 +101,7 @@ public:
   }
 
   csConfigManagerIterator(csConfigManager *cfg, const char *sub) {
-    CONSTRUCT_IBASE(NULL);
+    SCF_CONSTRUCT_IBASE(NULL);
     Config = cfg;
     Config->IncRef();
     CurrentDomain = Config->LastDomain;
@@ -166,20 +166,20 @@ public:
   }
 };
 
-IMPLEMENT_IBASE(csConfigManagerIterator);
-  IMPLEMENTS_INTERFACE(iConfigIterator);
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csConfigManagerIterator);
+  SCF_IMPLEMENTS_INTERFACE(iConfigIterator);
+SCF_IMPLEMENT_IBASE_END;
 
 /* config manager object */
 
-IMPLEMENT_IBASE(csConfigManager);
-  IMPLEMENTS_INTERFACE(iConfigManager);
-  IMPLEMENTS_INTERFACE(iConfigFile);
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csConfigManager);
+  SCF_IMPLEMENTS_INTERFACE(iConfigManager);
+  SCF_IMPLEMENTS_INTERFACE(iConfigFile);
+SCF_IMPLEMENT_IBASE_END;
 
 csConfigManager::csConfigManager(iConfigFile *dyn, bool opt)
 {
-  CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_IBASE(NULL);
   Optimize = opt;
   FirstDomain = new csConfigDomain(NULL, PriorityMin);
   LastDomain = new csConfigDomain(NULL, PriorityMax);

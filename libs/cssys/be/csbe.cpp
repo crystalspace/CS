@@ -31,9 +31,9 @@
 #include "cssys/be/csbe.h"
 #include "csutil/util.h"
 
-IMPLEMENT_IBASE_EXT(SysSystemDriver)
-  IMPLEMENTS_INTERFACE(iEventPlug)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT(SysSystemDriver)
+  SCF_IMPLEMENTS_INTERFACE(iEventPlug)
+SCF_IMPLEMENT_IBASE_EXT_END
 
 //-----------------------------------------------------------------------------
 // Locally defined BMessage types passed from BeOS thread to Crystal Space
@@ -383,7 +383,7 @@ void SysSystemDriver::DispatchMessage(BMessage* m)
       DoContextClose(m);
       break;
     default:
-      Printf(MSG_WARNING,
+      Printf(CS_MSG_WARNING,
         "DispatchUserAction(): Unrecognized message (%lu)\n", m->what);
       m->PrintToStream();
       break;

@@ -454,7 +454,7 @@ void cspFileDialog::Reread ()
   if (!(dh = opendir (path)))
   {
     csMessageBox (app, "Error", "Invalid directory");
-    app->System->Printf (MSG_INITIALIZATION, "Invalid directory path\n");
+    app->System->Printf (CS_MSG_INITIALIZATION, "Invalid directory path\n");
   }
   else
   {

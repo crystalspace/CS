@@ -473,7 +473,7 @@ void csBspTree::Statistics ()
   int min_poly_in_node;
   Statistics (&num_nodes, &num_leaves, &max_depth, &tot_polygons, &max_poly_in_node,
   	&min_poly_in_node);
-  CsPrintf (MSG_INITIALIZATION, "  nodes=%d leaves=%d max_depth=%d poly:tot=%d,max=%d,min=%d)\n",
+  CsPrintf (CS_MSG_INITIALIZATION, "  nodes=%d leaves=%d max_depth=%d poly:tot=%d,max=%d,min=%d)\n",
   	num_nodes, num_leaves, max_depth, tot_polygons,
 	max_poly_in_node, min_poly_in_node);
 }
@@ -562,7 +562,7 @@ bool csBspTree::ReadFromCache (iFile* cf, csBspNode* node,
       node->AddPolygon (polygons[i]);
     if (check_num_polygons != num)
     {
-      CsPrintf (MSG_WARNING, "Bsp does not match with loaded level (1)!\n");
+      CsPrintf (CS_MSG_WARNING, "Bsp does not match with loaded level (1)!\n");
       return false;
     }
     return true;
@@ -602,7 +602,7 @@ bool csBspTree::ReadFromCache (iFile* cf, csBspNode* node,
 
   if (check_num_polygons != node->polygons.GetPolygonCount ())
   {
-    CsPrintf (MSG_WARNING, "Bsp does not match with loaded level (2)!\n");
+    CsPrintf (CS_MSG_WARNING, "Bsp does not match with loaded level (2)!\n");
     return false;
   }
 

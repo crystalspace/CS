@@ -57,37 +57,37 @@ static DECLARE_GROWING_ARRAY_REF (VectorArray, csVector3);
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csPolyTexType)
-  IMPLEMENTS_INTERFACE (iPolyTexType)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csPolyTexType)
+  SCF_IMPLEMENTS_INTERFACE (iPolyTexType)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE_EXT (csPolyTexFlat)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iPolyTexFlat)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csPolyTexFlat)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolyTexFlat)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csPolyTexFlat::eiPolyTexFlat)
-  IMPLEMENTS_INTERFACE (iPolyTexFlat)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csPolyTexFlat::eiPolyTexFlat)
+  SCF_IMPLEMENTS_INTERFACE (iPolyTexFlat)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_IBASE_EXT (csPolyTexGouraud)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iPolyTexGouraud)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csPolyTexGouraud)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolyTexGouraud)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csPolyTexGouraud::eiPolyTexGouraud)
-  IMPLEMENTS_INTERFACE (iPolyTexGouraud)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csPolyTexGouraud::eiPolyTexGouraud)
+  SCF_IMPLEMENTS_INTERFACE (iPolyTexGouraud)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_IBASE_EXT (csPolyTexLightMap)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iPolyTexLightMap)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csPolyTexLightMap)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolyTexLightMap)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csPolyTexLightMap::eiPolyTexLightMap)
-  IMPLEMENTS_INTERFACE (iPolyTexLightMap)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csPolyTexLightMap::eiPolyTexLightMap)
+  SCF_IMPLEMENTS_INTERFACE (iPolyTexLightMap)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csPolyTexType::csPolyTexType ()
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   Alpha = 0;
   MixMode = CS_FX_COPY;
 }
@@ -98,7 +98,7 @@ csPolyTexType::~csPolyTexType ()
 
 csPolyTexLightMap::csPolyTexLightMap () : csPolyTexType ()
 {
-  CONSTRUCT_EMBEDDED_IBASE(scfiPolyTexLightMap);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPolyTexLightMap);
   txt_plane = NULL;
   tex = new csPolyTexture ();
   lightmap_up_to_date = false;
@@ -253,18 +253,18 @@ void csPolyTexGouraud::SetDynamicColor (int i, float r, float g, float b)
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE_EXT (csPolygon3D)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iPolygon3D)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csPolygon3D)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolygon3D)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csPolygon3D::eiPolygon3D)
-  IMPLEMENTS_INTERFACE (iPolygon3D)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csPolygon3D::eiPolygon3D)
+  SCF_IMPLEMENTS_INTERFACE (iPolygon3D)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csPolygon3D::csPolygon3D (csMaterialWrapper* material) : csPolygonInt (),
   csObject (), vertices (4)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
   polygon_id = 0;
 
   if (material) SetMaterial (material);
@@ -299,7 +299,7 @@ csPolygon3D::csPolygon3D (csMaterialWrapper* material) : csPolygonInt (),
 csPolygon3D::csPolygon3D (csPolygon3D& poly) : csPolygonInt (),
   csObject (), vertices (4)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
 
   const char* tname = poly.GetName ();
   if (tname) SetName (tname);
@@ -585,7 +585,7 @@ iPolyTexType* csPolygon3D::eiPolygon3D::GetPolyTexType ()
 
 iThingState* csPolygon3D::eiPolygon3D::GetParent ()
 {
-  iThingState* it = QUERY_INTERFACE (scfParent->GetParent (), iThingState);
+  iThingState* it = SCF_QUERY_INTERFACE (scfParent->GetParent (), iThingState);
   it->DecRef ();
   return it;
 }
@@ -764,7 +764,7 @@ void csPolygon3D::Finish ()
   csPolyTexLightMap *lmi = GetLightMapInfo ();
   if (!lmi)
   {
-    CsPrintf (MSG_INTERNAL_ERROR, "No txt_info in polygon!\n");
+    CsPrintf (CS_MSG_INTERNAL_ERROR, "No txt_info in polygon!\n");
     fatal_exit (0, false);
   }
   lmi->Setup (this, material);
@@ -995,13 +995,13 @@ int csPolygon3D::AddVertex (int v)
 {
   if (v >= thing->GetVertexCount ())
   {
-    CsPrintf (MSG_FATAL_ERROR, "Index number %d is too high for a polygon (max=%d)!\n",
+    CsPrintf (CS_MSG_FATAL_ERROR, "Index number %d is too high for a polygon (max=%d)!\n",
     	v, thing->GetVertexCount ());
     fatal_exit (0, false);
   }
   if (v < 0)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Bad negative vertex index %d!\n", v);
+    CsPrintf (CS_MSG_FATAL_ERROR, "Bad negative vertex index %d!\n", v);
     fatal_exit (0, false);
   }
   vertices.AddVertex (v);
@@ -1723,7 +1723,7 @@ void csPolygon3D::FillLightMap (csFrustumView& lview)
       // We are working for a vertex lighted polygon.
       csColor& col = linfo.GetColor ();
       csLight* l = (csLight*)lview.GetUserData ();
-      iLight* il = QUERY_INTERFACE (l, iLight);
+      iLight* il = SCF_QUERY_INTERFACE (l, iLight);
       UpdateVertexLighting (il, col, false, ctxt->IsFirstTime ());
       il->DecRef ();
       return;

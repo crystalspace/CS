@@ -60,11 +60,11 @@ void csGraphicsPipeline::Initialize (iSystem *System)
   MaxPage = 0;
   DrawMode = 0;
   memset (SyncArea, 0, sizeof (SyncArea));
-  G3D = QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
+  G3D = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
   if (G3D)
     (G2D = G3D->GetDriver2D ())->IncRef ();
   else
-    G2D = QUERY_PLUGIN_ID (System, CS_FUNCID_CANVAS, iGraphics2D);
+    G2D = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_CANVAS, iGraphics2D);
   RefreshRect.Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
   CanvasResize ();
 }

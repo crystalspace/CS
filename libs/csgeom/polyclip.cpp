@@ -28,13 +28,13 @@
 
 csPoly2DPool csClipper::polypool (csPoly2DFactory::SharedFactory ());
 
-IMPLEMENT_IBASE (csClipper)
-  IMPLEMENTS_INTERFACE (iClipper2D)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csClipper)
+  SCF_IMPLEMENTS_INTERFACE (iClipper2D)
+SCF_IMPLEMENT_IBASE_END
 
 csClipper::csClipper ()
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 UByte csClipper::ClipInPlace (csVector2 *InPolygon, int &InOutCount,

@@ -24,18 +24,18 @@
 #include "csparser/snddatao.h"
 #include "csutil/csobject.h"
 
-IMPLEMENT_IBASE (csSoundWrapper);
-  IMPLEMENTS_EMBEDDED_INTERFACE (iSoundWrapper);
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE (csSoundWrapper);
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSoundWrapper);
+SCF_IMPLEMENT_IBASE_END;
 
-IMPLEMENT_EMBEDDED_IBASE (csSoundWrapper::SoundWrapper)
-  IMPLEMENTS_INTERFACE (iSoundWrapper)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundWrapper::SoundWrapper)
+  SCF_IMPLEMENTS_INTERFACE (iSoundWrapper)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSoundWrapper::csSoundWrapper (iSoundHandle *buf) : csObject(), SoundHandle(buf)
 {
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiSoundWrapper);
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSoundWrapper);
 
   if (SoundHandle) SoundHandle->IncRef();
 }

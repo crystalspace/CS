@@ -22,9 +22,9 @@
 #include "csengine/polytext.h"
 #include "csengine/polygon.h"
 
-IMPLEMENT_EMBEDDED_IBASE (csEngineConfig)
-  IMPLEMENTS_INTERFACE (iConfig)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csEngineConfig)
+  SCF_IMPLEMENTS_INTERFACE (iConfig)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 static const csOptionDescription config_options [] =
 {

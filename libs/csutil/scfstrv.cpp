@@ -20,9 +20,9 @@
 #include "cssysdef.h"
 #include "csutil/scfstrv.h"
 
-IMPLEMENT_IBASE (scfStrVector)
-  IMPLEMENTS_INTERFACE (iStrVector)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (scfStrVector)
+  SCF_IMPLEMENTS_INTERFACE (iStrVector)
+SCF_IMPLEMENT_IBASE_END
 
 int scfStrVector::Length () const
 { return v.Length (); }

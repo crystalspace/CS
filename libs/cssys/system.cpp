@@ -169,7 +169,7 @@ bool csPluginList::Sort (csSystemDriver *iSys)
   // We'll use char for speed reasons
   if (len > 255)
   {
-    iSys->Printf (MSG_FATAL_ERROR, "PLUGIN LOADER: Too many plugins requested (%d, max 255)\n", len);
+    iSys->Printf (CS_MSG_FATAL_ERROR, "PLUGIN LOADER: Too many plugins requested (%d, max 255)\n", len);
     return false;
   }
 
@@ -248,10 +248,10 @@ bool csPluginList::RecurseSort (csSystemDriver *iSys, int row, char *order,
       char *already = strchr (loop, col + 1);
       if (already)
       {
-        iSys->Printf (MSG_FATAL_ERROR, "PLUGIN LOADER: Cyclic dependency detected!\n");
+        iSys->Printf (CS_MSG_FATAL_ERROR, "PLUGIN LOADER: Cyclic dependency detected!\n");
         int startx = int (already - loop);
         for (int x = startx; loop [x]; x++)
-          iSys->Printf (MSG_FATAL_ERROR, "   %s %s\n",
+          iSys->Printf (CS_MSG_FATAL_ERROR, "   %s %s\n",
             x == startx ? "+->" : loop [x + 1] ? "| |" : "<-+",
             Get (loop [x] - 1).ClassID);
         error = true;
@@ -279,14 +279,14 @@ bool csPluginList::RecurseSort (csSystemDriver *iSys, int row, char *order,
 
 //---------------------------------------------------- The System Driver -----//
 
-IMPLEMENT_IBASE (csSystemDriver)
-  IMPLEMENTS_INTERFACE (iSystem)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSystemDriver)
+  SCF_IMPLEMENTS_INTERFACE (iSystem)
+SCF_IMPLEMENT_IBASE_END
 
 csSystemDriver::csSystemDriver () : PlugIns (8, 8), EventQueue (),
   OptionList (16, 16), CommandLine (16, 16), CommandLineNames (16, 16)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
 
   Keyboard.SetSystemDriver (this);
   Mouse.SetSystemDriver    (this);
@@ -319,7 +319,7 @@ csSystemDriver::~csSystemDriver ()
 {
   Close ();
 
-  Printf (MSG_DEBUG_0F, "*** System driver is going to shut down now!\n");
+  Printf (CS_MSG_DEBUG_0F, "*** System driver is going to shut down now!\n");
 
   // Free all plugin options (also decrefs their iConfig interfaces)
   OptionList.DeleteAll ();
@@ -350,7 +350,7 @@ csSystemDriver::~csSystemDriver ()
 bool csSystemDriver::Initialize (int argc, const char* const argv[],
   const char *iConfigName)
 {
-  Printf (MSG_DEBUG_0F, "*** Initializing system driver!\n");
+  Printf (CS_MSG_DEBUG_0F, "*** Initializing system driver!\n");
 
   // Initialize Shared Class Facility|
   char scfconfigpath [MAXPATHLEN + 1];
@@ -389,12 +389,12 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   Config = new csConfigManager(cfg, true);
   cfg->DecRef ();
   Config->SetDomainPriority(cfg, ConfigPriorityApplication);
-  VFS = LOAD_PLUGIN (this, "crystalspace.kernel.vfs", CS_FUNCID_VFS, iVFS);
+  VFS = CS_LOAD_PLUGIN (this, "crystalspace.kernel.vfs", CS_FUNCID_VFS, iVFS);
 
   // Initialize application configuration file
   if (iConfigName)
     if (!cfg->Load (iConfigName, VFS))
-      Printf (MSG_WARNING,
+      Printf (CS_MSG_WARNING,
 	"WARNING: Failed to load configuration file `%s'\n", iConfigName);
 
   // look if the user-specific config domain should be used
@@ -434,7 +434,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
     // Alternate videodriver
     char temp [100];
     sprintf (temp, "crystalspace.graphics3d.%s", val);
-    Printf (MSG_INITIALIZATION, "Using alternative 3D driver: %s\n", temp);
+    Printf (CS_MSG_INITIALIZATION, "Using alternative 3D driver: %s\n", temp);
     PluginList.Push (new csPluginLoadRec (CS_FUNCID_VIDEO, temp));
     g3d_override = true;
   }
@@ -501,16 +501,16 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
 
   /// Now find the drivers that are known by the system driver
   if (!VFS)
-    VFS = QUERY_PLUGIN_ID (this, CS_FUNCID_VFS, iVFS);
-  G3D = QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
+    VFS = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VFS, iVFS);
+  G3D = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
   if (G3D)
     (G2D = G3D->GetDriver2D ())->IncRef ();
   else
-    G2D = QUERY_PLUGIN_ID (this, CS_FUNCID_CANVAS, iGraphics2D);
-  Sound = QUERY_PLUGIN_ID (this, CS_FUNCID_SOUND, iSoundRender);
-  NetDrv = QUERY_PLUGIN_ID (this, CS_FUNCID_NETDRV, iNetworkDriver);
-  Console = QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsoleOutput);
-  MotionMan = QUERY_PLUGIN_ID (this, CS_FUNCID_MOTION, iMotionManager);
+    G2D = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_CANVAS, iGraphics2D);
+  Sound = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_SOUND, iSoundRender);
+  NetDrv = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_NETDRV, iNetworkDriver);
+  Console = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsoleOutput);
+  MotionMan = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_MOTION, iMotionManager);
 
   // Check if the minimal required drivers are loaded
   if (!CheckDrivers ())
@@ -524,7 +524,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
 
 bool csSystemDriver::Open (const char *Title)
 {
-  Printf (MSG_DEBUG_0F, "*** Opening the drivers now!\n");
+  Printf (CS_MSG_DEBUG_0F, "*** Opening the drivers now!\n");
 
   if ((G3D && !G3D->Open (Title))
    || (!G3D && G2D && !G2D->Open (Title)))
@@ -547,7 +547,7 @@ bool csSystemDriver::Open (const char *Title)
 
 void csSystemDriver::Close ()
 {
-  Printf (MSG_DEBUG_0F, "*** Closing the drivers now!\n");
+  Printf (CS_MSG_DEBUG_0F, "*** Closing the drivers now!\n");
 
   // Warn all plugins the system is going down
   csEvent Event (GetTime (), csevBroadcast, cscmdSystemClose);
@@ -562,17 +562,17 @@ bool csSystemDriver::CheckDrivers ()
   bool rc = true;
   if (!VFS)
   {
-    Printf (MSG_FATAL_ERROR, "FATAL: No iVFS plug-in loaded!\n");
+    Printf (CS_MSG_FATAL_ERROR, "FATAL: No iVFS plug-in loaded!\n");
     rc = false;
   }
   if (!G3D)
   {
-    Printf (MSG_FATAL_ERROR, "FATAL: No iGraphics3D plug-in loaded!\n");
+    Printf (CS_MSG_FATAL_ERROR, "FATAL: No iGraphics3D plug-in loaded!\n");
     rc = false;
   }
   if (!G2D)
   {
-    Printf (MSG_FATAL_ERROR, "FATAL: No iGraphics2D plug-in loaded!\n");
+    Printf (CS_MSG_FATAL_ERROR, "FATAL: No iGraphics2D plug-in loaded!\n");
     rc = false;
   }
 
@@ -710,7 +710,7 @@ void csSystemDriver::SetSystemDefaults (iConfigManager *Config)
     int wres, hres;
     if (sscanf(val, "%dx%d", &wres, &hres) != 2)
     {
-      Printf (MSG_INITIALIZATION, "Mode %s unknown : assuming '-mode %dx%d'\n", val,
+      Printf (CS_MSG_INITIALIZATION, "Mode %s unknown : assuming '-mode %dx%d'\n", val,
         FrameWidth, FrameHeight);
     }
     else
@@ -729,7 +729,7 @@ void csSystemDriver::SetSystemDefaults (iConfigManager *Config)
     else if (!val [0] || !strcmp (val, "yes"))
       FullScreen = true;
     else
-      Printf (MSG_INITIALIZATION, "Unknown value `%s' for -fs switch: "
+      Printf (CS_MSG_INITIALIZATION, "Unknown value `%s' for -fs switch: "
         "`yes' or `no' expected\n", val);
 
   Mouse.SetDoubleClickTime (
@@ -775,7 +775,7 @@ void csSystemDriver::Help (iConfig* Config)
 	sprintf (desc, "%s (%ld)", option.description, def.v.l);
 	break;
     }
-    Printf (MSG_STDOUT, "%-21s%s\n", opt, desc);
+    Printf (CS_MSG_STDOUT, "%-21s%s\n", opt, desc);
   }
 }
 
@@ -785,10 +785,10 @@ void csSystemDriver::Help ()
   for (int i = 0; i < PlugIns.Length (); i++)
   {
     csPlugIn *plugin = PlugIns.Get (i);
-    iConfig *Config = QUERY_INTERFACE (plugin->PlugIn, iConfig);
+    iConfig *Config = SCF_QUERY_INTERFACE (plugin->PlugIn, iConfig);
     if (Config)
     {
-      Printf (MSG_STDOUT, "Options for %s:\n",
+      Printf (CS_MSG_STDOUT, "Options for %s:\n",
         iSCF::SCF->GetClassDescription (plugin->ClassID));
       Help (Config);
       Config->DecRef ();
@@ -796,15 +796,15 @@ void csSystemDriver::Help ()
     plugin->PlugIn->HandleEvent (HelpEvent);
   }
 
-  Printf (MSG_STDOUT, "General options:\n");
-  Printf (MSG_STDOUT, "  -help              this help\n");
-  Printf (MSG_STDOUT, "  -mode=<w>x<h>      set resolution (default=%dx%d)\n", FrameWidth, FrameHeight);
-  Printf (MSG_STDOUT, "  -depth=<d>         set depth (default=%d bpp)\n", Depth);
-  Printf (MSG_STDOUT, "  -[no]fs            use fullscreen videomode if available (default=%s)\n", FullScreen ? "yes" : "no");
-  Printf (MSG_STDOUT, "  -video=<s>         the 3D rendering driver (opengl, glide, software, ...)\n");
-  Printf (MSG_STDOUT, "  -canvas=<s>        the 2D canvas driver (asciiart, x2d, ...)\n");
-  Printf (MSG_STDOUT, "  -plugin=<s>        load the plugin after all others\n");
-  Printf (MSG_STDOUT, "  -debug=<n>         set debug level (default=%d)\n", debug_level);
+  Printf (CS_MSG_STDOUT, "General options:\n");
+  Printf (CS_MSG_STDOUT, "  -help              this help\n");
+  Printf (CS_MSG_STDOUT, "  -mode=<w>x<h>      set resolution (default=%dx%d)\n", FrameWidth, FrameHeight);
+  Printf (CS_MSG_STDOUT, "  -depth=<d>         set depth (default=%d bpp)\n", Depth);
+  Printf (CS_MSG_STDOUT, "  -[no]fs            use fullscreen videomode if available (default=%s)\n", FullScreen ? "yes" : "no");
+  Printf (CS_MSG_STDOUT, "  -video=<s>         the 3D rendering driver (opengl, glide, software, ...)\n");
+  Printf (CS_MSG_STDOUT, "  -canvas=<s>        the 2D canvas driver (asciiart, x2d, ...)\n");
+  Printf (CS_MSG_STDOUT, "  -plugin=<s>        load the plugin after all others\n");
+  Printf (CS_MSG_STDOUT, "  -debug=<n>         set debug level (default=%d)\n", debug_level);
 }
 
 void csSystemDriver::Alert (const char* msg)
@@ -834,7 +834,7 @@ void csSystemDriver::debug_out (bool flush, const char *str)
 
 void csSystemDriver::QueryOptions (iPlugIn *iObject)
 {
-  iConfig *Config = QUERY_INTERFACE (iObject, iConfig);
+  iConfig *Config = SCF_QUERY_INTERFACE (iObject, iConfig);
   if (Config)
   {
     int on = OptionList.Length ();
@@ -948,57 +948,57 @@ void csSystemDriver::Printf (int mode, const char *format, ...)
 
   switch (mode)
   {
-    case MSG_INTERNAL_ERROR:
-    case MSG_FATAL_ERROR:
+    case CS_MSG_INTERNAL_ERROR:
+    case CS_MSG_FATAL_ERROR:
       Alert (buf);
       break;
 
-    case MSG_WARNING:
+    case CS_MSG_WARNING:
       Warn (buf);
       break;
 
-    case MSG_INITIALIZATION:
+    case CS_MSG_INITIALIZATION:
       console_out (buf);
       debug_out (true, buf);
       if (Console)
-        Console->PutText (MSG_INITIALIZATION, buf);
+        Console->PutText (CS_MSG_INITIALIZATION, buf);
       break;
 
-    case MSG_CONSOLE:
+    case CS_MSG_CONSOLE:
       if (Console)
-        Console->PutText (MSG_CONSOLE, buf);
+        Console->PutText (CS_MSG_CONSOLE, buf);
       else
         console_out (buf);
       break;
 
-    case MSG_STDOUT:
+    case CS_MSG_STDOUT:
       console_out (buf);
       break;
 
-    case MSG_DEBUG_0:
+    case CS_MSG_DEBUG_0:
       debug_out (false, buf);
       break;
 
-    case MSG_DEBUG_1:
+    case CS_MSG_DEBUG_1:
       if (debug_level >= 1)
         debug_out (false, buf);
       break;
 
-    case MSG_DEBUG_2:
+    case CS_MSG_DEBUG_2:
       if (debug_level >= 2)
         debug_out (false, buf);
       break;
 
-    case MSG_DEBUG_0F:
+    case CS_MSG_DEBUG_0F:
       debug_out (true, buf);
       break;
 
-    case MSG_DEBUG_1F:
+    case CS_MSG_DEBUG_1F:
       if (debug_level >= 1)
         debug_out (true, buf);
       break;
 
-    case MSG_DEBUG_2F:
+    case CS_MSG_DEBUG_2F:
       if (debug_level >= 2)
         debug_out (true, buf);
       break;
@@ -1008,9 +1008,9 @@ void csSystemDriver::Printf (int mode, const char *format, ...)
 iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iFuncID,
   const char *iInterface, int iVersion)
 {
-  iPlugIn *p = CREATE_INSTANCE (iClassID, iPlugIn);
+  iPlugIn *p = SCF_CREATE_INSTANCE (iClassID, iPlugIn);
   if (!p)
-    Printf (MSG_WARNING, "WARNING: could not load plugin `%s'\n", iClassID);
+    Printf (CS_MSG_WARNING, "WARNING: could not load plugin `%s'\n", iClassID);
   else
   {
     int index = PlugIns.Push (new csPlugIn (p, iClassID, iFuncID));
@@ -1028,7 +1028,7 @@ iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iFuncID,
         return ret;
       }
     }
-    Printf (MSG_WARNING, "WARNING: failed to initialize plugin `%s'\n", iClassID);
+    Printf (CS_MSG_WARNING, "WARNING: failed to initialize plugin `%s'\n", iClassID);
     PlugIns.Delete (index);
   }
   return NULL;
@@ -1046,7 +1046,7 @@ bool csSystemDriver::RegisterPlugIn (const char *iClassID,
   }
   else
   {
-    Printf (MSG_WARNING, "WARNING: failed to initialize plugin `%s'\n", iClassID);
+    Printf (CS_MSG_WARNING, "WARNING: failed to initialize plugin `%s'\n", iClassID);
     PlugIns.Delete (index);
     return false;
   }
@@ -1113,7 +1113,7 @@ bool csSystemDriver::UnloadPlugIn (iPlugIn *iObject)
   if (idx < 0)
     return false;
 
-  iConfig *config = QUERY_INTERFACE (iObject, iConfig);
+  iConfig *config = SCF_QUERY_INTERFACE (iObject, iConfig);
   if (config)
   {
     for (int i = OptionList.Length () - 1; i >= 0; i--) 

@@ -23,18 +23,18 @@
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE_EXT (csKeyValuePair)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iKeyValuePair)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csKeyValuePair)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iKeyValuePair)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csKeyValuePair::KeyValuePair)
-  IMPLEMENTS_INTERFACE (iKeyValuePair)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csKeyValuePair::KeyValuePair)
+  SCF_IMPLEMENTS_INTERFACE (iKeyValuePair)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csKeyValuePair::csKeyValuePair (const char* Key, const char* Value)
 {
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiKeyValuePair);
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiKeyValuePair);
   SetName (Key);
   m_Value = csStrNew (Value);
 }

@@ -22,19 +22,19 @@
 #include "csgeom/matrix3.h"
 #include "csutil/util.h"
 
-IMPLEMENT_IBASE_EXT (csCameraPosition)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iCameraPosition)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csCameraPosition)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iCameraPosition)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csCameraPosition::CameraPosition)
-  IMPLEMENTS_INTERFACE (iCameraPosition)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csCameraPosition::CameraPosition)
+  SCF_IMPLEMENTS_INTERFACE (iCameraPosition)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csCameraPosition::csCameraPosition (const char *iName, const char *iSector,
   const csVector3 &iPosition, const csVector3 &iForward,
   const csVector3 &iUpward)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiCameraPosition);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCameraPosition);
   SetName (iName);
   Sector = csStrNew (iSector);
   Position = iPosition;

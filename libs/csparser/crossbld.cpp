@@ -44,7 +44,7 @@
 iImage *LoadImage (UByte* iBuffer, ULong iSize, int iFormat)
 {
   iImageIO *ImageLoader =
-    QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageIO);
+    CS_QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageIO);
   if (!ImageLoader) return NULL;
   iImage *img = ImageLoader->Load(iBuffer, iSize, iFormat);
   ImageLoader->DecRef();
@@ -84,10 +84,10 @@ csCrossBuild_SpriteTemplateFactory::~csCrossBuild_SpriteTemplateFactory()
 /// full sprite template builder
 void* csCrossBuild_SpriteTemplateFactory::CrossBuild (converter &buildsource)
 {
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = LOAD_PLUGIN (System, "crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
+    type = CS_LOAD_PLUGIN (System, "crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.sprite.3d\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();
@@ -100,7 +100,7 @@ void csCrossBuild_SpriteTemplateFactory::CrossBuild (void* object,
   converter &buildsource)
 {
   iMeshObjectFactory* fact = (iMeshObjectFactory*)object;
-  iSprite3DFactoryState* fstate = QUERY_INTERFACE (fact, iSprite3DFactoryState);
+  iSprite3DFactoryState* fstate = SCF_QUERY_INTERFACE (fact, iSprite3DFactoryState);
   buildsource.set_animation_frame(0);
 
   // build the triangle mesh
@@ -281,14 +281,14 @@ csCrossBuild_ThingTemplateFactory::~csCrossBuild_ThingTemplateFactory()
 /// full thing template builder
 void *csCrossBuild_ThingTemplateFactory::CrossBuild (converter &buildsource)
 {
-  iEngine* engine = QUERY_PLUGIN (System, iEngine);
+  iEngine* engine = CS_QUERY_PLUGIN (System, iEngine);
   iMeshObjectType* thing_type = engine->GetThingType ();
   engine->DecRef ();
   iMeshObjectFactory* thing_fact = thing_type->NewFactory ();
-  iMeshObject* thing_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
+  iMeshObject* thing_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
 
-  iThingState* thing_state = QUERY_INTERFACE (thing_obj, iThingState);
+  iThingState* thing_state = SCF_QUERY_INTERFACE (thing_obj, iThingState);
 
   CrossBuild ((void*)thing_state, buildsource);
   thing_state->DecRef ();
@@ -343,7 +343,7 @@ void csCrossBuild_ThingTemplateFactory::Build_TriangleMesh (
     ptemp->CreateVertex (c);
     ptemp->SetTextureType (POLYTXT_GOURAUD);
     iPolyTexType* pt = ptemp->GetPolyTexType ();
-    iPolyTexFlat* gs = QUERY_INTERFACE (pt, iPolyTexFlat);
+    iPolyTexFlat* gs = SCF_QUERY_INTERFACE (pt, iPolyTexFlat);
     gs->SetUV (0, buildsource.cor3_uv[0][a], buildsource.cor3_uv[1][a]);
     gs->SetUV (1, buildsource.cor3_uv[0][b], buildsource.cor3_uv[1][b]);
     gs->SetUV (2, buildsource.cor3_uv[0][c], buildsource.cor3_uv[1][c]);
@@ -353,7 +353,7 @@ void csCrossBuild_ThingTemplateFactory::Build_TriangleMesh (
 
 csCrossBuild_Quake2Importer::csCrossBuild_Quake2Importer()
 {
-  localVFS = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
+  localVFS = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
 }
 
 
@@ -364,7 +364,7 @@ csCrossBuild_Quake2Importer::csCrossBuild_Quake2Importer(iVFS *specialVFS)
 
 csCrossBuild_Quake2Importer::~csCrossBuild_Quake2Importer()
 {
-  DEC_REF (localVFS);
+  SCF_DEC_REF (localVFS);
 }
 
 iMeshObjectFactory *csCrossBuild_Quake2Importer::Import_Quake2File (
@@ -481,7 +481,7 @@ iTextureWrapper *csCrossBuild_Quake2Importer::Import_Quake2Textures (
 
       //if (!defaulttexture)
       defaulttexture = importdestination->GetTextureList ()->NewTexture (newskin);
-      iGraphics3D *G3D = QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
+      iGraphics3D *G3D = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
       defaulttexture->Register (G3D->GetTextureManager ());
       G3D->DecRef ();
       

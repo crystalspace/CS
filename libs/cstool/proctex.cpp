@@ -70,7 +70,7 @@ bool csProcTexture::Initialize (iSystem* system)
   iImage *proc_image;
   proc_image = (iImage*) new csImageMemory (mat_w, mat_h);
 
-  iEngine* engine = QUERY_PLUGIN (system, iEngine);
+  iEngine* engine = CS_QUERY_PLUGIN (system, iEngine);
   tex = engine->GetTextureList ()->NewTexture (proc_image);
   engine->DecRef ();
   proc_image->DecRef ();

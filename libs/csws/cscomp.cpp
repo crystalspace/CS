@@ -488,7 +488,7 @@ bool csComponent::HandleEvent (iEvent &Event)
           if (name)
             if (!ApplySkin ((csSkin *)Event.Command.Info))
             {
-              app->System->Printf (MSG_FATAL_ERROR,
+              app->System->Printf (CS_MSG_FATAL_ERROR,
                 "The skin does not contain a slice for component `%s'\n", name);
               abort ();
             }
@@ -577,7 +577,7 @@ AbortDrag:
   } /* endif */
 
   bool ret = false;
-  if (IS_KEYBOARD_EVENT (Event))
+  if (CS_IS_KEYBOARD_EVENT (Event))
   {
     if (focused && focused->GetState (CSS_VISIBLE))
       ret = focused->HandleEvent (Event);
@@ -586,7 +586,7 @@ AbortDrag:
   }
   else
   {
-    if (IS_MOUSE_EVENT (Event))
+    if (CS_IS_MOUSE_EVENT (Event))
     {
       // Pass mouse events to 'clip children'
       for (int i = clipchildren.Length () - 1; i >= 0; i--)
@@ -620,7 +620,7 @@ AbortDrag:
       // For mouse events, proceed from Z-order top child,
       // for all other events proceed from focused child
       if (!ret)
-        ret = (ForEach (do_handle_event, &Event, IS_MOUSE_EVENT (Event)) != NULL);
+        ret = (ForEach (do_handle_event, &Event, CS_IS_MOUSE_EVENT (Event)) != NULL);
   } /* endif */
 
   if (ret)
@@ -676,7 +676,7 @@ static bool do_prehandle_event (csComponent *child, void *param)
 {
   iEvent *Event = (iEvent *)param;
 
-  if (IS_MOUSE_EVENT (*Event))
+  if (CS_IS_MOUSE_EVENT (*Event))
   {
     // Bring mouse coordinates to child coordinate system
     int dX = child->bound.xmin, dY = child->bound.ymin;
@@ -692,14 +692,14 @@ static bool do_prehandle_event (csComponent *child, void *param)
 
 bool csComponent::PreHandleEvent (iEvent &Event)
 {
-  return !!(ForEach (do_prehandle_event, &Event, IS_MOUSE_EVENT (Event)));
+  return !!(ForEach (do_prehandle_event, &Event, CS_IS_MOUSE_EVENT (Event)));
 }
 
 static bool do_posthandle_event (csComponent *child, void *param)
 {
   iEvent *Event = (iEvent *)param;
 
-  if (IS_MOUSE_EVENT (*Event))
+  if (CS_IS_MOUSE_EVENT (*Event))
   {
     // Bring mouse coordinates to child coordinate system
     int dX = child->bound.xmin, dY = child->bound.ymin;
@@ -715,7 +715,7 @@ static bool do_posthandle_event (csComponent *child, void *param)
 
 bool csComponent::PostHandleEvent (iEvent &Event)
 {
-  return !!(ForEach (do_posthandle_event, &Event, IS_MOUSE_EVENT (Event)));
+  return !!(ForEach (do_posthandle_event, &Event, CS_IS_MOUSE_EVENT (Event)));
 }
 
 void *csComponent::SendCommand (int CommandCode, void *Info)
