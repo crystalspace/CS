@@ -35,10 +35,12 @@ csTerrainQuadDiv::csTerrainQuadDiv(int depth)
     corner_height[i] = 0.0;
     corner_texuv[i].Set(0,0);
     corner_color[i].Set(1,1,1);
+    corner_normal[i].Set(0,1,0);
   }
   middle_height = 0.0;
   middle_texuv.Set(0,0);
   middle_color.Set(1,1,1);
+  middle_normal.Set(0,1,0);
   subdivided = 0;
   dmax = 0;
   min_height = 0;
@@ -203,6 +205,7 @@ csTerrainQuad *csTerrainQuadDiv::GetVisQuad()
 
 void csTerrainQuadDiv::ComputeDmax(iTerrainHeightFunction* height_func,
     void (*texuv_func)(void*, csVector2&, float, float), void *texdata,
+    iTerrainNormalFunction *normal_func,
     float minx, float miny, float maxx, float maxy)
 {
   int i;
@@ -221,6 +224,12 @@ void csTerrainQuadDiv::ComputeDmax(iTerrainHeightFunction* height_func,
   corner_height[CS_QUAD_TOPRIGHT] = height_func->GetHeight(maxx, miny);
   middle_height = height_func->GetHeight(midx, midy);
   //printf("corners %g %g %g %g\n", corner_height[0], corner_height[1], corner_height[2], corner_height[3]);
+
+  corner_normal[CS_QUAD_TOPLEFT] = normal_func->GetNormal(minx, miny);
+  corner_normal[CS_QUAD_BOTLEFT] = normal_func->GetNormal(minx, maxy);
+  corner_normal[CS_QUAD_BOTRIGHT] = normal_func->GetNormal(maxx, maxy);
+  corner_normal[CS_QUAD_TOPRIGHT] = normal_func->GetNormal(maxx, miny);
+  middle_normal = normal_func->GetNormal(midx, midy);
 
   texuv_func(texdata, corner_texuv[CS_QUAD_TOPLEFT], minx, miny);
   texuv_func(texdata, corner_texuv[CS_QUAD_BOTLEFT], minx, maxy);
@@ -250,13 +259,13 @@ void csTerrainQuadDiv::ComputeDmax(iTerrainHeightFunction* height_func,
   else
   {
     children[CS_QUAD_TOPLEFT]->ComputeDmax (height_func, texuv_func, texdata,
-      minx, miny, midx, midy);
+      normal_func, minx, miny, midx, midy);
     children[CS_QUAD_TOPRIGHT]->ComputeDmax(height_func, texuv_func, texdata,
-      midx, miny, maxx, midy);
+      normal_func, midx, miny, maxx, midy);
     children[CS_QUAD_BOTLEFT]->ComputeDmax(height_func, texuv_func, texdata,
-      minx, midy, midx, maxy);
+      normal_func, minx, midy, midx, maxy);
     children[CS_QUAD_BOTRIGHT]->ComputeDmax(height_func, texuv_func, texdata,
-      midx, midy, maxx, maxy);
+      normal_func, midx, midy, maxx, maxy);
     min_height = children[0]->GetMinHeight();
     max_height = children[0]->GetMaxHeight();
     for(i=1; i<4; i++)
@@ -302,8 +311,8 @@ void csTerrainQuadDiv::ComputeDmax(iTerrainHeightFunction* height_func,
 }
 
 void csTerrainQuadDiv::ComputeLOD(int framenum, const csVector3& campos,
-  void (*light_func)(void*, csColor&, float, float), void *lightdata,
-  float minx, float miny, float maxx, float maxy)
+  void (*light_func)(void*, csColor&, float, float, const csVector3&), 
+  void *lightdata, float minx, float miny, float maxx, float maxy)
 {
   if(GetVisQuad()) if(!GetVisQuad()->IsVisible()) return;
   float midx = (minx+maxx)*0.5f;
@@ -311,11 +320,15 @@ void csTerrainQuadDiv::ComputeLOD(int framenum, const csVector3& campos,
 
   /// if we arrive at this point then the quad will be visible, so
   /// (re)compute lighting for it
-  light_func(lightdata, corner_color[CS_QUAD_TOPLEFT], minx, miny);
-  light_func(lightdata, corner_color[CS_QUAD_BOTLEFT], minx, maxy);
-  light_func(lightdata, corner_color[CS_QUAD_BOTRIGHT], maxx, maxy);
-  light_func(lightdata, corner_color[CS_QUAD_TOPRIGHT], maxx, miny);
-  light_func(lightdata, middle_color, midx, midy);
+  light_func(lightdata, corner_color[CS_QUAD_TOPLEFT], minx, miny,
+    corner_normal[CS_QUAD_TOPLEFT]);
+  light_func(lightdata, corner_color[CS_QUAD_BOTLEFT], minx, maxy,
+    corner_normal[CS_QUAD_BOTLEFT]);
+  light_func(lightdata, corner_color[CS_QUAD_BOTRIGHT], maxx, maxy,
+    corner_normal[CS_QUAD_BOTRIGHT]);
+  light_func(lightdata, corner_color[CS_QUAD_TOPRIGHT], maxx, miny,
+    corner_normal[CS_QUAD_TOPRIGHT]);
+  light_func(lightdata, middle_color, midx, midy, middle_normal);
 
   /// compute visible error  (lower = more quality)
   float maxerror = 0.001f;

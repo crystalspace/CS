@@ -67,6 +67,9 @@ class csTerrainQuadDiv
   /// cached lighting colors for corners and middle
   csColor corner_color[4], middle_color;
 
+  /// cached normal directions for corners and middle
+  csVector3 corner_normal[4], middle_normal;
+
 public:
   /// create tree of certain depth (0 = create leaf node).
   csTerrainQuadDiv(int depth);
@@ -94,9 +97,11 @@ public:
   /** Compute dmaxes from scratch.
    * Pass height func, and borders of this quad in flat space
    * Also pass a function that compute texture coords. and its userdata.
+   * And pass a normal computation func.
    */
   void ComputeDmax(iTerrainHeightFunction* height_func,
     void (*texuv_func)(void*, csVector2&, float, float), void *texdata,
+    iTerrainNormalFunction *normal_func,
     float minx, float miny, float maxx, float maxy);
   /// get Dmax
   float GetDmax() const {return dmax;}
@@ -112,8 +117,8 @@ public:
    *  Also pass a function to (re)compute lighting colors, and its data.
    */
   void ComputeLOD(int framenum, const csVector3& campos,
-    void (*light_func)(void*, csColor&, float, float), void *lightdata,
-    float minx, float miny, float maxx, float maxy);
+    void (*light_func)(void*, csColor&, float, float, const csVector3&), 
+    void *lightdata, float minx, float miny, float maxx, float maxy);
 
   /// estimate nr of triangles needed (rough estimate, will be higher)
   int EstimateTris(int framenum);

@@ -134,7 +134,7 @@ void csTerrBlock::PrepareQuadDiv(iTerrainHeightFunction *height_func,
   dat.block = this;
 
   quaddiv->ComputeDmax(height_func, qd_texuv_func, (void*)&dat,
-    bbox.MinX(), bbox.MinZ(), bbox.MaxX(), bbox.MaxZ());
+    terr->quad_normal, bbox.MinX(), bbox.MinZ(), bbox.MaxX(), bbox.MaxZ());
 }
 
 /// static light computing helper
@@ -143,7 +143,8 @@ struct qd_light_data {
   csTerrBlock *block;
   csTerrFuncObject *terr;
 };
-static void qd_light_func(void* data, csColor& col, float x, float y)
+static void qd_light_func(void* data, csColor& col, float /*x*/, float /*y*/,
+  const csVector3& normal)
 {
   struct qd_light_data *dat = (struct qd_light_data *)data;
   /// need to precompute a light-map texture
@@ -151,7 +152,8 @@ static void qd_light_func(void* data, csColor& col, float x, float y)
   if(dat->terr->do_dirlight && dat->terr->quad_normal)
   {
     float l;
-    l = dat->terr->dirlight * dat->terr->quad_normal->GetNormal(x,y);
+    l = dat->terr->dirlight * normal;
+    //dat->terr->quad_normal->GetNormal(x,y);
     if(l>0) col += dat->terr->dirlight_color * l;
   }
 }
@@ -537,7 +539,7 @@ csTerrFuncObject::csTerrFuncObject (iObjectRegistry* object_reg,
   current_lod = 1;
   current_features = 0;
   vbufmgr = NULL;
-  quaddiv_enabled = false;
+  quaddiv_enabled = true;
   quad_height = NULL;
   quad_normal = NULL;
   qd_framenum = 1;
