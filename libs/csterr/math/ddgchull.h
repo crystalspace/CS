@@ -109,9 +109,9 @@ public:
 	/// Array of points.
 	ddgPlane2		*lines;
 	/// Default Constructor.
-	ddgCHull2(void) : lines(0), noLines(0) {}
+	ddgCHull2(void) : noLines(0), lines(0) {}
 	/// Constructor.
-	ddgCHull2(ddgPlane2 *l, int nl) : lines(l), noLines(nl) {}
+	ddgCHull2(ddgPlane2 *l, int nl) : noLines(nl), lines(l) {}
 	/**
 	 *  Clip bounding rectangle against hull, return ddgIN if rectangle is entirely within,
 	 *  return ddgOUT if entirely outside, return ddgPART if part in and part out.

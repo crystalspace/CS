@@ -130,8 +130,8 @@
 
 #else // A_PI
 
-void A_SCANFUNC (void *dest, int len, unsigned long *zbuff,
-  long u, long du, long v, long dv, unsigned long z, long dz,
+void A_SCANFUNC (void *dest, int len, unsigned long* /*zbuff*/,
+  long u, long du, long v, long dv, unsigned long /*z*/, long /*dz*/,
   unsigned char *bitmap, int bitmap_log2w)
 {
   A_PIXTYPE *_dest = (A_PIXTYPE *)dest;

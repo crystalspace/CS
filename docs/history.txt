@@ -1,6 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
 2-Aug-2000
+	- Removed several warnings.
 	- Samuel Humphreys did the following:
      	    - Added emacs fontification friendly comments to some more .inc
 	      files.

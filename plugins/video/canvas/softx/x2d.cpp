@@ -1101,8 +1101,8 @@ bool csGraphics2DXLib::HandleEvent (csEvent &/*Event*/)
   bool down;
   bool resize = false;
   bool parent_resize = false;
-  int newWidth;
-  int newHeight;
+  int newWidth = 0;
+  int newHeight = 0;
 
 #ifdef DO_STUFF_EXTENDED_KEYCODE
   unsigned char keytranslated;

@@ -235,20 +235,20 @@ void ddgTBinTree::calculateVariance(ddgTriIndex tindex)
 		int hmin, hmax, error;
 		if (first(tindex) < _mesh->leafTriNo())
 		{
-			hmin = ddgUtil::min(_rawMinVal[first(tindex)],_rawMinVal[second(tindex)]);
-			hmax = ddgUtil::max(_rawMaxVal[first(tindex)],_rawMaxVal[second(tindex)]);
-			error = ddgUtil::max(_treeError[first(tindex)],_treeError[second(tindex)]);
+			hmin = int (ddgUtil::min(_rawMinVal[first(tindex)],_rawMinVal[second(tindex)]));
+			hmax = int (ddgUtil::max(_rawMaxVal[first(tindex)],_rawMaxVal[second(tindex)]));
+			error = int (ddgUtil::max(_treeError[first(tindex)],_treeError[second(tindex)]));
 		}
 		else // Leaf node.
 		{
-			hmin = ddgUtil::min(_rawHeight[first(tindex)],_rawHeight[second(tindex)]);
-			hmax = ddgUtil::max(_rawHeight[first(tindex)],_rawHeight[second(tindex)]);
+			hmin = int (ddgUtil::min(_rawHeight[first(tindex)],_rawHeight[second(tindex)]));
+			hmax = int (ddgUtil::max(_rawHeight[first(tindex)],_rawHeight[second(tindex)]));
 			error = 0;
 		}
 
 		_rawMinVal[tindex] = (short)ddgUtil::min(_rawHeight[parent(tindex)],hmin);
 		_rawMaxVal[tindex] = (short)ddgUtil::max(_rawHeight[parent(tindex)],hmax);
-	    _treeError[tindex] = error+ddgUtil::abs(((_rawHeight[_stri[tindex].v0]-_rawHeight[_stri[tindex].v1])/2)-_rawHeight[tindex]);
+	    _treeError[tindex] = error+(short)ddgUtil::abs(((_rawHeight[_stri[tindex].v0]-_rawHeight[_stri[tindex].v1])/2)-_rawHeight[tindex]);
 	}
 }
 
@@ -716,7 +716,7 @@ void ddgTBinTree::updateMerge(ddgTriIndex tindex, ddgPriority pr )
 	// triangles as being part of a merge diamond.
 	ddgTriIndex p = parent(tindex);
 	ddgTriIndex n = neighbour(p);
-	ddgCacheIndex cl, cr = 0, nl = 0, nr = 0;
+	ddgCacheIndex cl = 0, cr = 0, nl = 0, nr = 0;
 
 	ddgAssert( n < ddgNINIT );
 	ddgAssert( tindex > 0 );
@@ -896,8 +896,8 @@ ddgVisState ddgTBinTree::visibilityTriangle(ddgTriIndex tindex)
 		{ cr -= _stri[tindex].row;  cc -= _stri[tindex].col; }
 	else 
 		{ cr += _stri[tindex].row;  cc += _stri[tindex].col; }
-	cr -= _pos[0];
-	cc -= _pos[1];
+	cr -= (int)_pos[0];
+	cc -= (int)_pos[1];
 	ddgVector2 center(cr ,cc );
 
 	// Do a rough distance test and optionally a true distance test in 2D
@@ -997,8 +997,8 @@ ddgPriority ddgTBinTree::priorityCalc(ddgTriIndex tindex, float pf)
 	{ cr -= _stri[tindex].row;  cc -= _stri[tindex].col; }
 	else 
 	{ cr += _stri[tindex].row;  cc += _stri[tindex].col; }
-	cr -= _pos[0];
-	cc -= _pos[1];
+	cr -= (int)_pos[0];
+	cc -= (int)_pos[1];
 	ddgVector2 p(cr,cc);
 	// This is the same a f dot p1 - f dot p2, f dot p2 can be precomputed,
 	// but I don't think that will speed things up.
