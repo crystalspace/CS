@@ -126,9 +126,11 @@ void csRegion::Region::DeleteAll ()
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
-    if (copy[i] && ((csObject*)copy[i])->GetType () == csSector::Type)
+    if (copy[i])
     {
-      csSector* o = (csSector*)copy[i];
+      csObject* obj = (csObject*)copy[i];
+      csSector* o = QUERY_OBJECT_TYPE (obj, csSector);
+      if (!o) continue;
       int idx = scfParent->engine->sectors.Find (o);
       if (idx != -1)
         scfParent->engine->sectors.Delete (idx);
@@ -138,9 +140,11 @@ void csRegion::Region::DeleteAll ()
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
-    if (copy[i] && ((csObject*)copy[i])->GetType() == csMaterialWrapper::Type)
+    if (copy[i])
     {
-      csMaterialWrapper* o = (csMaterialWrapper*)copy[i];
+      csObject* obj = (csObject*)copy[i];
+      csMaterialWrapper* o = QUERY_OBJECT_TYPE (obj, csMaterialWrapper);
+      if (!o) continue;
       int idx = scfParent->engine->GetMaterials ()->Find (o);
       if (idx != -1)
         scfParent->engine->GetMaterials ()->Delete (idx);
@@ -150,9 +154,11 @@ void csRegion::Region::DeleteAll ()
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
-    if (copy[i] && ((csObject*)copy[i])->GetType () == csTextureWrapper::Type)
+    if (copy[i])
     {
-      csTextureWrapper* o = (csTextureWrapper*)copy[i];
+      csObject* obj = (csObject*)copy[i];
+      csTextureWrapper* o = QUERY_OBJECT_TYPE (obj, csTextureWrapper);
+      if (!o) continue;
       int idx = scfParent->engine->GetTextures ()->Find (o);
       if (idx != -1)
         scfParent->engine->GetTextures ()->Delete (idx);

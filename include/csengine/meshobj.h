@@ -325,6 +325,7 @@ public:
   }
 
   CSOBJTYPE;
+  DECLARE_OBJECT_INTERFACE;
   DECLARE_IBASE_EXT (csPObject);
 
   //--------------------- iMeshWrapper implementation --------------------//
@@ -483,6 +484,7 @@ public:
   void HardTransform (const csReversibleTransform& t);
 
   CSOBJTYPE;
+  DECLARE_OBJECT_INTERFACE;
   DECLARE_IBASE_EXT (csObject);
 
   //--------------------- iMeshFactoryWrapper implementation --------------------//

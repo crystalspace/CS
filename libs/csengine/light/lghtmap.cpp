@@ -310,9 +310,9 @@ bool csLightMap::ReadFromCache (int w, int h,
     light = engine->FindCsLight (ls.id);
     if (light)
     {
-      if (light->GetType () == csStatLight::Type && obj)
+      csStatLight *slight = QUERY_OBJECT_TYPE (light, csStatLight);
+      if (slight && obj)
       {
-        csStatLight* slight = (csStatLight*)light;
         // @@@: HACK!!! Curves and Polygon3Ds need a common base class which would
         //      help this temporary hack out a lot
         if (isPolygon)

@@ -162,6 +162,7 @@ public:
   void Visit ();
 
   CSOBJTYPE;
+  DECLARE_OBJECT_INTERFACE;
   DECLARE_IBASE_EXT (csPObject);
 
   //------------------- iMaterialWrapper implementation -----------------------

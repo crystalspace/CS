@@ -31,6 +31,9 @@ protected:
   iSoundHandle* SoundHandle;
 
 public:
+
+  DECLARE_OBJECT_INTERFACE
+
   ///
   csSoundWrapper(iSoundHandle* buf);
   ///

@@ -24,7 +24,15 @@
 #include "csparser/snddatao.h"
 #include "csobject/csobject.h"
 
-IMPLEMENT_CSOBJTYPE (csSoundWrapper,csObject);
+DECLARE_OBJECT_TYPE (csSoundWrapper);
+DECLARE_OBJECT_TYPE (iSoundWrapper);
+
+IMPLEMENT_CSOBJTYPE (csSoundWrapper, csObject);
+
+IMPLEMENT_OBJECT_INTERFACE (csSoundWrapper)
+  IMPLEMENTS_EMBEDDED_OBJECT_TYPE (iSoundWrapper)
+  IMPLEMENTS_OBJECT_TYPE (csSoundWrapper)
+IMPLEMENT_OBJECT_INTERFACE_END
 
 IMPLEMENT_IBASE (csSoundWrapper);
   IMPLEMENTS_EMBEDDED_INTERFACE (iSoundWrapper);
@@ -56,11 +64,12 @@ iSoundHandle* csSoundWrapper::GetSound (iObject* iobj, const char* name)
 {
   csObject &csobj = *((csObject*)iobj);
   if (!name) return NULL;
-  csObjIterator i = csobj.GetIterator (csSoundWrapper::Type);
+  csObjIterator i = csobj.GetIterator (csObject::Type, true);
   while (!i.IsNull ())
   {
-    if (strcmp (name, (*i).GetName ()) == 0)
-      return ((csSoundWrapper&)(*i)).GetSound();
+    csSoundWrapper *sw = QUERY_OBJECT_TYPE (i.GetObj (), csSoundWrapper);
+    if (sw && strcmp (name, (*i).GetName ()) == 0)
+      return sw->GetSound ();
     ++i;
   }
   return NULL;

@@ -114,6 +114,7 @@ public:
   void Visit () { if (use_callback) use_callback (&scfiTextureWrapper, use_data); }
 
   CSOBJTYPE;
+  DECLARE_OBJECT_INTERFACE;
   DECLARE_IBASE;
 
   //-------------------- iTextureWrapper implementation -----------------------

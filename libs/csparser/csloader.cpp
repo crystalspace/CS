@@ -60,6 +60,7 @@
 #include "isys/system.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
+#include "ivaria/strserv.h"
 
 #include "csengine/material.h"
 #include "csengine/keyval.h"
@@ -191,6 +192,9 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ZUSE)
   CS_TOKEN_DEF (ZTEST)
 CS_TOKEN_DEF_END
+
+ALLOCATE_OBJECT_TYPE (csSoundWrapper)
+ALLOCATE_OBJECT_TYPE (iSoundWrapper)
 
 //---------------------------------------------------------------------------
 
@@ -2602,7 +2606,7 @@ EXPORT_CLASS_TABLE (lvlload)
     "Level and library file loader", "crystalspace.kernel., "
     "crystalspace.sound.loader., crystalspace.image.loader, "
     "crystalspace.mesh.loader., crystalspace.terrain.loader., "
-    "crystalspace.engine.core")
+    "crystalspace.engine.core, crystalspace.string.server")
 EXPORT_CLASS_TABLE_END
 
 csLoader::csLoader(iBase *p)
@@ -2617,6 +2621,7 @@ csLoader::csLoader(iBase *p)
   G3D = NULL;
   SoundRender = NULL;
   MotionManager = NULL;
+  StringServer = NULL;
 
   flags = 0;
   ResolveOnlyRegion = false;
@@ -2632,6 +2637,7 @@ csLoader::~csLoader()
   DEC_REF(G3D);
   DEC_REF(SoundRender);
   DEC_REF(MotionManager);
+  DEC_REF(StringServer);
   delete Stats;
 }
 
@@ -2658,6 +2664,13 @@ bool csLoader::Initialize(iSystem *iSys)
   GET_PLUGIN(G3D, CS_FUNCID_VIDEO, iGraphics3D, "video driver");
   GET_PLUGIN(SoundRender, CS_FUNCID_SOUND, iSoundRender, "sound driver");
   GET_PLUGIN(MotionManager, CS_FUNCID_MOTION, iMotionManager, "motion manager");
+  GET_PLUGIN(StringServer, CS_FUNCID_STRSERV, iStringServer, "string server");
+
+  if (StringServer)
+  {
+    INITIALIZE_OBJECT_TYPE (StringServer, csSoundWrapper);
+    INITIALIZE_OBJECT_TYPE (StringServer, iSoundWrapper);
+  }
 
   return true;
 }

@@ -459,30 +459,33 @@ void WalkTest::ParseKeyCmds (csObject* src)
     csKeyValuePair* kp = (csKeyValuePair*)obj;
     if (!strcmp (kp->GetKey (), "cmd_AnimateSky"))
     {
-      if (src->GetType () == csSector::Type)
+      csSector *Sector = QUERY_OBJECT_TYPE (src, csSector);
+      if (Sector)
       {
         char name[100], rot[100];
         ScanStr (kp->GetValue (), "%s,%s,%f", name, rot, &anim_sky_speed);
         if (rot[0] == 'x') anim_sky_rot = 0;
         else if (rot[0] == 'y') anim_sky_rot = 1;
         else anim_sky_rot = 2;
-        anim_sky = ((csSector*)src)->GetMesh (name);
+        anim_sky = Sector->GetMesh (name);
       }
     }
     else if (!strcmp (kp->GetKey (), "cmd_AnimateDirLight"))
     {
-      if (src->GetType () == csTerrainWrapper::Type)
+      csTerrainWrapper *wrap = QUERY_OBJECT_TYPE (src, csTerrainWrapper);
+      if (wrap)
       {
-        anim_dirlight = (csTerrainWrapper*)src;
+        anim_dirlight = wrap;
       }
     }
     else if (!strcmp (kp->GetKey (), "entity_Door"))
     {
-      if (src->GetType () == csMeshWrapper::Type)
+      csMeshWrapper *wrap = QUERY_OBJECT_TYPE (src, csMeshWrapper);
+      if (wrap)
       {
         csVector3 hinge;
         ScanStr (kp->GetValue (), "%f,%f,%f", &hinge.x, &hinge.y, &hinge.z);
-	csDoor* door = new csDoor ((csMeshWrapper*)src);
+	csDoor* door = new csDoor (wrap);
 	door->SetHinge (hinge);
         src->ObjAdd (door);
       }
@@ -502,7 +505,8 @@ void WalkTest::ParseKeyCmds (csObject* src)
     }
     else if (!strcmp (kp->GetKey (), "entity_Light"))
     {
-      if (src->GetType () == csMeshWrapper::Type)
+      csMeshWrapper *wrap = QUERY_OBJECT_TYPE (src, csMeshWrapper);
+      if (wrap)
       {
 	csColor start_col, end_col;
 	float act_time;
@@ -542,9 +546,9 @@ void WalkTest::ParseKeyCmds (csObject* src)
     }
     it.Next ();
   }
-  if (src->GetType () >= csMeshWrapper::Type)
+  csMeshWrapper *mesh = QUERY_OBJECT_TYPE (src, csMeshWrapper);
+  if (mesh)
   {
-    csMeshWrapper* mesh = (csMeshWrapper*)src;
     int k;
     for (k = 0 ; k < mesh->GetChildren ().Length () ; k++)
     {
