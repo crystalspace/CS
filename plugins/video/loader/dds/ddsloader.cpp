@@ -16,10 +16,9 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #include "cssysdef.h"
-
 #include "ivaria/reporter.h"
-
 #include "dds.h"
 #include "ddsloader.h"
 
@@ -144,7 +143,9 @@ csPtr<iImage> csDDSImageFile::MipMap (int step, csRGBpixel* transp)
 {
   if (step == 0 || step > mipmapcount || transp)
     return csImageFile::MipMap (step, transp);
-  return csPtr<iImage> (mipmaps[step-1]->Clone ());
+  iImage* m = mipmaps[step-1];
+  m->IncRef();
+  return csPtr<iImage>(m);
 }
 
 int csDDSImageFile::HasMipmaps ()

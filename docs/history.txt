@@ -9,7 +9,13 @@ chronological order.
 23-Oct-2004
 	- res fixed the GL iGraphics3D::DrawPixmap() disabling blending, which
 	  messed up subsequent text writing.
-    - Andrew Robberts fixed some bugs in cal3d sockets
+	- Andrew Robberts fixed some bugs in cal3d sockets.
+	- Eric Sunshine simplified the 22-Oct-2004 change to DDS loader so that
+	  it no longer Clone()'s the image when returning a mipmap.  It is
+	  instead sufficient simply to return a reference to the existing image
+	  (as done by the original code).  The difference now, however, is that
+	  the reference counting logic is obvious and clear rather than obscure
+	  and hidden.  Also, the Clone() was unnecessarily expensive.
 22-Oct-2004
 	- Eric Sunshine fixed a bug in the replacement MakeLocate rule in
 	  subdir.jam where it failed to set the LOCATE variable for the target
