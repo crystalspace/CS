@@ -231,50 +231,36 @@ struct CPTraverseData
   bool is_solid;
   csVector3 pos;
   csVector3 test_points[6];
-  bool tested[6];
-  int num_tested;
+  bool polygon_was_hit[6];
+  int num_polygon_was_hit;
 };
 
 static void* ClassifyPointTraverse (csSector*, csPolygonInt** polygons,
-	int num, void* vdata)
+	int /*num*/, void* vdata)
 {
   // Only for csPolygon3D.
   if (polygons[0]->GetType () != 1) return NULL;
   csPolygon3D* p = (csPolygon3D*)polygons[0];
-  csPlane3* wplane = p->GetPolyPlane ();
-
-//printf ("  polygons %d\n", num);
 
   CPTraverseData* data = (CPTraverseData*)vdata;
   int i;
   for (i = 0 ; i < 6 ; i++)
-    if (!data->tested[i])
+    if (!data->polygon_was_hit[i])
     {
-//printf ("  %f,%f,%f -> %f,%f,%f\n", data->pos.x, data->pos.y, data->pos.z,
-//data->test_points[i].x, data->test_points[i].y, data->test_points[i].z);
-//{
-//int k;
-//for (k = 0 ; k < p->GetNumVertices () ; k++)
-//printf ("    %d: %f,%f,%f\n", k, p->Vwor (k).x, p->Vwor (k).y, p->Vwor (k).z);
-//}
       bool is = p->IntersectRayNoBackFace (data->pos, data->test_points[i]);
-//printf ("  test %d -> %d\n", i, is);
       if (is)
       {
-        data->tested[i] = true;
-	data->num_tested++;
+        data->polygon_was_hit[i] = true;
+	data->num_polygon_was_hit++;
         if (p->IntersectRay (data->pos, data->test_points[i]))
-	//if (!csMath3::Visible (data->pos, *wplane) &&
-                //ABS (wplane->Classify (data->pos)) >= SMALL_EPSILON)
 	{
-//printf ("  solid=false\n");
 	  // We can see the polygon from 'pos'. So we are in open
 	  // space.
 	  data->is_solid = false;
 	  return (void*)1;
 	}
 	// We tested all points.
-	if (data->num_tested >= 6) return (void*)1;
+	if (data->num_polygon_was_hit >= 6) return (void*)1;
       }
     }
   return NULL;
@@ -292,11 +278,18 @@ bool csPolygonTree::ClassifyPoint (const csVector3& p)
   data.test_points[4] = p+csVector3 (0, 0, 1);
   data.test_points[5] = p+csVector3 (0, 0, -1);
   int i;
-  for (i = 0 ; i < 6 ; i++) data.tested[i] = false;
-  data.num_tested = 0;
-printf ("START TEST pos=%f,%f,%f\n", p.x, p.y, p.z);
+  for (i = 0 ; i < 6 ; i++) data.polygon_was_hit[i] = false;
+  data.num_polygon_was_hit = 0;
   Front2Back (p, ClassifyPointTraverse, (void*)&data, NULL, NULL);
-printf ("END TEST %d\n", data.is_solid);
+  if (data.num_polygon_was_hit < 6)
+    for (i = 0 ; i < 6 ; i++)
+      if (!data.polygon_was_hit[i])
+      {
+        // This ray never hit a polygon. That means we will hit a sector
+        // wall and thus we are in open space.
+        data.is_solid = false;
+        break;
+      }
   return data.is_solid;
 }
 

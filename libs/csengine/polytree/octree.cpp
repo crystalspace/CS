@@ -159,7 +159,7 @@ void csOctree::Build ()
 
   delete [] polygons;
 
-  CalculateSolidMasks ((csOctreeNode*)root);
+  //CalculateSolidMasks ((csOctreeNode*)root);
 }
 
 void csOctree::Build (csPolygonInt** polygons, int num)
@@ -172,7 +172,7 @@ void csOctree::Build (csPolygonInt** polygons, int num)
   Build ((csOctreeNode*)root, bbox.Min (), bbox.Max (), new_polygons, num);
   delete [] new_polygons;
 
-  CalculateSolidMasks ((csOctreeNode*)root);
+  //CalculateSolidMasks ((csOctreeNode*)root);
 }
 
 void csOctree::ProcessTodo (csOctreeNode* node)
@@ -1454,12 +1454,8 @@ void csOctree::CalculateSolidMasks (csOctreeNode* node)
   	node->GetBox ().MaxZ (), GetSideBox (OCTREE_SIDE_Z, node->GetBox ()));
   int i;
 
-printf ("-----\n");
-printf ("%f,%f,%f %f,%f,%f\n",
-node->GetBox ().MinX (), node->GetBox ().MinY (), node->GetBox ().MinZ (),
-node->GetBox ().MaxX (), node->GetBox ().MaxY (), node->GetBox ().MaxZ ());
 for (i = 0 ; i < 6 ; i++)
-printf ("%d %04x\n", i, node->solid_masks[i]);
+if (node->solid_masks[i])printf ("%d %04x\n", i, node->solid_masks[i]);
 
   for (i = 0 ; i < 8 ; i++)
     CalculateSolidMasks ((csOctreeNode*)node->children[i]);

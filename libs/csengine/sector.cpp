@@ -188,7 +188,7 @@ void csSector::UseStaticTree (int mode, bool octree)
   {
     csVector3 min_bbox, max_bbox;
     static_thing->GetBoundingBox (min_bbox, max_bbox);
-    static_tree = new csOctree (this, min_bbox, max_bbox, 150/*20*//*50*/, mode);
+    static_tree = new csOctree (this, min_bbox, max_bbox, 150/*20*/, mode);
   }
   else
   {

@@ -98,6 +98,14 @@ public:
   csOctreeVisible* GetNext (csOctreeVisible* ovis) { return ovis->next; }
 };
 
+/// Six sides of the octree node.
+#define OCTREE_SIDE_x 0
+#define OCTREE_SIDE_X 1
+#define OCTREE_SIDE_y 2
+#define OCTREE_SIDE_Y 3
+#define OCTREE_SIDE_z 4
+#define OCTREE_SIDE_Z 5
+
 /**
  * An octree node.
  * @@@ We should have seperate leaf/non-leaf structures as they
@@ -115,6 +123,12 @@ private:
   csBox3 bbox;
   /// Center point for this node.
   csVector3 center;
+
+  /**
+   * Six masks representing solid space on the boundaries
+   * of this node. Use the OCTREE_SIDE_xxx flags to fetch them.
+   */
+  UShort solid_masks[6];
 
   /**
    * If true then this is a leaf.
@@ -216,6 +230,12 @@ public:
 
   /// Get a child.
   csOctreeNode* GetChild (int i) { return (csOctreeNode*)children[i]; }
+
+  /**
+   * Get one of the masks representing solid space on the boundaries
+   * of this node. Use the OCTREE_SIDE_xxx flags to fetch them.
+   */
+  UShort GetSolidMask (int idx) { return solid_masks[idx]; }
 
   /**
    * Get the list of all unsplit polygons in this node.
@@ -370,6 +390,11 @@ private:
   void BuildPVS (csThing* thing, csOctreeNode* node);
 
   /**
+   * Calculate masks for the sides of all nodes.
+   */
+  void CalculateSolidMasks (csOctreeNode* node);
+
+  /**
    * Add all nodes of a tree to the PVS of 'leaf'.
    */
   void AddDummyPVSNodes (csOctreeNode* leaf, csOctreeNode* node);
@@ -511,6 +536,15 @@ public:
   {
     return ClassifyPolygon ((csOctreeNode*)root, poly);
   }
+
+  /**
+   * Take an axis-aligned rectangle in 3D space represented by the plane
+   * and a 2D box on that plane.
+   * Return a 4x4 bitmap with information about the solid/open state
+   * of every 1/16'th of that rectangle.
+   */
+  UShort ClassifyRectangle (int plane_nr, float plane_pos,
+  	const csBox2& box);
 
   /**
    * Cache this entire octree to disk (VFS).

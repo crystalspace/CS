@@ -250,14 +250,6 @@ void WalkTest::NextFrame (time_t elapsed_time, time_t current_time)
   // The following will fetch all events from queue and handle them
   SysSystemDriver::NextFrame (elapsed_time, current_time);
 
-//@@@ DEBUGGING STUFF! DON'T REMOVE BEFORE CONSULTING JORRIT
-  //printf ("CP:%d\n", view->GetCamera ()->GetSector ()->GetStaticTree ()->
-  	//ClassifyPoint (view->GetCamera ()->Camera2World (csVector3 (0, 0, 0))));
-  //if (selected_polygon) printf ("PO:%d\n",
-  	//selected_polygon->IntersectRayNoBackFace (
-		//view->GetCamera ()->Camera2World (csVector3 (0, 0, 0)),
-		//view->GetCamera ()->Camera2World (csVector3 (0, 0, 1))));
-
   Sys->world->UpdateParticleSystems (elapsed_time);
 
   // Record the first time this routine is called.
