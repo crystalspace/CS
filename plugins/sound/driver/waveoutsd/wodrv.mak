@@ -40,6 +40,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   SNDWOS = $(OUT)$(LIB_PREFIX)sndwaveout$(LIB)
   DEP.EXE += $(SNDWOS)
+  LIBS.EXE += $(LIBS.SOUND.SYSTEM)
   SCF.STATIC += sndwaveout
   TO_INSTALL.STATIC_LIBS += $(SNDWOS)
 endif

@@ -100,6 +100,8 @@ The history order is reversed so that new features are at the top.
 	  or `apps' targets since most people do _not_ have the lib3ds package
 	  installed.  If you want to build this program, then you must
 	  explicitly mention the `3dslev' target.
+	- Eric Sunshine fixed a problem in wodrv.mak which prevented the driver
+	  from linking into an application with USE_PLUGINS=no.
 14-Oct-2001
 	- The 'stdrep' plugin now depends on output console and
 	  reporter plugins in SCF. This means that it will be loaded
