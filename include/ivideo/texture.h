@@ -167,7 +167,7 @@ struct iTextureHandle : public iBase
    * This depends both on whenever the original image had an alpha channel
    * and of the fact whenever the renderer supports alpha maps at all.
    */
-  virtual bool GetAlphaMap () const = 0;
+  virtual bool GetAlphaMap () = 0;
 
   /// Get the type of alpha associated with the texture.
   virtual csAlphaMode::AlphaType GetAlphaType () const = 0;

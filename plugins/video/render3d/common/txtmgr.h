@@ -167,7 +167,7 @@ public:
    * This depends both on whenever the original image had an alpha channel
    * and of the fact whenever the renderer supports alpha maps at all.
    */
-  virtual bool GetAlphaMap () const
+  virtual bool GetAlphaMap () 
   { return false; }
 
   /**

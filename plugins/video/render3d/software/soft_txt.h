@@ -73,7 +73,7 @@ public:
   uint8 *get_bitmap ()
   { return bitmap; }
   /// Return a pointer to alpha map data
-  uint8 *get_alphamap ()
+  uint8 *get_alphamap () const
   { return alphamap; }
 };
 
@@ -161,8 +161,8 @@ public:
    * This depends both on whenever the original image had an alpha channel
    * and of the fact whenever the renderer supports alpha maps at all.
    */
-  virtual bool GetAlphaMap ()
-  { return !!((csSoftwareTexture *)get_texture (0))->get_alphamap (); }
+  virtual bool GetAlphaMap () 
+  { return !!((const csSoftwareTexture *)get_texture (0))->get_alphamap (); }
 
   /**
    * Merge this texture into current palette, compute mipmaps and so on.
