@@ -21,9 +21,9 @@
 
 // Include volatile.h which contains the volatile configuration macros
 #if defined (WIN32_VOLATILE)
-#  include "cssys/win32/volatile.h"
+#  include <cssys/win32/volatile.h>
 #else
-#  include "volatile.h"
+#  include <volatile.h>
 #endif
 
 #endif // __CS_PLATFORM_H__

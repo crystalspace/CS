@@ -1836,7 +1836,7 @@ CS_HEADER_APPEND(
 #------------------------------------------------------------------------------
 # Output generated files.  Also create makefile cache if caching enabled.
 #------------------------------------------------------------------------------
-CS_HEADER_OUTPUT([volatile.h])
+CS_HEADER_OUTPUT([include/volatile.h])
 CS_JAMCONFIG_PROPERTY([PACKAGE.NAME], [$PACKAGE_NAME])
 CS_JAMCONFIG_PROPERTY([PACKAGE.VERSION], [$PACKAGE_VERSION])
 CS_JAMCONFIG_PROPERTY([PACKAGE.STRING], [$PACKAGE_STRING])

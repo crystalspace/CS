@@ -20201,7 +20201,7 @@ cs_header_text="${cs_header_text}#endif // __CS_VOLATILE_H__
 #------------------------------------------------------------------------------
 # Output generated files.  Also create makefile cache if caching enabled.
 #------------------------------------------------------------------------------
-          ac_config_commands="$ac_config_commands volatile.h"
+          ac_config_commands="$ac_config_commands include/volatile.h"
 
 cs_jamconfig_text="${cs_jamconfig_text}PACKAGE.NAME = \"$PACKAGE_NAME\" ;
 "
@@ -20763,13 +20763,13 @@ cat >>$CONFIG_STATUS <<_ACEOF
 # INIT-COMMANDS section.
 #
 
-cs_header_text='$cs_header_text' cs_dir=`(dirname volatile.h) 2>/dev/null ||
-$as_expr Xvolatile.h : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-         Xvolatile.h : 'X\(//\)[^/]' \| \
-         Xvolatile.h : 'X\(//\)$' \| \
-         Xvolatile.h : 'X\(/\)' \| \
+cs_header_text='$cs_header_text' cs_dir=`(dirname include/volatile.h) 2>/dev/null ||
+$as_expr Xinclude/volatile.h : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
+         Xinclude/volatile.h : 'X\(//\)[^/]' \| \
+         Xinclude/volatile.h : 'X\(//\)$' \| \
+         Xinclude/volatile.h : 'X\(/\)' \| \
          .     : '\(.\)' 2>/dev/null ||
-echo Xvolatile.h |
+echo Xinclude/volatile.h |
     sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{ s//\1/; q; }
   	  /^X\(\/\/\)[^/].*/{ s//\1/; q; }
   	  /^X\(\/\/\)$/{ s//\1/; q; }
@@ -20847,7 +20847,7 @@ for ac_config_target in $ac_config_targets
 do
   case "$ac_config_target" in
   # Handling of arguments.
-  "volatile.h" ) CONFIG_COMMANDS="$CONFIG_COMMANDS volatile.h" ;;
+  "include/volatile.h" ) CONFIG_COMMANDS="$CONFIG_COMMANDS include/volatile.h" ;;
   "Jamconfig" ) CONFIG_COMMANDS="$CONFIG_COMMANDS Jamconfig" ;;
   "Jamfile" ) CONFIG_COMMANDS="$CONFIG_COMMANDS Jamfile" ;;
   "test" ) CONFIG_COMMANDS="$CONFIG_COMMANDS test" ;;
@@ -20948,13 +20948,13 @@ ac_abs_top_srcdir=`cd "$ac_dir" && cd $ac_top_srcdir && pwd`
   { echo "$as_me:$LINENO: executing $ac_dest commands" >&5
 echo "$as_me: executing $ac_dest commands" >&6;}
   case $ac_dest in
-    volatile.h ) echo $ECHO_N "$cs_header_text$ECHO_C"  > $tmp/tcache
-            if diff volatile.h $tmp/tcache >/dev/null 2>&1; then
-                { echo "$as_me:$LINENO: volatile.h is unchanged" >&5
-echo "$as_me: volatile.h is unchanged" >&6;}
+    include/volatile.h ) echo $ECHO_N "$cs_header_text$ECHO_C"  > $tmp/tcache
+            if diff include/volatile.h $tmp/tcache >/dev/null 2>&1; then
+                { echo "$as_me:$LINENO: include/volatile.h is unchanged" >&5
+echo "$as_me: include/volatile.h is unchanged" >&6;}
             else
-                rm -f volatile.h
-                mv $tmp/tcache volatile.h
+                rm -f include/volatile.h
+                mv $tmp/tcache include/volatile.h
             fi ;;
     Jamconfig ) echo $ECHO_N "$cs_jamconfig_text$ECHO_C" | sed -e's/\${\([a-zA-Z_]\+\)}/$(\1)/g' -e's/\\/\\\\/g' > $tmp/tcache
             if diff Jamconfig $tmp/tcache >/dev/null 2>&1; then
