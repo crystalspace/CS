@@ -14,11 +14,32 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 13-Sep-1999
-	- Added djgpp.html doc from Seth Galbraith.
-	  Seth also updated tutorial.html.
+	- Added djgpp.html doc from Seth Galbraith.  Seth also updated
+	  tutorial.html.
 	- Small patch to unix glide driver from Stephan Goetter.
-	- Added sprite selection code from David Durant.
-	  Use mouse button 3 to select a sprite.
+	- Added sprite selection code from David Durant.  Use mouse button 3
+	  to select a sprite.
+	- Andrew Zabolotny added a wildcard expansion feature to VFS.
+	- Eric Sunshine fixed a bug in csVFS::FindFiles() which was introduced
+	  when wildcard expansion capability was added.  The bug frequently
+	  caused FindFiles() to return a list of files from the root (/)
+	  directory rather than the directory which was actually being
+	  searched.
+	- Eric Sunshine made the following changes to vsh (the VFS shell):
+	  - Fixed a bug which prevented the program from terminating when the
+	    user typed EOF (^d Unix, ^z DOS) on the input line.  In fact, it
+	    went into an infinite loop which spewed carriage returns to the
+	    console.
+	  - No longer uses the deprecated gets() function which is subject to
+	    input buffer overrun (and in fact, on MacOS/X Server, using this
+	    function actually generates a run-time warning message).  Now uses
+	    safe fgets() instead.
+	  - Now strips excess leading and trailing white-space from the input
+	    line.  Previously, such white-space would actually cause commands
+	    to go unrecognized, and prevent arguments from working correctly.
+	  - No longer gives an "unknown command: []" error when the user
+	    enters a blank line.
+	  - No longer overloads the name of the standard getopt() function.
 12-Sep-1999
 	- Fixed sprite visibility handling with octree/c-buffer and also
 	  made somewhat more optimal. There is still a problem with skeletal
