@@ -108,7 +108,7 @@ void csCoverageBuffer::InitializePolygonBuffer (const csBox2Int& bbox)
 
   int startcol = bbox.minx;
   if (startcol >= 40) startcol -= 40;
-  else if (startcol < 0) startcol = 0;
+  else startcol = 0;
   int endcol = bbox.maxx;
   if (endcol < 1000000) endcol += 40;	// For safety reasons!
   if (endcol >= width) endcol = width-1;
