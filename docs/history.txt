@@ -3,6 +3,10 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+16-May-2003
+	- Jorrit fixed a very weird bug in genmesh where SCF_CONSTRUCT_IBASE
+	  was called in the destructor of the embedded PolyMesh instead of
+	  the constructor. This could cause crashes at exit in some cases.
 15-May-2003
 	- res made the following changes to the fire proctex:
 	    - changed the algorithm a bit so it doesn't look tilted any more.
