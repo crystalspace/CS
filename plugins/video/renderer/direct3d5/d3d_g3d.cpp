@@ -1150,7 +1150,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonFX (ITextureHandle* handle,
   if (txt_mm->get_transparent ())
     VERIFY_RESULT (m_lpd3dDevice->SetRenderState (D3DRENDERSTATE_COLORKEYENABLE, TRUE), DD_OK);
 
-  if ((mode & CS_FX_MASK_MODE) != CS_FX_COPY)
+  if ((mode & CS_FX_MASK_MIXMODE) != CS_FX_COPY)
     VERIFY_RESULT (m_lpd3dDevice->SetRenderState (D3DRENDERSTATE_ALPHABLENDENABLE, TRUE), DD_OK);
 
   //Note: In all explanations of Mixing:
