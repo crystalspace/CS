@@ -22,10 +22,25 @@
 #include "csgeom/transfrm.h"
 #include "csengine/rview.h"
 #include "csobject/csobj.h"
+class csTextureHandle;
 
 class ddgTBinMesh;
 class ddgHeightMap;
 class ddgBBox;
+class ddgVector3;
+
+class ddgColor3
+{
+public:
+	/// Data
+	unsigned char v[3];
+	/// Set values
+	void set( ddgColor3 *c ) { v[0] = c->v[0]; v[1] = c->v[1]; v[2] = c->v[2]; }
+	/// Set values
+	void set( ddgColor3 c ) { v[0] = c.v[0]; v[1] = c.v[1]; v[2] = c.v[2]; }
+	/// Set values
+	void set( unsigned char r, unsigned char g, unsigned char b ) { v[0] = r; v[1] = g; v[2] = b; }
+};
 
 /**
  * This object encapsulates a terrain surface so that it
@@ -40,8 +55,15 @@ private:
   ddgHeightMap* height;
   ///
   ddgBBox* clipbox;
+  /// Terrain handle.
+  csTextureHandle *_textureMap;
   /// World to camera transformation matrix.
   double wtoc[16];
+  /// Colours used at various altitudes.
+  ddgColor3 _cliff, _beach, _grass, _trees, _rock, _snow;
+  /// Angle/Altitude at which color takes effect.
+  float	_cliffangle, _beachalt, _grassalt, _treealt, _rockalt, _snowalt;
+
 public:
   /**
    * Create an empty terrain.
@@ -65,6 +87,11 @@ public:
    * Draw this terrain given a view and transformation.
    */
   void Draw (csRenderView& rview, bool use_z_buf = true);
+
+  /// Set the texture for this surface.
+  void SetTexture (csTextureHandle *texture) { _textureMap = texture; }
+  /// Choose a color for a vertex.
+  void classify( ddgVector3 *p, ddgVector3 *n, ddgColor3 *c);
 
   CSOBJTYPE;
 };
