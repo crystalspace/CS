@@ -40,6 +40,9 @@ chronological order.
 	  is unrelated to the GNU command, and which serves a totally different
 	  purpose).  The check will be able to identify Apple's libtool even if
 	  a GNU's libtool appears in PATH before Apple's libtool.
+	- Eric Sunshine fixed bugs in configure.ac where it was composing
+	  search paths using a literal ":" delimiter rather than
+	  $PATH_SEPARATOR.
 22-Mar-2004
 	- Anders Stenberg fixed several places where mesh objects would
 	  return "false" from GetRenderMeshes (which is supposed to return
