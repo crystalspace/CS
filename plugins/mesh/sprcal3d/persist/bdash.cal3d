@@ -1,0 +1,51 @@
+<!--
+#
+# CS cal3d model xml file
+#
+# model: boulderdash
+#
+-->
+
+<!-- the meshfact name is the CS name used to instantiate instances of this object -->
+<meshfact name="boulderdash">
+
+   <!-- the plugin line specifies the plugin to use to parse the succeeding 'params' tag -->
+   <plugin>crystalspace.mesh.loader.factory.sprite.cal3d</plugin>
+
+   <params>
+
+	<!-- path specifies the OS-dependent directory path to where all the other files are located. optional.-->
+	<path dir="data/cal3d/" />
+
+	<!--scale value=".1" / not implemented yet -->
+
+	<!-- specify cal3d skeleton file used by model -->
+	<skeleton file="boulderdash.csf" />
+
+	<!-- animations specify the filename to load, and the CS-accessible name of this anim.
+  	     The type attribute is used to distinguish various types of animations.  Type 1 is
+	     a regular animation cycle with movement and type 4 is a one-time action. It is a
+	     TODO to use words instead of numbers here
+	     base_vel specifies the speed of translation which should be used when the animation
+	     is playing alone.
+	     min_vel and max_vel are used by the blender to achieve a specified desired velocity.
+	-->
+	<animation file="boulderdash_idle_01.caf"   name="stand"  type="1" base_vel="0" min_vel="0" max_vel="0" />
+	<animation file="boulderdash_walk_01.caf"   name="walk"   type="1" base_vel="0" min_vel="0" max_vel="0" />
+	<animation file="boulderdash_run_01.caf"    name="run"    type="1" base_vel="0" min_vel="0" max_vel="0" />
+	<animation file="boulderdash_taunt_01.caf"  name="taunt"  type="4" base_vel="0" min_vel="0" max_vel="0" />
+	<animation file="boulderdash_pain_01.caf"   name="pain"   type="4" base_vel="0" min_vel="0" max_vel="0" />
+	<animation file="boulderdash_attack_01.caf" name="attack" type="4" base_vel="0" min_vel="0" max_vel="0" />
+	<animation file="boulderdash_death_01.caf"  name="death"  type="4" base_vel="0" min_vel="0" max_vel="0" />
+	<animation file="boulderdash_dead_01.caf"   name="dead"   type="4" base_vel="0" min_vel="0" max_vel="0" />
+
+	<!-- materials are VFS filenames because they are CS materials and not cal3d materials. optional.-->
+	<material file="/this/data/cal3d/boulderdash_UVs.jpg" />
+
+	<!-- meshes specify each attachable part of the model.  The name is the CS-accessible name which will
+	     be used to select/deselect it for the model.  The material specified is the default CS material
+	     used by this mesh.  -->
+	<mesh file="boulderdash_super.cmf" name="Body" material="/this/data/cal3d/boulderdash_UVs.jpg" />
+
+    </params>
+</meshfact>
