@@ -175,7 +175,7 @@ void csPolyTexture::InitLightMaps ()
 //====================================================
 // This routine will try to find a plane that goes
 // through the light position and two points in space,
-// and that cleanly seperates the two given polygons
+// and that cleanly separates the two given polygons
 // (i.e. one polygon on the left and the other on the
 // right of that plane). If such a plane exists then
 // we know the polygons cannot shadow each other as
@@ -253,7 +253,7 @@ static bool CanCastShadow (
 {
   /*
    * To polygons cannot shadow each other if there is a plane between
-   * the light position and two points in space that cleanly seperates
+   * the light position and two points in space that cleanly separates
    * the two polygons. These are the criteria we now use in this test.
    */
   if (FindSeparatingPlane (
@@ -262,7 +262,7 @@ static bool CanCastShadow (
 	lightpos))
     return false;
 
-  // If we couldn't find a seperating plane between poly1 and p then
+  // If we couldn't find a separating plane between poly1 and p then
   // we also try the reverse because that way we might give a good
   // result.
   if (FindSeparatingPlane (
