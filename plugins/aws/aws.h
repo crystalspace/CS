@@ -86,6 +86,9 @@ class awsManager : public iAws
    /// The current component that has keyboard focus.
    iAwsComponent *keyb_focus;
 
+   /// The current component that has mouse focus locked, if there is one, NULL otherwise.
+   iAwsComponent *mouse_focus;
+
    /// True if mouse events are locked into the top window
    bool          mouse_captured;
 
@@ -171,7 +174,7 @@ public:
     virtual void       InvalidateUpdateStore();
 
     /// Capture all mouse events until release is called, no matter where the mouse is
-    virtual void       CaptureMouse();
+    virtual void       CaptureMouse(iAwsComponent *comp);
 
     /// Release the mouse events to go where they normally would.
     virtual void       ReleaseMouse();
@@ -188,6 +191,9 @@ protected:
 
     /// Handles MouseEnter/Exit message when broadcasting component events.
     bool CheckFocus(iAwsComponent *cmp, iEvent &Event);
+
+    /// Dispatches MouseEnter/Exit and Got/LostFocus messages for focus change.
+    void PerformFocusChange(iAwsComponent *cmp, iEvent &Event);
 
     /// Recursively creates child components and adds them into a parent.  Used internally.
     void CreateChildrenFromDef(iAws *wmgr, iAwsWindow *win, iAwsComponent *parent, awsComponentNode *settings);
@@ -231,7 +237,7 @@ public:
     /// Get the iGraphics3D interface so that components can use it.
     virtual iGraphics3D *G3D();
 
-    /// Get the iGraphics3D interface so that components can use it.
+    /// Get the iObjectRegistry interface so that components can use it.
     virtual iObjectRegistry *GetObjectRegistry();
 
     /// Dispatches events to the proper components
@@ -245,6 +251,9 @@ public:
 
     /// Returns the current flags
     virtual unsigned int GetFlags();
+
+    /// Returns true if all windows are presently hidden
+    bool AllWindowsHidden();
 
   //////////////////////////////////////
 

@@ -358,8 +358,8 @@ awsCmdButton::OnMouseUp(int ,int ,int )
 }
 
 bool
-awsCmdButton::OnMouseMove(int ,int ,int )
-{
+awsCmdButton::OnMouseMove(int button, int x, int y)
+{    
   return false;
 }
 
@@ -390,6 +390,7 @@ awsCmdButton::OnMouseExit()
 bool
 awsCmdButton::OnMouseEnter()
 {
+
   mouse_is_over=true;
   Invalidate();
   return true;

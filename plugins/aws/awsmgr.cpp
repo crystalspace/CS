@@ -50,10 +50,8 @@ awsManager::awsComponentFactoryMap::~awsComponentFactoryMap ()
   factory->DecRef ();
 }
 
-awsManager::awsManager(iBase *p):prefmgr(NULL), sinkmgr(NULL),
-updatestore_dirty(true),
-top(NULL), mouse_in(NULL), keyb_focus(NULL),
-mouse_captured(false),
+awsManager::awsManager(iBase *p):prefmgr(NULL), sinkmgr(NULL), updatestore_dirty(true),
+top(NULL), mouse_in(NULL), keyb_focus(NULL), mouse_focus(NULL), mouse_captured(false),
 ptG2D(NULL), ptG3D(NULL), object_reg(NULL),
 canvas(NULL), flags(0)
 {
@@ -689,15 +687,20 @@ awsManager::CreateChildrenFromDef(iAws *wmgr, iAwsWindow *win, iAwsComponent *pa
 }
 
 void
-awsManager::CaptureMouse()
+awsManager::CaptureMouse(iAwsComponent *comp)
 {
   mouse_captured=true;
+  if (comp==NULL)
+    comp=GetTopWindow();
+
+  mouse_focus=comp;
 }
 
 void
 awsManager::ReleaseMouse()
 {
   mouse_captured=false;
+  mouse_focus=NULL;
 }
 
 
@@ -717,41 +720,52 @@ awsManager::HandleEvent(iEvent& Event)
     if (GetTopWindow())
     {
       // If the mouse is locked into the top window, keep it there
-      if (mouse_captured)
+      if (mouse_captured && mouse_focus)
       {
-        if (RecursiveBroadcastToChildren(GetTopWindow(), Event)) return true;
-        else return GetTopWindow()->HandleEvent(Event);
-
-        break;
+        if (RecursiveBroadcastToChildren(mouse_focus, Event)) return true;
+        else return mouse_focus->HandleEvent(Event);
+        
       } // end mouse captured
-
-      // If the top window still contains the mouse, it stays on top
-      if (!GetTopWindow()->isHidden() && GetTopWindow()->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
-      {
-        if (RecursiveBroadcastToChildren(GetTopWindow(), Event)) return true;
-        else return GetTopWindow()->HandleEvent(Event);
-      } // end if topmost window contains it
       else
       {
-        // Find the window that DOES contain the mouse.
-
-        iAwsWindow *win=GetTopWindow();
-
-        // Skip the top 'cause we already checked it.
-        if (win) win=win->WindowBelow();
-
-        while (win)
+        // If the top window still contains the mouse, it stays on top
+        if (!GetTopWindow()->isHidden() && GetTopWindow()->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
         {
-          // If the window contains the mouse, it becomes new top.
-          if (!win->isHidden() && win->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
+          if (RecursiveBroadcastToChildren(GetTopWindow(), Event)) return true;
+          else 
+          {            
+            PerformFocusChange(GetTopWindow(), Event);
+            return GetTopWindow()->HandleEvent(Event);
+          }
+        } // end if topmost window contains it
+        else
+        {
+          // Find the window that DOES contain the mouse.
+
+          iAwsWindow *win=GetTopWindow();
+
+          // Skip the top 'cause we already checked it.
+          if (win) win=win->WindowBelow();
+
+          while (win)
           {
-            win->Raise();
-            if (RecursiveBroadcastToChildren(win, Event)) return true;
-            else return win->HandleEvent(Event);
-          } else
-            win = win->WindowBelow();
-        } // end while iterating windows
-      } // end else check all other windows
+            // If the window contains the mouse, it becomes new top.
+            if (!win->isHidden() && win->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
+            {
+              win->Raise();
+              if (RecursiveBroadcastToChildren(win, Event)) return true;
+              else 
+              {
+                PerformFocusChange(win, Event);
+                return win->HandleEvent(Event);
+              }
+            } 
+            else
+              win = win->WindowBelow();
+
+          } // end while iterating windows
+        } // end else check all other windows
+      } // end else mouse is not captured
     } // end if there is a top window
 
     break;
@@ -810,46 +824,7 @@ awsManager::CheckFocus(iAwsComponent *cmp, iEvent &Event)
     // Only give to child if it contains the mouse.
     if (cmp->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
     {
-
-      if (mouse_in != cmp)
-      {
-        // Create a new event for MouseExit and MouseEnter
-        uint8 et = Event.Type;
-
-        if (mouse_in)
-        {
-          Event.Type = csevMouseExit;
-          mouse_in->HandleEvent(Event);
-        }
-
-        mouse_in=cmp;
-        Event.Type = csevMouseEnter;
-        mouse_in->HandleEvent(Event);
-
-        Event.Type = et;
-      }
-
-      if (Event.Type == csevMouseDown)
-      {
-        if (keyb_focus != cmp)
-        {
-          // Create a new event for MouseExit and MouseEnter
-          uint8 et = Event.Type;
-
-          if (keyb_focus)
-          {
-            Event.Type = csevLostFocus;
-            keyb_focus->HandleEvent(Event);
-          }
-
-          keyb_focus=cmp;
-          Event.Type = csevGainFocus;
-          keyb_focus->HandleEvent(Event);
-
-          Event.Type = et;
-        }
-      }
-
+      PerformFocusChange(cmp, Event);      
       return cmp->HandleEvent(Event);
     }
     break;
@@ -863,6 +838,52 @@ awsManager::CheckFocus(iAwsComponent *cmp, iEvent &Event)
   }  // End switch
 
   return false;
+}
+
+void
+awsManager::PerformFocusChange(iAwsComponent *cmp, iEvent &Event)
+{
+  // Create a new event for MouseExit and MouseEnter
+  uint8 et = Event.Type;
+ 
+  if (mouse_in == cmp)
+    return;
+
+  //printf("focus %x (%s)-> %x (%s)\n", mouse_in, (mouse_in ? mouse_in->Type() : "None"), cmp, cmp->Type());
+
+  if (mouse_in)
+  {
+    Event.Type = csevMouseExit;
+    mouse_in->HandleEvent(Event);
+  }
+
+  mouse_in=cmp;
+
+  Event.Type = csevMouseEnter;
+  mouse_in->HandleEvent(Event);
+
+  Event.Type = et;
+
+  if (et == csevMouseDown)
+  {
+   if (keyb_focus != cmp)
+   {
+     // Create a new event for Got/Lost Focus messages
+     et = Event.Type;
+
+     if (keyb_focus)
+     {
+       Event.Type = csevLostFocus;
+       keyb_focus->HandleEvent(Event);
+     }
+
+     keyb_focus=cmp;
+     Event.Type = csevGainFocus;
+     keyb_focus->HandleEvent(Event);
+
+     Event.Type = et;
+   }
+  }
 }
 
 void
@@ -890,6 +911,22 @@ awsManager::RegisterCommonComponents()
   GetPrefMgr()->RegisterConstant("No", 0);
 
   GetPrefMgr()->RegisterConstant("signalComponentCreated", 0xefffffff);
+}
+
+bool
+awsManager::AllWindowsHidden()
+{
+  iAwsWindow *curwin=top, *oldwin = 0;
+
+  while (curwin)
+  {
+    if (!curwin->isHidden())
+      return false;
+    
+    curwin = curwin->WindowBelow();
+  }
+
+  return true;
 }
 
 iGraphics2D *

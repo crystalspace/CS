@@ -238,7 +238,8 @@ awsTextBox::OnDraw(csRect clip)
 bool
 awsTextBox::OnMouseDown(int ,int ,int )
 {
-  return false;
+  /// This is needed to get keyboard focus for the mouse!
+  return true;
 }
 
 bool
@@ -333,7 +334,7 @@ awsTextBox::OnLostFocus()
   has_focus=false;
   Broadcast(signalLostFocus);
   Invalidate();
-  return false;
+  return true;
 }
 
 bool
@@ -341,7 +342,7 @@ awsTextBox::OnGainFocus()
 {
   has_focus=true;
   Invalidate();
-  return false;
+  return true;
 }
 
 /************************************* Command Button Factory ****************/

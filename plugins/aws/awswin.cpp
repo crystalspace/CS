@@ -327,7 +327,7 @@ awsWindow::OnMouseDown(int button, int x, int y)
         y<Frame().ymax && y>Frame().ymax-grip_size)
     {
       resizing_mode=true;
-      WindowManager()->CaptureMouse();
+      WindowManager()->CaptureMouse(this);
       WindowManager()->Mark(Frame());
 
       // Erase the old frame if it needs it
@@ -354,7 +354,7 @@ awsWindow::OnMouseDown(int button, int x, int y)
             )
     {
       moving_mode=true;
-      WindowManager()->CaptureMouse();
+      WindowManager()->CaptureMouse(this);
       last_x=x;
       last_y=y;
 

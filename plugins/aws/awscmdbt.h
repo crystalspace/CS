@@ -33,7 +33,7 @@ class awsCmdButton : public awsComponent
 
    /// True if button was down, and button is in switch mode (toggle=yes)
    bool was_down;
-
+   
    /** Multipurpose: holds the texture and image bitmaps for normal and toolbar buttons, also
     * holds the normal, highlighted, and clicked images for bitmap buttons.
     */
