@@ -6,11 +6,22 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Dec-2004
+	- Jorrit added a first version of a new heightmapgen tool. This
+	  tool will take an input world file, pick up one mesh from that world
+	  file and convert it to a terrain world. This can be used to make
+	  worlds in blender (for example) that have a terrain. The way to do
+	  this is to make a genmesh terrain and then have this tool convert
+	  it. This tool works by taking a config file as input and using
+	  all settings in that config file. This is the first version. It
+	  still has several limitations. For example, it leaves the original
+	  world file alone but ideally it should remove the mesh from that
+	  world file. There is an example config file in
+	  data/config/heightmapgen.cfg. This one is not used by default though.
 22-Dec-2004
 	- Philipp Aumayr fixed a bug in the thing where the bounding box was not
 	  invalidated when a quad was added.. this fixes a culling probs with
 	  objects created at runtime.
-
 21-Dec-2004
 	- Eric Sunshine generalized `jobber.pl' to make it project-agnostic. It
 	  can now be used by any project for performing maintenance tasks.  The
