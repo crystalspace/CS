@@ -110,7 +110,7 @@
 #endif
 
 #if defined (OS_NEXT)
-#  include "cssys/next/shared/osdefs.h"
+#  include "cssys/next/osdefs.h"
 #endif
 
 //--//--//--//--//--/ Allow system-dependent header files to override these --//
