@@ -36,10 +36,10 @@
 
 //---------------------------------------------------------------------------
 
-csTGAImageLoader tgaloader;
 bool RegisterTGA ()
 {
-  return csImageLoader::Register (&tgaloader);
+  static csTGAImageLoader loader;
+  return csImageLoader::Register (&loader);
 }
 
 csImageFile* csTGAImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)

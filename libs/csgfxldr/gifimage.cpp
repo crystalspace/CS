@@ -24,11 +24,10 @@
 #include "csgfxldr/gifimage.h"
 
 //---------------------------------------------------------------------------
-csGIFImageLoader gifloader;
-
 bool RegisterGIF ()
 {
-  return csImageLoader::Register (&gifloader);
+  static csGIFImageLoader loader;
+  return csImageLoader::Register (&loader);
 }
 
 csImageFile* csGIFImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)

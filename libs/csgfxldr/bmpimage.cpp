@@ -26,11 +26,10 @@
 #include "csgfxldr/bmpimage.h"
 #include "cssys/csendian.h"
 
-csBMPImageLoader bmploader;
-
 bool RegisterBMP ()
 {
-  return csImageLoader::Register (&bmploader);
+  static csBMPImageLoader loader;
+  return csImageLoader::Register (&loader);
 }
 
 csImageFile* csBMPImageLoader::LoadImage (UByte* iBuffer, ULong iSize,
