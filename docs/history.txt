@@ -16,6 +16,8 @@ chronological order.
 	  They don't appear to work (crash).
 	- Troy in dynamics.h added bried comments to iRigidBody 
 	  AttachCollider methods to allow them to appear in API docs.
+	- res improved 'detection' of what font cache has to be used for 
+	  software canvases.
 14-Aug-2003
 	- Jorrit added iSharedVariableListener. With this interface you can
 	  listen to a variable and get notified when its value changes.

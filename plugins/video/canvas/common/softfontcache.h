@@ -55,6 +55,17 @@ public:
     const utf8_char* text);
 };
 
+class csSoftFontCache16_NoAA : public csSoftFontCache
+{
+public:
+  csSoftFontCache16_NoAA (csGraphics2D* G2D);
+
+  virtual void WriteString (iFont *font, int x, int y, int fg, int bg, 
+    const utf8_char* text);
+  virtual void WriteStringBaseline (iFont *font, int x, int y, int fg, int bg, 
+    const utf8_char* text);
+};
+
 class csSoftFontCache16_555 : public csSoftFontCache
 {
 public:

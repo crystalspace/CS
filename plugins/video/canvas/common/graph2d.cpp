@@ -275,15 +275,26 @@ bool csGraphics2D::Open ()
 
   if (!fontCache)
   {
-    if (Depth == 8)
+    if (pfmt.PixelBytes == 1)
     {
       fontCache = new csSoftFontCache8 (this);
     }
-    else if (Depth == 16)
+    else if (pfmt.PixelBytes == 2)
     {
-      fontCache = new csSoftFontCache16_565 (this);
+      if (pfmt.GreenMask == 0x07e0)
+      {
+        fontCache = new csSoftFontCache16_565 (this);
+      }
+      else if (pfmt.GreenMask == 0x03e0)
+      {
+        fontCache = new csSoftFontCache16_555 (this);
+      }
+      else
+      {
+        fontCache = new csSoftFontCache16_NoAA (this);
+      }
     }
-    else if (Depth == 32)
+    else if (pfmt.PixelBytes == 4)
     {
       fontCache = new csSoftFontCache32 (this);
     }

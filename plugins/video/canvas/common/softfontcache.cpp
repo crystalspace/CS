@@ -63,6 +63,17 @@ csSoftFontCache8::csSoftFontCache8 (csGraphics2D* G2D) : csSoftFontCache (G2D)
 
 //---------------------------------------------------------------------------
 
+csSoftFontCache16_NoAA::csSoftFontCache16_NoAA (csGraphics2D* G2D) : csSoftFontCache (G2D)
+{
+}
+
+#define WS_NAME csSoftFontCache16_NoAA::WriteString
+#define WS_NAME2 csSoftFontCache16_NoAA::WriteStringBaseline
+#define WS_PIXTYPE uint16
+#include "writechr.inc"
+
+//---------------------------------------------------------------------------
+
 csSoftFontCache16_555::csSoftFontCache16_555 (csGraphics2D* G2D) : csSoftFontCache (G2D)
 {
 }
