@@ -97,12 +97,10 @@ public:
 
   /// Reuse the iterator for an other search
   void Reset (iSector *pSector, const char *classname = 0);
-  /// Get the object we are pointing at
-  iMapNode *GetNode ();
   /// Move forward
-  void Next ();
+  iMapNode* Next ();
   /// Check if there are other nodes
-  bool IsFinished () const;
+  bool HasNext () const;
 
 protected:
   /// Skip all nodes with wrong classname

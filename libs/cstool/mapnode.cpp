@@ -67,9 +67,10 @@ void csMapNode::SetSector (iSector *pSector)
 iMapNode* csMapNode::GetNode (iSector *pSector, const char* name,
   const char* classname)
 {
-  for (csNodeIterator Iter(pSector,classname); !Iter.IsFinished(); Iter.Next())
+  csNodeIterator Iter (pSector,classname);
+  while (Iter.HasNext ())
   {
-    iMapNode *pNode = Iter.GetNode ();
+    iMapNode *pNode = Iter.Next ();
     if (strcmp (pNode->QueryObject ()->GetName (), name) == 0)
       return pNode;
   }
@@ -98,20 +99,16 @@ void csNodeIterator::Reset (iSector *pSector, const char *classname)
   SkipWrongClassname ();
 }
 
-iMapNode *csNodeIterator::GetNode ()
-{
-  return CurrentNode;
-}
-
-void csNodeIterator::Next ()
+iMapNode* csNodeIterator::Next ()
 {
   NextNode ();
   SkipWrongClassname ();
+  return CurrentNode;
 }
 
-bool csNodeIterator::IsFinished () const
+bool csNodeIterator::HasNext () const
 {
-  return !Iterator->HasNext ();
+  return Iterator->HasNext ();
 }
 
 void csNodeIterator::SkipWrongClassname ()

@@ -105,10 +105,10 @@ For example:
 
 @example
 csSector* pSector = GetCurrentSector();
-csNodeIterator iter(pSector,"cs_medikit");
-for ( ; !iter.IsFinished(); iter.Next())
+csNodeIterator iter (pSector,"cs_medikit");
+while (iter.HasNext ())
 @{
-  csMapNode* pNode = iter.GetNode();
+  csMapNode* pNode = iter.Next();
   csVector3 pos = pNode->GetPosition();
   CreateMedikit(pos);
 @}

@@ -244,6 +244,7 @@ the visible mesh.)
 @cindex @code{csModelDataTextureIterator}
 @cindex @code{csModelDataMaterialIterator}
 @cindex @code{csModelDataObjectIterator}
+@cindex @code{csNodeIterator}
 
 Changed the following iterators to conform to the following iterator standard:
 @example
@@ -277,5 +278,7 @@ Changed the following iterators to conform to the following iterator standard:
 @code{csModelDataMaterialIterator}
 @item
 @code{csModelDataObjectIterator}
+@item
+@code{csNodeIterator}
 @end itemize
 
