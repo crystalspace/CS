@@ -1193,7 +1193,8 @@ csMeshedPolygon* csThing::PolyMesh::GetPolygons ()
         num++;
     }
   
-    polygons = new csMeshedPolygon [num];
+    // Always allocate at least one polygon.
+    polygons = new csMeshedPolygon [num ? num : 1];
     num = 0;
     for (i = 0 ; i < scfParent->GetNumPolygons () ; i++)
     {

@@ -15,6 +15,7 @@ The history order is reversed so that new features are at the top.
 	  experiment with it.
 	- Removed the obsolete and unused support for multiple textures
 	  in G3DTriangleMesh. This now solved with materials.
+	- Fixed an allocate of 0 size in the engine.
 1-May-2001
 	- Fixed a bug in software renderer so that tiling really works.
 	- Extended the iMaterial structure in preparation of multi-texturing
