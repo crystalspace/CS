@@ -703,7 +703,10 @@ float ddgTBinTree::treeHeight(unsigned int r, unsigned int c, float dx, float dz
 {
     // Is this triangle mirrored.
     csVector3 v(dx,0,dz);
-/*
+#if 1
+    (void)r;
+    (void)c;
+#else
     unsigned int m = (dx+dz > 1.0) ? 1 : 0;
     float h1 = height(r+ m,  c + m);
     float h2 = height(r,  c+1);
@@ -713,7 +716,7 @@ float ddgTBinTree::treeHeight(unsigned int r, unsigned int c, float dx, float dz
     csVector3 p2(1,h3,0),
     ddgPlane p(p0,p1,p2);
     p.projectAlongY(&v);
-*/
+#endif
     return v.y;
 }
 
