@@ -52,7 +52,8 @@ SRC.GLRENDER3D = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.GLRENDER3D)/*.cpp \
 OBJ.GLRENDER3D = \
   $(addprefix $(OUT.GLRENDER3D)/,$(notdir $(SRC.GLRENDER3D:.cpp=$O)))
 DEP.GLRENDER3D = CSTOOL CSGFX CSGEOM CSUTIL
-CFG.GLRENDER3D = $(SRCDIR)/data/config/r3dopengl.cfg
+CFG.GLRENDER3D = \
+  $(SRCDIR)/data/config/r3dopengl.cfg $(SRCDIR)/data/config/gldrivers.xml
 
 OUTDIRS += $(OUT.GLRENDER3D)
 

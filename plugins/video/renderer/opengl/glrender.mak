@@ -63,7 +63,10 @@ SRC.GL3D = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.GL3D)/*.cpp \
 OBJ.GL3D = $(addprefix $(OUT.GL3D)/,$(notdir $(SRC.GL3D:.cpp=$O)))
 DEP.GL3D = CSGEOM CSUTIL CSUTIL CSGFX
 CFG.GL3D = $(addprefix $(SRCDIR)/, \
-  data/config/opengl.cfg data/config/glnvgf.cfg data/config/gl3dfx.cfg)
+  data/config/opengl.cfg \
+  data/config/glnvgf.cfg \
+  data/config/gl3dfx.cfg \
+  data/config/gldrivers.xml)
 
 OUTDIRS += $(OUT.GL3D)
 

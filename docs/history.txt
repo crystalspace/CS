@@ -47,6 +47,9 @@ chronological order.
 	  Needed for the GL driver db.
 	- res fixed mk/msvcgen/win32.mak to include generic/regex.c into the VC
 	  projects of csutil.
+	- Eric Sunshine fixed glrender.mak and gl_render3d.mak so that they
+	  install data/config/gldrivers.xml, which is needed by the OpenGL
+	  driver database.
 29-Feb-2004
 	- Eric Sunshine augmented the configure.ac Python check so that it can
 	  detect a working Python installation on MacOS/X despite the fact that
