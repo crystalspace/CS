@@ -7,8 +7,9 @@
 //
 
 
-// This code must be callable from the ObjC delegate.  Since that uses the standard C compiler, it doesn't like
-// C++ classes, so we create a C API to some functions of this object
+// This code must be callable from the ObjC delegate.  Since that uses the standard C
+// compiler, it doesn't like C++ classes, so we create a C API to some functions of
+// this object
 
 #ifndef __OSXDRIVER2D_H
 #define __OSXDRIVER2D_H
@@ -24,6 +25,7 @@
 #include "plugins/video/canvas/common/graph2d.h"
 
 #include <CoreFoundation/CoreFoundation.h>
+#include <ApplicationServices/ApplicationServices.h>
 
 
 class OSXDriver2D
@@ -91,13 +93,16 @@ protected:
 
     // Toggle current state of fullscreen
     virtual bool ToggleFullscreen();
-
-protected:
+    
+    // Choose which display to use
+    void ChooseDisplay();
 
     CFDictionaryRef originalMode;		// Original display mode
     bool inFullscreenMode;			// Flag to indicate that we have correctly switched to fs mode
-
-    int origWidth, origHeight;			// It is necessary to keep the original values so the can be
+    CGDirectDisplayID display;			// Screen to display on
+    uint32_t screen;				// Screen number to display on
+    
+    int origWidth, origHeight;			// It is necessary to keep the original values so they can be
                                                 // restored when switching modes
 
     OSXDelegate2D delegate;			// Delegate for ObjC stuff

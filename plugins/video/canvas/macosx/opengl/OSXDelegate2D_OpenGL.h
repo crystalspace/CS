@@ -16,7 +16,8 @@
 #define DEL2D_FUNC(ret, func) __private_extern__ "C" inline ret OSXDelegate2D_##func
 
 
-DEL2D_FUNC(CGLContextObj, createOpenGLContext)(OSXDelegate2D delegate, int depth);
+DEL2D_FUNC(CGLContextObj, createOpenGLContext)(OSXDelegate2D delegate, int depth,
+                                                CGDirectDisplayID display);
 DEL2D_FUNC(void, updateOpenGLContext)(OSXDelegate2D delegate);
 
 #undef DEL2D_FUNC

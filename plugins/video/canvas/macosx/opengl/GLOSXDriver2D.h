@@ -59,7 +59,7 @@ public:
 
     // Toggle between fullscreen/windowed mode
     virtual bool ToggleFullscreen();
-
+    
 protected:
 
     // Set up the function pointers for drawing based on the current Depth

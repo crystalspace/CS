@@ -34,7 +34,7 @@
 @interface OSXDelegate2D (OpenGL)
 
 // Create an OpenGL Context
-- (CGLContextObj) createOpenGLContext:(int) depth;
+- (CGLContextObj) createOpenGLContext:(int) depth display:(CGDirectDisplayID) display;
 
 // Update OpenGL context (bind to current window, etc)
 - (void) updateOpenGLContext;
@@ -50,14 +50,15 @@ NSOpenGLContext *context;
 // Create an OpenGL context in the window and return it
 // Return a C representation since the core class can't handle the ObjC object
 // Safe to call without a window - will create an unbound context
-- (CGLContextObj) createOpenGLContext:(int) depth
+- (CGLContextObj) createOpenGLContext:(int) depth display:(CGDirectDisplayID) display
 {
     NSOpenGLPixelFormat *pixelFormat;
 
     // Attributes for OpenGL contexts (0 is for fullscreen, 1 is for window)
     NSOpenGLPixelFormatAttribute attribs[] = {
         NSOpenGLPFAWindow, NSOpenGLPFADoubleBuffer, NSOpenGLPFAAccelerated,
-        NSOpenGLPFAColorSize, depth, NSOpenGLPFADepthSize, 16, nil
+        NSOpenGLPFAColorSize, depth, NSOpenGLPFADepthSize, 16, 
+        NSOpenGLPFAScreenMask, CGDisplayIDToOpenGLDisplayMask(display), nil
     };
 
     // Create a pixel format
@@ -74,8 +75,9 @@ NSOpenGLContext *context;
     // Need to know when window is resized so we can update the OpenGL context
     if (window != nil)
     {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(windowResized:)
-                                                name:NSWindowDidResizeNotification object:window];
+        [[NSNotificationCenter defaultCenter] addObserver:self 
+                selector:@selector(windowResized:)
+                name:NSWindowDidResizeNotification object:window];
 
         // Bind context
         [context setView:[window contentView]];
@@ -93,8 +95,9 @@ NSOpenGLContext *context;
 - (void) updateOpenGLContext
 {
     // Listen for resizes on new window
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(windowResized:)
-                                                name:NSWindowDidResizeNotification object:window];
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+                            selector:@selector(windowResized:)
+                            name:NSWindowDidResizeNotification object:window];
 
     [context setView:[window contentView]];
     [context makeCurrentContext];
@@ -122,9 +125,10 @@ typedef void *OSXDelegate2DHandle;
 
 
 // C API to driver delegate class - wrappers around methods
-DEL2D_FUNC(CGLContextObj, createOpenGLContext)(OSXDelegate2DHandle delegate, int depth)
+DEL2D_FUNC(CGLContextObj, createOpenGLContext)(OSXDelegate2DHandle delegate, int depth,
+                                                CGDirectDisplayID display)
 {
-    return [(OSXDelegate2D *) delegate createOpenGLContext:depth];
+    return [(OSXDelegate2D *) delegate createOpenGLContext:depth display:display];
 };
 
 DEL2D_FUNC(void, updateOpenGLContext)(OSXDelegate2DHandle delegate)

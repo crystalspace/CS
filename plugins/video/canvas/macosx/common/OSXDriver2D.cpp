@@ -10,6 +10,7 @@
 // Must be first include
 #include "cssysdef.h"
 #include "csutil/scf.h"
+#include "iutil/cmdline.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
@@ -18,7 +19,6 @@
 
 #include "OSXDriver2D.h"
 
-#include <ApplicationServices/ApplicationServices.h>
 
 SCF_IMPLEMENT_IBASE(OSXDriver2D::EventHandler)
   SCF_IMPLEMENTS_INTERFACE(iEventHandler)
@@ -36,6 +36,7 @@ OSXDriver2D::OSXDriver2D(csGraphics2D *inCanvas)
 
     origWidth = 0;
     origHeight = 0;
+    display = kCGDirectMainDisplay;
 
     delegate = OSXDelegate2D_new(this);
 };
@@ -87,8 +88,11 @@ bool OSXDriver2D::Initialize(iObjectRegistry *reg)
         queue->DecRef();
     }
 
+    // Figure out what screen we will be using
+    ChooseDisplay();
+
     // Get and save original mode - released in Close()
-    originalMode = CGDisplayCurrentMode(kCGDirectMainDisplay);
+    originalMode = CGDisplayCurrentMode(display);
 
     return true;
 };
@@ -120,7 +124,8 @@ bool OSXDriver2D::Open()
 
     // Create window
     if (OSXDelegate2D_openWindow(delegate, canvas->win_title,
-                                    canvas->Width, canvas->Height, canvas->Depth, canvas->FullScreen) == false)
+                                    canvas->Width, canvas->Height, canvas->Depth,
+                                    canvas->FullScreen, display, screen) == false)
         return false;
 
     return true;
@@ -155,6 +160,12 @@ bool OSXDriver2D::HandleEvent(iEvent &ev)
         if (ev.Command.Code == cscmdFocusChanged)
         {
             OSXDelegate2D_focusChanged(delegate, ev.Command.Info);
+            handled = true;
+        };
+        if (ev.Command.Code == cscmdCommandLineHelp)
+        {
+            printf("Options for MacOS X 2D graphics drivers:\n"
+                   "  -screen=<num>      Screen number to display on (default=0)\n");
             handled = true;
         };
     }
@@ -223,17 +234,17 @@ void OSXDriver2D::Initialize32()
 bool OSXDriver2D::EnterFullscreenMode()
 {
     // Find mode and copy parameters
-    CFDictionaryRef mode = CGDisplayBestModeForParameters(kCGDirectMainDisplay,
-                                                            canvas->Depth, canvas->Width, canvas->Height, NULL);
+    CFDictionaryRef mode = CGDisplayBestModeForParameters(display, canvas->Depth, 
+                                                        canvas->Width, canvas->Height, NULL);
     if (mode == NULL)
         return false;
 
     // Lock displays
-    if (CGCaptureAllDisplays() != CGDisplayNoErr)
+    if (CGDisplayCapture(display) != CGDisplayNoErr)
         return false;
 
     // Switch to new mode
-    if (CGDisplaySwitchToMode(kCGDirectMainDisplay, mode) == CGDisplayNoErr)
+    if (CGDisplaySwitchToMode(display, mode) == CGDisplayNoErr)
     {
         // Extract actual Width/Height/Depth
         CFNumberGetValue((CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayWidth), kCFNumberLongType,
@@ -257,7 +268,7 @@ bool OSXDriver2D::EnterFullscreenMode()
 // Switch out of fullscreen mode, to mode stored in originalMode
 void OSXDriver2D::ExitFullscreenMode()
 {
-    CGDisplaySwitchToMode(kCGDirectMainDisplay, originalMode);
+    CGDisplaySwitchToMode(display, originalMode);
     CGReleaseAllDisplays();
 };
 
@@ -291,11 +302,55 @@ bool OSXDriver2D::ToggleFullscreen()
 
     if (success == true)
         OSXDelegate2D_openWindow(delegate, canvas->win_title,
-                                    canvas->Width, canvas->Height, canvas->Depth, canvas->FullScreen);
+                                    canvas->Width, canvas->Height, canvas->Depth, canvas->FullScreen, display, screen);
 
     return success;
 };
 
+
+// chooseDisplay
+// Choose which display to use
+// Updates the screen and display members
+void OSXDriver2D::ChooseDisplay()
+{
+    iCommandLineParser *parser = CS_QUERY_REGISTRY(objectReg, iCommandLineParser);
+    const char *s = parser->GetOption("screen");
+    if (s != NULL)
+        screen = atoi(s);
+    else
+    {
+        csConfigAccess cfg(objectReg, "/config/video.cfg");
+        screen = cfg->GetInt("Video.ScreenNumber", 0);
+    };
+
+    // Get list of displays and get id of display to use if not default
+    display = kCGDirectMainDisplay;
+    if (screen != 0)
+    {
+        CGDisplayErr err;
+        CGDisplayCount numDisplays;
+        CGDirectDisplayID displayList[32];	// Who is going to have more than 32 displays??
+        
+        err = CGGetActiveDisplayList(32, displayList, &numDisplays);
+        if (err == CGDisplayNoErr)
+        {
+            if (screen < numDisplays)
+                display = displayList[screen];
+            else
+                csReport(objectReg, CS_REPORTER_SEVERITY_WARNING, 
+                        "crystalspace.canvas.osxdriver2d",
+                        "WARNING: Requested screen %d but only %d are available - using main display\n", 
+                        screen, numDisplays);
+        }
+        else
+            csReport(objectReg, CS_REPORTER_SEVERITY_WARNING, 
+                    "crystalspace.canvas.osxdriver2d",
+                    "WARNING: Requested screen %d but unable to get screen list - using main display\n", screen);
+                    
+        if (display == kCGDirectMainDisplay)
+            screen = 0;
+    };
+};
 
 
 /// C API to driver class

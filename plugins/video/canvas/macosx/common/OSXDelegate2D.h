@@ -54,7 +54,7 @@
 - (BOOL) acceptsFirstResponder;
 
 // Open a window if none open
-- (BOOL) openWindow:(char *) winTitle width:(int) w height:(int) h depth:(int) d fullscreen:(BOOL) fs;
+- (BOOL) openWindow:(char *) winTitle width:(int) w height:(int) h depth:(int) d fullscreen:(BOOL) fs onDisplay:(CGDirectDisplayID) display onScreen:(int) screen;
 
 // Set the window's title
 - (void) setTitle:(char *) newTitle;
@@ -95,6 +95,7 @@
 
 #else
 
+#include <ApplicationServices/ApplicationServices.h>
 
 #define DEL2D_FUNC(ret, func) __private_extern__ "C" inline ret OSXDelegate2D_##func
 
@@ -104,7 +105,7 @@ typedef void *csGraphics2DHandle;
 // C API to driver delegate class
 DEL2D_FUNC(OSXDelegate2D, new)(csGraphics2DHandle drv);
 DEL2D_FUNC(void, delete)(OSXDelegate2D delegate);
-DEL2D_FUNC(bool, openWindow)(OSXDelegate2D delegate, char *title, int w, int h, int d, bool fs);
+DEL2D_FUNC(bool, openWindow)(OSXDelegate2D delegate, char *title, int w, int h, int d, bool fs, CGDirectDisplayID display, int screen);
 DEL2D_FUNC(void, closeWindow)(OSXDelegate2D delegate);
 DEL2D_FUNC(void, setTitle)(OSXDelegate2D delegate, char *title);
 DEL2D_FUNC(bool, setMouseCursor)(OSXDelegate2D delegate, csMouseCursorID cursor);

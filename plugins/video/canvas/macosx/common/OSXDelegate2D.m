@@ -87,7 +87,7 @@
 // openWindow
 // Open a window if none open
 // In fullscreen mode, opens a zero-sized window to get events
-- (BOOL) openWindow:(char *) winTitle width:(int) w height:(int) h depth:(int) d fullscreen:(BOOL) fs
+- (BOOL) openWindow:(char *) winTitle width:(int) w height:(int) h depth:(int) d fullscreen:(BOOL) fs onDisplay:(CGDirectDisplayID) display onScreen:(int) screen;
 {
     NSRect rect = NSZeroRect;
 
@@ -102,14 +102,16 @@
         rect = NSMakeRect(0, [[NSScreen mainScreen] frame].size.height - h, w - 1, h - 1);
     else
     {
-        int dispWidth = CGDisplayPixelsWide(kCGDirectMainDisplay);
-        int dispHeight = CGDisplayPixelsHigh(kCGDirectMainDisplay);
+        int dispWidth = CGDisplayPixelsWide(display);
+        int dispHeight = CGDisplayPixelsHigh(display);
         rect = NSMakeRect((dispWidth - w) / 2, (dispHeight - h) / 2, w - 1, h - 1);
     };
 
     // Create window with correct style
     style = [self getWindowStyleForMode:fs];
-    window = [[OSXWindow alloc] initWithContentRect:rect styleMask:style backing:NSBackingStoreBuffered defer:NO];
+    window = [[OSXWindow alloc] initWithContentRect:rect styleMask:style
+                backing:NSBackingStoreBuffered defer:NO 
+                screen:[[NSScreen screens] objectAtIndex:screen]];
 
     if (window == nil)
         return NO;
@@ -426,9 +428,9 @@ DEL2D_FUNC(void, delete)(OSXDelegate2DHandle delegate)
     [(OSXDelegate2D *) delegate release];
 };
 
-DEL2D_FUNC(bool, openWindow)(OSXDelegate2DHandle delegate, char *title, int w, int h, int d, bool fs)
+DEL2D_FUNC(bool, openWindow)(OSXDelegate2DHandle delegate, char *title, int w, int h, int d, bool fs, CGDirectDisplayID display, int screen)
 {
-    return [(OSXDelegate2D *) delegate openWindow:title width:w height:h depth:d fullscreen:fs];
+    return [(OSXDelegate2D *) delegate openWindow:title width:w height:h depth:d fullscreen:fs onDisplay:display onScreen:screen];
 };
 
 DEL2D_FUNC(void, closeWindow)(OSXDelegate2DHandle delegate)

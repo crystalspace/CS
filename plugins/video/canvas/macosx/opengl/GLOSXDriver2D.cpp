@@ -13,6 +13,7 @@
 #include "iutil/eventq.h"
 #include "ivaria/reporter.h"
 #include "csver.h"
+#include "video/canvas/common/scrshot.h"
 
 #include "GLOSXDriver2D.h"
 
@@ -62,7 +63,7 @@ bool GLOSXDriver2D::Initialize(iObjectRegistry *reg)
     // We have to create our context early because all gl functions use it (including things like
     // glString() - the OpenGL renderer was using this before this driver had been Open()'d)
     // When the driver is actually Open()'d all we need to do is bind the context to our window
-    if ((context = OSXDelegate2D_createOpenGLContext(delegate, Depth)) == NULL)
+    if ((context = OSXDelegate2D_createOpenGLContext(delegate, Depth, display)) == NULL)
     {
         fprintf(stderr, "Failed to create OpenGL context\n");
         return false;
@@ -201,4 +202,3 @@ void GLOSXDriver2D::SetupDrawingFunctions()
         _GetPixelAt = GetPixelAt16;
     };
 };
-
