@@ -25,6 +25,8 @@ chronological order.
 	  (notably, stripping or adding alpha).
 	- Luca fixed a little compilation error (in xmlshader) that was 
 	  happening on the VisualC++ 6.0 "compiler".
+	- Squee fixed a problem in OpenGL canvases where alpha colors didn't
+	  always blend as expected.	  
 14-Oct-2004
 	- Eric Sunshine added an AAlib (ASCII Art library) check to
 	  configure.ac. If the package is present, then the CS `asciiart'

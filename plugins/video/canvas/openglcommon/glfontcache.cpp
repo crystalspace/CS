@@ -323,7 +323,7 @@ void csGLFontCache::FlushArrays ()
     }
     else
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
-    statecache->SetBlendFunc (GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     statecache->SetAlphaFunc (GL_GREATER, 0.0f);
 
     envColor = ~0;
@@ -348,8 +348,8 @@ void csGLFontCache::FlushArrays ()
 	  glTexEnvfv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, bgRGB);
 	  envColor = job.bg;
 	}
-	statecache->Disable_GL_ALPHA_TEST ();
-	statecache->Disable_GL_BLEND ();
+	/*statecache->Disable_GL_ALPHA_TEST ();
+	statecache->Disable_GL_BLEND ();*/
 
 	if (doBG)
 	{

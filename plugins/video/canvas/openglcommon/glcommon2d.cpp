@@ -336,8 +336,15 @@ void csGraphics2DGLCommon::DecomposeColor (int iColor,
 
 void csGraphics2DGLCommon::setGLColorfromint (int color)
 {
-  glColor4ub ((color >> 16) & 0xff, (color >> 8) & 0xff,
-    color & 0xff, (color >> 24) & 0xff);
+  if (pfmt.AlphaMask)
+  {
+    statecache->Enable_GL_BLEND ();		      
+    statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glColor4ub ((color >> 16) & 0xff, (color >> 8) & 0xff,
+      color & 0xff, (color >> 24) & 0xff);
+  }
+  else
+    glColor3ub ((color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff);
 }
 
 csGLScreenShot* csGraphics2DGLCommon::GetScreenShot ()
