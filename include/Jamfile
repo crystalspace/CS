@@ -78,7 +78,8 @@ CS_MASTER_HEADERS =
       iutil
       ivaria
       ivideo :
-      $(CS_MASTER_HEADER_BOILERPLATE) ] ;
+      $(CS_MASTER_HEADER_BOILERPLATE) : : :
+      cstool/tokenlist.h ] ;
 
 MasterHeader $(PACKAGE_NAME) :
   csqint.h
