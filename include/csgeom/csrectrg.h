@@ -42,6 +42,7 @@ protected:
 
   void pushRect(csRect const &);
   void deleteRect(int);
+  
   bool chopEdgeIntersection(csRect&, csRect&);
   void fragmentRect(csRect&, csRect&, bool testedContains, bool testedEdge);
   void fragmentContainedRect(csRect &r1, csRect &r2);
@@ -61,7 +62,8 @@ public:
   int Count() { return region_count; }
   /// Returns the rect at a specific index
   csRect& RectAt(int i) {  return region[i]; }
-  void makeEmpty () {free(region); region=NULL; region_count=0;}
+  /// Resets the region count to zero.
+  void makeEmpty();
 };
 
 #endif //__CS_CSRECTREGION_H__
