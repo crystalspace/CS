@@ -24,6 +24,7 @@
 
 // includes for registration/embedding
 #include "awscomp.h"
+#include "awstimer.h"
 #include "awsstdsk.h"
 #include "awscmdbt.h"
 #include "awslabel.h"

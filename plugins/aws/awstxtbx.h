@@ -55,6 +55,13 @@ class awsTextBox : public awsComponent
    /// Position of cursor
    int cursor;
 
+   /// The timer that makes the cursor blink.
+   awsTimer *blink_timer;
+
+   /// The current blink state.
+   bool blink;
+
+   
 public:
     awsTextBox();
     virtual ~awsTextBox();

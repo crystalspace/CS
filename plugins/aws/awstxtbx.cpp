@@ -1,4 +1,5 @@
 #include "cssysdef.h"
+#include "awstimer.h"
 #include "awstxtbx.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -19,16 +20,36 @@ const int awsTextBox::fsBitmap =0x1;
 const int awsTextBox::signalChanged=0x1;
 const int awsTextBox::signalLostFocus=0x2;
 
+iAwsSink *textbox_sink=0;
+awsSlot   textbox_slot;
+
+static
+void
+BlinkCursor(void *parm, iAwsSource *source)
+{
+  iAwsComponent *comp = source->GetComponent();
+
+  //  Setting blink actually forces an inversion of blink's property, and if the textbox is the 
+  // focus then it will be Invalidated as well.
+  comp->SetProperty("Blink", 0);
+}
+
+
 awsTextBox::awsTextBox(): mouse_is_over(false), has_focus(false), should_mask(0),
                           bkg(NULL),
                           frame_style(0), alpha_level(92),
                           text(NULL), disallow(NULL), maskchar(NULL),
-                          start(0), cursor(0)
-{
+                          start(0), cursor(0), blink_timer(NULL), blink(true)
+{   
 }
 
 awsTextBox::~awsTextBox()
 {
+  if (blink_timer!=0) 
+  {
+    textbox_slot.Disconnect(blink_timer, awsTimer::signalTick, textbox_sink, textbox_sink->GetTriggerID("Blink"));
+    delete blink_timer;
+  }
 }
 
 char *
@@ -39,6 +60,21 @@ bool
 awsTextBox::Setup(iAws *_wmgr, awsComponentNode *settings)
 {
  if (!awsComponent::Setup(_wmgr, settings)) return false;
+
+ // Setup blink event handling
+ if (textbox_sink==0)
+ {
+   textbox_sink = WindowManager()->GetSinkMgr()->CreateSink(NULL);
+   textbox_sink->RegisterTrigger("Blink", &BlinkCursor);
+ }
+
+ blink_timer = new awsTimer(WindowManager()->GetObjectRegistry(), this);
+ blink_timer->SetTimer(350);
+ blink_timer->Start();
+
+ textbox_slot.Connect(blink_timer, awsTimer::signalTick, textbox_sink, textbox_sink->GetTriggerID("Blink"));
+  
+ ////////////////
 
  iAwsPrefManager *pm=WindowManager()->GetPrefMgr();
 
@@ -106,7 +142,13 @@ awsTextBox::SetProperty(char *name, void *parm)
 {
   if (awsComponent::SetProperty(name, parm)) return true;
 
-  if (strcmp("Text", name)==0)
+  if (strcmp("Blink", name)==0)
+  {
+    blink = !blink;
+    if (has_focus) Invalidate();
+    return true;
+  }
+  else if (strcmp("Text", name)==0)
   {
     iString *s = (iString *)(parm);
 
@@ -224,10 +266,10 @@ awsTextBox::OnDraw(csRect clip)
       saved->DecRef();
     }
 
-    if (has_focus)
+    if (has_focus && blink)
       g2d->DrawLine(Frame().xmin+tx+tw+1,Frame().ymin+ty,Frame().xmin+tx+tw+1,Frame().ymin+ty+th, WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE));
   }
-  else if (has_focus)
+  else if (has_focus && blink)
   {
     g2d->DrawLine(Frame().xmin+5,Frame().ymin+5,Frame().xmin+5,Frame().ymax-5, WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE));
   }
@@ -344,6 +386,7 @@ awsTextBox::OnGainFocus()
   Invalidate();
   return true;
 }
+
 
 /************************************* Command Button Factory ****************/
 SCF_IMPLEMENT_IBASE(awsTextBoxFactory)

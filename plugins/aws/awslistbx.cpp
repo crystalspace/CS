@@ -1209,6 +1209,7 @@ awsListBox::OnMouseDown(int /*button*/,int x,int y)
         {
           awsListRow *row =(awsListRow *)hs->obj;
           sel=row;
+          Broadcast(awsListBox::signalSelected);
           Invalidate();
           return true;
         }
