@@ -24,6 +24,7 @@ chronological order.
 	- Eric Sunshine made the following changes to the new TerraFormer
 	  plugin:
 	    - Fixed nasty copy/paste errors in the makefile.
+	    - Updated makefile to new style which does not pollute $(OUT).
 	    - Added reference for plugin to user.mak.
 	    - Added missing Jamfile.
 	    - Added missing .csplugin meta-information file.
