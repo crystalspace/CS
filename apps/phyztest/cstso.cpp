@@ -96,7 +96,7 @@ real csRigidSpaceTimeObj::collision_check()
   csCollider *coli;
   //csMeshWrapper *sprt;
   csSector* first_sector;
-  csThing* thng;
+  //csThing* thng;
   ctMatrix3 M;
   csMatrix3 m;
   csVector3 n;

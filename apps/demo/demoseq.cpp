@@ -465,7 +465,7 @@ void DemoSequenceManager::DebugDrawPaths (iCamera* camera,
   //=====
   // Get the current selected path.
   //=====
-  cs_time start, total, seltime = 0;
+  cs_time start = 0, total = 0, seltime = 0;
   csNamedPath* selnp = NULL;
   if (hilight) selnp = GetSelectedPath (hilight, start, total);
   if (selnp)
