@@ -125,9 +125,9 @@ bool csMetaBall::Initialize ()
     mesh->vertex_colors[0] = new csColor[max_vertices];
     for (int i = 0; i < max_vertices; i++)
     {
-      mesh->vertices[i].Set(0,0,0);
-      mesh->texels[i].Set(0,0);
-      mesh->vertex_colors[i].Set(1,1,1);
+      mesh->vertices[i]->Set(0,0,0);
+      mesh->texels[i]->Set(0,0);
+      mesh->vertex_colors[i]->Set(1,1,1);
     }
     InitTables();
     mesh->do_fog = false;
