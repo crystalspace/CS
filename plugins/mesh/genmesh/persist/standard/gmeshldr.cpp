@@ -156,7 +156,8 @@ bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
 
 #ifdef CS_USE_NEW_RENDERER
 
-bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node, iGeneralFactoryState* state)
+bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node,
+	iGeneralFactoryState* state)
 {
   if(!node) return false;
   if(!state) return false;
@@ -189,7 +190,8 @@ bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node, iGeneralFactorySta
           attribname[1] = '\0';
           sprintf (&attribname[1], "%d", i);
 
-          floatarray[vertexindex * compcount + i] = child->GetAttributeValueAsFloat(attribname);
+          floatarray[vertexindex * compcount + i] = child
+	  	->GetAttributeValueAsFloat(attribname);
         }
         vertexindex++;
       }
@@ -217,7 +219,8 @@ bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node, iGeneralFactorySta
           attribname[1] = '\0';
           sprintf(&attribname[1], "%d", i);
 
-          intarray[vertexindex * compcount + i] = child->GetAttributeValueAsInt(attribname);
+          intarray[vertexindex * compcount + i] = child
+	  	->GetAttributeValueAsInt(attribname);
         }
         vertexindex++;
       }
@@ -227,8 +230,7 @@ bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node, iGeneralFactorySta
     state->SetStream(name, intarray);
     delete[] intarray;
   }
-  else
-  if(strcmp(comptype, "short") == 0)
+  else if(strcmp(comptype, "short") == 0)
   {
     compcount += (compcount % 2);
     short *shortarray = new short[length * compcount];
@@ -247,7 +249,8 @@ bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node, iGeneralFactorySta
           attribname[1] = '\0';
           sprintf (&attribname[1], "%d", i);
 
-          shortarray[vertexindex * compcount + i] = child->GetAttributeValueAsInt(attribname);
+          shortarray[vertexindex * compcount + i] = child
+	  	->GetAttributeValueAsInt(attribname);
         }
         vertexindex++;
       }
@@ -257,8 +260,7 @@ bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node, iGeneralFactorySta
     state->SetStream(name, (int*)shortarray);
     delete[] shortarray;
   }
-  else
-  if(strcmp(comptype, "byte") == 0)
+  else if(strcmp(comptype, "byte") == 0)
   {
     compcount += (compcount % 4);
     unsigned char *bytearray = new unsigned char[length * compcount];
@@ -277,7 +279,8 @@ bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node, iGeneralFactorySta
           attribname[1] = '\0';
           sprintf (&attribname[1], "%d", i);
 
-          bytearray[vertexindex * compcount + i] = child->GetAttributeValueAsInt(attribname);
+          bytearray[vertexindex * compcount + i] = child
+	  	->GetAttributeValueAsInt(attribname);
         }
         vertexindex++;
       }
