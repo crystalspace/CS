@@ -115,24 +115,6 @@ struct iKeyValuePair;
 #define CS_ENGINE_ZBUFFER 3
 
 
-/**
- * Setting for SetCuller().
- * Use the c-buffer (default).
- */
-#define CS_CULLER_CBUFFER 0
-
-/**
- * Setting for SetCuller().
- * Use the 3D quadtree.
- */
-#define CS_CULLER_QUAD3D 1
-
-/**
- * Setting for SetCuller().
- * Use the coverage mask tree.
- */
-#define CS_CULLER_COVTREE 2
-
 /// A callback function for csEngine::DrawFunc().
 typedef void (csDrawFunc) (iRenderView* rview, int type, void* entity);
 

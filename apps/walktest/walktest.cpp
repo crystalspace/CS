@@ -557,46 +557,6 @@ void WalkTest::DrawFrameDebug ()
 
 void WalkTest::DrawFrameExtraDebug ()
 {
-  csEngine* engine = (csEngine*)Engine;
-  csCoverageMaskTree* covtree = engine->GetCovtree ();
-  if (covtree)
-  {
-    Gfx2D->Clear (0);
-#   if 0
-    covtree->GfxDump (Gfx2D, covtree_level);
-#   else
-    //covtree->MakeInvalid ();
-    covtree->MakeEmpty ();
-    csCamera* c = view->GetCamera ()->GetPrivateObject ();
-    csPolygon2D poly1, poly2, poly3;
-    poly1.AddPerspective (c->Other2This (csVector3 (-1.6, 1, 5)));
-    poly1.AddPerspective (c->Other2This (csVector3 (1, 1.6, 5)));
-    poly1.AddPerspective (c->Other2This (csVector3 (1, -1, 5)));
-    poly1.AddPerspective (c->Other2This (csVector3 (-1, -1.3, 5)));
-    covtree->InsertPolygon (poly1.GetVertices (),
-	poly1.GetNumVertices (), poly1.GetBoundingBox ());
-    poly2.AddPerspective (c->Other2This (csVector3 (-1.5, .5, 6)));
-    poly2.AddPerspective (c->Other2This (csVector3 (.5, .5, 6)));
-    poly2.AddPerspective (c->Other2This (csVector3 (.5, -1.5, 6)));
-    poly2.AddPerspective (c->Other2This (csVector3 (-1.5, -1.5, 6)));
-    printf ("T2:%d ", covtree->TestPolygon (poly2.GetVertices (),
-	poly2.GetNumVertices (), poly2.GetBoundingBox ()));
-    printf ("P2:%d ", covtree->InsertPolygon (poly2.GetVertices (),
-	poly2.GetNumVertices (), poly2.GetBoundingBox ()));
-    poly3.AddPerspective (c->Other2This (csVector3 (-.5, .15, 7)));
-    poly3.AddPerspective (c->Other2This (csVector3 (1.5, .15, 7)));
-    poly3.AddPerspective (c->Other2This (csVector3 (1.5, -.5, 7)));
-    printf ("T3:%d ", covtree->TestPolygon (poly3.GetVertices (),
-	poly3.GetNumVertices (), poly3.GetBoundingBox ()));
-    printf ("P3:%d\n", covtree->InsertPolygon (poly3.GetVertices (),
-	poly3.GetNumVertices (), poly3.GetBoundingBox ()));
-    covtree->GfxDump (Gfx2D, covtree_level);
-    poly1.Draw (Gfx2D, 0x0303);
-    poly2.Draw (Gfx2D, 0x07e0);
-    poly3.Draw (Gfx2D, 0x008f);
-    //covtree->TestConsistency ();
-#   endif
-  }
 }
 
 void WalkTest::DrawFrameDebug3D ()

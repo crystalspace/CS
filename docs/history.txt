@@ -29,6 +29,11 @@ The history order is reversed so that new features are at the top.
 	- Avoids the bug with levels with multiple sectors and bsp trees.
 	  The level itself will now be rendered ok. But the bug isn't gone
 	  for real though. Objects are still culled wrongly.
+	- Started cleaning everything other than the c-buffer culler from
+	  CS engine. The rest isn't working either and is only useful for
+	  reference (which CVS will hold). This simplifies the engine
+	  considerably.
+	- Removed 'culler' command from WalkTest.
 4-Jun-2001
 	- Added csTransform This2OtherRelative() and Other2ThisRelative()
 	  which operate on csPlane3.

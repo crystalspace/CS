@@ -420,11 +420,7 @@ csEngine::csEngine (iBase *iParent) : camera_positions (16, 16)
   textures = NULL;
   materials = NULL;
   c_buffer = NULL;
-  quad3d = NULL;
-  covcube = NULL;
   cbufcube = NULL;
-  covtree = NULL;
-  covtree_lut = NULL;
   current_camera = NULL;
   current_engine = this;
   current_iengine = QUERY_INTERFACE (this, iEngine);
@@ -437,14 +433,8 @@ csEngine::csEngine (iBase *iParent) : camera_positions (16, 16)
   rad_debug = NULL;
   nextframe_pending = 0;
 
-  if (!covtree_lut)
-  {
-    covtree_lut = new csCovMaskLUT (16);
-  }
-  //covcube = new csCovcube (covtree_lut);
   cbufcube = new csCBufferCube (1024);
-
-  SetCuller (CS_CULLER_CBUFFER);
+  InitCuller ();
 
   textures = new csTextureList ();
   materials = new csMaterialList ();
@@ -472,13 +462,9 @@ csEngine::~csEngine ()
   delete textures;
   delete render_pol2d_pool;
   delete lightpatch_pool;
-  delete covcube;
   delete cbufcube;
-  delete covtree_lut;
   delete rad_debug;
   delete c_buffer;
-  delete covtree;
-  delete quad3d;
   
   // @@@ temp hack
   delete camera_hack;
@@ -660,7 +646,7 @@ void csEngine::Clear ()
   textures = new csTextureList ();
 
   // Delete engine states and their references to cullers before cullers are
-  // deleted in SetCuller below.
+  // deleted in InitCuller below.
   if (engine_states)
   {
     engine_states->DeleteAll ();
@@ -668,7 +654,7 @@ void csEngine::Clear ()
     engine_states = NULL;
   }
 
-  SetCuller (CS_CULLER_CBUFFER);
+  InitCuller ();
   delete render_pol2d_pool;
   render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory());
   delete lightpatch_pool;
@@ -797,39 +783,10 @@ void csEngine::SetLightmapCellSize (int Size)
   csLightMap::lightcell_size = Size;
 }
 
-void csEngine::SetCuller (int culler)
+void csEngine::InitCuller ()
 {
   delete c_buffer; c_buffer = NULL;
-  delete covtree; covtree = NULL;
-  delete quad3d; quad3d = NULL;
-  switch (culler)
-  {
-    case CS_CULLER_CBUFFER:
-      c_buffer = new csCBuffer (0, frame_width-1, frame_height);
-      break;
-    case CS_CULLER_QUAD3D:
-    {
-      csVector3 corners[4];
-      corners[0].Set (-1, -1, 1);
-      corners[1].Set (1, -1, 1);
-      corners[2].Set (1, 1, 1);
-      corners[3].Set (-1, 1, 1);
-      csBox3 bbox;
-      quad3d = new csQuadTree3D (csVector3 (0, 0, 0),
-    	  corners, bbox, 5);
-      break;
-    }
-    case CS_CULLER_COVTREE:
-    {
-      csBox2 box (0, 0, frame_width, frame_height);
-      if (!covtree_lut)
-      {
-        covtree_lut = new csCovMaskLUT (16);
-      }
-      covtree = new csCoverageMaskTree (covtree_lut, box);
-      break;
-    }
-  }
+  c_buffer = new csCBuffer (0, frame_width-1, frame_height);
 }
 
 void csEngine::PrepareTextures ()
@@ -1213,26 +1170,8 @@ void csEngine::StartDraw (csCamera* c, iClipper2D* view, csRenderView& rview)
     if (c_buffer)
     {
       c_buffer->Initialize ();
-      c_buffer->InsertPolygon (view->GetClipPoly (), view->GetNumVertices (), true);
-    }
-    else if (quad3d)
-    {
-      csVector3 corners[4];
-      c->InvPerspective (csVector2 (0, 0), 1, corners[0]);
-      corners[0] = c->Camera2World (corners[0]);
-      c->InvPerspective (csVector2 (frame_width-1, 0), 1, corners[1]);
-      corners[1] = c->Camera2World (corners[1]);
-      c->InvPerspective (csVector2 (frame_width-1, frame_height-1), 1, corners[2]);
-      corners[2] = c->Camera2World (corners[2]);
-      c->InvPerspective (csVector2 (0, frame_height-1), 1, corners[3]);
-      corners[3] = c->Camera2World (corners[3]);
-      quad3d->SetMainFrustum (c->GetOrigin (), corners);
-      quad3d->MakeEmpty ();
-    }
-    else if (covtree)
-    {
-      covtree->MakeEmpty ();
-      covtree->UpdatePolygonInverted (view->GetClipPoly (), view->GetNumVertices ());
+      c_buffer->InsertPolygon (view->GetClipPoly (), view->GetNumVertices (),
+      	true);
     }
   }
 
@@ -1311,7 +1250,7 @@ void csEngine::AddHalo (csLight* Light)
   // Halo size is 1/4 of the screen height; also we make sure its odd
   int hs = (frame_height / 4) | 1;
 
-  if(Light->GetHalo()->Type == cshtFlare)
+  if (Light->GetHalo()->Type == cshtFlare)
   {
     // put a new light flare into the queue
     // the cast is safe because of the type check above
@@ -2493,7 +2432,7 @@ void csEngine::Resize ()
   frame_width = G3D->GetWidth ();
   frame_height = G3D->GetHeight ();
   // Reset the culler.
-  SetCuller (GetCuller ());
+  InitCuller ();
 }
 
 csEngine::csEngineState::csEngineState (csEngine *e)
@@ -2501,8 +2440,6 @@ csEngine::csEngineState::csEngineState (csEngine *e)
   engine    = e;
   c_buffer = e->c_buffer;
   cbufcube = e->cbufcube;
-  covtree  = e->covtree;
-  quad3d   = e->quad3d;
   G2D      = e->G2D;
   G3D      = e->G3D;
   resize   = false;
@@ -2516,22 +2453,16 @@ csEngine::csEngineState::~csEngineState ()
     engine->G3D      = NULL;
     engine->G2D      = NULL;
     engine->c_buffer = NULL;
-    engine->quad3d   = NULL;
-    engine->covtree  = NULL;
     engine->cbufcube = NULL;
   }
   delete c_buffer;
   delete cbufcube;
-  delete quad3d;
-  delete covtree;
 }
 
 void csEngine::csEngineState::Activate ()
 {
   engine->c_buffer     = c_buffer;
   engine->cbufcube     = cbufcube;
-  engine->quad3d       = quad3d;
-  engine->covtree      = covtree;
   engine->frame_width  = G3D->GetWidth ();
   engine->frame_height = G3D->GetHeight ();
 
@@ -2541,8 +2472,6 @@ void csEngine::csEngineState::Activate ()
 
     c_buffer = engine->c_buffer;
     cbufcube = engine->cbufcube;
-    quad3d   = engine->quad3d;
-    covtree  = engine->covtree;
     resize   = false;
   }
 }
@@ -2595,16 +2524,13 @@ void csEngine::SetContext (iGraphics3D* g3d)
       int idg3d = engine_states->FindKey (g3d);
       if (idg3d < 0)
       {
-	int c = GetCuller ();
 	// Null out the culler which belongs to another state so its not deleted.
 	c_buffer = NULL;
 	cbufcube = NULL;
-	covtree  = NULL;
-	quad3d   = NULL;
 	frame_width = G3D->GetWidth ();
 	frame_height = G3D->GetHeight ();
 	cbufcube = new csCBufferCube (1024);
-	SetCuller (c);
+	InitCuller ();
 	engine_states->Push (new csEngineState (this));
       }
       else

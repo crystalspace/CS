@@ -45,15 +45,11 @@ class csCamera;
 class csCollection;
 class csStatLight;
 class csDynLight;
-class csCovcube;
 class csCBufferCube;
 class csEngine;
 class Dumper;
 class csLight;
 class csCBuffer;
-class csQuadTree3D;
-class csCoverageMaskTree;
-class csCovMaskLUT;
 class csPoly2DPool;
 class csLightPatchPool;
 class csLightHalo;
@@ -440,20 +436,8 @@ private:
   /// Pointer to radiosity system if we are in step-by-step radiosity mode.
   csRadiosity* rad_debug;
 
-  /// Optional 3D quadtree used for culling.
-  csQuadTree3D* quad3d;
-
   /// Optional c-buffer used for rendering.
   csCBuffer* c_buffer;
-
-  /// Optional coverage mask tree used for rendering.
-  csCoverageMaskTree* covtree;
-
-  /// Lookup table for coverage mask trees.
-  csCovMaskLUT* covtree_lut;
-
-  /// Coverage mask cube used for lighting.
-  csCovcube* covcube;
 
   /// C-buffer cube used for lighting.
   csCBufferCube* cbufcube;
@@ -660,45 +644,14 @@ public:
   cs_time GetLastAnimationTime () const { return nextframe_pending; }
 
   /**
-   * Set the culler to use in CS_ENGINE_FRONT2BACK mode.
-   * Possible values are CS_CULLER_....
+   * Initialize the culler.
    */
-  void SetCuller (int culler);
-
-  /**
-   * Get the current culler.
-   */
-  int GetCuller () const
-  {
-    if (c_buffer) return CS_CULLER_CBUFFER;
-    else if (covtree) return CS_CULLER_COVTREE;
-    else return CS_CULLER_QUAD3D;
-  }
-
-  /**
-   * Return 3D quadtree (or NULL if not used).
-   */
-  csQuadTree3D* GetQuad3D () const { return quad3d; }
+  void InitCuller ();
 
   /**
    * Return c-buffer (or NULL if not used).
    */
   csCBuffer* GetCBuffer () const { return c_buffer; }
-
-  /**
-   * Return coverage mask tree (or NULL if not used).
-   */
-  csCoverageMaskTree* GetCovtree () const { return covtree; }
-
-  /**
-   * Return the lookup table used for the coverage mask tree.
-   */
-  csCovMaskLUT* GetCovMaskLUT () const { return covtree_lut; }
-
-  /**
-   * Return coverage mask cube.
-   */
-  csCovcube* GetCovcube () const { return covcube; }
 
   /**
    * Return cbuffer cube.
@@ -1262,8 +1215,6 @@ private:
     iGraphics3D *G3D;
     csCBuffer* c_buffer;
     csCBufferCube* cbufcube;
-    csQuadTree3D* quad3d;
-    csCoverageMaskTree* covtree;
     /// Creates an engine state by copying the relevant data members
     csEngineState (csEngine *this_engine);
 

@@ -28,14 +28,12 @@
 #include "csengine/stats.h"
 #include "csengine/sector.h"
 #include "csengine/cbufcube.h"
-#include "csengine/covcube.h"
 #include "csengine/bspbbox.h"
 #include "csengine/curve.h"
 #include "csengine/texture.h"
 #include "csengine/material.h"
 #include "csengine/keyval.h"
 #include "csengine/meshobj.h"
-#include "csengine/quadtr3d.h"
 #include "csutil/csstring.h"
 #include "csutil/hashmap.h"
 #include "ivideo/graph3d.h"
@@ -789,10 +787,8 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
   csPortal* po;
   csVector3* verts;
   int num_verts;
-  int i, j;
+  int i;
   csCBuffer* c_buffer = csEngine::current_engine->GetCBuffer ();
-  csCoverageMaskTree* covtree = csEngine::current_engine->GetCovtree ();
-  csQuadTree3D* quad3d = csEngine::current_engine->GetQuad3D ();
   bool visible;
   csPoly2DPool* render_pool = csEngine::current_engine->render_pol2d_pool;
   csPolygon2D* clip;
@@ -830,51 +826,28 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 
 	// Culling.
 	bool mark_vis = false;
-	if (quad3d)
-	{
-	  clip = NULL;
-	  csVector3 test_poly[128];	// @@@ Bad hardcoded limit.
-	  csPolyTreeBBox* par = bsppol->GetParent ();
-	  csVector3Array& verts = par->GetVertices ();
-	  csPolyIndexed& pi = bsppol->GetPolygon ();
-	  for (j = 0 ; j < pi.GetNumVertices () ; j++)
-	    test_poly[j] = verts[pi[j]]-quad3d->GetCenter ();
-	  csBox3 bbox;
-//@@@ BF CULLING
-	  int rc = quad3d->TestPolygon (test_poly, pi.GetNumVertices (), bbox);
-	  mark_vis = (rc != CS_QUAD3D_NOCHANGE);
-	}
-	else
-	{
-    	  csPlane3 clip_plane, *pclip_plane;
-    	  bool do_clip_plane = d->GetClipPlane (clip_plane);
-    	  if (do_clip_plane) pclip_plane = &clip_plane;
-    	  else pclip_plane = NULL;
-          clip = (csPolygon2D*)(render_pool->Alloc ());
-          if ( bsppol->ClipToPlane (pclip_plane, camtrans.GetOrigin (),
+    	csPlane3 clip_plane, *pclip_plane;
+    	bool do_clip_plane = d->GetClipPlane (clip_plane);
+    	if (do_clip_plane) pclip_plane = &clip_plane;
+    	else pclip_plane = NULL;
+        clip = (csPolygon2D*)(render_pool->Alloc ());
+        if ( bsppol->ClipToPlane (pclip_plane, camtrans.GetOrigin (),
 	  	verts, num_verts))
+	{
+      	  csPlaneClip plclip;
+      	  bool do_plclip = icam->GetFarPlane (plclip);
+	  if (!do_plclip || plclip.ClipPolygon (verts, num_verts))   
 	  {
-      	    csPlaneClip plclip;
-      	    bool do_plclip = icam->GetFarPlane (plclip);
-	    if (!do_plclip || plclip.ClipPolygon (verts, num_verts))   
-	    {
-               if (bsppol->DoPerspective (camtrans, verts,
+            if (bsppol->DoPerspective (camtrans, verts,
 	       		num_verts, clip, icam->IsMirrored ()) 
 	          && clip->ClipAgainst (d->GetClipper ()) )
-               {
-	         if (covtree)
-	         {
-	           if (covtree->TestPolygon (clip->GetVertices (),
-	    	      clip->GetNumVertices (), clip->GetBoundingBox ()))
-	           mark_vis = true;
-	         }
-	         else if (c_buffer->TestPolygon (clip->GetVertices (),
+            {
+	      if (c_buffer->TestPolygon (clip->GetVertices (),
 	  	   clip->GetNumVertices ()))
-	          mark_vis = true;
-              }
-	    }
-	  }    
-	}
+	      mark_vis = true;
+            }
+	  }
+	}    
 	if (mark_vis)
           obj->visobj->MarkVisible ();
         if (clip) render_pool->Free (clip);
@@ -903,23 +876,6 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       {
         // Don't draw this polygon.
       }
-      else if (quad3d && !csEngine::current_engine->IsPVSOnly ())
-      {
-	csPlane3* wplane = p->GetPolyPlane ();
-	float cl = wplane->Classify (quad3d->GetCenter ());
-    	if (cl > 0)
-	  visible = false;
-	else
-	{
-	  csVector3 test_poly[128];	// @@@ Bad hardcoded limit.
-	  for (j = 0 ; j < p->GetNumVertices () ; j++)
-	    test_poly[j] = p->Vwor (j)-quad3d->GetCenter ();
-	  csBox3 bbox;
-          po = p->GetPortal ();
-	  int rc = quad3d->InsertPolygon (test_poly, p->GetNumVertices (), bbox);
-	  visible = (rc != CS_QUAD3D_NOCHANGE);
-	}
-      }
       else
       {
     	csPlane3 clip_plane, *pclip_plane;
@@ -940,9 +896,6 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
           po = p->GetPortal ();
 	  if (csEngine::current_engine->IsPVSOnly ())
             visible = true;
-	  else if (covtree)
-            visible = covtree->InsertPolygon (clip->GetVertices (),
-		    clip->GetNumVertices (), clip->GetBoundingBox ());
 	  else
             visible = c_buffer->InsertPolygon (clip->GetVertices (),
 		    clip->GetNumVertices ());
@@ -976,9 +929,7 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       {
         poly_queue->Push (p, clip);
 	Stats::polygons_accepted++;
-	if (quad3d && quad3d->IsFull ()) return (void*)1;	// Stop
 	if (c_buffer && c_buffer->IsFull ()) return (void*)1;	// Stop
-	if (covtree && covtree->IsFull ()) return (void*)1;	// Stop
       }
       else
       {
@@ -1427,8 +1378,6 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   csOctreeNode* onode = (csOctreeNode*)node;
 
   csCBuffer* c_buffer;
-  csQuadTree3D* quad3d;
-  csCoverageMaskTree* covtree;
   iRenderView* rview = (iRenderView*)data;
   static csPolygon2D persp;
   csVector3 array[7];
@@ -1444,8 +1393,6 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   //}
 
   c_buffer = w->GetCBuffer ();
-  covtree = w->GetCovtree ();
-  quad3d = w->GetQuad3D ();
   int num_array;
   use_far_plane = icam->GetFarPlane (far_plane);
   otree->GetConvexOutline (onode, pos, array, num_array, use_far_plane);
@@ -1454,20 +1401,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   {
     int nVert = MIN (6, num_array); // if we use a farplane we could have up to 7 corners, 
                                     // but the 7th we'll need not here
-    
-    if (quad3d)
-    {
-      csVector3 test_poly[6];
-      
-      for (i = 0 ; i < nVert ; i++)
-        test_poly[i] = array[i]-quad3d->GetCenter ();
-      csBox3 bbox;
-      int rc = quad3d->TestPolygon (test_poly, nVert, bbox);
-      bool visible = (rc != CS_QUAD3D_NOCHANGE);
-      if (!visible) return false;
-      goto is_vis;
-    }
-  
+
     csVector3 cam[7];
     // If all vertices are behind z plane then the node is
     // not visible. If some vertices are behind z plane then we
@@ -1550,12 +1484,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
     if (!persp.ClipAgainst (rview->GetClipper ())) return false;
 
     // c-buffer test.
-    bool vis;
-    if (covtree)
-      vis = covtree->TestPolygon (persp.GetVertices (),
-	persp.GetNumVertices (), persp.GetBoundingBox ());
-    else
-      vis = c_buffer->TestPolygon (persp.GetVertices (),
+    bool vis = c_buffer->TestPolygon (persp.GetVertices (),
       	persp.GetNumVertices ());
     if (!vis)
     {
@@ -1564,7 +1493,6 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
     }
   }
 
-is_vis:
   count_cull_node_vis++;
   // If a node is visible we check wether or not it has a minibsp.
   // If it has a minibsp then we need to transform all vertices used
@@ -2038,9 +1966,7 @@ static void CompressShadowFrustums (iShadowBlockList* list)
   if (!shadow_it->HasNext ()) { shadow_it->DecRef (); return; }
 
   csCBufferCube* cb = csEngine::current_engine->GetCBufCube ();
-  csCovcube* cc = csEngine::current_engine->GetCovcube ();
-  if (cb) cb->MakeEmpty ();
-  else cc->MakeEmpty ();
+  cb->MakeEmpty ();
 
   iSector* cur_sector = shadow_it->GetNextShadowBlock ()->GetSector ();
   int cur_draw_busy = shadow_it->GetNextShadowBlock ()->GetRecLevel ();
@@ -2050,11 +1976,7 @@ static void CompressShadowFrustums (iShadowBlockList* list)
     sf = shadow_it->Next ();
     if (shadlist->GetSector () != cur_sector || shadlist->GetRecLevel () != cur_draw_busy)
       break;
-    bool vis;
-    if (cb)
-      vis = cb->InsertPolygon (sf->GetVertices (), sf->GetNumVertices ());
-    else
-      vis = cc->InsertPolygon (sf->GetVertices (), sf->GetNumVertices ());
+    bool vis = cb->InsertPolygon (sf->GetVertices (), sf->GetNumVertices ());
     if (!vis)
       shadow_it->DeleteCurrent ();
   }
@@ -2075,7 +1997,6 @@ static void* CheckFrustumPolygonsFB (csThing* thing,
   iShadowBlockList* shadows = ctxt->GetShadows ();
   csVector3& center = ctxt->GetLightFrustum ()->GetOrigin ();
   csCBufferCube* cb = csEngine::current_engine->GetCBufCube ();
-  csCovcube* cc = csEngine::current_engine->GetCovcube ();
   bool cw = true;	// @@@ Mirror flag?
   int i, j;
   for (i = 0 ; i < num ; i++)
@@ -2098,11 +2019,7 @@ static void* CheckFrustumPolygonsFB (csThing* thing,
 	  csVector3Array& verts = pi_par->GetVertices ();
           for (j = 0 ; j < pi.GetNumVertices () ; j++)
             poly[j] = verts[pi[j]]-center;
-          bool vis = false;
-          if (cb)
-	    vis = cb->TestPolygon (poly, pi.GetNumVertices ());
-          else
-	    vis = cc->TestPolygon (poly, pi.GetNumVertices ());
+	  bool vis = cb->TestPolygon (poly, pi.GetNumVertices ());
 	  if (vis)
   	  {
 	    if (fview->ThingShadowsEnabled ())
@@ -2139,13 +2056,11 @@ static void* CheckFrustumPolygonsFB (csThing* thing,
 
     if (p->GetPortal ())
     {
-      if (cb) vis = cb->TestPolygon (poly, p->GetNumVertices ());
-      else vis = cc->TestPolygon (poly, p->GetNumVertices ());
+      vis = cb->TestPolygon (poly, p->GetNumVertices ());
     }
     else
     {
-      if (cb) vis = cb->InsertPolygon (poly, p->GetNumVertices ());
-      else vis = cc->InsertPolygon (poly, p->GetNumVertices ());
+      vis = cb->InsertPolygon (poly, p->GetNumVertices ());
     }
     if (vis)
     {
@@ -2226,10 +2141,7 @@ static bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node
     for (i = 0 ; i < num_outline ; i++)
       outline[i] -= center;
     csCBufferCube* cb = csEngine::current_engine->GetCBufCube ();
-    csCovcube* cc = csEngine::current_engine->GetCovcube ();
     if (cb && !cb->TestPolygon (outline, num_outline))
-      return false;
-    else if (cc && !cc->TestPolygon (outline, num_outline))
       return false;
   }
   fview->CallNodeFunction (onode);
@@ -2290,9 +2202,7 @@ void csThing::CastShadows (iFrustumView* fview)
 void csThing::CheckFrustum (iFrustumView* lview, iMovable* movable)
 {
   csCBufferCube* cb = csEngine::current_engine->GetCBufCube ();
-  csCovcube* cc = csEngine::current_engine->GetCovcube ();
-  if (cb) cb->MakeEmpty ();
-  else cc->MakeEmpty ();
+  cb->MakeEmpty ();
   RealCheckFrustum (lview, movable);
 }
 

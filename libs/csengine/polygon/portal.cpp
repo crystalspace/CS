@@ -137,40 +137,11 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
   if (csEngine::current_engine->GetEngineMode () == CS_ENGINE_FRONT2BACK)
   {
     csCBuffer* c_buffer = csEngine::current_engine->GetCBuffer ();
-    csCoverageMaskTree* covtree = csEngine::current_engine->GetCovtree ();
-    csQuadTree3D* quad3d = csEngine::current_engine->GetQuad3D ();
     if (c_buffer)
     {
       c_buffer->Initialize ();
       c_buffer->InsertPolygon (new_clipper->GetVertices (),
       	new_clipper->GetNumVertices (), true);
-    }
-    else if (quad3d)
-    {
-      csVector3 corners[4];
-      InvPerspective (csVector2 (0, 0), 1, corners[0],
-      	inv_aspect, shift_x, shift_y);
-      corners[0] = camtrans.This2Other (corners[0]);
-      InvPerspective (csVector2 (csEngine::current_engine->frame_width-1, 0),
-      	1, corners[1],
-      	inv_aspect, shift_x, shift_y);
-      corners[1] = camtrans.This2Other (corners[1]);
-      InvPerspective (csVector2 (csEngine::current_engine->frame_width-1,
-      	csEngine::current_engine->frame_height-1), 1, corners[2],
-	inv_aspect, shift_x, shift_y);
-      corners[2] = camtrans.This2Other (corners[2]);
-      InvPerspective (csVector2 (0, csEngine::current_engine->frame_height-1),
-      	1, corners[3],
-      	inv_aspect, shift_x, shift_y);
-      corners[3] = camtrans.This2Other (corners[3]);
-      quad3d->SetMainFrustum (camtrans.GetOrigin (), corners);
-      quad3d->MakeEmpty ();
-    }
-    else if (covtree)
-    {
-      covtree->MakeEmpty ();
-      covtree->UpdatePolygonInverted (new_clipper->GetVertices (),
-      	new_clipper->GetNumVertices ());
     }
   }
 

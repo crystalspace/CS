@@ -1019,9 +1019,7 @@ csObject** csSector::GetVisibleObjects (iFrustumView* lview, int& num_objects)
 void csSector::CheckFrustum (iFrustumView* lview)
 {
   csCBufferCube* cb = engine->GetCBufCube ();
-  csCovcube* cc = engine->GetCovcube ();
-  if (cb) cb->MakeEmpty ();
-  else cc->MakeEmpty ();
+  cb->MakeEmpty ();
   RealCheckFrustum (lview);
 }
 

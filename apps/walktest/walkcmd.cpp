@@ -662,7 +662,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 #   define CONPRI(m) Sys->Printf (MSG_CONSOLE, m);
     CONPRI("-*- Additional commands -*-\n");
     CONPRI("Visibility:\n");
-    CONPRI("  dumpvis culler emode pvs freezepvs pvsonly\n");
+    CONPRI("  dumpvis emode pvs freezepvs pvsonly\n");
     CONPRI("  db_octree, db_osolid, db_dumpstubs, db_cbuffer, db_frustum\n");
     CONPRI("  db_curleaf\n");
     CONPRI("Lights:\n");
@@ -1169,14 +1169,6 @@ bool CommandHandler (const char *cmd, const char *arg)
       engine->FreezePVS (Sys->view->GetCamera ()->GetTransform ().GetOrigin ());
     else
       engine->UnfreezePVS ();
-  }
-  else if (!strcasecmp (cmd, "culler"))
-  {
-    csEngine* engine = (csEngine*)(Sys->Engine);
-    const char* const choices[4] = { "cbuffer", "quad3d", "covtree", NULL };
-    int culler = engine->GetCuller ();
-    csCommandProcessor::change_choice (arg, &culler, "culler", choices, 3);
-    engine->SetCuller (culler);
   }
   else if (!strcasecmp (cmd, "emode"))
   {
