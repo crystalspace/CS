@@ -408,28 +408,30 @@ bool csGraphics2DOpenGL::Open()
   return true;
 }
 
+bool csGraphics2DOpenGL::RestoreDisplayMode ()
+{
+	if (is_open)
+	{
+		ChangeDisplaySettings(NULL, 0);
+		is_open = false;
+		return true;
+	}
+	return false;
+}
+
 void csGraphics2DOpenGL::Close(void)
 {
   if (!is_open) return;
+
   if (hGLRC)
   {
-    wglMakeCurrent(NULL, NULL);
-    wglDeleteContext(hGLRC);
+	wglDeleteContext (hGLRC);
+    wglMakeCurrent (NULL, NULL);
   }
-  ReleaseDC(m_hWnd, hDC);
 
-  if (FullScreen) ChangeDisplaySettings(NULL,0); 
+  ReleaseDC (m_hWnd, hDC);
 
-  if(!FullScreen)
-  {
-/*
-    // restore the original system palette.
-    HDC dc = GetDC(NULL);
-    SetSystemPaletteUse(dc, SYSPAL_STATIC);
-    PostMessage(HWND_BROADCAST, WM_SYSCOLORCHANGE, 0, 0);
-    ReleaseDC(NULL, dc);
-*/
-  }
+  RestoreDisplayMode();
 
   csGraphics2D::Close ();
 }

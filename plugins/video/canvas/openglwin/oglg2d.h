@@ -35,6 +35,8 @@ private:
   // Calculate the OpenGL pixel format.
   void CalcPixelFormat ();
 
+  bool RestoreDisplayMode ();
+
 public:
   SCF_DECLARE_IBASE_EXT (csGraphics2DGLCommon);
 
