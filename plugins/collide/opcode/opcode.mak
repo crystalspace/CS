@@ -4,7 +4,7 @@ DESCRIPTION.opcode = OPCODE collision detection plug-in
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make rapid        Make the $(DESCRIPTION.opcode)$"
+  $(NEWLINE)echo $"  make opcode        Make the $(DESCRIPTION.opcode)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
