@@ -22,6 +22,7 @@
 #include "cscom/com.h"
 #include "csgfxldr/boxfilt.h"
 #include "cs3d/common/imgtools.h"
+#include "csengine/cscolor.h"	// @@@BAD?
 #include "csutil/csvector.h"
 #include "itxtmgr.h"
 #include "itexture.h"
@@ -32,7 +33,6 @@ class csTextureMM;
 class csTextureManager;
 class csTexture;
 interface IImageFile;
-interface ITextureHandle;
 
 #define MIPMAP_UGLY 0
 #define MIPMAP_DEFAULT 1
@@ -41,6 +41,24 @@ interface ITextureHandle;
 
 #define MIX_TRUE_RGB 0
 #define MIX_NOCOLOR 1
+
+extern const IID IID_ITextureHandleMM;
+
+/**
+ * TextureHandleMM represents a concrete subclass of ITextureHandle.
+ */
+interface ITextureHandleMM : public ITextureHandle
+{
+  STDMETHOD (SetTransparent) (int red, int green, int blue);
+  STDMETHOD (GetTransparent) (bool& retval);
+  STDMETHOD (GetMipMapDimensions) (int mm, int& w, int& h);
+  STDMETHOD (GetBitmapDimensions) (int& bw, int& bh);
+  STDMETHOD (GetBitmapData) (void** bmdata);
+  STDMETHOD (GetMeanColor) (int& retval);
+  STDMETHOD (GetMeanColor) (float& r, float& g, float& b);
+  STDMETHOD (GetNumberOfColors) (int& retval);
+  DECLARE_IUNKNOWN();
+};
 
 /**
  * csTextureMM represents a texture and all its mipmapped
@@ -188,7 +206,7 @@ public:
 
   DECLARE_INTERFACE_TABLE (csTextureMM)
   DECLARE_IUNKNOWN()
-  DECLARE_COMPOSITE_INTERFACE (TextureHandle)
+  DECLARE_COMPOSITE_INTERFACE (TextureHandleMM)
 };
 
 struct HighColorCache_Data;
@@ -223,8 +241,8 @@ public:
 };
 
 
-#define GetITextureHandleFromcsTextureMM(a)  &a->m_xTextureHandle
-#define GetcsTextureMMFromITextureHandle(a)  ((csTextureMM*)((size_t)a - offsetof(csTextureMM, m_xTextureHandle)))
+#define GetITextureHandleFromcsTextureMM(a)  &a->m_xTextureHandleMM
+#define GetcsTextureMMFromITextureHandle(a)  ((csTextureMM*)((size_t)a - offsetof(csTextureMM, m_xTextureHandleMM)))
 
 /**
  * A simple Texture.

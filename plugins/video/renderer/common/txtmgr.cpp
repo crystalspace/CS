@@ -32,7 +32,7 @@
 IMPLEMENT_UNKNOWN_NODELETE (csTextureMM)
 
 BEGIN_INTERFACE_TABLE (csTextureMM)
-  IMPLEMENTS_COMPOSITE_INTERFACE (TextureHandle)
+  IMPLEMENTS_COMPOSITE_INTERFACE (TextureHandleMM)
 END_INTERFACE_TABLE ()
 
 csTextureMM::csTextureMM (IImageFile* image)
@@ -587,4 +587,54 @@ int csTextureManager::get_almost_black ()
   }
   // huh ?!
   return 0;
+}
+
+//---------------------------------------------------------------------------
+
+IMPLEMENT_COMPOSITE_UNKNOWN (csTextureMM, TextureHandleMM)
+
+IMPLEMENT_GET_PROPERTY (GetTransparent, istransp, bool, csTextureMM, TextureHandleMM)
+IMPLEMENT_GET_PROPERTY (GetMeanColor, mean_idx, int, csTextureMM, TextureHandleMM)
+IMPLEMENT_GET_PROPERTY (GetNumberOfColors, usage->get_num_colors(), int, csTextureMM, TextureHandleMM)
+ 
+STDMETHODIMP ITextureHandleMM::SetTransparent (int red, int green, int blue) 
+{ 
+  METHOD_PROLOGUE (csTextureMM, TextureHandleMM)
+  pThis->set_transparent (red, green, blue);
+  return S_OK; 
+}
+
+STDMETHODIMP ITextureHandleMM::GetMipMapDimensions (int mipmap, int& w, int& h) 
+{ 
+  METHOD_PROLOGUE (csTextureMM, TextureHandleMM)
+  csTexture* txt = pThis->get_texture (mipmap);
+  w = txt->get_width ();
+  h = txt->get_height ();
+  return S_OK; 
+}
+
+STDMETHODIMP ITextureHandleMM::GetBitmapDimensions (int& w, int& h) 
+{ 
+  METHOD_PROLOGUE (csTextureMM, TextureHandleMM)
+  csTexture* txt = pThis->get_texture (-1);
+  w = txt->get_width ();
+  h = txt->get_height ();
+  return S_OK; 
+}
+
+STDMETHODIMP ITextureHandleMM::GetBitmapData (void** bmdata)
+{ 
+  METHOD_PROLOGUE (csTextureMM, TextureHandleMM)
+  csTexture* txt = pThis->get_texture (-1);
+  *bmdata = (void*)(txt->get_bitmap8 ());
+  return S_OK; 
+}
+
+STDMETHODIMP ITextureHandleMM::GetMeanColor (float& r, float& g, float& b)
+{ 
+  METHOD_PROLOGUE (csTextureMM, TextureHandleMM)
+  r = pThis->mean_color.red;
+  g = pThis->mean_color.green;
+  b = pThis->mean_color.blue;
+  return S_OK; 
 }
