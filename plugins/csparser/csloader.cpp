@@ -2252,6 +2252,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       break;
     case XMLTOKEN_PRIORITY:
       priority = csStrNew (child->GetContentsValue ());
+      mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
       break;
     case XMLTOKEN_ADDON:
       TEST_MISSING_MESH
@@ -2282,26 +2283,31 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
     case XMLTOKEN_ZFILL:
       TEST_MISSING_MESH
       if (!priority) priority = csStrNew ("wall");
+      mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
       mesh->SetZBufMode (CS_ZBUF_FILL);
       break;
     case XMLTOKEN_ZUSE:
       TEST_MISSING_MESH
       if (!priority) priority = csStrNew ("object");
+      mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
       mesh->SetZBufMode (CS_ZBUF_USE);
       break;
     case XMLTOKEN_ZNONE:
       TEST_MISSING_MESH
       if (!priority) priority = csStrNew ("sky");
+      mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
       mesh->SetZBufMode (CS_ZBUF_NONE);
       break;
     case XMLTOKEN_ZTEST:
       TEST_MISSING_MESH
       if (!priority) priority = csStrNew ("alpha");
+      mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
       mesh->SetZBufMode (CS_ZBUF_TEST);
       break;
     case XMLTOKEN_CAMERA:
       TEST_MISSING_MESH
       if (!priority) priority = csStrNew ("sky");
+      mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
       mesh->GetFlags().Set (CS_ENTITY_CAMERA);
       break;
     case XMLTOKEN_BADOCCLUDER:
