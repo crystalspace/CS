@@ -24,6 +24,8 @@
 #include "csphyzik/phyztype.h"
 #include "csphyzik/ctvector.h"
 
+//!me need to add constructors and init vectors to 0
+
 class ctDynamicEntity;
 
 // abstract classes
@@ -60,7 +62,8 @@ public:
 	// relative to it's body frame
 	virtual ctVector3 get_linear_a()= 0;
 	virtual ctVector3 get_angular_a() = 0;
-
+  virtual void apply_impulse( ctVector3 impulse_point,
+			      ctVector3 impulse_vector ) = 0;
 
 };
 

@@ -68,6 +68,10 @@ public:
 	// that includeds this handle and all children down to the leaf nodes. 
 	void apply_forces( real t );
 
+
+  virtual void apply_impulse( ctVector3 impulse_point,
+			      ctVector3 impulse_vector );
+
 	virtual void init_state();
 
 	// methods for state to and from integrator

@@ -51,6 +51,9 @@ public:
 	ctVector3 get_linear_a(){ ctVector3 aret( a[3], a[4], a[5] ); return aret; }
 	ctVector3 get_angular_a(){ ctVector3 aret( a[0], a[1], a[2] ); return aret; }
 
+  void apply_impulse( ctVector3 impulse_point,
+			      ctVector3 impulse_vector );
+
 protected:
 
 	void fsolve_grounded( real t );
@@ -61,6 +64,10 @@ protected:
 	void compute_Ia_Za();
 
 	void compute_joint_a();
+
+  void impulse_to_v();
+
+  void propagate_impulse();
 
 	// the articulated body we are solving motions for
 	ctArticulatedBody &ab;
@@ -88,6 +95,10 @@ protected:
 	real sIs;
 	real QsZIc;
 	bool sIsQsZIc_computed;
+
+  // used for calculating impulse response
+  ctSpatialVector Ja;
+  ctSpatialVector dv;
 
 private:
   // some work variables that I don't want piled on the stack during recursion
