@@ -126,8 +126,6 @@ private:
   bool rstate_specular;
   /// Do we want mipmaps?
   int rstate_mipmap;
-  /// Do we want visible edges (mostly debug)?
-  bool rstate_edges;
 
   /// DrawFlags on last BeginDraw ()
   int DrawMode;
@@ -196,12 +194,6 @@ public:
   float zdist_mipmap1, zdist_mipmap2, zdist_mipmap3;
   /// Do we want Gouraud Shaded polygons?
   bool rstate_gouraud;
-
-  /**
-   * Option variable: draw white borders around the area of all polygons hit
-   * by some light. The light is selected with selected_light.
-   */
-  bool do_light_frust;
 
   /// @@todo: remove this
   bool do_debug;

@@ -221,7 +221,6 @@ csGraphics3DSoftware::csGraphics3DSoftware (ISystem* piSystem) : m_piG2D(NULL)
   do_lighting = true;
   do_transp = true;
   do_textured = true;
-  do_light_frust = false;
   do_debug = false;
   do_interlaced = -1;
   ilace_fastmove = false;
@@ -230,7 +229,6 @@ csGraphics3DSoftware::csGraphics3DSoftware (ISystem* piSystem) : m_piG2D(NULL)
   do_transp = true;
   do_textured = true;
   rstate_mipmap = 0;
-  rstate_edges = false;
   rstate_gouraud = true;
   rstate_specular = true;
   rstate_dither = false;
@@ -1723,7 +1721,7 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
       {
         // Check first if polygon has been finished
         if (scanR2 == min_i)
-`         goto finish;
+          goto finish;
         scanR1 = scanR2;
 	if (++scanR2 >= poly.num)
 	  scanR2 = 0;
@@ -2230,20 +2228,6 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygonDPQ& poly)
   }
 
 finish:
-  if (rstate_edges)
-  {
-    int white = txtmgr->white ();
-
-    for (i = 0; i < poly.num; i++)
-    {
-      int next = (i == poly.num - 1 ? 0 : i + 1);
-      m_piG2D->DrawLine (QRound (poly.vertices [i].sx),
-                         height - 1 - QRound (poly.vertices [i].sy),
-                         QRound (poly.vertices [next].sx),
-                         height - 1 - QRound (poly.vertices [next].sy), white);
-    } /* endfor */
-  }
-
   return S_OK;
 }
 
@@ -2728,20 +2712,6 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX(G3DPolygonDPFX& poly)
   }
 
 finish:
-  if (rstate_edges)
-  {
-    int white = txtmgr->white ();
-
-    for (i = 0; i < poly.num; i++)
-    {
-      int next = (i == poly.num - 1 ? 0 : i + 1);
-      m_piG2D->DrawLine (QRound (poly.vertices [i].sx),
-                         height - 1 - QRound (poly.vertices [i].sy),
-                         QRound (poly.vertices [next].sx),
-                         height - 1 - QRound (poly.vertices [next].sy), white);
-    } /* endfor */
-  }
-
   return S_OK;
 };
 
@@ -2859,9 +2829,6 @@ STDMETHODIMP csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
       do_textured = value;
       ScanSetup ();
       break;
-    case G3DRENDERSTATE_EDGESENABLE:
-      rstate_edges = value;
-      break;
     case G3DRENDERSTATE_MMXENABLE:
 #ifdef DO_MMX
       do_mmx = value;
@@ -2880,9 +2847,6 @@ STDMETHODIMP csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
       break;
     case G3DRENDERSTATE_DEBUGENABLE:
       do_debug = value;
-      break;
-    case G3DRENDERSTATE_LIGHTFRUSTRUMENABLE:
-      do_light_frust = value;
       break;
     case G3DRENDERSTATE_FILTERINGENABLE:
       do_texel_filt = value;
@@ -2939,9 +2903,6 @@ STDMETHODIMP csGraphics3DSoftware::GetRenderState(G3D_RENDERSTATEOPTION op, long
     case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
       retval = do_textured;
       break;
-    case G3DRENDERSTATE_EDGESENABLE:
-      retval = rstate_edges;
-      break;
     case G3DRENDERSTATE_MMXENABLE:
 #ifdef DO_MMX
       retval = do_mmx;
@@ -2957,9 +2918,6 @@ STDMETHODIMP csGraphics3DSoftware::GetRenderState(G3D_RENDERSTATEOPTION op, long
       break;
     case G3DRENDERSTATE_DEBUGENABLE:
       retval = do_debug;
-      break;
-    case G3DRENDERSTATE_LIGHTFRUSTRUMENABLE:
-      retval = do_light_frust;
       break;
     case G3DRENDERSTATE_FILTERINGENABLE:
       retval = do_texel_filt;
@@ -3615,15 +3573,14 @@ csOptionDescription IXConfig3DSoft::config_options[] =
   { 4, "txtfilt", "Texture filtering", CSVAR_BOOL },
   { 5, "bifilt", "Bilinear filtering", CSVAR_BOOL },
   { 6, "mmx", "MMX support", CSVAR_BOOL },
-  { 7, "lfrust", "Light frustrum", CSVAR_BOOL },
-  { 8, "gamma", "Gamma value", CSVAR_FLOAT },
-  { 9, "dmipmap1", "Mipmap distance 1", CSVAR_FLOAT },
-  { 10, "dmipmap2", "Mipmap distance 2", CSVAR_FLOAT },
-  { 11, "dmipmap3", "Mipmap distance 3", CSVAR_FLOAT },
-  { 12, "gouraud", "Gouraud shading", CSVAR_BOOL },
+  { 7, "gamma", "Gamma value", CSVAR_FLOAT },
+  { 8, "dmipmap1", "Mipmap distance 1", CSVAR_FLOAT },
+  { 9, "dmipmap2", "Mipmap distance 2", CSVAR_FLOAT },
+  { 10, "dmipmap3", "Mipmap distance 3", CSVAR_FLOAT },
+  { 11, "gouraud", "Gouraud shading", CSVAR_BOOL },
 };
 
-#define NUM_OPTIONS 13
+#define NUM_OPTIONS 12
 
 STDMETHODIMP IXConfig3DSoft::SetOption (int id, csVariant* value)
 {
@@ -3640,12 +3597,11 @@ STDMETHODIMP IXConfig3DSoft::SetOption (int id, csVariant* value)
 #ifdef DO_MMX
     case 6: pThis->do_mmx = value->v.bVal; break;
 #endif
-    case 7: pThis->do_light_frust = value->v.bVal; break;
-    case 8: pThis->txtmgr->Gamma = value->v.fVal; break;
-    case 9: pThis->zdist_mipmap1 = value->v.fVal; break;
-    case 10: pThis->zdist_mipmap2 = value->v.fVal; break;
-    case 11: pThis->zdist_mipmap3 = value->v.fVal; break;
-    case 12: pThis->rstate_gouraud = value->v.bVal; break;
+    case 7: pThis->txtmgr->Gamma = value->v.fVal; break;
+    case 8: pThis->zdist_mipmap1 = value->v.fVal; break;
+    case 9: pThis->zdist_mipmap2 = value->v.fVal; break;
+    case 10: pThis->zdist_mipmap3 = value->v.fVal; break;
+    case 11: pThis->rstate_gouraud = value->v.bVal; break;
     default: return E_FAIL;
   }
   pThis->ScanSetup ();
@@ -3667,12 +3623,11 @@ STDMETHODIMP IXConfig3DSoft::GetOption (int id, csVariant* value)
 #ifdef DO_MMX
     case 6: value->v.bVal = pThis->do_mmx; break;
 #endif
-    case 7: value->v.bVal = pThis->do_light_frust; break;
-    case 8: value->v.fVal = pThis->txtmgr->Gamma; break;
-    case 9: value->v.fVal = pThis->zdist_mipmap1; break;
-    case 10: value->v.fVal = pThis->zdist_mipmap2; break;
-    case 11: value->v.fVal = pThis->zdist_mipmap3; break;
-    case 12: value->v.bVal = pThis->rstate_gouraud; break;
+    case 7: value->v.fVal = pThis->txtmgr->Gamma; break;
+    case 8: value->v.fVal = pThis->zdist_mipmap1; break;
+    case 9: value->v.fVal = pThis->zdist_mipmap2; break;
+    case 10: value->v.fVal = pThis->zdist_mipmap3; break;
+    case 11: value->v.bVal = pThis->rstate_gouraud; break;
     default: return E_FAIL;
   }
   return S_OK;
