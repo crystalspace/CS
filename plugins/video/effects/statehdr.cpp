@@ -35,8 +35,11 @@ csStateHandler::csStateHandler()
 
 csStateHandler::~csStateHandler()
 {
-  csHashIterator cIterator( states );
-  while( cIterator.HasNext() )
+  if (iterator != NULL)
+    delete iterator;
+
+  csHashIterator cIterator (states);
+  while (cIterator.HasNext())
   {
     delete (statedata*)cIterator.Next();
   }
@@ -153,11 +156,11 @@ csEffectVector4 csStateHandler::GetStateVector4(csStringID state)
 
 csStringID csStateHandler::GetFirstState()
 {
-  if( iterator != NULL )
+  if (iterator != NULL)
     delete iterator;
 
-  iterator = new csHashIterator( states );
-  if( iterator->HasNext() )
+  iterator = new csHashIterator (states);
+  if (iterator->HasNext())
     return ((statedata*)(iterator->Next()))->name;
   return csInvalidStringID;
 }

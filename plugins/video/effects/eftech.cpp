@@ -42,13 +42,11 @@ csEffectTechnique::~csEffectTechnique ()
 {
 }
 
-iEffectPass* csEffectTechnique::CreatePass()
+csPtr<iEffectPass> csEffectTechnique::CreatePass()
 {
   csRef <iEffectPass> pass = csPtr<iEffectPass> (new csEffectPass());
-  
   passes.Push( pass );
-  
-  return pass;
+  return csPtr<iEffectPass> (pass);
 }
 
 int csEffectTechnique::GetPassCount()

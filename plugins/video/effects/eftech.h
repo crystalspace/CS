@@ -40,9 +40,9 @@ public:
   csEffectTechnique ();
   virtual ~csEffectTechnique ();
 
-  iEffectPass* CreatePass();
+  csPtr<iEffectPass> CreatePass();
   int GetPassCount();
-  iEffectPass* GetPass( int pass );
+  iEffectPass* GetPass (int pass);
 
   void SetValidation( int validation );
   int GetValidation();

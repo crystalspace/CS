@@ -250,9 +250,9 @@ private:
   csRef<iEffectServer> effectserver;
 
   // [lightmap no/yes ][fog 0/1][mixmode]
-  iEffectDefinition* StockEffects[2][2][9];
-  iEffectDefinition* SeparateLightmapStockEffect;
-  iEffectDefinition* SeparateFogStockEffect;
+  csRef<iEffectDefinition> StockEffects[2][2][9];
+  csRef<iEffectDefinition> SeparateLightmapStockEffect;
+  csRef<iEffectDefinition> SeparateFogStockEffect;
 
   /// Inits stock effects
   void InitStockEffects();

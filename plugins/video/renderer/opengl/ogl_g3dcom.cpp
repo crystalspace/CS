@@ -1095,7 +1095,7 @@ bool csGraphics3DOGLCommon::NewOpen ()
       if (queue)
 	queue->GetEventOutlet()->Broadcast (cscmdQuit);
     }
-
+		
     object_reg->Register (effectserver, "iEffectServer");
   }
   //csEffectStrings::InitStrings( effectserver );
@@ -1158,9 +1158,12 @@ void csGraphics3DOGLCommon::Close ()
     vbufmgr->DecRef (); vbufmgr = NULL;
   }
 
-  Report (CS_REPORTER_SEVERITY_NOTIFY,
-    "Peak GL texture cache size: %1.2f MB",
-    ((float)texture_cache->GetPeakTotalTextureSize() / (1024.0f * 1024.0f)));
+  if (texture_cache)
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Peak GL texture cache size: %1.2f MB",
+      ((float)texture_cache->GetPeakTotalTextureSize() / (1024.0f * 1024.0f)));
+  }
 
   delete texture_cache; texture_cache = NULL;
   delete lightmap_cache; lightmap_cache = NULL;
@@ -3362,9 +3365,9 @@ csStringID csGraphics3DOGLCommon::GLBlendToString (GLenum blend)
 
 void csGraphics3DOGLCommon::InitStockEffects()
 {
-  iEffectTechnique* tech;
-  iEffectPass* pass;
-  iEffectLayer* layer;
+  csRef<iEffectTechnique> tech;
+  csRef<iEffectPass> pass;
+  csRef<iEffectLayer> layer;
   csEffectStrings* efstrings = effectserver->GetStandardStrings();
 
   SeparateLightmapStockEffect = effectserver->CreateEffect ();
@@ -5670,7 +5673,7 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
           else if( layer->GetStateString( layer_state) == efstrings->lightmap)
             layer_data->inputtex = -2;
           else
-            // @@@SUSPICIOUS. IS INT, BUT FUNCTION RETURNS FLAOT
+            // @@@SUSPICIOUS. IS INT, BUT FUNCTION RETURNS FLOAT
             layer_data->inputtex = (int)layer->GetStateFloat(layer_state);
         }
         else if(  (layer_state == efstrings->texture_coordinate_source) )

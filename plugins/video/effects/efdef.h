@@ -24,6 +24,7 @@
 #include "cstypes.h"
 #include "csutil/strset.h"
 #include "csutil/ref.h"
+#include "csutil/refarr.h"
 #include "csutil/csvector.h"
 #include "ivideo/effects/efvector4.h"
 
@@ -53,7 +54,7 @@ public:
 class csEffectDefinition : public iEffectDefinition
 {
 private:
-  csBasicVector techniques;
+  csRefArray<iEffectTechnique> techniques;
   char* techniquename;
   csBasicVector variables;
 
@@ -63,17 +64,18 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  csEffectDefinition()
+  csEffectDefinition(): techniquename(NULL)
   {
     SCF_CONSTRUCT_IBASE( NULL );
   }
   virtual ~csEffectDefinition ()
   { 
+    if (techniquename) delete[] techniquename;
   }
 
-  iEffectTechnique* CreateTechnique();
+  csPtr<iEffectTechnique> CreateTechnique();
   int GetTechniqueCount();
-  iEffectTechnique* GetTechnique( int technique );
+  iEffectTechnique* GetTechnique (int technique);
 
   void SetName( const char* name );
   const char* GetName();

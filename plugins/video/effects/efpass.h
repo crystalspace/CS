@@ -40,9 +40,9 @@ public:
   csEffectPass ();
   virtual ~csEffectPass ();
 
-  iEffectLayer* CreateLayer();
+  csPtr<iEffectLayer> CreateLayer();
   int GetLayerCount();
-  iEffectLayer* GetLayer( int layer );
+  iEffectLayer* GetLayer (int layer);
 
   iBase* GetRendererData ();
   void SetRendererData (iBase* data);

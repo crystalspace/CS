@@ -34,14 +34,13 @@ SCF_IMPLEMENT_IBASE( csEffectDefinition )
   SCF_IMPLEMENTS_INTERFACE( iEffectDefinition )
 SCF_IMPLEMENT_IBASE_END
 
-iEffectTechnique* csEffectDefinition::CreateTechnique()
+csPtr<iEffectTechnique> csEffectDefinition::CreateTechnique()
 {
   csEffectTechnique* techniqueobj = new csEffectTechnique();
-  csRef<iEffectTechnique> technique (SCF_QUERY_INTERFACE(
-  	techniqueobj, iEffectTechnique));
+  csRef<iEffectTechnique> technique 
+    (SCF_QUERY_INTERFACE(techniqueobj, iEffectTechnique));
   techniques.Push (technique);
-  technique->IncRef ();	// To avoid smart pointer release.
-  return technique;
+  return csPtr<iEffectTechnique> ((iEffectTechnique*)technique);
 }
 
 int csEffectDefinition::GetTechniqueCount()
@@ -51,7 +50,7 @@ int csEffectDefinition::GetTechniqueCount()
 
 iEffectTechnique* csEffectDefinition::GetTechnique( int technique )
 {
-  return (iEffectTechnique*)(techniques.Get( technique ));
+  return techniques.Get (technique);
 }
 
 void csEffectDefinition::SetName( const char* name )

@@ -43,11 +43,11 @@ SCF_VERSION (iEffectDefinition, 0, 0, 1);
 struct iEffectDefinition : public iBase
 {
   /// Create a new technique
-  virtual iEffectTechnique* CreateTechnique() = 0;
+  virtual csPtr<iEffectTechnique> CreateTechnique() = 0;
   /// Get number of techniques
   virtual int GetTechniqueCount() = 0;
   /// Retrieve a technique
-  virtual iEffectTechnique* GetTechnique( int technique ) = 0;
+  virtual iEffectTechnique* GetTechnique (int technique) = 0;
 
   /// Set this Effect's name
   virtual void SetName( const char* name ) = 0;

@@ -52,21 +52,20 @@ bool csEffectServer::Initialize( iObjectRegistry* reg )
   return true;
 }
 
-iEffectDefinition* csEffectServer::CreateEffect()
+csPtr<iEffectDefinition> csEffectServer::CreateEffect()
 {
   csEffectDefinition* effectobj = new csEffectDefinition();
 
   csRef<iEffectDefinition> effect = 
     SCF_QUERY_INTERFACE(effectobj, iEffectDefinition);
 
-  char* name = new char[10];
-  sprintf(name, "effect%2d", seqnr);
+  char name[17];
+  sprintf(name, "effect%d", seqnr);
   seqnr++;
   effect->SetName(name);
 
   effects.Push(effect);
-
-  return effect;
+  return csPtr<iEffectDefinition> ((iEffectDefinition*)effect);
 }
 
 bool csEffectServer::Validate( iEffectDefinition* effect )
@@ -101,7 +100,7 @@ iEffectTechnique* csEffectServer::SelectAppropriateTechnique(
     return NULL;
 
   float maxquality = -1;
-  iEffectTechnique* tech = NULL;
+  csRef<iEffectTechnique> tech = NULL;
   for( int i=0; i<effect->GetTechniqueCount(); i++ )
     if( (effect->GetTechnique(i)->GetValidation() == CS_TECHNIQUE_PASSED) && 
         (effect->GetTechnique(i)->GetQuality()>maxquality) )

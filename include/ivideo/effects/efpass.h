@@ -48,7 +48,7 @@ struct iEffectPass : public iBase
   virtual void SetStateString( csStringID state, csStringID value ) = 0;
   /// Set a state opaque data.
   virtual void SetStateOpaque( csStringID state, void *value ) = 0;
-		/// Set a state vector4.
+  /// Set a state vector4.
   virtual void SetStateVector4( csStringID state, csEffectVector4 value) = 0;
 
   
@@ -58,17 +58,17 @@ struct iEffectPass : public iBase
   virtual csStringID GetStateString( csStringID state ) = 0;
   /// Get a state opaque data.
   virtual void *GetStateOpaque( csStringID state ) = 0;
-	/// Get a state vector4.
+  /// Get a state vector4.
   virtual csEffectVector4 GetStateVector4( csStringID state) = 0;
 
 
 
   /// Create a new layer.
-  virtual iEffectLayer* CreateLayer() = 0;
+  virtual csPtr<iEffectLayer> CreateLayer() = 0;
   /// Get number of layers.
   virtual int GetLayerCount() = 0;
   /// Get a specific layer.
-  virtual iEffectLayer* GetLayer( int layer ) = 0;
+  virtual iEffectLayer* GetLayer (int layer) = 0;
 
   /// Get the id of the first state.
   virtual csStringID GetFirstState() = 0;

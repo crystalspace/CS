@@ -1,3 +1,22 @@
+/*
+    Copyright (C) 2002 by Anders Stenberg
+    Written by Anders Stenberg
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #include "cssysdef.h"
 #include "video/canvas/openglcommon/iglstates.h"
 #include "video/canvas/openglcommon/glstates.h"
@@ -5,6 +24,15 @@
 SCF_IMPLEMENT_IBASE (csGLStateCache)
   SCF_IMPLEMENTS_INTERFACE (iGLStateCache)
 SCF_IMPLEMENT_IBASE_END
+
+csGLStateCache::~csGLStateCache()
+{
+  csHashIterator cIterator (&statecache);
+  while (cIterator.HasNext())
+  {
+    delete (csOpenGLState*)cIterator.Next();
+  }
+}
 
 void csGLStateCache::InitCache()
 {
@@ -30,20 +58,20 @@ void csGLStateCache::InitCache()
 void csGLStateCache::EnableState( GLenum state, int layer )
 {
   csHashIterator cIterator( &statecache, state );
-  while( cIterator.HasNext() )
+  while (cIterator.HasNext())
   {
-    csOpenGLState* glstate =  (csOpenGLState*)cIterator.Next();
+    csOpenGLState* glstate = (csOpenGLState*)cIterator.Next();
     if( (glstate->state == state) && (glstate->layer == layer) )
     {
       if( !glstate->enabled )
       {
-        glEnable( state );
+        glEnable (state);
         glstate->enabled = true;
       }
       return;
     }
   }
-  statecache.Put( state, new csOpenGLState( state, true, layer ) );
+  statecache.Put (state, new csOpenGLState (state, true, layer));
   glEnable( state );
 }
 

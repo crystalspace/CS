@@ -48,11 +48,11 @@ public:
 
   bool Initialize( iObjectRegistry* reg );
 
-  iEffectDefinition* CreateEffect();
+  csPtr<iEffectDefinition> CreateEffect();
 
   bool Validate( iEffectDefinition* effect );
 
-  iEffectTechnique* SelectAppropriateTechnique( iEffectDefinition* effect );
+  iEffectTechnique* SelectAppropriateTechnique (iEffectDefinition* effect);
 
   iEffectDefinition* GetEffect(const char *s);
 

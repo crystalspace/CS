@@ -39,14 +39,12 @@ csEffectPass::~csEffectPass ()
 {
 }
 
-iEffectLayer* csEffectPass::CreateLayer()
+csPtr<iEffectLayer> csEffectPass::CreateLayer()
 {
   csRef<iEffectLayer> layer = 
     csPtr<iEffectLayer> (new csEffectLayer());
-  
-  layers.Push( layer );
-  
-  return layer;
+  layers.Push (layer);
+  return csPtr<iEffectLayer> (layer);
 }
 
 int csEffectPass::GetLayerCount()
