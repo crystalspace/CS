@@ -77,7 +77,7 @@ public:
   /// create an animated pixmap
   csAnimatedPixmap(csAnimationTemplate *tpl);
   /// destroy this object
-  ~csAnimatedPixmap();
+  virtual ~csAnimatedPixmap();
 
   // implementation of csPixmap
   virtual int Width();

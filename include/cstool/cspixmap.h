@@ -41,6 +41,9 @@
 class csPixmap
 {
 public:
+  /// Destructor
+  virtual ~csPixmap() {}
+
   /// return current width of this pixmap
   virtual int Width() = 0;
   /// return current height of this pixmap
