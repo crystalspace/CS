@@ -48,7 +48,16 @@
  *        |--[ csNotebook ]		// notebook control
  *        |--[ csGrid ]			// grid control
  *        |--[ csSlider ]		// slider control
- *        +--[ csTreeCtrl ]		// tree control
+ *        |--[ csTreeCtrl ]		// tree control
+ *        +--[ csLayout ]		// layout control
+ *        |    |--[ csLayout2 ]	        // layout control 2
+ *        |    |--[ csAbsolueLayout ]	// absolute layout
+ *        |    |--[ csBoxLayout ]	// box layout
+ *        |    |--[ csFlowLayout ]	// flow layout
+ *        |    |--[ csBorderLayout ]	// border layout
+ *        |    |--[ csGridLayout ]	// grid layout
+ *        |    |--[ csGridBagLayout ]	// gridbag layout
+
  * </pre>
  */
 
@@ -61,6 +70,14 @@ class csObjVector;
 class csEventQueue;
 class csGraphicsPipeline;
 class csComponent;
+class csLayout;
+class csLayout2;
+class csAbsoluteLayout;
+class csBorderLayout;
+class csBoxLayout;
+class csFlowLayout;
+class csGridLayout;
+class csGridBagLayout;
 class csMouse;
 class csStatic;
 class csScrollBar;
@@ -120,7 +137,13 @@ struct iEvent;
 #include "csapp.h"			// Windowing System application
 #include "cswsutil.h"			// Windowing System shortcuts and utilites
 #include "csskin.h"			// Windowing System skin management
-
+#include "cslayout.h"                   // layout
+#include "csabslay.h"                   // absolute layout
+#include "csboxlay.h"                   // box layout
+#include "csbdrlay.h"                   // border layout
+#include "csflwlay.h"                   // flow layout
+#include "csgrdlay.h"                   // grid layout
+#include "csbaglay.h"                   // gridbag layout
 // Include all known skins here
 #include "sdefault.h"
 
