@@ -60,7 +60,7 @@ chronological order.
 	    Compiled with g++ [powerpc-apple-darwin7.4.0]
 	- Eric Sunshine fixed problem in csjava/Jamfile which caused Jam to
 	  complain that it did not know how to create crystalspace.jar at
-	  install if the archive had not already been created by 'all' or
+	  install time if the archive had not already been created by 'all' or
 	  'csjava'. This problem also caused the makefile emulation setup by
 	  configure.ac to fail.
 	- Eric Sunshine applied some corrections to the Swig input files,
