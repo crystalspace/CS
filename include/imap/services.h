@@ -25,6 +25,7 @@
  * @{ */
 #include "csutil/scf.h"
 #include "csutil/ref.h"
+#include "ivideo/graph3d.h"
 
 class csShaderVariable;
 class csMatrix3;
@@ -42,7 +43,6 @@ struct iLoaderContext;
 struct iDocumentNode;
 struct iString;
 struct iStringSet;
-enum csZBufMode;
 
 /**\name Texture transformation description
  * @{ */
