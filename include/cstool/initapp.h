@@ -24,6 +24,7 @@
 
 struct iObjectRegistry;
 struct iEvent;
+struct iEventHandler;
 
 /**
  * This is a very general function that does a lot of the application
