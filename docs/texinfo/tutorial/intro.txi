@@ -38,8 +38,8 @@ library.  All plug-ins can be accessed in a common fashion.  They have a
 are extracted to a DLL.  So they are the better solution as long as speed is
 not the dictator of all decisions as in the math library (access to plug-in
 functions uses virtual methods).  The main difference between the interface of
-a library and a plug-in is that a library may use @sc{scf} and C++ classes;
-plug-ins may only use @sc{scf}.
+a library and a plug-in is that a library may use @sc{scf}, the Shared Class
+Facility (@pxref{SCF}), and C++ classes; plug-ins may only use @sc{scf}.
 
 @itemize @bullet
 @item
