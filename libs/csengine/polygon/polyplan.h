@@ -142,12 +142,13 @@ public:
   }
 
   /**
-   * Check if this plane is close to another one in
-   * world space coordinates.
+   * Check if this plane is nearly equal to another one in
+   * world space coordinates (it only checks on the component
+   * values. The planes are not normalized).
    */
-  int Close (csPolyPlane* plane)
+  int NearlyEqual (csPolyPlane* plane)
   {
-    return csMath3::PlanesClose (plane_wor, plane->plane_wor);
+    return csMath3::PlanesEqual (plane_wor, plane->plane_wor);
   }
 
   /**
