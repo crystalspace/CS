@@ -390,7 +390,7 @@ bool csGraphics2DOpenGL::DoubleBuffer ()
   return m_bDisableDoubleBuffer;
 }
 
-void csGraphics2DOpenGL::Print (csRect */*area*/)
+void csGraphics2DOpenGL::Print (csRect* /*area*/)
 {
   SwapBuffers(hDC);
   glFlush();
