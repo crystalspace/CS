@@ -1,4 +1,4 @@
-UpCrystal Space detailed change log.
+Crystal Space detailed change log.
 http://crystal.sourceforge.net/
 
 The overall history is in reverse (descending) chronological order, so that
@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Aug-2003
+	- Anders Stenberg changed pico plugin to use pico's internal 
+	  framebuffer drawing. Now pico handles all drawing (to a 
+	  memory framebuffer), and CS just relays this to the real 
+	  framebuffer. This means we get perfect(?) output, although no 
+	  acceleration from CS. This could/should be upgraded later. 
 3-Aug-2003
 	- Paul G. implemented a very nasty (and hopefully very temporary) hack
 	  for csunicode.h to define CS_WCHAR_T_SIZE appropriately for Win32/COMP_GCC
