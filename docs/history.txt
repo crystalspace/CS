@@ -35,6 +35,8 @@ chronological order.
 	    - Agumented configure.ac so that it no longer emits CS_HAS_VOS,
 	      CS_HAS_ODE, and CS_HAS_WXWIDGETS to csconfig.h. These control
 	      macros have been obsoleted by the above change.
+	- res fixed jobber.pl to use 'crystalspace' as the package name in the
+	  fake Jamconfig.
 20-Sep-2004
         - Andrew Craig fixed memory leak in csparser.
 	- PK did the following:
