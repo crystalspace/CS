@@ -1721,11 +1721,11 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
     return;
   }
 
-  if (!do_textured || !poly.mat_handle->GetTexture ())
+  /*if (!do_textured || !poly.mat_handle->GetTexture ())
   {
     DrawPolygonFlat (poly);
     return;
-  }
+  }*/
 
   int i;
   float P1, P2, P3, P4;
@@ -1860,8 +1860,8 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
 
   csPolyTextureMapping* tmapping = poly.texmap; 
   csSoftwareTextureHandle *tex_mm =
-    (csSoftwareTextureHandle *)poly.mat_handle->GetTexture ()
-    	->GetPrivateObject ();
+    (csSoftwareTextureHandle *)/*poly.mat_handle->GetTexture ()
+    	->GetPrivateObject ()*/poly.txt_handle;
   csSoftRendererLightmap* srlm = (csSoftRendererLightmap*)poly.rlm;
 
   float fdu, fdv;
@@ -4172,23 +4172,41 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh)
 }
 
 void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh,
-  const csArray< csArray<csShaderVariable*> > &stack)
+  const csArray< csArray<csShaderVariable*> > &stacks)
 {
-  return;
   /*
   iRenderBufferSource* source = mesh->buffersource;
 
   csSoftPolygonRenderer* polyRender = (csSoftPolygonRenderer*)source;
   */
-  csSoftPolygonRenderer* polyRender = NULL;
 
   int i;
-/*  iRenderBuffer* indexbuf = source->GetRenderBuffer (
-    strings->Request ("indices"));
-  if (!indexbuf)
-    return;
+  CS_ASSERT (string_indices<(csStringID)stacks.Length ()
+      && stacks[string_indices].Length () > 0);
+  csShaderVariable* indexBufSV = stacks[string_indices].Top ();
+  iRenderBuffer* indexbuf = 0;
+  indexBufSV->GetValue (indexbuf);
+  CS_ASSERT(indexbuf);
+  
+  csSoftPolygonRenderer* polyRender = (csSoftPolygonRenderer*)indexbuf;
 
-  const int numBuffers = sizeof (activebuffers) / sizeof (iRenderBuffer*);
+  CS_ASSERT (string_texture_diffuse < (csStringID)stacks.Length ()
+      && stacks[string_texture_diffuse].Length () > 0);
+  csShaderVariable* texDiffuseSV = stacks[string_texture_diffuse].Top ();
+  iTextureHandle* texh = 0;
+  texDiffuseSV->GetValue (texh);
+  CS_ASSERT(texh);
+
+  /*uint32 *indices = (uint32*)indexbuf->Lock (CS_BUF_LOCK_NORMAL);
+
+  //do_lighting = false;
+  bool lazyclip = false;
+
+  //SetObjectToCamera (&mesh->object2camera);
+  z_buf_mode = CS_ZBUF_USE;
+
+  const unsigned int numBuffers =
+    sizeof (activebuffers) / sizeof (iRenderBuffer*);
   void* locks[numBuffers];
   for (i=0; i<numBuffers; ++i)
   {
@@ -4262,11 +4280,12 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh,
       memcpy (poly.vertices, p2d.GetVertices (), sizeof (csVector2) * poly.num);
       poly.z_value = camVerts[0].z;
       poly.normal = plane_cam;
+      poly.txt_handle = texh;
       //@@@@@ poly.mat_handle = spoly->material;
       // Adding the material handle to csPolygonRenderData is not
       // really an option but we need the material here. Perhaps use
       // same technique as OpenGL renderer uses?
-      CS_ASSERT (false);
+      //CS_ASSERT (false);
 
       csMatrix3 m_o2t;
       csVector3 v_o2t;
@@ -4316,7 +4335,12 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh,
     polyIdx++;
   }*/
 
-  //indexbuf->Release ();
+  /*indexbuf->Release ();
+  for (i=0; i<numBuffers; ++i)
+  {
+    if (activebuffers[i] != 0)
+      activebuffers[i]->Release ();
+  }*/
 }
 
 void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh,

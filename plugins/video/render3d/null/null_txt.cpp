@@ -246,7 +246,7 @@ void csTextureManagerNull::PrepareTextures ()
 
   // Remap all textures according to the new colormap.
   for (i = 0; i < textures.Length (); i++)
-    ((csTextureHandleNull*)textures[i])->remap_texture (this);
+    ((csTextureHandleNull*)((csTextureHandle*)textures[i]))->remap_texture (this);
 }
 
 csPtr<iTextureHandle> csTextureManagerNull::RegisterTexture (iImage* image,

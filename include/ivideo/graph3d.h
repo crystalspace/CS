@@ -494,6 +494,8 @@ struct G3DPolygonDP : public G3DPolygonDFP
 
   /// Z value (in camera space) of vertex[0].
   float z_value;
+
+  iTextureHandle* txt_handle;
 };
 
 /// Structure containing all info needed by DrawPolygonFlat (DPF)

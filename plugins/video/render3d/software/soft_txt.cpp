@@ -574,16 +574,20 @@ void csSoftwareTextureManager::PrepareTextures ()
   // Create mipmaps for all textures
   for (i = 0; i < textures.Length (); i++)
   {
-    csTextureHandle *txt = textures.Get (i);
-    txt->CreateMipmaps ();
+    csSoftwareTextureHandle* txt = (csSoftwareTextureHandle*)textures.Get (i);
+    if (txt) 
+    {
+      txt->CreateMipmaps ();
+      txt->remap_texture ();
+    }
   }
 
   // Remap all textures according to the new colormap.
-  for (i = 0; i < textures.Length (); i++)
+  /*for (i = 0; i < textures.Length (); i++)
   {
     csSoftwareTextureHandle* txt = (csSoftwareTextureHandle*)textures.Get (i);
     txt->remap_texture ();
-  }
+  }*/
 }
 
 csPtr<iTextureHandle> csSoftwareTextureManager::RegisterTexture (iImage* image,

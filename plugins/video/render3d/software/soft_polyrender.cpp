@@ -77,7 +77,7 @@ void csSoftPolygonRenderer::PrepareRenderMesh (csRenderMesh& mesh)
 
   csShaderVariable* sv;
   sv = mesh.variablecontext->GetVariableAdd (index_name);
-  sv->SetValue (index_buffer);
+  sv->SetValue (this /*index_buffer*/);
   sv = mesh.variablecontext->GetVariableAdd (vertex_name);
   sv->SetValue (vertex_buffer);
   /*

@@ -22,7 +22,8 @@
 
 class csSoftwareGraphics3DCommon;
 
-class csSoftPolygonRenderer : public iPolygonRenderer
+class csSoftPolygonRenderer : public iPolygonRenderer,
+			      public iRenderBuffer
 {
   csSoftwareGraphics3DCommon* parent;
   uint renderBufferNum;
@@ -32,7 +33,7 @@ class csSoftPolygonRenderer : public iPolygonRenderer
   //csRef<iRenderBuffer> texel_buffer;
   //csRef<iRenderBuffer> normal_buffer;
   //csRef<iRenderBuffer> color_buffer;
-  csRef<iRenderBuffer> index_buffer;
+  //csRef<iRenderBuffer> index_buffer;
 
   static csStringID vertex_name;
   //static csStringID texel_name;
@@ -55,5 +56,20 @@ public:
 
   virtual void Clear ();
   virtual void AddPolygon (csPolygonRenderData* poly);
+
+  virtual void* Lock(csRenderBufferLockType lockType) { return 0; }
+  virtual void Release() {}
+  virtual void CopyToBuffer(void *data, int length) {}
+  virtual void SetComponentCount (int count) {}
+  virtual int GetComponentCount () const { return 0; }
+  virtual void SetComponentType (csRenderBufferComponentType type) {}
+  virtual csRenderBufferComponentType GetComponentType () const 
+  { return CS_BUFCOMP_FLOAT; }
+  virtual csRenderBufferType GetBufferType() const
+  { return CS_BUF_STATIC; }
+  virtual int GetSize() const { return 0; }
+  virtual void SetStride(int stride) {}
+  virtual int GetStride() const { return 0; }
+  virtual void SetOffset(int offset) {}
 };
 

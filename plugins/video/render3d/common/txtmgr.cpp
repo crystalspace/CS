@@ -348,7 +348,10 @@ void csTextureManager::FreeImages ()
 {
   int i;
   for (i = 0 ; i < textures.Length () ; i++)
-    textures.Get (i)->FreeImage ();
+  {
+    csTextureHandle* tex = textures[i];
+    if (tex) tex->FreeImage ();
+  }
 }
 
 int csTextureManager::GetTextureFormat ()
@@ -383,12 +386,18 @@ void csTextureManager::PrepareMaterials ()
 {
   int i;
   for (i = 0; i < materials.Length (); i++)
-    materials.Get (i)->Prepare ();
+  {
+    csMaterialHandle* mat = materials.Get (i);
+    if (mat) mat->Prepare ();
+  }
 }
 
 void csTextureManager::FreeMaterials ()
 {
   int i;
   for (i = 0; i < materials.Length (); i++)
-    materials.Get (i)->FreeMaterial ();
+  {
+    csMaterialHandle* mat = materials.Get (i);
+    if (mat) mat->FreeMaterial ();
+  }
 }

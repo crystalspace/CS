@@ -29,6 +29,7 @@
 //#include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "csgfx/rgbpixel.h"
+#include "csutil/weakrefarr.h"
 
 class csTexture;
 class csTextureManager;
@@ -303,13 +304,15 @@ class csTextureManager : public iTextureManager
 {
 protected:
 
-  typedef csArray<csTextureHandle*> csTexVector;
+  //typedef csArray<csTextureHandle*> csTexVector;
+  typedef csWeakRefArray<csTextureHandle> csTexVector;
 
   /// List of textures.
   csTexVector textures;
 
   // Private class used to keep a list of objects derived from csMaterialHandle
-  typedef csArray<csMaterialHandle*> csMatVector;
+  //typedef csArray<csMaterialHandle*> csMatVector;
+  typedef csWeakRefArray<csMaterialHandle> csMatVector;
 
   /// List of materials.
   csMatVector materials;
