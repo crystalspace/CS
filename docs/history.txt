@@ -18,6 +18,9 @@ chronological order.
 	- Jorrit changed the main loader so that it also calls syntax services
 	  HandlePortalParameter(). This means that you can now specify all
 	  portal stuff in the <portal> statement.
+	- res added a patch from Fritz Elfert <felfert@to.com> to fix thread
+	  problems after change to _beginthreadex(). Apparently, the last 
+	  parameter needs to be a valid pointer.
 2-Oct-2003
 	- Jorrit extended the two versions of iEngine->CreatePortal() with
 	  a 'name' parameter. That name will be used for the portal container

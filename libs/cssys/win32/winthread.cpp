@@ -235,8 +235,9 @@ bool csWinThread::Start ()
     thread = CreateThread (0, 0, (LPTHREAD_START_ROUTINE) ThreadRun, (void*)this, 
       CREATE_SUSPENDED, 0);
   #else
+    uint dummyThreadId;
     thread = (HANDLE)_beginthreadex (0, 0, ThreadRun, (void*)this, 
-      CREATE_SUSPENDED, 0);
+      CREATE_SUSPENDED, &dummyThreadId);
   #endif
 
   bool created = (thread != 0);
