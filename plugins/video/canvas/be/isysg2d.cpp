@@ -27,22 +27,6 @@
 
 IMPLEMENT_COMPOSITE_UNKNOWN(csGraphics2DBeLib, XBeLibGraphicsInfo)
 
-STDMETHODIMP IXBeLibGraphicsInfo::GetDisplay (BView ** dpy)
-{
-    METHOD_PROLOGUE( csGraphics2DBeLib, XBeLibGraphicsInfo);
-    
-    *dpy = pThis->dpy;
-    return S_OK;
-}
-
-STDMETHODIMP IXBeLibGraphicsInfo::GetWindow (BWindow ** cryst_window)
-{
-    METHOD_PROLOGUE( csGraphics2DBeLib, XBeLibGraphicsInfo);
-    
-    *cryst_window = pThis->window;
-    return S_OK;
-}
-
 STDMETHODIMP IXBeLibGraphicsInfo::DirectConnect (direct_buffer_info *info)
 {
 // FIXME: Re-implement/re-enable DirectWindow mode.
