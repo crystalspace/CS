@@ -11,12 +11,53 @@ chronological order.
 	  expects CS and CEL versions 0.99. This way, external projects created
 	  with the 0.99 version of jamtemplate will require the corresponding
 	  version of the SDK's.
-	- Eric Sunshine added the 'noinstall' option to protomesh and
-	  protomeshldr since these plugins are just "examples", and serve no
-	  useful purpose at run-time.
 	- Jorrit fixed a bug in the particles mesh object where it would
 	  forget to remove itself from the physics plugin in case it was
 	  removed. This would cause crashes later.
+	- Eric Sunshine added the 'noinstall' option to protomesh and
+	  protomeshldr since these plugins are just "examples", and serve no
+	  useful purpose at run-time.
+	- Eric Sunshine removed the 'noinstall' option from protomesh and
+	  protomeshldr since 'flarge' (which is also installed) tries to load
+	  these plugins, despite the fact that they are not useful to the
+	  end-user in compiled-form.
+	- Eric Sunshine fixed jamtemplate/createproject.sh so that it works
+	  correctly both when installed and when used from the CS source tree.
+	- Eric Sunshine augmented the 'install' target so that it installs the
+	  following additional useful resources:
+	    ${datadir}/build/autoconf
+	    ${datadir}/build/jam
+	    ${datadir}/build/jamtemplate
+	    ${datadir}/build/maketemplate
+	    ${datadir}/build/msvcgen
+	    ${datadir}/conversion/hammer
+	    ${datadir}/conversion/max
+	    ${datadir}/conversion/maya
+	    ${datadir}/conversion/qt2aws
+	- Eric Sunshine imposed some order on the eclectic collection of
+	  resources installed in ${datadir} by grouping related items, which
+	  used to reside at the top-level of ${datadir}, into meaningful
+	  subdirectories:
+	    java   --> ${datadir}/bindings/java
+	    perl5  --> ${datadir}/bindings/perl5
+	    python --> ${datadir}/bindings/python
+	    *.zip  --> ${datadir}/data
+	    data   --> ${datadir}/data
+	    maps   --> ${datadir}/data/maps
+	- Eric Sunshine relocated the external make-based project skeleton
+	  resources, Makefile.template and appwrap.sh, from
+	  CS/scripts/cs-config to CS/scripts/maketemplate. 'maketemplate' is
+	  now installed in ${datadir}/build/maketemplate, alongside
+	  'jamtemplate'.
+	- Eric Sunshine fixed bug in the Wildcard rule in helper.jam where it
+	  produced and returned a bogus list of paths if the optional `dir'
+	  argument consisted of multiple subdirectory token; for instance:
+	  [ Wildcard foo bar : *.h *.inc ]
+	- Eric Sunshine added an InstallProgram rule to install.jam which is a
+	  convenience wrapper around DoInstall for installing already-existing
+	  invocable targets, such as shell scripts.
+        - Eric Sunshine relocated Norman's Qt -> AWS conversion style sheets
+	  from CS/scripts/aws to CS/scripts/qt2aws.
 3-Nov-2004
 	- res also applied the default hash table size and grow rate change to
 	  csHashReversible<>.

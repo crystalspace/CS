@@ -44,6 +44,11 @@ compiler.  Likewise, the @samp{--libs} argument will return the Crystal
 Space-specific linker switches and libraries with which you should link your
 program.
 
+For best results, be sure that the installation location of @file{cs-config} is
+mentioned by your @samp{PATH} environment variable. The default location,
+@file{/usr/local/bin}, normally is mentioned by @samp{PATH}, so you likely will
+not have to do anything special to make @file{cs-config} available.
+
 @subsubheading Jamtemplate
 @cindex Jamtemplate
 
@@ -54,14 +59,26 @@ For instance, on MacOS/X, it will correctly create the Cocoa wrapper
 (@file{.app}) for an application; on some platforms it knows how to embed
 plugin meta-information directly into the plugin module; and understands many
 of the familiar build targets, such as @samp{all}, @samp{clean},
-@samp{distclean}, @samp{install}, etc.  The Jam system knows how to correctly
+@samp{distclean}, @samp{install}, etc.  The Jam system knows how to
 build applications, plugin modules, and libraries on all platforms supported by
 Crystal Space.  The generated project skeleton even features support for
-synthesizing Microsoft Visual C++ project files for your application
-automatically (via the @samp{jam msvcgen} target).  Jamtemplate is quite easy
-to use.  After setting up your @samp{CRYSTAL} environment variable, simply run
-the @samp{createproject.sh} script and follow the instructions which it
-presents:
+generating Microsoft Visual C++ project files for your application
+automatically (via the @samp{jam msvcgen} target).
+
+Jamtemplate is quite easy to use.  After setting up your @samp{CRYSTAL}
+environment variable, go to the directory under which you would like to create
+the new project, run the @samp{createproject.sh} script, and follow the
+instructions which it presents.  If you have installed the Crystal Space
+@sc{sdk} (via @samp{make install} or @samp{jam install}), then the script will
+reside at:
+
+@noindent
+@code{$@{prefix@}/share/crystalspace/build/jamtemplate/createproject.sh}
+
+@noindent
+where @code{$@{prefix@}} is the package installation location (typically,
+@file{/usr/local}. Alternately, you may run the script directly from the
+Crystal Space source tree, where it resides at:
 
 @noindent
 @code{CS/scripts/jamtemplate/createproject.sh}
@@ -75,11 +92,22 @@ intructions.  Note, however, that the skeleton Makefile-based build system
 created by these instructions is bare-bones; it does not feature the fancy
 bells and whistles available with the Jam build system.
 
-To begin, in the Crystal Space directory you will find the following files:
+To begin, locate the files @file{Makefile.template} and @file{appwrap.sh}.  If
+you have installed the Crystal Space @sc{sdk} (via @samp{make install} or
+@samp{jam install}), then thes files will reside at:
 
 @noindent
-@code{CS/scripts/cs-config/Makefile.template}@*
-@code{CS/scripts/cs-config/appwrap.sh}
+@code{$@{prefix@}/share/build/maketemplate/Makefile.template}@*
+@code{$@{prefix@}/share/build/maketemplate/appwrap.sh}
+
+@noindent
+where @code{$@{prefix@}} is the package installation location (typically,
+@file{/usr/local}. Alternately, you may access the files directly from the
+Crystal Space source tree, where they resides at:
+
+@noindent
+@code{CS/scripts/maketemplate/Makefile.template}@*
+@code{CS/scripts/maketemplate/appwrap.sh}
 
 @noindent
 Copy these files to the directory where your project is located and rename

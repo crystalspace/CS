@@ -1,10 +1,20 @@
-The script in this directory can set up a skeleton build system (based upon
-Jam) for external Crystal Space projects.  It sets up Jam support, Autoconf
-macros, a configure script, a source directory and a simple main.cpp file.
+The createproject.sh script can set up a skeleton project with a build system
+based upon Jam for external Crystal Space projects.  It sets up Jam support,
+Autoconf macros, a configure script, MSVC project file generation capability, a
+source directory, and a few rudimentary source and header files.
 
-To run the script go to some directory under which you want to have the project
-created, and make sure you have set the CRYSTAL environment variable.  Then,
-just invoke the script.  Example:
+To run the script, set your CRSYTAL environment variable, and go to some
+directory under which you want to have the project created.  Then, just invoke
+the script. If the Crystal Space SDK has been installed, then the script will
+reside at:
 
-  $CRYSTAL/scripts/jamtemplate/createproject.sh
- 
+${prefix}/share/crystalspace/build/jamtemplate/createproject.sh
+
+where ${prefix} is the installation location (typically, /usr/local).
+Alternately, you can invoke the script directly from the Crystal Space source
+tree, where it resides at:
+
+CS/scripts/jamtemplate/createproject.sh
+
+Also see the HOWTO named "Creating an External Crystal Space Application" in
+the Crystal Space manual for additional details.

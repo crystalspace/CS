@@ -7,7 +7,8 @@ InstallData
   standard.zip
   stdtex.zip
   ttf-vera.zip
-  unifont.zip ;
+  unifont.zip 
+  : data ;
 
 maps =
   flarge
@@ -22,7 +23,7 @@ maps =
 for map in $(maps)
 {
     local files = [ Wildcard $(map) : *.jpg *.png *.map *.tga *.dds world ] ;
-    InstallData $(files) : maps $(map) ;
+    InstallData $(files) : data maps $(map) ;
 }
 
 SubInclude TOP data aws ;

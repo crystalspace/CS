@@ -132,14 +132,14 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(JAVA) && $(JAVAC) && $(CMD.SWIG) &&
     local SUBDIR = $(2) ;
     InstallData $(1) : $(3) ;
   }
-  InstallJavaJar $(jarfinal) : $(LOCATE_TARGET) : java ;
+  InstallJavaJar $(jarfinal) : $(LOCATE_TARGET) : bindings java ;
 
   rule InstallJavamod
   {
     local plugindir = $(appdatadir) ;
     SystemInstallPlugin $(1) : $(2) ;
   }
-  InstallJavamod $(javamod) : java ;
+  InstallJavamod $(javamod) : bindings java ;
 
   Always csjavaclean ;
   NotFile csjavaclean ;

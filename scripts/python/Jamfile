@@ -2,13 +2,13 @@ SubDir TOP scripts python ;
 
 PYTHON_DATAFILES = [ Wildcard *.py ] ;
 
-# cspace.py is the responsibility of cspython/Jamfile.  glextgen.py is a
+# cspace.py is the responsibility of cscript/cspython/Jamfile. glextgen.py is a
 # private tool, not meaningful to the end-user.
 PYTHON_DATAFILES = [ Filter $(PYTHON_DATAFILES) : cspace.py glextgen.py ] ;
 
 if $(PYTHON_DATAFILES)
 {
-  InstallData $(PYTHON_DATAFILES) : python ;
+  InstallData $(PYTHON_DATAFILES) : bindings python ;
 }
 
 # This is quite ugly. Normally, we avoid altering the source directory at all

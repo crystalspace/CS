@@ -73,9 +73,66 @@ capitalize()
 	s/\(.\)\n./\1/'
 }
 
+Instantiate()
+{
+    SOURCE="$1"
+    TARGET="$2"
+
+    # XXX We should somehow quote here...
+    cat "$SOURCE" | sed " \
+	s^#PROJECTNAME#^$PROJECTNAME^g;
+	s^#PROJECTNAMECAP#^$PROJECTNAMECAP^g;
+	s^#EMAIL#^$EMAIL^g; \
+	s^#HOMEPAGE#^$HOMEPAGE^g; \
+	s^#LONGNAME#^$LONGNAME^g; \
+	s^#AUTHOR#^$AUTHOR^g; \
+	s^#VERSION#^$VERSION^g; \
+	s^#COPYRIGHT#^$COPYRIGHT^g; \
+	s^#USECEL#^$USECEL^g; \
+	" > "$TARGET"
+}
+
+# Figure out where our resources reside. We test for an installation location
+# (i.e. ${prefix}/share/crystalspace/build) or a location in the source tree
+# (i.e. CS/mk).
+TEMPLATEDIR=`dirpart $0`
+
+if test -d "$TEMPLATEDIR/../autoconf"
+then
+    SUPPORTDIR="$TEMPLATEDIR/.."
+    EXTRAM4=false
+elif test -n "$CRYSTAL" && test -d "$CRYSTAL/share/crystalspace/build/autoconf"
+then
+    SUPPORTDIR="$CRYSTAL/share/crystalspace/build"
+    EXTRAM4=false
+elif test -d "$TEMPLATEDIR/../../mk/autoconf"
+then
+    SUPPORTDIR="$TEMPLATEDIR/../../mk"
+    EXTRAM4=true
+elif test -n "$CRYSTAL" && test -d "$CRYSTAL/mk/autoconf"
+then
+    SUPPORTDIR="$CRYSTAL/mk"
+    EXTRAM4=true
+else
+    echo "Failed to locate support resources (autoconf, jam, msvcgen)!"
+    exit 1
+fi
+
+if test -d "$SUPPORTDIR/perl5"
+then
+    PERLSUPPORT=true
+else
+    PERLSUPPORT=false
+fi
+
+echo "TEMPLATEDIR=[$TEMPLATEDIR]"
+echo "SUPPORTDIR=[$SUPPORTDIR]"
+echo "EXTRAM4=[$EXTRAM4]"
+echo "PERLSUPPORT=[$PERLSUPPORT]"
+
 # Part 1: Interactive - Gather information
 cat << __EOF__
-Crystal Space external Project Template
+Crystal Space External Project Template Creation
 
 This script will generate a basic Crystal Space project for you, complete with
 configuration (Autoconf) and build system (Jam).  The project will be created
@@ -100,6 +157,8 @@ ReadValueStrict PROJECTNAME "Short name:"
 ReadValueStrict LONGNAME "Long name:"
 ReadValueStrict VERSION "Version:"
 ReadValue HOMEPAGE "Home page URI:"
+
+PROJECTNAMECAP=`capitalize $PROJECTNAME`
 
 cat << __EOF__
 
@@ -130,44 +189,31 @@ CheckYesNo USECEL "Utilize CEL" no
 echo ""
 echo "*Creating project: $PROJECTNAME"
 
-TEMPLATEDIR=`dirpart $0`
-CSDIR="$TEMPLATEDIR/../.."
-PROJECTNAMECAP=`capitalize $PROJECTNAME`
-
-Instantiate()
-{
-    SOURCE="$1"
-    TARGET="$2"
-
-    # XXX We should somehow quote here...
-    cat "$SOURCE" | sed " \
-	s^#PROJECTNAME#^$PROJECTNAME^g;
-	s^#PROJECTNAMECAP#^$PROJECTNAMECAP^g;
-	s^#EMAIL#^$EMAIL^g; \
-	s^#HOMEPAGE#^$HOMEPAGE^g; \
-	s^#LONGNAME#^$LONGNAME^g; \
-	s^#AUTHOR#^$AUTHOR^g; \
-	s^#VERSION#^$VERSION^g; \
-	s^#COPYRIGHT#^$COPYRIGHT^g; \
-	s^#USECEL#^$USECEL^g; \
-	" > "$TARGET"
-}
-
 # create directories
 mkdir "$PROJECTNAME" || exit 2
 mkdir "$PROJECTNAME/mk" || exit 2
+mkdir "$PROJECTNAME/mk/autoconf" || exit 2
+mkdir "$PROJECTNAME/mk/jam" || exit 2
 mkdir "$PROJECTNAME/mk/msvcgen" || exit 2
 mkdir "$PROJECTNAME/msvc" || exit 2
 mkdir "$PROJECTNAME/src" || exit 2
 
 # copy Autoconf, Jam, and msvcgen support files.
-cp -pr "$CSDIR/mk/autoconf" "$PROJECTNAME/mk"
-cp -pr "$CSDIR/mk/jam" "$PROJECTNAME/mk"
-cp -p  "$CSDIR/mk/msvcgen/"*.tlib "$PROJECTNAME/mk/msvcgen"
-cp -pr "$CSDIR/mk/perl5" "$PROJECTNAME/mk"
+cp -p  "$SUPPORTDIR/autoconf/"*.m4 "$PROJECTNAME/mk/autoconf"
+cp -p  "$SUPPORTDIR/jam/"*.jam "$PROJECTNAME/mk/jam"
+cp -p  "$SUPPORTDIR/msvcgen/"*.tlib "$PROJECTNAME/mk/msvcgen"
 
-cp -p "$TEMPLATEDIR/cel.m4" "$PROJECTNAME/mk/autoconf"
-cp -p "$TEMPLATEDIR/cs_check_host.m4" "$PROJECTNAME/mk/autoconf"
+if $PERLSUPPORT
+then
+    cp -pr "$SUPPORTDIR/perl5" "$PROJECTNAME/mk"
+    chmod +x "$PROJECTNAME/mk/perl5/bin/ttree"
+fi
+
+if $EXTRAM4
+then
+    cp -p "$TEMPLATEDIR/cel.m4" "$PROJECTNAME/mk/autoconf"
+    cp -p "$TEMPLATEDIR/cs_check_host.m4" "$PROJECTNAME/mk/autoconf"
+fi
 
 # instantiate template files
 Instantiate "$TEMPLATEDIR/autogen.template" "$PROJECTNAME/autogen.sh"
@@ -186,7 +232,6 @@ Instantiate "$TEMPLATEDIR/README.template" "$PROJECTNAME/README"
 Instantiate "$TEMPLATEDIR/README-msvc.template" "$PROJECTNAME/msvc/README"
 
 chmod +x "$PROJECTNAME/autogen.sh"
-chmod +x "$PROJECTNAME/mk/perl5/bin/ttree"
 
 # remove CVS directories which may have been copied from the source location
 find "$PROJECTNAME" -type d -name CVS -exec rm -rf {} \; -prune

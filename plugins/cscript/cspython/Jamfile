@@ -43,7 +43,7 @@ if $(PYTHON.AVAILABLE) = "yes"
     local SUBDIR = [ on $(<) GetVar LOCATE ] ;
     InstallData $(<) : $(>) ;
   }
-  InstallCSPythonPY $(cspacepy) : python ;
+  InstallCSPythonPY $(cspacepy) : bindings python ;
 
 
   #--------
@@ -105,7 +105,7 @@ if $(PYTHON.AVAILABLE) = "yes"
     local plugindir = $(appdatadir) ; # Temporary override of global plugindir.
     SystemInstallPlugin $(1) : $(2) ;
   }
-  InstallPythmod $(pythmod) : python ;
+  InstallPythmod $(pythmod) : bindings python ;
 
   Always pythmodclean ;
   NotFile pythmodclean ;

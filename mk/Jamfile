@@ -1,3 +1,5 @@
 SubDir TOP mk ;
 
+SubInclude TOP mk autoconf ;
+SubInclude TOP mk jam ;
 SubInclude TOP mk msvcgen ;

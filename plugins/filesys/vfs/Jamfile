@@ -9,7 +9,7 @@ LinkWith vfs : csutil ;
 rule VfsCfgGen
 {
   Depends $(<) : $(>) ;
-  Always $(<) ;
+  Clean vfsclean : $(<) ;
 }
 
 actions VfsCfgGen
@@ -17,9 +17,9 @@ actions VfsCfgGen
   cat $(>) > $(<)
   echo "" >> $(<)
   echo "; Configuration-time installation paths." >> $(<)
-  echo "VFS.$(TARGET.OS.NORMALIZED).CS_DATADIR = $(appdatadir) " >> $(<)
-  echo "VFS.$(TARGET.OS.NORMALIZED).CS_CONFIGDIR = $(appconfdir) " >> $(<)
-  echo "VFS.$(TARGET.OS.NORMALIZED).CS_MAPDIR = $(appdatadir)/maps " >> $(<)
+  echo "VFS.$(TARGET.OS.NORMALIZED).CS_DATADIR = $(appdatadir)/data" >> $(<)
+  echo "VFS.$(TARGET.OS.NORMALIZED).CS_CONFIGDIR = $(appconfdir)" >> $(<)
+  echo "VFS.$(TARGET.OS.NORMALIZED).CS_MAPDIR = $(appdatadir)/data/maps" >>$(<)
 }
 
 # Build our own vfs.cfg

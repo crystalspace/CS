@@ -1,6 +1,6 @@
 %define name    crystalspace
 %define version 0.99
-%define release 3
+%define release 4
 %define prefix	/usr
 
 %define with_DEBUG 0
@@ -34,11 +34,11 @@ Crystal Space is a free (LGPL) and portable 3D SDK written in C++.
 
 # Dev package
 %package -n %{name}-devel
-Summary: C++ headers for Crystal Space free 3D SDK.
+Summary: C++ headers and link libraries for Crystal Space free 3D SDK.
 Group: Development/C++
 Provides:       %{name}-devel = %{version}-%{release}
 %description -n %{name}-devel
-Headers and files needed for building a Crystal Space apps
+Headers and link libraries needed for building projects based upon the Crystal Space 3D SDK.
 
 # Docs package
 %package -n %{name}-doc
@@ -73,10 +73,10 @@ make all
 DESTDIR=%{buildroot} make install
 
 ./cslight -canvas=null2d -video=null flarge
-cp -R data/flarge/cache %{buildroot}%{_datadir}/%{name}/maps/flarge
+cp -R data/flarge/cache %{buildroot}%{_datadir}/%{name}/data/maps/flarge
 
 ./cslight -canvas=null2d -video=null partsys
-cp -R data/partsys/cache %{buildroot}%{_datadir}/%{name}/maps/partsys
+cp -R data/partsys/cache %{buildroot}%{_datadir}/%{name}/data/maps/partsys
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
@@ -145,6 +145,10 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/%{name}/igraphic/*.h
 
 %changelog
+* Thu Nov 04 2004 Eric Sunshine <sunshine@sunshineco.com> 0.99-4
+- Upgraded for new location of installed map files.
+- Improved the package descriptions.
+
 * Sat Aug 07 2004 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-3
 - Upgraded for new headers installation directory.
 

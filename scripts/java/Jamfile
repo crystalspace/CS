@@ -3,5 +3,5 @@ SubDir TOP scripts java ;
 JAVA_DATAFILES = [ Wildcard *.java *.jar ] ;
 if $(JAVA_DATAFILES)
 {
-  InstallData $(JAVA_DATAFILES) : java ;
+  InstallData $(JAVA_DATAFILES) : bindings java ;
 }

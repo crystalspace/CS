@@ -22,6 +22,8 @@ GREP ?= grep ;
 
 SubDir TOP mk msvcgen ;
 
+InstallData [ Wildcard *.tlib ] : build msvcgen ;
+
 MsvcGenSubDir TOP mk msvc : 6 ;
 MsvcGenSubDir TOP mk msvc : 7 ;
 MsvcGenTemplateDir TOP mk msvcgen ;

@@ -1,6 +1,7 @@
 #============================================================================
 # Rules for installation
 # Copyright (C)2003 by Matze Braun <matzebraun@users.sourceforge.net>
+# Copyright (C)2004 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -106,6 +107,33 @@ rule InstallMan
     }
 }
 
+##  InstallProgram files [ : directories ]
+##    Installs program files (executable or shell script). This is a
+##    convenience wrapper for DoInstall when the resources to be installed is
+##    of an invocable nature. It sets SEARCH on `files', and uses
+##    $(INSTALL_PROGRAM) to perform the actual installation. Unlike
+##    SystemInstallApplication, it does not assume that all such targets should
+##    be installed into $(bindir); instead, you can provide `directories' to
+##    specify the installation location. If `directories' is not given, then
+##    $(bindir) is assumed. Also, unlike SystemInstallApplication, this rule
+##    does not have any platform-specific knowledge (such as how to install a
+##    Cocoa application wrapper on MacOS/X). Always use
+##    SystemInstallApplication for installation of full-fledged applications. A
+##    typical use for InstallProgram would be to install an already-existing
+##    shell script. This differs from the ShellScript rule which both creates a
+##    shell script from scratch at build time, and arranges for it to be
+##    installed. Like DoInstall, this rule returns the names of the installed
+##    targets, so it is convenient to use the results as the input for another
+##    rule, such as Depends.
+rule InstallProgram
+{
+    local files = [ GristInstall $(1) ] ;
+    local dir = $(2) ;
+    if ! $(dir) { dir = $(bindir) ; }
+    SEARCH on $(files) = $(SUBDIR) ;
+    return [ DoInstall $(files) : $(dir) : $(INSTALL_PROGRAM) ] ;
+}
+
 ##  DoInstall sourcenames : directories [ : installapp : [ postinstallrules ]]
 ##    Creates a new install target for the given sources named by
 ##    `sourcenames'.  `directories' is a list of directory components
@@ -114,12 +142,14 @@ rule InstallMan
 ##    $(INSTALL_DATA) is used.  If the optional `postinstallrules' is provided,
 ##    it is a list of Jam rules to invoke on the installed target after it is
 ##    installed.  Each rule is invoked with the installed target as the first
-##    argument, and the source target as the second.  This rule returns the
-##    names of the installed targets, so it is convenient to use the results as
-##    the input for another rule.  For example:
+##    argument, and the source target as the second. An obvious instance where
+##    `postinstallrules' proves useful is when the Ranlib rule should be
+##    invoked on just-installed static library (.a) files.  The DoInstall rule
+##    returns the names of the installed targets, so it is convenient to use
+##    the results as the input for another rule.  For example:
 ##        Depends install : [ DoInstall $(docfiles) : $(installdocdir) ] ;
-##    (Implementation Note: We can't name this rule Install, because Jambase
-##    already defines an action for DoInstall :-/)
+##    (Implementation Note: We did not name this rule Install, because Jambase
+##    already defines an action named Install :-/)
 rule DoInstall
 {
     local targets target i dir gdir ;

@@ -95,7 +95,7 @@ rule Wildcard
   if $(>)
   {
     dir = $(<)/ ;
-    sdir = $(<) ;
+    sdir = [ ConcatDirs $(<) ] ;
     wildcards = $(>) ;
   }
   else

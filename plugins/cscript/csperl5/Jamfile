@@ -90,7 +90,7 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
     local SUBDIR = [ on $(<) GetVar LOCATE ] ;
     InstallData $(<) : $(>) ;
   }
-  InstallCSPerl5PM $(pmfile) : perl5 ;
+  InstallCSPerl5PM $(pmfile) : bindings perl5 ;
 
 
   # Note that '__EOF__' is purposely quoted to prevent shell from intrepreting
