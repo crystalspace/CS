@@ -119,11 +119,6 @@ version i.e. 2.0.
 
 @subsubheading BisonFlex
 
-@emph{NOTE: }This tool is currently not required as the AWS plugin is not in
-the MSVC default build process at this time. For instructions on howto add
-and build the AWS plugin mail the CS Windows Port Maintainer at the address
-at the top of this page.
-
 To successfully build the Crystal Space Alternate Windowing System (AWS) plugin
 with Visual C++ requires you have @emph{BisonFlex} by
 @uref{http://www.fg-soup.com} installed on your system.  To download the
