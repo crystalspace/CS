@@ -44,6 +44,7 @@ chronological order.
 	- Eric Sunshine added --accept and --reject options to msvcgen.pl which
 	  allow filtering of the input filename list in case the client is
 	  unable to do the filtering itself.
+	- Marten Svanfeldt fixed the bug with stencil-shadows in r3dtest.
 14-Sep-2003
 	- DeSigna made the following changes:
 	    - Fixed the SCF_CREATE_INSTANCE macro to return a csPtr<>, in 

@@ -1,5 +1,6 @@
 /* 
     Copyright (C) 2003 by Jorrit Tyberghein, Daniel Duhprey
+              (C) 2003 Mårten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -194,7 +195,7 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
     for (i = 0; i < edge_count; i += 2)
     {
       csVector3 lightdir = entry->meshLightPos - edge_midpoints[i];
-      if (((lightdir * edge_normals[i]) * (lightdir * edge_normals[i+1])) < 0)
+      if (((lightdir * edge_normals[i]) * (lightdir * edge_normals[i+1])) <= 0)
       {
         buf[entry->index_range ++] = edge_indices[i*3 + 0];
         buf[entry->index_range ++] = edge_indices[i*3 + 1];
