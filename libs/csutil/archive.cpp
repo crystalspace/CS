@@ -446,6 +446,7 @@ bool csArchive::WriteZipArchive ()
   FILE *temp;
   char buff [16 * 1024];
   bool success = false;
+  int n = 0;
 
   // Step one: Copy archive file into a temporary file,
   // skipping entries marked as 'deleted'
@@ -553,7 +554,7 @@ bool csArchive::WriteZipArchive ()
   } /* endwhile */
 
   /* Now we have to append all files that were added to archive */
-  for (int n = 0; n < lazy.Length (); n++)
+  for (n = 0; n < lazy.Length (); n++)
   {
     ArchiveEntry *f = lazy.Get (n);
     if (!f->WriteFile (temp))

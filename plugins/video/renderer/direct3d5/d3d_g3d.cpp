@@ -73,7 +73,7 @@ DDSURFACEDESC csGraphics3DDirect3DDx5::m_ddsdHaloSurfDesc = { 0 };
 
 IMPLEMENT_FACTORY (csGraphics3DDirect3DDx5)
 
-EXPORT_CLASS_TABLE (dx53d)
+EXPORT_CLASS_TABLE (d3ddx5)
   EXPORT_CLASS (csGraphics3DDirect3DDx5, "crystalspace.graphics3d.direct3d.dx5",
     "Direct3D DX5 3D graphics driver for Crystal Space")
 EXPORT_CLASS_TABLE_END

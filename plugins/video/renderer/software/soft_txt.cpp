@@ -331,7 +331,13 @@ csTextureManagerSoftware::csTextureManagerSoftware (iSystem* iSys, iGraphics2D* 
 {
   txtMode = TXT_GLOBAL;
   force_txtMode = -1;
-  initialized = false;
+  initialized   = false;
+  lt_truergb         = NULL;
+  lt_truergb_private = NULL;
+  lt_white16         = NULL;
+  lt_white8          = NULL;
+  lt_pal             = NULL;
+  lt_alpha           = NULL;
 }
 
 void csTextureManagerSoftware::Initialize ()

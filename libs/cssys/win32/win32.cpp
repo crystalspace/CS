@@ -44,9 +44,7 @@
 #include <dos.h> // For _argc & _argv
 #endif
 
-#define NAME "Crystal"
-
-HINSTANCE ModuleHandle;
+extern HINSTANCE ModuleHandle;
 bool ApplicationActive = true;
 int ApplicationShow;
 
@@ -173,7 +171,7 @@ DWORD WINAPI s_threadroutine(LPVOID param)
 	CHK_FAILED(::DirectInputCreate(ModuleHandle, 0X300, &lpdi, NULL));  // 0X300 instead of DIRECTINPUT_VERSION allow the binaries to stay compatible with NT4
 	CHK_FAILED(lpdi->CreateDevice(GUID_SysKeyboard, &lpKbd, NULL));
 	CHK_FAILED(lpKbd->SetDataFormat(&c_dfDIKeyboard)); 
-	CHK_FAILED(lpKbd->SetCooperativeLevel(::FindWindow(NAME,NULL), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)); 
+	CHK_FAILED(lpKbd->SetCooperativeLevel(::FindWindow(WINDOWCLASSNAME,NULL), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)); 
 #ifdef DI_USEGETDEVICEDATA
 	{
 		DIPROPDWORD dpd;
@@ -408,7 +406,7 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   wc.hIcon = LoadIcon( NULL, IDI_APPLICATION );
   wc.hCursor = LoadCursor( NULL, IDC_ARROW );
   wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-  wc.lpszClassName = NAME;
+  wc.lpszClassName = WINDOWCLASSNAME;
 
   RegisterClass (&wc);
 // Serguei 'Snaar' Narojnyi
