@@ -9,33 +9,17 @@ It is assumed that you will have obtained a full set of sources at this stage.  
 
 BeOS settings
 ========
-You will need to make accessible the make files for various optional components.  The general method is to go into the libs/ directory and you will see a large number of component folders covering specific functionalities within CrystalSpace. In each of these folders are yet another set of target folders, each with  a makefile to compile that particular component.
-
->>> THIS SECTION WILL SOON BE OBSOLETE >>>
-*** NOTE: Glide support is currently broken ***
-As it currently stands, the Glide renderer can be activated by the following steps.
-
-To get the search paths correct, you need to comment out the following:-
-CFLAGS.GLIDE3D+=-I/usr/local/glide/include -DDO_GLIDE -DGLIDE24_ONLY
-LIBS._GLIDE3D+=-lglide2x
-and add instead
-LIBS._GLIDE3D+=/boot/develop/lib/x86/glide2x.so
-
-You will also need to comment out the following line in glrender.mak:-
-LIBS._GL3D+=-L$(X11_PATH)/lib -lXext -lX11
-<<< THIS SECTION WILL SOON BE OBSOLETE <<<
-
-You can then set up the compilation environment by going into the CS/ directory in terminal and typing:
+You  set up the compilation environment by going into the CS/ directory in terminal and typing:
 make beos
 make depend
 
 This sets up everything you should need to compile.
 
-Next, compile all the basic stuff:
+Next, compile all the basic drivers:
 make netdrivers
 make snddrivers
 
-As sound has not yet been implemented in the BeOS port, this just compiles null driver.
+Since sound has not yet been implemented in the BeOS port, this just compiles null driver.
 
 The graphics libraries consist of a OS-specific 2D driver and a OS-independent 3D renderer.  To get:
 1) software renderer
@@ -96,3 +80,17 @@ Other interesting example applications which you can run are blocks, metademo, s
 You should be able to start experimenting with the BeOS port at this stage!
 
 P.S. There may well be mistakes in this document.  Please feel free to correct them and send the text back to me.
+
+
+>>> THIS SECTION WILL SOON BE OBSOLETE >>>
+As it currently stands, the Glide renderer can be activated by the following steps.
+
+To get the search paths correct, you need to comment out the following in the makefile:
+CFLAGS.GLIDE3D+=-I/usr/local/glide/include -DDO_GLIDE -DGLIDE24_ONLY
+LIBS._GLIDE3D+=-lglide2x
+and add instead
+LIBS._GLIDE3D+=/boot/develop/lib/x86/glide2x.so
+
+You will also need to comment out the following line in glrender.mak:
+LIBS._GL3D+=-L$(X11_PATH)/lib -lXext -lX11
+<<< THIS SECTION WILL SOON BE OBSOLETE <<<
