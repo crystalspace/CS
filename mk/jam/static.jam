@@ -32,15 +32,19 @@ rule LinkStaticPlugins
   LinkWith $(<) : $(>)_static ;
 
   # construct flags
-  local deplibs i ;
+  local deplibs libs i ;
   for i in $(>)
   {
     deplibs += $($(i)_static.NEEDLIBS) ;
     LFlags $(<) : $($(i)_static.LFLAGS) ;
   }
-  deplibs = [ CreateLibList $(deplibs) ] ;
-  Depends $($(<)_TARGET) : $(deplibs) ;
-  NEEDLIBS on $($(<)_TARGET) += $(deplibs) ;
+  for i in $(deplibs) {
+    libs += $(i) $($(i)_depends) ;
+  }
+  libs = [ RemoveDups $(libs) ] ;
+  libs = lib$(libs)$(SUFLIB) ;     
+  Depends $($(<)_TARGET) : $(libs) ;
+  NEEDLIBS on $($(<)_TARGET) += $(libs) ;
 
   # construct initialization sourcefile
   local staticobject = [ BuildStaticFile $(>) ] ;

@@ -9,20 +9,19 @@
 ##    the leading "lib".
 rule LinkWith
 {
-  local deplibs = [ CreateLibList $(>) ] ;
-  DEPENDS $($(<)_TARGET) : $(deplibs) ;
-  NEEDLIBS on $($(<)_TARGET) += $(deplibs) ;
+  local i libs ;
+  for i in $(>) {
+      libs += $(i) $($(i)_depends) ;
+  }
+  libs = [ RemoveDups $(libs) ] ;
+  libs = lib$(libs)$(SUFLIB) ;
+      
+  DEPENDS $($(<)_TARGET) : $(libs) ;
+  NEEDLIBS on $($(<)_TARGET) += $(libs) ;
 
   if $($(<)_TYPE) = plugin
   {
     $(<)_static.NEEDLIBS += $(>) ;
-  }
-
-  local i ;
-
-  for i in $(>)
-  {
-    LFlags $(<) : $($(i).LIB_LFLAGS) ;
   }
 }
 
@@ -48,9 +47,9 @@ rule LFlags
 }
 
 ##  ExternalLibs appname : linkerflags
-##    Link an application with external libraries. It is possible to give a
-##    set of flags which will be passed to the linker when building the
-##    application (typically -L and -l flags).
+##    Link an application/library/plugin with external libraries. It is
+##    possible to give a set of flags which will be passed to the linker when
+##    building the application (typically -L and -l flags).
 rule ExternalLibs
 {
   local i ;
@@ -64,22 +63,6 @@ rule ExternalLibs
     {
       $(<)_static.LFLAGS += $($(i).LFLAGS) ;
     }
-  }
-}
-
-##  LibExternalLibs libname : linkerflags
-##    Link a library with external libraries. What this actually does is
-##    equivalent to "ExternalLibs appname : linkerflags" for every application
-##    and plugin which links with the library.
-rule LibExternalLibs
-{
-  local i ;
-  
-  for i in $(>)
-  {
-    CFlags $(<) : $($(i).CFLAGS) ;
-
-    $(<).LIB_LFLAGS += $($(>).LFLAGS) ;
   }
 }
 

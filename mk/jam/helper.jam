@@ -139,6 +139,24 @@ rule Filter
   return $(result) ;
 }
 
+##  RemoveDups list
+##    Removes duplicates in the list (this function tries to preserve the list
+##    order)
+rule RemoveDups
+{
+  local i result ;
+
+  for i in $(<)
+  {
+    if ! [ IsElem §(i) : $(result) ]
+    {
+      result += $(i) ;
+    }  
+  }
+
+  return $(result) ;
+} 
+
 ##  GetVar argument
 ##    Simply returns the value of the variable with name argument.
 ##    This is useful to query on target variables:

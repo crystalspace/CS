@@ -117,75 +117,15 @@ rule Library
 ##    Make Library dependant on other libraries. This will tell the build
 ##    system that your library uses functions from other libraries in the
 ##    project. The build system will resolve all cyclic dependencies.
-##    To link with an external library, use LibExternalLibs.
+##    Note that a library shouldn't be linked with any external library that
+##    should be done by the final application which uses the library.
 rule LibDepends
 {
-  $(<)_depends += $(>) ;
+      $(<)_depends += $(>) ;
 }
 
 #----------------------------------------------------------------------------
 # private part
-
-#----------------------------------------------------------------------------
-# Helper rules to resolve inter library dependencies...
-
-# Resolving dependencies for libraries.  In case there are circular
-# dependencies between libraries, we must list the libraries multiple times in
-# the link command in order to ensure that Unix linkers (which are
-# order-sensitive) will be able to link the target successfully.  This
-# algorithm isn't fully optimal, it be might be possible to reorder the
-# libraries to get fewer dependencies.
-rule _AddLibrary
-{
-  local added i ;
-
-  added = $(<) ;
-  cs_liblisttemp += $(<) ;
-    
-  for i in $($(<)_depends)
-  {
-    if [ IsElem $(i) : $(cs_liblisttemp) ]
-    {
-      if ! [ IsElem $(i) : $(added) ]
-      {
-  	cs_liblisttemp += $(i) ;
-      }
-    }
-    else
-    {
-      added += [ _AddLibrary $(i) ] ;
-    }
-  }
-
-  return $(added) ;
-}
-
-rule _CreateLibList
-{
-  local i ;
-
-  cs_liblisttemp = ;
-  for i in $(<)
-  {
-    if ! [ IsElem $(i) : $(cs_liblisttemp) ]
-    {
-      _AddLibrary $(i) ;
-    }
-  }
-
-  return $(cs_liblisttemp) ;
-}
-
-# Resolve dependencies for the passed library
-rule CreateLibList
-{
-  local files ;
-  
-  files = [ Prefix [ _CreateLibList $(<) ] : lib ] ;
-  files = $(files:S=$(SUFLIB)) ;
-
-  return $(files) ;
-}
 
 actions together Ranlib
 {
