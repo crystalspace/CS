@@ -74,6 +74,9 @@ private:
     /// The last values for x and y so that we can create deltas for moving
     int  last_x, last_y;
 
+    /// The alpha level for the overlay of the global texture
+    int alpha_level;
+
     /// True if we are currently resizing
     bool resizing_mode;
 

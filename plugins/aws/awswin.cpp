@@ -102,6 +102,7 @@ awsWindow::Setup(iAws *_wmgr, awsComponentNode *settings)
   pm->LookupRectKey("WindowMinAt", minp);
   pm->LookupRectKey("WindowZoomAt", maxp);
   pm->LookupRectKey("WindowCloseAt", closep);
+  pm->LookupIntKey("OverlayTextureAlpha", alpha_level);
 
   // Arrange control rects
   minp.xmin=Frame().xmax-minp.xmin;
@@ -379,6 +380,9 @@ awsWindow::OnMouseUp(int button, int x, int y)
 
         // Fix frame
         Frame().Set(unzoomed_frame);
+
+        // Fix redraw zone
+        todraw_dirty=true;
       }
       else
       {
@@ -399,6 +403,8 @@ awsWindow::OnMouseUp(int button, int x, int y)
         // Fix kids
         MoveChildren(-unzoomed_frame.xmin, delta_y);
 
+        // Fix redraw zone
+        todraw_dirty=true;
       }
 
       Invalidate();
@@ -421,6 +427,9 @@ awsWindow::OnMouseUp(int button, int x, int y)
     WindowManager()->ReleaseMouse();
     WindowManager()->Mark(Frame());
 
+    // Fix redraw zone
+    todraw_dirty=true;
+
     if (DEBUG_WINDOW_EVENTS)
         printf("aws-debug: Window resize mode=false\n");
 
@@ -429,6 +438,9 @@ awsWindow::OnMouseUp(int button, int x, int y)
   {
     moving_mode=false;
     WindowManager()->ReleaseMouse();
+    
+    // Fix redraw zone
+    todraw_dirty=true;
 
     if (DEBUG_WINDOW_EVENTS)
         printf("aws-debug: Window move mode=false\n");
@@ -476,8 +488,11 @@ awsWindow::OnMouseMove(int button, int x, int y)
     if (!marked)
       WindowManager()->Mark(Frame());
   
+    // Fix update zones
     WindowManager()->InvalidateUpdateStore();
 
+    // Fix internal redraw zone
+    todraw_dirty=true;
   } 
   else if (moving_mode)
   {
@@ -780,7 +795,7 @@ awsWindow::OnDraw(csRect clip)
         g2d->DrawLine(Frame().xmax-grip_size,   Frame().ymax-grip_size,   Frame().xmax-grip_size,   Frame().ymax-6, hi);
 
 
-        for(x=Frame().xmax-grip_size+4; x<Frame().xmax-4; x+=2)
+        /*for(x=Frame().xmax-grip_size+4; x<Frame().xmax-4; x+=2)
           for(y=Frame().ymax-grip_size+4; y<Frame().ymax-4; y+=2)
           {
             if (resizing_mode)
@@ -793,10 +808,47 @@ awsWindow::OnDraw(csRect clip)
              g2d->DrawPixel(x+1,y+1,lo2);
              g2d->DrawPixel(x,y,hi2);
             }
-          }
+          }*/
+
+        if (btxt)
+          g3d->DrawPixmap(btxt, 
+                        Frame().xmax-grip_size, Frame().ymax-grip_size, 
+                        7, 7, 
+                        Frame().xmax-grip_size-Frame().xmin, Frame().ymax-grip_size-Frame().ymin,
+                        7, 7, alpha_level);
+
 
       }
       
+      // Overlay the global texture (if there is one) on the frame
+      if (btxt)
+      {
+        g3d->DrawPixmap(btxt, 
+                        Frame().xmin, Frame().ymin, 
+                        Frame().Width(), title_bar_height+5, 
+                        Frame().xmin-Frame().xmin, Frame().ymin-Frame().ymin, 
+                        Frame().Width(), title_bar_height+5, alpha_level);
+
+        g3d->DrawPixmap(btxt, 
+                        Frame().xmin, Frame().ymin+title_bar_height+5, 
+                        9, Frame().Height(), 
+                        Frame().xmin-Frame().xmin, Frame().ymin+title_bar_height+5-Frame().ymin, 
+                        9, Frame().Height(), alpha_level);
+
+        g3d->DrawPixmap(btxt, 
+                        Frame().xmax-9, Frame().ymin+title_bar_height+5, 
+                        9, Frame().Height()-title_bar_height+5, 
+                        Frame().xmax-9-Frame().xmin, Frame().ymin+title_bar_height+5-Frame().ymin, 
+                        9, Frame().Height()-title_bar_height+5, alpha_level);
+
+        g3d->DrawPixmap(btxt, 
+                        Frame().xmin+9, Frame().ymax-9, 
+                        Frame().Width()-18, 9, 
+                        Frame().xmin+9-Frame().xmin, Frame().ymax-9-Frame().ymin, 
+                        Frame().Width()-18, 9, alpha_level);
+
+      }
+
       // Draw min/max/close buttons
       int mtw, mth, mxtw, mxth, ctw, cth;
 
