@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Render Priorities, HOWTO CS Project, HOWTO Pixmaps, HOWTO
+@node HOWTO Render Priorities, HOWTO User Objects, HOWTO Pixmaps, HOWTO
 @subsection Render Priorities and Objects in Sectors
 @cindex @code{iMeshWrapper}
 @cindex mesh objects

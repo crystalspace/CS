@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO User Objects, HOWTO Pseudo DynLight, HOWTO Mesh Movement, HOWTO
+@node HOWTO User Objects, HOWTO CS Project, HOWTO Render Priorities, HOWTO
 @subsection Attaching User Objects to CS Objects
 @cindex user objects
 @cindex @code{iObject}
