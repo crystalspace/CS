@@ -661,7 +661,7 @@ bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
     if (meshfactnode)
     {
       const char* meshfactname = meshfactnode->GetAttributeValue ("name");
-      if (ldr_context->CheckDupes ())
+      if (ldr_context->CheckDupes () && meshfactname)
       {
 	iMeshFactoryWrapper* t = Engine->FindMeshFactory (meshfactname);
 	if (t) { result = t; return true; }
@@ -688,7 +688,7 @@ bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
     if (meshobjnode)
     {
       const char* meshobjname = meshobjnode->GetAttributeValue ("name");
-      if (ldr_context->CheckDupes ())
+      if (ldr_context->CheckDupes () && meshobjname)
       {
 	iMeshWrapper* t = Engine->FindMeshObject (meshobjname);
 	if (t) { result = t; return true; }
@@ -1261,7 +1261,7 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
         case XMLTOKEN_MESHFACT:
           {
 	    const char* name = child->GetAttributeValue ("name");
-	    if (ldr_context->CheckDupes ())
+	    if (ldr_context->CheckDupes () && name)
 	    {
 	      iMeshFactoryWrapper* t = Engine->FindMeshFactory (name);
 	      if (t) break;
@@ -5068,9 +5068,9 @@ bool csLoader::ParseShaderList (iLoaderContext* ldr_context,
 	  shaderNode = child->GetNode ("shader");
 	}
 
-	if (ldr_context->CheckDupes ())
+        const char* name = shaderNode->GetAttributeValue ("name");
+	if (ldr_context->CheckDupes () && name)
 	{
-          const char* name = shaderNode->GetAttributeValue ("name");
 	  iShader* m = shaderMgr->GetShader (name);
 	  if (m) return true;
 	}

@@ -1148,7 +1148,9 @@
             <t v3="126" v2="127" v1="159" />
             <t v3="126" v2="159" v1="158" />
 
-            <material>flare_center</material>
+            <material>snow</material>
+            <mixmode> <add /> </mixmode>
+	    <back2front />
 	    <lighting>no</lighting>
 	    <manualcolors />
             <autonormals />
@@ -1169,7 +1171,7 @@
 		    <range from="128" to="159" weight="1" col_weight="1" />
 		</group>
 		<script name="main">
-		    <scalex group="level4" duration="1000" scale="2" />
+		    <!--<scalex group="level4" duration="1000" scale="2" />-->
 		    <roty group="level3" duration="1000" angle=".1" />
 		    <roty group="level5" duration="1000" angle="-.08" />
 		    <roty group="level2" duration="500" angle=".07" />
@@ -1179,7 +1181,7 @@
 		    <roty group="level1" duration="500" angle="-.05" />
 		    <delay time="500" />
 
-		    <scalex group="level4" duration="1000" scale=".5" />
+		    <!--<scalex group="level4" duration="1000" scale=".5" />-->
 		    <roty group="level3" duration="1000" angle="-.1" />
 		    <roty group="level5" duration="1000" angle=".08" />
 		    <roty group="level2" duration="500" angle="-.04" />
@@ -6413,7 +6415,8 @@
         </meshobj>
         <meshref name="circles">
             <factory>circles</factory>
-            <priority>object</priority>
+            <priority>alpha</priority>
+	    <ztest />
             <move>
                 <v x="-8" y="-1" z="11" />
             </move>

@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Sep-2004
+	- Jorrit fixed several cases in the loader where it would crash
+	  in case checkDupes was true and the object that it was loading
+	  didn't have a name.
+	- Jorrit made the special gmeshanim effect in flarge look nicer.
 15-Sep-2004
 	- Eric Sunshine added an `UNCONDITIONAL' argument to
 	  CS_EMIT_BUILD_PROPERTY(). This is analogous to the like-named
