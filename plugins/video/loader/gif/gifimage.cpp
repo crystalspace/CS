@@ -25,16 +25,16 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csGIFImageIO)
-  IMPLEMENTS_INTERFACE (iImageIO)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGIFImageIO)
+  SCF_IMPLEMENTS_INTERFACE (iImageIO)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csGIFImageIO);
+SCF_IMPLEMENT_FACTORY (csGIFImageIO);
 
-EXPORT_CLASS_TABLE (csgifimg)
-  EXPORT_CLASS (csGIFImageIO, "crystalspace.graphic.image.io.gif", "CrystalSpace GIF image format I/O plugin")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE (csgifimg)
+  SCF_EXPORT_CLASS (csGIFImageIO, "crystalspace.graphic.image.io.gif", "CrystalSpace GIF image format I/O plugin")
+SCF_EXPORT_CLASS_TABLE_END
 
 static iImageIO::FileFormatDescription formatlist[2] = 
 {
@@ -44,7 +44,7 @@ static iImageIO::FileFormatDescription formatlist[2] =
 
 csGIFImageIO::csGIFImageIO (iBase *pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
   formats.Push (&formatlist[0]);
   formats.Push (&formatlist[1]);
 }

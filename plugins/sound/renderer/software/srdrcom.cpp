@@ -35,21 +35,21 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csSoundRenderSoftware)
+SCF_IMPLEMENT_FACTORY (csSoundRenderSoftware)
 
-EXPORT_CLASS_TABLE (sndsoft)
-  EXPORT_CLASS (csSoundRenderSoftware, "crystalspace.sound.render.software",
+SCF_EXPORT_CLASS_TABLE (sndsoft)
+  SCF_EXPORT_CLASS (csSoundRenderSoftware, "crystalspace.sound.render.software",
     "Software Sound Renderer for Crystal Space")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE(csSoundRenderSoftware)
-	IMPLEMENTS_INTERFACE(iSoundRender)
-	IMPLEMENTS_INTERFACE(iPlugIn)
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csSoundRenderSoftware)
+	SCF_IMPLEMENTS_INTERFACE(iSoundRender)
+	SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+SCF_IMPLEMENT_IBASE_END;
 
 csSoundRenderSoftware::csSoundRenderSoftware(iBase* piBase) : Listener(NULL)
 {
-  CONSTRUCT_IBASE(piBase);
+  SCF_CONSTRUCT_IBASE(piBase);
   System = NULL;
   SoundDriver = NULL;
   Listener = NULL;
@@ -76,9 +76,9 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
   char *drv = "crystalspace.sound.driver.null";
 #endif
 
-  SoundDriver = LOAD_PLUGIN (System, drv, NULL, iSoundDriver);
+  SoundDriver = CS_LOAD_PLUGIN (System, drv, NULL, iSoundDriver);
   if (!SoundDriver) {	
-    System->Printf(MSG_INITIALIZATION, "csSoundRenderSoftware::Initialize(): "
+    System->Printf(CS_MSG_INITIALIZATION, "csSoundRenderSoftware::Initialize(): "
       "cannot load sound driver: %s\n", drv);
     return false;
   }
@@ -94,7 +94,7 @@ csSoundRenderSoftware::~csSoundRenderSoftware()
 
 bool csSoundRenderSoftware::Open()
 {
-  System->Printf (MSG_INITIALIZATION, "Software Sound Renderer selected\n");
+  System->Printf (CS_MSG_INITIALIZATION, "Software Sound Renderer selected\n");
 
   SoundDriver->Open(this,
     Config->GetInt("Sound.Software.Frequency", 22050),
@@ -111,9 +111,9 @@ bool csSoundRenderSoftware::Open()
   LoadFormat.Bits = is16Bits() ? 16 : 8;
   LoadFormat.Channels = -1;
 
-  System->Printf (MSG_INITIALIZATION, "  Playing %d Hz, %d bits, %s\n",
+  System->Printf (CS_MSG_INITIALIZATION, "  Playing %d Hz, %d bits, %s\n",
     getFrequency(), (is16Bits())?16:8, (isStereo())?"Stereo":"Mono");
-  System->Printf (MSG_INITIALIZATION, "  Volume: %g\n", Volume);
+  System->Printf (CS_MSG_INITIALIZATION, "  Volume: %g\n", Volume);
 
   cs_time et, ct;
   System->GetElapsedTime(et, ct);

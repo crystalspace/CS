@@ -66,12 +66,12 @@ public:
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
 
-  DECLARE_IBASE_EXT (csParticleSystem);
+  SCF_DECLARE_IBASE_EXT (csParticleSystem);
 
   //------------------------- iSpiralState implementation ----------------
   class SpiralState : public iSpiralState
   {
-    DECLARE_EMBEDDED_IBASE (csSpiralMeshObject);
+    SCF_DECLARE_EMBEDDED_IBASE (csSpiralMeshObject);
     virtual void SetParticleCount (int num)
     {
       scfParent->SetParticleCount (num);
@@ -108,7 +108,7 @@ public:
   virtual ~csSpiralMeshObjectFactory ();
 
   //------------------------ iMeshObjectFactory implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
@@ -135,7 +135,7 @@ public:
   virtual bool Initialize (iSystem *pSystem);
 
   //------------------------ iMeshObjectType implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* NewFactory ();
   virtual uint32 GetFeatures () const

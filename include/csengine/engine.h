@@ -62,34 +62,34 @@ struct iLight;
 struct iImageIO;
 struct iClipper2D;
 
-DECLARE_FAST_INTERFACE (iEngine)
-DECLARE_FAST_INTERFACE (iSector)
-DECLARE_FAST_INTERFACE (iMeshWrapper)
-DECLARE_FAST_INTERFACE (iCollection)
-DECLARE_FAST_INTERFACE (iMeshFactoryWrapper)
-DECLARE_FAST_INTERFACE (iCurveTemplate)
-DECLARE_FAST_INTERFACE (iMaterialWrapper)
-DECLARE_FAST_INTERFACE (iTextureWrapper)
-DECLARE_FAST_INTERFACE (iCameraPosition)
-DECLARE_FAST_INTERFACE (iPolyTxtPlane)
-DECLARE_FAST_INTERFACE (iStatLight)
-DECLARE_FAST_INTERFACE (iDynLight)
-DECLARE_FAST_INTERFACE (iMaterialHandle)
-DECLARE_FAST_INTERFACE (iTerrainWrapper)
-DECLARE_FAST_INTERFACE (iTerrainFactoryWrapper)
-DECLARE_FAST_INTERFACE (iMapNode)
+SCF_DECLARE_FAST_INTERFACE (iEngine)
+SCF_DECLARE_FAST_INTERFACE (iSector)
+SCF_DECLARE_FAST_INTERFACE (iMeshWrapper)
+SCF_DECLARE_FAST_INTERFACE (iCollection)
+SCF_DECLARE_FAST_INTERFACE (iMeshFactoryWrapper)
+SCF_DECLARE_FAST_INTERFACE (iCurveTemplate)
+SCF_DECLARE_FAST_INTERFACE (iMaterialWrapper)
+SCF_DECLARE_FAST_INTERFACE (iTextureWrapper)
+SCF_DECLARE_FAST_INTERFACE (iCameraPosition)
+SCF_DECLARE_FAST_INTERFACE (iPolyTxtPlane)
+SCF_DECLARE_FAST_INTERFACE (iStatLight)
+SCF_DECLARE_FAST_INTERFACE (iDynLight)
+SCF_DECLARE_FAST_INTERFACE (iMaterialHandle)
+SCF_DECLARE_FAST_INTERFACE (iTerrainWrapper)
+SCF_DECLARE_FAST_INTERFACE (iTerrainFactoryWrapper)
+SCF_DECLARE_FAST_INTERFACE (iMapNode)
 
-DECLARE_FAST_INTERFACE (csPolyTxtPlane)
-DECLARE_FAST_INTERFACE (csCollection)
-DECLARE_FAST_INTERFACE (csMeshWrapper)
-DECLARE_FAST_INTERFACE (csMeshFactoryWrapper)
-DECLARE_FAST_INTERFACE (csCurveTemplate)
-DECLARE_FAST_INTERFACE (csSector)
-DECLARE_FAST_INTERFACE (csTextureWrapper)
-DECLARE_FAST_INTERFACE (csMaterialWrapper)
-DECLARE_FAST_INTERFACE (csCollider)
-DECLARE_FAST_INTERFACE (csRadPoly)
-DECLARE_FAST_INTERFACE (csRadCurve)
+SCF_DECLARE_FAST_INTERFACE (csPolyTxtPlane)
+SCF_DECLARE_FAST_INTERFACE (csCollection)
+SCF_DECLARE_FAST_INTERFACE (csMeshWrapper)
+SCF_DECLARE_FAST_INTERFACE (csMeshFactoryWrapper)
+SCF_DECLARE_FAST_INTERFACE (csCurveTemplate)
+SCF_DECLARE_FAST_INTERFACE (csSector)
+SCF_DECLARE_FAST_INTERFACE (csTextureWrapper)
+SCF_DECLARE_FAST_INTERFACE (csMaterialWrapper)
+SCF_DECLARE_FAST_INTERFACE (csCollider)
+SCF_DECLARE_FAST_INTERFACE (csRadPoly)
+SCF_DECLARE_FAST_INTERFACE (csRadCurve)
 
 /**
  * Iterator to iterate over all static lights in the engine.
@@ -240,7 +240,7 @@ public:
  */
 struct csEngineConfig : public iConfig
 {
-  DECLARE_EMBEDDED_IBASE (csEngine);
+  SCF_DECLARE_EMBEDDED_IBASE (csEngine);
   virtual bool GetOptionDescription (int idx, csOptionDescription *option);
   virtual bool SetOption (int id, csVariant* value);
   virtual bool GetOption (int id, csVariant* value);
@@ -836,7 +836,7 @@ public:
   /**
    * This routine returns an iterator to iterate over
    * all objects of a given type that are within a radius
-   * of a given position. You can use QUERY_INTERFACE to get
+   * of a given position. You can use SCF_QUERY_INTERFACE to get
    * any interface from the returned objects. <p>
    * Delete the iterator with 'delete' when ready.
    */
@@ -972,7 +972,7 @@ public:
     return (iMeshObjectType*)thing_type;
   }
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   //--------------------- iPlugIn interface implementation --------------------
 
@@ -1257,7 +1257,7 @@ private:
    */
   class iObjectInterface : public csObject
   {
-    DECLARE_EMBEDDED_IBASE (csEngine);
+    SCF_DECLARE_EMBEDDED_IBASE (csEngine);
   } scfiObject;
 };
 

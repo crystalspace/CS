@@ -43,7 +43,7 @@ public:
   /// Handle next frame.
   virtual void NextFrame (float elapsed_time) = 0;
 
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
 
   virtual ~csWalkEntity ()
   {}

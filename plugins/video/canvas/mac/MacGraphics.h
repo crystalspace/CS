@@ -64,7 +64,7 @@ public:
  	virtual void		PauseDisplayContext( void );
  	virtual void		ActivateDisplayContext( void );
 
-	DECLARE_IBASE;
+	SCF_DECLARE_IBASE;
 
 protected:
 	WindowPtr			mMainWindow;

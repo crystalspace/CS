@@ -31,21 +31,21 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csSoundDriverWaveOut)
+SCF_IMPLEMENT_FACTORY (csSoundDriverWaveOut)
 
-EXPORT_CLASS_TABLE (sndwaveout)
-  EXPORT_CLASS (csSoundDriverWaveOut, "crystalspace.sound.driver.waveout",
+SCF_EXPORT_CLASS_TABLE (sndwaveout)
+  SCF_EXPORT_CLASS (csSoundDriverWaveOut, "crystalspace.sound.driver.waveout",
     "Software Sound Driver for Crystal Space")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE(csSoundDriverWaveOut)
-  IMPLEMENTS_INTERFACE(iPlugIn)
-  IMPLEMENTS_INTERFACE(iSoundDriver)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE(csSoundDriverWaveOut)
+  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE(iSoundDriver)
+SCF_IMPLEMENT_IBASE_END
 
 csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
 {
-  CONSTRUCT_IBASE(piBase);
+  SCF_CONSTRUCT_IBASE(piBase);
 
   System = NULL;
   SoundRender = NULL;
@@ -68,7 +68,7 @@ bool csSoundDriverWaveOut::Initialize (iSystem *iSys)
 
 bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16, bool stereo)
 {
-  System->Printf (MSG_INITIALIZATION, "Wave-Out Sound Driver selected.\n");
+  System->Printf (CS_MSG_INITIALIZATION, "Wave-Out Sound Driver selected.\n");
   ActivateSoundProc = false;
 
   // store pointer to sound renderer
@@ -95,7 +95,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
 
   // read settings from the config file
   unsigned int RefreshRate=Config->GetInt("Sound.WaveOut.Refresh", 5);
-  System->Printf (MSG_INITIALIZATION, "  updating %d times per second\n",
+  System->Printf (CS_MSG_INITIALIZATION, "  updating %d times per second\n",
     RefreshRate);
 
   // setup misc member variables
@@ -110,7 +110,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
   // support?
   MMRESULT res = waveOutOpen(&WaveOut, WAVE_MAPPER, &Format,
     (LONG)&waveOutProc, 0L, CALLBACK_FUNCTION);
-  if (res != MMSYSERR_NOERROR) System->Printf(MSG_INITIALIZATION,
+  if (res != MMSYSERR_NOERROR) System->Printf(CS_MSG_INITIALIZATION,
     "  could not open Wave-Out system (%s).\n", GetMMError(res));
 
   // Store old volume and set full volume because the software sound renderer
@@ -186,7 +186,7 @@ bool csSoundDriverWaveOut::HandleEvent(iEvent &e)
       SoundBlock *Block = (SoundBlock*)BlocksToDelete.Pop();
       MMRESULT res;
       res = waveOutUnprepareHeader(WaveOut, Block->WaveHeader, sizeof(WAVEHDR));
-      if (res != MMSYSERR_NOERROR) System->Printf(MSG_WARNING,
+      if (res != MMSYSERR_NOERROR) System->Printf(CS_MSG_WARNING,
         "cannot unprepare wave-out header (%s).\n", GetMMError(res));
 
       GlobalUnlock(Block->DataHandle);
@@ -260,11 +260,11 @@ void csSoundDriverWaveOut::SoundProc(LPWAVEHDR OldHeader) {
     // data is sent to the output device in the background.
     MMRESULT result = waveOutWrite(WaveOut, lpWaveHdr, sizeof(WAVEHDR)); 
     if (result != MMSYSERR_NOERROR) {
-      System->Printf(MSG_WARNING, "cannot write sound block to wave-out "
+      System->Printf(CS_MSG_WARNING, "cannot write sound block to wave-out "
         "(%s).\n", GetMMError(result));
 
       result = waveOutUnprepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
-      if (result != MMSYSERR_NOERROR) System->Printf(MSG_WARNING, "cannot "
+      if (result != MMSYSERR_NOERROR) System->Printf(CS_MSG_WARNING, "cannot "
         "unprepare sound block (%s).\n", GetMMError(result));
       GlobalUnlock(Block->DataHandle);
       GlobalFree(Block->DataHandle);

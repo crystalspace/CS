@@ -38,7 +38,7 @@ class csMultiplexImageIO : public iImageIO
   void StoreDesc (const csVector& format);
   
  public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csMultiplexImageIO (iBase *pParent);
   virtual ~csMultiplexImageIO ();

@@ -767,12 +767,12 @@ public:
   /// Disable fog.
   void DisableFog () { fog.enabled = false; }
 
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
 
   //------------------------- iThingState interface -------------------------
   struct ThingState : public iThingState
   {
-    DECLARE_EMBEDDED_IBASE (csThing);
+    SCF_DECLARE_EMBEDDED_IBASE (csThing);
     virtual void* GetPrivateObject () { return (void*)scfParent; }
     virtual void CompressVertices () { scfParent->CompressVertices(); }
     virtual int GetPolygonCount () { return scfParent->polygons.Length (); }
@@ -836,7 +836,7 @@ public:
   //------------------------- iLightingInfo interface -------------------------
   struct LightingInfo : public iLightingInfo
   {
-    DECLARE_EMBEDDED_IBASE (csThing);
+    SCF_DECLARE_EMBEDDED_IBASE (csThing);
     virtual void InitializeDefault ()
     {
       scfParent->InitializeDefault ();
@@ -859,7 +859,7 @@ public:
   //-------------------- iPolygonMesh interface implementation ---------------
   struct PolyMesh : public iPolygonMesh
   {
-    DECLARE_EMBEDDED_IBASE (csThing);
+    SCF_DECLARE_EMBEDDED_IBASE (csThing);
 
     virtual int GetVertexCount () { return scfParent->GetVertexCount (); }
     virtual csVector3* GetVertices () { return scfParent->wor_verts; }
@@ -881,7 +881,7 @@ public:
   //-------------------- iVisibilityCuller interface implementation ----------
   struct VisCull : public iVisibilityCuller
   {
-    DECLARE_EMBEDDED_IBASE (csThing);
+    SCF_DECLARE_EMBEDDED_IBASE (csThing);
     virtual void Setup ()
     {
       scfParent->BuildStaticTree (BSP_MINIMIZE_SPLITS);
@@ -920,7 +920,7 @@ public:
   //-------------------- iMeshObject interface implementation ----------
   struct MeshObject : public iMeshObject
   {
-    DECLARE_EMBEDDED_IBASE (csThing);
+    SCF_DECLARE_EMBEDDED_IBASE (csThing);
     virtual iMeshObjectFactory* GetFactory () const;
     virtual bool DrawTest (iRenderView* /*rview*/, iMovable* /*movable*/)
     {
@@ -976,7 +976,7 @@ public:
   //-------------------- iMeshObjectFactory interface implementation ---------
   struct MeshObjectFactory : public iMeshObjectFactory
   {
-    DECLARE_EMBEDDED_IBASE (csThing);
+    SCF_DECLARE_EMBEDDED_IBASE (csThing);
     virtual iMeshObject* NewInstance ();
     virtual void HardTransform (const csReversibleTransform& t)
     {
@@ -1007,7 +1007,7 @@ public:
   virtual bool Initialize (iSystem *pSystem);
 
   //------------------------ iMeshObjectType implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// New Factory.
   virtual iMeshObjectFactory* NewFactory ();

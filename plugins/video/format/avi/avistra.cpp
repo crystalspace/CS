@@ -21,14 +21,14 @@
 #include "isys/system.h"
 #include <ctype.h>
 
-IMPLEMENT_IBASE (csAVIStreamAudio)
-  IMPLEMENTS_INTERFACE (iAudioStream)
-  IMPLEMENTS_INTERFACE (iStream)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csAVIStreamAudio)
+  SCF_IMPLEMENTS_INTERFACE (iAudioStream)
+  SCF_IMPLEMENTS_INTERFACE (iStream)
+SCF_IMPLEMENT_IBASE_END
 
 csAVIStreamAudio::csAVIStreamAudio (iBase *pBase)
 {
-  CONSTRUCT_IBASE (pBase);
+  SCF_CONSTRUCT_IBASE (pBase);
   pChunk = NULL;
   pAVI = (csAVIFormat*)pBase;
   pSystem = NULL;
@@ -133,7 +133,7 @@ bool csAVIStreamAudio::LoadCodec (UByte *pInitData, ULong nInitDataLen,
   char cn[128];
   sprintf (cn, "crystalspace.audio.codec.avi.%s", strdesc.codec);
   // try open this class
-  pCodec = CREATE_INSTANCE (cn, iAVICodec);
+  pCodec = SCF_CREATE_INSTANCE (cn, iAVICodec);
   if (pCodec)
   {
     // codec exists, now try to initialize it
@@ -141,13 +141,13 @@ bool csAVIStreamAudio::LoadCodec (UByte *pInitData, ULong nInitDataLen,
       return true;
     else
     {
-      pSystem->Printf (MSG_WARNING, "CODEC class \"%s\" could not be initialized !", cn);
+      pSystem->Printf (CS_MSG_WARNING, "CODEC class \"%s\" could not be initialized !", cn);
       pCodec->DecRef ();
       pCodec = NULL;
     }
   }
   else
-    pSystem->Printf (MSG_WARNING, "CODEC class \"%s\" could not be loaded !", cn);
+    pSystem->Printf (CS_MSG_WARNING, "CODEC class \"%s\" could not be loaded !", cn);
 
   return false;
 }

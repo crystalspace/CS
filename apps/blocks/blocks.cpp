@@ -86,26 +86,26 @@ static long LastConnectTime = 0;
 //-----------------------------------------------------------------------------
 
 #define  QUERY_PLUG_ID(myPlug, funcid, iFace, errMsg) \
-  myPlug = QUERY_PLUGIN_ID (Sys, funcid, iFace); \
+  myPlug = CS_QUERY_PLUGIN_ID (Sys, funcid, iFace); \
   if (!myPlug) \
   { \
-    Sys->Printf (MSG_FATAL_ERROR, errMsg); \
+    Sys->Printf (CS_MSG_FATAL_ERROR, errMsg); \
     return -1; \
   }
 
 #define  QUERY_PLUG(myPlug, iFace, errMsg) \
-  myPlug = QUERY_PLUGIN (Sys, iFace); \
+  myPlug = CS_QUERY_PLUGIN (Sys, iFace); \
   if (!myPlug) \
   { \
-    Sys->Printf (MSG_FATAL_ERROR, errMsg); \
+    Sys->Printf (CS_MSG_FATAL_ERROR, errMsg); \
     return -1; \
   }
 
 #define  QUERY_PLUG_NM(myPlug, funcid, iFace, errMsg) \
-  myPlug = QUERY_PLUGIN_ID (Sys, funcid, iFace); \
+  myPlug = CS_QUERY_PLUGIN_ID (Sys, funcid, iFace); \
   if (!myPlug) \
   { \
-    Sys->Printf (MSG_INITIALIZATION, errMsg); \
+    Sys->Printf (CS_MSG_INITIALIZATION, errMsg); \
   }
 
 Blocks* Sys = NULL;
@@ -115,8 +115,8 @@ Blocks* Sys = NULL;
 
 //------------------------------------------------- We need the 3D engine -----
 
-REGISTER_STATIC_LIBRARY (engine)
-REGISTER_STATIC_LIBRARY (lvlload)
+SCF_REGISTER_STATIC_LIBRARY (engine)
+SCF_REGISTER_STATIC_LIBRARY (lvlload)
 
 int Blocks::white, Blocks::black, Blocks::red;
 
@@ -402,7 +402,7 @@ Blocks::~Blocks ()
 #if defined(BLOCKS_NETWORKING)
   TerminateConnection();
 #endif
-  DEC_REF (font);
+  SCF_DEC_REF (font);
   if (LevelLoader) LevelLoader->DecRef();
   if (myNetDrv) myNetDrv->DecRef ();
   if (myG2D) myG2D->DecRef ();
@@ -442,7 +442,7 @@ void Blocks::InitGame ()
 
 static void reset_vertex_colors (iMeshWrapper* th)
 {
-  iThingState* thing_state = QUERY_INTERFACE (th->GetMeshObject (),
+  iThingState* thing_state = SCF_QUERY_INTERFACE (th->GetMeshObject (),
   	iThingState);
   int i;
   for (i = 0 ; i < thing_state->GetPolygonCount () ; i++)
@@ -513,7 +513,7 @@ static iMeshFactoryWrapper* CreateMeshFactoryWrapper (
 static iMeshWrapper* CreateMeshWrapper (const char* name)
 {
   iMeshObjectFactory* thing_fact = Sys->thing_type->NewFactory ();
-  iMeshObject* mesh_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
+  iMeshObject* mesh_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
 
   iMeshWrapper *wrap = Sys->engine->CreateMeshObject (name);
@@ -538,7 +538,7 @@ void Blocks::add_pillar_template ()
 {
   pillar_tmpl = CreateMeshFactoryWrapper ("pillar");
   float dim = CUBE_DIM/2.;
-  iThingState* thing_state = QUERY_INTERFACE (
+  iThingState* thing_state = SCF_QUERY_INTERFACE (
   	pillar_tmpl->GetMeshObjectFactory (), iThingState);
   thing_state->CreateVertex (csVector3 (-dim, 0, dim));
   thing_state->CreateVertex (csVector3 (dim, 0, dim));
@@ -597,7 +597,7 @@ void Blocks::add_vrast_template ()
 {
   vrast_tmpl = CreateMeshFactoryWrapper ("vrast");
   float dim = RAST_DIM;
-  iThingState* thing_state = QUERY_INTERFACE (
+  iThingState* thing_state = SCF_QUERY_INTERFACE (
   	vrast_tmpl->GetMeshObjectFactory (), iThingState);
   thing_state->CreateVertex (csVector3 (-dim, 0, dim));
   thing_state->CreateVertex (csVector3 (dim, 0, dim));
@@ -631,7 +631,7 @@ void Blocks::add_hrast_template ()
 {
   hrast_tmpl = CreateMeshFactoryWrapper ("hrast");
   float dim = RAST_DIM;
-  iThingState* thing_state = QUERY_INTERFACE (
+  iThingState* thing_state = SCF_QUERY_INTERFACE (
   	hrast_tmpl->GetMeshObjectFactory (), iThingState);
 
   thing_state->CreateVertex (csVector3 ((-(float)ZONE_DIM/2.)*CUBE_DIM,
@@ -704,7 +704,7 @@ void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
 void Blocks::ChangeThingMaterial (iMeshWrapper* thing,
 	iMaterialWrapper* mat)
 {
-  iThingState* thing_state = QUERY_INTERFACE (thing->GetMeshObject (),
+  iThingState* thing_state = SCF_QUERY_INTERFACE (thing->GetMeshObject (),
   	iThingState);
   for (int i = 0 ; i < thing_state->GetPolygonCount () ; i++)
   {
@@ -718,7 +718,7 @@ void Blocks::add_cube_template ()
 {
   float dim = CUBE_DIM/2.;
   cube_tmpl = CreateMeshFactoryWrapper ("cube");
-  iThingState* cube_state = QUERY_INTERFACE (cube_tmpl->GetMeshObjectFactory (),
+  iThingState* cube_state = SCF_QUERY_INTERFACE (cube_tmpl->GetMeshObjectFactory (),
   	iThingState);
   cube_state->CreateVertex (csVector3 (-dim, -dim, dim));
   cube_state->CreateVertex (csVector3 (dim, -dim, dim));
@@ -771,8 +771,8 @@ void set_uv (iPolygon3D* p, float u1, float v1, float u2, float v2,
 {
   p->SetTextureType (POLYTXT_GOURAUD);
   iPolyTexType* ptt = p->GetPolyTexType ();
-  iPolyTexGouraud* gs = QUERY_INTERFACE (ptt, iPolyTexGouraud);
-  iPolyTexFlat* fs = QUERY_INTERFACE (ptt, iPolyTexFlat);
+  iPolyTexGouraud* gs = SCF_QUERY_INTERFACE (ptt, iPolyTexGouraud);
+  iPolyTexFlat* fs = SCF_QUERY_INTERFACE (ptt, iPolyTexFlat);
   gs->Setup (p);
   fs->SetUV (0, u1, v1);
   fs->SetUV (1, u2, v2);
@@ -791,7 +791,7 @@ iMeshWrapper* Blocks::create_cube_thing (float dx, float dy, float dz,
   	(dx-shift_rotate.x)*CUBE_DIM,
   	(dz-shift_rotate.z)*CUBE_DIM,
 	(dy-shift_rotate.y)*CUBE_DIM);
-  iThingState* thing_state = QUERY_INTERFACE (cube->GetMeshObject (),
+  iThingState* thing_state = SCF_QUERY_INTERFACE (cube->GetMeshObject (),
   	iThingState);
   thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL); // @@@ should be OFTEN!
 
@@ -836,14 +836,14 @@ iMeshWrapper* Blocks::add_cube_thing (iSector* sect,
 	float x, float y, float z, iMeshFactoryWrapper* tmpl)
 {
   iMeshWrapper* cube = create_cube_thing (dx, dy, dz, tmpl);
-  iThingState* cube_state = QUERY_INTERFACE (cube->GetMeshObject (),
+  iThingState* cube_state = SCF_QUERY_INTERFACE (cube->GetMeshObject (),
   	iThingState);
   cube->GetMovable ()->SetSector (sect);
   csVector3 v (x, y, z);
   cube->GetMovable ()->SetPosition (sect, v);
   cube->GetMovable ()->UpdateMove ();
   cube_state->DecRef ();
-  iLightingInfo* linfo = QUERY_INTERFACE (cube->GetMeshObject (),
+  iLightingInfo* linfo = SCF_QUERY_INTERFACE (cube->GetMeshObject (),
   	iLightingInfo);
   linfo->InitializeDefault ();
   room->ShineLights (cube);
@@ -1566,13 +1566,13 @@ void Blocks::freeze_shape ()
 
 void Blocks::dump_shape ()
 {
-  Printf (MSG_DEBUG_0,"Dump shape:\n");
+  Printf (CS_MSG_DEBUG_0,"Dump shape:\n");
   for (int i = 0 ; i < num_cubes ; i++)
   {
     int x = (int)cube_info[i].dx;
     int y = (int)cube_info[i].dy;
     int z = (int)cube_info[i].dz;
-    Printf (MSG_DEBUG_0, " %d: (%d,%d,%d) d=(%d,%d,%d)\n",
+    Printf (CS_MSG_DEBUG_0, " %d: (%d,%d,%d) d=(%d,%d,%d)\n",
     	i, player1->cube_x+x, player1->cube_y+y, player1->cube_z+z, x, y, z);
   }
 }
@@ -1940,7 +1940,7 @@ void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
   iMaterialWrapper* tm_front = engine->FindMaterial (mat);
 
   iMeshWrapper* thing_wrap = CreateMeshWrapper ("menu");
-  iThingState* thing_state = QUERY_INTERFACE (thing_wrap->GetMeshObject (),
+  iThingState* thing_state = SCF_QUERY_INTERFACE (thing_wrap->GetMeshObject (),
   	iThingState);
   thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
 
@@ -1979,7 +1979,7 @@ iMeshWrapper* Blocks::CreateMenuArrow (bool left)
   iMaterialWrapper* tm_front = engine->FindMaterial ("menu_back");
 
   iMeshWrapper* thing_wrap = CreateMeshWrapper ("menu");
-  iThingState* thing_state = QUERY_INTERFACE (thing_wrap->GetMeshObject (),
+  iThingState* thing_state = SCF_QUERY_INTERFACE (thing_wrap->GetMeshObject (),
   	iThingState);
   thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
 
@@ -2065,7 +2065,7 @@ void Blocks::ChangePlaySize (int new_size)
   for (i = 0 ; i < room->GetMeshCount () ; i++)
   {
     iMeshWrapper* mesh = room->GetMesh (i);
-    iLightingInfo* linfo = QUERY_INTERFACE (mesh->GetMeshObject (),
+    iLightingInfo* linfo = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
     	iLightingInfo);
     if (linfo)
     {
@@ -2077,7 +2077,7 @@ void Blocks::ChangePlaySize (int new_size)
   for (i = 0 ; i < room->GetMeshCount () ; i++)
   {
     iMeshWrapper* mesh = room->GetMesh (i);
-    iLightingInfo* linfo = QUERY_INTERFACE (mesh->GetMeshObject (),
+    iLightingInfo* linfo = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
     	iLightingInfo);
     if (linfo)
     {
@@ -2123,7 +2123,7 @@ void Blocks::InitGameRoom ()
   iMaterialWrapper* tm = engine->FindMaterial ("room");
   room = Sys->engine->CreateSector ("room");
   iMeshWrapper* walls = Sys->engine->CreateSectorWallsMesh (room, "walls");
-  iThingState* walls_state = QUERY_INTERFACE (walls->GetMeshObject (),
+  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
   	iThingState);
   Sys->set_cube_room (room);
   iPolygon3D* p;
@@ -2210,7 +2210,7 @@ void Blocks::InitDemoRoom ()
   iMaterialWrapper* demo_tm = engine->FindMaterial ("clouds");
   demo_room = Sys->engine->CreateSector ("room");
   iMeshWrapper* walls = Sys->engine->CreateSectorWallsMesh (demo_room, "walls");
-  iThingState* walls_state = QUERY_INTERFACE (walls->GetMeshObject (),
+  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
   	iThingState);
 
   iPolygon3D* p;
@@ -2259,7 +2259,7 @@ void Blocks::InitEngine ()
   InitDemoRoom ();
   Sys->engine->Prepare ();
 
-  iSoundRender *snd = QUERY_PLUGIN_ID (this, CS_FUNCID_SOUND, iSoundRender);
+  iSoundRender *snd = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_SOUND, iSoundRender);
   if (snd)
   {
     // Load the blocks.zip library where sound refs are stored
@@ -2463,7 +2463,7 @@ void Blocks::HandleLoweringPlanes (cs_time elapsed_time)
           t->GetMovable ()->MovePosition (csVector3 (0, -elapsed_fall, 0));
           t->GetMovable ()->UpdateMove ();
           reset_vertex_colors (t);
-	  iMeshWrapper* it = QUERY_INTERFACE (t, iMeshWrapper);
+	  iMeshWrapper* it = SCF_QUERY_INTERFACE (t, iMeshWrapper);
           room->ShineLights (it);
 	  it->DecRef ();
 	}
@@ -2534,9 +2534,9 @@ void Blocks::NextFrame ()
           Connection = Listener->Accept();
 	  // These slow down blocks too much.
 	  if (Connection != NULL)
-	    System->Printf(MSG_INITIALIZATION, "Connection accepted\n");
+	    System->Printf(CS_MSG_INITIALIZATION, "Connection accepted\n");
 	  else
-	    System->Printf(MSG_INITIALIZATION,
+	    System->Printf(CS_MSG_INITIALIZATION,
 			   "Awaiting connect (response %d)\n",
 			   Listener->GetLastError());
         }
@@ -2925,12 +2925,12 @@ void Blocks::ClientCheckConnection()
   {
     if (strcmp((char *)buff, "BYE") == 0)
     {
-      Sys->Printf(MSG_INITIALIZATION, "Server disconnected.\n");
+      Sys->Printf(CS_MSG_INITIALIZATION, "Server disconnected.\n");
       TerminateConnection();
     }
     else
     {
-      //Sys->Printf(MSG_INITIALIZATION, "Server responds: %s\n", buff);
+      //Sys->Printf(CS_MSG_INITIALIZATION, "Server responds: %s\n", buff);
       
       
       if(!player1_net->DecodeFromNetwork(buff,
@@ -2950,7 +2950,7 @@ void Blocks::ClientCheckConnection()
     const csNetworkDriverError err = Connection->GetLastError();
     if (err != CS_NET_ERR_NO_ERROR)
     {
-      Sys->Printf(MSG_INITIALIZATION, "Receive error %d\n", err);
+      Sys->Printf(CS_MSG_INITIALIZATION, "Receive error %d\n", err);
       Connection->DecRef();
       Connection = NULL;
     }
@@ -2967,19 +2967,19 @@ void Blocks::ServerCheckConnection()
   {
     if (strcmp((char *)buff, "BYE") == 0)
     {
-      Sys->Printf(MSG_INITIALIZATION, "Other blocks disconnected.\n");
+      Sys->Printf(CS_MSG_INITIALIZATION, "Other blocks disconnected.\n");
       TerminateConnection();
       InitNet();
     }
     else if (strcmp((char *)buff, "OK") == 0)
     {
-      Sys->Printf(MSG_INITIALIZATION, "Received data: %s\n", buff);
+      Sys->Printf(CS_MSG_INITIALIZATION, "Received data: %s\n", buff);
       Connection->Send("OK", sizeof("OK"));
     }
     
     else
     {
-      Sys->Printf(MSG_INITIALIZATION, "Other blocks responds: %s\n", buff);
+      Sys->Printf(CS_MSG_INITIALIZATION, "Other blocks responds: %s\n", buff);
       Connection->Send("You", sizeof("You"));
     }
   }
@@ -2988,7 +2988,7 @@ void Blocks::ServerCheckConnection()
     const csNetworkDriverError err = Connection->GetLastError();
     if (err != CS_NET_ERR_NO_ERROR)
     {
-      Sys->Printf(MSG_INITIALIZATION, "Receive error %d\n", err);
+      Sys->Printf(CS_MSG_INITIALIZATION, "Receive error %d\n", err);
       Connection->DecRef();
       Connection = NULL;
     }
@@ -3023,9 +3023,9 @@ bool Blocks::InitNet()
     if (!myNetDrv) return false;
     Listener = myNetDrv->NewListener (source, true, false, false);
     if (Listener != NULL)
-      Sys->Printf (MSG_INITIALIZATION, "Listening on port %s\n", source);
+      Sys->Printf (CS_MSG_INITIALIZATION, "Listening on port %s\n", source);
     else
-      Sys->Printf (MSG_INITIALIZATION,"Error creating network listener (%d)\n",
+      Sys->Printf (CS_MSG_INITIALIZATION,"Error creating network listener (%d)\n",
         myNetDrv->GetLastError ());
 
     return (Listener != NULL);
@@ -3043,12 +3043,12 @@ void Blocks::Connect ()
   const char target[] = "localhost:2222";
   Connection = NULL;
   if (!myNetDrv) return;
-  Sys->Printf(MSG_INITIALIZATION, "Attempting connection to %s...", target);
+  Sys->Printf(CS_MSG_INITIALIZATION, "Attempting connection to %s...", target);
   Connection = myNetDrv->NewConnection(target, true, false);
   if (Connection == NULL)
-    Sys->Printf (MSG_INITIALIZATION,"Error %d\n", myNetDrv->GetLastError());
+    Sys->Printf (CS_MSG_INITIALIZATION,"Error %d\n", myNetDrv->GetLastError());
   else
-    Sys->Printf(MSG_INITIALIZATION, "OK\nPress a key [A-Z] to send a"
+    Sys->Printf(CS_MSG_INITIALIZATION, "OK\nPress a key [A-Z] to send a"
       "message to the server.\n");
 }
 
@@ -3088,7 +3088,7 @@ int main (int argc, char* argv[])
 
   if (!Sys->Initialize (argc, argv, "/config/blocks.cfg"))
   {
-    Sys->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
+    Sys->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
     cleanup ();
     fatal_exit (0, false);
   }
@@ -3096,7 +3096,7 @@ int main (int argc, char* argv[])
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Sys->Open ("3D Blocks"))
   {
-    Sys->Printf (MSG_FATAL_ERROR, "Error opening system!\n");
+    Sys->Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     cleanup ();
     fatal_exit (0, false);
   }
@@ -3115,10 +3115,10 @@ int main (int argc, char* argv[])
   Sys->font = Gfx2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
 
   // Get the level loader
-  Sys->LevelLoader = QUERY_PLUGIN_ID(Sys, CS_FUNCID_LVLLOADER, iLoader);
+  Sys->LevelLoader = CS_QUERY_PLUGIN_ID(Sys, CS_FUNCID_LVLLOADER, iLoader);
   if (!Sys->LevelLoader)
   {
-    Sys->Printf (MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Sys->Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
     return -1;
   }
 
@@ -3126,8 +3126,8 @@ int main (int argc, char* argv[])
   Gfx3D->SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, (long)false);
 
   // Some commercials...
-  Sys->Printf (MSG_INITIALIZATION, "3D Blocks version 1.0.\n");
-  Sys->Printf (MSG_INITIALIZATION,
+  Sys->Printf (CS_MSG_INITIALIZATION, "3D Blocks version 1.0.\n");
+  Sys->Printf (CS_MSG_INITIALIZATION,
     "Created by Jorrit Tyberghein and others...\n\n");
   Sys->txtmgr = Gfx3D->GetTextureManager ();
   Sys->txtmgr->SetVerbose (true);
@@ -3140,7 +3140,7 @@ int main (int argc, char* argv[])
   Sys->view = Sys->engine->CreateView (Gfx3D);
 
   // Create our world.
-  Sys->Printf (MSG_INITIALIZATION, "Creating world!...\n");
+  Sys->Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
   Sys->engine->EnableLightingCache (false);
 
   // Change to virtual directory where Blocks data is stored
@@ -3150,7 +3150,7 @@ int main (int argc, char* argv[])
   world_file.Append("/");
   if (!Sys->myVFS->Exists (world_file.GetData()))
   {
-    Sys->Printf (MSG_FATAL_ERROR,
+    Sys->Printf (CS_MSG_FATAL_ERROR,
       "The directory on VFS (%s) for world file does not exist!\n",
       world_file.GetData());
     return -1;

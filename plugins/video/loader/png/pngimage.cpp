@@ -33,17 +33,17 @@ extern "C"
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csPNGImageIO)
-  IMPLEMENTS_INTERFACE (iImageIO)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csPNGImageIO)
+  SCF_IMPLEMENTS_INTERFACE (iImageIO)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csPNGImageIO);
+SCF_IMPLEMENT_FACTORY (csPNGImageIO);
 
-EXPORT_CLASS_TABLE (cspngimg)
-  EXPORT_CLASS (csPNGImageIO, "crystalspace.graphic.image.io.png", 
+SCF_EXPORT_CLASS_TABLE (cspngimg)
+  SCF_EXPORT_CLASS (csPNGImageIO, "crystalspace.graphic.image.io.png", 
 		"CrystalSpace PNG image format I/O plugin")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 #define PNG_MIME "image/png"
 
@@ -86,7 +86,7 @@ static iImageIO::FileFormatDescription formatlist[5] =
 
 csPNGImageIO::csPNGImageIO (iBase *pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
   formats.Push (&formatlist[0]);
   formats.Push (&formatlist[1]);
   formats.Push (&formatlist[2]);

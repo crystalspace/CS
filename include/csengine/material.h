@@ -122,7 +122,7 @@ public:
     reflection = oReflection;
   }
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 };
 
 /**
@@ -173,12 +173,12 @@ public:
    */
   void Visit ();
 
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
 
   //------------------- iMaterialWrapper implementation -----------------------
   struct MaterialWrapper : public iMaterialWrapper
   {
-    DECLARE_EMBEDDED_IBASE (csMaterialWrapper);
+    SCF_DECLARE_EMBEDDED_IBASE (csMaterialWrapper);
     virtual csMaterialWrapper* GetPrivateObject ()
     { return (csMaterialWrapper*)scfParent; }
     virtual iObject *QueryObject()
@@ -227,12 +227,12 @@ public:
   csMaterialWrapper *FindByName (const char* iName)
   { return (csMaterialWrapper *)csNamedObjVector::FindByName (iName); }
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   //------------------- iMaterialList implementation -----------------------
   struct MaterialList : public iMaterialList
   {
-    DECLARE_EMBEDDED_IBASE (csMaterialList);
+    SCF_DECLARE_EMBEDDED_IBASE (csMaterialList);
     virtual iMaterialWrapper* NewMaterial (iMaterial* material)
     {
       csMaterialWrapper* mw = scfParent->NewMaterial (material);

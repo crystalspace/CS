@@ -51,22 +51,22 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csBugPlug)
+SCF_IMPLEMENT_FACTORY (csBugPlug)
 
-EXPORT_CLASS_TABLE (bugplug)
-  EXPORT_CLASS (csBugPlug, "crystalspace.utilities.bugplug",
+SCF_EXPORT_CLASS_TABLE (bugplug)
+  SCF_EXPORT_CLASS (csBugPlug, "crystalspace.utilities.bugplug",
     "Debugging utility")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csBugPlug)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csBugPlug)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
 #define SysPrintf System->Printf
 
 csBugPlug::csBugPlug (iBase *iParent)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   Engine = NULL;
   System = NULL;
   G3D = NULL;
@@ -126,14 +126,14 @@ void csBugPlug::SetupPlugin ()
   if (initialized) return;
 
   if (!Engine)
-    Engine = QUERY_PLUGIN_ID (System, CS_FUNCID_ENGINE, iEngine);
+    Engine = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_ENGINE, iEngine);
   if (!Engine)
   {
     // No engine. It is possible that we are working with the iso-engine.
   }
 
   if (!G3D)
-    G3D = QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
+    G3D = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
   if (!G3D)
   {
     printf ("No G3D!\n");
@@ -149,7 +149,7 @@ void csBugPlug::SetupPlugin ()
   }
 
   if (!VFS)
-    VFS = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
+    VFS = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
   if (!VFS)
   {
     printf ("No VFS!\n");
@@ -157,13 +157,13 @@ void csBugPlug::SetupPlugin ()
   }
 
   if (!Conout)
-    Conout = QUERY_PLUGIN_ID (System, CS_FUNCID_CONSOLE, iConsoleOutput);
+    Conout = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_CONSOLE, iConsoleOutput);
 
   ReadKeyBindings ("/config/bugplug.cfg");
 
   initialized = true;
 
-  System->Printf (MSG_CONSOLE, "BugPlug loaded...\n");
+  System->Printf (CS_MSG_CONSOLE, "BugPlug loaded...\n");
 
   do_clear = false;
 }
@@ -181,13 +181,13 @@ void csBugPlug::UnleashSpider (int cmd)
     }
     else
     {
-      System->Printf (MSG_CONSOLE,
+      System->Printf (CS_MSG_CONSOLE,
 	"Spider could not weave its web (No sectors)!\n");
     }
   }
   else
   {
-    System->Printf (MSG_CONSOLE,
+    System->Printf (CS_MSG_CONSOLE,
       "Spider could not weave its web (No engine)!\n");
   }
 }
@@ -199,7 +199,7 @@ void csBugPlug::HideSpider (iCamera* camera)
   if (camera)
   {
     char buf[80];
-    System->Printf (MSG_CONSOLE, "Spider catched a camera!\n");
+    System->Printf (CS_MSG_CONSOLE, "Spider catched a camera!\n");
     switch (spider_command)
     {
       case DEBUGCMD_DUMPCAM:
@@ -239,12 +239,12 @@ void csBugPlug::ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name)
   v = !v;
   if (G3D->SetRenderState (op, v))
   {
-    System->Printf (MSG_CONSOLE, "BugPlug %s %s.\n",
+    System->Printf (CS_MSG_CONSOLE, "BugPlug %s %s.\n",
 	v ? "enabled" : "disabled", name);
   }
   else
   {
-    System->Printf (MSG_CONSOLE, "%s not supported for this renderer!\n",
+    System->Printf (CS_MSG_CONSOLE, "%s not supported for this renderer!\n",
     	name);
   }
 }
@@ -273,22 +273,22 @@ void csBugPlug::MouseButton3 (iCamera* camera)
 
   vw = isect;
   v = camera->GetTransform ().Other2This (vw);
-  System->Printf (MSG_CONSOLE,
+  System->Printf (CS_MSG_CONSOLE,
     "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n",
     v.x, v.y, v.z, vw.x, vw.y, vw.z);
-  System->Printf (MSG_DEBUG_0,
+  System->Printf (CS_MSG_DEBUG_0,
     "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n",
     v.x, v.y, v.z, vw.x, vw.y, vw.z);
 
   if (sel)
   {
-    iMeshWrapper* mesh = QUERY_INTERFACE (sel, iMeshWrapper);
+    iMeshWrapper* mesh = SCF_QUERY_INTERFACE (sel, iMeshWrapper);
     if (mesh)
     {
       // First release the ref to the previous selected_mesh.
       if (selected_mesh) selected_mesh->DecRef ();
 
-      // The QUERY_INTERFACE increased the reference to this mesh. We
+      // The SCF_QUERY_INTERFACE increased the reference to this mesh. We
       // don't DecRef() it to make sure it doesn't get deleted while
       // BugPlug still has a reference.
       // But of course we have to make sure that it will actually get
@@ -297,7 +297,7 @@ void csBugPlug::MouseButton3 (iCamera* camera)
       // as soon as the ref count reaches one.
       selected_mesh = mesh;
       const char* n = selected_mesh->QueryObject ()->GetName ();
-      System->Printf (MSG_CONSOLE, "BugPlug found mesh '%s'!\n",
+      System->Printf (CS_MSG_CONSOLE, "BugPlug found mesh '%s'!\n",
       	n ? n : "<noname>");
       bool bbox, rad;
       shadow->GetShowOptions (bbox, rad);
@@ -409,11 +409,11 @@ bool csBugPlug::EatKey (iEvent& event)
       process_next_key = !process_next_key;
       if (process_next_key)
       {
-        System->Printf (MSG_CONSOLE, "Press debug key...\n");
+        System->Printf (CS_MSG_CONSOLE, "Press debug key...\n");
       }
       else
       {
-        System->Printf (MSG_CONSOLE, "Back to normal key processing.\n");
+        System->Printf (CS_MSG_CONSOLE, "Back to normal key processing.\n");
       }
       return true;
     }
@@ -422,7 +422,7 @@ bool csBugPlug::EatKey (iEvent& event)
       process_next_mouse = !process_next_mouse;
       if (process_next_mouse)
       {
-        System->Printf (MSG_CONSOLE, "Click on screen...\n");
+        System->Printf (CS_MSG_CONSOLE, "Click on screen...\n");
       }
       return true;
     }
@@ -438,29 +438,29 @@ bool csBugPlug::EatKey (iEvent& event)
       case DEBUGCMD_UNKNOWN:
         return true;
       case DEBUGCMD_QUIT:
-        System->Printf (MSG_CONSOLE, "Nah nah! I will NOT quit!\n");
+        System->Printf (CS_MSG_CONSOLE, "Nah nah! I will NOT quit!\n");
         break;
       case DEBUGCMD_STATUS:
-        System->Printf (MSG_CONSOLE, "I'm running smoothly, thank you...\n");
+        System->Printf (CS_MSG_CONSOLE, "I'm running smoothly, thank you...\n");
         break;
       case DEBUGCMD_HELP:
-        System->Printf (MSG_CONSOLE, "Sorry, cannot help you yet.\n");
+        System->Printf (CS_MSG_CONSOLE, "Sorry, cannot help you yet.\n");
         break;
       case DEBUGCMD_DUMPENG:
         if (Engine)
 	{
-          System->Printf (MSG_CONSOLE,
+          System->Printf (CS_MSG_CONSOLE,
 		"Dumping entire engine contents to debug.txt.\n");
 	  Dump (Engine);
-	  System->Printf (MSG_DEBUG_0F, "\n");
+	  System->Printf (CS_MSG_DEBUG_0F, "\n");
 	}
         break;
       case DEBUGCMD_DUMPSEC:
-        System->Printf (MSG_CONSOLE, "Not implemented yet.\n");
+        System->Printf (CS_MSG_CONSOLE, "Not implemented yet.\n");
         break;
       case DEBUGCMD_CLEAR:
         do_clear = !do_clear;
-        System->Printf (MSG_CONSOLE, "BugPlug %s screen clearing.\n",
+        System->Printf (CS_MSG_CONSOLE, "BugPlug %s screen clearing.\n",
 	  	do_clear ? "enabled" : "disabled");
         break;
       case DEBUGCMD_EDGES:
@@ -494,7 +494,7 @@ bool csBugPlug::EatKey (iEvent& event)
         break;
       case DEBUGCMD_CACHECLEAR:
         G3D->ClearCache ();
-        System->Printf (MSG_CONSOLE, "BugPlug cleared the texture cache.\n");
+        System->Printf (CS_MSG_CONSOLE, "BugPlug cleared the texture cache.\n");
         break;
       case DEBUGCMD_CACHEDUMP:
         G3D->DumpCache ();
@@ -505,7 +505,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	  long v = G3D->GetRenderState (G3DRENDERSTATE_MIPMAPENABLE);
 	  v = (v+1)%5;
 	  G3D->SetRenderState (G3DRENDERSTATE_MIPMAPENABLE, v);
-	  System->Printf (MSG_CONSOLE, "BugPlug set mipmap to '%s'\n",
+	  System->Printf (CS_MSG_CONSOLE, "BugPlug set mipmap to '%s'\n",
 	  	choices[v]);
   	}
 	break;
@@ -515,7 +515,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	  long v = G3D->GetRenderState (G3DRENDERSTATE_INTERPOLATIONSTEP);
 	  v = (v+1)%4;
 	  G3D->SetRenderState (G3DRENDERSTATE_INTERPOLATIONSTEP, v);
-	  System->Printf (MSG_CONSOLE, "BugPlug set interpolation to '%s'\n",
+	  System->Printf (CS_MSG_CONSOLE, "BugPlug set interpolation to '%s'\n",
 	  	choices[v]);
 	}
 	break;
@@ -533,12 +533,12 @@ bool csBugPlug::EatKey (iEvent& event)
 	  state = !state;
 	  if (!G2D->DoubleBuffer (state))
 	  {
-	    System->Printf (MSG_CONSOLE,
+	    System->Printf (CS_MSG_CONSOLE,
 	    	"Double buffer not supported in current video mode!\n");
 	  }
 	  else
 	  {
-	    System->Printf (MSG_CONSOLE,
+	    System->Printf (CS_MSG_CONSOLE,
 	    	"BugPlug %s double buffering.\n",
 		state ? "enabled" : "disabled");
 	  }
@@ -555,7 +555,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	    for (j = 0 ; j < sector->GetTerrainCount () ; j++)
 	    {
 	      iTerrainWrapper* terr = sector->GetTerrain (j);
-	      iTerrFuncState* st = QUERY_INTERFACE (terr->GetTerrainObject (),
+	      iTerrFuncState* st = SCF_QUERY_INTERFACE (terr->GetTerrainObject (),
 	      	iTerrFuncState);
 	      if (st)
 	      {
@@ -570,19 +570,19 @@ bool csBugPlug::EatKey (iEvent& event)
 	  }
 	  if (enable_disable == -1)
 	  {
-	    System->Printf (MSG_CONSOLE,
+	    System->Printf (CS_MSG_CONSOLE,
 	      "BugPlug found no terrains to work with!\n");
 	  }
 	  else
 	  {
-	    System->Printf (MSG_CONSOLE,
+	    System->Printf (CS_MSG_CONSOLE,
 	      "BugPlug %s terrain visibility checking!\n",
 	      enable_disable ? "enabled" : "disabled");
 	  }
 	}
 	else
 	{
-	  System->Printf (MSG_CONSOLE,
+	  System->Printf (CS_MSG_CONSOLE,
 	    	"BugPlug has no engine to work on!\n");
 	}
         break;
@@ -591,7 +591,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	  bool bbox, rad;
 	  shadow->GetShowOptions (bbox, rad);
           bbox = !bbox;
-	  System->Printf (MSG_CONSOLE,
+	  System->Printf (CS_MSG_CONSOLE,
 	    	"BugPlug %s bounding box display.\n",
 		bbox ? "enabled" : "disabled");
 	  shadow->SetShowOptions (bbox, rad);
@@ -606,7 +606,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	  bool bbox, rad;
 	  shadow->GetShowOptions (bbox, rad);
           rad = !rad;
-	  System->Printf (MSG_CONSOLE,
+	  System->Printf (CS_MSG_CONSOLE,
 	    	"BugPlug %s bounding sphere display.\n",
 		rad ? "enabled" : "disabled");
 	  shadow->SetShowOptions (bbox, rad);
@@ -647,7 +647,7 @@ bool csBugPlug::HandleStartFrame (iEvent& /*event*/)
       shadow->RemoveFromEngine (Engine);
       selected_mesh->DecRef ();
       selected_mesh = NULL;
-      System->Printf (MSG_CONSOLE, "Selected mesh is deleted!");
+      System->Printf (CS_MSG_CONSOLE, "Selected mesh is deleted!");
     }
   }
   return false;
@@ -706,7 +706,7 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
       if (spider_timeout < 0)
       {
 	HideSpider (NULL);
-        System->Printf (MSG_CONSOLE, "Spider could not catch a camera!\n");
+        System->Printf (CS_MSG_CONSOLE, "Spider could not catch a camera!\n");
       }
     }
   }
@@ -922,7 +922,7 @@ void csBugPlug::ReadKeyBindings (const char* filename)
       }
       else
       {
-        System->Printf (MSG_WARNING,
+        System->Printf (CS_MSG_WARNING,
     	  "BugPlug hit a badly formed line in '%s'!\n", filename);
 	f->DecRef ();
         return;
@@ -932,15 +932,15 @@ void csBugPlug::ReadKeyBindings (const char* filename)
   }
   else
   {
-    System->Printf (MSG_WARNING,
+    System->Printf (CS_MSG_WARNING,
     	"BugPlug could not read '%s'!\n", filename);
   }
 }
 
 void csBugPlug::Dump (iEngine* engine)
 {
-  System->Printf (MSG_DEBUG_0, "===========================================\n");
-  System->Printf (MSG_DEBUG_0,
+  System->Printf (CS_MSG_DEBUG_0, "===========================================\n");
+  System->Printf (CS_MSG_DEBUG_0,
     "%d sectors, %d mesh factories, %d mesh objects\n",
     engine->GetSectorCount (),
     engine->GetMeshFactoryCount (),
@@ -961,22 +961,22 @@ void csBugPlug::Dump (iEngine* engine)
     iMeshWrapper* mesh = engine->GetMeshObject (i);
     Dump (mesh);
   }
-  System->Printf (MSG_DEBUG_0, "===========================================\n");
+  System->Printf (CS_MSG_DEBUG_0, "===========================================\n");
 }
 
 void csBugPlug::Dump (iSector* sector)
 {
   const char* sn = sector->QueryObject ()->GetName ();
-  System->Printf (MSG_DEBUG_0, "    Sector '%s' (%08lx)\n",
+  System->Printf (CS_MSG_DEBUG_0, "    Sector '%s' (%08lx)\n",
   	sn ? sn : "?", sector);
-  System->Printf (MSG_DEBUG_0, "    %d meshes, %d lights\n",
+  System->Printf (CS_MSG_DEBUG_0, "    %d meshes, %d lights\n",
   	sector->GetMeshCount (), sector->GetLightCount ());
   int i;
   for (i = 0 ; i < sector->GetMeshCount () ; i++)
   {
     iMeshWrapper* mesh = sector->GetMesh (i);
     const char* n = mesh->QueryObject ()->GetName ();
-    System->Printf (MSG_DEBUG_0, "        Mesh '%s' (%08lx)\n",
+    System->Printf (CS_MSG_DEBUG_0, "        Mesh '%s' (%08lx)\n",
     	n ? n : "?", mesh);
   }
 }
@@ -984,31 +984,31 @@ void csBugPlug::Dump (iSector* sector)
 void csBugPlug::Dump (iMeshWrapper* mesh)
 {
   const char* mn = mesh->QueryObject ()->GetName ();
-  System->Printf (MSG_DEBUG_0, "    Mesh wrapper '%s' (%08lx)\n",
+  System->Printf (CS_MSG_DEBUG_0, "    Mesh wrapper '%s' (%08lx)\n",
   	mn ? mn : "?", mesh);
   iMeshObject* obj = mesh->GetMeshObject ();
   if (!obj)
   {
-    System->Printf (MSG_DEBUG_0, "        Mesh object missing!\n");
+    System->Printf (CS_MSG_DEBUG_0, "        Mesh object missing!\n");
   }
   else
   {
-    iFactory* fact = QUERY_INTERFACE (obj, iFactory);
+    iFactory* fact = SCF_QUERY_INTERFACE (obj, iFactory);
     if (fact)
     {
-      System->Printf (MSG_DEBUG_0, "        Plugin '%s'\n",
+      System->Printf (CS_MSG_DEBUG_0, "        Plugin '%s'\n",
   	  fact->QueryDescription () ? fact->QueryDescription () : "NULL");
       fact->DecRef ();
     }
     csBox3 bbox;
     obj->GetObjectBoundingBox (bbox);
-    System->Printf (MSG_DEBUG_0, "        Object bounding box:\n");
+    System->Printf (CS_MSG_DEBUG_0, "        Object bounding box:\n");
     Dump (8, bbox);
   }
   iMovable* movable = mesh->GetMovable ();
   if (!movable)
   {
-    System->Printf (MSG_DEBUG_0, "        Mesh object missing!\n");
+    System->Printf (CS_MSG_DEBUG_0, "        Mesh object missing!\n");
   }
   else
   {
@@ -1021,7 +1021,7 @@ void csBugPlug::Dump (iMeshWrapper* mesh)
     {
       iSector* sec = movable->GetSector (i);
       const char* sn = sec->QueryObject ()->GetName ();
-      System->Printf (MSG_DEBUG_0, "        In sector '%s'\n",
+      System->Printf (CS_MSG_DEBUG_0, "        In sector '%s'\n",
       	sn ? sn : "?");
     }
   }
@@ -1030,7 +1030,7 @@ void csBugPlug::Dump (iMeshWrapper* mesh)
 void csBugPlug::Dump (iMeshFactoryWrapper* meshfact)
 {
   const char* mn = meshfact->QueryObject ()->GetName ();
-  System->Printf (MSG_DEBUG_0, "        Mesh factory wrapper '%s' (%08lx)\n",
+  System->Printf (CS_MSG_DEBUG_0, "        Mesh factory wrapper '%s' (%08lx)\n",
   	mn ? mn : "?", meshfact);
 }
 
@@ -1040,15 +1040,15 @@ void csBugPlug::Dump (int indent, const csMatrix3& m, char const* name)
   int i;
   for (i = 0 ; i < indent ; i++) ind[i] = ' ';
   ind[i] = 0;
-  System->Printf (MSG_DEBUG_0, "%sMatrix '%s':\n", ind, name);
-  System->Printf (MSG_DEBUG_0, "%s/\n", ind);
-  System->Printf (MSG_DEBUG_0, "%s| %3.2f %3.2f %3.2f\n",
+  System->Printf (CS_MSG_DEBUG_0, "%sMatrix '%s':\n", ind, name);
+  System->Printf (CS_MSG_DEBUG_0, "%s/\n", ind);
+  System->Printf (CS_MSG_DEBUG_0, "%s| %3.2f %3.2f %3.2f\n",
   	ind, m.m11, m.m12, m.m13);
-  System->Printf (MSG_DEBUG_0, "%s| %3.2f %3.2f %3.2f\n",
+  System->Printf (CS_MSG_DEBUG_0, "%s| %3.2f %3.2f %3.2f\n",
   	ind, m.m21, m.m22, m.m23);
-  System->Printf (MSG_DEBUG_0, "%s| %3.2f %3.2f %3.2f\n",
+  System->Printf (CS_MSG_DEBUG_0, "%s| %3.2f %3.2f %3.2f\n",
   	ind, m.m31, m.m32, m.m33);
-  System->Printf (MSG_DEBUG_0, "%s\\\n", ind);
+  System->Printf (CS_MSG_DEBUG_0, "%s\\\n", ind);
 }
 
 void csBugPlug::Dump (int indent, const csVector3& v, char const* name)
@@ -1057,7 +1057,7 @@ void csBugPlug::Dump (int indent, const csVector3& v, char const* name)
   int i;
   for (i = 0 ; i < indent ; i++) ind[i] = ' ';
   ind[i] = 0;
-  System->Printf (MSG_DEBUG_0,
+  System->Printf (CS_MSG_DEBUG_0,
   	"%sVector '%s': (%f,%f,%f)\n", ind, name, v.x, v.y, v.z);
 }
 
@@ -1067,7 +1067,7 @@ void csBugPlug::Dump (int indent, const csVector2& v, char const* name)
   int i;
   for (i = 0 ; i < indent ; i++) ind[i] = ' ';
   ind[i] = 0;
-  System->Printf (MSG_DEBUG_0, "%sVector '%s': (%f,%f)\n",
+  System->Printf (CS_MSG_DEBUG_0, "%sVector '%s': (%f,%f)\n",
   	ind, name, v.x, v.y);
 }
 
@@ -1077,7 +1077,7 @@ void csBugPlug::Dump (int indent, const csPlane3& p)
   int i;
   for (i = 0 ; i < indent ; i++) ind[i] = ' ';
   ind[i] = 0;
-  System->Printf (MSG_DEBUG_0, "%sA=%2.2f B=%2.2f C=%2.2f D=%2.2f\n",
+  System->Printf (CS_MSG_DEBUG_0, "%sA=%2.2f B=%2.2f C=%2.2f D=%2.2f\n",
             ind, p.norm.x, p.norm.y, p.norm.z, p.DD);
 }
 
@@ -1087,7 +1087,7 @@ void csBugPlug::Dump (int indent, const csBox2& b)
   int i;
   for (i = 0 ; i < indent ; i++) ind[i] = ' ';
   ind[i] = 0;
-  System->Printf (MSG_DEBUG_0, "%s(%2.2f,%2.2f)-(%2.2f,%2.2f)\n", ind,
+  System->Printf (CS_MSG_DEBUG_0, "%s(%2.2f,%2.2f)-(%2.2f,%2.2f)\n", ind,
   	b.MinX (), b.MinY (), b.MaxX (), b.MaxY ());
 }
 
@@ -1097,7 +1097,7 @@ void csBugPlug::Dump (int indent, const csBox3& b)
   int i;
   for (i = 0 ; i < indent ; i++) ind[i] = ' ';
   ind[i] = 0;
-  System->Printf (MSG_DEBUG_0, "%s(%2.2f,%2.2f,%2.2f)-(%2.2f,%2.2f,%2.2f)\n",
+  System->Printf (CS_MSG_DEBUG_0, "%s(%2.2f,%2.2f,%2.2f)-(%2.2f,%2.2f,%2.2f)\n",
   	ind, b.MinX (), b.MinY (), b.MinZ (), b.MaxX (), b.MaxY (), b.MaxZ ());
 }
 
@@ -1107,12 +1107,12 @@ void csBugPlug::Dump (iCamera* c)
   if (!sn) sn = "?";
   csPlane3 far_plane;
   bool has_far_plane = c->GetFarPlane (far_plane);
-  System->Printf (MSG_DEBUG_0, "Camera: %s (mirror=%d, fov=%d, fovangle=%g,\n",
+  System->Printf (CS_MSG_DEBUG_0, "Camera: %s (mirror=%d, fov=%d, fovangle=%g,\n",
   	sn, c->IsMirrored (), c->GetFOV (), c->GetFOVAngle ());
-  System->Printf (MSG_DEBUG_0, "    shiftx=%g shifty=%g camnr=%d)\n",
+  System->Printf (CS_MSG_DEBUG_0, "    shiftx=%g shifty=%g camnr=%d)\n",
   	c->GetShiftX (), c->GetShiftY (), c->GetCameraNumber ());
   if (has_far_plane)
-    System->Printf (MSG_DEBUG_0, "    far_plane=(%g,%g,%g,%g)\n",
+    System->Printf (CS_MSG_DEBUG_0, "    far_plane=(%g,%g,%g,%g)\n",
     	far_plane.A (), far_plane.B (), far_plane.C (), far_plane.D ());
   csReversibleTransform& trans = c->GetTransform ();
   Dump (4, trans.GetO2TTranslation (), "Camera vector");

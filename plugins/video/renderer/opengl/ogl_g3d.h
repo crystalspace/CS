@@ -38,7 +38,7 @@ struct iGraphics3D;
 class csGraphics3DOpenGL : public csGraphics3DOGLCommon
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   ///
   csGraphics3DOpenGL (iBase *iParent);
   ///

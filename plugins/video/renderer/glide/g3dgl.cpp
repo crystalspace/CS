@@ -76,17 +76,17 @@ CS_IMPLEMENT_PLUGIN
 
 #endif
 
-IMPLEMENT_FACTORY (csGraphics3DGlide)
+SCF_IMPLEMENT_FACTORY (csGraphics3DGlide)
 
-EXPORT_CLASS_TABLE (OUT_NAME)
-  EXPORT_CLASS_DEP (csGraphics3DGlide, GLIDE_CLASSID, GLIDE_DESC,
+SCF_EXPORT_CLASS_TABLE (OUT_NAME)
+  SCF_EXPORT_CLASS_DEP (csGraphics3DGlide, GLIDE_CLASSID, GLIDE_DESC,
     "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csGraphics3DGlide)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics3D)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics3DGlide)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
+SCF_IMPLEMENT_IBASE_END
 
 #define GLIDE_FX_VERTSIZE 10
 
@@ -151,7 +151,7 @@ csGraphics3DGlide::csGraphics3DGlide(iBase* iParent) :
     m_pLightmapCache(NULL),
     m_pAlphamapCache(NULL),
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
 
   m_piSystem = NULL;
   m_pCamera = NULL;
@@ -218,27 +218,27 @@ bool csGraphics3DGlide::Initialize (iSystem *iSys)
 {
   (m_piSystem = iSys)->IncRef ();
 
-  SysPrintf (MSG_INITIALIZATION, "\nGlideRender Glide selected\n");
+  SysPrintf (CS_MSG_INITIALIZATION, "\nGlideRender Glide selected\n");
 
   config.AddConfig(System, "/config/glide.cfg");
 
-  m_piG2D = LOAD_PLUGIN (m_piSystem, GLIDE_2D, NULL, iGraphics2D);
+  m_piG2D = CS_LOAD_PLUGIN (m_piSystem, GLIDE_2D, NULL, iGraphics2D);
   if (!m_piG2D) return false;
 
   txtmgr = new csTextureManagerGlide (m_piSystem, m_piG2D, this, config);
 
   m_bVRetrace = config->GetBool("Video.Glide.VRetrace",FALSE);
   // tell the 2D driver whether to wait for VRETRACE
-  m_piGlide2D  = QUERY_INTERFACE ( m_piG2D, iGraphics2DGlide );
-  if (!m_piGlide2D) SysPrintf ( MSG_INITIALIZATION, "\nCould not set VRETRACE\n");
+  m_piGlide2D  = SCF_QUERY_INTERFACE ( m_piG2D, iGraphics2DGlide );
+  if (!m_piGlide2D) SysPrintf ( CS_MSG_INITIALIZATION, "\nCould not set VRETRACE\n");
   else{
-      SysPrintf ( MSG_INITIALIZATION, "\nVRETRACE is %s\n", m_bVRetrace ? "on" : "off" );
+      SysPrintf ( CS_MSG_INITIALIZATION, "\nVRETRACE is %s\n", m_bVRetrace ? "on" : "off" );
       m_piGlide2D->SetVRetrace( m_bVRetrace );
   }
 
   m_bHaloEffect=config->GetBool("Video.Glide.DisableHalo", false);
   if (m_bHaloEffect)
-    SysPrintf (MSG_INITIALIZATION, " Disable Halo Effect support.\n");
+    SysPrintf (CS_MSG_INITIALIZATION, " Disable Halo Effect support.\n");
 
 
 #ifdef GLIDE3
@@ -316,10 +316,10 @@ bool csGraphics3DGlide::Open(const char* Title)
   // we have to force 640x480 resoltuions on boards with TMU < 4MB to enable Depthbuffering
   if ( m_piG2D->GetWidth () > 640 && m_iMultiPass && m_TMUs[0].memory_size < (2<<21) )
   {
-    SysPrintf (MSG_INITIALIZATION, "  Forcing 640x480 resolution to enable Depthbuffer on this system\n");
+    SysPrintf (CS_MSG_INITIALIZATION, "  Forcing 640x480 resolution to enable Depthbuffer on this system\n");
     if ( !m_piGlide2D )
     {
-       SysPrintf (MSG_INITIALIZATION, "  Yikes, cannot force, because 2D driver handle is NULL... exiting\n");
+       SysPrintf (CS_MSG_INITIALIZATION, "  Yikes, cannot force, because 2D driver handle is NULL... exiting\n");
        return false;
     }
     m_piGlide2D->ForceResolution( 640, 480 );
@@ -339,7 +339,7 @@ bool csGraphics3DGlide::Open(const char* Title)
 #endif
 
   if (use16BitTexture)
-    SysPrintf (MSG_INITIALIZATION, "  Use 16 bit textures\n");
+    SysPrintf (CS_MSG_INITIALIZATION, "  Use 16 bit textures\n");
 
   m_nWidth = m_piG2D->GetWidth ();
   m_nHalfWidth = m_nWidth/2;

@@ -20,17 +20,17 @@
 #include "isolight.h"
 #include "qint.h"
 
-IMPLEMENT_IBASE (csIsoLight)
-  IMPLEMENTS_INTERFACE (iIsoLight)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csIsoLight)
+  SCF_IMPLEMENTS_INTERFACE (iIsoLight)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csIsoFakeLight)
-  IMPLEMENTS_INTERFACE (iLight)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csIsoFakeLight)
+  SCF_IMPLEMENTS_INTERFACE (iLight)
+SCF_IMPLEMENT_IBASE_END
 
 csIsoLight::csIsoLight (iBase *iParent)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   grid = NULL;
   attenuation = CSISO_ATTN_REALISTIC;
   position.Set(0,0,0);

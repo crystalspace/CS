@@ -39,11 +39,11 @@ public:
   ///
   iSoundHandle* GetSound();
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   struct SoundWrapper : public iSoundWrapper
   {
-    DECLARE_EMBEDDED_IBASE(csSoundWrapper);
+    SCF_DECLARE_EMBEDDED_IBASE(csSoundWrapper);
 
     virtual iSoundHandle *GetSound ();
     virtual iObject *QueryObject ();

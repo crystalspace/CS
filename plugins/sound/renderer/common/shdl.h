@@ -25,7 +25,7 @@ struct iSoundData;
 class csSoundHandle : public iSoundHandle
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   // the sound data for this handle
   iSoundData *Data;
   // is this sound registered?

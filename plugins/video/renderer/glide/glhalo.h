@@ -46,7 +46,7 @@ class csGlideHalo : public iHalo
   int oldVerts;
 public:
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   // Create the halo object
   csGlideHalo (float iR, float iG, float iB, int iWidth, int iHeight, csGraphics3DGlide *iG3D, csGlideAlphaMap *am );

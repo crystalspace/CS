@@ -167,8 +167,8 @@ csTextureManagerGlide::~csTextureManagerGlide ()
 void csTextureManagerGlide::PrepareTextures ()
 {
   int i;
-  if (verbose) SysPrintf (MSG_INITIALIZATION, "Preparing textures...\n");
-  if (verbose) SysPrintf (MSG_INITIALIZATION, "  Creating texture mipmaps...\n");
+  if (verbose) SysPrintf (CS_MSG_INITIALIZATION, "Preparing textures...\n");
+  if (verbose) SysPrintf (CS_MSG_INITIALIZATION, "  Creating texture mipmaps...\n");
   for (i = 0 ; i < textures.Length () ; i++)
   {
     csTextureHandle* txt = textures.Get (i);

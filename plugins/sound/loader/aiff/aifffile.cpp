@@ -37,10 +37,10 @@ CS_IMPLEMENT_PLUGIN
 class csSoundLoader_AIFF : public iSoundLoader
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csSoundLoader_AIFF(iBase *p) {
-    CONSTRUCT_IBASE(p);
+    SCF_CONSTRUCT_IBASE(p);
   }
   virtual bool Initialize(iSystem *) {
     return true;
@@ -48,17 +48,17 @@ public:
   virtual iSoundData *LoadSound(void *Buffer, unsigned long Size) const;
 };
 
-IMPLEMENT_IBASE(csSoundLoader_AIFF)
-  IMPLEMENTS_INTERFACE(iSoundLoader)
-  IMPLEMENTS_INTERFACE(iPlugIn)
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csSoundLoader_AIFF)
+  SCF_IMPLEMENTS_INTERFACE(iSoundLoader)
+  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+SCF_IMPLEMENT_IBASE_END;
 
-IMPLEMENT_FACTORY(csSoundLoader_AIFF)
+SCF_IMPLEMENT_FACTORY(csSoundLoader_AIFF)
 
-EXPORT_CLASS_TABLE (sndaiff)
-EXPORT_CLASS (csSoundLoader_AIFF,
+SCF_EXPORT_CLASS_TABLE (sndaiff)
+SCF_EXPORT_CLASS (csSoundLoader_AIFF,
   "crystalspace.sound.loader.aiff", "AIFF Sound Loader")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 #define BIT8 0x0008
 #define BIT16 0x0010

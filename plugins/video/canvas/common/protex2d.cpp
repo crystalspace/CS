@@ -24,16 +24,16 @@
 #include "isys/system.h"
 #include "isys/event.h"
 
-IMPLEMENT_IBASE (csProcTextureSoft2D)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics2D)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csProcTextureSoft2D)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_END
 
 // csProcTextureSoft2D functions
 csProcTextureSoft2D::csProcTextureSoft2D (iSystem *isys) :
   csGraphics2D ()
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   System = isys;
   image_buffer = NULL;
   destroy_memory = false;
@@ -141,7 +141,7 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
   }
 
   // Get the font server, as we've bypassed csGraphics2D::Initialize
-  FontServer = QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iFontServer);
+  FontServer = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iFontServer);
 
   return (iGraphics2D*)this;
 }

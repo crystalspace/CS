@@ -106,7 +106,7 @@ public:
   bool IsMaxColorUsed () const { return use_max_color; }
 
   ///---------------------- iMeshObject implementation ------------------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return factory; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
@@ -148,7 +148,7 @@ public:
   //------------------------- iStarsState implementation ----------------
   class StarsState : public iStarsState
   {
-    DECLARE_EMBEDDED_IBASE (csStarsMeshObject);
+    SCF_DECLARE_EMBEDDED_IBASE (csStarsMeshObject);
     virtual void SetBox (const csBox3& b)
     {
       scfParent->SetBox (b);
@@ -212,7 +212,7 @@ public:
   virtual ~csStarsMeshObjectFactory ();
 
   //------------------------ iMeshObjectFactory implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
@@ -236,7 +236,7 @@ public:
   virtual bool Initialize (iSystem *pSystem);
 
   //------------------------ iMeshObjectType implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// New factory.
   virtual iMeshObjectFactory* NewFactory ();

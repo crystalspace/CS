@@ -273,7 +273,7 @@ struct iMeshWrapper : public iBase
   /**
    * Get the parent of this mesh. This will be either a pointer to the
    * engine or another meshwrapper (or NULL if the mesh is not linked
-   * to anything). Use QUERY_INTERFACE/QUERY_INTERFACE_FAST to see the
+   * to anything). Use SCF_QUERY_INTERFACE/SCF_QUERY_INTERFACE_FAST to see the
    * type of the parent.
    */
   virtual iBase* GetParentContainer () = 0;

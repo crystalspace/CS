@@ -30,7 +30,7 @@ class csGraphics2DDDraw8 : public csGraphics2D, public iGraphics2DDDraw8
 {
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
 protected:
 

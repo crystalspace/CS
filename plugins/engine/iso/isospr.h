@@ -50,7 +50,7 @@ private:
   void *gridcalldata;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   ///
   csIsoSprite(iBase *iParent);

@@ -94,7 +94,7 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed)
   iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
   if (!mat)
   {
-    Sys->Printf (MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
+    Sys->Printf (CS_MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
     return;
   }
 
@@ -102,9 +102,9 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed)
   sector->CalculateSectorBBox (bbox, true, false);
 
   // @@@ Memory leak on factories!
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.rain",
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.rain",
     	  "MeshObj", iMeshObjectType);
-  if (!type) type = LOAD_PLUGIN (System, "crystalspace.mesh.object.rain",
+  if (!type) type = CS_LOAD_PLUGIN (System, "crystalspace.mesh.object.rain",
     	  "MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
@@ -116,13 +116,13 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed)
 
   exp->SetZBufMode(CS_ZBUF_TEST);
 
-  iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
+  iParticleState* partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
   partstate->SetMaterialWrapper (mat);
   partstate->SetMixMode (CS_FX_ADD);
   partstate->SetColor (csColor (.25,.25,.25));
   partstate->DecRef ();
 
-  iRainState* rainstate = QUERY_INTERFACE (mesh, iRainState);
+  iRainState* rainstate = SCF_QUERY_INTERFACE (mesh, iRainState);
   rainstate->SetParticleCount (num);
   rainstate->SetDropSize (.3/50., .3);
   rainstate->SetLighting (false);
@@ -140,7 +140,7 @@ void add_particles_snow (iSector* sector, char* matname, int num, float speed)
   iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
   if (!mat)
   {
-    Sys->Printf (MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
+    Sys->Printf (CS_MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
     return;
   }
 
@@ -148,9 +148,9 @@ void add_particles_snow (iSector* sector, char* matname, int num, float speed)
   sector->CalculateSectorBBox (bbox, true, false);
 
   // @@@ Memory leak on factories!
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.snow",
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.snow",
     	  "MeshObj", iMeshObjectType);
-  if (!type) type = LOAD_PLUGIN (System, "crystalspace.mesh.object.snow",
+  if (!type) type = CS_LOAD_PLUGIN (System, "crystalspace.mesh.object.snow",
     	  "MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
@@ -162,13 +162,13 @@ void add_particles_snow (iSector* sector, char* matname, int num, float speed)
 
   exp->SetZBufMode(CS_ZBUF_TEST);
 
-  iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
+  iParticleState* partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
   partstate->SetMaterialWrapper (mat);
   partstate->SetMixMode (CS_FX_ADD);
   partstate->SetColor (csColor (.25,.25,.25));
   partstate->DecRef ();
 
-  iSnowState* snowstate = QUERY_INTERFACE (mesh, iSnowState);
+  iSnowState* snowstate = SCF_QUERY_INTERFACE (mesh, iSnowState);
   snowstate->SetParticleCount (num);
   snowstate->SetDropSize (.07, .07);
   snowstate->SetLighting (false);
@@ -188,14 +188,14 @@ void add_particles_fire (iSector* sector, char* matname, int num,
   iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
   if (!mat)
   {
-    Sys->Printf (MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
+    Sys->Printf (CS_MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
     return;
   }
 
   // @@@ Memory leak on factories!
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.fire",
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.fire",
       	"MeshObj", iMeshObjectType);
-  if (!type) type = LOAD_PLUGIN (System, "crystalspace.mesh.object.fire",
+  if (!type) type = CS_LOAD_PLUGIN (System, "crystalspace.mesh.object.fire",
       	"MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
@@ -207,12 +207,12 @@ void add_particles_fire (iSector* sector, char* matname, int num,
 
   exp->SetZBufMode(CS_ZBUF_TEST);
 
-  iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
+  iParticleState* partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
   partstate->SetMaterialWrapper (mat);
   partstate->SetMixMode (CS_FX_ADD);
   partstate->DecRef ();
 
-  iFireState* firestate = QUERY_INTERFACE (mesh, iFireState);
+  iFireState* firestate = SCF_QUERY_INTERFACE (mesh, iFireState);
   firestate->SetParticleCount (num);
   //firestate->SetDropSize (.02, .04);
   firestate->SetDropSize (.04, .08);
@@ -235,14 +235,14 @@ void add_particles_fountain (iSector* sector, char* matname, int num,
   iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
   if (!mat)
   {
-    Sys->Printf (MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
+    Sys->Printf (CS_MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
     return;
   }
 
   // @@@ Memory leak on factories!
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.fountain",
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.fountain",
       	"MeshObj", iMeshObjectType);
-  if (!type) type = LOAD_PLUGIN (System, "crystalspace.mesh.object.fountain",
+  if (!type) type = CS_LOAD_PLUGIN (System, "crystalspace.mesh.object.fountain",
       	"MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
@@ -254,14 +254,14 @@ void add_particles_fountain (iSector* sector, char* matname, int num,
 
   exp->SetZBufMode(CS_ZBUF_TEST);
 
-  iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
+  iParticleState* partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
   partstate->SetMaterialWrapper (mat);
   partstate->SetMixMode (CS_FX_ADD);
   partstate->SetColor (csColor (.25, .35, .55));
   partstate->SetChangeRotation (7.5);
   partstate->DecRef ();
 
-  iFountainState* fountstate = QUERY_INTERFACE (mesh, iFountainState);
+  iFountainState* fountstate = SCF_QUERY_INTERFACE (mesh, iFountainState);
   fountstate->SetParticleCount (num);
   fountstate->SetDropSize (.1, .1);
   fountstate->SetOrigin (csVector3 (0, 0, 0));
@@ -283,14 +283,14 @@ void add_particles_explosion (iSector* sector, const csVector3& center, char* ma
   iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
   if (!mat)
   {
-    Sys->Printf (MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
+    Sys->Printf (CS_MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
     return;
   }
 
   // @@@ Memory leak on factories!
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.explosion",
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.explosion",
       	"MeshObj", iMeshObjectType);
-  if (!type) type = LOAD_PLUGIN (System, "crystalspace.mesh.object.explosion",
+  if (!type) type = CS_LOAD_PLUGIN (System, "crystalspace.mesh.object.explosion",
       	"MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
@@ -302,7 +302,7 @@ void add_particles_explosion (iSector* sector, const csVector3& center, char* ma
 
   exp->SetZBufMode(CS_ZBUF_TEST);
 
-  iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
+  iParticleState* partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
   partstate->SetMaterialWrapper (mat);
   partstate->SetMixMode (CS_FX_SETALPHA (0.50));
   partstate->SetColor (csColor (1, 1, 0));
@@ -311,7 +311,7 @@ void add_particles_explosion (iSector* sector, const csVector3& center, char* ma
   partstate->SetSelfDestruct (3000);
   partstate->DecRef ();
 
-  iExplosionState* expstate = QUERY_INTERFACE (mesh, iExplosionState);
+  iExplosionState* expstate = SCF_QUERY_INTERFACE (mesh, iExplosionState);
   expstate->SetParticleCount (100);
   expstate->SetCenter (csVector3 (0, 0, 0));
   expstate->SetPush (csVector3 (0, 0, 0));
@@ -335,14 +335,14 @@ void add_particles_spiral (iSector* sector, const csVector3& bottom, char* matna
   iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
   if (!mat)
   {
-    Sys->Printf (MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
+    Sys->Printf (CS_MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
     return;
   }
 
   // @@@ Memory leak on factories!
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.spiral",
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.spiral",
       	"MeshObj", iMeshObjectType);
-  if (!type) type = LOAD_PLUGIN (System, "crystalspace.mesh.object.spiral",
+  if (!type) type = CS_LOAD_PLUGIN (System, "crystalspace.mesh.object.spiral",
       	"MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
@@ -354,14 +354,14 @@ void add_particles_spiral (iSector* sector, const csVector3& bottom, char* matna
 
   exp->SetZBufMode(CS_ZBUF_TEST);
 
-  iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
+  iParticleState* partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
   partstate->SetMaterialWrapper (mat);
   partstate->SetMixMode (CS_FX_SETALPHA (0.50));
   partstate->SetColor (csColor (1, 1, 0));
   partstate->SetChangeColor (csColor(+0.01,0.,-0.012));
   partstate->DecRef ();
 
-  iSpiralState* spirstate = QUERY_INTERFACE (mesh, iSpiralState);
+  iSpiralState* spirstate = SCF_QUERY_INTERFACE (mesh, iSpiralState);
   spirstate->SetParticleCount (500);
   spirstate->SetSource (csVector3 (0, 0, 0));
   spirstate->DecRef ();
@@ -437,7 +437,7 @@ void add_tree_limbs (iSprite3DFactoryState* state, iSpriteFrame* frame,
                                                  csXRotMatrix3(.15);
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
     con->SetTransformation (trans);
-    iSkeletonLimb* ilimb = QUERY_INTERFACE (con, iSkeletonLimb);
+    iSkeletonLimb* ilimb = SCF_QUERY_INTERFACE (con, iSkeletonLimb);
     add_tree_limbs (state, frame, ilimb,
     	vertex_idx, par_vertex_idx, maxdepth, width, recursion+1);
     ilimb->DecRef ();
@@ -450,7 +450,7 @@ iSkeleton* create_skeltree (iSprite3DFactoryState* state, iSpriteFrame* frame,
 {
   state->EnableSkeletalAnimation ();
   iSkeleton* skel = state->GetSkeleton ();
-  iSkeletonLimb* ilimb = QUERY_INTERFACE (skel, iSkeletonLimb);
+  iSkeletonLimb* ilimb = SCF_QUERY_INTERFACE (skel, iSkeletonLimb);
   add_tree_limbs (state, frame, ilimb,
   	vertex_idx, 0, maxdepth, width, 0);
   ilimb->DecRef ();
@@ -517,7 +517,7 @@ void animate_skeleton_tree (iSkeletonLimbState* limb)
     	csZRotMatrix3 (o->z_angle + o->z_angle_base) *
 	csXRotMatrix3 (o->x_angle + o->x_angle_base);
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
-    iSkeletonConnectionState* con = QUERY_INTERFACE (child, iSkeletonConnectionState);
+    iSkeletonConnectionState* con = SCF_QUERY_INTERFACE (child, iSkeletonConnectionState);
     con->SetTransformation (trans);
     con->DecRef ();
     animate_skeleton_tree (child);
@@ -527,27 +527,27 @@ void animate_skeleton_tree (iSkeletonLimbState* limb)
 
 struct AnimSkelTree : public iMeshDrawCallback
 {
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   AnimSkelTree ();
   virtual bool BeforeDrawing (iMeshWrapper* spr, iRenderView* rview);
 };
 
 
-IMPLEMENT_IBASE (AnimSkelTree)
-  IMPLEMENTS_INTERFACE (iMeshDrawCallback)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (AnimSkelTree)
+  SCF_IMPLEMENTS_INTERFACE (iMeshDrawCallback)
+SCF_IMPLEMENT_IBASE_END
 
 AnimSkelTree::AnimSkelTree ()
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 bool AnimSkelTree::BeforeDrawing (iMeshWrapper* spr, iRenderView* /*rview*/)
 {
   iMeshObject* obj = spr->GetMeshObject ();
-  iSprite3DState* state = QUERY_INTERFACE (obj, iSprite3DState);
+  iSprite3DState* state = SCF_QUERY_INTERFACE (obj, iSprite3DState);
   iSkeletonState* sk_state = state->GetSkeletonState ();
-  animate_skeleton_tree (QUERY_INTERFACE (sk_state, iSkeletonLimbState));
+  animate_skeleton_tree (SCF_QUERY_INTERFACE (sk_state, iSkeletonLimbState));
   state->DecRef ();
   return true;
 }
@@ -566,11 +566,11 @@ void add_skeleton_tree (iSector* where, csVector3 const& pos, int depth,
     	"crystalspace.mesh.object.sprite.3d", skelname);
     if (tmpl == NULL)
     {
-      CsPrintf (MSG_WARNING, "Could not load the sprite 3d plugin!\n");
+      CsPrintf (CS_MSG_WARNING, "Could not load the sprite 3d plugin!\n");
       return;
     }
     iMeshObjectFactory* fact = tmpl->GetMeshObjectFactory ();
-    iSprite3DFactoryState* state = QUERY_INTERFACE (fact, iSprite3DFactoryState);
+    iSprite3DFactoryState* state = SCF_QUERY_INTERFACE (fact, iSprite3DFactoryState);
     state->SetMaterialWrapper (Sys->Engine->FindMaterial ("white"));
     int vertex_idx = 0;
     iSpriteFrame* fr = state->AddFrame ();
@@ -615,12 +615,12 @@ class GhostSpriteInfo : public csObject
 public:
   float dir;
 
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
 };
 
-IMPLEMENT_IBASE_EXT (GhostSpriteInfo)
-  IMPLEMENTS_INTERFACE (GhostSpriteInfo)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (GhostSpriteInfo)
+  SCF_IMPLEMENTS_INTERFACE (GhostSpriteInfo)
+SCF_IMPLEMENT_IBASE_EXT_END
 
 // Recursive function to add limbs to a skeletal ghost. This also builds
 // the sprite template.
@@ -684,7 +684,7 @@ void add_ghost_limbs (iSprite3DFactoryState* state, iSpriteFrame* frame,
 	csXRotMatrix3 (.15);
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
     con->SetTransformation (trans);
-    iSkeletonLimb* ilimb = QUERY_INTERFACE (con, iSkeletonLimb);
+    iSkeletonLimb* ilimb = SCF_QUERY_INTERFACE (con, iSkeletonLimb);
     add_ghost_limbs (state, frame, ilimb,
     	vertex_idx, par_vertex_idx,
     	maxdepth, 1, recursion+1, dim * .7);
@@ -698,7 +698,7 @@ iSkeleton* create_skelghost (iSprite3DFactoryState* state, iSpriteFrame* frame,
 {
   state->EnableSkeletalAnimation ();
   iSkeleton* skel = state->GetSkeleton ();
-  iSkeletonLimb* ilimb = QUERY_INTERFACE (skel, iSkeletonLimb);
+  iSkeletonLimb* ilimb = SCF_QUERY_INTERFACE (skel, iSkeletonLimb);
   add_ghost_limbs (state, frame, ilimb,
   	vertex_idx, 0, maxdepth, width, 0, .2);
   ilimb->DecRef ();
@@ -750,7 +750,7 @@ void animate_skeleton_ghost (iSkeletonLimbState* limb)
     	csZRotMatrix3 (o->z_angle + o->z_angle_base) *
 	csXRotMatrix3 (o->x_angle + o->x_angle_base);
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
-    iSkeletonConnectionState* con = QUERY_INTERFACE (child, iSkeletonConnectionState);
+    iSkeletonConnectionState* con = SCF_QUERY_INTERFACE (child, iSkeletonConnectionState);
     con->SetTransformation (trans);
     con->DecRef ();
     animate_skeleton_ghost (child);
@@ -760,27 +760,27 @@ void animate_skeleton_ghost (iSkeletonLimbState* limb)
 
 struct AnimSkelGhost : public iMeshDrawCallback
 {
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   AnimSkelGhost ();
   virtual bool BeforeDrawing (iMeshWrapper* spr, iRenderView* rview);
 };
 
 
-IMPLEMENT_IBASE (AnimSkelGhost)
-  IMPLEMENTS_INTERFACE (iMeshDrawCallback)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (AnimSkelGhost)
+  SCF_IMPLEMENTS_INTERFACE (iMeshDrawCallback)
+SCF_IMPLEMENT_IBASE_END
 
 AnimSkelGhost::AnimSkelGhost ()
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 bool AnimSkelGhost::BeforeDrawing (iMeshWrapper* spr, iRenderView* /*rview*/)
 {
   iMeshObject* obj = spr->GetMeshObject ();
-  iSprite3DState* state = QUERY_INTERFACE (obj, iSprite3DState);
+  iSprite3DState* state = SCF_QUERY_INTERFACE (obj, iSprite3DState);
   iSkeletonState* sk_state = state->GetSkeletonState ();
-  iSkeletonLimbState* isk_limb = QUERY_INTERFACE (sk_state, iSkeletonLimbState);
+  iSkeletonLimbState* isk_limb = SCF_QUERY_INTERFACE (sk_state, iSkeletonLimbState);
   animate_skeleton_ghost (isk_limb);
   isk_limb->DecRef ();
   state->DecRef ();
@@ -801,11 +801,11 @@ void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
     	"crystalspace.mesh.object.sprite.3d", skelname);
     if (tmpl == NULL)
     {
-      CsPrintf (MSG_WARNING, "Could not load the sprite 3d plugin!\n");
+      CsPrintf (CS_MSG_WARNING, "Could not load the sprite 3d plugin!\n");
       return;
     }
     iMeshObjectFactory* fact = tmpl->GetMeshObjectFactory ();
-    iSprite3DFactoryState* state = QUERY_INTERFACE (fact, iSprite3DFactoryState);
+    iSprite3DFactoryState* state = SCF_QUERY_INTERFACE (fact, iSprite3DFactoryState);
     state->SetMaterialWrapper (Sys->Engine->FindMaterial ("green"));
     int vertex_idx = 0;
     iSpriteFrame* fr = state->AddFrame ();
@@ -818,13 +818,13 @@ void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
   }
   iMeshWrapper* spr = add_meshobj (skelname, "__skelghost__", where, pos, 1);
   iMeshObject* obj = spr->GetMeshObject ();
-  iSprite3DState* state = QUERY_INTERFACE (obj, iSprite3DState);
+  iSprite3DState* state = SCF_QUERY_INTERFACE (obj, iSprite3DState);
   state->SetMixMode (CS_FX_SETALPHA (0.75));
-  iPolygonMesh* mesh = QUERY_INTERFACE (obj, iPolygonMesh);
-  iObject* sprobj = QUERY_INTERFACE (spr, iObject);
+  iPolygonMesh* mesh = SCF_QUERY_INTERFACE (obj, iPolygonMesh);
+  iObject* sprobj = SCF_QUERY_INTERFACE (spr, iObject);
   (void)new csColliderWrapper (sprobj, Sys->collide_system, mesh);
   GhostSpriteInfo* gh_info = new GhostSpriteInfo ();
-  iObject* iobj = QUERY_INTERFACE (gh_info, iObject);
+  iObject* iobj = SCF_QUERY_INTERFACE (gh_info, iObject);
   sprobj->ObjAdd (iobj);
   gh_info->dir = 1;
   AnimSkelGhost* cb = new AnimSkelGhost ();
@@ -955,7 +955,7 @@ void add_bot (float size, iSector* where, csVector3 const& pos,
   bot->set_bot_move (pos);
   bot->set_bot_sector (where);
   bot->GetMovable ().UpdateMove ();
-  iSprite3DState* state = QUERY_INTERFACE (botmesh, iSprite3DState);
+  iSprite3DState* state = SCF_QUERY_INTERFACE (botmesh, iSprite3DState);
   state->SetAction ("default");
   state->DecRef ();
   bot->next = first_bot;
@@ -1025,7 +1025,7 @@ struct RandomLight
 void HandleDynLight (iDynLight* dyn)
 {
   LightStruct* ls = (LightStruct*)(csDataObject::GetData(dyn->QueryObject ()));
-  iLight* l = QUERY_INTERFACE (dyn, iLight);
+  iLight* l = SCF_QUERY_INTERFACE (dyn, iLight);
   l->DecRef ();
   switch (ls->type)
   {
@@ -1167,7 +1167,7 @@ void fire_missile ()
 
   iMeshFactoryWrapper *tmpl = Sys->view->GetEngine ()->FindMeshFactory (misname);
   if (!tmpl)
-    Sys->Printf (MSG_CONSOLE, "Could not find '%s' sprite factory!\n", misname);
+    Sys->Printf (CS_MSG_CONSOLE, "Could not find '%s' sprite factory!\n", misname);
   else
   {
     iMeshWrapper* sp = Sys->view->GetEngine ()->CreateMeshObject (tmpl, "missile");
@@ -1205,7 +1205,7 @@ void light_statics ()
   for (int i = 0 ; i < e->GetMeshObjectCount () ; i++)
   {
     iMeshWrapper* sp = e->GetMeshObject (i);
-    iSprite3DState* state = QUERY_INTERFACE (sp->GetMeshObject (), iSprite3DState);
+    iSprite3DState* state = SCF_QUERY_INTERFACE (sp->GetMeshObject (), iSprite3DState);
     if (state != NULL)
     {
       if (state->GetSkeletonState ())
@@ -1224,7 +1224,7 @@ void light_statics ()
 static iMeshWrapper* CreateMeshWrapper (const char* name)
 {
   iMeshObjectFactory* thing_fact = Sys->Engine->GetThingType ()->NewFactory ();
-  iMeshObject* mesh_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
+  iMeshObject* mesh_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
 
   iMeshWrapper* mesh_wrap = Sys->Engine->CreateMeshObject (mesh_obj, name);
@@ -1236,7 +1236,7 @@ iMeshWrapper* CreatePortalThing (const char* name, iSector* room,
     	iMaterialWrapper* tm, iPolygon3D*& portalPoly)
 {
   iMeshWrapper* thing = CreateMeshWrapper (name);
-  iThingState* thing_state = QUERY_INTERFACE (thing->GetMeshObject (),
+  iThingState* thing_state = SCF_QUERY_INTERFACE (thing->GetMeshObject (),
   	iThingState);
   thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
   thing->GetMovable ()->SetSector (room);
@@ -1427,7 +1427,7 @@ iMeshWrapper* CreatePortalThing (const char* name, iSector* room,
   portalPoly = p;
   thing_state->DecRef ();
 
-  iLightingInfo* linfo = QUERY_INTERFACE (thing->GetMeshObject (),
+  iLightingInfo* linfo = SCF_QUERY_INTERFACE (thing->GetMeshObject (),
     iLightingInfo);
   linfo->InitializeDefault ();
   room->ShineLights (thing);
@@ -1490,7 +1490,7 @@ void OpenPortal (iLoader *LevelLoader, csView* view, char* lev)
       thingBack->GetMovable ()->SetPosition (topos + csVector3 (0, Sys->cfg_legs_offset, -.1));
       thingBack->GetMovable ()->Transform (csYRotMatrix3 (M_PI));//view->GetCamera ()->GetW2C ());
       thingBack->GetMovable ()->UpdateMove ();
-      iSector* iroom = QUERY_INTERFACE (room, iSector);
+      iSector* iroom = SCF_QUERY_INTERFACE (room, iSector);
       iPortal* portalBack = portalPolyBack->CreatePortal (iroom);
       iroom->DecRef ();
       portalBack->GetFlags ().Set (CS_PORTAL_ZFILL);

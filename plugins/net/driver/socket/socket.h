@@ -51,10 +51,10 @@ public:
   virtual csNetworkDriverError GetLastError() const
     { return superclass::GetLastError(); }
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   struct csSocket : public iNetworkSocket
   {
-    DECLARE_EMBEDDED_IBASE(csSocketConnection);
+    SCF_DECLARE_EMBEDDED_IBASE(csSocketConnection);
     virtual csNetworkSocket GetSocket() const;
   } scfiNetworkSocket;
 };
@@ -73,10 +73,10 @@ public:
   virtual csNetworkDriverError GetLastError() const
     { return superclass::GetLastError(); }
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   struct csSocket : public iNetworkSocket
   {
-    DECLARE_EMBEDDED_IBASE(csSocketListener);
+    SCF_DECLARE_EMBEDDED_IBASE(csSocketListener);
     virtual csNetworkSocket GetSocket() const;
   } scfiNetworkSocket;
 };
@@ -118,7 +118,7 @@ public:
   virtual iNetworkListener* NewListener(const char* source,
     bool reliable, bool blockingListener, bool blockingConnection);
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 };
 
 #endif // __CS_SOCKET_H__

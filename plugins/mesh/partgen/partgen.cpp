@@ -31,19 +31,19 @@
 #include <math.h>
 #include <stdlib.h>
 
-IMPLEMENT_IBASE (csParticleSystem)
-  IMPLEMENTS_INTERFACE (iMeshObject)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iParticleState)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csParticleSystem)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iParticleState)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csParticleSystem::ParticleState)
-  IMPLEMENTS_INTERFACE (iParticleState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csParticleSystem::ParticleState)
+  SCF_IMPLEMENTS_INTERFACE (iParticleState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csParticleSystem::csParticleSystem (iSystem* system, iMeshObjectFactory* factory)
 {
-  CONSTRUCT_IBASE (factory);
-  CONSTRUCT_EMBEDDED_IBASE (scfiParticleState);
+  SCF_CONSTRUCT_IBASE (factory);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticleState);
   initialized = false;
   csParticleSystem::factory = factory;
   particles.SetLength (0);
@@ -62,9 +62,9 @@ csParticleSystem::csParticleSystem (iSystem* system, iMeshObjectFactory* factory
   vis_cb = NULL;
   mat = NULL;
 
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (system, "crystalspace.mesh.object.sprite.2d",
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (system, "crystalspace.mesh.object.sprite.2d",
       "MeshObj", iMeshObjectType);
-  if (!type) type = LOAD_PLUGIN (system, "crystalspace.mesh.object.sprite.2d", "MeshObj", iMeshObjectType);
+  if (!type) type = CS_LOAD_PLUGIN (system, "crystalspace.mesh.object.sprite.2d", "MeshObj", iMeshObjectType);
   spr_factory = type->NewFactory ();
   type->DecRef ();
   shapenr = 0;
@@ -92,8 +92,8 @@ void csParticleSystem::AppendRectSprite (float width, float height,
   iMaterialWrapper *mat, bool lighted)
 {
   iMeshObject* sprmesh = spr_factory->NewInstance ();
-  iParticle* part = QUERY_INTERFACE (sprmesh, iParticle);
-  iSprite2DState* state = QUERY_INTERFACE (sprmesh, iSprite2DState);
+  iParticle* part = SCF_QUERY_INTERFACE (sprmesh, iParticle);
+  iSprite2DState* state = SCF_QUERY_INTERFACE (sprmesh, iSprite2DState);
   csColoredVertices& vs = state->GetVertices();
 
   vs.SetLimit (4);
@@ -121,8 +121,8 @@ void csParticleSystem::AppendRegularSprite (int n, float radius,
   iMaterialWrapper* mat, bool lighted)
 {
   iMeshObject* sprmesh = spr_factory->NewInstance ();
-  iParticle* part = QUERY_INTERFACE (sprmesh, iParticle);
-  iSprite2DState* state = QUERY_INTERFACE (sprmesh, iSprite2DState);
+  iParticle* part = SCF_QUERY_INTERFACE (sprmesh, iParticle);
+  iSprite2DState* state = SCF_QUERY_INTERFACE (sprmesh, iSprite2DState);
   state->CreateRegularVertices (n, true);
   part->ScaleBy (radius);
   if (mat) state->SetMaterialWrapper (mat);

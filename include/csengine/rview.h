@@ -124,7 +124,7 @@ public:
     callback->DrawFunc (this, type, data);
   }
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Get the current render context.
   virtual csRenderContext* GetRenderContext () { return ctxt; }

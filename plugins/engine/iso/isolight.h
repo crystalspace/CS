@@ -51,7 +51,7 @@ private:
   csIsoFakeLight *fakelight;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   ///
   csIsoLight (iBase *iParent);
@@ -92,7 +92,7 @@ class csIsoFakeLight : public iLight {
   csIsoLight *isolight;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csIsoFakeLight(csIsoLight *par) {isolight = par;}
   virtual ~csIsoFakeLight() {}

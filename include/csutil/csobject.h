@@ -26,7 +26,7 @@
 
 /**
  * A generic csObject class. Any csObject can have any number of iObject
- * children attached to it. You can use QUERY_INTERFACE to get interfaces
+ * children attached to it. You can use SCF_QUERY_INTERFACE to get interfaces
  * from the child objects.
  */ 
 class csObject : public iObject
@@ -100,7 +100,7 @@ public:
    */
   virtual iObjectIterator *GetIterator ();
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   // @@@ temporary fix
   virtual void ObjReleaseOld (iObject *obj);

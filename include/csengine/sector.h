@@ -499,12 +499,12 @@ public:
   /// Disable fog.
   void DisableFog () { fog.enabled = false; }
 
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
 
   //-------------------- iReferencedObject interface --------------------------
   struct ReferencedObject : public iReferencedObject
   {
-    DECLARE_EMBEDDED_IBASE (csSector);
+    SCF_DECLARE_EMBEDDED_IBASE (csSector);
     virtual void AddReference (iReference* ref);
     virtual void RemoveReference (iReference* ref);
   } scfiReferencedObject;
@@ -513,7 +513,7 @@ public:
   //------------------------- iSector interface -------------------------------
   struct eiSector : public iSector
   {
-    DECLARE_EMBEDDED_IBASE (csSector);
+    SCF_DECLARE_EMBEDDED_IBASE (csSector);
 
     virtual csSector *GetPrivateObject ()
     { return (csSector*)scfParent; }

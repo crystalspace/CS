@@ -111,7 +111,7 @@ public:
   void CreateRegularVertices (int n, bool setuv);
 
   ///------------------------ iMeshObject implementation ------------------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
@@ -153,7 +153,7 @@ public:
   //------------------------- iSprite2DState implementation ----------------
   class Sprite2DState : public iSprite2DState
   {
-    DECLARE_EMBEDDED_IBASE (csSprite2DMeshObject);
+    SCF_DECLARE_EMBEDDED_IBASE (csSprite2DMeshObject);
     virtual void SetLighting (bool l) { scfParent->initialized = false; scfParent->lighting = l; }
     virtual bool HasLighting () const { return scfParent->lighting; }
     virtual void SetMaterialWrapper (iMaterialWrapper* material)
@@ -192,7 +192,7 @@ public:
     csVector3 part_pos;
 
   public:
-    DECLARE_EMBEDDED_IBASE (csSprite2DMeshObject);
+    SCF_DECLARE_EMBEDDED_IBASE (csSprite2DMeshObject);
     virtual void SetPosition (const csVector3& pos) { part_pos = pos; }
     virtual void MovePosition (const csVector3& move) { part_pos += move; }
     virtual void SetColor (const csColor& col);
@@ -283,7 +283,7 @@ class csSprite2DMeshObjectFactory : public iMeshObjectFactory
   }
 
   //------------------------ iMeshObjectFactory implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
@@ -292,7 +292,7 @@ class csSprite2DMeshObjectFactory : public iMeshObjectFactory
   //------------------------- iSprite2DFactoryState implementation ----------------
   class Sprite2DFactoryState : public iSprite2DFactoryState
   {
-    DECLARE_EMBEDDED_IBASE (csSprite2DMeshObjectFactory);
+    SCF_DECLARE_EMBEDDED_IBASE (csSprite2DMeshObjectFactory);
     virtual void SetLighting (bool l) { scfParent->lighting = l; }
     virtual bool HasLighting () const { return scfParent->HasLighting (); }
     virtual void SetMaterialWrapper (iMaterialWrapper* material)
@@ -334,7 +334,7 @@ public:
   virtual bool Initialize (iSystem *pSystem);
 
   //------------------------ iMeshObjectType implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// New Factory.
   virtual iMeshObjectFactory* NewFactory ();

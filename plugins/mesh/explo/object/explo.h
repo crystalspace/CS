@@ -183,12 +183,12 @@ public:
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
 
-  DECLARE_IBASE_EXT (csParticleSystem);
+  SCF_DECLARE_IBASE_EXT (csParticleSystem);
 
   //------------------------- iExplosionState implementation ----------------
   class ExplosionState : public iExplosionState
   {
-    DECLARE_EMBEDDED_IBASE (csExploMeshObject);
+    SCF_DECLARE_EMBEDDED_IBASE (csExploMeshObject);
     virtual void SetParticleCount (int num)
     {
       scfParent->SetParticleCount (num);
@@ -293,7 +293,7 @@ public:
   virtual ~csExploMeshObjectFactory ();
 
   //------------------------ iMeshObjectFactory implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
@@ -320,7 +320,7 @@ public:
   virtual bool Initialize (iSystem *pSystem);
 
   //------------------------ iMeshObjectType implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Draw.
   virtual iMeshObjectFactory* NewFactory ();

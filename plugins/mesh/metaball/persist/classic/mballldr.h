@@ -46,7 +46,7 @@ public:
 
 public:
   //------------------------ iLoaderPlugIn implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
@@ -72,7 +72,7 @@ public:
 
 public:
   //------------------------ iSaverPlugIn implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
@@ -98,7 +98,7 @@ public:
 
 public:
   //------------------------ iLoaderPlugIn implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
@@ -124,7 +124,7 @@ public:
 
 public:
   //------------------------ iSaverPlugIn implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);

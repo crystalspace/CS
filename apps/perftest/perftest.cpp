@@ -44,8 +44,8 @@ PerfTest::PerfTest ()
 
 PerfTest::~PerfTest ()
 {
-  DEC_REF (myG3D);
-  DEC_REF (myVFS);
+  SCF_DEC_REF (myG3D);
+  SCF_DEC_REF (myVFS);
   if (ImageLoader) ImageLoader->DecRef();
 }
 
@@ -62,7 +62,7 @@ iMaterialHandle* PerfTest::LoadMaterial (char* file)
   iDataBuffer *buf = myVFS->ReadFile (file);
   if (!buf || !buf->GetSize ())
   {
-    Printf (MSG_FATAL_ERROR, "Error loading texture '%s'!\n", file);
+    Printf (CS_MSG_FATAL_ERROR, "Error loading texture '%s'!\n", file);
     exit (-1);
   }
   image = ImageLoader->Load (buf->GetUint8 (), buf->GetSize (),
@@ -85,26 +85,26 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("Crystal Space Graphics Performance Tester"))
   {
-    Printf (MSG_FATAL_ERROR, "Error opening system!\n");
+    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     cleanup ();
     exit (1);
   }
 
-  ImageLoader = QUERY_PLUGIN_ID(this, CS_FUNCID_IMGLOADER, iImageIO);
+  ImageLoader = CS_QUERY_PLUGIN_ID(this, CS_FUNCID_IMGLOADER, iImageIO);
   if (!ImageLoader) {
-    Printf (MSG_FATAL_ERROR, "No image loader plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No image loader plugin!\n");
     return false;
   }
 
-  myG3D = QUERY_PLUGIN_ID(this, CS_FUNCID_VIDEO, iGraphics3D);
+  myG3D = CS_QUERY_PLUGIN_ID(this, CS_FUNCID_VIDEO, iGraphics3D);
   if (!myG3D) {
-    Printf (MSG_FATAL_ERROR, "No iGraphics3D loader plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D loader plugin!\n");
     return false;
   }
 
-  myVFS = QUERY_PLUGIN_ID(this, CS_FUNCID_VFS, iVFS);
+  myVFS = CS_QUERY_PLUGIN_ID(this, CS_FUNCID_VFS, iVFS);
   if (!myVFS) {
-    Printf (MSG_FATAL_ERROR, "No iVFS loader plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iVFS loader plugin!\n");
     return false;
   }
 
@@ -132,7 +132,7 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   txtmgr->SetPalette ();
 
   // Some commercials...
-  Printf (MSG_INITIALIZATION,
+  Printf (CS_MSG_INITIALIZATION,
     "Crystal Space 3D Performance Tester 0.1.\n");
 
   txtmgr->SetPalette ();
@@ -181,7 +181,7 @@ void PerfTest::NextFrame ()
     {
       test_skip = false;
       float totalelapsed = float(current_time - last_time)/1000.f;
-      Printf (MSG_INITIALIZATION, "%f FPS\n",
+      Printf (CS_MSG_INITIALIZATION, "%f FPS\n",
       	current_tester->GetCount ()/totalelapsed);
       Tester* next_tester = current_tester->NextTester ();
       delete current_tester;
@@ -210,7 +210,7 @@ void PerfTest::NextFrame ()
   if (needs_setup)
   {
     if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-    iConsoleOutput *Console = QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsoleOutput);
+    iConsoleOutput *Console = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsoleOutput);
     if (Console)
     {
       Console->Clear ();
@@ -219,7 +219,7 @@ void PerfTest::NextFrame ()
     last_time = current_time;
     char desc[255];
     current_tester->Description (desc);
-    Printf (MSG_INITIALIZATION, desc);
+    Printf (CS_MSG_INITIALIZATION, desc);
     needs_setup = false;
   }
 
@@ -269,7 +269,7 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
   {
-    System->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
+    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
     cleanup ();
     exit (1);
   }

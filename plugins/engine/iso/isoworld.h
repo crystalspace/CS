@@ -36,7 +36,7 @@ class csIsoWorld : public iIsoWorld {
 private:
   csIsoGridListNode *gridlist;
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   ///
   csIsoWorld (iBase *iParent);

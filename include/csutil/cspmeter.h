@@ -25,7 +25,7 @@
 /**
  * The csProgressMeter class displays a simple percentage-style textual
  * progress meter.  By default, the meter is presented to the user by passing
- * MSG_INITIALIZATION to the system print function.  This setting may be
+ * CS_MSG_INITIALIZATION to the system print function.  This setting may be
  * changed with the SetMessageType() method.  After constructing a progress
  * meter, call SetTotal() to set the total number of steps represented by the
  * meter.  The default is 100.  To animate the meter, call the Step() method
@@ -48,7 +48,7 @@ class csProgressMeter
 {
 private:
   iSystem* sys;
-  int type;	// One of MSG_INITIALIZATION, MSG_CONSOLE, MSG_STDOUT, etc.
+  int type;	// One of CS_MSG_INITIALIZATION, CS_MSG_CONSOLE, CS_MSG_STDOUT, etc.
   int granularity;
   int tick_scale;
   int total;
@@ -57,7 +57,7 @@ private:
 
 public:
   /// Constructs a new progress meter.
-  csProgressMeter(iSystem*, int total = 100, int type = MSG_INITIALIZATION);
+  csProgressMeter(iSystem*, int total = 100, int type = CS_MSG_INITIALIZATION);
   /// Destroys the progress meter.
   ~csProgressMeter() {}
 

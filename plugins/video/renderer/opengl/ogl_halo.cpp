@@ -43,7 +43,7 @@ class csOpenGLHalo : public iHalo
   csGraphics3DOGLCommon *G3D;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha, 
     int iWidth, int iHeight, csGraphics3DOGLCommon *iG3D);
@@ -63,14 +63,14 @@ public:
     csVector2 *iVertices, int iVertCount);
 };
 
-IMPLEMENT_IBASE (csOpenGLHalo)
-  IMPLEMENTS_INTERFACE (iHalo)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csOpenGLHalo)
+  SCF_IMPLEMENTS_INTERFACE (iHalo)
+SCF_IMPLEMENT_IBASE_END
 
 csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
   int iWidth, int iHeight, csGraphics3DOGLCommon *iG3D)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
 
   // Initialization
   R = iR; G = iG; B = iB;

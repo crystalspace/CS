@@ -28,22 +28,22 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csGraphics3DSoftware)
-IMPLEMENT_FACTORY (csSoftProcTexture3D)
+SCF_IMPLEMENT_FACTORY (csGraphics3DSoftware)
+SCF_IMPLEMENT_FACTORY (csSoftProcTexture3D)
 
-EXPORT_CLASS_TABLE (soft3d)
-  EXPORT_CLASS_DEP (csGraphics3DSoftware, "crystalspace.graphics3d.software",
+SCF_EXPORT_CLASS_TABLE (soft3d)
+  SCF_EXPORT_CLASS_DEP (csGraphics3DSoftware, "crystalspace.graphics3d.software",
     "Software 3D graphics driver for Crystal Space", "crystalspace.font.server.")
-  EXPORT_CLASS (csSoftProcTexture3D, 
+  SCF_EXPORT_CLASS (csSoftProcTexture3D, 
     "crystalspace.graphics3d.software.offscreen",
     "Software 3D off screen driver")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csGraphics3DSoftware)
-  IMPLEMENTS_INTERFACE (iGraphics3D)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics3DSoftware)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
+SCF_IMPLEMENT_IBASE_END
 
 #define SysPrintf System->Printf
 
@@ -51,8 +51,8 @@ csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent)
   : csGraphics3DSoftwareCommon ()
 {
   is_for_procedural_textures = false;
-  CONSTRUCT_IBASE (iParent);
-  CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   csScan_Initialize ();
 }
 
@@ -71,7 +71,7 @@ bool csGraphics3DSoftware::Initialize (iSystem *iSys)
   if (!driver)
     driver = config->GetStr ("Video.Software.Canvas", SOFTWARE_2D_DRIVER);
 
-  G2D = LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
+  G2D = CS_LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
 
   return G2D ? true : false;
 }
@@ -82,21 +82,21 @@ bool csGraphics3DSoftware::Open (const char *Title)
     return false;
 
   bool bFullScreen = G2D->GetFullScreen ();
-  SysPrintf(MSG_INITIALIZATION, 
+  SysPrintf(CS_MSG_INITIALIZATION, 
 	    "Using %s mode %dx%d (internal rendering at %dx%d).\n",
             bFullScreen ? "full screen" : "windowed", 
 	    G2D->GetWidth (), G2D->GetHeight (), width, height);
 
   if (pfmt.PixelBytes == 4)
-    SysPrintf (MSG_INITIALIZATION, 
+    SysPrintf (CS_MSG_INITIALIZATION, 
 	  "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.\n",
           pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
   else if (pfmt.PixelBytes == 2)
-    SysPrintf (MSG_INITIALIZATION, 
+    SysPrintf (CS_MSG_INITIALIZATION, 
 	   "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.\n",
 	   pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
   else
-    SysPrintf (MSG_INITIALIZATION, 
+    SysPrintf (CS_MSG_INITIALIZATION, 
 	       "Using palette mode with 1 byte per pixel (256 colors).\n");
 
   return true;
@@ -104,9 +104,9 @@ bool csGraphics3DSoftware::Open (const char *Title)
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_EMBEDDED_IBASE (csGraphics3DSoftware::csSoftConfig)
-  IMPLEMENTS_INTERFACE (iConfig)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DSoftware::csSoftConfig)
+  SCF_IMPLEMENTS_INTERFACE (iConfig)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 #define NUM_OPTIONS 8
 

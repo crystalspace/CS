@@ -51,7 +51,7 @@ RotatePartOp::RotatePartOp (const char* meshName, cs_time total,
   mesh = DemoSequenceManager::demo->engine->FindMeshObject (meshName);
   if (!mesh)
   {
-    DemoSequenceManager::demo->Printf (MSG_FATAL_ERROR,
+    DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
     	"Can't find mesh '%s'\n", meshName);
     exit (0);
   }
@@ -70,7 +70,7 @@ AttachOp::AttachOp (const char* meshName, const char* pathName)
     mesh = DemoSequenceManager::demo->engine->FindMeshObject (meshName);
     if (!mesh)
     {
-      DemoSequenceManager::demo->Printf (MSG_FATAL_ERROR,
+      DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
     	  "Can't find mesh '%s'\n", meshName);
       exit (0);
     }
@@ -80,7 +80,7 @@ AttachOp::AttachOp (const char* meshName, const char* pathName)
   path = DemoSequenceManager::demoseq->FindPath (pathName);
   if (!path)
   {
-    DemoSequenceManager::demo->Printf (MSG_FATAL_ERROR,
+    DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
     	"Can't find path '%s'\n", pathName);
     exit (0);
   }
@@ -99,7 +99,7 @@ PathOp::PathOp (cs_time t, const char* meshName, const char* pathName)
     mesh = DemoSequenceManager::demo->engine->FindMeshObject (meshName);
     if (!mesh)
     {
-      DemoSequenceManager::demo->Printf (MSG_FATAL_ERROR,
+      DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
     	  "Can't find mesh '%s'\n", meshName);
       exit (0);
     }
@@ -109,7 +109,7 @@ PathOp::PathOp (cs_time t, const char* meshName, const char* pathName)
   path = DemoSequenceManager::demoseq->FindPath (pathName);
   if (!path)
   {
-    DemoSequenceManager::demo->Printf (MSG_FATAL_ERROR,
+    DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
     	"Can't find path '%s'\n", pathName);
     exit (0);
   }
@@ -128,14 +128,14 @@ SetupMeshOp::SetupMeshOp (const char* meshName, const char* sectName,
   mesh = DemoSequenceManager::demo->engine->FindMeshObject (meshName);
   if (!mesh)
   {
-    DemoSequenceManager::demo->Printf (MSG_FATAL_ERROR,
+    DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
     	"Can't find mesh '%s'\n", meshName);
     exit (0);
   }
   sector = DemoSequenceManager::demo->engine->FindSector (sectName);
   if (!sector)
   {
-    DemoSequenceManager::demo->Printf (MSG_FATAL_ERROR,
+    DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
     	"Can't find sector '%s'\n", sectName);
     exit (0);
   }
@@ -158,7 +158,7 @@ ShowMeshOp::ShowMeshOp (const char* meshName)
   mesh = DemoSequenceManager::demo->engine->FindMeshObject (meshName);
   if (!mesh)
   {
-    DemoSequenceManager::demo->Printf (MSG_FATAL_ERROR,
+    DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
     	"Can't find mesh '%s'\n", meshName);
     exit (0);
   }
@@ -178,7 +178,7 @@ HideMeshOp::HideMeshOp (const char* meshName)
   mesh = DemoSequenceManager::demo->engine->FindMeshObject (meshName);
   if (!mesh)
   {
-    DemoSequenceManager::demo->Printf (MSG_FATAL_ERROR,
+    DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
     	"Can't find mesh '%s'\n", meshName);
     exit (0);
   }

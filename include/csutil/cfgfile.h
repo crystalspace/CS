@@ -30,7 +30,7 @@ class csConfigIterator;
 class csConfigFile : public iConfigFile
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Create a new configuration object from the given file.
   csConfigFile(const char *Filename = NULL, iVFS* = NULL);

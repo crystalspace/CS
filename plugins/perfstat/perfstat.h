@@ -141,7 +141,7 @@ protected:
   bool WriteFile ();
 
  public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csPerfStats (iBase *iParent);
   virtual ~csPerfStats ();
@@ -178,7 +178,7 @@ protected:
   { return (sub_section != NULL); }
 
   /**
-   * Print this sections current summary stats, where sysflags is MSG_STDOUT
+   * Print this sections current summary stats, where sysflags is CS_MSG_STDOUT
    * etc as defined in iSystem.h
    */
   virtual void PrintSectionStats (int sysflags);

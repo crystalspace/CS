@@ -34,26 +34,26 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE(csConsoleOutput)
-  IMPLEMENTS_INTERFACE(iConsoleOutput)
-  IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE(csConsoleOutput)
+  SCF_IMPLEMENTS_INTERFACE(iConsoleOutput)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csConsoleOutput::eiPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csConsoleOutput::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_FACTORY (csConsoleOutput)
+SCF_IMPLEMENT_FACTORY (csConsoleOutput)
 
-EXPORT_CLASS_TABLE (csconout)
-  EXPORT_CLASS (csConsoleOutput, "crystalspace.console.output.standard",
+SCF_EXPORT_CLASS_TABLE (csconout)
+  SCF_EXPORT_CLASS (csConsoleOutput, "crystalspace.console.output.standard",
 		"Crystal Space standard output console")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csConsoleOutput::csConsoleOutput (iBase *base)
 {
-  CONSTRUCT_IBASE (base);
-  CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_IBASE (base);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   fg_rgb.Set (255, 255, 255);	// Foreground defaults to white
   bg_rgb.Set (0, 0, 0);		// Background defaults to black
   transparent = false;		// Default to no transparency
@@ -89,7 +89,7 @@ csConsoleOutput::~csConsoleOutput ()
 bool csConsoleOutput::Initialize (iSystem *system)
 {
   System = system;
-  G3D = QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
+  G3D = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
   if (!G3D) return false;
   G2D = G3D->GetDriver2D ();
   G2D->IncRef ();
@@ -317,7 +317,7 @@ void csConsoleOutput::Draw2D (csRect *area)
     {
 #ifdef CS_DEBUG
       if (cx != 0)
-	System->Printf (MSG_WARNING,
+	System->Printf (CS_MSG_WARNING,
 	  "csConsoleOutput:  Current line is empty but cursor x != 0!\n");
 #endif // CS_DEBUG
       cx_pix = 1;
@@ -350,7 +350,7 @@ void csConsoleOutput::Draw2D (csRect *area)
         break;
 #ifdef CS_DEBUG
       default:
-        System->Printf(MSG_WARNING,
+        System->Printf(CS_MSG_WARNING,
 	  "csConsoleOutput:  Invalid cursor setting!\n");
 #endif // CS_DEBUG
     }

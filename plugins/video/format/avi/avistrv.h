@@ -61,7 +61,7 @@ class csAVIStreamVideo : public iVideoStream
   void PrepImageArea ();
 
  public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csAVIStreamVideo (iBase *pBase);
   bool Initialize (const csAVIFormat::AVIHeader *ph, 

@@ -42,7 +42,7 @@ protected:
   void FXgetImage(csRect*);
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csGraphics2DBeGlide(iBase*);
   virtual ~csGraphics2DBeGlide();

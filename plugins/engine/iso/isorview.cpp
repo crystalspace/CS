@@ -20,13 +20,13 @@
 #include "isorview.h"
 #include "ivideo/graph3d.h"
 
-IMPLEMENT_IBASE (csIsoRenderView)
-  IMPLEMENTS_INTERFACE (iIsoRenderView)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csIsoRenderView)
+  SCF_IMPLEMENTS_INTERFACE (iIsoRenderView)
+SCF_IMPLEMENT_IBASE_END
 
 csIsoRenderView::csIsoRenderView (iBase *iParent)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   view = NULL;
   g3d = NULL;
   renderpass = 0;

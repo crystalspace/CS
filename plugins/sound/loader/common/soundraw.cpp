@@ -19,13 +19,13 @@
 #include "cssysdef.h"
 #include "soundraw.h"
 
-IMPLEMENT_IBASE(csSoundDataRaw);
-  IMPLEMENTS_INTERFACE(iSoundData);
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csSoundDataRaw);
+  SCF_IMPLEMENTS_INTERFACE(iSoundData);
+SCF_IMPLEMENT_IBASE_END;
 
 csSoundDataRaw::csSoundDataRaw(iBase *iParent, void *d, long n,
     csSoundFormat f) {
-  CONSTRUCT_IBASE(iParent);
+  SCF_CONSTRUCT_IBASE(iParent);
   Data = d;
   NumSamples = n;
   Format = f;

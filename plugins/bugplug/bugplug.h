@@ -228,7 +228,7 @@ private:
   void ExitEditMode ();
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csBugPlug (iBase *iParent);
   virtual ~csBugPlug ();

@@ -33,7 +33,7 @@ private:
   csVector Loaders;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   // constructor
   csSoundLoaderMultiplexer(iBase *iParent);
@@ -48,20 +48,20 @@ public:
   virtual iSoundData *LoadSound(void *Data, unsigned long Size) const;
 };
 
-IMPLEMENT_FACTORY(csSoundLoaderMultiplexer);
+SCF_IMPLEMENT_FACTORY(csSoundLoaderMultiplexer);
 
-EXPORT_CLASS_TABLE (sndplex)
-EXPORT_CLASS_DEP (csSoundLoaderMultiplexer,
+SCF_EXPORT_CLASS_TABLE (sndplex)
+SCF_EXPORT_CLASS_DEP (csSoundLoaderMultiplexer,
   MY_CLASSNAME, "Sound Loader Multiplexer", "crystalspace.sound.loader.")
-EXPORT_CLASS_TABLE_END;
+SCF_EXPORT_CLASS_TABLE_END;
 
-IMPLEMENT_IBASE(csSoundLoaderMultiplexer)
-  IMPLEMENTS_INTERFACE(iSoundLoader)
-  IMPLEMENTS_INTERFACE(iPlugIn)
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csSoundLoaderMultiplexer)
+  SCF_IMPLEMENTS_INTERFACE(iSoundLoader)
+  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+SCF_IMPLEMENT_IBASE_END;
 
 csSoundLoaderMultiplexer::csSoundLoaderMultiplexer(iBase *iParent) {
-  CONSTRUCT_IBASE(iParent);
+  SCF_CONSTRUCT_IBASE(iParent);
 }
 
 csSoundLoaderMultiplexer::~csSoundLoaderMultiplexer() {
@@ -73,7 +73,7 @@ csSoundLoaderMultiplexer::~csSoundLoaderMultiplexer() {
 
 bool csSoundLoaderMultiplexer::Initialize(iSystem *sys) 
 {
-  sys->Printf(MSG_INITIALIZATION,
+  sys->Printf(CS_MSG_INITIALIZATION,
     "Initializing sound loading multiplexer...\n"
     "  Looking for sound loader modules:\n");
 
@@ -86,8 +86,8 @@ bool csSoundLoaderMultiplexer::Initialize(iSystem *sys)
       char const* classname = list->Get(i);
       if (strcasecmp (classname, MY_CLASSNAME))
       {
-        sys->Printf(MSG_INITIALIZATION, "  %s\n", classname);
-        iSoundLoader *ldr = LOAD_PLUGIN (sys, classname, 0, iSoundLoader);
+        sys->Printf(CS_MSG_INITIALIZATION, "  %s\n", classname);
+        iSoundLoader *ldr = CS_LOAD_PLUGIN (sys, classname, 0, iSoundLoader);
         if (ldr)
 	  Loaders.Push(ldr);
       }

@@ -28,37 +28,37 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY(csSocketDriver)
+SCF_IMPLEMENT_FACTORY(csSocketDriver)
 
-EXPORT_CLASS_TABLE(cssocket)
-  EXPORT_CLASS(csSocketDriver, "crystalspace.network.driver.sockets",
+SCF_EXPORT_CLASS_TABLE(cssocket)
+  SCF_EXPORT_CLASS(csSocketDriver, "crystalspace.network.driver.sockets",
     "Crystal Space BSD Sockets Network Driver")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE(csSocketConnection)
-  IMPLEMENTS_INTERFACE(iNetworkConnection)
-  IMPLEMENTS_INTERFACE(iNetworkEndPoint)
-  IMPLEMENTS_EMBEDDED_INTERFACE(iNetworkSocket)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE(csSocketConnection)
+  SCF_IMPLEMENTS_INTERFACE(iNetworkConnection)
+  SCF_IMPLEMENTS_INTERFACE(iNetworkEndPoint)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iNetworkSocket)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE(csSocketConnection::csSocket)
-  IMPLEMENTS_INTERFACE(iNetworkSocket)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE(csSocketConnection::csSocket)
+  SCF_IMPLEMENTS_INTERFACE(iNetworkSocket)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_IBASE(csSocketListener)
-  IMPLEMENTS_INTERFACE(iNetworkListener)
-  IMPLEMENTS_INTERFACE(iNetworkEndPoint)
-  IMPLEMENTS_EMBEDDED_INTERFACE(iNetworkSocket)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE(csSocketListener)
+  SCF_IMPLEMENTS_INTERFACE(iNetworkListener)
+  SCF_IMPLEMENTS_INTERFACE(iNetworkEndPoint)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iNetworkSocket)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE(csSocketListener::csSocket)
-  IMPLEMENTS_INTERFACE(iNetworkSocket)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE(csSocketListener::csSocket)
+  SCF_IMPLEMENTS_INTERFACE(iNetworkSocket)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_IBASE(csSocketDriver)
-  IMPLEMENTS_INTERFACE(iNetworkDriver)
-  IMPLEMENTS_INTERFACE(iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE(csSocketDriver)
+  SCF_IMPLEMENTS_INTERFACE(iNetworkDriver)
+  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
 
 // csSocketEndPoint -----------------------------------------------------------
@@ -120,8 +120,8 @@ bool csSocketEndPoint::PlatformSetBlocking(bool blocks)
 csSocketConnection::csSocketConnection(
   iBase* p, csNetworkSocket s, bool blocking) : csSocketEndPoint(s, blocking)
 {
-  CONSTRUCT_IBASE(p);
-  CONSTRUCT_EMBEDDED_IBASE(scfiNetworkSocket);
+  SCF_CONSTRUCT_IBASE(p);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiNetworkSocket);
 }
 
 bool csSocketConnection::Send(const void* data, size_t nbytes)
@@ -163,8 +163,8 @@ csSocketListener::csSocketListener(iBase* p, csNetworkSocket s,
   unsigned short port, bool blockingListener, bool blockingConnection) :
   csSocketEndPoint(s, blockingListener), BlockingConnection(blockingConnection)
 {
-  CONSTRUCT_IBASE(p);
-  CONSTRUCT_EMBEDDED_IBASE(scfiNetworkSocket);
+  SCF_CONSTRUCT_IBASE(p);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiNetworkSocket);
 
   struct sockaddr_in addr;
   addr.sin_family = AF_INET;
@@ -206,16 +206,16 @@ csNetworkSocket csSocketListener::csSocket::GetSocket() const
 // csSocketDriver -------------------------------------------------------------
 
 csSocketDriver::csSocketDriver(iBase* p) : LastError(CS_NET_ERR_NO_ERROR)
-  { CONSTRUCT_IBASE(p); }
+  { SCF_CONSTRUCT_IBASE(p); }
 csSocketDriver::~csSocketDriver() {}
 void csSocketDriver::ClearError() { LastError = CS_NET_ERR_NO_ERROR; }
 
 void csSocketDriver::Open()
 {
   ClearError();
-  Sys->Printf (MSG_INITIALIZATION, "Initializing socket network driver: ");
+  Sys->Printf (CS_MSG_INITIALIZATION, "Initializing socket network driver: ");
   const bool ok = PlatformDriverStart();
-  Sys->Printf (MSG_INITIALIZATION, ok ? "OK\n" : "FAILED\n");
+  Sys->Printf (CS_MSG_INITIALIZATION, ok ? "OK\n" : "FAILED\n");
 }
 
 void csSocketDriver::Close()

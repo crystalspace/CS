@@ -131,7 +131,7 @@ void X2D_CANVAS::EnterFullScreen ()
         GrabModeAsync, CurrentTime) != GrabSuccess)
   {
     XUnmapWindow (dpy, fs_window);
-    CsPrintf (MSG_FATAL_ERROR, "Unable to grab focus\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "Unable to grab focus\n");
     return;
   }
 
@@ -146,7 +146,7 @@ void X2D_CANVAS::EnterFullScreen ()
     if (!XF86VidModeSwitchToMode (dpy, screen_num, &fs_mode))
     {
       LeaveFullScreen ();
-      CsPrintf (MSG_FATAL_ERROR, "Unable to switch to mode %dx%d\n",
+      CsPrintf (CS_MSG_FATAL_ERROR, "Unable to switch to mode %dx%d\n",
         fs_mode.hdisplay, fs_mode.vdisplay);
       return;
     }
@@ -215,7 +215,7 @@ void X2D_CANVAS::LeaveFullScreen ()
     // switch to non-fullscreen mode
     if (!XF86VidModeSwitchToMode (dpy, screen_num, &orig_mode))
     {
-      CsPrintf (MSG_FATAL_ERROR, "Unable to restore mode %dx%d\n",
+      CsPrintf (CS_MSG_FATAL_ERROR, "Unable to restore mode %dx%d\n",
         fs_mode.hdisplay, fs_mode.vdisplay);
       return;
     }

@@ -120,8 +120,8 @@ iPolygon3D* HugeRoom::create_polygon (iThingState* thing_state,
 
   p->SetTextureType (POLYTXT_GOURAUD);
   iPolyTexType* ptt = p->GetPolyTexType ();
-  iPolyTexGouraud* gs = QUERY_INTERFACE (ptt, iPolyTexGouraud);
-  iPolyTexFlat* fs = QUERY_INTERFACE (ptt, iPolyTexFlat);
+  iPolyTexGouraud* gs = SCF_QUERY_INTERFACE (ptt, iPolyTexGouraud);
+  iPolyTexFlat* fs = SCF_QUERY_INTERFACE (ptt, iPolyTexFlat);
   gs->Setup (p);
   fs->SetUV (0, 0, 0);
   fs->SetUV (1, 1, 0);
@@ -143,7 +143,7 @@ iPolygon3D* HugeRoom::create_polygon (iThingState* thing_state,
 static iMeshWrapper* CreateMeshWrapper (const char* name)
 {
   iMeshObjectFactory* thing_fact = Sys->Engine->GetThingType ()->NewFactory ();
-  iMeshObject* mesh_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
+  iMeshObject* mesh_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
   iMeshWrapper* mesh_wrap = Sys->Engine->CreateMeshObject (mesh_obj, name);
   mesh_obj->DecRef ();
@@ -153,7 +153,7 @@ static iMeshWrapper* CreateMeshWrapper (const char* name)
 iMeshWrapper* HugeRoom::create_thing (iSector* sector, const csVector3& pos)
 {
   iMeshWrapper* thing = CreateMeshWrapper ("t");
-  iThingState* thing_state = QUERY_INTERFACE (thing->GetMeshObject (),
+  iThingState* thing_state = SCF_QUERY_INTERFACE (thing->GetMeshObject (),
   	iThingState);
 
 #ifdef ROOM_SMALL
@@ -230,7 +230,7 @@ iMeshWrapper* HugeRoom::create_building (iSector* sector,
 	float xdim, float ydim, float zdim, float angle_y)
 {
   iMeshWrapper* thing = CreateMeshWrapper ("t");
-  iThingState* thing_state = QUERY_INTERFACE (thing->GetMeshObject (),
+  iThingState* thing_state = SCF_QUERY_INTERFACE (thing->GetMeshObject (),
   	iThingState);
 
   float y_low = -wall_dim+1;
@@ -272,7 +272,7 @@ iSector* HugeRoom::create_huge_world (iEngine* engine)
 
   if (seed == 0) seed = rand ();
   srand (seed);
-  Sys->Printf (MSG_INITIALIZATION, "Used seed %u.\n", seed);
+  Sys->Printf (CS_MSG_INITIALIZATION, "Used seed %u.\n", seed);
 
   int i, num;
 
@@ -422,7 +422,7 @@ iSector* HugeRoom::create_huge_world (iEngine* engine)
 
 #if defined(ROOM_CITY)
   iMeshWrapper* floorthing = CreateMeshWrapper ("floor");
-  iThingState* thing_state = QUERY_INTERFACE (floorthing->GetMeshObject (),
+  iThingState* thing_state = SCF_QUERY_INTERFACE (floorthing->GetMeshObject (),
   	iThingState);
   create_wall (thing_state,
   	csVector3 (-wall_dim, -wall_dim+1, wall_dim),
@@ -434,7 +434,7 @@ iSector* HugeRoom::create_huge_world (iEngine* engine)
   floorthing->GetMovable ()->UpdateMove ();
 #elif !defined(ROOM_SMALL)
   iMeshWrapper* floorthing = CreateMeshWrapper ("floor");
-  iThingState* thing_state = QUERY_INTERFACE (floorthing->GetMeshObject (),
+  iThingState* thing_state = SCF_QUERY_INTERFACE (floorthing->GetMeshObject (),
   	iThingState);
   create_wall (thing_state, csVector3 (-3, -1, 3), csVector3 (3, -1, 3),
   	csVector3 (3, -1, -3), csVector3 (-3, -1, -3), 4, 4, 0);
@@ -446,7 +446,7 @@ iSector* HugeRoom::create_huge_world (iEngine* engine)
 #endif
 
   iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
-  thing_state = QUERY_INTERFACE (walls->GetMeshObject (),
+  thing_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
   	iThingState);
   create_wall (thing_state,
   	csVector3 (-wall_dim,wall_dim,wall_dim), csVector3 (wall_dim,wall_dim,wall_dim),
@@ -474,7 +474,7 @@ iSector* HugeRoom::create_huge_world (iEngine* engine)
 	wall_num_tris, wall_num_tris, 0);
   thing_state->DecRef ();
 
-  Sys->Printf (MSG_INITIALIZATION, "Number of polygons: %d\n", pol_nr);
+  Sys->Printf (CS_MSG_INITIALIZATION, "Number of polygons: %d\n", pol_nr);
   //room->UseCuller ("@@@ (NOT WORKING!!!)");
   return room;
 }

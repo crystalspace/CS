@@ -19,13 +19,13 @@
 #include "cssysdef.h"
 #include "slstn.h"
 
-IMPLEMENT_IBASE(csSoundListener);
-  IMPLEMENTS_INTERFACE(iSoundListener);
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csSoundListener);
+  SCF_IMPLEMENTS_INTERFACE(iSoundListener);
+SCF_IMPLEMENT_IBASE_END;
   
 csSoundListener::csSoundListener()
 {
-  CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_IBASE(NULL);
 
   SetPosition(csVector3(0,0,0));
   SetVelocity(csVector3(0,0,0));

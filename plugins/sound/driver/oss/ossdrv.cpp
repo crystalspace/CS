@@ -44,16 +44,16 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY(csSoundDriverOSS)
+SCF_IMPLEMENT_FACTORY(csSoundDriverOSS)
 
-EXPORT_CLASS_TABLE(ossdrv)
-    EXPORT_CLASS(csSoundDriverOSS, "crystalspace.sound.driver.oss", "OSS Sounddriver for Crystal Space")    
-EXPORT_CLASS_TABLE_END;
+SCF_EXPORT_CLASS_TABLE(ossdrv)
+    SCF_EXPORT_CLASS(csSoundDriverOSS, "crystalspace.sound.driver.oss", "OSS Sounddriver for Crystal Space")    
+SCF_EXPORT_CLASS_TABLE_END;
 
-IMPLEMENT_IBASE(csSoundDriverOSS)
-  IMPLEMENTS_INTERFACE(iPlugIn)
-  IMPLEMENTS_INTERFACE(iSoundDriver)
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csSoundDriverOSS)
+  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE(iSoundDriver)
+SCF_IMPLEMENT_IBASE_END;
 
 int lasterr=0;
 int gaudio;
@@ -247,7 +247,7 @@ bool csSoundDriverOSS::SetupTimer( int nTimesPerSecond )
 
 csSoundDriverOSS::csSoundDriverOSS(iBase *piBase)
 {
-  CONSTRUCT_IBASE(piBase);
+  SCF_CONSTRUCT_IBASE(piBase);
   m_piSystem = NULL;
   m_piSoundRender = NULL;
   memorysize = 0;
@@ -273,7 +273,7 @@ bool csSoundDriverOSS::Initialize(iSystem *iSys)
 
 bool csSoundDriverOSS::Open(iSoundRender *render, int frequency, bool bit16, bool stereo)
 {
-  m_piSystem->Printf (MSG_INITIALIZATION, "\nSoundDriver OSS selected\n");
+  m_piSystem->Printf (CS_MSG_INITIALIZATION, "\nSoundDriver OSS selected\n");
 
   m_piSoundRender = render;
 

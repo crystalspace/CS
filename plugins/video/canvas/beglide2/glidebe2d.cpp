@@ -26,17 +26,17 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csGraphics2DBeGlide)
+SCF_IMPLEMENT_FACTORY (csGraphics2DBeGlide)
 
-EXPORT_CLASS_TABLE (glidebe2d)
-  EXPORT_CLASS_DEP (csGraphics2DBeGlide, "crystalspace.graphics2d.glide.be.2",
+SCF_EXPORT_CLASS_TABLE (glidebe2d)
+  SCF_EXPORT_CLASS_DEP (csGraphics2DBeGlide, "crystalspace.graphics2d.glide.be.2",
     "Crystal Space Glide2 2D driver for BeOS", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csGraphics2DBeGlide)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics2D)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics2DBeGlide)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_END
 
 csGraphics2DBeGlide::csGraphics2DBeGlide(iBase* p) :
   superclass(p), view(0), window(0), bitmap(0)
@@ -52,7 +52,7 @@ bool csGraphics2DBeGlide::Initialize(iSystem* isys)
   bool ok = superclass::Initialize(isys);
   if (ok)
   {
-    System->Printf(MSG_INITIALIZATION,
+    System->Printf(CS_MSG_INITIALIZATION,
       "Crystal Space BeOS Glide2 2D Driver.\n");
 
     // Get current screen information.

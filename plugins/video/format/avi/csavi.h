@@ -39,7 +39,7 @@ class csAVIFormat : public iStreamFormat
     csAVIFormat *pAVI;
     int pos;
   public:
-    DECLARE_IBASE;
+    SCF_DECLARE_IBASE;
     virtual ~streamiterator ();
     bool HasNext ();
     iStream *GetNext ();
@@ -314,7 +314,7 @@ class csAVIFormat : public iStreamFormat
   UShort stream_number (const char c1, const char c2);
 
  public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csAVIFormat (iBase *pParent);
   virtual ~csAVIFormat ();

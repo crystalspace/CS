@@ -27,7 +27,7 @@ awsKey::awsKey(iString *n)
 
 awsPrefManager::awsPrefManager(iBase *iParent):n_win_defs(0), n_skin_defs(0), def_skin(0)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
 }
 
 awsPrefManager::~awsPrefManager()

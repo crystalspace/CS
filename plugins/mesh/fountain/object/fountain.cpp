@@ -29,13 +29,13 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE_EXT (csFountainMeshObject)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iFountainState)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csFountainMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iFountainState)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csFountainMeshObject::FountainState)
-  IMPLEMENTS_INTERFACE (iFountainState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csFountainMeshObject::FountainState)
+  SCF_IMPLEMENTS_INTERFACE (iFountainState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 void csFountainMeshObject::SetupObject ()
 {
@@ -83,7 +83,7 @@ void csFountainMeshObject::SetupObject ()
 csFountainMeshObject::csFountainMeshObject (iSystem* system, iMeshObjectFactory* factory)
 	: csParticleSystem (system, factory)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiFountainState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiFountainState);
   part_pos = NULL;
   part_speed = NULL;
   part_age = NULL;
@@ -181,13 +181,13 @@ void csFountainMeshObject::HardTransform (const csReversibleTransform& t)
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csFountainMeshObjectFactory)
-  IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csFountainMeshObjectFactory)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
+SCF_IMPLEMENT_IBASE_END
 
 csFountainMeshObjectFactory::csFountainMeshObjectFactory (iBase *pParent, iSystem* system)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
   csFountainMeshObjectFactory::system = system;
 }
 
@@ -198,28 +198,28 @@ csFountainMeshObjectFactory::~csFountainMeshObjectFactory ()
 iMeshObject* csFountainMeshObjectFactory::NewInstance ()
 {
   csFountainMeshObject* cm = new csFountainMeshObject (system, (iMeshObjectFactory*)this);
-  iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
+  iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
 }
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csFountainMeshObjectType)
-  IMPLEMENTS_INTERFACE (iMeshObjectType)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csFountainMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csFountainMeshObjectType)
+SCF_IMPLEMENT_FACTORY (csFountainMeshObjectType)
 
-EXPORT_CLASS_TABLE (fountain)
-  EXPORT_CLASS (csFountainMeshObjectType, "crystalspace.mesh.object.fountain",
+SCF_EXPORT_CLASS_TABLE (fountain)
+  SCF_EXPORT_CLASS (csFountainMeshObjectType, "crystalspace.mesh.object.fountain",
     "Crystal Space Fountain Mesh Type")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csFountainMeshObjectType::csFountainMeshObjectType (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csFountainMeshObjectType::~csFountainMeshObjectType ()
@@ -235,7 +235,7 @@ bool csFountainMeshObjectType::Initialize (iSystem* system)
 iMeshObjectFactory* csFountainMeshObjectType::NewFactory ()
 {
   csFountainMeshObjectFactory* cm = new csFountainMeshObjectFactory (this, system);
-  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;
 }

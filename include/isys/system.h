@@ -29,29 +29,29 @@
  * will be output to the console and so on.
  */
 /// Internal error, this is a serious bug in CS
-#define MSG_INTERNAL_ERROR	1
+#define CS_MSG_INTERNAL_ERROR	1
 /// Error which prevents proper further execution
-#define MSG_FATAL_ERROR		2
+#define CS_MSG_FATAL_ERROR		2
 /// Error which doesn't prevent proper execution
-#define MSG_WARNING		3
+#define CS_MSG_WARNING		3
 /// Initialization message
-#define MSG_INITIALIZATION	4
+#define CS_MSG_INITIALIZATION	4
 /// Message intended for display on the console
-#define MSG_CONSOLE		5
+#define CS_MSG_CONSOLE		5
 /// Message intended for display on stdout
-#define MSG_STDOUT		6
+#define CS_MSG_STDOUT		6
 /// Show message if debug level is 0, 1, or 2 (no debug)
-#define MSG_DEBUG_0		7
+#define CS_MSG_DEBUG_0		7
 /// Show message if debug level is 1 or 2 (debug mode)
-#define MSG_DEBUG_1		8
+#define CS_MSG_DEBUG_1		8
 /// Show message if debug level 2 (verbose mode)
-#define MSG_DEBUG_2		9
+#define CS_MSG_DEBUG_2		9
 /// Show message if debug level is 0, 1, or 2 (no debug) and flush
-#define MSG_DEBUG_0F		10
+#define CS_MSG_DEBUG_0F		10
 /// Show message if debug level is 1 or 2 (debug mode) and flush
-#define MSG_DEBUG_1F		11
+#define CS_MSG_DEBUG_1F		11
 /// Show message if debug level 2 (verbose mode) and flush
-#define MSG_DEBUG_2F		12
+#define CS_MSG_DEBUG_2F		12
 
 /*
  * Plugins have an additional characteristic called "functionality ID".
@@ -110,7 +110,7 @@
  * `Object' is a object that implements iSystem interface.
  * `Interface' is a interface name (iGraphics2D, iVFS and so on).
  */
-#define QUERY_PLUGIN(Object,Interface)					\
+#define CS_QUERY_PLUGIN(Object,Interface)					\
   (Interface *)(Object)->QueryPlugIn (#Interface, VERSION_##Interface)
 
 /**
@@ -122,7 +122,7 @@
  * functionality identifier no matter which interface it implements, ask
  * for some basic interface, say iBase or iPlugIn.
  */
-#define QUERY_PLUGIN_ID(Object,FuncID,Interface)			\
+#define CS_QUERY_PLUGIN_ID(Object,FuncID,Interface)			\
   (Interface *)(Object)->QueryPlugIn (FuncID, #Interface, VERSION_##Interface)
 
 /**
@@ -135,7 +135,7 @@
  * matter which interface it implements, ask for some basic interface,
  * say iBase or iPlugIn.
  */
-#define QUERY_PLUGIN_CLASS(Object,ClassID,FuncID,Interface)			\
+#define CS_QUERY_PLUGIN_CLASS(Object,ClassID,FuncID,Interface)			\
   (Interface *)(Object)->QueryPlugIn (ClassID, FuncID, #Interface, VERSION_##Interface)
 
 /**
@@ -146,14 +146,14 @@
  * `ClassID' is the class ID (`crystalspace.graphics3d.software').
  * `Interface' is a interface name (iGraphics2D, iVFS and so on).
  */
-#define LOAD_PLUGIN(Object,ClassID,FuncID,Interface)			\
+#define CS_LOAD_PLUGIN(Object,ClassID,FuncID,Interface)			\
   (Interface *)(Object)->LoadPlugIn (ClassID, FuncID, #Interface, VERSION_##Interface)
 
 /**
- * Same as LOAD_PLUGIN but don't bother asking for a interface.
+ * Same as CS_LOAD_PLUGIN but don't bother asking for a interface.
  * This is useful for unconditionally loading plugins.
  */
-#define _LOAD_PLUGIN(Object,ClassID,FuncID)				\
+#define _CS_LOAD_PLUGIN(Object,ClassID,FuncID)				\
   (Object)->LoadPlugIn (ClassID, FuncID, NULL, 0)
 
 struct iPlugIn;

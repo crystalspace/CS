@@ -27,7 +27,7 @@ struct iSoundData;
 class csSoundSourceEAX : public iSoundSource
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csSoundSourceEAX(iBase *scfParent);
   virtual ~csSoundSourceEAX();

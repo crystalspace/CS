@@ -36,14 +36,14 @@ class csDataBuffer : public iDataBuffer
   size_t Size;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Construct an preallocated data buffer (filled with garbage initially)
   csDataBuffer (size_t iSize)
-  { CONSTRUCT_IBASE (NULL); Data = new char [Size = iSize]; }
+  { SCF_CONSTRUCT_IBASE (NULL); Data = new char [Size = iSize]; }
   /// Construct an data buffer object given a existing (new char []) pointer
   csDataBuffer (char *iData, size_t iSize)
-  { CONSTRUCT_IBASE (NULL); Data = iData; Size = iSize; }
+  { SCF_CONSTRUCT_IBASE (NULL); Data = iData; Size = iSize; }
   /// Destroy (free) the buffer
   virtual ~csDataBuffer ();
 

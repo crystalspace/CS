@@ -40,12 +40,12 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csGraphics2DOS2GL)
+SCF_IMPLEMENT_FACTORY (csGraphics2DOS2GL)
 
-EXPORT_CLASS_TABLE (glos2)
-  EXPORT_CLASS_DEP (csGraphics2DOS2GL, "crystalspace.graphics2d.glos2",
+SCF_EXPORT_CLASS_TABLE (glos2)
+  SCF_EXPORT_CLASS_DEP (csGraphics2DOS2GL, "crystalspace.graphics2d.glos2",
     "OS/2 OpenGL 2D graphics driver for Crystal Space", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csGraphics2DOS2GL::csGraphics2DOS2GL (iBase *iParent) :
   csGraphics2DGLCommon (iParent),
@@ -93,7 +93,7 @@ bool csGraphics2DOS2GL::Initialize (iSystem *pSystem)
   // Initialize OpenGL
   if (!gdGLInitialize ())
   {
-    CsPrintf (MSG_FATAL_ERROR, "Unable to initialize OpenGL library\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "Unable to initialize OpenGL library\n");
     return false;
   }
 
@@ -121,7 +121,7 @@ bool csGraphics2DOS2GL::Initialize (iSystem *pSystem)
       WindowY = ypos;
     }
     else
-      System->Printf (MSG_WARNING, "Bad value `%s' for -winpos command-line parameter (X,Y expected)\n", val);
+      System->Printf (CS_MSG_WARNING, "Bad value `%s' for -winpos command-line parameter (X,Y expected)\n", val);
   }
 
   if (System->GetOptionCL ("sysmouse"))
@@ -140,9 +140,9 @@ bool csGraphics2DOS2GL::HandleEvent (iEvent &Event)
    && (Event.Command.Code == cscmdCommandLineHelp)
    && System)
   {
-    System->Printf (MSG_STDOUT, "Options for OS/2 OpenGL canvas driver:\n");
-    System->Printf (MSG_STDOUT, "  -winpos=<x>,<y>    set window position in percent of screen (default=center)\n");
-    System->Printf (MSG_STDOUT, "  -[no]sysmouse      use/don't use system mouse cursor (default=%s)\n",
+    System->Printf (CS_MSG_STDOUT, "Options for OS/2 OpenGL canvas driver:\n");
+    System->Printf (CS_MSG_STDOUT, "  -winpos=<x>,<y>    set window position in percent of screen (default=center)\n");
+    System->Printf (CS_MSG_STDOUT, "  -[no]sysmouse      use/don't use system mouse cursor (default=%s)\n",
       HardwareCursor ? "use" : "don't");
     return true;
   }
@@ -158,7 +158,7 @@ bool csGraphics2DOS2GL::Open (const char *Title)
   rq.Parm.CreateWindow.Title = Title;
   if ((rc = PMcall (pmcmdCreateWindow, &rq)) != pmrcOK)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Cannot create PM window: no resources bound to executable?\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "Cannot create PM window: no resources bound to executable?\n");
     return false;
   }
   WinHandle = rq.Parm.CreateWindow.Handle;
@@ -169,7 +169,7 @@ bool csGraphics2DOS2GL::Open (const char *Title)
   rq.Parm.CreateCtx.ContextFlags = PixelFormat;
   if ((rc = PMcall (pmcmdCreateGLctx, &rq)) != pmrcOK)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Cannot create OpenGL context\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "Cannot create OpenGL context\n");
     return false;
   }
 
@@ -189,7 +189,7 @@ bool csGraphics2DOS2GL::Open (const char *Title)
   rq.Parm.BindCtx.DesktopH = DesktopH;
   if ((rc = PMcall (pmcmdBindGLctx, &rq)) != pmrcOK)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Cannot bind OpenGL context to window!\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "Cannot bind OpenGL context to window!\n");
     return false;
   }
 

@@ -31,23 +31,23 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csPerfStats)
+SCF_IMPLEMENT_FACTORY (csPerfStats)
 
-EXPORT_CLASS_TABLE (perfstat)
-  EXPORT_CLASS (csPerfStats, "crystalspace.utilities.perfstat",
+SCF_EXPORT_CLASS_TABLE (perfstat)
+  SCF_EXPORT_CLASS (csPerfStats, "crystalspace.utilities.perfstat",
     "Performance statistics utility")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csPerfStats)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iPerfStats)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csPerfStats)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPerfStats)
+SCF_IMPLEMENT_IBASE_END
 
 #define SysPrintf System->Printf
 
 csPerfStats::csPerfStats (iBase *iParent)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   Engine = NULL;
   file_name = NULL;
   statlog_section = NULL;
@@ -83,7 +83,7 @@ bool csPerfStats::Initialize (iSystem *system)
   name = NULL;
   head_section = this;
 
-// iEngine *iengine = QUERY_PLUGIN_ID (System, CS_FUNCID_ENGINE, iEngine);
+// iEngine *iengine = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_ENGINE, iEngine);
 // if (iengine) 
 //   Engine = iengine->GetCsEngine ();
   return true;
@@ -299,7 +299,7 @@ void csPerfStats::SaveStats ()
   {
     WriteMainHeader ();
     if (!WriteFile ())
-      System->Printf (MSG_STDOUT, "Stats file output error\n");
+      System->Printf (CS_MSG_STDOUT, "Stats file output error\n");
   }
 }
 
@@ -331,7 +331,7 @@ void csPerfStats::WriteSummaryStats ()
   entry->frame_num = statlog_section->frame_num;
 
   if (entry->len > len_guess)
-    System->Printf (MSG_STDOUT, "WARNING MEMORY OVER-RUN IN PERFSTAT\n");
+    System->Printf (CS_MSG_STDOUT, "WARNING MEMORY OVER-RUN IN PERFSTAT\n");
 
   statlog_section->statvec->Push (entry);
 }
@@ -339,7 +339,7 @@ void csPerfStats::WriteSummaryStats ()
 void csPerfStats::WriteMainHeader ()
 {
     StatEntry *entry = new StatEntry ();
-    iGraphics3D *g3d = QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
+    iGraphics3D *g3d = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
     if (!g3d) abort ();
     iGraphics2D *g2d = g3d->GetDriver2D ();
     csGraphics3DCaps *caps = g3d->GetCaps ();
@@ -410,7 +410,7 @@ void csPerfStats::WriteMainHeader ()
     entry->len = strlen (entry->buf)+1;
     entry->frame_num = statlog_section->frame_num;
     if (entry->len > len_guess)
-      System->Printf (MSG_STDOUT, 
+      System->Printf (CS_MSG_STDOUT, 
         "WARNING MEMORY OVER-RUN IN PERFSTAT (WriteMainHeader)\n");
 
     statvec->Push (entry);
@@ -431,7 +431,7 @@ void csPerfStats::WriteSubSummary ()
     entry->len = strlen (entry->buf)+1;
     entry->frame_num = statlog_section->frame_num;
     if (entry->len > len_guess)
-      System->Printf (MSG_STDOUT, 
+      System->Printf (CS_MSG_STDOUT, 
         "WARNING MEMORY OVER-RUN IN PERFSTAT (WriteSubSummary)\n");
     statlog_section->statvec->Push (entry);
   }
@@ -449,7 +449,7 @@ void csPerfStats::WriteSubBegin ()
     entry->len = strlen (entry->buf)+1;
     entry->frame_num = statlog_section->frame_num;
     if (entry->len > len_guess)
-      System->Printf (MSG_STDOUT, 
+      System->Printf (CS_MSG_STDOUT, 
 		      "WARNING MEMORY OVER-RUN IN PERFSTAT (WriteSubBegin)\n");
     statlog_section->statvec->Push (entry);
   }
@@ -508,7 +508,7 @@ bool csPerfStats::WriteFile ()
     f_buf = new char[f_buf_len];
     if (!f_buf)
     {
-      System->Printf (MSG_STDOUT, "Out of Memory\n"); 
+      System->Printf (CS_MSG_STDOUT, "Out of Memory\n"); 
       return false;
     }
 
@@ -533,7 +533,7 @@ bool csPerfStats::WriteFile ()
   char *buffer = new char [total_len];
   if (!buffer)
   {
-    System->Printf (MSG_STDOUT, "Out of Memory\n"); 
+    System->Printf (CS_MSG_STDOUT, "Out of Memory\n"); 
     return false;
   }
 
@@ -592,7 +592,7 @@ bool csPerfStats::WriteFile ()
   statvec = NULL;
   head_section->framevec = NULL;
 
-  iVFS *vfs = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
+  iVFS *vfs = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
   if (!vfs) 
     return false;
 

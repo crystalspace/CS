@@ -132,7 +132,7 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
   sprintf (buf, "r%d_%d_%d", x, y, z);
   iSector* room = engine->CreateSector (buf);
   iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
-  iThingState* walls_state = QUERY_INTERFACE (walls->GetMeshObject (),
+  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
   	iThingState);
   float dx, dy, dz;
   dx = 2.0*(float)x;
@@ -190,20 +190,20 @@ void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2, int
   po2->CreatePortal (s1->sector);
 }
 
-IMPLEMENT_IBASE (InfPortalCS)
-  IMPLEMENTS_INTERFACE (iPortalCallback)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (InfPortalCS)
+  SCF_IMPLEMENTS_INTERFACE (iPortalCallback)
+SCF_IMPLEMENT_IBASE_END
 
 InfPortalCS::InfPortalCS ()
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   lviews = NULL;
 }
 
 bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
 {
   iFrustumView* fv;
-  if (context) fv = QUERY_INTERFACE (context, iFrustumView);
+  if (context) fv = SCF_QUERY_INTERFACE (context, iFrustumView);
   else fv = NULL;
   if (fv)
   {
@@ -239,7 +239,7 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
     for (i = 0 ; i < is->GetMeshCount () ; i++)
     {
       iMeshWrapper* mesh = is->GetMesh (i);
-      iLightingInfo* linfo = QUERY_INTERFACE (mesh->GetMeshObject (),
+      iLightingInfo* linfo = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
       	iLightingInfo);
       if (linfo)
       {
@@ -251,7 +251,7 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
     for (i = 0 ; i < is->GetMeshCount () ; i++)
     {
       iMeshWrapper* mesh = is->GetMesh (i);
-      iLightingInfo* linfo = QUERY_INTERFACE (mesh->GetMeshObject (),
+      iLightingInfo* linfo = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
       	iLightingInfo);
       if (linfo)
       {
@@ -275,9 +275,9 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
       delete lviews;
       lviews = n;
     }
-    iPolygonMesh* mesh = QUERY_INTERFACE (ird->walls->GetMeshObject (),
+    iPolygonMesh* mesh = SCF_QUERY_INTERFACE (ird->walls->GetMeshObject (),
   	iPolygonMesh);
-    iObject* io = QUERY_INTERFACE (ird->walls, iObject);
+    iObject* io = SCF_QUERY_INTERFACE (ird->walls, iObject);
     (void)new csColliderWrapper (io, Sys->collide_system, mesh);
     io->DecRef ();
     mesh->DecRef ();

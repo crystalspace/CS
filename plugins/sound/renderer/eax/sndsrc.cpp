@@ -29,14 +29,14 @@
 
 #define REFRESH_RATE    10
 
-IMPLEMENT_FACTORY(csSoundSourceEAX)
+SCF_IMPLEMENT_FACTORY(csSoundSourceEAX)
 
-IMPLEMENT_IBASE(csSoundSourceEAX)
-  IMPLEMENTS_INTERFACE(iSoundSource)
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csSoundSourceEAX)
+  SCF_IMPLEMENTS_INTERFACE(iSoundSource)
+SCF_IMPLEMENT_IBASE_END;
 
 csSoundSourceEAX::csSoundSourceEAX(iBase *piBase) {
-  CONSTRUCT_IBASE(piBase);
+  SCF_CONSTRUCT_IBASE(piBase);
 
   Buffer3D = NULL;
   Buffer2D = NULL;
@@ -89,7 +89,7 @@ bool csSoundSourceEAX::Initialize(csSoundRenderEAX *srdr,
 
   r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &Buffer2D, NULL);
   if (r != DS_OK) {
-    srdr->System->Printf(MSG_WARNING, "cannot create secondary sound buffer "
+    srdr->System->Printf(CS_MSG_WARNING, "cannot create secondary sound buffer "
      "for sound source (%s).\n", srdr->GetError(r));
     return false;
   }
@@ -104,7 +104,7 @@ bool csSoundSourceEAX::Initialize(csSoundRenderEAX *srdr,
 
   r = Buffer2D->QueryInterface(IID_IDirectSound3DBuffer, (void **) &Buffer3D);
   if (r != DS_OK) {
-    srdr->System->Printf(MSG_WARNING, "cannot query 3D buffer interface "
+    srdr->System->Printf(CS_MSG_WARNING, "cannot query 3D buffer interface "
       "for sound source (%s).\n", srdr->GetError(r));
     return false;
   }
@@ -160,7 +160,7 @@ void csSoundSourceEAX::SetMode3D(int mode3D) {
   
   HRESULT r = Buffer3D->SetMode(Mode, DS3D_DEFERRED);
   if (r != DS_OK) {
-    Renderer->System->Printf(MSG_WARNING, "cannot set secondary sound buffer 3d mode "
+    Renderer->System->Printf(CS_MSG_WARNING, "cannot set secondary sound buffer 3d mode "
       "for sound source (%s)\n.", Renderer->GetError(r));
   } else Renderer->SetDirty();
 }
@@ -169,7 +169,7 @@ int csSoundSourceEAX::GetMode3D() {
   DWORD Mode;
   HRESULT r = Buffer3D->GetMode(&Mode);
   if (r != DS_OK) {
-    Renderer->System->Printf(MSG_WARNING, "cannot get secondary sound buffer 3d mode "
+    Renderer->System->Printf(CS_MSG_WARNING, "cannot get secondary sound buffer 3d mode "
       "for sound source (%s)\n.", Renderer->GetError(r));
     return false;
   }

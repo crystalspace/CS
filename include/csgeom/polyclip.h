@@ -53,7 +53,7 @@ public:
   /// most recent Clipresult
   UByte LastClipResult () { return mrClipping; }
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 };
 
 /**

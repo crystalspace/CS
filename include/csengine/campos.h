@@ -63,12 +63,12 @@ public:
   /// Load the camera position into a camera object
   bool Load (iCamera*, iEngine*);
 
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
 
   //--------------------- iCameraPosition implementation ----------------------
   struct CameraPosition : public iCameraPosition
   {
-    DECLARE_EMBEDDED_IBASE(csCameraPosition);
+    SCF_DECLARE_EMBEDDED_IBASE(csCameraPosition);
 
     virtual iObject *QueryObject()
     { return scfParent; }

@@ -133,7 +133,7 @@ CS_IMPLEMENT_APPLICATION
 
 // We need the loader.
 // The line below will go away once the loader is a plugin.
-REGISTER_STATIC_LIBRARY (lvlload)
+SCF_REGISTER_STATIC_LIBRARY (lvlload)
 
 Simple::Simple ()
 @{
@@ -161,24 +161,24 @@ bool Simple::Initialize (int argc, const char const* const argv[],
     return false;
 
   // Find the pointer to engine plugin
-  engine = QUERY_PLUGIN (this, iEngine);
+  engine = CS_QUERY_PLUGIN (this, iEngine);
   if (!engine)
   @{
-    Printf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     exit (1);
   @}
 
-  loader = QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
+  loader = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
   if (!loader)
   @{
-    Printf (MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   @}
 
-  g3d = QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
+  g3d = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
   if (!g3d)
   @{
-    Printf (MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
     abort ();
   @}
 
@@ -186,12 +186,12 @@ bool Simple::Initialize (int argc, const char const* const argv[],
   // the previously loaded plug-ins.
   if (!Open ("Simple Crystal Space Application"))
   @{
-    Printf (MSG_FATAL_ERROR, "Error opening system!\n");
+    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     cleanup ();
     exit (1);
   @}
 
-  Printf (MSG_INITIALIZATION,
+  Printf (CS_MSG_INITIALIZATION,
     "Simple Crystal Space Application.\n");
 
   // First disable the lighting cache.
@@ -199,9 +199,9 @@ bool Simple::Initialize (int argc, const char const* const argv[],
   engine->EnableLightingCache (false);
 
   // Create our world.
-  Printf (MSG_INITIALIZATION, "Creating world...\n");
+  Printf (CS_MSG_INITIALIZATION, "Creating world...\n");
   engine->Prepare ();
-  Printf (MSG_INITIALIZATION, "Created.\n");
+  Printf (CS_MSG_INITIALIZATION, "Created.\n");
 
   return true;
 @}
@@ -234,7 +234,7 @@ int main (int argc, char* argv[])
   // plug-ins (3D, 2D, network, etc.) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
   @{
-    System->Printf (MSG_FATAL_ERROR, "Error initializing system.\n");
+    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system.\n");
     cleanup ();
     exit (1);
   @}
@@ -260,7 +260,7 @@ Before doing anything at all, after including the necessary header files, we
 first need to use a few macros.  The CS_IMPLEMENT_APPLICATION macro is
 essential for every application using CS.  It makes sure that the @code{main()}
 routine is correctly linked and called on every platform.
-REGISTER_STATIC_LIBRARY is a temporary macro which is now needed because the
+SCF_REGISTER_STATIC_LIBRARY is a temporary macro which is now needed because the
 level loader already tries very hard to be a plugin but it really isn't.  Once
 the level loader is a plugin you only have to remove this macro call.
 
@@ -285,7 +285,7 @@ by explicitely calling @code{RequestPlugin()} for all plugins that we
 want.
 
 @samp{Initialize()} retrieves a pointer to the engine via a call to the
-@sc{scf} function @code{QUERY_PLUGIN()} and then ``opens'' the system, which
+@sc{scf} function @code{CS_QUERY_PLUGIN()} and then ``opens'' the system, which
 basically means that all graphics subsystems are opened (i.e.  a window will
 be opened). All plugins that were specified in the config file or requested
 for with @code{RequestPlugin()} will also be loaded and opened. This function
@@ -394,11 +394,11 @@ bool Simple::Initialize (int argc, const char const* const argv[],
   txtmgr->ResetPalette ();
   @dots{}
   // Create the world.
-  Printf (MSG_INITIALIZATION, "Creating world...\n");
+  Printf (CS_MSG_INITIALIZATION, "Creating world...\n");
 
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   @{
-    Printf (MSG_FATAL_ERROR, "Error loading 'stone4' texture!\n");
+    Printf (CS_MSG_FATAL_ERROR, "Error loading 'stone4' texture!\n");
     cleanup ();
     exit (1);
   @}
@@ -407,7 +407,7 @@ bool Simple::Initialize (int argc, const char const* const argv[],
 
   room = engine->CreateSector ("room");
   iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
-  iThingState* walls_state = QUERY_INTERFACE (walls->GetMeshObject (),
+  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
   	iThingState);
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
@@ -472,7 +472,7 @@ bool Simple::Initialize (int argc, const char const* const argv[],
   room->AddLight (light);
 
   engine->Prepare ();
-  Printf (MSG_INITIALIZATION, "Created.\n");
+  Printf (CS_MSG_INITIALIZATION, "Created.\n");
 
   txtmgr->SetPalette ();
   return true;
@@ -504,13 +504,13 @@ in the engine (called @code{CreateSectorWallsMesh()}) which will create a
 thing mesh and add it to the given sector. The only thing that has to be
 done after this is add polygons to that mesh. To do this we first query
 the interface called @code{iThingState} from the thing mesh object.
-We use the macro @code{QUERY_INTERFACE} which is part of @sc{scf}
+We use the macro @code{SCF_QUERY_INTERFACE} which is part of @sc{scf}
 (@pxref{SCF}). This will see if the mesh object (which is wrapped by
 the mesh wrapper) actually implements @code{iThingState} (which should
 be the case here) and if so it will return a pointer to the implementation
 of @code{iThingState}. All mesh objects implement some kind of state
 interface which is used to set up or query the state of that mesh object.
-Note that all interfaces which you query using @code{QUERY_INTERFACE}
+Note that all interfaces which you query using @code{SCF_QUERY_INTERFACE}
 should be released when you no longer need them (by calling @code{DecRef()}).
 
 The returned thing state we can now use to create polygons by calling
@@ -611,7 +611,7 @@ bool Simple::Initialize (int argc, const char const* const argv[],
   char const* iConfigName)
 @{
   @dots{}
-  Printf (MSG_INITIALIZATION, "Created.\n");
+  Printf (CS_MSG_INITIALIZATION, "Created.\n");
 
   view = engine->CreateView (g3d);
   view->GetCamera ()->SetSector (room);

@@ -198,7 +198,7 @@ public:
   	csFrustumContext* ctxt, csPolygon3D *poly);
 
   //--------------------- iPolygonTexture implementation ---------------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   ///
   virtual iMaterialHandle *GetMaterialHandle ();
   ///

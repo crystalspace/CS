@@ -248,8 +248,8 @@ void csTextureManagerOpenGL::SetPixelFormat (csPixelFormat &PixelFormat)
 
 void csTextureManagerOpenGL::PrepareTextures ()
 {
-  if (verbose) SysPrintf(MSG_INITIALIZATION, "Preparing textures...\n");
-  if (verbose) SysPrintf(MSG_INITIALIZATION, "  Creating texture mipmaps...\n");
+  if (verbose) SysPrintf(CS_MSG_INITIALIZATION, "Preparing textures...\n");
+  if (verbose) SysPrintf(CS_MSG_INITIALIZATION, "  Creating texture mipmaps...\n");
 
   // Create mipmaps for all textures
   for (int i = 0; i < textures.Length (); i++)

@@ -120,61 +120,61 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ZFILL)
 CS_TOKEN_DEF_END
 
-IMPLEMENT_IBASE (csThingLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csThingLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csThingSaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csThingSaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csPlaneLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csPlaneLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csPlaneSaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csPlaneSaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csBezierLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csBezierLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csBezierSaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csBezierSaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csThingLoader)
-IMPLEMENT_FACTORY (csThingSaver)
-IMPLEMENT_FACTORY (csPlaneLoader)
-IMPLEMENT_FACTORY (csPlaneSaver)
-IMPLEMENT_FACTORY (csBezierLoader)
-IMPLEMENT_FACTORY (csBezierSaver)
+SCF_IMPLEMENT_FACTORY (csThingLoader)
+SCF_IMPLEMENT_FACTORY (csThingSaver)
+SCF_IMPLEMENT_FACTORY (csPlaneLoader)
+SCF_IMPLEMENT_FACTORY (csPlaneSaver)
+SCF_IMPLEMENT_FACTORY (csBezierLoader)
+SCF_IMPLEMENT_FACTORY (csBezierSaver)
 
-EXPORT_CLASS_TABLE (thingldr)
-  EXPORT_CLASS (csThingLoader, "crystalspace.mesh.loader.factory.thing",
+SCF_EXPORT_CLASS_TABLE (thingldr)
+  SCF_EXPORT_CLASS (csThingLoader, "crystalspace.mesh.loader.factory.thing",
     "Crystal Space Thing Mesh Factory Loader")
-  EXPORT_CLASS (csThingSaver, "crystalspace.mesh.saver.factory.thing",
+  SCF_EXPORT_CLASS (csThingSaver, "crystalspace.mesh.saver.factory.thing",
     "Crystal Space Thing Mesh Factory Saver")
-  EXPORT_CLASS (csThingLoader, "crystalspace.mesh.loader.thing",
+  SCF_EXPORT_CLASS (csThingLoader, "crystalspace.mesh.loader.thing",
     "Crystal Space Thing Mesh Loader")
-  EXPORT_CLASS (csThingSaver, "crystalspace.mesh.saver.thing",
+  SCF_EXPORT_CLASS (csThingSaver, "crystalspace.mesh.saver.thing",
     "Crystal Space Thing Mesh Saver")
-  EXPORT_CLASS (csPlaneLoader, "crystalspace.mesh.loader.thing.plane",
+  SCF_EXPORT_CLASS (csPlaneLoader, "crystalspace.mesh.loader.thing.plane",
     "Crystal Space Thing Plane Loader")
-  EXPORT_CLASS (csPlaneSaver, "crystalspace.mesh.saver.thing.plane",
+  SCF_EXPORT_CLASS (csPlaneSaver, "crystalspace.mesh.saver.thing.plane",
     "Crystal Space Thing Plane Saver")
-  EXPORT_CLASS (csBezierLoader, "crystalspace.mesh.loader.thing.bezier",
+  SCF_EXPORT_CLASS (csBezierLoader, "crystalspace.mesh.loader.thing.bezier",
     "Crystal Space Thing Bezier Loader")
-  EXPORT_CLASS (csBezierSaver, "crystalspace.mesh.saver.thing.bezier",
+  SCF_EXPORT_CLASS (csBezierSaver, "crystalspace.mesh.saver.thing.bezier",
     "Crystal Space Thing Bezier Saver")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 #define MAXLINE 200 /* max number of chars per line... */
 
@@ -182,7 +182,7 @@ EXPORT_CLASS_TABLE_END
 
 csThingLoader::csThingLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csThingLoader::~csThingLoader ()
@@ -718,7 +718,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
 	  iPolyTexType* ptt = poly3d->GetPolyTexType ();
-	  iPolyTexFlat* fs = QUERY_INTERFACE (ptt, iPolyTexFlat);
+	  iPolyTexFlat* fs = SCF_QUERY_INTERFACE (ptt, iPolyTexFlat);
           int num, nv = poly3d->GetVertexCount ();
 	  fs->Setup (poly3d);
           float list [2 * 100];
@@ -734,7 +734,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
 	  iPolyTexType* ptt = poly3d->GetPolyTexType ();
-	  iPolyTexGouraud* gs = QUERY_INTERFACE (ptt, iPolyTexGouraud);
+	  iPolyTexGouraud* gs = SCF_QUERY_INTERFACE (ptt, iPolyTexGouraud);
           int num, nv = poly3d->GetVertexCount ();
 	  gs->Setup (poly3d);
           float list [3 * 100];
@@ -751,7 +751,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
 	  iPolyTexType* ptt = poly3d->GetPolyTexType ();
-	  iPolyTexFlat* fs = QUERY_INTERFACE (ptt, iPolyTexFlat);
+	  iPolyTexFlat* fs = SCF_QUERY_INTERFACE (ptt, iPolyTexFlat);
           int num, nv = poly3d->GetVertexCount ();
 	  fs->Setup (poly3d);
           float list [3 * 100];
@@ -841,7 +841,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
   if (uv_shift_given)
   {
     iPolyTexType* ptt = poly3d->GetPolyTexType ();
-    iPolyTexLightMap* plm = QUERY_INTERFACE (ptt, iPolyTexLightMap);
+    iPolyTexLightMap* plm = SCF_QUERY_INTERFACE (ptt, iPolyTexLightMap);
     if (plm)
     {
       plm->GetPolyTxtPlane ()->GetTextureSpace (tx_matrix, tx_vector);
@@ -939,7 +939,7 @@ static bool load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
             printf ("Couldn't find thing factory '%s'!\n", str);
             return false;
           }
-	  iThingState* tmpl_thing_state = QUERY_INTERFACE (
+	  iThingState* tmpl_thing_state = SCF_QUERY_INTERFACE (
 	  	fact->GetMeshObjectFactory (), iThingState);
 	  if (cmd == CS_TOKEN_FACTORY && imeshwrap)
 	    imeshwrap->SetFactory (fact);
@@ -974,7 +974,7 @@ static bool load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
             return false;
           }
 
-	  iThingState* tmpl_thing_state = QUERY_INTERFACE (
+	  iThingState* tmpl_thing_state = SCF_QUERY_INTERFACE (
 	  	wrap->GetMeshObject (), iThingState);
 	  if (!tmpl_thing_state)
 	  {
@@ -1128,17 +1128,17 @@ iBase* csThingLoader::Parse (const char* string, iEngine* engine,
   iMeshObjectFactory* fact = NULL;
   iThingState* thing_state = NULL;
 
-  iMeshWrapper* imeshwrap = QUERY_INTERFACE (context, iMeshWrapper);
+  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
   if (imeshwrap) imeshwrap->DecRef ();
-  iMeshFactoryWrapper* ifactmeshwrap = QUERY_INTERFACE (context,
+  iMeshFactoryWrapper* ifactmeshwrap = SCF_QUERY_INTERFACE (context,
   	iMeshFactoryWrapper);
   if (ifactmeshwrap) ifactmeshwrap->DecRef ();
 
-  iMeshObjectType* type = engine->GetThingType (); // @@@ LOAD_PLUGIN LATER!
+  iMeshObjectType* type = engine->GetThingType (); // @@@ CS_LOAD_PLUGIN LATER!
   // We always do NewFactory() even for mesh objects.
   // That's because csThing implements both so a factory is a mesh object.
   fact = type->NewFactory ();
-  thing_state = QUERY_INTERFACE (fact, iThingState);
+  thing_state = SCF_QUERY_INTERFACE (fact, iThingState);
 
   char* buf = (char*)string;
   ThingLoadInfo info;
@@ -1156,7 +1156,7 @@ iBase* csThingLoader::Parse (const char* string, iEngine* engine,
 
 csThingSaver::csThingSaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csThingSaver::~csThingSaver ()
@@ -1172,7 +1172,7 @@ bool csThingSaver::Initialize (iSystem* system)
 void csThingSaver::WriteDown (iBase* /*obj*/, iStrVector *str,
   iEngine* /*engine*/)
 {
-  iFactory *fact = QUERY_INTERFACE (this, iFactory);
+  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
   char buf[MAXLINE];
   char name[MAXLINE];
   csFindReplace (name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
@@ -1185,7 +1185,7 @@ void csThingSaver::WriteDown (iBase* /*obj*/, iStrVector *str,
 
 csPlaneLoader::csPlaneLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csPlaneLoader::~csPlaneLoader ()
@@ -1321,7 +1321,7 @@ iBase* csPlaneLoader::Parse (const char* string, iEngine* engine,
 
 csPlaneSaver::csPlaneSaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csPlaneSaver::~csPlaneSaver ()
@@ -1343,7 +1343,7 @@ void csPlaneSaver::WriteDown (iBase* /*obj*/, iStrVector* /*str*/,
 
 csBezierLoader::csBezierLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csBezierLoader::~csBezierLoader ()
@@ -1427,7 +1427,7 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
 
 csBezierSaver::csBezierSaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csBezierSaver::~csBezierSaver ()

@@ -33,22 +33,22 @@ static VideoSystem VS;
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csGraphics2DDOSRAW)
+SCF_IMPLEMENT_FACTORY (csGraphics2DDOSRAW)
 
-EXPORT_CLASS_TABLE (dosraw)
-  EXPORT_CLASS_DEP (csGraphics2DDOSRAW, "crystalspace.graphics2d.dosraw",
+SCF_EXPORT_CLASS_TABLE (dosraw)
+  SCF_EXPORT_CLASS_DEP (csGraphics2DDOSRAW, "crystalspace.graphics2d.dosraw",
     "DOS/DJGPP 2D graphics driver for Crystal Space", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csGraphics2DDOSRAW)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics2D)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics2DDOSRAW)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_END
 
 csGraphics2DDOSRAW::csGraphics2DDOSRAW (iBase *iParent) :
   csGraphics2D ()
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   Memory = NULL;
 }
 
@@ -69,7 +69,7 @@ bool csGraphics2DDOSRAW::Initialize (iSystem *pSystem)
   if (!VS.FindMode (Width, Height, Depth, pfmt.PalEntries,
         rm, gm, bm))
   {
-    CsPrintf (MSG_FATAL_ERROR, "Cannot find a suitable videomode match\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "Cannot find a suitable videomode match\n");
     exit (-1);
   }
 
@@ -104,16 +104,16 @@ bool csGraphics2DDOSRAW::Open (const char* Title)
       {
         rc = set_gfx_mode (GFX_VESA2B, Width, Height, 0, 0);
         if (!rc)
-          CsPrintf (MSG_INITIALIZATION, "VESA2 Banked mode selected.\n");
+          CsPrintf (CS_MSG_INITIALIZATION, "VESA2 Banked mode selected.\n");
       }
       else
-        CsPrintf (MSG_INITIALIZATION, "VESA1 mode selected.\n");
+        CsPrintf (CS_MSG_INITIALIZATION, "VESA1 mode selected.\n");
     }
   }
 
   if (rc)
   {
-    CsPrintf (MSG_FATAL_ERROR, "ERROR! Could not set graphics mode.\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "ERROR! Could not set graphics mode.\n");
     exit (-1);
   }
 
@@ -122,7 +122,7 @@ bool csGraphics2DDOSRAW::Open (const char* Title)
 
   if (Memory == NULL)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Error initializing graphics subsystem: bad videomode!\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "Error initializing graphics subsystem: bad videomode!\n");
     return false;
   }
 
@@ -133,19 +133,19 @@ bool csGraphics2DDOSRAW::Open (const char* Title)
     case 0:
       break;
     case -1:
-      CsPrintf (MSG_FATAL_ERROR, "VESA ERROR: Incompatible VESA BIOS detected!\n");
+      CsPrintf (CS_MSG_FATAL_ERROR, "VESA ERROR: Incompatible VESA BIOS detected!\n");
       return false;
     case -2:
-      CsPrintf (MSG_FATAL_ERROR, "DPMI ERROR: Cannot map videobuffer into linear address space\n");
+      CsPrintf (CS_MSG_FATAL_ERROR, "DPMI ERROR: Cannot map videobuffer into linear address space\n");
       return false;
     case -3:
-      CsPrintf (MSG_FATAL_ERROR, "DPMI ERROR: Cannot set up a selector for accessing video memory\n");
+      CsPrintf (CS_MSG_FATAL_ERROR, "DPMI ERROR: Cannot set up a selector for accessing video memory\n");
       return false;
     case -4:
-      CsPrintf (MSG_FATAL_ERROR, "MEM ERROR: Not enough memory for allocating a back buffer\n");
+      CsPrintf (CS_MSG_FATAL_ERROR, "MEM ERROR: Not enough memory for allocating a back buffer\n");
       return false;
     default:
-      CsPrintf (MSG_FATAL_ERROR, "UNKNOWN ERROR ON VIDEO SUBSYSTEM INITIALIZATION\n");
+      CsPrintf (CS_MSG_FATAL_ERROR, "UNKNOWN ERROR ON VIDEO SUBSYSTEM INITIALIZATION\n");
       return false;
   }
 
@@ -170,7 +170,7 @@ bool csGraphics2DDOSRAW::Open (const char* Title)
       _GetPixelAt = GetPixelAt32;
       break;
     default:
-      CsPrintf (MSG_WARNING, "WARNING: No 2D routines for selected mode!\n");
+      CsPrintf (CS_MSG_WARNING, "WARNING: No 2D routines for selected mode!\n");
       break;
   } /* endif */
 

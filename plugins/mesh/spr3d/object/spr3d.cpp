@@ -42,13 +42,13 @@ CS_IMPLEMENT_PLUGIN
 
 //--------------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csSpriteFrame)
-  IMPLEMENTS_INTERFACE (iSpriteFrame)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSpriteFrame)
+  SCF_IMPLEMENTS_INTERFACE (iSpriteFrame)
+SCF_IMPLEMENT_IBASE_END
 
 csSpriteFrame::csSpriteFrame (int anm_idx, int tex_idx)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   name = NULL;
   animation_index = anm_idx;
   texturing_index = tex_idx;
@@ -74,13 +74,13 @@ void csSpriteFrame::SetName (char const* n)
 
 //--------------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csSpriteAction2)
-  IMPLEMENTS_INTERFACE (iSpriteAction)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSpriteAction2)
+  SCF_IMPLEMENTS_INTERFACE (iSpriteAction)
+SCF_IMPLEMENT_IBASE_END
 
 csSpriteAction2::csSpriteAction2() : frames (8, 8), delays (8, 8)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   name = NULL;
 }
 
@@ -139,20 +139,20 @@ csSpriteActionVector::~csSpriteActionVector ()
 
 //--------------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csSprite3DMeshObjectFactory)
-  IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iSprite3DFactoryState)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSprite3DMeshObjectFactory)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite3DFactoryState)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectFactory::Sprite3DFactoryState)
-  IMPLEMENTS_INTERFACE (iSprite3DFactoryState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectFactory::Sprite3DFactoryState)
+  SCF_IMPLEMENTS_INTERFACE (iSprite3DFactoryState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
     texels (8, 8), vertices (8, 8), normals (8, 8)
 {
-  CONSTRUCT_IBASE (pParent);
-  CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DFactoryState);
+  SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DFactoryState);
   cstxt = NULL;
   emerge_from = NULL;
   skeleton = NULL;
@@ -218,7 +218,7 @@ iMeshObject* csSprite3DMeshObjectFactory::NewInstance ()
   spr->SetLightingQualityConfig (GetLightingQualityConfig());
   spr->SetAction ("default");
   spr->InitSprite ();
-  iMeshObject* im = QUERY_INTERFACE (spr, iMeshObject);
+  iMeshObject* im = SCF_QUERY_INTERFACE (spr, iMeshObject);
   im->DecRef ();
   return im;
 }
@@ -434,8 +434,8 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base)
 {
   if (base > GetFrameCount())
   {
-    System->Printf (MSG_WARNING, "No frame number: \n", base);
-    System->Printf (MSG_WARNING, "no smoothing performed\n");
+    System->Printf (CS_MSG_WARNING, "No frame number: \n", base);
+    System->Printf (CS_MSG_WARNING, "no smoothing performed\n");
     return;
   }
   int i;
@@ -448,11 +448,11 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   int i, j;
 
   int num_frames = GetFrameCount();
-  if (base  > num_frames) System->Printf (MSG_WARNING, "No frame number: \n", base);
-  if (frame > num_frames) System->Printf (MSG_WARNING, "No frame number: \n", frame);
+  if (base  > num_frames) System->Printf (CS_MSG_WARNING, "No frame number: \n", base);
+  if (frame > num_frames) System->Printf (CS_MSG_WARNING, "No frame number: \n", frame);
   if (frame > num_frames || base > num_frames)
   {
-    System->Printf (MSG_WARNING, "no smoothing performed\n");
+    System->Printf (CS_MSG_WARNING, "no smoothing performed\n");
     return;
   }
 
@@ -566,26 +566,26 @@ void csSprite3DMeshObjectFactory::Sprite3DFactoryState::EnableSkeletalAnimation 
 iSkeleton* csSprite3DMeshObjectFactory::Sprite3DFactoryState::GetSkeleton ()
   const
 {
-  iSkeleton* iskel = QUERY_INTERFACE_SAFE (scfParent->GetSkeleton (), iSkeleton);
+  iSkeleton* iskel = SCF_QUERY_INTERFACE_SAFE (scfParent->GetSkeleton (), iSkeleton);
   if (iskel) iskel->DecRef ();
   return iskel;
 }
 
 //=============================================================================
 
-IMPLEMENT_IBASE (csSprite3DMeshObject)
-  IMPLEMENTS_INTERFACE (iMeshObject)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iSprite3DState)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSprite3DMeshObject)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite3DState)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::Sprite3DState)
-  IMPLEMENTS_INTERFACE (iSprite3DState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::Sprite3DState)
+  SCF_IMPLEMENTS_INTERFACE (iSprite3DState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::PolyMesh)
-  IMPLEMENTS_INTERFACE (iPolygonMesh)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::PolyMesh)
+  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 /// Static vertex array.
 static DECLARE_GROWING_ARRAY_REF (tr_verts, csVector3);
@@ -600,9 +600,9 @@ static DECLARE_GROWING_ARRAY_REF (tween_verts, csVector3);
 
 csSprite3DMeshObject::csSprite3DMeshObject ()
 {
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
-  CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DState);
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DState);
   cur_frame = 0;
   factory = NULL;
   force_otherskin = false;
@@ -882,7 +882,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 
   if (!factory->cstxt)
   {
-    factory->System->Printf (MSG_FATAL_ERROR, "Error! Trying to draw a sprite with no material!\n");
+    factory->System->Printf (CS_MSG_FATAL_ERROR, "Error! Trying to draw a sprite with no material!\n");
     exit (0); //fatal_exit (0, false);
   }
  
@@ -1125,7 +1125,7 @@ void csSprite3DMeshObject::InitSprite ()
 {
   if (!factory)
   {
-    factory->System->Printf (MSG_FATAL_ERROR, "There is no defined template for this sprite!\n");
+    factory->System->Printf (CS_MSG_FATAL_ERROR, "There is no defined template for this sprite!\n");
     exit (0); //fatal_exit (0, false);
   }
 
@@ -1582,34 +1582,34 @@ csMeshedPolygon* csSprite3DMeshObject::PolyMesh::GetPolygons ()
 
 iSkeletonState* csSprite3DMeshObject::Sprite3DState::GetSkeletonState () const
 {
-  iSkeletonState* iskelstate = QUERY_INTERFACE_SAFE (scfParent->GetSkeletonState (), iSkeletonState);
+  iSkeletonState* iskelstate = SCF_QUERY_INTERFACE_SAFE (scfParent->GetSkeletonState (), iSkeletonState);
   if (iskelstate) iskelstate->DecRef ();
   return iskelstate;
 }
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csSprite3DMeshObjectType)
-  IMPLEMENTS_INTERFACE (iMeshObjectType)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSprite3DMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectType::csSprite3DConfig)
-  IMPLEMENTS_INTERFACE (iConfig)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectType::csSprite3DConfig)
+  SCF_IMPLEMENTS_INTERFACE (iConfig)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_FACTORY (csSprite3DMeshObjectType)
+SCF_IMPLEMENT_FACTORY (csSprite3DMeshObjectType)
 
-EXPORT_CLASS_TABLE (spr3d)
-  EXPORT_CLASS (csSprite3DMeshObjectType, "crystalspace.mesh.object.sprite.3d",
+SCF_EXPORT_CLASS_TABLE (spr3d)
+  SCF_EXPORT_CLASS (csSprite3DMeshObjectType, "crystalspace.mesh.object.sprite.3d",
     "Crystal Space Sprite3D Mesh Type")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csSprite3DMeshObjectType::csSprite3DMeshObjectType (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
-  CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
 }
 
 csSprite3DMeshObjectType::~csSprite3DMeshObjectType ()
@@ -1626,7 +1626,7 @@ iMeshObjectFactory* csSprite3DMeshObjectType::NewFactory ()
 {
   csSprite3DMeshObjectFactory* cm = new csSprite3DMeshObjectFactory (this);
   cm->System = System;
-  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;
 }

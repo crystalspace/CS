@@ -107,7 +107,7 @@ protected:
   int closest_index (csRGBpixel *iColor);
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Destroy the image file object and free all associated storage
   virtual ~csImageFile ();

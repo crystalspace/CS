@@ -294,8 +294,8 @@ void csTextureCacheSoftware::fill_texture (int MipMap, iPolygonTexture* pt,
 
 void csTextureCacheSoftware::dump (csGraphics3DSoftwareCommon *iG3D)
 {
-  SysPrintf (MSG_CONSOLE, "Textures in the cache: %d\n", total_textures);
-  SysPrintf (MSG_CONSOLE, "Total size: %ld bytes\n", total_size);
+  SysPrintf (CS_MSG_CONSOLE, "Textures in the cache: %d\n", total_textures);
+  SysPrintf (CS_MSG_CONSOLE, "Total size: %ld bytes\n", total_size);
   int mean = (total_textures == 0) ? 0 : total_size / total_textures;
-  SysPrintf (MSG_CONSOLE, "Bytes per texture: %d\n", mean);
+  SysPrintf (CS_MSG_CONSOLE, "Bytes per texture: %d\n", mean);
 }

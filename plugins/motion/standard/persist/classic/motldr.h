@@ -54,7 +54,7 @@ public:
   
   virtual bool Initialize( iSystem *Sys);
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iBase* Parse( const char* string, iEngine *engine, iBase *context );
 };
@@ -72,7 +72,7 @@ public:
   
   virtual bool Initialize ( iSystem *system );
   
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   
   virtual void WriteDown ( iBase *obj, iStrVector *string, iEngine *engine );
   

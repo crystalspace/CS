@@ -41,7 +41,7 @@
 
 CS_IMPLEMENT_APPLICATION
 
-REGISTER_STATIC_LIBRARY (lvlload)
+SCF_REGISTER_STATIC_LIBRARY (lvlload)
 
 //-----------------------------------------------------------------------------
 
@@ -74,31 +74,31 @@ bool Simple::Initialize (int argc, const char* const argv[],
     return false;
 
   // Find the pointer to engine plugin
-  engine = QUERY_PLUGIN (this, iEngine);
+  engine = CS_QUERY_PLUGIN (this, iEngine);
   if (!engine)
   {
-    Printf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
 
-  loader = QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
+  loader = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
   if (!loader)
   {
-    Printf (MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
 
-  g3d = QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
+  g3d = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
   if (!g3d)
   {
-    Printf (MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
     abort ();
   }
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("Simple Crystal Space Application"))
   {
-    Printf (MSG_FATAL_ERROR, "Error opening system!\n");
+    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     cleanup ();
     exit (1);
   }
@@ -110,24 +110,24 @@ bool Simple::Initialize (int argc, const char* const argv[],
   // Initialize the texture manager
   txtmgr->ResetPalette ();
 
-  Printf (MSG_INITIALIZATION,
+  Printf (CS_MSG_INITIALIZATION,
     "Simple Crystal Space Application version 0.1.\n");
 
   // Create our world.
-  Printf (MSG_INITIALIZATION, "Loading world!...\n");
+  Printf (CS_MSG_INITIALIZATION, "Loading world!...\n");
 
   // Set VFS current directory to the level we want to load.
   VFS->ChDir ("/lev/flarge");
   // Load the level file which is called 'world'.
   if (!loader->LoadMapFile ("world"))
   {
-    Printf (MSG_FATAL_ERROR, "Couldn't load level!\n");
+    Printf (CS_MSG_FATAL_ERROR, "Couldn't load level!\n");
     cleanup ();
     exit (1);
   }
 
   engine->Prepare ();
-  Printf (MSG_INITIALIZATION, "Loaded.\n");
+  Printf (CS_MSG_INITIALIZATION, "Loaded.\n");
 
   // Find the starting position in this level.
   csVector3 pos (0, 0, 0);
@@ -146,7 +146,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   }
   if (!room)
   {
-    Printf (MSG_FATAL_ERROR, "Can't find a valid starting position!\n");
+    Printf (CS_MSG_FATAL_ERROR, "Can't find a valid starting position!\n");
     cleanup ();
     exit (1);
   }
@@ -235,7 +235,7 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
   {
-    System->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
+    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
     cleanup ();
     exit (1);
   }

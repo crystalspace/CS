@@ -24,14 +24,14 @@
 #include "ivideo/txtmgr.h"
 #include <ctype.h>
 
-IMPLEMENT_IBASE (csAVIStreamVideo)
-  IMPLEMENTS_INTERFACE (iVideoStream)
-  IMPLEMENTS_INTERFACE (iStream)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csAVIStreamVideo)
+  SCF_IMPLEMENTS_INTERFACE (iVideoStream)
+  SCF_IMPLEMENTS_INTERFACE (iStream)
+SCF_IMPLEMENT_IBASE_END
 
 csAVIStreamVideo::csAVIStreamVideo (iBase *pBase): memimage (1,1)
 {
-  CONSTRUCT_IBASE (pBase);
+  SCF_CONSTRUCT_IBASE (pBase);
   pChunk = NULL;
   pAVI = (csAVIFormat*)pBase;
   pSystem = NULL;
@@ -78,9 +78,9 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
   nStream = nStreamNumber;
   pSystem = pTheSystem;
   if (pG3D) pG3D->DecRef ();
-  pG3D = QUERY_PLUGIN (pSystem, iGraphics3D);
+  pG3D = CS_QUERY_PLUGIN (pSystem, iGraphics3D);
   if (pG2D) pG2D->DecRef ();
-  pG2D = QUERY_PLUGIN (pSystem, iGraphics2D);
+  pG2D = CS_QUERY_PLUGIN (pSystem, iGraphics2D);
 
   pIA->w = 0;
   pIA->h = 0;
@@ -445,7 +445,7 @@ bool csAVIStreamVideo::LoadCodec (UByte *pInitData, ULong nInitDataLen,
   char cn[128];
   sprintf (cn, "crystalspace.video.codec.avi.%s", strdesc.codec);
   // try open this class
-  pCodec = CREATE_INSTANCE (cn, iAVICodec);
+  pCodec = SCF_CREATE_INSTANCE (cn, iAVICodec);
   if (pCodec)
   {
     // codec exists, now try to initialize it
@@ -456,13 +456,13 @@ bool csAVIStreamVideo::LoadCodec (UByte *pInitData, ULong nInitDataLen,
     }
     else
     {
-      pSystem->Printf (MSG_WARNING, "CODEC class \"%s\" could not be initialized !", cn);
+      pSystem->Printf (CS_MSG_WARNING, "CODEC class \"%s\" could not be initialized !", cn);
       pCodec->DecRef ();
       pCodec = NULL;
     }
   }
   else
-    pSystem->Printf (MSG_WARNING, "CODEC class \"%s\" could not be loaded !", cn);
+    pSystem->Printf (CS_MSG_WARNING, "CODEC class \"%s\" could not be loaded !", cn);
 
   return false;
 }

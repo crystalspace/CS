@@ -68,7 +68,7 @@ bool Simple::Initialize(int argc, char const* const argv[],
   	"/lib/std/spark.png");
   if (txt == NULL)
   @{
-    Printf (MSG_FATAL_ERROR, "Error loading texture!\n");
+    Printf (CS_MSG_FATAL_ERROR, "Error loading texture!\n");
     cleanup ();
     exit (1);
   @}
@@ -128,7 +128,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   	"/lib/std/sprite1");
   if (imeshfact == NULL)
   @{
-    Printf (MSG_FATAL_ERROR, "Error loading mesh object factory!\n");
+    Printf (CS_MSG_FATAL_ERROR, "Error loading mesh object factory!\n");
     cleanup ();
     exit (1);
   @}
@@ -173,7 +173,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   csMatrix3 m; m.Identity (); m *= 5.;
   sprite->GetMovable ()->SetTransform (m);
   sprite->GetMovable ()->UpdateMove ();
-  iSprite3DState* spstate = QUERY_INTERFACE (sprite->GetMeshObject (),
+  iSprite3DState* spstate = SCF_QUERY_INTERFACE (sprite->GetMeshObject (),
   	iSprite3DState);
   spstate->SetAction ("default");
   imeshfact->DecRef ();
@@ -210,7 +210,7 @@ simple example the sprite has only one frame so there is not much animation
 to see.
 
 Whenever you are done with some interface you obtained through
-@code{QUERY_INTERFACE()} you should release the pointer with @code{DecRef()}.
+@code{SCF_QUERY_INTERFACE()} you should release the pointer with @code{DecRef()}.
 
 The last call to @code{DeferUpdateLighting} is interesting. If you don't
 call this then the sprite will be black. This call tells the engine

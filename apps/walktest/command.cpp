@@ -86,14 +86,14 @@ static int value_choice (const char* arg, int old_value, const char* const* choi
     if (!strcasecmp (choices[i], arg)) return i;
     i++;
   }
-  CsPrintf (MSG_CONSOLE, "Expected one of the following:\n");
+  CsPrintf (CS_MSG_CONSOLE, "Expected one of the following:\n");
   i = 0;
   while (choices[i])
   {
-    CsPrintf (MSG_CONSOLE, "    %s%s\n", choices[i], i == old_value ? " (current)" : "");
+    CsPrintf (CS_MSG_CONSOLE, "    %s%s\n", choices[i], i == old_value ? " (current)" : "");
     i++;
   }
-  CsPrintf (MSG_CONSOLE, "    or 'next' or 'prev'\n");
+  CsPrintf (CS_MSG_CONSOLE, "    or 'next' or 'prev'\n");
   return -1;
 }
 
@@ -105,7 +105,7 @@ static bool yes_or_no (const char* arg, bool old_value)
   if (!strcasecmp (arg, "yes") || !strcasecmp (arg, "true") || !strcasecmp (arg, "on")) return true;
   if (!strcasecmp (arg, "no") || !strcasecmp (arg, "false") || !strcasecmp (arg, "off")) return false;
   if (!strcasecmp (arg, "toggle")) return !old_value;
-  CsPrintf (MSG_CONSOLE, "Expected: yes, true, on, 1, no, false, off, 0, or toggle!\n");
+  CsPrintf (CS_MSG_CONSOLE, "Expected: yes, true, on, 1, no, false, off, 0, or toggle!\n");
   return false;
 }
 
@@ -127,13 +127,13 @@ void csCommandProcessor::change_boolean (const char* arg, bool* value, const cha
     if (v != -1)
     {
       *value = v;
-      CsPrintf (MSG_CONSOLE, "Set %s %s\n", what, say_on_or_off (*value));
+      CsPrintf (CS_MSG_CONSOLE, "Set %s %s\n", what, say_on_or_off (*value));
     }
   }
   else
   {
     // Show value
-    CsPrintf (MSG_CONSOLE, "Current %s is %s\n", what, say_on_or_off (*value));
+    CsPrintf (CS_MSG_CONSOLE, "Current %s is %s\n", what, say_on_or_off (*value));
   }
 }
 
@@ -149,13 +149,13 @@ void csCommandProcessor::change_choice (const char* arg, int* value, const char*
     if (v != -1)
     {
       *value = v;
-      CsPrintf (MSG_CONSOLE, "Set %s %s\n", what, choices[*value]);
+      CsPrintf (CS_MSG_CONSOLE, "Set %s %s\n", what, choices[*value]);
     }
   }
   else
   {
     // Show value
-    CsPrintf (MSG_CONSOLE, "Current %s is %s\n", what, choices[*value]);
+    CsPrintf (CS_MSG_CONSOLE, "Current %s is %s\n", what, choices[*value]);
   }
 }
 
@@ -176,18 +176,18 @@ bool csCommandProcessor::change_float (const char* arg, float* value, const char
       g = *value+dv;
     }
     else sscanf (arg, "%f", &g);
-    if (g < min || g > max) CsPrintf (MSG_CONSOLE, "Bad value for %s (%f <= value <= %f)!\n", what, min, max);
+    if (g < min || g > max) CsPrintf (CS_MSG_CONSOLE, "Bad value for %s (%f <= value <= %f)!\n", what, min, max);
     else
     {
       *value = g;
-      CsPrintf (MSG_CONSOLE, "Set %s to %f\n", what, *value);
+      CsPrintf (CS_MSG_CONSOLE, "Set %s to %f\n", what, *value);
       return true;
     }
   }
   else
   {
     // Show value.
-    CsPrintf (MSG_CONSOLE, "Current %s is %f\n", what, *value);
+    CsPrintf (CS_MSG_CONSOLE, "Current %s is %f\n", what, *value);
   }
   return false;
 }
@@ -209,18 +209,18 @@ bool csCommandProcessor::change_int (const char* arg, int* value, const char* wh
       g = *value+dv;
     }
     else sscanf (arg, "%d", &g);
-    if (g < min || g > max) CsPrintf (MSG_CONSOLE, "Bad value for %s (%d <= value <= %d)!\n", what, min, max);
+    if (g < min || g > max) CsPrintf (CS_MSG_CONSOLE, "Bad value for %s (%d <= value <= %d)!\n", what, min, max);
     else
     {
       *value = g;
-      CsPrintf (MSG_CONSOLE, "Set %s to %d\n", what, *value);
+      CsPrintf (CS_MSG_CONSOLE, "Set %s to %d\n", what, *value);
       return true;
     }
   }
   else
   {
     // Show value.
-    CsPrintf (MSG_CONSOLE, "Current %s is %d\n", what, *value);
+    CsPrintf (CS_MSG_CONSOLE, "Current %s is %d\n", what, *value);
   }
   return false;
 }
@@ -242,18 +242,18 @@ bool csCommandProcessor::change_long (const char* arg, long* value, const char* 
       g = *value+dv;
     }
     else sscanf (arg, "%ld", &g);
-    if (g < min || g > max) CsPrintf (MSG_CONSOLE, "Bad value for %s (%ld <= value <= %ld)!\n", what, min, max);
+    if (g < min || g > max) CsPrintf (CS_MSG_CONSOLE, "Bad value for %s (%ld <= value <= %ld)!\n", what, min, max);
     else
     {
       *value = g;
-      CsPrintf (MSG_CONSOLE, "Set %s to %ld\n", what, *value);
+      CsPrintf (CS_MSG_CONSOLE, "Set %s to %ld\n", what, *value);
       return true;
     }
   }
   else
   {
     // Show value.
-    CsPrintf (MSG_CONSOLE, "Current %s is %ld\n", what, *value);
+    CsPrintf (CS_MSG_CONSOLE, "Current %s is %ld\n", what, *value);
   }
   return false;
 }
@@ -292,26 +292,26 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     csEngine::System->GetSystemEventOutlet ()->Broadcast (cscmdQuit);
   else if (!strcasecmp (cmd, "help"))
   {
-    CsPrintf (MSG_CONSOLE, "-*- General commands -*-\n");
-    CsPrintf (MSG_CONSOLE, " about, version, quit, help\n");
-    CsPrintf (MSG_CONSOLE, " debug, db_maxpol, db_procpol\n");
-    CsPrintf (MSG_CONSOLE, " console, facenorth, facesouth, faceeast\n");
-    CsPrintf (MSG_CONSOLE, " facewest, faceup, facedown, turn, activate\n");
-    CsPrintf (MSG_CONSOLE, " cls, exec, dnl, cmessage, dmessage\n");
-    CsPrintf (MSG_CONSOLE, " portals, cosfact\n");
-    CsPrintf (MSG_CONSOLE, " extension, lod, sprlight, coordset\n");
+    CsPrintf (CS_MSG_CONSOLE, "-*- General commands -*-\n");
+    CsPrintf (CS_MSG_CONSOLE, " about, version, quit, help\n");
+    CsPrintf (CS_MSG_CONSOLE, " debug, db_maxpol, db_procpol\n");
+    CsPrintf (CS_MSG_CONSOLE, " console, facenorth, facesouth, faceeast\n");
+    CsPrintf (CS_MSG_CONSOLE, " facewest, faceup, facedown, turn, activate\n");
+    CsPrintf (CS_MSG_CONSOLE, " cls, exec, dnl, cmessage, dmessage\n");
+    CsPrintf (CS_MSG_CONSOLE, " portals, cosfact\n");
+    CsPrintf (CS_MSG_CONSOLE, " extension, lod, sprlight, coordset\n");
   }
   else if (!strcasecmp (cmd, "about"))
   {
-    CsPrintf (MSG_CONSOLE, "Crystal Space version %s (%s).\n", CS_VERSION, CS_RELEASE_DATE);
+    CsPrintf (CS_MSG_CONSOLE, "Crystal Space version %s (%s).\n", CS_VERSION, CS_RELEASE_DATE);
   }
   else if (!strcasecmp (cmd, "version"))
-    CsPrintf (MSG_CONSOLE, "%s\n", CS_VERSION);
+    CsPrintf (CS_MSG_CONSOLE, "%s\n", CS_VERSION);
   else if (!strcasecmp (cmd, "extension"))
   {
     iGraphics2D* g2d = g3d->GetDriver2D ();
     if (!g2d->PerformExtension (arg))
-      CsPrintf (MSG_CONSOLE, "Extension '%s' not supported!\n", arg);
+      CsPrintf (CS_MSG_CONSOLE, "Extension '%s' not supported!\n", arg);
   }
   else if (!strcasecmp (cmd, "db_maxpol"))
   {
@@ -328,19 +328,19 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
   }
   else if (!strcasecmp (cmd, "cmessage"))
   {
-    if (arg) CsPrintf (MSG_CONSOLE, arg);
-    else CsPrintf (MSG_CONSOLE, "Argument expected!\n");
+    if (arg) CsPrintf (CS_MSG_CONSOLE, arg);
+    else CsPrintf (CS_MSG_CONSOLE, "Argument expected!\n");
   }
   else if (!strcasecmp (cmd, "dmessage"))
   {
-    if (arg) CsPrintf (MSG_DEBUG_0, arg);
-    else CsPrintf (MSG_CONSOLE, "Argument expected!\n");
+    if (arg) CsPrintf (CS_MSG_DEBUG_0, arg);
+    else CsPrintf (CS_MSG_CONSOLE, "Argument expected!\n");
   }
   else if (!strcasecmp (cmd, "cosfact"))
     change_float (arg, &csPolyTexture::cfg_cosinus_factor, "cosinus factor", -1, 1);
   else if (!strcasecmp (cmd, "lod"))
   {
-    iMeshObjectType* type = QUERY_PLUGIN_CLASS (Sys, "crystalspace.mesh.object.sprite.3d",
+    iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (Sys, "crystalspace.mesh.object.sprite.3d",
       	  "MeshObj", iMeshObjectType);
     csVariant lod_level;
     GetConfigOption (type, "sprlod", lod_level);
@@ -349,7 +349,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
   }
   else if (!strcasecmp (cmd, "sprlight"))
   {
-    iMeshObjectType* type = QUERY_PLUGIN_CLASS (Sys, "crystalspace.mesh.object.sprite.3d",
+    iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (Sys, "crystalspace.mesh.object.sprite.3d",
       	  "MeshObj", iMeshObjectType);
     csVariant lqual;
     GetConfigOption (type, "sprlq", lqual);
@@ -357,7 +357,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     SetConfigOption (type, "sprlq", lqual);
   }
   else if (!strcasecmp (cmd, "dnl"))
-    CsPrintf (MSG_DEBUG_0, "\n");
+    CsPrintf (CS_MSG_DEBUG_0, "\n");
   else if (!strcasecmp (cmd, "exec"))
   {
     if (arg)
@@ -365,7 +365,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
       if (start_script (arg) && console)
         console->SetVisible (true);
     }
-    else CsPrintf (MSG_CONSOLE, "Please specify the name of the script!\n");
+    else CsPrintf (CS_MSG_CONSOLE, "Please specify the name of the script!\n");
   }
   else if (!strcasecmp (cmd, "portals"))
     change_boolean (arg, &csSector::do_portals, "portals");
@@ -388,26 +388,26 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     camera->RotateThis (VEC_ROT_RIGHT, M_PI);
   else if (!strcasecmp (cmd, "activate"))
   {
-    CsPrintf (MSG_CONSOLE, "OBSOLETE\n");
+    CsPrintf (CS_MSG_CONSOLE, "OBSOLETE\n");
   }
   else if (!strcasecmp (cmd, "coordset"))
   {
     if (!arg)
     {
-      CsPrintf (MSG_CONSOLE, "Expected argument!\n");
+      CsPrintf (CS_MSG_CONSOLE, "Expected argument!\n");
       return false;
     }
     char sect[100];
     float x, y, z;
     if (csScanStr (arg, "%s,%f,%f,%f", sect, &x, &y, &z) != 4)
     {
-      CsPrintf (MSG_CONSOLE, "Expected sector,x,y,z. Got something else!\n");
+      CsPrintf (CS_MSG_CONSOLE, "Expected sector,x,y,z. Got something else!\n");
       return false;
     }
     csSector* s = (csSector*)engine->sectors.FindByName (sect);
     if (!s)
     {
-      CsPrintf (MSG_CONSOLE, "Can't find this sector!\n");
+      CsPrintf (CS_MSG_CONSOLE, "Can't find this sector!\n");
       return false;
     }
     camera->SetSector (s);
@@ -437,7 +437,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
                                0,  1,  0 ) );
   else
   {
-    CsPrintf (MSG_CONSOLE, "Unknown command: `%s'\n", cmd);
+    CsPrintf (CS_MSG_CONSOLE, "Unknown command: `%s'\n", cmd);
     return false;
   }
   return true;
@@ -446,14 +446,14 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
 bool csCommandProcessor::start_script (const char* scr)
 {
   bool ok = false;
-  iVFS* v = QUERY_PLUGIN_ID (system, CS_FUNCID_VFS, iVFS);
+  iVFS* v = CS_QUERY_PLUGIN_ID (system, CS_FUNCID_VFS, iVFS);
   if (v)
   {
     if (v->Exists (scr))
     {
       iFile* f = v->Open (scr, VFS_FILE_READ);
       if (!f)
-        CsPrintf (MSG_CONSOLE, "Could not open script file '%s'!\n", scr);
+        CsPrintf (CS_MSG_CONSOLE, "Could not open script file '%s'!\n", scr);
       else
       {
         // Replace possible running script with this one.

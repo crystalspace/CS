@@ -28,14 +28,14 @@
 #include "sndhdl.h"
 #include "isys/system.h"
 
-IMPLEMENT_FACTORY(csSoundSourceDS3D)
+SCF_IMPLEMENT_FACTORY(csSoundSourceDS3D)
 
-IMPLEMENT_IBASE(csSoundSourceDS3D)
-  IMPLEMENTS_INTERFACE(iSoundSource)
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csSoundSourceDS3D)
+  SCF_IMPLEMENTS_INTERFACE(iSoundSource)
+SCF_IMPLEMENT_IBASE_END;
 
 csSoundSourceDS3D::csSoundSourceDS3D(iBase *piBase) {
-  CONSTRUCT_IBASE(piBase);
+  SCF_CONSTRUCT_IBASE(piBase);
 
   Buffer3D = NULL;
   Buffer2D = NULL;
@@ -89,14 +89,14 @@ bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr,
 
   r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &Buffer2D, NULL);
   if (r != DS_OK) {
-    srdr->System->Printf(MSG_WARNING, "cannot create secondary sound buffer "
+    srdr->System->Printf(CS_MSG_WARNING, "cannot create secondary sound buffer "
      "for sound source (%s).\n", srdr->GetError(r));
     return false;
   }
 
   r = Buffer2D->QueryInterface(IID_IDirectSound3DBuffer, (void **) &Buffer3D);
   if (r != DS_OK) {
-    srdr->System->Printf(MSG_WARNING, "cannot query 3D buffer interface "
+    srdr->System->Printf(CS_MSG_WARNING, "cannot query 3D buffer interface "
       "for sound source (%s).\n", srdr->GetError(r));
     return false;
   }
@@ -158,7 +158,7 @@ void csSoundSourceDS3D::SetMode3D(int mode3D) {
   
   HRESULT r = Buffer3D->SetMode(Mode, DS3D_DEFERRED);
   if (r != DS_OK) {
-    Renderer->System->Printf(MSG_WARNING, "cannot set secondary sound buffer 3d mode "
+    Renderer->System->Printf(CS_MSG_WARNING, "cannot set secondary sound buffer 3d mode "
       "for sound source (%s)\n.", Renderer->GetError(r));
   } else Renderer->SetDirty();
 }
@@ -167,7 +167,7 @@ int csSoundSourceDS3D::GetMode3D() {
   DWORD Mode;
   HRESULT r = Buffer3D->GetMode(&Mode);
   if (r != DS_OK) {
-    Renderer->System->Printf(MSG_WARNING, "cannot get secondary sound buffer 3d mode "
+    Renderer->System->Printf(CS_MSG_WARNING, "cannot get secondary sound buffer 3d mode "
       "for sound source (%s)\n.", Renderer->GetError(r));
     return false;
   }

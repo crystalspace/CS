@@ -28,7 +28,7 @@
 class csGraphics2DDDraw3 : public csGraphics2D
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csGraphics2DDDraw3 (iBase *iParent);
   // Uses3D is currently not specified

@@ -141,7 +141,7 @@ extern PFNGLMULTITEXCOORD4DVARB glMultiTexCoord4dvARB;
 #include "../ogl_g3d.h"
 
 //Just for printing debug info.
-#define MSG_INITIALIZATION 4
+#define CS_MSG_INITIALIZATION 4
 
 /*********************************************************************
 *
@@ -250,7 +250,7 @@ void csGraphics3DOGLCommon::DetectExtensions()
 {
   //The SysPrintf is just for debugging, but it writes which extensions you have into
   //debug.txt. Made me jealous when I ran it on a TnT2 :-(
-  SysPrintf (MSG_INITIALIZATION, "Detecting Win32 OpenGL extensions.\n");
+  SysPrintf (CS_MSG_INITIALIZATION, "Detecting Win32 OpenGL extensions.\n");
   const unsigned char *extensions;
   char *currentextension;
 
@@ -262,7 +262,7 @@ void csGraphics3DOGLCommon::DetectExtensions()
   while(1)
   {
     //Debugging
-    SysPrintf(MSG_INITIALIZATION,"Found extension: %s\n",currentextension);
+    SysPrintf(CS_MSG_INITIALIZATION,"Found extension: %s\n",currentextension);
 
     //Go through all the extension we know, and see if we find this one
     for(int i=0;i<NUM_EXTENSIONS;i++)
@@ -276,9 +276,9 @@ void csGraphics3DOGLCommon::DetectExtensions()
     {
     case 0:
       if(setupARBmultitexture())
-        SysPrintf(MSG_INITIALIZATION,"All procs found\n");
+        SysPrintf(CS_MSG_INITIALIZATION,"All procs found\n");
       else
-        SysPrintf(MSG_INITIALIZATION,"Not all procs found\n");
+        SysPrintf(CS_MSG_INITIALIZATION,"Not all procs found\n");
         ARB_multitexture=true;	//Flag that should be checked in renderer
       break;
     default:

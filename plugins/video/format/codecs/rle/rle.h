@@ -33,7 +33,7 @@ class csRLECodec : public iAVICodec
   void (*decode)(UByte *dst, UByte *src, ULong inlen, csRGBcolor *pMap, int w, int h);
 
  public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csRLECodec (iBase *pParent);
   virtual ~csRLECodec ();
 

@@ -110,7 +110,7 @@ private:
   iIsoWorld *world;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Create engine
   csIsoEngine (iBase *iParent);

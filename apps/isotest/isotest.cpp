@@ -84,36 +84,36 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
     return false;
 
   // Find the pointer to engine plugin
-  engine = QUERY_PLUGIN (this, iIsoEngine);
+  engine = CS_QUERY_PLUGIN (this, iIsoEngine);
   if (!engine)
   {
-    Printf (MSG_FATAL_ERROR, "No IsoEngine plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No IsoEngine plugin!\n");
     abort ();
   }
 
-  myG3D = QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
+  myG3D = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
   if (!myG3D)
   {
-    Printf (MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
     abort ();
   }
 
-  myG2D = QUERY_PLUGIN (this, iGraphics2D);
+  myG2D = CS_QUERY_PLUGIN (this, iGraphics2D);
   if (!myG2D)
   {
-    Printf (MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
     abort ();
   }
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("IsoTest Crystal Space Application"))
   {
-    Printf (MSG_FATAL_ERROR, "Error opening system!\n");
+    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     cleanup ();
     exit (1);
   }
 
-  iFontServer *fsvr = QUERY_PLUGIN(this, iFontServer);
+  iFontServer *fsvr = CS_QUERY_PLUGIN(this, iFontServer);
   font = fsvr->LoadFont(CSFONT_LARGE);
   fsvr->DecRef();
 
@@ -134,13 +134,13 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   txtmgr->SetPalette ();
 
   // Some commercials...
-  Printf (MSG_INITIALIZATION,
+  Printf (CS_MSG_INITIALIZATION,
     "IsoTest Crystal Space Application version 0.1.\n");
 
   // Create our world.
-  Printf (MSG_INITIALIZATION, "Creating world!...\n");
+  Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
 
-  Printf (MSG_INITIALIZATION, "--------------------------------------\n");
+  Printf (CS_MSG_INITIALIZATION, "--------------------------------------\n");
 
   // create our world to play in, and a view on it.
   world = engine->CreateWorld();
@@ -275,7 +275,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
     "cubeFact");
 
   ///*
-  iCubeFactoryState* cubelook = QUERY_INTERFACE(mesh_fact, iCubeFactoryState);
+  iCubeFactoryState* cubelook = SCF_QUERY_INTERFACE(mesh_fact, iCubeFactoryState);
   cubelook->SetMaterialWrapper(math2);
   //cubelook->SetSize(.5, .5, .5);
   cubelook->SetSize(1,1,1);
@@ -283,7 +283,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   cubelook->DecRef();
   //*/
   /*
-  iSprite2DFactoryState *fstate = QUERY_INTERFACE(mesh_fact, 
+  iSprite2DFactoryState *fstate = SCF_QUERY_INTERFACE(mesh_fact, 
     iSprite2DFactoryState);
   fstate->SetMaterialWrapper(math2);
   fstate->SetMixMode(CS_FX_ADD);
@@ -294,10 +294,10 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   iMeshObject *mesh_obj = mesh_fact->NewInstance();
 
   /*
-  iSprite2DState *ostate = QUERY_INTERFACE(mesh_obj, iSprite2DState);
+  iSprite2DState *ostate = SCF_QUERY_INTERFACE(mesh_obj, iSprite2DState);
   ostate->CreateRegularVertices(6, true);
   ostate->DecRef();
-  //iParticle *pstate = QUERY_INTERFACE(mesh_obj, iParticle);
+  //iParticle *pstate = SCF_QUERY_INTERFACE(mesh_obj, iParticle);
   //pstate->ScaleBy(10.0);
   //pstate->DecRef();
   */
@@ -315,8 +315,8 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   mesh_fact = engine->CreateMeshFactory(fo_classId, "fountainFact");
 
   mesh_obj = mesh_fact->NewInstance();
-  iParticleState *pastate = QUERY_INTERFACE(mesh_obj, iParticleState);
-  iFountainState *fostate = QUERY_INTERFACE(mesh_obj, iFountainState);
+  iParticleState *pastate = SCF_QUERY_INTERFACE(mesh_obj, iParticleState);
+  iFountainState *fostate = SCF_QUERY_INTERFACE(mesh_obj, iFountainState);
   pastate->SetMaterialWrapper(halo);
   pastate->SetMixMode(CS_FX_ADD);
   pastate->SetColor( csColor(0.125, 0.5, 1.0) );
@@ -505,7 +505,7 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
   {
-    System->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
+    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
     cleanup ();
     exit (1);
   }

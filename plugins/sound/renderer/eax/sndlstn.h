@@ -29,7 +29,7 @@ class csSoundListenerEAX  : public iSoundListener
 {
 friend class csSoundRenderEAX;
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csSoundListenerEAX(iBase *piBase);
   virtual ~csSoundListenerEAX();
 	

@@ -23,13 +23,13 @@
 #include "csgeom/polyclip.h"
 #include "qint.h"
 
-IMPLEMENT_IBASE (csIsoView)
-  IMPLEMENTS_INTERFACE (iIsoView)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csIsoView)
+  SCF_IMPLEMENTS_INTERFACE (iIsoView)
+SCF_IMPLEMENT_IBASE_END
 
 csIsoView::csIsoView (iBase *iParent, iIsoEngine *eng, iIsoWorld *world)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   engine = eng;
   csIsoView::world = world;
   rect.Set(1,1,engine->GetG3D()->GetWidth()-1, engine->GetG3D()->GetHeight()-1);
@@ -193,9 +193,9 @@ iCamera* csIsoView::GetFakeCamera(const csVector3& center,
 
 //------------- csIsoFakeCamera -----------------------------------
 
-IMPLEMENT_IBASE (csIsoFakeCamera)
-  IMPLEMENTS_INTERFACE (iCamera)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csIsoFakeCamera)
+  SCF_IMPLEMENTS_INTERFACE (iCamera)
+SCF_IMPLEMENT_IBASE_END
 
 
 csIsoFakeCamera::csIsoFakeCamera()

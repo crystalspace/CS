@@ -69,7 +69,7 @@ void map_key (const char* keyname, csKeyMap* map)
     else if (!strcmp (keyname, "alt")) map->alt = 1;
     else if (!strcmp (keyname, "ctrl")) map->ctrl = 1;
     else if (!strcmp (keyname, "status")) map->need_status = 1;
-    else Sys->Printf (MSG_CONSOLE, "Bad modifier '%s'!\n", keyname);
+    else Sys->Printf (CS_MSG_CONSOLE, "Bad modifier '%s'!\n", keyname);
 
     *dash = '-';
     keyname = dash+1;
@@ -103,7 +103,7 @@ void map_key (const char* keyname, csKeyMap* map)
   else if (!strcmp (keyname, "f10")) map->key = CSKEY_F10;
   else if (!strcmp (keyname, "f11")) map->key = CSKEY_F11;
   else if (!strcmp (keyname, "f12")) map->key = CSKEY_F12;
-  else if (*(keyname+1) != 0) Sys->Printf (MSG_CONSOLE, "Bad key '%s'!\n", keyname);
+  else if (*(keyname+1) != 0) Sys->Printf (CS_MSG_CONSOLE, "Bad key '%s'!\n", keyname);
   else if ((*keyname >= 'A' && *keyname <= 'Z') || strchr ("!@#$%^&*()_+", *keyname))
   {
     map->shift = 1;
@@ -183,7 +183,7 @@ void bind_key (const char* arg)
     csKeyMap* map = mapping;
     while (map)
     {
-      Sys->Printf (MSG_CONSOLE, "Key '%s' bound to '%s'.\n", keyname (map), map->cmd);
+      Sys->Printf (CS_MSG_CONSOLE, "Key '%s' bound to '%s'.\n", keyname (map), map->cmd);
       map = map->next;
     }
     return;
@@ -213,8 +213,8 @@ void bind_key (const char* arg)
   else
   {
     csKeyMap* map = find_mapping (arg);
-    if (map) Sys->Printf (MSG_CONSOLE, "Key bound to '%s'!\n", map->cmd);
-    else Sys->Printf (MSG_CONSOLE, "Key not bound!\n");
+    if (map) Sys->Printf (CS_MSG_CONSOLE, "Key bound to '%s'!\n", map->cmd);
+    else Sys->Printf (CS_MSG_CONSOLE, "Key not bound!\n");
   }
 }
 
@@ -619,8 +619,8 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
 
   vw = isect;
   v = view->GetCamera ()->GetTransform ().Other2This (vw);
-  Sys->Printf (MSG_CONSOLE, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);
-  Sys->Printf (MSG_DEBUG_0, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);
+  Sys->Printf (CS_MSG_CONSOLE, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);
+  Sys->Printf (CS_MSG_DEBUG_0, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);
 
   if (sel)
   {
@@ -630,8 +630,8 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
       Sys->selected_polygon = sel;
 
     iThingState* ps = sel->GetParent ();
-    iObject* psobj = QUERY_INTERFACE (ps, iObject);
-    Sys->Printf (MSG_DEBUG_0, "Hit polygon '%s/%s'\n",
+    iObject* psobj = SCF_QUERY_INTERFACE (ps, iObject);
+    Sys->Printf (CS_MSG_DEBUG_0, "Hit polygon '%s/%s'\n",
     	psobj->GetName (), sel->QueryObject ()->GetName ());
     //Dumper::dump (sel);
     psobj->DecRef ();
@@ -657,10 +657,10 @@ void WalkTest::MouseClick3Handler(iEvent &Event)
   screenPoint.y = Event.Mouse.y;
   closestMesh = FindNextClosestMesh (NULL, view->GetCamera(), &screenPoint);
   if (closestMesh)
-    Sys->Printf (MSG_CONSOLE, "Selected mesh %s\n", closestMesh->
+    Sys->Printf (CS_MSG_CONSOLE, "Selected mesh %s\n", closestMesh->
     	QueryObject ()->GetName ());
   else
-    Sys->Printf (MSG_CONSOLE, "No mesh selected!\n");
+    Sys->Printf (CS_MSG_CONSOLE, "No mesh selected!\n");
 }
 
 

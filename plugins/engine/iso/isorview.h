@@ -50,7 +50,7 @@ private:
   csIsoRenderBucket *prebuck;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   ///
   csIsoRenderView (iBase *iParent);

@@ -33,7 +33,7 @@ class csTGAImageIO : public iImageIO
   csVector formats;
 
  public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csTGAImageIO (iBase *pParent);
   virtual ~csTGAImageIO () {}

@@ -40,7 +40,7 @@ need to do:
 
 @example
 iImageIO* imgldr =
-  QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageIO);
+  CS_QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageIO);
 @end example
 
 When you don't need it anymore you must call @code{imgldr->DecRef ()}.

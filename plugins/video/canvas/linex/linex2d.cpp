@@ -30,28 +30,28 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csGraphics2DLineXLib)
-IMPLEMENT_FACTORY (csLineX2DFontServer)
+SCF_IMPLEMENT_FACTORY (csGraphics2DLineXLib)
+SCF_IMPLEMENT_FACTORY (csLineX2DFontServer)
 
-EXPORT_CLASS_TABLE (linex2d)
-  EXPORT_CLASS_DEP (csGraphics2DLineXLib, "crystalspace.graphics2d.linex2d",
+SCF_EXPORT_CLASS_TABLE (linex2d)
+  SCF_EXPORT_CLASS_DEP (csGraphics2DLineXLib, "crystalspace.graphics2d.linex2d",
     "X-Windows 2D graphics driver for Crystal Space", "crystalspace.font.server.")
-  EXPORT_CLASS (csLineX2DFontServer, "crystalspace.font.server.linex2d",
+  SCF_EXPORT_CLASS (csLineX2DFontServer, "crystalspace.font.server.linex2d",
     "Private X-Windows font server for LineX2D canvas")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csGraphics2DLineXLib)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics2D)
-  IMPLEMENTS_INTERFACE (iEventPlug)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics2DLineXLib)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+SCF_IMPLEMENT_IBASE_END
 
 Display *csGraphics2DLineXLib::dpy = NULL;
 
 csGraphics2DLineXLib::csGraphics2DLineXLib (iBase *iParent) :
   csGraphics2D (), cmap (0), currently_full_screen (false)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
 
   EmptyMouseCursor = 0;
   memset (&MouseCursor, 0, sizeof (MouseCursor));
@@ -69,7 +69,7 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
 
   if (!dpy)
   {
-    CsPrintf (MSG_FATAL_ERROR, "FATAL: Cannot open X display\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "FATAL: Cannot open X display\n");
     exit (-1);
   }
 
@@ -119,7 +119,7 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
   }
   else
   {
-    CsPrintf (MSG_FATAL_ERROR, "FATAL: Current screen depth not supported (8, 15, 16 or 32 bpp only)\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "FATAL: Current screen depth not supported (8, 15, 16 or 32 bpp only)\n");
     return false;
   }
 
@@ -168,7 +168,7 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
   EventOutlet = System->CreateEventOutlet (this);
 
   // Do a trick: unload the system font server since its useless for us
-  iPlugIn *fs = QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iPlugIn);
+  iPlugIn *fs = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iPlugIn);
   if (fs)
   {
     System->UnloadPlugIn (fs);
@@ -179,7 +179,7 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
     FontServer->DecRef ();
 
   // Load our specific font server instead
-  FontServer = LOAD_PLUGIN (System, "crystalspace.font.server.linex2d",
+  FontServer = CS_LOAD_PLUGIN (System, "crystalspace.font.server.linex2d",
     CS_FUNCID_FONTSERVER, iFontServer);
 
   return true;
@@ -194,8 +194,8 @@ csGraphics2DLineXLib::~csGraphics2DLineXLib(void)
 
 bool csGraphics2DLineXLib::Open(const char *Title)
 {
-  CsPrintf (MSG_INITIALIZATION, "Crystal Space X windows driver (Line drawing).\n");
-  CsPrintf (MSG_INITIALIZATION, "Using %d bit %sColor visual\n",
+  CsPrintf (CS_MSG_INITIALIZATION, "Crystal Space X windows driver (Line drawing).\n");
+  CsPrintf (CS_MSG_INITIALIZATION, "Using %d bit %sColor visual\n",
               vinfo.depth, (vclass == PseudoColor) ? "Pseudo" : "True");
 
   // Open your graphic interface
@@ -632,8 +632,8 @@ bool csGraphics2DLineXLib::HandleEvent (iEvent &Event)
    && (Event.Command.Code == cscmdCommandLineHelp)
    && System)
   {
-    System->Printf (MSG_STDOUT, "Options for X-Windows line 2D graphics driver:\n");
-    System->Printf (MSG_STDOUT, "  -[no]sysmouse      use/don't use system mouse cursor (default=%s)\n",
+    System->Printf (CS_MSG_STDOUT, "Options for X-Windows line 2D graphics driver:\n");
+    System->Printf (CS_MSG_STDOUT, "  -[no]sysmouse      use/don't use system mouse cursor (default=%s)\n",
       do_hwmouse ? "use" : "don't");
     return true;
   }
@@ -806,7 +806,7 @@ bool csGraphics2DLineXLib::ReallocateMemory ()
   DeAllocateMemory ();
   if (!AllocateMemory())
   {
-    CsPrintf (MSG_FATAL_ERROR, "Unable to allocate memory!\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "Unable to allocate memory!\n");
     return false;
   }
   EventOutlet->Broadcast (cscmdContextResize, (iGraphics2D *)this);
@@ -831,13 +831,13 @@ bool csGraphics2DLineXLib::ReallocateMemory ()
 
 //--------------------------------------------- The dummy font server --------//
 
-IMPLEMENT_IBASE (csLineX2DFontServer::csLineX2DFont)
-  IMPLEMENTS_INTERFACE (iFont)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csLineX2DFontServer::csLineX2DFont)
+  SCF_IMPLEMENTS_INTERFACE (iFont)
+SCF_IMPLEMENT_IBASE_END
 
 csLineX2DFontServer::csLineX2DFont::csLineX2DFont ()
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 csLineX2DFontServer::csLineX2DFont::~csLineX2DFont ()
@@ -887,14 +887,14 @@ int csLineX2DFontServer::csLineX2DFont::GetLength (const char *text, int maxwidt
 
 //----------
 
-IMPLEMENT_IBASE (csLineX2DFontServer)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iFontServer)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csLineX2DFontServer)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iFontServer)
+SCF_IMPLEMENT_IBASE_END
 
 csLineX2DFontServer::csLineX2DFontServer (iBase *iParent)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   font.xfont = NULL;
 }
 

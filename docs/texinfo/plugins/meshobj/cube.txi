@@ -16,7 +16,7 @@ A cube is a rectangularly shaped object.
 
 @subsubheading Basic Structure
 
-The following @sc{scf} class names are used (for @code{LOAD_PLUGIN()}):
+The following @sc{scf} class names are used (for @code{CS_LOAD_PLUGIN()}):
 
 @itemize @bullet
 @item
@@ -28,7 +28,7 @@ Factory loader plugin: @samp{crystalspace.mesh.loader.factory.cube}
 @end itemize
 
 Objects in this plugin implement the following @sc{scf} interfaces (get
-with @code{QUERY_INTERFACE()}):
+with @code{SCF_QUERY_INTERFACE()}):
 
 @itemize @bullet
 @item

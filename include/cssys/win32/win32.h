@@ -76,7 +76,7 @@ public:
   virtual bool GetInstallPath (char *oInstallPath, size_t iBufferSize);
 
   //------------------------ iEventPlug interface ---------------------------//
-  DECLARE_IBASE_EXT (csSystemDriver);
+  SCF_DECLARE_IBASE_EXT (csSystemDriver);
 
   virtual unsigned GetPotentiallyConflictingEvents ()
   { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }

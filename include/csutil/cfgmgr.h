@@ -30,7 +30,7 @@
 class csConfigManager : public iConfigManager
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /**
    * Create a new config manager object. If 'Optimize' is set to 'true', then

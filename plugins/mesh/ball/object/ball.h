@@ -168,7 +168,7 @@ public:
   }
 
   ///------------------------ iMeshObject implementation ------------------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return factory; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
@@ -210,7 +210,7 @@ public:
   //------------------------- iBallState implementation ----------------
   class BallState : public iBallState
   {
-    DECLARE_EMBEDDED_IBASE (csBallMeshObject);
+    SCF_DECLARE_EMBEDDED_IBASE (csBallMeshObject);
     virtual void SetRadius (float radiusx, float radiusy, float radiusz)
     {
       scfParent->SetRadius (radiusx, radiusy, radiusz);
@@ -276,7 +276,7 @@ public:
   virtual ~csBallMeshObjectFactory ();
 
   //------------------------ iMeshObjectFactory implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
@@ -300,7 +300,7 @@ public:
   virtual bool Initialize (iSystem *pSystem);
 
   //------------------------ iMeshObjectType implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Draw.
   virtual iMeshObjectFactory* NewFactory ();

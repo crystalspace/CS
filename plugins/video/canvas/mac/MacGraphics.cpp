@@ -64,18 +64,18 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csGraphics2DMac)
+SCF_IMPLEMENT_FACTORY (csGraphics2DMac)
 
-EXPORT_CLASS_TABLE (Driver2D)
-    EXPORT_CLASS_DEP (csGraphics2DMac, SOFTWARE_2D_DRIVER,
+SCF_EXPORT_CLASS_TABLE (Driver2D)
+    SCF_EXPORT_CLASS_DEP (csGraphics2DMac, SOFTWARE_2D_DRIVER,
         "Crystal Space 2D driver for Macintosh", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE(csGraphics2DMac)
-    IMPLEMENTS_INTERFACE(iPlugIn)
-    IMPLEMENTS_INTERFACE(iGraphics2D)
-    IMPLEMENTS_INTERFACE(iMacGraphics)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE(csGraphics2DMac)
+    SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+    SCF_IMPLEMENTS_INTERFACE(iGraphics2D)
+    SCF_IMPLEMENTS_INTERFACE(iMacGraphics)
+SCF_IMPLEMENT_IBASE_END
 
 
 /*----------------------------------------------------------------
@@ -84,7 +84,7 @@ IMPLEMENT_IBASE_END
 ----------------------------------------------------------------*/
 csGraphics2DMac::csGraphics2DMac(iBase *iParent)
 {
-	CONSTRUCT_IBASE(iParent);
+	SCF_CONSTRUCT_IBASE(iParent);
 
 	mMainWindow = NULL;
 	mColorTable = NULL;

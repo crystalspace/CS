@@ -233,11 +233,11 @@ public:
   static void CorrectForNocolor (float* rp, float* gp, float* bp);  
 
   //------------------------ iLight interface -----------------------------
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
 
   struct Light : public iLight
   {
-    DECLARE_EMBEDDED_IBASE (csLight);
+    SCF_DECLARE_EMBEDDED_IBASE (csLight);
     virtual csLight* GetPrivateObject ()
     { return scfParent; }
     virtual iObject *QueryObject()
@@ -370,11 +370,11 @@ public:
   void LightingFunc (csLightingFunc* callback, void* callback_data = NULL);
 
   //------------------------ iStatLight interface -----------------------------
-  DECLARE_IBASE_EXT (csLight);
+  SCF_DECLARE_IBASE_EXT (csLight);
 
   struct eiStaticLight : public iStatLight
   {
-    DECLARE_EMBEDDED_IBASE (csStatLight);
+    SCF_DECLARE_EMBEDDED_IBASE (csStatLight);
 
     /// Used by the engine to retrieve internal static light object (ugly)
     virtual csStatLight *GetPrivateObject ()
@@ -611,11 +611,11 @@ public:
   csDynLight* GetPrev () { return prev; }
 
   //------------------------ iDynLight interface -----------------------------
-  DECLARE_IBASE_EXT (csLight);
+  SCF_DECLARE_IBASE_EXT (csLight);
 
   struct eiDynLight : public iDynLight
   {
-    DECLARE_EMBEDDED_IBASE (csDynLight);
+    SCF_DECLARE_EMBEDDED_IBASE (csDynLight);
 
     /// Used by the engine to retrieve internal dyn light object (ugly)
     virtual csDynLight* GetPrivateObject ()

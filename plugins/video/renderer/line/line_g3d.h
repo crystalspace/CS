@@ -75,7 +75,7 @@ class csGraphics3DLine : public iGraphics3D
   int DrawMode;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /**
    * Low-level 2D graphics layer.
@@ -273,7 +273,7 @@ public:
   ///------------------- iConfig interface implementation -------------------
   struct csLineConfig : public iConfig
   {
-    DECLARE_EMBEDDED_IBASE (csGraphics3DLine);
+    SCF_DECLARE_EMBEDDED_IBASE (csGraphics3DLine);
     virtual bool GetOptionDescription (int idx, csOptionDescription *option);
     virtual bool SetOption (int id, csVariant* value);
     virtual bool GetOption (int id, csVariant* value);

@@ -509,7 +509,7 @@ void csTextureManagerSoftware::read_config (iConfigFile *config)
 
 csTextureManagerSoftware::~csTextureManagerSoftware ()
 {
-  DEC_REF (first_8bit_proc_tex); 
+  SCF_DEC_REF (first_8bit_proc_tex); 
   if (main_txtmgr == NULL)
   {
     delete [] Scan.GlobalCMap;
@@ -580,7 +580,7 @@ void csTextureManagerSoftware::create_inv_cmap ()
     return;
 
   if (verbose)
-    SysPrintf (MSG_INITIALIZATION, "  Computing inverse colormap...\n");
+    SysPrintf (CS_MSG_INITIALIZATION, "  Computing inverse colormap...\n");
 
   // Greg Ewing, 12 Oct 1998
   delete [] Scan.inv_cmap;
@@ -603,7 +603,7 @@ void csTextureManagerSoftware::create_alpha_tables ()
     return;
 
   if (verbose)
-    SysPrintf (MSG_INITIALIZATION, "  Computing alpha tables...\n");
+    SysPrintf (CS_MSG_INITIALIZATION, "  Computing alpha tables...\n");
 
   if (!alpha_tables)
     alpha_tables = new csAlphaTables ();
@@ -632,7 +632,7 @@ void csTextureManagerSoftware::compute_palette ()
   if (truecolor) return;
 
   if (verbose)
-    SysPrintf (MSG_INITIALIZATION, "  Computing palette...\n");
+    SysPrintf (CS_MSG_INITIALIZATION, "  Computing palette...\n");
 
   // Allocate first 6*6*4=144 colors in a uniformly-distributed fashion
   // since we'll get lighted/dimmed/colored textures more often
@@ -697,7 +697,7 @@ void csTextureManagerSoftware::compute_palette ()
 void csTextureManagerSoftware::PrepareTextures ()
 {
   if (verbose)
-    SysPrintf (MSG_INITIALIZATION, "Preparing textures (%s dithering)...\n",
+    SysPrintf (CS_MSG_INITIALIZATION, "Preparing textures (%s dithering)...\n",
       dither_textures ? "with" : "no");
 
   // Drop all "color allocated" flags to locked colors.
@@ -706,7 +706,7 @@ void csTextureManagerSoftware::PrepareTextures ()
   memcpy (cmap.alloc, locked, sizeof(locked));
 
   if (verbose)
-    SysPrintf (MSG_INITIALIZATION, "  Creating texture mipmaps...\n");
+    SysPrintf (CS_MSG_INITIALIZATION, "  Creating texture mipmaps...\n");
 
   int i;
 

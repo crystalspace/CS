@@ -74,7 +74,7 @@ private:
   void SetPosition(int x, int y, int width = -1, int height = -1);
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csFancyConsole (iBase *);
   virtual ~csFancyConsole ();
   virtual bool Initialize (iSystem *);
@@ -107,7 +107,7 @@ public:
   // Implement iPlugIn interface.
   struct eiPlugIn : public iPlugIn
   {
-    DECLARE_EMBEDDED_IBASE(csFancyConsole);
+    SCF_DECLARE_EMBEDDED_IBASE(csFancyConsole);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
   } scfiPlugIn;

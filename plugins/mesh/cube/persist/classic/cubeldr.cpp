@@ -52,45 +52,45 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SIZE)
 CS_TOKEN_DEF_END
 
-IMPLEMENT_IBASE (csCubeFactoryLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csCubeFactoryLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csCubeFactorySaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csCubeFactorySaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csCubeLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csCubeLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csCubeSaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csCubeSaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csCubeFactoryLoader)
-IMPLEMENT_FACTORY (csCubeFactorySaver)
-IMPLEMENT_FACTORY (csCubeLoader)
-IMPLEMENT_FACTORY (csCubeSaver)
+SCF_IMPLEMENT_FACTORY (csCubeFactoryLoader)
+SCF_IMPLEMENT_FACTORY (csCubeFactorySaver)
+SCF_IMPLEMENT_FACTORY (csCubeLoader)
+SCF_IMPLEMENT_FACTORY (csCubeSaver)
 
-EXPORT_CLASS_TABLE (cubeldr)
-  EXPORT_CLASS (csCubeFactoryLoader, "crystalspace.mesh.loader.factory.cube",
+SCF_EXPORT_CLASS_TABLE (cubeldr)
+  SCF_EXPORT_CLASS (csCubeFactoryLoader, "crystalspace.mesh.loader.factory.cube",
     "Crystal Space Cube Mesh Factory Loader")
-  EXPORT_CLASS (csCubeFactorySaver, "crystalspace.mesh.saver.factory.cube",
+  SCF_EXPORT_CLASS (csCubeFactorySaver, "crystalspace.mesh.saver.factory.cube",
     "Crystal Space Cube Mesh Factory Saver")
-  EXPORT_CLASS (csCubeLoader, "crystalspace.mesh.loader.cube",
+  SCF_EXPORT_CLASS (csCubeLoader, "crystalspace.mesh.loader.cube",
     "Crystal Space Cube Mesh Loader")
-  EXPORT_CLASS (csCubeSaver, "crystalspace.mesh.saver.cube",
+  SCF_EXPORT_CLASS (csCubeSaver, "crystalspace.mesh.saver.cube",
     "Crystal Space Cube Mesh Saver")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csCubeFactoryLoader::csCubeFactoryLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csCubeFactoryLoader::~csCubeFactoryLoader ()
@@ -168,17 +168,17 @@ iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine,
   char* params;
   char str[255];
 
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys,
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (sys,
   	"crystalspace.mesh.object.cube", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = LOAD_PLUGIN (sys, "crystalspace.mesh.object.cube",
+    type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.cube",
     	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.cube\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
-  iCubeFactoryState* cubeLook = QUERY_INTERFACE (fact, iCubeFactoryState);
+  iCubeFactoryState* cubeLook = SCF_QUERY_INTERFACE (fact, iCubeFactoryState);
 
   char* buf = (char*)string;
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
@@ -234,7 +234,7 @@ iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine,
 
 csCubeFactorySaver::csCubeFactorySaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csCubeFactorySaver::~csCubeFactorySaver ()
@@ -270,8 +270,8 @@ static void WriteMixmode(iStrVector *str, UInt mixmode)
 void csCubeFactorySaver::WriteDown (iBase* obj, iStrVector * str,
   iEngine* /*engine*/)
 {
-  iFactory *fact = QUERY_INTERFACE (this, iFactory);
-  iCubeFactoryState *cubelook = QUERY_INTERFACE(obj, iCubeFactoryState);
+  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
+  iCubeFactoryState *cubelook = SCF_QUERY_INTERFACE(obj, iCubeFactoryState);
   if(!cubelook)
   {
     printf("Error: non-cubefactorystate given to %s.\n",
@@ -304,7 +304,7 @@ void csCubeFactorySaver::WriteDown (iBase* obj, iStrVector * str,
 
 csCubeLoader::csCubeLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csCubeLoader::~csCubeLoader ()
@@ -329,7 +329,7 @@ iBase* csCubeLoader::Parse (const char* string, iEngine* engine,
   char* params;
   char str[255];
 
-  iMeshWrapper* imeshwrap = QUERY_INTERFACE (context, iMeshWrapper);
+  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
   imeshwrap->DecRef ();
 
   iMeshObject* mesh = 0;
@@ -365,7 +365,7 @@ iBase* csCubeLoader::Parse (const char* string, iEngine* engine,
 
 csCubeSaver::csCubeSaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csCubeSaver::~csCubeSaver ()
@@ -381,7 +381,7 @@ bool csCubeSaver::Initialize (iSystem* system)
 void csCubeSaver::WriteDown (iBase* /*obj*/, iStrVector *str,
   iEngine* /*engine*/)
 {
-  iFactory *fact = QUERY_INTERFACE (this, iFactory);
+  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
   char buf[MAXLINE];
   char name[MAXLINE];
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);

@@ -87,7 +87,7 @@ public:
 
   DECLARE_TYPED_VECTOR( csFrameSetVector, csFrameSet ) framesets;
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   ///
   csMotion();
@@ -161,7 +161,7 @@ class csMotionManager : public iMotionManager
   iSystem* iSys;
   
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   ///
   csMotionManager(iBase *iParent);

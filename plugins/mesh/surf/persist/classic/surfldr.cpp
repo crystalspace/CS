@@ -55,45 +55,45 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MIXMODE)
 CS_TOKEN_DEF_END
 
-IMPLEMENT_IBASE (csSurfFactoryLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSurfFactoryLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csSurfFactorySaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSurfFactorySaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csSurfLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSurfLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csSurfSaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSurfSaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csSurfFactoryLoader)
-IMPLEMENT_FACTORY (csSurfFactorySaver)
-IMPLEMENT_FACTORY (csSurfLoader)
-IMPLEMENT_FACTORY (csSurfSaver)
+SCF_IMPLEMENT_FACTORY (csSurfFactoryLoader)
+SCF_IMPLEMENT_FACTORY (csSurfFactorySaver)
+SCF_IMPLEMENT_FACTORY (csSurfLoader)
+SCF_IMPLEMENT_FACTORY (csSurfSaver)
 
-EXPORT_CLASS_TABLE (surfldr)
-  EXPORT_CLASS (csSurfFactoryLoader, "crystalspace.mesh.loader.factory.surface",
+SCF_EXPORT_CLASS_TABLE (surfldr)
+  SCF_EXPORT_CLASS (csSurfFactoryLoader, "crystalspace.mesh.loader.factory.surface",
     "Crystal Space Surface Factory Loader")
-  EXPORT_CLASS (csSurfFactorySaver, "crystalspace.mesh.saver.factory.surface",
+  SCF_EXPORT_CLASS (csSurfFactorySaver, "crystalspace.mesh.saver.factory.surface",
     "Crystal Space Surface Factory Saver")
-  EXPORT_CLASS (csSurfLoader, "crystalspace.mesh.loader.surface",
+  SCF_EXPORT_CLASS (csSurfLoader, "crystalspace.mesh.loader.surface",
     "Crystal Space Surface Mesh Loader")
-  EXPORT_CLASS (csSurfSaver, "crystalspace.mesh.saver.surface",
+  SCF_EXPORT_CLASS (csSurfSaver, "crystalspace.mesh.saver.surface",
     "Crystal Space Surface Mesh Saver")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csSurfFactoryLoader::csSurfFactoryLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSurfFactoryLoader::~csSurfFactoryLoader ()
@@ -109,11 +109,11 @@ bool csSurfFactoryLoader::Initialize (iSystem* system)
 iBase* csSurfFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys,
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (sys,
   	"crystalspace.mesh.object.surface", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = LOAD_PLUGIN (sys, "crystalspace.mesh.object.surface",
+    type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.surface",
     	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.surface\n");
   }
@@ -126,7 +126,7 @@ iBase* csSurfFactoryLoader::Parse (const char* /*string*/,
 
 csSurfFactorySaver::csSurfFactorySaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSurfFactorySaver::~csSurfFactorySaver ()
@@ -151,7 +151,7 @@ void csSurfFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 
 csSurfLoader::csSurfLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSurfLoader::~csSurfLoader ()
@@ -234,7 +234,7 @@ iBase* csSurfLoader::Parse (const char* string, iEngine* engine,
 
   iMeshObject* mesh = NULL;
   iSurfaceState* surfstate = NULL;
-  iMeshWrapper* imeshwrap = QUERY_INTERFACE (context, iMeshWrapper);
+  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
   imeshwrap->DecRef ();
 
   char* buf = (char*)string;
@@ -294,7 +294,7 @@ iBase* csSurfLoader::Parse (const char* string, iEngine* engine,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  imeshwrap->SetFactory (fact);
-          surfstate = QUERY_INTERFACE (mesh, iSurfaceState);
+          surfstate = SCF_QUERY_INTERFACE (mesh, iSurfaceState);
 	}
 	break;
       case CS_TOKEN_MATERIAL:
@@ -325,7 +325,7 @@ iBase* csSurfLoader::Parse (const char* string, iEngine* engine,
 
 csSurfSaver::csSurfSaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSurfSaver::~csSurfSaver ()
@@ -358,8 +358,8 @@ static void WriteMixmode(iStrVector *str, UInt mixmode)
 void csSurfSaver::WriteDown (iBase* obj, iStrVector *str,
   iEngine* /*engine*/)
 {
-  iFactory *fact = QUERY_INTERFACE (this, iFactory);
-  iMeshObject *mesh = QUERY_INTERFACE(obj, iMeshObject);
+  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
+  iMeshObject *mesh = SCF_QUERY_INTERFACE(obj, iMeshObject);
   if(!mesh)
   {
     printf("Error: non-mesh given to %s.\n", 
@@ -367,7 +367,7 @@ void csSurfSaver::WriteDown (iBase* obj, iStrVector *str,
     fact->DecRef();
     return;
   }
-  iSurfaceState *state = QUERY_INTERFACE(obj, iSurfaceState);
+  iSurfaceState *state = SCF_QUERY_INTERFACE(obj, iSurfaceState);
   if(!state)
   {
     printf("Error: invalid mesh given to %s.\n", 

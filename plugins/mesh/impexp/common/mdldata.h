@@ -48,7 +48,7 @@
 #define DECLARE_EMBEDDED_OBJECT(clname,itf)				\
   struct Embedded_##clname : public clname {				\
     typedef clname __scf_superclass__;					\
-    DECLARE_EMBEDDED_IBASE (iBase);					\
+    SCF_DECLARE_EMBEDDED_IBASE (iBase);					\
   } scf##itf;
 
 /**
@@ -56,12 +56,12 @@
  * whereever an object should be embedded instead of an interface.
  */
 #define IMPLEMENT_EMBEDDED_OBJECT(Class)				\
-  IMPLEMENT_EMBEDDED_IBASE_INCREF (Class);				\
-  IMPLEMENT_EMBEDDED_IBASE_DECREF (Class);				\
-  IMPLEMENT_EMBEDDED_IBASE_QUERY (Class);				\
+  SCF_IMPLEMENT_EMBEDDED_IBASE_INCREF (Class);				\
+  SCF_IMPLEMENT_EMBEDDED_IBASE_DECREF (Class);				\
+  SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY (Class);				\
     void *o = __scf_superclass__::QueryInterface (iInterfaceID, iVersion); \
     if (o) return o;							\
-  IMPLEMENT_EMBEDDED_IBASE_QUERY_END;
+  SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY_END;
 
 class csModelDataPolygon : public iModelDataPolygon
 {
@@ -72,7 +72,7 @@ private:
   DECLARE_GROWING_ARRAY (TextureCoords, csVector2);
   iModelDataMaterial *Material;
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   DECLARE_OBJECT_INTERFACE;
 
   /// constructor
@@ -101,7 +101,7 @@ private:
   DECLARE_GROWING_ARRAY (Vertices, csVector3);
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   DECLARE_OBJECT_INTERFACE;
   DECLARE_ARRAY_INTERFACE (const csVector3&, Vertex, Vertices);
 
@@ -115,7 +115,7 @@ private:
   csVector3 Position, UpVector, FrontVector, RightVector;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   DECLARE_OBJECT_INTERFACE;
 
   /// constructor
@@ -160,7 +160,7 @@ private:
   csColor Color;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   DECLARE_OBJECT_INTERFACE;
 
   /// constructor
@@ -182,7 +182,7 @@ class csModelDataMaterial : public iModelDataMaterial
 private:
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   DECLARE_OBJECT_INTERFACE;
 
   /// constructor
@@ -192,7 +192,7 @@ public:
 class csModelData : public iModelData
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   DECLARE_OBJECT_INTERFACE;
 
   /// constructor

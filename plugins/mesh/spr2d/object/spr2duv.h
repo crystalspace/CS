@@ -31,7 +31,7 @@ class csSprite2DUVAnimationFrame : public iSprite2DUVAnimationFrame
   TYPEDEF_GROWING_ARRAY(UVArray, csVector2) vCoo;
 
  public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
 
   csSprite2DUVAnimationFrame (iBase*);
@@ -109,7 +109,7 @@ class csSprite2DUVAnimation : public iSprite2DUVAnimation
   frameVector vFrames;
 
  public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csSprite2DUVAnimation (iBase*);
   virtual ~csSprite2DUVAnimation ();

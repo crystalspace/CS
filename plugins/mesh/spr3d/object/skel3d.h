@@ -115,7 +115,7 @@ public:
   /// Create a connection.
   virtual iSkeletonConnection* CreateConnection ();
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 };
 
 /**
@@ -147,11 +147,11 @@ public:
   /// Create a csSkelState from this csSkel.
   virtual csSkelLimbState* CreateState ();
 
-  DECLARE_IBASE_EXT (csSkelLimb);
+  SCF_DECLARE_IBASE_EXT (csSkelLimb);
 
   struct SkeletonConnection : public iSkeletonConnection
   {
-    DECLARE_EMBEDDED_IBASE (csSkelConnection);
+    SCF_DECLARE_EMBEDDED_IBASE (csSkelConnection);
     virtual void SetTransformation (const csTransform& t)
       { scfParent->SetTransformation(t); }
     virtual csTransform& GetTransformation ()
@@ -174,11 +174,11 @@ public:
   /// Create a csSkelState from this csSkel.
   virtual csSkelLimbState* CreateState ();
 
-  DECLARE_IBASE_EXT (csSkelLimb);
+  SCF_DECLARE_IBASE_EXT (csSkelLimb);
 
   struct Skeleton : public iSkeleton
   {
-    DECLARE_EMBEDDED_IBASE (csSkel);
+    SCF_DECLARE_EMBEDDED_IBASE (csSkel);
   } scfiSkeleton;
 };
 
@@ -268,7 +268,7 @@ public:
   virtual void* GetUserData () const { return data; }
 
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 };
 
 /**
@@ -312,17 +312,17 @@ public:
   /// Get the transformation.
   csTransform& GetTransformation () { return trans; }
 
-  DECLARE_IBASE_EXT (csSkelLimbState);
+  SCF_DECLARE_IBASE_EXT (csSkelLimbState);
 
   struct SkeletonBone : public iSkeletonBone
   {
-    DECLARE_EMBEDDED_IBASE (csSkelConnectionState);
+    SCF_DECLARE_EMBEDDED_IBASE (csSkelConnectionState);
 
     virtual iSkeletonBone* GetNext ()
     {
       csSkelLimbState* ls=scfParent->GetNext();
       if (!ls) return NULL;
-      iSkeletonBone* ibone = QUERY_INTERFACE(ls, iSkeletonBone);
+      iSkeletonBone* ibone = SCF_QUERY_INTERFACE(ls, iSkeletonBone);
       ibone->DecRef ();
       return ibone;
     }
@@ -330,7 +330,7 @@ public:
     {
       csSkelLimbState* ls=scfParent->GetFirstChild ();
       if (!ls) return NULL;
-      iSkeletonBone* ibone = QUERY_INTERFACE(ls, iSkeletonBone);
+      iSkeletonBone* ibone = SCF_QUERY_INTERFACE(ls, iSkeletonBone);
       ibone->DecRef ();
       return ibone;
     }
@@ -351,7 +351,7 @@ public:
 
   struct SkeletonConnectionState : iSkeletonConnectionState
   {
-    DECLARE_EMBEDDED_IBASE (csSkelConnectionState);
+    SCF_DECLARE_EMBEDDED_IBASE (csSkelConnectionState);
     virtual void SetTransformation (const csTransform& tr)
     {
       scfParent->SetTransformation (tr);
@@ -397,17 +397,17 @@ public:
   virtual void ComputeSqRadius (const csTransform& tr,
   	csVector3& max_sq_radius, csPoly3D* source);
 
-  DECLARE_IBASE_EXT (csSkelLimbState);
+  SCF_DECLARE_IBASE_EXT (csSkelLimbState);
 
   struct SkeletonBone : public iSkeletonBone
   {
-    DECLARE_EMBEDDED_IBASE (csSkelState);
+    SCF_DECLARE_EMBEDDED_IBASE (csSkelState);
 
     virtual iSkeletonBone* GetNext ()
     {
       csSkelLimbState* ls=scfParent->GetNext();
       if(!ls) return NULL;
-      iSkeletonBone* ibone = QUERY_INTERFACE(ls, iSkeletonBone);
+      iSkeletonBone* ibone = SCF_QUERY_INTERFACE(ls, iSkeletonBone);
       ibone->DecRef ();
       return ibone;
     }
@@ -415,7 +415,7 @@ public:
     {
       csSkelLimbState* ls=scfParent->GetFirstChild();
       if(!ls) return NULL;
-      iSkeletonBone* ibone = QUERY_INTERFACE(ls, iSkeletonBone);
+      iSkeletonBone* ibone = SCF_QUERY_INTERFACE(ls, iSkeletonBone);
       ibone->DecRef ();
       return ibone;
     }
@@ -433,7 +433,7 @@ public:
 
   struct SkeletonState : public iSkeletonState
   {
-    DECLARE_EMBEDDED_IBASE (csSkelState);
+    SCF_DECLARE_EMBEDDED_IBASE (csSkelState);
   } scfiSkeletonState;
 };
 

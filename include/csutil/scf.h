@@ -103,25 +103,25 @@ struct iBase
 };
 
 /// This macro should make use of IncRef() safer.
-#define INC_REF(ptr) {if (ptr) {ptr->IncRef();}}
+#define SCF_INC_REF(ptr) {if (ptr) {ptr->IncRef();}}
 
 /// This macro should make use of DecRef() safer.
-#define DEC_REF(ptr) {if (ptr) {ptr->DecRef();}}
+#define SCF_DEC_REF(ptr) {if (ptr) {ptr->DecRef();}}
 
 
 /**
  * This macro should be embedded into any SCF-capable class definition
  * to declare the minimal functionality required by iBase interface.
  */
-#define DECLARE_IBASE							\
+#define SCF_DECLARE_IBASE						\
   int scfRefCount;		/* Reference counter */			\
-  DECLARE_EMBEDDED_IBASE (iBase)
+  SCF_DECLARE_EMBEDDED_IBASE (iBase)
 
 /**
- * DECLARE_EMBEDDED_IBASE is used to declare the methods of iBase inside
+ * SCF_DECLARE_EMBEDDED_IBASE is used to declare the methods of iBase inside
  * an embedded class that is exposed via QueryInterface...
  */
-#define DECLARE_EMBEDDED_IBASE(OuterClass)				\
+#define SCF_DECLARE_EMBEDDED_IBASE(OuterClass)				\
 public:									\
   OuterClass *scfParent;	/* The parent object */			\
   virtual void IncRef ();						\
@@ -130,32 +130,32 @@ public:									\
   virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion)
 
 /**
- * The CONSTRUCT_IBASE macro should be invoked inside the constructor
+ * The SCF_CONSTRUCT_IBASE macro should be invoked inside the constructor
  * of an exported class (not inside an embedded interface). Normally each
  * constructor should accept an iBase* parameter (that is passed by
  * scfCreateInstance function) which should be passed to this macro.
  * The macro will zero the reference count and initialize the pointer
  * to the parent object.
  */
-#define CONSTRUCT_IBASE(Parent)						\
+#define SCF_CONSTRUCT_IBASE(Parent)					\
   scfRefCount = 1; scfParent = Parent; if (scfParent) scfParent->IncRef();
 
 /**
- * The CONSTRUCT_EMBEDDED_IBASE macro should be invoked inside the
+ * The SCF_CONSTRUCT_EMBEDDED_IBASE macro should be invoked inside the
  * constructor of an exported class that has exported embedded interfaces
  * (not inside the constructor of the embedded interface).
  * The macro will and initialize the pointer to the parent object
  * (to the object this one is embedded into).
  */
-#define CONSTRUCT_EMBEDDED_IBASE(Interface)				\
+#define SCF_CONSTRUCT_EMBEDDED_IBASE(Interface)				\
   Interface.scfParent = this;
 
 /**
- * The IMPLEMENT_IBASE_INCREF() macro implements the IncRef() method for a
+ * The SCF_IMPLEMENT_IBASE_INCREF() macro implements the IncRef() method for a
  * class in a C++ source module.  Typically, this macro is automatically
- * employed by the IMPLEMENT_IBASE() convenience macro.
+ * employed by the SCF_IMPLEMENT_IBASE() convenience macro.
  */
-#define IMPLEMENT_IBASE_INCREF(Class)					\
+#define SCF_IMPLEMENT_IBASE_INCREF(Class)				\
 void Class::IncRef ()							\
 {									\
   SCF_TRACE (("  (%s *)%p->IncRef (%d)\n", #Class, this, scfRefCount + 1));\
@@ -163,11 +163,11 @@ void Class::IncRef ()							\
 }
 
 /**
- * The IMPLEMENT_IBASE_DECREF() macro implements the DecRef() method for a
+ * The SCF_IMPLEMENT_IBASE_DECREF() macro implements the DecRef() method for a
  * class in a C++ source module.  Typically, this macro is automatically
- * employed by the IMPLEMENT_IBASE() convenience macro.
+ * employed by the SCF_IMPLEMENT_IBASE() convenience macro.
  */
-#define IMPLEMENT_IBASE_DECREF(Class)					\
+#define SCF_IMPLEMENT_IBASE_DECREF(Class)				\
 void Class::DecRef ()							\
 {									\
   scfRefCount--;							\
@@ -183,129 +183,134 @@ void Class::DecRef ()							\
 }
 
 /**
- * The IMPLEMENT_IBASE_GETREFCOUNT() macro implements GetRefCount()
+ * The SCF_IMPLEMENT_IBASE_GETREFCOUNT() macro implements GetRefCount()
  * for a class in a C++ source module.
  */
-#define IMPLEMENT_IBASE_GETREFCOUNT(Class)				\
+#define SCF_IMPLEMENT_IBASE_GETREFCOUNT(Class)				\
 int Class::GetRefCount ()						\
 {									\
   return scfRefCount;							\
 }
 
 /**
- * The IMPLEMENT_IBASE_QUERY() macro implements the opening boilerplate for the
- * QueryInterface() method for a class in a C++ source module.  Typically, this
- * macro is automatically employed by the IMPLEMENT_IBASE() convenience macro.
+ * The SCF_IMPLEMENT_IBASE_QUERY() macro implements the opening boilerplate for
+ * the QueryInterface() method for a class in a C++ source module.  Typically,
+ * this macro is automatically employed by the SCF_IMPLEMENT_IBASE()
+ * convenience macro.
  */
-#define IMPLEMENT_IBASE_QUERY(Class)					\
+#define SCF_IMPLEMENT_IBASE_QUERY(Class)				\
 void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
 {									\
   SCF_TRACE (("  (%s *)%p->QueryInterface (%u, %08X)\n",		\
     #Class, this, iInterfaceID, iVersion));
 
 /**
- * The IMPLEMENT_IBASE_QUERY_END macro implements the closing boilerplate for
- * the QueryInterface() method for a class in a C++ source module.  Typically,
- * this macro is automatically employed by the IMPLEMENT_IBASE_END convenience
- * macro.
+ * The SCF_IMPLEMENT_IBASE_QUERY_END macro implements the closing boilerplate
+ * for the QueryInterface() method for a class in a C++ source module.
+ * Typically, this macro is automatically employed by the
+ * SCF_IMPLEMENT_IBASE_END convenience macro.
  */
-#define IMPLEMENT_IBASE_QUERY_END					\
+#define SCF_IMPLEMENT_IBASE_QUERY_END					\
   return scfParent ?							\
     scfParent->QueryInterface (iInterfaceID, iVersion) : NULL;		\
 }
 
 /**
- * The IMPLEMENT_IBASE() macro should be used within the C++ source module that
- * implements a interface derived from iBase.  Of course, you can still
+ * The SCF_IMPLEMENT_IBASE() macro should be used within the C++ source module
+ * that implements a interface derived from iBase.  Of course, you can still
  * implement those methods manually, if you desire ...
  */
-#define IMPLEMENT_IBASE(Class)						\
-  IMPLEMENT_IBASE_INCREF(Class)						\
-  IMPLEMENT_IBASE_DECREF(Class)						\
-  IMPLEMENT_IBASE_GETREFCOUNT(Class)					\
-  IMPLEMENT_IBASE_QUERY(Class)
+#define SCF_IMPLEMENT_IBASE(Class)					\
+  SCF_IMPLEMENT_IBASE_INCREF(Class)					\
+  SCF_IMPLEMENT_IBASE_DECREF(Class)					\
+  SCF_IMPLEMENT_IBASE_GETREFCOUNT(Class)				\
+  SCF_IMPLEMENT_IBASE_QUERY(Class)
 
 /**
- * The IMPLEMENT_IBASE_END macro is used to finish an IMPLEMENT_IBASE
+ * The SCF_IMPLEMENT_IBASE_END macro is used to finish an SCF_IMPLEMENT_IBASE
  * definition
  */
-#define IMPLEMENT_IBASE_END						\
-  IMPLEMENT_IBASE_QUERY_END
+#define SCF_IMPLEMENT_IBASE_END						\
+  SCF_IMPLEMENT_IBASE_QUERY_END
 
 /**
- * The IMPLEMENT_EMBEDDED_IBASE_INCREF() macro implements the IncRef() method
- * for an embedded class in a C++ source module.  Typically, this macro is
- * automatically employed by the IMPLEMENT_EMBEDDED_IBASE() convenience macro.
+ * The SCF_IMPLEMENT_EMBEDDED_IBASE_INCREF() macro implements the IncRef()
+ * method for an embedded class in a C++ source module.  Typically, this macro
+ * is automatically employed by the SCF_IMPLEMENT_EMBEDDED_IBASE() convenience
+ * macro.
  */
-#define IMPLEMENT_EMBEDDED_IBASE_INCREF(Class)				\
+#define SCF_IMPLEMENT_EMBEDDED_IBASE_INCREF(Class)			\
 void Class::IncRef ()							\
 {									\
-  SCF_TRACE (("  (%s *)%p->IncRef (%d)\n", #Class, this, scfParent->scfRefCount + 1));\
+  SCF_TRACE (("  (%s *)%p->IncRef (%d)\n", #Class, this,		\
+    scfParent->scfRefCount + 1));					\
   scfParent->IncRef ();							\
 }
 
 /**
- * The IMPLEMENT_EMBEDDED_IBASE_DECREF() macro implements the DecRef() method
- * for an embedded class in a C++ source module.  Typically, this macro is
- * automatically employed by the IMPLEMENT_EMBEDDED_IBASE() convenience macro.
+ * The SCF_IMPLEMENT_EMBEDDED_IBASE_DECREF() macro implements the DecRef()
+ * method for an embedded class in a C++ source module.  Typically, this macro
+ * is automatically employed by the SCF_IMPLEMENT_EMBEDDED_IBASE() convenience
+ * macro.
  */
-#define IMPLEMENT_EMBEDDED_IBASE_DECREF(Class)				\
+#define SCF_IMPLEMENT_EMBEDDED_IBASE_DECREF(Class)			\
 void Class::DecRef ()							\
 {									\
   scfParent->DecRef ();							\
-  SCF_TRACE (("  (%s *)%p->DecRef (%d)\n", #Class, this, scfParent->scfRefCount));	\
+  SCF_TRACE (("  (%s *)%p->DecRef (%d)\n", #Class, this, 		\
+    scfParent->scfRefCount));						\
 }
 
 /**
- * The IMPLEMENT_EMBEDDED_IBASE_GETREFCOUNT() macro implements
+ * The SCF_IMPLEMENT_EMBEDDED_IBASE_GETREFCOUNT() macro implements
  * the GetRefCount() method for an embedded class in a C++ source module.
  */
-#define IMPLEMENT_EMBEDDED_IBASE_GETREFCOUNT(Class)			\
+#define SCF_IMPLEMENT_EMBEDDED_IBASE_GETREFCOUNT(Class)			\
 int Class::GetRefCount ()						\
 {									\
   return scfParent->GetRefCount ();					\
 }
 
 /**
- * The IMPLEMENT_EMBEDDED_IBASE_QUERY() macro implements the opening
+ * The SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY() macro implements the opening
  * boilerplate for the QueryInterface() method for an embedded class in a C++
  * source module.  Typically, this macro is automatically employed by the
- * IMPLEMENT_EMBEDDED_IBASE() convenience macro.
+ * SCF_IMPLEMENT_EMBEDDED_IBASE() convenience macro.
  */
-#define IMPLEMENT_EMBEDDED_IBASE_QUERY(Class)				\
+#define SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY(Class)			\
 void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
 {									\
   SCF_TRACE (("  (%s *)%p->QueryInterface (%u, %08X)\n",		\
     #Class, this, iInterfaceID, iVersion));
 
 /**
- * The IMPLEMENT_EMBEDDED_IBASE_QUERY_END macro implements the closing
+ * The SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY_END macro implements the closing
  * boilerplate for the QueryInterface() method for a class in an embedded C++
  * source module.  Typically, this macro is automatically employed by the
- * IMPLEMENT_EMBEDDED_IBASE_END convenience macro.
+ * SCF_IMPLEMENT_EMBEDDED_IBASE_END convenience macro.
  */
-#define IMPLEMENT_EMBEDDED_IBASE_QUERY_END				\
+#define SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY_END				\
   return scfParent->QueryInterface (iInterfaceID, iVersion);		\
 }
 
 /**
- * IMPLEMENT_EMBEDDED_IBASE should be used to implement embedded interfaces
- * derived from iBase.  It differs from IMPLEMENT_IBASE because embedded
+ * SCF_IMPLEMENT_EMBEDDED_IBASE should be used to implement embedded interfaces
+ * derived from iBase.  It differs from SCF_IMPLEMENT_IBASE because embedded
  * interface don't have reference counts themselves, but instead use the
  * reference count of their parent object.
  */
-#define IMPLEMENT_EMBEDDED_IBASE(Class)					\
-  IMPLEMENT_EMBEDDED_IBASE_INCREF(Class)				\
-  IMPLEMENT_EMBEDDED_IBASE_DECREF(Class)				\
-  IMPLEMENT_EMBEDDED_IBASE_GETREFCOUNT(Class)				\
-  IMPLEMENT_EMBEDDED_IBASE_QUERY(Class)
+#define SCF_IMPLEMENT_EMBEDDED_IBASE(Class)				\
+  SCF_IMPLEMENT_EMBEDDED_IBASE_INCREF(Class)				\
+  SCF_IMPLEMENT_EMBEDDED_IBASE_DECREF(Class)				\
+  SCF_IMPLEMENT_EMBEDDED_IBASE_GETREFCOUNT(Class)			\
+  SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY(Class)
 
 /**
- * The IMPLEMENT_EMBEDDED_IBASE_END macro is used to finish an
- * IMPLEMENT_EMBEDDED_IBASE definition
+ * The SCF_IMPLEMENT_EMBEDDED_IBASE_END macro is used to finish an
+ * SCF_IMPLEMENT_EMBEDDED_IBASE definition
  */
-#define IMPLEMENT_EMBEDDED_IBASE_END					\
-  IMPLEMENT_EMBEDDED_IBASE_QUERY_END
+#define SCF_IMPLEMENT_EMBEDDED_IBASE_END				\
+  SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY_END
 
 /**
  * The IMPLEMENT_INTERFACE macro is used inside QueryInterface function
@@ -313,20 +318,20 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
  * version of the interface correspond to the version we have and to
  * return a pointer to that interface if everything is correct.
  */
-#define IMPLEMENTS_INTERFACE(Interface)					\
-  IMPLEMENTS_INTERFACE_COMMON (Interface, this)
+#define SCF_IMPLEMENTS_INTERFACE(Interface)				\
+  SCF_IMPLEMENTS_INTERFACE_COMMON (Interface, this)
 
 /**
  * IMPLEMENT_EMBEDDED_INTERFACE is same as IMPLEMENT_INTERFACE but is used
  * when class implements the interface as an embedded member.
  */
-#define IMPLEMENTS_EMBEDDED_INTERFACE(Interface)			\
-  IMPLEMENTS_INTERFACE_COMMON (Interface, (&scf##Interface))
+#define SCF_IMPLEMENTS_EMBEDDED_INTERFACE(Interface)			\
+  SCF_IMPLEMENTS_INTERFACE_COMMON (Interface, (&scf##Interface))
 
 /**
  * This is a common macro used in all IMPLEMENTS_XXX_INTERFACE macros
  */
-#define IMPLEMENTS_INTERFACE_COMMON(Interface,Object)			\
+#define SCF_IMPLEMENTS_INTERFACE_COMMON(Interface,Object)		\
   static scfInterfaceID scfID_##Interface = (scfInterfaceID)-1;		\
   if (scfID_##Interface == (scfInterfaceID)-1)				\
     scfID_##Interface = iSCF::SCF->GetInterfaceID (#Interface);		\
@@ -347,7 +352,7 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
  * QueryInterface method and return the corresponding pointer when asked.  The
  * following macro makes such overrides simpler to write.
  */
-#define DECLARE_IBASE_EXT(ParentClass)					\
+#define SCF_DECLARE_IBASE_EXT(ParentClass)				\
   typedef ParentClass __scf_superclass;					\
   virtual void IncRef ();						\
   virtual void DecRef ();						\
@@ -355,85 +360,85 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
   virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion)
 
 /**
- * The IMPLEMENT_IBASE_EXT_INCREF() macro implements the IncRef() method for a
- * class extending another SCF class in a C++ source module.  Typically, this
- * macro is automatically employed by the IMPLEMENT_IBASE_EXT() convenience
- * macro.
+ * The SCF_IMPLEMENT_IBASE_EXT_INCREF() macro implements the IncRef() method
+ * for a class extending another SCF class in a C++ source module.  Typically,
+ * this macro is automatically employed by the SCF_IMPLEMENT_IBASE_EXT()
+ * convenience macro.
  */
-#define IMPLEMENT_IBASE_EXT_INCREF(Class)				\
+#define SCF_IMPLEMENT_IBASE_EXT_INCREF(Class)				\
 void Class::IncRef ()							\
 {									\
   __scf_superclass::IncRef ();						\
 }
 
 /**
- * The IMPLEMENT_IBASE_EXT_DECREF() macro implements the DecRef() method for a
- * class extending another SCF class in a C++ source module.  Typically, this
- * macro is automatically employed by the IMPLEMENT_IBASE_EXT() convenience
- * macro.
+ * The SCF_IMPLEMENT_IBASE_EXT_DECREF() macro implements the DecRef() method
+ * for a class extending another SCF class in a C++ source module.  Typically,
+ * this macro is automatically employed by the SCF_IMPLEMENT_IBASE_EXT()
+ * convenience macro.
  */
-#define IMPLEMENT_IBASE_EXT_DECREF(Class)				\
+#define SCF_IMPLEMENT_IBASE_EXT_DECREF(Class)				\
 void Class::DecRef ()							\
 {									\
   __scf_superclass::DecRef ();						\
 }
 
 /**
- * The IMPLEMENT_IBASE_EXT_GETREFCOUNT() macro implements the GetRefCount()
+ * The SCF_IMPLEMENT_IBASE_EXT_GETREFCOUNT() macro implements the GetRefCount()
  * method for a class extending another SCF class in a C++ source module.
  * Typically, this macro is automatically employed by the
- * IMPLEMENT_IBASE_EXT() convenience macro.
+ * SCF_IMPLEMENT_IBASE_EXT() convenience macro.
  */
-#define IMPLEMENT_IBASE_EXT_GETREFCOUNT(Class)				\
+#define SCF_IMPLEMENT_IBASE_EXT_GETREFCOUNT(Class)			\
 int Class::GetRefCount ()						\
 {									\
   return __scf_superclass::GetRefCount ();				\
 }
 
 /**
- * The IMPLEMENT_IBASE_EXT_QUERY() macro implements the opening boilerplate for
- * the QueryInterface() method for a class extending another SCF class in a C++
- * source module.  Typically, this macro is automatically employed by the
- * IMPLEMENT_IBASE_EXT() convenience macro.
+ * The SCF_IMPLEMENT_IBASE_EXT_QUERY() macro implements the opening boilerplate
+ * for the QueryInterface() method for a class extending another SCF class in a
+ * C++ source module.  Typically, this macro is automatically employed by the
+ * SCF_IMPLEMENT_IBASE_EXT() convenience macro.
  */
-#define IMPLEMENT_IBASE_EXT_QUERY(Class)				\
+#define SCF_IMPLEMENT_IBASE_EXT_QUERY(Class)				\
 void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
 {
 
 /**
- * The IMPLEMENT_IBASE_EXT_QUERY_END macro implements the closing boilerplate
- * for the QueryInterface() method for a class extending another SCF class in a
- * C++ source module.  Typically, this macro is automatically employed by the
- * IMPLEMENT_IBASE_EXT_END convenience macro.
+ * The SCF_IMPLEMENT_IBASE_EXT_QUERY_END macro implements the closing
+ * boilerplate for the QueryInterface() method for a class extending another
+ * SCF class in a C++ source module.  Typically, this macro is automatically
+ * employed by the SCF_IMPLEMENT_IBASE_EXT_END convenience macro.
  */
-#define IMPLEMENT_IBASE_EXT_QUERY_END					\
+#define SCF_IMPLEMENT_IBASE_EXT_QUERY_END				\
   return __scf_superclass::QueryInterface (iInterfaceID, iVersion);	\
 }
 
 /**
- * This macro implements same functionality as IMPLEMENT_IBASE
+ * This macro implements same functionality as SCF_IMPLEMENT_IBASE
  * except that it should be used for expansion SCF classes.
  */
-#define IMPLEMENT_IBASE_EXT(Class)					\
-  IMPLEMENT_IBASE_EXT_INCREF(Class)					\
-  IMPLEMENT_IBASE_EXT_DECREF(Class)					\
-  IMPLEMENT_IBASE_EXT_GETREFCOUNT(Class)				\
-  IMPLEMENT_IBASE_EXT_QUERY(Class)
+#define SCF_IMPLEMENT_IBASE_EXT(Class)					\
+  SCF_IMPLEMENT_IBASE_EXT_INCREF(Class)					\
+  SCF_IMPLEMENT_IBASE_EXT_DECREF(Class)					\
+  SCF_IMPLEMENT_IBASE_EXT_GETREFCOUNT(Class)				\
+  SCF_IMPLEMENT_IBASE_EXT_QUERY(Class)
 
 /**
- * This macro implements same functionality as IMPLEMENT_IBASE_END
+ * This macro implements same functionality as SCF_IMPLEMENT_IBASE_END
  * except that it is used for expansion SCF classes.
  */
-#define IMPLEMENT_IBASE_EXT_END						\
-  IMPLEMENT_IBASE_EXT_QUERY_END
+#define SCF_IMPLEMENT_IBASE_EXT_END					\
+  SCF_IMPLEMENT_IBASE_EXT_QUERY_END
 
 /**
- * The IMPLEMENT_FACTORY macro is used to define a factory for one of
+ * The SCF_IMPLEMENT_FACTORY macro is used to define a factory for one of
  * exported classes. You can define the function manually, of course,
  * if the constructor for your class has some specific constructor
  * arguments (that is, more than one iBase* argument).
  */
-#define IMPLEMENT_FACTORY(Class)					\
+#define SCF_IMPLEMENT_FACTORY(Class)					\
 void *Create_##Class (iBase *iParent)					\
 {									\
   void *ret = new Class (iParent);					\
@@ -442,10 +447,10 @@ void *Create_##Class (iBase *iParent)					\
 }
 
 /**
- * The DECLARE_FACTORY macro is used to provide a forward definition 
- * if IMPLEMENT_FACTORY is declared in another file.
+ * The SCF_DECLARE_FACTORY macro is used to provide a forward definition 
+ * if SCF_IMPLEMENT_FACTORY is declared in another file.
  */
-#define DECLARE_FACTORY(Class)  void *Create_##Class (iBase *iParent);
+#define SCF_DECLARE_FACTORY(Class)  void *Create_##Class (iBase *iParent);
 
 /**
  * The shared library loader expects an array of such structures
@@ -489,7 +494,7 @@ struct scfClassInfo
  * LibraryName_scfUnitInitialize() function which is not qualified as
  * `extern "C"'.
  */
-#define EXPORT_CLASS_TABLE(LibraryName)					\
+#define SCF_EXPORT_CLASS_TABLE(LibraryName)				\
 static inline void							\
 SCF_EXPORTED_NAME(LibraryName,_scfUnitInitialize)(iSCF *SCF)		\
 { iSCF::SCF = SCF; }							\
@@ -501,15 +506,15 @@ SCF_EXPORTED_NAME(LibraryName,_scfInitialize)(iSCF *SCF)		\
   {
 
 /** Add information about a exported class into the table. */
-#define EXPORT_CLASS(Class, ClassID, Description)			\
+#define SCF_EXPORT_CLASS(Class, ClassID, Description)			\
     { ClassID, Description, NULL, Create_##Class },
 
 /** Add information about an exported class and dependency info into table. */
-#define EXPORT_CLASS_DEP(Class, ClassID, Description, Dependencies)	\
+#define SCF_EXPORT_CLASS_DEP(Class, ClassID, Description, Dependencies)	\
     { ClassID, Description, Dependencies, Create_##Class },
 
 /** Finish the definition of exported class table. */
-#define EXPORT_CLASS_TABLE_END						\
+#define SCF_EXPORT_CLASS_TABLE_END					\
     { 0, 0, 0, 0 }							\
   };									\
   return ExportClassTable;						\
@@ -522,7 +527,7 @@ SCF_EXPORTED_NAME(LibraryName,_scfInitialize)(iSCF *SCF)		\
  * libraries won't be linked into the static executable. This macro defines
  * a dummy variable that registers given library during initialization.
  */
-#define REGISTER_STATIC_LIBRARY(LibraryName)				\
+#define SCF_REGISTER_STATIC_LIBRARY(LibraryName)			\
   extern "C" scfClassInfo *LibraryName##_scfInitialize (iSCF*);		\
   class __##LibraryName##_Init						\
   {									\
@@ -533,18 +538,18 @@ SCF_EXPORTED_NAME(LibraryName,_scfInitialize)(iSCF *SCF)		\
   } __##LibraryName##_dummy;
 
 /**
- * This macro is similar to REGISTER_STATIC_LIBRARY, but registers a
+ * This macro is similar to SCF_REGISTER_STATIC_LIBRARY, but registers a
  * single class. You also should provide a ClassID and a description
  * since a valid scfClassInfo structure should be created.
  */
-#define REGISTER_STATIC_CLASS(Class,ClassID,Description)		\
-  REGISTER_STATIC_CLASS_DEP (Class,ClassID,Description,NULL);
+#define SCF_REGISTER_STATIC_CLASS(Class,ClassID,Description)		\
+  SCF_REGISTER_STATIC_CLASS_DEP (Class,ClassID,Description,NULL);
 
 /**
- * This is similar to REGISTER_STATIC_CLASS except that you can provide
+ * This is similar to SCF_REGISTER_STATIC_CLASS except that you can provide
  * an additional argument specifying the class dependencies.
  */
-#define REGISTER_STATIC_CLASS_DEP(Class,ClassID,Description,Dependency)	\
+#define SCF_REGISTER_STATIC_CLASS_DEP(Class,ClassID,Description,Dependency)\
   extern void *Create_##Class (iBase *);				\
   static scfClassInfo Class##_ClassInfo =				\
   { ClassID, Description, Dependency, Create_##Class };			\
@@ -595,9 +600,9 @@ struct iStrVector;
  * This macro creates a wrapper function around a static variable that
  * contains the ID number for the given interface. The function
  * initializes the variable if that has not yet happened. This macro is
- * required if you want to use QUERY_INTERFACE_FAST ().
+ * required if you want to use SCF_QUERY_INTERFACE_FAST ().
  */
-#define DECLARE_FAST_INTERFACE(Interface)				\
+#define SCF_DECLARE_FAST_INTERFACE(Interface)				\
 inline scfInterfaceID scfGetID_##Interface ()				\
 {									\
   static scfInterfaceID ID = (scfInterfaceID)-1;			\
@@ -610,7 +615,7 @@ inline scfInterfaceID scfGetID_##Interface ()				\
  * Handy macro to create an instance of a shared class.
  * This is a simple wrapper around scfCreateInstance.
  */
-#define CREATE_INSTANCE(ClassID,Interface)				\
+#define SCF_CREATE_INSTANCE(ClassID,Interface)				\
   (Interface *)iSCF::SCF->CreateInstance (				\
   ClassID, #Interface, VERSION_##Interface)
 
@@ -618,7 +623,7 @@ inline scfInterfaceID scfGetID_##Interface ()				\
  * Shortcut macro to query given interface from given object.
  * This is a wrapper around iBase::QueryInterface method.
  */
-#define QUERY_INTERFACE(Object,Interface)				\
+#define SCF_QUERY_INTERFACE(Object,Interface)				\
   (Interface *)(Object)->QueryInterface (				\
     iSCF::SCF->GetInterfaceID (#Interface), VERSION_##Interface)
 
@@ -627,9 +632,9 @@ inline scfInterfaceID scfGetID_##Interface ()				\
  * wrapper around iBase::QueryInterface method that uses an ID number to
  * identify the requested interface instead of its name. To use this
  * macro, fast access to the interface must be declared with
- * DECLARE_FAST_INTERFACE ().
+ * SCF_DECLARE_FAST_INTERFACE ().
  */
-#define QUERY_INTERFACE_FAST(Object,Interface)				\
+#define SCF_QUERY_INTERFACE_FAST(Object,Interface)			\
   (Interface*)(Object)->QueryInterface (				\
   scfGetID_##Interface (), VERSION_##Interface)
 
@@ -638,7 +643,7 @@ inline scfInterfaceID scfGetID_##Interface ()				\
  * This is a wrapper around iBase::QueryInterface method.
  * This version tests if Object is NULL and will return NULL in that case.
  */
-#define QUERY_INTERFACE_SAFE(Object,Interface)				\
+#define SCF_QUERY_INTERFACE_SAFE(Object,Interface)			\
   (Interface *)(iBase::QueryInterfaceSafe ((Object),			\
     iSCF::SCF->GetInterfaceID (#Interface), VERSION_##Interface))
 
@@ -753,8 +758,8 @@ struct iSCF : public iBase
    * If you design a SCF module that contains a number of SCF classes, and you
    * want that module to be usable when using either static and dynamic
    * linkage, you can use scfRegisterClassList (or the
-   * SCF_REGISTER_STATIC_LIBRARY macro) to register the export class table with
-   * the SCF kernel.
+   * SCF_SCF_REGISTER_STATIC_LIBRARY macro) to register the export class table
+   * with the SCF kernel.
    */
   virtual bool RegisterClassList (scfClassInfo *iClassInfo) = 0;
 

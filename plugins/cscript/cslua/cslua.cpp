@@ -27,29 +27,29 @@ extern "C" {
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE(csLua)
-  IMPLEMENTS_INTERFACE(iScript)
-  IMPLEMENTS_INTERFACE(iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE(csLua)
+  SCF_IMPLEMENTS_INTERFACE(iScript)
+  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY(csLua)
+SCF_IMPLEMENT_FACTORY(csLua)
 
-EXPORT_CLASS_TABLE(cslua)
-  EXPORT_CLASS(csLua, "crystalspace.script.lua",
+SCF_EXPORT_CLASS_TABLE(cslua)
+  SCF_EXPORT_CLASS(csLua, "crystalspace.script.lua",
     "Crystal Space Script Lua")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csLua *thisclass=NULL;
 
-csLua::csLua(iBase *iParent) :Sys(NULL), Mode(MSG_INITIALIZATION)
+csLua::csLua(iBase *iParent) :Sys(NULL), Mode(CS_MSG_INITIALIZATION)
 {
-  CONSTRUCT_IBASE(iParent);
+  SCF_CONSTRUCT_IBASE(iParent);
 }
 
 lua_State *L = NULL;
 csLua::~csLua()
 {
-  Mode=MSG_INTERNAL_ERROR;
+  Mode=CS_MSG_INTERNAL_ERROR;
   lua_close(L);
   Sys=NULL;
   thisclass=NULL;
@@ -73,7 +73,7 @@ bool csLua::Initialize(iSystem* iSys)
 
   cspace_init(L);
 
-  Mode=MSG_STDOUT;
+  Mode=CS_MSG_STDOUT;
   return true;
 }
 
@@ -115,7 +115,7 @@ bool csLua::LoadModule(const char* name)
 void csLua::Print(bool Error, const char *msg)
 {
   if(Error)
-    Sys->Printf(MSG_FATAL_ERROR, "CrystalScript Error: %s\n", msg);
+    Sys->Printf(CS_MSG_FATAL_ERROR, "CrystalScript Error: %s\n", msg);
   else
     Sys->Printf(Mode, "%s", msg);
 }

@@ -49,11 +49,11 @@ DemoSequenceManager::DemoSequenceManager (Demo* demo)
 {
   DemoSequenceManager::demo = demo;
   demoseq = this;
-  seqmgr = LOAD_PLUGIN (demo, "crystalspace.utilities.sequence",
+  seqmgr = CS_LOAD_PLUGIN (demo, "crystalspace.utilities.sequence",
   	"Sequence", iSequenceManager);
   if (!seqmgr)
   {
-    demo->Printf (MSG_FATAL_ERROR, "Could not load sequence manager plugin!\n");
+    demo->Printf (CS_MSG_FATAL_ERROR, "Could not load sequence manager plugin!\n");
     exit (0);
   }
 
@@ -641,7 +641,7 @@ void DemoSequenceManager::SetupRotatePart (iMeshWrapper* mesh,
 	float angle_speed, cs_time total_rotate_time, cs_time already_elapsed)
 {
   MeshRotation* mrot = new MeshRotation ();
-  mrot->particle = QUERY_INTERFACE (mesh->GetMeshObject (), iParticle);
+  mrot->particle = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iParticle);
   if (!mrot->particle)
   {
     delete mrot;

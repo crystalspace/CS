@@ -22,14 +22,14 @@
 #include "gltex.h"
 #include "g3dgl.h"
 
-IMPLEMENT_IBASE (csGlideProcedural)
-  IMPLEMENTS_INTERFACE (iGraphics3D)
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE (csGlideProcedural)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
+SCF_IMPLEMENT_IBASE_END;
 
 
 csGlideProcedural::csGlideProcedural (iBase * pParent)
 { 
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
   tex=NULL; 
   g3d=NULL; 
 }

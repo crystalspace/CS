@@ -50,11 +50,11 @@ public:
   static iMapNode *GetNode (iSector *pSector, const char *name,
     const char *classname = NULL);
 
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
   //----------------------- iMapNode --------------------------
   struct MapNode : public iMapNode
   {
-    DECLARE_EMBEDDED_IBASE (csMapNode);
+    SCF_DECLARE_EMBEDDED_IBASE (csMapNode);
     virtual iObject *QueryObject()
     { return scfParent; }
     virtual void SetPosition (const csVector3& pos)

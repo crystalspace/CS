@@ -38,27 +38,27 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csSimpleConsole)
-  IMPLEMENTS_INTERFACE (iConsoleOutput)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSimpleConsole)
+  SCF_IMPLEMENTS_INTERFACE (iConsoleOutput)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSimpleConsole::eiPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSimpleConsole::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_FACTORY (csSimpleConsole)
+SCF_IMPLEMENT_FACTORY (csSimpleConsole)
 
-EXPORT_CLASS_TABLE (simpcon)
-  EXPORT_CLASS_DEP (csSimpleConsole, "crystalspace.console.output.simple",
+SCF_EXPORT_CLASS_TABLE (simpcon)
+  SCF_EXPORT_CLASS_DEP (csSimpleConsole, "crystalspace.console.output.simple",
     "Crystal Space simple output console",
     "crystalspace.kernel., crystalspace.graphics3d., crystalspace.graphics2d.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csSimpleConsole::csSimpleConsole (iBase *iParent)
 {
-  CONSTRUCT_IBASE (iParent);
-  CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   LineMessage = NULL;
   Line = NULL;
   LinesChanged = NULL;
@@ -91,7 +91,7 @@ bool csSimpleConsole::Initialize (iSystem *iSys)
 {
   System = iSys;
 
-  G3D = QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
+  G3D = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
   if (!G3D) return false;
   G2D = G3D->GetDriver2D ();
 
@@ -122,12 +122,12 @@ bool csSimpleConsole::Initialize (iSystem *iSys)
     fontname = buf;
   iFontServer *fs = G2D->GetFontServer ();
   if (!fs)
-    System->Printf(MSG_FATAL_ERROR,"Console: No font server plug-in loaded!\n");
+    System->Printf(CS_MSG_FATAL_ERROR,"Console: No font server plug-in loaded!\n");
   else
     console_font = fs->LoadFont (fontname);
   if (!console_font)
   {
-    System->Printf (MSG_FATAL_ERROR,
+    System->Printf (CS_MSG_FATAL_ERROR,
       "Cannot load font CONFONT=%s defined in configuration file.\n"
       "Try '*large', '*courier', '*italic' or '*small'\n", buf);
     return false;

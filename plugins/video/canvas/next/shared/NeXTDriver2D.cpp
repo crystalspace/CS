@@ -34,18 +34,18 @@ typedef void* NeXTDriverHandle2D;
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY(NeXTDriver2D)
+SCF_IMPLEMENT_FACTORY(NeXTDriver2D)
 
-EXPORT_CLASS_TABLE(next2d)
-  EXPORT_CLASS_DEP(NeXTDriver2D, "crystalspace.graphics2d.next",
+SCF_EXPORT_CLASS_TABLE(next2d)
+  SCF_EXPORT_CLASS_DEP(NeXTDriver2D, "crystalspace.graphics2d.next",
     "Crystal Space 2D driver for MacOS/X Server, OpenStep, and NextStep",
     "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE(NeXTDriver2D)
-  IMPLEMENTS_INTERFACE(iPlugIn)
-  IMPLEMENTS_INTERFACE(iGraphics2D)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE(NeXTDriver2D)
+  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE(iGraphics2D)
+SCF_IMPLEMENT_IBASE_END
 
 //-----------------------------------------------------------------------------
 // Constructor
@@ -53,7 +53,7 @@ IMPLEMENT_IBASE_END
 NeXTDriver2D::NeXTDriver2D(iBase* p) :
 csGraphics2D(), controller(0), frame_buffer(0)
 {
-  CONSTRUCT_IBASE(p);
+  SCF_CONSTRUCT_IBASE(p);
 }
 
 
@@ -116,7 +116,7 @@ bool NeXTDriver2D::init_driver(int desired_depth)
     }
   }
   else
-    System->Printf(MSG_FATAL_ERROR, "FATAL: Bizarre internal error; "
+    System->Printf(CS_MSG_FATAL_ERROR, "FATAL: Bizarre internal error; "
       "support for 15- and 32-bit RGB only\n");
   return ok;
 }
@@ -144,7 +144,7 @@ int NeXTDriver2D::get_desired_depth() const
   }
   if (depth != 0 && depth != 15 && depth != 16 && depth != 32)
   {
-    System->Printf(MSG_WARNING,
+    System->Printf(CS_MSG_WARNING,
       "WARNING: Ignoring request to simulate %d-bit RGB depth.\n"
       "WARNING: Can only simulate 15-, 16-, or 32-bit RGB depth.\n\n",
       depth);
@@ -229,7 +229,7 @@ N2D_PROTO(void,user_close)(NeXTDriverHandle2D handle)
 //-----------------------------------------------------------------------------
 bool NeXTDriver2D::Open(char const* title)
 {
-  System->Printf(MSG_INITIALIZATION, CS_PLATFORM_NAME
+  System->Printf(CS_MSG_INITIALIZATION, CS_PLATFORM_NAME
     " 2D graphics driver for Crystal Space " CS_VERSION_NUMBER "\n"
     "Written by Eric Sunshine <sunshine@sunshineco.com>\n\n");
   
@@ -301,7 +301,7 @@ bool NeXTDriver2D::HandleEvent(iEvent& e)
 void NeXTDriver2D::usage_summary() const
 {
   if (System != 0)
-    System->Printf(MSG_STDOUT,
+    System->Printf(CS_MSG_STDOUT,
       "Options for " CS_PLATFORM_NAME " 2D graphics driver:\n"
       "  -simdepth=<depth>  Simulate depth (15, 16, or 32) (default=none)\n");
 }

@@ -47,7 +47,7 @@ SCF_VERSION (iPosition, 0, 1, 0);
 
 /**
  * A position in the Crystal Space world, coupled together with an orientation
- * You can create a position by using the CREATE_INSTANCE function or if you
+ * You can create a position by using the SCF_CREATE_INSTANCE function or if you
  * want to create a linked position (where one object follows an other like
  * they would be mechanically linked) by calling CreateLinkedPosition in an
  * existing objects.

@@ -33,19 +33,19 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csSurfMeshObject)
-  IMPLEMENTS_INTERFACE (iMeshObject)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iSurfaceState)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSurfMeshObject)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSurfaceState)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSurfMeshObject::SurfaceState)
-  IMPLEMENTS_INTERFACE (iSurfaceState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSurfMeshObject::SurfaceState)
+  SCF_IMPLEMENTS_INTERFACE (iSurfaceState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSurfMeshObject::csSurfMeshObject (iMeshObjectFactory* factory)
 {
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiSurfaceState);
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSurfaceState);
   csSurfMeshObject::factory = factory;
   initialized = false;
   cur_cameranr = -1;
@@ -412,13 +412,13 @@ void csSurfMeshObject::HardTransform (const csReversibleTransform& t)
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csSurfMeshObjectFactory)
-  IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSurfMeshObjectFactory)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
+SCF_IMPLEMENT_IBASE_END
 
 csSurfMeshObjectFactory::csSurfMeshObjectFactory (iBase *pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSurfMeshObjectFactory::~csSurfMeshObjectFactory ()
@@ -428,28 +428,28 @@ csSurfMeshObjectFactory::~csSurfMeshObjectFactory ()
 iMeshObject* csSurfMeshObjectFactory::NewInstance ()
 {
   csSurfMeshObject* cm = new csSurfMeshObject ((iMeshObjectFactory*)this);
-  iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
+  iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
 }
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csSurfMeshObjectType)
-  IMPLEMENTS_INTERFACE (iMeshObjectType)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSurfMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csSurfMeshObjectType)
+SCF_IMPLEMENT_FACTORY (csSurfMeshObjectType)
 
-EXPORT_CLASS_TABLE (surf)
-  EXPORT_CLASS (csSurfMeshObjectType, "crystalspace.mesh.object.surface",
+SCF_EXPORT_CLASS_TABLE (surf)
+  SCF_EXPORT_CLASS (csSurfMeshObjectType, "crystalspace.mesh.object.surface",
     "Crystal Space Surface Mesh Type")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csSurfMeshObjectType::csSurfMeshObjectType (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSurfMeshObjectType::~csSurfMeshObjectType ()
@@ -464,7 +464,7 @@ bool csSurfMeshObjectType::Initialize (iSystem*)
 iMeshObjectFactory* csSurfMeshObjectType::NewFactory ()
 {
   csSurfMeshObjectFactory* cm = new csSurfMeshObjectFactory (this);
-  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;
 }

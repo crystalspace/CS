@@ -75,7 +75,7 @@ class csMetaBall : public iMeshObject
   uint32 current_features;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   
   csMetaBall (iMeshObjectFactory *fact);
   virtual ~csMetaBall ();
@@ -161,7 +161,7 @@ public:
 ///-------------------- Meta Ball state implementation
   class MetaBallState : public iMetaBallState
   {
-	DECLARE_EMBEDDED_IBASE(csMetaBall);
+	SCF_DECLARE_EMBEDDED_IBASE(csMetaBall);
 
 	virtual int GetMetaBallCount() 
 	  { return scfParent->GetMetaBallCount(); }
@@ -201,7 +201,7 @@ class csMetaBallFactory : public iMeshObjectFactory
 public:
   csMetaBallFactory( iBase *parent );
   virtual ~csMetaBallFactory();
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   virtual iMeshObject* NewInstance();
   virtual void HardTransform ( const csReversibleTransform & ) {};
   virtual bool SupportsHardTransform() const { return false; }
@@ -221,7 +221,7 @@ public:
   virtual ~csMetaBallType();
   virtual bool Initialize ( iSystem *sys );
   
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   
   virtual iMeshObjectFactory* NewFactory();
   virtual uint32 GetFeatures () const

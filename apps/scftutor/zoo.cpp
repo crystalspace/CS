@@ -23,19 +23,19 @@ CS_IMPLEMENT_APPLICATION
 
 // for the case we're using static linking ...
 #ifdef CS_STATIC_LINKED
-  REGISTER_STATIC_LIBRARY (dog)
-  REGISTER_STATIC_LIBRARY (worm)
+  SCF_REGISTER_STATIC_LIBRARY (dog)
+  SCF_REGISTER_STATIC_LIBRARY (worm)
 #endif
 
 // frog is always statically linked
-REGISTER_STATIC_LIBRARY (Frog)
+SCF_REGISTER_STATIC_LIBRARY (Frog)
 
 // This function will clone given object, do something with him
 // and finally destroy
 void Clone (iBase *iObject)
 {
   printf ("--- cloning the object\n");
-  iFactory *factory = QUERY_INTERFACE (iObject, iFactory);
+  iFactory *factory = SCF_QUERY_INTERFACE (iObject, iFactory);
   if (!factory)
   {
     fprintf (stderr, "Object does not support the iFactory interface!\n");
@@ -56,7 +56,7 @@ void Clone (iBase *iObject)
   }
 
   // Check if the object supports the iName interface
-  iName *name = QUERY_INTERFACE (newobj, iName);
+  iName *name = SCF_QUERY_INTERFACE (newobj, iName);
   if (name)
   {
     if (!name->GetName())
@@ -89,12 +89,12 @@ int main(int argc, char *argv[])
   iSCF::SCF->RegisterClass ("test.worm", "worm");
 #endif
 
-  iDog *dog = CREATE_INSTANCE ("test.dog", iDog);
+  iDog *dog = SCF_CREATE_INSTANCE ("test.dog", iDog);
   if (!dog)
     fprintf (stderr, "No csDog shared class!\n");
   else
   {
-    iName *name = QUERY_INTERFACE (dog, iName);
+    iName *name = SCF_QUERY_INTERFACE (dog, iName);
     if (!name)
       fprintf (stderr, "dog does not support iName interface!\n");
     else
@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
 
   printf ("----------------\n");
 
-  iWorm *worm = CREATE_INSTANCE ("test.worm", iWorm);
+  iWorm *worm = SCF_CREATE_INSTANCE ("test.worm", iWorm);
   if (!worm)
     fprintf (stderr, "No csWorm shared class!\n");
   else
@@ -137,12 +137,12 @@ int main(int argc, char *argv[])
   }
 
   printf ("----------------\n");
-  iFrog *frog = CREATE_INSTANCE ("test.frog", iFrog);
+  iFrog *frog = SCF_CREATE_INSTANCE ("test.frog", iFrog);
   if (!frog)
     fprintf (stderr, "No csFrog shared class!\n");
   else
   {
-    iName *name = QUERY_INTERFACE (frog, iName);
+    iName *name = SCF_QUERY_INTERFACE (frog, iName);
     if (!name)
       fprintf (stderr, "frog does not support iName interface!\n");
     else

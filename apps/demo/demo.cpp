@@ -55,18 +55,18 @@ CS_IMPLEMENT_APPLICATION
 //-----------------------------------------------------------------------------
 
 #define  QUERY_PLUG(myPlug, iFace, errMsg) \
-  myPlug = QUERY_PLUGIN (this, iFace); \
+  myPlug = CS_QUERY_PLUGIN (this, iFace); \
   if (!myPlug) \
   { \
-    Printf (MSG_FATAL_ERROR, errMsg); \
+    Printf (CS_MSG_FATAL_ERROR, errMsg); \
     return -1; \
   }
 
 #define  QUERY_PLUG_ID(myPlug, funcid, iFace, errMsg) \
-  myPlug = QUERY_PLUGIN_ID (this, funcid, iFace); \
+  myPlug = CS_QUERY_PLUGIN_ID (this, funcid, iFace); \
   if (!myPlug) \
   { \
-    Printf (MSG_FATAL_ERROR, errMsg); \
+    Printf (CS_MSG_FATAL_ERROR, errMsg); \
     return -1; \
   }
 
@@ -107,7 +107,7 @@ iMeshWrapper* Demo::LoadObject (const char* objname, const char* filename,
   if (!databuf || !databuf->GetSize ())
   {
     if (databuf) databuf->DecRef ();
-    Printf (MSG_FATAL_ERROR, "Could not open file '%s' on VFS!\n", filename);
+    Printf (CS_MSG_FATAL_ERROR, "Could not open file '%s' on VFS!\n", filename);
     exit (0);
   }
   iMeshWrapper* obj = engine->LoadMeshObject (classId, objname,
@@ -115,7 +115,7 @@ iMeshWrapper* Demo::LoadObject (const char* objname, const char* filename,
   databuf->DecRef ();
   if (!obj)
   {
-    Printf (MSG_FATAL_ERROR,
+    Printf (CS_MSG_FATAL_ERROR,
     	"There was an error loading object from file '%s'!\n",
 	filename);
     exit (0);
@@ -130,7 +130,7 @@ void Demo::LoadFactory (const char* factname, const char* filename,
   if (!databuf || !databuf->GetSize ())
   {
     if (databuf) databuf->DecRef ();
-    Printf (MSG_FATAL_ERROR, "Could not open file '%s' on VFS!\n", filename);
+    Printf (CS_MSG_FATAL_ERROR, "Could not open file '%s' on VFS!\n", filename);
     exit (0);
   }
   iMeshFactoryWrapper* fact = engine->LoadMeshFactory (classId, factname,
@@ -138,7 +138,7 @@ void Demo::LoadFactory (const char* factname, const char* filename,
   databuf->DecRef ();
   if (!fact)
   {
-    Printf (MSG_FATAL_ERROR,
+    Printf (CS_MSG_FATAL_ERROR,
     	"There was an error loading factory from file '%s'!\n",
 	filename);
     exit (0);
@@ -152,7 +152,7 @@ void Demo::SetupFactories ()
   	"ball_factory");
   if (!fact)
   {
-    Printf (MSG_FATAL_ERROR, "Could not open ball plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "Could not open ball plugin!\n");
     exit (0);
   }
 
@@ -160,7 +160,7 @@ void Demo::SetupFactories ()
   	"surf_factory");
   if (!fact)
   {
-    Printf (MSG_FATAL_ERROR, "Could not open surface plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "Could not open surface plugin!\n");
     exit (0);
   }
 
@@ -168,7 +168,7 @@ void Demo::SetupFactories ()
   	"fire_factory");
   if (!fact)
   {
-    Printf (MSG_FATAL_ERROR, "Could not open fire plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "Could not open fire plugin!\n");
     exit (0);
   }
 
@@ -284,7 +284,7 @@ void Demo::SetupSector ()
   walls->GetFlags ().Set (CS_ENTITY_CAMERA);
   walls->SetRenderPriority (engine->GetRenderPriority ("starLevel1"));
   walls->SetZBufMode (CS_ZBUF_NONE);
-  iThingState* walls_state = QUERY_INTERFACE (walls->GetMeshObject (),
+  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
       iThingState);
 
   float size = 500.0; /// Size of the skybox -- around 0,0,0 for now.
@@ -358,7 +358,7 @@ void Demo::SetupSector ()
   walls->GetFlags ().Set (CS_ENTITY_CAMERA);
   walls->SetRenderPriority (engine->GetRenderPriority ("starLevel2"));
   walls->SetZBufMode (CS_ZBUF_NONE);
-  walls_state = QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
+  walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
 
   size = 200.0; /// Size of the skybox -- around 0,0,0 for now.
   p = walls_state->CreatePolygon ("d");
@@ -439,7 +439,7 @@ void Demo::SetupSector ()
   iStatLight* light;
   light = engine->CreateLight (NULL, csVector3 (-500, 300, 900), 1000000,
   	csColor (1, 1, 1), false);
-  iLight* il = QUERY_INTERFACE (light, iLight);
+  iLight* il = SCF_QUERY_INTERFACE (light, iLight);
   iFlareHalo* flare = il->CreateFlareHalo ();
   iMaterialWrapper* ifmc = engine->FindMaterial ("flare_center");
   iMaterialWrapper* ifm1 = engine->FindMaterial ("flare_spark1");
@@ -478,7 +478,7 @@ void Demo::SetupObjects ()
   	NULL, csVector3 (0));
   sat->SetRenderPriority (engine->GetRenderPriority ("object"));
   sat->SetZBufMode (CS_ZBUF_USE);
-  bs = QUERY_INTERFACE (sat->GetMeshObject (), iBallState);
+  bs = SCF_QUERY_INTERFACE (sat->GetMeshObject (), iBallState);
   bs->SetRadius (100, 100, 100);
   bs->SetMaterialWrapper (engine->FindMaterial ("saturn"));
   bs->SetCylindricalMapping (true);
@@ -492,7 +492,7 @@ void Demo::SetupObjects ()
   	NULL, csVector3 (0));
   jup->SetRenderPriority (engine->GetRenderPriority ("object"));
   jup->SetZBufMode (CS_ZBUF_USE);
-  bs = QUERY_INTERFACE (jup->GetMeshObject (), iBallState);
+  bs = SCF_QUERY_INTERFACE (jup->GetMeshObject (), iBallState);
   bs->SetRadius (100, 100, 100);
   bs->SetMaterialWrapper (engine->FindMaterial ("jupiter"));
   bs->SetCylindricalMapping (true);
@@ -506,7 +506,7 @@ void Demo::SetupObjects ()
   	NULL, csVector3 (0));
   earth->SetRenderPriority (engine->GetRenderPriority ("object"));
   earth->SetZBufMode (CS_ZBUF_USE);
-  bs = QUERY_INTERFACE (earth->GetMeshObject (), iBallState);
+  bs = SCF_QUERY_INTERFACE (earth->GetMeshObject (), iBallState);
   bs->SetRadius (50, 50, 50);
   bs->SetMaterialWrapper (engine->FindMaterial ("earth"));
   bs->SetCylindricalMapping (true);
@@ -520,7 +520,7 @@ void Demo::SetupObjects ()
   	NULL, csVector3 (0));
   clouds->SetRenderPriority (engine->GetRenderPriority ("alpha"));
   clouds->SetZBufMode (CS_ZBUF_TEST);
-  bs = QUERY_INTERFACE (clouds->GetMeshObject (), iBallState);
+  bs = SCF_QUERY_INTERFACE (clouds->GetMeshObject (), iBallState);
   bs->SetRadius (55, 55, 55);
   bs->SetMaterialWrapper (engine->FindMaterial ("earthclouds"));
   bs->SetCylindricalMapping (true);
@@ -538,7 +538,7 @@ void Demo::SetupObjects ()
   spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d->SetZBufMode (CS_ZBUF_USE);
   spr3d->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
-  s3d = QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
+  s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
   s3d->SetBaseColor (csColor (.15, .15, .15));
   s3d->DecRef ();
   iMeshWrapper* tail = LoadObject ("FighterTail1",
@@ -555,7 +555,7 @@ void Demo::SetupObjects ()
   spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d->SetZBufMode (CS_ZBUF_USE);
   spr3d->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
-  s3d = QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
+  s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
   s3d->SetBaseColor (csColor (.15, .15, .15));
   s3d->DecRef ();
   tail = LoadObject ("FighterTail2",
@@ -572,7 +572,7 @@ void Demo::SetupObjects ()
   spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d->SetZBufMode (CS_ZBUF_USE);
   spr3d->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
-  s3d = QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
+  s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
   s3d->SetBaseColor (csColor (.15, .15, .15));
   s3d->DecRef ();
   tail = LoadObject ("ShuttleTail",
@@ -589,7 +589,7 @@ void Demo::SetupObjects ()
   spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d->SetZBufMode (CS_ZBUF_USE);
   spr3d->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
-  s3d = QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
+  s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
   s3d->SetBaseColor (csColor (.15, .15, .15));
   s3d->DecRef ();
   tail = LoadObject ("ShuttleTail2",
@@ -606,7 +606,7 @@ void Demo::SetupObjects ()
   	NULL, csVector3 (0));
   spr3d->SetRenderPriority (engine->GetRenderPriority ("alpha"));
   spr3d->SetZBufMode (CS_ZBUF_TEST);
-  s3d = QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
+  s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
   s3d->SetMixMode (CS_FX_ADD);
   s3d->SetLighting (false);
   s3d->SetBaseColor (csColor (.1, .1, 1));
@@ -617,7 +617,7 @@ void Demo::SetupObjects ()
   	NULL, csVector3 (0));
   spr3d->SetRenderPriority (engine->GetRenderPriority ("alpha"));
   spr3d->SetZBufMode (CS_ZBUF_TEST);
-  s3d = QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
+  s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
   s3d->SetMixMode (CS_FX_ADD);
   s3d->SetLighting (false);
   s3d->SetBaseColor (csColor (.1, .1, 1));
@@ -628,7 +628,7 @@ void Demo::SetupObjects ()
   	NULL, csVector3 (0));
   spr3d->SetRenderPriority (engine->GetRenderPriority ("alpha"));
   spr3d->SetZBufMode (CS_ZBUF_TEST);
-  s3d = QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
+  s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
   s3d->SetMixMode (CS_FX_ADD);
   s3d->SetLighting (false);
   s3d->SetBaseColor (csColor (.1, .1, 1));
@@ -716,10 +716,10 @@ void Demo::SetupObjects ()
   	NULL, csVector3 (0));
   spr2d->SetRenderPriority (engine->GetRenderPriority ("alpha"));
   spr2d->SetZBufMode (CS_ZBUF_TEST);
-  s2d = QUERY_INTERFACE (spr2d->GetMeshObject (), iSprite2DState);
+  s2d = SCF_QUERY_INTERFACE (spr2d->GetMeshObject (), iSprite2DState);
   s2d->CreateRegularVertices (4, true);
   s2d->DecRef ();
-  part = QUERY_INTERFACE (spr2d->GetMeshObject (), iParticle);
+  part = SCF_QUERY_INTERFACE (spr2d->GetMeshObject (), iParticle);
   part->ScaleBy (3);
   part->DecRef ();
 
@@ -728,10 +728,10 @@ void Demo::SetupObjects ()
   	NULL, csVector3 (0));
   spr2d->SetRenderPriority (engine->GetRenderPriority ("alpha"));
   spr2d->SetZBufMode (CS_ZBUF_TEST);
-  s2d = QUERY_INTERFACE (spr2d->GetMeshObject (), iSprite2DState);
+  s2d = SCF_QUERY_INTERFACE (spr2d->GetMeshObject (), iSprite2DState);
   s2d->CreateRegularVertices (4, true);
   s2d->DecRef ();
-  part = QUERY_INTERFACE (spr2d->GetMeshObject (), iParticle);
+  part = SCF_QUERY_INTERFACE (spr2d->GetMeshObject (), iParticle);
   part->ScaleBy (3);
   part->DecRef ();
 }
@@ -744,10 +744,10 @@ bool Demo::Initialize (int argc, const char* const argv[],
 
   // Load the engine plugin.
   engine =
-    LOAD_PLUGIN (this, "crystalspace.engine.core", CS_FUNCID_ENGINE, iEngine);
+    CS_LOAD_PLUGIN (this, "crystalspace.engine.core", CS_FUNCID_ENGINE, iEngine);
   if (!engine)
   {
-    Printf (MSG_FATAL_ERROR, "No engine!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No engine!\n");
     abort ();
   }
   QUERY_PLUG_ID (myG3D, CS_FUNCID_VIDEO, iGraphics3D, "No iGraphics3D plugin !\n");
@@ -758,7 +758,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("The Crystal Space Demo."))
   {
-    Printf (MSG_FATAL_ERROR, "Error opening system!\n");
+    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     cleanup ();
     exit (1);
   }
@@ -787,7 +787,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
     myConsole->Clear ();
 
   // Some commercials...
-  Printf (MSG_INITIALIZATION,
+  Printf (CS_MSG_INITIALIZATION,
     "The Crystal Space Demo.\n");
 
   // First disable the lighting cache. Our app is simple enough
@@ -795,7 +795,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
   engine->EnableLightingCache (false);
 
   // Create our world.
-  Printf (MSG_INITIALIZATION, "Creating world!...\n");
+  Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
 
   engine->RegisterRenderPriority ("starLevel1", 1);
   engine->RegisterRenderPriority ("starLevel2", 2);
@@ -810,7 +810,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
 
   engine->Prepare ();
 
-  Printf (MSG_INITIALIZATION, "--------------------------------------\n");
+  Printf (CS_MSG_INITIALIZATION, "--------------------------------------\n");
 
   view = engine->CreateView (myG3D);
   view->GetCamera ()->SetSector (room);
@@ -1715,7 +1715,7 @@ int main (int argc, char* argv[])
   // and initialize them.
   if (!System->Initialize (argc, argv, "/config/csdemo.cfg"))
   {
-    System->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
+    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
     cleanup ();
     exit (1);
   }

@@ -309,7 +309,7 @@ bool csGraphics3DSoftwareCommon::Open (const char* Title)
 {
   if (!G2D->Open (Title))
   {
-    SysPrintf (MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
+    SysPrintf (CS_MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
     // set "not opened" flag
     width = height = -1;
     return false;
@@ -357,7 +357,7 @@ bool csGraphics3DSoftwareCommon::NewOpen ()
   char vendor [13];
   csDetectCPU (&family, vendor, &features);
   cpu_mmx = (features & CPUx86_FEATURE_MMX) != 0;
-  SysPrintf (MSG_INITIALIZATION, "%d %s CPU detected; FPU (%s) MMX (%s) CMOV (%s)\n",
+  SysPrintf (CS_MSG_INITIALIZATION, "%d %s CPU detected; FPU (%s) MMX (%s) CMOV (%s)\n",
     family, vendor,
     (features & CPUx86_FEATURE_FPU) ? "yes" : "no",
     (features & CPUx86_FEATURE_MMX) ? "yes" : "no",
@@ -397,7 +397,7 @@ bool csGraphics3DSoftwareCommon::NewOpen ()
 
     if (!csize)
     {
-      SysPrintf (MSG_INITIALIZATION,
+      SysPrintf (CS_MSG_INITIALIZATION,
         "Invalid cache size specified, using default\n");
       csize = DEFAULT_CACHE_SIZE;
     }
@@ -2330,7 +2330,7 @@ void csGraphics3DSoftwareCommon::CloseFogObject (CS_ID id)
   FogBuffer* fb = find_fog_buffer (id);
   if (!fb)
   {
-    SysPrintf (MSG_INTERNAL_ERROR,
+    SysPrintf (CS_MSG_INTERNAL_ERROR,
     	"ENGINE FAILURE! Try to close a non-open fog object!\n");
     return;
   }
@@ -2419,7 +2419,7 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
     FogBuffer* fb = find_fog_buffer (id);
     if (!fb)
     {
-      SysPrintf (MSG_INTERNAL_ERROR, "ENGINE FAILURE! Fog object not open!\n");
+      SysPrintf (CS_MSG_INTERNAL_ERROR, "ENGINE FAILURE! Fog object not open!\n");
       exit (0);
     }
 

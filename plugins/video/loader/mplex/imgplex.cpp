@@ -26,21 +26,21 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE(csMultiplexImageIO);
-  IMPLEMENTS_INTERFACE(iImageIO);
-  IMPLEMENTS_INTERFACE(iPlugIn);
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csMultiplexImageIO);
+  SCF_IMPLEMENTS_INTERFACE(iImageIO);
+  SCF_IMPLEMENTS_INTERFACE(iPlugIn);
+SCF_IMPLEMENT_IBASE_END;
 
-IMPLEMENT_FACTORY(csMultiplexImageIO);
+SCF_IMPLEMENT_FACTORY(csMultiplexImageIO);
 
-EXPORT_CLASS_TABLE (imgplex)
-  EXPORT_CLASS (csMultiplexImageIO,
+SCF_EXPORT_CLASS_TABLE (imgplex)
+  SCF_EXPORT_CLASS (csMultiplexImageIO,
     MY_CLASSNAME, "Image file format multiplex plug-in.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csMultiplexImageIO::csMultiplexImageIO (iBase *pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csMultiplexImageIO::~csMultiplexImageIO ()
@@ -53,7 +53,7 @@ bool csMultiplexImageIO::Initialize (iSystem *pSystem)
 {
   if (pSystem)
   {
-    pSystem->Printf(MSG_INITIALIZATION,
+    pSystem->Printf(CS_MSG_INITIALIZATION,
       "Initializing image loading multiplexer...\n"
       "  Looking for image loader modules:\n");
 
@@ -67,8 +67,8 @@ bool csMultiplexImageIO::Initialize (iSystem *pSystem)
 	char const* classname = classlist->Get(i);
         if (strcasecmp (classname, MY_CLASSNAME))
         {
-	  pSystem->Printf(MSG_INITIALIZATION,"  %s\n",classname);
-	  iImageIO *plugin = LOAD_PLUGIN (pSystem, classname, NULL, iImageIO);
+	  pSystem->Printf(CS_MSG_INITIALIZATION,"  %s\n",classname);
+	  iImageIO *plugin = CS_LOAD_PLUGIN (pSystem, classname, NULL, iImageIO);
 	  if (plugin)
 	  {
 	    // remember the plugin

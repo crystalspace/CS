@@ -25,22 +25,22 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csArtsRenderer)
-  IMPLEMENTS_INTERFACE (iSoundRender)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iSoundListener)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csArtsRenderer)
+  SCF_IMPLEMENTS_INTERFACE (iSoundRender)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iSoundListener)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csArtsRenderer);
+SCF_IMPLEMENT_FACTORY (csArtsRenderer);
 
-EXPORT_CLASS_TABLE (csarts)
-  EXPORT_CLASS (csArtsRenderer, "crystalspace.sound.render.arts", 
+SCF_EXPORT_CLASS_TABLE (csarts)
+  SCF_EXPORT_CLASS (csArtsRenderer, "crystalspace.sound.render.arts", 
 		"aRts renderer plugin for Crystal Space")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csArtsRenderer::csArtsRenderer (iBase *pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
   dispatcher = NULL;
   bInit = false;
   SetVolume (1.0f);
@@ -64,8 +64,8 @@ bool csArtsRenderer::Initialize (iSystem *iSys)
   server = Arts::Reference (ARTS_SIMPLESOUNDSERVER);
   if (server.isNull ())
   {
-    iSys->Printf (MSG_WARNING, "Couldn't get a reference to the soundserver !\n");
-    iSys->Printf (MSG_WARNING, 
+    iSys->Printf (CS_MSG_WARNING, "Couldn't get a reference to the soundserver !\n");
+    iSys->Printf (CS_MSG_WARNING, 
 		  "Check whether you have the aRts server running (usually called \"artsd\")\n");
   }
   else

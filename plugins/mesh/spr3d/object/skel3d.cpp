@@ -20,14 +20,14 @@
 #include "spr3d.h"
 #include "qsqrt.h"
 
-IMPLEMENT_IBASE (csSkelLimb)
-  IMPLEMENTS_INTERFACE (iSkeletonLimb)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSkelLimb)
+  SCF_IMPLEMENTS_INTERFACE (iSkeletonLimb)
+SCF_IMPLEMENT_IBASE_END
 
 csSkelLimb::csSkelLimb ()
   : next (NULL), vertices (NULL), num_vertices (0), children (NULL), name(NULL)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 csSkelLimb::~csSkelLimb ()
@@ -142,7 +142,7 @@ iSkeletonConnection* csSkelLimb::CreateConnection ()
 {
   csSkelConnection* con = new csSkelConnection ();
   AddChild (con);
-  iSkeletonConnection* icon = QUERY_INTERFACE (con, iSkeletonConnection);
+  iSkeletonConnection* icon = SCF_QUERY_INTERFACE (con, iSkeletonConnection);
   icon->DecRef ();
   return icon;
 }
@@ -171,43 +171,43 @@ csSkelLimbState* csSkel::CreateState ()
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE_EXT (csSkelConnection)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonConnection)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csSkelConnection)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonConnection)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSkelConnection::SkeletonConnection)
-  IMPLEMENTS_INTERFACE (iSkeletonConnection)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSkelConnection::SkeletonConnection)
+  SCF_IMPLEMENTS_INTERFACE (iSkeletonConnection)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSkelConnection::csSkelConnection ()
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonConnection);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonConnection);
 }
 
-IMPLEMENT_IBASE_EXT (csSkel)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iSkeleton)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csSkel)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSkeleton)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSkel::Skeleton)
-  IMPLEMENTS_INTERFACE (iSkeleton)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSkel::Skeleton)
+  SCF_IMPLEMENTS_INTERFACE (iSkeleton)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSkel::csSkel ()
 {
-CONSTRUCT_EMBEDDED_IBASE (scfiSkeleton);
+SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSkeleton);
 }
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csSkelLimbState)
-  IMPLEMENTS_INTERFACE (iSkeletonLimbState)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSkelLimbState)
+  SCF_IMPLEMENTS_INTERFACE (iSkeletonLimbState)
+SCF_IMPLEMENT_IBASE_END
 
 csSkelLimbState::csSkelLimbState (): 
   next (NULL), tmpl (NULL), vertices (NULL), num_vertices (0),
   children (NULL), name (NULL), data (NULL)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 csSkelLimbState::~csSkelLimbState ()
@@ -386,23 +386,23 @@ void csSkelLimbState::ComputeSqRadius (const csTransform& tr,
   }
 }
 
-IMPLEMENT_IBASE_EXT (csSkelConnectionState)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonConnectionState)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonBone)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csSkelConnectionState)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonConnectionState)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonBone)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSkelConnectionState::SkeletonConnectionState)
-  IMPLEMENTS_INTERFACE (iSkeletonConnectionState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSkelConnectionState::SkeletonConnectionState)
+  SCF_IMPLEMENTS_INTERFACE (iSkeletonConnectionState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSkelConnectionState::SkeletonBone)
-  IMPLEMENTS_INTERFACE (iSkeletonBone)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSkelConnectionState::SkeletonBone)
+  SCF_IMPLEMENTS_INTERFACE (iSkeletonBone)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSkelConnectionState::csSkelConnectionState ()
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonBone);
-  CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonConnectionState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonBone);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonConnectionState);
 }
 
 void csSkelConnectionState::ComputeBoundingBox (
@@ -419,23 +419,23 @@ void csSkelConnectionState::ComputeSqRadius (const csTransform& tr,
   csSkelLimbState::ComputeSqRadius (tr_new, max_sq_radius, source);
 }
 
-IMPLEMENT_IBASE_EXT (csSkelState)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonState)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonBone)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csSkelState)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonState)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonBone)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSkelState::SkeletonState)
-  IMPLEMENTS_INTERFACE (iSkeletonState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSkelState::SkeletonState)
+  SCF_IMPLEMENTS_INTERFACE (iSkeletonState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSkelState::SkeletonBone)
-  IMPLEMENTS_INTERFACE (iSkeletonBone)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSkelState::SkeletonBone)
+  SCF_IMPLEMENTS_INTERFACE (iSkeletonBone)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSkelState::csSkelState ()
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonState);
-  CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonBone);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonBone);
 }
 
 void csSkelState::ComputeBoundingBox (const csTransform& tr,

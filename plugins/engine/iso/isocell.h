@@ -50,7 +50,7 @@ private:
     void (*func)(csIsoCellNode *, void *), void *data);
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   ///
   csIsoCell (iBase *iParent);

@@ -26,13 +26,13 @@
 #include "srdrcom.h"
 #include "sndhdl.h"
 
-IMPLEMENT_IBASE(csSoundSourceSoftware)
-  IMPLEMENTS_INTERFACE(iSoundSource)
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csSoundSourceSoftware)
+  SCF_IMPLEMENTS_INTERFACE(iSoundSource)
+SCF_IMPLEMENT_IBASE_END;
 
 csSoundSourceSoftware::csSoundSourceSoftware(csSoundRenderSoftware *srdr,
     csSoundHandleSoftware *hdl, int m3d) {
-  CONSTRUCT_IBASE(hdl);
+  SCF_CONSTRUCT_IBASE(hdl);
 
   SoundRender = srdr;
   FrequencyFactor = 1;

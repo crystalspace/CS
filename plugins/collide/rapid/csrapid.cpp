@@ -23,13 +23,13 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csRapidCollider)
-  IMPLEMENTS_INTERFACE (iCollider)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csRapidCollider)
+  SCF_IMPLEMENTS_INTERFACE (iCollider)
+SCF_IMPLEMENT_IBASE_END
 
 csRapidCollider::csRapidCollider (iPolygonMesh* mesh)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
 
   csRapidCollider::mesh = mesh;
   mesh->IncRef ();
@@ -44,21 +44,21 @@ csRapidCollider::~csRapidCollider ()
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csRapidCollideSystem)
-  IMPLEMENTS_INTERFACE (iCollideSystem)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csRapidCollideSystem)
+  SCF_IMPLEMENTS_INTERFACE (iCollideSystem)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csRapidCollideSystem)
+SCF_IMPLEMENT_FACTORY (csRapidCollideSystem)
 
-EXPORT_CLASS_TABLE (rapid)
-  EXPORT_CLASS (csRapidCollideSystem, "crystalspace.collisiondetection.rapid",
+SCF_EXPORT_CLASS_TABLE (rapid)
+  SCF_EXPORT_CLASS (csRapidCollideSystem, "crystalspace.collisiondetection.rapid",
     "Crystal Space RAPID CD System")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csRapidCollideSystem::csRapidCollideSystem (iBase *pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 bool csRapidCollideSystem::Initialize (iSystem*)

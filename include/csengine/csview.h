@@ -89,7 +89,7 @@ public:
   /// Draw 3D world as seen from the camera.
   virtual void Draw ();
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 };
 
 #endif // __CS_CSVIEW_H__

@@ -111,12 +111,12 @@ static void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 
 /////The 2D Graphics Driver//////////////
 
-IMPLEMENT_FACTORY (csGraphics2DOpenGL)
+SCF_IMPLEMENT_FACTORY (csGraphics2DOpenGL)
 
-EXPORT_CLASS_TABLE (glwin32)
-  EXPORT_CLASS_DEP (csGraphics2DOpenGL, "crystalspace.graphics2d.glwin32",
+SCF_EXPORT_CLASS_TABLE (glwin32)
+  SCF_EXPORT_CLASS_DEP (csGraphics2DOpenGL, "crystalspace.graphics2d.glwin32",
     "Win32 OpenGL 2D graphics driver for Crystal Space", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 ///// Windowed-mode palette stuff //////
 
@@ -226,7 +226,7 @@ bool csGraphics2DOpenGL::Initialize (iSystem *pSystem)
     return false;
 
   // QI for iWin32SystemDriver //
-  m_piWin32System = QUERY_INTERFACE (System, iWin32SystemDriver);
+  m_piWin32System = SCF_QUERY_INTERFACE (System, iWin32SystemDriver);
   if (!m_piWin32System)
       sys_fatalerror("csGraphics2DDDraw3::Open(QI) -- iSystem passed does not support iWin32SystemDriver.");
   
@@ -242,7 +242,7 @@ bool csGraphics2DOpenGL::Initialize (iSystem *pSystem)
     pfmt.PixelBytes = 1;
   }
   
-  CsPrintf (MSG_INITIALIZATION, "Using %d bits per pixel (%d color mode).\n", Depth, 1 << Depth);
+  CsPrintf (CS_MSG_INITIALIZATION, "Using %d bits per pixel (%d color mode).\n", Depth, 1 << Depth);
   return true;
 }
 
@@ -308,23 +308,23 @@ bool csGraphics2DOpenGL::Open(const char *Title)
       {
         case DISP_CHANGE_RESTART:
         //computer must restart for mode to work.
-        CsPrintf (MSG_INITIALIZATION, "gl2d error: must restart for display change.\n");
+        CsPrintf (CS_MSG_INITIALIZATION, "gl2d error: must restart for display change.\n");
         break;
         case DISP_CHANGE_BADFLAGS:
         //Bad Flag settings
-        CsPrintf (MSG_INITIALIZATION, "gl2d error: display change bad flags.\n");
+        CsPrintf (CS_MSG_INITIALIZATION, "gl2d error: display change bad flags.\n");
         break;
         case DISP_CHANGE_FAILED:
         //Failure to display
-        CsPrintf (MSG_INITIALIZATION, "gl2d error: display change failed.\n");
+        CsPrintf (CS_MSG_INITIALIZATION, "gl2d error: display change failed.\n");
         break;
         case DISP_CHANGE_NOTUPDATED:
         //No Reg Write Error
-        CsPrintf (MSG_INITIALIZATION, "gl2d error: display change could not write registry.\n");
+        CsPrintf (CS_MSG_INITIALIZATION, "gl2d error: display change could not write registry.\n");
         break;
         default:
         //Unknown Error
-        CsPrintf (MSG_INITIALIZATION, "gl2d error: display change gave unknown error.\n");
+        CsPrintf (CS_MSG_INITIALIZATION, "gl2d error: display change gave unknown error.\n");
         break;
       }
     }

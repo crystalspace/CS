@@ -21,14 +21,14 @@
 #include "artshndl.h"
 #include "artsrend.h"
 
-IMPLEMENT_IBASE (csArtsHandle)
-  IMPLEMENTS_INTERFACE (iSoundHandle)
-  IMPLEMENTS_INTERFACE (iSoundSource)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csArtsHandle)
+  SCF_IMPLEMENTS_INTERFACE (iSoundHandle)
+  SCF_IMPLEMENTS_INTERFACE (iSoundSource)
+SCF_IMPLEMENT_IBASE_END
 
 csArtsHandle::csArtsHandle (csArtsRenderer *pRend)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   this->pRend = pRend;
 }
 

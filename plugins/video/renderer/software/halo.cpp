@@ -38,7 +38,7 @@ class csSoftHalo : public iHalo
 
 public:
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Create the halo object
   csSoftHalo (float iR, float iG, float iB, unsigned char *iAlpha,
@@ -147,15 +147,15 @@ void halo_dscan_8 (void *src, void *dest, int count, int delta)
 
 //----------------------------------------------// Software halo class //-----//
 
-IMPLEMENT_IBASE (csSoftHalo)
-  IMPLEMENTS_INTERFACE (iHalo)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSoftHalo)
+  SCF_IMPLEMENTS_INTERFACE (iHalo)
+SCF_IMPLEMENT_IBASE_END
 
 // Create the halo object
 csSoftHalo::csSoftHalo (float iR, float iG, float iB, unsigned char *iAlpha,
   int iWidth, int iHeight, csGraphics3DSoftwareCommon *iG3D)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   R = iR; G = iG; B = iB;
   Alpha = new unsigned char [(Width = iWidth) * (Height = iHeight)];
   memcpy (Alpha, iAlpha, Width * Height);

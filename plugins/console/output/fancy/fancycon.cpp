@@ -35,28 +35,28 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE(csFancyConsole)
-  IMPLEMENTS_INTERFACE(iConsoleOutput)
-  IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE(csFancyConsole)
+  SCF_IMPLEMENTS_INTERFACE(iConsoleOutput)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csFancyConsole::eiPlugIn)
-  IMPLEMENTS_INTERFACE(iPlugIn)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csFancyConsole::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_FACTORY(csFancyConsole)
+SCF_IMPLEMENT_FACTORY(csFancyConsole)
 
-EXPORT_CLASS_TABLE (fancycon)
-  EXPORT_CLASS (csFancyConsole, "crystalspace.console.output.fancy",
+SCF_EXPORT_CLASS_TABLE (fancycon)
+  SCF_EXPORT_CLASS (csFancyConsole, "crystalspace.console.output.fancy",
 		"Crystal Space fancy output console")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csFancyConsole::csFancyConsole (iBase *p) :
   System(0), VFS(0), base(0), G2D(0), G3D(0), ImageLoader(NULL), border_computed(false),
   pix_loaded(false), system_ready(false), auto_update(true), visible(true)
 {
-  CONSTRUCT_IBASE (p);
-  CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_IBASE (p);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csFancyConsole::~csFancyConsole ()
@@ -77,18 +77,18 @@ bool csFancyConsole::Initialize (iSystem *system)
 {
   System = system;
 
-  VFS = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
+  VFS = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
   if (!VFS)
     return false;
 
   csConfigAccess ini(System, "/config/fancycon.cfg");
   char const* baseclass = ini->GetStr("FancyConsole.General.Superclass",
     "crystalspace.console.output.standard");
-  base = LOAD_PLUGIN(System, baseclass, 0, iConsoleOutput);
+  base = CS_LOAD_PLUGIN(System, baseclass, 0, iConsoleOutput);
   if (!base)
     return false;
 
-  G3D = QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
+  G3D = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
   if (!G3D)
     return false;
   G2D = G3D->GetDriver2D ();
@@ -118,7 +118,7 @@ bool csFancyConsole::HandleEvent (iEvent &Event)
           system_ready = true;
 	  if (!pix_loaded)
 	  {
-            ImageLoader = QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageIO);
+            ImageLoader = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageIO);
 	    LoadPix ();
 	    pix_loaded = true;
 	  }
@@ -401,7 +401,7 @@ void csFancyConsole::LoadPix ()
   const char* dir = ini->GetStr ("FancyConsole.General.Archive");
   const char* mountdir = ini->GetStr ("FancyConsole.General.Mount");
   if (!dir || !mountdir)
-    System->Printf (MSG_WARNING,
+    System->Printf (CS_MSG_WARNING,
       "FancyConsole: Data resource location unknown\n");
   else if (VFS->Mount (mountdir, dir))
   {
@@ -433,7 +433,7 @@ void csFancyConsole::LoadPix ()
     VFS->Unmount (mountdir, dir);
   }
   else
-    System->Printf (MSG_WARNING, "Could not mount %s on %s\n", dir, mountdir);
+    System->Printf (CS_MSG_WARNING, "Could not mount %s on %s\n", dir, mountdir);
 }
 
 void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
@@ -497,7 +497,7 @@ void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
       delete [] data;
     }
     else
-      System->Printf(MSG_WARNING, "Could not read %s\n", pix);
+      System->Printf(CS_MSG_WARNING, "Could not read %s\n", pix);
   }
 
   Keyname.Clear() << "FancyConsole." << sect << ".do_alpha";

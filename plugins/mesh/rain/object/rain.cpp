@@ -29,13 +29,13 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE_EXT (csRainMeshObject)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iRainState)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csRainMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRainState)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csRainMeshObject::RainState)
-  IMPLEMENTS_INTERFACE (iRainState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csRainMeshObject::RainState)
+  SCF_IMPLEMENTS_INTERFACE (iRainState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 void csRainMeshObject::SetupObject ()
 {
@@ -74,7 +74,7 @@ void csRainMeshObject::SetupObject ()
 csRainMeshObject::csRainMeshObject (iSystem* system, iMeshObjectFactory* factory)
 	: csParticleSystem (system, factory)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiRainState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRainState);
   part_pos = NULL;
   rainbox.Set (csVector3 (0, 0, 0), csVector3 (1, 1, 1));
   rain_dir.Set (0, -1, 0);
@@ -137,13 +137,13 @@ void csRainMeshObject::HardTransform (const csReversibleTransform& /*t*/)
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csRainMeshObjectFactory)
-  IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csRainMeshObjectFactory)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
+SCF_IMPLEMENT_IBASE_END
 
 csRainMeshObjectFactory::csRainMeshObjectFactory (iBase *pParent, iSystem* system)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
   csRainMeshObjectFactory::system = system;
 }
 
@@ -154,28 +154,28 @@ csRainMeshObjectFactory::~csRainMeshObjectFactory ()
 iMeshObject* csRainMeshObjectFactory::NewInstance ()
 {
   csRainMeshObject* cm = new csRainMeshObject (system, (iMeshObjectFactory*)this);
-  iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
+  iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
 }
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csRainMeshObjectType)
-  IMPLEMENTS_INTERFACE (iMeshObjectType)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csRainMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csRainMeshObjectType)
+SCF_IMPLEMENT_FACTORY (csRainMeshObjectType)
 
-EXPORT_CLASS_TABLE (rain)
-  EXPORT_CLASS (csRainMeshObjectType, "crystalspace.mesh.object.rain",
+SCF_EXPORT_CLASS_TABLE (rain)
+  SCF_EXPORT_CLASS (csRainMeshObjectType, "crystalspace.mesh.object.rain",
     "Crystal Space Rain Mesh Type")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csRainMeshObjectType::csRainMeshObjectType (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csRainMeshObjectType::~csRainMeshObjectType ()
@@ -191,7 +191,7 @@ bool csRainMeshObjectType::Initialize (iSystem* system)
 iMeshObjectFactory* csRainMeshObjectType::NewFactory ()
 {
   csRainMeshObjectFactory* cm = new csRainMeshObjectFactory (this, system);
-  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;
 }

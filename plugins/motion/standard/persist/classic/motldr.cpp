@@ -57,30 +57,30 @@ CS_TOKEN_DEF_START
 CS_TOKEN_DEF_END
 
 
-IMPLEMENT_IBASE (csMotionLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csMotionLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csMotionSaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csMotionSaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
 
-IMPLEMENT_FACTORY (csMotionLoader)
-IMPLEMENT_FACTORY (csMotionSaver)
+SCF_IMPLEMENT_FACTORY (csMotionLoader)
+SCF_IMPLEMENT_FACTORY (csMotionSaver)
 
-EXPORT_CLASS_TABLE (motldr)
-  EXPORT_CLASS (csMotionLoader, "crystalspace.motion.loader.default",
+SCF_EXPORT_CLASS_TABLE (motldr)
+  SCF_EXPORT_CLASS (csMotionLoader, "crystalspace.motion.loader.default",
     "Skeletal Motion Manager Loader for Crystal Space")
-  EXPORT_CLASS (csMotionSaver, "crystalspace.motion.saver.default",
+  SCF_EXPORT_CLASS (csMotionSaver, "crystalspace.motion.saver.default",
     "Skeletal Motion Manager Saver for Crystal Space")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csMotionLoader::csMotionLoader(iBase *iParent)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   sys=NULL;
 }
 
@@ -93,13 +93,13 @@ csMotionLoader::~csMotionLoader()
 bool csMotionLoader::Initialize (iSystem* Sys)
 {
   sys=Sys;
-  vfs = QUERY_PLUGIN_ID( sys, CS_FUNCID_VFS, iVFS );
+  vfs = CS_QUERY_PLUGIN_ID( sys, CS_FUNCID_VFS, iVFS );
   if (!vfs)
   {
 	printf("Motion Loader: Virtual file system not loaded.. aborting\n");
 	return false;
   }
-  motman = QUERY_PLUGIN_CLASS( sys, "crystalspace.motion.manager.default", "MotionManager" , iMotionManager );
+  motman = CS_QUERY_PLUGIN_CLASS( sys, "crystalspace.motion.manager.default", "MotionManager" , iMotionManager );
   if (!motman)
   {
 	printf("Motion Loader: Motion manager not loaded... aborting\n");
@@ -222,7 +222,7 @@ iMotion* csMotionLoader::LoadMotion (const char* fname )
   if (!databuff || !databuff->GetSize ())
   {
     if (databuff) databuff->DecRef ();
-    sys->Printf (MSG_FATAL_ERROR, "Could not open motion file \"%s\" on VFS!\n", fname);
+    sys->Printf (CS_MSG_FATAL_ERROR, "Could not open motion file \"%s\" on VFS!\n", fname);
     return NULL;
   }
 
@@ -239,12 +239,12 @@ iMotion* csMotionLoader::LoadMotion (const char* fname )
   {
     if (!data)
     {
-      sys->Printf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      sys->Printf (CS_MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
       fatal_exit (0, false);
     }
 
     if (!motman)
-      sys->Printf (MSG_FATAL_ERROR, "No motion manager loaded!\n");
+      sys->Printf (CS_MSG_FATAL_ERROR, "No motion manager loaded!\n");
     else
     {
       iMotion* m = motman->FindByName (name);
@@ -300,7 +300,7 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
   {
     if (!params)
     {
-      sys->Printf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      sys->Printf (CS_MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
       fatal_exit (0, false);
     }
     switch (cmd)
@@ -341,7 +341,7 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
 		  }
 		  break;
 	    default:
-	      sys->Printf (MSG_FATAL_ERROR, "Expected MATRIX, Q, or V instead of '%s'!\n", buf);
+	      sys->Printf (CS_MSG_FATAL_ERROR, "Expected MATRIX, Q, or V instead of '%s'!\n", buf);
 	      fatal_exit (0, false);
 	  }     
         }
@@ -380,7 +380,7 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
 			}
 			break;
 		  default:
-	    	sys->Printf (MSG_FATAL_ERROR, "Expected LINK instead of '%s'!\n", buf);
+	    	sys->Printf (CS_MSG_FATAL_ERROR, "Expected LINK instead of '%s'!\n", buf);
 	    	fatal_exit (0, false);
 		}
 	  }
@@ -390,7 +390,7 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    sys->Printf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the a sprite template!\n",
+    sys->Printf (CS_MSG_FATAL_ERROR, "Token '%s' not found while parsing the a sprite template!\n",
         csGetLastOffender ());
     fatal_exit (0, false);
   }
@@ -445,7 +445,7 @@ CS_TOKEN_TABLE_END
   }
 	if (cmd == CS_PARSERR_TOKENNOTFOUND)
 	{
-	  sys->Printf( MSG_FATAL_ERROR,
+	  sys->Printf( CS_MSG_FATAL_ERROR,
 		  "Token '%s' not found while parsing the iMotionLoader plugin\n",
 			csGetLastOffender());
 	  fatal_exit(0,false);
@@ -457,7 +457,7 @@ CS_TOKEN_TABLE_END
 
 csMotionSaver::csMotionSaver( iBase* base )
 {
-  CONSTRUCT_IBASE (base);
+  SCF_CONSTRUCT_IBASE (base);
 }
 
 csMotionSaver::~csMotionSaver()
@@ -472,7 +472,7 @@ bool csMotionSaver::Initialize( iSystem* system )
 
 void csMotionSaver::WriteDown ( iBase* /* obj */, iStrVector* /* string */, iEngine* /* engine */)
 {
-  iMotionManager *motman = QUERY_PLUGIN_CLASS( sys, "crystalspace.motion.manager.default", "MotionManager" , iMotionManager );
+  iMotionManager *motman = CS_QUERY_PLUGIN_CLASS( sys, "crystalspace.motion.manager.default", "MotionManager" , iMotionManager );
   if (motman)
   {
 	motman->DecRef();

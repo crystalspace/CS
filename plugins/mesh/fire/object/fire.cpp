@@ -33,13 +33,13 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE_EXT (csFireMeshObject)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iFireState)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csFireMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iFireState)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csFireMeshObject::FireState)
-  IMPLEMENTS_INTERFACE (iFireState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csFireMeshObject::FireState)
+  SCF_IMPLEMENTS_INTERFACE (iFireState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 // Aging ratios
 #define COL_AGE0	0.0
@@ -117,7 +117,7 @@ void csFireMeshObject::SetupObject ()
 csFireMeshObject::csFireMeshObject (iSystem* system,
   iMeshObjectFactory* factory) : csParticleSystem (system, factory)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiFireState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiFireState);
   part_pos = NULL;
   part_speed = NULL;
   part_age = NULL;
@@ -153,7 +153,7 @@ void csFireMeshObject::SetControlledLight (iLight *l)
 {
   light = l;
   if (dynlight) dynlight->DecRef ();
-  dynlight = QUERY_INTERFACE_SAFE (light, iDynLight);
+  dynlight = SCF_QUERY_INTERFACE_SAFE (light, iDynLight);
 }
 
 void csFireMeshObject::RestartParticle (int index, float pre_move)
@@ -247,7 +247,7 @@ void csFireMeshObject::AddLight (iEngine *engine, iSector *sec)
 {
   if (light) return;
   dynlight = engine->CreateDynLight (origin.GetCenter(), 5, csColor (1, 1, 0));
-  light = QUERY_INTERFACE (dynlight, iLight);
+  light = SCF_QUERY_INTERFACE (dynlight, iLight);
   light->SetSector (sec);
   dynlight->Setup ();
   delete_light = true;
@@ -263,13 +263,13 @@ void csFireMeshObject::HardTransform (const csReversibleTransform& t)
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csFireMeshObjectFactory)
-  IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csFireMeshObjectFactory)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
+SCF_IMPLEMENT_IBASE_END
 
 csFireMeshObjectFactory::csFireMeshObjectFactory(iBase* b, iSystem* s)
 {
-  CONSTRUCT_IBASE (b);
+  SCF_CONSTRUCT_IBASE (b);
   system = s;
 }
 
@@ -281,28 +281,28 @@ iMeshObject* csFireMeshObjectFactory::NewInstance ()
 {
   csFireMeshObject* cm =
     new csFireMeshObject (system, (iMeshObjectFactory*)this );
-  iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
+  iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
 }
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csFireMeshObjectType)
-  IMPLEMENTS_INTERFACE (iMeshObjectType)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csFireMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csFireMeshObjectType)
+SCF_IMPLEMENT_FACTORY (csFireMeshObjectType)
 
-EXPORT_CLASS_TABLE (fire)
-  EXPORT_CLASS (csFireMeshObjectType, "crystalspace.mesh.object.fire",
+SCF_EXPORT_CLASS_TABLE (fire)
+  SCF_EXPORT_CLASS (csFireMeshObjectType, "crystalspace.mesh.object.fire",
     "Crystal Space Fire Mesh Type")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csFireMeshObjectType::csFireMeshObjectType (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csFireMeshObjectType::~csFireMeshObjectType ()
@@ -318,7 +318,7 @@ bool csFireMeshObjectType::Initialize (iSystem* system)
 iMeshObjectFactory* csFireMeshObjectType::NewFactory ()
 {
   csFireMeshObjectFactory* cm = new csFireMeshObjectFactory (this, system);
-  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;
 }

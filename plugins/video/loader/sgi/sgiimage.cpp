@@ -26,16 +26,16 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csSGIImageIO)
-  IMPLEMENTS_INTERFACE (iImageIO)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSGIImageIO)
+  SCF_IMPLEMENTS_INTERFACE (iImageIO)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csSGIImageIO);
+SCF_IMPLEMENT_FACTORY (csSGIImageIO);
 
-EXPORT_CLASS_TABLE (cssgiimg)
-  EXPORT_CLASS (csSGIImageIO, "crystalspace.graphic.image.io.sgi", "CrystalSpace SGI image format I/O plugin")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE (cssgiimg)
+  SCF_EXPORT_CLASS (csSGIImageIO, "crystalspace.graphic.image.io.sgi", "CrystalSpace SGI image format I/O plugin")
+SCF_EXPORT_CLASS_TABLE_END
 
 static iImageIO::FileFormatDescription formatlist[2] = 
 {
@@ -45,7 +45,7 @@ static iImageIO::FileFormatDescription formatlist[2] =
 
 csSGIImageIO::csSGIImageIO (iBase *pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
   formats.Push (&formatlist[0]);
   formats.Push (&formatlist[1]);
 }

@@ -128,7 +128,7 @@ class csVFS : public iVFS
   iSystem *System;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Initialize VFS by reading contents of given INI file
   csVFS (iBase *iParent);

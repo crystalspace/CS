@@ -49,7 +49,7 @@ public:
   /// Destructor
   virtual ~csEvent ();
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 };
 
 #endif // __CSEVENT_H__

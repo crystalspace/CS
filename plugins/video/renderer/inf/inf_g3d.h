@@ -99,7 +99,7 @@ class csGraphics3DInfinite : public iGraphics3D
   bool do_fastmesh;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /**
    * Low-level 2D graphics layer.
@@ -294,7 +294,7 @@ public:
   ///------------------- iConfig interface implementation -------------------
   struct csInfiniteConfig : public iConfig
   {
-    DECLARE_EMBEDDED_IBASE (csGraphics3DInfinite);
+    SCF_DECLARE_EMBEDDED_IBASE (csGraphics3DInfinite);
     virtual bool GetOptionDescription (int idx, csOptionDescription *option);
     virtual bool SetOption (int id, csVariant* value);
     virtual bool GetOption (int id, csVariant* value);
@@ -306,7 +306,7 @@ public:
 class csGraphics2DInfinite : public csGraphics2D
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csGraphics2DInfinite (iBase *iParent);
   virtual ~csGraphics2DInfinite ();

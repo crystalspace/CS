@@ -27,7 +27,7 @@ struct iSystem;
 class csProcTextureSoft2D : public csGraphics2D
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   // For 16bit procedural textures sharing texture manager
   csRGBpixel *image_buffer;

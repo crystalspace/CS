@@ -36,7 +36,7 @@ class csSoundSourceDS3D;
 class csSoundRenderDS3D : public iSoundRender
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csSoundRenderDS3D(iBase *piBase);
   virtual ~csSoundRenderDS3D();
   virtual bool Initialize (iSystem *iSys);

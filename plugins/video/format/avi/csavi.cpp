@@ -23,16 +23,16 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csAVIFormat)
-  IMPLEMENTS_INTERFACE (iStreamFormat)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csAVIFormat)
+  SCF_IMPLEMENTS_INTERFACE (iStreamFormat)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csAVIFormat)
-EXPORT_CLASS_TABLE (csavi)
-  EXPORT_CLASS (csAVIFormat, "crystalspace.video.format.avi", 
+SCF_IMPLEMENT_FACTORY (csAVIFormat)
+SCF_EXPORT_CLASS_TABLE (csavi)
+  SCF_EXPORT_CLASS (csAVIFormat, "crystalspace.video.format.avi", 
 		"CrystalSpace AVI format interface")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 #define AVI_EVEN(x) ((x)&1?(x)+1:(x))
 
@@ -53,7 +53,7 @@ csAVIFormat::csAVIFormat (iBase *pParent) :
   CHUNK_STRN("strn"),
   CHUNK_IDX1("idx1")
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csAVIFormat::~csAVIFormat ()
@@ -132,7 +132,7 @@ bool csAVIFormat::InitVideoData ()
   if (bSucc)
   {
     if (fileheader.size > datalen)
-      pSystem->Printf (MSG_WARNING, 
+      pSystem->Printf (CS_MSG_WARNING, 
 		       "AVI: RIFF header claims to be longer than the whole file is !\n");
     bSucc = false;
     p += len_id;
@@ -190,7 +190,7 @@ bool csAVIFormat::InitVideoData ()
 	  }
 	  else
 	  {
-	    pSystem->Printf (MSG_DEBUG_0, "unrecognized LIST type \"%4c\" .. skipping it !", strl.id);
+	    pSystem->Printf (CS_MSG_DEBUG_0, "unrecognized LIST type \"%4c\" .. skipping it !", strl.id);
 	  }
 	  p = pListEnd;
 	}
@@ -239,18 +239,18 @@ bool csAVIFormat::InitVideoData ()
 	}
       }
       else
-	pSystem->Printf (MSG_WARNING, "No <avih> chunk found !\n");
+	pSystem->Printf (CS_MSG_WARNING, "No <avih> chunk found !\n");
     }
     else
-      pSystem->Printf (MSG_WARNING, "No <hdrl> LIST found !\n");
+      pSystem->Printf (CS_MSG_WARNING, "No <hdrl> LIST found !\n");
   }
   else
-    pSystem->Printf (MSG_WARNING, "No RIFF header found !\n");
+    pSystem->Printf (CS_MSG_WARNING, "No RIFF header found !\n");
 
   // did we find a video stream ?
   // first check the validity of the streams found
   if (!ValidateStreams ())
-    pSystem->Printf (MSG_WARNING, "No valid videostream found !\n");
+    pSystem->Printf (CS_MSG_WARNING, "No valid videostream found !\n");
   return vStream.Length () > 0;
 }
 
@@ -396,7 +396,7 @@ ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
     strh.Endian ();
     if (!strh.Is (CHUNK_STRF))
     {
-      pSystem->Printf (MSG_WARNING, "Unsupported streamtype \"%4c\" found ... ignoring it !", 
+      pSystem->Printf (CS_MSG_WARNING, "Unsupported streamtype \"%4c\" found ... ignoring it !", 
 		       strh.id);
       n = AVI_EVEN(strh.size) + len_hcl;
       p += AVI_EVEN(strh.size) + len_hcl;
@@ -557,14 +557,14 @@ void csAVIFormat::NextFrame ()
   pVideo->NextFrame ();
 }
 
-IMPLEMENT_IBASE (csAVIFormat::streamiterator)
-  IMPLEMENTS_INTERFACE (iStreamIterator)
-  IMPLEMENTS_INTERFACE (iBase)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csAVIFormat::streamiterator)
+  SCF_IMPLEMENTS_INTERFACE (iStreamIterator)
+  SCF_IMPLEMENTS_INTERFACE (iBase)
+SCF_IMPLEMENT_IBASE_END
 
 csAVIFormat::streamiterator::streamiterator (iBase *pBase)
 {
-  CONSTRUCT_IBASE (pBase);
+  SCF_CONSTRUCT_IBASE (pBase);
    pAVI = (csAVIFormat*)pBase;
    pos = 0;
 }

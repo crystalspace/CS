@@ -46,23 +46,23 @@ static unsigned short ScanCodeToChar[128] =
   0,        0,        0,        0,        0,        0,        0,        0       // 78..7F
 };
 
-IMPLEMENT_FACTORY (csGraphics2DSVGALib)
+SCF_IMPLEMENT_FACTORY (csGraphics2DSVGALib)
 
-EXPORT_CLASS_TABLE (svga2d)
-  EXPORT_CLASS_DEP (csGraphics2DSVGALib, "crystalspace.graphics2d.svgalib",
+SCF_EXPORT_CLASS_TABLE (svga2d)
+  SCF_EXPORT_CLASS_DEP (csGraphics2DSVGALib, "crystalspace.graphics2d.svgalib",
     "SVGALib 2D graphics driver for Crystal Space", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csGraphics2DSVGALib)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics2D)
-  IMPLEMENTS_INTERFACE (iEventPlug)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics2DSVGALib)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+SCF_IMPLEMENT_IBASE_END
 
 // csGraphics2DSVGALib functions
 csGraphics2DSVGALib::csGraphics2DSVGALib(iBase *iParent) : csGraphics2D ()
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   EventOutlet = NULL;
 }
 
@@ -75,8 +75,8 @@ bool csGraphics2DSVGALib::Initialize (iSystem *pSystem)
 
   // SVGALIB Starts here
 
-  CsPrintf (MSG_INITIALIZATION, "Crystal Space Linux/SVGALIB version.\n");
-  CsPrintf (MSG_INITIALIZATION,  "Using %dx%dx%d resolution.\n\n", Width, Height, Depth);
+  CsPrintf (CS_MSG_INITIALIZATION, "Crystal Space Linux/SVGALIB version.\n");
+  CsPrintf (CS_MSG_INITIALIZATION,  "Using %dx%dx%d resolution.\n\n", Width, Height, Depth);
 
   gl_copyscreen (&physicalscreen);
 
@@ -177,7 +177,7 @@ bool csGraphics2DSVGALib::Open(const char *Title)
       sprintf (depthstr, "16M32");
       break;
     default :
-      CsPrintf (MSG_FATAL_ERROR, "Unsupported depth %d\n", Depth);
+      CsPrintf (CS_MSG_FATAL_ERROR, "Unsupported depth %d\n", Depth);
       return false;
   }
 
@@ -186,7 +186,7 @@ bool csGraphics2DSVGALib::Open(const char *Title)
 
   if ((vgamode==-1) || (vga_setmode (vgamode) == -1))
   {
-    CsPrintf (MSG_FATAL_ERROR, "Specified screenmode %s is not available!\n", modestr);
+    CsPrintf (CS_MSG_FATAL_ERROR, "Specified screenmode %s is not available!\n", modestr);
     return false;
   }
 

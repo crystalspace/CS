@@ -42,7 +42,7 @@ protected:
   bool m_bStereo;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csSoundDriverMac(iBase *piBase);
   virtual ~csSoundDriverMac();
   virtual bool Initialize(iSystem *iSys);

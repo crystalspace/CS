@@ -105,15 +105,15 @@ roughly, you have to perform the following steps:
 
 @itemize
 @item
-Load the Mesh Object Type with @code{LOAD_PLUGIN()} (preferably after checking
-if it is already loaded, by calling @code{QUERY_PLUGIN_CLASS()}).
+Load the Mesh Object Type with @code{CS_LOAD_PLUGIN()} (preferably after checking
+if it is already loaded, by calling @code{CS_QUERY_PLUGIN_CLASS()}).
 
 @item
 Create at least one Mesh Object Factory by calling @code{NewFactory()} on the
 Mesh Object Type instance.
 
 @item
-If the factory has parameters you can call @code{QUERY_INTERFACE()} to get a
+If the factory has parameters you can call @code{SCF_QUERY_INTERFACE()} to get a
 handle to the @samp{iSomethingFactoryState} interface (replace @emph{Something}
 with whatever the type name of the Mesh Object is).  Then you set the
 parameters you want on that factory.
@@ -123,7 +123,7 @@ Create one or more Mesh Object instances by using one of your factories and
 calling @code{NewInstance()} on them.
 
 @item
-If the object has parameters you use @code{QUERY_INTERFACE()} to get a handle
+If the object has parameters you use @code{SCF_QUERY_INTERFACE()} to get a handle
 to the @samp{iSomethingState} interface (replace @emph{Something} with whatever
 the type name of the Mesh Object is).  Then set the parameters you want on the
 Mesh Object.  Note that there are Mesh Object implementations which have
@@ -144,13 +144,13 @@ void Initialize ()
 @{
   @dots{}
   // Get the ball mesh object plug-in.
-  ball_type = QUERY_PLUGIN_CLASS (this,
+  ball_type = CS_QUERY_PLUGIN_CLASS (this,
     "crystalspace.mesh.object.ball", "MeshObj", iMeshObjectType);
   if (!ball_type)
-    ball_type = LOAD_PLUGIN (this,
+    ball_type = CS_LOAD_PLUGIN (this,
       "crystalspace.mesh.object.ball", "MeshObj", iMeshObjectType);
   if (!ball_type)
-    Printf (MSG_WARNING, "No ball type plug-in found!\n");
+    Printf (CS_MSG_WARNING, "No ball type plug-in found!\n");
   ball_factory = ball_type->NewFactory ();
   @dots{}
 @}
@@ -160,7 +160,7 @@ void SetupWorld ()
   @dots{}
   // Make a ball using the ball plug-in.
   iMeshObject* ballMesh = ball_factory->NewInstance ();
-  iBallState* ballState = QUERY_INTERFACE (ballMesh, iBallState);
+  iBallState* ballState = SCF_QUERY_INTERFACE (ballMesh, iBallState);
   ballState->SetRadius (.5, .5, .5);
   ballState->SetMaterialWrapper (material);
   ballState->SetRimVertices (12);

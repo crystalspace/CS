@@ -31,7 +31,7 @@ class csConsoleBuffer;
 class csConsoleOutput : public iConsoleOutput
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csConsoleOutput (iBase *base);
   virtual ~csConsoleOutput ();
@@ -150,7 +150,7 @@ public:
   // Implement iPlugIn interface.
   struct eiPlugIn : public iPlugIn
   {
-    DECLARE_EMBEDDED_IBASE(csConsoleOutput);
+    SCF_DECLARE_EMBEDDED_IBASE(csConsoleOutput);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
   } scfiPlugIn;

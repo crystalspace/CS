@@ -40,7 +40,7 @@ class csSoftProcTexture3D : public csGraphics3DSoftwareCommon,
   csTextureCacheSoftware *main_tcache;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csSoftProcTexture3D (iBase *iParent);
   virtual ~csSoftProcTexture3D ();

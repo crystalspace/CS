@@ -40,7 +40,7 @@ private:
   bool continue_running() const { return !Shutdown; }
 
 public:
-  DECLARE_IBASE_EXT(csSystemDriver);
+  SCF_DECLARE_IBASE_EXT(csSystemDriver);
 
   NeXTSystemDriver();
   virtual ~NeXTSystemDriver();
@@ -51,7 +51,7 @@ public:
   // Implement iEventPlug interface.
   struct NeXTSystemEventPlug : public iEventPlug
   {
-    DECLARE_EMBEDDED_IBASE(NeXTSystemDriver);
+    SCF_DECLARE_EMBEDDED_IBASE(NeXTSystemDriver);
     virtual uint GetPotentiallyConflictingEvents();
     virtual uint QueryEventPriority(uint type);
   } scfiEventPlug;

@@ -19,9 +19,9 @@
 #include "cssysdef.h"
 #include "glalpha.h"
 
-IMPLEMENT_IBASE (csGlideAlphaMap)
-  IMPLEMENTS_INTERFACE (iTextureHandle)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGlideAlphaMap)
+  SCF_IMPLEMENTS_INTERFACE (iTextureHandle)
+SCF_IMPLEMENT_IBASE_END
 
 void csGlideAlphaMap::savemap()
 {

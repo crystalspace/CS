@@ -29,23 +29,23 @@ class scfString : public iString
   csString s;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Create an empty scfString object
   scfString ()
-  { CONSTRUCT_IBASE (NULL); }
+  { SCF_CONSTRUCT_IBASE (NULL); }
 
   /// Create an scfString object and reserve space for iLength characters
   scfString (int iLength) : s(iLength)
-  { CONSTRUCT_IBASE (NULL); }
+  { SCF_CONSTRUCT_IBASE (NULL); }
 
   /// Copy constructor
   scfString (const iString &copy) : s(copy.GetData())
-  { CONSTRUCT_IBASE (NULL); }
+  { SCF_CONSTRUCT_IBASE (NULL); }
 
   /// Yet another copy constructor
   scfString (const char *copy) : s(copy)
-  { CONSTRUCT_IBASE (NULL); }
+  { SCF_CONSTRUCT_IBASE (NULL); }
 
   /// Destroy a scfString object
   virtual ~scfString () {}

@@ -29,14 +29,14 @@
 #define assert_goto McAssertGoTo
 
 #ifdef __CRYSTALSPACE__
-#define CT_DEBUG_LEVEL MSG_DEBUG_1
+#define CT_DEBUG_LEVEL CS_MSG_DEBUG_1
 #define Debug csEngine
 #define logf System->Printf
 #define log System->Printf
 // only takes two args....
-#define DEBUGLOGF2( A, B, C )  CsPrintf ( MSG_DEBUG_1, A, B, C )
-#define DEBUGLOGF( A, B )  CsPrintf ( MSG_DEBUG_1, A, B )
-#define DEBUGLOG( A )  CsPrintf ( MSG_DEBUG_1, A )
+#define DEBUGLOGF2( A, B, C )  CsPrintf ( CS_MSG_DEBUG_1, A, B, C )
+#define DEBUGLOGF( A, B )  CsPrintf ( CS_MSG_DEBUG_1, A, B )
+#define DEBUGLOG( A )  CsPrintf ( CS_MSG_DEBUG_1, A )
 #else
 #define CT_DEBUG_LEVEL 1
 //!me broken

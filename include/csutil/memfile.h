@@ -78,7 +78,7 @@ public:
    */
   virtual const char* GetData() const;
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
 protected:
   Disposition disposition;

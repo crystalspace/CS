@@ -276,12 +276,12 @@ public:
   /// Do a hard transform on this curve.
   virtual void HardTransform (const csReversibleTransform& trans);
   
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
 
   //----------------------- iCurve interface implementation -----------------
   struct Curve : public iCurve
   {
-    DECLARE_EMBEDDED_IBASE (csCurve);
+    SCF_DECLARE_EMBEDDED_IBASE (csCurve);
     virtual csCurve* GetOriginalObject () { return (csCurve*)scfParent; }
     virtual iObject *QueryObject() {return scfParent;}
     virtual iCurveTemplate* GetParentTemplate ();
@@ -330,12 +330,12 @@ public:
   ///
   void SetMaterialWrapper (csMaterialWrapper* h) { cstxt = h; }
 
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
 
   //------------------ iCurveTemplate interface implementation --------------
   struct CurveTemplate : public iCurveTemplate
   {
-    DECLARE_EMBEDDED_IBASE (csCurveTemplate);
+    SCF_DECLARE_EMBEDDED_IBASE (csCurveTemplate);
     virtual iObject *QueryObject()
     {
       return scfParent;
@@ -378,7 +378,7 @@ public:
   // Should not be necessary, but without this buggy NextStep compiler
   // incorrectly calls csObject::QueryInterface() rather than correctly
   // calling csCurveTemplate::QueryInterface().
-  DECLARE_IBASE_EXT(csCurveTemplate);
+  SCF_DECLARE_IBASE_EXT(csCurveTemplate);
 };
 
 /**

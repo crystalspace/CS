@@ -32,13 +32,13 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE_EXT (csExploMeshObject)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iExplosionState)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csExploMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iExplosionState)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csExploMeshObject::ExplosionState)
-  IMPLEMENTS_INTERFACE (iExplosionState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csExploMeshObject::ExplosionState)
+  SCF_IMPLEMENTS_INTERFACE (iExplosionState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 void csExploMeshObject::SetupObject ()
 {
@@ -88,7 +88,7 @@ void csExploMeshObject::SetupObject ()
 csExploMeshObject::csExploMeshObject (iSystem* system, iMeshObjectFactory* factory)
 	: csNewtonianParticleSystem (system, factory)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiExplosionState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiExplosionState);
   /// defaults
   has_light = false;
   light_sector = NULL;
@@ -138,7 +138,7 @@ void csExploMeshObject::AddLight (iEngine *engine, iSector *sec, cs_time fade)
   light_fade = fade;
   has_light = true;
   explight = engine->CreateDynLight (center, 5, csColor (1, 1, 0));
-  ilight = QUERY_INTERFACE (explight, iLight);
+  ilight = SCF_QUERY_INTERFACE (explight, iLight);
   ilight->SetSector (light_sector);
   ilight->DecRef ();
   explight->Setup ();
@@ -166,13 +166,13 @@ void csExploMeshObject::HardTransform (const csReversibleTransform& t)
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csExploMeshObjectFactory)
-  IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csExploMeshObjectFactory)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
+SCF_IMPLEMENT_IBASE_END
 
 csExploMeshObjectFactory::csExploMeshObjectFactory (iBase *pParent, iSystem* system)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
   csExploMeshObjectFactory::system = system;
 }
 
@@ -183,28 +183,28 @@ csExploMeshObjectFactory::~csExploMeshObjectFactory ()
 iMeshObject* csExploMeshObjectFactory::NewInstance ()
 {
   csExploMeshObject* cm = new csExploMeshObject (system, (iMeshObjectFactory*)this);
-  iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
+  iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
 }
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csExploMeshObjectType)
-  IMPLEMENTS_INTERFACE (iMeshObjectType)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csExploMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csExploMeshObjectType)
+SCF_IMPLEMENT_FACTORY (csExploMeshObjectType)
 
-EXPORT_CLASS_TABLE (explo)
-  EXPORT_CLASS (csExploMeshObjectType, "crystalspace.mesh.object.explosion",
+SCF_EXPORT_CLASS_TABLE (explo)
+  SCF_EXPORT_CLASS (csExploMeshObjectType, "crystalspace.mesh.object.explosion",
     "Crystal Space Explosion Mesh Type")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csExploMeshObjectType::csExploMeshObjectType (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csExploMeshObjectType::~csExploMeshObjectType ()
@@ -220,7 +220,7 @@ bool csExploMeshObjectType::Initialize (iSystem* system)
 iMeshObjectFactory* csExploMeshObjectType::NewFactory ()
 {
   csExploMeshObjectFactory* cm = new csExploMeshObjectFactory (this, system);
-  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;
 }

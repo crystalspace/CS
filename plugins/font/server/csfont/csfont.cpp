@@ -53,21 +53,21 @@ static csFontDef const FontList [] =
 
 int const FontListCount = sizeof (FontList) / sizeof (csFontDef);
 
-IMPLEMENT_IBASE (csDefaultFontServer)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iFontServer)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csDefaultFontServer)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iFontServer)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csDefaultFontServer)
+SCF_IMPLEMENT_FACTORY (csDefaultFontServer)
 
-EXPORT_CLASS_TABLE (csfont)
-  EXPORT_CLASS (csDefaultFontServer, "crystalspace.font.server.default", 
+SCF_EXPORT_CLASS_TABLE (csfont)
+  SCF_EXPORT_CLASS (csDefaultFontServer, "crystalspace.font.server.default", 
     "Crystal Space default font server")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csDefaultFontServer::csDefaultFontServer (iBase *pParent) : System(0)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csDefaultFontServer::~csDefaultFontServer()
@@ -146,12 +146,12 @@ void csDefaultFontServer::NotifyDelete (csDefaultFont *font)
 
 csDefaultFont *csDefaultFontServer::ReadFontFile(const char *file)
 {
-  iVFS *VFS = QUERY_PLUGIN (System, iVFS);
+  iVFS *VFS = CS_QUERY_PLUGIN (System, iVFS);
   iDataBuffer *fntfile = VFS->ReadFile (file);
   VFS->DecRef ();
   if (!fntfile)
   {
-    System->Printf (MSG_WARNING, "Could not read font file %s.\n", file);
+    System->Printf (CS_MSG_WARNING, "Could not read font file %s.\n", file);
     return NULL;
   }
 
@@ -249,15 +249,15 @@ error:
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//- The font object -//--//
 
-IMPLEMENT_IBASE (csDefaultFont)
-  IMPLEMENTS_INTERFACE (iFont)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csDefaultFont)
+  SCF_IMPLEMENTS_INTERFACE (iFont)
+SCF_IMPLEMENT_IBASE_END
 
 csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
   int first, int glyphs, int width, int height, uint8 *bitmap,
   uint8 *individualwidth) : DeleteCallbacks (4, 4)
 {
-  CONSTRUCT_IBASE (parent);
+  SCF_CONSTRUCT_IBASE (parent);
   Parent = parent;
   Parent->NotifyCreate (this);
   if (name [0] != '*')

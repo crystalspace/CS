@@ -43,7 +43,7 @@ class csIsoFakeMovable : public iMovable
   csReversibleTransform obj;
   long updatenumber;
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csIsoFakeMovable(iIsoMeshSprite *t) {isomesh = t; updatenumber = 0;}
   virtual ~csIsoFakeMovable() {}
 
@@ -115,9 +115,9 @@ public:
 
 };
 
-IMPLEMENT_IBASE (csIsoFakeMovable)
-  IMPLEMENTS_INTERFACE (iMovable)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csIsoFakeMovable)
+  SCF_IMPLEMENTS_INTERFACE (iMovable)
+SCF_IMPLEMENT_IBASE_END
 
 
 /// fake 3d render view ...
@@ -131,14 +131,14 @@ class csIsoFakeRenderView : public iRenderView {
   iDrawFuncCallback* callback;
   
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csIsoFakeRenderView() 
   {
     callback = NULL;
   }
   virtual ~csIsoFakeRenderView() 
   {
-    DEC_REF (callback);
+    SCF_DEC_REF (callback);
   }
 
   /// set data to render an isometric mesh
@@ -231,21 +231,21 @@ public:
   }
 };
 
-IMPLEMENT_IBASE (csIsoFakeRenderView)
-  IMPLEMENTS_INTERFACE (iRenderView)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csIsoFakeRenderView)
+  SCF_IMPLEMENTS_INTERFACE (iRenderView)
+SCF_IMPLEMENT_IBASE_END
 
 
 //------------ IsoMeshSprite ------------------------------------
 
-IMPLEMENT_IBASE (csIsoMeshSprite)
-  IMPLEMENTS_INTERFACE (iIsoMeshSprite)
-  IMPLEMENTS_INTERFACE (iIsoSprite)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csIsoMeshSprite)
+  SCF_IMPLEMENTS_INTERFACE (iIsoMeshSprite)
+  SCF_IMPLEMENTS_INTERFACE (iIsoSprite)
+SCF_IMPLEMENT_IBASE_END
 
 csIsoMeshSprite::csIsoMeshSprite (iBase *iParent)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   position.Set(0,0,0);
   transform.Identity();
   grid = NULL;

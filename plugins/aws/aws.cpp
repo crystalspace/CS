@@ -4,23 +4,23 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (awsPrefManager)
-  IMPLEMENTS_INTERFACE (iAwsPrefs)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (awsPrefManager)
+  SCF_IMPLEMENTS_INTERFACE (iAwsPrefs)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (awsManager)
-  IMPLEMENTS_INTERFACE (iAws)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (awsManager)
+  SCF_IMPLEMENTS_INTERFACE (iAws)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (awsManager::eiPlugIn)                                                               
-   IMPLEMENTS_INTERFACE (iPlugIn)                                                                              
-IMPLEMENT_EMBEDDED_IBASE_END                                                                                  
+SCF_IMPLEMENT_EMBEDDED_IBASE (awsManager::eiPlugIn)                                                               
+   SCF_IMPLEMENTS_INTERFACE (iPlugIn)                                                                              
+SCF_IMPLEMENT_EMBEDDED_IBASE_END                                                                                  
                                                                                                                
-IMPLEMENT_FACTORY (awsManager)                                                                                
-IMPLEMENT_FACTORY (awsPrefManager)                                                                                
+SCF_IMPLEMENT_FACTORY (awsManager)                                                                                
+SCF_IMPLEMENT_FACTORY (awsPrefManager)                                                                                
 
-EXPORT_CLASS_TABLE (aws)                                                                                      
-  EXPORT_CLASS (awsManager, "crystalspace.window.alternatemanager", "Crystal Space alternate window manager") 
-  EXPORT_CLASS (awsPrefManager, "crystalspace.window.preferencemanager", "Crystal Space window preference manager") 
-EXPORT_CLASS_TABLE_END                                                                                        
+SCF_EXPORT_CLASS_TABLE (aws)                                                                                      
+  SCF_EXPORT_CLASS (awsManager, "crystalspace.window.alternatemanager", "Crystal Space alternate window manager") 
+  SCF_EXPORT_CLASS (awsPrefManager, "crystalspace.window.preferencemanager", "Crystal Space window preference manager") 
+SCF_EXPORT_CLASS_TABLE_END                                                                                        

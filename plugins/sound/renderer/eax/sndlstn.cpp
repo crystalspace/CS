@@ -28,12 +28,12 @@
 #include "sndrdr.h"
 #include "sndlstn.h"
 
-IMPLEMENT_IBASE(csSoundListenerEAX)
-	IMPLEMENTS_INTERFACE(iSoundListener)
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csSoundListenerEAX)
+	SCF_IMPLEMENTS_INTERFACE(iSoundListener)
+SCF_IMPLEMENT_IBASE_END;
 
 csSoundListenerEAX::csSoundListenerEAX(iBase *piBase) {
-  CONSTRUCT_IBASE(piBase);
+  SCF_CONSTRUCT_IBASE(piBase);
   PrimaryBuffer = NULL;
   Listener = NULL;
   Renderer = NULL;
@@ -71,14 +71,14 @@ bool csSoundListenerEAX::Initialize(csSoundRenderEAX *srdr) {
   HRESULT r;
   r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &PrimaryBuffer, NULL);
   if (r != DS_OK) {
-    Renderer->System->Printf(MSG_INITIALIZATION, "EAX listener: "
+    Renderer->System->Printf(CS_MSG_INITIALIZATION, "EAX listener: "
       "Cannot create primary sound buffer (%s).\n", Renderer->GetError(r));
     return false;
   }
 	
   r = PrimaryBuffer->QueryInterface(IID_IDirectSound3DListener, (void **) &Listener);
   if (r != DS_OK) {
-    Renderer->System->Printf(MSG_INITIALIZATION, "EAX listener: Cannot query listener"
+    Renderer->System->Printf(CS_MSG_INITIALIZATION, "EAX listener: Cannot query listener"
       " interface from primary sound buffer (%s).\n", Renderer->GetError(r));
     return false;
   }
@@ -91,13 +91,13 @@ bool csSoundListenerEAX::Initialize(csSoundRenderEAX *srdr) {
 		if(!SUCCEEDED(r) || (support&(KSPROPERTY_SUPPORT_GET|KSPROPERTY_SUPPORT_SET))
 				!= (KSPROPERTY_SUPPORT_GET|KSPROPERTY_SUPPORT_SET))
 		{
-			Renderer->System->Printf(MSG_INITIALIZATION, "EAX listener : this device don't support EAX 2.0\nSo only DirectSound3D will be used.");
+			Renderer->System->Printf(CS_MSG_INITIALIZATION, "EAX listener : this device don't support EAX 2.0\nSo only DirectSound3D will be used.");
 			EaxKsPropertiesSet->Release();
 			EaxKsPropertiesSet = NULL;
 		}
 	}
 	else
-		Renderer->System->Printf(MSG_INITIALIZATION, "EAX listener : cannot get properties, this device may not support EAX\nSo only DirectSound3D will be used.");
+		Renderer->System->Printf(CS_MSG_INITIALIZATION, "EAX listener : cannot get properties, this device may not support EAX\nSo only DirectSound3D will be used.");
 
   SetPosition(csVector3(0,0,0));
   SetVelocity(csVector3(0,0,0));

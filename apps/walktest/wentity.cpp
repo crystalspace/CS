@@ -24,9 +24,9 @@
 
 extern WalkTest* Sys;
 
-IMPLEMENT_IBASE_EXT (csWalkEntity)
-  IMPLEMENTS_INTERFACE (csWalkEntity)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csWalkEntity)
+  SCF_IMPLEMENTS_INTERFACE (csWalkEntity)
+SCF_IMPLEMENT_IBASE_EXT_END
 
 //--------------------------------------------------------------------------
 
@@ -77,7 +77,7 @@ csRotatingObject::csRotatingObject (iObject* p)
   tparent = p;
   angles.Set (90, 0, 0);
   remaining = 0;
-  iMeshWrapper *mw = QUERY_INTERFACE_FAST (p, iMeshWrapper);
+  iMeshWrapper *mw = SCF_QUERY_INTERFACE_FAST (p, iMeshWrapper);
   if (mw)
   {
     movable = mw->GetMovable ();

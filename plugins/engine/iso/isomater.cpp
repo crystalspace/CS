@@ -22,9 +22,9 @@
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
 
-IMPLEMENT_IBASE (csIsoMaterial)
-  IMPLEMENTS_INTERFACE (iMaterial)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csIsoMaterial)
+  SCF_IMPLEMENTS_INTERFACE (iMaterial)
+SCF_IMPLEMENT_IBASE_END
 
 csIsoMaterial::csIsoMaterial () :
   texture(0),
@@ -32,7 +32,7 @@ csIsoMaterial::csIsoMaterial () :
   ambient(CS_DEFMAT_AMBIENT),
   reflection(CS_DEFMAT_REFLECTION)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   flat_color.Set (255, 255, 255); // Default state is white, flat-shaded.
 }
 
@@ -42,7 +42,7 @@ csIsoMaterial::csIsoMaterial (iTextureHandle* w) :
   ambient(CS_DEFMAT_AMBIENT),
   reflection(CS_DEFMAT_REFLECTION)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   flat_color.Set (255, 255, 255); // Default state is white, flat-shaded.
 }
 
@@ -76,24 +76,24 @@ void csIsoMaterial::GetReflection (float &oDiffuse, float &oAmbient,
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE_EXT (csIsoMaterialWrapper)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iMaterialWrapper)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iIsoMaterialWrapperIndex)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csIsoMaterialWrapper)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMaterialWrapper)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iIsoMaterialWrapperIndex)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csIsoMaterialWrapper::MaterialWrapper)
-  IMPLEMENTS_INTERFACE (iMaterialWrapper)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csIsoMaterialWrapper::MaterialWrapper)
+  SCF_IMPLEMENTS_INTERFACE (iMaterialWrapper)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csIsoMaterialWrapper::IsoMaterialWrapperIndex)
-  IMPLEMENTS_INTERFACE (iIsoMaterialWrapperIndex)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csIsoMaterialWrapper::IsoMaterialWrapperIndex)
+  SCF_IMPLEMENTS_INTERFACE (iIsoMaterialWrapperIndex)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csIsoMaterialWrapper::csIsoMaterialWrapper (iMaterial* material) :
   csObject (), handle (NULL)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
-  CONSTRUCT_EMBEDDED_IBASE (scfiIsoMaterialWrapperIndex);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiIsoMaterialWrapperIndex);
   csIsoMaterialWrapper::material = material;
   material->IncRef ();
   index = 0;
@@ -103,8 +103,8 @@ csIsoMaterialWrapper::csIsoMaterialWrapper (iMaterial* material) :
 csIsoMaterialWrapper::csIsoMaterialWrapper (csIsoMaterialWrapper &th) :
   csObject (), handle (NULL)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
-  CONSTRUCT_EMBEDDED_IBASE (scfiIsoMaterialWrapperIndex);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiIsoMaterialWrapperIndex);
   (material = th.material)->IncRef ();
   handle = th.GetMaterialHandle ();
   SetName (th.GetName ());
@@ -115,8 +115,8 @@ csIsoMaterialWrapper::csIsoMaterialWrapper (csIsoMaterialWrapper &th) :
 csIsoMaterialWrapper::csIsoMaterialWrapper (iMaterialHandle *ith) :
   csObject (), material (NULL)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
-  CONSTRUCT_EMBEDDED_IBASE (scfiIsoMaterialWrapperIndex);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiIsoMaterialWrapperIndex);
   ith->IncRef ();
   handle = ith;
   index = 0;
@@ -166,18 +166,18 @@ void csIsoMaterialWrapper::Visit ()
 
 //------------------------------------------------------ csMaterialList -----//
 
-IMPLEMENT_IBASE (csIsoMaterialList)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iMaterialList)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csIsoMaterialList)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMaterialList)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csIsoMaterialList::MaterialList)
-  IMPLEMENTS_INTERFACE (iMaterialList)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csIsoMaterialList::MaterialList)
+  SCF_IMPLEMENTS_INTERFACE (iMaterialList)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csIsoMaterialList::csIsoMaterialList () : csNamedObjVector (16, 16)
 {
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiMaterialList);
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialList);
   lastindex = 0;
 }
 

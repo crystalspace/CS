@@ -41,20 +41,20 @@ CS_IMPLEMENT_PLUGIN
 #define BICLRUSED(x) *(ULong*)((x) + 32)
 #define BIPALETTE(x) (UByte*)((x)+40)
 
-IMPLEMENT_IBASE (csRLECodec)
-  IMPLEMENTS_INTERFACE (iAVICodec)
-  IMPLEMENTS_INTERFACE (iBase)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csRLECodec)
+  SCF_IMPLEMENTS_INTERFACE (iAVICodec)
+  SCF_IMPLEMENTS_INTERFACE (iBase)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csRLECodec)
-EXPORT_CLASS_TABLE (rlecodec)
-  EXPORT_CLASS (csRLECodec, "crystalspace.video.codec.avi.rle", "CrystalSpace RLE codec")
-  EXPORT_CLASS (csRLECodec, "crystalspace.video.codec.avi.RLE", "CrystalSpace RLE codec")
-EXPORT_CLASS_TABLE_END
+SCF_IMPLEMENT_FACTORY (csRLECodec)
+SCF_EXPORT_CLASS_TABLE (rlecodec)
+  SCF_EXPORT_CLASS (csRLECodec, "crystalspace.video.codec.avi.rle", "CrystalSpace RLE codec")
+  SCF_EXPORT_CLASS (csRLECodec, "crystalspace.video.codec.avi.RLE", "CrystalSpace RLE codec")
+SCF_EXPORT_CLASS_TABLE_END
 
 csRLECodec::csRLECodec (iBase *pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
   pixel = NULL;
 }
 

@@ -25,28 +25,28 @@ extern "C" {
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE(csPython)
-  IMPLEMENTS_INTERFACE(iScript)
-  IMPLEMENTS_INTERFACE(iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE(csPython)
+  SCF_IMPLEMENTS_INTERFACE(iScript)
+  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY(csPython)
+SCF_IMPLEMENT_FACTORY(csPython)
 
-EXPORT_CLASS_TABLE(cspython)
-  EXPORT_CLASS(csPython, "crystalspace.script.python",
+SCF_EXPORT_CLASS_TABLE(cspython)
+  SCF_EXPORT_CLASS(csPython, "crystalspace.script.python",
     "Crystal Space Script Python")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csPython *thisclass=NULL;
 
-csPython::csPython(iBase *iParent) :Sys(NULL), Mode(MSG_INITIALIZATION)
+csPython::csPython(iBase *iParent) :Sys(NULL), Mode(CS_MSG_INITIALIZATION)
 {
-  CONSTRUCT_IBASE(iParent);
+  SCF_CONSTRUCT_IBASE(iParent);
 }
 
 csPython::~csPython()
 {
-  Mode=MSG_INTERNAL_ERROR;
+  Mode=CS_MSG_INTERNAL_ERROR;
   Py_Finalize();
   Sys=NULL;
   thisclass=NULL;
@@ -82,7 +82,7 @@ bool csPython::Initialize(iSystem* iSys)
   if(!LoadModule("cspace"))
     return false;
 
-  Mode=MSG_STDOUT;
+  Mode=CS_MSG_STDOUT;
   return true;
 }
 
@@ -125,7 +125,7 @@ bool csPython::LoadModule(const char* name)
 void csPython::Print(bool Error, const char *msg)
 {
   if(Error)
-    Sys->Printf(MSG_FATAL_ERROR, "CrystalScript Error: %s\n", msg);
+    Sys->Printf(CS_MSG_FATAL_ERROR, "CrystalScript Error: %s\n", msg);
   else
     Sys->Printf(Mode, "%s", msg);
 }

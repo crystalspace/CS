@@ -29,7 +29,7 @@ class csSoundListenerDS3D  : public csSoundListener
 {
 friend class csSoundRenderDS3D;
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csSoundListenerDS3D(iBase *piBase);
   virtual ~csSoundListenerDS3D();
 	

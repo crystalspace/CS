@@ -35,23 +35,23 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csGraphics2DAA)
+SCF_IMPLEMENT_FACTORY (csGraphics2DAA)
 
-EXPORT_CLASS_TABLE (asciiart)
-  EXPORT_CLASS_DEP (csGraphics2DAA, "crystalspace.graphics2d.asciiart",
+SCF_EXPORT_CLASS_TABLE (asciiart)
+  SCF_EXPORT_CLASS_DEP (csGraphics2DAA, "crystalspace.graphics2d.asciiart",
     "Ascii Art 2D graphics driver for Crystal Space", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csGraphics2DAA)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics2D)
-  IMPLEMENTS_INTERFACE (iEventPlug)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics2DAA)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+SCF_IMPLEMENT_IBASE_END
 
 csGraphics2DAA::csGraphics2DAA (iBase *iParent) :
   csGraphics2D ()
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   context = NULL;
   EventOutlet = NULL;
 }
@@ -138,7 +138,7 @@ bool csGraphics2DAA::Open (const char *Title)
   context = aa_autoinit (&aa_defparams);
   if (context == NULL)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Cannot initialize AA-lib. Sorry\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "Cannot initialize AA-lib. Sorry\n");
     return false;
   }
   Width = aa_imgwidth (context);

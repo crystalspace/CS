@@ -34,7 +34,7 @@ class csBMPImageIO : public iImageIO
   csVector formats;
 
  public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csBMPImageIO (iBase *pParent);
   virtual ~csBMPImageIO () {}

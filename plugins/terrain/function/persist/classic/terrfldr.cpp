@@ -51,30 +51,30 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (VISTEST)
 CS_TOKEN_DEF_END
 
-IMPLEMENT_IBASE (csTerrFuncFactoryLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csTerrFuncFactoryLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csTerrFuncLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csTerrFuncLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csTerrFuncFactoryLoader)
-IMPLEMENT_FACTORY (csTerrFuncLoader)
+SCF_IMPLEMENT_FACTORY (csTerrFuncFactoryLoader)
+SCF_IMPLEMENT_FACTORY (csTerrFuncLoader)
 
-EXPORT_CLASS_TABLE (terrfldr)
-  EXPORT_CLASS (csTerrFuncFactoryLoader,
+SCF_EXPORT_CLASS_TABLE (terrfldr)
+  SCF_EXPORT_CLASS (csTerrFuncFactoryLoader,
     "crystalspace.terrain.loader.factory.terrfunc",
     "Crystal Space Function Terrain Factory Loader")
-  EXPORT_CLASS (csTerrFuncLoader, "crystalspace.terrain.loader.terrfunc",
+  SCF_EXPORT_CLASS (csTerrFuncLoader, "crystalspace.terrain.loader.terrfunc",
     "Crystal Space Function Terrain Loader")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csTerrFuncFactoryLoader::csTerrFuncFactoryLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csTerrFuncFactoryLoader::~csTerrFuncFactoryLoader ()
@@ -90,12 +90,12 @@ bool csTerrFuncFactoryLoader::Initialize (iSystem* pSys)
 iBase* csTerrFuncFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
-  iTerrainObjectType* pType = QUERY_PLUGIN_CLASS (pSystem,
+  iTerrainObjectType* pType = CS_QUERY_PLUGIN_CLASS (pSystem,
   	"crystalspace.terrain.object.terrfunc", "TerrainObj",
 	iTerrainObjectType);
   if (!pType)
   {
-    pType = LOAD_PLUGIN (pSystem, "crystalspace.terrain.object.terrfunc",
+    pType = CS_LOAD_PLUGIN (pSystem, "crystalspace.terrain.object.terrfunc",
     	"TerrainObj", iTerrainObjectType);
     printf ("Load TYPE plugin crystalspace.terrain.object.terrfunc\n");
   }
@@ -107,7 +107,7 @@ iBase* csTerrFuncFactoryLoader::Parse (const char* /*string*/,
 
 csTerrFuncLoader::csTerrFuncLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csTerrFuncLoader::~csTerrFuncLoader ()
@@ -169,7 +169,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
 	    return NULL;
 	  }
 	  iTerrObj = iFactory->GetTerrainObjectFactory()->NewInstance();
-          iTerrainState = QUERY_INTERFACE (iTerrObj, iTerrFuncState);
+          iTerrainState = SCF_QUERY_INTERFACE (iTerrObj, iTerrFuncState);
 	}
 	break;
       case CS_TOKEN_MATERIAL:
@@ -278,13 +278,13 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
         {
 	  float hscale, hshift;
 	  csScanStr (pParams, "%s,%f,%f\n", pStr, &hscale, &hshift);
-	  iVFS* vfs = QUERY_PLUGIN (pSystem, iVFS);
+	  iVFS* vfs = CS_QUERY_PLUGIN (pSystem, iVFS);
 	  if (!vfs)
 	  {
 	    printf ("No VFS!\n");
 	    exit (0);
 	  }
-	  iImageIO* loader = QUERY_PLUGIN_ID (pSystem,
+	  iImageIO* loader = CS_QUERY_PLUGIN_ID (pSystem,
 	  	CS_FUNCID_IMGLOADER, iImageIO);
 	  if (!loader)
 	  {

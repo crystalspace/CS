@@ -33,7 +33,7 @@ class csWALImageIO : public iImageIO
   csVector formats;
 
  public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csWALImageIO (iBase *pParent);
   virtual ~csWALImageIO (){}

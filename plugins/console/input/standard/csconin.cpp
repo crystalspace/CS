@@ -26,26 +26,26 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csConsoleInput)
-  IMPLEMENTS_INTERFACE (iConsoleInput)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csConsoleInput)
+  SCF_IMPLEMENTS_INTERFACE (iConsoleInput)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csConsoleInput::eiPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csConsoleInput::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_FACTORY (csConsoleInput)
+SCF_IMPLEMENT_FACTORY (csConsoleInput)
 
-EXPORT_CLASS_TABLE (csconin)
-  EXPORT_CLASS (csConsoleInput, "crystalspace.console.input.standard",
+SCF_EXPORT_CLASS_TABLE (csconin)
+  SCF_EXPORT_CLASS (csConsoleInput, "crystalspace.console.input.standard",
     "Crystal Space standard input console")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csConsoleInput::csConsoleInput (iBase *iParent) : History (16, 16)
 {
-  CONSTRUCT_IBASE (iParent);
-  CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   Callback = NULL;
   Console = NULL;
   Prompt = NULL;
@@ -124,7 +124,7 @@ bool csConsoleInput::HandleEvent (iEvent &Event)
           InsertMode = !InsertMode;
           break;
         case CSKEY_ENTER:
-	  Console->PutText(MSG_CONSOLE, "\n");
+	  Console->PutText(CS_MSG_CONSOLE, "\n");
           if (Callback)
             Callback (CallbackData, line);
           if (line [0])
@@ -241,9 +241,9 @@ void csConsoleInput::SetPrompt (const char *iPrompt)
 void csConsoleInput::Refresh ()
 {
   if (!Console || !Console->GetVisible ()) return;
-  Console->PutText (MSG_CONSOLE, "\r");
-  Console->PutText (MSG_CONSOLE, Prompt);
-  Console->PutText (MSG_CONSOLE, line);
+  Console->PutText (CS_MSG_CONSOLE, "\r");
+  Console->PutText (CS_MSG_CONSOLE, Prompt);
+  Console->PutText (CS_MSG_CONSOLE, line);
   Console->SetCursorPos (PromptLen + CursorPos);
   if (InsertMode)
     Console->SetCursorStyle (csConInsertCursor);

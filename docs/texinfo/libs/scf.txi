@@ -195,9 +195,9 @@ This method will return a pointer to an interface or to an embedded interface,
 
 To simplify things even more, @file{scf.h} provides several macros that
 provide default declarations and default implementations of these three
-methods. The @samp{DECLARE_IBASE} macro will declare these three methods
+methods. The @samp{SCF_DECLARE_IBASE} macro will declare these three methods
 within any class definition that is derived from @samp{iBase}. The
-@samp{IMPLEMENT_IBASE} will add the default implementation of these function
+@samp{SCF_IMPLEMENT_IBASE} will add the default implementation of these function
 to your module.  Example:
 
 @example
@@ -208,28 +208,28 @@ struct iTest : public iBase
 
 class Test : public iTest
 @{
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 @};
 
-IMPLEMENT_IBASE(Test)
+SCF_IMPLEMENT_IBASE(Test)
 @end example
 
 In reality, we need a few more macros because the @code{QueryInterface()}
 function is not static---it depends on the interfaces implemented by given
-object. In fact, @code{IMPLEMENT_IBASE()} defines @code{IncRef()} and
+object. In fact, @code{SCF_IMPLEMENT_IBASE()} defines @code{IncRef()} and
 @code{DecRef()} and the beginning of the @code{QueryInterface()} function,
 but not the end of that function (i.e. the closing brace). That's because you
-have to use an additional macro called @code{IMPLEMENTS_INTERFACE()} that
+have to use an additional macro called @code{SCF_IMPLEMENTS_INTERFACE()} that
 will add the code required to support all implemented interface inside the
 @code{QueryInterface()}:
 
 @example
-IMPLEMENT_IBASE(Test)
-  IMPLEMENTS_INTERFACE(iTest)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE(Test)
+  SCF_IMPLEMENTS_INTERFACE(iTest)
+SCF_IMPLEMENT_IBASE_END
 @end example
 
-The @samp{DECLARE_IBASE} macro also defines two member variables:
+The @samp{SCF_DECLARE_IBASE} macro also defines two member variables:
 @samp{scfRefCount} and @samp{scfParent}. @samp{scfRefCount} is the counter
 for external references to this object and is used by @code{IncRef()} and
 @code{DecRef()} methods. The @samp{scfParent} variable points to the parent
@@ -251,11 +251,11 @@ Thus, if we call the @code{IncRef()} method for @emph{Sub-embedded interface},
 we also will increment reference count for @emph{Object} and
 @emph{ClassFactory}.
 
-You also should call @code{CONSTRUCT_IBASE(@var{parent})} inside your class
+You also should call @code{SCF_CONSTRUCT_IBASE(@var{parent})} inside your class
 constructor, this macro will initialize @samp{scfRefCount} to zero and
 @samp{scfParent} to @var{parent}. In fact, the constructor of any class
 should receive at least one argument of type @samp{iBase*} which should then
-be passed along to the @code{CONSTRUCT_IBASE()} macro.
+be passed along to the @code{SCF_CONSTRUCT_IBASE()} macro.
 
 @node SCF Multiple Interfaces, SCF Versions, SCF Using, SCF
 @subsection Classes Implementing Multiple Interfaces
@@ -300,11 +300,11 @@ use the @code{IMPLEMENT_INTERFACE()} macro once for each implemented
 interface:
 
 @example
-IMPLEMENT_IBASE(MyGraphics3D)
-  IMPLEMENTS_INTERFACE(iGraphics3D)
-  IMPLEMENTS_INTERFACE(iHalo)
-  IMPLEMENTS_INTERFACE(iBumpMap)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE(MyGraphics3D)
+  SCF_IMPLEMENTS_INTERFACE(iGraphics3D)
+  SCF_IMPLEMENTS_INTERFACE(iHalo)
+  SCF_IMPLEMENTS_INTERFACE(iBumpMap)
+SCF_IMPLEMENT_IBASE_END
 @end example
 
 @anchor{SCF Embedded Interfaces}
@@ -322,18 +322,18 @@ class MyGraphics3D : public iGraphics3D
   // Declare the iHalo embedded interface.
   class MyHalo : public iHalo
   @{
-    DECLARE_EMBEDDED_IBASE(MyGraphics3D);
+    SCF_DECLARE_EMBEDDED_IBASE(MyGraphics3D);
     @dots{}
   @} scfiHalo;
   // Declare the iBumpMap embedded interface.
   class MyBumpMap : public iBumpMap
   @{
-    DECLARE_EMBEDDED_IBASE(MyGraphics3D);
+    SCF_DECLARE_EMBEDDED_IBASE(MyGraphics3D);
     @dots{}
   @} scfiBumpMap;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   @dots{}
 @};
 @end example
@@ -347,31 +347,31 @@ form @samp{scf@var{InterfaceName}}. For instance, @samp{scfiBase},
 @samp{scfiTest}, @samp{scfiGraphics3D}, and so on.
 
 When you declare the @samp{iBase} methods within an embedded class, you can
-use the @code{DECLARE_EMBEDDED_IBASE(@var{OuterClass})} macro instead of
-@samp{DECLARE_IBASE}. In this case the @samp{scfParent} member will be of
+use the @code{SCF_DECLARE_EMBEDDED_IBASE(@var{OuterClass})} macro instead of
+@samp{SCF_DECLARE_IBASE}. In this case the @samp{scfParent} member will be of
 type @code{@var{OuterClass}*} rather than of type @code{iBase*}; this will
 allow the member class to talk with its parent directly, thus allowing for
 direct member variables and functions access. In fact, the
-@samp{DECLARE_IBASE} macro expands to @code{DECLARE_EMBEDDED_IBASE(iBase)}.
+@samp{SCF_DECLARE_IBASE} macro expands to @code{SCF_DECLARE_EMBEDDED_IBASE(iBase)}.
 
-You also should use the @code{IMPLEMENT_EMBEDDED_IBASE()} macro instead of
-@code{IMPLEMENT_IBASE()} because @code{IMPLEMENT_IBASE()} will destroy the
+You also should use the @code{SCF_IMPLEMENT_EMBEDDED_IBASE()} macro instead of
+@code{SCF_IMPLEMENT_IBASE()} because @code{SCF_IMPLEMENT_IBASE()} will destroy the
 object when its reference count will reach zero; if you do the same for an
 embedded interface it will fail because the object is allocated and freed at
 the same time when parent object is (since it is directly embedded within the
 parent).
 
 @example
-IMPLEMENT_IBASE(MyGraphics3D)
-  IMPLEMENTS_INTERFACE (iGraphics3D)
-  IMPLEMENTS_EMBEDDED_INTERFACE(iHalo)
-  IMPLEMENTS_EMBEDDED_INTERFACE(iBumpMap)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE(MyGraphics3D)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iHalo)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iBumpMap)
+SCF_IMPLEMENT_IBASE_END
 @end example
 
 And finally, in the parent object's constructor you should initialize all
 embedded interface objects with the
-@code{CONSTRUCT_EMBEDDED_IBASE(@var{InterfaceName})} macro.  This will
+@code{SCF_CONSTRUCT_EMBEDDED_IBASE(@var{InterfaceName})} macro.  This will
 initialize @samp{scfRefCount} and @samp{scfParent} fields within
 @samp{scf@var{InterfaceName}} member variables to appropiate values (zero and
 @samp{this}).  Here is how to do it:
@@ -379,14 +379,14 @@ initialize @samp{scfRefCount} and @samp{scfParent} fields within
 @example
 MyGraphics3D::MyGraphics3D(iBase* iParent)
 @{
-  CONSTRUCT_IBASE(iParent);
-  CONSTRUCT_EMBEDDED_IBASE(iHalo);
-  CONSTRUCT_EMBEDDED_IBASE(iBumpMap);
+  SCF_CONSTRUCT_IBASE(iParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(iHalo);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(iBumpMap);
   @dots{}
 @}
 @end example
 
-You should not call @code{CONSTRUCT_IBASE()} within embedded object's
+You should not call @code{SCF_CONSTRUCT_IBASE()} within embedded object's
 constructor (in fact, it can not have a constructor at all) since all work
 needed to initialize @code{iBase} fields is done in the carrier object's
 constructor.
@@ -430,8 +430,8 @@ are you looking for.  If a module cannot provide an interface compatible with
 the requested version, then @code{QueryInterface()} will return @samp{NULL}
 (same as if interface wasn't available at all).  You can use
 @code{scfCompatibleVersion()} to check whether the requested version is
-compatible with interface version. In fact, the @code{IMPLEMENTS_INTERFACE()}
-and @code{IMPLEMENTS_EMBEDDED_INTERFACE()} macros employ this function.
+compatible with interface version. In fact, the @code{SCF_IMPLEMENTS_INTERFACE()}
+and @code{SCF_IMPLEMENTS_EMBEDDED_INTERFACE()} macros employ this function.
 
 For easier definition of versioned interfaces you can use the
 @code{SCF_VERSION()} macro.
@@ -450,13 +450,13 @@ struct MyGraphics3D : public iBase
 
 Now let's explain how to use all this mess from client side. First, we should
 be able to create objects that implements the interfaces we want.  For this,
-you should use the @code{CREATE_INSTANCE()} macro. It receives two arguments:
+you should use the @code{SCF_CREATE_INSTANCE()} macro. It receives two arguments:
 the name of external class, and the name of the interface it implements. So,
 if we know class @samp{MyGraphics3D} implements the @samp{iGraphics3D}
 interface, you should write:
 
 @example
-iGraphics3D* G3D = CREATE_INSTANCE(MyGraphics3D, iGraphics3D);
+iGraphics3D* G3D = SCF_CREATE_INSTANCE(MyGraphics3D, iGraphics3D);
 if (!G3D)
 @{
   fprintf(stderr,
@@ -480,12 +480,12 @@ not use @samp{G3D} anymore; you should create another instance of
 @samp{iGraphics3D} for this.
 
 To query an embedded interface, you will want to use the
-@code{QUERY_INTERFACE()} macro. It also receives two arguments, first being
+@code{SCF_QUERY_INTERFACE()} macro. It also receives two arguments, first being
 the object you are querying for the embedded interface and second being the
 name of the interface you want. Example:
 
 @example
-iHalo* halo = QUERY_INTERFACE(G3D, iHalo);
+iHalo* halo = SCF_QUERY_INTERFACE(G3D, iHalo);
 if (!halo)
 @{
   fprintf(stderr,
@@ -557,14 +557,14 @@ class csDog : public iDog
   class csName : public iName
   @{
   public:
-    DECLARE_EMBEDDED_IBASE(csDog);
+    SCF_DECLARE_EMBEDDED_IBASE(csDog);
     virtual char const* GetName();
     virtual void SetName(char const* iName);
   @} scfiName;
   friend class csName;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csDog(iBase* iParent);
   virtual void Walk();
   virtual void Shout(char const* iWhat);
@@ -572,15 +572,15 @@ public:
 
 //---------- Implementation ---------
 
-IMPLEMENT_IBASE(csDog)
-  IMPLEMENTS_INTERFACE(iDog)
-  IMPLEMENTS_EMBEDDED_INTERFACE(iName)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE(csDog)
+  SCF_IMPLEMENTS_INTERFACE(iDog)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iName)
+SCF_IMPLEMENT_IBASE_END
 
 csDog::csDog(iBase* iParent)
 @{
-  CONSTRUCT_IBASE(iParent);
-  CONSTRUCT_EMBEDDED_IBASE(scfiName);
+  SCF_CONSTRUCT_IBASE(iParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiName);
   Name = NULL;
 @}
 
@@ -596,9 +596,9 @@ void csDog::Shout(char const* iWhat)
 
 // iName interface for dog.
 
-IMPLEMENT_EMBEDDED_IBASE(csDog::csName)
-  IMPLEMENTS_INTERFACE(iName)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE(csDog::csName)
+  SCF_IMPLEMENTS_INTERFACE(iName)
+SCF_IMPLEMENT_IBASE_END
 
 char const* csDog::csName::GetName()
 @{
@@ -614,16 +614,16 @@ void csDog::csName::SetName(char const* iName)
 
 // Now export all classes.
 
-IMPLEMENT_FACTORY(csDog)
+SCF_IMPLEMENT_FACTORY(csDog)
 
-EXPORT_CLASS_TABLE(Dog)
-  EXPORT_CLASS(csDog, "A Dog that shouts")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE(Dog)
+  SCF_EXPORT_CLASS(csDog, "A Dog that shouts")
+SCF_EXPORT_CLASS_TABLE_END
 @end example
 
 The above three files should be compiled together to get a shared library.
 The shared library should export the @code{Create_csDog()} function
-(implemented with the @code{IMPLEMENT_FACTORY()} macro).  On most platforms
+(implemented with the @code{SCF_IMPLEMENT_FACTORY()} macro).  On most platforms
 this is achieved automatically, however on @sc{os}/2 you will need to write a
 @file{.def} file for this.  Finally, here is the source code for a client
 application that uses the @samp{csDog} class:
@@ -643,12 +643,12 @@ int main ()
   csIniFile config("scf.cfg");
   scfInitialize(&config);
 
-  iDog *dog = CREATE_INSTANCE(csDog, iDog);
+  iDog *dog = SCF_CREATE_INSTANCE(csDog, iDog);
   if (!dog)
     fprintf(stderr, "No csDog shared class!\n");
   else
   @{
-    iName* name = QUERY_INTERFACE(dog, iName);
+    iName* name = SCF_QUERY_INTERFACE(dog, iName);
     if (!name)
       fprintf(stderr,
         "Dog does not support iName interface!\n");
@@ -723,18 +723,18 @@ Sometimes you don't want to register your classes with the @sc{scf} kernel.
 That is, you create your objects manually, using @samp{new} or some other
 method.  In this case your object is not a part of the class tree (see above)
 and thus doesn't have a parent.  In this case you have to pass @samp{NULL} to
-the @code{CONSTRUCT_IBASE()} macro in constructor.
+the @code{SCF_CONSTRUCT_IBASE()} macro in constructor.
 
 @example
 MyClass::MyClass()
 @{
-  CONSTRUCT_IBASE(NULL)
+  SCF_CONSTRUCT_IBASE(NULL)
 @}
 @end example
 
 If you also want your object to not be automatically deleted when the
-reference count reaches zero, you can use @code{IMPLEMENT_EMBEDDED_IBASE()}
-instead of @code{IMPLEMENT_IBASE()}, as if your object was an embedded
+reference count reaches zero, you can use @code{SCF_IMPLEMENT_EMBEDDED_IBASE()}
+instead of @code{SCF_IMPLEMENT_IBASE()}, as if your object was an embedded
 interface.  Embedded interfaces don't have the habit of deleting themselves
 when their reference count reaches zero.  In this case you should take care
 and delete your object manually.

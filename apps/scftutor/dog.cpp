@@ -17,7 +17,7 @@ class csDog : public iDog
   class csName : public iName
   {
   public:
-    DECLARE_EMBEDDED_IBASE (csDog);
+    SCF_DECLARE_EMBEDDED_IBASE (csDog);
 
     virtual char *GetName ();
     virtual void SetName (char *iName);
@@ -25,7 +25,7 @@ class csDog : public iDog
   friend class csName;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csDog (iBase *iParent);
   virtual ~csDog ();
@@ -37,15 +37,15 @@ public:
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csDog)
-  IMPLEMENTS_INTERFACE (iDog)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iName)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csDog)
+  SCF_IMPLEMENTS_INTERFACE (iDog)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iName)
+SCF_IMPLEMENT_IBASE_END
 
 csDog::csDog (iBase *iParent)
 {
-  CONSTRUCT_IBASE (iParent);
-  CONSTRUCT_EMBEDDED_IBASE (scfiName);
+  SCF_CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiName);
   Name = NULL;
 }
 
@@ -68,9 +68,9 @@ void csDog::Barf (char *iWhat)
 
 // IName interface for dog
 
-IMPLEMENT_EMBEDDED_IBASE (csDog::csName)
-  IMPLEMENTS_INTERFACE (iName)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csDog::csName)
+  SCF_IMPLEMENTS_INTERFACE (iName)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 char *csDog::csName::GetName ()
 {
@@ -86,8 +86,8 @@ void csDog::csName::SetName (char *iName)
 
 // ... and now export all classes
 
-IMPLEMENT_FACTORY (csDog)
+SCF_IMPLEMENT_FACTORY (csDog)
 
-EXPORT_CLASS_TABLE (dog)
-  EXPORT_CLASS (csDog, "test.dog", "A Dog that barfs")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE (dog)
+  SCF_EXPORT_CLASS (csDog, "test.dog", "A Dog that barfs")
+SCF_EXPORT_CLASS_TABLE_END

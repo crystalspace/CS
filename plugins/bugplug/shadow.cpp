@@ -27,13 +27,13 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 
-IMPLEMENT_IBASE (csShadow)
-  IMPLEMENTS_INTERFACE (iMeshObject)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csShadow)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
+SCF_IMPLEMENT_IBASE_END
 
 csShadow::csShadow ()
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   wrap = NULL;
   shadow_mesh = NULL;
   do_bbox = true;

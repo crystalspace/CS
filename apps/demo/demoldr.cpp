@@ -70,7 +70,7 @@ DemoSequenceLoader::DemoSequenceLoader (Demo* demo,
   if (!buf || !buf->GetSize ())
   {
     if (buf) buf->DecRef ();
-    demo->Printf (MSG_FATAL_ERROR,
+    demo->Printf (CS_MSG_FATAL_ERROR,
     	"Could not open sequence file '%s' on VFS!\n", fileName);
     exit (0);
   }
@@ -127,7 +127,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
   {
     if (!params)
     {
-      demo->Printf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n",
+      demo->Printf (CS_MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n",
 		buf);
       fatal_exit (0, false);
     }
@@ -239,7 +239,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
         iSequence* newseq = GetSequence (seqName);
 	if (!newseq)
 	{
-    	  demo->Printf (MSG_FATAL_ERROR, "Can't find sequence '%s'!\n",
+    	  demo->Printf (CS_MSG_FATAL_ERROR, "Can't find sequence '%s'!\n",
 	  	seqName);
 	  exit (0);
 	}
@@ -258,7 +258,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    demo->Printf (MSG_FATAL_ERROR,
+    demo->Printf (CS_MSG_FATAL_ERROR,
       	"Token '%s' not found while parsing a sequence!\n",
 	csGetLastOffender ());
     fatal_exit (0, false);
@@ -281,7 +281,7 @@ void DemoSequenceLoader::LoadSequences (char* buf)
   {
     if (!params)
     {
-      demo->Printf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n",
+      demo->Printf (CS_MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n",
 		buf);
       fatal_exit (0, false);
     }
@@ -319,7 +319,7 @@ void DemoSequenceLoader::LoadSequences (char* buf)
 	}
 	else if (!newseq->IsEmpty ())
 	{
-    	  demo->Printf (MSG_FATAL_ERROR, "Sequence '%s' is already defined!\n",
+    	  demo->Printf (CS_MSG_FATAL_ERROR, "Sequence '%s' is already defined!\n",
 	  	name);
 	  exit (0);
 	}
@@ -330,7 +330,7 @@ void DemoSequenceLoader::LoadSequences (char* buf)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    demo->Printf (MSG_FATAL_ERROR,
+    demo->Printf (CS_MSG_FATAL_ERROR,
       	"Token '%s' not found while parsing sequences!\n",
 	csGetLastOffender ());
     fatal_exit (0, false);
@@ -349,7 +349,7 @@ void DemoSequenceLoader::LoadSequencesMain (char* buf)
   {
     if (!data)
     {
-      demo->Printf (MSG_FATAL_ERROR,
+      demo->Printf (CS_MSG_FATAL_ERROR,
       	"Expected parameters instead of '%s'!\n", buf);
       fatal_exit (0, false);
     }
@@ -412,7 +412,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
   {
     if (!params)
     {
-      demo->Printf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n",
+      demo->Printf (CS_MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n",
 		buf);
       fatal_exit (0, false);
     }
@@ -426,7 +426,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	if (!buf || !buf->GetSize ())
 	{
 	  if (buf) buf->DecRef ();
-	  demo->Printf (MSG_FATAL_ERROR,
+	  demo->Printf (CS_MSG_FATAL_ERROR,
 	    "Could not open path file '%s' on VFS!\n", fname);
 	  exit (0);
 	}
@@ -438,7 +438,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
       {
         if (seq != 0)
 	{
-	  demo->Printf (MSG_FATAL_ERROR,
+	  demo->Printf (CS_MSG_FATAL_ERROR,
 	  	"NUM has to come first in path '%s'!\n", pName);
 	  exit (0);
 	}
@@ -451,7 +451,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
       {
         if (seq < 2)
 	{
-	  demo->Printf (MSG_FATAL_ERROR,
+	  demo->Printf (CS_MSG_FATAL_ERROR,
 	  	"First use NUM, POS in path '%s'!\n", pName);
 	  exit (0);
 	}
@@ -464,7 +464,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	if (n != num-1)
 	{
 	  delete[] list;
-	  demo->Printf (MSG_FATAL_ERROR,
+	  demo->Printf (CS_MSG_FATAL_ERROR,
 	  	"SPEED should use %d-1 entries in path '%s'!\n", num, pName);
 	  exit (0);
 	}
@@ -503,7 +503,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
       {
         if (seq < 2)
 	{
-	  demo->Printf (MSG_FATAL_ERROR,
+	  demo->Printf (CS_MSG_FATAL_ERROR,
 	  	"First use NUM, POS in path '%s'!\n", pName);
 	  exit (0);
 	}
@@ -547,7 +547,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
       {
         if (seq < 1)
 	{
-	  demo->Printf (MSG_FATAL_ERROR,
+	  demo->Printf (CS_MSG_FATAL_ERROR,
 	  	"First use NUM in path '%s'!\n", pName);
 	  exit (0);
 	}
@@ -557,7 +557,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	if (n != num)
 	{
 	  delete[] list;
-	  demo->Printf (MSG_FATAL_ERROR,
+	  demo->Printf (CS_MSG_FATAL_ERROR,
 	  	"TIMES should use %d entries in path '%s'!\n", num, pName);
 	  exit (0);
 	}
@@ -569,7 +569,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
       {
         if (seq < 1)
 	{
-	  demo->Printf (MSG_FATAL_ERROR,
+	  demo->Printf (CS_MSG_FATAL_ERROR,
 	  	"First use NUM in path '%s'!\n", pName);
 	  exit (0);
 	}
@@ -578,7 +578,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	if (!ParseVectorList (params, v, num))
 	{
 	  delete[] v;
-	  demo->Printf (MSG_FATAL_ERROR,
+	  demo->Printf (CS_MSG_FATAL_ERROR,
 	  	"POS should use %d entries in path '%s'!\n", num, pName);
 	  exit (0);
 	}
@@ -590,7 +590,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
       {
         if (seq < 1)
 	{
-	  demo->Printf (MSG_FATAL_ERROR,
+	  demo->Printf (CS_MSG_FATAL_ERROR,
 	  	"First use NUM in path '%s'!\n", pName);
 	  exit (0);
 	}
@@ -598,7 +598,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	if (!ParseVectorList (params, v, num))
 	{
 	  delete[] v;
-	  demo->Printf (MSG_FATAL_ERROR,
+	  demo->Printf (CS_MSG_FATAL_ERROR,
 	  	"FORWARD should use %d entries in path '%s'!\n", num, pName);
 	  exit (0);
 	}
@@ -610,7 +610,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
       {
         if (seq < 1)
 	{
-	  demo->Printf (MSG_FATAL_ERROR,
+	  demo->Printf (CS_MSG_FATAL_ERROR,
 	  	"First use NUM in path '%s'!\n", pName);
 	  exit (0);
 	}
@@ -618,7 +618,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	if (!ParseVectorList (params, v, num))
 	{
 	  delete[] v;
-	  demo->Printf (MSG_FATAL_ERROR,
+	  demo->Printf (CS_MSG_FATAL_ERROR,
 	  	"UP should use %d entries in path '%s'!\n", num, pName);
 	  exit (0);
 	}
@@ -630,7 +630,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    demo->Printf (MSG_FATAL_ERROR,
+    demo->Printf (CS_MSG_FATAL_ERROR,
       	"Token '%s' not found while parsing a path!\n",
 	csGetLastOffender ());
     fatal_exit (0, false);

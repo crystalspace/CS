@@ -60,7 +60,7 @@ public:
 
 	int mGraphicsReady;
 
-	DECLARE_IBASE;
+	SCF_DECLARE_IBASE;
 
 protected:
 	CWindowPtr			mMainWindow;

@@ -215,7 +215,7 @@ class awsPrefManager : public iAwsPrefs
   awsSkinNode *def_skin;
 
 public:
-    DECLARE_IBASE;
+    SCF_DECLARE_IBASE;
 
     awsPrefManager(iBase *iParent);
     virtual ~awsPrefManager();

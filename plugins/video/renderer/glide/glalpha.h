@@ -46,7 +46,7 @@ protected:
 public:
   csGlideAlphaMap ( unsigned char* map, int width, int height )
   { 
-    CONSTRUCT_IBASE( NULL );
+    SCF_CONSTRUCT_IBASE( NULL );
     pCacheData = NULL;
     alpha = NULL;
     realwidth = width; realheight = height;
@@ -72,7 +72,7 @@ public:
   void GetRealDimensions( int& w, int& h )
   { w = realwidth; h = realheight; }
     
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   
   /// The following doesnt matter since we have an alphamap anyway
   virtual void SetKeyColor (bool ){};

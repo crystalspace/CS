@@ -47,18 +47,18 @@ inline void memsetd (void *dest, unsigned int value, size_t count)
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csGraphics2DOS2DIVE)
+SCF_IMPLEMENT_FACTORY (csGraphics2DOS2DIVE)
 
-EXPORT_CLASS_TABLE (csdive)
-  EXPORT_CLASS_DEP (csGraphics2DOS2DIVE, "crystalspace.graphics2d.dive",
+SCF_EXPORT_CLASS_TABLE (csdive)
+  SCF_EXPORT_CLASS_DEP (csGraphics2DOS2DIVE, "crystalspace.graphics2d.dive",
     "OS/2 DIVE 2D graphics driver for Crystal Space", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csGraphics2DOS2DIVE)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics2D)
-  IMPLEMENTS_INTERFACE (iEventPlug)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics2DOS2DIVE)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+SCF_IMPLEMENT_IBASE_END
 
 csGraphics2DOS2DIVE::csGraphics2DOS2DIVE (iBase *iParent) :
   csGraphics2D (),
@@ -66,7 +66,7 @@ csGraphics2DOS2DIVE::csGraphics2DOS2DIVE (iBase *iParent) :
   WindowX (INT_MIN), WindowY (INT_MIN),
   WindowWidth (-1), WindowHeight (-1)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   // Initialize module handle
 #ifdef CS_STATIC_LINKED
   gdMH = NULLHANDLE;
@@ -115,7 +115,7 @@ bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
   // Initialize DIVE
   if (!gdDiveInitialize ())
   {
-    CsPrintf (MSG_FATAL_ERROR, "Unable to initialize OS/2 DIVE\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "Unable to initialize OS/2 DIVE\n");
     return false;
   }
 
@@ -136,7 +136,7 @@ bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
       WindowHeight = hres;
     }
     else
-      System->Printf (MSG_WARNING, "Bad value `%s' for -winsize command-line parameter (W,H expected)\n", val);
+      System->Printf (CS_MSG_WARNING, "Bad value `%s' for -winsize command-line parameter (W,H expected)\n", val);
   }
 
   if ((val = System->GetOptionCL ("winpos")))
@@ -148,7 +148,7 @@ bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
       WindowY = ypos;
     }
     else
-      System->Printf (MSG_WARNING, "Bad value `%s' for -winpos command-line parameter (X,Y expected)\n", val);
+      System->Printf (CS_MSG_WARNING, "Bad value `%s' for -winpos command-line parameter (X,Y expected)\n", val);
   }
 
   if (System->GetOptionCL ("sysmouse"))
@@ -167,10 +167,10 @@ bool csGraphics2DOS2DIVE::HandleEvent (iEvent &Event)
    && (Event.Command.Code == cscmdCommandLineHelp)
    && System)
   {
-    System->Printf (MSG_STDOUT, "Options for OS/2 DIVE driver:\n");
-    System->Printf (MSG_STDOUT, "  -winpos=<x>,<y>    set window position in percent of screen (default=center)\n");
-    System->Printf (MSG_STDOUT, "  -winsize=<w>,<h>   set window size (default=max fit mode multiple)\n");
-    System->Printf (MSG_STDOUT, "  -[no]sysmouse      use/don't use system mouse cursor (default=%s)\n",
+    System->Printf (CS_MSG_STDOUT, "Options for OS/2 DIVE driver:\n");
+    System->Printf (CS_MSG_STDOUT, "  -winpos=<x>,<y>    set window position in percent of screen (default=center)\n");
+    System->Printf (CS_MSG_STDOUT, "  -winsize=<w>,<h>   set window size (default=max fit mode multiple)\n");
+    System->Printf (CS_MSG_STDOUT, "  -[no]sysmouse      use/don't use system mouse cursor (default=%s)\n",
       HardwareCursor ? "use" : "don't");
     return true;
   }
@@ -237,7 +237,7 @@ bool csGraphics2DOS2DIVE::Open (const char *Title)
     case 8:
       break;
     default:
-      CsPrintf (MSG_FATAL_ERROR, "ERROR: %d bits per pixel modes not supported\n", Depth);
+      CsPrintf (CS_MSG_FATAL_ERROR, "ERROR: %d bits per pixel modes not supported\n", Depth);
       break;
   } /* endswitch */
 
@@ -304,7 +304,7 @@ bool csGraphics2DOS2DIVE::Open (const char *Title)
 
   if ((Depth >> 3) != pfmt.PixelBytes)
   {
-    CsPrintf (MSG_WARNING, "WARNING: %d bpp mode requested, but not available: using %d bpp mode\n",
+    CsPrintf (CS_MSG_WARNING, "WARNING: %d bpp mode requested, but not available: using %d bpp mode\n",
       Depth, pfmt.PixelBytes << 3);
     Depth = pfmt.PixelBytes << 3;
   }
@@ -314,14 +314,14 @@ bool csGraphics2DOS2DIVE::Open (const char *Title)
   FGVideoMode Mode = // selected mode with double buffering
   { Width, Height, PixelFormat, 2, vmfWindowed };
 
-  CsPrintf (MSG_INITIALIZATION, "Using %c%c%c%c pixel format\n",
+  CsPrintf (CS_MSG_INITIALIZATION, "Using %c%c%c%c pixel format\n",
     PixelFormat, PixelFormat >> 8, PixelFormat >> 16, PixelFormat >> 24);
 
   // Create PM window
   rq.Parm.CreateWindow.Title = Title;
   if ((rc = PMcall (pmcmdCreateWindow, &rq)) != pmrcOK)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Cannot create PM window: no resources bound to driver?\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "Cannot create PM window: no resources bound to driver?\n");
     return false;
   }
   WinHandle = rq.Parm.CreateWindow.Handle;
@@ -330,7 +330,7 @@ bool csGraphics2DOS2DIVE::Open (const char *Title)
   rq.Parm.CreateCtx.Mode = &Mode;
   if ((rc = PMcall (pmcmdCreateDIVEctx, &rq)) != pmrcOK)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Cannot create DIVE context\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "Cannot create DIVE context\n");
     return false;
   }
 
@@ -349,7 +349,7 @@ bool csGraphics2DOS2DIVE::Open (const char *Title)
   rq.Parm.BindCtx.DesktopH = DesktopH;
   if ((rc = PMcall (pmcmdBindDIVEctx, &rq)) != pmrcOK)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Cannot bind DIVE context to window!\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "Cannot bind DIVE context to window!\n");
     return false;
   }
 
@@ -394,7 +394,7 @@ bool csGraphics2DOS2DIVE::Open (const char *Title)
       _GetPixelAt = GetPixelAt32;
       break;
     default:
-      CsPrintf (MSG_WARNING, "WARNING: No 2D routines for selected mode!\n");
+      CsPrintf (CS_MSG_WARNING, "WARNING: No 2D routines for selected mode!\n");
       break;
   } /* endif */
 

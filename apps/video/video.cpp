@@ -41,8 +41,8 @@
 
 CS_IMPLEMENT_APPLICATION
 
-REGISTER_STATIC_LIBRARY (engine)
-REGISTER_STATIC_LIBRARY (lvlload)
+SCF_REGISTER_STATIC_LIBRARY (engine)
+SCF_REGISTER_STATIC_LIBRARY (lvlload)
 
 //-----------------------------------------------------------------------------
 
@@ -83,32 +83,32 @@ bool Video::Initialize (int argc, const char* const argv[],
     return false;
 
   // Find the pointer to engine plugin
-  engine = QUERY_PLUGIN (this, iEngine);
+  engine = CS_QUERY_PLUGIN (this, iEngine);
   if (!engine)
   {
-    Printf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
 
   // Find the pointer to level loader plugin
-  LevelLoader = QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
+  LevelLoader = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
   if (!LevelLoader)
   {
-    Printf (MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
 
-  myG3D = QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
+  myG3D = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
   if (!myG3D)
   {
-    Printf (MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
     abort ();
   }
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("Video Crystal Space Application"))
   {
-    Printf (MSG_FATAL_ERROR, "Error opening system!\n");
+    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     cleanup ();
     exit (1);
   }
@@ -130,7 +130,7 @@ bool Video::Initialize (int argc, const char* const argv[],
   txtmgr->SetPalette ();
 
   // Some commercials...
-  Printf (MSG_INITIALIZATION,
+  Printf (CS_MSG_INITIALIZATION,
     "Video Crystal Space Application version 0.1.\n");
 
   // First disable the lighting cache. Our app is simple enough
@@ -138,15 +138,15 @@ bool Video::Initialize (int argc, const char* const argv[],
   engine->EnableLightingCache (false);
 
   // Create our world.
-  Printf (MSG_INITIALIZATION, "Creating world!...\n");
+  Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
 
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
-  iMaterialWrapper *iMW = QUERY_INTERFACE (tm, iMaterialWrapper);
+  iMaterialWrapper *iMW = SCF_QUERY_INTERFACE (tm, iMaterialWrapper);
  
   room = engine->CreateSector ("room");
-  iThingState* walls = QUERY_INTERFACE (engine->CreateSectorWallsMesh (room, "walls")->GetMeshObject (), iThingState);
+  iThingState* walls = SCF_QUERY_INTERFACE (engine->CreateSectorWallsMesh (room, "walls")->GetMeshObject (), iThingState);
   csVector3 
 	   f1 (-5, 20, 5),
 	   f2 ( 5, 20, 5), 
@@ -218,7 +218,7 @@ bool Video::Initialize (int argc, const char* const argv[],
 
   engine->Prepare ();
 
-  Printf (MSG_INITIALIZATION, "--------------------------------------\n");
+  Printf (CS_MSG_INITIALIZATION, "--------------------------------------\n");
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by
@@ -232,19 +232,19 @@ bool Video::Initialize (int argc, const char* const argv[],
   txtmgr->SetPalette ();
 
   // load the videoformat plugin
-  Printf (MSG_INITIALIZATION, "Loading an iVideoFormat.\n");
-  pVideoFormat = CREATE_INSTANCE ("crystalspace.video.format.avi", iStreamFormat);
+  Printf (CS_MSG_INITIALIZATION, "Loading an iVideoFormat.\n");
+  pVideoFormat = SCF_CREATE_INSTANCE ("crystalspace.video.format.avi", iStreamFormat);
 
-  Printf (MSG_INITIALIZATION, "initializing iVideoFormat.\n");
+  Printf (CS_MSG_INITIALIZATION, "initializing iVideoFormat.\n");
   if (pVideoFormat && pVideoFormat->Initialize (this))
   {
-    iVFS *pVFS = QUERY_PLUGIN (this, iVFS);
+    iVFS *pVFS = CS_QUERY_PLUGIN (this, iVFS);
     if (pVFS)
     {
-      Printf (MSG_INITIALIZATION, "Opening the video file.\n");
+      Printf (CS_MSG_INITIALIZATION, "Opening the video file.\n");
       iFile *pFile = pVFS->Open ("/this/data/video.avi", VFS_FILE_READ);
       pVFS->DecRef ();
-      Printf (MSG_INITIALIZATION, "Scanning the video file.\n");
+      Printf (CS_MSG_INITIALIZATION, "Scanning the video file.\n");
       if (pFile && pVideoFormat->Load (pFile))
       {
 	pFile->DecRef ();
@@ -253,14 +253,14 @@ bool Video::Initialize (int argc, const char* const argv[],
 	// look up an video stream
 	csStreamDescription desc;
 	iStream *pStream=NULL, *pS;
-	Printf (MSG_INITIALIZATION, "Looking for video stream.\n");
+	Printf (CS_MSG_INITIALIZATION, "Looking for video stream.\n");
 	while (it->HasNext ())
 	{
 	   pS= it->GetNext ();
 	   pS->GetStreamDescription (desc);
 	   if (desc.type == CS_STREAMTYPE_VIDEO)
 	   {
-	     Printf (MSG_INITIALIZATION, "found video stream.\n");
+	     Printf (CS_MSG_INITIALIZATION, "found video stream.\n");
 	     pStream = pS;
 	     break;
 	   }
@@ -268,18 +268,18 @@ bool Video::Initialize (int argc, const char* const argv[],
 	it->DecRef ();
 	if (pStream)
 	{
-	  pVStream = QUERY_INTERFACE (pStream, iVideoStream);
+	  pVStream = SCF_QUERY_INTERFACE (pStream, iVideoStream);
 	  // show some data we gathered
 	  csVideoStreamDescription desc;
 	  pVStream->GetStreamDescription (desc);
-	  Printf (MSG_INITIALIZATION, "======= video stream data ======\n");
-	  Printf (MSG_INITIALIZATION, "Colordepth     : %d\n", desc.colordepth);
-	  Printf (MSG_INITIALIZATION, "Framecount     : %ld\n", desc.framecount);
-	  Printf (MSG_INITIALIZATION, "Width x Height : %d x %d\n", desc.width, desc.height);
-	  Printf (MSG_INITIALIZATION, "Framerate      : %g\n", desc.framerate);
-	  Printf (MSG_INITIALIZATION, "Duration       : %ld\n", desc.duration);
-	  Printf (MSG_INITIALIZATION, "CODEC          : %s\n", desc.codec);
-	  Printf (MSG_INITIALIZATION, "================================\n");
+	  Printf (CS_MSG_INITIALIZATION, "======= video stream data ======\n");
+	  Printf (CS_MSG_INITIALIZATION, "Colordepth     : %d\n", desc.colordepth);
+	  Printf (CS_MSG_INITIALIZATION, "Framecount     : %ld\n", desc.framecount);
+	  Printf (CS_MSG_INITIALIZATION, "Width x Height : %d x %d\n", desc.width, desc.height);
+	  Printf (CS_MSG_INITIALIZATION, "Framerate      : %g\n", desc.framerate);
+	  Printf (CS_MSG_INITIALIZATION, "Duration       : %ld\n", desc.duration);
+	  Printf (CS_MSG_INITIALIZATION, "CODEC          : %s\n", desc.codec);
+	  Printf (CS_MSG_INITIALIZATION, "================================\n");
 
 	  // show the video in the center of the window
 	  int vw = desc.width/2, vh = desc.height/2;
@@ -290,16 +290,16 @@ bool Video::Initialize (int argc, const char* const argv[],
 	  pVStream->SetRect (x, y, vw, vh);
  	}
 	else
-	  Printf (MSG_DEBUG_0, "No video stream found in video file.\n");
+	  Printf (CS_MSG_DEBUG_0, "No video stream found in video file.\n");
       }
       else
-	Printf (MSG_DEBUG_0, "Could not load the video file.\n");
+	Printf (CS_MSG_DEBUG_0, "Could not load the video file.\n");
     }
     else
-      Printf (MSG_DEBUG_0, "Could not query VFS plugin.\n");
+      Printf (CS_MSG_DEBUG_0, "Could not query VFS plugin.\n");
   }
   else
-    Printf (MSG_DEBUG_0, "Could not create or initialize an instance of crystalspace.video.format.avi.\n");
+    Printf (CS_MSG_DEBUG_0, "Could not create or initialize an instance of crystalspace.video.format.avi.\n");
   // @@@ DEBUG: IF THIS IS REMOVED THE SPRITE CRASHES!
   engine->Prepare ();
 
@@ -382,7 +382,7 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
   {
-    System->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
+    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
     cleanup ();
     exit (1);
   }

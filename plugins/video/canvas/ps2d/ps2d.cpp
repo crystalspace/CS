@@ -30,23 +30,23 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csGraphics2Dps2)
+SCF_IMPLEMENT_FACTORY (csGraphics2Dps2)
 
-EXPORT_CLASS_TABLE (ps2d)
-  EXPORT_CLASS (csGraphics2Dps2, "crystalspace.graphics2d.ps2d",
+SCF_EXPORT_CLASS_TABLE (ps2d)
+  SCF_EXPORT_CLASS (csGraphics2Dps2, "crystalspace.graphics2d.ps2d",
     "Playstation 2 2D graphics driver (ps2d) for Crystal Space")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csGraphics2Dps2)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics2D)
-  IMPLEMENTS_INTERFACE (iEventPlug)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics2Dps2)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+SCF_IMPLEMENT_IBASE_END
 
 csGraphics2Dps2::csGraphics2Dps2 (iBase *iParent) :
   csGraphics2D ()
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
 
   EventOutlet = NULL;
 }
@@ -89,7 +89,7 @@ csGraphics2Dps2::~csGraphics2Dps2(void)
 bool pdglSetCrystalSpace();
 bool csGraphics2Dps2::Open(const char *Title)
 {
-  CsPrintf (MSG_INITIALIZATION, "Crystal Space PS2 Driver.\n");
+  CsPrintf (CS_MSG_INITIALIZATION, "Crystal Space PS2 Driver.\n");
 
   SDL_Init(255);
   pdglSetCrystalSpace();

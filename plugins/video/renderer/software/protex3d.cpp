@@ -26,19 +26,19 @@
 #include "csgfx/rgbpixel.h"
 #include "ivideo/texture.h"
 
-DECLARE_FACTORY (csSoftProcTexture3D)
+SCF_DECLARE_FACTORY (csSoftProcTexture3D)
 
-IMPLEMENT_IBASE (csSoftProcTexture3D)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics3D)
-  IMPLEMENTS_INTERFACE (iSoftProcTexture)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSoftProcTexture3D)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
+  SCF_IMPLEMENTS_INTERFACE (iSoftProcTexture)
+SCF_IMPLEMENT_IBASE_END
 
 csSoftProcTexture3D::csSoftProcTexture3D (iBase *iParent)
   : csGraphics3DSoftwareCommon ()
 {
   is_for_procedural_textures = true;
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   soft_tex_mm = NULL;
   parent_tex_mm = NULL;
   System = NULL;
@@ -110,7 +110,7 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *main_texman, csText
       return false;
 
 #ifdef CS_DEBUG
-    System->Printf (MSG_INITIALIZATION, "8bit procedural texture\n");
+    System->Printf (CS_MSG_INITIALIZATION, "8bit procedural texture\n");
 #endif
   }
   else
@@ -129,7 +129,7 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *main_texman, csText
 	return false;
 
 #ifdef CS_DEBUG
-      System->Printf (MSG_INITIALIZATION, "%sbit procedural texture\n",
+      System->Printf (CS_MSG_INITIALIZATION, "%sbit procedural texture\n",
         main_texman->pfmt.PixelBytes == 2 ? "16" : "32");
 #endif
     }
@@ -153,7 +153,7 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *main_texman, csText
         main_texman->SetProcTextureManager (texman);
         texman->ResetPalette ();
 #ifdef CS_DEBUG
-        System->Printf (MSG_INITIALIZATION, 
+        System->Printf (CS_MSG_INITIALIZATION, 
           "Preparing dedicated procedural texture manager\n");
 #endif
         // Initialize the texture manager
@@ -184,7 +184,7 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *main_texman, csText
       }
 
 #ifdef CS_DEBUG
-      System->Printf (MSG_INITIALIZATION, "%s/8bit procedural texture\n",
+      System->Printf (CS_MSG_INITIALIZATION, "%s/8bit procedural texture\n",
         main_texman->pfmt.PixelBytes == 2 ? "16" : "32");
 #endif
     }
@@ -217,7 +217,7 @@ iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer
 
   if (!G2D)
   {
-    System->Printf (MSG_FATAL_ERROR, 
+    System->Printf (CS_MSG_FATAL_ERROR, 
 		    "Error opening Graphics2D texture context.\n");
     return NULL;
   }

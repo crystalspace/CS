@@ -34,20 +34,20 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY(csSoundRenderDS3D);
+SCF_IMPLEMENT_FACTORY(csSoundRenderDS3D);
 
-EXPORT_CLASS_TABLE (sndrdrds3d)
-EXPORT_CLASS (csSoundRenderDS3D, "crystalspace.sound.render.ds3d",
+SCF_EXPORT_CLASS_TABLE (sndrdrds3d)
+SCF_EXPORT_CLASS (csSoundRenderDS3D, "crystalspace.sound.render.ds3d",
         "DirectSound 3D Sound Driver for Crystal Space")
-EXPORT_CLASS_TABLE_END;
+SCF_EXPORT_CLASS_TABLE_END;
 
-IMPLEMENT_IBASE(csSoundRenderDS3D)
-  IMPLEMENTS_INTERFACE(iSoundRender)
-  IMPLEMENTS_INTERFACE(iPlugIn)
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csSoundRenderDS3D)
+  SCF_IMPLEMENTS_INTERFACE(iSoundRender)
+  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+SCF_IMPLEMENT_IBASE_END;
 
 csSoundRenderDS3D::csSoundRenderDS3D(iBase *piBase) {
-  CONSTRUCT_IBASE(piBase);
+  SCF_CONSTRUCT_IBASE(piBase);
   Listener = NULL;
   AudioRenderer = NULL;
   System = NULL;
@@ -69,13 +69,13 @@ csSoundRenderDS3D::~csSoundRenderDS3D() {
 
 bool csSoundRenderDS3D::Open()
 {
-  System->Printf (MSG_INITIALIZATION, "SoundRender DirectSound3D selected\n");
+  System->Printf (CS_MSG_INITIALIZATION, "SoundRender DirectSound3D selected\n");
   
   HRESULT r;
   if (!AudioRenderer) {
     r = DirectSoundCreate(NULL, &AudioRenderer, NULL);
     if (r != DS_OK) {
-      System->Printf(MSG_FATAL_ERROR, "Error : Cannot Initialize "
+      System->Printf(CS_MSG_FATAL_ERROR, "Error : Cannot Initialize "
         "DirectSound3D (%s).\n", GetError(r));
       Close();
       return false;
@@ -84,7 +84,7 @@ bool csSoundRenderDS3D::Open()
     DWORD dwLevel = DSSCL_EXCLUSIVE;
     r = AudioRenderer->SetCooperativeLevel(GetForegroundWindow(), dwLevel);
     if (r != DS_OK) {
-      System->Printf(MSG_FATAL_ERROR, "Error : Cannot Set "
+      System->Printf(CS_MSG_FATAL_ERROR, "Error : Cannot Set "
         "Cooperative Level (%s).\n", GetError(r));
       Close();
       return false;
@@ -98,7 +98,7 @@ bool csSoundRenderDS3D::Open()
 
   float vol = Config->GetFloat("Sound.Volume",-1);
   if (vol>=0) SetVolume(vol);
-  System->Printf (MSG_INITIALIZATION, "  Volume: %g\n", GetVolume());
+  System->Printf (CS_MSG_INITIALIZATION, "  Volume: %g\n", GetVolume());
 
   cs_time et, ct;
   System->GetElapsedTime(et, ct);

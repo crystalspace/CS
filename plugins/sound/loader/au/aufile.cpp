@@ -35,10 +35,10 @@ CS_IMPLEMENT_PLUGIN
 class csSoundLoader_AU : public iSoundLoader
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csSoundLoader_AU(iBase *p) {
-    CONSTRUCT_IBASE(p);
+    SCF_CONSTRUCT_IBASE(p);
   }
   virtual bool Initialize(iSystem *) {
     return true;
@@ -46,17 +46,17 @@ public:
   virtual iSoundData *LoadSound(void *Buffer, unsigned long Size) const;
 };
 
-IMPLEMENT_IBASE(csSoundLoader_AU)
-  IMPLEMENTS_INTERFACE(iSoundLoader)
-  IMPLEMENTS_INTERFACE(iPlugIn)
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csSoundLoader_AU)
+  SCF_IMPLEMENTS_INTERFACE(iSoundLoader)
+  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+SCF_IMPLEMENT_IBASE_END;
 
-IMPLEMENT_FACTORY(csSoundLoader_AU);
+SCF_IMPLEMENT_FACTORY(csSoundLoader_AU);
 
-EXPORT_CLASS_TABLE (sndau)
-EXPORT_CLASS (csSoundLoader_AU,
+SCF_EXPORT_CLASS_TABLE (sndau)
+SCF_EXPORT_CLASS (csSoundLoader_AU,
   "crystalspace.sound.loader.au", "AU Sound Loader")
-EXPORT_CLASS_TABLE_END;
+SCF_EXPORT_CLASS_TABLE_END;
 
 #define BIT16 0x03
 #define BIT8 0x02

@@ -70,7 +70,7 @@ protected:
   void DrawCursor ();
   
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /** Constructor initializes System member.. LocalFontServer and
    *  texture_cache are initialized in Open() */

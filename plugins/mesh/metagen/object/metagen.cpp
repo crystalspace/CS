@@ -40,19 +40,19 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csMetaGen)
-  IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iMetaGen)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csMetaGen)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMetaGen)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csMetaGen::MetaGen)
-  IMPLEMENTS_INTERFACE (iMetaGen)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMetaGen::MetaGen)
+  SCF_IMPLEMENTS_INTERFACE (iMetaGen)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csMetaGen::csMetaGen (iBase* parent)
 {
-  CONSTRUCT_IBASE (parent);
-  CONSTRUCT_EMBEDDED_IBASE(scfiMetaGen);
+  SCF_CONSTRUCT_IBASE (parent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiMetaGen);
 
   XStart = YStart = ZStart = 0.0;
   XFin = YFin = ZFin = 0.0;
@@ -710,21 +710,21 @@ csTriangle* csMetaGen::GetTriangles()
 #endif
 //========================================= csMetGenType
 
-IMPLEMENT_IBASE (csMetaGenType)
-  IMPLEMENTS_INTERFACE (iMeshObjectType)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csMetaGenType)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csMetaGenType)
+SCF_IMPLEMENT_FACTORY (csMetaGenType)
 
-EXPORT_CLASS_TABLE (metagen)
-  EXPORT_CLASS (csMetaGenType, "crystalspace.mesh.factory.metagen",
+SCF_EXPORT_CLASS_TABLE (metagen)
+  SCF_EXPORT_CLASS (csMetaGenType, "crystalspace.mesh.factory.metagen",
     "The Crystal Space Meta Surface Generator")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csMetaGenType::csMetaGenType( iBase *par )
 {
-  CONSTRUCT_IBASE (par);
+  SCF_CONSTRUCT_IBASE (par);
 }
 
 csMetaGenType::~csMetaGenType()
@@ -739,7 +739,7 @@ bool csMetaGenType::Initialize( iSystem* )
 iMeshObjectFactory* csMetaGenType::NewFactory()
 {
   csMetaGen* cm = new csMetaGen(this);
-  iMeshObjectFactory* ifact = QUERY_INTERFACE(cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE(cm, iMeshObjectFactory);
   ifact->DecRef();
   return ifact;
 }

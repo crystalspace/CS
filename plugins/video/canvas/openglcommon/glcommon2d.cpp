@@ -25,16 +25,16 @@
 #include "isys/system.h"
 #include "qint.h"
 
-IMPLEMENT_IBASE (csGraphics2DGLCommon)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics2D)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics2DGLCommon)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_END
 
 csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
   csGraphics2D (),
   FontCache (NULL)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   EventOutlet = NULL;
 }
 
@@ -79,10 +79,10 @@ bool csGraphics2DGLCommon::Open (const char *Title)
   const char *renderer = (const char *)glGetString (GL_RENDERER);
   const char *version = (const char *)glGetString (GL_VERSION);
   if (renderer || version)
-  CsPrintf (MSG_INITIALIZATION, "OpenGL renderer: %s version %s\n",
+  CsPrintf (CS_MSG_INITIALIZATION, "OpenGL renderer: %s version %s\n",
     renderer ? renderer : "unknown", version ? version : "unknown");
 
-  CsPrintf (MSG_INITIALIZATION, "Using %s mode at resolution %dx%d.\n",
+  CsPrintf (CS_MSG_INITIALIZATION, "Using %s mode at resolution %dx%d.\n",
 	     FullScreen ? "full screen" : "windowed", Width, Height);
 
   glClearColor (0., 0., 0., 0.);

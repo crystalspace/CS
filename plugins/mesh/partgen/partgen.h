@@ -216,7 +216,7 @@ public:
   virtual void Update (cs_time elapsed_time);
 
   //------------------------ iMeshObject implementation ------------------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return factory; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
@@ -267,7 +267,7 @@ public:
   //------------------------- iParticleState implementation ----------------
   class ParticleState : public iParticleState
   {
-    DECLARE_EMBEDDED_IBASE (csParticleSystem);
+    SCF_DECLARE_EMBEDDED_IBASE (csParticleSystem);
     virtual void SetMaterialWrapper (iMaterialWrapper* material)
     {
       scfParent->initialized = false;

@@ -29,7 +29,7 @@ class csScreenShot : public iImage
   csRGBpixel *Palette;
   int Width, Height;
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   /// Initialize the screenshot object
   csScreenShot (iGraphics2D *G2D);
   /// Destroy the screenshot object

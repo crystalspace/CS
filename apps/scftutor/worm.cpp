@@ -14,7 +14,7 @@ class csWorm : public iWorm
   int length;
   int number;
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csWorm (iBase *iParent);
   virtual ~csWorm ();
@@ -29,15 +29,15 @@ public:
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csWorm)
-  IMPLEMENTS_INTERFACE (iWorm)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csWorm)
+  SCF_IMPLEMENTS_INTERFACE (iWorm)
+SCF_IMPLEMENT_IBASE_END
 
 static int worm_count = 1;
 
 csWorm::csWorm (iBase *iParent)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   length = 50 + (rand () % 50);
   number = worm_count++;
 }
@@ -72,8 +72,8 @@ iWorm *csWorm::Split (int iLen1, int iLen2)
 
 // ... and now export all classes
 
-IMPLEMENT_FACTORY (csWorm)
+SCF_IMPLEMENT_FACTORY (csWorm)
 
-EXPORT_CLASS_TABLE (worm)
-  EXPORT_CLASS (csWorm, "test.worm", "A Worm that crawls")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE (worm)
+  SCF_EXPORT_CLASS (csWorm, "test.worm", "A Worm that crawls")
+SCF_EXPORT_CLASS_TABLE_END

@@ -80,7 +80,7 @@ public:
   // The display context
   static Display* dpy;
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csGraphics2DLineXLib (iBase *iParent);
   virtual ~csGraphics2DLineXLib ();
@@ -153,11 +153,11 @@ class csLineX2DFontServer : public iFontServer
     virtual bool RemoveDeleteCallback (DeleteNotify, void *)
     { return true; }
     void Load ();
-    DECLARE_IBASE;
+    SCF_DECLARE_IBASE;
   } font;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csLineX2DFontServer (iBase *iParent);
   virtual ~csLineX2DFontServer () {}

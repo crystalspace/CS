@@ -70,7 +70,7 @@ protected:
   virtual void MessageReceived(BMessage*); // BHandler override.
 
 public:
-  DECLARE_IBASE_EXT(csSystemDriver);
+  SCF_DECLARE_IBASE_EXT(csSystemDriver);
 
   SysSystemDriver();
   ~SysSystemDriver();

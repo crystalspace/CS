@@ -178,7 +178,7 @@ class csSystemDriver : public iSystem
     // The system driver
     csSystemDriver *System;
   public:
-    DECLARE_IBASE;
+    SCF_DECLARE_IBASE;
 
     // Initialize the outlet
     csEventOutlet (iEventPlug *iPlug, csSystemDriver *iSys);
@@ -404,7 +404,7 @@ protected:
   virtual iConfigFile *OpenUserConfig(const char *ApplicationID, const char *Alias);
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /**************************** iSystem interface ****************************/
 

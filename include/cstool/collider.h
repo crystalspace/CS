@@ -102,7 +102,7 @@ public:
    */
   static csColliderWrapper* GetColliderWrapper (iObject* object);
 
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
 };
 
 #endif // __CS_COLLIDER_H__

@@ -138,7 +138,7 @@ class csMetaGen : public iMeshObjectFactory
   uint32 current_features;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csMetaGen (iBase *parent);
   virtual ~csMetaGen ();
@@ -264,7 +264,7 @@ public:
 ///-------------------- Meta Ball state implementation
   class MetaGen : public iMetaGen
   {
-    DECLARE_EMBEDDED_IBASE(csMetaGen);
+    SCF_DECLARE_EMBEDDED_IBASE(csMetaGen);
 
     virtual int GenerateLinearSurface( int b )
       { return scfParent->GenerateLinearSurface(b); }
@@ -343,7 +343,7 @@ public:
   virtual ~csMetaGenType();
   virtual bool Initialize ( iSystem *sys );
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* NewFactory();
   virtual uint32 GetFeatures () const

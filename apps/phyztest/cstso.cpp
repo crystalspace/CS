@@ -31,7 +31,7 @@ csRigidSpaceTimeObj::csRigidSpaceTimeObj( iCollideSystem* cdsys, csMeshWrapper *
  // col = pcollide;
   sprt = psprt;
   rb = prb;
-  iPolygonMesh* mesh = QUERY_INTERFACE ( sprt->GetMeshObject(), iPolygonMesh);
+  iPolygonMesh* mesh = SCF_QUERY_INTERFACE ( sprt->GetMeshObject(), iPolygonMesh);
   col = new csColliderWrapper (*sprt, cdsys, mesh);
   mesh->DecRef ();
   what_type = ST_RIGID;
@@ -172,7 +172,7 @@ real csRigidSpaceTimeObj::collision_check()
         n = ((cd.b2-cd.a2)%(cd.c2-cd.b2)).Unit();
 
 
-	//  CsPrintf( MSG_DEBUG_1, "n %f, %f, %f\n", n.x, n.y, n.z );
+	//  CsPrintf( CS_MSG_DEBUG_1, "n %f, %f, %f\n", n.x, n.y, n.z );
         this_contact->n = n;
 
       // just one collision at a time here.

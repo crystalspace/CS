@@ -34,12 +34,12 @@
 #include <GL/gl.h>
 #endif
 
-IMPLEMENT_IBASE (csOpenGLProcSoftware)
-  IMPLEMENTS_INTERFACE (iGraphics3D)
-IMPLEMENT_IBASE_END;
-IMPLEMENT_IBASE (csOpenGLProcSoftware2D)
-  IMPLEMENTS_INTERFACE (iGraphics2D)
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE (csOpenGLProcSoftware)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
+SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE (csOpenGLProcSoftware2D)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_END;
 
 #define SysPrintf system->Printf
 
@@ -65,7 +65,7 @@ class dummyMaterial : public iMaterialHandle
 public:
   iTextureHandle* handle;
   dummyMaterial ();
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   virtual iTextureHandle* GetTexture ()
   { return handle; }
   virtual void GetFlatColor (csRGBpixel &oColor)
@@ -76,13 +76,13 @@ public:
   { }
 };
 
-IMPLEMENT_IBASE (dummyMaterial)
-  IMPLEMENTS_INTERFACE (iMaterialHandle)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (dummyMaterial)
+  SCF_IMPLEMENTS_INTERFACE (iMaterialHandle)
+SCF_IMPLEMENT_IBASE_END
 
 dummyMaterial::dummyMaterial ()
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 class TxtHandleVector : public csVector
@@ -120,7 +120,7 @@ iTextureHandle *TxtHandleVector::RegisterAndPrepare (iTextureHandle *ogl_txt)
 #ifdef CS_DEBUG
   if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC) 
   {
-    SysPrintf (MSG_STDOUT, "Big Error, attempting to register and prepare a procedural texture with the software Opengl texture vector\n");
+    SysPrintf (CS_MSG_STDOUT, "Big Error, attempting to register and prepare a procedural texture with the software Opengl texture vector\n");
   }
 #endif
   // image gets a DecRef() in the software texture manager if procedural texture
@@ -154,7 +154,7 @@ void TxtHandleVector::AddTextureHandles (iTextureHandle *soft,
 
 csOpenGLProcSoftware::csOpenGLProcSoftware (iBase * pParent)
 { 
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
   tex = NULL; 
   g3d = NULL; 
   parent_g3d = NULL;
@@ -255,21 +255,21 @@ bool csOpenGLProcSoftware::Prepare
   alone_mode = alone_hint;
 
   // Get an instance of the software procedural texture renderer
-  iGraphics3D *soft_proc_g3d = LOAD_PLUGIN (system, 
+  iGraphics3D *soft_proc_g3d = CS_LOAD_PLUGIN (system, 
     "crystalspace.graphics3d.software.offscreen", NULL, iGraphics3D);
   if (!soft_proc_g3d)
   {
-    SysPrintf (MSG_FATAL_ERROR, "Error creating offscreen software renderer\n");
+    SysPrintf (CS_MSG_FATAL_ERROR, "Error creating offscreen software renderer\n");
     return false;
   }
 
-  isoft_proc =(iSoftProcTexture*)QUERY_INTERFACE(soft_proc_g3d, 
+  isoft_proc =(iSoftProcTexture*)SCF_QUERY_INTERFACE(soft_proc_g3d, 
 						 iSoftProcTexture);
   isoft_proc->DecRef ();
 
   if (!isoft_proc)
   {
-    SysPrintf (MSG_FATAL_ERROR, "Error creating offscreen software renderer\n");
+    SysPrintf (CS_MSG_FATAL_ERROR, "Error creating offscreen software renderer\n");
     return false;
   }
   // temporarily assign parent_g3d as g3d so that the software 3d driver
@@ -310,7 +310,7 @@ bool csOpenGLProcSoftware::Prepare
     last->next_soft_tex = this;
   }
 
-  SysPrintf (MSG_STDOUT, "GL software procedural texture\n");
+  SysPrintf (CS_MSG_STDOUT, "GL software procedural texture\n");
   return true;
 }
 

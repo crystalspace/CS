@@ -32,27 +32,27 @@ CS_IMPLEMENT_PLUGIN
 
 #ifdef GLIDE3
 
-IMPLEMENT_FACTORY (csGraphics2DGlideX)
+SCF_IMPLEMENT_FACTORY (csGraphics2DGlideX)
 
-EXPORT_CLASS_TABLE (glidx2d3)
-  EXPORT_CLASS_DEP (csGraphics2DGlideX, "crystalspace.graphics2d.glide.x.3",
+SCF_EXPORT_CLASS_TABLE (glidx2d3)
+  SCF_EXPORT_CLASS_DEP (csGraphics2DGlideX, "crystalspace.graphics2d.glide.x.3",
     "Glide V3/X 2D graphics driver for Crystal Space", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 #else
 
-IMPLEMENT_FACTORY (csGraphics2DGlideX)
+SCF_IMPLEMENT_FACTORY (csGraphics2DGlideX)
 
-EXPORT_CLASS_TABLE (glidx2d2)
-  EXPORT_CLASS_DEP (csGraphics2DGlideX, "crystalspace.graphics2d.glide.x.2",
+SCF_EXPORT_CLASS_TABLE (glidx2d2)
+  SCF_EXPORT_CLASS_DEP (csGraphics2DGlideX, "crystalspace.graphics2d.glide.x.2",
     "Glide V2/X 2D graphics driver for Crystal Space", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 #endif
 
-IMPLEMENT_IBASE (csGraphics2DGlideX)
-  IMPLEMENTS_INTERFACE (iEventPlug)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics2DGlideX)
+  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+SCF_IMPLEMENT_IBASE_END
 
 csGraphics2DGlideX* thisPtr=NULL;
 
@@ -122,8 +122,8 @@ bool csGraphics2DGlideX::Initialize (iSystem *pSystem)
     pfmt.PixelBytes = 2;		// Truecolor mode
 	*/
 
-  CsPrintf (MSG_INITIALIZATION, "Video driver Glide/X version ");
-  CsPrintf (MSG_INITIALIZATION, "\n");
+  CsPrintf (CS_MSG_INITIALIZATION, "Video driver Glide/X version ");
+  CsPrintf (CS_MSG_INITIALIZATION, "\n");
  
   // Tell system driver to call us on every frame
   System->CallOnEvents (this, CSMASK_Nothing);
@@ -194,7 +194,7 @@ bool csGraphics2DGlideX::Open(const char *Title)
       if (do_shm && !XShmQueryExtension (dpy))
       {
         do_shm = false;
-        //CsPrintf (MSG_INITIALIZATION, "Shm extension not available on display!\n");
+        //CsPrintf (CS_MSG_INITIALIZATION, "Shm extension not available on display!\n");
         printf ("Shm extension not available on display!\n");
       }
       if (do_shm)

@@ -78,7 +78,7 @@ class csCrossBuild_Factory
   converter * filedata = new converter;
   if (filedata->ivcon (filename) == ERROR)
   {
-    Sys->Printf (MSG_CONSOLE, "There was an error reading the data!\n");
+    Sys->Printf (CS_MSG_CONSOLE, "There was an error reading the data!\n");
     delete filedata;
     return;
   }
@@ -197,7 +197,7 @@ class csCrossBuild_ThingTemplateFactory : public csCrossBuild_Factory
  csCrossBuild_Quake2Importer importer;
  iMeshObjectFactory *newtemplate =
    importer.ImportQuake2Pack(filename,'bob',engine);
- iSprite3DFactoryState* fstat = QUERY_INTERFACE (newtemplate, iSprite3DFactoryState);
+ iSprite3DFactoryState* fstat = SCF_QUERY_INTERFACE (newtemplate, iSprite3DFactoryState);
  fstate->SetMaterial(bobMaterial);
  iMeshObject* obj = newtemplate->NewInstance ();
 =================================================

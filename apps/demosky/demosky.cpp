@@ -44,8 +44,8 @@
 
 CS_IMPLEMENT_APPLICATION
 
-REGISTER_STATIC_LIBRARY (engine)
-REGISTER_STATIC_LIBRARY (lvlload)
+SCF_REGISTER_STATIC_LIBRARY (engine)
+SCF_REGISTER_STATIC_LIBRARY (lvlload)
 
 //-----------------------------------------------------------------------------
 
@@ -120,38 +120,38 @@ bool Simple::Initialize (int argc, const char* const argv[],
     return false;
 
   // Find the pointer to engine plugin
-  engine = QUERY_PLUGIN (this, iEngine);
+  engine = CS_QUERY_PLUGIN (this, iEngine);
   if (!engine)
   {
-    Printf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
 
-  LevelLoader = QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
+  LevelLoader = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
   if (!LevelLoader)
   {
-    Printf (MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
 
-  myG3D = QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
+  myG3D = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
   if (!myG3D)
   {
-    Printf (MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
     abort ();
   }
 
-  myG2D = QUERY_PLUGIN (this, iGraphics2D);
+  myG2D = CS_QUERY_PLUGIN (this, iGraphics2D);
   if (!myG2D)
   {
-    Printf (MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
     abort ();
   }
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("Crystal Space Procedural Sky Demo"))
   {
-    Printf (MSG_FATAL_ERROR, "Error opening system!\n");
+    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     exit (1);
   }
 
@@ -174,14 +174,14 @@ bool Simple::Initialize (int argc, const char* const argv[],
   font = myG2D->GetFontServer()->LoadFont(CSFONT_LARGE);
 
   // Some commercials...
-  Printf (MSG_INITIALIZATION, "Crystal Space Procedural Sky Demo.\n");
+  Printf (CS_MSG_INITIALIZATION, "Crystal Space Procedural Sky Demo.\n");
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
   engine->EnableLightingCache (false);
 
   // Create our world.
-  Printf (MSG_INITIALIZATION, "Creating world!...\n");
+  Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
 
   //LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   //csMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("stone");
@@ -203,7 +203,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
   room = engine->CreateSector ("room");
   iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
-  iThingState* walls_state = QUERY_INTERFACE (walls->GetMeshObject (),
+  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
   	iThingState);
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
@@ -271,12 +271,12 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
   LevelLoader->LoadTexture ("seagull", "/lib/std/seagull.gif");
   iMaterialWrapper *sg = engine->GetMaterialList ()->FindByName("seagull");
-  flock = new Flock(engine, 10, QUERY_INTERFACE(sg, iMaterialWrapper), 
-    QUERY_INTERFACE(room, iSector));
+  flock = new Flock(engine, 10, SCF_QUERY_INTERFACE(sg, iMaterialWrapper), 
+    SCF_QUERY_INTERFACE(room, iSector));
 
   engine->Prepare ();
 
-  Printf (MSG_INITIALIZATION, "--------------------------------------\n");
+  Printf (CS_MSG_INITIALIZATION, "--------------------------------------\n");
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by
@@ -371,7 +371,7 @@ Flock::Flock(iEngine *engine, int num, iMaterialWrapper *mat, iSector *sector)
   int i;
   iMeshFactoryWrapper *fact = engine->CreateMeshFactory(
     "crystalspace.mesh.object.sprite.2d", "BirdFactory");
-  iSprite2DFactoryState *state = QUERY_INTERFACE(fact->GetMeshObjectFactory(),
+  iSprite2DFactoryState *state = SCF_QUERY_INTERFACE(fact->GetMeshObjectFactory(),
     iSprite2DFactoryState);
   state->SetMaterialWrapper(mat);
   state->SetLighting(false);
@@ -396,7 +396,7 @@ Flock::Flock(iEngine *engine, int num, iMaterialWrapper *mat, iSector *sector)
     pos.z -= (float(rand()+1.)/float(RAND_MAX))*20. ;
     spr[i] = engine->CreateMeshObject(fact, "Bird", sector, pos);
 
-    iSprite2DState *sprstate = QUERY_INTERFACE(spr[i]->GetMeshObject(), 
+    iSprite2DState *sprstate = SCF_QUERY_INTERFACE(spr[i]->GetMeshObject(), 
       iSprite2DState);
     sprstate->GetVertices().SetLimit(4);
     sprstate->GetVertices().SetLength(4);
@@ -513,7 +513,7 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
   {
-    System->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
+    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
     exit (1);
   }
 

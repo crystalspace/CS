@@ -58,7 +58,7 @@ private:
   iLight **fakelights;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   ///
   csIsoGrid (iBase *iParent, iIsoWorld *world, int w, int h);

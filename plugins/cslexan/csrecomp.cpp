@@ -21,14 +21,14 @@
 #include "cssysdef.h"
 #include "cslex.h"
 
-IMPLEMENT_IBASE (csRegExpCompiler)
-  IMPLEMENTS_INTERFACE (iRegExpCompiler)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csRegExpCompiler)
+  SCF_IMPLEMENTS_INTERFACE (iRegExpCompiler)
+SCF_IMPLEMENT_IBASE_END
 
 csRegExpCompiler::csRegExpCompiler(iBase* p):
   paren_recursion_depth(0), paren_recursion_ended_at(0)
 {
-  CONSTRUCT_IBASE (p);
+  SCF_CONSTRUCT_IBASE (p);
 }
 
 bool 

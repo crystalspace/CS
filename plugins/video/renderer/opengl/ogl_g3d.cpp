@@ -55,16 +55,16 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csGraphics3DOpenGL)
-  EXPORT_CLASS_TABLE (gl3d)
-  EXPORT_CLASS_DEP (csGraphics3DOpenGL, "crystalspace.graphics3d.opengl",
+SCF_IMPLEMENT_FACTORY (csGraphics3DOpenGL)
+  SCF_EXPORT_CLASS_TABLE (gl3d)
+  SCF_EXPORT_CLASS_DEP (csGraphics3DOpenGL, "crystalspace.graphics3d.opengl",
     "OpenGL 3D graphics driver for Crystal Space", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csGraphics3DOpenGL)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics3D)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics3DOpenGL)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
+SCF_IMPLEMENT_IBASE_END
 
 /*=========================================================================
  Method implementations
@@ -73,7 +73,7 @@ IMPLEMENT_IBASE_END
 csGraphics3DOpenGL::csGraphics3DOpenGL (iBase *iParent) :
   csGraphics3DOGLCommon ()
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
 }
 
 csGraphics3DOpenGL::~csGraphics3DOpenGL ()

@@ -110,7 +110,7 @@ class awsManager : public iAws
    csDLinkList component_factories;
 
 public:
-    DECLARE_IBASE;
+    SCF_DECLARE_IBASE;
 
     awsManager(iBase *p);
     virtual ~awsManager();
@@ -169,7 +169,7 @@ public:
   // Implement iPlugIn interface.
   struct eiPlugIn : public iPlugIn
   {
-    DECLARE_EMBEDDED_IBASE(awsManager);
+    SCF_DECLARE_EMBEDDED_IBASE(awsManager);
     virtual bool Initialize(iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent(iEvent&)   { return false; }
   } scfiPlugIn;

@@ -24,13 +24,13 @@
 #include <unistd.h>
 
 #define SNAP ((float)(3L<<18))
-IMPLEMENT_IBASE (csGlideHalo)
-  IMPLEMENTS_INTERFACE(iHalo)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGlideHalo)
+  SCF_IMPLEMENTS_INTERFACE(iHalo)
+SCF_IMPLEMENT_IBASE_END
 
 csGlideHalo::csGlideHalo (float iR, float iG, float iB, int iWidth, int iHeight, csGraphics3DGlide *iG3D, csGlideAlphaMap *am){
 
-  CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_IBASE(NULL);
 
   R = int( iR * 255.);
   G = int( iG * 255.);

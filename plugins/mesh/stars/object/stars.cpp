@@ -33,19 +33,19 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csStarsMeshObject)
-  IMPLEMENTS_INTERFACE (iMeshObject)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iStarsState)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csStarsMeshObject)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iStarsState)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csStarsMeshObject::StarsState)
-  IMPLEMENTS_INTERFACE (iStarsState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csStarsMeshObject::StarsState)
+  SCF_IMPLEMENTS_INTERFACE (iStarsState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csStarsMeshObject::csStarsMeshObject (iMeshObjectFactory* factory)
 {
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiStarsState);
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiStarsState);
   csStarsMeshObject::factory = factory;
   initialized = false;
   box.Set (csVector3 (-10, -10, -10), csVector3 (10, 10, 10));
@@ -131,13 +131,13 @@ void csStarsMeshObject::GetObjectBoundingBox (csBox3& b, int /*type*/)
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csStarsMeshObjectFactory)
-  IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csStarsMeshObjectFactory)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
+SCF_IMPLEMENT_IBASE_END
 
 csStarsMeshObjectFactory::csStarsMeshObjectFactory (iBase *pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csStarsMeshObjectFactory::~csStarsMeshObjectFactory ()
@@ -147,28 +147,28 @@ csStarsMeshObjectFactory::~csStarsMeshObjectFactory ()
 iMeshObject* csStarsMeshObjectFactory::NewInstance ()
 {
   csStarsMeshObject* cm = new csStarsMeshObject ((iMeshObjectFactory*)this);
-  iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
+  iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
 }
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csStarsMeshObjectType)
-  IMPLEMENTS_INTERFACE (iMeshObjectType)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csStarsMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csStarsMeshObjectType)
+SCF_IMPLEMENT_FACTORY (csStarsMeshObjectType)
 
-EXPORT_CLASS_TABLE (stars)
-  EXPORT_CLASS (csStarsMeshObjectType, "crystalspace.mesh.object.stars",
+SCF_EXPORT_CLASS_TABLE (stars)
+  SCF_EXPORT_CLASS (csStarsMeshObjectType, "crystalspace.mesh.object.stars",
     "Crystal Space Stars Mesh Type")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csStarsMeshObjectType::csStarsMeshObjectType (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csStarsMeshObjectType::~csStarsMeshObjectType ()
@@ -183,7 +183,7 @@ bool csStarsMeshObjectType::Initialize (iSystem*)
 iMeshObjectFactory* csStarsMeshObjectType::NewFactory ()
 {
   csStarsMeshObjectFactory* cm = new csStarsMeshObjectFactory (this);
-  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;
 }

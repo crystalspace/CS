@@ -425,7 +425,7 @@ int main (int argc, char *argv[])
   sys.RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
   if (!sys.Initialize (argc, argv, NULL))
   {
-    sys.Printf (MSG_FATAL_ERROR, "Error initializing system !");
+    sys.Printf (CS_MSG_FATAL_ERROR, "Error initializing system !");
     return -1;
   }
 
@@ -521,7 +521,7 @@ int main (int argc, char *argv[])
   if (optind >= argc)
     return display_help ();
 
-  ImageLoader = QUERY_PLUGIN (&sys, iImageIO);
+  ImageLoader = CS_QUERY_PLUGIN (&sys, iImageIO);
   if (!ImageLoader)
   {
     printf("could not load image loader");

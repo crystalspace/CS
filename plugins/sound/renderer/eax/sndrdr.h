@@ -36,7 +36,7 @@ struct iConfigFile;
 class csSoundRenderEAX : public iSoundRender
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csSoundRenderEAX(iBase *piBase);
   virtual ~csSoundRenderEAX();
   virtual bool Initialize (iSystem *iSys);

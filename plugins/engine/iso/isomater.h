@@ -86,7 +86,7 @@ public:
   /// Set reflection of the material
   inline void SetReflection (float val) { reflection = val; }
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   //--------------------- iMaterial implementation ---------------------
 
@@ -168,12 +168,12 @@ public:
   /// Set the material index
   void SetIndex(int i) {index = i;}
 
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
 
   //------------------- iMaterialWrapper implementation -----------------------
   struct MaterialWrapper : public iMaterialWrapper
   {
-    DECLARE_EMBEDDED_IBASE (csIsoMaterialWrapper);
+    SCF_DECLARE_EMBEDDED_IBASE (csIsoMaterialWrapper);
     //// @@@ cast is wrong! It is an csIsoMaterialWrapper
     virtual csMaterialWrapper* GetPrivateObject ()
     {
@@ -206,7 +206,7 @@ public:
   //------------------- iIsoMaterialWrapperIndex implementation ------------
   struct IsoMaterialWrapperIndex : public iIsoMaterialWrapperIndex
   {
-    DECLARE_EMBEDDED_IBASE (csIsoMaterialWrapper);
+    SCF_DECLARE_EMBEDDED_IBASE (csIsoMaterialWrapper);
     virtual int GetIndex() const {return scfParent->GetIndex();}
     virtual void SetIndex(int i) {scfParent->SetIndex(i);}
   } scfiIsoMaterialWrapperIndex;
@@ -247,12 +247,12 @@ public:
   /// remove 'index' from the list. Does not decref/delete.
   void RemoveIndex(int i);
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   //------------------- iMaterialList implementation -----------------------
   struct MaterialList : public iMaterialList
   {
-    DECLARE_EMBEDDED_IBASE (csIsoMaterialList);
+    SCF_DECLARE_EMBEDDED_IBASE (csIsoMaterialList);
     virtual iMaterialWrapper* NewMaterial (iMaterial* material)
     {
       csIsoMaterialWrapper* mw = scfParent->NewMaterial (material);

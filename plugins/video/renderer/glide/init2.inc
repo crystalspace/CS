@@ -42,7 +42,7 @@
   char szVersion[80];
   GlideLib_grGlideGetVersion(szVersion);
 
-  SysPrintf (MSG_INITIALIZATION, " Glide %s detected.\n",szVersion);
+  SysPrintf (CS_MSG_INITIALIZATION, " Glide %s detected.\n",szVersion);
 
   int i;
   board=0;
@@ -130,7 +130,7 @@
         }
     }
 
-  SysPrintf (MSG_INITIALIZATION, " Board %d selected.\n",board);
+  SysPrintf (CS_MSG_INITIALIZATION, " Board %d selected.\n",board);
 
 /**
 * This Function gets information from the Current Board selected.
@@ -146,18 +146,18 @@
 #ifndef GLIDE24_ONLY
   case GR_SSTTYPE_Voodoo2:
     {
-          SysPrintf (MSG_INITIALIZATION, " Board is a Voodoo2.\n");
-          SysPrintf (MSG_INITIALIZATION, "  Pixelfx Revision %d.\n",hwconfig.SSTs[board].sstBoard.Voodoo2Config.fbiRev);
-          SysPrintf (MSG_INITIALIZATION, "  Pixelfx Memory : %d MB.\n",hwconfig.SSTs[board].sstBoard.Voodoo2Config.fbRam);
-          SysPrintf (MSG_INITIALIZATION, "  Number of Texelfx Chips %d.\n",hwconfig.SSTs[board].sstBoard.Voodoo2Config.nTexelfx);
+          SysPrintf (CS_MSG_INITIALIZATION, " Board is a Voodoo2.\n");
+          SysPrintf (CS_MSG_INITIALIZATION, "  Pixelfx Revision %d.\n",hwconfig.SSTs[board].sstBoard.Voodoo2Config.fbiRev);
+          SysPrintf (CS_MSG_INITIALIZATION, "  Pixelfx Memory : %d MB.\n",hwconfig.SSTs[board].sstBoard.Voodoo2Config.fbRam);
+          SysPrintf (CS_MSG_INITIALIZATION, "  Number of Texelfx Chips %d.\n",hwconfig.SSTs[board].sstBoard.Voodoo2Config.nTexelfx);
           for(i=0;i<hwconfig.SSTs[board].sstBoard.Voodoo2Config.nTexelfx;i++)
           {
-            SysPrintf (MSG_INITIALIZATION, "   Texelfx nb %d has revision %d and %d MB of RAM.\n",i+1,
+            SysPrintf (CS_MSG_INITIALIZATION, "   Texelfx nb %d has revision %d and %d MB of RAM.\n",i+1,
                         hwconfig.SSTs[board].sstBoard.Voodoo2Config.tmuConfig[i].tmuRev,
                         hwconfig.SSTs[board].sstBoard.Voodoo2Config.tmuConfig[i].tmuRam);
           }
           if (hwconfig.SSTs[board].sstBoard.Voodoo2Config.sliDetect)
-            SysPrintf (MSG_INITIALIZATION, " SLI Detected.\n");
+            SysPrintf (CS_MSG_INITIALIZATION, " SLI Detected.\n");
 
           if (hwconfig.SSTs[board].sstBoard.Voodoo2Config.nTexelfx==1)
           {
@@ -176,18 +176,18 @@
 
   case GR_SSTTYPE_VOODOO:
     {
-      SysPrintf (MSG_INITIALIZATION, " Board is a Voodoo Graphics.\n");
-      SysPrintf (MSG_INITIALIZATION, "  Pixelfx Revision %d.\n",hwconfig.SSTs[board].sstBoard.VoodooConfig.fbiRev);
-      SysPrintf (MSG_INITIALIZATION, "  Pixelfx Memory : %d MB.\n",hwconfig.SSTs[board].sstBoard.VoodooConfig.fbRam);
-      SysPrintf (MSG_INITIALIZATION, "  Number of Texelfx Chips %d.\n",hwconfig.SSTs[board].sstBoard.VoodooConfig.nTexelfx);
+      SysPrintf (CS_MSG_INITIALIZATION, " Board is a Voodoo Graphics.\n");
+      SysPrintf (CS_MSG_INITIALIZATION, "  Pixelfx Revision %d.\n",hwconfig.SSTs[board].sstBoard.VoodooConfig.fbiRev);
+      SysPrintf (CS_MSG_INITIALIZATION, "  Pixelfx Memory : %d MB.\n",hwconfig.SSTs[board].sstBoard.VoodooConfig.fbRam);
+      SysPrintf (CS_MSG_INITIALIZATION, "  Number of Texelfx Chips %d.\n",hwconfig.SSTs[board].sstBoard.VoodooConfig.nTexelfx);
       for(i=0;i<hwconfig.SSTs[board].sstBoard.VoodooConfig.nTexelfx;i++)
         {
-          SysPrintf (MSG_INITIALIZATION, "   Texelfx nb %d has revision %d and %d MB of RAM.\n",i+1,
+          SysPrintf (CS_MSG_INITIALIZATION, "   Texelfx nb %d has revision %d and %d MB of RAM.\n",i+1,
                      hwconfig.SSTs[board].sstBoard.VoodooConfig.tmuConfig[i].tmuRev,
                      hwconfig.SSTs[board].sstBoard.VoodooConfig.tmuConfig[i].tmuRam);
         }
       if (hwconfig.SSTs[board].sstBoard.VoodooConfig.sliDetect)
-        SysPrintf (MSG_INITIALIZATION, " SLI Detected.\n");
+        SysPrintf (CS_MSG_INITIALIZATION, " SLI Detected.\n");
 
       if (hwconfig.SSTs[board].sstBoard.VoodooConfig.nTexelfx==1)
         {
@@ -205,10 +205,10 @@
 
   case GR_SSTTYPE_SST96:
     {
-      SysPrintf (MSG_INITIALIZATION, " Board is a Rush.\n");
-      SysPrintf (MSG_INITIALIZATION, "  Pixelfx Memory : %d MB.\n",hwconfig.SSTs[board].sstBoard.SST96Config.fbRam);
-      SysPrintf (MSG_INITIALIZATION, "  Number of Texelfx Chips %d.\n",hwconfig.SSTs[board].sstBoard.SST96Config.nTexelfx);
-      SysPrintf (MSG_INITIALIZATION, "   Texelfx nb %d has revision %d and %d MB of RAM.\n",1,
+      SysPrintf (CS_MSG_INITIALIZATION, " Board is a Rush.\n");
+      SysPrintf (CS_MSG_INITIALIZATION, "  Pixelfx Memory : %d MB.\n",hwconfig.SSTs[board].sstBoard.SST96Config.fbRam);
+      SysPrintf (CS_MSG_INITIALIZATION, "  Number of Texelfx Chips %d.\n",hwconfig.SSTs[board].sstBoard.SST96Config.nTexelfx);
+      SysPrintf (CS_MSG_INITIALIZATION, "   Texelfx nb %d has revision %d and %d MB of RAM.\n",1,
                  hwconfig.SSTs[board].sstBoard.SST96Config.tmuConfig.tmuRev,
                  hwconfig.SSTs[board].sstBoard.SST96Config.tmuConfig.tmuRam);
       m_iMultiPass=true;
@@ -218,8 +218,8 @@
 
   case GR_SSTTYPE_AT3D:
     {
-      SysPrintf (MSG_INITIALIZATION, " Board is an AT3D.\n");
-      SysPrintf (MSG_INITIALIZATION, "  Chipset Revision %d.\n",hwconfig.SSTs[board].sstBoard.AT3DConfig.rev);
+      SysPrintf (CS_MSG_INITIALIZATION, " Board is an AT3D.\n");
+      SysPrintf (CS_MSG_INITIALIZATION, "  Chipset Revision %d.\n",hwconfig.SSTs[board].sstBoard.AT3DConfig.rev);
       m_iMultiPass=true;
       iTMUTexture=1;
       iTMULightMap=0;
@@ -227,7 +227,7 @@
 
   default:
     {
-      SysPrintf (MSG_INITIALIZATION, " Board is of an unknown type.(%x)\n",hwconfig.SSTs[board].type);
+      SysPrintf (CS_MSG_INITIALIZATION, " Board is of an unknown type.(%x)\n",hwconfig.SSTs[board].type);
       m_iMultiPass=true;
       iTMUTexture=1;
       iTMULightMap=0;
@@ -235,18 +235,18 @@
   }
   if(config->GetBool("Video.Glide.ForceMultipass",false)&& m_iMultiPass==false)
     {
-      SysPrintf (MSG_INITIALIZATION, " MultiPass Rendering enable by user.\n");
+      SysPrintf (CS_MSG_INITIALIZATION, " MultiPass Rendering enable by user.\n");
       m_iMultiPass=true;
     }
 
   if(m_iMultiPass)
     {
-      SysPrintf (MSG_INITIALIZATION, " Will use MultiPass Rendering.\n");
+      SysPrintf (CS_MSG_INITIALIZATION, " Will use MultiPass Rendering.\n");
     }
   else
     {
-      SysPrintf (MSG_INITIALIZATION, " Will use SinglePass Rendering.\n");
-      SysPrintf (MSG_INITIALIZATION, " Affected %d TMU for Texture and %d for LightMap.\n",iTMUTexture,iTMULightMap);
+      SysPrintf (CS_MSG_INITIALIZATION, " Will use SinglePass Rendering.\n");
+      SysPrintf (CS_MSG_INITIALIZATION, " Affected %d TMU for Texture and %d for LightMap.\n",iTMUTexture,iTMULightMap);
     }
   m_TMUs = new TMUInfo[2];
 

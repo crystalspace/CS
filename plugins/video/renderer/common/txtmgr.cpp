@@ -31,13 +31,13 @@
 
 //---------------------------------------------------------- csTextureHandle -----//
 
-IMPLEMENT_IBASE (csTextureHandle)
-  IMPLEMENTS_INTERFACE (iTextureHandle)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csTextureHandle)
+  SCF_IMPLEMENTS_INTERFACE (iTextureHandle)
+SCF_IMPLEMENT_IBASE_END
 
 csTextureHandle::csTextureHandle (iImage* Image, int Flags)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
 
   (image = Image)->IncRef ();
   flags = Flags;
@@ -167,13 +167,13 @@ void csTextureHandle::AdjustSizePo2 ()
 
 //----------------------------------------------------- csMaterialHandle -----//
 
-IMPLEMENT_IBASE (csMaterialHandle)
-  IMPLEMENTS_INTERFACE (iMaterialHandle)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csMaterialHandle)
+  SCF_IMPLEMENTS_INTERFACE (iMaterialHandle)
+SCF_IMPLEMENT_IBASE_END
 
 csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   num_texture_layers = 0;
   if ((material = m) != 0)
   {
@@ -200,7 +200,7 @@ csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
 
 csMaterialHandle::csMaterialHandle (iTextureHandle* t, csTextureManager *parent)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   material = NULL;
   num_texture_layers = 0;
   diffuse = 0.7; ambient = 0; reflection = 0;
@@ -220,7 +220,7 @@ void csMaterialHandle::FreeMaterial ()
 {
   if (material)
   {
-    DEC_REF (texture);
+    SCF_DEC_REF (texture);
     material->DecRef ();
     material = NULL;
   }
@@ -250,14 +250,14 @@ void csTexture::compute_masks ()
 
 //----------------------------------------------------- csTextureManager -----//
 
-IMPLEMENT_IBASE (csTextureManager)
-  IMPLEMENTS_INTERFACE (iTextureManager)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csTextureManager)
+  SCF_IMPLEMENTS_INTERFACE (iTextureManager)
+SCF_IMPLEMENT_IBASE_END
 
 csTextureManager::csTextureManager (iSystem* iSys, iGraphics2D *iG2D)
   : textures (16, 16), materials (16, 16)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   System = iSys;
   verbose = false;
 

@@ -106,12 +106,12 @@ public:
   
   virtual int CollisionDetect (csTransform *p);
 
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
 
   //------------------- iTerrainWrapper implementation ------------------//
   struct TerrainWrapper : public iTerrainWrapper
   {
-    DECLARE_EMBEDDED_IBASE (csTerrainWrapper);
+    SCF_DECLARE_EMBEDDED_IBASE (csTerrainWrapper);
     virtual csTerrainWrapper* GetPrivateObject ()
     {
       return (csTerrainWrapper*)scfParent;
@@ -173,12 +173,12 @@ public:
    */
   csTerrainWrapper* NewTerrainObject( iEngine *pEng );
 
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
 
   //------------------ iTerrainFactoryWrapper implementation -----------------//
   struct TerrainFactoryWrapper : public iTerrainFactoryWrapper
   {
-    DECLARE_EMBEDDED_IBASE (csTerrainFactoryWrapper);
+    SCF_DECLARE_EMBEDDED_IBASE (csTerrainFactoryWrapper);
     virtual iTerrainObjectFactory* GetTerrainObjectFactory ()
     {
       return scfParent->GetTerrainObjectFactory ();

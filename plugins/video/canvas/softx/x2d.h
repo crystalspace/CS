@@ -99,7 +99,7 @@ class csGraphics2DXLib : public csGraphics2D, public iEventPlug
   iEventOutlet *EventOutlet;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csGraphics2DXLib (iBase *iParent);
   virtual ~csGraphics2DXLib ();

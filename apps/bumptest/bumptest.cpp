@@ -58,8 +58,8 @@
 
 CS_IMPLEMENT_APPLICATION
 
-REGISTER_STATIC_LIBRARY (engine)
-REGISTER_STATIC_LIBRARY (lvlload)
+SCF_REGISTER_STATIC_LIBRARY (engine)
+SCF_REGISTER_STATIC_LIBRARY (lvlload)
 
 //-----------------------------------------------------------------------------
 
@@ -103,8 +103,8 @@ bool BumpTest::InitProcDemo ()
     CS_TEXTURE_2D| CS_TEXTURE_3D);
   iMaterialWrapper* ibp = engine->CreateMaterial("bumptexture", bptex);
   engine->Prepare ();
-  //iImageIO *imgloader = QUERY_PLUGIN(System, iImageIO);
-  //iVFS *VFS = QUERY_PLUGIN(System, iVFS);
+  //iImageIO *imgloader = CS_QUERY_PLUGIN(System, iImageIO);
+  //iVFS *VFS = CS_QUERY_PLUGIN(System, iVFS);
   //iDataBuffer *buf = VFS->ReadFile (vfsfilename);
   //iImage *map = imgloader->Load(buf->GetUint8 (), buf->GetSize (),
       //txtmgr->GetTextureFormat ());
@@ -119,12 +119,12 @@ bool BumpTest::InitProcDemo ()
   prBump->PrepareAnim ();
   iMeshObjectType* thing_type = engine->GetThingType ();
   iMeshObjectFactory* thing_fact = thing_type->NewFactory ();
-  iMeshObject* thing_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
+  iMeshObject* thing_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
 
 
-  iMaterialWrapper* imatBump = QUERY_INTERFACE (matBump, iMaterialWrapper);
-  iThingState* thing_state = QUERY_INTERFACE (thing_obj, iThingState);
+  iMaterialWrapper* imatBump = SCF_QUERY_INTERFACE (matBump, iMaterialWrapper);
+  iThingState* thing_state = SCF_QUERY_INTERFACE (thing_obj, iThingState);
   float dx = 1, dy = 1, dz = 1;
   iPolygon3D* p;
 
@@ -238,7 +238,7 @@ bool BumpTest::InitProcDemo ()
   */
 
 #if 0
-  iSector* iroom = QUERY_INTERFACE (room, iSector);
+  iSector* iroom = SCF_QUERY_INTERFACE (room, iSector);
 #endif
   iMeshWrapper* thing_wrap = engine->CreateMeshObject ("Bumpy");
   thing_obj->DecRef ();
@@ -249,7 +249,7 @@ bool BumpTest::InitProcDemo ()
   thing_wrap->GetMovable ()->UpdateMove ();
   thing_state->DecRef ();
 
-  iLightingInfo* linfo = QUERY_INTERFACE (thing_obj, iLightingInfo);
+  iLightingInfo* linfo = SCF_QUERY_INTERFACE (thing_obj, iLightingInfo);
   linfo->InitializeDefault ();
   room->ShineLights (thing_wrap);
   linfo->PrepareLighting ();
@@ -258,7 +258,7 @@ bool BumpTest::InitProcDemo ()
 #if 0
   iMeshFactoryWrapper* sprfact = engine->CreateMeshFactory (
     "crystalspace.mesh.object.sprite.3d", "sprite3d");
-  iSprite3DFactoryState* sprfactstate = QUERY_INTERFACE(
+  iSprite3DFactoryState* sprfactstate = SCF_QUERY_INTERFACE(
     sprfact->GetMeshObjectFactory(), iSprite3DFactoryState);
   sprfactstate->SetMaterialWrapper(imatBump);
   iSpriteAction *a0 = sprfactstate->AddAction();
@@ -280,7 +280,7 @@ bool BumpTest::InitProcDemo ()
   iMeshWrapper* sprite = engine->CreateMeshObject(sprfact, "bumpspr",
     iroom, csVector3(0, 5, 1) );
   sprite->GetMovable ()->UpdateMove ();
-  iSprite3DState* spstate = QUERY_INTERFACE (sprite->GetMeshObject (), 
+  iSprite3DState* spstate = SCF_QUERY_INTERFACE (sprite->GetMeshObject (), 
     iSprite3DState);
 
   //sprite->GetFlags().Set(CS_ENTITY_NOLIGHTING, CS_ENTITY_NOLIGHTING);
@@ -313,31 +313,31 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
     return false;
 
   // Find the pointer to engine plugin
-  engine = QUERY_PLUGIN (this, iEngine);
+  engine = CS_QUERY_PLUGIN (this, iEngine);
   if (!engine)
   {
-    Printf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
 
-  LevelLoader = QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
+  LevelLoader = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
   if (!LevelLoader)
   {
-    Printf (MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
 
-  myG3D = QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
+  myG3D = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
   if (!myG3D)
   {
-    Printf (MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
     abort ();
   }
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("BumpTest Crystal Space Application"))
   {
-    Printf (MSG_FATAL_ERROR, "Error opening system!\n");
+    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     cleanup ();
     exit (1);
   }
@@ -359,7 +359,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   txtmgr->SetPalette ();
 
   // Some commercials...
-  Printf (MSG_INITIALIZATION,
+  Printf (CS_MSG_INITIALIZATION,
     "BumpTest Crystal Space Application version 0.1.\n");
 
   // First disable the lighting cache. Our app is simple enough
@@ -367,7 +367,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   engine->EnableLightingCache (false);
 
   // Create our world.
-  Printf (MSG_INITIALIZATION, "Creating world!...\n");
+  Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
 
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   LevelLoader->LoadTexture ("wood", "/lib/std/andrew_wood.gif");
@@ -376,7 +376,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   room = engine->CreateSector ("room");
   iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
   iPolygon3D* p;
-  iThingState* walls_state = QUERY_INTERFACE (walls->GetMeshObject (),
+  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
   	iThingState);
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
@@ -441,7 +441,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   light = new csStatLight (-3, 5, -2, 10, 1, 1, 1, false); // white
   light->SetHalo (new csCrossHalo (1.0, 0.7));  // intensity, crossfactor
   room->AddLight (light);
-  bumplight = QUERY_INTERFACE(light, iLight);
+  bumplight = SCF_QUERY_INTERFACE(light, iLight);
   //light = new csStatLight (3, 5, 0, 10, 0, 0, 1, false);
   //light = new csStatLight (0, 5, -3, 10, 0, 1, 0, false);
   */
@@ -459,7 +459,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   dynlight->Setup ();
   bumplight = dynlight->QueryLight ();
 
-  Printf (MSG_INITIALIZATION, "--------------------------------------\n");
+  Printf (CS_MSG_INITIALIZATION, "--------------------------------------\n");
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by
@@ -573,7 +573,7 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, "/config/csbumptest.cfg"))
   {
-    System->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
+    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
     cleanup ();
     exit (1);
   }

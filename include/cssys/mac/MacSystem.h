@@ -49,7 +49,7 @@ public:
 
 	OSErr		HandleAppleEvent( const AppleEvent *theEvent );
 
-	DECLARE_IBASE_EXT (csSystemDriver);
+	SCF_DECLARE_IBASE_EXT (csSystemDriver);
 
 	//------------------------- iEventPlug interface ---------------------------//
 

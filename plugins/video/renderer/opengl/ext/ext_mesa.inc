@@ -29,7 +29,7 @@ static char const* const knownExtensions[] =
 
 void csGraphics3DOGLCommon::DetectExtensions()
 {
-  SysPrintf (MSG_INITIALIZATION, "Detecting Mesa Driver extensions...\n");
+  SysPrintf (CS_MSG_INITIALIZATION, "Detecting Mesa Driver extensions...\n");
   const unsigned char* extensions = glGetString(GL_EXTENSIONS);
   if (!extensions)
     return;	//No luck, no extensions on this machine.
@@ -47,7 +47,7 @@ void csGraphics3DOGLCommon::DetectExtensions()
       if (*(searchresult + strlen(knownExtensions[i])) == ' ' ||
 	  *(searchresult + strlen(knownExtensions[i])) == '\0')
       {
-        SysPrintf(MSG_INITIALIZATION,
+        SysPrintf(CS_MSG_INITIALIZATION,
 	  "Found extension: %s\n", knownExtensions[i]);
         switch (i)
         {

@@ -57,47 +57,47 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ANIMATE)
 CS_TOKEN_DEF_END
 
-IMPLEMENT_IBASE (csSprite2DFactoryLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSprite2DFactoryLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csSprite2DFactorySaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSprite2DFactorySaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csSprite2DLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSprite2DLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csSprite2DSaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSprite2DSaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csSprite2DFactoryLoader)
-IMPLEMENT_FACTORY (csSprite2DFactorySaver)
-IMPLEMENT_FACTORY (csSprite2DLoader)
-IMPLEMENT_FACTORY (csSprite2DSaver)
+SCF_IMPLEMENT_FACTORY (csSprite2DFactoryLoader)
+SCF_IMPLEMENT_FACTORY (csSprite2DFactorySaver)
+SCF_IMPLEMENT_FACTORY (csSprite2DLoader)
+SCF_IMPLEMENT_FACTORY (csSprite2DSaver)
 
-EXPORT_CLASS_TABLE (spr2dldr)
-  EXPORT_CLASS (csSprite2DFactoryLoader,
+SCF_EXPORT_CLASS_TABLE (spr2dldr)
+  SCF_EXPORT_CLASS (csSprite2DFactoryLoader,
   	"crystalspace.mesh.loader.factory.sprite.2d",
 	"Crystal Space Sprite2D Mesh Factory Loader")
-  EXPORT_CLASS (csSprite2DFactorySaver,
+  SCF_EXPORT_CLASS (csSprite2DFactorySaver,
   	"crystalspace.mesh.saver.factory.sprite.2d",
 	"Crystal Space Sprite2D Mesh Factory Saver")
-  EXPORT_CLASS (csSprite2DLoader, "crystalspace.mesh.loader.sprite.2d",
+  SCF_EXPORT_CLASS (csSprite2DLoader, "crystalspace.mesh.loader.sprite.2d",
     "Crystal Space Sprite2D Mesh Loader")
-  EXPORT_CLASS (csSprite2DSaver, "crystalspace.mesh.saver.sprite.2d",
+  SCF_EXPORT_CLASS (csSprite2DSaver, "crystalspace.mesh.saver.sprite.2d",
     "Crystal Space Sprite2D Mesh Saver")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csSprite2DFactoryLoader::csSprite2DFactoryLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSprite2DFactoryLoader::~csSprite2DFactoryLoader ()
@@ -218,17 +218,17 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine,
   char* params;
   char str[255];
 
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys,
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (sys,
   	"crystalspace.mesh.object.sprite.2d", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = LOAD_PLUGIN (sys, "crystalspace.mesh.object.sprite.2d",
+    type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.sprite.2d",
     	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.sprite.2d\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
-  iSprite2DFactoryState* spr2dLook = QUERY_INTERFACE (fact,
+  iSprite2DFactoryState* spr2dLook = SCF_QUERY_INTERFACE (fact,
   	iSprite2DFactoryState);
 
   char* buf = (char*)string;
@@ -282,7 +282,7 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine,
 //---------------------------------------------------------------------------
 csSprite2DFactorySaver::csSprite2DFactorySaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSprite2DFactorySaver::~csSprite2DFactorySaver ()
@@ -318,7 +318,7 @@ static void WriteMixmode(iStrVector *str, UInt mixmode)
 void csSprite2DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
   iEngine* /*engine*/)
 {
-  iSprite2DFactoryState *state = QUERY_INTERFACE (obj, iSprite2DFactoryState);
+  iSprite2DFactoryState *state = SCF_QUERY_INTERFACE (obj, iSprite2DFactoryState);
   char buf[MAXLINE];
 
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
@@ -337,7 +337,7 @@ void csSprite2DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
 
 csSprite2DLoader::csSprite2DLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSprite2DLoader::~csSprite2DLoader ()
@@ -369,7 +369,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
   char* params;
   char str[255];
 
-  iMeshWrapper* imeshwrap = QUERY_INTERFACE (context, iMeshWrapper);
+  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
   imeshwrap->DecRef ();
 
   iMeshObject* mesh = NULL;
@@ -399,7 +399,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  imeshwrap->SetFactory (fact);
-          spr2dLook = QUERY_INTERFACE (mesh, iSprite2DState);
+          spr2dLook = SCF_QUERY_INTERFACE (mesh, iSprite2DState);
 	  verts = &(spr2dLook->GetVertices ());
 	}
 	break;
@@ -495,7 +495,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
 
 csSprite2DSaver::csSprite2DSaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSprite2DSaver::~csSprite2DSaver ()
@@ -511,8 +511,8 @@ bool csSprite2DSaver::Initialize (iSystem* system)
 void csSprite2DSaver::WriteDown (iBase* obj, iStrVector *str,
   iEngine* /*engine*/)
 {
-  iFactory *fact = QUERY_INTERFACE (this, iFactory);
-  iSprite2DState *state = QUERY_INTERFACE (obj, iSprite2DState);
+  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
+  iSprite2DState *state = SCF_QUERY_INTERFACE (obj, iSprite2DState);
   char buf[MAXLINE];
   char name[MAXLINE];
 

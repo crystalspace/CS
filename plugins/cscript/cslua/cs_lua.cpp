@@ -5330,7 +5330,7 @@ static void *SwigiSystemToiBase(void *ptr) {
 }
 
 static iEngine * iSystem_Query_iEngine(iSystem *self) {
-      return QUERY_PLUGIN(self, iEngine);
+      return CS_QUERY_PLUGIN(self, iEngine);
     }
 static int _wrap_iSystem_Query_iEngine(lua_State *lua_state) {
 
@@ -5360,7 +5360,7 @@ static int _wrap_iSystem_Query_iEngine(lua_State *lua_state) {
     return 1;
 }
 static iGraphics3D * iSystem_Query_iGraphics3D(iSystem *self) {
-      return QUERY_PLUGIN(self, iGraphics3D);
+      return CS_QUERY_PLUGIN(self, iGraphics3D);
     }
 static int _wrap_iSystem_Query_iGraphics3D(lua_State *lua_state) {
 

@@ -37,27 +37,27 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csGraphics3DInfinite)
-IMPLEMENT_FACTORY (csGraphics2DInfinite)
+SCF_IMPLEMENT_FACTORY (csGraphics3DInfinite)
+SCF_IMPLEMENT_FACTORY (csGraphics2DInfinite)
 
-EXPORT_CLASS_TABLE (inf3d)
-  EXPORT_CLASS_DEP (csGraphics3DInfinite, "crystalspace.graphics3d.infinite",
+SCF_EXPORT_CLASS_TABLE (inf3d)
+  SCF_EXPORT_CLASS_DEP (csGraphics3DInfinite, "crystalspace.graphics3d.infinite",
     "Infinite 3D graphics driver for Crystal Space", "crystalspace.font.server.")
-  EXPORT_CLASS_DEP (csGraphics2DInfinite, "crystalspace.graphics2d.infinite",
+  SCF_EXPORT_CLASS_DEP (csGraphics2DInfinite, "crystalspace.graphics2d.infinite",
     "Infinite 2D graphics driver for Crystal Space", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csGraphics3DInfinite)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics3D)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics3DInfinite)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
+SCF_IMPLEMENT_IBASE_END
 
 csGraphics3DInfinite::csGraphics3DInfinite (iBase *iParent) :
   G2D (NULL)
 {
-  CONSTRUCT_IBASE (iParent);
-  CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
 
   clipper = NULL;
   texman = NULL;
@@ -104,7 +104,7 @@ bool csGraphics3DInfinite::Initialize (iSystem *iSys)
 
   width = height = -1;
 
-  G2D = LOAD_PLUGIN (System, "crystalspace.graphics2d.infinite", NULL, iGraphics2D);
+  G2D = CS_LOAD_PLUGIN (System, "crystalspace.graphics2d.infinite", NULL, iGraphics2D);
   if (!G2D)
     return false;
 
@@ -119,7 +119,7 @@ bool csGraphics3DInfinite::Open (const char *Title)
 
   if (!G2D->Open (Title))
   {
-    SysPrintf (MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
+    SysPrintf (CS_MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
     // set "not opened" flag
     width = height = -1;
 
@@ -134,7 +134,7 @@ bool csGraphics3DInfinite::Open (const char *Title)
 
   SetDimensions (nWidth, nHeight);
 
-  SysPrintf (MSG_INITIALIZATION, "Using virtual mode %dx%d.\n", width, height);
+  SysPrintf (CS_MSG_INITIALIZATION, "Using virtual mode %dx%d.\n", width, height);
 
   z_buf_mode = CS_ZBUF_NONE;
 
@@ -362,9 +362,9 @@ void csGraphics3DInfinite::DrawLine (const csVector3&, const csVector3&, float, 
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_EMBEDDED_IBASE (csGraphics3DInfinite::csInfiniteConfig)
-  IMPLEMENTS_INTERFACE (iConfig)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DInfinite::csInfiniteConfig)
+  SCF_IMPLEMENTS_INTERFACE (iConfig)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 #define NUM_OPTIONS 2
 
@@ -410,16 +410,16 @@ bool csGraphics3DInfinite::csInfiniteConfig::GetOptionDescription
 
 //====================================================================
 
-IMPLEMENT_IBASE (csGraphics2DInfinite)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics2D)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics2DInfinite)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_END
 
 // csGraphics2DInfinite functions
 csGraphics2DInfinite::csGraphics2DInfinite (iBase *iParent) :
   csGraphics2D ()
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
 }
 
 bool csGraphics2DInfinite::Initialize (iSystem *pSystem)

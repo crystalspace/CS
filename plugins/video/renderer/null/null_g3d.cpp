@@ -35,21 +35,21 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csGraphics3DNull)
+SCF_IMPLEMENT_FACTORY (csGraphics3DNull)
 
-EXPORT_CLASS_TABLE (null3d)
-  EXPORT_CLASS_DEP (csGraphics3DNull, "crystalspace.graphics3d.null",
+SCF_EXPORT_CLASS_TABLE (null3d)
+  SCF_EXPORT_CLASS_DEP (csGraphics3DNull, "crystalspace.graphics3d.null",
     "NULL 3D graphics driver for Crystal Space", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csGraphics3DNull)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics3D)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics3DNull)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
+SCF_IMPLEMENT_IBASE_END
 
 csGraphics3DNull::csGraphics3DNull (iBase *iParent) : G2D (NULL)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
 
   texman = NULL;
 
@@ -83,7 +83,7 @@ bool csGraphics3DNull::Initialize (iSystem *iSys)
   if (!driver)
     driver = config->GetStr ("Video.Null.Canvas", SOFTWARE_2D_DRIVER);
 
-  G2D = LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
+  G2D = CS_LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
   if (!G2D)
     return false;
 
@@ -98,7 +98,7 @@ bool csGraphics3DNull::Open (const char *Title)
 
   if (!G2D->Open (Title))
   {
-    SysPrintf (MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
+    SysPrintf (CS_MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
     // set "not opened" flag
     width = height = -1;
 
@@ -129,7 +129,7 @@ bool csGraphics3DNull::Open (const char *Title)
 
   SetDimensions (nWidth, nHeight);
 
-  SysPrintf (MSG_INITIALIZATION, "Using %s mode %dx%d.\n",
+  SysPrintf (CS_MSG_INITIALIZATION, "Using %s mode %dx%d.\n",
             bFullScreen ? "full screen" : "windowed", width, height);
 
   z_buf_mode = CS_ZBUF_NONE;

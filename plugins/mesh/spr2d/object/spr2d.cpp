@@ -34,27 +34,27 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csSprite2DMeshObject)
-  IMPLEMENTS_INTERFACE (iMeshObject)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iSprite2DState)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iParticle)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSprite2DMeshObject)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite2DState)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iParticle)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObject::Sprite2DState)
-  IMPLEMENTS_INTERFACE (iSprite2DState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObject::Sprite2DState)
+  SCF_IMPLEMENTS_INTERFACE (iSprite2DState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObject::Particle)
-  IMPLEMENTS_INTERFACE (iParticle)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObject::Particle)
+  SCF_IMPLEMENTS_INTERFACE (iParticle)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory)
 {
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiSprite2DState);
-  CONSTRUCT_EMBEDDED_IBASE (scfiParticle);
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite2DState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticle);
   csSprite2DMeshObject::factory = factory;
-  ifactory = QUERY_INTERFACE (factory, iMeshObjectFactory);
+  ifactory = SCF_QUERY_INTERFACE (factory, iMeshObjectFactory);
   material = factory->GetMaterialWrapper ();
   lighting = factory->HasLighting ();
   MixMode = factory->GetMixMode ();
@@ -594,19 +594,19 @@ const csVector2 *csSprite2DMeshObject::uvAnimationControl::GetVertices (int &num
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csSprite2DMeshObjectFactory)
-  IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iSprite2DFactoryState)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSprite2DMeshObjectFactory)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite2DFactoryState)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObjectFactory::Sprite2DFactoryState)
-  IMPLEMENTS_INTERFACE (iSprite2DFactoryState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObjectFactory::Sprite2DFactoryState)
+  SCF_IMPLEMENTS_INTERFACE (iSprite2DFactoryState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory (iBase *pParent)
 {
-  CONSTRUCT_IBASE (pParent);
-  CONSTRUCT_EMBEDDED_IBASE (scfiSprite2DFactoryState);
+  SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite2DFactoryState);
   material = NULL;
   MixMode = 0;
   lighting = true;
@@ -619,28 +619,28 @@ csSprite2DMeshObjectFactory::~csSprite2DMeshObjectFactory ()
 iMeshObject* csSprite2DMeshObjectFactory::NewInstance ()
 {
   csSprite2DMeshObject* cm = new csSprite2DMeshObject (this);
-  iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
+  iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
 }
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csSprite2DMeshObjectType)
-  IMPLEMENTS_INTERFACE (iMeshObjectType)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSprite2DMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csSprite2DMeshObjectType)
+SCF_IMPLEMENT_FACTORY (csSprite2DMeshObjectType)
 
-EXPORT_CLASS_TABLE (spr2d)
-  EXPORT_CLASS (csSprite2DMeshObjectType, "crystalspace.mesh.object.sprite.2d",
+SCF_EXPORT_CLASS_TABLE (spr2d)
+  SCF_EXPORT_CLASS (csSprite2DMeshObjectType, "crystalspace.mesh.object.sprite.2d",
     "Crystal Space Sprite2D Mesh Type")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csSprite2DMeshObjectType::csSprite2DMeshObjectType (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSprite2DMeshObjectType::~csSprite2DMeshObjectType ()
@@ -655,7 +655,7 @@ bool csSprite2DMeshObjectType::Initialize (iSystem *)
 iMeshObjectFactory* csSprite2DMeshObjectType::NewFactory ()
 {
   csSprite2DMeshObjectFactory* cm = new csSprite2DMeshObjectFactory (this);
-  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;
 }

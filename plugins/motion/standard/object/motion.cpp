@@ -26,21 +26,21 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csMotionManager)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iMotionManager)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csMotionManager)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iMotionManager)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csMotionManager)
+SCF_IMPLEMENT_FACTORY (csMotionManager)
 
-EXPORT_CLASS_TABLE (motion)
-  EXPORT_CLASS_DEP (csMotionManager, "crystalspace.motion.manager.default",
+SCF_EXPORT_CLASS_TABLE (motion)
+  SCF_EXPORT_CLASS_DEP (csMotionManager, "crystalspace.motion.manager.default",
     "Skeletal Motion Manager for Crystal Space", NULL)
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csMotionManager::csMotionManager(iBase *iParent)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   oldtime=0;
   iSys=NULL;
 }
@@ -525,13 +525,13 @@ void csMotionManager::UpdateAll( int time )
   }
 }
 
-IMPLEMENT_IBASE (csMotion)
-  IMPLEMENTS_INTERFACE (iMotion)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csMotion)
+  SCF_IMPLEMENTS_INTERFACE (iMotion)
+SCF_IMPLEMENT_IBASE_END
 
 csMotion::csMotion()
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   name = NULL;
   hash = 0;
   transquat = NULL;

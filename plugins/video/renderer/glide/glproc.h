@@ -46,7 +46,7 @@ class csGlideProcedural : public iGraphics3D
   csPixelFormat *pfmt;
   
  public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csGlideProcedural (iBase * pParent);
   virtual ~csGlideProcedural (){}

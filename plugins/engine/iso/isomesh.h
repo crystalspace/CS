@@ -47,7 +47,7 @@ private:
   csZBufMode zbufmode;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   ///
   csIsoMeshSprite(iBase *iParent);

@@ -47,23 +47,23 @@ static unsigned short ScanCodeToChar [128] =
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csGraphics2DAlleg)
+SCF_IMPLEMENT_FACTORY (csGraphics2DAlleg)
 
-EXPORT_CLASS_TABLE (alleg2d)
-  EXPORT_CLASS_DEP (csGraphics2DAlleg, "crystalspace.graphics2d.allegro",
+SCF_EXPORT_CLASS_TABLE (alleg2d)
+  SCF_EXPORT_CLASS_DEP (csGraphics2DAlleg, "crystalspace.graphics2d.allegro",
     "Allegro 2D graphics driver for Crystal Space", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csGraphics2DAlleg)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics2D)
-  IMPLEMENTS_INTERFACE (iEventPlug)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics2DAlleg)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+SCF_IMPLEMENT_IBASE_END
 
 csGraphics2DAlleg::csGraphics2DAlleg (iBase *iParent) :
   csGraphics2D ()
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   EventOutlet = NULL;
   hook_kbd = hook_mouse = true;
   kbd_hook_active = mouse_hook_active = false;
@@ -134,7 +134,7 @@ bool csGraphics2DAlleg::Open (const char* Title)
    && (Width > 800 || Height > 600 || set_gfx_mode (GFX_AUTODETECT, 800, 600, 0, 0))
    && (Width > 1024|| Height > 768 || set_gfx_mode (GFX_AUTODETECT, 1024,768, 0, 0)))
   {
-    CsPrintf (MSG_FATAL_ERROR, "ERROR! Could not set graphics mode.\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "ERROR! Could not set graphics mode.\n");
     exit (-1);
   }
 
@@ -142,7 +142,7 @@ bool csGraphics2DAlleg::Open (const char* Title)
 
   if (bitmap == NULL)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Error initializing graphics subsystem: bad "
+    CsPrintf (CS_MSG_FATAL_ERROR, "Error initializing graphics subsystem: bad "
                                "videomode!\n");
     return false;
   }
@@ -168,7 +168,7 @@ bool csGraphics2DAlleg::Open (const char* Title)
       _GetPixelAt = GetPixelAt32;
       break;
     default:
-      CsPrintf (MSG_WARNING, "WARNING: No 2D routines for selected mode!\n");
+      CsPrintf (CS_MSG_WARNING, "WARNING: No 2D routines for selected mode!\n");
       break;
   } /* endif */
 
@@ -376,7 +376,7 @@ bool csGraphics2DAlleg::PerformExtension (const char *iCommand, ...)
 {
   if (!strcasecmp (iCommand, "fullscreen"))
   {
-    System->Printf (MSG_INITIALIZATION, "Fullscreen toggle.");
+    System->Printf (CS_MSG_INITIALIZATION, "Fullscreen toggle.");
     scale = !scale;
     clear (screen);
     Print (NULL);

@@ -63,7 +63,7 @@ class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
   char *buffer;
 
  public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csOpenGLProcBackBuffer (iBase *parent);
 
@@ -102,7 +102,7 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
   csPixelFormat *pfmt;
 
  public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csOpenGLProcBackBuffer2D (iGraphics2D *ig2d, int iwidth, int iheight, 
 			    csPixelFormat *ipfmt);  

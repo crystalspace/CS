@@ -63,47 +63,47 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SPREADACCEL)
 CS_TOKEN_DEF_END
 
-IMPLEMENT_IBASE (csExplosionFactoryLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csExplosionFactoryLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csExplosionFactorySaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csExplosionFactorySaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csExplosionLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csExplosionLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csExplosionSaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csExplosionSaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csExplosionFactoryLoader)
-IMPLEMENT_FACTORY (csExplosionFactorySaver)
-IMPLEMENT_FACTORY (csExplosionLoader)
-IMPLEMENT_FACTORY (csExplosionSaver)
+SCF_IMPLEMENT_FACTORY (csExplosionFactoryLoader)
+SCF_IMPLEMENT_FACTORY (csExplosionFactorySaver)
+SCF_IMPLEMENT_FACTORY (csExplosionLoader)
+SCF_IMPLEMENT_FACTORY (csExplosionSaver)
 
-EXPORT_CLASS_TABLE (exploldr)
-  EXPORT_CLASS (csExplosionFactoryLoader, 
+SCF_EXPORT_CLASS_TABLE (exploldr)
+  SCF_EXPORT_CLASS (csExplosionFactoryLoader, 
     "crystalspace.mesh.loader.factory.explosion",
     "Crystal Space Explosion Factory Loader")
-  EXPORT_CLASS (csExplosionFactorySaver, 
+  SCF_EXPORT_CLASS (csExplosionFactorySaver, 
     "crystalspace.mesh.saver.factory.explosion",
     "Crystal Space Explosion Factory Saver")
-  EXPORT_CLASS (csExplosionLoader, "crystalspace.mesh.loader.explosion",
+  SCF_EXPORT_CLASS (csExplosionLoader, "crystalspace.mesh.loader.explosion",
     "Crystal Space Explosion Mesh Loader")
-  EXPORT_CLASS (csExplosionSaver, "crystalspace.mesh.saver.explosion",
+  SCF_EXPORT_CLASS (csExplosionSaver, "crystalspace.mesh.saver.explosion",
     "Crystal Space Explosion Mesh Saver")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csExplosionFactoryLoader::csExplosionFactoryLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csExplosionFactoryLoader::~csExplosionFactoryLoader ()
@@ -119,11 +119,11 @@ bool csExplosionFactoryLoader::Initialize (iSystem* system)
 iBase* csExplosionFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys,
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (sys,
   	"crystalspace.mesh.object.explosion", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = LOAD_PLUGIN (sys, "crystalspace.mesh.object.explosion",
+    type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.explosion",
     	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.explosion\n");
   }
@@ -136,7 +136,7 @@ iBase* csExplosionFactoryLoader::Parse (const char* /*string*/,
 
 csExplosionFactorySaver::csExplosionFactorySaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csExplosionFactorySaver::~csExplosionFactorySaver ()
@@ -180,7 +180,7 @@ void csExplosionFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 
 csExplosionLoader::csExplosionLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csExplosionLoader::~csExplosionLoader ()
@@ -268,7 +268,7 @@ iBase* csExplosionLoader::Parse (const char* string, iEngine* engine,
   char* params;
   char str[255];
 
-  iMeshWrapper* imeshwrap = QUERY_INTERFACE (context, iMeshWrapper);
+  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
   imeshwrap->DecRef ();
 
   iMeshObject* mesh = NULL;
@@ -321,8 +321,8 @@ iBase* csExplosionLoader::Parse (const char* string, iEngine* engine,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  imeshwrap->SetFactory (fact);
-          partstate = QUERY_INTERFACE (mesh, iParticleState);
-          explostate = QUERY_INTERFACE (mesh, iExplosionState);
+          partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
+          explostate = SCF_QUERY_INTERFACE (mesh, iExplosionState);
 	}
 	break;
       case CS_TOKEN_MATERIAL:
@@ -412,7 +412,7 @@ iBase* csExplosionLoader::Parse (const char* string, iEngine* engine,
 
 csExplosionSaver::csExplosionSaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csExplosionSaver::~csExplosionSaver ()
@@ -428,9 +428,9 @@ bool csExplosionSaver::Initialize (iSystem* system)
 void csExplosionSaver::WriteDown (iBase* obj, iStrVector *str,
   iEngine* /*engine*/)
 {
-  iFactory *fact = QUERY_INTERFACE (this, iFactory);
-  iParticleState *partstate = QUERY_INTERFACE (obj, iParticleState);
-  iExplosionState *explostate = QUERY_INTERFACE (obj, iExplosionState);
+  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
+  iParticleState *partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
+  iExplosionState *explostate = SCF_QUERY_INTERFACE (obj, iExplosionState);
   char buf[MAXLINE];
   char name[MAXLINE];
 

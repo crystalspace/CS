@@ -49,7 +49,7 @@ class csArtsHandle : public iSoundHandle, public iSoundSource
 
  public:
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   virtual ~csArtsHandle ();
   /// *************** iSoundHandle ****************  
   /// is this a static or streamed handle?

@@ -295,7 +295,7 @@ public:
   static void SetLightCellSize (int size);
 
   //------------------------ iLightMap implementation ------------------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   ///
   virtual unsigned char *GetMapData ();
   ///

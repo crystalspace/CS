@@ -123,7 +123,7 @@ public:
   /// Return the shadow list for the 'next' element.
   csShadowBlock* GetCsNextShadowBlock () { return cur; }
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 };
 
 /**
@@ -280,7 +280,7 @@ public:
   /// Get draw_busy for sector.
   virtual int GetRecLevel () { return draw_busy; }
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 };
 
 /**
@@ -401,7 +401,7 @@ public:
     	reverse ? -1 : 1));
   }
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 };
 
 class csFrustumView;
@@ -549,7 +549,7 @@ public:
     return ((mask & process_thing_mask) == process_thing_value);
   }
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 };
 
 #endif // __CS_LVIEW_H__

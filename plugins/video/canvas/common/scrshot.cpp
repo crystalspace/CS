@@ -19,13 +19,13 @@
 #include "cssysdef.h"
 #include "scrshot.h"
 
-IMPLEMENT_IBASE (csScreenShot)
-  IMPLEMENTS_INTERFACE (iImage)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csScreenShot)
+  SCF_IMPLEMENTS_INTERFACE (iImage)
+SCF_IMPLEMENT_IBASE_END
 
 csScreenShot::csScreenShot (iGraphics2D *G2D)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
 
   Width = G2D->GetWidth ();
   Height = G2D->GetHeight ();

@@ -104,7 +104,7 @@ public:
    */
   void GetRadius (csVector3& r) const { r = radius; }
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 };
 
 /**
@@ -145,7 +145,7 @@ public:
   virtual int GetFrameDelay (int f)
   { return (int)delays [f]; }
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
 private:
   char *name;
@@ -467,7 +467,7 @@ public:
   void MergeNormals ();
 
   //------------------------ iMeshObjectFactory implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform& t);
@@ -476,7 +476,7 @@ public:
   //--------------------- iSprite3DFactoryState implementation -------------//
   struct Sprite3DFactoryState : public iSprite3DFactoryState
   {
-    DECLARE_EMBEDDED_IBASE (csSprite3DMeshObjectFactory);
+    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObjectFactory);
     virtual void SetMaterialWrapper (iMaterialWrapper* material)
     {
       scfParent->SetMaterial (material);
@@ -563,13 +563,13 @@ public:
     }
     virtual iSpriteFrame* AddFrame ()
     {
-      iSpriteFrame* ifr = QUERY_INTERFACE_SAFE (scfParent->AddFrame (), iSpriteFrame);
+      iSpriteFrame* ifr = SCF_QUERY_INTERFACE_SAFE (scfParent->AddFrame (), iSpriteFrame);
       if (ifr) ifr->DecRef ();
       return ifr;
     }
     virtual iSpriteFrame* FindFrame (const char* name) const
     {
-      iSpriteFrame* ifr = QUERY_INTERFACE_SAFE (scfParent->FindFrame (name), iSpriteFrame);
+      iSpriteFrame* ifr = SCF_QUERY_INTERFACE_SAFE (scfParent->FindFrame (name), iSpriteFrame);
       if (ifr) ifr->DecRef ();
       return ifr;
     }
@@ -579,25 +579,25 @@ public:
     }
     virtual iSpriteFrame* GetFrame (int f) const
     {
-      iSpriteFrame* ifr = QUERY_INTERFACE_SAFE (scfParent->GetFrame (f), iSpriteFrame);
+      iSpriteFrame* ifr = SCF_QUERY_INTERFACE_SAFE (scfParent->GetFrame (f), iSpriteFrame);
       if (ifr) ifr->DecRef ();
       return ifr;
     }
     virtual iSpriteAction* AddAction ()
     {
-      iSpriteAction* ia = QUERY_INTERFACE_SAFE (scfParent->AddAction (), iSpriteAction);
+      iSpriteAction* ia = SCF_QUERY_INTERFACE_SAFE (scfParent->AddAction (), iSpriteAction);
       if (ia) ia->DecRef ();
       return ia;
     }
     virtual iSpriteAction* FindAction (const char* name) const
     {
-      iSpriteAction* ia = QUERY_INTERFACE_SAFE (scfParent->FindAction (name), iSpriteAction);
+      iSpriteAction* ia = SCF_QUERY_INTERFACE_SAFE (scfParent->FindAction (name), iSpriteAction);
       if (ia) ia->DecRef ();
       return ia;
     }
     virtual iSpriteAction* GetFirstAction () const
     {
-      iSpriteAction* ia = QUERY_INTERFACE_SAFE (scfParent->GetFirstAction (), iSpriteAction);
+      iSpriteAction* ia = SCF_QUERY_INTERFACE_SAFE (scfParent->GetFirstAction (), iSpriteAction);
       if (ia) ia->DecRef ();
       return ia;
     }
@@ -607,7 +607,7 @@ public:
     }
     virtual iSpriteAction* GetAction (int No) const
     {
-      iSpriteAction* ia = QUERY_INTERFACE_SAFE (scfParent->GetAction (No), iSpriteAction);
+      iSpriteAction* ia = SCF_QUERY_INTERFACE_SAFE (scfParent->GetAction (No), iSpriteAction);
       if (ia) ia->DecRef ();
       return ia;
     }
@@ -1131,11 +1131,11 @@ public:
 	const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox);
 
   ///------------------------ iMeshObject implementation ----------------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const
   {
-    iMeshObjectFactory* ifact = QUERY_INTERFACE (factory, iMeshObjectFactory);
+    iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (factory, iMeshObjectFactory);
     ifact->DecRef ();
     return ifact;
   }
@@ -1181,7 +1181,7 @@ public:
   //------------------ iPolygonMesh interface implementation ----------------//
   struct PolyMesh : public iPolygonMesh
   {
-    DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
+    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
 
     /// Get the number of vertices for this mesh.
     virtual int GetVertexCount ()
@@ -1222,7 +1222,7 @@ public:
   //--------------------- iSprite3DState implementation -------------//
   struct Sprite3DState : public iSprite3DState
   {
-    DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
+    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
     virtual void SetMaterialWrapper (iMaterialWrapper* material)
     {
       scfParent->SetMaterial (material);
@@ -1266,7 +1266,7 @@ public:
     }
     virtual iSpriteAction* GetCurAction () const
     {
-      iSpriteAction* ia = QUERY_INTERFACE_SAFE (scfParent->GetCurAction (), iSpriteAction);
+      iSpriteAction* ia = SCF_QUERY_INTERFACE_SAFE (scfParent->GetCurAction (), iSpriteAction);
       if (ia) ia->DecRef ();
       return ia;
     }
@@ -1349,7 +1349,7 @@ public:
   virtual bool Initialize (iSystem *pSystem);
 
   //------------------------ iMeshObjectType implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// New Factory.
   virtual iMeshObjectFactory* NewFactory ();
@@ -1361,7 +1361,7 @@ public:
   ///------------------- iConfig interface implementation -------------------
   struct csSprite3DConfig : public iConfig
   {
-    DECLARE_EMBEDDED_IBASE (csSprite3DMeshObjectType);
+    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObjectType);
     virtual bool GetOptionDescription (int idx, csOptionDescription *option);
     virtual bool SetOption (int id, csVariant* value);
     virtual bool GetOption (int id, csVariant* value);

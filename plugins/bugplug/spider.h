@@ -71,7 +71,7 @@ public:
   /// Unweave the web.
   void UnweaveWeb (iEngine* engine);
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return NULL; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);

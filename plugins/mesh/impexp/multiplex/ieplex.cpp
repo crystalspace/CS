@@ -31,7 +31,7 @@ DECLARE_TYPED_VECTOR_NODELETE (csStringVector, csString);
 class csModelConverterMultiplexer : iModelConverter
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csModelConverterVector Converters;
   csStringVector Formats;
 
@@ -49,35 +49,35 @@ public:
   virtual iDataBuffer *Save (iModelData*, const char *Format);
 
   struct Plugin : public iPlugIn {
-    DECLARE_EMBEDDED_IBASE (csModelConverterMultiplexer);
+    SCF_DECLARE_EMBEDDED_IBASE (csModelConverterMultiplexer);
     virtual bool Initialize (iSystem *sys)
     { return scfParent->Initialize (sys); }
   } scfiPlugIn;
 };
 
-IMPLEMENT_IBASE (csModelConverterMultiplexer)
-  IMPLEMENTS_INTERFACE (iModelConverter)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csModelConverterMultiplexer)
+  SCF_IMPLEMENTS_INTERFACE (iModelConverter)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csModelConverterMultiplexer::Plugin)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csModelConverterMultiplexer::Plugin)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csModelConverterMultiplexer);
+SCF_IMPLEMENT_FACTORY (csModelConverterMultiplexer);
 
-EXPORT_CLASS_TABLE (ieplex)
-  EXPORT_CLASS (csModelConverterMultiplexer,
+SCF_EXPORT_CLASS_TABLE (ieplex)
+  SCF_EXPORT_CLASS (csModelConverterMultiplexer,
     "crystalspace.modelconverter.multiplexer"
     "Multiplexer for Model Converters")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 CS_IMPLEMENT_PLUGIN
 
 csModelConverterMultiplexer::csModelConverterMultiplexer (iBase *p)
 {
-  CONSTRUCT_IBASE (p);
-  CONSTRUCT_EMBEDDED_IBASE (scfiPlugIn);
+  SCF_CONSTRUCT_IBASE (p);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugIn);
 }
 
 csModelConverterMultiplexer::~csModelConverterMultiplexer ()

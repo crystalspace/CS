@@ -336,12 +336,12 @@ public:
     v.y = (p.y - shift_y) * z * inv_aspect;
   }
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   //------------------------ iCamera implementation ------------------------
   struct Camera : public iCamera
   {
-    DECLARE_EMBEDDED_IBASE (csCamera);
+    SCF_DECLARE_EMBEDDED_IBASE (csCamera);
     virtual csCamera* GetPrivateObject ()
     { return scfParent; }
 

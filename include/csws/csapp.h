@@ -93,7 +93,7 @@ protected:
   /// The iPlugIn interface
   class csAppPlugIn : public iPlugIn
   {
-    DECLARE_IBASE;
+    SCF_DECLARE_IBASE;
     /// The parent application
     csApp *app;
 

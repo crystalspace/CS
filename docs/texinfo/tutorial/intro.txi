@@ -109,7 +109,7 @@ How you must register a library depends on whether it is a static library or
 a dynamic library (@file{.dll} or @file{.so}). For a static library, put this
 line at toplevel into one of your C++ files and link to the static library:
 @example
-REGISTER_STATIC_LIBRARY(@var{name})
+SCF_REGISTER_STATIC_LIBRARY(@var{name})
 @end example
 This will register all plug-ins in the statically-linked library @file{name}.
 This name is chosen by the author of the library. In the case of static
@@ -209,23 +209,23 @@ appears first in the config file (or in the first @code{RequestPlugin} line).
 requires all plug-ins to correctly say which plug-ins they rely on, which only
 a few plug-ins do at this time.}
 
-The third possibility to load a plug-in is to use @code{LOAD_PLUGIN()}.
+The third possibility to load a plug-in is to use @code{CS_LOAD_PLUGIN()}.
 This can also be used after the system was initialized. The disadvantage is
 that a plug-in loaded this way is not included in the sorting process
 described above. So you must make sure that all plug-ins required by the one
 you want to load are already loaded at the time you use this. Also, if you
 use this function there is no need to query the plug-in anymore, as
-@code{LOAD_PLUGIN()} directly returns the plug-in interface.
+@code{CS_LOAD_PLUGIN()} directly returns the plug-in interface.
 
 @item
 How can I query the plug-in interface?
 
 This is the last step before you can use the plug-in. It means that inside
 your program you ask the system driver for the plug-in interface:
-@code{QUERY_PLUGIN_ID(@var{SystemDriver},@var{FuncID},@var{iInterface})}.
+@code{CS_QUERY_PLUGIN_ID(@var{SystemDriver},@var{FuncID},@var{iInterface})}.
 This macro returns the pointer or NULL if the interface is not found. If you
 want to search through all identifiers for an interface, you can use
-@code{QUERY_PLUGIN(@var{YourSysDriver},@var{iSomething})}.
+@code{CS_QUERY_PLUGIN(@var{YourSysDriver},@var{iSomething})}.
 
 @item
 Conclusion

@@ -63,47 +63,47 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SPEED)
 CS_TOKEN_DEF_END
 
-IMPLEMENT_IBASE (csFountainFactoryLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csFountainFactoryLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csFountainFactorySaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csFountainFactorySaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csFountainLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csFountainLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csFountainSaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csFountainSaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csFountainFactoryLoader)
-IMPLEMENT_FACTORY (csFountainFactorySaver)
-IMPLEMENT_FACTORY (csFountainLoader)
-IMPLEMENT_FACTORY (csFountainSaver)
+SCF_IMPLEMENT_FACTORY (csFountainFactoryLoader)
+SCF_IMPLEMENT_FACTORY (csFountainFactorySaver)
+SCF_IMPLEMENT_FACTORY (csFountainLoader)
+SCF_IMPLEMENT_FACTORY (csFountainSaver)
 
-EXPORT_CLASS_TABLE (fountldr)
-  EXPORT_CLASS (csFountainFactoryLoader,
+SCF_EXPORT_CLASS_TABLE (fountldr)
+  SCF_EXPORT_CLASS (csFountainFactoryLoader,
   	"crystalspace.mesh.loader.factory.fountain",
 	"Crystal Space Fountain Factory Loader")
-  EXPORT_CLASS (csFountainFactorySaver,
+  SCF_EXPORT_CLASS (csFountainFactorySaver,
   	"crystalspace.mesh.saver.factory.fountain",
 	"Crystal Space Fountain Factory Saver")
-  EXPORT_CLASS (csFountainLoader, "crystalspace.mesh.loader.fountain",
+  SCF_EXPORT_CLASS (csFountainLoader, "crystalspace.mesh.loader.fountain",
     "Crystal Space Fountain Mesh Loader")
-  EXPORT_CLASS (csFountainSaver, "crystalspace.mesh.saver.fountain",
+  SCF_EXPORT_CLASS (csFountainSaver, "crystalspace.mesh.saver.fountain",
     "Crystal Space Fountain Mesh Saver")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csFountainFactoryLoader::csFountainFactoryLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csFountainFactoryLoader::~csFountainFactoryLoader ()
@@ -119,11 +119,11 @@ bool csFountainFactoryLoader::Initialize (iSystem* system)
 iBase* csFountainFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys,
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (sys,
   	"crystalspace.mesh.object.fountain", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = LOAD_PLUGIN (sys, "crystalspace.mesh.object.fountain",
+    type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.fountain",
     	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.fountain\n");
   }
@@ -136,7 +136,7 @@ iBase* csFountainFactoryLoader::Parse (const char* /*string*/,
 
 csFountainFactorySaver::csFountainFactorySaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csFountainFactorySaver::~csFountainFactorySaver ()
@@ -180,7 +180,7 @@ void csFountainFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 
 csFountainLoader::csFountainLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csFountainLoader::~csFountainLoader ()
@@ -268,7 +268,7 @@ iBase* csFountainLoader::Parse (const char* string, iEngine* engine,
   char* params;
   char str[255];
 
-  iMeshWrapper* imeshwrap = QUERY_INTERFACE (context, iMeshWrapper);
+  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
   imeshwrap->DecRef ();
 
   iMeshObject* mesh = NULL;
@@ -363,8 +363,8 @@ iBase* csFountainLoader::Parse (const char* string, iEngine* engine,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  imeshwrap->SetFactory (fact);
-          partstate = QUERY_INTERFACE (mesh, iParticleState);
-          fountstate = QUERY_INTERFACE (mesh, iFountainState);
+          partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
+          fountstate = SCF_QUERY_INTERFACE (mesh, iFountainState);
 	}
 	break;
       case CS_TOKEN_MATERIAL:
@@ -412,7 +412,7 @@ iBase* csFountainLoader::Parse (const char* string, iEngine* engine,
 
 csFountainSaver::csFountainSaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csFountainSaver::~csFountainSaver ()
@@ -428,9 +428,9 @@ bool csFountainSaver::Initialize (iSystem* system)
 void csFountainSaver::WriteDown (iBase* obj, iStrVector *str,
   iEngine* /*engine*/)
 {
-  iFactory *fact = QUERY_INTERFACE (this, iFactory);
-  iParticleState *partstate = QUERY_INTERFACE (obj, iParticleState);
-  iFountainState *state = QUERY_INTERFACE (obj, iFountainState);
+  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
+  iParticleState *partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
+  iFountainState *state = SCF_QUERY_INTERFACE (obj, iFountainState);
   char buf[MAXLINE];
   char name[MAXLINE];
 

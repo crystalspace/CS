@@ -24,13 +24,13 @@
 #include "iengine/sector.h"
 #include "iengine/movable.h"
 
-IMPLEMENT_IBASE (csSpider)
-  IMPLEMENTS_INTERFACE (iMeshObject)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSpider)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
+SCF_IMPLEMENT_IBASE_END
 
 csSpider::csSpider ()
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   camera = NULL;
   wrap = NULL;
 }

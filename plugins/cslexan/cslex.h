@@ -83,7 +83,7 @@ class csRegExp : public iRegExp
   unsigned length;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csRegExp(iBase* = 0);
   virtual ~csRegExp();
@@ -125,7 +125,7 @@ class csRegExpCompiler  : public iRegExpCompiler
  unsigned int compile_error;
  
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Intializes the compiler
   csRegExpCompiler(iBase* = 0);
@@ -190,7 +190,7 @@ class csLexicalAnalyzer  : public iLexicalAnalyzer
   csString     last_matched_text;
     
 public:
- DECLARE_IBASE;
+ SCF_DECLARE_IBASE;
 
  /// constructs the machine
  csLexicalAnalyzer(iBase* = 0);
@@ -245,7 +245,7 @@ public:
   // Implement iPlugIn interface.
   struct eiPlugIn : public iPlugIn
   {
-    DECLARE_EMBEDDED_IBASE(csLexicalAnalyzer);
+    SCF_DECLARE_EMBEDDED_IBASE(csLexicalAnalyzer);
     virtual bool Initialize(iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent(iEvent&) { return false; }
   } scfiPlugIn;

@@ -38,22 +38,22 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csIsoEngine)
-  IMPLEMENTS_INTERFACE (iIsoEngine)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csIsoEngine)
+  SCF_IMPLEMENTS_INTERFACE (iIsoEngine)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csIsoEngine)
+SCF_IMPLEMENT_FACTORY (csIsoEngine)
 
-EXPORT_CLASS_TABLE (iso)
-  EXPORT_CLASS_DEP (csIsoEngine, "crystalspace.engine.iso",
+SCF_EXPORT_CLASS_TABLE (iso)
+  SCF_EXPORT_CLASS_DEP (csIsoEngine, "crystalspace.engine.iso",
     "Crystal Space Isometric Engine",
     "crystalspace.kernel., crystalspace.graphics3d., crystalspace.graphics2d.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csIsoEngine::csIsoEngine (iBase *iParent)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   system = NULL;
   g2d = NULL;
   g3d = NULL;
@@ -87,22 +87,22 @@ bool csIsoEngine::HandleEvent (iEvent& Event)
       case cscmdSystemOpen:
       {
         // system is open we can get ptrs now
-        g3d = QUERY_PLUGIN_ID (system, CS_FUNCID_VIDEO, iGraphics3D);
+        g3d = CS_QUERY_PLUGIN_ID (system, CS_FUNCID_VIDEO, iGraphics3D);
         if (!g3d)
         {
-          system->Printf(MSG_INTERNAL_ERROR, "IsoEngine: could not get G3D.\n");
+          system->Printf(CS_MSG_INTERNAL_ERROR, "IsoEngine: could not get G3D.\n");
           return false;
         }
         g2d = g3d->GetDriver2D ();
         if (!g2d) 
         {
-          system->Printf(MSG_INTERNAL_ERROR, "IsoEngine: could not get G2D.\n");
+          system->Printf(CS_MSG_INTERNAL_ERROR, "IsoEngine: could not get G2D.\n");
           return false;
         }
         txtmgr = g3d->GetTextureManager();
         if (!txtmgr) 
         {
-          system->Printf(MSG_INTERNAL_ERROR, 
+          system->Printf(CS_MSG_INTERNAL_ERROR, 
             "IsoEngine: could not get TextureManager.\n");
           return false;
         }
@@ -212,9 +212,9 @@ iIsoLight* csIsoEngine::CreateLight()
 iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(iMaterial *material,
       const char *name)
 {
-  iMaterialWrapper* wrap = QUERY_INTERFACE(materials.NewMaterial(material),
+  iMaterialWrapper* wrap = SCF_QUERY_INTERFACE(materials.NewMaterial(material),
     iMaterialWrapper);
-  iObject *object = QUERY_INTERFACE(wrap, iObject);
+  iObject *object = SCF_QUERY_INTERFACE(wrap, iObject);
   object->SetName(name);
   object->DecRef();
   return wrap;
@@ -223,9 +223,9 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(iMaterial *material,
 iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(iMaterialHandle *handle,
 	    const char *name)
 {
-  iMaterialWrapper* wrap = QUERY_INTERFACE(materials.NewMaterial(handle),
+  iMaterialWrapper* wrap = SCF_QUERY_INTERFACE(materials.NewMaterial(handle),
     iMaterialWrapper);
-  iObject *object = QUERY_INTERFACE(wrap, iObject);
+  iObject *object = SCF_QUERY_INTERFACE(wrap, iObject);
   object->SetName(name);
   object->DecRef();
   //printf("name %s = %d \n", name, materials.FindByName(name)->GetIndex());
@@ -235,19 +235,19 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(iMaterialHandle *handle,
 iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
 	          const char *materialname)
 {
-  iImageIO *imgloader = QUERY_PLUGIN(system, iImageIO);
+  iImageIO *imgloader = CS_QUERY_PLUGIN(system, iImageIO);
   if(imgloader==NULL)
   {
-    system->Printf(MSG_INTERNAL_ERROR, "Could not get image loader plugin.\n");
-    system->Printf(MSG_INTERNAL_ERROR, "Failed to load file %s.\n", 
+    system->Printf(CS_MSG_INTERNAL_ERROR, "Could not get image loader plugin.\n");
+    system->Printf(CS_MSG_INTERNAL_ERROR, "Failed to load file %s.\n", 
       vfsfilename);
     return NULL;
   }
-  iVFS *VFS = QUERY_PLUGIN(system, iVFS);
+  iVFS *VFS = CS_QUERY_PLUGIN(system, iVFS);
   if(VFS==NULL)
   {
-    system->Printf(MSG_INTERNAL_ERROR, "Could not get VFS plugin.\n");
-    system->Printf(MSG_INTERNAL_ERROR, "Failed to load file %s.\n", 
+    system->Printf(CS_MSG_INTERNAL_ERROR, "Could not get VFS plugin.\n");
+    system->Printf(CS_MSG_INTERNAL_ERROR, "Failed to load file %s.\n", 
       vfsfilename);
     return NULL;
   }
@@ -255,7 +255,7 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
   iDataBuffer *buf = VFS->ReadFile (vfsfilename);
   if(!buf) 
   {
-    system->Printf(MSG_INTERNAL_ERROR, "Could not read vfs file %s\n", 
+    system->Printf(CS_MSG_INTERNAL_ERROR, "Could not read vfs file %s\n", 
       vfsfilename);
     return NULL;
   }
@@ -263,7 +263,7 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
     txtmgr->GetTextureFormat ());
   if(!image) 
   {
-    system->Printf(MSG_INTERNAL_ERROR, 
+    system->Printf(CS_MSG_INTERNAL_ERROR, 
       "The imageloader could not load image %s\n", vfsfilename);
     return NULL;
   }
@@ -271,7 +271,7 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
     CS_TEXTURE_3D);
   if(!handle) 
   {
-    system->Printf(MSG_INTERNAL_ERROR, 
+    system->Printf(CS_MSG_INTERNAL_ERROR, 
       "Texturemanager could not register texture %s\n", vfsfilename);
     return NULL;
   }
@@ -279,7 +279,7 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
   iMaterialHandle *math = txtmgr->RegisterMaterial(material);
   if(!math) 
   {
-    system->Printf(MSG_INTERNAL_ERROR, 
+    system->Printf(CS_MSG_INTERNAL_ERROR, 
       "Texturemanager could not register material %s\n", materialname);
     return NULL;
   }
@@ -291,12 +291,12 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
 
 iMaterialWrapper *csIsoEngine::FindMaterial(const char *name)
 {
-  return QUERY_INTERFACE(materials.FindByName(name), iMaterialWrapper);
+  return SCF_QUERY_INTERFACE(materials.FindByName(name), iMaterialWrapper);
 }
 
 iMaterialWrapper *csIsoEngine::FindMaterial(int index)
 {
-  return QUERY_INTERFACE(materials.Get(index), iMaterialWrapper);
+  return SCF_QUERY_INTERFACE(materials.Get(index), iMaterialWrapper);
 }
 
 void csIsoEngine::RemoveMaterial(const char *name)
@@ -331,9 +331,9 @@ iMeshObjectFactory *csIsoEngine::CreateMeshFactory(const char* classId,
 {
   if(name && FindMeshFactory(name))
     return FindMeshFactory(name);
-  iMeshObjectType *mesh_type = QUERY_PLUGIN_CLASS (system, classId, "MeshObj", 
+  iMeshObjectType *mesh_type = CS_QUERY_PLUGIN_CLASS (system, classId, "MeshObj", 
     iMeshObjectType);
-  if(!mesh_type) mesh_type = LOAD_PLUGIN( system, classId,  "MeshObj", 
+  if(!mesh_type) mesh_type = CS_LOAD_PLUGIN( system, classId,  "MeshObj", 
     iMeshObjectType);
   if(!mesh_type) return NULL;
   iMeshObjectFactory *mesh_fact = mesh_type->NewFactory();

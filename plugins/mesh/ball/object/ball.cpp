@@ -33,19 +33,19 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csBallMeshObject)
-  IMPLEMENTS_INTERFACE (iMeshObject)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iBallState)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csBallMeshObject)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iBallState)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::BallState)
-  IMPLEMENTS_INTERFACE (iBallState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::BallState)
+  SCF_IMPLEMENTS_INTERFACE (iBallState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
 {
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiBallState);
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiBallState);
   csBallMeshObject::factory = factory;
   initialized = false;
   cur_cameranr = -1;
@@ -586,13 +586,13 @@ void csBallMeshObject::HardTransform (const csReversibleTransform& t)
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csBallMeshObjectFactory)
-  IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csBallMeshObjectFactory)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
+SCF_IMPLEMENT_IBASE_END
 
 csBallMeshObjectFactory::csBallMeshObjectFactory (iBase *pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csBallMeshObjectFactory::~csBallMeshObjectFactory ()
@@ -602,28 +602,28 @@ csBallMeshObjectFactory::~csBallMeshObjectFactory ()
 iMeshObject* csBallMeshObjectFactory::NewInstance ()
 {
   csBallMeshObject* cm = new csBallMeshObject ((iMeshObjectFactory*)this);
-  iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
+  iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
 }
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csBallMeshObjectType)
-  IMPLEMENTS_INTERFACE (iMeshObjectType)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csBallMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csBallMeshObjectType)
+SCF_IMPLEMENT_FACTORY (csBallMeshObjectType)
 
-EXPORT_CLASS_TABLE (ball)
-  EXPORT_CLASS (csBallMeshObjectType, "crystalspace.mesh.object.ball",
+SCF_EXPORT_CLASS_TABLE (ball)
+  SCF_EXPORT_CLASS (csBallMeshObjectType, "crystalspace.mesh.object.ball",
     "Crystal Space Ball Mesh Type")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csBallMeshObjectType::csBallMeshObjectType (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csBallMeshObjectType::~csBallMeshObjectType ()
@@ -638,7 +638,7 @@ bool csBallMeshObjectType::Initialize (iSystem*)
 iMeshObjectFactory* csBallMeshObjectType::NewFactory ()
 {
   csBallMeshObjectFactory* cm = new csBallMeshObjectFactory (this);
-  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;
 }

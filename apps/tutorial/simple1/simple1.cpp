@@ -40,7 +40,7 @@
 
 CS_IMPLEMENT_APPLICATION
 
-REGISTER_STATIC_LIBRARY (lvlload)
+SCF_REGISTER_STATIC_LIBRARY (lvlload)
 
 //-----------------------------------------------------------------------------
 
@@ -73,31 +73,31 @@ bool Simple::Initialize (int argc, const char* const argv[],
     return false;
 
   // Find the pointer to engine plugin
-  engine = QUERY_PLUGIN (this, iEngine);
+  engine = CS_QUERY_PLUGIN (this, iEngine);
   if (!engine)
   {
-    Printf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
 
-  loader = QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
+  loader = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
   if (!loader)
   {
-    Printf (MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
 
-  g3d = QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
+  g3d = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
   if (!g3d)
   {
-    Printf (MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
     abort ();
   }
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("Simple Crystal Space Application"))
   {
-    Printf (MSG_FATAL_ERROR, "Error opening system!\n");
+    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     cleanup ();
     exit (1);
   }
@@ -109,7 +109,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   // Initialize the texture manager
   txtmgr->ResetPalette ();
 
-  Printf (MSG_INITIALIZATION,
+  Printf (CS_MSG_INITIALIZATION,
     "Simple Crystal Space Application version 0.1.\n");
 
   // First disable the lighting cache. Our app is simple enough
@@ -117,11 +117,11 @@ bool Simple::Initialize (int argc, const char* const argv[],
   engine->EnableLightingCache (false);
 
   // Create our world.
-  Printf (MSG_INITIALIZATION, "Creating world!...\n");
+  Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
 
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   {
-    Printf (MSG_FATAL_ERROR, "Error loading 'stone4' texture!\n");
+    Printf (CS_MSG_FATAL_ERROR, "Error loading 'stone4' texture!\n");
     cleanup ();
     exit (1);
   }
@@ -129,7 +129,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
   room = engine->CreateSector ("room");
   iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
-  iThingState* walls_state = QUERY_INTERFACE (walls->GetMeshObject (),
+  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
   	iThingState);
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
@@ -194,7 +194,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   room->AddLight (light);
 
   engine->Prepare ();
-  Printf (MSG_INITIALIZATION, "Created.\n");
+  Printf (CS_MSG_INITIALIZATION, "Created.\n");
 
   view = engine->CreateView (g3d);
   view->GetCamera ()->SetSector (room);
@@ -280,7 +280,7 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
   {
-    System->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
+    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
     cleanup ();
     exit (1);
   }

@@ -55,46 +55,46 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SOURCE)
 CS_TOKEN_DEF_END
 
-IMPLEMENT_IBASE (csSpiralFactoryLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSpiralFactoryLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csSpiralFactorySaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSpiralFactorySaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csSpiralLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSpiralLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csSpiralSaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSpiralSaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csSpiralFactoryLoader)
-IMPLEMENT_FACTORY (csSpiralFactorySaver)
-IMPLEMENT_FACTORY (csSpiralLoader)
-IMPLEMENT_FACTORY (csSpiralSaver)
+SCF_IMPLEMENT_FACTORY (csSpiralFactoryLoader)
+SCF_IMPLEMENT_FACTORY (csSpiralFactorySaver)
+SCF_IMPLEMENT_FACTORY (csSpiralLoader)
+SCF_IMPLEMENT_FACTORY (csSpiralSaver)
 
-EXPORT_CLASS_TABLE (spirldr)
-  EXPORT_CLASS (csSpiralFactoryLoader,
+SCF_EXPORT_CLASS_TABLE (spirldr)
+  SCF_EXPORT_CLASS (csSpiralFactoryLoader,
   	"crystalspace.mesh.loader.factory.spiral",
 	"Crystal Space Spiral Factory Loader")
-  EXPORT_CLASS (csSpiralFactorySaver, "crystalspace.mesh.saver.factory.spiral",
+  SCF_EXPORT_CLASS (csSpiralFactorySaver, "crystalspace.mesh.saver.factory.spiral",
     "Crystal Space Spiral Factory Saver")
-  EXPORT_CLASS (csSpiralLoader, "crystalspace.mesh.loader.spiral",
+  SCF_EXPORT_CLASS (csSpiralLoader, "crystalspace.mesh.loader.spiral",
     "Crystal Space Spiral Mesh Loader")
-  EXPORT_CLASS (csSpiralSaver, "crystalspace.mesh.saver.spiral",
+  SCF_EXPORT_CLASS (csSpiralSaver, "crystalspace.mesh.saver.spiral",
     "Crystal Space Spiral Mesh Saver")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csSpiralFactoryLoader::csSpiralFactoryLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSpiralFactoryLoader::~csSpiralFactoryLoader ()
@@ -110,11 +110,11 @@ bool csSpiralFactoryLoader::Initialize (iSystem* system)
 iBase* csSpiralFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys,
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (sys,
   	"crystalspace.mesh.object.spiral", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = LOAD_PLUGIN (sys, "crystalspace.mesh.object.spiral",
+    type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.spiral",
     	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.spiral\n");
   }
@@ -126,7 +126,7 @@ iBase* csSpiralFactoryLoader::Parse (const char* /*string*/,
 //---------------------------------------------------------------------------
 csSpiralFactorySaver::csSpiralFactorySaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSpiralFactorySaver::~csSpiralFactorySaver ()
@@ -167,7 +167,7 @@ void csSpiralFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 //---------------------------------------------------------------------------
 csSpiralLoader::csSpiralLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSpiralLoader::~csSpiralLoader ()
@@ -247,7 +247,7 @@ iBase* csSpiralLoader::Parse (const char* string, iEngine* engine,
   char* params;
   char str[255];
 
-  iMeshWrapper* imeshwrap = QUERY_INTERFACE (context, iMeshWrapper);
+  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
   imeshwrap->DecRef ();
 
   iMeshObject* mesh = NULL;
@@ -293,8 +293,8 @@ iBase* csSpiralLoader::Parse (const char* string, iEngine* engine,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  imeshwrap->SetFactory (fact);
-          partstate = QUERY_INTERFACE (mesh, iParticleState);
-          spiralstate = QUERY_INTERFACE (mesh, iSpiralState);
+          partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
+          spiralstate = SCF_QUERY_INTERFACE (mesh, iSpiralState);
 	}
 	break;
       case CS_TOKEN_MATERIAL:
@@ -334,7 +334,7 @@ iBase* csSpiralLoader::Parse (const char* string, iEngine* engine,
 
 csSpiralSaver::csSpiralSaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSpiralSaver::~csSpiralSaver ()
@@ -350,9 +350,9 @@ bool csSpiralSaver::Initialize (iSystem* system)
 void csSpiralSaver::WriteDown (iBase* obj, iStrVector *str,
   iEngine* /*engine*/)
 {
-  iFactory *fact = QUERY_INTERFACE (this, iFactory);
-  iParticleState *partstate = QUERY_INTERFACE (obj, iParticleState);
-  iSpiralState *state = QUERY_INTERFACE (obj, iSpiralState);
+  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
+  iParticleState *partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
+  iSpiralState *state = SCF_QUERY_INTERFACE (obj, iSpiralState);
   char buf[MAXLINE];
   char name[MAXLINE];
 

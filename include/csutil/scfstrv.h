@@ -29,11 +29,11 @@ class scfStrVector : public iStrVector
   csStrVector v;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Create a iStrVector from scratch
   scfStrVector (int iLimit = 16, int iDelta = 16) : v (iLimit, iDelta)
-  { CONSTRUCT_IBASE (NULL); }
+  { SCF_CONSTRUCT_IBASE (NULL); }
 
   /// Destructor - nothing to do
   virtual ~scfStrVector ()

@@ -111,12 +111,12 @@ public:
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return false; }
 
-  DECLARE_IBASE_EXT (csParticleSystem);
+  SCF_DECLARE_IBASE_EXT (csParticleSystem);
 
   //------------------------- iRainState implementation ----------------
   class RainState : public iRainState
   {
-    DECLARE_EMBEDDED_IBASE (csRainMeshObject);
+    SCF_DECLARE_EMBEDDED_IBASE (csRainMeshObject);
     virtual void SetParticleCount (int num)
     {
       scfParent->SetParticleCount (num);
@@ -167,7 +167,7 @@ public:
   virtual ~csRainMeshObjectFactory ();
 
   //------------------------ iMeshObjectFactory implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
@@ -194,7 +194,7 @@ public:
   virtual bool Initialize (iSystem *pSystem);
 
   //------------------------ iMeshObjectType implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Draw.
   virtual iMeshObjectFactory* NewFactory ();

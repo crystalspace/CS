@@ -40,18 +40,18 @@ extern "C"
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csJPGImageIO)
-  IMPLEMENTS_INTERFACE (iImageIO)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csJPGImageIO)
+  SCF_IMPLEMENTS_INTERFACE (iImageIO)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csJPGImageIO);
+SCF_IMPLEMENT_FACTORY (csJPGImageIO);
 
-EXPORT_CLASS_TABLE (csjpgimg)
-  EXPORT_CLASS (csJPGImageIO,
+SCF_EXPORT_CLASS_TABLE (csjpgimg)
+  SCF_EXPORT_CLASS (csJPGImageIO,
     "crystalspace.graphic.image.io.jpg",
     "CrystalSpace JPG image format I/O plugin")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 #define JPG_MIME "image/jpg"
 
@@ -63,7 +63,7 @@ static iImageIO::FileFormatDescription formatlist[2] =
 
 csJPGImageIO::csJPGImageIO (iBase *pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
   formats.Push (&formatlist[0]);
   formats.Push (&formatlist[1]);
 }

@@ -15,7 +15,7 @@ class csSGIImageIO : public iImageIO
   csVector formats;
 
  public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csSGIImageIO (iBase *pParent);
   virtual ~csSGIImageIO () {}

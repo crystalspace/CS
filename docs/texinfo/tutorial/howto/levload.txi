@@ -12,7 +12,7 @@ At this moment the level loader is not yet a plugin but already
 behaves like one. For that reason you still have to do:
 
 @example
-  REGISTER_STATIC_LIBRARY (lvlload)
+  SCF_REGISTER_STATIC_LIBRARY (lvlload)
 @end example
 
 Somewhere in the beginning of your program (this is a declaration, put
@@ -44,7 +44,7 @@ To finally be able to use the level loader in your application you
 need to do:
 
 @example
-  iLoader* level_loader = QUERY_PLUGIN_ID (System,
+  iLoader* level_loader = CS_QUERY_PLUGIN_ID (System,
   	CS_FUNCID_LVLLOADER, iLoader);
 @end example
 

@@ -54,7 +54,7 @@ public:
   /// Set halo intensity
   virtual void SetIntensity (float iInt) { Intensity = iInt; }
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 };
 
 /**
@@ -75,10 +75,10 @@ public:
   virtual unsigned char *Generate (int Size);
 
   //------------------------ iCrossHalo ------------------------------------
-  DECLARE_IBASE_EXT (csHalo);
+  SCF_DECLARE_IBASE_EXT (csHalo);
   struct CrossHalo : public iCrossHalo
   {
-    DECLARE_EMBEDDED_IBASE (csCrossHalo);
+    SCF_DECLARE_EMBEDDED_IBASE (csCrossHalo);
     virtual void SetIntensityFactor (float i)
     { scfParent->IntensityFactor = i; }
     virtual float GetIntensityFactor ()
@@ -109,10 +109,10 @@ public:
   virtual unsigned char *Generate (int Size);
 
   //------------------------ iNovaHalo ------------------------------------
-  DECLARE_IBASE_EXT (csHalo);
+  SCF_DECLARE_IBASE_EXT (csHalo);
   struct NovaHalo : public iNovaHalo
   {
-    DECLARE_EMBEDDED_IBASE (csNovaHalo);
+    SCF_DECLARE_EMBEDDED_IBASE (csNovaHalo);
     virtual void SetRandomSeed (int s)
     { scfParent->Seed = s; }
     virtual int GetRandomSeed ()
@@ -176,10 +176,10 @@ public:
   virtual unsigned char *Generate (int Size);
 
   //------------------------ iFlareHalo ------------------------------------
-  DECLARE_IBASE_EXT (csHalo);
+  SCF_DECLARE_IBASE_EXT (csHalo);
   struct FlareHalo : public iFlareHalo
   {
-    DECLARE_EMBEDDED_IBASE (csFlareHalo);
+    SCF_DECLARE_EMBEDDED_IBASE (csFlareHalo);
     virtual void AddComponent (float pos, float w, float h, UInt mode, 
       iMaterialWrapper *image)
     {

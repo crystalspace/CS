@@ -102,12 +102,12 @@ public:
   ///
   iObject* operator[] (int i) { return (iObject*) (objects[i]); }
   
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   //------------------------- iCollection interface --------------------------
   struct Collection : public iCollection
   {
-    DECLARE_EMBEDDED_IBASE (csCollection);
+    SCF_DECLARE_EMBEDDED_IBASE (csCollection);
     virtual void* GetPrivateObject () { return (void*)scfParent; }
     virtual iObject *QueryObject()
       { return scfParent; }

@@ -32,12 +32,12 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csGraphics2DGLX)
+SCF_IMPLEMENT_FACTORY (csGraphics2DGLX)
 
-EXPORT_CLASS_TABLE (glx2d)
-  EXPORT_CLASS_DEP (csGraphics2DGLX, "crystalspace.graphics2d.glx",
+SCF_EXPORT_CLASS_TABLE (glx2d)
+  SCF_EXPORT_CLASS_DEP (csGraphics2DGLX, "crystalspace.graphics2d.glx",
     "GL/X OpenGL 2D graphics driver for Crystal Space", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 #define DEF_OGLDISP "crystalspace.graphics2d.glx.disp.empty"
 
@@ -62,9 +62,9 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
 
   if ((strDriver = config->GetStr ("Video.OpenGL.Display.Driver", NULL)))
   {
-    dispdriver = LOAD_PLUGIN (pSystem, strDriver, NULL, iOpenGLDisp);
+    dispdriver = CS_LOAD_PLUGIN (pSystem, strDriver, NULL, iOpenGLDisp);
     if (!dispdriver)
-      CsPrintf (MSG_FATAL_ERROR, "Could not create an instance of %s ! Using NULL instead.\n", strDriver);
+      CsPrintf (CS_MSG_FATAL_ERROR, "Could not create an instance of %s ! Using NULL instead.\n", strDriver);
     else
     {
       if (!dispdriver->open ())
@@ -85,7 +85,7 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
   dpy = XOpenDisplay (NULL);
   if (!dpy)
   {
-    CsPrintf (MSG_FATAL_ERROR, "FATAL: Cannot open X display\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "FATAL: Cannot open X display\n");
     exit (-1);
   }
 
@@ -148,12 +148,12 @@ bool csGraphics2DGLX::CreateContext (int *desired_attributes)
     cmap = XCreateColormap (dpy, RootWindow (dpy, active_GLVisual->screen),
 			    active_GLVisual->visual, AllocNone);
 
-//    CsPrintf (MSG_INITIALIZATION, "Seized Visual ID %d\n", 
+//    CsPrintf (CS_MSG_INITIALIZATION, "Seized Visual ID %d\n", 
 //	      active_GLVisual->visual->visualid);
   }
   else
   {
-    CsPrintf (MSG_FATAL_ERROR, "FATAL: Could not find proper GLX visual\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "FATAL: Could not find proper GLX visual\n");
  
     // what attribute was not supplied? we know that trying to get
     // all the attributes at once doesn't work.  provide more user info by
@@ -171,18 +171,18 @@ bool csGraphics2DGLX::CreateContext (int *desired_attributes)
 
     if (!glXChooseVisual(dpy, screen_num, color_attributes) )
     {
-      CsPrintf(MSG_FATAL_ERROR, "Graphics display does not support at least 12 bit color\n");
+      CsPrintf(CS_MSG_FATAL_ERROR, "Graphics display does not support at least 12 bit color\n");
     }
 
     // try to get visual with a depth buffer
     int depthbuffer_attributes [] = {GLX_RGBA, GLX_DEPTH_SIZE,1, None};
     if (!glXChooseVisual (dpy,screen_num,depthbuffer_attributes))
-      CsPrintf(MSG_FATAL_ERROR,"Graphics display does not support a depth buffer\n");
+      CsPrintf(CS_MSG_FATAL_ERROR,"Graphics display does not support a depth buffer\n");
 
     // try to get a visual with double buffering
     int doublebuffer_attributes [] = {GLX_RGBA, GLX_DOUBLEBUFFER, None};
     if (!glXChooseVisual (dpy,screen_num,doublebuffer_attributes))
-	CsPrintf(MSG_FATAL_ERROR,"Graphics display does not provide double buffering\n");
+	CsPrintf(CS_MSG_FATAL_ERROR,"Graphics display does not provide double buffering\n");
 
     return false;
   }
@@ -230,8 +230,8 @@ bool csGraphics2DGLX::Open(const char *Title)
   if (!CreateContext (desired_attributes))
     return false;
 
-  CsPrintf (MSG_INITIALIZATION, "\nVideo driver GL/X version ");
-  CsPrintf (MSG_INITIALIZATION, "%s\n",
+  CsPrintf (CS_MSG_INITIALIZATION, "\nVideo driver GL/X version ");
+  CsPrintf (CS_MSG_INITIALIZATION, "%s\n",
     glXIsDirect (dpy, active_GLContext) ? "(direct renderer)" : "");
 
   Depth = active_GLVisual->depth;
@@ -240,7 +240,7 @@ bool csGraphics2DGLX::Open(const char *Title)
     pfmt.PixelBytes = 4;
   else pfmt.PixelBytes = 2;
 
-  CsPrintf (MSG_INITIALIZATION, "Visual ID: %x, %dbit %s\n",
+  CsPrintf (CS_MSG_INITIALIZATION, "Visual ID: %x, %dbit %s\n",
 	    active_GLVisual->visualid, Depth, 
 	    visual_class_name (active_GLVisual->c_class));
 
@@ -268,24 +268,24 @@ bool csGraphics2DGLX::Open(const char *Title)
   }
 
   // Report Info
-  CsPrintf (MSG_INITIALIZATION, "Frame buffer: %dbit ", frame_buffer_depth);
+  CsPrintf (CS_MSG_INITIALIZATION, "Frame buffer: %dbit ", frame_buffer_depth);
   if (ctype)
   {
     if (pfmt.RedMask > pfmt.BlueMask)
     {
-      CsPrintf (MSG_INITIALIZATION, 
+      CsPrintf (CS_MSG_INITIALIZATION, 
 		"R%d:G%d:B%d:A%d, ", 
 		pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits, alpha_bits);
     }
     else
     {
-      CsPrintf (MSG_INITIALIZATION, 
+      CsPrintf (CS_MSG_INITIALIZATION, 
 		"B%d:G%d:R%d:A%d, ", 
 		pfmt.BlueBits, pfmt.GreenBits, pfmt.RedBits, alpha_bits);
     }
   } 
-  CsPrintf (MSG_INITIALIZATION, "level %d, double buffered\n", level);
-  CsPrintf (MSG_INITIALIZATION, "Depth buffer: %dbit\n", size_depth_buffer);
+  CsPrintf (CS_MSG_INITIALIZATION, "level %d, double buffered\n", level);
+  CsPrintf (CS_MSG_INITIALIZATION, "Depth buffer: %dbit\n", size_depth_buffer);
 
   pfmt.complete ();
 

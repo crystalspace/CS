@@ -20,13 +20,13 @@
 #include "isocell.h"
 #include "ivideo/graph3d.h"
 
-IMPLEMENT_IBASE (csIsoCell)
-  IMPLEMENTS_INTERFACE (iIsoCell)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csIsoCell)
+  SCF_IMPLEMENTS_INTERFACE (iIsoCell)
+SCF_IMPLEMENT_IBASE_END
 
 csIsoCell::csIsoCell (iBase *iParent)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   root = NULL;
 }
 

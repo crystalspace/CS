@@ -214,12 +214,12 @@ public:
    */
   void CheckFrustum (iFrustumView* lview, int alpha);
 
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
 
   //------------------- iPortal implementation -----------------------
   struct Portal : public iPortal
   {
-    DECLARE_EMBEDDED_IBASE (csPortal);
+    SCF_DECLARE_EMBEDDED_IBASE (csPortal);
     virtual iReferencedObject* GetReferencedObject () const
     { return scfParent->GetReferencedObject (); }
     virtual void SetReferencedObject (iReferencedObject* b)

@@ -27,23 +27,23 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csGraphics2DMGL)
+SCF_IMPLEMENT_FACTORY (csGraphics2DMGL)
 
-EXPORT_CLASS_TABLE (mgl2d)
-  EXPORT_CLASS_DEP (csGraphics2DMGL, "crystalspace.graphics2d.mgl",
+SCF_EXPORT_CLASS_TABLE (mgl2d)
+  SCF_EXPORT_CLASS_DEP (csGraphics2DMGL, "crystalspace.graphics2d.mgl",
     "SciTech MGL 2D graphics driver for Crystal Space", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csGraphics2DMGL)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics2D)
-  IMPLEMENTS_INTERFACE (iEventPlug)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics2DMGL)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+SCF_IMPLEMENT_IBASE_END
 
 // csGraphics2DMGL functions
 csGraphics2DMGL::csGraphics2DMGL (iBase *iParent) : csGraphics2D ()
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   dc = backdc = NULL;
   joybutt = 0;
   EventOutlet = NULL;
@@ -72,20 +72,20 @@ bool csGraphics2DMGL::Initialize (iSystem *pSystem)
 
   if (Depth != 8 && Depth != 15 && Depth != 16 && Depth != 32)
   {
-    System->Printf (MSG_FATAL_ERROR, "Invalid color bit depth (%d)!\n", Depth);
+    System->Printf (CS_MSG_FATAL_ERROR, "Invalid color bit depth (%d)!\n", Depth);
     return false;
   }
 
   if (MGL_init (".", NULL) == 0)
   {
-    System->Printf (MSG_FATAL_ERROR, "%s\n", MGL_errorMsg (MGL_result ()));
+    System->Printf (CS_MSG_FATAL_ERROR, "%s\n", MGL_errorMsg (MGL_result ()));
     return false;
   }
 
   video_mode = MGL_findMode (Width, Height, Depth);
   if (video_mode == -1)
   {
-    System->Printf (MSG_FATAL_ERROR, "The mode %dx%dx%d is not available (%s)!\n",
+    System->Printf (CS_MSG_FATAL_ERROR, "The mode %dx%dx%d is not available (%s)!\n",
       Width, Height, Depth, MGL_errorMsg (MGL_result ()));
     return false;
   }
@@ -137,7 +137,7 @@ bool csGraphics2DMGL::Open (const char *Title)
 
   if ((dc = MGL_createDisplayDC (video_mode, numPages, MGL_DEFAULT_REFRESH)) == NULL)
   {
-    System->Printf (MSG_FATAL_ERROR, "%s\n", MGL_errorMsg (MGL_result ()));
+    System->Printf (CS_MSG_FATAL_ERROR, "%s\n", MGL_errorMsg (MGL_result ()));
     return false;
   }
   MGL_makeCurrentDC (dc);

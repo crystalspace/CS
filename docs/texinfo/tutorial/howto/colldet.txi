@@ -27,10 +27,10 @@ To load a collision detection system you can use the following code:
 const char* p = Config->GetStr ("MyGame.Settings.CollDetPlugIn",
   	"crystalspace.collisiondetection.rapid");
 iCollideSystem* cd_sys =
-  LOAD_PLUGIN (System, p, "CollDet", iCollideSystem);
+  CS_LOAD_PLUGIN (System, p, "CollDet", iCollideSystem);
 if (!cd_sys)
 @{
-  Printf (MSG_FATAL_ERROR, "No Collision Detection plugin found!\n");
+  Printf (CS_MSG_FATAL_ERROR, "No Collision Detection plugin found!\n");
   return false;
 @}
 @end example
@@ -55,7 +55,7 @@ for a mesh:
 @example
 iCollider* MyGame::InitCollider (iMeshWrapper* mesh)
 @{
-  iPolygonMesh* polmesh = QUERY_INTERFACE (mesh->GetMeshObject (),
+  iPolygonMesh* polmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
   	iPolygonMesh);
   if (polmesh)
     return cd_sys->CreateCollider (polmesh);

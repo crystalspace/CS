@@ -29,7 +29,7 @@
  * is generally used as a sort of pulse beat during indeterminately lengthy
  * computational operations in order to let the user know that progress is
  * being made and that the program is not hanging.  By default, the pulse beat
- * is presented to the user by passing MSG_INITIALIZATION to the system print
+ * is presented to the user by passing CS_MSG_INITIALIZATION to the system print
  * function.  This setting may be changed with the SetMessageType() method.
  * To animate the pulse object, call the Step() method each time a unit of
  * work has been completed.  At each step a backspace (\b) followed by one of
@@ -43,7 +43,7 @@ class csProgressPulse
 {
 private:
   iSystem* sys;
-  int type;	// One of MSG_INITIALIZATION, MSG_CONSOLE, MSG_STDOUT, etc.
+  int type;	// One of CS_MSG_INITIALIZATION, CS_MSG_CONSOLE, CS_MSG_STDOUT, etc.
   int state;
   bool drawn;
 

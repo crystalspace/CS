@@ -55,7 +55,7 @@ public:
 
   bool system_extension(char const* msg, void* = 0, void* = 0) const;
   void user_close() const;
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 };
 
 #else // __cplusplus

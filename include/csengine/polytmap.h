@@ -130,12 +130,12 @@ public:
   /// Get the transformation from object to texture space.
   void GetTextureSpace (csMatrix3& tx_matrix, csVector3& tx_vector);
 
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
 
   //----------------- iPolyTxtPlane interface implementation -----------------
   struct PolyTxtPlane : public iPolyTxtPlane
   {
-    DECLARE_EMBEDDED_IBASE (csPolyTxtPlane);
+    SCF_DECLARE_EMBEDDED_IBASE (csPolyTxtPlane);
 
     virtual iObject *QueryObject()
     {

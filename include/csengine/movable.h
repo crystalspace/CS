@@ -229,12 +229,12 @@ public:
    */
   long GetUpdateNumber () const { return updatenr; }
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   //------------------------- iMovable interface -------------------------------
   struct eiMovable : public iMovable
   {
-    DECLARE_EMBEDDED_IBASE (csMovable);
+    SCF_DECLARE_EMBEDDED_IBASE (csMovable);
     virtual iMovable* GetParent () const
     {
       return scfParent->iparent;

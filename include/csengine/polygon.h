@@ -126,7 +126,7 @@ public:
   /// Gets the mode that is used for DrawPolygonFX.
   virtual UInt GetMixMode () { return (MixMode | Alpha); }
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 };
 
 /**
@@ -148,7 +148,7 @@ private:
 protected:
   /// Constructor.
   csPolyTexFlat () : csPolyTexType ()
-  { CONSTRUCT_EMBEDDED_IBASE(scfiPolyTexFlat); uv_coords = NULL; }
+  { SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPolyTexFlat); uv_coords = NULL; }
 
   /// Destructor.
   virtual ~csPolyTexFlat ();
@@ -192,11 +192,11 @@ public:
   /// Get the pointer to the vertex uv coordinates.
   virtual csVector2 *GetUVCoords () { return uv_coords; }
 
-  DECLARE_IBASE_EXT (csPolyTexType);
+  SCF_DECLARE_IBASE_EXT (csPolyTexType);
 
   struct eiPolyTexFlat : public iPolyTexFlat
   {
-    DECLARE_EMBEDDED_IBASE(csPolyTexFlat);
+    SCF_DECLARE_EMBEDDED_IBASE(csPolyTexFlat);
     virtual void Setup (iPolygon3D *p) { scfParent->Setup(p); }
     virtual void SetUV (int i, float u, float v) { scfParent->SetUV(i,u,v); }
     virtual void ClearUV () { scfParent->ClearUV(); }
@@ -229,7 +229,7 @@ private:
 protected:
   /// Constructor.
   csPolyTexGouraud () : csPolyTexFlat ()
-  { CONSTRUCT_EMBEDDED_IBASE(scfiPolyTexGouraud); colors = static_colors = 0; }
+  { SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPolyTexGouraud); colors = static_colors = 0; }
 
   /// Destructor.
   virtual ~csPolyTexGouraud ();
@@ -300,11 +300,11 @@ public:
   virtual void SetColor (int i, const csColor& c)
   { SetColor (i, c.red, c.green, c.blue); }
 
-  DECLARE_IBASE_EXT (csPolyTexFlat);
+  SCF_DECLARE_IBASE_EXT (csPolyTexFlat);
 
   struct eiPolyTexGouraud : public iPolyTexGouraud
   {
-    DECLARE_EMBEDDED_IBASE(csPolyTexGouraud);
+    SCF_DECLARE_EMBEDDED_IBASE(csPolyTexGouraud);
     virtual void Setup (iPolygon3D *p) { scfParent->Setup(p); }
     virtual void ClearColors () { scfParent->ClearColors(); }
     virtual csColor *GetColors () { return scfParent->GetColors(); }
@@ -380,11 +380,11 @@ public:
    */
   iLightMap* GetLightMap () { return tex->GetLightMap (); }
 
-  DECLARE_IBASE_EXT (csPolyTexType);
+  SCF_DECLARE_IBASE_EXT (csPolyTexType);
 
   struct eiPolyTexLightMap : public iPolyTexLightMap
   {
-    DECLARE_EMBEDDED_IBASE(csPolyTexLightMap);
+    SCF_DECLARE_EMBEDDED_IBASE(csPolyTexLightMap);
     virtual iPolyTxtPlane* GetPolyTxtPlane () const
     { return scfParent->GetPolyTxtPlane(); }
   } scfiPolyTexLightMap;
@@ -1227,13 +1227,13 @@ public:
   void SetNextShare (csPolygon3D *next)
   { txt_share_list = next; }
 
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
 
   //------------------- iPolygon3D interface implementation -------------------
 
   struct eiPolygon3D : public iPolygon3D
   {
-    DECLARE_EMBEDDED_IBASE (csPolygon3D);
+    SCF_DECLARE_EMBEDDED_IBASE (csPolygon3D);
 
     virtual csPolygon3D *GetPrivateObject () { return scfParent; }
     virtual iObject *QueryObject() {return scfParent;}
@@ -1258,7 +1258,7 @@ public:
       if (!scfParent->GetMaterialWrapper ()) return NULL;
       else
       {
-        iMaterialWrapper* wrap = QUERY_INTERFACE (
+        iMaterialWrapper* wrap = SCF_QUERY_INTERFACE (
 	  scfParent->GetMaterialWrapper (), iMaterialWrapper);
         wrap->DecRef ();
 	return wrap;

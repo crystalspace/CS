@@ -56,7 +56,7 @@ class csFontServerMultiplexor : public iFontServer
   } fontservers;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Create the plugin object
   csFontServerMultiplexor (iBase *pParent);

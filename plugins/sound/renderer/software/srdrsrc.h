@@ -29,7 +29,7 @@ class csSoundHandleSoftware;
 class csSoundSourceSoftware : public iSoundSource
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 	
   csSoundSourceSoftware(csSoundRenderSoftware *srdr,
     csSoundHandleSoftware *hdl, int snd3d);

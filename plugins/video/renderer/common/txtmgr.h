@@ -110,7 +110,7 @@ public:
   virtual void ComputeMeanColor () = 0;
 
   ///---------------------- iTextureHandle implementation ----------------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Enable transparent color
   virtual void SetKeyColor (bool Enable);
@@ -259,7 +259,7 @@ public:
   { return texture_layer_translate[idx]; }
 
   ///---------------------- iMaterialHandle implementation ----------------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /**
    * Get a texture from the material.
@@ -338,7 +338,7 @@ public:
   /// Pixel format.
   csPixelFormat pfmt;
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Initialize the texture manager
   csTextureManager (iSystem* iSys, iGraphics2D *iG2D);

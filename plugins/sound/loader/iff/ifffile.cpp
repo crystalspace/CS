@@ -34,10 +34,10 @@ CS_IMPLEMENT_PLUGIN
 class csSoundLoader_IFF : public iSoundLoader
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csSoundLoader_IFF(iBase *p) {
-    CONSTRUCT_IBASE(p);
+    SCF_CONSTRUCT_IBASE(p);
   }
   virtual bool Initialize(iSystem *) {
     return true;
@@ -45,17 +45,17 @@ public:
   virtual iSoundData *LoadSound(void *Buffer, unsigned long Size) const;
 };
 
-IMPLEMENT_IBASE(csSoundLoader_IFF)
-  IMPLEMENTS_INTERFACE(iSoundLoader)
-  IMPLEMENTS_INTERFACE(iPlugIn)
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csSoundLoader_IFF)
+  SCF_IMPLEMENTS_INTERFACE(iSoundLoader)
+  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+SCF_IMPLEMENT_IBASE_END;
 
-IMPLEMENT_FACTORY(csSoundLoader_IFF);
+SCF_IMPLEMENT_FACTORY(csSoundLoader_IFF);
 
-EXPORT_CLASS_TABLE (sndiff)
-EXPORT_CLASS (csSoundLoader_IFF,
+SCF_EXPORT_CLASS_TABLE (sndiff)
+SCF_EXPORT_CLASS (csSoundLoader_IFF,
   "crystalspace.sound.loader.iff", "IFF Sound Loader")
-EXPORT_CLASS_TABLE_END;
+SCF_EXPORT_CLASS_TABLE_END;
 
 #define setStream(x) {if(x>size) {goto exit_read;} else {index=x;}}
 #define canAddStream(x) {if((index+x)>size) goto exit_read;}

@@ -48,7 +48,7 @@ class csGraphics2DAlleg : public csGraphics2D, public iEventPlug
   bool kbd_hook_active, mouse_hook_active;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csGraphics2DAlleg (iBase *iParent);
   virtual ~csGraphics2DAlleg ();

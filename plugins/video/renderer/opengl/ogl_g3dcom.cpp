@@ -196,7 +196,7 @@ bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
   if (!driver)
     driver = config->GetStr ("Video.OpenGL.Canvas", OPENGL_2D_DRIVER);
 
-  G2D = LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
+  G2D = CS_LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
   if (!G2D)
     return false;
 
@@ -225,7 +225,7 @@ bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
   	"Video.OpenGL.SuperLightMapSize", 256);
   if (OpenGLLightmapCache::super_lm_size > Caps.maxTexWidth)
     OpenGLLightmapCache::super_lm_size = Caps.maxTexWidth;
-  SysPrintf (MSG_INITIALIZATION, "  Super lightmaps: num=%d size=%dx%d\n",
+  SysPrintf (CS_MSG_INITIALIZATION, "  Super lightmaps: num=%d size=%dx%d\n",
   	OpenGLLightmapCache::super_lm_num,
 	OpenGLLightmapCache::super_lm_size,
 	OpenGLLightmapCache::super_lm_size);
@@ -246,7 +246,7 @@ bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
       if (j >= 3) break;
     }
     while (j < 3) clip_optional[j++] = '0';
-    SysPrintf (MSG_INITIALIZATION, "  Optional Clipping: %c%c%c\n",
+    SysPrintf (CS_MSG_INITIALIZATION, "  Optional Clipping: %c%c%c\n",
       clip_optional[0], clip_optional[1], clip_optional[2]);
   }
 
@@ -266,7 +266,7 @@ bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
       if (j >= 3) break;
     }
     while (j < 3) clip_required[j++] = '0';
-    SysPrintf (MSG_INITIALIZATION, "  Required Clipping: %c%c%c\n",
+    SysPrintf (CS_MSG_INITIALIZATION, "  Required Clipping: %c%c%c\n",
         clip_required[0], clip_required[1], clip_required[2]);
   }
 
@@ -287,7 +287,7 @@ bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
       if (j >= 3) break;
     }
     while (j < 3) clip_outer[j++] = '0';
-    SysPrintf (MSG_INITIALIZATION, "  Outer Clipping: %c%c%c\n",
+    SysPrintf (CS_MSG_INITIALIZATION, "  Outer Clipping: %c%c%c\n",
         clip_outer[0], clip_outer[1], clip_outer[2]);
   }
 
@@ -449,7 +449,7 @@ void csGraphics3DOGLCommon::PerfTest ()
         cnt++;
       }
       test_modes[i].cnt = cnt;
-      SysPrintf (MSG_INITIALIZATION, "    %d FPS for %c\n", cnt,
+      SysPrintf (CS_MSG_INITIALIZATION, "    %d FPS for %c\n", cnt,
     	  test_modes[i].mode); fflush (stdout);
     }
     // Sort the results.
@@ -504,7 +504,7 @@ void csGraphics3DOGLCommon::PerfTest ()
       cnt++;
     }
     test_modes[i].cnt = cnt;
-    SysPrintf (MSG_INITIALIZATION, "    %d FPS for %c (small clipper)\n", cnt,
+    SysPrintf (CS_MSG_INITIALIZATION, "    %d FPS for %c (small clipper)\n", cnt,
     	test_modes[i].mode); fflush (stdout);
   }
 
@@ -533,11 +533,11 @@ void csGraphics3DOGLCommon::PerfTest ()
       j++;
     }
   }
-  SysPrintf (MSG_INITIALIZATION, "    Video.OpenGL.ClipOuter = %c%c%c\n",
+  SysPrintf (CS_MSG_INITIALIZATION, "    Video.OpenGL.ClipOuter = %c%c%c\n",
   	clip_outer[0], clip_outer[1], clip_outer[2]);
-  SysPrintf (MSG_INITIALIZATION, "    Video.OpenGL.ClipRequired = %c%c%c\n",
+  SysPrintf (CS_MSG_INITIALIZATION, "    Video.OpenGL.ClipRequired = %c%c%c\n",
   	clip_required[0], clip_required[1], clip_required[2]);
-  SysPrintf (MSG_INITIALIZATION, "    Video.OpenGL.ClipOptional = %c%c%c\n",
+  SysPrintf (CS_MSG_INITIALIZATION, "    Video.OpenGL.ClipOptional = %c%c%c\n",
   	clip_optional[0], clip_optional[1], clip_optional[2]);
   char buf[4]; buf[3] = 0;
   buf[0] = clip_required[0];
@@ -584,7 +584,7 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
 
   if (!G2D->Open (Title))
   {
-    SysPrintf (MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
+    SysPrintf (CS_MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
     // set "not opened" flag
     width = height = -1;
     return false;
@@ -654,12 +654,12 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
     if (maxtextures > 1)
     {
       m_config_options.do_multitexture_level = maxtextures;
-      SysPrintf (MSG_INITIALIZATION,
+      SysPrintf (CS_MSG_INITIALIZATION,
       	"Using multitexture extension with %d texture units\n", maxtextures);
     }
     else
     {
-      SysPrintf (MSG_INITIALIZATION,
+      SysPrintf (CS_MSG_INITIALIZATION,
       	"WARNING: driver supports multitexture extension but only allows one texture unit!\n");
     }
   }
@@ -720,9 +720,9 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   errtest = glGetError ();
   if (errtest != GL_NO_ERROR)
   {
-    //SysPrintf (MSG_DEBUG_0, "openGL error string: %s\n",
+    //SysPrintf (CS_MSG_DEBUG_0, "openGL error string: %s\n",
     	//gluErrorString (errtest));
-    SysPrintf (MSG_DEBUG_0, "openGL error: %d\n", errtest);
+    SysPrintf (CS_MSG_DEBUG_0, "openGL error: %d\n", errtest);
   }
 
   // If blend style is 'auto' try to determine which mode to use by drawing
@@ -3550,7 +3550,7 @@ void csGraphics3DOGLCommon::Guess_BlendMode (GLenum *src, GLenum*dst)
   // these will hold the resultant color intensities
   float blendresult1[3], blendresult2[3];
 
-  SysPrintf (MSG_INITIALIZATION,
+  SysPrintf (CS_MSG_INITIALIZATION,
   	"Attempting to determine best blending mode to use.\n");
 
   // draw the polys
@@ -3592,7 +3592,7 @@ void csGraphics3DOGLCommon::Guess_BlendMode (GLenum *src, GLenum*dst)
 
   glReadPixels (2,2,1,1,GL_RGB,GL_FLOAT, &blendresult2);
 
-  SysPrintf (MSG_INITIALIZATION,
+  SysPrintf (CS_MSG_INITIALIZATION,
   	"Blend mode values are %f and %f...",
 	blendresult1[1],
 	blendresult2[1]);
@@ -3608,14 +3608,14 @@ void csGraphics3DOGLCommon::Guess_BlendMode (GLenum *src, GLenum*dst)
 
   if (resultB > 1.5 * resultA)
   {
-    SysPrintf(MSG_INITIALIZATION, "using 'multiplydouble' blend mode.\n");
+    SysPrintf(CS_MSG_INITIALIZATION, "using 'multiplydouble' blend mode.\n");
 
     *src = GL_DST_COLOR;
     *dst = GL_SRC_COLOR;
   }
   else
   {
-    SysPrintf(MSG_INITIALIZATION, "using 'multiply' blend mode.\n");
+    SysPrintf(CS_MSG_INITIALIZATION, "using 'multiply' blend mode.\n");
 
     *src = GL_DST_COLOR;
     *dst = GL_ZERO;

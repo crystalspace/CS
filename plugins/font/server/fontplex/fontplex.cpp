@@ -25,21 +25,21 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csFontServerMultiplexor)
-  IMPLEMENTS_INTERFACE (iFontServer)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csFontServerMultiplexor)
+  SCF_IMPLEMENTS_INTERFACE (iFontServer)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csFontServerMultiplexor)
+SCF_IMPLEMENT_FACTORY (csFontServerMultiplexor)
 
-EXPORT_CLASS_TABLE (fontplex)
-  EXPORT_CLASS_DEP (csFontServerMultiplexor, "crystalspace.font.server.multiplexor", 
+SCF_EXPORT_CLASS_TABLE (fontplex)
+  SCF_EXPORT_CLASS_DEP (csFontServerMultiplexor, "crystalspace.font.server.multiplexor", 
     "Crystal Space font server multiplexor", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csFontServerMultiplexor::csFontServerMultiplexor (iBase *pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csFontServerMultiplexor::~csFontServerMultiplexor ()
@@ -53,12 +53,12 @@ bool csFontServerMultiplexor::Initialize (iSystem *System)
   for (int idx = 1; ; idx++)
   {
     sprintf (funcid, "FontServer.%d", idx);
-    iFontServer *fs = QUERY_PLUGIN_ID (System, funcid, iFontServer);
+    iFontServer *fs = CS_QUERY_PLUGIN_ID (System, funcid, iFontServer);
     if (!fs) break;
     fontservers.Push (fs);
   }
   if (!fontservers.Length ())
-    System->Printf (MSG_WARNING, "Font server multiplexor: WARNING, no slave font servers found!\n");
+    System->Printf (CS_MSG_WARNING, "Font server multiplexor: WARNING, no slave font servers found!\n");
   return true;
 }
 

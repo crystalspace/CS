@@ -27,13 +27,13 @@
 #include "ivideo/txtmgr.h"
 #include "iengine/material.h"
 
-IMPLEMENT_IBASE (csIsoSprite)
-  IMPLEMENTS_INTERFACE (iIsoSprite)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csIsoSprite)
+  SCF_IMPLEMENTS_INTERFACE (iIsoSprite)
+SCF_IMPLEMENT_IBASE_END
 
 csIsoSprite::csIsoSprite (iBase *iParent)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   position.Set(0,0,0);
   material = NULL;
   g3dpolyfx.mixmode = CS_FX_COPY;
@@ -261,7 +261,7 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
     PreparePolygonFX2 (&g3dpolyfx, clipped_poly2d, num_clipped_verts,
         clipped_vtstats, poly.GetVertexCount(), true);
 
-  iIsoMaterialWrapperIndex *wrapindex = QUERY_INTERFACE(
+  iIsoMaterialWrapperIndex *wrapindex = SCF_QUERY_INTERFACE(
     material, iIsoMaterialWrapperIndex);
   if((rview->GetRenderPass()==CSISO_RENDERPASS_MAIN) && wrapindex)
   {

@@ -23,26 +23,26 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csLexicalAnalyzer)
-  IMPLEMENTS_INTERFACE (iLexicalAnalyzer)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csLexicalAnalyzer)
+  SCF_IMPLEMENTS_INTERFACE (iLexicalAnalyzer)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csLexicalAnalyzer::eiPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csLexicalAnalyzer::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_FACTORY (csLexicalAnalyzer)
+SCF_IMPLEMENT_FACTORY (csLexicalAnalyzer)
 
-EXPORT_CLASS_TABLE (cslexan)
-  EXPORT_CLASS (csLexicalAnalyzer, "crystalspace.scanner.regex",
+SCF_EXPORT_CLASS_TABLE (cslexan)
+  SCF_EXPORT_CLASS (csLexicalAnalyzer, "crystalspace.scanner.regex",
     "Crystal Space regular-expression-based scanner")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csLexicalAnalyzer::csLexicalAnalyzer(iBase* p):next_key(1)
 {
-  CONSTRUCT_IBASE (p);
-  CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_IBASE (p);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csLexicalAnalyzer::~csLexicalAnalyzer()

@@ -64,7 +64,7 @@ class csArtsRenderer : public iSoundRender, public iSoundListener
   Arts::csSoundModule *CreateArtsModule ();
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csArtsRenderer (iBase *pParent);
   virtual ~csArtsRenderer ();
 

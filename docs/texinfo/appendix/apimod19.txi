@@ -69,7 +69,7 @@ code:
 #include "igraphic/imageio.h"
 @dots{}
 iDataBuffer* buf = @dots{};
-iImageIO* imgldr = QUERY_PLUGIN (System, iImageIO);
+iImageIO* imgldr = CS_QUERY_PLUGIN (System, iImageIO);
 imgldr->Load (buf->GetUint8 (), buf->GetSize (),
 txtmgr->GetTextureFormat ());
 @dots{}
@@ -85,7 +85,7 @@ At this moment the level loader is not yet a plugin but already
 behaves like one. For that reason you still have to do:
 
 @example
-REGISTER_STATIC_LIBRARY (lvlload)
+SCF_REGISTER_STATIC_LIBRARY (lvlload)
 @end example
 
 Somewhere in the beginning of your program (this is a declaration, put
@@ -111,7 +111,7 @@ Then you can get the level loader with:
 
 @example
 iLoader* level_loader =
-  QUERY_PLUGIN_ID (System, CS_FUNCID_LVLLOADER, iLoader);
+  CS_QUERY_PLUGIN_ID (System, CS_FUNCID_LVLLOADER, iLoader);
 @end example
 
 When you don't need it anymore you must call @code{level_loader->DecRef ()}.
@@ -169,7 +169,7 @@ instead of linking to the @file{csengine} library.  You can do this with:
 System->RequestPlugin ("crystalspace.engine.core:Engine");
 System->Initialize (argc, argv, NULL);
 @dots{}
-iEngine* engine = QUERY_PLUGIN (System, iEngine);
+iEngine* engine = CS_QUERY_PLUGIN (System, iEngine);
 @end example
 
 You then use the engine through @sc{scf} interfaces.  Therefore, your programs
@@ -476,13 +476,13 @@ are slated for removal:
 @end itemize
 
 In most cases, applications should now maintain these variables themselves
-rather than relying upon the system driver to do so.  Currently, in the case
-of @samp{VFS}, code can invoke the @code{QUERY_INTERFACE()} macro to obtain a
+rather than relying upon the system driver to do so.  Currently, in the case of
+@samp{VFS}, code can invoke the @code{SCF_QUERY_INTERFACE()} macro to obtain a
 pointer to the shared @sc{vfs} instance.  For example:
 
 @example
 iSystem* sys = @dots{};
-iVFS* vfs = QUERY_INTERFACE(sys, iVFS);
+iVFS* vfs = SCF_QUERY_INTERFACE(sys, iVFS);
 @end example
 
 @subheading @sc{ddg} Terrain Engine Removed

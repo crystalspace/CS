@@ -64,12 +64,12 @@ public:
    */
   virtual bool IsInRegion (iObject* obj);
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   //--------------------- iRegion implementation ---------------------
   struct Region : public iRegion
   {
-    DECLARE_EMBEDDED_IBASE (csRegion);
+    SCF_DECLARE_EMBEDDED_IBASE (csRegion);
 
     /// @@@ Ugly
     virtual void* GetPrivateObject () { return (void*)scfParent; }

@@ -45,7 +45,7 @@ public:
   csDefaultFontServer *Parent;
   csVector DeleteCallbacks;
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Create the font object
   csDefaultFont (csDefaultFontServer *parent, const char *name, int first,
@@ -124,7 +124,7 @@ private:
   csDefaultFont *ReadFontFile(const char *file);
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Create the plugin object
   csDefaultFontServer (iBase *pParent);

@@ -54,9 +54,9 @@ is described below:
 
 @example
 iSprite3dFactoryState *fstat =
-  QUERY_INTERFACE(fact, iSprite3dFactoryState);
+  SCF_QUERY_INTERFACE(fact, iSprite3dFactoryState);
 iSprite3DState *stat =
-  QUERY_INTERFACE(mesh, iSprite3DState);
+  SCF_QUERY_INTERFACE(mesh, iSprite3DState);
 @end example
 
 The @samp{mesh} and @samp{fact} variables are the ones mentioned earlier in

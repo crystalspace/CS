@@ -29,23 +29,23 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csGraphics2DGGI)
+SCF_IMPLEMENT_FACTORY (csGraphics2DGGI)
 
-EXPORT_CLASS_TABLE (ggi2d)
-  EXPORT_CLASS_DEP (csGraphics2DGGI, "crystalspace.graphics2d.ggi",
+SCF_EXPORT_CLASS_TABLE (ggi2d)
+  SCF_EXPORT_CLASS_DEP (csGraphics2DGGI, "crystalspace.graphics2d.ggi",
     "GGI 2D graphics driver for Crystal Space", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csGraphics2DGGI)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics2D)
-  IMPLEMENTS_INTERFACE (iEventPlug)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics2DGGI)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+SCF_IMPLEMENT_IBASE_END
 
 // csGraphics2DGGI functions
 csGraphics2DGGI::csGraphics2DGGI(iBase *iParent) : csGraphics2D ()
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   EventOutlet = NULL;
 }
 
@@ -59,20 +59,20 @@ bool csGraphics2DGGI::Initialize (iSystem *pSystem)
 
   // GGI Starts here
 
-  CsPrintf (MSG_INITIALIZATION, "Crystal Space GGI version.\n");
-  CsPrintf (MSG_INITIALIZATION,  "Using %dx%dx%d resolution.\n\n", Width, Height, Depth);
+  CsPrintf (CS_MSG_INITIALIZATION, "Crystal Space GGI version.\n");
+  CsPrintf (CS_MSG_INITIALIZATION,  "Using %dx%dx%d resolution.\n\n", Width, Height, Depth);
 
   Memory = NULL;
 
   if (ggiInit() != 0) {
-    CsPrintf (MSG_FATAL_ERROR, "Couldn't initialize LibGGI\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "Couldn't initialize LibGGI\n");
     exit (1);
   }
 
   vis = ggiOpen(NULL);
 
   if (vis == NULL) {
-    CsPrintf (MSG_FATAL_ERROR, "Couldn't open GGI visual\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "Couldn't open GGI visual\n");
     exit (2);
   }
  
@@ -85,7 +85,7 @@ bool csGraphics2DGGI::Initialize (iSystem *pSystem)
   ggiCheckMode(vis, &vis_mode);
 
   if (ggiSetMode(vis, &vis_mode) < 0) {
-    CsPrintf (MSG_FATAL_ERROR, "Couldn't set mode\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "Couldn't set mode\n");
     exit (3);
   }
   // Put GGI into async mode
@@ -99,7 +99,7 @@ bool csGraphics2DGGI::Initialize (iSystem *pSystem)
   const ggi_pixelformat *ggi_pf = ggiGetPixelFormat(vis);
 
   if (ggi_pf == NULL) {
-    CsPrintf (MSG_FATAL_ERROR, "Couldn't get pixel format\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "Couldn't get pixel format\n");
     exit (4);
   }
   
@@ -122,7 +122,7 @@ bool csGraphics2DGGI::Initialize (iSystem *pSystem)
       break;
 
     default:
-      CsPrintf (MSG_FATAL_ERROR, "Unsupported pixel format\n");
+      CsPrintf (CS_MSG_FATAL_ERROR, "Unsupported pixel format\n");
       exit (5);
   }
 

@@ -107,13 +107,13 @@ enum
 
 // Some handy macros
 /// Check if a event is a keyboard event
-#define IS_KEYBOARD_EVENT(e)	((1 << (e).Type) & CSMASK_Keyboard)
+#define CS_IS_KEYBOARD_EVENT(e)	((1 << (e).Type) & CSMASK_Keyboard)
 /// Check if a event is a mouse event
-#define IS_MOUSE_EVENT(e)	((1 << (e).Type) & CSMASK_Mouse)
+#define CS_IS_MOUSE_EVENT(e)	((1 << (e).Type) & CSMASK_Mouse)
 /// Check if a event is a joystick event
-#define IS_JOYSTICK_EVENT(e)	((1 << (e).Type) & CSMASK_Joystick)
+#define CS_IS_JOYSTICK_EVENT(e)	((1 << (e).Type) & CSMASK_Joystick)
 /// Check if the event is a network event
-#define IS_NETWORK_EVENT(e)	((1 << (e).Type) & CSMASK_Network)
+#define CS_IS_NETWORK_EVENT(e)	((1 << (e).Type) & CSMASK_Network)
 
 /*
  * Event flags masks.
@@ -340,7 +340,7 @@ enum
    *<pre>
    * <2 spaces><switch - 18 positions><space><switch description>{default value}
    *</pre>
-   * The help should be displayed through iSystem::Printf (MSG_STDOUT, ...).
+   * The help should be displayed through iSystem::Printf (CS_MSG_STDOUT, ...).
    */
   cscmdCommandLineHelp,
 

@@ -141,7 +141,7 @@ public:
   csColor GetColor () const { return color; }
 
   ///------------------------ iMeshObject implementation ------------------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return factory; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
@@ -183,7 +183,7 @@ public:
   //------------------------- iSurfaceState implementation ----------------
   class SurfaceState : public iSurfaceState
   {
-    DECLARE_EMBEDDED_IBASE (csSurfMeshObject);
+    SCF_DECLARE_EMBEDDED_IBASE (csSurfMeshObject);
     virtual void SetResolution (int x, int y)
     {
       scfParent->SetResolution (x, y);
@@ -265,7 +265,7 @@ public:
   virtual ~csSurfMeshObjectFactory ();
 
   //------------------------ iMeshObjectFactory implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
@@ -289,7 +289,7 @@ public:
   virtual bool Initialize (iSystem *pSystem);
 
   //------------------------ iMeshObjectType implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// New factory.
   virtual iMeshObjectFactory* NewFactory ();

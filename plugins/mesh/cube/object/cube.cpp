@@ -32,15 +32,15 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csCubeMeshObject)
-  IMPLEMENTS_INTERFACE (iMeshObject)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csCubeMeshObject)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
+SCF_IMPLEMENT_IBASE_END
 
 csCubeMeshObject::csCubeMeshObject (csCubeMeshObjectFactory* factory)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   csCubeMeshObject::factory = factory;
-  ifactory = QUERY_INTERFACE (factory, iMeshObjectFactory);
+  ifactory = SCF_QUERY_INTERFACE (factory, iMeshObjectFactory);
   initialized = false;
   cur_cameranr = -1;
   cur_movablenr = -1;
@@ -352,19 +352,19 @@ void csCubeMeshObject::HardTransform (const csReversibleTransform& t)
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csCubeMeshObjectFactory)
-  IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iCubeFactoryState)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csCubeMeshObjectFactory)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iCubeFactoryState)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csCubeMeshObjectFactory::CubeFactoryState)
-  IMPLEMENTS_INTERFACE (iCubeFactoryState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csCubeMeshObjectFactory::CubeFactoryState)
+  SCF_IMPLEMENTS_INTERFACE (iCubeFactoryState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csCubeMeshObjectFactory::csCubeMeshObjectFactory (iBase *pParent)
 {
-  CONSTRUCT_IBASE (pParent);
-  CONSTRUCT_EMBEDDED_IBASE (scfiCubeFactoryState);
+  SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCubeFactoryState);
   sizex = 1;
   sizey = 1;
   sizez = 1;
@@ -380,34 +380,34 @@ csCubeMeshObjectFactory::~csCubeMeshObjectFactory ()
 iMeshObject* csCubeMeshObjectFactory::NewInstance ()
 {
   csCubeMeshObject* cm = new csCubeMeshObject (this);
-  iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
+  iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
 }
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csCubeMeshObjectType)
-  IMPLEMENTS_INTERFACE (iMeshObjectType)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csCubeMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csCubeMeshObjectType::csCubeConfig)
-  IMPLEMENTS_INTERFACE (iConfig)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csCubeMeshObjectType::csCubeConfig)
+  SCF_IMPLEMENTS_INTERFACE (iConfig)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_FACTORY (csCubeMeshObjectType)
+SCF_IMPLEMENT_FACTORY (csCubeMeshObjectType)
 
-EXPORT_CLASS_TABLE (cube)
-  EXPORT_CLASS (csCubeMeshObjectType, "crystalspace.mesh.object.cube",
+SCF_EXPORT_CLASS_TABLE (cube)
+  SCF_EXPORT_CLASS (csCubeMeshObjectType, "crystalspace.mesh.object.cube",
     "Crystal Space Cube Mesh Type")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csCubeMeshObjectType::csCubeMeshObjectType (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
-  CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   default_sizex = 1;
   default_sizey = 1;
   default_sizez = 1;
@@ -427,11 +427,11 @@ bool csCubeMeshObjectType::Initialize (iSystem*)
 iMeshObjectFactory* csCubeMeshObjectType::NewFactory ()
 {
   csCubeMeshObjectFactory* cm = new csCubeMeshObjectFactory (this);
-  iCubeFactoryState* cubeLook = QUERY_INTERFACE (cm, iCubeFactoryState);
+  iCubeFactoryState* cubeLook = SCF_QUERY_INTERFACE (cm, iCubeFactoryState);
   cubeLook->SetSize (default_sizex, default_sizey, default_sizez);
   cubeLook->SetShift (default_shift.x, default_shift.y, default_shift.z);
   cubeLook->DecRef ();
-  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;
 }

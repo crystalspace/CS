@@ -27,12 +27,12 @@
 #include "sndrdr.h"
 #include "sndlstn.h"
 
-IMPLEMENT_IBASE(csSoundListenerDS3D)
-	IMPLEMENTS_INTERFACE(iSoundListener)
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csSoundListenerDS3D)
+	SCF_IMPLEMENTS_INTERFACE(iSoundListener)
+SCF_IMPLEMENT_IBASE_END;
 
 csSoundListenerDS3D::csSoundListenerDS3D(iBase *piBase) {
-  CONSTRUCT_IBASE(piBase);
+  SCF_CONSTRUCT_IBASE(piBase);
   PrimaryBuffer = NULL;
   Listener = NULL;
   Renderer = NULL;
@@ -61,14 +61,14 @@ bool csSoundListenerDS3D::Initialize(csSoundRenderDS3D *srdr) {
   HRESULT r;
   r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &PrimaryBuffer, NULL);
   if (r != DS_OK) {
-    Renderer->System->Printf(MSG_INITIALIZATION, "DS3D listener: "
+    Renderer->System->Printf(CS_MSG_INITIALIZATION, "DS3D listener: "
       "Cannot create primary sound buffer (%s).\n", Renderer->GetError(r));
     return false;
   }
 	
   r = PrimaryBuffer->QueryInterface(IID_IDirectSound3DListener, (void **) &Listener);
   if (r != DS_OK) {
-    Renderer->System->Printf(MSG_INITIALIZATION, "DS3D listener: Cannot query listener"
+    Renderer->System->Printf(CS_MSG_INITIALIZATION, "DS3D listener: Cannot query listener"
       " interface from primary sound buffer (%s).\n", Renderer->GetError(r));
     return false;
   }

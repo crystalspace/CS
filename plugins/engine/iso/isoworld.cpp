@@ -20,13 +20,13 @@
 #include "isoworld.h"
 #include "isogrid.h"
 
-IMPLEMENT_IBASE (csIsoWorld)
-  IMPLEMENTS_INTERFACE (iIsoWorld)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csIsoWorld)
+  SCF_IMPLEMENTS_INTERFACE (iIsoWorld)
+SCF_IMPLEMENT_IBASE_END
 
 csIsoWorld::csIsoWorld (iBase *iParent)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   gridlist = NULL;
 }
 

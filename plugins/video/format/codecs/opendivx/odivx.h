@@ -35,7 +35,7 @@ class csOpenDivX : public iAVICodec
   DEC_FRAME dec_frame;
 
  public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csOpenDivX (iBase *pParent);
   virtual ~csOpenDivX ();
 

@@ -26,22 +26,22 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csGraphics2DBeLib)
+SCF_IMPLEMENT_FACTORY (csGraphics2DBeLib)
 
-EXPORT_CLASS_TABLE (be2d)
-  EXPORT_CLASS_DEP (csGraphics2DBeLib, "crystalspace.graphics2d.be",
+SCF_EXPORT_CLASS_TABLE (be2d)
+  SCF_EXPORT_CLASS_DEP (csGraphics2DBeLib, "crystalspace.graphics2d.be",
     "Crystal Space 2D driver for BeOS", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csGraphics2DBeLib)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics2D)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics2DBeLib)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_END
 
 csGraphics2DBeLib::csGraphics2DBeLib (iBase* p) :
   superclass(), view(0), window(0), bitmap(0)
 {
-  CONSTRUCT_IBASE(p);
+  SCF_CONSTRUCT_IBASE(p);
 }
 
 csGraphics2DBeLib::~csGraphics2DBeLib()
@@ -53,7 +53,7 @@ bool csGraphics2DBeLib::Initialize(iSystem* isys)
   bool ok = superclass::Initialize(isys);
   if (ok)
   {
-    System->Printf(MSG_INITIALIZATION, "Crystal Space BeOS 2D Driver.\n");
+    System->Printf(CS_MSG_INITIALIZATION, "Crystal Space BeOS 2D Driver.\n");
 
     // Get current screen information.
     BScreen screen(B_MAIN_SCREEN_ID);

@@ -35,21 +35,21 @@ static pascal void SoundDoubleBackProc(
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY(csSoundDriverMac);
+SCF_IMPLEMENT_FACTORY(csSoundDriverMac);
 
-EXPORT_CLASS_TABLE (snddrv)
-	EXPORT_CLASS (csSoundDriverMac, SOUND_DRIVER,
+SCF_EXPORT_CLASS_TABLE (snddrv)
+	SCF_EXPORT_CLASS (csSoundDriverMac, SOUND_DRIVER,
 		"Crystal Space Sound driver for Macintosh")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE(csSoundDriverMac)
-  IMPLEMENTS_INTERFACE(iPlugIn)
-  IMPLEMENTS_INTERFACE(iSoundDriver)
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csSoundDriverMac)
+  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE(iSoundDriver)
+SCF_IMPLEMENT_IBASE_END;
 
 csSoundDriverMac::csSoundDriverMac(iBase *piBase)
 {
-  CONSTRUCT_IBASE(piBase);
+  SCF_CONSTRUCT_IBASE(piBase);
   m_piSystem = NULL;
   mStopPlayback = false;
   mSoundDBHeader.dbhDoubleBack = NULL;
@@ -72,7 +72,7 @@ bool csSoundDriverMac::Initialize(iSystem *iSys)
 
 bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16, bool stereo)
 {
-  m_piSystem->Printf (MSG_INITIALIZATION, "\nSoundDriver Mac selected\n");
+  m_piSystem->Printf (CS_MSG_INITIALIZATION, "\nSoundDriver Mac selected\n");
   
   m_piSoundRender = render;
   OSErr	theError;
@@ -96,7 +96,7 @@ bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16, boo
 
   theError = SndNewChannel( &mSoundChannel, sampledSynth, outputChannels, NULL );
   if ( theError != noErr ) {
-    m_piSystem->Printf( MSG_FATAL_ERROR, "Unable to open a sound channel.");
+    m_piSystem->Printf( CS_MSG_FATAL_ERROR, "Unable to open a sound channel.");
     return false;
   }
   
@@ -134,7 +134,7 @@ bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16, boo
     mSoundChannel = NULL;
     DisposeRoutineDescriptor( mSoundDBHeader.dbhDoubleBack );
     mSoundDBHeader.dbhDoubleBack = NULL;
-    m_piSystem->Printf( MSG_FATAL_ERROR, "Unable to get the space for the sound buffer.");
+    m_piSystem->Printf( CS_MSG_FATAL_ERROR, "Unable to get the space for the sound buffer.");
     return false;
   }
   mSoundDBHeader.dbhBufferPtr[0]->dbNumFrames = 0L;
@@ -157,7 +157,7 @@ bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16, boo
     mSoundDBHeader.dbhDoubleBack = NULL;
     DisposePtr( (Ptr)mSoundDBHeader.dbhBufferPtr[0] );
     mSoundDBHeader.dbhBufferPtr[0] = NULL;
-    m_piSystem->Printf( MSG_FATAL_ERROR, "Unable to get the space for the sound buffer.");
+    m_piSystem->Printf( CS_MSG_FATAL_ERROR, "Unable to get the space for the sound buffer.");
     return false;
   }
   mSoundDBHeader.dbhBufferPtr[1]->dbNumFrames = 0L;
@@ -182,7 +182,7 @@ bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16, boo
     mSoundDBHeader.dbhBufferPtr[0] = NULL;
     DisposePtr( (Ptr)mSoundDBHeader.dbhBufferPtr[1] );
     mSoundDBHeader.dbhBufferPtr[1] = NULL;
-    m_piSystem->Printf( MSG_FATAL_ERROR, "Unable to start the sound playing.");
+    m_piSystem->Printf( CS_MSG_FATAL_ERROR, "Unable to start the sound playing.");
     return false;
   }
   

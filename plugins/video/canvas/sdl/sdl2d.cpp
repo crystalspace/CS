@@ -55,17 +55,17 @@ CS_IMPLEMENT_PLUGIN
 #    include <dlfcn.h>
 #endif
 
-IMPLEMENT_FACTORY (csGraphics2DSDL)
+SCF_IMPLEMENT_FACTORY (csGraphics2DSDL)
 
-EXPORT_CLASS_TABLE (sdl2d)
-  EXPORT_CLASS_DEP (csGraphics2DSDL, "crystalspace.graphics2d.sdl2d",
+SCF_EXPORT_CLASS_TABLE (sdl2d)
+  SCF_EXPORT_CLASS_DEP (csGraphics2DSDL, "crystalspace.graphics2d.sdl2d",
     "SDL 2D graphics driver for Crystal Space", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csGraphics2DSDL)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics2D)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics2DSDL)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_END
 
 #if SHADE_BUF
 #include "util/img.inc"
@@ -185,7 +185,7 @@ static int drawing_thread(void *_owner)
 // csGraphics2DSDL functions
 csGraphics2DSDL::csGraphics2DSDL(iBase *iParent) : csGraphics2D ()
 {
-    CONSTRUCT_IBASE (iParent);
+    SCF_CONSTRUCT_IBASE (iParent);
     EventOutlet = NULL;
 }
 
@@ -208,9 +208,9 @@ void csGraphics2DSDL::fixlibrary()
     dladdr(sdl2d_scfInitialize,&dlip);
     dlopen(dlip.dli_fname,RTLD_NOW);
 
-    CsPrintf (MSG_INITIALIZATION, "Library %s locked.\n",dlip.dli_fname);
+    CsPrintf (CS_MSG_INITIALIZATION, "Library %s locked.\n",dlip.dli_fname);
 #else
-    CsPrintf (MSG_INITIALIZATION,
+    CsPrintf (CS_MSG_INITIALIZATION,
               "WARNING: Your operating system is not tested\n"
               "         yet with sdl2d video driver!\n");
 #endif
@@ -227,13 +227,13 @@ bool csGraphics2DSDL::Initialize (iSystem *pSystem)
 
     // SDL Starts here
 
-    CsPrintf (MSG_INITIALIZATION, "Crystal Space SDL version.\n");
+    CsPrintf (CS_MSG_INITIALIZATION, "Crystal Space SDL version.\n");
 
     //fixup:
     //make library persistent
     fixlibrary();
 
-    CsPrintf (MSG_INITIALIZATION,  "Defaults to %dx%dx%d resolution.\n", Width, Height, Depth);
+    CsPrintf (CS_MSG_INITIALIZATION,  "Defaults to %dx%dx%d resolution.\n", Width, Height, Depth);
 
     Memory = NULL;
 
@@ -270,7 +270,7 @@ bool csGraphics2DSDL::Initialize (iSystem *pSystem)
         pfmt.PixelBytes = 4;
         break;
       default:
-        CsPrintf (MSG_FATAL_ERROR, "Pixel depth %d not supported\n", Depth);
+        CsPrintf (CS_MSG_FATAL_ERROR, "Pixel depth %d not supported\n", Depth);
     }
 
     return true;
@@ -293,13 +293,13 @@ bool csGraphics2DSDL::Open(const char *Title)
   if (!csGraphics2D::Open (Title)) return false;
 
   if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_NOPARACHUTE) < 0) {
-    CsPrintf (MSG_FATAL_ERROR, "Couldn't initialize SDL: %s\n", SDL_GetError());
+    CsPrintf (CS_MSG_FATAL_ERROR, "Couldn't initialize SDL: %s\n", SDL_GetError());
     exit (1);
   }
 
   screen = SDL_SetVideoMode(Width,Height,Depth,SDL_SWSURFACE);
   if (screen == NULL) {
-    CsPrintf (MSG_FATAL_ERROR, "Couldn't set %dx%dx%d video mode: %s\n",
+    CsPrintf (CS_MSG_FATAL_ERROR, "Couldn't set %dx%dx%d video mode: %s\n",
                                Width, Height, Depth, SDL_GetError());
     return false;
   }
@@ -353,7 +353,7 @@ bool csGraphics2DSDL::Open(const char *Title)
       _GetPixelAt = GetPixelAt32;
       break;
     default:
-      CsPrintf (MSG_FATAL_ERROR, "Pixel depth %d not supported\n", Depth);
+      CsPrintf (CS_MSG_FATAL_ERROR, "Pixel depth %d not supported\n", Depth);
   }
 
   pfmt.complete ();

@@ -96,7 +96,7 @@ public:
 	const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox);
 
   ///------------------------ iMeshObject implementation ------------------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
@@ -176,7 +176,7 @@ public:
   UInt GetMixMode () const { return MixMode; }
 
   //------------------------ iMeshObjectFactory implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
@@ -185,7 +185,7 @@ public:
   //------------------------- iCubeFactoryState implementation ----------------
   class CubeFactoryState : public iCubeFactoryState
   {
-    DECLARE_EMBEDDED_IBASE (csCubeMeshObjectFactory);
+    SCF_DECLARE_EMBEDDED_IBASE (csCubeMeshObjectFactory);
     virtual void SetSize (float sizex, float sizey, float sizez)
     {
       scfParent->sizex = sizex;
@@ -236,7 +236,7 @@ public:
   virtual bool Initialize (iSystem *pSystem);
 
   //------------------------ iMeshObjectType implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Draw.
   virtual iMeshObjectFactory* NewFactory ();
@@ -248,7 +248,7 @@ public:
   ///------------------- iConfig interface implementation -------------------
   struct csCubeConfig : public iConfig
   {
-    DECLARE_EMBEDDED_IBASE (csCubeMeshObjectType);
+    SCF_DECLARE_EMBEDDED_IBASE (csCubeMeshObjectType);
     virtual bool GetOptionDescription (int idx, csOptionDescription *option);
     virtual bool SetOption (int id, csVariant* value);
     virtual bool GetOption (int id, csVariant* value);

@@ -66,13 +66,13 @@ struct iPerfStats : public iPlugIn
   /// Is there currently a subsection?
   virtual bool IsSubsection () = 0;
   /**
-   * Print this sections current summary stats, where sysflags is MSG_STDOUT
+   * Print this sections current summary stats, where sysflags is CS_MSG_STDOUT
    * etc. as defined in iSystem.h
    */
   virtual void PrintSectionStats (int sysflags) = 0;
 
   /**
-   * Print the subsections current stats, where sysflags is MSG_STDOUT etc as 
+   * Print the subsections current stats, where sysflags is CS_MSG_STDOUT etc as 
    * defined in iSystem.h
    */
   virtual void PrintSubsectionStats (int sysflags) = 0;

@@ -42,7 +42,7 @@ class csGraphics2DAA : public csGraphics2D, public iEventPlug
   iEventOutlet *EventOutlet;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csGraphics2DAA (iBase *iParent);
   virtual ~csGraphics2DAA ();

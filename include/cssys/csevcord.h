@@ -28,7 +28,7 @@ struct iPlugIn;
 class csEventCord : public iEventCord
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Create an event cord for a given category/subcategory
   csEventCord(int category, int subcategory);

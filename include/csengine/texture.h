@@ -127,12 +127,12 @@ public:
    */
   inline void Visit ();
 
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
 
   //-------------------- iTextureWrapper implementation -----------------------
   struct TextureWrapper : public iTextureWrapper
   {
-    DECLARE_EMBEDDED_IBASE (csTextureWrapper);
+    SCF_DECLARE_EMBEDDED_IBASE (csTextureWrapper);
 
     virtual csTextureWrapper *GetPrivateObject()
     {return scfParent;}
@@ -183,12 +183,12 @@ public:
   csTextureWrapper *FindByName (const char* iName)
   { return (csTextureWrapper *)csNamedObjVector::FindByName (iName); }
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   //-------------------- iTextureList implementation -------------------------
   struct TextureList : public iTextureList
   {
-    DECLARE_EMBEDDED_IBASE (csTextureList);
+    SCF_DECLARE_EMBEDDED_IBASE (csTextureList);
 
     virtual iTextureWrapper *NewTexture (iImage *image);
     virtual iTextureWrapper *NewTexture (iTextureHandle *ith);

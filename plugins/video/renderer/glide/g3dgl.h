@@ -168,7 +168,7 @@ public:
   /// The Glide texture manager
   csTextureManagerGlide* txtmgr; 
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// The constructor. Pass all arguments to this.
   csGraphics3DGlide (iBase* iParent);

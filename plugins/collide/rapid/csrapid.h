@@ -45,7 +45,7 @@ public:
 
 public:
   ///------------------------ iCollider implementation ------------------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Return a reference to the polygon mesh for this collider.
   virtual iPolygonMesh* GetGeometry () { return mesh; }
@@ -57,7 +57,7 @@ public:
 class csRapidCollideSystem : public iCollideSystem
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Create the plugin object
   csRapidCollideSystem (iBase *pParent);

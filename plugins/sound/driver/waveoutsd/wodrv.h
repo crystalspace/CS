@@ -32,7 +32,7 @@
 class csSoundDriverWaveOut : public iSoundDriver
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 	
   csSoundDriverWaveOut(iBase *piBase);
 	

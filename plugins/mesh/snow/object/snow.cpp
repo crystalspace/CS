@@ -29,13 +29,13 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE_EXT (csSnowMeshObject)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iSnowState)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csSnowMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSnowState)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSnowMeshObject::SnowState)
-  IMPLEMENTS_INTERFACE (iSnowState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSnowMeshObject::SnowState)
+  SCF_IMPLEMENTS_INTERFACE (iSnowState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 void csSnowMeshObject::SetupObject ()
 {
@@ -77,7 +77,7 @@ void csSnowMeshObject::SetupObject ()
 csSnowMeshObject::csSnowMeshObject (iSystem* system, iMeshObjectFactory* factory)
 	: csParticleSystem (system, factory)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiSnowState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSnowState);
   part_pos = NULL;
   part_speed = NULL;
   rainbox.Set (csVector3 (0, 0, 0), csVector3 (1, 1, 1));
@@ -149,13 +149,13 @@ void csSnowMeshObject::HardTransform (const csReversibleTransform& /*t*/)
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csSnowMeshObjectFactory)
-  IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSnowMeshObjectFactory)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
+SCF_IMPLEMENT_IBASE_END
 
 csSnowMeshObjectFactory::csSnowMeshObjectFactory (iBase *pParent,iSystem* system)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
   csSnowMeshObjectFactory::system = system;
 }
 
@@ -166,28 +166,28 @@ csSnowMeshObjectFactory::~csSnowMeshObjectFactory ()
 iMeshObject* csSnowMeshObjectFactory::NewInstance ()
 {
   csSnowMeshObject* cm = new csSnowMeshObject (system, (iMeshObjectFactory*)this);
-  iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
+  iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
 }
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csSnowMeshObjectType)
-  IMPLEMENTS_INTERFACE (iMeshObjectType)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSnowMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csSnowMeshObjectType)
+SCF_IMPLEMENT_FACTORY (csSnowMeshObjectType)
 
-EXPORT_CLASS_TABLE (snow)
-  EXPORT_CLASS (csSnowMeshObjectType, "crystalspace.mesh.object.snow",
+SCF_EXPORT_CLASS_TABLE (snow)
+  SCF_EXPORT_CLASS (csSnowMeshObjectType, "crystalspace.mesh.object.snow",
     "Crystal Space Snow Mesh Type")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csSnowMeshObjectType::csSnowMeshObjectType (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSnowMeshObjectType::~csSnowMeshObjectType ()
@@ -203,7 +203,7 @@ bool csSnowMeshObjectType::Initialize (iSystem* system)
 iMeshObjectFactory* csSnowMeshObjectType::NewFactory ()
 {
   csSnowMeshObjectFactory* cm = new csSnowMeshObjectFactory (this, system);
-  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;
 }

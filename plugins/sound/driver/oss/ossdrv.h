@@ -75,7 +75,7 @@ protected:
   unsigned char *soundbuffer;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csSoundDriverOSS(iBase *iParent);
   virtual ~csSoundDriverOSS();
 

@@ -42,7 +42,7 @@ public:
   void ShowError();
   void Print(bool Error, const char *msg);
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 };
 
 extern csJava *thisclass;

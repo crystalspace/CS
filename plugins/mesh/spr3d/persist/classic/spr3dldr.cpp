@@ -78,47 +78,47 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (VERTICES)
 CS_TOKEN_DEF_END
 
-IMPLEMENT_IBASE (csSprite3DFactoryLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSprite3DFactoryLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csSprite3DFactorySaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSprite3DFactorySaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csSprite3DLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSprite3DLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csSprite3DSaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSprite3DSaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csSprite3DFactoryLoader)
-IMPLEMENT_FACTORY (csSprite3DFactorySaver)
-IMPLEMENT_FACTORY (csSprite3DLoader)
-IMPLEMENT_FACTORY (csSprite3DSaver)
+SCF_IMPLEMENT_FACTORY (csSprite3DFactoryLoader)
+SCF_IMPLEMENT_FACTORY (csSprite3DFactorySaver)
+SCF_IMPLEMENT_FACTORY (csSprite3DLoader)
+SCF_IMPLEMENT_FACTORY (csSprite3DSaver)
 
-EXPORT_CLASS_TABLE (spr3dldr)
-  EXPORT_CLASS (csSprite3DFactoryLoader,
+SCF_EXPORT_CLASS_TABLE (spr3dldr)
+  SCF_EXPORT_CLASS (csSprite3DFactoryLoader,
   	"crystalspace.mesh.loader.factory.sprite.3d",
 	"Crystal Space Sprite3D Mesh Factory Loader")
-  EXPORT_CLASS (csSprite3DFactorySaver,
+  SCF_EXPORT_CLASS (csSprite3DFactorySaver,
   	"crystalspace.mesh.saver.factory.sprite.3d",
 	"Crystal Space Sprite3D Mesh Factory Saver")
-  EXPORT_CLASS (csSprite3DLoader, "crystalspace.mesh.loader.sprite.3d",
+  SCF_EXPORT_CLASS (csSprite3DLoader, "crystalspace.mesh.loader.sprite.3d",
     "Crystal Space Sprite3D Mesh Loader")
-  EXPORT_CLASS (csSprite3DSaver, "crystalspace.mesh.saver.sprite.3d",
+  SCF_EXPORT_CLASS (csSprite3DSaver, "crystalspace.mesh.saver.sprite.3d",
     "Crystal Space Sprite3D Mesh Saver")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csSprite3DFactoryLoader::csSprite3DFactoryLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSprite3DFactoryLoader::~csSprite3DFactoryLoader ()
@@ -180,7 +180,7 @@ static bool load_matrix (char* buf, csMatrix3 &m)
           m *= csYRotMatrix3 (list[1]);
         }
         //else
-	  //@@@ Error handling!: CsPrintf (MSG_WARNING, "Badly formed rotation: '%s'\n", params);
+	  //@@@ Error handling!: CsPrintf (CS_MSG_WARNING, "Badly formed rotation: '%s'\n", params);
         break;
       case CS_TOKEN_SCALE_X:
         csScanStr (params, "%f", &scaler);
@@ -201,7 +201,7 @@ static bool load_matrix (char* buf, csMatrix3 &m)
         else if (num == 3) // Three scalers; applied to X, Y, Z individually.
 	  m *= csMatrix3 (list[0],0,0,0,list[1],0,0,0,list[2]);
         //else
-	  //@@@ Error handling!: CsPrintf (MSG_WARNING, "Badly formed scale: '%s'\n", params);
+	  //@@@ Error handling!: CsPrintf (CS_MSG_WARNING, "Badly formed scale: '%s'\n", params);
         break;
     }
   }
@@ -218,7 +218,7 @@ static bool load_matrix (char* buf, csMatrix3 &m)
         list[3], list[4], list[5],
         list[6], list[7], list[8]);
     //else
-      //@@@ Error handling!: CsPrintf (MSG_WARNING, "Badly formed matrix '%s'\n", buf);
+      //@@@ Error handling!: CsPrintf (CS_MSG_WARNING, "Badly formed matrix '%s'\n", buf);
   }
   return true;
 }
@@ -298,14 +298,14 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
   long cmd;
   char* params;
 
-  iSkeletonConnection* con = QUERY_INTERFACE (limb, iSkeletonConnection);
+  iSkeletonConnection* con = SCF_QUERY_INTERFACE (limb, iSkeletonConnection);
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
       //@@@ Error handling!
-      //CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      //CsPrintf (CS_MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
       if (con) con->DecRef ();
       return false;
     }
@@ -314,7 +314,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
       case CS_TOKEN_LIMB:
         {
           iSkeletonConnection* newcon = limb->CreateConnection ();
-	  iSkeletonLimb* newlimb = QUERY_INTERFACE (newcon, iSkeletonLimb);
+	  iSkeletonLimb* newlimb = SCF_QUERY_INTERFACE (newcon, iSkeletonLimb);
 	  if (name) newlimb->SetName (name);
 	  if (!LoadSkeleton (newlimb, params))
 	  {
@@ -335,7 +335,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
     	    if (!params2)
     	    {
 	      //@@@ Error handling!
-      	      //CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+      	      //CsPrintf (CS_MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
       	      //fatal_exit (0, false);
 	      con->DecRef ();
 	      return false;
@@ -356,7 +356,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
 	else
 	{
 	  //@@@ Error handling!
-	  //CsPrintf (MSG_FATAL_ERROR, "TRANSFORM not valid for this type of skeleton limb!\n");
+	  //CsPrintf (CS_MSG_FATAL_ERROR, "TRANSFORM not valid for this type of skeleton limb!\n");
 	  //fatal_exit (0, false);
 	  if (con) con->DecRef ();
 	  return false;
@@ -374,7 +374,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     //@@@ Error handling!
-    //CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the a sprite skeleton!\n",
+    //CsPrintf (CS_MSG_FATAL_ERROR, "Token '%s' not found while parsing the a sprite skeleton!\n",
         //csGetLastOffender ());
     //fatal_exit (0, false);
     if (con) con->DecRef ();
@@ -413,15 +413,15 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
   char* params2;
   char str[255];
 
-  iMeshFactoryWrapper* imeshfactwrap = QUERY_INTERFACE (context,
+  iMeshFactoryWrapper* imeshfactwrap = SCF_QUERY_INTERFACE (context,
   	iMeshFactoryWrapper);
   imeshfactwrap->DecRef ();
 
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys,
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (sys,
   	"crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = LOAD_PLUGIN (sys, "crystalspace.mesh.object.sprite.3d",
+    type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.sprite.3d",
     	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.sprite.3d\n");
   }
@@ -435,7 +435,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
     fact = type->NewFactory ();
 
   type->DecRef ();
-  iSprite3DFactoryState* spr3dLook = QUERY_INTERFACE (fact,
+  iSprite3DFactoryState* spr3dLook = SCF_QUERY_INTERFACE (fact,
   	iSprite3DFactoryState);
 
   char* buf = (char*)string;
@@ -470,7 +470,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
 	{
 	  spr3dLook->EnableSkeletalAnimation ();
 	  iSkeleton* skeleton = spr3dLook->GetSkeleton ();
-	  iSkeletonLimb* skellimb = QUERY_INTERFACE (skeleton, iSkeletonLimb);
+	  iSkeletonLimb* skellimb = SCF_QUERY_INTERFACE (skeleton, iSkeletonLimb);
 	  if (name) skellimb->SetName (name);
 	  if (!LoadSkeleton (skellimb, params))
 	  {
@@ -494,7 +494,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
             if (!params2)
             {
 	      //@@@ Error handling!
-              //CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+              //CsPrintf (CS_MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
 	      printf ("Bad action!\n");
 	      spr3dLook->DecRef ();
 	      fact->DecRef ();
@@ -508,7 +508,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
                 if (!ff)
                 {
 	          //@@@ Error handling!
-                  //CsPrintf (MSG_FATAL_ERROR, "Error! Trying to add a unknown frame '%s' in %s action !\n",
+                  //CsPrintf (CS_MSG_FATAL_ERROR, "Error! Trying to add a unknown frame '%s' in %s action !\n",
                         //fn, act->GetName ());
 		  printf ("Bad frame!\n");
 		  spr3dLook->DecRef ();
@@ -535,7 +535,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
             if (!params2)
             {
 	      //@@@ Error handling!
-              //CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+              //CsPrintf (CS_MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
 	      printf ("Error\n");
 	      spr3dLook->DecRef ();
 	      fact->DecRef ();
@@ -553,7 +553,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
                 else if (i >= spr3dLook->GetTexelCount ())
                 {
 		  //@@@ Error handling!
-                  //CsPrintf (MSG_FATAL_ERROR, "Error! Trying to add too many vertices in frame '%s'!\n",
+                  //CsPrintf (CS_MSG_FATAL_ERROR, "Error! Trying to add too many vertices in frame '%s'!\n",
                     //fr->GetName ());
 	      	  printf ("Too many vertices!\n");
 		  spr3dLook->DecRef ();
@@ -569,7 +569,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
           if (cmd == CS_PARSERR_TOKENNOTFOUND)
           {
 	    //@@@ Error handling!
-            //CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing frame '%s'!\n",
+            //CsPrintf (CS_MSG_FATAL_ERROR, "Token '%s' not found while parsing frame '%s'!\n",
                 //fr->GetName (), csGetLastOffender ());
 	    printf ("Token not found!\n");
 	    spr3dLook->DecRef ();
@@ -579,7 +579,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
           if (i < spr3dLook->GetTexelCount ())
           {
 	    //@@@ Error handling!
-            //CsPrintf (MSG_FATAL_ERROR, "Error! Too few vertices in frame '%s'! (%d %d)\n",
+            //CsPrintf (CS_MSG_FATAL_ERROR, "Error! Too few vertices in frame '%s'! (%d %d)\n",
                 //fr->GetName (), i, state->GetTexelCount ());
 	    printf ("Too few vertices!\n");
 	    spr3dLook->DecRef ();
@@ -606,8 +606,8 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
             case 0  :  spr3dLook->MergeNormals ();                  break;
             case 1  :  spr3dLook->MergeNormals (list[0]);           break;
             case 2  :  spr3dLook->MergeNormals (list[0], list[1]);  break;
-            //default :  CsPrintf (MSG_WARNING, "Confused by SMOOTH options: '%s'\n", params);
-                       //CsPrintf (MSG_WARNING, "no smoothing performed\n");
+            //default :  CsPrintf (CS_MSG_WARNING, "Confused by SMOOTH options: '%s'\n", params);
+                       //CsPrintf (CS_MSG_WARNING, "no smoothing performed\n");
           }
         }
         break;
@@ -629,7 +629,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
 
 csSprite3DFactorySaver::csSprite3DFactorySaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSprite3DFactorySaver::~csSprite3DFactorySaver ()
@@ -675,7 +675,7 @@ static void WriteMatrix(const csMatrix3& m, iStrVector* str)
 void csSprite3DFactorySaver::SaveSkeleton (iSkeletonLimb* limb, 
   iStrVector* str)
 {
-  iSkeletonConnection* con = QUERY_INTERFACE (limb, iSkeletonConnection);
+  iSkeletonConnection* con = SCF_QUERY_INTERFACE (limb, iSkeletonConnection);
   int i;
   char buf[MAXLINE];
   str->Push(csStrNew("VERTICES ("));
@@ -710,7 +710,7 @@ void csSprite3DFactorySaver::SaveSkeleton (iSkeletonLimb* limb,
 void csSprite3DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
   iEngine* /*engine*/)
 {
-  iSprite3DFactoryState *state = QUERY_INTERFACE (obj, iSprite3DFactoryState);
+  iSprite3DFactoryState *state = SCF_QUERY_INTERFACE (obj, iSprite3DFactoryState);
   char buf[MAXLINE];
 
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
@@ -759,7 +759,7 @@ void csSprite3DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
   iSkeleton *skeleton = state->GetSkeleton();
   if(skeleton) 
   {
-    iSkeletonLimb* skellimb = QUERY_INTERFACE (skeleton, iSkeletonLimb);
+    iSkeletonLimb* skellimb = SCF_QUERY_INTERFACE (skeleton, iSkeletonLimb);
     iSkeletonLimb* skelp = skellimb;
     while(skelp) 
     {
@@ -786,7 +786,7 @@ void csSprite3DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
 //---------------------------------------------------------------------------
 csSprite3DLoader::csSprite3DLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSprite3DLoader::~csSprite3DLoader ()
@@ -818,7 +818,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
   char* params;
   char str[255];
 
-  iMeshWrapper* imeshwrap = QUERY_INTERFACE (context, iMeshWrapper);
+  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
   imeshwrap->DecRef ();
 
   iMeshObject* mesh = NULL;
@@ -848,7 +848,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  imeshwrap->SetFactory (fact);
-          spr3dLook = QUERY_INTERFACE (mesh, iSprite3DState);
+          spr3dLook = SCF_QUERY_INTERFACE (mesh, iSprite3DState);
 	}
 	break;
       case CS_TOKEN_ACTION:
@@ -890,7 +890,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 	  case CS_TOKEN_APPLY_MOTION:
 	{
 	  csScanStr( params, "%s", str);
-	  iMotionManager *motman = QUERY_PLUGIN_CLASS( sys, 
+	  iMotionManager *motman = CS_QUERY_PLUGIN_CLASS( sys, 
 		"crystalspace.motion.manager.default","MotionManager",iMotionManager);
 	  if (!motman) 
 	  { 
@@ -904,15 +904,15 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 		return NULL; 
 	  }
 	  iSkeletonState *skel_state = spr3dLook->GetSkeletonState();
-	  iSkeletonLimbState *limb = QUERY_INTERFACE( skel_state, iSkeletonLimbState );
+	  iSkeletonLimbState *limb = SCF_QUERY_INTERFACE( skel_state, iSkeletonLimbState );
 	  limb->DecRef();
 	  if (!(limb = limb->GetChildren()))
 	  { 
 		printf("Warning: Skeleton has no libs -- cannot apply motion\n");
 		break;
 	  }
-	  iSkeletonConnectionState *con = QUERY_INTERFACE( limb, iSkeletonConnectionState );
-	  iSkeletonBone *bone = QUERY_INTERFACE ( con, iSkeletonBone );
+	  iSkeletonConnectionState *con = SCF_QUERY_INTERFACE( limb, iSkeletonConnectionState );
+	  iSkeletonBone *bone = SCF_QUERY_INTERFACE ( con, iSkeletonBone );
 	  if (!bone)
 	  {
 		printf("The skeleton has no bones!\n");
@@ -940,7 +940,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 
 csSprite3DSaver::csSprite3DSaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSprite3DSaver::~csSprite3DSaver ()
@@ -956,11 +956,11 @@ bool csSprite3DSaver::Initialize (iSystem* system)
 void csSprite3DSaver::WriteDown (iBase* obj, iStrVector *str,
   iEngine* /*engine*/)
 {
-  iFactory *fact = QUERY_INTERFACE (this, iFactory);
-  iSprite3DState *state = QUERY_INTERFACE (obj, iSprite3DState);
+  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
+  iSprite3DState *state = SCF_QUERY_INTERFACE (obj, iSprite3DState);
 
-  iMeshObject *meshobj= QUERY_INTERFACE (obj, iMeshObject);
-  iSprite3DFactoryState *factstate = QUERY_INTERFACE (
+  iMeshObject *meshobj= SCF_QUERY_INTERFACE (obj, iMeshObject);
+  iSprite3DFactoryState *factstate = SCF_QUERY_INTERFACE (
     meshobj->GetFactory(), iSprite3DFactoryState);
   meshobj->DecRef();
   char buf[MAXLINE];

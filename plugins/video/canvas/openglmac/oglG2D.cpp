@@ -37,23 +37,23 @@
 
 /////The 2D Graphics Driver//////////////
 
-IMPLEMENT_FACTORY (csGraphics2DOpenGL)
+SCF_IMPLEMENT_FACTORY (csGraphics2DOpenGL)
 
-EXPORT_CLASS_TABLE (Driver2DGL)
-  EXPORT_CLASS_DEP (csGraphics2DOpenGL, OPENGL_2D_DRIVER,
+SCF_EXPORT_CLASS_TABLE (Driver2DGL)
+  SCF_EXPORT_CLASS_DEP (csGraphics2DOpenGL, OPENGL_2D_DRIVER,
     "Crystal Space OpenGL 2D driver for Macintosh", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csGraphics2DOpenGL)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics2D)
-  IMPLEMENTS_INTERFACE (iMacGraphics)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics2DOpenGL)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+  SCF_IMPLEMENTS_INTERFACE (iMacGraphics)
+SCF_IMPLEMENT_IBASE_END
 
 csGraphics2DOpenGL::csGraphics2DOpenGL(iBase* iParent) : 
                    csGraphics2DGLCommon (iParent)
 {
-	CONSTRUCT_IBASE(iParent);
+	SCF_CONSTRUCT_IBASE(iParent);
 
 	mMainWindow = NULL;
 	mColorTable = NULL;
@@ -200,7 +200,7 @@ bool csGraphics2DOpenGL::Initialize (iSystem *pSystem)
   		pfmt.complete ();
 	}
   
-	CsPrintf (MSG_INITIALIZATION, "Using %d bits per pixel (%d color mode).\n", Depth, 1 << Depth);
+	CsPrintf (CS_MSG_INITIALIZATION, "Using %d bits per pixel (%d color mode).\n", Depth, 1 << Depth);
 
 	return true;
 }

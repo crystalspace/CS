@@ -18,7 +18,7 @@ class csFrog : public iFrog, public iName
 {
   char *Name;
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csFrog (iBase *iParent);
   virtual ~csFrog ();
@@ -30,14 +30,14 @@ public:
 
 //--------------- implementation ----------------
 
-IMPLEMENT_IBASE (csFrog)
-  IMPLEMENTS_INTERFACE (iFrog)
-  IMPLEMENTS_INTERFACE (iName)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csFrog)
+  SCF_IMPLEMENTS_INTERFACE (iFrog)
+  SCF_IMPLEMENTS_INTERFACE (iName)
+SCF_IMPLEMENT_IBASE_END
 
 csFrog::csFrog (iBase *iParent)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   Name = NULL;
 }
 
@@ -72,8 +72,8 @@ void csFrog::SetName (char *iName)
 
 // ... and now export all classes
 
-IMPLEMENT_FACTORY (csFrog)
+SCF_IMPLEMENT_FACTORY (csFrog)
 
-EXPORT_CLASS_TABLE (Frog)
-  EXPORT_CLASS (csFrog, "test.frog", "A Frog that croaks")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE (Frog)
+  SCF_EXPORT_CLASS (csFrog, "test.frog", "A Frog that croaks")
+SCF_EXPORT_CLASS_TABLE_END

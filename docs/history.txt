@@ -78,6 +78,13 @@ The history order is reversed so that new features are at the top.
 	  that the array argument is now `const'.  This helps to indicate that
 	  the incoming array is not intended for modification.  Also clarified
 	  the documentation to make this point painfully clear.
+	- Eric Sunshine made the following name changes throughout the project
+	  in order to avoid global namespace pollution:
+	    - All SCF macros are now prefixed by "SCF_".
+	    - All MSG_BLAH macros are now prefixed by "CS_".
+	    - All QUERY_PLUGIN macros are now prefixed by "CS_".
+	    - All LOAD_PLUGIN macros are now prefixed by "CS_".
+	    - All IS_BLAH_EVENT macros are now prefixed by "CS_".
 24-Jun-2001
 	- 'Fixed' the lightmap overflow bug in software renderer. It is
 	  not really an elegant bug fix as I simply test for overflow

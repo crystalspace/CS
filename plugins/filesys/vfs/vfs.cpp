@@ -61,7 +61,7 @@ class DiskFile : public csFile
   void CheckError ();
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   // destructor
   virtual ~DiskFile ();
@@ -101,7 +101,7 @@ class ArchiveFile : public csFile
     const char *NameSuffix, VfsArchive *ParentArchive);
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   // destructor
   virtual ~ArchiveFile ();
@@ -299,9 +299,9 @@ iDataBuffer *csFile::GetAllData ()
 
 // ------------------------------------------------------------ DiskFile --- //
 
-IMPLEMENT_IBASE (DiskFile)
-  IMPLEMENTS_INTERFACE (iFile)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (DiskFile)
+  SCF_IMPLEMENTS_INTERFACE (iFile)
+SCF_IMPLEMENT_IBASE_END
 
 #ifndef O_BINARY
 #  define O_BINARY 0
@@ -313,7 +313,7 @@ IMPLEMENT_IBASE_END
 DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
   const char *NameSuffix) : csFile (Mode, ParentNode, RIndex, NameSuffix)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   char *rp = (char *)Node->RPathV [Index];
   size_t rpl = strlen (rp);
   size_t nsl = strlen (NameSuffix);
@@ -521,15 +521,15 @@ size_t DiskFile::GetPos ()
 
 // --------------------------------------------------------- ArchiveFile --- //
 
-IMPLEMENT_IBASE (ArchiveFile)
-  IMPLEMENTS_INTERFACE (iFile)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (ArchiveFile)
+  SCF_IMPLEMENTS_INTERFACE (iFile)
+SCF_IMPLEMENT_IBASE_END
 
 ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, int RIndex,
   const char *NameSuffix, VfsArchive *ParentArchive) :
   csFile (Mode, ParentNode, RIndex, NameSuffix)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   Archive = ParentArchive;
   Error = VFS_STATUS_OTHER;
   Size = 0;
@@ -1119,22 +1119,22 @@ int csVFS::VfsVector::CompareKey (csSome Item, csConstSome Key, int Mode) const
 
 // --------------------------------------------------------------- csVFS --- //
 
-IMPLEMENT_IBASE (csVFS)
-  IMPLEMENTS_INTERFACE (iVFS)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csVFS)
+  SCF_IMPLEMENTS_INTERFACE (iVFS)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csVFS)
+SCF_IMPLEMENT_FACTORY (csVFS)
 
-EXPORT_CLASS_TABLE (vfs)
-  EXPORT_CLASS (csVFS, "crystalspace.kernel.vfs",
+SCF_EXPORT_CLASS_TABLE (vfs)
+  SCF_EXPORT_CLASS (csVFS, "crystalspace.kernel.vfs",
     "Crystal Space Virtual File System")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
 {
   System = NULL;
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   cwd = new char [2];
   cwd [0] = VFS_PATH_SEPARATOR;
   cwd [1] = 0;

@@ -3,8 +3,8 @@
 
 awsManager::awsManager(iBase *p)
 {
-  CONSTRUCT_IBASE (p);
-  CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_IBASE (p);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 
   canvas.DisableAutoUpdate();
 }

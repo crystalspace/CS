@@ -31,41 +31,41 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csEmitFixed)
-  IMPLEMENTS_INTERFACE (iEmitGen3D)
-IMPLEMENT_IBASE_END
-IMPLEMENT_IBASE (csEmitSphere)
-  IMPLEMENTS_INTERFACE (iEmitSphere)
-  IMPLEMENTS_INTERFACE (iEmitGen3D)
-IMPLEMENT_IBASE_END
-IMPLEMENT_IBASE (csEmitBox)
-  IMPLEMENTS_INTERFACE (iEmitBox)
-  IMPLEMENTS_INTERFACE (iEmitGen3D)
-IMPLEMENT_IBASE_END
-IMPLEMENT_IBASE (csEmitCone)
-  IMPLEMENTS_INTERFACE (iEmitCone)
-  IMPLEMENTS_INTERFACE (iEmitGen3D)
-IMPLEMENT_IBASE_END
-IMPLEMENT_IBASE (csEmitMix)
-  IMPLEMENTS_INTERFACE (iEmitMix)
-  IMPLEMENTS_INTERFACE (iEmitGen3D)
-IMPLEMENT_IBASE_END
-IMPLEMENT_IBASE (csEmitCylinder)
-  IMPLEMENTS_INTERFACE (iEmitCylinder)
-  IMPLEMENTS_INTERFACE (iEmitGen3D)
-IMPLEMENT_IBASE_END
-IMPLEMENT_IBASE (csEmitLine)
-  IMPLEMENTS_INTERFACE (iEmitLine)
-  IMPLEMENTS_INTERFACE (iEmitGen3D)
-IMPLEMENT_IBASE_END
-IMPLEMENT_IBASE (csEmitSphereTangent)
-  IMPLEMENTS_INTERFACE (iEmitSphereTangent)
-  IMPLEMENTS_INTERFACE (iEmitGen3D)
-IMPLEMENT_IBASE_END
-IMPLEMENT_IBASE (csEmitCylinderTangent)
-  IMPLEMENTS_INTERFACE (iEmitCylinderTangent)
-  IMPLEMENTS_INTERFACE (iEmitGen3D)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csEmitFixed)
+  SCF_IMPLEMENTS_INTERFACE (iEmitGen3D)
+SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csEmitSphere)
+  SCF_IMPLEMENTS_INTERFACE (iEmitSphere)
+  SCF_IMPLEMENTS_INTERFACE (iEmitGen3D)
+SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csEmitBox)
+  SCF_IMPLEMENTS_INTERFACE (iEmitBox)
+  SCF_IMPLEMENTS_INTERFACE (iEmitGen3D)
+SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csEmitCone)
+  SCF_IMPLEMENTS_INTERFACE (iEmitCone)
+  SCF_IMPLEMENTS_INTERFACE (iEmitGen3D)
+SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csEmitMix)
+  SCF_IMPLEMENTS_INTERFACE (iEmitMix)
+  SCF_IMPLEMENTS_INTERFACE (iEmitGen3D)
+SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csEmitCylinder)
+  SCF_IMPLEMENTS_INTERFACE (iEmitCylinder)
+  SCF_IMPLEMENTS_INTERFACE (iEmitGen3D)
+SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csEmitLine)
+  SCF_IMPLEMENTS_INTERFACE (iEmitLine)
+  SCF_IMPLEMENTS_INTERFACE (iEmitGen3D)
+SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csEmitSphereTangent)
+  SCF_IMPLEMENTS_INTERFACE (iEmitSphereTangent)
+  SCF_IMPLEMENTS_INTERFACE (iEmitGen3D)
+SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csEmitCylinderTangent)
+  SCF_IMPLEMENTS_INTERFACE (iEmitCylinderTangent)
+  SCF_IMPLEMENTS_INTERFACE (iEmitGen3D)
+SCF_IMPLEMENT_IBASE_END
 
 /// utility function
 static float GetRandomFloat(float min, float max)
@@ -76,7 +76,7 @@ static float GetRandomFloat(float min, float max)
 
 csEmitFixed::csEmitFixed(iBase *parent)
 {
-  CONSTRUCT_IBASE(parent);
+  SCF_CONSTRUCT_IBASE(parent);
   val.Set(0,0,0);
 }
 
@@ -96,7 +96,7 @@ void csEmitFixed::SetValue(const csVector3& value)
 
 csEmitBox::csEmitBox(iBase *parent)
 {
-  CONSTRUCT_IBASE(parent);
+  SCF_CONSTRUCT_IBASE(parent);
   min.Set(0,0,0);
   max.Set(0,0,0);
 }
@@ -126,7 +126,7 @@ void csEmitBox::GetContent(csVector3& min, csVector3& max)
 
 csEmitSphere::csEmitSphere(iBase *parent)
 {
-  CONSTRUCT_IBASE(parent);
+  SCF_CONSTRUCT_IBASE(parent);
   center.Set(0,0,0);
   min = 0;
   max = 0;
@@ -180,7 +180,7 @@ void csEmitSphere::GetContent(csVector3& center, float& min, float& max)
 
 csEmitCone::csEmitCone(iBase *parent)
 {
-  CONSTRUCT_IBASE(parent);
+  SCF_CONSTRUCT_IBASE(parent);
   origin.Set(0,0,0);
   elevation = 0;
   azimuth = 0;
@@ -246,7 +246,7 @@ void csEmitCone::GetContent(csVector3& origin, float& elevation,
 
 csEmitMix::csEmitMix(iBase *parent)
 {
-  CONSTRUCT_IBASE(parent);
+  SCF_CONSTRUCT_IBASE(parent);
   list = NULL;
   totalweight = 0.0;
   nr = 0;
@@ -312,7 +312,7 @@ void csEmitMix::GetContent(int num, float& weight, iEmitGen3D*& emit)
 
 csEmitLine::csEmitLine(iBase *parent)
 {
-  CONSTRUCT_IBASE(parent);
+  SCF_CONSTRUCT_IBASE(parent);
   start.Set(0,0,0);
   end.Set(0,0,0);
 }
@@ -341,7 +341,7 @@ void csEmitLine::GetContent(csVector3& start, csVector3& end)
 
 csEmitCylinder::csEmitCylinder(iBase *parent)
 {
-  CONSTRUCT_IBASE(parent);
+  SCF_CONSTRUCT_IBASE(parent);
   start.Set(0,0,0);
   end.Set(0,0,0);
   min = 0;
@@ -408,7 +408,7 @@ void csEmitCylinder::GetContent(csVector3& start, csVector3& end,
 
 csEmitCylinderTangent::csEmitCylinderTangent(iBase *parent)
 {
-  CONSTRUCT_IBASE(parent);
+  SCF_CONSTRUCT_IBASE(parent);
   start.Set(0,0,0);
   end.Set(0,0,0);
   min = 0;
@@ -460,7 +460,7 @@ void csEmitCylinderTangent::GetContent(csVector3& start, csVector3& end,
 
 csEmitSphereTangent::csEmitSphereTangent(iBase *parent)
 {
-  CONSTRUCT_IBASE(parent);
+  SCF_CONSTRUCT_IBASE(parent);
   center.Set(0,0,0);
   min = 0;
   max = 0;
@@ -504,13 +504,13 @@ void csEmitSphereTangent::GetContent(csVector3& center, float& min, float& max)
 
 //----------------- csEmitMeshObject -----------------------------------
 
-IMPLEMENT_IBASE_EXT (csEmitMeshObject)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iEmitState)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csEmitMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEmitState)
+SCF_IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csEmitMeshObject::EmitState)
-  IMPLEMENTS_INTERFACE (iEmitState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csEmitMeshObject::EmitState)
+  SCF_IMPLEMENTS_INTERFACE (iEmitState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 
 void csEmitMeshObject::SetupObject ()
@@ -553,7 +553,7 @@ csEmitMeshObject::csEmitMeshObject (iSystem* system,
   iMeshObjectFactory* factory)
 	: csParticleSystem (system, factory)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiEmitState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEmitState);
   lighted_particles = false;
   number = 50;
   ages = NULL;
@@ -816,19 +816,19 @@ void csEmitMeshObject::GetAgingMoment(int i, int& time, csColor& color,
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csEmitMeshObjectFactory)
-  IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iEmitFactoryState)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csEmitMeshObjectFactory)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEmitFactoryState)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csEmitMeshObjectFactory::EmitFactoryState)
-  IMPLEMENTS_INTERFACE (iEmitFactoryState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csEmitMeshObjectFactory::EmitFactoryState)
+  SCF_IMPLEMENTS_INTERFACE (iEmitFactoryState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csEmitMeshObjectFactory::csEmitMeshObjectFactory (iBase *pParent, iSystem* system)
 {
-  CONSTRUCT_IBASE (pParent);
-  CONSTRUCT_EMBEDDED_IBASE (scfiEmitFactoryState);
+  SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEmitFactoryState);
   csEmitMeshObjectFactory::system = system;
 }
 
@@ -839,28 +839,28 @@ csEmitMeshObjectFactory::~csEmitMeshObjectFactory ()
 iMeshObject* csEmitMeshObjectFactory::NewInstance ()
 {
   csEmitMeshObject* cm = new csEmitMeshObject (system, (iMeshObjectFactory*)this);
-  iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
+  iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
 }
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csEmitMeshObjectType)
-  IMPLEMENTS_INTERFACE (iMeshObjectType)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csEmitMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csEmitMeshObjectType)
+SCF_IMPLEMENT_FACTORY (csEmitMeshObjectType)
 
-EXPORT_CLASS_TABLE (emit)
-  EXPORT_CLASS (csEmitMeshObjectType, "crystalspace.mesh.object.emit",
+SCF_EXPORT_CLASS_TABLE (emit)
+  SCF_EXPORT_CLASS (csEmitMeshObjectType, "crystalspace.mesh.object.emit",
     "Crystal Space Emit Mesh Type")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csEmitMeshObjectType::csEmitMeshObjectType (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csEmitMeshObjectType::~csEmitMeshObjectType ()
@@ -876,7 +876,7 @@ bool csEmitMeshObjectType::Initialize (iSystem* system)
 iMeshObjectFactory* csEmitMeshObjectType::NewFactory ()
 {
   csEmitMeshObjectFactory* cm = new csEmitMeshObjectFactory (this, system);
-  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;
 }

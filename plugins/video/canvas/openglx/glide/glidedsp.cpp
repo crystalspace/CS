@@ -25,20 +25,20 @@
 #include "isys/plugin.h"
 #include "isys/system.h"
 
-IMPLEMENT_FACTORY(csOpenGLGlideDisp)
+SCF_IMPLEMENT_FACTORY(csOpenGLGlideDisp)
 
-EXPORT_CLASS_TABLE(oglglide)
-    EXPORT_CLASS( csOpenGLGlideDisp, "crystalspace.graphics2d.glx.disp.glide", "Glide Displaydriver for Crystal Space GL/X")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE(oglglide)
+    SCF_EXPORT_CLASS( csOpenGLGlideDisp, "crystalspace.graphics2d.glx.disp.glide", "Glide Displaydriver for Crystal Space GL/X")
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE(csOpenGLGlideDisp)
-  IMPLEMENTS_INTERFACE(iPlugIn)
-  IMPLEMENTS_INTERFACE(iOpenGLDisp)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE(csOpenGLGlideDisp)
+  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE(iOpenGLDisp)
+SCF_IMPLEMENT_IBASE_END
 
 csOpenGLGlideDisp::csOpenGLGlideDisp (iBase *iParent)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
 }
 
 bool csOpenGLGlideDisp::Initialize(iSystem */*pSystem*/)

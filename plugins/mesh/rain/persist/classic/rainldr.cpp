@@ -58,45 +58,45 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (BOX)
 CS_TOKEN_DEF_END
 
-IMPLEMENT_IBASE (csRainFactoryLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csRainFactoryLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csRainFactorySaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csRainFactorySaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csRainLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csRainLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csRainSaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csRainSaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csRainFactoryLoader)
-IMPLEMENT_FACTORY (csRainFactorySaver)
-IMPLEMENT_FACTORY (csRainLoader)
-IMPLEMENT_FACTORY (csRainSaver)
+SCF_IMPLEMENT_FACTORY (csRainFactoryLoader)
+SCF_IMPLEMENT_FACTORY (csRainFactorySaver)
+SCF_IMPLEMENT_FACTORY (csRainLoader)
+SCF_IMPLEMENT_FACTORY (csRainSaver)
 
-EXPORT_CLASS_TABLE (rainldr)
-  EXPORT_CLASS (csRainFactoryLoader, "crystalspace.mesh.loader.factory.rain",
+SCF_EXPORT_CLASS_TABLE (rainldr)
+  SCF_EXPORT_CLASS (csRainFactoryLoader, "crystalspace.mesh.loader.factory.rain",
     "Crystal Space Rain Factory Loader")
-  EXPORT_CLASS (csRainFactorySaver, "crystalspace.mesh.saver.factory.rain",
+  SCF_EXPORT_CLASS (csRainFactorySaver, "crystalspace.mesh.saver.factory.rain",
     "Crystal Space Rain Factory Saver")
-  EXPORT_CLASS (csRainLoader, "crystalspace.mesh.loader.rain",
+  SCF_EXPORT_CLASS (csRainLoader, "crystalspace.mesh.loader.rain",
     "Crystal Space Rain Mesh Loader")
-  EXPORT_CLASS (csRainSaver, "crystalspace.mesh.saver.rain",
+  SCF_EXPORT_CLASS (csRainSaver, "crystalspace.mesh.saver.rain",
     "Crystal Space Rain Mesh Saver")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csRainFactoryLoader::csRainFactoryLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csRainFactoryLoader::~csRainFactoryLoader ()
@@ -112,11 +112,11 @@ bool csRainFactoryLoader::Initialize (iSystem* system)
 iBase* csRainFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys,
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (sys,
   	"crystalspace.mesh.object.rain", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = LOAD_PLUGIN (sys, "crystalspace.mesh.object.rain",
+    type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.rain",
     	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.rain\n");
   }
@@ -128,7 +128,7 @@ iBase* csRainFactoryLoader::Parse (const char* /*string*/,
 //---------------------------------------------------------------------------
 csRainFactorySaver::csRainFactorySaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csRainFactorySaver::~csRainFactorySaver ()
@@ -170,7 +170,7 @@ void csRainFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 
 csRainLoader::csRainLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csRainLoader::~csRainLoader ()
@@ -253,7 +253,7 @@ iBase* csRainLoader::Parse (const char* string, iEngine* engine,
   char* params;
   char str[255];
 
-  iMeshWrapper* imeshwrap = QUERY_INTERFACE (context, iMeshWrapper);
+  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
   imeshwrap->DecRef ();
 
   iMeshObject* mesh = NULL;
@@ -315,8 +315,8 @@ iBase* csRainLoader::Parse (const char* string, iEngine* engine,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  imeshwrap->SetFactory (fact);
-          partstate = QUERY_INTERFACE (mesh, iParticleState);
-          rainstate = QUERY_INTERFACE (mesh, iRainState);
+          partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
+          rainstate = SCF_QUERY_INTERFACE (mesh, iRainState);
 	}
 	break;
       case CS_TOKEN_MATERIAL:
@@ -363,7 +363,7 @@ iBase* csRainLoader::Parse (const char* string, iEngine* engine,
 
 csRainSaver::csRainSaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csRainSaver::~csRainSaver ()
@@ -379,9 +379,9 @@ bool csRainSaver::Initialize (iSystem* system)
 void csRainSaver::WriteDown (iBase* obj, iStrVector *str,
   iEngine* /*engine*/)
 {
-  iFactory *fact = QUERY_INTERFACE (this, iFactory);
-  iParticleState *partstate = QUERY_INTERFACE (obj, iParticleState);
-  iRainState *state = QUERY_INTERFACE (obj, iRainState);
+  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
+  iParticleState *partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
+  iRainState *state = SCF_QUERY_INTERFACE (obj, iRainState);
   char buf[MAXLINE];
   char name[MAXLINE];
 

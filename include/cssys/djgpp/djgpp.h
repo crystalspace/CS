@@ -42,7 +42,7 @@ public:
   /// Execute a system-dependent extension
   virtual bool SystemExtension (const char *iCommand, ...);
 
-  DECLARE_IBASE_EXT (csSystemDriver);
+  SCF_DECLARE_IBASE_EXT (csSystemDriver);
 
   //------------------------- iEventPlug interface ---------------------------//
 

@@ -40,7 +40,7 @@ class csSoundRenderSoftware : public iSoundRender
 {
 friend class csSoundSourceSoftware;
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   // the system driver
   iSystem *System;
 

@@ -210,7 +210,7 @@ class csLoader : public iLoader
 
 public:
   /********** iLoader implementation **********/
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   
   // system driver
   iSystem *System;

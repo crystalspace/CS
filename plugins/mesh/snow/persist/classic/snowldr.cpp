@@ -59,45 +59,45 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SWIRL)
 CS_TOKEN_DEF_END
 
-IMPLEMENT_IBASE (csSnowFactoryLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSnowFactoryLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csSnowFactorySaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSnowFactorySaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csSnowLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSnowLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csSnowSaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSnowSaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csSnowFactoryLoader)
-IMPLEMENT_FACTORY (csSnowFactorySaver)
-IMPLEMENT_FACTORY (csSnowLoader)
-IMPLEMENT_FACTORY (csSnowSaver)
+SCF_IMPLEMENT_FACTORY (csSnowFactoryLoader)
+SCF_IMPLEMENT_FACTORY (csSnowFactorySaver)
+SCF_IMPLEMENT_FACTORY (csSnowLoader)
+SCF_IMPLEMENT_FACTORY (csSnowSaver)
 
-EXPORT_CLASS_TABLE (snowldr)
-  EXPORT_CLASS (csSnowFactoryLoader, "crystalspace.mesh.loader.factory.snow",
+SCF_EXPORT_CLASS_TABLE (snowldr)
+  SCF_EXPORT_CLASS (csSnowFactoryLoader, "crystalspace.mesh.loader.factory.snow",
     "Crystal Space Snow Factory Loader")
-  EXPORT_CLASS (csSnowFactorySaver, "crystalspace.mesh.saver.factory.snow",
+  SCF_EXPORT_CLASS (csSnowFactorySaver, "crystalspace.mesh.saver.factory.snow",
     "Crystal Space Snow Factory Saver")
-  EXPORT_CLASS (csSnowLoader, "crystalspace.mesh.loader.snow",
+  SCF_EXPORT_CLASS (csSnowLoader, "crystalspace.mesh.loader.snow",
     "Crystal Space Snow Mesh Loader")
-  EXPORT_CLASS (csSnowSaver, "crystalspace.mesh.saver.snow",
+  SCF_EXPORT_CLASS (csSnowSaver, "crystalspace.mesh.saver.snow",
     "Crystal Space Snow Mesh Saver")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csSnowFactoryLoader::csSnowFactoryLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSnowFactoryLoader::~csSnowFactoryLoader ()
@@ -113,11 +113,11 @@ bool csSnowFactoryLoader::Initialize (iSystem* system)
 iBase* csSnowFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys,
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (sys,
   	"crystalspace.mesh.object.snow", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = LOAD_PLUGIN (sys, "crystalspace.mesh.object.snow",
+    type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.snow",
     	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.snow\n");
   }
@@ -130,7 +130,7 @@ iBase* csSnowFactoryLoader::Parse (const char* /*string*/,
 
 csSnowFactorySaver::csSnowFactorySaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSnowFactorySaver::~csSnowFactorySaver ()
@@ -172,7 +172,7 @@ void csSnowFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 //---------------------------------------------------------------------------
 csSnowLoader::csSnowLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSnowLoader::~csSnowLoader ()
@@ -256,7 +256,7 @@ iBase* csSnowLoader::Parse (const char* string, iEngine* engine,
   char* params;
   char str[255];
 
-  iMeshWrapper* imeshwrap = QUERY_INTERFACE (context, iMeshWrapper);
+  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
   imeshwrap->DecRef ();
 
   iMeshObject* mesh = NULL;
@@ -325,8 +325,8 @@ iBase* csSnowLoader::Parse (const char* string, iEngine* engine,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  imeshwrap->SetFactory (fact);
-          partstate = QUERY_INTERFACE (mesh, iParticleState);
-          snowstate = QUERY_INTERFACE (mesh, iSnowState);
+          partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
+          snowstate = SCF_QUERY_INTERFACE (mesh, iSnowState);
 	}
 	break;
       case CS_TOKEN_MATERIAL:
@@ -373,7 +373,7 @@ iBase* csSnowLoader::Parse (const char* string, iEngine* engine,
 
 csSnowSaver::csSnowSaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csSnowSaver::~csSnowSaver ()
@@ -389,9 +389,9 @@ bool csSnowSaver::Initialize (iSystem* system)
 void csSnowSaver::WriteDown (iBase* obj, iStrVector *str,
   iEngine* /*engine*/)
 {
-  iFactory *fact = QUERY_INTERFACE (this, iFactory);
-  iParticleState *partstate = QUERY_INTERFACE (obj, iParticleState);
-  iSnowState *state = QUERY_INTERFACE (obj, iSnowState);
+  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
+  iParticleState *partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
+  iSnowState *state = SCF_QUERY_INTERFACE (obj, iSnowState);
   char buf[MAXLINE];
   char name[MAXLINE];
  csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);

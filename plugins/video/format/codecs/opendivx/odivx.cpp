@@ -22,20 +22,20 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csOpenDivX)
-  IMPLEMENTS_INTERFACE (iAVICodec)
-  IMPLEMENTS_INTERFACE (iBase)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csOpenDivX)
+  SCF_IMPLEMENTS_INTERFACE (iAVICodec)
+  SCF_IMPLEMENTS_INTERFACE (iBase)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csOpenDivX)
-EXPORT_CLASS_TABLE (odivx)
-  EXPORT_CLASS (csOpenDivX, "crystalspace.video.codec.avi.dvx1", "CrystalSpace OpenDivX codec")
-  EXPORT_CLASS (csOpenDivX, "crystalspace.video.codec.avi.divx", "CrystalSpace OpenDivX codec")
-EXPORT_CLASS_TABLE_END
+SCF_IMPLEMENT_FACTORY (csOpenDivX)
+SCF_EXPORT_CLASS_TABLE (odivx)
+  SCF_EXPORT_CLASS (csOpenDivX, "crystalspace.video.codec.avi.dvx1", "CrystalSpace OpenDivX codec")
+  SCF_EXPORT_CLASS (csOpenDivX, "crystalspace.video.codec.avi.divx", "CrystalSpace OpenDivX codec")
+SCF_EXPORT_CLASS_TABLE_END
 
 csOpenDivX::csOpenDivX (iBase *pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
   ydata = udata = vdata = NULL;
 }
 

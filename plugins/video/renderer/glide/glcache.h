@@ -98,7 +98,7 @@ public:
   ///
   virtual ~csGlideTextureCache();
   
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Add a texture to the texture memory
   void Add (iTextureHandle *texture, bool alpha);

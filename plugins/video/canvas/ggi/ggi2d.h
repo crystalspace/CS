@@ -39,7 +39,7 @@ private:
   virtual int translate_key(ggi_event *ev);
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csGraphics2DGGI (iBase *iParent);
   virtual ~csGraphics2DGGI ();

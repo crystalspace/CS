@@ -133,7 +133,7 @@ public:
   };
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csSequence (iSequenceManager* seqmgr);
   virtual ~csSequence ();
@@ -172,7 +172,7 @@ private:
   bool suspended;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csSequenceManager (iBase *iParent);
   virtual ~csSequenceManager ();
@@ -193,7 +193,7 @@ public:
 
   struct eiPlugIn : public iPlugIn
   {
-    DECLARE_EMBEDDED_IBASE(csSequenceManager);
+    SCF_DECLARE_EMBEDDED_IBASE(csSequenceManager);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
   } scfiPlugIn;

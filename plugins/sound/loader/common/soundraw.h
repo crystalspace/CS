@@ -24,7 +24,7 @@
 
 class csSoundDataRaw : public iSoundData {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csSoundDataRaw(iBase *iParent, void *Data, long NumSamples,
     csSoundFormat Format);

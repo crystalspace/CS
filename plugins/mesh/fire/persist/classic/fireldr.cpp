@@ -62,45 +62,45 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (TOTALTIME)
 CS_TOKEN_DEF_END
 
-IMPLEMENT_IBASE (csFireFactoryLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csFireFactoryLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csFireFactorySaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csFireFactorySaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csFireLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csFireLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csFireSaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csFireSaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csFireFactoryLoader)
-IMPLEMENT_FACTORY (csFireFactorySaver)
-IMPLEMENT_FACTORY (csFireLoader)
-IMPLEMENT_FACTORY (csFireSaver)
+SCF_IMPLEMENT_FACTORY (csFireFactoryLoader)
+SCF_IMPLEMENT_FACTORY (csFireFactorySaver)
+SCF_IMPLEMENT_FACTORY (csFireLoader)
+SCF_IMPLEMENT_FACTORY (csFireSaver)
 
-EXPORT_CLASS_TABLE (fireldr)
-  EXPORT_CLASS (csFireFactoryLoader, "crystalspace.mesh.loader.factory.fire",
+SCF_EXPORT_CLASS_TABLE (fireldr)
+  SCF_EXPORT_CLASS (csFireFactoryLoader, "crystalspace.mesh.loader.factory.fire",
     "Crystal Space Fire Factory Loader")
-  EXPORT_CLASS (csFireFactorySaver, "crystalspace.mesh.saver.factory.fire",
+  SCF_EXPORT_CLASS (csFireFactorySaver, "crystalspace.mesh.saver.factory.fire",
     "Crystal Space Fire Factory Saver")
-  EXPORT_CLASS (csFireLoader, "crystalspace.mesh.loader.fire",
+  SCF_EXPORT_CLASS (csFireLoader, "crystalspace.mesh.loader.fire",
     "Crystal Space Fire Mesh Loader")
-  EXPORT_CLASS (csFireSaver, "crystalspace.mesh.saver.fire",
+  SCF_EXPORT_CLASS (csFireSaver, "crystalspace.mesh.saver.fire",
     "Crystal Space Fire Mesh Saver")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csFireFactoryLoader::csFireFactoryLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csFireFactoryLoader::~csFireFactoryLoader ()
@@ -116,11 +116,11 @@ bool csFireFactoryLoader::Initialize (iSystem* system)
 iBase* csFireFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys,
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (sys,
   	"crystalspace.mesh.object.fire", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = LOAD_PLUGIN (sys, "crystalspace.mesh.object.fire",
+    type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.fire",
     	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.fire\n");
   }
@@ -133,7 +133,7 @@ iBase* csFireFactoryLoader::Parse (const char* /*string*/,
 
 csFireFactorySaver::csFireFactorySaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csFireFactorySaver::~csFireFactorySaver ()
@@ -176,7 +176,7 @@ void csFireFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 
 csFireLoader::csFireLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csFireLoader::~csFireLoader ()
@@ -263,7 +263,7 @@ iBase* csFireLoader::Parse (const char* string, iEngine* engine,
   char* params;
   char str[255];
 
-  iMeshWrapper* imeshwrap = QUERY_INTERFACE (context, iMeshWrapper);
+  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
   imeshwrap->DecRef ();
 
   iMeshObject* mesh = NULL;
@@ -353,8 +353,8 @@ iBase* csFireLoader::Parse (const char* string, iEngine* engine,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  imeshwrap->SetFactory (fact);
-          partstate = QUERY_INTERFACE (mesh, iParticleState);
-          firestate = QUERY_INTERFACE (mesh, iFireState);
+          partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
+          firestate = SCF_QUERY_INTERFACE (mesh, iFireState);
 	}
 	break;
       case CS_TOKEN_MATERIAL:
@@ -403,7 +403,7 @@ iBase* csFireLoader::Parse (const char* string, iEngine* engine,
 
 csFireSaver::csFireSaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csFireSaver::~csFireSaver ()
@@ -419,9 +419,9 @@ bool csFireSaver::Initialize (iSystem* system)
 void csFireSaver::WriteDown (iBase* obj, iStrVector *str,
   iEngine* /*engine*/)
 {
-  iFactory *fact = QUERY_INTERFACE (this, iFactory);
-  iParticleState *partstate = QUERY_INTERFACE (obj, iParticleState);
-  iFireState *state = QUERY_INTERFACE (obj, iFireState);
+  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
+  iParticleState *partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
+  iFireState *state = SCF_QUERY_INTERFACE (obj, iFireState);
   char buf[MAXLINE];
   char name[MAXLINE];
 

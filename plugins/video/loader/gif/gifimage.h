@@ -33,7 +33,7 @@ class csGIFImageIO : public iImageIO
   csVector formats;
 
  public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csGIFImageIO (iBase *pParent);
   virtual ~csGIFImageIO () {}

@@ -165,12 +165,12 @@ public:
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
 
-  DECLARE_IBASE_EXT (csParticleSystem);
+  SCF_DECLARE_IBASE_EXT (csParticleSystem);
 
   //------------------------- iFountainState implementation ----------------
   class FountainState : public iFountainState
   {
-    DECLARE_EMBEDDED_IBASE (csFountainMeshObject);
+    SCF_DECLARE_EMBEDDED_IBASE (csFountainMeshObject);
     virtual void SetParticleCount (int num)
     {
       scfParent->SetParticleCount (num);
@@ -271,7 +271,7 @@ public:
   virtual ~csFountainMeshObjectFactory ();
 
   //------------------------ iMeshObjectFactory implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
@@ -298,7 +298,7 @@ public:
   virtual bool Initialize (iSystem *pSystem);
 
   //------------------------ iMeshObjectType implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Draw.
   virtual iMeshObjectFactory* NewFactory ();

@@ -38,16 +38,16 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csWALImageIO)
-  IMPLEMENTS_INTERFACE (iImageIO)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csWALImageIO)
+  SCF_IMPLEMENTS_INTERFACE (iImageIO)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csWALImageIO);
+SCF_IMPLEMENT_FACTORY (csWALImageIO);
 
-EXPORT_CLASS_TABLE (cswalimg)
-  EXPORT_CLASS (csWALImageIO, "crystalspace.graphic.image.io.wal", "CrystalSpace WAL image format I/O plugin")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE (cswalimg)
+  SCF_EXPORT_CLASS (csWALImageIO, "crystalspace.graphic.image.io.wal", "CrystalSpace WAL image format I/O plugin")
+SCF_EXPORT_CLASS_TABLE_END
 
 /* Header definition. */
 struct WALHeader
@@ -71,7 +71,7 @@ static iImageIO::FileFormatDescription formatlist[1] =
 
 csWALImageIO::csWALImageIO (iBase *pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
   formats.Push (&formatlist[0]);
 }
 

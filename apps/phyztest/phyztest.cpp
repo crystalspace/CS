@@ -46,8 +46,8 @@
 
 CS_IMPLEMENT_APPLICATION
 
-REGISTER_STATIC_LIBRARY (engine)
-REGISTER_STATIC_LIBRARY (lvlload)
+SCF_REGISTER_STATIC_LIBRARY (engine)
+SCF_REGISTER_STATIC_LIBRARY (lvlload)
 
 //-----------------------------------------------------------------------------
 
@@ -109,7 +109,7 @@ csMeshWrapper *add_test_mesh( csMeshFactoryWrapper *tmpl, csSector *aroom, csVie
   tsprt->GetMovable ().SetPosition (csVector3( 0, 0, 0 ));    // only matters for root in chain demo
   tsprt->GetMovable ().UpdateMove ();
 
-  iSprite3DState* state = QUERY_INTERFACE (tsprt->GetMeshObject (), iSprite3DState);
+  iSprite3DState* state = SCF_QUERY_INTERFACE (tsprt->GetMeshObject (), iSprite3DState);
   state->SetAction ("default");
   state->DecRef ();
 
@@ -140,8 +140,8 @@ Phyztest::~Phyztest ()
     courierFont->DecRef ();
   if (LevelLoader)
     LevelLoader->DecRef ();
-  DEC_REF (myG2D);
-  DEC_REF (myG3D);
+  SCF_DEC_REF (myG2D);
+  SCF_DEC_REF (myG3D);
 }
 
 void cleanup ()
@@ -156,40 +156,40 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
     return false;
 
   // Find the pointer to engine plugin
-  myG3D = QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
+  myG3D = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
   if (!myG3D)
   {
-    CsPrintf (MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
     abort ();
   }
 
-  myG2D = QUERY_PLUGIN (this, iGraphics2D);
+  myG2D = CS_QUERY_PLUGIN (this, iGraphics2D);
   if (!myG2D)
   {
-    CsPrintf (MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
     abort ();
   }
 
-  iEngine *Engine = QUERY_PLUGIN (this, iEngine);
+  iEngine *Engine = CS_QUERY_PLUGIN (this, iEngine);
   if (!Engine)
   {
-    CsPrintf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
   engine = Engine->GetCsEngine ();
   Engine->DecRef ();
 
-  LevelLoader = QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
+  LevelLoader = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
   if (!LevelLoader)
   {
-    CsPrintf (MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("Phyztest Crystal Space Application"))
   {
-    Printf (MSG_FATAL_ERROR, "Error opening system!\n");
+    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     cleanup ();
     exit (1);
   }
@@ -199,15 +199,15 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
     courierFont = fs->LoadFont (CSFONT_COURIER);
   else
   {
-    Printf (MSG_FATAL_ERROR, "No font plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No font plugin!\n");
     cleanup ();
     exit (1);
   }
 
-  cdsys = LOAD_PLUGIN (Sys, "crystalspace.collisiondetection.rapid", "CollDet", iCollideSystem);
+  cdsys = CS_LOAD_PLUGIN (Sys, "crystalspace.collisiondetection.rapid", "CollDet", iCollideSystem);
 
   // Some commercials...
-  Printf (MSG_INITIALIZATION, "Phyztest Crystal Space Application version 0.1.\n");
+  Printf (CS_MSG_INITIALIZATION, "Phyztest Crystal Space Application version 0.1.\n");
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
@@ -216,22 +216,22 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   engine->EnableLightingCache (false);
 
   // Create our world.
-  Printf (MSG_INITIALIZATION, "Creating world!...\n");
+  Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
 
 
   if (!LevelLoader->LoadLibraryFile ("/lib/std/library" ) )
   {
-    Printf (MSG_INITIALIZATION, "LIBRARY NOT LOADED!...\n");
+    Printf (CS_MSG_INITIALIZATION, "LIBRARY NOT LOADED!...\n");
     Shutdown = true;
     return false;
   }
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   csMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("stone");
 
-  iMaterialWrapper *iMW = QUERY_INTERFACE (tm, iMaterialWrapper);
+  iMaterialWrapper *iMW = SCF_QUERY_INTERFACE (tm, iMaterialWrapper);
  
   room = engine->CreateCsSector ("room");
-  iThingState* walls = QUERY_INTERFACE (engine->CreateSectorWallsMesh (room,
+  iThingState* walls = SCF_QUERY_INTERFACE (engine->CreateSectorWallsMesh (room,
   	"walls")->GetMeshObject (), iThingState);
   csVector3 
 	   f1 (-5,  5,  5),
@@ -303,7 +303,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   room->AddLight (light);
 
   csMeshWrapper *mw = room->GetMesh (0);
-  iPolygonMesh* mesh = QUERY_INTERFACE (mw->GetMeshObject (), iPolygonMesh);
+  iPolygonMesh* mesh = SCF_QUERY_INTERFACE (mw->GetMeshObject (), iPolygonMesh);
   (void)new csColliderWrapper(*mw, cdsys, mesh);
   mesh->DecRef ();
 
@@ -316,7 +316,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   dynlight->SetSector (room);
   dynlight->Setup ();
 */
-  Printf (MSG_INITIALIZATION, "--------------------------------------\n");
+  Printf (CS_MSG_INITIALIZATION, "--------------------------------------\n");
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by
@@ -361,14 +361,14 @@ void Phyztest::NextFrame ()
   // add a chain
   if (GetKeyState (CSKEY_DEL) && !chain_added )
   {
-    // CsPrintf (MSG_DEBUG_0, "adding chain\n");
+    // CsPrintf (CS_MSG_DEBUG_0, "adding chain\n");
     // use box template
 
     csMeshFactoryWrapper* bxtmpl = (csMeshFactoryWrapper*)
       view->GetEngine ()->GetCsEngine ()->mesh_factories.FindByName ("box");
     if (!bxtmpl)
     {  
-      Printf (MSG_INITIALIZATION, "couldn't load template 'box'\n");
+      Printf (CS_MSG_INITIALIZATION, "couldn't load template 'box'\n");
       return;
     }
 
@@ -427,14 +427,14 @@ void Phyztest::NextFrame ()
 	view->GetEngine ()->GetCsEngine ()->mesh_factories.FindByName ("box");
       if (!tmpl)
       {     
-	Printf (MSG_INITIALIZATION, "couldn't load template 'bot'\n");
+	Printf (CS_MSG_INITIALIZATION, "couldn't load template 'bot'\n");
 	return;
       }
 
       bot = tmpl->NewMeshObject (view->GetEngine ()->GetCsEngine ()->QueryCsObject ());
       view->GetEngine ()->GetCsEngine ()->meshes.Push (bot);
       bot->GetMovable ().SetSector (room);
-      iSprite3DState* state = QUERY_INTERFACE (bot->GetMeshObject (), iSprite3DState);
+      iSprite3DState* state = SCF_QUERY_INTERFACE (bot->GetMeshObject (), iSprite3DState);
       state->SetAction ("default");
       state->DecRef ();
 
@@ -517,7 +517,7 @@ void Phyztest::NextFrame ()
       {
         //  get the position of this link
         new_p = chain[i]->rb->get_pos();
-	//  CsPrintf (MSG_DEBUG_0, "chain pos %d = %f, %f, %f\n",
+	//  CsPrintf (CS_MSG_DEBUG_0, "chain pos %d = %f, %f, %f\n",
 	//            i, new_p.x, new_p.y, new_p.z);
         chain[i]->sprt->GetMovable ().SetPosition ( new_p );
         
@@ -680,7 +680,7 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!Sys->Initialize (argc, argv, NULL))
   {
-    Sys->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
+    Sys->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
     cleanup ();
     exit (1);
   }

@@ -69,7 +69,7 @@ class csGraphics3DNull : public iGraphics3D
   csReversibleTransform o2c;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /**
    * Low-level 2D graphics layer.

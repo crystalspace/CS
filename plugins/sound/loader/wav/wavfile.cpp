@@ -98,10 +98,10 @@ CS_IMPLEMENT_PLUGIN
 class csSoundLoader_WAV : public iSoundLoader
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csSoundLoader_WAV(iBase *p) {
-    CONSTRUCT_IBASE(p);
+    SCF_CONSTRUCT_IBASE(p);
   }
   virtual bool Initialize(iSystem *) {
     return true;
@@ -109,17 +109,17 @@ public:
   virtual iSoundData *LoadSound(void *Buffer, unsigned long Size) const;
 };
 
-IMPLEMENT_IBASE(csSoundLoader_WAV)
-  IMPLEMENTS_INTERFACE(iSoundLoader)
-  IMPLEMENTS_INTERFACE(iPlugIn)
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE(csSoundLoader_WAV)
+  SCF_IMPLEMENTS_INTERFACE(iSoundLoader)
+  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+SCF_IMPLEMENT_IBASE_END;
 
-IMPLEMENT_FACTORY(csSoundLoader_WAV);
+SCF_IMPLEMENT_FACTORY(csSoundLoader_WAV);
 
-EXPORT_CLASS_TABLE (sndwav)
-EXPORT_CLASS (csSoundLoader_WAV,
+SCF_EXPORT_CLASS_TABLE (sndwav)
+SCF_EXPORT_CLASS (csSoundLoader_WAV,
   "crystalspace.sound.loader.wav", "WAV Sound Loader")
-EXPORT_CLASS_TABLE_END;
+SCF_EXPORT_CLASS_TABLE_END;
 
 
 // header of the RIFF-chunk

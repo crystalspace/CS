@@ -30,11 +30,11 @@
 
   GlideLib_grGlideInit();
 
-  SysPrintf (MSG_INITIALIZATION, " Glide %s detected.\n", GlideLib_grGetString( GR_VERSION ));
+  SysPrintf (CS_MSG_INITIALIZATION, " Glide %s detected.\n", GlideLib_grGetString( GR_VERSION ));
   
   const char* szBoard = GlideLib_grGetString ( GR_HARDWARE );
   board = 0;
-  SysPrintf (MSG_INITIALIZATION, " Board %d selected.\n", board);
+  SysPrintf (CS_MSG_INITIALIZATION, " Board %d selected.\n", board);
 
   long pixelfx, texelfx, revtfx, revpfx, mempfx, memtfx;
   
@@ -48,13 +48,13 @@
   val = GlideLib_grGet ( GR_MEMORY_TMU, 4, &memtfx );
   texelfx *= pixelfx;
   
-  SysPrintf (MSG_INITIALIZATION, " Board is a %s.\n", szBoard);
-  SysPrintf (MSG_INITIALIZATION, "  Number of Pixelfx Chips %d.\n", pixelfx);
-  SysPrintf (MSG_INITIALIZATION, "  Number of Texelfx Chips %d.\n", texelfx);
-  SysPrintf (MSG_INITIALIZATION, "  Pixelfx Revision %d.\n", revpfx);
-  SysPrintf (MSG_INITIALIZATION, "  Texelfx Revision %d.\n", revtfx);
-  SysPrintf (MSG_INITIALIZATION, "  Pixelfx Memory per pixelfx chip %d.\n", mempfx);
-  SysPrintf (MSG_INITIALIZATION, "  Texelfx Memory per texelfx chip %d.\n", memtfx);
+  SysPrintf (CS_MSG_INITIALIZATION, " Board is a %s.\n", szBoard);
+  SysPrintf (CS_MSG_INITIALIZATION, "  Number of Pixelfx Chips %d.\n", pixelfx);
+  SysPrintf (CS_MSG_INITIALIZATION, "  Number of Texelfx Chips %d.\n", texelfx);
+  SysPrintf (CS_MSG_INITIALIZATION, "  Pixelfx Revision %d.\n", revpfx);
+  SysPrintf (CS_MSG_INITIALIZATION, "  Texelfx Revision %d.\n", revtfx);
+  SysPrintf (CS_MSG_INITIALIZATION, "  Pixelfx Memory per pixelfx chip %d.\n", mempfx);
+  SysPrintf (CS_MSG_INITIALIZATION, "  Texelfx Memory per texelfx chip %d.\n", memtfx);
 
   m_iMultiPass = (texelfx == 1);
   iTMUTexture  = 1;
@@ -62,18 +62,18 @@
   
   if(config->GetBool("Video.Glide.ForceMultipass",false)&& m_iMultiPass==false)
     {
-      SysPrintf (MSG_INITIALIZATION, " MultiPass Rendering enable by user.\n");
+      SysPrintf (CS_MSG_INITIALIZATION, " MultiPass Rendering enable by user.\n");
       m_iMultiPass=true;
     }
 
   if(m_iMultiPass)
     {
-      SysPrintf (MSG_INITIALIZATION, " Will use MultiPass Rendering.\n");
+      SysPrintf (CS_MSG_INITIALIZATION, " Will use MultiPass Rendering.\n");
     }
   else
     {
-      SysPrintf (MSG_INITIALIZATION, " Will use SinglePass Rendering.\n");
-      SysPrintf (MSG_INITIALIZATION, " Affected %d TMU for Texture and %d for LightMap.\n",iTMUTexture,iTMULightMap);
+      SysPrintf (CS_MSG_INITIALIZATION, " Will use SinglePass Rendering.\n");
+      SysPrintf (CS_MSG_INITIALIZATION, " Affected %d TMU for Texture and %d for LightMap.\n",iTMUTexture,iTMULightMap);
     }
   m_TMUs = new TMUInfo[2];
 

@@ -35,7 +35,7 @@ that it uses.  These type specific interfaces are usually called
 
 Some Mesh Objects also implement the @sc{scf} interface @samp{iPolygonMesh}
 which you can use for collision detection.  You can use
-@code{QUERY_INTERFACE()} to find out if some Mesh Object implements this
+@code{SCF_QUERY_INTERFACE()} to find out if some Mesh Object implements this
 interface.
 
 In addition to the interfaces above, Mesh Objects also sometimes implement

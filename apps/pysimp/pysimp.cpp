@@ -35,8 +35,8 @@
 
 CS_IMPLEMENT_APPLICATION
 
-REGISTER_STATIC_LIBRARY (engine)
-REGISTER_STATIC_LIBRARY (lvlload)
+SCF_REGISTER_STATIC_LIBRARY (engine)
+SCF_REGISTER_STATIC_LIBRARY (lvlload)
 
 //-----------------------------------------------------------------------------
 
@@ -51,7 +51,7 @@ PySimple::PySimple ()
 
 PySimple::~PySimple ()
 {
-  DEC_REF (myG3D);
+  SCF_DEC_REF (myG3D);
   if(view)
     delete view;
   if (LevelLoader)
@@ -71,38 +71,38 @@ bool PySimple::Initialize (int argc, const char* const argv[],
     return false;
 
   // Find the pointer to engine plugin
-  iEngine *Engine = QUERY_PLUGIN (this, iEngine);
+  iEngine *Engine = CS_QUERY_PLUGIN (this, iEngine);
   if (!Engine)
   {
-    CsPrintf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
   engine = Engine->GetCsEngine ();
   Engine->DecRef ();
 
-  myG3D = QUERY_PLUGIN_ID(this, CS_FUNCID_VIDEO, iGraphics3D);
+  myG3D = CS_QUERY_PLUGIN_ID(this, CS_FUNCID_VIDEO, iGraphics3D);
   if (!myG3D) {
-    Printf (MSG_FATAL_ERROR, "No iGraphics3D loader plugin!\n");
+    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D loader plugin!\n");
     return false;
   }
 
-  LevelLoader = QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
+  LevelLoader = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
   if (!LevelLoader)
   {
-    CsPrintf (MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    CsPrintf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("Simple Crystal Space Python Application"))
   {
-    Printf (MSG_FATAL_ERROR, "Error opening system!\n");
+    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     cleanup ();
     exit (1);
   }
 
   // Some commercials...
-  Printf (MSG_INITIALIZATION, "Simple Crystal Space Python Application version 0.1.\n");
+  Printf (CS_MSG_INITIALIZATION, "Simple Crystal Space Python Application version 0.1.\n");
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
@@ -111,13 +111,13 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   engine->EnableLightingCache (false);
 
   // Create our world.
-  Printf (MSG_INITIALIZATION, "Creating world!...\n");
+  Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
 
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   csSector *room = engine->CreateCsSector ("room");
 
   // Initialize the python plugin.
-  iScript* is = LOAD_PLUGIN (this, "crystalspace.script.python", "Python", iScript);
+  iScript* is = CS_LOAD_PLUGIN (this, "crystalspace.script.python", "Python", iScript);
   if (is) {
 
   // Load a python module (scripts/python/pysimp.py).
@@ -137,7 +137,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   }
 
 //Now try some lua scripting stuff
-  is = LOAD_PLUGIN (this, "crystalspace.script.lua", "Lua", iScript);
+  is = CS_LOAD_PLUGIN (this, "crystalspace.script.lua", "Lua", iScript);
   if (is) {
 
     if (!is->LoadModule ("scripts/lua/pysimp.lua"))
@@ -155,7 +155,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
 
   engine->Prepare ();
 
-  Printf (MSG_INITIALIZATION, "--------------------------------------\n");
+  Printf (CS_MSG_INITIALIZATION, "--------------------------------------\n");
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by
@@ -242,7 +242,7 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
   {
-    System->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
+    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
     cleanup ();
     exit (1);
   }

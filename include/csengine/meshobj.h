@@ -317,12 +317,12 @@ public:
     return render_priority;
   }
 
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
 
   //--------------------- iMeshWrapper implementation --------------------//
   struct MeshWrapper : public iMeshWrapper
   {
-    DECLARE_EMBEDDED_IBASE (csMeshWrapper);
+    SCF_DECLARE_EMBEDDED_IBASE (csMeshWrapper);
     virtual csMeshWrapper* GetPrivateObject ()
     {
       return (csMeshWrapper*)scfParent;
@@ -420,7 +420,7 @@ public:
   //-------------------- iVisibilityObject interface implementation ----------
   struct VisObject : public iVisibilityObject
   {
-    DECLARE_EMBEDDED_IBASE (csMeshWrapper);
+    SCF_DECLARE_EMBEDDED_IBASE (csMeshWrapper);
     virtual iMovable* GetMovable () const
     {
       return &(scfParent->movable.scfiMovable);
@@ -488,12 +488,12 @@ public:
    */
   void HardTransform (const csReversibleTransform& t);
 
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
 
   //----------------- iMeshFactoryWrapper implementation --------------------//
   struct MeshFactoryWrapper : public iMeshFactoryWrapper
   {
-    DECLARE_EMBEDDED_IBASE (csMeshFactoryWrapper);
+    SCF_DECLARE_EMBEDDED_IBASE (csMeshFactoryWrapper);
     virtual csMeshFactoryWrapper* GetPrivateObject ()
     {
       return (csMeshFactoryWrapper*)scfParent;

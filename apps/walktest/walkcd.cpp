@@ -82,10 +82,10 @@ void WalkTest::CreateColliders ()
   iPolygon3D *p;
   iPolygonMesh* mesh;
   iMeshObjectFactory* thing_fact = Engine->GetThingType ()->NewFactory ();
-  iMeshObject* mesh_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
+  iMeshObject* mesh_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
   plbody = Engine->CreateMeshObject (mesh_obj, "Player's Body");
-  iThingState* thing_state = QUERY_INTERFACE (mesh_obj, iThingState);
+  iThingState* thing_state = SCF_QUERY_INTERFACE (mesh_obj, iThingState);
   mesh_obj->DecRef ();
 
   thing_state->CreateVertex (csVector3 (-DX_2, OY,    -DZ_2));
@@ -127,17 +127,17 @@ void WalkTest::CreateColliders ()
   p->CreateVertex (0); p->CreateVertex (4);
   p->CreateVertex (7); p->CreateVertex (3);
 
-  mesh = QUERY_INTERFACE (mesh_obj, iPolygonMesh);
+  mesh = SCF_QUERY_INTERFACE (mesh_obj, iPolygonMesh);
   body = new csColliderWrapper (plbody->QueryObject (), collide_system, mesh);
   body_radius = plbody->GetRadius ();
   mesh->DecRef ();
   thing_state->DecRef ();
 
   thing_fact = Engine->GetThingType ()-> NewFactory ();
-  mesh_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
+  mesh_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
   pllegs = Engine->CreateMeshObject (mesh_obj, "Player's Legs");
-  thing_state = QUERY_INTERFACE (mesh_obj, iThingState);
+  thing_state = SCF_QUERY_INTERFACE (mesh_obj, iThingState);
   mesh_obj->DecRef ();
 
   thing_state->CreateVertex (csVector3 (-DX_2L, OYL,     -DZ_2L));
@@ -179,7 +179,7 @@ void WalkTest::CreateColliders ()
   p->CreateVertex (0); p->CreateVertex (4);
   p->CreateVertex (7); p->CreateVertex (3);
 
-  mesh = QUERY_INTERFACE (mesh_obj, iPolygonMesh);
+  mesh = SCF_QUERY_INTERFACE (mesh_obj, iPolygonMesh);
   legs = new csColliderWrapper (pllegs->QueryObject (), collide_system, mesh);
   legs_radius = pllegs->GetRadius ();
   mesh->DecRef ();

@@ -29,16 +29,16 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csBMPImageIO)
-  IMPLEMENTS_INTERFACE (iImageIO)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csBMPImageIO)
+  SCF_IMPLEMENTS_INTERFACE (iImageIO)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csBMPImageIO);
+SCF_IMPLEMENT_FACTORY (csBMPImageIO);
 
-EXPORT_CLASS_TABLE (csbmpimg)
-  EXPORT_CLASS (csBMPImageIO, "crystalspace.graphic.image.io.bmp", "CrystalSpace BMP image format I/O plugin")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE (csbmpimg)
+  SCF_EXPORT_CLASS (csBMPImageIO, "crystalspace.graphic.image.io.bmp", "CrystalSpace BMP image format I/O plugin")
+SCF_EXPORT_CLASS_TABLE_END
 
 #define BMP_MIME "image/bmp"
 
@@ -149,7 +149,7 @@ struct bmpHeader
 
 csBMPImageIO::csBMPImageIO (iBase *pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
   formats.Push (&formatlist[0]);
   formats.Push (&formatlist[1]);
   formats.Push (&formatlist[2]);

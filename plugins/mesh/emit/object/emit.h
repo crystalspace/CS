@@ -32,7 +32,7 @@ class csEmitFixed : public iEmitFixed
 {
   csVector3 val;
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csEmitFixed(iBase *parent);
   virtual ~csEmitFixed();
   virtual void GetValue(csVector3& value, csVector3 &given);
@@ -44,7 +44,7 @@ class csEmitBox : public iEmitBox
 {
   csVector3 min, max;
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csEmitBox(iBase *parent);
   virtual ~csEmitBox();
   virtual void GetValue(csVector3& value, csVector3 &given);
@@ -58,7 +58,7 @@ class csEmitSphere : public iEmitSphere
   csVector3 center;
   float min, max;
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csEmitSphere(iBase *parent);
   virtual ~csEmitSphere();
   virtual void GetValue(csVector3& value, csVector3 &given);
@@ -72,7 +72,7 @@ class csEmitCone : public iEmitCone
   csVector3 origin;
   float elevation, azimuth, aperture, min, max;
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csEmitCone(iBase *parent);
   virtual ~csEmitCone();
   virtual void GetValue(csVector3& value, csVector3 &given);
@@ -89,7 +89,7 @@ class csEmitMix : public iEmitMix
   float totalweight;
   int nr;
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csEmitMix(iBase *parent);
   virtual ~csEmitMix();
   virtual void GetValue(csVector3& value, csVector3 &given);
@@ -104,7 +104,7 @@ class csEmitLine : public iEmitLine
 {
   csVector3 start, end;
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csEmitLine(iBase *parent);
   virtual ~csEmitLine();
   virtual void GetValue(csVector3& value, csVector3 &given);
@@ -118,7 +118,7 @@ class csEmitCylinder : public iEmitCylinder
   csVector3 start, end;
   float min, max;
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csEmitCylinder(iBase *parent);
   virtual ~csEmitCylinder();
   virtual void GetValue(csVector3& value, csVector3 &given);
@@ -134,7 +134,7 @@ class csEmitSphereTangent : public iEmitSphereTangent
   csVector3 center;
   float min, max;
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csEmitSphereTangent(iBase *parent);
   virtual ~csEmitSphereTangent();
   virtual void GetValue(csVector3& value, csVector3 &given);
@@ -148,7 +148,7 @@ class csEmitCylinderTangent : public iEmitCylinderTangent
   csVector3 start, end;
   float min, max;
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csEmitCylinderTangent(iBase *parent);
   virtual ~csEmitCylinderTangent();
   virtual void GetValue(csVector3& value, csVector3 &given);
@@ -316,12 +316,12 @@ public:
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return false; }
 
-  DECLARE_IBASE_EXT (csParticleSystem);
+  SCF_DECLARE_IBASE_EXT (csParticleSystem);
 
   //------------------------- iEmitState implementation ----------------
   class EmitState : public iEmitState
   {
-    DECLARE_EMBEDDED_IBASE (csEmitMeshObject);
+    SCF_DECLARE_EMBEDDED_IBASE (csEmitMeshObject);
     virtual void SetParticleCount (int num)
     { scfParent->SetParticleCount (num); }
     virtual void SetLighting (bool l)
@@ -390,7 +390,7 @@ public:
   virtual ~csEmitMeshObjectFactory ();
 
   //------------------------ iMeshObjectFactory implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
@@ -399,7 +399,7 @@ public:
   //------------------------- iEmitFactoryState implementation ----------------
   class EmitFactoryState : public iEmitFactoryState
   {
-    DECLARE_EMBEDDED_IBASE (csEmitMeshObjectFactory);
+    SCF_DECLARE_EMBEDDED_IBASE (csEmitMeshObjectFactory);
     virtual iEmitFixed* CreateFixed() {return new csEmitFixed(scfParent);}
     virtual iEmitBox* CreateBox() {return new csEmitBox(scfParent);}
     virtual iEmitSphere* CreateSphere() {return new csEmitSphere(scfParent);}
@@ -436,7 +436,7 @@ public:
   virtual bool Initialize (iSystem *pSystem);
 
   //------------------------ iMeshObjectType implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Draw.
   virtual iMeshObjectFactory* NewFactory ();

@@ -57,7 +57,7 @@ private:
   float invx_axis_y;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   ///
   csIsoView(iBase *iParent, iIsoEngine *eng, iIsoWorld *world);
@@ -109,7 +109,7 @@ class csIsoFakeCamera : public iCamera
   /// the scale of the view
   float scale;
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csIsoFakeCamera();
   virtual ~csIsoFakeCamera();
 

@@ -25,7 +25,7 @@
 class csOpenGLGlideDisp : public iOpenGLDisp
 {
   public:
-      DECLARE_IBASE;
+      SCF_DECLARE_IBASE;
       
       csOpenGLGlideDisp( iBase *iParent );
       

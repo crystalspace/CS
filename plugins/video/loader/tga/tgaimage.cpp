@@ -38,16 +38,16 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csTGAImageIO)
-  IMPLEMENTS_INTERFACE (iImageIO)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csTGAImageIO)
+  SCF_IMPLEMENTS_INTERFACE (iImageIO)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csTGAImageIO);
+SCF_IMPLEMENT_FACTORY (csTGAImageIO);
 
-EXPORT_CLASS_TABLE (cstgaimg)
-  EXPORT_CLASS (csTGAImageIO, "crystalspace.graphic.image.io.tga", "CrystalSpace TGA image format I/O plugin")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE (cstgaimg)
+  SCF_EXPORT_CLASS (csTGAImageIO, "crystalspace.graphic.image.io.tga", "CrystalSpace TGA image format I/O plugin")
+SCF_EXPORT_CLASS_TABLE_END
 
 /* Header definition. */
 struct TGAheader
@@ -114,7 +114,7 @@ static iImageIO::FileFormatDescription formatlist[6] =
 
 csTGAImageIO::csTGAImageIO (iBase *pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
   formats.Push (&formatlist[0]);
   formats.Push (&formatlist[1]);
   formats.Push (&formatlist[2]);

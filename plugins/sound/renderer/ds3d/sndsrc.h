@@ -30,7 +30,7 @@ class csSoundHandleDS3D;
 class csSoundSourceDS3D : public iSoundSource
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csSoundSourceDS3D(iBase *scfParent);
   virtual ~csSoundSourceDS3D();

@@ -30,12 +30,12 @@
 #include "iengine/polygon.h"
 #include "iengine/lightmap.h"
 
-IMPLEMENT_IBASE (csGlideTextureCache)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGlideTextureCache)
+SCF_IMPLEMENT_IBASE_END
 
 csGlideTextureCache::csGlideTextureCache (TMUInfo *tmu, int bpp, TextureMemoryManager * tm)
 {
-    CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (NULL);
     m_tmu = tmu;
     cache_size= m_tmu->memory_size;
     num=0;
@@ -323,7 +323,7 @@ bool csGlideTextureCache::CalculateTexData ( int width, int height, float wfak, 
   }
   else
   {
-    //Printf(MSG_CONSOLE,"GlideError : Texture Ratio: (%dx%d)\n",width,height);
+    //Printf(CS_MSG_CONSOLE,"GlideError : Texture Ratio: (%dx%d)\n",width,height);
     return false;
   }
 
@@ -369,7 +369,7 @@ bool csGlideTextureCache::CalculateTexData ( int width, int height, float wfak, 
   }
   else
   {
-    //CsPrintf(MSG_CONSOLE,"GlideError : Can't compute lod-level because tex-size is not pow of 2 (actual size is: (%dx%d))\n",width,height);
+    //CsPrintf(CS_MSG_CONSOLE,"GlideError : Can't compute lod-level because tex-size is not pow of 2 (actual size is: (%dx%d))\n",width,height);
     return false;
   }
 
@@ -410,7 +410,7 @@ void csGlideTextureCache::LoadTex(csGlideCacheData *d, int nMM)
 
     /* if(d->texhnd.size!=d->size)
     {
-      CsPrintf(MSG_CONSOLE,"Ooups size! (%d != %d)\n",texhnd->size,d->size);
+      CsPrintf(CS_MSG_CONSOLE,"Ooups size! (%d != %d)\n",texhnd->size,d->size);
       }*/
   
     d->mempos=manager->allocSpaceMem(d->texhnd.size);
@@ -443,7 +443,7 @@ void csGlideTextureCache::LoadTex(csGlideCacheData *d, int nMM)
 void csGlideTextureCache::LoadLight (csGlideCacheData *d)
 {
 
-  iLightMap *piLM = QUERY_INTERFACE (d->pSource, iLightMap);
+  iLightMap *piLM = SCF_QUERY_INTERFACE (d->pSource, iLightMap);
 
   int width = piLM->GetWidth();
   int height = piLM->GetHeight();
@@ -564,11 +564,11 @@ void csGlideTextureCache::Load (csGlideCacheData *d, int nMM)
 
 void csGlideTextureCache::Dump ()
 {
-  //CsPrintf (MSG_CONSOLE, "Textures in the cache: %d\n", num);
-  //CsPrintf (MSG_CONSOLE, "Total size: %ld bytes\n", total_size);
+  //CsPrintf (CS_MSG_CONSOLE, "Textures in the cache: %d\n", num);
+  //CsPrintf (CS_MSG_CONSOLE, "Total size: %ld bytes\n", total_size);
   int mean;
   if (num == 0) mean = 0;
   else mean = total_size/num;
-  //CsPrintf (MSG_CONSOLE, "Bytes per texture: %d\n", mean);
-  //CsPrintf (MSG_CONSOLE, "Fragmentation of Memory: %d\n",manager->getFragmentationState());
+  //CsPrintf (CS_MSG_CONSOLE, "Bytes per texture: %d\n", mean);
+  //CsPrintf (CS_MSG_CONSOLE, "Fragmentation of Memory: %d\n",manager->getFragmentationState());
 }

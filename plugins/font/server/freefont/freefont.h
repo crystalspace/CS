@@ -94,7 +94,7 @@ public:
   TT_UShort pID, eID;
   TT_CharMap charMap;
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Constructor
   csFreeTypeFont (const char *filename);
@@ -195,7 +195,7 @@ public:
   iVFS *VFS;
   const char *fontset;
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csFreeTypeServer (iBase *iParent);
   virtual ~csFreeTypeServer ();

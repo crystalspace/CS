@@ -67,7 +67,7 @@ class csOpenGLProcSoftware : public iGraphics3D
   void ConvertAloneMode ();
 
  public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// The instance of csSoftProcTexture3D this instance wraps
   iGraphics3D *g3d;
@@ -178,11 +178,11 @@ class csOpenGLProcSoftware2D : public iGraphics2D
   csPixelFormat *gl_pfmt;
 
  public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csOpenGLProcSoftware2D (iGraphics3D *g3d, csPixelFormat *pfmt)
   {
-    CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (NULL);
     g2d = g3d->GetDriver2D ();
     soft_texman = g3d->GetTextureManager ();
     gl_pfmt = pfmt;

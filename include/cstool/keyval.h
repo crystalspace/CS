@@ -48,11 +48,11 @@ public:
   /// Set the value of a key in an object.
   void SetValue (const char* value);
 
-  DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
   //----------------------- iKeyValuePair --------------------------
   struct KeyValuePair : public iKeyValuePair
   {
-    DECLARE_EMBEDDED_IBASE (csKeyValuePair);
+    SCF_DECLARE_EMBEDDED_IBASE (csKeyValuePair);
     virtual iObject *QueryObject() { return scfParent; }
     virtual const char *GetKey () const { return scfParent->GetKey (); }
     virtual void SetKey (const char* s) { scfParent->SetKey (s); }

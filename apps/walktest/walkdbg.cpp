@@ -148,10 +148,10 @@ void select_object (iRenderView* rview, int type, void* entity)
 	    else Sys->selected_light = light;
 	    //check_light = false;
 	  }
-          Sys->Printf (MSG_CONSOLE, "Selected light %s/(%f,%f,%f).\n",
+          Sys->Printf (CS_MSG_CONSOLE, "Selected light %s/(%f,%f,%f).\n",
                     sector->GetName (), light->GetCenter ().x,
                     light->GetCenter ().y, light->GetCenter ().z);
-          Sys->Printf (MSG_DEBUG_0, "Selected light %s/(%f,%f,%f).\n",
+          Sys->Printf (CS_MSG_DEBUG_0, "Selected light %s/(%f,%f,%f).\n",
                     sector->GetName (), light->GetCenter ().x,
                     light->GetCenter ().y, light->GetCenter ().z);
         }

@@ -369,7 +369,7 @@ public:
                                  csCoverageMatrix* shadow_matrix)
   { GetPolygon3D()->GetLightMapInfo()->GetPolyTex()->
                     GetCoverageMatrix(*lview, *shadow_matrix); }
-  DECLARE_IBASE_EXT (csRadElement);
+  SCF_DECLARE_IBASE_EXT (csRadElement);
 };
 
 
@@ -416,7 +416,7 @@ public:
                                  csCoverageMatrix* shadow_matrix)
   { curve->GetCoverageMatrix(*lview, *shadow_matrix); }
 
-  DECLARE_IBASE_EXT (csRadElement);
+  SCF_DECLARE_IBASE_EXT (csRadElement);
 };
 
 

@@ -25,13 +25,13 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csGraphics2DGLBe)
+SCF_IMPLEMENT_FACTORY (csGraphics2DGLBe)
 
-EXPORT_CLASS_TABLE (glbe2d)
-  EXPORT_CLASS_DEP (csGraphics2DGLBe, "crystalspace.graphics2d.glbe",
+SCF_EXPORT_CLASS_TABLE (glbe2d)
+  SCF_EXPORT_CLASS_DEP (csGraphics2DGLBe, "crystalspace.graphics2d.glbe",
     "Crystal Space 2D driver for OpenGL using GL on BeOS",
     "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csGraphics2DGLBe::csGraphics2DGLBe(iBase* p) :
   superclass(p), view(0), window(0)
@@ -47,7 +47,7 @@ bool csGraphics2DGLBe::Initialize(iSystem* p)
   bool ok = csGraphics2DGLCommon::Initialize(p);
   if (ok)
   {
-    CsPrintf (MSG_INITIALIZATION, "Crystal Space BeOS OpenGL 2D driver.\n");
+    CsPrintf (CS_MSG_INITIALIZATION, "Crystal Space BeOS OpenGL 2D driver.\n");
     // Get current screen information.
     BScreen screen(B_MAIN_SCREEN_ID);
     screen_frame = screen.Frame();

@@ -70,7 +70,7 @@ class csGraphics2DOS2DIVE : public csGraphics2D, public iEventPlug
   iEventOutlet *EventOutlet;
 
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csGraphics2DOS2DIVE (iBase *iParent);
   virtual ~csGraphics2DOS2DIVE ();

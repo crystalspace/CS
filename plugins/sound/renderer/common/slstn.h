@@ -24,7 +24,7 @@
 class csSoundListener : public iSoundListener
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   csSoundListener();
 
   virtual void SetDirection (const csVector3 &Front, const csVector3 &Top);

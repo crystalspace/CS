@@ -38,22 +38,22 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csMetaBall)
-  IMPLEMENTS_INTERFACE (iMeshObject)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iMetaBallState)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csMetaBall)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMetaBallState)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csMetaBall::MetaBallState)
-  IMPLEMENTS_INTERFACE (iMetaBallState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMetaBall::MetaBallState)
+  SCF_IMPLEMENTS_INTERFACE (iMetaBallState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 #define MAP_RESOLUTION  256
 static float asin_table[2*MAP_RESOLUTION+1];
 
 csMetaBall::csMetaBall (iMeshObjectFactory *fact)
 {
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE(scfiMetaBallState);
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiMetaBallState);
   th = NULL;
   alpha = frame = 0;
   meta_balls = NULL;
@@ -428,13 +428,13 @@ bool csMetaBall::Draw( iRenderView* rview, iMovable* /* movable */,
   return true;
 }
 
-IMPLEMENT_IBASE(csMetaBallFactory)
-  IMPLEMENTS_INTERFACE(iMeshObjectFactory)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE(csMetaBallFactory)
+  SCF_IMPLEMENTS_INTERFACE(iMeshObjectFactory)
+SCF_IMPLEMENT_IBASE_END
 
 csMetaBallFactory::csMetaBallFactory( iBase *par )
 {
-  CONSTRUCT_IBASE(par);
+  SCF_CONSTRUCT_IBASE(par);
 }
 csMetaBallFactory::~csMetaBallFactory()
 {
@@ -443,26 +443,26 @@ iMeshObject* csMetaBallFactory::NewInstance()
 {
   csMetaBall* cm = new csMetaBall((iMeshObjectFactory *) this);
   cm->Initialize();
-  iMeshObject* im = QUERY_INTERFACE( cm, iMeshObject );
+  iMeshObject* im = SCF_QUERY_INTERFACE( cm, iMeshObject );
   im->DecRef();
   return im;
 }
 
-IMPLEMENT_IBASE (csMetaBallType)
-  IMPLEMENTS_INTERFACE (iMeshObjectType)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csMetaBallType)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csMetaBallType)
+SCF_IMPLEMENT_FACTORY (csMetaBallType)
 
-EXPORT_CLASS_TABLE (metaball)
-  EXPORT_CLASS (csMetaBallType, "crystalspace.mesh.object.metaball",
+SCF_EXPORT_CLASS_TABLE (metaball)
+  SCF_EXPORT_CLASS (csMetaBallType, "crystalspace.mesh.object.metaball",
     "Crystal Space MetaBall mesh object")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csMetaBallType::csMetaBallType( iBase *par )
 {
-  CONSTRUCT_IBASE (par);
+  SCF_CONSTRUCT_IBASE (par);
 }
 csMetaBallType::~csMetaBallType()
 {
@@ -476,7 +476,7 @@ bool csMetaBallType::Initialize( iSystem* )
 iMeshObjectFactory* csMetaBallType::NewFactory()
 {
   csMetaBallFactory* cm = new csMetaBallFactory(this);
-  iMeshObjectFactory* ifact = QUERY_INTERFACE(cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE(cm, iMeshObjectFactory);
   ifact->DecRef();
   return ifact;
 }

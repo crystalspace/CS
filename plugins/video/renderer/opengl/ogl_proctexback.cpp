@@ -30,16 +30,16 @@
 #include <GL/gl.h>
 #endif
 
-IMPLEMENT_IBASE (csOpenGLProcBackBuffer)
-  IMPLEMENTS_INTERFACE (iGraphics3D)
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE (csOpenGLProcBackBuffer)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
+SCF_IMPLEMENT_IBASE_END;
 
 #define SysPrintf System->Printf
 
 csOpenGLProcBackBuffer::csOpenGLProcBackBuffer (iBase *parent) :
   csGraphics3DOGLCommon ()
 { 
-  CONSTRUCT_IBASE (parent);
+  SCF_CONSTRUCT_IBASE (parent);
   tex_mm = NULL; 
   g3d = NULL;
   rstate_bilinearmap = false;
@@ -103,7 +103,7 @@ void csOpenGLProcBackBuffer::Prepare (csGraphics3DOGLCommon *g3d,
     memset (buffer, 0, sizeof(char)*width*height*3);
   }
 #ifdef CS_DEBUG
-  SysPrintf (MSG_STDOUT, "GL backbuffer procedural texture\n");
+  SysPrintf (CS_MSG_STDOUT, "GL backbuffer procedural texture\n");
 #endif
 }
 
@@ -281,14 +281,14 @@ float csOpenGLProcBackBuffer::GetZBuffValue (int x, int y)
 // Dummy iGraphics2D
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csOpenGLProcBackBuffer2D)
-  IMPLEMENTS_INTERFACE (iGraphics2D)
-IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE (csOpenGLProcBackBuffer2D)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_END;
 
 csOpenGLProcBackBuffer2D::csOpenGLProcBackBuffer2D 
     (iGraphics2D *ig2d, int iwidth, int iheight, csPixelFormat *ipfmt)
 {  
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   g2d = ig2d; 
   width = iwidth;
   height = iheight; 

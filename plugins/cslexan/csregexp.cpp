@@ -20,13 +20,13 @@
 #include "cssysdef.h"
 #include "cslex.h"
 
-IMPLEMENT_IBASE (csRegExp)
-  IMPLEMENTS_INTERFACE (iRegExp)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csRegExp)
+  SCF_IMPLEMENTS_INTERFACE (iRegExp)
+SCF_IMPLEMENT_IBASE_END
 
 csRegExp::csRegExp(iBase* p):code(0), length(0)
 {
-  CONSTRUCT_IBASE (p);
+  SCF_CONSTRUCT_IBASE (p);
 }
 
 csRegExp::~csRegExp() { if (code) delete [] code; }

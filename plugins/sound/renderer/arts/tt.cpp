@@ -91,16 +91,16 @@ int main(int argc, const char* const args[])
 
   if (!sys.Initialize (argc, args, NULL))
   {
-    sys.Printf (MSG_FATAL_ERROR, "Error initializing system !");
+    sys.Printf (CS_MSG_FATAL_ERROR, "Error initializing system !");
     return -1;
   }
 
   // get a soundloader
-  iSoundLoader *pLoader = QUERY_PLUGIN_ID (&sys, "SoundLoader", iSoundLoader);
+  iSoundLoader *pLoader = CS_QUERY_PLUGIN_ID (&sys, "SoundLoader", iSoundLoader);
   // we read the soundata the CS way, that is through VFS
-  iVFS *pVFS = QUERY_PLUGIN (&sys, iVFS);
+  iVFS *pVFS = CS_QUERY_PLUGIN (&sys, iVFS);
   // well, since we want to try our renderer, we should request it now
-  iSoundRender *pSR = QUERY_PLUGIN (&sys, iSoundRender);
+  iSoundRender *pSR = CS_QUERY_PLUGIN (&sys, iSoundRender);
   
   // load the sound
   iDataBuffer *db = pVFS->ReadFile (args[1]);

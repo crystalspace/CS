@@ -53,7 +53,7 @@ private:
   void fixlibrary(); 
   
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csGraphics2DSDL (iBase *iParent);
   virtual ~csGraphics2DSDL ();

@@ -234,14 +234,14 @@ bool LoadCamera (iVFS* vfs, const char *fName)
 {
   if (!vfs->Exists (fName))
   {
-    CsPrintf (MSG_FATAL_ERROR, "Could not open coordinate file '%s'!\n", fName);
+    CsPrintf (CS_MSG_FATAL_ERROR, "Could not open coordinate file '%s'!\n", fName);
     return false;
   }
 
   iDataBuffer *data = vfs->ReadFile(fName);
   if (!data)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Could not read coordinate file '%s'!\n", fName);
+    CsPrintf (CS_MSG_FATAL_ERROR, "Could not read coordinate file '%s'!\n", fName);
     return false;
   }
 
@@ -271,7 +271,7 @@ bool LoadCamera (iVFS* vfs, const char *fName)
   data->DecRef ();
   if (!s)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Sector `%s' in coordinate file does not "
+    CsPrintf (CS_MSG_FATAL_ERROR, "Sector `%s' in coordinate file does not "
       "exist in this map!\n", sector_name);
     return false;
   }
@@ -298,7 +298,7 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
   // First check if the texture exists.
   if (!Sys->view->GetEngine ()->FindMaterial (txtname))
   {
-    Sys->Printf (MSG_CONSOLE, "Can't find material '%s' in memory!\n", txtname);
+    Sys->Printf (CS_MSG_CONSOLE, "Can't find material '%s' in memory!\n", txtname);
     return;
   }
 
@@ -306,7 +306,7 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
   converter * filedata = new converter;
   if (filedata->ivcon (filename, true, false, NULL, Sys->myVFS) == ERROR)
   {
-    Sys->Printf (MSG_CONSOLE, "There was an error reading the data!\n");
+    Sys->Printf (CS_MSG_CONSOLE, "There was an error reading the data!\n");
     delete filedata;
     return;
   }
@@ -317,7 +317,7 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
   delete filedata;
 
   // Add this sprite template to the engine.
-  iSprite3DFactoryState* fstate = QUERY_INTERFACE (result, iSprite3DFactoryState);
+  iSprite3DFactoryState* fstate = SCF_QUERY_INTERFACE (result, iSprite3DFactoryState);
   fstate->SetMaterialWrapper (Sys->Engine->FindMaterial (txtname));
   fstate->DecRef ();
 
@@ -330,10 +330,10 @@ iMeshWrapper* add_meshobj (char* tname, char* sname, iSector* where,
   iMeshFactoryWrapper* tmpl = Sys->Engine->FindMeshFactory (tname);
   if (!tmpl)
   {
-    Sys->Printf (MSG_CONSOLE, "Unknown mesh factory '%s'!\n", tname);
+    Sys->Printf (CS_MSG_CONSOLE, "Unknown mesh factory '%s'!\n", tname);
     return NULL;
   }
-  iSector* isector = QUERY_INTERFACE (where, iSector);
+  iSector* isector = SCF_QUERY_INTERFACE (where, iSector);
   iMeshWrapper* spr = Sys->Engine->CreateMeshObject (tmpl, sname,
   	isector, pos);
   isector->DecRef ();
@@ -360,11 +360,11 @@ void list_meshes (void)
     mesh_name = mesh->QueryObject ()->GetName();
 
     if (mesh_name)
-      Sys->Printf (MSG_CONSOLE, "%s\n", mesh_name);
+      Sys->Printf (CS_MSG_CONSOLE, "%s\n", mesh_name);
     else
-      Sys->Printf (MSG_CONSOLE, "A mesh with no name.\n");
+      Sys->Printf (CS_MSG_CONSOLE, "A mesh with no name.\n");
   }
-  Sys->Printf (MSG_CONSOLE, "There are:%d meshes\n",
+  Sys->Printf (CS_MSG_CONSOLE, "There are:%d meshes\n",
 	       Sys->Engine->GetMeshObjectCount ());
 }
 
@@ -372,9 +372,9 @@ void list_meshes (void)
 
 void SetConfigOption (iBase* plugin, const char* optName, const char* optValue)
 {
-  iConfig* config = QUERY_INTERFACE (plugin, iConfig);
+  iConfig* config = SCF_QUERY_INTERFACE (plugin, iConfig);
   if (!config)
-    CsPrintf (MSG_CONSOLE, "No config interface for this plugin.\n");
+    CsPrintf (CS_MSG_CONSOLE, "No config interface for this plugin.\n");
   else
   {
     int i;
@@ -384,7 +384,7 @@ void SetConfigOption (iBase* plugin, const char* optName, const char* optValue)
       if (!config->GetOptionDescription (i, &odesc)) break;
       if (strcmp (odesc.name, optName) == 0)
       {
-	CsPrintf (MSG_CONSOLE, "Set option %s to %s\n", odesc.name, optValue);
+	CsPrintf (CS_MSG_CONSOLE, "Set option %s to %s\n", odesc.name, optValue);
 	csVariant var;
 	switch (odesc.type)
 	{
@@ -403,9 +403,9 @@ void SetConfigOption (iBase* plugin, const char* optName, const char* optValue)
 
 void SetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
 {
-  iConfig* config = QUERY_INTERFACE (plugin, iConfig);
+  iConfig* config = SCF_QUERY_INTERFACE (plugin, iConfig);
   if (!config)
-    CsPrintf (MSG_CONSOLE, "No config interface for this plugin.\n");
+    CsPrintf (CS_MSG_CONSOLE, "No config interface for this plugin.\n");
   else
   {
     int i;
@@ -424,9 +424,9 @@ void SetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
 
 bool GetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
 {
-  iConfig* config = QUERY_INTERFACE (plugin, iConfig);
+  iConfig* config = SCF_QUERY_INTERFACE (plugin, iConfig);
   if (!config)
-    CsPrintf (MSG_CONSOLE, "No config interface for this plugin.\n");
+    CsPrintf (CS_MSG_CONSOLE, "No config interface for this plugin.\n");
   else
   {
     int i;
@@ -453,7 +453,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
   iObjectIterator *it = src->GetIterator ();
   while (!it->IsFinished ())
   {
-    iKeyValuePair* kp = QUERY_INTERFACE (it->GetObject (), iKeyValuePair);
+    iKeyValuePair* kp = SCF_QUERY_INTERFACE (it->GetObject (), iKeyValuePair);
     if (!kp)
     {
       it->Next ();
@@ -461,7 +461,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
     if (!strcmp (kp->GetKey (), "cmd_AnimateSky"))
     {
-      iSector *Sector = QUERY_INTERFACE_FAST (src, iSector);
+      iSector *Sector = SCF_QUERY_INTERFACE_FAST (src, iSector);
       if (Sector)
       {
         char name[100], rot[100];
@@ -475,7 +475,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
     else if (!strcmp (kp->GetKey (), "cmd_AnimateDirLight"))
     {
-      iTerrainWrapper *wrap = QUERY_INTERFACE_FAST (src, iTerrainWrapper);
+      iTerrainWrapper *wrap = SCF_QUERY_INTERFACE_FAST (src, iTerrainWrapper);
       if (wrap)
       {
         anim_dirlight = wrap;
@@ -484,7 +484,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
     else if (!strcmp (kp->GetKey (), "cmd_AnimateDynLight"))
     {
-      iLight* l = QUERY_INTERFACE_FAST (src, iLight);
+      iLight* l = SCF_QUERY_INTERFACE_FAST (src, iLight);
       if (l)
       {
         anim_dynlight = l;
@@ -493,7 +493,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
     else if (!strcmp (kp->GetKey (), "entity_Door"))
     {
-      iMeshWrapper *wrap = QUERY_INTERFACE_FAST (src, iMeshWrapper);
+      iMeshWrapper *wrap = SCF_QUERY_INTERFACE_FAST (src, iMeshWrapper);
       if (wrap)
       {
         csVector3 hinge;
@@ -520,7 +520,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
     else if (!strcmp (kp->GetKey (), "entity_Light"))
     {
-      iMeshWrapper *wrap = QUERY_INTERFACE_FAST (src, iMeshWrapper);
+      iMeshWrapper *wrap = SCF_QUERY_INTERFACE_FAST (src, iMeshWrapper);
       if (wrap)
       {
 	csColor start_col, end_col;
@@ -534,7 +534,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
 	iSector* sect = Engine->FindSector (sector_name);
 	if (!sect)
 	{
-	  CsPrintf (MSG_WARNING, "Sector '%s' not found! 'entity_Light' is ignored!\n",
+	  CsPrintf (CS_MSG_WARNING, "Sector '%s' not found! 'entity_Light' is ignored!\n",
 	  	sector_name);
 	}
 	else
@@ -542,12 +542,12 @@ void WalkTest::ParseKeyCmds (iObject* src)
 	  iStatLight* l = sect->GetLight (light_name);
 	  if (!l)
 	  {
-	    CsPrintf (MSG_WARNING, "Light '%s' not found! 'entity_Light' is ignored!\n",
+	    CsPrintf (CS_MSG_WARNING, "Light '%s' not found! 'entity_Light' is ignored!\n",
 	  	light_name);
 	  }
 	  else
 	  {
-	    iLight* il = QUERY_INTERFACE (l, iLight);
+	    iLight* il = SCF_QUERY_INTERFACE (l, iLight);
 	    csLightObject* lobj = new csLightObject (il);
 	    il->DecRef ();
 	    lobj->SetColors (start_col, end_col);
@@ -568,7 +568,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
   }
   it->DecRef ();
 
-  iMeshWrapper *mesh = QUERY_INTERFACE_FAST (src, iMeshWrapper);
+  iMeshWrapper *mesh = SCF_QUERY_INTERFACE_FAST (src, iMeshWrapper);
   if (mesh)
   {
     int k;
@@ -614,7 +614,7 @@ void WalkTest::ActivateObject (iObject* src)
   iObjectIterator *it = src->GetIterator ();
   while (!it->IsFinished ())
   {
-    csWalkEntity* wentity = QUERY_INTERFACE_FAST (it->GetObject (), csWalkEntity);
+    csWalkEntity* wentity = SCF_QUERY_INTERFACE_FAST (it->GetObject (), csWalkEntity);
     if (wentity)
     {
       wentity->Activate ();
@@ -660,7 +660,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     csCommandProcessor::perform (cmd, arg);
 #   undef CONPRI
-#   define CONPRI(m) Sys->Printf (MSG_CONSOLE, m);
+#   define CONPRI(m) Sys->Printf (CS_MSG_CONSOLE, m);
     CONPRI("-*- Additional commands -*-\n");
     CONPRI("Visibility:\n");
     CONPRI("  emode pvs freezepvs pvsonly\n");
@@ -697,12 +697,12 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "coordsave"))
   {
-    Sys->Printf (MSG_CONSOLE, "Saved camera location in /temp/walktest.cam\n");
+    Sys->Printf (CS_MSG_CONSOLE, "Saved camera location in /temp/walktest.cam\n");
     SaveCamera (Sys->myVFS, "/temp/walktest.cam");
   }
   else if (!strcasecmp (cmd, "coordload"))
   {
-    Sys->Printf (MSG_CONSOLE, "Loaded camera location from /temp/walktest.cam\n");
+    Sys->Printf (CS_MSG_CONSOLE, "Loaded camera location from /temp/walktest.cam\n");
     LoadCamera (Sys->myVFS, "/temp/walktest.cam");
   }
   else if (!strcasecmp (cmd, "plugins"))
@@ -712,8 +712,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     for (i = 0 ; i < num ; i++)
     {
       iBase* plugin = Sys->GetPlugIn (i);
-      iFactory* fact = QUERY_INTERFACE (plugin, iFactory);
-      CsPrintf (MSG_CONSOLE, "%d: %s\n", i, fact->QueryDescription ());
+      iFactory* fact = SCF_QUERY_INTERFACE (plugin, iFactory);
+      CsPrintf (CS_MSG_CONSOLE, "%d: %s\n", i, fact->QueryDescription ());
       fact->DecRef ();
     }
   }
@@ -724,13 +724,13 @@ bool CommandHandler (const char *cmd, const char *arg)
       int idx;
       sscanf (arg, "%d", &idx);
       if (idx < 0 || idx >= Sys->GetPlugInCount ())
-	CsPrintf (MSG_CONSOLE, "Bad value for plugin (see 'plugins' command)!\n");
+	CsPrintf (CS_MSG_CONSOLE, "Bad value for plugin (see 'plugins' command)!\n");
       else
       {
         iBase* plugin = Sys->GetPlugIn (idx);
-        iConfig* config = QUERY_INTERFACE (plugin, iConfig);
+        iConfig* config = SCF_QUERY_INTERFACE (plugin, iConfig);
 	if (!config)
-	  CsPrintf (MSG_CONSOLE, "No config interface for this plugin.\n");
+	  CsPrintf (CS_MSG_CONSOLE, "No config interface for this plugin.\n");
 	else
 	{
           int i;
@@ -738,24 +738,24 @@ bool CommandHandler (const char *cmd, const char *arg)
           {
 	    csOptionDescription odesc;
 	    if (!config->GetOptionDescription (i, &odesc)) break;
-	    CsPrintf (MSG_CONSOLE, "Option %s (%s) ", odesc.name,
+	    CsPrintf (CS_MSG_CONSOLE, "Option %s (%s) ", odesc.name,
 	        odesc.description);
 	    csVariant var;
 	    config->GetOption (i, &var);
 	    switch (odesc.type)
 	    {
-	      case CSVAR_LONG: CsPrintf (MSG_CONSOLE, "LONG=%ld\n",
+	      case CSVAR_LONG: CsPrintf (CS_MSG_CONSOLE, "LONG=%ld\n",
 				   var.v.l);
 			       break;
-	      case CSVAR_BOOL: CsPrintf (MSG_CONSOLE, "BOOL=%d\n",
+	      case CSVAR_BOOL: CsPrintf (CS_MSG_CONSOLE, "BOOL=%d\n",
 				   var.v.b);
 			       break;
-	      case CSVAR_CMD: CsPrintf (MSG_CONSOLE, "CMD\n");
+	      case CSVAR_CMD: CsPrintf (CS_MSG_CONSOLE, "CMD\n");
 			       break;
-	      case CSVAR_FLOAT: CsPrintf (MSG_CONSOLE, "FLOAT=%g\n",
+	      case CSVAR_FLOAT: CsPrintf (CS_MSG_CONSOLE, "FLOAT=%g\n",
 				   var.v.f);
 			       break;
-	      default: CsPrintf (MSG_CONSOLE, "<unknown type>\n");
+	      default: CsPrintf (CS_MSG_CONSOLE, "<unknown type>\n");
 		       break;
 	    }
           }
@@ -764,7 +764,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
     }
     else
-      Sys->Printf (MSG_CONSOLE, "Expected index to plugin (from 'plugins' command)!\n");
+      Sys->Printf (CS_MSG_CONSOLE, "Expected index to plugin (from 'plugins' command)!\n");
   }
   else if (!strcasecmp (cmd, "confset"))
   {
@@ -775,7 +775,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       int idx;
       csScanStr (arg, "%d,%s,%s", &idx, name, val);
       if (idx < 0 || idx >= Sys->GetPlugInCount ())
-	CsPrintf (MSG_CONSOLE, "Bad value for plugin (see 'plugins' command)!\n");
+	CsPrintf (CS_MSG_CONSOLE, "Bad value for plugin (see 'plugins' command)!\n");
       else
       {
         iBase* plugin = Sys->GetPlugIn (idx);
@@ -783,7 +783,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
     }
     else
-      Sys->Printf (MSG_CONSOLE, "Expected index to plugin (from 'plugins' command)!\n");
+      Sys->Printf (CS_MSG_CONSOLE, "Expected index to plugin (from 'plugins' command)!\n");
   }
   else if (!strcasecmp (cmd, "action"))
   {
@@ -791,9 +791,9 @@ bool CommandHandler (const char *cmd, const char *arg)
     csPolygon3D* p = Sys->view->GetCamera ()->GetPrivateObject ()->GetHit (where);
     if (p)
     {
-      CsPrintf (MSG_CONSOLE, "Action polygon '%s' ", p->GetName ());
+      CsPrintf (CS_MSG_CONSOLE, "Action polygon '%s' ", p->GetName ());
       csThing* ob = p->GetParent ();
-      CsPrintf (MSG_CONSOLE, "in set '%s'\n", ob->GetName ());
+      CsPrintf (CS_MSG_CONSOLE, "in set '%s'\n", ob->GetName ());
       printf ("ACTION\n");
       Sys->ActivateObject ((csObject*)ob);
     }
@@ -837,14 +837,14 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       Sys->cfg_playrecording = -1;
       Sys->cfg_recording = 0;
-      Sys->Printf (MSG_CONSOLE, "Start recording camera movement...\n");
+      Sys->Printf (CS_MSG_CONSOLE, "Start recording camera movement...\n");
       if (Sys->perf_stats)
         Sys->recorded_perf_stats = Sys->perf_stats->StartNewSubsection (NULL);
     }
     else
     {
       Sys->cfg_recording = -1;
-      Sys->Printf (MSG_CONSOLE, "Stop recording.\n");
+      Sys->Printf (CS_MSG_CONSOLE, "Stop recording.\n");
       if (Sys->perf_stats)
         Sys->perf_stats->FinishSubsection ();
       Sys->recorded_perf_stats = NULL;
@@ -856,7 +856,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       Sys->cfg_recording = -1;
       Sys->cfg_playrecording = 0;
-      Sys->Printf (MSG_CONSOLE, "Start playing back camera movement...\n");
+      Sys->Printf (CS_MSG_CONSOLE, "Start playing back camera movement...\n");
       Sys->cfg_playloop = true;
       if (arg)
       {
@@ -893,7 +893,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
     {
       Sys->cfg_playrecording = -1;
-      Sys->Printf (MSG_CONSOLE, "Stop playback.\n");
+      Sys->Printf (CS_MSG_CONSOLE, "Stop playback.\n");
       if (Sys->perf_stats)
         Sys->perf_stats->FinishSubsection ();
       Sys->recorded_perf_stats = NULL;
@@ -907,22 +907,22 @@ bool CommandHandler (const char *cmd, const char *arg)
       if (!Sys->recorded_perf_stats->IsSubsection ())
       {
 	if (!arg)
-	  Sys->Printf (MSG_CONSOLE, "Error: Expecting name of subsection.\n");
+	  Sys->Printf (CS_MSG_CONSOLE, "Error: Expecting name of subsection.\n");
 	else
 	{
 	  Sys->recorded_perf_stats->StartNewSubsection (arg);
-	  Sys->Printf (MSG_CONSOLE, "Performance subsection '%s'\n",arg);
+	  Sys->Printf (CS_MSG_CONSOLE, "Performance subsection '%s'\n",arg);
 	}
       }
       else
       {
-	Sys->Printf (MSG_CONSOLE, "Finished performance subsection.\n");
-	Sys->recorded_perf_stats->PrintSubsectionStats (MSG_CONSOLE);
+	Sys->Printf (CS_MSG_CONSOLE, "Finished performance subsection.\n");
+	Sys->recorded_perf_stats->PrintSubsectionStats (CS_MSG_CONSOLE);
 	Sys->recorded_perf_stats->FinishSubsection ();
       }
     }
     else
-      Sys->Printf (MSG_CONSOLE, "Error: Option valid only when recording.\n");
+      Sys->Printf (CS_MSG_CONSOLE, "Error: Option valid only when recording.\n");
   }
   else if (!strcasecmp (cmd, "bind"))
   {
@@ -931,7 +931,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "bugplug"))
   {
-    (void)LOAD_PLUGIN (System, "crystalspace.utilities.bugplug", "BugPlug", iPlugIn);
+    (void)CS_LOAD_PLUGIN (System, "crystalspace.utilities.bugplug", "BugPlug", iPlugIn);
   }
   else if (!strcasecmp (cmd, "fps"))
     csCommandProcessor::change_boolean (arg, &Sys->do_fps, "fps");
@@ -973,13 +973,13 @@ bool CommandHandler (const char *cmd, const char *arg)
       csOctree* otree = (csOctree*)tree;
       csOctreeNode* l = otree->GetLeaf (Sys->view->GetCamera ()->GetOrigin ());
       Sys->debug_box1 = l->GetBox ();
-      Sys->Printf (MSG_CONSOLE, "Box 1: (%f,%f,%f)-(%f,%f,%f)\n",
+      Sys->Printf (CS_MSG_CONSOLE, "Box 1: (%f,%f,%f)-(%f,%f,%f)\n",
 	  	Sys->debug_box1.MinX (), Sys->debug_box1.MinY (),
 	  	Sys->debug_box1.MinZ (), Sys->debug_box1.MaxX (),
 	  	Sys->debug_box1.MaxY (), Sys->debug_box1.MaxZ ());
     }
     else
-      Sys->Printf (MSG_CONSOLE, "There is no octree in this sector!\n");
+      Sys->Printf (CS_MSG_CONSOLE, "There is no octree in this sector!\n");
 #endif
   }
   else if (!strcasecmp (cmd, "db_boxnode2"))
@@ -994,13 +994,13 @@ bool CommandHandler (const char *cmd, const char *arg)
       csOctree* otree = (csOctree*)tree;
       csOctreeNode* l = otree->GetLeaf (Sys->view->GetCamera ()->GetOrigin ());
       Sys->debug_box2 = l->GetBox ();
-      Sys->Printf (MSG_CONSOLE, "Box 2: (%f,%f,%f)-(%f,%f,%f)\n",
+      Sys->Printf (CS_MSG_CONSOLE, "Box 2: (%f,%f,%f)-(%f,%f,%f)\n",
 	  	Sys->debug_box2.MinX (), Sys->debug_box2.MinY (),
 	  	Sys->debug_box2.MinZ (), Sys->debug_box2.MaxX (),
 	  	Sys->debug_box2.MaxY (), Sys->debug_box2.MaxZ ());
     }
     else
-      Sys->Printf (MSG_CONSOLE, "There is no octree in this sector!\n");
+      Sys->Printf (CS_MSG_CONSOLE, "There is no octree in this sector!\n");
 #endif
   }
   else if (!strcasecmp (cmd, "db_boxvis"))
@@ -1015,10 +1015,10 @@ bool CommandHandler (const char *cmd, const char *arg)
       //csOctree* otree = (csOctree*)tree;
       //bool vis1 = otree->BoxCanSeeBox (Sys->debug_box1, Sys->debug_box2);
       //bool vis2 = otree->BoxCanSeeBox (Sys->debug_box2, Sys->debug_box1);
-      //CsPrintf (MSG_CONSOLE, "Box1->box2:%d box2->box1:%d\n", vis1, vis2);
+      //CsPrintf (CS_MSG_CONSOLE, "Box1->box2:%d box2->box1:%d\n", vis1, vis2);
     }
     else
-      CsPrintf (MSG_CONSOLE, "No octree in this sector!\n");
+      CsPrintf (CS_MSG_CONSOLE, "No octree in this sector!\n");
 #endif
   }
   else if (!strcasecmp (cmd, "db_cbuffer"))
@@ -1049,7 +1049,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       printf ("Solid Mask Z: %04x\n", l->GetSolidMask (BOX_SIDE_Z));
     }
     else
-      Sys->Printf (MSG_CONSOLE, "There is no octree in this sector!\n");
+      Sys->Printf (CS_MSG_CONSOLE, "There is no octree in this sector!\n");
 #endif
   }
   else if (!strcasecmp (cmd, "db_dumpstubs"))
@@ -1070,7 +1070,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       //@@@@@Dumper::dump_stubs (spr->GetPolyTreeObject ());
     }
-    CsPrintf (MSG_DEBUG_0F, "======\n");
+    CsPrintf (CS_MSG_DEBUG_0F, "======\n");
 #endif
   }
   else if (!strcasecmp (cmd, "db_osolid"))
@@ -1120,7 +1120,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     csEngine* engine = (csEngine*)(Sys->Engine);
     if ((rad = engine->GetRadiosity ()) != NULL)
     {
-      Sys->selected_polygon = QUERY_INTERFACE (rad->GetNextPolygon (),
+      Sys->selected_polygon = SCF_QUERY_INTERFACE (rad->GetNextPolygon (),
       	iPolygon3D);
       Sys->selected_polygon->DecRef ();
     }
@@ -1189,8 +1189,8 @@ bool CommandHandler (const char *cmd, const char *arg)
 #if 0
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     csPolygon3D* hi = arg ? Sys->view->GetCamera ()->GetSector ()->GetPolygon3D (arg) : (csPolygon3D*)NULL;
-    if (hi) Sys->Printf (MSG_CONSOLE, "Hilighting polygon: '%s'\n", arg);
-    else Sys->Printf (MSG_CONSOLE, "Disabled hilighting.\n");
+    if (hi) Sys->Printf (CS_MSG_CONSOLE, "Hilighting polygon: '%s'\n", arg);
+    else Sys->Printf (CS_MSG_CONSOLE, "Disabled hilighting.\n");
     Sys->selected_polygon = hi;
 #endif
   }
@@ -1207,9 +1207,9 @@ bool CommandHandler (const char *cmd, const char *arg)
         csCommandProcessor::change_int (arg, &a, "portal alpha", 0, 100);
 	hi->SetAlpha (a);
       }
-      else Sys->Printf (MSG_CONSOLE, "Only for portals!\n");
+      else Sys->Printf (CS_MSG_CONSOLE, "Only for portals!\n");
     }
-    else Sys->Printf (MSG_CONSOLE, "No polygon selected!\n");
+    else Sys->Printf (CS_MSG_CONSOLE, "No polygon selected!\n");
 #endif
   }
   else if (!strcasecmp (cmd, "s_fog"))
@@ -1217,7 +1217,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     csFog* f = Sys->view->GetCamera ()->GetSector ()->GetFog ();
     if (!arg)
     {
-      Sys->Printf (MSG_CONSOLE, "Fog in current sector (%f,%f,%f) density=%f\n",
+      Sys->Printf (CS_MSG_CONSOLE, "Fog in current sector (%f,%f,%f) density=%f\n",
       	f->red, f->green, f->blue, f->density);
     }
     else
@@ -1225,7 +1225,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       float r, g, b, dens;
       if (csScanStr (arg, "%f,%f,%f,%f", &r, &g, &b, &dens) != 4)
       {
-        Sys->Printf (MSG_CONSOLE, "Expected r,g,b,density. Got something else!\n");
+        Sys->Printf (CS_MSG_CONSOLE, "Expected r,g,b,density. Got something else!\n");
         return false;
       }
       f->enabled = true;
@@ -1247,7 +1247,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       OpenPortal (Sys->LevelLoader, Sys->view, level);
     }
     else
-      Sys->Printf (MSG_CONSOLE, "Expected parameter 'level'!\n");
+      Sys->Printf (CS_MSG_CONSOLE, "Expected parameter 'level'!\n");
   }
   else if (!strcasecmp (cmd, "fs_inter"))
   {
@@ -1299,7 +1299,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
       else
       {
-        Sys->Printf (MSG_CONSOLE, "Can't find material!\n");
+        Sys->Printf (CS_MSG_CONSOLE, "Can't find material!\n");
 	Sys->do_fs_fadetxt = false;
       }
     }
@@ -1376,7 +1376,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
 #endif
     }
-    //Sys->Printf (MSG_CONSOLE, "No debug0 implementation in this version.\n");
+    //Sys->Printf (CS_MSG_CONSOLE, "No debug0 implementation in this version.\n");
 #endif
   }
   else if (!strcasecmp (cmd, "debug1"))
@@ -1385,7 +1385,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     covtree_level++;
     if (covtree_level > 25) covtree_level = 1;
     printf ("covtree_level=%d\n", covtree_level);
-    //Sys->Printf (MSG_CONSOLE, "No debug1 implementation in this version.\n");
+    //Sys->Printf (CS_MSG_CONSOLE, "No debug1 implementation in this version.\n");
   }
   else if (!strcasecmp (cmd, "debug2"))
   {
@@ -1393,7 +1393,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     extern bool do_covtree_dump;
     do_covtree_dump = !do_covtree_dump;
 #   else
-    Sys->Printf (MSG_CONSOLE, "No debug2 implementation in this version.\n");
+    Sys->Printf (CS_MSG_CONSOLE, "No debug2 implementation in this version.\n");
 #   endif
   }
   else if (!strcasecmp (cmd, "strafe_left"))
@@ -1598,7 +1598,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     	char* txtname);
     if (cnt != 1)
     {
-      Sys->Printf (MSG_CONSOLE, "Expected parameter 'texture'!\n");
+      Sys->Printf (CS_MSG_CONSOLE, "Expected parameter 'texture'!\n");
     }
     else
       add_particles_explosion (Sys->view->GetCamera ()->GetSector (),
@@ -1613,7 +1613,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     	char* txtname);
     if (cnt != 1)
     {
-      Sys->Printf (MSG_CONSOLE, "Expected parameter 'texture'!\n");
+      Sys->Printf (CS_MSG_CONSOLE, "Expected parameter 'texture'!\n");
     }
     else
       add_particles_spiral (Sys->view->GetCamera ()->GetSector (),
@@ -1626,7 +1626,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg) cnt = csScanStr (arg, "%s,%s,%s", filename, tempname, txtname);
     if (cnt != 3)
     {
-      Sys->Printf (MSG_CONSOLE, "Expected parameters 'file','template','texture'!\n");
+      Sys->Printf (CS_MSG_CONSOLE, "Expected parameters 'file','template','texture'!\n");
     }
     else load_meshobj (filename, tempname, txtname);
   }
@@ -1639,8 +1639,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg) cnt = csScanStr (arg, "%s,%s,%f", tname, sname, &size);
     if(cnt != 3)
     {
-      Sys->Printf (MSG_CONSOLE, "Expected parameters 'templatename',");
-      Sys->Printf (MSG_CONSOLE, "'meshname','size'!\n");
+      Sys->Printf (CS_MSG_CONSOLE, "Expected parameters 'templatename',");
+      Sys->Printf (CS_MSG_CONSOLE, "'meshname','size'!\n");
     }
     else
     {
@@ -1658,10 +1658,10 @@ bool CommandHandler (const char *cmd, const char *arg)
       if (obj)
         Sys->view->GetEngine ()->GetCsEngine ()->RemoveMesh ((csMeshWrapper*)obj);
       else
-        CsPrintf (MSG_CONSOLE, "Can't find mesh with that name!\n");
+        CsPrintf (CS_MSG_CONSOLE, "Can't find mesh with that name!\n");
     }
     else
-      CsPrintf (MSG_CONSOLE, "Missing mesh name!\n");
+      CsPrintf (CS_MSG_CONSOLE, "Missing mesh name!\n");
   }
   else if (!strcasecmp (cmd, "listmeshes"))
   {
@@ -1675,8 +1675,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg) cnt = csScanStr (arg, "%s,%s", name, action);
     if(cnt != 1)
     {
-      Sys->Printf (MSG_CONSOLE, "Expected parameters 'meshname'!\n");
-      Sys->Printf (MSG_CONSOLE, "To get the names use 'listmeshes'\n");
+      Sys->Printf (CS_MSG_CONSOLE, "Expected parameters 'meshname'!\n");
+      Sys->Printf (CS_MSG_CONSOLE, "To get the names use 'listmeshes'\n");
     }
     else
     {
@@ -1684,7 +1684,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       iMeshWrapper *wrap = Sys->Engine->FindMeshObject (name);
       if (wrap)
       {
-	iSprite3DFactoryState* fstate = QUERY_INTERFACE (
+	iSprite3DFactoryState* fstate = SCF_QUERY_INTERFACE (
 		wrap->GetMeshObject ()->GetFactory (),
 		iSprite3DFactoryState);
 	iSpriteAction* aspr_act;
@@ -1693,14 +1693,14 @@ bool CommandHandler (const char *cmd, const char *arg)
 	for (i = 0; i < (fstate->GetActionCount ()); i ++)
 	{
 	  aspr_act = fstate->GetAction (i);
-	  Sys->Printf (MSG_CONSOLE, "%s\n", aspr_act->GetName ());
+	  Sys->Printf (CS_MSG_CONSOLE, "%s\n", aspr_act->GetName ());
 	}
 	fstate->DecRef ();
       }
       else
       {
-        Sys->Printf (MSG_CONSOLE, "Expected parameters 'meshname'!\n");
-        Sys->Printf (MSG_CONSOLE, "To get the names use 'listmeshes'\n");
+        Sys->Printf (CS_MSG_CONSOLE, "Expected parameters 'meshname'!\n");
+        Sys->Printf (CS_MSG_CONSOLE, "To get the names use 'listmeshes'\n");
       }
     }
   }
@@ -1712,33 +1712,33 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg) cnt = csScanStr (arg, "%s,%s", name, action);
     if(cnt != 2)
     {
-      Sys->Printf (MSG_CONSOLE, "Expected parameters 'meshname,action'!\n");
-      Sys->Printf (MSG_CONSOLE, "To get the names use 'listmeshes'\n");
+      Sys->Printf (CS_MSG_CONSOLE, "Expected parameters 'meshname,action'!\n");
+      Sys->Printf (CS_MSG_CONSOLE, "To get the names use 'listmeshes'\n");
     }
     else
     {
       // Test to see if the mesh exists.
       iMeshWrapper* wrap = Sys->Engine->FindMeshObject (name);
       if (!wrap)
-        Sys->Printf (MSG_CONSOLE, "No such mesh!\n");
+        Sys->Printf (CS_MSG_CONSOLE, "No such mesh!\n");
       else
       {
-        iSprite3DState* state = QUERY_INTERFACE (wrap->GetMeshObject (),
+        iSprite3DState* state = SCF_QUERY_INTERFACE (wrap->GetMeshObject (),
 		iSprite3DState);
         if (state)
         {
           // Test to see if the action exists for that sprite.
           if (!state->SetAction (action))
 	  {
-            Sys->Printf (MSG_CONSOLE,
+            Sys->Printf (CS_MSG_CONSOLE,
 		         "Expected parameters 'meshname,action'!\n");
-	    Sys->Printf (MSG_CONSOLE,
+	    Sys->Printf (CS_MSG_CONSOLE,
 		   "That mesh does not have that action.\n");
 	  }
 	  state->DecRef ();
         }
         else
-          Sys->Printf (MSG_CONSOLE, "Mesh is not a 3D sprite!");
+          Sys->Printf (CS_MSG_CONSOLE, "Mesh is not a 3D sprite!");
       }
     }
   }
@@ -1750,22 +1750,22 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg) cnt = csScanStr (arg, "%s,%s", name, motion);
     if(cnt != 2)
     {
-      Sys->Printf (MSG_CONSOLE, "Expected parameters 'meshname,motion'!\n");
-      Sys->Printf (MSG_CONSOLE, "To get the names use 'listmeshes'\n");
+      Sys->Printf (CS_MSG_CONSOLE, "Expected parameters 'meshname,motion'!\n");
+      Sys->Printf (CS_MSG_CONSOLE, "To get the names use 'listmeshes'\n");
     }
     else
     {
       // Test to see if the mesh exists.
       iMeshWrapper* wrap = Sys->Engine->FindMeshObject (name);
       if (!wrap)
-        Sys->Printf (MSG_CONSOLE, "No such mesh!\n");
+        Sys->Printf (CS_MSG_CONSOLE, "No such mesh!\n");
       else
       {
-	iSprite3DState* state = QUERY_INTERFACE (wrap->GetMeshObject (),
+	iSprite3DState* state = SCF_QUERY_INTERFACE (wrap->GetMeshObject (),
 		iSprite3DState);
         if (state)
         {
-	  iSkeletonBone *sb=QUERY_INTERFACE(state->GetSkeletonState(),
+	  iSkeletonBone *sb=SCF_QUERY_INTERFACE(state->GetSkeletonState(),
 	  	iSkeletonBone);
 	  if (sb)
 	  {
@@ -1773,19 +1773,19 @@ bool CommandHandler (const char *cmd, const char *arg)
 	    {
 	      if (!Sys->myMotionMan->ApplyMotion(sb, motion, motion, true,
 	      	false, 1.0, 0, false))
-	        Sys->Printf (MSG_CONSOLE, "That motion does not exist!\n");
+	        Sys->Printf (CS_MSG_CONSOLE, "That motion does not exist!\n");
 	    }
 	    else
-	      Sys->Printf (MSG_CONSOLE, "No motion manager exists to animate the skeleton!\n");
+	      Sys->Printf (CS_MSG_CONSOLE, "No motion manager exists to animate the skeleton!\n");
 	    sb->DecRef ();
 	  }
 	  else
-	    Sys->Printf (MSG_CONSOLE, "That sprite does not contain a skeleton!\n");
+	    Sys->Printf (CS_MSG_CONSOLE, "That sprite does not contain a skeleton!\n");
 	  state->DecRef ();
         }
 	else
 	{
-          Sys->Printf (MSG_CONSOLE, "Mesh is not a 3D sprite!\n");
+          Sys->Printf (CS_MSG_CONSOLE, "Mesh is not a 3D sprite!\n");
 	}
       }
     }
@@ -1847,10 +1847,10 @@ bool CommandHandler (const char *cmd, const char *arg)
       if (arg && csScanStr (arg, "%f,%f,%f", &r, &g, &b) == 3)
         Sys->selected_light->SetColor (csColor (r, g, b));
       else
-        CsPrintf (MSG_CONSOLE, "Arguments missing or invalid!\n");
+        CsPrintf (CS_MSG_CONSOLE, "Arguments missing or invalid!\n");
     }
     else
-      CsPrintf (MSG_CONSOLE, "No light selected!\n");
+      CsPrintf (CS_MSG_CONSOLE, "No light selected!\n");
   }
   else if (!strcasecmp (cmd, "addlight"))
   {
@@ -1880,7 +1880,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     extern void AttachRandomLight (csDynLight* light);
     if (rnd)
       AttachRandomLight (dyn);
-    Sys->Printf (MSG_CONSOLE, "Dynamic light added.\n");
+    Sys->Printf (CS_MSG_CONSOLE, "Dynamic light added.\n");
   }
   else if (!strcasecmp (cmd, "dellight"))
   {
@@ -1889,7 +1889,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       Sys->view->GetEngine ()->GetCsEngine ()->RemoveDynLight (dyn);
       delete dyn;
-      Sys->Printf (MSG_CONSOLE, "Dynamic light deleted.\n");
+      Sys->Printf (CS_MSG_CONSOLE, "Dynamic light deleted.\n");
     }
   }
   else if (!strcasecmp (cmd, "dellights"))
@@ -1901,21 +1901,21 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->view->GetEngine ()->GetCsEngine ()->RemoveDynLight (dyn);
       delete dyn;
     }
-    Sys->Printf (MSG_CONSOLE, "All dynamic lights deleted.\n");
+    Sys->Printf (CS_MSG_CONSOLE, "All dynamic lights deleted.\n");
   }
   else if (!strcasecmp (cmd, "picklight"))
   {
 #   if 0
     pickup_light = Sys->view->GetEngine ()->GetFirstFltLight ();
-    if (pickup_light) Sys->Printf (MSG_CONSOLE, "Floating light taken.\n");
-    else Sys->Printf (MSG_CONSOLE, "No floating light to take.\n");
+    if (pickup_light) Sys->Printf (CS_MSG_CONSOLE, "Floating light taken.\n");
+    else Sys->Printf (CS_MSG_CONSOLE, "No floating light to take.\n");
 #   endif
   }
   else if (!strcasecmp (cmd, "droplight"))
   {
 #   if 0
-    if (pickup_light) Sys->Printf (MSG_CONSOLE, "Floating light dropped.\n");
-    else Sys->Printf (MSG_CONSOLE, "No floating light to drop.\n");
+    if (pickup_light) Sys->Printf (CS_MSG_CONSOLE, "Floating light dropped.\n");
+    else Sys->Printf (CS_MSG_CONSOLE, "No floating light to drop.\n");
     pickup_light = NULL;
 #   endif
   }
@@ -1940,7 +1940,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       if (sb)
         sb->GetSound ()->Play();
       else
-        Sys->Printf (MSG_CONSOLE, "Sound '%s' not found!\n", arg);
+        Sys->Printf (CS_MSG_CONSOLE, "Sound '%s' not found!\n", arg);
     }
   }
   else if (!strcasecmp (cmd, "snd_volume"))

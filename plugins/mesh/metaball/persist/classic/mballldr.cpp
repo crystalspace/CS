@@ -59,45 +59,45 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SHIFT)
 CS_TOKEN_DEF_END
 
-IMPLEMENT_IBASE (csMetaBallFactoryLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csMetaBallFactoryLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csMetaBallFactorySaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csMetaBallFactorySaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csMetaBallLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csMetaBallLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csMetaBallSaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csMetaBallSaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csMetaBallFactoryLoader)
-IMPLEMENT_FACTORY (csMetaBallFactorySaver)
-IMPLEMENT_FACTORY (csMetaBallLoader)
-IMPLEMENT_FACTORY (csMetaBallSaver)
+SCF_IMPLEMENT_FACTORY (csMetaBallFactoryLoader)
+SCF_IMPLEMENT_FACTORY (csMetaBallFactorySaver)
+SCF_IMPLEMENT_FACTORY (csMetaBallLoader)
+SCF_IMPLEMENT_FACTORY (csMetaBallSaver)
 
-EXPORT_CLASS_TABLE (mballldr)
-  EXPORT_CLASS (csMetaBallFactoryLoader, "crystalspace.mesh.loader.factory.metaball",
+SCF_EXPORT_CLASS_TABLE (mballldr)
+  SCF_EXPORT_CLASS (csMetaBallFactoryLoader, "crystalspace.mesh.loader.factory.metaball",
     "Crystal Space MetaBall Factory Loader")
-  EXPORT_CLASS (csMetaBallFactorySaver, "crystalspace.mesh.saver.factory.metaball",
+  SCF_EXPORT_CLASS (csMetaBallFactorySaver, "crystalspace.mesh.saver.factory.metaball",
     "Crystal Space MetaBall Factory Saver")
-  EXPORT_CLASS (csMetaBallLoader, "crystalspace.mesh.loader.metaball",
+  SCF_EXPORT_CLASS (csMetaBallLoader, "crystalspace.mesh.loader.metaball",
     "Crystal Space MetaBall Mesh Loader")
-  EXPORT_CLASS (csMetaBallSaver, "crystalspace.mesh.saver.metaball",
+  SCF_EXPORT_CLASS (csMetaBallSaver, "crystalspace.mesh.saver.metaball",
     "Crystal Space MetaBall Mesh Saver")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csMetaBallFactoryLoader::csMetaBallFactoryLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csMetaBallFactoryLoader::~csMetaBallFactoryLoader ()
@@ -113,11 +113,11 @@ bool csMetaBallFactoryLoader::Initialize (iSystem* system)
 iBase* csMetaBallFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys,
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (sys,
   	"crystalspace.mesh.object.metaball", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = LOAD_PLUGIN (sys, "crystalspace.mesh.object.metaball",
+    type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.metaball",
     	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.metaball\n");
   }
@@ -130,7 +130,7 @@ iBase* csMetaBallFactoryLoader::Parse (const char* /*string*/,
 
 csMetaBallFactorySaver::csMetaBallFactorySaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csMetaBallFactorySaver::~csMetaBallFactorySaver ()
@@ -155,7 +155,7 @@ void csMetaBallFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 
 csMetaBallLoader::csMetaBallLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csMetaBallLoader::~csMetaBallLoader ()
@@ -241,7 +241,7 @@ iBase* csMetaBallLoader::Parse (const char* string, iEngine* engine,
   iMeshObject* mesh = NULL;
   iMetaBallState* ballstate = NULL;
   MetaParameters* mp = NULL;
-  iMeshWrapper* imeshwrap = QUERY_INTERFACE (context, iMeshWrapper);
+  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
   imeshwrap->DecRef ();
 
   char* buf = (char*)string;
@@ -314,7 +314,7 @@ iBase* csMetaBallLoader::Parse (const char* string, iEngine* engine,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  imeshwrap->SetFactory (fact);
-      ballstate = QUERY_INTERFACE (mesh, iMetaBallState);
+      ballstate = SCF_QUERY_INTERFACE (mesh, iMetaBallState);
 	  mp = ballstate->GetParameters();
 	}
 	break;
@@ -354,7 +354,7 @@ iBase* csMetaBallLoader::Parse (const char* string, iEngine* engine,
 
 csMetaBallSaver::csMetaBallSaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csMetaBallSaver::~csMetaBallSaver ()
@@ -387,8 +387,8 @@ static void WriteMixmode(iStrVector *str, UInt mixmode)
 void csMetaBallSaver::WriteDown (iBase* obj, iStrVector *str,
   iEngine* /*engine*/)
 {
-  iFactory *fact = QUERY_INTERFACE (this, iFactory);
-  iMeshObject *mesh = QUERY_INTERFACE(obj, iMeshObject);
+  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
+  iMeshObject *mesh = SCF_QUERY_INTERFACE(obj, iMeshObject);
   if(!mesh)
   {
     printf("Error: non-mesh given to %s.\n", 
@@ -396,7 +396,7 @@ void csMetaBallSaver::WriteDown (iBase* obj, iStrVector *str,
     fact->DecRef();
     return;
   }
-  iMetaBallState *state = QUERY_INTERFACE(obj, iMetaBallState);
+  iMetaBallState *state = SCF_QUERY_INTERFACE(obj, iMetaBallState);
   if(!state)
   {
     printf("Error: invalid mesh given to %s.\n", 

@@ -22,13 +22,13 @@
 #include "qsqrt.h"
 #include "qint.h"
 
-IMPLEMENT_IBASE (csIsoGrid)
-  IMPLEMENTS_INTERFACE (iIsoGrid)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csIsoGrid)
+  SCF_IMPLEMENTS_INTERFACE (iIsoGrid)
+SCF_IMPLEMENT_IBASE_END
 
 csIsoGrid::csIsoGrid (iBase *iParent, iIsoWorld *world, int w, int h)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   csIsoGrid::world = world;
   width = w;
   height = h;

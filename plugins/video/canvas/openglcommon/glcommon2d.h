@@ -55,7 +55,7 @@ public:
   /// The event plug object
   iEventOutlet *EventOutlet;
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Constructor does little, most initialization stuff happens in Initialize()
   csGraphics2DGLCommon (iBase *iParent);

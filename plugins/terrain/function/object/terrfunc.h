@@ -322,7 +322,7 @@ public:
   void TestVisibility (iRenderView* rview);
 
   ///--------------------- iTerrainObject implementation ---------------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual void SetDirLight (const csVector3& pos, const csColor& col)
   {
@@ -363,7 +363,7 @@ public:
   //------------------------- iTerrFuncState implementation ----------------
   class TerrFuncState : public iTerrFuncState
   {
-    DECLARE_EMBEDDED_IBASE (csTerrFuncObject);
+    SCF_DECLARE_EMBEDDED_IBASE (csTerrFuncObject);
     virtual void LoadMaterialGroup (iEngine* engine, const char *pName,
       int iStart, int iEnd)
     {
@@ -488,7 +488,7 @@ public:
   /// Destructor.
   virtual ~csTerrFuncObjectFactory ();
 
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   virtual iTerrainObject* NewInstance ();
 };
@@ -513,7 +513,7 @@ public:
   virtual bool Initialize (iSystem *pSys);
 
   //---------------------- iTerrainObjectType implementation --------------
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   /// Draw.
   virtual iTerrainObjectFactory* NewFactory ();

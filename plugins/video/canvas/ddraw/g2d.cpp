@@ -40,17 +40,17 @@ static DirectDetectionDevice *DirectDevice;
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_FACTORY (csGraphics2DDDraw3)
+SCF_IMPLEMENT_FACTORY (csGraphics2DDDraw3)
 
-EXPORT_CLASS_TABLE (csddraw)
-  EXPORT_CLASS_DEP (csGraphics2DDDraw3, SOFTWARE_2D_DRIVER,
+SCF_EXPORT_CLASS_TABLE (csddraw)
+  SCF_EXPORT_CLASS_DEP (csGraphics2DDDraw3, SOFTWARE_2D_DRIVER,
     "Crystal Space 2D DirectDraw driver", "crystalspace.font.server.")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (csGraphics2DDDraw3)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics2D)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csGraphics2DDDraw3)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_END
 
 csGraphics2DDDraw3::csGraphics2DDDraw3(iBase *iParent) :
   csGraphics2D (),
@@ -67,7 +67,7 @@ csGraphics2DDDraw3::csGraphics2DDDraw3(iBase *iParent) :
   m_bDoubleBuffer (false),
   m_bAllowWindowed (false)
 {
-  CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_IBASE (iParent);
   m_hInstance = GetModuleHandle (NULL);
 }
 
@@ -133,7 +133,7 @@ bool csGraphics2DDDraw3::Open (const char *Title)
   if (!DirectDevice->IsPrimary2D)
     pGuid = &DirectDevice->Guid2D;
 
-  System->Printf (MSG_INITIALIZATION, "Using DirectDraw %s (%s)\n",
+  System->Printf (CS_MSG_INITIALIZATION, "Using DirectDraw %s (%s)\n",
     DirectDevice->DeviceDescription2D, DirectDevice->DeviceName2D);
 
   // Create a DD object for either the primary device or the secondary.
@@ -691,7 +691,7 @@ HRESULT csGraphics2DDDraw3::InitFail (HRESULT hRet, LPCTSTR szError)
   ReleaseAllObjects ();
   if (m_lpDD)
     m_lpDD->RestoreDisplayMode ();
-  System->Printf (MSG_FATAL_ERROR, szError, hRet);
+  System->Printf (CS_MSG_FATAL_ERROR, szError, hRet);
   DestroyWindow (m_hWnd);
   return hRet;
 }

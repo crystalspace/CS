@@ -26,7 +26,7 @@
 class csGraphics3DSoftware : public csGraphics3DSoftwareCommon
 {
 public:
-  DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
   /// Constructor
   csGraphics3DSoftware (iBase *iParent);
   /// Destructor
@@ -39,7 +39,7 @@ public:
   ///------------------- iConfig interface implementation -------------------
   struct csSoftConfig : public iConfig
   {
-    DECLARE_EMBEDDED_IBASE (csGraphics3DSoftware);
+    SCF_DECLARE_EMBEDDED_IBASE (csGraphics3DSoftware);
     virtual bool GetOptionDescription (int idx, csOptionDescription *option);
     virtual bool SetOption (int id, csVariant* value);
     virtual bool GetOption (int id, csVariant* value);

@@ -20,13 +20,13 @@
 #include "spr2duv.h"
 #include "csutil/util.h"
 
-IMPLEMENT_IBASE (csSprite2DUVAnimationFrame)
-  IMPLEMENTS_INTERFACE (iSprite2DUVAnimationFrame)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSprite2DUVAnimationFrame)
+  SCF_IMPLEMENTS_INTERFACE (iSprite2DUVAnimationFrame)
+SCF_IMPLEMENT_IBASE_END
 
 csSprite2DUVAnimationFrame::csSprite2DUVAnimationFrame (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
   duration = 0;
   name = NULL;
 }
@@ -99,13 +99,13 @@ void csSprite2DUVAnimationFrame::SetDuration (int duration)
 }
 
 // ------------------- csSprite2DUVAnimation ---------
-IMPLEMENT_IBASE (csSprite2DUVAnimation)
-  IMPLEMENTS_INTERFACE (iSprite2DUVAnimation)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csSprite2DUVAnimation)
+  SCF_IMPLEMENTS_INTERFACE (iSprite2DUVAnimation)
+SCF_IMPLEMENT_IBASE_END
 
 csSprite2DUVAnimation::csSprite2DUVAnimation (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
   name = NULL;
 }
 

@@ -73,45 +73,45 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (WEIGHT)
 CS_TOKEN_DEF_END
 
-IMPLEMENT_IBASE (csEmitFactoryLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csEmitFactoryLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csEmitFactorySaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csEmitFactorySaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csEmitLoader)
-  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csEmitLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csEmitSaver)
-  IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csEmitSaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csEmitFactoryLoader)
-IMPLEMENT_FACTORY (csEmitFactorySaver)
-IMPLEMENT_FACTORY (csEmitLoader)
-IMPLEMENT_FACTORY (csEmitSaver)
+SCF_IMPLEMENT_FACTORY (csEmitFactoryLoader)
+SCF_IMPLEMENT_FACTORY (csEmitFactorySaver)
+SCF_IMPLEMENT_FACTORY (csEmitLoader)
+SCF_IMPLEMENT_FACTORY (csEmitSaver)
 
-EXPORT_CLASS_TABLE (emitldr)
-  EXPORT_CLASS (csEmitFactoryLoader, "crystalspace.mesh.loader.factory.emit",
+SCF_EXPORT_CLASS_TABLE (emitldr)
+  SCF_EXPORT_CLASS (csEmitFactoryLoader, "crystalspace.mesh.loader.factory.emit",
     "Crystal Space Emit Factory Loader")
-  EXPORT_CLASS (csEmitFactorySaver, "crystalspace.mesh.saver.factory.emit",
+  SCF_EXPORT_CLASS (csEmitFactorySaver, "crystalspace.mesh.saver.factory.emit",
     "Crystal Space Emit Factory Saver")
-  EXPORT_CLASS (csEmitLoader, "crystalspace.mesh.loader.emit",
+  SCF_EXPORT_CLASS (csEmitLoader, "crystalspace.mesh.loader.emit",
     "Crystal Space Emit Mesh Loader")
-  EXPORT_CLASS (csEmitSaver, "crystalspace.mesh.saver.emit",
+  SCF_EXPORT_CLASS (csEmitSaver, "crystalspace.mesh.saver.emit",
     "Crystal Space Emit Mesh Saver")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csEmitFactoryLoader::csEmitFactoryLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csEmitFactoryLoader::~csEmitFactoryLoader ()
@@ -127,11 +127,11 @@ bool csEmitFactoryLoader::Initialize (iSystem* system)
 iBase* csEmitFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys,
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (sys,
   	"crystalspace.mesh.object.emit", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = LOAD_PLUGIN (sys, "crystalspace.mesh.object.emit",
+    type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.emit",
     	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.emit\n");
   }
@@ -144,7 +144,7 @@ iBase* csEmitFactoryLoader::Parse (const char* /*string*/,
 
 csEmitFactorySaver::csEmitFactorySaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csEmitFactorySaver::~csEmitFactorySaver ()
@@ -187,7 +187,7 @@ void csEmitFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 
 csEmitLoader::csEmitLoader (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csEmitLoader::~csEmitLoader ()
@@ -403,7 +403,7 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
   char* params;
   char str[255];
 
-  iMeshWrapper* imeshwrap = QUERY_INTERFACE (context, iMeshWrapper);
+  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
   imeshwrap->DecRef ();
 
   iMeshObject* mesh = NULL;
@@ -436,9 +436,9 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  imeshwrap->SetFactory (fact);
-          partstate = QUERY_INTERFACE (mesh, iParticleState);
-          emitstate = QUERY_INTERFACE (mesh, iEmitState);
-	  emitfactorystate = QUERY_INTERFACE(fact->GetMeshObjectFactory(),
+          partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
+          emitstate = SCF_QUERY_INTERFACE (mesh, iEmitState);
+	  emitfactorystate = SCF_QUERY_INTERFACE(fact->GetMeshObjectFactory(),
 	    iEmitFactoryState);
 	}
 	break;
@@ -552,7 +552,7 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
 
 csEmitSaver::csEmitSaver (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csEmitSaver::~csEmitSaver ()
@@ -572,7 +572,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
   char buf[MAXLINE];
   csVector3 a,b;
   float p, q, r, s, t;
-  iEmitFixed *efixed = QUERY_INTERFACE(emit, iEmitFixed);
+  iEmitFixed *efixed = SCF_QUERY_INTERFACE(emit, iEmitFixed);
   if(efixed)
   {
     /// b is ignored
@@ -582,7 +582,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
     efixed->DecRef();
     return;
   }
-  iEmitSphere *esphere = QUERY_INTERFACE(emit, iEmitSphere);
+  iEmitSphere *esphere = SCF_QUERY_INTERFACE(emit, iEmitSphere);
   if(esphere)
   {
     esphere->GetContent(a, p, q);
@@ -591,7 +591,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
     esphere->DecRef();
     return;
   }
-  iEmitBox *ebox = QUERY_INTERFACE(emit, iEmitBox);
+  iEmitBox *ebox = SCF_QUERY_INTERFACE(emit, iEmitBox);
   if(ebox)
   {
     ebox->GetContent(a, b);
@@ -600,7 +600,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
     ebox->DecRef();
     return;
   }
-  iEmitCone *econe = QUERY_INTERFACE(emit, iEmitCone);
+  iEmitCone *econe = SCF_QUERY_INTERFACE(emit, iEmitCone);
   if(econe)
   {
     econe->GetContent(a, p, q, r, s, t);
@@ -610,7 +610,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
     econe->DecRef();
     return;
   }
-  iEmitMix *emix = QUERY_INTERFACE(emit, iEmitMix);
+  iEmitMix *emix = SCF_QUERY_INTERFACE(emit, iEmitMix);
   if(emix)
   {
     for(int i=0; i<emix->GetEmitterCount(); i++)
@@ -626,7 +626,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
     emix->DecRef();
     return;
   }
-  iEmitLine *eline = QUERY_INTERFACE(emit, iEmitLine);
+  iEmitLine *eline = SCF_QUERY_INTERFACE(emit, iEmitLine);
   if(eline)
   {
     eline->GetContent(a, b);
@@ -635,7 +635,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
     eline->DecRef();
     return;
   }
-  iEmitCylinder *ecyl = QUERY_INTERFACE(emit, iEmitCylinder);
+  iEmitCylinder *ecyl = SCF_QUERY_INTERFACE(emit, iEmitCylinder);
   if(ecyl)
   {
     ecyl->GetContent(a, b, p, q);
@@ -645,7 +645,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
     ecyl->DecRef();
     return;
   }
-  iEmitCylinderTangent *ecyltan = QUERY_INTERFACE(emit, iEmitCylinderTangent);
+  iEmitCylinderTangent *ecyltan = SCF_QUERY_INTERFACE(emit, iEmitCylinderTangent);
   if(ecyltan)
   {
     ecyltan->GetContent(a, b, p, q);
@@ -655,7 +655,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
     ecyltan->DecRef();
     return;
   }
-  iEmitSphereTangent *espheretan = QUERY_INTERFACE(emit, iEmitSphereTangent);
+  iEmitSphereTangent *espheretan = SCF_QUERY_INTERFACE(emit, iEmitSphereTangent);
   if(espheretan)
   {
     espheretan->GetContent(a, p, q);
@@ -670,9 +670,9 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
 void csEmitSaver::WriteDown (iBase* obj, iStrVector *str,
   iEngine* /*engine*/)
 {
-  iFactory *fact = QUERY_INTERFACE (this, iFactory);
-  iParticleState *partstate = QUERY_INTERFACE (obj, iParticleState);
-  iEmitState *state = QUERY_INTERFACE (obj, iEmitState);
+  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
+  iParticleState *partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
+  iEmitState *state = SCF_QUERY_INTERFACE (obj, iEmitState);
   char buf[MAXLINE];
   char name[MAXLINE];
 

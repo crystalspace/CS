@@ -40,14 +40,14 @@
 
 CS_IMPLEMENT_PLUGIN
 
-IMPLEMENT_IBASE (csTerrFuncObject)
-  IMPLEMENTS_INTERFACE (iTerrainObject)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iTerrFuncState)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csTerrFuncObject)
+  SCF_IMPLEMENTS_INTERFACE (iTerrainObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iTerrFuncState)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csTerrFuncObject::TerrFuncState)
-  IMPLEMENTS_INTERFACE (iTerrFuncState)
-IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrFuncObject::TerrFuncState)
+  SCF_IMPLEMENTS_INTERFACE (iTerrFuncState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 //------------------------------------------------------------------------
 
@@ -142,8 +142,8 @@ void csTerrFuncObject::SetHeightMap (iImage* im, float hscale, float hshift)
 csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
 	iTerrainObjectFactory *pFactory)
 {
-  CONSTRUCT_IBASE (NULL)
-  CONSTRUCT_EMBEDDED_IBASE (scfiTerrFuncState);
+  SCF_CONSTRUCT_IBASE (NULL)
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTerrFuncState);
   pSystem = pSys;
   csTerrFuncObject::pFactory = pFactory;
   initialized = false;
@@ -1302,13 +1302,13 @@ int csTerrFuncObject::CollisionDetect (csTransform* transform)
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csTerrFuncObjectFactory)
-  IMPLEMENTS_INTERFACE (iTerrainObjectFactory)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csTerrFuncObjectFactory)
+  SCF_IMPLEMENTS_INTERFACE (iTerrainObjectFactory)
+SCF_IMPLEMENT_IBASE_END
 
 csTerrFuncObjectFactory::csTerrFuncObjectFactory (iSystem* pSys)
 {
-  CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
   pSystem = pSys;
 }
 
@@ -1324,21 +1324,21 @@ iTerrainObject* csTerrFuncObjectFactory::NewInstance ()
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csTerrFuncObjectType)
-  IMPLEMENTS_INTERFACE (iTerrainObjectType)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE (csTerrFuncObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iTerrainObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csTerrFuncObjectType)
+SCF_IMPLEMENT_FACTORY (csTerrFuncObjectType)
 
-EXPORT_CLASS_TABLE (terrfunc)
-  EXPORT_CLASS (csTerrFuncObjectType, "crystalspace.terrain.object.terrfunc",
+SCF_EXPORT_CLASS_TABLE (terrfunc)
+  SCF_EXPORT_CLASS (csTerrFuncObjectType, "crystalspace.terrain.object.terrfunc",
     "Crystal Space Function Terrain Type")
-EXPORT_CLASS_TABLE_END
+SCF_EXPORT_CLASS_TABLE_END
 
 csTerrFuncObjectType::csTerrFuncObjectType (iBase* pParent)
 {
-  CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (pParent);
 }
 
 csTerrFuncObjectType::~csTerrFuncObjectType ()
