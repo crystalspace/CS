@@ -31,7 +31,6 @@
 #include "csengine/thing.h"
 #include "csfx/proctex.h"
 #include "csfx/prsky.h"
-#include "csparser/csloader.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivaria/conout.h"
@@ -39,6 +38,7 @@
 #include "imesh/sprite2d.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
+#include "imap/parser.h"
 
 //------------------------------------------------- We need the 3D engine -----
 

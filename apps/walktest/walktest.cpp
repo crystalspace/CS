@@ -25,7 +25,6 @@
 #include "infmaze.h"
 #include "hugeroom.h"
 #include "command.h"
-#include "csparser/csloader.h"
 #include "csgeom/frustum.h"
 #include "csengine/dumper.h"
 #include "csengine/campos.h"

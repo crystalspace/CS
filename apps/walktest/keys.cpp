@@ -38,7 +38,6 @@
 #include "csobject/dataobj.h"
 #include "isound/data.h"
 #include "csparser/snddatao.h"
-#include "csparser/csloader.h"
 #include "csparser/crossbld.h"
 #include "csgeom/math3d.h"
 #include "cssys/system.h"

@@ -28,7 +28,6 @@
 #include "csengine/meshobj.h"
 #include "csengine/texture.h"
 #include "csengine/thing.h"
-#include "csparser/csloader.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivaria/conout.h"

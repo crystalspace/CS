@@ -31,7 +31,6 @@
 #include "cssysdef.h"
 #include "blocks.h"
 #include "cssys/system.h"
-#include "csparser/csloader.h"
 #include "csutil/csstring.h"
 #include "csgfx/csimage.h"
 #include "csengine/dumper.h"

@@ -32,6 +32,18 @@ class csSoundDataObject;
 class csMeshFactoryWrapper;
 class csMeshWrapper;
 
+/**
+ * Bit flags for the loader (used in csLoader::SetMode).
+ * Some actions may be unwanted during loading, thus these flags.
+ */
+/// Do not compress vertices
+#define CS_LOADER_NOCOMPRESS	0x00000001
+/// Do not create BSP/octrees
+#define CS_LOADER_NOBSP		0x00000002
+/// Do not apply transformations to things (and do not create bounding box)
+#define CS_LOADER_NOTRANSFORM	0x00000004
+
+
 SCF_VERSION (iLoader, 0, 0, 1);
 
 /**

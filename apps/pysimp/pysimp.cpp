@@ -26,7 +26,6 @@
 #include "csengine/camera.h"
 #include "csengine/light.h"
 #include "csengine/polygon.h"
-#include "csparser/csloader.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivaria/script.h"

@@ -26,7 +26,6 @@
 #include "csengine/light.h"
 #include "csengine/polygon.h"
 #include "csengine/collider.h"
-#include "csparser/csloader.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
