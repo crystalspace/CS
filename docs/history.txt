@@ -37,6 +37,7 @@ chronological order.
 	    - csRefArray now also inherits from csArrayBase.
 	    - Moved Find() to csArrayBase.
 	    - Added Truncate() to csRefArray and csPDelArray.
+	    - csStringArray now also inherits from csArrayBase.
 3-Aug-2003
 	- Paul G. implemented a very nasty (and hopefully very temporary) hack
 	  for csunicode.h to define CS_WCHAR_T_SIZE appropriately for

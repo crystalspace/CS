@@ -22,6 +22,7 @@
 
 #include <stdarg.h>
 #include "csutil/util.h"
+#include "csutil/arraybase.h"
 
 typedef int csStringArrayCompareFunction (char const* item1, char const* item2);
 typedef int csStringArraySortFunction (void const* item1, void const* item2);
@@ -30,69 +31,22 @@ typedef int csStringArraySortFunction (void const* item1, void const* item2);
  * An array of strings. This array will properly make copies of the strings
  * and delete those copies using delete[] later.
  */
-class csStringArray
+class csStringArray : private csArrayBase<char*>  // Note! Private.
 {
-private:
-  int count, limit, threshold;
-  char** root;
-
-  // Set vector length to n.  If 'dealloc' is true and the array is being
-  // shortened, then the excess items are deallocated.  If it is false, then
-  // the items are not deallocated.  Passing false for this argument is unsafe.
-  // Do so only if you know precisely what you are doing.  Obvious examples of
-  // functions which might want to partake of this unsafe behavior are those
-  // which return the excess strings to the caller with the expectation that
-  // the caller will be responsible for freeing them with delete[].
-  void SetLength (int n, bool dealloc)
-  {
-    // Free all items between new count and old count.
-    int i;
-    for (i = n ; i < count ; i++)
-    {
-      if (dealloc)
-	  delete[] root[i];
-      root[i] = 0;
-    }
-
-    int old_count = count;
-    count = n;
-
-    if (n > limit || (limit > threshold && n < limit - threshold))
-    {
-      n = ((n + threshold - 1) / threshold ) * threshold;
-      if (!n)
-      {
-        DeleteAll ();
-      }
-      else if (root == 0)
-      {
-        root = (char**)calloc (n, sizeof(char*));
-      }
-      else
-      {
-        char** newroot = (char**)calloc (n, sizeof(char*));
-	memcpy (newroot, root, old_count * sizeof (char*));
-	free (root);
-	root = newroot;
-      }
-      limit = n;
-    }
-  }
-
 public:
+  // We take the following public functions from csArrayBase<T> and
+  // make them public here.
+  using csArrayBase<char*>::Length;
+  using csArrayBase<char*>::Capacity;
+  // using csArrayBase<char*>::Find; We have our own version
+
   /**
    * Initialize object to hold initially 'ilimit' elements, and increase
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
   csStringArray (int ilimit = 0, int ithreshold = 0)
+  	: csArrayBase<char*> (ilimit, ithreshold)
   {
-    count = 0;
-    limit = (ilimit > 0 ? ilimit : 0);
-    threshold = (ithreshold > 0 ? ithreshold : 16);
-    if (limit != 0)
-      root = (char**)calloc (limit, sizeof(char*));
-    else
-      root = 0;
   }
 
   /**
@@ -100,15 +54,10 @@ public:
    */
   void DeleteAll ()
   {
-    if (root)
-    {
-      int i;
-      for (i = 0 ; i < limit ; i++)
-        delete[] root[i];
-      free (root);
-      root = 0;
-      limit = count = 0;
-    }
+    int i;
+    for (i = 0 ; i < count ; i++)
+      delete[] root[i];
+    DeleteRoot ();
   }
 
   /**
@@ -130,28 +79,42 @@ public:
     destination.DeleteAll ();
     destination.root = root;
     destination.count = count;
-    destination.limit = limit;
+    destination.capacity = capacity;
     destination.threshold = threshold;
     root = 0;
-    limit = count = 0;
+    capacity = count = 0;
+  }
+
+  /**
+   * Truncate array to specified number of elements. The new number of
+   * elements cannot exceed the current number of elements. Use SetLength()
+   * for a more general way to enlarge the array.
+   */
+  void Truncate (int n)
+  {
+    CS_ASSERT(n >= 0);
+    CS_ASSERT(n <= count);
+    if (n < count)
+    {
+      for (int i = n; i < count; i++)
+        delete[] root[i];
+      SetLengthUnsafe(n);
+    }
   }
 
   /// Set vector length to n.
   void SetLength (int n)
   {
-    SetLength(n, true);
-  }
-
-  /// Query vector length.
-  int Length () const
-  {
-    return count;
-  }
-
-  /// Query vector limit.
-  int Limit () const
-  {
-    return limit;
+    if (n <= count)
+    {
+      Truncate (n);
+    }
+    else
+    {
+      int old_len = Length ();
+      SetLengthUnsafe (n);
+      memset (root+old_len, 0, (n-old_len)*sizeof (char*));
+    }
   }
 
   /// Get a string.
@@ -173,7 +136,7 @@ public:
   {
     CS_ASSERT (n >= 0);
     if (n >= count)
-      SetLength (n + 1, true);
+      SetLength (n + 1);
     delete root[n];
     root[n] = csStrNew (ptr);
   }
@@ -212,7 +175,7 @@ public:
   /// Push a element on 'top' of vector (makes a copy of the string).
   int Push (char const* what)
   {
-    SetLength (count + 1, true);
+    SetLength (count + 1);
     root [count - 1] = csStrNew (what);
     return (count - 1);
   }
@@ -249,7 +212,7 @@ public:
   {
     char* ret = root [count - 1];
     root [count - 1] = 0;
-    SetLength (count - 1, false);
+    SetLength (count - 1);
     return ret;
   }
 
@@ -288,9 +251,9 @@ public:
       if (nmove > 0)
       {
         memmove (&root [n], &root [n + 1], nmove * sizeof (char*));
-	root[count-1] = 0;	// Clear last element to prevent deletion.
       }
-      SetLength (ncount, false);
+      root[ncount] = 0;	// Clear last element to prevent deletion.
+      SetLength (ncount);
     }
     return rc;
   }
@@ -329,7 +292,7 @@ public:
   {
     if (n <= count)
     {
-      SetLength (count + 1, true); // Increments 'count' as a side-effect.
+      SetLength (count + 1); // Increments 'count' as a side-effect.
       const int nmove = (count - n - 1);
       if (nmove > 0)
       {
