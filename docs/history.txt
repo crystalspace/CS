@@ -62,6 +62,11 @@ chronological order.
 	      this was unconditionally disabled, but it works now that
 	      configure emits the proper SDL build flags.
 	    - Fixed compilation errors in SDL canvas.
+	- Oktal moved bfdplugins.cpp from cssys/general to cssys/unix, and
+	  modified cssys/Jamfile and unix.jam so that external projects making
+	  use of the CS Jam build system won't have BFD storing metadata in
+	  their plugins unless they specifically ask for it in their own
+	  project Jamfiles.
 26-Aug-2003
         - Philip Wyett eliminated warning suggesting adding parentheses
           around truth value in csGLShaderFFP::LoadLayer (...);.

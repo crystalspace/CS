@@ -45,7 +45,7 @@ include $(SRCDIR)/mk/unix.mak
 
 # Extra libraries needed on this system.
 ifndef LIBS.EXE
-  LIBS.EXE += $(LFLAGS.l)dl $(LFLAGS.l)m 
+  LIBS.EXE += $(LFLAGS.l)dl $(LFLAGS.l)m
 endif
 
 # Indicate where special include files can be found.
@@ -68,7 +68,8 @@ endif
 
 # General flags for the linker which are used in any case.
 # <cs-config>
-LFLAGS.GENERAL = $(LFLAGS.L)/usr/local/lib $(LFLAGS.SYSTEM) $(CSTHREAD.LFLAGS)
+LFLAGS.GENERAL = $(LFLAGS.L)/usr/local/lib $(LFLAGS.SYSTEM) \
+$(CSTHREAD.LFLAGS) $(LIBBFD.LFLAGS)
 # </cs-config>
 
 # Flags for the linker which are used when profiling.
@@ -85,7 +86,8 @@ LFLAGS.DLL = -shared -Wl,-soname -Wl,$@
 NASMFLAGS.SYSTEM = -f elf
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS= $(wildcard $(SRCDIR)/libs/cssys/unix/*.cpp) \
+SRC.SYS_CSSYS = \
+  $(filter-out bfdplugins.cpp,$(wildcard $(SRCDIR)/libs/cssys/unix/*.cpp)) \
   $(SRCDIR)/libs/cssys/general/appdir.cpp \
   $(SRCDIR)/libs/cssys/general/apppath.cpp \
   $(SRCDIR)/libs/cssys/general/csprocessorcap.cpp \
@@ -96,9 +98,17 @@ SRC.SYS_CSSYS= $(wildcard $(SRCDIR)/libs/cssys/unix/*.cpp) \
   $(SRCDIR)/libs/cssys/general/printf.cpp \
   $(SRCDIR)/libs/cssys/general/resdir.cpp \
   $(SRCDIR)/libs/cssys/general/runloop.cpp \
-  $(SRCDIR)/libs/cssys/general/scanplugins.cpp \
   $(SRCDIR)/libs/cssys/general/sysroot.cpp \
   $(CSTHREAD.SRC)
+#ifeq (LIBBFD.AVAILABLE,yes)
+  #ifeq (OBJCOPY.AVAILABLE,yes)
+    SRC.SYS_CSSYS += $(SRCDIR)/libs/cssys/general/bfdplugins.cpp
+  #else
+    SRC.SYS_CSSYS += $(SRCDIR)/libs/cssys/general/scanplugins.cpp
+  #endif
+#else
+  SRC.SYS_CSSYS += $(SRCDIR)/libs/cssys/general/scanplugins.cpp
+#endif
 INC.SYS_CSSYS = $(wildcard $(SRCDIR)/libs/cssys/unix/*.h) $(CSTHREAD.INC)
 
 # Use makedep to build dependencies

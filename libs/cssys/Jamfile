@@ -31,7 +31,7 @@ case MACOS_X :
 case * :		# posix/unix/linux mode
   SearchSubdir unix ;
   SearchSubdir general ;
-  SYSFILES = [ Wildcard unix : *.cpp *.h ]
+  SYSFILES = [ Filter [ Wildcard unix : *.cpp *.h ] : bfdplugins.cpp ]
 		appdir.cpp
 		apppath.cpp
 		csprocessorcap.cpp
@@ -46,10 +46,11 @@ case * :		# posix/unix/linux mode
 		resdir.cpp
 		runloop.cpp 
 		sysroot.cpp ;
-  if $(LIBBFD.AVAILABLE) = yes && $(OBJCOPY.AVAILABLE) = "yes"
+  if $(LIBBFD.AVAILABLE) = "yes"
   {
     SYSFILES += bfdplugins.cpp ;
     LibExternalLibs cssys : LIBBFD ;
+    TAG_METADATA_WITH_BFD = yes ;
   }
   else
   {

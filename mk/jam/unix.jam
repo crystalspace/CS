@@ -60,7 +60,7 @@ rule SystemLinkPlugin
   
   Depends $(target) : $(>) ;
   LinkPlugin $(target) : $(>) ;
-  if $(OBJCOPY.AVAILABLE) = "yes" && $(LIBBFD.AVAILABLE) = "yes"
+  if $(OBJCOPY.AVAILABLE) = "yes" && $(TAG_METADATA_WITH_BFD) = "yes"
   {
     ObjTagMetaData $(target) : $($(<)_METAFILE) ;
   }
