@@ -210,6 +210,7 @@ public:
   inline dBodyID GetID() { return bodyID; }
 
   bool MakeStatic (void);
+  bool IsStatic (void) { return statjoint != 0; }
   bool MakeDynamic (void);
 
   bool AttachColliderMesh (iMeshWrapper* mesh,

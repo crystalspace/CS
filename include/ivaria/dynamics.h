@@ -118,8 +118,16 @@ SCF_VERSION (iRigidBody, 0, 0, 1);
  */
 struct iRigidBody : public iBase
 {
+  /** 
+   * Makes a body stop reacting dynamically.  This is especially useful
+   * for environmental objects.  It will also increase speed in some cases
+   * by ignoring all physics for that body
+   */
   virtual bool MakeStatic (void) = 0;
+  /// Returns a static body to a dynamic state
   virtual bool MakeDynamic (void) = 0;
+  /// Tells whether a body has been made static or not
+  virtual bool IsStatic (void) = 0;
 
   /// Add a collider with a associated friction coefficient
   virtual bool AttachColliderMesh (iMeshWrapper* mesh,

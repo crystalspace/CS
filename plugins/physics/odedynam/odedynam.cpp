@@ -121,33 +121,31 @@ void csODEDynamics::Step (float stepsize)
 
 void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
 {
+  iRigidBody *b1 = (iRigidBody *)dBodyGetData (dGeomGetBody (o1));
+  iRigidBody *b2 = (iRigidBody *)dBodyGetData (dGeomGetBody (o2));
+
+  if (b1->IsStatic() && b2->IsStatic()) return;
+
   dContact contact[10];
   int a = dCollide (o1, o2, 10, &(contact[0].geom), sizeof (dContact));
-
   if (a > 0) 
   {
     /* there is only 1 actual body per set */
-    dGeomID t1 = (dGeomID)dGeomGetData (contact[0].geom.g1);
-    dGeomID t2 = (dGeomID)dGeomGetData (contact[0].geom.g2);
-    iRigidBody *b1 = (iRigidBody *)dBodyGetData (dGeomGetBody(t1));
-    iRigidBody *b2 = (iRigidBody *)dBodyGetData (dGeomGetBody(t2));
 
     b1->Collision (b2);
     b2->Collision (b1);
 
     for( int i=0; i<a; i++ )
     {
-      dGeomID t1 = (dGeomID)dGeomGetData (contact[i].geom.g1);
-      dGeomID t2 = (dGeomID)dGeomGetData (contact[i].geom.g2);	
-      float *f1 = (float*)dGeomGetData (t1);
-      float *f2 = (float*)dGeomGetData (t2);
+      float *f1 = (float *)dGeomGetData (contact[i].geom.g1);
+      float *f2 = (float *)dGeomGetData (contact[i].geom.g2);	
       
       contact[i].surface.mode = dContactBounce;
       contact[i].surface.mu = f1[0]*f2[0];
       contact[i].surface.bounce = f1[1]*f2[1];
       dJointID c = dJointCreateContact ( ((csODEDynamicSystem*)data)
     	  ->GetWorldID(), contactjoints,contact+i );
-      dJointAttach (c, dGeomGetBody(t1), dGeomGetBody(t2));
+      dJointAttach (c, dGeomGetBody(o1), dGeomGetBody(o2));
     }
   }
   return;
@@ -539,6 +537,7 @@ csODERigidBody::csODERigidBody (csODEDynamicSystem* sys)
   bodyID = dBodyCreate (dynsys->GetWorldID());
   dBodySetData (bodyID, this);
   groupID = dCreateGeomGroup (dynsys->GetSpaceID());
+  dGeomSetBody (groupID, bodyID);
   statjoint = 0;
 
   mesh = NULL;
@@ -618,11 +617,10 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
   dGeomSetBody (id, bodyID);
   dGeomGroupAdd (groupID, id);
 
-  dGeomSetData (gid,(void*)id);
   float *f = new float[2];
   f[0] = friction;
   f[1] = elasticity;
-  dGeomSetData (id, (void*)f);
+  dGeomSetData (gid, (void*)f);
 
   return true;
 }
@@ -666,11 +664,10 @@ bool csODERigidBody::AttachColliderCylinder (float length, float radius,
   dGeomSetBody (id, bodyID);
   dGeomGroupAdd (groupID, id);
 
-  dGeomSetData (gid,(void*)id);
   float *f = new float[2];
   f[0] = friction;
   f[1] = elasticity;
-  dGeomSetData (id, (void*)f);
+  dGeomSetData (gid, (void*)f);
 
   return true;
 }
@@ -714,11 +711,10 @@ bool csODERigidBody::AttachColliderBox (csVector3 size,
   dGeomSetBody (id, bodyID);
   dGeomGroupAdd (groupID, id);
  
-  dGeomSetData (gid, (void*)id);
   float *f = new float[2];
   f[0] = friction;
   f[1] = elasticity;
-  dGeomSetData (id, (void*)f);
+  dGeomSetData (gid, (void*)f);
 
   return true;
 }
@@ -752,11 +748,10 @@ bool csODERigidBody::AttachColliderSphere (float radius, const csVector3 &offset
   dGeomSetBody (id, bodyID);
   dGeomGroupAdd (groupID, id);
 
-  dGeomSetData (gid, (void*)id);
   float *f = new float[2];
   f[0] = friction;
   f[1] = elasticity;
-  dGeomSetData (id, (void*)f);
+  dGeomSetData (gid, (void*)f);
 
   return true;
 }
