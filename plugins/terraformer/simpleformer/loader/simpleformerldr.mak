@@ -4,7 +4,7 @@ DESCRIPTION.simpleformerldr = Crystal Space simple terraformer loader
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make simpleformerldr$"
+  $(NEWLINE)echo $"  make simpleformerldr$" \
   $(NEWLINE)echo $"                    Make the $(DESCRIPTION.simpleformerldr)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
