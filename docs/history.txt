@@ -1,6 +1,26 @@
 The history order has been reversed so that new features are at the top.
 
+21-Jan-2001
+	- Martin Geisse moved the following modules to the new config system:
+	    - Glide renderer/canvas.
+	    - DirectX renderer/canvas.
+	    - Null renderer.
+	    - OpenGL renderer/canvas.
+	    - Software renderer.
+	- Wouter Wijngaards added intersection point caching to the
+	  procedural sky. Speed improvement is only 10%, using several
+	  Megs of memory.
+20-Jan-2001
+	- Martin Geisse removed the remaining entries about the DirectX 5
+	  renderer from the config files.
+	- Wyatt Miler fixed compiling problems with Codewarrior 6.
+	  Also a temporary hack for Codewarrior 6. CW 4&5 users should see
+	  if this still works for you.
+	- Philip Wyett added include for csgeom/transfrm.h to rain and
+	  snow plugins.
 19-Jan-2001
+	- Martin Geisse moved the following modules to the new config system:
+	    - Sound modules
 	- Fixed a 'delete' vs 'new[]' bug in csPolygonSet and csSprite3D.
 	- Fixed the bug which Martin Geisse reported with sprite frames
 	  and actions. They were contained within a csNamedObjVector
