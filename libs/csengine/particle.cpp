@@ -58,8 +58,9 @@ csParticleSystem :: ~csParticleSystem()
   for(int i=0; i<num_particles; i++)
     if(part_2d[i])
     {
-      csWorld::current_world->RemoveSprite(part_2d[i]);
-      //delete part_2d[i]; done in above call
+      //both lines should do the same.
+      //csWorld::current_world->RemoveSprite(part_2d[i]);
+      delete part_2d[i]; 
     }
   delete[] part_2d;
 }
@@ -166,6 +167,8 @@ void csParticleSystem :: Update(time_t elapsed_time)
     change *= elapsed_seconds;
     for(i=0; i<num_particles; i++)
       part_2d[i]->AddColor(change);
+    if(num_particles > 0 && !part_2d[0]->HasLighting())
+      SetLighting(false); // to copy color_init towards color in sprite2d.
   }
   if(change_size)
   {
