@@ -24,6 +24,7 @@
 #include "csinput/csinput.h"
 #include "cssys/unix/iunix.h"
 #include "csutil/csrect.h"
+#include "csutil/inifile.h"
 #include "isystem.h"
 #include "itexture.h"
 
@@ -34,14 +35,18 @@ EXPORT_CLASS_TABLE (glx2d)
     "GL/X OpenGL 2D graphics driver for Crystal Space")
 EXPORT_CLASS_TABLE_END
 
+#define DEF_OGLDISP "crystalspace.graphics2d.glx.disp.empty"
+
 // csGraphics2DGLX function
 csGraphics2DGLX::csGraphics2DGLX (iBase *iParent) :
   csGraphics2DGLCommon (iParent), xim (NULL), cmap (0)
 {
+
 }
 
 bool csGraphics2DGLX::Initialize (iSystem *pSystem)
 {
+
   if (!csGraphics2DGLCommon::Initialize (pSystem))
     return false;
 
@@ -53,6 +58,27 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
     return false;
   }
 
+  csIniFile *config = new csIniFile( "opengl.cfg" );
+  
+  dispdriver = NULL;
+  char *strDriver;
+  if ( config ){  
+  if ( (strDriver = config->GetStr( "Display", "Driver", DEF_OGLDISP )) ){
+      dispdriver = LOAD_PLUGIN( pSystem, strDriver, iOpenGLDisp );
+      if ( !dispdriver ){
+          printf( "Could not create an instance of %s ! Using NULL instead. \n", strDriver );
+      }else{
+          if ( !dispdriver->open() ){
+	      printf( "open of displaydriver %s failed !\n", strDriver );
+	      return false;
+	  }
+      }
+  }
+  CHK( delete config );
+  }else{
+   printf( "could not opengl.cfg, will use NULL as displaydriver\n" );
+  }
+  
   Screen* screen_ptr;
 
   // Query system settings
@@ -146,9 +172,13 @@ csGraphics2DGLX::~csGraphics2DGLX ()
 {
   // Destroy your graphic interface
   Close ();
-  if (UnixSystem)
+  if (UnixSystem){
     UnixSystem->DecRef ();
+  }
   CHKB (delete [] Memory);
+  if ( dispdriver ){
+      dispdriver->DecRef();
+  }
 }
 
 bool csGraphics2DGLX::Open(const char *Title)
@@ -280,6 +310,10 @@ void csGraphics2DGLX::Close(void)
   {
     XDestroyWindow (dpy, window);
     window = 0;
+  }
+
+  if ( dispdriver ){
+      dispdriver->close();
   }
   // Close your graphic interface
   csGraphics2DGLCommon::Close ();

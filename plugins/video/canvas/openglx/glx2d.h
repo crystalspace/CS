@@ -25,6 +25,8 @@
 
 #include <GL/glx.h>
 
+#include "iogldisp.h"
+
 #define XK_MISCELLANY 1
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -50,6 +52,9 @@ class csGraphics2DGLX : public csGraphics2DGLCommon
   XVisualInfo *active_GLVisual;
   GLXContext active_GLContext;
 
+  // we are using a specific displaydriver
+  iOpenGLDisp *dispdriver;
+  
   // Window colormap
   Colormap cmap;
 
