@@ -2322,7 +2322,7 @@ void csLoader::TokenError (const char *Object)
 {
   ReportError (
     "crystalspace.maploader.parse.badtoken",
-    "Token '%s' not found while parsing a %s!",
+    "Token '%s' not found while parsing %s!",
     csGetLastOffender (), Object);
 }
 
