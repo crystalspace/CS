@@ -176,6 +176,7 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *main_texman,
           (csTextureHandleSoftware *)texman->RegisterTexture (im, CS_TEXTURE_2D | CS_TEXTURE_PROC);
         dummy->Prepare();
 	dummy->DecRef();
+        im->DecRef ();
       }
 
 #ifdef CS_DEBUG
