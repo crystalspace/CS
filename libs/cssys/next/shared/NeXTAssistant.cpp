@@ -92,7 +92,11 @@ NeXTAssistant::~NeXTAssistant()
 iEventQueue* NeXTAssistant::get_event_queue()
 {
   if (event_queue == 0 && registry != 0)
+  {
     event_queue = CS_QUERY_REGISTRY(registry, iEventQueue);
+    if (event_queue != 0)
+      event_queue->IncRef();
+  }
   return event_queue;
 }
 

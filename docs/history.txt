@@ -143,6 +143,29 @@ The history order is reversed so that new features are at the top.
 	  modules (such as VFS, soft3d, etc.) would get linked into the
 	  application.  Technically speaking, without static.mak, the derived
 	  cslibref.cpp file was never generated.
+	- Eric Sunshine fixed a bug in csInitializer::CreateEnvironment() where
+	  it would leak an iObjectRegistry if any of the invoked "creation"
+	  functions failed.
+	- Eric Sunshine changed the order of application initialization so that
+	  csPlatformStartup() is now called as the final step of
+	  csInitializer::CreateEnvironment(), rather than being called by
+	  csInitializer::Initialize().  The consequence of this change is that
+	  csPlatformStartup() is now called considerably earlier in the startup
+	  sequence, thus any platform-specific "helper" objects published by
+	  csPlatformStartup() will now be available in the later initialization
+	  step when plugins are loaded.  This change was necessary since some
+	  plugins expect the "helper" objects to be available at load time.
+	- Eric Sunshine fixed a nasty bug in csEventQueue where, at destruction
+	  time, it would unconditionally delete all event outlets even if other
+	  objects held references to those outlets.
+	- Eric Sunshine fixed the documentation for
+	  iEventQueue::CreateEventOutlet() so that it informs the caller that
+	  it is the caller's responsibility to send DecRef() to the outlet
+	  when no longer needed.
+	- Eric Sunshine fixed a bug in NeXTAssistant where it failed to send
+	  IncRef() to the shared event queue which it caches even though it was
+	  sending DecRef() at destruction time (thus stealing some other
+	  object's reference to the event queue).
 11-Oct-2001
 	- Moved the plugin manager implementation out of the system driver
 	  into csPluginManager (in csutil/plugmgr.h). Modified

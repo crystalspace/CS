@@ -85,6 +85,7 @@ public:
    * <li>CreateCommandLineParser()
    * <li>CreateConfigManager()
    * <li>CreateInputDrivers()
+   * <li>csPlatformStartup()
    * </ul>
    * This function will return the pointer to the object registry where
    * all the created objects will be registered.
@@ -240,7 +241,9 @@ public:
       CSMASK_JoystickUp);
 
   /**
-   * Destroy the application.
+   * Destroy the application.<p>
+   * Undo all of the initialization done by CreateEnvironment() or any of the
+   * other setup functions.
    */
   static void DestroyApplication (iObjectRegistry*);
 };

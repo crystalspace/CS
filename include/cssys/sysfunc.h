@@ -50,9 +50,10 @@ extern bool csDefaultRunLoop(iObjectRegistry*);
  * processing.  For instance, on some platforms, platform-specific "helper"
  * objects may be placed in the shared-object registry for use by other
  * platform-specific components.  Typically, this function is automatically
- * called by the higher-level csInitializer::Initialize(), however if you are
- * performing application initialization manually, you should call it yourself.
- * Returns `true' if startup initialization was successful, otherwise `false'.
+ * called by the higher-level csInitializer::CreateEnvironment(), however if
+ * you are performing application initialization manually, you should call it
+ * yourself.  Returns `true' if startup initialization was successful,
+ * otherwise `false'.
  */
 extern bool csPlatformStartup(iObjectRegistry*);
 

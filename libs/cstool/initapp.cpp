@@ -71,16 +71,25 @@ static iEventHandler* installed_event_handler = NULL;
 
 iObjectRegistry* csInitializer::CreateEnvironment ()
 {
-  if (!InitializeSCF ()) return NULL;
-  iObjectRegistry* object_reg = CreateObjectRegistry ();
-  if (!object_reg) return NULL;
-  if (!CreatePluginManager (object_reg)) return NULL;
-  if (!CreateEventQueue (object_reg)) return NULL;
-  if (!CreateVirtualClock (object_reg)) return NULL;
-  if (!CreateCommandLineParser (object_reg)) return NULL;
-  if (!CreateConfigManager (object_reg)) return NULL;
-  if (!CreateInputDrivers (object_reg)) return NULL;
-  return object_reg;
+  iObjectRegistry* reg = 0;
+  if (InitializeSCF())
+  {
+    iObjectRegistry* r = CreateObjectRegistry();
+    if (r != 0)
+    {
+      if (CreatePluginManager(r) &&
+          CreateEventQueue(r) &&
+          CreateVirtualClock(r) &&
+          CreateCommandLineParser(r) &&
+          CreateConfigManager(r) &&
+          CreateInputDrivers(r) &&
+	  csPlatformStartup(r))
+        reg = r;
+      else
+        r->DecRef();
+    }
+  }
+  return reg;
 }
 
 bool csInitializer::InitializeSCF ()
@@ -109,84 +118,81 @@ bool csInitializer::InitializeSCF ()
 
 iObjectRegistry* csInitializer::CreateObjectRegistry ()
 {
-  csObjectRegistry* object_reg = new csObjectRegistry ();
-  global_sys = new SysSystemDriver (object_reg);
-  return object_reg;
+  csObjectRegistry* r = new csObjectRegistry ();
+  global_sys = new SysSystemDriver (r);
+  return r;
 }
 
-iPluginManager* csInitializer::CreatePluginManager (
-	iObjectRegistry* object_reg)
+iPluginManager* csInitializer::CreatePluginManager (iObjectRegistry* r)
 {
-  csPluginManager* plugmgr = new csPluginManager (object_reg);
-  object_reg->Register (plugmgr, NULL);
+  csPluginManager* plugmgr = new csPluginManager (r);
+  r->Register (plugmgr, NULL);
   plugmgr->DecRef ();
   return plugmgr;
 }
 
-iEventQueue* csInitializer::CreateEventQueue (iObjectRegistry* object_reg)
+iEventQueue* csInitializer::CreateEventQueue (iObjectRegistry* r)
 {
   // Register the shared event queue.
-  iEventQueue* q = new csEventQueue (object_reg);
-  object_reg->Register (q, NULL);
+  iEventQueue* q = new csEventQueue (r);
+  r->Register (q, NULL);
   q->DecRef();
   return q;
 }
 
-bool csInitializer::CreateInputDrivers (iObjectRegistry* object_reg)
+bool csInitializer::CreateInputDrivers (iObjectRegistry* r)
 {
   // Register some generic pseudo-plugins.  (Some day these should probably
   // become real plugins.)
-  iKeyboardDriver* k = new csKeyboardDriver (object_reg);
-  iMouseDriver*    m = new csMouseDriver    (object_reg);
-  iJoystickDriver* j = new csJoystickDriver (object_reg);
-  object_reg->Register (k, NULL);
-  object_reg->Register (m, NULL);
-  object_reg->Register (j, NULL);
+  iKeyboardDriver* k = new csKeyboardDriver (r);
+  iMouseDriver*    m = new csMouseDriver    (r);
+  iJoystickDriver* j = new csJoystickDriver (r);
+  r->Register (k, NULL);
+  r->Register (m, NULL);
+  r->Register (j, NULL);
   j->DecRef();
   m->DecRef();
   k->DecRef();
   return true;
 }
 
-iVirtualClock* csInitializer::CreateVirtualClock (iObjectRegistry* object_reg)
+iVirtualClock* csInitializer::CreateVirtualClock (iObjectRegistry* r)
 {
   csVirtualClock* vc = new csVirtualClock ();
-  object_reg->Register (vc, NULL);
+  r->Register (vc, NULL);
   vc->DecRef ();
   return vc;
 }
 
-iCommandLineParser* csInitializer::CreateCommandLineParser (
-  	iObjectRegistry* object_reg)
+iCommandLineParser* csInitializer::CreateCommandLineParser(iObjectRegistry* r)
 {
   iCommandLineParser* cmdline = new csCommandLineParser ();
-  object_reg->Register (cmdline, NULL);
+  r->Register (cmdline, NULL);
   cmdline->DecRef ();
   return cmdline;
 }
 
-iConfigManager* csInitializer::CreateConfigManager (
-	iObjectRegistry* object_reg)
+iConfigManager* csInitializer::CreateConfigManager (iObjectRegistry* r)
 {
   iConfigFile* cfg = new csConfigFile ();
   iConfigManager* Config = new csConfigManager (cfg, true);
-  object_reg->Register (Config, NULL);
+  r->Register (Config, NULL);
   Config->DecRef ();
   cfg->DecRef ();
   return Config;
 }
 
-bool csInitializer::SetupCommandLineParser (iObjectRegistry* object_reg,
-  	int argc, const char* const argv[])
+bool csInitializer::SetupCommandLineParser (
+  iObjectRegistry* r, int argc, const char* const argv[])
 {
-  iCommandLineParser* c = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+  iCommandLineParser* c = CS_QUERY_REGISTRY (r, iCommandLineParser);
   CS_ASSERT (c != NULL);
   c->Initialize (argc, argv);
   return true;
 }
 
-bool csInitializer::SetupConfigManager (iObjectRegistry* object_reg,
-	const char* configName)
+bool csInitializer::SetupConfigManager (
+  iObjectRegistry* r, const char* configName)
 {
   if (config_done) return true;
 
@@ -203,7 +209,7 @@ bool csInitializer::SetupConfigManager (iObjectRegistry* object_reg,
   // can be loaded. At the end, we make the user-and-application-specific
   // config file the dynamic one.
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (r, iPluginManager);
   iVFS* VFS = CS_QUERY_PLUGIN (plugin_mgr, iVFS);
   if (!VFS)
   {
@@ -211,10 +217,10 @@ bool csInitializer::SetupConfigManager (iObjectRegistry* object_reg,
   	  CS_FUNCID_VFS, iVFS);
     if (!VFS)
       return false;
-    object_reg->Register (VFS);
+    r->Register (VFS);
   }
 
-  iConfigManager* Config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  iConfigManager* Config = CS_QUERY_REGISTRY (r, iConfigManager);
   iConfigFile* cfg = Config->GetDynamicDomain ();
   Config->SetDomainPriority (cfg, iConfigManager::ConfigPriorityApplication);
 
@@ -229,7 +235,7 @@ bool csInitializer::SetupConfigManager (iObjectRegistry* object_reg,
 
   // look if the user-specific config domain should be used
   {
-    csConfigAccess cfgacc (object_reg, "/config/system.cfg");
+    csConfigAccess cfgacc (r, "/config/system.cfg");
     if (cfgacc->GetBool ("System.UserConfig", true))
     {
       // open the user-specific, application-neutral config domain
@@ -252,14 +258,14 @@ bool csInitializer::SetupConfigManager (iObjectRegistry* object_reg,
   return true;
 }
 
-bool csInitializer::RequestPlugins (iObjectRegistry* object_reg, ...)
+bool csInitializer::RequestPlugins (iObjectRegistry* r, ...)
 {
-  if (!config_done) SetupConfigManager (object_reg, NULL);
+  if (!config_done) SetupConfigManager (r, NULL);
 
-  csPluginLoader* plugldr = new csPluginLoader (object_reg);
+  csPluginLoader* plugldr = new csPluginLoader (r);
 
   va_list arg;
-  va_start (arg, object_reg);
+  va_start (arg, r);
   char* plugName = va_arg (arg, char*);
   while (plugName != NULL)
   {
@@ -277,17 +283,17 @@ bool csInitializer::RequestPlugins (iObjectRegistry* object_reg, ...)
   return rc;
 }
 
-bool csInitializer::Initialize (iObjectRegistry* object_reg)
+bool csInitializer::Initialize (iObjectRegistry* r)
 {
-  if (!config_done) SetupConfigManager (object_reg, NULL);
-  return csPlatformStartup (object_reg) && global_sys->Initialize ();
+  if (!config_done) SetupConfigManager (r, NULL);
+  return global_sys->Initialize ();
 }
 
-bool csInitializer::SetupEventHandler (iObjectRegistry* object_reg,
-	iEventHandler* evhdlr, unsigned int eventmask)
+bool csInitializer::SetupEventHandler (
+  iObjectRegistry* r, iEventHandler* evhdlr, unsigned int eventmask)
 {
   CS_ASSERT(installed_event_handler == 0);
-  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  iEventQueue* q = CS_QUERY_REGISTRY (r, iEventQueue);
   if (q)
   {
     q->RegisterListener (evhdlr, eventmask);
@@ -312,39 +318,39 @@ SCF_IMPLEMENT_IBASE (csAppEventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-bool csInitializer::SetupEventHandler (iObjectRegistry* object_reg,
-	csEventHandlerFunc evhdlr_func, unsigned int eventmask)
+bool csInitializer::SetupEventHandler (
+  iObjectRegistry* r, csEventHandlerFunc evhdlr_func, unsigned int eventmask)
 {
   csAppEventHandler* evhdlr = new csAppEventHandler (evhdlr_func);
-  return SetupEventHandler (object_reg, evhdlr, eventmask);
+  return SetupEventHandler (r, evhdlr, eventmask);
 }
 
-bool csInitializer::OpenApplication (iObjectRegistry* object_reg)
+bool csInitializer::OpenApplication (iObjectRegistry* r)
 {
   // Pass the open event to all interested listeners.
   csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemOpen);
-  iEventQueue* EventQueue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  iEventQueue* EventQueue = CS_QUERY_REGISTRY (r, iEventQueue);
   CS_ASSERT (EventQueue != NULL);
   EventQueue->Dispatch (Event);
   return true;
 }
 
-void csInitializer::CloseApplication (iObjectRegistry* object_reg)
+void csInitializer::CloseApplication (iObjectRegistry* r)
 {
-  // Warn all interested listeners the system is going down
+  // Notify all interested listeners that the system is going down
   csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemClose);
-  iEventQueue* EventQueue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  iEventQueue* EventQueue = CS_QUERY_REGISTRY (r, iEventQueue);
   CS_ASSERT (EventQueue != NULL);
   EventQueue->Dispatch (Event);
 }
 
-void csInitializer::DestroyApplication (iObjectRegistry* object_reg)
+void csInitializer::DestroyApplication (iObjectRegistry* r)
 {
-  CloseApplication (object_reg);
-  csPlatformShutdown (object_reg);
+  CloseApplication (r);
+  csPlatformShutdown (r);
   if (installed_event_handler)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    iEventQueue* q = CS_QUERY_REGISTRY (r, iEventQueue);
     q->RemoveListener (installed_event_handler);
   }
   delete global_sys;
@@ -352,11 +358,11 @@ void csInitializer::DestroyApplication (iObjectRegistry* object_reg)
   // Explicitly clear the object registry before its destruction since some
   // objects being cleared from it may need to query it for other objects, and
   // such queries can fail (depending upon the compiler) if they are made while
-  // the registry itself it being destroyed.  Furthermore, such objects may may
-  // SCF queries as they are destroyed, so this must occur before SCF is
+  // the registry itself it being destroyed.  Furthermore, such objects may
+  // make SCF queries as they are destroyed, so this must occur before SCF is
   // finalized (see below).
-  object_reg->Clear ();
-  object_reg->DecRef ();
+  r->Clear ();
+  r->DecRef ();
 
   iSCF::SCF->Finish();
 }

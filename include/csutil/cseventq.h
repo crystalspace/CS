@@ -52,29 +52,33 @@ private:
   };
   CS_TYPEDEF_GROWING_ARRAY(ListenerVector, Listener);
 
-  // The array of all allocated event outlets.
+  // The array of all allocated event outlets.  *NOTE* It is not the
+  // responsibility of this class to free the contained event outlets, thus
+  // this class does not override FreeItem().  Instead, it is the
+  // responsibility of the caller of iEventQueue::CreateEventOutlet() to send
+  // the outlet a DecRef() message (which, incidentally, will result in the
+  // automatic removal of the outlet from this list if no references to the
+  // outlet remain).
   class EventOutletsVector : public csVector
   {
   public:
-    EventOutletsVector () : csVector (16, 16) {}
-    virtual ~EventOutletsVector () { DeleteAll (); }
-    virtual bool FreeItem (csSome Item)
-      { delete (csEventOutlet *)Item; return true; }
-    csEventOutlet *Get (int idx)
-      { return (csEventOutlet *)csVector::Get (idx); }
+    EventOutletsVector() : csVector (16, 16) {}
+    virtual ~EventOutletsVector () { DeleteAll(); }
+    csEventOutlet* Get(int i)
+      { return (csEventOutlet*)csVector::Get(i); }
   };
 
   // The array of all allocated event cords.
   class EventCordsVector : public csVector
   {
   public:
-    EventCordsVector () : csVector (16, 16) {}
-    virtual ~EventCordsVector () { DeleteAll (); }
-    virtual bool FreeItem (csSome Item)
-      { delete (csEventCord *)Item; return true; }
-    csEventCord *Get (int idx)
-      { return (csEventCord *)csVector::Get (idx); }
-    int Find (int Category, int SubCategory);
+    EventCordsVector() : csVector (16, 16) {}
+    virtual ~EventCordsVector() { DeleteAll(); }
+    virtual bool FreeItem(csSome p)
+      { ((csEventCord*)p)->DecRef(); return true; }
+    csEventCord* Get(int i)
+      { return (csEventCord*)csVector::Get(i); }
+    int Find(int Category, int SubCategory);
   };
 
   // Shared-object registry
