@@ -296,7 +296,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
     triangle[2].x = p3->x * iz + rview.shift_x;
     triangle[2].y = p3->y * iz + rview.shift_y;
 
-    if (!rview.view->Clip (triangle, clipped_triangle, 3, rescount))
+    if (!rview.view->Clip (triangle, 3, clipped_triangle, rescount))
       continue;
     poly.num = rescount;
 
