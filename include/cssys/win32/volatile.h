@@ -36,7 +36,9 @@
   #define ZLIB_DLL
 #endif
 
-//  #define DO_DINPUT_KEYBOARD // undefine this if you have problems with keyboard handling
+// if you don't want to use direct input, comment this out
+// keyboard handler will default to window message handling.
+#define DO_DINPUT_KEYBOARD
 
 #if defined(COMP_VC)
 // #ifdef _DEBUG
