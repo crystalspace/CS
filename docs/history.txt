@@ -12,6 +12,10 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+4-Feb-2000
+	- Michael Ewert added new csDVector3 and csDMatrix3 to csgeom.
+	  These are equivalen tto csVector3 and csMatrix3 but they use
+	  'double' instead of 'float'.
 3-Feb-2000
 	- Seth Galbraith changed sprite loading in csParser so that
 	  csSpriteTemplate::MergeTexels is now called to eliminate duplicate
@@ -25,6 +29,61 @@ Short-term cleanups that need to be done:
 	  that they are now implemented via safe and portable bit masks rather
 	  than unsafe and unportable unions.  This fixes the known problems
 	  with big-endian machines without resorting to special-case hackery.
+	- Andrew Zabolotny did a huge update again:
+	    - Re-written csgfxldr library:
+		- Renamed iImageFile to iImage. An iImage not always
+		  originates from a file.
+		- Added paletted images support. On a call to
+		  csImageLoader::Load you can tell loader whenever you want
+		  CS_IMGFMT_PALETTED8 format or CS_IMGFMT_TRUECOLOR
+		  (see iimage.h).
+		- Added alpha channel support. There is a bit called
+		  CS_IMGFMT_ALPHA that can be combined with above to load
+		  RGBA images or paletted + alpha channel separately. Also
+		  there is another "image format" called CS_IMGFMT_NONE
+		  that can be combined with CS_IMGFMT_ALPHA to load just
+		  alpha channel.
+		- Added Heckbert quantization routine. This is a very fast
+		  algorithm for converting truecolor images into paletted
+		  ones (by the way, my routine converts about 3.200.000
+		  pixels/sec on my good old P5/166). The routine is useable
+		  even separately from CS (its not CS-related at all).
+		  No wonder mpeg players are able to compute palette for
+		  MPEG videos in each frame.
+		- Improved SGI image loader support. Now loads encoding-type
+		  3 images too.
+		- Improved most other image loaders. JPEG loader now converts
+		  to 8-bit paletted images internally if required.
+		- Removed PCX write support. Anybody cries? :-)
+		- Added PNG write support. You can write truecolor and
+		  paletted PNG files, just pass an iImage pointer.
+		- FAST! mipmap computation. Removed Blend() method. Only one
+		  MipMap() (of two) method remains. Mipmap step 0 is the
+		  blended image, mipmap step 1 is a 2x2 scaled texture,
+		  2 - 4x4, 3 - 8x8. When mipmaps are scaled down, the average
+		  of 2x2, 4x4, 8x8 blocks of pixels is taken. The speed seems
+		  about 42 256x256 RGB blended mipmaps (level 0) per second.
+		  Level 1,2,3 mipmaps are created much faster naturally
+		  (~150, ~200, ~400 per second).
+	    - Modified the 3D renderers. Just two mipmap modes are
+	      supported: MIPMAP_NICE and MIPMAP_VERYNICE. UGLY and DEFAULT
+	      are gone. Made required modifications to let them work with
+	      the new iImage interface. Added ScreenShot () method to
+	      iGraphics3D interface. Only software renderer implements it
+	      though.
+	    - Changed walktest. Now it does PNG snapshots at any bit depth
+	      (with software renderer only). The OpenGL driver could
+	      possibly use glGetPixels() for this.
+	    - Changed csparser. Removed lots of csWorld * passed all over
+	      the place. Made one global static csWorld * variable instead.
+	      Moved all private methods under "private:", just three methods
+	      are left to be public.
+	- Thomas Hieber fixed several of the apps after Andrew's big changes.
+	- Andrew implemented a cool Ascii-Art {R} {tm} display. -d or
+	  --display options. Default size 79x24, you can enlarge for more
+	  pleasant results if you use a larger console (with -d79,40 for
+	  example).
+	- Eric Sunshine fixed portablility options in terrain engine.
 2-Feb-2000
 	- Large update to terrain engine from Alex Pfaffe.
 	    - Now renders 3000 triangles instead of only about 1000.
