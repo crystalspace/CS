@@ -203,7 +203,6 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, int num)
       else
         ii = i;
       const csPlane3& poly_plane = *polygons[ii]->GetPolyPlane ();
-DB((MSG_DEBUG_0, "SP: %d: pl=%.3f,%.3f,%.3f,%.3f\n", ii, poly_plane.A(),poly_plane.B(),poly_plane.C(),poly_plane.D()));
       int front = 0, back = 0;
       int splits = 0;
       for (j = 0 ; j < n ; j++)
@@ -213,16 +212,6 @@ DB((MSG_DEBUG_0, "SP: %d: pl=%.3f,%.3f,%.3f,%.3f\n", ii, poly_plane.A(),poly_pla
 	else
 	  jj = j;
         int c = polygons[jj]->Classify (poly_plane);
-#if 0
-{
-int kk;
-csPolygon3D* p = (csPolygon3D*)polygons[jj];
-for (kk = 0 ; kk < p->GetNumVertices (); kk++)
-CsPrintf (MSG_DEBUG_0, "    %d: %.3f,%.3f,%.3f\n", kk, p->Vwor(kk).x,
-p->Vwor(kk).y, p->Vwor(kk).z);
-}
-#endif
-DB((MSG_DEBUG_0, "    %d: RC %d\n", jj, c));
 	if (c == POL_FRONT) front++;
 	else if (c == POL_BACK) back++;
 	else if (c == POL_SPLIT_NEEDED) splits++;
@@ -237,7 +226,10 @@ DB((MSG_DEBUG_0, "    %d: RC %d\n", jj, c));
       float penalty = balance_factor * balance_penalty + split_factor * split_penalty;
 
 DB((MSG_DEBUG_0, "    pen=%f least=%f\n", penalty, least_penalty));
-      if (penalty < least_penalty)
+      // Add EPSILON to penalty before comparing to avoid system dependent
+      // results because a cost result is ALMOST the same.
+      // This is to try to get the same octree on all platforms.
+      if ((penalty+EPSILON) < least_penalty)
       {
 DB((MSG_DEBUG_0, "    SEL=%d\n", ii));
         least_penalty = penalty;
@@ -266,8 +258,6 @@ DB((MSG_DEBUG_0, "num=%d\n", num))
 
   csPolygonInt* split_poly = polygons[SelectSplitter (polygons, num)];
   node->splitter = *(split_poly->GetPolyPlane ());
-DB((MSG_DEBUG_0, "  sp plane=%.3f,%.3f,%.3f,%.3f\n", node->splitter.A (),
-	node->splitter.B (), node->splitter.C (), node->splitter.D ()))
 
   // Now we split the node according to the plane of that polygon.
   csPolygonInt** front_poly = new csPolygonInt* [num];
@@ -277,16 +267,6 @@ DB((MSG_DEBUG_0, "  sp plane=%.3f,%.3f,%.3f,%.3f\n", node->splitter.A (),
   for (i = 0 ; i < num ; i++)
   {
     int c = polygons[i]->Classify (node->splitter);
-DB((MSG_DEBUG_0, "  cl pol %d -> %d\n", i, c))
-#if 0
-{
-int j;
-csPolygon3D* p = (csPolygon3D*)polygons[i];
-for (j = 0 ; j < p->GetNumVertices () ; j++)
-CsPrintf (MSG_DEBUG_0, "    %d: %.3f,%.3f,%.3f\n", j, p->Vwor (j).x,
-p->Vwor (j).y, p->Vwor (j).z);
-}
-#endif
     switch (c)
     {
       case POL_SAME_PLANE:
