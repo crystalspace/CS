@@ -25,7 +25,8 @@
 #include "iengine/mesh.h"
 #include "iengine/sector.h"
 
-/** @file This defines the plugin interface for the Crystal Space
+/** @file 
+    This defines the plugin interface for the Crystal Space
     Virtual Object System (VOS) Abstract 3D Layer plugin (A3DL).  VOS
     is an object-oriented distributed network architechture; A3DL is a
     set of extensions to VOS to describe 3D scenes.  This plugin makes

@@ -78,6 +78,9 @@ chronological order.
 	- Eric Sunshine removed the unused and incomplete PicoGUI plugin and
 	  test program.  For easy revival, they have been tagged in CVS with
 	  PICOGUI_OBSOLETE.
+	- res removed ivaria/gconnect.h and gserver.h which were only used to
+	  interface PicoGUI.
+	- res made a small documentation fix to vosa3dl.h.
 17-Apr-2004
 	- Aren Blondahl updated map2cs to have newly optimized render priority
 	  on entities ('priority' tag in the .map) and fixed map2cs to support
