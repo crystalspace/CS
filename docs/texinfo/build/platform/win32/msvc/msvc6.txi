@@ -3,6 +3,11 @@
 @subsubsection Microsoft Visual C++ 6
 @cindex Windows, Building
 
+@noindent
+@emph{Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
+@noindent
+@emph{Last updated 25 June 2003.}
+
 In order to successfully compile the Crystal Space 3D Software Development
 Kit (@sc{sdk}), you will need a copy of @emph{Microsoft Developer Studio 6}
 or the stand alone version of @emph{Microsoft Visual C++ 6}, with additionally
@@ -15,10 +20,6 @@ general.  You can subscribe and then post a message to the Crystal Space
 mailing list.  To subscribe see the following site and fill in the form:
 
 @uref{http://lists.sourceforge.net/lists/listinfo/crystal-main}
-
-Alternatively you can email the Win32 port maintainer directly at the following:
-
-@email{philipwyett@@dsl.pipex.com}.
 
 @subsubheading Required/Optional External Libraries and Software
 

@@ -16,6 +16,9 @@ The history order is reversed so that new features are at the top.
 	  typemap to convert csHashMapReversible to a native Perl hash type.
 	- Jorrit did a minor change to emit again to properly change the
 	  object model when some of the attributes change.
+        - Philip Wyett removed the references in the docs that offered
+          people to contact me directly re MSVC related build issues and
+          updated authors info to indicate my current inactive status.
 24-Jun-2003
 	- Oktal added an iGraphicsMemory interface with which to access
 	  the csGraphicsMemory plugin.

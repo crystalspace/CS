@@ -181,8 +181,9 @@ editor.
 @item
 Philip Wyett (@email{philipwyett@@dsl.pipex.com})
 
-Philip has taken over from Frank O'Connor as the Windows port maintainer.
-He also maintains the instructions for building Crystal Space on Windows.
+Philip took over from Frank O'Connor as the Windows port maintainer.
+He also wrote and maintained the instructions for building Crystal
+Space on Windows. Philip is at this time inactive as a CS developer.
 
 @item
 Andreas Busch (@email{nobita@@t-online.de})
