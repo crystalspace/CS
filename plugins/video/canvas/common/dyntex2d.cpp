@@ -109,7 +109,7 @@ iGraphics2D *csDynamicTexture2D::CreateOffScreenCanvas (int width, int height,
 
 bool csDynamicTexture2D::Open(const char *Title)
 {
-  CsPrintf (MSG_INITIALIZATION, "Crystal Space dynamic texture buffer");
+  CsPrintf (MSG_INITIALIZATION, "Crystal Space dynamic texture buffer\n");
 
   // Open your graphic interface
   if (!csGraphics2D::Open (Title))
