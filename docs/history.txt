@@ -26,6 +26,8 @@ chronological order.
 	      compatible shader for detail textures. Those are relatively 
 	      cheap, but give the illusion of a higher res texture. Applied
 	      to the "mosaic" material(s) in flarge.
+	- res "fixed" csconf.mak for the cs-config changes by having it emit
+	  hardcoded lib dependencies again.
 28-Apr-2004
 	- Eric Sunshine applied a few scripting-related patches from Michael
 	  Franz Aigner <crystal-space@amfranz.com>:

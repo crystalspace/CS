@@ -112,6 +112,66 @@ $(CSCONFIG.EXE): $(CSCONFIG.DEP)
 	@$(CSCONFIG.MAKEFRAG) >> cs-config
 	@echo $"EOF$"					>> cs-config
 	@echo $"}$"					>> cs-config
+	@echo $"# dependencies of CS$"			>> cs-config
+	@echo $"depends()$"				>> cs-config
+	@echo $"{$"					>> cs-config
+	@echo $"    case $$1 in$"			>> cs-config
+	@echo $"        -lcsappframe) DEPS=" -lcstool -lcsutil" ;;$"	>> cs-config
+	@echo $"        -lcsgeom) DEPS=" -lcsutil" ;;$"	>> cs-config
+	@echo $"        -lcsgfx) DEPS=" -lcsgeom -lcsutil" ;;$"	>> cs-config
+	@echo $"        -lcstool) DEPS=" -lcsgfx -lcsgeom -lcsutil" ;;$"	>> cs-config
+	@echo $"        -lcsutil) DEPS=" -$$(CSTHREAD.LFLAGS)" ;;$"	>> cs-config
+	@echo $"        -lcsws) DEPS=" -lcstool -lcsgfx -lcsgeom -lcsutil" ;;$"	>> cs-config
+	@echo $"	*)$"				>> cs-config
+	@echo $"	    CEXFILE=.cex$"		>> cs-config
+	@echo $"	    findcexfile "$$CEXFILE"$"	>> cs-config
+	@echo $"	    if test -r "$$CEXFILE"; then$"	>> cs-config
+	@echo $"		DEPS=`/bin/sh $$CEXFILE --deps`$"	>> cs-config
+	@echo $"	    else$"			>> cs-config
+	@echo $"		DEPS=''$"		>> cs-config
+	@echo $"	    fi$"			>> cs-config
+	@echo $"	    ;;$"			>> cs-config
+	@echo $"    esac$"				>> cs-config
+	@echo $"}$"					>> cs-config
+	@echo $"checklibname()$"			>> cs-config
+	@echo $"{$"					>> cs-config
+	@echo $"    case $$1 in$"			>> cs-config
+	@echo $"     csappframe)$"			>> cs-config
+	@echo $"	addlib "-lcsappframe"$"		>> cs-config
+	@echo $"	;;$"				>> cs-config
+	@echo $"     csgeom)$"				>> cs-config
+	@echo $"	addlib "-lcsgeom"$"		>> cs-config
+	@echo $"	;;$"				>> cs-config
+	@echo $"     csgfx)$"				>> cs-config
+	@echo $"	addlib "-lcsgfx"$"		>> cs-config
+	@echo $"	;;$"				>> cs-config
+	@echo $"     cstool)$"				>> cs-config
+	@echo $"	addlib "-lcstool"$"		>> cs-config
+	@echo $"	;;$"				>> cs-config
+	@echo $"     csutil)$"				>> cs-config
+	@echo $"	addlib "-lcsutil"$"		>> cs-config
+	@echo $"	;;$"				>> cs-config
+	@echo $"     csws)$"				>> cs-config
+	@echo $"	addlib "-lcsws"$"		>> cs-config
+	@echo $"	;;$"				>> cs-config
+	@echo $"    *)$"				>> cs-config
+	@echo $"	findcexfile "$$1"$"		>> cs-config
+	@echo $"	if test -z "$$CEXFILE"; then$"	>> cs-config
+	@echo $"	    echo "Unknown lib: $$1" 1>&2$"	>> cs-config
+	@echo $"            usage 1>&2$"		>> cs-config
+	@echo $"	    exit 1$"			>> cs-config
+	@echo $"	fi$"				>> cs-config
+	@echo $"	addexlib "$$CEXFILE"$"		>> cs-config
+	@echo $"        ;;$"				>> cs-config
+	@echo $"    esac$"				>> cs-config
+	@echo $"}$"					>> cs-config
+	@echo $"liblist="        csappframe $"		>> cs-config
+	@echo $"        csgeom $"			>> cs-config
+	@echo $"        csgfx $"			>> cs-config
+	@echo $"        cstool $"			>> cs-config
+	@echo $"        csutil $"			>> cs-config
+	@echo $"        csws $"				>> cs-config
+	@echo $""					>> cs-config
 	@echo						>> cs-config
 	@cat $(SRCDIR)/scripts/cs-config/cs-config.temppost >> cs-config
 
