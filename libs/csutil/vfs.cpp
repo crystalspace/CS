@@ -1169,7 +1169,7 @@ bool csVFS::PopDir ()
 {
   if (!dirstack.Length ())
     return false;
-  char *olddir = dirstack.Pop ();
+  char *olddir = (char *) dirstack.Pop ();
   bool retcode = ChDir (olddir);
   delete [] olddir;
   return retcode;

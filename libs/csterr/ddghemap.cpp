@@ -63,7 +63,7 @@ bool ddgHeightMap::writeTGN(char *filename, unsigned int base, unsigned int scal
 {
 	FILE *fptr = filename && filename[0] ? fopen(filename,"w") : 0;
 	if (!fptr) {
-		ddgErrorSet(FileWrite,(filename ? filename : "(null)"));
+		ddgErrorSet(FileWrite,(char *) (filename ? filename : "(null)"));
 		goto error;
 	}
 

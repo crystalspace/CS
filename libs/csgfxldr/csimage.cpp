@@ -112,7 +112,7 @@ void box_filter5 (Filter5x5& f, RGBPixel* bm, int x, int y, int w, int h, int* p
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_UNKNOWN (ImageFile)
+IMPLEMENT_UNKNOWN_NODELETE (ImageFile)
   
 BEGIN_INTERFACE_TABLE (ImageFile)
 	IMPLEMENTS_COMPOSITE_INTERFACE (ImageFile)
