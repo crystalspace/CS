@@ -2774,8 +2774,12 @@ bool csEngine::RemoveObject (iBase *object)
     csRef<iSector> sector (SCF_QUERY_INTERFACE (object, iSector));
     if (sector)
     {
-      if (region)
-        region->QueryObject ()->ObjRemove (sector->QueryObject ());
+      // Remove from region it might be in.
+      if (sector->QueryObject ()->GetObjectParent ())
+      {
+	sector->QueryObject ()->GetObjectParent ()->ObjRemove (
+		sector->QueryObject ());
+      }
       sectors.Remove (sector);
       return true;
     }
@@ -2784,7 +2788,12 @@ bool csEngine::RemoveObject (iBase *object)
     csRef<iCameraPosition> cp (SCF_QUERY_INTERFACE (object, iCameraPosition));
     if (cp)
     {
-      if (region) region->QueryObject ()->ObjRemove (cp->QueryObject ());
+      // Remove from region it might be in.
+      if (cp->QueryObject ()->GetObjectParent ())
+      {
+	cp->QueryObject ()->GetObjectParent ()->ObjRemove (
+		cp->QueryObject ());
+      }
       camera_positions.scfiCameraPositionList.Remove (cp);
       return true;
     }
@@ -2793,7 +2802,12 @@ bool csEngine::RemoveObject (iBase *object)
     csRef<iDynLight> dl (SCF_QUERY_INTERFACE (object, iDynLight));
     if (dl)
     {
-      if (region) region->QueryObject ()->ObjRemove (dl->QueryObject ());
+      // Remove from region it might be in.
+      if (dl->QueryObject ()->GetObjectParent ())
+      {
+	dl->QueryObject ()->GetObjectParent ()->ObjRemove (
+		dl->QueryObject ());
+      }
       RemoveDynLight (dl);
       return true;
     }
@@ -2802,7 +2816,12 @@ bool csEngine::RemoveObject (iBase *object)
     csRef<iCollection> col (SCF_QUERY_INTERFACE (object, iCollection));
     if (col)
     {
-      if (region) region->QueryObject ()->ObjRemove (col->QueryObject ());
+      // Remove from region it might be in.
+      if (col->QueryObject ()->GetObjectParent ())
+      {
+	col->QueryObject ()->GetObjectParent ()->ObjRemove (
+		col->QueryObject ());
+      }
       collections.scfiCollectionList.Remove (col);
       return true;
     }
@@ -2811,7 +2830,12 @@ bool csEngine::RemoveObject (iBase *object)
     csRef<iTextureWrapper> txt (SCF_QUERY_INTERFACE (object, iTextureWrapper));
     if (txt)
     {
-      if (region) region->QueryObject ()->ObjRemove (txt->QueryObject ());
+      // Remove from region it might be in.
+      if (txt->QueryObject ()->GetObjectParent ())
+      {
+	txt->QueryObject ()->GetObjectParent ()->ObjRemove (
+		txt->QueryObject ());
+      }
       GetTextureList ()->Remove (txt);
       return true;
     }
@@ -2822,7 +2846,12 @@ bool csEngine::RemoveObject (iBase *object)
         iMaterialWrapper));
     if (mat)
     {
-      if (region) region->QueryObject ()->ObjRemove (mat->QueryObject ());
+      // Remove from region it might be in.
+      if (mat->QueryObject ()->GetObjectParent ())
+      {
+	mat->QueryObject ()->GetObjectParent ()->ObjRemove (
+		mat->QueryObject ());
+      }
       GetMaterialList ()->Remove (mat);
       return true;
     }
@@ -2833,8 +2862,12 @@ bool csEngine::RemoveObject (iBase *object)
         iMeshFactoryWrapper));
     if (factwrap)
     {
-      if (region)
-        region->QueryObject ()->ObjRemove (factwrap->QueryObject ());
+      // Remove from region it might be in.
+      if (factwrap->QueryObject ()->GetObjectParent ())
+      {
+	factwrap->QueryObject ()->GetObjectParent ()->ObjRemove (
+		factwrap->QueryObject ());
+      }
       mesh_factories.Remove (factwrap);
       return true;
     }
@@ -2843,8 +2876,12 @@ bool csEngine::RemoveObject (iBase *object)
     csRef<iMeshWrapper> meshwrap (SCF_QUERY_INTERFACE (object, iMeshWrapper));
     if (meshwrap)
     {
-      if (region)
-        region->QueryObject ()->ObjRemove (meshwrap->QueryObject ());
+      // Remove from region it might be in.
+      if (meshwrap->QueryObject ()->GetObjectParent ())
+      {
+	meshwrap->QueryObject ()->GetObjectParent ()->ObjRemove (
+		meshwrap->QueryObject ());
+      }
       meshes.Remove (meshwrap);
       return true;
     }
@@ -2853,7 +2890,12 @@ bool csEngine::RemoveObject (iBase *object)
     csRef<iPolyTxtPlane> ptp (SCF_QUERY_INTERFACE (object, iPolyTxtPlane));
     if (ptp)
     {
-      if (region) region->QueryObject ()->ObjRemove (ptp->QueryObject ());
+      // Remove from region it might be in.
+      if (ptp->QueryObject ()->GetObjectParent ())
+      {
+	ptp->QueryObject ()->GetObjectParent ()->ObjRemove (
+		ptp->QueryObject ());
+      }
 
       csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (
           GetThingType (),
