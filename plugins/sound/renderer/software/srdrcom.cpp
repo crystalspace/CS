@@ -198,12 +198,17 @@ void csSoundRenderSoftware::Close()
   owning = true;
   downing = true;
   ActivateMixing = false;
+
+  // Must release the lock while we close the driver
+  mixing->Release ();
+
   if (SoundDriver)
   {
     SoundDriver->Close ();
     SoundDriver = 0;
   }
 
+  mixing->LockWait ();
   if (Listener)
   {
     Listener->DecRef();
