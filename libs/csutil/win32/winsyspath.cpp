@@ -137,17 +137,7 @@ bool csPathsIdentical (const char* path1, const char* path2)
 csString csGetAppPath (const char*)
 {
   char appPath[MAX_PATH];
-  GetModuleFileName (0, appPath, sizeof (appPath) - 1);
+  GetModuleFileName (0, appPath, MAX_PATH - 1);
+  appPath[MAX_PATH - 1] = '\0';
   return appPath;
-}
-
-csString csGetAppDir (const char* argv0)
-{
-  char* apppath = csStrNew(csGetAppPath(argv0));
-  char* slash = strrchr (apppath, PATH_SEPARATOR);
-  if (slash)
-    *slash = 0;
-  csString appdir = apppath;
-  delete[] apppath;
-  return appdir;
 }

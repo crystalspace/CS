@@ -6,6 +6,40 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Jan-2004
+	- Eric Sunshine made the following changes to clean up after Matze
+	  changed the return type of csGetConfigDir(), csGetResourceDir(),
+	  csGetAppDir(), and csGetAppPath() to return csString instead of char
+	  const*.
+	    - Completely restored the functionality of the platform-independent
+	      csGetPluginPaths(), most of which Matze had removed for some
+	      reason.  Most importantly, this makes csGetPluginPaths() once
+	      again search for installed Crystal Space plugin modules, which is
+	      something that no longer occurred following Matze's changes, and
+	      would easily account for the fact that external projects on
+	      MacOS/X and Windows -- both of which use this implementation of
+	      csGetPluginPaths() -- could no longer locate any CS plugins.
+	    - Fixed bugs where he was returning 0 (null) for functions which
+	      were supposed to be returning csString.
+	    - Updated Doxygen comments for these functions since they were
+	      quite invalid following Matze's changes.
+	    - Eliminated unnecessary obfuscation in OSXGetDirs.cpp and
+	      winsyspath.cpp which was introduced with this change.
+	    - Upgraded csGetConfigPath() for MacOS/X since Matze forgot to
+	      update this implementation.
+	    - Changed Windows port to use generic/appdir.cpp since
+	      winsyspath.cpp was simply duplicating its functionality.
+	    - Fixed bug: Following Matze's changes, platform-independent
+	      csGetAppPath() would leak `envPATH' string if program was not
+	      found in $PATH.
+	    - Fixed csGetConfigPath() for Unix so that it once again checks
+	      $CRYSTAL/etc for vfs.cfg.  Likewise, csGetPluginPaths() for Unix
+	      once again checks $CRYSTAL/lib.
+	    - Restored error checking code which had been removed, the reomval
+	      of which could potentially cause csPluginPaths::AddOnce() to
+	      misbehave.
+	    - Generally cleaned up the code.  Also eliminated compilation
+	      errors and warnings.
 28-Jan-2004
 	- Eric Sunshine removed a slew of csengine library references from the
 	  project since the csengine library no longer exists.

@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C) 2002 by Matt Reda <mreda@mac.com>
+//	Copyright (C) 2004 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // This library is free software; you can redistribute it and/or modify it
 // under the terms of the GNU Library General Public License as published by
@@ -24,37 +24,29 @@
 //
 //-----------------------------------------------------------------------------
 #include "cssysdef.h"
-#include "csutil/sysfunc.h"
+#include "csutil/syspath.h"
 #include "OSXInstallPath.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "csutil/util.h"
-
 //-----------------------------------------------------------------------------
 // csGetConfigPath
 //-----------------------------------------------------------------------------
-char* csGetConfigPath()
+csString csGetConfigPath()
 {
-  char* buff = new char[FILENAME_MAX];
-  if (OSXGetInstallPath(buff, FILENAME_MAX, PATH_SEPARATOR) == 0)
-  {
-    char const* path = getenv("CRYSTAL");
-    if (path == 0 || *path == 0)
-      strncpy(buff, ".", FILENAME_MAX);
-    else
-      strncpy(buff, path, FILENAME_MAX);
-  }
+  csString path;
+  char buff[FILENAME_MAX];
+  char* env;
 
-  // Add path separator if not present.
-  int const length = strlen(buff);
-  if (buff[length - 1] != PATH_SEPARATOR && length <= FILENAME_MAX - 2)
-  {
-    buff[length] = PATH_SEPARATOR;
-    buff[length + 1] = '\0';
-  }
-  
-  return buff;
+  if (OSXGetInstallPath(buff, FILENAME_MAX, PATH_SEPARATOR))
+    path = buff;
+  else if ((env = getenv("CRYSTAL")) != 0 && *env != '\0')
+    path = env;
+
+  if (path.IsEmpty())
+    path << "." << PATH_SEPARATOR;
+  else if (path[path.Length() - 1] != PATH_SEPARATOR)
+    path << PATH_SEPARATOR;
+
+  return path;
 }
-
-

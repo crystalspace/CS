@@ -30,8 +30,32 @@ csPluginPaths* csGetPluginPaths (const char* argv0)
 {
   csPluginPaths* paths = new csPluginPaths;
 
-  paths->AddOnce(csGetAppDir(argv0), DO_SCAN_RECURSION, "app");
-  paths->AddOnce(csGetResourceDir(argv0), DO_SCAN_RECURSION, "app");
+  csString appPath = csGetAppDir (argv0);
+  csString resPath = csGetResourceDir (argv0);
+  csString configPath = csGetConfigPath ();
+  
+  // Don't add "/" since it won't work on Windows.
+  if (!resPath.IsEmpty() && resPath != PATH_SEPARATOR)
+    paths->AddOnce (resPath, DO_SCAN_RECURSION, "app");
+  if (!appPath.IsEmpty() && appPath != PATH_SEPARATOR)
+    paths->AddOnce (appPath, DO_SCAN_RECURSION, "app");
 
+  if (!configPath.IsEmpty())
+  {
+    csString tmp;
+    tmp << configPath << PATH_SEPARATOR << "lib";
+    paths->AddOnce (tmp, DO_SCAN_RECURSION, "crystal");
+
+    tmp.Clear();
+    tmp << configPath << PATH_SEPARATOR << "crystal" << PATH_SEPARATOR << "lib";
+    paths->AddOnce (tmp, DO_SCAN_RECURSION, "crystal");
+
+    tmp.Clear();
+    tmp << configPath << PATH_SEPARATOR << "crystal";
+    paths->AddOnce (tmp, DO_SCAN_RECURSION, "crystal");
+
+    paths->AddOnce (configPath, false, "crystal");
+  }
+    
   return paths;
 }

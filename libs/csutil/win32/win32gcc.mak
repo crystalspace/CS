@@ -102,6 +102,7 @@ NASMFLAGS.SYSTEM = -f win32 $(CFLAGS.D)EXTERNC_UNDERSCORE
 
 # System dependent source files included into csutil library
 SRC.SYS_CSUTIL = $(wildcard $(SRCDIR)/libs/csutil/win32/*.cpp) \
+  $(SRCDIR)/libs/csutil/generic/appdir.cpp \
   $(SRCDIR)/libs/csutil/generic/csprocessorcap.cpp \
   $(SRCDIR)/libs/csutil/generic/findlib.cpp \
   $(SRCDIR)/libs/csutil/generic/getopt.cpp \

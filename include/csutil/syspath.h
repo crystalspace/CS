@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 1998-2003 by Jorrit Tyberghein
-	      (C) 2003 by Frank Richter
+    Copyright (C) 2003 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -47,10 +46,11 @@ csRef<iStringArray> csFindSystemRoots();
 
 /**
  * Get the installation path.
- * This returns the path where the system has been installed to.
- * It has a limited use because mostly everything should be done
- * through VFS which is installation directory - independent; but
- * some initialization tasks still need this.
+ * This returns the path where the system has been installed to.  It has a
+ * limited use because mostly everything should be done through VFS which is
+ * installation directory - independent; but some initialization tasks still
+ * need this.  May return the empty string if unable to determine the
+ * installation path.
  */
 csString csGetConfigPath ();
 
@@ -70,10 +70,8 @@ char* csExpandPath (const char* path);
 
 /**
  * Return the absolute path of the executable.
- * \remark May return 0 if some problem prevents determination of the
- *   application's path.
- * \remark Caller is responsible for freeing the returend string with delete[] 
- *   after using it.
+ * \remark May return the empty string if some problem prevents determination
+ *   of the application's path.
  * \remark This function is primarily intended for very low-level use before 
  *   or during the initialization of CS core components.
  * \param argv0 The first element of the argv[] array passed to main().  On
@@ -86,10 +84,8 @@ csString csGetAppPath (const char* argv0);
  * Return the directory in which the application executable resides.  For
  * MacOS/X, returns the directory in which the Cocoa application wrapper
  * resides.
- * \remark May return 0 if some problem prevents determination of the
- *   application's directory.
- * \remark Caller is responsible for freeing the returned string with delete[] 
- *   after using it.
+ * \remark May return the empty string if some problem prevents determination
+ *   of the application's directory.
  * \remark This function is primarily intended for very low-level use before 
  *   or during the initialization of CS core components. Past this point,
  *   applications and plugins should rather use 
@@ -108,10 +104,8 @@ csString csGetAppDir (const char* argv0);
  * override the default implementation if this behavior is unsuitable.  For
  * example, on MacOS/X, for GUI applications, resources reside in the
  * "Resources" directory within the Cocoa application wrapper.
- * \remark May return 0 if some problem prevents determination of the
- *   resource path.
- * \remark Caller is responsible for freeing the returend string with delete[] 
- *   after using it.
+ * \remark May return the empty string if some problem prevents determination
+ *   of the resource path.
  * \param argv0 The first element of the argv[] array passed to main().  On
  *   many platforms, this is the only way to determine the actual location of
  *   the resources.

@@ -24,11 +24,9 @@
 
 csString csGetAppDir (const char* argv0)
 {
-  csString apppath = csGetAppPath(argv0);
-  size_t lastslash = apppath.FindLast(PATH_SEPARATOR);
-  if(lastslash != (size_t) -1) {
-    return apppath.Slice(0, lastslash);
-  }
-
-  return apppath;
+  csString appdir = csGetAppPath(argv0);
+  size_t slash = appdir.FindLast(PATH_SEPARATOR);
+  if (slash != (size_t)-1)
+    appdir.Truncate(slash);
+  return appdir;
 }

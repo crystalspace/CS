@@ -8,6 +8,7 @@ switch $(TARGET.OS)
 {
 case WIN32 :					# Windows 
   CSSYS_SRC += [ Wildcard win32 : *.cpp *.h ] 
+		generic/appdir.cpp
 		generic/csprocessorcap.cpp
 		generic/findlib.cpp
 		generic/getopt.cpp

@@ -49,45 +49,44 @@ csString csGetConfigPath ()
 {
   const char* crystalconfig = getenv("CRYSTAL_CONFIG");
   if (crystalconfig)
-  {
     return crystalconfig;
-  }
   
   const char* crystal = getenv ("CRYSTAL");
   if (crystal)
   {
-    csString path = crystal;
-    csString file;
-    path += "/etc/crystal";
-    
+    csString path, file;
+
+    path = crystal;
+    path << "/etc/crystal";
     file = path;
-    file += "/vfs.cfg";
+    file << "/vfs.cfg";
     if (!access(file, F_OK))
-    {
       return path;
-    }
+
+    path = crystal;
+    path << "/etc";
+    file = path;
+    file << "/vfs.cfg";
+    if (!access(file, F_OK))
+      return path;
 
     path = crystal;
     file = path;
-    file += "/vfs.cfg";
+    file << "/vfs.cfg";
     if (!access(file, F_OK))
-    {
       return path;
-    }
 
     fprintf (stderr,
-        "Couldn't find vfs.cfg in '%s' (defined by CRYSTAL var).\n", crystal);
-    return (const char*) 0;
+        "Failed to find vfs.cfg in '%s' (defined by CRYSTAL var).\n", crystal);
+    return "";
   }
 
-  // no setting, use the default.
-  // is the current dir a possible install? try opening vfs.cfg,
-  if (!access ("vfs.cfg", F_OK))
-  {
+  // No environment variable.
+  // Is the current dir a possible install?
+  if (!access("vfs.cfg", F_OK))
     return ".";
-  }
 
-  // default install place
+  // Fallback to default location.
   return CS_CONFIGDIR;
 }
 
@@ -95,28 +94,31 @@ csPluginPaths* csGetPluginPaths (const char* argv0)
 {
   csPluginPaths* paths = new csPluginPaths;
 
-  paths->AddOnce(csGetResourceDir(argv0), DO_SCAN_RECURSION, "app");
-  paths->AddOnce(csGetAppDir(argv0), DO_SCAN_RECURSION, "app");
+  csString resPath = csGetResourceDir (argv0);
+  if (!resPath.IsEmpty())
+    paths->AddOnce (resPath, DO_SCAN_RECURSION, "app");
+
+  csString appPath = csGetAppDir (argv0);
+  if (!appPath.IsEmpty())
+    paths->AddOnce (appPath, DO_SCAN_RECURSION, "app");
 
   const char* crystal = getenv("CRYSTAL");
   if (crystal)
   {
-    csString path = crystal;
-    path += "/lib/crystal";
-    paths->AddOnce(path, DO_SCAN_RECURSION, "plugins");
-    paths->AddOnce(crystal, DO_SCAN_RECURSION, "plugins");
-  }
-  const char* crystal_plugin = getenv("CRYSTAL_PLUGIN");
-  if (crystal_plugin)
-  {
-    paths->AddOnce(crystal_plugin, DO_SCAN_RECURSION, "plugins");
+    csString libpath1, libpath2;
+    libpath1 << crystal << "/lib";
+    libpath2 << libpath1 << "/crystal";
+    paths->AddOnce(libpath2, DO_SCAN_RECURSION, "plugins");
+    paths->AddOnce(libpath1, DO_SCAN_RECURSION, "plugins");
+    paths->AddOnce(crystal,  DO_SCAN_RECURSION, "plugins");
   }
 
+  const char* crystal_plugin = getenv("CRYSTAL_PLUGIN");
+  if (crystal_plugin)
+    paths->AddOnce(crystal_plugin, DO_SCAN_RECURSION, "plugins");
+
   if (!crystal && !crystal_plugin)
-  {
     paths->AddOnce(CS_PLUGINDIR, DO_SCAN_RECURSION, "plugins");
-  }
     
   return paths;
 }
-

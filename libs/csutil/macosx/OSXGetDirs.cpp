@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C) 2003 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C) 2003,2004 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // This library is free software; you can redistribute it and/or modify it
 // under the terms of the GNU Library General Public License as published by
@@ -39,34 +39,41 @@
 //	Given argv[0], returns absolute path of the directory containing the
 //	.app wrapper for GUI applications, or the directory containing the
 //	executable for console applications.  Also returns the basename of the
-//	executable itself.
+//	executable itself.  Guarantees that `dir' and `name' will be empty if
+//	unable to determine the application's path, or some other fatal problem
+//	occurs.
 //-----------------------------------------------------------------------------
 bool app_info(char const* argv0, csString& dir, csString& name, bool& is_gui)
 {
   bool ok = false;
-  char* apppath = csStrNew(csGetAppPath(argv0));
-  if ((const char*) apppath != 0)
+  csString apppath = csGetAppPath(argv0);
+  if (!apppath.IsEmpty())
   {
-    char* slash = strrchr(apppath, PATH_SEPARATOR);
-    CS_ASSERT( slash != 0 );
-    name = slash + 1;
-    *slash = '\0';
+    size_t slash = apppath.FindLast(PATH_SEPARATOR);
+    CS_ASSERT(slash != (size_t)-1);
+    name = apppath.Slice(slash + 1, apppath.Length() - slash - 1);
+    apppath.Truncate(slash);
 
     is_gui = false;
-    int const n = slash - apppath;
+    int const n = apppath.Length();
     int const ngrist = sizeof(OSX_WRAPPER_GRIST) - 1;
     if (strcasecmp(apppath + n - ngrist, OSX_WRAPPER_GRIST) == 0) // GUI app.
     {
       is_gui = true;
-      *(apppath + n - ngrist) = '\0';
-      slash = strrchr(apppath, PATH_SEPARATOR);
-      CS_ASSERT( slash != 0 );
-      *slash = '\0';
+      apppath.Truncate(n - ngrist);
+      slash = apppath.FindLast(PATH_SEPARATOR);
+      CS_ASSERT(slash != (size_t)-1);
+      apppath.Truncate(slash);
     }
 
     dir = apppath;
-    delete[] apppath;
     ok = true;
+  }
+  else
+  {
+    dir.Clear();
+    name.Clear();
+    is_gui = false;
   }
   return ok;
 }
@@ -81,17 +88,14 @@ bool app_info(char const* argv0, csString& dir, csString& name, bool& is_gui)
 //	executable resides.  Consequently, MacOS/X requires a custom version of
 //	csGetAppDir().  Note that for console applications, which do not reside
 //	within a wrapper, we just return the directory containing the
-//	executable.
+//	executable.  Returns the empty string if unable to determine the
+//	directory.
 //-----------------------------------------------------------------------------
-csString csGetAppDir (const char* argv0)
+csString csGetAppDir(char const* argv0)
 {
-  csString dir;
-  csString name;
+  csString dir, name;
   bool is_gui;
-  char* appdir = 0;
-  if (!app_info(argv0, dir, name, is_gui))
-    return 0;
-  
+  app_info(argv0, dir, name, is_gui);
   return dir;
 }
 
@@ -105,18 +109,14 @@ csString csGetAppDir (const char* argv0)
 //	of csGetResourceDir().  Note that for console applications, which do
 //	not reside within a wrapper, we just return the directory containing
 //	the executable, which happens to be the default behavior for
-//	non-MacOS/X platforms.
+//	non-MacOS/X platforms.  Returns the empty string if unable to determine
+//	the directory.
 //-----------------------------------------------------------------------------
-csString csGetResourceDir (const char* argv0)
+csString csGetResourceDir(char const* argv0)
 {
-  csString dir;
-  csString name;
+  csString dir, name;
   bool is_gui;
-  char* resdir = 0;
-  if (!app_info(argv0, dir, name, is_gui))
-    return 0;
-  
-  if (is_gui)
+  if (app_info(argv0, dir, name, is_gui) && is_gui)
     dir << PATH_SEPARATOR << name << OSX_RESOURCES_GRIST;
   return dir;
 }
