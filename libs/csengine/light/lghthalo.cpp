@@ -472,9 +472,12 @@ void csLightFlareHalo::ProcessFlareComponent(csEngine const& engine,
   if (clip_result == CS_CLIP_OUTSIDE) return; // nothing to do
 
   // draw the halo
+  float intensity = flare->GetIntensity();
   uint mode = comp->mixmode;
-  if(flare->GetIntensity() < 1.0)
-    return; // many drivers do not support combinations of weird modes
+  if(intensity < 1.0)
+    mode |= CS_FX_GOURAUD;
+  //if(flare->GetIntensity() < 1.0)
+    //return; // many drivers do not support combinations of weird modes
     //mode |= CS_FX_SETALPHA(1.0 - flare->GetIntensity());
 
   // prepare for drawing
@@ -503,16 +506,14 @@ void csLightFlareHalo::ProcessFlareComponent(csEngine const& engine,
     dpfx.vertices[i].y = HaloPoly[i].y;
     dpfx.vertices[i].u = HaloUV[i].x;
     dpfx.vertices[i].v = HaloUV[i].y;
-    dpfx.vertices[i].r = 1.0;
-    dpfx.vertices[i].g = 1.0;
-    dpfx.vertices[i].b = 1.0;
+    dpfx.vertices[i].r = dpfx.vertices[i].g = dpfx.vertices[i].b = intensity;
   }
 
   if(clip_result != CS_CLIP_INSIDE)
   {
     // need to interpolate u,v
     PreparePolygonFX2 (&dpfx, clipped_poly2d, num_clipped_verts,
-	        clipped_vtstats, 4, false);
+	        clipped_vtstats, 4, true);
   }
 
   /// draw
