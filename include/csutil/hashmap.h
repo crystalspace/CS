@@ -67,14 +67,14 @@ class csGlobalHashIterator
 private:
   /// Next bucket we are iterating over. NULL if no more elements.
   csHashBucket* bucket;
-  /// Current bucket we are iterating over. NULL if no more elements.
-  csHashBucket* current_bucket;
-  /// Current index in bucket.
-  int current_index;
   /// index of next item in bucket.
   int element_index;
   /// Current bucket index in hashmap.
   uint32 bucket_index;
+  /// Current number of items in bucket.
+  uint32 bucket_len;
+  /// Number of buckets.
+  uint32 nbuckets;
   /// Pointer to the hashmap.
   csHashMap* hash;
 

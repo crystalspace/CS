@@ -55,6 +55,10 @@ class csGlobalHashIteratorReversible : public csGlobalHashIterator
 
 private:
   csHashMapReversible *hashr;
+  /// Current bucket we are iterating over. NULL if no more elements.
+  csHashBucket* current_bucket;
+  /// Current index in bucket.
+  int current_index;
 
 public:
   /// Construct an iterator over specific elements of a reversible hash
@@ -62,6 +66,9 @@ public:
 
   /// Get the key of the current value.
   const char* GetKey () const;
+
+  /// Get the next element.
+  csHashObject Next ();
 };
 
 /// A csHashIterator that knows about csHashMapReversible's reverse hash.

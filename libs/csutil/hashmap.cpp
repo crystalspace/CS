@@ -52,8 +52,10 @@ csGlobalHashIterator::csGlobalHashIterator (csHashMap *hm)
 {
   hash = hm;
   bucket = NULL;
+  bucket_len = 0;
   element_index = 0;
   bucket_index = (uint32)-1;
+  nbuckets = (uint32)hash->Buckets.Length();
   GotoNextElement ();
 }
 
@@ -65,11 +67,10 @@ bool csGlobalHashIterator::HasNext ()
 void csGlobalHashIterator::GotoNextElement ()
 {
   element_index++;
-  if (!bucket || element_index >= bucket->Length ())
+  if (element_index >= bucket_len)
   {
     // Next bucket.
     bucket_index++;
-    uint32 const nbuckets = (uint32)hash->Buckets.Length();
     while (bucket_index < nbuckets && (hash->Buckets[bucket_index].Length()==0))
       bucket_index++;
     if (bucket_index >= nbuckets)
@@ -78,16 +79,14 @@ void csGlobalHashIterator::GotoNextElement ()
     {
       bucket = &(hash->Buckets[bucket_index]);
       element_index = 0;
+      bucket_len = bucket->Length ();
     }
   }
 }
 
 csHashObject csGlobalHashIterator::Next ()
 {
-  if (bucket == NULL) return NULL;
   csHashObject obj = ((*bucket)[element_index]).object;
-  current_index = element_index;
-  current_bucket = bucket;
   GotoNextElement ();
   return obj;
 }
@@ -131,7 +130,6 @@ void csHashIterator::GotoNextSameKey ()
 
 csHashObject csHashIterator::Next ()
 {
-  if (bucket == NULL) return NULL;
   csHashObject obj = ((*bucket)[element_index]).object;
   current_index = element_index;
   GotoNextSameKey ();

@@ -96,6 +96,16 @@ csGlobalHashIteratorReversible::csGlobalHashIteratorReversible (
   hashr = r;
 }
 
+csHashObject csGlobalHashIteratorReversible::Next ()
+{
+  if (bucket == NULL) return NULL;
+  csHashObject obj = ((*bucket)[element_index]).object;
+  current_index = element_index;
+  current_bucket = bucket;
+  GotoNextElement ();
+  return obj;
+}
+
 const char* csGlobalHashIteratorReversible::GetKey () const
 {
   if ((current_bucket != NULL) && (current_index > -1)

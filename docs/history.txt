@@ -26,6 +26,8 @@ The history order is reversed so that new features are at the top.
 	  want that you need csGlobalHashIterator instead. That way it
 	  is possible to more efficiently optimize the two different
 	  ways to iterator. The same is true for csHashIteratorReversible.
+	- Some further optimizations on csGlobalHashIterator.
+	- Several fixes to csArray::SetCapacity() and related.
 24-Apr-2003
 	- Eric Sunshine made the following changes:
 	    - Improved robustness of --with-x check for Darwin/Macintosh, since

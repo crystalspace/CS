@@ -50,13 +50,10 @@ private:
   {
     (root + n)->T::~T();
   }
-
-  // Set array length.  NOTE: Do not make this public since it does not
-  // properly construct/destroy elements.  To safely truncate the array, use
-  // Truncate().  To safely set the capacity, use SetCapacity().
-  void SetLengthUnsafe (int n)
+ 
+  // Adjust internal capacity of this array.
+  void AdjustCapacity (int n)
   {
-    count = n;
     if (n > capacity || (capacity > threshold && n < capacity - threshold))
     {
       n = ((n + threshold - 1) / threshold ) * threshold;
@@ -66,6 +63,16 @@ private:
         root = (T*)realloc (root, n * sizeof(T));
       capacity = n;
     }
+  }
+
+  // Set array length.  NOTE: Do not make this public since it does not
+  // properly construct/destroy elements.  To safely truncate the array, use
+  // Truncate().  To safely set the capacity, use SetCapacity().
+  void SetLengthUnsafe (int n)
+  {
+    if (n > capacity)
+      AdjustCapacity (n);
+    count = n;
   }
 
 public:
@@ -172,7 +179,7 @@ public:
     else
     {
       int old_len = Length ();
-      SetCapacity (n);
+      SetLengthUnsafe (n);
       for (int i = old_len ; i < n ; i++)
         ConstructElement (i, what);
     }
@@ -213,8 +220,8 @@ public:
    */
   void SetCapacity (int n)
   {
-    if (n > Length())
-      SetLengthUnsafe(n);
+    if (n > capacity)
+      AdjustCapacity (n);
   }
 
   /**
