@@ -49,6 +49,7 @@ private:
   csRef<iMeshObjectFactory> imeshfact;
   float move_sprite_speed;
   float scale;
+  bool is_cal3d;
 
   csMenu *menu;
   csWindow *dialog;

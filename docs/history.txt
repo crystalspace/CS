@@ -12,6 +12,11 @@ chronological order.
 	- Jorrit fixed makefiles for GIF and PNG image loaders.
 	- Jorrit fixed makefile for BMP image loader.
         - Boyan fixed errors in broadcasting in iNetworkSocket2.
+	- Keith Fulton added support for animation action wrappers in cal3d
+	  plugin and augmented viewmesh to allow user to set/clear/blend
+	  both anim cycles and anim actions.  With a nicer GUI, viewmesh
+	  would now come close to duplicating the functionality of the
+	  "official" cal3d cally demo.
 4-Aug-2003
 	- Oktal added the following to csutil:
 	    - A template class, csHash<T>, intended to replace csHashMap soon.
