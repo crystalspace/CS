@@ -9167,6 +9167,7 @@ class iShaderVariableContext(iBase):
     def GetShaderVariables(*args): return _cspace.iShaderVariableContext_GetShaderVariables(*args)
     def PushVariables(*args): return _cspace.iShaderVariableContext_PushVariables(*args)
     def PopVariables(*args): return _cspace.iShaderVariableContext_PopVariables(*args)
+    def IsEmpty(*args): return _cspace.iShaderVariableContext_IsEmpty(*args)
     def __del__(self, destroy=_cspace.delete_iShaderVariableContext):
         try:
             if self.thisown: destroy(self)
@@ -9471,50 +9472,6 @@ CS_MATERIAL_VARNAME_AMBIENT = _cspace.CS_MATERIAL_VARNAME_AMBIENT
 CS_MATERIAL_VARNAME_REFLECTION = _cspace.CS_MATERIAL_VARNAME_REFLECTION
 CS_MATERIAL_VARNAME_FLATCOLOR = _cspace.CS_MATERIAL_VARNAME_FLATCOLOR
 CS_MATERIAL_TEXTURE_DIFFUSE = _cspace.CS_MATERIAL_TEXTURE_DIFFUSE
-CS_MATERIAL_TEXTURE_LAYER1 = _cspace.CS_MATERIAL_TEXTURE_LAYER1
-CS_MATERIAL_TEXTURE_LAYER2 = _cspace.CS_MATERIAL_TEXTURE_LAYER2
-CS_MATERIAL_TEXTURE_LAYER3 = _cspace.CS_MATERIAL_TEXTURE_LAYER3
-CS_MATERIAL_TEXTURE_LAYER4 = _cspace.CS_MATERIAL_TEXTURE_LAYER4
-class csTextureLayer(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csTextureLayer, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csTextureLayer, name)
-    def __repr__(self):
-        return "<C csTextureLayer instance at %s>" % (self.this,)
-    __swig_setmethods__["txt_handle"] = _cspace.csTextureLayer_txt_handle_set
-    __swig_getmethods__["txt_handle"] = _cspace.csTextureLayer_txt_handle_get
-    if _newclass:txt_handle = property(_cspace.csTextureLayer_txt_handle_get, _cspace.csTextureLayer_txt_handle_set)
-    __swig_setmethods__["mode"] = _cspace.csTextureLayer_mode_set
-    __swig_getmethods__["mode"] = _cspace.csTextureLayer_mode_get
-    if _newclass:mode = property(_cspace.csTextureLayer_mode_get, _cspace.csTextureLayer_mode_set)
-    __swig_setmethods__["uscale"] = _cspace.csTextureLayer_uscale_set
-    __swig_getmethods__["uscale"] = _cspace.csTextureLayer_uscale_get
-    if _newclass:uscale = property(_cspace.csTextureLayer_uscale_get, _cspace.csTextureLayer_uscale_set)
-    __swig_setmethods__["vscale"] = _cspace.csTextureLayer_vscale_set
-    __swig_getmethods__["vscale"] = _cspace.csTextureLayer_vscale_get
-    if _newclass:vscale = property(_cspace.csTextureLayer_vscale_get, _cspace.csTextureLayer_vscale_set)
-    __swig_setmethods__["ushift"] = _cspace.csTextureLayer_ushift_set
-    __swig_getmethods__["ushift"] = _cspace.csTextureLayer_ushift_get
-    if _newclass:ushift = property(_cspace.csTextureLayer_ushift_get, _cspace.csTextureLayer_ushift_set)
-    __swig_setmethods__["vshift"] = _cspace.csTextureLayer_vshift_set
-    __swig_getmethods__["vshift"] = _cspace.csTextureLayer_vshift_get
-    if _newclass:vshift = property(_cspace.csTextureLayer_vshift_get, _cspace.csTextureLayer_vshift_set)
-    def __init__(self, *args):
-        _swig_setattr(self, csTextureLayer, 'this', _cspace.new_csTextureLayer(*args))
-        _swig_setattr(self, csTextureLayer, 'thisown', 1)
-    def __del__(self, destroy=_cspace.delete_csTextureLayer):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class csTextureLayerPtr(csTextureLayer):
-    def __init__(self, this):
-        _swig_setattr(self, csTextureLayer, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, csTextureLayer, 'thisown', 0)
-        _swig_setattr(self, csTextureLayer,self.__class__,csTextureLayer)
-_cspace.csTextureLayer_swigregister(csTextureLayerPtr)
-
 class iMaterial(iShaderVariableContext):
     __swig_setmethods__ = {}
     for _s in [iShaderVariableContext]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -9529,8 +9486,6 @@ class iMaterial(iShaderVariableContext):
     def GetShader(*args): return _cspace.iMaterial_GetShader(*args)
     def GetShaders(*args): return _cspace.iMaterial_GetShaders(*args)
     def GetTexture(*args): return _cspace.iMaterial_GetTexture(*args)
-    def GetTextureLayerCount(*args): return _cspace.iMaterial_GetTextureLayerCount(*args)
-    def GetTextureLayer(*args): return _cspace.iMaterial_GetTextureLayer(*args)
     def GetFlatColor(*args): return _cspace.iMaterial_GetFlatColor(*args)
     def SetFlatColor(*args): return _cspace.iMaterial_SetFlatColor(*args)
     def GetReflection(*args): return _cspace.iMaterial_GetReflection(*args)
