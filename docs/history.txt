@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+19-Jun-2001
+	- Removed verbose output of lightmap calculation if recalculation
+	  of lighting is not enabled. Now the progress bars are only
+	  displayed when lighting is actually being calculated.
 18-Jun-2001
 	- Fixed a bug in the region checking code from the loader.
 	- Renamed csCollider to csColliderWrapper and moved it from csengine
