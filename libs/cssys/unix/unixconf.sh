@@ -33,6 +33,11 @@ echo "#include <vga.h>" > conftest.cpp
 ${CXX} -c conftest.cpp 2>/dev/null && echo "PLUGINS += video/canvas/svgalib"
 rm -f conftest.cpp conftest.o
 
+# Test for presence of pthread.
+echo "#include <pthread.h>" > conftest.cpp
+${CXX} -c conftest.cpp 2>/dev/null && echo "THREADS = pthread" && echo "THREADS.INC = csthrd.h"
+rm -f conftest.cpp conftest.o
+
 # Test for presence of CAL3D.
 echo "#include <cal3d/cal3d.h>" > conftest.cpp
 ${CXX} -c conftest.cpp 2>/dev/null && echo "HAS_CAL3D = yes"
