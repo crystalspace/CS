@@ -137,12 +137,6 @@ check box or radio button).
 @tab If @samp{true}, the item in column @emph{X} will have a radio button-type
 state box instead of the default check box-style state.
 
-@item @code{selectableX}
-@tab @code{bool}
-@tab If @samp{false}, then the item is not selectable and will never be
-highlighted.  This is useful for items that have state of some sort and aren't
-intended to be ``picked'' out of a list.
-
 @item @code{aligntxtX}
 @tab @code{int}
 @tab Alignment of the text in column @emph{X}.  By default, all text is
@@ -157,6 +151,12 @@ image.
 @item @code{paramX}
 @tab @code{int}
 @tab An optional parameter you can attach to an item in the row.
+
+@item @code{selectable}
+@tab @code{bool}
+@tab If @samp{false}, then the item is not selectable and will never be
+highlighted.  This is useful for items that have state of some sort and aren't
+intended to be ``picked'' out of a list.
 
 @item @code{parent}
 @tab @code{int}
