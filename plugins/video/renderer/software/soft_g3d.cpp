@@ -1228,6 +1228,17 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   tex->GetSubtexSize (subtex_size);
   if (do_lighting)
   {
+    if (subtex_size)
+    {
+      // If the size of the lighted polygon is too small we don't
+      // bother with the subtex optimization because it will be
+      // counter-productive. The problem is finding the exact value
+      // of 'too small'.
+      int size;
+      tex->GetNumPixels (size);
+      if (size < 64*64) subtex_size = 0;
+    }
+
     if (subtex_size) CacheInitTexture (tex);
     else CacheTexture (tex);
   }
