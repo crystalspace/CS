@@ -122,12 +122,15 @@ STATIC.PLUGINLIST =
   simpleformerldr
   ;
 
+# GL canvases
 if $(GLX.AVAILABLE) = "yes" { STATIC.PLUGINLIST += glx2d ; }
-if $(X11.AVAILABLE) = "yes" { STATIC.PLUGINLIST += x2d xextshm xwin ; }
-if $(XFREE86VM.AVAILABLE) = "yes" { STATIC.PLUGINLIST += xext86vm ; }
-if $(DIRECTX.AVAILABLE) = "yes" { STATIC.PLUGINLIST += ddraw2d ; }
 if $(TARGET.OS) = "WIN32" && $(GL.AVAILABLE) = "yes"
   { STATIC.PLUGINLIST += glwin32 ; }
-if $(TARGET.OS) = "MACOS_X" { STATIC.PLUGINLIST += cgdriver2d ; }
 if $(TARGET.OS) = "MACOS_X" && $(GL.AVAILABLE) = "yes"
   { STATIC.PLUGINLIST += glosx2d ; }
+  
+# Software canvases. Disabled, soft3d is not in the static plugin list.
+#if $(X11.AVAILABLE) = "yes" { STATIC.PLUGINLIST += x2d xextshm xwin ; }
+#if $(XFREE86VM.AVAILABLE) = "yes" { STATIC.PLUGINLIST += xext86vm ; }
+#if $(DIRECTX.AVAILABLE) = "yes" { STATIC.PLUGINLIST += ddraw2d ; }
+#if $(TARGET.OS) = "MACOS_X" { STATIC.PLUGINLIST += cgdriver2d ; }

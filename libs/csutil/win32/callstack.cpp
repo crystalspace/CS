@@ -499,6 +499,11 @@ static LONG WINAPI ExceptionFilter (struct _EXCEPTION_POINTERS* ExceptionInfo)
   return EXCEPTION_CONTINUE_EXECUTION;
 }
 
+// Work around lack of ULONG_PTR on older platform SDKs
+#ifndef __int3264
+#define ULONG_PTR   ULONG
+#endif
+
 /* A slightly odd method to get a thread context, deliberately raising an exception
  * to get to the exception handler... but a bit quicker than the "use 2nd thread"
  * method. */

@@ -115,8 +115,6 @@ public:
   virtual bool RegisterPlugin (const char* path);
 };
 
-#ifndef CS_STATIC_LINKED
-
 class scfSharedLibrary;
 
 static class csStringSet* libraryNames = 0; 
@@ -249,8 +247,6 @@ int scfLibraryVector::CompareName (scfSharedLibrary* const& Item,
   return Item->LibraryName < Key ? -1 : (Item->LibraryName > Key ? 1 : 0);
 }
 
-#endif // CS_STATIC_LINKED
-
 /// This structure contains everything we need to know about a particular class
 class scfFactory : public iFactory
 {
@@ -272,12 +268,10 @@ public:
     be reported)
   */
   csStringID classContext;
-#ifndef CS_STATIC_LINKED
   // Shared module that implements this class or 0 for local classes
   csStringID LibraryName;
   // A pointer to shared library object (0 for local classes)
   scfSharedLibrary *Library;
-#endif
 
   // Create the factory for a class located in a shared library
   scfFactory (const char *iClassID, const char *iLibraryName,
@@ -336,13 +330,9 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   FactoryClass = csStrNew (iFactoryClass);
   CreateFunc = iCreate;
   classContext = context;
-#ifndef CS_STATIC_LINKED
   LibraryName =
     iLibraryName ? libraryNames->Request (iLibraryName) : csInvalidStringID;
   Library = 0;
-#else
-  (void)iLibraryName;
-#endif
 
   SCF_INIT_TRACKER_ALIASES
 }
@@ -356,10 +346,8 @@ scfFactory::~scfFactory ()
       scfRefCount, ClassID);
 #endif
 
-#ifndef CS_STATIC_LINKED
   if (Library)
     Library->DecRef ();
-#endif
   delete [] FactoryClass;
   delete [] Dependencies;
   delete [] Description;
@@ -371,7 +359,6 @@ scfFactory::~scfFactory ()
 void scfFactory::IncRef ()
 {
   csRefTrackerAccess::TrackIncRef (this, scfRefCount);
-#ifndef CS_STATIC_LINKED
   if (!Library && (LibraryName != csInvalidStringID))
   {
     size_t libidx = LibraryRegistry->FindLibrary(LibraryName);
@@ -401,7 +388,6 @@ void scfFactory::IncRef ()
 
     Library->IncRef ();
   }
-#endif
   scfRefCount++;
 }
 
@@ -417,7 +403,6 @@ void scfFactory::DecRef ()
   }
 #endif
   scfRefCount--;
-#ifndef CS_STATIC_LINKED
   if (scfRefCount == 0)
   {
     // now we no longer need the library either
@@ -427,7 +412,6 @@ void scfFactory::DecRef ()
       Library = 0;
     }
   }
-#endif
 }
 
 void scfFactory::AddRefOwner (iBase** ref_owner)
@@ -517,8 +501,6 @@ SCF_IMPLEMENT_IBASE_END;
 
 void csSCF::ScanPluginsInt (csPluginPaths* pluginPaths, const char* context)
 {
-#ifndef CS_STATIC_LINKED
-
   if (pluginPaths)
   {
     // Search plugins in pluginpaths
@@ -578,8 +560,16 @@ void csSCF::ScanPluginsInt (csPluginPaths* pluginPaths, const char* context)
       }
     }
   }
-#endif
 }
+
+/* Flag indicating whether external linkage was used when building the 
+ * application. Determines whether SCF scans for plugins at startup.
+ */
+#ifdef CS_BUILD_SHARED_LIBS
+const bool scfStaticallyLinked = false;
+#else
+extern bool scfStaticallyLinked;
+#endif
 
 void scfInitialize (csPluginPaths* pluginPaths, bool verbose)
 {
@@ -592,9 +582,16 @@ void scfInitialize (csPluginPaths* pluginPaths, bool verbose)
 
 void scfInitialize (int argc, const char* const argv[])
 {
-  csPluginPaths* pluginPaths = csGetPluginPaths (argv[0]);
-  scfInitialize (pluginPaths, csCheckVerbosity (argc, argv, "scf"));
-  delete pluginPaths;
+  if (scfStaticallyLinked)
+  {
+    scfInitialize (0, csCheckVerbosity (argc, argv, "scf"));
+  }
+  else
+  {
+    csPluginPaths* pluginPaths = csGetPluginPaths (argv[0]);
+    scfInitialize (pluginPaths, csCheckVerbosity (argc, argv, "scf"));
+    delete pluginPaths;
+  }
 }
 
 csSCF::csSCF (bool v) : verbose(v),
@@ -615,12 +612,10 @@ csSCF::csSCF (bool v) : verbose(v),
   if (!ClassRegistry)
     ClassRegistry = new scfClassRegistry ();
 
-#ifndef CS_STATIC_LINKED
   if (!LibraryRegistry)
     LibraryRegistry = new scfLibraryVector ();
   if (!libraryNames)
     libraryNames = new csStringSet;
-#endif
 
   // We need a recursive mutex.
   mutex = csMutex::Create (true);
@@ -632,13 +627,11 @@ csSCF::~csSCF ()
 {
   delete ClassRegistry;
   ClassRegistry = 0;
-#ifndef CS_STATIC_LINKED
   UnloadUnusedModules ();
   delete LibraryRegistry;
   LibraryRegistry = 0;
   delete libraryNames;
   libraryNames = 0;
-#endif
 
   mutex = 0;
 #ifdef CS_REF_TRACKER
@@ -791,14 +784,12 @@ void *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
 
 void csSCF::UnloadUnusedModules ()
 {
-#ifndef CS_STATIC_LINKED
   csScopedMutexLock lock (mutex);
   for (size_t i = LibraryRegistry->Length (); i > 0; i--)
   {
     scfSharedLibrary *sl = (scfSharedLibrary *)LibraryRegistry->Get (i - 1);
     sl->TryUnload ();
   }
-#endif
 }
 
 inline static bool ContextClash (csStringID contextA, csStringID contextB)
@@ -1016,7 +1007,6 @@ const char *csSCF::GetClassDependencies (const char *iClassID)
 csRef<iDocument> csSCF::GetPluginMetadata (char const *iClassID)
 {
   csRef<iDocument> metadata;
-#ifndef CS_STATIC_LINKED
   csScopedMutexLock lock (mutex);
   size_t idx = ClassRegistry->FindClass(iClassID);
   if (idx != (size_t)-1)
@@ -1025,7 +1015,6 @@ csRef<iDocument> csSCF::GetPluginMetadata (char const *iClassID)
     if (cf->LibraryName != csInvalidStringID)
       csGetPluginMetadata (get_library_name(cf->LibraryName), metadata);
   }
-#endif
   return metadata;
 }
 

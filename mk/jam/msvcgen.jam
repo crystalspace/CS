@@ -810,6 +810,55 @@ rule RegisterWellKnownCompileGroups
   }
 }
 
+rule LinkStaticPlugins
+{
+  # link with static plugins
+  LinkWith $(<) : $(>)_static ;
+
+  # construct flags
+  local deplibs libs i ;
+  for i in $(>)
+  {
+    deplibs += $($(i).NEEDLIBS) ;
+    ExternalLibs $(<) : $($(i).EXTERNALLIBS) ;
+    
+    for mode in debug release
+    {
+      MsvcExternalLibrary $(<) : $($(i)_$(mode)_EXTERNALLIBS) : $(mode) ;
+      MsvcExternalLibrary $(<) : $($(i)_$(mode)_EXTERNALLIBS) : $(mode) ;
+    }
+  }
+  # We must eliminate the duplicates in reverse order in order to ensure that
+  # we do not destroy the overall library ordering since Unix linkers are
+  # order-sensitive.
+  #libs = [ Reverse [ RemoveDups [ Reverse $(deplibs) ] ] ] ;
+  #libs = lib$(libs)$(SUFLIB) ;
+  LinkWith $(<) : $(deplibs) ;
+
+  # Generate static plugin instantiation
+  local outdir = [ Property msvcgen : outdir$(MSVC_VERSION) ] ;
+  local staticuse_out = $(MSVC.PREFIX.appgui)$(<)_staticuse.cpp ; # @@@ Prefix hardcoded
+  MakeLocate $(staticuse_out) : $(outdir) ;
+  SEARCH on $(staticuse_out) = $(outdir) ;
+  local metalist metafile i ;
+  for i in $(>)
+  {
+    metafile = $($(i)_METAFILE) ;
+    metalist += $(metafile) ;
+    Depends $(staticuse_out) : $(metafile) ;
+  }
+  GenerateStaticPluginBoilerplate $(staticuse_out) ;
+  GenerateStaticPluginInstantiation $(staticuse_out) : $(metalist) ;
+  Always $(staticuse_out) ;
+  Depends msvcgen : $(staticuse_out) ;
+
+  # Add usefile to project
+  ResponseFile $($(<)_PRJ_RESPFILE) : 
+    "file|$(staticuse_out:R=$(outdir))" : notfile :
+    $($(<)_PRJ_RESPDIR) ;
+  Depends $(<) : $(staticuse_out) ;
+}
+
 rule Application
 {
   RegisterWellKnownCompileGroups ;
@@ -824,6 +873,7 @@ rule Application
     projtype = appgui ;
   }
   MsvcProject $(<) : $(projtype) : $(<:S=.exe) : $(>) ;
+  
   CompileGroups $(<) : all apps ;
 }
 
@@ -831,12 +881,36 @@ rule Plugin
 {
   RegisterWellKnownCompileGroups ;
 
+  $(<)_TYPE = plugin ;
+  
   local metafile ;
   metafile = [ FAppendSuffix $(<) : $(SUFMETA) ] ;
   SEARCH on $(metafile) = $(SEARCH_SOURCE) ;
   $(<)_METAFILE = $(metafile) ;
   MsvcProject $(<) : plugin : $(<:S=.dll) : $(>) ;
   CompileGroups $(<) : all plugins ;
+
+  # Generate static variant of plugin
+  #  Static registry
+  local outdir = [ Property msvcgen : outdir$(MSVC_VERSION) ] ;
+  local staticreg_out = $(MSVC.PREFIX.library)$(<)_staticreg.cpp ;
+  MakeLocate $(staticreg_out) : $(outdir) ;
+  SEARCH on $(staticreg_out) = $(outdir) ;
+  GenerateStaticPluginBoilerplate $(staticreg_out) ;
+  GenerateStaticPluginRegistration $(staticreg_out) : $(metafile) ;
+  Always $(staticreg_out) ;
+  Depends msvcgen : $(staticreg_out) ;
+  
+  #  VC project
+  local staticname = $(<)_static ;
+  SubVariant static ;
+  Library $(staticname) : $(>) : $(3) independent noinstall nohelp notest ;
+  MsvcDefine $(staticname) : CS_STATIC_LINKED ;
+  ResponseFile $($(staticname)_PRJ_RESPFILE) : 
+    "file|$(staticreg_out:R=$(outdir))" : notfile :
+    $($(staticname)_PRJ_RESPDIR) ;
+  Depends $(staticname) : $(staticreg_out) ;
+  SubVariant ;
 }
 
 rule Library
@@ -892,6 +966,7 @@ rule LinkWith
       }
     }
   }
+  $(<).NEEDLIBS = $(libs) ;
 }
 
 rule MsvcClassifyMode
@@ -932,6 +1007,12 @@ rule _MsvcRespEmit
 rule MsvcExternalLibrary1
 {
   _MsvcRespEmit $(1) : $(2) : library : $(3) ;
+  if $($(1)_TYPE) = plugin
+  {
+    local mode = $(3) ;
+    mode ?= debug release ;
+    $(1)_$(mode)_EXTERNALLIBS += $(2) ;
+  }
 }
 
 # MsvcDefine target [ : key [ : value [ : mode ]]]
@@ -1030,6 +1111,11 @@ rule ExternalLibs
     {
       $(<).EXTERNALLIBS += $(i) ;
     }
+  }
+  # Mild hack to propagate external dependencies to static variants
+  if $($(<)_TYPE) = plugin
+  {
+    ExternalLibs $(<)_static : $(>) ;
   }
 }
 

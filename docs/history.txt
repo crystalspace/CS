@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Feb-2005
+	- res made the following changes:
+	    - Added a flag that is set via a variable indicating whether the
+	      app was statically linked or not. In the case of static linking,
+	      SCF will by default not scan for plugins on startup (the app can
+	      still scan manually).
+	    - Added VC projects for static versions of the plugins.
+	- res fixed a compile error occuring on older Platform SDKs.
+	- res fixed some build issues with the AWS bison/flex stuff.
 19-Feb-2005
 	- res changed the token table init function name from init_token_table
 	  to InitTokenTable.

@@ -45,7 +45,8 @@ if ! [ Property build : projgen ]
     # and LOCATE_TARGET is the "current directory" in this case, but we do this
     # for that extra measure of insurance.)
     C++FLAGS on [ DoObjectGrist skinpars$(SUFOBJ) skinlex$(SUFOBJ) ] +=
-      [ FIncludes $(LOCATE_TARGET) $(SEARCH_SOURCE) ] ;
+      [ FIncludes $(LOCATE_TARGET) $(SEARCH_SOURCE) ../$(SEARCH_SOURCE) ] ;
+    # @@@ ../$(SEARCH_SOURCE) is a hack to make aws_static work
   }
 }
 

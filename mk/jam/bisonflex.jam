@@ -88,7 +88,7 @@ if $(CMD.BISON)
 
     # Jam's header file scannning doesn't use grist so we have to workaround
     # this here.
-    Includes $(headerfile:G=$(SUBVARIANT)) : $(headerfile) ;
+    Includes $(headerfile:G=$(SUBVARIANT:J=!)) : $(headerfile) ;
 
     MakeLocate $(cfile) $(headerfile) : $(LOCATE_TARGET) ;
     
@@ -112,7 +112,7 @@ if $(CMD.BISON)
 
     # Jam's header file scannning doesn't use grist so we have to workaround
     # this here.
-    Includes $(headerfile:G=$(SUBVARIANT)) : $(headerfile) ;
+    Includes $(headerfile:G=$(SUBVARIANT:J=!)) : $(headerfile) ;
 
     MakeLocate $(cppfile) : $(LOCATE_TARGET) ;
     MakeLocate $(headerfile) : $(LOCATE_TARGET) ;

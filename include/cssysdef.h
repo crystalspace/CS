@@ -288,6 +288,20 @@ void Name (void (*p)())                                                \
     CS_DECLARE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);
 #endif
 
+/**\var scfStaticallyLinked
+ * \internal
+ * Flag indicating whether external linkage was used when building the 
+ * application. Determines whether SCF scans for plugins at startup.
+ */
+#if defined(CS_BUILD_SHARED_LIBS)
+#  define CS_DEFINE_STATICALLY_LINKED_FLAG
+#elif defined(CS_STATIC_LINKED)
+#  define CS_DEFINE_STATICALLY_LINKED_FLAG  bool scfStaticallyLinked = true;
+#else
+#  define CS_DEFINE_STATICALLY_LINKED_FLAG  bool scfStaticallyLinked = false;
+#endif
+
+
 /**\def CS_IMPLEMENT_FOREIGN_DLL
  * The CS_IMPLEMENT_FOREIGN_DLL macro should be placed at the global scope in
  * exactly one compilation unit comprising a foreign (non-Crystal Space)
@@ -301,12 +315,14 @@ void Name (void (*p)())                                                \
  */
 #ifndef CS_IMPLEMENT_FOREIGN_DLL
 #  if defined(CS_BUILD_SHARED_LIBS)
-#    define CS_IMPLEMENT_FOREIGN_DLL \
+#    define CS_IMPLEMENT_FOREIGN_DLL					    \
        CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(csStaticVarCleanup_local); \
+       CS_DEFINE_STATICALLY_LINKED_FLAG					    \
        CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_local);
 #  else
-#    define CS_IMPLEMENT_FOREIGN_DLL \
-       CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION; \
+#    define CS_IMPLEMENT_FOREIGN_DLL					    \
+       CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION;			    \
+       CS_DEFINE_STATICALLY_LINKED_FLAG					    \
        CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);
 #  endif
 #endif
@@ -357,6 +373,7 @@ void Name (void (*p)())                                                \
 #ifndef CS_IMPLEMENT_APPLICATION
 #  define CS_IMPLEMENT_APPLICATION       				\
   CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION;			\
+  CS_DEFINE_STATICALLY_LINKED_FLAG					\
   CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);	\
   CS_IMPLEMENT_PLATFORM_APPLICATION 
 #endif

@@ -23,7 +23,10 @@
 # MsvcGenWorkspace all : : "grp.+_(?!all$)" ;
 
 # What the typical user will need. Presently, everything but wxWidgets.
-MsvcGenWorkspace typical : : "grp.+_(?!typical$)" wx ;
+MsvcGenWorkspace typical : : "grp.+_(?!typical$)" wx static ;
 
 # Similar to "typical", but with wxWidgets.
-MsvcGenWorkspace wxtypical : : "grp.+_(?!wxtypical$)" ;
+MsvcGenWorkspace wxtypical : : "grp.+_(?!wxtypical$)" static ;
+
+# Workspace for static variants of plugins and apps.
+MsvcGenWorkspace static : static ^lib.* : "grp.+_(?!static$)" wx ; #"grplibs_(?!static$)" 
