@@ -342,6 +342,8 @@ A texture description:
 <transparent> ::= 'TRANSPARENT' '(' <color> ')'
 <procedural> ::= 'PROCEDURAL' '(' ')'
 <tex2d> ::= 'TEX2D' '(' ')'
+<tex3d> ::= 'TEX3D' '(' ')'
+<tex2d3d> ::= 'TEX2D3D' '(' ')'
 <persistent> ::= 'PERSISTENT' '(' ')'
 <filter> ::= 'FILTER' '(' ... ')'
 <mipmap> ::= 'MIPMAP' '(' <yes-no> ')'
@@ -349,7 +351,7 @@ A texture description:
 <texture-file> ::= 'FILE' '(' <file-name> ')'
 
 <texture-desc-comp> ::= <transparent> | <filter> | <mipmap> | <dither> |
-  <file> | <procedural> | <tex2d> | <persistent>
+  <file> | <procedural> | <tex2d> | <tex3d> | <tex2d3d> | <persistent>
 <texture-desc> ::= 'TEXTURE' <texture-name> '(' [ <texture-desc-comp> ] ')'
 @end example
 

@@ -5,8 +5,11 @@ The history order has been reversed so that new features are at the top.
 	  (including the much asked for worldfmt.tex file).
 	- Added TEX2D keyword to parsing of textures in world file.
 	  So you can mark textures as being 2D only.
+	- Added TEX3D and TEX2D3D keywords to complete the functionality.
 	- Added a missing menu to the world format texinfo documentation
 	  file.
+	- Alex Pfaffe fixed visibility determination for CS in the terrain
+	  engine.
 26-Jul-2000
 	- Started completing support for the rapid collision detection
 	  plugin and also completing support for the interfaces needed

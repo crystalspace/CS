@@ -231,6 +231,8 @@ TOKEN_DEF_START
   TOKEN_DEF (TEX_SET)
   TOKEN_DEF (TEX_SET_SELECT)
   TOKEN_DEF (TEX2D)
+  TOKEN_DEF (TEX2D3D)
+  TOKEN_DEF (TEX3D)
   TOKEN_DEF (THING)
   TOKEN_DEF (TOTALTIME)
   TOKEN_DEF (TRANSFORM)
@@ -2327,6 +2329,8 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
     TOKEN_TABLE (PROCEDURAL)
     TOKEN_TABLE (PERSISTENT)
     TOKEN_TABLE (TEX2D)
+    TOKEN_TABLE (TEX2D3D)
+    TOKEN_TABLE (TEX3D)
   TOKEN_TABLE_END
 
   long cmd;
@@ -2342,6 +2346,14 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
     {
       case TOKEN_TEX2D:
         flags |= CS_TEXTURE_2D;
+	flags &= ~CS_TEXTURE_3D;
+        break;
+      case TOKEN_TEX3D:
+        flags |= CS_TEXTURE_3D;
+	flags &= ~CS_TEXTURE_2D;
+        break;
+      case TOKEN_TEX2D3D:
+        flags |= CS_TEXTURE_2D | CS_TEXTURE_3D;
         break;
       case TOKEN_PERSISTENT:
         flags |= CS_TEXTURE_PROC_PERSISTENT;
