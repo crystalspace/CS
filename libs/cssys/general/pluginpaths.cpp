@@ -21,6 +21,11 @@
 #include "cssys/syspath.h"
 #include "csutil/util.h"
 
+// @@@ Re-enable recursive scanning after we rethink it.  Presently, many
+// developers run applications from within the source tree, and recursion
+// causes a lot of needless scanning. For now it is disabled.
+#define DO_SCAN_RECURSION false
+
 csPluginPaths* csGetPluginPaths (const char* argv0)
 {
   csPluginPaths* paths = new csPluginPaths;
@@ -31,19 +36,19 @@ csPluginPaths* csGetPluginPaths (const char* argv0)
   
   // Don't add "/" since it won't work on Windows.
   if (resPath && *resPath && (resPath[1] != 0 || *resPath != PATH_SEPARATOR))
-    paths->AddOnce (resPath, true, "app");
+    paths->AddOnce (resPath, DO_SCAN_RECURSION, "app");
   if (appPath && *appPath && (appPath[1] != 0 || *appPath != PATH_SEPARATOR))
-    paths->AddOnce (appPath, true, "app");
+    paths->AddOnce (appPath, DO_SCAN_RECURSION, "app");
 
   if (configPath)
   {
     csString tmp;
     tmp << configPath << PATH_SEPARATOR << "lib";
-    paths->AddOnce (tmp, true, "crystal");
+    paths->AddOnce (tmp, DO_SCAN_RECURSION, "crystal");
 
     tmp.Clear();
     tmp << configPath << PATH_SEPARATOR << "crystal";
-    paths->AddOnce (tmp, true, "crystal");
+    paths->AddOnce (tmp, DO_SCAN_RECURSION, "crystal");
 
     paths->AddOnce (configPath, false, "crystal");
   }
