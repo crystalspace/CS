@@ -617,7 +617,12 @@ void csTextureHandleOpenGL::PrepareKeycolor ()
       Drop the alpha of the transparent pixels to 0 and of non-transparent
       to 255, so really only keycolored pixels are transparent.
      */
-    _src->alpha = transp_color.eq (*_src) ? 0 : 255;
+    //_src->alpha = transp_color.eq (*_src) ? 0 : 255;
+    /*
+      @@@ AWS always sets a keycolor on loaded textures, causing trouble when
+      alpha transparency is desired. Really, AWS should be fixed.
+     */
+     if (transp_color.eq (*_src)) _src->alpha = 0;
     _src++;
   }
 

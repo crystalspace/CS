@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Nov-2003
+	- res reverted the behaviour of setting the alpha of keycolored 
+	  pixels of textures in GL: just drop the alpha of KCed pixels to 0,
+	  but don't raise the alpha of non-KCed pixels to 255, which gave
+	  problems with alpha transparency in AWS (which sets a keycolor on
+	  all images.)
 6-Nov-2003
 	- res bumped the version of the iGraphics2D interface and updated
 	  some doxygen comments in include/graph2d.h. (Basically the 
