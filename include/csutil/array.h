@@ -31,8 +31,7 @@
 #endif
 
 /// This function prototype is used for Sort()
-typedef int ArraySortCompareFunction (void const* item1,
-	void const* item2);
+typedef int ArraySortCompareFunction (void const* item1, void const* item2);
 
 /**
  * The default element handler for csArray.
@@ -43,7 +42,7 @@ class csArrayElementHandler
 public:
   static void Construct (T* address, T const& src)
   {
-    new (static_cast<void*>(address)) T(src);
+    new (CS_STATIC_CAST(void*,address)) T(src);
   }
 
   static void Destroy (T* address)
