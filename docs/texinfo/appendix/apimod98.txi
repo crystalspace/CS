@@ -201,16 +201,16 @@ The behaviour of procedural textures also differs as a material of the same
 name was created along with the texture; this isn't the case any more, you
 have to create a material which uses the procedural texture manually.
 
-@subheading Mesh factories and iPolygonMesh
+@subheading Mesh objects and iPolygonMesh
 
-Some mesh factories used to support the querying of the @code{iPolygonMesh}
+Some mesh objects used to support the querying of the @code{iPolygonMesh}
 interface (e.g. Thing, Sprite3D, Genmesh). Due to the way this was 
 implemented internally this caused leaks. So, querying @code{iPolygonMesh} 
-directly from the factory is now discouraged. Although it may still work in 
+directly from the object is now discouraged. Although it may still work in 
 some cases, this feature may be dropped without further notice and may not 
 work in all cases. 
 
-Instead, if you want the polygon mesh from a factory, query for the 
+Instead, if you want the polygon mesh from a object, query for the 
 @code{iObjectModel} interface and utilize one of the 
 @code{GetPolygonMeshXXX()} methods, depending on what you need (the old 
 interface query returned the collision detection mesh.) This has also the 
