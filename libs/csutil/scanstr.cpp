@@ -161,7 +161,7 @@ int csScanStr (const char* in, const char* format, ...)
 	  else if (*in != 0)
 	  {
 	    const char* in2 = in + strspn (in, "abcdefghijklmnopqrstuvwxyz"
-	      "ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789./");
+	      "ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789./-");
 	    strncpy (a, in, (int)(in2-in));
 	    a[(int)(in2-in)] = 0;
 	    in = in2;
