@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Aug-2004
+	- Eric Sunshine changed the install location of Crystal Space headers
+	  from ${includedir} to ${includedir}/crystalspace in order to avoid
+	  polluting the top-level of the global header directory
+	  (/usr/local/include, for instance). cs-config has been altered to
+	  return the new header location in response to --includedir, --cflags,
+	  and --cxxflags, thus the header directory relocation should be
+	  essentially transparent to clients.
+	- Eric Sunshine fixed bug in cs-config where the --libdir option always
+	  returned the empty string.
 2-Aug-2004
 	- Eric Sunshine localized the faked-up `socklen_t' from csdef.h to
 	  csutil/sockets.h so that the type is faked up only if requested by

@@ -1,21 +1,15 @@
 # Detect type of the installation and the directories where the library files
 # reside in.
+libdir=""
 lflags=""
 
-#A standard installation
-if test -r "${exec_prefix}/lib/libcsutil.a"; then
+if test -r "$prefix/Jamfile" && \
+    test -r "$prefix/$makeout/libs/csutil/libcsutil.a"; then
+    libdir="$prefix/$makeout/libs"
+    lflags="-L$libdir/csutil -L$libdir/cstool -L$libdir/csgfx -L$libdir/csgeom -L$libdir/csws"
+elif test -z "$libdir" && test -r "${exec_prefix}/lib/libcsutil.a"; then
+    libdir="${exec_prefix}/lib"
     lflags="-L${exec_prefix}/lib"
-fi
-#is it an old make type build?
-if test -z "$libdir" -a -r "$prefix/Makefile" \
-     -a -r "$prefix/$makeout/libcsutil.a"; then
-    lflags="-L$prefix/$makeout"
-fi
-#new style jam build?
-if test -z "$libdir" -a -r "$prefix/Jamfile" \
-     -a -r "$prefix/$makeout/libs/csutil/libcsutil.a"; then
-    libd=$prefix/$makeout/libs
-    lflags="-L$libd/csutil -L$libd/cstool -L$libd/csgfx -L$libd/csgeom -L$libd/csws"
 fi
 
 usage()

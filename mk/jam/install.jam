@@ -26,6 +26,7 @@ INSTALL_DATA ?= "$(INSTALL) -m 644" ;
 appdatadir ?= [ ConcatDirs $(datadir) $(PACKAGE_NAME) ] ;
 appdocdir ?= [ ConcatDirs $(datadir) doc $(PACKAGE_NAME)-$(PACKAGE_VERSION) ] ;
 appconfdir ?= [ ConcatDirs $(sysconfdir) $(PACKAGE_NAME) ] ;
+appincdir ?= [ ConcatDirs $(includedir) $(PACKAGE_NAME) ] ;
 plugindir ?= [ ConcatDirs $(libdir) $(PACKAGE_NAME) ] ;
 
 rule GristInstall
@@ -46,7 +47,7 @@ rule InstallHeader
 {
     local files = [ GristInstall $(<) ] ;
     SEARCH on $(files) = $(SUBDIR) ;
-    Depends install_include : [ DoInstall $(files) : $(includedir) $(2) ] ;
+    Depends install_include : [ DoInstall $(files) : $(appincdir) $(2) ] ;
 }
 
 ##  InstallData files [ : subdir ]
