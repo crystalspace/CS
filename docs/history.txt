@@ -40,6 +40,7 @@ chronological order.
 	  the PVSvis culler. This is the first time a culler implements
 	  a specific interface. This will be used to fetch the PVS tree
 	  from a culler (for PVScalc).
+	- Jorrit fixed a missing semi-colon in xwindow.cpp.
 22-Dec-2004
 	- Philipp Aumayr fixed a bug in the thing where the bounding box was not
 	  invalidated when a quad was added.. this fixes a culling probs with

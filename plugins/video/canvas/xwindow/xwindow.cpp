@@ -479,7 +479,7 @@ static Bool AlwaysTruePredicate (Display*, XEvent*, char*)
 bool csXWindow::HandleEvent (iEvent &Event)
 {
   static int buttonMapping[6] = {0, 1, 3, 2};
-  const int buttonMapCount = sizeof (buttonMapping) / sizeof (int)
+  const int buttonMapCount = sizeof (buttonMapping) / sizeof (int);
   XEvent event;
   KeySym xKey;
   utf32_char csKeyRaw = 0, csKeyCooked = 0;
