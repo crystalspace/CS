@@ -30,6 +30,7 @@ IMPLEMENT_CSOBJTYPE (csSprite2D, csSprite)
 csSprite2D::csSprite2D () : csSprite (), position (0, 0, 0)
 {
   cstxt = NULL;
+  lighting = true;
 }
 
 csSprite2D::~csSprite2D ()
@@ -43,6 +44,7 @@ void csSprite2D::UpdatePolyTreeBBox ()
 void csSprite2D::UpdateLighting (csLight** lights, int num_lights)
 {
   defered_num_lights = 0;
+  if (!lighting) return;
   csColor color (0, 0, 0);
 
   csSector* sect = (csSector*)sectors[0];

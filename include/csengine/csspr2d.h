@@ -60,6 +60,12 @@ private:
   csTextureHandle* cstxt;
 
   /**
+   * If false then we don't do lighting but instead use
+   * the given colors.
+   */
+  bool lighting;
+
+  /**
    * Update the bounding box for the polygon tree
    * algorithm.
    */
@@ -76,6 +82,15 @@ public:
 
   /// Get the vertex array.
   csColoredVertices& GetVertices () { return vertices; }
+
+  /**
+   * Set true if this sprite needs lighting (default).
+   * Otherwise the given colors are used.
+   */
+  void SetLighting (bool l) { lighting = l; }
+
+  /// Return the value of the lighting flag.
+  bool HasLighting () { return lighting; }
 
   /**
    * Set the transformation vector to move sprite to some position.

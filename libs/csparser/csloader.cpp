@@ -4734,6 +4734,7 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
     TOKEN_TABLE (TEXNR)
     TOKEN_TABLE (MIXMODE)
     TOKEN_TABLE (MOVE)
+    TOKEN_TABLE (COLORS)
   TOKEN_TABLE_END
 
   char* name;
@@ -4784,6 +4785,22 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
 	    verts[i].u = list[i*2+0];
 	    verts[i].v = list[i*2+1];
 	  }
+        }
+        break;
+      case TOKEN_COLORS:
+        {
+          float list[100];
+	  int num;
+          ScanStr (params, "%F", list, &num);
+	  num /= 3;
+	  verts.SetLength (num);
+          for (i = 0 ; i < num ; i++)
+	  {
+	    verts[i].color.red = list[i*3+0];
+	    verts[i].color.green = list[i*3+1];
+	    verts[i].color.blue = list[i*3+2];
+	  }
+	  spr->SetLighting (false);
         }
         break;
       case TOKEN_MOVE:

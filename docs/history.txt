@@ -19,6 +19,10 @@ Short-term cleanups that need to be done:
 	  Now you can do things like MIXMODE (MULTIPLY () ADD ())
 	  or MIXMODE (ALPHA (.5)).
 	- Implemented support for lighting of 2D sprites.
+	- Added support for explicit color setting of the 2D sprite
+	  vertices. This can be used instead of the default lighting
+	  if you want the vertices to have a fixed color.
+	  Use the COLORS keyword in the loader.
 	- Andrew Zabolotny did the following changes:
 	    - Further work on MazeD. Well, it is already useable: you
 	      can build simple levels in MazeD (from scratch) without
