@@ -401,8 +401,6 @@ void awsScrollBar::KnobTick (void *sk, iAwsSource *)
    *  know how "proportional scrollbars" are supposed to work so I haven't
    *  attempted to fix them.
    */
-  // For non "proportional" scrollbars, this value is sb->max (the Max property of the scrollbar) + 1
-  float maxval = (sb->max  - sb->amntvis + 1);
 
   if (sb->orientation == sboVertical)
   {
@@ -430,7 +428,7 @@ void awsScrollBar::KnobTick (void *sk, iAwsSource *)
     int bh = f.Height () - height;
     
     // If there's no area to scroll through or the range (max - min) is less than 0, then there is only one possible position to be at.
-    if (((maxval - sb->min) <= 0) || (bh == 0)) 
+    if (((sb->max - sb->min) <= 0) || (bh == 0)) 
       sb->value = 0;
     else
       /*  sb->knob->last_y is actually the last y position of the mouse while dragging the knob
@@ -441,7 +439,7 @@ void awsScrollBar::KnobTick (void *sk, iAwsSource *)
        *  That value is multiplied by the range this bar is supposed to cover (max - min) which gives us the number in range-units that we are into
        *  the bar.  Finally we add the minimum to get the actual range-unit the mouse is at.
        */
-      sb->value = ((sb->knob->last_y - (sb->knob->Frame().Height()/2) - sb->decVal->Frame ().ymax) * (maxval - sb->min) / bh) + sb->min;
+      sb->value = ((sb->knob->last_y - (sb->knob->Frame().Height()/2) - sb->decVal->Frame ().ymax) * (sb->max - sb->min) / bh) + sb->min;
 
   }
   else if (sb->orientation == sboHorizontal)
@@ -464,10 +462,10 @@ void awsScrollBar::KnobTick (void *sk, iAwsSource *)
    
     int bw = f.Width () - width;
 
-    if (maxval == 0)
-      sb->value = 0;
+    if ((sb->max - sb->min <= 0) || (bw == 0))
+      sb->value = sb->min;
     else
-      sb->value = ((sb->knob->last_x - (sb->knob->Frame().Width()/2) - sb->decVal->Frame ().xmax) * (maxval - sb->min) / bw) + sb->min ;
+      sb->value = ((sb->knob->last_x - (sb->knob->Frame().Width()/2) - sb->decVal->Frame ().xmax) * (sb->max - sb->min) / bw) + sb->min ;
   }
   else
     return ;
@@ -475,7 +473,7 @@ void awsScrollBar::KnobTick (void *sk, iAwsSource *)
   sb->value =
     (
       sb->value < sb->min ? sb->min :
-        (sb->value > maxval ? maxval : sb->value)
+        (sb->value > sb->max ? sb->max : sb->value)
     );
   sb->Broadcast (signalChanged);
   sb->Invalidate ();
@@ -522,11 +520,10 @@ void awsScrollBar::IncClicked (void *sk, iAwsSource *)
   sb->value += sb->value_delta;
 
   /// Check floor and ceiling
-  float maxval = (sb->max - sb->amntvis + 1);
   sb->value =
     (
      sb->value < sb->min ? sb->min :
-     (sb->value > maxval ? maxval : sb->value)
+     (sb->value > sb->max ? sb->max : sb->value)
      );
 
   sb->Broadcast (signalChanged);
@@ -540,11 +537,10 @@ void awsScrollBar::DecClicked (void *sk, iAwsSource *)
   sb->value -= sb->value_delta;
 
   /// Check floor and ceiling
-  float maxval = (sb->max - sb->amntvis + 1);
   sb->value =
     (
       sb->value < sb->min ? sb->min :
-        (sb->value > maxval ? maxval : sb->value)
+        (sb->value > sb->max ? sb->max : sb->value)
     );
 
   sb->Broadcast (signalChanged);
