@@ -7,7 +7,7 @@ The history order has been reversed so that new features are at the top.
 	      looks *much* nicer in the printed manual, and quite a bit better
 	      in the HTML and Info translations as well.
 	    - Eliminated the overfull 'hbox' warnings reported by TeX.
-	    - Added discussion about word loading semantics.
+	    - Added discussion about world loading semantics.
 	    - Added section explaining grammar of world file syntax.  Added
 	      grammar examples, as well.
 	- Eric Sunshine upgraded texi2html to version 1.64.
