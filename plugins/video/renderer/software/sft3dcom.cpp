@@ -1535,6 +1535,10 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
     if ((ABS (poly.vertices [i].sx - poly.vertices [i - 1].sx)
        + ABS (poly.vertices [i].sy - poly.vertices [i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
       num_vertices++;
+    // the above does not catch cases like this:
+    // p1   p2   p3
+    // x----x----x    a degenerated hexagon :)  norman
+    // p6   p5   p4   
   }
 
   if (((min_y + EPSILON) < 0) ||
