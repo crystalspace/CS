@@ -1391,8 +1391,9 @@ AC_DEFUN([CS_CHECK_LIB3DS],
 	[cs_3ds_libs_test='-lm'], [cs_3ds_libs_test=''])
     CS_CHECK_LIB_WITH([3ds],
 	[AC_LANG_PROGRAM(
-	    [#include <lib3ds/file.h>],
-	    [lib3ds_file_new();])],
+	    [#include <lib3ds/file.h>
+	    #include <lib3ds/io.h>],
+	    [lib3ds_file_new(); lib3ds_io_free(0);])],
 	[libs/lib3ds*], [],
 	[CS_MAKEFILE_BUILD_RESULT([cs_cv_lib3ds], [3DS])], [],
 	[], [], [$cs_3ds_libs_test])])
