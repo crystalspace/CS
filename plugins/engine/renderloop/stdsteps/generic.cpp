@@ -253,7 +253,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   int numSSM = 0;
   iShader* shader = 0;
 
-  csShaderVariable *sv;
+  csRef<csShaderVariable> sv;
   sv = shadervars.GetVariableAdd (fogdensity_name);
   if (sector->HasFog())
     sv->SetValue (sector->GetFog()->density);
@@ -262,7 +262,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 
   //construct a cameraplane
   csVector4 fogPlane;
-  /*iPortal *lastPortal = rview->GetLastPortal();
+  iPortal *lastPortal = rview->GetLastPortal();
   if(lastPortal)
   {
     csPlane3 plane;
@@ -270,12 +270,20 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     fogPlane = plane.norm;
     fogPlane.w = plane.DD;
   }
-  else*/
+  else
   {
     fogPlane = csVector4(0.0,0.0,1.0,0.0);
   }
-  sv = shadervars.GetVariableAdd (fogplane_name);
+  sv = csPtr<csShaderVariable> (
+    new csShaderVariable (fogplane_name));
   sv->SetValue (fogPlane);
+
+  if (stacks.Length () <= (int)fogplane_name)
+    stacks.SetLength (fogplane_name+1);
+  stacks[fogplane_name].Push (sv);
+
+  /*sv = shadervars.GetVariableAdd (fogplane_name);
+  sv->SetValue (fogPlane);*/
 
   for (int n = 0; n < num; n++)
   {
@@ -327,6 +335,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       RenderMeshes (g3d, shader, sameShaderMeshes+lastidx, 
         numSSM, stacks);
   }
+
+  stacks[fogplane_name].Pop ();
 
   ToggleStepSettings (g3d, false);
 }
