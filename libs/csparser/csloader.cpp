@@ -374,7 +374,7 @@ iCollection* csLoader::load_collection (char* name, char* buf)
       case CS_TOKEN_LIGHT:
         {
           ScanStr (params, "%s", str);
-	  csStatLight* l = Engine->GetCsEngine()->FindLight (str);
+	  csStatLight* l = Engine->GetCsEngine()->FindLight (str, ResolveOnlyRegion);
           if (!l)
             CsPrintf (MSG_WARNING, "Light '%s' not found!\n", str);
 	  else
@@ -397,7 +397,7 @@ iCollection* csLoader::load_collection (char* name, char* buf)
         {
           ScanStr (params, "%s", str);
 	  //@@@$$$ TODO: Collection in regions.
-          iCollection* th = Engine->FindCollection(str);
+          iCollection* th = Engine->FindCollection(str, ResolveOnlyRegion);
           if (!th)
           {
             CsPrintf (MSG_FATAL_ERROR, "Collection '%s' not found!\n", str);
