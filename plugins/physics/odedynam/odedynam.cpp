@@ -975,13 +975,13 @@ bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
 
 void csODERigidBody::SetPosition (const csVector3& pos)
 {
-    dGeomSetPosition (groupID, pos.x, pos.y, pos.z);
+    dBodySetPosition (bodyID, pos.x, pos.y, pos.z);
     if (statjoint != 0) dJointSetFixed(statjoint);
 }
 
 const csVector3 csODERigidBody::GetPosition () const
 {
-  const dReal* pos = dGeomGetPosition (bodyID);
+  const dReal* pos = dBodyGetPosition (bodyID);
   return csVector3 (pos[0], pos[1], pos[2]);
 }
 
