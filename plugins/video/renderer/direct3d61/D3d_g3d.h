@@ -347,6 +347,11 @@ public:
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
     int tx, int ty, int tw, int th);
 
+  /// Create an off screen canvas
+  virtual iGraphics3D *CreateOffScreenRenderer (int /*width*/, int /*height*/, 
+     csPixelFormat */*pfmt*/, void */*buffer*/, RGBPixel */*palette*/, int /*pal_size*/)
+  { return NULL; }
+
 private:
 
   // Z-Buffer enumeration callback  

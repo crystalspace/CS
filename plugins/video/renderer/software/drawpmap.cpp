@@ -17,7 +17,7 @@
 */
 
 #include "sysdef.h"
-#include "soft_g3d.h"
+#include "sft3dcom.h"
 #include "soft_txt.h"
 
 #define DRAWSPRITE_NAME DrawPixmap8
@@ -32,7 +32,7 @@
 #define DRAWSPRITE_PIXTYPE ULong
 #include "drawsprt.inc"
 
-void csGraphics3DSoftware::DrawPixmap (iTextureHandle *hTex,
+void csGraphics3DSoftwareCommon::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh,
   int tx, int ty, int tw, int th)
 {

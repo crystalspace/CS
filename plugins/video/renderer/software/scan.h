@@ -27,7 +27,7 @@
 
 class csTextureSoftware;
 class csTextureMMSoftware;
-class csGraphics3DSoftware;
+class csGraphics3DSoftwareCommon;
 struct iPolygonTexture;
 
 //---//---//---//---//---//---//---//---//---//---//---//---// Constants //---//
@@ -228,10 +228,10 @@ void csScan_Finalize ();
 /// Calculate blending tables (should be called each time pixel format changes)
 void csScan_CalcBlendTables (int rbits, int gbits, int bbits);
 /// Initialize the scanline variables
-void csScan_InitDraw (int MipMap, csGraphics3DSoftware* g3d,
+void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
   iPolygonTexture* tex, csTextureMMSoftware* texture, csTextureSoftware *untxt);
 /// Dump debugging information about last polygon
-void csScan_dump (csGraphics3DSoftware* pG3D);
+void csScan_dump (csGraphics3DSoftwareCommon* pG3D);
 /// Pixel-depth independent routine
 csDrawScanline csScan_draw_scanline_zfil;
 /// Pixel-depth independent routine

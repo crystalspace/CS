@@ -24,6 +24,11 @@ The history order has been reversed so that new features are at the top.
 	- Norman fixed gfxtest to change %ld to %d. Eric then fixed this
 	  fix to be more portable with regards to how size_t is defined.
 	- Norman removed various unused variables.
+	- Received a patch from Samuel Humphreys which allows you to render
+	  on texture dynamically. Currently this only works for the software
+	  renderer. Support for the other renderers will have to be added.
+	  There is also a new 'dtsimple' demo app to show of the new
+	  feature.
 8-May-2000
 	- Eric Sunshine re-enabled -kb flag and re-added CRLF line terminators
 	  for all .dsp files so that they will work even from CVS snapshot

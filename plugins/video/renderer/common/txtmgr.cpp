@@ -27,7 +27,7 @@
 #include "iimage.h"
 #include "isystem.h"
 #include "lightdef.h"
-
+#include "igraph2d.h"
 //---------------------------------------------------------- csTextureMM -----//
 
 IMPLEMENT_IBASE (csTextureMM)
@@ -66,13 +66,14 @@ void csTextureMM::CreateMipmaps ()
 {
   if (!image) return;
 
+  RGBPixel *tc = transp ? &transp_color : (RGBPixel *)NULL;
+
+  image->IncRef ();
+
   // Delete existing mipmaps, if any
   for (int i = 0; i < 4; i++)
     CHKB (delete tex [i]);
 
-  RGBPixel *tc = transp ? &transp_color : (RGBPixel *)NULL;
-
-  image->IncRef ();
   tex [0] = NewTexture (image);
 
   // 2D textures uses just the top-level mipmap

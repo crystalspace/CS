@@ -141,6 +141,12 @@ public:
 
   /// Apply gamma correction to private palette
   void ApplyGamma (UByte *GammaTable);
+
+  void CreateDynamicTexture(csTextureManagerSoftware *texman, iGraphics3D *parentG3D, csPixelFormat *PixelFormat);
+
+  virtual iGraphics3D *GetDynamicTextureInterface ();
+
+  virtual void DynamicTextureSyncPalette ();
 };
 
 /**
@@ -176,6 +182,32 @@ public:
 };
 
 /**
+ * csTextureSoftwareDynamic is a class derived from csTextureSoftware that
+ * implements the additional functionality to allow acess to the texture
+ * memory via iGraphics2D/3D interfaces. Internally iGraphics2D/3D are 
+ * initialised in 8bit mode and use the palette as calculated by 
+ * csTextureMMSoftware, so you can render to them as usual without
+ * requiring recalculation of palettes each frame. 
+ */
+class csTextureSoftwareDynamic : public csTextureSoftware
+{
+public:
+  iGraphics3D *texG3D;
+  csTextureManagerSoftware *texman;
+
+  csTextureSoftwareDynamic (csTextureMM *Parent, iImage *Image)
+    : csTextureSoftware (Parent, Image)
+  {};
+  /// Destroy the texture
+  virtual ~csTextureSoftwareDynamic ();
+
+
+  void CreateInterfaces (csTextureManagerSoftware *texman, 
+   iGraphics3D *parentG3D, csPixelFormat *pfmt,  RGBPixel *palette, 
+   int palette_size);
+};
+
+/**
  * Software version of the texture manager. This instance of the
  * texture manager is probably the most involved of all 3D rasterizer
  * specific texture manager implementations because it needs to do
@@ -203,6 +235,8 @@ private:
   /// We need a pointer to the 2D driver
   iGraphics2D *G2D;
 
+  /// We need a pointer to the 3D driver
+  iGraphics3D *G3D;
 public:
   /// Apply dithering to textures while reducing from 24-bit to 8-bit paletted?
   bool dither_textures;
@@ -226,7 +260,7 @@ public:
   float Gamma;
 
   ///
-  csTextureManagerSoftware (iSystem *iSys, iGraphics2D *iG2D, csIniFile *config);
+  csTextureManagerSoftware (iSystem *iSys, iGraphics3D *iG3D, csIniFile *config);
   ///
   virtual ~csTextureManagerSoftware ();
 

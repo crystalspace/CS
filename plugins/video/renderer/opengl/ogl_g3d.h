@@ -397,6 +397,12 @@ public:
 
   //Extension flags
   bool ARB_multitexture;
+
+
+  /// Create an off screen canvas
+  virtual iGraphics3D *CreateOffScreenRenderer (int /*width*/, int /*height*/, 
+     csPixelFormat */*pfmt*/, void */*buffer*/, RGBPixel */*palette*/, int /*pal_size*/)
+  { return NULL; }
 };
 
 #endif

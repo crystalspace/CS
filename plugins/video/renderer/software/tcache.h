@@ -24,7 +24,7 @@
 #include "csutil/bitset.h"
 #include "ipolygon.h"
 
-class csGraphics3DSoftware;
+class csGraphics3DSoftwareCommon;
 class csTextureManagerSoftware;
 struct csPixelFormat;
 
@@ -45,6 +45,7 @@ struct csPixelFormat;
 class SoftwareCachedTexture
 {
 public:
+
   /// Linked in the texture cache.
   SoftwareCachedTexture *next, *prev;
 
@@ -120,6 +121,24 @@ protected:
   csTextureManagerSoftware *texman;
 
 public:
+  void (csTextureCacheSoftware::*create_lighted_texture) 
+                        (iPolygonTexture *pt, SoftwareCachedTexture *ct, 
+		         csTextureManagerSoftware *texman,
+		         float u_min, float v_min, float u_max, float v_max);
+
+  void create_lighted_texture_8 (iPolygonTexture *pt, 
+		 SoftwareCachedTexture *ct, csTextureManagerSoftware *texman,
+		        float u_min, float v_min, float u_max, float v_max);
+  void create_lighted_texture_555(iPolygonTexture *pt, 
+		 SoftwareCachedTexture *ct, csTextureManagerSoftware *texman,
+			float u_min, float v_min, float u_max, float v_max);
+  void create_lighted_texture_565(iPolygonTexture *pt, 
+		 SoftwareCachedTexture *ct, csTextureManagerSoftware *texman,
+			float u_min, float v_min, float u_max, float v_max);
+  void create_lighted_texture_888(iPolygonTexture *pt, 
+		 SoftwareCachedTexture *ct, csTextureManagerSoftware *texman,
+			float u_min, float v_min, float u_max, float v_max);
+
   /// Current frame number
   int frameno;
 
@@ -159,7 +178,7 @@ public:
   /**
    * Do a debugging dump.
    */
-  void dump (csGraphics3DSoftware *iG3D);
+  void dump (csGraphics3DSoftwareCommon *iG3D);
 };
 
 #endif // __TCACHE_H__

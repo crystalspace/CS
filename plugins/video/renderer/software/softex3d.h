@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 1998-2000 by Jorrit Tyberghein
+    Copyright (C) 2000 by Jorrit Tyberghein
+    Written by Samuel Humphreys
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,46 +17,36 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SOFT_G3D_H__
-#define __SOFT_G3D_H__
+#ifndef __SOFTEX3D_H__
+#define __SOFTEX3D_H__
 
 // GRAPH3D.H
-// csGraphics3DSoftware software rasterizer class.
+// csDynamicTextureSoft3Dture software rasterizer class.
 
 #include "csutil/scf.h"
-#include "iconfig.h"
-#include "video/renderer/software/sft3dcom.h"
+#include "sft3dcom.h"
+
+struct iGraphics2D;
+struct iGraphics3D;
+struct iSystem;
 
 
-class csGraphics3DSoftware : public csGraphics3DSoftwareCommon
+class csDynamicTextureSoft3D : public csGraphics3DSoftwareCommon
 {
 
 public:
   DECLARE_IBASE;
-  ///
-  csGraphics3DSoftware (iBase *iParent);
-  ///
-  virtual ~csGraphics3DSoftware ();
 
+  iGraphics2D* parentG2D;
+
+  csDynamicTextureSoft3D (iSystem *isys, iGraphics2D *iparentG2D);
   ///
-  virtual bool Initialize (iSystem *iSys);
-  ///
+  virtual ~csDynamicTextureSoft3D () {};
+
   virtual bool Open (const char *Title);
 
   virtual iGraphics3D *CreateOffScreenRenderer (int width, int height, 
      csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size);
-
-  ///------------------- iConfig interface implementation -------------------
-  struct csSoftConfig : public iConfig
-  {
-    DECLARE_EMBEDDED_IBASE (csGraphics3DSoftware);
-    virtual bool GetOptionDescription (int idx, csOptionDescription *option);
-    virtual bool SetOption (int id, csVariant* value);
-    virtual bool GetOption (int id, csVariant* value);
-  } scfiConfig;
-  friend struct csSoftConfig;
-
-
 };
 
-#endif // __SOFT_G3D_H__
+#endif // __SOFTEX3D_H__

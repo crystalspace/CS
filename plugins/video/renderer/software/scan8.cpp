@@ -59,7 +59,7 @@
 #define SCANFUNC csScan_8_draw_scanline_map_filt_zfil
 #define SCANMAP
 #define SCANLOOP \
-    int filter_bf_shifted=csGraphics3DSoftware::filter_bf>>1,filter_du, filter_dv;            \
+    int filter_bf_shifted=csGraphics3DSoftwareCommon::filter_bf>>1,filter_du, filter_dv;            \
     while(_dest<=_destend&&((vv<BAILOUT_CONSTANT||uu<BAILOUT_CONSTANT)||(vv>=Scan.th2fp-BAILOUT_CONSTANT||uu>=Scan.tw2fp-BAILOUT_CONSTANT)))\
     {                                                                   \
       *_dest++ = srcTex[((vv>>16)<<shifter) + (uu>>16)];                \

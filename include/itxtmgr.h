@@ -41,6 +41,7 @@ struct iTextureHandle;
 /// You're going to yse the texture for 3D drawing
 #define CS_TEXTURE_3D			0x00000002
 /**
+ * Create a dynamic texture.
  * The texture manager should be able to hand you a pointer to some buffer
  * containing texture image and a format description. You can change the
  * contents of that buffer and then hand it back to the texture manager.

@@ -30,27 +30,27 @@ static int hash_table [384];
 
 //------------------------------------------------------------------------------
 
-#define LM_NAME		create_lighted_texture_8
+#define LM_NAME		csTextureCacheSoftware::create_lighted_texture_8
 #define PI_INDEX8
 #include "lightmap.inc"
 
-#define LM_NAME		create_lighted_texture_555
+#define LM_NAME		csTextureCacheSoftware::create_lighted_texture_555
 #define PI_R5G5B5
 #include "lightmap.inc"
 
-#define LM_NAME		create_lighted_texture_565
+#define LM_NAME		csTextureCacheSoftware::create_lighted_texture_565
 #define PI_R5G6B5
 #include "lightmap.inc"
 
-#define LM_NAME		create_lighted_texture_888
+#define LM_NAME		csTextureCacheSoftware::create_lighted_texture_888
 #define PI_R8G8B8
 #include "lightmap.inc"
 
 //------------------------------------------------- csTextureCacheSoftware ---//
 
-static void (*create_lighted_texture) (iPolygonTexture *pt,
-  SoftwareCachedTexture *ct, csTextureManagerSoftware *texman,
-  float u_min, float v_min, float u_max, float v_max);
+//  static void (*create_lighted_texture) (iPolygonTexture *pt,
+//    SoftwareCachedTexture *ct, csTextureManagerSoftware *texman,
+//    float u_min, float v_min, float u_max, float v_max);
 
 static void compute_hash_table ()
 {
@@ -66,14 +66,14 @@ csTextureCacheSoftware::csTextureCacheSoftware (csTextureManagerSoftware *TexMan
   Clear ();
   bytes_per_texel = texman->pfmt.PixelBytes;
   if (texman->pfmt.PixelBytes == 1)
-    create_lighted_texture = create_lighted_texture_8;
+    create_lighted_texture = &csTextureCacheSoftware::create_lighted_texture_8;
   else if (texman->pfmt.PixelBytes == 2)
     if (texman->pfmt.GreenBits == 5)
-      create_lighted_texture = create_lighted_texture_555;
+      create_lighted_texture = &csTextureCacheSoftware::create_lighted_texture_555;
     else
-      create_lighted_texture = create_lighted_texture_565;
+      create_lighted_texture = &csTextureCacheSoftware::create_lighted_texture_565;
   else if (texman->pfmt.PixelBytes == 4)
-    create_lighted_texture = create_lighted_texture_888;
+    create_lighted_texture = &csTextureCacheSoftware::create_lighted_texture_888;
   else
     abort (); // huh???
   compute_hash_table ();
@@ -259,7 +259,7 @@ void csTextureCacheSoftware::fill_texture (int MipMap, iPolygonTexture* pt,
 
 #define SysPrintf iG3D->System->Printf
 
-void csTextureCacheSoftware::dump (csGraphics3DSoftware *iG3D)
+void csTextureCacheSoftware::dump (csGraphics3DSoftwareCommon *iG3D)
 {
   SysPrintf (MSG_CONSOLE, "Textures in the cache: %d\n", total_textures);
   SysPrintf (MSG_CONSOLE, "Total size: %ld bytes\n", total_size);

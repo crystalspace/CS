@@ -1,3 +1,21 @@
+/*
+    Copyright (C) 1998, 2000mak by Jorrit Tyberghein
+  
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+  
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+  
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #include "csutil/scf.h"
 #include "types.h"
 
@@ -5,6 +23,8 @@
 #define ITEXTURE_H
 
 SCF_VERSION (iTextureHandle, 2, 0, 0);
+
+struct iGraphics3D;
 
 /** 
  * A texture handle as returned by iTextureManager.
@@ -44,6 +64,24 @@ struct iTextureHandle : public iBase
    * For internal usage by the 3D driver.
    */
   virtual void *GetPrivateObject () = 0;
+
+  /**
+   * If the texture handle was created with a dynamic texture, this
+   * function returns an iGraphics3D interface to a texture buffer which 
+   * can be used in the  same way as a frame buffer based iGraphics3D.
+   * This interface only becomes available once the texture has been
+   * prepared by the texture manager.
+   */ 
+  virtual iGraphics3D *GetDynamicTextureInterface () = 0;
+
+  /**
+   * If this is a dynamic texture, call this function after you have changed
+   * the palette on the dynamic texture iGraphics3Ds' own texture manager.
+   * This will sync palettes between the textures' texture manager and the 
+   * the texture manager which is managing the dynamic texture. Is that clear!
+   */
+
+  virtual void DynamicTextureSyncPalette () = 0;
 };
 
 #endif //ITEXTURE_H

@@ -278,6 +278,10 @@ struct iGraphics2D : public iPlugIn
 
   /// Do a screenshot: return a new iImage object
   virtual iImage *ScreenShot () = 0;
+
+  /// Create an Off Screen Canvas
+  virtual iGraphics2D *CreateOffScreenCanvas (int width, int height, 
+     csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size) = 0;
 };
 
 #endif // __IGRAPH2D_H__

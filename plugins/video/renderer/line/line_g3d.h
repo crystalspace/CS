@@ -226,6 +226,11 @@ public:
   virtual void DrawPixmap (iTextureHandle*, int, int, int, int, int, int, int, int)
   { }
 
+  /// Create an off screen canvas
+  virtual iGraphics3D *CreateOffScreenRenderer (int /*width*/, int /*height*/, 
+     csPixelFormat */*pfmt*/, void */*buffer*/, RGBPixel */*palette*/, int /*pal_size*/)
+  { return NULL; }
+
   ///------------------- iConfig interface implementation -------------------
   struct csLineConfig : public iConfig
   {

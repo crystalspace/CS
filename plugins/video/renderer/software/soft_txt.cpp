@@ -144,7 +144,10 @@ csTextureMMSoftware::~csTextureMMSoftware ()
 
 csTexture *csTextureMMSoftware::NewTexture (iImage *Image)
 {
-  return new csTextureSoftware (this, Image);
+  if ((flags & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC)
+    return new csTextureSoftwareDynamic (this, Image);
+  else
+    return new csTextureSoftware (this, Image);
 }
 
 void csTextureMMSoftware::ApplyGamma (UByte *GammaTable)
@@ -198,7 +201,7 @@ void csTextureMMSoftware::ComputeMeanColor ()
         csQuantizeRemap ((RGBPixel *)t->image->GetImageData (),
           t->get_size (), t->bitmap, tc);
 
-      // Very well. Now we don'tex need the iImage anymore, so free it
+      // Very well, we don't need the iImage anymore, so free it
       t->image->DecRef ();
       t->image = NULL;
     }
@@ -277,6 +280,43 @@ void csTextureMMSoftware::remap_texture (csTextureManagerSoftware *texman)
   }
 }
 
+void csTextureMMSoftware::DynamicTextureSyncPalette ()
+{
+  if ((flags & CS_TEXTURE_DYNAMIC) != CS_TEXTURE_DYNAMIC)
+    return;
+  // still need to consider when in 8bit mode.
+  remap_texture (((csTextureSoftwareDynamic*)tex[0])->texman);
+}
+
+iGraphics3D *csTextureMMSoftware::GetDynamicTextureInterface ()
+{
+  if ((flags & CS_TEXTURE_DYNAMIC) != CS_TEXTURE_DYNAMIC)
+    return NULL;
+
+  return ((csTextureSoftwareDynamic*)tex[0])->texG3D;
+}
+
+void csTextureMMSoftware::CreateDynamicTexture (csTextureManagerSoftware *texman,iGraphics3D *parentG3D, csPixelFormat *pfmt)
+{
+  ((csTextureSoftwareDynamic*)tex[0])->CreateInterfaces (texman, parentG3D,
+                               pfmt, palette, 256 /*palette_size*/);
+}
+
+//----------------------------------------------- csTextureSoftwareDynamic----//
+void csTextureSoftwareDynamic::CreateInterfaces 
+  (csTextureManagerSoftware *itexman, iGraphics3D *parentG3D, 
+   csPixelFormat *pfmt, RGBPixel *palette, int palette_size)
+{
+  texman = itexman;
+  texG3D = parentG3D->CreateOffScreenRenderer (w, h, pfmt, (void*) bitmap, 
+					       palette, palette_size);
+}
+
+csTextureSoftwareDynamic::~csTextureSoftwareDynamic ()
+{ 
+  texG3D->DecRef (); 
+}
+
 //----------------------------------------------- csTextureManagerSoftware ---//
 
 static UByte *GenLightmapTable (int bits)
@@ -295,12 +335,14 @@ static UByte *GenLightmapTable (int bits)
 }
 
 csTextureManagerSoftware::csTextureManagerSoftware (iSystem *iSys,
-  iGraphics2D *iG2D, csIniFile *config) : csTextureManager (iSys, iG2D)
+  iGraphics3D *iG3D, csIniFile *config) 
+  : csTextureManager (iSys, iG3D->GetDriver2D())
 {
   alpha_tables = NULL;
   ResetPalette ();
   read_config (config);
-  G2D = iG2D;
+  G3D = iG3D;
+  G2D = iG3D->GetDriver2D ();
   inv_cmap = NULL;
   texman = this;
 }
@@ -469,6 +511,8 @@ void csTextureManagerSoftware::compute_palette ()
   for (int t = textures.Length () - 1; t >= 0; t--)
   {
     csTextureMMSoftware *txt = (csTextureMMSoftware *)textures [t];
+    if ((txt->GetFlags() & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC)
+      continue;
     RGBPixel colormap [256];
     int colormapsize;
     txt->GetOriginalColormap (colormap, colormapsize);
@@ -541,14 +585,18 @@ void csTextureManagerSoftware::PrepareTextures ()
 
   // Remap all textures according to the new colormap.
   for (i = 0; i < textures.Length (); i++)
-    ((csTextureMMSoftware*)textures.Get (i))->remap_texture (this);
+  {
+    csTextureMMSoftware* txt = (csTextureMMSoftware*)textures.Get (i);
+    txt->remap_texture (this);
+    if ((txt->GetFlags() & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC)
+      ((csTextureMMSoftware*)txt)->CreateDynamicTexture (this, G3D, &pfmt);
+  }
 }
 
 iTextureHandle *csTextureManagerSoftware::RegisterTexture (iImage* image,
   int flags)
 {
   if (!image) return NULL;
-
   CHK (csTextureMMSoftware *txt = new csTextureMMSoftware (image, flags));
   textures.Push (txt);
   return txt;
@@ -561,6 +609,8 @@ void csTextureManagerSoftware::PrepareTexture (iTextureHandle *handle)
   csTextureMMSoftware *txt = (csTextureMMSoftware *)handle->GetPrivateObject ();
   txt->CreateMipmaps ();
   txt->remap_texture (this);
+  if ((txt->GetFlags() & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC)
+    txt->CreateDynamicTexture (this, G3D, &pfmt);
 }
 
 void csTextureManagerSoftware::UnregisterTexture (iTextureHandle* handle)
@@ -603,3 +653,4 @@ void csTextureManagerSoftware::SetPalette ()
     G2D->SetRGB (i, r, g, b);
   }
 }
+

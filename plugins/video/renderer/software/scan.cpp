@@ -22,7 +22,7 @@
 #include "scan.h"
 #include "tcache.h"
 #include "soft_txt.h"
-#include "soft_g3d.h"
+#include "sft3dcom.h"
 #include "isystem.h"
 #include "ipolygon.h"
 #include "sttest.h"
@@ -176,7 +176,7 @@ void csScan_Finalize ()
   CHK (delete [] Scan.one_div_z);
 }
 
-void csScan_InitDraw (int MipMap, csGraphics3DSoftware* g3d,
+void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
   iPolygonTexture* tex, csTextureMMSoftware* texture, csTextureSoftware *untxt)
 {
   Scan.Texture = texture;
@@ -217,7 +217,7 @@ void csScan_InitDraw (int MipMap, csGraphics3DSoftware* g3d,
 
 #define SysPrintf pG3D->System->Printf
 
-void csScan_dump (csGraphics3DSoftware* pG3D)
+void csScan_dump (csGraphics3DSoftwareCommon* pG3D)
 {
   SysPrintf (MSG_DEBUG_0, "------------------------------------------------\n");
   if (Scan.bitmap2)

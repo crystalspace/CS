@@ -130,6 +130,9 @@ public:
 
   /// Called on every frame by system driver
   virtual bool HandleEvent (csEvent &Event);
+
+  virtual iGraphics2D *CreateOffScreenCanvas (int width, int height, 
+      csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size);
 };
 
 #endif // __X2D_H__

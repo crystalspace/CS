@@ -1,3 +1,4 @@
+/*  -*- Mode: C++; -*- */
 // Depending on the Colorformat, we define different masks and shiftvalues
 // to get the accrding values for rgb; R,G,B stands for Red, Green and Blue,
 // and M, S, B stands for Mask, Shift and Bits correspondingly. In 8-bit mode

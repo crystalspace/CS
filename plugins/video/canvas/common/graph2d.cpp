@@ -45,11 +45,14 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
   // Get the system parameters
   System->GetSettings (Width, Height, Depth, FullScreen);
 
+  CHK (Palette = new RGBPixel[256]);
+
   // get the fontrenderer
   const char *p = pSystem->ConfigGetStr ("FontRender", CS_FUNCID_FONT, "crystalspace.font.render.csfont");
   FontRenderer = LOAD_PLUGIN (pSystem, p, CS_FUNCID_FONT, iFontRender);
 //  FontRenderer = QUERY_PLUGIN_ID (pSystem, CS_FUNCID_FONT, iFontRender);
   Font = 0;
+
   pfmt.PalEntries = 256;
   pfmt.PixelBytes = 1;
   // Initialize pointers to default drawing methods
@@ -72,6 +75,8 @@ csGraphics2D::~csGraphics2D ()
 {
   if (FontRenderer) FontRenderer->DecRef ();
   Close ();
+  if (Palette)
+    delete [] Palette;
 }
 
 bool csGraphics2D::Open (const char *Title)

@@ -1,3 +1,4 @@
+/*  -*- Mode: C++; -*- */
 /*
     This file contains the routine that creates lightmapped textures.
     Basically it takes a texture, a lightmap and combines them together.

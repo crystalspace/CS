@@ -84,6 +84,7 @@ public:
 
   /// Called on every frame by system driver
   virtual bool HandleEvent (csEvent &Event);
+
 };
 
 #endif // __XLIB2D_H__

@@ -37,6 +37,8 @@ struct iPolygonTexture;
 struct iTextureManager;
 struct iTextureHandle;
 struct iHalo;
+struct RGBPixel;
+struct csPixelFormat;
 
 #define CS_FOG_FRONT		0
 #define CS_FOG_BACK		1
@@ -637,6 +639,10 @@ struct iGraphics3D : public iPlugIn
   /// Draw a sprite using a rectangle from given texture
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
     int tx, int ty, int tw, int th) = 0;
+
+  /// Create an Off Screen Renderer
+  virtual iGraphics3D *CreateOffScreenRenderer (int width, int height,
+    csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size) = 0;
 };
 
 #endif // __IGRAPH3D_H__

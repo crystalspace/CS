@@ -34,7 +34,7 @@ class csSoftHalo : public iHalo
   int Width, Height;
 
   // Software 3D rasterizer
-  csGraphics3DSoftware *G3D;
+  csGraphics3DSoftwareCommon *G3D;
 
 public:
 
@@ -42,7 +42,7 @@ public:
 
   // Create the halo object
   csSoftHalo (float iR, float iG, float iB, unsigned char *iAlpha,
-    int iWidth, int iHeight, csGraphics3DSoftware *iG3D);
+    int iWidth, int iHeight, csGraphics3DSoftwareCommon *iG3D);
 
   // Destroy the halo object
   virtual ~csSoftHalo ();
@@ -155,7 +155,7 @@ IMPLEMENT_IBASE_END
 
 // Create the halo object
 csSoftHalo::csSoftHalo (float iR, float iG, float iB, unsigned char *iAlpha,
-  int iWidth, int iHeight, csGraphics3DSoftware *iG3D)
+  int iWidth, int iHeight, csGraphics3DSoftwareCommon *iG3D)
 {
   CONSTRUCT_IBASE (NULL);
   R = iR; G = iG; B = iB;
@@ -394,7 +394,7 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
   } /* endfor */
 }
 
-iHalo *csGraphics3DSoftware::CreateHalo (float iR, float iG, float iB,
+iHalo *csGraphics3DSoftwareCommon::CreateHalo (float iR, float iG, float iB,
   unsigned char *iAlpha, int iWidth, int iHeight)
 {
   CHK (csSoftHalo *h = new csSoftHalo (iR, iG, iB, iAlpha, iWidth, iHeight, this));

@@ -22,7 +22,9 @@
 #include "csutil/csvector.h"
 #include "itxtmgr.h"
 #include "itexture.h"
+#include "igraph3d.h"
 #include "igraph2d.h"
+#include "csgfxldr/rgbpixel.h"
 
 class csIniFile;
 class csTexture;
@@ -138,6 +140,11 @@ public:
   /// Get the csTextureMM object associated with the texture handle
   virtual void *GetPrivateObject ()
   { return (csTextureMM *)this; }
+
+  virtual iGraphics3D *GetDynamicTextureInterface ()
+  { return NULL; }
+
+  virtual void DynamicTextureSyncPalette () {};
 };
 
 /**

@@ -62,7 +62,7 @@ public:
   /// True if visual is full-screen
   bool FullScreen;
   /// 256-color palette
-  RGBPixel Palette[256];
+  RGBPixel *Palette;
   /// true if some palette entry is already allocated
   bool PaletteAlloc[256];
   // The counter that is incremented inside BeginDraw and decremented in FinishDraw
@@ -234,6 +234,11 @@ public:
 
   /// Do a screenshot: return a new iImage object
   virtual iImage *ScreenShot ();
+
+  /// Create an off screen canvas
+  virtual iGraphics2D *CreateOffScreenCanvas (int /*width*/, int /*height*/, 
+     csPixelFormat */*pfmt*/, void */*buffer*/, RGBPixel */*palette*/, int /*pal_size*/)
+  { return NULL; }
 
 protected:
   /**
