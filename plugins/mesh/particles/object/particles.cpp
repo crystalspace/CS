@@ -228,7 +228,7 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
   emitter = csVector3(0.0f, 0.0f, 0.0f);
   radius = 1.0f;
   dead_particles = 0;
-  point_sprites = p->g3d->GetCaps ()->SupportsPointSprites;
+  point_sprites = false;//p->g3d->GetCaps ()->SupportsPointSprites;
 
   dynDomain = new csShaderVariableContext ();
 
@@ -409,7 +409,8 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
       index_buffer = pFactory->g3d->CreateRenderBuffer (
         sizeof (unsigned int) * buffer_length, CS_BUF_STATIC, 
         CS_BUFCOMP_UNSIGNED_INT, 1, true);
-        index_buffer->CopyToBuffer (indices, sizeof(unsigned int) * buffer_length);
+      index_buffer->CopyToBuffer (indices, sizeof(unsigned int) * buffer_length);
+      delete [] indices;
     }
     else 
     {
@@ -428,7 +429,7 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
       }
       unsigned int *indices = new unsigned int[buffer_length * 6];
       int j;
-      for(i=0,j=0;i<buffer_length * 4;i+=4,j+=6)
+      for(i=0,j=0;i<bufsize-1;i+=4,j+=6)
       {
         // First triangle
         indices[j] = i;
@@ -442,7 +443,8 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
       index_buffer = pFactory->g3d->CreateRenderBuffer (
         sizeof (unsigned int) * buffer_length * 6, CS_BUF_STATIC, 
         CS_BUFCOMP_UNSIGNED_INT, 1, true);
-        index_buffer->CopyToBuffer (indices, sizeof(unsigned int) * buffer_length * 6);
+      index_buffer->CopyToBuffer (indices, sizeof(unsigned int) * buffer_length * 6);
+      delete [] indices;
     }
     texcoord_buffer->CopyToBuffer (texcoords, sizeof(csVector2) * bufsize);
     delete [] texcoords;
@@ -460,8 +462,8 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
     {
       int len = point_data.Length ();
       vertex_data.SetLength (len * 4);
-      int j = 0;
-      for(int i=0;i<len;i++)
+      int i,j;
+      for(i=0, j=0;i<len-1;i++,j+=4)
       {
         csParticlesData &point = point_data[i];
         i_vertex &vertex = vertex_data[j];
@@ -473,14 +475,13 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
         vertex = vertex_data[j + 2];
         vertex.position = point.position + corners[2];
         vertex.color = point.color;
-        vertex = vertex_data[j + 2];
+        vertex = vertex_data[j + 3];
         vertex.position = point.position + corners[3];
         vertex.color = point.color;
-        j+=4;
       }
 
       data = vertex_data.GetArray ();
-      size = vertex_data.Length () * (sizeof(i_vertex));
+      size = vertex_data.Length () * sizeof(i_vertex);
     }
     // Vertex buffer is an interleaved buffer, so copy all the data into it
     vertex_buffer->CopyToBuffer (data, size);
