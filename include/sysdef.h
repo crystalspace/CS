@@ -168,7 +168,7 @@
 #  ifndef TEMP_FILE
 #    if defined(OS_UNIX)
 #      include <unistd.h>
-#      define TEMP_FILE "cs%d.tmp", getpid()
+#      define TEMP_FILE "cs%lud.tmp", (unsigned long)getpid()
 #    else
 #      define TEMP_FILE "$cs$.tmp"
 #    endif
