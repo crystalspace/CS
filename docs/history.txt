@@ -2,6 +2,9 @@ The history order is reversed so that new features are at the top.
 
 3-Jul-2001
 	- Fixed the Python plugin after Martin's changes.
+	- Added iEngine::GetCameraPosition() which takes a name as a parameter
+	  instead of an index.
+	- Fixed a warning in engine.cpp.
 2-Jul-2001
 	- Removed the bad and global 'thisclass' pointer from the Python
 	  plugin. Removed the 'GetSystem()' call from 'cs.i'. The Python

@@ -129,7 +129,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 2, 0);
+SCF_VERSION (iEngine, 0, 2, 1);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -482,6 +482,8 @@ struct iEngine : public iBase
   virtual int GetCameraPositionCount () const = 0;
   /// Get a camera position by its index
   virtual iCameraPosition* GetCameraPosition (int idx) const = 0;
+  /// Get a camera position by its name.
+  virtual iCameraPosition* GetCameraPosition (const char* name) const = 0;
 
   /**
    * Get the list of all textures.

@@ -372,8 +372,7 @@ SCF_EXPORT_CLASS_TABLE (engine)
       "crystalspace.graphic.image.io.")
 SCF_EXPORT_CLASS_TABLE_END
 
-csEngine::csEngine (iBase *iParent) : camera_positions (16, 16),
-	sectors (true)
+csEngine::csEngine (iBase *iParent) : sectors (true), camera_positions (16, 16)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
@@ -2367,7 +2366,13 @@ int csEngine::GetCameraPositionCount () const
 
 iCameraPosition* csEngine::GetCameraPosition (int idx) const
 {
-  return &((csCameraPosition*)camera_positions.Get(idx))->scfiCameraPosition;
+  return &((csCameraPosition*)camera_positions.Get (idx))->scfiCameraPosition;
+}
+
+iCameraPosition* csEngine::GetCameraPosition (const char* name) const
+{
+  return &((csCameraPosition*)camera_positions.FindByName (name))
+  	->scfiCameraPosition;
 }
 
 //-------------------End-Multi-Context-Support--------------------------------

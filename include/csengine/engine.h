@@ -1110,10 +1110,12 @@ public:
   /// Get a collection by its index
   virtual iCollection* GetCollection (int idx) const;
 
-  /// Get the number of camera positions in the engine
+  /// Get the number of camera positions in the engine.
   virtual int GetCameraPositionCount () const;
-  /// Get a camera position by its index
+  /// Get a camera position by its index.
   virtual iCameraPosition* GetCameraPosition (int idx) const;
+  /// Get a camera position by its name.
+  virtual iCameraPosition* GetCameraPosition (const char* name) const;
 
   //--------------------- iConfig interface implementation --------------------
 
