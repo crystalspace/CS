@@ -436,7 +436,7 @@ Nag to Jorrit about this feature if you want it.");
 	return false;
     }
   }
-//if (thing_state->GetPortalCount () == 0) thing_state->GetFlags ().Set (CS_THING_FASTMESH);
+//if (thing_state->GetPortalCount () == 0 && thing_state->GetCurveCount () == 0) thing_state->GetFlags ().Set (CS_THING_FASTMESH);
   return true;
 }
 

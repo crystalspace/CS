@@ -183,7 +183,7 @@ public:
   ~OpenGLLightmapCache ();
 
   // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  GLuint GetTempHandle () { return TempHandle; }
+  GLuint GetTempHandle () { Setup (); return TempHandle; }
   // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
   /// Cache a whole precalculated superlightmap

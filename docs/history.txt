@@ -64,6 +64,9 @@ The history order is reversed so that new features are at the top.
 	      reference-counted interfaces per class without having to resort
 	      to SCF.  (That is, csRefCount should support more flexible usage
 	      in the future.)
+	- Fixed a bug in the OpenGL renderer which caused all levels that
+	  didn't use DPM (DrawPolygonMesh) to render incorrectly (no
+	  lightmaps).
 8-Oct-2002
 	- Eric Sunshine made the following changes:
 	    - Added the new makefile variable MKDIRS which, given a path
