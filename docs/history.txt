@@ -16,8 +16,8 @@ chronological order.
 	  were specified in the wrong order (they were listed far too early in
 	  the link invocation).
 	- Anders Stenberg reimplemented the PicoGUI video driver. Now it should 
-	  be hardware accelerated and generally cleaner. Sprites and logical 
-	  operations aren't supported yet though. (Sprites crash.)
+	  be hardware accelerated and generally cleaner. Logical operations 
+	  aren't supported yet though, and there are some redraw issues.
 29-Aug-2003
 	- renej added support for using CS from Java. SWIG is needed since
 	  no generated files are in the CVS repository. Building is done
