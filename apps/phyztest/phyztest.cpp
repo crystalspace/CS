@@ -368,7 +368,7 @@ ctVector3 px;
     rb_bot->rotate_around_line( rotaxisy, degree_to_rad(45) );  
     rb_bot->rotate_around_line( rotaxisz, degree_to_rad(60) );
     rb_bot->set_angular_v( ctVector3( 0,0,0) );
-    new csRigidSpaceTimeObj( bot, rb_bot );
+    (void)new csRigidSpaceTimeObj( bot, rb_bot );
   }
   
   // Move the dynamic light around.
