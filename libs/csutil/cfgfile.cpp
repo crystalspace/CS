@@ -612,8 +612,9 @@ void csConfigFile::SetStr (const char *Key, const char *Val)
 void csConfigFile::SetInt (const char *Key, int Value)
 {
   csConfigNode *Node = FindNode(Key);
-  if (!Node) Node = CreateNode(Key);
-  if (Node && Value != Node->GetInt())
+  bool const Create = !Node;
+  if (Create) Node = CreateNode(Key);
+  if (Node && (Create || Value != Node->GetInt()))
   {
     Node->SetInt(Value);
     Dirty = true;
@@ -623,8 +624,9 @@ void csConfigFile::SetInt (const char *Key, int Value)
 void csConfigFile::SetFloat (const char *Key, float Value)
 {
   csConfigNode *Node = FindNode(Key);
-  if (!Node) Node = CreateNode(Key);
-  if (Node && Value != Node->GetFloat())
+  bool const Create = !Node;
+  if (Create) Node = CreateNode(Key);
+  if (Node && (Create || Value != Node->GetFloat()))
   {
     Node->SetFloat(Value);
     Dirty = true;
@@ -634,8 +636,9 @@ void csConfigFile::SetFloat (const char *Key, float Value)
 void csConfigFile::SetBool (const char *Key, bool Value)
 {
   csConfigNode *Node = FindNode(Key);
-  if (!Node) Node = CreateNode(Key);
-  if (Node && Value != Node->GetBool())
+  bool const Create = !Node;
+  if (Create) Node = CreateNode(Key);
+  if (Node && (Create || Value != Node->GetBool()))
   {
     Node->SetBool(Value);
     Dirty = true;
