@@ -23,6 +23,7 @@ code.
 * HOWTO Pixmaps:: Loading Images for Pixmaps
 * HOWTO Render Priorities:: Render Priorities and Objects in Sectors
 * HOWTO User Objects:: Attaching User Objects to CS Objects
+* HOWTO User Objects in Maps:: Attaching User Objects to CS Objects in a map file
 * HOWTO CS Project:: Creating an External Crystal Space Application
 * HOWTO Creating External MSVC 6 Application:: Creating an External @sc{msvc} 6 Application
 * HOWTO Creating External MSVC 7 Application:: Creating an External @sc{msvc} 7 Application
@@ -45,6 +46,7 @@ code.
 @importss{tutorial,howto,pixmap.txi}
 @importss{tutorial,howto,rendpri.txi}
 @importss{tutorial,howto,userobj.txi}
+@importss{tutorial,howto,mapuserobj.txi}
 @importss{tutorial,howto,project.txi}
 @importsss{tutorial,howto,msvc6proj,msvc6proj.txi}
 @importsss{tutorial,howto,msvc7proj,msvc7proj.txi}
