@@ -15,6 +15,8 @@ The history order is reversed so that new features are at the top.
 	  user documentation and public API reference manual, and I
 	  incorporated all useful suggestions, corrections, and clarifications
 	  into the real manual.
+	- Updated part of the Map2CS documentation that was still using
+	  old syntax for map2cs.cfg config file.
 29-May-2002
 	- Implemented history culling in Dynavis. This means that if an
 	  object is visible then it will be kept as visible for a few

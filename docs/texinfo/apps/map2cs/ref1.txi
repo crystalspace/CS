@@ -9,22 +9,22 @@ The @file{map2cs.cfg} file is the most important way to configure
 A sample @file{map2cs.cfg} will look like this:
 
 @example
-[texturesettings]
-defaulttexture = a_4hewn
-wad1 = E:\Sierra\Half-Life\valve\halflife.wad
-wad2 = E:\Sierra\Half-Life\valve\xeno.wad
-wad3 = E:\Sierra\Half-Life\valve\liquids.wad
-wad4 = E:\Sierra\Half-Life\valve\texpack.wad
-zip1 = E:\Cryst\skybox.zip
-zip2 = E:\Cryst\skybox2.zip
-pk1 = D:\Games\Quake III Arena\baseq3\pak0.pk3
-pk2 = D:\Games\Quake III Arena\baseq3\mapmedia.pk3
+Map2CS.TextureSettings.DefaultTexture = a_4hewn
+Map2CS.TextureSettings.wad1 = E:\Sierra\Half-Life\valve\halflife.wad
+Map2CS.TextureSettings.wad2 = E:\Sierra\Half-Life\valve\xeno.wad
+Map2CS.TextureSettings.wad3 = E:\Sierra\Half-Life\valve\liquids.wad
+Map2CS.TextureSettings.wad4 = E:\Sierra\Half-Life\valve\texpack.wad
+Map2CS.TextureSettings.zip1 = E:\Cryst\skybox.zip
+Map2CS.TextureSettings.zip2 = E:\Cryst\skybox2.zip
+Map2CS.TextureSettings.pk1 = D:\Games\Quake III Arena\baseq3\pak0.pk3
+Map2CS.TextureSettings.pk2 = D:\Games\Quake III Arena\baseq3\mapmedia.pk3
 
-[general]
-scaling = 0.025
-usebsp = 1
-removehidden = 1
-lightscale = 30
+Map2CS.General.Scaling = 0.025
+Map2CS.General.UseBSP = 1
+Map2CS.General.RemoveHidden = 1
+Map2CS.General.LightScale = 30
+
+System.ApplicationID = Map2CS
 @end example
 
 The following sections describe the various configuration file entries and the
@@ -33,11 +33,11 @@ associated values which may appear in each section.
 @subsubheading Texture Settings
 
 @noindent
-@code{[texturesettings]}
+@code{texturesettings}
 
 @itemize @bullet
 @item
-@code{defaulttexture}
+@code{DefaultTexture}
 
 Specifies the name of the texture, that will be used, when the original
 texture is not found.  If the default texture will not be found, the resulting
@@ -77,7 +77,7 @@ zip file (in this order): @sc{tga}, @sc{jpg}, @sc{jpeg}, @sc{bmp}, @sc{wal}.
 @subsubheading General Settings
 
 @noindent
-@code{[general]}
+@code{general}
 
 @itemize @bullet
 @anchor{map2cs.cfg scaling}
