@@ -305,13 +305,17 @@ void csTerrainQuad::ComputeVisibility(const csVector3& campos,
   cbox[CS_QUAD_BOTLEFT].Set (bbox.MinX(), 0, midz, midx, 0, bbox.MaxZ());
   cbox[CS_QUAD_BOTRIGHT].Set(midx, 0, midz, bbox.MaxX(), 0, bbox.MaxZ());
 
+  // rect is set up as: 0 1
+  //                    2 3
+  // so, in bits, this is ab:  a is 0(left) 1(right), b is 0(top) 1(bot)
+  // flip bits to get the other squares.
   int child = camchild;
   GetChild(child)->ComputeVisibility(campos, cbox[child], horizon, horsize);
-  child = (camchild+1)&3;
+  child = camchild^1;
   GetChild(child)->ComputeVisibility(campos, cbox[child], horizon, horsize);
-  child = (camchild+3)&3;
+  child = camchild^2;
   GetChild(child)->ComputeVisibility(campos, cbox[child], horizon, horsize);
-  child = (camchild+2)&3;
+  child = camchild^3;
   GetChild(child)->ComputeVisibility(campos, cbox[child], horizon, horsize);
 }
 
