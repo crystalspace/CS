@@ -416,8 +416,26 @@ rollout Test1 "Export GenMesh Skelanim to CS" width:238 height:345
 						final_roty = -(new_rotvalues.y * pi)/180
 						final_rotz = (new_rotvalues.z * pi)/180
 						format "        <rot bone=\"%\" duration=\"%\" x=\"%\" y=\"%\" z=\"%\"/>\n" t.name duration final_rotx final_roty final_rotz to:outFile
+
 					)
 
+					write_x_rot = false
+					write_y_rot = false
+					write_z_rot = false
+					if (abs(biped_position.x - biped_transforms[bp_index].pos.x) > 0.0001) then
+						write_x_rot = true
+					if (abs(biped_position.y - biped_transforms[bp_index].pos.y) > 0.0001) then
+						write_y_rot = true
+					if (abs(biped_position.z - biped_transforms[bp_index].pos.z) > 0.0001) then
+						write_z_rot = true
+
+					if write_x_rot or write_y_rot or write_z_rot then
+					(
+						biped_animation_found = true
+						format "        <move bone=\"%\" duration=\"%\" x=\"%\" y=\"%\" z=\"%\"/>\n" t.name duration biped_position.x biped_position.z biped_position.y to:outFile
+					)
+
+					biped_transforms[bp_index].pos = biped_position
 					biped_transforms[bp_index].rotx = new_rotvalues.x
 					biped_transforms[bp_index].roty = new_rotvalues.y
 					biped_transforms[bp_index].rotz = new_rotvalues.z
