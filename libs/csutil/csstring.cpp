@@ -230,7 +230,7 @@ csString &csString::Format(const char *format, ...)
   if (Data == 0) // Ensure that backing-store exists prior to vsnprintf().
     SetCapacity(255);
 
-  int rc;
+  int rc = 0;
   while (1)
   {
     rc = cs_vsnprintf(Data, MaxSize, format, args);
