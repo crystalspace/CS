@@ -124,10 +124,10 @@ chronological order.
 	  fast versions of csQround() actually give different results on
 	  different systems. Places where these different results can have
 	  bad effects have been fixed. This includes:
-	  	- float2short/float2long endian routines.
-		- places where cached data is compared for validity. A
-		  different result of csQround() can cause (for example)
-		  lightmaps not to load on some system.
+	    - float2short/float2long endian routines.
+	    - places where cached data is compared for validity. A different
+	      result of csQround() can cause (for example) lightmaps not to
+	      load on some system.
 	  The faster csQround() versions are still considerably faster then
 	  the simple function above so I opted against removal for now.
 	- Jorrit also changed the csQround() fallback macro to be an inline

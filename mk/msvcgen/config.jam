@@ -52,7 +52,6 @@ MIKMOD.LIBS = mikmod.lib ;
 MNG.AVAILABLE = yes ;
 MNG.LIBS = libmng.lib ;
 ODE.AVAILABLE = yes ;
-ODE.CFLAGS = "/D \"CS_HAS_ODE\"" ;
 ODE.LIBS = ode.lib ;
 OPENAL.AVAILABLE = yes ;
 OPENAL.LIBS = openal32.lib alut.lib ;
@@ -69,8 +68,7 @@ WAVEOUT.LIBS = winmm.lib ;
 ZLIB.AVAILABLE = yes ;
 ZLIB.LIBS = zlib.lib ;
 WX.AVAILABLE = yes ;
-WX.CFLAGS = "/D \"CS_HAS_WXWIDGETS\" /D \"wxUSE_GUI=1\" /D \"WXUSINGDLL=1\"" ;
+WX.CFLAGS = "/D \"wxUSE_GUI=1\" /D \"WXUSINGDLL=1\"" ;
 WX.LIBS = "wxmsw24.lib opengl32.lib" ;
-WX.CFLAGS.DEBUG = "/D \"CS_HAS_WXWIDGETS\" /D \"wxUSE_GUI=1\" /D \"WXDEBUG=1\""
-  "/D \"WXUSINGDLL=1\"" ;
+WX.CFLAGS.DEBUG = "/D \"wxUSE_GUI=1\" /D \"WXDEBUG=1\" /D \"WXUSINGDLL=1\"" ;
 WX.LIBS.DEBUG = "wxmsw24d.lib opengl32.lib" ;
