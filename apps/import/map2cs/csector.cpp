@@ -135,55 +135,38 @@ bool CCSSector::Write(csRef<iDocumentNode> node, CIWorld* pIWorld)
     CreateNode (sector, "cullerp", "crystalspace.culling.dynavis");
   }
 
-  CMapEntity* pEntity = m_pOriginalBrush->GetEntity();
-
-  DocNode meshobj = CreateNode (sector, "meshobj");
-  meshobj->SetAttribute ("name", 
-    pEntity->GetValueOfKey ("cs_name",
-    csString().Format ("%s_portals", GetName())));
-  CreateNode (meshobj, "plugin", "thing");
-  CreateNode (meshobj, "zuse");
-  CreateNode (meshobj, "priority", "wall");
-
-  CCSWorld::WriteKeys(meshobj, pWorld, pEntity);
-
-  DocNode params = CreateNode (meshobj, "params");
-
-//  if (pMap->GetConfigInt("Map2CS.General.UseBSP", 0))
-//  {
-//    pWorld->WriteIndent();
-//    fprintf(fd, "VISTREE()\n");
-//  }
-
   if (m_IsDefaultsector && pWorld->NeedSkysector())
   {
     pWorld->WriteSky(node);
   }
   else
   {
-    if (/*m_Walls.Length() > 0 ||*/
-        m_Portals.Length() > 0)
+    if (m_Portals.Length() > 0)
     {
-      //DocNode part = CreateNode (params, "part");
-      //part->SetAttribute ("name", "p1");
-      DocNode part = params;
+      CMapEntity* pEntity = m_pOriginalBrush->GetEntity();
+
+      DocNode meshobj = CreateNode (sector, "meshobj");
+      csString meshname;
+      meshname.Format ("%s_portals", GetName());
+      if (pEntity)
+      {
+	meshname = pEntity->GetValueOfKey ("cs_name", meshname);
+      }
+      meshobj->SetAttribute ("name", meshname);
+      CreateNode (meshobj, "plugin", "thing");
+      CreateNode (meshobj, "zuse");
+      CreateNode (meshobj, "priority", "wall");
+
+      CCSWorld::WriteKeys(meshobj, pWorld, pEntity);
+
+      DocNode params = CreateNode (meshobj, "params");
 
       int i, j, l;
 
       CVertexBuffer Vb;
       Vb.AddVertices(&m_Walls);
       Vb.AddVertices(&m_Portals);
-      Vb.WriteCS(part, pWorld);
-
-/*      for (i=0; i<m_Walls.Length(); i++)
-      {
-        CMapPolygonSet* pPolySet = m_Walls[i];
-        for (j=0; j<pPolySet->GetPolygonCount(); j++)
-        {
-          CMapPolygon* pPolygon = pPolySet->GetPolygon(j);
-          pWorld->WritePolygon(part, pPolygon, this, true, Vb);
-        }
-      }*/
+      Vb.WriteCS(params, pWorld);
 
       for (i=0; i<m_Portals.Length(); i++)
       {
@@ -198,7 +181,7 @@ bool CCSSector::Write(csRef<iDocumentNode> node, CIWorld* pIWorld)
           //Because for a sector we draw the _inside_ of the brush, we spit out the
           //vertices in reverse order, so they will have proper orientation for
           //backface culling in the engine.
-	  DocNode p = CreateNode (part, "p");
+	  DocNode p = CreateNode (params, "p");
           for (l=pPolygon->GetVertexCount()-1; l>=0; l--)
           {
 	    CreateNode (p, "v", (int)Vb.GetIndex(pPolygon->GetVertex(l)));
@@ -243,9 +226,13 @@ bool CCSSector::WriteWorldspawn(csRef<iDocumentNode> node, CIWorld* pWorld)
       CMapEntity* pEntity = m_pOriginalBrush->GetEntity();
 
       DocNode meshobj = CreateNode (node, "meshobj");
-      meshobj->SetAttribute ("name", 
-	pEntity->GetValueOfKey ("cs_name",
-	csString().Format ("%s_walls", GetName())));
+      csString meshname;
+      meshname.Format ("%s_walls", GetName());
+      if (pEntity)
+      {
+	meshname = pEntity->GetValueOfKey ("cs_name", meshname);
+      }
+      meshobj->SetAttribute ("name", meshname);
       CreateNode (meshobj, "plugin", "thing");
       CreateNode (meshobj, "zuse");
 

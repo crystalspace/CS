@@ -10,6 +10,8 @@ The history order is reversed so that new features are at the top.
 	  QueryObject() function has been removed. However it is still
 	  possible to set names on polygons. To do that you can use
 	  SetName() and GetName().
+	- res fixed a map2cs crash when a map w/o sectors is converted.
+	- res fixed a case where map2cs wrote things w/o polys.
 10-Mar-2003
 	- Added a few timing printfs in region code to debug long load times.
 	- A few optimizations in the spr2d plugin to make particle systems use
