@@ -19,6 +19,8 @@
 #include "cssysdef.h"
 #include "genmaze.h"
 
+// http://www.pmms.cam.ac.uk/~gjm11/programs/maze/index.html
+// This URL helped me to understand this code
 csGenMaze::csGenMaze(int w, int h)
 {
   width = w;
@@ -115,7 +117,7 @@ void csGenMaze::GenOrder(int order[4], int direction)
     int found = 0;
     for(k=0; k<4; k++)
     {
-      if(!done[k])
+      if(!done[k]) 
       {
         numskipped++;
         if(numskipped == skip+1){ found = k; break; }
@@ -193,4 +195,76 @@ bool csGenMaze::Opening(int x1, int y1, int x2, int y2)
   /// unreachable
   CS_ASSERT(false);
   return false;
+}
+
+int csGenMaze::ActualHeight()
+{
+	return (height*2)+1;
+}
+
+int csGenMaze::ActualWidth()
+{
+	return (width*2)+1;
+}
+
+/// Returns true if ActualX,ActualY is solid
+/// Notes: The maze might be say 10 x 10 but the real
+/// size of the maze (with tickness of walls taken into
+/// account is 21 x 21) - This function adjusts for those 
+/// walls and reports on it. 
+///   -- based on code cut from isptest.cpp
+bool csGenMaze::ActualSolid(int x,int y)
+{
+
+	// Last row of the maze
+	// The x%2 will trip on ActualHeight()-1
+	// thus setting the SE corner to solid (true)
+	if (y==ActualHeight()-1)
+	{
+		if (x%2==0)
+			return true;
+		else
+			return !GetNode(x/2,(y/2)-1).opening[2];
+	}
+
+	// Every other row, Starting with the 0'th row,
+	// only need to check northern openings here
+	if (y%2==0) 
+	{
+		if (x==ActualWidth()-1)
+			return true;
+
+		if (x%2==0)
+			return true;
+		else
+			return !GetNode(x/2,y/2).opening[0];
+		
+	}
+
+	// Every other row, starting with the 1'st row
+	// only need to check western openings generally
+	// but check eastern at the end of a row
+	if (x==ActualWidth()-1)
+		return !GetNode((x/2)-1,y/2).opening[1];
+	if (x%2==0)
+		return !GetNode(x/2,y/2).opening[3];	
+	else
+		return false;
+
+}
+
+/// Prints Maze - Helpful during testing
+void csGenMaze::PrintMaze()
+{
+	int x,y;
+
+	for(y=0; y<ActualHeight(); y++)
+	{
+		for (x=0; x<ActualWidth(); x++)
+			if (ActualSolid(x,y))
+				printf("X");
+			else
+				printf(" ");
+		printf("\n");
+	}
 }

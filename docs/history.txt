@@ -1,5 +1,19 @@
 he history order is reversed so that new features are at the top.
 
+19-Jan-2002
+	- Richard Uren made the following changes to isotest app:
+	    - The code that was in isotest.cpp which looped through each
+	      (x,y) pair was cleaned up and moved to
+	      csGenMaze::ActualSolid.  csGenMaze::ActualSolid(x,y) returns
+	      true if a cell is solid or false if it is empty - makes it
+	      simple to render a maze.
+	    - It adds csGenMaze::PrintMaze() which prints a random maze in
+	      ascii. Maze debug code removed from isotest.cpp
+	    - It adds csGenMaze::ActualWidth() & csGenMaze::ActualHeight()
+	      which both return either the width or height of the maze
+	      with walls taken into account.
+	    - AddWall() in isotest.cpp had a few fixes to render walls
+	      correctly.
 18-Jan-2002
 	- Greatly enhanced and clarified the comments for the
 	  csTransform, csReversibleTransform, and csOrthoTransform classes

@@ -19,9 +19,9 @@
 #ifndef __CS_GENMAZE_H__
 #define __CS_GENMAZE_H__
 
-/**
- * node for csGenMaze
-*/
+///
+/// node for csGenMaze
+///
 class csGenMazeNode {
 public:
   /// visited
@@ -31,19 +31,22 @@ public:
 };
 
 
-/**
- * Class to generate gridlike mazes.
-*/
+///
+/// Class to generate gridlike mazes.
+///
 class csGenMaze {
   /// maze size
   int width, height;
+
   /// maze contents
   csGenMazeNode *maze;
 
   /// straightness
   float straightness;
+
   /// cyclicalness
   float cyclicalness;
+
 public:
   /// give width and height of maze, initialises maze.
   csGenMaze(int w, int h);
@@ -61,6 +64,27 @@ public:
   /// get the cyclicalness of the corridors in the maze
   float GetCyclicalness() const {return cyclicalness;}
 
+  /// Set a position at an edge to be an 'access point' to the maze.
+  /// there will be an opening to the outside there.
+  /// (corner points will make double accesses)
+  void MakeAccess(int x, int y);
+
+  /// generate the maze from a given starting point
+  void GenerateMaze(int x, int y);
+
+  /// Prints ascii Maze - amazing :-) 
+  void PrintMaze();
+
+  /// Return actual height - allows for thickness of walls
+  int ActualHeight();
+
+  /// Return actual width - allows for thickness of walls
+  int ActualWidth();
+
+  /// Returns true if x,y is solid - note this function adjusts 
+  /// for tickness of walls
+  bool ActualSolid(int x,int y);
+
   /// get a maze node
   csGenMazeNode& GetNode(int x, int y)
   {
@@ -69,26 +93,21 @@ public:
     return maze[y*width+x];
   }
 
-  /** Set a position at an edge to be an 'access point' to the maze.
-   * there will be an opening to the outside there.
-   * (corner points will make double accesses)
-   */
-  void MakeAccess(int x, int y);
-
-  /** generate the maze from a given starting point */
-  void GenerateMaze(int x, int y);
-
   /// visit a node, used to gen maze.
   void VisitNode(int x, int y, int direction);
+
   /// in gen maze: generate an order with preference
   void GenOrder(int order[4], int direction);
+
   /// get neightboring position in direction
   void GetNeighbor(int dir, int x, int y, int& nx, int& ny);
+
   /// make an opening between two nodes
   void MakeOpening(int x1, int y1, int x2, int y2);
 
   /// is there an opening between two nodes?
   bool Opening(int x1, int y1, int x2, int y2);
+
 };
 
 

@@ -540,22 +540,19 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
 
 // static helper
 static void AddWall(iIsoEngine *engine, iIsoWorld *world, iIsoGrid *grid,
-  int x, int y, int offx, int offy, int multx, int multy,
+  int x, int y, int offx, int offy, int multx, int multy, 
   float bot, float height,
   iMaterialWrapper *side, iMaterialWrapper *top)
 {
-  height = 0;
-  return;
   int my, mx;
   for(my=0; my<multy; my++)
     for(mx=0; mx<multx; mx++)
       grid->SetGroundValue(x, y, mx, my, height);
+
   iIsoSprite *sprite = 0;
   if(bot != height)
   {
-    height -= bot;
-    height = 1.0;
-    sprite = engine->CreateZWallSprite(csVector3(y+offy+0.999,bot,x+offy),
+    sprite = engine->CreateZWallSprite(csVector3(y+offy+1,bot,x+offy),
       1.0, height);
     sprite->SetMaterialWrapper(side);
     //sprite->SetMixMode( CS_FX_COPY | CS_FX_TILING );
@@ -577,60 +574,28 @@ static void AddWall(iIsoEngine *engine, iIsoWorld *world, iIsoGrid *grid,
 void IsoTest::AddMazeGrid(iIsoWorld *world, float posx, float posy,
   iMaterialWrapper *floor, iMaterialWrapper *wall)
 {
-  int width = 40;
-  int height = 40;
-  /// create the maze
+  int width = 10,height = 10;
+
+  // create the maze
   csGenMaze *maze = new csGenMaze(width, height);
   //maze->SetStraightness(0.1);
   //maze->SetCyclicalness(0.1);
-  // add some access points to the maze, at the top.
   int x,y;
-  for(x=1; x<width; x+=3)
-    maze->MakeAccess(x, 0);
-  //maze->GenerateMaze(0,0);
 
-  /// debug display
-#if 0
-  for(y=0; y<height; y++)
-  {
-    printf("X");
-    for(x=0; x<width; x++)
-    {
-      if(maze->GetNode(x,y).opening[0])
-        printf(" ");
-      else printf("X");
-      printf("X");
-    }
-    printf("\n");
-    for(x=0 ; x<width; x++)
-    {
-      if(maze->GetNode(x,y).opening[3])
-        printf(" ");
-      else printf("X");
-      printf(" ");
-    }
-    if(maze->GetNode(width-1,y).opening[1])
-      printf(" ");
-    else printf("X");
-    printf("\n");
-  }
-  printf("X");
-  for(x=0 ; x<width; x++)
-  {
-    if(maze->GetNode(x,height-1).opening[2])
-      printf(" ");
-    else printf("X");
-    printf("X");
-  }
-  printf("\n");
-#endif
+  // Make entry & exit points
+  maze->MakeAccess(0, 0);
+  maze->MakeAccess(width-1,height-1);
+  maze->GenerateMaze(0,0);
+
+  // debug display
+  // maze->PrintMaze();
 
   // create a grid to display the maze in.
-  int gridw = width*2+1;
-  int gridh = height*2+1;
-  iIsoGrid *mazegrid = world->CreateGrid(gridw, gridh);
+  iIsoGrid *mazegrid = world->CreateGrid(maze->ActualWidth(), \
+    maze->ActualHeight());
+
   mazegrid->SetSpace((int)posy, (int)posx, -1.0, +10.0);
-  return;
+
   int multx = 1;
   int multy = 1;
   mazegrid->SetGroundMult(multx, multy);
@@ -651,38 +616,13 @@ void IsoTest::AddMazeGrid(iIsoWorld *world, float posx, float posy,
 #define ADDWALLEMPTY(x, y) AddWall(engine, world, mazegrid, x, y, (int)posx, \
   (int)posy, multx, multy, 0.0, 0.0, wall, floor);
 
-  for(y=0; y<height; y++)
-  {
-    //printf("y=%d\n", y);
-    for(x=0; x<width; x++)
-    {
-      ADDWALLFULL(x*2, y*2)
-      if(maze->GetNode(x,y).opening[0])
-        ADDWALLEMPTY(x*2+1, y*2)
-      else ADDWALLFULL(x*2+1, y*2)
-    }
-    ADDWALLFULL(gridw-1, y*2)
-    for(x=0 ; x<width; x++)
-    {
-      if(maze->GetNode(x,y).opening[3])
-        ADDWALLEMPTY(x*2, y*2+1)
-      else ADDWALLFULL(x*2, y*2+1)
-      ADDWALLEMPTY(x*2+1, y*2+1)
-    }
-    if(maze->GetNode(width-1,y).opening[1])
-      ADDWALLEMPTY(gridw-1, y*2+1)
-    else ADDWALLFULL(gridw-1, y*2+1)
-  }
-
-  for(x=0; x<width; x++)
-  {
-    ADDWALLFULL(x*2, gridh-1)
-    if(maze->GetNode(x,height-1).opening[2])
-      ADDWALLEMPTY(x*2+1, gridh-1)
-    else ADDWALLFULL(x*2+1, gridh-1)
-  }
-  ADDWALLFULL(gridw-1, gridh-1)
-
+  for(y=0; y<maze->ActualHeight(); y++)
+    for(x=0; x<maze->ActualWidth(); x++)
+      if(maze->ActualSolid(x,y))
+        ADDWALLFULL(x,y)
+      else
+        ADDWALLEMPTY(x,y)
+      
 }
 
 void IsoTest::SetupFrame ()
