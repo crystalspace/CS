@@ -15,7 +15,7 @@ even libraries and plug-ins for that matter) are mentioned here. You are
 advised to browse the source code or the mailing list to get the most up-to-date
 idea of Crystal Space's current feature set.
 
-Here are some of Crystal Space's current features:
+Here are some of Crystal Space's current features in no particular order:
 
 @table @emph
 @item System Library
@@ -154,191 +154,150 @@ layout widgets (notebook, grid)
 GUI hints
 @end itemize
 
-@item 2D Canvas / 3D Renderer
-These libraries allow you to draw directly on the screen and to use
-hardware accelerated 3D drawing. They are independent from the engine and
-perform only basic operations. You can actually use them if you want to
-write your own engine. Features include:
-
+@item Video Plug-in
 @itemize @bullet
 @item
-Direct3D for Windows (32 bit) port.
+2D canvas (null, memory, OpenGL, DirectDraw, X11, Allegro, DOS, DIVE)
 
 @item
-OpenGL support for GNU/Linux, BeOS, MacOS/9, OS/2, and Windows (32 bit).
+3D renderer (null, software, OpenGL, Line 3D)
 
 @item
-Drawing arbitrary sloped convex polygons.
+AVI streams (RLE, DivX 4, OpenDivX)
 
 @item
-Perspective correct texture mapping. You can chose between accuracy
-and speed (by selecting the interpolation step).
-
-@item
-Support for 8-bit (palette), 15/16-bit and 32-bit truecolor displays
-(no support for 24-bit yet).
-
-@item
-Mipmapping to minimize memory strain on the texture cache and to have
-nicer textures in the distance.
-
-@item
-The width and height of textures must be a power of two but the
-texture need not be a square.
-
-@item
-Procedural textures. Currently the included procedural textures are plasma,
-sky, water, and fire. You can also define your own procedural textures.
-
-@item
-It is possible to map the texture on a polygon in various ways such as via
-rotation, scaling, mirroring, etc.
-
-@item
-Transparent and semi-transparent textures allowing for see-through
-water surfaces and windows.
-
-@item
-Colored volumetric fog.
-
-@item
-Halos around lights.
+image loaders (BMP, GIF, JPG, PNG, SGI, TGA, WAL)
 @end itemize
 
-@item 3D Engine
-The engine features the following:
-
+@item 3D Engine Plug-in
 @itemize @bullet
 @item
-True six-degrees-of-freedom (@sc{6dof}).
+portals and sectors
 
 @item
-Integrated landscape engine.
+polygon trees (BSP, octree)
 
 @item
-Moving objects and scripts controlling the movement.
+lighting (static, pseudo-dynamic, dynamic, halos, shadows, radiosity)
 
 @item
-Static colored lighting with real shadows. Lighting and shadows are
-precomputed before the world is displayed. Radiosity is also supported.
+bezier curves
 
 @item
-Pseudo-dynamic colored lights which cannot move but have very accurate
-shadows and can change intensity/color randomly.
+visibility culling
 
 @item
-Dynamic colored lighting with support for shadows (detail objects are
-ignored for shadows currently).
+multiple cameras
 
 @item
-Support for frame and skeletal based 3D triangle mesh sprites with
-level-of-detail (@sc{lod}) reduction via progressive meshes.
+textures and materials
 
 @item
-Support for 2D sprites and particle systems.
-
-@item
-Mesh object plugin system that is used for 3D sprites, 2D sprites and
-particle systems. The game developer can also write his own mesh objects
-and plug them into the engine transparently.
-
-@item
-Portals are used for efficient and easy visibility sorting. In
-addition you can optionally enable an @sc{octree} and/or @sc{bsp} for some
-sectors to allow for even more powerful world definitions.
-
-@item
-Additional C-buffer (coverage buffer) which can be enabled for even
-better visibility culling.
-
-@item
-Using portals you can also create transparent and semi-transparent
-mirrors.
-
-@item
-Alpha transparency in combination with mirrors allows simulation of
-shining walls.
-
-@item
-You can also include gouraud shaded triangles in the world.
-
-@item
-Dynamic gouraud shaded sky spheres. Also support for skybox.
-
-@item
-Curved bezier surfaces with dynamic tessellation depending on viewer
-distance.
-
-@item
-Support for multiple cameras and the ability to make 1st person or
-3rd person cameras.
-
-@item
-@sc{zip} archive format to pack the map file, the textures and all other
-needed data files for one level inside one file. Crystal Space also
-uses the same @sc{zip} file to automatically add lightmap data. This 
-greatly speeds up the start-up of Crystal Space.
-
-@item
-Powerful text-based map file format allows you to easily redefine the world.
-
-@item
-Libraries of commonly used objects and textures are supported.
+isometric engine
 @end itemize
 
-@item Utility Library
-Much of the utility functionality in this library can be used independently
-of Crystal Space.  This library includes the following functionality:
-
+@item Virtual File System (VFS) Plug-in
 @itemize @bullet
 @item
-Reading configuration (@sc{ini}) files for program options.
+cross-platform file access (I/O and file attributes)
 
 @item
-Reading and writing @sc{zip} files as data files.
+filesystem abstraction (archives may be treated the same as a native
+filesystem)
 
 @item
-Simple parser that you can use if @sc{ini} files are not enough. It is used
-by the engine to read map files.
+a virtual path
 
 @item
-Defining an interface for shared libraries (@file{.so} or @sc{.dll}).  This is
-used by the plug-in system.
-
-@item
-Dynamically-sized arrays (@code{csVector}).
+find files
 @end itemize
 
-@item @sc{vfs}
-Virtual file system.  @xref{VFS}.
-
-@item Tool Library
-Much of the utility functionality in this library can be used independently
-of Crystal Space.  This library includes the following functionality:
-
+@item Sound Plug-in
 @itemize @bullet
 @item
-Contains several functions that can help setup an application. 
-The most important class in this library is csInitializer which will create 
-everything needed to get a CS application operational.
+drivers for CoreAudio (MacOS X), OSS (UNIX), and WaveOut (Windows)
 
 @item
-Support for models, procedural textures, and sprites.
+renderers (software, DirectSound 3D, EAX, aRts)
 
 @item
-Support for collision detection.
+loaders (WAV, AU, IFF, AIFF, MOD, MP3, OGG)
+
+@item
+multiplexer
 @end itemize
 
-@item Sound Driver / Sound Renderer
-General sound system.  Currently drivers exist for GNU/Linux, MacOS/9, and
-Windows.
+@item Mesh Plug-in
+@itemize @bullet
+@item
+Thing meshes
 
-@item Network Driver
-General networking support.  Currently supports socket-based networking via
-@sc{TCP/IP}.
+@item
+2D and 3D sprites
 
-@item Scripting
-Crystal Space supports scripting through the @sc{Python} plugin. This way
-a game using Crystal Space can call @sc{Python} methods and @sc{Python}
-scripts can call Crystal Space methods.
+@item
+terrains
+
+@item
+metaballs
+
+@item
+particle systems (fire, explosions, rain, snow, spirals, fountain)
+
+@item
+haze meshes
+
+@item
+mesh builders and sprite factories
+@end itemize
+
+@item Console Plug-in
+The console plug-in can be used to create a pull-down console similar to one
+you would find in nearly any FPS today.
+@emph{FIXME:} add console features.
+
+@item Network Plug-in
+The network plug-in provides BSD-style socket access for UNIX, win32, BeOS, and
+OS/2.
+@emph{FIXME:} add network features.
+
+@item Collide Plug-in
+The collide plug-in provides collision detection using the RAPID library.
+@emph{FIXME:} add collision detection features.
+
+@item Font Plug-in
+The font plug-in provides access to bitmapped and scalable fonts.
+@emph{FIXME:} add font features.
+
+@item Parser Plug-in
+The parser plug-in handles loading and parsing map files.
+@emph{FIXME:} add map file parser features.
+
+@item Script Plug-in
+The script plug-in uses python to provide scripting capabilities to Crystal
+Space projects.
+@emph{FIXME:} add script features.
+
+@item Alternate Windowing System (AWS) Plug-in
+The AWS plug-in provides an alternative to the CSWS (Crystal Space Windowing
+System).
+@emph{FIXME:} add AWS features.
+
+@item Performance Statistics Plug-in
+@emph{FIXME:} add performance statistic features.
+
+@item Motion Plug-in
+The motion plug-in is capable of skeletal animation.
+@emph{FIXME:} add motion plug-in features.
+
+@item Dynavis Culling Plug-in
+Dynavis is a dynamic visibility system that is currently under development by
+Jorrit.  It will change a bit about how maps are loaded and rendered.
+@emph{FIXME:} add dynavis features.
+
+@item Bugplug Plug-in
+Bugplug is a new debugging plug-in that is under development along with
+Dynavis.
+@emph{FIXME:} add bugplug features.
+
 @end table
