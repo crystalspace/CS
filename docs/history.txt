@@ -22,6 +22,9 @@ chronological order.
 	  This time in Dynavis.
 	- Jorrit fixed csPolygonMeshTools::CalculateEdges() so it doesn't
 	  allocate 0-sized chunks.
+	- Jorrit added a bool parameter to Dump() for the memory tracker
+	  so that you can get a summary alone. Also cleaned up the
+	  total summary line a bit.
 16-Feb-2004
 	- Jorrit fixed rain mesh object so it now has a reasonably default
 	  box in case the user doesn't call SetBox().

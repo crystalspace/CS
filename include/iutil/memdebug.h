@@ -31,7 +31,7 @@ SCF_VERSION (iMemoryTracker, 0, 0, 1);
 struct iMemoryTracker : public iBase
 {
   /// Dump all information.
-  virtual void Dump () = 0;
+  virtual void Dump (bool summary_only) = 0;
 };
 
 #endif // __CS_IUTIL_MEMDEBUG_H__

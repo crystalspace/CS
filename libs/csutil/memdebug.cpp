@@ -727,7 +727,7 @@ public:
     return FindInsertMtiTableEntry (filename, 0, mti_table_count-1);
   }
 
-  void Dump ()
+  void Dump (bool summary_only)
   {
     int i;
     printf ("-----------------------------------------------------\n");
@@ -738,14 +738,17 @@ public:
     for (i = 0 ; i < mti_table_count ; i++)
     {
       MemTrackerInfo* mti = mti_table[i];
-      printf ("    %8d %8d %8d %8d %s\n", mti->current_alloc,
-    	  mti->max_alloc, mti->current_count, mti->max_count,
-	  mti->file);
+      if (!summary_only)
+      {
+        printf ("    %8d %8d %8d %8d %s\n", mti->current_alloc,
+    	    mti->max_alloc, mti->current_count, mti->max_count,
+	    mti->file);
+      }
       total_current_alloc += mti->current_alloc;
       total_current_count += mti->current_count;
     }
-    printf ("   (%8d)        (%8d)\n", total_current_alloc,
-    	total_current_count);
+    printf ("total_alloc=%d total_count=%d Module=%s\n",
+    	total_current_alloc, total_current_count, Class);
     fflush (stdout);
   }
 };
@@ -778,12 +781,12 @@ public:
     return mod;
   }
 
-  virtual void Dump ()
+  virtual void Dump (bool summary_only)
   {
     int i;
     for (i = 0 ; i < num_modules ; i++)
     {
-      modules[i]->Dump ();
+      modules[i]->Dump (summary_only);
     }
   }
 };

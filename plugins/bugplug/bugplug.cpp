@@ -1232,7 +1232,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	    }
 	    else
 	    {
-	      mtr->Dump ();
+	      mtr->Dump (false);
 	      Report (CS_REPORTER_SEVERITY_NOTIFY,
 	    	"Memory dump sent to stdout!");
 	    }
