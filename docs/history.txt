@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+31-Oct-2002
+	- Optimized frustvis and dynavis by removing some SCF_QUERY_INTERFACE
+	  calls.
 30-Oct-2002
 	- Replaced ReportError() with ReportWarning() when an image couldn't
 	  be loaded in the main loader.

@@ -41,6 +41,7 @@ struct iBugPlug;
 struct iMeshWrapper;
 struct iShadowCaster;
 struct iShadowReceiver;
+struct iThingState;
 
 #define VIEWMODE_STATS 0
 #define VIEWMODE_STATSOVERLAY 1
@@ -72,6 +73,7 @@ public:
   csRef<iMeshWrapper> mesh;
   csRef<iShadowCaster> caster;
   csRef<iShadowReceiver> receiver;
+  csRef<iThingState> thing_state;	// Optional.
 
   csVisibilityObjectWrapper ()
   {

@@ -155,6 +155,8 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
     	iShadowCaster);
     visobj_wrap->receiver = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
     	iShadowReceiver);
+    visobj_wrap->thing_state = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+	iThingState);
   }
 
   visobj_vector.Push (visobj_wrap);
@@ -563,11 +565,9 @@ static bool IntersectSegment_Front2Back (csSimpleKDTree* treenode,
       if (csIntersect3::BoxSegment (obj_bbox, data->seg, box_isect) != -1)
       {
         // This object is possibly intersected by this beam.
-	csRef<iMeshWrapper> mesh (SCF_QUERY_INTERFACE (visobj_wrap->visobj,
-		iMeshWrapper));
-	if (mesh)
+	if (visobj_wrap->mesh)
 	{
-	  if (!mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE))
+	  if (!visobj_wrap->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE))
 	  {
 	    // Transform our vector to object space.
 	    //@@@ Consider the ability to check if
@@ -579,10 +579,9 @@ static bool IntersectSegment_Front2Back (csSimpleKDTree* treenode,
 	    csVector3 obj_isect;
 	    float r;
 
-	    csRef<iThingState> st (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-	      	iThingState));
-	    if (st)
+	    if (visobj_wrap->thing_state)
 	    {
+	      iThingState* st = visobj_wrap->thing_state;
 	      iPolygon3D* p = st->IntersectSegment (
 			obj_start, obj_end,
 			obj_isect, &r, false);
@@ -593,12 +592,12 @@ static bool IntersectSegment_Front2Back (csSimpleKDTree* treenode,
 		data->isect = movtrans.This2Other (obj_isect);
 		data->sqdist = csSquaredDist::PointPoint (
 			data->seg.Start (), data->isect);
-		data->mesh = mesh;
+		data->mesh = visobj_wrap->mesh;
 	      }
 	    }
 	    else
 	    {
-	      if (mesh->GetMeshObject ()->HitBeamOutline (obj_start,
+	      if (visobj_wrap->mesh->GetMeshObject ()->HitBeamOutline (obj_start,
 	      	obj_end, obj_isect, &r))
 	      {
 	        if (r < data->r)
@@ -608,7 +607,7 @@ static bool IntersectSegment_Front2Back (csSimpleKDTree* treenode,
 		  data->isect = movtrans.This2Other (obj_isect);
 		  data->sqdist = csSquaredDist::PointPoint (
 			data->seg.Start (), data->isect);
-		  data->mesh = mesh;
+		  data->mesh = visobj_wrap->mesh;
 		}
 	      }
 	    }

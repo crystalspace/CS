@@ -32,6 +32,7 @@ class csSimpleKDTreeChild;
 struct iPolygonMesh;
 struct iMovable;
 struct iMeshWrapper;
+struct iThingState;
 
 struct FrustTest_Front2BackData;
 
@@ -50,6 +51,7 @@ public:
   csRef<iMeshWrapper> mesh;
   csRef<iShadowCaster> caster;
   csRef<iShadowReceiver> receiver;
+  csRef<iThingState> thing_state;
 
   csFrustVisObjectWrapper ()
   {
