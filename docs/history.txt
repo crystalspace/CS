@@ -25,6 +25,10 @@ The history order is reversed so that new features are at the top.
 	  This fixes the seeing of a nasty little 2 pixel black
 	  border at top and right side of window in apps like
 	  csdemo.
+	- Fixed a bug with the terrain heightmap function not being completely
+	  correct. This fixes both collision detection (i.e. walking on the
+	  terrain which used to be very bumpy) as well as texture mapping
+	  using the texture generation process.
 15-May-2001
 	- Philip Wyett added the new cslexan to global build process.
 	  Philip also changed MSVC project file generation process to create

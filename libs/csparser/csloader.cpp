@@ -764,8 +764,8 @@ struct HeightMapData
 static float HeightMapFunc (void* data, float x, float y)
 {
   HeightMapData* hm = (HeightMapData*)data;
-  float dw = fmod (x*hm->w, 1.0f);
-  float dh = fmod (y*hm->h, 1.0f);
+  float dw = fmod (x*(hm->w-1), 1.0f);
+  float dh = fmod (y*(hm->h-1), 1.0f);
   int ix = int (x*(hm->w-1));
   int iy = int (y*(hm->h-1));
   int iw = hm->iw;

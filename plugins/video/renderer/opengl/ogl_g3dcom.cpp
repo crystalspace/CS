@@ -2533,7 +2533,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       	GL_UNSIGNED_INT, triangles);
     }
 
- 
     // If we have to do gouraud shading we do it here.
     if (do_gouraud)
     {
