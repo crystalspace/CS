@@ -47,8 +47,7 @@ INC.ENGINE = $(wildcard $(SRCDIR)/$(DIR.ENGINE)/*.h)
 SRC.ENGINE = $(wildcard $(SRCDIR)/$(DIR.ENGINE)/*.cpp)
 OBJ.ENGINE = $(addprefix $(OUT.ENGINE)/,$(notdir $(SRC.ENGINE:.cpp=$O)))
 DEP.ENGINE = CSTOOL CSGFX CSGEOM CSUTIL
-CFG.ENGINE = $(SRCDIR)/data/config/engine.cfg \
-  $(SRCDIR)/data/shader/or_lighting.xml
+CFG.ENGINE = $(SRCDIR)/data/config/engine.cfg
 
 OUTDIRS += $(OUT.ENGINE)
 

@@ -49,6 +49,8 @@ DEP.SHADERMGR = CSTOOL CSGFX CSGEOM CSUTIL
 
 OUTDIRS += $(OUT.SHADERMGR)
 
+TO_INSTALL.DATA += $(wildcard $(addprefix $(SRCDIR)/data/shader/*.,xml avp))
+
 MSVC.DSP += SHADERMGR
 DSP.SHADERMGR.NAME = shadermgr
 DSP.SHADERMGR.TYPE = plugin
