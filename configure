@@ -865,109 +865,86 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-cpu-specific-instructions
                           enable CPU-specific code generation (default YES);
-                          use with caution
- since code for one CPU will not
+                          use with caution since code for one CPU will not
                           work with earlier CPUs (for example,
                           Pentium-specific code will not run on an Intel 486)
   --disable-freetypetest  Do not try to compile and run
                           a test FreeType program
   --enable-linux-joystick enable Linux joystick support (default NO)
-  --enable-optimize       build with optimizations enabled (default YES);
-                          same as --enable-mode=optimize
-  --enable-debug          build with debugging information (default NO);
- same
+  --enable-optimize       build with optimizations enabled (default YES); same
+                          as --enable-mode=optimize
+  --enable-debug          build with debugging information (default NO); same
                           as --enable-mode=debug
-  --enable-profile        build with profiling information (default NO);
- same
+  --enable-profile        build with profiling information (default NO); same
                           as --enable-mode=profile
   --enable-mode=mode      set build mode; recognized modes are `optimize',
-                          `debug', `profile'
- (default OPTIMIZE)
+                          `debug', `profile' (default OPTIMIZE)
   --enable-plugins        create plugin modules instead of static link
                           libraries (default YES)
   --enable-strict-smart-pointers
                           enable strict smart pointers (default YES); when
-                          enabled, csPtr<T>
- returned from functions can only
-                          be assigned to csRef<T>; when
- disabled, csPtr<T>
-                          can also be assigned to T*, but client is then
+                          enabled, csPtr<T> returned from functions can only
+                          be assigned to csRef<T>; when disabled, csPtr<T> can
+                          also be assigned to T*, but client is then
                           responsible for invoking DecRef()
   --enable-extensive-memory-debugger
                           enable the extensive memory debugger which catches
-                          common memory
- management mistakes (default NO)
+                          common memory management mistakes (default NO)
   --enable-makefile-cache enable caching of makefile information to speed up
-                          build process;
- (default YES)
+                          build process; (default YES)
   --enable-makefile-cache-monitor
                           auto-refresh makefile cache when source makefiles
-                          change
- (default YES); auto-refresh entails very
-                          slight performance
- penalty but is more robust
+                          change (default YES); auto-refresh entails very
+                          slight performance penalty but is more robust
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-x                use the X Window System
   --with-libXxf86vm=dir   specify location of libXxf86vm if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-mesa             use Mesa OpenGL library if available (default YES)
   --with-libz=dir         specify location of libz if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-libpng=dir       specify location of libpng if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-libjpeg=dir      specify location of libjpeg if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-libmng=dir       specify location of libmng if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-libmikmod=dir    specify location of libmikmod if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-libogg=dir       specify location of libogg if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-libvorbis=dir    specify location of libvorbis if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-libvorbisfile=dir
                           specify location of libvorbisfile if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-lib3ds=dir       specify location of lib3ds if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-libode=dir       specify location of libode if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-ft-prefix=PREFIX
                           Prefix where FreeType is installed (optional)
   --with-ft-exec-prefix=PREFIX
                           Exec prefix where FreeType is installed (optional)
   --with-libvga=dir       specify location of libvga if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-libcal3d=dir     specify location of libcal3d if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
 
 Some influential environment variables:
@@ -9185,15 +9162,17 @@ if test "$no_x" != yes; then
 "
     cs_makefile_text="${cs_makefile_text}X_CFLAGS = $X_CFLAGS
 "
+    cs_jamconfig_text="${cs_jamconfig_text}X_CFLAGS ?= \"$X_CFLAGS\" ;
+"
     cs_makefile_text="${cs_makefile_text}X_LIBS = $X_LIBS
+"
+    cs_jamconfig_text="${cs_jamconfig_text}X_LIBS ?= \"$X_LIBS\" ;
 "
     cs_makefile_text="${cs_makefile_text}X_PRE_LIBS = $X_PRE_LIBS
 "
-    cs_makefile_text="${cs_makefile_text}X_EXTRA_LIBS = $X_EXTRA_LIBS
-"
     cs_jamconfig_text="${cs_jamconfig_text}X_PRE_LIBS ?= \"$X_PRE_LIBS\" ;
 "
-    cs_jamconfig_text="${cs_jamconfig_text}X_LIBS ?= \"$X_LIBS\" ;
+    cs_makefile_text="${cs_makefile_text}X_EXTRA_LIBS = $X_EXTRA_LIBS
 "
     cs_jamconfig_text="${cs_jamconfig_text}X_EXTRA_LIBS ?= \"$X_EXTRA_LIBS\" ;
 "
@@ -11711,11 +11690,10 @@ fi
 #------------------------------------------------------------------------------
 # Check for DirectDraw.
 #------------------------------------------------------------------------------
-
 if test "" != yes; then
   echo "$as_me:$LINENO: checking for DirectDraw" >&5
 echo $ECHO_N "checking for DirectDraw... $ECHO_C" >&6
-if test "${cs_cv_ddraw+set}" = set; then
+if test "${cs_cv_libddraw+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -11795,13 +11773,11 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-
-    #include <ddraw.h>
-
+#include <ddraw.h>
 int
 main ()
 {
-DirectDrawCreate(NULL, NULL, NULL);
+DirectDrawCreate(0,0,0)
   ;
   return 0;
 }
@@ -11842,17 +11818,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_ddraw=yes
-		cs_cv_ddraw_cflags=$cs_build_cflags
-		cs_cv_ddraw_lflags=$cs_build_lflags
-		cs_cv_ddraw_libs=$cs_build_libs
+	cs_cv_libddraw=yes
+		cs_cv_libddraw_cflags=$cs_build_cflags
+		cs_cv_libddraw_lflags=$cs_build_lflags
+		cs_cv_libddraw_libs=$cs_build_libs
 else
-  cs_cv_ddraw=no
+  cs_cv_libddraw=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_ddraw" >&5
-echo "${ECHO_T}$cs_cv_ddraw" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libddraw" >&5
+echo "${ECHO_T}$cs_cv_libddraw" >&6
 else
   echo "$as_me:$LINENO: checking for DirectDraw" >&5
 echo $ECHO_N "checking for DirectDraw... $ECHO_C" >&6
@@ -11933,13 +11909,11 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-
-    #include <ddraw.h>
-
+#include <ddraw.h>
 int
 main ()
 {
-DirectDrawCreate(NULL, NULL, NULL);
+DirectDrawCreate(0,0,0)
   ;
   return 0;
 }
@@ -11980,26 +11954,26 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_ddraw=yes
-		cs_cv_ddraw_cflags=$cs_build_cflags
-		cs_cv_ddraw_lflags=$cs_build_lflags
-		cs_cv_ddraw_libs=$cs_build_libs
+	cs_cv_libddraw=yes
+		cs_cv_libddraw_cflags=$cs_build_cflags
+		cs_cv_libddraw_lflags=$cs_build_lflags
+		cs_cv_libddraw_libs=$cs_build_libs
 else
-  cs_cv_ddraw=no
+  cs_cv_libddraw=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_ddraw" >&5
-echo "${ECHO_T}$cs_cv_ddraw" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libddraw" >&5
+echo "${ECHO_T}$cs_cv_libddraw" >&6
 fi
 
-    if test $cs_cv_ddraw = yes; then
-  if test "$cs_cv_ddraw" = yes; then
+    if test $cs_cv_libddraw = yes; then
+  if test "$cs_cv_libddraw" = yes; then
   cs_makefile_text="${cs_makefile_text}DDRAW.AVAILABLE = yes
 "
     cs_jamconfig_text="${cs_jamconfig_text}DDRAW.AVAILABLE ?= \"yes\" ;
 "
-	cs_result_cflags=`echo x$cs_cv_ddraw_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_result_lflags=`echo x$cs_cv_ddraw_lflags $cs_cv_ddraw_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_result_cflags=`echo x$cs_cv_libddraw_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_result_lflags=`echo x$cs_cv_libddraw_lflags $cs_cv_libddraw_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}DDRAW.CFLAGS = $cs_result_cflags
 "
@@ -12017,11 +11991,12 @@ fi
 fi
 
 else
-  cs_cv_ddraw_cflags=''
-	cs_cv_ddraw_lflags=''
-	cs_cv_ddraw_libs=''
+  cs_cv_libddraw_cflags=''
+	cs_cv_libddraw_lflags=''
+	cs_cv_libddraw_libs=''
 	:
 fi
+
 
 
 
@@ -20165,12 +20140,6 @@ done
 
 
 
-
-
-
-
-
-
 for ac_header in unistd.h \
     sys/types.h \
     sys/socket.h \
@@ -21485,11 +21454,9 @@ if test "${enable_mode+set}" = set; then
   enableval="$enable_mode"
   case $enableval in
 	optimize|debug|profile) cs_build_mode=$enableval ;;
-	*) { { echo "$as_me:$LINENO: error: unrecognized mode --enable-mode=$enableval;
- use
+	*) { { echo "$as_me:$LINENO: error: unrecognized mode --enable-mode=$enableval; use
     \`optimize', \`debug', or \`profile'" >&5
-echo "$as_me: error: unrecognized mode --enable-mode=$enableval;
- use
+echo "$as_me: error: unrecognized mode --enable-mode=$enableval; use
     \`optimize', \`debug', or \`profile'" >&2;}
    { (exit 1); exit 1; }; } ;;
     esac
@@ -21585,7 +21552,7 @@ fi
 #------------------------------------------------------------------------------
 # Determine installation directory.
 #------------------------------------------------------------------------------
-# GNU makefile build system.
+### GNU makefile build system.
 if test $prefix = NONE; then
   cs_install_dir=/usr/local/crystal
 else
@@ -21595,20 +21562,20 @@ fi
 cs_makefile_text="${cs_makefile_text}INSTALL_DIR = $cs_install_dir
 "
 
-# Jam build system.
+### Jam build system.
 # Handle the case when no prefix is given. And the special case when a path
 # contains more than 2 slashes, these paths seem to be correct but jam fails
 # on them.
 if test $prefix = NONE; then
   prefix="$ac_default_prefix"
 else
-  prefix=`echo "$prefix" | sed -e 's#///*#/#g'`
+  prefix=`echo "$prefix" | sed -e 's:///*:/:g'`
 fi
 
 if test $exec_prefix = NONE; then
   exec_prefix="\$(INSTALLDIR.PREFIX)"
 else
-  exec_prefix=`echo "$exec_prefix" | sed -e 's#///*#/#g'`
+  exec_prefix=`echo "$exec_prefix" | sed -e 's:///*:/:g'`
 fi
 
 

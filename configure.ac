@@ -972,7 +972,6 @@ cs_pylib1="-l$cs_cv_python_base"
 cs_pylib2=`echo "-l$cs_cv_python_base" | sed 's/\.//g'`
 CS_CHECK_BUILD([if Python SDK is usable], [cs_cv_python],
     [AC_LANG_PROGRAM([#include <Python.h>],[Py_Initialize(); Py_Finalize();])],
-
     [CS_CREATE_TUPLE([],[],[$cs_pylib1]) CS_CREATE_TUPLE([],[],[$cs_pylib2])],
     [], [CS_EMIT_BUILD_RESULT([cs_cv_python], [PYTHON])], [], [],
     [$cs_cv_python_base_cflags], [$cs_cv_python_base_lflags],
@@ -1266,13 +1265,10 @@ AC_PATH_XTRA
 
 AS_IF([test "$no_x" != yes],
     [CS_BUILD_PROPERTY([X11.AVAILABLE], [yes])
-    CS_MAKEFILE_PROPERTY([X_CFLAGS], [$X_CFLAGS])
-    CS_MAKEFILE_PROPERTY([X_LIBS], [$X_LIBS])
-    CS_MAKEFILE_PROPERTY([X_PRE_LIBS], [$X_PRE_LIBS])
-    CS_MAKEFILE_PROPERTY([X_EXTRA_LIBS], [$X_EXTRA_LIBS])
-    CS_JAMCONFIG_PROPERTY([X_PRE_LIBS], [$X_PRE_LIBS])
-    CS_JAMCONFIG_PROPERTY([X_LIBS], [$X_LIBS])
-    CS_JAMCONFIG_PROPERTY([X_EXTRA_LIBS], [$X_EXTRA_LIBS])
+    CS_BUILD_PROPERTY([X_CFLAGS], [$X_CFLAGS])
+    CS_BUILD_PROPERTY([X_LIBS], [$X_LIBS])
+    CS_BUILD_PROPERTY([X_PRE_LIBS], [$X_PRE_LIBS])
+    CS_BUILD_PROPERTY([X_EXTRA_LIBS], [$X_EXTRA_LIBS])
     CS_JAMCONFIG_PROPERTY([X11.CFLAGS], [$X_CFLAGS])
     CS_JAMCONFIG_PROPERTY([X11.LFLAGS],
       [AS_ESCAPE([$(X_PRE_LIBS) $(X_LIBS) -lXext -lX11 $(X_EXTRA_LIBS)])])
@@ -1434,14 +1430,11 @@ AS_IF([test $cs_cv_libgl = yes],
 #------------------------------------------------------------------------------
 # Check for DirectDraw.
 #------------------------------------------------------------------------------
-
-CS_CHECK_BUILD([for DirectDraw], [cs_cv_ddraw],
-    [AC_LANG_PROGRAM([
-    #include <ddraw.h>
-    ],
-    [DirectDrawCreate(NULL, NULL, NULL);])],
+CS_CHECK_BUILD([for DirectDraw], [cs_cv_libddraw],
+    [AC_LANG_PROGRAM([#include <ddraw.h>], [DirectDrawCreate(0,0,0)])],
     [CS_CREATE_TUPLE([],[],[-lddraw])], [],
-    [CS_EMIT_BUILD_RESULT([cs_cv_ddraw], [DDRAW])], [], [])
+    [CS_EMIT_BUILD_RESULT([cs_cv_libddraw], [DDRAW])])
+
 
 
 #------------------------------------------------------------------------------
@@ -2162,20 +2155,20 @@ AS_IF([test $enable_extensive_memory_debugger = yes],
 #------------------------------------------------------------------------------
 # Determine installation directory.
 #------------------------------------------------------------------------------
-# GNU makefile build system.
+### GNU makefile build system.
 AS_IF([test $prefix = NONE],
     [cs_install_dir=cs_install_dir_default], [cs_install_dir=$prefix])
 CS_MAKEFILE_PROPERTY([INSTALL_DIR], [$cs_install_dir])
 
-# Jam build system.
+### Jam build system.
 # Handle the case when no prefix is given. And the special case when a path
 # contains more than 2 slashes, these paths seem to be correct but jam fails
 # on them.
 AS_IF([test $prefix = NONE], [prefix="$ac_default_prefix"],
-    [prefix=`echo "$prefix" | sed -e 's#///*#/#g'`])
+    [prefix=`echo "$prefix" | sed -e 's:///*:/:g'`])
 AS_IF([test $exec_prefix = NONE],
     [exec_prefix="AS_ESCAPE([$(INSTALLDIR.PREFIX)])"],
-    [exec_prefix=`echo "$exec_prefix" | sed -e 's#///*#/#g'`])
+    [exec_prefix=`echo "$exec_prefix" | sed -e 's:///*:/:g'`])
 	
 CS_JAMCONFIG_PROPERTY([INSTALLDIR.PREFIX], [$prefix])
 CS_JAMCONFIG_PROPERTY([INSTALLDIR.EXEC_PREFIX], [$exec_prefix])

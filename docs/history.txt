@@ -4,21 +4,21 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 15-Apr-2003
-	- Fixed a bug in the thing plugin. If the dynavis culler was
-	  already mentioned before all other objects in the sector then
-	  this could cause crashes.
+	- Fixed a bug in the thing plugin.  If the dynavis culler was already
+	  mentioned before all other objects in the sector then this could
+	  cause crashes.
 	- Added the following functions to iObjectModel:
-	    - GetPolygonMeshBase: Get a polygon mesh representing the
-	      basic geometry of the object.
+	    - GetPolygonMeshBase: Get a polygon mesh representing the basic
+	      geometry of the object.
 	    - SetPolygonMeshColldet: Set a polygon mesh representing the
-	      geometry of the object. This mesh is useful for collision
-	      detection. This can be used to replace the default polygon mesh
-	      returned by GetPolygonMeshColldet() with one that has less
-	      detail or even to support polygon mesh for mesh objects that
-	      otherwise don't support it. The object model will keep a
-	      reference to the given polymesh.
-	    - SetPolygonMeshViscull: Similar to SetPolygonMeshColldet() but
-	      now for visibility culling (occluder writing).
+	      geometry of the object.  This mesh is useful for collision
+	      detection.  This can be used to replace the default polygon mesh
+	      returned by GetPolygonMeshColldet() with one that has less detail
+	      or even to support polygon mesh for mesh objects that otherwise
+	      don't support it.  The object model will keep a reference to the
+	      given polymesh.
+	    - SetPolygonMeshViscull: Similar to SetPolygonMeshColldet() but now
+	      for visibility culling (occluder writing).
 	- Added csObjectModel helper class to csgeom to help implement object
 	  models for mesh object plugins.
 	- Fixed all mesh object implementations to use the new csObjectModel.
@@ -27,11 +27,11 @@ The history order is reversed so that new features are at the top.
 	- Added new rain mesh object from Martin Geisse. This version looks
 	  correct if you tilt the camera to look up and it is considerably
 	  faster since it is using DrawTriangleMesh.
-	- Fixed csMeshObject default implementation a bit. The bounding box
-	  stuff was not very good and the functions were not virtual so it
-	  was not possible to override them.
-	- It is now possible to specify alternative polygon meshes for
-	  objects in the map file. Here is an example:
+	- Fixed csMeshObject default implementation a bit.  The bounding box
+	  stuff was not very good and the functions were not virtual so it was
+	  not possible to override them.
+	- It is now possible to specify alternative polygon meshes for objects
+	  in the map file.  Here is an example:
 	    <polymesh>
                 <box>
                     <min x="-1" y="-1" z="-1" />
@@ -39,12 +39,11 @@ The history order is reversed so that new features are at the top.
                 </box>
 	        <colldet />
 	    </polymesh>
-	  Add this inside a 'meshfact' or 'meshobj'. It will make a box
-	  mesh for the object at the given object-space coordinates.
-	  The mesh will be used for collision detection. If you want to use
-	  this mesh for visibility occlusion you can use the <viscull />
-	  keyword instead (or both). Check out data/flarge/world for an
-	  example.
+	  Add this inside a 'meshfact' or 'meshobj'.  It will make a box mesh
+	  for the object at the given object-space coordinates.  The mesh will
+	  be used for collision detection.  If you want to use this mesh for
+	  visibility occlusion you can use the <viscull /> keyword instead (or
+	  both).  Check out data/flarge/world for an example.
 	- Additionally implemented <mesh> inside <polymesh>.
 	    <polymesh>
                 <mesh>
@@ -56,16 +55,22 @@ The history order is reversed so that new features are at the top.
 	        <colldet />
 	    </polymesh>
 	- res did more new renderer lighting tweaks and fixes:
-	    - Added helper function to iLight to calculate an attenuation vector
-	      for an attenuation type, a radius and a brightness at this radius.
-	    - Added helper function to find the distance from a light for a 
+	    - Added helper function to iLight to calculate an attenuation
+	      vector for an attenuation type, a radius and a brightness at this
+	      radius.
+	    - Added helper function to find the distance from a light for a
 	      brightness.
-	    - Parser now recognizes a "brightness" attribute for <radius> to 
-	      specify what brightness a light should have at the specified radius.
-	    - Influence radius can be manually override using <influenceradius>.
+	    - Parser now recognizes a "brightness" attribute for <radius> to
+	      specify what brightness a light should have at the specified
+	      radius.
+	    - Influence radius can be manually override using
+	      <influenceradius>.
+	- Eric Sunshine folded out some redundancy from configure.ac introduced
+	  recently into the X-Windows check.  Also performed very minor cleanup
+	  of new DirectDraw check.
 14-Apr-2003
-	- Philip Wyett removed makedep entry under apps/tools for Jam. This
-	  is no longer needed after recent changes.
+	- Philip Wyett removed makedep entry under apps/tools for Jam.  This is
+	  no longer needed after recent changes.
 	- Eric Sunshine made the following Jam-related changes for MacOS/X:
 	    - Fixed bug: Was ignoring the "console" attribute when building
 	      console applications, thus it was attempting to place console
