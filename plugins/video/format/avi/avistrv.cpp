@@ -274,22 +274,25 @@ void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
   int ytic=th, xtic;
   int ls = 0;
   float y,u,v, uf1, uf2, vf1, vf2;
+  int sr=0, sc; // source row and col
 
   csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
   for (int row=0; row < th; row++)
   {
     xtic = 0;
+    sc = 0;
     for (int col=0; col < tw; col++)
     {
-      if (uvidx != (idx>>2)) // this YUV is a 1:4:4 scheme
+      if (uvidx != (sc>>1)) // this YUV is a 1:4:4 scheme
       {
-	uvidx = idx >> 2;
+	uvidx = (sr>>1) * sw + sc>>1;
 	u=((float)(unsigned char)udata[uvidx]) - 128.f;
 	v=((float)(unsigned char)vdata[uvidx]) - 128.f;
 	uf1 = 2.018f * u;
 	uf2 = 0.813f * u;
 	vf1 = 0.391f * v;
 	vf2 = 1.596f * v;
+	uvidx = sc  >>1;
       }
       y=1.164f*(((float)(unsigned char)ydata[idx]) - 16.f);
       pixel[tidx].blue = FIX_RANGE(y + uf1);
@@ -299,6 +302,7 @@ void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
       while (xtic < sw)
       {
 	idx++;
+	sc++;
 	xtic += tw;
       }
       xtic -=sw;
@@ -307,6 +311,7 @@ void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
     while (ytic < sh)
     {
       ls += sw;
+      sr++;
       ytic += th;
     }
     ytic -=sh;
