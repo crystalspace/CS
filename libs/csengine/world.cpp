@@ -466,6 +466,8 @@ void csWorld::Clear ()
   delete textures; textures = NULL;
   textures = new csTextureList ();
 
+  // Delete world states and their references to cullers before cullers are
+  // deleted in SetCuller below.
   if (world_states)
   {
     world_states->DeleteAll ();

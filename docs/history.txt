@@ -31,7 +31,8 @@ The history order has been reversed so that new features are at the top.
               software proc textures.
 	    - Fixed the GL proc texture bug which created new proc textures each
               time PrepareTextures was called.
-            - dtsimple now responds to contextClose events.
+            - dtsimple now responds to contextClose events, and exits without
+	      crashing.
 28-Jul-2000
 	- Norman Kramer fixes the x2d canvas so that the title is set
 	  to the right window.
