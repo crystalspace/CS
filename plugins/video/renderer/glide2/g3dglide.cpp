@@ -64,7 +64,7 @@
 #include "cs3d/glide2/glidelib.h"
 #include "cs3d/glide2/g3dglide.h"
 
-#include "cs2d/glide2common/scrnshot.h"
+#include "scrnshot.h"
 
 //
 // Interface table definition
@@ -395,7 +395,8 @@ csGraphics3DGlide2x::csGraphics3DGlide2x(iBase* iParent) :
   m_dpvertsize = 0;
   poly_alpha = -1;
   poly_fog = false;
-
+  clipper = NULL;
+  
   // default
   m_Caps.ColorModel = G3DCOLORMODEL_RGB;
   m_Caps.CanClip = false;
@@ -428,6 +429,8 @@ csGraphics3DGlide2x::~csGraphics3DGlide2x()
 {
   GlideLib_grGlideShutdown();
 
+  if ( clipper )
+    delete clipper;
   if ( m_verts )
     delete [] m_verts;
   if (m_pTextureCache)
@@ -693,6 +696,15 @@ void csGraphics3DGlide2x::SetPerspectiveCenter (int x, int y)
 {
   m_nHalfWidth = x;
   m_nHalfHeight = y;
+}
+
+void csGraphics3DGlide2x::SetClipper (csVector2* vertices, int num_vertices)
+{
+  CHK (delete clipper);
+  clipper = NULL;
+  if (!vertices) return;
+  
+  CHK (clipper = new csPolygonClipper (vertices, num_vertices, false, true));
 }
 
 bool csGraphics3DGlide2x::BeginDraw (int DrawFlags)
@@ -1010,7 +1022,6 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
     }
   }
   float x,y,ooz,z,u,v,lu,lv;
-  int from, to, inc;
   TextureHandler *thLm =NULL, 
                  *thTex = (TextureHandler *)tcache->pData;
                   

@@ -34,6 +34,8 @@
 #include "cs3d/glide2/glcache.h"
 #include "cs3d/glide2/gl_txtmgr.h"
 #include "glidhalo.h"
+#include "csgeom/transfrm.h"
+#include "csgeom/polyclip.h"
 
 class GlideTextureCache;
 class GlideLightmapCache;
@@ -123,6 +125,13 @@ private:
   /// fogtable
   GrFog_t fogtable[ GR_FOG_TABLE_SIZE];
   
+  /// aspect
+  float aspect, inv_aspect;
+  /// object -> camera transformation
+  csTransform o2c;
+  /// current clipper
+  csClipper* clipper;
+  
 public:
   DECLARE_IBASE;
 
@@ -202,14 +211,26 @@ public:
   virtual int GetHeight () { return m_nHeight; }
   /// Set center of projection.
   virtual void SetPerspectiveCenter (int x, int y);
-  /// Set perspective aspect. @@@ NOT YET IMPLEMENTED
-  virtual void SetPerspectiveAspect (float aspect) { }
-  /// Set world to camera transformation. @@@ NOT YET IMPLEMENTED
-  virtual void SetObjectToCamera (csTransform* o2c) { }
-  /// Set optional clipper. @@@ NOT YET IMPLEMENTED
-  virtual void SetClipper (csVector2* vertices, int num_vertices) { }
-  /// Draw a triangle mesh. @@@ NOT YET IMPLEMENTED
-  virtual void DrawTriangleMesh (G3DTriangleMesh& mesh) { }
+  /// Set perspective aspect
+  virtual void SetPerspectiveAspect (float aspect) 
+  {
+    this->aspect = aspect; inv_aspect = 1.0/aspect;	 
+  }
+  /// Set world to camera transformation.
+  virtual void SetObjectToCamera (csTransform* o2c) 
+  { 
+    this->o2c = *o2c;
+  }
+  /// Set optional clipper
+  virtual void SetClipper (csVector2* vertices, int num_vertices);
+  /// Draw a triangle mesh.
+  virtual void DrawTriangleMesh (G3DTriangleMesh& mesh) 
+  { 
+    // i'm lazy thats why i'm calling the generic funtion :)
+    void DrawTriangleMesh( G3DTriangleMesh& mesh, iGraphics3D* g3d, csTransform& o2c,
+         csClipper* clipper, float aspect, int width2, int height2 );
+    DrawTriangleMesh( mesh, this, o2c, clipper, aspect, m_nHalfWidth, m_nHalfHeight );
+  }
 
   ///
   virtual bool NeedsPO2Maps () { return true; }
