@@ -327,6 +327,10 @@
             <autonormals />
         </params>
     </meshfact>
+    <meshfact name="paramsFileTest">
+        <plugin>spr3dFact</plugin>
+        <paramsfile>/lib/std/sprite3</paramsfile>
+    </meshfact>
     <meshfact name="treeFact">
         <plugin>treeFact</plugin>
         <params />
@@ -4007,6 +4011,16 @@
             <hardmove>
                 <v x="13" y="0" z="12" />
             </hardmove>
+        </meshobj>
+        <meshobj name="paramsFile">
+            <plugin>spr3d</plugin>
+            <params>
+                <factory>paramsFileTest</factory>
+                <action>default</action>
+            </params>
+            <move>
+                <v x="10" y="0.3" z="10" />
+            </move>
         </meshobj>
         <meshobj name="switchBoard">
             <plugin>thing</plugin>

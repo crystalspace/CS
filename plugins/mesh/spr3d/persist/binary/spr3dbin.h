@@ -35,7 +35,7 @@ struct iObjectRegistry;
 /**
  * Sprite 3D factory loader for Binary formatted sprites
  */
-class csSprite3DBinFactoryLoader : public iLoaderPlugin
+class csSprite3DBinFactoryLoader : public iBinaryLoaderPlugin
 {
 private:
   iReporter* reporter;
@@ -59,16 +59,9 @@ public:
   /// Register plugin with the system driver
   virtual bool Initialize (iObjectRegistry *object_reg);
 
-  /// Parse a given string and return a new object for it.
-  virtual iBase* Parse (const char* string, 
+  /// Parse data  and return a new object for it.
+  virtual iBase* Parse (void* data, 
     iLoaderContext* ldr_context, iBase* context);
-
-  /// Parse a given node and return a new object for it.
-  virtual iBase* Parse (iDocumentNode* node,
-    iLoaderContext* ldr_context, iBase* context)
-  {
-    return NULL;
-  }
 
   struct eiComponent : public iComponent
   {

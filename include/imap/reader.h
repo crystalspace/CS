@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2002 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -31,7 +31,7 @@ struct iDocumentNode;
 SCF_VERSION (iLoaderPlugin, 0, 2, 0);
 
 /**
- * This is a plugin for the loader.
+ * This is a plugin for the loader based on document tree.
  */
 struct iLoaderPlugin : public iBase
 {
@@ -41,6 +41,18 @@ struct iLoaderPlugin : public iBase
 
   /// Parse a given XML node and return a new object for it.
   virtual iBase* Parse (iDocumentNode* node, iLoaderContext* ldr_context,
+  	iBase* context) = 0;
+};
+
+SCF_VERSION (iBinaryLoaderPlugin, 0, 0, 1);
+
+/**
+ * This is a binary plugin for the loader.
+ */
+struct iBinaryLoaderPlugin : public iBase
+{
+  /// Parse given data and return a new object for it.
+  virtual iBase* Parse (void* data, iLoaderContext* ldr_context,
   	iBase* context) = 0;
 };
 

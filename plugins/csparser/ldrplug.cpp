@@ -25,21 +25,31 @@ struct csLoaderPluginRec
 {
   char* ShortName;
   char* ClassID;
+  iComponent* Component;
   iLoaderPlugin* Plugin;
+  iBinaryLoaderPlugin* BinPlugin;
 
-  csLoaderPluginRec (const char* iShortName,
-	const char *iClassID, iLoaderPlugin *iPlugin)
+  csLoaderPluginRec (const char* shortName,
+	const char *classID,
+	iComponent* component,
+	iLoaderPlugin *plugin,
+	iBinaryLoaderPlugin* binPlugin)
   {
-    if (iShortName) ShortName = csStrNew (iShortName);
+    if (shortName) ShortName = csStrNew (shortName);
     else ShortName = NULL;
-    ClassID = csStrNew (iClassID);
-    Plugin = iPlugin;
+    ClassID = csStrNew (classID);
+    Component = component;
+    Plugin = plugin;
+    BinPlugin = binPlugin;
   }
 
   ~csLoaderPluginRec ()
   {
     delete [] ShortName;
     delete [] ClassID;
+    if (Component) Component->DecRef ();
+    if (Plugin) Plugin->DecRef ();
+    if (BinPlugin) BinPlugin->DecRef ();
   }
 };
 
@@ -57,18 +67,9 @@ csLoader::csLoadedPluginVector::~csLoadedPluginVector ()
 bool csLoader::csLoadedPluginVector::FreeItem (csSome Item)
 {
   csLoaderPluginRec *rec = (csLoaderPluginRec*)Item;
-  if (rec->Plugin)
+  if (rec->Component && plugin_mgr)
   {
-    if (plugin_mgr)
-    {
-      iComponent* p = SCF_QUERY_INTERFACE(rec->Plugin, iComponent);
-      if (p)
-      {
-        plugin_mgr->UnloadPlugin(p);
-	p->DecRef();
-      }
-    }
-    rec->Plugin->DecRef ();
+    plugin_mgr->UnloadPlugin (rec->Component);
   }
   delete rec;
   return true;
@@ -89,30 +90,46 @@ csLoaderPluginRec* csLoader::csLoadedPluginVector::FindPluginRec (
   return NULL;
 }
 
-iLoaderPlugin* csLoader::csLoadedPluginVector::GetPluginFromRec (
-	csLoaderPluginRec *rec)
+bool csLoader::csLoadedPluginVector::GetPluginFromRec (
+	csLoaderPluginRec *rec, iLoaderPlugin*& plug,
+	iBinaryLoaderPlugin*& binplug)
 {
-  if (!rec->Plugin)
-    rec->Plugin = CS_LOAD_PLUGIN (plugin_mgr,
-    	rec->ClassID, iLoaderPlugin);
-  return rec->Plugin;
+  if (!rec->Component)
+  {
+    rec->Component = CS_LOAD_PLUGIN (plugin_mgr,
+    	rec->ClassID, iComponent);
+    if (rec->Component)
+    {
+      rec->Plugin = SCF_QUERY_INTERFACE (rec->Component, iLoaderPlugin);
+      rec->BinPlugin = SCF_QUERY_INTERFACE (rec->Component,
+      	iBinaryLoaderPlugin);
+    }
+  }
+  plug = rec->Plugin;
+  binplug = rec->BinPlugin;
+  return rec->Component != NULL;
 }
 
-iLoaderPlugin* csLoader::csLoadedPluginVector::FindPlugin (
-	const char* Name)
+bool csLoader::csLoadedPluginVector::FindPlugin (
+	const char* Name, iLoaderPlugin*& plug,
+	iBinaryLoaderPlugin*& binplug)
 {
   // look if there is already a loading record for this plugin
   csLoaderPluginRec* pl = FindPluginRec (Name);
   if (pl)
-    return GetPluginFromRec(pl);
+  {
+    return GetPluginFromRec (pl, plug, binplug);
+  }
 
   // create a new loading record
   NewPlugin (NULL, Name);
-  return GetPluginFromRec((csLoaderPluginRec*)Get(Length()-1));
+  return GetPluginFromRec ((csLoaderPluginRec*)Get(Length()-1),
+  	plug, binplug);
 }
 
 void csLoader::csLoadedPluginVector::NewPlugin
 	(const char *ShortName, const char *ClassID)
 {
-  Push (new csLoaderPluginRec (ShortName, ClassID, NULL));
+  Push (new csLoaderPluginRec (ShortName, ClassID, NULL, NULL, NULL));
 }
+

@@ -5,6 +5,22 @@ The history order is reversed so that new features are at the top.
 	- Fixed Cs2Xml so that it only adds the name attribute to some node
 	  if it is actually different from the empty string.
 	- Fixed a few compilation issues in csloader after changes from res.
+	- Added iBinaryLoaderPlugin. This new interface will be for loader
+	  plugins that are interested in parsing binary data and not
+	  XML tree data.
+	- The main loader will transparently handle both types of
+	  loader plugins (iLoaderPlugin and iBinaryLoaderPlugin) and
+	  switch behaviour accordingly. Of course binary loader plugins
+	  can only be used with the <paramsfile> tag.
+	- The binary sprite loader now implements iBinaryLoaderPlugin instead
+	  of iLoaderPlugin.
+	- <addon> will now fail if the plugin parser fails.
+	- <addon> now also supports <paramsfile>.
+	- All <paramsfile> options (and even the old PARAMSFILE) will now
+	  detect if the file that is being load is XML and switch accordingly.
+	- Added example usage of <paramsfile> to flarge. Also added a
+	  new 'sprite3' in standard.zip which only contains the <params> block
+	  so it can be used with <paramsfile>.
 22-Aug-2002
 	- Fixed Cs2Xml for DURATION and FRAME commands in motion loader.
 	- Cs2Xml now supports the normal notation for vertices in 3D

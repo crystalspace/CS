@@ -302,7 +302,8 @@ void csLoader::ReportNotify (const char* description, ...)
   va_end (arg);
 }
 
-void csLoader::ReportNotifyV (const char* id, const char* description, va_list arg)
+void csLoader::ReportNotifyV (const char* id, const char* description,
+	va_list arg)
 {
   if (Reporter)
   {
@@ -342,6 +343,63 @@ void csLoader::ReportWarning (const char* id, const char* description, ...)
     csPrintf ("Description: %s\n", buf);
   }
   va_end (arg);
+}
+
+//---------------------------------------------------------------------------
+
+// XML: temporary code to detect if we have an XML file. If that's
+// the case then we will use the XML parsers. Returns false on failure
+// to parse XML.
+bool csLoader::TestXml (const char* file, iDataBuffer* buf,
+	csRef<iDocument>& doc)
+{
+  const char* b = **buf;
+  while (*b == ' ' || *b == '\n' || *b == '\t') b++;
+  if (*b == '<')
+  {
+    // XML.
+    // First try to find out if there is an iDocumentSystem registered in the
+    // object registry. If that's the case we will use that. Otherwise
+    // we'll use tinyxml.
+    csRef<iDocumentSystem> xml;
+    xml.Take (CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
+    if (!xml) xml.Take (new csTinyDocumentSystem ());
+    doc = xml->CreateDocument ();
+    const char* error = doc->Parse (buf);
+    if (error != NULL)
+    {
+      ReportError (
+	      "crystalspace.maploader.parse.xml",
+    	      "XML error '%s' for file '%s'!", error, file);
+      doc = NULL;
+      return false;
+    }
+  }
+  return true;
+}
+
+iBase* csLoader::TestXmlPlugParse (iLoaderPlugin* plug, iDataBuffer* buf,
+  	iBase* context, const char* fname)
+{
+  csRef<iDocument> doc;
+  bool er = TestXml (fname, buf, doc);
+  if (!er) return NULL;
+  if (doc)
+  {
+    // First find the <params> node in the loaded file.
+    csRef<iDocumentNode> paramsnode = doc->GetRoot ()->GetNode ("params");
+    if (!paramsnode)
+    {
+      SyntaxService->ReportError (
+	      "crystalspace.maploader.load.plugin",
+              doc->GetRoot (), "Could not find <params> in '%s'!", fname);
+      return NULL;
+    }
+    return plug->Parse (paramsnode, GetLoaderContext (), context);
+  }
+  else
+    return plug->Parse ((char*)(buf->GetUint8 ()), GetLoaderContext (),
+    	context);
 }
 
 //---------------------------------------------------------------------------
@@ -515,42 +573,16 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
 
   Engine->ResetWorldSpecificSettings();
 
-  // XML: temporary code to detect if we have an XML file. If that's
-  // the case then we will use the XML parsers.
-  // @@@
-  char* b = **buf;
-  while (*b == ' ' || *b == '\n' || *b == '\t') b++;
-  if (*b == '<')
+  csRef<iDocument> doc;
+  bool er = TestXml (file, buf, doc);
+  if (!er) return false;
+  if (doc)
   {
-    // XML.
-    // First try to find out if there is an iDocumentSystem registered in the
-    // object registry. If that's the case we will use that. Otherwise
-    // we'll use tinyxml.
-    csRef<iDocumentSystem> xml;
-    xml.Take (CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
-    if (!xml) xml.Take (new csTinyDocumentSystem ());
-    csRef<iDocument> doc = xml->CreateDocument ();
-    const char* error = doc->Parse (buf);
-    if (error == NULL)
-    {
-      if (!LoadMap (doc->GetRoot ()))
-	return false;
-    }
-    else
-    {
-      ReportError (
-	      "crystalspace.maploader.parse.map",
-    	      "XML error '%s' for file '%s'!", error, file);
-      return false;
-    }
+    if (!LoadMap (doc->GetRoot ())) return false;
   }
   else
   {
-    // Old format.
-    if (!LoadMap (**buf))
-    {
-      return false;
-    }
+    if (!LoadMap (**buf)) return false;
   }
 
   if (Stats->polygons_loaded)
@@ -743,40 +775,17 @@ bool csLoader::LoadLibraryFile (const char* fname)
   ResolveOnlyRegion = false;
   SCF_DEC_REF (ldr_context); ldr_context = NULL;
 
-  // XML: temporary code to detect if we have an XML file. If that's
-  // the case then we will use the XML parsers.
-  // @@@
-  char* b = **buf;
-  while (*b == ' ' || *b == '\n' || *b == '\t') b++;
-  if (*b == '<')
+  csRef<iDocument> doc;
+  bool er = TestXml (fname, buf, doc);
+  if (!er) return false;
+  if (doc)
   {
-    // XML.
-    // First try to find out if there is an iDocumentSystem registered in the
-    // object registry. If that's the case we will use that. Otherwise
-    // we'll use tinyxml.
-    csRef<iDocumentSystem> xml;
-    xml.Take (CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
-    if (!xml) xml.Take (new csTinyDocumentSystem ());
-    csRef<iDocument> doc = xml->CreateDocument ();
-    const char* error = doc->Parse (buf);
-    if (error == NULL)
-    {
-      if (!LoadLibrary (doc->GetRoot ()))
-	return false;
-    }
-    else
-    {
-      ReportError (
-	      "crystalspace.maploader.parse.map",
-    	      "XML error '%s' for file '%s'!", error, fname);
-      return false;
-    }
+    return LoadLibrary (doc->GetRoot ());
   }
   else
   {
     return LoadLibrary (**buf);
   }
-  return true;
 }
 
 //---------------------------------------------------------------------------
@@ -900,53 +909,32 @@ iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
     return NULL;
   }
 
-  // XML: temporary code to detect if we have an XML file. If that's
-  // the case then we will use the XML parsers.
-  // @@@
-  char* b = **databuff;
-  while (*b == ' ' || *b == '\n' || *b == '\t') b++;
-  if (*b == '<')
+  csRef<iDocument> doc;
+  bool er = TestXml (fname, databuff, doc);
+  if (!er) return false;
+  if (doc)
   {
-    // XML.
-    // First try to find out if there is an iDocumentSystem registered in the
-    // object registry. If that's the case we will use that. Otherwise
-    // we'll use tinyxml.
-    csRef<iDocumentSystem> xml;
-    xml.Take (CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
-    if (!xml) xml.Take (new csTinyDocumentSystem ());
-    csRef<iDocument> doc = xml->CreateDocument ();
-    const char* error = doc->Parse (databuff);
-    if (error == NULL)
-    {
-      csRef<iDocumentNode> meshfactnode = doc->GetRoot ()->GetNode ("meshfact");
-      if (!meshfactnode)
-      {
-        ReportError (
-	      "crystalspace.maploader.parse.map",
-    	      "File '%s' does not seem to contain a 'meshfact'!", fname);
-        return NULL;
-      }
-      iMeshFactoryWrapper* t = Engine->CreateMeshFactory (
-      	meshfactnode->GetAttributeValue ("name"));
-      if (LoadMeshObjectFactory (t, meshfactnode))
-      {
-        return t;
-      }
-      else
-      {
-        // Error is already reported.
-        iMeshFactoryWrapper* factwrap = Engine->GetMeshFactories ()
-      	  ->FindByName (meshfactnode->GetAttributeValue ("name"));
-        Engine->GetMeshFactories ()->Remove (factwrap);
-        return NULL;
-      }
-    }
-    else
+    csRef<iDocumentNode> meshfactnode = doc->GetRoot ()->GetNode ("meshfact");
+    if (!meshfactnode)
     {
       ReportError (
 	      "crystalspace.maploader.parse.map",
-    	      "XML error '%s' for file '%s'!", error, fname);
-      return false;
+    	      "File '%s' does not seem to contain a 'meshfact'!", fname);
+      return NULL;
+    }
+    iMeshFactoryWrapper* t = Engine->CreateMeshFactory (
+      	meshfactnode->GetAttributeValue ("name"));
+    if (LoadMeshObjectFactory (t, meshfactnode))
+    {
+      return t;
+    }
+    else
+    {
+      // Error is already reported.
+      iMeshFactoryWrapper* factwrap = Engine->GetMeshFactories ()
+      	  ->FindByName (meshfactnode->GetAttributeValue ("name"));
+      Engine->GetMeshFactories ()->Remove (factwrap);
+      return NULL;
     }
   }
   else
@@ -1013,6 +1001,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
   char* params;
   char str[255];
   iLoaderPlugin* plug = NULL;
+  iBinaryLoaderPlugin* binplug = NULL;
   str[0] = 0;
   iMaterialWrapper *mat = NULL;
 
@@ -1100,7 +1089,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	}
         break;
       case CS_TOKEN_PARAMSFILE:
-	if (!plug)
+	if (!plug && !binplug)
 	{
           ReportError (
 	      "crystalspace.maploader.load.plugin",
@@ -1122,7 +1111,12 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	  // We give here the iMeshObjectFactory as the context. If this
 	  // is a new factory this will be NULL. Otherwise it is possible
 	  // to append information to the already loaded factory.
-	  iBase* mof = plug->Parse ((char*)(buf->GetUint8 ()),
+	  iBase* mof;
+	  if (plug)
+	    mof = TestXmlPlugParse (plug, buf, stemp->GetMeshObjectFactory (),
+	    	str);
+	  else
+	    mof = binplug->Parse ((void*)(buf->GetUint8 ()),
 	  	GetLoaderContext (), stemp->GetMeshObjectFactory ());
 	  buf->DecRef ();
 	  if (!mof)
@@ -1231,7 +1225,13 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
       case CS_TOKEN_PLUGIN:
 	{
 	  csScanStr (params, "%s", str);
-	  plug = loaded_plugins.FindPlugin (str);
+	  if (!loaded_plugins.FindPlugin (str, plug, binplug))
+	  {
+            ReportError (
+ 	      "crystalspace.maploader.parse.loadingmodel",
+	      "Error loading plugin '%s'!", str);
+	    return false;
+	  }
 	}
         break;
 
@@ -1757,6 +1757,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 
   Stats->meshes_loaded++;
   iLoaderPlugin* plug = NULL;
+  iBinaryLoaderPlugin* binplug = NULL;
 
   while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
@@ -2003,7 +2004,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	}
         break;
       case CS_TOKEN_PARAMSFILE:
-	if (!plug)
+	if (!plug && !binplug)
 	{
           ReportError (
 	      "crystalspace.maploader.load.plugin",
@@ -2021,7 +2022,11 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	      "Error opening file '%s'!", str);
 	    return false;
 	  }
-	  iBase* mo = plug->Parse ((char*)(buf->GetUint8 ()),
+	  iBase* mo;
+	  if (plug)
+	    mo = TestXmlPlugParse (plug, buf, NULL, str);
+	  else
+	    mo = binplug->Parse ((void*)(buf->GetUint8 ()),
 	  	GetLoaderContext (), NULL);
           if (mo)
           {
@@ -2064,7 +2069,13 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
       case CS_TOKEN_PLUGIN:
 	{
 	  csScanStr (params, "%s", str);
-	  plug = loaded_plugins.FindPlugin (str);
+	  if (!loaded_plugins.FindPlugin (str, plug, binplug))
+	  {
+            ReportError (
+ 	      "crystalspace.maploader.parse.meshobj",
+	      "Error loading plugin '%s'!", str);
+	    return false;
+	  }
 	}
         break;
 
@@ -2117,6 +2128,7 @@ bool csLoader::LoadAddOn (char* buf, iBase* context)
   str[0] = 0;
 
   iLoaderPlugin* plug = NULL;
+  iBinaryLoaderPlugin* binplug = NULL;
 
   while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
@@ -2147,7 +2159,13 @@ bool csLoader::LoadAddOn (char* buf, iBase* context)
       case CS_TOKEN_PLUGIN:
 	{
 	  csScanStr (params, "%s", str);
-	  plug = loaded_plugins.FindPlugin (str);
+	  if (!loaded_plugins.FindPlugin (str, plug, binplug))
+	  {
+            ReportError (
+ 	      "crystalspace.maploader.parse.addon",
+	      "Error loading plugin '%s'!", str);
+	    return false;
+	  }
 	}
         break;
     }
@@ -2343,46 +2361,26 @@ iMeshWrapper* csLoader::LoadMeshObject (const char* fname)
     return NULL;
   }
 
-  // XML: temporary code to detect if we have an XML file. If that's
-  // the case then we will use the XML parsers.
-  // @@@
-  char* b = **databuff;
-  while (*b == ' ' || *b == '\n' || *b == '\t') b++;
-  if (*b == '<')
+  csRef<iDocument> doc;
+  bool er = TestXml (fname, databuff, doc);
+  if (!er) return false;
+  if (doc)
   {
-    // XML.
-    // First try to find out if there is an iDocumentSystem registered in the
-    // object registry. If that's the case we will use that. Otherwise
-    // we'll use tinyxml.
-    csRef<iDocumentSystem> xml;
-    xml.Take (CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
-    if (!xml) xml.Take (new csTinyDocumentSystem ());
-    csRef<iDocument> doc = xml->CreateDocument ();
-    const char* error = doc->Parse (databuff);
-    if (error == NULL)
-    {
-      csRef<iDocumentNode> meshobjnode = doc->GetRoot ()->GetNode ("meshobj");
-      if (!meshobjnode)
-      {
-        ReportError (
-	      "crystalspace.maploader.parse.map",
-    	      "File '%s' does not seem to contain a 'meshobj'!", fname);
-        return NULL;
-      }
-      mesh = Engine->CreateMeshWrapper (
-      	meshobjnode->GetAttributeValue ("name"));
-      if (!LoadMeshObject (mesh, meshobjnode))
-      {
-	// Error is already reported.
-	mesh->DecRef ();
-      }
-    }
-    else
+    csRef<iDocumentNode> meshobjnode = doc->GetRoot ()->GetNode ("meshobj");
+    if (!meshobjnode)
     {
       ReportError (
 	      "crystalspace.maploader.parse.map",
-    	      "XML error '%s' for file '%s'!", error, fname);
-      return false;
+    	      "File '%s' does not seem to contain a 'meshobj'!", fname);
+      return NULL;
+    }
+    mesh = Engine->CreateMeshWrapper (
+    	meshobjnode->GetAttributeValue ("name"));
+    if (!LoadMeshObject (mesh, meshobjnode))
+    {
+      // Error is already reported.
+      mesh->DecRef ();
+      mesh = NULL;
     }
   }
   else
@@ -2410,6 +2408,7 @@ iMeshWrapper* csLoader::LoadMeshObject (const char* fname)
         {
 	  // Error is already reported.
 	  mesh->DecRef ();
+          mesh = NULL;
         }
       }
     }
@@ -3706,6 +3705,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	iDocumentNode* node, csReversibleTransform* transf)
 {
   iLoaderPlugin* plug = NULL;
+  iBinaryLoaderPlugin* binplug = NULL;
   iMaterialWrapper *mat = NULL;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -3785,7 +3785,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	}
         break;
       case XMLTOKEN_PARAMSFILE:
-	if (!plug)
+	if (!plug && !binplug)
 	{
           SyntaxService->ReportError (
 	      "crystalspace.maploader.load.plugin",
@@ -3806,8 +3806,12 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	  // We give here the iMeshObjectFactory as the context. If this
 	  // is a new factory this will be NULL. Otherwise it is possible
 	  // to append information to the already loaded factory.
-	  // @@@ SWITCH TO XML HERE!
-	  iBase* mof = plug->Parse ((char*)(buf->GetUint8 ()),
+	  iBase* mof;
+	  if (plug)
+	    mof = TestXmlPlugParse (plug, buf, stemp->GetMeshObjectFactory (),
+	    	child->GetContentsValue ());
+	  else
+	    mof = binplug->Parse ((void*)(buf->GetUint8 ()),
 	  	GetLoaderContext (), stemp->GetMeshObjectFactory ());
 	  buf->DecRef ();
 	  if (!mof)
@@ -3913,7 +3917,14 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
         break;
 
       case XMLTOKEN_PLUGIN:
-	plug = loaded_plugins.FindPlugin (child->GetContentsValue ());
+	if (!loaded_plugins.FindPlugin (child->GetContentsValue (),
+		plug, binplug))
+	{
+	  SyntaxService->ReportError (
+ 	      "crystalspace.maploader.parse.addon",
+	      child, "Error loading plugin '%s'!", child->GetContentsValue ());
+	  return false;
+	}
         break;
 
       case XMLTOKEN_MESHFACT:
@@ -4308,6 +4319,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 
   Stats->meshes_loaded++;
   iLoaderPlugin* plug = NULL;
+  iBinaryLoaderPlugin* binplug = NULL;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -4520,7 +4532,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	}
         break;
       case XMLTOKEN_PARAMSFILE:
-	if (!plug)
+	if (!plug && !binplug)
 	{
           SyntaxService->ReportError (
 	      "crystalspace.maploader.load.plugin",
@@ -4546,8 +4558,11 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	      child, "Error opening file '%s'!", fname);
 	    return false;
 	  }
-	  // @@@ SWITCH TO XML HERE!
-	  iBase* mo = plug->Parse ((char*)(buf->GetUint8 ()),
+	  iBase* mo;
+	  if (plug)
+	    mo = TestXmlPlugParse (plug, buf, NULL, fname);
+	  else
+	    mo = binplug->Parse ((void*)(buf->GetUint8 ()),
 	  	GetLoaderContext (), NULL);
           if (mo)
           {
@@ -4594,7 +4609,13 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	      child, "Specify a plugin name with 'plugin'!");
 	    return false;
 	  }
-	  plug = loaded_plugins.FindPlugin (plugname);
+	  if (!loaded_plugins.FindPlugin (plugname, plug, binplug))
+	  {
+	    SyntaxService->ReportError (
+ 	        "crystalspace.maploader.parse.addon",
+	        child, "Error loading plugin '%s'!", plugname);
+	    return false;
+	  }
 	}
         break;
 
@@ -4631,6 +4652,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 bool csLoader::LoadAddOn (iDocumentNode* node, iBase* context)
 {
   iLoaderPlugin* plug = NULL;
+  iBinaryLoaderPlugin* binplug = NULL;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -4651,12 +4673,57 @@ bool csLoader::LoadAddOn (iDocumentNode* node, iBase* context)
 	}
 	else
 	{
-	  plug->Parse (child, GetLoaderContext (), context);
+	  if (!plug->Parse (child, GetLoaderContext (), context))
+	    return false;
+	}
+        break;
+
+      case XMLTOKEN_PARAMSFILE:
+	if (!plug && !binplug)
+	{
+          SyntaxService->ReportError (
+	      "crystalspace.maploader.load.plugin",
+              child, "Could not load plugin!");
+	  return false;
+	}
+	else
+	{
+	  const char* fname = child->GetContentsValue ();
+	  if (!fname)
+	  {
+            SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.loadingfile",
+	      child, "Specify a VFS filename with 'paramsfile'!");
+	    return false;
+	  }
+          iDataBuffer *buf = VFS->ReadFile (fname);
+	  if (!buf)
+	  {
+            SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.loadingfile",
+	      child, "Error opening file '%s'!", fname);
+	    return false;
+	  }
+	  bool rc;
+	  if (plug)
+	    rc = TestXmlPlugParse (plug, buf, NULL, fname) != NULL;
+	  else
+	    rc = binplug->Parse ((void*)(buf->GetUint8 ()),
+	  	GetLoaderContext (), NULL) != NULL;
+	  if (!rc)
+	    return false;
 	}
         break;
 
       case XMLTOKEN_PLUGIN:
-	plug = loaded_plugins.FindPlugin (child->GetContentsValue ());
+	if (!loaded_plugins.FindPlugin (child->GetContentsValue (),
+		plug, binplug))
+	{
+	  SyntaxService->ReportError (
+ 	      "crystalspace.maploader.parse.addon",
+	      child, "Error loading plugin '%s'!", child->GetContentsValue ());
+	  return false;
+	}
         break;
       default:
 	SyntaxService->ReportBadToken (child);

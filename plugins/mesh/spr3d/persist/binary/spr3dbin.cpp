@@ -80,7 +80,7 @@ static void ReportError (iReporter* reporter, const char* id,
 }
 
 SCF_IMPLEMENT_IBASE (csSprite3DBinFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
+  SCF_IMPLEMENTS_INTERFACE (iBinaryLoaderPlugin)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
@@ -146,7 +146,7 @@ bool csSprite3DBinFactoryLoader::Initialize (iObjectRegistry* object_reg)
 /**
  * Loads a csSprite3DBinFactoryLoader
  */
-iBase* csSprite3DBinFactoryLoader::Parse (const char* string,
+iBase* csSprite3DBinFactoryLoader::Parse (void* data,
 				       iLoaderContext* ldr_context,
 				       iBase* context)
 {
@@ -183,7 +183,7 @@ iBase* csSprite3DBinFactoryLoader::Parse (const char* string,
   	iSprite3DFactoryState);
 
 
-  char* p = (char*)string;
+  char* p = (char*)data;
 
   // Read the magic number so we can ID the file
   char magic[4] = {'5','1', '5','0'};

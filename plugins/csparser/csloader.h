@@ -45,12 +45,15 @@ struct iVFS;
 struct iGraphics3D;
 struct iSoundRender;
 struct iLoaderPlugin;
+struct iBinaryLoaderPlugin;
 struct iObjectRegistry;
 struct iPluginManager;
 struct iModelConverter;
 struct iCrossBuilder;
 struct iCameraPosition;
 struct iDocumentNode;
+struct iDocument;
+struct iDataBuffer;
 
 struct iObject;
 struct iThingState;
@@ -204,7 +207,8 @@ private:
     // Find a loader plugin record
     struct csLoaderPluginRec* FindPluginRec (const char* name);
     // Return the loader plugin from a record, possibly loading the plugin now
-    iLoaderPlugin* GetPluginFromRec (csLoaderPluginRec*);
+    bool GetPluginFromRec (csLoaderPluginRec*,
+    	iLoaderPlugin*& plug, iBinaryLoaderPlugin*& binplug);
   public:
     iPluginManager* plugin_mgr;
 
@@ -214,8 +218,13 @@ private:
     ~csLoadedPluginVector ();
     // delete a plugin record
     virtual bool FreeItem (csSome Item);
-    // find a plugin by its name or load it if it doesn't exist
-    iLoaderPlugin* FindPlugin (const char* Name);
+    /**
+     * Find a plugin by its name or load it if it doesn't exist.
+     * Supports both binary and normal plugins. Returns 'false' if the
+     * plugin doesn't exist.
+     */
+    bool FindPlugin (const char* Name, iLoaderPlugin*& plug,
+    	iBinaryLoaderPlugin*& binplug);
     // add a new plugin record
     void NewPlugin (const char* ShortName, const char* ClassID);
   };
@@ -454,6 +463,21 @@ private:
 
   //========================================================================
   //========================================================================
+
+  /**
+   * XML: temporary function to detect if we have an XML file. If that's
+   * the case then we will use the XML parsers. Returns false on failure
+   * to parse XML.
+   */
+  bool TestXml (const char* file, iDataBuffer* buf, csRef<iDocument>& doc);
+
+  /**
+   * XML: temporary function that checks if a given data buffer is actually
+   * XML and will call the XML Parse function in that case. Otherwise it
+   * will call the old style Parse function.
+   */
+  iBase* TestXmlPlugParse (iLoaderPlugin* plug, iDataBuffer* buf,
+  	iBase* context, const char* fname);
 
   /**
    * Print an error about an unknown token. 'object' is the type of object
