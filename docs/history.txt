@@ -36,6 +36,13 @@ The history order is reversed so that new features are at the top.
 	  directory.  However, at link time, MSVC expects to find the .res file
 	  in the buid directory (CS/mk/visualc/csdebug/temp/walktest, for
 	  example).  We need to devise a reasonable solution for this problem.
+	- Eric Sunshine temporarily disabled use of $(PROJECT.EXE).WINRSRC in
+	  win32gcc.mak since it was causing problems for users.  In particular,
+	  the Mingw resource compiler wants to know the path to the cs1.ico
+	  file from the CS root directory, rather than just the relative path
+	  from the CS/libs/cssys/win32/rsrc directory.  This problem is in
+	  some fasion related to the problem experienced by MSVC users.  We
+	  need a proper solution.
 	- Added iXmlNode and iXmlAttribute. These are proposals for the
 	  XML interfaces we're going to use in CS.
 4-Aug-2002
