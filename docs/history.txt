@@ -11,6 +11,9 @@ chronological order.
             - Added 3ds2lev and makedep to CS/ root .cvsignore.
             - Changed instances of NULL to 0 in fullquad.cpp.
 	- Jorrit added another initializer to csArray copy constructor.
+	- Eric Sunshine moved definition of csSkinSlice above csSkin in
+	  csskin.h so that csSkinSlice in known before it is used in template
+	  instantiation.
 7-Aug-2003
 	- Jorrit did the following array related changes:
 	    - Added Put() to csArray.
