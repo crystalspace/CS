@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+27-Aug-2002
+	- Eric Sunshine simplified the task of extracting version numbers and
+	  release date from csver.h by external tools.  Also simplified the
+	  actual sed commands used to perform the extractions.  Hopefully,
+	  these changes will fix remaining problems (specifically, bizarre
+	  quoting problems of make/shell/sed) with cs-config synthesis which
+	  someone (Jorrit) was experiencing.
 26-Aug-2002
 	- Removed some debug stuff from OpenGL canvas code which used iostream.
 	- Added support for proper conversion of HEIGHTGEN keyword (and

@@ -8,8 +8,8 @@ outfile=$1
 description=$2
 
 verfile=include/csver.h
-vmajor=`sed -e '/#define[ 	][ 	]*CS_VERSION_MAJOR/!d' -e '/#define[ 	][ 	]*CS_VERSION_MAJOR/s/\(#define[ 	][ 	]*CS_VERSION_MAJOR[ 	][ 	]*"\)\([^\"]*\)"\(.*\)/\2/' < ${verfile}`
-vminor=`sed -e '/#define[ 	][ 	]*CS_VERSION_MINOR/!d' -e '/#define[ 	][ 	]*CS_VERSION_MINOR/s/\(#define[ 	][ 	]*CS_VERSION_MINOR[ 	][ 	]*"\)\([^\"]*\)"\(.*\)/\2/' < ${verfile}`
+vmajor=`sed -e '/#define[ 	][ 	]*CS_VERSION_MAJOR/!d' -e 's/#define[ 	][ 	]*CS_VERSION_MAJOR[ 	][ 	]*CS_VER_QUOTE(\(..*\)).*/\1/' < ${verfile}`
+vminor=`sed -e '/#define[ 	][ 	]*CS_VERSION_MINOR/!d' -e 's/#define[ 	][ 	]*CS_VERSION_MINOR[ 	][ 	]*CS_VER_QUOTE(\(..*\)).*/\1/' < ${verfile}`
 vminor=`echo ${vminor} | sed -e 's/[^0-9]//g'`
 if [ -z "$vminor" ]; then
     vminor=0

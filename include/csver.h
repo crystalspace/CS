@@ -19,9 +19,12 @@
 #ifndef __CS_CSVER_H__
 #define __CS_CSVER_H__
 
-#define CS_VERSION_MAJOR "0.95"	/* NOTE: Update docs/texinfo/version.txi  */
-#define CS_VERSION_MINOR "dev"	/* whenever updating these two values.    */
-#define CS_RELEASE_DATE "Wed, 2-Apr-2002"
+/* NOTE: Also update docs/texinfo/version.txi when updating these values. */
+#define CS_VERSION_MAJOR CS_VER_QUOTE(0.95)
+#define CS_VERSION_MINOR CS_VER_QUOTE(dev)
+#define CS_RELEASE_DATE  CS_VER_QUOTE(Wed 2-Apr-2002)
+
+#define CS_VER_QUOTE(X) #X
 
 #if !defined(CS_PLATFORM_NAME)
 #  define CS_PLATFORM_NAME "MysteryPlatform"

@@ -38,9 +38,9 @@ TO_INSTALL.EXE	+= $(CSCONFIG.EXE)
 ifeq ($(DO_CREATE_CSCONFIG),yes)
 
 CSCONFIG.VERFILE := include/csver.h
-CSCONFIG.VMAJOR  := $(shell sed -e '/\#define[ 	][ 	]*CS_VERSION_MAJOR/!d' -e '/\#define[ 	][ 	]*CS_VERSION_MAJOR/s/\(\#define[ 	][ 	]*CS_VERSION_MAJOR[ 	][ 	]*"\)\([^\\"]*\)"\(.*\)/\2/' < $(CSCONFIG.VERFILE))
-CSCONFIG.VMINOR  := $(shell sed -e '/\#define[ 	][ 	]*CS_VERSION_MINOR/!d' -e '/\#define[ 	][ 	]*CS_VERSION_MINOR/s/\(\#define[ 	][ 	]*CS_VERSION_MINOR[ 	][ 	]*"\)\([^\\"]*\)"\(.*\)/\2/' < $(CSCONFIG.VERFILE))
-CSCONFIG.RDATE   := $(shell sed -e '/\#define[ 	][ 	]*CS_RELEASE_DATE/!d'  -e '/\#define[ 	][ 	]*CS_RELEASE_DATE/s/\(\#define[ 	][ 	]*CS_RELEASE_DATE[ 	][ 	]*"\)\([^\\"]*\)"\(.*\)/\2/' < $(CSCONFIG.VERFILE))
+CSCONFIG.VMAJOR  := $(shell sed -e '/\#define[ 	][ 	]*CS_VERSION_MAJOR/!d' -e 's/\#define[ 	][ 	]*CS_VERSION_MAJOR[ 	][ 	]*CS_VER_QUOTE(\(..*\)).*/\1/' < $(CSCONFIG.VERFILE))
+CSCONFIG.VMINOR  := $(shell sed -e '/\#define[ 	][ 	]*CS_VERSION_MINOR/!d' -e 's/\#define[ 	][ 	]*CS_VERSION_MINOR[ 	][ 	]*CS_VER_QUOTE(\(..*\)).*/\1/' < $(CSCONFIG.VERFILE))
+CSCONFIG.RDATE   := $(shell sed -e '/\#define[ 	][ 	]*CS_RELEASE_DATE/!d'  -e 's/\#define[ 	][ 	]*CS_RELEASE_DATE[ 	][ 	]*CS_VER_QUOTE(\(..*\)).*/\1/' < $(CSCONFIG.VERFILE))
 
 # Some makefile variables reference $@, and we want that reference to appear
 # verbatim in the synthesized makefile fragment.  Unfortunately, when these
