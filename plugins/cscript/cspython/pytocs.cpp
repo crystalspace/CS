@@ -25,12 +25,16 @@ extern "C" {
 #include "Python.h"
 }
 
+// The NextStep compiler does not allow C++ expressions in `extern "C"'
+// functions.  This thin cover function works around that limitation.
+static inline csPython* shared_cspython() { return csPython::shared_instance; }
+
 extern "C" PyObject* pytocs_printout(PyObject *self, PyObject* args) {
   char *command;
 
   (void)self;
   if (PyArg_ParseTuple(args, "s", &command))
-    csPython::shared_instance->Print(0, command);
+    shared_cspython()->Print(0, command);
   
   Py_INCREF(Py_None);
   return Py_None;
@@ -41,7 +45,7 @@ extern "C" PyObject* pytocs_printerr(PyObject *self, PyObject* args) {
 
   (void)self;
   if (PyArg_ParseTuple(args, "s", &command))
-    csPython::shared_instance->Print(1, command);
+    shared_cspython()->Print(1, command);
   
   Py_INCREF(Py_None);
   return Py_None;

@@ -33,7 +33,9 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 #TCLTK=-ltk8.0 -ltcl8.0 -L/usr/X11R6/lib -lX11
+ifneq ($(OS),NEXT)
 PTHREAD=-lpthread
+endif
 
 ifneq (,$(strip $(PYTHON_INC)))
   CFLAGS.PYTHON += $(CFLAGS.I)$(PYTHON_INC)
