@@ -45,10 +45,16 @@ Unzip the @sc{nasm} archive files and copy the @file{.exe} files into
 
 @item
 Adjust your @samp{PATH} environment variable.  On Windows 95 and 98 edit the
-@file{c:\autoexec.bat} file and add the following entry.
+@file{c:\autoexec.bat} file add the following entries.
 
 @example
 SET PATH=c:\mingw32\bin
+@end example
+
+You must also add the following variable, so that GCC can find the @samp{Python} header files.
+
+@example
+set PYTHON_INC=c:\mingw32\include
 @end example
 
 @noindent
