@@ -45,6 +45,16 @@ The history order is reversed so that new features are at the top.
 	      <setvar var="v" red="0" green="0" blue="1"/> set 'v' to blue.
 	    - These changes are totally untested!
 	- Matze added an Iterator to csArray.
+	- Luca (groton@gmx.net) fixed a bug in the awsList: the bug was that
+	  the list box wasn't displaying the last item in some cases. I had to
+	  modify in some places the source code of the awsScrollBar too: 
+	  I replaced in the awsScrollBar's source code many 'max - amntvis' 
+	  expressions with the expression 'max - amountVis + 1': 
+	  in fact if i have 10 item in my own listbox (ie the 'max' is 9),
+	  and if the visible items are 5 (ie 'amntvis' is 5), then the correct
+	  expression to get the max value for the index of the item displayed
+	  in the first row is 'max - amntvis + 1', that is 5, with the previous
+	  code that value was wrongly set to 4.
 23-Jun-2003
         - Boyan did the following in AWS:
           - Added iAwsComponent->GetFirstFocusableChild

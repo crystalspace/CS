@@ -155,7 +155,7 @@ bool awsScrollBar::Setup (iAws *_wmgr, iAwsComponentNode *settings)
       }
       break;
 
-    default:
+      default:
       {
         incimg = pm->GetTexture ("ScrollBarRt");
         decimg = pm->GetTexture ("ScrollBarLt");
@@ -278,8 +278,9 @@ bool awsScrollBar::SetProperty (const char *name, void *parm)
     max = *(int *)parm;
 
     // Fix the page size
-    if (amntvis > max) amntvis = max;
-    int maxval = (int)(max-amntvis);
+    if (amntvis > max) 
+      amntvis = max + 1;
+    int maxval = (int)(max - amntvis + 1);
 
     // Fix value in case it's out of range
     value = (value < 0 ? 0 : (value > maxval ? maxval : value));
@@ -292,8 +293,9 @@ bool awsScrollBar::SetProperty (const char *name, void *parm)
     amntvis = *(int *)parm;
 
     // Fix the page size
-    if (amntvis > max) amntvis = max;
-    int maxval = (int)(max-amntvis);
+    if (amntvis > max) 
+      amntvis = max + 1;
+    int maxval = (int)(max - amntvis + 1);
 
     // Fix value in case it's out of range
     value = (value < 0 ? 0 : (value > maxval ? maxval : value));
@@ -306,7 +308,7 @@ bool awsScrollBar::SetProperty (const char *name, void *parm)
     value = *(int *)parm;
 
     // Fix value in case it's out of range
-    int maxval = (int)(max-amntvis);
+    int maxval = (int)(max - amntvis + 1);
 
     value = (value < 0 ? 0 : (value > maxval ? maxval : value));
 
@@ -322,7 +324,7 @@ void awsScrollBar::KnobTick (void *sk, iAwsSource *)
 {
   // adjust position of knob and scrollbar value
   awsScrollBar *sb = (awsScrollBar *)sk;
-  int maxval = (int)(sb->max - sb->amntvis);
+  int maxval = (int)(sb->max - sb->amntvis + 1);
 
   if (sb->orientation == sboVertical)
   {
@@ -344,7 +346,7 @@ void awsScrollBar::KnobTick (void *sk, iAwsSource *)
     // Get the actual height that we can traverse with the knob
     int bh = f.Height () - height;
     
-    if (maxval == 0)
+    if ((maxval == 0) || (bh == 0)) 
       sb->value = 0;
     else
       sb->value = (sb->knob->last_y - sb->decVal->Frame ().ymax) * maxval / bh;
@@ -407,7 +409,7 @@ void awsScrollBar::TickTock (void *sk, iAwsSource *)
       return ;
   }
 
- int maxval = (int)(sb->max - sb->amntvis);
+ int maxval = (int)(sb->max - sb->amntvis + 1);
   sb->value =
     (
       sb->value < sb->min ? 0 :
@@ -425,7 +427,7 @@ void awsScrollBar::IncClicked (void *sk, iAwsSource *)
   sb->value += sb->value_delta;
 
   /// Check floor and ceiling
- int maxval = (int)(sb->max - sb->amntvis);
+ int maxval = (int)(sb->max - sb->amntvis + 1);
   sb->value =
     (
      sb->value < sb->min ? 0 :
@@ -443,7 +445,7 @@ void awsScrollBar::DecClicked (void *sk, iAwsSource *)
   sb->value -= sb->value_delta;
 
   /// Check floor and ceiling
- int maxval = (int)(sb->max - sb->amntvis);
+ int maxval = (int)(sb->max - sb->amntvis + 1);
   sb->value =
     (
       sb->value < sb->min ? 0 :
@@ -456,8 +458,6 @@ void awsScrollBar::DecClicked (void *sk, iAwsSource *)
 
 void awsScrollBar::OnDraw (csRect clip)
 {
-
-
   int height = 10, width = 10;
 
   csRect f (Frame ());
@@ -481,7 +481,7 @@ void awsScrollBar::OnDraw (csRect clip)
 
     // Get the knob's position
     int ky;
-    if ((max-amntvis) == 0)
+    if (max - amntvis == 0)
       ky = 0;
     else
       ky = (int)((value * bh) / (max-amntvis));
@@ -498,7 +498,8 @@ void awsScrollBar::OnDraw (csRect clip)
     f.xmax -= incVal->Frame ().Width () + 1;
 
     if (amntvis == 0)
-      WindowManager ()->GetPrefMgr ()->LookupIntKey ("ScrollBarWidth", width);
+      WindowManager ()->GetPrefMgr ()->LookupIntKey 
+        ("ScrollBarWidth", width);
     else
       width = (int)((amntvis * f.Width ()) / max);
 
@@ -507,7 +508,7 @@ void awsScrollBar::OnDraw (csRect clip)
 
     // Get the knob's position
     int kx;
-    if ((max-amntvis)==0)
+    if ((max - amntvis) == 0)
       kx = 0;
     else
       kx = (int)((value * bw) / max);

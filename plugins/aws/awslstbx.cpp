@@ -278,7 +278,7 @@ void awsListBox::UpdateMap ()
     map = new awsListRow *[map_size];
 
     // Set the scroll bar's max position
-    map_size_m1 = map_size - 1;
+    map_size_m1 = map_size;
     scrollbar->SetProperty ("Max", &map_size_m1);
 
     // Map out items
