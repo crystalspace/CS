@@ -759,6 +759,8 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csPoly3D::operator[];
 %include "csgeom/poly3d.h"
 
+%include "csgeom/tri.h"
+
 %include "csgeom/csrect.h"
 %include "csgeom/csrectrg.h"
 
@@ -833,24 +835,24 @@ TYPEMAP_OUT_csWrapPtr
 %include "iengine/region.h"
 %include "iengine/viscull.h"
 
-%include "imesh/mdlconv.h"
-%include "imesh/object.h"
+#ifndef CS_SWIG_PUBLISH_IGENERAL_FACTORY_STATE_ARRAYS
+%ignore iGeneralFactoryState::GetVertices;
+%ignore iGeneralFactoryState::GetTexels;
+%ignore iGeneralFactoryState::GetNormals;
+%ignore iGeneralFactoryState::GetTriangles;
+%ignore iGeneralFactoryState::GetColors;
+#endif
+%include "imesh/genmesh.h"
+
+%ignore iSprite2DState::GetVertices;
 %include "imesh/sprite2d.h"
 %include "imesh/sprite3d.h"
 %include "imesh/spritecal3d.h"
+%include "imesh/mdlconv.h"
+%include "imesh/object.h"
 %include "imesh/ball.h"
-%include "imesh/genmesh.h"
 %include "imesh/thing.h"
 
-%extend iSprite2DState
-{
-  csSprite2DVertex* GetVertexByIndex(int index)
-  {
-    return &(self->GetVertices()[index]);
-  }
-}
-
-%include "imap/parser.h"
 %include "imap/loader.h"
 %include "imap/reader.h"
 %include "imap/saver.h"
@@ -1035,6 +1037,7 @@ APPLY_FOR_EACH_INTERFACE
 #undef INTERFACE_APPLY
 #define INTERFACE_APPLY(x) CAST_FROM_BASE(x)
 
+// csutil/scf.h
 %extend iBase
 {
 	csWrapPtr _DynamicCast (const char * to_name)
@@ -1050,6 +1053,49 @@ APPLY_FOR_EACH_INTERFACE
 #undef CAST_FROM_BASE
 
 #ifndef CS_MINI_SWIG
+// imesh/sprite2d.h
+%extend iSprite2DState
+{
+  csSprite2DVertex* GetVertexByIndex(int index)
+  {
+    return &(self->GetVertices()[index]);
+  }
+
+  int GetVertexCount()
+  {
+    return self->GetVertices().Length();
+  }
+}
+
+// imesh/genmesh.h
+%extend iGeneralFactoryState
+{
+  csVector3 *GetVertexByIndex(int index)
+  {
+    return &(self->GetVertices()[index]);
+  }
+
+  csVector2 *GetTexelByIndex(int index)
+  {
+    return &(self->GetTexels()[index]);
+  }
+
+  csVector3 *GetNormalByIndex(int index)
+  {
+    return &(self->GetNormals()[index]);
+  }
+
+  csTriangle *GetTriangleByIndex(int index)
+  {
+    return &(self->GetTriangles()[index]);
+  }
+
+  csColor *GetColorByIndex(int index)
+  {
+    return &(self->GetColors()[index]);
+  }
+}
+
 // iaws/aws.h
 %extend iAws
 {

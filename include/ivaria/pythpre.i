@@ -300,4 +300,60 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 	}
 %enddef
 
+#ifndef CS_MINI_SWIG
+/*
+ * Using the shadow feature allows us to define our own python code to replace
+ * the automatically generated wrapper for a function.  This is also the only
+ * way I could locate to allow us to inject code into a ?proxy? object.  (Not
+ * sure if that's the correct SWIG terminology.)  This means if you want to
+ * add a python method to a class, there needs to be some underlying method
+ * that SWIG is trying to wrap whose auto-generated code you will replace.
+ * If you want to introduce a completely new method, I imagine this means you
+ * would need to use %extend to introduce such a function.
+ *
+ * I suppose the following could be accomplished via a %define, but this
+ * seems much more readable/intuitive.
+ */
+
+// Let cspace.i know that we are providing overrides for these methods.
+#define CS_SWIG_PUBLISH_IGENERAL_FACTORY_STATE_ARRAYS
+
+%feature("shadow") iGeneralFactoryState::GetVertices()
+%{
+    def GetVertices(self):
+        return CSMutableArrayHelper(self.GetVertexByIndex,
+                                    self.GetVertexCount)
+%}
+
+%feature("shadow") iGeneralFactoryState::GetTexels()
+%{
+    def GetTexels(self):
+        return CSMutableArrayHelper(self.GetTexelByIndex,
+                                    self.GetVertexCount)
+%}
+
+%feature("shadow") iGeneralFactoryState::GetNormals()
+%{
+    def GetNormals(self):
+        # iGeneralFactoryState::GetVertices()
+        return CSMutableArrayHelper(self.GetNormalByIndex,
+                                    self.GetVertexCount)
+%}
+
+%feature("shadow") iGeneralFactoryState::GetTriangles()
+%{
+    def GetTriangles(self):
+        return CSMutableArrayHelper(self.GetTriangleByIndex,
+                                    self.GetTriangleCount)
+%}
+
+%feature("shadow") iGeneralFactoryState::GetColors()
+%{
+    def GetColors(self):
+        return CSMutableArrayHelper(self.GetNormalByIndex,
+                                    self.GetVertexCount)
+%}
+
+#endif // ifndef CS_MINI_SWIG
+
 #endif // SWIGPYTHON

@@ -81,6 +81,37 @@ chronological order.
 	  some shader plugin makefiles to utilize the common shaderplugin code.
 	- res changed char arrays on the stack to csStrings in stdrep and 
 	  simpcon to avoid buffer overflows.
+	- Eric Sunshine applied a Swig-related patch from Andrew Sutherland
+	  <sombrero@alum.mit.edu> (patch #925053).  Andrew writes:
+	    The problem, long story short: iGeneralFactoryState has a number
+	    of methods that return arrays.  However, the signature is just
+	    csVector3* or the like, which SWIG interprets to be a point to a
+	    single object, rather than an array.  The specific methods are
+	    GetVertices, GetTexels, GetNormals, GetTriangles, and GetColors.
+	    The changes are:
+	    - Swigs csgeom/tri.h, which defines csTriangle.  This is exposed by
+	      GetTriangles/GetTriangleByIndex, but was previously just treated
+	      as an opaque pointer.
+	    - Introduces GetVertexByIndex, GetTexelByIndex, GetNormalByIndex,
+	      GetTriangleByIndex, GetColorByIndex.
+	    - Introduces (tiny manual) python replacements for GetVertices,
+	      GetTexels, GetNormals, GetTriangles, and GetColors via the SWIG
+	      python binding's 'shadow' feature.  These replacements create
+	      instances of the next class, providing it with the proper
+	      by-index-getter and count-getter.
+	    - Introduces a new Python class that takes a by-index-getter and
+	      count-getter and exposes them as an object that implements
+	      __len__ and __getitem__.  This is sufficient for 'for' loops and
+	      (index-guarded) subscript access to work properly.  This has the
+	      benefit of presenting a 'lazy' list view to the user.
+	      Specifically, there's no getting around the wrapper object being
+	      constructed for each index retrieved (after all, we're just
+	      calling GetFooByIndex), but at least it doesn't happen all at
+	      once.
+	  In addition, Eric added iSprite2DState::GetVertexCount(), and added
+	  %ignore directives for non-Python platforms to ignore the methods
+	  which are incorrectly exported by Swig, and which the new
+	  GetFooByIndex() methods are meant to replace.
 1-Apr-2004
 	- Eric Sunshine fixed include/Jamfile so that it installs Swig (*.i)
 	  files.  These are needed by CEL, for instance.

@@ -437,6 +437,42 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 	void __setitem__ (size_t i, char c)
 		{ self->SetAt(i, c); }
 }
+
+/*
+ * We introduce the following python class to serve as a pseudo-list for
+ *  those cases where the C++ code returns a pointer which is actually
+ *  a pointer to an array.  Of course, in order for this to work, we
+ *  must use the shadow feature to override the default wrapper code
+ *  that is generated.  Such features must go in pythpre.i, placing them
+ *  here is too late.
+ */
+%pythoncode %{
+class CSMutableArrayHelper:
+    def __init__(self, getFunc, lenFunc):
+        self.getFunc = getFunc
+        self.lenFunc = lenFunc
+
+    def __len__(self):
+        return self.lenFunc()
+
+    def __getitem__(self, key):
+        if type(key) != type(0):
+	    raise TypeError()
+        arrlen = self.lenFunc()
+        if key < 0 or key >= arrlen:
+            raise IndexError('Length is ' + str(arrlen) + ', you asked for ' 
+                             + str(key))
+        return self.getFunc(key)
+
+    # We do not implement __setitem__ because the only legal action is to
+    #  overwrite the object at the given location.  (The contents of the
+    #  array are mutable, but the array is a single allocation of a single
+    #  type.)  Callers should be using the contained objects' own
+    #  __setitem__ or mutation methods.
+
+    # We do not implement __delitem__ because we cannot delete items.
+%}
+
 #endif // CS_MINI_SWIG
 
 // csutil/csstring.h
