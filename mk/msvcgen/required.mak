@@ -45,9 +45,9 @@ MSVC.PLUGINS.REQUIRED =         \
   cscript/cspython              \
   font/server/freefnt2          \
   mesh/impexp/3ds               \
-  sound/driver/waveoutsd        \
   net/driver/ensocket           \
   physics/odedynam              \
+  sound/driver/waveoutsd        \
   sound/loader/mod              \
   sound/loader/mp3              \
   sound/loader/ogg              \
