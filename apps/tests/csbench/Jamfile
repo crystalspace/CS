@@ -1,9 +1,8 @@
 SubDir TOP apps tests csbench ;
 
+if [ Property build : newrenderer ] || [ Property build : projgen ]
+{
 Description csbench : "Crystal Space benchmark" ;
-
-Application csbench
-	: [ Wildcard *.cpp *.h ]
-;
+Application csbench : [ Wildcard *.cpp *.h ] ;
 LinkWith csbench : csgeom csgfx cstool csutil ;
-
+}

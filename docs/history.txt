@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Aug-2004
+        - Philip Wyett made the following changes:
+          - Fixed attempts to load "crystalspace.graphics3d.shader.soft"
+            instead of the correct "crystalspace.graphics3d.shader.software".
+          - Removed csbench from OR build for releases. The application is
+            experimental not to mention buggy.
 20-Aug-2004
 	- res updated the "External Libs" docs for the new 0.98r004 
 	  cs-win32libs.
