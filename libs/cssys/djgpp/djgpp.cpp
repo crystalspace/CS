@@ -32,6 +32,7 @@
 
 #include "cssysdef.h"
 #include "cssys/djgpp/djgpp.h"
+#include "csutil/cfgacc.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "inputq.h"
@@ -80,7 +81,7 @@ SysSystemDriver::SysSystemDriver (iObjectRegistry* object_reg)
   if (sizeof (event_queue [0]) != 12)
   {
     printf ("ERROR! Your compiler does not handle packed structures!\n");
-    printf ("sizeof (event_queue [0]) == %d instead of 12!\n",
+    printf ("sizeof (event_queue [0]) == %ld instead of 12!\n",
       sizeof (event_queue [0]));
     exit (-1);
   }
@@ -180,7 +181,7 @@ bool SysSystemDriver::HandleEvent (iEvent& e)
     KeyboardOpened = true;
 
     csConfigAccess cfg;
-    cfg.AddConfig(GetObjectRegistry(), "/config/mouse.cfg");
+    cfg.AddConfig(object_reg, "/config/mouse.cfg");
     SensivityFactor = cfg->GetFloat ("MouseDriver.MouseSensivity", 1.0);
 
     if (MH.install ())
@@ -288,8 +289,8 @@ void SysSystemDriver::SetMousePosition (int x, int y)
     regs.x.ax = 0x04;
     __dpmi_int (0x33, &regs);
     }
-  }
 }
+
 
 void SysSystemDriver::DoEnablePrintf (bool en)
 {

@@ -23,8 +23,8 @@
 #define DJGPP_H
 
 #include "csutil/csinput.h"
-#include "iutil/eventh.h"
 #include "iutil/event.h"
+#include "iutil/eventh.h"
 #include "cssys/system.h"
 #include "cssys/djgpp/doshelp.h"
 
@@ -46,7 +46,7 @@ public:
 
   SCF_DECLARE_IBASE;
   virtual void SetMousePosition (int x, int y);
-  virtual void EnablePrintf (bool en);
+  virtual void DoEnablePrintf (bool en);
 };
 
 /// DJGPP version.
