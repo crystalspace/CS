@@ -514,7 +514,7 @@ rule MsvcAddPrefix
 
 ## MsvcGenConfig variable [ : value ]
 ##   (See documentation above.)
-rule MsvcGenConfig
+rule MsvcGenConfig1
 {
   $(<) = $(>) ;
 }
