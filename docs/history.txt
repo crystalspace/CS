@@ -14,6 +14,7 @@ chronological order.
 	  used as the mixmode in a shader pass the rendered mesh's resp. 
 	  mixmode will be used.
 	- res made some fixes so NR properly respects the "alpha" mixmode.
+        - Fritz Elfert fixed an msvc compile error in the null renderer.
 23-Feb-2004
 	- Jorrit moved the Engine.Lighthing.LightmapQuality config option
 	  from engine.cfg to thing.cfg (and renamed it

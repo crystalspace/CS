@@ -75,7 +75,7 @@ public:
     virtual bool HandleEvent (iEvent& ev)
     { return parent->HandleEvent (ev); }
   };
-  csRef<csNullGraphics3D::EventHandler> scfiEventHandler;
+  csRef<EventHandler> scfiEventHandler;
 
   bool Open ();
   void Close ();
