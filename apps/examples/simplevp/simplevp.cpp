@@ -188,6 +188,7 @@ bool Simple::Initialize ()
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
       "crystalspace.application.simplevp",
       "Couldn't get a iVFS to mount effectdata!");
+	return false;
   }
     
   vfs->Mount("/effect/", "$@data$/effectsys$/");
