@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: cspython cspythonclean cspythonswig
+.PHONY: cspython cspymod cspythonclean cspythonswig
 ifeq ($(USE_NEW_CSPYTHON_PLUGIN),yes)
 all plugins: cspython cspymod
 else
@@ -89,7 +89,7 @@ OBJ.CSPYTHON = $(addprefix $(OUT)/, $(notdir $(SRC.CSPYTHON:.cpp=$O)))
 DEP.CSPYTHON = CSTOOL CSGEOM CSSYS CSUTIL CSSYS CSUTIL
 
 INC.CSPYMOD =
-SRC.CSPYMOD = cspymod.cpp $(SWIG.CSPYTHON)
+SRC.CSPYMOD = plugins/cscript/cspython/cspymod.cpp $(SWIG.CSPYTHON)
 OBJ.CSPYMOD = $(addprefix $(OUT)/, $(notdir $(SRC.CSPYMOD:.cpp=$O)))
 DEP.CSPYMOD = $(DEP.CSPYTHON)
 
@@ -104,7 +104,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: cspython cspythonclean cspythonswig csjavaswigclean
+.PHONY: cspython cspymod cspythonclean cspythonswig csjavaswigclean
 
 ifeq ($(USE_NEW_CSPYTHON_PLUGIN),yes)
 all: $(CSPYTHON.LIB) $(CSPYMOD.LIB)
@@ -113,7 +113,7 @@ all: $(CSPYTHON.LIB)
 endif
 cspython: $(OUTDIRS) $(CSPYTHON) python.cex
 ifeq ($(USE_NEW_CSPYTHON_PLUGIN),yes)
-cspymod: $(CSPYMOD) python.cex
+cspymod: $(OUTDIRS) $(CSPYMOD) python.cex
 endif
 clean: cspythonclean
 
@@ -170,12 +170,30 @@ cspythonswig: cspythonswigclean cspython
 cspythonswigclean:
 	-$(RM) $(CSPYTHON) $(CSPYMOD) $(SWIG.CSPYTHON) $(OUT)/cs_pyth.cpp
 
+ifeq ($(USE_NEW_CSPYTHON_PLUGIN),yes)
+
+ifdef DO_DEPEND
+dep: $(OUTOS)/cspython.dep
+$(OUTOS)/cspython.dep: $(SRC.CSPYTHON)
+	$(DO.DEP1) $(PYTHON.CFLAGS) $(DO.DEP2)
+dep: $(OUTOS)/cspymod.dep
+$(OUTOS)/cspymod.dep: $(SRC.CSPYMOD)
+	$(DO.DEP1) $(PYTHON.CFLAGS) $(DO.DEP2)
+else
+-include $(OUTOS)/cspython.dep
+-include $(OUTOS)/cspymod.dep
+endif
+
+else
+
 ifdef DO_DEPEND
 dep: $(OUTOS)/cspython.dep
 $(OUTOS)/cspython.dep: $(SRC.CSPYTHON)
 	$(DO.DEP1) $(PYTHON.CFLAGS) $(DO.DEP2)
 else
 -include $(OUTOS)/cspython.dep
+endif
+
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
