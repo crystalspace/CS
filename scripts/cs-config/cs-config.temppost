@@ -38,7 +38,7 @@ fi
 if test -z "$libdir" -a -r "$prefix/Jamfile" \
      -a -r "$prefix/$makeout/libs/csutil/libcsutil.a"; then
     libd=$prefix/$makeout/libs
-    lflags="-L$libd/csutil -L$libd/cstool -L$libd/csengine -L$libd/csgfx -L$libd/csgeom -L$libd/csws"
+    lflags="-L$libd/csutil -L$libd/cstool -L$libd/csengine -L$libd/csgfx -L$libd/csgeom -L$libd/csws -L$libd/csappframe"
 fi
 
 usage()

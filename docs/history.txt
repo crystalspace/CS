@@ -22,6 +22,9 @@ chronological order.
 	  versions of iEngine->CreatePortal() so that the caller can more
 	  easily find out the portal that was created without having to
 	  revert to getting the last created portal in the portal container.
+	- res fixed the missing of the csappframe library directory from 
+	  cs-config output under certain circumstances, as reported by 
+	  Bjorn Hansen <holomorph@users.sourceforge.net>.
 1-Oct-2003
 	- Jorrit fixed a bug reported by valgrind in the portal container.
 	  It was using an uninitialized variable.
