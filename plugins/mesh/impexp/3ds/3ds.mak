@@ -38,7 +38,7 @@ endif
 INC.IE3DS = $(wildcard plugins/mesh/impexp/3ds/*.h)
 SRC.IE3DS = $(wildcard plugins/mesh/impexp/3ds/*.cpp)
 OBJ.IE3DS = $(addprefix $(OUT),$(notdir $(SRC.IE3DS:.cpp=$O)))
-DEP.IE3DS = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.IE3DS = CSGEOM CSUTIL CSSYS CSTOOL CSUTIL
 
 MSVC.DSP += IE3DS
 DSP.IE3DS.NAME = ie3ds
