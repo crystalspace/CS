@@ -36,12 +36,23 @@ csShaderVariable::csShaderVariable (csStringID name) : csRefCount (),
 }
 
 
-int csShaderVariableList::InsertSorted (csShaderVariableProxy item)
+int csShaderVariableProxyList::InsertSorted (csShaderVariableProxy item)
 {
   return csArray<csShaderVariableProxy>::InsertSorted (item, ShaderVariableWrapperCompare);
 }
 
-int csShaderVariableList::Push (csShaderVariableProxy item)
+int csShaderVariableProxyList::Push (csShaderVariableProxy item)
 {
   return csArray<csShaderVariableProxy>::InsertSorted (item, ShaderVariableWrapperCompare);
+}
+
+void csShaderVariableProxyList::PrepareFill ()
+{
+  csShaderVariableProxyList::Iterator it (GetIterator ());
+  while(it.HasNext())
+  {
+    csShaderVariableProxy *cur = (csShaderVariableProxy*)&it.Next();
+    cur->shaderVariable = 0;
+    *cur->realLocation = 0;
+  }
 }

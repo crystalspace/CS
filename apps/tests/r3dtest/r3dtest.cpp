@@ -491,6 +491,18 @@ void R3DTest::Start ()
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
+
+  csShaderVariableContextHelper hlp;
+  csShaderVariable var0(12);
+  hlp.AddVariable (&var0);
+
+  csShaderVariableProxy p0(1,0), p1(12,1);
+  csShaderVariableList list;
+  list.InsertSorted (p0);
+  list.InsertSorted (p1);
+
+  hlp.FillVariableList (&list);
+
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
 
   r3dtest = new R3DTest (object_reg);

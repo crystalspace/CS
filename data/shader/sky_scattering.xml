@@ -28,15 +28,16 @@
     <pass>
       <mixmode><copy/></mixmode>
       <streammapping stream="vertices" destination="attribute 0" />
+      <streammapping stream="texture coordinates" destination="attribute 1" />
       <vp type="gl_arb_vp" file="/shader/scattering.avp" />
       <texturemapping unit="0" name="tex diffuse" />
       <fp type="gl_fixed_fp">
         <fixedfp>
-          <layer> 
+          <layer>
             <colorsource num="0" source="primary color" modifier="color"/>
             <coloroperation operation="replace"/>
           </layer>
-	</fixedfp>
+        </fixedfp>
       </fp>
     </pass>
   </technique>

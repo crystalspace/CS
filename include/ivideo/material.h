@@ -91,7 +91,7 @@ SCF_VERSION (iMaterial, 0, 0, 6);
  * plays same role related to iMaterialHandle as iImage plays
  * related to iTextureHandle.
  */
-struct iMaterial : public iShaderVariableContext
+struct iMaterial : public iBase, public iShaderVariableContext
 {
   /**
    * Associate a shader with a shader type

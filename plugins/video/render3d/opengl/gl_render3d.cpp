@@ -140,7 +140,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
     texunit[i] = 0;
     texunitenabled[i] = false;
   }
-  lastUsedShaderpass = 0;
+//  lastUsedShaderpass = 0;
 }
 
 csGLGraphics3D::~csGLGraphics3D()
@@ -807,8 +807,8 @@ bool csGLGraphics3D::Open ()
     imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
     iTextureHandle::CS_TEX_IMG_2D);
 
-  csRef<csShaderVariable> fogvar = shadermgr->CreateVariable(
-    strings->Request ("standardtex fog"));
+  csRef<csShaderVariable> fogvar = csPtr<csShaderVariable>( new csShaderVariable(
+    strings->Request ("standardtex fog")));
   fogvar->SetValue (fogtex);
   shadermgr->AddVariable(fogvar);
 
@@ -881,8 +881,8 @@ bool csGLGraphics3D::Open ()
     imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
     iTextureHandle::CS_TEX_IMG_CUBEMAP);
 
-  csRef<csShaderVariable> normvar = shadermgr->CreateVariable(
-    strings->Request ("standardtex normalization map"));
+  csRef<csShaderVariable> normvar = csPtr<csShaderVariable>( new csShaderVariable(
+    strings->Request ("standardtex normalization map")));
   normvar->SetValue (normtex);
   shadermgr->AddVariable(normvar);
 
@@ -914,8 +914,8 @@ bool csGLGraphics3D::Open ()
     imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
     iTextureHandle::CS_TEX_IMG_2D);
 
-  csRef<csShaderVariable> attvar = shadermgr->CreateVariable(
-    strings->Request ("standardtex attenuation"));
+  csRef<csShaderVariable> attvar = csPtr<csShaderVariable>( new csShaderVariable(
+    strings->Request ("standardtex attenuation")));
   attvar->SetValue (atttex);
   shadermgr->AddVariable(attvar);
 
@@ -946,12 +946,12 @@ void csGLGraphics3D::Close ()
 bool csGLGraphics3D::BeginDraw (int drawflags)
 {
   current_drawflags = drawflags;
-  if (lastUsedShaderpass)
+/*  if (lastUsedShaderpass)
   {
     lastUsedShaderpass->ResetState ();
     lastUsedShaderpass->Deactivate ();
   }
-
+*/
   SetWriteMask (true, true, true, true);
 
   int i = 0;

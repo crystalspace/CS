@@ -199,7 +199,7 @@ private:
   iTextureHandle* texunit[16]; // @@@ Hardcoded max number of units
   bool texunitenabled[16]; // @@@ Hardcoded max number of units
 
-  iShaderPass* lastUsedShaderpass;
+
 public:
   static csGLStateCache* statecache;
 

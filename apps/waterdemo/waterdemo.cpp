@@ -529,9 +529,6 @@ bool csWaterDemo::Initialize ()
 
 
 
-
-
-
   csRef<iTextureHandle> tex = r3d->GetTextureManager ()->RegisterTexture (
     imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
     iTextureHandle::CS_TEX_IMG_CUBEMAP);
@@ -541,8 +538,6 @@ bool csWaterDemo::Initialize ()
     strings->Request ("tex diffuse"));
   attvar->SetValue (tex);
   mat->AddVariable(attvar);  
-
-
 
 
   gMesh->SetMaterialWrapper (matW);

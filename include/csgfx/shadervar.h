@@ -29,6 +29,7 @@
 #include "iengine/texture.h"
 #include "ivideo/texture.h"
 #include "csutil/refarr.h"
+#include "ivideo/rndbuf.h"
 
 struct iTextureHandle;
 struct iTextureWrapper;
@@ -48,6 +49,7 @@ public:
     STRING,
     COLOR,
     TEXTURE,
+    RENDERBUFFER,
     VECTOR2,
     VECTOR3,
     VECTOR4
@@ -62,6 +64,7 @@ private:
   csRef<iString> String;
   csRef<iTextureHandle> TextureHandValue;
   csRef<iTextureWrapper> TextureWrapValue;
+  csRef<iRenderBuffer> RenderBuffer;
   csVector4 VectorValue;
 
 public:
@@ -125,6 +128,13 @@ public:
   bool GetValue (iTextureWrapper*& value) const
   {
     value = TextureWrapValue;
+    return true;
+  }
+
+  /// Retrieve a iRenderBuffer
+  bool GetValue (iRenderBuffer*& value) const
+  {
+    value = RenderBuffer;
     return true;
   }
 
@@ -213,6 +223,14 @@ public:
     return true;
   }
 
+  /// Store a render buffer
+  bool SetValue (iRenderBuffer* value)
+  {
+    Type = RENDERBUFFER;
+    RenderBuffer = value;
+    return true;
+  }
+
   /// Store a csVector2
   bool SetValue (const csVector2 &value)
   {
@@ -247,16 +265,17 @@ struct csShaderVariableProxy
 public:
 
   csShaderVariableProxy () :
-      Name (csInvalidStringID), userData (0), shaderVariable(0)
+      Name (csInvalidStringID), userData (0), shaderVariable(0), realLocation(0)
   {}
 
-  csShaderVariableProxy (csStringID name, int ud) :
-      Name (name), userData(ud), shaderVariable(0)
+  csShaderVariableProxy (csStringID name, int ud, csShaderVariable **realplace=0) :
+      Name (name), userData(ud), shaderVariable(0), realLocation(realplace)
   {}
         
   csStringID Name;
-  int userData;
   csShaderVariable *shaderVariable;
+  csShaderVariable **realLocation;
+  int userData;
 };
 
 
@@ -280,12 +299,13 @@ static int ShaderVariableKeyCompare (csShaderVariable* const& item1, void* item2
 /**
  * Sorted list of shadervariables
  */
-class csShaderVariableList : 
+class csShaderVariableProxyList : 
   public csArray<csShaderVariableProxy>
 {
 public:
   int InsertSorted (csShaderVariableProxy item);
   int Push (csShaderVariableProxy item);
+  void PrepareFill ();
 };
 
 class csShaderVariableContextHelper
@@ -301,7 +321,11 @@ public:
   /// Add a variable to this context
   inline void AddVariable (csShaderVariable *variable) 
   {
-    variables.InsertSorted (variable, ShaderVariableCompare);
+    csShaderVariable* var = GetVariable(variable->Name);
+    if (var == 0)
+      variables.InsertSorted (variable, ShaderVariableCompare);
+    else
+      *var = *variable;
   }
 
   /// Get a named variable from this context
@@ -316,12 +340,13 @@ public:
   * Fill a csShaderVariableList
   * It requires the passed list to be sorted.
   */
-  inline void FillVariableList (csShaderVariableList *list) const
+  inline unsigned int FillVariableList (csShaderVariableProxyList *list) const
   {
-    if (list->Length ()== 0 || variables.Length() == 0) return;
+    unsigned int count = 0;
+    if (list->Length ()== 0 || variables.Length() == 0) return 0;
 
     csRefArray<csShaderVariable>::Iterator varIter (variables.GetIterator ());
-    csShaderVariableList::Iterator inputIter (list->GetIterator ());
+    csShaderVariableProxyList::Iterator inputIter (list->GetIterator ());
     csShaderVariable* curVar=0;
     curVar=varIter.Next ();
 
@@ -333,14 +358,21 @@ public:
         curVar=varIter.Next ();
       }
       if (curVar->Name == curInput->Name && curInput->shaderVariable == 0)
+      {
         curInput->shaderVariable = curVar;
+        if (curInput->realLocation!=0) (*curInput->realLocation) = curVar;
+        count++;
+      }
       else if (curVar->Name > curInput->Name)
         continue;
       else if (varIter.HasNext ())
         continue; //still may have more
+      else if (curVar->Name > curInput->Name)
+        continue;  
       else
-        return;
+        return count;
     }
+    return count;
   }
 
 private:
