@@ -11,6 +11,9 @@ chronological order.
 	  cssys/general/platformconfig.cpp: S_IWGRPS_IXGRP --> S_IWGRP|S_IXGRP.
 	  Also made more robust in case any of the read-write-execute named
 	  constants are missing at compile time.
+	- Eric Sunshine fixed problem in cssys/general/platformconfig.cpp where
+	  it was trying to pass a csString into fprintf() rather than passing
+	  in the (char const*) equivalent.
 13-Oct-2003
 	- Eric Sunshine eliminated several compilation warnings from Walktest.
 	- Jorrit fixed phystut for the latest polygon changes.
