@@ -35,17 +35,13 @@ private:
 
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
-  csRef<iRenderBuffer> color_buffer;
   csRef<iRenderBuffer> index_buffer;
-  csRef<iRenderBuffer> tangent_buffer;
-  csRef<iRenderBuffer> binormal_buffer;
   csRef<iRenderBuffer> lmcoords_buffer;
   uint rbIndexStart, rbIndexEnd;
 
   static csStringID vertex_name;
   static csStringID texel_name;
   static csStringID normal_name;
-  static csStringID color_name;
   static csStringID index_name;
   static csStringID tangent_name;
   static csStringID binormal_name;
@@ -115,6 +111,62 @@ private:
   };
   friend class NormalAccesor;
   csRef<NormalAccesor> normal_accessor;
+
+  class BiNormalAccesor : public iShaderVariableAccessor
+  {
+  private:
+    csGLPolygonRenderer *renderer;
+    csRef<iRenderBuffer> binormal_buffer;
+    
+    uint binormalVerticesNum;
+  public:
+    CS_LEAKGUARD_DECLARE (BiNormalAccesor);
+    SCF_DECLARE_IBASE;
+
+    BiNormalAccesor (csGLPolygonRenderer *renderer)
+      : binormalVerticesNum (0)
+    {
+      SCF_CONSTRUCT_IBASE(0);
+      this->renderer = renderer;    
+    }
+
+    virtual ~BiNormalAccesor()
+    {
+      SCF_DESTRUCT_IBASE();
+    }
+
+    void PreGetValue (csShaderVariable *variable);
+  };
+  friend class BiNormalAccesor;
+  csRef<BiNormalAccesor> binormal_accessor;
+
+  class TangentAccesor : public iShaderVariableAccessor
+  {
+  private:
+    csGLPolygonRenderer *renderer;
+    csRef<iRenderBuffer> tangent_buffer;
+    
+    uint tangentVerticesNum;
+  public:
+    CS_LEAKGUARD_DECLARE (TangentAccesor);
+    SCF_DECLARE_IBASE;
+
+    TangentAccesor (csGLPolygonRenderer *renderer)
+      : tangentVerticesNum (0)
+    {
+      SCF_CONSTRUCT_IBASE(0);
+      this->renderer = renderer;    
+    }
+
+    virtual ~TangentAccesor()
+    {
+      SCF_DESTRUCT_IBASE();
+    }
+
+    void PreGetValue (csShaderVariable *variable);
+  };
+  friend class TangentAccesor;
+  csRef<TangentAccesor> tangent_accessor;
 
 public:
   CS_LEAKGUARD_DECLARE (csGLPolygonRenderer);

@@ -29,6 +29,8 @@
 CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer)
 CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer::FogAccesor)
 CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer::NormalAccesor)
+CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer::BiNormalAccesor)
+CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer::TangentAccesor)
 
 SCF_IMPLEMENT_IBASE(csGLPolygonRenderer)
   SCF_IMPLEMENTS_INTERFACE(iPolygonRenderer)
@@ -42,10 +44,17 @@ SCF_IMPLEMENT_IBASE(csGLPolygonRenderer::NormalAccesor)
   SCF_IMPLEMENTS_INTERFACE(iShaderVariableAccessor)
 SCF_IMPLEMENT_IBASE_END
 
+SCF_IMPLEMENT_IBASE(csGLPolygonRenderer::BiNormalAccesor)
+  SCF_IMPLEMENTS_INTERFACE(iShaderVariableAccessor)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_IBASE(csGLPolygonRenderer::TangentAccesor)
+  SCF_IMPLEMENTS_INTERFACE(iShaderVariableAccessor)
+SCF_IMPLEMENT_IBASE_END
+
 csStringID csGLPolygonRenderer::vertex_name   = csInvalidStringID;
 csStringID csGLPolygonRenderer::texel_name    = csInvalidStringID;
 csStringID csGLPolygonRenderer::normal_name   = csInvalidStringID;
-csStringID csGLPolygonRenderer::color_name    = csInvalidStringID;
 csStringID csGLPolygonRenderer::index_name    = csInvalidStringID;
 csStringID csGLPolygonRenderer::tangent_name  = csInvalidStringID;
 csStringID csGLPolygonRenderer::binormal_name = csInvalidStringID;
@@ -65,6 +74,8 @@ csGLPolygonRenderer::csGLPolygonRenderer (csGLGraphics3D* parent)
   polysNum = 0;
   fog_accessor.AttachNew (new FogAccesor(this));
   normal_accessor.AttachNew (new NormalAccesor(this));
+  binormal_accessor.AttachNew (new BiNormalAccesor(this));
+  tangent_accessor.AttachNew (new TangentAccesor(this));
   shadermanager = parent->shadermgr;
 }
 
@@ -78,7 +89,6 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
   if ((vertex_name  == csInvalidStringID) ||
     (texel_name     == csInvalidStringID) ||
     (normal_name    == csInvalidStringID) ||
-    (color_name     == csInvalidStringID) ||
     (index_name     == csInvalidStringID) ||
     (tangent_name   == csInvalidStringID) ||
     (binormal_name  == csInvalidStringID) ||
@@ -89,7 +99,6 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
     vertex_name   = strings->Request ("vertices");
     texel_name    = strings->Request ("texture coordinates");
     normal_name   = strings->Request ("normals");
-    color_name    = strings->Request ("colors");
     index_name    = strings->Request ("indices");
     tangent_name  = strings->Request ("tangents");
     binormal_name = strings->Request ("binormals");
@@ -129,14 +138,6 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
       CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, num_verts - 1);
     int* indices = (int*)index_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
-    tangent_buffer = parent->CreateRenderBuffer (num_verts * sizeof (csVector3), 
-      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-    csVector3* tangents = (csVector3*)tangent_buffer->Lock (CS_BUF_LOCK_NORMAL);
-
-    binormal_buffer = parent->CreateRenderBuffer (num_verts * sizeof (csVector3), 
-      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-    csVector3* binormals = (csVector3*)binormal_buffer->Lock (CS_BUF_LOCK_NORMAL);
-
     lmcoords_buffer = parent->CreateRenderBuffer (num_verts * sizeof (csVector2), 
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
     csVector2* lmcoords = (csVector2*)lmcoords_buffer->Lock (CS_BUF_LOCK_NORMAL);
@@ -149,17 +150,6 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
     for (i = 0; i < polys.Length(); i++)
     {
       csPolygonRenderData* static_data = polys[i];
-      bool smoothed = static_data->objNormals && *static_data->objNormals;
-
-      //int* poly_indices = static_data->GetVertexIndices ();
-
-      csVector3 polynormal;
-      if (!smoothed)
-      {
-	// hmm... It seems that both polynormal and obj_normals[] need to be inverted.
-	//  Don't know why, just found it out empirical.
-	polynormal = -static_data->plane_obj.Normal();
-      }
 
       /*
 	To get the texture coordinates of a vertex, the coordinates
@@ -212,30 +202,6 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
           0));
       }
 
-      /*
-	Calculate the 'tangent' vector of this poly, needed for dot3.
-	It is "a tangent to the surface which represents the direction 
-	of increase of the t texture coordinate." (Quotation from
-	http://www.ati.com/developer/sdk/rage128sdk/Rage128BumpTutorial.html)
-	Conveniently, all polys have a object->texture space transformation
-	associated with them.
-
-	@@@ Ignores the fact things can be smooth.
-	But it's simpler for now :)
-      */
-      csTransform tangentTF (t_m.GetInverse (), csVector3 (0));
-      csVector3 origin = tangentTF.Other2This (csVector3 (0, 0, 0));
-      csVector3 tangent = 
-	tangentTF.Other2This (csVector3 (1, 0, 0)) - origin;
-      tangent.Normalize ();
-
-      /*
-	Calculate the 'binormal' vector of this poly, needed for dot3.
-      */
-      csVector3 binormal = 
-	tangentTF.Other2This (csVector3 (0, 1, 0)) - origin;
-      binormal.Normalize ();
-
       // First, fill the normal/texel/vertex buffers.
       csVector3* obj_verts = *(static_data->p_obj_verts);
       int j, vc = static_data->num_vertices;
@@ -244,19 +210,11 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
         int vidx = static_data->vertices[j];
         const csVector3& vertex = obj_verts[vidx];
         *vertices++ = vertex;
-        //if (smoothed)
-        //{
-	  //*normals++ = -(*static_data->objNormals)[vidx];
-        //}
-        //else
-	  //*normals++ = polynormal;
 
         csVector3 t = object2texture.Other2This (vertex);
         *texels++ = csVector2 (t.x, t.y);
         csVector3 l = tex2lm.Other2This (t);
         *lmcoords++ = csVector2 (l.x, l.y);
-        *tangents++ = tangent;
-        *binormals++ = binormal;
 
         pvIndices[j] = vindex++;
       }
@@ -286,8 +244,6 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
   index_buffer->Release ();
   texel_buffer->Release ();
   vertex_buffer->Release ();
-  tangent_buffer->Release ();
-  binormal_buffer->Release ();
   lmcoords_buffer->Release ();
 }
 
@@ -306,13 +262,11 @@ void csGLPolygonRenderer::PrepareRenderMesh (csRenderMesh& mesh)
   sv = mesh.variablecontext->GetVariableAdd (normal_name);
   sv->SetAccessor (normal_accessor);
   sv = mesh.variablecontext->GetVariableAdd (binormal_name);
-  sv->SetValue (binormal_buffer);
+  sv->SetAccessor (binormal_accessor);
   sv = mesh.variablecontext->GetVariableAdd (tangent_name);
-  sv->SetValue (tangent_buffer);
+  sv->SetAccessor (tangent_accessor);
   sv = mesh.variablecontext->GetVariableAdd (lmcoords_name);
   sv->SetValue (lmcoords_buffer);
-  sv = mesh.variablecontext->GetVariableAdd (color_name);
-  sv->SetValue (color_buffer);
   sv = mesh.variablecontext->GetVariableAdd (fog_name);
   sv->SetAccessor (fog_accessor);
 
@@ -463,3 +417,154 @@ void csGLPolygonRenderer::NormalAccesor::PreGetValue (
 
   variable->SetValue (normal_buffer);
 }
+
+void csGLPolygonRenderer::BiNormalAccesor::PreGetValue (
+	csShaderVariable *variable)
+{
+  if (binormalVerticesNum != renderer->polysNum)
+  {
+    int num_verts = 0;
+    size_t i;
+
+    for (i = 0; i < renderer->polys.Length(); i++)
+    {
+      csPolygonRenderData* poly = renderer->polys[i];
+      num_verts += poly->num_vertices;
+    }
+
+    binormal_buffer = renderer->parent->CreateRenderBuffer (
+    	num_verts * sizeof (csVector3), 
+        CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+    csVector3* binormals = (csVector3*)binormal_buffer->Lock (CS_BUF_LOCK_NORMAL);
+    memset (binormals,0,num_verts*sizeof(csVector3));
+    binormal_buffer->Release();
+    binormalVerticesNum = renderer->polysNum;
+  }
+
+  csVector3* binormals = (csVector3*)binormal_buffer->Lock (CS_BUF_LOCK_NORMAL);
+
+  for (size_t i = 0; i < renderer->polys.Length(); i++)
+  {
+    csPolygonRenderData* static_data = renderer->polys[i];
+
+    csMatrix3 t_m;
+    csVector3 t_v;
+    if (static_data->tmapping)
+    {
+      t_m = static_data->tmapping->GetO2T ();
+      t_v = static_data->tmapping->GetO2TTranslation ();
+    }
+    else
+    {
+      CS_ASSERT (false);	// @@@ NEED TO SUPPORT FLAT SHADING!!!
+    }
+
+    /*
+	Calculate the 'tangent' vector of this poly, needed for dot3.
+	It is "a tangent to the surface which represents the direction 
+	of increase of the t texture coordinate." (Quotation from
+	http://www.ati.com/developer/sdk/rage128sdk/Rage128BumpTutorial.html)
+	Conveniently, all polys have a object->texture space transformation
+	associated with them.
+
+	@@@ Ignores the fact things can be smooth.
+	But it's simpler for now :)
+    */
+    csTransform tangentTF (t_m.GetInverse (), csVector3 (0));
+    csVector3 origin = tangentTF.Other2This (csVector3 (0, 0, 0));
+    //csVector3 tangent = 
+	//tangentTF.Other2This (csVector3 (1, 0, 0)) - origin;
+    //tangent.Normalize ();
+
+    /*
+	Calculate the 'binormal' vector of this poly, needed for dot3.
+    */
+    csVector3 binormal = 
+	tangentTF.Other2This (csVector3 (0, 1, 0)) - origin;
+    binormal.Normalize ();
+
+    int j, vc = static_data->num_vertices;
+    for (j = 0; j < vc; j++)
+    {
+      //*tangents++ = tangent;
+      *binormals++ = binormal;
+    }
+
+  }
+
+  binormal_buffer->Release ();
+
+  variable->SetValue (binormal_buffer);
+}
+
+void csGLPolygonRenderer::TangentAccesor::PreGetValue (
+	csShaderVariable *variable)
+{
+  if (tangentVerticesNum != renderer->polysNum)
+  {
+    int num_verts = 0;
+    size_t i;
+
+    for (i = 0; i < renderer->polys.Length(); i++)
+    {
+      csPolygonRenderData* poly = renderer->polys[i];
+      num_verts += poly->num_vertices;
+    }
+
+    tangent_buffer = renderer->parent->CreateRenderBuffer (
+    	num_verts * sizeof (csVector3), 
+        CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+    csVector3* tangents = (csVector3*)tangent_buffer->Lock (CS_BUF_LOCK_NORMAL);
+    memset (tangents,0,num_verts*sizeof(csVector3));
+    tangent_buffer->Release();
+    tangentVerticesNum = renderer->polysNum;
+  }
+
+  csVector3* tangents = (csVector3*)tangent_buffer->Lock (CS_BUF_LOCK_NORMAL);
+
+  for (size_t i = 0; i < renderer->polys.Length(); i++)
+  {
+    csPolygonRenderData* static_data = renderer->polys[i];
+
+    csMatrix3 t_m;
+    csVector3 t_v;
+    if (static_data->tmapping)
+    {
+      t_m = static_data->tmapping->GetO2T ();
+      t_v = static_data->tmapping->GetO2TTranslation ();
+    }
+    else
+    {
+      CS_ASSERT (false);	// @@@ NEED TO SUPPORT FLAT SHADING!!!
+    }
+
+    /*
+	Calculate the 'tangent' vector of this poly, needed for dot3.
+	It is "a tangent to the surface which represents the direction 
+	of increase of the t texture coordinate." (Quotation from
+	http://www.ati.com/developer/sdk/rage128sdk/Rage128BumpTutorial.html)
+	Conveniently, all polys have a object->texture space transformation
+	associated with them.
+
+	@@@ Ignores the fact things can be smooth.
+	But it's simpler for now :)
+    */
+    csTransform tangentTF (t_m.GetInverse (), csVector3 (0));
+    csVector3 origin = tangentTF.Other2This (csVector3 (0, 0, 0));
+    csVector3 tangent = 
+	tangentTF.Other2This (csVector3 (1, 0, 0)) - origin;
+    tangent.Normalize ();
+
+    int j, vc = static_data->num_vertices;
+    for (j = 0; j < vc; j++)
+    {
+      *tangents++ = tangent;
+    }
+
+  }
+
+  tangent_buffer->Release ();
+
+  variable->SetValue (tangent_buffer);
+}
+

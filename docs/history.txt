@@ -54,6 +54,7 @@ chronological order.
 	  creates buffers for normals if normals are actually asked for.
 	  Need to do the same for binormals, tangents, and others but it
 	  already helps a bit for memory usage.
+	- Jorrit also made binormal and tangent information use accessors.
         - Matze fixed AWS lexer to accept comments. The // and # tokens now
           start a comment till the end of the line
 	- Eric Sunshine updated some outdated URL's in the CS manual. Also
