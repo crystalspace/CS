@@ -1820,7 +1820,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
     csStringID id = xmltokens.Request (value);
     bool handled;
     if (!HandleMeshParameter (mesh, child, id, handled, priority))
-      return false;
+      return NULL;
     if (!handled) switch (id)
     {
       case XMLTOKEN_FACTORY:
