@@ -49,6 +49,17 @@ The history order has been reversed so that new features are at the top.
 	  directories.  These modules were moved to the plugins directory
 	  several days ago.  (The directories should have been removed from
 	  CVS at that time but were not for an unknown reason.)
+	- Eric Sunshine relocated socket network driver from plugins/csnetdrv
+	  to plugins/net/driver/socket and made a few minor changes.  Note
+	  that the distinction of "socket" within the "driver" directory.
+	  This distinction is important since it is possible to have drivers
+	  of many different types.  When the socket driver was originally
+	  moved to plugins/csnetdrv from libs/csnetdrv/sockets this
+	  distinction was lost.  FURTHER NOTE: This is just a prelude to
+	  actually repairing the damage which was done to the abstract
+	  networking interfaces when socket-specific junk was added to
+	  inetdrv.h for NetSpace, thus corrupting and polluting the pure
+	  abstract interfaces defined therein.
 27-Apr-2000
 	- Frank O'Connor updated VC project files for NetComm and
 	  the scfTutor apps (zoo, dog, worm).
