@@ -587,7 +587,7 @@ void csPolygon3DStatic::Finish ()
 
   if (IsTextureMappingEnabled ())
   {
-    if (!material->GetMaterialHandle ()->GetTexture ())
+    if (!material || !material->GetMaterialHandle ()->GetTexture ())
     {
       EnableTextureMapping (false);
       return ;

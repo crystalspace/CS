@@ -9,6 +9,20 @@ The history order is reversed so that new features are at the top.
 	  callbacks were not cloned with the effect that the destination
 	  sector of the portal would not be resolved.
 	- Added Jamfiles for the new bezier mesh plugin.
+	- Removed iThingFactoryState->MergeTemplate() and ReplaceMaterials().
+	  These don't work correctly and are no longer needed.
+	- Removed broken support for material sets ('materialselect' and
+	  'matset' keywords).
+	- Added new 'replacematerial' keyword which you can use in a thing
+	  instance to replace the material used in the factory with another one.
+	  Using this feature you can still reuse a factory even if the
+	  materials are different. Note that the materials MUST have the
+	  same size! i.e. if the factory uses a 64x64 material then you can
+	  only replace it with another 64x64 material.
+	  Currently unimplemented!!!
+	- Fixed a bug with collision detection and HardTransform of a thing
+	  mesh object. This is a new bug introduced with my changes yesterday
+	  and it was visible in the partsys level (when traversing a portal).
 10-Apr-2003
 	- Fixed a compile error in binary XML reader. I wonder if people
 	  compile after changing something...

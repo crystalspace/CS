@@ -57,8 +57,8 @@ enum
   XMLTOKEN_FACTORY,
   XMLTOKEN_FASTMESH,
   XMLTOKEN_FOG,
-  XMLTOKEN_MATSETSELECT,
   XMLTOKEN_MATERIAL,
+  XMLTOKEN_REPLACEMATERIAL,
   XMLTOKEN_MOVEABLE,
   XMLTOKEN_PART,
   XMLTOKEN_P,
@@ -127,8 +127,8 @@ bool csThingLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
   xmltokens.Register ("fastmesh", XMLTOKEN_FASTMESH);
   xmltokens.Register ("fog", XMLTOKEN_FOG);
-  xmltokens.Register ("matsetselect", XMLTOKEN_MATSETSELECT);
   xmltokens.Register ("material", XMLTOKEN_MATERIAL);
+  xmltokens.Register ("replacematerial", XMLTOKEN_REPLACEMATERIAL);
   xmltokens.Register ("moveable", XMLTOKEN_MOVEABLE);
   xmltokens.Register ("part", XMLTOKEN_PART);
   xmltokens.Register ("p", XMLTOKEN_P);
@@ -255,14 +255,6 @@ if (!info.thing_fact_state) \
 	  }
 	  info.obj = fact->GetMeshObjectFactory ()->NewInstance ();
 	  info.thing_state = SCF_QUERY_INTERFACE (info.obj, iThingState);
-
-	  //@@@@@@@@@@@@@@
-	  if (info.use_mat_set)
-          {
-	    info.thing_fact_state->ReplaceMaterials (engine->GetMaterialList (),
-	      info.mat_set_name);
-	    info.use_mat_set = false;
-	  }
         }
         break;
       case XMLTOKEN_CLONE:
@@ -307,14 +299,6 @@ if (!info.thing_fact_state) \
 	  info.obj = wrap->GetFactory ()->GetMeshObjectFactory ()
 	  	->NewInstance ();
 	  info.thing_state = SCF_QUERY_INTERFACE (info.obj, iThingState);
-
-	  //@@@@@@@@@@@@@@
-	  if (info.use_mat_set)
-          {
-	    info.thing_fact_state->ReplaceMaterials (engine->GetMaterialList (),
-	      info.mat_set_name);
-	    info.use_mat_set = false;
-	  }
         }
         break;
       case XMLTOKEN_PART:
@@ -360,6 +344,12 @@ Nag to Jorrit about this feature if you want it.");
         }
         break;
 
+      case XMLTOKEN_REPLACEMATERIAL:
+        CHECK_TOPLEVEL("replacematerial");
+        CHECK_OBJECTONLY("replacematerial");
+	CREATE_FACTORY_IF_NEEDED;
+	break;
+
       case XMLTOKEN_MATERIAL:
 	CHECK_DONTEXTENDFACTORY;
 	CREATE_FACTORY_IF_NEEDED;
@@ -377,10 +367,6 @@ Nag to Jorrit about this feature if you want it.");
         break;
       case XMLTOKEN_TEXLEN:
 	info.default_texlen = child->GetContentsValueAsFloat ();
-        break;
-      case XMLTOKEN_MATSETSELECT:
-        info.SetTextureSet (child->GetContentsValue ());
-        info.use_mat_set = true;
         break;
       case XMLTOKEN_SMOOTH:
 	CHECK_DONTEXTENDFACTORY;

@@ -72,12 +72,11 @@ public:
    * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
    */
   PolyMeshHelper (uint32 flag) :
-  	polygons (NULL), vertices (NULL), alloc_vertices (NULL),
-	poly_flag (flag) { }
+  	polygons (NULL), vertices (NULL), poly_flag (flag) { }
   virtual ~PolyMeshHelper () { Cleanup (); }
 
   void Setup ();
-  void SetThing (csThingStatic* thing) { PolyMeshHelper::thing = thing; }
+  void SetThing (csThingStatic* thing);
 
   virtual int GetVertexCount ()
   {
@@ -106,12 +105,9 @@ public:
 
 private:
   csThingStatic* thing;
+  uint32 static_data_nr;	// To see if the static thing has changed.
   csMeshedPolygon* polygons;	// Array of polygons.
-  csVector3* vertices;		// Array of vertices (points to alloc_vertices
-  				// or else obj_verts of scfParent).
-  csVector3* alloc_vertices;	// Optional copy of vertices from parent.
-    				// This copy is used if there are curve
-				// vertices.
+  csVector3* vertices;		// Array of vertices (points to obj_verts).
   int num_poly;			// Total number of polygons.
   int num_verts;		// Total number of vertices.
   uint32 poly_flag;		// Polygons must match with this flag.
@@ -320,12 +316,6 @@ public:
   virtual iPolygon3DStatic* GetPortalPolygon (int idx) const;
 
   virtual csFlags& GetFlags () { return flags; }
-
-  virtual void MergeTemplate (iThingFactoryState* tpl,
-  	iMaterialWrapper* default_material = NULL,
-	csVector3* shift = NULL, csMatrix3* transform = NULL);
-  virtual void ReplaceMaterials (iMaterialList* materials,
-    	const char* prefix);
 
   virtual iPolygon3DStatic* IntersectSegment (const csVector3& start,
 	const csVector3& end, csVector3& isect,

@@ -47,22 +47,10 @@ public:
   csRef<iThingFactoryState> thing_fact_state;
   iMaterialWrapper* default_material;
   float default_texlen;
-  bool use_mat_set;
-  char* mat_set_name;
   bool load_factory;	// If true we are loading a factory.
   bool global_factory;	// We are using a global factory ('factory' or 'clone').
 
-  ThingLoadInfo () : default_material (NULL),
-    default_texlen (1),
-    use_mat_set (false), mat_set_name (NULL)
-    {}
-
-  void SetTextureSet (const char* name)
-  {
-    delete [] mat_set_name;
-    mat_set_name = new char [strlen (name) + 1];
-    strcpy (mat_set_name, name);
-  }
+  ThingLoadInfo () : default_material (NULL), default_texlen (1) {}
 };
 
 /**

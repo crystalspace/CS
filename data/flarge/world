@@ -6756,6 +6756,7 @@
             <plugin>thing</plugin>
             <params>
                 <factory>cube</factory>
+		<replacematerial old="bricks" new="asphalt" />
                 <moveable />
             </params>
             <move>

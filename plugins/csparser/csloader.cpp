@@ -771,7 +771,6 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("textures", XMLTOKEN_TEXTURES);
   xmltokens.Register ("transparent", XMLTOKEN_TRANSPARENT);
   xmltokens.Register ("type", XMLTOKEN_TYPE);
-  xmltokens.Register ("matset", XMLTOKEN_MATSET);
   xmltokens.Register ("up", XMLTOKEN_UP);
   xmltokens.Register ("v", XMLTOKEN_V);
   xmltokens.Register ("world", XMLTOKEN_WORLD);
@@ -935,10 +934,6 @@ bool csLoader::LoadMap (iDocumentNode* node)
         case XMLTOKEN_COLLECTION:
           if (!ParseCollection (child))
 	    return false;
-          break;
-	case XMLTOKEN_MATSET:
-          if (!ParseMaterialList (child))
-            return false;
           break;
 	case XMLTOKEN_SEQUENCES:
 	  // Defer sequence parsing to later.

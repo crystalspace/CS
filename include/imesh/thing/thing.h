@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 1998-2003 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -58,7 +58,7 @@ struct iMovable;
 #define CS_THING_MOVE_OCCASIONAL 2
 
 
-SCF_VERSION (iThingFactoryState, 0, 0, 1);
+SCF_VERSION (iThingFactoryState, 0, 1, 0);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -130,23 +130,6 @@ struct iThingFactoryState : public iBase
 
   /// Set thing flags (see CS_THING_... values above)
   virtual csFlags& GetFlags () = 0;
-
-  /**
-   * Add polygons and vertices from the specified thing (seen as template).
-   */
-  virtual void MergeTemplate (iThingFactoryState* tpl,
-  	iMaterialWrapper* default_material = NULL,
-	csVector3* shift = NULL, csMatrix3* transform = NULL) = 0;
-
-  /**
-   * Replace the materials in this thing with new materials that are
-   * prefixed by some name. For example, if a polygon in this thing uses
-   * a material 'blabla' and the prefix is 'pref' then the new material
-   * that will be used is called 'pref_blabla'. If that material cannot
-   * be found then the original material will be used.
-   */
-  virtual void ReplaceMaterials (iMaterialList* matList,
-  	const char* prefix) = 0;
 
   /**
    * Intersect a segment with this thing and return the first

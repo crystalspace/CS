@@ -619,52 +619,6 @@ iPolygon3DStatic* csThingStatic::IntersectSegment (
   return p != -1 ? &(static_polygons.Get (p)->scfiPolygon3DStatic) : NULL;
 }
 
-void csThingStatic::MergeTemplate (
-  iThingFactoryState *tpl,
-  iMaterialWrapper *default_material,
-  csVector3 *shift,
-  csMatrix3 *transform)
-{
-  int i, j;
-  int *merge_vertices;
-
-  flags.SetAll (tpl->GetFlags ().Get ());
-
-  merge_vertices = new int[tpl->GetVertexCount () + 1];
-  for (i = 0; i < tpl->GetVertexCount (); i++)
-  {
-    csVector3 v;
-    v = tpl->GetVertex (i);
-    if (transform) v = *transform * v;
-    if (shift) v += *shift;
-    merge_vertices[i] = AddVertex (v);
-  }
-
-  for (i = 0; i < tpl->GetPolygonCount (); i++)
-  {
-    iPolygon3DStatic *pt = tpl->GetPolygon (i);
-    csPolygon3DStatic *ps;
-    iMaterialWrapper *mat = pt->GetMaterial ();
-    ps = thing_type->blk_polygon3dstatic.Alloc ();
-    ps->SetMaterial (mat);
-    AddPolygon (ps);
-    ps->SetName (pt->GetName ());
-
-    iMaterialWrapper *wrap = pt->GetMaterial ();
-    if (!wrap && default_material)
-      ps->SetMaterial (default_material);
-
-    int *idx = pt->GetVertexIndices ();
-    for (j = 0; j < pt->GetVertexCount (); j++)
-      ps->AddVertex (merge_vertices[idx[j]]);
-
-    ps->flags.SetAll (pt->GetFlags ().Get ());
-    ps->CopyTextureType (pt);
-  }
-
-  delete[] merge_vertices;
-}
-
 csPtr<csThingStatic> csThingStatic::Clone ()
 {
   csThingStatic* clone = new csThingStatic (scfParent, thing_type);
@@ -710,23 +664,6 @@ csPtr<csThingStatic> csThingStatic::Clone ()
   clone->portal_polygons = portal_polygons;
 
   return csPtr<csThingStatic> (clone);
-}
-
-void csThingStatic::ReplaceMaterials (iMaterialList *matList,
-	const char *prefix)
-{
-  int i;
-  for (i = 0; i < GetPolygonCount (); i++)
-  {
-    csPolygon3DStatic *p = GetPolygon3DStatic (i);
-    const char *txtname = p->GetMaterialWrapper ()->QueryObject ()->GetName ();
-    char *newname = new char[strlen (prefix) + strlen (txtname) + 2];
-    sprintf (newname, "%s_%s", prefix, txtname);
-
-    iMaterialWrapper *mw = matList->FindByName (newname);
-    if (mw != NULL) p->SetMaterial (mw);
-    delete[] newname;
-  }
 }
 
 void csThingStatic::HardTransform (const csReversibleTransform &t)
@@ -1061,6 +998,8 @@ void csThing::HardTransform (const csReversibleTransform& t)
   csRef<csThingStatic> new_static_data = static_data->Clone ();
   static_data = new_static_data;
   static_data->HardTransform (t);
+  scfiPolygonMesh.SetThing (static_data);
+  scfiPolygonMeshLOD.SetThing (static_data);
 }
 
 void csThing::Prepare ()
@@ -1098,15 +1037,13 @@ void csThing::Prepare ()
 	p->RefreshFromStaticData ();
 	p->Finish ();
       }
+      shapenr++;
     }
     return;
   }
 
   prepared = true;
   shapenr++;
-
-  scfiPolygonMeshLOD.Cleanup ();
-  scfiPolygonMesh.Cleanup ();
 
   static_data_nr = static_data->static_data_nr;
 
@@ -1178,8 +1115,6 @@ void csThing::InvalidateThing ()
   static_data->obj_bbox_valid = false;
 
   shapenr++;
-  scfiPolygonMeshLOD.Cleanup ();
-  scfiPolygonMesh.Cleanup ();
   delete [] static_data->obj_normals; static_data->obj_normals = NULL;
   FireListeners ();
 }
@@ -1659,13 +1594,25 @@ csThing::PolyMeshLOD::PolyMeshLOD () : PolyMeshHelper (CS_POLY_VISCULL)
 
 //-------------------------------------------------------------------------
 
+void PolyMeshHelper::SetThing (csThingStatic* thing)
+{
+  PolyMeshHelper::thing = thing;
+  static_data_nr = thing->GetStaticDataNumber ()-1;
+}
+
 void PolyMeshHelper::Setup ()
 {
-  if (polygons || alloc_vertices)
+  thing->Prepare ();
+  if (static_data_nr != thing->GetStaticDataNumber ())
+  {
+    static_data_nr = thing->GetStaticDataNumber ();
+    Cleanup ();
+  }
+
+  if (polygons)
   {
     // Already set up. First we check if the object vertex array
-    // is still valid (if it is not a copy).
-    if (alloc_vertices) return ;
+    // is still valid.
     if (vertices == thing->obj_verts) return ;
   }
 
@@ -1710,8 +1657,6 @@ void PolyMeshHelper::Cleanup ()
 {
   delete[] polygons;
   polygons = NULL;
-  delete[] alloc_vertices;
-  alloc_vertices = NULL;
   vertices = NULL;
 }
 
