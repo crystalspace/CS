@@ -291,6 +291,12 @@ struct csGraphics3DCaps
 struct csTriangle
 {
   int a, b, c;
+
+  /// Empty default constructor
+  csTriangle() {}
+
+  /// Convenience constructor, builds a triangle with initializers
+  csTriangle(int _a, int _b, int _c):a(_a), b(_b), c(_c) {}
 };
 
 /**
