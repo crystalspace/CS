@@ -183,7 +183,7 @@ awsCheckBox::OnDraw(csRect clip)
 }
 
 bool 
-awsCheckBox::OnMouseDown(int button, int x, int y)
+awsCheckBox::OnMouseDown(int , int , int )
 {
   is_down=true;
   Invalidate();
@@ -191,7 +191,7 @@ awsCheckBox::OnMouseDown(int button, int x, int y)
 }
     
 bool 
-awsCheckBox::OnMouseUp(int button, int x, int y)
+awsCheckBox::OnMouseUp(int , int , int )
 {
   if (is_down)
     Broadcast(signalClicked);
@@ -208,19 +208,19 @@ awsCheckBox::OnMouseUp(int button, int x, int y)
 }
     
 bool
-awsCheckBox::OnMouseMove(int button, int x, int y)
+awsCheckBox::OnMouseMove(int , int , int )
 {
   return false;
 }
 
 bool
-awsCheckBox::OnMouseClick(int button, int x, int y)
+awsCheckBox::OnMouseClick(int , int , int )
 {
   return false;
 }
 
 bool
-awsCheckBox::OnMouseDoubleClick(int button, int x, int y)
+awsCheckBox::OnMouseDoubleClick(int , int , int )
 {
   return false;
 }
@@ -246,7 +246,7 @@ awsCheckBox::OnMouseEnter()
 }
 
 bool
-awsCheckBox::OnKeypress(int key, int modifiers)
+awsCheckBox::OnKeypress(int , int )
 {
   return false;
 }

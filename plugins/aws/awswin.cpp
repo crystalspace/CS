@@ -289,6 +289,7 @@ awsWindow::OnLower()
 bool 
 awsWindow::OnMouseDown(int button, int x, int y)
 {
+  (void) button;
 
   if (!(frame_style & fsBitmap))
   {
@@ -379,6 +380,8 @@ awsWindow::OnMouseDown(int button, int x, int y)
 bool 
 awsWindow::OnMouseUp(int button, int x, int y)
 {
+  (void) button;
+  
   if (max_down && (frame_options & foZoom) && maxp.Contains(x, y))
   {
     max_down=false;
@@ -475,9 +478,11 @@ awsWindow::OnMouseUp(int button, int x, int y)
 bool 
 awsWindow::OnMouseMove(int button, int x, int y)
 {
+  (void) button;
+  
   if (resizing_mode)
   {
-    bool marked=false;
+    //bool marked=false;
 
     if (x<Frame().xmax || y<Frame().ymax)
     {
@@ -626,19 +631,19 @@ awsWindow::OnMouseEnter()
 }
 
 bool
-awsWindow::OnMouseClick(int button, int x, int y)
+awsWindow::OnMouseClick(int ,int ,int )
 {
   return false;
 }
 
 bool
-awsWindow::OnMouseDoubleClick(int button, int x, int y)
+awsWindow::OnMouseDoubleClick(int ,int ,int )
 {
   return false;
 }
 
 bool 
-awsWindow::OnKeypress(int key, int modifiers)
+awsWindow::OnKeypress(int ,int )
 {
   return false;
 }

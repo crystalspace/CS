@@ -8,6 +8,7 @@
 void 
 awsStandardSink::Hide(void *sink, iAwsSource *source)
 {
+  (void) sink;
   iAwsComponent *c = source->GetComponent();
 
   c->Hide();
@@ -16,6 +17,7 @@ awsStandardSink::Hide(void *sink, iAwsSource *source)
 void 
 awsStandardSink::Show(void *sink, iAwsSource *source)
 {
+  (void) sink;
   iAwsComponent *c = source->GetComponent();
 
   c->Show();
@@ -24,6 +26,7 @@ awsStandardSink::Show(void *sink, iAwsSource *source)
 void 
 awsStandardSink::HideWindow(void *sink, iAwsSource *source)
 {
+  (void) sink;
   iAwsComponent *c = source->GetComponent();
 
   if (strcmp(c->Type(), "Window")==0)
@@ -39,6 +42,7 @@ awsStandardSink::HideWindow(void *sink, iAwsSource *source)
 void 
 awsStandardSink::Invalidate(void *sink, iAwsSource *source)
 {
+  (void) sink;
   iAwsComponent *c = source->GetComponent();
 
   c->Invalidate();

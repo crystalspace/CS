@@ -127,7 +127,7 @@ void awsMultiProctexCanvas::awscG2D::DrawLine (
     for (i=0; i<count; ++i)
     {
       csRect crect(*awsc->GetFlatCanvasRect(i));
-      csRect rect(x1-1,y1-1,x2+1,y2+1);
+      csRect rect((int) x1-1,(int) y1-1,(int) x2+1,(int) y2+1);
       
       if (rect.Intersects (crect))
       {
@@ -297,7 +297,7 @@ void awsMultiProctexCanvas::awscG2D::ClearAll(int color)
   DrawBox (0, 0, Width, Height, color);
 }
 
-bool awsMultiProctexCanvas::awscG2D::DoubleBuffer (bool Enable)
+bool awsMultiProctexCanvas::awscG2D::DoubleBuffer (bool )
 {
   return true;
 }
@@ -442,7 +442,7 @@ bool awsMultiProctexCanvas::awscG3D::Open ()
 
   int nWidth = G2D->GetWidth ();
   int nHeight = G2D->GetHeight ();
-  bool bFullScreen = G2D->GetFullScreen ();
+  //bool bFullScreen = G2D->GetFullScreen ();
 
   pfmt = *G2D->GetPixelFormat ();
   if (pfmt.PalEntries)
@@ -710,7 +710,8 @@ awsMultiProctexCanvas::Animate (csTicks current_time)
 
 void awsMultiProctexCanvas::Show (csRect *area, iGraphics3D *g3d, uint8 Alpha)
 {
-  //vG3D->Print (area);
+  (void) g3d;
+  //G3D->Print (area);
 
   int i, count=GetFlatCanvasCount();
 

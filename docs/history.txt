@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+25-Dec-2001
+	- Matze had nothing to do and fixed hundrets of compiler warnings in aws
 21-Dec-2001
 	- Fixed the JPG loader so that it actually fails instead of just
 	  hanging on JPG images that are too short.

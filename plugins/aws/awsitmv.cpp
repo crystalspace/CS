@@ -19,7 +19,7 @@ awsListRowVector::FreeItem (csSome Item)
 }
 
 int 
-awsListRowVector::Compare (csSome Item1, csSome Item2, int Mode) const
+awsListRowVector::Compare (csSome Item1, csSome Item2, int /*Mode*/) const
 {
   awsListRow *r1 = (awsListRow *)Item1;
   awsListRow *r2 = (awsListRow *)Item2;
@@ -36,7 +36,7 @@ awsListRowVector::Compare (csSome Item1, csSome Item2, int Mode) const
 }
 
 int 
-awsListRowVector::CompareKey (csSome Item, csConstSome Key, int Mode) const
+awsListRowVector::CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
 {
   awsListRow *r1 = (awsListRow *)Item;
 

@@ -382,18 +382,65 @@ awsComponent::Broadcast(unsigned long signal)
   signalsrc.Broadcast(signal);
 }
 
-void awsComponent::OnDraw(csRect clip)                           { return; }
-bool awsComponent::OnMouseDown(int button, int x, int y)         { return false; }
-bool awsComponent::OnMouseUp(int button, int x, int y)           { return false; }
-bool awsComponent::OnMouseMove(int button, int x, int y)         { return false; }
-bool awsComponent::OnMouseClick(int button, int x, int y)        { return false; }
-bool awsComponent::OnMouseDoubleClick(int button, int x, int y)  { return false; }
-bool awsComponent::OnMouseExit()                                 { return false; }
-bool awsComponent::OnMouseEnter()                                { return false; }
-bool awsComponent::OnKeypress(int key, int modifiers)            { return false; }
-bool awsComponent::OnLostFocus()                                 { return false; }
-bool awsComponent::OnGainFocus()                                 { return false; }
-bool awsComponent::OnFrame()                                     { return false; }
+void awsComponent::OnDraw(csRect )
+{ 
+  return;
+}
+
+bool awsComponent::OnMouseDown(int ,int ,int )
+{ 
+  return false;
+}
+
+bool awsComponent::OnMouseUp(int ,int ,int )
+{ 
+  return false;
+}
+
+bool awsComponent::OnMouseMove(int ,int ,int )
+{ 
+  return false;
+}
+
+bool awsComponent::OnMouseClick(int ,int ,int )
+{ 
+  return false;
+}
+
+bool awsComponent::OnMouseDoubleClick(int ,int ,int )
+{ 
+  return false;
+}
+
+bool awsComponent::OnMouseExit()
+{ 
+  return false;
+}
+
+bool awsComponent::OnMouseEnter()
+{ 
+  return false;
+}
+
+bool awsComponent::OnKeypress(int ,int )
+{ 
+  return false; 
+}
+
+bool awsComponent::OnLostFocus()
+{ 
+  return false;
+}
+
+bool awsComponent::OnGainFocus()
+{ 
+  return false;
+}
+
+bool awsComponent::OnFrame()
+{ 
+  return false;
+}
 
 /////////////////////////////////////  awsComponentFactory ////////////////////////////////////////////////////////
 

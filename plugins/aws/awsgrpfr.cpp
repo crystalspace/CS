@@ -123,31 +123,31 @@ awsGroupFrame::OnDraw(csRect clip)
 }
 
 bool 
-awsGroupFrame::OnMouseDown(int button, int x, int y)
+awsGroupFrame::OnMouseDown(int ,int ,int )
 {
   return false;
 }
     
 bool 
-awsGroupFrame::OnMouseUp(int button, int x, int y)
+awsGroupFrame::OnMouseUp(int ,int ,int )
 {  
   return false;
 }
     
 bool
-awsGroupFrame::OnMouseMove(int button, int x, int y)
+awsGroupFrame::OnMouseMove(int ,int ,int )
 {
   return false;
 }
 
 bool
-awsGroupFrame::OnMouseClick(int button, int x, int y)
+awsGroupFrame::OnMouseClick(int ,int ,int )
 {
   return false;
 }
 
 bool
-awsGroupFrame::OnMouseDoubleClick(int button, int x, int y)
+awsGroupFrame::OnMouseDoubleClick(int ,int ,int )
 {
   return false;
 }
@@ -165,7 +165,7 @@ awsGroupFrame::OnMouseEnter()
 }
 
 bool
-awsGroupFrame::OnKeypress(int key, int modifiers)
+awsGroupFrame::OnKeypress(int ,int )
 {
   return false;
 }

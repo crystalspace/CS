@@ -221,7 +221,7 @@ awsRadButton::OnDraw(csRect clip)
 }
 
 bool 
-awsRadButton::OnMouseDown(int button, int x, int y)
+awsRadButton::OnMouseDown(int ,int ,int )
 {
   is_down=true;
   Invalidate();
@@ -229,7 +229,7 @@ awsRadButton::OnMouseDown(int button, int x, int y)
 }
     
 bool 
-awsRadButton::OnMouseUp(int button, int x, int y)
+awsRadButton::OnMouseUp(int ,int ,int )
 {
   if (is_down)
     Broadcast(signalClicked);
@@ -248,19 +248,19 @@ awsRadButton::OnMouseUp(int button, int x, int y)
 }
     
 bool
-awsRadButton::OnMouseMove(int button, int x, int y)
+awsRadButton::OnMouseMove(int ,int ,int )
 {
   return false;
 }
 
 bool
-awsRadButton::OnMouseClick(int button, int x, int y)
+awsRadButton::OnMouseClick(int ,int ,int )
 {
   return false;
 }
 
 bool
-awsRadButton::OnMouseDoubleClick(int button, int x, int y)
+awsRadButton::OnMouseDoubleClick(int ,int ,int )
 {
   return false;
 }
@@ -286,7 +286,7 @@ awsRadButton::OnMouseEnter()
 }
 
 bool
-awsRadButton::OnKeypress(int key, int modifiers)
+awsRadButton::OnKeypress(int ,int )
 {
   return false;
 }

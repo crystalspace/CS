@@ -43,7 +43,7 @@ awsSinkManager::~awsSinkManager()
 }
     
 bool 
-awsSinkManager::Initialize(iObjectRegistry *sys)
+awsSinkManager::Initialize(iObjectRegistry* )
 {
   return true;
 }

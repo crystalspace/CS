@@ -295,7 +295,7 @@ awsCmdButton::OnDraw(csRect clip)
 }
 
 bool 
-awsCmdButton::OnMouseDown(int button, int x, int y)
+awsCmdButton::OnMouseDown(int , int , int )
 {
   was_down=is_down;
 
@@ -307,7 +307,7 @@ awsCmdButton::OnMouseDown(int button, int x, int y)
 }
     
 bool 
-awsCmdButton::OnMouseUp(int button, int x, int y)
+awsCmdButton::OnMouseUp(int ,int ,int )
 {
   if (!is_switch)
   {
@@ -331,19 +331,19 @@ awsCmdButton::OnMouseUp(int button, int x, int y)
 }
     
 bool
-awsCmdButton::OnMouseMove(int button, int x, int y)
+awsCmdButton::OnMouseMove(int ,int ,int )
 {
   return false;
 }
 
 bool
-awsCmdButton::OnMouseClick(int button, int x, int y)
+awsCmdButton::OnMouseClick(int ,int ,int )
 {
   return false;
 }
 
 bool
-awsCmdButton::OnMouseDoubleClick(int button, int x, int y)
+awsCmdButton::OnMouseDoubleClick(int ,int ,int )
 {
   return false;
 }
@@ -369,7 +369,7 @@ awsCmdButton::OnMouseEnter()
 }
 
 bool
-awsCmdButton::OnKeypress(int key, int modifiers)
+awsCmdButton::OnKeypress(int ,int )
 {
   return false;
 }

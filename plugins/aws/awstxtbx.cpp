@@ -236,31 +236,31 @@ awsTextBox::OnDraw(csRect clip)
 }
 
 bool 
-awsTextBox::OnMouseDown(int button, int x, int y)
+awsTextBox::OnMouseDown(int ,int ,int )
 {
   return false;
 }
     
 bool 
-awsTextBox::OnMouseUp(int button, int x, int y)
+awsTextBox::OnMouseUp(int ,int ,int )
 {
   return false;
 }
     
 bool
-awsTextBox::OnMouseMove(int button, int x, int y)
+awsTextBox::OnMouseMove(int ,int ,int )
 {
   return false;
 }
 
 bool
-awsTextBox::OnMouseClick(int button, int x, int y)
+awsTextBox::OnMouseClick(int ,int ,int )
 {
   return false;
 }
 
 bool
-awsTextBox::OnMouseDoubleClick(int button, int x, int y)
+awsTextBox::OnMouseDoubleClick(int ,int ,int )
 {
   return false;
 }
@@ -284,6 +284,7 @@ awsTextBox::OnMouseEnter()
 bool
 awsTextBox::OnKeypress(int key, int modifiers)
 {
+  (void) modifiers;
   
   switch(key)
   {

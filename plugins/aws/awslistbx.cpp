@@ -489,7 +489,7 @@ awsListBox::OnDraw(csRect clip)
 {
 
   iGraphics2D *g2d = WindowManager()->G2D();
-  iGraphics3D *g3d = WindowManager()->G3D();
+  //iGraphics3D *g3d = WindowManager()->G3D();
 
   int hi2   = WindowManager()->GetPrefMgr()->GetColor(AC_HIGHLIGHT2);
   int lo2   = WindowManager()->GetPrefMgr()->GetColor(AC_SHADOW2);    
@@ -868,9 +868,10 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, in
 }
 
 bool 
-awsListBox::OnMouseDown(int button, int x, int y)
+awsListBox::OnMouseDown(int /*button*/,int x,int y)
 {
   int i;
+  
   for (i=0; i<hotspots.Length(); ++i)
   {
     awsListHotspot *hs = (awsListHotspot *)hotspots[i];
@@ -922,25 +923,25 @@ awsListBox::OnMouseDown(int button, int x, int y)
 }
 
 bool 
-awsListBox::OnMouseUp(int button, int x, int y)
+awsListBox::OnMouseUp(int ,int ,int )
 {
   return false;
 }
 
 bool
-awsListBox::OnMouseMove(int button, int x, int y)
+awsListBox::OnMouseMove(int ,int ,int )
 {
   return false;
 }
 
 bool
-awsListBox::OnMouseClick(int button, int x, int y)
+awsListBox::OnMouseClick(int ,int ,int )
 {
   return false;
 }
 
 bool
-awsListBox::OnMouseDoubleClick(int button, int x, int y)
+awsListBox::OnMouseDoubleClick(int ,int ,int )
 {
   return false;
 }
@@ -966,7 +967,7 @@ awsListBox::OnMouseEnter()
 }
 
 bool
-awsListBox::OnKeypress(int key, int modifiers)
+awsListBox::OnKeypress(int ,int )
 {
   return false;
 }

@@ -266,3 +266,4 @@ awsParmList::GetPoint(char *name, csPoint **value)
 
   return false;
 }
+

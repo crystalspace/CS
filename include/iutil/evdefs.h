@@ -48,8 +48,9 @@ enum
   csevMouseExit,		// The mouse has exited a component
   csevLostFocus,                // The component has lost keyboard focus
   csevGainFocus,                // The component has gained keyboard focus
-  csevGroupOff                  // A component in a group has been selected, 
+  csevGroupOff,                  // A component in a group has been selected, 
                                 //  everyone else should go to their off state.
+  csevFrameStart
 };
 
 /*

@@ -134,7 +134,7 @@ awsLabel::OnDraw(csRect clip)
 }
 
 bool 
-awsLabel::OnMouseDown(int button, int x, int y)
+awsLabel::OnMouseDown(int ,int ,int )
 {
   is_down=true;
   //Invalidate();
@@ -142,7 +142,7 @@ awsLabel::OnMouseDown(int button, int x, int y)
 }
     
 bool 
-awsLabel::OnMouseUp(int button, int x, int y)
+awsLabel::OnMouseUp(int ,int ,int )
 {
   if (is_down)
     Broadcast(signalClicked);
@@ -153,19 +153,19 @@ awsLabel::OnMouseUp(int button, int x, int y)
 }
     
 bool
-awsLabel::OnMouseMove(int button, int x, int y)
+awsLabel::OnMouseMove(int ,int ,int )
 {
   return false;
 }
 
 bool
-awsLabel::OnMouseClick(int button, int x, int y)
+awsLabel::OnMouseClick(int ,int ,int )
 {
   return false;
 }
 
 bool
-awsLabel::OnMouseDoubleClick(int button, int x, int y)
+awsLabel::OnMouseDoubleClick(int ,int ,int )
 {
   return false;
 }
@@ -191,7 +191,7 @@ awsLabel::OnMouseEnter()
 }
 
 bool
-awsLabel::OnKeypress(int key, int modifiers)
+awsLabel::OnKeypress(int ,int )
 {
   return false;
 }

@@ -55,13 +55,14 @@ public:
   }
 
   virtual void Animate (csTicks current_time)
-  { /* do nothing */ }
+  { (void) current_time; /* do nothing */ }
 
   iGraphics2D *G2D() { return rG2D; }
   iGraphics3D *G3D() { return rG3D; }
 
   virtual void Show (csRect *area = NULL, iGraphics3D *g3d=NULL, uint8 Alpha=0)
-  { /* do nothing */ }
+  { (void) area; (void) g3d; (void) Alpha;/* do nothing */ }
 };
 
 #endif // __AWSCSCR_H__
+

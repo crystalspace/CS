@@ -66,7 +66,8 @@ private:
     virtual void DrawLine (float x1, float y1, float x2, float y2, int color);
     /// Draw a box
     virtual void DrawBox (int x, int y, int w, int h, int color);
-    virtual void SetRGB (int i, int r, int g, int b) {};
+    virtual void SetRGB (int i, int r, int g, int b)
+	{(void) i; (void) r; (void) g; (void) b; };
     /// Write a text string
     virtual void Write (iFont*, int x, int y, int fg, int bg, const char *text);
 
@@ -80,37 +81,47 @@ private:
     virtual int GetPixelBytes ();
     virtual csPixelFormat* GetPixelFormat (); 
     
-    virtual csImageArea *SaveArea (int x, int y, int w, int h) { return NULL; }
-    virtual void RestoreArea (csImageArea *Area, bool Free = true) {};
-    virtual void FreeArea (csImageArea *Area) {};
+    virtual csImageArea *SaveArea (int x, int y, int w, int h) 
+	{ (void) x; (void) y; (void) w; (void) h; return NULL; }
+    virtual void RestoreArea (csImageArea *Area, bool Free = true) 
+	{ (void) Area; (void) Free; };
+    virtual void FreeArea (csImageArea *Area) 
+	{ (void) Area; };
 
     virtual bool ClipLine (float &x1, float &y1, float &x2, float &y2,
       int xmin, int ymin, int xmax, int ymax)
       { return rG2D->ClipLine(x1, y1, x2, y2, xmin, ymin, xmax, ymax); }
     
     virtual iFontServer *GetFontServer ()
-    { return FontServer; }
+	{ return FontServer; }
 
     virtual int GetWidth () { return Width; }
     virtual int GetHeight () { return Height; }
     virtual csRGBpixel *GetPalette () { return NULL; }
     virtual void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB);
 
-    virtual bool PerformExtension (char const* command, ...) { return false; };
-    virtual bool PerformExtensionV (char const* command, va_list) { return false; };
+    virtual bool PerformExtension (char const* command, ...) 
+	{ (void) command; return false; };
+    virtual bool PerformExtensionV (char const* command, va_list)
+	{ (void) command; return false; };
     virtual iImage *ScreenShot () { return NULL; };
     virtual iGraphics2D *CreateOffScreenCanvas
     (int width, int height, void *buffer, bool alone_hint, 
      csPixelFormat *pfmt = NULL, csRGBpixel *palette = NULL, int pal_size = 0)
-    { return NULL; };
+    { (void) width; (void) height; (void) buffer; (void) alone_hint;
+      (void) pfmt; (void) palette; (void) pal_size; return NULL; };
 
     virtual void AllowResize (bool /*iAllow*/) { };
-    virtual bool Resize (int w, int h) { return false; };
+    virtual bool Resize (int w, int h) 
+	{ (void) w; (void) h; return false; };
     virtual iNativeWindow* GetNativeWindow () { return NULL; };
     virtual bool GetFullScreen () { return false; }
-    virtual void SetFullScreen (bool b) {};
-    virtual bool SetMousePosition (int x, int y) { return false; };
-    virtual bool SetMouseCursor (csMouseCursorID iShape) { return false; };
+    virtual void SetFullScreen (bool b) 
+	{ (void) b; };
+    virtual bool SetMousePosition (int x, int y)
+	{ (void) x; (void) y; return false; };
+    virtual bool SetMouseCursor (csMouseCursorID iShape)
+	{ (void) iShape; return false; };
 
     /**
      * This routine should be called before any draw operations.
@@ -347,3 +358,4 @@ public:
 };
 
 #endif // __AWSCMPT_H__
+
