@@ -42,9 +42,9 @@ chronological order.
 	  from a culler (for PVScalc).
 	- Jorrit fixed a missing semi-colon in xwindow.cpp.
 22-Dec-2004
-	- Philipp Aumayr fixed a bug in the thing where the bounding box was not
-	  invalidated when a quad was added.. this fixes a culling probs with
-	  objects created at runtime.
+	- Philipp Aumayr fixed a bug in the thing where the bounding box was
+	  not invalidated when a quad was added.. this fixes a culling probs
+	  with objects created at runtime.
 21-Dec-2004
 	- Eric Sunshine generalized `jobber.pl' to make it project-agnostic. It
 	  can now be used by any project for performing maintenance tasks.  The
