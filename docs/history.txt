@@ -12,6 +12,12 @@ The history order is reversed so that new features are at the top.
 	  all now inherit from.
 	  It should now be ready for use, and I leave that to
 	  Anders and Marten :-)
+	- Jorrit attempted to fix the perl plugin but only partially succeeded.
+	  Down to one error (with mingw/msys):
+	    plugins/cscript/csperl5/cswigpl5.inc: In function
+	    `void _wrap_scfInitialize(PerlInterpreter *, CV *)':
+	    plugins/cscript/csperl5/cswigpl5.inc:4575: `argv' undeclared
+	    (first use this function)
 23-Jun-2003
         - Boyan did the following in AWS:
           - Added iAwsComponent->GetFirstFocusableChild

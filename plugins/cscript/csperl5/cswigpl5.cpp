@@ -10,6 +10,7 @@
 
 */
 
+#include "cssysdef.h"
 #include "css.h"
 #undef MIN
 #undef MAX
