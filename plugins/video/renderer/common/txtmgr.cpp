@@ -209,16 +209,18 @@ void csMaterialHandle::FreeMaterial ()
     material->DecRef ();
     material = NULL;
   }
-  if (texture)
-  {
-    texture->DecRef ();
-    texture = NULL;
-  }
 }
 
 void csMaterialHandle::Prepare ()
 {
-  // nothing to do
+  if (material)
+  {
+    if (texture) texture->DecRef ();
+    texture = material->GetTexture ();
+    if (texture) texture->IncRef ();
+    material->GetReflection (diffuse, ambient, reflection);
+    material->GetFlatColor (flat_color);
+  }
 }
 
 //------------------------------------------------------------ csTexture -----//

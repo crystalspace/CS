@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "cssys/sysdriv.h"
+#include "cssys/csendian.h"
 #include "video/canvas/openglcommon/glcommon2d.h"
 #include "video/canvas/common/scrshot.h"
 #include "csutil/csrect.h"
@@ -413,6 +414,22 @@ iImage *csGraphics2DGLCommon::ScreenShot ()
 		    GL_UNSIGNED_BYTE, screen_shot);
       break;
   }
+
+#if defined (CS_BIG_ENDIAN)
+  // On big endian and 32-bit displays we swap the RGBA
+  // colors.
+  if (pfmt.PixelBytes == 4)
+  {
+    ulong* s = (ulong*)screen_shot;
+    int i;
+    for (i = 0 ; i < Width*Height ; i++)
+    {
+    	*s = convert_endian (*s);
+	s++;
+    }
+  }
+#endif
+
   csScreenShot *ss = new csScreenShot (this);
 
   delete [] screen_shot;
