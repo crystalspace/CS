@@ -36,6 +36,11 @@
 
 // Plugin stuff
 
+SCF_IMPLEMENT_IBASE(csBaseProctexType);
+  SCF_IMPLEMENTS_INTERFACE(iTextureType);
+  SCF_IMPLEMENTS_INTERFACE(iComponent);
+SCF_IMPLEMENT_IBASE_END;
+
 SCF_IMPLEMENT_IBASE(csBaseProctexLoader);
   SCF_IMPLEMENTS_INTERFACE(iLoaderPlugin);
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent);
@@ -45,17 +50,16 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csBaseProctexLoader::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_IBASE(csBaseProctexType);
-  SCF_IMPLEMENTS_INTERFACE(iTextureType);
-  SCF_IMPLEMENTS_INTERFACE(iComponent);
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE (csBaseProctexSaver)
+  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csBaseProctexSaver::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 CS_IMPLEMENT_PLUGIN
-
-SCF_IMPLEMENT_FACTORY(csPtDotsLoader);
-SCF_IMPLEMENT_FACTORY(csPtPlasmaLoader);
-SCF_IMPLEMENT_FACTORY(csPtWaterLoader);
-
 
 //---------------------------------------------------------------------------
 // Base for all PT types
@@ -113,47 +117,23 @@ csPtr<iBase> csBaseProctexLoader::PrepareProcTex (csProcTexture* pt)
 }
 
 //---------------------------------------------------------------------------
-// 'Dots' loader.
+// Base for all PT Savers
 
-csPtDotsLoader::csPtDotsLoader(iBase *p) : csBaseProctexLoader(p)
+csBaseProctexSaver::csBaseProctexSaver (iBase* p)
 {
+  SCF_CONSTRUCT_IBASE (p);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
-csPtr<iBase> csPtDotsLoader::Parse (iDocumentNode* node, 
-				    iLoaderContext* ldr_context,
-  				    iBase* context)
+csBaseProctexSaver::~csBaseProctexSaver ()
 {
-  csRef<csProcTexture> pt = csPtr<csProcTexture> (new csProcDots ());
-  return PrepareProcTex (pt);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
-//---------------------------------------------------------------------------
-// 'Water' loader.
-
-csPtWaterLoader::csPtWaterLoader(iBase *p) : csBaseProctexLoader(p)
+bool csBaseProctexSaver::Initialize (iObjectRegistry* object_reg)
 {
+  csBaseProctexSaver::object_reg = object_reg;
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  return true;
 }
-
-csPtr<iBase> csPtWaterLoader::Parse (iDocumentNode* node, 
-				    iLoaderContext* ldr_context,
-  				    iBase* context)
-{
-  csRef<csProcTexture> pt = csPtr<csProcTexture> (new csProcWater ());
-  return PrepareProcTex (pt);
-}
-
-//---------------------------------------------------------------------------
-// 'Plasma' loader.
-
-csPtPlasmaLoader::csPtPlasmaLoader(iBase *p) : csBaseProctexLoader(p)
-{
-}
-
-csPtr<iBase> csPtPlasmaLoader::Parse (iDocumentNode* node, 
-				      iLoaderContext* ldr_context,
-  				      iBase* context)
-{
-  csRef<csProcTexture> pt = csPtr<csProcTexture> (new csProcPlasma ());
-  return PrepareProcTex (pt);
-}
-

@@ -30,8 +30,9 @@
 #include "stdproctex.h"
 #include "fire.h"
 
-SCF_IMPLEMENT_FACTORY(csPtFireType);
-SCF_IMPLEMENT_FACTORY(csPtFireLoader);
+SCF_IMPLEMENT_FACTORY(csPtFireType)
+SCF_IMPLEMENT_FACTORY(csPtFireLoader)
+SCF_IMPLEMENT_FACTORY(csPtFireSaver)
 
 #define CLASSID_FIRETYPE "crystalspace.texture.type.fire"
 
@@ -42,21 +43,22 @@ csPtFireType::csPtFireType (iBase* p) : csBaseProctexType(p)
 csPtr<iTextureFactory> csPtFireType::NewFactory()
 {
   return csPtr<iTextureFactory> (new csPtFireFactory (
-    (iComponent*)this, 
-    object_reg));
+    this, object_reg));
 }
 
 //---------------------------------------------------------------------------
 // 'Fire' PT factory
 
-csPtFireFactory::csPtFireFactory (iBase* p, iObjectRegistry* object_reg) : 
+csPtFireFactory::csPtFireFactory (iTextureType* p, iObjectRegistry* object_reg) : 
     csBaseTextureFactory (p, object_reg)
 {
 }
 
 csPtr<iTextureWrapper> csPtFireFactory::Generate ()
 {
-  csRef<csProcTexture> pt = csPtr<csProcTexture> (new csProcFire (width, height));
+  csRef<csProcTexture> pt = 
+    csPtr<csProcTexture> (new csProcFire (this, width, height));
+
   if (pt->Initialize (object_reg))
   {
     csRef<iTextureWrapper> tw = pt->GetTextureWrapper ();
@@ -175,4 +177,16 @@ csPtr<iBase> csPtFireLoader::Parse (iDocumentNode* node,
   }
 
   return csPtr<iBase> (tex);
+}
+
+//---------------------------------------------------------------------------
+// 'Fire' saver.
+
+csPtFireSaver::csPtFireSaver (iBase* p) : csBaseProctexSaver(p)
+{
+}
+
+bool csPtFireSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+{
+  return true;
 }

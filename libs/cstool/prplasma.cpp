@@ -28,7 +28,7 @@
 #include "cstool/prplasma.h"
 
 /// the implementation of the plasma texture
-csProcPlasma::csProcPlasma () : csProcTexture()
+csProcPlasma::csProcPlasma (iTextureFactory* p) : csProcTexture(p)
 {
   palsize = 0;
   palette = 0;

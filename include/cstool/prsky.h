@@ -47,7 +47,7 @@ class CS_CSTOOL_EXPORT csProcSkyTexture : public csProcTexture
 
 public:
   /// create, given a sky it belongs to.
-  csProcSkyTexture(csProcSky *par);
+  csProcSkyTexture(iTextureFactory* p, csProcSky *par);
   ///
   virtual ~csProcSkyTexture();
 

@@ -29,9 +29,9 @@
 #include "iutil/eventh.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
+#include "itexture/itexfact.h"
 #include "csqint.h"
 
-struct iTextureWrapper;
 struct iMaterialWrapper;
 struct iEngine;
 
@@ -40,6 +40,17 @@ struct iTextureManager;
 struct iTextureWrapper;
 
 class ProcEventHandler;
+
+SCF_VERSION (iProcTexCallback, 0, 0, 1);
+
+/**
+ * A callback for when a iTextureWrapper is used.
+ */
+struct iProcTexCallback : public iBase
+{
+  /// Get csProcTexture.
+  virtual iProcTexture* GetProcTexture() const = 0;
+};
 
 /**
  * Generic superclass for procedural textures. This class
@@ -116,6 +127,7 @@ protected:
 
     virtual bool GetAlwaysAnimate ();
     virtual void SetAlwaysAnimate (bool enable);
+    virtual iTextureFactory* GetFactory();
   } scfiProcTexture;
   friend struct eiProcTexture;
 
@@ -128,10 +140,13 @@ public:
 private:
   static void ProcCallback (iTextureWrapper* txt, void* data);
 
+  /// Parent factory
+  csRef<iTextureFactory> parent;
+
 public:
   SCF_DECLARE_IBASE_EXT (csObject);
 
-  csProcTexture ();
+  csProcTexture (iTextureFactory* p = 0);
   virtual ~csProcTexture ();
 
   iGraphics3D* GetG3D () { return g3d; }
@@ -203,6 +218,7 @@ public:
   /// Get the texture corresponding with this procedural texture.
   iTextureWrapper* GetTextureWrapper ()
   { return &scfiTextureWrapper; /*return tex;*/ }
+
 };
 
 

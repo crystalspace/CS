@@ -55,7 +55,7 @@ private:
 
 public:
   /// Create a new texture.
-  csProcWater ();
+  csProcWater (iTextureFactory* p);
   ///
   virtual ~csProcWater ();
 

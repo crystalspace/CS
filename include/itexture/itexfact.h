@@ -31,6 +31,7 @@
 #include "csutil/scf.h"
 
 struct iTextureWrapper;
+struct iTextureType;
 
 SCF_VERSION (iTextureFactory, 0, 0, 1);
 
@@ -54,6 +55,10 @@ struct iTextureFactory : public iBase
    * Get the size of the texture to be created.
    */
   virtual void GetSize (int& w, int& h) = 0;
+  /**
+   * Get the TextureType for this texture factory.
+   */
+  virtual iTextureType* GetTextureType () const = 0;
 };
 
 SCF_VERSION (iTextureType, 0, 0, 1);

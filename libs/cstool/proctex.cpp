@@ -125,7 +125,7 @@ SCF_IMPLEMENT_IBASE_EXT (csProcTexture)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iProcTexture)
 SCF_IMPLEMENT_IBASE_EXT_END
 
-csProcTexture::csProcTexture ()
+csProcTexture::csProcTexture (iTextureFactory* p)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiProcTexture);
@@ -140,6 +140,7 @@ csProcTexture::csProcTexture ()
   anim_prepared = false;
   always_animate = false;
   visible = false;
+  parent = p;
 }
 
 csProcTexture::~csProcTexture ()
@@ -167,17 +168,19 @@ iEventHandler* csProcTexture::SetupProcEventHandler (
   return proceh;
 }
 
-struct csProcTexCallback : public iTextureCallback
+struct csProcTexCallback : public iTextureCallback, iProcTexCallback
 {
   csRef<csProcTexture> pt;
   SCF_DECLARE_IBASE;
   csProcTexCallback () { SCF_CONSTRUCT_IBASE (0); }
   virtual ~csProcTexCallback () { SCF_DESTRUCT_IBASE(); }
   virtual void UseTexture (iTextureWrapper*);
+  virtual iProcTexture* GetProcTexture() const;
 };
 
 SCF_IMPLEMENT_IBASE (csProcTexCallback)
   SCF_IMPLEMENTS_INTERFACE (iTextureCallback)
+  SCF_IMPLEMENTS_INTERFACE (iProcTexCallback)
 SCF_IMPLEMENT_IBASE_END
 
 void csProcTexCallback::UseTexture (iTextureWrapper*)
@@ -185,6 +188,10 @@ void csProcTexCallback::UseTexture (iTextureWrapper*)
   if (!pt->PrepareAnim ()) return;
   pt->visible = true;
   ((ProcEventHandler*)(iEventHandler*)(pt->proceh))->PushTexture (pt);
+}
+iProcTexture* csProcTexCallback::GetProcTexture() const
+{
+  return &pt->scfiProcTexture;
 }
 
 bool csProcTexture::Initialize (iObjectRegistry* object_reg)
@@ -369,3 +376,8 @@ void csProcTexture::eiProcTexture::SetAlwaysAnimate (bool enable)
 {
   scfParent->SetAlwaysAnimate (enable);
 }
+iTextureFactory* csProcTexture::eiProcTexture::GetFactory()
+{
+  return scfParent->parent;
+}
+

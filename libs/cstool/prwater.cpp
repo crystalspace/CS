@@ -28,7 +28,7 @@
 #include "cstool/prwater.h"
 
 /// the implementation of the water texture
-csProcWater::csProcWater () : csProcTexture()
+csProcWater::csProcWater (iTextureFactory* p) : csProcTexture(p)
 {
   palsize = 0;
   palette = 0;

@@ -27,7 +27,7 @@
 #include "cstool/prdots.h"
 
 /// the implementation of the dots texture
-csProcDots::csProcDots () : csProcTexture()
+csProcDots::csProcDots (iTextureFactory* p) : csProcTexture(p)
 {
   palsize = 0;
   palette = 0;

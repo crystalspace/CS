@@ -44,11 +44,13 @@ protected:
   int width;
   /// Height parameter
   int height;
+  /// Texture Type
+  iTextureType* texture_type;
 
 public:
   SCF_DECLARE_IBASE;
 
-  csBaseTextureFactory (iBase* parent, iObjectRegistry* object_reg);
+  csBaseTextureFactory (iTextureType* parent, iObjectRegistry* object_reg);
   virtual ~csBaseTextureFactory();
   
   /**
@@ -59,6 +61,10 @@ public:
    * Get the size of the texture to be created.
    */
   virtual void GetSize (int& w, int& h);
+  /**
+   * Get the TextureType for this texture factory.
+   */
+  virtual iTextureType* GetTextureType () const;
 };
 
 #endif

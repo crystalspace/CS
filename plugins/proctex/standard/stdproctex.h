@@ -24,6 +24,8 @@
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "imap/reader.h"
+#include "imap/services.h"
+#include "imap/writer.h"
 #include "itexture/itexfact.h"
 
 class csProcTexture;
@@ -67,31 +69,29 @@ public:
   } scfiComponent;
 };  
 
-class csPtDotsLoader : public csBaseProctexLoader
+class csBaseProctexSaver : public iSaverPlugin
 {
+private:
+  iObjectRegistry* object_reg;
+  csRef<iSyntaxService> synldr;
+
 public:
-  csPtDotsLoader(iBase *p);
+  SCF_DECLARE_IBASE;
 
-  virtual csPtr<iBase> Parse (iDocumentNode* node,
-    iLoaderContext* ldr_context, iBase* context);
-};
+  csBaseProctexSaver (iBase*);
+  virtual ~csBaseProctexSaver ();
 
-class csPtWaterLoader : public csBaseProctexLoader
-{
-public:
-  csPtWaterLoader(iBase *p);
+  bool Initialize (iObjectRegistry* p);
 
-  virtual csPtr<iBase> Parse (iDocumentNode* node, 
-    iLoaderContext* ldr_context, iBase* context);
-};
+  virtual bool WriteDown (iBase *obj, iDocumentNode* parent) = 0;
 
-class csPtPlasmaLoader : public csBaseProctexLoader
-{
-public:
-  csPtPlasmaLoader(iBase *p);
-
-  virtual csPtr<iBase> Parse (iDocumentNode* node, 
-    iLoaderContext* ldr_context, iBase* context);
+  struct eiComponent : public iComponent
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csBaseProctexSaver);
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize (p); }
+  } scfiComponent;
+  friend struct eiComponent;
 };
 
 #endif

@@ -159,7 +159,7 @@ void csAnimateProctexLoader::Report (int severity, iDocumentNode* node,
 
 //----------------------------------------------------------------------------
 
-csProcAnimated::csProcAnimated (iImage* img)
+csProcAnimated::csProcAnimated (iImage* img) : csProcTexture()
 {
   image = img;
   animation = csPtr<iAnimatedImage>

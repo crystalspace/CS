@@ -8,6 +8,23 @@ chronological order.
 
 20-Sep-2004
         - Andrew Craig fixed memory leak in csparser.
+	- PK did the following:
+	    - Implemented loader, saver and type for each procedural textures.
+	    - Added a iTextureFactory* parameter to the following constructors:
+	        - csBaseTextureFactory
+	        - csProcTexture
+	        - csProcDots
+	        - csProcFire
+	        - csProcPlasma
+	        - csProcSkyTexture
+	        - csProcWater
+	    - Added csHaloType GetType () to iBaseHalo.
+	    - Added iBaseHalo* GetHalo () to iLight.
+	    - Added iTextureFactory* GetFactory() to iProcTexture.
+	    - Added iTextureType* GetTextureType () to the iTextureFactory.
+	    - Implemented iTextureType* csBaseTextureFactory::GetTextureType().
+	    - Improved the iSaver.
+	    - Corrected some wrong savings in gmeshldr and spr3dldr.
 19-Sep-2004
 	- Eric Sunshine fixed the Jam 'install' target so that it also installs
 	  Marten's new parallax data files.

@@ -672,10 +672,13 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 
     //Writedown DefaultColor tag
     csColor col = gfact->GetColor();
-    csRef<iDocumentNode> colorNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    colorNode->SetValue("defaultcolor");
-    synldr->WriteColor(colorNode, &col);
+    if (col.red != 0 || col.green != 0 || col.blue != 0)
+    {
+      csRef<iDocumentNode> colorNode = 
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      colorNode->SetValue("defaultcolor");
+      synldr->WriteColor(colorNode, &col);
+    }
 
     //Write Color Tags
     if (!gfact->IsLighting())
@@ -694,20 +697,23 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
     synldr->WriteBool(paramsNode, "lighting", gfact->IsLighting(), true);
 
     //Writedown Back2Front tag
-    synldr->WriteBool(paramsNode, "back2front", gfact->IsBack2Front(), true);
+    if (gfact->IsBack2Front())
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
+        ->SetValue("back2front");
 
     //Writedown NoShadows tag
     if (!gfact->IsShadowCasting())
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("noshadows");
 
     //Writedown LocalShadows tag
-    if (!gfact->IsShadowReceiving())
+    if (gfact->IsShadowReceiving())
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
         ->SetValue("localshadows");
 
     //Writedown ManualColor tag
-    synldr->WriteBool(paramsNode, "manualcolors", 
-                      gfact->IsManualColors(), true);
+    if (gfact->IsManualColors())
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
+        ->SetValue("manualcolors");
 
     //Writedown Mixmode tag
     int mixmode = gfact->GetMixMode();

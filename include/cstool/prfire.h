@@ -79,7 +79,7 @@ public:
   SCF_DECLARE_IBASE_EXT(csProcTexture);
 
   /// Create a new texture.
-  csProcFire (int w = 128, int h = 128);
+  csProcFire (iTextureFactory* p, int w = 128, int h = 128);
   ///
   virtual ~csProcFire ();
 

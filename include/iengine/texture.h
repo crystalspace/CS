@@ -28,6 +28,7 @@
 #include "csutil/scf.h"
 #include "cstypes.h"
 
+class csProcTexture;
 struct iImage;
 struct iTextureHandle;
 struct iTextureManager;

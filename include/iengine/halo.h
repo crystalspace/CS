@@ -54,6 +54,8 @@ struct iBaseHalo : public iBase
   virtual void SetIntensity (float i) = 0;
   /// Get intensity.
   virtual float GetIntensity () = 0;
+  /// Get halo type.
+  virtual csHaloType GetType () = 0;
 };
 
 SCF_VERSION (iCrossHalo, 0, 0, 1);

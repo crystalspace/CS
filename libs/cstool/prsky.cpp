@@ -27,7 +27,8 @@
 #include "iutil/objreg.h"
 
 //---------- csProcSkyTexture ------------------------------------
-csProcSkyTexture::csProcSkyTexture(csProcSky *par) : csProcTexture()
+csProcSkyTexture::csProcSkyTexture(iTextureFactory* p,csProcSky *par)
+: csProcTexture(p)
 {
   sky = par;
   mat_w = 256;

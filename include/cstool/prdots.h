@@ -44,7 +44,7 @@ private:
 
 public:
   /// Create a new texture.
-  csProcDots ();
+  csProcDots (iTextureFactory* p);
   ///
   virtual ~csProcDots ();
 

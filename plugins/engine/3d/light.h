@@ -28,9 +28,9 @@
 #include "csutil/refarr.h"
 #include "plugins/engine/3d/lview.h"
 #include "iengine/light.h"
+#include "plugins/engine/3d/halo.h"
 
 class csLightMap;
-class csHalo;
 class csPolygon3D;
 class csCurve;
 class csKDTreeChild;
@@ -401,7 +401,7 @@ public:
     { scfParent->AddAffectedLightingInfo (li); }
     virtual void RemoveAffectedLightingInfo (iLightingInfo* li)
     { scfParent->RemoveAffectedLightingInfo (li); }
-
+    virtual iBaseHalo* GetHalo () { return scfParent->GetHalo (); }
     virtual void Setup ()
     { scfParent->CalculateLighting (); }
   } scfiLight;

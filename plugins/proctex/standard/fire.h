@@ -34,7 +34,7 @@ public:
 class csPtFireFactory : public csBaseTextureFactory
 {
 public:
-  csPtFireFactory (iBase* p, iObjectRegistry* object_reg);
+  csPtFireFactory (iTextureType* p, iObjectRegistry* object_reg);
   virtual csPtr<iTextureWrapper> Generate ();
 };
 
@@ -48,6 +48,14 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node, 
     iLoaderContext* ldr_context, iBase* context);
+};
+
+class csPtFireSaver : public csBaseProctexSaver
+{
+public:
+  csPtFireSaver(iBase *p);
+
+  virtual bool WriteDown (iBase *obj, iDocumentNode* parent);
 };
 
 #endif 

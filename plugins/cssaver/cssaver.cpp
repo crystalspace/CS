@@ -49,6 +49,13 @@
 #include "imesh/thing.h"
 #include "iengine/renderloop.h"
 #include "iengine/sharevar.h"
+#include "plugins/engine/3d/halo.h"
+#include "ivideo/halo.h"
+#include "iengine/halo.h"
+#include "itexture/ifire.h"
+#include "itexture/itexfact.h"
+#include "itexture/iproctex.h"
+#include "cstool/proctex.h"
 
 #define ONE_OVER_256 (1.0/255.0)
 
@@ -150,9 +157,42 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
 	  csColor(r * ONE_OVER_256, g * ONE_OVER_256, b * ONE_OVER_256));
       }
     }
-    else
-    {
-    }
+
+    iTextureCallback* texCb = texWrap->GetUseCallback();
+    if (!texCb) continue;
+
+    csRef<iProcTexCallback> proctexCb = 
+      SCF_QUERY_INTERFACE(texCb, iProcTexCallback);
+    if (!proctexCb) continue;
+
+    iProcTexture* proctex = proctexCb->GetProcTexture();
+    if (!proctex) continue;
+
+    iTextureFactory* texfact = proctex->GetFactory();
+    if (!texfact) continue;
+
+    iTextureType* textype = texfact->GetTextureType();
+    if (!textype) continue;
+
+    csRef<iFactory> fact = SCF_QUERY_INTERFACE(textype, iFactory);
+    if (!fact) continue;
+
+    char loadername[128] = "";
+    csFindReplace(loadername, fact->QueryClassID(), ".type.", ".loader.",128);
+    CreateValueNode(child, "type", loadername);
+
+    char savername[128] = "";
+    csFindReplace(savername, fact->QueryClassID(), ".type.", ".saver.", 128);
+
+    //Invoke the iSaverPlugin::WriteDown
+    csRef<iPluginManager> plugin_mgr = 
+      CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    csRef<iSaverPlugin> saver = 
+      CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
+    if (!saver) 
+      saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
+    if (saver)
+      saver->WriteDown(proctex, child);
   }
   return true;
 }
@@ -545,7 +585,7 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList,
 
     const char* pluginname = factory->QueryClassID();
 
-    if (!(pluginname && *pluginname)) return false;
+    if (!(pluginname && *pluginname)) continue;
 
     csRef<iDocumentNode> pluginNode = CreateNode(factNode, "plugin");
 
@@ -597,7 +637,7 @@ bool csSaver::SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent)
     if (portal) 
     {
       for (int i=0; i<portal->GetPortalCount(); i++)
-        if (!SavePortals(portal->GetPortal(i), parent)) return false;
+        if (!SavePortals(portal->GetPortal(i), parent)) continue;
 
       continue;
     }
@@ -750,17 +790,78 @@ bool csSaver::SaveSectorLights(iSector *s, iDocumentNode *parent)
     centerNode->SetAttributeAsFloat("y", center.y);
     centerNode->SetAttributeAsFloat("z", center.z);
 
-    //Add the light center node
+    //Add the light radius node
     float radius = light->GetInfluenceRadius();
     csRef<iDocumentNode> radiusNode = CreateNode(lightNode, "radius");
     radiusNode->CreateNodeBefore(CS_NODE_TEXT)->SetValueAsFloat(radius);
 
-    //Add the light center node
+    //Add the light color node
     csColor color = light->GetColor();
-    csRef<iDocumentNode> colorNode = CreateNode(lightNode, "center");
+    csRef<iDocumentNode> colorNode = CreateNode(lightNode, "color");
     colorNode->SetAttributeAsFloat("red", color.red);
     colorNode->SetAttributeAsFloat("green", color.green);
     colorNode->SetAttributeAsFloat("blue", color.blue);
+
+    iBaseHalo* halo = light->GetHalo();
+
+    if (halo)
+    {
+      csRef<iDocumentNode> haloNode = CreateNode(lightNode, "halo");
+
+      switch (halo->GetType())
+      {
+        case cshtCross:
+        {
+          csRef<iCrossHalo> cross = SCF_QUERY_INTERFACE(halo, iCrossHalo);
+          csRef<iDocumentNode> typeNode = CreateNode(haloNode, "type");
+          typeNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue("cross");
+
+          float intensity = cross->GetIntensityFactor();
+          csRef<iDocumentNode>intensityNode = CreateNode(haloNode, "intensity");
+          intensityNode->CreateNodeBefore(CS_NODE_TEXT)
+            ->SetValueAsInt(intensity);
+
+          float crossfact = cross->GetCrossFactor();
+          csRef<iDocumentNode>crossfactNode = CreateNode(haloNode, "cross");
+          crossfactNode->CreateNodeBefore(CS_NODE_TEXT)
+            ->SetValueAsFloat(crossfact);
+
+          break;
+        }
+        case cshtNova:
+        {
+          csRef<iNovaHalo> nova = SCF_QUERY_INTERFACE(halo, iNovaHalo);
+          csRef<iDocumentNode> typeNode = CreateNode(haloNode, "type");
+          typeNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue("nova");
+
+          int seed = nova->GetRandomSeed();
+          csRef<iDocumentNode>seedNode = CreateNode(haloNode, "seed");
+          seedNode->CreateNodeBefore(CS_NODE_TEXT)->SetValueAsInt(seed);
+
+          int numspokes = nova->GetSpokeCount();
+          csRef<iDocumentNode>numspokesNode = CreateNode(haloNode, "numspokes");
+          numspokesNode->CreateNodeBefore(CS_NODE_TEXT)
+            ->SetValueAsInt(numspokes);
+
+          float roundness = nova->GetRoundnessFactor();
+          csRef<iDocumentNode>roundnessNode = CreateNode(haloNode, "roundness");
+          roundnessNode->CreateNodeBefore(CS_NODE_TEXT)
+            ->SetValueAsFloat(roundness);
+
+          break;
+        }
+        case cshtFlare:
+        {
+          csRef<iFlareHalo> flare = SCF_QUERY_INTERFACE(halo, iFlareHalo);
+          csRef<iDocumentNode> typeNode = CreateNode(haloNode, "type");
+          typeNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue("flare");
+
+          //TBD: implement the saving of flare halos
+
+          break;
+        }
+      }
+    }
   }
   return true;
 }

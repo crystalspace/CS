@@ -21,10 +21,10 @@
 #define __CS_HALO_H__
 
 #include "csgeom/math3d.h"
-#include "plugins/engine/3d/light.h"
 #include "ivideo/halo.h"
 #include "iengine/halo.h"
 
+class csLight;
 class csEngine;
 struct iCamera;
 struct iMaterialWrapper;
@@ -54,6 +54,8 @@ public:
   virtual float GetIntensity () { return Intensity; }
   /// Set halo intensity
   virtual void SetIntensity (float iInt) { Intensity = iInt; }
+  /// Get halo type.
+  virtual csHaloType GetType () { return Type; }
 
   SCF_DECLARE_IBASE;
 };

@@ -36,7 +36,7 @@ SCF_IMPLEMENT_IBASE_EXT(csProcFire)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 /// the implementation of the fire texture
-csProcFire::csProcFire (int w, int h) : csProcTexture()
+csProcFire::csProcFire (iTextureFactory* p,int w, int h) : csProcTexture(p)
 {
   palsize = 0;
   palette = 0;

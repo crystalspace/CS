@@ -35,6 +35,7 @@ class csFlags;
 struct iLight;
 struct iSector;
 struct iObject;
+struct iBaseHalo;
 struct iCrossHalo;
 struct iNovaHalo;
 struct iFlareHalo;
@@ -313,6 +314,9 @@ struct iLight : public iBase
   	float roundness) = 0;
   /// Create a flare halo for this light.
   virtual iFlareHalo* CreateFlareHalo () = 0;
+
+  /// Return the associated halo
+  virtual iBaseHalo* GetHalo () = 0;
 
   /// Get the brightness of a light at a given distance.
   virtual float GetBrightnessAtDistance (float d) = 0;

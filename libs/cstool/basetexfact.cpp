@@ -25,13 +25,15 @@ SCF_IMPLEMENT_IBASE (csBaseTextureFactory)
   SCF_IMPLEMENTS_INTERFACE (iTextureFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csBaseTextureFactory::csBaseTextureFactory (iBase* parent, 
+csBaseTextureFactory::csBaseTextureFactory (iTextureType* parent, 
 					    iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE (parent);
   
   csBaseTextureFactory::object_reg = object_reg;
   
+  texture_type = parent;
+
   width = 128;
   height = 128;
 }
@@ -49,4 +51,9 @@ void csBaseTextureFactory::SetSize (int w, int h)
 void csBaseTextureFactory::GetSize (int& w, int& h)
 {
   w = width; h = height;
+}
+
+iTextureType* csBaseTextureFactory::GetTextureType () const
+{
+  return texture_type;
 }

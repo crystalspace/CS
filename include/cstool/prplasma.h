@@ -57,7 +57,7 @@ private:
 
 public:
   /// Create a new texture.
-  csProcPlasma ();
+  csProcPlasma (iTextureFactory* p);
   ///
   virtual ~csProcPlasma ();
 
