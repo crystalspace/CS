@@ -45,8 +45,16 @@ case * :		# posix/unix/linux mode
 		printf.cpp
 		resdir.cpp
 		runloop.cpp 
-		scanplugins.cpp
 		sysroot.cpp ;
+  if $(LIBBFD.AVAILABLE) = yes && $(OBJCOPY.AVAILABLE) = "yes"
+  {
+    SYSFILES += bfdplugins.cpp ;
+    LibExternalLibs cssys : LIBBFD ;
+  }
+  else
+  {
+    SYSFILES += scanplugins.cpp ;
+  }
 }
 
 Library cssys :

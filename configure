@@ -314,7 +314,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX FLEXBIN BISONBIN DOXYGEN TEXI2DVI DVIPS DVIPDF MAKEINFO INSTALL RANLIB ac_ct_RANLIB SWIGBIN MAKE JAM SET_MAKE NASM MAKEDEP PERL PYTHON CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP FT2_CONFIG FT2_CFLAGS FT2_LIBS CXXCPP LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX FLEXBIN BISONBIN DOXYGEN TEXI2DVI DVIPS DVIPDF MAKEINFO INSTALL RANLIB ac_ct_RANLIB SWIGBIN MAKE JAM SET_MAKE NASM MAKEDEP PERL PYTHON CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP FT2_CONFIG FT2_CFLAGS FT2_LIBS OBJCOPY CXXCPP LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -949,6 +949,9 @@ Optional Packages:
                           automatically; searches dir, dir/include, and
                           dir/lib
   --with-libSDL=dir       specify location of libSDL if not detected
+                          automatically; searches dir, dir/include, and
+                          dir/lib
+  --with-libbfd=dir       specify location of libbfd if not detected
                           automatically; searches dir, dir/include, and
                           dir/lib
 
@@ -20301,6 +20304,504 @@ else
 fi
 
 
+#------------------------------------------------------------------------------
+# Check if libbfd is present (part of GNU binutils).
+#------------------------------------------------------------------------------
+
+# Check whether --with-libbfd or --without-libbfd was given.
+if test "${with_libbfd+set}" = set; then
+  withval="$with_libbfd"
+
+fi;
+
+    if test -z "$with_libbfd"; then
+  with_libbfd=yes
+fi
+
+    if test "$with_libbfd" != no; then
+  # If --with-lib value is same as cached value, then assume other
+	 # cached values are also valid; otherwise, ignore all cached values.
+	if test "$with_libbfd" != "$cs_cv_with_libbfd"; then
+  cs_ignore_cache=yes
+else
+  cs_ignore_cache=no
+fi
+
+
+	if test $with_libbfd != yes; then
+  cs_check_lib_paths=$with_libbfd
+else
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+fi
+
+
+	cs_check_lib_flags=''
+    for cs_lib_item in $cs_check_lib_paths
+    do
+	case $cs_lib_item in
+	    *\|*)
+    set filler `echo "$cs_lib_item" | awk 'BEGIN { FS="|" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_check_incdir=''
+else
+  if test "$1" = filler; then
+  cs_check_incdir=''
+else
+  cs_check_incdir=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_check_libdir=''
+else
+  if test "$1" = filler; then
+  cs_check_libdir=''
+else
+  cs_check_libdir=$1
+fi
+
+	shift
+fi
+
+		if test -n "$cs_check_incdir"; then
+  cs_check_lib_cflag="-I$cs_check_incdir"
+else
+  cs_check_lib_cflag=''
+fi
+
+    if test -n "$cs_check_libdir"; then
+  cs_check_lib_lflag="-L$cs_check_libdir"
+else
+  cs_check_lib_lflag=''
+fi
+
+    if test -n "bfd"; then
+  cs_check_lib_libs="-lbfd"
+else
+  cs_check_lib_libs=''
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		;;
+	    *)  if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
+else
+  cs_check_lib_cflag=''
+fi
+
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
+else
+  cs_check_lib_lflag=''
+fi
+
+    if test -n "bfd"; then
+  cs_check_lib_libs="-lbfd"
+else
+  cs_check_lib_libs=''
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
+else
+  cs_check_lib_cflag=''
+fi
+
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
+else
+  cs_check_lib_lflag=''
+fi
+
+    if test -n "bfd"; then
+  cs_check_lib_libs="-lbfd"
+else
+  cs_check_lib_libs=''
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		;;
+	esac
+    done
+
+	if test "$cs_ignore_cache" != yes; then
+  echo "$as_me:$LINENO: checking for libbfd" >&5
+echo $ECHO_N "checking for libbfd... $ECHO_C" >&6
+if test "${cs_cv_libbfd+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+    for cs_build_item in $cs_check_lib_flags
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test -liberty $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <bfd.h>
+int
+main ()
+{
+bfd_init();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes
+	    break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+    done
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test -liberty | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libbfd=yes
+		cs_cv_libbfd_cflags=$cs_build_cflags
+		cs_cv_libbfd_lflags=$cs_build_lflags
+		cs_cv_libbfd_libs=$cs_build_libs
+else
+  cs_cv_libbfd=no
+fi
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_libbfd" >&5
+echo "${ECHO_T}$cs_cv_libbfd" >&6
+else
+  echo "$as_me:$LINENO: checking for libbfd" >&5
+echo $ECHO_N "checking for libbfd... $ECHO_C" >&6
+	    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+    for cs_build_item in $cs_check_lib_flags
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test -liberty $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <bfd.h>
+int
+main ()
+{
+bfd_init();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes
+	    break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+    done
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test -liberty | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libbfd=yes
+		cs_cv_libbfd_cflags=$cs_build_cflags
+		cs_cv_libbfd_lflags=$cs_build_lflags
+		cs_cv_libbfd_libs=$cs_build_libs
+else
+  cs_cv_libbfd=no
+fi
+
+	    echo "$as_me:$LINENO: result: $cs_cv_libbfd" >&5
+echo "${ECHO_T}$cs_cv_libbfd" >&6
+fi
+
+    if test $cs_cv_libbfd = yes; then
+  :
+else
+  cs_cv_libbfd_cflags=''
+	cs_cv_libbfd_lflags=''
+	cs_cv_libbfd_libs=''
+	:
+fi
+
+else
+  cs_cv_libbfd=no
+fi
+
+    cs_cv_with_libbfd="$with_libbfd"
+
+    if test "$cs_cv_libbfd" = yes; then
+  if test "$cs_cv_libbfd" = yes; then
+  cs_makefile_text="${cs_makefile_text}LIBBFD.AVAILABLE = yes
+"
+    cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.AVAILABLE ?= \"yes\" ;
+"
+	cs_result_cflags=`echo x$cs_cv_libbfd_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_result_lflags=`echo x$cs_cv_libbfd_lflags $cs_cv_libbfd_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	if test -n "$cs_result_cflags"; then
+  cs_makefile_text="${cs_makefile_text}LIBBFD.CFLAGS = $cs_result_cflags
+"
+    cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.CFLAGS ?= \"$cs_result_cflags\" ;
+"
+fi
+
+	if test -n "$cs_result_lflags"; then
+  cs_makefile_text="${cs_makefile_text}LIBBFD.LFLAGS = $cs_result_lflags
+"
+    cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.LFLAGS ?= \"$cs_result_lflags\" ;
+"
+fi
+
+fi
+
+else
+  :
+fi
+
+
+#------------------------------------------------------------------------------
+# Check if objcopy is present (part of GNU binutils).
+#------------------------------------------------------------------------------
+for ac_prog in objcopy
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_OBJCOPY+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$OBJCOPY"; then
+  ac_cv_prog_OBJCOPY="$OBJCOPY" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_OBJCOPY="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+OBJCOPY=$ac_cv_prog_OBJCOPY
+if test -n "$OBJCOPY"; then
+  echo "$as_me:$LINENO: result: $OBJCOPY" >&5
+echo "${ECHO_T}$OBJCOPY" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$OBJCOPY" && break
+done
+
+if test -n "$OBJCOPY"; then
+  cs_makefile_text="${cs_makefile_text}OBJCOPY.AVAILABLE = yes
+"
+    cs_jamconfig_text="${cs_jamconfig_text}OBJCOPY.AVAILABLE ?= \"yes\" ;
+"
+    cs_makefile_text="${cs_makefile_text}CMD.OBJCOPY = $OBJCOPY
+"
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJCOPY ?= \"$OBJCOPY\" ;
+"
+fi
 
 
 #------------------------------------------------------------------------------
@@ -25409,6 +25910,7 @@ s,@EGREP@,$EGREP,;t t
 s,@FT2_CONFIG@,$FT2_CONFIG,;t t
 s,@FT2_CFLAGS@,$FT2_CFLAGS,;t t
 s,@FT2_LIBS@,$FT2_LIBS,;t t
+s,@OBJCOPY@,$OBJCOPY,;t t
 s,@CXXCPP@,$CXXCPP,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t

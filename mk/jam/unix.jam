@@ -41,6 +41,16 @@ rule SystemLinkApplication
   Clean $(<)clean : $(target) ;
 }
 
+# Put the meta data into the object file headers
+rule ObjTagMetaData
+{
+  Depends $(<) : $(>) ;
+}
+actions ObjTagMetaData
+{
+  $(CMD.OBJCOPY) --add-section .crystal=$(>) $(<)
+}
+
 # SystemLinkPlugin target : objects : options
 #  do system specific actions needed for linking the plugin and construct
 #  correct clean targets.
@@ -50,17 +60,24 @@ rule SystemLinkPlugin
   
   Depends $(target) : $(>) ;
   LinkPlugin $(target) : $(>) ;
-  PluginMetaData $(<) : $($(<)_METAFILE) ;
+  if $(OBJCOPY.AVAILABLE) = "yes" && $(LIBBFD.AVAILABLE) = "yes"
+  {
+    ObjTagMetaData $(target) : $($(<)_METAFILE) ;
+  }
+  else
+  {
+    PluginMetaData $(<) : $($(<)_METAFILE) ;
+  }
   # setup clean rules
   Clean clean : $(target) ;
   Clean $(<)clean : $(target) ;
 }
 
-actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS
-{
-  $(CMD.LINK) -shared -Wl,-soname -Wl,$(<) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
-}
 actions LinkApplication bind NEEDLIBS bind EXTRAOBJECTS
 {
   $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+}
+actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS
+{
+  $(CMD.LINK) -shared -Wl,-soname -Wl,$(<) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }

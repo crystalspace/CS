@@ -17,6 +17,13 @@ rule LinkWith
   {
     $(<)_static.NEEDLIBS += $(>) ;
   }
+
+  local i ;
+
+  for i in $(>)
+  {
+    LFlags $(<) : $($(i).LIB_LFLAGS) ;
+  }
 }
 
 ##  CFlags target : flags
@@ -57,6 +64,22 @@ rule ExternalLibs
     {
       $(<)_static.LFLAGS += $($(i).LFLAGS) ;
     }
+  }
+}
+
+##  LibExternalLibs libname : linkerflags
+##    Link a library with external libraries. What this actually does is
+##    equivalent to "ExternalLibs appname : linkerflags" for every application
+##    and plugin which links with the library.
+rule LibExternalLibs
+{
+  local i ;
+  
+  for i in $(>)
+  {
+    CFlags $(<) : $($(i).CFLAGS) ;
+
+    $(<).LIB_LFLAGS += $($(>).LFLAGS) ;
   }
 }
 

@@ -1284,7 +1284,20 @@ CS_CHECK_BUILD([for Linux joystick API], [cs_cv_sys_linux_joystick],
     [], [],
     [CS_BUILD_PROPERTY([LINUXJOYSTICK.AVAILABLE], [yes])])
 
+#------------------------------------------------------------------------------
+# Check if libbfd is present (part of GNU binutils).
+#------------------------------------------------------------------------------
+CS_CHECK_LIB_WITH([bfd],
+    [AC_LANG_PROGRAM([#include <bfd.h>], [bfd_init();])], [], [],
+    [CS_EMIT_BUILD_RESULT([cs_cv_libbfd], [LIBBFD])], [], [], [], [-liberty])
 
+#------------------------------------------------------------------------------
+# Check if objcopy is present (part of GNU binutils).
+#------------------------------------------------------------------------------
+AC_CHECK_PROGS([OBJCOPY], [objcopy])
+AS_IF([test -n "$OBJCOPY"],
+    [CS_BUILD_PROPERTY([OBJCOPY.AVAILABLE], [yes])
+    CS_BUILD_PROPERTY([CMD.OBJCOPY], [$OBJCOPY])])
 
 #------------------------------------------------------------------------------
 # Determine if plugin modules must implement main().  This is needed on some

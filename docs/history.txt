@@ -25,9 +25,17 @@ chronological order.
 	      and extra output parameter, "from", which gives the packet's
 	      originator's identifier, which makes multicast actually useful.
 	- Marten Svanfeldt removed all traces of culling in new renderer/engine 
-	  for new renderer to make it compile with the above cullerchanges. Note 
-	  that it didn't work anyway. A new implementation is being developed at 
-	  the moment, but it will be a little while before it is finished.
+	  for new renderer to make it compile with the above cullerchanges.
+	  Note that it didn't work anyway. A new implementation is being
+	  developed at the moment, but it will be a little while before it is
+	  finished.
+	- Oktal added stuff to the Jam build system that writes .csplugin data
+	  into the headers of the plugins' shared object files themselves, on
+	  platforms where configure detects libbfd and objcopy, which are both
+	  parts of GNU bintools. And added code to cssys to read the .csplugin
+	  data from the headers in order to locate SCF plugins.
+	  This means no more ugly .csplugin files in the CS root directory on
+	  most *nix systems.
 22-Aug-2003
 	- Oktal fixed a couple of typos in the Perl plugin, and fixed a bit of
 	  const correctness in iScriptObject.
