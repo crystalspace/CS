@@ -1441,7 +1441,7 @@ csBinaryDocument::csBinaryDocument ()
 
 csBinaryDocument::~csBinaryDocument ()
 {
-  if (root->flags & BD_NODE_MODIFIED)
+  if (root && (root->flags & BD_NODE_MODIFIED))
     delete root;
   while (nodePool)
   {

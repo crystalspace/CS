@@ -29,7 +29,8 @@ The history order is reversed so that new features are at the top.
 	      bugplug.mak changes.
 	    - added iDocument::Changeable() which returns whether a 
 	      can be changed or not.
-	    - res added the document system makefiles to user.mak.
+	    - added the document system makefiles to user.mak.
+	- res fixed a NULL pointer access under circumstances in binary DS.
 31-Mar-2003
 	- Fixed a very old clipping bug with individual polygon drawing
 	  in the thing plugin in case there is rendering through a portal
