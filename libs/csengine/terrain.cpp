@@ -132,7 +132,7 @@ bool csTerrain::Initialize (char* heightmap)
   return true;
 }
 
-void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
+void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 {
   G3DPolygonDPFX poly;
 
