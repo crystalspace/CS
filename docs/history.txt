@@ -25,6 +25,9 @@ chronological order.
 	  minor formatting and whitespace corrections.
 	- Luca fixed an error in a math formula in the documentation section
 	  "7.6.6.4 Bringing it All Together" for doing texture mapping.
+	- Rhad fixed csString's use of isalpha, isspace, toupper, tolower.
+	  These functions must be passed a value in the range of an unsigned
+	  char or EOF.
 3-Oct-2003
 	- Jorrit changed syntax services->ParsePortal() into
 	  HandlePortalParameter(). This is a more general function which can

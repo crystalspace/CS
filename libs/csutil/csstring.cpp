@@ -232,9 +232,13 @@ csString& csString::Downcase()
 {
   char* p = GetData();
   char const* const pN = p + Length();
+  /* isalpha(int c)  toupper(int c) tolower(int c) isspace(int c)
+   *        If  c  is  not  an  unsigned char value, or EOF, the behaviour of these
+   *    functions is undefined.
+   */
   for ( ; p < pN; p++)
-    if (isalpha(*p))
-      *p = (char)tolower(*p);
+    if (isalpha((unsigned char )(*p)))
+      *p = (char)tolower((unsigned char)(*p));
   return *this;
 }
 
@@ -242,17 +246,25 @@ csString& csString::Upcase()
 {
   char* p = GetData();
   char const* const pN = p + Length();
+  /* isalpha(int c)  toupper(int c) tolower(int c) isspace(int c)
+   *        If  c  is  not  an  unsigned char value, or EOF, the behaviour of these
+   *    functions is undefined.
+   */
   for ( ; p < pN; p++)
-    if (isalpha(*p))
-      *p = (char)toupper(*p);
+    if (isalpha((unsigned char)(*p)))
+      *p = (char)toupper((unsigned char)(*p));
   return *this;
 }
 
 csString &csString::LTrim()
 {
   size_t i;
+  /* isalpha(int c)  toupper(int c) tolower(int c) isspace(int c)
+   *        If  c  is  not  an  unsigned char value, or EOF, the behaviour of these
+   *    functions is undefined.
+   */
   for (i = 0; i < Size; i++)
-    if (!isspace (Data[i]))
+    if (!isspace ((unsigned char)Data[i]))
       break;
   if (i > 0)
     DeleteAt (0, i);
@@ -264,8 +276,12 @@ csString &csString::RTrim()
   if (Size > 0)
   {
     int i;
+    /* isalpha(int c)  toupper(int c) tolower(int c) isspace(int c)
+     *        If  c  is  not  an  unsigned char value, or EOF, the behaviour of these
+     *    functions is undefined.
+     */
     for (i = Size - 1; i >= 0; i--)
-      if (!isspace (Data[i]))
+      if (!isspace ((unsigned char)Data[i]))
         break;
     if (i < int(Size - 1))
       Truncate(i + 1);
