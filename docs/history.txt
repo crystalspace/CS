@@ -10,6 +10,10 @@ The history order has been reversed so that new features are at the top.
 	  (thanks to Seth Galbraith for starting this). Unfortunatelly
 	  I had to break LOD for this (temporarily). Luckily LOD is not
 	  used by the engine right now.
+	- Fixed missile code so that there is now only one particle
+	  system created for an explosion. This bug was caused by
+	  a misconception that there are five explosions for a single
+	  missile. This is not true.
 26-Apr-2000
 	- Fixed csMath3::FindObserverSides().
 	- Added csBox2 and csBox3::GetEdge() to iterate over all edges

@@ -89,7 +89,7 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* t
     return;
   }
 
-  CHK (csParSysExplosion* exp = new csParSysExplosion (20,
+  CHK (csParSysExplosion* exp = new csParSysExplosion (100,
   	center, csVector3 (0, 0, 0), txt, 6, 0.15, true, .6, 2., 2.));
   exp->MoveToSector (sector);
   exp->SetSelfDestruct (3000);
@@ -770,6 +770,7 @@ void HandleDynLight (csDynLight* dyn)
         es->dir = 1;
         CHK (csDataObject* esdata = new csDataObject (es));
         dyn->ObjAdd (esdata);
+        add_particles_explosion (dyn->GetSector (), dyn->GetCenter (), "explo.jpg");
         return;
       }
       else ms->dir.SetOrigin (v);
@@ -806,7 +807,6 @@ void HandleDynLight (csDynLight* dyn)
       }
       dyn->Resize (es->radius);
       dyn->Setup ();
-      add_particles_explosion (dyn->GetSector (), dyn->GetCenter (), "explo.jpg");
       break;
     }
     case DYN_TYPE_RANDOM:
