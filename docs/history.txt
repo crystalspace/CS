@@ -22,6 +22,15 @@ The history order is reversed so that new features are at the top.
 	  Actually I tried to worked around the bug. I don't understand the
 	  real nature of the bug though. The code is commented because
 	  it doesn't work correctly yet. There are also underflows it seems!
+	- Eric Sunshine fixed a problem with csSystemDriver::LoadPlugIn() where
+	  the returned object had an inconsistent reference count.  In some
+	  cases, the caller of LoadPlugIn() was responsible for invoking
+	  DecRef() on the returned object to dispose of it, but in other cases
+	  the system driver maintained authority over the returned object and
+	  the caller was not allowed to invoke DecRef().  Now, the reference
+	  count of the returned object is consistent in all cases, and the
+	  caller must _always_ invoke DecRef() to dispose of the returned
+	  object.
 21-Jun-2001
 	- Fixed a bug in the cleanup of sectors in the engine.  The portal
 	  references were not cleaned up.

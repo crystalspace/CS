@@ -1021,7 +1021,7 @@ iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iFuncID,
         ret = (iBase *)p->QueryInterface (
 	  iSCF::SCF->GetInterfaceID (iInterface), iVersion);
       else
-        ret = p;
+        (ret = p)->IncRef();
       if (ret)
       {
         QueryOptions (p);
