@@ -10,6 +10,11 @@ chronological order.
 	- res renamed the rlloader, rlsstd and rlsstencil plugins to less
 	  cryptic rendloop_loader, rendstep_std and rendstep_stencil.
 	  Don't forget to delete the old rl* plugin binaries.
+	- Jorrit added the ability to define static lod for a hierarchical
+	  mesh factory too. Using the same syntax. Using <meshref> or
+	  iMeshFactoryWrapper->CreateMeshWrapper() you can create a
+	  hierarchical mesh object that inherits the lod attributes
+	  from the factory.
 12-Aug-2003
 	- Jorrit fixed a compile error in the OpenGL Windows canvas after the
 	  changes from res yesterday.

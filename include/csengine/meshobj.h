@@ -43,6 +43,7 @@ class csMeshWrapper;
 class csMeshFactoryWrapper;
 class csLight;
 class csStaticLODMesh;
+class csStaticLODFactoryMesh;
 
 /**
  * General list of meshes. This class implements iMeshList.
@@ -827,6 +828,12 @@ private:
   /// Children of this object (other instances of iMeshFactoryWrapper).
   csMeshFactoryFactoryList children;
 
+  /**
+   * Optional LOD control that will turn a hierarchical mesh in a
+   * mesh that supports static LOD.
+   */
+  csRef<csStaticLODFactoryMesh> static_lod;
+
 private:
   /// Destructor.
   virtual ~csMeshFactoryWrapper ();
@@ -877,6 +884,14 @@ public:
    */
   void SetTransform (const csReversibleTransform& tr) { transform = tr; }
 
+  // Static LOD methods.
+  void CreateStaticLOD ();
+  void DestroyStaticLOD ();
+  void SetStaticLOD (float m, float a);
+  void GetStaticLOD (float& m, float& a) const;
+  void RemoveFactoryFromStaticLOD (iMeshFactoryWrapper* mesh);
+  void AddFactoryToStaticLOD (int lod, iMeshFactoryWrapper* mesh);
+
   SCF_DECLARE_IBASE_EXT (csObject);
 
   //----------------- iMeshFactoryWrapper implementation --------------------//
@@ -903,6 +918,30 @@ public:
       { return scfParent->GetTransform (); }
     virtual void SetTransform (const csReversibleTransform& tr)
       { scfParent->SetTransform (tr); }
+    virtual void CreateStaticLOD ()
+    {
+      scfParent->CreateStaticLOD ();
+    }
+    virtual void DestroyStaticLOD ()
+    {
+      scfParent->DestroyStaticLOD ();
+    }
+    virtual void SetStaticLOD (float m, float a)
+    {
+      scfParent->SetStaticLOD (m, a);
+    }
+    virtual void GetStaticLOD (float& m, float& a) const
+    {
+      scfParent->GetStaticLOD (m, a);
+    }
+    virtual void RemoveFactoryFromStaticLOD (iMeshFactoryWrapper* fact)
+    {
+      scfParent->RemoveFactoryFromStaticLOD (fact);
+    }
+    virtual void AddFactoryToStaticLOD (int lod, iMeshFactoryWrapper* fact)
+    {
+      scfParent->AddFactoryToStaticLOD (lod, fact);
+    }
   } scfiMeshFactoryWrapper;
   friend struct MeshFactoryWrapper;
 };

@@ -21,10 +21,12 @@
 
 #include "csutil/scf.h"
 #include "csutil/array.h"
+#include "csutil/refcount.h"
 #include "iengine/lod.h"
 #include "iengine/mesh.h"
 
 struct iMeshWrapper;
+struct iMeshFactoryWrapper;
 
 /**
  * This class is used to represent the static lod levels of a
@@ -33,10 +35,7 @@ struct iMeshWrapper;
 class csStaticLODMesh : public iLODControl
 {
 private:
-  /**
-   * There are 10 static lod levels. Every lod level can contain
-   * several meshes.
-   */
+  /// All static lod levels.
   csArray<csArray<iMeshWrapper*> > meshes_for_lod;
 
   /// Function for lod.
@@ -76,6 +75,45 @@ public:
     if (idx < 0) idx = 0;
     else if (idx >= l) idx = l-1;
     return meshes_for_lod[idx];
+  }
+
+  /// Get number of lod levels we have.
+  int GetLODCount ()
+  {
+    return meshes_for_lod.Length ();
+  }
+};
+
+/**
+ * This class is used to represent the static lod levels of a
+ * hierarchical mesh factory. It is used as a template to create
+ * a csStaticLODMesh instance.
+ */
+class csStaticLODFactoryMesh : public csRefCount
+{
+private:
+  /// All static lod levels.
+  csArray<csArray<iMeshFactoryWrapper*> > meshes_for_lod;
+
+  /// Function for lod.
+  float lod_m, lod_a;
+
+public:
+  /// constructor
+  csStaticLODFactoryMesh ();
+  virtual ~csStaticLODFactoryMesh ();
+
+  void SetLOD (float m, float a);
+  void GetLOD (float& m, float& a) const;
+
+  /// Get the mesh array for the numerical lod.
+  csArray<iMeshFactoryWrapper*>& GetMeshesForLOD (int lod)
+  {
+    if (lod > meshes_for_lod.Length ())
+    {
+      meshes_for_lod.SetLength (lod+1);
+    }
+    return meshes_for_lod[lod];
   }
 
   /// Get number of lod levels we have.

@@ -53,3 +53,28 @@ int csStaticLODMesh::GetLODPolygonCount (float lod) const
   return 0;
 }
 
+//----------------------------------------------------------------------------
+
+csStaticLODFactoryMesh::csStaticLODFactoryMesh ()
+{
+  lod_m = 0;
+  lod_a = 1;
+}
+
+csStaticLODFactoryMesh::~csStaticLODFactoryMesh ()
+{
+}
+
+void csStaticLODFactoryMesh::SetLOD (float m, float a)
+{
+  lod_m = m;
+  lod_a = a;
+}
+
+void csStaticLODFactoryMesh::GetLOD (float& m, float& a) const
+{
+  m = lod_m;
+  a = lod_a;
+}
+
+

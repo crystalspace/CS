@@ -465,7 +465,7 @@ struct iMeshWrapper : public iBase
 #endif
 };
 
-SCF_VERSION (iMeshFactoryWrapper, 0, 1, 6);
+SCF_VERSION (iMeshFactoryWrapper, 0, 1, 7);
 
 /**
  * A mesh factory wrapper is an engine-level object that wraps around a
@@ -527,6 +527,45 @@ struct iMeshFactoryWrapper : public iBase
    * Set optional relative transform (relative to parent).
    */
   virtual void SetTransform (const csReversibleTransform& tr) = 0;
+
+  /**
+   * Create a LOD control template for this factory. This is relevant
+   * only if the factory is hierarchical. The LOD control will be
+   * used to select which children are visible and which are not.
+   * Use this to create static lod.
+   */
+  virtual void CreateStaticLOD () = 0;
+
+  /**
+   * Destroy the LOD control for this factory.
+   */
+  virtual void DestroyStaticLOD () = 0;
+
+  /**
+   * Set the LOD function parameters for this factory. These control the
+   * function:
+   * <pre>
+   *    float lod = m * distance + a;
+   * </pre>
+   */
+  virtual void SetStaticLOD (float m, float a) = 0;
+
+  /**
+   * Get the LOD function parameters for this factory.
+   */
+  virtual void GetStaticLOD (float& m, float& a) const = 0;
+
+  /**
+   * Set a given child factory at a specific lod level. Note that a factory
+   * can be at several lod levels at once.
+   */
+  virtual void AddFactoryToStaticLOD (int lod, iMeshFactoryWrapper* fact) = 0;
+
+  /**
+   * Remove a child factory from all lod levels. The factory is not removed
+   * from the list of factories however.
+   */
+  virtual void RemoveFactoryFromStaticLOD (iMeshFactoryWrapper* fact) = 0;
 };
 
 SCF_VERSION (iMeshList, 0, 0, 1);
