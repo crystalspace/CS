@@ -420,8 +420,8 @@ AS_IF([test -n "$PERL"],
 #	[CS_BUILD_PROPERTY([PERL5.LFLAGS], [$cs_cv_perl_lflags])])
 #   CS_CHECK_BUILD([if Perl SDK is usable], [cs_cv_perl],
 #       [AC_LANG_PROGRAM([
-            #include <EXTERN.h>
-	    #include <perl.h>],
+#            #include <EXTERN.h>
+#	    #include <perl.h>],
 #	    [perl_run (0);])],
 #    	    [],
 #           [], [CS_BUILD_PROPERTY([PERL5.SDK.AVAILABLE], [yes])], [], [],
@@ -793,6 +793,107 @@ AS_IF([test -d /usr/local/lib],
 
 
 #------------------------------------------------------------------------------
+# Determine host platform.  Recognized families: Unix, Windows, MacOS/X.
+#
+# CS_CHECK_HOST
+#	Sets the shell variables cs_host_target, cs_host_makefile, and
+#	cs_host_family.  Client code can use these variables to emit
+#	appropriate TARGET and TARGET_MAKEFILE makefile variables, and OS_FOO
+#	header define.
+#------------------------------------------------------------------------------
+cs_host_os_normalized=''
+AC_DEFUN([CS_CHECK_HOST],
+    [AC_REQUIRE([AC_CANONICAL_HOST])
+    case $host_os in
+	mingw*|cygwin*)
+	    cs_host_target=win32gcc
+	    cs_host_makefile=libs/cssys/win32/win32gcc.mak
+	    cs_host_family=windows
+	    ;;
+	darwin*)
+	    _CS_CHECK_HOST_DARWIN
+	    ;;
+	*)
+	    # Everything else is assumed to be Unix or Unix-like.
+	    cs_host_target=unix
+	    cs_host_makefile=libs/cssys/unix/unix.mak
+	    cs_host_family=unix
+	    ;;
+    esac])
+
+AC_DEFUN([_CS_CHECK_HOST_DARWIN],
+    [AC_REQUIRE([AC_PROG_CC])
+    AC_REQUIRE([AC_PROG_CXX])
+
+    # Both MacOS/X and Darwin are identified via $host_os as "darwin".  We need
+    # a way to distinguish between the two.  If Carbon.h is present, then
+    # assume MacOX/S; if not, assume Darwin.  If --with-x=yes was invoked, and
+    # Carbon.h is present, then assume that user wants to cross-build for
+    # Darwin even though build host is MacOS/X.
+
+    AC_CHECK_HEADER([Carbon/Carbon.h],
+	[cs_host_macosx=yes], [cs_host_macosx=no])
+
+    AS_IF([test $cs_host_macosx = yes],
+	[AC_MSG_CHECKING([for --with-x])
+	AS_IF([test "${with_x+set}" = set && test "$with_x" = "yes"],
+	    [AC_MSG_RESULT([yes (assume Darwin)])
+	    cs_host_macosx=no],
+	    [AC_MSG_RESULT([no])])])
+
+    AS_IF([test $cs_host_macosx = yes],
+	[cs_host_target=macosx
+	cs_host_makefile=libs/cssys/macosx/macosx.mak
+	cs_host_family=unix
+	cs_host_os_normalized='MacOS/X'
+
+	CS_HEADER_PROPERTY([OS_MACOSX])
+	CS_HEADER_PROPERTY([CS_24BIT_PIXEL_LAYOUT], [CS_24BIT_PIXEL_ARGB])
+
+	# We assume that we always have CoreAudio available on MacOS/X.
+	CS_JAMCONFIG_PROPERTY([COREAUDIO.AVAILABLE], [yes])
+	CS_JAMCONFIG_PROPERTY([COREAUDIO.LFLAGS], [-framework CoreAudio])
+
+	AC_CACHE_CHECK([for Objective-C compiler], [cs_cv_prog_objc],
+	    [cs_cv_prog_objc="$CC"])
+	CS_MAKEFILE_PROPERTY([OBJC], [$cs_cv_prog_objc -c])
+	CS_JAMCONFIG_PROPERTY([CMD.OBJC], [$cs_cv_prog_objc])
+	AC_CACHE_CHECK([for Objective-C++ compiler], [cs_cv_prog_objcxx],
+	    [cs_cv_prog_objcxx="$CXX"])
+	CS_MAKEFILE_PROPERTY([OBJCXX], [$cs_cv_prog_objcxx -c])
+	CS_JAMCONFIG_PROPERTY([CMD.OBJC++], [$cs_cv_prog_objcxx])],
+
+	[cs_host_target=unix
+	cs_host_makefile=libs/cssys/unix/unix.mak
+	cs_host_family=unix])])
+
+CS_CHECK_HOST
+
+case $cs_host_family in
+    windows)
+	CS_HEADER_PROPERTY([OS_WIN32])
+	AS_IF([test -z "$cs_host_os_normalized"],
+	    [cs_host_os_normalized='Win32'])
+	;;
+    unix)
+	CS_HEADER_PROPERTY([OS_UNIX])
+	AS_IF([test -z "$cs_host_os_normalized"],
+	    [cs_host_os_normalized='Unix'])
+	;;
+esac
+
+cs_host_os_normalized_uc="AS_TR_CPP([$cs_host_os_normalized])"
+CS_MAKEFILE_PROPERTY([TARGET], [$cs_host_target])
+CS_MAKEFILE_PROPERTY([TARGET_MAKEFILE], [$cs_host_makefile])
+CS_MAKEFILE_PROPERTY([OS], [$cs_host_os_normalized_uc])
+CS_JAMCONFIG_PROPERTY([TARGET.OS], [$cs_host_os_normalized_uc])
+CS_JAMCONFIG_PROPERTY([TARGET.OS.NORMALIZED], [$cs_host_os_normalized])
+CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
+    [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
+
+
+
+#------------------------------------------------------------------------------
 # Check for typical required libraries (libm, libdl, libnsl).
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_COMMON_LIBS],
@@ -817,9 +918,23 @@ CS_CHECK_COMMON_LIBS
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_X_CHECK_PREPARE],
     [AC_REQUIRE([AC_CANONICAL_HOST])
+    AC_REQUIRE([CS_CHECK_HOST])
+
+    # Explicitly disable X checking on Windows to avoid discovering XFree86 in
+    # case Cygwin is installed.  Doing so allows us to avoid Mesa's OpenGL
+    # headers during the OpenGL check, and prefer Microsoft's OpenGL headers.
+    # The Mesa OpenGL headers cause link errors because they do not employ
+    # __stdcall.
     case $host_os in
 	mingw*|cygwin*) with_x=no ;;
-    esac])
+    esac
+
+    # Explicitly disable X checking on MacOS/X in case the optional XFree86 is
+    # installed since we want to avoid an undesirable dependency upon XFree86
+    # in the CS executables and plugins.  If the user is actually
+    # cross-building for Darwin on MacOS/X, then the --with-x option will
+    # override this test (by setting cs_host_macosx to "no").
+    AS_IF([test x$cs_host_macosx = xyes], [with_x=no])])
 
 CS_X_CHECK_PREPARE
 AC_PATH_X
@@ -1390,94 +1505,6 @@ AC_DEFUN([CS_SYS_PLUGIN_MAIN],
 	[CS_HEADER_PROPERTY([CS_UNIX_PLUGIN_REQUIRES_MAIN])])])
 
 CS_SYS_PLUGIN_MAIN
-
-
-
-#------------------------------------------------------------------------------
-# Determine host platform.  Recognized families: Unix, Windows, MacOS/X.
-#
-# CS_CHECK_HOST
-#	Sets the shell variables cs_host_target, cs_host_makefile, and
-#	cs_host_family.  Client code can use these variables to emit
-#	appropriate TARGET and TARGET_MAKEFILE makefile variables, and OS_FOO
-#	header define.
-#------------------------------------------------------------------------------
-cs_host_os_normalized=''
-AC_DEFUN([CS_CHECK_HOST],
-    [AC_REQUIRE([AC_CANONICAL_HOST])
-    case $host_os in
-	mingw*|cygwin*)
-	    cs_host_target=win32gcc
-	    cs_host_makefile=libs/cssys/win32/win32gcc.mak
-	    cs_host_family=windows
-	    ;;
-	darwin*)
-	    _CS_CHECK_HOST_DARWIN
-	    ;;
-	*)
-	    # Everything else is assumed to be Unix or Unix-like.
-	    cs_host_target=unix
-	    cs_host_makefile=libs/cssys/unix/unix.mak
-	    cs_host_family=unix
-	    ;;
-    esac])
-
-AC_DEFUN([_CS_CHECK_HOST_DARWIN],
-    [AC_REQUIRE([AC_PATH_X])
-    AC_REQUIRE([AC_PROG_CC])
-    AC_REQUIRE([AC_PROG_CXX])
-    # If user explicitly requested --with-x, then assume Darwin+XFree86; else
-    # assume MacOS/X.
-    AC_MSG_CHECKING([for --with-x])
-    AS_IF([test x$with_x = xyes],
-	[AC_MSG_RESULT([yes (assume Darwin)])
-	cs_host_target=unix
-	cs_host_makefile=libs/cssys/unix/unix.mak
-	cs_host_family=unix],
-	[AC_MSG_RESULT([no (assume MacOS/X)])
-	cs_host_target=macosx
-	cs_host_makefile=libs/cssys/macosx/macosx.mak
-	cs_host_family=unix
-	cs_host_os_normalized='MacOS/X'
-	CS_HEADER_PROPERTY([OS_MACOSX])
-	CS_HEADER_PROPERTY([CS_24BIT_PIXEL_LAYOUT], [CS_24BIT_PIXEL_ARGB])
-
-	# We assume that we always have CoreAudio available on MacOS/X.
-	CS_JAMCONFIG_PROPERTY([COREAUDIO.AVAILABLE], [yes])
-	CS_JAMCONFIG_PROPERTY([COREAUDIO.LFLAGS], [-framework CoreAudio])
-
-	AC_CACHE_CHECK([for Objective-C compiler], [cs_cv_prog_objc],
-	    [cs_cv_prog_objc="$CC"])
-	CS_MAKEFILE_PROPERTY([OBJC], [$cs_cv_prog_objc -c])
-	CS_JAMCONFIG_PROPERTY([CMD.OBJC], [$cs_cv_prog_objc])
-	AC_CACHE_CHECK([for Objective-C++ compiler], [cs_cv_prog_objcxx],
-	    [cs_cv_prog_objcxx="$CXX"])
-	CS_MAKEFILE_PROPERTY([OBJCXX], [$cs_cv_prog_objcxx -c])
-	CS_JAMCONFIG_PROPERTY([CMD.OBJC++], [$cs_cv_prog_objcxx])])])
-
-CS_CHECK_HOST
-
-case $cs_host_family in
-    windows)
-	CS_HEADER_PROPERTY([OS_WIN32])
-	AS_IF([test -z "$cs_host_os_normalized"],
-	    [cs_host_os_normalized='Win32'])
-	;;
-    unix)
-	CS_HEADER_PROPERTY([OS_UNIX])
-	AS_IF([test -z "$cs_host_os_normalized"],
-	    [cs_host_os_normalized='Unix'])
-	;;
-esac
-
-cs_host_os_normalized_uc="AS_TR_CPP([$cs_host_os_normalized])"
-CS_MAKEFILE_PROPERTY([TARGET], [$cs_host_target])
-CS_MAKEFILE_PROPERTY([TARGET_MAKEFILE], [$cs_host_makefile])
-CS_MAKEFILE_PROPERTY([OS], [$cs_host_os_normalized_uc])
-CS_JAMCONFIG_PROPERTY([TARGET.OS], [$cs_host_os_normalized_uc])
-CS_JAMCONFIG_PROPERTY([TARGET.OS.NORMALIZED], [$cs_host_os_normalized])
-CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
-    [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
 
 
 
