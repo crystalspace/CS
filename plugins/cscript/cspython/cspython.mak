@@ -88,7 +88,7 @@ cspythonclean:
 cspythonswig: cspythonswigclean cspython
 
 cspythonswigclean:
-	-$(RM) $(CSPYTHON) $(SWIG.PYTHON) $(OUT)cs_pyth.cpp
+	-$(RM) $(CSPYTHON) $(SWIG.CSPYTHON) $(OUT)cs_pyth.cpp
 
 ifdef DO_DEPEND
 dep: $(OUTOS)cspython.dep

@@ -7,8 +7,15 @@
   int MakeVersion(int version0, int version1, int version2) {
     return SCF_CONSTRUCT_VERSION(version0, version1, version2);
   }
-  iSystem* GetSystem();
-  void* GetMyPtr();
+
+#include "isystem.h"
+#include "csparser/csloader.h"
+iSystem* GetSystem() {
+	return NULL;
+}
+
+void* GetMyPtr() { return NULL; }
+
 %}
 
 %include pointer.i
@@ -28,14 +35,14 @@ public:
   float x,y,z;
 
   csVector3(float x, float y, float z);
-
+/*
   %addmethods {
     char *__str__() {
       static char temp[256];
       sprintf(temp,"[ %g, %g, %g ]", self->x, self->y, self->z);
       return temp;
     }
-  }
+  }*/
 };
 
 struct csRGBpixel {
@@ -77,8 +84,8 @@ struct iGraphics3D:public iPlugIn {
   void OpenFogObject (CS_ID id, csFog* fog);
   void DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fogtype);
   void CloseFogObject (CS_ID id);
-  bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
-  long GetRenderState (G3D_RENDERSTATEOPTION op);
+//  bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
+//  long GetRenderState (G3D_RENDERSTATEOPTION op);
   csGraphics3DCaps *GetCaps ();
   unsigned long *GetZBuffAt (int x, int y);
   float GetZBuffValue (int x, int y);
@@ -119,7 +126,7 @@ struct iPolygonSet:public iBase {
   bool CreateKey (const char *iName, const char *iValue);
 };
 
-struct iSector:public iBase, public iPolygonSet {
+struct iSector:public iBase {
   void CreateBSP();
 
 }
@@ -135,7 +142,8 @@ struct iPolygon3D : public iBase {
   void SetName (const char *iName);
   iPolygonSet *GetContainer ();
   iLightMap *GetLightMap ();
-  iPolygonTexture *GetTexture ();
+  iMaterialHandle *GetMaterialHandle ();
+//  iPolygonTexture *GetTexture ();
 //  iTextureHandle *GetTextureHandle ();
   int GetVertexCount ();
   csVector3 &GetVertex (int idx);
@@ -185,6 +193,7 @@ struct iTextureManager : public iBase
 
 struct iPolygonTexture : public iBase
 {
+  iMaterialHandle *GetMaterialHandle ();
 //  iTextureHandle *GetTextureHandle ();
   float GetFDU ();
   float GetFDV ();
@@ -225,6 +234,7 @@ struct iWorld:public iPlugIn {
 //****** System Interface
 struct iSystem:public iBase {
 public:
+/*
   %addmethods {
     iSCF* GetSCF() {
       iSCF *scf = QUERY_INTERFACE (self, iSCF);
@@ -237,7 +247,7 @@ public:
     iGraphics3D* Query_iGraphics3D() {
       return QUERY_PLUGIN(self, iGraphics3D);
     }
-  }
+  }*/
 };
 
 iSystem* GetSystem();
