@@ -63,7 +63,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: linex2d linelibxclean
+.PHONY: linex2d linex2dclean
 
 linex2d: $(OUTDIRS) $(LINEX2D)
 
@@ -73,7 +73,7 @@ $(OUT)%$O: plugins/video/canvas/linex/%.cpp
 $(LINEX2D): $(OBJ.LINEX2D) $(LIB.LINEX2D)
 	$(DO.PLUGIN) $(LIB.LINEX2D.SPECIAL)
 
-clean: linelibxclean
+clean: linex2dclean
 linex2dclean:
 	$(RM) $(LINEX2D) $(OBJ.LINEX2D) $(OUTOS)linex2d.dep
 

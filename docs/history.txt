@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+6-Feb-2001
+	- Eric Sunshine fixed a couple copy/paste errors in linex2d.mak which
+	  were pointed out by Jan Dvorak <johnydog@go.cz>.
 5-Feb-2001
 	- Eric Sunshine eliminated a couple compilation warnings in
 	  csfedit.cpp.
