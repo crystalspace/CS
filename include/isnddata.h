@@ -30,7 +30,6 @@ SCF_VERSION (iSoundData, 0, 0, 1);
 
 struct iSoundData : public iBase
 {
-public:
   /// Create a stream to read the data.
   virtual iSoundStream *CreateStream() = 0;
   /// return the format of this sound
@@ -52,7 +51,6 @@ SCF_VERSION (iSoundStream, 0, 0, 1);
 
 struct iSoundStream : public iBase
 {
-public:
   /// Return the sound data of which this is an instance
   virtual iSoundData *GetSoundData() = 0;
 
@@ -68,7 +66,7 @@ public:
   virtual void *Read(unsigned long &NumSamples) = 0;
 
   /// discard a buffer creates by Read().
-  virtual void DiscardBuffer(void *Buffer);
+  virtual void DiscardBuffer(void *Buffer) = 0;
 
   /// reset this instance to the beginning of the sound data
   virtual void Reset() = 0;
