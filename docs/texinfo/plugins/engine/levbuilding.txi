@@ -42,7 +42,7 @@ when deciding on how to partition your level into sectors:
 @item
 Creating multiple sectors complicates level design a bit since you have to
 think about placing portals between the sectors. On the other hand it can
-easy level design since you can pass different parts of the level to other
+ease level design since you can pass different parts of the level to other
 people.
 @item
 It is easier to implement dynamic loading when you use more sectors as you
