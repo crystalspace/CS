@@ -149,7 +149,6 @@ rule Texi2HTML
 
   # Create Output directory
   local dir = [ FDirName $(LOCATE.DOCS) $(3) ] ;
-  DOCDIR_$(<) = $(dir) ;
   Depends $(<) : $(dir) ;
   MkDir $(dir) ;
   CleanDir $(<)clean : $(dir) ;
@@ -188,36 +187,40 @@ rule Texi2PDF
 
 if $(CMD.DOXYGEN)
 {
-##  Doxygen targetname : doxyprofile [ : subdir : additional files ]
-##    Run doxygen from TOP source dir to extract comments from headers and
-##    build an API documentation. Flags can be passed through the DOXYFLAGS
-##    variable.
+##  Doxygen targetname : doxyprofile [ : subdir : additionalfiles ]
+##    Create a target named 'targetname' which invoked Doxygen to generate API
+##    documentation based upon 'doxyprofile', which is a Doxygen configuration
+##    file.  'subdir' is an optional subdirectory of $(LOCATE.DOCS) into which
+##    the generated files will be placed.  'additionalfiles' files are
+##    additional files to copy the the output directory.  It is assumed that
+##    'doxyprofile' and 'additional' reside in $(SUBDIR).
 rule Doxygen
 {
-  SEARCH on $(>) = $(SUBDIR) ;
-
-  # Create Output directory
   local dir = [ FDirName $(LOCATE.DOCS) $(3) ] ;
-  DOCDIR_$(<) = $(dir) ; 
-  Depends $(<) : $(dir) ;
-  MkDir $(dir) ;
-  CleanDir $(<)clean : $(dir) ;
-  Depends cleandoc : $(<)clean ;
+  MakeLocate $(<) : $(dir) ;
+
+  local i ;
+  for i in $(4)
+  {
+    local src = $(i:G=$(<)src) ;
+    local dst = $(i:G=$(<)dst) ;
+    SEARCH on $(src) = $(SUBDIR) ;
+    MakeLocate $(dst) : $(dir) ;
+    Depends $(dst) : $(src) ;
+    Depends $(<) : $(dst) ;
+    Copy $(dst) : $(src) ;
+    Clean $(<)clean : $(dst) ;
+  }
+
+  SEARCH on $(>) = $(SUBDIR) ;
 
   NotFile $(<) ;
   Always $(<) ;
   Depends $(<) : $(>) ;
+  Depends $(<) : $(dir) ;
+  CleanDir $(<)clean : $(dir) ;
+  Depends cleandoc : $(<)clean ;
   RunDoxygen $(<) : $(>) : $(dir) ;
-
-  # copy over additional files
-  local i ;
-  for i in $(4)
-  {
-    LOCATE on $(i:G=copy) = $(SUBDIR) ;
-    Copy $(dir) : $(i:G=copy) ;
-    Always $(i:G=copy) ;
-    Depends $(<) : $(i:G=copy) ;
-  }
 }
 }
 

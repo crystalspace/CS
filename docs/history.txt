@@ -23,6 +23,10 @@ chronological order.
 	  system.
 	- Jorrit temporarily fixed the clipping bug in the NR GL renderer.
 	  Have to think about this a bit more though.
+	- Eric Sunshine re-engineered the Doxygen rule in docs.jam to correct
+	  a problem where its actions would emit warnings of the form:
+	    Copy ./out/docs/html/api
+	    rm: cannot remove `./out/docs/html/api': Is a directory
 21-Apr-2004
 	- Jorrit fixed compilation of the engine plugin with OR after
 	  breaking it yesterday.

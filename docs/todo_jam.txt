@@ -80,6 +80,9 @@ W - Wishlist (the build also works without this feature)
     with a message telling that you should rerun configure, or at least emit a
     big warning?
 
+[*] Doxygen rule causes warning of the sort on modern Unix platforms:
+      Copy ./out/docs/html/api
+      rm: cannot remove `./out/docs/html/api': Is a directory
 [*] The `jobber' script on SourceForge should use jam instead of make.
 [*] msvcgen.jam: The command line for creating a project and workspace files
     frequently overflows Jam's command-line length limit, causing it to abort
