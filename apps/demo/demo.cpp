@@ -409,7 +409,7 @@ void Demo::SetupFrame ()
     GfxWrite (tx, ty, col_black, col_bg,
     	"Download 'demodata.zip' from"); ty += 10;
     GfxWrite (tx, ty, col_fgdata, col_bg,
-    	"    ftp://sunsite.dk/projects/crystal/cs096/levels/demodata.zip"); ty += 10;
+    	"    ftp://sunsite.dk/projects/crystal/cs098/levels/demodata.zip"); ty += 10;
 
     ty += 10;
 
