@@ -26,7 +26,7 @@
 
 class csSoundBufferNull;
 
-class csSoundSourceNull : public ISoundSource
+class csSoundSourceNull : public iSoundSource
 {
 public:
 	csSoundSourceNull();

@@ -84,7 +84,7 @@ csString &csString::Overwrite (size_t iPos, const csString &iStr)
   return *this;
 }
 
-csString &csString::Append (const csString &iStr, size_t iCount = (size_t)-1)
+csString &csString::Append (const csString &iStr, size_t iCount)
 {
   if (iCount == (size_t)-1)
     iCount = iStr.Length ();
@@ -102,7 +102,7 @@ csString &csString::Append (const csString &iStr, size_t iCount = (size_t)-1)
   return *this;
 }
 
-csString &csString::Append (const char *iStr, size_t iCount = (size_t)-1)
+csString &csString::Append (const char *iStr, size_t iCount)
 {
   if (iCount == (size_t)-1)
     iCount = strlen (iStr);

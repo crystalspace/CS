@@ -17,12 +17,14 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */ 
 
+#include <windows.h>
+
 #include "sysdef.h"
 #include "csutil/scf.h"
 
 #undef main
 extern int csMain (int argc, char* argv[]);
-extern HINSTANCE ModuleHandle;		// defined in the COM library
+HINSTANCE ModuleHandle;		// defined in the COM library
 
 // The main entry for console applications
 int main (int argc, char* argv[])

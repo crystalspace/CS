@@ -16,23 +16,21 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "sysdef.h"
-#include "csutil/scf.h"
+#include "cssys/csshlib.h"
 
 #include <windows.h>
 
-CS_HLIBRARY SysLoadLibrary (const char* szLibName)
+csLibraryHandle csLoadLibrary (const char* szLibName)
 {
-  CS_HLIBRARY Handle = (CS_HLIBRARY)LoadLibrary (szLibName);
-  return Handle;
+  return LoadLibrary (szLibName);
 }
 
-PROC SysGetProcAddress (CS_HLIBRARY Handle, const char* szProcName)
+void* csGetLibrarySymbol(csLibraryHandle Handle, const char* Name)
 {
-  return GetProcAddress ((HMODULE)Handle, szProcName);
+  return GetProcAddress ((HMODULE)Handle, Name);
 }
 
-bool SysFreeLibrary (CS_HLIBRARY Handle)
+bool csUnloadLibrary (csLibraryHandle Handle)
 {
-  return FreeLibrary ((HMODULE)Handle);
+  return FreeLibrary ((HMODULE)Handle)!=0;
 }

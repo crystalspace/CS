@@ -106,7 +106,7 @@ protected:
   RGBPixel* get_buffer() { return image; }
 
 public:
-  DECLARE_IBASE
+  DECLARE_IBASE;
 
   ///
   virtual ~csImageFile ();

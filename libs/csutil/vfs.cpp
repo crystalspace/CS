@@ -57,7 +57,7 @@ class DiskFile : public csFile
   // The file
   FILE *file;
   // constructor
-  DiskFile (int Mode, VfsNode *ParentNode, int RIndex, const char *NameSuffix);
+    DiskFile(int Mode, VfsNode * ParentNode, int RIndex, const char * NameSuffix);
   // set Error according to errno
   void CheckError ();
 
@@ -304,13 +304,14 @@ IMPLEMENT_IBASE_END
 DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
   const char *NameSuffix) : csFile (Mode, ParentNode, RIndex, NameSuffix)
 {
+  char* ns=strdup(NameSuffix);
   CONSTRUCT_IBASE (NULL);
   char *rp = (char *)Node->RPathV [Index];
   size_t rpl = strlen (rp);
-  size_t nsl = strlen (NameSuffix);
+  size_t nsl = strlen (ns);
   char *fName = new char [rpl + nsl + 1];
   memcpy (fName, rp, rpl);
-  memcpy (fName + rpl, NameSuffix, nsl + 1);
+  memcpy (fName + rpl, ns, nsl + 1);
 
   // Convert all VFS_PATH_SEPARATOR's in filename into PATH_SEPARATOR's
   for (size_t n = 0; n < nsl; n++)
@@ -325,12 +326,12 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
     file = fopen (fName, (Mode & VFS_FILE_MODE) == VFS_FILE_WRITE ? "wb" : "rb");
     if (file || (t != 1))
       break;
-    char *lastps = strrchr (NameSuffix, VFS_PATH_SEPARATOR);
+    char *lastps = strrchr (ns, VFS_PATH_SEPARATOR);
     if (!lastps)
       break;
 
     *lastps = 0;
-    MakeDir (rp, NameSuffix);
+    MakeDir (rp, ns);
     *lastps = VFS_PATH_SEPARATOR;
   }
 
@@ -1489,3 +1490,4 @@ bool csVFS::SaveMounts (const char *FileName)
   }
   return config->Save (FileName);
 }
+

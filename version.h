@@ -69,6 +69,8 @@
 #  define CC_VERSION "MWERKS"
 #elif defined(COMP_VC)
 #  define CC_VERSION "VisualC"
+#elif defined(COMP_BC)
+#  define CC_VERSION "BorlandCPP"
 #elif defined(COMP_UNKNOWN)
 #  define CC_VERSION "Unknown"
 #else

@@ -9,6 +9,7 @@
   #define PROC_INTEL
 #if defined(__BORLANDC__)
   #define COMP_BC
+  #define __NEED_GENERIC_ISDIR
 #else
   #define COMP_VC
 #endif

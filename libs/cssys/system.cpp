@@ -904,3 +904,7 @@ void csSystemDriver::GetMousePosition (int &x, int &y)
   x = Mouse->GetLastX ();
   y = Mouse->GetLastY ();
 }
+
+IMPLEMENT_IBASE(csSystemDriver)
+  IMPLEMENTS_INTERFACE (iSystem)
+IMPLEMENT_IBASE_END;

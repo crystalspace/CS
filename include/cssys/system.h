@@ -85,6 +85,8 @@ public:
  */
 class csSystemDriver : public iSystem
 {
+	DECLARE_IBASE;
+
   // This is a private structure used to keep the list of plugins
   class csPlugIn : public csBase
   {
