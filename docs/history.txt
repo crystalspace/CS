@@ -39,6 +39,8 @@ chronological order.
 	- Jorrit again changed the triangle connectivity. This speeds
 	- Jorrit changed data/terrainf/world to use the new CD mesh LOD
 	  reduction.
+	- Jorrit fixed genmesh so that it honors the SetColor() call
+	  again.
 13-Oct-2004
 	- Jorrit removed the triangle connectivity information in
 	  the csTriangleVerticesCost class since they were not used there.

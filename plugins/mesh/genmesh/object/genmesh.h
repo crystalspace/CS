@@ -292,7 +292,12 @@ public:
 
 
   virtual iObjectModel* GetObjectModel ();
-  virtual bool SetColor (const csColor& col) { color = col; return true; }
+  virtual bool SetColor (const csColor& col)
+  {
+    color = col;
+    initialized = false;
+    return true;
+  }
   virtual bool GetColor (csColor& col) const { col = color; return true; }
   virtual bool SetMaterialWrapper (iMaterialWrapper* mat);
   virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
