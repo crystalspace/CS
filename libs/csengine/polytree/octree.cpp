@@ -1343,7 +1343,7 @@ bool csOctree::ReadFromCache (iFile* cf, csOctreeNode* node,
 }
 
 bool csOctree::ReadFromCache (iVFS* vfs, char* name,
-	csPolygonInt** polygons, int num)
+	csPolygonInt** polygons, int /*num*/)
 {
   iFile* cf = vfs->Open (name, VFS_FILE_READ);
   if (!cf) return false;		// File doesn't exist
