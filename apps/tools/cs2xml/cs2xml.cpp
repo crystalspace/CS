@@ -299,7 +299,7 @@ void Cs2Xml::ParseMatrix (csParser *parser, char *buf, int indent)
   float scaler;
   int num;
   float list[100];
-  const char* orig_buf = csStrNew (buf);
+  char* orig_buf = csStrNew (buf);
 
   while ((cmd = parser->GetCommand (&buf, commands, &params)) > 0)
   {
@@ -384,7 +384,6 @@ void Cs2Xml::ParseMatrix (csParser *parser, char *buf, int indent)
     // Neither SCALE, ROT, nor IDENTITY, so matrix may contain a single scaler
     // or the nine values of a 3x3 matrix.
     csScanStr (orig_buf, "%F", list, &num);
-    orig_buf = NULL;
     if (num == 1)
     {
       WriteToken (indent, "scale", NULL, false, false);
@@ -417,6 +416,7 @@ void Cs2Xml::ParseMatrix (csParser *parser, char *buf, int indent)
       // Error @@@
     }
   }
+  delete[] orig_buf;
 }
 
 void Cs2Xml::ParseGeneral (const char* parent_token,
