@@ -59,15 +59,15 @@ csFontServerMultiplexor::~csFontServerMultiplexor ()
 
 bool csFontServerMultiplexor::Initialize (iObjectRegistry *object_reg)
 {
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   // Query the auxiliary font servers in turn
-  char funcid [20];
+  char tag [20];
   int idx;
   for (idx = 1; ; idx++)
   {
-    sprintf (funcid, "FontServer.%d", idx);
-    iFontServer *fs = CS_QUERY_PLUGIN_ID (plugin_mgr, funcid, iFontServer);
-    if (!fs) break;
+    sprintf (tag, "FontServer.%d", idx);
+    iBase* b = CS_QUERY_REGISTRY_TAG (object_reg, tag);
+    if (!b) break;
+    iFontServer* fs = SCF_QUERY_INTERFACE (b, iFontServer);
     fontservers.Push (fs);
   }
   if (!fontservers.Length ())

@@ -65,7 +65,7 @@ SysSystemDriver::SysSystemDriver(iObjectRegistry* object_reg) :
   for (i = CSBE_MOUSE_BUTTON_COUNT; i-- > 0; )
     button_state[i] = false;
   BeHelper* behelper = new BeHelper (this);
-  object_reg->Register (behelper, "SystemHelper");
+  object_reg->Register (behelper, "iBeHelper");
 }
 
 

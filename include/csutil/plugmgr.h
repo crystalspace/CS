@@ -42,11 +42,11 @@ private:
   public:
     // The plugin itself
     iComponent *Plugin;
-    // The class ID of the plugin, and their functionality ID
-    char *ClassID, *FuncID;
+    // The class ID of the plugin
+    char *ClassID;
 
     // Construct the object that represents a plugin
-    csPlugin (iComponent *iObject, const char *iClassID, const char *iFuncID);
+    csPlugin (iComponent *iObject, const char *iClassID);
     // Free storage
     virtual ~csPlugin ();
   };
@@ -59,15 +59,10 @@ private:
   public:
     // Create the vector
     csPluginsVector (int iLimit, int iDelta) : csVector (iLimit, iDelta) {}
-    // Find a plugin either by its address or by his function ID
+    // Find a plugin by its address
     virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const
     {
-      if (Mode == 0)
-        return ((csPlugin *)Item)->Plugin == Key ? 0 : 1;
-      else
-        return ((csPlugin *)Item)->FuncID
-	     ? strcmp (((csPlugin *)Item)->FuncID, (char *)Key)
-             : ((csPlugin *)Item)->FuncID == Key ? 0 : 1;
+      return ((csPlugin *)Item)->Plugin == Key ? 0 : 1;
     }
     // Overrided Get() to avoid typecasts
     csPlugin *Get (int idx)
@@ -125,15 +120,13 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  virtual iBase *LoadPlugin (const char *iClassID, const char *iFuncID,
+  virtual iBase *LoadPlugin (const char *iClassID,
         const char *iInterface = NULL, int iVersion = 0);
   virtual iBase *QueryPlugin (const char *iInterface, int iVersion);
-  virtual iBase *QueryPlugin (const char *iFuncID, const char *iInterface,
-  	  int iVersion);
-  virtual iBase *QueryPlugin (const char* iClassID, const char *iFuncID,
+  virtual iBase *QueryPlugin (const char* iClassID,
   	  const char *iInterface, int iVersion);
   virtual bool UnloadPlugin (iComponent *iObject);
-  virtual bool RegisterPlugin (const char *iClassID, const char *iFuncID,
+  virtual bool RegisterPlugin (const char *iClassID,
           iComponent *iObject);
   virtual int GetPluginCount ();
   virtual iBase* GetPlugin (int idx);

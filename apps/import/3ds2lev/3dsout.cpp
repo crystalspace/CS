@@ -4,21 +4,30 @@
  *  Author: Luca Pancallo 2000.09.28
  */
 
-#include "cssysdef.h"
-#include "3dsload.h"
 #include "3dsco.h"
 #include "3dsout.h"
 #include <stdio.h>
+#include <string.h>
 #include <ctype.h>
+
+// includes for lib3ds
+#include "lib3ds/camera.h"
+#include "lib3ds/file.h"
+#include "lib3ds/io.h"
+#include "lib3ds/light.h"
+#include "lib3ds/material.h"
+#include "lib3ds/matrix.h"
+#include "lib3ds/mesh.h"
+#include "lib3ds/node.h"
+#include "lib3ds/vector.h"
 
 extern int flags;
 
 /**
  * Outputs the header with TEXTURES, MATERIALS, PLUGINS.
  */
-void OutpHeadCS (FILE * o, H3dsScene * scene, int verts, char *)
+void OutpHeadCS (FILE *o, Lib3dsFile *p3dsFile)
 {
-  (void)scene; (void)verts;
   if (flags & FLAG_SPRITE)
   {
     fprintf (o, "MESHFACT 'sprite' (\n");
@@ -27,21 +36,49 @@ void OutpHeadCS (FILE * o, H3dsScene * scene, int verts, char *)
   }
   else
   {
-    int n;
+
+    // extracts all unique textures
+    char *textures[100];
+    int numTextures = 0;
+    // set the current mesh to the first in the file
+    Lib3dsMesh *p3dsMesh = p3dsFile->meshes;
+    // as long as we have a valid mesh...
+    while( p3dsMesh )
+    {
+      // search if already present
+      bool found = false;
+      for (int j=0; j<numTextures; j++) {
+        if (strcmp(p3dsMesh->faceL->material, textures[j])==0) {
+          found = true;
+          break;
+        }
+      }
+      // if not present add it!
+      if (!found) {
+        textures[numTextures] = p3dsMesh->faceL->material;
+        numTextures++;
+      }
+
+      // go to next mesh
+      p3dsMesh = p3dsMesh->next;
+    }
 
     fprintf (o, "WORLD (\n");
+
     fprintf (o, "  TEXTURES (\n");
-    for (n=0; n<scene->meshobjs; n++) {
-        H3dsMeshObj * mo = &scene->meshobjlist[n];
-        fprintf (o, "    TEXTURE '%s' (FILE (%s.png)) \n",mo->material, mo->material);
-    }
+
+    // set the current mesh to the first in the file
+
+    for (int j=0; j<numTextures; j++)
+        fprintf (o, "    TEXTURE '%s' (FILE (%s.png)) \n",textures[j], textures[j]);
+
     fprintf (o, "  )\n\n");
 
     fprintf (o, "  MATERIALS (\n");
-    for (n=0; n<scene->meshobjs; n++) {
-        H3dsMeshObj * mo = &scene->meshobjlist[n];
-        fprintf (o, "    MATERIAL '%s' (TEXTURE ('%s')) \n",mo->material, mo->material);
-    }
+
+    for (j=0; j<numTextures; j++)
+        fprintf (o, "    MATERIAL '%s' (TEXTURE ('%s')) \n",textures[j], textures[j]);
+
     fprintf (o, "  )\n\n");
 
     fprintf (o, "  PLUGINS (\n");
@@ -57,46 +94,72 @@ void OutpHeadCS (FILE * o, H3dsScene * scene, int verts, char *)
  * Based on the object name we create MESHOBJ or PART.
  *
  */
-void OutpObjectsCS (FILE * o, H3dsScene * scene, H3dsMapVert* ,
-		    int /*verts*/, char * name, bool lighting)
+void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
 {
-  int i, n, j;
+
+  Lib3dsMesh *p3dsMesh = p3dsFile->meshes;
 
   if (flags & FLAG_SPRITE)
   {
-    fprintf (o, "  ; '%s'\n", name);
+    fprintf (o, "  ; '%s'\n", p3dsMesh->name);
   } else {
 
-      // Reorder the objects to have all "_s_" first.
-      for (n=0; n<scene->meshobjs; n++) {
-        H3dsMeshObj * mo1 = &scene->meshobjlist[n];
+    // count meshes
+    int numMeshes = 0;
+    while (p3dsMesh) {
+         numMeshes++;
+         p3dsMesh = p3dsMesh->next;
+    }
+    // build an array with all meshes
+    Lib3dsMesh* p3dsMeshArray = new Lib3dsMesh[numMeshes];
+    p3dsMesh = p3dsFile->meshes;
+    for (int n=0; n<numMeshes; n++) {
+         p3dsMeshArray[n] = *p3dsMesh;
+         p3dsMesh = p3dsMesh->next;
+    }
+
+    // Reorder the objects to have all "_s_" first.
+    // set the current mesh to the first in the file
+    for (n=0; n<numMeshes; n++)
+    {
         // if not static...
-        if (!strstr(mo1->name, "_s_")) {
-              // search a static and swap
-              for (j=n+1; j<scene->meshobjs; j++) {
-                H3dsMeshObj * mo2 = &(scene->meshobjlist[j]);
-                if (strstr(mo2->name, "_s_")) {
-                        H3dsMeshObj tmp = *mo2;
-                        scene->meshobjlist[j] = *mo1;
-                        scene->meshobjlist[n] = tmp;
-                        break;
-                }
-              }
+        if (!strstr( ((Lib3dsMesh *)&p3dsMeshArray[n])->name, "_s_")) {
+          // search a static and swap
+          for (int j=n+1; j<numMeshes; j++) {
+             if (strstr( ((Lib3dsMesh *)&p3dsMeshArray[j])->name, "_s_")) {
+                Lib3dsMesh tmp = p3dsMeshArray[j];
+                p3dsMeshArray[j] = p3dsMeshArray[n];
+                p3dsMeshArray[n] = tmp;
+                break;
+             }
+          }
         }
-      }
+    }
+
+    // assign reordered vector to main Lib3ds struct
+    p3dsMesh = p3dsFile->meshes;
+    for (n=0; n<numMeshes-1; n++) {
+      ((Lib3dsMesh *)&p3dsMeshArray[n])->next=&p3dsMeshArray[n+1];
+    }
+    ((Lib3dsMesh *)&p3dsMeshArray[n])->next=0;
+
+    p3dsFile->meshes = p3dsMeshArray;
   }
+
+  // iterate on all meshes
+  p3dsMesh = p3dsFile->meshes;
 
   bool staticObj = false;
   bool part = false;
-  for (n=0; n<scene->meshobjs; n++)
+  int numMesh = 0;
+  while (p3dsMesh)
   {
-    H3dsMeshObj * mo = &scene->meshobjlist[n];
 
     if (flags & FLAG_SPRITE) {
     }
     else {
         // on "_s_" decide if MESHOBJ or PART
-        if (strstr(mo->name, "_s_")) {
+        if (strstr(p3dsMesh->name, "_s_")) {
             if (!staticObj) {
                 fprintf (o, "    MESHOBJ 'static' (\n");
                 fprintf (o, "      PLUGIN ('thing')\n");
@@ -104,13 +167,13 @@ void OutpObjectsCS (FILE * o, H3dsScene * scene, H3dsMapVert* ,
                 fprintf (o, "      PRIORITY('wall')\n");
                 fprintf (o, "      PARAMS (\n");
                 fprintf (o, "      VISTREE()\n");
-                fprintf (o, "; Object Name : %s ", mo->name);
-                fprintf (o, " Faces: %6d faces \n", (int)mo->faces);
-                fprintf (o, "      PART '%s' (\n", mo->name);
+                fprintf (o, "; Object Name : %s ", p3dsMesh->name);
+                fprintf (o, " Faces: %6d faces \n", (int)p3dsMesh->faces);
+                fprintf (o, "      PART '%s' (\n", p3dsMesh->name);
                 staticObj = true;
             }
             else  {
-                fprintf (o, "      PART '%s' (\n", mo->name);
+                fprintf (o, "      PART '%s' (\n", p3dsMesh->name);
             }
             part = true;
         // else always MESHOBJ
@@ -121,14 +184,14 @@ void OutpObjectsCS (FILE * o, H3dsScene * scene, H3dsMapVert* ,
                 fprintf (o, "    )\n\n");
                 part = false;
             }
-            fprintf (o, "; Object Name : %s ", mo->name);
-            fprintf (o, " Faces: %6d faces \n", (int)mo->faces);
+            fprintf (o, "; Object Name : %s ", p3dsMesh->name);
+            fprintf (o, " Faces: %6d faces \n", (int)p3dsMesh->faces);
 
-            fprintf (o, "    MESHOBJ '%s' (\n", mo->name);
+            fprintf (o, "    MESHOBJ '%s' (\n", p3dsMesh->name);
             fprintf (o, "      PLUGIN ('thing')\n");
             fprintf (o, "      ZUSE ()\n");
             // handles transparent objects
-            if (strstr(mo->name, "_t_")) {
+            if (strstr(p3dsMesh->name, "_t_")) {
                 fprintf (o, "      PRIORITY('alpha')\n");
             } else {
                 fprintf (o, "      PRIORITY('object')\n");
@@ -136,48 +199,77 @@ void OutpObjectsCS (FILE * o, H3dsScene * scene, H3dsMapVert* ,
             fprintf (o, "      PARAMS (\n");
         }
     }
-    fprintf (o, "        MATERIAL ('%s')\n", mo->material);
+    fprintf (o, "        MATERIAL ('%s')\n", p3dsMesh->faceL->material);
 
-    // output vertexes
-    for (int v=0; v<mo->verts; v++)
+
+    // <--output vertexes-->
+
+    // get the number of vertices in the current mesh
+    int numVertices = p3dsMesh->points;
+
+    // vertexes pointer
+    Lib3dsPoint *pCurPoint = p3dsMesh->pointL;
+    Lib3dsTexel *pCurTexel = p3dsMesh->texelL;
+
+    for ( int i = 0 ; i < numVertices ; i++ )
     {
+      // index to the position on the list using index
+      float *xyz = pCurPoint->pos;
+      float u = pCurTexel[0][0];
+      float v = pCurTexel[0][1];
+
       if (flags & FLAG_SPRITE)
       {
-          fprintf (o, "        V(%g,%g,%g:", mo->vertlist[v].ix, mo->vertlist[v].iy, mo->vertlist[v].iz);
-          if (mo->maplist==NULL)
+          fprintf (o, "        V(%g,%g,%g:", xyz[0], xyz[1], xyz[2]);
+          if (pCurTexel==NULL)
               fprintf (o, "0,0)\n");
           else
-            fprintf (o, "%g,%g)\n",mo->maplist[0].u, (flags & FLAG_SWAP_V ? 1.-mo->maplist[0].v : mo->maplist[0].v));
+            fprintf (o, "%g,%g)\n",u, (flags & FLAG_SWAP_V ? 1.-v : v));
       } else {
           fprintf (o, "        VERTEX (%g,%g,%g)    ; %d\n",
-        	mo->vertlist[v].ix, mo->vertlist[v].iy, mo->vertlist[v].iz, v);
+        	  xyz[0], xyz[1], xyz[2], i);
       }
 
+      // go to next vertex and texel
+      pCurPoint++;
+      pCurTexel++;
     }
 
+    // <--output faces-->
+
+    // get the number of faces in the current mesh
+    int numFaces = p3dsMesh->faces;
+    Lib3dsFace *pCurFace = p3dsMesh->faceL;
+
     // output faces
-    for (i=0; i<mo->faces; i++)
+    for (i=0; i<numFaces; i++)
     {
-      H3dsFace * fa = &mo->facelist[i];
-      H3dsMap* mapV0 = &mo->maplist[fa->p0];
-      H3dsMap* mapV1 = &mo->maplist[fa->p1];
-      H3dsMap* mapV2 = &mo->maplist[fa->p2];
+      Lib3dsTexel *mapV0 = (Lib3dsTexel*)p3dsMesh->texelL[pCurFace->points[0]];
+      Lib3dsTexel *mapV1 = (Lib3dsTexel*)p3dsMesh->texelL[pCurFace->points[1]];
+      Lib3dsTexel *mapV2 = (Lib3dsTexel*)p3dsMesh->texelL[pCurFace->points[2]];
 
       if (flags & FLAG_SPRITE)
       {
-        fprintf (o, "        TRIANGLE (%d,%d,%d)\n", fa->p0, fa->p1, fa->p2);
+        fprintf (o, "        TRIANGLE (%d,%d,%d)\n", pCurFace->points[0], pCurFace->points[1], pCurFace->points[2]);
       }
       else
       {
+        // if a light is present in the 3ds file force LIGHTNING (yes)
+        if (p3dsFile->lights)
+            lighting = true;
+
         fprintf (o, "        POLYGON 'x%d_%d'  (VERTICES (%d,%d,%d)%s\n",
-	             n, i, fa->p0, fa->p1, fa->p2,
+	             numMesh, i, pCurFace->points[0], pCurFace->points[1], pCurFace->points[2],
 	             lighting ? "" : " LIGHTING (no)");
         fprintf (o, "          TEXTURE (UV (0,%g,%g,1,%g,%g,2,%g,%g))\n",
-                 mapV0->iu, mapV0->iv,
-                 mapV1->iu, mapV1->iv,
-                 mapV2->iu, mapV2->iv);
+                 mapV0[0][0], mapV0[0][1],
+                 mapV1[0][0], mapV1[0][1],
+                 mapV2[0][0], mapV2[0][1]);
         fprintf (o, "        )\n"); // close polygon
       }
+
+      // go to next face
+      pCurFace++;
     }
     // close PARAMS tag
     fprintf (o, "      )\n\n");
@@ -185,7 +277,13 @@ void OutpObjectsCS (FILE * o, H3dsScene * scene, H3dsMapVert* ,
     // close MESHOBJ tag
     if (!part)
         fprintf (o, "    )\n\n");
-  }
+
+    // increment mesh count
+    numMesh++;
+    p3dsMesh = p3dsMesh->next;
+
+  } // ~end while (p3dsMesh)
+
   if (flags & FLAG_SPRITE)
   {
     fprintf (o, "ACTION 'default' (F (f1,1000))\n");
@@ -194,43 +292,29 @@ void OutpObjectsCS (FILE * o, H3dsScene * scene, H3dsMapVert* ,
   else
   {
     fprintf (o, "    CULLER ('static')\n");
+
+    Lib3dsLight *pCurLight = p3dsFile->lights;
+    // output lights
+    while (pCurLight) {
+
+      // discart spot-lights
+      if (pCurLight->spot_light) {
+        fprintf (stderr, "Spotlight are not supported. Light '%s' will not be imported in CS\n", pCurLight->name);
+      // convert omni-lights
+      } else {
+        fprintf (o, "    LIGHT (\n");
+        fprintf (o, "      CENTER (%g,%g,%g) \n",pCurLight->position[0], pCurLight->position[1], pCurLight->position[2]);
+        fprintf (o, "      RADIUS (%g) \n",pCurLight->outer_range);
+        fprintf (o, "      COLOR (%g,%g,%g)\n",pCurLight->color[0], pCurLight->color[1], pCurLight->color[2]);
+        fprintf (o, "    )\n");
+      }
+
+      pCurLight = pCurLight->next;
+    }
+
     fprintf (o, "  )\n");
     fprintf (o, ")\n");
   }
-}
 
-/**
- * This outputs all the vertexes of the 3ds file,
- * regardless of the objects they belong to
- *
- * es. format: VERTEX (10.000000,-1.800000,5.700000)  ; 1
- */
-void OutpVertsCS (FILE * o, H3dsMapVert * vrtmap, int verts,char * name)
-{
-  (void)name;
-  if (flags & FLAG_SPRITE)
-  {
-    fprintf (o, "FRAME '%s' (\n", "f1");
-  }
-  int n;
-  for (n=0; n<verts; n++)
-  {
-    H3dsMapVert * vm = &vrtmap[n];
-    if (flags & FLAG_SPRITE)
-    {
-      fprintf (o, "  V(%g,%g,%g:%g,%g)\n",
-    	vm->ix, vm->iy, vm->iz, vm->iu, vm->iv);
-      	
-    }
-    else
-    {
-      fprintf (o, "        VERTEX (%g,%g,%g)    ; %d\n",
-    	vm->ix, vm->iy, vm->iz, n);
-    }
-  }
-  if (flags & FLAG_SPRITE)
-  {
-    fprintf (o, ")\n");
-  }
 }
 

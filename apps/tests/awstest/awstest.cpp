@@ -204,7 +204,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
     Report(CS_REPORTER_SEVERITY_ERROR, "Could not load the engine plugin!\n");
     return false;
   }
-  object_reg->Register (engine);
+  object_reg->Register (engine, "iEngine");
     
   QUERY_REG (myG3D, iGraphics3D, "Couldn't load iGraphics3D plugin !\n");
   QUERY_REG (myG2D, iGraphics2D, "Couldn't load  iGraphics2D plugin !\n");
@@ -229,7 +229,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
     Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!\n");
     return false;
   }
-  object_reg->Register (loader);
+  object_reg->Register (loader, "iLoader");
  
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = myG2D->GetNativeWindow ();

@@ -38,7 +38,7 @@ SysSystemDriver::SysSystemDriver (iObjectRegistry* object_reg)
   _uflags (_UF_SBRK_MODEL, _UF_SBRK_ARBITRARY);
 
   Os2Helper* os2helper = new Os2Helper (this);
-  object_reg->Register (os2helper, "SystemHelper");
+  object_reg->Register (os2helper, "iOs2Helper");
 }
 
 void csSleep (int SleepTime)

@@ -37,13 +37,13 @@
 
 struct csPluginLoadRec
 {
-  char *FuncID;
-  char *ClassID;
+  char* Tag;
+  char* ClassID;
 
-  csPluginLoadRec (const char *iFuncID, const char *iClassID)
-  { FuncID = csStrNew (iFuncID); ClassID = csStrNew (iClassID); }
+  csPluginLoadRec (const char* iTag, const char* iClassID)
+  { Tag = csStrNew (iTag); ClassID = csStrNew (iClassID); }
   ~csPluginLoadRec ()
-  { delete [] ClassID; delete [] FuncID; }
+  { delete [] ClassID; delete [] Tag; }
 };
 
 class csPluginList : public csVector
@@ -57,7 +57,7 @@ public:
   virtual bool FreeItem (csSome Item)
   { delete (csPluginLoadRec *)Item; return true; }
 private:
-  bool RecurseSort (iObjectRegistry*, int row, char *order, char *loop,
+  bool RecurseSort (iObjectRegistry*, int row, int *order, int *loop,
     bool *matrix);
 };
 
@@ -71,7 +71,7 @@ private:
  * or even worse A on B, B on C and C on A. The sort algorithm should detect
  * this case and type an error message if it is detected.
  * <p>
- * The alogorithm works as follows. First, a dependency matrix is built. Here
+ * The algorithm works as follows. First, a dependency matrix is built. Here
  * is a example of a simple dependency matrix:
  * <pre>
  *                iEngine      iVFS     iGraphics3D iGraphics2D
@@ -123,15 +123,6 @@ bool csPluginList::Sort (iObjectRegistry* object_reg)
 {
   int row, col, len = Length ();
 
-  // We'll use char for speed reasons
-  if (len > 255)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.pluginloader.sort",
-    	"Too many plugins requested (%d, max 255)", len);
-    return false;
-  }
-
   // Build the dependency matrix
   bool *matrix = (bool *)alloca (len * len * sizeof (bool));
   memset (matrix, 0, len * len * sizeof (bool));
@@ -167,9 +158,9 @@ bool csPluginList::Sort (iObjectRegistry* object_reg)
 
   // Go through dependency matrix and put all plugins into an array
   bool error = false;
-  char *order = (char *)alloca (len + 1);
+  int *order = (int *)alloca (sizeof (int) * (len + 1));
   *order = 0;
-  char *loop = (char *)alloca (len + 1);
+  int *loop = (int *)alloca (sizeof (int) * (len + 1));
   *loop = 0;
 
   for (row = 0; row < len; row++)
@@ -185,27 +176,37 @@ bool csPluginList::Sort (iObjectRegistry* object_reg)
   return !error;
 }
 
+static int* strchr_int (int* str, int fnd)
+{
+  while (*str != fnd)
+  {
+    if (!*str) return NULL;
+    str++;
+  }
+  return str;
+}
+
 bool csPluginList::RecurseSort (iObjectRegistry *object_reg,
-	int row, char *order, char *loop, bool *matrix)
+	int row, int *order, int *loop, bool *matrix)
 {
   // If the plugin is already in the load list, skip it
-  if (strchr (order, row + 1))
+  if (strchr_int (order, row + 1))
     return true;
 
   int len = Length ();
   bool *dep = matrix + row * len;
   bool error = false;
-  char *loopp = strchr (loop, 0);
+  int *loopp = strchr_int (loop, 0);
   *loopp++ = row + 1; *loopp = 0;
   int col, x;
   for (col = 0; col < len; col++)
     if (*dep++)
     {
       // If the plugin is already loaded, skip
-      if (strchr (order, col + 1))
+      if (strchr_int (order, col + 1))
         continue;
 
-      char *already = strchr (loop, col + 1);
+      int *already = strchr_int (loop, col + 1);
       if (already)
       {
 	csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -237,7 +238,7 @@ bool csPluginList::RecurseSort (iObjectRegistry *object_reg,
     }
 
   // Put current plugin into the list
-  char *orderp = strchr (order, 0);
+  int *orderp = strchr_int (order, 0);
   *orderp++ = row + 1; *orderp = 0;
 
   return !error;
@@ -276,7 +277,7 @@ bool csPluginLoader::LoadPlugins ()
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
     	"crystalspace.pluginloader.loadplugins",
     	"Using alternative 3D driver: %s", temp);
-    PluginList.Push (new csPluginLoadRec (CS_FUNCID_VIDEO, temp));
+    PluginList.Push (new csPluginLoadRec ("iGraphics3D", temp));
     g3d_override = true;
   }
   if ((val = CommandLine->GetOption ("canvas")))
@@ -297,10 +298,10 @@ bool csPluginLoader::LoadPlugins ()
     char temp [100];
     if (sl >= sizeof (temp)) sl = sizeof (temp) - 1;
     memcpy (temp, val, sl); temp [sl] = 0;
-    char *func = strchr (temp, ':');
-    if (func) *func++ = 0;
-    if (g3d_override && !strcmp (CS_FUNCID_VIDEO, func)) continue;
-    PluginList.Push (new csPluginLoadRec (func, temp));
+    char *tag = strchr (temp, ':');
+    if (tag) *tag++ = 0;
+    if (g3d_override && !strcmp ("iGraphics3D", tag)) continue;
+    PluginList.Push (new csPluginLoadRec (tag, temp));
   }
 
   // Now load and initialize all plugins
@@ -311,13 +312,13 @@ bool csPluginLoader::LoadPlugins ()
   {
     while (plugin_list->Next ())
     {
-      const char *funcID = plugin_list->GetKey (true);
+      const char *tag = plugin_list->GetKey (true);
       // If -video was used to override 3D driver, then respect it.
-      if (g3d_override && strcmp (funcID, CS_FUNCID_VIDEO) == 0)
+      if (g3d_override && strcmp (tag, "iGraphics3D") == 0)
         continue;
       const char *classID = plugin_list->GetStr ();
       if (classID)
-        PluginList.Push (new csPluginLoadRec (funcID, classID));
+        PluginList.Push (new csPluginLoadRec (tag, classID));
     }
     plugin_list->DecRef ();
   }
@@ -335,17 +336,12 @@ bool csPluginLoader::LoadPlugins ()
   {
     const csPluginLoadRec& r = PluginList.Get(n);
     // If plugin is VFS then skip if already loaded earlier.
-    if (VFS && r.FuncID && strcmp (r.FuncID, CS_FUNCID_VFS) == 0)
+    if (VFS && r.Tag && strcmp (r.Tag, "iVFS") == 0)
       continue;
-    iBase *plg = plugin_mgr->LoadPlugin (r.ClassID, r.FuncID, NULL, 0);
+    iBase *plg = plugin_mgr->LoadPlugin (r.ClassID, NULL, 0);
     if (plg)
     {
-      // @@@ The following register to the object registry is a temporary
-      // hack. This is the right class to register the objects but we
-      // need to be more clever about the tag we register with. Currently
-      // we just register everything as default which is not very nice.
-      object_reg->Register (plg);
-
+      object_reg->Register (plg, r.Tag);
       plg->DecRef ();
     }
   }
@@ -360,7 +356,6 @@ void csPluginLoader::RequestPlugin (const char *iPluginName,
 {
   iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
-  //@@@ Temporary
   char buf[256];
   strcpy (buf, iPluginName);
   if (!strchr (buf, ':'))

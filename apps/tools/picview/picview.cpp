@@ -145,7 +145,7 @@ bool PicViewApp::Initialize ()
     	"crystalspace.application.picview", "No image loader plugin!");
     abort ();
   }
-  object_reg->Register (image_loader);
+  object_reg->Register (image_loader, "iImageIO");
   
   pG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   pG3D->IncRef ();

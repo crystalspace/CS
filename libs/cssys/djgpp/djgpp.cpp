@@ -93,7 +93,7 @@ SysSystemDriver::SysSystemDriver (iObjectRegistry* object_reg)
   EnablePrintf = true;
 
   DosHelper* doshelper = new DosHelper (this);
-  object_reg->Register (doshelper, "SystemHelper");
+  object_reg->Register (doshelper, "iDosHelper");
 
   EventOutlet = NULL;
 }

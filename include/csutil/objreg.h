@@ -46,7 +46,9 @@ public:
   virtual bool Register (iBase* obj, char const* tag = NULL);
   virtual void Unregister (iBase* obj, char const* tag = NULL);
   virtual iBase* Get (char const* tag);
-  virtual iBase* Get (scfInterfaceID id, int version);
+  virtual iBase* Get (char const* tag, scfInterfaceID id, int version);
+  virtual iObjectRegistryIterator* Get (scfInterfaceID id, int version);
+  virtual iObjectRegistryIterator* Get ();
 };
 
 #endif // __CS_OBJREG_H__

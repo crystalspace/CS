@@ -386,10 +386,10 @@ bool csGraphics3DOGLCommon::NewInitialize ()
   if (!driver)
     driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
 
-  G2D = CS_LOAD_PLUGIN_OLD (plugin_mgr, driver, NULL, iGraphics2D);
+  G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
   if (!G2D)
     return false;
-  object_reg->Register (G2D);
+  object_reg->Register (G2D, "iGraphics2D");
 
   vbufmgr = new csPolArrayVertexBufferManager (object_reg);
 

@@ -85,8 +85,7 @@ bool csMultiplexImageIO::Initialize (iObjectRegistry *object_reg)
 	  	CS_REPORTER_SEVERITY_NOTIFY,
 		"crystalspace.video.mplex",
 		"  %s",classname);
-	  iImageIO *plugin = CS_LOAD_PLUGIN_OLD (plugin_mgr,
-	  	classname, NULL, iImageIO);
+	  iImageIO *plugin = CS_LOAD_PLUGIN (plugin_mgr, classname, iImageIO);
 	  if (plugin)
 	  {
 	    // remember the plugin

@@ -8,6 +8,16 @@ If you have an object with a trasparent texture, then his name must start with "
 
 A 3DSMax object can have only 1 texture for the converter to work. If you need more textures, split the objects in different objects.
 
+Lights:
+The converter supports also lights with this rules:
+- only Omni light are converted. Spotlights are not supported.
+- to have the same effect in CS and in 3DSMax you should define your omni light with these parameters:
+   Under "General Parameters" you should have "Diffuse" and "Specular" checked, "Ambient Only" UNchecked.
+   Under "Attenuation Parameters":
+      In section "Near Attenuation" you should have "Use" checked, "Start" = 0, "End" = the outer range of your light.
+      In section "Far Attenuation" you should have "Use" checked, "Start" = "End" = the outer range of your light.
+	For example: Near Start = 0 Near End = 5; Far Start = 5 Far End = 5; all 3 last numbers must be equal.
+
 
 For programmers:
 These are the CS rules that were applied to the objects convertion process:

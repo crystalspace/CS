@@ -12,3 +12,25 @@
 #define  FLAG_LIST          0x1000    /* List all objects in this 3ds     */
 #define  FLAG_SWAP_V        0x2000    /* Texture origin lower left    */
 
+
+#ifndef __CS_3DS2LEV_H__
+#define __CS_3DS2LEV_H__
+
+#include "lib3ds/types.h"
+
+class cs3ds2LevConverter
+{
+
+public:
+
+  /// constructor
+  cs3ds2LevConverter();
+
+  /// destructor
+  ~cs3ds2LevConverter();
+
+  // loads a 3ds file
+  Lib3dsFile * LoadFile( char *filename );
+};
+
+#endif // __CS_3DS2LEV_H__

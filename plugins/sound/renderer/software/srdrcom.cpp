@@ -105,7 +105,7 @@ bool csSoundRenderSoftware::Initialize (iObjectRegistry *r)
 #endif
 
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  SoundDriver = CS_LOAD_PLUGIN_OLD (plugin_mgr, drv, NULL, iSoundDriver);
+  SoundDriver = CS_LOAD_PLUGIN (plugin_mgr, drv, iSoundDriver);
   if (!SoundDriver)
   {
     Report (CS_REPORTER_SEVERITY_ERROR,

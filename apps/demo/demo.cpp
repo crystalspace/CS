@@ -903,7 +903,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No engine!");
     abort ();
   }
-  object_reg->Register (engine);
+  object_reg->Register (engine, "iEngine");
   engine->IncRef ();
 
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);

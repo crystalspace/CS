@@ -24,11 +24,12 @@
 #define CS_QUERY_REGISTRY_TAG(Reg,Tag)			\
   ((Reg)->Get (Tag))
 #define CS_QUERY_REGISTRY(Reg,Interface)		\
-  (Interface*)((Reg)->Get (iSCF::SCF->GetInterfaceID (#Interface), VERSION_##Interface))
-#define CS_QUERY_REGISTRY_FAST(Reg,Interface)		\
-  (Interface*)((Reg)->Get (scfGetID_##Interface (), VERSION_##Interface))
+  (Interface*)((Reg)->Get (#Interface, iSCF::SCF->GetInterfaceID (#Interface), \
+  	VERSION_##Interface))
 
-SCF_VERSION (iObjectRegistry, 0, 0, 2);
+struct iObjectRegistryIterator;
+
+SCF_VERSION (iObjectRegistry, 0, 0, 4);
 
 /**
  * This interface serves as a registry of other objects.
@@ -64,10 +65,51 @@ struct iObjectRegistry : public iBase
   virtual iBase* Get (char const* tag) = 0;
 
   /**
-   * Get the registered object that implements some interface.
+   * Get the registered object corresponding with the given tag and
+   * implementing the specified interface.
    * This function will NOT increase the ref count of the returned object.
    */
-  virtual iBase* Get (scfInterfaceID, int version) = 0;
+  virtual iBase* Get (char const* tag, scfInterfaceID id, int version) = 0;
+
+  /**
+   * Get an iterator with all objects implementing the given interface.
+   */
+  virtual iObjectRegistryIterator* Get (scfInterfaceID id, int version) = 0;
+
+  /**
+   * Get an iterator with all objects in this object registry.
+   */
+  virtual iObjectRegistryIterator* Get () = 0;
+};
+
+SCF_VERSION (iObjectRegistryIterator, 0, 0, 1);
+
+/**
+ * Use an instance of this class to iterate over objects in the object
+ * registry.
+ */
+struct iObjectRegistryIterator : public iBase
+{
+  /**
+   * Restart the iterator. Returns false if there are no ellements
+   * in it.
+   */
+  virtual bool Restart () = 0;
+
+  /**
+   * Get the current element. Return NULL if none (end of list).
+   */
+  virtual iBase* GetCurrent () = 0;
+
+  /**
+   * Return the current tag.
+   */
+  virtual const char* GetCurrentTag () = 0;
+
+  /**
+   * Proceed with next element. Return true if there is one.
+   */
+  virtual bool Next () = 0;
 };
 
 #endif

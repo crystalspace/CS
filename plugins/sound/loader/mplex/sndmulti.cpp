@@ -118,7 +118,7 @@ bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
           reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
       		"crystalspace.sound.loader.mplex",
 	  	"  %s", classname);
-        iSoundLoader *ldr = CS_LOAD_PLUGIN_OLD (plugin_mgr, classname, 0,
+        iSoundLoader *ldr = CS_LOAD_PLUGIN (plugin_mgr, classname,
 		iSoundLoader);
         if (ldr)
 	{

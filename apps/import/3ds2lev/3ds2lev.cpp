@@ -1,5 +1,6 @@
 /*
  *  Object converter/optimizer
+ *  Author: Luca Pancallo
  */
 
 #include "cssysdef.h"
@@ -9,6 +10,25 @@
 #include "3dsload.h"
 #include "3dsout.h"
 #include "3dsco.h"
+
+// --------- new implementation
+#include "3ds2lev.h"
+
+
+#include "csutil/datastrm.h"
+
+// includes for lib3ds
+#include "lib3ds/camera.h"
+#include "lib3ds/file.h"
+#include "lib3ds/io.h"
+#include "lib3ds/light.h"
+#include "lib3ds/material.h"
+#include "lib3ds/matrix.h"
+#include "lib3ds/mesh.h"
+#include "lib3ds/node.h"
+#include "lib3ds/vector.h"
+
+// ~end new implementation --------- 
 
 CS_IMPLEMENT_APPLICATION
 
@@ -29,6 +49,220 @@ int modelnum = -1;
 #define MODE_ZYX 5
 int mode_xyz = MODE_XYZ;
 
+
+/*
+ * Moves (or relocates) the whole scene.
+ * All meshes are moved.
+ * All lights are moved.
+ */
+void Lib3dsMove (Lib3dsFile* p3dsFile, float32 x, float32 y, float32 z)
+{
+
+  // a vertex
+  Lib3dsPoint *pCurPoint;
+
+  // used for coords of vertex
+  float *xyz;
+
+  // set the current mesh to the first in the file
+  Lib3dsMesh *p3dsMesh = p3dsFile->meshes;
+
+  // as long as we have a valid mesh...
+  while( p3dsMesh )
+  {
+    // get the number of vertices in the current mesh
+    int numVertices = p3dsMesh->points;
+
+    // vertexes pointer
+    pCurPoint = p3dsMesh->pointL;
+
+    for ( int i = 0 ; i < numVertices ; i++ )
+    {
+        // index to the position on the list using index
+        xyz = pCurPoint->pos;
+
+        // Move the vertex
+        xyz[0]+=x;
+        xyz[1]+=y;
+        xyz[2]+=z;
+
+        // go to next vertex
+        pCurPoint++;
+    }
+    p3dsMesh = p3dsMesh->next;
+  }
+
+  // move lights
+  Lib3dsLight *pCurLight = p3dsFile->lights;
+
+  while (pCurLight) {
+
+    pCurLight->position[0]+=x;
+    pCurLight->position[1]+=y;
+    pCurLight->position[2]+=z;
+
+    pCurLight = pCurLight->next;
+  }
+}
+
+/*
+ * Scales the whole scene.
+ * All meshes are scaled.
+ * All lights are scaled.
+ */
+void Lib3dsScale (Lib3dsFile* p3dsFile, float32 x, float32 y, float32 z)
+{
+
+  // a vertex
+  Lib3dsPoint *pCurPoint;
+
+  // used for coords of vertex
+  float *xyz;
+
+  // set the current mesh to the first in the file
+  Lib3dsMesh *p3dsMesh = p3dsFile->meshes;
+
+  // as long as we have a valid mesh...
+  while( p3dsMesh )
+  {
+    // get the number of vertices in the current mesh
+    int numVertices = p3dsMesh->points;
+
+    // vertexes pointer
+    pCurPoint = p3dsMesh->pointL;
+
+    for ( int i = 0 ; i < numVertices ; i++ )
+    {
+        // index to the position on the list using index
+        xyz = pCurPoint->pos;
+
+        // Scale the vertex
+        xyz[0]*=x;
+        xyz[1]*=y;
+        xyz[2]*=z;
+
+        // go to next vertex
+        pCurPoint++;
+    }
+    // go to next mesh
+    p3dsMesh = p3dsMesh->next;
+  }
+
+  // scale lights
+  Lib3dsLight *pCurLight = p3dsFile->lights;
+
+  while (pCurLight) {
+
+    pCurLight->position[0]*=x;
+    pCurLight->position[1]*=y;
+    pCurLight->position[2]*=z;
+
+    // scale range of light on 'x' scaling
+    pCurLight->outer_range*=x;
+    pCurLight->inner_range*=x;
+
+    pCurLight = pCurLight->next;
+  }
+
+
+}
+
+/**
+ * Simply switch x,y,z coord depending on the selected MODE_XYZ
+ */
+void ConvertXYZ (float& x, float& y, float& z)
+{
+  float sw;
+  switch (mode_xyz)
+  {
+    case MODE_XYZ: return;
+    case MODE_XZY: sw = y; y = z; z = sw; return;
+    case MODE_YXZ: sw = x; x = y; y = sw; return;
+    case MODE_YZX: sw = x; x = y; y = z; z = sw; return;
+    case MODE_ZXY: sw = x; x = z; z = y; y = sw; return;
+    case MODE_ZYX: sw = x; x = z; z = sw; return;
+  }
+}
+
+/**
+ * Swap x,y,z coord depending on the selected MODE_XYZ
+ * All vertexes and triangles are affected.
+ * All lights are affected.
+ */
+void Lib3dsConvertXYZ (Lib3dsFile* p3dsFile)
+{
+
+  // TODO: should be done for -center option. actually not supported.
+  //ConvertXYZ (scene->centre.x, scene->centre.y, scene->centre.z);
+
+  // a vertex
+  Lib3dsPoint *pCurPoint;
+
+  // used for coords of vertex
+  float *xyz;
+
+  // set the current mesh to the first in the file
+  Lib3dsMesh *p3dsMesh = p3dsFile->meshes;
+
+  // as long as we have a valid mesh...
+  while( p3dsMesh )
+  {
+    // get the number of vertices in the current mesh
+    int numVertices = p3dsMesh->points;
+
+    // vertexes pointer
+    pCurPoint = p3dsMesh->pointL;
+    for ( int i = 0 ; i < numVertices ; i++ )
+    {
+        // index to the position on the list using index
+        xyz = pCurPoint->pos;
+
+        // Convert the vertex coords
+        ConvertXYZ (xyz[0], xyz[1], xyz[2]);
+
+        // go to next vertex
+        pCurPoint++;
+    }
+
+    // we must convert also triangles or the texture will be flipped
+    // get the triangle count and go to the first triangle
+    int numTriangles = p3dsMesh->faces;
+    Lib3dsFace *pCurFace = p3dsMesh->faceL;
+
+    // convert each triangle
+    for ( i = 0 ; i < numTriangles ; i++ ) {
+        float v1 = pCurFace->points[0];
+        float v2 = pCurFace->points[1];
+        float v3 = pCurFace->points[2];
+        ConvertXYZ (v1, v2, v3);
+        pCurFace->points[0] = v1;
+        pCurFace->points[1] = v2;
+        pCurFace->points[2] = v3;
+
+        // go to next triangle
+        pCurFace++;
+    }
+
+    // go to next mesh
+    p3dsMesh = p3dsMesh->next;
+  }
+
+  // swap coords of lights
+  Lib3dsLight *pCurLight = p3dsFile->lights;
+
+  while (pCurLight) {
+
+    ConvertXYZ (pCurLight->position[0], pCurLight->position[1], pCurLight->position[2]);
+
+    pCurLight = pCurLight->next;
+  }
+
+}
+
+
+/**
+ * Actually not used: must be redone for Lib3dsFile
+ */
 void FindCentrePoints (H3dsScene * scene)
 {
   float32 xmino= 1e30, ymino= 1e30, zmino= 1e30;
@@ -65,129 +299,9 @@ void FindCentrePoints (H3dsScene * scene)
   scene->centre.z = zmaxo-(zmaxo-zmino)*0.5;
 }
 
-void Move (H3dsScene * scene, float32 x, float32 y, float32 z)
-{
-  scene->centre.x+=x;
-  scene->centre.y+=y;
-  scene->centre.z+=z;
-  int n, v;
-  for (n=0; n<scene->meshobjs; n++)
-  {
-    H3dsMeshObj * mo = &scene->meshobjlist[n];
-    mo->centre.x+=x;
-    mo->centre.y+=y;
-    mo->centre.z+=z;
-    for (v=0; v<mo->verts; v++)
-    {
-      H3dsVert * vrt=&mo->vertlist[v];
-      vrt->x+=x;
-      vrt->y+=y;
-      vrt->z+=z;
-    }
-  }
-}
-
-void Scale (H3dsScene * scene, float32 x, float32 y, float32 z)
-{
-  scene->centre.x*=x;
-  scene->centre.y*=y;
-  scene->centre.z*=z;
-  int n, v;
-  for (n=0; n<scene->meshobjs; n++)
-  {
-    H3dsMeshObj * mo = &scene->meshobjlist[n];
-    mo->centre.x*=x;
-    mo->centre.y*=y;
-    mo->centre.z*=z;
-    for (v=0; v<mo->verts; v++)
-    {
-      H3dsVert * vrt=&mo->vertlist[v];
-      vrt->x*=x;
-      vrt->y*=y;
-      vrt->z*=z;
-    }
-  }
-}
-
-void ConvertXYZ (float& x, float& y, float& z)
-{
-  float sw;
-  switch (mode_xyz)
-  {
-    case MODE_XYZ: return;
-    case MODE_XZY: sw = y; y = z; z = sw; return;
-    case MODE_YXZ: sw = x; x = y; y = sw; return;
-    case MODE_YZX: sw = x; x = y; y = z; z = sw; return;
-    case MODE_ZXY: sw = x; x = z; z = y; y = sw; return;
-    case MODE_ZYX: sw = x; x = z; z = sw; return;
-  }
-}
-
-void ConvertXYZ (H3dsScene * scene)
-{
-  ConvertXYZ (scene->centre.x, scene->centre.y, scene->centre.z);
-  int n, v, f;
-  for (n=0; n<scene->meshobjs; n++)
-  {
-    H3dsMeshObj * mo = &scene->meshobjlist[n];
-    ConvertXYZ (mo->centre.x, mo->centre.y, mo->centre.z);
-    for (v=0; v<mo->verts; v++)
-    {
-      H3dsVert * vrt=&mo->vertlist[v];
-      ConvertXYZ (vrt->x, vrt->y, vrt->z);
-    }
-	// we must convert also triangles or the texture will be flippe
-	for (f=0; f<mo->faces; f++)
-    {
-      H3dsFace * fa = &mo->facelist[f];
-	  float v1 = fa->p0;
-	  float v2 = fa->p1;
-	  float v3 = fa->p2;
-
-      ConvertXYZ (v1, v2, v3);
-
-	  fa->p0 = (word)v1;
-	  fa->p1 = (word)v2;
-	  fa->p2 = (word)v3;
-    }
-  }
-}
-
-void ConvertFloatsToInts (H3dsScene * scene)
-{
-  int n, v;
-  for (n=0; n<scene->meshobjs; n++)
-  {
-    H3dsMeshObj * mo = &scene->meshobjlist[n];
-    for (v=0; v<mo->verts; v++)
-    {
-      H3dsVert * vrt = &mo->vertlist[v];
-      vrt->ix = roundFloat(vrt->x);
-      vrt->iy = roundFloat(vrt->y);
-      vrt->iz = roundFloat(vrt->z);
-    }
-    mo->centre.ix = mo->centre.x;
-    mo->centre.iy = mo->centre.y;
-    mo->centre.iz = mo->centre.z;
-  }
-  scene->centre.ix = scene->centre.x;
-  scene->centre.iy = scene->centre.y;
-  scene->centre.iz = scene->centre.z;
-}
-
-float roundFloat (float f)
-{
-  float rem = fabs(fmod(f,1));
-  if (rem<0.00001 && rem>0)
-  {
-    if (f>0)
-      return f-rem;
-    else
-      return f+rem;
-  }
-  return f;
-}
-
+/**
+ * Used by FindCentrePoints()
+ */
 void FindExchange (H3dsScene * scene, int find, int exchange)
 {
   // Find all references to the 'find' vertice and replace
@@ -206,6 +320,9 @@ void FindExchange (H3dsScene * scene, int find, int exchange)
   }
 }
 
+/**
+ * Actually not used: must be redone for Lib3dsFile
+ */
 int RemoveDupVerts (H3dsScene * scene, H3dsMapVert * vrtmap, int verts)
 {
   int vrttop=0, dot=0, currvtx, runvtx;
@@ -258,6 +375,9 @@ int RemoveDupVerts (H3dsScene * scene, H3dsMapVert * vrtmap, int verts)
   return vrttop;
 }
 
+/**
+ * Actually not used: must be redone for Lib3dsFile
+ */
 void AdjustFaceIndexes (H3dsScene * scene)
 {
   int m=0, f, n;
@@ -275,6 +395,9 @@ void AdjustFaceIndexes (H3dsScene * scene)
   }
 }
 
+/**
+ * Actually not used: must be redone for Lib3dsFile
+ */
 void CollectVertsAndMaps (H3dsScene * scene, H3dsMapVert * vrtmap)
 {
   int vn=0, mn, v, n, m, mmn;
@@ -310,19 +433,21 @@ void CollectVertsAndMaps (H3dsScene * scene, H3dsMapVert * vrtmap)
   }
 }
 
+/**
+ * Main function
+ */
 int main (int argc, char * argv[])
 {
   char * infn=0, * outfn=0, * name=DEFNAME;
-  FILE * inf, * outf;
+  FILE * outf;
   int n;
-  H3dsScene * scene;
   float32 xscale = 0, yscale = 0, zscale = 0;
   float32 xrelocate = 0, yrelocate = 0, zrelocate = 0;
 
   flags = 0;
   curmodel = 0;
   modelnum = -1;
-  mode_xyz = MODE_XYZ;
+  mode_xyz = MODE_XZY;
 
   argc--;
   argv++;
@@ -361,8 +486,6 @@ int main (int argc, char * argv[])
   }
 
   // Get the parameters and filenames
-
-  mode_xyz = MODE_XZY; // default mode
 
   for (n=0; n<argc; n++)
   {
@@ -464,16 +587,20 @@ int main (int argc, char * argv[])
     return 1;
   }
 
-  // Open inputfile
+  // <--------- finished parsing parameters ----------->
 
-  if (!(inf = fopen(infn, "rb")))
-  {
+
+  // <--------- opening input and output files--------->
+
+  // Read inputfile
+  cs3ds2LevConverter *converter = new cs3ds2LevConverter();
+  Lib3dsFile *p3dsFile = converter->LoadFile(infn);
+  if (!p3dsFile ) {
     fprintf (stderr, "Failed to open %s\n", infn);
     return 1;
   }
 
   // Open, create or redirect outputfile
-
   if (!(flags & FLAG_LIST) && outfn)
   {
     if ((outf = fopen(outfn, "r+b")) != 0)
@@ -481,19 +608,19 @@ int main (int argc, char * argv[])
       if ((flags & FLAG_OVERWR) == 0)
       {
         fprintf (stderr, "%s exist, overwrite [y/n] ", outfn);
-	fflush (stdout);
+        fflush (stdout);
         if (toupper(getc(stdin)) != 'Y')
-	{
+        {
           fclose (outf);
-          fclose (inf);
+          //fclose (inf);
           return 0;
         }
         fprintf (stderr, "\n");
         fclose (outf);
         if ((outf = fopen(outfn, "w+b")) == 0)
-	{
+        {
           fprintf (stderr, "Unable to reopen %s\n", outfn);
-          fclose (inf);
+          //fclose (inf);
           return 1;
         }
       }
@@ -503,7 +630,7 @@ int main (int argc, char * argv[])
       if ((outf = fopen(outfn, "w+b")) == 0)
       {
         fprintf (stderr, "Unable to create %s\n", outfn);
-        fclose (inf);
+        //fclose (inf);
         return 1;
       }
     }
@@ -514,185 +641,80 @@ int main (int argc, char * argv[])
     outf = stdout;
   }
 
-  // Here we have both the source and destination files opened as:
-  // FILE * inf  -> source file
-  // FILE * outf -> destination file (could be stdout)
+  // <--------- finished opening input and output files--------->
 
-  long size;
-  if (fseek(inf, 0, SEEK_END))
-  {
-    fprintf (stderr, "Error seeking %s\n", infn);
-    if (outf!=stdout) fclose (outf);
-    fclose (inf);
-    return 1;
-  }
-
-  if ((size=ftell(inf)) == -1L)
-  {
-    fprintf (stderr, "Error seeking %s\n", infn);
-    if (outf!=stdout) fclose (outf);
-    fclose (inf);
-    return 1;
-  }
-  rewind (inf);
-
-  if ((scene = HRead3dsScene (inf, 0, size)) == 0)
-  {
-    fprintf (stderr, "Failed to load %s\n", infn);
-    if (outf!=stdout) fclose (outf);
-    fclose (inf);
-    return 1;
-  }
-  fclose (inf);
-
-  // At this point we have all object's data loaded into memory.
-  // H3dsScene * scene  -> object data
-
-  // Do any rotating, moving, scaling here before
-  // we convert all floats to integers.
-
+  /* Centering: currently not supported
   FindCentrePoints (scene);
-
   if (flags & FLAG_CENTRE)
     Move (scene, -scene->centre.x, -scene->centre.y, -scene->centre.z);
+  */
 
+  // scale model if requested
   if (flags & FLAG_SCALE)
-    Scale (scene, xscale, yscale, zscale);
+    Lib3dsScale (p3dsFile, xscale, yscale, zscale);
 
+  // move (relocate) model if requested
   if (flags & FLAG_RELOCATE)
-    Move (scene, -xrelocate, -yrelocate, -zrelocate);
+    Lib3dsMove (p3dsFile, -xrelocate, -yrelocate, -zrelocate);
 
+  // swap xyz if requested
   if (mode_xyz != MODE_XYZ)
-    ConvertXYZ (scene);
+    Lib3dsConvertXYZ (p3dsFile);
 
-  ConvertFloatsToInts (scene);
-
+  // Print some interesting information about what we have
   if (flags & FLAG_VERBOSE)
   {
-    // Print some interesting information about what we have
-    fprintf (stderr, "3DS data size: %ld byte\n", size);
+    // fprintf (stderr, "3DS data size: %ld byte\n", size);
+    fprintf (stderr, "3DS name: %s\n", p3dsFile->name);
+    fprintf (stderr, "lights: %s\n", p3dsFile->lights ? "yes" : "no");
     fprintf (stderr, "object-name     faces vertices  maps  matrix\n");
-    int f=0, v=0, m=0;
-    for (n=0; n<scene->meshobjs; n++)
+
+    // set the current mesh to the first in the file
+    Lib3dsMesh *p3dsMesh = p3dsFile->meshes;
+    // as long as we have a valid mesh...
+    while( p3dsMesh )
     {
-      H3dsMeshObj * mo = &scene->meshobjlist[n];
-      char * mtrx="yes";
-      if (mo->matrix==0)
-        mtrx="no";
-      fprintf(stderr, "===================================================\n");
-      fprintf(stderr, "%-14s  %5d  %5d  %5d    %s\n",
-              mo->name, mo->faces, mo->verts, mo->maps, mtrx);
-      f+=mo->faces;
-      v+=mo->verts;
-      m+=mo->maps;
-      int i;
-      float minx = 1000000000., miny = 1000000000., minz = 1000000000.;
-      float maxx = -1000000000., maxy = -1000000000., maxz = -1000000000.;
-      for (i = 0 ; i < mo->verts ; i++)
-      {
-        H3dsVert& v = mo->vertlist[i];
-        if (v.ix < minx) minx = v.ix;
-        if (v.iy < miny) miny = v.iy;
-        if (v.iz < minz) minz = v.iz;
-        if (v.ix > maxx) maxx = v.ix;
-        if (v.iy > maxy) maxy = v.iy;
-        if (v.iz > maxz) maxz = v.iz;
-      }
-      fprintf (stderr,
-        "    min=(%g,%g,%g)\n    max=(%g,%g,%g)\n    center=(%g,%g,%g)\n",
-      	minx, miny, minz, maxx, maxy, maxz,
-	(minx+maxx)/2, (miny+maxy)/2, (minz+maxz)/2);
-      if (mo->matrix)
-      {
-        fprintf (stderr, "    local matrix:\n");
-        fprintf (stderr, "\t%g\t%g\t%g\n",
-		roundFloat (mo->TraMatrix[0]),
-		roundFloat (mo->TraMatrix[1]),
-		roundFloat (mo->TraMatrix[2]));
-        fprintf (stderr, "\t%g\t%g\t%g\n",
-		roundFloat (mo->TraMatrix[3]),
-		roundFloat (mo->TraMatrix[4]),
-		roundFloat (mo->TraMatrix[5]));
-        fprintf (stderr, "\t%g\t%g\t%g\n",
-		roundFloat (mo->TraMatrix[6]),
-		roundFloat (mo->TraMatrix[7]),
-		roundFloat (mo->TraMatrix[8]));
-        fprintf (stderr, "    translation vector:\n");
-        fprintf (stderr, "\t%g\t%g\t%g\n",
-		roundFloat (mo->TraMatrix[9]),
-		roundFloat (mo->TraMatrix[10]),
-		roundFloat (mo->TraMatrix[11]));
-      }
+        // get the numbers in the current mesh
+        fprintf(stderr, "===================================================\n");
+        fprintf(stderr, "%-14s  %5d  %5d  %5d    %s\n",
+              p3dsMesh->name, p3dsMesh->faces, p3dsMesh->points, -1, " ");
+
+        // go to next mesh
+        p3dsMesh = p3dsMesh->next;
     }
-    if (scene->meshobjs >= 1)
-      fprintf (stderr, "%d faces, %d vertices, %d maps in "
-              "%d objects loaded\n", f, v, m, scene->meshobjs);
-    fprintf (stderr, "global center=%g,%g,%g\n",
-    	scene->centre.x, scene->centre.y, scene->centre.z);
   }
 
-  // Prepare to collect all vertices to one big array
-
-  int verts=0;
-  for (n=0; n<scene->meshobjs; n++)
-  {
-    int v=scene->meshobjlist[n].verts;
-    if (scene->meshobjlist[n].maps > v)
-    {
-      fprintf (stderr, "%-14s more maps than vertices, quitting!\n",
-          scene->meshobjlist[n].name);
-      if (outf!=stdout) fclose (outf);
-      return 1;
-    }
-    // Get the total number of vertices in all objects
-    verts+=v;
-  }
-
-  H3dsMapVert * vrtmap = (H3dsMapVert *) malloc(verts*sizeof(H3dsMapVert));
-  if (!vrtmap)
-  {
-    fprintf (stderr, "Failed to allocate mem for vertice array\n");
-    HFree3dsScene (scene);
-    fclose (outf);
-    return 1;
-  }
-  memset (vrtmap, 0, verts*sizeof(H3dsMapVert));
-
-  // Do it! Collect them
-
-  CollectVertsAndMaps (scene, vrtmap);
-
-  // Adjust the face indexes to the new vertice array
-  //AdjustFaceIndexes (scene);
-
-#if 0
-// @@@ This corrupts texture mapping!
-  if (!(flags & FLAG_NORMDUP))
-  {
-    if (flags & FLAG_VERBOSE)
-      fprintf (stderr, "Removing duplicated vertices ");
-    n = RemoveDupVerts (scene, vrtmap, verts);
-    if (flags & FLAG_VERBOSE)
-      fprintf (stderr, "\nRemoved %d duplicated vertices\n", verts-n);
-    verts=n;
-  }
-#endif
-
-  // Output data
-
+  // Output data in CS format
   if (!(flags & FLAG_LIST))
   {
-    fprintf (stderr, "CS format!\n");
-    OutpHeadCS (outf, scene, verts, name);
-    // removed because we output every object with its vertexes
-    //OutpVertsCS (outf, vrtmap, verts, name);
-    OutpObjectsCS (outf, scene, vrtmap, verts, name, flags & FLAG_LIGHTING);
-  }
+    fprintf (stderr, "Writing output in CS format...");
+    OutpHeadCS (outf, p3dsFile);
+    OutpObjectsCS (outf, p3dsFile, flags & FLAG_LIGHTING);
 
-  free (vrtmap);
-  HFree3dsScene (scene);
-  if (!(flags & FLAG_LIST) && outf != stdout)
-    fclose (outf);
+    fprintf (stderr, "done! \n");
+  }
 
   return 0;
 }
+
+
+/**
+ * Is it better to have it as a class?
+ */
+cs3ds2LevConverter::cs3ds2LevConverter() {
+
+}
+
+
+cs3ds2LevConverter::~cs3ds2LevConverter() {
+
+}
+
+Lib3dsFile *cs3ds2LevConverter::LoadFile( char *filename )
+{
+
+  Lib3dsFile *pFile = lib3ds_file_load(filename);
+
+  return pFile;
+}
+

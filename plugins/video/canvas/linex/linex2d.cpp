@@ -89,7 +89,7 @@ bool csGraphics2DLineXLib::Initialize (iObjectRegistry *object_reg)
     return false;
 
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  xwin = CS_LOAD_PLUGIN_OLD (plugin_mgr, XWIN_SCF_ID, NULL, iXWindow);
+  xwin = CS_LOAD_PLUGIN (plugin_mgr, XWIN_SCF_ID, iXWindow);
   if (!xwin)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, 

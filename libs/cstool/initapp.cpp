@@ -126,7 +126,7 @@ iObjectRegistry* csInitializer::CreateObjectRegistry ()
 iPluginManager* csInitializer::CreatePluginManager (iObjectRegistry* r)
 {
   csPluginManager* plugmgr = new csPluginManager (r);
-  r->Register (plugmgr, NULL);
+  r->Register (plugmgr, "iPluginManager");
   plugmgr->DecRef ();
   return plugmgr;
 }
@@ -135,7 +135,7 @@ iEventQueue* csInitializer::CreateEventQueue (iObjectRegistry* r)
 {
   // Register the shared event queue.
   iEventQueue* q = new csEventQueue (r);
-  r->Register (q, NULL);
+  r->Register (q, "iEventQueue");
   q->DecRef();
   return q;
 }
@@ -147,9 +147,9 @@ bool csInitializer::CreateInputDrivers (iObjectRegistry* r)
   iKeyboardDriver* k = new csKeyboardDriver (r);
   iMouseDriver*    m = new csMouseDriver    (r);
   iJoystickDriver* j = new csJoystickDriver (r);
-  r->Register (k, NULL);
-  r->Register (m, NULL);
-  r->Register (j, NULL);
+  r->Register (k, "iKeyboardDriver");
+  r->Register (m, "iMouseDriver");
+  r->Register (j, "iJoystickDriver");
   j->DecRef();
   m->DecRef();
   k->DecRef();
@@ -159,7 +159,7 @@ bool csInitializer::CreateInputDrivers (iObjectRegistry* r)
 iVirtualClock* csInitializer::CreateVirtualClock (iObjectRegistry* r)
 {
   csVirtualClock* vc = new csVirtualClock ();
-  r->Register (vc, NULL);
+  r->Register (vc, "iVirtualClock");
   vc->DecRef ();
   return vc;
 }
@@ -167,7 +167,7 @@ iVirtualClock* csInitializer::CreateVirtualClock (iObjectRegistry* r)
 iCommandLineParser* csInitializer::CreateCommandLineParser(iObjectRegistry* r)
 {
   iCommandLineParser* cmdline = new csCommandLineParser ();
-  r->Register (cmdline, NULL);
+  r->Register (cmdline, "iCommandLineParser");
   cmdline->DecRef ();
   return cmdline;
 }
@@ -176,7 +176,7 @@ iConfigManager* csInitializer::CreateConfigManager (iObjectRegistry* r)
 {
   iConfigFile* cfg = new csConfigFile ();
   iConfigManager* Config = new csConfigManager (cfg, true);
-  r->Register (Config, NULL);
+  r->Register (Config, "iConfigManager");
   Config->DecRef ();
   cfg->DecRef ();
   return Config;
@@ -216,7 +216,7 @@ bool csInitializer::SetupConfigManager (
     VFS = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.kernel.vfs", iVFS);
     if (!VFS)
       return false;
-    r->Register (VFS);
+    r->Register (VFS, "iVFS");
   }
 
   iConfigManager* Config = CS_QUERY_REGISTRY (r, iConfigManager);

@@ -31,18 +31,15 @@
 
 //------------------------------------------------------ csPlugin class -----//
 
-csPluginManager::csPlugin::csPlugin (iComponent *iObject, const char *iClassID,
-  const char *iFuncID)
+csPluginManager::csPlugin::csPlugin (iComponent *iObject, const char *iClassID)
 {
   Plugin = iObject;
   ClassID = csStrNew (iClassID);
-  FuncID = csStrNew (iFuncID);
 }
 
 csPluginManager::csPlugin::~csPlugin ()
 {
   delete [] ClassID;
-  delete [] FuncID;
   Plugin->DecRef ();
 }
 
@@ -133,7 +130,7 @@ void csPluginManager::QueryOptions (iComponent *iObject)
   }
 }
 
-iBase *csPluginManager::LoadPlugin (const char *iClassID, const char *iFuncID,
+iBase *csPluginManager::LoadPlugin (const char *iClassID,
   const char *iInterface, int iVersion)
 {
   iComponent *p = SCF_CREATE_INSTANCE (iClassID, iComponent);
@@ -145,7 +142,7 @@ iBase *csPluginManager::LoadPlugin (const char *iClassID, const char *iFuncID,
   }
   else
   {
-    int index = Plugins.Push (new csPlugin (p, iClassID, iFuncID));
+    int index = Plugins.Push (new csPlugin (p, iClassID));
     if (p->Initialize (object_reg))
     {
       iBase *ret;
@@ -169,9 +166,9 @@ iBase *csPluginManager::LoadPlugin (const char *iClassID, const char *iFuncID,
 }
 
 bool csPluginManager::RegisterPlugin (const char *iClassID,
-  const char *iFuncID, iComponent *iObject)
+  iComponent *iObject)
 {
-  int index = Plugins.Push (new csPlugin (iObject, iClassID, iFuncID));
+  int index = Plugins.Push (new csPlugin (iObject, iClassID));
   if (iObject->Initialize (object_reg))
   {
     QueryOptions (iObject);
@@ -213,18 +210,7 @@ iBase *csPluginManager::QueryPlugin (const char *iInterface, int iVersion)
   return NULL;
 }
 
-iBase *csPluginManager::QueryPlugin (
-  const char *iFuncID, const char *iInterface, int iVersion)
-{
-  int idx = Plugins.FindKey (iFuncID, 1);
-  if (idx < 0)
-    return NULL;
-
-  return (iBase *)Plugins.Get (idx)->Plugin->QueryInterface (
-    iSCF::SCF->GetInterfaceID (iInterface), iVersion);
-}
-
-iBase *csPluginManager::QueryPlugin (const char* iClassID, const char *iFuncID, 
+iBase *csPluginManager::QueryPlugin (const char* iClassID,
 				    const char *iInterface, int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
@@ -232,13 +218,10 @@ iBase *csPluginManager::QueryPlugin (const char* iClassID, const char *iFuncID,
   for (i = 0 ; i < Plugins.Length () ; i++)
   {
     csPlugin* pl = Plugins.Get (i);
-    if (pl->ClassID && pl->FuncID)
+    if (pl->ClassID)
       if (pl->ClassID == iClassID || !strcmp (pl->ClassID, iClassID))
       {
-	if (pl->FuncID == iFuncID || !strcmp (pl->FuncID, iFuncID))
-	{
-	  return (iBase*)Plugins.Get(i)->Plugin->QueryInterface(ifID,iVersion);
-	}
+	return (iBase*)Plugins.Get(i)->Plugin->QueryInterface(ifID,iVersion);
       }
   }
   return NULL;

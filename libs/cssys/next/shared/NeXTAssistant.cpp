@@ -288,7 +288,7 @@ bool csPlatformStartup(iObjectRegistry* r)
   printf("Crystal Space for " CS_PLATFORM_NAME " " CS_VERSION "\nPorted to "
     CS_PLATFORM_NAME " by Eric Sunshine <sunshine@sunshineco.com>\n\n");
   iNeXTAssistant* a = new NeXTAssistant(r);
-  r->Register(a, "NeXTAssistant");
+  r->Register(a, "iNeXTAssistant");
   a->DecRef();
   return true;
 }

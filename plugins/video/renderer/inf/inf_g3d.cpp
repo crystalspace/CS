@@ -131,11 +131,11 @@ bool csGraphics3DInfinite::Initialize (iObjectRegistry *r)
   width = height = -1;
 
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  G2D = CS_LOAD_PLUGIN_OLD (plugin_mgr, "crystalspace.graphics2d.infinite",
-    NULL, iGraphics2D);
+  G2D = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.graphics2d.infinite",
+  	iGraphics2D);
   if (!G2D)
     return false;
-  object_reg->Register (G2D);
+  object_reg->Register (G2D, "iGraphics2D");
 
   texman = new csTextureManagerInfinite (object_reg, G2D, config);
   vbufmgr = new csPolArrayVertexBufferManager (object_reg);

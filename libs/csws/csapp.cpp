@@ -186,8 +186,7 @@ csApp::~csApp ()
 
 bool csApp::Initialize ()
 {
-  if (!plugin_mgr->RegisterPlugin
-  	("crystalspace.windowing.system", "CSWS", scfiPlugin))
+  if (!plugin_mgr->RegisterPlugin ("crystalspace.windowing.system", scfiPlugin))
     return false;
 
   // Create the graphics pipeline
