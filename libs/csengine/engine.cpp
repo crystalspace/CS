@@ -840,6 +840,7 @@ csEngine::csEngine (iBase *iParent) :
   use_pvs_only = false;
   freeze_pvs = false;
   clear_zbuf = false;
+  clear_screen = false;
   engine_states = NULL;
   rad_debug = NULL;
   nextframe_pending = 0;
@@ -849,6 +850,7 @@ csEngine::csEngine (iBase *iParent) :
   default_max_lightmap_h = 256;
   default_lightmap_cell_size = 16;
   default_clear_zbuf = false;
+  default_clear_screen = false;
 
   cbufcube = new csCBufferCube (1024);
   InitCuller ();
@@ -1281,10 +1283,13 @@ void csEngine::SetLightmapCellSize (int Size)
 void csEngine::ResetWorldSpecificSettings()
 {
   SetClearZBuf (default_clear_zbuf);
+  SetClearScreen (default_clear_screen);
   SetLightmapCellSize (default_lightmap_cell_size);
   SetMaxLightmapSize (default_max_lightmap_w, default_max_lightmap_h);
-  SetAmbientLight (csColor (default_ambient_red / 255.0f, default_ambient_green / 255.0f, 
-    default_ambient_blue / 255.0f));
+  SetAmbientLight (csColor (
+  	default_ambient_red / 255.0f,
+	default_ambient_green / 255.0f, 
+        default_ambient_blue / 255.0f));
 }
 
 void csEngine::InitCuller ()
@@ -2116,7 +2121,9 @@ void csEngine::ReadConfig (iConfigFile *Config)
 
   default_clear_zbuf = 
     Config->GetBool ("Engine.ClearZBuffer", default_clear_zbuf);
-  clear_zbuf = default_clear_zbuf;
+  default_clear_screen = 
+    Config->GetBool ("Engine.ClearScreen", default_clear_screen);
+  clear_screen = default_clear_screen;
 }
 
 struct LightAndDist

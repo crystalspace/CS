@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+31-May-2002
+	- Implemented a new CLEARSCREEN option in the SETTINGS block. Using
+	  this you can force clearing of the screen every frame (this is
+	  not done by default). There is also a iEngine::SetClearScreen()
+	  function and equivalent. And an Engine.ClearScreen config option.
 30-May-2002
 	- Removed support for the XOR buffer in the engine. The XOR buffer
 	  is still used in Dynavis. Also removed 'toggle_xorbuf' command

@@ -173,7 +173,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 7, 8);
+SCF_VERSION (iEngine, 0, 7, 9);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -457,8 +457,27 @@ struct iEngine : public iBase
    * Get the value of the clear Z-buffer flag set with SetClearZBuf().
    */
   virtual bool GetClearZBuf () const = 0;
-  /// Get default clear z-buffer flag
+  /// Get default clear z-buffer flag.
   virtual bool GetDefaultClearZBuf () const = 0;
+
+  /**
+   * Require that the screen is cleared every frame. The engine
+   * itself will not use this setting but will only return the
+   * correct flag in GetBeginDrawFlags() so that the screen is actually
+   * cleared. Note that this requires that the application actually
+   * uses GetBeginDrawFlags() in the call to g3d->BeginDraw() (which it should).
+   * By default this flag is false. It is useful to set this flag to true
+   * if you have a level that doesn't itself have another way to initialize
+   * the screen.
+   */
+  virtual void SetClearScreen (bool yesno) = 0;
+
+  /**
+   * Get the value of the clear screen flag set with SetClearScreen().
+   */
+  virtual bool GetClearScreen () const = 0;
+  /// Get default clear screen flag
+  virtual bool GetDefaultClearScreen () const = 0;
 
   /**
    * Set the maximum lightmap dimensions. Polys with lightmaps larger than

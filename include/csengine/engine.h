@@ -410,8 +410,14 @@ private:
   /// Clear the Z-buffer every frame.
   bool clear_zbuf;
 
-  /// default buffer clear flag
+  /// default buffer clear flag.
   bool default_clear_zbuf;
+
+  /// Clear the screen every frame.
+  bool clear_screen;
+
+  /// default buffer clear flag.
+  bool default_clear_screen;
 
   /// default lightmap cell size
   int default_lightmap_cell_size;
@@ -631,10 +637,12 @@ public:
    */
   virtual int GetBeginDrawFlags () const
   {
+    int flag = 0;
+    if (clear_screen) flag |= CSDRAW_CLEARSCREEN;
     if (clear_zbuf || engine_mode == CS_ENGINE_ZBUFFER)
-      return CSDRAW_CLEARZBUFFER;
+      return flag | CSDRAW_CLEARZBUFFER;
     else
-      return 0;
+      return flag;
   }
 
   /**
@@ -726,7 +734,8 @@ public:
   /// Set lightmap cell size
   virtual void SetLightmapCellSize (int Size);
   /// Return default lightmap cell size
-  virtual int GetDefaultLightmapCellSize () const { return default_lightmap_cell_size; }
+  virtual int GetDefaultLightmapCellSize () const
+  { return default_lightmap_cell_size; }
 
   /// Set clear z buffer flag
   virtual void SetClearZBuf (bool yesno)
@@ -739,6 +748,18 @@ public:
 
   /// Get default clear z-buffer flag
   virtual bool GetDefaultClearZBuf () const { return default_clear_zbuf; }
+
+  /// Set clear screen flag
+  virtual void SetClearScreen (bool yesno)
+  {
+    clear_screen = yesno;
+  }
+
+  /// Get clear screen flag
+  virtual bool GetClearScreen () const { return clear_screen; }
+
+  /// Get default clear screen flag
+  virtual bool GetDefaultClearScreen () const { return default_clear_screen; }
 
   /**
    * Set the maximum lightmap dimensions. Polys with lightmaps larger than
