@@ -19,11 +19,12 @@ If the libraries are not already available on your system, then see the
 following sections for information about how to obtain them.
 
 Microsoft Visual C++ and @sc{dos} users can download a single package
-@file{winlibs0.19a.zip} containing all three dynamic link libraries in
-pre-compiled form from the following location at the Crystal Space site:
+@file{winlibs0.19b.zip} containing all headers prebuilt library files
+and dynamic link libraries in pre-compiled form from the following location
+on the Crystal Space server:
 
 @noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/winlibs0.19.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/winlibs0.19b.zip}
 
 @subheading zlib
 @cindex zlib

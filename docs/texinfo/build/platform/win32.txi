@@ -6,7 +6,7 @@
 @emph{Originally written by Dan Ogles @email{dogles@@peachtree.com}.
 Updated by Nathaniel ``Noote'' Saint Martin, @email{noote@@bigfoot.com}; Thomas
 Hieber, @email{thieber@@gmx.net}; Frank O'Connor, @email{frank@@oconnors.org};
-Last updated 20 May 2001 by Philip Wyett.}
+Last updated 09 July 2001 by Philip Wyett.}
 
 The Windows port of Crystal Space is currently maintained by Philip Wyett
 @email{philipwyett@@redeye-entertainment.co.uk}.
@@ -55,6 +55,21 @@ All the following libraries and Software Development Kits (@sc{sdk}) unless
 stated are not required.  However, if you choose not to install them, at
 compile time you must follow the documented instructions of how to unload these
 projects from the Crystal Space build process.
+
+@subsubheading Winlibs (REQUIRED)
+
+Before you attempt to compile Crystal Space, you must download
+and install @emph{winlibs}.  Winlibs is a package containing all
+third party header, pre-built library and dll files used by Crystal
+Space, i.e. @samp{zlib.dll}, @samp{libjpeg.dll}, @samp{png.dll} and
+@samp{xmlparse.dll}.  The latest version of the winlibs package
+@samp{winlibs0.19b.zip} can be downloaded from:
+
+@noindent
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/winlibs0.19b.zip}
+
+Once you have downloaded the winlbs package, extract it too your @samp{CS\}
+root directory.
 
 @subsubheading OpenGL
 
@@ -231,18 +246,6 @@ grpall.lib - 0 error(s), 0 warning(s)
 
 @node Win32 Rundemo, Win32 Workspace, Win32 Compile, Win32
 @subsubsection Running the Demonstration Applications
-
-Before you attempt to run of the Crystal Space applications, you must download
-and install @emph{winlibs}.  Winlibs is a set of Dynamic Link Libraries
-(@sc{dll}), i.e. @samp{zlib.dll}, @samp{libjpeg.dll}, @samp{png.dll} and
-@samp{xmlparse.dll}.  The latest version of the winlibs package
-@samp{winlibs0.19a.zip} can be downloaded from:
-
-@noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/winlibs0.19.zip}
-
-Once you have downloaded the winlbs package, extract it too your @samp{CS\}
-root directory.
 
 The first app you should try is Walktest.  This program shows many of the
 features of the 3D engine.  You can run it by starting it from the windows
