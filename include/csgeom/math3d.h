@@ -26,6 +26,7 @@
 
 class csVector3;
 class csMatrix3;
+class csDVector3;
 
 // this is used in inline functions (we can use fSquare from csUtil?)
 inline float fSqr (float f)
@@ -68,6 +69,12 @@ public:
   csVector3 ( const csVector3& other )
    { csVector3::x = other.x; csVector3::y = other.y; csVector3::z = other.z; }
 
+  // conversion from double precision vector to single
+  csVector3( const csDVector3 &csv );
+
+  // conversion from double precision vector to single
+  void operator=( const csDVector3 &csv );
+
   /// Add two vectors.
   inline friend csVector3 operator+ (const csVector3& v1, const csVector3& v2)
   { return csVector3(v1.x+v2.x, v1.y+v2.y, v1.z+v2.z); }
@@ -86,6 +93,13 @@ public:
     return csVector3 (v1.y*v2.z-v1.z*v2.y,
                     v1.z*v2.x-v1.x*v2.z,
                     v1.x*v2.y-v1.y*v2.x);
+  }
+
+  // take cross product of two vectors and put result in this vector
+  void cross(const csVector3 & px, const csVector3 & py){
+    x = px.y*py.z - px.z*py.y;
+    y = px.z*py.x - px.x*py.z;
+    z = px.x*py.y - px.y*py.x;
   }
 
   /// Multiply a vector and a scalar.
@@ -126,6 +140,9 @@ public:
 
 	/// Returns n-th component of the vector
   inline float operator[](int n) const {return !n?x:n&1?y:z;}
+
+	/// Returns n-th component of the vector.
+  inline float & operator[](int n){return !n?x:n&1?y:z;}
 
   /// Add another vector to this vector.
   inline csVector3& operator+= (const csVector3& v)
@@ -183,6 +200,9 @@ public:
 
   // Normalizes a vector to a unit vector.
   inline static csVector3 Unit (const csVector3& v) { return v.Unit(); }
+
+  // scale this vector to length = 1.0;
+  void Normalize();
 
 };
 

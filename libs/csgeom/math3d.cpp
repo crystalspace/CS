@@ -21,11 +21,26 @@
 #include "sysdef.h"
 #include "qint.h"
 #include "csgeom/math3d.h"
+#include "csgeom/math3d_d.h"
 
 //---------------------------------------------------------------------------
 
 float csVector3::Norm () const
 { return sqrt (x*x + y*y + z*z); }
+
+void csVector3::Normalize() {
+float len;
+  len = this->Norm();
+  if( len > SMALL_EPSILON )
+    *this /= len;
+}
+
+// conversion from single precision vector to double
+csVector3::csVector3( const csDVector3 &csv ){ x = (float)csv.x; y = (float)csv.y; z = (float)csv.z; }
+
+// conversion from single precision vector to double
+void csVector3::operator=( const csDVector3 &csv ){ x = (float)csv.x; y = (float)csv.y; z = (float)csv.z; }
+
 
 //---------------------------------------------------------------------------
 
