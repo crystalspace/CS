@@ -93,6 +93,11 @@ public:
    * Get the bounding box of this object.
    */
   const csBox3& GetBBox () const { return bbox; }
+
+  /**
+   * Get the pointer to the black box object.
+   */
+  void* GetObject () const { return object; }
 };
 
 #define CS_KDTREE_AXISX 0
@@ -121,7 +126,8 @@ private:
   csKDTree* child1;		// If child1 is not NULL then child2 will
   csKDTree* child2;		// also be not NULL.
 
-  csBox3 obj_bbox;		// Bbox of all objects in this tree.
+  bool obj_bbox_valid;		// If false obj_bbox is not valid.
+  csBox3 obj_bbox;		// Bbox of all objects in this node.
   csBox3 node_bbox;		// Bbox of the node itself.
 
   int split_axis;		// One of CS_KDTREE_AXIS?
@@ -151,6 +157,8 @@ private:
   void AddObject (csKDTreeChild* obj);
   /// Physically remove a child from this tree node.
   void RemoveObject (int idx);
+  /// Find an object. Returns -1 if not found.
+  int FindObject (csKDTreeChild* obj);
 
   /**
    * Add an object to this kd-tree node.
@@ -216,6 +224,23 @@ public:
   csKDTreeChild* AddObject (const csBox3& bbox, void* object);
 
   /**
+   * Unlink an object from the kd-tree. The 'csKDTreeChild' instance
+   * will NOT be deleted.
+   */
+  void UnlinkObject (csKDTreeChild* object);
+
+  /**
+   * Remove an object from the kd-tree. The 'csKDTreeChild' instance
+   * will be deleted.
+   */
+  void RemoveObject (csKDTreeChild* object);
+
+  /**
+   * Move an object (give it a new bounding box).
+   */
+  void MoveObject (csKDTreeChild* object, const csBox3& new_bbox);
+
+  /**
    * Distribute all objects in this node to its children.
    * This may also create new children if needed. Note that this
    * will only distribute one level (this node) and will not
@@ -253,9 +278,9 @@ public:
   csKDTreeChild** GetObjects () const { return objects; }
 
   /**
-   * Return the bounding box of all objects in this node and children.
+   * Return the bounding box of all objects in this node.
    */
-  const csBox3& GetObjectBBox () const { return obj_bbox; }
+  const csBox3& GetObjectBBox ();
 
   /**
    * Return the bounding box of the node itself (does not always contain

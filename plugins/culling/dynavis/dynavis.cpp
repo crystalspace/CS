@@ -24,6 +24,7 @@
 #include "csutil/scfstr.h"
 #include "dynavis.h"
 #include "kdtree.h"
+#include "depthbuf.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -81,6 +82,20 @@ iString* csDynaVis::Debug_UnitTest ()
     }
   }
   delete kdtree;
+
+  csDepthBuffer* depthbuf = new csDepthBuffer ();
+  dbghelp = SCF_QUERY_INTERFACE (depthbuf, iDebugHelper);
+  if (dbghelp)
+  {
+    iString* rc = dbghelp->UnitTest ();
+    dbghelp->DecRef ();
+    if (rc)
+    {
+      delete depthbuf;
+      return rc;
+    }
+  }
+  delete depthbuf;
 
   return NULL;
 }

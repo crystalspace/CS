@@ -132,6 +132,7 @@ csKDTree::csKDTree ()
   num_objects = max_objects = 0;
   disallow_distribute = false;
 
+  obj_bbox_valid = true;
   obj_bbox.StartBoundingBox ();
   node_bbox.Set (-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE,
   	-CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE,
@@ -160,6 +161,7 @@ void csKDTree::Clear ()
   delete child1; child1 = NULL;
   delete child2; child2 = NULL;
   disallow_distribute = false;
+  obj_bbox_valid = true;
   obj_bbox.StartBoundingBox ();
 }
 
@@ -190,8 +192,20 @@ void csKDTree::RemoveObject (int idx)
   }
 
   if (idx < num_objects-1)
-    memmove (&objects[idx], &objects[idx+1], num_objects-idx-1);
+    memmove (&objects[idx], &objects[idx+1],
+    	sizeof (csKDTreeChild*) * (num_objects-idx-1));
   num_objects--;
+}
+
+int csKDTree::FindObject (csKDTreeChild* obj)
+{
+  int i;
+  for (i = 0 ; i < num_objects ; i++)
+  {
+    if (objects[i] == obj)
+      return i;
+  }
+  return -1;
 }
 
 int csKDTree::FindBestSplitLocation (int axis, float& split_loc)
@@ -287,10 +301,34 @@ void csKDTree::UpdateBBox (const csBox3& bbox)
 {
   // This function assumes that the object is already
   // added to this node.
-  if (num_objects > 1 || child1)
+  if (!obj_bbox_valid)
+  {
+    // If obj_bbox was not valid we do nothing. The bbox will be calculated
+    // later when we really need it anyway.
+    return;
+  }
+  if (num_objects > 1)
     obj_bbox += bbox;
   else
     obj_bbox = bbox;
+}
+
+const csBox3& csKDTree::GetObjectBBox ()
+{
+  if (!obj_bbox_valid)
+  {
+    obj_bbox_valid = true;
+    if (num_objects > 0)
+    {
+      obj_bbox = objects[0]->bbox;
+      int i;
+      for (i = 1 ; i < num_objects ; i++)
+        obj_bbox += objects[i]->bbox;
+    }
+    else
+      obj_bbox.StartBoundingBox ();
+  }
+  return obj_bbox;
 }
 
 void csKDTree::DistributeLeafObjects ()
@@ -353,6 +391,82 @@ csKDTreeChild* csKDTree::AddObject (const csBox3& bbox, void* object)
   return obj;
 }
 
+void csKDTree::UnlinkObject (csKDTreeChild* object)
+{
+  int i;
+  for (i = 0 ; i < object->num_leafs ; i++)
+  {
+    csKDTree* leaf = object->leafs[i];
+    int idx = leaf->FindObject (object);
+    CS_ASSERT (idx != -1);
+    leaf->RemoveObject (idx);
+    leaf->obj_bbox_valid = false;
+    leaf->disallow_distribute = false;	// Give distribute a new chance.
+  }
+  object->num_leafs = 0;
+}
+
+void csKDTree::RemoveObject (csKDTreeChild* object)
+{
+  UnlinkObject (object);
+  delete object;
+}
+
+void csKDTree::MoveObject (csKDTreeChild* object, const csBox3& new_bbox)
+{
+  // If the object is in only one leaf then we test if this object
+  // will still be in the bounding box of that leaf after moving it around.
+  if (object->num_leafs == 1)
+  {
+    if (object->leafs[0]->GetNodeBBox ().Contains (new_bbox))
+    {
+      // Even after moving we are still completely inside the bounding box
+      // of the current leaf.
+      object->bbox = new_bbox;
+      object->leafs[0]->obj_bbox_valid = false;
+      object->leafs[0]->disallow_distribute = false;
+      return;
+    }
+  }
+
+  // If there are two or more leafs containing this object we
+  // are going to check if the object will still be in those leafs
+  // after moving.
+  if (object->num_leafs >= 2)
+  {
+    int i;
+    csBox3 bb; bb.StartBoundingBox ();
+    bool valid = true;
+    for (i = 0 ; i < object->num_leafs ; i++)
+    {
+      const csBox3& nb = object->leafs[i]->GetNodeBBox ();
+      if (!nb.Overlap (new_bbox))
+      {
+        valid = false;
+	break;
+      }
+      bb += nb;
+    }
+    if (valid && bb.Contains (new_bbox))
+    {
+      object->bbox = new_bbox;
+      for (i = 0 ; i < object->num_leafs ; i++)
+      {
+        object->leafs[i]->obj_bbox_valid = false;
+        object->leafs[i]->disallow_distribute = false;
+      }
+      return;
+    }
+  }
+
+  // The bad case. In this case we have no choice but to remove the
+  // object and reinsert it in the top level of the tree so that it will
+  // get redistributed later.
+  UnlinkObject (object);
+  object->bbox = new_bbox;
+  AddObject (new_bbox, object);
+}
+  
 void csKDTree::Distribute ()
 {
   // Check if there are objects to distribute or if distribution
@@ -368,8 +482,8 @@ void csKDTree::Distribute ()
     CS_ASSERT (num_objects == 0);
 
     // Update the bounding box of this node.
-    obj_bbox = child1->obj_bbox;
-    obj_bbox += child2->obj_bbox;
+    obj_bbox.StartBoundingBox ();
+    obj_bbox_valid = true;
   }
   else
   {
@@ -413,11 +527,11 @@ void csKDTree::Distribute ()
       DistributeLeafObjects ();
       CS_ASSERT (num_objects == 0);
       // Update the bounding box of this node.
-      obj_bbox = child1->obj_bbox;
-      obj_bbox += child2->obj_bbox;
-      child1->node_bbox = node_bbox;
+      obj_bbox.StartBoundingBox ();
+      obj_bbox_valid = true;
+      child1->node_bbox = GetNodeBBox ();
       child1->node_bbox.SetMax (split_axis, split_location);
-      child2->node_bbox = node_bbox;
+      child2->node_bbox = GetNodeBBox ();
       child2->node_bbox.SetMin (split_axis, split_location);
     }
   }
@@ -568,15 +682,22 @@ bool csKDTree::Debug_CheckTree (csString& str)
 
     KDT_ASSERT (split_axis >= CS_KDTREE_AXISX && split_axis <= CS_KDTREE_AXISZ,
     	"axis");
-    KDT_ASSERT (obj_bbox.Contains (child1->obj_bbox), "obj_bbox mismatch");
-    KDT_ASSERT (obj_bbox.Contains (child2->obj_bbox), "obj_bbox mismatch");
-    KDT_ASSERT (node_bbox.Contains (child1->node_bbox), "node_bbox mismatch");
-    KDT_ASSERT (node_bbox.Contains (child2->node_bbox), "node_bbox mismatch");
-    csBox3 new_node_bbox = child1->node_bbox;
-    new_node_bbox += child2->node_bbox;
-    KDT_ASSERT (new_node_bbox == node_bbox, "node_bbox mismatch");
-    csBox3 intersect = node_bbox * obj_bbox;
-    KDT_ASSERT (!intersect.Empty (), "node_bbox * tree_box == empty!");
+    KDT_ASSERT (GetNodeBBox ().Contains (child1->GetNodeBBox ()),
+    	"node_bbox mismatch");
+    KDT_ASSERT (GetNodeBBox ().Contains (child2->GetNodeBBox ()),
+    	"node_bbox mismatch");
+    csBox3 new_node_bbox = child1->GetNodeBBox ();
+    new_node_bbox += child2->GetNodeBBox ();
+    KDT_ASSERT (new_node_bbox == GetNodeBBox (), "node_bbox mismatch");
+    if (num_objects > 0)
+    {
+      csBox3 intersect = GetNodeBBox () * GetObjectBBox ();
+      KDT_ASSERT (!intersect.Empty (), "node_bbox * tree_box == empty!");
+    }
+    else
+    {
+      KDT_ASSERT (GetObjectBBox ().Empty (), "obj_bbox is not empty!");
+    }
 
     if (!child1->Debug_CheckTree (str))
       return false;
@@ -596,7 +717,7 @@ bool csKDTree::Debug_CheckTree (csString& str)
   {
     csKDTreeChild* o = objects[i];
 
-    KDT_ASSERT (obj_bbox.Contains (o->bbox), "object not in obj_bbox");
+    KDT_ASSERT (GetObjectBBox ().Contains (o->bbox), "object not in obj_bbox");
 
     KDT_ASSERT (o->num_leafs <= o->max_leafs, "leaf list");
     int parcnt = 0;
@@ -722,21 +843,66 @@ iString* csKDTree::Debug_UnitTest ()
   // it every 20 objects instead of after all objects have
   // been added the quality of the tree will not be optimal.
   // The tests below will print out statistics to show that.
+  // Every 20 objects we will also remove one object to test
+  // if RemoveObject() is working properly.
   //=================
   int i, j;
+  csKDTreeChild* remove_obj = NULL;
   for (i = 0 ; i < CS_UNITTEST_OBJECTS ; i++)
   {
     float x = rnd (100.0)-50.0;
     float y = rnd (100.0)-50.0;
     float z = rnd (100.0)-50.0;
     b.Set (x, y, z, x+rnd (7.0)+.5, y+rnd (7.0)+.5, z+rnd (7.0)+.5);
-    AddObject (b, (void*)0);
+    csKDTreeChild* new_obj = AddObject (b, (void*)0);
     if (!Debug_CheckTree (str)) return rc;
     if (i % 20 == 0)
     {
       FullDistribute ();
       if (!Debug_CheckTree (str)) return rc;
+      // Remove the previous object and store pointer to this one
+      // for next removal.
+      if (remove_obj)
+      {
+        csBox3 bb = remove_obj->GetBBox ();
+	void* obj = remove_obj->GetObject ();
+        RemoveObject (remove_obj);
+	AddObject (bb, obj);
+      }
+      remove_obj = new_obj;
     }
+  }
+
+  //=================
+  // 'remove_obj' will now point to one of the objects in the tree.
+  // We will move that around randomly.
+  //=================
+  for (i = 0 ; i < 1000 ; i++)
+  {
+    if (rnd (10.0) < 1.0)
+    {
+      // Total new position.
+      float x = rnd (100.0)-50.0;
+      float y = rnd (100.0)-50.0;
+      float z = rnd (100.0)-50.0;
+      b.Set (x, y, z, x+rnd (7.0)+.5, y+rnd (7.0)+.5, z+rnd (7.0)+.5);
+    }
+    else
+    {
+      // Move the current box slightly.
+      b = remove_obj->GetBBox ();
+      float dx = rnd (1.0)-0.5;
+      float dy = rnd (1.0)-0.5;
+      float dz = rnd (1.0)-0.5;
+      b.SetMin (0, b.MinX ()+dx);
+      b.SetMin (1, b.MinY ()+dy);
+      b.SetMin (2, b.MinZ ()+dz);
+      b.SetMax (0, b.MaxX ()+dx);
+      b.SetMax (1, b.MaxY ()+dy);
+      b.SetMax (2, b.MaxZ ()+dz);
+    }
+    MoveObject (remove_obj, b);
+    if (!Debug_CheckTree (str)) return rc;
   }
 
   //=================
@@ -996,11 +1162,13 @@ void csKDTree::Debug_Dump (csString& str, int indent)
   csString ss;
   iString* stats = Debug_Statistics ();
   ss.Format ("%s KDT obj_bbox(%g,%g,%g)-(%g,%g,%g) disallow_dist=%d\n%s     node_bbox=(%g,%g,%g)-(%g,%g,%g)\n%s %s",
-  	spaces, obj_bbox.MinX (), obj_bbox.MinY (), obj_bbox.MinZ (),
-	obj_bbox.MaxX (), obj_bbox.MaxY (), obj_bbox.MaxZ (),
+  	spaces, GetObjectBBox ().MinX (), GetObjectBBox ().MinY (),
+	GetObjectBBox ().MinZ (), GetObjectBBox ().MaxX (),
+	GetObjectBBox ().MaxY (), GetObjectBBox ().MaxZ (),
 	disallow_distribute,
-  	spaces, node_bbox.MinX (), node_bbox.MinY (), node_bbox.MinZ (),
-	node_bbox.MaxX (), node_bbox.MaxY (), node_bbox.MaxZ (),
+  	spaces, GetNodeBBox ().MinX (), GetNodeBBox ().MinY (),
+	GetNodeBBox ().MinZ (), GetNodeBBox ().MaxX (),
+	GetNodeBBox ().MaxY (), GetNodeBBox ().MaxZ (),
   	spaces, stats->GetData ());
   stats->DecRef ();
   str.Append (ss);

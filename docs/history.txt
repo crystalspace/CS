@@ -1,5 +1,22 @@
 The history order is reversed so that new features are at the top.
 
+7-May-2002
+	- Implemented csKDTree::RemoveObject().
+	- Added lazy obj_bbox calculation in csKDTree. This is useful
+	  so that we don't immediatelly have to recalculate the
+	  obj_bbox when objects are removed.
+	- Fixed a bad bug in the existing low-level csKDTree::RemoveObject().
+	- Implemented an efficient csKDTree::MoveObject(). This function
+	  only does RemoveObject/AddObject if it cannot resolve the move
+	  more efficiently (by checking if it remains in the current
+	  leafs after moving).
+	- Changed the meaning of obj_bbox (and csKDTree::GetObjectBBox()).
+	  It now represents only the bounding box of all objects in this
+	  node and not the children.
+	- Added csDepthBuffer class to the Dynavis plugin. This will
+	  implement the depth buffer. The Dynavis unit tester will also
+	  call UnitTest on the depth buffer. The depth buffer is not
+	  yet functional though.
 6-May-2002
 	- Added csBox2::SetMin/SetMax and csBox3::SetMin/SetMax functions.
 	- Renamed csKDTree::tree_bbox to obj_bbox and added a node_bbox
