@@ -137,10 +137,10 @@ struct csRGBpixel
   bool eq (const csRGBpixel& p) const
   { return operator==(p); }
   /// Get the pixel intensity
-  int Intensity ()
+  int Intensity () const
   { return (red + green + blue) / 3; }
   /// Get the pixel luminance
-  unsigned char Luminance ()
+  unsigned char Luminance () const
   {
     return (unsigned char)(((int)red*30 + (int)green*59 + (int)blue*11) / 100);
   }
