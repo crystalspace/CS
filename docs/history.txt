@@ -21,6 +21,11 @@ chronological order.
 	  lines which fit the Swig check version number template:
 	    SWIG Version 1.3.21
 	    Compiled with g++ [powerpc-apple-darwin7.4.0]
+	- Eric Sunshine fixed problem in csjava/Jamfile which caused Jam to
+	  complain that it did not know how to create crystalspace.jar at
+	  install if the archive had not already been created by 'all' or
+	  'csjava'. This problem also caused the makefile emulation setup by
+	  configure.ac to fail.
 27-Jul-2004
 	- Peter Amstutz added the wxgl canvas (initially developed by
 	  Daniel Fryer) which makes it fairly easy to embed Crystal Space

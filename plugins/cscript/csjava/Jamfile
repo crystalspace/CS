@@ -74,10 +74,11 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(CMD.SWIG) &&
     Copy $(i:BSG=built) : $(i) ;
   }
 
-  local jar = crystalspace.jar ;
   local buildbase = [ ConcatDirs $(LOCATE_TARGET) build ] ;
   local buildxml = build.xml ;
   local classdir = [ ConcatDirs $(LOCATE_TARGET) classes ] ;
+  local jar = crystalspace.jar ;
+  jar = $(jar:G=csjava) ;
   SEARCH on $(buildxml) = $(SEARCH_SOURCE) ;
   Depends $(buildxml:G=build) : $(buildxml) ;
   MakeLocate $(buildxml:G=build) : $(LOCATE_TARGET) ;
