@@ -1,6 +1,48 @@
 The history order is reversed so that new features are at the top.
 
+20-Sep-2001
+	- Fixed the bug in csFrustum::Classify() and BatchClassify().
+	  It now seems to work properly in all cases I could find.
 19-Sep-2001
+	- Wouter Wijngaards did the following:
+	    - New command: PaintSky for the ball mesh. demosky2 animates it,
+	      see the sun move across the sky, day and night.
+	    - Slightly fixed nighttime to be blacker. FPS is good! Computation
+	      of a frame costs about 0 msec for me :-) Drawing is the ball
+	      mesh only, so it performs well.
+	- Norman Kramer fixed OpenGL software proctextures so that they
+	  are now released fine.
+	- Norman hopefully fixed the text problem in OpenGL 16 bit modes.
+	- Norman added the created proctexture as child to the materialwrapper
+	  of that proctexture - this ensures the object is destructed.
+	- Norman fixed a crasher in the fire procedural texture due to an
+	  unitialized fireline variable.
+	- Christopher Nelson did the following:
+	    - Finished all cases for the rectangle fragment function. Code
+	      is untested.
+	    - Also updated Exclude to actually do something useful. 
+	      This code is still untested, and incomplete since the inverse
+	      edge intersection part is still unwritten. This means that it
+	      does not generate correct regions for some cases.
+	    - Realized that code for proper fragmentation of edge cases in
+	      exclude already exists, I simply have to call it for an
+	      intersection rather than a whole. Changed code to perform this
+	      function. Regions should now be correct and optimal. Note that
+	      the code is still untested.
+	    - Fixed a bug in fragmentRect that caused pushRect to
+	      accidentally overwrite the ymax member of r1 when called.
+	      I did this by renaming the reference parameters and copying
+	      them into two local parameters made on the stack. While this
+	      functions correctly, the old method SHOULD have worked fine
+	      too. I suspect that this may have to do with either a memory
+	      leak somewhere, or an odd compiler bug.
+	    - Added some diagnostic messages to fragmentRect to help me find
+	      out which rules are behaving incorrectly.
+	    - Added A new function Count() which retrieves the number of
+	      rects in the region.
+	    - Added a new function RectAt() which retrieves the rect at the
+	      specific location.
+	- Philip Wyett removed a redefinition of 'i' in ball mesh.
 	- Matze Braun <matze@braunis.de> made a cygwin port for CS.
 	- Fixed a bug in csFrustum::Classify() and BatchClassify().
 	  Unfortunatelly this does not yet fix the routine completely

@@ -777,9 +777,9 @@ int csFrustum::Classify (csVector3* frustum, int num_frust,
     {
       csVector3 pn = poly [pvp] % poly [pv];
       float c = pn * frustum [test_point];
-      if (c > SMALL_EPSILON)
+      if (c >= EPSILON)
         return CS_FRUST_OUTSIDE;
-      if (ABS (c) < SMALL_EPSILON)
+      if (ABS (c) < EPSILON)
       {
         test_point++;
 	stop = false;
@@ -867,9 +867,9 @@ int csFrustum::BatchClassify (csVector3* frustum, csVector3* frustumNormals,
     {
       csVector3 pn = poly [pvp] % poly [pv];
       float c = pn * frustum [test_point];
-      if (c > SMALL_EPSILON)
+      if (c >= EPSILON)
         return CS_FRUST_OUTSIDE;
-      if (ABS (c) < SMALL_EPSILON)
+      if (ABS (c) < EPSILON)
       {
         test_point++;
 	stop = false;
