@@ -133,13 +133,13 @@ public:
       return object1;
     else if (depth < 9)
     {
-      float f = float ((rand () >> 3) & 0xff) / 255.;
+      float f = float (((rand () >> 3) & 0xff) / 255.0f);
       if (f <= .05) return object2;
       return object1;
     }
     else if (depth == 9)
     {
-      float f = float ((rand () >> 3) & 0xff) / 255.;
+      float f = float (((rand () >> 3) & 0xff) / 255.0f);
       if (f <= .1) return object3;
       return object1;
     }
@@ -236,19 +236,19 @@ void csGeneralTreeFactoryLoader::GenerateTrunk (csConstructionGeometry* co,
   int vtidx[100];
 
   j = 0;
-  vt[j++].Set (-.1*brad, 0, 0*brad);
-  vt[j++].Set (-.03*brad, 0, .07*brad);
-  vt[j++].Set (.03*brad, 0, .07*brad);
-  vt[j++].Set (.1*brad, 0, 0*brad);
-  vt[j++].Set (.03*brad, 0, -.07*brad);
-  vt[j++].Set (-.03*brad, 0, -.07*brad);
+  vt[j++].Set (-0.1f * brad, 0, 0 * brad);
+  vt[j++].Set (-0.03f * brad, 0, 0.07f * brad);
+  vt[j++].Set (0.03f * brad, 0, 0.07f * brad);
+  vt[j++].Set (0.1f * brad, 0, 0 * brad);
+  vt[j++].Set (0.03f * brad, 0, -0.07f * brad);
+  vt[j++].Set (-0.03f * brad, 0, -0.07f * brad);
 
-  vt[j++].Set (-.1*trad, height, 0*trad);
-  vt[j++].Set (-.03*trad, height, .07*trad);
-  vt[j++].Set (.03*trad, height, .07*trad);
-  vt[j++].Set (.1*trad, height, 0*trad);
-  vt[j++].Set (.03*trad, height, -.07*trad);
-  vt[j++].Set (-.03*trad, height, -.07*trad);
+  vt[j++].Set (-0.1f * trad, height, 0 * trad);
+  vt[j++].Set (-0.03f * trad, height, 0.07f * trad);
+  vt[j++].Set (0.03f * trad, height, 0.07f * trad);
+  vt[j++].Set (0.1f * trad, height, 0 * trad);
+  vt[j++].Set (0.03f * trad, height, -0.07f * trad);
+  vt[j++].Set (-0.03f * trad, height, -0.07f * trad);
   co->SetVertices (j, 6, vt);
 
   j = 0;
@@ -291,34 +291,34 @@ void csGeneralTreeFactoryLoader::GenerateBranch (csConstructionGeometry* co,
   int vtidx[100];
 
   j = 0;
-  vt[j++].Set (-.1*brad, 0, 0*brad);
-  vt[j++].Set (-.03*brad, 0, .07*brad);
-  vt[j++].Set (.03*brad, 0, .07*brad);
-  vt[j++].Set (.1*brad, 0, 0*brad);
-  vt[j++].Set (.03*brad, 0, -.07*brad);
-  vt[j++].Set (-.03*brad, 0, -.07*brad);
-  vt[j++].Set (-.1*trad, height, 0*trad);
-  vt[j++].Set (-.03*trad, height, .07*trad);
-  vt[j++].Set (.03*trad, height, .07*trad);
-  vt[j++].Set (.1*trad, height, 0*trad);
-  vt[j++].Set (.03*trad, height, -.07*trad);
-  vt[j++].Set (-.03*trad, height, -.07*trad);
+  vt[j++].Set (-0.1f * brad, 0, 0 * brad);
+  vt[j++].Set (-0.03f * brad, 0, 0.07f * brad);
+  vt[j++].Set (0.03f * brad, 0, 0.07f * brad);
+  vt[j++].Set (0.1f * brad, 0, 0 * brad);
+  vt[j++].Set (0.03f * brad, 0, -0.07f * brad);
+  vt[j++].Set (-0.03f * brad, 0, -0.07f * brad);
+  vt[j++].Set (-0.1f * trad, height, 0 * trad);
+  vt[j++].Set (-0.03f * trad, height, 0.07f * trad);
+  vt[j++].Set (0.03f * trad, height, 0.07f * trad);
+  vt[j++].Set (0.1f * trad, height, 0 * trad);
+  vt[j++].Set (0.03f * trad, height, -0.07f * trad);
+  vt[j++].Set (-0.03f * trad, height, -0.07f * trad);
 
   // Vertices for the connection to the side branch.
-  vt[j++].Set (-.1, height*.28, 0);
-  vt[j++].Set (-.065, height*.42, .035);
-  vt[j++].Set (-.065, height*.58, .035);
-  vt[j++].Set (-.1, height*.72, 0);
-  vt[j++].Set (-.065, height*.58, -.035);
-  vt[j++].Set (-.065, height*.42, -.035);
+  vt[j++].Set (-0.1f, height * 0.28f, 0);
+  vt[j++].Set (-0.065f, height * 0.42f, 0.035f);
+  vt[j++].Set (-0.065f, height * 0.58f, 0.035f);
+  vt[j++].Set (-0.1f, height * 0.72f, 0);
+  vt[j++].Set (-0.065f, height * 0.58f, -0.035f);
+  vt[j++].Set (-0.065f, height * 0.42f, -0.035f);
 
   // Vertices for the top of the side branch.
-  vt[j++].Set (-.21, height*.8, 0);
-  vt[j++].Set (-.18, height*.83, .035);
-  vt[j++].Set (-.15, height*.86, .035);
-  vt[j++].Set (-.12, height*.89, 0);
-  vt[j++].Set (-.15, height*.86, -.035);
-  vt[j++].Set (-.18, height*.83, -.035);
+  vt[j++].Set (-0.21f, height * 0.8f, 0);
+  vt[j++].Set (-0.18f, height * 0.83f, 0.035f);
+  vt[j++].Set (-0.15f, height * 0.86f, 0.035f);
+  vt[j++].Set (-0.12f, height * 0.89f, 0);
+  vt[j++].Set (-0.15f, height * 0.86f, -0.035f);
+  vt[j++].Set (-0.18f, height * 0.83f, -0.035f);
 
   co->SetVertices (j, 6, vt);
   j = 0;
@@ -375,7 +375,7 @@ void csGeneralTreeFactoryLoader::GenerateBranch (csConstructionGeometry* co,
 
   m.Set (.4, 0, 0, 0, .4, 0, 0, 0, .4);
   m *= csZRotMatrix3 (.7);
-  v = m.GetInverse () * csVector3 (.165, -.845*height, 0);
+  v = m.GetInverse () * csVector3 (0.165f, -0.845f * height, 0);
   transform.SetO2TTranslation (v);
   transform.SetO2T (m);
 
@@ -445,34 +445,34 @@ void csGeneralTreeFactoryLoader::GenerateSmallBranch (
   int vtidx[100];
 
   j = 0;
-  vt[j++].Set (-.1*brad, 0, 0*brad);
-  vt[j++].Set (-.03*brad, 0, .07*brad);
-  vt[j++].Set (.03*brad, 0, .07*brad);
-  vt[j++].Set (.1*brad, 0, 0*brad);
-  vt[j++].Set (.03*brad, 0, -.07*brad);
-  vt[j++].Set (-.03*brad, 0, -.07*brad);
-  vt[j++].Set (-.1*trad, height, 0*trad);
-  vt[j++].Set (-.03*trad, height, .07*trad);
-  vt[j++].Set (.03*trad, height, .07*trad);
-  vt[j++].Set (.1*trad, height, 0*trad);
-  vt[j++].Set (.03*trad, height, -.07*trad);
-  vt[j++].Set (-.03*trad, height, -.07*trad);
+  vt[j++].Set (-0.1f * brad, 0, 0 * brad);
+  vt[j++].Set (-0.03f * brad, 0, 0.07f * brad);
+  vt[j++].Set (0.03f * brad, 0, 0.07f * brad);
+  vt[j++].Set (0.1f * brad, 0, 0 * brad);
+  vt[j++].Set (0.03f * brad, 0, -0.07f * brad);
+  vt[j++].Set (-0.03f * brad, 0, -0.07f * brad);
+  vt[j++].Set (-0.1f * trad, height, 0 * trad);
+  vt[j++].Set (-0.03f * trad, height, 0.07f * trad);
+  vt[j++].Set (0.03f * trad, height, 0.07f * trad);
+  vt[j++].Set (0.1f * trad, height, 0 * trad);
+  vt[j++].Set (0.03f * trad, height, -0.07f * trad);
+  vt[j++].Set (-0.03f * trad, height, -0.07f * trad);
 
   // Vertices for the connection to the side branch.
-  vt[j++].Set (-.1, height*.4, 0);
-  vt[j++].Set (-.085, height*.48, .015);
-  vt[j++].Set (-.085, height*.52, .015);
-  vt[j++].Set (-.1, height*.6, 0);
-  vt[j++].Set (-.085, height*.52, -.015);
-  vt[j++].Set (-.085, height*.48, -.015);
+  vt[j++].Set (-0.1f, height * 0.4f, 0);
+  vt[j++].Set (-0.085f, height * 0.48f, 0.015f);
+  vt[j++].Set (-0.085f, height * 0.52f, 0.015f);
+  vt[j++].Set (-0.1f, height * 0.6f, 0);
+  vt[j++].Set (-0.085f, height * 0.52f, -0.015f);
+  vt[j++].Set (-0.085f, height * 0.48f, -0.015f);
 
   // Vertices for the top of the side branch.
-  vt[j++].Set (-.19, height*.52, 0);
-  vt[j++].Set (-.175, height*.535, .015);
-  vt[j++].Set (-.155, height*.555, .015);
-  vt[j++].Set (-.14, height*.57, 0);
-  vt[j++].Set (-.155, height*.555, -.015);
-  vt[j++].Set (-.175, height*.535, -.015);
+  vt[j++].Set (-0.19f, height * 0.52f, 0);
+  vt[j++].Set (-0.175f, height * 0.535f, 0.015f);
+  vt[j++].Set (-0.155f, height * 0.555f, 0.015f);
+  vt[j++].Set (-0.14f, height * 0.57f, 0);
+  vt[j++].Set (-0.155f, height * 0.555f, -0.015f);
+  vt[j++].Set (-0.175f, height * 0.535f, -0.015f);
 
   co->SetVertices (j, 6, vt);
   j = 0;
@@ -529,7 +529,7 @@ void csGeneralTreeFactoryLoader::GenerateSmallBranch (
 
   m.Set (.3, 0, 0, 0, .3, 0, 0, 0, .3);
   m *= csZRotMatrix3 (.7);
-  v = m.GetInverse () * csVector3 (.165, -.545*height, 0);
+  v = m.GetInverse () * csVector3 (0.165f, -0.545f * height, 0);
   transform.SetO2TTranslation (v);
   transform.SetO2T (m);
 
@@ -743,9 +743,9 @@ printf ("tri:%d vt:%d\n", construction->GetTriangleCount (),
     const csVector3& v = vt[i];
     csVector2& uv = tx[i];
     // This is a bit like 3D texture mapping.
-    uv.x = fmod (10.*fabs (v.x+v.z), 1.)/2.;
-    uv.y = fmod (fabs (v.y), 1.0f);
-    if (int (v.y) & 1) uv.y = 1-uv.y;
+    uv.x = (float) fmod (10.0f * fabs (v.x + v.z), 1.0f) * 0.5f;
+    uv.y = (float) fmod (fabs (v.y), 1.0f);
+    if (int (v.y) & 1) uv.y = 1 - uv.y;
   }
   state->SetTriangleCount (construction->GetTriangleCount ());
   memcpy (state->GetTriangles (), construction->GetTriangles (),

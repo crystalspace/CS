@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+10-May-2003
+	- Philip Wyett eliminated the 88 double to float conversion compiler
+          warnings in gtreeldr.cpp under MSVC 6.
 9-May-2003
 	- Philip Wyett did the following:
 	    - Added 'Makefile' to 'jam distclean', so at distclean the 'CS/'
