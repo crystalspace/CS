@@ -204,12 +204,15 @@ struct iRigidBody : public iBase
   virtual bool AttachColliderCylinder (float length, float radius,
   	const csOrthoTransform& trans, float friction, float density,
 	float elasticity, float softness = 0.316f) = 0;
+  /// Add a collider box with given properties
   virtual bool AttachColliderBox (const csVector3 &size,
   	const csOrthoTransform& trans, float friction, float density,
 	float elasticity, float softness = 0.316f) = 0;
+  /// Add a collider sphere with given properties
   virtual bool AttachColliderSphere (float radius, const csVector3 &offset,
   	float friction, float density, float elasticity,
 	float softness = 0.316f) = 0;
+  /// Add a collider plane with given properties
   virtual bool AttachColliderPlane (const csPlane3 &plane, float friction,
     float density, float elasticity, float softness = 0.316f) = 0;
 
