@@ -104,6 +104,11 @@ rule Library
 rule LibDepends
 {
   $(<)_depends += $(>) ;
+  
+  if "$(<)_SHARED"
+  {
+    LinkWith $(<) : $(>) ;
+  }
 }
 
 #----------------------------------------------------------------------------
@@ -187,7 +192,8 @@ rule LibraryShared
 
   local deplibs ;
   local i ;
-  for i in $($(<)_depends)
+  #for i in $($(<)_depends)
+  for i in $(LIBDEPENDS)
   {
     deplibs += [ ConstructLibraryLinkTarget $(i) : $(3) ] ;
   }

@@ -13,7 +13,14 @@ chronological order.
             - Replaced some printf()s with csPrintf()s in the shader expression
               code.
             - Made csGradient::GetShades() return a ref to a const array.
-            - Added some missing CS_CSGEOM_EXPORT invokations to csBox2.
+            - Added some missing CS_CSGEOM_EXPORT invocations to csBox2.
+        - res made the following changes:
+            - Changed the LibDepends Jam rule for more LinkWith-like invocation
+              (ie after Library, not before).
+            - Hardcoded the section name in bfdplugins.cpp to be more 
+              symmetrical with unix.jam.
+            - Fixed the logic when to use local and csutil static var cleanup
+              function.
 4-Dec-2004
         - res fixed the GL renderer to not call glDeleteTextures() on super
           lightmap textures.

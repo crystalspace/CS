@@ -66,7 +66,9 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
   {
     if (bfd_check_format (abfd, bfd_object))
     {
-      asection *sect = bfd_get_section_by_name (abfd, "." CS_PACKAGE_NAME);
+      asection *sect = bfd_get_section_by_name (abfd, ".crystalspace");
+      /* Note: The section name must be of the same value as SECTION_TAG_NAME 
+         in unix.jam */
       if (sect)
       {
         int size = bfd_section_size (abfd, sect);
