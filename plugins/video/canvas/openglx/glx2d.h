@@ -75,6 +75,13 @@ public:
 
   virtual void AllowResize (bool iAllow);
 
+  virtual void AlertV (int type, const char* title, const char* okMsg,
+  	const char* msg, va_list arg) 
+  {
+    if (!xwin->AlertV (type, title, okMsg, msg, arg))
+      csGraphics2DGLCommon::AlertV (type, title, okMsg, msg, arg);
+  }
+
   virtual void SetTitle (const char* title)
   { xwin->SetTitle (title); }
 

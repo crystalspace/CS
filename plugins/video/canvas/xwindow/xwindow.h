@@ -135,6 +135,9 @@ public:
                                int hotspot_x, int hotspot_y,
                                csRGBcolor fg, csRGBcolor bg);
 
+  virtual bool AlertV (int type, const char* title, const char* okMsg,
+  	const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0);
+
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csXWindow);

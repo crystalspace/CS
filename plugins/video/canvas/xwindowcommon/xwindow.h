@@ -67,6 +67,13 @@ struct iXWindow : public iBase
   virtual bool SetMouseCursor (iImage *image, const csRGBcolor* keycolor, 
                                int hotspot_x, int hotspot_y,
                                csRGBcolor fg, csRGBcolor bg) = 0;
+  /**
+   * Show a message box. 
+   * \return Whether the message was actually shown. If 'false', the 
+   * caller should display the message in an alternate way.
+   */
+  virtual bool AlertV (int type, const char* title, const char* okMsg,
+  	const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0) = 0;
 };
 
 #endif // __CS_IVIDEO_XWINDOW_H__

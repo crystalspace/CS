@@ -950,7 +950,19 @@ AS_IF([test "$no_x" != yes],
 	CS_EMIT_BUILD_PROPERTY([XFREE86VM.LFLAGS],
 	    [AS_ESCAPE([$(X_PRE_LIBS) $(X_LIBS) -lXxf86vm -lXext -lX11
 	    $(X_EXTRA_LIBS)])])], [],
-	[$X_CFLAGS], [], [$X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS])])
+	[$X_CFLAGS], [], [$X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS])
+
+    CS_CHECK_LIB_WITH([Xaw],
+	[AC_LANG_PROGRAM(
+		[[#include <X11/Shell.h>
+		#include <X11/Xaw/Form.h>]],
+		[XtVaGetValues(0, 0, 0, 0)])], 
+		[], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libXaw], [XAW])],
+	[],
+	[$X_CFLAGS], [], [$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS])
+    ])
+
 
 
 

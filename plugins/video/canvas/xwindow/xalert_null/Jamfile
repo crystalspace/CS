@@ -1,0 +1,8 @@
+
+SubDir TOP plugins video canvas xwindow xalert_null ;
+
+Library xalert_null
+	: [ Wildcard *.cpp *.h ]
+	: noinstall ;
+
+# LibDepends canvascommon : cstool csgfx csgeom csutil ;

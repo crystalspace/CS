@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Dec-2004
+	- res added a graphical alert box to the xwindow plugin. It is based 
+	  upon the xmessage program, utilizes the Xaw toolkit and is enabled
+	  if the latter is detected by configure.
 14-Dec-2004
 	- PK replaced the old, csws using viewmesh with a new, aws using version.
 13-Dec-2004
