@@ -7,10 +7,15 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 12-Jan-2005
+	- Jorrit worked further on the PVS visibility culler.
 	- Chris fixed a bug in the AWS manager that meant that modal dialogs
 	  could not receive keyboard events
-12-Jan-2005
-	- Jorrit worked further on the PVS visibility culler.
+	- Jorrit extended iVisibilityCuller with a new method to load
+	  parameters from an XML document node. You can now give parameters
+	  to a visibility culler by adding them to the <cullerp> node in
+	  the world file. Currently no visibility culler has parameters but
+	  the PVS visibility culler will use a parameter to specify the
+	  filename of the PVS cache.
 10-Jan-2005
 	- Jorrit fixed traversal of movable listeners so that it uses a
 	  size_t loop instead of one based on int. This should be the same

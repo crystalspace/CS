@@ -51,6 +51,7 @@ struct iRenderLoop;
 struct iFrustumView;
 struct iSector;
 struct iPortal;
+struct iDocumentNode;
 class csRenderMeshList;
 
 SCF_VERSION (iSectorCallback, 0, 0, 1);
@@ -89,7 +90,7 @@ struct iSectorMeshCallback : public iBase
   virtual void RemoveMesh (iSector* sector, iMeshWrapper* mesh) = 0;
 };
 
-SCF_VERSION (iSector, 0, 5, 4);
+SCF_VERSION (iSector, 0, 5, 5);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -175,8 +176,11 @@ struct iSector : public iBase
    * Use the specified plugin as the visibility culler for
    * this sector. Returns false if the culler could not be
    * loaded for some reason.
+   * The optional culler parameters will be given to the new
+   * visibility culler.
    */
-  virtual bool SetVisibilityCullerPlugin (const char *Name) = 0;
+  virtual bool SetVisibilityCullerPlugin (const char* name,
+  	iDocumentNode* culler_params = 0) = 0;
   /**
    * Get the visibility culler that is used for this sector.
    * If there is no culler yet a culler of type 'crystalspace.culling.frustvis'

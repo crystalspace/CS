@@ -336,7 +336,7 @@ public:
    * iVisibilityCuller). Returns false if the culler could not be
    * loaded for some reason.
    */
-  bool UseCullerPlugin (const char* plugname);
+  bool UseCullerPlugin (const char* plugname, iDocumentNode* culler_params = 0);
 
   /**
    * Get the visibility culler that is used for this sector.
@@ -528,8 +528,11 @@ public:
       { scfParent->draw_busy++; }
     virtual void DecRecLevel ()
       { scfParent->draw_busy--; }
-    virtual bool SetVisibilityCullerPlugin (const char *Name)
-      { return scfParent->UseCullerPlugin (Name); }
+    virtual bool SetVisibilityCullerPlugin (const char* name,
+    	iDocumentNode* culler_params = 0)
+    {
+      return scfParent->UseCullerPlugin (name, culler_params);
+    }
     virtual iVisibilityCuller* GetVisibilityCuller ()
       { return scfParent->GetVisibilityCuller (); }
     virtual iMeshList* GetMeshes ()

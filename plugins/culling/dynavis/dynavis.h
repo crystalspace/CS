@@ -337,7 +337,7 @@ public:
     iMeshWrapper** p_mesh = 0, int* poly_idx = 0,
     bool accurate = true);
   virtual void CastShadows (iFrustumView* fview);
-  //virtual uint32 GetCurrentVisibilityNumber () const { return current_visnr; }
+  virtual const char* ParseCullerParameters (iDocumentNode*) { return 0; }
 
   // Debugging functions.
   csPtr<iString> Debug_UnitTest ();

@@ -238,7 +238,8 @@ void csSector::RelinkMesh (iMeshWrapper *mesh)
 
 //----------------------------------------------------------------------
 
-bool csSector::UseCullerPlugin (const char *plugname)
+bool csSector::UseCullerPlugin (const char *plugname,
+	iDocumentNode* culler_params)
 {
   culler = 0;
 
@@ -249,6 +250,14 @@ bool csSector::UseCullerPlugin (const char *plugname)
 
   if (!culler)
   {
+    return false;
+  }
+
+  const char* err = culler->ParseCullerParameters (culler_params);
+  if (err)
+  {
+    csEngine::current_engine->Error ("Error loading visibility culler: %s!",
+    	err);
     return false;
   }
 

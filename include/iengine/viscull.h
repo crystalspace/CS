@@ -36,6 +36,7 @@ struct iShadowReceiver;
 struct iMeshWrapper;
 struct iPolygonMesh;
 struct iObjectModel;
+struct iDocumentNode;
 class csVector3;
 class csBox3;
 class csSphere;
@@ -78,7 +79,7 @@ struct iVisibilityCullerListener : public iBase
     iMeshWrapper *mesh, uint32 frustum_mask) = 0;
 };
 
-SCF_VERSION (iVisibilityCuller, 0, 6, 0);
+SCF_VERSION (iVisibilityCuller, 0, 7, 0);
 
 /**
  * This interface represents a visibility culling system.
@@ -215,12 +216,10 @@ struct iVisibilityCuller : public iBase
   virtual void CastShadows (iFrustumView* fview) = 0;
 
   /**
-   * Get the current visibility number. You can compare this number
-   * to the visibility number as returned by
-   * iVisibilityObject->GetVisibilityNumber(). If equal then the object
-   * was visible.
+   * Parse a document node with additional parameters for this culler.
+   * Returns error message on error or 0 otherwise.
    */
-  //virtual uint32 GetCurrentVisibilityNumber () const = 0;
+  virtual const char* ParseCullerParameters (iDocumentNode* node) = 0;
 };
 
 /** \name GetCullerFlags() flags

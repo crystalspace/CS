@@ -4681,6 +4681,8 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
     AddToRegion (ldr_context, sector->QueryObject ());
   }
 
+  csRef<iDocumentNode> culler_params;
+
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -4745,6 +4747,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	goto error;
       case XMLTOKEN_CULLERP:
 	culplugname = csStrNew (child->GetContentsValue ());
+	culler_params = child;	// Remember for later.
 	if (!culplugname)
 	{
 	  SyntaxService->ReportError (
@@ -4849,7 +4852,8 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	  {
       	    SyntaxService->ReportError (
 	      	"crystalspace.maploader.load.meshobject",
-		child, "Could not find mesh object '%s' in sector '%s' for MESHLIB!",
+		child,
+		"Could not find mesh object '%s' in sector '%s' for MESHLIB!",
 		meshname, secname ? secname : "<noname>");
 	    goto error;
 	  }
@@ -4920,7 +4924,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
   }
   if (do_culler)
   {
-    bool rc = sector->SetVisibilityCullerPlugin (culplugname);
+    bool rc = sector->SetVisibilityCullerPlugin (culplugname, culler_params);
     if (!rc)
     {
       SyntaxService->ReportError (
