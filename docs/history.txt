@@ -27,6 +27,10 @@ chronological order.
 	- Jorrit enhanced Dynavis and Frustvis to use the clip planes as
 	  defined by the last portal that was traversed. This can benefit
 	  performance a bit.
+	- Jorrit fixed a bug in waterdemo. It would forget to call
+	  Invalidate() after changing the genmesh vertices. This bug triggered
+	  after Jorrit made a modification so that simply calling GetVertices()
+	  on a genmesh does not make the vertex buffers dirty in NR.
 24-Feb-2004
         - Fritz Elfert fixed conversion of bezier mesh factories in map2cs
           and re-enabled them (With wrong cvs log-message: "Before big

@@ -700,6 +700,8 @@ void csWaterDemo::updateWater (float time)
 
   if (haveRan)
     generateNormals ();
+
+  gFactState->Invalidate ();
 }
 
 void csWaterDemo::pushDownPoint (float x, float z, float depth)
