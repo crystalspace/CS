@@ -125,8 +125,10 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
   {
     // Not in cache.
     if (pfmt.PixelBytes == 2)
-      glReadPixels (0,0, width, height, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
-		    tex_0->get_image_data());
+	{
+	  //glReadPixels (0,0, width, height, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
+		//    tex_0->get_image_data());
+	}
     else
       glReadPixels (0, 0, width, height,
 		    GL_RGB, GL_UNSIGNED_BYTE, tex_0->get_image_data());

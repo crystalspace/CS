@@ -247,9 +247,9 @@ void csOpenGLProcSoftware::Print (csRect *area)
     switch (pfmt.PixelBytes)
     {
       case 2:
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
-			width, height,
-			GL_RGB, GL_UNSIGNED_SHORT_5_6_5, buffer);
+//	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
+//			width, height,
+//			GL_RGB, GL_UNSIGNED_SHORT_5_6_5, buffer);
 	break;
       case 4:
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,

@@ -323,8 +323,8 @@ iImage *csGraphics2DGLCommon::ScreenShot ()
       break;
     case 2:
       // experimental
-      glReadPixels (0, 0, Width, Height, GL_RGB,
-		    GL_UNSIGNED_SHORT_5_6_5, screen_shot);
+      //glReadPixels (0, 0, Width, Height, GL_RGB,
+	  //    GL_UNSIGNED_SHORT_5_6_5, screen_shot);
       break;
     default:
       glReadPixels (0, 0, Width, Height, GL_RGBA,
