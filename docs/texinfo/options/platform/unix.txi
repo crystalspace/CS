@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Platform peruser unix,
+@node Platform peruser unix, , Platform peruser Win32, Platform peruser
 @subsection Storage of per-user configuration on Unix and Linux
 @cindex Unix per-user configuration
 

@@ -27,6 +27,7 @@ least used by CrystalSpace itself, so be wary of possible conflicts).
 
 @menu
 * Platform peruser Win32:: Storage of per-user configuration on Windows
+* Platform peruser unix:: Storage of per-user configuration on Unix and Linux
 @end menu
 
 @importss{options,platform,win32.txi}
