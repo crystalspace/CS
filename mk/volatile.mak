@@ -89,6 +89,9 @@ endif
 ifeq ($(CS_USE_FAKE_SOCKLEN_TYPE),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_USE_FAKE_SOCKLEN_TYPE$">>volatile.tmp
 endif
+ifeq ($(CS_NO_QSQRT),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_NO_QSQRT$">>volatile.tmp
+endif
 ifeq ($(DO_COREDUMP),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_COREDUMP$">>volatile.tmp
 endif

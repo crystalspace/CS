@@ -41,21 +41,22 @@ esac
 # the processor is correctly catched
 # IP30 came up on an IRIX machine (Dmitry)
 case $MACHINE in
-  *sun*)	MACHINE=$CPU  ;;
-  *IP[0-9][0-9]*)	MACHINE=$CPU  ;;
+  *sun*)          MACHINE=$CPU ;;
+  *IP[0-9][0-9]*) MACHINE=$CPU ;;
 esac
 
 # Now check processor type: add more checks here as needed
 case $MACHINE in
-  *ppc*)	echo "PROC = POWERPC" ;;
-  *i[3-9]86*)	echo "PROC = X86" ;;
-  *ia64*)	echo "PROC = UNKNOWN" ;;
-  *sparc*)	echo "PROC = SPARC" ;;
-  *mips*)	echo "PROC = MIPS" ;;
-  *alpha*)	echo "PROC = ALPHA" ;;
+  *ppc*)	PROC="POWERPC" ;;
+  *i[3-9]86*)	PROC="X86"     ;;
+  *ia64*)	PROC="UNKNOWN" ;;
+  *sparc*)	PROC="SPARC"   ;;
+  *mips*)	PROC="MIPS"    ;;
+  *alpha*)	PROC="ALPHA"   ;;
   *)		echo "UNKNOWN MACHINE TYPE: Please fix $0!" >&2
-		exit 1
+		exit 1         ;;
 esac
+echo "PROC = ${PROC}"
 
 # Find the C++ compiler
 [ -z "${CXX}" ] && CXX=`which gcc 2>&1 | grep -v "[Nn]o"`
@@ -158,7 +159,7 @@ echo "USE_XFREE86VM = yes"
 ([ -w /usr/local ] && echo "INSTALL_DIR = /usr/local/crystal") ||
 echo "INSTALL_DIR = "${HOME}"/crystal"
 
-sh ${SCRIPT_DIR}/comptest.sh ${CXX}
+sh ${SCRIPT_DIR}/comptest.sh ${CXX} ${PROC}
 sh ${SCRIPT_DIR}/endtest.sh ${CXX}
 sh ${SCRIPT_DIR}/haspythn.sh ${CXX}
 

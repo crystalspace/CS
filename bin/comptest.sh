@@ -3,18 +3,21 @@
 # A compiler capability testing script.
 #
 # Arguments: $1 is the name of the C++ compiler (gcc, c++, etc.)
+#            $2 is the symbolic name of the CPU (X86, SPARC, POWERPC, etc.)
 #
 # The output of this script (a makefile fragment) is configuration information
 # needed for building Crystal Space.  It is piped to stdout, and errors are
 # piped to stderr.
 #==============================================================================
 CXX=$1
+PROC=$2
 
 #------------------------------------------------------------------------------
 # Check if C++ compiler has a built-in 'bool' type.
 #------------------------------------------------------------------------------
 echo "int func() { bool b = true; return (int)b; }" > comptest.cpp
 ${CXX} -c comptest.cpp 2>/dev/null || echo "CS_USE_FAKE_BOOL_TYPE = yes"
+
 
 #------------------------------------------------------------------------------
 # Check if C++ compiler understands new-style C++ casting syntax.
@@ -33,11 +36,32 @@ A* func4(void* p) { return reinterpret_cast<A*>(p); }
 TEST
 ${CXX} -c comptest.cpp 2>/dev/null || echo "CS_USE_OLD_STYLE_CASTS = yes"
 
+
 #------------------------------------------------------------------------------
 # Check if C++ compiler understands new C++ `explicit' keyword.
 #------------------------------------------------------------------------------
 echo "class A { public: explicit A(int); };" > comptest.cpp
 ${CXX} -c comptest.cpp 2>/dev/null || echo "CS_USE_FAKE_EXPLICIT_KEYWORD = yes"
+
+
+#------------------------------------------------------------------------------
+# If processor type was specified, check if compiler is able to understand
+# CS/include/qsqrt.h.  This test should not only catch compilers which do not
+# understand the x86 assembly in that file, but should also catch compilers
+# which fail with an internal error on this file (such as the RedHat 7 GCC).
+# If the processor type was not specified, then no test is made, nor are any
+# makefile variables set.  In this case, it is up to the platform-specific
+# configuration mechanism to enable the CS_NO_QSQRT flag if necessary.
+#------------------------------------------------------------------------------
+if [ -n "${PROC}" ]; then
+cat << TEST > comptest.cpp
+#define PROC_${PROC}
+#define COMP_GCC
+#include "include/qsqrt.h"
+float func() { float n = 1; return qsqrt(n); }
+TEST
+${CXX} -c comptest.cpp 2>/dev/null || echo "CS_NO_QSQRT = yes"
+fi
 
 #------------------------------------------------------------------------------
 # Clean up.
