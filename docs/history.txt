@@ -4,6 +4,11 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 5-Apr-2003
+        - Rhad improved the Direct Sound 3d sound renderer.
+          Design is similar to OpenAL renderer.
+          A background thread is now used to support streaming audio
+          data.
+          Read the source if interested, too many changes to list here.
         - Rhad improved the OpenAL sound renderer.
           Major overhaul of implementation.
           A background thread is now used to support streaming audio 

@@ -32,14 +32,16 @@ SCF_IMPLEMENT_IBASE(csSoundListenerDS3D)
 	SCF_IMPLEMENTS_INTERFACE(iSoundListener)
 SCF_IMPLEMENT_IBASE_END;
 
-csSoundListenerDS3D::csSoundListenerDS3D(iBase *piBase) {
+csSoundListenerDS3D::csSoundListenerDS3D(iBase *piBase) 
+{
   SCF_CONSTRUCT_IBASE(piBase);
   PrimaryBuffer = NULL;
   Listener = NULL;
   Renderer = NULL;
 }
 
-csSoundListenerDS3D::~csSoundListenerDS3D() {
+csSoundListenerDS3D::~csSoundListenerDS3D() 
+{
   if (Renderer) Renderer = NULL;
   if (Listener) Listener->Release();
   if (PrimaryBuffer) {
@@ -48,7 +50,8 @@ csSoundListenerDS3D::~csSoundListenerDS3D() {
   }
 }
 
-bool csSoundListenerDS3D::Initialize(csRef<csSoundRenderDS3D> srdr) {
+bool csSoundListenerDS3D::Initialize(csRef<csSoundRenderDS3D> srdr) 
+{
   Renderer = srdr;
 
   DSBUFFERDESC dsbd;
@@ -59,15 +62,15 @@ bool csSoundListenerDS3D::Initialize(csRef<csSoundRenderDS3D> srdr) {
   dsbd.lpwfxFormat = NULL;
 
   csRef<iReporter> reporter = CS_QUERY_REGISTRY (Renderer->object_reg,
-  	iReporter);
+    iReporter);
 
   HRESULT r;
   r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &PrimaryBuffer, NULL);
   if (r != DS_OK) {
     if (reporter)
       reporter->Report (CS_REPORTER_SEVERITY_WARNING,
-      	"crystalspace.sound.ds3d", "DS3D listener: "
-        "Cannot create primary sound buffer (%s).", Renderer->GetError(r));
+      "crystalspace.sound.ds3d", "DS3D listener: "
+      "Cannot create primary sound buffer (%s).", Renderer->GetError(r));
     return false;
   }
 
@@ -75,9 +78,9 @@ bool csSoundListenerDS3D::Initialize(csRef<csSoundRenderDS3D> srdr) {
   if (r != DS_OK) {
     if (reporter)
       reporter->Report (CS_REPORTER_SEVERITY_WARNING,
-      	"crystalspace.sound.ds3d",
-        "DS3D listener: Cannot query listener"
-        " interface from primary sound buffer (%s).", Renderer->GetError(r));
+      "crystalspace.sound.ds3d",
+      "DS3D listener: Cannot query listener"
+      " interface from primary sound buffer (%s).", Renderer->GetError(r));
     return false;
   }
 
@@ -86,55 +89,64 @@ bool csSoundListenerDS3D::Initialize(csRef<csSoundRenderDS3D> srdr) {
   return true;
 }
 
-void csSoundListenerDS3D::SetPosition(const csVector3 &v) {
+void csSoundListenerDS3D::SetPosition(const csVector3 &v) 
+{
   Dirty = true;
   csSoundListener::SetPosition(v);
   Listener->SetPosition( v.x, v.y, v.z, DS3D_DEFERRED);
 }
 
-void csSoundListenerDS3D::SetDirection(const csVector3 &f, const csVector3 &t) {
+void csSoundListenerDS3D::SetDirection(const csVector3 &f, const csVector3 &t) 
+{
   Dirty = true;
   csSoundListener::SetDirection(f, t);
   Listener->SetOrientation(f.x, f.y, f.z,t.x, t.y, t.z,DS3D_DEFERRED);
 }
 
-void csSoundListenerDS3D::SetHeadSize(float size) {
-//  Dirty = true;
+void csSoundListenerDS3D::SetHeadSize(float size) 
+{
+  //  Dirty = true;
   csSoundListener::SetHeadSize(size);
-// @@@
+  // @@@
 }
 
-void csSoundListenerDS3D::SetVelocity(const csVector3 &v) {
+void csSoundListenerDS3D::SetVelocity(const csVector3 &v) 
+{
   Dirty = true;
   csSoundListener::SetVelocity(v);
   Listener->SetVelocity(v.x, v.y, v.z, DS3D_DEFERRED);
 }
 
-void csSoundListenerDS3D::SetDopplerFactor(float factor) {
+void csSoundListenerDS3D::SetDopplerFactor(float factor) 
+{
   Dirty = true;
   csSoundListener::SetDopplerFactor(factor);
   Listener->SetDopplerFactor(factor, DS3D_DEFERRED);
 }
 
-void csSoundListenerDS3D::SetDistanceFactor(float factor) {
+void csSoundListenerDS3D::SetDistanceFactor(float factor) 
+{
   Dirty = true;
   csSoundListener::SetDistanceFactor(factor);
   Listener->SetDistanceFactor(factor, DS3D_DEFERRED);
 }
 
-void csSoundListenerDS3D::SetRollOffFactor(float factor) {
+void csSoundListenerDS3D::SetRollOffFactor(float factor) 
+{
   Dirty = true;
   csSoundListener::SetRollOffFactor(factor);
   Listener->SetRolloffFactor(factor, DS3D_DEFERRED);
 }
 
-void csSoundListenerDS3D::SetEnvironment(csSoundEnvironment env) {
-//  Dirty = true;
+void csSoundListenerDS3D::SetEnvironment(csSoundEnvironment env) 
+{
+  //  Dirty = true;
   csSoundListener::SetEnvironment(env);
-// @@@
+  // @@@
 }
 
-void csSoundListenerDS3D::Prepare() {
+void csSoundListenerDS3D::Prepare() 
+{
   if (!Dirty) return;
   Listener->CommitDeferredSettings();
   Dirty = false;

@@ -21,29 +21,47 @@
 #include "sndrdr.h"
 #include "sndsrc.h"
 
-#define REFRESH_RATE    10
 
-csSoundHandleDS3D::csSoundHandleDS3D(csRef<csSoundRenderDS3D> srdr, csRef<iSoundData> snd)
-        : csSoundHandle(snd)
+csSoundHandleDS3D::csSoundHandleDS3D(csRef<csSoundRenderDS3D> srdr, csRef<iSoundData> snd, float BufferLengthSeconds, bool LocalBuffer)
+: csSoundHandle(snd)
 {
   SoundRender = srdr;
   Registered = true;
+  buffer=NULL;  
+
   NumSamples = Data->IsStatic() ? Data->GetStaticSampleCount() :
-    (Data->GetFormat()->Freq/REFRESH_RATE);
+  (((float)(Data->GetFormat()->Freq)) * BufferLengthSeconds);
+
+  buffer_length=(NumSamples* Data->GetFormat()->Bits * Data->GetFormat()->Channels)/8;
+  if (LocalBuffer)
+    buffer=malloc(buffer_length);
+
+  buffer_writecursor=0;
+
+  mutex_WriteCursor=csMutex::Create();
+
 }
 
-csSoundHandleDS3D::~csSoundHandleDS3D() {
+csSoundHandleDS3D::~csSoundHandleDS3D() 
+{
   SoundRender = NULL;
+  if (buffer)
+    free(buffer);
+  buffer=NULL;
 }
 
-void csSoundHandleDS3D::Unregister() {
+void csSoundHandleDS3D::Unregister() 
+{
   Registered = false;
   ReleaseSoundData();
 }
 
-csPtr<iSoundSource> csSoundHandleDS3D::CreateSource(int Mode3d) {
+csPtr<iSoundSource> csSoundHandleDS3D::CreateSource(int Mode3d) 
+{
   if (!Registered) return NULL;
   csSoundSourceDS3D *src = new csSoundSourceDS3D(NULL);
+
+
   if (src->Initialize(SoundRender, this, Mode3d, NumSamples))
     return csPtr<iSoundSource> (src);
   else
@@ -51,6 +69,195 @@ csPtr<iSoundSource> csSoundHandleDS3D::CreateSource(int Mode3d) {
     src->DecRef();
     return NULL;
   }
+
+
+}
+
+void csSoundHandleDS3D::StartStream(bool Loop)
+{
+  if (!Data->IsStatic() && !ActiveStream)
+  {
+    buffer_writecursor=0;
+    LoopStream = Loop;
+    ActiveStream = true;
+    // Fill our local buffer if we have one
+    UpdateCount(NumSamples);
+  }
+}
+
+// Only overridden because it calls UpdateCount which is altered
+void csSoundHandleDS3D::Update_Time(csTicks Time)
+{
+  UpdateCount (Time * Data->GetFormat()->Freq / 1000);
+}
+
+void csSoundHandleDS3D::UpdateCount(long NumSamples)
+{
+  int32 freespace;
+  csSoundSourceDS3D *src;
+  long Num;
+  long bytespersample;
+  bool noneplaying=true;
+
+
+  // If the stream is not active, allow the source to check for buffer end
+  if (!ActiveStream)
+  {
+    // Check to be sure this is not a static buffer
+    if (!Data->IsStatic())
+    {
+      // Find any sources associated with us
+      for (long i=0; i<SoundRender->ActiveSources.Length(); i++)
+      {
+        src = (csSoundSourceDS3D*)SoundRender->ActiveSources.Get(i);
+        if (src->GetSoundHandle()==this && src->IsPlaying())
+          src->WatchBufferEnd();
+      }
+    }
+    return;
+  }
+
+
+  /* Calculate the smallest amount of free space in the Direct Sound buffers that is no longer valid (has been played but not yet written with new data)
+  *   If the sources aren't well syncronized, this will reduce the amount the advance buffer is used.
+  *
+  */
+  mutex_WriteCursor->LockWait();
+  freespace=0;
+  for (long i=0; i<SoundRender->ActiveSources.Length(); i++)
+  {
+    src = (csSoundSourceDS3D*)SoundRender->ActiveSources.Get(i);
+    if (src->GetSoundHandle()==this && src->IsPlaying())
+    {
+      noneplaying=false;
+      int32 srcfree=src->GetFreeBufferSpace();
+      if (srcfree && (freespace==0 || srcfree<freespace))
+        freespace=srcfree;
+    }
+  }
+
+
+  bytespersample=(Data->GetFormat()->Bits * Data->GetFormat()->Channels)/8;
+
+
+
+  // Translate free space into samples for calling an iSoundData interface
+  Num=freespace/bytespersample;
+
+  // If no sources are playing, use the passed reference sample count to advance time
+  if (noneplaying)
+    Num=NumSamples;
+
+
+  /* If the amount to be read is greater than the total buffer length, we have underbuffered.
+  *  All we can do is skip.  This should only be possible if we are using our csGetTicks() calculated
+  *  time delta since the directsound cursor method is circular.
+  */
+  if (Num*bytespersample>buffer_length)
+    Num=buffer_length/bytespersample;
+
+
+  // Read until we've read a full buffer's worth
+  while (Num > 0)
+  {
+    long n =1;
+
+    // Read data until the end of the stream, or the buffer is full
+    while (n>0) 
+    {
+      n=Num;
+      /* Some SoundData formats allocate the internal buffer for decoded data in a 
+      *  brain-dead manner.  They simply allocate as much space as we pass even
+      *  if the data is much smaller.  In the case of Ogg, the codec simply
+      *  won't provide more than 1 Ogg frame per read call, so with a 500k
+      *  maximum buffer, Ogg ends up allocating 500k and never putting more than 
+      *  512 bytes into it.
+      * We provide a memory-saving sane maximum value to process here.
+      */
+      if (n>32768)
+        n=32768;
+
+      void *buf = Data->ReadStreamed(n);
+      // Add the data that we did get to the buffer
+      vUpdate(buf, n);
+      // If the local buffer is valid, copy the data to the local buffer too
+      if (buffer)
+      {
+        long position1;
+        long length1,length2;
+        long readlength=n*bytespersample;
+
+        length2=0;
+        position1=buffer_writecursor;
+        length1=readlength;;
+        if (buffer_writecursor+readlength > buffer_length)
+        {
+          length1=buffer_length-buffer_writecursor;
+          length2=(buffer_writecursor+readlength) % buffer_length;
+        }
+        if (length1) CopyMemory((unsigned char *)buffer+position1,buf,length1);
+        // Position 2 is always 0, even if valid since it will be at the start of the buffer
+        if (length2) CopyMemory(buffer,(unsigned char *)buf+length1,length2);
+      }
+
+
+      // Advance the local write cursor
+      buffer_writecursor=(buffer_writecursor+n*bytespersample) % buffer_length;
+
+      Num -= n;
+    }
+    // If the buffer isn't full, we must have reached the end of the stream. Reset to the beginning and continue filling.
+    if (Num > 0)
+    {
+      // If this should not loop, we are done.
+      if (!LoopStream) 
+      {
+        if (!Data->IsStatic())
+        {
+          ActiveStream=false; // Stream is done playing
+          // Notify all sources that this stream has ended
+          for (long i=0; i<SoundRender->ActiveSources.Length(); i++)
+          {
+            src = (csSoundSourceDS3D*)SoundRender->ActiveSources.Get(i);
+            if (src->GetSoundHandle()==this && src->IsPlaying())
+              src->NotifyStreamEnd(); 
+          }
+        }
+        break;
+      }
+      Data->ResetStreamed(); // Reset the data stream to the begining and pull more data out for looping
+    }
+  }
+
+  mutex_WriteCursor->Release();
+
+}
+
+
+long csSoundHandleDS3D::GetPlayCursorPosition()
+{
+  /*
+  * (WriteCursor+BytesFree)%BufferSize = PlayCursor
+  *
+  */
+  long bytesfree;
+  csSoundSourceDS3D *src;
+
+  if (ActiveStream)
+  {
+    // Find a source playing our stream
+    for (long i=0; i<SoundRender->ActiveSources.Length(); i++)
+    {
+      src = (csSoundSourceDS3D*)SoundRender->ActiveSources.Get(i);
+      if (src->GetSoundHandle()==this && src->IsPlaying())
+      {
+        bytesfree=src->GetFreeBufferSpace();
+        return (buffer_writecursor+bytesfree) % buffer_length;
+      }
+    }
+  }
+
+  return buffer_writecursor;
 }
 
 void csSoundHandleDS3D::vUpdate(void *buf, long Num)
