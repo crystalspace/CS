@@ -16,6 +16,10 @@ The history order is reversed so that new features are at the top.
 	  New 'noshadows' keyword. New SetShadowCasting() function.
 	- Fixed BugPlug so the screenshot key no longer shows the BugPlug
 	  alert.
+	- Added the new 3dsMax exporter that is being used by the PlaneShift
+	  project to create their magnificant levels. Written by Luca Pancallo.
+	  You can find the script in CS/scripts/max. Check out the documenation
+	  html that is there.
 28-Nov-2002
 	- Eric Sunshine disabled the "experimental" render3d project by default
 	  for MSVC users since its many compilation problems were causing
