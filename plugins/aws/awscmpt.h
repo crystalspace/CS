@@ -263,6 +263,8 @@ public:
     virtual void OpenFogObject (CS_ID, csFog *)               { }
     virtual void DrawFogPolygon (CS_ID, G3DPolygonDFP &, int) { }
     virtual void CloseFogObject (CS_ID)                       { }
+    virtual void OpenPortal (csVector2*, int) { }
+    virtual void ClosePortal () { }
     virtual void DrawLine (
                   const csVector3 &v1,
                   const csVector3 &v2,
