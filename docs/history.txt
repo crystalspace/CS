@@ -22,6 +22,7 @@ chronological order.
 	  everything to portals. This error complained if a part had no polygons
 	  but it should only complain if the entire thing has none.
 	- Jorrit removed the unused csSector::IntersectSphere().
+	- Jorrit removed a few additional declarations of iPolygon3D.
 9-oct-2003
 	- Jorrit added the following new functions to iThingFactoryState:
 	    - FindPolygonByName (const char*)

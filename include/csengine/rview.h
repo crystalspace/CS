@@ -31,7 +31,6 @@ class csRenderView;
 struct csFog;
 struct iGraphics3D;
 struct iGraphics2D;
-struct iPolygon3D;
 struct iSector;
 struct iClipper2D;
 

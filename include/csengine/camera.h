@@ -26,7 +26,6 @@
 
 class Vertex;
 class csEngine;
-struct iPolygon3D;
 
 /**
  * A camera positioned in the 3D world.

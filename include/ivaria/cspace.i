@@ -188,7 +188,6 @@
 	INTERFACE_APPLY(iObjectModelListener)
 	INTERFACE_APPLY(iObjectRegistry)
 	INTERFACE_APPLY(iPluginManager)
-	INTERFACE_APPLY(iPolygon3D)
 	INTERFACE_APPLY(iPolygonMesh)
 	INTERFACE_APPLY(iPolygonTexture)
 	INTERFACE_APPLY(iSCF)

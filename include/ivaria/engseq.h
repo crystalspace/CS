@@ -28,7 +28,6 @@ struct iSequenceWrapper;
 struct iMaterialWrapper;
 struct iSector;
 struct iMeshWrapper;
-struct iPolygon3D;
 struct iObject;
 struct iLight;
 struct iCamera;
