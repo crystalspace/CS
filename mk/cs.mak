@@ -174,10 +174,12 @@ all: $(OUTDIRS)
 dep: $(OUTBASE) $(OUTOS)
 
 -include mk/install.mak
-install: $(INSTALL_DIR) install_data install_config install_dynamiclibs \
+install: $(TO_INSTALL.ROOT) $(TO_INSTALL.CONFIG) $(TO_INSTALL.DATA) \
+  $(TO_INSTALL.EXE) $(TO_INSTALL.STATIC_LIBS) $(TO_INSTALL.DYNAMIC_LIBS) \
+  $(INSTALL_DIR) install_data install_config install_dynamiclibs \
   install_staticlibs install_exe install_include install_docs \
   install_root install_logfile
-	@echo Please export CRYSTAL=$(INSTALL_DIR)/ in your environment.
+	@echo Please export CRYSTAL=$(INSTALL_DIR) in your environment.
 
 uninstall: uninstexe
 	uninst $(INSTALL_DIR)/install.log

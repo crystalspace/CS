@@ -11,8 +11,12 @@
 # TO_INSTALL.STATIC_LIBS: files will be put in lib/
 # TO_INSTALL.DYNAMIC_LIBS: files could be put in lib/, but could also end
 #                     up in a platform specific location (e.g. System folder).
+#
+# Always copied:
 # TO_INSTALL.INCLUDE does not exist, the entire include/ hierarchy is copied
-#                   to include/. (max 3 levels deep now)
+#               to include/. (max 3 levels deep now)
+# TO_INSTALL.DOCS also does not exist, the docs/html dir is copied (all .htm)
+#               to docs/. , as well as all subdirs (2 deep) with gif,jpg,png.
 
 .PHONY: install_config install_data install_dynamiclibs install_staticlibs \
   install_exe install_include install_root install_logfile install_docs
@@ -28,7 +32,7 @@ $(INSTALL_DIR)/data/config:
 install_logfile:
 	@echo $(INSTALL_LOG) >> $(INSTALL_LOG)
 
-install_config: $(INSTALL_DIR)/data/config
+install_config: $(TO_INSTALL.CONFIG) $(INSTALL_DIR)/data/config
 	$(CP) $(TO_INSTALL.CONFIG) $(INSTALL_DIR)/data/config
 	@echo $(addprefix $(INSTALL_DIR)/data/config/, \
 	  $(notdir $(TO_INSTALL.CONFIG))) >> $(INSTALL_LOG)
@@ -84,13 +88,16 @@ install_include: $(INSTALL_DIR)/include $(INSTALL_INCLUDE.DIR) \
 INSTALL_DOCS.FILES = $(wildcard docs/html/*htm \
   docs/html/*/*jpg docs/html/*/*gif docs/html/*/*png  \
   docs/html/*/*/*jpg docs/html/*/*/*gif docs/html/*/*/*png)
-INSTALL_DOCS.DIR = $(addprefix $(INSTALL_DIR)/,  \
+INSTALL_DOCS.DIR1 = $(addprefix $(INSTALL_DIR)/,  \
   $(patsubst %/, %, \
   $(patsubst docs/html/%, docs/%, $(sort $(dir $(INSTALL_DOCS.FILES))))))
+# also include parent dirs in dirlist, for tutorial/mapcs 
+INSTALL_DOCS.DIR = $(filter-out $(INSTALL_DIR), $(sort $(INSTALL_DOCS.DIR1) \
+  $(patsubst %/, %, $(dir $(INSTALL_DOCS.DIR1)))))
 INSTALL_DOCS.DESTFILES = $(addprefix $(INSTALL_DIR)/,  \
   $(patsubst docs/html/%, docs/%,$(sort $(INSTALL_DOCS.FILES))))
 
-$(INSTALL_DOCS.DIR):
+$(INSTALL_DOCS.DIR): 
 	$(MKDIR)
 
 $(INSTALL_DOCS.DESTFILES): $(INSTALL_DIR)/docs/% : docs/html/%

@@ -20,6 +20,7 @@
 #define SYSDEF_PATH
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
+#include "cssys/system.h"
 #include "csutil/csstrvec.h"
 #include "csutil/util.h"
 
@@ -63,5 +64,9 @@ csLibraryHandle csFindLoadLibrary (const char *iPrefix, const char *iName,
         break;
     }
   }
+  char buf[500];
+  sprintf(buf, "DLERROR: Could not find (%s)%s(%s).\n", 
+    iPrefix, iName, iSuffix );
+  csSystemDriver::console_out(buf);
   return (csLibraryHandle)0;
 }

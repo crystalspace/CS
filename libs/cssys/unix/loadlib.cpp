@@ -54,8 +54,7 @@ csLibraryHandle csFindLoadLibrary (const char *iName)
 csLibraryHandle csLoadLibrary (const char* iName)
 {
   csLibraryHandle Handle = dlopen (iName, DLOPEN_MODE);
-  if (!Handle)
-    fprintf (stderr, "DLERROR: %s\n", dlerror ());
+  //if (!Handle) fprintf (stderr, "DLERROR: %s\n", dlerror ());
   return Handle;
 }
 

@@ -35,10 +35,12 @@ vpath %.cpp plugins/simpcon
 ifeq ($(USE_SHARED_PLUGINS),yes)
   SIMPCON=$(OUTDLL)simpcon$(DLL)
   DEP.SIMPCON=$(CSGEOM.LIB) $(CSSYS.LIB) $(CSUTIL.LIB)
+  TO_INSTALL.DYNAMIC_LIBS+=$(SIMPCON)
 else
   SIMPCON=$(OUT)$(LIB_PREFIX)simpcon$(LIB)
   DEP.EXE+=$(SIMPCON)
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_SIMPCON
+  TO_INSTALL.STATIC_LIBS+=$(SIMPCON)
 endif
 DESCRIPTION.$(SIMPCON) = $(DESCRIPTION.simpcon)
 SRC.SIMPCON = $(wildcard plugins/simpcon/*.cpp)
