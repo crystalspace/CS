@@ -35,7 +35,7 @@ class csBCTerrBlock;
 
 
 
-SCF_VERSION (iBCTerrState, 0, 0, 1);
+SCF_VERSION (iBCTerrState, 0, 0, 2);
 
 /**
  * This interface describes the API for the Bezier Curve terrain object.
@@ -51,6 +51,7 @@ struct iBCTerrState : public iBase
   	iMaterialWrapper* mat) = 0;
   /// Used to create control points, needs size to be set.
   virtual void SetHeightMap (iImage* im) = 0;
+  virtual int HeightTest (csVector3 *point) = 0;
 };
 
 SCF_VERSION (iBCTerrFactoryState, 0, 0, 2);
