@@ -3,7 +3,7 @@
 
     This document was written by Eric Sunshine <sunshine@sunshineco.com>
     Copyright (C)1999 by Eric Sunshine
-    1999/07/16
+    1999/08/10
 
     Also see README.NeXT for implementation details.
 ===============================================================================
@@ -276,16 +276,23 @@ platform, as summarized below:
     OpenStep        AMBIENT_WHITE=40
     NextStep        AMBIENT_WHITE=40
 
-The first time you explore a level after changing the AMBIENT_WHITE value,
-Crystal Space will automatically recalculate the lights in the map.  This
-process can be quite time consuming, particularly for sizable levels such as
-large.zip, so be patient.
+The first time you explore a level after changing the AMBIENT_WHITE value, you
+should run WalkTest with the "-recalc" option.  This causes Crystal Space to
+recalculate some of the lighting information in the map.  However, this
+process may be time consuming, particularly for sizable levels such as
+large.zip, so be patient.  At other times Crystal Space may determine, on its
+own, that it needs to recalculate the lighting information.  This is a normal
+occurrence and should not cause alarm.
 
-To run the WalkTest demonstration program, type:
+To run WalkTest on a level for the very first time, for example, type:
+
+    % ./walktest -recalc data/large.zip
+
+Subsequent uses of the level file do not require "-recalc", so you may type:
 
     % ./walktest data/large.zip
 
-With this command, you will be able to explore the level file large.zip.  To
+Using this command, you will be able to explore the level file large.zip.  To
 explore a different level, substitute its name in place of large.zip.
 
 MetaBalls, MazeD, and Blocks can be run with the following commands:

@@ -3,7 +3,7 @@
 
     This document was written by Eric Sunshine <sunshine@sunshineco.com>
     Copyright (C)1999 by Eric Sunshine
-    1999/07/16
+    1999/08/10
 
     Also see README.NeXT for implementation details.
 ===============================================================================
@@ -71,17 +71,23 @@ These are the files which contain the maps and rooms which you explore with
 WalkTest and edit with MazeD.  See the accompanying README document for
 information about obtaining level files.
 
-The first time you explore a level with WalkTest after downloading it from the
-Internet, Crystal Space may determine that it needs to recalculate some of the
-lighting information which is stored in the level file.  This is a normal
-occurrence and should not cause alarm, however the process can be quite time
-consuming, particularly for sizable levels such as large.zip, so please be
-patient.
-
 Assuming that the level file large.zip is in the same directory as WalkTest,
 you can explore the it by typing this command:
 
     % ./walktest large.zip
+
+The very first time you explore a level with WalkTest after downloading it
+from the Internet, you should run WalkTest with the "-recalc" option.  This
+causes Crystal Space to recalculate some of the lighting information which is
+store in the level file.  For instance:
+
+    % ./walktest -recalc large.zip
+
+Recalculating the lighting information may be a time consuming process,
+particularly for sizable levels such as large.zip, so please be patient.  At
+other times, Crystal Space may determine, on its own, that it needs to
+recalculate the lighting information.  This is a normal occurrence and should
+not cause alarm.
 
 MetaBalls, MazeD, and Blocks can be run with the following commands:
 
