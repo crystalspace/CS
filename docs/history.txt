@@ -25,6 +25,8 @@ chronological order.
 	  it didn't have some ingenious significance and I botched it up.
 	- Anders Stenberg made GL extension manager only print extension info
 	  when verbose mode is enabled.
+  - Philip Wyett added missing newline at the end of the file to shadermgr.cpp
+    and xmlshader.h.
 17-Dec-2003
 	- Jorrit fixed an initialition bug in the xmlshader compiler.
 	  It would not initialize the writemask which means that you could
