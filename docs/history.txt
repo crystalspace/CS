@@ -38,6 +38,7 @@ The history order is reversed so that new features are at the top.
 	- Removed ambient lighting counter and instead use the light counter
 	  to check if a lightmap needs recalculating. Saves some memory and
 	  is also faster to check.
+	- Fixed python plugin for latest changes. Also fixed css.h.
 4-Mar-2003
         - Andrew Craig fixed coordshow text drawing in walktest.  If you had 
           a long sector name it was often cut off.  

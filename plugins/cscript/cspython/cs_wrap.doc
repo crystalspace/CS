@@ -620,8 +620,6 @@ GetTextureBox(fMinU,fMinV,fMaxU,fMaxV)
 
 GetOriginalWidth()
 
-GetPolygon()
-
 DynamicLightsDirty()
 
 RecalculateDynamicLights()
