@@ -73,7 +73,7 @@ csGLShader_MTEX::csGLShader_MTEX(iBase* parent)
 
 csGLShader_MTEX::~csGLShader_MTEX()
 {
-
+  printf ("Bye1...\n");
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -114,7 +114,7 @@ csPtr<iString> csGLShader_MTEX::GetProgramID(const char* programstring)
 {
   csMD5::Digest d = csMD5::Encode(programstring);
   scfString* str = new scfString();
-  str->Append((const char*)d.data[0], 16);
+  str->Append((const char*)d.data, 16);
   return csPtr<iString>(str);
 }
 
@@ -312,7 +312,7 @@ bool csShaderGLMTEX::LoadEnvironment(mtexlayer* layer, iDocumentNode* node)
           continue;
         
 	const char* str;
-	if (str = child->GetAttributeValue("source"))
+	if ( (str = child->GetAttributeValue("source")) )
 	{
 	  int i = xmltokens.Request(str);
 	  if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE||i == GL_CONSTANT_ARB||i==GL_PREVIOUS_ARB)
@@ -327,7 +327,7 @@ bool csShaderGLMTEX::LoadEnvironment(mtexlayer* layer, iDocumentNode* node)
 	  }
 	}
 
-	if (str = child->GetAttributeValue("modifier"))
+	if ( (str = child->GetAttributeValue("modifier")) )
 	{
           int m = xmltokens.Request(str);
           if(m == GL_SRC_COLOR ||m == GL_ONE_MINUS_SRC_COLOR||m == GL_SRC_ALPHA||m == GL_ONE_MINUS_SRC_ALPHA)
@@ -520,6 +520,6 @@ csPtr<iString> csShaderGLMTEX::GetProgramID()
 {
   csMD5::Digest d = csMD5::Encode(programstring);
   scfString* str = new scfString();
-  str->Append((const char*)d.data[0], 16);
+  str->Append((const char*)d.data, 16);
   return csPtr<iString>(str);
 }
