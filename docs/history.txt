@@ -15,6 +15,9 @@ The history order is reversed so that new features are at the top.
 	- Oktal updated the csperl5 Jamfile in line with the recent updates to
 	  the Makefile (see Oktal 30-Apr-2003). It is still disabled, because
 	  I can't figure out how to enable and test it (see Matze 29-Apr-2003)
+	- Fixed a double declaration of window_item in skinpars.yy
+	- Fixed a problem with jamrules on win32. shellscripts should be
+	  invoked through the shell.
 1-May-2003
 	- res made the following changes to VFS:
 	    - Added iFile::SetPos() to complement iFile::GetPos().
