@@ -54,6 +54,9 @@ public:
   /// Most systems have a pointer to (real or pseudo) video RAM
   unsigned char *Memory;
 
+  /// Open/Close state.
+  bool is_open;
+
   /// Keep a array of Y*width to avoid multiplications
   int *LineAddress;
 

@@ -110,7 +110,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   }
 
   // Setup the texture manager
-  iTextureManager* txtmgr = G3D->GetTextureManager ();
+  iTextureManager* txtmgr = g3d->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
   // Initialize the texture manager

@@ -303,9 +303,6 @@ csSystemDriver::csSystemDriver () : Plugins (8, 8), EventQueue (),
   EventOutlets.Push (new csEventOutlet (NULL, this));
 
   VFS = NULL;
-  G3D = NULL;
-  G2D = NULL;
-
   Console = NULL;
 
   debug_level = 0;
@@ -330,8 +327,6 @@ csSystemDriver::~csSystemDriver ()
 
   // Deregister all known drivers and plugins
   if (Console) Console->DecRef ();
-  if (G2D) G2D->DecRef ();
-  if (G3D) G3D->DecRef ();
   if (VFS) VFS->DecRef ();
 
   // Free all plugins
@@ -501,11 +496,6 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   /// Now find the drivers that are known by the system driver
   if (!VFS)
     VFS = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VFS, iVFS);
-  G3D = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
-  if (G3D)
-    (G2D = G3D->GetDriver2D ())->IncRef ();
-  else
-    G2D = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_CANVAS, iGraphics2D);
   Console = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsoleOutput);
 
   // flush all removed config files
@@ -516,10 +506,6 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
 bool csSystemDriver::Open (const char *Title)
 {
   Printf (CS_MSG_DEBUG_0F, "*** Opening the drivers now!\n");
-
-  if ((G3D && !G3D->Open (Title))
-   || (!G3D && G2D && !G2D->Open (Title)))
-    return false;
 
   // Now pass the open event to all plugins
   csEvent Event (GetTime (), csevBroadcast, cscmdSystemOpen);
@@ -535,9 +521,6 @@ void csSystemDriver::Close ()
   // Warn all plugins the system is going down
   csEvent Event (GetTime (), csevBroadcast, cscmdSystemClose);
   HandleEvent (Event);
-
-  if (G3D)
-    G3D->Close ();
 }
 
 void csSystemDriver::NextFrame ()
@@ -1031,8 +1014,6 @@ bool csSystemDriver::UnloadPlugin (iPlugin *iObject)
   if (!strcmp (p->FuncID, Func)) { Var->DecRef (); Var = NULL; }
 
   CHECK (VFS, CS_FUNCID_VFS)
-  CHECK (G3D, CS_FUNCID_VIDEO)
-  CHECK (G2D, CS_FUNCID_CANVAS)
   CHECK (Console, CS_FUNCID_CONSOLE)
 
 #undef CHECK

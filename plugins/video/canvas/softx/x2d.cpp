@@ -266,6 +266,7 @@ csGraphics2DXLib::~csGraphics2DXLib(void)
 
 bool csGraphics2DXLib::Open(const char *Title)
 {
+  if (is_open) return true;
   CsPrintf (CS_MSG_INITIALIZATION, "Crystal Space X windows driver");
   if (do_shm)
     CsPrintf (CS_MSG_INITIALIZATION, " (Using SHM extension).\n");
@@ -491,6 +492,7 @@ bool csGraphics2DXLib::AllocateMemory ()
 
 void csGraphics2DXLib::Close ()
 {
+  if (!is_open) return;
   LeaveFullScreen ();
 
   if (EmptyMouseCursor)

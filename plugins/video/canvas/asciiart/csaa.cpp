@@ -135,6 +135,7 @@ bool csGraphics2DAA::Initialize (iSystem *pSystem)
 
 bool csGraphics2DAA::Open (const char *Title)
 {
+  if (is_open) return true;
   context = aa_autoinit (&aa_defparams);
   if (context == NULL)
   {
@@ -154,6 +155,7 @@ bool csGraphics2DAA::Open (const char *Title)
 
 void csGraphics2DAA::Close ()
 {
+  if (!is_open) return;
   if (!context)
     return;
   aa_showcursor (context);

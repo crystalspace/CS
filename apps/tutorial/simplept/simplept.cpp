@@ -114,6 +114,14 @@ bool Simple::Initialize (int argc, const char* const argv[],
   iObjectRegistry* object_reg = GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
+  // Find the pointer to VFS.
+  iVFS* VFS = CS_QUERY_PLUGIN (plugin_mgr, iVFS);
+  if (!engine)
+  {
+    Printf (CS_MSG_FATAL_ERROR, "No iVFS plugin!\n");
+    abort ();
+  }
+
   // Find the pointer to engine plugin
   engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
   if (!engine)
@@ -145,7 +153,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   }
 
   // Setup the texture manager
-  iTextureManager* txtmgr = G3D->GetTextureManager ();
+  iTextureManager* txtmgr = g3d->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
   // Initialize the texture manager
@@ -170,7 +178,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
   // Create the procedural texture and a material for it
   ProcTexture = new csEngineProcTex ();
-  if (!ProcTexture->Initialize (G3D, engine, VFS, loader))
+  if (!ProcTexture->Initialize (g3d, engine, VFS, loader))
   {
     Printf (CS_MSG_FATAL_ERROR, "Could not initialize procedural texture!\n");
     Cleanup ();
@@ -217,6 +225,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   txtmgr->SetPalette ();
+  VFS->DecRef ();
   return true;
 }
 

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -206,13 +206,9 @@ class csSystemDriver : public iSystem
   // Elapsed time between last two frames and absolute time in milliseconds
   csTime ElapsedTime, CurrentTime;
   
-protected:
+private:
   /// The Virtual File System object
   iVFS *VFS;
-  /// 3D Graphics context
-  iGraphics3D* G3D;
-  /// 2D Graphics context
-  iGraphics2D* G2D;
   /// System console
   iConsoleOutput *Console;
 

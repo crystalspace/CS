@@ -179,6 +179,7 @@ bool csGraphics2DOS2DIVE::HandleEvent (iEvent &Event)
 
 bool csGraphics2DOS2DIVE::Open (const char *Title)
 {
+  if (is_open) return true;
   if (!csGraphics2D::Open (Title))
     return false;
 
@@ -410,6 +411,7 @@ bool csGraphics2DOS2DIVE::Open (const char *Title)
 
 void csGraphics2DOS2DIVE::Close (void)
 {
+  if (!is_open) return;
   PMrq rq;
 
   if (!dW)

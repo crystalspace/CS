@@ -36,6 +36,7 @@
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
+#include "isys/event.h"
 
 #if defined (DO_MMX)
 #  include "video/renderer/software/i386/cpuid.h"
@@ -290,7 +291,27 @@ csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
 bool csGraphics3DSoftwareCommon::Initialize (iSystem* p)
 {
   System = p;
+  System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
   return true;
+}
+
+bool csGraphics3DSoftwareCommon::HandleEvent (iEvent& Event)
+{
+  if (Event.Type == csevBroadcast)
+    switch (Event.Command.Code)
+    {
+      case cscmdSystemOpen:
+      {
+        Open ("Dummy title");
+        return true;
+      }
+      case cscmdSystemClose:
+      {
+        Close ();
+        return true;
+      }
+    }
+  return false;
 }
 
 void csGraphics3DSoftwareCommon::NewInitialize ()

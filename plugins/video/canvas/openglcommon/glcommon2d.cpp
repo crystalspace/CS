@@ -66,6 +66,7 @@ csGraphics2DGLCommon::~csGraphics2DGLCommon ()
 
 bool csGraphics2DGLCommon::Open (const char *Title)
 {
+  if (is_open) return true;
   // initialize font cache object
   if (!FontCache)
     FontCache = new GLFontCache (FontServer);
@@ -96,6 +97,7 @@ bool csGraphics2DGLCommon::Open (const char *Title)
 
 void csGraphics2DGLCommon::Close ()
 {
+  if (!is_open) return;
   delete FontCache;
   FontCache = NULL;
   csGraphics2D::Close ();

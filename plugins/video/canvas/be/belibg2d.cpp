@@ -65,6 +65,7 @@ bool csGraphics2DBeLib::Initialize(iSystem* isys)
 
 bool csGraphics2DBeLib::Open(char const* title)
 {
+  if (is_open) return true;
   bool ok = superclass::Open(title);
   if (ok)
   {
@@ -101,6 +102,7 @@ bool csGraphics2DBeLib::Open(char const* title)
 
 void csGraphics2DBeLib::Close()
 {
+  if (!is_open) return;
   window->Lock();
   window->Quit();
   window = NULL;

@@ -343,6 +343,7 @@ bool csGraphics2DMac::Initialize( iSystem* piSystem )
 ----------------------------------------------------------------*/
 bool csGraphics2DMac::Open(const char* Title)
 {
+  if (is_open) return true;
 	Str255			theTitle;
 	Rect			theBounds;
 	Rect			displayRect;
@@ -449,6 +450,7 @@ bool csGraphics2DMac::Open(const char* Title)
 ----------------------------------------------------------------*/
 void csGraphics2DMac::Close(void)
 {
+  if (!is_open) return;
 	if ( mDrawSprocketsEnabled ) {
 		if ( mDisplayContext != NULL )
 		{

@@ -203,6 +203,7 @@ csGraphics2DLineXLib::~csGraphics2DLineXLib(void)
 
 bool csGraphics2DLineXLib::Open(const char *Title)
 {
+  if (is_open) return true;
   CsPrintf (CS_MSG_INITIALIZATION, "Crystal Space X windows driver (Line drawing).\n");
   CsPrintf (CS_MSG_INITIALIZATION, "Using %d bit %sColor visual\n",
               vinfo.depth, (vclass == PseudoColor) ? "Pseudo" : "True");
@@ -363,6 +364,7 @@ void csGraphics2DLineXLib::DeAllocateMemory ()
 
 void csGraphics2DLineXLib::Close ()
 {
+  if (!is_open) return;
   LeaveFullScreen();
 
   if (EmptyMouseCursor)

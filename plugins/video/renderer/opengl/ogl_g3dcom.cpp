@@ -205,7 +205,27 @@ bool csGraphics3DOGLCommon::Initialize (iSystem* p)
   System = p;
   object_reg = System->GetObjectRegistry ();
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
   return true;
+}
+
+bool csGraphics3DOGLCommon::HandleEvent (iEvent& Event)
+{
+  if (Event.Type == csevBroadcast)
+    switch (Event.Command.Code)
+    {
+      case cscmdSystemOpen:
+      {
+        Open ("Dummy title");
+        return true;
+      }
+      case cscmdSystemClose:
+      {
+        Close ();
+        return true;
+      }
+    }
+  return false;
 }
 
 bool csGraphics3DOGLCommon::NewInitialize ()

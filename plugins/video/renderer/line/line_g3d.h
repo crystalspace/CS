@@ -99,6 +99,7 @@ public:
 
   ///
   virtual bool Initialize (iSystem *iSys);
+  bool HandleEvent (iEvent&);
   ///
   virtual bool Open (const char *Title);
   ///
@@ -275,7 +276,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DLine);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
+    virtual bool HandleEvent (iEvent& ev) { return scfParent->HandleEvent (ev); }
   } scfiPlugin;
 
   struct eiLineConfig : public iConfig

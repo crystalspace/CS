@@ -156,6 +156,7 @@ bool csGraphics2DOS2GL::HandleEvent (iEvent &Event)
 
 bool csGraphics2DOS2GL::Open (const char *Title)
 {
+  if (is_open) return true;
   PMrq rq;
   u_int rc;
 
@@ -242,6 +243,7 @@ bool csGraphics2DOS2GL::Open (const char *Title)
 
 void csGraphics2DOS2GL::Close ()
 {
+  if (!is_open) return;
   PMrq rq;
 
   if (!glW)

@@ -76,6 +76,7 @@ bool csGraphics2DDOSRAW::Initialize (iSystem *pSystem)
 
 bool csGraphics2DDOSRAW::Open (const char* Title)
 {
+  if (is_open) return true;
   if (!csGraphics2D::Open (Title))
     return false;
   PaletteChanged = false;
@@ -175,6 +176,7 @@ bool csGraphics2DDOSRAW::Open (const char* Title)
 
 void csGraphics2DDOSRAW::Close ()
 {
+  if (!is_open) return;
 #if USE_ALLEGRO
   destroy_bitmap ((BITMAP *)_vdata);
 #else

@@ -149,6 +149,7 @@ csGraphics2DSVGALib::~csGraphics2DSVGALib(void)
 
 bool csGraphics2DSVGALib::Open(const char *Title)
 {
+  if (is_open) return true;
   // Open your graphic interface
   if (!csGraphics2D::Open (Title))
     return false;
@@ -209,6 +210,7 @@ bool csGraphics2DSVGALib::Open(const char *Title)
 
 void csGraphics2DSVGALib::Close(void)
 {
+  if (!is_open) return;
   // Close your graphic interface
   keyboard_close ();
   vga_setmode (TEXT);

@@ -29,6 +29,7 @@
 #include "iutil/objreg.h"
 #include "isys/system.h"
 #include "isys/plugin.h"
+#include "isys/event.h"
 #include "ivideo/graph2d.h"
 #include "imesh/thing/polygon.h"	//@@@
 #include "imesh/thing/lightmap.h"	//@@@
@@ -127,8 +128,28 @@ bool csGraphics3DInfinite::Initialize (iSystem *iSys)
     return false;
 
   texman = new csTextureManagerInfinite (System, G2D, config);
+  System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
 
   return true;
+}
+
+bool csGraphics3DInfinite::HandleEvent (iEvent& Event)
+{
+  if (Event.Type == csevBroadcast)
+    switch (Event.Command.Code)
+    {
+      case cscmdSystemOpen:
+      {
+        Open ("Dummy title");
+        return true;
+      }
+      case cscmdSystemClose:
+      {
+        Close ();
+        return true;
+      }
+    }
+  return false;
 }
 
 bool csGraphics3DInfinite::Open (const char *Title)

@@ -33,7 +33,6 @@ class csGraphics2DSDL : public csGraphics2D, public iEventPlug
 public:
   SDL_Surface *screen;
   int size_mem;
-  bool opened;
   int shutdown;
   unsigned char *membuffer;
   SDL_mutex *th_lock;

@@ -28,6 +28,7 @@
 #include "iutil/objreg.h"
 #include "isys/system.h"
 #include "isys/plugin.h"
+#include "isys/event.h"
 #include "ivideo/graph2d.h"
 
 #define SysPrintf System->Printf
@@ -98,8 +99,28 @@ bool csGraphics3DNull::Initialize (iSystem *iSys)
     return false;
 
   texman = new csTextureManagerNull (System, G2D, config);
+  System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
 
   return true;
+}
+
+bool csGraphics3DNull::HandleEvent (iEvent& Event)
+{
+  if (Event.Type == csevBroadcast)
+    switch (Event.Command.Code)
+    {
+      case cscmdSystemOpen:
+      {
+        Open ("Dummy title");
+        return true;
+      }
+      case cscmdSystemClose:
+      {
+        Close ();
+        return true;
+      }
+    }
+  return false;
 }
 
 bool csGraphics3DNull::Open (const char *Title)

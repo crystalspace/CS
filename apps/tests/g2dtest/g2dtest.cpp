@@ -84,7 +84,6 @@ public:
   virtual void NextFrame ();
   virtual bool HandleEvent (iEvent &Event);
 
-  void SetG2D (iGraphics2D *g2d) { G2D = g2d; }
 private:
   void SetFont (const char *fontID);
 
@@ -802,7 +801,6 @@ int main (int argc, char *argv[])
       canvas = tmp;
     }
     System.myG2D = CS_LOAD_PLUGIN (plugin_mgr, canvas, CS_FUNCID_CANVAS, iGraphics2D);
-    System.SetG2D (System.myG2D); // @@ temporary as long as the rest of CS relies on G2D variable in System
     System.myG2D->IncRef ();
   }
 

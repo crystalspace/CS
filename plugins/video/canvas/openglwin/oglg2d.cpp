@@ -279,6 +279,7 @@ void csGraphics2DOpenGL::CalcPixelFormat ()
 
 bool csGraphics2DOpenGL::Open(const char *Title)
 {
+  if (is_open) return true;
   DEVMODE dmode;
   LONG ti;
 
@@ -362,6 +363,7 @@ bool csGraphics2DOpenGL::Open(const char *Title)
 
 void csGraphics2DOpenGL::Close(void)
 {
+  if (!is_open) return;
   if (hGLRC)
   {
     wglMakeCurrent(NULL, NULL);

@@ -37,7 +37,6 @@ class csGraphics2DAlleg : public csGraphics2D, public iEventPlug
   int x_mouse;
   int y_mouse; /* Previously recorded mouse position */
   int button;
-  int opened;
   BITMAP *bitmap;
   bool scale; /* Bitmap is not screen size, scale it */
   // The event outlet

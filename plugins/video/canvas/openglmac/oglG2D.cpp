@@ -203,6 +203,7 @@ bool csGraphics2DOpenGL::Initialize (iSystem *pSystem)
 
 bool csGraphics2DOpenGL::Open(const char *Title)
 {
+  if (is_open) return true;
 	Str255			theTitle;
 	Rect			theBounds;
 	Rect			displayRect;
@@ -274,6 +275,7 @@ bool csGraphics2DOpenGL::Open(const char *Title)
 
 void csGraphics2DOpenGL::Close(void)
 {
+  if (!is_open) return;
 	if ( mGLContext ) {
 		aglSetCurrentContext(NULL);
 		aglSetDrawable(mGLContext, NULL);

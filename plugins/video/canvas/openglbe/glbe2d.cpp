@@ -59,6 +59,7 @@ bool csGraphics2DGLBe::Initialize(iSystem* p)
 
 bool csGraphics2DGLBe::Open(char const* title)
 {
+  if (is_open) return true;
   int const INSET = 32;
   int const sw = screen_frame.IntegerWidth();
   int const sh = screen_frame.IntegerHeight();
@@ -90,6 +91,7 @@ bool csGraphics2DGLBe::Open(char const* title)
 
 void csGraphics2DGLBe::Close()
 {
+  if (!is_open) return;
   window->Lock();
   window->Quit();
   window = NULL;

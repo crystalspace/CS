@@ -116,8 +116,8 @@ bool csGraphics2DAlleg::Initialize (iSystem *pSystem)
 
 bool csGraphics2DAlleg::Open (const char* Title)
 {
-  if (opened)
-    return false;
+  if (is_open)
+    return true;
   if (!csGraphics2D::Open (Title))
     return false;
   PaletteChanged = false;
@@ -183,14 +183,13 @@ bool csGraphics2DAlleg::Open (const char* Title)
 
   // Clear all videopages
   ClearAll (0);
-  opened = true;
 
   return true;
 }
 
 void csGraphics2DAlleg::Close (void)
 {
-  if (!opened)
+  if (!is_open)
     return;
 
   if (kbd_hook_active)
@@ -211,12 +210,11 @@ void csGraphics2DAlleg::Close (void)
   csGraphics2D::Close ();
   System->PerformExtension ("EnablePrintf", true);
   set_gfx_mode (GFX_TEXT, 0, 0, 0, 0);
-  opened = false;
 }
 
 void csGraphics2DAlleg::Print (csRect *area)
 {
-  if (!opened)
+  if (!is_open)
     return;
   if (PaletteChanged && pfmt.PalEntries)
   {
@@ -321,7 +319,7 @@ bool csGraphics2DAlleg::HandleEvent (iEvent &/*Event*/)
 {
   int scancode, keycode, c;
   
-  if (!opened)
+  if (!is_open)
     return false;
   if (keyboard_needs_poll ())
     poll_keyboard ();
@@ -391,7 +389,7 @@ void csGraphics2DAlleg::EnableEvents (unsigned iType, bool iEnable)
     if (hook_kbd != iEnable)
     {
       hook_kbd = iEnable;
-      if (opened && (hook_kbd != kbd_hook_active))
+      if (is_open && (hook_kbd != kbd_hook_active))
         if (hook_kbd)
         {
           install_keyboard ();
@@ -409,7 +407,7 @@ void csGraphics2DAlleg::EnableEvents (unsigned iType, bool iEnable)
     if (hook_mouse != iEnable)
     {
       hook_mouse = iEnable;
-      if (opened && (hook_mouse != mouse_hook_active))
+      if (is_open && (hook_mouse != mouse_hook_active))
         if (hook_mouse)
         {
           install_mouse ();

@@ -148,7 +148,7 @@ static int drawing_thread(void *_owner)
 
   owner->shutdown=0;
 
-  while(owner->opened)
+  while(owner->is_open)
   {
     SDL_LockMutex(owner->th_lock);
     SDL_LockSurface(owner->screen);
@@ -223,7 +223,6 @@ bool csGraphics2DSDL::Initialize (iSystem *pSystem)
       return false;
 
     Memory = NULL;
-    opened = false;
 
     // SDL Starts here
 
@@ -288,7 +287,7 @@ csGraphics2DSDL::~csGraphics2DSDL(void)
 
 bool csGraphics2DSDL::Open(const char *Title)
 {
-  if (opened) return false;
+  if (is_open) return true;
 
   // Open your graphic interface
   if (!csGraphics2D::Open (Title)) return false;
@@ -368,16 +367,13 @@ bool csGraphics2DSDL::Open(const char *Title)
   if (!EventOutlet)
     EventOutlet = System->CreateEventOutlet (this);
 
-  opened=true;
-
   return true;
 }
 
 void csGraphics2DSDL::Close(void)
 {
-  if (!opened) return;
+  if (!is_open) return;
   // Close your graphic interface
-  opened=false;
 
 #if SHADE_BUF
   while(!shutdown)

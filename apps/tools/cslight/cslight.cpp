@@ -144,6 +144,13 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
 
+  iVFS* VFS = CS_QUERY_PLUGIN (plugin_mgr, iVFS);
+  if (!VFS)
+  {
+    Printf (CS_MSG_FATAL_ERROR, "No iVFS plugin!\n");
+    abort ();
+  }
+
   // Find the pointer to engine plugin
   engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
   if (!engine)
@@ -248,6 +255,7 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   delete meter;
 
   txtmgr->SetPalette ();
+  VFS->DecRef ();
   return true;
 }
 

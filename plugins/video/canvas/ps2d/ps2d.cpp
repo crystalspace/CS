@@ -77,6 +77,7 @@ csGraphics2Dps2::~csGraphics2Dps2(void)
 bool pdglSetCrystalSpace();
 bool csGraphics2Dps2::Open(const char *Title)
 {
+  if (is_open) return true;
   CsPrintf (CS_MSG_INITIALIZATION, "Crystal Space PS2 Driver.\n");
 
   SDL_Init(255);
@@ -91,6 +92,7 @@ bool csGraphics2Dps2::Open(const char *Title)
 
 void csGraphics2Dps2::Close ()
 {
+  if (!is_open) return;
   csGraphics2D::Close ();
 }
 

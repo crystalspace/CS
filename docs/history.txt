@@ -15,6 +15,43 @@ The history order is reversed so that new features are at the top.
 		  	iCommandLineParser);
 	    - Removed iSystem::GetConfig(). Use the object registry instead
 	      to get to the config manager (iConfigManager).
+	    - Made VFS, G3D, G2D, and Console members in csSystemDriver
+	      private. Eventually they need to be removed. This is step one
+	      to check if something is still using those variables.
+	    - Made BugPlug more robust so it can handle the case where there
+	      is no G3D.
+	    - All canvases (in video/common/graph2d.cpp) will now listen
+	      to cscmdSystemOpen and cscmdSystemClose. On receiving those
+	      messages Open() and Close() are called. This removes the need
+	      for the system driver to have explicit knowledge about G2D
+	      and G3D in order to open or close those plugins.
+	      This has one current consequence though: Open() will no longer
+	      get a valid title so we need another way to set the title of
+	      the canvas.
+	    - Another important consequence is that the order in which
+	      plugins get cscmdSystemOpen messages is undefined. This means
+	      that you cannot depend on G3D/G2D being open in the open
+	      message of another plugin! In the past this was possible
+	      because G3D and G2D were explictely opened BEFORE all the other
+	      plugins. This seems to work ok but this can be because the
+	      Open messages are sent in the right order already (i.e. G3D
+	      and G2D plugins are loaded early so this could be the case).
+	      But it is not good to depend on this!
+	    - Close() is called in the same order as Open() and there we
+	      have a problem. The engine::Close handler is called after the
+	      G3D::Close handler and this causes a crash because the engine
+	      will then start unregistering materials and textures. This
+	      seems to cause a crash at exit but at the moment I'm not sure
+	      yet how to solve this and why exactly it crashes. Will
+	      investigate later.
+	    - Protected the canvases so that it is now safe to call Open/Close
+	      multiple times. Did this by adding is_open flag in csGraphics2D.
+	    - All 3D renderers will now also listen to cscmdSystemOpen and
+	      cscmdSystemClose.
+	    - Because of the above changes the system driver no longer has
+	      the internal G2D and G3D pointers. It still keeps pointers
+	      to Console and VFS for other reasons. Those will be removed
+	      later.
 23-Jul-2001
 	- Continued work on the decomposition of the system driver. The
 	  following items were performed:

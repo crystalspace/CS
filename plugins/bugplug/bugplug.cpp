@@ -140,6 +140,7 @@ void csBugPlug::SetupPlugin ()
     G3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
   if (!G3D)
   {
+    initialized = true;
     printf ("No G3D!\n");
     return;
   }
@@ -238,6 +239,7 @@ void csBugPlug::HideSpider (iCamera* camera)
 
 void csBugPlug::ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name)
 {
+  if (!G3D) return;
   bool v;
   v = G3D->GetRenderState (op);
   v = !v;
@@ -515,14 +517,19 @@ bool csBugPlug::EatKey (iEvent& event)
         ToggleG3DState (G3DRENDERSTATE_TRANSPARENCYENABLE, "transp mode");
         break;
       case DEBUGCMD_CACHECLEAR:
-        G3D->ClearCache ();
-        System->Printf (CS_MSG_CONSOLE, "BugPlug cleared the texture cache.\n");
+        if (G3D)
+	{
+	  G3D->ClearCache ();
+          System->Printf (CS_MSG_CONSOLE,
+	    "BugPlug cleared the texture cache.\n");
+	}
         break;
       case DEBUGCMD_CACHEDUMP:
-        G3D->DumpCache ();
+        if (G3D) G3D->DumpCache ();
         break;
       case DEBUGCMD_MIPMAP:
         {
+	  if (!G3D) break;
 	  char* choices[6] = { "on", "off", "1", "2", "3", NULL };
 	  long v = G3D->GetRenderState (G3DRENDERSTATE_MIPMAPENABLE);
 	  v = (v+1)%5;
@@ -533,6 +540,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	break;
       case DEBUGCMD_INTER:
 	{
+	  if (!G3D) break;
 	  char* choices[5] = { "smart", "step32", "step16", "step8", NULL };
 	  long v = G3D->GetRenderState (G3DRENDERSTATE_INTERPOLATIONSTEP);
 	  v = (v+1)%4;
@@ -543,6 +551,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	break;
       case DEBUGCMD_GAMMA:
         {
+	  if (!G3D) break;
 	  float val = G3D->GetRenderState (G3DRENDERSTATE_GAMMACORRECTION)
 		/ 65536.;
 	  sprintf (buf, "%g", val);
@@ -653,6 +662,8 @@ bool csBugPlug::EatKey (iEvent& event)
 bool csBugPlug::HandleStartFrame (iEvent& /*event*/)
 {
   SetupPlugin ();
+  if (!G3D) return false;
+
   if (do_clear)
   {
     G3D->BeginDraw (CSDRAW_2DGRAPHICS);
@@ -678,6 +689,8 @@ bool csBugPlug::HandleStartFrame (iEvent& /*event*/)
 bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
 {
   SetupPlugin ();
+  if (!G3D) return false;
+
   if (edit_mode)
   {
     G3D->BeginDraw (CSDRAW_2DGRAPHICS);

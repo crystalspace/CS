@@ -30,6 +30,7 @@
 #include "iengine/texture.h"
 #include "iutil/objreg.h"
 #include "isys/plugin.h"
+#include "isys/event.h"
 
 SCF_IMPLEMENT_IBASE(csGraphics2D)
   SCF_IMPLEMENTS_INTERFACE(iGraphics2D)
@@ -58,6 +59,7 @@ csGraphics2D::csGraphics2D (iBase* parent)
   Height = 480;
   Depth = 16;
   FullScreen = false;
+  is_open = false;
 }
 
 bool csGraphics2D::Initialize (iSystem* pSystem)
@@ -99,6 +101,8 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
     Palette [i].green = 0;
     Palette [i].blue = 0;
   }
+
+  System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
 
   return true;
 }
@@ -148,10 +152,29 @@ csGraphics2D::~csGraphics2D ()
   delete [] Palette;
 }
 
-bool csGraphics2D::HandleEvent(iEvent&) { return false; }
+bool csGraphics2D::HandleEvent (iEvent& Event)
+{
+  if (Event.Type == csevBroadcast)
+    switch (Event.Command.Code)
+    {
+      case cscmdSystemOpen:
+      {
+        Open ("Dummy title");
+        return true;
+      }
+      case cscmdSystemClose:
+      {
+        Close ();
+        return true;
+      }
+    }
+  return false;
+}
 
 bool csGraphics2D::Open (const char *Title)
 {
+  if (is_open) return true;
+  is_open = true;
   (void)Title;
 
   FrameBufferLocked = 0;
@@ -171,6 +194,8 @@ bool csGraphics2D::Open (const char *Title)
 
 void csGraphics2D::Close ()
 {
+  if (!is_open) return;
+  is_open = false;
   delete [] LineAddress;
   LineAddress = NULL;
 }

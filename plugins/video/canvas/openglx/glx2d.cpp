@@ -216,6 +216,7 @@ static const char *visual_class_name (int cls)
 
 bool csGraphics2DGLX::Open(const char *Title)
 {
+  if (is_open) return true;
   // We now select the visual here as with a mesa bug it is not possible
   // to destroy double buffered contexts and then create a single buffered
   // one.
@@ -414,6 +415,7 @@ bool csGraphics2DGLX::Open(const char *Title)
 
 void csGraphics2DGLX::Close(void)
 {
+  if (!is_open) return;
   LeaveFullScreen ();
 
   if (EmptyMouseCursor)

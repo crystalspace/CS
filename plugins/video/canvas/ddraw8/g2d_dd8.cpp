@@ -82,6 +82,7 @@ bool csGraphics2DDDraw8::Initialize(iSystem *pSystem)
 
 bool csGraphics2DDDraw8::Open (const char *Title)
 {
+  if (is_open) return true;
   if (!csGraphics2D::Open (Title))
     return false;
 
@@ -169,6 +170,7 @@ bool csGraphics2DDDraw8::Open (const char *Title)
 
 void csGraphics2DDDraw8::Close ()
 {
+  if (!is_open) return;
   ReleaseAllObjects ();
 
   if (m_lpDD7)

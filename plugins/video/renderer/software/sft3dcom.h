@@ -261,6 +261,11 @@ public:
    */
   virtual bool Initialize (iSystem*);
 
+  /**
+   * Open or close our interface.
+   */
+  bool HandleEvent (iEvent& ev);
+
   /// Initialize new state from config file
   void NewInitialize ();
 
@@ -470,7 +475,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DSoftwareCommon);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
+    virtual bool HandleEvent (iEvent& ev) { return scfParent->HandleEvent (ev); }
   } scfiPlugin;
 };
 

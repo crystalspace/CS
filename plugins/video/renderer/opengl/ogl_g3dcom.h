@@ -498,6 +498,11 @@ public:
 
   /// Initialization for iPlugin.  Sets System pointer.
   virtual bool Initialize (iSystem*);
+  /**
+   * Open or close our interface.
+   */
+  bool HandleEvent (iEvent& ev);
+
   /// Common initialization for subclasses.
   bool NewInitialize ();
   /// Initialize from the state data of another driver of this type
@@ -749,7 +754,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DOGLCommon);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
+    virtual bool HandleEvent (iEvent& ev) { return scfParent->HandleEvent (ev); }
   } scfiPlugin;
 };
 
