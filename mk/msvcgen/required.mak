@@ -40,6 +40,7 @@
 #------------------------------------------------------------------------------
 
 MSVC.PLUGINS.REQUIRED =         \
+  aws                           \
   cscript/cspython              \
   cscript/cslua                 \
   font/server/freefont          \
