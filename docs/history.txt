@@ -54,6 +54,8 @@ chronological order.
 	  from Character Studio.
 	- Eric Sunshine fixed Texinfo mark-up problems and rewrote and
 	  clarified discussion recently added to apimod100.txi.
+	- Eric Sunshine added a Jamfile to the new CS/scripts/max/gmeshskelanim
+	  directory to ensure that this converter script gets installed.
 3-Mar-2005
 	- Jorrit fixed a compile error in spr2d. ||= is not a valid
 	  C++ operator. So put the original |= back.

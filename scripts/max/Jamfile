@@ -5,3 +5,5 @@ InstallData [ Wildcard exporterguide : *.htm *.html ] :
   conversion max exporterguide ;
 InstallData [ Wildcard exporterguide pictures : *.jpg *.gif ] :
   conversion max exporterguide pictures ;
+
+SubInclude TOP scripts max gmeshskelanim ;
