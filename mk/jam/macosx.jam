@@ -11,7 +11,7 @@ if $(PTHREAD.AVAILABLE) = "yes"
 # jam2.4 has wrong rules for handling archives. This should work better
 if $(JAMVERSION) = 2.4
 {
-  AR = ar ru
+  AR = "ar ru" ;
   NOARUPDATE = ;  
   NOARSCAN = ;
 }
