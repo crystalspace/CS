@@ -118,7 +118,7 @@ public:
   virtual iMeshObject* NewInstance ();
 
   //------------------------- iCubeMeshObject implementation ----------------
-  struct CubeMeshObject : public iCubeMeshObject
+  class CubeMeshObject : public iCubeMeshObject
   {
     DECLARE_EMBEDDED_IBASE (csCubeMeshObjectFactory);
     virtual void SetSize (float size) { scfParent->size = size; }
