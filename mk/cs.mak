@@ -108,7 +108,7 @@ ifndef DO.DEP
   else
     ifeq ($(DEPEND_TOOL),mkdep)
       # If mkdep is already installed, don't build it
-      ifeq ($(DEPEND_TOOL.INSTALLED),yes)
+      ifneq ($(DEPEND_TOOL.INSTALLED),yes)
         depend: mkdep
       endif
       DO.DEP = makedep $(MEM) $(subst $(CFLAGS.I),-I,$(CFLAGS.INCLUDE)) \
