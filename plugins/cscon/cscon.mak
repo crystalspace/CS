@@ -31,7 +31,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   CSCON = $(OUT)$(LIB_PREFIX)cscon$(LIB)
   DEP.EXE += $(CSCON)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_CSCON
+  SCF.STATIC += cscon
   TO_INSTALL.STATIC_LIBS += $(CSCON)
 endif
 

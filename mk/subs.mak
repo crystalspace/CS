@@ -38,7 +38,8 @@ ifneq ($(TESTS_SUBMAKEFILES),)
 endif
 
 ifeq ($(COMPOSITE_SUBMAKEFILES),)
-  COMPOSITE_SUBMAKEFILES=docs/docs.mak mk/install.mak mk/msvcgen/msvcgen.mak
+  COMPOSITE_SUBMAKEFILES=docs/docs.mak mk/install.mak mk/msvcgen/msvcgen.mak \
+    mk/static.mak
 endif
 ifneq ($(COMPOSITE_SUBMAKEFILES),)
   include $(COMPOSITE_SUBMAKEFILES)

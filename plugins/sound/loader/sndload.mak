@@ -35,7 +35,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   SNDLOAD = $(OUT)$(LIB_PREFIX)sndload$(LIB)
   DEP.EXE += $(SNDLOAD)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_SNDLOAD
+  SCF.STATIC += sndload
   TO_INSTALL.STATIC_LIBS += $(SNDLOAD)
 endif
 

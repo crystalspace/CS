@@ -87,11 +87,11 @@ scftut: $(OUTDIRS) $(ZOO.EXE)
 scftutdlls: $(OUTDIRS) $(DOG.DLL) $(WORM.DLL)
 clean: scftutclean
 
-$(ZOO.EXE): $(DEP.EXE) $(OBJ.ZOO) $(LIB.ZOO)
+$(ZOO.EXE): $(OBJ.ZOO) $(LIB.ZOO)
 	$(DO.LINK.CONSOLE.EXE)
-$(DOG.DLL): $(DEP.EXE) $(OBJ.DOG) $(LIB.DOG)
+$(DOG.DLL): $(OBJ.DOG) $(LIB.DOG)
 	$(DO.SHARED.PLUGIN)
-$(WORM.DLL): $(DEP.EXE) $(OBJ.WORM) $(LIB.WORM)
+$(WORM.DLL): $(OBJ.WORM) $(LIB.WORM)
 	$(DO.SHARED.PLUGIN)
 
 scftutclean:

@@ -39,13 +39,13 @@ CSOS2.LIB = $(OUT)$(LIB_PREFIX)csos2$(LIB)
 
 # The 2D OS/2 DIVE driver
 ifeq ($(USE_PLUGINS),yes)
-  CSDIVE = csdive$(DLL)
+  CSDIVE = $(OUTDLL)csdive$(DLL)
   LIB.CSDIVE = $(foreach d,$(DEP.CSDIVE),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(CSDIVE)
 else
   CSDIVE = $(OUT)$(LIB_PREFIX)csdive$(LIB)
   DEP.EXE += $(DIVE2D.RES) $(CSDIVE) $(CSOS2.LIB)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_DIVE2D
+  SCF.STATIC += csdive
   TO_INSTALL.STATIC_LIBS += $(CSDIVE)
 endif
 

@@ -38,7 +38,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   LINE3D = $(OUT)$(LIB_PREFIX)line$(LIB)
   DEP.EXE += $(LINE3D)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_LINE3D
+  SCF.STATIC += line3d
   TO_INSTALL.STATIC_LIBS += $(LINE3D)
 endif
 

@@ -39,7 +39,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   STDLDR = $(OUT)$(LIB_PREFIX)stdld$(LIB)
   DEP.EXE += $(STDLDR)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_STDLDR
+  SCF.STATIC += stdldr
 # TO_INSTALL.STATIC_LIBS += $(STDLDR)
 endif
 

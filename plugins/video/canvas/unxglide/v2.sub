@@ -40,7 +40,7 @@ else
   GLIDX2D2 = $(OUT)$(LIB_PREFIX)glidx2d2$(LIB)
   DEP.EXE += $(GLIDX2D2)
   LIBS.EXE += $(LIB.GLIDX2D2.SYSTEM)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_GLIDX2D2
+  SCF.STATIC += glidx2d2
 endif
 
 INC.GLIDX2D2 = plugins/video/canvas/unxglide/glidex2d.h \
@@ -54,9 +54,8 @@ SRC.GLIDX2D2 = plugins/video/canvas/unxglide/glidex2d.cpp \
   plugins/video/canvas/common/x11-keys.cpp \
   $(SRC.COMMON.DRV2D)
 TMP.GLIDX2D2 = $(wordlist 2,$(words $(SRC.GLIDX2D2)), $(SRC.GLIDX2D2))
-OBJ.GLIDX2D2 = $(addprefix $(OUT),$(notdir $(TMP.GLIDX2D2:.cpp=$O))) $(OUT)glidx2d2$O
-
-#OBJ.GLIDX2D2 = $(wordlist 2,$(words $(OBJ.GLIDX2D2)), $(OBJ.GLIDX2D2)) $(OUT)glidx2d2$O
+OBJ.GLIDX2D2 = $(addprefix $(OUT),$(notdir $(TMP.GLIDX2D2:.cpp=$O))) \
+  $(OUT)glidx2d2$O
 DEP.GLIDX2D2 = CSUTIL CSSYS
 
 endif # ifeq ($(MAKESECTION),postdefines)

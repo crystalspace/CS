@@ -1,0 +1,130 @@
+#==============================================================================
+#
+#    Automatic symbolic reference generation makefile
+#    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
+#
+#    This library is free software; you can redistribute it and/or
+#    modify it under the terms of the GNU Library General Public
+#    License as published by the Free Software Foundation; either
+#    version 2 of the License, or (at your option) any later version.
+#
+#    This library is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    Library General Public License for more details.
+#
+#    You should have received a copy of the GNU Library General Public
+#    License along with this library; if not, write to the Free
+#    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#==============================================================================
+#------------------------------------------------------------------------------
+# static.mak
+#
+#	A makefile for synthesizing hard references to symbols within libraries
+#	in order to ensure that those libraries are linked into the
+#	application.
+#
+#	When Crystal Space applications are configured to dynamically load
+#	plug-in modules at run-time (that is, USE_PLUGINS=yes), the code for
+#	plug-in modules is packaged into a dynamic-link library.  On the other
+#	hand, when applications are configured to link statically (that is,
+#	USE_PLUGINS=no), plug-in modules must be linked directly into the
+#	application (since they can not be loaded at run-time).
+#
+#	In this case, the code for plug-in modules is packaged into a static
+#	library.  In order to ensure that the linker actually incorporates
+#	these libraries into the application, it is necessary to force a hard
+#	reference to symbols within the library.  If this reference is not
+#	made, then today's so-called "smart" linkers will not actually link the
+#	library into the application even though the library is mentioned in
+#	the linkage statement.
+#
+#	This makefile facilitates the process of static linking by synthesizing
+#	a C++ source file which contains hard references to symbols within each
+#	plug-in module.  The synthesis is accomplished by examining the
+#	makefile variable SCF.STATIC and generating a programmatic call to the
+#	SCF function REGISTER_STATIC_LIBRARY() for each entry listed in
+#	SCF.STATIC.  The synthesized C++ file is then added to the
+#	application's dependency list, with the result that it is both compiled
+#	and linked into the final application.
+#
+#	The contents of the SCF.STATIC list can change if the user
+#	re-configures the makefile system or modifies the list of desired
+#	plug-in modules in CS/mk/user.mak.  This makefile is smart enough to
+#	recognize such events and regenerate the synthesized C++ file as
+#	necessary.
+#
+# IMPORTS
+#	The makefile variable SCF.STATIC is examined during synthesis of the
+#	C++ source file which symbolically references each plug-in module.
+#	Each item listed in SCF.STATIC should be the core name of a plug-in
+#	module (such as `soft3d', `vfs', etc.)
+#
+#	The synthesized C++ file must be regenerated when certain external
+#	events occur (such as when the user alters the list of desired plug-in
+#	modules in CS/mk/user.mak).  The list of resources which must be
+#	monitored in order to facilitate automatic regeneration, is contained
+#	in the makefile variable DEP.LIBREF.EXTRA (below).
+#
+# EXPORTS
+#	If the project is configured to link plug-in modules into applications
+#	statically (that is, if USE_PLUGINS=no), then the makefile variable
+#	DEP.EXE is augmented with the name of the object file corresponding to
+#	the synthesized C++ file.
+#
+#	The name of the synthesized C++ file is contained in the makefile
+#	variable SRC.LIBREF.  The location of the file is mentioned in
+#	DIR.LIBREF.
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------- postdefines ---#
+ifeq ($(MAKESECTION),postdefines)
+
+DIR.LIBREF = $(OUTBASE)derived
+SRC.LIBREF = $(DIR.LIBREF)/cslibref.cpp
+OBJ.LIBREF = $(addprefix $(OUT),$(notdir $(SRC.LIBREF:.cpp=$O)))
+
+# List of resources to monitor for changes.  If any of these resources change,
+# then the file referenced by SRC.LIBREF will be regenerated.
+DEP.LIBREF.EXTRA = config.mak mk/user.mak
+
+# If plug-in modules will be linked into applications statically, then also
+# link against the synthesized reference file.
+ifneq ($(USE_PLUGINS),yes)
+  DEP.EXE += $(OBJ.LIBREF)
+endif
+
+# Contents of the reference file.  Makes a call to the SCF function
+# REGISTER_STATIC_LIBRARY() for each item listed in the makefile variable
+# SCF.STATIC.
+define LIBREF.CONTENT
+  echo $"// Do not modify.  This file is automatically generated.$"\
+    >$(SRC.LIBREF)
+  echo $"#include "cssysdef.h"$">>$(SRC.LIBREF)
+  echo $"#if defined(CS_STATIC_LINKED)$">>$(SRC.LIBREF)
+  echo $"#include "csutil/scf.h"$">>$(SRC.LIBREF)
+  echo $"$(foreach r,$(SCF.STATIC),REGISTER_STATIC_LIBRARY($r);)$"\
+    >>$(SRC.LIBREF)
+  echo $"#endif // CS_STATIC_LINKED$">>$(SRC.LIBREF)
+endef
+
+endif # ifeq ($(MAKESECTION),postdefines)
+
+#----------------------------------------------------------------- targets ---#
+ifeq ($(MAKESECTION),targets)
+
+# Rule for creating directories.
+$(DIR.LIBREF): $(OUTBASE)
+	$(MKDIR)
+
+# Rule to synthesize SRC.LIBREF.
+$(SRC.LIBREF): $(DEP.LIBREF.EXTRA) $(DIR.LIBREF)
+	@$(LIBREF.CONTENT)
+	@echo "Generated $(SRC.LIBREF)"
+
+# Rule to compile SRC.LIBREF into OBJ.LIBREF.
+$(OBJ.LIBREF): $(SRC.LIBREF)
+	$(DO.COMPILE.CPP)
+
+endif # ifeq ($(MAKESECTION),targets)

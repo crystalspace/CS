@@ -38,7 +38,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   NULL3D = $(OUT)$(LIB_PREFIX)null3d$(LIB)
   DEP.EXE += $(NULL3D)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_NULL3D
+  SCF.STATIC += null3d
   TO_INSTALL.STATIC_LIBS += $(NULL3D)
 endif
 

@@ -35,7 +35,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   MOTION = $(OUT)$(LIB_PREFIX)motion$(LIB)
   DEP.EXE += $(MOTION)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_MOTION
+  SCF.STATIC += motion
   TO_INSTALL.STATIC_LIBS += $(MOTION)
 endif
 

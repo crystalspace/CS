@@ -29,7 +29,7 @@ vpath %.cpp apps/cswstest apps/support
 
 CSWSTEST.EXE = cswstest$(EXE)
 INC.CSWSTEST = $(wildcard apps/cswstest/*.h)
-SRC.CSWSTEST = $(wildcard apps/cswstest/*.cpp) apps/support/static.cpp
+SRC.CSWSTEST = $(wildcard apps/cswstest/*.cpp)
 OBJ.CSWSTEST = $(addprefix $(OUT),$(notdir $(SRC.CSWSTEST:.cpp=$O)))
 DEP.CSWSTEST = CSWS CSGEOM CSGFXLDR CSSYS CSGEOM CSUTIL
 LIB.CSWSTEST = $(foreach d,$(DEP.CSWSTEST),$($d.LIB))

@@ -33,7 +33,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   ENGINE = $(OUT)$(LIB_PREFIX)engine$(LIB)
   DEP.EXE += $(ENGINE)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_ENGINE
+  SCF.STATIC += engine
   TO_INSTALL.STATIC_LIBS += $(ENGINE)
 endif
 

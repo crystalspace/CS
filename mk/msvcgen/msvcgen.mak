@@ -231,9 +231,7 @@ MSVC.OUTPUT = $(MSVC.OUT.DIR)/$(MSVC.PROJECT)$(MSVC.EXT.DSP)
 MSVC.FRAGMENT = $(MSVC.OUT.FRAGMENT)/$(MSVC.PROJECT)$(MSVC.EXT.FRAGMENT)
 
 # Macro to compose entire list of resources which comprise a project.
-# The file static.cpp is filtered out since it is not needed by MSVC.
-MSVC.CONTENTS = $(filter-out apps/support/static.cpp,$(SRC.$*)) \
-  $(INC.$*) $(CFG.$*) $(DSP.$*.RESOURCES)
+MSVC.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) $(DSP.$*.RESOURCES)
 
 # Macro to compose the entire dependency list for a particular project.
 # Dependencies are gleaned from three variables: DSP.PROJECT.DEPEND,

@@ -38,7 +38,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   SOFT3D = $(OUT)$(LIB_PREFIX)soft3d$(LIB)
   DEP.EXE += $(SOFT3D)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_SOFT3D
+  SCF.STATIC += soft3d
   TO_INSTALL.STATIC_LIBS += $(SOFT3D)
 endif
 

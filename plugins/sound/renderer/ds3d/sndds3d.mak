@@ -35,7 +35,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   SNDDS3D = $(OUT)$(LIB_PREFIX)sndds3d$(LIB)
   DEP.EXE += $(SNDDS3D)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_SNDDS3D
+  SCF.STATIC += sndds3d
   TO_INSTALL.STATIC_LIBS += $(SNDDS3D)
 endif
 

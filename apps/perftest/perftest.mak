@@ -29,7 +29,7 @@ vpath %.cpp apps/perftest apps/support
 
 PERF.EXE = perftest$(EXE)
 INC.PERF = $(wildcard apps/perftest/*.h)
-SRC.PERF = $(wildcard apps/perftest/*.cpp) apps/support/static.cpp
+SRC.PERF = $(wildcard apps/perftest/*.cpp)
 OBJ.PERF = $(addprefix $(OUT),$(notdir $(SRC.PERF:.cpp=$O)))
 DEP.PERF = CSUTIL CSSYS CSGEOM CSGFXLDR CSUTIL
 LIB.PERF = $(foreach d,$(DEP.PERF),$($d.LIB))

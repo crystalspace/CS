@@ -39,8 +39,8 @@ ifeq ($(USE_PLUGINS),yes)
 else
   GLBE2D = $(OUT)$(LIB_PREFIX)glbe2d$(LIB)
   DEP.EXE += $(GLBE2D)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_GLBE2D
   LIBS.EXE += -lGL
+  SCF.STATIC += glbe2d
   TO_INSTALL.STATIC_LIBS += $(GLBE2D)
 endif
 

@@ -38,7 +38,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   SIMPCON = $(OUT)$(LIB_PREFIX)simpcon$(LIB)
   DEP.EXE += $(SIMPCON)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_SIMPCON
+  SCF.STATIC += simpcon
   TO_INSTALL.STATIC_LIBS += $(SIMPCON)
 endif
 

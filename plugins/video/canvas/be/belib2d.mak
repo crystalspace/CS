@@ -39,7 +39,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   BE2D = be2d.a
   DEP.EXE += $(BE2D)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_BE2D
+  SCF.STATIC += be2d
   TO_INSTALL.STATIC_LIBS += $(BE2D)
 endif
 

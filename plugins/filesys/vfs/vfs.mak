@@ -37,7 +37,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   VFS = $(OUT)$(LIB_PREFIX)vfs$(LIB)
   DEP.EXE += $(VFS)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_VFS
+  SCF.STATIC += vfs
   TO_INSTALL.STATIC_LIBS += $(VFS)
 endif
 

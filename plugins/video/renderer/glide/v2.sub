@@ -45,7 +45,7 @@ else
   GLIDE3D2 = $(OUT)$(LIB_PREFIX)gl3d2$(LIB)
   DEP.EXE += $(GLIDE3D2)
   LIBS.EXE += $(LIB.GLIDE3D2.SYSTEM)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_GLIDE3D2
+  SCF.STATIC += glide3d2
   TO_INSTALL.STATIC_LIBS += $(GLIDE3D2)
 endif
 
@@ -55,7 +55,7 @@ SRC.GLIDE3D2.1 = $(wildcard plugins/video/renderer/glide/*.cpp)
 SRC.GLIDE3D2.2 = $(wildcard plugins/video/renderer/common/*.cpp)
 SRC.GLIDE3D2 = $(SRC.GLIDE3D2.1) $(SRC.GLIDE3D2.2)
 OBJ.GLIDE3D2 = $(addprefix $(OUT),$(notdir $(SRC.GLIDE3D2.1:.cpp=2$O))) \
-$(addprefix $(OUT),$(notdir $(SRC.GLIDE3D2.2:.cpp=$O)))
+  $(addprefix $(OUT),$(notdir $(SRC.GLIDE3D2.2:.cpp=$O)))
 DEP.GLIDE3D2 = CSGEOM CSGFXLDR CSUTIL CSSYS
 CFG.GLIDE3D2 = data/config/glide.cfg
 

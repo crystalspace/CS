@@ -39,7 +39,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   SNDOSS = $(OUT)$(LIB_PREFIX)ossdrv.a
   DEP.EXE += $(SNDOSS)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_SNDOSS
+  SCF.STATIC += ossdrv
   TO_INSTALL.STATIC_LIBS += $(SNDOSS)
 endif
 

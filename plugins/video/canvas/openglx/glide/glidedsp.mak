@@ -41,7 +41,7 @@ else
   OGLGLIDE = $(OUT)$(LIB_PREFIX)oglglide$(LIB)
   DEP.EXE += $(OGLGLIDE)
   LIBS.EXE += $(LIB.OGLGLIDE.SYSTEM) $(CSUTIL.LIB) $(CSSYS.LIB)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_OGLGLIDE
+  SCF.STATIC += oglglide
 endif
 
 INC.OGLGLIDE = $(wildcard plugins/video/canvas/openglx/glide/*.h)

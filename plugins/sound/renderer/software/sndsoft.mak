@@ -52,7 +52,7 @@ else
       LIBS.EXE += $(LIBS.DSOUND)$(LIB)
     endif
   endif
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_SNDSOFT
+  SCF.STATIC += sndsoft
   TO_INSTALL.STATIC_LIBS += $(SNDSOFT)
 endif
 

@@ -31,7 +31,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   FREEFONT = $(OUT)$(LIB_PREFIX)freefont$(LIB)
   DEP.EXE += $(FREEFONT)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_FREEFONT
+  SCF.STATIC += freefont
   TO_INSTALL.STATIC_LIBS += $(FREEFONT)
 endif
 

@@ -38,7 +38,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   INF3D = $(OUT)$(LIB_PREFIX)inf$(LIB)
   DEP.EXE += $(INF3D)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_INF3D
+  SCF.STATIC += inf3d
   TO_INSTALL.STATIC_LIBS += $(INF3D)
 endif
 

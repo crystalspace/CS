@@ -30,7 +30,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   FONTPLEX = $(OUT)$(LIB_PREFIX)fontplex$(LIB)
   DEP.EXE += $(FONTPLEX)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_FONTPLEX
+  SCF.STATIC += fontplex
   TO_INSTALL.STATIC_LIBS += $(FONTPLEX)
 endif
 

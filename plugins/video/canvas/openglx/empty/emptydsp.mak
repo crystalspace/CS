@@ -38,7 +38,7 @@ else
   OGLEMPTY = $(OUT)$(LIB_PREFIX)oglempty$(LIB)
   DEP.EXE += $(OGLEMPTY)
   LIBS.EXE += $(CSUTIL.LIB) $(CSSYS.LIB)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_OGLEMPTY
+  SCF.STATIC += oglempty
 endif
 
 INC.OGLEMPTY = $(wildcard plugins/video/canvas/openglx/empty/*.cpp)

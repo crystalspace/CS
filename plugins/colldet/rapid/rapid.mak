@@ -31,7 +31,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   RAPID = $(OUT)$(LIB_PREFIX)rapid$(LIB)
   DEP.EXE += $(RAPID)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_RAPID
+  SCF.STATIC += rapid
   TO_INSTALL.STATIC_LIBS += $(RAPID)
 endif
 

@@ -47,7 +47,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   NEXT2D = $(OUT)$(LIB_PREFIX)next2d$(LIB)
   DEP.EXE += $(NEXT2D)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_NEXT2D
+  SCF.STATIC += next2d
   TO_INSTALL.STATIC_LIBS += $(NEXT2D)
 endif
 

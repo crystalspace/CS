@@ -33,9 +33,9 @@ PLUGINS.DYNAMIC += engine
 PLUGINS.DYNAMIC += net/driver/socket
 #PLUGINS.DYNAMIC += font/server/freefont
 PLUGINS.DYNAMIC += font/server/fontplex
-PLUGINS.DYNAMIC += csstdldr
 PLUGINS.DYNAMIC += metaball
 PLUGINS.DYNAMIC += motion
+#PLUGINS.DYNAMIC += csstdldr
 #PLUGINS.DYNAMIC += csgame/gamecore
 
 #-----------------------------------------------------------------------------

@@ -30,7 +30,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   CSFONT = $(OUT)$(LIB_PREFIX)csfont$(LIB)
   DEP.EXE += $(CSFONT)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_CSFONT
+  SCF.STATIC += csfont
   TO_INSTALL.STATIC_LIBS += $(CSFONT)
 endif
 

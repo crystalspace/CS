@@ -29,7 +29,7 @@ vpath %.cpp apps/blocks apps/support
 
 BLOCKS.EXE = blocks$(EXE)
 INC.BLOCKS = $(wildcard apps/blocks/*.h)
-SRC.BLOCKS = $(wildcard apps/blocks/*.cpp) apps/support/static.cpp
+SRC.BLOCKS = $(wildcard apps/blocks/*.cpp)
 OBJ.BLOCKS = $(addprefix $(OUT),$(notdir $(SRC.BLOCKS:.cpp=$O)))
 DEP.BLOCKS = \
   CSPARSER CSENGINE CSTERR CSGFXLDR CSUTIL CSSYS CSGEOM CSOBJECT CSUTIL

@@ -40,7 +40,7 @@ else
   DDRAW = $(OUT)$(LIB_PREFIX)ddraw$(LIB)
   DEP.EXE += $(DDRAW)
   LIBS.EXE += $(LFLAGS.l)ddraw
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_DDRAW
+  SCF.STATIC += csddraw
   TO_INSTALL.STATIC_LIBS += $(DDRAW)
 endif
 

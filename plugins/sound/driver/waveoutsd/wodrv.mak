@@ -40,7 +40,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   SNDWOS = $(OUT)$(LIB_PREFIX)sndwaveout$(LIB)
   DEP.EXE += $(SNDWOS)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_SNDWOS
+  SCF.STATIC += sndwaveout
   TO_INSTALL.STATIC_LIBS += $(SNDWOS)
 endif
 

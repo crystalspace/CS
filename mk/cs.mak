@@ -195,9 +195,6 @@ cleanlib:
 cleandep: $(OUTBASE) $(OUTOS)
 	-$(RM) $(OUTOS)*.dep
 
-$(OUT)static$O: static.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.STATIC_SCF)
-
 $(OUT)%$O: %.cpp
 	$(DO.COMPILE.CPP)
 

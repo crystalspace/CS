@@ -38,7 +38,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   RAW2D = $(OUT)$(LIB_PREFIX)dosraw$(LIB)
   DEP.EXE += $(RAW2D)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_RAW2D
+  SCF.STATIC += dosraw
   TO_INSTALL.STATIC_LIBS += $(RAW2D)
 endif
 

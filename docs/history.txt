@@ -1,5 +1,52 @@
 The history order has been reversed so that new features are at the top.
 
+10-Dec-2000
+	- Eric Sunshine made the following changes to the project:
+	    - Finally eliminated the evil monolithic apps/support/static.cpp
+	      file which caused repeated maintenance headaches.  The problem
+	      with this file was that every time a plug-in module was added or
+	      removed from the project, a developer also had to remember to
+	      edit static.cpp to reflect the change.  Thus, the perceived
+	      modularity of plug-ins was offset by the very real monolithic
+	      disposition of this file.
+	    - As a replacement for static.cpp, the new makefile
+	      CS/mk/static.mak automatically and dynamically synthesizes C++
+	      code which forces hard symbolic references to each plug-in module
+	      being linked into the application (assuming that the application
+	      is being linked statically---that is, with USE_PLUGINS=no).
+	    - Information used by the synthesis process is gleaned from the GNU
+	      makefiles, project-wide.  The old CFLAGS.STATIC_SCF makefile
+	      variable has been removed.  A new variable, SCF.STATIC, contains
+	      a list of plug-in module basenames (such as `soft3d', `vfs',
+	      etc.), and this information is used to synthesize the hard
+	      references needed when linking applications statically.
+	    - The static.mak makefile is smart enough to regenerate the
+	      synthesized symbolic references when certain events occur; such
+	      as when the user edits the list of plug-in modules in user.mak or
+	      reconfigures the project's makefiles.
+	    - Note that the new synthesis process is geared toward platforms
+	      which utilize the GNU makefile system to build the project.  It
+	      does not apply to ports which use `project files'.  However,
+	      historically, none of the ports which rely on project files has
+	      ever supported static linking, so this is no loss.  If, in the
+	      future, a port does wish to support static linking via project
+	      files, it would be a simple matter to set up an automated
+	      synthesis task, and commit the result to the CVS repository on a
+	      regular basis, much as is already done with MSVC project files.
+	    - Added $(DEP.EXE) to the dependency lists of the following GUI
+	      applications.  This should allow them to successfully link
+	      statically (that is, when USE_PLUGINS is `no'):
+		cctest
+		g2dtest
+	    - Removed $(DEP.EXE) from the dependency list of the following
+	      console applications, since they need not link against the
+	      various plug-in modules:
+		csfgen
+		makedep
+		scfreg
+		scftutor
+		textconv
+		uninst
 9-Dec-2000
 	- Added 'regionOnly' parameter to all 'FindXxx()' methods in
 	  csEngine and iEngine. When this parameter is 'true' (default is

@@ -50,7 +50,7 @@ ifeq ($(MAKESECTION),targets)
 g2dtst: $(OUTDIRS) $(G2DTEST.EXE)
 clean: g2dtstclean
 
-$(G2DTEST.EXE): $(OBJ.G2DTEST) $(LIB.G2DTEST)
+$(G2DTEST.EXE): $(DEP.EXE) $(OBJ.G2DTEST) $(LIB.G2DTEST)
 	$(DO.LINK.EXE)
 
 g2dtstclean:

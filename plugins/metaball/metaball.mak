@@ -38,7 +38,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   METABALL = $(OUT)$(LIB_PREFIX)meta$(LIB)
   DEP.EXE += $(METABALL)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_METABALL
+  SCF.STATIC += metaball
   TO_INSTALL.STATIC_LIBS += $(METABALL)
 endif
 

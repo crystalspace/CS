@@ -29,7 +29,7 @@ vpath %.cpp apps/phyztest apps/support
 
 PHYZTEST.EXE = phyztest$(EXE)
 INC.PHYZTEST = $(wildcard apps/phyztest/*.h)
-SRC.PHYZTEST = $(wildcard apps/phyztest/*.cpp) apps/support/static.cpp
+SRC.PHYZTEST = $(wildcard apps/phyztest/*.cpp)
 OBJ.PHYZTEST = $(addprefix $(OUT),$(notdir $(SRC.PHYZTEST:.cpp=$O)))
 DEP.PHYZTEST = CSPARSER CSENGINE CSTERR CSPHYZIK CSGFXLDR CSUTIL CSSYS CSGEOM \
   CSOBJECT CSUTIL

@@ -38,7 +38,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   PERFSTAT = $(OUT)$(LIB_PREFIX)perfstat$(LIB)
   DEP.EXE += $(PERFSTAT)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_PERFSTAT
+  SCF.STATIC += perfstat
   TO_INSTALL.STATIC_LIBS += $(PERFSTAT)
 endif
 

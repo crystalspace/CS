@@ -33,7 +33,7 @@ vpath %.cpp apps/pysimp apps/support
 
 PYSIMP.EXE = pysimp$(EXE)
 INC.PYSIMP = $(wildcard apps/pysimp/*.h)
-SRC.PYSIMP = $(wildcard apps/pysimp/*.cpp) apps/support/static.cpp
+SRC.PYSIMP = $(wildcard apps/pysimp/*.cpp)
 OBJ.PYSIMP = $(addprefix $(OUT),$(notdir $(SRC.PYSIMP:.cpp=$O)))
 DEP.PYSIMP = \
   CSPARSER CSENGINE CSTERR CSGFXLDR CSUTIL CSSYS CSGEOM CSOBJECT CSUTIL

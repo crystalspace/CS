@@ -39,7 +39,7 @@ else
   OGLSVGA = $(OUT)$(LIB_PREFIX)oglsvga$(LIB)
   DEP.EXE += $(OGLSVGA)
   LIBS.EXE += $(CSUTIL.LIB) $(CSSYS.LIB)
-  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_OGLSVGA
+  SCF.STATIC += oglsvga
 endif
 
 INC.OGLSVGA = $(wildcard plugins/video/canvas/openglx/svga/*.h)
