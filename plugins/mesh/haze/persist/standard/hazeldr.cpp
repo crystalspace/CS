@@ -347,7 +347,8 @@ bool csHazeFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
         hullbox->GetSettings(min, max);
         csRef<iDocumentNode> boxNode = layerNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         boxNode->SetValue("hazebox");
-        synldr->WriteBox(boxNode,&csBox3(min, max));
+        csBox3 b(min, max);
+        synldr->WriteBox(boxNode,&b);
       }
       else if (hullcone)
       {
@@ -357,7 +358,8 @@ bool csHazeFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
         hullcone->GetSettings(number, min, max, p, q);
         csRef<iDocumentNode> coneNode = layerNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         coneNode->SetValue("hazecone");
-        synldr->WriteBox(coneNode,&csBox3(min, max));
+        csBox3 b(min, max);
+        synldr->WriteBox(coneNode,&b);
         coneNode->SetAttributeAsFloat("p", p);
         coneNode->SetAttributeAsFloat("q", q);
         coneNode->SetAttributeAsInt("number", number);
@@ -590,7 +592,8 @@ bool csHazeSaver::WriteDown (iBase* obj, iDocumentNode* parent)
         hullbox->GetSettings(min, max);
         csRef<iDocumentNode> boxNode = layerNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         boxNode->SetValue("hazebox");
-        synldr->WriteBox(boxNode,&csBox3(min, max));
+        csBox3 b(min, max);
+        synldr->WriteBox(boxNode,&b);
       }
       else if (hullcone)
       {
@@ -600,7 +603,8 @@ bool csHazeSaver::WriteDown (iBase* obj, iDocumentNode* parent)
         hullcone->GetSettings(number, min, max, p, q);
         csRef<iDocumentNode> coneNode = layerNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         coneNode->SetValue("hazecone");
-        synldr->WriteBox(coneNode,&csBox3(min, max));
+        csBox3 b(min, max);
+        synldr->WriteBox(coneNode,&b);
         coneNode->SetAttributeAsFloat("p", p);
         coneNode->SetAttributeAsFloat("q", q);
         coneNode->SetAttributeAsInt("number", number);

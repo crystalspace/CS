@@ -492,9 +492,6 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
 
   csRGBpixel* map = lm->GetRealMap ();
   iLight *light = lp->GetLight ();
-#if defined(CS_DEBUG)
-  long lm_size = lm->GetWidth () * lm->GetHeight (); // Used only for asserts.
-#endif
 
   int i;
   float miny = 1000000, maxy = -1000000;

@@ -1005,10 +1005,10 @@ void csShaderConditionResolver::DumpConditionNode (csRealConditionNode* node,
   {
     Indent (level);
     if (node->variant != csArrayItemNotFound)
-      csPrintf ("variant: %lu\n", node->variant);
+      csPrintf ("variant: %lu\n", (unsigned long)node->variant);
     else
     {
-      csPrintf ("condition: %lu\n", node->condition);
+      csPrintf ("condition: %lu\n", (unsigned long)node->condition);
       Indent (level);
       csPrintf ("True node: ");
       DumpConditionNode (node->trueNode, level + 1);
