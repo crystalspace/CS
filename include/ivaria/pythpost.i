@@ -473,6 +473,31 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 %}
 #endif // CS_MINI_SWIG
 
+/*
+ csWrapTypedObject is used to wrap a c++ object and pass it around as a Python 
+ object. As an example think of passing the iObjectRegistry* from the main c++
+ program to your python code.
+*/
+
+
+%{
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+SWIGRUNTIME(PyObject *) csWrapTypedObject (void* objectptr, const char *typetag, int own)
+{
+  swig_type_info *ti = SWIG_TypeQuery (typetag);
+  PyObject *obj = SWIG_NewPointerObj (objectptr, ti, own);
+  return obj;
+}
+#ifdef __cplusplus
+}
+#endif
+
+%}
+
 %include "ivaria/pythvarg.i"
 
 #endif // SWIGPYTHON
