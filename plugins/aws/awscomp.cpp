@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 
-const bool AWS_COMP_DEBUG=true;
+const bool AWS_COMP_DEBUG=false;
 
 
 awsComponent::awsComponent():wmgr(NULL), win(NULL), parent(NULL), children(NULL), signalsrc(this)

@@ -867,6 +867,22 @@ bool
 awsWindow::HasChildren()
 { return comp.HasChildren(); }
 
+iAwsWindow *
+awsWindow::Window()
+{ return comp.Window(); }
+    
+iAwsComponent *
+awsWindow::Parent()
+{ return comp.Parent(); }
+
+void 
+awsWindow::SetWindow(iAwsWindow *win)
+{ comp.SetWindow(win); }
+
+void 
+awsWindow::SetParent(iAwsComponent *parent)
+{ comp.SetParent(parent); }
+
 bool 
 awsWindow::RegisterSlot(iAwsSlot *slot, unsigned long signal)
 { return comp.RegisterSlot(slot, signal); }

@@ -502,12 +502,12 @@ awsManager::RecursiveDrawChildren(iAwsComponent *cmp, csRect &dirtyarea)
 iAwsWindow *
 awsManager::CreateWindowFrom(char *defname)
 {
-   printf("aws-debug: Searching for window def \"%s\"\n", defname);
+   if (DEBUG_MANAGER) printf("aws-debug: Searching for window def \"%s\"\n", defname);
    
    // Find the window definition
    awsComponentNode *winnode = GetPrefMgr()->FindWindowDef(defname);
    
-   printf("aws-debug: Window definition was %s\n", (winnode ? "found." : "not found."));
+   if (DEBUG_MANAGER) printf("aws-debug: Window definition was %s\n", (winnode ? "found." : "not found."));
    
    // If we couldn't find it, abort
    if (winnode==NULL) return NULL;
@@ -556,7 +556,7 @@ awsManager::CreateChildrenFromDef(iAws *wmgr, iAwsWindow *win, iAwsComponent *pa
         // Setup window and parent of component
         comp->SetWindow(win);
         comp->SetParent(parent);
-		
+       		
 	// Prepare the component, and add it into it's parent
 	comp->Setup(wmgr, comp_node);
 	parent->AddChild(comp);

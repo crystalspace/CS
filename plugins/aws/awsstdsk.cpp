@@ -8,7 +8,7 @@
 void 
 awsStandardSink::Hide(void *sink, iAwsSource *source)
 {
-  awsComponent *c = (awsComponent *)source;
+  iAwsComponent *c = source->GetComponent();
 
   c->Hide();
 }
@@ -16,7 +16,7 @@ awsStandardSink::Hide(void *sink, iAwsSource *source)
 void 
 awsStandardSink::Show(void *sink, iAwsSource *source)
 {
-  awsComponent *c = (awsComponent *)source;
+  iAwsComponent *c = source->GetComponent();
 
   c->Show();
 }
@@ -24,7 +24,7 @@ awsStandardSink::Show(void *sink, iAwsSource *source)
 void 
 awsStandardSink::HideWindow(void *sink, iAwsSource *source)
 {
-  awsComponent *c = (awsComponent *)source;
+  iAwsComponent *c = source->GetComponent();
 
   if (strcmp(c->Type(), "Window")==0)
   {
@@ -32,15 +32,14 @@ awsStandardSink::HideWindow(void *sink, iAwsSource *source)
   }
   else
   { 
-    printf("hiding window, %s\n", c->Window()->Type());
-    //if (c->Window()) c->Window()->Hide();
+    if (c->Window()) c->Window()->Hide();
   }
 }
 
 void 
 awsStandardSink::Invalidate(void *sink, iAwsSource *source)
 {
-  awsComponent *c = (awsComponent *)source;
+  iAwsComponent *c = source->GetComponent();
 
   c->Invalidate();
 }
