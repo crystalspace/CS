@@ -76,7 +76,10 @@ csTerrBlock::csTerrBlock ()
   material = NULL;
   node = NULL;
   quaddiv = NULL;
-  framenum = 1;
+  quaddiv_visible = false;
+  qd_portal = false;
+  qd_plane = false;
+  qd_z_plane = false;
 }
 
 csTerrBlock::~csTerrBlock ()
@@ -101,11 +104,9 @@ void csTerrBlock::PrepareQuadDiv(iTerrainHeightFunction *height_func)
     bbox.MinX(), bbox.MinZ(), bbox.MaxX(), bbox.MaxZ());
 }
 
-void csTerrBlock::PrepareFrame(const csVector3& campos)
+void csTerrBlock::PrepareFrame(const csVector3& campos, int framenum)
 {
   CS_ASSERT(quaddiv);
-  /// invalidate previous divisions;
-  framenum++;
   /// compute LOD
   quaddiv->ComputeLOD(framenum, campos, bbox.MinX(), bbox.MinZ(), bbox.MaxX(),
     bbox.MaxZ());
@@ -196,7 +197,7 @@ static void TerrTri(void *userdata, const csVector3& zt1,
 
 void csTerrBlock::Draw(iRenderView *rview, bool clip_portal, bool clip_plane,
   bool clip_z_plane, float correct_du, float correct_su, float correct_dv, 
-  float correct_sv, csTerrFuncObject *terr)
+  float correct_sv, csTerrFuncObject *terr, int framenum)
 {
   /// collect triangles and draw them
   iGraphics3D *pG3D = rview->GetGraphics3D();
@@ -243,8 +244,8 @@ void csTerrBlock::Draw(iRenderView *rview, bool clip_portal, bool clip_plane,
 
   m.mesh.num_triangles = m.triangles.Length();
   m.mesh.triangles = m.triangles.GetArray();
-  printf("terrfuncdiv block %x: %d triangles\n", (int)this,
-    m.mesh.num_triangles);
+  //printf("terrfuncdiv block %x: %d triangles\n", (int)this,
+    //m.mesh.num_triangles);
 
   CS_ASSERT(m.mesh.buffers[0]);
   CS_ASSERT(!m.mesh.buffers[0]->IsLocked ());
@@ -466,6 +467,7 @@ csTerrFuncObject::csTerrFuncObject (iObjectRegistry* object_reg,
   quaddiv_enabled = false;
   quad_height = NULL;
   quad_normal = NULL;
+  qd_framenum = 1;
 }
 
 csTerrFuncObject::~csTerrFuncObject ()
@@ -1661,9 +1663,10 @@ void csTerrFuncObject::InitQuadDiv()
       blidx = by*blockxy + bx;
       blocks[blidx].quaddiv = new csTerrainQuadDiv(initdepth);
       blocks[blidx].PrepareQuadDiv(quad_height);
-      printf("block bx=%d by=%d block %x qd %x center %g,%g,%g\n", bx, by,
-        (int)&blocks[blidx], (int)blocks[blidx].quaddiv, blocks[blidx].center.x,
-	blocks[blidx].center.y, blocks[blidx].center.z);
+      blocks[blidx].quaddiv->SetVisQuad(blocks[blidx].node);
+      //printf("block bx=%d by=%d block %x qd %x center %g,%g,%g\n", bx, by,
+       //(int)&blocks[blidx],(int)blocks[blidx].quaddiv,blocks[blidx].center.x,
+       //blocks[blidx].center.y, blocks[blidx].center.z);
     }
   }
 
@@ -1698,6 +1701,62 @@ void csTerrFuncObject::UpdateLighting (iLight**, int,
   return;
 }
 
+void csTerrFuncObject::QuadDivDraw (iRenderView* rview, csZBufMode zbufMode)
+{
+  qd_framenum++;
+  iGraphics3D* pG3D = rview->GetGraphics3D ();
+  iCamera* pCamera = rview->GetCamera ();
+
+  csReversibleTransform& camtrans = pCamera->GetTransform ();
+  const csVector3& origin = camtrans.GetOrigin ();
+  pG3D->SetObjectToCamera (&camtrans);
+  pG3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zbufMode );
+
+  int bx, by;
+  int blidx = 0;
+  /// 1st pass - compute subdivision
+  for (by = 0 ; by < blockxy ; by++)
+  {
+    for (bx = 0 ; bx < blockxy ; bx++, blidx++)
+    {
+      csTerrBlock& block = blocks[blidx];
+      if (do_vis_test)
+      {
+        CS_ASSERT (block.node != NULL);
+        if (!block.node->IsVisible ()) continue;
+      }
+      int clip_portal, clip_plane, clip_z_plane;
+      if (BBoxVisible (block.bbox, rview, pCamera, clip_portal, clip_plane,
+      	clip_z_plane))
+      {
+        block.quaddiv_visible = true;
+        block.qd_portal = clip_portal;
+        block.qd_plane = clip_plane;
+        block.qd_z_plane = clip_z_plane;
+        block.PrepareFrame( origin, qd_framenum );
+      }
+    }
+  }
+
+  /// 2nd pass - draw without seams
+  blidx = 0;
+  for (by = 0 ; by < blockxy ; by++)
+  {
+    for (bx = 0 ; bx < blockxy ; bx++, blidx++)
+    {
+      csTerrBlock& block = blocks[blidx];
+      if(block.quaddiv_visible)
+      {
+        //if((bx!=0&&bx!=1) || by!=0) continue; // one block only
+        SetupVertexBuffer (block.vbuf[0], block.vbuf[0]);
+        block.Draw(rview, block.qd_portal, block.qd_plane, block.qd_z_plane,
+          correct_du, correct_su, correct_dv, correct_sv, this, qd_framenum);
+	block.quaddiv_visible = false;
+      }
+    }
+  }
+}
+
 bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   	csZBufMode zbufMode)
 {
@@ -1707,6 +1766,12 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 
   if (do_vis_test)
     TestVisibility (rview);
+
+  if(quaddiv_enabled)
+  {
+    QuadDivDraw(rview, zbufMode);
+    return true;
+  }
 
   iGraphics3D* pG3D = rview->GetGraphics3D ();
   iCamera* pCamera = rview->GetCamera ();
@@ -1726,21 +1791,12 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
       if (do_vis_test)
       {
         CS_ASSERT (block.node != NULL);
-        if (!quaddiv_enabled && !block.node->IsVisible ()) continue;
+        if (!block.node->IsVisible ()) continue;
       }
       int clip_portal, clip_plane, clip_z_plane;
       if (BBoxVisible (block.bbox, rview, pCamera, clip_portal, clip_plane,
       	clip_z_plane))
       {
-        if(quaddiv_enabled)
-	{
-	  if((bx!=0&&bx!=1) || by!=0) continue; // one block only
-	  block.PrepareFrame( origin );
-	  SetupVertexBuffer (block.vbuf[0], block.vbuf[0]);
-	  block.Draw(rview, clip_portal, clip_plane, clip_z_plane,
-	    correct_du, correct_su, correct_dv, correct_sv, this);
-	  continue;
-	}
         csVector3& bc = block.center;
         int lod = 0;
         float sqdist = csSquaredDist::PointPoint (bc, origin);

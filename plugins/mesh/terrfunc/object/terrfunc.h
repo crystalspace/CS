@@ -65,8 +65,10 @@ public:
 
   /// the triangle divisor for this block (if enabled)
   csTerrainQuadDiv *quaddiv;
-  /// quaddiv framenumber to use
-  int framenum;
+  /// quaddiv- block visible?
+  bool quaddiv_visible;
+  /// and then store these bools for later
+  bool qd_portal, qd_plane, qd_z_plane;
 
 public:
   csTerrBlock ();
@@ -75,11 +77,11 @@ public:
   /// prepare quad divisor, precalculations
   void PrepareQuadDiv(iTerrainHeightFunction *height_func);
   /// compute LOD for block, prepare to render (for quaddiv use)
-  void PrepareFrame(const csVector3& campos);
+  void PrepareFrame(const csVector3& campos, int framenum);
   /// Draw (for quaddiv use)
   void Draw(iRenderView *rview, bool clip_portal, bool clip_plane,
     bool clip_z_plane, float correct_du, float correct_su, float correct_dv, 
-    float correct_sv, csTerrFuncObject *terr);
+    float correct_sv, csTerrFuncObject *terr, int framenum);
 };
 
 class csTerrFuncObject : public iMeshObject
@@ -109,6 +111,8 @@ public:
   iTerrainHeightFunction *quad_height;
   /// quad normal function wrapper
   iTerrainNormalFunction *quad_normal;
+  /// quaddiv framenumber to use
+  int qd_framenum;
 
 //private: //@@@
 public:
@@ -398,6 +402,9 @@ public:
    * Construct quad divisors for all blocks and interconnects them.
    */
   void InitQuadDiv();
+
+  /** Draw the quaddivisor terrain */
+  void QuadDivDraw (iRenderView* rview, csZBufMode zbufMode);
 
   void SetDirLight (const csVector3& pos, const csColor& col)
   {

@@ -55,6 +55,8 @@ class csTerrainQuadDiv
   /// also min / max height of this quad
   float min_height, max_height;
 
+  /// visibility check quad to use (if any);
+  csTerrainQuad *visquad;
 
 public:
   /// create tree of certain depth (0 = create leaf node).
@@ -71,6 +73,11 @@ public:
    * NULL means no neighbor (of same size) in that direction.
   */
   csTerrainQuadDiv* GetNeighbor(int dir);
+
+  /** Get terrainquad for visibility for this node */
+  csTerrainQuad *GetVisQuad();
+  /** Set visibility node to use */
+  void SetVisQuad(csTerrainQuad *vis) {visquad = vis;}
 
   /// is this quad a leaf node? (nodes always have four or zero children)
   bool IsLeaf() const {return children[0] == NULL;}

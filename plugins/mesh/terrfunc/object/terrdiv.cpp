@@ -37,6 +37,7 @@ csTerrainQuadDiv::csTerrainQuadDiv(int depth)
   dmax = 0;
   min_height = 0;
   max_height = 0;
+  visquad = NULL;
 
   /// subcreate
   if(depth > 0)
@@ -125,8 +126,8 @@ void csTerrainQuadDiv::SetNeighbor(int dir, csTerrainQuadDiv *neigh)
 
 csTerrainQuadDiv* csTerrainQuadDiv::GetNeighbor(int dir)
 {
-  if(!parent && neighbors[dir]) printf("qd %x dir %d %x\n", 
-    (int)this, dir, (int)neighbors[dir]);
+  //if(!parent && neighbors[dir]) printf("qd %x dir %d %x\n", 
+    //(int)this, dir, (int)neighbors[dir]);
   if(neighbors[dir]) return neighbors[dir];
   /// find & cache it;
   if(!parent) return NULL;
@@ -184,6 +185,16 @@ csTerrainQuadDiv* csTerrainQuadDiv::GetNeighbor(int dir)
   return neighbors[dir];
 }
 
+csTerrainQuad *csTerrainQuadDiv::GetVisQuad()
+{
+  if(visquad) return visquad;
+  if(!parent) return NULL;
+  csTerrainQuad *pquad = parent->GetVisQuad();
+  if(!pquad) return NULL;
+  visquad = pquad->GetChild(parentplace);
+  return visquad;
+}
+
 void csTerrainQuadDiv::ComputeDmax(iTerrainHeightFunction* height_func,
     float minx, float miny, float maxx, float maxy)
 {
@@ -192,7 +203,6 @@ void csTerrainQuadDiv::ComputeDmax(iTerrainHeightFunction* height_func,
   float midy = (miny+maxy)*0.5f;
   float h;
   float cornerh[4];
-  float old_dmax = dmax;
   cornerh[0] = height_func->GetHeight(minx, miny);
   cornerh[1] = height_func->GetHeight(minx, maxy);
   cornerh[2] = height_func->GetHeight(maxx, maxy);
@@ -261,48 +271,48 @@ void csTerrainQuadDiv::ComputeDmax(iTerrainHeightFunction* height_func,
   h -= (cornerh[2] + cornerh[3])*0.5;
   h = ABS(h); if(h > dmax) dmax = h;
 
-  CS_ASSERT((old_dmax==0.0f)||(old_dmax==dmax));
   //printf("size %g dmax is %g.\n", maxx-minx, dmax);
 }
 
 void csTerrainQuadDiv::ComputeLOD(int framenum, const csVector3& campos,
   float minx, float miny, float maxx, float maxy)
 {
+  if(GetVisQuad()) if(!GetVisQuad()->IsVisible()) return;
   float midx = (minx+maxx)*0.5f;
   float midy = (miny+maxy)*0.5f;
 
-  /// compute visible error
+  /// compute visible error  (lower = more quality)
+  float maxerror = 0.001f;
+  float distfactor = 0.5f;
   /// which is heightchange / distance * cameraslant
   float e = dmax; 
-  /// if camera in quad: dist = 1; (see full length)
-  float dist = 1.;
-  float distfactor = 0.1;
-  if( (campos.x < minx) || (campos.x > maxx) || (campos.z < miny)
-    || (campos.z > maxy))
-  {
-    float distx = 0;
-    float disty = 0;
-    if(campos.x < minx) distx = minx-campos.x;
-    if(campos.x > maxx) distx = campos.x-maxx;
-    if(campos.z < miny) disty = miny-campos.z;
-    if(campos.z > maxy) disty = campos.z-maxy;
-    distx*=distfactor;
-    disty*=distfactor;
-    //dist = 1. / qsqrt(1.0 + distx*distx + disty*disty);
-    dist = 1. / (1.0 + distx*distx + disty*disty);
-  }
-  e *= dist;
+
+  /// if camera in quad: dist = 1; (you can see full length)
+  float distx = 1.f;
+  float disty = 1.f;
+  float disth = 1.f;
+  if(campos.x < minx) distx = minx-campos.x;
+  if(campos.x > maxx) distx = campos.x-maxx;
+  if(campos.z < miny) disty = miny-campos.z;
+  if(campos.z > maxy) disty = campos.z-maxy;
+  if(campos.y < min_height) disth = min_height-campos.z;
+  if(campos.y > max_height) disth = campos.z-max_height;
+  distx*=distfactor;
+  disty*=distfactor;
+  disth*=distfactor;
+  /// distance mult factor is thus:
+  e /= 1.0f + distx*distx + disty*disty + disth*disth;
+
   /// if camera in quad, camslant = 1 (full length is visible)
-  float camslant = 1.0;
+  /**float camslant = 1.0;
   if(campos.y > max_height) camslant = 1.0 / 
     (1.+ distfactor*(campos.y - max_height));
   if(campos.y < min_height) camslant = 1.0 / 
     (1.+ distfactor*(min_height - campos.y));
-  e *= camslant;
+  e *= camslant;**/
 
   /// can this quad be displayed?
   bool OK = true;
-  float maxerror = 0.010;
   if(e > maxerror) OK = false;
 
   if(OK) return; // no need to divide
@@ -310,6 +320,8 @@ void csTerrainQuadDiv::ComputeLOD(int framenum, const csVector3& campos,
   /// debug prints
   if(0)
   {
+    float camslant = 1.;
+    float dist = 1.0f /(1.0f + distx*distx + disty*disty + disth*disth);
     printf("LOD %g dmax is %g, dist %g, cam %g, error is %f.\n", 
       maxx-minx, dmax, dist, camslant, e);
   }
