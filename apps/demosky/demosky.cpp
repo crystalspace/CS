@@ -75,8 +75,9 @@ void cleanup ()
 }
 
 
-void Simple::SetTexSpace(csPolygon3D *poly, int size, const csVector3& orig,
-  const csVector3& upt, float ulen, const csVector3& vpt, float vlen)
+void Simple::SetTexSpace(csProcSkyTexture *skytex, csPolygon3D *poly, 
+  int size, const csVector3& orig, const csVector3& upt, float ulen, 
+  const csVector3& vpt, float vlen)
 {
   csVector3 texorig = orig;
   csVector3 texu = upt;
@@ -91,9 +92,10 @@ void Simple::SetTexSpace(csPolygon3D *poly, int size, const csVector3& orig,
   texorig -= vvector / float(size);
   texu += uvector / float(size);
   texv += vvector / float(size);
-  texulen += 2. / float(size);
-  texvlen += 2. / float(size);
+  texulen += ulen * 2. / float(size);
+  texvlen += vlen * 2. / float(size);
   poly->SetTextureSpace (texorig, texu, texulen, texv, texvlen);
+  skytex->SetTextureSpace(texorig, texu-texorig, texv-texorig);
 }
 
 
@@ -170,14 +172,13 @@ bool Simple::Initialize (int argc, const char* const argv[],
   csPolygon3D* p;
   p = walls->NewPolygon (matd);
   float size = 500.0; /// size of the skybox -- around 0,0,0 for now.
-  float simi = size*255./256.; /// sizeminor
+  float simi = size; //*255./256.; /// sizeminor
   p->AddVertex (-size, -simi, size);
   p->AddVertex (size, -simi, size);
   p->AddVertex (size, -simi, -size);
   p->AddVertex (-size, -simi, -size);
-  sky_d->SetTextureSpace(p->Vobj(0), p->Vobj(1)-p->Vobj(0), 
-    p->Vobj(3)-p->Vobj(0));
-  SetTexSpace (p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
+  //sky_d->SetTextureSpace(p->Vobj(0), p->Vobj(1)-p->Vobj(0), p->Vobj(3)-p->Vobj(0));
+  SetTexSpace (sky_d, p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
   p->flags.Set(CS_POLY_LIGHTING, 0);
 
   p = walls->NewPolygon (matu);
@@ -185,9 +186,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
   p->AddVertex (size, simi, -size);
   p->AddVertex (size, simi, size);
   p->AddVertex (-size, simi, size);
-  sky_u->SetTextureSpace(p->Vobj(0), p->Vobj(1)-p->Vobj(0), 
-    p->Vobj(3)-p->Vobj(0));
-  SetTexSpace (p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
+  //sky_u->SetTextureSpace(p->Vobj(0), p->Vobj(1)-p->Vobj(0), p->Vobj(3)-p->Vobj(0));
+  SetTexSpace (sky_u, p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
   p->flags.Set(CS_POLY_LIGHTING, 0);
 
   p = walls->NewPolygon (matf);
@@ -195,9 +195,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
   p->AddVertex (size, size, simi);
   p->AddVertex (size, -size, simi);
   p->AddVertex (-size, -size, simi);
-  sky_f->SetTextureSpace(p->Vobj(0), p->Vobj(1)-p->Vobj(0), 
-    p->Vobj(3)-p->Vobj(0));
-  SetTexSpace (p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
+  //sky_f->SetTextureSpace(p->Vobj(0), p->Vobj(1)-p->Vobj(0), p->Vobj(3)-p->Vobj(0));
+  SetTexSpace (sky_f, p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
   p->flags.Set(CS_POLY_LIGHTING, 0);
 
   p = walls->NewPolygon (matr);
@@ -205,9 +204,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
   p->AddVertex (simi, size, -size);
   p->AddVertex (simi, -size, -size);
   p->AddVertex (simi, -size, size);
-  sky_r->SetTextureSpace(p->Vobj(0), p->Vobj(1)-p->Vobj(0), 
-    p->Vobj(3)-p->Vobj(0));
-  SetTexSpace (p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
+  //sky_r->SetTextureSpace(p->Vobj(0), p->Vobj(1)-p->Vobj(0), p->Vobj(3)-p->Vobj(0));
+  SetTexSpace (sky_r, p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
   p->flags.Set(CS_POLY_LIGHTING, 0);
 
   p = walls->NewPolygon (matl);
@@ -215,9 +213,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
   p->AddVertex (-simi, size, size);
   p->AddVertex (-simi, -size, size);
   p->AddVertex (-simi, -size, -size);
-  sky_l->SetTextureSpace(p->Vobj(0), p->Vobj(1)-p->Vobj(0), 
-    p->Vobj(3)-p->Vobj(0));
-  SetTexSpace (p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
+  //sky_l->SetTextureSpace(p->Vobj(0), p->Vobj(1)-p->Vobj(0), p->Vobj(3)-p->Vobj(0));
+  SetTexSpace (sky_l, p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
   p->flags.Set(CS_POLY_LIGHTING, 0);
 
   p = walls->NewPolygon (matb);
@@ -225,9 +222,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
   p->AddVertex (-size, size, -simi);
   p->AddVertex (-size, -size, -simi);
   p->AddVertex (size, -size, -simi);
-  sky_b->SetTextureSpace(p->Vobj(0), p->Vobj(1)-p->Vobj(0), 
-    p->Vobj(3)-p->Vobj(0));
-  SetTexSpace (p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
+  //sky_b->SetTextureSpace(p->Vobj(0), p->Vobj(1)-p->Vobj(0), p->Vobj(3)-p->Vobj(0));
+  SetTexSpace (sky_b, p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
   p->flags.Set(CS_POLY_LIGHTING, 0);
 
   engine->Prepare ();
