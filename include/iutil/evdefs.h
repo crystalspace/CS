@@ -256,7 +256,7 @@ enum
  * {
  *   cscmdMyCommand1 = 0xdeadf00d,
  *   cscmdMyCommand2,
- *   cscmdMyCommand3,
+ *   cscmdMyCommand3
  *   ...
  * }
  *</pre>

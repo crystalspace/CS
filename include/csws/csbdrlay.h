@@ -161,7 +161,7 @@ class csBorderLayout : public csLayout2
     _AFTER_LAST_LINE    = _SOUTH,
     _AFTER_LINE_ENDS    = _EAST,
     _BEFORE_FIRST_LINE  = _NORTH,
-    _BEFORE_LINE_BEGINS = _WEST,
+    _BEFORE_LINE_BEGINS = _WEST
   };
 
  protected:

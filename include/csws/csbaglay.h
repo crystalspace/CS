@@ -250,7 +250,7 @@ public:
     SOUTH     = 15,
     SOUTHWEST = 16,
     WEST      = 17,
-    NORTHWEST = 18,
+    NORTHWEST = 18
   };
 
   // used interally  (do not use!)

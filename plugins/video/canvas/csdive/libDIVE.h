@@ -103,7 +103,7 @@ enum tDiveError
   derrAllocBuffer,                      // Cannot allocate DIVE buffer
   derrCreateSem,                        // Cannot create event semaphore
   derrPalette,                          // Cannot set up palette
-  derrDestroyed,                        // User dismissed the window
+  derrDestroyed                         // User dismissed the window
 };
 
 #define DIVE_MAXBUFFERS 16		// Maximal number of backbuffers

@@ -42,7 +42,7 @@ public:
   csBasicVector (int ilimit = 0, int ithreshold = 0);
   
   /// Destroy the container but none of the objects to which it points.
-  ~csBasicVector();
+  virtual ~csBasicVector();
 
   /// Get a reference to n-th element
   inline csSome& operator [] (int n);

@@ -68,7 +68,7 @@ struct iConfigManager : public iConfigFile
     PriorityMedium =    0,
     PriorityHigh =      +50,
     PriorityVeryHigh =  +100,
-    PriorityMax =       +1000000000,
+    PriorityMax =       +1000000000
   };
 
   /// Default priority values (you may use other values if you want)

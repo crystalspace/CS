@@ -79,7 +79,7 @@ enum tOpenGLError
   glerAllocBuffer,                      // Cannot allocate GL buffer
   glerCreateSem,                        // Cannot create event semaphore
   glerPalette,                          // Cannot set up palette
-  glerDestroyed,                        // User dismissed the window
+  glerDestroyed                         // User dismissed the window
 };
 
 extern long DesktopW, DesktopH;         // Desktop width and height

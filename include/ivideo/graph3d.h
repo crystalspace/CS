@@ -358,7 +358,7 @@ struct G3DTriangleMesh
   enum
   {
     /// Maximum number of vertex pool, used for vertex weighting/morphing.
-    MAX_VERTEXPOOL = 2,
+    MAX_VERTEXPOOL = 2
   };
 
   /// Number of vertex sets, if > 1, morphing will be applied.
