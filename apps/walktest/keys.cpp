@@ -55,6 +55,8 @@
 
 csKeyMap* mapping = NULL;
 
+csSprite3D *FindNextClosestSprite(csSprite3D *baseSprite, csCamera *camera, csVector2 *screenCoord);
+
 //===========================================================================
 // Some utility functions used throughout this source.
 //===========================================================================
@@ -987,11 +989,11 @@ static bool CommandHandler (char *cmd, char *arg)
   else if (!strcasecmp (cmd, "coordsave"))
   {
     ISystem *s=GetISystemFromSystem(System);
-    
+
     Sys->Printf (MSG_CONSOLE, "SAVE COORDS\n");
     Sys->view->GetCamera()->SaveFile ("coord");
     FILE *fo;
-    
+
     s->FOpen("coord","a",&fo);
 
     fprintf(fo,"Head=(%g,%g,%g)\n",Sys->angle.x,Sys->angle.y,Sys->angle.z);
@@ -1001,11 +1003,11 @@ static bool CommandHandler (char *cmd, char *arg)
   else if (!strcasecmp (cmd, "coordload"))
   {
     ISystem *s=GetISystemFromSystem(System);
-    
+
     Sys->Printf (MSG_CONSOLE, "LOAD COORDS\n");
     Sys->view->GetCamera()->LoadFile (Sys->world, "coord");
     FILE *fp;
-    
+
     s->FOpen("coord","r",&fp);
 
     char buf[128];
@@ -2069,10 +2071,22 @@ void WalkTest::NextFrame (long elapsed_time, long current_time)
         break;
       case csevMouseDown:
         if (Event->Mouse.Button == 1)
-	        move_forward = true;
-        else
-        if (Event->Mouse.Button == 2)
+	  move_forward = true;
+        else if (Event->Mouse.Button == 3)
         {
+          csVector2   screenPoint;
+          csSprite3D *closestSprite;
+
+          screenPoint.x = Event->Mouse.x;
+          screenPoint.y = Event->Mouse.y;
+          closestSprite = FindNextClosestSprite(NULL, view->GetCamera(), &screenPoint);
+          if (closestSprite)
+            Sys->Printf (MSG_CONSOLE, "Selected sprite %s\n", csNameObject::GetName(*closestSprite));
+          else
+            Sys->Printf (MSG_CONSOLE, "No sprite selected!\n");
+	}
+        else if (Event->Mouse.Button == 2)
+	{
 	  unsigned long real_zb;
           unsigned long* zb = &real_zb;
 	  System->piG3D->GetZBufPoint(Event->Mouse.x, Event->Mouse.y, &zb);
@@ -2157,3 +2171,53 @@ void WalkTest::NextFrame (long elapsed_time, long current_time)
     if (Command::get_script_line (buf, 255)) Command::perform_line (buf);
   }
 }
+
+
+
+csSprite3D *FindNextClosestSprite(csSprite3D *baseSprite, csCamera *camera, csVector2 *screenCoord)
+   {
+   int               spriteIndex;
+   float             thisZLocation;
+   float             closestZLocation;
+   csSprite3D *      closestSprite;
+   csSprite3D *      nextSprite;
+   csBox             screenBoundingBox;
+
+   if (baseSprite)
+      {
+      closestSprite = baseSprite;
+      closestZLocation = baseSprite->GetScreenBoundingBox(camera, screenBoundingBox);
+      // if the baseSprite isn't in front of the camera, return
+      if (closestZLocation < 0)
+         return NULL;
+      }
+   else
+      {
+      closestSprite = NULL;
+      closestZLocation = 32000;
+      }
+
+   for (spriteIndex = 0; spriteIndex < Sys->world->sprites.Length(); spriteIndex++)
+      {
+      nextSprite = (csSprite3D*)Sys->world->sprites[spriteIndex];
+
+//      Sys->Printf(MSG_CONSOLE, "Checking sprite %s\n", csNameObject::GetName(*nextSprite));
+      if (nextSprite != baseSprite)
+         {
+         thisZLocation = nextSprite->GetScreenBoundingBox(camera, screenBoundingBox);
+         if ((thisZLocation > 0) && (thisZLocation < closestZLocation))
+            {
+            if (screenBoundingBox.In(screenCoord->x, screenCoord->y))
+               {
+               closestZLocation = thisZLocation;
+               closestSprite = nextSprite;
+               }
+            }
+         }
+      }
+
+   return closestSprite;
+   }
+
+
+
