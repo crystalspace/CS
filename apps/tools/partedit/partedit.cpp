@@ -399,7 +399,7 @@ bool PartEdit::RecreateParticleSystem(const char *texturefile)
   e_bptr->SetContent(state_initial_position.box_min,state_initial_position.box_max);
   e_cyptr->SetContent(state_initial_position.cylinder_start,state_initial_position.cylinder_end,
                     state_initial_position.cylinder_min,state_initial_position.cylinder_max);
-  e_coptr->SetContent(state_initial_position.cone_elevation,state_initial_position.cone_elevation,
+  e_coptr->SetContent(state_initial_position.cone_origin,state_initial_position.cone_elevation,
                     state_initial_position.cone_azimuth,state_initial_position.cone_aperture,
                     state_initial_position.cone_min,state_initial_position.cone_max);
   e_sptr->SetContent(state_initial_position.sphere_center,state_initial_position.sphere_min,state_initial_position.sphere_max);
@@ -489,7 +489,7 @@ bool PartEdit::RecreateParticleSystem(const char *texturefile)
   e_bptr->SetContent(state_initial_speed.box_min,state_initial_speed.box_max);
   e_cyptr->SetContent(state_initial_speed.cylinder_start,state_initial_speed.cylinder_end,
                     state_initial_speed.cylinder_min,state_initial_speed.cylinder_max);
-  e_coptr->SetContent(state_initial_speed.cone_elevation,state_initial_speed.cone_elevation,
+  e_coptr->SetContent(state_initial_speed.cone_origin,state_initial_speed.cone_elevation,
                     state_initial_speed.cone_azimuth,state_initial_speed.cone_aperture,
                     state_initial_speed.cone_min,state_initial_speed.cone_max);
   e_sptr->SetContent(state_initial_speed.sphere_center,state_initial_speed.sphere_min,state_initial_speed.sphere_max);
@@ -578,7 +578,7 @@ bool PartEdit::RecreateParticleSystem(const char *texturefile)
   e_bptr->SetContent(state_initial_acceleration.box_min,state_initial_acceleration.box_max);
   e_cyptr->SetContent(state_initial_acceleration.cylinder_start,state_initial_acceleration.cylinder_end,
                     state_initial_acceleration.cylinder_min,state_initial_acceleration.cylinder_max);
-  e_coptr->SetContent(state_initial_acceleration.cone_elevation,state_initial_acceleration.cone_elevation,
+  e_coptr->SetContent(state_initial_acceleration.cone_origin,state_initial_acceleration.cone_elevation,
                     state_initial_acceleration.cone_azimuth,state_initial_acceleration.cone_aperture,
                     state_initial_acceleration.cone_min,state_initial_acceleration.cone_max);
   e_sptr->SetContent(state_initial_acceleration.sphere_center,state_initial_acceleration.sphere_min,state_initial_acceleration.sphere_max);
@@ -673,7 +673,7 @@ bool PartEdit::RecreateParticleSystem(const char *texturefile)
     e_bptr->SetContent(state_attractor.e3d_state.box_min,state_attractor.e3d_state.box_max);
     e_cyptr->SetContent(state_attractor.e3d_state.cylinder_start,state_attractor.e3d_state.cylinder_end,
       state_attractor.e3d_state.cylinder_min,state_attractor.e3d_state.cylinder_max);
-    e_coptr->SetContent(state_attractor.e3d_state.cone_elevation,state_attractor.e3d_state.cone_elevation,
+    e_coptr->SetContent(state_attractor.e3d_state.cone_origin,state_attractor.e3d_state.cone_elevation,
       state_attractor.e3d_state.cone_azimuth,state_attractor.e3d_state.cone_aperture,
       state_attractor.e3d_state.cone_min,state_attractor.e3d_state.cone_max);
     e_sptr->SetContent(state_attractor.e3d_state.sphere_center,state_attractor.e3d_state.sphere_min,state_attractor.e3d_state.sphere_max);
