@@ -21,7 +21,7 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "video/canvas/ggi/ggi2d.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "cssys/csinput.h"
 #include "isys/system.h"
 

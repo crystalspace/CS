@@ -22,7 +22,7 @@
 #include <limits.h>
 #include "cssysdef.h"
 #include "csutil/scf.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
 #include "video/canvas/common/scancode.h"
 #include "video/canvas/common/os2-keys.h"

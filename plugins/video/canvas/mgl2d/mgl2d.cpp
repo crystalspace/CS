@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "qint.h"
 #include "isys/system.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
 #include "plugins/video/canvas/common/scancode.h"
 #include "mgl2d.h"

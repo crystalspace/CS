@@ -23,7 +23,7 @@
 #include "csutil/csstring.h"
 #include "video/canvas/linex/linex2d.h"
 #include "video/canvas/common/scancode.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
 #include "isys/system.h"
 #include "iutil/cfgmgr.h"

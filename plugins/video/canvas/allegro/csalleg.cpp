@@ -22,7 +22,7 @@
 #include "cssysdef.h"
 #include "csalleg.h"
 #include "cssys/csinput.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "csutil/csstring.h"
 #include "isys/system.h"
 #include "allegro.h"

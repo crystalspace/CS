@@ -22,7 +22,7 @@
 #include "csutil/scf.h"
 #include "cssys/csinput.h"
 #include "video/renderer/glide/gllib.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "isys/system.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"

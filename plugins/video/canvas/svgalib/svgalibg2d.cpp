@@ -20,7 +20,7 @@
 
 #include "cssysdef.h"
 #include "video/canvas/svgalib/svga.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "cssys/csinput.h"
 #include "isys/system.h"
 

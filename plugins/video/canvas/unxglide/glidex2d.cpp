@@ -22,7 +22,7 @@
 #include "glidex2d.h"
 #include "csutil/scf.h"
 #include "cssys/csinput.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "isys/system.h"
 #include "video/canvas/common/x11comm.h"
 #include "video/canvas/common/scancode.h"

@@ -18,7 +18,7 @@
 
 #include "cssysdef.h"
 #include "cssys/win32/directdetection.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "g2d_61.h"
 #include "isys/system.h"
 

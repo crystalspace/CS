@@ -20,7 +20,7 @@
 #include "csutil/scf.h"
 #include "belibg2d.h"
 #include "CrystWindow.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "isys/system.h"
 #include <Screen.h>
 

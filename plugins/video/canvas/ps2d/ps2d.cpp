@@ -22,7 +22,7 @@
 #include "csutil/csstring.h"
 #include "video/canvas/ps2d/ps2d.h"
 #include "video/canvas/common/scancode.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "isys/system.h"
 
 #include "SDL/SDL.h"

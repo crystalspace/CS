@@ -23,7 +23,7 @@
 #include "csutil/scf.h"
 #include "video/canvas/sdl/sdl2d.h"
 #include "cssys/unix/unix.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "cssys/csinput.h"
 #include "isys/system.h"
 

@@ -29,7 +29,7 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "cssys/system.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 
 #include <SegLoad.h>
 #include <Memory.h>

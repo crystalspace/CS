@@ -22,7 +22,7 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "video/canvas/dosraw/raw.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "isys/system.h"
 
 #include "djvidsys.h"

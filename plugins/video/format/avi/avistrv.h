@@ -21,7 +21,7 @@
 
 #include "ivideo/codec.h"
 #include "csavi.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "ivideo/graph3d.h"

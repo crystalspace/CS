@@ -21,7 +21,7 @@
 #include "cssys/csendian.h"
 #include "video/canvas/openglcommon/glcommon2d.h"
 #include "video/canvas/common/scrshot.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "isys/system.h"
 #include "qint.h"
 

@@ -23,7 +23,7 @@
 #include "video/canvas/common/scancode.h"
 #include "csutil/scf.h"
 #include "cssys/csinput.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
 #include "isys/system.h"
 #include "ivideo/texture.h"

@@ -21,7 +21,7 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "iglide2d.h"
 #include <glide.h>
 

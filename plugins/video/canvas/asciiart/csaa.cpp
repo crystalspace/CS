@@ -22,7 +22,7 @@
 #include <limits.h>
 #include "cssysdef.h"
 #include "csutil/scf.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
 #include "isys/system.h"
 #include "isys/event.h"

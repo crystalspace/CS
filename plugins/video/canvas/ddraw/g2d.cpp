@@ -21,7 +21,7 @@
 #include "csutil/csstring.h"
 #include "video/canvas/ddraw/g2d.h"
 #include "cssys/win32/directdetection.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "csutil/util.h"
 #include "isys/system.h"
 #include "isys/event.h"
