@@ -2,7 +2,7 @@
 @node External Libraries, Platform Instructions, Requirements, Building
 @section External Libraries
 
-Crystal Space relies upon several external, and publically available
+Crystal Space relies upon several external, and publicly available
 development libraries.  These libraries are:
 
 @itemize @bullet
