@@ -1002,8 +1002,8 @@ void awsManager::UnSetModal()
 
 bool awsManager::HandleEvent (iEvent &Event)
 {  
-   //  If there is a modal_dialog check to see if we are
-   //  it's or a child of it.  If not return out.
+  //  If there is a modal_dialog check to see if we are
+  //  it's or a child of it.  If not return out.
   if (modal_dialog)
   {
     iAwsComponent *comp = ComponentAt(Event.Mouse.x, Event.Mouse.y);
@@ -1027,118 +1027,117 @@ bool awsManager::HandleEvent (iEvent &Event)
   // Find out what kind of event it is
   switch (Event.Type)
   {
-    case csevMouseMove:
-    case csevMouseUp:
-    case csevMouseClick:
-    case csevMouseDown:
+  case csevMouseMove:
+  case csevMouseUp:
+  case csevMouseClick:
+  case csevMouseDown:
+    {
+      // If the mouse is locked keep it there
+      if (mouse_captured && mouse_focus)
+        if(mouse_focus->HandleEvent (Event))
+          return true;
+
+      // Find out which component contains the pointer.
+      iAwsComponent* comp = ComponentAt(Event.Mouse.x, Event.Mouse.y);
+
+      // if the mouse is still captured just stop
+      if (mouse_captured && mouse_focus)
+        return false;
+
+      // check to see if focus needs updating
+      // if that succeeds then the keyboard might need focusing too
+      if(comp && ChangeMouseFocus(comp, Event))
+        ChangeKeyboardFocus(comp, Event);
+
+      // its possible that some component captured the mouse
+      // in response to losing mouse focus. If that occured then we
+      // give that component a chance to handle the event
+      // rather than the component curently containing the mouse
+      if(mouse_captured && mouse_focus)
+        return mouse_focus->HandleEvent(Event);
+
+      // move up the chain of components to find the first one that can handle
+      // the event. 
+      while(comp && !(comp->Flags() & AWSF_CMP_DEAF) &&  !comp->HandleEvent(Event))
+        comp = comp->Parent();
+
+      // if we haven't reached the top then some component handled it
+      if(comp)
+        return true;
+    }
+    break;
+
+  case csevKeyboard:
+    if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
+    {
+      iAwsComponent *cmp = 0;
+
+      if (flags & AWSF_KeyboardControl)	
       {
-	// If the mouse is locked keep it there
-	if (mouse_captured && mouse_focus)
-	  if(mouse_focus->HandleEvent (Event))
-	    return true;
-	
-	// Find out which component contains the pointer.
-	iAwsComponent* comp = ComponentAt(Event.Mouse.x, Event.Mouse.y);
+        cmp = GetFocusedComponent();
 
-	// if the mouse is still captured just stop
-	if (mouse_captured && mouse_focus)
-	  return false;
-	
-	// check to see if focus needs updating
-	// if that succeeds then the keyboard might need focusing too
-	if(ChangeMouseFocus(comp, Event))
-	  ChangeKeyboardFocus(comp, Event);
-	
-	// its possible that some component captured the mouse
-	// in response to losing mouse focus. If that occured then we
-	// give that component a chance to handle the event
-	// rather than the component curently containing the mouse
-	if(mouse_captured && mouse_focus)
-	  return mouse_focus->HandleEvent(Event);
-	
-	// move up the chain of components to find the first one that can handle
-	// the event. 
-	while(comp && !(comp->Flags() & AWSF_CMP_DEAF) &&  !comp->HandleEvent(Event))
-	  comp = comp->Parent();
-	
-	// if we haven't reached the top then some component handled it
-	if(comp)
-	  return true;
+        csKeyModifiers m;
+        csKeyEventHelper::GetModifiers (&Event, m);
+        utf32_char code = csKeyEventHelper::GetCookedCode (&Event);
+
+        if(code == CSKEY_TAB)
+        {
+          bool found = false;
+          while(cmp && !found) 
+          {
+            if (m.modifiers[csKeyModifierTypeCtrl] != 0)
+            {
+              if(cmp->Parent() && 
+                cmp == cmp->Parent()->GetTabComponent(0) && 
+                cmp->Parent()->Parent())
+              {
+                cmp = cmp->Parent();
+              }
+
+              cmp = cmp->Parent()->TabPrev(cmp);
+            }
+            else
+            {
+              if (cmp->Parent() 
+                && cmp == cmp->Parent()->GetTabComponent(
+                cmp->Parent()->GetTabLength() - 1) && 
+                cmp->Parent()->Parent())
+              {
+                cmp = cmp->Parent();
+              }
+
+              cmp = cmp->Parent()->TabNext(cmp);
+            }
+
+            if (cmp && cmp->Focusable() && !cmp->isHidden())
+              found = true;
+            else 
+            {
+              if (cmp && cmp->HasChildren())
+              {
+                if (m.modifiers[csKeyModifierTypeCtrl] != 0)
+                  cmp = cmp->GetTabComponent(cmp->GetTabLength() - 1);
+                else cmp = cmp->GetTabComponent(0);
+                if(cmp && cmp->Focusable() && !cmp->isHidden())
+                  found = true;
+              }
+            }
+          }
+
+          if(cmp)
+            SetFocusedComponent(cmp);
+
+          return true;
+        }
+        if (cmp) ChangeKeyboardFocus(cmp, Event);
       }
-      break;
-      
-    case csevKeyboard:
-      if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
-      {
-        iAwsComponent *cmp = 0;
 
-	if (flags & AWSF_KeyboardControl)	
-	{
-	  cmp = GetFocusedComponent();
-
-	  csKeyModifiers m;
-	  csKeyEventHelper::GetModifiers (&Event, m);
-	  utf32_char code = csKeyEventHelper::GetCookedCode (&Event);
-
-	  if(code == CSKEY_TAB)
-	  {
-            bool found = false;
-	    while(cmp && !found) 
-	    {
-	      if (m.modifiers[csKeyModifierTypeCtrl] != 0)
-	      {
-		if(cmp->Parent() && 
-		  cmp == cmp->Parent()->GetTabComponent(0) && 
-		  cmp->Parent()->Parent())
-		{
-		  cmp = cmp->Parent();
-		}
-
-		cmp = cmp->Parent()->TabPrev(cmp);
-	      }
-	      else
-	      {
-		if (cmp->Parent() 
-		  && cmp == cmp->Parent()->GetTabComponent(
-		  cmp->Parent()->GetTabLength() - 1) && 
-		  cmp->Parent()->Parent())
-		{
-		  cmp = cmp->Parent();
-		}
-
-		cmp = cmp->Parent()->TabNext(cmp);
-	      }
-
-	      if (cmp && cmp->Focusable() && !cmp->isHidden())
-		found = true;
-	      else 
-	      {
-		if (cmp && cmp->HasChildren())
-		{
-		  if (m.modifiers[csKeyModifierTypeCtrl] != 0)
-		    cmp = cmp->GetTabComponent(cmp->GetTabLength() - 1);
-		  else cmp = cmp->GetTabComponent(0);
-		  if(cmp && cmp->Focusable() && !cmp->isHidden())
-		    found = true;
-		}
-	      }
-	    }
-
-	    if(cmp)
-	      SetFocusedComponent(cmp);
-
-	    return true;
-	  }
-
-          ChangeKeyboardFocus(cmp, Event);
-	}
-
-	if (keyb_focus) 
-	  return keyb_focus->HandleEvent (Event);
-      }
-      break;
+      if (keyb_focus) 
+        return keyb_focus->HandleEvent (Event);
+    }
+    break;
   }
-  
+
   return false;
 }
 
