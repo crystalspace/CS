@@ -45,6 +45,25 @@ csTerrain::~csTerrain ()
   CHK (delete clipbox);
 }
 
+csRenderView *grview = NULL;
+// Perform coord transformation using CS instead of DDG.
+void csTransform(ddgVector3 vin, ddgVector3 *vout)
+{
+	if (grview)
+	{
+		csVector3 csw1 = grview->World2Camera( csVector3(vin.v[0],vin.v[1],vin.v[2]) );
+		vout->v[0] = csw1.x;
+		vout->v[1] = csw1.y;
+		vout->v[2] = csw1.z;
+	}
+	else
+	{
+		vout->v[0] = vin.v[0];
+		vout->v[1] = vin.v[1];
+		vout->v[2] = vin.v[2];
+	}
+}
+
 bool csTerrain::Initialize (char* heightmap)
 {
   CHK (height = new ddgHeightMap ());
@@ -68,6 +87,7 @@ bool csTerrain::Initialize (char* heightmap)
   wtoc[14] = 0;
   wtoc[15] = 1;
   float fov = 90.0;
+  mesh->settransform(csTransform); 
   mesh->init (wtoc, clipbox, fov);
   return true;
 }
@@ -77,6 +97,7 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
   // Initialize.
   const csMatrix3& m_o2t = rview.GetO2T ();
   const csVector3& v_o2t = rview.GetO2TTranslation ();
+  /*
   wtoc[0] = m_o2t.m11;
   wtoc[4] = m_o2t.m12;
   wtoc[8] = m_o2t.m13;
@@ -93,7 +114,7 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
   wtoc[7] = 0;
   wtoc[11] = 0;
   wtoc[15] = 1;
-
+  */
   G3DPolygonDPFX poly;
   memset (&poly, 0, sizeof(poly));
   poly.inv_aspect = rview.inv_aspect;
@@ -103,7 +124,7 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, use_z_buf);
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
   rview.g3d->StartPolygonFX (poly.txt_handle, CS_FX_GOURAUD);
-
+  grview = &rview;
   // For each frame.
   // Update the wtoc.
   mesh->calculate ();
@@ -122,25 +143,38 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
 	  p3 =	bt->tri(bt->parent (tvc))->pos();
 	  p2 =	bt->tri(bt->v1 (tvc))->pos();
 	  p1 =	bt->tri(bt->v0 (tvc))->pos();
+
+	  
+		ddgVector3 w1,w2,w3;
+		bt->vertex(bt->v0 (tvc),&w1);
+		bt->vertex(bt->v1 (tvc),&w2);
+		bt->vertex(bt->parent (tvc),&w3);
+		csVector3 csp1(w1.v[0],w1.v[1],w1.v[2]);
+		csVector3 csp2(w2.v[0],w2.v[1],w2.v[2]);
+		csVector3 csp3(w3.v[0],w3.v[1],w3.v[2]);
+	    csVector3 csw1 = rview.World2Camera( csp1 );
+	    csVector3 csw2 = rview.World2Camera( csp2 );
+	    csVector3 csw3 = rview.World2Camera( csp3 );
+	  
       // DDG vectors work with negative Z pointing forwards.
       float iz;
       float pz[3];
       csVector2 triangle[3];
-      if (p1->v[2] > SMALL_Z) goto not_vis;
+      if (p1->v[2] < SMALL_Z) goto not_vis;
       pz[0] = 1 / -p1->v[2];
       iz = rview.aspect * pz[0];
       triangle[0].x = p1->v[0] * iz + rview.shift_x;
-      triangle[0].y = 10*p1->v[1] * iz + rview.shift_x;
-      if (p2->v[2] > SMALL_Z) goto not_vis;
+      triangle[0].y = p1->v[1] * iz + rview.shift_x;
+      if (p2->v[2] < SMALL_Z) goto not_vis;
       pz[1] = 1 / -p2->v[2];
       iz = rview.aspect * pz[1];
       triangle[1].x = p2->v[0] * iz + rview.shift_x;
-      triangle[1].y = 10*p2->v[1] * iz + rview.shift_x;
-      if (p3->v[2] > SMALL_Z) goto not_vis;
+      triangle[1].y = p2->v[1] * iz + rview.shift_x;
+      if (p3->v[2] < SMALL_Z) goto not_vis;
       pz[2] = 1 / -p3->v[2];
       iz = rview.aspect * pz[2];
       triangle[2].x = p3->v[0] * iz + rview.shift_x;
-      triangle[2].y = 10*p3->v[1] * iz + rview.shift_x;
+      triangle[2].y = p3->v[1] * iz + rview.shift_x;
 
       csVector2 clipped_triangle [10];	//@@@BAD HARCODED!
       int rescount;
