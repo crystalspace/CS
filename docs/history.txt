@@ -7,10 +7,12 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 25-Mar-2005
-	- Wouter Wijngaards changed csBitArrayHashKeyHandler::ComputeHash
+	- Wouter Wijngaards changed csBitArrayHashKeyHandler::ComputeHash()
 	  in bitarray.h, int to size_t to remove signed/unsigned warning.
 	- Jorrit fixed a problem in syntax services where there were too
 	  few parameters to csReport.
+	- res fixed a the std_foo shaders for the recent xmlshader changes.
+	- res fixed a crash with the terrain level.
 24-Mar-2005
 	- res removed a >= 0 comparison with an unsigned var from array.h.
 	- res fixed some wrong ref counting caused by iLoader->LoadTexture()

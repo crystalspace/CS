@@ -1378,6 +1378,7 @@ SCF_IMPLEMENT_IBASE_END
 void csXMLShader::ParseGlobalSVs ()
 {
   SVCWrapper wrapper (globalSVContext);
+  resolver->ResetEvaluationCache();
   resolver->SetEvalParams (0, &wrapper.svStack);
   compiler->LoadSVBlock (shaderSource, &wrapper);
   resolver->SetEvalParams (0, 0);

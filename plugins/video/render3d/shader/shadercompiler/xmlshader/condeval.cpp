@@ -648,6 +648,16 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
   else if (condition == csCondAlwaysFalse)
     return false;
 
+  /* Hack: it can happen that while evaluating a shader, new conditions 
+   * are added (notably when a shader source is retrieved from an
+   * external source). Make sure the cache is large enough.
+   */
+  if (condChecked.Length() < GetNumConditions ())
+  {
+    condChecked.SetLength (GetNumConditions ());
+    condResult.SetLength (GetNumConditions ());
+  }
+
   if (condChecked.IsBitSet (condition))
   {
     return condResult.IsBitSet (condition);
