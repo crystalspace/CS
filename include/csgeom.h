@@ -50,6 +50,7 @@
 #include "csgeom/polypool.h"
 #include "csgeom/quaterni.h"
 #include "csgeom/segment.h"
+#include "csgeom/solidspace.h"
 #include "csgeom/sphere.h"
 #include "csgeom/spline.h"
 #include "csgeom/subrec.h"
