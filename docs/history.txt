@@ -11,6 +11,9 @@ chronological order.
 	- res changed the type of csArray<> indices and sizes from int to
 	  size_t. CVS has been tagged with PRE_CSARRAY_SIZE_T_INDICES before 
 	  the change.
+	- res added a new appendix for 0.98->1.00 API changes.
+	- res added a paragraph about the csArray<> index type change to the
+	  API changes.
 1-Jul-2004
 	- Eric Sunshine augmented "jam install" so that CS/data/cube and
 	  CS/data/flarge/mosaic-detail.dds are also installed.
