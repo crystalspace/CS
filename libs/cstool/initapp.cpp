@@ -137,24 +137,14 @@ bool csInitializer::InitializeSCF ()
 	  strcat(scffilepath, de->d_name);
 	  scfconfig.Clear();
 	  scfconfig.Load(scffilepath);
-	  int scfver = scfconfig.GetInt(".scfVersion", 0);
-	  switch (scfver)
+	  csRef<iConfigIterator> it (scfconfig.Enumerate());
+	  while (it->Next())
 	  {
-	    case 1:
-	      {
-	        csRef<iConfigIterator> it (scfconfig.Enumerate());
-	        while (it->Next())
-	        {
-		  char const* key = it->GetKey();
-		  if (*key == '.')
-		    scfconfig.DeleteKey(key);
-	        }
-	        scfInitialize (&scfconfig);
-	      }
-	      break;
-	    default:
-	      /* unrecognized version */;
+	    char const* key = it->GetKey();
+	    if (*key == '.')
+	     scfconfig.DeleteKey(key);
 	  }
+	  scfInitialize (&scfconfig);
 	}
       }
     }
