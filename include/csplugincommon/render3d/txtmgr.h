@@ -258,6 +258,8 @@ protected:
   csRef<iMaterial> material;
   /// Parent texture manager
   csRef<csTextureManager> texman;
+  /// Texture handle, if created from one
+  csRef<iTextureHandle> texture;
 
 public:
   ///

@@ -52,36 +52,11 @@
 /// Name string for the material "diffuse" texture
 #define CS_MATERIAL_TEXTURE_DIFFUSE		"tex diffuse"
 
-/// Name string for old renderer: layer 1
-#define CS_MATERIAL_TEXTURE_LAYER1		"tex layer1"
-/// Name string for old renderer: layer 2
-#define CS_MATERIAL_TEXTURE_LAYER2		"tex layer2"
-/// Name string for old renderer: layer 3
-#define CS_MATERIAL_TEXTURE_LAYER3		"tex layer3"
-/// Name string for old renderer: layer 4
-#define CS_MATERIAL_TEXTURE_LAYER4		"tex layer4"
-
 struct iTextureHandle;
 struct csRGBpixel;
 struct csRGBcolor;
 
-/**
- * This structure represents an extra texture
- * layer which is applied on top of the previous one.
- */
-struct csTextureLayer
-{
-  /// Texture handle
-  csRef<iTextureHandle> txt_handle;
-  /// Mode: one of #CS_FX_ADD ...
-  uint mode;    
-  /// Txt mapping scale relative to parent texture
-  float uscale, vscale; 
-  /// Txt mapping shift relative to parent texture
-  float ushift, vshift; 
-};
-
-SCF_VERSION (iMaterial, 0, 0, 6);
+SCF_VERSION (iMaterial, 0, 1, 0);
 
 /**
  * This class represents a material as seen from the engine
@@ -129,19 +104,6 @@ struct iMaterial : public iShaderVariableContext
    * Get a texture from the material.
    */
   virtual iTextureHandle* GetTexture (csStringID name) = 0;
-
-  /**
-   * Get the number of texture layers. The base
-   * texture is not counted in this.
-   * OR only!
-   */
-  virtual int GetTextureLayerCount () = 0;
-
-  /**
-   * Get a texture layer.
-   * OR only!
-   */
-  virtual csTextureLayer* GetTextureLayer (int idx) = 0;
 
   /**
    * Get the flat color. If the material has a texture assigned, this

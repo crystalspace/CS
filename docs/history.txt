@@ -20,6 +20,9 @@ chronological order.
 	  csUnicodeTransform::Encode()/Decode() on VC.
 	- res added an optimization where a per-meshwrapper SV context is not
 	  considered if it's empty.
+	- res changed csMaterialHandle to also store a iTextureHandle ref.
+	  Fixes crashes when fancycon is used with SW rendering.
+	- res removed some old layer stuff from iMaterial.
 10-Mar-2005
 	- Fixed flarge so that the name of the 'fire' texture plugin
 	  no longer conflicts with the name of the 'fire' mesh loader plugin

@@ -138,11 +138,6 @@ public:
    */
   virtual iTextureHandle *GetTexture (csStringID name);
 
-  /// Get num texture layers. OR only.
-  virtual int GetTextureLayerCount () { return 0; }
-  /// Get a texture layer. OR only.
-  virtual csTextureLayer* GetTextureLayer (int) { return 0; }
-
   /// Get flat color.
   virtual void GetFlatColor (csRGBpixel &oColor, bool useTextureMean = true);
   /// Set the flat shading color

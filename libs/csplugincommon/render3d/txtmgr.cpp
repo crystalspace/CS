@@ -253,6 +253,11 @@ csMaterialHandle::csMaterialHandle (iTextureHandle* t, csTextureManager *parent)
   DG_TYPE (this, "csMaterialHandle");
   // @@@ Need iMaterial, or a shader branch or so!!!
   texman = parent;
+  texture = t;
+  if (texture)
+  {
+    DG_LINK (this, texture);
+  }
 }
 
 csMaterialHandle::~csMaterialHandle ()
@@ -265,7 +270,6 @@ csMaterialHandle::~csMaterialHandle ()
 
 void csMaterialHandle::FreeMaterial ()
 {
-  csRef<iTextureHandle> texture = GetTexture ();
   if (texture)
   {
     DG_UNLINK (this, texture);
@@ -281,7 +285,7 @@ iTextureHandle* csMaterialHandle::GetTexture ()
   }
   else
   {
-    return 0;
+    return texture;
   }
 }
 
