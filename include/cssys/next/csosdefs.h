@@ -1,8 +1,8 @@
-#ifndef __NeXT_osdefs_h
-#define __NeXT_osdefs_h
+#ifndef __NeXT_csosdefs_h
+#define __NeXT_csosdefs_h
 //=============================================================================
 //
-//	Copyright (C)1999 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -116,13 +116,8 @@ static inline char* getcwd( char* p, size_t size )
 
 
 //-----------------------------------------------------------------------------
-// Load getopt() definition.
+// Endian support.
 //-----------------------------------------------------------------------------
-#ifdef SYSDEF_GETOPT
-#undef SYSDEF_GETOPT
-#  include "support/gnu/getopt.h"
-#endif // SYSDEF_GETOPT
-
 #if defined (__LITTLE_ENDIAN__)
 #  define CS_LITTLE_ENDIAN
 #elif defined (__BIG_ENDIAN__)
@@ -131,4 +126,4 @@ static inline char* getcwd( char* p, size_t size )
 #  error "Please define a suitable CS_XXX_ENDIAN macro in next/csosdefs.h!"
 #endif
 
-#endif // __NeXT_osdefs_h
+#endif // __NeXT_csosdefs_h
