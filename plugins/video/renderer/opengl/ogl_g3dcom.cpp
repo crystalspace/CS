@@ -5337,8 +5337,8 @@ iEffectTechnique* csGraphics3DOGLCommon::GetStockTechnique (
       return effectserver->SelectAppropriateTechnique(
         StockEffects[0][mesh.do_fog?1:0][4] );
     case CS_FX_ALPHA:
-      return effectserver->SelectAppropriateTechnique(
-        StockEffects[0][mesh.do_fog?1:0][5] );
+      return NULL;/*effectserver->SelectAppropriateTechnique(
+        StockEffects[0][mesh.do_fog?1:0][5] );*/
     case CS_FX_TRANSPARENT:
       return effectserver->SelectAppropriateTechnique(
         StockEffects[0][mesh.do_fog?1:0][6] );
