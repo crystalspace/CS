@@ -1,6 +1,12 @@
 The history order has been reversed so that new features are at the top.
 8-Jul-2000
         - Samuel did the following changes:
+            - Added emacs friendly comments that these .inc files are really C++
+              files.
+            - Fixed a bug in the shared initialisation and open routines in the 
+              opengl renderer, the backbuffer proc texture looks much better.
+            - Cleaned up a little the shared initialisation and open routines
+              in the software renderer
             - Upped the res on the level_texture, and changed the start position 
               to look at it
             - The shared open code in the software driver now properly sets the 
