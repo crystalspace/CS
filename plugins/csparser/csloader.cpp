@@ -578,7 +578,8 @@ void csLoader::ReportWarning (const char* id, const char* description, ...)
   va_end (arg);
 }
 
-void csLoader::ReportWarning (const char* id, iDocumentNode* node, const char* description, ...)
+void csLoader::ReportWarning (const char* id, iDocumentNode* node,
+	const char* description, ...)
 {
   va_list arg;
   va_start (arg, description);
@@ -985,6 +986,7 @@ csLoader::~csLoader()
 bool csLoader::Initialize (iObjectRegistry *object_Reg)
 {
   csLoader::object_reg = object_Reg;
+  loaded_plugins.SetObjectRegistry (object_reg);
   csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
   do_verbose = cmdline->GetOption ("verbose") != 0;
@@ -3527,18 +3529,18 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
     iDocumentNode* defaults = 0;
     if (!loaded_plugins.FindPlugin (plugin_name, plug, binplug, defaults))
     {
-      SyntaxService->ReportError (
+      ReportWarning (
  	        "crystalspace.maploader.parse.addon",
-	        node, "Error loading plugin '%s'!",
+	        node, "Couldn't find or load addon plugin '%s'!",
 		plugin_name);
-      return false;
+      return true;
     }
     if (!plug)
     {
-      SyntaxService->ReportError (
+      ReportWarning (
 	        "crystalspace.maploader.load.plugin",
-                node, "Could not load plugin!");
-      return false;
+                node, "Could not find or load addon plugin!");
+      return true;
     }
     if (defaults != 0)
     {
@@ -3565,10 +3567,10 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
         case XMLTOKEN_PARAMS:
 	  if (!plug)
 	  {
-            SyntaxService->ReportError (
+            ReportWarning (
 	        "crystalspace.maploader.load.plugin",
-                child, "Could not load plugin!");
-	    return false;
+                child, "Could not find or load plugin!");
+	    return true;
 	  }
 	  else
 	  {
@@ -3580,10 +3582,10 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
         case XMLTOKEN_PARAMSFILE:
 	  if (!plug && !binplug)
 	  {
-            SyntaxService->ReportError (
+            ReportWarning (
 	        "crystalspace.maploader.load.plugin",
-                child, "Could not load plugin!");
-	    return false;
+                child, "Could not find or load plugin!");
+	    return true;
 	  }
 	  else
 	  {
@@ -3628,11 +3630,11 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
 	    if (!loaded_plugins.FindPlugin (child->GetContentsValue (),
 		  plug, binplug, defaults))
 	    {
-	      SyntaxService->ReportError (
+	      ReportWarning (
  	          "crystalspace.maploader.parse.addon",
-	          child, "Error loading plugin '%s'!",
+	          child, "Could not find or load plugin '%s'!",
 		  child->GetContentsValue ());
-	      return false;
+	      return true;
 	    }
 	    if (defaults != 0)
 	    {

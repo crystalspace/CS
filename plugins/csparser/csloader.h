@@ -408,6 +408,7 @@ private:
   private:
     /// Mutex to make the plugin vector thread-safe.
     csRef<csMutex> mutex;
+    iObjectRegistry* object_reg;
 
     csArray<csLoaderPluginRec*> vector;
 
@@ -436,6 +437,11 @@ private:
      * Delete all loaded plugins.
      */
     void DeleteAll ();
+
+    void SetObjectRegistry (iObjectRegistry* object_reg)
+    {
+      csLoadedPluginVector::object_reg = object_reg;
+    }
   };
 
   /// List of loaded plugins

@@ -16,6 +16,13 @@ chronological order.
 	  might not be mentioned in the user's PATH. The default list of extra
 	  directories searched includes /usr/local/bin and /sw/bin (where Fink
 	  on MacOS/X installs programs).
+	- Jorrit extended the addon handling in the loader so that it will
+	  first try to find the addon classID in the object registry. That
+	  way you can more easily make addon's without them having to be
+	  real plugins.
+	- Jorrit changed the loading of addons so that the loading no longer
+	  fails if an addon cannot be found. Addon's are now optional.
+	  A warning is still given though.
 	- Eric Sunshine added a test to checkpython.py to figure out how to
 	  suppress warnings about `long double' when #including Python headers,
 	  since some installations on MacOS/X emit excessive warnings over

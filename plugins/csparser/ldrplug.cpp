@@ -21,6 +21,7 @@
 #include "csloader.h"
 #include "imap/reader.h"
 #include "iutil/document.h"
+#include "iutil/objreg.h"
 
 struct csLoaderPluginRec
 {
@@ -106,8 +107,13 @@ bool csLoader::csLoadedPluginVector::GetPluginFromRec (
 {
   if (!rec->Component)
   {
-    rec->Component = CS_LOAD_PLUGIN (plugin_mgr,
+    rec->Component = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     	rec->ClassID, iComponent);
+    if (!rec->Component)
+    {
+      rec->Component = CS_LOAD_PLUGIN (plugin_mgr,
+    	  rec->ClassID, iComponent);
+    }
     if (rec->Component)
     {
       rec->Plugin = SCF_QUERY_INTERFACE (rec->Component, iLoaderPlugin);
