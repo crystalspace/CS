@@ -193,7 +193,7 @@ bool csDelayedLightingInfo::Collect (csFrustumView *lview, csPolygon3D *poly)
   // We should never cleanly quit ot of loop. If it is so, it means
   // we have a polygon that is not on share list (which means something
   // went wrong).
-  CS_ASSERT (!cur_poly);
+  CS_ASSERT (cur_poly);
 
   // Check if any shadow frustums we have now have not been seen in the past
   csShadowFrustum *csf = lview->shadows.GetFirst ();
@@ -211,7 +211,7 @@ bool csDelayedLightingInfo::FinishLightView ()
   int idx = lvlist.Length () - 1;
 
   // We shouldn't get here for empty DelayedLightInfo's
-  CS_ASSERT (idx < 0);
+  CS_ASSERT (idx >= 0);
 
   // Deregister ourselves from the cleanup list of frustumview
   lvlist.Get (idx)->frustum->DeregisterCleanup (this);

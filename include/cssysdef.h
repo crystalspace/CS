@@ -361,9 +361,16 @@
 #    else
 #      define DEBUG_BREAK	{ static int x = 0; x /= x; }
 #    endif
-#    if !defined (CS_ASSERT)
-#      define CS_ASSERT(x)	if (x) DEBUG_BREAK;
-#    endif
+#  endif
+#  if !defined (CS_ASSERT)
+#    include <stdio.h>
+#    define CS_ASSERT(x)						\
+       if (!(x))							\
+       {								\
+         fprintf (stderr, __FILE__ ":%d: failed assertion `" #x "'\n",	\
+           int(__LINE__));						\
+         DEBUG_BREAK;							\
+       }
 #  endif
 #else
 #  undef DEBUG_BREAK
