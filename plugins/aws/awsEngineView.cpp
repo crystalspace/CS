@@ -1,6 +1,20 @@
-// awsEngineView.cpp: implementation of the awsEngineView class.
-//
-//////////////////////////////////////////////////////////////////////
+/*
+    Copyright (C) ???
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
 
 #include "cssysdef.h"
 #include "awsEngineView.h"
@@ -10,54 +24,49 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
-awsEngineView::awsEngineView()
-  : view(0)
+awsEngineView::awsEngineView () : view (0)
 {
 }
 
-awsEngineView::~awsEngineView()
+awsEngineView::~awsEngineView ()
 {
-  if(view) view->DecRef();
+  if (view) view->DecRef ();
 }
 
 bool awsEngineView::SetProperty (const char* name, void* parm)
 {
-  int i = strcmp(name, "view");
-  printf("%d", i);
-  if(strcmp(name, "view")==0)
+  int i = strcmp (name, "view");
+  printf ("%d", i);
+  if (strcmp (name, "view") == 0)
   {
-    if(view)
-      view->DecRef();
+    if (view)
+      view->DecRef ();
     view = (iView*) parm;
-    if(view)
-      view->IncRef();
+    if (view)
+      view->IncRef ();
     return true;
   }
   else
-    return awsComponent::SetProperty(name, parm);
+    return awsComponent::SetProperty (name, parm);
 }
 
 bool awsEngineView::GetProperty (const char* name, void** parm)
 {
-  if(strcmp(name, "view")==0)
+  if (strcmp (name, "view") == 0)
   {
     *parm = (void*) view;
     return true;
   }
   else
-    return awsComponent::GetProperty(name, parm);
+    return awsComponent::GetProperty (name, parm);
 }
 
-const char* awsEngineView::Type()
+const char* awsEngineView::Type ()
 {
   return "Engine View";
 }
 
-void awsEngineView::OnDraw(csRect )
+void awsEngineView::OnDraw (csRect clip)
 {
   if (view)
   {
@@ -66,42 +75,39 @@ void awsEngineView::OnDraw(csRect )
     view->SetContext (g3d);
 
     view->SetRectangle (
-        Frame ().xmin,
-        g3d->GetHeight () - Frame ().ymax,
-        Frame ().Width (),
-        Frame ().Height ());
+      Frame ().xmin,
+      g3d->GetHeight () - Frame ().ymax,
+      Frame ().Width (),
+      Frame ().Height ());
     view->GetCamera ()->SetPerspectiveCenter (
-        Frame ().xmin + (Frame ().Width () >> 1),
-        (g3d->GetHeight () - Frame ().Height () - Frame ().ymin) +
-          (Frame ().Height () >> 1));
+      Frame ().xmin + (Frame ().Width () >> 1),
+      (g3d->GetHeight () - Frame ().Height () - Frame ().ymin) +
+      (Frame ().Height () >> 1));
     //view->GetCamera ()->SetFOV (
-        //view->GetCamera ()->GetFOV (),
-        //Frame ().Width ());
+      //view->GetCamera ()->GetFOV (),
+      //Frame ().Width ());
     view->GetCamera ()->SetFOV (
-        Frame ().Height (),
-        Frame ().Width ());
+      Frame ().Height (),
+      Frame ().Width ());
     g3d->BeginDraw (
     	view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS);
     view->Draw ();
     g3d->BeginDraw (CSDRAW_2DGRAPHICS);
-    view->SetContext(og3d);
+    view->SetContext (og3d);
   }
 }
 
-/* ---------------------------- Window Factory ----------------------------- */
-
-awsEngineViewFactory::awsEngineViewFactory(iAws* wmgr) :
-    awsComponentFactory(wmgr)
+awsEngineViewFactory::awsEngineViewFactory (iAws* wmgr)
+  : awsComponentFactory (wmgr)
 {
   Register ("Engine View");
 }
 
-awsEngineViewFactory::~awsEngineViewFactory()
+awsEngineViewFactory::~awsEngineViewFactory ()
 {
 }
 
-iAwsComponent* awsEngineViewFactory::Create()
+iAwsComponent* awsEngineViewFactory::Create ()
 {
-  return (new awsEngineView())->GetComponent();
+  return (new awsEngineView ())->GetComponent ();
 }
-
