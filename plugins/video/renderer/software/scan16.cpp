@@ -24,6 +24,8 @@
 
 #include "sttest.h"
 
+#define SCAN16
+
 //--//--//--//--//--//--//--//--//--//--//--/ assembler implementations --//--//
 
 #if !defined (NO_ASSEMBLER)
@@ -45,10 +47,6 @@
 
 #ifndef NO_draw_scanline_map_zfil
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_16_draw_scanline_map_zfil
 #define SCANMAP 1
 #define SCANLOOP \
@@ -66,7 +64,7 @@
       izz += dzz;							\
     }									\
     while (z_buffer <= lastZbuf)
-#include "scanln16.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_map_zfil
 
@@ -76,10 +74,6 @@
 
 extern int filter_bf;
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_16_draw_scanline_map_filt_zfil
 #define SCANMAP 1
 #define SCANLOOP \
@@ -120,7 +114,7 @@ extern int filter_bf;
       izz += dzz;							\
     }									\
     while (z_buffer <= lastZbuf)
-#include "scanln16.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_map_filt_zfil
 
@@ -128,10 +122,6 @@ extern int filter_bf;
 
 #ifndef NO_draw_scanline_map_filt2_zfil
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_16_draw_scanline_map_filt2_zfil
 #define SCANMAP 1
 #define SCANLOOP \
@@ -174,7 +164,7 @@ extern int filter_bf;
       izz += dzz;							\
     }									\
     while (z_buffer <= lastZbuf)
-#include "scanln16.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_map_filt2_zfil
 
@@ -182,10 +172,6 @@ extern int filter_bf;
 
 #ifndef NO_draw_scanline_map_zuse
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_16_draw_scanline_map_zuse
 #define SCANMAP 1
 #define SCANLOOP \
@@ -206,7 +192,7 @@ extern int filter_bf;
       izz += dzz;							\
     }									\
     while (_dest <= _destend)
-#include "scanln16.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_map_zuse
 
@@ -214,10 +200,6 @@ extern int filter_bf;
 
 #ifndef NO_draw_scanline_map_alpha50
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_16_draw_scanline_map_alpha50
 #define SCANMAP 1
 #define SCANLOOP \
@@ -229,7 +211,7 @@ extern int filter_bf;
       vv += dvv;							\
     }									\
     while (_dest <= _destend)
-#include "scanln16.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_map_alpha50
 
@@ -237,10 +219,6 @@ extern int filter_bf;
 
 #ifndef NO_draw_scanline_map_alpha_555
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_16_draw_scanline_map_alpha_555
 #define SCANMAP 1
 #define SCANLOOP \
@@ -258,7 +236,7 @@ extern int filter_bf;
       vv += dvv;							\
     }									\
     while (_dest <= _destend)
-#include "scanln16.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_map_alpha_555
 
@@ -266,10 +244,6 @@ extern int filter_bf;
 
 #ifndef NO_draw_scanline_map_alpha_565
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_16_draw_scanline_map_alpha_565
 #define SCANMAP 1
 #define SCANLOOP \
@@ -287,7 +261,7 @@ extern int filter_bf;
       vv += dvv;							\
     }									\
     while (_dest <= _destend)
-#include "scanln16.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_map_alpha_565
 
@@ -295,10 +269,6 @@ extern int filter_bf;
 
 #ifndef NO_draw_scanline_map_key_zfil
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_16_draw_scanline_map_key_zfil
 #define SCANMAP 1
 #define SCANLOOP \
@@ -320,7 +290,7 @@ extern int filter_bf;
       izz += dzz;							\
     }									\
     while (_dest <= _destend)
-#include "scanln16.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_map_key_zfil
 
@@ -328,10 +298,6 @@ extern int filter_bf;
 
 #ifndef NO_draw_scanline_tex_zfil
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_16_draw_scanline_tex_zfil
 #define SCANLOOP \
     do									\
@@ -348,7 +314,7 @@ extern int filter_bf;
       izz += dzz;							\
     }									\
     while (z_buffer <= lastZbuf)
-#include "scanln16.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_tex_zfil
 
@@ -356,10 +322,6 @@ extern int filter_bf;
 
 #ifndef NO_draw_scanline_tex_zuse
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_16_draw_scanline_tex_zuse
 #define SCANLOOP \
     do									\
@@ -379,7 +341,7 @@ extern int filter_bf;
       izz += dzz;							\
     }									\
     while (_dest <= _destend)
-#include "scanln16.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_tex_zuse
 
@@ -387,10 +349,6 @@ extern int filter_bf;
 
 #ifndef NO_draw_scanline_tex_priv_zuse
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_16_draw_scanline_tex_priv_zuse
 #define SCANLOOP \
     do									\
@@ -410,7 +368,7 @@ extern int filter_bf;
       izz += dzz;							\
     }									\
     while (_dest <= _destend)
-#include "scanln16.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_tex_priv_zuse
 
@@ -418,10 +376,6 @@ extern int filter_bf;
 
 #ifndef NO_draw_scanline_tex_priv_zfil
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_16_draw_scanline_tex_priv_zfil
 #define SCANLOOP \
     do									\
@@ -438,7 +392,7 @@ extern int filter_bf;
       izz += dzz;							\
     }									\
     while (z_buffer <= lastZbuf)
-#include "scanln16.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_tex_priv_zfil
 
@@ -741,32 +695,9 @@ void csScan_16_draw_scanline_fog_plane_565 (int xx, unsigned char* d,
 #ifndef NO_draw_pi_scanline_tex_zuse
 
 #define PI_SCANFUNC csScan_16_draw_pi_scanline_tex_zuse
-#define ZUSE
-#define BPP16
+#define PI_ZUSE
+#define PI_R5G6B5
 #include "scanpi.inc"
-
-/*
-void csScan_16_draw_pi_scanline_tex_zuse (void *dest, int len,
-  unsigned long *zbuff, long u, long du, long v, long dv,
-  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w)
-{
-  UShort *_dest = (UShort *)dest;
-  UShort *_destend = _dest + len;
-  while (_dest < _destend)
-  {
-    if (z >= *zbuff)
-    {
-      *_dest = Scan.PaletteTable[*(bitmap + ((v >> 16) << bitmap_log2w) + (u >> 16))];
-      *zbuff = z;
-    }
-    _dest++;
-    zbuff++;
-    u += du;
-    v += dv;
-    z += dz;
-  }
-}
-*/
 
 #endif // NO_draw_pi_scanline_tex_zuse
 
@@ -775,27 +706,9 @@ void csScan_16_draw_pi_scanline_tex_zuse (void *dest, int len,
 #ifndef NO_draw_pi_scanline_tex_zfil
 
 #define PI_SCANFUNC csScan_16_draw_pi_scanline_tex_zfil
-#define ZFILL
-#define BPP16
+#define PI_ZFILL
+#define PI_R5G6B5
 #include "scanpi.inc"
-
-/*
-void csScan_16_draw_pi_scanline_tex_zfil (void *dest, int len,
-  unsigned long *zbuff, long u, long du, long v, long dv,
-  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w)
-{
-  UShort *_dest = (UShort *)dest;
-  UShort *_destend = _dest + len;
-  while (_dest < _destend)
-  {
-    *_dest++ = Scan.PaletteTable[*(bitmap + ((v >> 16) << bitmap_log2w) + (u >> 16))];
-    *zbuff++ = z;
-    u += du;
-    v += dv;
-    z += dz;
-  }
-}
-*/
 
 #endif // NO_draw_pi_scanline_tex_zfil
 
@@ -804,38 +717,10 @@ void csScan_16_draw_pi_scanline_tex_zfil (void *dest, int len,
 #ifndef NO_draw_pi_scanline_tex_gouraud_zfil_555
 
 #define PI_SCANFUNC csScan_16_draw_pi_scanline_tex_gouraud_zfil_555
-#define ZFILL
-#define GOURAUD
-#define COLOR555
-#define BPP16
+#define PI_ZFILL
+#define PI_GOURAUD
+#define PI_R5G5B5
 #include "scanpi.inc"
-
-/*
-void csScan_16_draw_pi_scanline_tex_gouraud_zfil_555 (void *dest, int len,
-  unsigned long *zbuff, long u, long du, long v, long dv,
-  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-  long r, long g, long b, long dr, long dg, long db)
-{
-  UShort *_dest = (UShort *)dest;
-  UShort *_destend = _dest + len;
-  UShort tex;
-  int r1, g1, b1;
-  while (_dest < _destend)
-  {
-    tex = Scan.PaletteTable[*(bitmap + ((v >> 16) << bitmap_log2w) + (u >> 16))];
-    r1 = tex >> 10;
-    g1 = (tex >> 5) & 0x1f;
-    b1 = tex & 0x1f;
-    r1 = (r1*r) >> (16+5);
-    g1 = (g1*g) >> (16+5);
-    b1 = (b1*b) >> (16+5);
-    *_dest++ = (r1<<10) | (g1<<5) | b1;
-    *zbuff++ = z;
-    u += du; v += dv; z += dz;
-    r += dr; g += dg; b += db;
-  }
-}
-*/
 
 #endif // NO_draw_pi_scanline_tex_gouraud_zfil_555
 
@@ -844,38 +729,10 @@ void csScan_16_draw_pi_scanline_tex_gouraud_zfil_555 (void *dest, int len,
 #ifndef NO_draw_pi_scanline_tex_gouraud_zfil_565
 
 #define PI_SCANFUNC csScan_16_draw_pi_scanline_tex_gouraud_zfil_565
-#define ZFILL
-#define GOURAUD
-#define COLOR565
-#define BPP16
+#define PI_ZFILL
+#define PI_GOURAUD
+#define PI_R5G6B5
 #include "scanpi.inc"
-
-/*
-void csScan_16_draw_pi_scanline_tex_gouraud_zfil_565 (void *dest, int len,
-  unsigned long *zbuff, long u, long du, long v, long dv,
-  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-  long r, long g, long b, long dr, long dg, long db)
-{
-  UShort *_dest = (UShort *)dest;
-  UShort *_destend = _dest + len;
-  UShort tex;
-  int r1, g1, b1;
-  while (_dest < _destend)
-  {
-    tex = Scan.PaletteTable[*(bitmap + ((v >> 16) << bitmap_log2w) + (u >> 16))];
-    r1 = tex >> 11;
-    g1 = (tex >> 5) & 0x3f;
-    b1 = tex & 0x1f;
-    r1 = (r1*r) >> (16+5);
-    g1 = (g1*g) >> (16+6);
-    b1 = (b1*b) >> (16+5);
-    *_dest++ = (r1<<11) | (g1<<5) | b1;
-    *zbuff++ = z;
-    u += du; v += dv; z += dz;
-    r += dr; g += dg; b += db;
-  }
-}
-*/
 
 #endif // NO_draw_pi_scanline_tex_gouraud_zfil_565
 
@@ -884,43 +741,10 @@ void csScan_16_draw_pi_scanline_tex_gouraud_zfil_565 (void *dest, int len,
 #ifndef NO_draw_pi_scanline_tex_gouraud_zuse_555
 
 #define PI_SCANFUNC csScan_16_draw_pi_scanline_tex_gouraud_zuse_555
-#define ZUSE
-#define GOURAUD
-#define COLOR555
-#define BPP16
+#define PI_ZUSE
+#define PI_GOURAUD
+#define PI_R5G5B5
 #include "scanpi.inc"
-
-/*
-void csScan_16_draw_pi_scanline_tex_gouraud_zuse_555 (void *dest, int len,
-  unsigned long *zbuff, long u, long du, long v, long dv,
-  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-  long r, long g, long b, long dr, long dg, long db)
-{
-  UShort *_dest = (UShort *)dest;
-  UShort *_destend = _dest + len;
-  UShort tex;
-  int r1, g1, b1;
-  while (_dest < _destend)
-  {
-    if (z >= *zbuff)
-    {
-      tex = Scan.PaletteTable[*(bitmap + ((v >> 16) << bitmap_log2w) + (u >> 16))];
-      r1 = tex >> 10;
-      g1 = (tex >> 5) & 0x1f;
-      b1 = tex & 0x1f;
-      r1 = (r1*r) >> (16+5);
-      g1 = (g1*g) >> (16+5);
-      b1 = (b1*b) >> (16+5);
-      *_dest = (r1<<10) | (g1<<5) | b1;
-      *zbuff = z;
-    }
-    _dest++;
-    zbuff++;
-    u += du; v += dv; z += dz;
-    r += dr; g += dg; b += db;
-  }
-}
-*/
 
 #endif // NO_draw_pi_scanline_tex_gouraud_zuse_555
 
@@ -929,155 +753,98 @@ void csScan_16_draw_pi_scanline_tex_gouraud_zuse_555 (void *dest, int len,
 #ifndef NO_draw_pi_scanline_tex_gouraud_zuse_565
 
 #define PI_SCANFUNC csScan_16_draw_pi_scanline_tex_gouraud_zuse_565
-#define ZUSE
-#define GOURAUD
-#define COLOR565
-#define BPP16
+#define PI_ZUSE
+#define PI_GOURAUD
+#define PI_R5G6B5
 #include "scanpi.inc"
-
-/*
-
-void csScan_16_draw_pi_scanline_tex_gouraud_zuse_565 (void *dest, int len,
-  unsigned long *zbuff, long u, long du, long v, long dv,
-  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-  long r, long g, long b, long dr, long dg, long db)
-{
-  UShort *_dest = (UShort *)dest;
-  UShort *_destend = _dest + len;
-  UShort tex;
-  int r1, g1, b1;
-  while (_dest < _destend)
-  {
-    if (z >= *zbuff)
-    {
-      tex = Scan.PaletteTable[*(bitmap + ((v >> 16) << bitmap_log2w) + (u >> 16))];
-      r1 = tex >> 11;
-      g1 = (tex >> 5) & 0x3f;
-      b1 = tex & 0x1f;
-      r1 = (r1*r) >> (16+5);
-      g1 = (g1*g) >> (16+6);
-      b1 = (b1*b) >> (16+5);
-      *_dest = (r1<<11) | (g1<<5) | b1;
-      *zbuff = z;
-    }
-    _dest++;
-    zbuff++;
-    u += du; v += dv; z += dz;
-    r += dr; g += dg; b += db;
-  }
-}
-
-*/
 
 #endif // NO_draw_pi_scanline_tex_gouraud_zuse_565
 
 //------------------------------------------------------------------
 
-/*
-#ifndef NO_draw_pi_scanline_transp_gouraud_555
+#ifndef NO_draw_pi_scanline_flat_zuse
 
-#define PI_SCANFUNC csScan_16_draw_pi_scanline_transp_gouraud_555
-#define ZUSE
-#define GOURAUD
-#define COLOR555
-#define COLORKEY
-#define BPP16
+#define PI_SCANFUNC csScan_16_draw_pi_scanline_flat_zuse
+#define PI_ZUSE
+#define PI_FLAT
+#define PI_R5G6B5
 #include "scanpi.inc"
-*/
-/*
-void csScan_16_draw_pi_scanline_transp_gouraud_555 (void *dest, int len, long *zbuff, long u, long du,
-  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-  long r, long g, long b, long dr, long dg, long db)
-{
-  UShort *_dest = (UShort *)dest;
-  UShort *_destend = _dest + len;
-  UShort tex;
-  int r1, g1, b1;
-  while (_dest < _destend)
-  {
-    if (z >= *zbuff)
-    {
-      tex = Scan.PaletteTable[*(bitmap + ((v >> 16) << bitmap_log2w) + (u >> 16))];
-      if (tex)
-      {
-        r1 = tex >> 10;
-        g1 = (tex >> 5) & 0x1f;
-        b1 = tex & 0x1f;
-        r1 = (r1*r) >> (16+5);
-        g1 = (g1*g) >> (16+5);
-        b1 = (b1*b) >> (16+5);
-        *_dest = (r1<<10) | (g1<<5) | b1;
-        *zbuff = z;
-      }
-    }
-    _dest++;
-    zbuff++;
-    u += du; v += dv; z += dz;
-    r += dr; g += dg; b += db;
-  }
-}
-*/
 
-//#endif // NO_draw_pi_scanline_transp_gouraud_555
+#endif // NO_draw_pi_scanline_flat_zuse
 
 //------------------------------------------------------------------
-/*
-#ifndef NO_draw_pi_scanline_transp_gouraud_565
 
-#define PI_SCANFUNC csScan_16_draw_pi_scanline_transp_gouraud_565
-#define ZUSE
-#define GOURAUD
-#define COLOR565
-#define COLORKEY
-#define BPP16
+#ifndef NO_draw_pi_scanline_flat_zfil
+
+#define PI_SCANFUNC csScan_16_draw_pi_scanline_flat_zfil
+#define PI_ZFILL
+#define PI_FLAT
+#define PI_R5G6B5
 #include "scanpi.inc"
-*/
-/*
-void csScan_16_draw_pi_scanline_transp_gouraud_565 (void *dest, int len, long *zbuff, long u, long du,
-  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-  long r, long g, long b, long dr, long dg, long db)
-{
-  UShort *_dest = (UShort *)dest;
-  UShort *_destend = _dest + len;
-  UShort tex;
-  int r1, g1, b1;
-  while (_dest < _destend)
-  {
-    if (z >= *zbuff)
-    {
-      tex = Scan.PaletteTable[*(bitmap + ((v >> 16) << bitmap_log2w) + (u >> 16))];
-      if (tex)
-      {
-        r1 = tex >> 11;
-        g1 = (tex >> 5) & 0x3f;
-        b1 = tex & 0x1f;
-        r1 = (r1*r) >> (16+5);
-        g1 = (g1*g) >> (16+6);
-        b1 = (b1*b) >> (16+5);
-        *_dest = (r1<<11) | (g1<<5) | b1;
-        *zbuff = z;
-      }
-    }
-    _dest++;
-    zbuff++;
-    u += du; v += dv; z += dz;
-    r += dr; g += dg; b += db;
-  }
-}
-*/
 
-//#endif // NO_draw_pi_scanline_transp_gouraud_565
+#endif // NO_draw_pi_scanline_flat_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_flat_gouraud_zfil_555
+
+#define PI_SCANFUNC csScan_16_draw_pi_scanline_flat_gouraud_zfil_555
+#define PI_ZFILL
+#define PI_FLAT
+#define PI_GOURAUD
+#define PI_R5G5B5
+#include "scanpi.inc"
+
+#endif // NO_draw_pi_scanline_flat_gouraud_zfil_555
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_flat_gouraud_zfil_565
+
+#define PI_SCANFUNC csScan_16_draw_pi_scanline_flat_gouraud_zfil_565
+#define PI_ZFILL
+#define PI_FLAT
+#define PI_GOURAUD
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_draw_pi_scanline_flat_gouraud_zfil_565
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_flat_gouraud_zuse_555
+
+#define PI_SCANFUNC csScan_16_draw_pi_scanline_flat_gouraud_zuse_555
+#define PI_ZUSE
+#define PI_FLAT
+#define PI_GOURAUD
+#define PI_R5G5B5
+#include "scanpi.inc"
+
+#endif // NO_draw_pi_scanline_flat_gouraud_zuse_555
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_flat_gouraud_zuse_565
+
+#define PI_SCANFUNC csScan_16_draw_pi_scanline_flat_gouraud_zuse_565
+#define PI_ZUSE
+#define PI_FLAT
+#define PI_GOURAUD
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_draw_pi_scanline_flat_gouraud_zuse_565
 
 //------------------------------------------------------------------
 
 #ifndef NO_draw_pifx_scanline_zfil_555
 
 #define PI_SCANFUNC csScan_16_draw_pifx_scanline_zfil_555
-#define ZFILL
-#define GOURAUD
-#define COLOR555
-#define BPP16
-#define USEEFFECTS
+#define PI_ZFILL
+#define PI_GOURAUD
+#define PI_R5G5B5
+#define PI_BLEND
 #include "scanpi.inc"
 
 #endif
@@ -1087,11 +854,10 @@ void csScan_16_draw_pi_scanline_transp_gouraud_565 (void *dest, int len, long *z
 #ifndef NO_draw_pifx_scanline_zfil_565
 
 #define PI_SCANFUNC csScan_16_draw_pifx_scanline_zfil_565
-#define ZFILL
-#define GOURAUD
-#define COLOR565
-#define BPP16
-#define USEEFFECTS
+#define PI_ZFILL
+#define PI_GOURAUD
+#define PI_R5G6B5
+#define PI_BLEND
 #include "scanpi.inc"
 
 #endif
@@ -1101,11 +867,10 @@ void csScan_16_draw_pi_scanline_transp_gouraud_565 (void *dest, int len, long *z
 #ifndef NO_draw_pifx_scanline_zuse_555
 
 #define PI_SCANFUNC csScan_16_draw_pifx_scanline_zuse_555
-#define ZUSE
-#define GOURAUD
-#define COLOR555
-#define BPP16
-#define USEEFFECTS
+#define PI_ZUSE
+#define PI_GOURAUD
+#define PI_R5G5B5
+#define PI_BLEND
 #include "scanpi.inc"
 
 #endif
@@ -1115,11 +880,10 @@ void csScan_16_draw_pi_scanline_transp_gouraud_565 (void *dest, int len, long *z
 #ifndef NO_draw_pifx_scanline_zuse_565
 
 #define PI_SCANFUNC csScan_16_draw_pifx_scanline_zuse_565
-#define ZUSE
-#define GOURAUD
-#define COLOR565
-#define BPP16
-#define USEEFFECTS
+#define PI_ZUSE
+#define PI_GOURAUD
+#define PI_R5G6B5
+#define PI_BLEND
 #include "scanpi.inc"
 
 #endif
@@ -1129,12 +893,11 @@ void csScan_16_draw_pi_scanline_transp_gouraud_565 (void *dest, int len, long *z
 #ifndef NO_draw_pifx_scanline_transp_zfil_555
 
 #define PI_SCANFUNC csScan_16_draw_pifx_scanline_transp_zfil_555
-#define ZFILL
-#define GOURAUD
-#define COLOR555
-#define COLORKEY
-#define BPP16
-#define USEEFFECTS
+#define PI_ZFILL
+#define PI_GOURAUD
+#define PI_R5G5B5
+#define PI_COLORKEY
+#define PI_BLEND
 #include "scanpi.inc"
 
 #endif
@@ -1144,12 +907,11 @@ void csScan_16_draw_pi_scanline_transp_gouraud_565 (void *dest, int len, long *z
 #ifndef NO_draw_pifx_scanline_transp_zfil_565
 
 #define PI_SCANFUNC csScan_16_draw_pifx_scanline_transp_zfil_565
-#define ZFILL
-#define GOURAUD
-#define COLOR565
-#define COLORKEY
-#define BPP16
-#define USEEFFECTS
+#define PI_ZFILL
+#define PI_GOURAUD
+#define PI_R5G6B5
+#define PI_COLORKEY
+#define PI_BLEND
 #include "scanpi.inc"
 
 #endif
@@ -1159,12 +921,11 @@ void csScan_16_draw_pi_scanline_transp_gouraud_565 (void *dest, int len, long *z
 #ifndef NO_draw_pifx_scanline_transp_zuse_555
 
 #define PI_SCANFUNC csScan_16_draw_pifx_scanline_transp_zuse_555
-#define ZUSE
-#define GOURAUD
-#define COLOR555
-#define COLORKEY
-#define BPP16
-#define USEEFFECTS
+#define PI_ZUSE
+#define PI_GOURAUD
+#define PI_R5G5B5
+#define PI_COLORKEY
+#define PI_BLEND
 #include "scanpi.inc"
 
 #endif
@@ -1174,233 +935,13 @@ void csScan_16_draw_pi_scanline_transp_gouraud_565 (void *dest, int len, long *z
 #ifndef NO_draw_pifx_scanline_transp_zuse_565
 
 #define PI_SCANFUNC csScan_16_draw_pifx_scanline_transp_zuse_565
-#define ZUSE
-#define GOURAUD
-#define COLOR565
-#define COLORKEY
-#define BPP16
-#define USEEFFECTS
+#define PI_ZUSE
+#define PI_GOURAUD
+#define PI_R5G6B5
+#define PI_COLORKEY
+#define PI_BLEND
 #include "scanpi.inc"
 
 #endif
 
 //------------------------------------------------------------------
-
-#ifndef NO_draw_pi_scanline_flat_zuse
-
-#define PI_SCANFUNC csScan_16_draw_pi_scanline_flat_zuse
-#define ZUSE
-#define FLAT
-#define BPP16
-#include "scanpi.inc"
-
-/*
-void csScan_16_draw_pi_scanline_flat_zuse (void *dest, int len,
-  unsigned long *zbuff, long u, long du, long v, long dv,
-  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w)
-{
-  (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
-  UShort *_dest = (UShort *)dest;
-  UShort *_destend = _dest + len;
-  while (_dest < _destend)
-  {
-    if (z >= *zbuff)
-    {
-      *_dest = 0xffff;
-      *zbuff = z;
-    }
-    _dest++;
-    zbuff++;
-    z += dz;
-  }
-}
-*/
-
-#endif // NO_draw_pi_scanline_flat_zuse
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_pi_scanline_flat_zfil
-
-#define PI_SCANFUNC csScan_16_draw_pi_scanline_flat_zfil
-#define ZFILL
-#define FLAT
-#define BPP16
-#include "scanpi.inc"
-
-/*
-void csScan_16_draw_pi_scanline_flat_zfil (void *dest, int len,
-  unsigned long *zbuff, long u, long du, long v, long dv,
-  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w)
-{
-  (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
-  UShort *_dest = (UShort *)dest;
-  UShort *_destend = _dest + len;
-  while (_dest < _destend)
-  {
-    *_dest++ = 0xffff;
-    *zbuff++ = z;
-    z += dz;
-  }
-}
-*/
-
-#endif // NO_draw_pi_scanline_flat_zfil
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_pi_scanline_flat_gouraud_zfil_555
-
-#define PI_SCANFUNC csScan_16_draw_pi_scanline_flat_gouraud_zfil_555
-#define ZFILL
-#define FLAT
-#define GOURAUD
-#define COLOR555
-#define BPP16
-#include "scanpi.inc"
-
-/*
-void csScan_16_draw_pi_scanline_flat_gouraud_zfil_555 (void *dest, int len,
-  unsigned long *zbuff, long u, long du, long v, long dv,
-  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-  long r, long g, long b, long dr, long dg, long db)
-{
-  (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
-  UShort *_dest = (UShort *)dest;
-  UShort *_destend = _dest + len;
-  int r1, g1, b1;
-  while (_dest < _destend)
-  {
-    r1 = r >> 16;
-    g1 = g >> 16;
-    b1 = b >> 16;
-    *_dest++ = (r1<<10) | (g1<<5) | b1;
-    *zbuff++ = z;
-    z += dz;
-    r += dr; g += dg; b += db;
-  }
-}
-*/
-
-#endif // NO_draw_pi_scanline_flat_gouraud_zfil_555
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_pi_scanline_flat_gouraud_zfil_565
-
-#define PI_SCANFUNC csScan_16_draw_pi_scanline_flat_gouraud_zfil_565
-#define ZFILL
-#define FLAT
-#define GOURAUD
-#define COLOR565
-#define BPP16
-#include "scanpi.inc"
-
-/*
-void csScan_16_draw_pi_scanline_flat_gouraud_zfil_565 (void *dest, int len,
-  unsigned long *zbuff, long u, long du, long v, long dv,
-  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-  long r, long g, long b, long dr, long dg, long db)
-{
-  (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
-  UShort *_dest = (UShort *)dest;
-  UShort *_destend = _dest + len;
-  int r1, g1, b1;
-  while (_dest < _destend)
-  {
-    r1 = r >> 16;
-    g1 = g >> 16;
-    b1 = b >> 16;
-    *_dest++ = (r1<<11) | (g1<<5) | b1;
-    *zbuff++ = z;
-    z += dz;
-    r += dr; g += dg; b += db;
-  }
-}
-*/
-
-#endif // NO_draw_pi_scanline_flat_gouraud_zfil_565
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_pi_scanline_flat_gouraud_zuse_555
-
-#define PI_SCANFUNC csScan_16_draw_pi_scanline_flat_gouraud_zuse_555
-#define ZUSE
-#define FLAT
-#define GOURAUD
-#define COLOR555
-#define BPP16
-#include "scanpi.inc"
-
-/*
-void csScan_16_draw_pi_scanline_flat_gouraud_zuse_555 (void *dest, int len,
-  unsigned long *zbuff, long u, long du, long v, long dv,
-  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-  long r, long g, long b, long dr, long dg, long db)
-{
-  (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
-  UShort *_dest = (UShort *)dest;
-  UShort *_destend = _dest + len;
-  int r1, g1, b1;
-  while (_dest < _destend)
-  {
-    if (z >= *zbuff)
-    {
-      r1 = r >> 16;
-      g1 = g >> 16;
-      b1 = b >> 16;
-      *_dest = (r1<<10) | (g1<<5) | b1;
-      *zbuff = z;
-    }
-    _dest++;
-    zbuff++;
-    z += dz;
-    r += dr; g += dg; b += db;
-  }
-}
-*/
-
-#endif // NO_draw_pi_scanline_flat_gouraud_zuse_555
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_pi_scanline_flat_gouraud_zuse_565
-
-#define PI_SCANFUNC csScan_16_draw_pi_scanline_flat_gouraud_zuse_565
-#define ZUSE
-#define FLAT
-#define GOURAUD
-#define COLOR565
-#define BPP16
-#include "scanpi.inc"
-
-/*
-void csScan_16_draw_pi_scanline_flat_gouraud_zuse_565 (void *dest, int len,
-  unsigned long *zbuff, long u, long du, long v, long dv,
-  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-  long r, long g, long b, long dr, long dg, long db)
-{
-  (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
-  UShort *_dest = (UShort *)dest;
-  UShort *_destend = _dest + len;
-  int r1, g1, b1;
-  while (_dest < _destend)
-  {
-    if (z >= *zbuff)
-    {
-      r1 = r >> 16;
-      g1 = g >> 16;
-      b1 = b >> 16;
-      *_dest = (r1<<11) | (g1<<5) | b1;
-      *zbuff = z;
-    }
-    _dest++;
-    zbuff++;
-    z += dz;
-    r += dr; g += dg; b += db;
-  }
-}
-*/
-
-#endif // NO_draw_pi_scanline_flat_gouraud_zuse_565

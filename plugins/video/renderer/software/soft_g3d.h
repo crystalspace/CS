@@ -110,7 +110,7 @@ private:
   long dbg_current_polygon;
 
   /// Z Buffer mode to use while rendering next polygon.
-  ZBufMode z_buf_mode;
+  G3DZBufMode z_buf_mode;
 
   /// Fog buffers.
   FogBuffer* fog_buffers;
@@ -149,9 +149,7 @@ private:
   /// draw_pi_scanline_gouraud_xxx routines
   csDrawPIScanlineGouraud* ScanProcPIG [4];
   /// draw_pi_scanline_fx_xxx routines
-  csDrawPIScanlineFX* ScanProcPIFX[4];
-
-  UByte* m_BlendingTable[8];
+  csDrawPIScanlineGouraud* ScanProcPIFX [4];
 
   /// The routine for getting the address of needed scanline_xxx_alpha
   csDrawScanline* (*ScanProc_Alpha) (csGraphics3DSoftware *This, int alpha);
@@ -256,7 +254,7 @@ public:
   STDMETHODIMP Print (csRect *area);
 
   /// Set the mode for the Z buffer used for drawing the next polygon.
-  STDMETHODIMP SetZBufMode (ZBufMode mode);
+  STDMETHODIMP SetZBufMode (G3DZBufMode mode);
 
   /// Draw the projected polygon with light and texture.
   STDMETHODIMP DrawPolygon (G3DPolygonDP& poly);
@@ -309,13 +307,13 @@ public:
   STDMETHODIMP DrawLine (csVector3& v1, csVector3& v2, float fov, int color);
 
   /// Start a series of DrawPolygonFX
-  STDMETHODIMP StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, float alpha, bool gouraud);
+  STDMETHODIMP StartPolygonFX (ITextureHandle* handle, UInt mode);
 
   /// Finish a series of DrawPolygonFX
   STDMETHODIMP FinishPolygonFX();
 
   /// Draw a polygon with special effects.
-  STDMETHODIMP DrawPolygonFX    (G3DPolygonDPFX& poly);
+  STDMETHODIMP DrawPolygonFX (G3DPolygonDPFX& poly);
 
   /// Give a texture to csGraphics3DSoftware to cache it.
   STDMETHODIMP CacheTexture (IPolygonTexture* texture);

@@ -165,9 +165,6 @@ struc csScanSetup
   ; Height of unlighted texture.
   int th;
 
-  ; SJI: dynamic lighting.
-  unsigned_char_P LightTable;
-
   ;
   ; The following fields are used by the polygon drawer
   ; and contain information fot calculating the 1/z, u/z, and v/z linear
@@ -220,6 +217,9 @@ struc csScanSetup
   ; Set up by poly renderer to alpha blending table
   RGB8map_P AlphaMap;
 
+  ; Current blending table
+  unsigned_char_P BlendTable;
+
   ; table used for bilinear filtering
   int_P filter_mul_table;
 
@@ -233,6 +233,14 @@ struc csScanSetup
   unsigned_char_P exp_256;
   ; Same in the range 0..31 for 8-bit fog
   unsigned_char_P exp_16;
+
+  ; Blending tables
+  unsigned_char_P BlendingTable_ADD
+  unsigned_char_P BlendingTable_MULTIPLY
+  unsigned_char_P BlendingTable_MULTIPLY2
+  unsigned_char_P BlendingTable_ALPHA25
+  unsigned_char_P BlendingTable_ALPHA50
+  unsigned_char_P BlendingTable_ALPHA75
 endstruc
 
 ; The only external variable of csScanSetup type

@@ -104,15 +104,6 @@
 #define SCANPROCPIFX_TRANSP_ZUSE        0x02
 #define SCANPROCPIFX_TRANSP_ZFIL        0x03
 
-#define BLENDTABLE_COPY                 0x00
-#define BLENDTABLE_ADD                  0x01
-#define BLENDTABLE_MULTIPLY             0x02
-#define BLENDTABLE_MULTIPLY2            0x03
-#define BLENDTABLE_ALPHA25              0x04
-#define BLENDTABLE_ALPHA50              0x05
-#define BLENDTABLE_ALPHA75              0x06
-#define BLENDTABLE_ALPHA100             0x07
-
 ///---------------------------------------------------------------------------
 
 IMPLEMENT_UNKNOWN (csGraphics3DSoftware)
@@ -331,10 +322,10 @@ void csGraphics3DSoftware::ScanSetup ()
       if (do_transp)
         ScanProc_Alpha = ScanProc_8_Alpha;
 
-      ScanProcPIFX [SCANPROCPIFX_ZUSE] = csScan_8_draw_pifx_scanline_dummy;
-      ScanProcPIFX [SCANPROCPIFX_ZFIL] = csScan_8_draw_pifx_scanline_dummy;
-      ScanProcPIFX [SCANPROCPIFX_TRANSP_ZUSE] = csScan_8_draw_pifx_scanline_dummy;
-      ScanProcPIFX [SCANPROCPIFX_TRANSP_ZFIL] = csScan_8_draw_pifx_scanline_dummy;
+//    ScanProcPIFX [SCANPROCPIFX_ZUSE] = ;
+//    ScanProcPIFX [SCANPROCPIFX_ZFIL] = ;
+//    ScanProcPIFX [SCANPROCPIFX_TRANSP_ZUSE] = ;
+//    ScanProcPIFX [SCANPROCPIFX_TRANSP_ZFIL] = ;
       break;
 
     case 2:
@@ -481,36 +472,12 @@ void csGraphics3DSoftware::ScanSetup ()
       break;
   } /* endswitch */
 
-  int MaxColorcomponent = 64; // (pfmt.PixelBytes == 4) ? 256 : 32;
-
-  // For DrawPolygonFX we will need to do some blending of textures with current
-  // screen content.
-  int i;
-  for (i = 0; i < 8; i++)
-    m_BlendingTable [i] = new UByte [MaxColorcomponent * MaxColorcomponent];
-
-  for (int src = 0; src<MaxColorcomponent; src++)
-  {
-    for (int dest = 0; dest<MaxColorcomponent; dest++)
-    {
-      // The index in the table is a combintation of src pixel and dest pixel
-      int index = dest * MaxColorcomponent + src;
-
-      // Calculate all the available blendingmodes supported.
-      m_BlendingTable [BLENDTABLE_COPY     ][index] =  src;
-      m_BlendingTable [BLENDTABLE_ADD      ][index] =  dest + src;
-      m_BlendingTable [BLENDTABLE_MULTIPLY ][index] = (dest * src)/MaxColorcomponent;
-      m_BlendingTable [BLENDTABLE_MULTIPLY2][index] = (dest * src * 2)/MaxColorcomponent;
-      m_BlendingTable [BLENDTABLE_ALPHA25  ][index] =  dest/4 + (src*3)/4;
-      m_BlendingTable [BLENDTABLE_ALPHA50  ][index] =  dest/2 + src/2;
-      m_BlendingTable [BLENDTABLE_ALPHA75  ][index] = (dest*3)/4 + src/4;
-      m_BlendingTable [BLENDTABLE_ALPHA100 ][index] =  dest;
-
-      for (i = 0; i < 8; i++)
-        if (m_BlendingTable[i][index] >= MaxColorcomponent)
-          m_BlendingTable[i][index] = MaxColorcomponent-1;
-    }
-  }
+  static int o_rbits = -1, o_gbits, o_bbits;
+  if ((o_rbits != pfmt.RedBits)
+   || (o_gbits != pfmt.GreenBits)
+   || (o_bbits != pfmt.BlueBits))
+    csScan_CalcBlendTables (o_rbits = pfmt.RedBits, o_gbits = pfmt.GreenBits,
+      o_bbits = pfmt.BlueBits);
 }
 
 csDrawScanline* csGraphics3DSoftware::ScanProc_8_Alpha
@@ -657,7 +624,7 @@ STDMETHODIMP csGraphics3DSoftware::Open (char *Title)
 
   FINAL_RELEASE (piGI);
 
-  z_buf_mode = ZBuf_None;
+  z_buf_mode = CS_ZBUF_NONE;
   fog_buffers = NULL;
   for (int i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
     fog_tables [i].table = NULL;
@@ -837,7 +804,7 @@ STDMETHODIMP csGraphics3DSoftware::Print (csRect *area)
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::SetZBufMode (ZBufMode mode)
+STDMETHODIMP csGraphics3DSoftware::SetZBufMode (G3DZBufMode mode)
 {
   z_buf_mode = mode;
   return S_OK;
@@ -1014,7 +981,7 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
   if (do_transp && (Scan.Texture->get_transparent ()) || poly.alpha)
     return S_OK;
   int scan_index = SCANPROC_FLAT_ZFIL;
-  if (z_buf_mode == ZBuf_Use)
+  if (z_buf_mode == CS_ZBUF_USE)
     scan_index++;
   csDrawScanline* dscan = ScanProc [scan_index];
   if (!dscan)
@@ -1368,7 +1335,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
     else
       scan_index = SCANPROC_TEX_ZFIL;
   } /* endif */
-  if (z_buf_mode == ZBuf_Use)
+  if (z_buf_mode == CS_ZBUF_USE)
     scan_index++;
   if (!dscan)
     if ((scan_index < 0) || !(dscan = ScanProc [scan_index]))
@@ -1947,119 +1914,114 @@ static struct
   int shf_w;
   bool transparent;
   bool textured;
-  bool do_gouraud;
-  DPFXMixMode mixmode;
-  UByte* BlendingTable;
+  UInt mixmode;
   float r, g, b;
-  csDrawPIScanline*        drawline;
-  csDrawPIScanlineGouraud* drawline_gouraud;
-  csDrawPIScanlineFX*      drawline_fx;
+  csDrawPIScanline *drawline;
+  csDrawPIScanlineGouraud *drawline_gouraud;
 } pqinfo;
-
 
 #define EPS   0.0001
 
-
-STDMETHODIMP csGraphics3DSoftware::StartPolygonFX(ITextureHandle* handle,
-                                                  DPFXMixMode mode,
-                                                  float alpha,
-                                                  bool gouraud)
+STDMETHODIMP csGraphics3DSoftware::StartPolygonFX (ITextureHandle* handle,
+  UInt mode)
 {
-  pqinfo.do_gouraud = rstate_gouraud && gouraud;
-  pqinfo.mixmode    = mode;
-
-  csTextureMMSoftware* txt_mm;
-  csTexture* txt_unl;
-  pqinfo.textured = true;
-
-  if (mode == FX_Copy && !pqinfo.transparent)
-  {
-    if (!do_lighting) gouraud = false;
-    if (!do_textured) pqinfo.textured = false;
-    if (!handle) pqinfo.textured = false;
-    pqinfo.do_gouraud = rstate_gouraud && (gouraud || !handle);
-  }
-
-  int itw, ith;
+  if (!rstate_gouraud || !do_lighting)
+    mode &= ~CS_FX_GOURAUD;
 
   if (handle)
   {
-    txt_mm = (csTextureMMSoftware*)GetcsTextureMMFromITextureHandle (handle);
-    txt_unl = txt_mm->get_texture (0);
+    csTextureMMSoftware *txt_mm = (csTextureMMSoftware*)GetcsTextureMMFromITextureHandle (handle);
+    csTexture *txt_unl = txt_mm->get_texture (0);
     pqinfo.bm = txt_unl->get_bitmap8 ();
-    itw = txt_unl->get_width ();
-    ith = txt_unl->get_height ();
+    pqinfo.tw = txt_unl->get_width ();
+    pqinfo.th = txt_unl->get_height ();
     pqinfo.shf_w = txt_unl->get_w_shift ();
-
-    pqinfo.tw          = (float)itw;
-    pqinfo.th          = (float)ith;
-    pqinfo.twfp        = QInt16 (pqinfo.tw);
-    pqinfo.thfp        = QInt16 (pqinfo.th);
+    pqinfo.twfp = QInt16 (pqinfo.tw) - 1;
+    pqinfo.thfp = QInt16 (pqinfo.th) - 1;
     pqinfo.transparent = txt_mm->get_transparent();
+    pqinfo.textured = do_textured;
   }
+  else
+    pqinfo.textured = false;
 
   Scan.AlphaMask = txtmgr->alpha_mask;
   Scan.PaletteTable = txtmgr->lt_pal->pal_to_true;
 
-  pqinfo.redFact = (1 << pfmt.RedBits) - 1;
-  pqinfo.greenFact = (1 << pfmt.GreenBits) - 1;
-  pqinfo.blueFact = (1 << pfmt.BlueBits) - 1;
-
   // Select draw scanline routine
   int scan_index = pqinfo.textured ? SCANPROCPI_TEX_ZFIL : SCANPROCPI_FLAT_ZFIL;
-  if (z_buf_mode == ZBuf_Use)
+  if (z_buf_mode == CS_ZBUF_USE)
     scan_index++;
   pqinfo.drawline = ScanProcPI [scan_index];
-  pqinfo.drawline_gouraud = ScanProcPIG [scan_index];
-  if (!pqinfo.drawline_gouraud)
-    pqinfo.do_gouraud = false;
 
-  scan_index = (z_buf_mode == ZBuf_Use) ? SCANPROCPIFX_ZUSE : SCANPROCPIFX_ZFIL;
-  if (pqinfo.transparent) scan_index += 0x02;
-  pqinfo.drawline_fx = ScanProcPIFX[scan_index];
-
-  switch (mode)
+  csDrawPIScanlineGouraud *gouraud_proc = ScanProcPIG [scan_index];
+  if (mode & CS_FX_MASK_MIXMODE == CS_FX_COPY)
+    pqinfo.drawline_gouraud = gouraud_proc;
+  else
   {
-    case FX_Add:
-      pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_ADD];
+    scan_index = (z_buf_mode == CS_ZBUF_USE) ? SCANPROCPIFX_ZUSE : SCANPROCPIFX_ZFIL;
+    if (pqinfo.transparent) scan_index += 2;
+    pqinfo.drawline_gouraud = ScanProcPIFX [scan_index];
+  }
+
+  switch (mode & CS_FX_MASK_MIXMODE)
+  {
+    case CS_FX_ADD:
+      Scan.BlendTable = Scan.BlendingTable [BLENDTABLE_ADD];
       break;
-    case FX_Multiply:
-      pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_MULTIPLY];
+    case CS_FX_MULTIPLY:
+      Scan.BlendTable = Scan.BlendingTable [BLENDTABLE_MULTIPLY];
       break;
-    case FX_Multiply2:
-      pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_MULTIPLY2];
+    case CS_FX_MULTIPLY2:
+      Scan.BlendTable = Scan.BlendingTable [BLENDTABLE_MULTIPLY2];
       break;
-    case FX_Alpha:
-      if (alpha<0.05)
-      {
-        pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_COPY];
-      }
-      else if (alpha<0.375)
-      {
-        pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_ALPHA25];
-      }
-      else if (alpha<0.625)
-      {
-        pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_ALPHA50];
-      }
-      else if (alpha<0.95)
-      {
-        pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_ALPHA75];
-      }
+    case CS_FX_ALPHA:
+    {
+      int alpha = mode & CS_FX_MASK_ALPHA;
+      if (alpha < 12)
+        pqinfo.drawline_gouraud = gouraud_proc;
+      else if (alpha < 96)
+        Scan.BlendTable = Scan.BlendingTable [BLENDTABLE_ALPHA25];
+      else if (alpha < 160)
+        Scan.BlendTable = Scan.BlendingTable [BLENDTABLE_ALPHA50];
+      else if (alpha < 244)
+        Scan.BlendTable = Scan.BlendingTable [BLENDTABLE_ALPHA75];
       else
       {
-        pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_ALPHA100];
+        mode &= ~CS_FX_GOURAUD;
+        pqinfo.drawline = csScan_draw_pi_scanline_zfil;
       }
       break;
-    case FX_Transparent:
-      pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_ALPHA100];
+    }
+    case CS_FX_TRANSPARENT:
+      mode &= ~CS_FX_GOURAUD;
+      pqinfo.drawline = csScan_draw_pi_scanline_zfil;
       break;
-    case FX_Copy:
+    case CS_FX_COPY:
     default:
-      pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_COPY];
-      //pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_ADD];
+      pqinfo.drawline_gouraud = gouraud_proc;
       break;
   }
+
+  // Once again check for availability of gouraud procedure
+  if (!pqinfo.drawline_gouraud)
+    mode &= ~(CS_FX_GOURAUD | CS_FX_MASK_MIXMODE);
+
+  pqinfo.mixmode = mode;
+  if (pqinfo.textured)
+  {
+    // In textured modes we use 7.8 fixed-point format for R,G,B factors
+    pqinfo.redFact =
+    pqinfo.greenFact =
+    pqinfo.blueFact = 0x7F;
+  }
+  else
+  {
+    // In flat modes we use #.16 fixed-point format for R,G,B factors
+    // where # is the number of bits per component
+    pqinfo.redFact = (pfmt.RedMask >> pfmt.RedBits);
+    pqinfo.greenFact = (pfmt.GreenMask >> pfmt.GreenBits);
+    pqinfo.blueFact = (pfmt.BlueMask >> pfmt.BlueBits);
+  } /* endif */
 
   return S_OK;
 }
@@ -2069,54 +2031,10 @@ STDMETHODIMP csGraphics3DSoftware::FinishPolygonFX()
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX(G3DPolygonDPFX& poly)
+STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
 {
-  int i;
-  bool gouraud  = pqinfo.do_gouraud;
-  bool textured = pqinfo.textured;
-
   if (!pqinfo.drawline && !pqinfo.drawline_gouraud)
     return S_OK;
-
-  float flat_r, flat_g, flat_b;
-  if (poly.txt_handle)
-    flat_r = flat_g = flat_b = 1;
-  else
-  {
-    flat_r = poly.flat_color_r;
-    flat_g = poly.flat_color_g;
-    flat_b = poly.flat_color_b;
-  }
-
-  //-----
-  // Get the values from the polygon for more conveniant local access.
-  // Also look for the top-most and bottom-most vertices.
-  //-----
-  float uu[64], vv[64], iz[64];
-  float rr[64], gg[64], bb[64];
-  int top, bot;
-  float top_y = -99999;
-  float bot_y = 99999;
-  top = bot = 0;                        // avoid GCC complains
-  for (i = 0 ; i < poly.num ; i++)
-  {
-    uu[i] = pqinfo.tw * poly.vertices [i].u;
-    vv[i] = pqinfo.th * poly.vertices [i].v;
-    iz[i] = poly.vertices [i].z;
-    rr[i] = pqinfo.redFact * (flat_r * poly.vertices [i].r);
-    gg[i] = pqinfo.greenFact * (flat_g * poly.vertices [i].g);
-    bb[i] = pqinfo.blueFact * (flat_b * poly.vertices [i].b);
-    if (poly.vertices [i].sy > top_y)
-    {
-      top_y = poly.vertices [i].sy;
-      top = i;
-    }
-    if (poly.vertices [i].sy < bot_y)
-    {
-      bot_y = poly.vertices [i].sy;
-      bot = i;
-    }
-  }
 
   //-----
   // Calculate constant du,dv,dz.
@@ -2142,9 +2060,48 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX(G3DPolygonDPFX& poly)
   if ((last == poly.num) || (dd == 0))
     return S_OK;
 
+  float flat_r, flat_g, flat_b;
+  if (poly.txt_handle)
+    flat_r = flat_g = flat_b = 1;
+  else
+  {
+    flat_r = poly.flat_color_r;
+    flat_g = poly.flat_color_g;
+    flat_b = poly.flat_color_b;
+  }
+  Scan.FlatColor =
+    (QRound (flat_r * pfmt.RedMask) & pfmt.RedMask)
+  | (QRound (flat_g * pfmt.GreenMask) & pfmt.GreenMask)
+  | (QRound (flat_b * pfmt.BlueMask) & pfmt.BlueMask);
+
+  //-----
+  // Get the values from the polygon for more conveniant local access.
+  // Also look for the top-most and bottom-most vertices.
+  //-----
+  float uu[64], vv[64], iz[64];
+  float rr[64], gg[64], bb[64];
+  int top, bot;
+  float top_y = -99999;
+  float bot_y = 99999;
+  top = bot = 0;                        // avoid GCC complains
+  int i;
+  for (i = 0 ; i < poly.num ; i++)
+  {
+    uu[i] = pqinfo.tw * poly.vertices [i].u;
+    vv[i] = pqinfo.th * poly.vertices [i].v;
+    iz[i] = poly.vertices [i].z;
+    rr[i] = pqinfo.redFact * (flat_r * poly.vertices [i].r);
+    gg[i] = pqinfo.greenFact * (flat_g * poly.vertices [i].g);
+    bb[i] = pqinfo.blueFact * (flat_b * poly.vertices [i].b);
+    if (poly.vertices [i].sy > top_y)
+      top_y = poly.vertices [top = i].sy;
+    if (poly.vertices [i].sy < bot_y)
+      bot_y = poly.vertices [bot = i].sy;
+  }
+
   float inv_dd = 1 / dd;
   int du = 0, dv = 0;
-  if (textured)
+  if (pqinfo.textured)
   {
     float uu0 = pqinfo.tw * poly.vertices [0].u;
     float uu1 = pqinfo.tw * poly.vertices [1].u;
@@ -2163,23 +2120,29 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX(G3DPolygonDPFX& poly)
   int dz = QInt24 (((iz0 - iz2) * (poly.vertices [1].sy - poly.vertices [last].sy)
                   - (iz1 - iz2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
   long dr = 0, dg = 0, db = 0;
-  if (gouraud)
+  if (pqinfo.mixmode & CS_FX_GOURAUD)
   {
     float rr0 = pqinfo.redFact * (flat_r * poly.vertices [0].r);
     float rr1 = pqinfo.redFact * (flat_r * poly.vertices [1].r);
     float rr2 = pqinfo.redFact * (flat_r * poly.vertices [last].r);
-    dr = QInt16 (((rr0 - rr2) * (poly.vertices [1].sy - poly.vertices [last].sy)
-                - (rr1 - rr2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
+    float _dr = ((rr0 - rr2) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                - (rr1 - rr2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd;
     float gg0 = pqinfo.greenFact * (flat_g * poly.vertices [0].g);
     float gg1 = pqinfo.greenFact * (flat_g * poly.vertices [1].g);
     float gg2 = pqinfo.greenFact * (flat_g * poly.vertices [last].g);
-    dg = QInt16 (((gg0 - gg2) * (poly.vertices [1].sy - poly.vertices [last].sy)
-                - (gg1 - gg2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
+    float _dg = ((gg0 - gg2) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                - (gg1 - gg2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd;
     float bb0 = pqinfo.blueFact * (flat_b * poly.vertices [0].b);
     float bb1 = pqinfo.blueFact * (flat_b * poly.vertices [1].b);
     float bb2 = pqinfo.blueFact * (flat_b * poly.vertices [last].b);
-    db = QInt16 (((bb0 - bb2) * (poly.vertices [1].sy - poly.vertices [last].sy)
-                - (bb1 - bb2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
+    float _db = ((bb0 - bb2) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                - (bb1 - bb2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd;
+
+    // For textures we keep R,G,B components and deltas in 7.8 format not in #.16
+    if (pqinfo.textured)
+      dr = QRound (_dr * 256), dg = QRound (_dg * 256), db = QRound (_db * 256);
+    else
+      dr = QInt16 (_dr), dg = QInt16 (_dg), db = QInt16 (_db);
   }
 
   //-----
@@ -2196,6 +2159,25 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX(G3DPolygonDPFX& poly)
 
   int sy, fyL, fyR;
   sy = fyL = fyR = QRound (poly.vertices [top].sy);
+
+  int max_r = ((pqinfo.redFact   + 1) << 16) - 1;
+  int max_g = ((pqinfo.greenFact + 1) << 16) - 1;
+  int max_b = ((pqinfo.blueFact  + 1) << 16) - 1;
+
+  // Decide whenever we should use Gouraud or flat (faster) routines
+  bool use_gouraud = (pqinfo.drawline_gouraud != NULL)
+    && ((pqinfo.mixmode & CS_FX_GOURAUD)
+     || (pqinfo.mixmode & CS_FX_MASK_MIXMODE) != CS_FX_COPY);
+  if (use_gouraud && !(pqinfo.mixmode & CS_FX_GOURAUD))
+  {
+    int color_shift = pqinfo.textured ? 8 : 16;
+    rL = pqinfo.redFact << color_shift;
+    gL = pqinfo.greenFact << color_shift;
+    bL = pqinfo.blueFact << color_shift;
+  } /* endif */
+
+  if (pqinfo.textured)
+    max_r >>= 8; max_g >>= 8; max_b >>= 8;
 
   //-----
   // The loop.
@@ -2251,17 +2233,19 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX(G3DPolygonDPFX& poly)
         {
           float inv_dyL = 1/dyL;
           dxdyL = QInt16 ((poly.vertices [scanL2].sx - poly.vertices [scanL1].sx) * inv_dyL);
-          if (textured)
+          if (pqinfo.textured)
           {
             dudyL = QInt16 ((uu[scanL2] - uu[scanL1]) * inv_dyL);
             dvdyL = QInt16 ((vv[scanL2] - vv[scanL1]) * inv_dyL);
           }
           dzdyL = QInt24 ((iz[scanL2] - iz[scanL1]) * inv_dyL);
-          if (gouraud)
+          if (pqinfo.mixmode & CS_FX_GOURAUD)
           {
             drdyL = QInt16 ((rr[scanL2] - rr[scanL1]) * inv_dyL);
             dgdyL = QInt16 ((gg[scanL2] - gg[scanL1]) * inv_dyL);
             dbdyL = QInt16 ((bb[scanL2] - bb[scanL1]) * inv_dyL);
+            if (pqinfo.textured)
+              drdyL >>= 8, dgdyL >>= 8, dbdyL >>= 8;
           }
           xL = QInt16 (poly.vertices [scanL1].sx);
 
@@ -2277,17 +2261,19 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX(G3DPolygonDPFX& poly)
           else
             Factor = 0;
 
-          if (textured)
+          if (pqinfo.textured)
           {
             uL = QInt16 (uu [scanL1] + (uu [scanL2] - uu [scanL1]) * Factor);
             vL = QInt16 (vv [scanL1] + (vv [scanL2] - vv [scanL1]) * Factor);
           }
           zL = QInt24 (iz [scanL1] + (iz [scanL2] - iz [scanL1]) * Factor);
-          if (gouraud)
+          if (pqinfo.mixmode & CS_FX_GOURAUD)
           {
             rL = QInt16 (rr [scanL1] + (rr [scanL2] - rr [scanL1]) * Factor);
             gL = QInt16 (gg [scanL1] + (gg [scanL2] - gg [scanL1]) * Factor);
             bL = QInt16 (bb [scanL1] + (bb [scanL2] - bb [scanL1]) * Factor);
+            if (pqinfo.textured)
+              rL >>= 8, gL >>= 8, bL >>= 8;
           }
         } /* endif */
       } /* endif */
@@ -2303,84 +2289,26 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX(G3DPolygonDPFX& poly)
       fin_y = fyR;
 
     int screenY = height - 1 - sy;
-    if (!textured)
+    while (sy > fin_y)
     {
-      while (sy > fin_y)
+      if ((sy & 1) != do_interlaced)
       {
-        if ((sy & 1) != do_interlaced)
+        //-----
+        // Draw one scanline.
+        //-----
+        int xl = round16 (xL);
+        int xr = round16 (xR);
+
+        if (xr > xl)
         {
-          //-----
-          // Draw one scanline.
-          //-----
-          int xl = round16 (xL);
-          int xr = round16 (xR);
+          int l = xr - xl;
 
-          if (xr > xl)
+          int uu = uL, vv = vL;
+          int duu = du, dvv = dv;
+
+          if (pqinfo.textured)
           {
-            register unsigned long *zbuff = z_buffer + width * screenY + xl;
-            unsigned char* pixel_at = line_table[screenY] + (xl << pixel_shift);
-
-            if (pqinfo.mixmode == FX_Copy && !pqinfo.transparent)
-            {
-              if (gouraud)
-                pqinfo.drawline_gouraud (pixel_at, xr-xl, zbuff, 0, 0,
-                      0, 0, zL, dz, NULL, 0, rL, gL, bL, dr, dg, db);
-              else
-                pqinfo.drawline (pixel_at, xr - xl, zbuff, 0, 0,
-                        0, 0, zL, dz, NULL, 0);
-            }
-            else
-            {
-              if (gouraud)
-              {
-                pqinfo.drawline_fx (pixel_at, xr-xl, zbuff, 0, 0,
-                      0, 0, zL, dz, NULL, 0,
-                      rL, gL, bL, dr, dg, db,
-                      pqinfo.BlendingTable);
-              }
-              else
-              {
-                pqinfo.drawline_fx (pixel_at, xr-xl, zbuff, 0, 0,
-                      0, 0, zL, dz, NULL, 0,
-                      pqinfo.redFact << 16,
-                      pqinfo.greenFact << 16,
-                      pqinfo.blueFact << 16,
-                      0, 0, 0,
-                      pqinfo.BlendingTable);
-              }
-            }
-          } /* endif */
-        }
-
-        xL += dxdyL; xR += dxdyR; zL += dzdyL;// zR += dzdyR;
-
-        if(gouraud)
-          rL += drdyL, gL += dgdyL, bL += dbdyL;
-
-        sy--;
-        screenY++;
-      }
-    }
-    else
-    {
-      while (sy > fin_y)
-      {
-        if ((sy & 1) != do_interlaced)
-        {
-          //-----
-          // Draw one scanline.
-          //-----
-          int xl = round16 (xL);
-          int xr = round16 (xR);
-
-          if (xr > xl)
-          {
-            register unsigned long *zbuff = z_buffer + width * screenY + xl;
-
-            int l=xr-xl;
             // Check for texture overflows
-            int uu = uL, vv = vL;
-            int duu = du, dvv = dv;
             if (uu < 0) uu = 0; if (uu > pqinfo.twfp) uu = pqinfo.twfp;
             if (vv < 0) vv = 0; if (vv > pqinfo.thfp) vv = pqinfo.thfp;
 
@@ -2396,49 +2324,51 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX(G3DPolygonDPFX& poly)
               if (tmpv < 0) tmpv = 0; if (tmpv > pqinfo.thfp) tmpv = pqinfo.thfp;
               dvv = (tmpv - vv) / l;
             }
-
-            unsigned char *pixel_at = line_table [screenY] + (xl << pixel_shift);
-
-            if (pqinfo.mixmode == FX_Copy && !pqinfo.transparent)
-            {
-              if (gouraud)
-                pqinfo.drawline_gouraud (pixel_at, xr - xl, zbuff, uu, duu,
-                      vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w, rL, gL, bL, dr, dg, db);
-              else
-                pqinfo.drawline (pixel_at, xr - xl, zbuff, uu, duu,
-                      vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w);
-            }
-            else
-            {
-              if (gouraud)
-              {
-                pqinfo.drawline_fx (pixel_at, xr - xl, zbuff, uu, duu,
-                      vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w,
-                      rL, gL, bL, dr, dg, db,
-                      pqinfo.BlendingTable);
-              }
-              else
-              {
-                pqinfo.drawline_fx (pixel_at, xr - xl, zbuff, uu, duu,
-                      vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w,
-                      pqinfo.redFact << 16,
-                      pqinfo.greenFact << 16,
-                      pqinfo.blueFact << 16,
-                      0, 0, 0,
-                      pqinfo.BlendingTable);
-              }
-            }
           }
+
+          // R,G,B brightness can underflow due to pixel subcorrection
+          // Underflow will cause visual artifacts while small overflows
+          // will be neutralized by our "clamp to 1.0" circuit.
+          int rr = rL, gg = gL, bb = bL;
+          int drr = dr; int dgg = dg; int dbb = db;
+          bool clamp = false;
+          if (pqinfo.mixmode & CS_FX_GOURAUD)
+          {
+            if (rr < 0) rr = 0;
+            if (gg < 0) gg = 0;
+            if (bb < 0) bb = 0;
+
+            int tmp = rr + drr * l;
+            if (tmp < 0) drr = - (rr / l);
+            clamp |= (rr > max_r) || (tmp > max_r);
+            tmp = gg + dgg * l;
+            if (tmp < 0) dgg = - (gg / l);
+            clamp |= (gg > max_g) || (tmp > max_g);
+            tmp = bb + dbb * l;
+            if (tmp < 0) dbb = - (bb / l);
+            clamp |= (bb > max_b) || (tmp > max_b);
+          }
+
+          unsigned long *zbuff = z_buffer + width * screenY + xl;
+          unsigned char *dest = line_table [screenY] + (xl << pixel_shift);
+
+          if (use_gouraud)
+            pqinfo.drawline_gouraud (dest, l, zbuff, uu, duu, vv, dvv,
+              zL, dz, pqinfo.bm, pqinfo.shf_w, rr, gg, bb, drr, dgg, dbb, clamp);
+          else
+            pqinfo.drawline (dest, l, zbuff, uu, duu, vv, dvv,
+              zL, dz, pqinfo.bm, pqinfo.shf_w);
         }
-
-        xL += dxdyL; xR += dxdyR;
-        uL += dudyL; vL += dvdyL; zL += dzdyL;
-        if (gouraud)
-          rL += drdyL, gL += dgdyL, bL += dbdyL;
-
-        sy--;
-        screenY++;
       }
+
+      xL += dxdyL; xR += dxdyR; zL += dzdyL;
+      if (pqinfo.textured)
+        uL += dudyL, vL += dvdyL;
+      if (pqinfo.mixmode & CS_FX_GOURAUD)
+        rL += drdyL, gL += dgdyL, bL += dbdyL;
+
+      sy--;
+      screenY++;
     }
   }
 
@@ -2551,41 +2481,41 @@ STDMETHODIMP csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
     case G3DRENDERSTATE_ZBUFFERTESTENABLE:
       if (value)
       {
-         if (z_buf_mode == ZBuf_Test)
+         if (z_buf_mode == CS_ZBUF_TEST)
            return S_OK;
-         if (z_buf_mode == ZBuf_None)
-           z_buf_mode = ZBuf_Test;
-         else if (z_buf_mode == ZBuf_Fill)
-           z_buf_mode = ZBuf_Use;
+         if (z_buf_mode == CS_ZBUF_NONE)
+           z_buf_mode = CS_ZBUF_TEST;
+         else if (z_buf_mode == CS_ZBUF_FILL)
+           z_buf_mode = CS_ZBUF_USE;
       }
       else
       {
-         if (z_buf_mode == ZBuf_Fill)
+         if (z_buf_mode == CS_ZBUF_FILL)
            return S_OK;
-         if (z_buf_mode == ZBuf_Use)
-           z_buf_mode = ZBuf_Fill;
-         else if (z_buf_mode == ZBuf_Test)
-           z_buf_mode = ZBuf_None;
+         if (z_buf_mode == CS_ZBUF_USE)
+           z_buf_mode = CS_ZBUF_FILL;
+         else if (z_buf_mode == CS_ZBUF_TEST)
+           z_buf_mode = CS_ZBUF_NONE;
       }
       break;
     case G3DRENDERSTATE_ZBUFFERFILLENABLE:
       if (value)
       {
-        if (z_buf_mode == ZBuf_Fill)
+        if (z_buf_mode == CS_ZBUF_FILL)
           return S_OK;
-        if (z_buf_mode == ZBuf_None)
-          z_buf_mode = ZBuf_Fill;
-        else if (z_buf_mode == ZBuf_Test)
-          z_buf_mode = ZBuf_Use;
+        if (z_buf_mode == CS_ZBUF_NONE)
+          z_buf_mode = CS_ZBUF_FILL;
+        else if (z_buf_mode == CS_ZBUF_TEST)
+          z_buf_mode = CS_ZBUF_USE;
       }
       else
       {
-        if (z_buf_mode == ZBuf_Test)
+        if (z_buf_mode == CS_ZBUF_TEST)
           return S_OK;
-        if (z_buf_mode == ZBuf_Use)
-          z_buf_mode = ZBuf_Test;
-        else if (z_buf_mode == ZBuf_Fill)
-          z_buf_mode = ZBuf_None;
+        if (z_buf_mode == CS_ZBUF_USE)
+          z_buf_mode = CS_ZBUF_TEST;
+        else if (z_buf_mode == CS_ZBUF_FILL)
+          z_buf_mode = CS_ZBUF_NONE;
       }
       break;
     case G3DRENDERSTATE_DITHERENABLE:
@@ -2663,10 +2593,10 @@ STDMETHODIMP csGraphics3DSoftware::GetRenderState(G3D_RENDERSTATEOPTION op, long
       retval = 0;
       break;
     case G3DRENDERSTATE_ZBUFFERTESTENABLE:
-      retval = (bool)(z_buf_mode & ZBuf_Test);
+      retval = (bool)(z_buf_mode & CS_ZBUF_TEST);
       break;
     case G3DRENDERSTATE_ZBUFFERFILLENABLE:
-      retval = (bool)(z_buf_mode & ZBuf_Fill);
+      retval = (bool)(z_buf_mode & CS_ZBUF_FILL);
       break;
     case G3DRENDERSTATE_DITHERENABLE:
       retval = rstate_dither;
@@ -2733,7 +2663,7 @@ STDMETHODIMP csGraphics3DSoftware::GetCaps(G3D_CAPS *caps)
   caps->ColorModel = G3DCOLORMODEL_RGB;
   caps->CanClip = false;
   caps->SupportsArbitraryMipMapping = true;
-  caps->BitDepth = 8;
+  caps->BitDepth = pfmt.PixelBytes * 8;
   caps->ZBufBitDepth = 32;
   caps->minTexHeight = 2;
   caps->minTexWidth = 2;

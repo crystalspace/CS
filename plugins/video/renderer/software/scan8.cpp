@@ -25,13 +25,7 @@
 
 #include "sttest.h"
 
-/// The only instance of this structure lives here
-csScanSetup Scan =
-{
-  16,			// InterpolStep
-  4,			// InterpolShift
-  INTER_MODE_SMART	// InterpolMode
-};
+#define SCAN8
 
 //--//--//--//--//--//--//--//--//--//--//--/ assembler implementations --//--//
 
@@ -59,10 +53,6 @@ csScanSetup Scan =
 
 #ifndef NO_draw_scanline_map_zfil
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_8_draw_scanline_map_zfil
 #define SCANMAP 1
 #define SCANLOOP \
@@ -80,7 +70,7 @@ csScanSetup Scan =
       izz += dzz;							\
     }									\
     while (z_buffer <= lastZbuf)
-#include "scanln8.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_map_zfil
 
@@ -90,10 +80,6 @@ int filter_bf;
 
 #ifndef NO_draw_scanline_map_filt_zfil
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_8_draw_scanline_map_filt_zfil
 #define SCANMAP 1
 #define SCANLOOP \
@@ -134,7 +120,7 @@ int filter_bf;
       izz += dzz;                                                       \
     }                                                                   \
     while (z_buffer <= lastZbuf)
-#include "scanln8.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_map_filt_zfil
 
@@ -142,10 +128,6 @@ int filter_bf;
 
 #ifndef NO_draw_scanline_tex_zfil
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_8_draw_scanline_tex_zfil
 #define SCANLOOP \
     do                                                                  \
@@ -162,7 +144,7 @@ int filter_bf;
       izz += dzz;                                                       \
     }                                                                   \
     while (z_buffer <= lastZbuf)
-#include "scanln8.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_tex_zfil
 
@@ -170,10 +152,6 @@ int filter_bf;
 
 #ifndef NO_draw_scanline_tex_priv_zfil
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_8_draw_scanline_tex_priv_zfil
 #define SCANLOOP \
     do                                                                  \
@@ -190,7 +168,7 @@ int filter_bf;
       izz += dzz;                                                       \
     }                                                                   \
     while (z_buffer <= lastZbuf)
-#include "scanln8.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_tex_priv_zfil
 
@@ -198,10 +176,6 @@ int filter_bf;
 
 #ifndef NO_draw_scanline_map_alpha1
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_8_draw_scanline_map_alpha1
 #define SCANMAP 1
 #define SCANLOOP \
@@ -213,7 +187,7 @@ int filter_bf;
       vv += dvv;                                                        \
     }                                                                   \
     while (_dest <= _destend)
-#include "scanln8.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_map_alpha1
 
@@ -221,10 +195,6 @@ int filter_bf;
 
 #ifndef NO_draw_scanline_map_alpha2
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_8_draw_scanline_map_alpha2
 #define SCANMAP 1
 #define SCANLOOP \
@@ -236,7 +206,7 @@ int filter_bf;
       vv += dvv;                                                        \
     }                                                                   \
     while (_dest <= _destend)
-#include "scanln8.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_map_alpha2
 
@@ -244,10 +214,6 @@ int filter_bf;
 
 #ifndef NO_draw_scanline_tex_key_zfil
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_8_draw_scanline_tex_key_zfil
 #define SCANLOOP \
     unsigned char c;                                                    \
@@ -269,7 +235,7 @@ int filter_bf;
       izz += dzz;                                                       \
     }                                                                   \
     while (_dest <= _destend)
-#include "scanln8.inc"
+#include "scanln.inc"
 
 #endif // draw_scanline_tex_key_zfil
 
@@ -277,10 +243,6 @@ int filter_bf;
 
 #ifndef NO_draw_scanline_tex_priv_key_zfil
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_8_draw_scanline_tex_priv_key_zfil
 #define SCANLOOP \
     do                                                                  \
@@ -302,7 +264,7 @@ int filter_bf;
       izz += dzz;                                                       \
     }                                                                   \
     while (_dest <= _destend)
-#include "scanln8.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_tex_priv_key_zfil
 
@@ -310,10 +272,6 @@ int filter_bf;
 
 #ifndef NO_draw_scanline_map_key_zfil
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_8_draw_scanline_map_key_zfil
 #define SCANMAP 1
 #define SCANLOOP \
@@ -335,7 +293,7 @@ int filter_bf;
       izz += dzz;                                                       \
     }                                                                   \
     while (_dest <= _destend)
-#include "scanln8.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_map_key_zfil
 
@@ -343,10 +301,6 @@ int filter_bf;
 
 #ifndef NO_draw_scanline_tex_zuse
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_8_draw_scanline_tex_zuse
 #define SCANLOOP \
     do                                                                  \
@@ -366,7 +320,7 @@ int filter_bf;
       izz += dzz;                                                       \
     }                                                                   \
     while (_dest <= _destend)
-#include "scanln8.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_tex_zuse
 
@@ -374,10 +328,6 @@ int filter_bf;
 
 #ifndef NO_draw_scanline_tex_priv_zuse
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_8_draw_scanline_tex_priv_zuse
 #define SCANLOOP \
     do                                                                  \
@@ -397,7 +347,7 @@ int filter_bf;
       izz += dzz;                                                       \
     }                                                                   \
     while (_dest <= _destend)
-#include "scanln8.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_tex_priv_zuse
 
@@ -405,10 +355,6 @@ int filter_bf;
 
 #ifndef NO_draw_scanline_map_zuse
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
 #define SCANFUNC csScan_8_draw_scanline_map_zuse
 #define SCANMAP 1
 #define SCANLOOP \
@@ -429,70 +375,9 @@ int filter_bf;
       izz += dzz;                                                       \
     }                                                                   \
     while (_dest <= _destend)
-#include "scanln8.inc"
+#include "scanln.inc"
 
 #endif // NO_draw_scanline_map_zuse
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_scanline_map_light
-
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
-#define SCANFUNC csScan_8_draw_scanline_map_light
-#define SCANMAP 1
-#define SCANLOOP \
-    do                                                                  \
-    {                                                                   \
-      *_dest++ = Scan.LightTable[srcTex[((vv>>16)<<shifter) + (uu>>16)]];\
-      uu += duu;                                                        \
-      vv += dvv;                                                        \
-    }                                                                   \
-    while (_dest <= _destend)
-#define SCANEND \
-    do                                                                  \
-    {                                                                   \
-      *z_buffer++ = izz;							\
-      izz += dzz;                                                       \
-    }                                                                   \
-    while (z_buffer <= lastZbuf)
-#include "scanln8.inc"
-
-#endif // NO_draw_scanline_map_light
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_scanline_map_light_zuse
-
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
-#define SCANFUNC csScan_8_draw_scanline_map_light_zuse
-#define SCANMAP 1
-#define SCANLOOP \
-    do                                                                  \
-    {                                                                   \
-      if (izz >= (int)(*z_buffer))					\
-      {                                                                 \
-        *_dest++ = Scan.LightTable[srcTex[((vv>>16)<<shifter) + (uu>>16)]];\
-        *z_buffer++ = izz;						\
-      }                                                                 \
-      else                                                              \
-      {                                                                 \
-        _dest++;                                                        \
-        z_buffer++;							\
-      }                                                                 \
-      uu += duu;                                                        \
-      vv += dvv;                                                        \
-      izz += dzz;                                                       \
-    }                                                                   \
-    while (_dest <= _destend)
-#include "scanln8.inc"
-
-#endif // NO_draw_scanline_map_light_zuse
 
 //------------------------------------------------------------------
 
@@ -729,16 +614,3 @@ void csScan_8_draw_pi_scanline_tex_zfil (void *dest, int len,
 }
 
 #endif // NO_draw_pi_scanline_tex_zfil
-
-void csScan_8_draw_pifx_scanline_dummy
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-   ULong r, ULong g, ULong b, long dr, long dg, long db,
-   UByte* BlendingTable)
-{
-   (void) dest;(void) len;(void) zbuff;
-   (void) u;(void) du;(void) v;(void) dv;(void) z;(void) dz;
-   (void) *bitmap;(void) bitmap_log2w;
-   (void) r; (void) g; (void) b; (void) dr; (void) dg; (void) db;
-   (void) BlendingTable;
-}

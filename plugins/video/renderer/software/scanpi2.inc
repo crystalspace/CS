@@ -1,96 +1,115 @@
 /*
     This is a subinclude file for scanpi.inc
-    It does what draw_pi_scanline_xxx is supposed to do
-    with or without clamping r,g,b multipliers to 1.0
+    It does what draw_pi_scanline_xxx is supposed to do with or
+    without clamping texture R,G,B after multiplication to 1.0
     (so that 2*SRC lighting will work correctly)
 */
 
   while (_dest < _destend)
   {
-#ifdef ZUSE
+#ifdef PI_ZUSE
     if (z >= *zbuff)
 #endif
     {
-
-#ifdef FLAT
-      // if flat shading is desired, we will just use white as our texel color
-      (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
-  #ifndef GOURAUD
-      // if Gouraud is selected, we don't need to intialize texel here.
-    #ifdef BPP16
-      texel = 0xffff;
-    #else
-      texel = 0xffffff;
-    #endif
-  #endif
-#else
-      // read the texel from the texture
-  #ifdef BPP16
-      texel = Scan.PaletteTable [*(bitmap + ((v >> 16) << bitmap_log2w) + (u >> 16))];
+#ifndef PI_FLAT
+  #ifdef PI_R8G8B8
+      register UInt texel = *(((ULong*)bitmap) + ((v >> 16) << bitmap_log2w) + (u >> 16));
   #else
-      texel = *(((ULong*)bitmap) + ((v >> 16) << bitmap_log2w) + (u >> 16));
+      register UInt texel = Scan.PaletteTable [*(bitmap + ((v >> 16) << bitmap_log2w) + (u >> 16))];
   #endif
-#endif
-
-#ifdef COLORKEY
+  #ifdef PI_COLORKEY
       // if colorkeying is enabled, we will ignore texels with the value 0.
       if (texel)
+  #endif
 #endif
       {
-#ifdef GOURAUD
-  #ifdef FLAT
-        r1 = r >> 16;
-        g1 = g >> 16;
-        b1 = b >> 16;
-  #else
-        r1 =  texel >> REDSHIFT;
-        g1 = (texel >> GREENSHIFT) & GREENMASK;
-        b1 =  texel  & BLUEMASK;
-        r1 = (r1*r) >> (16+REDBITS);
-        g1 = (g1*g) >> (16+GREENBITS);
-        b1 = (b1*b) >> (16+BLUEBITS);
-  #endif
-        // Now r1, g1 and b1 contain the color of the new pixel on screen
-  #ifdef USEEFFECTS
-        ULong pixel = *_dest;
-        r2 = (pixel >> REDSHIFT) & REDMASK;
-        g2 = (pixel >> GREENSHIFT) & GREENMASK;
-        b2 = (pixel) & BLUEMASK;
-        // Now r2, g2 and b2 contain the color of the old pixel on pixel
-    #ifdef BPP16
-        r1 = BlendingTable [r1 * 2 + r2 * 128] / 2;
-      #ifdef COLOR555
-        g1 = BlendingTable [g1 * 2 + g2 * 128] / 2;
-      #else
-        g1 = BlendingTable [g1 + g2 * 64];
-      #endif
-        b1 = BlendingTable [b1 * 2 + b2 * 128] / 2;
+#if defined (PI_ZUSE) || defined (PI_ZFILL)
+        *zbuff = z;
+#endif
+#if defined (PI_BLEND)
+        // The color of the source texel (SRC)
+  #if defined (PI_GOURAUD)
+    #if PI_RS >= 15
+        register UInt rs = ShiftToPos ((texel >> PI_RS_BLEND) * r, 15, PI_RBB) & ((PI_RM2 >> PI_RS) << PI_RBB);
     #else
-        // 32Bit Blending Mode
-        r1 = BlendingTable [(r1 >> 2) + (r2 >> 2) * 64] << 2;
-        g1 = BlendingTable [(g1 >> 2) + (g2 >> 2) * 64] << 2;
-        b1 = BlendingTable [(b1 >> 2) + (b2 >> 2) * 64] << 2;
+        register UInt rs = ShiftToPos ((texel & PI_RM_BLEND) * r, PI_RS_BLEND + 15, PI_RBB) & ((PI_RM2 >> PI_RS) << PI_RBB);
     #endif
-        // Now r1, g1 and b1 now contain a blend between old and new pixel.
+        register UInt gs = ShiftToPos ((texel & PI_GM_BLEND) * g, PI_GS_BLEND + 15, PI_GBB) & ((PI_GM2 >> PI_GS) << PI_GBB);
+        register UInt bs = ShiftToPos ((texel & PI_BM_BLEND) * b, PI_BS_BLEND + 15, PI_BBB) & ((PI_BM2 >> PI_BS) << PI_BBB);
+  #else
+        register UInt rs = ShiftToPos (texel & PI_RM_BLEND, PI_RS_BLEND, PI_RBB);
+        register UInt gs = ShiftToPos (texel & PI_GM_BLEND, PI_GS_BLEND, PI_GBB);
+        register UInt bs = ShiftToPos (texel & PI_BM_BLEND, PI_BS_BLEND, PI_BBB);
   #endif
-  #ifdef CLAMP_RGB
-        if (r1 > REDMASK)   r1 = REDMASK;
-        if (g1 > GREENMASK) g1 = GREENMASK;
-        if (b1 > BLUEMASK)  b1 = BLUEMASK;
+
+        // The color of the screen pixel (DST)
+        UInt pixel = *_dest;
+        register UInt rd = (pixel              ) >> PI_RS_BLEND;
+        register UInt gd = (pixel & PI_GM_BLEND) >> PI_GS_BLEND;
+        register UInt bd = (pixel & PI_BM_BLEND) >> PI_BS_BLEND;
+
+        rs = UInt (Scan.BlendTable [PI_RBT_OFS + rs + rd]);
+        gs = UInt (Scan.BlendTable [PI_GBT_OFS + gs + gd]);
+        bs = UInt (Scan.BlendTable [PI_BBT_OFS + bs + bd]);
+
+        texel = (rs << PI_RS) | (gs << PI_GS) | (bs << PI_BS);
+#elif defined (PI_GOURAUD)
+        // The color of the source texel (SRC)
+        register UInt rs, gs, bs;
+  #ifdef PI_FLAT
+    #ifdef PI_CLAMP_RGB
+        if (r >= ((PI_RM >> PI_RS) << 16)) rs = PI_RM; else
+    #endif
+        rs = (r >> (16 - PI_RS)) & PI_RM;
+    #ifdef PI_CLAMP_RGB
+        if (g >= ((PI_GM >> PI_GS) << 16)) gs = PI_GM; else
+    #endif
+        gs = (g >> (16 - PI_GS)) & PI_GM;
+    #ifdef PI_CLAMP_RGB
+        if (b >= ((PI_BM >> PI_BS) << 16)) bs = PI_BM; else
+    #endif
+        bs = (b >> (16 - PI_BS))/* & PI_BM*/;
+        register UInt texel = (rs | gs | bs);
+  #else
+    #if PI_RS >= 15
+        rs = (((texel & PI_RM) >> 15) * r) & (PI_RM | (PI_RM << 1));
+    #else
+        rs = ((texel & PI_RM) * r) & ((PI_RM << 15) | (PI_RM << 16));
+    #endif
+        gs = ((texel & PI_GM) * g) & ((PI_GM << 15) | (PI_GM << 16));
+        bs = ((texel & PI_BM) * b) & ((PI_BM << 15) | (PI_BM << 16));
+
+        // If in textured Gouraud but not in blending mode, we should normalize
+        // R,G,B components as they were multiplied with 7.15 light components
+    #ifdef PI_CLAMP_RGB
+      #if PI_RS >= 15
+        if (rs > PI_RM) rs = PI_RM;
+      #else
+        if (rs > PI_RM << 15) rs = PI_RM << 15;
+      #endif
+        if (gs > PI_GM << 15) gs = PI_GM << 15;
+        if (bs > PI_BM << 15) bs = PI_BM << 15;
+    #endif
+    #if PI_RS >= 15
+        texel = rs | ((gs | bs) >> 15);
+    #else
+        texel = (rs | gs | bs) >> 15;
+    #endif
   #endif
-        texel = (r1 << REDSHIFT) | (g1 << GREENSHIFT) | (b1);
+#elif defined (PI_FLAT)
+        UInt texel = Scan.FlatColor;
 #endif
 
         *_dest = texel;
-#if defined (ZUSE) || defined (ZFILL)
-        *zbuff = z;
-#endif
       }
     }
     _dest++;
+    u += du; v += dv;
+#if defined (PI_ZUSE) || defined (PI_ZFILL)
     zbuff++;
-    u += du; v += dv; z += dz;
-#ifdef GOURAUD
+    z += dz;
+#endif;
+#ifdef PI_GOURAUD
     r += dr; g += dg; b += db;
 #endif
   } /* endwhile */

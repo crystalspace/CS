@@ -26,6 +26,14 @@
 #include "ipolygon.h"
 #include "sttest.h"
 
+/// The only instance of this structure lives here
+csScanSetup Scan =
+{
+  16,			// InterpolStep
+  4,			// InterpolShift
+  INTER_MODE_SMART	// InterpolMode
+};
+
 //---------------------- This routine is pixel-depth independent ---
 
 #ifndef NO_draw_scanline_zfil
@@ -51,6 +59,24 @@ void csScan_draw_scanline_zfil (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
+void csScan_draw_pi_scanline_zfil (void *dest, int len, unsigned long *zbuff,
+  long u, long du, long v, long dv, unsigned long z, long dz,
+  unsigned char *bitmap, int bitmap_log2w)
+{
+  (void)u; (void)du; (void)v; (void)dv;
+  (void)bitmap; (void)bitmap_log2w;
+  ULong *lastZbuf = zbuff + len - 1;
+
+  do
+  {
+    *zbuff++ = z;
+    z += dz;
+  }
+  while (zbuff <= lastZbuf);
+}
+
+//------------------------------------------------------------------
+
 void csScan_Initialize ()
 {
   // 64K
@@ -63,6 +89,8 @@ void csScan_Initialize ()
   CHK (Scan.exp_256 = new unsigned char [EXP_256_SIZE+3]);
   // ~1K
   CHK (Scan.exp_16 = new unsigned char [EXP_32_SIZE+3]);
+  // 6*8K
+  memset (&Scan.BlendingTable, sizeof (Scan.BlendingTable), 0);
 
   int i, j;
   int mx = 1 << LOG2_STEPS_X, my = 1 << LOG2_STEPS_Y;
@@ -114,8 +142,77 @@ void csScan_Initialize ()
     Scan.exp_16 [i] = QRound (32 * exp (-float (i) / 256.)) - 1;
 }
 
+void csScan_CalcBlendTables (int rbits, int gbits, int bbits)
+{
+  int i;
+  // First free old blending tables
+  for (i = 0; i < 6; i++)
+    if (Scan.BlendingTable [i])
+      CHKB (delete [] Scan.BlendingTable [i]);
+
+  // Compute number of bits for our blending table
+  unsigned int bits = MAX (MAX (rbits, gbits), bbits);
+  unsigned int max = (1 << bits) - 1;
+  // for modes with different bits per comp (i.e. R5G6B5) we create second table
+  unsigned int bits2 = (rbits == gbits && gbits == bbits) ? 0 : rbits;
+  unsigned int max2 = (1 << bits2) - 1;
+
+  // For memory size reasons don't allow tables for more than 6 bits per color
+  unsigned int add_shft = 0, add_val = 0;
+  if (bits > 6)
+  {
+    add_shft = bits - 6;
+    add_val = 1 << (add_shft - 1);
+    bits = 6;
+  }
+
+  // Now allocate memory for blending tables
+  unsigned int table_size = 1 << (2 * bits + 1);
+  if (bits2)
+    table_size += 1 << (2 * bits2 + 1);
+  for (i = 0; i < 6; i++)
+    CHKB (Scan.BlendingTable [i] = new unsigned char [table_size]);
+
+  unsigned int index = 0;
+
+  do
+  {
+    unsigned int max_src, max_dest, max_val, max_bits;
+    max_bits = bits2 ? bits2 : bits;
+    max_src = 2 << max_bits;
+    max_dest = 1 << max_bits;
+    max_val = bits2 ? max2 : max;
+    bits2 = 0; max_bits += add_shft;
+
+    for (unsigned int s = 0; s < max_src; s++)
+    {
+      unsigned int src = (s << add_shft) + add_val;
+      for (unsigned int d = 0; d < max_dest; d++)
+      {
+        unsigned int dst = (d << add_shft) + add_val;
+        // Calculate all the available blendingmodes supported.
+        #define CALC(idx,val)						     \
+        {								     \
+          register unsigned int tmp = val;				     \
+          Scan.BlendingTable [idx] [index] = (tmp < max_val) ? tmp : max_val;\
+        }
+        CALC (BLENDTABLE_ADD,       dst + src);
+        CALC (BLENDTABLE_MULTIPLY,  ((dst * src) + (max_val / 2)) >> max_bits);
+        CALC (BLENDTABLE_MULTIPLY2, ((dst * src * 2) + (max_val / 2)) >> max_bits);
+        CALC (BLENDTABLE_ALPHA25,   (dst + src * 3 + 2) / 4);
+        CALC (BLENDTABLE_ALPHA50,   (dst + src + 1) / 2);
+        CALC (BLENDTABLE_ALPHA75,   (dst * 3 + src + 2) / 4);
+        #undef CALC
+        index++;
+      }
+    }
+  } while (index < table_size);
+}
+
 void csScan_Finalize ()
 {
+  for (int i = 0; i < 6; i++)
+    CHKB (delete [] Scan.BlendingTable [i]);
   CHK (delete [] Scan.exp_16);
   CHK (delete [] Scan.exp_256);
   CHK (delete [] Scan.one_div_z);

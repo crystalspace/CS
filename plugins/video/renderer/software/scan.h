@@ -66,6 +66,14 @@ typedef unsigned char RGB8map[256];	// do we need entire soft_txt.h?
 /// Same for QRound (32 * exp (-float (i) / 256.))
 #define EXP_32_SIZE			1065
 
+/// Blending table indices
+#define BLENDTABLE_ADD                  0x00
+#define BLENDTABLE_MULTIPLY             0x01
+#define BLENDTABLE_MULTIPLY2            0x02
+#define BLENDTABLE_ALPHA25              0x03
+#define BLENDTABLE_ALPHA50              0x04
+#define BLENDTABLE_ALPHA75              0x05
+
 //---//---//---//---//---//---//---//---//---//---//---/ Precomputed data /---//
 
 /*
@@ -121,9 +129,6 @@ struct csScanSetup
   /// Height of unlighted texture.
   int th;
 
-  /// SJI: dynamic lighting.
-  unsigned char *LightTable;
-
   /**
    * The following fields are used by the polygon drawer
    * and contain information fot calculating the 1/z, u/z, and v/z linear
@@ -176,6 +181,9 @@ struct csScanSetup
   /// Set up by poly renderer to alpha blending table
   RGB8map *AlphaMap;
 
+  /// Current blending table
+  unsigned char *BlendTable;
+
   /**
    * These tables are used for bilinear filtering. This feature is still
    * (and IMHO, till Merced III-10GHz, will remain) experimental. - D.D.
@@ -191,7 +199,7 @@ struct csScanSetup
    * This table is really two tables in one (they have the same size --
    * notice the 2 as a multiplier). It removes all the multiplications from
    * the function. Sorry for lack of details, but there's a lot to be said.
-   * If you really want to know what is this table for, see "math3d.cpp" and
+   * If you really want to know what is this table for, see "scan.cpp" and
    * "scan16.cpp" -- generation of the table, and it's usage respectively.
    */
   unsigned short *color_565_table;
@@ -211,6 +219,14 @@ struct csScanSetup
    * Same in the range 0..31 for 8-bit fog
    */
   unsigned char *exp_16;
+
+  /**
+   * This table contains eight subtables - one for each available blending
+   * mode (see BLENDTABLE_XXX constants). Since SRC can be twice brighter
+   * than maximum, BlendingTable has a twice larger SRC dimension (i.e.
+   * it is a (BLENDTABLE_MAX*2 x BLENDTABLE_MAX) matrix);
+   */
+  unsigned char *BlendingTable [6];
 };
 
 /// The only instance of this structure
@@ -228,13 +244,7 @@ typedef void (csDrawPIScanline)
 typedef void (csDrawPIScanlineGouraud)
   (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
    unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-   ULong r, ULong g, ULong b, long dr, long dg, long db);
-/// The interface definition for all draw_pi_scanline_XXX_fx_XXX routines
-typedef void (csDrawPIScanlineFX)
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-   ULong r, ULong g, ULong b, long dr, long dg, long db,
-   UByte* BlendingTable);
+   ULong r, ULong g, ULong b, long dr, long dg, long db, bool clamp);
 
 //---//---//---//---//---//---//---//---//---//---//---//---//- Routines //---//
 
@@ -242,6 +252,8 @@ typedef void (csDrawPIScanlineFX)
 extern "C" void csScan_Initialize ();
 /// Free all tables
 extern "C" void csScan_Finalize ();
+/// Calculate blending tables (should be called each time pixel format changes)
+extern "C" void csScan_CalcBlendTables (int rbits, int gbits, int bbits);
 /// Initialize the scanline variables
 extern "C" void csScan_InitDraw (csGraphics3DSoftware* g3d,
   IPolygonTexture* tex, csTextureMMSoftware* texture, csTexture* untxt);
@@ -249,6 +261,8 @@ extern "C" void csScan_InitDraw (csGraphics3DSoftware* g3d,
 extern "C" void csScan_dump (csGraphics3DSoftware* pG3D);
 /// Pixel-depth independent routine
 extern "C" csDrawScanline csScan_draw_scanline_zfil;
+/// Pixel-depth independent routine
+extern "C" csDrawPIScanline csScan_draw_pi_scanline_zfil;
 
 //---//---//---//---//---//---//---//---//---//-- 8-bit drawing routines //---//
 
@@ -287,23 +301,12 @@ extern "C" csDrawScanline csScan_8_draw_scanline_map_alpha1;
 /// Draw one horizontal scanline (lighting and alpha transparency).
 extern "C" csDrawScanline csScan_8_draw_scanline_map_alpha2;
 
-/// Draw one horizontal scanline (lighting and uniform lighting).
-extern "C" csDrawScanline csScan_8_draw_scanline_map_light;
-/// Draw one horizontal scanline (Z buffer, lighting and uniform lighting).
-extern "C" csDrawScanline csScan_8_draw_scanline_map_light_zuse;
-
 #ifdef DO_MMX
 /// Draw one horizontal scanline (lighting) using MMX
 extern "C" csDrawScanline csScan_8_mmx_draw_scanline_map_zfil;
 /// Draw one horizontal scanline (no lighting) using MMX
 extern "C" csDrawScanline csScan_8_mmx_draw_scanline_tex_zfil;
 #endif
-
-/**
-  * empty dummyfunction to avoid crashs when calling the nondefined versions 
-  * in the 8 Bit renderer.
-  */
-extern "C" csDrawPIScanlineFX      csScan_8_draw_pifx_scanline_dummy;
 
 /*
  * The following methods are used by DrawPolygonFX() and do not require
@@ -408,21 +411,21 @@ extern "C" csDrawPIScanlineGouraud csScan_16_draw_pi_scanline_flat_gouraud_zuse_
 extern "C" csDrawPIScanlineGouraud csScan_16_draw_pi_scanline_flat_gouraud_zuse_565;
 
 /// Draw a perspective-incorrect polygon scanline with various effects Z fill only
-extern "C" csDrawPIScanlineFX csScan_16_draw_pifx_scanline_zfil_555;
+extern "C" csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_zfil_555;
 /// Draw a perspective-incorrect polygon scanline with various effects Z fill only
-extern "C" csDrawPIScanlineFX csScan_16_draw_pifx_scanline_zfil_565;
+extern "C" csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_zfil_565;
 /// Draw a perspective-incorrect polygon scanline with various effects
-extern "C" csDrawPIScanlineFX csScan_16_draw_pifx_scanline_zuse_555;
+extern "C" csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_zuse_555;
 /// Draw a perspective-incorrect polygon scanline with various effects
-extern "C" csDrawPIScanlineFX csScan_16_draw_pifx_scanline_zuse_565;
+extern "C" csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_zuse_565;
 /// Draw a perspective-incorrect polygon scanline with various effects Z fill only (colorkeying)
-extern "C" csDrawPIScanlineFX csScan_16_draw_pifx_scanline_transp_zfil_555;
+extern "C" csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_transp_zfil_555;
 /// Draw a perspective-incorrect polygon scanline with various effects Z fill only (colorkeying)
-extern "C" csDrawPIScanlineFX csScan_16_draw_pifx_scanline_transp_zfil_565;
+extern "C" csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_transp_zfil_565;
 /// Draw a perspective-incorrect polygon scanline with various effects (colorkeying)
-extern "C" csDrawPIScanlineFX csScan_16_draw_pifx_scanline_transp_zuse_555;
+extern "C" csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_transp_zuse_555;
 /// Draw a perspective-incorrect polygon scanline with various effects (colorkeying)
-extern "C" csDrawPIScanlineFX csScan_16_draw_pifx_scanline_transp_zuse_565;
+extern "C" csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_transp_zuse_565;
 
 //---//---//---//---//---//---//---//---//---//- 32-bit scanline drawers //---//
 
@@ -483,15 +486,15 @@ extern "C" csDrawPIScanlineGouraud csScan_32_draw_pi_scanline_tex_gouraud_zfil;
 extern "C" csDrawPIScanlineGouraud csScan_32_draw_pi_scanline_tex_gouraud_zuse;
 
 /// Draw a perspective-incorrect polygon scanline with various effects Z fill only
-extern "C" csDrawPIScanlineFX csScan_32_draw_pifx_scanline_zfil;
+extern "C" csDrawPIScanlineGouraud csScan_32_draw_pifx_scanline_zfil;
 
 /// Draw a perspective-incorrect polygon scanline with various effects
-extern "C" csDrawPIScanlineFX csScan_32_draw_pifx_scanline_zuse;
+extern "C" csDrawPIScanlineGouraud csScan_32_draw_pifx_scanline_zuse;
 
 /// Draw a perspective-incorrect polygon scanline with various effects Z fill (colorkeying)
-extern "C" csDrawPIScanlineFX csScan_32_draw_pifx_scanline_transp_zfil;
+extern "C" csDrawPIScanlineGouraud csScan_32_draw_pifx_scanline_transp_zfil;
 
 /// Draw a perspective-incorrect polygon scanline with various effects (colorkeying)
-extern "C" csDrawPIScanlineFX csScan_32_draw_pifx_scanline_transp_zuse;
+extern "C" csDrawPIScanlineGouraud csScan_32_draw_pifx_scanline_transp_zuse;
 
 #endif // __SCAN_H__
