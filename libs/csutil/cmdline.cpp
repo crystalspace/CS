@@ -36,6 +36,11 @@ struct csCommandLineOption
   { delete [] Name; delete [] Value; }
 };
 
+csCommandLineParser::csCommandLineOptionVector::~csCommandLineOptionVector ()
+{
+  DeleteAll ();
+}
+
 bool csCommandLineParser::csCommandLineOptionVector::FreeItem (csSome item)
 {
   delete ((csCommandLineOption*)item);

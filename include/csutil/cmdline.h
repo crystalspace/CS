@@ -36,6 +36,7 @@ private:
   class csCommandLineOptionVector : public csCommandLineOptionVectorHelper
   {
   public:
+    virtual ~csCommandLineOptionVector ();
     virtual bool FreeItem (csSome item);
     virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
   };
