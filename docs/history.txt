@@ -2,9 +2,23 @@ The history order has been reversed so that new features are at the top.
 
 3-Aug-2000
 	- Samuel Humphreys did the following:
-	    - Rearranged perftest for 2d testing aswell. Added tests for pixmaps,
-              lines, pixels and text.
+	    - Rearranged perftest for 2d testing aswell. Added tests for
+	      pixmaps, lines, pixels and text.
+	- Alex Pfaffe commited a few fixes to terrain engine (still not
+	  working properly though).
+	- Renamed csPluginCollider to csCollider. This class is a conveniance
+	  class that csengine users can use to attach iCollider's to
+	  engine objects (or game objects). Usage of this class is optional
+	  and the engine will never use it itself.
+	- Fixed WalkTest so that it REALLY compiles now.
 2-Aug-2000
+	- Martin Geisse added 2d animations and aligned pixmaps.
+	- Norman Kramer fixed funcon plugin so that use_fog=false for DPFX.
+	- Norman also fixed the glx2d canvas because color shift values
+	  were not computed.
+	- Norman did the following change to OpenGL renderer: after Open the
+	  pixelformat is requested from the G2D (since they are calculated
+	  there after window open only).
 	- Changed API in iCollideSystem to make it easier to collect
 	  collisions with multiple objects.
 	- Added csPolygonSet::GetRadius() which will return the radius

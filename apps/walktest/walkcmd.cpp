@@ -59,7 +59,6 @@
 #include "isndrdr.h"
 #include "igraph3d.h"
 #include "ivfs.h"
-#include "csengine/rapid.h"
 
 extern WalkTest* Sys;
 

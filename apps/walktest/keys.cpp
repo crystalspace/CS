@@ -49,7 +49,6 @@
 #include "csparser/crossbld.h"
 #include "csgeom/math3d.h"
 #include "igraph3d.h"
-#include "csengine/rapid.h"
 
 extern WalkTest* Sys;
 

@@ -21,63 +21,54 @@
 #include "csengine/collider.h"
 #include "icollide.h"
 
-csCollider::csCollider (csObject &parent)
-{
-  parent.ObjAdd(this);
-}
-
-IMPLEMENT_CSOBJTYPE (csCollider, csObject);
 
 //----------------------------------------------------------------------
 
-csPluginCollider::csPluginCollider (csObject& parent,
+IMPLEMENT_CSOBJTYPE (csCollider, csObject);
+
+csCollider::csCollider (csObject& parent,
 	iCollideSystem* collide_system,
-	iPolygonMesh* mesh) : csCollider (parent)
+	iPolygonMesh* mesh)
 {
-  csPluginCollider::collide_system = collide_system;
+  parent.ObjAdd (this);
+  csCollider::collide_system = collide_system;
   collide_system->IncRef ();
   collider = collide_system->CreateCollider (mesh);
-  m_CollisionDetectionActive = true;
 }
 
-csPluginCollider::~csPluginCollider ()
+csCollider::~csCollider ()
 {
   collide_system->DecRef ();
   collider->DecRef ();
 }
 
-bool csPluginCollider::Collide (csObject &otherObject,
-                               csTransform *pThisTransform,
-                               csTransform *pOtherTransform) 
+bool csCollider::Collide (csObject& otherObject,
+                          csTransform* pThisTransform,
+                          csTransform* pOtherTransform) 
 {
-  csPluginCollider *pOtherCollider = GetPluginCollider (otherObject);
+  csCollider *pOtherCollider = GetCollider (otherObject);
   if (pOtherCollider)
     return Collide (*pOtherCollider, pThisTransform, pOtherTransform);
   else
     return false;
 }
 
-bool csPluginCollider::Collide (csCollider &otherCollider, 
-                               csTransform *pTransform1, 
-                               csTransform *pTransform2)
+bool csCollider::Collide (csCollider& otherCollider, 
+                          csTransform* pTransform1, 
+                          csTransform* pTransform2)
 {
-  if (otherCollider.GetType() != csPluginCollider::Type) return false;
-  csPluginCollider *pCollider2 = (csPluginCollider *)&otherCollider;
+  if (otherCollider.GetType() != csCollider::Type) return false;
+  csCollider *pCollider2 = (csCollider *)&otherCollider;
   if (pCollider2 == this) return false;
-  // Skip inactive combinations.
-  if (!m_CollisionDetectionActive || 
-      !pCollider2->m_CollisionDetectionActive) return 0;
 
   return collide_system->Collide (collider, pTransform1,
   	pCollider2->collider, pTransform2);
 }
 
-csPluginCollider *csPluginCollider::GetPluginCollider (csObject &object) 
+csCollider *csCollider::GetCollider (csObject &object) 
 {
-  csObject *o = object.GetChild (csPluginCollider::Type);
-  if (o) return (csPluginCollider*) o;
+  csObject *o = object.GetChild (csCollider::Type);
+  if (o) return (csCollider*) o;
   return NULL;
 }
-
-IMPLEMENT_CSOBJTYPE (csPluginCollider, csCollider);
 

@@ -968,13 +968,13 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
     csSector* sp = (csSector*)world->sectors[sn];
     // Initialize the sector itself.
     mesh = QUERY_INTERFACE (sp, iPolygonMesh);
-    (void)new csPluginCollider (*sp, collide_system, mesh);
+    (void)new csCollider (*sp, collide_system, mesh);
     // Initialize the things in this sector.
     csThing* tp = sp->GetFirstThing ();
     while (tp)
     {
       mesh = QUERY_INTERFACE (tp, iPolygonMesh);
-      (void)new csPluginCollider (*tp, collide_system, mesh);
+      (void)new csCollider (*tp, collide_system, mesh);
       tp = (csThing*)(tp->GetNext ());
     }
   }
@@ -988,7 +988,7 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
     if (sp->GetType () != csSprite3D::Type) continue;
     spp = (csSprite3D*)sp;
     mesh = QUERY_INTERFACE (spp, iPolygonMesh);
-    (void)new csPluginCollider (*spp, collide_system, mesh);
+    (void)new csCollider (*spp, collide_system, mesh);
   }
 
   // Create a player object that follows the camera around.

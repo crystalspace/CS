@@ -29,54 +29,15 @@ struct iPolygonMesh;
 struct iCollideSystem;
 struct iCollider;
 
-/// Abstract class for low level collision detection.
-class csCollider : public csPObject
-{
-protected:
-  /// If true this is an active collision object.
-  bool m_CollisionDetectionActive;
-
-public:
-  /// Create the collider object. The parent of the collider will be null.
-  csCollider ();
-
-  /**
-   * Create the collider object. Sets parent as parent of the collider,
-   * and sets the collider as child of parent.
-   */
-  csCollider (csObject &parent);
-  
-  /// Destroy the collider object.
-  virtual ~csCollider () {}
-
-  /// Enable collision detection for this object.
-  void Activate (bool on) {m_CollisionDetectionActive = on;}
-
-  /**
-   * Check if this collider collides with otherCollider.
-   * Returns true if collision detected and adds the pair to
-   * the collisions hits vector.
-   * This collider and otherCollider must be of comparable subclasses, if
-   * not false is returned.
-   */
-  virtual bool Collide (csCollider &otherCollider,
-                        csTransform *pThisTransform = 0,
-                        csTransform *pOtherTransform = 0) = 0;
-
-  /// Similar to Collide for csCollider.
-  virtual bool Collide (csObject &otherObject,
-                        csTransform *pThisTransform = 0,
-                        csTransform *pOtherTransform = 0) = 0;
-  
-  CSOBJTYPE;
-};
-
 /**
- * Collision detection system using the CD plugin.
- * This is only temporary until the CD plugin is perfectly working
- * and we can remove all internal CD support from the engine.
+ * This is a conveniance object that you can use in your own
+ * games to attach an iCollider object (from the CD plugin system)
+ * to any other csObject (including CS entities). Use of this object
+ * is optional (if you can assign your iCollider's to entities in
+ * another manner then this is ok) and the engine will not use
+ * this object itself.
  */
-class csPluginCollider : public csCollider
+class csCollider : public csPObject
 {
 private:
   iCollideSystem* collide_system;
@@ -84,11 +45,11 @@ private:
 
 public:
   /// Create a collider based on a mesh.
-  csPluginCollider (csObject& parent, iCollideSystem* collide_system,
+  csCollider (csObject& parent, iCollideSystem* collide_system,
   	iPolygonMesh* mesh);
 
   /// Destroy the plugin collider object
-  virtual ~csPluginCollider ();
+  virtual ~csCollider ();
 
   /// Get the collider interface for this object.
   iCollider* GetCollider () { return collider; }
@@ -100,130 +61,21 @@ public:
    * This collider and pOtherCollider must be of comparable subclasses, if
    * not false is returned.
    */
-  virtual bool Collide (csCollider &pOtherCollider,
-                        csTransform *pThisTransform = NULL,
-                        csTransform *pOtherTransform = NULL);
+  bool Collide (csCollider& pOtherCollider,
+                        csTransform* pThisTransform = NULL,
+                        csTransform* pOtherTransform = NULL);
   /// Similar to Collide for csCollider. Calls GetCollider for otherCollider.
-  virtual bool Collide (csObject &otherObject,
-                        csTransform *pThisTransform = 0,
-                        csTransform *pOtherTransform = 0);
+  bool Collide (csObject& otherObject,
+                        csTransform* pThisTransform = NULL,
+                        csTransform* pOtherTransform = NULL);
 
   /**
    * If object has a child of type csCollider it is returned. Otherwise 0
    * is returned.
    */
-  static csPluginCollider *GetPluginCollider (csObject &object);
+  static csCollider *GetCollider (csObject& object);
   
   CSOBJTYPE;
 };
-
-#if 0
-class csCdModel;
-class csCdBBox;
-class csPolygonSet;
-class csSprite3D;
-struct csCdTriangle;
-struct collision_pair;
-
-/// Low level collision detection using the RAPID algorithm.
-class csRAPIDCollider : public csCollider
-{
-  friend class csCdBBox;
-  friend class csBeing;
-
-  /// The internal collision object.
-  csCdModel* m_pCollisionModel;
-
-  /**
-   * Find the first collision that involved this object, and return who
-   * it was.  This call does not alter queue state.  Return 0 if no
-   * collision involving this object occurred.
-   * Optionally return the triangles involved in the collision.
-   */
-  csRAPIDCollider* FindCollision (csCdTriangle **tr1 = 0, csCdTriangle **tr2 = 0);
-  /// Get top level bounding box.
-  const csCdBBox* GetBbox () const;
-
-  /// Delete and free memory of this objects oriented bounding box.
-  void DestroyBbox ();
-
-  /// Recursively test collisions of bounding boxes.
-  static int CollideRecursive (csCdBBox *b1, csCdBBox *b2,
-  	const csMatrix3& R, const csVector3& T);
-
-  /**
-    * Global variables
-    * Matrix, and Vector used for collision testing.
-    */
-  static csMatrix3 mR;
-  static csVector3 mT;
-  /**
-   * Statistics, to allow early bailout.
-   * If the number of triangles tested is too high the BBox structure
-   * probably isn't very good.
-   */
-  static int trianglesTested;		// TEMPORARY.
-  /// The number of boxes tested.
-  static int boxesTested;		// TEMPORARY.
-  /**
-   * If bbox is less than this size, dont bother testing further,
-   * just return with the results so far.
-   */
-  static float minBBoxDiam;
-  /// Number of levels to test.
-  static int testLevel;
-  /// Test only up to the 1st hit.
-  static bool firstHit;
-
-  void PolygonInitialize (csPolygonSet *ps);
-  void Sprite3DInitialize (csSprite3D *sp);
-  
-public:
-
-  static int numHits;
- 
-  /// Create a collider based on a csPolygonSet.
-  csRAPIDCollider (csPolygonSet *ps);
-  csRAPIDCollider (csObject &parent, csPolygonSet *ps);
-  /// Create a collider based on a Sprite3D.
-  csRAPIDCollider (csSprite3D *sp);
-  csRAPIDCollider (csObject &parent, csSprite3D *sp);
-
-  /// Destroy the RAPID collider object
-  virtual ~csRAPIDCollider();
-
-  /**
-   * Check if this collider collides with pOtherCollider.
-   * Returns true if collision detected and adds the pair to the collisions
-   * hists vector.
-   * This collider and pOtherCollider must be of comparable subclasses, if
-   * not false is returned.
-   */
-  virtual bool Collide (csCollider &pOtherCollider,
-                        csTransform *pThisTransform = NULL,
-                        csTransform *pOtherTransform = NULL);
-  /// Similar to Collide for csCollider. Calls GetCollider for otherCollider.
-  virtual bool Collide (csObject &otherObject,
-                        csTransform *pThisTransform = 0,
-                        csTransform *pOtherTransform = 0);
-
-  /// Query the array with collisions (and their count).
-  static collision_pair *GetCollisions ();
-
-  static void CollideReset ();
-  static void SetFirstHit (bool fh) {firstHit = fh;}
-  static bool GetFirstHit () {return firstHit;}
-  static int Report (csCollider **id1, csCollider **id2);
-  const csVector3 &GetRadius() const;
-
-  /**
-   * If object has a child of type csCollider it is returned. Otherwise 0
-   * is returned.
-   */
-  static csRAPIDCollider *GetRAPIDCollider (csObject &object);
-  
-  CSOBJTYPE;
-};
-#endif
 
 #endif // __CS_COLLIDER_H__

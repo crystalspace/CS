@@ -42,7 +42,6 @@
 #include "csengine/collider.h"
 #include "csengine/cspixmap.h"
 #include "csengine/cssprite.h"
-#include "csengine/rapid.h"
 #include "csengine/terrain.h"
 #include "csparser/impexp.h"
 #include "csutil/inifile.h"
@@ -131,7 +130,7 @@ void WalkTest::CreateColliders ()
   p->AddVertex (7); p->AddVertex (3);
 
   mesh = QUERY_INTERFACE (plbody, iPolygonMesh);
-  body = new csPluginCollider (*plbody, collide_system, mesh);
+  body = new csCollider (*plbody, collide_system, mesh);
   body_radius = plbody->GetRadius ();
 
   pllegs = new csPolygonSet (world);
@@ -177,7 +176,7 @@ void WalkTest::CreateColliders ()
   p->AddVertex (7); p->AddVertex (3);
 
   mesh = QUERY_INTERFACE (pllegs, iPolygonMesh);
-  legs = new csPluginCollider (*pllegs, collide_system, mesh);
+  legs = new csCollider (*pllegs, collide_system, mesh);
   legs_radius = pllegs->GetRadius ();
 
   if (!body || !legs)
@@ -217,7 +216,7 @@ int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa)
   return c;
 }
 
-int CollisionDetect (csPluginCollider *c, csSector* sp, csTransform *cdt)
+int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
 {
   int hit = 0;
 

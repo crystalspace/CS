@@ -55,7 +55,6 @@
 #include "isndrdr.h"
 #include "igraph3d.h"
 #include "icollide.h"
-#include "csengine/rapid.h"
 
 extern WalkTest* Sys;
 
@@ -685,7 +684,7 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth,
   csSprite3D* spr = add_sprite (skelname, "__skelghost__", where, pos, 1);
   spr->SetMixmode (CS_FX_SETALPHA (0.75));
   iPolygonMesh* mesh = QUERY_INTERFACE (spr, iPolygonMesh);
-  (void)new csPluginCollider (*spr, Sys->collide_system, mesh);
+  (void)new csCollider (*spr, Sys->collide_system, mesh);
   GhostSpriteInfo* gh_info = new GhostSpriteInfo ();
   spr->ObjAdd (gh_info);
   gh_info->dir = 1;
@@ -695,13 +694,13 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth,
 #define MAXSECTORSOCCUPIED  20
 
 extern int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa);
-extern int CollisionDetect (csPluginCollider *c, csSector* sp, csTransform *cdt);
-extern collision_pair our_cd_contact[1000];//=0;
+extern int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt);
+extern csCollisionPair our_cd_contact[1000];//=0;
 extern int num_our_cd;
 
 void move_ghost (csSprite3D* spr)
 {
-  csPluginCollider* col = csPluginCollider::GetPluginCollider (*spr);
+  csCollider* col = csCollider::GetCollider (*spr);
   csSector* first_sector = spr->GetSector (0);
 
   // Create a transformation 'test' which indicates where the ghost
@@ -729,8 +728,8 @@ void move_ghost (csSprite3D* spr)
   // Change our velocity according to the collisions.
   for (int j=0 ; j<hits ; j++)
   {
-    csCdTriangle *wall = our_cd_contact[j].tr2;
-    csVector3 n = ((wall->p3-wall->p2)%(wall->p2-wall->p1)).Unit();
+    csCollisionPair& cd = our_cd_contact[j];
+    csVector3 n = ((cd.c2-cd.b2)%(cd.b2-cd.a2)).Unit();
     if (n*vel<0)
       continue;
     vel = -(vel%n)%n;

@@ -124,8 +124,8 @@ public:
   csVector3 angle_velocity;
 
   /// Colliders for "legs" and "body". Intersections are handled differently.
-  csPluginCollider *legs;
-  csPluginCollider *body;
+  csCollider *legs;
+  csCollider *body;
   csVector3 body_radius, legs_radius;
 
   /// Vector with recorded camera transformations.
