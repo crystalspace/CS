@@ -1,9 +1,23 @@
 The history order is reversed so that new features are at the top.
 
 7-Oct-2002
-	- Eric Sunshine fixed Texinfo error reported by makeinfo.
-	- Eric Sunshine made aesthetic improvements to FAQ.
-	- Removed some obsolete texmem.* files in the 3D renderer directories.
+	- Removed some obsolete texmem.{cpp|h} files in the 3D renderer
+	  directories.
+	- Eric Sunshine made the following documentation-related changes:
+	    - Fixed Texinfo error reported by makeinfo.
+	    - Made aesthetic improvements to FAQ.
+	    - Worked around problem in Texinfo files where some versions of
+	      makeinfo are pickier than others and dislike @xref{} references
+	      which span multiple lines.
+	    - Updated the Apple/NeXT build and platform-internal documentation
+	      to reflect fact that it is now possible to launch applications by
+	      double-clicking on them from the Finder or Workspace.
+	    - Greatly expanded the discussion of CrystalSpaceRoot for the
+	      Apple/NeXT platforms and gave it a more prominent position in the
+	      documentation since it is important for people to set it if they
+	      wish to launch applications from the Finder or Workspace.
+	    - Apple/NeXT build instructions now talk about the makefile
+	      "install" target, as well as INSTALL_DIR.
 6-Oct-2002
 	- Eric Sunshine upgraded CS/docs/texinfo/texinfo.tex to the most recent
 	  version.

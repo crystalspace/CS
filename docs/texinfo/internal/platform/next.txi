@@ -15,7 +15,7 @@
 
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Copyright
 @copyright{} 1999, 2000, 2001, 2002 by Eric Sunshine.  Last updated
-18 September 2002.}
+7 October 2002.}
 
 Crystal Space was ported to MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep,
 and NextStep by Eric Sunshine.  If you have questions or comments about this
@@ -814,42 +814,6 @@ Create native AppKit cursors for @sc{csws} cursors.
 Write an Apple/@NeXT{} @samp{line} canvas which utilizes @samp{NSBezierPath} on
 MacOS/X and MacOS/X Server 1.0 (Rhapsody), and which utilizes PostScript
 primitives on OpenStep and NextStep.
-@end itemize
-
-@cindex @sc{n}e@sc{xt} Bugs
-@subsubheading Bugs
-
-This is a list of known problems with the current release of this project:
-
-@itemize @bullet
-@item
-It is not currently possible to launch the Crystal Space demonstration
-applications by double-clicking on them in the Viewer application in MacOS/X
-Server, or from the the Workspace Manager's File Viewer on OpenStep and
-NextStep.  This problem is a result of a limitation of Viewer and Workspace
-Manager applications.  When the Crystal Space demonstration applications are
-launched, they expect to find the configuration files @file{scf.cfg} and
-@file{vfs.cfg} in the @dfn{current directory}---which is generally the same
-directory in which the Crystal Space applications reside.  Unfortunately,
-neither Viewer nor Workspace Manager provide the necessary information for
-Crystal Space to locate these administrative files.  Therefore, at this time,
-all Crystal Space applications @emph{must} be launched from the command-line.
-The proper solution to this problem is to place each Crystal Space application
-within its own application wrapper (@file{.app}) at build time.  Doing so,
-however, will require a certain amount of re-work of the makefile system.  It
-is also not clear as to precisely which resources should be relocated into the
-application wrapper.
-
-@item
-One attempt to solve the problem of not being able to launch an application via
-double-click (distinct from creating an application wrapper) was the
-introduction of a default, @samp{CrystalSpaceRoot}, which tells the application
-where the root of the Crystal Space resource hierarchy resides.  This setting
-does allow applications to be launched via a double-click in NextStep, however
-it fails on OpenStep.  It is suspected that the problem has to do with the fact
-that the Workspace provides no path information whatsoever (not even in
-@code{argv[0]}).  Although the application wrapper is ultimately a better
-solution, it is still worthwhile to resolve this issue.
 @end itemize
 
 @unmacro NeXT
