@@ -102,9 +102,10 @@ void NeXTSystemDriver::init_menu(iConfigFile* next_config)
 
 //-----------------------------------------------------------------------------
 // Loop
-//	Start the application's run-loop.  Is called at application launch time
-//	and each time CSWS launches a modal window.  Returns when application
-//	terminates and when CSWS modal window is dismissed.
+//	Start the application's run-loop.  This method is called exactly once
+//	at application launch time by Crystal Space to begin the run-loop.  It
+//	is illegal to call this method recursively.  Returns when application
+//	terminates.
 //-----------------------------------------------------------------------------
 void NeXTSystemDriver::Loop()
 {
@@ -121,7 +122,7 @@ void NeXTSystemDriver::Loop()
 void NeXTSystemDriver::advance_state()
 {
   NextFrame();
-  if (!continue_looping())
+  if (!continue_running())
     NeXTDelegate_stop_event_loop(controller);
 }
 
@@ -134,11 +135,6 @@ void NeXTSystemDriver::advance_state()
 //	advancestate
 //	    Sent by some mechanism on a periodic basis to trigger invocation
 //	    of the NextFrame() method.
-//	continuelooping <int*>
-//	    Query whether or not the application's event loop should continue
-//	    running.  The result is returned as a boolean result in the integer
-//	    variable referenced by the argument.  Returns `true' if the system
-//	    driver variable Shutdown is false.
 //	continuerunning <int*>
 //	    Query whether or not the application's event loop should continue
 //	    running.  The result is returned as a boolean result in the integer
@@ -193,9 +189,6 @@ bool NeXTSystemDriver::PerformExtensionV(char const* cmd, va_list args)
   STR_SWITCH (cmd)
     STR_CASE (advancestate)
       advance_state();
-    STR_CASE (continuelooping)
-      int* flag = AGET(int*);
-      *flag = continue_looping();
     STR_CASE (continuerunning)
       int* flag = AGET(int*);
       *flag = continue_running();

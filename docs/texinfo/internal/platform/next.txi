@@ -276,48 +276,36 @@ Utility functions for manipulation of page-aligned memory blocks for the
 @cindex @sc{n}e@sc{xt} Run-Loop
 
 The design of Crystal Space assumes that the programmer has full control over
-the application's run-loop.  It further assumes that the run-loop is
-re-entrant.  The Crystal Space Windowing System, or @sc{csws} (@pxref{CSWS}),
-for instance, recursively invokes the run-loop each time it initiates a modal
-session, such as when a modal panel is placed on-screen.
-
-With most ports of Crystal Space, this is not a problem since the main
-run-loop is generally implemented in this fashion:
+the application's run-loop.  With most ports of Crystal Space, this is not a
+problem since the main run-loop is generally implemented in this fashion:
 
 @example
-csSystemDriver::Loop() @{
-    while (!Shutdown) @{
-        NextFrame(); // @r{Process events and render next frame.}
-    @}
+csSystemDriver::Loop()
+@{
+  while (!Shutdown)
+    NextFrame(); // @r{Process events and render next frame.}
 @}
 @end example
-
-In this simple form it is generally safe to call @code{Loop()} recursively.
-Even if there is some risk involved with recursive invocations, such
-situations can usually be handled specially since the run-loop is under
-programmer control.
 
 With the AppKit, on the other hand, the main run-loop is not accessible to the
-programmer and is essentially a black-box.  Furthermore, the application's
-@samp{-run} method which encapsulates the run-loop is not re-entrant.  In
-other words, the naive implementation of @code{Loop()} as shown below does not
-work properly when called recursively.
+programmer and is essentially a black-box.  The above mechanism is easily
+emulated with the AppKit using the following code:
 
 @example
-NeXTSystemDriver::Loop() @{
-    [NSApp run];
+NeXTSystemDriver::Loop()
+@{
+  [NSApp run];
 @}
 @end example
 
-This makes it difficult to conform to Crystal Space's assumptions about the
-run-loop.  Consequently it was necessary to work around the AppKit's
-limitation on recursive invocation of the application's run-loop.
-
-To do so, a category was introduced which extends the AppKit's application
-class with the introduction of a method named @samp{-runRecursively:}.  This
-method, as the name implies, provides the capability of recursive run-loop
-invocation by patching and overriding the default run-loop behavior.  The
-implementation of this method is contained in @file{NeXTDelegate.m}.
+This code launches the AppKit's run-loop but does not address the problem of
+periodically invoking Crystal Space's @code{iSystem::NextFrame()} method.  To
+solve this problem @samp{NeXTDelegate} artifically injects
+@dfn{application-defined} events into the AppKit event queue and then triggers
+an invocation of @code{NextFrame()} for each such received event.  In
+particular, a single application-defined event is injected into the event queue
+in order to begin the process, and then an event is injected into the queue
+after each invocation of @code{NextFrame()}.
 
 In the long run, it may be desirable to re-engineer Crystal Space so that it
 runs as a client in a surrounding application framework, rather than forcing
@@ -802,16 +790,6 @@ bounds.
 
 @item
 Support user-initiated canvas resizing in @samp{next2d}.
-
-@item
-Consider ditching the recursive run-loop mechanism and go with a threaded model
-instead.  Since the AppKit and Crystal Space will then each be running in a
-distinct thread, there will no longer be a need for an artificial mechanism
-(such as a timer or event queue feed) for pulsing the engine.  A benefit of
-this approach is that it would facilitate elimination of the recursive run-loop
-hack (@pxref{NeXT Run-Loop}), which is the only place in the entire
-Apple/@NeXT{} port where private (and potentially volatile) AppKit @sc{api} was
-employed.
 
 @item
 Create native AppKit cursors for @sc{csws} cursors.

@@ -133,34 +133,6 @@ enum
   };
 
 
-//-----------------------------------------------------------------------------
-// continue_running
-//-----------------------------------------------------------------------------
-static inline BOOL continue_running(NeXTSystemDriver driver)
-{
-  int run;
-  NeXTSystemDriver_system_extension(driver, "continuerunning", &run);
-  return run;
-}
-
-
-//=============================================================================
-// Category of NSApplication which supports recursive run loops.
-//=============================================================================
-@interface NSApplication (NeXTDelegate)
-- (void)runRecursively:(NeXTSystemDriver)driver;
-@end
-@implementation NSApplication (NeXTDelegate)
-- (void)runRecursively:(NeXTSystemDriver)driver
-{
-  int const was_running = _running; // The old run-loop invocation depth.
-  [self run];
-  if (continue_running(driver))
-    _running = was_running; // Restore old depth rather than terminating.
-}
-@end
-
-
 //=============================================================================
 // Subclass of NSApplication which provides an -applicationDefined: delegate
 // message much like the one provided by the old NextStep Application class.
@@ -220,8 +192,10 @@ static inline BOOL continue_running(NeXTSystemDriver driver)
 //-----------------------------------------------------------------------------
 - (void)applicationDefined:(NSEvent*)e
 {
+  int run;
   NeXTSystemDriver_system_extension(driver, "advancestate");
-  if (!paused && continue_running(driver))
+  NeXTSystemDriver_system_extension(driver, "continuerunning", &run);
+  if (!paused && run)
     [self scheduleEvent];
 }
 
@@ -613,32 +587,18 @@ ND_PROTO(void,init_app_menu)
 
 //-----------------------------------------------------------------------------
 // startEventLoop
-//	Begin running an event-loop.  May be called recursively by CSWS.  Uses
-//	special -runRecursively: method to handle recursive invocations of
-//	event-loop.
-//
-// *CONTINUE-RUNNING*
-//	Since -startEventLoop may be invoked recursively, special care must be
-//	taken to avoid starting the new event-loop if the user has requested
-//	application termination via an external means, such as closing the
-//	AppKit window.  When the user does perform an external request for
-//	termination, we forcibly terminate all CSWS modal loops.
-//	Unfortunately, however, code which employs CSWS may not itself check
-//	that termination has been requested, and may try launching another
-//	modal session by recursively invoking -startEventLoop immediately
-//	following the one which was just forcibly aborted.  In order to prevent
-//	another modal session from actually launching in this circumstance we
-//	check continue_running() before even starting the event-loop.
+//	Begin running the event-loop.  This method will be called when Crystal
+//	Space requests that the event-loop commences running at application
+//	launch time.  Does not return until either user or Crystal Space
+//	requests application termination.  It is illegal to invoke this method
+//	recursively.
 //-----------------------------------------------------------------------------
 - (void)startEventLoop
 {
-  if (continue_running(driver))		// *CONTINUE-RUNNING*
-  {
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    [self scheduleEvent];
-    [NSApp runRecursively:driver];
-    [pool release];
-  }
+  NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+  [self scheduleEvent];
+  [NSApp run];
+  [pool release];
 }
 
 ND_PROTO(void,start_event_loop)(NeXTDelegateHandle handle)

@@ -127,34 +127,6 @@ enum
 };
 
 
-//-----------------------------------------------------------------------------
-// continue_running
-//-----------------------------------------------------------------------------
-static inline BOOL continue_running(NeXTSystemDriver driver)
-{
-  int run;
-  NeXTSystemDriver_system_extension(driver, "continuerunning", &run);
-  return run;
-}
-
-
-//=============================================================================
-// Category of Application which supports recursive run loops.
-//=============================================================================
-@interface Application (NeXTDelegate)
-- (void)runRecursively:(NeXTSystemDriver)driver;
-@end
-@implementation Application (NeXTDelegate)
-- (void)runRecursively:(NeXTSystemDriver)driver
-{
-  int const was_running = running; // The old run-loop invocation depth.
-  [self run];
-  if (continue_running(driver))
-    running = was_running; // Restore old depth rather than terminating.
-}
-@end
-
-
 //=============================================================================
 // NeXTDelegate Implementation
 //=============================================================================
@@ -198,8 +170,10 @@ static inline BOOL continue_running(NeXTSystemDriver driver)
 //-----------------------------------------------------------------------------
 - (id)applicationDefined:(NXEvent*)e
 {
+  int run;
   NeXTSystemDriver_system_extension(driver, "advancestate");
-  if (!paused && continue_running(driver))
+  NeXTSystemDriver_system_extension(driver, "continuerunning", &run);
+  if (!paused && run)
     [self scheduleEvent];
   return self;
 }
@@ -596,30 +570,16 @@ ND_PROTO(void,init_app_menu)
 
 //-----------------------------------------------------------------------------
 // startEventLoop
-//	Begin running an event-loop.  May be called recursively by CSWS.  Uses
-//	special -runRecursively: method to handle recursive invocations of
-//	event-loop.
-//
-// *CONTINUE-RUNNING*
-//	Since -startEventLoop may be invoked recursively, special care must be
-//	taken to avoid starting the new event-loop if the user has requested
-//	application termination via an external means, such as closing the
-//	AppKit window.  When the user does perform an external request for
-//	termination, we forcibly terminate all CSWS modal loops.
-//	Unfortunately, however, code which employs CSWS may not itself check
-//	that termination has been requested, and may try launching another
-//	modal session by recursively invoking -startEventLoop immediately
-//	following the one which was just forcibly aborted.  In order to prevent
-//	another modal session from actually launching in this circumstance we
-//	check continue_running() before even starting the event-loop.
+//	Begin running the event-loop.  This method will be called when Crystal
+//	Space requests that the event-loop commences running at application
+//	launch time.  Does not return until either user or Crystal Space
+//	requests application termination.  It is illegal to invoke this method
+//	recursively.
 //-----------------------------------------------------------------------------
 - (void)startEventLoop
 {
-  if (continue_running(driver))		// *CONTINUE-RUNNING*
-  {
-    [self scheduleEvent];
-    [NXApp runRecursively:driver];
-  }
+  [self scheduleEvent];
+  [NXApp run];
 }
 
 ND_PROTO(void,start_event_loop)(NeXTDelegateHandle handle)

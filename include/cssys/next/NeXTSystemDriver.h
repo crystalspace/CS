@@ -37,7 +37,6 @@ private:
   void init_menu(iConfigFile*);
   void advance_state();			// Calls NextFrame(), etc.
   bool continue_running() const { return !Shutdown; }
-  bool continue_looping() const { return (continue_running()); }
 
 public:
   SCF_DECLARE_IBASE_EXT(csSystemDriver);
@@ -48,7 +47,6 @@ public:
   virtual bool PerformExtensionV(char const*, va_list);
   virtual void Loop();
 
-  // Implement iEventPlug interface.
   struct NeXTSystemEventPlug : public iEventPlug
   {
     SCF_DECLARE_EMBEDDED_IBASE(NeXTSystemDriver);
