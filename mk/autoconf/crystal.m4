@@ -105,10 +105,8 @@ AS_IF([test "$cs_sdk" = yes && test "$enable_cstest" = yes],
 	    [#include <cssysdef.h>
 	    #include <csutil/scf.h>
 	    #include <stdio.h>
-	    #include <stdlib.h>
-	    CS_IMPLEMENT_APPLICATION],
+	    #include <stdlib.h>],
 	    [scfInitialize(0,0);
-	    CS_STATIC_VARIABLE_CLEANUP
 	    iSCF::SCF->Finish();])],
 	[CS_CREATE_TUPLE([$CRYSTAL_CFLAGS],[],[$CRYSTAL_LIBS])], [C++],
 	[], [cs_sdk=no])])
