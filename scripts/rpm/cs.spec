@@ -1,6 +1,6 @@
 %define name    crystalspace
 %define version 0.99
-%define release 10
+%define release 11
 %define prefix	/usr
 
 %define with_DEBUG 0
@@ -147,6 +147,9 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/%{name}/*
 
 %changelog
+* Fri Mar 25 2005 Frank Richter <resqu@gmx.ch> 0.99-11
+- The CSWS library has been retired.
+
 * Sun Feb 27 2005 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-10
 - Cleanup (using more wildcards, %exclude and %{_bindir}).
 
