@@ -12,6 +12,10 @@ The history order is reversed so that new features are at the top.
 	  variables in wavefile.cpp.
 	- Eric Sunshine eliminated several compilation warnings from NeXTView.m
 	  and NeXTDelegate2D.m by including needed header files on MacOS/X.
+	- Eric Sunshine eliminated several compilation warnings from
+	  inf_g3d.cpp regarding mismatch of printf() format directive and
+	  incoming argument.  The warnings were caused by different definitions
+	  of cs_time on various platforms.
 23-May-2001
 	- Added 'virtual' before the csView destructor and also fixed a
 	  warning in the csView constructor.

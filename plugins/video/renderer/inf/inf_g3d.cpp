@@ -149,10 +149,10 @@ void csGraphics3DInfinite::Close()
   printf ("   # DrawPolygonFX: %d (inside DTM)\n", num_drawpolygonfx_mesh);
   printf ("# DrawPolygonMesh: %d\n", num_drawpolymesh);
   printf ("   # DrawPolygon: %d (inside DPM)\n", num_drawpolygon_mesh);
-  printf ("Time spend in 3D rendering: %ld\n", total_3d_time);
-  printf ("Time spend in 2D rendering: %ld\n", total_2d_time);
-  printf ("Time spend while not rendering: %ld\n", total_none_time);
-  printf ("Total time : %ld\n", total_time);
+  printf ("Time spend in 3D rendering: %ld\n", (long)total_3d_time);
+  printf ("Time spend in 2D rendering: %ld\n", (long)total_2d_time);
+  printf ("Time spend while not rendering: %ld\n", (long)total_none_time);
+  printf ("Total time : %ld\n", (long)total_time);
   printf ("Average FPS: %f\n", 1000. * (float)num_frames / (float)total_time);
   if (do_overdraw)
   {
