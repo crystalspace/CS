@@ -23,7 +23,7 @@
 
 struct iCacheManager;
 
-SCF_VERSION (iLightingInfo, 0, 2, 0);
+SCF_VERSION (iLightingInfo, 0, 3, 0);
 
 /**
  * This interface is implemented by mesh objects that have some kind
@@ -71,26 +71,16 @@ struct iLightingInfo : public iBase
   virtual const csColor& GetDynamicAmbientLight () = 0;
 
   /**
-   * Indicate that some dynamic light has changed. This function will
-   * be called by the lighting system whenever a dynamic light that
+   * Indicate that some light has changed. This function will
+   * be called by the lighting system whenever a light that
    * affects this mesh is changed in some way.
    */
-  virtual void DynamicLightChanged (iLight* dynlight) = 0;
+  virtual void LightChanged (iLight* light) = 0;
 
   /**
-   * Indicate that some dynamic light no longer affects this mesh.
+   * Indicate that some light no longer affects this mesh.
    */
-  virtual void DynamicLightDisconnect (iLight* dynlight) = 0;
-
-  /**
-   * Indicate that some pseudo-dynamic light has changed color.
-   */
-  virtual void StaticLightChanged (iLight* statlight) = 0;
-
-  /**
-   * Indicate that some pseudo-dynamic light no longer affects this mesh.
-   */
-  virtual void StaticLightDisconnect (iLight* statlight) = 0;
+  virtual void LightDisconnect (iLight* light) = 0;
 };
 
 #endif // __CS_IMESH_LIGHTING_H__

@@ -275,35 +275,23 @@ void csBezierMesh::MarkLightmapsDirty ()
   light_version++;
 }
 
-void csBezierMesh::DynamicLightChanged (iLight* /*dynlight*/)
+void csBezierMesh::LightChanged (iLight* /*light*/)
 {
   MarkLightmapsDirty ();
 }
 
-void csBezierMesh::DynamicLightDisconnect (iLight* dynlight)
+void csBezierMesh::LightDisconnect (iLight* light)
 {
   MarkLightmapsDirty ();
   int i;
+  int dt = light->GetDynamicType ();
   for (i = 0; i < curves.Length (); i++)
   {
     csCurve *c = GetCurve (i);
-    c->DynamicLightDisconnect (dynlight);
-  }
-}
-
-void csBezierMesh::StaticLightChanged (iLight* /*statlight*/)
-{
-  MarkLightmapsDirty ();
-}
-
-void csBezierMesh::StaticLightDisconnect (iLight* statlight)
-{
-  MarkLightmapsDirty ();
-  int i;
-  for (i = 0; i < curves.Length (); i++)
-  {
-    csCurve *c = GetCurve (i);
-    c->StaticLightDisconnect (statlight);
+    if (dt == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
+      c->DynamicLightDisconnect (light);
+    else
+      c->StaticLightDisconnect (light);
   }
 }
 

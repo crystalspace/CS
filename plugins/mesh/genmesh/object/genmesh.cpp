@@ -420,27 +420,14 @@ void csGenmeshMeshObject::PrepareLighting ()
 {
 }
 
-void csGenmeshMeshObject::DynamicLightChanged (iLight* dynlight)
+void csGenmeshMeshObject::LightChanged (iLight*)
 {
-  (void)dynlight;
   lighting_dirty = true;
 }
 
-void csGenmeshMeshObject::DynamicLightDisconnect (iLight* dynlight)
+void csGenmeshMeshObject::LightDisconnect (iLight* light)
 {
-  affecting_lights.Delete (dynlight);
-  lighting_dirty = true;
-}
-
-void csGenmeshMeshObject::StaticLightChanged (iLight* statlight)
-{
-  (void)statlight;
-  lighting_dirty = true;
-}
-
-void csGenmeshMeshObject::StaticLightDisconnect (iLight* statlight)
-{
-  affecting_lights.Delete (statlight);
+  affecting_lights.Delete (light);
   lighting_dirty = true;
 }
 
@@ -627,10 +614,11 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
 
   if (!dyn)
   {
-    if (!do_shadow_rec || li->IsDynamic ())
+    if (!do_shadow_rec || li->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_PSEUDO)
     {
       li->AddAffectedLightingInfo (&scfiLightingInfo);
-      if (!li->IsDynamic ()) affecting_lights.Add (li);
+      if (!li->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_PSEUDO)
+        affecting_lights.Add (li);
     }
   }
   else
@@ -658,7 +646,7 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
   csVector3 wor_light_pos = li->GetCenter ();
   csVector3 obj_light_pos = o2w.Other2This (wor_light_pos);
 
-  bool pseudoDyn = li->IsDynamic ();
+  bool pseudoDyn = li->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_PSEUDO;
   csShadowArray* shadowArr;
   if (pseudoDyn)
   {

@@ -1336,7 +1336,7 @@ void csEngine::RemoveLight (iLight* light)
     iLightingInfo* linfo = s->GetLightingInfo ();
     if (linfo)
     {
-      linfo->StaticLightDisconnect (light);
+      linfo->LightDisconnect (light);
     }
   }
   light->GetSector ()->GetLights ()->Remove (light);

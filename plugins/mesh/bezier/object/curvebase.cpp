@@ -440,7 +440,7 @@ void csCurve::CalculateLightingStatic (iFrustumView *lview, bool vis)
   int lm_height = LightMap->GetHeight ();
 
   iLight* l = lpi->GetLight ();
-  bool dyn = l->IsDynamic ();
+  bool dyn = l->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_PSEUDO;
 
   csCurveShadowMap *smap;
   uint8 *ShadowMap = 0;

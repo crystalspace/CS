@@ -1643,35 +1643,23 @@ void csThing::MarkLightmapsDirty ()
   light_version++;
 }
 
-void csThing::DynamicLightChanged (iLight* /*dynlight*/)
+void csThing::LightChanged (iLight*)
 {
   MarkLightmapsDirty ();
 }
 
-void csThing::DynamicLightDisconnect (iLight* dynlight)
+void csThing::LightDisconnect (iLight* light)
 {
   MarkLightmapsDirty ();
+  int dt = light->GetDynamicType ();
   int i;
   for (i = 0 ; i < polygons.Length () ; i++)
   {
     csPolygon3D *p = GetPolygon3D (i);
-    p->DynamicLightDisconnect (dynlight);
-  }
-}
-
-void csThing::StaticLightChanged (iLight* /*statlight*/)
-{
-  MarkLightmapsDirty ();
-}
-
-void csThing::StaticLightDisconnect (iLight* statlight)
-{
-  MarkLightmapsDirty ();
-  int i;
-  for (i = 0 ; i < polygons.Length () ; i++)
-  {
-    csPolygon3D *p = GetPolygon3D (i);
-    p->StaticLightDisconnect (statlight);
+    if (dt == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
+      p->DynamicLightDisconnect (light);
+    else
+      p->StaticLightDisconnect (light);
   }
 }
 

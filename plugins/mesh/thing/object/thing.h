@@ -928,10 +928,8 @@ public:
   uint32 GetLightVersion() const
   { return light_version; }
 
-  void DynamicLightChanged (iLight* dynlight);
-  void DynamicLightDisconnect (iLight* dynlight);
-  void StaticLightChanged (iLight* statlight);
-  void StaticLightDisconnect (iLight* statlight);
+  void LightChanged (iLight* light);
+  void LightDisconnect (iLight* light);
 
   void SetMixMode (uint mode)
   {
@@ -1045,14 +1043,10 @@ public:
     { scfParent->SetDynamicAmbientLight (color); }
     virtual const csColor& GetDynamicAmbientLight ()
     { return scfParent->GetDynamicAmbientLight (); }
-    virtual void DynamicLightChanged (iLight* dynlight)
-    { scfParent->DynamicLightChanged (dynlight); }
-    virtual void DynamicLightDisconnect (iLight* dynlight)
-    { scfParent->DynamicLightDisconnect (dynlight); }
-    virtual void StaticLightChanged (iLight* statlight)
-    { scfParent->StaticLightChanged (statlight); }
-    virtual void StaticLightDisconnect (iLight* statlight)
-    { scfParent->StaticLightDisconnect (statlight); }
+    virtual void LightChanged (iLight* light)
+    { scfParent->LightChanged (light); }
+    virtual void LightDisconnect (iLight* light)
+    { scfParent->LightDisconnect (light); }
   } scfiLightingInfo;
   friend struct LightingInfo;
 

@@ -783,7 +783,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
   float mul_u = 1.0f / ww;
   float mul_v = 1.0f / hh;
 
-  bool dyn = light->IsDynamic ();
+  bool dyn = light->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_PSEUDO;
 
   // From: T = Mwt * (W - Vwt)
   // ===>

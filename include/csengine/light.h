@@ -163,9 +163,6 @@ public:
   /// Get the ID of this light.
   const char* GetLightID () { return GenerateUniqueID (); }
 
-  /// Return true if the light is pseudo-dynamic.
-  virtual bool IsDynamic () const { return false; }
-
   /**
    * Set the current sector for this light.
    */
@@ -198,7 +195,7 @@ public:
    * lightmaps are not automatically updated when calling this function
    * as that is a time consuming process.
    */
-  virtual void SetColor (const csColor& col);
+  void SetColor (const csColor& col);
 
   /**
    * Return the associated halo
@@ -345,7 +342,6 @@ public:
     }
     virtual const csColor& GetColor () { return scfParent->GetColor (); }
     virtual void SetColor (const csColor& col) { scfParent->SetColor (col); }
-    virtual bool IsDynamic () const { return scfParent->IsDynamic (); }
     virtual int GetAttenuation () { return scfParent->GetAttenuation (); }
     virtual void SetAttenuation (int a) { scfParent->SetAttenuation (a); }
     virtual float GetBrightnessAtDistance (float d)
@@ -429,7 +425,8 @@ public:
    */
   csStatLight (float x, float y, float z, float dist,
      float red, float green, float blue,
-   bool dynamic);
+     bool dynamic);
+
   /**
    * Destroy the light. Note that destroying a light
    * may not have the expected effect. Static lights result
@@ -437,23 +434,6 @@ public:
    * update those lightmaps as that is a time-consuming process.
    */
   virtual ~csStatLight ();
-
-  /**
-   * Return true if this light is pseudo-dynamic.
-   */
-  virtual bool IsDynamic () const { return dynamic; }
-
-  /**
-   * Set the light color. Note that setting the color
-   * of a light may not always have an immediate visible effect.
-   * Static lights are precalculated into the lightmaps and those
-   * lightmaps are not automatically updated when calling this function
-   * as that is a time consuming process.
-   * However, this function works as expected for pseudo-dynamic
-   * lights. In this case the lightmaps will be correctly updated
-   * the next time they become visible.
-   */
-  virtual void SetColor (const csColor& col);
 
   /**
    * Shine this light on all polygons visible from the light.
@@ -512,12 +492,6 @@ public:
   {
     return next ? &(next->scfiLight) : 0;
   }
-
-  /**
-   * Call this when the color of the light changes. This is more
-   * efficient than calling Setup().
-   */
-  virtual void SetColor (const csColor& col);
 
   ///
   void SetNext (csDynLight* n) { next = n; }

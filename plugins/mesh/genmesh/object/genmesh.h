@@ -203,10 +203,8 @@ public:
   void CastShadows (iMovable* movable, iFrustumView* fview);
   void FinalizeLighting (iMovable* movable, iLight* light,
     const csArray<bool>& influences);
-  void DynamicLightChanged (iLight* dynlight);
-  void DynamicLightDisconnect (iLight* dynlight);
-  void StaticLightChanged (iLight* statlight);
-  void StaticLightDisconnect (iLight* statlight);
+  void LightChanged (iLight* light);
+  void LightDisconnect (iLight* light);
 
   //----------------------- iMeshObject implementation ----------------------
   SCF_DECLARE_IBASE;
@@ -282,21 +280,13 @@ public:
     {
       return scfParent->dynamic_ambient;
     }
-    virtual void DynamicLightChanged (iLight* dynlight)
+    virtual void LightChanged (iLight* light)
     {
-      scfParent->DynamicLightChanged (dynlight);
+      scfParent->LightChanged (light);
     }
-    virtual void DynamicLightDisconnect (iLight* dynlight)
+    virtual void LightDisconnect (iLight* light)
     {
-      scfParent->DynamicLightDisconnect (dynlight);
-    }
-    virtual void StaticLightChanged (iLight* statlight)
-    {
-      scfParent->StaticLightChanged (statlight);
-    }
-    virtual void StaticLightDisconnect (iLight* statlight)
-    {
-      scfParent->StaticLightDisconnect (statlight);
+      scfParent->LightDisconnect (light);
     }
   } scfiLightingInfo;
   friend struct LightingInfo;

@@ -140,7 +140,6 @@ public:
   }
 
   virtual csFlags& GetFlags () { return flags; }
-  virtual bool IsDynamic() const { return false; }
   //----------------------------------------------------------------------
   // Callbacks
   //----------------------------------------------------------------------

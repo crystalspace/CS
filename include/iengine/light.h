@@ -213,9 +213,6 @@ struct iLight : public iBase
   /// Set the color of this light.
   virtual void SetColor (const csColor& col) = 0;
   
-  /// Return true if this light is pseudo-dynamic.
-  virtual bool IsDynamic () const = 0;
-
   /** 
    * Get the influence radius of the light
    */

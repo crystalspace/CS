@@ -100,6 +100,7 @@ csLight::~csLight ()
   while (it.HasNext ())
   {
     iLightingInfo* linfo = (iLightingInfo*)it.Next ();
+    linfo->LightDisconnect (&scfiLight);
     linfo->DecRef ();
   }
   lightinginfos.DeleteAll ();
@@ -223,6 +224,13 @@ void csLight::SetColor (const csColor& col)
 
   color = col; 
   lightnr++;
+
+  csGlobalHashIterator it (lightinginfos.GetHashMap ());
+  while (it.HasNext ())
+  {
+    iLightingInfo* linfo = (iLightingInfo*)it.Next ();
+    linfo->LightChanged (&scfiLight);
+  }
 }
 
 void csLight::SetAttenuation (int a)
@@ -435,7 +443,6 @@ csStatLight::csStatLight (
   bool dynamic) :
     csLight(x, y, z, dist, red, green, blue)
 {
-  csStatLight::dynamic = dynamic;
   dynamic_type = dynamic
   	? CS_LIGHT_DYNAMICTYPE_PSEUDO
 	: CS_LIGHT_DYNAMICTYPE_STATIC;
@@ -500,17 +507,6 @@ void csStatLight::CalculateLighting (iMeshWrapper *th)
   lpi->FinalizeLighting ();
 }
 
-void csStatLight::SetColor (const csColor &col)
-{
-  csLight::SetColor (col);
-  csGlobalHashIterator it (lightinginfos.GetHashMap ());
-  while (it.HasNext ())
-  {
-    iLightingInfo* linfo = (iLightingInfo*)it.Next ();
-    linfo->StaticLightChanged (&scfiLight);
-  }
-}
-
 //---------------------------------------------------------------------------
 
 csDynLight::csDynLight (
@@ -524,14 +520,6 @@ csDynLight::csDynLight (
 
 csDynLight::~csDynLight ()
 {
-  csGlobalHashIterator it (lightinginfos.GetHashMap ());
-  while (it.HasNext ())
-  {
-    iLightingInfo* linfo = (iLightingInfo*)it.Next ();
-    linfo->DynamicLightDisconnect (&scfiLight);
-    linfo->DecRef ();
-  }
-  lightinginfos.DeleteAll ();
 }
 
 void csDynLight::Setup ()
@@ -540,7 +528,7 @@ void csDynLight::Setup ()
   while (it.HasNext ())
   {
     iLightingInfo* linfo = (iLightingInfo*)it.Next ();
-    linfo->DynamicLightDisconnect (&scfiLight);
+    linfo->LightDisconnect (&scfiLight);
     linfo->DecRef ();
   }
   lightinginfos.DeleteAll ();
@@ -563,18 +551,6 @@ void csDynLight::Setup ()
   sector->CheckFrustum ((iFrustumView *) &lview);
 
   lpi->FinalizeLighting ();
-}
-
-void csDynLight::SetColor (const csColor &col)
-{
-  csLight::SetColor (col);
-
-  csGlobalHashIterator it (lightinginfos.GetHashMap ());
-  while (it.HasNext ())
-  {
-    iLightingInfo* linfo = (iLightingInfo*)it.Next ();
-    linfo->DynamicLightChanged (&scfiLight);
-  }
 }
 
 // --- csLightList -----------------------------------------------------------
