@@ -70,7 +70,7 @@ SCF_IMPLEMENT_IBASE_END
 
 void ProcCallback::UseTexture (iTextureWrapper*)
 {
-  pt->PrepareAnim ();
+  if (!pt->PrepareAnim ()) return;
   csTicks elapsed_time, current_time;
   iSystem* sys = CS_GET_SYSTEM (pt->object_reg);	//@@@
   sys->GetElapsedTime (elapsed_time, current_time);
