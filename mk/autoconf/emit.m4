@@ -22,13 +22,14 @@ AC_PREREQ([2.56])
 #------------------------------------------------------------------------------
 # CS_EMIT_BUILD_PROPERTY(KEY, VALUE, [APPEND], [EMPTY-OKAY], [EMITTER],
 #                        [UNCONDITIONAL])
-#	A utility function which invokes CS_JAMCONFIG_PROPERTY() if VALUE is
-#	not the empty string (after leading and trailing whitespace is
-#	stripped). If EMPTY-OKAY is not an empty string, then the property is
-#	emitted even if VALUE is empty; that is, it is emitted unconditionally.
-#	If APPEND is the empty string, then the value is set via "?=";
-#	otherwise it is appended to the existing value of the Jam variable via
-#	"+=". EMITTER is a macro name, such as CS_JAMCONFIG_PROPERTY or
+#	A utility function which invokes an emitter to record the KEY/VALUE
+#	tuple if VALUE is not the empty string (after leading and trailing
+#	whitespace is stripped). If EMPTY-OKAY is not an empty string, then the
+#	property is emitted even if VALUE is empty; that is, it is emitted
+#	unconditionally.  If APPEND is the empty string, then the emitter sets
+#	the key's value directly (though it may be overridden by the
+#	environment), otherwise the emitter appends VALUE to the existing value
+#	of the key.  EMITTER is a macro name, such as CS_JAMCONFIG_PROPERTY or
 #	CS_MAKEFILE_PROPERTY, which performs the actual task of emitting the
 #	KEY/VALUE tuple; it should also accept APPEND as an optional third
 #	argument. If EMITTER is omitted, CS_JAMCONFIG_PROPERTY is used.  Some
@@ -51,9 +52,9 @@ AC_DEFUN([CS_EMIT_BUILD_PROPERTY],
 
 #------------------------------------------------------------------------------
 # CS_EMIT_BUILD_RESULT(CACHE-VAR, PREFIX, [EMITTER])
-#	Record the results of CS_CHECK_BUILD() or CS_CHECK_LIB_WITH() via Jam
-#	variables in the Jam text cache.  If CACHE-VAR indicates that the build
-#	succeeded, then the following properties are emitted:
+#	Record the results of CS_CHECK_BUILD() or CS_CHECK_LIB_WITH() via some
+#	emitter.  If CACHE-VAR indicates that the build succeeded, then the
+#	following properties are emitted:
 #
 #	PREFIX.AVAILABLE = yes
 #	PREFIX.CFLAGS = $CACHE-VAR_cflags
