@@ -377,6 +377,13 @@ Nag to Jorrit about this feature if you want it.");
 	return false;
     }
   }
+
+  if (!info.thing_fact_state) {
+    synldr->ReportError ("crystalspace.thingloader.loadpart",
+	node, "No Vertex or face in params node found.");
+    return false;
+  }
+
   return true;
 }
 
