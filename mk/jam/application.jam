@@ -17,83 +17,29 @@
 ##    If you have sourcefiles in subdirectories, then you'll need to use the
 ##    SearchSubdir rule. Never specify sourcefiles with paths, only specify
 ##    the filenames.
+##    Options:
+##	console: Create a console application
+##	noinstall: Don't setup a default installation target.
+##	independent: The target will not be made a dependency of the apps and
+##		     all target.
 rule Application
 {
   # check options
-  _Options $(<) : $(3) ;
-    
+  CheckOptions noinstall console independent : $(3) : $(<) ;
+
+  local target = [ ConstructApplicationTarget $(<) : $(3) ] ;
   local sources = [ DoSourceGrist $(>) ] ;
+  local objects = [ CompileObjects $(sources) ] ;
 
-  # Allow overriding of application suffix for gui/console (if defined).
-  local suffix = $(SUFEXE) ;
-  if $(CONSOLEAPP_$(<)) = "yes"
-  {
-    if $(APPLICATION.SUFFIX.CONSOLE)
-    {
-      suffix = $(APPLICATION.SUFFIX.CONSOLE) ;
-    }
-  }
-  else
-  {
-    if $(APPLICATION.SUFFIX.GUI)
-    {
-      suffix = $(APPLICATION.SUFFIX.GUI) ;
-    }
-  }
-  local SUFEXE = $(suffix) ;
+  $(<)_TYPE = application ;
+  $(<)_OBJECTS = $(objects) ;
+  $(<)_SOURCES = $(sources) ;
+  $(<)_TARGET = $(target) ;
 
-  $(<)_type = application ;
-  $(<)_target = [ FAppendSuffix $(<) : $(SUFEXE) ] ;
-  $(<)_objects = [ CompileObjects $(sources) ] ;
-  ApplicationFromObjects $(<) : $($(<)_objects) ;
-  CFlags $(<) : $(APPLICATION.CFLAGS) ;
-  LFlags $(<) : $(LINKLIBS) $(APPLICATION.LFLAGS) ;
-}
-
-##  LinkStaticPlugins target : plugins
-rule LinkStaticPlugins
-{
-  LinkWith $(<) : $(>)_static ;
-  local regsrc = [ DoObjectGrist _registerstatic.cpp ] ;
-  local regobj = [ CompileObject $(regsrc) ] ;
-  Depends $(<)_target : $(regobj) ;
-
-  # construct flags
-  local deplibs i ;
-  for i in $(>)
-  {
-    deplibs += $($(i)_static.NEEDLIBS) ;
-    LFlags $(<) : $($(i)_static.LFLAGS) ;
-  }
-  deplibs = [ CreateLibList $(deplibs) ] ;
-  Depends $($(<)_target) : $(deplibs) ;
-  NEEDLIBS on $($(<)_target) += $(deplibs) ;
-
-  # construct initialization sourcefile
-  local staticobject = [ BuildStaticFile $(>) ] ;
-  ExtraObjects $(<) : $(staticobject) ;
-}
-
-rule ExtraObjects
-{
-  Depends $($(<)_target) : $(>) ;
-  EXTRAOBJECTS on $($(<)_target) += $(>) ;
-  Clean $(<)clean : $(>) ;
-}
-
-#----------------------------------------------------------------------------
-# private part
-
-rule ApplicationFromObjects
-{
-  local target ;
-  local apptype = GUI ;
-  if $(CONSOLEAPP_$(<))
-  {
-    apptype = CONSOLE ;
-  }
-  
-  target = $($(<)_target) ;
+  # create target clean rule
+  Always $(<)clean ;
+  NotFile $(<)clean ;
+  Clean $(<)clean : $(objects) ; # create target clean rule 
 
   # so 'jam foo' works when it's really foo.exe (Windows) or foo.app (MacOS/X)
   if $(target) != $(<)
@@ -102,57 +48,28 @@ rule ApplicationFromObjects
     NotFile $(<) ;
   }
 
-  # make compiled sources a dependency of target
-  if ! $($(<)_INDEPENDENT)
+  # make dependency on apps target
+  if ! [ IsElem independent : $(3) ]
   {
     Depends apps : $(target) ;
   }
-  Depends $(target) : $(>) ;
-	
-  MakeLocate $(target) : $(LOCATE.TARGETS) ;
-	
+
   # construct Install Targets
-  if ! $(DONTINSTALL_$(<))
+  if ! [ IsElem noinstall : $(3) ]
   {
     InstallApplication $(target) ;
   }
 
-  # construct Clean Targets
-  local cleanrule = "Clean" ;
-  if $(APPLICATION.CLEAN.$(apptype))
-  {
-    cleanrule = $(APPLICATION.CLEAN.$(apptype)) ;
-  }
-  Clean $(<)clean : $(>) ;
-  $(cleanrule) $(<)clean : $(target) ;
-  $(cleanrule) clean : $(target) ;
+  # Link
+  MakeLocate $(target) : $(LOCATE.TARGETS) ;
+  SystemLinkApplication $(<) : $(objects) : $(3) ;
 
-  # Invoke Link rule
-  NAME on $(target) = $(<) ;
-  if $(apptype) = CONSOLE
-  {
-    LinkApplicationConsole $(target) : $(>) ;
-  }
-  else
-  {
-    LinkApplication $(target) : $(>) ;
-  }
+  CFlags $(<) : $(APPLICATION.CFLAGS) ;
+  LFlags $(<) : $(LINKLIBS) $(APPLICATION.LFLAGS) ;      
 }
 
-rule Option_console
-{
-  CONSOLEAPP_$(<) = yes ;
-}
-
-rule Option_noinstall
-{
-  DONTINSTALL_$(<) = yes ;
-}
-
-rule Option_install
-{
-  DONTINSTALL_$(<) = ;
-}
+#----------------------------------------------------------------------------
+# private part
 
 # Construct pseudo target apps which is used instead of the pseudo target exe
 # in Jambase

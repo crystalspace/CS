@@ -3,7 +3,7 @@
 #============================================================================
 
 # enable if you want debug messages
-# JAM_DEBUG = 1 ;
+JAM_DEBUG ?= 1 ;
 
 jamrulesdir = $(TOP)/mk/jam ;
 

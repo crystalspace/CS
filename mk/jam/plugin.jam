@@ -13,25 +13,28 @@
 ##    Don't specify any extensions for the plugin. If you have sourcefiles in
 ##    subdirectories, then you'll need to use the SearchSubdir rule. Don't
 ##    mention the subdirectory name again for the sourcefiles.
+##    Options:
+##	noinstall: Don't setup a default installation target.
+##	independent: The target will not be made a dependency of the plugins
+##		     and all target.
 rule Plugin
 {
-  # process options
-  _Options $(<) : $(3) ;
+  # check options
+  CheckOptions noinstall independent : $(3) : $(<) ;
 
-  # filter headers
-  local sources  = [ DoSourceGrist $(>) ] ;
+  local target = [ ConstructPluginTarget $(<) : $(3) ] ;
+  local sources = [ DoSourceGrist $(>) ] ;
+  local objects = [ CompileObjects $(sources) ] ;
 
-  # rules for compiling the source files
-  $(<)_type = plugin ;
-  $(<)_target = [ FAppendSuffix $(<) : $(SUFPLUGIN) ] ;
-  $(<)_objects = [ CompileObjects $(sources) ] ;
-  CFlags $(<) : $(PLUGIN.CFLAGS) ;
-  # XXX: not sure why we have to mention LINKLIBS again, somehow the +=
-  # operator doesn't use the LINKLIBS var, while it seems doing so for
-  # CFLAGS ?!?
-  LFlags $(<) : $(LINKLIBS) $(PLUGIN.LFLAGS) ;
+  $(<)_TYPE = plugin ;
+  $(<)_OBJECTS = $(objects) ;
+  $(<)_SOURCES = $(sources) ;
+  $(<)_TARGET = $(target) ;
 
-  PluginFromObjects $(<) : $($(<)_objects) ;
+  # create target clean rule
+  Always $(<)clean ;
+  NotFile $(<)clean ;
+  Clean $(<)clean : $(objects) ; # create target clean rule 
 
   # Create a target for eventual static linking
   SubVariant static ;
@@ -39,46 +42,35 @@ rule Plugin
   CFlags $(<)_static : -DCS_STATIC_LINKED ;
   LFlags $(<)_static : $(LINKLIBS) ;
   SubVariant ;
-}
 
-#----------------------------------------------------------------------------
-# private rules
-
-rule PluginFromObjects
-{
-  local souces target ;
-  
-  target = $($(<)_target) ;
-  
-  # create a simple meta target (ie. csutil instead of libcsutil.a)
+  # so 'jam foo' works when it's really foo.exe (Windows) or foo.app (MacOS/X)
   if $(target) != $(<)
   {
     Depends $(<) : $(target) ;
     NotFile $(<) ;
   }
 
-  if ! $($(<)_INDEPENDENT)
+  if ! [ IsElem independent : $(3) ]
   {
     Depends plugins : $(target) ;
   }
-  Depends $(target) : $(>) ;
 
-  MakeLocate $(target) : $(LOCATE.TARGETS) ;
-
-  # Install rules
-  if ! $(DONTINSTALL_$(<))
+  # construct install atrget
+  if ! [ IsElem noinstall : $(3) ]
   {
-    InstallPlugin $(target) ;  
+    InstallPlugin $(target) ;
   }
 
-  # Construct Clean Target
-  Clean clean : $(target) ;
-  Clean $(<)clean : $(target) $(>) ;
+  # Link
+  MakeLocate $(target) : $(LOCATE.TARGETS) ;
+  SystemLinkPlugin $(<) : $(objects) : $(3) ;
 
-  # Invoke Link rule
-  NAME on $(target) = $(<) ;
-  LinkPlugin $(target) : $(>) ;
+  CFlags $(<) : $(PLUGIN.CFLAGS) ;
+  LFlags $(<) : $(LINKLIBS) $(PLUGIN.LFLAGS) ;
 }
+
+#----------------------------------------------------------------------------
+# private rules
 
 # Construct pseudo target plugins
 Depends exe : plugins ;

@@ -17,16 +17,92 @@
 ##    again for the sourcefiles.
 rule Library
 {
-  # process options
-  _Options $(<) : $(3) ;
-    
-  # filter headers
-  local sources  = [ DoSourceGrist $(>) ] ;
+  # check options
+  CheckOptions noinstall independent shared : $(3) : $(<) ;
 
-  $(<)_type = library ;
-  $(<)_target = [ FAppendSuffix lib$(<) : $(SUFLIB) ] ;
-  $(<)_objects = [ CompileObjects $(sources) ] ;
-  csLibraryFromObjects $(<) : $($(<)_objects) ;
+  local target = [ ConstructLibraryTarget $(<) : $(3) ] ;
+  local sources = [ DoSourceGrist $(>) ] ;
+  local objects = [ CompileObjects $(sources) ] ;
+
+  $(<)_TYPE = library ;
+  $(<)_OBJECTS = $(objects) ;
+  $(<)_SOURCES = $(sources) ;
+  $(<)_TARGET = $(target) ;
+
+  # create target clean rule
+  Always $(<)clean ;
+  NotFile $(<)clean ;
+  Clean $(<)clean : $(objects) ; # create target clean rule 
+
+  # so 'jam foo' works when it's really foo.exe (Windows) or foo.app (MacOS/X)
+  if $(target) != $(<)
+  {
+    Depends $(<) : $(target) ;
+    NotFile $(<) ;                                                              
+  }                                                                             
+
+  # library depends on its member objects
+  if ! [ IsElem independent : $(3) ]
+  {
+    if $(KEEPOBJS)
+    {
+      Depends obj : $(objects) ;
+    }
+    else
+    {
+      Depends libs : $(target) ;
+    }
+  }
+
+  # Set LOCATE for the library and its contents.  The bound
+  # value shows up as $(NEEDLIBS) on the Link actions.
+  # For compatibility, we only do this if the library doesn't
+  # already have a path.
+  if ! $(target:D)
+  {
+    MakeLocate $(target) $(target)($(objects:BS)) : $(LOCATE_TARGET) ;
+  }
+
+  if $(NOARSCAN)
+  {
+    # If we can't scan the library to timestamp its contents,
+    # we have to just make the library depend directly on the
+    # on-disk object files.  
+    Depends $(target) : $(objects) ;
+  }
+  else
+  {
+    # If we can scan the library, we make the library depend
+    # on its members and each member depend on the on-disk
+    # object file.
+    Depends $(target) : $(target)($(objects:BS)) ;
+
+    local i ;
+    for i in $(objects)
+    {
+      Depends $(target)($(i:BS)) : $(i) ;
+    }
+  }
+
+  # Generate install rules
+  if ! $(DONTINSTALL_$(<))
+  {
+    InstallLibrary $(target) ;
+  }
+
+  if $(CRELIB) { CreLib $(target) : $(objects[1]) ; }
+
+  Archive $(target) : $(objects) ;
+  Clean $(<)clean : $(target) ;
+
+  if $(CMD.RANLIB) { Ranlib $(target) ; }
+
+  # If we can't scan the library, we have to leave the .o's around.
+  if ! ( $(NOARSCAN) || $(NOARUPDATE) )
+  {
+    RmTemps $(target) : $(objects) ;
+  }
+  
   CFlags $(<) : $(LIBRARY.CFLAGS) ;
   LFlags $(<) : $(LIBRARY.LFLAGS) ;
 }
@@ -44,80 +120,6 @@ rule LibDepends
 
 #----------------------------------------------------------------------------
 # private part
-
-rule csLibraryFromObjects
-{
-  local target i ;
-
-  target = $($(<)_target) ;
-  # make jam csutil working when it's really libcsutil.a
-  if $(target) != $(<)
-  {
-    Depends $(<) : $(target) ;
-    NotFile $(<) ;
-  }
-
-  # library depends on its member objects
-  if ! $($(<)_INDEPENDENT)
-  {
-    if $(KEEPOBJS)
-    {
-      Depends obj : $(>) ;
-    }
-    else
-    {
-      Depends libs : $(target) ;
-    }
-  }
-
-  # Set LOCATE for the library and its contents.  The bound
-  # value shows up as $(NEEDLIBS) on the Link actions.
-  # For compatibility, we only do this if the library doesn't
-  # already have a path.
-  if ! $(target:D)
-  {
-    MakeLocate $(target) $(target)($(>:BS)) : $(LOCATE_TARGET) ;
-  }
-
-  if $(NOARSCAN)
-  {
-    # If we can't scan the library to timestamp its contents,
-    # we have to just make the library depend directly on the
-    # on-disk object files.  
-    Depends $(target) : $(>) ;
-  }
-  else
-  {
-    # If we can scan the library, we make the library depend
-    # on its members and each member depend on the on-disk
-    # object file.
-    Depends $(target) : $(target)($(>:BS)) ;
-
-    for i in $(>)
-    {
-      Depends $(target)($(i:BS)) : $(i) ;
-    }
-  }
-
-  # Generate clean rules
-  Clean $(<)clean : $(target) $(>) ;
-  Clean clean : $(target) ;
-
-  # Generate install rules
-  if ! $(DONTINSTALL_$(<))
-  {
-    InstallLibrary $(target) ;
-  }
-
-  if $(CRELIB) { CreLib $(target) : $(>[1]) ; }
-
-  Archive $(target) : $(>) ;
-
-  if $(CMD.RANLIB) { Ranlib $(target) ; }
-
-  # If we can't scan the library, we have to leave the .o's around.
-  if ! ( $(NOARSCAN) || $(NOARUPDATE) ) { RmTemps $(target) : $(>) ; }
-}
 
 #----------------------------------------------------------------------------
 # Helper rules to resolve inter library dependencies...
@@ -176,19 +178,6 @@ rule CreateLibList
   files = $(files:S=$(SUFLIB)) ;
 
   return $(files) ;
-}
-
-rule Option_shared
-{
-  echo "Error: Build rules for shared libraries are not implemented yet." ;
-}
-rule Option_static
-{
-}
-
-rule Option_independent
-{
-  $(<)_INDEPENDENT = yes ;
 }
 
 actions together Ranlib

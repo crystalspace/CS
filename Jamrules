@@ -11,9 +11,16 @@ if ! $(JAMCONFIG_READ)
   EXIT "Couldn't find config. Please configure the project." ;
 }
 
-# csutil uses zlib :-/
+# csutil uses zlib
 APPLICATION.LFLAGS += $(ZLIB.LFLAGS) ;
 APPLICATION.CFLAGS += $(ZLIB.CFLAGS) ;
+# cssys uses pthread
+if $(PTHREAD.AVAILABLE) = "yes"
+{
+  LINKLIBS += $(PTHREAD.LFLAGS) ;
+  C++FLAGS += $(PTHREAD.CFLAGS) ;
+  CFLAGS += $(PTHREAD.CFLAGS) ;
+}
 
 # Put output files into out/systemname.
 LOCATE.OBJECTS = $(BUILDTOP)/out/$(OSFULL[1]:L) ;

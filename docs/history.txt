@@ -42,6 +42,18 @@ The history order is reversed so that new features are at the top.
 	  as specified by the renderpriorities works now.
 	- res fixed a bug in the new renderer where not binding of a render 
 	  buffer caused visual distortions.
+	- Matze did several changes to the jam build system:
+	    - Reworked the Application, Library and Plugin rules. Code should
+	      be clearer now. The linking logic has been moved to the platform
+	      specific jamfiles. Also constructing of the target names is done
+	      in the platform specific files now.
+	    - Option handling changed. The options are passed along and tested
+	      directly now, instead of setting strange flags.
+	    - New rules for .rc file handling on win32
+	    - Win32 rules now generate fileversion resource files without
+	      invoking external scripts
+	    - Introduced a debug mode for the rules
+	    - Fixed some typos/comments all over the rules
 23-May-2003
 	- Jorrit fixed a bug with 3D sprites. If the factory was
 	  HardTransformed() the shape indicator was not changed.

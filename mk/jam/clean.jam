@@ -2,7 +2,7 @@
 # Rules for cleaning build detritus.
 #============================================================================
 
-DELTREE ?= rm -rf ;
+DELTREE ?= "rm -rf" ;
 
 # CleanDir <tag> : <dir> ...
 #   Forcibly delete a set of directories, even if they are not empty.

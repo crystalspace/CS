@@ -1,33 +1,65 @@
 #============================================================================
 # Jam configuration and actions for Linux/Unix
 #============================================================================
-if $(PTHREAD.AVAILABLE) = "yes"
-{
-  LINKLIBS += $(PTHREAD.LFLAGS) ;
-  C++FLAGS += $(PTHREAD.CFLAGS) ;
-  CCFLAGS += $(PTHREAD.CFLAGS) ;
-}
-
 SHELL ?= "/bin/sh" ;
 
 # only use nasm on x86 for now...
 NASM.FLAGS += -f elf ;
-SUFPLUGIN ?= .so ;
 # disabled (Matze: I really think we should eanble this, regardless of the 1%
 # speed loss...)
 #PLUGIN.CFLAGS += -fPIC ;
 
-actions LinkPlugin bind NEEDLIBS
+#----------------------------------------------------------------------------
+# platform specific rules
+
+##  ConstructApplicationTarget target : options
+##    Constructs the application atrget name (ie. foo.exe for foo)
+rule ConstructApplicationTarget
 {
-  $(CMD.LINK) -shared -Wl,-soname -Wl,$(<) -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
+  return $(<) ;
+}
+rule ConstructLibraryTarget
+{
+  return lib$(<)$(SUFLIB) ;
+}
+rule ConstructPluginTarget
+{
+  return $(<).so ;
 }
 
+# SystemLinkPlugin target : objects : options
+#  do system specific actions needed for linking the application and construct
+#  correct clean targets.
+rule SystemLinkApplication
+{
+  local target = $($(<)_TARGET) ;
+  
+  Depends $(target) : $(>) ;
+  LinkApplication $(target) : $(>) ;
+  # setup clean rules
+  Clean clean : $(target) ;
+  Clean $(<)clean : $(target) ;
+}
+
+# SystemLinkPlugin target : objects : options
+#  do system specific actions needed for linking the plugin and construct
+#  correct clean targets.
+rule SystemLinkPlugin
+{
+  local target = $($(<)_TARGET) ;
+  
+  Depends $(target) : $(>) ;
+  LinkPlugin $(target) : $(>) ;
+  # setup clean rules
+  Clean clean : $(target) ;
+  Clean $(<)clean : $(target) ;
+}
+
+actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS
+{
+  $(CMD.LINK) -shared -Wl,-soname -Wl,$(<) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+}
 actions LinkApplication bind NEEDLIBS bind EXTRAOBJECTS
 {
   $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
-}
-
-rule LinkApplicationConsole
-{
-  LinkApplication $(<) : $(>) ;
 }

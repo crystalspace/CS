@@ -6,48 +6,16 @@
 # private rule - please specify the options in Application, Plugin or Library
 # rule and don't use this rule here directly.
 
-##  _Options target : options
-##    Specify a list of options for a target. Currently the following options
-##    are known:
-##      for Applictaion targets: console
-##	    The console flag should be specified for applications which are
-##          typically started by commandline and don't rely and provide GUI
-##	    user interaction. (this flag is useful on MacOS/X where console
-##	    applications are simple executables, but GUI applications are
-##	    "wrapped" executable bundles.
-##	for Libraries: static, shared
-##	    Some platforms support building libraries as shared libraries,
-##	    which should reduce memory usage and loadtimes when the library is
-##	    used by several applications or plugins.
-##	for all targets: noinstall, install(default)
-##	    Some rules like Application or Plugin are setting up default rules
-##	    for the installation of the target. You can disable this behaviour
-##	    with the noinstall flag.
-##	fot all targets: independent
-##	    The target will not be made a dependency of the all target.
-rule _Options
+##  CheckOptions candidates : Options : target
+rule CheckOptions
 {
-  local target ;
-  for target in $(<)
+  local i ;
+  for i in $(>)
   {
-    local option ;
-    for option in $(>)
+    if ! [ IsElem $(i) : $(<) ]
     {
-      switch $(option)
-      {
-	case console : Option_console $(target) ;
-	
-	case static : Option_static $(target) ;
-	case shared : Option_shared $(target) ;
-
-        case install : Option_install $(target) ;
-	case noinstall : Option_noinstall $(target) ;
-
-	case independent : Option_independent $(target) ;
-	  
-	case * :
-	  echo "Warning: Unknown option $(option) specified for target $(target)" ;
-      }
+      echo "WARNING: Unknown option $(i) specified at $(3)." ;
     }
   }
 }
+

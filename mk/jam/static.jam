@@ -28,6 +28,29 @@ rule BuildStaticFile
   return $(object) ;
 }
 
+##  LinkStaticPlugins target : plugins
+rule LinkStaticPlugins
+{
+  LinkWith $(<) : $(>)_static ;
+  local regsrc = [ DoObjectGrist _registerstatic.cpp ] ;
+  local regobj = [ CompileObject $(regsrc) ] ;
+
+  # construct flags
+  local deplibs i ;
+  for i in $(>)
+  {
+    deplibs += $($(i)_static.NEEDLIBS) ;
+    LFlags $(<) : $($(i)_static.LFLAGS) ;
+  }
+  deplibs = [ CreateLibList $(deplibs) ] ;
+  Depends $($(<)_TARGET) : $(deplibs) ;
+  NEEDLIBS on $($(<)_TARGET) += $(deplibs) ;
+
+  # construct initialization sourcefile
+  local staticobject = [ BuildStaticFile $(>) ] ;
+  ExtraObjects $(<) : $(staticobject) ;
+}
+
 #----------------------------------------------------------------------------
 
 actions GenerateStaticPluginRegistry

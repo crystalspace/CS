@@ -5,21 +5,12 @@
 SHELL ?= "/bin/sh" ;
 DEEPCOPY ?= "cp -R" ;
 
-APPLICATION.LFLAGS += -framework AppKit -framework Foundation ;
-APPLICATION.CONSOLE.LFLAGS += -framework AppKit -framework Foundation ;
-PLUGIN.LFLAGS += -bundle -framework AppKit -framework Foundation ;
+APPLICATION.LFLAGS += "-framework AppKit -framework Foundation" ;
+APPLICATION.CONSOLE.LFLAGS += "-framework AppKit -framework Foundation" ;
+PLUGIN.LFLAGS += "-bundle -framework AppKit -framework Foundation" ;
 SUFPLUGIN ?= $(MACOSX.PLUGIN_EXT) ;
 MACOSX.APP_ICON = ;
-MACOSX.ENVIRON = export MACOSX_DEPLOYMENT_TARGET=10.2 ;
-APPLICATION.CLEAN.GUI = "CleanDir" ;
-APPLICATION.CLEAN.CONSOLE = "Clean" ;
-
-if $(PTHREAD.AVAILABLE) = "yes"
-{
-  LINKLIBS += $(PTHREAD.LFLAGS) ;
-  C++FLAGS += $(PTHREAD.CFLAGS) ;
-  CFLAGS += $(PTHREAD.CFLAGS) ;
-}
+MACOSX.ENVIRON = "export MACOSX_DEPLOYMENT_TARGET=10.2" ;
 
 # Experience seems to indicate that library scanning misbehaves on MacOS/X with
 # Jam 2.4, consequently we disable it.
@@ -35,12 +26,70 @@ actions Archive
 # Public rules.
 #------------------------------------------------------------------------------
 
+##  ConstructApplicationTarget target : options
+##    Constructs the application atrget name (ie. foo.exe for foo)
+rule ConstructApplicationTarget
+{
+  if [ IsElem console : $(>) ]
+  {
+    return $(<) ;
+  }
+  else
+  {
+    return $(<) ;
+  }
+}
+##  ConstructLibraryTarget target : options
+rule ConstructLibraryTarget
+{
+      return lib$(<)$(SUFLIB) ;
+}
+##  ConstructPluginTarget : options
+rule ConstructPluginTarget
+{
+  # don't use $(MACOSX_PLUGIN_EXT) yet until we can be sure that external
+  # projects set that value as well
+  return $(<).csplugin ;
+}
+
+rule SystemLinkApplication
+{
+  local target = $($(>)_TARGET) ;
+
+  if [ IsElem console : $(3) ]
+  {
+    Depends $(target) : $(>) ;
+    LinkApplicationConsole $(target) : $(>) ;
+    Clean clean : $(target) ;
+    Clean $(<)clean : $(target) ;
+  }
+  else
+  {
+    Depends $(target) : $(>) ;
+    CreateApplicationWrapper $(target) : $(>) ;
+    CleanDir clean : [ Wrapper $(<) : app ] ;
+    CleanDir $(<)clean : [ Wrapper $(<) : app ] ;
+  }
+}
+
+rule SystemLinkPlugin
+{
+  local target = $($(<)_TARGET) ;
+
+  Depends $(target) : $(>) ;
+  LinkPlugin $(target) : $(>) ;
+  # setup clean rules
+  Clean clean : $(target) ;
+  Clean $(<)clean : $(target) ;
+}
+
+
 ## LinkPlugin plugin : objects
 ##    Link a plugin module from a set of object files.
-actions LinkPlugin bind NEEDLIBS
+actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS
 {
   $(MACOSX.ENVIRON)
-  $(CMD.LINK) -bundle -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
+  $(CMD.LINK) -bundle -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }
 
 ## LinkApplicationConsole exe : objects
@@ -51,11 +100,11 @@ actions LinkApplicationConsole bind NEEDLIBS bind EXTRAOBJECTS
   $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }
 
-## LinkApplication basename : objects
+## CreateApplicationWrapper basename : objects
 ##    Create a complete, though minimal, application wrapper given a set of
 ##    object files.  The rules ApplicationIconDefaultOSX and ApplicationIconOSX
 ##    control the icon associated with the application wrapper.
-rule LinkApplication
+rule CreateApplicationWrapper
 {
   WrapFile $(<) : $(<) : Contents MacOS : AppExe : $(>) ;
   WrapFile $(<) : PkgInfo : Contents : AppPkgInfo : $(>) ;
@@ -63,11 +112,11 @@ rule LinkApplication
   WrapFile $(<) : Info.plist : Contents : AppInfoPlist : $(>) ;
   WrapFile $(<) : InfoPlist.strings : Contents Resources English.lproj : 
     AppInfoPlistStrings : $(>) ;
-  if $(MACOSX.APP_ICON) && ! $($(<)_APPICON
+  if $(MACOSX.APP_ICON) && ! $($(<)_APPICON)
   {
     AppIcon $(<) : $(MACOSX.APP_ICON) ;
   }
-  CleanDir clean $(<)clean : [ Wrapper $(<) : app ] ;
+  CleanDir clean $(<)clean : [ Wrapper $(<) : app ] ;                        
 }
 
 ## ApplicationIconDefaultOSX icon [ : pathcomponents ]
@@ -82,23 +131,20 @@ rule ApplicationIconDefaultOSX
   }
 }
 
-## ApplicationIconOSX basename : icon [ : pathcomponents ]
-##    Specify the icon for the application given by basename.  If
-##    pathcomponents is omitted, SEARCH_SOURCE is used.  If this rule is not
-##    invoked, then the icon specified via ApplicationIconDefaultOSX is used.
-##    If ApplicationIconDefaultOSX was never invoked, then no icon is used.
-##
-##    Implementation note: The logic to get the icon copied into the wrapper is
-##    complicated by the fact that it is possible to specify no icon at all (by
-##    invoking neither ApplicationIconDefaultOSX nor ApplicationIconOSX), as
-##    well as being possible to spcify it globally or per-application.  The
-##    convolution of this logic results in a case where two icons might be
-##    copied to the wrapper (one specified with ApplicationIconDefaultOSX and
-##    one by ApplicationIconOSX).  This occurs when ApplicationIconOSX is
-##    invoked after LinkApplication.  Fortunately, other than the extra (unsed)
-##    icon in the application wrapper (the icon specified with
-##    ApplicationIconDefaultOSX), there is no negative impact.  Care is taken
-##    to ensure that Info.plist mentions the correct icon in all cases.
+# ApplicationIconOSX basename : icon [ : pathcomponents ]
+#    See resource.jam for docu
+#
+#    Implementation note: The logic to get the icon copied into the wrapper is
+#    complicated by the fact that it is possible to specify no icon at all (by
+#    invoking neither ApplicationIconDefaultOSX nor ApplicationIconOSX), as
+#    well as being possible to spcify it globally or per-application.  The
+#    convolution of this logic results in a case where two icons might be
+#    copied to the wrapper (one specified with ApplicationIconDefaultOSX and
+#    one by ApplicationIconOSX).  This occurs when ApplicationIconOSX is
+#    invoked after LinkApplication.  Fortunately, other than the extra (unsed)
+#    icon in the application wrapper (the icon specified with
+#    ApplicationIconDefaultOSX), there is no negative impact.  Care is taken
+#    to ensure that Info.plist mentions the correct icon in all cases.
 rule ApplicationIconOSX
 {
   local dir ;
@@ -114,10 +160,10 @@ rule ApplicationIconOSX
 # Private utility rules.
 #------------------------------------------------------------------------------
 
-## Wrapper basename : suffix [ : pathcomponents ]
-##    Returns wrapper name in the directory specified by pathcomponents for
-##    the given basename.  If pathcomponents is omitted, LOCATE.TARGETS is
-##    used.
+# Wrapper basename : suffix [ : pathcomponents ]
+#    Returns wrapper name in the directory specified by pathcomponents for
+#    the given basename.  If pathcomponents is omitted, LOCATE.TARGETS is
+#    used.
 rule Wrapper
 {
   local dir ;
@@ -126,27 +172,27 @@ rule Wrapper
   return [ FDirName $(dir) $(1).$(2) ] ;
 }
 
-## WrapFile basename : file : pathcomponents : rule [ : objects : [ suffix ] ]
-##    Generate a file within a wrapper.  pathcomponents is a list of names
-##    which compose the relative path within the wrapper where file should be
-##    placed.  pathcomponents may be the empty list if the file should reside
-##    at the top-level of the wrapper.  rule is rule/action which should be
-##    invoked to generate file.  rule is invoked with arguments
-##    <basename.suffix/pathcomponents/file>, <objects>, and <basename>.
-##    objects is an optional list of files from which file should be built.  It
-##    may be omitted if file does not depend upon any other files.  suffix is
-##    the extension of the wrapper (not of file).  If suffix is omitted, "app"
-##    is assumed.
-##
-##    Implementation note: If basename and file are the same, then we do not
-##    grist file.  (Obviously, we also do not want to set the file dependent
-##    upon itself.)  The reason we do not grist file in this case is that the
-##    LinkWith, and LFlags rules associate the variables NEEDLIBS and
-##    LINKLIBS with the ungristed name, therefore in order to get access to
-##    these variables at AppExe action time, we must use the same (ungristed)
-##    name.  It is otherwise impossible to gain access to those variables.
-##    This is an unfortunate hack which pollutes the otherwise general-purpose
-##    WrapFile rule.
+# WrapFile basename : file : pathcomponents : rule [ : objects : [ suffix ] ]
+#    Generate a file within a wrapper.  pathcomponents is a list of names
+#    which compose the relative path within the wrapper where file should be
+#    placed.  pathcomponents may be the empty list if the file should reside
+#    at the top-level of the wrapper.  rule is rule/action which should be
+#    invoked to generate file.  rule is invoked with arguments
+#    <basename.suffix/pathcomponents/file>, <objects>, and <basename>.
+#    objects is an optional list of files from which file should be built.  It
+#    may be omitted if file does not depend upon any other files.  suffix is
+#    the extension of the wrapper (not of file).  If suffix is omitted, "app"
+#    is assumed.
+#
+#    Implementation note: If basename and file are the same, then we do not
+#    grist file.  (Obviously, we also do not want to set the file dependent
+#    upon itself.)  The reason we do not grist file in this case is that the
+#    LinkWith, and LFlags rules associate the variables NEEDLIBS and
+#    LINKLIBS with the ungristed name, therefore in order to get access to
+#    these variables at AppExe action time, we must use the same (ungristed)
+#    name.  It is otherwise impossible to gain access to those variables.
+#    This is an unfortunate hack which pollutes the otherwise general-purpose
+#    WrapFile rule.
 rule WrapFile
 {
   local suffix ;
@@ -162,25 +208,25 @@ rule WrapFile
   if $(5) { Depends $(target) : $(5) ; }
   BASENAME on $(target) = $(1) ;
   $(4) $(target) : $(5) : $(1) ;
-  Always $(<)clean ;
-  NotFile $(<)clean ;
-  Clean clean $(1)clean : [ FDirName $(dir) $(target) ] ;
+
+  Clean clean : [ FDirName $(dir) $(target) ] ;
+  Clean $(1)clean : [ FDirName $(dir) $(target) ] ;
 }
 
-## LinkApplication exe : objects
+#  LinkApplication exe : objects
 actions AppExe bind NEEDLIBS bind EXTRAOBJECTS
 {
   $(MACOSX_ENVIRON)
   $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }
 
-## AppPkgInfo file
+#  AppPkgInfo file
 actions AppPkgInfo
 {
   echo 'APPL???' > $(<) ;
 }
 
-## AppInfoPlistStrings file
+#  AppInfoPlistStrings file
 actions AppInfoPlistStrings
 {
   cat << EOT > $(<)
@@ -190,7 +236,7 @@ CFBundleGetInfoString = "$(BASENAME), $(PACKAGE.VERSION)";
 EOT
 }
 
-## AppVersionPlist file
+#  AppVersionPlist file
 actions AppVersionPlist
 {
   cat << EOT > $(<)
@@ -209,18 +255,18 @@ actions AppVersionPlist
 EOT
 }
 
-## AppInfoPlist filename : placeholder : basename
-##    If client did not invoke ApplicationIconOSX, then use the default icon
-##    specified via ApplicationIconDefaultOSX.
-##
-##    Implementation Note: $(BASENAME)_APPICON might be empty in the actions of
-##    this rule, if the client did not specify a default icon or a
-##    target-specific icon, in which case we need to omit both the
-##    CFBundleIconFile key and value.  To accomplish this, the key and value
-##    are placed on a single line with no intervening whitespace.  When Jam
-##    interpolates a variable, if the variable is empty, it removes all
-##    adjacent text (the key and value, in this case) which is just what we
-##    desire.
+#  AppInfoPlist filename : placeholder : basename
+#    If client did not invoke ApplicationIconOSX, then use the default icon
+#    specified via ApplicationIconDefaultOSX.
+#
+#    Implementation Note: $(BASENAME)_APPICON might be empty in the actions of
+#    this rule, if the client did not specify a default icon or a
+#    target-specific icon, in which case we need to omit both the
+#    CFBundleIconFile key and value.  To accomplish this, the key and value
+#    are placed on a single line with no intervening whitespace.  When Jam
+#    interpolates a variable, if the variable is empty, it removes all
+#    adjacent text (the key and value, in this case) which is just what we
+#    desire.
 rule AppInfoPlist
 {
   if ! $($(3)_APPICON)
@@ -260,13 +306,13 @@ actions AppInfoPlist
 EOT
 }
 
-## AppIcon <basename> : <icon>
-##    Copy an icon into the wrapper.  It is assumed that some other agent has
-##    already set SEARCH on the icon, if necessary.
-##
-##    Implementation note: We can not use the File rule to copy the icon since
-##    that rule assumes the source is in SEARCH_SOURCE, which is not always a
-##    valid assumption for icons.
+#  AppIcon <basename> : <icon>
+#    Copy an icon into the wrapper.  It is assumed that some other agent has
+#    already set SEARCH on the icon, if necessary.
+#
+#    Implementation note: We can not use the File rule to copy the icon since
+#    that rule assumes the source is in SEARCH_SOURCE, which is not always a
+#    valid assumption for icons.
 rule AppIcon
 {
   local icon = $(>:G=$(<)) ;
@@ -282,11 +328,11 @@ actions AppIcon1
     $(CP) $(>) $(<)
 }
 
-## InstallApplicationGUI installapp : app
-##    Overrides InstallApplicationGUI from install.jam.  Unlike applications
-##    on other platforms which exist as a single executable file, on MacOS/X,
-##    an application is wrapped in a directory hierarchy, thus a deep copy is
-##    needed (i.e. the typical Install rule does not work).
+#  InstallApplicationGUI installapp : app
+#    Overrides InstallApplicationGUI from install.jam.  Unlike applications
+#    on other platforms which exist as a single executable file, on MacOS/X,
+#    an application is wrapped in a directory hierarchy, thus a deep copy is
+#    needed (i.e. the typical Install rule does not work).
 rule InstallApplicationGUI
 {
   local target = $(<).app ;
@@ -307,3 +353,4 @@ actions InstallApplicationWrapper
   $(DELTREE) $(<) ;
   $(DEEPCOPY) $(>) $(<) ;
 }
+
