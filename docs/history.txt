@@ -3,21 +3,57 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
-3-Max-2003
+4-May-2003
+	- Eric Sunshine made the following changes:
+	    - Updated Swig test in configure.ac to utilize new optional version
+	      number component capability of progver.m4.  This is needed
+	      because older versions of Swig emit a 2-part version number (such
+	      as 1.1), whereas newer ones emit a 3-part number (such as
+	      1.3.19).
+	    - Fixed problem where recent change to configure.ac caused it to
+	      create several files deep within the CS source tree.  This is a
+	      problem because the CS source tree might be on a read-only volume
+	      (such as a CD-ROM), or might be shared (perhaps via NFS) between
+	      several builds.  Furthermore, it failed when the build directory
+	      differed from the source directory.  Instead of creating the
+	      one-line csperlxs.c file in the plugins/cscript/csperl5 directory
+	      to include the appropriate .inc file, it now emits the header
+	      property CS_PERL5_XSINC to volatile.h with the value of the .inc
+	      file to include.
+	    - Fixed problem where configure.ac was creating the file
+	      csperlxs.inc during the configuration phase.  It is not the
+	      responsibility of the configure script to create output files.
+	      Instead, it is the responsibility of config.status to see to this
+	      chore.  Therefore, configure.ac now invokes AC_CONFIG_COMMANDS()
+	      to delegate creation of csperlxs.inc to config.status.
+	    - Fixed bug where recent changes to configure.ac caused it to
+	      reference the non-existent shell variable
+	      PERL5.EXTUTILS.DYNALOADER, thus causing creation of csperlxs.inc
+	      to fail.
+	    - The configure script no longer emits the PERL5.EXTUTILS.AVAILABLE
+	      and PERL5.EXTUTILS.DYNALOADER build properties to config.mak and
+	      Jamconfig since recent changes obsoleted these variables, and
+	      they are no longer used by the csperl5 makefile and Jamfile.
+	    - Fixed a number of errors in csperl5.mak where it was not
+	      respecting $(SRCDIR), thus resulting in build failure when
+	      building outside of the CS source tree.
+	    - Fixed bugs in csperl5.mak where it used CEX.CSPERL5 and
+	      CIN.CSPERL5 in some places but CEX.PERL5 and CIN.PERL5 in others.
+3-May-2003
 	- Matze changed -Wno-unused-function and -Wno-unused-label flags to
 	  -Wno-unused in aws Jamfile. Seems gcc2.9x doesn't like the first 2
 	  flags.
 	- Matze did several changes in the jamrules:
-	  - rewrote custom filetype registration in the jamrules. Now the
-	    rules can decide themself what objects result from sourcefiles. This
-	    allows cleaner handling of header files and makes it possible to
-	    output multiple object files from 1 sourcefile
+	  - Rewrote custom filetype registration in the jamrules.  Now the
+	    rules can decide themself what objects result from sourcefiles.
+	    This allows cleaner handling of header files and makes it possible
+	    to output multiple object files from one source file.
 	  - Headerfile scanning has to be enabled explicitely for registered
 	    rules. This avoids incorrect headerfilescanning in bison and flex
 	    files.
 	  - Cleaned up and improved bison and flex rules. They are alot more
 	    robust now as jam is aware that bison produces 2 files (a cpp and
-	    a header file)
+	    a header file).
 	- Oktal updated the Perl module:
 	  - Rearranged the generation of csperlxs.c. Configure now generates a
 	    csperlxs.inc file with Perl, and echoes out a one-line csperlxs.c
@@ -27,11 +63,11 @@ The history order is reversed so that new features are at the top.
 	  - Updated the Makefile in line with the changes.
 	  - Fixed the example Perl code in perl5test so it follows the
 	    conventions of the new SWIG module.
-	  - Norman Kraemer extended progver.m4 for patterns to contain
-	    optional components. Thus we can now have a pattern like this:
-	     9.9|.9 where the last part is optional (.9)
-	     or even
-	     9.9|.9|._|.9 where we have 3 optional parts
+	- Norman Kraemer extended progver.m4 for patterns to contain optional
+	    components.  Thus we can now have a pattern like this:
+	    9.9|.9 where the last part is optional (.9)
+	    or even
+	    9.9|.9|._|.9 where we have 3 optional parts
 2-May-2003
 	- Eric Sunshine augmented jobber.pl to make it possible to associate
 	  multiple directories with a single "target" (in @TARGETS).  All of
