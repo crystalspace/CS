@@ -20,58 +20,64 @@
 #include "csutil/strset.h"
 #include "csutil/util.h"
 
-csStringSet::csStringSet (int size) : Registry (size), reverse_mapping (size)
+csStringSet::csStringSet (size_t size) :
+  registry(size), reverse(size), next_id(0)
 {
-  IDCounter = 0;
 }
 
 csStringSet::~csStringSet ()
 {
 }
 
-csStringID csStringSet::Request (const char *Name)
+csStringID csStringSet::Request (const char* s)
 {
-  csStringID id = Registry.Request (Name);
+  csStringID id = registry.Request(s);
   if (id == csInvalidStringID)
   {
-    const char* registered_name = Registry.Register (Name, IDCounter);
-    reverse_mapping.Put (IDCounter, registered_name);
-    IDCounter++;
-    return IDCounter-1;
+    const char* t = registry.Register(s, next_id);
+    reverse.Put(next_id, t);
+    id = next_id;
+    next_id++;
   }
-  else
-  {
-    return id;
-  }
+  return id;
 }
 
 const char* csStringSet::Request (csStringID id) const
 {
-  return reverse_mapping.Get (id, 0);
+  return reverse.Get(id, 0);
 }
 
 bool csStringSet::Contains (char const* s) const
 {
-  return Registry.Request(s) != csInvalidStringID;
+  return registry.Request(s) != csInvalidStringID;
 }
 
-void csStringSet::Clear ()
+bool csStringSet::Delete (char const* s)
 {
-  Registry.Clear ();
-  reverse_mapping.DeleteAll ();
+  csStringID const id = registry.Request(s);
+  bool const ok = (id != csInvalidStringID);
+  if (ok)
+  {
+    registry.Delete(s);
+    reverse.DeleteAll(id);
+  }
+  return ok;
 }
 
-csStringSetIterator::csStringSetIterator (csStringSet* hash)
+bool csStringSet::Delete (csStringID id)
 {
-  hashIt = new csStringHashIterator (&hash->Registry);
+  char const* s = reverse.Get(id,0);
+  bool const ok = (s != 0);
+  if (ok)
+  {
+    registry.Delete(s);
+    reverse.DeleteAll(id);
+  }
+  return ok;
 }
 
-bool csStringSetIterator::HasNext ()
+void csStringSet::Empty ()
 {
-  return hashIt->HasNext();
-}
-
-csStringID csStringSetIterator::Next ()
-{
-  return hashIt->Next();
+  registry.Empty();
+  reverse.Empty();
 }

@@ -22,23 +22,3 @@
 SCF_IMPLEMENT_IBASE (csScfStringSet)
   SCF_IMPLEMENTS_INTERFACE (iStringSet)
 SCF_IMPLEMENT_IBASE_END
-
-csStringID csScfStringSet::Request (const char *s)
-{
-  return set.Request (s);
-}
-
-const char* csScfStringSet::Request (csStringID id) const
-{
-  return set.Request (id);
-}
-
-bool csScfStringSet::Contains(char const* s) const
-{
-  return set.Contains (s);
-}
-
-void csScfStringSet::Clear ()
-{
-  set.Clear ();
-}

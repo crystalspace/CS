@@ -723,6 +723,60 @@ consistent with the names of all other available ``null'' plugins:
 @code{crystalspace.graphics2d.null}
 @end itemize
 
+For @sc{api} consistency and uniformity between container classes, the
+following methods have been renamed:
+
+@itemize @bullet
+@item
+@code{csArray<>::Length()} @result{} @code{csArray<>::GetSize()}
+@item
+@code{csArray<>::SetLength()} @result{} @code{csArray<>::SetSize()}
+@item
+@code{csHash<>::DeleteAll()} @result{} @code{csHash<>::Empty()}
+@item
+@code{csHash<>::In()} @result{} @code{csHash<>::Contains()}
+@item
+@code{csHash<>::PutFirst()} @result{} @code{csHash<>::PutUnique()}
+@item
+@code{csList<>::FetchPrev()} @result{} @code{csList<>::FetchPrevious()}
+@item
+@code{csList<>::HasPrev()} @result{} @code{csList<>::HasPrevious()}
+@item
+@code{csSet<>::DeleteAll()} @result{} @code{csSet<>::Empty()}
+@item
+@code{csSet<>::In()} @result{} @code{csSet<>::Contains()}
+@item
+@code{csString::Clear()} @result{} @code{csString::Empty()}
+@item
+@code{csString::FindReplace()} @result{} @code{csString::ReplaceAll()}
+@item
+@code{csString::FindStr()} @result{} @code{csString::Find()}
+@item
+@code{csString::Reclaim()} @result{} @code{csString::ShrinkBestFit()}
+@item
+@code{iString::FindReplace()} @result{} @code{iString::ReplaceAll()}
+@item
+@code{iString::FindStr()} @result{} @code{iString::Find()}
+@item
+@code{iStringArray::DeleteAll()} @result{} @code{iStringArray::Empty()}
+@item
+@code{iStringSet::Clear()} @result{} @code{iStringSet::Empty()}
+@end itemize
+
+@noindent
+In most cases, the old names listed above are still recognized for backward
+compatibility, but they are deprecated, so you probably ought to convert to the
+new @sc{api} at some point. The @sc{api} of most of the container classes also
+has been expanded, so you may want to study the @sc{api} reference manual to
+learn about newly available functionality.
+
+Likewise, the following global functions have been renamed:
+
+@itemize @bullet
+@item
+@code{csFindReplace()} @result{} @code{csReplaceAll()}
+@end itemize
+
 For consistency with like-named methods in other @sc{scf} interfaces, the
 following @samp{iImage} methods have been renamed:
 
@@ -731,23 +785,6 @@ following @samp{iImage} methods have been renamed:
 @code{GetKeycolor()} @result{} @code{GetKeyColor()}
 @item
 @code{HasKeycolor()} @result{} @code{HasKeyColor()}
-@end itemize
-
-For consistency with related methods (such as @code{HasPrevious()}) in the
-@code{csList<>} template, the following methods have been renamed:
-
-@itemize @bullet
-@item
-@code{FetchPrev()} @result{} @code{FetchPrevious()}
-@item
-@code{HasPrev()} @result{} @code{HasPrevious()}
-@end itemize
-
-For clarification, the following @code{csHash<>} methods have been renamed:
-
-@itemize @bullet
-@item
-@code{PutFirst()} @result{} @code{PutUnique()}
 @end itemize
 
 Various methods in @samp{csIntersect3} have been renamed in order to improve
@@ -954,14 +991,14 @@ if (ev->Retrieve(@dots{}) == csEventErrNone)
 @}
 @end example
 
-@subheading Old Renderer Architecture Removed
+@subheading Old Renderer Architecture Removal
 
 The old rendering architecture along with the old renderer plugins have been
 removed. Additionally, a few plugins, applications, classes, and methods have
 been deprecated because they are not applicable to the new rendering
 architecture. The results of the old renderer removal are summarized below.
 
-@subsubheading Removed plugins
+@subsubheading Removed Plugins
 
 The following plugin modules have been removed:
 
@@ -1346,28 +1383,6 @@ methods.
 functionality is provided by @code{SetGrowsBy(0)} and @code{GetGrowsBy()}.
 @end itemize
 
-For @sc{api} consistency and uniformity between container classes, the
-following @samp{csString} and @samp{iString} methods (when present) have been
-renamed:
-
-@itemize @bullet
-@item
-@code{Clear()} @result{} @code{Empty()}
-@item
-@code{FindReplace()} @result{} @code{ReplaceAll()}
-@item
-@code{FindStr()} @result{} @code{Find()}
-@item
-@code{Reclaim()} @result{} @code{ShrinkBestFit()}
-@end itemize
-
-Likewise, the following string-related functions have been renamed:
-
-@itemize @bullet
-@item
-@code{csFindReplace()} @result{} @code{csReplaceAll()}
-@end itemize
-
 @subheading @sc{rapid} Collision Detection Plugin Removal
 
 The @sc{rapid} collision detection plugin has been removed. In addition to
@@ -1534,3 +1549,51 @@ The long-deprecated @samp{csHashMap}, @samp{csHashMapReversible}, and
 @code{csHash<>}, @code{csHashReversible<>}, and @code{csSet<>}.  For
 string-related @dfn{set} functionality, you may also want to consider using
 @samp{csStringHash} and @samp{csStringSet}.
+
+@subheading @code{csObjectPool<>} Removal
+
+The @code{csObjectPool<>} utility class has been removed since it managed
+memory poorly, and failed to invoke the destructor of contained objects at the
+time they were recycled via @code{csObjectPool<>::Free()}, which meant that the
+objects might not release their own resources in a timely fashion.  (It did
+correctly destroy the freed objects when the pool itself was destroyed, but
+should have been doing so at @code{Free()}-time.)
+
+You can use @code{csBlockAllocator<>} (see @file{csutil/blockallocator.h}) as a
+drop-in replacement for @code{csObjectPool<>} since the @sc{api} of
+@code{csBlockAllocator<>} is a proper superset of the @code{csObjectPool<>}
+@sc{api}. A global search and replace should be sufficient to account for this
+change.
+
+@subheading @samp{csStringSetIterator} and @samp{csStringHashIterator} Removal
+
+@samp{csStringSetIterator} and @samp{csStringHashIterator} have been replaced
+by @samp{csStringSet::GlobalIterator} and @samp{csStringHash::GlobalIterator},
+respectively.  Rather than instantiating iterators directly, you now ask the
+set or hash for an iterator. This brings the @samp{csStringSet} and
+@samp{csStringHash} @sc{api}'s in line with other container classes which vend
+iterators. Given old code which is using @samp{csStringSetIterator}:
+
+@example
+csStringSet set;
+// ...populate set...
+csStringSetIterator iter(&set);
+while (iter.HasNext())
+@{
+  char const* s = iter.Next();
+  // ...do something with `s'...
+@}
+@end example
+
+@noindent
+Convert it like this:
+
+@example
+csStringSet::GlobalIterator iter = set.GetIterator();
+while (iter.HasNext())
+@{
+@end example
+
+@noindent
+Code using @samp{csStringHashIterator} can be fixed using the same simple
+transformation.

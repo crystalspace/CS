@@ -19,7 +19,7 @@
 #ifndef __CS_LIGHTPOOL_H__
 #define __CS_LIGHTPOOL_H__
 
-#include "csutil/objpool.h"
+#include "csutil/blockallocator.h"
 #include "csgeom/frustum.h"
 
 class csBezierLightPatchPool;
@@ -156,15 +156,14 @@ public:
  * If needed it will allocate one for you but ideally it can
  * give you one which was allocated earlier.
  */
-class csBezierLightPatchPool : public csObjectPool<csBezierLightPatch>
+class csBezierLightPatchPool : public csBlockAllocator<csBezierLightPatch>
 {
 public:
   void Free (csBezierLightPatch* o)
   {
     o->RemovePatch ();
-    csObjectPool<csBezierLightPatch>::Free (o);
+    csBlockAllocator<csBezierLightPatch>::Free (o);
   }
 };
 
 #endif // __CS_LIGHTPOOL_H__
-

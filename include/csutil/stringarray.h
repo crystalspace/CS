@@ -46,27 +46,31 @@ public:
 
 /**
  * An array of strings. This array will properly make copies of the strings
- * and delete those copies using delete[] later.
+ * and later delete those copies via delete[].
  */
 class csStringArray : public csArray<const char*, csStringArrayElementHandler>
 {
+private:
   typedef csArray<const char*, csStringArrayElementHandler> superclass;
+
 public:
   /**
-   * Initialize object to hold initially 'ilimit' elements, and increase
-   * storage by 'ithreshold' each time the upper bound is exceeded.
+   * Initialize object to hold initially \c limit elements, and increase
+   * storage by \c threshold each time the upper bound is exceeded.
    */
-  csStringArray (int ilimit = 0, int ithreshold = 0)
-  	: superclass(ilimit, ithreshold)
+  csStringArray (size_t limit = 0, size_t threshold = 0)
+  	: superclass(limit, threshold)
   {
   }
 
+  /// Case-sensitive comparision function for strings.
   static int CaseSensitiveCompare (const char* const &item1,
 				   const char* const &item2)
   {
     return strcmp (item1, item2);
   }
 
+  /// Case-insensitive comparision function for strings.
   static int CaseInsensitiveCompare (const char* const &item1,
 				     const char* const &item2)
   {
@@ -83,6 +87,8 @@ public:
 
   /**
    * Sort array.
+   * \param case_sensitive If true, consider case when performing comparison.
+   *   (default: yes)
    */
   void Sort (bool case_sensitive = true)
   {
@@ -94,7 +100,8 @@ public:
 
   /**
    * Find an element based on some key, using a comparison function.
-   * The array must be sorted. Returns -1 if element does not exist.
+   * \return csArrayItemNotFound if not found, else item index.
+   * \remarks The array must be sorted.
    */
   size_t FindSortedKey (csArrayCmpDecl(char const*, char const*) comparekey,
     size_t* candidate = 0) const
@@ -103,8 +110,9 @@ public:
   }
 
   /**
-   * Find an element.  The array must be sorted.  Returns -1 if element does
-   * not exist.
+   * Find an element.
+   * \return csArrayItemNotFound if not found, else item index.
+   * \remarks The array must be sorted.
    */
   size_t FindSortedKey (char const* key, bool case_sensitive = true,
     size_t* candidate = 0) const
@@ -115,10 +123,9 @@ public:
       candidate);
   }
 
-
   /**
    * Insert an element at a sorted position.
-   * Assumes array is already sorted.
+   * \remarks Assumes array is already sorted.
    */
   size_t InsertSorted (const char* item, bool case_sensitive = true,
     size_t* equal_index = 0)
@@ -128,43 +135,63 @@ public:
     return superclass::InsertSorted (item, cf, equal_index);
   }
 
-
   /**
-   * Pop an element from tail end of array.  Caller is responsible for
-   * invoking delete[] on the returned string when no longer needed.
+   * Pop an element from tail end of array.
+   * \remarks Caller is responsible for invoking delete[] on the returned
+   *   string when no longer needed.
    */
   char* Pop ()
   {
-    CS_ASSERT (Length () > 0);
-    size_t l = Length () - 1;
+    CS_ASSERT (GetSize () > 0);
+    size_t l = GetSize () - 1;
     char* ret = (char*)Get (l);
     InitRegion (l, 1);
-    SetLength (l);
+    SetSize (l);
     return ret;
   }
 
   /**
-   * Find a string, case-sensitive. Returns -1 if not found, else item index.
-   * Works with unsorted arrays.  For sorted arrays, FindSortedKey() is faster.
+   * Find a string, case-sensitive.
+   * \return csArrayItemNotFound if not found, else item index.
+   * \remarks Works with sorted and unsorted arrays, but FindSortedKey() is
+   *   faster on sorted arrays.
    */
-  size_t Find (const char* what) const
+  size_t Find (const char* str) const
   {
-    for (size_t i = 0; i < Length (); i++)
-      if (! strcmp (Get (i), what))
+    for (size_t i = 0; i < GetSize (); i++)
+      if (! strcmp (Get (i), str))
         return i;
     return (size_t)-1;
   }
 
   /**
-   * Find a string, case-insensitive. Returns -1 if not found, else item index.
-   * Works with unsorted arrays.  For sorted arrays, FindSortedKey() is faster.
+   * Find a string, case-insensitive.
+   * \return csArrayItemNotFound if not found, else item index.
+   * \remarks Works with sorted and unsorted arrays, but FindSortedKey() is
+   *   faster on sorted arrays.
    */
-  size_t FindCaseInsensitive (const char* what) const
+  size_t FindCaseInsensitive (const char* str) const
   {
-    for (size_t i = 0; i < Length (); i++)
-      if (!csStrCaseCmp (Get (i), what))
+    for (size_t i = 0; i < GetSize (); i++)
+      if (!csStrCaseCmp (Get (i), str))
         return i;
     return (size_t)-1;
+  }
+
+  /**
+   * Alias for Find() and FindCaseInsensitive().
+   * \param str String to look for in array.
+   * \param case_sensitive If true, consider case when performing comparison.
+   *   (default: yes)
+   * \return csArrayItemNotFound if not found, else item index.
+   * \remarks Works with sorted and unsorted arrays, but FindSortedKey() is
+   *   faster on sorted arrays.
+   * <p>
+   * \remarks Some people find Contains() more idiomatic than Find().
+   */
+  size_t Contains(const char* str, bool case_sensitive = true) const
+  {
+    return case_sensitive ? Find(str) : FindCaseInsensitive(str);
   }
 };
 

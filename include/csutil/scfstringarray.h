@@ -33,17 +33,26 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Create a iStringArray from scratch.
-  scfStringArray (int iLimit = 16, int iDelta = 16) : v (iLimit, iDelta)
+  scfStringArray (int limit = 16, int delta = 16) : v (limit, delta)
   { SCF_CONSTRUCT_IBASE (0); }
 
   /// Destructor - nothing to do.
   virtual ~scfStringArray ()
   { SCF_DESTRUCT_IBASE(); }
 
-  /// Query array length.
-  virtual size_t Length () const
+  /// Get array length.
+  virtual size_t GetSize () const
   {
     return v.Length ();
+  }
+
+  /**
+   * Get array length.
+   * \deprecated Use GetSize() instead.
+   */
+  virtual size_t Length () const
+  {
+    return GetSize ();
   }
 
   /// Push a string onto the stack.
@@ -52,60 +61,116 @@ public:
     v.Push ((char*)value);
   }
 
-  /// Pop a string from the top of stack.
+  /**
+   * Pop an element from tail end of array.
+   * \remarks Caller is responsible for invoking delete[] on the returned
+   *   string when no longer needed.
+   */
   virtual char *Pop ()
   {
     return v.Pop ();
   }
 
-  /// Get Nth string in vector.
+  /// Get a particular string from the array.
   virtual char const *Get (size_t n) const
   {
     return v.Get (n);
   }
 
-  /// Find index of given string, case sensitive.
+  /**
+   * Find a string, case-sensitive.
+   * \return csArrayItemNotFound if not found, else item index.
+   * \remarks Works with sorted and unsorted arrays, but FindSortedKey() is
+   *   faster on sorted arrays.
+   */
   virtual size_t Find (const char *value) const
   {
     return v.Find (value);
   }
 
-  /// Find index of given string, case insensitive.
+  /**
+   * Find a string, case-insensitive.
+   * \return csArrayItemNotFound if not found, else item index.
+   * \remarks Works with sorted and unsorted arrays, but FindSortedKey() is
+   *   faster on sorted arrays.
+   */
   virtual size_t FindCaseInsensitive (const char *value) const
   {
     return v.FindCaseInsensitive (value);
   }
 
-  /// Find index of a string in a pre-sorted string array.
+  /**
+   * Find an element based on some key, using a comparison function.
+   * \return csArrayItemNotFound if not found, else item index.
+   * \remarks The array must be sorted.
+   */
   virtual size_t FindSortedKey (const char *value) const
   {
     return v.FindSortedKey ((char*)value);
   }
 
-  /// Sort the string array.
-  virtual void Sort ()
+  /**
+   * Alias for Find() and FindCaseInsensitive().
+   * \param str String to look for in array.
+   * \param case_sensitive If true, consider case when performing comparison.
+   *   (default: yes)
+   * \return csArrayItemNotFound if not found, else item index.
+   * \remarks Works with sorted and unsorted arrays, but FindSortedKey() is
+   *   faster on sorted arrays.
+   * <p>
+   * \remarks Some people find Contains() more idiomatic than Find().
+   */
+  virtual size_t Contains(const char* str, bool case_sensitive = true) const
   {
-    v.Sort ();
+    return v.Contains (str, case_sensitive);
   }
 
-  /// Delete Nth string in the array.
+  /**
+   * Sort array.
+   * \param case_sensitive If true, consider case when performing comparison.
+   *   (default: yes)
+   */
+  virtual void Sort (bool case_sensitive = true)
+  {
+    v.Sort (case_sensitive);
+  }
+
+  /// Delete string \c n from the array.
   virtual bool DeleteIndex (size_t n)
   {
     return v.DeleteIndex (n);
   }
 
-  /// Insert a string before Nth string in the array.
+  /// Insert a string before entry \c n in the array.
   virtual bool Insert (size_t n, char const *value)
   {
     return v.Insert (n, (char*)value);
   }
 
-  /// Delete all strings in array.
+  /// Remove all strings from array, releasing allocated memory.
+  virtual void Empty ()
+  {
+    v.Empty();
+  }
+
+  /**
+   * Remove all strings from array.
+   * \deprecated Use Empty() instead.
+   */
   virtual void DeleteAll ()
   {
-    v.DeleteAll ();
+    Empty();
+  }
+
+  /**
+   * Return true if the array is empty.
+   * \remarks Rigidly equivalent to <tt>return GetSize() == 0</tt>, but more
+   *   idiomatic.
+   */
+  virtual bool IsEmpty() const
+  {
+    return v.IsEmpty();
   }
 };
 
 #endif // __CS_SCFSTRINGARRAY_H__
-

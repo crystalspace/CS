@@ -1,6 +1,4 @@
 /*
-    Copyright (C) 2001 by Martin Geisse <mgeisse@gmx.net>
-
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -16,40 +14,16 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_OBJPOOL_H__
-#define __CS_OBJPOOL_H__
+#ifndef __CSUTIL_CS_OBJPOOL_H__
+#define __CSUTIL_CS_OBJPOOL_H__
 
-#include "parray.h"
+#if defined(CS_COMPILER_GCC)
+#warning csObjectPool is deprecated; use csBlockAllocator instead
+#elif defined(CS_COMPILER_MSVC)
+#pragma message ("csObjectPool is deprecated; use csBlockAllocator instead")
+#endif
 
-/**
- * This class defines a 'pool' class for the given type.
- * This class can be used to create objects of the given 
- * type, but it will re-use older objects if possible to save time. For this 
- * reason, unused objects of the given type should not be deleted but given 
- * to the pool.
- */
-template <class T>
-class csObjectPool
-{
-protected:
-  csPDelArray<T> Objects;
+#define csObjectPool csBlockAllocator
+#include "blockallocator.h"
 
-public:
-  /// Get an object from the pool.
-  T *Alloc ()
-  {
-    if (Objects.Length () > 0)
-      return Objects.Pop ();
-    else
-      return new T ();
-  }
-
-  /// Give an object back to the pool
-  void Free (T* o)
-  {
-    Objects.Push (o);
-  }
-};
-
-#endif // __CS_OBJPOOL_H__
-
+#endif // __CSUTIL_CS_OBJPOOL_H__

@@ -6,6 +6,82 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Apr-2005
+	- Eric Sunshine updated csBlockAllocator<> so that it automatically
+	  destroys contained objects at its own destruction time rather than
+	  forcing the client to invoke csBlockAllocator<>::Free() for every
+	  allocated object before destorying the csBlockAllocator<> itself.
+	  Forcing the client to recycle each object manually was not only
+	  rather strange, but is was also quite hostile, and made the usage of
+	  the class much more onerous than it ought have been.
+	- Eric Sunshine retired the csObjectPool<> template since it managed
+	  memory poorly and failed to invoke the destructor of contained
+	  objects at the time they were recycled via csObjectPool<>::Free(),
+	  which meant that the objects might not release their own resources in
+	  a timely fashion.  (It did correctly destroy the freed objects when
+	  the pool itself was destroyed, but should have been doing so at
+	  Free()-time.) csBlockAllocator<> can be used as a drop-in replacement
+	  for csObjectPool<>.
+	- Eric Sunshine added a new class csMemoryPool, which is a
+	  quick-allocation pool for storage of arbitrary data. Pointers to
+	  allocations made from the pool are guaranteed to remain valid as long
+	  as the pool is alive; the pool contents are never relocated.  All
+	  individually allocated memory chunks are freed when the pool itself
+	  is destroyed.
+	- Eric Sunshine fixed a serious design flaw in csSet<> where it stored
+	  each object twice, thus consuming an unnecessarily excessive amount
+	  of memory.
+	- Eric Sunshine simplified the internal implementation of csStringHash
+	  significantly, making it more heap-friendly and much easier to
+	  understand.
+	- Eric Sunshine retired csStringSetIterator and csStringHashIterator,
+	  and replaced them with csStringSet::GlobalIterator and
+	  csStringHash::GlobalIterator, respectively. For consistency with
+	  other container classes, rather than manually instantiating the
+	  iterators, csStringSet and csStringHash now vend iterators to clients
+	  via GetIterator().
+	- Eric Sunshine fixed bug where every csStringSet iterator was leaking
+	  a csStringHash iterator.
+	- Eric Sunshine greatly improved the Doxygen documentation for the
+	  various container classes.
+	- Eric Sunshine added the following methods to various classes and
+	  interfaces in order to promote API consistency between the various
+	  container classes. In some cases, the new methods deprecated existing
+	  ones; in other cases, they add functionality which was missing.
+	    csArray<>::Contains()
+	    csArray<>::GetSize()
+	    csArray<>::IsEmpty()
+	    csArray<>::SetSize()
+	    csBlockAllocator<>::Empty()
+	    csHash<>::Empty()
+	    csHash<>::IsEmpty()
+	    csSet<>::Empty()
+	    csSet<>::IsEmpty()
+	    csStringArray::Contains()
+	    csStringHash::Contains(csStringID)
+	    csStringHash::Delete(char const*)
+	    csStringHash::Delete(csStringID)
+	    csStringHash::Empty()
+	    csStringHash::GetIterator()
+	    csStringHash::GetSize()
+	    csStringHash::IsEmpty()
+	    csStringSet::Contains(csStringID)
+	    csStringSet::Delete(char const*)
+	    csStringSet::Delete(csStringID)
+	    csStringSet::Empty()
+	    csStringSet::GetIterator()
+	    csStringSet::GetSize()
+	    csStringSet::IsEmpty()
+	    iStringArray::Contains()
+	    iStringArray::Empty()
+	    iStringArray::GetSize()
+	    iStringArray::IsEmpty()
+	    iStringSet::Contains(csStringID)
+	    iStringSet::Delete(char const*)
+	    iStringSet::Delete(csStringID)
+	    iStringSet::Empty()
+	    iStringSet::GetSize()
+	    iStringSet::IsEmpty()
 2-Apr-2005
 	- res fixed some VC7.0 warnings.
 	- res fixed crashes when making screenshots of render targets.

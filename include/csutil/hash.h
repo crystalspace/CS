@@ -152,6 +152,7 @@ public:
    * Here are a few primes: 7, 11, 19, 29, 59, 79, 101, 127, 151, 199, 251,
    * 307, 401, 503, 809, 1009, 1499, 2003, 3001, 5003, 12263, 25247, 36923,
    * 50119, 70951, 90313, 104707.
+   *
    * For a bigger list go to http://www.utm.edu/research/primes/
    */
   csHash (int size = 23, int grow_rate = 5, int max_size = 20000)
@@ -336,6 +337,9 @@ public:
     Size = 0;
   }
 
+  /// Delete all the elements. (Idiomatic alias for DeleteAll().)
+  void Empty() { DeleteAll(); }
+
   /// Delete all the elements matching the given key.
   bool DeleteAll (const K& key)
   {
@@ -379,6 +383,16 @@ public:
   size_t GetSize () const
   {
     return Size;
+  }
+
+  /**
+   * Return true if the hash is empty.
+   * \remarks Rigidly equivalent to <tt>return GetSize() == 0</tt>, but more
+   *   idiomatic.
+   */
+  bool IsEmpty() const
+  {
+    return GetSize() == 0;
   }
 
   /// An iterator class for the hash.
@@ -526,6 +540,7 @@ public:
       return ret;
     }
 
+    /// Get the next element's value and key, don't move the iterator.
     const T& NextNoAdvance (K &key)
     {
       key = hash->Elements[bucket][element].key;
@@ -557,8 +572,8 @@ public:
   /**
    * Return an iterator for the hash, to iterate only over the elements
    * with the given key.
-   * Modifying the hash (except with DeleteElement) while you have open 
-   * iterators will cause undefined behaviour.
+   * \warning Modifying the hash (except with DeleteElement()) while you have
+   *   open iterators will result in undefined behaviour.
    */
   Iterator GetIterator (const K& key) const
   {
@@ -567,8 +582,8 @@ public:
 
   /**
    * Return an iterator for the hash, to iterate over all elements.
-   * Modifying the hash (except with DeleteElement) while you have open 
-   * iterators will cause undefined behaviour.
+   * \warning Modifying the hash (except with DeleteElement()) while you have
+   *   open iterators will result in undefined behaviour.
    */
   GlobalIterator GetIterator () const
   {
@@ -585,20 +600,25 @@ template <class T, class KeyHandler = csIntegralHashKeyHandler<T> >
 class csSet
 {
 private:
-  csHash<T, T, KeyHandler> map;
+  csHash<bool, T, KeyHandler> map;
 
 public:
   /// An iterator class for the set.
-  class GlobalIterator : public csHash<T, T, KeyHandler>::GlobalIterator
+  class GlobalIterator : public csHash<bool, T, KeyHandler>::GlobalIterator
   {
   protected:
     GlobalIterator () {}
-    GlobalIterator (const csSet<T, KeyHandler> *set0) : 
-      csHash<T, T, KeyHandler>::GlobalIterator(&set0->map)
-    { }
+    GlobalIterator (const csSet<T, KeyHandler>* s) :
+      csHash<bool, T, KeyHandler>::GlobalIterator(&s->map) {}
 
   public:
     friend class csSet<T, KeyHandler>;
+    T Next()
+    {
+      T key;
+      csHash<bool, T, KeyHandler>::GlobalIterator::Next(key);
+      return key;
+    }
   };
   friend class GlobalIterator;
 
@@ -629,7 +649,7 @@ public:
    */
   void AddNoTest (const T& object)
   {
-    map.Put (object, object);
+    map.Put (object, true);
   }
 
   /**
@@ -656,6 +676,9 @@ public:
     map.DeleteAll ();
   }
 
+  /// Delete all elements in the set. (Idiomatic alias for DeleteAll().)
+  void Empty() { DeleteAll(); }
+
   /**
    * Delete an object from the set. This function
    * does nothing if the object is not in the set.
@@ -672,13 +695,23 @@ public:
     return map.GetSize ();
   }
 
+  /**
+   * Return true if the set is empty.
+   * \remarks Rigidly equivalent to <tt>return GetSize() == 0</tt>, but more
+   *   idiomatic.
+   */
+  bool IsEmpty() const
+  {
+    return GetSize() == 0;
+  }
+
   /// Return the hash map for this hash set.
-  csHash<T, T, KeyHandler>* GetHash () { return &map; }
+  csHash<bool, T, KeyHandler>* GetHash () { return &map; }
 
   /**
    * Return an iterator for the hash set, to iterate over all elements.
-   * Modifying the set while you have open iterators will cause undefined 
-   * behaviour.
+   * \warning Modifying the set while you have open iterators will cause
+   *   undefined behaviour.
    */
   GlobalIterator GetIterator () const
   {

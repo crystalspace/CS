@@ -414,7 +414,7 @@ void InternalScanPluginDir (iStringArray*& messages,
   // Now go over all the files.  This way files in a dir will have precedence
   // over files a subdir.
   {
-    csStringHashIterator fileIt (&files);
+    csStringHash::GlobalIterator fileIt(files.GetIterator());
     csString fullPath;
 
     csRef<iString> msg;
@@ -467,7 +467,7 @@ void InternalScanPluginDir (iStringArray*& messages,
     files.Clear();
   }
   {
-    csStringHashIterator dirIt (&dirs);
+    csStringHash::GlobalIterator dirIt(dirs.GetIterator());
     csString fullPath;
 
     while (dirIt.HasNext())

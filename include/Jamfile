@@ -17,18 +17,19 @@ Recurse InstallHeader : .h .i .inc .fun .tok ;
 # under different contexts, or because they are deprecated.
 CS_MASTER_HEADER_REJECTS =
   [ Wildcard [ ConcatDirs csplugincommon directx ] : *.h ]
-  [ Wildcard [ ConcatDirs csplugincommon macosx ] : *.h ]
-  [ Wildcard [ ConcatDirs csplugincommon opengl ] : *.h ]
-  [ Wildcard [ ConcatDirs csplugincommon win32 ] : *.h ]
-  [ ConcatDirs cstool tokenlist.h ]
-  [ ConcatDirs csutil archive.h ]
-  [ ConcatDirs csutil csosdefs.h ]
-  [ ConcatDirs csutil garray.h ]
-  [ ConcatDirs csutil getopt.h ]
-  [ ConcatDirs csutil zip.h ]
-  [ ConcatDirs inetwork vosapi.h ]
-  [ ConcatDirs ivaria ode.h ]
-  [ ConcatDirs ivideo wxwin.h ]
+  [ Wildcard [ ConcatDirs csplugincommon macosx  ] : *.h ]
+  [ Wildcard [ ConcatDirs csplugincommon opengl  ] : *.h ]
+  [ Wildcard [ ConcatDirs csplugincommon win32   ] : *.h ]
+  [ ConcatDirs cstool   tokenlist.h ]
+  [ ConcatDirs csutil   archive.h   ]
+  [ ConcatDirs csutil   csosdefs.h  ]
+  [ ConcatDirs csutil   garray.h    ]
+  [ ConcatDirs csutil   getopt.h    ]
+  [ ConcatDirs csutil   objpool.h   ]
+  [ ConcatDirs csutil   zip.h       ]
+  [ ConcatDirs inetwork vosapi.h    ]
+  [ ConcatDirs ivaria   ode.h       ]
+  [ ConcatDirs ivideo   wxwin.h     ]
   ;
 
 CS_MASTER_HEADER_BOILERPLATE =

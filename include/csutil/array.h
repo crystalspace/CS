@@ -238,8 +238,8 @@ public:
  * Special allocator for csArray that makes sure that when
  * the array is reallocated that the objects are properly constructed
  * and destructed at their new position. This is needed for objects
- * that can't be safely moved around in memory (like weak references).
- * This is of course slower and that's the reason that this is not
+ * that can not be safely moved around in memory (like weak references).
+ * This is of course slower and that is the reason that this is not
  * done by default.
  */
 template <class T, class ElementHandler = csArrayElementHandler<T> >
@@ -311,9 +311,10 @@ const size_t csArrayItemNotFound = (size_t)-1;
 /**
  * A templated array class.  The objects in this class are constructed via
  * copy-constructor and are destroyed when they are removed from the array or
- * the array is destroyed.  Note: If you want to store reference-counted object
- * pointers (such as iSomething*), then you should look at csRefArray instead
- * of this class.
+ * the array is destroyed.
+ * \note If you want to store reference-counted object pointers, such as iFoo*,
+ * then you should consider csRefArray<>, which is more idiomatic than
+ * csArray<csRef<iFoo>>.
  */
 template <class T,
 	class ElementHandler = csArrayElementHandler<T>,
@@ -325,7 +326,7 @@ private:
   size_t capacity;
   size_t threshold;
   T* root;
-# ifdef CS_MEMORY_TRACKER
+#ifdef CS_MEMORY_TRACKER
   MemTrackerInfo* mti;
   void UpdateMti (int dn, int curcapacity)
   {
@@ -343,7 +344,7 @@ private:
     }
     mtiUpdateAmount (mti, dn, dn * sizeof (T));
   }
-# endif
+#endif
 
 protected:
   /**
@@ -363,35 +364,35 @@ private:
     {
       DeleteAll ();
       threshold = source.threshold;
-      SetLengthUnsafe (source.Length ());
+      SetSizeUnsafe (source.Length ());
       for (size_t i=0 ; i<source.Length() ; i++)
         ElementHandler::Construct (root + i, source[i]);
     }
   }
 
-  /// Set the capacity of the array precisely to `n' elements.
+  /// Set the capacity of the array precisely to \c n elements.
   void InternalSetCapacity (size_t n)
   {
     if (root == 0)
     {
       root = MemoryAllocator::Alloc (n);
-#	ifdef CS_MEMORY_TRACKER
+#ifdef CS_MEMORY_TRACKER
       UpdateMti (n, n);
-#	endif
+#endif
     }
     else
     {
       root = MemoryAllocator::Realloc (root, count, capacity, n);
-#	ifdef CS_MEMORY_TRACKER
+#ifdef CS_MEMORY_TRACKER
       UpdateMti (n-capacity, n);
-#	endif
+#endif
     }
     capacity = n;
   }
 
   /**
-   * Adjust capacity of this array to `n' elements rounded up to a multiple of
-   * `threshold'.
+   * Adjust capacity of this array to \c n elements rounded up to a multiple of
+   * \c threshold.
    */
   void AdjustCapacity (size_t n)
   {
@@ -402,11 +403,12 @@ private:
   }
 
   /**
-   * Set array length.  NOTE: Do not make this public since it does not
-   * properly construct/destroy elements.  To safely truncate the array, use
-   * Truncate().  To safely set the capacity, use SetCapacity().
+   * Set array length.
+   * \warning Do not make this public since it does not properly
+   *   construct/destroy elements.  To safely truncate the array, use
+   *   Truncate().  To safely set the capacity, use SetCapacity().
    */
-  void SetLengthUnsafe (size_t n)
+  void SetSizeUnsafe (size_t n)
   {
     if (n > capacity)
       AdjustCapacity (n);
@@ -431,23 +433,23 @@ public:
   }
 
   /**
-   * Initialize object to have initial capacity of 'icapacity' elements, and to
-   * increase storage by 'ithreshold' each time the upper bound is exceeded.
+   * Initialize object to have initial capacity of \c capacity elements, and to
+   * increase storage by \c threshold each time the upper bound is exceeded.
    */
-  csArray (size_t icapacity = 0, size_t ithreshold = 0)
+  csArray (size_t capacity = 0, size_t threshold = 0)
   {
-#   ifdef CS_MEMORY_TRACKER
+#ifdef CS_MEMORY_TRACKER
     mti = 0;
-#   endif
+#endif
     count = 0;
-    capacity = (icapacity > 0 ? icapacity : 0);
-    threshold = (ithreshold > 0 ? ithreshold : 16);
+    capacity = (capacity > 0 ? capacity : 0);
+    threshold = (threshold > 0 ? threshold : 16);
     if (capacity != 0)
     {
       root = MemoryAllocator::Alloc (capacity);
-#     ifdef CS_MEMORY_TRACKER
+#ifdef CS_MEMORY_TRACKER
       UpdateMti (capacity, capacity);
-#     endif
+#endif
     }
     else
     {
@@ -455,7 +457,7 @@ public:
     }
   }
 
-  /// Destructor.
+  /// Destroy array and all contained elements.
   ~csArray ()
   {
     DeleteAll ();
@@ -464,9 +466,9 @@ public:
   /// Copy constructor.
   csArray (const csArray& source)
   {
-#   ifdef CS_MEMORY_TRACKER
+#ifdef CS_MEMORY_TRACKER
     mti = 0;
-#   endif
+#endif
     root = 0;
     capacity = 0;
     count = 0;
@@ -480,10 +482,19 @@ public:
     return *this;
   }
 
-  /// Return the number of elements in the Array
-  size_t Length () const
+  /// Return the number of elements in the array.
+  size_t GetSize () const
   {
     return count;
+  }
+
+  /**
+   * Return the number of elements in the array.
+   * \deprecated Use GetSize() instead.
+   */
+  size_t Length () const
+  {
+    return GetSize();
   }
 
   /// Query vector capacity.  Note that you should rarely need to do this.
@@ -507,23 +518,25 @@ public:
       destination.count = count;
       destination.capacity = capacity;
       destination.threshold = threshold;
-#     ifdef CS_MEMORY_TRACKER
+#ifdef CS_MEMORY_TRACKER
       destination.mti = mti;
       mti = 0;
-#     endif
+#endif
       root = 0;
       capacity = count = 0;
     }
   }
 
   /**
-   * Set the actual number of items in this array. This can be used to
-   * shrink an array (works like Truncate() then in which case it will properly
-   * destroy all truncated objects) or to enlarge an array in which case
-   * it will properly set the new capacity and construct all new items
-   * based on the given item.
+   * Set the actual number of items in this array. This can be used to shrink
+   * an array (like Truncate()) or to enlarge an array, in which case it will
+   * properly construct all new items based on the given item.
+   * \param n New array length.
+   * \param what Object used as template to construct each newly added object
+   *   using the object's copy constructor when the array size is increased by
+   *   this method.
    */
-  void SetLength (size_t n, T const& what)
+  void SetSize (size_t n, T const& what)
   {
     if (n <= count)
     {
@@ -532,14 +545,20 @@ public:
     else
     {
       size_t old_len = Length ();
-      SetLengthUnsafe (n);
+      SetSizeUnsafe (n);
       for (size_t i = old_len ; i < n ; i++)
         ElementHandler::Construct (root + i, what);
     }
   }
 
-  /// Set array length to n.
-  void SetLength (size_t n)
+  /**
+   * Set the actual number of items in this array. This can be used to shrink
+   * an array (like Truncate()) or to enlarge an array, in which case it will
+   * properly construct all new items using their default (zero-argument)
+   * constructor.
+   * \param n New array length.
+   */
+  void SetSize (size_t n)
   {
     if (n <= count)
     {
@@ -548,10 +567,19 @@ public:
     else
     {
       size_t old_len = Length ();
-      SetLengthUnsafe (n);
+      SetSizeUnsafe (n);
       ElementHandler::InitRegion (root + old_len, n-old_len);
     }
   }
+
+  /** @{ */
+  /**
+   * Set the actual number of items in this array.
+   * \deprecated Use SetLength() instead.
+   */
+  void SetLength (size_t n, T const& what) { SetSize(n, what); }
+  void SetLength (size_t n) { SetSize(n); }
+  /** @} */
 
   /// Get an element (non-const).
   T& Get (size_t n)
@@ -568,13 +596,14 @@ public:
   }
 
   /**
-   * Get an item from the array. If the number of elements in this
-   * array is too small the array will be automatically extended.
+   * Get an item from the array. If the number of elements in this array is too
+   * small the array will be automatically extended, and the newly added
+   * objects will be created using their default (no-argument) constructor.
    */
   T& GetExtend (size_t n)
   {
     if (n >= count)
-      SetLength (n+1);
+      SetSize (n+1);
     return root[n];
   }
 
@@ -590,17 +619,21 @@ public:
     return Get(n);
   }
 
-  /// Put an element at some position.
+  /// Insert a copy of element at the indicated position.
   void Put (size_t n, T const& what)
   {
     if (n >= count)
-      SetLength (n+1);
+      SetSize (n+1);
     ElementHandler::Destroy (root + n);
     ElementHandler::Construct (root + n, what);
   }
 
   /**
-   * Find an element based on some key.
+   * Find an element based upon some arbitrary key, which may be embedded
+   * within an element, or otherwise derived from it. The incoming key \e
+   * functor defines the relationship between the key and the array's element
+   * type.
+   * \return csArrayItemNotFound if not found, else item index.
    */
   csArrayTemplate(K)
   size_t FindKey (csArrayCmpDecl(T,K) comparekey) const
@@ -611,7 +644,10 @@ public:
     return csArrayItemNotFound;
   }
 
-  /// Push an element onto the tail end of the array. Returns index of element.
+  /**
+   * Push a copy of an element onto the tail end of the array.
+   * \return Index of newly added element.
+   */
   size_t Push (T const& what)
   {
     if (((&what >= root) && (&what < root + Length())) &&
@@ -624,12 +660,12 @@ public:
 	around this.
        */
       size_t whatIndex = &what - root;
-      SetLengthUnsafe (count + 1);
+      SetSizeUnsafe (count + 1);
       ElementHandler::Construct (root + count - 1, root[whatIndex]);
     }
     else
     {
-      SetLengthUnsafe (count + 1);
+      SetSizeUnsafe (count + 1);
       ElementHandler::Construct (root + count - 1, what);
     }
     return count - 1;
@@ -637,7 +673,7 @@ public:
 
   /**
    * Push a element onto the tail end of the array if not already present.
-   * Returns index of newly pushed element or index of already present element.
+   * \return Index of newly pushed element or index of already present element.
    */
   size_t PushSmart (T const& what)
   {
@@ -651,30 +687,30 @@ public:
     CS_ASSERT (count > 0);
     T ret(root [count - 1]);
     ElementHandler::Destroy (root + count - 1);
-    SetLengthUnsafe (count - 1);
+    SetSizeUnsafe (count - 1);
     return ret;
   }
 
-  /// Return the top element but do not remove it.
+  /// Return the top element but do not remove it. (const)
   T const& Top () const
   {
     CS_ASSERT (count > 0);
     return root [count - 1];
   }
 
-  /// Return the top element but do not remove it.
+  /// Return the top element but do not remove it. (non-const)
   T& Top ()
   {
     CS_ASSERT (count > 0);
     return root [count - 1];
   }
 
-  /// Insert element 'item' before element 'n'.
+  /// Insert element \c item before element \c n.
   bool Insert (size_t n, T const& item)
   {
     if (n <= count)
     {
-      SetLengthUnsafe (count + 1); // Increments 'count' as a side-effect.
+      SetSizeUnsafe (count + 1); // Increments 'count' as a side-effect.
       size_t const nmove = (count - n - 1);
       if (nmove > 0)
 	MemoryAllocator::MemMove (root, n+1, n, nmove);
@@ -686,7 +722,7 @@ public:
   }
 
   /**
-   * Get the portion of the array between low and high inclusive
+   * Get the portion of the array between \c low and \c high inclusive.
    */
   csArray<T> Section (size_t low, size_t high) const
   {
@@ -698,8 +734,8 @@ public:
 
   /**
    * Find an element based on some key, using a comparison function.
-   * The array must be sorted. Returns csArrayItemNotFound if element does
-   * not exist.
+   * \return csArrayItemNotFound if not found, else the item index.
+   * \remarks The array must be sorted.
    */
   csArrayTemplate(K)
   size_t FindSortedKey (csArrayCmpDecl(T,K) comparekey,
@@ -726,7 +762,9 @@ public:
 
   /**
    * Insert an element at a sorted position, using an element comparison
-   * function.  Assumes array is already sorted.
+   * function.
+   * \return The index of the inserted item.
+   * \remarks The array must be sorted.
    */
   size_t InsertSorted (const T& item,
     int (*compare)(T const&, T const&) = DefaultCompare,
@@ -749,8 +787,6 @@ public:
       else
         r = m;
     }
-    //if (m == r)
-    //  m++;
     if ((m + 1) == r)
       m++;
     if (equal_index) *equal_index = csArrayItemNotFound;
@@ -759,8 +795,10 @@ public:
   }
 
   /**
-   * Find a element in array and return its index (or csArrayItemNotFound
-   * if not found).
+   * Find a element in array.
+   * \return csArrayItemNotFound if not found, else the item index.
+   * \warning Performs a slow linear search. For faster searching, sort the
+   *   array and then use FindSortedKey().
    */
   size_t Find (T const& which) const
   {
@@ -770,9 +808,13 @@ public:
     return csArrayItemNotFound;
   }
 
+  /// An alias for Find() which may be considered more idiomatic by some.
+  size_t Contains(T const& which) const
+  { return Find(which); }
+
   /**
    * Given a pointer to an element in the array this function will return
-   * the index. Note that this function doesn't check if the returned
+   * the index. Note that this function does not check if the returned
    * index is actually valid. The caller of this function is responsible
    * for testing if the returned index is within the bounds of the array.
    */
@@ -784,7 +826,7 @@ public:
   }
 
   /**
-   * Sort array.
+   * Sort array using a comparison function.
    */
   void Sort (int (*compare)(T const&, T const&) = DefaultCompare)
   {
@@ -793,7 +835,7 @@ public:
   }
 
   /**
-   * Clear entire vector.
+   * Clear entire array, releasing all allocated memory.
    */
   void DeleteAll ()
   {
@@ -813,8 +855,14 @@ public:
 
   /**
    * Truncate array to specified number of elements. The new number of
-   * elements cannot exceed the current number of elements. Use SetLength()
-   * for a more general way to enlarge the array.
+   * elements cannot exceed the current number of elements.
+   * \remarks Does not reclaim memory used by the array itself, though the
+   *   removed objects are destroyed. To reclaim the array's memory invoke
+   *   ShrinkBestFit(), or DeleteAll() if you want to release all allocated
+   *   resources.
+   * <p>
+   * \remarks The more general-purpose SetSize() method can also enlarge the
+   *   array.
    */
   void Truncate (size_t n)
   {
@@ -823,7 +871,7 @@ public:
     {
       for (size_t i = n; i < count; i++)
         ElementHandler::Destroy (root + i);
-      SetLengthUnsafe(n);
+      SetSizeUnsafe(n);
     }
   }
 
@@ -838,10 +886,20 @@ public:
   }
 
   /**
-   * Set vector capacity to approximately 'n' elements.  Never sets the
-   * capacity to fewer than the current number of elements in the array.  See
-   * Truncate() or SetLength() if you need to adjust the number of actual
-   * array elements.
+   * Return true if the array is empty.
+   * \remarks Rigidly equivalent to <tt>return GetSize() == 0</tt>, but more
+   *   idiomatic.
+   */
+  bool IsEmpty() const
+  {
+    return GetSize() == 0;
+  }
+
+  /**
+   * Set vector capacity to approximately \c n elements.
+   * \remarks Never sets the capacity to fewer than the current number of
+   *   elements in the array.  See Truncate() or SetSize() if you need to
+   *   adjust the number of actual array elements.
    */
   void SetCapacity (size_t n)
   {
@@ -851,7 +909,7 @@ public:
 
   /**
    * Make the array just as big as it needs to be. This is useful in cases
-   * where you know the array isn't going to be modified anymore in order
+   * where you know the array is not going to be modified anymore in order
    * to preserve memory.
    */
   void ShrinkBestFit ()
@@ -863,14 +921,21 @@ public:
     else if (count != capacity)
     {
       root = MemoryAllocator::Realloc (root, count, capacity, count);
-#     ifdef CS_MEMORY_TRACKER
+#ifdef CS_MEMORY_TRACKER
       UpdateMti (count-capacity, count);
-#     endif
+#endif
       capacity = count;
     }
   }
 
-  /// Delete element number 'n' from vector.
+  /**
+   * Delete an element from the array.
+   * return True if the indicated item index was valid, else false.
+   * \remarks Deletion speed is proportional to the size of the array and the
+   *   location of the element being deleted. If the order of the elements in
+   *   the array is not important, then you can instead use DeleteIndexFast()
+   *   for constant-time deletion.
+  */
   bool DeleteIndex (size_t n)
   {
     if (n < count)
@@ -880,7 +945,7 @@ public:
       ElementHandler::Destroy (root + n);
       if (nmove > 0)
 	MemoryAllocator::MemMove (root, n, n+1, nmove);
-      SetLengthUnsafe (ncount);
+      SetSizeUnsafe (ncount);
       return true;
     }
     else
@@ -888,10 +953,13 @@ public:
   }
 
   /**
-   * Delete element number 'n' from vector.
-   * This is a special version of DeleteIndex() that doesn't
-   * preserve the order of the elements that remain. This is
-   * a lot faster for big arrays though.
+   * Delete an element from the array in constant-time, regardless of the
+   * array's size.
+   * return True if the indicated item index was valid, else false.
+   * \remarks This is a special version of DeleteIndex() which does not
+   *   preserve the order of the remaining elements. This characteristic allows
+   *   deletions to be performed in constant-time, regardless of the size of
+   *   the array.
    */
   bool DeleteIndexFast (size_t n)
   {
@@ -902,7 +970,7 @@ public:
       ElementHandler::Destroy (root + n);
       if (nmove > 0)
         MemoryAllocator::MemMove (root, n, ncount, 1);
-      SetLengthUnsafe (ncount);
+      SetSizeUnsafe (ncount);
       return true;
     }
     else
@@ -910,8 +978,8 @@ public:
   }
 
   /**
-   * Delete a given range (inclusive). This routine will clamp start and end
-   * to the size of the array.
+   * Delete a given range (inclusive).
+   * \remarks Will clamp \c start and \c end to the array limits.
    */
   void DeleteRange (size_t start, size_t end)
   {
@@ -930,10 +998,14 @@ public:
     size_t const nmove = count - end - 1;
     if (nmove > 0)
       MemoryAllocator::MemMove (root, start, start + range_size, nmove);
-    SetLengthUnsafe (ncount);
+    SetSizeUnsafe (ncount);
   }
 
-  /// Delete the given element from vector.
+  /**
+   * Delete the given element from the array.
+   * \remarks Performs a linear search of the array to locate \c item, thus it
+   *   may be slow for large arrays.
+   */
   bool Delete (T const& item)
   {
     size_t const n = Find (item);
@@ -943,10 +1015,17 @@ public:
   }
 
   /**
-   * Delete the given element from vector.
-   * This is a special version of Delete() that doesn't
-   * preserve the order of the elements that remain. This is
-   * a lot faster for big arrays though.
+   * Delete the given element from the array.
+   * \remarks This is a special version of Delete() which does not
+   *   preserve the order of the remaining elements. This characteristic allows
+   *   deletions to be performed somewhat more quickly than by Delete(),
+   *   however the speed gain is largely mitigated by the fact that a linear
+   *   search is performed in order to locate \c item, thus this optimization
+   *   is mostly illusory.
+   * \deprecated The speed gain promised by this method is mostly illusory on
+   *   account of the linear search for the item. In many cases, it will be
+   *   faster to keep the array sorted, search for \c item using
+   *   FindSortedKey(), and then remove it using the plain DeleteIndex().
    */
   bool DeleteFast (T const& item)
   {
@@ -956,7 +1035,7 @@ public:
     return false;
   }
 
-  /** Iterator for the Array object */
+  /** Iterator for the Array<> class */
   class Iterator
   {
   public:
@@ -979,10 +1058,10 @@ public:
     /** Reset the array to the first element */
     void Reset()
     { currentelem = 0; }
+
   protected:
     Iterator(const csArray<T, ElementHandler>& newarray)
-	: currentelem(0), array(newarray)
-    { }
+	: currentelem(0), array(newarray) {}
     friend class csArray<T, ElementHandler>;
 
   private:
@@ -990,13 +1069,13 @@ public:
     const csArray<T, ElementHandler>& array;
   };
 
-  /** Returns an Iterator which traverses the Array */
+  /** Returns an Iterator which traverses the array. */
   Iterator GetIterator() const
   { return Iterator(*this); }
 };
 
 /**
- * Convenience class to make a version of csArray that does a
+ * Convenience class to make a version of csArray<> that does a
  * safe-copy in case of reallocation of the array. Useful for weak
  * references.
  */
@@ -1008,12 +1087,12 @@ class csSafeCopyArray
 {
 public:
   /**
-   * Initialize object to hold initially 'ilimit' elements, and increase
-   * storage by 'ithreshold' each time the upper bound is exceeded.
+   * Initialize object to hold initially \c limit elements, and increase
+   * storage by \c threshold each time the upper bound is exceeded.
    */
-  csSafeCopyArray (size_t ilimit = 0, size_t ithreshold = 0)
+  csSafeCopyArray (size_t limit = 0, size_t threshold = 0)
   	: csArray<T, csArrayElementHandler<T>,
-		     csSafeCopyArrayMemoryAllocator<T> > (ilimit, ithreshold)
+		     csSafeCopyArrayMemoryAllocator<T> > (limit, threshold)
   {
   }
 };

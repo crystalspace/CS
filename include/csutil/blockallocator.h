@@ -39,19 +39,19 @@
 
 /**
  * This class implements a memory allocator which can efficiently allocate
- * objects that all have the same size. It has NO memory overhead per allocation
- * (unless the objects are smaller than 8 bytes) and is extremely fast, both
- * for Alloc and Free. Only restriction is it can only be used for the same
- * type of object.
+ * objects that all have the same size. It has no memory overhead per
+ * allocation (unless the objects are smaller than 8 bytes) and is extremely
+ * fast, both for Alloc() and Free(). Only restriction is it can only be used
+ * for the same type of object.
+ * \remarks The objects are properly constructed and destructed.
  * <p>
- * Note that the objects are properly constructed and destructed.
- * <p>
- * WARNING: This class does VERY little error checking!
- * <p>
- * Defining the macro CS_BLOCKALLOC_DEBUG will cause freed objects to be
- * overwritten with '0xfb' bytes. This can be useful to track use of
- * already freed objects, as they can be more easily recognized (as some
- * members will be likely bogus.)
+ * \remarks Defining the macro CS_BLOCKALLOC_DEBUG will cause freed objects to
+ *   be overwritten with '0xfb' bytes. This can be useful to track use of
+ *   already freed objects, as they can be more easily recognized (as some
+ *   members will be likely bogus.)
+ * \warning This class does VERY little error checking!
+ * \sa csArray
+ * \sa csMemoryPool
  */
 template <class T>
 class csBlockAllocator
@@ -116,10 +116,10 @@ private:
    * If the current free block is full, find a new one. If needed
    * create a new one.
    */
-  void FindAndUpdateFreeBlock ()
+  void FindAndUpdateFreeBlock (size_t potentialnextfree)
   {
     CS_ASSERT (blocks.Length() != 0);
-    ++firstfreeblock;
+    firstfreeblock = potentialnextfree;
     while (firstfreeblock < blocks.Length ()
 		&& blocks[firstfreeblock].firstfree == 0)
       ++firstfreeblock;
@@ -144,17 +144,49 @@ private:
     }
   }
 
+  /**
+   * Destroys all living objects and releases all memory allocated by the pool.
+   * \remarks Unconditionally disposes of all memory. Does NOT maintain the one
+   *   pre-allocated page expected by Alloc() and other methods, thus after
+   *   invocation of this method, it is not safe to invoke any other methods
+   *   which expect at least one block to be present.
+   */
+  void DisposeAll()
+  {
+    for (size_t i = blocks.Length(); i-- > 0; )
+    {
+      csBlock const& bl = blocks[i];
+      uint8* el = (uint8*)bl.memory;
+      uint8 const* blockend = el + blocksize;
+      uint8 const* nextfree = (uint8*)bl.firstfree;
+      CS_ASSERT(nextfree == 0 || (nextfree >= el && nextfree < blockend));
+      for ( ; el < blockend; el += elsize)
+      {
+	if (nextfree == 0 || el < nextfree)
+	  ((T*)el)->~T();
+	else if (nextfree != 0)
+	  nextfree = (uint8*)((csFreeList*)nextfree)->next;
+      }
+    }
+    blocks.Empty();
+    firstfreeblock = (size_t)-1;
+  }
+
 public:
   /**
-   * Construct a new block allocator which uses 'size' elements
-   * per block. Using a bigger 'size' means there is more memory
-   * 'wasted' but it makes performance faster.
+   * Construct a new block allocator which uses \c nelem elements per
+   * block. Bigger values for \c nelem will improve allocation performance, but
+   * at the cost of having some potential waste if you do not add \c nelem
+   * elements to the pool.  For instance, if \c nelem is 50 but you only add 3
+   * elements to the pool, then the space for the remaining 47 elements, though
+   * allocated, will remain unused (until you add more elements).
    */
-  csBlockAllocator (size_t s)
+  csBlockAllocator (size_t nelem = 32)
   {
-    size = s;
+    size = nelem;
     elsize = sizeof (T);
-    if (elsize < sizeof (csFreeList)) elsize = sizeof (csFreeList);
+    if (elsize < sizeof (csFreeList))
+      elsize = sizeof (csFreeList);
     blocksize = elsize * size;
 
     size_t idx = blocks.Push (csBlock ());
@@ -168,7 +200,7 @@ public:
     bl.memory = (void*)ptr;
 #   else
     bl.memory = (void*)malloc (blocksize);
-#endif
+#   endif
     bl.firstfree = (csFreeList*)bl.memory;
     bl.firstfree->next = 0;
     bl.firstfree->numfree = size;
@@ -177,23 +209,22 @@ public:
   }
 
   /**
-   * Destruct all. Note that objects have to be freed properly before
-   * the block allocator is called, otherwise the destructors will not
-   * be called! In debug mode this destructor will also check that all
-   * objects are freed correctly.
+   * Destroy all allocated objects and release memory.
    */
   ~csBlockAllocator ()
   {
-#ifdef CS_DEBUG
-    CS_ASSERT (firstfreeblock == 0);
-    size_t i;
-    for (i = 0 ; i < blocks.Length () ; i++)
-    {
-      CS_ASSERT (blocks[i].firstfree == (csFreeList*)blocks[i].memory);
-      CS_ASSERT (blocks[i].firstfree->next == 0);
-      CS_ASSERT (blocks[i].firstfree->numfree == size);
-    }
-#endif
+    DisposeAll();
+  }
+
+  /**
+   * Destroy all objects allocated by the pool.
+   * \remarks All pointers returned by Alloc() are invalidated. It is safe to
+   *   perform new allocations from the pool after invoking Empty().
+   */
+  void Empty()
+  {
+    DisposeAll();
+    FindAndUpdateFreeBlock(0);
   }
 
   /**
@@ -242,7 +273,7 @@ public:
       if (!freebl.firstfree)
       {
         // This block has no more free space. We need a new one.
-	FindAndUpdateFreeBlock ();
+	FindAndUpdateFreeBlock (firstfreeblock + 1);
       }
     }
 

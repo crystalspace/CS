@@ -19,7 +19,7 @@
 #ifndef __CS_LPPOOL_H__
 #define __CS_LPPOOL_H__
 
-#include "csutil/objpool.h"
+#include "csutil/blockallocator.h"
 
 class csLightPatchPool;
 class csPolygon3D;
@@ -145,15 +145,14 @@ public:
  * If needed it will allocate one for you but ideally it can
  * give you one which was allocated earlier.
  */
-class csLightPatchPool : public csObjectPool<csLightPatch>
+class csLightPatchPool : public csBlockAllocator<csLightPatch>
 {
 public:
   void Free (csLightPatch* o)
   {
     o->RemovePatch ();
-    csObjectPool<csLightPatch>::Free (o);
+    csBlockAllocator<csLightPatch>::Free (o);
   }
 };
 
 #endif // __CS_LPPOOL_H__
-

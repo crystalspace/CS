@@ -22,14 +22,13 @@
 #include "csextern.h"
 #include "hash.h"
 #include "hashhandlers.h"
+#include "mempool.h"
 #include "iutil/strset.h"
 
 /**\file
- * String-to-ID hash table
+ * String-to-ID hash table.
  */
  
-class csStringHashIterator;
-
 /**
  * A string-to-ID hash table.  Useful when you need to work with strings but
  * want the performance characteristics of simple numeric comparisons.
@@ -40,25 +39,17 @@ class csStringHashIterator;
 class CS_CRYSTALSPACE_EXPORT csStringHash
 {
 private:
-  friend class csStringHashIterator;
-
-  struct csRegisteredString
-  {
-    typedef csStringID IDtype;
-    IDtype ID;
-    //char String[];
-
-    static csRegisteredString* Alloc (const char* str);
-    static void Free (csRegisteredString* regStr);
-    const char* GetString() const { return ((char*)this) + sizeof (IDtype); }
-  };
-  
-  csHash<csRegisteredString*, const char*, csConstCharHashKeyHandler> Registry;
+  typedef csHash<csStringID, char const*, csConstCharHashKeyHandler> HashType;
+  HashType registry;
+  csMemoryPool pool;
 
 public:
-  /// Constructor
-  csStringHash (int size = 23);
-  /// Destructor
+  typedef HashType::GlobalIterator GlobalIterator;
+
+public:
+  /// Constructor.
+  csStringHash (size_t size = 23);
+  /// Destructor.
   ~csStringHash ();
 
   /**
@@ -92,7 +83,9 @@ public:
   /**
    * Request the string for a given ID.
    * \return The string associated with the given ID, or the null pointer if
-   *   the string has not yet been registered.
+   *   the string has not yet been registered. If more than one string is
+   *   associated with the ID, then one is returned (but specifically which one
+   *   is unspecified).
    * \warning This operation is slow.  If you need to perform reverse lookups
    *   frequently, then instead consider using csStringSet, in which reverse
    *   lookups are optimized.
@@ -108,40 +101,61 @@ public:
   { return Request(s) != csInvalidStringID; }
 
   /**
-   * Delete all stored strings.
+   * Check if the hash contains a string with a particular ID.
+   * \remarks This is rigidly equivalent to
+   *   <tt>return Request(id) != NULL</tt>, but more idiomatic.
+   * \warning This operation is slow.  If you need to check containment of ID's
+   *   frequently, then instead consider using csStringSet, in which such
+   *   checks are optimized.
    */
-  void Clear ();
-};
-
-/**
- * An iterator to iterate over elements in a csStringHash.
- * When you have an open iterator you should not alter the
- * string hash that this object iterates over. 
- */
-class CS_CRYSTALSPACE_EXPORT csStringHashIterator
-{
-  friend class csStringHash;
-
-private:
-  //csGlobalHashIterator* hashIt;
-  csHash<csStringHash::csRegisteredString*, const char*, 
-    csConstCharHashKeyHandler>::GlobalIterator hashIt;
-
-public:
+  bool Contains(csStringID id) const
+  { return Request(id) != 0; }
 
   /**
-   * Construct an iterator to iterate over all elements in the string hash.
-   * \remarks You should not make changes to the hash map when you have open
-   *   iterators.
+   * Remove specified string.
+   * \return True if a matching string was in thet set; else false.
    */
-  csStringHashIterator (csStringHash*);
-  /// Destructor.
-  virtual ~csStringHashIterator ();
+  bool Delete(char const* s);
 
-  /// Is there a next element in this iterator?
-  bool HasNext ();
-  /// Get the next element.
-  csStringID Next ();
+  /**
+   * Remove a string with the specified ID.
+   * \return True if a matching string was in thet set; else false.
+   * \remarks If more than one string is associated with the ID, then one is
+   *   removed (but specifically which one is unspecified).
+   */
+  bool Delete(csStringID id);
+
+  /**
+   * Remove all stored strings.
+   */
+  void Empty ();
+
+  /**
+   * Delete all stored strings.
+   * \deprecated Use Empty() instead.
+   */
+  /*CS_DEPRECATED_METHOD*/ void Clear ()
+  { Empty(); }
+
+  /// Get the number of elements in the hash.
+  size_t GetSize () const
+  { return registry.GetSize (); }
+
+  /**
+   * Return true if the hash is empty.
+   * \remarks Rigidly equivalent to <tt>return GetSize() == 0</tt>, but more
+   *   idiomatic.
+   */
+  bool IsEmpty() const
+  { return GetSize() == 0; }
+
+  /**
+   * Return an iterator for the string hash which iterates over all elements.
+   * \warning Modifying the hash while you have open iterators will result
+   *   undefined behaviour.
+   */
+  GlobalIterator GetIterator () const
+  { return registry.GetIterator(); }
 };
 
 #endif // __CS_STRHASH_H__
