@@ -73,9 +73,10 @@ chronological order.
 22-Nov-2004
 	- Eric Sunshine added blurb to apimod100.txi regarding newly supported
 	  Java bindings.
-	- Vincent Knecht made the following changes to cs.spec file:
+	- Vincent Knecht made the following changes to rpm/cs.spec file:
 	    - Moved cslight invokations to post-install step.
-	    - Changed cslight invokations to use null instead of null2d.
+	    - Changed cslight invocations to use `-canvas=null' instead of
+	      `null2d'.
 21-Nov-2004
 	- res fixed a problem in the NR software renderer were wrong renderer
 	  lightmaps were selected for polygons, causing problems from visual 
