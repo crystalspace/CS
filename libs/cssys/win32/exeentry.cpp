@@ -30,6 +30,7 @@ int main (int argc, char* argv[])
 {
   // hInstance is really the handle of module
   ModuleHandle = GetModuleHandle (NULL);
+  ApplicationShow = SW_SHOWNORMAL;
   return csMain (argc, argv);
 }
 
