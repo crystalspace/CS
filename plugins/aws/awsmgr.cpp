@@ -584,6 +584,11 @@ void awsManager::RecursiveDrawChildren (iAwsComponent *cmp, csRect &dirtyarea)
   {
     child = cmp->GetChildAt (i);
 
+    // Do not draw the child if it's hidden of invisible.
+    if (child->isHidden() ||
+        child->Flags() & AWSF_CMP_INVISIBLE)
+	continue;
+
     if (DEBUG_MANAGER)
       printf ("aws-debug: entered draw children loop for %p.\n", child);
 

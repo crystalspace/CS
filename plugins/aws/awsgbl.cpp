@@ -2,6 +2,7 @@
 #include "awslayot.h"
 #include "awsgbl.h"
 #include "awsgbc.h"
+#include "iaws/awsdefs.h"
 #include <stdlib.h>
 #include <math.h>
 
@@ -958,6 +959,7 @@ void awsGridBagLayout::ArrangeGrid (iAwsComponent *parent)
     if ((r.Width () <= 0) || (r.Height () <= 0))
     {
       cmp->Frame ().MakeEmpty ();
+      cmp->SetFlag(AWSF_CMP_INVISIBLE);
     }
     else
     {
@@ -967,6 +969,7 @@ void awsGridBagLayout::ArrangeGrid (iAwsComponent *parent)
         cmp->Frame ().Width () != r.Width () ||
         cmp->Frame ().Height () != r.Height ())
       {
+	cmp->ClearFlag(AWSF_CMP_INVISIBLE);
         cmp->Frame ().Set (r);
         cmp->OnResized ();
       }

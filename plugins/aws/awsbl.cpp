@@ -1,6 +1,7 @@
 #include "cssysdef.h"
 #include "awsbl.h"
 #include "iaws/aws.h"
+#include "iaws/awsdefs.h"
 
 awsBorderLayout::awsBorderLayout (iAwsComponent *owner, 
 				  iAwsPrefManager *pm,
@@ -71,6 +72,11 @@ void awsBorderLayout::LayoutComponents ()
     cmp->Frame().ymax=cmp->Frame().ymin+cr.ymax;
 
     cmp->OnResized();
+
+    if (cmp->Frame().Width()<=0 || cmp->Frame().Height()<=0)
+      cmp->SetFlag(AWSF_CMP_INVISIBLE);
+    else
+      cmp->ClearFlag(AWSF_CMP_INVISIBLE);
   }
 
   if (components[GBS_SOUTH])
@@ -86,6 +92,11 @@ void awsBorderLayout::LayoutComponents ()
     cmp->Frame().ymax=r.ymax-i.ymax;
 
     cmp->OnResized();
+
+    if (cmp->Frame().Width()<=0 || cmp->Frame().Height()<=0)
+      cmp->SetFlag(AWSF_CMP_INVISIBLE);
+    else
+      cmp->ClearFlag(AWSF_CMP_INVISIBLE);
   }
 
   if (components[GBS_EAST])
@@ -101,6 +112,11 @@ void awsBorderLayout::LayoutComponents ()
     cmp->Frame().ymax=r.ymax-i.ymax-(has_south ? components[GBS_SOUTH]->Frame().Height() + vGap : 0);
 
     cmp->OnResized();
+
+    if (cmp->Frame().Width()<=0 || cmp->Frame().Height()<=0)
+      cmp->SetFlag(AWSF_CMP_INVISIBLE);
+    else
+      cmp->ClearFlag(AWSF_CMP_INVISIBLE);
   }
 
   if (components[GBS_WEST])
@@ -116,6 +132,11 @@ void awsBorderLayout::LayoutComponents ()
     cmp->Frame().ymax=r.ymax-i.ymax-(has_south ? components[GBS_SOUTH]->Frame().Height() + vGap: 0);
 
     cmp->OnResized();
+
+    if (cmp->Frame().Width()<=0 || cmp->Frame().Height()<=0)
+      cmp->SetFlag(AWSF_CMP_INVISIBLE);
+    else
+      cmp->ClearFlag(AWSF_CMP_INVISIBLE);
   }
 
   if (components[GBS_CENTER])
@@ -130,5 +151,10 @@ void awsBorderLayout::LayoutComponents ()
     cmp->Frame().ymax=r.ymax-i.ymax - (has_south ? components[GBS_SOUTH]->Frame().Height() + vGap : 0);
 
     cmp->OnResized();
+
+    if (cmp->Frame().Width()<=0 || cmp->Frame().Height()<=0)
+      cmp->SetFlag(AWSF_CMP_INVISIBLE);
+    else
+      cmp->ClearFlag(AWSF_CMP_INVISIBLE);
   }
 }

@@ -207,6 +207,7 @@ csRect awsGroupFrame::getInsets()
     return csRect(2,2,2,2);
   
   case fsNone:
+  default:
     return csRect(0,0,0,0);
   }
 }
