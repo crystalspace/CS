@@ -7,17 +7,66 @@
 @noindent
 @emph{Last updated 2 June 2003.}
 
+This @sc{howto} is a step by step guide for creating a basic Crystal Space
+application with @sc{msvc} 7 @sc{.net} outside the Crystal Space source tree.
+
+@sc{important}: This tutorial assumes you have a basic familiarity with
+@sc{msvc} and it's inner workings. This tutorial also assumes you have a fully
+compiled (both release and debug) version of Crystal Space somewhere on your
+computer.
+
+@subsubheading Step 1 - Creating a basic project solution.
+
+Start @sc{msvc} 7 and from the @emph{File} menu click on @emph{File} then
+@emph{New} and once the sub menu of @emph{New} opens, click on
+@emph{Project}.  You will now be presented with a dialog box (see image
+below) for creating a new project.
+
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap0}
 @end ifnotinfo
+
+Firstly we need to select the type of project we wish to create.  Crystal Space
+applications are Win32 applications and primarily work from a console
+base.  This still allows the creation of @emph{Graphical User Interface}
+(@sc{gui}) applications.  However, it also allows you to use the @emph{-console}
+command line switch and access more verbose runtime data normally only
+available with debug builds.  If you do wish to create standard win32
+applications, you may do so.  However... the @emph{-console} switch will
+not operate correctly in that type of application.
+
+In the @emph{Project Types:} window select @emph{Visual C++ projects}.  Next we
+move to the @emph{Templates:} window and choose the application type we wish to
+create.  As mentioned above Crystal Space applications are Win32 applications.
+So, search that window and select @emph{Win32 Project}.  Now enter the name of
+your application in the @emph{Name} text box.  In our example, the application
+will be named @file{simple1}.  Once done, click on the @emph{@sc{ok}} button.
+
+You will now be presented with another dialog box (see image below).
 
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap1}
 @end ifnotinfo
 
+We wish to specify some application settings.  So, click on hyperlink text
+@emph{Application Settings} below @emph{Overview} and you will be presented
+with what can be seen in the screenshot below.
+
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap2}
 @end ifnotinfo
+
+As discussed above, Crystal Space applications are primarily console based
+(though @sc{GUI} are allowed) inorder to give us acces to the verbose
+diagnostic text via @emph{-console}.  Under @emph{Application type:}, select
+@emph{Console application}.  We are starting from a blank canvas. So, in the
+@emph{Additional options:} section, check the box @emph{Empty project}.  Once
+done, click on the @emph{Finish} button.
+
+You should now be in the @sc{msvc} 7 @sc{ide} (Intergrated Development
+Environment), with the @emph{simple1} project loaded.  Lets move on...
+
+@subsubheading Step 2 - Adding files/code to the project solution.
 
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap3}
