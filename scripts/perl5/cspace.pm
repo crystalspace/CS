@@ -7755,6 +7755,39 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iEventAttributeIterator ##############
+
+package cspace::iEventAttributeIterator;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*HasNext = *cspacec::iEventAttributeIterator_HasNext;
+*Next = *cspacec::iEventAttributeIterator_Next;
+*Reset = *cspacec::iEventAttributeIterator_Reset;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iEventAttributeIterator($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csKeyEventData ##############
 
 package cspace::csKeyEventData;
@@ -7953,27 +7986,16 @@ package cspace::iEvent;
 *AddUInt8 = *cspacec::iEvent_AddUInt8;
 *AddInt16 = *cspacec::iEvent_AddInt16;
 *AddUInt16 = *cspacec::iEvent_AddUInt16;
-*AddInt32 = *cspacec::iEvent_AddInt32;
 *AddUInt32 = *cspacec::iEvent_AddUInt32;
 *AddFloat = *cspacec::iEvent_AddFloat;
 *AddDouble = *cspacec::iEvent_AddDouble;
-*AddBool = *cspacec::iEvent_AddBool;
 *Add = *cspacec::iEvent_Add;
-*FindInt8 = *cspacec::iEvent_FindInt8;
-*FindUInt8 = *cspacec::iEvent_FindUInt8;
-*FindInt16 = *cspacec::iEvent_FindInt16;
-*FindUInt16 = *cspacec::iEvent_FindUInt16;
-*FindUInt32 = *cspacec::iEvent_FindUInt32;
-*FindFloat = *cspacec::iEvent_FindFloat;
-*FindDouble = *cspacec::iEvent_FindDouble;
-*FindBool = *cspacec::iEvent_FindBool;
-*Find = *cspacec::iEvent_Find;
+*Retrieve = *cspacec::iEvent_Retrieve;
+*AttributeExists = *cspacec::iEvent_AttributeExists;
+*GetAttributeType = *cspacec::iEvent_GetAttributeType;
 *Remove = *cspacec::iEvent_Remove;
 *RemoveAll = *cspacec::iEvent_RemoveAll;
-*Print = *cspacec::iEvent_Print;
-*FlattenSize = *cspacec::iEvent_FlattenSize;
-*Flatten = *cspacec::iEvent_Flatten;
-*Unflatten = *cspacec::iEvent_Unflatten;
+*GetAttributeIterator = *cspacec::iEvent_GetAttributeIterator;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -12840,9 +12862,23 @@ sub VFS_STATUS_NOSPACE () { $cspacec::VFS_STATUS_NOSPACE }
 sub VFS_STATUS_RESOURCES () { $cspacec::VFS_STATUS_RESOURCES }
 sub VFS_STATUS_ACCESSDENIED () { $cspacec::VFS_STATUS_ACCESSDENIED }
 sub VFS_STATUS_IOERROR () { $cspacec::VFS_STATUS_IOERROR }
-sub CS_CRYSTAL_PROTOCOL () { $cspacec::CS_CRYSTAL_PROTOCOL }
-sub CS_MUSCLE_PROTOCOL () { $cspacec::CS_MUSCLE_PROTOCOL }
-sub CS_XML_PROTOCOL () { $cspacec::CS_XML_PROTOCOL }
+sub csEventErrNone () { $cspacec::csEventErrNone }
+sub csEventErrLossy () { $cspacec::csEventErrLossy }
+sub csEventErrNotFound () { $cspacec::csEventErrNotFound }
+sub csEventErrMismatchInt () { $cspacec::csEventErrMismatchInt }
+sub csEventErrMismatchUInt () { $cspacec::csEventErrMismatchUInt }
+sub csEventErrMismatchFloat () { $cspacec::csEventErrMismatchFloat }
+sub csEventErrMismatchBuffer () { $cspacec::csEventErrMismatchBuffer }
+sub csEventErrMismatchEvent () { $cspacec::csEventErrMismatchEvent }
+sub csEventErrMismatchIBase () { $cspacec::csEventErrMismatchIBase }
+sub csEventErrUhOhUnknown () { $cspacec::csEventErrUhOhUnknown }
+sub csEventAttrUnknown () { $cspacec::csEventAttrUnknown }
+sub csEventAttrInt () { $cspacec::csEventAttrInt }
+sub csEventAttrUInt () { $cspacec::csEventAttrUInt }
+sub csEventAttrFloat () { $cspacec::csEventAttrFloat }
+sub csEventAttrDatabuffer () { $cspacec::csEventAttrDatabuffer }
+sub csEventAttrEvent () { $cspacec::csEventAttrEvent }
+sub csEventAttriBase () { $cspacec::csEventAttriBase }
 sub csevNothing () { $cspacec::csevNothing }
 sub csevKeyboard () { $cspacec::csevKeyboard }
 sub csevMouseMove () { $cspacec::csevMouseMove }
