@@ -28,6 +28,9 @@
 #include "csutil/debug.h"
 #include "iutil/cfgfile.h"
 #include "igraphic/image.h"
+#include "csgfx/memimage.h"
+#include "ivaria/reporter.h"
+#include "csgfx/xorpat.h"
 
 //---------------------------------------------------------------------------
 
@@ -714,7 +717,13 @@ void csTextureManagerOpenGL::PrepareTextures ()
 
 iTextureHandle *csTextureManagerOpenGL::RegisterTexture (iImage* image, int flags)
 {
-  if (!image) return NULL;
+  if (!image) 
+  {
+    G3D->Report(CS_REPORTER_SEVERITY_BUG, 
+      "BAAAD!!! csTextureManagerOpenGL::RegisterTexture with NULL image!");
+
+    image = csCreateXORPatternImage(32, 32, 5);
+  }
 
   csTextureHandleOpenGL* txt = new csTextureHandleOpenGL (image, flags, GL_RGBA, pfmt.PixelBytes*8, G3D);
   textures.Push (txt);

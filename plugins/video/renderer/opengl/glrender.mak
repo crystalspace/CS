@@ -78,7 +78,7 @@ SRC.GL3D = $(wildcard plugins/video/renderer/opengl/*.cpp) \
   plugins/video/renderer/common/vbufmgr.cpp \
   plugins/video/renderer/common/polybuf.cpp
 OBJ.GL3D = $(addprefix $(OUT),$(notdir $(SRC.GL3D:.cpp=$O)))
-DEP.GL3D = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.GL3D = CSGEOM CSUTIL CSSYS CSUTIL CSGFX
 CFG.GL3D = data/config/opengl.cfg
 
 TO_INSTALL.CONFIG += $(CFG.GL3D)

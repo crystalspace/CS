@@ -32,6 +32,8 @@
 #include "ivaria/reporter.h"
 #include "qint.h"
 #include "protex3d.h"
+#include "csgfx/memimage.h"
+#include "csgfx/xorpat.h"
 
 #define RESERVED_COLOR(c) ((c == 0) || (c == 255))
 
@@ -742,7 +744,14 @@ void csTextureManagerSoftware::PrepareTextures ()
 iTextureHandle *csTextureManagerSoftware::RegisterTexture (iImage* image,
   int flags)
 {
-  if (!image) return NULL;
+  if (!image) 
+  {
+    G3D->Report(CS_REPORTER_SEVERITY_BUG, 
+      "BAAAD!!! csTextureManagerOpenGL::RegisterTexture with NULL image!");
+
+    image = csCreateXORPatternImage(32, 32, 5);
+  }
+
   csTextureHandleSoftware *txt = new csTextureHandleSoftware (this, image, flags);
   textures.Push (txt);
   return txt;

@@ -34,6 +34,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
+#include  "csgfx/xorpat.h"
 
 iImage* csLoader::LoadImage (const char* name, int Format)
 {
@@ -65,21 +66,24 @@ iImage* csLoader::LoadImage (const char* name, int Format)
     ReportError (
 	      "crystalspace.maploader.parse.image",
     	      "Could not open image file '%s' on VFS!", name);
-    return NULL;
+    //return NULL;
+  } else {
+    ifile = ImageLoader->Load (buf->GetUint8 (), buf->GetSize (), Format);
+    buf->DecRef ();
+
+    if (!ifile)
+    {
+      ReportError (
+		"crystalspace.maploader.parse.image",
+    		"Could not load image '%s'. Unknown format or wrong extension!",
+		name);
+      //return NULL;
+    }
   }
-
-  ifile = ImageLoader->Load (buf->GetUint8 (), buf->GetSize (), Format);
-  buf->DecRef ();
-
-  if (!ifile)
-  {
-    ReportError (
-	      "crystalspace.maploader.parse.image",
-    	      "Could not load image '%s'. Unknown format or wrong extension!",
-	      name);
-    return NULL;
-  }
-
+  if (!ifile) {
+    ifile = csCreateXORPatternImage(32, 32, 5);
+  } 
+  
   iDataBuffer *xname = VFS->ExpandPath (name);
   ifile->SetName (**xname);
   xname->DecRef ();
