@@ -10,6 +10,8 @@ chronological order.
 	- res applied (a variation of) patch #1152721, "Cygwin compatability 
 	  with _X and _C", from Michael D. Adams.
 	- res fixed a printf() format warning in vfscache.cpp on Cygwin.
+	- res added missing SCF_CONSTRUCT_IBASE/SCF_DESTRUCT_IBASE to 
+	  BufferNameIter class (in userrndbuf.cpp).
 26-Feb-2005
 	- res renamed "anonymous render buffers" to user render buffers,
 	  simplified csUserRenderBufferManager, added a render buffer parser

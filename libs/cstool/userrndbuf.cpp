@@ -67,8 +67,14 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  BufferNameIter() : index(0) {}
-  virtual ~BufferNameIter() {}
+  BufferNameIter() : index(0) 
+  {
+    SCF_CONSTRUCT_IBASE(0);
+  }
+  virtual ~BufferNameIter() 
+  {
+    SCF_DESTRUCT_IBASE();
+  }
 
   bool HasNext();
   csStringID Next (csRef<iRenderBuffer>* buf = 0);
