@@ -1777,13 +1777,15 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDP& poly)
       {
 	const csPlane& pl = fog_info->incoming_plane;
 	float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
-	dist1 = v.Norm () * (-pl.DD / denom);
+	//dist1 = v.Norm () * (-pl.DD / denom);
+	dist1 = v.z * (-pl.DD / denom);
       }
       else
         dist1 = 0;
       const csPlane& pl = fog_info->outgoing_plane;
       float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
-      dist2 = v.Norm () * (-pl.DD / denom);
+      //dist2 = v.Norm () * (-pl.DD / denom);
+      dist2 = v.z * (-pl.DD / denom);
 
 #ifdef USE_EXP_FOG
       // Implement semi-exponential fog (linearily approximated)
