@@ -22,6 +22,7 @@
 #include "csengine/world.h"
 #include "csengine/sector.h"
 #include "csengine/pol2d.h"
+#include <math.h>
 
 //=============================================================================
 
@@ -33,13 +34,61 @@ csSprite2D::csSprite2D () : csSprite (), position (0, 0, 0)
   lighting = true;
 }
 
+
 csSprite2D::~csSprite2D ()
 {
+  csWorld::current_world->UnlinkSprite (this);
 }
+
+
+void csSprite2D::CreateRegularVertices (int n, bool setuv)
+{
+  double angle_inc = 2.0*PI / n;
+  double angle = 0.0;
+  vertices.SetLimit(n);
+  vertices.SetLength(n);
+  for (int i=0; i<vertices.Length(); i++, angle += angle_inc)
+  {
+    vertices[i].pos.y = cos(angle);
+    vertices[i].pos.x = sin(angle);
+    if (setuv) 
+    {
+      // reuse sin/cos values and scale to [0..1]
+      vertices[i].u = vertices[i].pos.x / 2.0f + 0.5f;
+      vertices[i].v = vertices[i].pos.y / 2.0f + 0.5f;
+    }
+  }
+}
+
+
+void csSprite2D::ScaleBy (float factor)
+{
+  for (int i=0; i<vertices.Length(); i++)
+    vertices[i].pos *= factor;
+}
+
+
+void csSprite2D::Rotate (float angle)
+{
+  for (int i=0; i<vertices.Length(); i++)
+    vertices[i].pos.Rotate(angle);
+}
+
+
+void csSprite2D::Shift (float dx, float dy)
+{
+  for (int i=0; i<vertices.Length(); i++)
+  {
+    vertices[i].pos.x += dx;
+    vertices[i].pos.y += dy;
+  }
+}
+
 
 void csSprite2D::UpdatePolyTreeBBox ()
 {
 }
+
 
 void csSprite2D::SetLighting (bool l)
 {
@@ -51,6 +100,7 @@ void csSprite2D::SetLighting (bool l)
       vertices[i].color = vertices[i].color_init;
   }
 }
+
 
 void csSprite2D::UpdateLighting (csLight** lights, int num_lights)
 {
@@ -87,6 +137,7 @@ void csSprite2D::UpdateLighting (csLight** lights, int num_lights)
     vertices[i].color.Clamp (2, 2, 2);
   }
 }
+
 
 void csSprite2D::Draw (csRenderView& rview)
 {

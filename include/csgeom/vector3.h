@@ -102,17 +102,33 @@ public:
   inline friend csVector3 operator* (float f, const csVector3& v)
   { return csVector3(v.x*f, v.y*f, v.z*f); }
 
-  /// Multiply a vector and a scalar.
+  /// Multiply a vector and a scalar double. Casts down the double!
   inline friend csVector3 operator* (const csVector3& v, double f)
-  { return v*(float)f; }
+  { return v * (float)f; }
 
-  /// Multiply a vector and a scalar.
+  /// Multiply a vector and a scalar double. Casts down the double!
   inline friend csVector3 operator* (double f, const csVector3& v)
-  { return v*(float)f; }
+  { return v * (float)f; }
+
+  /// Multiply a vector and a scalar int.
+  inline friend csVector3 operator* (const csVector3& v, int f)
+  { return v * (float)f; }
+
+  /// Multiply a vector and a scalar int.
+  inline friend csVector3 operator* (int f, const csVector3& v)
+  { return v * (float)f; }
 
   /// Divide a vector by a scalar.
   inline friend csVector3 operator/ (const csVector3& v, float f)
   { f = 1.0f/f; return csVector3(v.x*f, v.y*f, v.z*f); }
+
+  /// Divide a vector by a scalar double. Casts down the double!
+  inline friend csDVector3 operator/ (const csVector3& v, double f)
+  { return v / (float)f; }
+
+  /// Divide a vector by a scalar int.
+  inline friend csVector3 operator/ (const csVector3& v, int f)
+  { return v / (float)f; }
 
   /// Check if two vectors are equal.
   inline friend bool operator== (const csVector3& v1, const csVector3& v2)

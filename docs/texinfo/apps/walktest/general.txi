@@ -236,6 +236,10 @@ Add a floating transparent green ghost. The first argument is the depth. A
 depth of 1 will create a root and one layer above. The second argument is
 the width. This is the number of arms for the ghost.
 
+@item explosion
+Add a particle system simulating an explosion. A bit primitive at this
+moment because of lack for a good texture.
+
 @item dumpvis
 This command takes the current view and dumps information for the rendering
 process. You will see what sectors and polygons are rendered and how they

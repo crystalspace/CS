@@ -39,6 +39,7 @@
 #include "csengine/sector.h"
 #include "csengine/cspixmap.h"
 #include "csengine/collider.h"
+#include "csengine/particle.h"
 #include "csutil/scanstr.h"
 #include "csparser/impexp.h"
 #include "csobject/dataobj.h"
@@ -192,6 +193,29 @@ csSprite3D* add_sprite (char* tname, char* sname, csSector* where, csVector3 con
 
   spr->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   return spr;
+}
+
+//===========================================================================
+// Demo particle system.
+//===========================================================================
+csParticleSystem* global_ps = NULL;
+
+void add_particles (csSector* sector, const csVector3& center, char* txtname)
+{
+  // First check if the texture exists.
+  csTextureHandle* txt = Sys->view->GetWorld ()->GetTextures ()->FindByName (txtname);
+  if (!txt)
+  {
+    Sys->Printf (MSG_CONSOLE, "Couldn't find texture '%s' in memory!\n", txtname);
+    return;
+  }
+
+  CHK (csParSysExplosion* exp = new csParSysExplosion (20,
+  	center, csVector3 (0, 0, 0), txt));
+  exp->MoveToSector (sector);
+  exp->SetSelfDestruct (3000);
+  exp->SetMixmodes (CS_FX_SETALPHA (0.75));
+  global_ps = exp;
 }
 
 //===========================================================================
@@ -811,6 +835,7 @@ void HandleDynLight (csDynLight* dyn)
       }
       dyn->Resize (es->radius);
       dyn->Setup ();
+      add_particles (dyn->GetSector (), dyn->GetCenter (), "green.gif");
       break;
     }
     case DYN_TYPE_RANDOM:
@@ -1063,7 +1088,7 @@ static bool CommandHandler (char *cmd, char *arg)
     Sys->Printf (MSG_CONSOLE, " i_forward, i_backward, i_left, i_right, i_up, i_down\n");
     Sys->Printf (MSG_CONSOLE, " i_rotleftc, i_rotleftw, i_rotrightc, i_rotrightw\n");
     Sys->Printf (MSG_CONSOLE, " i_rotleftx, i_rotleftz, i_rotrightx, i_rotrightz\n");
-    Sys->Printf (MSG_CONSOLE, " clrlights, setlight, palette, db_octree\n");
+    Sys->Printf (MSG_CONSOLE, " clrlights, setlight, palette, db_octree, explosion\n");
   }
   else if (!strcasecmp (cmd, "coordsave"))
   {
@@ -1405,6 +1430,19 @@ static bool CommandHandler (char *cmd, char *arg)
       move_sprite (sp, Sys->view->GetCamera ()->GetSector (), pos);
     }
   }
+  else if (!strcasecmp (cmd, "explosion"))
+  {
+    char txtname[100];
+    int cnt = 0;
+    if (arg) cnt = ScanStr (arg, "%s", txtname);
+    if (cnt != 1)
+    {
+      Sys->Printf (MSG_CONSOLE, "Expected parameter 'texture'!\n");
+    }
+    else
+      add_particles (Sys->view->GetCamera ()->GetSector (),
+    	Sys->view->GetCamera ()->GetOrigin (), txtname);
+  }
   else if (!strcasecmp (cmd, "loadsprite"))
   {
     char filename[100], tempname[100], txtname[100];
@@ -1422,7 +1460,8 @@ static bool CommandHandler (char *cmd, char *arg)
     float size;
     if (arg) ScanStr (arg, "%s,%f", name, &size);
     else { *name = 0; size = 1; }
-    add_sprite (name, name, Sys->view->GetCamera ()->GetSector (), Sys->view->GetCamera ()->GetOrigin (), size);
+    add_sprite (name, name, Sys->view->GetCamera ()->GetSector (),
+    	Sys->view->GetCamera ()->GetOrigin (), size);
   }
   else if (!strcasecmp (cmd, "delsprite"))
   {
@@ -2100,8 +2139,10 @@ void WalkTest::NextFrame (time_t elapsed_time, time_t current_time)
   // The following will fetch all events from queue and handle them
   SysSystemDriver::NextFrame (elapsed_time, current_time);
 
+  csParticleSystem::UpdateAll (elapsed_time);
+
   // Record the first time this routine is called.
-  if(do_bots)
+  if (do_bots)
   {
     static long first_time = -1;
     static time_t next_bot_at;
@@ -2167,7 +2208,7 @@ void WalkTest::NextFrame (time_t elapsed_time, time_t current_time)
     }
   } /* endif */
 
-  if(first_bot)
+  if (first_bot)
   {
     Bot* bot = first_bot;
     while (bot)

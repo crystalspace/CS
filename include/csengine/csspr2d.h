@@ -84,6 +84,13 @@ public:
   /// Get the vertex array.
   csColoredVertices& GetVertices () { return vertices; }
 
+  /** 
+   * Set vertices to form a regular n-polygon around (0,0),
+   * optionally also set u,v to corresponding coordinates in a texture.
+   * Large n approximates a circle with radius 1. n must be > 2. 
+   */
+  void CreateRegularVertices(int n, bool setuv);
+
   /**
    * Set true if this sprite needs lighting (default).
    * Otherwise the given colors are used.
@@ -127,6 +134,28 @@ public:
 
   /// Get position of this sprite.
   inline csVector3 GetOrigin () const { return position; }
+
+  /**
+   * Scale the vertices of the sprite by factor.
+   */
+  void ScaleBy (float factor);
+
+  /**
+   * Rotate the vertices of the sprite by angle, angle in radians.
+   */
+  void Rotate (float angle);
+
+  /**
+   * Shift the vertices of the sprite by delta x and y.
+   * The sprite will be drawn displaced from the center position.
+   */
+  void Shift (float dx, float dy);
+
+  /**
+   * Shift the vertices of the sprite by vector delta.
+   * The sprite will be drawn displaced from the center position.
+   */
+  void Shift (csVector2& delta) { Shift (delta.x, delta.y); }
 
   /**
    * Light sprite according to the given array of lights (i.e.
