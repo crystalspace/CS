@@ -67,7 +67,7 @@ HEADER=$(wildcard *.h */*.h */*/*.h */*/*/*.h */*/*/*/*.h)
 
 CFLAGS.INCLUDE+=$(CFLAGS.I). $(CFLAGS.I)./include $(CFLAGS.I)./libs \
   $(CFLAGS.I)./apps $(CFLAGS.I)./support
-
+  
 CFLAGS=$(CFLAGS.GENERAL) $(CFLAGS.$(MODE)) $(MEM)
 LFLAGS=$(LFLAGS.GENERAL) $(LFLAGS.$(MODE)) $(LFLAGS.L)$(OUT)
 LIBS=$(LIBS.EXE) $(Z_LIBS)
@@ -164,14 +164,51 @@ cleanlib:
 cleandep:
 	-$(RM) $(OUTOS)*.dep
 
-doc:
-	doc++ -H -d csdoc -f $(HEADER)
-
 api:
-	doc++ -b -H -d csapi -f \
+	doc++ -H -d csapi -f \
 		$(wildcard include/csengine/*.h) \
 		$(wildcard include/csobject/*.h) \
 		$(wildcard include/csgeom/*.h)
+		
+doc:
+	doc++ -H -d csdoc -f $(HEADER)
+
+PDFLATEX=pdflatex -interaction=nonstopmode
+PDF_FILES=csgeom.pdf csengine.pdf csobject.pdf
+
+VPATH=newdoc:out:include/csgeom
+
+html: api doc
+	latex2html newdoc/html
+
+%.tex: $(wildcard include/$(*F)/*.h)
+	doc++ -t -o $(*F).tex $(wildcard include/$(*F)/*.h)
+
+%.pdf: %.tex
+	$(PDFLATEX) $<
+
+classpdf: $(PDF_FILES)
+
+pdf: cs-tut.pdf cs-inst.pdf classpdf
+
+pdfbook: crystal.pdf classpdf
+
+cleandoc:
+	rm -f *.aux
+	rm -f *.log
+	rm -f *.pdf
+	rm -f *.idx
+	rm -f *.toc
+	rm -f *.tex
+	rm -f *.txt
+	rm -rf csdoc
+	rm -rf csapi
+	rm -rf html
+
+%.txt: %.tex
+	detex $< > $(*F).txt
+
+detex: cs-tut.txt cs-inst.txt csgeom.txt csengine.txt csobject.txt
 
 $(OUT)static$O: static.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.STATIC_COM)
