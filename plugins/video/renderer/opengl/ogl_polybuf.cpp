@@ -205,7 +205,7 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
      * to a vertex that has the same uv's
      */
     int j;
-    int indexVert;
+    int indexVert=-1;
     for(j = 0; j < pol->vertices[verts[0]]->indices.Length(); j++)
     {
       indexVert = pol->vertices[verts[0]]->indices[j].vertex;
@@ -281,7 +281,7 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
        * to a vertex that has the same uv's
        */
       int j;
-      int indexVert;
+      int indexVert=-1;
       for(j = 0; j < pol->vertices[verts[i]]->indices.Length(); j++)
       {
         indexVert = pol->vertices[verts[i]]->indices[j].vertex;
@@ -344,7 +344,7 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
       * to a vertex that has the same uv's
       */
      int j;
-     int indexVert;
+     int indexVert=-1;
      for(j = 0; j < pol->vertices[verts[i+1]]->indices.Length(); j++)
      {
         indexVert = pol->vertices[verts[i+1]]->indices[j].vertex;
