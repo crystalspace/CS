@@ -25,9 +25,57 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine performed the SCF conversion on the Simple Network
 	  Manager.  He also renamed types, classes, & constants, and
 	  reformatted the source code to more closely follow CS guidelines.
+29-Nov-1999
+	- Andrew Zabolotny did the following changes:
+	    - Fully rewrote halo support in software renderer. The
+	      iHaloRasterizer interface has changed much, so it is
+	      possible that other 3D rasterizers will compile with minor
+	      errors (I tried to do my best to avoid it, but it is
+	      anyway possible).
+            - The following enhancements have been made to the halos:
+        	- Halos are fully supported now in 8 (sic!), 15, 16 and
+		  32bpp modes. Besides they should be now much faster
+		  since halos consists of just an alpha map now (no texture
+		  as before).
+        	- Many fixes in engine handling of halos. Halos now fade
+		  away as expected (do not disappear suddenly) as the
+		  light itsel (i.e. the center of the halo) goes off the
+		  screen. Also try to launch a rocket into the
+        	  halo such that the missile will cover the light.
+        	- Full clipping support. The halos will be now clipped
+		  against any complex clipping polygon.
+        	- Halos have now an "intensity factor" that shows how fast
+		  the intensity goes down from maximum.
+     		- New file in cs3d/common: halogen.cpp. This has nothing to
+		  do with chemistry :-) its just a abbreviation of "halo
+		  generator". This file provides a routine that will
+		  generate an alpha map for a halo given the above two
+		  parameters. If somebody cares to fix halo support in
+		  hardware renderers (:-) they should include that file
+		  into the project files for the respective renderers.
+		  The halo support in direct3D driver have not been
+		  removed, thus you'll get same halos as before; however
+         	  it would be much better to add support for the new halos.
+28-Nov-1999
+	- Some additional work on coverage mask tree implementation.
+	- Thomas Hieber implemented the first step to manual sectoring
+	  in Map2CS.
+27-Nov-1999
+	- Michael Dale Long did the following changes to csclear:
+	    - Added initial ccPhysicsPlugin code. Collision reaction now
+	      works through it.
+	    - Improved impluse registration system in ccImpulseManager,
+	      but it needs more work.
 26-Nov-1999
 	- Andrew Zabolotny modified SCF so that object reference counts are
 	  initialized to 1 rather than 0.
+	- CrystalClear documentation update from Michael Dale Long.
+	- Michael Dale Long added initial collision detection to cctest.
+	  Right now the entity performs collision detection against all
+	  sectors, things, and sprites (oh my :) in the world, and if a
+	  collision is detected it aborts the move.  This currently does
+	  not apply to rotation, either.  So right now, it is only very
+	  rough detection, but it is a major step forward.
 	- Eric Sunshine fixed a crasher in SCF which was introduced with
 	  Andrew's reference-count modification.  The problem was that the
 	  CONSTRUCT_IBASE macro was calling virtual IncRef() from within the
@@ -60,6 +108,14 @@ Short-term cleanups that need to be done:
 	  though it was.
 	- Eric Sunshine fixed cctest so that it compiles once again following
 	  recent changes which broke it.
+	- Brandon Ehle added python debugger.
+	- Brandon fixed cspython so that it gives a good error if python
+	  is not installed correctly.
+	- Michael Dale Long reworked cctest input controls and
+	  CrystalClear input plugin quite a bit. Now has better key
+	  handling and mouse look capabilities.
+	- Update to Map2CS from Thomas Hieber. First partially working
+	  manual sectoring.
 24-Nov-1999
 	- Eric Sunshine fixed a transpostion error in snddata.cpp which was
 	  leaking memory.
@@ -70,6 +126,14 @@ Short-term cleanups that need to be done:
 	  when an inline method calls a second inline method before the
 	  compiler has seen the second method.  The same bug was also
 	  triggered by several files in the new csPhyziks library.
+	- Robert Bate started initial sound support for the Macintosh (SCF).
+	- Robert also fixed OpenGL for Mac.
+	- Robert also did various other changes and cleanups to the Mac
+	  port.
+	- Alex Pfaffe changed terrain engine so that it no longer needs
+	  the ddgQueue class.
+	- Updates to documentation from Wyatt Miller (checked in by
+	  Brandon Ehle).
 23-Nov-1999
 	- Robert Bate cleaned up the Macintosh port with relation to the
 	  old COM and new SCF.
@@ -88,6 +152,10 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine made minor changes to the new csphyziks library to
 	  eliminate some compilation warnings and allow it to compile on
 	  NextStep.
+	- Brandon Ehle fixed the Unreal Map loader so that it mostly works
+	  now.
+	- Thomas Hieber added patches from Peter Donald for sound. Peter
+	  fixed the sound stuff to SCF.
 22-Nov-1999
 	- Alex Pfaffe added support for Z sorted triangles to terrain
 	  engine.
