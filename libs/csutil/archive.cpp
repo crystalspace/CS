@@ -1023,9 +1023,13 @@ bool csArchive::ArchiveEntry::ReadExtraField (FILE *infile, size_t extra_field_l
     extrafield = NULL;
   }
   info.extra_field_length = extra_field_length;
-  if (!extrafield)
-    CHKB (extrafield = new char[extra_field_length]);
-  return (fread (extrafield, 1, extra_field_length, infile) == extra_field_length);
+  if (extra_field_length)
+  {
+    if (!extrafield)
+      CHKB (extrafield = new char[extra_field_length]);
+    return (fread (extrafield, 1, extra_field_length, infile) == extra_field_length);
+  }
+  else return true;
 }
 
 bool csArchive::ArchiveEntry::ReadFileComment (FILE *infile, size_t file_comment_length)
@@ -1036,9 +1040,13 @@ bool csArchive::ArchiveEntry::ReadFileComment (FILE *infile, size_t file_comment
     comment = NULL;
   }
   info.file_comment_length = file_comment_length;
-  if (!comment)
-    CHKB (comment = new char[file_comment_length]);
-  return (fread (comment, 1, file_comment_length, infile) == file_comment_length);
+  if (file_comment_length)
+  {
+    if (!comment)
+      CHKB (comment = new char[file_comment_length]);
+    return (fread (comment, 1, file_comment_length, infile) == file_comment_length);
+  }
+  else return true;
 }
 
 bool csArchive::ArchiveEntry::WriteFile (FILE *outfile)
