@@ -1679,7 +1679,7 @@ int main (int argc, char* argv[])
   return 1;
 }
 
-#if 1
+#if 0
 
 #define DETECT_SIZE 20
 #define DETECT     "ABCDabcd01234567890+"
