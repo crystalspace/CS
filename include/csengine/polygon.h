@@ -1242,10 +1242,8 @@ public:
       const csMatrix3 &iMatrix);
     virtual bool SetPlane (const char *iName);
 
-    virtual unsigned GetFlags ()
-    { return scfParent->flags.Get (); }
-    virtual void SetFlags (unsigned iMask, unsigned iValue)
-    { scfParent->flags.Set (iMask, iValue); }
+    virtual csFlags& GetFlags ()
+    { return scfParent->flags; }
 
     virtual void SetLightingMode (bool iGouraud)
     { scfParent->SetTextureType(iGouraud ? POLYTXT_GOURAUD:POLYTXT_LIGHTMAP); }

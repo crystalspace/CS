@@ -20,6 +20,7 @@
 #define __IENGINE_THING_H__
 
 #include "csutil/scf.h"
+#include "csutil/flags.h"
 
 class csVector3;
 class csMatrix3;
@@ -93,7 +94,7 @@ struct iThing : public iBase
   /// Get the given vertex coordinates in camera space
   virtual csVector3 &GetVertexC (int idx) = 0;
   /// Create a vertex given his object-space coords and return his index
-  virtual int CreateVertex (csVector3 &iVertex) = 0;
+  virtual int CreateVertex (const csVector3 &iVertex) = 0;
 
   /// Create a key/value pair object
   virtual bool CreateKey (const char *iName, const char *iValue) = 0;
@@ -102,7 +103,7 @@ struct iThing : public iBase
   virtual iMovable* GetMovable () = 0;
 };
 
-SCF_VERSION (iThingState, 0, 0, 2);
+SCF_VERSION (iThingState, 0, 0, 3);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -138,7 +139,7 @@ struct iThingState : public iBase
   /// Get the given vertex coordinates in camera space
   virtual csVector3 &GetVertexC (int idx) = 0;
   /// Create a vertex given his object-space coords and return his index
-  virtual int CreateVertex (csVector3 &iVertex) = 0;
+  virtual int CreateVertex (const csVector3 &iVertex) = 0;
   /**
    * Prepare the lightmaps for all polys so that they are suitable
    * for the 3D rasterizer.
@@ -159,10 +160,8 @@ struct iThingState : public iBase
    */
   virtual void CheckFrustum (iFrustumView* fview) = 0;
 
-  /// Get the flags for this thing.
-  virtual unsigned GetFlags () = 0;
-  /// Set any number of flags for this thing.
-  virtual void SetFlags (unsigned iMask, unsigned iValue) = 0;
+  /// Set thing flags (see CS_THING_... values above)
+  virtual csFlags& GetFlags () = 0;
 
   /**
    * Get the moving option.

@@ -62,12 +62,13 @@
  */
 #define CS_PORTAL_STATICDEST 0x00000010
 
+class csTransform;
 class csMatrix3;
 class csVector3;
 struct iSector;
 struct iPolygon3D;
 
-SCF_VERSION (iPortal, 0, 0, 2);
+SCF_VERSION (iPortal, 0, 0, 3);
 
 /**
  * This is the interface to the Portal objects. Polygons that are
@@ -92,6 +93,12 @@ struct iPortal : public iBase
    */
   virtual void SetWarp (const csMatrix3 &m_w, const csVector3 &v_w_before,
     const csVector3 &v_w_after) = 0;
+  /**
+   * Set the warping transformation for this portal in object space and world
+   * space.
+   */
+  virtual void SetWarp (const csTransform& t);
+
   /// Set warping transformation to mirror around given polygon
   virtual void SetMirror (iPolygon3D *iPoly) = 0;
 };

@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
+#include "csgeom/transfrm.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "thingldr.h"
@@ -28,6 +29,7 @@
 #include "isys/system.h"
 #include "iengine/thing.h"//@@@ (should be from imesh)
 #include "iengine/polygon.h"//@@@ (should be from imesh)
+#include "iengine/portal.h"	//@@@ (imesh)
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "qint.h"
@@ -134,7 +136,7 @@ EXPORT_CLASS_TABLE (thingldr)
     "Crystal Space Thing Mesh Saver")
 EXPORT_CLASS_TABLE_END
 
-#define MAXLINE 100 /* max number of chars per line... */
+#define MAXLINE 200 /* max number of chars per line... */
 
 //---------------------------------------------------------------------------
 
@@ -152,6 +154,27 @@ bool csThingLoader::Initialize (iSystem* system)
   sys = system;
   return true;
 }
+
+class ThingLoadInfo
+{
+public:
+  iMaterialWrapper* default_material;
+  float default_texlen;
+  bool use_mat_set;
+  char* mat_set_name;
+  
+  ThingLoadInfo () : default_material (NULL),
+    default_texlen (1),
+    use_mat_set (false), mat_set_name (NULL)
+    {}
+
+  void SetTextureSet (const char* name)
+  {
+    delete [] mat_set_name;
+    mat_set_name = new char [strlen (name) + 1];
+    strcpy (mat_set_name, name);
+  }   
+};
 
 static bool load_matrix (char* buf, csMatrix3 &m)
 {
@@ -253,9 +276,8 @@ static bool load_vector (char* buf, csVector3 &v)
 
 static void OptimizePolygon (iPolygon3D *p)
 {
-//@@@
-  //if (!p->GetPortal () || p->GetAlpha ())
-    //return;
+  if (!p->GetPortal () || p->GetAlpha ())
+    return;
 
   iMaterialWrapper *mat = p->GetMaterial ();
   if (mat)
@@ -381,7 +403,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
         {
           int do_lighting;
           ScanStr (params, "%b", &do_lighting);
-          poly3d->SetFlags (CS_POLY_LIGHTING,
+          poly3d->GetFlags ().Set (CS_POLY_LIGHTING,
 	  	do_lighting ? CS_POLY_LIGHTING : 0);
         }
         break;
@@ -409,17 +431,12 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
         break;
       case CS_TOKEN_PORTAL:
         {
-#if 0
           ScanStr (params, "%s", str);
-          csSector *s = new csSector (Engine);
-          s->SetName (str);
-          poly3d->SetCSPortal (s);
-          csLoaderStat::portals_loaded++;
-#endif
+          iSector* s = engine->CreateSector (str);
+          poly3d->CreatePortal (s);
         }
         break;
       case CS_TOKEN_WARP:
-#if 0
         if (poly3d->GetPortal ())
         {
           csMatrix3 m_w; m_w.Identity ();
@@ -452,20 +469,19 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
 		if (!set_colldet) set_colldet = 1;
                 break;
               case CS_TOKEN_STATIC:
-                poly3d->GetPortal ()->flags.Set (CS_PORTAL_STATICDEST);
+                poly3d->GetPortal ()->GetFlags ().Set (CS_PORTAL_STATICDEST);
                 break;
       	      case CS_TOKEN_ZFILL:
-		poly3d->GetPortal ()->flags.Set (CS_PORTAL_ZFILL);
+		poly3d->GetPortal ()->GetFlags ().Set (CS_PORTAL_ZFILL);
         	break;
       	      case CS_TOKEN_CLIP:
-		poly3d->GetPortal ()->flags.Set (CS_PORTAL_CLIPDEST);
+		poly3d->GetPortal ()->GetFlags ().Set (CS_PORTAL_CLIPDEST);
         	break;
             }
           }
           if (!do_mirror)
             poly3d->GetPortal ()->SetWarp (m_w, v_w_before, v_w_after);
         }
-#endif
         break;
       case CS_TOKEN_TEXTURE:
         while ((cmd = csGetObject (&params, tex_commands, &name, &params2)) > 0)
@@ -676,9 +692,9 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
   }
 
   if (set_colldet == 1)
-    poly3d->SetFlags (CS_POLY_COLLDET, CS_POLY_COLLDET);
+    poly3d->GetFlags ().Set (CS_POLY_COLLDET);
   else if (set_colldet == -1)
-    poly3d->SetFlags (CS_POLY_COLLDET, 0);
+    poly3d->GetFlags ().Reset (CS_POLY_COLLDET);
 
   if (tx_uv_given)
   {
@@ -746,19 +762,17 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
   }
 #endif
 
-#if 0
-//@@@
   if (do_mirror)
     poly3d->GetPortal ()->SetWarp (csTransform::GetReflect (
-    	*(poly3d->GetPolyPlane ()) ));
-#endif
+    	poly3d->GetWorldPlane () ));
 
   OptimizePolygon (poly3d);
 
   return poly3d;
 }
 
-static iBase* load_thing_part (iEngine* engine, iBase* loadingObj,
+static iBase* load_thing_part (ThingLoadInfo& info,
+	iEngine* engine, iBase* loadingObj,
 	iThingState* thing_state, char* buf, int vt_offset, bool isParent)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -805,7 +819,7 @@ static iBase* load_thing_part (iEngine* engine, iBase* loadingObj,
 	  printf ("VISTREE flag only for top-level thing!\n");
 	  return NULL;
 	}
-        else thing_state->SetFlags (CS_THING_VISTREE, CS_THING_VISTREE);
+        else thing_state->GetFlags ().Set (CS_THING_VISTREE);
         break;
       case CS_TOKEN_MOVEABLE:
         if (!isParent)
@@ -862,7 +876,7 @@ static iBase* load_thing_part (iEngine* engine, iBase* loadingObj,
             printf ("Object '%s' is not a thing!\n", str);
             return NULL;
 	  }
-	  thing_state->MergeTemplate (tmpl_thing_state, NULL /*@@@info.default_material*/);
+	  thing_state->MergeTemplate (tmpl_thing_state, info.default_material);
 	  tmpl_thing_state->DecRef ();
 	  //@@@if (info.use_mat_set)
           //{
@@ -895,7 +909,7 @@ static iBase* load_thing_part (iEngine* engine, iBase* loadingObj,
             printf ("Object '%s' is not a thing!\n", str);
             return NULL;
 	  }
-	  thing_state->MergeTemplate (tmpl_thing_state, NULL /*@@@info.default_material*/);
+	  thing_state->MergeTemplate (tmpl_thing_state, info.default_material);
 	  tmpl_thing_state->DecRef ();
 	  //@@@if (info.use_mat_set)
           //{
@@ -906,7 +920,7 @@ static iBase* load_thing_part (iEngine* engine, iBase* loadingObj,
         }
         break;
       case CS_TOKEN_PART:
-	if (!load_thing_part (engine, loadingObj, thing_state, params,
+	if (!load_thing_part (info, engine, loadingObj, thing_state, params,
 		thing_state->GetVertexCount (), false))
 	  return NULL;
         break;
@@ -923,7 +937,6 @@ static iBase* load_thing_part (iEngine* engine, iBase* loadingObj,
         break;
       case CS_TOKEN_CIRCLE:
         {
-#if 0
           float x, y, z, rx, ry, rz;
           int num, dir;
           ScanStr (params, "%f,%f,%f:%f,%f,%f,%d",
@@ -945,9 +958,8 @@ static iBase* load_thing_part (iEngine* engine, iBase* loadingObj,
 	    { cy = y; cx = x+cc*rx; cz = z+ss*rz; }
             else if (ABS (rz) < SMALL_EPSILON)
 	    { cz = z; cx = x+cc*rx; cy = y+ss*ry; }
-            thing->AddVertex (cx, cy, cz);
+            thing_state->CreateVertex (csVector3 (cx, cy, cz));
           }
-#endif
         }
         break;
       case CS_TOKEN_FOG:
@@ -969,7 +981,7 @@ static iBase* load_thing_part (iEngine* engine, iBase* loadingObj,
       case CS_TOKEN_POLYGON:
         {
 	  iPolygon3D* poly3d = load_poly3d (engine, name, params,
-            NULL/*@@@info.default_material*/, 1/*@@@info.default_texlen*/,
+            info.default_material, info.default_texlen,
 	    thing_state, vt_offset);
 	  if (!poly3d) return NULL;
         }
@@ -1022,20 +1034,21 @@ static iBase* load_thing_part (iEngine* engine, iBase* loadingObj,
 
       case CS_TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
-        //@@@info.default_material = FindMaterial (str, onlyRegion);
-        //if (info.default_material == NULL)
-        //{
-          //printf ("Couldn't find material named '%s'!\n", str);
-          //return NULL;
-        //}
+        info.default_material = engine->FindMaterial (str
+		/*@@@ REGIONS?, onlyRegion*/);
+        if (info.default_material == NULL)
+        {
+          printf ("Couldn't find material named '%s'!\n", str);
+          return NULL;
+        }
         break;
       case CS_TOKEN_TEXLEN:
-        //@@@ScanStr (params, "%f", &info.default_texlen);
+        ScanStr (params, "%f", &info.default_texlen);
         break;
       case CS_TOKEN_MAT_SET_SELECT:
-        //@@@ScanStr (params, "%s", str);
-        //@@@info.SetTextureSet (str);
-        //@@@info.use_mat_set = true;
+        ScanStr (params, "%s", str);
+        info.SetTextureSet (str);
+        info.use_mat_set = true;
         break;
     }
   }
@@ -1063,7 +1076,8 @@ iBase* csThingLoader::Parse (const char* string, iEngine* engine,
   }
 
   char* buf = (char*)string;
-  return load_thing_part (engine, fact, thing_state, buf, 0, true);
+  ThingLoadInfo info;
+  return load_thing_part (info, engine, fact, thing_state, buf, 0, true);
 }
 
 //---------------------------------------------------------------------------

@@ -38,6 +38,13 @@ The history order has been reversed so that new features are at the top.
 	- Changed csThing::MergeTemplate() to work on SCF interfaces
 	  (iThingState, iMaterialWrapper, ...).
 	- The thing loader compiles now but is far from complete and usable.
+	- Made access to flags in iPolygon3D and iThing more consistant
+	  so that it works like iPortal. There is now a 'GetFlags()' which
+	  returns an object of type csFlags.
+	- Added iPortal::SetWarp(csTransform&).
+	- Added support for portals in the thing loader.
+	- Added support for setting materials in the thing loader.
+	- Added support for CIRCLE command in the thing loader.
 3-Apr-2001
 	- Norman Kramer fixed a warning about explicit initialization
 	  of iBase in copy constructor of csCamera.

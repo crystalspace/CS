@@ -822,7 +822,7 @@ public:
     virtual csVector3 &GetVertex (int i) { return scfParent->obj_verts[i]; }
     virtual csVector3 &GetVertexW (int i) { return scfParent->wor_verts[i]; }
     virtual csVector3 &GetVertexC (int i) { return scfParent->cam_verts[i]; }
-    virtual int CreateVertex (csVector3 &iVertex)
+    virtual int CreateVertex (const csVector3 &iVertex)
     { return scfParent->AddVertex (iVertex.x, iVertex.y, iVertex.z); }
     virtual bool CreateKey (const char *iName, const char *iValue);
     virtual iMovable* GetMovable ()
@@ -844,7 +844,7 @@ public:
     virtual csVector3 &GetVertex (int i) { return scfParent->obj_verts[i]; }
     virtual csVector3 &GetVertexW (int i) { return scfParent->wor_verts[i]; }
     virtual csVector3 &GetVertexC (int i) { return scfParent->cam_verts[i]; }
-    virtual int CreateVertex (csVector3 &iVertex)
+    virtual int CreateVertex (const csVector3 &iVertex)
     { return scfParent->AddVertex (iVertex.x, iVertex.y, iVertex.z); }
     virtual void CreateLightMaps (iGraphics3D* g3d)
     { scfParent->CreateLightMaps (g3d); }
@@ -854,9 +854,7 @@ public:
     { scfParent->CacheLightMaps (); }
     virtual void CheckFrustum (iFrustumView* fview)
     { scfParent->CheckFrustum (fview); }
-    virtual unsigned GetFlags () { return scfParent->flags.Get (); }
-    virtual void SetFlags (unsigned iMask, unsigned iValue)
-    { scfParent->flags.Set (iMask, iValue); }
+    virtual csFlags& GetFlags () { return scfParent->flags; }
     virtual int GetMovingOption ()
     { return scfParent->GetMovingOption (); }
     virtual void SetMovingOption (int opt)

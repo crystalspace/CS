@@ -2384,7 +2384,7 @@ void csThing::MergeTemplate (iThingState* tpl,
   int i, j;
   int* merge_vertices;
 
-  flags.SetAll (tpl->GetFlags ());
+  flags.SetAll (tpl->GetFlags ().Get ());
   //@@@ OBSOLETE: SetZBufMode (tpl->GetZBufMode ());
   SetMovingOption (tpl->GetMovingOption ());
 
@@ -2422,7 +2422,7 @@ void csThing::MergeTemplate (iThingState* tpl,
     for (j = 0 ; j < pt->GetVertexCount () ; j++)
       p->AddVertex (merge_vertices[idx[j]]);
 
-    p->flags.SetAll (pt->GetFlags ());
+    p->flags.SetAll (pt->GetFlags ().Get ());
     p->CopyTextureType (pt);
   }
 

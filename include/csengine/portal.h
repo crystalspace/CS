@@ -104,7 +104,7 @@ public:
    * Set the warping transformation for this portal in object space and world
    * space.
    */
-  void SetWarp (const csTransform& t);
+  virtual void SetWarp (const csTransform& t);
 
   /**
    * Get the warping transformation in object space.

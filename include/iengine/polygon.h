@@ -21,6 +21,7 @@
 
 #include "csutil/scf.h"
 #include "csgeom/plane3.h"
+#include "csutil/flags.h"
 
 struct iMaterialHandle;
 struct iMaterialWrapper;
@@ -83,7 +84,7 @@ class csColor;
 #define CS_POLY_COLLDET	0x00000002
 
 
-SCF_VERSION (iPolygon3D, 0, 1, 7);
+SCF_VERSION (iPolygon3D, 0, 1, 8);
 
 /**
  * This is the interface to 3D polygons.
@@ -146,10 +147,8 @@ struct iPolygon3D : public iBase
   /// Set polygon texture mapping plane
   virtual bool SetPlane (const char *iName) = 0;
 
-  /// Get the flags for this polygon
-  virtual unsigned GetFlags () = 0;
-  /// Set any number of flags for this polygon
-  virtual void SetFlags (unsigned iMask, unsigned iValue) = 0;
+  /// Set polygon flags (see CS_POLY_... values above)
+  virtual csFlags& GetFlags () = 0;
 
   /// Set Gouraud vs lightmap polygon lighting
   virtual void SetLightingMode (bool iGouraud) = 0;
