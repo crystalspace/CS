@@ -6,11 +6,11 @@
 @emph{Originally written by Dan Ogles @email{dogles@@peachtree.com}.
 Updated by Nathaniel ``Noote'' Saint Martin, @email{noote@@bigfoot.com}; Thomas
 Hieber, @email{thieber@@gmx.net}; Frank O'Connor, @email{frank@@oconnors.org};
-Philip Wyett, @email{philip.wyett@@lineone.net}.
-Last updated February 13, 2001.}
+Philip Wyett, @email{philipwyett@@redeye-entertainment.co.uk}.
+Last updated March 20, 2001.}
 
 The Windows port of Crystal Space is currently maintained by Philip Wyett
-@email{philip.wyett@@lineone.net}.
+@email{philipwyett@@redeye-entertainment.co.uk}.
 
 @menu
 * Win32 General:: General Information
