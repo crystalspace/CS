@@ -414,25 +414,45 @@ void DiskFile::CheckError ()
     case 0:
       Error = VFS_STATUS_OK;
       break;
+#ifdef ENOSPC
     case ENOSPC:
       Error = VFS_STATUS_NOSPC;
       break;
+#endif
+#ifdef EMFILE
     case EMFILE:
+#endif
+#ifdef ENFILE
     case ENFILE:
+#endif
+#ifdef ENOMEM
     case ENOMEM:
+#endif
+#if defined( EMFILE ) || defined( ENFILE ) || defined( ENOMEM )
       Error = VFS_STATUS_RESOURCES;
       break;
+#endif
 #ifdef ETXTBSY
     case ETXTBSY:
 #endif
+#ifdef EROFS
     case EROFS:
-    case EPERM:
-    case EACCES:
+#endif
+#ifdef EPERM
+   case EPERM:
+#endif
+#ifdef EACCES
+   case EACCES:
+#endif
+#if defined( ETXTBSY ) || defined( EROFS ) || defined( EPERM ) || defined( EACCES )
       Error = VFS_STATUS_ACCESSDENIED;
       break;
+#endif
+#ifdef EIO
     case EIO:
       Error = VFS_STATUS_IOERROR;
       break;
+#endif
     default:
       Error = VFS_STATUS_OTHER;
       break;
