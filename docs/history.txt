@@ -26,6 +26,11 @@ chronological order.
 	- Jorrit added some debug code to scan for big memory allocations
 	  in memdebug.cpp.
 	- Anders Stenberg fixed procedural textures in NR.
+	- Eric Sunshine fixed problem in cspython.mak from 14-Dec-2003 where it
+	  was using raw library names (such as "gdi") from
+	  PYTHMOD.LIBS.PLATFORM when trying to link cspython.dll, rather than
+	  using proper library references (such as "-lgdi") in the link
+	  command.
 16-Dec-2003
 	- Jorrit fixed a warning in shadervar.h with initializers given in
 	  the wrong order.
