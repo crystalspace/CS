@@ -167,7 +167,7 @@ DO.SHARED.PLUGIN.POSTAMBLE = -mwindows -lstdc++
 
 DO.LINK.EXE = \
   $(MAKEVERSIONINFO) $(OUT)/$(@:$(EXE)=-version.rc) \
-    "$(DESCRIPTION.$(TARGET.RAW))" $(COMMAND_DELIM) \
+    "$(DESCRIPTION.$(TARGET.RAW))" "$(SRCDIR)/include/csver.h" $(COMMAND_DELIM) \
   $(MERGERES) $(OUT)/$(@:$(EXE)=-rsrc.rc) $(SRCDIR) $(SRCDIR) \
     $(OUT)/$(@:$(EXE)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
   $(COMPILE_RES) -i $(OUT)/$(@:$(EXE)=-rsrc.rc) \
