@@ -62,6 +62,7 @@ csParticleSystem::csParticleSystem (iSystem* system, iMeshObjectFactory* factory
       "MeshObj", iMeshObjectType);
   if (!type) type = LOAD_PLUGIN (system, "crystalspace.mesh.object.sprite.2d", "MeshObj", iMeshObjectType);
   spr_factory = type->NewFactory ();
+  type->DecRef ();
 }
 
 csParticleSystem::~csParticleSystem()
