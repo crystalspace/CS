@@ -46,7 +46,7 @@ void set_no_rewind( ctEntity *ppe )
   ppe->set_rewind(false);
 }
 
-void csRigidSpaceTimeObj::evolve_system( real t1, real t2, ctWorld *time_world, csEngine *space_engine )
+void csRigidSpaceTimeObj::evolve_system( real t1, real t2, ctWorld *time_world, iEngine *space_engine )
 {
   (void) space_engine;
   real ta, tb;

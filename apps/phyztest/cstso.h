@@ -8,8 +8,8 @@
 #include "ivaria/collider.h"
 #include "isys/system.h"
 
-class csEngine;
 struct iMeshWrapper;
+struct iEngine;
 class ctRigidBody;
 class ctCollidingContact;
 class ctWorld;
@@ -38,7 +38,7 @@ public:
   static long continuum_end;
 
   static void evolve_system ( real t1, real t2, 
-			      ctWorld *time_world, csEngine *space_engine );
+			      ctWorld *time_world, iEngine *space_engine );
 
   csColliderWrapper *col;
   iMeshWrapper *sprt;

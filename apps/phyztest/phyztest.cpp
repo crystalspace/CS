@@ -470,7 +470,7 @@ void Phyztest::NextFrame ()
 
   // evolve the physics world by time step.  Slowed down by 4x due to speed of demo objects
   //!me phyz_world.evolve( 0, 0.25*elapsed_time / 1000.0 );  //!me .25 needed to balance test samples..
-  csRigidSpaceTimeObj::evolve_system( 0, 0.25*elapsed_time / 1000.0, &phyz_world, engine->GetCsEngine () );
+  csRigidSpaceTimeObj::evolve_system( 0, 0.25*elapsed_time / 1000.0, &phyz_world, engine );
 
   // Add a boost
   if (rb_bot && GetKeyState (CSKEY_ENTER))
@@ -482,7 +482,7 @@ void Phyztest::NextFrame ()
   // !me phyz_world.evolve( 0, 0.25*elapsed_time / 1000.0 );  
 
   csRigidSpaceTimeObj::evolve_system
-    ( 0, 0.25*elapsed_time / 1000.0, &phyz_world, engine->GetCsEngine () );
+    ( 0, 0.25*elapsed_time / 1000.0, &phyz_world, engine );
 
 
 
