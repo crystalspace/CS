@@ -22,13 +22,16 @@
 #define __INETWORK_H__
 
 #include "csutil/scf.h"
+#include "isystem.h"
+#include "istring.h"
 
 #define CS_NET_CONNORIENTED	0
 #define CS_NET_CONNLESS		1
 
 enum csNetworkError
 {
-  CS_NET_NOT_INITIALIZED = 0,
+  CS_NET_NO_ERROR=0,
+  CS_NET_NOT_INITIALIZED,
   CS_NET_ALREADY_CONNECTED,
   CS_NET_CANNOT_RESOLVE_NAME,
   CS_NET_CANNOT_CONNECT,
@@ -77,24 +80,26 @@ SCF_INTERFACE (iNetworkDriver, 0, 0, 1) : public iBase
 {
 public:
 
+  virtual bool Initialize (iSystem *iSys) = 0;
+
   /// Open the network driver
   virtual bool Open () = 0;
   /// Close the network driver
-  virtual void Close () = 0;
+  virtual bool Close () = 0;
 
-  virtual csNetHandle Connect (csNetworkAddress *iNetAddress) = 0;
+  csNetHandle Spawn(csNetworkCaps *caps);
+
+  virtual bool Connect (csNetworkAddress *iNetAddress) = 0;
 
   virtual void Disconnect (csNetHandle iHandle) = 0;
 
-  virtual void Send (csNetHandle iHandle, void *iData, size_t iSize) = 0;
+  virtual void Send (csNetHandle iHandle, iString *iStr) = 0;
 
-  virtual void Receive (csNetHandle iHandle, size_t *ioSize, void *iData) = 0;
+  virtual void Receive (csNetHandle iHandle, iString *iStr) = 0;
 
   virtual void SetListenState (csNetHandle iHandle, int iPort) = 0;
 
   virtual void Accept (csNetHandle iListen, csNetHandle *iServer, csNetworkAddress *oAddress) = 0;
-
-  virtual void Spawn (csNetHandle *oHandle, size_t iType) = 0;
 
   virtual void Kill (csNetHandle Handle) = 0;
 

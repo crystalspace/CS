@@ -25,19 +25,26 @@
 #include "csutil/scf.h"
 #include "csnetdrv/sockets/netsdrv.h"
 #include "csnetdrv/sockets/drvsdefs.h"
-#include "isystem.h"
 
-IMPLEMENT_UNKNOWN_NODELETE (csNetworkDriverSockets)
+/*IMPLEMENT_FACTORY(csNetworkDriverSockets)
 
-BEGIN_INTERFACE_TABLE (csNetworkDriverSockets)
-  IMPLEMENTS_INTERFACE (INetworkDriver)
-END_INTERFACE_TABLE ()
+EXPORT_CLASS_TABLE(netsdrv)
+  EXPORT_CLASS(csNetworkDriverSockets, "crystalspace.netdrv.socket", "TCP Socket Network Driver");
+EXPORT_CLASS_TABLE_END
 
-csNetworkDriverSockets::csNetworkDriverSockets(iSystem* piSystem)
+IMPLEMENT_IBASE(csNetworkDriverSockets)
+  IMPLEMENTS_INTERFACE(iNetworkDriver)
+IMPLEMENT_IBASE_END*/
+
+csNetworkDriverSockets::csNetworkDriverSockets(iBase* iParent)
+  : SocksReady(0), dwLastError(CS_NET_NO_ERROR), Sys(NULL)
 {
-	m_piSystem = piSystem;
-	SocksReady = false;
-	dwLastError = 0;
+  CONSTRUCT_IBASE(iParent);
+}
+
+bool csNetworkDriverSockets::Initialize(iSystem* iSys)
+{
+	Sys = iSys;
 
 	for(short i = 0; i < CS_NET_MAX_SOCKETS; i++)
 	{
@@ -45,59 +52,48 @@ csNetworkDriverSockets::csNetworkDriverSockets(iSystem* piSystem)
 		SocketConnected[i] = false;
 		SocketInitialized[i] = false;
 	}
+	return 1;
 }
 
 csNetworkDriverSockets::~csNetworkDriverSockets()
 {
 }
 
-void csNetworkDriverSockets::SysPrintf(int mode, char* szMsg, ...)
+bool csNetworkDriverSockets::Open()
 {
-	char buf[1024];
-	va_list arg;
+	Sys->Print(MSG_INITIALIZATION, "Network driver sockets: ");
 
-	va_start(arg, szMsg);
-	vsprintf(buf, szMsg, arg);
-	va_end(arg);
+  if(!InitSocks()) {
+	  Sys->Print(MSG_INITIALIZATION, "FAILED\n");
+	  return 0;
+	}
 
-	m_piSystem->Print(mode, buf);
+  Sys->Print(MSG_INITIALIZATION, "OK\n");
+	return 1;
 }
 
-STDMETHODIMP csNetworkDriverSockets::Open()
-{
-	SysPrintf(MSG_INITIALIZATION, "\nNetwork driver stuff:\n");
-
-	if (InitSocks() == S_OK) SysPrintf(MSG_INITIALIZATION, "Network driver initialisation finished\n");
-	else SysPrintf(MSG_INITIALIZATION, "Network driver initialisation failed!\n");
-
-	SysPrintf(MSG_INITIALIZATION, "\n");
-
-	return S_OK;
-}
-
-STDMETHODIMP csNetworkDriverSockets::Close()
+bool csNetworkDriverSockets::Close()
 {
 	KillAll();
 
 	if(SocksReady)
-	{
-		if(ReleaseSocks() != S_OK) return S_FALSE;
-	}
-	return S_OK;
+		return ReleaseSocks();
+		
+	return 1;
 }
 
-STDMETHODIMP csNetworkDriverSockets::Connect(DWORD dwID, csNetworkAddress *lpNetAddress)
+csNetHandle csNetworkDriverSockets::Connect(csNetworkAddress *iNetAddress)
 {
-	if(!SocksReady)
+	if(!SocksReady)	
 	{
-		dwLastError = CS_NET_DRV_ERR_NOT_INITIALIZED;
-		return S_FALSE;
+		dwLastError = CS_NET_NOT_INITIALIZED;
+		return 0;
 	}
 
-	if(SocketConnected[dwID])
+	if(SocketConnected[csNetHandle])
 	{
-		dwLastError = CS_NET_DRV_ERR_ALREADY_CONNECTED;
-		return S_FALSE;
+		dwLastError = CS_NET_ALREADY_CONNECTED;
+		return 0;
 	}
 
 #if !defined(NO_SOCKETS_SUPPORT)
@@ -109,25 +105,25 @@ STDMETHODIMP csNetworkDriverSockets::Connect(DWORD dwID, csNetworkAddress *lpNet
 	addr.sin_family = AF_INET;
 	if((hp = gethostbyname(lpNetAddress->hostnm)) == NULL)
 	{
-		dwLastError = CS_NET_DRV_ERR_CANNOT_RESOLVE_NAME;
-		return S_FALSE;
+		dwLastError = CS_NET_CANNOT_RESOLVE_NAME;
+		return 0;
 	}
 	memcpy((char*)&addr.sin_addr, (char*)hp->h_addr, hp->h_length);
 	addr.sin_port = htons(lpNetAddress->port);
 	len = sizeof(addr);
 	if(connect(Socket[dwID], (struct sockaddr*)&addr, len) < 0)
 	{
-		dwLastError = CS_NET_DRV_ERR_CANNOT_CONNECT;
-		return S_FALSE;
+		dwLastError = CS_NET_CANNOT_CONNECT;
+		return 0;
 	}
 
 #endif
 
 	SocketConnected[dwID] = true;
-	return S_OK;
+	return 1;
 }
 
-STDMETHODIMP csNetworkDriverSockets::Disconnect(DWORD dwID)
+void csNetworkDriverSockets::Disconnect(DWORD dwID)
 {
 	// This is not really a good thing going on here but i had no choice since BSD sockets cannot disconnect
 	if(!SocksReady)
@@ -323,7 +319,7 @@ STDMETHODIMP csNetworkDriverSockets::SetListenState(DWORD dwID, int iPort)
 
 }
 
-STDMETHODIMP csNetworkDriverSockets::Spawn(DWORD *lpdwID /*out*/, DWORD dwType)
+bool csNetworkDriverSockets::Spawn(DWORD dwType)
 {
 	if(!SocksReady)
 	{

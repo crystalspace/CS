@@ -21,7 +21,7 @@
 #ifndef __DRVSDEFS_H__
 #define __DRVSDEFS_H__
 
-#include "csnetdrv/ndrvdefs.h"
+#include "inetdrv.h"
 
 #define CS_NET_MAX_SOCKETS			64
 

@@ -28,77 +28,64 @@
 #include "csnetdrv/sockets/drvsdefs.h"
 #include "inetdrv.h"
 
-extern const CLSID CLSID_SocketsNetworkDriver;
-
 ///
-class csNetworkDriverSockets : public INetworkDriver
+class csNetworkDriverSockets : public iNetworkDriver
 {
 protected:
 	bool SocketListening[CS_NET_MAX_SOCKETS];
 	bool SocketConnected[CS_NET_MAX_SOCKETS];
 	bool SocketInitialized[CS_NET_MAX_SOCKETS];
+  bool SocketInUse
 
 	CS_NET_SOCKET Socket[CS_NET_MAX_SOCKETS];
 
 	bool SocksReady;
 
-	DWORD dwLastError;
+	csNetworkError dwLastError;
 
-	HRESULT InitSocks();
+	bool InitSocks();
 
-	HRESULT ReleaseSocks();
+	bool ReleaseSocks();
 
-	void SysPrintf(int mode, char* str, ...);
+	bool Spawn(csNetHandle *oHandle, size_t iType);
 
 public:
 	/// The System interface. 
-	iSystem* m_piSystem;
+	iSystem* Sys;
 
-	csNetworkDriverSockets(iSystem* piSystem);
+	csNetworkDriverSockets(iBase* iParent);
 
 	virtual ~csNetworkDriverSockets();
 
-	STDMETHODIMP Open();
+  bool Initialize(iSystem* iSys);
 
-	STDMETHODIMP Close();
+	bool Open();
 
-	STDMETHODIMP Connect(DWORD dwID, csNetworkAddress *lpNetAddress);
+	bool Close();
 
-	STDMETHODIMP Disconnect(DWORD dwID);
+  csNetHandle Spawn(csNetworkCaps *caps);
 
-	STDMETHODIMP Send(DWORD dwID, DWORD dwBytesToSend, char *lpDataBuffer);
+	bool Connect(csNetworkAddress *lpNetAddress);
 
-	STDMETHODIMP Receive(DWORD dwID, DWORD *lpdwBytesToReceive /* in/out */, char *lpDataBuffer);
+	void Disconnect(csNetHandle iHandle);
 
-	STDMETHODIMP SetListenState(DWORD dwID, int iPort);
+	void Send(csNetHandle iHandle, iString *iStr);
 
-	STDMETHODIMP Accept(DWORD dwLID/*listening socket*/, DWORD *lpdwID/*server socket*/, csNetworkAddress *lpCSNetAddress/*out*/);
+	void Receive(csNetHandle iHandle, iString *iStr);
 
-	STDMETHODIMP Spawn(DWORD *lpdwID /*out*/, DWORD dwType);
+	void SetListenState(csNetHandle iHandle, int iPort);
 
-	STDMETHODIMP Kill(DWORD dwID);
+	void Accept(csNetHandle iListen, csNetHandle *iServer, csNetworkAddress *oAddress);
 
-	STDMETHODIMP KillAll();
+	void Kill(csNetHandle Handle);
 
-	STDMETHODIMP GetDriverCaps(csNetworkCaps *lpCSNetDriverCaps);
+	void KillAll();
 
-	STDMETHODIMP GetLastError();
+	void GetDriverCaps(csNetworkCaps *lpCSNetDriverCaps);
 
-	DECLARE_IUNKNOWN()
-	DECLARE_INTERFACE_TABLE(csNetworkDriverSockets)
-};
+	int GetLastError();
 
-///
-class csNetworkDriverSocketsFactory : public INetworkDriverFactory
-{
-  ///
-  STDMETHODIMP CreateInstance (REFIID riid, iSystem * piSystem, void **ppv);
-
-  /// Lock or unlock from memory.
-  STDMETHODIMP LockServer (COMBOOL bLock);
-
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (csNetworkDriverSocketsFactory)
+	DECLARE_IBASE;
 };
 
 #endif	//__NETWORK_SOCKES_H__
