@@ -254,7 +254,9 @@ DB((MSG_DEBUG_0, "  !Covers\n"))
     return;
   }
 
-  csPolygonInt* split_poly = polygons[SelectSplitter (polygons, num)];
+  int poly_idx = SelectSplitter (polygons, num);
+DB((MSG_DEBUG_0, "  poly_idx=%d\n", poly_idx))
+  csPolygonInt* split_poly = polygons[poly_idx];
   node->splitter = *(split_poly->GetPolyPlane ());
 
   // Now we split the node according to the plane of that polygon.
@@ -265,6 +267,7 @@ DB((MSG_DEBUG_0, "  !Covers\n"))
   for (i = 0 ; i < num ; i++)
   {
     int c = polygons[i]->Classify (node->splitter);
+DB((MSG_DEBUG_0, "  pol%d->%d\n", i, c))
     switch (c)
     {
       case POL_SAME_PLANE:
