@@ -140,9 +140,10 @@ Updated by Thomas Hieber
 
 _ How do I compile Crystal Space using Visual C++ 5.0?
 
-MSVC 5.0 is no more actiely supported. I should work anyway, but it
-it not tested. If you have some experincene with it, please mail me.
-(thieber@gmx.net)
+MSVC 5.0 should work, if you have installed the latest Service Release, 
+and the necessary SDK's (esp. DirectX). If you have further questions,
+you might want to contact  "Brad 'GreyBear' Davis" <jbdavis@uswest.net>,
+as he has recently reported successful compilation of CS, using MSVC 5.0.
 
 _ How do I compile Crystal Space using Visual C++ 6.0?
 
