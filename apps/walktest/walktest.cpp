@@ -1594,6 +1594,11 @@ int main (int argc, char* argv[])
   if (Sys->auto_script)
     Command::start_script (Sys->auto_script);
 
+  // Remember the number of static sprites for lighting
+  Sys->static_sprites = Sys->view->GetWorld ()->sprites.Length ();
+  // Apply lighting to all static sprites
+  light_statics ();
+
   //TestFrustrum ();
   // The main loop.
   Sys->Loop ();

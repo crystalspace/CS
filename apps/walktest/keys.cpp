@@ -178,6 +178,16 @@ void HandleSprite (csSprite3D* spr)
   }
 }
 
+void light_statics ()
+{
+  csWorld *w = Sys->view->GetWorld ();
+  for (int i = 0; i < Sys->static_sprites; i++)
+  {
+    csSprite3D *spr = (csSprite3D *)w->sprites [i];
+    move_sprite (spr, (csSector*)(spr->sectors[0]), spr->GetW2TTranslation ());
+  }
+}
+
 void HandleDynLight (csDynLight* dyn)
 {
   LightStruct* ls = (LightStruct*)(csDataObject::GetData(*dyn));
@@ -272,6 +282,7 @@ void HandleDynLight (csDynLight* dyn)
       break;
     }
   }
+  light_statics ();
 }
 
 void map_key (char* keyname, csKeyMap* map)

@@ -169,6 +169,9 @@ public:
   bool on_ground;
   bool inverse_mouse;
 
+  /// number of static sprites (defined in world file)
+  int static_sprites;
+
 public:
   ///
   WalkTest ();
@@ -249,5 +252,8 @@ extern WalkTest* Sys;
 extern void perf_test ();
 extern void CaptureScreen ();
 extern void free_keymap ();
+
+/// Apply lights to all static objects (currently only sprites)
+void light_statics ();
 
 #endif // MAIN_H
