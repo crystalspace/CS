@@ -22,6 +22,8 @@
 #include "cssys/win32/directdetection.h"
 #include "isystem.h"
 
+#define ASSERT assert
+
 DirectDetection DDetection;
 DirectDetectionDevice * DirectDevice;
 
@@ -60,6 +62,7 @@ void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 
 /////The 2D Graphics Driver//////////////
 
+/*
 IMPLEMENT_FACTORY (csGraphics2DDDraw3)
 
 EXPORT_CLASS_TABLE (ddraw)
@@ -68,6 +71,7 @@ EXPORT_CLASS_TABLE (ddraw)
   EXPORT_CLASS (csGraphics2DDDraw3, "crystalspace.graphics2d.direct3d.dx5",
     "DirectDraw DX5 2D graphics driver for Crystal Space")
 EXPORT_CLASS_TABLE_END
+*/
 
 IMPLEMENT_IBASE (csGraphics2DDDraw3)
   IMPLEMENTS_INTERFACE (iPlugIn)
@@ -164,7 +168,7 @@ void CreateIdentityPalette(RGBpaletteEntry *p)
 extern DirectDetection DDetection;
 extern DirectDetectionDevice * DirectDevice;
 
-csGraphics2DDDraw3::csGraphics2DDDraw3(iBase *iParent, bool bUses3D) : 
+csGraphics2DDDraw3::csGraphics2DDDraw3(iSystem* piSystem, bool bUses3D) : 
   csGraphics2D (),
   m_hWnd(NULL),
   m_bDisableDoubleBuffer(false),
@@ -181,13 +185,13 @@ csGraphics2DDDraw3::csGraphics2DDDraw3(iBase *iParent, bool bUses3D) :
   m_piWin32System(NULL),
   m_bUses3D(bUses3D)
 {
-  CONSTRUCT_IBASE (iParent);
+  CONSTRUCT_IBASE (piSystem);
 
   HRESULT ddrval;
 
   // QI for iWin32SystemDriver //
-  m_piWin32System* piWin32System = QUERY_INTERFACE (System, iWin32SystemDriver);
-  if (!m_piWin32System))
+  m_piWin32System = QUERY_INTERFACE (System, iWin32SystemDriver);
+  if (!m_piWin32System)
       sys_fatalerror("csGraphics2DDDraw3::Open(QI) -- iSystem passed does not support iWin32SystemDriver.", ddrval);
 }
 
@@ -211,7 +215,7 @@ bool csGraphics2DDDraw3::Initialize (iSystem *pSystem)
   m_piWin32System->GetInstance(&m_hInstance);
   m_piWin32System->GetCmdShow(&m_nCmdShow);
 
-  System->GetSetting(Width, Height, Depth, FullScreen);
+  System->GetSettings(Width, Height, Depth, FullScreen);
   
   // Create the DirectDraw device //
   LPGUID pGuid = NULL;

@@ -24,10 +24,10 @@
 
 SCF_INTERFACE (iStrVector, 0, 0, 1) : public iBase
 {
-  virtual int Length() const = 0;
+  virtual int   Length() const = 0;
   virtual char* Get (int n) const = 0;
-  virtual int Find (const char*) const = 0;
-  virtual int Push (char*) = 0;
+  virtual int   Find (const char*) const = 0;
+  virtual void  Push (char*) = 0;
   virtual char* Pop() = 0;
 };
 

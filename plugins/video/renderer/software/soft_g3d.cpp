@@ -1084,7 +1084,7 @@ void csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
 void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
 {
   if (!do_textured)
-    return DrawPolygonFlat (poly);
+    DrawPolygonFlat (poly);
 
   int i;
   float P1, P2, P3, P4;

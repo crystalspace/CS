@@ -3,9 +3,7 @@
 
 #define WINDOWCLASSNAME "Crystal"
 
-extern const IID IID_IWin32SystemDriver;
-
-interface IWin32SystemDriver : public iBase
+SCF_INTERFACE(iWin32SystemDriver, 0, 0, 1) : public iBase
 {
 	/// Returns the HINSTANCE of the program
 	STDMETHOD(GetInstance)(HINSTANCE* retval) = 0;

@@ -98,7 +98,7 @@ public:
   virtual void Warn (const char* s);
 
   /// Implementation of IWin32SystemDriver interface.
-  class XWin32SystemDriver : public IWin32SystemDriver
+  class XWin32SystemDriver : public iWin32SystemDriver
   {
     /// Returns the HINSTANCE of the program
     STDMETHODIMP GetInstance (HINSTANCE* retval);

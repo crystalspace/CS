@@ -42,7 +42,7 @@ public:
   virtual ~scfStrVector ();
 
   /// Query array length
-  virtual int Length ();
+  virtual int Length () const;
 
   /// Push a string onto the stack
   virtual void Push (char *iValue);
@@ -51,10 +51,10 @@ public:
   virtual char *Pop ();
 
   /// Get Nth string in vector
-  virtual char *Get (int iIndex);
+  virtual char *Get (int iIndex) const;
 
   /// Find index of given string
-  virtual int Find (const char *iValue);
+  virtual int Find (const char *iValue) const;
 
   /// Find index of a string in a pre-sorted string array
   virtual int FindSorted (const char *iValue);
