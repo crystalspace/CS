@@ -174,7 +174,6 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
 
   delete hard_transform;
   delete hard_bbox;
-
 }
 
 void csGenmeshMeshObject::CheckLitColors ()
@@ -391,7 +390,7 @@ void csGenmeshMeshObject::AppendShadows (iMovable* movable,
   int vt_num = factory->GetVertexCount ();
   csVector3* vt_world, * vt_array_to_delete;
   int i;
-  if (movable->IsFullTransformIdentity ())
+  if (movable->IsFullTransformIdentity () && !hard_transform)
   {
     vt_array_to_delete = 0;
     vt_world = vt;
@@ -401,6 +400,8 @@ void csGenmeshMeshObject::AppendShadows (iMovable* movable,
     vt_array_to_delete = new csVector3 [vt_num];
     vt_world = vt_array_to_delete;
     csReversibleTransform movtrans = movable->GetFullTransform ();
+    if (hard_transform)
+      movtrans *= *hard_transform;
     for (i = 0 ; i < vt_num ; i++)
       vt_world[i] = movtrans.This2Other (vt[i]);
   }
@@ -531,7 +532,8 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
   affecting_lights.Add (li);
 }
 
-void csGenmeshMeshObject::UpdateLightingOne (const csReversibleTransform& trans, iLight* li)
+void csGenmeshMeshObject::UpdateLightingOne (const csReversibleTransform& trans,
+	iLight* li)
 {
   csVector3* normals = factory->GetNormals ();
   csColor* colors = lit_mesh_colors;
@@ -602,6 +604,8 @@ void csGenmeshMeshObject::UpdateLighting2 (iMovable* movable)
     colors[i] = col;
 
   csReversibleTransform trans = movable->GetFullTransform ();
+  if (hard_transform)
+    trans *= *hard_transform;
   csGlobalHashIterator it (affecting_lights.GetHashMap ());
   while (it.HasNext ())
   {
@@ -649,6 +653,8 @@ void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
 
   // Do the lighting.
   csReversibleTransform trans = movable->GetFullTransform ();
+  if (hard_transform)
+    trans *= *hard_transform;
   // the object center in world coordinates. "0" because the object
   // center in object space is obviously at (0,0,0).
   for (l = 0 ; l < num_lights ; l++)

@@ -50,6 +50,7 @@ struct iEngine;
 class csGenmeshMeshObjectFactory;
 class csGenmeshMeshObjectType;
 class csColor;
+class csPolygonMesh;
 class G3DFogInfo;
 
 /**
@@ -117,6 +118,7 @@ private:
 
   // Optional hard transform and bbox in case of hard transform.
   csReversibleTransform* hard_transform;
+
   csBox3* hard_bbox;
   csVector3 hard_radius;
 

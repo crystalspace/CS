@@ -115,15 +115,18 @@ csColliderWrapper* csColliderWrapper::GetColliderWrapper (iObject* object)
 void csColliderHelper::InitializeCollisionWrapper (iCollideSystem* colsys,
 	iMeshWrapper* mesh)
 {
+  iObjectModel* obj_objmodel = mesh->GetMeshObject ()->GetObjectModel ();
+  iPolygonMesh* obj_polymesh = obj_objmodel->GetPolygonMeshColldet ();
+
   iMeshFactoryWrapper* factory = mesh->GetFactory ();
   if (factory)
   {
-    iObjectModel* objmodel = factory->GetMeshObjectFactory ()
+    iObjectModel* fact_objmodel = factory->GetMeshObjectFactory ()
     	->GetObjectModel ();
-    if (objmodel)
+    if (fact_objmodel)
     {
-      iPolygonMesh* polymesh = objmodel->GetPolygonMeshColldet ();
-      if (polymesh)
+      iPolygonMesh* fact_polymesh = fact_objmodel->GetPolygonMeshColldet ();
+      if (fact_polymesh && (fact_polymesh == obj_polymesh || !obj_polymesh))
       {
         // First check if the parent factory has a collider wrapper.
 	iCollider* collider;
@@ -136,7 +139,7 @@ void csColliderHelper::InitializeCollisionWrapper (iCollideSystem* colsys,
 	else
 	{
 	  csColliderWrapper *cw_fact = new csColliderWrapper (
-	  	factory->QueryObject (), colsys, polymesh);
+	  	factory->QueryObject (), colsys, fact_polymesh);
 	  cw_fact->SetName (factory->QueryObject ()->GetName());
 	  collider = cw_fact->GetCollider ();
 	  cw_fact->DecRef ();
@@ -154,13 +157,10 @@ void csColliderHelper::InitializeCollisionWrapper (iCollideSystem* colsys,
     }
   }
 
-
-  iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
-  iPolygonMesh* polymesh = objmodel->GetPolygonMeshColldet ();
-  if (polymesh)
+  if (obj_polymesh)
   {
     csColliderWrapper *cw = new csColliderWrapper (mesh->QueryObject (),
-	colsys, polymesh);
+	colsys, obj_polymesh);
     cw->SetName (mesh->QueryObject ()->GetName());
     cw->DecRef ();
   }

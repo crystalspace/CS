@@ -3,11 +3,22 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
-02-June-2003
+2-June-2003
 	- Philip Wyett updated the docs to reflect a new msvc_libs release.
+	- Jorrit fixed genmesh in case the genmesh object (not the factory)
+	  itself is hard-transformed for the following functions:
+	  	- AppendShadows()
+		- UpdateLighting2()
+		- UpdateLighting()
+	- Jorrit updated csColliderHelper::InitializeCollisionWrapper()
+	  function so that it compares the polygon mesh returned by the
+	  object with the one from the factory. If they are different it
+	  will use the one from the object. This fix makes sure that objects
+	  can optionally override the object model if they need that.
+	- Jorrit added default csPolygonMesh implementation for conveniance.
+1-June-2003
 	- Philip Wyett started adding MSVC 7 external app HOWTO screenshot
 	  images.
-01-June-2003
 	- res made some minor optimizations to the movie recorder.
 	- res added output of some statistics when a movie finished recording.
 	- res improved the performance of GL screenshots. They now deal
