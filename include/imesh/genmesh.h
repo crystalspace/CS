@@ -163,16 +163,16 @@ struct iGeneralFactoryState : public iBase
 #ifdef CS_USE_NEW_RENDERER
 
   /// Adds an independantly named stream, sets to VertexCount
-  virtual bool AddStream (const char *name, 
+  virtual bool AddRenderBuffer (const char *name, 
     csRenderBufferComponentType component_type, int component_size) = 0;
 
   /// Adds a component to stream with name
-  virtual bool SetStreamComponent (const char *name, int index, int component, float value) = 0; 
-  virtual bool SetStreamComponent (const char *name, int index, int component, int value) = 0; 
+  virtual bool SetRenderBufferComponent (const char *name, int index, int component, float value) = 0; 
+  virtual bool SetRenderBufferComponent (const char *name, int index, int component, int value) = 0; 
 
   /// Sets the stream based on the input array
-  virtual bool SetStream (const char *name, float *value) = 0;
-  virtual bool SetStream (const char *name, int *value) = 0;
+  virtual bool SetRenderBuffer (const char *name, float *value) = 0;
+  virtual bool SetRenderBuffer (const char *name, int *value) = 0;
 
 #endif
 };
