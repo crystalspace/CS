@@ -50,6 +50,20 @@ csTextureOpenGL::~csTextureOpenGL ()
 
 //---------------------------------------------------------------------------
 
+void csTextureOpenGLDynamic::CreateInterfaces (iGraphics3D *parentG3D, 
+  csPixelFormat *pfmt)
+{
+  texG3D = parentG3D->CreateOffScreenRenderer (w, h, pfmt,
+     image->GetImageData (), NULL, 0);
+}
+
+csTextureOpenGLDynamic::~csTextureOpenGLDynamic ()
+{ 
+  texG3D->DecRef (); 
+}
+
+//---------------------------------------------------------------------------
+
 csTextureMMOpenGL::csTextureMMOpenGL (iImage *image, int flags,
   csGraphics3DOpenGL *iG3D) : csTextureMM (image, flags)
 {
@@ -65,7 +79,10 @@ csTextureMMOpenGL::~csTextureMMOpenGL ()
 
 csTexture *csTextureMMOpenGL::NewTexture (iImage *Image)
 {
-  return new csTextureOpenGL (this, Image);
+  if ((flags & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC)
+    return new csTextureOpenGLDynamic (this, Image);
+  else
+    return new csTextureOpenGL (this, Image);
 }
 
 void csTextureMMOpenGL::ComputeMeanColor ()
@@ -95,6 +112,20 @@ void csTextureMMOpenGL::ComputeMeanColor ()
   mean_color.blue  = b / pixels;
 }
 
+iGraphics3D *csTextureMMOpenGL::GetDynamicTextureInterface ()
+{
+  if ((flags & CS_TEXTURE_DYNAMIC) != CS_TEXTURE_DYNAMIC)
+    return NULL;
+
+  return ((csTextureOpenGLDynamic*)tex[0])->texG3D;
+}
+
+void csTextureMMOpenGL::CreateDynamicTexture (iGraphics3D *parentG3D, 
+  csPixelFormat *pfmt)
+{
+  ((csTextureOpenGLDynamic*)tex[0])->CreateInterfaces (parentG3D, pfmt);
+}
+
 //---------------------------------------------------------------------------
 
 csTextureManagerOpenGL::csTextureManagerOpenGL (iSystem* iSys,
@@ -122,6 +153,8 @@ void csTextureManagerOpenGL::PrepareTextures ()
   {
     csTextureMM *txt = textures.Get (i);
     txt->CreateMipmaps ();
+    if ((txt->GetFlags() & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC)
+      ((csTextureMMOpenGL*)txt)->CreateDynamicTexture (G3D, &pfmt);
   }
 }
 
@@ -141,6 +174,8 @@ void csTextureManagerOpenGL::PrepareTexture (iTextureHandle *handle)
 
   csTextureMMOpenGL *txt = (csTextureMMOpenGL *)handle->GetPrivateObject ();
   txt->CreateMipmaps ();
+  if ((txt->GetFlags() & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC)
+    ((csTextureMMOpenGL*)txt)->CreateDynamicTexture (G3D, &pfmt);
 }
 
 void csTextureManagerOpenGL::UnregisterTexture (iTextureHandle* handle)

@@ -26,6 +26,7 @@
 #include "csutil/inifile.h"
 #include "isystem.h"
 #include "itexture.h"
+#include "video/canvas/common/dyntex2d.h"
 
 IMPLEMENT_FACTORY (csGraphics2DGLX)
 
@@ -447,4 +448,12 @@ bool csGraphics2DGLX::HandleEvent (csEvent &/*Event*/)
       }
     }
   return false;
+}
+
+iGraphics2D *csGraphics2DGLX::CreateOffScreenCanvas (int width, int height, 
+	   csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size)
+{
+  CHK (csDynamicTexture2D *tex = new csDynamicTexture2D (System));
+  return tex->CreateOffScreenCanvas (width, height, pfmt, buffer, 
+				     palette, pal_size);
 }

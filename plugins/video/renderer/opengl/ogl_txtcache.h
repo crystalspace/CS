@@ -69,6 +69,7 @@ public:
 
   ///
   void cache_texture (iTextureHandle *texture);
+
   ///
   void cache_lightmap (iPolygonTexture *polytex);
   ///

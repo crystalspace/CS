@@ -284,7 +284,9 @@ void csTextureMMSoftware::DynamicTextureSyncPalette ()
 {
   if ((flags & CS_TEXTURE_DYNAMIC) != CS_TEXTURE_DYNAMIC)
     return;
-  // still need to consider when in 8bit mode.
+
+  // Calculate pal2glob from palette created by the dynamic textures'
+  // texture manager which this texture shares.
   remap_texture (((csTextureSoftwareDynamic*)tex[0])->texman);
 }
 

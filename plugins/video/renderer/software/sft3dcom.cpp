@@ -1044,6 +1044,7 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
     return;
   }
 
+  // dynamic textures need to be uncached each frame if using lightmaps.
   bool uncache_dynamic_texture = false;
   int i;
   float P1, P2, P3, P4;
@@ -1445,7 +1446,10 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
 #undef CHECK
     }
 texr_done:
-    uncache_dynamic_texture = ((tex_mm->GetFlags () & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC);
+
+    // check if a dynamic texture
+    uncache_dynamic_texture = 
+      ((tex_mm->GetFlags () & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC);
     tcache->fill_texture (mipmap, tex, u_min, v_min, u_max, v_max);
   }
   csScan_InitDraw (mipmap, this, tex, tex_mm, txt_unl);

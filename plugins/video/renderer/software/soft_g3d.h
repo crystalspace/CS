@@ -42,6 +42,7 @@ public:
   ///
   virtual bool Open (const char *Title);
 
+  /// Create an off screen renderer
   virtual iGraphics3D *CreateOffScreenRenderer (int width, int height, 
      csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size);
 

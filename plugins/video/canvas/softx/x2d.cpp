@@ -1219,7 +1219,7 @@ bool csGraphics2DXLib::ReallocateMemory ()
 iGraphics2D *csGraphics2DXLib::CreateOffScreenCanvas (int width, int height, 
 	   csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size)
 {
-  csDynamicTexture2D *tex = new csDynamicTexture2D (System);
+  CHK (csDynamicTexture2D *tex = new csDynamicTexture2D (System));
   return tex->CreateOffScreenCanvas (width, height, pfmt, buffer, 
 				     palette, pal_size);
 }

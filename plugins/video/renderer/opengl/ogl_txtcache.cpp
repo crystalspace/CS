@@ -137,6 +137,8 @@ void OpenGLCache::cache_texture (iTextureHandle *txt_handle)
   }
 }
 
+
+
 void OpenGLCache::cache_lightmap (iPolygonTexture *polytex)
 {
   csGLCacheData *cached_texture;
@@ -165,6 +167,9 @@ void OpenGLCache::cache_lightmap (iPolygonTexture *polytex)
 
     num--;
     total_size -= cached_texture->Size;
+
+    if (head == cached_texture) head = NULL;
+    if (tail == cached_texture) tail = NULL;
 
     delete cached_texture;
     cached_texture = NULL;
@@ -296,7 +301,7 @@ void OpenGLTextureCache::Uncache (iTextureHandle *texh)
   Unload (cached_texture);
 
   csGLCacheData *n = cached_texture->next;
-  if (n)
+  if (n && n->next)
     n->next->prev = cached_texture->prev;
   else
     tail = cached_texture->prev;
@@ -305,6 +310,7 @@ void OpenGLTextureCache::Uncache (iTextureHandle *texh)
   else
     head = n;
 
+  total_size -= cached_texture->Size;
   delete cached_texture;
 }
 
@@ -437,6 +443,8 @@ void OpenGLTextureCache::Unload (csGLCacheData *d)
   }
 }
 
+
+//----------------------------------------------------------------------------//
 OpenGLLightmapCache::OpenGLLightmapCache(int size, int bitdepth)
   : OpenGLCache(size,CS_LIGHTMAP,bitdepth)
 {

@@ -42,6 +42,9 @@
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"
 
+// for the software texture renderer
+#include "video/renderer/software/softex3d.h"
+
 #include <GL/gl.h>
 #include <GL/glu.h>
 
@@ -49,8 +52,7 @@
 
 // uncomment the 'USE_MULTITEXTURE 1' define to enable code for
 // multitexture support - this is independent of the extension detection,
-// but
-// it may rely on the extension module to supply proper function 
+// but  it may rely on the extension module to supply proper function 
 // prototypes for the ARB_MULTITEXTURE functions
 //#define USE_MULTITEXTURE 1
 
@@ -229,9 +231,8 @@ bool csGraphics3DOpenGL::Open (const char *Title)
   m_config_options.do_extra_bright = config->GetYesNo ("OpenGL", "EXTRA_BRIGHT", false);
 
   // determine what blend mode to use when combining lightmaps with
-  // their
-  // underlying textures.  This mode is set in the Opengl configuration
-  // file
+  // their  underlying textures.  This mode is set in the Opengl 
+  // configuration  file
   struct
   {
     char *blendstylename;
@@ -503,12 +504,10 @@ void csGraphics3DOpenGL::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   if (ABS (Dc) < SMALL_D)
   {
     // The Dc component of the plane normal is too small. This means
-    // that
-    // the plane of the polygon is almost perpendicular to the eye of
-    // the
-    // viewer. In this case, nothing much can be seen of the plane
-    // anyway
-    // so we just take one value for the entire polygon.
+    // that  the plane of the polygon is almost perpendicular to the 
+    // eye of the viewer. In this case, nothing much can be seen of 
+    // the plane anyway so we just take one value for the entire 
+    // polygon.
     M = 0;
     N = 0;
     // For O choose the transformed z value of one vertex.
@@ -526,8 +525,7 @@ void csGraphics3DOpenGL::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   // coordinates.
   // We are going to use these to scan the polygon from top to bottom.
   // Also compute the min_z/max_z in camera space coordinates. This is
-  // going to be
-  // used for mipmapping.
+  // going to be used for mipmapping.
   max_z = min_z = M * (poly.vertices[0].sx - width2)
     + N * (poly.vertices[0].sy - height2) + O;
   // count 'real' number of vertices
@@ -554,6 +552,9 @@ void csGraphics3DOpenGL::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   iPolygonTexture *tex = poly.poly_texture;
   csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) poly.txt_handle->GetPrivateObject ();
 
+  bool uncache_dynamic_texture =
+    ((txt_mm->GetFlags () & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC);
+
   // find lightmap information, if any
   iLightMap *thelightmap = tex->GetLightMap ();
 
@@ -561,8 +562,8 @@ void csGraphics3DOpenGL::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   // the texture in the texture cache (if this is not already the case).
   CacheTexture (tex);
 
-  // @@@ The texture transform matrix is currently written as T =
-  // M*(C-V)
+  // @@@ The texture transform matrix is currently written as 
+  // T = M*(C-V)
   // (with V being the transform vector, M the transform matrix, and C
   // the position in camera space coordinates. It would be better (more
   // suitable for the following calculations) if it would be written
@@ -657,9 +658,9 @@ void csGraphics3DOpenGL::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     u_over_sz = (J1 * sx + J2 * sy + J3);
     v_over_sz = (K1 * sx + K2 * sy + K3);
     // we must communicate the perspective correction (1/z) for
-    // textures
-    // by using homogenous coordinates in either texture space
-    // or in object (vertex) space.  We do it in texture space.
+    // textures by using homogenous coordinates in either texture 
+    // space or in object (vertex) space.  We do it in texture 
+    // space.
     // glTexCoord4f(u_over_sz,v_over_sz,one_over_sz,one_over_sz);
     // glVertex3f(poly.vertices[i].sx, poly.vertices[i].sy,
     // -one_over_sz);
@@ -672,9 +673,8 @@ void csGraphics3DOpenGL::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   glEnd ();
 
   // next draw the lightmap over the texture.  The two are blended
-  // together.
-  // if a lightmap exists, extract the proper data (GL handle, plus
-  // texture coordinate bounds)
+  // together. If a lightmap exists, extract the proper 
+  // data (GL handle, plus texture coordinate bounds)
   if (thelightmap && m_renderstate.lighting)
   {
     csGLCacheData *lightmapcache_data = (csGLCacheData *)thelightmap->GetCacheData ();
@@ -682,8 +682,7 @@ void csGraphics3DOpenGL::DrawPolygonSingleTexture (G3DPolygonDP & poly)
 
     // Jorrit: this code was added to scale the lightmap.
     // @@@ Note that many calculations in this routine are not very
-    // optimal
-    // to do here and should in fact be precalculated.
+    // optimal  to do here and should in fact be precalculated.
     int lmwidth = thelightmap->GetWidth ();
     int lmrealwidth = thelightmap->GetRealWidth ();
     int lmheight = thelightmap->GetHeight ();
@@ -728,12 +727,9 @@ void csGraphics3DOpenGL::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     glEnable (GL_TEXTURE_2D);
 
     // Here we set the Z buffer depth function to GL_EQUAL to make
-    // sure
-    // that the lightmap only overwrites those areas where the Z
-    // buffer
-    // was updated in the previous pass. This makes sure that
-    // intersecting
-    // polygons are properly lighted.
+    // sure that the lightmap only overwrites those areas where the 
+    // Z buffer was updated in the previous pass. This makes sure
+    // that  intersecting polygons are properly lighted.
     if (z_buf_mode == CS_ZBUF_FILL)
       glDisable (GL_DEPTH_TEST);
     else
@@ -756,9 +752,9 @@ void csGraphics3DOpenGL::DrawPolygonSingleTexture (G3DPolygonDP & poly)
       light_u = (u_over_sz * sz - lightmap_low_u) * lightmap_scale_u;
       light_v = (v_over_sz * sz - lightmap_low_v) * lightmap_scale_v;
       // we must communicate the perspective correction (1/z) for
-      // textures
-      // by using homogenous coordinates in either texture space
-      // or in object (vertex) space.  We do it in texture space.
+      // textures by using homogenous coordinates in either texture 
+      // space or in object (vertex) space.  We do it in texture 
+      // space.
       // glTexCoord4f(light_u/sz,light_v/sz,one_over_sz,one_over_sz);
       // glVertex3f(poly.vertices[i].sx, poly.vertices[i].sy,
       // -one_over_sz);
@@ -841,6 +837,9 @@ void csGraphics3DOpenGL::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     glEnd ();
 
   }
+  // When using a software dynamic texture
+  if (uncache_dynamic_texture)
+    texture_cache->Uncache (poly.txt_handle);
 }
 
 void csGraphics3DOpenGL::DrawPolygonDebug (G3DPolygonDP &/* poly */ )
@@ -1042,6 +1041,13 @@ void csGraphics3DOpenGL::DrawPolygonFX (G3DPolygonDPFX & poly)
     if (!m_gouraud)
       glShadeModel (GL_FLAT);
   }
+
+  // Only for software dynamic textures:-----------------------------------
+  csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) poly.txt_handle->GetPrivateObject ();
+
+  if ((txt_mm->GetFlags () & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC)
+    texture_cache->Uncache (poly.txt_handle);
+  //----------------------------------------------------------------------
 }
 
 void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
@@ -1553,12 +1559,10 @@ bool csGraphics3DOpenGL::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   if (ABS (Dc) < SMALL_D)
   {
     // The Dc component of the plane normal is too small. This means
-    // that
-    // the plane of the polygon is almost perpendicular to the eye of
-    // the
-    // viewer. In this case, nothing much can be seen of the plane
-    // anyway
-    // so we just take one value for the entire polygon.
+    // that the plane of the polygon is almost perpendicular to the 
+    // eye of the viewer. In this case, nothing much can be seen of 
+    // the plane anyway so we just take one value for the entire 
+    // polygon.
     M = 0;
     N = 0;
     // For O choose the transformed z value of one vertex.
@@ -1573,11 +1577,9 @@ bool csGraphics3DOpenGL::DrawPolygonMultiTexture (G3DPolygonDP & poly)
     O = -Cc * inv_Dc;
   }
   // Compute the min_y and max_y for this polygon in screen space
-  // coordinates.
-  // We are going to use these to scan the polygon from top to bottom.
-  // Also compute the min_z/max_z in camera space coordinates. This is
-  // going to be
-  // used for mipmapping.
+  // coordinates. We are going to use these to scan the polygon from 
+  // top to bottom. Also compute the min_z/max_z in camera space 
+  // coordinates. This is  going to be used for mipmapping.
   float max_z, min_z;
   max_z = min_z = M * (poly.vertices[0].sx - width2)
     + N * (poly.vertices[0].sy - height2) + O;
@@ -1613,8 +1615,8 @@ bool csGraphics3DOpenGL::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   // the texture in the texture cache (if this is not already the case).
   CacheTexture (tex);
 
-  // @@@ The texture transform matrix is currently written as T =
-  // M*(C-V)
+  // @@@ The texture transform matrix is currently written as 
+  // T = M*(C-V)
   // (with V being the transform vector, M the transform matrix, and C
   // the position in camera space coordinates. It would be better (more
   // suitable for the following calculations) if it would be written
@@ -1695,8 +1697,7 @@ bool csGraphics3DOpenGL::DrawPolygonMultiTexture (G3DPolygonDP & poly)
 
   // Jorrit: this code was added to scale the lightmap.
   // @@@ Note that many calculations in this routine are not very
-  // optimal
-  // to do here and should in fact be precalculated.
+  // optimal to do here and should in fact be precalculated.
   int lmwidth = thelightmap->GetWidth ();
   int lmrealwidth = thelightmap->GetRealWidth ();
   int lmheight = thelightmap->GetHeight ();
@@ -1753,8 +1754,7 @@ bool csGraphics3DOpenGL::DrawPolygonMultiTexture (G3DPolygonDP & poly)
 
   // we must disable the 2nd texture unit, so that other parts of the
   // code won't accidently have a second texture applied if they
-  // don't want it.
-  // at this point our active texture is still TEXTURE1_ARB
+  // don't want it. At this point our active texture is still TEXTURE1_ARB
   glActiveTextureARB (GL_TEXTURE1_ARB);
   glDisable (GL_TEXTURE_2D);
   glActiveTextureARB (GL_TEXTURE0_ARB);
@@ -1772,8 +1772,7 @@ float csGraphics3DOpenGL::GetZBuffValue (int x, int y)
   GLfloat zvalue;
   glReadPixels (x, height - y - 1, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &zvalue);
   // 0.090909=1/11, that is 1 divided by total depth delta set by
-  // glOrtho
-  // Where 0.090834 comes from, I don't know
+  // glOrtho. Where 0.090834 comes from, I don't know
   return (0.090834 / (zvalue - (0.090909)));
 }
 
@@ -1859,7 +1858,8 @@ void csGraphics3DOpenGL::DrawPixmap (iTextureHandle *hTex,
   int bitmapwidth = 0, bitmapheight = 0;
   hTex->GetMipMapDimensions (0, bitmapwidth, bitmapheight);
 
-  // convert texture coords given above to normalized (0-1.0) texture coordinates
+  // convert texture coords given above to normalized (0-1.0) texture 
+  // coordinates
   float ntx1,nty1,ntx2,nty2;
   ntx1 = (_tx      ) / bitmapwidth;
   ntx2 = (_tx + _tw) / bitmapwidth;
@@ -1877,4 +1877,14 @@ void csGraphics3DOpenGL::DrawPixmap (iTextureHandle *hTex,
   glTexCoord2f (ntx1, nty2);
   glVertex2i (sx, height - sy - sh - 1);
   glEnd ();
+}
+
+iGraphics3D *csGraphics3DOpenGL::CreateOffScreenRenderer (int width, int height,  csPixelFormat *pfmt, void *buffer, RGBPixel */*palette*/, int /*pal_size*/)
+{
+
+  // For now just create a software dynamic texture
+  CHK (csDynamicTextureSoft3D *tex3d =  
+       new csDynamicTextureSoft3D (System, G2D));
+
+  return tex3d->CreateOffScreenRenderer (width, height, pfmt, buffer, NULL, 0);
 }

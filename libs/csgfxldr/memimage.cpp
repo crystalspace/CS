@@ -20,26 +20,21 @@
 #include "csgfxldr/memimage.h"
 #include "csgfxldr/rgbpixel.h"
 
-IMPLEMENT_IBASE (csImageMemory)
-  IMPLEMENTS_INTERFACE (iImage)
-IMPLEMENT_IBASE_END
-
 csImageMemory::csImageMemory (int width, int height)
-  : Width (width), Height (height)
+  : csImageFile (CS_IMGFMT_TRUECOLOR)
 {
   CONSTRUCT_IBASE (NULL);
-  Data = (void*) new RGBPixel[Width*Height];
+  Width = width;
+  Height = height;
+  //  Data = (void*) new RGBPixel[Width*Height];
+  Image = (void*) new RGBPixel[Width*Height];
 };
 
-csImageMemory::~csImageMemory ()
-{
-  delete [] (RGBPixel *)Data;
-}
-
+// short cut
 void csImageMemory::Rescale (int NewWidth, int NewHeight)
 {
   Width = NewWidth;
   Height = NewHeight;
-  delete [] (RGBPixel *)Data;
-  Data = (void*) new RGBPixel[Width*Height];
+  delete [] (RGBPixel *) Image;
+  CHK (Image = (void*) new RGBPixel[Width*Height]);
 }

@@ -98,7 +98,8 @@ bool csGraphics3DSoftware::Open (const char *Title)
 
 iGraphics3D *csGraphics3DSoftware::CreateOffScreenRenderer (int width, int height,  csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size)
 {
-  csDynamicTextureSoft3D *tex3d =  new csDynamicTextureSoft3D (System, G2D);
+  CHK (csDynamicTextureSoft3D *tex3d =  
+       new csDynamicTextureSoft3D (System, G2D));
 
   return tex3d->CreateOffScreenRenderer (width, height, pfmt, buffer, 
 				       palette, pal_size);

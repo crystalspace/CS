@@ -142,7 +142,8 @@ public:
   /// Apply gamma correction to private palette
   void ApplyGamma (UByte *GammaTable);
 
-  void CreateDynamicTexture(csTextureManagerSoftware *texman, iGraphics3D *parentG3D, csPixelFormat *PixelFormat);
+  void CreateDynamicTexture(csTextureManagerSoftware *texman, 
+    iGraphics3D *parentG3D, csPixelFormat *PixelFormat);
 
   virtual iGraphics3D *GetDynamicTextureInterface ();
 

@@ -44,6 +44,13 @@ public:
   virtual csTexture *NewTexture (iImage *Image);
   /// Compute the mean color for the just-created texture
   virtual void ComputeMeanColor ();
+
+
+  void CreateDynamicTexture(iGraphics3D *parentG3D, csPixelFormat *PixelFormat);
+
+  virtual iGraphics3D *GetDynamicTextureInterface ();
+
+  virtual void DynamicTextureSyncPalette () { /* no paletted textures */ };
 };
 
 /**
@@ -53,6 +60,7 @@ public:
  */
 class csTextureOpenGL : public csTexture
 {
+protected:
   /// The actual image
   iImage *image;
 
@@ -67,6 +75,26 @@ public:
   /// Get the image object
   iImage *get_image ()
   { return image; }
+};
+
+/**
+ * csTextureOpenGLDynamic is a class derived from csTextureOpenGL that
+ * implements the additional functionality to allow acess to the texture
+ * memory via iGraphics2D/3D interfaces.
+ */
+class csTextureOpenGLDynamic : public csTextureOpenGL
+{
+public:
+  iGraphics3D *texG3D;
+
+  csTextureOpenGLDynamic (csTextureMM *Parent, iImage *Image)
+    : csTextureOpenGL (Parent, Image)
+  {};
+  /// Destroy the texture
+  virtual ~csTextureOpenGLDynamic ();
+
+
+  void CreateInterfaces (iGraphics3D *parentG3D, csPixelFormat *pfmt);
 };
 
 /**

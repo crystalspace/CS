@@ -14,6 +14,8 @@ The history order has been reversed so that new features are at the top.
 	  Clear code.
 	- Andrew Zabolotny did a few code style fixes for csfont plugin
 	  and misc fixes for OS/2 DIVE canvas.
+	- Samuel Humphreys sent me a new patch to clean up his dynamic
+	  textures and also implement them for OpenGL.
 9-May-2000
 	- -revis commandline option will now work to force recalculation
 	  of the octree. -norevis will not work for this as CS cannot
