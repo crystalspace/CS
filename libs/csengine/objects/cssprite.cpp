@@ -195,8 +195,6 @@ void csSpriteTemplate::AddVertices (int num)
 
   for (vertex = 0; vertex < num; vertex++)
   {
-    //texel_to_normal [num_texels + num] = num_normals + num;
-    //texel_to_vertex [num_texels + num] = num_vertices + num;
     texel_to_normal [num_texels + vertex] = num_normals + vertex;
     texel_to_vertex [num_texels + vertex] = num_vertices + vertex;
   }
@@ -212,7 +210,7 @@ void csSpriteTemplate::AddTriangle (int a, int b, int c)
 
   if (normal_mesh != NULL)
     normal_mesh->AddTriangle
-      (texel_to_normal[a], texel_to_normal[b], texel_to_vertex[c]);
+      (texel_to_normal[a], texel_to_normal[b], texel_to_normal[c]);
 
   if (vertex_mesh != NULL)
     vertex_mesh->AddTriangle
