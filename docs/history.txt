@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+8-Dec-2001
+	- Fixed a closing brace in mapfmt.txi.
 7-Dec-2001
 	- Added a new tutorial application (no doc yet) for collision
 	  detection. This tutorial contains a hierarchical mesh object
