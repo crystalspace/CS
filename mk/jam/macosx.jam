@@ -116,7 +116,6 @@ rule CreateApplicationWrapper
   {
     AppIcon $(<) : $(MACOSX.APP_ICON) ;
   }
-  CleanDir clean $(<)clean : [ Wrapper $(<) : app ] ;                        
 }
 
 ## ApplicationIconDefaultOSX icon [ : pathcomponents ]
