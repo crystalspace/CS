@@ -315,6 +315,52 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
       where = a;
     }
   }
+
+  // Also try to calculate quality for all axis aligned planes.
+  for (i = 0 ; i < axis_polylist.Length () ; i++)
+  {
+    // Calculate a possible split location.
+    a = axis_polylist[i].GetWhere ();
+    if (a < mina+EPSILON && a > maxa-EPSILON)
+      continue;
+
+    // Now count the number of objects that are completely
+    // on the left and the number of objects completely on the right
+    // side. The remaining objects are cut by this position.
+    int left = 0;
+    int right = 0;
+    for (j = 0 ; j < boxlist.Length () ; j++)
+    {
+      const csBox3& bbox = boxlist[j];
+      // The .0001 is for safety.
+      if (bbox.Max (axis) < a-.0001) left++;
+      else if (bbox.Min (axis) > a+.0001) right++;
+    }
+    int cut = boxlist.Length ()-left-right;
+    // If we have no object on the left or right then this is a bad
+    // split which we should never take.
+    float qual;
+    if (left == 0 || right == 0)
+    {
+      qual = -1.0;
+    }
+    else if (left == (int)boxlist.Length () || right == (int)boxlist.Length ())
+    {
+      qual = -1.0;
+    }
+    else
+    {
+      float qual_cut = 1.0 - (float (cut) * inv_num_objects);
+      float qual_balance = 1.0 - (float (ABS (left-right)) * inv_num_objects);
+      qual = .6 + (6.0 * qual_cut + qual_balance);	// Bonus for using axis plane.
+    }
+    if (qual > best_qual)
+    {
+      best_qual = qual;
+      where = a;
+    }
+  }
+
 # undef FBSL_ATTEMPTS
   return best_qual;
 }

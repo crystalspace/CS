@@ -16,6 +16,9 @@ chronological order.
 	- Jorrit made pvscalc kdtree calculation better. Also did a first
 	  attempt to use the axis aligned polygons present in the level
 	  to optimize the kdtree building. Not fully implemented yet.
+	- Jorrit did another optimization to the kdtree building. This
+	  time the axis aligned polygons are also used for the general
+	  kdtree builder. This makes a more compact kdtree.
 16-Feb-2005
 	- Jorrit significantly improved PVS quality by fixing the polygon
 	  clipper so that the orientation of the polygon clipper is
