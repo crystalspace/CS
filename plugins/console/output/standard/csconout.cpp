@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
+#include "csutil/cfgacc.h"
 #include "csconout.h"
 #include "conbuff.h"
 #include "ivaria/conout.h"
@@ -37,6 +38,7 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/cfgmgr.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -106,6 +108,9 @@ bool csConsoleOutput::Initialize (iObjectRegistry *object_reg)
   if (!G3D) return false;
   G2D = G3D->GetDriver2D ();
 
+  csConfigAccess Config (object_reg, "/config/standardcon.cfg");
+  const char* fontname = Config->GetStr ("StandardConsole.ConFont", "auto");
+
   // Initialize the display rectangle to the entire display
   size.Set (0, 0, G2D->GetWidth () - 1, G2D->GetHeight () - 1);
   invalid.Set (size); // Invalidate the entire console
@@ -113,7 +118,17 @@ bool csConsoleOutput::Initialize (iObjectRegistry *object_reg)
   csRef<iFontServer> fserv = G2D->GetFontServer();
   if (fserv)
   {
-    font = fserv->LoadFont (CSFONT_LARGE);
+    if (!strcasecmp (fontname, "auto"))
+    {
+      // choose a font that allows at least 80 columns of text
+      if (G2D->GetWidth () <= 560)
+        fontname = CSFONT_SMALL;
+      else if (G2D->GetWidth () <= 640)
+        fontname = CSFONT_COURIER;
+      else
+        fontname = CSFONT_LARGE;
+    }
+    font = fserv->LoadFont (fontname);
     font->GetMaxSize (fw, fh);
   }
   else

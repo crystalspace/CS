@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Mar-2004
+	- Jorrit extended the standard output console so that it now also
+	  supports setting of the font through the config file. Added
+	  a data/config/standardcon.cfg file. Currently the only setting
+	  that the standard output console supports is StandardConsole.ConFont
+	  which can have the following values:
+	  	- auto: select font based on size of display, similar like
+		  what simple output console does.
+		- select the specified font.
 23-Mar-2004
 	- Anders Stenberg brought stencil shadows back to life in NR.
 	  They should get along well with stencil clipping.
