@@ -365,6 +365,9 @@ public:
     virtual int GetPolygonCount ();
     virtual csMeshedPolygon* GetPolygons ();
     virtual void Cleanup () { }
+    
+    virtual bool IsDeformable () const { return false;  }
+    virtual uint32 GetChangeNumber() const { return 0; }
 
     PolyMesh () { }
     virtual ~PolyMesh () { }

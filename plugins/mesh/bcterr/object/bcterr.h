@@ -164,6 +164,10 @@ public:
   {
     return;
   }
+ 
+  virtual bool IsDeformable () const { return false;  }
+  virtual uint32 GetChangeNumber() const { return 0; }
+
 };
 
 /**
