@@ -148,7 +148,7 @@ rule RemoveDups
 
   for i in $(<)
   {
-    if ! [ IsElem µ(i) : $(result) ]
+    if ! [ IsElem $(i) : $(result) ]
     {
       result += $(i) ;
     }  
@@ -156,6 +156,17 @@ rule RemoveDups
 
   return $(result) ;
 } 
+
+rule Reverse
+{
+  local result ;
+  
+  for i in $(<)
+  {
+    result = $(i) $(result) ;
+  }
+  return $(result) ;
+}
 
 ##  GetVar argument
 ##    Simply returns the value of the variable with name argument.

@@ -47,6 +47,10 @@ chronological order.
 	- Jorrit fixed visibility culling errors in mottest which were caused
 	  by scaling objects through the movable (not allowed!). Fixed this
 	  by using HardTransform instead.
+	- Eric Sunshine reverted Jorrit's reversion of helper.jam.  Eric's
+	  fix to RemoveDups was correct, but fixing RemoveDups allowed a bug in
+	  LinkWith (flags.jam) to manifest.  Consequently, applied a patch from
+	  Matze which fixes LinkWith.
 14-Oct-2003
 	- Eric Sunshine fixed typographical error in constant expression in
 	  cssys/general/platformconfig.cpp: S_IWGRPS_IXGRP --> S_IWGRP|S_IXGRP.
