@@ -158,6 +158,7 @@ void appSystemDriver::DemoWrite (const char* buf)
   {
     if (SUCCEEDED (piG2D->BeginDraw ()))
     {
+      application->Invalidate(true);
       piG2D->Clear (application->Pal [cs_Color_Gray_D]);
       piG2D->SetFontID (application->GetFont ());
       int fh = ((csComponent *) application)->TextHeight () + 2;
