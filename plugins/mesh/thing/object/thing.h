@@ -1394,7 +1394,7 @@ public:
     }
     virtual void SetLightmapCellSize (int size)
     {
-      csLightMap::lightcell_size = size;
+      csLightMap::SetLightCellSize (size);
     }
     virtual int GetDefaultLightmapCellSize () const
     {

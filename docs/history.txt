@@ -9,6 +9,11 @@ The history order is reversed so that new features are at the top.
 	- Work around to a division by zero bug that sometimes happens in emit.
 	  Don't know what causes this and I don't understand the emit code
 	  so I cannot give a real fix.
+	- Fixed a very bad bug in the thing mesh plugin. When a lightcell
+	  size was selected different from the default 16, all shadow
+	  calculations would go wrong because the shift value (4) wasn't
+	  updated. This bug was introduced when I moved thing to a seperate
+	  plugin.
 31-Jan-2003
 	- Another small optimization in the super lightmap cache. This time
 	  avoid virtual function calls.
