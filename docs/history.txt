@@ -19,6 +19,8 @@ Short-term cleanups that need to be done:
 	  in export_table for the OSS sound driver.
 	- Norman fixed a small typo in system destructor that caused
 	  the 3d and 2d driver not to unregister.
+	- Some fixes on the coverage mask tree stuff. Still not working
+	  properly although we're getting close now.
 10-Dec-1999
 	- Thomas Hieber did some small adjustments on the VC project
 	  files and added coverage mask tree files.
