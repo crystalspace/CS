@@ -25,7 +25,6 @@
 
 #include "platform.h"
 #include "cstypes.h"
-#include "debug/memory.h"
 
 //---------------------------------------------------------------
 // Define the appropriate PROC_ flag for the current architecture
