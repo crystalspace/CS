@@ -57,6 +57,9 @@ chronological order.
 	      - stars now compiles.
 	      - Disabled terrfunc and terrbig from the Jam build with
 	        new renderer enabled. There are a bit harder to fix right.
+	- Eric Sunshine fixed xwindow.mak to use DO.PLUGIN.PREAMBLE, CORE,
+	  POSTAMBLE, rather than simply DO.PLUGIN.  This is necesary since it
+	  utilizes additional build flags.
 28-Aug-2003
 	- Jorrit fixed the x2d plugin so it actually reports an error if the
 	  'xwin' plugin cannot be found.

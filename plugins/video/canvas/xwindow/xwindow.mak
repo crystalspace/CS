@@ -72,7 +72,9 @@ $(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/xwindow/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.XWIN)
 
 $(XWIN): $(OBJ.XWIN) $(LIB.XWIN)
-	$(DO.PLUGIN) $(LIB.XWIN.SPECIAL)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(LIB.XWIN.SPECIAL) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 clean: xwinclean
 xwinclean:
