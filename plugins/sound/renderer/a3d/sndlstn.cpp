@@ -204,6 +204,23 @@ STDMETHODIMP csSoundListenerA3D::SetEnvironment(SoundEnvironment env)
 {
   Environment = env;
 
+  if(m_p3DAudioRenderer)
+  {
+    switch(Environment)
+    {
+    case ENVIRONMENT_GENERIC:
+      m_p3DAudioRenderer->SetEq(1.0);
+      break;
+
+    case ENVIRONMENT_UNDERWATER:
+      m_p3DAudioRenderer->SetEq(0.3);
+      break;
+
+    // I need to define others audio environments....
+    default:
+      break;
+    }
+  }
   return S_OK;
 }
 

@@ -55,6 +55,9 @@ STDMETHODIMP csSoundBufferA3D::CreateSource(ISoundSource** ppv)
 
   pNew->pSoundBuffer = this;
   pNew->m_p3DSource = m_p3DSource;
+  pNew->m_p3DSource->SetRenderMode(A3DSOURCE_RENDERMODE_A3D |
+        A3DSOURCE_RENDERMODE_OCCLUSIONS |
+        A3DSOURCE_RENDERMODE_1ST_REFLECTIONS);
   pNew->m_p3DAudioRenderer = m_p3DAudioRenderer;
 
   return pNew->QueryInterface (IID_ISoundSource, (void**)ppv);
@@ -77,7 +80,7 @@ int csSoundBufferA3D::CreateSoundBuffer(ISoundRender * render, csSoundData * sou
   if (!m_p3DAudioRenderer)
     return(E_FAIL);
   
-  if ((hr = m_p3DAudioRenderer->NewSource( A3DSOURCE_INITIAL_RENDERMODE_A3D , &m_p3DSource)) != S_OK)
+  if ((hr = m_p3DAudioRenderer->NewSource( A3DSOURCE_INITIAL_RENDERMODE_NATIVE , &m_p3DSource)) != S_OK)
   {
     if (m_p3DSource)
       m_p3DSource = NULL;
@@ -168,10 +171,37 @@ STDMETHODIMP csSoundBufferA3D::Play(SoundBufferPlayMethod playMethod)
 {
   if (m_p3DSource)
   {
-    if (playMethod == SoundBufferPlay_InLoop)
-      m_p3DSource->Play(A3D_LOOPED);
-    else
+    switch(playMethod)
+    {
+    case SoundBufferPlay_Normal:
+      m_p3DSource->Stop();
       m_p3DSource->Play(A3D_SINGLE);
+      break;
+
+    case SoundBufferPlay_InLoop:
+      m_p3DSource->Stop();
+      m_p3DSource->Play(A3D_LOOPED);
+      break;
+
+    case SoundBufferPlay_RestartInLoop:
+      m_p3DSource->Stop();
+      m_p3DSource->Rewind();
+      m_p3DSource->Play(A3D_LOOPED);
+      break;
+
+    case SoundBufferPlay_Restart:
+      m_p3DSource->Stop();
+      m_p3DSource->Rewind();
+      m_p3DSource->Play(A3D_SINGLE);
+      break;
+    
+    case SoundBufferPlay_DestroyAtEnd:
+      break;
+
+    default:
+      return S_FALSE;
+      break;
+    }
   }
 
   return S_OK;
@@ -184,3 +214,44 @@ STDMETHODIMP csSoundBufferA3D::Stop()
 
   return S_OK;
 }
+
+STDMETHODIMP csSoundBufferA3D::SetVolume(float vol)
+{
+  fVolume = vol;
+  
+  if (m_p3DSource)
+    m_p3DSource->SetGain(vol);
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundBufferA3D::GetVolume(float &vol)
+{
+  vol = fVolume;
+
+  if (m_p3DSource)
+    m_p3DSource->GetGain(&vol);
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundBufferA3D::SetFrequencyFactor(float factor)
+{
+  fFrequencyFactor = factor;
+
+  if (m_p3DSource)
+    m_p3DSource->SetPitch(factor);
+
+  return S_FALSE;
+}
+
+STDMETHODIMP csSoundBufferA3D::GetFrequencyFactor(float &factor)
+{
+  factor = fFrequencyFactor;
+
+  if (m_p3DSource)
+    m_p3DSource->GetPitch(&factor);
+  
+  return S_FALSE;
+}
+

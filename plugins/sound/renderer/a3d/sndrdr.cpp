@@ -75,6 +75,7 @@ STDMETHODIMP csSoundRenderA3D::CreateSource(ISoundSource** ppv, csSoundData *snd
   }
 
   pNew->CreateSoundBuffer(this, snd);
+  pNew->SetVolume (1.0);
 
   return pNew->CreateSource(ppv);
 }
@@ -89,6 +90,7 @@ STDMETHODIMP csSoundRenderA3D::CreateSoundBuffer(ISoundBuffer** ppv, csSoundData
   }
 
   pNew->CreateSoundBuffer(this, snd);
+  pNew->SetVolume (1.0);
   
   return pNew->QueryInterface (IID_ISoundBuffer, (void**)ppv);
 }
@@ -139,7 +141,6 @@ STDMETHODIMP csSoundRenderA3D::Close()
     m_pListener->Release();
   }
 
-
   if (m_p3DAudioRenderer)
   {
     if ((hr = m_p3DAudioRenderer->Release()) < S_OK)
@@ -155,18 +156,25 @@ STDMETHODIMP csSoundRenderA3D::Close()
 
 STDMETHODIMP csSoundRenderA3D::Update()
 {
-  m_p3DAudioRenderer->Flush();
+  if (m_p3DAudioRenderer)
+    m_p3DAudioRenderer->Flush();
 
   return S_OK;
 }
 
 STDMETHODIMP csSoundRenderA3D::SetVolume(float vol)
 {
+  if (m_p3DAudioRenderer)
+    m_p3DAudioRenderer->SetOutputGain(vol);
+
   return S_OK;
 }
 
 STDMETHODIMP csSoundRenderA3D::GetVolume(float *vol)
 {
+  if (m_p3DAudioRenderer)
+    m_p3DAudioRenderer->GetOutputGain(vol);
+
   return S_OK;
 }
 
