@@ -19,7 +19,6 @@
 
 #include "cssysdef.h"
 #include "csutil/csobject.h"
-#include "csutil/dataobj.h"
 
 #include <stdlib.h>
 #include <string.h>
