@@ -400,7 +400,7 @@ void Reset()             // resets iterator (not all implement this).
 cavas, use @code{iAWS::SetupCanvas()} instead. 
 
 @code{iAWS::CreateTransition()} and @code{iAWS::CreateTransitionEx()} have been
-changed to take a @samp{delay} parameter specified in $code{csTicks} instead of
+changed to take a @samp{delay} parameter specified in @code{csTicks} instead of
 using a @samp{step_size} parameter.  This change ensures that transitions take
 the same amount of time on computers having different processor speeds.
 
