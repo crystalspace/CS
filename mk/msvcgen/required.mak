@@ -43,13 +43,14 @@
 #------------------------------------------------------------------------------
 MSVC.MAKE.FLAGS =		\
   3DS.AVAILABLE=yes		\
+  CAL3D.AVAILABLE=yes		\
+  CG.AVAILABLE=yes		\
   DIRECTX.AVAILABLE=yes		\
   FT2.AVAILABLE=yes		\
   GL.AVAILABLE=yes		\
   GLU.AVAILABLE=yes		\
-  CG.AVAILABLE=yes		\
-  CAL3D.AVAILABLE=yes		\
   JPEG.AVAILABLE=yes		\
+  MIKMOD.AVAILABLE=yes		\
   MNG.AVAILABLE=yes		\
   ODE.AVAILABLE=yes		\
   OPENAL.AVAILABLE=yes		\
@@ -59,7 +60,6 @@ MSVC.MAKE.FLAGS =		\
   SOCKET.AVAILABLE=yes		\
   USE_NEW_RENDERER=yes		\
   VORBISFILE.AVAILABLE=yes	\
-  MIKMOD.AVAILABLE=yes		\
   ZLIB.AVAILABLE=yes
 
 MSVC.PLUGINS.REQUIRED =         \
