@@ -29,7 +29,7 @@ Crystal Space.
 @cindex @code{iWorld}
 @cindex @code{iEngine}
 
-The class @code{csWorld} has been renamed to @code{csEngine}.  Here is a
+The class @samp{csWorld} has been renamed to @samp{csEngine}.  Here is a
 summary of all the changes which result from this:
 
 @itemize @bullet
@@ -52,59 +52,69 @@ summary of all the changes which result from this:
 @subheading @code{csThingTemplate} Removed
 @cindex @code{csThingTemplate}
 
-The class @code{csThingTemplate} has been removed. Instead you use normal
-@code{csThing} instances and clone them using @code{csThing::MergeTemplate()}.
-The @code{thing_templates} list in @code{csEngine} is still there but it
-now contains instances of @code{csThing} instead of @code{csThingTemplate}.
-This also means that @code{csPolygonTemplate} is removed. Fixing applications
-for this change is not very hard. It mostly means replacing @code{csThingTemplate}
-with @code{csThing} and then doing small modifications to the API.
+The class @samp{csThingTemplate} has been removed.  Instead you use normal
+@samp{csThing} instances and clone them using @code{csThing::MergeTemplate()}.
+The @samp{thing_templates} list in @samp{csEngine} is still there but it now
+contains instances of @samp{csThing} instead of @samp{csThingTemplate}.  This
+also means that @samp{csPolygonTemplate} is removed.  Fixing applications for
+this change is not very hard.  It mostly means replacing @samp{csThingTemplate}
+with @samp{csThing} and then doing small modifications to the @sc{api}.
 
 @subheading Configuration File Changes
 @cindex Configuration Files
 
-The configuration file format has changed significantly. In contrast to the
-@sc{ini} format used before, Crystal Space now uses a flat format. Sections
-are gone. Every config file is just a list of keys in the following format:
+The configuration file format has changed significantly.  In contrast to the
+@sc{ini} format used previously, Crystal Space now uses a flat format.
+Sections are gone.  Every configuration file is just a list of keys in the
+following format:
+
 @example
 ; optional comment
 ; (can also be several lines long)
 KeyName = Value
 @end example
-Also, key names have been changed completely. Keys are organized in a
-pseudo-hierarchical structure by using key names like
-@samp{Engine.Lighting.Ambient.Red}. To convert your own config files to the
-new format, you should best take all keys from all sections and rename them
-to @samp{ApplicationName.SectionName.KeyName}. This is only a suggestion.
-You can choose whatever name you want, except the initial
-@samp{ApplicationName.}. This is done to give every option a unique name.
-The same should be done for plugins (@samp{PluginName.SectionName.KeyName}).
 
-Comments at the end of the file are preserved and put back at the end when
-saving the file.
+Also, key names have been changed completely.  Keys are organized in a
+pseudo-hierarchical structure by using key names such as
+@samp{Engine.Lighting.Ambient.Red}.  To convert your own configuration files to
+the new format, you should take all keys from all sections and rename them
+using the template @samp{ApplicationName.SectionName.KeyName}.  This is only a
+suggestion.  You can choose whatever name you want, except that the initial
+@samp{ApplicationName.} should be used in order to avoid naming collisions with
+keys in other configuration files.  This is done to give every option a unique
+name.  The same should be done for plugins
+(@samp{PluginName.SectionName.KeyName}).
+
+Comments at the end of the file are preserved when saving the file.
 
 On the application side, things have also changed:
+
 @itemize @bullet
 @item
-The old @code{csIniFile} class still exists. All these changes refer to the
-difference between @code{csIniFile} and @code{csConfigFile}, and the
-difference between @code{iConfigFile} and @code{iConfigFileNew}. Sorry for
-this mess, but there were a few cases where I could not (yet) port modules
-to the new config system, so they still require the old system. This will
-change soon. The header files for the new system are @file{csutil/cfgfile.h}
-and @file{icfgnew.h}. The main system config file already uses the new system.
+The old @samp{csIniFile} class still exists.  All these changes refer to the
+difference between @samp{csIniFile} and @samp{csConfigFile}, and the difference
+between @samp{iConfigFile} and @samp{iConfigFileNew}.  Sorry for this mess, but
+there were a few cases where I could not (yet) port modules to the new config
+system, so they still require the old system.  This will change soon.  The
+header files for the new system are @file{CS/csutil/cfgfile.h} and
+@file{icfgnew.h}.  The main system configuration file already uses the new
+system.
 
 @item
-To read or write config keys, you now only pass the key name and default
-value, because sections don't exist anymore. Be careful when porting,
-because the line
+To read or write configuration keys, you now only pass the key name and default
+value, because sections no longer exist.  Be careful when porting, because the
+line:
+
 @example
 const char *s = Config->GetStr("section", "key");
 @end example
-in your code may now be interpreted as
+
+In your code may now be interpreted as:
+
 @example
 const char *s = Config->GetStr("key", "default");
 @end example
+
 The compiler will not complain about this.
 
 @item
@@ -112,15 +122,15 @@ The compiler will not complain about this.
 and @code{SetBool()}.
 
 @item
-The @samp{dirty} flag is now hidden inside the config file object. The
-@code{Save()} method will look for this flag.
+The @samp{dirty} flag is now hidden inside the configuration file object. The
+@code{Save()} method respects this flag.
 
 @item
-The section and data iterators have been merged to a single object. This
+The section and data iterators have been merged into a single object. This
 iterator can be used to cycle through all options, or through all options
 in one @dfn{subsection}, which is the initial substring of the key name.
 For example, if you iterate all options in subsection @samp{Engine.Lighting.},
-you'll get all options whose name begin with this string. Note the trailing
+you will get all options whose name begin with this string. Note the trailing
 dot. It is part of the subsection name. This is important if you have other
 options like @samp{Engine.LightingActivate}, which would otherwise be
 enumerated as well. It is also important because you can ask an iterator for
@@ -132,12 +142,12 @@ this would be @samp{.Ambient.Red}, which may not be what you want. To
 retrieve the local name, call @code{Iterator->GetName(true);}.
 
 @item
-Some methods for easier access to key values have been added to the iterators.
-So you can now read integer, float and bool values as well, not only strings.
+Convenience methods such as GetInt(), GetFloat(), and GetBool() have been
+added to the iterators.
 
 @item
 The @code{Prev()} method of iterators has been removed because a new planned
-implementation of the @code{iConfigFileNew} interface is probably not able
+implementation of the @samp{iConfigFileNew} interface is probably not able
 to implement this method. Also, it was never used.
 @end itemize
 
@@ -148,212 +158,229 @@ to implement this method. Also, it was never used.
 @cindex Particle Systems
 
 Particle systems, 2D sprites, and 3D sprites are now no longer in the
-engine. This means that classes like @code{csSprite3D}, @code{csSprite2D},
-@code{csParticleSystem}, ... are no longer accessible directly and now
+engine. This means that classes like @samp{csSprite3D}, @samp{csSprite2D},
+@samp{csParticleSystem}, etc., are no longer directly accessible and now
 have to be accessed through the new mesh object plugin system.
 
-In the engine the two main classes are now @code{csMeshWrapper} and
-@code{csMeshFactoryWrapper}. @code{csMeshWrapper} replaces the original
-@code{csSprite} (superclass of all sprites). @code{csMeshFactoryWrapper}
-is roughly similar to what @code{csSpriteTemplate} used to do except
-that it is now also a parent for particle system and 2D sprite instances.
+In the engine the two primary mesh-related classes are now @samp{csMeshWrapper}
+and @samp{csMeshFactoryWrapper}.  The old @samp{csSprite} class which was the
+superclass of all sprites has been replaced with @samp{csMeshWrapper}
+@samp{csMeshFactoryWrapper} is roughly similar to what @samp{csSpriteTemplate}
+used to do except that it is now also a parent for particle system and 2D
+sprite instances.
 
-The explanation below mainly tells you how to port the original @code{csSprite3D}
-code to the new system. The other stuff follows almost automatically from
-what you see below.
+The explanation below mainly tells you how to port the original
+@samp{csSprite3D} code to the new system.  The other stuff follows almost
+automatically from what you see below.
 
 Here is a list of things that are removed and which things
 you will have to use instead. More detailed info will come later:
 
 @itemize @bullet
 @item
- @code{csSprite} -> @code{csMeshWrapper}
+@code{csSprite} @result{} @code{csMeshWrapper}
 @item
- @code{csSprite2D} -> @code{csMeshWrapper}, @code{iSprite2DState}
+@code{csSprite2D} @result{} @code{csMeshWrapper}, @code{iSprite2DState}
 @item
- @code{csSprite3D} -> @code{csMeshWrapper}, @code{iSprite3DState}
+@code{csSprite3D} @result{} @code{csMeshWrapper}, @code{iSprite3DState}
 @item
- @code{csSpriteTemplate} -> @code{csMeshFactoryWrapper}, @code{iSprite3DFactoryState}
+@code{csSpriteTemplate} @result{} @code{csMeshFactoryWrapper},
+@code{iSprite3DFactoryState}
 @item
- @code{csFrame} -> @code{iSpriteFrame}
+@code{csFrame} @result{} @code{iSpriteFrame}
 @item
- @code{csSpriteAction} -> @code{iSpriteAction}
+@code{csSpriteAction} @result{} @code{iSpriteAction}
 @item
- @code{csSkeleton} -> @code{iSkeleton}
+@code{csSkeleton} @result{} @code{iSkeleton}
 @item
- @code{csSkeletonLimb} -> @code{iSkeletonLimb}
+@code{csSkeletonLimb} @result{} @code{iSkeletonLimb}
 @item
- @code{csSkeletonConnection} -> @code{iSkeletonConnection}
+@code{csSkeletonConnection} @result{} @code{iSkeletonConnection}
 @item
- @code{csSkeletonState} -> @code{iSkeletonState}
+@code{csSkeletonState} @result{} @code{iSkeletonState}
 @item
- @code{csSkeletonLimbState} -> @code{iSkeletonLimbState}
+@code{csSkeletonLimbState} @result{} @code{iSkeletonLimbState}
 @item
- @code{csSkeletonConnectionState} -> @code{iSkeletonConnectionState}
+@code{csSkeletonConnectionState} @result{} @code{iSkeletonConnectionState}
 @item
- @code{iSprite} -> @code{iMeshWrapper}
+@code{iSprite} @result{} @code{iMeshWrapper}
 @item
- @code{iSpriteTemplate} -> @code{iMeshFactoryWrapper}
+@code{iSpriteTemplate} @result{} @code{iMeshFactoryWrapper}
 @item
- @code{csLoade}::LoadSpriteTemplate()} -> use spr3dldr plugin to load factories
+@code{csLoader::LoadSpriteTemplate()} @result{} Use @file{spr3dldr} plugin to
+load factories
 @item
- @code{csLoade}::LoadSprite()} -> use spr3dldr plugin to load sprites
+@code{csLoader::LoadSprite()} @result{} Use @file{spr3dldr} plugin to load
+sprites
 @item
- @code{csEngine::sprites} -> @code{csEngine::meshes}
+@code{csEngine::sprites} @result{} @code{csEngine::meshes}
 @item
- @code{csEngine::RemoveSprite} -> @code{csEngine::RemoveMesh}
+@code{csEngine::RemoveSprite} @result{} @code{csEngine::RemoveMesh}
 @item
- @code{csEngine::UnlinkSprite} -> @code{csEngine::UnlinkMesh}
+@code{csEngine::UnlinkSprite} @result{} @code{csEngine::UnlinkMesh}
 @item
- @code{csEngine::sprite_templates} -> @code{csEngine::mesh_factories}
+@code{csEngine::sprite_templates} @result{} @code{csEngine::mesh_factories}
 @item
- @code{csSector::sprites} -> @code{csSector::meshes}
+@code{csSector::sprites} @result{} @code{csSector::meshes}
 @end itemize
 
-In addition to that the @samp{SPRITE} keyworld in map files is also no longer
-supported. Instead you should use @samp{MESHOBJ}.
+In addition to that the @samp{SPRITE} keyword in map files is also no longer
+supported. Instead you should use the new @samp{MESHOBJ} keyword.
 
-First I recommend everyone who wants to port first to read the general
-documentation about the mesh object plugin system (@pxref{MeshObject}).
-Read this very carefully. A good understanding is required to do a
-succesful port.
+It is recommended that anyone who wants to convert to the new system should
+first to read the general documentation about the mesh object plugin system
+(@pxref{MeshObject}).  Read this very carefully.  A good understanding is
+required to perform a succesful conversion.
 
-In addition to what is explained there are also two conveniance functions to
+In addition to what is explained, there are also two conveniance functions to
 create mesh factories and mesh objects:
 
 @example
-  /**
-   * Conveniance function to create a mesh factory from a given type.
-   * The type plugin will only be loaded if needed. 'classId' is the
-   * SCF name of the plugin (like 'crystalspace.mesh.object.cube').
-   * Returns NULL on failure. The factory will be registered with the engine
-   * under the given name. If there is already a factory with that name
-   * no new factory will be created but the found one is returned instead.
-   * If the name is NULL then no name will be set and no check will happen
-   * if the factory already exists.
-   */
-  virtual iMeshFactoryWrapper* CreateMeshFactory (const char* classId,
-        const char* name) = 0;
+/**
+ * Conveniance function to create a mesh factory from a
+ * given type.  The type plugin will only be loaded if
+ * needed.  'classId' is the SCF name of the plugin (like
+ * 'crystalspace.mesh.object.cube').  Returns NULL on
+ * failure.  The factory will be registered with the engine
+ * under the given name.  If there is already a factory with
+ * that name no new factory will be created but the found
+ * one is returned instead.  If the name is NULL then no
+ * name will be set and no check will happen if the factory
+ * already exists.
+ */
+virtual iMeshFactoryWrapper* CreateMeshFactory(
+  const char* classId, const char* name) = 0;
 
-  /**
-   * Conveniance function to create a mesh object for a given factory.
-   * If 'sector' is NULL then the mesh object will not be set to a position.
-   * Returns NULL on failure. The object will be given the specified name.
-   * 'name' can be NULL if no name is wanted. Different mesh objects can
-   * have the same name (in contrast with factory objects).
-   */
-  virtual iMeshWrapper* CreateMeshObject (iMeshFactoryWrapper* factory,
-        const char* name, iSector* sector, const csVector3& pos) = 0;
+/**
+ * Conveniance function to create a mesh object for a given
+ * factory.  If 'sector' is NULL then the mesh object will
+ * not be set to a position.  Returns NULL on failure.  The
+ * object will be given the specified name.  'name' can be
+ * NULL if no name is wanted.  Different mesh objects can
+ * have the same name (in contrast with factory objects).
+ */
+virtual iMeshWrapper* CreateMeshObject(
+  iMeshFactoryWrapper* factory, const char* name,
+  iSector* sector, const csVector3& pos) = 0;
 @end example
 
-To see how to use them you can take a look at the simple application.
+To see how to use them you can take a look at the Simple application.
 
 Here are a few examples of old code compared to new code:
 
+@noindent
+Old code:
+
+@example
+// Load a sprite template from disk.
+csSpriteTemplate* spritetmpl =
+  csLoader::LoadSpriteTemplate (engine, "/lib/std/sprite1");
+// Add the sprite to the engine.
+csSprite3D* sprite = spritetmpl->NewSprite (engine);
+sprite->SetName ("MySprite");
+engine->sprites.Push (sprite);
+sprite->GetMovable ().SetSector (room);
+csMatrix3 m; m.Identity (); m *= 5.;
+sprite->GetMovable ().SetTransform (m);
+sprite->GetMovable ().SetPosition (csVector3 (-3, 5, 3));
+sprite->GetMovable ().UpdateMove ();
+sprite->SetAction ("default");
+sprite->InitSprite ();
+@end example
+
+@noindent
+New code:
+
+@example
+// Load a sprite template from disk.
+csMeshFactoryWrapper* spritetmpl =
+  csLoader::LoadMeshObjectFactory (engine, "/lib/std/sprite1");
+if (spritetmpl == NULL)
+@{
+  Printf (MSG_FATAL_ERROR, "Error loading mesh object factory!\n");
+  cleanup ();
+  exit (1);
+@}
+// Add the sprite to the engine.
+iMeshWrapper* sprite = engine->CreateMeshObject (
+   QUERY_INTERFACE (spritetmpl, iMeshFactoryWrapper),
+  "MySprite",
+  QUERY_INTERFACE (room, iSector),
+  csVector3 (-3, 5, 3));
+csMatrix3 m; m.Identity (); m *= 5.;
+sprite->GetMovable ()->SetTransform (m);
+sprite->GetMovable ()->UpdateMove ();
+iSprite3DState* spstate =
+  QUERY_INTERFACE (sprite->GetMeshObject (), iSprite3DState);
+spstate->SetAction ("default");
+spstate->DecRef ();
+@end example
+
+Keep in mind that for this to work @file{/lib/std/sprite1} has to be modified
+from old to new syntax, as well.
+
+Here is an example for sprite templates:
+
+@noindent
+Old syntax (sprite template):
+
+@example
+SPRITE 'mySpriteTmpl' (
+  TEXNR ('xxx.gif')
+  FRAME (@dots{...})
+  @dots{...}
+)
+@end example
+
+@noindent
+New syntax (mesh wrapper factory):
+
+@example
+MESHOBJ 'mySpriteTmpl' (
+  PLUGIN ('crystalspace.mesh.loader.factory.sprite.3d')
+  PARAMS (
+    MATERIAL ('xxx')
+    FRAME (@dots{})
+    @dots{}
+  )
+)
+@end example
+
+And here is an example for actual sprite instances:
+
+@noindent
+Old syntax (sprite):
+
+@example
+SPRITE 'mySprite' (
+  TEXNR ('xxx.gif')
+  TEMPLATE ('mySpriteTmpl', 'someAction')
+  MOVE (@dots{})
+)
+@end example
+
+@noindent
+New syntax (mesh wrapper):
+
+@example
+MESHOBJ 'mySprite' (
+  PLUGIN ('crystalspace.mesh.loader.sprite.3d')
+  PARAMS (
+    MATERIAL ('xxx')
+    FACTORY ('mySpriteTmpl')
+    ACTION ('someAction')
+  )
+  MOVE (@dots{})
+)
+@end example
+
+Here are some additional notes.
+
 @itemize @bullet
 @item
-Old Version:
-@example
-  // Load a sprite template from disk.
-  csSpriteTemplate* spritetmpl = csLoader::LoadSpriteTemplate (engine,
-   "/lib/std/sprite1");
-  // Add the sprite to the engine.
-  csSprite3D* sprite = spritetmpl->NewSprite (engine);
-  sprite->SetName ("MySprite");
-  engine->sprites.Push (sprite);
-  sprite->GetMovable ().SetSector (room);
-  csMatrix3 m; m.Identity (); m *= 5.;
-  sprite->GetMovable ().SetTransform (m);
-  sprite->GetMovable ().SetPosition (csVector3 (-3, 5, 3));
-  sprite->GetMovable ().UpdateMove ();
-  sprite->SetAction ("default");
-  sprite->InitSprite ();
-@end example
+Notice that @code{MOVE()} goes outside the @code{PARAMS()} block for a sprite.
 @item
-New Version:
-@example
-  // Load a sprite template from disk.
-  csMeshFactoryWrapper* spritetmpl = csLoader::LoadMeshObjectFactory (engine,
-   "/lib/std/sprite1");
-  if (spritetmpl == NULL)
-  @{
-    Printf (MSG_FATAL_ERROR, "Error loading mesh object factory!\n");
-    cleanup ();
-    exit (1);
-  @}
-  // Add the sprite to the engine.
-  iMeshWrapper* sprite = engine->CreateMeshObject (
-       QUERY_INTERFACE (spritetmpl, iMeshFactoryWrapper),
-      "MySprite",
-      QUERY_INTERFACE (room, iSector),
-      csVector3 (-3, 5, 3));
-  csMatrix3 m; m.Identity (); m *= 5.;
-  sprite->GetMovable ()->SetTransform (m);
-  sprite->GetMovable ()->UpdateMove ();
-  iSprite3DState* spstate = QUERY_INTERFACE (sprite->GetMeshObject (), iSprite3DState);
-  spstate->SetAction ("default");
-  spstate->DecRef ();
-@end example
-@end itemize
-
-Keep in mind that for this to work /lib/std/sprite1 has to be modified from
-old to new syntax too (I already did this in CS).
-
-@itemize @bullet
-@item
-Old Syntax (sprite templates):
-@example
-  SPRITE 'mySpriteTmpl' (
-    TEXNR ('xxx.gif')
-    FRAME (...)
-    ...
-  )
-@end example
-@item
-New Syntax (mesh wrapper factory):
-@example
-  MESHOBJ 'mySpriteTmpl' (
-    PLUGIN ('crystalspace.mesh.loader.factory.sprite.3d')
-    PARAMS (
-      MATERIAL ('xxx')
-      FRAME (...)
-      ...
-    )
-  )
-@end example
-@end itemize
-
-@itemize @bullet
-@item
-Old Syntax (for sprites):
-@example
-  SPRITE 'mySprite' (
-    TEXNR ('xxx.gif')
-    TEMPLATE ('mySpriteTmpl', 'someAction')
-    MOVE (...)
-  )
-@end example
-@item
-New Syntax (mesh wrapper):
-@example
-  MESHOBJ 'mySprite' (
-    PLUGIN ('crystalspace.mesh.loader.sprite.3d')
-    PARAMS (
-      MATERIAL ('xxx')
-      FACTORY ('mySpriteTmpl')
-      ACTION ('someAction')
-    )
-    MOVE (...)
-  )
-@end example
-@end itemize
-
-Some notes:
-@itemize @bullet
-@item
-Notice that @samp{MOVE()} goes outside the @samp{PARAMS} block for a sprite.
-@item
-Note that the new @samp{spr3d} cannot work with textures. It needs materials.
+Note that the new @samp{spr3d} can not work with textures. It needs materials.
 So add a definition to the @samp{MATERIALS} section.
 @end itemize
 
@@ -385,69 +412,76 @@ There have been three main changes in the sound system:
 
 @itemize @bullet
 @item
-Some of the options in the config file have become redundant. The others have
-been moved to @file{CS/data/config/sound.cfg}. Have a look at this file to
-see which options are left.
+Some of the options in the configuration file have become redundant.  The
+others have been moved to @file{CS/data/config/sound.cfg}.  Have a look at this
+file to see which options remain.
 
 @item
 As before, a sound can be loaded as a static or streamed sound, but this
-difference is now expressed in using different classes: @code{iSoundData} and
-@code{iSoundStream}. You can create any number of instances (sources) of a
+difference is now expressed by using different classes: @samp{iSoundData} and
+@samp{iSoundStream}. You can create any number of instances (sources) of a
 static sound, but only one instance of a streamed sound. In fact, whenever
 you play a static sound, a separate sound stream is created from it. The
-definition of a static sound is now explicitly @samp{a sound of which any
-number of instances can be created}.
+definition of a static sound is now explicitly ``a sound of which any
+number of instances can be created''.
 
 @item
-The system of 3d and non-3d sources has been changed a bit. Every sound source
-now has a new attribute, the 3d mode. This mode can also be changed after the
+The system of 3D and non-3D sources has been changed a bit. Every sound source
+now has a new attribute, the 3D mode. This mode can also be changed after the
 source is created. It can be set to the following values:
+
 @table @code
 @item SOUND3D_DISABLE
-This will cause the sound source to produce no 3d effect. This is also the
-only mode in which the original stereo effects are preserved (this does not
-work correctly at the moment).
+This will cause the sound source to produce no 3D effect. This is also the
+only mode in which the original stereo effects are preserved.  (This does not
+work correctly at the moment.)
 
 @item SOUND3D_ABSOLUTE
 This will interpret the position of the sound source and the listener as
-absolute coordinates and create the 3d effect based on this.
+absolute coordinates and create the 3D effect based on this.
 
 @item SOUND3D_RELATIVE
 This will ignore the listener's position and interpret the position of the
 sound source as relative coordinated to the listener. In other words, it
-calculates the 3d effect as if the listener was positioned at @code{(0,0,0)}
+calculates the 3D effect as if the listener was positioned at (0,0,0)
 with default orientation.
 @end table
 @end itemize
 
-@subheading Various smaller changes
+@subheading Miscellaneous Changes
 
 @itemize @bullet
 @item
-  @code{iGraphics2D::WriteChar()} is removed. Use @code{Write()} instead.
-@item
-  All @code{UpdateLighting} calls now accept @code{iLight} pointers intead
-  of @code{csLight} pointers. In addition @code{csEngine::GetNearbyLights()}
-  returns an array of @code{iLight} pointers.
-@item
-  The obsolete @code{CLights} class (for uniform dynamic lighting) is removed.
-  It wasn't working properly anyway.
-@item
-  @code{csEngine::PrepareParticleSystems()} is now gone.
-  Use @code{csEngine::PrepareMeshes()}.
-@item
-  The @code{csEngine::AdvanceSpriteFrames()} method has been renamed to
-  @code{NextFrame()}.  In addition @code{UpdateParticleSystems()} has been
-  removed and is now also handled by @code{csEngine::NextFrame()}.
-@item
-  With the new mesh object plugin system the @code{iParticle} interface
-  also changed a little. Check out the header to see the changes.
-@item
-  @code{FastSqrt()} is gone. Use @code{qsqrt()} instead. If you want
-  to calculate @code{1/sqrt()} then use @code{qisqrt()}.
-@item
-  @code{csRenderView} has no public members anymore. You need to
-  access everything through @code{Get...} and @code{Set...}. Check out
-  the header for more details.
-@end itemize
+@code{iGraphics2D::WriteChar()} has been removed. Use @code{Write()} instead.
 
+@item
+All @code{UpdateLighting()} calls now accept @samp{iLight} pointers intead
+of @samp{csLight} pointers. In addition @code{csEngine::GetNearbyLights()}
+returns an array of @samp{iLight} pointers.
+
+@item
+The obsolete @samp{CLights} class (for uniform dynamic lighting) has been
+removed. It was not working properly anyway.
+
+@item
+The @code{csEngine::PrepareParticleSystems()} method has been removed.
+Instead, use the new @code{csEngine::PrepareMeshes()} method.
+
+@item
+The @code{csEngine::AdvanceSpriteFrames()} method has been renamed to
+@code{NextFrame()}.  In addition @code{UpdateParticleSystems()} has been
+removed and is now also handled by @code{csEngine::NextFrame()}.
+
+@item
+With the new mesh object plugin system the @samp{iParticle} interface
+also changed a little. Check out the header to see the changes.
+
+@item
+@code{FastSqrt()} is gone. Use @code{qsqrt()} instead. If you want
+to calculate @code{1/sqrt()} then use @code{qisqrt()}.
+
+@item
+@samp{csRenderView} has no public members anymore.  You need to access
+everything through @code{GetFoo()} and @code{SetFoo()} methods Check out the
+header for more details.
+@end itemize

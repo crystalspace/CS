@@ -12,70 +12,71 @@
 @emph{Written by Jorrit Tyberghein,
 @email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
 
-A cube is a rectangular shaped object.
+A cube is a rectangularly shaped object.
 
 @subsubheading Basic Structure
 
-The following @sc{SCF} class names are used (for @code{LOAD_PLUGIN}):
-@itemize
-@item
-  Type plugin: @samp{crystalspace.mesh.object.cube}
-@item
-  Loader plugin: @samp{crystalspace.mesh.loader.cube}
-@item
-  Factory loader plugin: @samp{crystalspace.mesh.loader.factory.cube}
-@end itemize
+The following @sc{scf} class names are used (for @code{LOAD_PLUGIN()}):
 
-Objects in this plugin implement the following @sc{SCF} interfaces (get
-with @code{QUERY_INTERFACE}):
 @itemize @bullet
 @item
-  @code{MeshObject}
-  @itemize @bullet
-  @item
-    Implements @code{iMeshObject}
-  @end itemize
+Type plugin: @samp{crystalspace.mesh.object.cube}
 @item
-  @code{MeshObjectFactory}
-  @itemize @bullet
-  @item
-    Implements @code{iMeshObjectFactory}
-  @item
-    Implements @code{iCubeFactoryState}
-  @end itemize
+Loader plugin: @samp{crystalspace.mesh.loader.cube}
 @item
-  @code{MeshObjectFactory}
-  @itemize @bullet
-  @item
-    Implements @code{iMeshObjectType}
-  @item
-    Implements @code{iConfig}
-  @end itemize
+Factory loader plugin: @samp{crystalspace.mesh.loader.factory.cube}
+@end itemize
+
+Objects in this plugin implement the following @sc{scf} interfaces (get
+with @code{QUERY_INTERFACE()}):
+
+@itemize @bullet
+@item
+@emph{MeshObject}
+@itemize @bullet
+@item
+Implements @samp{iMeshObject}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectFactory}
+@item
+Implements @samp{iCubeFactoryState}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectType}
+@item
+Implements @samp{iConfig}
+@end itemize
 @end itemize
 
 @subsubheading Factory State Interface
 
-@code{iCubeFactoryState} is the @sc{SCF} interface that you can
+@samp{iCubeFactoryState} is the @sc{scf} interface that you can
 use to set/get settings for a cube factory. The definition of this
-interface can be found in @code{include/imcube.h} and that's also the
+interface can be found in @file{CS/include/imcube.h} and that's also the
 include file you need to include in your applications to use this plugin.
 Using this interface you can access the material, blending mode (mixmode),
 and various settings related to the shape of the cube.
 
 @subsubheading Factory Loader
 
-@itemize @bullet
-@item
-  @samp{MATERIAL}: Material to use for the polygon.
-@item
-  @samp{MIXMODE}: Blending mode, one of @samp{ADD}, @samp{ALPHA},
-  	@samp{COPY}, @samp{KEYCOLOR}, @samp{MULTIPLY2}, @samp{MULTIPLY},
-	or @samp{TRANSPARENT}.
-@item
-  @samp{SIZE}: Size of the cube in x, y, and z direction.
-@item
-  @samp{SHIFT}: Shift of the cube in x, y, z direction.
-@end itemize
+@table @code
+@item MATERIAL
+Material to use for the polygon.
+@item MIXMODE
+Blending mode, one of @samp{ADD}, @samp{ALPHA}, @samp{COPY}, @samp{KEYCOLOR},
+@samp{MULTIPLY2}, @samp{MULTIPLY}, or @samp{TRANSPARENT}.
+@item SIZE
+Size of the cube in x, y, and z direction.
+@item SHIFT
+Shift of the cube in x, y, z direction.
+@end table
 
 @subsubheading Object State Interface
 
@@ -83,28 +84,27 @@ This plugin has no object state interface.
 
 @subsubheading Object Loader
 
-@itemize @bullet
-@item
-  @samp{FACTORY}: Name of the factory to use for creation of this instance.
-@end itemize
+@table @code
+@item FACTORY
+Name of the factory to use for creation of this instance.
+@end table
 
 @subsubheading Configuration Parameters
 
 The cube plugin supports the following configuration parameters
-through @code{iConfig} in the mesh object type plugin:
+through @samp{iConfig} in the mesh object type plugin:
 
-@itemize @bullet
-@item
-  @samp{sizex}: Size of cube in X direction.
-@item
-  @samp{sizey}: Size of cube in Y direction.
-@item
-  @samp{sizez}: Size of cube in Z direction.
-@item
-  @samp{shiftx}: Shift of cube in X direction.
-@item
-  @samp{shifty}: Shift of cube in Y direction.
-@item
-  @samp{shiftz}: Shift of cube in Z direction.
-@end itemize
-
+@table @code
+@item sizex
+Size of cube in X direction.
+@item sizey
+Size of cube in Y direction.
+@item sizez
+Size of cube in Z direction.
+@item shiftx
+Shift of cube in X direction.
+@item shifty
+Shift of cube in Y direction.
+@item shiftz
+Shift of cube in Z direction.
+@end table

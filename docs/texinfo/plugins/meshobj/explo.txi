@@ -12,47 +12,49 @@
 @emph{Written by Jorrit Tyberghein,
 @email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
 
-Explosion is a particle system that emulates an explosion.
-@xref{MeshObject PartSys} for information
-which is valid for all particle systems.
+Explosion is a particle system that emulates an explosion.  Also see the
+general particle system documentation which is valid for all particle systems.
+@xref{MeshObject PartSys}.
 
 @subsubheading Basic Structure
 
-The following @sc{SCF} class names are used (for @code{LOAD_PLUGIN}):
-@itemize
-@item
-  Type plugin: @samp{crystalspace.mesh.object.explosion}
-@item
-  Loader plugin: @samp{crystalspace.mesh.loader.explosion}
-@item
-  Factory loader plugin: @samp{crystalspace.mesh.loader.factory.explosion}
-@end itemize
+The following @sc{scf} class names are used (for @code{LOAD_PLUGIN()}):
 
-Objects in this plugin implement the following @sc{SCF} interfaces (get
-with @code{QUERY_INTERFACE}):
 @itemize @bullet
 @item
-  @code{MeshObject}
-  @itemize @bullet
-  @item
-    Implements @code{iMeshObject}
-  @item
-    Implements @code{iParticleState}
-  @item
-    Implements @code{iExplosionState}
-  @end itemize
+Type plugin: @samp{crystalspace.mesh.object.explosion}
 @item
-  @code{MeshObjectFactory}
-  @itemize @bullet
-  @item
-    Implements @code{iMeshObjectFactory}
-  @end itemize
+Loader plugin: @samp{crystalspace.mesh.loader.explosion}
 @item
-  @code{MeshObjectFactory}
-  @itemize @bullet
-  @item
-    Implements @code{iMeshObjectType}
-  @end itemize
+Factory loader plugin: @samp{crystalspace.mesh.loader.factory.explosion}
+@end itemize
+
+Objects in this plugin implement the following @sc{scf} interfaces (get
+with @code{QUERY_INTERFACE()}):
+
+@itemize @bullet
+@item
+@emph{MeshObject}
+@itemize @bullet
+@item
+Implements @samp{iMeshObject}
+@item
+Implements @samp{iParticleState}
+@item
+Implements @samp{iExplosionState}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectFactory}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectType}
+@end itemize
 @end itemize
 
 @subsubheading Factory State Interface
@@ -65,42 +67,42 @@ The fountain mesh factory loader has no parameters.
 
 @subsubheading Object State Interface
 
-@code{iExplosionState} is the @sc{SCF} interface that you can
+@samp{iExplosionState} is the @sc{scf} interface that you can
 use to set/get settings for an explosion object. The definition of this
-interface can be found in @code{include/imexplo.h} and that's also the
+interface can be found in @file{CS/include/imexplo.h} and that's also the
 include file you need to include in your applications to use this plugin.
 Using this interface you can access the number of particles, the size
 of the particles, and various other explosion parameters.
 
-In addition you can use @code{iParticleState}.
+In addition you can use @samp{iParticleState}.
 
 @subsubheading Object Loader
 
-@xref{MeshObject PartSys} for other keywords.
-@itemize @bullet
-@item
-  @samp{DROPSIZE}: Size of the droplets for the snow (width and height).
-@item
-  @samp{CENTER}: Center of the explosion. In most cases you should use
-  the origin here (0,0,0) and let the engine control the position of the
-  explosion.
-@item
-  @samp{PUSH}: Initial push (vector with three parameters).
-@item
-  @samp{FADE}: Fade.
-@item
-  @samp{PARTRADIUS}: Radius of every part.
-@item
-  @samp{NRSIDES}: Number of sides to use for the explosion particles.
-@item
-  @samp{SPREADPOS}: SpreadPos.
-@item
-  @samp{SPREADSPEED}: SpreadSpeed.
-@item
-  @samp{SPREADACCEL}: SpreadAccel.
-@item
-  @samp{LIGHTING}: Disable or enable lighting for the explosion particles.
-@item
-  @samp{NUMBER}: Number of particles to use.
-@end itemize
+Also see the general documentation for particle systems for other recognized
+keywords.  @xref{MeshObject PartSys}.
 
+@table @code
+@item DROPSIZE
+Size of the droplets for the snow (width and height).
+@item CENTER
+Center of the explosion.  In most cases you should use the origin here (0,0,0)
+and let the engine control the position of the explosion.
+@item PUSH
+Initial push (vector with three parameters).
+@item FADE
+Fade.
+@item PARTRADIUS
+Radius of every part.
+@item NRSIDES
+Number of sides to use for the explosion particles.
+@item SPREADPOS
+SpreadPos.
+@item SPREADSPEED
+SpreadSpeed.
+@item SPREADACCEL
+SpreadAccel.
+@item LIGHTING
+Disable or enable lighting for the explosion particles.
+@item NUMBER
+Number of particles to use.
+@end table

@@ -12,47 +12,49 @@
 @emph{Written by Jorrit Tyberghein,
 @email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
 
-Rain is a particle system that emulates rain.
-@xref{MeshObject PartSys} for information
-which is valid for all particle systems.
+Rain is a particle system that emulates rain.  Also see the general particle
+system documentation which is valid for all particle systems.  @xref{MeshObject
+PartSys}.
 
 @subsubheading Basic Structure
 
-The following @sc{SCF} class names are used (for @code{LOAD_PLUGIN}):
-@itemize
-@item
-  Type plugin: @samp{crystalspace.mesh.object.rain}
-@item
-  Loader plugin: @samp{crystalspace.mesh.loader.rain}
-@item
-  Factory loader plugin: @samp{crystalspace.mesh.loader.factory.rain}
-@end itemize
+The following @sc{scf} class names are used (for @code{LOAD_PLUGIN()}):
 
-Objects in this plugin implement the following @sc{SCF} interfaces (get
-with @code{QUERY_INTERFACE}):
 @itemize @bullet
 @item
-  @code{MeshObject}
-  @itemize @bullet
-  @item
-    Implements @code{iMeshObject}
-  @item
-    Implements @code{iParticleState}
-  @item
-    Implements @code{iRainState}
-  @end itemize
+Type plugin: @samp{crystalspace.mesh.object.rain}
 @item
-  @code{MeshObjectFactory}
-  @itemize @bullet
-  @item
-    Implements @code{iMeshObjectFactory}
-  @end itemize
+Loader plugin: @samp{crystalspace.mesh.loader.rain}
 @item
-  @code{MeshObjectFactory}
-  @itemize @bullet
-  @item
-    Implements @code{iMeshObjectType}
-  @end itemize
+Factory loader plugin: @samp{crystalspace.mesh.loader.factory.rain}
+@end itemize
+
+Objects in this plugin implement the following @sc{scf} interfaces (get
+with @code{QUERY_INTERFACE()}):
+
+@itemize @bullet
+@item
+@emph{MeshObject}
+@itemize @bullet
+@item
+Implements @samp{iMeshObject}
+@item
+Implements @samp{iParticleState}
+@item
+Implements @samp{iRainState}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectFactory}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectType}
+@end itemize
 @end itemize
 
 @subsubheading Factory State Interface
@@ -65,29 +67,29 @@ The fountain mesh factory loader has no parameters.
 
 @subsubheading Object State Interface
 
-@code{iRainState} is the @sc{SCF} interface that you can
+@samp{iRainState} is the @sc{scf} interface that you can
 use to set/get settings for a rain object. The definition of this
-interface can be found in @code{include/imrain.h} and that's also the
+interface can be found in @file{CS/include/imrain.h} and that's also the
 include file you need to include in your applications to use this plugin.
 Using this interface you can access the number of particles, the size
 of the particles, and various other rain parameters.
 
-In addition you can use @code{iParticleState}.
+In addition you can use @samp{iParticleState}.
 
 @subsubheading Object Loader
 
-@xref{MeshObject PartSys} for other keywords.
-@itemize @bullet
-@item
-  @samp{DROPSIZE}: Size of the droplets for the rain (width and height).
-@item
-  @samp{BOX}: Box that will contain the rain particles. Give two 3D
-  coordinates here.
-@item
-  @samp{FALLSPEED}: Speed of the rain.
-@item
-  @samp{LIGHTING}: Disable or enable lighting for the rain particles.
-@item
-  @samp{NUMBER}: Number of particles to use.
-@end itemize
+Also see the general documentation for particle systems for other recognized
+keywords.  @xref{MeshObject PartSys}.
 
+@table @code
+@item DROPSIZE
+Size of the droplets for the rain (width and height).
+@item BOX
+Box that will contain the rain particles.  Give two 3D coordinates here.
+@item FALLSPEED
+Speed of the rain.
+@item LIGHTING
+Disable or enable lighting for the rain particles.
+@item NUMBER
+Number of particles to use.
+@end table

@@ -17,9 +17,9 @@ a particle system in particular.
 
 @subsubheading Particle State Interface
 
-@code{iParticleState} is the @sc{SCF} interface that you can
+@samp{iParticleState} is the @sc{scf} interface that you can
 use to set/get settings for a particle system in general. The definition of
-this interface can be found in @code{include/impartic.h} and that's also the
+this interface can be found in @file{CS/include/impartic.h} and that's also the
 include file you need to include in your applications to use particle system
 plugins. Using this interface you can access the material, blending mode
 (mixmode), color, and various other parameters.
@@ -30,16 +30,14 @@ Every particle system will at least have the following keywords in
 the loader for the object. In addition it will add particle system specific
 keywords which are explained in the respective sections.
 
-@itemize @bullet
-@item
-  @samp{FACTORY}: Name of the factory to use for creation of this instance.
-@item
-  @samp{MIXMODE}: Blending mode, one of @samp{ADD}, @samp{ALPHA},
-  	@samp{COPY}, @samp{KEYCOLOR}, @samp{MULTIPLY2}, @samp{MULTIPLY},
-	or @samp{TRANSPARENT}.
-@item
-  @samp{MATERIAL}: Material to use for the particle system.
-@item
-  @samp{COLOR}: Color to use for all particles.
-@end itemize
-
+@table @code
+@item FACTORY
+Name of the factory to use for creation of this instance.
+@item MIXMODE
+Blending mode, one of @samp{ADD}, @samp{ALPHA}, @samp{COPY}, @samp{KEYCOLOR},
+@samp{MULTIPLY2}, @samp{MULTIPLY}, or @samp{TRANSPARENT}.
+@item MATERIAL
+Material to use for the particle system.
+@item COLOR
+Color to use for all particles.
+@end table

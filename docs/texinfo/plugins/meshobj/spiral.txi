@@ -12,49 +12,50 @@
 @emph{Written by Jorrit Tyberghein,
 @email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
 
-Spiral is a particle system for a special spiral effect.
-This is an experimental particle system which is currently not
-fully operational.
-@xref{MeshObject PartSys} for information
-which is valid for all particle systems.
+Spiral is a particle system for a special spiral effect.  This is an
+experimental particle system which is currently not fully operational.  Also
+see the general particle system documentation which is valid for all particle
+systems.  @xref{MeshObject PartSys}.
 
 @subsubheading Basic Structure
 
-The following @sc{SCF} class names are used (for @code{LOAD_PLUGIN}):
-@itemize
-@item
-  Type plugin: @samp{crystalspace.mesh.object.spiral}
-@item
-  Loader plugin: @samp{crystalspace.mesh.loader.spiral}
-@item
-  Factory loader plugin: @samp{crystalspace.mesh.loader.factory.spiral}
-@end itemize
+The following @sc{scf} class names are used (for @code{LOAD_PLUGIN()}):
 
-Objects in this plugin implement the following @sc{SCF} interfaces (get
-with @code{QUERY_INTERFACE}):
 @itemize @bullet
 @item
-  @code{MeshObject}
-  @itemize @bullet
-  @item
-    Implements @code{iMeshObject}
-  @item
-    Implements @code{iParticleState}
-  @item
-    Implements @code{iSpiralState}
-  @end itemize
+Type plugin: @samp{crystalspace.mesh.object.spiral}
 @item
-  @code{MeshObjectFactory}
-  @itemize @bullet
-  @item
-    Implements @code{iMeshObjectFactory}
-  @end itemize
+Loader plugin: @samp{crystalspace.mesh.loader.spiral}
 @item
-  @code{MeshObjectFactory}
-  @itemize @bullet
-  @item
-    Implements @code{iMeshObjectType}
-  @end itemize
+Factory loader plugin: @samp{crystalspace.mesh.loader.factory.spiral}
+@end itemize
+
+Objects in this plugin implement the following @sc{scf} interfaces (get
+with @code{QUERY_INTERFACE()}):
+
+@itemize @bullet
+@item
+@emph{MeshObject}
+@itemize @bullet
+@item
+Implements @samp{iMeshObject}
+@item
+Implements @samp{iParticleState}
+@item
+Implements @samp{iSpiralState}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectFactory}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectType}
+@end itemize
 @end itemize
 
 @subsubheading Factory State Interface
@@ -67,22 +68,23 @@ The fountain mesh factory loader has no parameters.
 
 @subsubheading Object State Interface
 
-@code{iSpiralState} is the @sc{SCF} interface that you can
+@samp{iSpiralState} is the @sc{scf} interface that you can
 use to set/get settings for an spiral object. The definition of this
-interface can be found in @code{include/imspiral.h} and that's also the
+interface can be found in @file{CS/include/imspiral.h} and that's also the
 include file you need to include in your applications to use this plugin.
 Using this interface you can access the number of particles and the
 source of the spiral.
 
-In addition you can use @code{iParticleState}.
+In addition you can use @samp{iParticleState}.
 
 @subsubheading Object Loader
 
-@xref{MeshObject PartSys} for other keywords.
-@itemize @bullet
-@item
-  @samp{SOURCE}: Source of the spiral (3D coordinate).
-@item
-  @samp{NUMBER}: Number of particles to use.
-@end itemize
+Also see the general documentation for particle systems for other recognized
+keywords.  @xref{MeshObject PartSys}.
 
+@table @code
+@item SOURCE
+Source of the spiral (3D coordinate).
+@item NUMBER
+Number of particles to use.
+@end table

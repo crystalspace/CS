@@ -16,39 +16,41 @@ the detail (i.e. number of triangles used).
 
 @subsubheading Basic Structure
 
-The following @sc{SCF} class names are used (for @code{LOAD_PLUGIN}):
-@itemize
-@item
-  Type plugin: @samp{crystalspace.mesh.object.ball}
-@item
-  Loader plugin: @samp{crystalspace.mesh.loader.ball}
-@item
-  Factory loader plugin: @samp{crystalspace.mesh.loader.factory.ball}
-@end itemize
+The following @sc{scf} class names are used (for @code{LOAD_PLUGIN()}):
 
-Objects in this plugin implement the following @sc{SCF} interfaces (get
-with @code{QUERY_INTERFACE}):
 @itemize @bullet
 @item
-  @code{MeshObject}
-  @itemize @bullet
-  @item
-    Implements @code{iMeshObject}
-  @item
-    Implements @code{iBallState}
-  @end itemize
+Type plugin: @samp{crystalspace.mesh.object.ball}
 @item
-  @code{MeshObjectFactory}
-  @itemize @bullet
-  @item
-    Implements @code{iMeshObjectFactory}
-  @end itemize
+Loader plugin: @samp{crystalspace.mesh.loader.ball}
 @item
-  @code{MeshObjectFactory}
-  @itemize @bullet
-  @item
-    Implements @code{iMeshObjectType}
-  @end itemize
+Factory loader plugin: @samp{crystalspace.mesh.loader.factory.ball}
+@end itemize
+
+Objects in this plugin implement the following @sc{scf} interfaces (get
+with @code{QUERY_INTERFACE()}):
+
+@itemize @bullet
+@item
+@emph{MeshObject}
+@itemize @bullet
+@item
+Implements @samp{iMeshObject}
+@item
+Implements @samp{iBallState}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectFactory}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectType}
+@end itemize
 @end itemize
 
 @subsubheading Factory State Interface
@@ -61,7 +63,7 @@ The ball mesh factory loader has no parameters.
 
 @subsubheading Object State Interface
 
-@code{iBallState} is the @sc{SCF} interface that you can
+@samp{iBallState} is the @sc{scf} interface that you can
 use to set/get settings for a ball object. The definition of this
 interface can be found in @code{include/imball.h} and that's also the
 include file you need to include in your applications to use this plugin.
@@ -70,21 +72,19 @@ and radius.
 
 @subsubheading Object Loader
 
-@itemize @bullet
-@item
-  @samp{FACTORY}: Name of the factory to use for creation of this instance.
-@item
-  @samp{MIXMODE}: Blending mode, one of @samp{ADD}, @samp{ALPHA},
-  	@samp{COPY}, @samp{KEYCOLOR}, @samp{MULTIPLY2}, @samp{MULTIPLY},
-	or @samp{TRANSPARENT}.
-@item
-  @samp{MATERIAL}: Material to use for the ball.
-@item
-  @samp{NUMRIM}: Number of vertices on the rim of the ball (i.e. the
-  number of vertices along the equator). A good default is 6.
-@item
-  @samp{RADIUS}: Three parameters for x, y, and z radius.
-@item
-  @samp{SHIFT}: Three parameters for x, y, and z shift.
-@end itemize
-
+@table @code
+@item FACTORY
+Name of the factory to use for creation of this instance.
+@item MIXMODE
+Blending mode, one of @samp{ADD}, @samp{ALPHA}, @samp{COPY}, @samp{KEYCOLOR},
+@samp{MULTIPLY2}, @samp{MULTIPLY}, or @samp{TRANSPARENT}.
+@item MATERIAL
+Material to use for the ball.
+@item NUMRIM
+Number of vertices on the rim of the ball (i.e. the number of vertices along
+the equator).  A good default is 6.
+@item RADIUS
+Three parameters for x, y, and z radius.
+@item SHIFT
+Three parameters for x, y, and z shift.
+@end table
