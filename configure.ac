@@ -1714,15 +1714,6 @@ AC_C_BIGENDIAN(
 
 
 #------------------------------------------------------------------------------
-# Check if C++ compiler has a built-in `bool' type.
-#------------------------------------------------------------------------------
-AC_LANG_PUSH([C++])
-AC_CHECK_TYPE([bool], [], [CS_HEADER_PROPERTY([CS_USE_FAKE_BOOL_TYPE])])
-AC_LANG_POP([C++])
-
-
-
-#------------------------------------------------------------------------------
 # Check if stdint.h is available and if the INT64_C() macro is available.
 #------------------------------------------------------------------------------
 AC_CHECK_HEADER([stdint.h],
