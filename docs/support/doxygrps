@@ -11,7 +11,25 @@
  
 /**
  * \defgroup aws AWS
+ * @{ */
+
+/** 
+ *    	\defgroup aws_comp_flags Component flags
  */
+ 
+/**
+ *	\defgroup aws_sink_errors Sink error codes
+ */
+ 
+/** 
+ *    	\defgroup aws_sys_flags Window manager flags
+ */
+ 
+/**
+ *	\defgroup aws_window_trans Window transitions
+ */
+ 
+/** @} */
  
 /**
  * \defgroup csws Crystal Space Windowing System

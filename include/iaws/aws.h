@@ -59,7 +59,7 @@ struct  iEvent;
 const   bool aws_debug=false;  // set to true to turn on debugging printf's
 
 /**
- * \addtogroup aws
+ * \addtogroup aws_sys_flags
  * @{ */
 
 /**
@@ -77,6 +77,12 @@ const int AWSF_AlwaysEraseWindows=1;
  * context.
  */
 const int AWSF_AlwaysRedrawWindows=2;
+
+/** @} */
+
+/**
+ * \addtogroup aws
+ * @{ */
 
 SCF_VERSION (iAws, 0, 1, 0);
 
@@ -169,35 +175,35 @@ public:
   /**
    * Creates and enables a transition for a window.
    * <code>transition_type</code> is one of AWS_TRANSITION_*.
-   * \sa AWS_TRANSITION_SLIDE_IN_LEFT
+   * \sa \ref aws_window_trans
    */
   virtual void CreateTransition(iAwsWindow *win, unsigned transition_type, float step_size=0.1)=0;
 
   /**
    * Creates and enables a transition for a window, using a user specified start or finish (transition type defines which).
    * <code>transition_type</code> is one of AWS_TRANSITION_*.
-   * \sa AWS_TRANSITION_SLIDE_IN_LEFT
+   * \sa \ref aws_window_trans
    */
   virtual void CreateTransitionEx(iAwsWindow *win, unsigned transition_type, float step_size, csRect &user)=0;
 
   /**
    * Sets one or more flags for different operating modes. 
    * <code>flags</code> is a combination of AWSF_*.
-   * \sa AWSF_AlwaysEraseWindows
+   * \sa \ref aws_sys_flags
    */
   virtual void SetFlag(unsigned int flags)=0;
 
   /**
    * Clears one or more flags for different operating modes.
    * <code>flags</code> is a combination of AWSF_*.
-   * \sa AWSF_AlwaysEraseWindows
+   * \sa \ref aws_sys_flags
    */
   virtual void ClearFlag(unsigned int flags)=0;
 
   /**
    * Returns the current flags
    * <code>flags</code> is a combination of AWSF_*.
-   * \sa AWSF_AlwaysEraseWindows
+   * \sa \ref aws_sys_flags
    */
   virtual unsigned int GetFlags()=0;
   
@@ -361,7 +367,7 @@ struct iAwsSink : public iBase
   /**
    * Returns the last error code set.  This code is good until the next call to this sink.
    * Return value is one of AWS_ERR_SINK_*.
-   * \sa AWS_ERR_SINK_NONE
+   * \sa \ref aws_sink_errors
    */
   virtual unsigned int GetError()=0;
 };
@@ -442,21 +448,21 @@ struct iAwsComponent : public iAwsSource
   /**
    * Sets the flag (can handle multiple simultaneous sets). 
    * <code>flag</code> is one of AWSF_CMP_*.
-   * \sa AWSF_CMP_TRANSPARENT
+   * \sa \ref aws_comp_flags
    */
   virtual void SetFlag(unsigned int flag)=0;
 
   /**
    * Clears the flag (can handle multiple simultaneous clears).
    * <code>flag</code> is one of AWSF_CMP_*.
-   * \sa AWSF_CMP_TRANSPARENT
+   * \sa \ref aws_comp_flags
    */
   virtual void ClearFlag(unsigned int flag)=0;
 
   /**
    * Returns the current state of the flags.
    * <code>flag</code> is one of AWSF_CMP_*.
-   * \sa AWSF_CMP_TRANSPARENT
+   * \sa \ref aws_comp_flags
    */
   virtual unsigned int Flags()=0;
 
