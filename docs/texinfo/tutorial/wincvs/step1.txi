@@ -25,25 +25,7 @@ Jorrit Tyberghein (@email{jorrit.tyberghein@@uz.kuleuven.ac.be})@*
 Eric Sunshine (@email{sunshine@@sunshineco.com})
 
 Secure Shell software comes in a variety of forms and increasingly via some
-open source @sc{ssh} projects.  However, for use with WinCVS, many Crystal
-Space developers and myself have found one particular version which works well.
-The package @file{ssh-1.2.14-win32.exe} can be downloaded by using the
-following @sc{url}:
+open source @sc{ssh} projects.  SSH for Windows can be obtained via the
+following website.
 
-@ifnottex
-@uref{ftp://sunsite.dk/projects/crystal/support/ssh/ssh-1.2.14-win32.exe}
-@end ifnottex
-@iftex
-@noindent
-@code{ftp://sunsite.dk/projects/crystal/support/ssh/}@*
-@code{ssh-1.2.14-win32.exe}
-@end iftex
-
-@ifnottex
-@uref{ftp://62.188.48.183/crystal_space/support/ssh/ssh-1.2.14-win32.exe}
-@end ifnottex
-@iftex
-@noindent
-@code{ftp://62.188.48.183/crystal_space/support/ssh/}@*
-@code{ssh-1.2.14-win32.exe}
-@end iftex
+@uref{http://www.openssh.org}
