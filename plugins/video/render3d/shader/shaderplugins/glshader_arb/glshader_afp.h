@@ -67,8 +67,8 @@ public:
 
   csShaderGLAFP (csGLShader_ARB* shaderPlug)
   {
-    validProgram = true;
     SCF_CONSTRUCT_IBASE (0);
+    validProgram = true;
     this->shaderPlug = shaderPlug;
     programstring = 0;
     description = 0;
@@ -77,6 +77,7 @@ public:
   {
     delete[] programstring;
     delete[] description;
+    SCF_DESTRUCT_IBASE ();
   }
 
   bool LoadProgramStringToGL( const char* programstring );

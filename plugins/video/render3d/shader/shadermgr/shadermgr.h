@@ -75,7 +75,10 @@ public:
 
   //==================== iShaderManager ================//
 
-  /// Register a shader to the shadermanager. Compiler should register all shaders
+  /**
+   * Register a shader to the shadermanager. Compiler should register all
+   * shaders.
+   */
   virtual void RegisterShader (iShader* shader);
   /// Get a shader by name
   virtual iShader* GetShader (const char* name);
@@ -136,18 +139,21 @@ public:
   private:
     csShaderManager* parent;
   public:
+    SCF_DECLARE_IBASE;
+
     EventHandler (csShaderManager* parent)
     {
       SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
+    virtual ~EventHandler ()
+    {
+      SCF_DESTRUCT_IBASE ();
+    }
     
-    SCF_DECLARE_IBASE;
     virtual bool HandleEvent (iEvent& ev) 
     { return parent->HandleEvent (ev); }
   } * scfiEventHandler;
 };
 
-
 #endif //__SHADERMGR_H__
-

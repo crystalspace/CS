@@ -45,8 +45,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGLShader_CG)
 
-
-
 SCF_IMPLEMENT_IBASE(csGLShader_CG)
 SCF_IMPLEMENTS_INTERFACE(iShaderProgramPlugin)
 SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
@@ -71,6 +69,8 @@ csGLShader_CG::csGLShader_CG(iBase* parent)
 csGLShader_CG::~csGLShader_CG()
 {
   cgDestroyContext (context);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csGLShader_CG::ErrorCallback ()

@@ -89,9 +89,7 @@ public:
   SCF_DECLARE_IBASE;
 
   csGLShaderFVP (csGLShader_FIXED* shaderPlug);
-  virtual ~csGLShaderFVP ()
-  {
-  }
+  virtual ~csGLShaderFVP ();
 
   void SetValid(bool val) { validProgram = val; }
 

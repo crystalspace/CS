@@ -37,7 +37,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/rndbuf.h"
 #include "ivideo/rendermesh.h"
 #include "ivideo/shader/shader.h"
-//#include "ivideo/shader/shadervar.h"
 
 #include "video/canvas/openglcommon/glextmanager.h"
 
@@ -50,8 +49,8 @@ SCF_IMPLEMENT_IBASE_END
 
 csGLShaderFVP::csGLShaderFVP (csGLShader_FIXED* shaderPlug)
 {
-  validProgram = true;
   SCF_CONSTRUCT_IBASE (0);
+  validProgram = true;
   csGLShaderFVP::shaderPlug = shaderPlug;
   csGLShaderFVP::object_reg = shaderPlug->object_reg;
 
@@ -59,18 +58,21 @@ csGLShaderFVP::csGLShaderFVP (csGLShader_FIXED* shaderPlug)
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 }
 
+csGLShaderFVP::~csGLShaderFVP ()
+{
+  SCF_DESTRUCT_IBASE ();
+}
+
 void csGLShaderFVP::Activate ()
 {
-
 }
 
 void csGLShaderFVP::Deactivate()
 {
-
 }
 
-void csGLShaderFVP::SetupState (csRenderMesh *mesh,
-                                csArray<iShaderVariableContext*> &dynamicDomains)
+void csGLShaderFVP::SetupState (
+  csRenderMesh *mesh, csArray<iShaderVariableContext*> &dynamicDomains)
 {
   int i;
 
@@ -192,7 +194,8 @@ void csGLShaderFVP::SetupState (csRenderMesh *mesh,
     float mAutoTextureMatrix[16];
     // Transpose 3x3 in order to invert matrix (rotation)
     // Note that we need to invert the Z _before_ the rotation
-    // No idea why we have to invert the Z at all, but reflection is wrong without it
+    // No idea why we have to invert the Z at all, but reflection
+    // is wrong without it
     mAutoTextureMatrix[0] = orientation.m11; 
     mAutoTextureMatrix[1] = orientation.m12; 
     mAutoTextureMatrix[2] = orientation.m13;
@@ -205,8 +208,10 @@ void csGLShaderFVP::SetupState (csRenderMesh *mesh,
     mAutoTextureMatrix[9] = orientation.m32; 
     mAutoTextureMatrix[10] = orientation.m33;
 
-    mAutoTextureMatrix[3] = mAutoTextureMatrix[7] = mAutoTextureMatrix[11] = 0.0f;
-    mAutoTextureMatrix[12] = mAutoTextureMatrix[13] = mAutoTextureMatrix[14] = 0.0f;
+    mAutoTextureMatrix[3] =
+      mAutoTextureMatrix[7] = mAutoTextureMatrix[11] = 0.0f;
+    mAutoTextureMatrix[12] =
+      mAutoTextureMatrix[13] = mAutoTextureMatrix[14] = 0.0f;
     mAutoTextureMatrix[15] = 1.0f;  
 
     glMatrixMode(GL_TEXTURE);
@@ -217,7 +222,6 @@ void csGLShaderFVP::SetupState (csRenderMesh *mesh,
 void csGLShaderFVP::ResetState ()
 {
   int i;
-
   if (do_lighting)
   {
     for (i = 0; i < lights.Length(); ++i)
@@ -438,7 +442,8 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticdomains)
     {
       for (j=0;j<staticdomains.Length();j++)
       {
-        ent.attenuationVarRef = staticdomains[j]->GetVariable (ent.attenuationvar);
+        ent.attenuationVarRef =
+	  staticdomains[j]->GetVariable (ent.attenuationvar);
         if (ent.attenuationVarRef) break;
       }
     }
@@ -449,9 +454,3 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticdomains)
 
   return true;
 }
-  
-/*bool csGLShaderFVP::Prepare(iShaderPass* pass)
-{
-
-}
-*/

@@ -24,6 +24,11 @@ chronological order.
 	- Eric Sunshine added a bunch of missing SCF_DESTRUCT_IBASE() and
 	  SCF_DESTRUCT_EMBEDDED_IBASE() invocations which Frank missed when he
 	  updated the CS/plugins/mesh directory to invoke these macros.
+	- Eric Sunshine added a bunch of missing SCF_DESTRUCT_IBASE() and
+	  SCF_DESTRUCT_EMBEDDED_IBASE() invocations to classes in
+	  CS/plugins/video/render3d/shader which had been added to the project
+	  after Eric had added these macros to all classes in the
+	  CS/plugins/video directory.
 19-Dec-2003
 	- Eric Sunshine added the new method
 	  csInitializer::RequestPlugins(csArray<csPluginRequest> const&) to

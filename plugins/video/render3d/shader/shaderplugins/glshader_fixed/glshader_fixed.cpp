@@ -68,7 +68,8 @@ csGLShader_FIXED::csGLShader_FIXED(iBase* parent)
 
 csGLShader_FIXED::~csGLShader_FIXED()
 {
-
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csGLShader_FIXED::Report (int severity, const char* msg, ...)
@@ -155,7 +156,8 @@ void csGLShader_FIXED::Open()
       descr = "whopping";
     else 
       descr = "unseen before";
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Multitexture units: %s %d", descr, texUnits);
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Multitexture units: %s %d",
+      descr, texUnits);
   #else
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Multitexture units: %d", texUnits);
   #endif
@@ -181,4 +183,3 @@ bool csGLShader_FIXED::Initialize(iObjectRegistry* reg)
   object_reg = reg;
   return true;
 }
-

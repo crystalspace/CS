@@ -78,7 +78,6 @@ csShaderManager::csShaderManager(iBase* parent)
   SCF_CONSTRUCT_IBASE(parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   scfiEventHandler = 0;
-
   seqnumber = 0;
 }
 
@@ -87,6 +86,8 @@ csShaderManager::~csShaderManager()
   //clear all shaders
   shaders.DeleteAll ();
   if (scfiEventHandler) scfiEventHandler->DecRef();
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 void csShaderManager::Report (int severity, const char* msg, ...)
@@ -128,7 +129,8 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
 	CS_LOAD_PLUGIN (plugin_mgr, classname, iShaderCompiler);
       if (plugin)
       {
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "Loaded compilerplugin %s, compiler: %s", 
+        Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Loaded compilerplugin %s, compiler: %s", 
           classname,plugin->GetName());
         RegisterCompiler(plugin);
       }

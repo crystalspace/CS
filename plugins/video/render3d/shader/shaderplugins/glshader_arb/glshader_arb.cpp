@@ -37,9 +37,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "glshader_avp.h"
 #include "glshader_afp.h"
-
 #include "glshader_arb.h"
-
 
 CS_IMPLEMENT_PLUGIN
 
@@ -66,7 +64,8 @@ csGLShader_ARB::csGLShader_ARB(iBase* parent)
 
 csGLShader_ARB::~csGLShader_ARB()
 {
-
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 ////////////////////////////////////////////////////////////////////

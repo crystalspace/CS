@@ -58,12 +58,13 @@ csSoftShader::csSoftShader(iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-
   enable = false;
 }
 
 csSoftShader::~csSoftShader()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 ////////////////////////////////////////////////////////////////////
