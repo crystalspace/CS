@@ -68,7 +68,7 @@
   cmp conftest.1 conftest.2
   if not errorlevel 1 goto noremovequote
   echo $$$ O.K. Setting to use cmd.exe settings
-  type libs\cssys\win32\win32conf.var >>config.tmp
+  type libs\cssys\win32\winconf.var >>config.tmp
 
 :noremovequote
   del conftest.* >nul

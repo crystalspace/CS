@@ -8,6 +8,9 @@ The history order is reversed so that new features are at the top.
 	  the load. Since I don't fully understand neither the original
 	  nor the new code I decided to revert the changes for now.
 	- Small cosmetic change to csEngine::SelectRegion().
+	- Eric Sunshine fixed a small error in winconf.bat where it was not
+	  properly making use of the result of its Bash quote-test.  (Was
+	  invoking the wrong filename.)
 8-Nov-2001
 	- Jorge Acereda fixed a leak in ieplex.cpp where the result of a
 	  SCF::QueryClassList() wasn't DecRef()ed.
