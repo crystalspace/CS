@@ -17,6 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <math.h>
+#include <float.h>
 #include "sysdef.h"
 #include "qint.h"
 #include "csgeom/math3d.h"
