@@ -8,6 +8,7 @@ The history order is reversed so that new features are at the top.
 	  and HardTransform(). The problem was that the sector and portal
 	  callbacks were not cloned with the effect that the destination
 	  sector of the portal would not be resolved.
+	- Added Jamfiles for the new bezier mesh plugin.
 10-Apr-2003
 	- Fixed a compile error in binary XML reader. I wonder if people
 	  compile after changing something...
