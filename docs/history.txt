@@ -13,6 +13,15 @@ The history order is reversed so that new features are at the top.
 	  destroyed via delete[].  This problem occurred in a number of places
 	  where csDataBuffer() was constructed from the return value of
 	  csString::Detach().
+	- Eric Sunshine applied a patch to csInitializer::InitializeSCF() from
+	  resqu@gmx.ch.  Eric also made some modifications to the patch to make
+	  it more robust.  This patch causes InitializeSCF() to look for *.scf
+	  files in the installation directory (alongside scf.cfg).  These files
+	  can be used to augment the information contained in scf.cfg without
+	  actually having to edit scf.cfg.  *NOTE* This patch is only a
+	  temporary measure to address the nasty monolithic nature of scf.cfg.
+	  Plans are already laid, for the near future, for eliminating scf.cfg
+	  entirely, thus this patch will cease to exist at that time.
 4-Nov-2001
 	- Matze Braun cleaned up config scripts for Unix and cygwin.
 	- Eric Sunshine made the following changes:

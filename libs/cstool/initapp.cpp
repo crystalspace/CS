@@ -17,6 +17,7 @@
 */
 
 #define CS_SYSDEF_PROVIDE_PATH
+#define CS_SYSDEF_PROVIDE_DIR
 #include "cssysdef.h"
 #include "cssys/sysdriv.h"
 #include "cssys/system.h"
@@ -97,6 +98,9 @@ bool csInitializer::InitializeSCF ()
 {
   // Initialize Shared Class Facility|
   char scfconfigpath [MAXPATHLEN + 1];
+  char scffilepath [MAXPATHLEN + 1];
+  struct dirent* de;
+  DIR* dh;
 
 #ifndef CS_STATIC_LINKED
   // Add both installpath and installpath/lib dirs to search for plugins
@@ -111,9 +115,48 @@ bool csInitializer::InitializeSCF ()
 
   // Find scf.cfg and initialize SCF
   csGetInstallPath (scfconfigpath, sizeof (scfconfigpath));
-  strcat (scfconfigpath, "scf.cfg");
-  csConfigFile scfconfig (scfconfigpath);
+  strcpy(scffilepath, scfconfigpath);
+  strcat (scffilepath, "scf.cfg");
+  csConfigFile scfconfig (scffilepath);
   scfInitialize (&scfconfig);
+
+  dh = opendir(scfconfigpath[0] == '\0' ? "." : scfconfigpath);
+  if (dh != 0)
+  {
+    while ((de = readdir(dh)) != 0)
+    {
+      if (!(isdir(scfconfigpath, de)))
+      {
+        int const n = strlen(de->d_name);
+        if (n >= 4 && strcasecmp(de->d_name + n - 4, ".scf") == 0)
+        {
+	  strcpy(scffilepath, scfconfigpath);
+	  strcat(scffilepath, de->d_name);
+	  scfconfig.Clear();
+	  scfconfig.Load(scffilepath);
+	  int scfver = scfconfig.GetInt(".scfVersion", 0);
+	  switch (scfver)
+	  {
+	    case 1:
+	      iConfigIterator* it;
+	      it = scfconfig.Enumerate();
+	      while (it->Next())
+	      {
+		char const* key = it->GetKey();
+		if (*key == '.')
+		  scfconfig.DeleteKey(key);
+	      }
+	      it->DecRef();
+	      scfInitialize (&scfconfig);
+	      break;
+	    default:
+	      /* unrecognized version */;
+	  }
+	}
+      }
+    }
+    closedir(dh);
+  }
   return true;
 }
 
