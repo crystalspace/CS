@@ -25,15 +25,32 @@ Short-term cleanups that need to be done:
 	  means that it is important to iniatialize the skeleton to some
 	  useful default setup (set up transformations in skeleton template).
 	- Fixed lighting for sprites which are not touched by any light.
-	- Fixed bug with 'delete[]' being called too much with skeleton sprites.
-	- Did some fixes on the changes from Eric Sunshine.
+	- Fixed bug with delete[] being called too much with skeleton sprites.
+	- Jorrit fixed a compilation problem in Eric Sunshine's changes from
+	  yesterday, which the NextStep compiler did not catch.  He also fixed
+	  the ndrvdem makefile which failed to mention csapputil.
+	- Did some minor fixes on the changes from Eric Sunshine.
 	- For more fun, Jorrit extended the 'addskel' command so that you
 	  can now give a negative width. In that case the real width at every
 	  node will be random between 1 and -width.
 	- Implemented csSprite3D::DeferUpdateLighting() which defers update to
 	  sprite lighting until the sprite becomes visible. Much more optimal.
 	- Renamed BOOL to COMBOOL for compatiblity problems with BOOL on
-	  some systems (like IRIX).
+	  some systems (like IRIX, MacOS/X Server, OpenStep, and NextStep).
+	- Eric Sunshine made these changes:
+	    - Fixed a new compilation warning in cssprite.cpp.
+	    - Fixed the MacOS/X Server, OpenStep, and NextStep ports to so
+	      that they once again compile following the rename of BOOL to
+	      COMBOOL.
+	    - Jorrit pointed out that the new library name csapputil is too
+	      long for DOS.  It has been renamed to cstools.
+	    - Jorrit pointed out that the csengine library had undesirable
+	      static dependencies on csProgressMeter and csProgressPulse in
+	      the cssys library.  Moved these classes to csengine for now
+	      to remove this dependency.  Ultimately these classes should
+	      probably be placed elsewhere since they are generic enough to
+	      be useful to applications which use cssys but not csengine.  I
+	      would do it myself, but I don't have time right now.
 19-Jul-1999
 	- Added GetXRotation(), GetYRotation() and GetZRotation() to
 	  csMatrix3.

@@ -134,13 +134,6 @@ subdirectories.
         [CS/libs/cs3d/opengl]     3D rasterizer using OpenGL
         [CS/libs/cs3d/software]   Software based rasterizer
 
-    [CS/libs/csapputil]
-    High level application utility objects.  This are specialized objects
-    which provide applications with high-level functionality.  Though
-    specialized, they are still general enough to be useful to certain types
-    of applications.  An example is csSimpleConsole which provides basic
-    input/output facilities within an application framework.
-
     [CS/libs/cscom]
     The Crystal Space COM layer.  Especially imporant, because the only OS
     with native COM support right now is Win32.
@@ -262,6 +255,13 @@ subdirectories.
         [CS/libs/cssys/unix]         Unix
         [CS/libs/cssys/win32]        Win32
         [CS/libs/cssys/amiga]        Amiga
+
+    [CS/libs/tools]
+    High level application tools.  This are specialized objects which provide
+    applications with high-level functionality.  Though specialized, they are
+    still general enough to be useful to certain types of applications.  An
+    example is csSimpleConsole which provides basic input/output facilities
+    within an application framework.
 
     [CS/libs/csutil]
     Utility library
