@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Sep-2003
+	- Jorrit unreverted the changes from Old_Belge on the sprcal3d
+	  mesh object. Unfortunatelly this means that this plugin now
+	  requires the CVS version of cal3d. Version 0.9 is no longer
+	  sufficient.
 31-Aug-2003
         - Philip Wyett changed #include "GL/glu.h" to <GL/glu.h>, in the new
           GL renderer gl_txtcache.cpp, eliminating the warning messages within
