@@ -18,7 +18,7 @@
 */
 
 #ifdef __SYSDEFS_H__
-#error Don't include sysdef.h from header files please!
+#error Do not include sysdef.h from header files please!
 #else
 #define __SYSDEFS_H__
 
