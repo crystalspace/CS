@@ -313,8 +313,8 @@ csSystemDriver::~csSystemDriver ()
   }
 
   DEREGISTER_DRIVER (VFS, iVFS);
-  DEREGISTER_DRIVER (G2D, iGraphics3D);
-  DEREGISTER_DRIVER (G3D, iGraphics2D);
+  DEREGISTER_DRIVER (G3D, iGraphics3D);
+  DEREGISTER_DRIVER (G2D, iGraphics2D);
   DEREGISTER_DRIVER (Sound, iSoundRender);
   DEREGISTER_DRIVER (NetDrv, iNetworkDriver);
   DEREGISTER_DRIVER (NetMan, iNetworkManager);
