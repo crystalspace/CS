@@ -457,8 +457,10 @@ void csTextureManagerSoftware::PrepareTextures ()
 
   if (verbose) SysPrintf (MSG_INITIALIZATION, "  Creating texture mipmaps...\n");
 
+  int i;
+
   // Create mipmaps for all textures
-  for (int i = 0; i < textures.Length (); i++)
+  for (i = 0; i < textures.Length (); i++)
   {
     csTextureMM *txt = textures.Get (i);
     if (!pfmt.PalEntries)
