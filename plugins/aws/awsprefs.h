@@ -37,6 +37,13 @@
  Windows can be filled in because components provide a factory service by
  registering, and then know how to get their settings from the window
  definition.
+
+ Note that many of these classes use this in the base member initializer list.
+ While the ISO C++ standard supports this in paragraph 8 of section 12.16.2, 
+ some compilers do not particularly like it.  It can also be abused by having
+ some class refer to objects that have not yet been initialized.  Be very careful
+ in modifying the architecture of keys.
+
 ****/
 
 //////////////////////////////////  Keys  ///////////////////////////////////
