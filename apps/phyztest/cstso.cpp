@@ -31,7 +31,7 @@ csRigidSpaceTimeObj::csRigidSpaceTimeObj( iCollideSystem* cdsys, csMeshWrapper *
  // col = pcollide;
   sprt = psprt;
   rb = prb;
-  iPolygonMesh* mesh = QUERY_INTERFACE (sprt, iPolygonMesh);
+  iPolygonMesh* mesh = QUERY_INTERFACE ( sprt->GetMeshObject(), iPolygonMesh);
   col = new csCollider (*sprt, cdsys, mesh);
   mesh->DecRef ();
   what_type = ST_RIGID;
@@ -96,6 +96,7 @@ real csRigidSpaceTimeObj::collision_check()
   csCollider *coli;
   //csMeshWrapper *sprt;
   csSector* first_sector;
+  csThing* thng;
   ctMatrix3 M;
   csMatrix3 m;
   csVector3 n;
@@ -114,7 +115,6 @@ real csRigidSpaceTimeObj::collision_check()
   for( int i = 0; i < continuum_end; i++ )
   {
     first_sector = space_time_continuum[i]->sprt->GetMovable ().GetSector (0);
-    
     // Start collision detection.
     coli = space_time_continuum[i]->col;
     iCollideSystem* cdsys = coli->GetCollideSystem ();
@@ -125,7 +125,7 @@ real csRigidSpaceTimeObj::collision_check()
     m.Set( M[0][0], M[0][1], M[0][2],
                M[1][0], M[1][1], M[1][2],
                M[2][0], M[2][1], M[2][2]);    // orientation of mesh
-//    hits += CollisionDetect (col, first_sector, &m);
+//    hits += CollisionDetect (coli, first_sector, &m);
     x = space_time_continuum[i]->rb->get_pos();
     // this IS a transformaition from other to this space.
     tfm.SetO2T( m );
@@ -137,7 +137,8 @@ real csRigidSpaceTimeObj::collision_check()
 
     if ( first_sector )
     {
-      coli->Collide(*first_sector, &tfm);
+	  thng = first_sector->GetThing("walls");
+      coli->Collide(*thng, &tfm);
       CD_contact = cdsys->GetCollisionPairs ();
     }
 

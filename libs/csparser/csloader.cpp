@@ -3177,6 +3177,8 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
     	    printf ("Load TYPE plugin crystalspace.mesh.object.sprite.3d\n");
   	  }
 	  iMeshObjectFactory* fact = type->NewFactory ();
+	  //@@@ Beware, this line shouldnt be here, but if it is removed,
+	  // a segfault will occur later on. TODO: fix it. mv.
 	  stemp->SetMeshObjectFactory (fact);
 	  fact->DecRef ();
 	  csCrossBuild_SpriteTemplateFactory builder;
