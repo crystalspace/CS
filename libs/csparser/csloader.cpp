@@ -4215,6 +4215,7 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
   char* params;
   char str[255];
   iLoaderPlugIn* plug = NULL;
+  str[0] = 0;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
@@ -4228,7 +4229,7 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
       case CS_TOKEN_PARAMS:
 	if (!plug)
 	{
-          CsPrintf (MSG_FATAL_ERROR, "Could not load plugin!\n");
+          CsPrintf (MSG_FATAL_ERROR, "Could not load plugin '%s'!\n", str);
           fatal_exit (0, false);
 	}
 	else
@@ -4284,6 +4285,7 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
   long cmd;
   char* params;
   char str[255];
+  str[0] = 0;
 
   csLoaderStat::sprites_loaded++;
   iLoaderPlugIn* plug = NULL;
@@ -4347,7 +4349,7 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
       case CS_TOKEN_PARAMS:
 	if (!plug)
 	{
-          CsPrintf (MSG_FATAL_ERROR, "Could not load plugin!\n");
+          CsPrintf (MSG_FATAL_ERROR, "Could not load plugin '%s'!\n", str);
           fatal_exit (0, false);
 	}
 	else
