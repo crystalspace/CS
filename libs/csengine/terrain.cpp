@@ -193,7 +193,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
     }
     // Ugly hack to help software renderer, reindex the triangles per block.
     i = 0;
-    int j;
+    unsigned int j;
     s = 0;
     while (i < mesh->getBinTreeNo())
     {
