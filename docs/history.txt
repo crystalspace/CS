@@ -2,6 +2,10 @@ The history order is reversed so that new features are at the top.
 
 7-Jun-2001
 	- Justin Miller fixed a minor syntax error in csview.h.
+	- Wouter Wijngaards gave the start to implementing a visibility
+	  system for the terrfunc terrain engine and I tried to finish
+	  it but things are not yet working. So at the moment it is
+	  still disabled.
 6-Jun-2001
 	- Removed support for the quadtree, coverage mask tree, coverage mask
 	  cube, and solid tree from CS. I parked the code locally and it will

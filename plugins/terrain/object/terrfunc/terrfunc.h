@@ -32,6 +32,7 @@ struct iSystem;
 class csTerrainQuad;
 
 #define LOD_LEVELS 4
+#define CS_HORIZON_SIZE 100
 
 /**
  * This is one block in the terrain.
@@ -47,6 +48,8 @@ public:
   // for a mesh and LOD.
   int dirlight_numbers[LOD_LEVELS];
   csBox3 bbox;				// Bounding box in 3D of this block.
+  csTerrainQuad* node;			// Pointer to corresponding node in
+  					// quadtree.
 
 public:
   csTerrBlock ();
@@ -66,6 +69,7 @@ public:
   csVector3 scale;
   csTerrBlock* blocks;
   bool block_dim_invalid;
+  csBox3 global_bbox;
 
 private:
   iSystem* pSystem;
@@ -98,6 +102,7 @@ private:
   int quad_depth;
   int block_depth;	// Depth of the quadtree in one block.
   csTerrainQuad* quadtree;
+  float horizon[CS_HORIZON_SIZE];
 
   /**
    * Take a part of a mesh and calculate the minimum/maximum height.
@@ -129,7 +134,7 @@ private:
    * Setup the visibility tree.
    */
   void SetupVisibilityTree (csTerrainQuad* quad,
-    int x1, int y1, int x2, int y2);
+    int x1, int y1, int x2, int y2, int depth);
 
   /**
    * Setup the visibility tree.

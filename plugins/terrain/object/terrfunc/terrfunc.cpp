@@ -863,6 +863,7 @@ void csTerrFuncObject::ComputeBBox (const G3DTriangleMesh& mesh, csBox3& bbox)
 
 void csTerrFuncObject::ComputeBBoxes ()
 {
+  global_bbox.StartBoundingBox ();
   int lod;
   int bx, by;
   for (by = 0 ; by < blockxy ; by++)
@@ -876,6 +877,7 @@ void csTerrFuncObject::ComputeBBoxes ()
 	ComputeBBox (blocks[blidx].mesh[lod], bb);
 	blocks[blidx].bbox += bb;
       }
+      global_bbox += blocks[blidx].bbox;
     }
 }
 
@@ -964,6 +966,7 @@ void csTerrFuncObject::GetMinMaxMesh (const G3DTriangleMesh& mesh,
   	int cx, int cy, int w,
 	float& min_height, float& max_height)
 {
+//@@@ OBSOLETE
   float boxw = bbox.MaxX () - bbox.MinX ();
   float boxh = bbox.MaxY () - bbox.MinY ();
   float minx = bbox.MinX () + float (cx) * boxw / float (w);
@@ -993,33 +996,52 @@ void csTerrFuncObject::GetMinMaxMesh (const G3DTriangleMesh& mesh,
 }
 
 void csTerrFuncObject::SetupVisibilityTree (csTerrainQuad* quad,
-	int x1, int y1, int x2, int y2)
+	int x1, int y1, int x2, int y2, int depth)
 {
   float min_height, max_height;
+  min_height = 1000000000.;
+  max_height = -1000000000.;
+  depth++;
 
-  if (quad->IsLeaf ())
+  float res = float ((1 << quad_depth) -1);
+
+  if (depth == quad_depth-block_depth+1)
   {
+    // Put the pointer to this node in the corresponding block.
     // bx and by are coordinates of block.
     int bx = x1 >> block_depth;
     int by = y1 >> block_depth;
-    // w is total width/height inside block.
-    int w = 1 << block_depth;
-    // cx and cy are coordinates inside block.
-    int cx = x1 & (w-1);
-    int cy = y1 & (w-1);
-
     int blidx = by*blockxy + bx;
     csTerrBlock& block = blocks[blidx];
-    G3DTriangleMesh& mesh = block.mesh[0];
-    GetMinMaxMesh (mesh, block.bbox, cx, cy, w, min_height, max_height);
+    block.node = quad;
+  }
 
+  if (quad->IsLeaf ())
+  {
+    float dx1 = float (x1) / res;
+    float dy1 = float (y1) / res;
+    float dx2 = float (x2) / res;
+    float dy2 = float (y2) / res;
+    // Calculate minimum and maximum height by sampling a series
+    // of points in the leaf.
+    int x, y;
+    float dx, dy;
+    for (y = 0 ; y < 5 ; y++)
+    {
+      dy = dy1 + (float (y) / 4.) * (dy2-dy1);
+      for (x = 0 ; x < 5 ; x++)
+      {
+        dx = dx1 + (float (x) / 4.) * (dx2-dx1);
+        float h = height_func (height_func_data, dx, dy);
+	if (h < min_height) min_height = h;
+	if (h > max_height) max_height = h;
+      }
+    }
     quad->SetMinimumHeight (min_height);
     quad->SetMaximumHeight (max_height);
     return;
   }
 
-  min_height = 1000000000.;
-  max_height = -1000000000.;
   int i;
   for (i = 0 ; i < 4 ; i++)
   {
@@ -1041,7 +1063,7 @@ void csTerrFuncObject::SetupVisibilityTree (csTerrainQuad* quad,
 	break;
     }
     csTerrainQuad* c = quad->GetChild (i);
-    SetupVisibilityTree (c, xx1, yy1, xx2, yy2);
+    SetupVisibilityTree (c, xx1, yy1, xx2, yy2, depth);
     if (c->GetMinimumHeight () < min_height)
       min_height = c->GetMinimumHeight ();
     if (c->GetMaximumHeight () > max_height)
@@ -1065,7 +1087,7 @@ void csTerrFuncObject::SetupVisibilityTree ()
     b >>= 1;
   }
   block_depth = quad_depth-block_depth;
-  SetupVisibilityTree (quadtree, 0, 0, res, res);
+  SetupVisibilityTree (quadtree, 0, 0, res, res, 0);
 }
 
 void csTerrFuncObject::SetupObject ()
@@ -1222,50 +1244,20 @@ bool csTerrFuncObject::BBoxVisible (const csBox3& bbox,
 
 void csTerrFuncObject::TestVisibility (iRenderView* rview)
 {
-  SetupObject ();
-
   csTerrainQuad::MarkAllInvisible ();
+  quadtree->InitHorizon (horizon, CS_HORIZON_SIZE);
 
   iCamera* camera = rview->GetCamera ();
-  iClipper2D* clipper = rview->GetClipper ();
-
   const csReversibleTransform& camtrans = camera->GetTransform ();
   const csVector3& origin = camtrans.GetOrigin ();
-  float inv_fov = camera->GetInvFOV ();
-  float sx = camera->GetShiftX ();
-  float sy = camera->GetShiftY ();
-
-  // First take the current clipper and calculate the left-most
-  // and right-most viewing vectors (and then angles) as seen in object
-  // space for the terrain.
-  int nv = clipper->GetNumVertices ();
-  csVector2* v = clipper->GetClipPoly ();
-  csVector3 v3;
-  v3.z = 1;
-  int i, i1;
-  i1 = nv-1;
-  for (i = 0 ; i < nv ; i++)
-  {
-    v3.x = (v[i].x - sx) * inv_fov;
-    v3.y = (v[i].y - sy) * inv_fov;
-    csVector3 vo3 = camtrans.This2Other (v3);
-    // origin->vo3 is now a vector in object space. We now calculate
-    // the angle projected on the xz plane.
-    vo3 -= origin;
-    vo3.Normalize ();
-    float cos_angle = vo3 * csVector3 (1, 0, 0);
-    // @@@ BAD USE LOOKUP TABLE!!!
-    if (cos_angle < -1) cos_angle = -1;
-    else if (cos_angle > 1) cos_angle = 1;
-    float angle = acos (cos_angle);
-    if (vo3.z < 0) angle = M_PI*2 - angle;
-    i1 = i;
-  }
+  quadtree->ComputeVisibility (origin, global_bbox, horizon, CS_HORIZON_SIZE);
 }
 
 void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
 {
   SetupObject ();
+  //TestVisibility (rview);
+
   iGraphics3D* pG3D = rview->GetGraphics3D ();
   iCamera* pCamera = rview->GetCamera ();
 
@@ -1282,6 +1274,8 @@ void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
     for (bx = 0 ; bx < blockxy ; bx++, blidx++)
     {
       csTerrBlock& block = blocks[blidx];
+      //CS_ASSERT (block.node != NULL);
+      //if (!block.node->IsVisible ()) continue;
       int clip_portal, clip_plane;
       if (BBoxVisible (block.bbox, rview, pCamera, clip_portal, clip_plane))
       {

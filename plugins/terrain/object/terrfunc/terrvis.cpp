@@ -75,6 +75,15 @@ void csTerrainQuad::InitHorizon(float *horizon, int horsize)
 int csTerrainQuad::GetHorIndex(const csVector3& campos, float x, float z, 
   int horsize)
 {
+#if 1
+  x -= campos.x;
+  z -= campos.z;
+  float len = qsqrt (x*x + z*z);
+  float cosinus = x / len;
+  int idx = QInt (acos (cosinus) * float (horsize-1) / (M_PI*2.));
+  if (idx == 0) return idx;
+  if (z < 0) idx = horsize-idx;
+#else
   /// @@@ could make a table to lookup the angle from x/z
   /// instead of atan
   float diffx = x - campos.x;
@@ -86,6 +95,7 @@ int csTerrainQuad::GetHorIndex(const csVector3& campos, float x, float z,
   atn += M_PI_2;
   atn *= float(horsize-1)/PI;
   int idx = QInt(atn);
+#endif
   CS_ASSERT(idx >= 0 && idx < horsize);
   return idx;
 }
@@ -106,7 +116,7 @@ void csTerrainQuad::ComputeExtent(const csVector3& campos, const csBox3& bbox,
   for(int i=1; i<4; i++)
   {
     // already included?
-    if( (right-idx[i])%horsize <= (right-left)%horsize )
+    if( (right-idx[i]+horsize)%horsize <= (right-left+horsize)%horsize )
       continue;
     // extend the directions, by adding this angle to existing range.
     int ldiff = (left - idx[i] + horsize) % horsize;
@@ -118,7 +128,11 @@ void csTerrainQuad::ComputeExtent(const csVector3& campos, const csBox3& bbox,
       right = idx[i];
   }
   /// the resulting span should be less than half the horizon
-  CS_ASSERT( (right - left)%horsize <= horsize/2);
+printf ("idx[0]=%d idx[1]=%d idx[2]=%d idx[3]=%d\n", idx[0], idx[1], idx[2], idx[3]);
+printf ("left=%d right=%d horsize=%d\n", left, right, horsize);
+printf ("campos=(%g,%g,%g) bbox=(%g,%g,%g)-(%g,%g,%g)\n", campos.x, campos.y, campos.z, bbox.MinX (), bbox.MinY (), bbox.MinZ (), bbox.MaxX (), bbox.MaxY (), bbox.MaxZ ());
+fflush (stdout);
+  CS_ASSERT( (right - left + horsize)%horsize <= (horsize/2+1));
 }
 
 void csTerrainQuad::ComputeMinMaxDY(const csVector3& campos, const csBox3& bbox,
@@ -188,6 +202,14 @@ void csTerrainQuad::ComputeMinMaxDY(const csVector3& campos, const csBox3& bbox,
     else maxdy = maxh / qsqrt(mindist);
   }
 
+//printf ("sqdist[0]=%g\n", sqdist[0]);
+//printf ("sqdist[1]=%g\n", sqdist[1]);
+//printf ("sqdist[2]=%g\n", sqdist[2]);
+//printf ("sqdist[3]=%g\n", sqdist[3]);
+//printf ("mindist=%g maxdist=%g\n", mindist, maxdist);
+//printf ("min_height=%g max_height=%g\n", min_height, max_height);
+//printf ("minh=%g maxh=%g\n", minh, maxh);
+//fflush (stdout);
   /// we've been trying to do this all along here.
   CS_ASSERT( mindy <= maxdy );
 }
@@ -196,7 +218,7 @@ bool csTerrainQuad::CheckIfAbove(float* horizon, int horsize, int left,
   int right, float dy)
 {
   /// loop from left to right, but it can wrap by horsize
-  int len = (right-left)%horsize;
+  int len = (right-left+horsize)%horsize;
   int idx = left;
   while(len--)
   {
@@ -209,7 +231,7 @@ bool csTerrainQuad::CheckIfAbove(float* horizon, int horsize, int left,
 void csTerrainQuad::HeightenHorizon(float* horizon, int horsize, int left, 
   int right, float dy)
 {
-  int len = (right-left)%horsize;
+  int len = (right-left+horsize)%horsize;
   int idx = left;
   while(len--)
   {
@@ -233,8 +255,10 @@ void csTerrainQuad::ComputeVisibility(const csVector3& campos,
   // visibility
   bool vis = false;
   // if camera is 'in' this node (disregarding height), vis always true
-  if(  (bbox.MinX() <= campos.x) && (campos.x <= bbox.MaxX())
-    && (bbox.MinZ() <= campos.z) && (campos.z <= bbox.MaxZ()) )
+  if(  (bbox.MinX()-SMALL_EPSILON <= campos.x) &&
+       (campos.x <= bbox.MaxX()+SMALL_EPSILON)
+    && (bbox.MinZ()-SMALL_EPSILON <= campos.z) &&
+       (campos.z <= bbox.MaxZ()+SMALL_EPSILON) )
   {
     // node spans the entire horizon
     left = 0;
