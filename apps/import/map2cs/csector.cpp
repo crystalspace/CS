@@ -157,15 +157,15 @@ bool CCSSector::Write(CIWorld* pIWorld)
 
   if (m_IsDefaultsector && pWorld->NeedSkysector())
   {
-    pWorld->WriteIndent();
+    /*pWorld->WriteIndent();
     fprintf(fd, "PART 'p1' (\n");
-    pWorld->Indent();
+    pWorld->Indent();*/
 
     pWorld->WriteSky();
 
-    pWorld->Unindent();
+    /*pWorld->Unindent();
     pWorld->WriteIndent();
-    fprintf(fd, ")\n"); //PART
+    fprintf(fd, ")\n");*/ //PART
   }
   else
   {

@@ -277,27 +277,27 @@ void CCSWorld::WriteSkysector()
     fprintf(m_fd, "PARAMS(\n");
     Indent();
 
-    WriteIndent();
+    /*WriteIndent();
     fprintf(m_fd, "PART 'p1' (\n");
-    Indent();
+    Indent();*/
 
     WriteSky();
 
-    Unindent();
+    /*Unindent();
     WriteIndent();
-    fprintf(m_fd, ")\n");
+    fprintf(m_fd, ")\n");*/
 
     Unindent();
     WriteIndent();
-    fprintf(m_fd, ")\n");
+    fprintf(m_fd, ")\n"); // END params
 
     Unindent();
     WriteIndent();
-    fprintf(m_fd, ")\n");
+    fprintf(m_fd, ")\n"); // END meshobj
 
     Unindent();
     WriteIndent();
-    fprintf(m_fd, ")\n\n");
+    fprintf(m_fd, ")\n\n"); // END sector
   }
 }
 
@@ -314,6 +314,8 @@ void CCSWorld::WriteSky()
   {
     WriteSkydome();
   }
+  WriteIndent();
+  fprintf(m_fd, "MOVEABLE()\n");
 }
 
 void CCSWorld::WriteSkydome()

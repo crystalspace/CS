@@ -30,6 +30,8 @@ The history order is reversed so that new features are at the top.
 	  This hack doesn't use vfs files anymore now, but reads CRYSTAL var
 	  itself and composes $CRYSTAL/data/config/map2cs.cfg as config
           path...
+	- Matze fixed map2cs skybox export by addiong MOVEABLE() to PARAMS
+	  section, still the texture mapping seems incorrect
 24-Jan-2002
 	- Jorge Acereda relaxed a limit in 3ds2lev that made it crash
 	  with scenes with more than 100 textures.
