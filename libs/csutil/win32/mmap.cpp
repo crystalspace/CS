@@ -16,11 +16,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#define CS_SYSDEF_PROVIDE_HARDWARE_MMIO
 #include "cssysdef.h"
 #include "csutil/csmmap.h"
 
-static bool map_window (mmioInfo* info, unsigned int offset, 
+static bool map_window (csMemMapInfo* info, unsigned int offset, 
   unsigned int len, bool writable) 
 {
   unsigned char* p =
@@ -38,10 +37,10 @@ static bool map_window (mmioInfo* info, unsigned int offset,
   return false;
 }
 
-bool MemoryMapWindow(mmioInfo* info, mmioInfo* original, unsigned int offset, 
+bool csMemoryMapWindow(csMemMapInfo* info, csMemMapInfo* original, unsigned int offset, 
   unsigned int len, bool writable) 
 {
-  memcpy (info, original, sizeof (mmioInfo));
+  memcpy (info, original, sizeof (csMemMapInfo));
   if (map_window (info, offset, len, writable)) 
   {
     info->close = false;
@@ -52,11 +51,11 @@ bool MemoryMapWindow(mmioInfo* info, mmioInfo* original, unsigned int offset,
   return false;
 }
 
-bool MemoryMapWindow(mmioInfo* info, char const * filename, 
+bool csMemoryMapWindow(csMemMapInfo* info, char const * filename, 
   unsigned int offset, unsigned int len, bool writable) 
 {
   bool ok = false;
-  memset (info, 0, sizeof (mmioInfo));
+  memset (info, 0, sizeof (csMemMapInfo));
   HANDLE file, mapping = INVALID_HANDLE_VALUE;
   file = CreateFile (
     filename, GENERIC_READ | (writable ? GENERIC_WRITE : 0), 
@@ -87,12 +86,12 @@ bool MemoryMapWindow(mmioInfo* info, char const * filename,
   return ok;
 }
 
-// Fills in the mmioInfo struct by mapping in filename.
+// Fills in the csMemMapInfo struct by mapping in filename.
 // Returns true on success, false otherwise.
-bool MemoryMapFile (mmioInfo* info, char const* filename)
+bool csMemoryMapFile (csMemMapInfo* info, char const* filename)
 {  
   bool ok = false;
-  memset (info, 0, sizeof (mmioInfo));
+  memset (info, 0, sizeof (csMemMapInfo));
   HANDLE file, mapping = INVALID_HANDLE_VALUE;
   file = CreateFile (
     filename, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
@@ -121,7 +120,7 @@ bool MemoryMapFile (mmioInfo* info, char const* filename)
   return ok;
 }
 
-void UnMemoryMapFile(mmioInfo* info)
+void csUnMemoryMapFile(csMemMapInfo* info)
 {
   if (info->data != 0)
     UnmapViewOfFile(info->data);

@@ -23,6 +23,7 @@ case MACOS_X :					# MacOS/X
 		[ ConcatDirs generic cspthrd.h ]
 		[ ConcatDirs generic findlib.cpp ]
 		[ ConcatDirs generic getopt.cpp ]
+		[ ConcatDirs generic mmap.cpp ]
 		[ ConcatDirs generic pathutil.cpp ] 
 		[ ConcatDirs generic pluginpaths.cpp ]
 		[ ConcatDirs generic printf.cpp ]
@@ -38,6 +39,7 @@ case * :					# Posix, Unix, Linux, etc.
 		[ ConcatDirs generic cspthrd.h ]
 		[ ConcatDirs generic findlib.cpp ]
 		[ ConcatDirs generic getopt.cpp ]
+		[ ConcatDirs generic mmap.cpp ]
 		[ ConcatDirs generic pathutil.cpp ]
 		[ ConcatDirs generic platformconfig.cpp ] 
 		[ ConcatDirs generic pluginpaths.cpp ]
@@ -62,10 +64,10 @@ if $(REGEX.AVAILABLE) != "yes"
 
 Library csutil :
   [ Wildcard *.cpp *.cc *.c *.h ] $(CSSYS_SRC)
-  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csutil ] : *.h ]
+  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csutil        ] : *.h ]
   [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csutil macosx ] : *.h ]
-  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csutil win32 ] : *.h ]
-  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csutil unix ] : *.h ] ;
+  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csutil unix   ] : *.h ]
+  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csutil win32  ] : *.h ] ;
 
 CFlags csutil :
   [ FDefines CS_CONFIGDIR='\"$(appconfdir)\"' ]

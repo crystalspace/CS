@@ -19,10 +19,6 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#define CS_SYSDEF_PROVIDE_DIR
-#define CS_SYSDEF_PROVIDE_TEMP
-#define CS_SYSDEF_PROVIDE_UNLINK
-#define CS_SYSDEF_PROVIDE_ACCESS
 
 #include "cssysdef.h"
 #include "csutil/csendian.h"
@@ -48,9 +44,9 @@
 #  define APPEND_SLASH(str,len)                 \
      if ((len)                                  \
       && (str[len - 1] != '/')                  \
-      && (str[len - 1] != PATH_SEPARATOR))      \
+      && (str[len - 1] != CS_PATH_SEPARATOR))   \
      {                                          \
-       str[len++] = PATH_SEPARATOR;             \
+       str[len++] = CS_PATH_SEPARATOR;          \
        str[len] = 0;                            \
      } /* endif */
 
@@ -150,7 +146,7 @@ void csArchive::ReadDirectory ()
     {
       char* slash = strchr(sep, '/');
       if (slash == 0)
-        slash = strchr (sep, PATH_SEPARATOR);
+        slash = strchr (sep, CS_PATH_SEPARATOR);
       sep = slash;
       if (sep != 0)
       {
@@ -283,7 +279,7 @@ void csArchive::ReadZipEntries (FILE *infile)
     buff[lfh.filename_length] = 0;
 
     if ((buff[lfh.filename_length - 1] != '/')
-        && (buff[lfh.filename_length - 1] != PATH_SEPARATOR))
+        && (buff[lfh.filename_length - 1] != CS_PATH_SEPARATOR))
     {
       /* Partialy convert lfh to cdfh */
       memset (&cdfh, 0, sizeof (cdfh));
@@ -532,13 +528,12 @@ bool csArchive::WriteZipArchive ()
 
   // Step one: Copy archive file into a temporary file,
   // skipping entries marked as 'deleted'
-  strcpy (temp_file, TEMP_DIR);
+  strcpy (temp_file, CS_TEMP_DIR);
   size_t tmplen = strlen (temp_file);
 
   APPEND_SLASH (temp_file, tmplen);
     
-  cs_snprintf (&temp_file[tmplen], CS_MAXPATHLEN - tmplen, TEMP_FILE);
-  //sprintf (&temp_file[tmplen], TEMP_FILE);
+  cs_snprintf (&temp_file[tmplen], CS_MAXPATHLEN - tmplen, CS_TEMP_FILE);
   if ((temp = fopen (temp_file, "w+b")) == 0)
     return false;               /* Cannot create temporary file */
   fseek (file, 0, SEEK_SET);

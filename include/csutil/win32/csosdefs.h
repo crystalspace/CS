@@ -172,18 +172,19 @@
 
 #else
 
-#if !defined(_X86_) && !defined(_IA64_) && !defined(_AMD64_) && defined(_M_IX86)
+#if !defined(_X86_) && !defined(_IA64_) && !defined(_AMD64_) && \
+     defined(_M_IX86)
 #define _X86_
 #endif
 
-#if !defined(_X86_) && !defined(_IA64_) && !defined(_AMD64_) && defined(_M_AMD64)
+#if !defined(_X86_) && !defined(_IA64_) && !defined(_AMD64_) && \
+     defined(_M_AMD64)
 #define _AMD64_
 #endif
 
-#if !defined(_X86_) && !defined(_M_IX86) && !defined(_AMD64_) && defined(_M_IA64)
-#if !defined(_IA64_)
+#if !defined(_X86_) && !defined(_M_IX86) && !defined(_AMD64_) && \
+     defined(_M_IA64) && !defined(_IA64_)
 #define _IA64_
-#endif 
 #endif
 
 #endif
@@ -195,6 +196,13 @@
 #include <windef.h>
 #include <winbase.h>
 #include <malloc.h>
+#include <sys/types.h>
+#include <sys/select.h>
+#include <sys/stat.h>
+#ifndef __CYGWIN32__
+#include <direct.h>
+#endif
+
 
 #ifndef WINGDIAPI
 #define WINGDIAPI DECLSPEC_IMPORT
@@ -258,13 +266,11 @@
   #define CS_INITIALIZE_PLATFORM_APPLICATION CS_WIN32_MSVC_DEBUG_GOOP
 #endif
 
-#ifdef CS_SYSDEF_PROVIDE_HARDWARE_MMIO
-
 // Defines that this platform supports hardware memory-mapped i/o
-#define CS_HAS_MEMORY_MAPPED_IO 1
+#define CS_HAS_MEMORY_MAPPED_IO
 
 /// Windows specific memory-mapped I/O stuff.
-struct mmioInfo
+struct csMemMapInfo
 {
     /// Handle to the mapped file 
     HANDLE hMappedFile;
@@ -282,8 +288,6 @@ struct mmioInfo
     unsigned int file_size;
 };
 
-#endif
-
 // The 2D graphics driver used by software renderer on this platform
 #define CS_SOFTWARE_2D_DRIVER "crystalspace.graphics2d.directdraw"
 #define CS_OPENGL_2D_DRIVER "crystalspace.graphics2d.glwin32"
@@ -294,12 +298,6 @@ struct mmioInfo
 // SCF symbol export facility.
 #undef CS_EXPORTED_FUNCTION
 #define CS_EXPORTED_FUNCTION extern "C" __declspec(dllexport)
-
-#if defined (CS_SYSDEF_PROVIDE_DIR) || defined (CS_SYSDEF_PROVIDE_GETCWD) || defined (CS_SYSDEF_PROVIDE_MKDIR)
-#ifndef __CYGWIN32__
-#  include <direct.h>
-#endif
-#endif
 
 #if defined (CS_COMPILER_BCC)
 #  define strcasecmp stricmp
@@ -317,49 +315,58 @@ struct mmioInfo
 #else
 #  define CS_MAXPATHLEN 260 /* not 256 */
 #endif
-#define PATH_SEPARATOR '\\'
-#define PATH_DELIMITER ';'
+#define CS_PATH_DELIMITER ';'
+#define CS_PATH_SEPARATOR '\\'
 
-#if defined (__CYGWIN32__) && defined(CS_SYSDEF_PROVIDE_MKDIR)
-#    define MKDIR(path) mkdir(path, 0755)
-#    undef CS_SYSDEF_PROVIDE_MKDIR
+#if defined (__CYGWIN32__)
+#  define CS_MKDIR(path) mkdir(path, 0755)
+#else
+#  define CS_MKDIR(path) _mkdir(path)
 #endif
 
-#ifdef CS_SYSDEF_VFS_PROVIDE_CHECK_VAR
-  #define CS_PROVIDES_VFS_VARS 1
-#  ifdef CS_CSUTIL_LIB
-  extern CS_EXPORT_SYM const char* csCheckPlatformVFSVar(const char* VarName);
-#  else
-  extern CS_IMPORT_SYM const char* csCheckPlatformVFSVar(const char* VarName);
-#  endif // CS_CSUTIL_LIB
+// Although CS_COMPILER_GCC has opendir(), readdir(), etc., we prefer the CS
+// versions of these functions.
+#define CS_WIN32_USE_CUSTOM_OPENDIR
+
+# if defined(CS_WIN32_USE_CUSTOM_OPENDIR)
+struct DIR;
+struct dirent;
+extern "C" CS_CSUTIL_EXPORT DIR *opendir (const char *name);
+extern "C" CS_CSUTIL_EXPORT dirent *readdir (DIR *dirp);
+extern "C" CS_CSUTIL_EXPORT int closedir (DIR *dirp);
+# endif
+
+// Directory read functions, file access, etc.
+#include <io.h>
+#ifndef F_OK
+#  define F_OK 0
+#endif
+#ifndef R_OK
+#  define R_OK 2
+#endif
+#ifndef W_OK
+#  define W_OK 4
 #endif
 
-#ifdef CS_SYSDEF_PROVIDE_EXPAND_PATH
-  #define CS_PROVIDES_EXPAND_PATH 1
-
-  inline void
-  csPlatformExpandPath(const char* path, char* buffer, int bufsize)
-  {
-    GetFullPathName (path, bufsize, buffer, 0);
-  }
-
+#define CS_PROVIDES_VFS_VARS 1
+#ifdef CS_CSUTIL_LIB
+extern CS_EXPORT_SYM const char* csCheckPlatformVFSVar(const char* VarName);
+#else
+extern CS_IMPORT_SYM const char* csCheckPlatformVFSVar(const char* VarName);
 #endif
 
-// Although CS_COMPILER_GCC has opendir, readdir, CS' versions are preferred.
-#if defined(CS_SYSDEF_PROVIDE_DIR)
-// Directory read functions
-  #define __NEED_OPENDIR_PROTOTYPE
-  #include <io.h>
+#define CS_PROVIDES_EXPAND_PATH 1
+inline void csPlatformExpandPath(const char* path, char* buffer, int bufsize)
+{
+  GetFullPathName (path, bufsize, buffer, 0);
+}
 
-  // Directory entry
-  struct dirent
-  {
-    char d_name [CS_MAXPATHLEN + 1]; // File name, 0 terminated
-    size_t d_size; // File size (bytes)
-    long dwFileAttributes; // File attributes (Windows-specific)
-  };
-  // Directory handle
-  struct DIR;
+struct dirent
+{
+  char d_name [CS_MAXPATHLEN + 1]; // File name, 0 terminated
+  size_t d_size; // File size (bytes)
+  long dwFileAttributes; // File attributes (Windows-specific)
+};
 
 # ifdef CS_CSUTIL_LIB
   extern "C" CS_EXPORT_SYM DIR *opendir (const char *name);
@@ -374,30 +381,21 @@ struct mmioInfo
 # endif // CS_BUILD_SHARED_LIBS
 #endif
 
-#ifdef CS_SYSDEF_PROVIDE_SELECT
-#  undef CS_SYSDEF_PROVIDE_SELECT
-#endif
-
-#ifdef CS_SYSDEF_PROVIDE_ACCESS
-#  include <io.h>
-#endif
-
 #if defined (CS_COMPILER_BCC) || defined (__CYGWIN32__)
 #  define GETPID() getpid()
 #else
 #  define GETPID() _getpid()
 #endif
 
-#ifdef CS_SYSDEF_PROVIDE_TEMP
-# ifdef __CYGWIN32__
-#   include <unistd.h>
-#   define TEMP_FILE "cs%lu.tmp", (unsigned long)getpid()
-#   define TEMP_DIR  "/tmp"
-# else
-#   include <process.h>
-#   define TEMP_FILE "%x.cs", GETPID()
-#   define TEMP_DIR win32_tempdir()
-   // This is the function called by TEMP_DIR macro
+#ifdef __CYGWIN32__
+#  include <unistd.h>
+#  define CS_TEMP_FILE "cs%lu.tmp", (unsigned long)getpid()
+#  define CS_TEMP_DIR  "/tmp"
+#else
+#  include <process.h>
+#  define CS_TEMP_FILE "%x.cs", GETPID()
+#  define CS_TEMP_DIR win32_tempdir()
+   // This is the function called by CS_TEMP_DIR macro
    static inline char *win32_tempdir()
    {
      char *tmp;
@@ -407,8 +405,7 @@ struct mmioInfo
        return tmp;
      return "";
    }
-# endif
-#endif // CS_SYSDEF_PROVIDE_TEMP
+#endif
 
 // Microsoft Visual C++ compiler includes a very in-efficient 'memcpy'.
 // This also replaces the older 'better_memcpy', which was also not as

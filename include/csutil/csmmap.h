@@ -33,29 +33,29 @@
 #ifdef CS_HAS_MEMORY_MAPPED_IO
 /**
  * Map a file to a memory area. 
- * Fills in the mmioInfo struct by mapping in \c filename.
+ * Fills in the csMemMapInfo struct by mapping in \c filename.
  * \c filename is a platform-dependent path.
  * Returns true on success, false otherwise.
  */
-extern CS_CSUTIL_EXPORT bool MemoryMapFile(mmioInfo* info, char const* filename);
+extern CS_CSUTIL_EXPORT bool csMemoryMapFile(csMemMapInfo* info, char const* filename);
 /// Unmap a file from a memory area.
-extern CS_CSUTIL_EXPORT void UnMemoryMapFile(mmioInfo* info);
+extern CS_CSUTIL_EXPORT void csUnMemoryMapFile(csMemMapInfo* info);
 /**
  * Memory map in part of a file.
- * Provides more control than the standard MemoryMapFile().
- * The mmioInfo struct is compatible, UnMapMemoryFile() should
+ * Provides more control than the standard csMemoryMapFile().
+ * The csMemMapInfo struct is compatible, UnMapMemoryFile() should
  * be used to unmap.
  */
-extern CS_CSUTIL_EXPORT bool MemoryMapWindow(mmioInfo*, char const* filename, unsigned int offset, unsigned int len, bool writable);
+extern CS_CSUTIL_EXPORT bool csMemoryMapWindow(csMemMapInfo*, char const* filename, unsigned int offset, unsigned int len, bool writable);
 /**
  * Memory map in another part of an already mapped file.
- * Provides more control than the standard MemoryMapFile().
- * The mmioInfo struct is compatible, UnMapMemoryFile() should
+ * Provides more control than the standard csMemoryMapFile().
+ * The csMemMapInfo struct is compatible, UnMapMemoryFile() should
  * be used to unmap.
  * This struct will reuse filehandles and any other possible resource
  * from the already mapped file.
  */
-extern CS_CSUTIL_EXPORT bool MemoryMapWindow(mmioInfo*, mmioInfo * original, unsigned int offset, unsigned int len, bool writable);
+extern CS_CSUTIL_EXPORT bool csMemoryMapWindow(csMemMapInfo*, csMemMapInfo * original, unsigned int offset, unsigned int len, bool writable);
 #endif
 
 #endif // __CS_CSSYS_CSMMAP_H__

@@ -43,10 +43,10 @@ CS_IMPLEMENT_APPLICATION
 
 #if defined (CS_PLATFORM_DOS)
   #define IS_A_PATH_SEPARATOR(c)	\
-    (((c) == PATH_SEPARATOR) || ((c) == '/') || ((c) == ':'))
+    (((c) == CS_PATH_SEPARATOR) || ((c) == '/') || ((c) == ':'))
 #else
   #define IS_A_PATH_SEPARATOR(c)	\
-    (((c) == PATH_SEPARATOR) || ((c) == '\\') || ((c) == '/'))
+    (((c) == CS_PATH_SEPARATOR) || ((c) == '\\') || ((c) == '/'))
 #endif
 
 #define THRESHOLD 0.0000001

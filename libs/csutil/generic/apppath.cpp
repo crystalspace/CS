@@ -34,15 +34,15 @@ csString csGetAppPath (const char* argv0)
   {
     fullpath.Clear();
   }
-  else if (*argv0 == PATH_SEPARATOR) // Absolute path; exact location of app.
+  else if (*argv0 == CS_PATH_SEPARATOR) // Absolute: exact location of app.
   {
     fullpath = argv0;  
   } 
-  else if (strchr (argv0, PATH_SEPARATOR) != 0) // Relative path containing / ?
+  else if (strchr (argv0, CS_PATH_SEPARATOR) != 0) // Relative:containing / ?
   {
     char dir[CS_MAXPATHLEN];		// Yes, getcwd()+relpath gives location
     if (getcwd(dir, sizeof(dir)) != 0)	// of app.
-      fullpath << dir << PATH_SEPARATOR << argv0;
+      fullpath << dir << CS_PATH_SEPARATOR << argv0;
   }
   else 
   {
@@ -54,12 +54,12 @@ csString csGetAppPath (const char* argv0)
     do
     {
       currentPart = nextPart;
-      nextPart = strchr (currentPart, PATH_DELIMITER);
+      nextPart = strchr (currentPart, CS_PATH_DELIMITER);
       if (nextPart)
 	*nextPart++ = 0;
 
       csString apppath;
-      apppath << currentPart << PATH_SEPARATOR << argv0;
+      apppath << currentPart << CS_PATH_SEPARATOR << argv0;
       if (access (apppath, F_OK) == 0)
       {
         fullpath = apppath;

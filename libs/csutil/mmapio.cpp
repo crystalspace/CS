@@ -16,8 +16,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#define CS_SYSDEF_PROVIDE_HARDWARE_MMIO 1
-
 #include "cssysdef.h"
 #include "csutil/csmmap.h"
 #include "csutil/mmapio.h"
@@ -25,8 +23,8 @@
 #include "csutil/ref.h"
 
 #ifdef CS_HAS_MEMORY_MAPPED_IO
-bool MemoryMapFile(mmioInfo*, char const* filename);
-void UnMemoryMapFile(mmioInfo*);
+bool csMemoryMapFile(csMemMapInfo*, char const* filename);
+void csUnMemoryMapFile(csMemMapInfo*);
 #endif
 
 csMemoryMappedIO::csMemoryMappedIO(unsigned _block_size, char const *filename, 
@@ -47,7 +45,7 @@ csMemoryMappedIO::csMemoryMappedIO(unsigned _block_size, char const *filename,
   if (realpath)
   {
    #ifdef CS_HAS_MEMORY_MAPPED_IO
-    valid_platform = MemoryMapFile(&platform, realpath);
+    valid_platform = csMemoryMapFile(&platform, realpath);
     if (!valid_platform)
    #endif
     {
@@ -67,7 +65,7 @@ csMemoryMappedIO::~csMemoryMappedIO()
    #ifdef CS_HAS_MEMORY_MAPPED_IO
     if (valid_platform)
     {
-      UnMemoryMapFile(&platform);
+      csUnMemoryMapFile(&platform);
     }
     else
    #endif

@@ -18,7 +18,6 @@
 */
 #include <stdarg.h>
 
-#define CS_SYSDEF_PROVIDE_DIR
 #include "cssysdef.h"
 #include "csws/cswsutil.h"
 #include "csws/csstddlg.h"
@@ -398,7 +397,7 @@ bool cspFileDialog::BuildAndSetPath ()
   else
     buff [0] = 0;
 
-  char pathsep = usevfs ? VFS_PATH_SEPARATOR : PATH_SEPARATOR;
+  char pathsep = usevfs ? VFS_PATH_SEPARATOR : CS_PATH_SEPARATOR;
   int maxlen = usevfs ? VFS_MAX_PATH_LEN : CS_MAXPATHLEN;
 
   while (cur->id == CSFDI_PATHCOMPONENT)
@@ -472,7 +471,7 @@ void cspFileDialog::Reread ()
   // Clear "file name" field
   SetName ("");
 
-  char pathsep = usevfs ? VFS_PATH_SEPARATOR : PATH_SEPARATOR;
+  char pathsep = usevfs ? VFS_PATH_SEPARATOR : CS_PATH_SEPARATOR;
   int maxlen = usevfs ? VFS_MAX_PATH_LEN : CS_MAXPATHLEN;
 
   // Now decompose path into components
@@ -596,7 +595,7 @@ bool cspFileDialog::GetFileName(char *buf, size_t bufsize)
     p->GetText (buf, bufsize);
     size_t sl = strlen (buf);
 
-    char separator = usevfs ? VFS_PATH_SEPARATOR : PATH_SEPARATOR;
+    char separator = usevfs ? VFS_PATH_SEPARATOR : CS_PATH_SEPARATOR;
 
     if (sl < bufsize)
     {

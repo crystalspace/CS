@@ -74,9 +74,9 @@ bool App#PROJECTNAMECAP#::OnInitialize(int argc, char* argv[])
   if (!cel_path.IsEmpty())
   {
     cel_paths.AddOnce(cel_path, false, "cel");
-    cel_path << PATH_SEPARATOR << "lib";
+    cel_path << CS_PATH_SEPARATOR << "lib";
     cel_paths.AddOnce(cel_path, false, "cel");
-    cel_path << PATH_SEPARATOR << "cel";
+    cel_path << CS_PATH_SEPARATOR << "cel";
     cel_paths.AddOnce(cel_path, false, "cel");
   }
 #ifdef CEL_PLUGIN_DIR

@@ -26,12 +26,7 @@
  * \addtogroup geom_utils
  * @{ */
 
-#ifndef __CS_CSSYSDEFS_H__
-#error "cssysdef.h must be included in EVERY source file!"
-#endif
-
 #include "csextern.h"
-
 #include "csgeom/vector3.h"
 
 class csQuaternion;

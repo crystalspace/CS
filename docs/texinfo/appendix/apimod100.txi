@@ -10,8 +10,8 @@ Crystal Space.
 
 @code{csArray<>} has been changed to use the @code{size_t} instead of
 @samp{int} for array sizes and indices.  Probably, the most significant
-semantic difference of this change is that @samp{size_t} is @emph{unsigned} as
-opposed to @samp{int} which is @emph{signed}.
+semantic difference of this change is that @samp{size_t} is usually
+@emph{unsigned} as opposed to @samp{int} which is @emph{signed}.
 
 @strong{Read this paragraph carefully.} In actual code, this change may result
 in nothing more than simple-looking compiler warnings. However, it may have
@@ -160,7 +160,7 @@ them from your applications if you used them):
 @subheading Input Definitions
 
 The file @file{csutil/inpnames.h} has been renamed to
-@file{inputdef.h} and the following functions have been removed:
+@file{inputdef.h}, and the following functions have been removed:
 
 @itemize @bullet
 @item
@@ -185,15 +185,14 @@ and vice versa.
 
 The way to do this is now, however, is to use @samp{csInputDefinition}, which
 resides in @file{csutil/inputdef.h}. The preferred way to convert a string to a
-definition is to construct a @samp{csInputDefinition} from a @samp{char
-const*}; and the preferred way to convert a definition back to a string
-(perhaps constructed some other way) is via
+definition is to construct a @samp{csInputDefinition} from a
+@samp{char const*}; and the preferred way to convert a definition back to a
+string (perhaps constructed some other way) is via
 @code{csInputDefinition::ToString()}.
 
-There are also static helper methods in @samp{csInputDefinition} which
-accept arguments in a similar way to the old functions. These are
-convenience methods which perform the
-work of instantiating the object for you:
+There are also static helper methods in @samp{csInputDefinition} which accept
+arguments in a similar way to the old functions. These are convenience methods
+which perform the work of instantiating the object for you:
 
 @itemize @bullet
 @item
@@ -211,13 +210,13 @@ work of instantiating the object for you:
 In order to avoid polluting the top-level system include directory, the Crystal
 Space header tree is now installed (by @samp{make install} or
 @samp{jam install}) in a subdirectory named @file{crystalspace}, rather than
-being installed directly in top-level system directory. For example, assuming
-the default installation location, the Crystal Space headers are now installed
-in @file{/usr/local/include/crystalspace}. Previously, they would have been
-installed directly in @file{/usr/local/include}. The @samp{cs-config} utility
-script properly returns the new header location in response to the
-@samp{--includedir}, @samp{--cflags}, and @samp{--cxxflags} options, so this
-relocation should be mostly transparent to external projects.
+being installed directly in the top-level system directory. For example,
+assuming the default installation location, the Crystal Space headers are now
+installed in @file{/usr/local/include/crystalspace}. Previously, they would
+have been installed directly into @file{/usr/local/include}. The
+@samp{cs-config} utility script properly returns the new header location in
+response to the @samp{--includedir}, @samp{--cflags}, and @samp{--cxxflags}
+options, so this relocation should be mostly transparent to external projects.
 
 The following global header files have been renamed in order to avoid possible
 conflict with headers installed by other packages.
@@ -238,29 +237,29 @@ global namespace.
 
 @itemize @bullet
 @item
-@code{QInt} @result{} @code{csQint()}
-@item
-@code{QInt8} @result{} @code{csQint8()}
-@item
-@code{QInt16} @result{} @code{csQint16()}
-@item
-@code{QInt24} @result{} @code{csQint24()}
-@item
-@code{qisqrt} @result{} @code{csQisqrt()}
-@item
-@code{qsqrt} @result{} @code{csQsqrt()}
-@item
-@code{QRound} @result{} @code{csQround()}
-@item
 @code{COMP_BC} @result{} @code{CS_COMPILER_BCC}
 @item
 @code{COMP_GCC} @result{} @code{CS_COMPILER_GCC}
 @item
 @code{COMP_VC} @result{} @code{CS_COMPILER_MSVC}
 @item
+@code{CS_PROCSIZE} @result{} @code{CS_PROCESSOR_SIZE}
+@item
 @code{DO_MMX} @result{} @code{CS_USE_MMX}
 @item
 @code{DO_NASM} @result{} @code{CS_USE_NASM}
+@item
+@code{MemoryMapFile()} @result{} @code{csMemoryMapFile()}
+@item
+@code{MemoryMapWindow()} @result{} @code{csMemoryMapWindow()}
+@item
+@code{MKDIR()} @result{} @code{CS_MKDIR()}
+@item
+@code{mmioInfo} @result{} @code{csMemMapInfo}
+@item
+@code{__NEED_GENERIC_ISDIR} @result{} @code{CS_USE_CUSTOM_ISDIR}
+@item
+@code{__NEED_OPENDIR_PROTOTYPE} @result{} @code{CS_WIN32_USE_CUSTOM_OPENDIR}
 @item
 @code{OS_DOS} @result{} @code{CS_PLATFORM_DOS}
 @item
@@ -270,10 +269,86 @@ global namespace.
 @item
 @code{OS_WIN32} @result{} @code{CS_PLATFORM_WIN32}
 @item
+@code{PATH_DELIMITER} @result{} @code{CS_PATH_DELIMITER}
+@item
+@code{PATH_SEPARATOR} @result{} @code{CS_PATH_SEPARATOR}
+@item
 @code{PROC_FOO} @result{} @code{CS_PROCESSOR_FOO} (where @samp{FOO} is
 @samp{X86}, @samp{M68K}, etc.)
 @item
-@code{CS_PROCSIZE} @result{} @code{CS_PROCESSOR_SIZE}
+@code{QInt()} @result{} @code{csQint()}
+@item
+@code{QInt8()} @result{} @code{csQint8()}
+@item
+@code{QInt16()} @result{} @code{csQint16()}
+@item
+@code{QInt24()} @result{} @code{csQint24()}
+@item
+@code{qisqrt()} @result{} @code{csQisqrt()}
+@item
+@code{qsqrt()} @result{} @code{csQsqrt()}
+@item
+@code{QRound()} @result{} @code{csQround()}
+@item
+@code{TEMP_DIR} @result{} @code{CS_TEMP_DIR}
+@item
+@code{TEMP_FILE} @result{} @code{CS_TEMP_FILE}
+@item
+@code{UnMemoryMapFile()} @result{} @code{csUnMemoryMapFile()}
 @item
 @code{WIN32_VOLATILE} @result{} @code{CS_WIN32_CSCONFIG}
 @end itemize
+
+@subheading @file{cssysdef.h} Changes
+
+The @samp{CS_SYSDEF_PROVIDE_FACILITY} macros, which clients would
+@code{#define} before including @file{cssysdef.h} in order to alter the
+behavior of @file{cssysdef.h}, have been removed. Retirement of these macros
+eliminates the polymorphic behavior of @file{cssysdef.h}, thus helping to pave
+the way toward eventually pre-compiling Crystal Space's headers in order to
+reduce overall compilation time.  In addition to removing these macros from
+your code, the following table explains what else (if anything) needs to be
+done to account for the removal.
+
+@table @code
+@item CS_SYSDEF_PROVIDE_ACCESS
+No additional changes.
+@item CS_SYSDEF_PROVIDE_ALLOCA
+Use the @samp{CS_ALLOC_STACK_ARRAY()} macro, rather than @code{alloca()}.
+@item CS_SYSDEF_PROVIDE_CASE
+No additional changes.
+@item CS_SYSDEF_PROVIDE_DIR
+No additional changes.
+@item CS_SYSDEF_PROVIDE_EXPAND_PATH
+No additional changes.
+@item CS_SYSDEF_PROVIDE_GETCWD
+No additional changes.
+@item CS_SYSDEF_PROVIDE_GETOPT
+Include @file{csutil/getopt.h}.
+@item CS_SYSDEF_PROVIDE_MKDIR
+Use the @samp{CS_MKDIR(path)} macro to create the directory, rather than the
+obsolete @samp{MKDIR()} macro.
+@item CS_SYSDEF_PROVIDE_PATH
+No additional changes.
+@item CS_SYSDEF_PROVIDE_SELECT
+No additional changes.
+@item CS_SYSDEF_PROVIDE_SOCKETS
+Include @file{csutil/sockets.h}.
+@item CS_SYSDEF_PROVIDE_SOFTWARE2D
+No additional changes.
+@item CS_SYSDEF_PROVIDE_TEMP
+Use the @samp{CS_TEMP_DIR} and @samp{CS_TEMP_FILE} macros, rather than the
+obsolete @samp{TEMP_DIR} and @samp{TEMP_FILE} macros.
+@item CS_SYSDEF_PROVIDE_UNLINK
+No additional changes.
+@item CS_SYSDEF_VFS_PROVIDE_CHECK_VAR
+No additional changes.
+@end table
+
+The age-old restriction that @file{cssysdef.h} could be included only by source
+files (@file{.cpp}) has been lifted. This restriction was an unfortunate
+side-effect of the polymorphic behavior of @file{cssysdef.h} in the presence
+of various @samp{CS_SYSDEF_PROVIDE_FACILITY} macros. It is now safe, even
+recommended, to include @file{cssysdef.h} in header files (@file{.h}). Doing so
+helps to make header files more self-contained, thus reducing the burden of
+clients of those headers.

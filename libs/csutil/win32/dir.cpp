@@ -16,9 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#define CS_SYSDEF_PROVIDE_DIR
 #include "cssysdef.h"
-#ifdef __NEED_OPENDIR_PROTOTYPE
+#ifdef CS_WIN32_USE_CUSTOM_OPENDIR
 
 struct DIR
 {
@@ -45,10 +44,10 @@ DIR *opendir (const char *name)
   CS_ALLOC_STACK_ARRAY (char, fullname, namelen + 3);
   strcpy (fullname, name);
   char* nameend = &fullname[namelen - 1];
-  if (*nameend != PATH_SEPARATOR)
+  if (*nameend != CS_PATH_SEPARATOR)
   {
     nameend++;
-    *nameend = PATH_SEPARATOR;
+    *nameend = CS_PATH_SEPARATOR;
   }
   strcpy (nameend + 1, "*");
 

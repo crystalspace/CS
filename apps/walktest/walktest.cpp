@@ -22,7 +22,6 @@
 */
 #include <stdarg.h>
 
-#define CS_SYSDEF_PROVIDE_ACCESS
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "walktest.h"

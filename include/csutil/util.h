@@ -128,11 +128,10 @@ public:
 extern CS_CSUTIL_EXPORT char *csExpandName (const char *iName);
 
 /**
- * Split a pathname into separate path and name. Path delimiters are either
- * '/', PATH_SEPARATOR and, for OS/2, MS-DOS and Win32 targets, ':'.
+ * Split a pathname into separate path and name.
  */
-extern CS_CSUTIL_EXPORT void csSplitPath (const char *iPathName, char *oPath, size_t iPathSize,
-  char *oName, size_t iNameSize);
+extern CS_CSUTIL_EXPORT void csSplitPath (const char *iPathName, char *oPath,
+  size_t iPathSize, char *oName, size_t iNameSize);
 
 /**
  * This is a really simple function that does very nice

@@ -49,7 +49,7 @@ bool app_info(char const* argv0, csString& dir, csString& name, bool& is_gui)
   csString apppath = csGetAppPath(argv0);
   if (!apppath.IsEmpty())
   {
-    size_t slash = apppath.FindLast(PATH_SEPARATOR);
+    size_t slash = apppath.FindLast(CS_PATH_SEPARATOR);
     CS_ASSERT(slash != (size_t)-1);
     name = apppath.Slice(slash + 1, apppath.Length() - slash - 1);
     apppath.Truncate(slash);
@@ -61,7 +61,7 @@ bool app_info(char const* argv0, csString& dir, csString& name, bool& is_gui)
     {
       is_gui = true;
       apppath.Truncate(n - ngrist);
-      slash = apppath.FindLast(PATH_SEPARATOR);
+      slash = apppath.FindLast(CS_PATH_SEPARATOR);
       CS_ASSERT(slash != (size_t)-1);
       apppath.Truncate(slash);
     }
@@ -117,6 +117,6 @@ csString csGetResourceDir(char const* argv0)
   csString dir, name;
   bool is_gui;
   if (app_info(argv0, dir, name, is_gui) && is_gui)
-    dir << PATH_SEPARATOR << name << OSX_RESOURCES_GRIST;
+    dir << CS_PATH_SEPARATOR << name << OSX_RESOURCES_GRIST;
   return dir;
 }

@@ -16,7 +16,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#define CS_SYSDEF_PROVIDE_DIR
 #include "cssysdef.h"
 #include "csutil/csshlib.h"
 #include "csutil/sysfunc.h"

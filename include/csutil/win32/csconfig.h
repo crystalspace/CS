@@ -25,7 +25,7 @@
 #  if !defined(CS_COMPILER_NAME)
 #    define CS_COMPILER_NAME "Borland"
 #  endif
-#  define __NEED_GENERIC_ISDIR
+#  define CS_USE_CUSTOM_ISDIR
 #elif defined(__MINGW32__) || defined(__CYGWIN32__)
 #  define CS_COMPILER_GCC
 #  if !defined(CS_COMPILER_NAME)

@@ -16,7 +16,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#define CS_SYSDEF_PROVIDE_SOFTWARE2D
 #include "cssysdef.h"
 #include "iutil/eventq.h"
 #include "iutil/event.h"

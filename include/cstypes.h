@@ -24,10 +24,6 @@
 /**\addtogroup util
  * @{
  */
-#ifndef __CS_CSSYSDEFS_H__
-#error "cssysdef.h must be included in EVERY source file!"
-#endif
-
 #include "csplatform.h"
 #include <float.h>
 

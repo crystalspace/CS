@@ -65,8 +65,8 @@ csPtr<iConfigFile> csGetPlatformConfig(const char* key)
   
   // Construct directory and filename of the config file
   csString dir, fname;
-  dir << home << PATH_SEPARATOR << "." CS_PACKAGE_NAME;
-  fname << dir << PATH_SEPARATOR << key << ".cfg";
+  dir << home << CS_PATH_SEPARATOR << "." CS_PACKAGE_NAME;
+  fname << dir << CS_PATH_SEPARATOR << key << ".cfg";
 
   // Try to create the directory (we assume that $HOME is already created)
   struct stat stats;

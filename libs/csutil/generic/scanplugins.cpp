@@ -17,7 +17,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#define CS_SYSDEF_PROVIDE_DIR
 #include "cssysdef.h"
 #include "csutil/csshlib.h"
 #include "csutil/sysfunc.h"
@@ -82,7 +81,7 @@ void InternalScanPluginDir (iStringArray*& messages,
         if (n >= 9 && strcasecmp(de->d_name + n - 9, ".csplugin") == 0)
         {
 	  csString scffilepath;
-	  scffilepath << dir << PATH_SEPARATOR << de->d_name;
+	  scffilepath << dir << CS_PATH_SEPARATOR << de->d_name;
 	  
 	  plugins->Push (scffilepath);
         }
@@ -95,7 +94,7 @@ void InternalScanPluginDir (iStringArray*& messages,
 	  iStringArray* subdirMessages = 0;
 	  
 	  csString scffilepath;
-	  scffilepath << dir << PATH_SEPARATOR << de->d_name;
+	  scffilepath << dir << CS_PATH_SEPARATOR << de->d_name;
 	
 	  InternalScanPluginDir (subdirMessages, scffilepath,
 	    plugins, recursive);

@@ -17,7 +17,7 @@
 */
 
 #if !defined(CSDEF_FRIEND)
-#error You are not allowed to include this file! Use cssysdef.h instead.
+#error You are not allowed to include this file! Include cssysdef.h instead.
 #endif
 
 #ifndef __CS_CSDEF_H__

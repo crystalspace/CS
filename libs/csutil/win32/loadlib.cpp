@@ -16,7 +16,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */	
 
-#define CS_SYSDEF_PROVIDE_HARDWARE_MMIO
 #include "cssysdef.h"
 #include "csutil/csshlib.h"
 #include "csutil/sysfunc.h"
@@ -355,10 +354,10 @@ void InternalScanPluginDir (iStringArray*& messages,
   csString filemask;
 
   // The directory sometimes has a trailing path separator attached.
-  if (!strlen(dir) || dir[strlen(dir)-1]==PATH_SEPARATOR)
+  if (!strlen(dir) || dir[strlen(dir)-1] == CS_PATH_SEPARATOR)
       filemask << dir  << "*.*";
   else
-      filemask << dir << PATH_SEPARATOR << "*.*";
+      filemask << dir << CS_PATH_SEPARATOR << "*.*";
 
   WIN32_FIND_DATA findData;
   HANDLE hSearch = FindFirstFile (filemask, &findData);
@@ -432,10 +431,10 @@ void InternalScanPluginDir (iStringArray*& messages,
       {
 	fullPath.Clear();
 	// The directory sometimes has a trailing path separator attached.
-	if (!strlen(dir) || dir[strlen(dir)-1]==PATH_SEPARATOR)
+	if (!strlen(dir) || dir[strlen(dir)-1] == CS_PATH_SEPARATOR)
 	  fullPath << dir << fileName;
 	else
-	  fullPath << dir << PATH_SEPARATOR << fileName;
+	  fullPath << dir << CS_PATH_SEPARATOR << fileName;
 
 	/*
 	  Check whether the DLL has a companion .csplugin.
@@ -476,7 +475,7 @@ void InternalScanPluginDir (iStringArray*& messages,
       csStringID id = dirIt.Next();
 
       fullPath.Clear();
-      fullPath << dir << PATH_SEPARATOR << dirs.Request (id);
+      fullPath << dir << CS_PATH_SEPARATOR << dirs.Request (id);
 
       iStringArray* subdirMessages = 0;
       InternalScanPluginDir (subdirMessages, fullPath, plugins,

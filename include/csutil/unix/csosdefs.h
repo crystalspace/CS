@@ -22,46 +22,32 @@
 
 #include <math.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/select.h>
+#include <sys/stat.h>
+#include <dirent.h>
 
-// filesystem settings
-#define CS_MAXPATHLEN	256
-#define PATH_SEPARATOR  '/'
-#define PATH_DELIMITER	':'
+#ifndef F_OK
+#  define F_OK 0
+#endif
+#ifndef R_OK
+#  define R_OK 2
+#endif
+#ifndef W_OK
+#  define W_OK 4
+#endif
+
+#define CS_HAS_POSIX_MMAP
+#define CS_USE_CUSTOM_ISDIR
+#define CS_MAXPATHLEN 256
+#define CS_PATH_DELIMITER ':'
+#define CS_PATH_SEPARATOR '/'
+
+#define CS_MKDIR(p) mkdir(p, 0755)
 
 #define CS_SOFTWARE_2D_DRIVER "crystalspace.graphics2d.x2d"
-
-#ifdef CS_SYSDEF_PROVIDE_HARDWARE_MMIO
-
-// Defines that this platform supports hardware memory-mapped i/o
-#define CS_HAS_MEMORY_MAPPED_IO 1
-
-// Unix specific memory mapped I/O platform dependent stuff
-struct mmioInfo
-{          
-    /// Handle to the mapped file 
-    int hMappedFile;
-
-    /// Base pointer to the data
-    unsigned char *data;
-    
-    /// File size
-    unsigned int file_size;
-
-    /// Close FD at unmapping
-    bool close;
-};
-
-#endif // memory-mapped I/O
-
-// The 2D graphics driver used by OpenGL renderer
-#define CS_OPENGL_2D_DRIVER "crystalspace.graphics2d.glx"
-
-// The sound driver
-#define CS_SOUND_DRIVER "crystalspace.sound.driver.oss"
-
-#if defined (CS_SYSDEF_PROVIDE_DIR)
-#  define __NEED_GENERIC_ISDIR
-#endif
+#define CS_OPENGL_2D_DRIVER   "crystalspace.graphics2d.glx"
+#define CS_SOUND_DRIVER       "crystalspace.sound.driver.oss"
 
 #if !defined(CS_STATIC_LINKED) && defined(CS_UNIX_PLUGIN_REQUIRES_MAIN)
 // Dummy main function required for plugin modules on some Unix platforms.

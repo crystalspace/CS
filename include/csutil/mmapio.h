@@ -130,7 +130,7 @@ private:
   /// Hash table for active blocks
   CacheBlock *cache[csmmioDefaultHashSize];
 
-  // Software specific mmioInfo struct, should only be defined for
+  // Software specific csMemMapInfo struct, should only be defined for
   // platforms w/o hardware mmio.
   struct emulatedMmioInfo 
   {          
@@ -146,7 +146,7 @@ private:
   
 #ifdef CS_HAS_MEMORY_MAPPED_IO
   /// Holds information specific to the platform for hardware paging.
-  mmioInfo platform;
+  csMemMapInfo platform;
   
   /// true if \c platform contains valid data.
   bool valid_platform;

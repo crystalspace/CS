@@ -6,25 +6,68 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Sep-2004
+	- Eric Sunshine renamed the following symbols in order to avoid
+	  global namespace pollution:
+	    mmioInfo                 --> csMemMapInfo
+	    MemoryMapFile()          --> csMemoryMapFile()
+	    MemoryMapWindow()        --> csMemoryMapWindow()
+	    UnMemoryMapFile()        --> csUnMemoryMapFile()
+	    MKDIR()                  --> CS_MKDIR()
+	    PATH_DELIMITER           --> CS_PATH_DELIMITER
+	    PATH_SEPARATOR           --> CS_PATH_SEPARATOR
+	    TEMP_DIR                 --> CS_TEMP_DIR
+	    TEMP_FILE                --> CS_TEMP_FILE
+	    __NEED_GENERIC_ISDIR     --> CS_USE_CUSTOM_ISDIR
+	    __NEED_OPENDIR_PROTOTYPE --> CS_WIN32_USE_CUSTOM_OPENDIR
+	- Eric Sunshine retired the following CS_SYSDEF_PROVIDE_FACILITY set of
+	  macros, which clients would #define before including cssysdef.h in
+	  order to alter the behavior of cssysdef.h. Removal of these macros
+	  eliminates the polymorphic behavior of cssysdef.h, thus helping to
+	  pave the way toward eventually pre-compiling Crystal Space's headers
+	  in order to reduce overall compilation time.
+	    CS_SYSDEF_PROVIDE_ACCESS
+	    CS_SYSDEF_PROVIDE_ALLOCA
+	    CS_SYSDEF_PROVIDE_CASE
+	    CS_SYSDEF_PROVIDE_DIR
+	    CS_SYSDEF_PROVIDE_EXPAND_PATH
+	    CS_SYSDEF_PROVIDE_GETCWD
+	    CS_SYSDEF_PROVIDE_GETOPT
+	    CS_SYSDEF_PROVIDE_MKDIR
+	    CS_SYSDEF_PROVIDE_PATH
+	    CS_SYSDEF_PROVIDE_SELECT
+	    CS_SYSDEF_PROVIDE_SOCKETS
+	    CS_SYSDEF_PROVIDE_SOFTWARE2D
+	    CS_SYSDEF_PROVIDE_TEMP
+	    CS_SYSDEF_PROVIDE_UNLINK
+	    CS_SYSDEF_VFS_PROVIDE_CHECK_VAR
+	- Eric Sunshine lifted the age-old restriction that cssysdef.h could be
+	  included only by source files (.cpp), and not by header files (.h).
+	  This restriction was an unfortunate side-effect of the polymorphic
+	  behavior of cssysdef.h in the presence of various
+	  CS_SYSDEF_PROVIDE_FACILITY macros. It is now safe, even recommended,
+	  to include cssysdef.h in header files. Doing so helps to make header
+	  files more self-contained, thus reducing the burden of clients of
+	  those headers.
 12-Sep-2004
 	- Jorrit fixed genmesh so it compiles with OR again.
 	- Jorrit did some more work on gmeshanim. Still unfinished.
 	- PK did the following:
-	    - fixed genmesh so that it really compiles with OR.
-	    - extended the iShaderVarContext with GetShaderVariables()
+	    - Fixed genmesh so that it really compiles with OR.
+	    - Extended the iShaderVarContext with GetShaderVariables()
 	      to get a all shadervariables.
-	    - extended the genmesh API with ->IsAutoNormals()
+	    - Extended the genmesh API with ->IsAutoNormals()
 	      to check if the normals were automatically calculated.
-	    - extended iMaterial with GetShaders() 
+	    - Extended iMaterial with GetShaders() 
 	      to get a list of all shaders that material uses.
-	    - extended the iShader API to allow the manual setting of a file.
-	    - changed the csloader so it sets the filename in the shader.
-	    - did a lot in the cssaver.cpp, mainly implementing the following:
-	        - bool SaveShaders(iDocumentNode *parent);
-	        - bool SaveSettings(iDocumentNode* node);
-	        - bool SaveRenderPriorities(iDocumentNode* node);
-	        - bool SaveVariables (iDocumentNode* node);
-	    - fixed some lines that were longer than 79.
+	    - Extended the iShader API to allow the manual setting of a file.
+	    - Changed the csloader so it sets the filename in the shader.
+	    - Did a lot in the cssaver.cpp, mainly implementing the following:
+	        bool SaveShaders(iDocumentNode*);
+	        bool SaveSettings(iDocumentNode*);
+	        bool SaveRenderPriorities(iDocumentNode*);
+	        bool SaveVariables (iDocumentNode*);
+	    - Fixed some lines that were longer than 79.
 11-Sep-2004
 	- Andrew Robberts updated sprcal3d to allow for transformations of
 	  a mesh attached to a socket.

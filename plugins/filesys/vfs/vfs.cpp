@@ -22,12 +22,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#define CS_SYSDEF_PROVIDE_DIR
-#define CS_SYSDEF_PROVIDE_ACCESS
-#define CS_SYSDEF_PROVIDE_MKDIR
-#define CS_SYSDEF_PROVIDE_UNLINK
-#define CS_SYSDEF_VFS_PROVIDE_CHECK_VAR
-#define CS_SYSDEF_PROVIDE_HARDWARE_MMIO 1
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
@@ -356,12 +350,12 @@ int csFile::GetStatus ()
 // ------------------------------------------------------------ DiskFile --- //
 
 #ifdef CS_HAS_MEMORY_MAPPED_IO
-bool MemoryMapFile(mmioInfo*, char const* filename);
-void UnMemoryMapFile(mmioInfo*);
+bool csMemoryMapFile(csMemMapInfo*, char const* filename);
+void csUnMemoryMapFile(csMemMapInfo*);
 
 class csMMapDataBuffer : public iDataBuffer
 {
-  mmioInfo mapping;
+  csMemMapInfo mapping;
   bool status;
 public:
   SCF_DECLARE_IBASE;
@@ -383,7 +377,7 @@ csMMapDataBuffer::csMMapDataBuffer (const char* filename)
 {
   SCF_CONSTRUCT_IBASE (0);
 
-  status = MemoryMapFile (&mapping, filename);
+  status = csMemoryMapFile (&mapping, filename);
   if (!status)
   {
     mapping.data = 0; 
@@ -395,7 +389,7 @@ csMMapDataBuffer::~csMMapDataBuffer ()
 {
   if (status)
   {
-    UnMemoryMapFile (&mapping);
+    csUnMemoryMapFile (&mapping);
   }
   SCF_DESTRUCT_IBASE();
 }
@@ -432,11 +426,11 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, size_t RIndex,
   memcpy (fName, rp, rpl);
   memcpy (fName + rpl, NameSuffix, nsl + 1);
 
-  // Convert all VFS_PATH_SEPARATOR's in filename into PATH_SEPARATOR's
+  // Convert all VFS_PATH_SEPARATOR's in filename into CS_PATH_SEPARATOR's
   size_t n;
   for (n = 0; n < nsl; n++)
     if (fName [rpl + n] == VFS_PATH_SEPARATOR)
-      fName [rpl + n] = PATH_SEPARATOR;
+      fName [rpl + n] = CS_PATH_SEPARATOR;
 
   writemode = (Mode & VFS_FILE_MODE) != VFS_FILE_READ;
 
@@ -536,10 +530,10 @@ void DiskFile::MakeDir (const char *PathBase, const char *PathSuffix)
   strcpy (path, PathBase);
   strcpy (cur, PathSuffix);
 
-  // Convert all VFS_PATH_SEPARATOR's in path into PATH_SEPARATOR's
+  // Convert all VFS_PATH_SEPARATOR's in path into CS_PATH_SEPARATOR's
   for (size_t n = 0; n < pl; n++)
     if (path [n] == VFS_PATH_SEPARATOR)
-      path [n] = PATH_SEPARATOR;
+      path [n] = CS_PATH_SEPARATOR;
 
   while (cur != prev)
   {
@@ -550,12 +544,12 @@ void DiskFile::MakeDir (const char *PathBase, const char *PathSuffix)
 #ifdef VFS_DEBUG
     printf ("VFS: Trying to create directory \"%s\"\n", path);
 #endif
-    MKDIR (path);
+    CS_MKDIR (path);
     *cur = oldchar;
     if (*cur)
       cur++;
 
-    while (*cur && (*cur != PATH_SEPARATOR))
+    while (*cur && (*cur != CS_PATH_SEPARATOR))
       cur++;
   }
   delete [] path;
@@ -1124,7 +1118,7 @@ const char *VfsNode::GetValue (csVFS *Parent, const char *VarName)
   static char path_separator [] = {VFS_PATH_SEPARATOR, 0};
   if (strcmp (VarName, path_separator) == 0)	// Path separator variable?
   {
-    static char path_sep [] = {PATH_SEPARATOR, 0};
+    static char path_sep [] = {CS_PATH_SEPARATOR, 0};
     return path_sep;
   }
 
@@ -1150,7 +1144,7 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
   {
     char *rpath = (char *)RPathV [i];
     size_t rpl = strlen (rpath);
-    if (rpath [rpl - 1] == PATH_SEPARATOR)
+    if (rpath [rpl - 1] == CS_PATH_SEPARATOR)
     {
       // rpath is a directory
       DIR *dh;
@@ -1166,8 +1160,8 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
        && (!((rpl == 3) && (tpath [1] == ':') && (tpath [2] == '\\')))
        // keep trailing backslash for drive letters
 #endif
-       && ((tpath [rpl - 1] == '/') || (tpath [rpl - 1] == PATH_SEPARATOR)))
-        tpath [rpl - 1] = 0;		// remove trailing PATH_SEPARATOR
+       && ((tpath [rpl - 1] == '/') || (tpath [rpl - 1] == CS_PATH_SEPARATOR)))
+        tpath [rpl - 1] = 0;		// remove trailing CS_PATH_SEPARATOR
 
       if ((dh = opendir (tpath)) == 0)
         continue;
@@ -1258,7 +1252,7 @@ iFile* VfsNode::Open (int Mode, const char *FileName)
   for (i = 0; i < RPathV.Length (); i++)
   {
     char *rpath = (char *)RPathV [i];
-    if (rpath [strlen (rpath) - 1] == PATH_SEPARATOR)
+    if (rpath [strlen (rpath) - 1] == CS_PATH_SEPARATOR)
     {
       // rpath is a directory
       f = new DiskFile (Mode, this, i, FileName);
@@ -1310,7 +1304,7 @@ bool VfsNode::FindFile (const char *Suffix, char *RealPath,
   for (i = 0; i < RPathV.Length (); i++)
   {
     char *rpath = (char *)RPathV [i];
-    if (rpath [strlen (rpath) - 1] == PATH_SEPARATOR)
+    if (rpath [strlen (rpath) - 1] == CS_PATH_SEPARATOR)
     {
       // rpath is a directory
       size_t rl = strlen (rpath);
@@ -1496,8 +1490,8 @@ csVFS::~csVFS ()
 
 static void add_final_delimiter(csString& s)
 {
-  if (!s.IsEmpty() && s[s.Length() - 1] != PATH_SEPARATOR)
-    s << PATH_SEPARATOR;
+  if (!s.IsEmpty() && s[s.Length() - 1] != CS_PATH_SEPARATOR)
+    s << CS_PATH_SEPARATOR;
 }
 
 static char* alloc_normalized_path(char const* s)

@@ -20,10 +20,7 @@
 #include <stdarg.h>
 #include <string.h>
 
-#define CS_SYSDEF_PROVIDE_GETCWD
-#define CS_SYSDEF_PROVIDE_EXPAND_PATH
 #include "cssysdef.h"
-
 #include "csutil/csunicode.h"
 #include "csutil/csuctransform.h"
 #include "csutil/util.h"
@@ -113,14 +110,14 @@ wchar_t* csStrNewW (const char *s)
 
 #if defined (CS_PLATFORM_DOS)
   #define IS_PATH_SEPARATOR(c)	\
-    (((c) == PATH_SEPARATOR) || ((c) == '/') || ((c) == ':'))
+    (((c) == CS_PATH_SEPARATOR) || ((c) == '/') || ((c) == ':'))
 #else
   #define IS_PATH_SEPARATOR(c)	\
-    (((c) == PATH_SEPARATOR) || ((c) == '/'))
+    (((c) == CS_PATH_SEPARATOR) || ((c) == '/'))
 #endif
 
 #ifndef CS_PROVIDES_EXPAND_PATH
-// generic csExpandName for all platforms
+// Generic csExpandName for all platforms.
 
 #ifdef CS_COMPILER_BCC
 static int __getcwd (char drive, char *buffer, int buffersize) {
@@ -168,7 +165,7 @@ char *csExpandName (const char *iName)
       getcwd (outname, sizeof (outname));
       outp = strlen (outname);
       if (strcmp (tmp, "."))
-        outname [outp++] = PATH_SEPARATOR;
+        outname [outp++] = CS_PATH_SEPARATOR;
     } /* endif */
 
 #if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
@@ -186,7 +183,7 @@ char *csExpandName (const char *iName)
     {
       while ((outp > 0)
           && ((outname [outp - 1] == '/')
-           || (outname [outp - 1] == PATH_SEPARATOR)
+           || (outname [outp - 1] == CS_PATH_SEPARATOR)
 #if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
            || (outname [outp - 1] == ':')
 #endif
@@ -195,7 +192,7 @@ char *csExpandName (const char *iName)
         outp--;
       while ((outp > 0)
           && (outname [outp - 1] != '/')
-          && (outname [outp - 1] != PATH_SEPARATOR)
+          && (outname [outp - 1] != CS_PATH_SEPARATOR)
 #if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
           && (outname [outp - 1] != ':')
 #endif
@@ -222,20 +219,20 @@ char *csExpandName (const char *iName)
         if ((inp == 1)
          && (iName [inp] == ':'))
           if ((iName [inp + 1] == '/')
-           || (iName [inp + 1] == PATH_SEPARATOR))
+           || (iName [inp + 1] == CS_PATH_SEPARATOR))
             outname [outp++] = ':';
           else
             outp += __getcwd (iName [inp - 1], outname + outp - 1,
 	      sizeof (outname) - outp + 1) - 1;
         if ((outname [outp - 1] != '/')
-         && (outname [outp - 1] != PATH_SEPARATOR))
+         && (outname [outp - 1] != CS_PATH_SEPARATOR))
 #endif
-        outname [outp++] = PATH_SEPARATOR;
+        outname [outp++] = CS_PATH_SEPARATOR;
       }
     } /* endif */
     while ((inp < namelen)
         && ((iName [inp] == '/')
-         || (iName [inp] == PATH_SEPARATOR)
+         || (iName [inp] == CS_PATH_SEPARATOR)
 #if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
          || (iName [inp] == ':')
 #endif

@@ -20,7 +20,6 @@
 
 #include <stdarg.h>
 
-#define CS_SYSDEF_PROVIDE_SOFTWARE2D
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "csutil/csuctransform.h"

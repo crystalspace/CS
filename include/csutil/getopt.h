@@ -20,14 +20,18 @@
 #ifndef __CS_GETOPT_H__
 #define __CS_GETOPT_H__
 
+#ifndef __STDC__
+#  define __STDC__ 1
+#endif
+
 #include "csextern.h"
 
 /**\file
  * Declarations for getopt
  */
 
-#if defined(__NeXT__) || defined(__APPLE__)
-// NeXT already has a valid getopt; avoid link errors.
+#if defined(CS_PLATFORM_MACOSX)
+// MacOS/X already has a valid getopt; avoid link errors.
 #define getopt __getopt
 #define optarg __optarg
 #define opterr __opterr

@@ -18,7 +18,6 @@
 
 #include <stdarg.h>
 
-#define CS_SYSDEF_PROVIDE_SOFTWARE2D
 #include "cssysdef.h"
 #include "soft_g3d.h"
 #include "iutil/plugin.h"

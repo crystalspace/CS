@@ -17,61 +17,26 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifdef __CS_CSSYSDEFS_H__
-#error Do not include cssysdef.h from header files please!
-#else
-#define __CS_CSSYSDEFS_H__
+#ifndef __CS_CSSYSDEF_H__
+#define __CS_CSSYSDEF_H__
 
 #define CSDEF_FRIEND
 #include "csdef.h"
 #undef CSDEF_FRIEND
 
 /** \file
-
-    This include file should be included from every source file.
-    Just before #include directive it can contain several #define's
-    that specify what the source file requires.
-
-    The following variables can be defined:
-
-    #define CS_SYSDEF_PROVIDE_MKDIR
-      Include definition for MKDIR()
-
-    #define CS_SYSDEF_PROVIDE_GETCWD
-      Include definition for getcwd()
-
-    #define CS_SYSDEF_PROVIDE_TEMP
-      Include definitions for TEMP_DIR and TEMP_FILE.
-
-    #define CS_SYSDEF_PROVIDE_DIR
-      Include definitions required for opendir(), readdir(), closedir()
-      and isdir().
- 
-    #define CS_SYSDEF_PROVIDE_UNLINK
-      Include definitions required for unlink()
-
-    #define CS_SYSDEF_PROVIDE_ACCESS
-      Include definitions required for access()
-
-    #define CS_SYSDEF_PROVIDE_GETOPT
-      For getopt() and GNU getopt_long()
-
-    #define CS_SYSDEF_PROVIDE_SELECT
-      Includes definitions required for select(), FD_* macros, and
-      struct timeval.
-
-    The system-dependent include files can undefine some or all
-    CS_SYSDEF_PROVIDE_xxx macros to avoid further definitions in this file.
-    For example, if a system-dependent file defines everything needed for
-    CS_SYSDEF_PROVIDE_GETOPT it should #undefine CS_SYSDEF_PROVIDE_GETOPT to
-    avoid including util/gnu/getopt.h at the bottom of this file.
+  This file should be #included before any other Crystal Space header files. It
+  sets up a compilation environment which smooths over differences between
+  platforms, allowing the same code to compile cleanly over a variety of
+  operating systems and build tools. It also provides a number of utility
+  macros useful to projects utilizing Crystal Space and to the Crystal Space
+  code itself.
 */
 
 /*
  * Pull in platform-specific overrides of the requested functionality.
  */
 #include "csutil/csosdefs.h"
-
 #include "csextern.h"
 
 /*
@@ -95,122 +60,73 @@
       type *var = (type *)alloca ((size) * sizeof (type))
 #endif
 
-/**\def TEMP_DIR
+/**\def CS_TEMP_DIR
  * Directory for temporary files
  */
-#ifdef CS_SYSDEF_PROVIDE_TEMP
-#  ifndef TEMP_DIR
-#    if defined(CS_PLATFORM_UNIX)
-#      define TEMP_DIR "/tmp/"
-#    else
-#      define TEMP_DIR ""
-#    endif
+#ifndef CS_TEMP_DIR
+#  if defined(CS_PLATFORM_UNIX)
+#    define CS_TEMP_DIR "/tmp/"
+#  else
+#    define CS_TEMP_DIR ""
 #  endif
-#  ifndef TEMP_FILE
-#    if defined(CS_PLATFORM_UNIX)
-#      include <unistd.h>
-/// Name for temporary file
-#      define TEMP_FILE "cs%lud.tmp", (unsigned long)getpid()
-#    else
-/// Name for temporary file
-#      define TEMP_FILE "$cs$.tmp"
-#    endif
-#  endif
-#endif // CS_SYSDEF_PROVIDE_TEMP
+#endif
 
-/**\def MKDIR(path)
- * How to make a directory (not entire path, only the last on the path)
+/**\def CS_TEMP_FILE
+ * Name for temporary files
  */
-#ifdef CS_SYSDEF_PROVIDE_MKDIR
-#  ifndef MKDIR
-#    if defined(CS_PLATFORM_WIN32) || (defined(CS_PLATFORM_DOS) && !defined(CS_COMPILER_GCC))
-#      define MKDIR(path) _mkdir (path)
-#    else
-#      define MKDIR(path) mkdir (path, 0755)
-#    endif
-#  endif
-#endif // CS_SYSDEF_PROVIDE_MKDIR
-
-#ifdef CS_SYSDEF_PROVIDE_GETCWD
-#  if !defined(CS_COMPILER_MSVC) && !defined(CS_COMPILER_BCC)
-#    include <unistd.h>
-#  endif
-#endif // CS_SYSDEF_PROVIDE_GETCWD
-
-#ifdef CS_SYSDEF_PROVIDE_DIR
-// For systems without opendir()
-// Although CS_COMPILER_GCC has opendir, readdir, CS' versions are preferred.
-# if defined(__NEED_OPENDIR_PROTOTYPE)
-     struct DIR;
-     struct dirent;
-     extern "C" CS_CSUTIL_EXPORT DIR *opendir (const char *name);
-     extern "C" CS_CSUTIL_EXPORT dirent *readdir (DIR *dirp);
-     extern "C" CS_CSUTIL_EXPORT int closedir (DIR *dirp);
-     //extern "C" void seekdir (DIR *dirp, long off);
-     //extern "C" long telldir (DIR *dirp);
-     //extern "C" void rewinddir (DIR *dirp);
-# endif
-// Generic ISDIR where needed
-#  ifdef __NEED_GENERIC_ISDIR
-#    if defined (CS_PLATFORM_WIN32) || defined (CS_PLATFORM_DOS)
-#      include <io.h>
-#    endif
-#    include <sys/types.h>
-#    if !defined(CS_PLATFORM_WIN32)
-#      include <dirent.h>
-#    endif
-#    include <sys/stat.h>
-     static inline bool isdir (const char *path, struct dirent *de)
-     {
-       int pathlen = strlen (path);
-       CS_ALLOC_STACK_ARRAY(char, fullname, pathlen + 2 + strlen (de->d_name));
-       memcpy (fullname, path, pathlen + 1);
-       
-       if ((pathlen) && (fullname[pathlen-1] != PATH_SEPARATOR))
-       {
-	 fullname[pathlen++] = PATH_SEPARATOR;
-	 fullname[pathlen] = 0;
-       }
-              
-       strcat (&fullname [pathlen], de->d_name);
-       struct stat st;
-       stat (fullname, &st);
-       return ((st.st_mode & S_IFMT) == S_IFDIR);
-     }
-#  endif
-#endif // CS_SYSDEF_PROVIDE_DIR
-
-#ifdef CS_SYSDEF_PROVIDE_UNLINK
-#  if !defined(CS_COMPILER_MSVC) && !defined(CS_COMPILER_BCC)
-#    include <unistd.h>
+#ifndef CS_TEMP_FILE
+#  if defined(CS_PLATFORM_UNIX)
+#    define CS_TEMP_FILE "cs%lud.tmp", (unsigned long)getpid()
+#  else
+#    define CS_TEMP_FILE "$cs$.tmp"
 #  endif
 #endif
 
-#ifdef CS_SYSDEF_PROVIDE_ACCESS
-#  if !defined(CS_COMPILER_MSVC) && !defined(CS_COMPILER_BCC)
-#    include <unistd.h>
-#  endif
-#  ifndef F_OK
-#    define F_OK 0
-#  endif
-#  ifndef R_OK
-#    define R_OK 2
-#  endif
-#  ifndef W_OK
-#    define W_OK 4
-#  endif
+#ifdef CS_USE_CUSTOM_ISDIR
+static inline bool isdir (const char *path, struct dirent *de)
+{
+  int pathlen = strlen (path);
+  CS_ALLOC_STACK_ARRAY(char, fullname, pathlen + 2 + strlen (de->d_name));
+  memcpy (fullname, path, pathlen + 1);
+  if ((pathlen) && (fullname[pathlen-1] != CS_PATH_SEPARATOR))
+  {
+    fullname[pathlen++] = CS_PATH_SEPARATOR;
+    fullname[pathlen] = 0;
+  }
+  strcat (&fullname [pathlen], de->d_name);
+  struct stat st;
+  stat (fullname, &st);
+  return ((st.st_mode & S_IFMT) == S_IFDIR);
+}
 #endif
 
-#ifdef CS_SYSDEF_PROVIDE_GETOPT
-#  ifndef __STDC__
-#    define __STDC__ 1
-#  endif
-#  include "csutil/getopt.h"
+/**\def CS_HAS_POSIX_MMAP
+ * Platforms which support POSIX mmap() should #define CS_HAS_POSIX_MMAP. This
+ * can be done via the platform-specific csosdef.h or via the configure script.
+ * Doing so will declare a POSIX mmap()-suitable csMemMapInfo structure. The
+ * build process on such platforms must also arrange to have
+ * CS/libs/csutil/generic/mmap.cpp incorporated into the csutil library.
+ */
+#ifdef CS_HAS_POSIX_MMAP
+
+#ifndef CS_HAS_MEMORY_MAPPED_IO
+#define CS_HAS_MEMORY_MAPPED_IO
 #endif
 
-#ifdef CS_SYSDEF_PROVIDE_SELECT
-#  include <sys/select.h>
-#endif
+/// POSIX-specific memory mapped I/O platform dependent structure.
+struct csMemMapInfo
+{          
+  /// Handle to the mapped file.
+  int hMappedFile;
+  /// Base pointer to the data.
+  unsigned char *data;
+  /// File size.
+  unsigned int file_size;
+  /// Close file descriptor (handle) when unmapping.
+  bool close;
+};
+
+#endif // CS_HAS_POSIX_MMAP
 
 /**
  * The CS_HEADER_GLOBAL() macro composes a pathname from two components and
@@ -746,4 +662,4 @@ extern void* operator new[] (size_t s, void* filename, int line);
 /// Fatal exit routine (which can be replaced if neccessary)
 extern void (*fatal_exit) (int errorcode, bool canreturn);
 
-#endif // __CS_CSSYSDEFS_H__
+#endif // __CS_CSSYSDEF_H__

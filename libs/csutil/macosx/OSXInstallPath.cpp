@@ -38,15 +38,15 @@ csString csGetConfigPath()
   char buff[FILENAME_MAX];
   char* env;
 
-  if (OSXGetInstallPath(buff, FILENAME_MAX, PATH_SEPARATOR))
+  if (OSXGetInstallPath(buff, FILENAME_MAX, CS_PATH_SEPARATOR))
     path = buff;
   else if ((env = getenv("CRYSTAL")) != 0 && *env != '\0')
     path = env;
 
   if (path.IsEmpty())
-    path << "." << PATH_SEPARATOR;
-  else if (path[path.Length() - 1] != PATH_SEPARATOR)
-    path << PATH_SEPARATOR;
+    path << "." << CS_PATH_SEPARATOR;
+  else if (path[path.Length() - 1] != CS_PATH_SEPARATOR)
+    path << CS_PATH_SEPARATOR;
 
   return path;
 }

@@ -35,29 +35,29 @@ csPluginPaths* csGetPluginPaths (const char* argv0)
   csString configPath = csGetConfigPath ();
   
   // Don't add "/" since it won't work on Windows.
-  if (!resPath.IsEmpty() && resPath != PATH_SEPARATOR)
+  if (!resPath.IsEmpty() && resPath != CS_PATH_SEPARATOR)
     paths->AddOnce (resPath, DO_SCAN_RECURSION, "app");
-  if (!appPath.IsEmpty() && appPath != PATH_SEPARATOR)
+  if (!appPath.IsEmpty() && appPath != CS_PATH_SEPARATOR)
     paths->AddOnce (appPath, DO_SCAN_RECURSION, "app");
 
   if (!configPath.IsEmpty())
   {
     csString tmp;
-    tmp << configPath << PATH_SEPARATOR << "lib";
+    tmp << configPath << CS_PATH_SEPARATOR << "lib";
     paths->AddOnce (tmp, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
 
     tmp.Clear();
-    tmp << configPath << PATH_SEPARATOR << "lib" << PATH_SEPARATOR
+    tmp << configPath << CS_PATH_SEPARATOR << "lib" << CS_PATH_SEPARATOR
 	<< CS_PACKAGE_NAME;
     paths->AddOnce (tmp, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
 
     tmp.Clear();
-    tmp << configPath << PATH_SEPARATOR << CS_PACKAGE_NAME << PATH_SEPARATOR
-	<< "lib";
+    tmp << configPath << CS_PATH_SEPARATOR << CS_PACKAGE_NAME
+	<< CS_PATH_SEPARATOR << "lib";
     paths->AddOnce (tmp, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
 
     tmp.Clear();
-    tmp << configPath << PATH_SEPARATOR << CS_PACKAGE_NAME;
+    tmp << configPath << CS_PATH_SEPARATOR << CS_PACKAGE_NAME;
     paths->AddOnce (tmp, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
 
     paths->AddOnce (configPath, false, CS_PACKAGE_NAME);
