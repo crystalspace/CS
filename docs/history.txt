@@ -1,6 +1,22 @@
 The history order has been reversed so that new features are at the top.
 
+25-Feb-2001
+	- Added csVertexArrayPool, csPooledVertexArrayPool, and
+	  csDefaultVertexArrayPool. These will be used for pooled
+	  vertex arrays.
+23-Feb-2001
+	- Started work on a big change to the way that things control movement. The
+	  CS_ENTITY_MOVEABLE flag is gone. Instead there are now three
+	  options. But they don't work yet.
+	- Added csThing::SetMovingOption()/GetMovingOption().
+	- Added csThing::WorUpdate().
 22-Feb-2001
+	- Martin Geisse added iConfigManager::SetDynamicDomain().
+	- Wouter Wijngaards made clouds blow across the sky by a
+	  configurable wind (direction/speed) when animated in demosky.
+	- Robert Bate updated the Macintosh port.
+	- Robert started work to Carbonize the Mac port.
+	- Robert added CSPro6 compatibility to the Mac port.
 	- Philip Wyett removed: 'System.Win32.DebugConsole = yes/no'
 	  from system.cfg and re-coded 'SetSystemDefaults' so if you do a
 	  debug build you get the debug console windows and if you do a
