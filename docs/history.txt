@@ -31,6 +31,11 @@ chronological order.
 	  SCF_REGISTER_STATIC_LIBRARY() and SCF_REGISTER_STATIC_CLASS() are
 	  invoked. (This problem was supposed to have been addressed on
 	  17-Jan-2005 but the original problem report was mis-read.)
+	- Eric Sunshine upgraded the Swig check in configure.ac so that it
+	  demands a slightly more recent version in order to work around
+	  Swig/Java bug where it generates incompatible return types for
+	  methods between base classes and subclasses. (For instance,
+	  `SWIGTYPE_void iFoo::Bar()' and `SWIGTYPE_p_void csFoo::Bar()'.)
 1-Feb-2005
 	- Jorrit reverted a bug fix in engine->GetNearbyObjects() and
 	  GetNearbyMeshes() that was done on 15-Jan. The problem is that this
