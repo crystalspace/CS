@@ -1,5 +1,14 @@
 The history order has been reversed so that new features are at the top.
 
+20-Mar-2001:
+	- Philip Wyett altered his email address in the docs.
+	- Wouter Wijngaards added the following methods to explosion
+	  particlesystem: GetNumberParticles, GetCenter, GetPush,
+	  GetNrSides, GetPartRadius, GetLighting, GetSpreadPos,
+	  GetSpreadSpeed, GetSpreadAcceleration and GetFadeSprites.
+	- Wouter also added a method GetColor() to iParticleState, to get
+	  the particle color.
+	- Wouter added the ExplosionSaver and ExplosionFactorySaver PlugIns.
 18-Mar-2001
 	- Fixed skydomes so that they need to be in the same part. Without
 	  this fix the circle command could only correctly be specified in the
