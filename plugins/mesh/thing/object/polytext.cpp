@@ -32,7 +32,6 @@
 #include "iengine/material.h"
 #include "iengine/shadows.h"
 #include "iengine/dynlight.h"
-#include "csutil/bitset.h"
 #include "csutil/debug.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
