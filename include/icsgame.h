@@ -646,6 +646,11 @@ struct iDataLoader : public iBase
   virtual void CloseContext() = 0;
 
   /**
+   * return the data of the current context
+   */
+  virtual const char* GetCurrentContextData() = 0;
+
+  /**
    * Gets the name of the first context in the current context, or NULL 
    * if there is no Context at all
    */
@@ -658,25 +663,30 @@ struct iDataLoader : public iBase
   virtual const char* GetNextContext(geMAPITERATOR& iter) = 0;
 
   /**
-   * Gets the name and value of the first element in the current context, 
-   * or NULL if there is no element at all
+   * Gets the name and value of the first attribute in the current context, 
+   * or NULL if there are no attributes at all
    */
-  virtual bool GetFirstElement(geMAPITERATOR& iter,
-                               const char*& Key, 
-                               const char*& Value) = 0;
+  virtual bool GetFirstAttribute(geMAPITERATOR& iter,
+                                 const char*& Key, 
+                                 const char*& Value) = 0;
 
   /**
-   * Gets the name and value of the next element in the current context, 
-   * or NULL if there is no further element.
+   * Gets the name and value of the next attribute in the current context, 
+   * or NULL if there are no further attributes.
    */
-  virtual bool GetNextElement(geMAPITERATOR& iter,
-                              const char*& Key, 
-                              const char*& Value) = 0;
+  virtual bool GetNextAttribute(geMAPITERATOR& iter,
+                                const char*& Key, 
+                                const char*& Value) = 0;
 
   /**
    * Gets the value of the Element with the given name
    */
-  virtual const char* GetElement(const char* Key) = 0;
+  virtual const char* GetAttributeData(const char* Key) = 0;
+
+  /**
+   * Gets the value of the Context with the given name
+   */
+  virtual const char* GetContextData(const char* Context) = 0;
 };
 
 //---------------------------------------------------------------------------
