@@ -23,7 +23,6 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "csgeom/transfrm.h"
-#include "av3dtxt.h"
 
 class awsScreenCanvas : public iAwsCanvas
 {
