@@ -45,6 +45,9 @@ chronological order.
 	- Jorrit fixed null3d renderer to the Prepare changes that were
 	  done yesterday. I forgot to remember that the texture was already
 	  prepared which could have bad consequences.
+	- Eric Sunshine fixed bug in csArray::DeleteRange() where it failed to
+	  destroy (invoke the destructor of) the last object in the range.
+	  Reported by Bedrich Zaba <frogbride@seznam.cz>.
 27-Jul-2004
 	- Peter Amstutz added the wxgl canvas (initially developed by
 	  Daniel Fryer) which makes it fairly easy to embed Crystal Space

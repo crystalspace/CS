@@ -874,12 +874,12 @@ public:
     if (start >= count) return;
     if (end < 0) return;
     if (start < 0) start = 0;
-    if (end >= count) end = count-1;
+    if (end >= count) end = count - 1;
     size_t i;
-    for (i = start ; i < end ; i++)
+    for (i = start ; i <= end ; i++)
       ElementHandler::Destroy (root + i);
 
-    size_t const range_size = end-start+1;
+    size_t const range_size = end - start + 1;
     size_t const ncount = count - range_size;
     size_t const nmove = count - end - 1;
     if (nmove > 0)
