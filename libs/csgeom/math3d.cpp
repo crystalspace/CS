@@ -141,7 +141,8 @@ int csMatrix3::Eigen (csMatrix3* vout, csVector3* dout)
   int nrot;
 
   csMatrix3 v;
-  csVector3 b,z,d;
+  csVector3 b,d;
+  csVector3 z (0, 0, 0);
 
   // Load b and d with the diagonals of a.
   b.x = d.x = m11;
