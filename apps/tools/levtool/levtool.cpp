@@ -462,6 +462,104 @@ void ltThing::CreateVertexInfo ()
   }
 }
 
+void ltThing::PaintConnectedPolygons (ltPolygon* sweep, int obj_number)
+{
+  if (sweep->GetObjectNumber () != -1)
+  {
+    CS_ASSERT (sweep->GetObjectNumber () == obj_number);
+    return;
+  }
+  sweep->SetObjectNumber (obj_number);
+  int i;
+  for (i = 0 ; i < sweep->GetVertexCount () ; i++)
+  {
+    int vtidx = sweep->GetVertex (i);
+    ltVertex& vt = GetVertex (vtidx);
+    if (vt.GetObjectNumber () == -1)
+    {
+      vt.SetObjectNumber (obj_number);
+    }
+    CS_ASSERT (vt.GetObjectNumber () == obj_number);
+    int j;
+    for (j = 0 ; j < vt.GetPolygonCount () ; j++)
+    {
+      int ptidx = vt.GetPolygon (j);
+      ltPolygon* p = GetPolygon (ptidx);
+      PaintConnectedPolygons (p, obj_number);
+    }
+  }
+}
+
+void ltThing::SplitThingSeperateUnits ()
+{
+  max_obj_number = -1;
+  int i;
+  for (i = 0 ; i < num_polygons ; i++)
+  {
+    ltPolygon* p = polygons[i];
+    p->SetObjectNumber (-1);
+  }
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    vertices[i]->SetObjectNumber (-1);
+  }
+
+  while (true)
+  {
+    ltPolygon* sweep = NULL;
+    for (i = 0 ; i < num_polygons ; i++)
+    {
+      ltPolygon* p = polygons[i];
+      if (p->GetObjectNumber () == -1)
+      {
+        sweep = p;
+        break;
+      }
+    }
+    if (!sweep) break;
+    max_obj_number++;
+    PaintConnectedPolygons (sweep, max_obj_number);
+  }
+  printf ("Found %d sub-objects\n", max_obj_number); fflush (stdout);
+}
+
+void ltThing::DoNotSplitThingSeperateUnits ()
+{
+  max_obj_number = 0;
+  int i;
+  for (i = 0 ; i < num_polygons ; i++)
+  {
+    ltPolygon* p = polygons[i];
+    p->SetObjectNumber (0);
+  }
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    vertices[i]->SetObjectNumber (0);
+  }
+}
+
+int* ltThing::CreateUnitMapping (int obj_number)
+{
+  int* map = new int [num_vertices];
+  int new_i = 0;
+  int i;
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    ltVertex* vt = vertices[i];
+    if (vt->GetObjectNumber () == obj_number)
+    {
+      map[i] = new_i;
+      new_i++;
+    }
+    else
+    {
+      map[i] = -1;
+    }
+  }
+
+  return map;
+}
+
 //-----------------------------------------------------------------------------
 
 bool LevTool::TestValidXML (iDocument* doc)
@@ -626,14 +724,94 @@ void LevTool::FindAllThings (iDocument* doc)
   }
 }
 
-void LevTool::WriteOutThing (iDocumentNode* params_node, ltThing* th)
+void LevTool::WriteOutPolygon (iDocumentNode* poly_node, ltPolygon* p,
+	int* mapping)
 {
-  csRef<iDocumentNodeIterator> it = th->GetPartNode ()->GetNodes ();
+  csRef<iDocumentNodeIterator> it = p->GetNode ()->GetNodes ();
+  bool write_vertices = true;
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
     const char* value = child->GetValue ();
-    if (child->GetType () == CS_NODE_ELEMENT && !strcmp (value, "part"))
+    if (child->GetType () == CS_NODE_ELEMENT && !strcmp (value, "v"))
+    {
+      if (write_vertices)
+      {
+        write_vertices = false;
+	int i;
+	for (i = 0 ; i < p->GetVertexCount () ; i++)
+	{
+	  csRef<iDocumentNode> newchild = poly_node->CreateNodeBefore (
+	    CS_NODE_ELEMENT);
+	  newchild->SetValue ("v");
+	  csRef<iDocumentNode> text = newchild->CreateNodeBefore (
+	    CS_NODE_TEXT);
+	  int newvtidx = mapping[p->GetVertex (i)];
+	  CS_ASSERT (newvtidx != -1);
+	  text->SetValueAsInt (newvtidx);
+	}
+      }
+    }
+    else
+    {
+      csRef<iDocumentNode> newchild = poly_node->CreateNodeBefore (
+        CS_NODE_ELEMENT);
+      CloneNode (child, newchild);
+    }
+  }
+}
+
+void LevTool::WriteOutThing (iDocumentNode* params_node, ltThing* th,
+	int obj_number)
+{
+  int* mapping = th->CreateUnitMapping (obj_number);
+  csRef<iDocumentNodeIterator> it = th->GetPartNode ()->GetNodes ();
+  bool write_vertices = true;
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    const char* value = child->GetValue ();
+    if (child->GetType () == CS_NODE_ELEMENT && !strcmp (value, "v"))
+    {
+      if (write_vertices)
+      {
+        write_vertices = false;
+	int i;
+	for (i = 0 ; i < th->GetVertexCount () ; i++)
+	{
+	  const ltVertex& vt = th->GetVertex (i);
+	  if (vt.GetObjectNumber () == obj_number)
+	  {
+	    csRef<iDocumentNode> newchild = params_node->CreateNodeBefore (
+	      CS_NODE_ELEMENT);
+	    newchild->SetValue ("v");
+	    newchild->SetAttributeAsFloat ("x", vt.x);
+	    newchild->SetAttributeAsFloat ("y", vt.y);
+	    newchild->SetAttributeAsFloat ("z", vt.z);
+	  }
+	}
+      }
+    }
+    else if (child->GetType () == CS_NODE_ELEMENT && !strcmp (value, "p"))
+    {
+      int i;
+      for (i = 0 ; i < th->GetPolygonCount () ; i++)
+      {
+        ltPolygon* p = th->GetPolygon (i);
+	if (p->GetObjectNumber () == obj_number
+		&& p->GetNode ()->Equals (child))
+	{
+	  csRef<iDocumentNode> newchild = params_node->CreateNodeBefore (
+	    CS_NODE_ELEMENT);
+	  newchild->SetValue ("p");
+	  if (p->GetName ())
+	    newchild->SetAttribute ("name", p->GetName ());
+	  WriteOutPolygon (newchild, p, mapping);
+	  break;
+	}
+      }
+    }
+    else if (child->GetType () == CS_NODE_ELEMENT && !strcmp (value, "part"))
     {
     }
     else if (child->GetType () == CS_NODE_ELEMENT && !strcmp (value,
@@ -647,6 +825,7 @@ void LevTool::WriteOutThing (iDocumentNode* params_node, ltThing* th)
       CloneNode (child, newchild);
     }
   }
+  delete[] mapping;
 }
 
 void LevTool::SplitThing (iDocumentNode* meshnode, iDocumentNode* parentnode)
@@ -659,44 +838,57 @@ void LevTool::SplitThing (iDocumentNode* meshnode, iDocumentNode* parentnode)
     {
       if (th->GetPolygonCount () == 0) continue;
 
-      csRef<iDocumentNode> newmesh = parentnode->CreateNodeBefore (
-        CS_NODE_ELEMENT);
-      newmesh->SetValue (meshnode->GetValue ());
-      csRef<iDocumentAttributeIterator> atit = meshnode->GetAttributes ();
-      while (atit->HasNext ())
+      int j;
+      for (j = 0 ; j <= th->GetMaxObjectNumber () ; j++)
       {
-	csRef<iDocumentAttribute> attr = atit->Next ();
-	newmesh->SetAttribute (attr->GetName (), attr->GetValue ());
-      }
-      newmesh->SetAttribute ("name", th->GetName ());
-
-      csRef<iDocumentNodeIterator> it = meshnode->GetNodes ();
-      while (it->HasNext ())
-      {
-        csRef<iDocumentNode> child = it->Next ();
-        const char* value = child->GetValue ();
-        if (child->GetType () == CS_NODE_ELEMENT &&
-    	    (!strcmp (value, "params")))
+        csRef<iDocumentNode> newmesh = parentnode->CreateNodeBefore (
+          CS_NODE_ELEMENT);
+        newmesh->SetValue (meshnode->GetValue ());
+        csRef<iDocumentAttributeIterator> atit = meshnode->GetAttributes ();
+        while (atit->HasNext ())
         {
-	  csRef<iDocumentNode> params_clone = newmesh->CreateNodeBefore (
-	    child->GetType ());
-	  params_clone->SetValue ("params");
-	  WriteOutThing (params_clone, th);
-	}
-        else if (child->GetType () == CS_NODE_ELEMENT &&
-    	    (!strcmp (value, "zfill")))
+	  csRef<iDocumentAttribute> attr = atit->Next ();
+	  newmesh->SetAttribute (attr->GetName (), attr->GetValue ());
+        }
+	if (j == 0)
 	{
-	  csRef<iDocumentNode> child_clone = newmesh->CreateNodeBefore (
-	    child->GetType ());
-	  CloneNode (child, child_clone);
-	  child_clone->SetValue ("zuse");
+          newmesh->SetAttribute ("name", th->GetName ());
 	}
 	else
 	{
-	  csRef<iDocumentNode> child_clone = newmesh->CreateNodeBefore (
-	    child->GetType ());
-	  CloneNode (child, child_clone);
+	  char newname[512];
+	  sprintf (newname, "%s_%d", th->GetName (), j);
+          newmesh->SetAttribute ("name", newname);
 	}
+
+        csRef<iDocumentNodeIterator> it = meshnode->GetNodes ();
+        while (it->HasNext ())
+        {
+          csRef<iDocumentNode> child = it->Next ();
+          const char* value = child->GetValue ();
+          if (child->GetType () == CS_NODE_ELEMENT &&
+    	      (!strcmp (value, "params")))
+          {
+	    csRef<iDocumentNode> params_clone = newmesh->CreateNodeBefore (
+	      child->GetType ());
+	    params_clone->SetValue ("params");
+	    WriteOutThing (params_clone, th, j);
+	  }
+          else if (child->GetType () == CS_NODE_ELEMENT &&
+    	      (!strcmp (value, "zfill")))
+	  {
+	    csRef<iDocumentNode> child_clone = newmesh->CreateNodeBefore (
+	      child->GetType ());
+	    CloneNode (child, child_clone);
+	    child_clone->SetValue ("zuse");
+	  }
+	  else
+	  {
+	    csRef<iDocumentNode> child_clone = newmesh->CreateNodeBefore (
+	      child->GetType ());
+	    CloneNode (child, child_clone);
+	  }
+        }
       }
     }
   }
@@ -991,6 +1183,9 @@ LevTool::~LevTool ()
 #define OP_DYNAVIS 2
 #define OP_VALIDATE 3
 
+#define FLAG_NOSPLIT 1
+#define FLAG_NOCOMPRESS 2
+
 //----------------------------------------------------------------------------
 
 void LevTool::Main ()
@@ -999,6 +1194,7 @@ void LevTool::Main ()
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
 
   int op = OP_LIST;
+  int flag = 0;
 
   if (cmdline->GetOption ("help"))
   {
@@ -1006,11 +1202,15 @@ void LevTool::Main ()
     printf ("  -list: list world contents\n");
     printf ("  -validate: validate world contents\n");
     printf ("  -dynavis: convert to Dynavis\n");
+    printf ("      -nosplit: don't split parts in seperate units\n");
+    printf ("      -nocompress: don't compress vertices (implies -nosplit)\n");
     exit (0);
   }
   if (cmdline->GetOption ("dynavis")) op = OP_DYNAVIS;
   if (cmdline->GetOption ("list")) op = OP_LIST;
   if (cmdline->GetOption ("validate")) op = OP_VALIDATE;
+  if (cmdline->GetOption ("nosplit")) flag = FLAG_NOSPLIT;
+  if (cmdline->GetOption ("nocompress")) flag = FLAG_NOCOMPRESS;
 
   const char* val = cmdline->GetName ();
   if (!val)
@@ -1078,6 +1278,24 @@ void LevTool::Main ()
 	AnalyzePluginSection (doc);
 	FindAllThings (doc);
 	csRef<iDocument> newdoc = xml->CreateDocument ();
+
+	int i;
+	for (i = 0 ; i < things.Length () ; i++)
+	{
+	  ltThing* th = (ltThing*)things.Get (i);
+	  if (!(flag & FLAG_NOCOMPRESS))
+	  {
+	    th->CompressVertices ();
+	    th->RemoveUnusedVertices ();
+	    th->RemoveDuplicateVertices ();
+	    th->CreateVertexInfo ();
+	    if (flag & FLAG_NOSPLIT)
+	      th->DoNotSplitThingSeperateUnits ();
+	    else
+	      th->SplitThingSeperateUnits ();
+	  }
+	}
+
 	CloneAndSplit (doc, newdoc);
         error = newdoc->Write (vfs, filename);
 	//error = newdoc->Write (vfs, "/this/world");

@@ -1,5 +1,16 @@
 The history order is reversed so that new features are at the top.
 
+5-Dec-2002
+	- 'levtool' will now split all parts in seperate units. A unit
+	  is defined as a set of polygons that are connected and that
+	  doesn't connect with any other polygon from the same part.
+	  This results in a much better object seperation for Dynavis.
+	  Performance improves by doing this but is still not perfect.
+	- Added a '-nosplit' commandline option to disable this new
+	  feature so that the things are only split in parts.
+	- Added '-nocompress' commandline option to levtool so that vertices
+	  are not compressed and unused vertices are not removed. This
+	  option implies '-nosplit'.
 4-Dec-2002
 	- Added iDocumentNode->Equals() to compare two nodes. Comparing
 	  the pointers doesn't work because these are only wrappers

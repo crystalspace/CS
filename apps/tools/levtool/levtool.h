@@ -42,6 +42,7 @@ private:
   int* polygons;
   int num_polygons;
   int max_polygons;
+  int obj_number;
 
 public:
   ltVertex ();
@@ -52,6 +53,13 @@ public:
   int GetPolygonCount () const { return num_polygons; }
   int GetPolygon (int idx) const { return polygons[idx]; }
   int* GetPolygonIndices () const { return polygons; }
+
+  void SetObjectNumber (int obj_number)
+  {
+    ltVertex::obj_number = obj_number;
+  }
+  int GetObjectNumber () const { return obj_number; }
+
 };
 
 /**
@@ -67,6 +75,10 @@ private:
   int num_vertices;
   int max_vertices;
 
+  // When splitting an object this will indicate the object
+  // this polygon belongs too.
+  int obj_number;
+
 public:
   ltPolygon (iDocumentNode* polynode);
   ~ltPolygon ();
@@ -80,6 +92,12 @@ public:
 
   void SetName (const char* name);
   const char* GetName () const { return name; }
+
+  void SetObjectNumber (int obj_number)
+  {
+    ltPolygon::obj_number = obj_number;
+  }
+  int GetObjectNumber () const { return obj_number; }
 
   iDocumentNode* GetNode () const { return polynode; }
 };
@@ -113,6 +131,14 @@ private:
 
   csBox3 bbox;
 
+  int max_obj_number;
+
+  /**
+   * Used by SplitThingSeperateUnits(). Will fill the given object number
+   * in all polygons connected to this one.
+   */
+  void PaintConnectedPolygons (ltPolygon* sweep, int obj_number);
+
 public:
   ltThing (iDocumentNode* meshnode, iDocumentNode* partnode);
   ~ltThing ();
@@ -120,6 +146,7 @@ public:
   void AddVertex (const csVector3& vt);
   int GetVertexCount () const { return num_vertices; }
   const ltVertex& GetVertex (int idx) const { return *vertices[idx]; }
+  ltVertex& GetVertex (int idx) { return *vertices[idx]; }
 
   ltPolygon* AddPolygon (iDocumentNode* polynode);
   int GetPolygonCount () const { return num_polygons; }
@@ -127,6 +154,8 @@ public:
 
   void SetName (const char* name);
   const char* GetName () const { return name; }
+
+  int GetMaxObjectNumber () const { return max_obj_number; }
 
   /**
    * Warning! Only call this function BEFORE CreateVertexInfo()!
@@ -155,6 +184,32 @@ public:
    * a table of all polygon indices that use these vertices.
    */
   void CreateVertexInfo ();
+
+  /**
+   * Warning! Call this function AFTER CreateVertexInfo().
+   * This function will split this thing in seperate units.
+   * A unit is defined as a group of polygons that is not
+   * connected to other groups of polygons in the thing.
+   * This splitting will happen by setting obj_number variable
+   * to the appropriate sub-part.
+   */
+  void SplitThingSeperateUnits ();
+
+  /**
+   * Use this instead of SplitThingSeperateUnits() if you don't want to
+   * split.
+   */
+  void DoNotSplitThingSeperateUnits ();
+
+  /**
+   * Create a mapping to map the current vertex id's to the
+   * vertex id's relevant for the given object number.
+   * Delete this array after using. This table will be as big
+   * as the total number of vertices in this thing. The mapping
+   * table will return -1 for vertices that are not in the
+   * sub-object with number 'obj_number'.
+   */
+  int* CreateUnitMapping (int obj_number);
 
   iDocumentNode* GetMeshNode () const { return meshnode; }
   iDocumentNode* GetPartNode () const { return partnode; }
@@ -213,9 +268,18 @@ public:
   void ParseThing (iDocumentNode* meshnode);
 
   /**
-   * Write out a params block.
+   * Write out a polygon block.
+   * The mapping table is used to map vertices in the polygon to
+   * new vertices.
    */
-  void WriteOutThing (iDocumentNode* params_node, ltThing* th);
+  void WriteOutPolygon (iDocumentNode* poly_node, ltPolygon* p, int* mapping);
+
+  /**
+   * Write out a params block. Only write out polygons belonging
+   * to the given obj_number.
+   */
+  void WriteOutThing (iDocumentNode* params_node, ltThing* th,
+  	int obj_number);
 
   /**
    * Clone a document but split all things in the process.
