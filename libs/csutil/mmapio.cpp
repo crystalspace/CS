@@ -29,7 +29,7 @@ csMemoryMappedIO::MemoryMapFile(mmioInfo *_platform, char *filename)
   
   // Initialize the cache so that all buckets have at least one block
   
-  int i;
+  unsigned i;
   for(i=0; i<csmmioDefaultHashSize; ++i)
   {
     CacheBlock *cp=new CacheBlock;
