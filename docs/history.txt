@@ -36,6 +36,12 @@ The history order is reversed so that new features are at the top.
 	  behaviour. The standard map file loader now calls this function
 	  with this parameter set at 'false' so the automatic define
 	  of the materials no longer happens.
+	- Eric Sunshine renamed PROC_NEEDS_STRICT_ALIGNMENT to
+	  CS_STRICT_ALIGNMENT.  Also moved CS_STRICT_ALIGNMENT to cssysdef.h
+	  from csendian.h so that it is available to all clients (just like the
+	  CS_FOO_ENDIAN macros), rather than only to those importing
+	  csendian.h.  Note that in the future, CS_STRICT_ALIGNMENT should be
+	  moved to volatile.h and be determined at configuration time.
 19-Sep-2002
 	- Fixed some memory leaks in csInitializer.
 	- Several enhancements to levtool. By default it now lists the

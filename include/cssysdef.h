@@ -613,6 +613,18 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #  error No CS_XXX_ENDIAN macro defined in your OS-specific csosdefs.h!
 #endif
 
+/*
+ * This is a bit of overkill but if you're sure your CPU doesn't require
+ * strict alignment add your CPU to the !defined below to get slightly
+ * smaller and faster code in some cases.
+ *
+ * @@@ In the future, this should be moved to volatile.h and determined as
+ * part of the configuration process.
+ */
+#if !defined (PROC_X86)
+#  define CS_STRICT_ALIGNMENT
+#endif
+
 // Adjust some definitions contained in volatile.h
 #if defined (PROC_X86) && !defined (DO_NASM)
 #  undef NO_ASSEMBLER

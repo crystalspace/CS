@@ -23,15 +23,6 @@
 #include "cstypes.h"
 #include "qint.h"
 
-/*
- * This is a bit of overkill but if you're sure your CPU doesn't require
- * strict alignment add your CPU to the !defined below to get slightly
- * smaller and faster code in some cases.
- */
-#if !defined (PROC_X86)
-#  define PROC_NEEDS_STRICT_ALIGNMENT
-#endif
-
 struct swap_4
 {
   unsigned char b1, b2, b3, b4;
@@ -177,7 +168,7 @@ static inline float convert_endian (float f)
 /// Read a little-endian short from address
 inline uint16 get_le_short (void *buff)
 {
-#ifdef PROC_NEEDS_STRICT_ALIGNMENT
+#ifdef CS_STRICT_ALIGNMENT
   uint16 s; memcpy (&s, buff, sizeof (s));
   return little_endian_short (s);
 #else
@@ -188,7 +179,7 @@ inline uint16 get_le_short (void *buff)
 /// Read a little-endian long from address
 inline uint32 get_le_long (void *buff)
 {
-#ifdef PROC_NEEDS_STRICT_ALIGNMENT
+#ifdef CS_STRICT_ALIGNMENT
   uint32 l; memcpy (&l, buff, sizeof (l));
   return little_endian_long (l);
 #else
@@ -207,7 +198,7 @@ inline float get_le_float16 (void *buff)
 /// Set a little-endian short on a address
 inline void set_le_short (void *buff, uint16 s)
 {
-#ifdef PROC_NEEDS_STRICT_ALIGNMENT
+#ifdef CS_STRICT_ALIGNMENT
   s = little_endian_short (s);
   memcpy (buff, &s, sizeof (s));
 #else
@@ -218,7 +209,7 @@ inline void set_le_short (void *buff, uint16 s)
 /// Set a little-endian long on a address
 inline void set_le_long (void *buff, uint32 l)
 {
-#ifdef PROC_NEEDS_STRICT_ALIGNMENT
+#ifdef CS_STRICT_ALIGNMENT
   l = little_endian_long (l);
   memcpy (buff, &l, sizeof (l));
 #else
