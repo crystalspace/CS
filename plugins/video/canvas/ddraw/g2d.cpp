@@ -905,10 +905,13 @@ void csGraphics2DDDraw3::SetTitle (const char* title)
 void csGraphics2DDDraw3::AlertV (int type, const char* title, 
     const char* okMsg, const char* msg, va_list args)
 {
+  if (FullScreen)
+  {
+    m_lpDD->SetCooperativeLevel (m_hWnd, DDSCL_NORMAL);  
+  }
   m_piWin32Assistant->AlertV (m_hWnd, type, title, okMsg, msg, args);
   if (FullScreen)
   {
     ChangeCoopLevel();
-    // @@@ window acts strange after this
   }
 }
