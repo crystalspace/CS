@@ -679,7 +679,7 @@ int ap_vformatter(int (*flush_func)(ap_vformatter_buff *),
 
     register char *s = NULL;
     char *q;
-    int s_len;
+    int s_len = 0;
 
     register int min_width = 0;
     int precision = 0;
