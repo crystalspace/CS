@@ -21,7 +21,7 @@
 #define __CS_GL_VARBUFMGR_H__
 
 #include "csutil/csvector.h"
-
+#include "csutil/list.h"
 #include "ivideo/rndbuf.h"
 
 //#include "gl_render3d.h"
@@ -92,19 +92,30 @@ SCF_VERSION(csVARRenderBuffer, 0,0,1);
 class csVARRenderBuffer : public iRenderBuffer
 {
 private:
+  static const char MAXMEMORYBLOCKS = 2;
+  friend class csVARRenderBufferManager;
   bool isRealVAR;
   csVARMemoryBlock* memblock;
+  char currentBlock;
   int size;
   CS_RENDERBUFFER_TYPE type;
   bool locked;
+  bool discarded;
+  bool discardable;
+
+  csListElement<csVARRenderBuffer*>* listEl;
 
   csVARRenderBufferManager* bm;
 
   CS_BUFFER_LOCK_TYPE lastlock;
+  csVARRenderBuffer(void *buffer, int size, CS_RENDERBUFFER_TYPE type, csVARRenderBufferManager* bm);
+
+  bool Discard(); //returns true if it was discarded and all memory freed
+  void* AllocData(int size);
+
 public:
   SCF_DECLARE_IBASE;
 
-  csVARRenderBuffer(void *buffer, int size, CS_RENDERBUFFER_TYPE type, csVARRenderBufferManager* bm);
   virtual ~csVARRenderBuffer ();
   
   /**
@@ -116,9 +127,11 @@ public:
   /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release();
 
-  virtual bool IsDiscarded() {return false; }
+  /// Get wheter the buffer is discarded or not
+  virtual bool IsDiscarded() { return discarded; }
 
-  virtual void CanDiscard(bool value) { }
+  /// Set if buffer can be discarded or not
+  virtual void CanDiscard(bool value) { discardable = value; }
 
   /// Get type of buffer (where it's located)
   virtual CS_RENDERBUFFER_TYPE GetBufferType() { return type; }
@@ -137,8 +150,15 @@ private:
   unsigned char* var_buffer;
   csBuddyAllocator* myalloc;
 
-  //unlocked blocks, these should be freed as soon as the fence is released
-  csBasicVector discardedBlocks;
+  csList <csVARRenderBuffer*> staticList;
+  csList <csVARRenderBuffer*> dynamicList;
+
+  void AddBlockInLRU(csVARRenderBuffer* buf);
+  void RemoveBlockInLRU(csVARRenderBuffer* buf);
+  void TouchBlockInLRU(csVARRenderBuffer* buf);
+  bool ReclaimMemory(); //traverse the LRUs and free some memory. Discard those blocks needed.
+                        //return true if we got some more free memory
+
 public:
   SCF_DECLARE_IBASE;
   /**
@@ -151,8 +171,7 @@ public:
   virtual ~csVARRenderBufferManager();
 
   /// Allocate a buffer of the specified type and return it
-  csPtr<iRenderBuffer> GetBuffer(int buffersize, CS_RENDERBUFFER_TYPE location);
-
+  csPtr<iRenderBuffer> CreateBuffer(int buffersize, CS_RENDERBUFFER_TYPE location);
 };
 
 #endif // __CS_GL_VARBUFMGR_H__

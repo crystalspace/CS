@@ -23,6 +23,7 @@
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 #include "ivideo/rndbuf.h"
+#include "csutil/list.h"
 
 #include "gl_sysbufmgr.h"
 #include "gl_varbufmgr.h"
@@ -166,7 +167,7 @@ void* csBuddyAllocator::alloc(int size)
   assert(m_Tree&&m_Size>0&&m_Height>0);
   size=(size+CS_BUDDY_ADD)>>CS_BUDDY_SHIFT;      /*sz in blocks now*/
   if(size<=0||1<<m_Tree[0]<size)       /*oops?*/
-    return 0;
+    return (void*)-1;
 
   for(found=0,i=0;!found&&2*i+2<2*m_Size-1;level--)
   {
@@ -215,8 +216,26 @@ bool csBuddyAllocator::free(void *ptr)
     return false;
 }
 
+void csBuddyAllocator::PrintStats()
+{
+  int  s;
+  char level;
+  if(!m_Tree||m_Size<=0||m_Height<=0)
+  {
+    printf("Buddy system not initialized.\n\n");
+    return;
+  }
+  else
+  {
+    printf("Buddy system initialized.\n");
+    printf("Address %x, %d blocks (%dKB), ",0,m_Size,m_Size<<CS_BUDDY_SHIFT-10);
+    printf("%d blocks free (%dKB).\n",m_Freeblk,m_Freeblk<<CS_BUDDY_SHIFT-10);
+    traverse(0,m_Height-1);
+    printf("\n");
+  }
+}
 
-#define CS_VAR_ALLOC_SIZE (8*1024*1024)
+#define CS_VAR_ALLOC_SIZE (500*1024)
 
 bool csVARRenderBufferManager::Initialize(csGLRender3D* render3d)
 {
@@ -238,124 +257,270 @@ bool csVARRenderBufferManager::Initialize(csGLRender3D* render3d)
 
   myalloc = new csBuddyAllocator();
   myalloc->Initialize(CS_VAR_ALLOC_SIZE);
+
   return true;
 }
 
 csVARRenderBufferManager::~csVARRenderBufferManager()
 {
+  glDisableClientState(GL_VERTEX_ARRAY_RANGE_NV);
+
   if(var_buffer)
     render3d->ext.wglFreeMemoryNV(var_buffer);
   var_buffer = 0;
+  
+  myalloc->PrintStats();
+  delete myalloc;
 }
 
-csPtr<iRenderBuffer> csVARRenderBufferManager::GetBuffer(int size, CS_RENDERBUFFER_TYPE location)
+csPtr<iRenderBuffer> csVARRenderBufferManager::CreateBuffer(int size, CS_RENDERBUFFER_TYPE location)
 {
   csVARRenderBuffer* buffer = new csVARRenderBuffer( NULL, size, location, this);
 
+  printf("Created buffer at: %X\n", (long)buffer);
+  buffer->IncRef();
   return buffer;
+}
+
+void csVARRenderBufferManager::AddBlockInLRU(csVARRenderBuffer* buf)
+{
+  if (buf->type == CS_BUF_STATIC)
+  {
+    buf->listEl = staticList.prepend(buf);
+    return;
+  }
+  else if (buf->type == CS_BUF_DYNAMIC)
+  {
+    buf->listEl = dynamicList.prepend(buf);
+    return;
+  }
+}
+
+void csVARRenderBufferManager::RemoveBlockInLRU(csVARRenderBuffer* buf)
+{
+  if (buf->listEl == NULL) return;
+
+  if (buf->type == CS_BUF_STATIC)
+  {
+    staticList.remove(buf->listEl);
+    return;
+  }
+  else if (buf->type == CS_BUF_DYNAMIC)
+  {
+    dynamicList.remove(buf->listEl);
+    return;
+  }
+}
+
+void csVARRenderBufferManager::TouchBlockInLRU(csVARRenderBuffer* buf)
+{
+  if (buf->listEl == NULL) return;
+
+  if (buf->type == CS_BUF_STATIC)
+  {
+    staticList.remove(buf->listEl);
+    buf->listEl = staticList.prepend(buf);
+    return;
+  }
+  else if (buf->type == CS_BUF_DYNAMIC)
+  {
+    dynamicList.remove(buf->listEl);
+    buf->listEl = dynamicList.prepend(buf);
+    return;
+  }
+}
+
+bool csVARRenderBufferManager::ReclaimMemory()
+{
+  csList<csVARRenderBuffer*>::Iterator dynamicIt(dynamicList, true);
+  while(dynamicIt.HasPrevious())
+  {
+    csVARRenderBuffer* b = dynamicIt--;
+    if(b->Discard())
+      return true;
+  }
+
+  csList<csVARRenderBuffer*>::Iterator staticIt(staticList, true);
+  while(staticIt.HasPrevious())
+  {
+    csVARRenderBuffer* b = staticIt--;
+    if(b->Discard())
+      return true;
+  }
+  return false;
+}
+
+void* csVARRenderBuffer::AllocData(int size)
+{
+  long offset;
+  while( ((offset = (long) bm->myalloc->alloc(size)) == -1) && bm->ReclaimMemory())
+    {};
+
+  if(offset == -1) return NULL; //could not alloc memory
+
+  return bm->var_buffer + offset;
 }
 
 csVARRenderBuffer::csVARRenderBuffer(void *buffer, int size, CS_RENDERBUFFER_TYPE type, csVARRenderBufferManager* bm)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  memblock = new csVARMemoryBlock();
-
-  /// decide wheter to use VAR or not (some special cases)
-  if(type == CS_BUF_INDEX)
-  {
-    isRealVAR = false;
-    memblock->buffer = new char[size];
-  }
-  else if(type == CS_BUF_STATIC)
-  {
-    isRealVAR = true;
-    memblock->buffer = bm->var_buffer + (int) bm->myalloc->alloc(size);
-    bm->render3d->ext.glGenFencesNV(1, &memblock->fence_id);
-  } else 
-  {
-    isRealVAR = true;
-  }
+  currentBlock = 0;
 
   csVARRenderBuffer::size = size;
   csVARRenderBuffer::type = type;
 
   csVARRenderBuffer::bm = bm;
   locked = false;
+  discarded = false;
+  discardable = true;
+
+  listEl = NULL;
+
+  memblock = new csVARMemoryBlock[MAXMEMORYBLOCKS];
+  int i;
+  for(i = 0; i < MAXMEMORYBLOCKS; ++i)
+  {
+    memblock[i].buffer = NULL;
+    memblock[i].fence_id = -1;
+  }
 }
 
 csVARRenderBuffer::~csVARRenderBuffer()
 {
-  if (memblock && type != CS_BUF_INDEX)
+  bm->RemoveBlockInLRU(this);
+  if( type == CS_BUF_INDEX)
   {
-    bm->render3d->ext.glFinishFenceNV(memblock->fence_id);
-    bm->myalloc->free(memblock->buffer);
-  }else if(memblock && type == CS_BUF_INDEX)
+    int i;
+    for(i = 0; i < MAXMEMORYBLOCKS; ++i)
+      delete memblock[i].buffer;
+  }else
   {
-    delete memblock->buffer;
-    delete memblock;
+    int i;
+    for(i = 0; i < MAXMEMORYBLOCKS;++i)
+    {
+      bm->render3d->ext.glFinishFenceNV(memblock[i].fence_id);
+      if(memblock[i].buffer)
+        bm->myalloc->free( (void*)((long)(memblock[i].buffer) - (long)(bm->var_buffer)));
+      bm->render3d->ext.glDeleteFencesNV(1, &memblock[i].fence_id);
+    }
   }
+  delete[] memblock;
 }
 
 void* csVARRenderBuffer::Lock(CS_BUFFER_LOCK_TYPE lockType)
 {
+  //if its already locked, we cannot return it
   if(locked) return NULL;
-  
 
-  if(memblock->buffer)
+  //first, if doing render-locking, just return our current memblock buffer
+  if(lockType == CS_BUF_LOCK_RENDER)
   {
-    if(lockType == CS_BUF_LOCK_RENDER)
+    if(memblock[currentBlock].buffer && !discarded)
     {
-      lastlock = lockType;
       locked = true;
-      return memblock->buffer;
+      lastlock = lockType;
+      bm->TouchBlockInLRU(this);
+      return memblock[currentBlock].buffer;
     }
-    if(type == CS_BUF_STATIC)
-    {
-      bm->render3d->ext.glFinishFenceNV(memblock->fence_id); //for now.. lockup until finnished
-      lastlock = lockType;
-      locked = true;
-      return memblock->buffer;
-    }else if(type == CS_BUF_INDEX)
-    {
-      lastlock = lockType;
-      locked = true;
-      return memblock->buffer;
-    }else if(type == CS_BUF_DYNAMIC)
-    {
-      if(bm->render3d->ext.glTestFenceNV(memblock->fence_id))
-      {
-        lastlock = lockType;
-        locked = true;
-        return memblock->buffer;
-      }
-      else
-        return NULL;
-    }else
-      return NULL;
-  }else
-  {
-    if(type == CS_BUF_DYNAMIC)
-    {
-      //alloc a new VAR buffer..
-      memblock->buffer = bm->myalloc->alloc(size);
-      bm->render3d->ext.glGenFencesNV(1, &memblock->fence_id);
-      lastlock = lockType;
-      locked = true;
-      return memblock->buffer;
-    }else
-      return NULL;
+    return NULL;
   }
+
+  if(!memblock[currentBlock].buffer || discarded)
+  {
+    //have no buffer.. create one
+    if(type == CS_BUF_INDEX)
+    {
+      //indexbuffer is always in system-memory
+      memblock[currentBlock].buffer = new char[size];
+      memblock[currentBlock].fence_id = -1;
+      discarded = false;
+      locked = true;
+      lastlock = lockType;
+      return memblock[currentBlock].buffer;
+    }else
+    {
+      memblock[currentBlock].buffer = AllocData(size);
+      if(memblock[currentBlock].buffer)
+      {
+        locked = true;
+        discarded = false;
+        lastlock = lockType;
+        bm->AddBlockInLRU(this);
+        bm->render3d->ext.glGenFencesNV(1, &(memblock[currentBlock].fence_id));
+      }
+      return memblock[currentBlock].buffer;
+    }
+  }
+
+  if(type == CS_BUF_INDEX)
+  {
+    locked = true;
+    discarded = false;
+    lastlock = lockType;
+    return memblock[currentBlock].buffer;
+  }
+  else if (type == CS_BUF_STATIC)
+  {
+    bm->render3d->ext.glFinishFenceNV(memblock[currentBlock].fence_id);
+    locked = true;
+    discarded = false;
+    lastlock = lockType;
+    return memblock[currentBlock].buffer;
+  }
+  else if (type == CS_BUF_DYNAMIC)
+  {
+    if(bm->render3d->ext.glTestFenceNV(memblock[currentBlock].fence_id))
+    {
+      //it was free, use it
+      locked = true;
+      discarded = false;
+      lastlock = lockType;
+      return memblock[currentBlock].buffer;
+    }
+    else
+    {
+      //we need to use the other block
+      ++currentBlock;
+      currentBlock %= MAXMEMORYBLOCKS;
+      return Lock(lockType);
+    }
+
+  }
+  
   return NULL;
 }
 
 void csVARRenderBuffer::Release()
 {
-  if(lastlock == CS_BUF_LOCK_RENDER && isRealVAR)
+  if(lastlock == CS_BUF_LOCK_RENDER && type != CS_BUF_INDEX)
   {
     bm->render3d->ext.glSetFenceNV(memblock->fence_id, GL_ALL_COMPLETED_NV);
   }
 
+  discardable = true;
   lastlock = CS_BUF_LOCK_NOLOCK;
   locked = false;
 }
+
+bool csVARRenderBuffer::Discard()
+{
+  //never discard a locked buffer, or a non-discardable buffer
+  if (locked || !discardable) return false;
+
+  int i;
+  for(i = 0; i < MAXMEMORYBLOCKS; ++i)
+  {
+    if(memblock[i].buffer != NULL)
+    {
+      bm->render3d->ext.glFinishFenceNV(memblock[i].fence_id);
+      bm->myalloc->free( (void*)((long)(memblock[i].buffer) - (long)(bm->var_buffer)));
+      bm->render3d->ext.glDeleteFencesNV(1, &memblock[i].fence_id);
+      memblock[i].buffer = NULL;
+    }
+  }
+  discarded = true;
+  bm->RemoveBlockInLRU(this);
+  return true;
+}
+
 
