@@ -481,9 +481,9 @@ void ddgTBinTree::updateMerge(ddgTriIndex tindex, ddgPriority pr )
 {
 	// Check all 4 members of this potential mergable group.
 	// A mergeble group looks as follows:
-	//      /|\
-	//     / | \
-	//    /__|__\
+	//      /|\ 
+	//     / | \ 
+	//    /__|__\ 
 	//    \  |  /
 	//     \ | /
 	//      \|/
