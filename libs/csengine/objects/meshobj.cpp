@@ -222,7 +222,7 @@ void csMeshWrapper::Draw (iRenderView *rview)
 
 csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n)
 {
-  iMeshWrapper *meshwrap = &scfiMeshWrapper;
+//  iMeshWrapper *meshwrap = &scfiMeshWrapper;
 
   //int i;
   // Callback are traversed in reverse order so that they can safely

@@ -53,6 +53,7 @@ chronological order.
 	      should not duplicate the string on the array's behalf.)
 	    - Simplified some csStringArray::Push() invocations in
 	      win32/loadlib.cpp.
+	- Eric Sunshine eliminated compilation warning in csengine/meshobj.cpp.
 30-Aug-2003
 	- Old_Belge added the morph target support to sprcal3d.
 	- Eric Sunshine augmented configure.ac so that it emits the appropriate
