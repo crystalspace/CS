@@ -65,6 +65,7 @@ chronological order.
 	- Eric Sunshine augmented the OpenAL check in configure.ac so that it
 	  utilizes -lm (if available).  This seems to be needed by Suse 7.3
 	  Linux.
+	- res unbroke the VC7 plugin project templates.
 18-Feb-2004
 	- Jorrit added the ability to specify defaults for mesh object types
 	  in the map loader. Here is an example to demonstrate how this works:

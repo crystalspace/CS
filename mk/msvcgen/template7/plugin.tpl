@@ -59,7 +59,7 @@
 				OptimizeReferences="1"
 				ImportLibrary=".\csrelease\temp\%project%/%project%.lib"
 				TargetMachine="1"
-				BaseAddress="%base%" />
+				BaseAddress="" />
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
@@ -134,7 +134,7 @@ copy &quot;$(TargetPath)&quot;  csrelease\bin
 				SubSystem="2"
 				ImportLibrary=".\csdebug\temp\%project%/%project%.lib"
 				TargetMachine="1"
-				BaseAddress="%base%" />
+				BaseAddress="" />
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
@@ -209,7 +209,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 				SubSystem="2"
 				ImportLibrary=".\csmemdbg\temp\%project%/%project%.lib"
 				TargetMachine="1"
-				BaseAddress="%base%" />
+				BaseAddress="" />
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
