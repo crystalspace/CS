@@ -5507,6 +5507,7 @@ class iSpriteCal3DState(iBase):
     def SetActiveAnims(*args): return _cspace.iSpriteCal3DState_SetActiveAnims(*args)
     def SetAnimAction(*args): return _cspace.iSpriteCal3DState_SetAnimAction(*args)
     def SetVelocity(*args): return _cspace.iSpriteCal3DState_SetVelocity(*args)
+    def SetDefaultIdleAnim(*args): return _cspace.iSpriteCal3DState_SetDefaultIdleAnim(*args)
     def SetLOD(*args): return _cspace.iSpriteCal3DState_SetLOD(*args)
     def AttachCoreMesh(*args): return _cspace.iSpriteCal3DState_AttachCoreMesh(*args)
     def DetachCoreMesh(*args): return _cspace.iSpriteCal3DState_DetachCoreMesh(*args)
@@ -9047,6 +9048,30 @@ class iShaderPtr(iShader):
         _swig_setattr(self, iShader,self.__class__,iShader)
 _cspace.iShader_swigregister(iShaderPtr)
 
+class iShaderPriorityList(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iShaderPriorityList, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iShaderPriorityList, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iShaderPriorityList instance at %s>" % (self.this,)
+    def GetCount(*args): return _cspace.iShaderPriorityList_GetCount(*args)
+    def GetPriority(*args): return _cspace.iShaderPriorityList_GetPriority(*args)
+    def __del__(self, destroy=_cspace.delete_iShaderPriorityList):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class iShaderPriorityListPtr(iShaderPriorityList):
+    def __init__(self, this):
+        _swig_setattr(self, iShaderPriorityList, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iShaderPriorityList, 'thisown', 0)
+        _swig_setattr(self, iShaderPriorityList,self.__class__,iShaderPriorityList)
+_cspace.iShaderPriorityList_swigregister(iShaderPriorityListPtr)
+
 class iShaderCompiler(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -9061,6 +9086,7 @@ class iShaderCompiler(iBase):
     def CompileShader(*args): return _cspace.iShaderCompiler_CompileShader(*args)
     def ValidateTemplate(*args): return _cspace.iShaderCompiler_ValidateTemplate(*args)
     def IsTemplateToCompiler(*args): return _cspace.iShaderCompiler_IsTemplateToCompiler(*args)
+    def GetPriorities(*args): return _cspace.iShaderCompiler_GetPriorities(*args)
     def __del__(self, destroy=_cspace.delete_iShaderCompiler):
         try:
             if self.thisown: destroy(self)
