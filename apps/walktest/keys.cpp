@@ -1188,7 +1188,11 @@ static bool CommandHandler (char *cmd, char *arg)
   else if (!strcasecmp (cmd, "capture"))
     CaptureScreen ();
   else if (!strcasecmp (cmd, "perftest"))
-    perf_test ();
+  {
+    int num = 100;
+    if (arg) ScanStr (arg, "%d", &num);
+    perf_test (num);
+  }
   else if (!strcasecmp (cmd, "debug0"))
   {
     csCamera* c = Sys->view->GetCamera ();

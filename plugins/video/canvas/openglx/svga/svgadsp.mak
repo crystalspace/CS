@@ -2,7 +2,7 @@
 # to build the SVGA Displaydriver for GLX 2D driver -- oglsvga
 
 # Driver description
-DESCRIPTION.oglsvga=SVGA Displaydriver for Crystal Space GL/X 2D driver
+DESCRIPTION.oglsvga=SVGA driver for Crystal Space GL/X 2D driver
 
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)

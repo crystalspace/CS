@@ -1074,24 +1074,24 @@ void WalkTest::PrepareFrame (time_t elapsed_time, time_t current_time)
   layer->step_run ();
 }
 
-void perf_test ()
+void perf_test (int num)
 {
   Sys->busy_perf_test = true;
   time_t t1, t2, t;
   Sys->Printf (MSG_CONSOLE, "Performance test busy...\n");
   t = t1 = SysGetTime ();
   int i;
-  for (i = 0 ; i < 100 ; i++)
+  for (i = 0 ; i < num ; i++)
   {
     Sys->layer->step_run ();
     Sys->DrawFrame (SysGetTime ()-t, SysGetTime ());
     t = SysGetTime ();
   }
   t2 = SysGetTime ();
-  Sys->Printf (MSG_CONSOLE, "%f secs to render 100 frames: %f fps\n",
-        (float)(t2-t1)/1000., 100000./(float)(t2-t1));
-  Sys->Printf (MSG_DEBUG_0, "%f secs to render 100 frames: %f fps\n",
-        (float)(t2-t1)/1000., 100000./(float)(t2-t1));
+  Sys->Printf (MSG_CONSOLE, "%f secs to render %d frames: %f fps\n",
+        (float)(t2-t1)/1000., num, 100000./(float)(t2-t1));
+  Sys->Printf (MSG_DEBUG_0, "%f secs to render %d frames: %f fps\n",
+        (float)(t2-t1)/1000., num, 100000./(float)(t2-t1));
   cnt = 1;
   time0 = (time_t)-1;
   Sys->busy_perf_test = false;

@@ -4,23 +4,20 @@
 # Friendly names for building environment
 DESCRIPTION.solaris = Solaris
 
-# Choose which drivers you want to build/use
-DRIVERS+=cs2d/softx cs3d/software
+# Choose which 2D/3D driver combinations you want to build/use
+DRIVERS+=cs3d/software cs2d/softx
+DRIVERS+=cs3d/opengl cs2d/openglx
+DRIVERS+=cs3d/line cs2d/linex
+DRIVERS+=cs3d/inf
+
+# Uncomment the following to build GGI 2D driver
+#DRIVERS+=cs2d/ggi
 
 # Networking manager.
 #DRIVERS+=csnetman/simple
 
-# uncomment the following to build sound renderer
+# Uncomment the following to build sound renderer
 #DRIVERS+=cssndrdr/software
-
-# uncomment the following to build GGI 2D driver
-#DRIVERS+=cs2d/ggi
-
-# uncomment the following to build OpenGL stuff
-DRIVERS+=cs3d/opengl cs2d/openglx
-
-# uncomment the following to build the 3D line driver
-DRIVERS+=cs3d/line cs2d/linex
 
 # uncomment the following for socket network support
 #DRIVERS+=csnetdrv/sockets

@@ -265,7 +265,7 @@ extern WalkTest* Sys;
 #define FRAME_WIDTH Sys->FrameWidth
 #define FRAME_HEIGHT Sys->FrameHeight
 
-extern void perf_test ();
+extern void perf_test (int num);
 extern void CaptureScreen ();
 extern void free_keymap ();
 

@@ -4,35 +4,30 @@
 # Friendly names for building environment
 DESCRIPTION.linux = Linux
 
-# Choose which drivers you want to build/use
+# Choose which 2D/3D driver combinations you want to build/use
 DRIVERS+=cs2d/softx cs3d/software
-DRIVERS+=csnetdrv/sockets csnetman/simple
+DRIVERS+=cs3d/opengl cs2d/openglx
+DRIVERS+=cs3d/inf cs2d/inf
+#DRIVERS+=cs3d/line cs2d/linex
+#DRIVERS+=cs3d/glide2 cs2d/unxglide2
+#DRIVERS+=cs3d/glide3 cs2d/unxglide3
 
-# uncomment the following to build sound drivers
-DRIVERS+=cssnddrv/oss cssndrdr/software
-
-# uncomment the following to build SVGALIB 2D driver
-DRIVERS+=cs2d/svgalib
-
-# uncomment the following to build GGI 2D driver
+# uncomment the following to build SVGALIB and/or GGI 2D drivers
+#DRIVERS+=cs2d/svgalib
 #DRIVERS+=cs2d/ggi 
 
-# uncomment the following to build OpenGL stuff
-DRIVERS+=cs3d/opengl cs2d/openglx
+# For networking:
+#DRIVERS+=csnetdrv/sockets csnetman/simple
 
-# uncomment the following to build the 3D line driver
-#DRIVERS+=cs3d/line cs2d/linex
+# uncomment the following to build sound drivers
+#DRIVERS+=cssnddrv/oss cssndrdr/software
 
 # uncomment some of the following if you have a special MESA version that uses some 
 # of the following hardware/software renderers
 # Also set the entry Driver in section Display of opengl.cfg
 #DRIVERS+=cs2d/openglx/glide
-DRIVERS+=cs2d/openglx/svga
+#DRIVERS+=cs2d/openglx/svga
 DRIVERS+=cs2d/openglx/empty
-
-# uncomment the following to build Glide stuff
-#DRIVERS+=cs3d/glide2 cs2d/unxglide2
-#DRIVERS+=cs3d/glide3 cs2d/unxglide3
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))

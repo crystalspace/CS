@@ -2,7 +2,7 @@
 # to build the Empty Displaydriver for GLX 2D driver -- oglempty
 
 # Driver description
-DESCRIPTION.oglempty=Empty Displaydriver for Crystal Space GL/X 2D driver
+DESCRIPTION.oglempty=Empty driver for Crystal Space GL/X 2D driver
 
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)

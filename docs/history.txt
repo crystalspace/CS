@@ -1,18 +1,52 @@
 The history order has been reversed so that new features are at the top.
 
-Short-term cleanups that need to be done:
-	- Resolve config/console/commandline mess.  Several things are broken
-	  currently: gamma, dmipmap1, ...
-	- Add to API: absolute versions of Rotate and RotateWorld for csCamera.
-	- Resolve confusion with SetTexture() and SetTextureHandle().  We need
-	  to be consequent.
-	- Consider flattening many of the routines that are now structured to
-	  go through all the recursive object layers (csWorld, csSector,
-	  csThing, ...)
-	- Check the dependencies of libraries/COM objects and try to find
-	  includes that don't belong there (like from csengine).
-
 30-Mar-2000
+	- Added static compilation support for line renderer and new
+	  infinite renderer.
+	- Added new infinite 3D renderer for statistics gathering. This
+	  is a theoretical infinite speed renderer with which you can
+	  exactly time what work the engine is doing and what the
+	  maximum theoretical FPS for the engine is.
+	  This renderer doesn't even create a window so it is not
+	  interactive at all. This means that you have to prepare a
+	  bit in order to use it. First start with a normal renderer
+	  and go to some spot that you want to benchmark. Press shift-C
+	  there to record the position (in 'coord'). Then quit and
+	  restart walktest with the following parameters:
+	  	walktest level -video=infinite -exec=perf.scr
+	  perf.scr is an example script that will turn on the c-buffer,
+	  restore the camera to the location, render a number of frames
+	  and then quit CS.
+	- Added -overdraw commandline option for the infinite 3D renderer
+	  so that you have additional testing for the overdraw ratio
+	  per frame. The overdraw ratio is the ratio of drawn pixels
+	  compared to the number of screen pixels. A ratio of one means
+	  no overdraw. A ratio less than one means underdraw (i.e. not
+	  all of the screen is rendered). Note that since the default
+	  clipper in CS is actually slightly less than the screen size
+	  you will get something like 0.98 also even if you have perfect
+	  no overdraw.
+	  Note that overdraw testing SLIGHTLY increases the infinite
+	  3D renderer processing time so this means that performance
+	  might go down a little.
+	- Added -fastmesh commandline option for the infinite 3D
+	  renderer which simulates a renderer that has hardware accelerated
+	  transforms. In other words, DrawTriangleMesh and DrawPolygonMesh
+	  will not do any transformation from world->screen space anymore
+	  as it happens when -fastmath is not used. Note that this
+	  invalidates the accuracy of the overdraw testing. So you should
+	  probably not combine both options.
+	- Added argument to 'perftest' command for the number of
+	  performance iterations.
+	- Norman Kramer did a few small changes to glide.
+	- Paul Garceau did some updates to the MingW makefile.
+	- Andrew Zabolotny did the following changes:
+	    - "-gamma=#" option works again (for software renderer, of
+	      course). Alas, other renderers still lack gamma support.
+	    - Gamma has now the correct direction. E.g. 2.0 for a brighter
+	      image, 0.5 to darken the image, not vice versa as it was
+	      before. wouter@ppp14.dialup.cs.vu.nl told me Quake has a
+	      incorrect direction of gamma too.
 	- Eric Sunshine made the following changes to csProgressMeter:
 	    - Added a "refresh granularity" setting which allows the client to
 	      configure how often the meter is refreshed.  The default is 10,

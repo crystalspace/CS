@@ -28,6 +28,8 @@ Activate the object that is right in front of you.
 
 @item perftest
 Run a performance test on the current position.
+The default number of runs is 100 but you can change it
+with an optional argument.
 
 @item coorddump
 Show where the camera is located (sector and position).

@@ -2,7 +2,7 @@
 # to build the Glide Displaydriver for GLX 2D driver -- oglglide
 
 # Driver description
-DESCRIPTION.oglglide=Glide Displaydriver for Crystal Space GL/X 2D driver
+DESCRIPTION.oglglide=Glide driver for Crystal Space GL/X 2D driver
 
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
