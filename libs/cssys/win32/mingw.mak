@@ -142,6 +142,7 @@ ASM=.asm
 ifneq ($(NASM.INSTALLED),no)
 #
 # System-dependent flags to pass to NASM
+#   NASM is not supported for Mingw, use gnu assembler instead
 #
 NASMFLAGS.SYSTEM=-f win32 -DEXTERNC_UNDERSCORE
 endif
