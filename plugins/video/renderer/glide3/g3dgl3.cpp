@@ -116,6 +116,7 @@ void sys_fatalerror( char* thestr, int hRes=0 )
 
   MessageBox(NULL, str, "Fatal Error in Glide3xRender.dll", MB_OK);
 #elif defined( OS_MACOS )
+  (void)hRes;
 	Str255	theString;
 	Str255	theString2;
 
@@ -127,6 +128,7 @@ void sys_fatalerror( char* thestr, int hRes=0 )
 	StopAlert( kGeneralErrorDialog, NULL );
 	GlideLib_grSstControlMode( GR_CONTROL_ACTIVATE );
 #else
+  (void)hRes;
   fprintf(stderr, "FATAL ERROR: %s", thestr);
 #endif
 
@@ -188,9 +190,7 @@ void csGraphics3DGlide3x::InitializeBoard( const char* szHW )
     {
       m_TMUs[0].tmu_id=m_TMUs[1].tmu_id=GR_TMU0;
       m_TMUs[0].minAddress = GlideLib_grTexMinAddress(GR_TMU0);
-      m_TMUs[1].maxAddress = GlideLib_grTexMaxAddress(GR_TMU0);
-      m_TMUs[1].minAddress = m_TMUs[0].maxAddress = (m_TMUs[1].maxAddress -  m_TMUs[0].minAddress)/2;
-      m_TMUs[1].minAddress = (m_TMUs[1].minAddress+7)&(~7);
+      m_TMUs[0].maxAddress = GlideLib_grTexMaxAddress(GR_TMU0);
     } 
   else {
     m_TMUs[0].tmu_id=GR_TMU0;
@@ -626,9 +626,8 @@ void csGraphics3DGlide3x::Print(csRect* rect)
 /// Set the mode for the Z buffer (functionality also exists in SetRenderState).
 #define SNAP (( float ) ( 3L << 18 ))
 
-void csGraphics3DGlide3x::RenderPolygonSinglePass (MyGrVertex * verts, int num, bool haslight,
-                                                   TextureHandler* text, TextureHandler* light,
-                                                   bool is_transparent)
+void csGraphics3DGlide3x::RenderPolygonSinglePass (MyGrVertex * verts, int num, TextureHandler* text,
+                                                   TextureHandler* light,  bool is_transparent)
 {
   int i;
 
@@ -710,7 +709,7 @@ void csGraphics3DGlide3x::RenderPolygonSinglePass (MyGrVertex * verts, int num, 
   */
 }
 
-void csGraphics3DGlide3x::RenderPolygonMultiPass (MyGrVertex* verts, int num, bool haslight,
+void csGraphics3DGlide3x::RenderPolygonMultiPass (MyGrVertex* verts, int num, 
                                                   TextureHandler* text, TextureHandler* light,
 						  bool is_transparent)
 {
@@ -999,7 +998,7 @@ void csGraphics3DGlide3x::DrawPolygon (G3DPolygonDP& poly)
       GlideLib_grFogMode ( GR_FOG_DISABLE );
   }
 
-  RenderPolygon (m_dpverts,poly.num,lm_exists,thTex,thLm,is_transparent);
+  RenderPolygon (m_dpverts,poly.num,thTex,thLm,is_transparent);
 
   if (is_colorkeyed)
     GlideLib_grChromakeyMode (GR_CHROMAKEY_DISABLE);

@@ -73,7 +73,7 @@ public:
   DECLARE_IBASE;
   
   /// The following doesnt matter since we have an alphamap anyway
-  virtual void SetTransparent (bool Enable){};
+  virtual void SetTransparent (bool ){};
   virtual void SetTransparent (UByte red, UByte green, UByte blue){};
   virtual bool GetTransparent (){ return true; }
 

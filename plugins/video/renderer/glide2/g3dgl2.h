@@ -274,11 +274,11 @@ private:
   /// Initialize Instance from Board Config
   void InitializeBoard(GrHwConfiguration &);
   /// ptr to Rendering Function
-  void (*RenderPolygon)(GrVertex*, int, bool,TextureHandler*,TextureHandler*,bool);
+  void (*RenderPolygon)(GrVertex*, int, TextureHandler*,TextureHandler*,bool);
   /// Rendering Function with MultiPass (One TMU)
-  static void RenderPolygonMultiPass(GrVertex*, int, bool,TextureHandler*,TextureHandler*,bool);
+  static void RenderPolygonMultiPass(GrVertex*, int, TextureHandler*,TextureHandler*,bool);
   /// Rendering Function with SinglePass (Two (or more) TMUs)
-  static void RenderPolygonSinglePass(GrVertex*, int, bool,TextureHandler*,TextureHandler*,bool);
+  static void RenderPolygonSinglePass(GrVertex*, int, TextureHandler*,TextureHandler*,bool);
 
   /// used to set up polygon geometry before rasterization.
   inline void SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2, float& J3, 

@@ -281,11 +281,11 @@ private:
   /// Initialize Instance from Board Config
   void InitializeBoard(const char*);
   /// ptr to Rendering Function
-  void (*RenderPolygon)(MyGrVertex*, int, bool,TextureHandler*,TextureHandler*,bool);
+  void (*RenderPolygon)(MyGrVertex*, int, TextureHandler*,TextureHandler*,bool);
   /// Rendering Function with MultiPass (One TMU)
-  static void RenderPolygonMultiPass(MyGrVertex*, int, bool,TextureHandler*,TextureHandler*,bool);
+  static void RenderPolygonMultiPass(MyGrVertex*, int, TextureHandler*,TextureHandler*,bool);
   /// Rendering Function with SinglePass (Two (or more) TMUs)
-  static void RenderPolygonSinglePass(MyGrVertex*, int, bool,TextureHandler*,TextureHandler*,bool);
+  static void RenderPolygonSinglePass(MyGrVertex*, int, TextureHandler*,TextureHandler*,bool);
 
   /// used to set up polygon geometry before rasterization.
   inline void SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2, float& J3, 
