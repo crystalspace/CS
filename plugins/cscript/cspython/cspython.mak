@@ -107,7 +107,9 @@ $(SWIG.CSPYTHON): $(SWIG.INTERFACE)
 	mv plugins/cscript/cspython/cspace.py scripts/python/
 
 $(CSPYTHON): $(OBJ.CSPYTHON) $(LIB.CSPYTHON)
-	$(DO.PLUGIN) $(LIB.CSPYTHON.LOCAL)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(LIB.CSPYTHON.LOCAL) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 cspythonclean:
 	-$(RM) $(CSPYTHON) $(OBJ.CSPYTHON) $(TRASH.CSPYTHON)

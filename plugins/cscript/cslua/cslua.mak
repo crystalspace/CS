@@ -77,7 +77,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: cslua csluaclean csluaswig csjavaswigclean
+.PHONY: cslua csluaclean csluaswig csluaswigclean
 
 all: $(CSLUA.LIB)
 cslua: $(OUTDIRS) $(CSLUA)
@@ -96,7 +96,9 @@ $(SWIG.CSLUA): $(SWIG.INTERFACE)
 	swiglua -multistate -c++ -o $(SWIG.CSLUA) $(SWIG.INTERFACE)
 
 $(CSLUA): $(OBJ.CSLUA) $(LIB.CSLUA)
-	$(DO.PLUGIN) $(LIB.CSLUA.LOCAL)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(LIB.CSLUA.LOCAL) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 csluaclean:
 	-$(RM) $(CSLUA) $(OBJ.CSLUA) $(TRASH.CSLUA)

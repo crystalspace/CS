@@ -49,6 +49,14 @@ The history order has been reversed so that new features are at the top.
 	    - Added a video/loader reference to mk/user.mak.  This _is_ the
 	      appropriate place to list such modules.
 	    - Removed the obsolete csstdldr reference from mk/user.mak.
+	- Eric Sunshine repaired imgload.mak so that it works correctly on
+	  platforms which define a custom DO.PLUGIN makefile variable.  (In his
+	  CVS log message for the previous version of this makefile, Norman
+	  correctly speculated that I would end up changing things around.)
+	  Fixing the problem required the introduction of distinct plugin build
+	  steps in a fashion analogous to the DO.DEP1/DO.DEP2 solution of yore.
+	  Also repaired glrender.mak, cspython.mak, csjava.mak, and cslua.mak;
+	  all of which experienced the same problem.
 16-Apr-2001
 	- Added iEngine::CreateSectorWallsMesh().
 	- Fixed simplep (plugin version of simple) so that it works

@@ -115,9 +115,13 @@ DO.STATIC.LIBRARY = $(AR) $(ARFLAGS) $(ARFLAGS.@) $(^^)
 # How to make a shared/dynamic library
 DO.SHARED.LIBRARY = $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS)
 # How to make a static plugin
-DO.STATIC.PLUGIN = $(AR) $(ARFLAGS) $(ARFLAGS.@) $(^^)
+DO.STATIC.PLUGIN.PREAMBLE =
+DO.STATIC.PLUGIN.CORE = $(AR) $(ARFLAGS) $(ARFLAGS.@) $(^^)
+DO.STATIC.PLUGIN.POSTAMBLE =
 # How to make a shared plugin
-DO.SHARED.PLUGIN = $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS)
+DO.SHARED.PLUGIN.PREAMBLE =
+DO.SHARED.PLUGIN.CORE = $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS)
+DO.SHARED.PLUGIN.POSTAMBLE =
 # How to link a console executable
 DO.LINK.CONSOLE.EXE = $(LINK) $(LFLAGS) $(LFLAGS.CONSOLE.EXE) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
 # How to link a graphical executable
@@ -125,10 +129,15 @@ DO.LINK.EXE = $(LINK) $(LFLAGS) $(LFLAGS.EXE) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(
 
 # How to do either a dynamic or static library (depending on MAKE_DLL)
 ifeq ($(MAKE_DLL),yes)
-  DO.PLUGIN = $(DO.SHARED.PLUGIN)
+  DO.PLUGIN.PREAMBLE = $(DO.SHARED.PLUGIN.PREAMBLE)
+  DO.PLUGIN.CORE = $(DO.SHARED.PLUGIN.CORE)
+  DO.PLUGIN.POSTAMBLE = $(DO.SHARED.PLUGIN.POSTAMBLE)
 else
-  DO.PLUGIN = $(DO.STATIC.PLUGIN)
+  DO.PLUGIN.PREAMBLE = $(DO.STATIC.PLUGIN.PREAMBLE)
+  DO.PLUGIN.CORE = $(DO.STATIC.PLUGIN.CORE)
+  DO.PLUGIN.POSTAMBLE = $(DO.STATIC.PLUGIN.POSTAMBLE)
 endif
+DO.PLUGIN = $(DO.PLUGIN.PREAMBLE) $(DO.PLUGIN.CORE) $(DO.PLUGIN.POSTAMBLE)
 
 # The sed script used to build dependencies
 SED_DEPEND=-e "s/^\([^ \#].*\)/$(BUCK)\(OUT\)\1/" $(SYS_SED_DEPEND)
