@@ -3208,7 +3208,6 @@ void csThingObjectType::RemovePolyTxtPlane (iPolyTxtPlane* pl)
     if (pl == &(pli->scfiPolyTxtPlane))
     {
       planes.Delete (i);
-      //pl->DecRef ();
       return;
     }
   }
@@ -3226,7 +3225,6 @@ void csThingObjectType::RemoveCurveTemplate (iCurveTemplate* ct)
     if (ct == i_cti)
     {
       curve_templates.Delete (i);
-      //ct->DecRef ();
       return;
     }
   }
