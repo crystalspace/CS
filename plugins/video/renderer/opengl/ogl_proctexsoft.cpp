@@ -180,33 +180,14 @@ bool csOpenGLProcSoftware::Prepare(
 { 
   // We generate a 32 bit pfmt based on whether the platform uses
   // an RGB or BGR frame buffer
-    
-#if (CS_24BIT_PIXEL_LAYOUT == CS_24BIT_PIXEL_ABGR)
-  if (ipfmt->RedMask > ipfmt->BlueMask)
-  {
-    pfmt.RedMask   = 0xff000000;
-    pfmt.GreenMask = 0x00ff0000;
-    pfmt.BlueMask  = 0x0000ff00;
-  }
-  else
-  {
-    pfmt.RedMask   = 0x0000ff00;
-    pfmt.GreenMask = 0x00ff0000;
-    pfmt.BlueMask  = 0xff000000;
-  }
-#else
-  if (ipfmt->RedMask > ipfmt->BlueMask)
-  {
-    pfmt.RedMask   = 0x000000ff;
-    pfmt.GreenMask = 0x0000ff00;
-    pfmt.BlueMask  = 0x00ff0000;
-  }
-  else
-  {
+#if (CS_24BIT_PIXEL_LAYOUT == CS_24BIT_PIXEL_ARGB)
     pfmt.RedMask   = 0x00ff0000;
     pfmt.GreenMask = 0x0000ff00;
     pfmt.BlueMask  = 0x000000ff;
-  }
+#else
+    pfmt.RedMask   = 0x000000ff;
+    pfmt.GreenMask = 0x0000ff00;
+    pfmt.BlueMask  = 0x00ff0000;
 #endif
   pfmt.PixelBytes = 4;
   pfmt.PalEntries = 0;

@@ -25,6 +25,10 @@
 #include "ivaria/reporter.h"
 #include "qint.h"
 
+// This header should be moved
+#include "video/renderer/common/pixfmt.h"
+
+
 SCF_IMPLEMENT_IBASE_EXT (csGraphics2DGLCommon)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
 SCF_IMPLEMENT_IBASE_EXT_END
@@ -40,16 +44,17 @@ bool csGraphics2DGLCommon::Initialize (iObjectRegistry *object_reg)
   if (!csGraphics2D::Initialize (object_reg))
     return false;
 
-  // We don't really care about pixel format, except for ScreenShot ()
-# if defined (CS_BIG_ENDIAN)
-	pfmt.RedMask   = 0xff000000;
-	pfmt.GreenMask = 0x00ff0000;
-	pfmt.BlueMask  = 0x0000ff00;
-# else
-	pfmt.RedMask   = 0x000000ff;
-	pfmt.GreenMask = 0x0000ff00;
-	pfmt.BlueMask  = 0x00ff0000;
-# endif
+  // We don't really care about pixel format, except for ScreenShot()
+  // and OpenGL software proctexes
+#if (CS_24BIT_PIXEL_LAYOUT == CS_24BIT_PIXEL_ABGR)
+    pfmt.RedMask = 0x000000FF;
+    pfmt.GreenMask = 0x0000FF00;
+    pfmt.BlueMask = 0x00FF0000;
+#else 
+    pfmt.RedMask = 0x00FF0000;
+    pfmt.GreenMask = 0x0000FF00;
+    pfmt.BlueMask = 0x000000FF;
+#endif
   pfmt.PixelBytes = 4;
   pfmt.PalEntries = 0;
   pfmt.complete ();
@@ -435,20 +440,23 @@ iImage *csGraphics2DGLCommon::ScreenShot ()
       break;
   }
 
-#if defined (CS_BIG_ENDIAN)
-  // On big endian and 32-bit displays we swap the RGBA
-  // colors.
+// Pixel formats expect AXXX not XXXA so swap
+// On ABGR machines, we also need to swap B/R bytes
   if (pfmt.PixelBytes == 4)
   {
     uint32* s = (uint32*)screen_shot;
     int i;
     for (i = 0 ; i < Width*Height ; i++)
     {
-    	*s = convert_endian (*s);
+#if (CS_24BIT_PIXEL_LAYOUT == CS_24BIT_PIXEL_ABGR)
+        *s = ((*s & 0x000000FF) << 24) | ((*s & 0x0000FF00) << 8) |
+                ((*s & 0x00FF0000) >> 8) | ((*s & 0xFF000000) >> 24);
+#else 
+        *s = ((*s & 0xFF) << 24) | ((*s & 0xFFFFFF00) >> 8);
+#endif
 	s++;
     }
   }
-#endif
 
   csScreenShot *ss = new csScreenShot (this);
 
