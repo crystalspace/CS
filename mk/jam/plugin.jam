@@ -35,7 +35,7 @@ rule Plugin
 
   # Create a target for eventual static linking
   SubVariant static ;
-  Library $(<)_static : $(>) : $(3) independant ;
+  Library $(<)_static : $(>) : $(3) independent ;
   CFlags $(<)_static : -DCS_STATIC_LINKED ;
   LFlags $(<)_static : $(LINKLIBS) ;
   SubVariant ;
@@ -57,7 +57,7 @@ rule PluginFromObjects
     NotFile $(<) ;
   }
 
-  if ! $($(<)_INDEPENDANT)
+  if ! $($(<)_INDEPENDENT)
   {
     Depends plugins : $(target) ;
   }

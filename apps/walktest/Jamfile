@@ -8,7 +8,7 @@ LinkWith walktest : csengine csgeom csgfx cssys cstool csutil ;
 SubVariant static ;
 Application walktest_static
 	: [ Wildcard *.cpp *.h ]
-	: independant
+	: independent
 ;
 LinkWith walktest_static : csengine csgeom csgfx cssys cstool csutil ;
 LinkStaticPlugins walktest_static : $(STATIC.PLUGINLIST) ;

@@ -103,7 +103,7 @@ rule ApplicationFromObjects
   }
 
   # make compiled sources a dependency of target
-  if ! $($(<)_INDEPENDANT)
+  if ! $($(<)_INDEPENDENT)
   {
     Depends apps : $(target) ;
   }

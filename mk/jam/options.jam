@@ -23,7 +23,7 @@
 ##	    Some rules like Application or Plugin are setting up default rules
 ##	    for the installation of the target. You can disable this behaviour
 ##	    with the noinstall flag.
-##	fot all targets: independant
+##	fot all targets: independent
 ##	    The target will not be made a dependency of the all target.
 rule _Options
 {
@@ -43,7 +43,7 @@ rule _Options
         case install : Option_install $(target) ;
 	case noinstall : Option_noinstall $(target) ;
 
-	case independant : Option_independant $(target) ;
+	case independent : Option_independent $(target) ;
 	  
 	case * :
 	  echo "Warning: Unknown option $(option) specified for target $(target)" ;

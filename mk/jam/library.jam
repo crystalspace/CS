@@ -58,7 +58,7 @@ rule csLibraryFromObjects
   }
 
   # library depends on its member objects
-  if ! $($(<)_INDEPENDANT)
+  if ! $($(<)_INDEPENDENT)
   {
     if $(KEEPOBJS)
     {
@@ -186,9 +186,9 @@ rule Option_static
 {
 }
 
-rule Option_independant
+rule Option_independent
 {
-  $(<)_INDEPENDANT = yes ;
+  $(<)_INDEPENDENT = yes ;
 }
 
 actions together Ranlib
