@@ -71,10 +71,10 @@ chronological order.
 	  The only remaining directories which need to be converted are
 	  CS/plugins/mesh and CS/plugins/video.
 6-Nov-2003
-	- res bumped the version of the iGraphics2D interface and updated
-	  some doxygen comments in include/graph2d.h. (Basically the
-	  differences between his local copy he forgot to commit and
-	  Eric Sunshine's recent update to this file to fix compilation.)
+	- res bumped the version of the iGraphics2D interface and updated some
+	  Doxygen comments in include/graph2d.h (basically, the differences
+	  between res's local copy he forgot to commit yesterday and Eric
+	  Sunshine's patch to graph2d.h to work around res's commit amnesia :-)
 	- res made the csShadowIterator destructor virtual.
 	- Eric Sunshine added an ugly hack to jobber.pl to work around
 	  SourceForge CVS server brokenness.  Specifically, the SourceForge CVS
