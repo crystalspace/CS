@@ -38,7 +38,7 @@ The history order is reversed so that new features are at the top.
 	  system. Both still unused.
 	- Philip Wyett eliminated some compiler warnings in MSVC
 	  and MingW ports.
-	- Philiop also added Martins strserv plugin to global build process.
+	- Philip also added Martins strserv plugin to global build process.
 4-May-2001
 	- Philip Wyett fixed the signed/unsigned warnings in the
 	  sequence manager.
