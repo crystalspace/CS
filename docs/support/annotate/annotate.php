@@ -47,11 +47,13 @@ if ($action=="") {
         writeXMLFile($h);
         include ("mail.php");
         foreach ($mail as $i) {
-	    mail ($i, "CS documentation annotated by $authorname ($emailname)",
+	    $emailmangled = str_replace("@", " at ", $emailname);
+	    $emailmangled = str_replace(".", " dot ", $emailmangled);
+	    mail ($i, "CS documentation annotated by $authorname",
 		"Author: $authorname\n".
-		"E-Mail: $emailname\n".
+		"E-Mail: $emailmangled\n".
 		"Topic:  $theme\n".
-		"File:   $self\n".
+		"File:   $HTTP_REFERER\n".
 		"Time:   ".strftime("%a, %d %b %G (%H:%M UTC)",$newentry->date)." (".$newentry->date.")\n".
 		"Comment:\n".
 		stripslashes($texttext));
