@@ -67,6 +67,12 @@ struct iPolygonMesh : public iBase
    * This gives the polygon mesh a chance to clean up some stuff.
    */
   virtual void Cleanup () = 0;
+  
+  //is this a deformable mesh?
+  virtual bool IsDeformable() const = 0;
+  
+  //this returns the number of deformations occurred to the mesh
+  virtual uint32 GetChangeNumber() const = 0;
 };
 
 /** @} */
