@@ -866,8 +866,6 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
     	Engine->GetLightmapCellSize ()));
     cfg->DecRef();
   }
-  System->Printf (MSG_INITIALIZATION, "Lightmap grid size = %dx%d.\n",
-      Engine->GetLightmapCellSize (), Engine->GetLightmapCellSize ());
 
   if (!LoadMap (**buf))
     return false;

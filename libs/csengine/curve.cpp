@@ -294,28 +294,6 @@ void csCurve::Normal (csVector3& /*vec*/, double /*u*/, double /*v*/)
 // #define CURVE_LM_SIZE 32
 #define CURVE_LM_SIZE (8 - 2) /*this is the real value - 2*/
 
-void csCurve::InitLightMaps (bool do_cache)
-{
-  if (!IsLightable ()) return;
-  lightmap = new csLightMap ();
-
-  // Allocate space for the lightmap and initialize it to ambient color.
-  int r, g, b;
-  r = csLight::ambient_red;
-  g = csLight::ambient_green;
-  b = csLight::ambient_blue;
-  lightmap->Alloc (CURVE_LM_SIZE*csLightMap::lightcell_size, 
-                   CURVE_LM_SIZE*csLightMap::lightcell_size, r, g, b);
-
-  if (!do_cache) { lightmap_up_to_date = false; return; }
-  if (csEngine::do_force_relight) lightmap_up_to_date = false;
-  else 
-    if (!lightmap->ReadFromCache ( CURVE_LM_SIZE*csLightMap::lightcell_size,
-           CURVE_LM_SIZE*csLightMap::lightcell_size, this, false, 
-           csEngine::current_engine))
-    lightmap_up_to_date = true;
-  else lightmap_up_to_date = true;
-}
 
 void csCurve::MakeDirtyDynamicLights () 
 { 
@@ -711,15 +689,56 @@ void csCurve::SetObject2World (csReversibleTransform* o2w)
   }
 }
 
-void csCurve::CacheLightMaps ()
+void csCurve::InitializeDefault ()
 {
-  if (!lightmap) return;
+  if (!IsLightable ()) return;
+  lightmap = new csLightMap ();
+
+  // Allocate space for the lightmap and initialize it to ambient color.
+  int r, g, b;
+  r = csLight::ambient_red;
+  g = csLight::ambient_green;
+  b = csLight::ambient_blue;
+  lightmap->Alloc (CURVE_LM_SIZE*csLightMap::lightcell_size, 
+                   CURVE_LM_SIZE*csLightMap::lightcell_size, r, g, b);
+  lightmap_up_to_date = false;
+}
+
+bool csCurve::ReadFromCache (int id)
+{
+  if (!IsLightable ()) return true;
+  lightmap = new csLightMap ();
+
+  // Allocate space for the lightmap and initialize it to ambient color.
+  int r, g, b;
+  r = csLight::ambient_red;
+  g = csLight::ambient_green;
+  b = csLight::ambient_blue;
+  lightmap->Alloc (CURVE_LM_SIZE*csLightMap::lightcell_size, 
+                   CURVE_LM_SIZE*csLightMap::lightcell_size, r, g, b);
+
+  lightmap->ReadFromCache (id, CURVE_LM_SIZE*csLightMap::lightcell_size,
+           CURVE_LM_SIZE*csLightMap::lightcell_size, this, false, 
+           csEngine::current_engine);
+  lightmap_up_to_date = true;
+  return true;
+}
+
+bool csCurve::WriteToCache (int id)
+{
+  if (!lightmap) return true;
   if (!lightmap_up_to_date)
   {
     lightmap_up_to_date = true;
-    lightmap->Cache (NULL, this, csEngine::current_engine);
+    lightmap->Cache (id, NULL, this, csEngine::current_engine);
   }
-  lightmap->ConvertToMixingMode ();
+  return true;
+}
+
+void csCurve::PrepareLighting ()
+{
+  if (lightmap)
+    lightmap->ConvertToMixingMode ();
 }
 
 float csCurve::GetArea()

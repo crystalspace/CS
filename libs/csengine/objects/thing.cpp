@@ -51,6 +51,7 @@ long csThing::current_light_frame_number = 0;
 
 IMPLEMENT_IBASE_EXT (csThing)
   IMPLEMENTS_EMBEDDED_INTERFACE (iThingState)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iLightingInfo)
   IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
   IMPLEMENTS_EMBEDDED_INTERFACE (iVisibilityCuller)
   IMPLEMENTS_EMBEDDED_INTERFACE (iMeshObject)
@@ -59,6 +60,10 @@ IMPLEMENT_IBASE_EXT_END
 
 IMPLEMENT_EMBEDDED_IBASE (csThing::ThingState)
   IMPLEMENTS_INTERFACE (iThingState)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csThing::LightingInfo)
+  IMPLEMENTS_INTERFACE (iLightingInfo)
 IMPLEMENT_EMBEDDED_IBASE_END
 
 IMPLEMENT_EMBEDDED_IBASE(csThing::PolyMesh)
@@ -77,14 +82,21 @@ IMPLEMENT_EMBEDDED_IBASE(csThing::MeshObjectFactory)
   IMPLEMENTS_INTERFACE(iMeshObjectFactory)
 IMPLEMENT_EMBEDDED_IBASE_END
 
+int csThing::last_thing_id = 0;
+
 csThing::csThing (iBase* parent) : csObject (parent),
 	polygons (64, 64), curves (16, 16)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiThingState);
+  CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityCuller);
   CONSTRUCT_EMBEDDED_IBASE (scfiMeshObject);
   CONSTRUCT_EMBEDDED_IBASE (scfiMeshObjectFactory);
+
+  last_thing_id++;
+  thing_id = last_thing_id;
+  last_polygon_id = 0;
 
   csEngine::current_engine->AddToCurrentRegion (this);
 
@@ -249,8 +261,10 @@ int csThing::AddCurveVertex (const csVector3& v, const csVector2& t)
     max_curve_vertices += 10;
     csVector3* new_vertices = new csVector3 [max_curve_vertices];
     csVector2* new_texels   = new csVector2 [max_curve_vertices];
-    memcpy (new_vertices, curve_vertices, sizeof (csVector3)*num_curve_vertices);
-    memcpy (new_texels,   curve_texels,   sizeof (csVector2)*num_curve_vertices);
+    memcpy (new_vertices, curve_vertices,
+    	sizeof (csVector3)*num_curve_vertices);
+    memcpy (new_texels, curve_texels,
+    	sizeof (csVector2)*num_curve_vertices);
     delete [] curve_vertices;
     delete [] curve_texels;
     curve_vertices = new_vertices;
@@ -1194,16 +1208,6 @@ void csThing::UpdateCurveTransform (const csReversibleTransform& movtrans)
   }
 }
 
-
-void csThing::CreateLightMaps (iGraphics3D* g3d)
-{
-  int i;
-  for (i = 0 ; i < polygons.Length () ; i++)
-  {
-    csPolygon3D* p = GetPolygon3D (i);
-    p->CreateLightMaps (g3d);
-  }
-}
 
 csPolygon3D* csThing::IntersectSphere (csVector3& center, float radius,
 	float* pr)
@@ -2239,23 +2243,50 @@ void csThing::RealCheckFrustum (iFrustumView* lview, iMovable* movable)
   draw_busy--;
 }
 
-void csThing::InitLightMaps (bool do_cache)
+void csThing::InitializeDefault ()
 {
   Prepare ();
   int i;
   for (i = 0 ; i < polygons.Length () ; i++)
-    polygons.Get (i)->InitLightMaps (do_cache);
+    polygons.Get (i)->InitializeDefault ();
   for (i = 0 ; i < GetCurveCount () ; i++)
-    curves.Get (i)->InitLightMaps (do_cache);
+    curves.Get (i)->InitializeDefault ();
 }
 
-void csThing::CacheLightMaps ()
+bool csThing::ReadFromCache (int id)
+{
+  Prepare ();
+  if (id == 0) id = thing_id;
+  int i;
+  for (i = 0 ; i < polygons.Length () ; i++)
+    if (!polygons.Get (i)->ReadFromCache (id))
+      return false;
+  for (i = 0 ; i < GetCurveCount () ; i++)
+    if (!curves.Get (i)->ReadFromCache (id))
+      return false;
+  return true;
+}
+
+bool csThing::WriteToCache (int id)
+{
+  if (id == 0) id = thing_id;
+  int i;
+  for (i = 0 ; i < polygons.Length () ; i++)
+    if (!polygons.Get (i)->WriteToCache (id))
+      return false;
+  for (i = 0 ; i < GetCurveCount () ; i++)
+    if (!curves.Get (i)->WriteToCache (id))
+      return false;
+  return true;
+}
+
+void csThing::PrepareLighting ()
 {
   int i;
   for (i = 0 ; i < polygons.Length () ; i++)
-    polygons.Get (i)->CacheLightMaps ();
+    polygons.Get (i)->PrepareLighting ();
   for (i = 0 ; i < GetCurveCount () ; i++)
-    curves.Get (i)->CacheLightMaps ();
+    curves.Get (i)->PrepareLighting ();
 }
 
 void csThing::Merge (csThing* other)

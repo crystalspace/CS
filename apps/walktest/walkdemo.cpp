@@ -52,6 +52,7 @@
 #include "isound/renderer.h"
 #include "ivideo/graph3d.h"
 #include "ivaria/collider.h"
+#include "imesh/lighting.h"
 #include "imesh/partsys.h"
 #include "imesh/fountain.h"
 #include "imesh/explode.h"
@@ -1384,16 +1385,14 @@ iMeshWrapper* CreatePortalThing (const char* name, iSector* room,
       p->GetVertex (1), csVector2 (1, 0),
       p->GetVertex (2), csVector2 (1, 1));
   portalPoly = p;
-
-  thing_state->InitLightMaps (false);
-  iMeshWrapper* iwrap = QUERY_INTERFACE (thing->GetMeshObject (), iMeshWrapper);
-  if (iwrap)
-  {
-    room->ShineLights (iwrap);
-    iwrap->DecRef ();
-  }
-  thing_state->CreateLightMaps (Sys->myG3D);
   thing_state->DecRef ();
+
+  iLightingInfo* linfo = QUERY_INTERFACE (thing->GetMeshObject (),
+    iLightingInfo);
+  linfo->InitializeDefault ();
+  room->ShineLights (thing);
+  linfo->PrepareLighting ();
+  linfo->DecRef ();
 
   return thing;
 }

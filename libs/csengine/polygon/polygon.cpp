@@ -249,8 +249,6 @@ void csPolyTexGouraud::SetDynamicColor (int i, float r, float g, float b)
 
 //---------------------------------------------------------------------------
 
-unsigned long csPolygon3D::last_polygon_id = 0;
-
 IMPLEMENT_IBASE_EXT (csPolygon3D)
   IMPLEMENTS_EMBEDDED_INTERFACE (iPolygon3D)
 IMPLEMENT_IBASE_EXT_END
@@ -263,7 +261,7 @@ csPolygon3D::csPolygon3D (csMaterialWrapper* material) : csPolygonInt (),
   csObject (), vertices (4)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
-  polygon_id = last_polygon_id++;
+  polygon_id = 0;
 
   if (material) SetMaterial (material);
   else csPolygon3D::material = NULL;
@@ -299,12 +297,14 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csPolygonInt (),
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
 
-  polygon_id = last_polygon_id++;
   const char* tname = poly.GetName ();
   if (tname) SetName (tname);
 
   thing = poly.thing;
-  //sector = poly.sector;
+  if (thing)
+    polygon_id = thing->GetNewPolygonID ();
+  else
+    polygon_id = 0;
 
   portal = poly.portal;
 
@@ -347,6 +347,12 @@ csPolygon3D::~csPolygon3D ()
 #ifdef DO_HW_UVZ
   if ( uvz ) delete [] uvz;
 #endif
+}
+
+void csPolygon3D::SetParent (csThing* thing)
+{
+  csPolygon3D::thing = thing;
+  polygon_id = thing->GetNewPolygonID ();
 }
 
 void csPolygon3D::SetTextureType (int type)
@@ -793,17 +799,6 @@ void csPolygon3D::SetupHWUV()
   }
 }
 #endif
-
-void csPolygon3D::CreateLightMaps (iGraphics3D* /*g3d*/)
-{
-  if (orig_poly) return;
-  csPolyTexLightMap *lmi = GetLightMapInfo ();
-  if (!lmi || !lmi->tex->lm) return;
-
-  if (lmi->tex->lm)
-    lmi->tex->lm->ConvertFor3dDriver (csEngine::current_engine->NeedPO2Maps,
-      csEngine::current_engine->MaxAspectRatio);
-}
 
 float csPolygon3D::GetArea()
 {
@@ -1591,26 +1586,53 @@ bool csPolygon3D::IntersectRayPlane (const csVector3& start, const csVector3& en
   return r >= 0;
 }
 
-void csPolygon3D::InitLightMaps (bool do_cache)
+void csPolygon3D::InitializeDefault ()
 {
   if (orig_poly) return;
   csPolyTexLightMap* lmi = GetLightMapInfo ();
   if (!lmi || lmi->tex->lm == NULL) return;
-  if (!do_cache) { lmi->lightmap_up_to_date = false; return; }
-  if (csEngine::do_force_relight || !csEngine::current_engine->IsLightingCacheEnabled ())
-  {
-    lmi->tex->InitLightMaps ();
-    lmi->lightmap_up_to_date = false;
-  }
-  else if (!lmi->tex->lm->ReadFromCache (lmi->tex->w_orig, lmi->tex->h,
-    this, true, csEngine::current_engine))
-  {
-    lmi->tex->InitLightMaps ();
-    lmi->lightmap_up_to_date = true;
-  }
-  else
-    lmi->lightmap_up_to_date = true;
+  lmi->tex->InitLightMaps ();
+  lmi->lightmap_up_to_date = false;
 }
+
+bool csPolygon3D::ReadFromCache (int id)
+{
+  if (orig_poly) return true;
+  csPolyTexLightMap* lmi = GetLightMapInfo ();
+  if (!lmi || lmi->tex->lm == NULL) return true;
+  if (!lmi->tex->lm->ReadFromCache (id, lmi->tex->w_orig, lmi->tex->h,
+      this, true, csEngine::current_engine))
+    lmi->tex->InitLightMaps ();
+  lmi->lightmap_up_to_date = true;
+  return true;
+}
+
+bool csPolygon3D::WriteToCache (int id)
+{
+  if (orig_poly) return true;
+  csPolyTexLightMap* lmi = GetLightMapInfo ();
+  if (!lmi || lmi->tex->lm == NULL)
+    return true;
+  if (!lmi->lightmap_up_to_date)
+  {
+    lmi->lightmap_up_to_date = true;
+    if (csEngine::current_engine->IsLightingCacheEnabled ()
+    	&& do_cache_lightmaps)
+      lmi->tex->lm->Cache (id, this, NULL, csEngine::current_engine);
+  }
+  return true;
+}
+
+void csPolygon3D::PrepareLighting ()
+{
+  if (orig_poly) return;
+  csPolyTexLightMap *lmi = GetLightMapInfo ();
+  if (!lmi || !lmi->tex->lm) return;
+  lmi->tex->lm->ConvertToMixingMode ();
+  lmi->tex->lm->ConvertFor3dDriver (csEngine::current_engine->NeedPO2Maps,
+      csEngine::current_engine->MaxAspectRatio);
+}
+
 
 void csPolygon3D::UpdateVertexLighting (iLight* light, const csColor& lcol,
   bool dynamic, bool reset)
@@ -2011,17 +2033,3 @@ void csPolygon3D::CalculateDelayedLighting (csFrustumView *lview,
   lview->RestoreFrustumContext (old_ctxt);
 }
 
-void csPolygon3D::CacheLightMaps ()
-{
-  if (orig_poly) return;
-  csPolyTexLightMap* lmi = GetLightMapInfo ();
-  if (!lmi || lmi->tex->lm == NULL)
-    return;
-  if (!lmi->lightmap_up_to_date)
-  {
-    lmi->lightmap_up_to_date = true;
-    if (csEngine::current_engine->IsLightingCacheEnabled () && do_cache_lightmaps)
-      lmi->tex->lm->Cache (this, NULL, csEngine::current_engine);
-  }
-  lmi->tex->lm->ConvertToMixingMode ();
-}

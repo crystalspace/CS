@@ -212,12 +212,13 @@ struct LightHeader
   long dyn_cnt;		// Number of dynamic maps
 };
 
-void CacheName (char *buf, char* prefix, unsigned long ident, char *suffix)
+void CacheName (char *buf, char* prefix, int id,
+	unsigned long ident, char *suffix)
 {
-  sprintf (buf, "lm/%s%lu%s", prefix, ident, suffix);
+  sprintf (buf, "lm/%s%d_%lu%s", prefix, id, ident, suffix);
 }
 
-bool csLightMap::ReadFromCache (int w, int h,
+bool csLightMap::ReadFromCache (int id, int w, int h,
   csObject* obj, bool isPolygon, csEngine* engine)
 {
   char buf[200];
@@ -246,11 +247,11 @@ bool csLightMap::ReadFromCache (int w, int h,
     pswanted.x2 = convert_endian (float2short (poly->Vobj (1).x));
     pswanted.y2 = convert_endian (float2short (poly->Vobj (1).y));
     pswanted.z2 = convert_endian (float2short (poly->Vobj (1).z));
-    CacheName (buf, "P", poly->GetPolygonID (), "");
+    CacheName (buf, "P", id, poly->GetPolygonID (), "");
   }
   else
   {
-    CacheName (buf, "C", curve->GetCurveID (), "");
+    CacheName (buf, "C", id, curve->GetCurveID (), "");
   }
   pswanted.lm_size = convert_endian (lm_size);
   pswanted.lm_cnt = convert_endian (111);
@@ -303,9 +304,9 @@ bool csLightMap::ReadFromCache (int w, int h,
   // Now load the dynamic data.
   //-------------------------------
   if (poly)
-    CacheName (buf, "P", poly->GetPolygonID (), "_d");
+    CacheName (buf, "P", id, poly->GetPolygonID (), "_d");
   else
-    CacheName (buf, "C", curve->GetCurveID (), "_d");
+    CacheName (buf, "C", id, curve->GetCurveID (), "_d");
   data = engine->VFS->ReadFile (buf);
   if (!data) return true;	// No dynamic data. @@@ Recalculate dynamic data?
 
@@ -337,7 +338,8 @@ bool csLightMap::ReadFromCache (int w, int h,
   return true;
 }
 
-void csLightMap::Cache (csPolygon3D* poly, csCurve* curve, csEngine* engine)
+void csLightMap::Cache (int id, csPolygon3D* poly,
+	csCurve* curve, csEngine* engine)
 {
   (void) engine;
   char buf[200];
@@ -354,11 +356,11 @@ void csLightMap::Cache (csPolygon3D* poly, csCurve* curve, csEngine* engine)
     ps.x2 = convert_endian (float2short (poly->Vobj (1).x));
     ps.y2 = convert_endian (float2short (poly->Vobj (1).y));
     ps.z2 = convert_endian (float2short (poly->Vobj (1).z));
-    CacheName (buf, "P", poly->GetPolygonID (), "");
+    CacheName (buf, "P", id, poly->GetPolygonID (), "");
   }
   else
   {
-    CacheName (buf, "C", curve->GetCurveID (), "");
+    CacheName (buf, "C", id, curve->GetCurveID (), "");
   }
   ps.lm_size = convert_endian (lm_size);
   ps.lm_cnt = 0;
@@ -398,9 +400,9 @@ void csLightMap::Cache (csPolygon3D* poly, csCurve* curve, csEngine* engine)
     smap = first_smap;
 
     if (poly)
-      CacheName (buf, "P", poly->GetPolygonID (), "_d");
+      CacheName (buf, "P", id, poly->GetPolygonID (), "_d");
     else
-      CacheName (buf, "C", curve->GetCurveID (), "_d");
+      CacheName (buf, "C", id, curve->GetCurveID (), "_d");
     cf = engine->VFS->Open (buf, VFS_FILE_WRITE);
     cf->Write (lh.header, 4);
     l = convert_endian (lh.dyn_cnt);

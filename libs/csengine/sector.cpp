@@ -394,24 +394,6 @@ csObject* csSector::HitBeam (const csVector3& start, const csVector3& end,
   return (csObject*)near_mesh;
 }
 
-void csSector::CreateLightMaps (iGraphics3D* g3d)
-{
-  int i;
-  for (i = 0 ; i < meshes.Length () ; i++)
-  {
-    csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
-    // @@@ Engine should now know about things.
-    iThingState* thing_state = QUERY_INTERFACE (mesh->GetMeshObject (),
-    	iThingState);
-    if (thing_state)
-    {
-      thing_state->CreateLightMaps (g3d);
-      thing_state->DecRef ();
-    }
-  }
-}
-
-
 struct ISectData
 {
   csSegment3 seg;
@@ -1121,40 +1103,6 @@ void csSector::RealCheckFrustum (iFrustumView* lview)
   }
 
   draw_busy--;
-}
-
-void csSector::InitLightMaps (bool do_cache)
-{
-  int i;
-  for (i = 0 ; i < meshes.Length () ; i++)
-  {
-    csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
-    // @@@ Engine should now know about things.
-    iThingState* thing_state = QUERY_INTERFACE_SAFE (mesh->GetMeshObject (),
-    	iThingState);
-    if (thing_state)
-    {
-      thing_state->InitLightMaps (do_cache);
-      thing_state->DecRef ();
-    }
-  }
-}
-
-void csSector::CacheLightMaps ()
-{
-  int i;
-  for (i = 0 ; i < meshes.Length () ; i++)
-  {
-    csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
-    // @@@ Engine should now know about things.
-    iThingState* thing_state = QUERY_INTERFACE_SAFE (mesh->GetMeshObject (),
-    	iThingState);
-    if (thing_state)
-    {
-      thing_state->CacheLightMaps ();
-      thing_state->DecRef ();
-    }
-  }
 }
 
 void csSector::ShineLights (csProgressPulse* pulse)

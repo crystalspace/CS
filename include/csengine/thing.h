@@ -32,6 +32,7 @@
 #include "iengine/rview.h"
 #include "imesh/thing/thing.h"
 #include "imesh/object.h"
+#include "imesh/lighting.h"
 
 class csSector;
 class csEngine;
@@ -103,6 +104,13 @@ class csThing : public csObject
   friend class Dumper;
 
 private:
+  /// ID for this thing (will be >0).
+  unsigned int thing_id;
+  /// Last used ID.
+  static int last_thing_id;
+  /// Last used polygon ID.
+  unsigned long last_polygon_id;
+
   /// Number of vertices
   int num_vertices;
   /// Maximal number of vertices
@@ -406,6 +414,15 @@ public:
   /// Get the entire array of polygons.
   csPolygonArray& GetPolygonArray () { return polygons; }
 
+  /**
+   * Get a new polygon ID. This is used by the polygon constructor.
+   */
+  unsigned long GetNewPolygonID ()
+  {
+    last_polygon_id++;
+    return last_polygon_id;
+  }
+
   //----------------------------------------------------------------------
   // Curve handling functions
   //----------------------------------------------------------------------
@@ -605,20 +622,25 @@ public:
   //----------------------------------------------------------------------
   
   /**
-   * Prepare the lightmaps for all polys so that they are suitable
-   * for the 3D rasterizer.
-   */
-  void CreateLightMaps (iGraphics3D* g3d);
-
-  /**
    * Init the lightmaps for all polygons in this thing.
    */
-  void InitLightMaps (bool do_cache = true);
+  void InitializeDefault ();
+
+  /**
+   * Read the lightmaps from the cache.
+   */
+  bool ReadFromCache (int id);
 
   /**
    * Cache the lightmaps for all polygons in this thing.
    */
-  void CacheLightMaps ();
+  bool WriteToCache (int id);
+
+  /**
+   * Prepare the lightmaps for all polys so that they are suitable
+   * for the 3D rasterizer.
+   */
+  void PrepareLighting ();
 
   //----------------------------------------------------------------------
   // Utility functions
@@ -763,12 +785,6 @@ public:
     virtual csVector3 &GetVertexC (int i) { return scfParent->cam_verts[i]; }
     virtual int CreateVertex (const csVector3 &iVertex)
     { return scfParent->AddVertex (iVertex.x, iVertex.y, iVertex.z); }
-    virtual void CreateLightMaps (iGraphics3D* g3d)
-    { scfParent->CreateLightMaps (g3d); }
-    virtual void InitLightMaps (bool do_cache = true)
-    { scfParent->InitLightMaps (do_cache); }
-    virtual void CacheLightMaps ()
-    { scfParent->CacheLightMaps (); }
     virtual void CheckFrustum (iFrustumView* fview, iMovable* movable)
     { scfParent->CheckFrustum (fview, movable); }
     virtual csFlags& GetFlags () { return scfParent->flags; }
@@ -817,6 +833,29 @@ public:
   } scfiThingState;
   friend struct ThingState;
  
+  //------------------------- iLightingInfo interface -------------------------
+  struct LightingInfo : public iLightingInfo
+  {
+    DECLARE_EMBEDDED_IBASE (csThing);
+    virtual void InitializeDefault ()
+    {
+      scfParent->InitializeDefault ();
+    }
+    virtual bool ReadFromCache (int id)
+    {
+      return scfParent->ReadFromCache (id);
+    }
+    virtual bool WriteToCache (int id)
+    {
+      return scfParent->WriteToCache (id);
+    }
+    virtual void PrepareLighting ()
+    {
+      scfParent->PrepareLighting ();
+    }
+  } scfiLightingInfo;
+  friend struct LightingInfo;
+
   //-------------------- iPolygonMesh interface implementation ---------------
   struct PolyMesh : public iPolygonMesh
   {

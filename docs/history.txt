@@ -4,8 +4,20 @@ The history order is reversed so that new features are at the top.
 	- Removed verbose output of lightmap calculation if recalculation
 	  of lighting is not enabled. Now the progress bars are only
 	  displayed when lighting is actually being calculated.
-	- Removed some totally useles init message in the parser with regards
+	- Removed some totally useless init message in the parser with regards
 	  to lightmap cell size.
+	- Added iLightingInfo class which encapsulates lighting systems
+	  for mesh objects. Currently only thing mesh objects implement
+	  this. This class contains method to initialize lighting and
+	  also for lighting cache management.
+	- Removed all lightmap related stuff from iSector. This is now
+	  handled by the thing mesh object.
+	- Removed all lightmap related stuff from iThingState.
+	- Fixed a bug in the 'portal' command. It would try to query
+	  iMeshWrapper from the iMeshObject. Note that this fix doesn't
+	  fix the crash though.
+	- Changed the name of the cached lightmaps again. This means that
+	  levels will be black unless you use -recalc or -relight!
 	- Eric Sunshine made the following changes to the documentation:
 	    - Fixed a slew of Texinfo mark-up problems in dirhier.txi and
 	      apimod19.txi.

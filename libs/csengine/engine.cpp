@@ -60,6 +60,7 @@
 #include "iutil/cfgmgr.h"
 #include "iutil/databuff.h"
 #include "imap/reader.h"
+#include "imesh/lighting.h"
 
 //---------------------------------------------------------------------------
 
@@ -881,8 +882,11 @@ void csEngine::ShineLights (csRegion* region)
   if (do_force_relight)
   {
     CsPrintf (MSG_INITIALIZATION, "Recalculation of lightmaps forced.\n");
-    CsPrintf (MSG_INITIALIZATION, "  Pseudo-radiosity system %s.\n", csSector::do_radiosity ? "enabled" : "disabled");
-    CsPrintf (MSG_INITIALIZATION, "  Maximum number of visits per sector = %d.\n", csSector::cfg_reflections);
+    CsPrintf (MSG_INITIALIZATION, "  Pseudo-radiosity system %s.\n",
+      csSector::do_radiosity ? "enabled" : "disabled");
+    CsPrintf (MSG_INITIALIZATION,
+      "  Maximum number of visits per sector = %d.\n",
+      csSector::cfg_reflections);
   }
   else
   {
@@ -900,33 +904,46 @@ void csEngine::ShineLights (csRegion* region)
   lit->Restart ();
   while (lit->Fetch ()) light_count++;
 
-  bool do_verbose = false;
+  bool do_relight = false;
   if (do_force_relight && IsLightingCacheEnabled ())
-    do_verbose = true;
+    do_relight = true;
 
   int sn = 0;
-  int num_sectors = sectors.Length ();
+  int num_meshes = meshes.Length ();
   csProgressMeter meter (System);
 
-  if (do_verbose)
+  if (do_relight)
   {
-    CsPrintf (MSG_INITIALIZATION, "Initializing lightmaps (%d sectors):\n  ", num_sectors);
-    meter.SetTotal (num_sectors);
+    CsPrintf (MSG_INITIALIZATION, "Initializing lighting (%d meshes):\n  ",
+      num_meshes);
+    meter.SetTotal (num_meshes);
     meter.Restart ();
   }
-  for (sn = 0; sn < num_sectors ; sn++)
+  for (sn = 0; sn < num_meshes ; sn++)
   {
-    csSector* s = (csSector*)sectors [sn];
+    csMeshWrapper* s = (csMeshWrapper*)meshes[sn];
     if (!region || region->IsInRegion (s))
-      s->InitLightMaps ();
-    if (do_verbose) meter.Step();
+    {
+      iLightingInfo* linfo = QUERY_INTERFACE (s->GetMeshObject (),
+      	iLightingInfo);
+      if (linfo)
+      {
+        if (do_force_relight || !IsLightingCacheEnabled ())
+          linfo->InitializeDefault ();
+	else
+	  linfo->ReadFromCache (0);	// ID?
+	linfo->DecRef ();
+      }
+    }
+    if (do_relight) meter.Step();
   }
 
   cs_time start, stop;
   start = System->GetTime ();
-  if (do_verbose)
+  if (do_relight)
   {
-    CsPrintf (MSG_INITIALIZATION, "\nShining lights (%d lights):\n  ", light_count);
+    CsPrintf (MSG_INITIALIZATION, "\nShining lights (%d lights):\n  ",
+      light_count);
     meter.SetTotal (light_count);
     meter.Restart ();
   }
@@ -934,11 +951,12 @@ void csEngine::ShineLights (csRegion* region)
   while ((l = lit->Fetch ()) != NULL)
   {
     ((csStatLight*)l)->CalculateLighting ();
-    if (do_verbose) meter.Step();
+    if (do_relight) meter.Step();
   }
   stop = System->GetTime ();
-  if (do_verbose)
-    CsPrintf (MSG_INITIALIZATION, "\n(%.4f seconds)", (float)(stop-start)/1000.);
+  if (do_relight)
+    CsPrintf (MSG_INITIALIZATION, "\n(%.4f seconds)",
+      (float)(stop-start)/1000.);
 
   // Render radiosity
   if (use_new_radiosity && !do_not_force_relight && do_force_relight)
@@ -955,53 +973,43 @@ void csEngine::ShineLights (csRegion* region)
       delete rad;
     }
     stop = System->GetTime ();
-    if (do_verbose)
-      CsPrintf (MSG_INITIALIZATION, "(%.4f seconds)", (float)(stop-start)/1000.);
+    if (do_relight)
+      CsPrintf (MSG_INITIALIZATION, "(%.4f seconds)",
+      	(float)(stop-start)/1000.);
   }
 
-  if (do_verbose)
+  if (do_relight)
   {
-    CsPrintf (MSG_INITIALIZATION, "\nCaching lightmaps (%d sectors):\n  ", num_sectors);
-    meter.SetTotal (num_sectors);
+    CsPrintf (MSG_INITIALIZATION, "\nCaching lighting (%d meshes):\n  ",
+    	num_meshes);
+    meter.SetTotal (num_meshes);
     meter.Restart ();
   }
-  for (sn = 0; sn < num_sectors ; sn++)
+  for (sn = 0; sn < num_meshes ; sn++)
   {
-    csSector* s = (csSector*)sectors[sn];
+    csMeshWrapper* s = (csMeshWrapper*)meshes[sn];
     if (!region || region->IsInRegion (s))
-      s->CacheLightMaps ();
-    if (do_verbose) meter.Step();
-  }
-
-  if (do_verbose)
-  {
-    CsPrintf (MSG_INITIALIZATION, "\nPreparing lightmaps (%d meshes):\n  ",
-  	meshes.Length ());
-    meter.SetTotal (meshes.Length ());
-    meter.Restart ();
-  }
-  int i;
-  for (i = 0 ; i < meshes.Length () ; i++)
-  {
-    csMeshWrapper* wrap = (csMeshWrapper*)meshes[i];
-    // @@@ Temporary code!
-    iThingState* thing_state = QUERY_INTERFACE (wrap->GetMeshObject (),
-    	iThingState);
-    if (thing_state)
     {
-      thing_state->CreateLightMaps (G3D);
-      thing_state->DecRef ();
+      iLightingInfo* linfo = QUERY_INTERFACE (s->GetMeshObject (),
+      	iLightingInfo);
+      if (linfo)
+      {
+        if (do_relight)
+          linfo->WriteToCache (0);	// @@@ id
+	linfo->PrepareLighting ();
+        linfo->DecRef ();
+      }
     }
-    if (do_verbose) meter.Step();
+    if (do_relight) meter.Step();
   }
 
   csThing::current_light_frame_number++;
 
-  if (do_verbose)
+  if (do_relight)
     CsPrintf (MSG_INITIALIZATION, "\nUpdating VFS...\n");
   if (!VFS->Sync ())
     CsPrintf (MSG_WARNING, "WARNING: error updating lighttable cache!\n");
-  if (do_verbose)
+  if (do_relight)
     CsPrintf (MSG_INITIALIZATION, "DONE!\n");
 
   delete lit;

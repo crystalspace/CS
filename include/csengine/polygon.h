@@ -451,10 +451,8 @@ class csPolygon3D : public csPolygonInt, public csObject
   friend class csPolyTexture;
 
 private:
-  /// ID for this polygon.
+  /// ID for this polygon relative to the parent (will be >0).
   unsigned long polygon_id;
-  /// Last used ID.
-  static unsigned long last_polygon_id;
 
   /*
    * A table of indices into the vertices of the parent csThing
@@ -569,8 +567,12 @@ public:
    */
   virtual ~csPolygon3D ();
 
-  /// Get the ID of this polygon.
-  unsigned long GetPolygonID () { return polygon_id; }
+  /// Get the ID of this polygon relative to the parent (will be >0).
+  unsigned long GetPolygonID ()
+  {
+    CS_ASSERT (polygon_id != 0);
+    return polygon_id;
+  }
 
   /**
    * Set type of texturing to use for this polygon (one of
@@ -720,7 +722,7 @@ public:
   /**
    * Set the thing that this polygon belongs to.
    */
-  void SetParent (csThing* thing) { csPolygon3D::thing = thing; }
+  void SetParent (csThing* thing);
 
   /**
    * Get the polygonset (container) that this polygons belongs to.
@@ -935,15 +937,6 @@ public:
    */
   void SetTextureSpace (csMatrix3 const&, csVector3 const&);
 
-  /**
-   * Prepare the lightmaps for use.
-   * This function also converts the lightmaps to the correct
-   * format required by the 3D driver. This function does NOT
-   * create the first lightmap. This is done by the precalculated
-   * lighting process (using CalculateLighting()).
-   */
-  void CreateLightMaps (iGraphics3D* g3d);
-
   /// Return the pointer to the original polygon (before any BSP splits).
   csPolygonInt* GetUnsplitPolygon () { return orig_poly; }
 
@@ -995,14 +988,33 @@ public:
   /**
    * Initialize the lightmaps for this polygon.
    * Should be called before calling CalculateLighting() and before
-   * calling CacheLightMaps().<p>
-   *
+   * calling WriteToCache().
+   */
+  void InitializeDefault ();
+
+  /**
    * This function will try to read the lightmap from the
    * cache in the level archive.
    * If do_cache == false this function will not try to read the lightmap
    * from the cache.
    */
-  void InitLightMaps (bool do_cache);
+  bool ReadFromCache (int id);
+
+  /**
+   * Call after calling InitializeDefault() and CalculateLighting to cache
+   * the calculated lightmap to the level archive. This function does
+   * nothing if the cached lightmap was already up-to-date.
+   */
+  bool WriteToCache (int id);
+
+  /**
+   * Prepare the lightmaps for use.
+   * This function also converts the lightmaps to the correct
+   * format required by the 3D driver. This function does NOT
+   * create the first lightmap. This is done by the precalculated
+   * lighting process (using CalculateLighting()).
+   */
+  void PrepareLighting ();
 
   /**
    * Fill the lightmap of this polygon according to the given light and
@@ -1056,13 +1068,6 @@ public:
    * This function will also traverse through a portal if so needed.
    */
   void CalculateLighting (csFrustumView* lview);
-
-  /**
-   * Call after calling InitLightMaps and CalculateLighting to cache
-   * the calculated lightmap to the level archive. This function does
-   * nothing if the cached lightmap was already up-to-date.
-   */
-  void CacheLightMaps ();
 
   /**
    * Transform the plane of this polygon from object space to world space.

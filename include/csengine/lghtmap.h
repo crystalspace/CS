@@ -260,13 +260,16 @@ public:
 
   /**
    * Read from the cache. Return true if succesful.
+   * 'id' is a global id that is used to identify objects.
    */
-  bool ReadFromCache (int w, int h, csObject* obj, bool isPolygon, csEngine*);
+  bool ReadFromCache (int id, int w, int h,
+    csObject* obj, bool isPolygon, csEngine*);
 
   /**
    * Cache the lightmaps in the precalculation area.
+   * 'id' is a global id that is used to identify objects.
    */
-  void Cache (csPolygon3D* poly, csCurve* curve, csEngine*);
+  void Cache (int id, csPolygon3D* poly, csCurve* curve, csEngine*);
 
   /**
    * Convert the lightmaps to the correct mixing mode.

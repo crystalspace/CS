@@ -39,7 +39,7 @@ struct csFog;
 struct iGraphics3D;
 struct iPolygon3D;
 
-SCF_VERSION (iSector, 0, 2, 11);
+SCF_VERSION (iSector, 0, 2, 12);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -110,29 +110,10 @@ struct iSector : public iBase
   virtual iStatLight *FindLight (float x, float y, float z, float dist)
     const = 0;
 
-  /**
-   * Init the lightmaps for all polygons in this sector. If this
-   * routine can find them in the cache it will load them, otherwise
-   * it will prepare the lightmap for the lighting routines.
-   * If do_cache == false this function will not try to read from
-   * the cache.
-   */
-  virtual void InitLightMaps (bool do_cache = true) = 0;
   /// Calculate lighting for all objects in this sector
   virtual void ShineLights () = 0;
   /// Version of ShineLights() which only affects one mesh object.
   virtual void ShineLights (iMeshWrapper*) = 0;
-  /**
-   * Prepare the lightmaps so that they are suitable for the
-   * 3D rasterizer.
-   */
-  virtual void CreateLightMaps (iGraphics3D* g3d) = 0;
-  /**
-   * Cache the lightmaps for all polygons in this sector.
-   * The lightmaps will be cached to the current level file
-   * (if it is an archive) or else to 'precalc.zip'.
-   */
-  virtual void CacheLightMaps () = 0;
 
   /**
    * Calculate the bounding box of all objects in this sector.

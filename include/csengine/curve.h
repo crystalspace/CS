@@ -245,8 +245,6 @@ public:
   virtual void PosInSpace (csVector3& vec, double u, double v);
   ///
   virtual void Normal (csVector3& vec, double u, double v);
-  ///
-  void InitLightMaps (bool do_cache);
 
   /// Add a lightpatch to this curves list of light patches
   void AddLightPatch (csLightPatch* lp);
@@ -263,8 +261,17 @@ public:
   /// calculate the lighting for this curve
   void CalculateLighting (csFrustumView& lview);
 
-  ///
-  void CacheLightMaps ();
+  /// Initialize default lighting.
+  void InitializeDefault ();
+
+  /// Read lighting from cache.
+  bool ReadFromCache (int id);
+
+  /// Cache the curve lightmaps.
+  bool WriteToCache (int id);
+
+  /// Prepare lighting.
+  void PrepareLighting ();
 
   /// Do a hard transform on this curve.
   virtual void HardTransform (const csReversibleTransform& trans);

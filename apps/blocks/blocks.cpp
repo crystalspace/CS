@@ -58,6 +58,7 @@
 #include "iengine/mesh.h"
 #include "iengine/camera.h"
 #include "imesh/object.h"
+#include "imesh/lighting.h"
 #include "iutil/object.h"
 #include "imap/parser.h"
 
@@ -841,10 +842,13 @@ iMeshWrapper* Blocks::add_cube_thing (iSector* sect,
   csVector3 v (x, y, z);
   cube->GetMovable ()->SetPosition (sect, v);
   cube->GetMovable ()->UpdateMove ();
-  cube_state->InitLightMaps (false);
-  room->ShineLights (cube);
-  cube_state->CreateLightMaps (Gfx3D);
   cube_state->DecRef ();
+  iLightingInfo* linfo = QUERY_INTERFACE (cube->GetMeshObject (),
+  	iLightingInfo);
+  linfo->InitializeDefault ();
+  room->ShineLights (cube);
+  linfo->PrepareLighting ();
+  linfo->DecRef ();
   return cube;
 }
 
@@ -2057,9 +2061,30 @@ void Blocks::ChangePlaySize (int new_size)
   player1->zone_dim = new_size;
   WriteConfig ();
   InitGameRoom ();
-  room->InitLightMaps (false);
+  int i;
+  for (i = 0 ; i < room->GetMeshCount () ; i++)
+  {
+    iMeshWrapper* mesh = room->GetMesh (i);
+    iLightingInfo* linfo = QUERY_INTERFACE (mesh->GetMeshObject (),
+    	iLightingInfo);
+    if (linfo)
+    {
+      linfo->InitializeDefault ();
+      linfo->DecRef ();
+    }
+  }
   room->ShineLights ();
-  room->CreateLightMaps (Gfx3D);
+  for (i = 0 ; i < room->GetMeshCount () ; i++)
+  {
+    iMeshWrapper* mesh = room->GetMesh (i);
+    iLightingInfo* linfo = QUERY_INTERFACE (mesh->GetMeshObject (),
+    	iLightingInfo);
+    if (linfo)
+    {
+      linfo->PrepareLighting ();
+      linfo->DecRef ();
+    }
+  }
 }
 
 void Blocks::StartKeyConfig ()

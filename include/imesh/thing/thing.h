@@ -50,7 +50,7 @@ struct iMovable;
 #define CS_THING_MOVE_OFTEN 1
 #define CS_THING_MOVE_OCCASIONAL 2
 
-SCF_VERSION (iThingState, 0, 0, 7);
+SCF_VERSION (iThingState, 0, 0, 8);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -92,19 +92,6 @@ struct iThingState : public iBase
   virtual csVector3 &GetVertexC (int idx) = 0;
   /// Create a vertex given his object-space coords and return his index
   virtual int CreateVertex (const csVector3 &iVertex) = 0;
-  /**
-   * Prepare the lightmaps for all polys so that they are suitable
-   * for the 3D rasterizer.
-   */
-  virtual void CreateLightMaps (iGraphics3D* g3d) = 0;
-  /**
-   * Init the lightmaps for all polygons in this thing.
-   */
-  virtual void InitLightMaps (bool do_cache = true) = 0;
-  /**
-   * Cache the lightmaps for all polygons in this thing.
-   */
-  virtual void CacheLightMaps () = 0;
   /**
    * Check frustum visibility on this thing.
    * First initialize the 2D culler cube.

@@ -446,28 +446,6 @@ public:
   //------------------------------------------------
 
   /**
-   * Init the lightmaps for all polygons in this sector. If this
-   * routine can find them in the cache it will load them, otherwise
-   * it will prepare the lightmap for the lighting routines.
-   * If do_cache == false this function will not try to read from
-   * the cache.
-   */
-  void InitLightMaps (bool do_cache = true);
-
-  /**
-   * Prepare the lightmaps so that they are suitable for the
-   * 3D rasterizer.
-   */
-  void CreateLightMaps (iGraphics3D* g3d);
-
-  /**
-   * Cache the lightmaps for all polygons in this sector.
-   * The lightmaps will be cached to the current level file
-   * (if it is an archive) or else to 'precalc.zip'.
-   */
-  void CacheLightMaps ();
-
-  /**
    * The whole setup starts with csEngine::shine_lights calling
    * csSector::shine_lights for every sector in the engine.
    * This function will call csStatLight::shine_lightmaps for every
@@ -559,16 +537,10 @@ public:
     virtual iStatLight *GetLight (int n) const;
     virtual iStatLight *GetLight (const char* name) const;
     virtual iStatLight *FindLight (float x, float y, float z, float dist) const;
-    virtual void InitLightMaps (bool do_cache)
-    { scfParent->InitLightMaps (do_cache); }
     virtual void ShineLights ()
     { scfParent->ShineLights (); }
     virtual void ShineLights (iMeshWrapper* mesh)
     { scfParent->ShineLights (mesh); }
-    virtual void CreateLightMaps (iGraphics3D* g3d)
-    { scfParent->CreateLightMaps (g3d); }
-    virtual void CacheLightMaps ()
-    { scfParent->CacheLightMaps (); }
 
     virtual void CalculateSectorBBox (csBox3& bbox, bool do_meshes,
   	bool do_terrain) const

@@ -51,6 +51,7 @@
 #include "iengine/dynlight.h"
 #include "iengine/camera.h"
 #include "igraphic/loader.h"
+#include "imesh/object.h"
 
 //------------------------------------------------- We need the 3D engine -----
 
@@ -245,10 +246,13 @@ bool BumpTest::InitProcDemo ()
   thing_wrap->HardTransform (csTransform (csMatrix3 (), csVector3 (0, 5, 1)));
   thing_wrap->GetMovable ()->SetSector (room);
   thing_wrap->GetMovable ()->UpdateMove ();
+  thing_state->DecRef ();
 
-  thing_state->InitLightMaps (false);
+  iLightingInfo* linfo = QUERY_INTERFACE (thing_obj, iLightingInfo);
+  linfo->InitializeDefault ();
   room->ShineLights (thing_wrap);
-  thing_state->CreateLightMaps (myG3D);
+  linfo->PrepareLighting ();
+  linfo->DecRef ();
 
 #if 0
   iMeshFactoryWrapper* sprfact = engine->CreateMeshFactory (

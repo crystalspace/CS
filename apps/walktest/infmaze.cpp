@@ -32,6 +32,8 @@
 #include "cstool/collider.h"
 #include "csutil/dataobj.h"
 #include "csutil/sparse3d.h"
+#include "imesh/object.h"
+#include "imesh/lighting.h"
 
 InfiniteMaze::InfiniteMaze ()
 {
@@ -223,9 +225,32 @@ static bool CompleteSectorCB (iPortal* portal, iBase* context, void* data)
     	ipc->x2, ipc->y2, ipc->z2, false);
     portal->SetSector (is);
     infinite_maze->random_loose_portals (ipc->x2, ipc->y2, ipc->z2);
-    s->InitLightMaps (false);
+
+    int i;
+    for (i = 0 ; i < is->GetMeshCount () ; i++)
+    {
+      iMeshWrapper* mesh = is->GetMesh (i);
+      iLightingInfo* linfo = QUERY_INTERFACE (mesh->GetMeshObject (),
+      	iLightingInfo);
+      if (linfo)
+      {
+        linfo->InitializeDefault ();
+	linfo->DecRef ();
+      }
+    }
     s->ShineLights ();
-    s->CreateLightMaps (Sys->myG3D);
+    for (i = 0 ; i < is->GetMeshCount () ; i++)
+    {
+      iMeshWrapper* mesh = is->GetMesh (i);
+      iLightingInfo* linfo = QUERY_INTERFACE (mesh->GetMeshObject (),
+      	iLightingInfo);
+      if (linfo)
+      {
+        linfo->PrepareLighting ();
+	linfo->DecRef ();
+      }
+    }
+
     while (ipc->lviews)
     {
       int old_draw_busy = s->draw_busy;
