@@ -40,7 +40,7 @@ public:
 
   static void Destroy (T* address)
   {
-    address->T::~T();
+    address->~T();
   }
 
   static void InitRegion (T* address, int count)

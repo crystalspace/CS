@@ -196,7 +196,7 @@ public:
     int idx = FindBlock ((void*)el);
     CS_ASSERT (idx != -1);
 
-    el->T::~T();
+    el->~T();
 
 #ifdef CS_BLOCKALLOC_DEBUG
     memset (el, 0xfb, elsize);

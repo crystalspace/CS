@@ -23,6 +23,17 @@ chronological order.
 	  plugin.
 	- Jorrit removed some warnings from stdrep and also fixed a wrong
 	  printf statement (%0.77s is not valid).
+	- Eric Sunshine changed csArray<> and csBlockAllocator<> to perform
+	  explicit object destruction via p->~T() rather than p->T::~T() in
+	  order to pacify the Borland compiler which seems to be inexplicably
+	  buggy and which "randomly" emits bogus error messages about
+	  "destructor not matching class name" in a few cases where csArray<>
+	  and csBlockAllocator<> are used.  The reason we were using p->T::~T()
+	  in the first place was that some older (buggy) C++ compilers disliked
+	  p->~T(), however I think that we no longer support those compilers,
+	  thus p->~T() should be safe.  If, however, we find that some
+	  compilers still complain about this notation, then we will have to
+	  pursue a more complicated solution.
 18-Dec-2003
 	- Jorrit added two new methods to iAwsComponent. One to set the
 	  preferred size and one to clear it again. This way one can forcibly
