@@ -19,7 +19,7 @@
 
 #include <stdarg.h>
 #include "sysdef.h"
-#include "cs2d/dosalleg/allegro.h"
+#include "csalleg.h"
 #include "cssys/djgpp/idjgpp.h"
 #include "csgeom/csrect.h"
 #include "isystem.h"
