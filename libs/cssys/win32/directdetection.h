@@ -9,6 +9,8 @@
 #pragma once
 #endif // _MSC_VER >= 1000
 
+// define directInput to be backwards compatible with dx3 input
+#define DIRECTINPUT_VERSION 0x0300
 #include <windowsx.h>
 #include <ddraw.h>
 #include <d3d.h>
