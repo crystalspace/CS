@@ -241,7 +241,7 @@ iImage *csImageFile::MipMap (int steps, csRGBpixel *transp)
     return Clone ();
   }
 
-  csImageFile* nimg;
+  csImageFile* nimg = NULL;
 
   if (steps == 0)
   {
