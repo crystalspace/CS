@@ -1437,7 +1437,7 @@ void csThing::AppendShadows (iMovable* movable, iShadowBlockList* shadows,
   for (i = 0 ; i < polygons.Length () ; i++)
   {
     p = polygons.Get (i);
-    if (p->GetPortal ()) return;	// No portals
+    if (p->GetPortal ()) continue;	// No portals
     //if (p->GetPlane ()->VisibleFromPoint (origin) != cw) continue;
     float clas = p->GetPlane ()->GetWorldPlane ().Classify (origin);
     if (ABS (clas) < EPSILON) continue;

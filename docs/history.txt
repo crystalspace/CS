@@ -38,9 +38,12 @@ The history order is reversed so that new features are at the top.
 	- Also fixed the dangling references on the reporter and reporter
 	  listener. The reporter listener should not keep a permanent
 	  reference to the reporter.
-	- fixed bugs with cs-config - The script now also works when CS is
-       	  not installed.
-	- another cygwin fix
+	- Fixed a bug in csThing::AppendShadows(). If there was a portal
+	  in the thing it would ignore all polygons as shadows that
+	  came after that portal. Thanks to Norman Kramer for spotting this.
+	- Matze Braun fixed bugs with cs-config - The script now also works
+	  when CS is not installed.
+	- Matze also did another cygwin fix.
 17-Oct-2001
 	- M Voase did the following
 	  - Small typo fix to data/walktest.cfg. This just fixes up
