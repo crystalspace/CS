@@ -278,11 +278,4 @@ inline void csVector::QuickSort (int Mode)
     return true;							\
   END_TYPED_VECTOR_EXT (TYPE)
 
-/// This is a special version of typed vectors for SCF objects
-#define DECLARE_TYPED_SCF_VECTOR(NAME,TYPE)				\
-  BEGIN_TYPED_VECTOR_EXT (NAME,TYPE,obj)				\
-    obj->DecRef();							\
-    return true;							\
-  END_TYPED_VECTOR_EXT (TYPE)
-
 #endif // __CSVECTOR_H__

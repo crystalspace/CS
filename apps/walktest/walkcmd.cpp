@@ -502,6 +502,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
 	csDoor* door = new csDoor (wrap);
 	door->SetHinge (hinge);
         src->ObjAdd (door);
+	door->DecRef ();
 	wrap->DecRef ();
       }
     }
@@ -553,6 +554,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
 	    lobj->SetColors (start_col, end_col);
 	    lobj->SetTotalTime (act_time);
             src->ObjAdd (lobj);
+	    lobj->DecRef ();
 	  }
 	}
 	wrap->DecRef ();

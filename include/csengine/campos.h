@@ -20,7 +20,6 @@
 #define __CS_CAMPOS_H__
 
 #include "csobject/csobject.h"
-#include "csobject/pobject.h"
 #include "csobject/nobjvec.h"
 #include "csgeom/vector3.h"
 #include "csengine/camera.h"
@@ -36,7 +35,7 @@ struct iCamera;
  * and so on. In the map file you can use CAMERA (...) keyword to
  * define such points.
  */
-class csCameraPosition : public csPObject
+class csCameraPosition : public csObject
 {
 public:
   /// The sector this camera points to
@@ -63,7 +62,7 @@ public:
   /// Load the camera position into a camera object
   bool Load (iCamera*, iEngine*);
 
-  DECLARE_IBASE_EXT (csPObject);
+  DECLARE_IBASE_EXT (csObject);
 
   //--------------------- iCameraPosition implementation ----------------------
   struct CameraPosition : public iCameraPosition

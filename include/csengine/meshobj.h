@@ -19,7 +19,7 @@
 #ifndef __CS_MESHOBJ_H__
 #define __CS_MESHOBJ_H__
 
-#include "csobject/pobject.h"
+#include "csobject/csobject.h"
 #include "csobject/nobjvec.h"
 #include "csengine/movable.h"
 #include "csutil/flags.h"
@@ -42,7 +42,7 @@ SCF_VERSION (csMeshWrapper, 0, 0, 1);
 /**
  * The holder class for all implementations of iMeshObject.
  */
-class csMeshWrapper : public csPObject
+class csMeshWrapper : public csObject
 {
   friend class Dumper;
   friend class csMovable;
@@ -328,7 +328,7 @@ public:
     return render_priority;
   }
 
-  DECLARE_IBASE_EXT (csPObject);
+  DECLARE_IBASE_EXT (csObject);
 
   //--------------------- iMeshWrapper implementation --------------------//
   struct MeshWrapper : public iMeshWrapper

@@ -21,7 +21,6 @@
 
 #include "csgeom/transfrm.h"
 #include "csobject/csobject.h"
-#include "csobject/pobject.h"
 #include "iengine/polytmap.h"
 
 class Dumper;
@@ -34,7 +33,7 @@ SCF_VERSION (csPolyTxtPlane, 0, 0, 1);
  * that defines the orientation and offset of a texture. It can
  * be used by several polygons to let the textures fit perfectly.
  */
-class csPolyTxtPlane : public csPObject
+class csPolyTxtPlane : public csObject
 {
   ///
   friend class csPolygon2D;
@@ -131,7 +130,7 @@ public:
   /// Get the transformation from object to texture space.
   void GetTextureSpace (csMatrix3& tx_matrix, csVector3& tx_vector);
 
-  DECLARE_IBASE_EXT (csPObject);
+  DECLARE_IBASE_EXT (csObject);
 
   //----------------- iPolyTxtPlane interface implementation -----------------
   struct PolyTxtPlane : public iPolyTxtPlane

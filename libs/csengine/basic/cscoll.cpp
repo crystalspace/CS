@@ -32,7 +32,7 @@ IMPLEMENT_EMBEDDED_IBASE (csCollection::Collection)
 IMPLEMENT_EMBEDDED_IBASE_END
 
 csCollection::csCollection (csEngine* engine) :
-  csPObject(), objects (8,8), movable ()
+  csObject(), objects (8,8), movable ()
 {
   CONSTRUCT_IBASE(NULL);
   CONSTRUCT_EMBEDDED_IBASE(scfiCollection);

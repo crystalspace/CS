@@ -30,7 +30,6 @@
 #include "csengine/lghtmap.h"
 #include "csengine/rview.h"
 #include "csobject/csobject.h"
-#include "csobject/pobject.h"
 #include "ivideo/graph3d.h"
 #include "iengine/curve.h"
 
@@ -297,7 +296,7 @@ SCF_VERSION (csCurveTemplate, 0, 0, 1);
 /**
  * A curve template.
  */
-class csCurveTemplate : public csPObject
+class csCurveTemplate : public csObject
 {
 protected:
   csMaterialWrapper* cstxt;
@@ -322,7 +321,7 @@ public:
   ///
   void SetMaterialWrapper (csMaterialWrapper* h) { cstxt = h; }
 
-  DECLARE_IBASE_EXT (csPObject);
+  DECLARE_IBASE_EXT (csObject);
 
   //------------------ iCurveTemplate interface implementation --------------
   struct CurveTemplate : public iCurveTemplate

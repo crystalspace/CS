@@ -42,9 +42,7 @@ csCollider::csCollider (iObject* parent,
 	iCollideSystem* collide_system,
 	iPolygonMesh* mesh)
 {
-  iObject* ithis = QUERY_INTERFACE (this, iObject);
-  parent->ObjAdd (ithis);
-  ithis->DecRef ();
+  parent->ObjAdd (this);
   csCollider::collide_system = collide_system;
   collide_system->IncRef ();
   collider = collide_system->CreateCollider (mesh);

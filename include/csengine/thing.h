@@ -20,7 +20,7 @@
 #define __CS_THING_H__
 
 #include "csgeom/transfrm.h"
-#include "csobject/pobject.h"
+#include "csobject/csobject.h"
 #include "csengine/bsp.h"
 #include "csutil/flags.h"
 #include "csutil/cscolor.h"
@@ -96,7 +96,7 @@ struct csThingBBox
  * If you add a static tree (octree/BSP trees) to a thing it can
  * be used as a visibility culler (i.e. it implements iVisibilityCuller).
  */
-class csThing : public csPObject
+class csThing : public csObject
 {
   friend class Dumper;
 
@@ -740,7 +740,7 @@ public:
   /// Disable fog.
   void DisableFog () { fog.enabled = false; }
 
-  DECLARE_IBASE_EXT (csPObject);
+  DECLARE_IBASE_EXT (csObject);
 
   //------------------------- iThingState interface -------------------------
   struct ThingState : public iThingState

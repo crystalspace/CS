@@ -90,7 +90,7 @@ IMPLEMENT_EMBEDDED_IBASE (csIsoMaterialWrapper::IsoMaterialWrapperIndex)
 IMPLEMENT_EMBEDDED_IBASE_END
 
 csIsoMaterialWrapper::csIsoMaterialWrapper (iMaterial* material) :
-  csPObject (), handle (NULL)
+  csObject (), handle (NULL)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
   CONSTRUCT_EMBEDDED_IBASE (scfiIsoMaterialWrapperIndex);
@@ -101,7 +101,7 @@ csIsoMaterialWrapper::csIsoMaterialWrapper (iMaterial* material) :
 }
 
 csIsoMaterialWrapper::csIsoMaterialWrapper (csIsoMaterialWrapper &th) :
-  csPObject (), handle (NULL)
+  csObject (), handle (NULL)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
   CONSTRUCT_EMBEDDED_IBASE (scfiIsoMaterialWrapperIndex);
@@ -113,7 +113,7 @@ csIsoMaterialWrapper::csIsoMaterialWrapper (csIsoMaterialWrapper &th) :
 }
 
 csIsoMaterialWrapper::csIsoMaterialWrapper (iMaterialHandle *ith) :
-  csPObject (), material (NULL)
+  csObject (), material (NULL)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
   CONSTRUCT_EMBEDDED_IBASE (scfiIsoMaterialWrapperIndex);

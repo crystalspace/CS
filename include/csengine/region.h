@@ -28,7 +28,7 @@ class csEngine;
  * A region. A region is basically a collection of objects in the
  * 3D engine that can be treated as a unit.
  */
-class csRegion : public csObjectNoDel
+class csRegion : public csObject
 {
   friend class Dumper;
 

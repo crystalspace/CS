@@ -21,7 +21,6 @@
 
 #include "csgeom/matrix3.h"
 #include "csobject/csobject.h"
-#include "csobject/pobject.h"
 #include "csutil/csvector.h"
 #include "csengine/movable.h"
 #include "iengine/collectn.h"
@@ -38,7 +37,7 @@ SCF_VERSION (csCollection, 0, 0, 1);
  * operations like 'move' and 'transform' on all the objects in
  * the collection together.
  */
-class csCollection : public csPObject
+class csCollection : public csObject
 {
   friend class csMovable;
 

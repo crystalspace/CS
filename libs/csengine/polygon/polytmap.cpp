@@ -33,7 +33,7 @@ IMPLEMENT_EMBEDDED_IBASE (csPolyTxtPlane::PolyTxtPlane)
   IMPLEMENTS_INTERFACE (iPolyTxtPlane)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csPolyTxtPlane::csPolyTxtPlane () : csPObject ()
+csPolyTxtPlane::csPolyTxtPlane () : csObject ()
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiPolyTxtPlane);
   csEngine::current_engine->AddToCurrentRegion (this);

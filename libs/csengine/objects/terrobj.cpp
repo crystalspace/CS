@@ -36,10 +36,10 @@ IMPLEMENT_IBASE_EXT_INCREF(csTerrainWrapper)
 // point at its superclass' `vtbl' as soon as the destructor is entered, rather
 // than modifying it after the destructor has completed, which is how all other
 // compilers behave.  This early vptr modification, thus transmogrifies this
-// object into its superclass (csPObject) too early; before
+// object into its superclass (csObject) too early; before
 // QueryInterface(iMeshWrapper) is invoked.  As a result, by the time
 // UnlinkTerrain(this) was being called, the object already appeared to be a
-// csPObject and failed to respond positively to QueryInterface(iMeshWrapper).
+// csObject and failed to respond positively to QueryInterface(iMeshWrapper).
 // To work around this problem, the UnlinkTerrain() invocation was moved out of
 // the destructor and into DecRef(), thus it is now called prior to the
 // undesirable transmogrification.  Note that the csTerrainWrapper destructor

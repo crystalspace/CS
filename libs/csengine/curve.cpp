@@ -873,7 +873,7 @@ iMaterialWrapper* csCurve::Curve::GetMaterial ()
   return &(scfParent->GetMaterialWrapper ()->scfiMaterialWrapper);
 }
 
-csCurveTemplate::csCurveTemplate () : csPObject ()
+csCurveTemplate::csCurveTemplate () : csObject ()
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiCurveTemplate);
   csEngine::current_engine->AddToCurrentRegion (this);

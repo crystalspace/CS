@@ -576,7 +576,11 @@ defaulthalo:
       break;
   }
   l->QueryLight ()->SetAttenuation (attenuation);
-  if (kvp) l->QueryObject ()->ObjAdd (kvp->QueryObject ());
+  if (kvp)
+  {
+    l->QueryObject ()->ObjAdd (kvp->QueryObject ());
+    kvp->DecRef ();
+  }
   return l;
 }
 
@@ -1389,8 +1393,14 @@ iSector* csLoader::load_sector (char* secname, char* buf)
         sector->AddLight ( load_statlight(name, params) );
         break;
       case CS_TOKEN_NODE:
-        sector->QueryObject ()->ObjAdd (load_node(name, params, sector)->
-		QueryObject ());
+        {
+          iMapNode *n = load_node(name, params, sector);
+	  if (n)
+	  {
+            sector->QueryObject ()->ObjAdd (n->QueryObject ());
+	    n->DecRef ();
+	  }
+	}
         break;
       case CS_TOKEN_FOG:
         {
@@ -1435,7 +1445,7 @@ void csLoader::ResolvePortalSectors (iThingState *th)
       {
         System->Printf (MSG_FATAL_ERROR, "Sector '%s' not found for portal in"
           " polygon '%s/%s'!\n", stmp->QueryObject ()->GetName (),
-          p->QueryObject ()->GetObjectParentI ()->GetName (),
+          p->QueryObject ()->GetObjectParent ()->GetName (),
           p->QueryObject ()->GetName ());
         fatal_exit (0, false);
       }
@@ -2911,6 +2921,7 @@ iSoundWrapper *csLoader::LoadSound (const char* name, const char* fname) {
   iSoundWrapper* Wrapper = &(new csSoundWrapper (Sound))->scfiSoundWrapper;
   Wrapper->QueryObject ()->SetName (name);
   Engine->QueryObject ()->ObjAdd(Wrapper->QueryObject ());
+  Wrapper->DecRef ();
 
   return Wrapper;
 }

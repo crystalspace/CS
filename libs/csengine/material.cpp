@@ -135,7 +135,7 @@ IMPLEMENT_EMBEDDED_IBASE (csMaterialWrapper::MaterialWrapper)
 IMPLEMENT_EMBEDDED_IBASE_END
 
 csMaterialWrapper::csMaterialWrapper (iMaterial* m) :
-  csPObject (), handle (NULL)
+  csObject (), handle (NULL)
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
@@ -148,7 +148,7 @@ csMaterialWrapper::csMaterialWrapper (iMaterial* m) :
 }
 
 csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) :
-  csPObject (), material (NULL)
+  csObject (), material (NULL)
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);

@@ -36,7 +36,7 @@ IMPLEMENT_EMBEDDED_IBASE (csTextureWrapper::TextureWrapper)
 IMPLEMENT_EMBEDDED_IBASE_END
 
 csTextureWrapper::csTextureWrapper (iImage* Image) :
-  csPObject (), handle (NULL), flags (CS_TEXTURE_3D), use_callback (NULL)
+  csObject (), handle (NULL), flags (CS_TEXTURE_3D), use_callback (NULL)
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
@@ -49,7 +49,7 @@ csTextureWrapper::csTextureWrapper (iImage* Image) :
 }
 
 csTextureWrapper::csTextureWrapper (iTextureHandle *ith) :
-  csPObject (), image (NULL), use_callback (NULL)
+  csObject (), image (NULL), use_callback (NULL)
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);

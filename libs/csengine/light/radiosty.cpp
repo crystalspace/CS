@@ -421,7 +421,6 @@ csRadPoly :: csRadPoly(csPolygon3D *original, csSector* sector)
 
 csRadPoly :: ~csRadPoly()
 {
-  polygon->ObjRelease(this); // detach from original
 }
 
 void csRadPoly::CalcLumel2World(csVector3& res, int x, int y)
@@ -520,7 +519,6 @@ csRadCurve :: csRadCurve(csCurve *original, csSector* sector)
 
 csRadCurve :: ~csRadCurve()
 {
-  curve->ObjRelease(this); // detach from original
 }
 
 

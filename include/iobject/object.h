@@ -71,7 +71,7 @@ struct iObjectIterator;
   ((Interface*)(object)->GetChild (scfID_##Interface, VERSION_##Interface, name, true))
 
 
-SCF_VERSION (iObject, 0, 2, 0);
+SCF_VERSION (iObject, 0, 3, 0);
 
 /**
  * This interface is an SCF interface for encapsulating csObject.
@@ -87,22 +87,22 @@ struct iObject : public iBase
   /// Get the unique ID associated with this object.
   virtual CS_ID GetID () const = 0;
 
+  /**
+   * Set the parent iObject. Note that this only sets the 'parent' pointer but
+   * does not add the object as a child object.
+   */
+  virtual void SetObjectParent (iObject *obj) = 0;
+
   /// Returns the parent iObject.
-  virtual iObject* GetObjectParentI () const = 0;
+  virtual iObject* GetObjectParent () const = 0;
 
   /// Attach a new iObject to the tree
   virtual void ObjAdd (iObject *obj) = 0;
 
-  /// Removes the given object from the tree, without freeing the contents
-  virtual void ObjRelease (iObject *obj) = 0;
-
-  /// Deletes the given object, removing it from the object tree
+  /// Remove an iObject from the tree.
   virtual void ObjRemove (iObject *obj) = 0;
 
-  /// Removes all objects from the tree, without freeing the contents
-  virtual void ObjReleaseAll () = 0;
-
-  /// Deletes all objects, removing them from the object tree
+  /// Remove all child objects.
   virtual void ObjRemoveAll () = 0;
 
   /**
@@ -126,6 +126,12 @@ struct iObject : public iBase
    * remove child objects while iterating.
    */
   virtual iObjectIterator *GetIterator () = 0;
+
+  /**
+   * @@@ temporary fix: Remove an object from the tree without doing a
+   * DecRef on it.
+   */
+  virtual void ObjReleaseOld (iObject *obj) = 0;
 };
 
 

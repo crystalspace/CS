@@ -1039,6 +1039,7 @@ void HandleDynLight (iDynLight* dyn)
         es->dir = 1;
         csDataObject* esdata = new csDataObject (es);
         dyn->GetPrivateObject ()->ObjAdd (esdata);
+	esdata->DecRef ();
         add_particles_explosion (l->GetSector (), l->GetCenter (), "explo");
         return;
       }
@@ -1118,6 +1119,7 @@ void fire_missile ()
   ms->sprite = NULL;
   csDataObject* msdata = new csDataObject(ms);
   dyn->QueryObject ()->ObjAdd(msdata);
+  msdata->DecRef ();
 
   char misname[10];
   sprintf (misname, "missile%d", ((rand () >> 3) & 1)+1);
@@ -1148,6 +1150,7 @@ void AttachRandomLight (csDynLight* light)
   rl->dyn_r1 = rl->dyn_g1 = rl->dyn_b1 = 1;
   csDataObject* rldata = new csDataObject (rl);
   light->ObjAdd (rldata);
+  rldata->DecRef ();
 }
 
 //===========================================================================

@@ -20,23 +20,14 @@
 #include "cssysdef.h"
 #include "csobject/csobject.h"
 #include "csobject/dataobj.h"
-#include "csobject/pobject.h"
+#include "csutil/csvector.h"
 
 #include <stdlib.h>
 #include <string.h>
 
-#define CONTAINER_LIMIT_DELTA	16
+DECLARE_TYPED_VECTOR_NODELETE (csObjectContainer, iObject);
 
-class csObjContainer
-{
-public:
-  // Amount of child objects
-  unsigned short count, limit;
-  // Some dumb compilers (i.e. Watcom) do not like [0] arrays
-  csObject *obj [1];
-  // Enlarge the array of children
-  static void SetLimit (csObjContainer *&iContainer, int iLimit);
-};
+/*** Object Iterators ***/
 
 class csObjectIterator : public iObjectIterator
 {
@@ -62,7 +53,7 @@ public:
 
     while (1) {
       Position++;
-      if (Position == Object->children->count)
+      if (Position == Object->Children->Length ())
       {
         Position = -1;
         return false;
@@ -72,14 +63,14 @@ public:
   }
   virtual void Reset()
   {
-    if (Object->children == NULL)
+    if (Object->Children == NULL)
       Position = -1;
     else
       Position = 0;
   }
   virtual iObject *GetObject () const
   {
-    return Object->children->obj[Position];
+    return Object->Children->Get (Position);
   }
   virtual iObject* GetParentObj() const
   {
@@ -105,184 +96,139 @@ IMPLEMENT_IBASE (csObjectIterator)
   IMPLEMENTS_INTERFACE (iObjectIterator)
 IMPLEMENT_IBASE_END
 
-void csObjContainer::SetLimit (csObjContainer *&iContainer, int iLimit)
-{
-  if (iLimit == 0)
-  {
-    free (iContainer);
-    iContainer = NULL;
-    return;
-  }
-  else if (iContainer == NULL)
-  {
-    iContainer = (csObjContainer *)malloc (
-      sizeof (csObjContainer) + sizeof (csObject *) * (iLimit - 1));
-    iContainer->count = 0;
-  }
-  else
-    iContainer = (csObjContainer *)realloc (iContainer,
-      sizeof (csObjContainer) + sizeof (csObject *) * (iLimit - 1));
-  iContainer->limit = iLimit;
-}
+/*** csObject itself ***/
 
 IMPLEMENT_IBASE (csObject)
   IMPLEMENTS_INTERFACE (iObject)
 IMPLEMENT_IBASE_END
 
-csObject::csObject () : csBase (), iObject (), children (NULL), Name (NULL)
+csObject::csObject () : Children (NULL), Name (NULL)
 {
   CONSTRUCT_IBASE (NULL);
   static CS_ID id = 0;
   csid = id++;
-}
-
-csObject::csObject (csObject& iObj) :
-  csBase (), iObject (iObj), csid (iObj.csid), children (NULL), Name (NULL)
-{
-  CONSTRUCT_IBASE (NULL);
-  if (iObj.children)
-  {
-    int size =
-      sizeof(csObjContainer) + sizeof(csObject*) * (iObj.children->limit - 1);
-    if (size > 0)
-    {
-      children = (csObjContainer *)malloc (size);
-      memcpy (children, iObj.children, size);
-    }
-  }
+  ParentObject = NULL;
 }
 
 csObject::~csObject ()
 {
-  int idx = 0;
-  while (children && children->count > idx)
-  {
-    csObject* child = children->obj[idx];
-    // If the parent of the child is equal to this object
-    // then we know that deleting the child will do the needed
-    // cleanup of the 'children' array. Otherwise we have to do
-    // this ourselves.
-    if (child->GetObjectParent () == this)
-      delete child;
-    else
-    {
-      delete child;
-      idx++;	// Skip this index.
-    }
-  }
-  // If there is still a 'children' array (possible if some
-  // of the children didn't have this object as a parent) then
-  // we delete this array here.
-  if (children) free (children);
-
+  ObjRemoveAll ();
+  if (Children) delete Children;
   delete [] Name;
-}
 
-csObjectNoDel::~csObjectNoDel ()
-{
-  if (children)
+  /*
+   * @@@ This should not be required for two reasons:
+   * 1. If the parent keeps a pointer to this object, then the pointer was
+   *    IncRef'ed, so this object cannot be deleted. Removing the object from
+   *    its parent from here is only needed if the object was illegally
+   *    deleted, not DecRef'ed.
+   * 2. Several objects could contain this object as a child. The 'parent'
+   *    poitner is not a safe way to find out which object contains this
+   *    object as a child.
+   */
+  if (ParentObject)
   {
-    int i;
-    // First we unlink all children from this parent. But
-    // only if the parent is equal to this.
-    for (i = 0 ; i < children->count ; i++)
-    {
-      csObject* child = children->obj[i];
-      if (child->GetObjectParent () == this)
-        child->SetObjectParent (NULL);
-    }
-    free (children);
-    children = NULL;
+    ParentObject->ObjReleaseOld (this);
   }
 }
 
-void csObject::ObjAdd (csObject *obj)
+void csObject::SetName (const char *iName)
 {
-  if (!obj)
-    return;
+  delete [] Name;
+  Name = strnew (iName);
+}
 
-  if (!children)
-    csObjContainer::SetLimit (children, CONTAINER_LIMIT_DELTA);
-  else if (children->count >= children->limit)
-    csObjContainer::SetLimit(children, children->limit + CONTAINER_LIMIT_DELTA);
+const char *csObject::GetName () const
+{
+  return Name;
+}
 
-  children->obj [children->count++] = obj;
-  obj->SetObjectParent (this);
+CS_ID csObject::GetID () const
+{
+  return csid;
+}
+
+iObject* csObject::GetObjectParent () const
+{
+  return ParentObject;
+}
+
+void csObject::SetObjectParent (iObject *obj)
+{
+  ParentObject = obj;
 }
 
 void csObject::ObjAdd (iObject *obj)
 {
-  if (!obj) return;
-  // @@@ WARNING! We assume here that casting iObject to csObject works.
-  ObjAdd ((csObject*)obj);
-}
-
-void csObject::ObjRelease (csObject *obj)
-{ 
-  if (!children || !obj)
+  if (!obj)
     return;
-  for (int i = 0; i < children->count; i++)
-    if (children->obj [i] == obj)
-    {
-      obj->SetObjectParent (NULL);
-      memmove (&children->obj [i], &children->obj [i + 1],
-        (children->limit - (i + 1)) * sizeof (csObject *));
-      if (--children->count <= children->limit - CONTAINER_LIMIT_DELTA)
-        csObjContainer::SetLimit (children,
-	  children->limit - CONTAINER_LIMIT_DELTA);
-      break;
-    }
-}
 
-void csObject::ObjRelease (iObject *obj)
-{ 
-  if (!children || !obj) return;
-  // @@@ WARNING! We assume here that casting iObject to csObject works.
-  ObjRelease ((csObject*)obj);
-}
+  if (!Children)
+    Children = new csObjectContainer ();
 
-void csObject::ObjRemove (csObject *obj)
-{ 
-  ObjRelease (obj);
-  delete obj; 
+  obj->IncRef ();
+  obj->SetObjectParent (this);
+  Children->Push (obj);
 }
 
 void csObject::ObjRemove (iObject *obj)
 { 
-  ObjRelease (obj);
-  obj->DecRef ();
+  if (!Children || !obj)
+    return;
+
+  int n = Children->Find (obj);
+  if (n>=0)
+  {
+    Children->Delete (n);
+    obj->SetObjectParent (NULL);
+    obj->DecRef ();
+  }
 }
 
-void csObject::ObjReleaseAll ()
-{
-  while (children->count > 0)
-    ObjRelease (children->obj[0]);
+void csObject::ObjReleaseOld (iObject *obj)
+{ 
+  if (!Children || !obj)
+    return;
+
+  int n = Children->Find (obj);
+  if (n>=0)
+  {
+    Children->Delete (n);
+    obj->SetObjectParent (NULL);
+  }
 }
 
 void csObject::ObjRemoveAll ()
 {
-  while (children->count > 0)
-    ObjRemove (children->obj[0]);
+  if (!Children)
+    return;
+
+  for (int i=0; i<Children->Length (); i++)
+  {
+    Children->Get (i)->SetObjectParent (NULL);
+    Children->Get (i)->DecRef ();
+  }
+  Children->DeleteAll ();
 }
 
 void* csObject::GetChild (int InterfaceID, int Version,
 	const char *Name, bool fn) const
 {
-  if (!children)
+  if (!Children)
     return NULL;
 
   if (fn)
   {
-    iObject *obj = GetChild(Name);
+    iObject *obj = GetChild (Name);
     return obj ? obj->QueryInterface (InterfaceID, Version) : NULL;
   }
 
-  for (int i = 0; i < children->count; i++)
+  for (int i = 0; i < Children->Length (); i++)
   {
-    if (Name && strcmp(children->obj[i]->GetName (), Name))
+    if (Name && strcmp(Children->Get (i)->GetName (), Name))
       continue;
 
-    void *obj = children->obj[i]->QueryInterface (InterfaceID, Version);
+    void *obj = Children->Get (i)->QueryInterface (InterfaceID, Version);
     if (obj) return obj;
   }
 
@@ -291,13 +237,13 @@ void* csObject::GetChild (int InterfaceID, int Version,
 
 iObject* csObject::GetChild (const char *Name) const
 {
-  if (!children || !Name)
+  if (!Children || !Name)
     return NULL;
   
-  for (int i = 0; i < children->count; i++)
+  for (int i = 0; i < Children->Length (); i++)
   {
-    if (!strcmp (children->obj[i]->GetName (), Name))
-      return children->obj[i];
+    if (!strcmp (Children->Get (i)->GetName (), Name))
+      return Children->Get (i);
   }
   return NULL;
 }
@@ -316,12 +262,3 @@ IMPLEMENT_IBASE_EXT_END
 IMPLEMENT_EMBEDDED_IBASE (csDataObject::DataObject)
   IMPLEMENTS_INTERFACE (iDataObject)
 IMPLEMENT_EMBEDDED_IBASE_END
-
-csPObject::~csPObject ()
-{
-  if (parent)
-  {
-    parent->ObjRelease (this);
-  }
-}
-

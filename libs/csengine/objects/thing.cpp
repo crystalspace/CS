@@ -78,7 +78,7 @@ IMPLEMENT_EMBEDDED_IBASE(csThing::MeshObjectFactory)
   IMPLEMENTS_INTERFACE(iMeshObjectFactory)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csThing::csThing () : csPObject (), polygons (64, 64), curves (16, 16)
+csThing::csThing () : csObject (), polygons (64, 64), curves (16, 16)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiThingState);
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);

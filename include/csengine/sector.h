@@ -19,7 +19,7 @@
 #ifndef __CS_SECTOR_H__
 #define __CS_SECTOR_H__
 
-#include "csobject/pobject.h"
+#include "csobject/csobject.h"
 #include "csobject/nobjvec.h"
 #include "csengine/bsp.h"
 #include "csgeom/math3d.h"
@@ -55,7 +55,7 @@ SCF_VERSION (csSector, 0, 0, 1);
  * A sector is a container for objects. It is one of
  * the base classes for the portal engine.
  */
-class csSector : public csPObject
+class csSector : public csObject
 {
   friend class Dumper;
 
@@ -507,7 +507,7 @@ public:
   /// Disable fog.
   void DisableFog () { fog.enabled = false; }
 
-  DECLARE_IBASE_EXT (csPObject);
+  DECLARE_IBASE_EXT (csObject);
 
   //------------------------- iSector interface -------------------------------
   struct eiSector : public iSector

@@ -25,83 +25,53 @@
 #include "csutil/util.h"
 #include "iobject/object.h"
 
-class csObjContainer;
-
 /**
  * A generic csObject class. Any csObject can have any number of iObject
  * children attached to it. You can use QUERY_INTERFACE to get interfaces
  * from the child objects.
  */ 
-class csObject : public csBase, public iObject
+class csObject : public iObject
 {
 protected:
-  friend class csObjIterator;
   friend class csObjectIterator;
-  friend class csObjectNoDel;
   /// Each object have a unique ID associated with it
   CS_ID csid;
 
   /// The array of child nodes
-  csObjContainer *children;
+  class csObjectContainer *Children;
 
   /// Object's name or NULL if unnamed.
   char *Name;
 
-  /// Set the parent csObject. Implemented in csPObject class.
-  virtual void SetObjectParent (csObject *)
-  { }
+  /// Parent object
+  iObject *ParentObject;
 
 public:
   /// Initialize the csObject
   csObject ();
-  /// Make a copy of another object
-  csObject (csObject& iObj);
   /// Destroy this object and the associated children
   virtual ~csObject ();
 
   /// Set object name
-  virtual void SetName (const char *iName)
-  { delete [] Name; Name = strnew (iName); }
+  virtual void SetName (const char *iName);
 
   /// Query object name
-  virtual const char *GetName () const
-  { return Name; }
+  virtual const char *GetName () const;
 
   /// Get the unique ID associated with this object
-  virtual CS_ID GetID () const
-  { return csid; }
+  virtual CS_ID GetID () const;
 
-  /// Returns the parent csObject. Implemented in csPObject class.
-  virtual csObject* GetObjectParent () const
-  { return NULL; }
+  /// Set the parent csObject.
+  virtual void SetObjectParent (iObject *);
 
-  /**
-   * Returns the parent csObject. Implemented in csPObject class.
-   * @@@ Ugly name!
-   */
-  virtual iObject* GetObjectParentI () const
-  { return QUERY_INTERFACE_SAFE (GetObjectParent (), iObject); }
-
-  /// Attach a new csObject to the tree
-  void ObjAdd (csObject *obj);
+  /// Returns the parent iObject.
+  virtual iObject* GetObjectParent () const;
 
   /// Attach a new iObject to the tree
   virtual void ObjAdd (iObject *obj);
 
-  /// Removes the given object from the tree, without freeing the contents
-  void ObjRelease (csObject *obj);
-
-  /// Removes the given object from the tree, without freeing the contents
-  virtual void ObjRelease (iObject *obj);
-
-  /// Deletes the given object, removing it from the object tree
-  void ObjRemove (csObject *obj);
-
   /// Deletes the given object, removing it from the object tree
   virtual void ObjRemove (iObject *obj);
-
-  /// Removes all objects from the tree, without freeing the contents
-  virtual void ObjReleaseAll ();
 
   /// Deletes all objects, removing them from the object tree
   virtual void ObjRemoveAll ();
@@ -129,19 +99,9 @@ public:
   virtual iObjectIterator *GetIterator ();
 
   DECLARE_IBASE;
-};
 
-/**
- * A small modification to csObject that does not delete the
- * contained children objects in the destructor
- */
-class csObjectNoDel : public csObject
-{
-public:
-  /// Create the object
-  csObjectNoDel () : csObject () {}
-  /// Free the memory allocated for children but do not delete them
-  virtual ~csObjectNoDel ();
+  // @@@ temporary fix
+  virtual void ObjReleaseOld (iObject *obj);
 };
 
 #endif // __CSOBJ_H__

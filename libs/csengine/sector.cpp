@@ -68,7 +68,7 @@ IMPLEMENT_EMBEDDED_IBASE (csSector::eiSector)
   IMPLEMENTS_INTERFACE (iSector)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csSector::csSector (csEngine* engine) : csPObject ()
+csSector::csSector (csEngine* engine) : csObject ()
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSector);
   csSector::engine = engine;

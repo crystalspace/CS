@@ -20,7 +20,6 @@
 #define __WENTITY_H
 
 #include "csengine/movable.h"
-#include "csobject/pobject.h"
 #include "csobject/dataobj.h"
 #include "csgeom/vector3.h"
 #include "csutil/cscolor.h"
@@ -35,7 +34,7 @@ SCF_VERSION (csWalkEntity, 0, 0, 1);
 /**
  * A general WalkTest entity.
  */
-class csWalkEntity : public csPObject
+class csWalkEntity : public csObject
 {
 public:
   /// Activate this entity.
@@ -44,7 +43,7 @@ public:
   /// Handle next frame.
   virtual void NextFrame (float elapsed_time) = 0;
 
-  DECLARE_IBASE_EXT (csPObject);
+  DECLARE_IBASE_EXT (csObject);
 
   virtual ~csWalkEntity ()
   {}

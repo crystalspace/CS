@@ -43,7 +43,7 @@ IMPLEMENT_EMBEDDED_IBASE (csRegion::Region)
   IMPLEMENTS_INTERFACE (iRegion)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csRegion::csRegion (csEngine* e) : csObjectNoDel ()
+csRegion::csRegion (csEngine* e) : csObject ()
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiRegion);
@@ -57,7 +57,7 @@ csRegion::~csRegion ()
 
 void csRegion::Region::Clear ()
 {
-  scfParent->ObjReleaseAll ();
+  scfParent->ObjRemoveAll ();
 }
 
 void csRegion::Region::DeleteAll ()
@@ -105,9 +105,6 @@ void csRegion::Region::DeleteAll ()
 //      o->DecRef (); @@@ Uncomment when the engine does a DecRef, not delete
     }
 
-  // @@@ Should mesh factories be deleted if there are still mesh objects
-  // (in other regions) using them? Maybe a ref counter. Also make
-  // sure to ObjRelease when you don't delete a mesh factory.
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
@@ -200,10 +197,7 @@ void csRegion::Region::DeleteAll ()
       iObject* obj = (iObject*)copy[i];
       iPolyTxtPlane* o = QUERY_INTERFACE_FAST (obj, iPolyTxtPlane);
       if (!o) continue;
-      // Do a release here because the plane may still be used by other
-      // polygons not belonging to this sector and we want to be sure
-      // to release it from this region.
-      scfParent->ObjRelease (o->QueryObject ());
+      scfParent->ObjRemove (o->QueryObject ());
       int idx = scfParent->engine->planes.Find (o->GetPrivateObject ());
       o->DecRef ();
       if (idx != -1)
@@ -324,7 +318,7 @@ void csRegion::AddToRegion (iObject* obj)
 
 void csRegion::ReleaseFromRegion (iObject* obj)
 {
-  ObjRelease (obj);
+  ObjRemove (obj);
 }
 
 iSector* csRegion::Region::FindSector (const char *iName)
@@ -374,7 +368,7 @@ iCollection* csRegion::Region::FindCollection (const char *iName)
 
 bool csRegion::IsInRegion (iObject* iobj)
 {
-  return iobj->GetObjectParentI () == this;
+  return iobj->GetObjectParent () == this;
 }
 
 bool csRegion::Region::IsInRegion (iObject* iobj)

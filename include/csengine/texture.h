@@ -21,7 +21,6 @@
 
 #include "cstypes.h"
 #include "csobject/csobject.h"
-#include "csobject/pobject.h"
 #include "csobject/nobjvec.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/texture.h"
@@ -40,7 +39,7 @@ SCF_VERSION (csTextureWrapper, 0, 0, 1);
  * csTextureWrapper represents a texture and its link
  * to the iTextureHandle as returned by iTextureManager.
  */
-class csTextureWrapper : public csPObject
+class csTextureWrapper : public csObject
 {
 private:
   /// The corresponding iImage.

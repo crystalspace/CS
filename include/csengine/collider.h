@@ -19,7 +19,7 @@
 #ifndef __CS_COLLIDER_H__
 #define __CS_COLLIDER_H__
 
-#include "csobject/pobject.h"
+#include "csobject/csobject.h"
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/vector3.h"
@@ -41,7 +41,7 @@ SCF_VERSION (csCollider, 0, 0, 2);
  * another manner then this is ok) and the engine will not use
  * this object itself.
  */
-class csCollider : public csPObject
+class csCollider : public csObject
 {
 private:
   iCollideSystem* collide_system;
@@ -96,7 +96,7 @@ public:
    */
   static csCollider* GetCollider (iObject* object);
 
-  DECLARE_IBASE_EXT (csPObject);
+  DECLARE_IBASE_EXT (csObject);
 };
 
 #endif // __CS_COLLIDER_H__

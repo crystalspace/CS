@@ -22,7 +22,6 @@
 
 #include "csgfx/rgbpixel.h"
 #include "csobject/csobject.h"
-#include "csobject/pobject.h"
 #include "csobject/nobjvec.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
@@ -130,7 +129,7 @@ public:
  * csMaterialWrapper represents a texture and its link
  * to the iMaterialHandle as returned by iTextureManager.
  */
-class csMaterialWrapper : public csPObject
+class csMaterialWrapper : public csObject
 {
 private:
   /// The corresponding iMaterial.
@@ -172,7 +171,7 @@ public:
    */
   void Visit ();
 
-  DECLARE_IBASE_EXT (csPObject);
+  DECLARE_IBASE_EXT (csObject);
 
   //------------------- iMaterialWrapper implementation -----------------------
   struct MaterialWrapper : public iMaterialWrapper

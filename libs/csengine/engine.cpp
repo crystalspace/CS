@@ -1648,7 +1648,7 @@ void csEngine::SelectLibrary (const char *iName)
   library = libraries.FindByName (iName);
   if (!library)
   {
-    library = new csObjectNoDel ();
+    library = new csObject ();
     library->SetName (iName);
     libraries.Push (library);
   }
@@ -1785,7 +1785,9 @@ iCameraPosition *csEngine::CreateCameraPosition (const char *iName, const char *
 
 bool csEngine::CreateKey (const char *iName, const char *iValue)
 {
-  scfiObject.ObjAdd (new csKeyValuePair (iName, iValue));
+  csKeyValuePair *kvp = new csKeyValuePair (iName, iValue);
+  scfiObject.ObjAdd (kvp);
+  kvp->DecRef ();
   return true;
 }
 
