@@ -55,9 +55,8 @@ private:
 
 public:
   int num_outline_edges;
-  int num_outline_verts;
   int* outline_edges;
-  int* outline_verts;
+  bool* outline_verts;
   float valid_radius;
   csVector3 outline_pos;
 };

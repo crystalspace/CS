@@ -593,6 +593,7 @@ void csKDTree::Flatten ()
 bool csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
   	void* userdata, uint32 cur_timestamp)
 {
+  CS_ASSERT (this != NULL);
   if (!func (this, userdata, cur_timestamp))
     return false;
   if (child1)
@@ -601,11 +602,13 @@ bool csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
     if (pos[split_axis] <= split_location)
     {
       child1->Front2Back (pos, func, userdata, cur_timestamp);
+      CS_ASSERT (child2 != NULL);
       child2->Front2Back (pos, func, userdata, cur_timestamp);
     }
     else
     {
       child2->Front2Back (pos, func, userdata, cur_timestamp);
+      CS_ASSERT (child1 != NULL);
       child1->Front2Back (pos, func, userdata, cur_timestamp);
     }
   }

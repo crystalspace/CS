@@ -976,18 +976,6 @@ static bool ContainsEdge (int* outline_edges, int num_outline_edges,
   return false;
 }
 
-static bool ContainsVertex (int* outline_verts, int num_outline_verts,
-	int vt)
-{
-  int i;
-  for (i = 0 ; i < num_outline_verts ; i++)
-  {
-    int v = *outline_verts++;
-    if (v == vt) return true;
-  }
-  return false;
-}
-
 iString* csGeomDebugHelper::UnitTest ()
 {
   scfString* rc = new scfString ();
@@ -1051,24 +1039,27 @@ iString* csGeomDebugHelper::UnitTest ()
   GEO_ASSERT (edges[11].active == true, "active edge");
 
   int outline_edges[24];
-  int outline_verts[8];
-  int num_outline_edges, num_outline_verts;
+  bool outline_verts[8];
+  int num_outline_edges;
   float valid_radius;
 
   csPolygonMeshTools::CalculateOutline (edges, num_edges,
   	planes, mesh->GetVertexCount (),
 	csVector3 (0, 0, -10),
 	outline_edges, num_outline_edges,
-	outline_verts, num_outline_verts,
+	outline_verts,
 	valid_radius);
   GEO_ASSERT (valid_radius > 0.49, "radius");
   GEO_ASSERT (valid_radius < 0.51, "radius");
   GEO_ASSERT (num_outline_edges == 4, "outline edges");
-  GEO_ASSERT (num_outline_verts == 4, "outline verts");
-  GEO_ASSERT (ContainsVertex (outline_verts, num_outline_verts, 0), "cont vt");
-  GEO_ASSERT (ContainsVertex (outline_verts, num_outline_verts, 1), "cont vt");
-  GEO_ASSERT (ContainsVertex (outline_verts, num_outline_verts, 4), "cont vt");
-  GEO_ASSERT (ContainsVertex (outline_verts, num_outline_verts, 5), "cont vt");
+  GEO_ASSERT (outline_verts[0] == true, "cont vt");
+  GEO_ASSERT (outline_verts[1] == true, "cont vt");
+  GEO_ASSERT (outline_verts[2] == false, "cont vt");
+  GEO_ASSERT (outline_verts[3] == false, "cont vt");
+  GEO_ASSERT (outline_verts[4] == true, "cont vt");
+  GEO_ASSERT (outline_verts[5] == true, "cont vt");
+  GEO_ASSERT (outline_verts[6] == false, "cont vt");
+  GEO_ASSERT (outline_verts[7] == false, "cont vt");
   GEO_ASSERT (ContainsEdge (outline_edges, num_outline_edges, 0, 1), "cont e");
   GEO_ASSERT (ContainsEdge (outline_edges, num_outline_edges, 0, 4), "cont e");
   GEO_ASSERT (ContainsEdge (outline_edges, num_outline_edges, 1, 5), "cont e");
@@ -1078,18 +1069,19 @@ iString* csGeomDebugHelper::UnitTest ()
   	planes, mesh->GetVertexCount (),
 	csVector3 (2, 0, -2),
 	outline_edges, num_outline_edges,
-	outline_verts, num_outline_verts,
+	outline_verts,
 	valid_radius);
   GEO_ASSERT (valid_radius > 0.49, "radius");
   GEO_ASSERT (valid_radius < 0.51, "radius");
   GEO_ASSERT (num_outline_edges == 6, "outline edges");
-  GEO_ASSERT (num_outline_verts == 6, "outline verts");
-  GEO_ASSERT (ContainsVertex (outline_verts, num_outline_verts, 0), "cont vt");
-  GEO_ASSERT (ContainsVertex (outline_verts, num_outline_verts, 1), "cont vt");
-  GEO_ASSERT (ContainsVertex (outline_verts, num_outline_verts, 4), "cont vt");
-  GEO_ASSERT (ContainsVertex (outline_verts, num_outline_verts, 5), "cont vt");
-  GEO_ASSERT (ContainsVertex (outline_verts, num_outline_verts, 3), "cont vt");
-  GEO_ASSERT (ContainsVertex (outline_verts, num_outline_verts, 7), "cont vt");
+  GEO_ASSERT (outline_verts[0] == true, "cont vt");
+  GEO_ASSERT (outline_verts[1] == true, "cont vt");
+  GEO_ASSERT (outline_verts[2] == false, "cont vt");
+  GEO_ASSERT (outline_verts[3] == true, "cont vt");
+  GEO_ASSERT (outline_verts[4] == true, "cont vt");
+  GEO_ASSERT (outline_verts[5] == true, "cont vt");
+  GEO_ASSERT (outline_verts[6] == false, "cont vt");
+  GEO_ASSERT (outline_verts[7] == true, "cont vt");
   GEO_ASSERT (ContainsEdge (outline_edges, num_outline_edges, 0, 1), "cont e");
   GEO_ASSERT (ContainsEdge (outline_edges, num_outline_edges, 0, 4), "cont e");
   GEO_ASSERT (ContainsEdge (outline_edges, num_outline_edges, 4, 5), "cont e");
@@ -1101,18 +1093,19 @@ iString* csGeomDebugHelper::UnitTest ()
   	planes, mesh->GetVertexCount (),
 	csVector3 (2, 2, -2),
 	outline_edges, num_outline_edges,
-	outline_verts, num_outline_verts,
+	outline_verts,
 	valid_radius);
   GEO_ASSERT (valid_radius > 1.49, "radius");
   GEO_ASSERT (valid_radius < 1.51, "radius");
   GEO_ASSERT (num_outline_edges == 6, "outline edges");
-  GEO_ASSERT (num_outline_verts == 6, "outline verts");
-  GEO_ASSERT (ContainsVertex (outline_verts, num_outline_verts, 0), "cont vt");
-  GEO_ASSERT (ContainsVertex (outline_verts, num_outline_verts, 1), "cont vt");
-  GEO_ASSERT (ContainsVertex (outline_verts, num_outline_verts, 3), "cont vt");
-  GEO_ASSERT (ContainsVertex (outline_verts, num_outline_verts, 7), "cont vt");
-  GEO_ASSERT (ContainsVertex (outline_verts, num_outline_verts, 6), "cont vt");
-  GEO_ASSERT (ContainsVertex (outline_verts, num_outline_verts, 4), "cont vt");
+  GEO_ASSERT (outline_verts[0] == true, "cont vt");
+  GEO_ASSERT (outline_verts[1] == true, "cont vt");
+  GEO_ASSERT (outline_verts[2] == false, "cont vt");
+  GEO_ASSERT (outline_verts[3] == true, "cont vt");
+  GEO_ASSERT (outline_verts[4] == true, "cont vt");
+  GEO_ASSERT (outline_verts[5] == false, "cont vt");
+  GEO_ASSERT (outline_verts[6] == true, "cont vt");
+  GEO_ASSERT (outline_verts[7] == true, "cont vt");
   GEO_ASSERT (ContainsEdge (outline_edges, num_outline_edges, 0, 1), "cont e");
   GEO_ASSERT (ContainsEdge (outline_edges, num_outline_edges, 1, 3), "cont e");
   GEO_ASSERT (ContainsEdge (outline_edges, num_outline_edges, 3, 7), "cont e");
@@ -1125,7 +1118,7 @@ iString* csGeomDebugHelper::UnitTest ()
   	planes, mesh->GetVertexCount (),
 	csVector3 (.5, 0, -10),
 	outline_edges, num_outline_edges,
-	outline_verts, num_outline_verts,
+	outline_verts,
 	valid_radius);
   GEO_ASSERT (valid_radius < 0.01, "radius");
 

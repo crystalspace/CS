@@ -3,6 +3,13 @@ The history order is reversed so that new features are at the top.
 28-May-2002
 	- Fixed visibility culling in Dynavis when the camera was inside
 	  the bounding box of an object.
+	- Optimized outline visibility writing a bit by avoiding unneeded
+	  storage of transformed z coordinate.
+	- Changed csPolygonMeshTools::CalculateOutline() so that it returns
+	  the used vertices with a bool array instead of the old method.
+	  This is more efficient for Dynavis.
+	- There seems to be a bug in the KD-tree traversal in some
+	  special cases... Need to investigate.
 27-May-2002
 	- Fixed IsZero() from Toni by using a 'float' precision instead
 	  of 'double'.

@@ -261,6 +261,7 @@ struct VisTest_Front2BackData
 bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
 	VisTest_Front2BackData* data)
 {
+printf ("t1 treenode=%p\n", treenode); fflush (stdout);
   const csBox3& node_bbox = treenode->GetNodeBBox ();
   const csVector3& pos = data->pos;
 
@@ -454,7 +455,6 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
   // First transform all vertices.
   //@@@ Avoid allocate?
   csVector2* tr_verts = new csVector2[vertex_count];
-  float* tr_z = new float[vertex_count];
   float max_depth = -1.0;
   for (i = 0 ; i < vertex_count ; i++)
   {
@@ -462,14 +462,12 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
     if (camv.z <= 0.0)
     {
       // @@@ Later we should clamp instead of ignoring this outline.
-      delete[] tr_z;
       delete[] tr_verts;
       return;
     }
     if (camv.z > max_depth) max_depth = camv.z;
-    tr_z[i] = camv.z;
-    // @@@ ONLY DO THIS WHEN NEEDED IN OUTLINE
-    Perspective (camv, tr_verts[i], fov, sx, sy);
+    if (outline_info.outline_verts[i])
+      Perspective (camv, tr_verts[i], fov, sx, sy);
   }
 
   if (do_state_dump)
@@ -493,15 +491,17 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
   {
     printf ("  max_depth=%g rc=%d\n", max_depth, rc);
     int j;
-    for (j = 0 ; j < outline_info.num_outline_verts ; j++)
+    for (j = 0 ; j < vertex_count ; j++)
     {
-      int vt = outline_info.outline_verts[j];
-      csVector3 cam = trans.Other2This (verts[vt]);
-      printf ("  V%d: %d(%g,%g / %g,%g,%g / %g,%g,%g)\n",
-	j, vt,
-	tr_verts[vt].x, tr_verts[vt].y,
-	verts[vt].x, verts[vt].y, verts[vt].z,
-	cam.x, cam.y, cam.z);
+      if (outline_info.outline_verts[j])
+      {
+        csVector3 cam = trans.Other2This (verts[j]);
+        printf ("  V%d: (%g,%g / %g,%g,%g / %g,%g,%g)\n",
+	  j,
+	  tr_verts[j].x, tr_verts[j].y,
+	  verts[j].x, verts[j].y, verts[j].z,
+	  cam.x, cam.y, cam.z);
+      }
     }
     for (j = 0 ; j < outline_info.num_outline_edges ; j++)
     {
@@ -515,7 +515,6 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
     str->DecRef ();
   }
 
-  delete[] tr_z;
   delete[] tr_verts;
 }
 

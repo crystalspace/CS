@@ -83,19 +83,6 @@ Bugs to fix:
 	     positioned.
 	     The question is if this light is a desired feature.
 	     [Bug 231392]
-	[V]  With OpenGL the lightmaps are not mapped correctly.
-	     This is very visible if you have two adjacent polygons which
-	     have a different size and a shadow going over those two
-	     polygons (in dmburg this situation occurs a few times).
-	     In that case the shadows on both polygons will not match
-	     exactly.
-	     Fixing this bug for real probably requires a change of the
-	     lightmap format (to make then one lumel bigger both horizontally
-	     as vertically). While this is relatively easy to do for
-	     static lightmaps the dynamic lightmaps might be more problematic.
-	     Also this may require a big change in the software renderer...
-	     Rather complicated bug. But an important one to fix.
-	     [Bug 405964]
 	[V]  The software renderer implementation of DrawTriangleMesh
 	     is still missing a few clipping features. In general it would
 	     be nice to investigate the use of the OpenGL clipping routines
@@ -123,6 +110,19 @@ Bugs to fix:
 	        Mount ("this/is/a/dir$/", "/lib/whatever");
 	     i.e. the last '/' has to be preceeded with '$'. This needs
 	     to be fixed.
+	[**] With OpenGL the lightmaps are not mapped correctly.
+	     This is very visible if you have two adjacent polygons which
+	     have a different size and a shadow going over those two
+	     polygons (in dmburg this situation occurs a few times).
+	     In that case the shadows on both polygons will not match
+	     exactly.
+	     Fixing this bug for real probably requires a change of the
+	     lightmap format (to make then one lumel bigger both horizontally
+	     as vertically). While this is relatively easy to do for
+	     static lightmaps the dynamic lightmaps might be more problematic.
+	     Also this may require a big change in the software renderer...
+	     Rather complicated bug. But an important one to fix.
+	     [Bug 405964]
 	[**] Fix the problem with adding -lutil for more recent
 	     versions of python. This should be automatic and not manual.
 	[**] Shoot a missile in hole in flarge. The walls of the hole

@@ -83,10 +83,10 @@ public:
    * Given a table of edges (as calculated with CalculateEdges()), a
    * table of planes (as calculated with CalculatePlanes()), and a position
    * in space. This function will calculate an outline that is valid from
-   * that position. This outline will be given as an array of vertex
-   * indices that are used (so these have to be transformed from 3D to 2D)
-   * and also an array of double vertex indices (every set of two vertex
-   * indices forms one edge) that form the outline.
+   * that position. This outline will be given as an array of bool indicating
+   * which vertex indices that are used (so these have to be transformed from
+   * 3D to 2D) and also an array of double vertex indices (every set of two
+   * vertex indices forms one edge) that form the outline.
    * This function will also return a radius. As long as the position
    * doesn't move outside this radius the outline will be valid.
    * The two input tables should have enough space for the returned
@@ -104,7 +104,7 @@ public:
   	csPlane3* planes, int num_vertices,
 	const csVector3& pos,
 	int* outline_edges, int& num_outline_edges,
-	int* outline_verts, int& num_outline_verts,
+	bool* outline_verts,
 	float& valid_radius);
 };
 

@@ -283,7 +283,7 @@ void csPolygonMeshTools::CalculateOutline (
   	csPlane3* planes, int num_vertices,
 	const csVector3& pos,
 	int* outline_edges, int& num_outline_edges,
-	int* outline_verts, int& num_outline_verts,
+	bool* outline_verts,
 	float& valid_radius)
 {
   int i;
@@ -292,7 +292,7 @@ void csPolygonMeshTools::CalculateOutline (
   valid_radius = 10000000.0;
   for (i = 0 ; i < num_vertices ; i++)
   {
-    outline_verts[i] = 0;
+    outline_verts[i] = false;
   }
   for (i = 0 ; i < num_edges ; i++, e++)
   {
@@ -307,8 +307,8 @@ void csPolygonMeshTools::CalculateOutline (
       num_outline_edges++;
       CS_ASSERT (e->vt1 >= 0 && e->vt1 < num_vertices);
       CS_ASSERT (e->vt2 >= 0 && e->vt2 < num_vertices);
-      outline_verts[e->vt1] = 1;	// Mark vertices as in use.
-      outline_verts[e->vt2] = 1;
+      outline_verts[e->vt1] = true;	// Mark vertices as in use.
+      outline_verts[e->vt2] = true;
     }
     else
     {
@@ -326,23 +326,14 @@ void csPolygonMeshTools::CalculateOutline (
         num_outline_edges++;
         CS_ASSERT (e->vt1 >= 0 && e->vt1 < num_vertices);
         CS_ASSERT (e->vt2 >= 0 && e->vt2 < num_vertices);
-        outline_verts[e->vt1] = 1;	// Mark vertices as in use.
-        outline_verts[e->vt2] = 1;
+        outline_verts[e->vt1] = true;	// Mark vertices as in use.
+        outline_verts[e->vt2] = true;
       }
       // Calculate minimum distance at which this edge changes status
       // (from in to out or vice versa).
       float cl = MIN (ABS (cl1), ABS (cl2));
       if (cl < valid_radius) valid_radius = cl;
     }
-  }
-
-  // Now check which vertices are used by the outline edges.
-  // These are the vertices to transform.
-  num_outline_verts = 0;
-  for (i = 0 ; i < num_vertices ; i++)
-  {
-    CS_ASSERT (outline_verts[i] == 0 || outline_verts[i] == 1);
-    if (outline_verts[i]) outline_verts[num_outline_verts++] = i;
   }
 }
 

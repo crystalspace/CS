@@ -54,7 +54,7 @@ void csObjectModel::UpdateOutline (const csVector3& pos)
   {
     // @@@ Only allocate active edges.
     outline_info.outline_edges = new int [num_edges*2];
-    outline_info.outline_verts = new int [num_vertices];
+    outline_info.outline_verts = new bool [num_vertices];
     recalc_outline = true;
   }
   else
@@ -69,7 +69,7 @@ void csObjectModel::UpdateOutline (const csVector3& pos)
     csPolygonMeshTools::CalculateOutline (edges, num_edges,
     	planes, num_vertices, pos,
 	outline_info.outline_edges, outline_info.num_outline_edges,
-	outline_info.outline_verts, outline_info.num_outline_verts,
+	outline_info.outline_verts,
 	outline_info.valid_radius);
     printf ("Recalc outline %g\n", outline_info.valid_radius); fflush (stdout);
     outline_info.outline_pos = pos;
