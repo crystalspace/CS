@@ -21,6 +21,9 @@ The history order is reversed so that new features are at the top.
 	- Jorrit fixed various compile errors in csStringArray which were
 	  introduced after the changes to char const*. These changes were
 	  incomplete.
+        - Philip Wyett commented out all MSVC project file related lines
+          until time permits to investigate why it hangs the nsvcgen process
+          when run locally.
 18-Jun-2003
 	- Jorrit added a new 'do_logo' command to walktest. Assigned 'l' key
 	  to it. This command toggles the display of the logo.
