@@ -236,9 +236,9 @@ class csColor(_object):
     def Clamp(*args): return _cspace.csColor_Clamp(*args)
     def ClampDown(*args): return _cspace.csColor_ClampDown(*args)
     def assign(*args): return _cspace.csColor_assign(*args)
-    def __imul__(*args): return _cspace.csColor___imul__(*args)
     def __iadd__(*args): return _cspace.csColor___iadd__(*args)
     def __isub__(*args): return _cspace.csColor___isub__(*args)
+    def __imul__(*args): return _cspace.csColor___imul__(*args)
     def __eq__(*args): return _cspace.csColor___eq__(*args)
     def __ne__(*args): return _cspace.csColor___ne__(*args)
     def Add(*args): return _cspace.csColor_Add(*args)
@@ -9197,6 +9197,8 @@ class iShaderManager(iShaderVariableContext):
     def SetTagOptions(*args): return _cspace.iShaderManager_SetTagOptions(*args)
     def GetTagOptions(*args): return _cspace.iShaderManager_GetTagOptions(*args)
     def GetTags(*args): return _cspace.iShaderManager_GetTags(*args)
+    def SetActiveLights(*args): return _cspace.iShaderManager_SetActiveLights(*args)
+    def GetActiveLights(*args): return _cspace.iShaderManager_GetActiveLights(*args)
     def __del__(self, destroy=_cspace.delete_iShaderManager):
         try:
             if self.thisown: destroy(self)
@@ -9232,6 +9234,37 @@ class iShaderRenderInterfacePtr(iShaderRenderInterface):
         _swig_setattr(self, iShaderRenderInterface,self.__class__,iShaderRenderInterface)
 _cspace.iShaderRenderInterface_swigregister(iShaderRenderInterfacePtr)
 
+class csShaderMetadata(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csShaderMetadata, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csShaderMetadata, name)
+    def __repr__(self):
+        return "<C csShaderMetadata instance at %s>" % (self.this,)
+    __swig_setmethods__["name"] = _cspace.csShaderMetadata_name_set
+    __swig_getmethods__["name"] = _cspace.csShaderMetadata_name_get
+    if _newclass:name = property(_cspace.csShaderMetadata_name_get, _cspace.csShaderMetadata_name_set)
+    __swig_setmethods__["description"] = _cspace.csShaderMetadata_description_set
+    __swig_getmethods__["description"] = _cspace.csShaderMetadata_description_get
+    if _newclass:description = property(_cspace.csShaderMetadata_description_get, _cspace.csShaderMetadata_description_set)
+    __swig_setmethods__["numberOfLights"] = _cspace.csShaderMetadata_numberOfLights_set
+    __swig_getmethods__["numberOfLights"] = _cspace.csShaderMetadata_numberOfLights_get
+    if _newclass:numberOfLights = property(_cspace.csShaderMetadata_numberOfLights_get, _cspace.csShaderMetadata_numberOfLights_set)
+    def __init__(self, *args):
+        _swig_setattr(self, csShaderMetadata, 'this', _cspace.new_csShaderMetadata(*args))
+        _swig_setattr(self, csShaderMetadata, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csShaderMetadata):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class csShaderMetadataPtr(csShaderMetadata):
+    def __init__(self, this):
+        _swig_setattr(self, csShaderMetadata, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csShaderMetadata, 'thisown', 0)
+        _swig_setattr(self, csShaderMetadata,self.__class__,csShaderMetadata)
+_cspace.csShaderMetadata_swigregister(csShaderMetadataPtr)
+
 class iShader(iShaderVariableContext):
     __swig_setmethods__ = {}
     for _s in [iShaderVariableContext]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -9251,6 +9284,7 @@ class iShader(iShaderVariableContext):
     def SetupPass(*args): return _cspace.iShader_SetupPass(*args)
     def TeardownPass(*args): return _cspace.iShader_TeardownPass(*args)
     def DeactivatePass(*args): return _cspace.iShader_DeactivatePass(*args)
+    def GetMetadata(*args): return _cspace.iShader_GetMetadata(*args)
     def __del__(self, destroy=_cspace.delete_iShader):
         try:
             if self.thisown: destroy(self)
