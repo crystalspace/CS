@@ -20,20 +20,13 @@ To compile Crystal Space, you'll have to perform the following steps:
 
 1. Load mk/visualc/csall.dsw
 
-2. if you have not installed A3D SDK: unload SoundRenderA3D 
-   (Files tab, right mouse button on SoundRenderA3D)
+2. Make "All Files" you active project.
 
-3. if you have not installed EAX SDK: unload SoundRenderEAX
+3. Select Menu "Build" "Rebuild All"
 
-4. if you have not installed Glide2x SDK: unload Glide2xRender
+4. After a while you should finish with almost no warnings and no errors.
 
-5. Make "All Files" you active project.
-
-6. Select Menu "Build" "Rebuild All"
-
-7. After a while you should finish with almost no warnings and no errors.
-
-8. Change your settings in cryst.cfg (included in the Configuration Files folder
+5. Change your settings in cryst.cfg (included in the Configuration Files folder
    in the CrystalSpace project) to the following (or whatever you like more):
 
      DRIVER = crystalspace.graphics3d.software
@@ -45,7 +38,7 @@ To compile Crystal Space, you'll have to perform the following steps:
    be downloaded to the $/cryst/data directory. Do not attempt to extract this 
    archive - Crystal Space decompresses the ZIP file at run time.
 
-9. Open "Project", "Settings", select walktest on the left list. Select the 
+6. Open "Project", "Settings", select walktest on the left list. Select the 
    "Debug" tab in the register, select category "general" and enter the the 
    same directory the exe sits in as workdirectory. If the executable would be 
    in "E:\cvs\Cs\walktest.exe", you should select "E:\cvs\Cs\" as working 
@@ -57,7 +50,7 @@ To compile Crystal Space, you'll have to perform the following steps:
 
    alternatively, you can switch to the windows explorer and call walktest. 
    
-10. Enjoy :-)
+7. Enjoy :-)
 
 (Or see the FAQ section below)
 
@@ -92,10 +85,13 @@ The drivers :
   CrystalSpace EXE.
 * Direct3D6Render - the Direct3D Dx6 Render DLL, which includes the 3D graphics
   driver for Direct3D-accelerated rasterization. This is loaded by the
-  CrystalSpace EXE.
+  CrystalSpace EXE. (This driver is not working, and will proably be
+  removed soon)
 * Glide2xRender - the Glide2x Render DLL, which includes the 3D graphics
   driver for Glide-accelerated rasterization. This is loaded by the
-  CrystalSpace EXE.
+  CrystalSpace EXE. (This driver is not part of the standard Windows workspace
+  any more. If you still want to give it a try, you will need to add it to
+  the workspace manually, and add a depencency to the "com" project.)
 * Glide3xRender - the Glide3x Render DLL, which includes the 3D graphics
   driver for Glide-accelerated rasterization. This is loaded by the
   CrystalSpace EXE. (Not yet working, and therefore not included in 
@@ -108,18 +104,14 @@ The drivers :
   EXE.
 * DirectDraw2D6 - the DirectDraw Dx6 Graphics DLL, which includes the 2D graphics
   layer for DirectDraw screen devices. This is loaded by the CrystalSpace
-  EXE. it's Dx6 compatible and used by Direct3D Dx6 Render. (Not yet working, 
-  and therefore not included in csall workspace)
+  EXE. it's Dx6 compatible and used by Direct3D Dx6 Render. (This driver is not 
+  working, and will proably be removed soon)
 
 * SoundDriverNull - A dummy sound driver
 * SoundDriverWaveOut - A simple sound driver
 * SoundRenderNull - A dummy 3D sound render
-* SoundRenderA3D - A special 3D sound render. To use this, you will need
-  the according SDK, which I don't have, so I don't know if this project
-  will even compile. Normally you will unload that project.
-* SoundRenderEAX - A special 3D sound render. To use this, you will need
-  the according SDK, which I don't have, so I don't know if this project
-  will even compile. Normally you will unload that project.
+* SoundRenderA3D - A special 3D sound render. 
+* SoundRenderEAX - A special 3D sound render. 
 * SoundRenderDS3D - A DirectX 3D sound driver. 
 
 * NetworkDriverNull - the null network Driver, This is loaded by the CrystalSpace
@@ -135,11 +127,10 @@ The applications :
 * WalkTest -- a walktest application, which includes key handling and such.
 * MazeD -- an editor. (Almost working, but progressing much slower, than 
   the CS engine.)
-* PrimEdit -- an editor. (No project file inlcuded, because that project
-  is dead. You might want to reanmite it anyway.)
 * Simple -- a simple (minimum) CyrstalSpace application.
-
-Note : Direct3DDx6 and Glide3x render currently don't work.
+* metademo -- a demonstration of a completely different use of Crystal Space
+* shooter -- a simple example of a 3D shooter and the csgame library. 
+  - Not finished yet.
 
 ---------[3] FREQUENTLY ASKED QUESTIONS-------------------
 
@@ -149,13 +140,11 @@ Updated by Thomas Hieber
 
 - How do I compile Crystal Space using Visual C++ 5.0?
 
-MSVC 5.0 should work, if you have installed the latest Service Release, 
-and the necessary SDK's (esp. DirectX. You will need at least the 
-DirectX 5.0 SDK. The DirectX runtime version, that is usually bundled
-with games will not be enough!). It should be enough to follow the
-steps described in this doc. If you have further questions,
-you might want to contact  "Brad 'GreyBear' Davis" <jbdavis@uswest.net>,
-as he has recently reported successful compilation of CS, using MSVC 5.0.
+MSVC 5.0 should work, if you have installed the latest Service Release.
+It should be enough to follow the steps described in this doc. 
+If you have further questions, you might want to contact  "Brad 
+'GreyBear' Davis" <jbdavis@uswest.net>, as he has recently reported 
+successful compilation of CS, using MSVC 5.0.
 
 - How do I compile Crystal Space using Visual C++ 6.0?
 
@@ -166,72 +155,19 @@ I. COMPILATION TIME:
 
 - Where are those damn zlib.h, png.h or jpeglib.h files?
 
-Those files are not part of the Crystal Space project, but they are required
-to build it. You must get a version of the following packages: ZLIB and LIBPNG.
-Those packages can be easily found on the net. 
-the latest version of the ZLIB sources are at:
-    ftp://ftp.uu.net/graphics/png/src/zlib???.zip
-the latest version of the LIBPNG sources are at:
-    ftp://ftp.uu.net/graphics/png/src/lpng???.zip
-the latest version of the JPEGLIB sources are at:
-    ftp://ftp.uu.net/graphics/png/src/jpeglib???.zip
-
-To make things easier you can download precompiled DLL's and lib's for
-Windows at Jorrit Tyberghein's homepage:
-    http://crystal.linuxgames.com
-Check for libdlls.zip and read the included readme. This is the recommended way.
-For CS Version 0.13 the locatation for the zlib files has changed. But there
-are still some old versions of libdlls.zip floating around. You can either
-download an up to date version from my homepage:
-http://members.xoom.com/thieber/libdlls13.zip
-If everything works alright the files should be in the following places:
-
-cryst\libjpeg.dll
-cryst\png.dll
-cryst\zlib.dll
-cryst\libs\libjpeg\jconfig.h
-cryst\libs\libjpeg\jerror.h
-cryst\libs\libjpeg\jinclude.h
-cryst\libs\libjpeg\jmorecfg.h
-cryst\libs\libjpeg\jpeglib.h
-cryst\libs\libjpeg\libjpeg.lib
-cryst\libs\libpng\png.h
-cryst\libs\libpng\png.lib
-cryst\libs\libpng\pngconf.h
-cryst\libs\zlib\zconf.h
-cryst\libs\zlib\zlib.h
-cryst\libs\zlib\zlib.lib
-
-This is in fact the most common reason for not being able to compile CS,
-so make sure, that you installed the files to the right places.
+They are now included in the official release, so you shouldn't need
+to bother any more. If they are sill missing, send me a mail.
 
 - Will I need to install additional SDK's?
 
-If you are using MSVC 6.0 (as I highly recommend), you have all needed
-headers and libraries for DirectX 5 and OpenGL installed. If you want
-to use Glide, EAX, A3D or DirectX 6, you will have to download the SDK's
-from their according sites.
-If you want just to build Crystal Space using those API', but don't need
-any docs or samples, you can get a mimum version of these API's from
-NooTe's homepage. Take a look at:
-http://www.multimania.com/noote/CrystalSpace 
-in the Sources section. 
-You will need a3d 2.0, eax 1.0 and Glide2x.
-Of course, you can also get the full SDK at 
-Aureal (A3D), CreativeLabs (EAX) and 3D/FX (Glide).
-
-and the most current DirectX SDK from
-http://www.microsoft.com 
-(But they sometimes remove it after a while, so you can't be sure)
-
+Crystal Space includes all headers and libraries that are needed to 
+compile and link Crystal Space on Win32. However, if you want the
+full sources, documentation and other stuff, you will still need
+to visit the homepage of the respective SDK's distributors.
+Note also, that the Glide2x headers and libs are not included. You
+need to get them from http://www.3dfx.com yourself.
 
 II. LINKING TIME:
-
-- Where are the file png.lib and zlib.lib?
-
-Just look above at the question about zlib.h and pnb.h! It's the same problem,
-and if you have already done what is told there, I can't do much for you!
-
 
 - I've got unresolved symbols!
 
@@ -281,25 +217,6 @@ sure you have set an appropriate directory set. (see above)
 Make sure you have the level given in cryst.cfg as WORLDFILE=
 at the exact location available (also keep in mind, that your 
 current directory is, where the executable sits.)
-
-- I don't care about png support, what can I do?
-
-It's easy. In the "Project"|"Settings" panel, choose the "C/C++" tab,
-"General" Category, select the field "Preprocessor definitions" and remove
-DO_PNG. Be sure to remove the png.lib from the modules added during link
-time (see above).
-
-- I don't care about Direct3D support.
-
-Right click on the Direct3DRender project, and click "Unload project". It 
-won't be compiled any longer after that. To reload it, right click on it and
-click "Load Project".
-
-- I have a working jpeg library, how can I let CrystalSpace use it?
-
-Add DO_JPEG in the same place as above. Be sure to create the libjpeg
-directory (with libjpeg.lib, jpeg.h, jerror.h, jmorecfg.h and jconfig.h in
-it). 
 
 - My last update did compile, but now I got a new version and everthing 
   seems to be broken.
