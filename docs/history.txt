@@ -9,6 +9,10 @@ chronological order.
 15-Feb-2004
 	- Norman Kraemer removed inclusion of recently removed av3dtxt.h
 	  in aws screencanvas header.
+	  He also fixed the call to eventoutlet's Key() method in sdl and svga
+	  canvas where -1 was used instead of 0 to force a simple cookedcode
+	  computation from the supplied rawcode. This also silenced the
+	  compiler comlaining about converting -1 to unsigned int.
 14-Feb-2004
 	- Norman Kraemer added an ALSA sound driver. It can be used 
 	  if you disabled OSS emulation in your ALSA configuration.
