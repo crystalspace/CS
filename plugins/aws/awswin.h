@@ -159,6 +159,12 @@ private:
   /// Shows a component
   virtual void Show ();
 
+  /// Returns the state of the DEAF flag
+  virtual bool isDeaf ();
+
+  /// set component deaf or "undeaf"
+  virtual void SetDeaf (bool bDeaf);
+
   /// Sets the flag (can handle multiple simultaneous sets)
   virtual void SetFlag (unsigned int flag);
 

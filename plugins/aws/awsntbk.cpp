@@ -901,6 +901,7 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
     btn->SetActive (false);
     btn->SetFirst (false);
     comp->Hide ();
+    comp->SetDeaf (true);
   }
   else
   {
@@ -909,6 +910,7 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
     btn->SetActive (true);
     btn->SetFirst (true);
     comp->Show ();
+    comp->SetDeaf (false);
   }
 
   AddChild (btn);
@@ -1058,9 +1060,11 @@ void awsNotebookButtonBar::MakeVisible (int idx)
 void awsNotebookButtonBar::Activate (int idx)
 {
   vTabs.Get (active)->comp->Hide ();
+  vTabs.Get (active)->comp->SetDeaf (true);
   vTabs.Get (active)->button->SetActive (false);
   vTabs.Get (active)->button->Invalidate ();
   vTabs.Get (idx)->comp->Show ();
+  vTabs.Get (idx)->comp->SetDeaf (false);
   active = idx;
 }
 

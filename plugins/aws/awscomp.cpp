@@ -63,6 +63,11 @@ bool awsComponent::isHidden ()
   return Flags () & AWSF_CMP_HIDDEN;
 }
 
+bool awsComponent::isDeaf ()
+{
+  return Flags () & AWSF_CMP_DEAF;
+}
+
 void awsComponent::SetFlag (unsigned int flag)
 {
   flags |= flag;
@@ -388,6 +393,15 @@ void awsComponent::Show ()
     ClearFlag (AWSF_CMP_HIDDEN);
     WindowManager ()->Mark (Frame ());
   }
+}
+
+void awsComponent::SetDeaf (bool bDeaf)
+{
+  if ((Flags () & AWSF_CMP_DEAF) ^ bDeaf)
+    if (bDeaf)
+      SetFlag (AWSF_CMP_DEAF);
+    else
+      ClearFlag (AWSF_CMP_DEAF);
 }
 
 void awsComponent::MoveChildren (int delta_x, int delta_y)

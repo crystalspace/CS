@@ -145,6 +145,12 @@ public:
   /// Shows a component
   virtual void Show ();
 
+  /// Returns the state of the DEAF flag
+  virtual bool isDeaf ();
+
+  /// set component deaf or "undeaf"
+  virtual void SetDeaf (bool bDeaf);
+
   /// Get's the unique id of this component.
   virtual unsigned long GetID ();
 

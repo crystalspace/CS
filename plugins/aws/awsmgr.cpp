@@ -1008,6 +1008,7 @@ bool awsManager::HandleEvent (iEvent &Event)
         {
           // If the top window still contains the mouse, it stays on top
           if (
+            !GetTopWindow ()->isDeaf () &&
             !GetTopWindow ()->isHidden () &&
             GetTopWindow ()->Frame ().Contains (Event.Mouse.x, Event.Mouse.y))
           {
@@ -1031,6 +1032,7 @@ bool awsManager::HandleEvent (iEvent &Event)
             {
               // If the window contains the mouse, it becomes new top.
               if (
+                !win->isDeaf () &&
                 !win->isHidden () &&
                 win->Frame ().Contains (Event.Mouse.x, Event.Mouse.y))
               {
@@ -1073,7 +1075,7 @@ bool awsManager::RecursiveBroadcastToChildren (
   iAwsComponent *cmp,
   iEvent &Event)
 {
-  if (!cmp->isHidden ())
+  if (!cmp->isDeaf ())
   {
     int i;
     iAwsComponent *child;

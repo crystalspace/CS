@@ -1305,6 +1305,11 @@ bool awsWindow::isHidden ()
   return comp.isHidden ();
 }
 
+bool awsWindow::isDeaf ()
+{
+  return comp.isDeaf ();
+}
+
 void awsWindow::Hide ()
 {
   comp.Hide ();
@@ -1316,6 +1321,12 @@ void awsWindow::Show ()
   comp.Show ();
   WindowManager ()->InvalidateUpdateStore ();
 }
+
+void awsWindow::SetDeaf (bool bDeaf)
+{
+  comp.SetDeaf (bDeaf);
+}
+
 
 unsigned long awsWindow::GetID ()
 {
