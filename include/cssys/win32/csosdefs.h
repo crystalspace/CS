@@ -23,6 +23,7 @@
 #if defined(COMP_VC)
 
   #pragma warning(disable:4097)   // use of xxx as synonym for a classname
+  #pragma warning(disable:4099)   // type seen as both 'struct' and `class'
   #pragma warning(disable:4100)   // Use of void* as a formal function parameter
   #pragma warning(disable:4102)   // 'label' : unreferenced label
   #pragma warning(disable:4127)   // conditional expression is constant
