@@ -213,9 +213,9 @@
 #ifdef SYSDEF_DIR
 // For systems without opendir()
 // COMP_GCC has opendir, readdir 
-# ifndef COMP_GCC
-#  ifdef __NEED_OPENDIR_PROTOTYPE
-#    if defined(OS_MACOS)
+# if !defined(COMP_GCC) || defined(OS_PS2)
+#  if defined(__NEED_OPENDIR_PROTOTYPE) || defined(OS_PS2)
+#    if defined(OS_MACOS) || defined(OS_PS2)
        typedef char DIR;
        typedef struct dirent {
 	  char d_name[ MAXPATHLEN ];
@@ -241,7 +241,7 @@
 #      include <stat.h>
 #    else
 #      include <sys/types.h>
-#      if !(defined (OS_WIN32) && defined (COMP_WCC))
+#      if !(defined (OS_WIN32) && defined (COMP_WCC)) && !defined(OS_PS2)
 #        include <dirent.h>
 #      endif
 #	 if defined(__CYGWIN32__)
@@ -279,6 +279,8 @@
 #    include <malloc.h>
 #  elif defined(COMP_GCC) && defined(OS_DOS)
 #    include <stdlib.h>
+#  elif defined(COMP_GCC) && defined(OS_PS2)
+#    include <malloc.h>
 #  elif defined(OS_BSD)
 #    include <stdlib.h>
 #  else

@@ -18,13 +18,17 @@
 */
 
 #include <math.h>
-#include <memory.h>
 
 #include "cssysdef.h"
 #include "cstypes.h"
 #include "csgeom/math3d.h"
 #include "csgfxldr/bmpimage.h"
 #include "cssys/csendian.h"
+
+#ifndef OS_PS2
+//TODO Azverkan is this really needed?
+# include <memory.h>
+#endif
 
 bool RegisterBMP ()
 {

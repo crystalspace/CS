@@ -5,12 +5,12 @@
 DESCRIPTION.ps2 = Playstation 2
 
 # Choose which 2D/3D driver combinations you want to build/use
-PLUGINS+=video/canvas/softx video/renderer/software
-PLUGINS+=video/renderer/opengl video/canvas/openglx
-PLUGINS+=video/canvas/linex
+#PLUGINS+=video/canvas/softx video/renderer/software
+#PLUGINS+=video/renderer/opengl video/canvas/openglx
+#PLUGINS+=video/canvas/linex
 
 # uncomment the following to build SVGALIB and/or GGI 2D drivers
-PLUGINS+=video/canvas/svgalib
+#PLUGINS+=video/canvas/svgalib
 #PLUGINS+=video/canvas/ggi 
 
 # uncomment the following to build sound drivers
@@ -21,7 +21,7 @@ PLUGINS+=video/canvas/svgalib
 # Also set the entry Driver in section Display of opengl.cfg
 #PLUGINS+=video/canvas/openglx/glide
 #PLUGINS+=video/canvas/openglx/svga
-PLUGINS+=video/canvas/openglx/empty
+#PLUGINS+=video/canvas/openglx/empty
 
 # uncomment the following to build Glide stuff
 #GLIDE_VERSIONS=2 3
@@ -54,16 +54,16 @@ include mk/unix.mak
 NEED_SOCKET_LIB=no
 
 # Extra libraries needed on this system.
-LIBS.EXE+=-ldl -lm  
+LIBS.EXE+=-lgcc -lstdc++ -lm  
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-lz
+Z_LIBS=
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-lpng
+PNG_LIBS=
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-ljpeg
+JPG_LIBS=
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
@@ -112,8 +112,8 @@ LFLAGS.DLL=-Wl,-shared
 NASMFLAGS.SYSTEM=-f elf
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = libs/cssys/unix/unix.cpp libs/cssys/unix/utiming.cpp \
-  libs/cssys/unix/loadlib.cpp libs/cssys/general/findlib.cpp \
+SRC.SYS_CSSYS = \
+  libs/cssys/general/findlib.cpp \
   libs/cssys/general/printf.cpp libs/cssys/general/getopt.cpp
 SRC.SYS_CSSYS_DLL = libs/cssys/unix/dummy.cpp
 

@@ -17,6 +17,8 @@
 #  define OS_VERSION OS_NEXT_DESCRIPTION    /* Must appear before OS_UNIX */
 #elif defined(OS_BE)
 #  define OS_VERSION "BeOS"                 /* Must appear before OS_UNIX */
+#elif defined(OS_PS2)
+#  define OS_VERSION "Playstation 2"
 #elif defined(OS_UNIX)
 #  define OS_VERSION "Unix"
 #elif defined(OS_DOS)
@@ -47,7 +49,9 @@
 #  define PR_VERSION "PA-RISC"
 #elif defined(PROC_ALPHA)
 #  define PR_VERSION "Alpha"
-#elif defined(PROC_UNKNOWN)
+#elif defined(PROC_EE)
+#  define PR_VERSION "EmotionEngine"
+# elif defined(PROC_UNKNOWN)
 #  define PR_VERSION "Unknown"
 #else
 #  error "Unspecified processor!"
