@@ -55,7 +55,7 @@ CMapPolygonSet& CMapPolygonSet::operator=(const CMapPolygonSet& Other)
 
 void CMapPolygonSet::AddPolygons(const CMapPolygonSet& Other)
 {
-  int i;
+  size_t i;
   for (i=0; i<Other.m_Polygon.Length(); i++)
   {
     m_Polygon.Push(new CMapPolygon(*Other.m_Polygon.Get(i)));
@@ -64,7 +64,7 @@ void CMapPolygonSet::AddPolygons(const CMapPolygonSet& Other)
 
 void CMapPolygonSet::FlipSide()
 {
-  int i;
+  size_t i;
   for (i=0; i<m_Polygon.Length(); i++)
   {
     m_Polygon[i]->FlipSide();
@@ -74,7 +74,8 @@ void CMapPolygonSet::FlipSide()
 void CMapPolygonSet::ReduceToCommonParts(const CMapPolygonSet& Other, bool optimise)
 {
   CMapPolygonVector NewPoly;
-  int i, j, k;
+  size_t i, j;
+  int k;
 
   //We handle every pair of convex Polygon and Other convex Polygon
   for (i=0; i<m_Polygon.Length(); i++)
@@ -116,7 +117,7 @@ void CMapPolygonSet::ReduceToCommonParts(const CMapPolygonSet& Other, bool optim
   //As a last step, we clear the current list of polygons and replace
   //it by a new list.
   DELETE_VECTOR_MEMBERS(m_Polygon);
-  int p;
+  size_t p;
   for (p=0; p<NewPoly.Length(); p++)
   {
     m_Polygon.Push(NewPoly.Get(p));
@@ -125,7 +126,7 @@ void CMapPolygonSet::ReduceToCommonParts(const CMapPolygonSet& Other, bool optim
 
 void CMapPolygonSet::RemoveCommonParts(const CMapPolygonSet& Other, bool optimise)
 {
-  int i;
+  size_t i;
   for (i=0; i<Other.m_Polygon.Length(); i++)
   {
     if (optimise)
@@ -153,7 +154,8 @@ void CMapPolygonSet::RemovePolygon(const CMapPolygon& Other)
 {
   CMapPolygonVector NewPoly;
 
-  int i, k;
+  size_t i;
+  int k;
   for (i=0; i<m_Polygon.Length(); i++)
   {
     CMapPolygon Poly(*(m_Polygon[i]));
@@ -181,7 +183,7 @@ void CMapPolygonSet::RemovePolygon(const CMapPolygon& Other)
   //As a last step, we clear the current list of polygons and replace
   //it by a new list.
   DELETE_VECTOR_MEMBERS(m_Polygon);
-  int p;
+  size_t p;
   for (p=0; p<NewPoly.Length(); p++)
   {
     m_Polygon.Push(NewPoly.Get(p));

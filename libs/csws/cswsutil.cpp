@@ -85,7 +85,7 @@ void csWindowList::SetState (int mask, bool enable)
 
 static bool do_sendcommand (csComponent *child, void *param)
 {
-  ((csComponent *)(child->id))->SendCommand ((int)param, 0);
+  ((csComponent *)(child->id))->SendCommand (*((int*)param), 0);
   return false;
 }
 
@@ -124,22 +124,28 @@ bool csWindowList::HandleEvent (iEvent &Event)
       } /* endif */
       break;
     case csevCommand:
-      switch (Event.Command.Code)
       {
-        case cscmdWindowListShow:
-          list->ForEachItem (do_sendcommand, (void *)cscmdHide);
-          return true;
-        case cscmdWindowListMaximize:
-          list->ForEachItem (do_sendcommand, (void *)cscmdMaximize);
-          return true;
-        case cscmdWindowListClose:
-          list->ForEachItem (do_sendcommand, (void *)cscmdClose);
-          return true;
-        case cscmdListBoxItemDoubleClicked:
-          list->ForEachItem (do_select);
-          return true;
-      } /* endswitch */
-      break;
+	int cmd;
+	switch (Event.Command.Code)
+	{
+	  case cscmdWindowListShow:
+	    cmd = cscmdHide;
+	    list->ForEachItem (do_sendcommand, &cmd);
+	    return true;
+	  case cscmdWindowListMaximize:
+	    cmd = cscmdMaximize;
+	    list->ForEachItem (do_sendcommand, &cmd);
+	    return true;
+	  case cscmdWindowListClose:
+	    cmd = cscmdClose;
+	    list->ForEachItem (do_sendcommand, &cmd);
+	    return true;
+	  case cscmdListBoxItemDoubleClicked:
+	    list->ForEachItem (do_select);
+	    return true;
+	} /* endswitch */
+	break;
+      }
   } /* endswitch */
 
   return csWindow::HandleEvent (Event);
@@ -152,7 +158,7 @@ bool csWindowList::do_addtowindowlist (csComponent *child, void *param)
   {
     const char *title = child->GetText ();
     if (title && title[0])
-      (void)new csListBoxItem (windowlist->list, title, (int)child,
+      (void)new csListBoxItem (windowlist->list, title, (ID)child,
         child == windowlist->focusedwindow ? cslisEmphasized : cslisNormal);
   } /* endif */
   return false;
@@ -210,11 +216,11 @@ struct RectUnionRec
   csRect *result;
 };
 
-static bool doRectUnion (int *vector, int count, void *arg)
+static bool doRectUnion (size_t* vector, size_t count, void *arg)
 {
   RectUnionRec *ru = (RectUnionRec *)arg;
   csRect tmp (*(csRect *)(*ru->rect) [vector [0]]);
-  int i;
+  size_t i;
   for (i = 0; i < count; i++)
     tmp.AddAdjanced (*(csRect *)(*ru->rect) [vector [i]]);
   for (i = count; i < ru->rect->Length (); i++)
@@ -224,11 +230,11 @@ static bool doRectUnion (int *vector, int count, void *arg)
   return false;
 }
 
-static bool RecursivecsCombinations (int *vector, int top, int mask, int m, int
-n,
-  bool (*callback) (int *vector, int count, void *arg), void *arg)
+static bool RecursivecsCombinations (size_t* vector, size_t top, int mask, size_t m, 
+				     size_t n,
+  bool (*callback) (size_t* vector, size_t count, void *arg), void *arg)
 {
-  int i;
+  size_t i;
   for (i = 0; i < m; i++)
   {
     if (mask & (1 << i))
@@ -246,10 +252,10 @@ n,
   return false;
 }
 
-void csCombinations (int m, int n, bool (*callback) (int *vector, int count,
+void csCombinations (size_t m, size_t n, bool (*callback) (size_t* vector, size_t count,
   void *arg), void *arg)
 {
-  int *vector = new int [m];
+  size_t* vector = new size_t[m];
   RecursivecsCombinations (vector, 0, 0, m, n, callback, arg);
   delete [] vector;
 }
@@ -257,7 +263,7 @@ void csCombinations (int m, int n, bool (*callback) (int *vector, int count,
 void RectUnion (cswsRectVector &rect, csRect &result)
 {
   // Sort rectangles by area so that we can compute much less variants
-  int i, j;
+  size_t i, j;
   for (i = 0; i < rect.Length (); i++)
     for (j = rect.Length () - 1; j > i; j--)
       if (((csRect *)rect [i])->Area () < ((csRect *)rect [j])->Area ())
@@ -272,7 +278,7 @@ void RectUnion (cswsRectVector &rect, csRect &result)
   ru.rect = &rect;
   ru.result = &result;
   result.MakeEmpty ();
-  int n = rect.Length ();
+  size_t n = rect.Length ();
   // Save user from endless wait
   if (n > 8)
     n = 8;

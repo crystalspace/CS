@@ -70,7 +70,7 @@ public:
     CSREFARR_TRACK_DECREF ((*address), address);
   }
 
-  static void InitRegion (T* address, int count)
+  static void InitRegion (T* address, size_t count)
   {
     memset (address, 0, count*sizeof (T));
   }

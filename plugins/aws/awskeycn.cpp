@@ -50,7 +50,7 @@ iAwsKey *awsKeyContainer::Find (unsigned long idname)
       idname,
       children.Length ());
 
-  int i;
+  size_t i;
   for (i = 0; i < children.Length (); ++i)
   {
     iAwsKey *key = children[i];

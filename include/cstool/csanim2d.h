@@ -49,7 +49,7 @@ public:
   ~csAnimationTemplate();
 
   /// get number of frames
-  inline int GetFrameCount() const
+  inline size_t GetFrameCount() const
   {return Frames.Length();}
   /// get total length of animation (all delays added together)
   inline csTicks GetLength() const
@@ -66,7 +66,7 @@ public:
   {AddFrame(Delay, new csSimplePixmap(Tex, x, y, w, h));}
 
   /// get a frame by number
-  inline csPixmap *GetFrame(int n) const
+  inline csPixmap *GetFrame(size_t n) const
   {return Frames.Get(n);}
   /// get a frame by time
   csPixmap *GetFrameByTime(csTicks Time);

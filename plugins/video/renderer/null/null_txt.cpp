@@ -237,7 +237,7 @@ uint32 csTextureManagerNull::encode_rgb (int r, int g, int b)
 void csTextureManagerNull::PrepareTextures ()
 {
   // Create mipmaps for all textures
-  int i;
+  size_t i;
   for (i = 0; i < textures.Length (); i++)
   {
     csTextureHandle *txt = textures.Get (i);

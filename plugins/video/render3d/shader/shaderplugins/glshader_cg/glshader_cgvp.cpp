@@ -53,7 +53,7 @@ void csShaderGLCGVP::Activate()
 
   if (cgTrackMatrices)
   {
-    for (int i = 0; i < cgMatrixTrackers.Length(); ++i)
+    for (size_t i = 0; i < cgMatrixTrackers.Length(); ++i)
     {
       const CGMatrixTrackerEntry& mt = cgMatrixTrackers[i];
 
@@ -63,7 +63,7 @@ void csShaderGLCGVP::Activate()
   }
   if (nvTrackMatrices)
   {
-    for (int i = 0; i < nvMatrixTrackers.Length(); ++i)
+    for (size_t i = 0; i < nvMatrixTrackers.Length(); ++i)
     {
       const NVMatrixTrackerEntry& mt = nvMatrixTrackers[i];
 
@@ -214,7 +214,7 @@ bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 	  if (sscanf (varName, "c%d[4]", &varIndex) != 1)
 	    break;
 	  
-	  if ((varIndex >= remap.Length()) || (remap[varIndex] == 0)) break;
+	  if (((size_t)varIndex >= remap.Length()) || (remap[varIndex] == 0)) break;
 
 	  line.Format ("PARAM c%d[4] = { %s };", varIndex, remap[varIndex]);
 	}
@@ -231,7 +231,7 @@ bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 
     csArray<csShaderVarMapping> mappings;
 
-    for (int i = 0; i < variablemap.Length (); i++)
+    for (size_t i = 0; i < variablemap.Length (); i++)
     {
       // Get the Cg parameter
       CGparameter parameter = (CGparameter)variablemap[i].userPtr;
@@ -444,7 +444,7 @@ bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 
 	csHash<int, int> constRemap;
 
-	for (int m = 0; m < matrixParams.Length(); m++)
+	for (size_t m = 0; m < matrixParams.Length(); m++)
 	{
 	  NVMatrixTrackerEntry mte = matrixParams[m];
 	  int newIndex = 0;

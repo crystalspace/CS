@@ -1570,7 +1570,7 @@ void csLightingPolyTexQueue::UpdateMaps (
   if (light->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
     return; // No update maps for dynamic lights.
 
-  int i;
+  size_t i;
   for (i = 0; i < polytxts.Length (); i++)
   {
     csPolyTexture *pt = polytxts[i];

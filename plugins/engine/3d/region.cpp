@@ -77,7 +77,7 @@ void csRegion::DeleteAll ()
   // object type since the order in which objects types are deleted
   // is important. i.e. we should first delete all meshes and things
   // and only then delete the sectors.
-  int i;
+  size_t i;
 
   for (i = 0; i < copy.Length (); i++)
   {

@@ -36,7 +36,7 @@ csPixmap *csAnimationTemplate::GetFrameByTime(csTicks Time)
   // wrap time
   Time %= GetLength();
   // search for frame (@@@ optimize this!)
-  long i;
+  size_t i;
   for (i=0; i<GetFrameCount(); i++) {
     if (Time < FinishTimes[i])
       return GetFrame(i);

@@ -97,7 +97,7 @@ bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
   list = iSCF::SCF->QueryClassList ("crystalspace.sound.loader.");
   if (list.IsValid())
   {
-    int i = 0;
+    size_t i = 0;
     while (i < list->Length())
     {
       char const* classname = list->Get(i);

@@ -40,7 +40,7 @@ struct csRenderMesh;
 class CS_CSTOOL_EXPORT csRenderMeshHolderSingle
 {
   csArray<csRenderMesh*> meshes;
-  int lastMesh;
+  size_t lastMesh;
   uint nextShrink;
 public:
   csRenderMeshHolderSingle ();
@@ -67,7 +67,7 @@ class CS_CSTOOL_EXPORT csRenderMeshHolderMultiple
 {
   csArray<csDirtyAccessArray<csRenderMesh*>*> rmHolderList;
   csArray<csDirtyAccessArray<csRenderMesh*>*> clearQueue;
-  int rmHolderListIndex;
+  size_t rmHolderListIndex;
 public:
   /**
    * Whether to delete the rendermeshes contained in the managed

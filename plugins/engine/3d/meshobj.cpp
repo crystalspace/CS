@@ -433,7 +433,7 @@ const csArray<iLight*>& csMeshWrapper::GetRelevantLights (int /*maxLights*/,
     {
       // Object didn't move. Now check lights (moved or destroyed).
       bool relevant = true;
-      int i;
+      size_t i;
       for (i = 0 ; i < relevant_lights.Length () ; i++)
       {
         iLight* l = relevant_lights[i];
@@ -1118,7 +1118,7 @@ iMeshWrapper *csMeshFactoryWrapper::NewMeshObject ()
       {
         csArray<iMeshFactoryWrapper*>& facts_for_lod =
       	  static_lod->GetMeshesForLOD (l);
-        int j;
+        size_t j;
 	for (j = 0 ; j < facts_for_lod.Length () ; j++)
 	{
 	  if (facts_for_lod[j] == childfact)
@@ -1215,7 +1215,7 @@ iMeshWrapper* csMeshList::FindByNameWithChild (const char *Name) const
   char const* p = strchr (Name, ':');
   if (!p) return list.FindByName (Name);
 
-  int i;
+  size_t i;
   for (i = 0 ; i < list.Length () ; i++)
   {
     iMeshWrapper* m = list.Get (i);
@@ -1251,7 +1251,7 @@ bool csMeshList::Remove (int n)
 
 void csMeshList::RemoveAll ()
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < list.Length () ; i++)
   {
     FreeMesh (list[i]);
@@ -1377,7 +1377,7 @@ bool csMeshFactoryList::Remove (int n)
 
 void csMeshFactoryList::RemoveAll ()
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < list.Length () ; i++)
   {
     FreeFactory (list[i]);

@@ -143,8 +143,8 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
     visible = Get_visible ();
   }
 
-  int num_vertices = polbuf->GetVertexCount ();
-  int num_polygons = polbuf->GetPolygonCount ();
+  size_t num_vertices = polbuf->GetVertexCount ();
+  size_t num_polygons = polbuf->GetPolygonCount ();
 
   // Update work arrays
   if (num_vertices > tr_verts->Capacity ())
@@ -156,7 +156,7 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
 
   csVector3 *f1 = polbuf->GetVertices ();
   csVector3 *work_verts;
-  int i;
+  size_t i;
 
   // Perform vertex transforms if necessary
   if (mesh.vertex_mode == G3DPolygonMesh::VM_WORLDSPACE)

@@ -33,14 +33,15 @@ private:
   void *buffer;
   bool locked;
 
-  int size, compcount, compSize, stride, offset;
+  size_t size;
+  int compcount, compSize, stride, offset;
   csRenderBufferType type;
   csRenderBufferComponentType comptype;
 public:
   SCF_DECLARE_IBASE;
 
   /// Constructor.
-  csSoftRenderBuffer (void *buffer, int size, csRenderBufferType type,
+  csSoftRenderBuffer (void *buffer, size_t size, csRenderBufferType type,
     csRenderBufferComponentType comptype, int compcount);
 
   /// Destructor.
@@ -50,7 +51,7 @@ public:
   virtual csRenderBufferType GetBufferType() const { return type; }
 
   /// Get the size of the buffer (in bytes)
-  virtual int GetSize() const { return size; }
+  virtual size_t GetSize() const { return size; }
 
   /// Sets the number of component per element
   virtual void SetComponentCount (int count) 
@@ -81,7 +82,7 @@ public:
   /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release() { locked = false; }
 
-  virtual void CopyToBuffer (const void *data, int length)
+  virtual void CopyToBuffer (const void *data, size_t length)
   {
     memcpy (buffer, data, length);
   }

@@ -45,7 +45,7 @@ public:
   /**
   * Insert an Image into the Vector at specified index
   */
-  virtual void InsertImage (iImage* img, int index);
+  virtual void InsertImage (iImage* img, size_t index);
   /**
   * Add an Image to the End of the Vector
   */
@@ -53,19 +53,19 @@ public:
   /**
   * Get Image at specified index
   */
-  virtual csRef<iImage> GetImage(int index);
+  virtual csRef<iImage> GetImage(size_t index);
   /**
   * Get Image operator[]
   */
-  virtual void SetImage (int index, iImage* img);
+  virtual void SetImage (size_t index, iImage* img);
   /**
   * Get Image Count
   */
-  virtual int Length();
+  virtual size_t Length();
   /**
    * Remove a specific index
    */
-  virtual void DeleteIndex(int index);
+  virtual void DeleteIndex(size_t index);
   /**
   * Remove All Images
   */

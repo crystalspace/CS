@@ -351,7 +351,7 @@ void csTextureManager::read_config (iConfigFile* /*config*/)
 
 void csTextureManager::FreeImages ()
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < textures.Length () ; i++)
     textures.Get (i)->FreeImage ();
 }
@@ -380,20 +380,20 @@ csPtr<iMaterialHandle> csTextureManager::RegisterMaterial (
 
 void csTextureManager::UnregisterMaterial (csMaterialHandle* handle)
 {
-  int idx = materials.Find (handle);
-  if (idx >= 0) materials.DeleteIndex (idx);
+  size_t idx = materials.Find (handle);
+  if (idx != csArrayItemNotFound) materials.DeleteIndex (idx);
 }
 
 void csTextureManager::PrepareMaterials ()
 {
-  int i;
+  size_t i;
   for (i = 0; i < materials.Length (); i++)
     materials.Get (i)->Prepare ();
 }
 
 void csTextureManager::FreeMaterials ()
 {
-  int i;
+  size_t i;
   for (i = 0; i < materials.Length (); i++)
     materials.Get (i)->FreeMaterial ();
 }

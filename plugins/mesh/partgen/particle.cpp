@@ -406,8 +406,8 @@ void csNewParticleSystem::UpdateLighting (const csArray<iLight*>& lights,
     csColor lightColor = Color;
     csVector3 wpos = transform.This2Other (PositionArray [i]);
 
-    int num = lights.Length ();
-    for (int j=0; j<num; j++)
+    size_t num = lights.Length ();
+    for (size_t j=0; j<num; j++)
     {
       float d = (wpos - lights [j]->GetCenter ()).Norm ();
       float br = lights [j]->GetBrightnessAtDistance (d);

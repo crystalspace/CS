@@ -301,7 +301,7 @@ bool awsPrefManager::SelectDefaultSkin (const char* skin_name)
 {
   unsigned long id = NameToId (skin_name);
 
-  for (int i=0;i<skin_defs.Length(); i++)
+  for (size_t i = 0; i < skin_defs.Length(); i++)
   {
     if (skin_defs[i]->Name () == id)
     {
@@ -597,7 +597,7 @@ iAwsComponentNode *awsPrefManager::FindWindowDef (const char *name)
 {
   unsigned long id = NameToId (name);
 
-  for (int i=0;i<win_defs.Length();i++)
+  for (size_t i = 0; i < win_defs.Length(); i++)
     if (win_defs[i]->Name () == id)
       return win_defs[i];
 
@@ -608,7 +608,7 @@ iAwsKeyContainer *awsPrefManager::FindSkinDef (const char *name)
 {
   unsigned long id = NameToId (name);
 
-  for (int i=0;i<skin_defs.Length();i++)
+  for (size_t i = 0; i < skin_defs.Length(); i++)
     if (skin_defs[i]->Name () == id)
       return skin_defs[i];
 
@@ -629,7 +629,7 @@ int awsPrefManager::GetConstantValue (const char *name)
 {
   unsigned int namev = NameToId (name);
 
-  int i;
+  size_t i;
   for (i = 0; i < constants.Length (); ++i)
   {
     constant_entry *c = constants.Get (i);
@@ -644,7 +644,7 @@ bool awsPrefManager::ConstantExists (const char *name)
 {
   unsigned int namev = NameToId (name);
 
-  int i;
+  size_t i;
   for (i = 0; i < constants.Length (); ++i)
   {
     constant_entry *c = constants.Get (i);

@@ -38,7 +38,7 @@
 // Horizontal large scrolling step
 #define LISTBOX_HORIZONTAL_PAGESTEP     8
 
-csListBoxItem::csListBoxItem (csComponent *iParent, const char *iText, int iID,
+csListBoxItem::csListBoxItem (csComponent *iParent, const char *iText, ID iID,
   csListBoxItemStyle iStyle) : csComponent (iParent),
     ItemStyle(iStyle), deltax(0),  ItemBitmap(0),  DeleteBitmap(false),
     hOffset(0)

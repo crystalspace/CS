@@ -78,7 +78,7 @@ iFont* csFontLoadOrderEntry::GetFont (csFontPlexer* parent)
 
 void csFontLoaderOrder::AppendSmart (const csFontLoaderOrder& other)
 {
-  int i;
+  size_t i;
   for (i = 0; i < other.Length (); i++)
   {
     PushSmart (other[i]);
@@ -229,7 +229,7 @@ csPtr<iFont> csFontServerMultiplexor::LoadFont (const char *filename,
   }
   else
   {
-    int i;
+    size_t i;
     for (i = 0; i < fontservers.Length (); i++)
     {
       order->PushSmart (csFontLoadOrderEntry (fontservers[i], filename, 1.0f));
@@ -240,7 +240,7 @@ csPtr<iFont> csFontServerMultiplexor::LoadFont (const char *filename,
 
   // The first font that could be loaded is the "primary" font.
   iFont* primary = 0;
-  int i;
+  size_t i;
   for (i = 0; i < order->Length (); i++)
   {
     primary = (*order)[i].font = 
@@ -305,7 +305,7 @@ void csFontServerMultiplexor::ParseFontLoaderOrder (
 	order.PushSmart (csFontLoadOrderEntry (fs, fontName, scale));
       }
     }
-    int i;
+    size_t i;
     for (i = 0; i < fontservers.Length (); i++)
     {
       order.PushSmart (csFontLoadOrderEntry (fontservers[i], fontName, scale));
@@ -403,7 +403,7 @@ void csFontPlexer::GetMaxSize (int &oW, int &oH)
 bool csFontPlexer::GetGlyphMetrics (utf32_char c, csGlyphMetrics& metrics)
 {
   iFont* font;
-  int i;
+  size_t i;
   for (i = 0; i < order->Length (); i++)
   {
     if ((font = (*order)[i].GetFont (this)))
@@ -419,7 +419,7 @@ csPtr<iDataBuffer> csFontPlexer::GetGlyphBitmap (utf32_char c,
   csBitmapMetrics& metrics)
 {
   iFont* font;
-  int i;
+  size_t i;
   for (i = 0; i < order->Length (); i++)
   {
     if ((font = (*order)[i].GetFont (this)))
@@ -439,7 +439,7 @@ csPtr<iDataBuffer> csFontPlexer::GetGlyphAlphaBitmap (utf32_char c,
   csBitmapMetrics& metrics)
 {
   iFont* font;
-  int i;
+  size_t i;
   for (i = 0; i < order->Length (); i++)
   {
     if ((font = (*order)[i].GetFont (this)))
@@ -479,7 +479,7 @@ void csFontPlexer::GetDimensions (const char *text, int &oW, int &oH, int &desc)
 
     csGlyphMetrics gMetrics = defMetrics;
     iFont* font;
-    int i;
+    size_t i;
     for (i = 0; i < order->Length (); i++)
     {
       if ((font = (*order)[i].GetFont (this)))
@@ -530,7 +530,7 @@ int csFontPlexer::GetLength (const char *text, int maxwidth)
 
     csGlyphMetrics gMetrics = defMetrics;
     iFont* font;
-    int i;
+    size_t i;
     for (i = 0; i < order->Length (); i++)
     {
       if ((font = (*order)[i].GetFont (this)))
@@ -584,7 +584,7 @@ int csFontPlexer::GetAscent ()
 bool csFontPlexer::HasGlyph (utf32_char c)
 {
   iFont* font;
-  int i;
+  size_t i;
   for (i = 0; i < order->Length (); i++)
   {
     if ((font = (*order)[i].GetFont (this)))

@@ -361,7 +361,8 @@ awsGridBagLayout::GridBagLayoutInfo * awsGridBagLayout::GetLayoutInfo (
   iAwsComponent *cmp;
   awsGridBagConstraints *constraints;
 
-  int compindex, i, k, px, py, pixels_diff, nextSize;
+  size_t compindex;
+  int i, k, px, py, pixels_diff, nextSize;
   int curX, curY, curWidth, curHeight, curRow, curCol;
   double weight_diff, weight;
   int xMax[MAXGRIDSIZE], yMax[MAXGRIDSIZE];
@@ -825,7 +826,7 @@ csRect awsGridBagLayout::GetMinSize (
 void awsGridBagLayout::ArrangeGrid (iAwsComponent *parent)
 {
   iAwsComponent *cmp;
-  int compindex;
+  size_t compindex;
   awsGridBagConstraints *constraints;
   csRect insets (0, 0, 0, 0);
   csRect d;

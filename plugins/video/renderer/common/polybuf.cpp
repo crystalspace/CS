@@ -60,7 +60,7 @@ void csPolArrayPolygonBuffer::SetMaterial (int idx,
 
 void csPolArrayPolygonBuffer::Clear ()
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < polygons.Length () ; i++)
   {
     csPolArrayPolygon& pol = polygons[i];

@@ -40,7 +40,7 @@ typedef csDirtyAccessArray<UsedVertexInfo> UsedVerticesInfo;
 
 bool csSpriteBuilder::Build (iModelDataObject *Object)
 {
-  int i,j;
+  size_t i,j;
   csRef<iObjectIterator> it1;
   iModelDataMaterial *Material = 0;
 
@@ -145,7 +145,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
      otherwise add this combo.
 */
 
-  int vertices=Frames[0]->GetVertexCount();
+  size_t vertices=Frames[0]->GetVertexCount();
   UsedVerticesInfo *usedvertices = new UsedVerticesInfo [vertices];
 
   it1 = Object->QueryObject ()->GetIterator ();
@@ -175,7 +175,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
         }
         if (index == -1)
         {
-          index = SpriteVertices.Push (vertex);
+          index = (int)SpriteVertices.Push (vertex);
           SpriteNormals.Push (normal);
           SpriteTexels.Push (texel);
           UsedVertexInfo vtxinfo;
@@ -208,13 +208,14 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
   /* create all frames in the target factory. This is done separately because
    * adding the vertices fails if no frames exist.
    */
-  int NumPreviousFrames = StoreFrameInfo (Frames.Length (), SpriteVertices.Length ());
+  int NumPreviousFrames = StoreFrameInfo ((int)Frames.Length (), 
+    (int)SpriteVertices.Length ());
 
   // create all frames in the target factory
   bool NeedTiling = false;
   for (i=0; i<Frames.Length (); i++)
   {
-    int FrameIndex = NumPreviousFrames + i;
+    int FrameIndex = NumPreviousFrames + (int)i;
     BeginFrame (FrameIndex);
     iModelDataVertices *Vertices = Frames.Get (i);
 
@@ -261,7 +262,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
          * meaning of the time values in the model data structures and
          * in 3d sprites.
          */
-        int FrameIndex = (i == 0) ? (ac->GetFrameCount ()-1) : (i-1);
+        int FrameIndex = (int)((i == 0) ? (ac->GetFrameCount ()-1) : (i-1));
         csRef<iModelDataVertices> ver (SCF_QUERY_INTERFACE (
                 ac->GetState (FrameIndex), iModelDataVertices));
         if (ver)
@@ -270,9 +271,9 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
           float Delay = ThisTime - LastTime;
           LastTime = ThisTime;
 
-          int FrameIndex = Frames.Find (ver);
-          CS_ASSERT (FrameIndex != -1);
-          StoreActionFrame (FrameIndex, int(Delay * 1000),0);
+	  size_t FrameIndex = Frames.Find (ver);
+	  CS_ASSERT (FrameIndex != csArrayItemNotFound);
+          StoreActionFrame ((int)FrameIndex, int(Delay * 1000),0);
         }
       }
       FinishAction ();

@@ -29,7 +29,7 @@ class csObjectIterator : public iObjectIterator
 public:
   SCF_DECLARE_IBASE;
   csRef<csObject> object;
-  int position;
+  size_t position;
 
   csObjectIterator (csObject *obj) 
       : object (obj)
@@ -194,8 +194,8 @@ void csObject::ObjRemove (iObject *obj)
   if (!Children || !obj)
     return;
 
-  int n = Children->Find (obj);
-  if (n>=0)
+  size_t n = Children->Find (obj);
+  if (n != (size_t)-1)
   {
     obj->SetObjectParent (0);
     DG_REMPARENT (obj, this);
@@ -209,8 +209,8 @@ void csObject::ObjReleaseOld (iObject *obj)
   if (!Children || !obj)
     return;
 
-  int n = Children->Find (obj);
-  if (n>=0)
+  size_t n = Children->Find (obj);
+  if (n != (size_t)-1)
   {
     obj->SetObjectParent (0);
     // @@@ WARNING! Doing only one DecRef() here does not prevent a second
@@ -231,14 +231,15 @@ void csObject::ObjRemoveAll ()
   if (!Children)
     return;
 
-  int i;
-  for (i=Children->Length ()-1; i>=0; i--)
+  size_t i;
+  for (i=Children->Length (); i>0; i--)
   {
-    iObject* child = Children->Get (i);
+    const size_t idx = i - 1;
+    iObject* child = Children->Get (idx);
     child->SetObjectParent (0);
     DG_REMPARENT (child, this);
     DG_REMCHILD (this, child);
-    Children->DeleteIndex (i);
+    Children->DeleteIndex (idx);
   }
 }
 
@@ -263,7 +264,7 @@ void* csObject::GetChild (int InterfaceID, int Version,
     return obj ? obj->QueryInterface (InterfaceID, Version) : 0;
   }
 
-  int i;
+  size_t i;
   for (i = 0; i < Children->Length (); i++)
   {
     if (Name)
@@ -285,7 +286,7 @@ iObject* csObject::GetChild (const char *Name) const
   if (!Children || !Name)
     return 0;
 
-  for (int i = 0; i < Children->Length (); i++)
+  for (size_t i = 0; i < Children->Length (); i++)
   {
     const char *ThisName = Children->Get (i)->GetName ();
     if (ThisName != 0 && !strcmp (ThisName, Name))

@@ -1396,7 +1396,7 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
   bool fill_lightmap = true;
 
   num_vertices = spoly->polygon_data.num_vertices;
-  if (num_vertices > VectorArray->Length ())
+  if ((size_t)num_vertices > VectorArray->Length ())
     VectorArray->SetLength (num_vertices);
   poly = VectorArray->GetArray ();
 

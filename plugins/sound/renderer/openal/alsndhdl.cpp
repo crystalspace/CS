@@ -97,7 +97,7 @@ void csSoundHandleOpenAL::UpdateCount(long NumSamples)
     if (!Data->IsStatic())
     {
       // Find any sources associated with us
-      for (long i=0; i<SoundRender->ActiveSources.Length(); i++)
+      for (size_t i=0; i<SoundRender->ActiveSources.Length(); i++)
       {
         src = (csSoundSourceOpenAL*)SoundRender->ActiveSources.Get(i);
         if (src->GetSoundHandle()==this && src->IsPlaying())
@@ -164,7 +164,7 @@ void csSoundHandleOpenAL::UpdateCount(long NumSamples)
       {
         ActiveStream=false; // Stream is done playing
         // Notify all sources that this stream has ended
-        for (long i=0; i<SoundRender->ActiveSources.Length(); i++)
+        for (size_t i=0; i<SoundRender->ActiveSources.Length(); i++)
         {
           src = (csSoundSourceOpenAL*)SoundRender->ActiveSources.Get(i);
           if (src->GetSoundHandle()==this && src->IsPlaying())
@@ -189,7 +189,7 @@ long csSoundHandleOpenAL::GetPlayCursorPosition()
 void csSoundHandleOpenAL::vUpdate(void *buf, long Num)
 {
   long NumBytes = Num * Data->GetFormat()->Bits/8 * Data->GetFormat()->Channels;
-  for (long i=0; i<SoundRender->ActiveSources.Length(); i++)
+  for (size_t i=0; i<SoundRender->ActiveSources.Length(); i++)
   {
     csSoundSourceOpenAL *src = (csSoundSourceOpenAL*)SoundRender->ActiveSources.Get(i);
     if (src->GetSoundHandle()==this && src->IsPlaying())

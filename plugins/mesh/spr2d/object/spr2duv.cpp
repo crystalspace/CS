@@ -70,7 +70,7 @@ void csSprite2DUVAnimationFrame::SetUV (int idx, float u, float v)
 {
   csVector2 uv (u, v);
 
-  if (idx == -1 || idx >= vCoo.Length ())
+  if (idx == -1 || (size_t)idx >= vCoo.Length ())
     vCoo.Push (uv);
   else
     vCoo[MAX (0, idx)] = uv;
@@ -150,7 +150,7 @@ iSprite2DUVAnimationFrame *csSprite2DUVAnimation::GetFrame (const char *name)
 iSprite2DUVAnimationFrame *csSprite2DUVAnimation::CreateFrame (int idx)
 {
   csSprite2DUVAnimationFrame *p = new csSprite2DUVAnimationFrame (this);
-  if (idx == -1 || idx >= vFrames.Length ())
+  if (idx == -1 || (size_t)idx >= vFrames.Length ())
     vFrames.Push (p);
   else
     vFrames.Insert (MAX (0, idx), p);
@@ -160,7 +160,7 @@ iSprite2DUVAnimationFrame *csSprite2DUVAnimation::CreateFrame (int idx)
 void csSprite2DUVAnimation::MoveFrame (int frame, int idx)
 {
   csSprite2DUVAnimationFrame* p = vFrames.Get (frame);
-  if (idx == -1 || idx >= vFrames.Length ())
+  if (idx == -1 || (size_t)idx >= vFrames.Length ())
     vFrames.Push (p);
   else
     vFrames.Insert (MAX (0, idx), p);

@@ -206,7 +206,7 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 
   glGetError ();
 
-  for (int i=0; i < txt_mm->vTex.Length (); i++)
+  for (size_t i=0; i < txt_mm->vTex.Length (); i++)
   {
     csTextureOpenGL *togl = txt_mm->vTex[i];
     if (togl->compressed == GL_FALSE)

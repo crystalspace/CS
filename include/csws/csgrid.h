@@ -154,12 +154,12 @@ public:
   void* GetAt (int row, int col)
   {
     void* result = 0;
-    int idx1 = rows.FindSortedKey (rows.KeyCmp(row));
-    if (idx1 != -1)
+    size_t idx1 = rows.FindSortedKey (rows.KeyCmp(row));
+    if (idx1 != (size_t)-1)
     {
-      int idx2 = ((csGridRow *)rows.Get (idx1)->data)->FindSortedKey (
+      size_t idx2 = ((csGridRow *)rows.Get (idx1)->data)->FindSortedKey (
       	rows.KeyCmp(col));
-      if (idx2 != -1)
+      if (idx2 != (size_t)-1)
 	result = ((csGridRow *)rows.Get (idx1)->data)->Get (idx2)->data;
     }
     return result;
@@ -168,8 +168,8 @@ public:
   // Set the data at given row/column
   void SetAt (int row, int col, void* data)
   {
-    int idx = rows.FindSortedKey (rows.KeyCmp(row));
-    if (idx == -1)
+    size_t idx = rows.FindSortedKey (rows.KeyCmp(row));
+    if (idx == (size_t)-1)
       idx = rows.InsertSorted (new csGridRowEntry (row, new csGridRow (row)),
       	rows.Compare);
     ((csGridRow *)rows.Get (idx)->data)->SetAt (col, data);

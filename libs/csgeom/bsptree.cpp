@@ -53,13 +53,13 @@ void csBSPTree::Clear ()
   }
 }
 
-int csBSPTree::FindBestSplitter (csTriangle* triangles, csPlane3* planes,
+size_t csBSPTree::FindBestSplitter (csTriangle* triangles, csPlane3* planes,
 	int num_triangles, csVector3* vertices,
 	const csArray<int>& triidx)
 {
-  int i, j;
+  size_t i, j;
   float mincost = 1000000.0;
-  int minidx = -1;
+  size_t minidx = (size_t)-1;
   for (i = 0 ; i < triidx.Length () ; i++)
   {
     int cnt_splits = 0;
@@ -122,14 +122,14 @@ void csBSPTree::Build (csTriangle* triangles, csPlane3* planes,
     return;
   }
 
-  int idx = FindBestSplitter (triangles, planes, num_triangles, vertices,
+  size_t idx = FindBestSplitter (triangles, planes, num_triangles, vertices,
   	triidx);
-  CS_ASSERT (idx >= 0);
+  CS_ASSERT (idx != (size_t)-1);
   splitters.Push (triidx[idx]);
 
   csArray<int> left;
   csArray<int> right;
-  int i;
+  size_t i;
   split_plane = planes[triidx[idx]];
   for (i = 0 ; i < triidx.Length () ; i++)
     if (i != idx)
@@ -210,7 +210,7 @@ void csBSPTree::Back2Front (const csVector3& pos, csDirtyAccessArray<int>& arr,
     if (child1) child1->Back2Front (pos, arr, used_indices);
   }
 
-  int i;
+  size_t i;
   for (i = 0 ; i < splitters.Length () ; i++)
     if (!used_indices.In (splitters[i]))
     {

@@ -341,7 +341,7 @@ int csTreeItem::Toggle (int iAction)
 
 static bool do_toggle (csTreeItem *iItem, void *iParam)
 {
-  iItem->Toggle ((int)iParam);
+  iItem->Toggle (*((int*)iParam));
   return false;
 }
 
@@ -438,7 +438,7 @@ bool csTreeItem::HandleEvent (iEvent &Event)
           Event.Command.Info = CS_TREEITEM_MAGIC;
           return true;
         case cscmdTreeItemToggleAll:
-          ForEachItem (do_toggle, Event.Command.Info, false);
+          ForEachItem (do_toggle, &Event.Command.Info, false);
           // Fallback to cscmdTreeItemToggle
         case cscmdTreeItemToggle:
           Event.Command.Info = (void *)Toggle ((int)Event.Command.Info);

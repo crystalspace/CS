@@ -32,8 +32,8 @@ struct CS_CSUTIL_EXPORT csTinyXmlAttributeIterator :
   public iDocumentAttributeIterator
 {
 private:
-  int current;
-  int count;
+  size_t current;
+  size_t count;
   TiXmlElement* parent;
 
 public:

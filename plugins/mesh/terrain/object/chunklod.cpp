@@ -985,7 +985,7 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
     texel_error_projection *= texel_error_projection;
     if (texel_error_projection > sq_dist) 
     {
-      for (int i = 0; i < palette.Length(); i ++)
+      for (size_t i = 0; i < palette.Length(); i ++)
       {
 	csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated,
 	  rv->GetCurrentFrameNumber ());
@@ -1096,7 +1096,7 @@ bool csChunkLodTerrainObject::SetMaterialPalette (
 	const csArray<iMaterialWrapper*>& pal)
 {
   palette.SetLength (pal.Length());
-  for (int i = 0; i < pal.Length(); i++)
+  for (size_t i = 0; i < pal.Length(); i++)
   {
     palette[i] = pal[i];
   }
@@ -1118,7 +1118,7 @@ bool csChunkLodTerrainObject::SetMaterialMap (const csArray<char>& data,
   matwrap->GetMaterial()->AddVariable (lod_var); 
     // @@@ FIXME: Don't change the material, use the RM SV context
 
-  for (int i = 0; i < palette.Length(); i ++) 
+  for (size_t i = 0; i < palette.Length(); i ++) 
   {
     csRef<iImage> alpha = csPtr<iImage> (new csImageMemory (w, h, 
 	CS_IMGFMT_ALPHA | CS_IMGFMT_TRUECOLOR));
@@ -1129,7 +1129,7 @@ bool csChunkLodTerrainObject::SetMaterialMap (const csArray<char>& data,
     {
       for (x = 0; x < w; x ++) 
       {
-	int v = (data[x + y * w] == i) ? 255 : 0;
+	int v = ((unsigned char)data[x + y * w] == i) ? 255 : 0;
 	map[x + y * w].Set (v, v, v, v);
       }
     }
@@ -1301,7 +1301,7 @@ void csChunkLodTerrainObject::UpdateColors (const csArray<int>& colors,
     baseColor += amb;
   }
       
-  for (int i = 0; i < colors.Length(); i++)
+  for (size_t i = 0; i < colors.Length(); i++)
   {
     csColor col (baseColor);
     if (staticLighting)
@@ -1311,20 +1311,20 @@ void csChunkLodTerrainObject::UpdateColors (const csArray<int>& colors,
     staticColors[i] = col;
   }
 
-  for (int l = 0; l < lightQueue.Length(); l++)
+  for (size_t l = 0; l < lightQueue.Length(); l++)
   {
     const QueuedLight& ql = lightQueue[l];
 
     if (ql.isPseudo)
     {
-      for (int i = 0; i < colors.Length(); i++)
+      for (size_t i = 0; i < colors.Length(); i++)
       {
 	staticColors[i] += ql.lightcol * ql.intensities[colors[i]];
       }
     }
     else
     {
-      for (int i = 0; i < colors.Length(); i++)
+      for (size_t i = 0; i < colors.Length(); i++)
       {
 	float obj_sq_dist = csSquaredDist::PointPoint (ql.obj_light_pos, 
 	  vertices[i]);
@@ -1435,7 +1435,7 @@ void csChunkLodTerrainObject::InitializeDefault (bool clear)
     float lightScale = CS_NORMAL_LIGHT_LEVEL / 256.0f;
     pFactory->engine->GetAmbientLight (amb);
     amb *= lightScale;
-    for (int i = 0 ; i < staticLights.Length(); i++)
+    for (size_t i = 0 ; i < staticLights.Length(); i++)
     {
       staticLights[i] = amb;
     }
@@ -1468,7 +1468,7 @@ bool csChunkLodTerrainObject::ReadFromCache (iCacheManager* cache_mgr)
     magic[CachedLightingMagicSize] = 0;
     if (strcmp (magic, CachedLightingMagic) == 0)
     {
-      int v;
+      size_t v;
       for (v = 0; v < staticLights.Length(); v++)
       {
 	csColor& c = staticLights[v];
@@ -1494,7 +1494,7 @@ bool csChunkLodTerrainObject::ReadFromCache (iCacheManager* cache_mgr)
 	csShadowArray* shadowArr = new csShadowArray();
 	float* intensities = new float[staticLights.Length()];
 	shadowArr->shadowmap = intensities;
-	for (int n = 0; n < staticLights.Length(); n++)
+	for (size_t n = 0; n < staticLights.Length(); n++)
 	{
           uint8 b;
           if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b))
@@ -1527,7 +1527,7 @@ bool csChunkLodTerrainObject::WriteToCache (iCacheManager* cache_mgr)
   bool rc = false;
   csMemFile mf;
   mf.Write (CachedLightingMagic, CachedLightingMagicSize);
-  for (int v = 0; v < staticLights.Length(); v++)
+  for (size_t v = 0; v < staticLights.Length(); v++)
   {
     const csColor& c = staticLights[v];
     int i; uint8 b;
@@ -1558,7 +1558,7 @@ bool csChunkLodTerrainObject::WriteToCache (iCacheManager* cache_mgr)
     mf.Write ((char*)lid, 16);
 
     float* intensities = shadowArr->shadowmap;
-    for (int n = 0; n < staticLights.Length(); n++)
+    for (size_t n = 0; n < staticLights.Length(); n++)
     {
       int i; uint8 b;
       i = QInt (intensities[n] * STATIC_LIGHT_SCALE);
@@ -1582,7 +1582,7 @@ void csChunkLodTerrainObject::PrepareLighting ()
   {
     const csArray<iLight*>& relevant_lights = pFactory->light_mgr
       ->GetRelevantLights (logparent, -1, false);
-    for (int i = 0; i < relevant_lights.Length(); i++)
+    for (size_t i = 0; i < relevant_lights.Length(); i++)
       affecting_lights.Add (relevant_lights[i]);
   }
 }
@@ -1663,7 +1663,7 @@ void csChunkLodTerrainObject::CastShadows (iMovable* movable,
     li->GetColor () * lightScale /* * (256. / CS_NORMAL_LIGHT_LEVEL)*/;
 
   csColor col;
-  int i;
+  size_t i;
   for (i = 0 ; i < staticLights.Length() ; i++)
   {
     const csChunkLodTerrainFactory::Data& data = pFactory->datamap[i];

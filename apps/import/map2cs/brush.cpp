@@ -81,7 +81,7 @@ CMapBrush::CMapBrush(CMapEntity* pEntity)
 
 CMapBrush::~CMapBrush()
 {
-  int i;
+  size_t i;
   for (i=0; i<m_Polygons.Length(); i++)
   {
     delete m_Polygons[i];

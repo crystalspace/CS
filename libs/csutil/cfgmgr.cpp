@@ -259,8 +259,8 @@ iConfigFile* csConfigManager::AddDomain(
       return d->Cfg;
     }
 
-    int n = FindRemoved(path);
-    if (n != -1)
+    size_t n = FindRemoved(path);
+    if (n != (size_t)-1)
     {
       iConfigFile* cfg = Removed[n];
       AddDomain(cfg, priority);
@@ -546,8 +546,8 @@ csConfigDomain *csConfigManager::FindConfig(const char *Name) const
 
 void csConfigManager::RemoveIterator(csConfigManagerIterator *it)
 {
-  int n = Iterators.Find(it);
-  CS_ASSERT(n != -1);
+  size_t n = Iterators.Find(it);
+  CS_ASSERT(n != (size_t)-1);
   Iterators.DeleteIndex(n);
 }
 
@@ -556,21 +556,21 @@ void csConfigManager::FlushRemoved()
   Removed.DeleteAll();
 }
 
-void csConfigManager::FlushRemoved(int n)
+void csConfigManager::FlushRemoved(size_t n)
 {
   Removed.DeleteIndex (n);
 }
 
-int csConfigManager::FindRemoved(const char *Name) const
+size_t csConfigManager::FindRemoved(const char *Name) const
 {
-  for (long i=0; i<Removed.Length(); i++)
+  for (size_t i=0; i<Removed.Length(); i++)
   {
     iConfigFile *cfg = Removed[i];
     if (cfg->GetFileName())
       if (strcmp(cfg->GetFileName(), Name)==0)
         return i;
   }
-  return -1;
+  return (size_t)-1;
 }
 
 void csConfigManager::RemoveDomain(csConfigDomain *d)

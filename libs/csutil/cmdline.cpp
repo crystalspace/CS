@@ -78,9 +78,9 @@ void csCommandLineParser::Reset()
 }
 
 csCommandLineOption*
-csCommandLineParser::FindOption (const char *name, int iIndex) const
+csCommandLineParser::FindOption (const char *name, size_t iIndex) const
 {
-  int idx;
+  size_t idx;
   for (idx = 0 ; idx < Options.Length () ; idx++)
   {
     csCommandLineOption* cl = Options[idx];
@@ -104,7 +104,7 @@ csCommandLineParser::FindOption (const char *name, int iIndex) const
 }
 
 bool csCommandLineParser::ReplaceOption (
-  const char *iName, const char *iValue, int iIndex)
+  const char *iName, const char *iValue, size_t iIndex)
 {
   csCommandLineOption *clo = FindOption (iName, iIndex);
   if (clo)
@@ -117,7 +117,7 @@ bool csCommandLineParser::ReplaceOption (
     return false;
 }
 
-bool csCommandLineParser::ReplaceName (const char *iValue, int iIndex)
+bool csCommandLineParser::ReplaceName (const char *iValue, size_t iIndex)
 {
   if ((iIndex >= 0) && (iIndex < Names.Length ()))
   {
@@ -128,13 +128,13 @@ bool csCommandLineParser::ReplaceName (const char *iValue, int iIndex)
     return false;
 }
 
-const char *csCommandLineParser::GetOption(const char *iName, int iIndex) const
+const char *csCommandLineParser::GetOption(const char *iName, size_t iIndex) const
 {
   csCommandLineOption *clo = FindOption (iName, iIndex);
   return clo ? (clo->Value ? clo->Value : "") : 0;
 }
 
-const char *csCommandLineParser::GetName (int iIndex) const
+const char *csCommandLineParser::GetName (size_t iIndex) const
 {
   if ((iIndex >= 0) && (iIndex < Names.Length ()))
     return Names[iIndex];
@@ -158,10 +158,10 @@ bool csCommandLineParser::GetBoolOption(const char *iName, bool defaultValue)
   CS_ALLOC_STACK_ARRAY (char, negName, strlen(iName)+3);
   strcpy (negName, "no");
   strcpy (negName+2, iName);
-  int idx;
-  for (idx = Options.Length ()-1; idx >= 0; idx--)
+  size_t idx;
+  for (idx = Options.Length (); idx > 0; idx--)
   {
-    csCommandLineOption* cl = Options[idx];
+    csCommandLineOption* cl = Options[idx - 1];
     if (!strcmp (cl->Name, iName))
     {
       result = true;

@@ -267,7 +267,7 @@ private:
   };
   csSafeCopyArray<LightRef> relevant_lights_ref;
   bool relevant_lights_valid;
-  int relevant_lights_max;
+  size_t relevant_lights_max;
   csFlags relevant_lights_flags;
 
 public:

@@ -306,7 +306,7 @@ const char* csSprite3DMeshObjectFactory::GetCacheName ()
   
 void csSprite3DMeshObjectFactory::AddVertices (int num)
 {
-  int frame;
+  size_t frame;
 
   int oldvt = GetVertexCount ();
   for (frame = 0; frame < frames.Length(); frame++)
@@ -370,7 +370,7 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
 
   csTriangleMeshLOD::CalculateLOD (new_mesh, verts, translate, emerge_from);
 
-  for (i = 0 ; i < texels.Length () ; i++)
+  for (i = 0 ; i < (int)texels.Length () ; i++)
   {
     int j;
     csVector2* new_texels = new csVector2 [GetVertexCount ()];
@@ -512,7 +512,8 @@ void csSprite3DMeshObjectFactory::SetMaterial (iMaterialWrapper *material)
 
 void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)
 {
-  int i, j;
+  int i;
+  size_t j;
 
   // @@@ We only calculated normals once for every frame.
   // Normal calculation is too expensive to do again every time.
@@ -597,7 +598,8 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base)
 
 void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
 {
-  int i, j;
+  int i;
+  size_t j;
 
   int num_frames = GetFrameCount();
   if (base  > num_frames)
@@ -673,7 +675,7 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   for (i = 0; i < GetVertexCount(); i++)
   {
     merge[i] = i;
-    for (j = 0; j < i; j++)
+    for (j = 0; j < (size_t)i; j++)
     {
       csVector3 difference = base_verts[i] - base_verts[j];
       if (difference.SquaredNorm () < 0.0001)
@@ -1166,7 +1168,7 @@ void csSprite3DMeshObject::GenerateSpriteLOD (int num_vts)
   int* emerge_from = factory->GetEmergeFrom ();
   csTriangleMesh* base_mesh = factory->GetTexelMesh ();
   mesh->SetSize (0);
-  int i;
+  size_t i;
   int a, b, c;
   for (i = 0 ; i < base_mesh->GetTriangleCount () ; i++)
   {
@@ -1180,7 +1182,7 @@ void csSprite3DMeshObject::GenerateSpriteLOD (int num_vts)
 
 void csSprite3DMeshObject::UpdateWorkTables (int max_size)
 {
-  if (max_size > tr_verts->Length ())
+  if ((size_t)max_size > tr_verts->Length ())
   {
     tr_verts->SetLength (max_size);
     uv_verts->SetLength (max_size);
@@ -1402,7 +1404,9 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable,
   int cf_idx = cframe->GetAnmIndex();
 
   csVector3* real_tween_verts = 0;
+#ifndef CS_USE_NEW_RENDERER
   csVector3* real_obj_verts = factory->GetVertices (cf_idx);
+#endif
   if (do_tween)
   {
     int nf_idx = next_frame->GetAnmIndex();
@@ -2503,7 +2507,7 @@ void csSprite3DMeshObject::PositionChild (iMeshObject* child,
 	csTicks current_time)
 {
   iSpriteSocket* socket = 0;
-  int i;
+  size_t i;
   for(i=0;i<sockets.Length();i++)
   {
     if(sockets[i]->GetMeshWrapper())
@@ -2642,7 +2646,7 @@ void csSprite3DMeshObject::PreGetShaderVariableValue (
       const float oneMinusTween = 1.0f - tween_ratio;
       for (int n = 0; n < final_num_vertices; n++)
       {
-	tweenedVerts[n] = real_obj_verts[n] * oneMinusTween +
+	tweenedVerts[(size_t)n] = real_obj_verts[n] * oneMinusTween +
 	   tween_ratio * real_tween_verts[n];
       }
     }
@@ -2687,7 +2691,7 @@ void csSprite3DMeshObject::PreGetShaderVariableValue (
       const float oneMinusTween = 1.0f - tween_ratio;
       for (int n = 0; n < final_num_vertices; n++)
       {
-	tweenedNorms[n] = real_obj_norms[n] * oneMinusTween +
+	tweenedNorms[(size_t)n] = real_obj_norms[n] * oneMinusTween +
 	   tween_ratio * real_tween_norms[n];
       }
     }

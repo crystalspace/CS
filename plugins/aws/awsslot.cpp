@@ -47,7 +47,7 @@ void awsSinkManager::RegisterSink (const char *name, iAwsSink *sink)
 
 bool awsSinkManager::RemoveSink (iAwsSink* sink)
 {
-  int i;
+  size_t i;
   for (i = 0; i < sinks.Length (); ++i)
   {
     SinkMap *sm = sinks[i];
@@ -62,7 +62,7 @@ bool awsSinkManager::RemoveSink (iAwsSink* sink)
 
 iAwsSink *awsSinkManager::FindSink (const char *_name)
 {
-  int i;
+  size_t i;
   unsigned long name = NameToId (_name);
 
   for (i = 0; i < sinks.Length (); ++i)
@@ -102,7 +102,7 @@ awsSink::~awsSink ()
 unsigned long awsSink::GetTriggerID (const char *_name)
 {
   unsigned long name = NameToId (_name);
-  int i;
+  size_t i;
 
   sink_err=0;
 
@@ -168,7 +168,7 @@ bool awsSource::RegisterSlot (iAwsSlot *slot, unsigned long signal)
 
 bool awsSource::UnregisterSlot (iAwsSlot *slot, unsigned long signal)
 {
-  for (int i = 0; i < slots.Length (); ++i)
+  for (size_t i = 0; i < slots.Length (); ++i)
   {
     SlotSignalMap *ssm = slots[i];
 
@@ -184,7 +184,7 @@ bool awsSource::UnregisterSlot (iAwsSlot *slot, unsigned long signal)
 
 void awsSource::Broadcast (unsigned long signal)
 {
-  int i;
+  size_t i;
 
   for (i = 0; i < slots.Length (); ++i)
   {
@@ -214,7 +214,7 @@ void awsSlot::Connect (
 {
   source->RegisterSlot (this, signal);
 
-  int i;
+  size_t i;
 
   for (i = 0; i < stmap.Length (); ++i)
   {
@@ -238,7 +238,7 @@ void awsSlot::Disconnect (
 {
   source->UnregisterSlot (this, signal);
 
-  int i;
+  size_t i;
 
   for (i = 0; i < stmap.Length (); ++i)
   {
@@ -260,7 +260,7 @@ void awsSlot::Disconnect (
 
 void awsSlot::Emit (iAwsSource &source, unsigned long signal)
 {
-  int i;
+  size_t i;
 
   for (i = 0; i < stmap.Length (); ++i)
   {

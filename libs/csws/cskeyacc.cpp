@@ -73,8 +73,8 @@ bool csKeyboardAccelerator::PostHandleEvent (iEvent &Event)
    && (app->FocusOwner == 0)
    && (app->KeyboardOwner == 0))
   {
-	int i;
-    for (i = Accelerators.Length () - 1; i >= 0; i--)
+    size_t i;
+    for (i = Accelerators.Length (); i-- > 0;)
     {
       csAccElement *ae = (csAccElement *)Accelerators [i];
       if ((ae->Key == csKeyEventHelper::GetRawCode (&Event))

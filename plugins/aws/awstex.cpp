@@ -107,7 +107,7 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
       __FILE__,
       textures.Length ());
 
-  int i;
+  size_t i;
   for (i = 0; i < textures.Length () && txtfound == false; ++i)
   {
     awsTexture *awstxt = textures[i];

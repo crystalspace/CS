@@ -474,7 +474,7 @@ bool csNullGraphics3D::SetOption (const char*, const char*)
   return false;
 }
 
-csPtr<iRenderBuffer> csNullGraphics3D::CreateRenderBuffer (int size,
+csPtr<iRenderBuffer> csNullGraphics3D::CreateRenderBuffer (size_t size,
   csRenderBufferType type, csRenderBufferComponentType componentType,
   int componentCount)
 {
@@ -482,7 +482,7 @@ csPtr<iRenderBuffer> csNullGraphics3D::CreateRenderBuffer (int size,
     new char[size], size, type, componentType, componentCount));
 }
 
-csPtr<iRenderBuffer> csNullGraphics3D::CreateIndexRenderBuffer (int size, 
+csPtr<iRenderBuffer> csNullGraphics3D::CreateIndexRenderBuffer (size_t size, 
   csRenderBufferType type, csRenderBufferComponentType componentType,
   size_t rangeStart, size_t rangeEnd)
 {
@@ -490,7 +490,7 @@ csPtr<iRenderBuffer> csNullGraphics3D::CreateIndexRenderBuffer (int size,
     new char[size], size, type, componentType, 1));
 }
 
-void csNullGraphics3D::CreateInterleavedRenderBuffers (int size, 
+void csNullGraphics3D::CreateInterleavedRenderBuffers (size_t size, 
   csRenderBufferType type, int count, csRefArray<iRenderBuffer>& buffers)
 {
   csRef<iRenderBuffer> buf;

@@ -328,7 +328,7 @@ void csConsoleInput::Bind (iConsoleOutput *iCon)
 
 const char *csConsoleInput::GetText (int iLine) const
 {
-  return ((iLine >= -1) && (iLine < History.Length ())) ?
+  return ((iLine >= -1) && ((size_t)(iLine + 1) <= History.Length ())) ?
          History.Get (iLine == -1 ? History.Length () - 1 : iLine) : 0;
 }
 

@@ -186,7 +186,7 @@ csHintManager::~csHintManager ()
 
 void csHintManager::FreeAll ()
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < Length () ; i++)
     FreeItem (Get (i));
   DeleteAll ();
@@ -221,8 +221,8 @@ void csHintManager::Add (const char *iText, csComponent *iComp)
 
 void csHintManager::Remove (csComponent *iComp)
 {
-  int idx = FindSortedKey (KeyCmp(iComp));
-  if (idx >= 0)
+  size_t idx = FindSortedKey (KeyCmp(iComp));
+  if (idx != (size_t)-1)
     DeleteIndex (idx);
 }
 
@@ -261,8 +261,8 @@ void csHintManager::HandleEvent (iEvent &Event)
         if (c && !c->GetState (CSS_DISABLED))
         {
           // Look for a hint for given component
-          int idx = FindSortedKey (KeyCmp(c));
-          if (idx >= 0)
+          size_t idx = FindSortedKey (KeyCmp(c));
+          if (idx != (size_t)-1)
           {
             // Okay, create the floating hint object
             HintStore *ts = (HintStore *)Get (idx);

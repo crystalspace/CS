@@ -148,7 +148,7 @@ static int list_supported_formats (iObjectRegistry *r)
     "%-20s %-40s %-5s %-5s\n";
 
   const csImageIOFileFormatDescriptions& descr = ImageLoader->GetDescription ();
-  int i;
+  size_t i;
   printf (mask, "MIME", "description", "load?", "save?");
   printf (mask, "----", "-----------", "-----", "-----");
   for (i = 0; i < descr.Length (); i++)

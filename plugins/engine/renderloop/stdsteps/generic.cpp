@@ -315,7 +315,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     new csShaderVariable (fogplane_name));
   sv->SetValue (fogPlane);
 
-  if (stacks.Length () <= (int)fogplane_name)
+  if (stacks.Length () <= (size_t)fogplane_name)
     stacks.SetLength (fogplane_name+1);
   stacks[fogplane_name].Push (sv);
 

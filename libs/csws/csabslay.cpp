@@ -16,7 +16,7 @@ void csAbsoluteLayout::SuggestSize (int &sugw, int& sugh)
 {
   sugw = 0;
   sugh = 0;
-  int i, cnt = vConstraints.Length ();
+  size_t i, cnt = vConstraints.Length ();
 
   for (i=0; i<cnt; i++)
   {

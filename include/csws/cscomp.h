@@ -387,6 +387,25 @@ protected:
   static cswsRectVector *visregion;
 
 public:
+#ifndef CS_PLATFORM_IS_64BITS
+# if (_MSC_VER >= 1300)
+  /*
+   * Silence VC7 64bit warning.
+   */
+  typedef unsigned int __w64 ID;
+# else
+  /// An opaque hash key.
+  typedef unsigned int ID;
+# endif
+#else
+  /*
+   * At some places, pointers are casted to csHashKey. Work around truncation
+   * problems by forcing csHashKey to at least 64bit on 64bit machines.
+   */
+  typedef uint64 ID;
+#endif
+
+
   /// The focused child window
   csComponent *focused;
   /// The top-Z child window
@@ -402,7 +421,7 @@ public:
   /// Abstract pointer for internal use by skin slice
   void** skindata;
   /// Component ID, unique within its parrent's child ring
-  unsigned int id;
+  ID id;
   /// Component size/position rectangle
   csRect bound;
 
@@ -506,7 +525,7 @@ public:
    */
   virtual void SetText (const char *iText);
   /// Query component text
-  virtual void GetText (char *oText, int iTextSize) const;
+  virtual void GetText (char *oText, size_t iTextSize) const;
   /// Same, but you cannot change returned value
   virtual const char *GetText () const { return text; }
 
@@ -520,7 +539,7 @@ public:
     void *param = 0, bool Zorder = false);
 
   /// Find a child component by its ID
-  csComponent *GetChild (int find_id) const;
+  csComponent *GetChild (ID find_id) const;
 
   /// Set the application for this object and all its children
   void SetApp (csApp *newapp);
@@ -808,7 +827,7 @@ public:
   ///-------------------------------------- Utility drawing functions ----------
 
   /// Draw a underline under iText drawn at iX,iY with iColor
-  void DrawUnderline (int iX, int iY, const char *iText, int iUnderlinePos,
+  void DrawUnderline (int iX, int iY, const char *iText, size_t iUnderlinePos,
     int iColor);
 
 protected:
@@ -835,15 +854,15 @@ protected:
    * into oLabel. Former underline position is stored into oUnderlinePos.
    * This is used by labels, menuitems, static components etc.
    */
-  static void PrepareLabel (const char *iLabel, char * &oLabel, int &oUnderlinePos);
+  static void PrepareLabel (const char *iLabel, char * &oLabel, size_t &oUnderlinePos);
 
   /// Check if the keyboard event fits given hot key
   bool CheckHotKey (iEvent &iEvent, char iHotKey);
 
   /// Utility functions: return position one word left from StartPos
-  static int WordLeft (const char *iText, int StartPos);
+  static size_t WordLeft (const char *iText, size_t StartPos);
   /// Return position one word right from StartPos
-  static int WordRight (const char *iText, int StartPos);
+  static size_t WordRight (const char *iText, size_t StartPos);
 
   /// Apply a skin <b>only</b> to this component: returns true on success
   bool ApplySkin (csSkin *Skin);

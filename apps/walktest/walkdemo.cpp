@@ -400,7 +400,7 @@ void WalkTest::del_bot ()
 
 void WalkTest::move_bots (csTicks elapsed_time)
 {
-  int i;
+  size_t i;
   for (i = 0; i < bots.Length(); i++)
   {
     bots[i]->move (elapsed_time);

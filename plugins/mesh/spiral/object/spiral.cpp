@@ -65,7 +65,7 @@ void csSpiralMeshObject::SetupObject ()
     radius = qsqrt (a*a + a*a);
 
     // create particles
-    int i;
+    size_t i;
     for (i=0 ; i<number ; i++)
     {
       RestartParticle(FindOldest(), (part_time / float(number)) * float(number-i));
@@ -124,7 +124,7 @@ int csSpiralMeshObject::FindOldest ()
 {
   int num = GetNumParticles ();
   int part_idx;
-  if (num >= number)
+  if ((size_t)num >= number)
   {
     part_idx = last_reuse;
     last_reuse = (last_reuse+1)%number;
@@ -156,7 +156,7 @@ void csSpiralMeshObject::Update (csTicks elapsed_time)
   float delta_t = elapsed_time / 1000.0f; // in seconds
 
   // Update position
-  int i;
+  size_t i;
   for (i=0 ; i < particles.Length () ; i++)
   {
     part_pos[i] += part_speed* delta_t;

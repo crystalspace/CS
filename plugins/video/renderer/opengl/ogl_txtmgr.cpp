@@ -551,7 +551,7 @@ void csTextureHandleOpenGL::ComputeMeanColor (int w, int h, csRGBpixel *src)
 
 bool csTextureHandleOpenGL::GetMipMapDimensions (int mipmap, int &w, int &h)
 {
-  if (mipmap < vTex.Length ())
+  if ((size_t)mipmap < vTex.Length ())
   {
     w = vTex[mipmap]->get_width () << txtmgr->texture_downsample;
     h = vTex[mipmap]->get_height () << txtmgr->texture_downsample;
@@ -734,7 +734,7 @@ csTextureManagerOpenGL::~csTextureManagerOpenGL ()
 {
   csTextureManager::Clear ();
 
-  int i;
+  size_t i;
   for (i = 0; i < superLMs.Length (); i++)
   {
     // In case we get destructed while SLM are still "in the wild."
@@ -846,7 +846,7 @@ void csTextureManagerOpenGL::SetPixelFormat (csPixelFormat const& PixelFormat)
 void csTextureManagerOpenGL::PrepareTextures ()
 {
   // Create mipmaps for all textures
-  int i;
+  size_t i;
   for (i = 0; i < textures.Length (); i++)
     textures.Get (i)->Prepare ();
 }
@@ -878,7 +878,7 @@ void csTextureManagerOpenGL::UnregisterTexture (csTextureHandleOpenGL *handle)
 
 void csTextureManagerOpenGL::Clear ()
 {
-  int i;
+  size_t i;
   for (i=0; i < textures.Length (); i++)
     ((csTextureHandleOpenGL *)textures.Get (i))->Clear ();
   for (i = 0; i < superLMs.Length(); i++)
@@ -891,7 +891,7 @@ void csTextureManagerOpenGL::Clear ()
 
 void csTextureManagerOpenGL::FreeImages ()
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < textures.Length () ; i++)
   {
     textures.Get (i)->FreeImage ();
@@ -917,7 +917,7 @@ void csTextureManagerOpenGL::DumpSuperLightmaps (iVFS* VFS, iImageIO* iio,
 						 const char* dir)
 {
   csString outfn;
-  for (int i = 0; i < superLMs.Length(); i++)
+  for (size_t i = 0; i < superLMs.Length(); i++)
   {
     csRef<iImage> img = superLMs[i]->Dump ();
     if (img)

@@ -589,7 +589,7 @@ private:
   csPolygonArray polygons;
   /// World space planes (if movable is not identity).
   csPlane3* polygon_world_planes;
-  int polygon_world_planes_num;
+  size_t polygon_world_planes_num;
 
   /// Optional array of materials to replace.
   csArray<RepMaterial> replace_materials;

@@ -66,10 +66,11 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, uint mode)
   * all resulting rectangles.
   */
   cswsRectVector rect (8, 4);
-  int i, x = QInt (poly.vertices[0].x), y = QInt (poly.vertices[0].y);
+  int x = QInt (poly.vertices[0].x), y = QInt (poly.vertices[0].y);
+  int p;
   csRect *lb = new csRect (x, y, x, y);
-  for (i = 1; i < poly.num; i++)
-    lb->Extend (QInt (poly.vertices[i].x), QInt (poly.vertices[i].y));
+  for (p = 1; p < poly.num; p++)
+    lb->Extend (QInt (poly.vertices[p].x), QInt (poly.vertices[p].y));
 
   lb->xmax++;
   lb->ymax++;
@@ -88,17 +89,18 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, uint mode)
   CS_ALLOC_STACK_ARRAY (csVector2, orig_poly_texels, orig_num_vert);
   CS_ALLOC_STACK_ARRAY (csColor, orig_poly_colors, orig_num_vert);
   CS_ALLOC_STACK_ARRAY (float, orig_poly_z, orig_num_vert);
-  for (i = 0; i < orig_num_vert; i++)
+  for (p = 0; p < orig_num_vert; p++)
   {
-    orig_vert [i].x = dx + poly.vertices [i].x;
-    orig_vert [i].y = dy + poly.vertices [i].y;
-    orig_poly_vertices [i] = poly.vertices [i];
-    orig_poly_texels [i] = poly.texels [i];
-    orig_poly_colors [i] = poly.colors [i];
-    orig_poly_z [i] = poly.z [i];
+    orig_vert [p].x = dx + poly.vertices [p].x;
+    orig_vert [p].y = dy + poly.vertices [p].y;
+    orig_poly_vertices [p] = poly.vertices [p];
+    orig_poly_texels [p] = poly.texels [p];
+    orig_poly_colors [p] = poly.colors [p];
+    orig_poly_z [p] = poly.z [p];
   }
 
-  for (i = rect.Length () - 1; i >= 0; i--)
+  size_t i;
+  for (i = rect.Length (); i-- > 0;)
   {
     csRect *cur = (csRect *)rect[i];
 
@@ -208,7 +210,7 @@ void csComponent::ClearZbuffer (int x1, int y1, int x2, int y2)
   rect.Push (lb);
   FastClip (rect);
 
-  int i;
+  size_t i;
   for (i = rect.Length () - 1; i >= 0; i--)
   {
     csRect *cur = (csRect *)rect[i];

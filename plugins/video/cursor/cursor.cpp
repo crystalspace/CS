@@ -62,7 +62,7 @@ csCursor::csCursor (iBase *parent) :
 
 csCursor::~csCursor ()
 {
-  eventq->RemoveListener (&scfiEventHandler);
+  if (eventq) eventq->RemoveListener (&scfiEventHandler);
   RemoveAllCursors ();
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiEventHandler);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
@@ -113,7 +113,8 @@ bool csCursor::ParseConfigFile (const char *iFile)
 
     // Check if we've already added it or there was a problem with it.
     // If so, ignore it
-    if (cursors.In ((const char *) name) || ignorelist.Find (name) != -1)
+    if (cursors.In ((const char *) name) || 
+      ignorelist.Find (name) != csArrayItemNotFound)
       continue;
 
     // Get all parameters for this cursor

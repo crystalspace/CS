@@ -976,7 +976,7 @@ struct iGraphics3D : public iBase
    * \param componentType Components Types; CS_BUFCOMP_FLOAT, CS_BUFCOMP_INT, etc
    * \param componentCount Number of components per element (e.g. 4 for RGBA)
    */
-  virtual csPtr<iRenderBuffer> CreateRenderBuffer (int size, 
+  virtual csPtr<iRenderBuffer> CreateRenderBuffer (size_t size, 
     csRenderBufferType type, csRenderBufferComponentType componentType, 
     int componentCount) = 0;
   /**
@@ -990,7 +990,7 @@ struct iGraphics3D : public iBase
    * \param rangeEnd Maximum index value that is expected to be written to 
    *  the created buffer.
    */
-  virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (int size, 
+  virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (size_t size, 
     csRenderBufferType type, csRenderBufferComponentType componentType,
     size_t rangeStart, size_t rangeEnd) = 0;
 
@@ -1000,7 +1000,7 @@ struct iGraphics3D : public iBase
    * \param size Size of the buffer in bytes
    * \param count Number of renderbuffers you want
    */
-  virtual void CreateInterleavedRenderBuffers (int size, 
+  virtual void CreateInterleavedRenderBuffers (size_t size, 
     csRenderBufferType type, int count, csRefArray<iRenderBuffer>& buffers) = 0;
 
   /**

@@ -590,7 +590,7 @@ csBdNode::~csBdNode ()
   if (flags & BD_NODE_MODIFIED)
   {
     delete[] vstr;
-    int i;
+    size_t i;
     for (i = 0; i < attrs->Length(); i++)
       doc->FreeBdAttr (attrs->Get (i));
     delete attrs;

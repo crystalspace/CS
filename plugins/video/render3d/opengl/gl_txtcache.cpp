@@ -328,7 +328,7 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
   }
   else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_2D)
   {
-    int i;
+    size_t i;
     for (i = 0; i < txt_mm->vTex.Length(); i++)
     {
       csGLTexture *togl = txt_mm->vTex[i];
@@ -361,7 +361,7 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
   }
   else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_3D)
   {
-    for (int i=0; i < txt_mm->vTex.Length (); i++)
+    for (size_t i=0; i < txt_mm->vTex.Length (); i++)
     {
       csGLTexture *togl = txt_mm->vTex[i];
       G3D->ext->glTexImage3DEXT (GL_TEXTURE_3D, 
@@ -378,7 +378,7 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
   }
   else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_CUBEMAP)
   {
-    for (int i=0; i < txt_mm->vTex.Length (); i++)
+    for (size_t i=0; i < txt_mm->vTex.Length (); i++)
     {
       csGLTexture *togl = txt_mm->vTex[i];
       // TODO: load cubemaps into GL texture 

@@ -36,9 +36,9 @@ class csConsoleInput : public iConsoleInput
 {
   // The command history
   csStringArray History;
-  int HistoryPos;
+  size_t HistoryPos;
   // Max lines in history
-  int MaxLines;
+  size_t MaxLines;
   // The callback
   csRef<iConsoleExecCallback> Callback;
   // The console

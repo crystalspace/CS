@@ -163,7 +163,7 @@ iAwsComponentFactory *awsManager::FindComponentFactory (const char *name)
 {
   unsigned long id = prefmgr->NameToId (name);
 
-  for (int i=0;i<component_factories.Length();i++)
+  for (size_t i = 0; i < component_factories.Length(); i++)
   {
     if (component_factories[i].id == id)
       return component_factories[i].factory;
@@ -406,7 +406,7 @@ awsWindowTransition* awsManager::FindTransition(iAwsComponent *win)
 {
   awsWindowTransition *t;
   
-  for(int i = 0; i < transitions.Length(); ++i)
+  for(size_t i = 0; i < transitions.Length(); ++i)
   {
     t = (awsWindowTransition *)transitions[i];
 

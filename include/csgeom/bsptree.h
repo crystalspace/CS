@@ -45,7 +45,7 @@ private:
   csPlane3 split_plane;
   csArray<int> splitters;
 
-  int FindBestSplitter (csTriangle* triangles, csPlane3* planes,
+  size_t FindBestSplitter (csTriangle* triangles, csPlane3* planes,
 	int num_triangles, csVector3* vertices,
 	const csArray<int>& triidx);
   void Build (csTriangle* triangles, csPlane3* planes,

@@ -221,7 +221,7 @@ CMapTexturedPlane* CMapFile::AddPlane(CMapTexturedPlane* pNewPlane)
 
 void CMapFile::CreatePolygons()
 {
-  int i;
+  size_t i;
   for (i=0; i<m_Entities.Length(); i++)
   {
     m_Entities[i]->CreatePolygons();

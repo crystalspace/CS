@@ -32,7 +32,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 void csSharedVariable::FireListeners ()
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < listeners.Length () ; i++)
     listeners[i]->VariableChanged (&scfiSharedVariable);
 }

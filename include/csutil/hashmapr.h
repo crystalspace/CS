@@ -78,7 +78,7 @@ private:
   /// Current bucket we are iterating over. 0 if no more elements.
   csHashBucket* current_bucket;
   /// Current index in bucket.
-  int current_index;
+  size_t current_index;
 
 public:
   /// Construct an iterator over specific elements of a reversible hash

@@ -95,7 +95,7 @@ protected:
   csFlags flags;
 
   // Number of particles.
-  int number;
+  size_t number;
   /// particle position
   csVector3 *part_pos;
 
@@ -103,8 +103,8 @@ protected:
 
 #ifdef CS_USE_NEW_RENDERER
   csRef<csShaderVariableContext> svcontext;
-  int VertexCount;
-  int TriangleCount;
+  size_t VertexCount;
+  size_t TriangleCount;
   csVector3* vertices;
   csVector2* texels;
   csColor* colors;
@@ -119,8 +119,8 @@ protected:
 #endif
 
   /// Setup the buffers for the particles.
-  void SetupBuffers (int part_sides);
-  int part_sides;	// Number of vertices per particle (for buffers).
+  void SetupBuffers (size_t part_sides);
+  size_t part_sides;	// Number of vertices per particle (for buffers).
 
   bool initialized;
   /// Setup this object.
@@ -154,20 +154,20 @@ public:
   virtual ~csParticleSystem ();
 
   /// Set the number of particles to use.
-  virtual void SetParticleCount (int num)
+  virtual void SetParticleCount (size_t num)
   {
     number = num;
     ChangeObject ();
   }
   /// Get the number of particles
-  int GetParticleCount () const { return number; }
+  size_t GetParticleCount () const { return number; }
 
   void UpdateLighting (const csArray<iLight*>& lights, iMovable* movable);
 
   /// How many particles the system currently has.
-  inline int GetNumParticles () const { return particles.Length();}
+  inline size_t GetNumParticles () const { return particles.Length();}
   /// Get a particle.
-  inline iParticle* GetParticle (int idx) const
+  inline iParticle* GetParticle (size_t idx) const
   { return particles[idx]; }
   /// Remove all particles.
   void RemoveParticles ();

@@ -26,7 +26,7 @@
 
 void DAGNode::PrintStats(FILE *s,int level) 
 {
-  for (int i=0;i<children.Length();i++)
+  for (size_t i=0;i<children.Length();i++)
     children[i]->PrintStats (s, level+1);
 }
 

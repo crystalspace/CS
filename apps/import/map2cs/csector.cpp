@@ -181,7 +181,8 @@ bool CCSSector::Write(csRef<iDocumentNode> node, CIWorld* pIWorld)
 	meshname = pEntity->GetValueOfKey ("cs_name", meshname);
       }
 
-      int i, j;
+      size_t i;
+      int j;
 
       for (i=0; i<m_Portals.Length(); i++)
       {
@@ -230,7 +231,7 @@ bool CCSSector::Write(csRef<iDocumentNode> node, CIWorld* pIWorld)
 
 bool CCSSector::WriteWorldspawn(csRef<iDocumentNode> node, CIWorld* pWorld)
 {
-  int i;
+  size_t i;
   for (i=0; i<m_Things.Length(); i++)
   {
     if (strcasecmp(m_Things[i]->GetClassname(), "worldspawn")==0)
@@ -270,7 +271,7 @@ bool CCSSector::WriteWorldspawn(csRef<iDocumentNode> node, CIWorld* pWorld)
 
 bool CCSSector::WriteThings(csRef<iDocumentNode> node, CIWorld* pWorld)
 {
-  int i;
+  size_t i;
   for (i=0; i<m_Things.Length(); i++)
   {
     if (strcasecmp(m_Things[i]->GetClassname(), "worldspawn")!=0)
@@ -465,7 +466,7 @@ bool CCSSector::WriteNodes(csRef<iDocumentNode> node, CIWorld* pWorld)
   double ScaleFactor = pWorld->GetScalefactor();
 
   //iterate all nodes
-  int i;
+  size_t i;
   for (i=0; i<m_Nodes.Length(); i++)
   {
     CMapEntity* pEntity = m_Nodes[i];

@@ -465,7 +465,7 @@ void ceCswsEngineApp::LoadNewMap (const char* filename)
   start_sector = engine->GetSectors ()->FindByName (room_name);
 
   // Update the engine views.
-  int i;
+  size_t i;
   for (i = 0 ; i < engine_views.Length () ; i++)
   {
     ceEngineView* eview = engine_views[i];

@@ -163,8 +163,8 @@ csLayoutConstraint *csBorderLayout::AddLayoutComponent (csComponent* comp)
 
 void csBorderLayout::RemoveLayoutComponent (csComponent* comp)
 {
-  int idx = vConstraints.FindKey (vConstraints.KeyCmp(comp));
-  if (idx != -1)
+  size_t idx = vConstraints.FindKey (vConstraints.KeyCmp(comp));
+  if (idx != (size_t)-1)
   {
     csBorderConstraint *c = (csBorderConstraint*)vConstraints.Get (idx);
     switch (c->mAlign)

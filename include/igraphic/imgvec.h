@@ -39,7 +39,7 @@ struct iImageVector : public iBase
   /**
    * Insert an Image into the Vector at specified index
    */
-  virtual void InsertImage(iImage* img, int index) = 0;
+  virtual void InsertImage(iImage* img, size_t index) = 0;
   /**
   * Add an Image to the End of the Vector
   */
@@ -47,19 +47,19 @@ struct iImageVector : public iBase
   /**
   * Get Image at specified index
   */
-  virtual csRef<iImage> GetImage(int index) = 0;
+  virtual csRef<iImage> GetImage(size_t index) = 0;
   /**
   * Set Image at specified index
   */
-  virtual void SetImage (int index, iImage* img) = 0;
+  virtual void SetImage (size_t index, iImage* img) = 0;
   /**
   * Get Image Count
   */
-  virtual int Length() = 0;
+  virtual size_t Length() = 0;
   /**
    * Remove a specific index
    */
-  virtual void DeleteIndex(int index) = 0;
+  virtual void DeleteIndex(size_t index) = 0;
   /**
   * Remove All Images
   */

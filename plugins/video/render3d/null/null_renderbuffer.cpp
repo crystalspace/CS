@@ -26,7 +26,7 @@ SCF_IMPLEMENT_IBASE (csNullRenderBuffer)
   SCF_IMPLEMENTS_INTERFACE (iRenderBuffer)
 SCF_IMPLEMENT_IBASE_END
 
-csNullRenderBuffer::csNullRenderBuffer (int size, csRenderBufferType type,
+csNullRenderBuffer::csNullRenderBuffer (size_t size, csRenderBufferType type,
 	csRenderBufferComponentType comptype, int compcount)
 {
   static const int compSizes[] = 

@@ -30,7 +30,7 @@ void awsActionDispatcher::Execute (
       (unsigned char *)action,
       strlen (action));
 
-  int i;
+  size_t i;
   for (i = 0; i < actions.Length (); ++i)
   {
     awsActionMap *map = actions[i];

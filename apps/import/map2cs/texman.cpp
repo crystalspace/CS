@@ -145,7 +145,7 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
   }
 
   //First, we search in the array of already stored textures.
-  int i;
+  size_t i;
   for (i=0; i<m_StoredTextures.Length(); i++)
   {
     CTextureFile* pTexture = m_StoredTextures[i];
@@ -212,7 +212,7 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
 bool CTextureManager::AddAllTexturesToVFS(csRef<iVFS> VFS, const char* path)
 {
   bool ok = true;
-  int i;
+  size_t i;
   for (i=0; i<m_StoredTextures.Length(); i++)
   {
     CTextureFile* pTexture = m_StoredTextures[i];

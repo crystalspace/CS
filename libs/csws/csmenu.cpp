@@ -77,7 +77,7 @@ void csMenuItem::Init ()
   SetPalette (CSPAL_MENUITEM);
   text = 0;
   info = 0;
-  underline_pos = -1;
+  underline_pos = (size_t)-1;
 
   menuitemref++;
   if (app)
@@ -109,14 +109,14 @@ void csMenuItem::SetText (const char *iText)
 
   text = 0;
   info = 0;
-  underline_pos = -1;
+  underline_pos = (size_t)-1;
 
   if (!iText)
     return;
 
-  int sl = strlen (iText);
-  int cc = 0;
-  int i;
+  size_t sl = strlen (iText);
+  size_t cc = 0;
+  size_t i;
 
   for (i = 0; i < sl; i++)
     if (iText [i] == '\t')
@@ -221,7 +221,7 @@ bool csMenuItem::HandleEvent (iEvent &Event)
       if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
       {
 	// Check hot key
-	if ((underline_pos >= 0)
+	if ((underline_pos != (size_t)-1)
 	  && ((csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_CTRL) == 0)
 	  && ((toupper (csKeyEventHelper::GetCookedCode (&Event)) == 
 	    toupper (text [underline_pos]))))

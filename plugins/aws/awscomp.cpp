@@ -880,9 +880,9 @@ bool awsComponent::AddToTabOrder (iAwsComponent *child)
 
 iAwsComponent *awsComponent::TabNext (iAwsComponent *child)
 {
-  int n = TabOrder.Find (child);
+  size_t n = TabOrder.Find (child);
 
-  if (n == -1)
+  if (n == csArrayItemNotFound)
     return 0;
   else if (n == TabOrder.Length () - 1)
     return ((iAwsComponent *)TabOrder[0]);
@@ -912,7 +912,7 @@ int awsComponent::GetTabLength ()
 
 iAwsComponent *awsComponent::GetTabComponent (int index)
 {
-  if (index < TabOrder.Length ())
+  if ((size_t)index < TabOrder.Length ())
     return TabOrder[index];
   else
     return 0;

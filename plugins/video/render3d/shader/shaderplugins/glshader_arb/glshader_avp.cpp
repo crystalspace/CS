@@ -70,7 +70,7 @@ void csShaderGLAVP::Deactivate()
 void csShaderGLAVP::SetupState (const csRenderMesh *mesh, 
 	const csShaderVarStack &stacks)
 {
-  int i;
+  size_t i;
   const csGLExtensionManager* ext = shaderPlug->ext;
 
   // set variables
@@ -207,7 +207,7 @@ bool csShaderGLAVP::Load (const char* program,
   programBuffer.AttachNew (new csDataBuffer (csStrNew (program),
     strlen (program)));
 
-  for (int i = 0; i < mappings.Length(); i++)
+  for (size_t i = 0; i < mappings.Length(); i++)
   {
     variablemap.Push (VariableMapEntry (mappings[i]));
   }
@@ -221,7 +221,7 @@ bool csShaderGLAVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 
   ResolveStaticVars (staticContexts);
 
-  for (int i = 0; i < variablemap.Length ();)
+  for (size_t i = 0; i < variablemap.Length ();)
   {
     int dest;
     if (sscanf (variablemap[i].destination, "register %d", &dest) != 1)

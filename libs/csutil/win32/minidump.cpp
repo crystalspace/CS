@@ -424,7 +424,7 @@ const char* cswinMinidumpWriter::WriteWrappedMinidump (
       void* callstackEntry = reportZip->NewFile ("callstack.txt");
       csString s;
       csString line;
-      for (int i = 0; i < stack->GetEntryCount(); i++)
+      for (size_t i = 0; i < stack->GetEntryCount(); i++)
       {
 	line.Clear();
 	bool hasFunc = stack->GetFunctionName (i, s);

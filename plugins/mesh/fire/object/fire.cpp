@@ -99,7 +99,7 @@ void csFireMeshObject::SetupObject ()
     radius = qsqrt (a*a + a*a);
 
     // create particles
-    int i;
+    size_t i;
     for (i=0 ; i < number ; i++)
     {
       AppendRectSprite (drop_width, drop_height, mat, lighted_particles);
@@ -221,7 +221,7 @@ void csFireMeshObject::Update (csTicks elapsed_time)
 
   float delta_t = elapsed_time / 1000.0f; // in seconds
   // move particles;
-  int i;
+  size_t i;
   for (i=0 ; i < particles.Length () ; i++)
   {
     MoveAndAge (i, delta_t);

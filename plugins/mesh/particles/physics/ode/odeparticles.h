@@ -57,7 +57,7 @@ class csODEParticlePhysics : public iParticlesPhysics
 
   ParticleObjects *Find (iParticlesObjectState *p)
   {
-    for (int i = 0; i < partobjects.Length(); i ++)
+    for (size_t i = 0; i < partobjects.Length(); i ++)
     {
       if (p == partobjects[i].particles)
         return &partobjects[i];

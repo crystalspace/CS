@@ -43,7 +43,7 @@ public:
     delete *address;
   }
 
-  static void InitRegion (T* address, int count)
+  static void InitRegion (T* address, size_t count)
   {
     memset (address, 0, count*sizeof (T));
   }
@@ -78,7 +78,7 @@ public:
    * will be set to 0. You are responsible for deleting the returned
    * pointer later.
    */
-  T* GetAndClear (int n)
+  T* GetAndClear (size_t n)
   {
     T* ret = this->Get (n); // see *1*
     this->InitRegion (n, 1);
@@ -108,7 +108,7 @@ public:
 
   /// Variant of SetLength() which copies the pointed-to object instead of
   /// the actual pointer.
-  void SetLength (int n, T const &what)
+  void SetLength (size_t n, T const &what)
   {
     if (n <= this->Length ()) // see *1*
     {
@@ -116,20 +116,20 @@ public:
     }
     else
     {
-      int old_len = this->Length (); // see *1*
+      size_t old_len = this->Length (); // see *1*
       superclass::SetLength (n);
-      for (int i = old_len ; i < n ; i++) this->Get(i) = new T (what);
+      for (size_t i = old_len ; i < n ; i++) this->Get(i) = new T (what);
     }
   }
 
   /// Call csArray<T*>::SetLength(n, w).
-  void SetLength (int n, T* const &w)
+  void SetLength (size_t n, T* const &w)
   {
     superclass::SetLength(n, w);
   }
 
   /// Call csArray<T*>::SetLength(n).
-  void SetLength (int n)
+  void SetLength (size_t n)
   {
     superclass::SetLength(n);
   }

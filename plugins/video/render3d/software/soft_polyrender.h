@@ -62,7 +62,7 @@ public:
     bool samePointer = false) 
   { return 0; }
   virtual void Release() {}
-  virtual void CopyToBuffer(const void *data, int length) {}
+  virtual void CopyToBuffer(const void *data, size_t length) {}
   virtual void SetComponentCount (int count) {}
   virtual int GetComponentCount () const { return 0; }
   virtual void SetComponentType (csRenderBufferComponentType type) {}
@@ -70,7 +70,7 @@ public:
   { return CS_BUFCOMP_FLOAT; }
   virtual csRenderBufferType GetBufferType() const
   { return CS_BUF_STATIC; }
-  virtual int GetSize() const { return 0; }
+  virtual size_t GetSize() const { return 0; }
   virtual void SetStride(int stride) {}
   virtual int GetStride() const { return 0; }
   virtual void SetOffset(int offset) {}

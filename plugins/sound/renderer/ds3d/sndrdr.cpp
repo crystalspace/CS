@@ -265,7 +265,7 @@ iSoundListener *csSoundRenderDS3D::GetListener()
 
 void csSoundRenderDS3D::Update()
 {
-  int i;
+  size_t i;
   csTicks ct, et;
   ct = csGetTicks ();
 

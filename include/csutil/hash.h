@@ -85,17 +85,17 @@ protected:
   };
   csArray< csArray<Element> > Elements;
 
-  int Modulo;
+  size_t Modulo;
 
 private:
-  int InitModulo;
-  int GrowRate;
-  int MaxSize;
-  int Size;
+  size_t InitModulo;
+  size_t GrowRate;
+  size_t MaxSize;
+  size_t Size;
 
   void Grow ()
   {
-    static const int Primes[] =
+    static const size_t Primes[] =
     {
       53,         97,         193,       389,       769, 
       1543,       3079,       6151,      12289,     24593,
@@ -105,27 +105,27 @@ private:
       1610612741, 0
     };
 
-    const int *p;
-    int elen = Elements.Length ();
+    const size_t *p;
+    size_t elen = Elements.Length ();
     for (p = Primes; *p && *p <= elen; p++) ;
     Modulo = *p;
     CS_ASSERT (Modulo);
 
     Elements.SetLength (Modulo);
 
-    for (int i = 0; i < elen; i++)
+    for (size_t i = 0; i < elen; i++)
     {
       csArray<Element>& src = Elements[i];
-      int slen = src.Length ();
-      for (int j = slen - 1; j >= 0; j--)
+      size_t slen = src.Length ();
+      for (size_t j = slen; j > 0; j--)
       {
-        const Element& srcElem = src[j];
+        const Element& srcElem = src[j - 1];
         csArray<Element>& dst = 
 	  Elements.Get (KeyHandler::ComputeHash (srcElem.key) % Modulo);
         if (&src != &dst)
         {
           dst.Push (srcElem);
-          src.DeleteIndex (j);
+          src.DeleteIndex (j - 1);
         }
       }
     }
@@ -174,8 +174,8 @@ public:
     const csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
     csArray<T> ret (values.Length () / 2);
-    const int len = values.Length ();
-    for (int i = 0; i < len; ++i)
+    const size_t len = values.Length ();
+    for (size_t i = 0; i < len; ++i)
     {
       const Element& v = values[i];
       if (KeyHandler::CompareKeys (v.key, key)) 
@@ -189,8 +189,8 @@ public:
   {
     csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
-    const int len = values.Length ();
-    for (int i = 0; i < len; ++i)
+    const size_t len = values.Length ();
+    for (size_t i = 0; i < len; ++i)
     {
       Element& v = values[i];
       if (KeyHandler::CompareKeys (v.key, key))
@@ -211,8 +211,8 @@ public:
   {
     const csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
-    const int len = values.Length ();
-    for (int i = 0; i < len; ++i)
+    const size_t len = values.Length ();
+    for (size_t i = 0; i < len; ++i)
       if (KeyHandler::CompareKeys (values[i].key, key)) 
 	return true;
 
@@ -227,8 +227,8 @@ public:
   {
     const csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
-    const int len = values.Length ();
-    for (int i = 0; i < len; ++i)
+    const size_t len = values.Length ();
+    for (size_t i = 0; i < len; ++i)
     {
       const Element& v = values[i];
       if (KeyHandler::CompareKeys (v.key, key))
@@ -246,8 +246,8 @@ public:
   {
     csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
-    const int len = values.Length ();
-    for (int i = 0; i < len; ++i)
+    const size_t len = values.Length ();
+    for (size_t i = 0; i < len; ++i)
     {
       Element& v = values[i];
       if (KeyHandler::CompareKeys (v.key, key))
@@ -265,8 +265,8 @@ public:
   {
     const csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
-    const int len = values.Length ();
-    for (int i = 0; i < len; ++i)
+    const size_t len = values.Length ();
+    for (size_t i = 0; i < len; ++i)
     {
       const Element& v = values[i];
       if (KeyHandler::CompareKeys (v.key, key))
@@ -284,8 +284,8 @@ public:
   {
     csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
-    const int len = values.Length ();
-    for (int i = 0; i < len; ++i)
+    const size_t len = values.Length ();
+    for (size_t i = 0; i < len; ++i)
     {
       Element& v = values[i];
       if (KeyHandler::CompareKeys (v.key, key))
@@ -299,8 +299,8 @@ public:
   void DeleteAll ()
   {
     Elements.SetLength (Modulo = InitModulo);
-    int elen = Elements.Length ();
-    for (int i = 0; i < elen; i++)
+    size_t elen = Elements.Length ();
+    for (size_t i = 0; i < elen; i++)
       Elements[i].Empty ();
     Size = 0;
   }
@@ -311,13 +311,16 @@ public:
     bool ret = false;
     csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
-    for (int i = values.Length () - 1; i >= 0; i--)
-      if (KeyHandler::CompareKeys (values[i].key, key))
+    for (size_t i = values.Length (); i > 0; i--)
+    {
+      const size_t idx = i - 1;
+      if (KeyHandler::CompareKeys (values[idx].key, key))
       {
-        values.DeleteIndex (i);
+        values.DeleteIndex (idx);
         ret = true;
         Size--;
       }
+    }
     return ret;
   }
   
@@ -327,19 +330,22 @@ public:
     bool ret = false;
     csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
-    for (int i = values.Length () - 1; i >= 0; i--)
-      if (KeyHandler::CompareKeys (values[i].key, key) && 
-	(values[i].value == value))
+    for (size_t i = values.Length (); i > 0; i--)
+    {
+      const size_t idx = i - 1;
+      if (KeyHandler::CompareKeys (values[idx].key, key) && 
+	(values[idx].value == value))
       {
-        values.DeleteIndex (i);
+        values.DeleteIndex (idx);
         ret = true;
         Size--;
       }
+    }
     return ret;
   }
 
   /// Get the number of elements in the hash.
-  int GetSize () const
+  size_t GetSize () const
   {
     return Size;
   }
@@ -413,7 +419,7 @@ public:
   {
   private:
     const csHash<T, K, KeyHandler> *hash;
-    int bucket, size, element;
+    size_t bucket, size, element;
 
     void Zero () { bucket = element = 0; }
     void Init () { size = hash->Elements[bucket].Length (); }
@@ -629,7 +635,7 @@ public:
   }
 
   /// Get the number of elements in the set.
-  int GetSize () const
+  size_t GetSize () const
   {
     return map.GetSize ();
   }

@@ -64,13 +64,13 @@ csTinyXmlAttributeIterator::csTinyXmlAttributeIterator (TiDocumentNode* parent)
   csTinyXmlAttributeIterator::parent = parent->ToElement ();
   if (csTinyXmlAttributeIterator::parent == 0)
   {
-    current = -1;
+    current = (size_t)-1;
     return;
   }
   count = csTinyXmlAttributeIterator::parent->GetAttributeCount ();
   if (!count) 
   {
-    current = -1;
+    current = (size_t)-1;
     return;
   }
   current = 0;
@@ -83,19 +83,19 @@ csTinyXmlAttributeIterator::~csTinyXmlAttributeIterator()
 
 bool csTinyXmlAttributeIterator::HasNext ()
 {
-  return current != -1;
+  return current != (size_t)-1;
 }
 
 csRef<iDocumentAttribute> csTinyXmlAttributeIterator::Next ()
 {
   csRef<iDocumentAttribute> attr;
-  if (current != -1)
+  if (current != (size_t)-1)
   {
     attr = csPtr<iDocumentAttribute> (new csTinyXmlAttribute (
     	&parent->GetAttribute (current)));
     current++;
     if (current >= count)
-      current = -1;
+      current = (size_t)-1;
   }
   return attr;
 }
@@ -399,8 +399,8 @@ csRef<iDocumentAttributeIterator> csTinyXmlNode::GetAttributes ()
 
 TiDocumentAttribute* csTinyXmlNode::GetAttributeInternal (const char* name)
 {
-  int count = node->ToElement ()->GetAttributeCount ();
-  int i;
+  size_t count = node->ToElement ()->GetAttributeCount ();
+  size_t i;
   for (i = 0 ; i < count ; i++)
   {
     TiDocumentAttribute& attrib = node->ToElement ()->GetAttribute (i);

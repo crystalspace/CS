@@ -136,7 +136,7 @@ csObjectWatcher::~csObjectWatcher ()
 
 void csObjectWatcher::Reset ()
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < movables.Length () ; i++)
   {
     movables[i]->RemoveListener (movable_listener);
@@ -173,7 +173,7 @@ void csObjectWatcher::WatchLight (iLight* light)
 
 void csObjectWatcher::RemoveLight (iLight* light)
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < lights.Length () ; i++)
   {
     if (lights[i] == light)
@@ -187,7 +187,7 @@ void csObjectWatcher::RemoveLight (iLight* light)
 
 iLight* csObjectWatcher::GetLight (int idx)
 {
-  CS_ASSERT (idx >= 0 && idx < lights.Length ());
+  CS_ASSERT (idx >= 0 && (size_t)idx < lights.Length ());
   return lights[idx];
 }
 
@@ -199,7 +199,7 @@ void csObjectWatcher::WatchMovable (iMovable* movable)
 
 void csObjectWatcher::RemoveMovable (iMovable* movable)
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < movables.Length () ; i++)
   {
     if (movables[i] == movable)
@@ -213,7 +213,7 @@ void csObjectWatcher::RemoveMovable (iMovable* movable)
 
 iMovable* csObjectWatcher::GetMovable (int idx)
 {
-  CS_ASSERT (idx >= 0 && idx < movables.Length ());
+  CS_ASSERT (idx >= 0 && (size_t)idx < movables.Length ());
   return movables[idx];
 }
 

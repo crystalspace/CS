@@ -92,7 +92,7 @@ public:
    */
   void FireListeners ()
   {
-    int i;
+    size_t i;
     for (i = 0 ; i < listeners.Length () ; i++)
       listeners[i]->ObjectModelChanged (this);
   }

@@ -612,7 +612,7 @@ void csEmitMeshObject::SetupObject ()
 
 
     /// create new particles and add to particle system
-    int i;
+    size_t i;
     for (i=0 ; i < number ; i++)
     {
       if(using_rect_sprites)
@@ -663,11 +663,11 @@ bool csEmitMeshObject::Draw (iRenderView* rview, iMovable* movable,
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
   // sort
-  int i;
+  size_t i;
   csReversibleTransform trans = movable->GetFullTransform ();
   csReversibleTransform tr_o2c = rview->GetCamera()->GetTransform() / trans;
   cpa->SetLength(number);
-  int num_cpa_now = 0;
+  size_t num_cpa_now = 0;
   for (i = 0 ; i < number ; i++)
   {
     if(!has_container_box || (
@@ -868,7 +868,7 @@ void csEmitMeshObject::Update (csTicks elapsed_time)
   float delta_t = elapsed_time / 1000.0f; // in seconds
   int elapsed = elapsed_time;
   // age particles;
-  int i;
+  size_t i;
   for (i=0 ; i < particles.Length () ; i++)
   {
     if(ages[i] + elapsed > timetolive)

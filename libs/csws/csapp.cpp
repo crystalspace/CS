@@ -234,11 +234,11 @@ void csApp::InitializeSkin ()
     SectionName << "CSWS." << skin->Prefix << ".Textures.";
   DefaultSection << "CSWS.Textures.";
 
-  int i;
+  size_t i;
   bool modified = false;
 
   // First of all, scan through all loaded textures and unload unneeded textures
-  for (i = Textures.Length () - 1; i >= 0; i--)
+  for (i = Textures.Length (); i-- > 0;)
   {
     csWSTexture *t = Textures.Get (i);
     const char *tn = t->GetName ();
@@ -444,7 +444,7 @@ void csApp::PrepareTextures ()
   iTextureManager *txtmgr = GfxPpl.G3D->GetTextureManager ();
 
   // Register all CSWS textures to the texture manager
-  int i;
+  size_t i;
   for (i = 0; i < Textures.Length (); i++)
     Textures.Get (i)->Register (txtmgr);
 
@@ -769,7 +769,7 @@ bool csApp::StartModal (csComponent* comp, iBase* userdata)
 void csApp::StopModal (int iCode)
 {
   if (ModalInfo.Length () == 0) return;
-  int idx = ModalInfo.Length ()-1;
+  size_t idx = ModalInfo.Length ()-1;
   csModalInfo* mi = ModalInfo[idx];
   mi->component->SetState (CSS_MODAL, false);
   CaptureFocus (mi->old_focus);

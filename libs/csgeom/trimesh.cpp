@@ -56,7 +56,7 @@ void csTriangleMesh::AddTriangle (int a, int b, int c)
 
 //---------------------------------------------------------------------------
 
-void csTriangleVertex::AddTriangle (int idx)
+void csTriangleVertex::AddTriangle (size_t idx)
 {
   con_triangles.PushSmart (idx);
 }
@@ -74,7 +74,8 @@ csTriangleVertices::csTriangleVertices (csTriangleMesh* mesh,
 
   // Build connectivity information for all vertices in this mesh.
   csTriangle* triangles = mesh->GetTriangles ();
-  int i, j;
+  int i;
+  size_t j;
   for (i = 0 ; i < num_vertices ; i++)
   {
     vertices[i].pos = verts[i];

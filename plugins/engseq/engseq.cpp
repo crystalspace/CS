@@ -1957,7 +1957,7 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
       int polyidx = -1;
       iMeshWrapper* sel = sector->HitBeam (origin, end, isect, &polyidx);
 
-      int i;
+      size_t i;
       for (i = 0 ; i < mesh_triggers.Length () ; i++)
       {
 	if (mesh_triggers[i]->GetClickMesh () == sel)
@@ -1974,7 +1974,7 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
 void csEngineSequenceManager::RegisterMeshTrigger (
 	csSequenceTrigger* trigger)
 {
-  if (mesh_triggers.Find (trigger) == -1)
+  if (mesh_triggers.Find (trigger) == csArrayItemNotFound)
     mesh_triggers.Push (trigger);
 }
 
@@ -2022,7 +2022,7 @@ iSequenceTrigger* csEngineSequenceManager::GetTrigger (int idx) const
 iSequenceTrigger* csEngineSequenceManager::FindTriggerByName (
 	const char* name) const
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < triggers.Length () ; i++)
   {
     if (!strcmp (name, triggers[i]->QueryObject ()->GetName ()))
@@ -2076,7 +2076,7 @@ iSequenceWrapper* csEngineSequenceManager::GetSequence (int idx) const
 iSequenceWrapper* csEngineSequenceManager::FindSequenceByName (
 	const char* name) const
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < sequences.Length () ; i++)
   {
     if (!strcmp (name, sequences[i]->QueryObject ()->GetName ()))

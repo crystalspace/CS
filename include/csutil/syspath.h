@@ -184,14 +184,14 @@ public:
    * \remark Saves full native paths and uses csExpandPath() for this.
    * \remark Uses csPathsIdentical() to compare paths.
    */
-  int AddOnce (const char* path, bool scanRecursive = false, 
+  size_t AddOnce (const char* path, bool scanRecursive = false, 
     const char* type = 0, bool overrideRecursive = true)
   {
-    if (path == 0) return -1;
+    if (path == 0) return (size_t)-1;
     char* pathExpanded = csExpandPath (path);
-    if (pathExpanded == 0) return -1;
+    if (pathExpanded == 0) return (size_t)-1;
   
-    int i;
+    size_t i;
     for (i = 0; i < paths.Length(); i++)
     {
       if (csPathsIdentical (pathExpanded, paths[i].path))
@@ -212,8 +212,8 @@ public:
     return (paths.Push (pluginPath));
   }
   
-  int GetCount () { return paths.Length(); }
-  csPluginPath const& operator [] (int n) const
+  size_t GetCount () { return paths.Length(); }
+  csPluginPath const& operator [] (size_t n) const
   { return paths[n]; }
 };
 

@@ -551,7 +551,7 @@ csLightList::~csLightList ()
 
 iLight *csLightList::FindByID (const char* id) const
 {
-  int i;
+  size_t i;
   for (i = 0; i < list.Length (); i++)
   {
     iLight *l = list.Get (i);
@@ -581,7 +581,7 @@ bool csLightList::Remove (int n)
 
 void csLightList::RemoveAll ()
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < list.Length () ; i++)
   {
     FreeLight (list[i]);
@@ -626,7 +626,7 @@ void csLightingProcessInfo::AttachUserdata (iLightingProcessData* userdata)
 csPtr<iLightingProcessData> csLightingProcessInfo::QueryUserdata (
   scfInterfaceID id, int version)
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < userdatas.Length () ; i++)
   {
     iLightingProcessData* ptr = (iLightingProcessData*)(
@@ -641,7 +641,7 @@ csPtr<iLightingProcessData> csLightingProcessInfo::QueryUserdata (
 
 void csLightingProcessInfo::FinalizeLighting ()
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < userdatas.Length () ; i++)
   {
     userdatas[i]->FinalizeLighting ();

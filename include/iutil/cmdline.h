@@ -52,18 +52,18 @@ struct iCommandLineParser : public iBase
   /// Clear all options and names.
   virtual void Reset () = 0;
   /// Query specific commandline option (you can query second etc. such option)
-  virtual const char *GetOption (const char *iName, int iIndex = 0) const = 0;
+  virtual const char *GetOption (const char *iName, size_t iIndex = 0) const = 0;
   /// Query filename specified on commandline (that is, without leading '-')
-  virtual const char *GetName (int iIndex = 0) const = 0;
+  virtual const char *GetName (size_t iIndex = 0) const = 0;
   /// Add a command-line option to the command-line option array
   virtual void AddOption (const char *iName, const char *iValue) = 0;
   /// Add a command-line name to the command-line names array
   virtual void AddName (const char *iName) = 0;
   /// Replace the Nth command-line option with a new value
   virtual bool ReplaceOption (const char *iName, const char *iValue,
-    int iIndex = 0) = 0;
+    size_t iIndex = 0) = 0;
   /// Replace the Nth command-line name with a new value
-  virtual bool ReplaceName (const char *iValue, int iIndex = 0) = 0;
+  virtual bool ReplaceName (const char *iValue, size_t iIndex = 0) = 0;
   /**
    * Check for a -[no]option toggle. The difference to using GetOption() to
    * check for the two possibilities is that this function respects the

@@ -29,18 +29,18 @@
 #include "iutil/vfs.h"
 
 #define CS_IMPLEMENT_ARRAY_INTERFACE_NONUM(clname,type,sing_name,mult_name) \
-  type clname::Get##sing_name (int n) const				\
+  type clname::Get##sing_name (size_t n) const				\
   { return mult_name[n]; }						\
-  void clname::Set##sing_name (int n, type val)				\
+  void clname::Set##sing_name (size_t n, type val)			\
   { mult_name[n] = val; }
 
 #define CS_IMPLEMENT_ARRAY_INTERFACE(clname,type,sing_name,mult_name)	\
   CS_IMPLEMENT_ARRAY_INTERFACE_NONUM (clname, type, sing_name, mult_name)	\
-  int clname::Get##sing_name##Count () const				\
+  size_t clname::Get##sing_name##Count () const				\
   { return mult_name.Length (); }					\
-  int clname::Add##sing_name (type v)					\
+  size_t clname::Add##sing_name (type v)				\
   { mult_name.Push (v); return mult_name.Length () - 1; }		\
-  void clname::Delete##sing_name (int n)				\
+  void clname::Delete##sing_name (size_t n)				\
   { mult_name.DeleteIndex (n); }
 
 #define CS_IMPLEMENT_ACCESSOR_METHOD(clname,type,name)			\
@@ -202,7 +202,7 @@ csModelDataVertices::~csModelDataVertices()
 void csModelDataVertices::CopyFrom (const iModelDataVertices *v)
 {
   if (!v) return;
-  int i;
+  size_t i;
   for (i=0; i<v->GetVertexCount (); i++)
     AddVertex (v->GetVertex (i));
   for (i=0; i<v->GetNormalCount (); i++)
@@ -216,7 +216,7 @@ void csModelDataVertices::CopyFrom (const iModelDataVertices *v)
 iModelDataVertices *csModelDataVertices::Clone () const
 {
   csModelDataVertices *v = new csModelDataVertices ();
-  int i;
+  size_t i;
 
   for (i=0; i<Vertices.Length (); i++)
     v->AddVertex (Vertices [i]);
@@ -229,42 +229,42 @@ iModelDataVertices *csModelDataVertices::Clone () const
   return v;
 }
 
-int csModelDataVertices::FindVertex (const csVector3 &v) const
+size_t csModelDataVertices::FindVertex (const csVector3 &v) const
 {
-  int i;
+  size_t i;
   for (i=0; i<Vertices.Length (); i++)
     if (Vertices [i] - v < EPSILON)
       return i;
-  return -1;
+  return (size_t)-1;
 }
 
-int csModelDataVertices::FindNormal (const csVector3 &v) const
+size_t csModelDataVertices::FindNormal (const csVector3 &v) const
 {
-  int i;
+  size_t i;
   for (i=0; i<Normals.Length (); i++)
     if (Normals [i] - v < EPSILON)
       return i;
-  return -1;
+  return (size_t)-1;
 }
 
-int csModelDataVertices::FindColor (const csColor &v) const
+size_t csModelDataVertices::FindColor (const csColor &v) const
 {
-  int i;
+  size_t i;
   for (i=0; i<Colors.Length (); i++)
     if ((Colors[i].red - v.red < EPSILON) &&
         (Colors[i].green - v.green < EPSILON) &&
         (Colors[i].blue - v.blue < EPSILON))
       return i;
-  return -1;
+  return (size_t)-1;
 }
 
-int csModelDataVertices::FindTexel (const csVector2 &v) const
+size_t csModelDataVertices::FindTexel (const csVector2 &v) const
 {
-  int i;
+  size_t i;
   for (i=0; i<Texels.Length (); i++)
     if (Texels [i] - v < EPSILON)
       return i;
-  return -1;
+  return (size_t)-1;
 }
 
 /*** csModelDataAction ***/
@@ -288,22 +288,22 @@ csModelDataAction::~csModelDataAction()
   SCF_DESTRUCT_IBASE ();
 }
 
-int csModelDataAction::GetFrameCount () const
+size_t csModelDataAction::GetFrameCount () const
 {
   return Times.Length ();
 }
 
-float csModelDataAction::GetTime (int Frame) const
+float csModelDataAction::GetTime (size_t Frame) const
 {
   return Times[Frame];
 }
 
-iObject *csModelDataAction::GetState (int Frame) const
+iObject *csModelDataAction::GetState (size_t Frame) const
 {
   return States.Get (Frame);
 }
 
-void csModelDataAction::SetTime (int Frame, float NewTime)
+void csModelDataAction::SetTime (size_t Frame, float NewTime)
 {
   // save the object
   iObject *obj = States.Get (Frame);
@@ -320,21 +320,21 @@ void csModelDataAction::SetTime (int Frame, float NewTime)
   obj->DecRef ();
 }
 
-void csModelDataAction::SetState (int Frame, iObject *State)
+void csModelDataAction::SetState (size_t Frame, iObject *State)
 {
   States[Frame] = State;
 }
 
 void csModelDataAction::AddFrame (float Time, iObject *State)
 {
-  int i;
+  size_t i;
   for (i=0; i<Times.Length (); i++)
     if (Times.Get (i) > Time) break;
   Times.Insert (i, Time);
   States.Insert (i, State);
 }
 
-void csModelDataAction::DeleteFrame (int n)
+void csModelDataAction::DeleteFrame (size_t n)
 {
   Times.DeleteIndex (n);
   States.DeleteIndex (n);
@@ -369,12 +369,12 @@ csModelDataPolygon::~csModelDataPolygon ()
   SCF_DESTRUCT_IBASE ();
 }
 
-int csModelDataPolygon::GetVertexCount () const
+size_t csModelDataPolygon::GetVertexCount () const
 {
   return Vertices.Length ();
 }
 
-int csModelDataPolygon::AddVertex (int ver, int nrm, int col, int tex)
+size_t csModelDataPolygon::AddVertex (int ver, int nrm, int col, int tex)
 {
   Vertices.Push (ver);
   Normals.Push (nrm);
@@ -383,7 +383,7 @@ int csModelDataPolygon::AddVertex (int ver, int nrm, int col, int tex)
   return Vertices.Length () - 1;
 }
 
-void csModelDataPolygon::DeleteVertex (int n)
+void csModelDataPolygon::DeleteVertex (size_t n)
 {
   Vertices.DeleteIndex (n);
   Normals.DeleteIndex (n);
@@ -400,7 +400,7 @@ CS_IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Texel, Texels);
 iModelDataPolygon *csModelDataPolygon::Clone () const
 {
   csModelDataPolygon *p = new csModelDataPolygon ();
-  int i;
+  size_t i;
   for (i=0; i<Vertices.Length (); i++)
     p->AddVertex (Vertices[i], Normals[i], Colors[i], Texels[i]);
   p->SetMaterial (Material);

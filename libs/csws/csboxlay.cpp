@@ -20,7 +20,7 @@ void csBoxLayout::SuggestSize (int &sugw, int& sugh)
   int width = 0;
   int maxHeight = 0;
   int x, y;
-  int i, cnt = vConstraints.Length ();
+  size_t i, cnt = vConstraints.Length ();
 
   for (i = 0; i < cnt; i++)
   {
@@ -54,7 +54,7 @@ void csBoxLayout::LayoutContainer ()
 {
   // fragment form preferedLayoutSize()...
 
-  int i, cnt = vConstraints.Length ();
+  size_t i, cnt = vConstraints.Length ();
 
   if (!cnt) return;
 

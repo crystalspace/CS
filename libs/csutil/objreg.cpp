@@ -30,7 +30,7 @@ class csObjectRegistryIterator : public iObjectRegistryIterator
 private:
   csRefArray<iBase> objects;
   csStringArray tags;
-  int cur_idx;
+  size_t cur_idx;
 
 public:
   csObjectRegistryIterator ();
@@ -57,13 +57,13 @@ csObjectRegistryIterator::csObjectRegistryIterator ()
 
 csObjectRegistryIterator::~csObjectRegistryIterator ()
 {
-  for (int i = objects.Length() - 1; i >= 0; i--)
+  for (size_t i = objects.Length(); i > 0; i--)
   {
     // Take special care to ensure that this object is no longer on the list
     // before calling DecRef(), since we don't want some other object asking
     // for it during its own destruction.
-    objects.DeleteIndex (i);
-    tags.DeleteIndex (i);
+    objects.DeleteIndex (i - 1);
+    tags.DeleteIndex (i - 1);
   }
   SCF_DESTRUCT_IBASE ();
 }
@@ -129,15 +129,15 @@ void csObjectRegistry::Clear ()
   csScopedMutexLock lock (mutex);
 
   clearing = true;
-  int i;
-  for (i = registry.Length() - 1; i >= 0; i--)
+  size_t i;
+  for (i = registry.Length(); i > 0; i--)
   {
     // Take special care to ensure that this object is no longer on the list
     // before calling DecRef(), since we don't want some other object asking
     // for it during its own destruction.
-    iBase* b = registry[i];
-    registry.DeleteIndex (i); // Remove from list before DecRef().
-    tags.DeleteIndex (i);
+    iBase* b = registry[i - 1];
+    registry.DeleteIndex (i - 1); // Remove from list before DecRef().
+    tags.DeleteIndex (i - 1);
     b->DecRef ();
   }
   clearing = false;
@@ -180,8 +180,8 @@ void csObjectRegistry::Unregister (iBase* obj, char const* tag)
   CS_ASSERT (registry.Length () == tags.Length ());
   if (!clearing && obj != 0)
   {
-    int i;
-    for (i = registry.Length() - 1; i >= 0; i--)
+    size_t i;
+    for (i = registry.Length(); i-- > 0;)
     {
       iBase* b = registry[i];
       if (b == obj)
@@ -205,13 +205,13 @@ iBase* csObjectRegistry::Get (char const* tag)
   csScopedMutexLock lock (mutex);
 
   CS_ASSERT (registry.Length () == tags.Length ());
-  int i;
-  for (i = registry.Length() - 1; i >= 0; i--)
+  size_t i;
+  for (i = registry.Length(); i > 0; i--)
   {
-    const char* t = tags[i];
+    const char* t = tags[i - 1];
     if (t && !strcmp (tag, t))
     {
-      iBase* b = registry[i];
+      iBase* b = registry[i - 1];
       b->IncRef ();
       return b;
     }
@@ -224,13 +224,13 @@ iBase* csObjectRegistry::Get (char const* tag, scfInterfaceID id, int version)
   csScopedMutexLock lock (mutex);
 
   CS_ASSERT (registry.Length () == tags.Length ());
-  int i;
-  for (i = registry.Length() - 1; i >= 0; i--)
+  size_t i;
+  for (i = registry.Length(); i > 0; i--)
   {
-    const char* t = tags[i];
+    const char* t = tags[i - 1];
     if (t && !strcmp (tag, t))
     {
-      iBase* b = registry[i];
+      iBase* b = registry[i - 1];
       iBase* interf = (iBase*)(b->QueryInterface (id, version));
       if (!interf)
       {
@@ -249,15 +249,15 @@ csPtr<iObjectRegistryIterator> csObjectRegistry::Get (
 	scfInterfaceID id, int version)
 {
   csObjectRegistryIterator* iterator = new csObjectRegistryIterator ();
-  int i;
+  size_t i;
   csScopedMutexLock lock (mutex);
-  for (i = registry.Length() - 1; i >= 0; i--)
+  for (i = registry.Length(); i > 0; i--)
   {
-    iBase* b = registry[i];
+    iBase* b = registry[i - 1];
     iBase* interf = (iBase*)(b->QueryInterface (id, version));
     if (interf)
     {
-      const char* t = tags[i];
+      const char* t = tags[i - 1];
       iterator->Add (interf, t);
       interf->DecRef ();
     }
@@ -268,12 +268,12 @@ csPtr<iObjectRegistryIterator> csObjectRegistry::Get (
 csPtr<iObjectRegistryIterator> csObjectRegistry::Get ()
 {
   csObjectRegistryIterator* iterator = new csObjectRegistryIterator ();
-  int i;
+  size_t i;
   csScopedMutexLock lock (mutex);
-  for (i = registry.Length() - 1; i >= 0; i--)
+  for (i = registry.Length(); i > 0; i--)
   {
-    iBase* b = registry[i];
-    const char* t = tags[i];
+    iBase* b = registry[i - 1];
+    const char* t = tags[i - 1];
     iterator->Add (b, t);
   }
   return csPtr<iObjectRegistryIterator> (iterator);

@@ -217,7 +217,7 @@ void DemoSequenceManager::SetupFade (float start_fade, float end_fade,
 void DemoSequenceManager::ReplacePathObject (csNamedPath* path,
 	iMeshWrapper* mesh)
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < pathForMesh.Length () ; i++)
   {
     PathForMesh* pfm = pathForMesh[i];
@@ -561,7 +561,7 @@ void DemoSequenceManager::SelectPreviousPath (char* hilight)
     SelectLastPath (hilight);
     return;
   }
-  int i;
+  size_t i;
   for (i = 0 ; i < pathForMesh.Length () ; i++)
   {
     PathForMesh* pfm = pathForMesh[i];
@@ -590,7 +590,7 @@ void DemoSequenceManager::SelectNextPath (char* hilight)
     SelectFirstPath (hilight);
     return;
   }
-  int i;
+  size_t i;
   for (i = 0 ; i < pathForMesh.Length () ; i++)
   {
     PathForMesh* pfm = pathForMesh[i];

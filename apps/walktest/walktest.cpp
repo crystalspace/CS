@@ -392,7 +392,7 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
   // Update all busy entities.
   // We first push all entities in a vector so that NextFrame() can safely
   // remove it self from the busy_entities list (or add other entities).
-  int i;
+  size_t i;
   busy_vector.DeleteAll ();
   csWalkEntity* wentity;
   for (i = 0 ; i < busy_entities.Length () ; i++)
@@ -647,7 +647,7 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
     return;
 
   // Apply lighting BEFORE the very first frame
-  int i;
+  size_t i;
   for (i = 0 ; i < dynamic_lights.Length () ; i++)
   {
     iLight* dyn = dynamic_lights[i];
@@ -755,7 +755,7 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
       csRecordedCamera* reccam = (csRecordedCamera*)recording[cfg_playrecording];
       cfg_playrecording++;
       record_frame_count++;
-      if (cfg_playrecording >= recording.Length ())
+      if ((size_t)cfg_playrecording >= recording.Length ())
       {
 	csTicks t1 = record_start_time;
 	csTicks t2 = csGetTicks ();

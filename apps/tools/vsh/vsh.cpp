@@ -265,7 +265,8 @@ static void cmd_ls (char *args)
   if (fl->Length() > 0)
   {
     bool nl = false;
-	int i;
+	
+    size_t i;
     for (i = 0; i < fl->Length (); i++)
     {
       const char *fname = fl->Get (i);
@@ -314,7 +315,7 @@ static void cmd_cp (char *args)
     return;
 
   csRef<iStringArray> fl (VFS->FindFiles (src));
-  int i;
+  size_t i;
   for (i = 0; i < fl->Length (); i++)
   {
     char destname [VFS_MAX_PATH_LEN + 1];

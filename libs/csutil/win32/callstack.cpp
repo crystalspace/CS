@@ -88,7 +88,7 @@ void cswinCallStack::AddFrame (const STACKFRAME64& frame)
   }
 }
 
-int cswinCallStack::GetEntryCount ()
+size_t cswinCallStack::GetEntryCount ()
 {
   return entries.Length();
 }
@@ -117,7 +117,7 @@ static void RescanModules ()
   CloseHandle (hSnap);
 }
 
-bool cswinCallStack::GetFunctionName (int num, csString& str)
+bool cswinCallStack::GetFunctionName (size_t num, csString& str)
 {
   str.Clear();
 
@@ -161,7 +161,7 @@ bool cswinCallStack::GetFunctionName (int num, csString& str)
   return true;
 }
 
-bool cswinCallStack::GetLineNumber (int num, csString& str)
+bool cswinCallStack::GetLineNumber (size_t num, csString& str)
 {
   str.Clear();
 
@@ -178,12 +178,12 @@ bool cswinCallStack::GetLineNumber (int num, csString& str)
   return false;
 }
 
-bool cswinCallStack::GetParameters (int num, csString& str)
+bool cswinCallStack::GetParameters (size_t num, csString& str)
 {
   if (!entries[num].hasParams) return false;
 
   str.Clear();
-  for (int i = 0; i < entries[num].params.Length(); i++)
+  for (size_t i = 0; i < entries[num].params.Length(); i++)
   {
     if (i > 0) str << ", ";
     str << strings.Request (entries[num].params[i].name);

@@ -257,7 +257,7 @@ public:
    */
   csNamedPath* FindPath (const char* name)
   {
-    int i;
+    size_t i;
     for (i = 0 ; i < paths.Length () ; i++)
     {
       csNamedPath* p = paths[i];

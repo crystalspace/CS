@@ -123,10 +123,11 @@ bool csEventTimer::HandleEvent (iEvent& event)
   }
 
   minimum_time = 2000000000;
-  int i;
-  for (i = timerevents.Length() - 1 ; i >= 0 ; i--)
+  size_t i;
+  for (i = timerevents.Length() ; i > 0 ; i--)
   {
-    timerevent& te = timerevents[i];
+    const size_t idx = i - 1;
+    timerevent& te = timerevents[idx];
     te.time_left -= elapsed+accumulate_elapsed;
     if (te.time_left <= 0)
     {
@@ -137,8 +138,8 @@ bool csEventTimer::HandleEvent (iEvent& event)
       }
       else
       {
-        timerevents.DeleteIndex (i);
-	i--;
+        timerevents.DeleteIndex (idx);
+	//i--;
       }
     }
     else
@@ -150,15 +151,15 @@ bool csEventTimer::HandleEvent (iEvent& event)
   return true;
 }
 
-int csEventTimer::FindTimerEvent (iTimerEvent* ev)
+size_t csEventTimer::FindTimerEvent (iTimerEvent* ev)
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < timerevents.Length () ; i++)
   {
     if (timerevents[i].event == ev)
       return i;
   }
-  return -1;
+  return (size_t)-1;
 }
 
 void csEventTimer::AddTimerEvent (iTimerEvent* ev, csTicks delay)
@@ -173,8 +174,8 @@ void csEventTimer::AddTimerEvent (iTimerEvent* ev, csTicks delay)
 
 void csEventTimer::RemoveTimerEvent (iTimerEvent* ev)
 {
-  int idx = FindTimerEvent (ev);
-  if (idx != -1)
+  size_t idx = FindTimerEvent (ev);
+  if (idx != (size_t)-1)
     timerevents.DeleteIndex (idx);
 }
 

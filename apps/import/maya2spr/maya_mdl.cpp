@@ -226,7 +226,7 @@ bool Maya4Model::WriteSPR(const char* spritename, csArray<Animation*>& anims)
       return false;
     }
 
-    int i;
+    size_t i;
     for (i=0;i<anims.Length();i++)
     {
       Animation* anim = anims[i];

@@ -35,7 +35,7 @@ static const int compSizes[] =
   };
 
 csSoftRenderBuffer::csSoftRenderBuffer 
-  (void *buffer, int size, csRenderBufferType type, 
+  (void *buffer, size_t size, csRenderBufferType type, 
   csRenderBufferComponentType comptype, int compcount)
 {
   /*static const GLenum compGLtypes[] =
@@ -74,7 +74,7 @@ void csSoftRenderBuffer::SetComponentType (csRenderBufferComponentType type)
 
 //-----------------------------------------------------------------
 
-csPtr<iRenderBuffer> csSoftwareGraphics3DCommon::CreateRenderBuffer (int size, 
+csPtr<iRenderBuffer> csSoftwareGraphics3DCommon::CreateRenderBuffer (size_t size, 
   csRenderBufferType type, csRenderBufferComponentType componentType,
   int componentCount)
 {
@@ -84,7 +84,7 @@ csPtr<iRenderBuffer> csSoftwareGraphics3DCommon::CreateRenderBuffer (int size,
 }
 
 csPtr<iRenderBuffer> csSoftwareGraphics3DCommon::CreateIndexRenderBuffer (
-  int size, csRenderBufferType type, csRenderBufferComponentType componentType,
+  size_t size, csRenderBufferType type, csRenderBufferComponentType componentType,
   size_t rangeStart, size_t rangeEnd)
 {
   csSoftRenderBuffer *buffer = new csSoftRenderBuffer (
@@ -92,7 +92,7 @@ csPtr<iRenderBuffer> csSoftwareGraphics3DCommon::CreateIndexRenderBuffer (
   return csPtr<iRenderBuffer> (buffer);
 }
 
-void csSoftwareGraphics3DCommon::CreateInterleavedRenderBuffers (int size,
+void csSoftwareGraphics3DCommon::CreateInterleavedRenderBuffers (size_t size,
   csRenderBufferType type, int count, csRefArray<iRenderBuffer>& buffers)
 {
   char *mem = new char[size];

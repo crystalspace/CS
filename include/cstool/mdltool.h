@@ -32,7 +32,7 @@ struct iModelDataPolygon;
 /// Mapping table, used by csModelDataTools::CopyVerticesMapped().
 struct csModelDataVertexMap
 {
-  int VertexCount, NormalCount, ColorCount, TexelCount;
+  size_t VertexCount, NormalCount, ColorCount, TexelCount;
   int *Vertices, *Normals, *Colors, *Texels;
 };
 
@@ -47,7 +47,7 @@ private:
   bool Delete;
   // number of vertices. This is stored outside the lists because not all lists
   // may be available, making it hard to get the vertex count from the lists.
-  int Count;
+  size_t Count;
   // the lists
   csDirtyAccessArray<int> *Vertices, *Normals, *Colors, *Texels;
 
@@ -78,7 +78,7 @@ public:
    * and returns the single index. Certain elements are ignored if no lists
    * exist for them (if demanded so at construction of the set).
    */
-  int Add (int Vertex, int Normal, int Color, int Texel);
+  size_t Add (int Vertex, int Normal, int Color, int Texel);
 
   /**
    * Add several vertices at once.
@@ -86,16 +86,16 @@ public:
   void Add (int num, int *Vertices, int *Normal, int *Colors, int *Texels);
 
   /// Return the number of contained vertices
-  int GetVertexCount () const;
+  size_t GetVertexCount () const;
 
   /// Get a vertex index
-  int GetVertex (int n) const;
+  int GetVertex (size_t n) const;
   /// Get a normal index
-  int GetNormal (int n) const;
+  int GetNormal (size_t n) const;
   /// Get a color index
-  int GetColor (int n) const;
+  int GetColor (size_t n) const;
   /// Get a texel index
-  int GetTexel (int n) const;
+  int GetTexel (size_t n) const;
 };
 
 /// A set of utility functions to deal with model data components.

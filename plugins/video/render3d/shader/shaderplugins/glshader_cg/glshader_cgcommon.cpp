@@ -77,7 +77,7 @@ void csShaderGLCGCommon::Deactivate()
 void csShaderGLCGCommon::SetupState (const csRenderMesh* mesh,
   const csShaderVarStack &stacks)
 {
-  int i;
+  size_t i;
 
   // set variables
   for(i = 0; i < variablemap.Length(); ++i)
@@ -138,7 +138,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
   CGGLenum type, csArray<iShaderVariableContext*> &staticContexts)
 {
   csShaderVariable *var;
-  int i,j;
+  size_t i, j;
 
   CGprofile profile = CG_PROFILE_UNKNOWN;
 

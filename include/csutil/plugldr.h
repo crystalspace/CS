@@ -44,7 +44,7 @@ class CS_CSUTIL_EXPORT csPluginList : public csPDelArray<csPluginLoadRec>
 public:
   bool Sort (iObjectRegistry* object_reg);
 private:
-  bool RecurseSort (iObjectRegistry*, int row, int *order, int *loop,
+  bool RecurseSort (iObjectRegistry*, size_t row, size_t* order, size_t* loop,
     bool *matrix);
 };
 

@@ -56,7 +56,7 @@ class CS_CSWS_EXPORT csMenuItem : public csComponent
   /// Menu item info (if not 0) (placed to the right of menu item text)
   char *info;
   /// Character number that should be underlined (-1 == none)
-  int underline_pos;
+  size_t underline_pos;
   /// Menu item styles
   int Style;
   /// Menu item command code

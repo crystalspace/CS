@@ -54,7 +54,7 @@ void csShaderProgram::ResolveParamStatic (ProgramParam& param,
 {
   if (param.name != csInvalidStringID)
   {
-    for (int j=0; j < staticContexts.Length(); j++)
+    for (size_t j=0; j < staticContexts.Length(); j++)
     {
       if (!param.var)
       {
@@ -381,14 +381,14 @@ void csShaderProgram::ResolveStaticVars (
 {
   csShaderVariable *var;
 
-  for (int i = 0; i < variablemap.Length (); i++)
+  for (size_t i = 0; i < variablemap.Length (); i++)
   {
     // Check if we've got it locally
     var = svcontext.GetVariable(variablemap[i].name);
     if (!var)
     {
       // If not, check the static contexts
-      for (int j = 0; j < staticContexts.Length(); j++)
+      for (size_t j = 0; j < staticContexts.Length(); j++)
       {
 	var = staticContexts[j]->GetVariable (variablemap[i].name);
 	if (var) break;
@@ -411,7 +411,7 @@ void csShaderProgram::DumpProgramInfo (csString& output)
 
 void csShaderProgram::DumpVariableMappings (csString& output)
 {
-  for (int v = 0; v < variablemap.Length(); v++)
+  for (size_t v = 0; v < variablemap.Length(); v++)
   {
     const VariableMapEntry& vme = variablemap[v];
 
@@ -419,7 +419,6 @@ void csShaderProgram::DumpVariableMappings (csString& output)
     output << '(' << vme.name << ") -> ";
     output << vme.destination << ' ';
     output << vme.userInt << ' ';
-    output << (csString().Format ("0x%.8x", (uint32)vme.userPtr)) << 
-      '\n'; // @@@ fix for 64 bit
+    output << (csString().Format ("0x%p", (void*)vme.userPtr)) << '\n'; 
   }
 }

@@ -1169,7 +1169,7 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
 	"This is not supported!");
       return 0;
     }
-    int i;
+    size_t i;
     for (i = 0 ; i < info.replace_materials.Length () ; i++)
     {
       RepMaterial& rm = info.replace_materials[i];

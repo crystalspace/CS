@@ -103,11 +103,11 @@ bool csComponent::ApplySkin (csSkin *Skin)
   if (!skinname)
     return true;	// we don't need a skin slice
 
-  int sliceidx = Skin->FindSortedKey (Skin->KeyCmp(skinname));
-  if ((sliceidx < 0) && !skinslice)
+  size_t sliceidx = Skin->FindSortedKey (Skin->KeyCmp(skinname));
+  if ((sliceidx == csArrayItemNotFound) && !skinslice)
     return false;
 
-  if (sliceidx >= 0)
+  if (sliceidx != csArrayItemNotFound)
     Skin->Get (sliceidx)->Apply (*this);
   return true;
 }
@@ -179,8 +179,8 @@ void csComponent::InsertClipChild (csComponent *clipchild)
 
 void csComponent::DeleteClipChild (csComponent *clipchild)
 {
-  int num = clipchildren.Find (clipchild);
-  if (num >= 0)
+  size_t num = clipchildren.Find (clipchild);
+  if (num != csArrayItemNotFound)
     clipchildren.DeleteIndex (num);
 }
 
@@ -268,12 +268,12 @@ csComponent *csComponent::ForEach (bool (*func) (csComponent *child, void *param
 
 static bool find_child_by_id (csComponent *child, void *find_id)
 {
-  return (child->id == (unsigned int)find_id);
+  return (child->id == (csComponent::ID)find_id);
 }
 
-csComponent *csComponent::GetChild (int find_id) const
+csComponent *csComponent::GetChild (ID find_id) const
 {
-  return ((csComponent *)this)->ForEach (find_child_by_id, (void *)find_id);
+  return ((csComponent *)this)->ForEach (find_child_by_id, (void*)find_id);
 }
 
 bool csComponent::SetFocused (csComponent *comp)
@@ -597,8 +597,8 @@ AbortDrag:
     if (CS_IS_MOUSE_EVENT (Event))
     {
       // Pass mouse events to 'clip children'
-	  int i;
-      for (i = clipchildren.Length () - 1; i >= 0; i--)
+      size_t i;
+      for (i = clipchildren.Length (); i-- > 0;)
       {
         csComponent *child = clipchildren[i];
         // If child is not visible, skip it
@@ -949,8 +949,8 @@ void csComponent::CheckDirtyTD (csRect &ioR)
     // should mark as dirty the respective area on their neightbours.
 
     // "Clip children" are always topmost, so start from them
-	int i;
-    for (i = clipchildren.Length () - 1; i >= 0; i--)
+    size_t i;
+    for (i = clipchildren.Length (); i-- > 0;)
       clipchildren[i]->CheckDirtyTD (r);
 
     // Loop through all "direct" children top-down
@@ -1034,7 +1034,7 @@ void csComponent::CheckDirtyBU (csRect &ioR)
   }
 
   // Continue with "clip children" bottom-up
-  int i;
+  size_t i;
   for (i = 0; i < clipchildren.Length (); i++)
     clipchildren[i]->CheckDirtyBU (r);
 
@@ -1169,8 +1169,8 @@ bool csComponent::SetRect (int xmin, int ymin, int xmax, int ymax)
       } while (cur != focused);
 
       // Now invalidate all clip children that intersects these two areas
-	  int i;
-      for (i = clipchildren.Length () - 1; i >= 0; i--)
+      size_t i;
+      for (i = clipchildren.Length (); i-- > 0;)
       {
         csComponent *cur = clipchildren[i];
         int dX = 0, dY = 0;
@@ -1280,17 +1280,17 @@ void csComponent::Invalidate (csRect &area, bool fIncludeChildren,
       } while (child != top);
 
     // And now all indirect children
-    int i = clipchildren.Length () - 1;
+    size_t i = clipchildren.Length ();
     if (below && (below->parent != this))
     {
-      while ((i >= 0) && (clipchildren.Get (i) != below))
+      while ((i > 0) && (clipchildren.Get (i - 1) != below))
         i--;
-      if (i >= 0)
+      if (i > 0)
         i--;
     }
-    while (i >= 0)
+    while (i > 0)
     {
-      child = clipchildren[i];
+      child = clipchildren[i - 1];
       csRect dr (area);
       int dX = 0, dY = 0;
       LocalToGlobal (dX, dY);
@@ -1350,8 +1350,8 @@ void csComponent::ClipChild (cswsRectVector &rect, csComponent *child)
   childbound.Intersect (relbound);
 
   // Now clip all the rectangles against this child's bound
-  int i;
-  for (i = rect.Length () - 1; i >= 0; i--)
+  size_t i;
+  for (i = rect.Length (); i-- > 0; )
   {
     csRect *cur = (csRect *)rect[i];
     if (childbound.Intersects (*cur))
@@ -1383,7 +1383,7 @@ void csComponent::ClipChild (cswsRectVector &rect, csComponent *child)
 
 void csComponent::Clip (cswsRectVector &rect, csComponent *last, bool forchild)
 {
-  int i; // for dumb compilers that don't understand ANSI C++ "for" scoping
+  size_t i; // for dumb compilers that don't understand ANSI C++ "for" scoping
 
   if (!GetState (CSS_VISIBLE))
   {
@@ -1395,7 +1395,7 @@ void csComponent::Clip (cswsRectVector &rect, csComponent *last, bool forchild)
   {
     // Clip all rectangles against this window
     csRect relbound (0, 0, bound.xmax - bound.xmin, bound.ymax - bound.ymin);
-    for (i = rect.Length () - 1; i >= 0; i--)
+    for (i = rect.Length (); i-- > 0;)
     {
       ((csRect *)rect[i])->Intersect (relbound);
       if (((csRect *)rect[i])->IsEmpty ())
@@ -1418,8 +1418,8 @@ void csComponent::Clip (cswsRectVector &rect, csComponent *last, bool forchild)
 
   // Clip rectangles against 'clip children' bounds.
   // (see the remark at definition of csComponent::parentclip)
-  int c;
-  for (c = clipchildren.Length () - 1; c >= 0; c--)
+  size_t c;
+  for (c = clipchildren.Length (); c-- > 0;)
   {
     csComponent *nb = clipchildren[c];
     if (nb == last)
@@ -1439,7 +1439,7 @@ void csComponent::Clip (cswsRectVector &rect, csComponent *last, bool forchild)
 
   // transform all rectangles from local window coordinates
   // to parent window coordinates
-  for (i = (int)rect.Length () - 1; i >= 0; i--)
+  for (i = rect.Length (); i-- > 0;)
     ((csRect *)rect[i])->Move (dX, dY);
 
   // Now tell our clip parent to perform further clipping
@@ -1452,15 +1452,15 @@ void csComponent::FastClip (cswsRectVector &rect)
   int dX = 0, dY = 0;
   LocalToGlobal (dX, dY);
   // Clip all the rectangles in "rect" against all the rectangles in "visregion"
-  int i, j;
-  for (i = rect.Length () - 1; i >= 0; i--)
+  size_t i, j;
+  for (i = rect.Length (); i-- > 0;)
   {
     csRect *r = (csRect *)rect.Get (i);
     // Transform rectangle to global coordinates
     csRect cr (*r);
     cr.Move (dX, dY);
     bool used = false;
-    for (j = visregion->Length () - 1; j >= 0; j--)
+    for (j = visregion->Length (); j-- > 0;)
     {
       csRect vis (*(csRect *)visregion->Get (j));
       vis.Intersect (cr);
@@ -1529,8 +1529,8 @@ void csComponent::Box (int xmin, int ymin, int xmax, int ymax, int colindx)
     bb->Intersect (clip);
   rect.Push (bb);
   FastClip (rect);
-  int i;
-  for (i = rect.Length () - 1; i >= 0; i--)
+  size_t i;
+  for (i = rect.Length (); i-- > 0;)
   {
     csRect *cur = (csRect *)rect[i];
     app->pplBox (cur->xmin, cur->ymin, cur->xmax, cur->ymax,
@@ -1565,8 +1565,8 @@ void csComponent::Line (float x1, float y1, float x2, float y2, int colindx)
   x2 += dx; y2 += dy;
 
   int color = GetColor (colindx);
-  int i;
-  for (i = rect.Length () - 1; i >= 0; i--)
+  size_t i;
+  for (i = rect.Length (); i-- > 0;)
   {
     csRect *cur = (csRect *)rect[i];
     float xx1 = x1, xx2 = x2, yy1 = y1, yy2 = y2;
@@ -1593,8 +1593,8 @@ void csComponent::Pixel (int x, int y, int colindx)
   LocalToGlobal (x, y);
 
   int color = GetColor (colindx);
-  int i;
-  for (i = rect.Length () - 1; i >= 0; i--)
+  size_t i;
+  for (i = rect.Length (); i-- > 0;)
   {
     csRect *cur = (csRect *)rect[i];
     app->pplPixel (cur->xmin, cur->ymin, color);
@@ -1624,8 +1624,8 @@ void csComponent::Text (int x, int y, int fgindx, int bgindx, const char *s)
   bool restoreclip = false;
   iFont *font;
   GetFont (font);
-  int i;
-  for (i = rect.Length () - 1; i >= 0; i--)
+  size_t i;
+  for (i = rect.Length (); i-- > 0;)
   {
     csRect *cur = (csRect *)rect[i];
     if (cur->Intersects (tb))
@@ -1657,8 +1657,8 @@ void csComponent::Pixmap (csPixmap *s2d, int x, int y, int w, int h, uint8 Alpha
 
   LocalToGlobal (x, y);
   bool restoreclip = false;
-  int i;
-  for (i = rect.Length () - 1; i >= 0; i--)
+  size_t i;
+  for (i = rect.Length (); i-- > 0;)
   {
     csRect *cur = (csRect *)rect[i];
     app->pplSetClipRect (*cur); restoreclip = true;
@@ -1685,8 +1685,8 @@ void csComponent::Pixmap (csPixmap *s2d, int x, int y, int w, int h,
   rect.Push (sb);
   FastClip (rect);
 
-  int i;
-  for (i = rect.Length () - 1; i >= 0; i--)
+  size_t i;
+  for (i = rect.Length (); i-- > 0;)
   {
     csRect *cur = (csRect *)rect [i];
     app->pplTiledPixmap (s2d, cur->xmin, cur->ymin, cur->Width (), cur->Height (),
@@ -1708,8 +1708,8 @@ void csComponent::Texture (iTextureHandle *tex, int x, int y, int w, int h,
   FastClip (rect);
 
   LocalToGlobal (orgx, orgy);
-  int i;
-  for (i = rect.Length () - 1; i >= 0; i--)
+  size_t i;
+  for (i = rect.Length (); i-- > 0;)
   {
     csRect *cur = (csRect *)rect [i];
     app->pplTexture (tex, cur->xmin, cur->ymin, cur->Width (), cur->Height (),
@@ -1924,8 +1924,8 @@ csComponent *csComponent::GetChildAt (int x, int y,
   bool (*func) (csComponent *, void *), void *data)
 {
   // Check clip children first
-  int i;
-  for (i = clipchildren.Length () - 1; i >= 0; i--)
+  size_t i;
+  for (i = clipchildren.Length (); i-- > 0;)
   {
     csComponent *child = clipchildren[i];
     if (child->GetState (CSS_VISIBLE))
@@ -1967,19 +1967,19 @@ csComponent *csComponent::GetChildAt (int x, int y,
 }
 
 void csComponent::PrepareLabel (const char *iLabel, char * &oLabel,
-  int &oUnderlinePos)
+  size_t &oUnderlinePos)
 {
   if (oLabel)
     delete[] oLabel;
 
-  oUnderlinePos = -1;
+  oUnderlinePos = (size_t)-1;
   oLabel = 0;
 
   if (iLabel)
   {
-    int sl = strlen (iLabel);
-    int cc = 0;
-    int i;
+    size_t sl = strlen (iLabel);
+    size_t cc = 0;
+    size_t i;
 
     for (i = 0; i < sl; i++)
       if (iLabel [i] != '~')
@@ -1996,10 +1996,10 @@ void csComponent::PrepareLabel (const char *iLabel, char * &oLabel,
   } /* endif */
 }
 
-void csComponent::DrawUnderline (int iX, int iY, const char *iText, int iUnderlinePos,
+void csComponent::DrawUnderline (int iX, int iY, const char *iText, size_t iUnderlinePos,
   int iColor)
 {
-  if ((iUnderlinePos >= 0) && (iUnderlinePos < (int)strlen (iText)))
+  if ((iUnderlinePos != (size_t)-1) && (iUnderlinePos < strlen (iText)))
   {
     size_t sl = strlen (iText) + 1;
     CS_ALLOC_STACK_ARRAY (char, tmp, sl);
@@ -2015,7 +2015,7 @@ void csComponent::DrawUnderline (int iX, int iY, const char *iText, int iUnderli
   } /* endif */
 }
 
-int csComponent::WordLeft (const char *iText, int StartPos)
+size_t csComponent::WordLeft (const char *iText, size_t StartPos)
 {
   while ((StartPos > 0) && (!isalnum (iText [StartPos - 1])))
     StartPos--;
@@ -2024,9 +2024,9 @@ int csComponent::WordLeft (const char *iText, int StartPos)
   return StartPos;
 }
 
-int csComponent::WordRight (const char *iText, int StartPos)
+size_t csComponent::WordRight (const char *iText, size_t StartPos)
 {
-  int sl = strlen (iText);
+  size_t sl = strlen (iText);
 
   if (isalnum (iText [StartPos]))
     while ((StartPos < sl) && (isalnum (iText [StartPos])))
@@ -2045,11 +2045,11 @@ void csComponent::SetText (const char *iText)
   Invalidate ();
 }
 
-void csComponent::GetText (char *oText, int iTextSize) const
+void csComponent::GetText (char *oText, size_t iTextSize) const
 {
   if (text)
   {
-    int sl = strlen (text);
+    size_t sl = strlen (text);
     if (sl >= iTextSize)
       sl = iTextSize - 1;
     memcpy (oText, text, sl);

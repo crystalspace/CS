@@ -57,7 +57,7 @@ bool csPlane3::ClipPolygon (
   static csgeom_csPlane3_Vis *vis = GetStatic_csgeom_csPlane3_Vis ();
 
   if (!reversed) Invert ();
-  if (num_verts > verts->Capacity ())
+  if ((size_t)num_verts > verts->Capacity ())
   {
     verts->SetCapacity (num_verts);
     vis->SetCapacity (num_verts);

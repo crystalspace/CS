@@ -359,7 +359,7 @@ bool csGLShaderFFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 
   ext = (csGLExtensionManager*) sri->GetPrivateObject ("ext");
 
-  if (texlayers.Length () > maxlayers)
+  if (texlayers.Length () > (size_t)maxlayers)
     return false;
 
   // Don't support layers if the COMBINE ext isn't present
@@ -369,7 +369,7 @@ bool csGLShaderFFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
   const bool hasDOT3 = ext->CS_GL_ARB_texture_env_dot3 || 
     ext->CS_GL_EXT_texture_env_dot3;
 
-  for(int i = 0; i < texlayers.Length(); ++i)
+  for(size_t i = 0; i < texlayers.Length(); ++i)
   {
     const mtexlayer& layer = texlayers[i];
     if (((layer.colorp == GL_DOT3_RGB_ARB) || 
@@ -394,7 +394,7 @@ bool csGLShaderFFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 
 void csGLShaderFFP::Activate ()
 {
-  for(int i = 0; i < texlayers.Length(); ++i)
+  for(size_t i = 0; i < texlayers.Length(); ++i)
   {
     statecache->SetActiveTU (i);
 
@@ -431,6 +431,10 @@ void csGLShaderFFP::Activate ()
       glTexEnvf(GL_TEXTURE_ENV, GL_ALPHA_SCALE, layer.scale_alpha);
     }
   }
+  if (fog.mode != FogOff)
+  {
+    statecache->Enable_GL_FOG ();
+  }
 }
 
 void csGLShaderFFP::Deactivate()
@@ -452,6 +456,11 @@ void csGLShaderFFP::Deactivate()
     glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_MODULATE);
     glTexEnvf (GL_TEXTURE_ENV, GL_ALPHA_SCALE, 1.0f);
   }
+
+  if (fog.mode != FogOff)
+  {
+    statecache->Disable_GL_FOG ();
+  }
 }
 
 void csGLShaderFFP::SetupState (const csRenderMesh *mesh, 
@@ -459,8 +468,6 @@ void csGLShaderFFP::SetupState (const csRenderMesh *mesh,
 {
   if (fog.mode != FogOff)
   {
-    statecache->Enable_GL_FOG ();
-
     RetrieveParamValue (fog.density, stacks);
     RetrieveParamValue (fog.start, stacks);
     RetrieveParamValue (fog.end, stacks);
@@ -488,14 +495,12 @@ void csGLShaderFFP::SetupState (const csRenderMesh *mesh,
 	  glFogf (GL_FOG_DENSITY, fog.density.vectorValue.x);
 	}
 	break;
+      default:
+	break;
     }
   }
 }
 
 void csGLShaderFFP::ResetState ()
 {
-  if (fog.mode != FogOff)
-  {
-    statecache->Disable_GL_FOG ();
-  }
 }

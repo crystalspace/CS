@@ -22,8 +22,8 @@
 class CS_CSWS_EXPORT csGridLayout : public csLayout
 {
 protected:
-  int mRows;
-  int mCols;
+  size_t mRows;
+  size_t mCols;
   int mHgap;
   int mVgap;
 public:
@@ -33,14 +33,14 @@ public:
 
   csGridLayout (csComponent *pParent, int rows, int cols, int hgap, int vgap);
 
-  virtual int GetColumns () { return mCols; }
+  virtual size_t GetColumns () { return mCols; }
   virtual int GetHgap () { return mHgap; }
-  virtual int GetRows () { return mRows; }
+  virtual size_t GetRows () { return mRows; }
   virtual int GetVgap () { return mVgap; }
 
-  virtual void SetColumns (int columns ) { mCols = columns; }
+  virtual void SetColumns (size_t columns ) { mCols = columns; }
   virtual void SetHgap (int hgap) { mHgap = hgap; }
-  virtual void SetRows (int rows) { mRows = rows; }
+  virtual void SetRows (size_t rows) { mRows = rows; }
   virtual void SetVgap (int vgap) { mVgap = vgap; }
 
   virtual void SuggestSize (int &sugw, int &sugh);

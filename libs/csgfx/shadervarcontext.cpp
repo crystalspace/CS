@@ -47,7 +47,7 @@ void csShaderVariableContext::AddVariable
 csShaderVariable* csShaderVariableContext::GetVariable 
   (csStringID name) const 
 {
-  for (int i=0; i<variables.Length (); ++i)
+  for (size_t i=0; i<variables.Length (); ++i)
   {
     if (variables[i]->GetName () == name)
       return variables[i];
@@ -58,10 +58,10 @@ csShaderVariable* csShaderVariableContext::GetVariable
 void csShaderVariableContext::PushVariables 
   (csShaderVarStack &stacks) const
 {
-  for (int i=0; i<variables.Length (); ++i)
+  for (size_t i=0; i<variables.Length (); ++i)
   {
     csStringID name = variables[i]->GetName ();
-    if (stacks.Length () <= (int)name)
+    if (stacks.Length () <= (size_t)name)
       stacks.SetLength (name+1);
     stacks[name].Push (variables[i]);
   }
@@ -70,10 +70,10 @@ void csShaderVariableContext::PushVariables
 void csShaderVariableContext::PopVariables 
   (csShaderVarStack &stacks) const
 {
-  for (int i=0; i<variables.Length (); ++i)
+  for (size_t i=0; i<variables.Length (); ++i)
   {
     csStringID name = variables[i]->GetName ();
-    if ((stacks.Length () > (int)name) && // @@@ Why is this needed?
+    if ((stacks.Length () > (size_t)name) && // @@@ Why is this needed?
       (stacks[name].Length () > 0))
       stacks[name].Pop ();
   }

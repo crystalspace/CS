@@ -8,6 +8,9 @@ chronological order.
 
 2-Jul-2004
 	- Jorrit fixed compile errors in sprcal3d and terrfunc.
+	- res changed the type of csArray<> indices and sizes from int to
+	  size_t. CVS has been tagged with PRE_CSARRAY_SIZE_T_INDICES before 
+	  the change.
 1-Jul-2004
 	- Eric Sunshine augmented "jam install" so that CS/data/cube and
 	  CS/data/flarge/mosaic-detail.dds are also installed.

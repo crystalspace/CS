@@ -57,7 +57,7 @@ private:
   csStringArray Names;
 
   /// Find Nth command-line option and return a pointer to the object (or 0)
-  csCommandLineOption *FindOption (const char *iName, int iIndex) const;
+  csCommandLineOption *FindOption (const char *iName, size_t iIndex) const;
 
   /// Directory of application resources.
   csString resDir;
@@ -85,18 +85,18 @@ public:
   /// Clear all options and names.
   virtual void Reset ();
   /// Query specific commandline option (you can query second etc. such option)
-  virtual const char *GetOption (const char *iName, int iIndex = 0) const;
+  virtual const char *GetOption (const char *iName, size_t iIndex = 0) const;
   /// Query filename specified on commandline (that is, without leading '-')
-  virtual const char *GetName (int iIndex = 0) const;
+  virtual const char *GetName (size_t iIndex = 0) const;
   /// Add a command-line option to the command-line option array
   virtual void AddOption (const char *iName, const char *iValue);
   /// Add a command-line name to the command-line names array
   virtual void AddName (const char *iName);
   /// Replace the Nth command-line option with a new value
   virtual bool ReplaceOption (const char *iName, const char *iValue,
-    int iIndex = 0);
+    size_t iIndex = 0);
   /// Replace the Nth command-line name with a new value
-  virtual bool ReplaceName (const char *iValue, int iIndex = 0);
+  virtual bool ReplaceName (const char *iValue, size_t iIndex = 0);
   /**
    * Check for a -[no]option toggle. 
    */

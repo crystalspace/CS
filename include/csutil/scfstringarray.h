@@ -41,7 +41,7 @@ public:
   { SCF_DESTRUCT_IBASE(); }
 
   /// Query array length.
-  virtual int Length () const
+  virtual size_t Length () const
   {
     return v.Length ();
   }
@@ -59,25 +59,25 @@ public:
   }
 
   /// Get Nth string in vector.
-  virtual char const *Get (int n) const
+  virtual char const *Get (size_t n) const
   {
     return v.Get (n);
   }
 
   /// Find index of given string, case sensitive.
-  virtual int Find (const char *value) const
+  virtual size_t Find (const char *value) const
   {
     return v.Find (value);
   }
 
   /// Find index of given string, case insensitive.
-  virtual int FindCaseInsensitive (const char *value) const
+  virtual size_t FindCaseInsensitive (const char *value) const
   {
     return v.FindCaseInsensitive (value);
   }
 
   /// Find index of a string in a pre-sorted string array.
-  virtual int FindSortedKey (const char *value) const
+  virtual size_t FindSortedKey (const char *value) const
   {
     return v.FindSortedKey ((char*)value);
   }
@@ -89,13 +89,13 @@ public:
   }
 
   /// Delete Nth string in the array.
-  virtual bool DeleteIndex (int n)
+  virtual bool DeleteIndex (size_t n)
   {
     return v.DeleteIndex (n);
   }
 
   /// Insert a string before Nth string in the array.
-  virtual bool Insert (int n, char const *value)
+  virtual bool Insert (size_t n, char const *value)
   {
     return v.Insert (n, (char*)value);
   }

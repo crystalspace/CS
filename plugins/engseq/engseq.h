@@ -61,26 +61,26 @@ public:
   }
   virtual iBase* GetParameter (int idx) const
   {
-    CS_ASSERT (idx >= 0 && idx < params.Length ());
+    CS_ASSERT (idx >= 0 && (size_t)idx < params.Length ());
     return params[idx]->value;
   }
   virtual iBase* GetParameter (const char* name) const
   {
-    int i;
+    size_t i;
     for (i = 0 ; i < params.Length () ; i++)
       if (!strcmp (name, params[i]->name)) return params[i]->value;
     return 0;
   }
   virtual int GetParameterIdx (const char* name) const
   {
-    int i;
+    size_t i;
     for (i = 0 ; i < params.Length () ; i++)
       if (!strcmp (name, params[i]->name)) return i;
     return -1;
   }
   virtual const char* GetParameterName (int idx) const
   {
-    CS_ASSERT (idx >= 0 && idx < params.Length ());
+    CS_ASSERT (idx >= 0 && (size_t)idx < params.Length ());
     return params[idx]->name;
   }
   virtual void AddParameter (const char* name, iBase* def_value = 0)
@@ -93,7 +93,7 @@ public:
   }
   virtual void SetParameter (int idx, iBase* value)
   {
-    CS_ASSERT (idx >= 0 && idx < params.Length ());
+    CS_ASSERT (idx >= 0 && (size_t)idx < params.Length ());
     params[idx]->value = value;
   }
   virtual void SetParameter (const char* name, iBase* value)

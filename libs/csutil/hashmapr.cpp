@@ -118,7 +118,7 @@ csHashObject csHashIteratorReversible::Next ()
 
 const char* csHashIteratorReversible::GetKey () const
 {
-  if ((bucket != 0) && (current_index > -1)
+  if ((bucket != 0) && (current_index >= 0)
   	&& (current_index <= bucket->Length())) 
     return hashr->GetKey ( ((*bucket) [current_index]) .key);
   else
@@ -145,7 +145,7 @@ csHashObject csGlobalHashIteratorReversible::Next ()
 
 const char* csGlobalHashIteratorReversible::GetKey () const
 {
-  if ((current_bucket != 0) && (current_index > -1)
+  if ((current_bucket != 0) && (current_index >= 0)
   	&& (current_index <= current_bucket->Length())) 
     return hashr->GetKey ( ((*current_bucket)
     	[current_index]) .key);

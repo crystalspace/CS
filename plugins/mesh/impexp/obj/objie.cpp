@@ -517,7 +517,7 @@ csPtr<iDataBuffer> csModelConverterOBJ::Save (iModelData *Data, const char *Form
   	CS_GET_CHILD_OBJECT (Data->QueryObject (), iModelDataObject));
   if (!obj) return 0;
   iModelDataVertices *ver = obj->GetDefaultVertices ();
-  int i;
+  size_t i;
 
   csString out;
   out << "# Created by Crystal Space.\n\n";

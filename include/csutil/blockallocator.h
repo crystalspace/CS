@@ -57,7 +57,7 @@ private:
   struct csFreeList
   {
     csFreeList* next;
-    uint32 numfree;	// Free elements in this block.
+    size_t numfree;	// Free elements in this block.
   };
 
   // A memory block (a series of 'size' objects).
@@ -82,19 +82,19 @@ private:
   };
 
   csArray<csBlock> blocks;
-  unsigned int size;		// Number of elements per block.
-  unsigned int elsize;		// Element size (bigger than 8).
-  unsigned int blocksize;	// Size in bytes per block.
+  size_t size;		// Number of elements per block.
+  size_t elsize;		// Element size (bigger than 8).
+  size_t blocksize;		// Size in bytes per block.
 
   // First block that contains a free element.
-  int firstfreeblock;
+  size_t firstfreeblock;
 
   /**
    * Find the memory block which contains the given memory.
    */
-  int FindBlock (void* m)
+  size_t FindBlock (void* m)
   {
-    int i;
+    size_t i;
     for (i = 0 ; i < blocks.Length () ; i++)
     {
       csBlock* b = &blocks[i];
@@ -105,7 +105,7 @@ private:
 	  return i;
       }
     }
-    return -1;
+    return (size_t)-1;
   }
 
   /**
@@ -145,14 +145,14 @@ public:
    * per block. Using a bigger 'size' means there is more memory
    * 'wasted' but it makes performance faster.
    */
-  csBlockAllocator (int s)
+  csBlockAllocator (size_t s)
   {
     size = s;
     elsize = sizeof (T);
     if (elsize < sizeof (csFreeList)) elsize = sizeof (csFreeList);
     blocksize = elsize * size;
 
-    int idx = blocks.Push (csBlock ());
+    size_t idx = blocks.Push (csBlock ());
     csBlock& bl = blocks[idx];
 #   ifdef CS_MEMORY_TRACKER
     char buf[255];
@@ -181,7 +181,7 @@ public:
   {
 #ifdef CS_DEBUG
     CS_ASSERT (firstfreeblock == 0);
-    int i;
+    size_t i;
     for (i = 0 ; i < blocks.Length () ; i++)
     {
       CS_ASSERT (blocks[i].firstfree == (csFreeList*)blocks[i].memory);
@@ -197,7 +197,8 @@ public:
    */
   void Compact ()
   {
-    int i = blocks.Length ()-1;
+    if (blocks.Length() == 0) return;
+    size_t i = blocks.Length ()-1;
     while (i > firstfreeblock)
     {
       if (blocks[i].firstfree == (csFreeList*)blocks[i].memory &&
@@ -245,8 +246,8 @@ public:
   {
     if (!el) return;
 
-    int idx = FindBlock ((void*)el);
-    CS_ASSERT (idx != -1);
+    size_t idx = FindBlock ((void*)el);
+    CS_ASSERT (idx != (size_t)-1);
 
     el->~T();
 

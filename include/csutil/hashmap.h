@@ -36,8 +36,23 @@ class csHashIteratorReversible;
 
 class csHashMap;
 
-/// An opaque hash key.
-typedef unsigned int csHashKey;
+#ifndef CS_PLATFORM_IS_64BITS
+# if (_MSC_VER >= 1300)
+  /*
+   * Silence VC7 64bit warning.
+   */
+  typedef unsigned int __w64 csHashKey;
+# else
+  /// An opaque hash key.
+  typedef unsigned int csHashKey;
+# endif
+#else
+  /*
+   * At some places, pointers are casted to csHashKey. Work around truncation
+   * problems by forcing csHashKey to at least 64bit on 64bit machines.
+   */
+  typedef uint64 csHashKey;
+#endif
 /// An opaque hash value.
 typedef void* csHashObject;
 
@@ -74,13 +89,13 @@ private:
   /// Const version of bucket.
   const csHashBucket* cbucket;
   /// index of next item in bucket.
-  int element_index;
+  size_t element_index;
   /// Current bucket index in hashmap.
-  unsigned int bucket_index;
+  size_t bucket_index;
   /// Current number of items in bucket.
-  unsigned int bucket_len;
+  size_t bucket_len;
   /// Number of buckets.
-  unsigned int nbuckets;
+  size_t nbuckets;
   /// Pointer to the hashmap.
   csHashMap* hash;
   /// Const version of hash.
@@ -138,11 +153,11 @@ private:
   /// Const version of bucket
   const csHashBucket* cbucket;
   /// index of next item in bucket.
-  int element_index;
+  size_t element_index;
   /// Current index in bucket.
-  int current_index;
+  size_t current_index;
   /// Current bucket index in hashmap.
-  unsigned int bucket_index;
+  size_t bucket_index;
   /// Key to iterate over.
   csHashKey key;
   /// Pointer to the hashmap.
@@ -200,24 +215,24 @@ private:
   /// the list of buckets
   csHashBucketVector Buckets;
   /// Max size of this vector.
-  unsigned int NumBuckets;
+  size_t NumBuckets;
   /// Number of elements in hash (to detect when to increase vector size).
-  int hash_elements;
+  size_t hash_elements;
 
   /// Reorganize the hashmap with a different size of buckets.
-  void ChangeBuckets (unsigned int newsize);
+  void ChangeBuckets (size_t newsize);
 
   /**
    * Put an object in the bucket vector.
    */
-  void PutInternal (unsigned int idx, csHashKey key, csHashObject object);
+  void PutInternal (size_t idx, csHashKey key, csHashObject object);
 
 
   /// Find a prime number bigger then the given input number.
-  static unsigned int FindNextPrime (unsigned int num);
+  static size_t FindNextPrime (size_t num);
 
 public:
-  static unsigned int prime_table[];
+  static size_t prime_table[];
 
   /**
    * Constructor. The parameter for the constructor
@@ -229,7 +244,7 @@ public:
    * For a bigger list go to www.utm.edu/research/primes.
    * The map will grow dynamically if needed.
    */
-  csHashMap (unsigned int size = 53);
+  csHashMap (size_t size = 53);
 
   /**
    * Destructor. The objects referenced too in this hash

@@ -129,7 +129,7 @@ class CS_CSWS_EXPORT csStatic : public csComponent
 {
 protected:
   // Character number that should be underlined (-1 == none)
-  int underline_pos;
+  size_t underline_pos;
   // Static component style
   csStaticStyle style;
   // Component to which this label is linked

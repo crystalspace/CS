@@ -434,7 +434,7 @@ void csGridBagLayout::CreateMatrix ()
   // creating cells for all added components according
   // to the info in their constraints
 
-  int i = 0;
+  size_t i = 0;
   for (; i != vConstraints.Length (); ++i)
   {
     int w = 0, h = 0;

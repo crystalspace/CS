@@ -573,7 +573,7 @@ uint32 csSoftwareTextureManager::encode_rgb (int r, int g, int b)
 
 void csSoftwareTextureManager::PrepareTextures ()
 {
-  int i;
+  size_t i;
 
   // Create mipmaps for all textures
   for (i = 0; i < textures.Length (); i++)

@@ -57,7 +57,7 @@ public:
   {
     CS_ASSERT (secondary_vertidx == 0);
     secondary_vertidx = vertidx;
-    int i;
+    size_t i;
     for (i = 0; i < polysToAdd.Length (); i++)
     {
       polys.Push (polysToAdd[i]);

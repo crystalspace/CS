@@ -61,7 +61,7 @@ private:
   };
   typedef csArray<Listener> ListenerVector;
 
-  int EventCordsFind (int cat, int subcat);
+  size_t EventCordsFind (int cat, int subcat);
 
   // Shared-object registry
   iObjectRegistry* Registry;
@@ -96,7 +96,7 @@ private:
   // Unlock the queue
   inline void Unlock () { Mutex->Release(); }
   // Find a particular listener index; return -1 if listener is not registered.
-  int FindListener (iEventHandler*) const;
+  size_t FindListener (iEventHandler*) const;
   // Send listeners of CSMASK_FrameProcess one of the frame processing
   // pseudo-events.
   void Notify (unsigned int pseudo_event);

@@ -58,7 +58,7 @@ csStatic::~csStatic ()
 void csStatic::Init (csStaticStyle iStyle)
 {
   Bitmap = 0;
-  underline_pos = -1;
+  underline_pos = (size_t)-1;
   link = 0;
   SetPalette (CSPAL_STATIC);
   style = iStyle;
@@ -219,7 +219,7 @@ void csStatic::Draw ()
 
 bool csStatic::IsHotKey (iEvent &Event)
 {
-  return ((underline_pos >= 0)
+  return ((underline_pos != (size_t)-1)
     && ((csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_CTRL) == 0)
        && (toupper (csKeyEventHelper::GetCookedCode (&Event)) == 
        toupper (text [underline_pos])));

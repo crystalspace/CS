@@ -70,7 +70,7 @@ void csShaderGLAFP::SetupState (const csRenderMesh *mesh,
 	const csShaderVarStack &stacks)
 {
   const csGLExtensionManager* ext = shaderPlug->ext;
-  int i;
+  size_t i;
 
   // set variables
   for(i = 0; i < variablemap.Length(); ++i)
@@ -200,7 +200,7 @@ bool csShaderGLAFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 
   ResolveStaticVars (staticContexts);
 
-  for (int i = 0; i < variablemap.Length ();)
+  for (size_t i = 0; i < variablemap.Length ();)
   {
     int dest;
     if (sscanf (variablemap[i].destination, "register %d", &dest) != 1)

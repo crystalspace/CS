@@ -196,11 +196,11 @@ void csEventQueue::EndLoop ()
     // We are no longer in a loop and a delete occured so here
     // we really clean up the entries in the listener array.
     delete_occured = false;
-    for (int i = Listeners.Length() - 1; i >= 0; i--)
+    for (size_t i = Listeners.Length(); i > 0; i--)
     {
-      Listener const& listener = Listeners[i];
+      Listener const& listener = Listeners[i - 1];
       if (!listener.object)
-        Listeners.DeleteIndex (i);
+        Listeners.DeleteIndex (i - 1);
     }
   }
 }
@@ -212,9 +212,9 @@ void csEventQueue::Notify (unsigned int pseudo_event)
   e->Command.Info = 0;
 
   StartLoop ();
-  for (int i = Listeners.Length() - 1; i >= 0; i--)
+  for (size_t i = Listeners.Length(); i > 0; i--)
   {
-    Listener const& listener = Listeners[i];
+    Listener const& listener = Listeners[i - 1];
     if (listener.object && (listener.trigger & CSMASK_Nothing) != 0)
       listener.object->HandleEvent (*e);
   }
@@ -242,7 +242,7 @@ void csEventQueue::Dispatch (iEvent& e)
   int const evmask = 1 << e.Type;
   bool const canstop = ((e.Flags & CSEF_BROADCAST) == 0);
   StartLoop ();
-  int i, n;
+  size_t i, n;
   for (i = 0, n = Listeners.Length(); i < n; i++)
   {
     Listener const& l = Listeners[i];
@@ -253,23 +253,24 @@ void csEventQueue::Dispatch (iEvent& e)
   EndLoop ();
 }
 
-int csEventQueue::FindListener (iEventHandler* listener) const
+size_t csEventQueue::FindListener (iEventHandler* listener) const
 {
-  int i;
-  for (i = Listeners.Length() - 1; i >= 0; i--)
+  size_t i;
+  for (i = Listeners.Length(); i > 0; i--)
   {
-    Listener const& l = Listeners[i];
+    const size_t idx = i - 1;
+    Listener const& l = Listeners[idx];
     if (l.object == listener)
-      return i;
+      return idx;
   }
-  return -1;
+  return (size_t)-1;
 }
 
 void csEventQueue::RegisterListener (iEventHandler* listener,
   unsigned int trigger)
 {
-  int const n = FindListener (listener);
-  if (n >= 0)
+  size_t const n = FindListener (listener);
+  if (n != (size_t)-1)
     Listeners[n].trigger = trigger;
   else
   {
@@ -281,8 +282,8 @@ void csEventQueue::RegisterListener (iEventHandler* listener,
 
 void csEventQueue::RemoveListener (iEventHandler* listener)
 {
-  int const n = FindListener(listener);
-  if (n >= 0)
+  size_t const n = FindListener(listener);
+  if (n != (size_t)-1)
   {
     iBase* listener = Listeners[n].object;
     // Only delete the entry in the vector if we're not in a loop.
@@ -299,16 +300,17 @@ void csEventQueue::RemoveListener (iEventHandler* listener)
 
 void csEventQueue::RemoveAllListeners ()
 {
-  for (int i = Listeners.Length() - 1; i >= 0; i--)
+  for (size_t i = Listeners.Length(); i > 0; i--)
   {
-    iBase* listener = Listeners[i].object;
+    const size_t idx = i - 1;
+    iBase* listener = Listeners[idx].object;
     if (busy_looping <= 0)
     {
-      Listeners.DeleteIndex (i);
+      Listeners.DeleteIndex (idx);
     }
     else
     {
-      Listeners[i].object = 0;
+      Listeners[idx].object = 0;
       delete_occured = true;
     }
     listener->DecRef();
@@ -319,8 +321,8 @@ void csEventQueue::RemoveAllListeners ()
 void csEventQueue::ChangeListenerTrigger (iEventHandler* l,
   unsigned int trigger)
 {
-  int const n = FindListener(l);
-  if (n >= 0)
+  size_t const n = FindListener(l);
+  if (n != (size_t)-1)
     Listeners[n].trigger = trigger;
 }
 
@@ -343,8 +345,8 @@ iEventOutlet* csEventQueue::GetEventOutlet()
 iEventCord* csEventQueue::GetEventCord (int cat, int subcat)
 {
   csEventCord* cord;
-  int const n = EventCordsFind (cat, subcat);
-  if (n >= 0)
+  size_t const n = EventCordsFind (cat, subcat);
+  if (n != (size_t)-1)
     cord = EventCords.Get(n);
   else
   {
@@ -355,14 +357,14 @@ iEventCord* csEventQueue::GetEventCord (int cat, int subcat)
   return cord;
 }
 
-int csEventQueue::EventCordsFind (int cat, int subcat)
+size_t csEventQueue::EventCordsFind (int cat, int subcat)
 {
-  int i;
+  size_t i;
   for (i = EventCords.Length() - 1; i >= 0; i--)
   {
     csEventCord *cord = EventCords[i];
     if (cat == cord->GetCategory() && subcat == cord->GetSubcategory())
       return i;
   }
-  return -1;
+  return (size_t)-1;
 }

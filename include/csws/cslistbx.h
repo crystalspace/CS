@@ -201,7 +201,7 @@ class CS_CSWS_EXPORT csListBoxItem : public csComponent
 
 public:
   /// Listbox item constructor: text item with optional style
-  csListBoxItem (csComponent *iParent, const char *iText, int iID = 0,
+  csListBoxItem (csComponent *iParent, const char *iText, ID iID = 0,
     csListBoxItemStyle iStyle = cslisNormal);
 
   /// Listbox item destructor

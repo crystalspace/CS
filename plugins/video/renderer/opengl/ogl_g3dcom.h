@@ -816,13 +816,13 @@ public:
   //========================================================================
   // All stuff below is only to be compatible with the NR api.
   //========================================================================
-  virtual csPtr<iRenderBuffer> CreateRenderBuffer (int, 
+  virtual csPtr<iRenderBuffer> CreateRenderBuffer (size_t, 
     csRenderBufferType, csRenderBufferComponentType, 
     int) { return 0; }
-  virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (int, 
+  virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (size_t, 
     csRenderBufferType, csRenderBufferComponentType, 
     size_t, size_t) { return 0; }
-  virtual void CreateInterleavedRenderBuffers (int size, 
+  virtual void CreateInterleavedRenderBuffers (size_t size, 
     csRenderBufferType type, int count, csRefArray<iRenderBuffer>& buffers) { }
   virtual void SetBufferState (csVertexAttrib*,
   	iRenderBuffer**, int count) { }

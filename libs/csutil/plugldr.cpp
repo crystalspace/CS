@@ -93,7 +93,7 @@
  */
 bool csPluginList::Sort (iObjectRegistry* object_reg)
 {
-  int row, col, len = Length ();
+  size_t row, col, len = Length ();
 
   // Build the dependency matrix
   CS_ALLOC_STACK_ARRAY (bool, matrix, len * len);
@@ -130,9 +130,9 @@ bool csPluginList::Sort (iObjectRegistry* object_reg)
 
   // Go through dependency matrix and put all plugins into an array
   bool error = false;
-  CS_ALLOC_STACK_ARRAY (int, order, len + 1);
+  CS_ALLOC_STACK_ARRAY (size_t, order, len + 1);
   *order = 0;
-  CS_ALLOC_STACK_ARRAY (int, loop, len + 1);
+  CS_ALLOC_STACK_ARRAY (size_t, loop, len + 1);
   *loop = 0;
 
   for (row = 0; row < len; row++)
@@ -150,7 +150,7 @@ bool csPluginList::Sort (iObjectRegistry* object_reg)
   return !error;
 }
 
-static int* strchr_int (int* str, int fnd)
+static size_t* strchr_int (size_t* str, size_t fnd)
 {
   while (*str != fnd)
   {
@@ -161,18 +161,18 @@ static int* strchr_int (int* str, int fnd)
 }
 
 bool csPluginList::RecurseSort (iObjectRegistry *object_reg,
-	int row, int *order, int *loop, bool *matrix)
+	size_t row, size_t* order, size_t* loop, bool *matrix)
 {
   // If the plugin is already in the load list, skip it
   if (strchr_int (order, row + 1))
     return true;
 
-  int len = Length ();
+  size_t len = Length ();
   bool *dep = matrix + row * len;
   bool error = false;
-  int *loopp = strchr_int (loop, 0);
+  size_t* loopp = strchr_int (loop, 0);
   *loopp++ = row + 1; *loopp = 0;
-  int col, x;
+  size_t col, x;
   for (col = 0; col < len; col++)
     if (*dep++)
     {
@@ -180,13 +180,13 @@ bool csPluginList::RecurseSort (iObjectRegistry *object_reg,
       if (strchr_int (order, col + 1))
         continue;
 
-      int *already = strchr_int (loop, col + 1);
+      size_t* already = strchr_int (loop, col + 1);
       if (already)
       {
 	csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
 	    "crystalspace.pluginloader.recursesort",
 	    "Cyclic dependency detected!");
-        int startx = int (already - loop);
+        size_t startx = already - loop;
         for (x = startx; loop [x]; x++)
 	{
 	  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -212,7 +212,7 @@ bool csPluginList::RecurseSort (iObjectRegistry *object_reg,
     }
 
   // Put current plugin into the list
-  int *orderp = strchr_int (order, 0);
+  size_t* orderp = strchr_int (order, 0);
   *orderp++ = row + 1; *orderp = 0;
 
   return !error;
@@ -270,7 +270,7 @@ bool csPluginLoader::LoadPlugins ()
   }
 
   // Eat all --plugin switches specified on the command line
-  int n = 0;
+  size_t n = 0;
   while ((val = CommandLine->GetOption ("plugin", n++)))
   {
     size_t sl = strlen (val);
@@ -316,11 +316,11 @@ bool csPluginLoader::LoadPlugins ()
 
   // Check all requested plugins and see if there is already
   // a plugin with that tag present. If not we add it.
-  int i;
+  size_t i;
   for (i = 0 ; i < requested_plugins.Length () ; i++)
   {
     csPluginLoadRec* req_plugin = requested_plugins.Get (i);
-    int j;
+    size_t j;
     bool present = false;
     for (j = 0 ; j < PluginList.Length () ; j++)
     {

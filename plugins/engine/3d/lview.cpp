@@ -233,7 +233,8 @@ const csBox3& csShadowBlock::GetBoundingBox ()
   if (!bbox_valid)
   {
     bbox.StartBoundingBox ();
-    int i, j;
+    size_t i;
+    int j;
     for (i = 0 ; i < shadows.Length () ; i++)
     {
       csShadowFrustum *sf = shadows[i];

@@ -95,7 +95,7 @@ void WS_NAME (iFont *font, int pen_x, int pen_y,
   WS_PREPARE_ALPHABLEND(fg, bg)
 #endif
 
-  int textLen = strlen ((char*)text);
+  size_t textLen = strlen ((char*)text);
   int charW, charH, advance = 0;
   bool firstchar = true;
   while (textLen > 0)

@@ -61,7 +61,7 @@ void csSnowMeshObject::SetupObject ()
     radius = qsqrt (a*a + a*a);
 
     csVector3 pos;
-	int i;
+    size_t i;
     for (i=0 ; i < number ; i++)
     {
       AppendRectSprite (drop_width, drop_height, mat, lighted_particles);
@@ -105,7 +105,7 @@ void csSnowMeshObject::Update (csTicks elapsed_time)
   float delta_t = elapsed_time / 1000.0f; // in seconds
   // move particles;
   csVector3 move, pos;
-  int i;
+  size_t i;
   for (i=0 ; i < particles.Length () ; i++)
   {
     move = rain_dir * delta_t;

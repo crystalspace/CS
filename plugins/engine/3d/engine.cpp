@@ -1149,8 +1149,8 @@ void csEngine::RegisterRenderPriority (
 
   // If our priority goes over the number of defined priorities
   // then we have to initialize.
-  int old_pri_len = render_priorities.Length ();
-  if (priority + 1 >= render_priority_sortflags.Length ())
+  size_t old_pri_len = render_priorities.Length ();
+  if ((size_t)(priority + 1) >= render_priority_sortflags.Length ())
   {
     render_priority_sortflags.SetLength (priority + 2);
     render_priorities.SetLength (priority+2);
@@ -1180,11 +1180,11 @@ void csEngine::UpdateStandardRenderPriorities ()
 
 long csEngine::GetRenderPriority (const char *name) const
 {
-  int i;
+  size_t i;
   for (i = 0; i < render_priorities.Length (); i++)
   {
     const char *n = render_priorities[i];
-    if (n && !strcmp (name, n)) return i;
+    if (n && !strcmp (name, n)) return (long)i;
   }
 
   return 0;
@@ -1192,7 +1192,7 @@ long csEngine::GetRenderPriority (const char *name) const
 
 int csEngine::GetRenderPrioritySorting (const char *name) const
 {
-  int i;
+  size_t i;
   for (i = 0; i < render_priorities.Length (); i++)
   {
     const char *n = render_priorities[i];
@@ -1226,7 +1226,8 @@ int csEngine::GetRenderPriorityCount () const
 
 const char* csEngine::GetRenderPriorityName (long priority) const
 {
-  if (priority < 0 && priority >= render_priorities.Length ()) return 0;
+  if (priority < 0 && (size_t)priority >= render_priorities.Length ()) 
+    return 0;
   return render_priorities[priority];
 }
 
@@ -1252,7 +1253,7 @@ void csEngine::ResetWorldSpecificSettings()
 
 void csEngine::PrepareTextures ()
 {
-  int i;
+  size_t i;
 
   iTextureManager *txtmgr = G3D->GetTextureManager ();
 
@@ -1957,7 +1958,7 @@ void csEngine::AddHalo (iCamera* camera, csLight *Light)
 
 void csEngine::RemoveHalo (csLight *Light)
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < halos.Length () ; i++)
   {
     csLightHalo* lh = halos[i];
@@ -2545,7 +2546,7 @@ void csEngine::GetNearbyObjectList (iSector* sector,
               CS_ASSERT (portal != 0);
               if (sector != portal->GetSector () && portal->GetSector ())
               {
-                int l;
+                size_t l;
                 bool already_visited = false;
                 for (l = 0 ; l < visited_sectors.Length () ; l++)
                 {
@@ -2659,7 +2660,7 @@ void csEngine::GetNearbyMeshList (iSector* sector,
               CS_ASSERT (portal != 0);
               if (sector != portal->GetSector () && portal->GetSector ())
               {
-                int l;
+                size_t l;
                 bool already_visited = false;
                 for (l = 0 ; l < visited_sectors.Length () ; l++)
                 {

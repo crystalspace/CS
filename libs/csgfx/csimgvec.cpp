@@ -38,7 +38,7 @@ void csImageVector::AddImage(iImage* img)
   image.Push (img);
 }
 
-void csImageVector::InsertImage(iImage* img, int index)
+void csImageVector::InsertImage(iImage* img, size_t index)
 {
   image.Insert (index, img);
 }
@@ -48,23 +48,23 @@ void csImageVector::operator += (iImage* img)
   image.Push (img);
 }
 
-csRef<iImage> csImageVector::GetImage(int index)
+csRef<iImage> csImageVector::GetImage(size_t index)
 {
   csRef<iImage> r = image[index];
   return r;
 }
 
-void csImageVector::SetImage (int index, iImage* img)
+void csImageVector::SetImage (size_t index, iImage* img)
 {
   image.Put (index, img);
 }
 
-int csImageVector::Length()
+size_t csImageVector::Length()
 {
   return image.Length();
 }
 
-void csImageVector::DeleteIndex(int index)
+void csImageVector::DeleteIndex(size_t index)
 {
   image.DeleteIndex (index);
 }

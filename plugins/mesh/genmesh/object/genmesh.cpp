@@ -549,7 +549,7 @@ void csGenmeshMeshObject::SetupObject ()
     sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::color_name);
     sv->SetAccessor (scfiShaderVariableAccessor);
 
-    for(int i=0;i<factory->GetAnonymousNames().Length();i++)
+    for(size_t i=0;i<factory->GetAnonymousNames().Length();i++)
     {
       sv = svcontext->GetVariableAdd (factory->GetAnonymousNames().Get(i));
       sv->SetAccessor (factory->scfiShaderVariableAccessor);
@@ -1046,7 +1046,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     }
     const csDirtyAccessArray<int>& triidx = back2front_tree->Back2Front (
     	tr_o2c.GetOrigin ());
-    CS_ASSERT (triidx.Length () == num_sorted_mesh_triangles);
+    CS_ASSERT (triidx.Length () == (size_t)num_sorted_mesh_triangles);
 
     csTriangle* factory_triangles = factory->GetTriangles ();
     int i;
@@ -1211,8 +1211,8 @@ void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
       if (!do_manual_colors)
       {
         if (!color_buffer || 
-            (color_buffer->GetSize() != 
-	    (int)(sizeof (csColor) * num_lit_mesh_colors)))
+            (color_buffer->GetSize() != (sizeof (csColor) * 
+	    num_lit_mesh_colors)))
         {
           // Recreate the render buffer only if the new data cannot fit inside
           //  the existing buffer.
@@ -1229,8 +1229,8 @@ void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
       else
       {
         if (!color_buffer || 
-            (color_buffer->GetSize() != 
-	    (int)(sizeof (csColor) * factory->GetVertexCount())))
+            (color_buffer->GetSize() != (sizeof (csColor) * 
+	    factory->GetVertexCount())))
         {
           // Recreate the render buffer only if the new data cannot fit inside
           //  the existing buffer.
@@ -1935,7 +1935,8 @@ bool csGenmeshMeshObjectFactory::CompressVertices (
 
 void csGenmeshMeshObjectFactory::CalculateNormals ()
 {
-  int i, j;
+  int i;
+  size_t j;
 
 #ifndef CS_USE_NEW_RENDERER
   int num_triangles = top_mesh.num_triangles;

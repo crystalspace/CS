@@ -184,9 +184,9 @@ public:
     address->~T();
   }
 
-  static void InitRegion (T* address, int count)
+  static void InitRegion (T* address, size_t count)
   {
-    for (int i = 0 ; i < count ; i++)
+    for (size_t i = 0 ; i < count ; i++)
       Construct (address + i, T ());
   }
 };
@@ -198,7 +198,7 @@ template <class T>
 class csArrayMemoryAllocator
 {
 public:
-  static T* Alloc (int count)
+  static T* Alloc (size_t count)
   {
     return (T*)malloc (count * sizeof(T));
   }
@@ -210,7 +210,8 @@ public:
 
   // The 'relevantcount' parameter should be the number of items
   // in the old array that are initialized.
-  static T* Realloc (T* mem, int relevantcount, int oldcount, int newcount)
+  static T* Realloc (T* mem, size_t relevantcount, size_t oldcount, 
+    size_t newcount)
   {
     (void)relevantcount; (void)oldcount;
     return (T*)realloc (mem, newcount * sizeof(T));
@@ -229,7 +230,7 @@ template <class T, class ElementHandler = csArrayElementHandler<T> >
 class csSafeCopyArrayMemoryAllocator
 {
 public:
-  static T* Alloc (int count)
+  static T* Alloc (size_t count)
   {
     return (T*)malloc (count * sizeof(T));
   }
@@ -239,7 +240,8 @@ public:
     free (mem);
   }
 
-  static T* Realloc (T* mem, int relevantcount, int oldcount, int newcount)
+  static T* Realloc (T* mem, size_t relevantcount, size_t oldcount, 
+    size_t newcount)
   {
     if (newcount <= oldcount)
     {
@@ -250,7 +252,7 @@ public:
     }
 
     T* newmem = Alloc (newcount);
-    int i;
+    size_t i;
     for (i = 0 ; i < relevantcount ; i++)
     {
       ElementHandler::Construct (newmem + i, mem[i]);
@@ -261,6 +263,11 @@ public:
   }
 };
 
+/**
+ * This value is returned whenever an array item could not be located or does
+ * not exist.
+ */
+const size_t csArrayItemNotFound = (size_t)-1;
 
 /**
  * A templated array class.  The objects in this class are constructed via
@@ -275,9 +282,9 @@ template <class T,
 class csArray
 {
 private:
-  int count;
-  int capacity;
-  int threshold;
+  size_t count;
+  size_t capacity;
+  size_t threshold;
   T* root;
 # ifdef CS_MEMORY_TRACKER
   MemTrackerInfo* mti;
@@ -304,7 +311,7 @@ protected:
    * Initialize a region. This is a dangerous function to use because it
    * does not properly destruct the items in the array.
    */
-  void InitRegion (int start, int count)
+  void InitRegion (size_t start, size_t count)
   {
     ElementHandler::InitRegion (root+start, count);
   }
@@ -318,13 +325,13 @@ private:
       DeleteAll ();
       threshold = source.threshold;
       SetLengthUnsafe (source.Length ());
-      for (int i=0 ; i<source.Length() ; i++)
+      for (size_t i=0 ; i<source.Length() ; i++)
         ElementHandler::Construct (root + i, source[i]);
     }
   }
 
   // Adjust internal capacity of this array.
-  void AdjustCapacity (int n)
+  void AdjustCapacity (size_t n)
   {
     if (n > capacity || (capacity > threshold && n < capacity - threshold))
     {
@@ -350,7 +357,7 @@ private:
   // Set array length.  NOTE: Do not make this public since it does not
   // properly construct/destroy elements.  To safely truncate the array, use
   // Truncate().  To safely set the capacity, use SetCapacity().
-  void SetLengthUnsafe (int n)
+  void SetLengthUnsafe (size_t n)
   {
     if (n > capacity)
       AdjustCapacity (n);
@@ -378,7 +385,7 @@ public:
    * Initialize object to have initial capacity of 'icapacity' elements, and to
    * increase storage by 'ithreshold' each time the upper bound is exceeded.
    */
-  csArray (int icapacity = 0, int ithreshold = 0)
+  csArray (size_t icapacity = 0, size_t ithreshold = 0)
   {
 #   ifdef CS_MEMORY_TRACKER
     mti = 0;
@@ -424,13 +431,13 @@ public:
   }
 
   /// Return the number of elements in the Array
-  int Length () const
+  size_t Length () const
   {
     return count;
   }
 
   /// Query vector capacity.  Note that you should rarely need to do this.
-  int Capacity () const
+  size_t Capacity () const
   {
     return capacity;
   }
@@ -466,7 +473,7 @@ public:
    * it will properly set the new capacity and construct all new items
    * based on the given item.
    */
-  void SetLength (int n, T const& what)
+  void SetLength (size_t n, T const& what)
   {
     if (n <= count)
     {
@@ -474,15 +481,15 @@ public:
     }
     else
     {
-      int old_len = Length ();
+      size_t old_len = Length ();
       SetLengthUnsafe (n);
-      for (int i = old_len ; i < n ; i++)
+      for (size_t i = old_len ; i < n ; i++)
         ElementHandler::Construct (root + i, what);
     }
   }
 
-  /// Set vector length to n.
-  void SetLength (int n)
+  /// Set array length to n.
+  void SetLength (size_t n)
   {
     if (n <= count)
     {
@@ -490,21 +497,21 @@ public:
     }
     else
     {
-      int old_len = Length ();
+      size_t old_len = Length ();
       SetLengthUnsafe (n);
       ElementHandler::InitRegion (root + old_len, n-old_len);
     }
   }
 
   /// Get an element (non-const).
-  T& Get (int n)
+  T& Get (size_t n)
   {
     CS_ASSERT (n >= 0 && n < count);
     return root[n];
   }
 
   /// Get an element (const).
-  T const& Get (int n) const
+  T const& Get (size_t n) const
   {
     CS_ASSERT (n >= 0 && n < count);
     return root[n];
@@ -514,7 +521,7 @@ public:
    * Get an item from the array. If the number of elements in this
    * array is too small the array will be automatically extended.
    */
-  T& GetExtend (int n)
+  T& GetExtend (size_t n)
   {
     CS_ASSERT (n >= 0);
     if (n >= count)
@@ -523,19 +530,19 @@ public:
   }
 
   /// Get an element (non-const).
-  T& operator [] (int n)
+  T& operator [] (size_t n)
   {
     return Get(n);
   }
 
   /// Get a const reference.
-  T const& operator [] (int n) const
+  T const& operator [] (size_t n) const
   {
     return Get(n);
   }
 
   /// Put an element at some position.
-  void Put (int n, T const& what)
+  void Put (size_t n, T const& what)
   {
     CS_ASSERT (n >= 0);
     if (n >= count)
@@ -548,16 +555,16 @@ public:
    * Find an element based on some key.
    */
   csArrayTemplate(K)
-  int FindKey (csArrayCmpDecl(T,K) comparekey) const
+  size_t FindKey (csArrayCmpDecl(T,K) comparekey) const
   {
-    for (int i = 0 ; i < Length () ; i++)
+    for (size_t i = 0 ; i < Length () ; i++)
       if (csArrayCmpInvoke(comparekey, root[i]) == 0)
         return i;
-    return -1;
+    return csArrayItemNotFound;
   }
 
   /// Push an element onto the tail end of the array. Returns index of element.
-  int Push (T const& what)
+  size_t Push (T const& what)
   {
     if (((&what >= root) && (&what < root + Length())) && 
       (capacity < count + 1))
@@ -568,7 +575,7 @@ public:
 	element to be pushed to be read from deleted memory. Work
 	around this.
        */
-      int whatIndex = &what - root;
+      size_t whatIndex = &what - root;
       SetLengthUnsafe (count + 1);
       ElementHandler::Construct (root + count - 1, root[whatIndex]);
     }
@@ -584,10 +591,10 @@ public:
    * Push a element onto the tail end of the array if not already present.
    * Returns index of newly pushed element or index of already present element.
    */
-  int PushSmart (T const& what)
+  size_t PushSmart (T const& what)
   {
-    int const n = Find (what);
-    return (n < 0) ? Push (what) : n;
+    size_t const n = Find (what);
+    return (n == csArrayItemNotFound) ? Push (what) : n;
   }
 
   /// Pop an element from tail end of array.
@@ -615,12 +622,12 @@ public:
   }
 
   /// Insert element 'item' before element 'n'.
-  bool Insert (int n, T const& item)
+  bool Insert (size_t n, T const& item)
   {
     if (n <= count)
     {
       SetLengthUnsafe (count + 1); // Increments 'count' as a side-effect.
-      int const nmove = (count - n - 1);
+      size_t const nmove = (count - n - 1);
       if (nmove > 0)
         memmove (root + n + 1, root + n, nmove * sizeof(T));
       ElementHandler::Construct (root + n, item);
@@ -633,50 +640,51 @@ public:
   /**
    * Get the portion of the array between low and high inclusive
    */
-  csArray<T> Section (int low, int high) const
+  csArray<T> Section (size_t low, size_t high) const
   {
     CS_ASSERT (low >= 0 && high < count && high >= low);
     csArray<T> sect (high - low + 1);
-    for (int i = low; i <= high; i++) sect.Push (root[i]);
+    for (size_t i = low; i <= high; i++) sect.Push (root[i]);
     return sect;
   }
 
   /**
    * Find an element based on some key, using a comparison function.
-   * The array must be sorted. Returns -1 if element does not exist.
+   * The array must be sorted. Returns csArrayItemNotFound if element does 
+   * not exist.
    */
   csArrayTemplate(K)
-  int FindSortedKey (csArrayCmpDecl(T,K) comparekey, int* candidate = 0) const
+  size_t FindSortedKey (csArrayCmpDecl(T,K) comparekey, size_t* candidate = 0) const
   {
-    int m = 0, l = 0, r = Length () - 1;
-    while (l <= r)
+    size_t m = 0, l = 0, r = Length ();
+    while (l < r)
     {
       m = (l + r) / 2;
       int cmp = csArrayCmpInvoke(comparekey, root[m]);
       if (cmp == 0)
       {
-        if (candidate) *candidate = -1;
+        if (candidate) *candidate = csArrayItemNotFound;
         return m;
       }
       else if (cmp < 0)
         l = m + 1;
       else
-        r = m - 1;
+        r = m;
     }
     if (candidate) *candidate = m;
-    return -1;
+    return csArrayItemNotFound;
   }
 
   /**
    * Insert an element at a sorted position, using an element comparison
    * function.  Assumes array is already sorted.
    */
-  int InsertSorted (const T& item,
+  size_t InsertSorted (const T& item,
     int (*compare)(T const&, T const&) = DefaultCompare,
-    int* equal_index = 0)
+    size_t* equal_index = 0)
   {
-    int m = 0, l = 0, r = Length () - 1;
-    while (l <= r)
+    size_t m = 0, l = 0, r = Length ();
+    while (l < r)
     {
       m = (l + r) / 2;
       int cmp = compare (root [m], item);
@@ -690,22 +698,27 @@ public:
       else if (cmp < 0)
         l = m + 1;
       else
-        r = m - 1;
+        r = m;
     }
-    if (r == m)
+    //if (m == r)
+    //  m++;
+    if ((m + 1) == r)
       m++;
-    if (equal_index) *equal_index = -1;
+    if (equal_index) *equal_index = csArrayItemNotFound;
     Insert (m, item);
     return m;
   }
 
-  /// Find a element in array and return its index (or -1 if not found).
-  int Find (T const& which) const
+  /**
+   * Find a element in array and return its index (or csArrayItemNotFound 
+   * if not found).
+   */
+  size_t Find (T const& which) const
   {
-    for (int i = 0 ; i < Length () ; i++)
+    for (size_t i = 0 ; i < Length () ; i++)
       if (root[i] == which)
         return i;
-    return -1;
+    return csArrayItemNotFound;
   }
 
   /**
@@ -714,8 +727,10 @@ public:
    * index is actually valid. The caller of this function is responsible
    * for testing if the returned index is within the bounds of the array.
    */
-  int GetIndex (const T* which) const
+  size_t GetIndex (const T* which) const
   {
+    CS_ASSERT (which >= root);
+    CS_ASSERT (which < (root + count));
     return which-root;
   }
 
@@ -735,7 +750,7 @@ public:
   {
     if (root)
     {
-      int i;
+      size_t i;
       for (i = 0 ; i < count ; i++)
         ElementHandler::Destroy (root + i);
       MemoryAllocator::Free (root);
@@ -752,13 +767,13 @@ public:
    * elements cannot exceed the current number of elements. Use SetLength()
    * for a more general way to enlarge the array.
    */
-  void Truncate (int n)
+  void Truncate (size_t n)
   {
     CS_ASSERT(n >= 0);
     CS_ASSERT(n <= count);
     if (n < count)
     {
-      for (int i = n; i < count; i++)
+      for (size_t i = n; i < count; i++)
         ElementHandler::Destroy (root + i);
       SetLengthUnsafe(n);
     }
@@ -780,7 +795,7 @@ public:
    * Truncate() or SetLength() if you need to adjust the number of actual
    * array elements.
    */
-  void SetCapacity (int n)
+  void SetCapacity (size_t n)
   {
     if (n > Length ())
       AdjustCapacity (n);
@@ -808,12 +823,12 @@ public:
   }
 
   /// Delete element number 'n' from vector.
-  bool DeleteIndex (int n)
+  bool DeleteIndex (size_t n)
   {
     if (n >= 0 && n < count)
     {
-      int const ncount = count - 1;
-      int const nmove = ncount - n;
+      size_t const ncount = count - 1;
+      size_t const nmove = ncount - n;
       ElementHandler::Destroy (root + n);
       if (nmove > 0)
         memmove (root + n, root + n + 1, nmove * sizeof(T));
@@ -828,19 +843,19 @@ public:
    * Delete a given range (inclusive). This routine will clamp start and end
    * to the size of the array.
    */
-  void DeleteRange (int start, int end)
+  void DeleteRange (size_t start, size_t end)
   {
     if (start >= count) return;
     if (end < 0) return;
     if (start < 0) start = 0;
     if (end >= count) end = count-1;
-    int i;
+    size_t i;
     for (i = start ; i < end ; i++)
       ElementHandler::Destroy (root + i);
 
-    int const range_size = end-start+1;
-    int const ncount = count - range_size;
-    int const nmove = count - end - 1;
+    size_t const range_size = end-start+1;
+    size_t const ncount = count - range_size;
+    size_t const nmove = count - end - 1;
     if (nmove > 0)
       memmove (root + start, root + start + range_size, nmove * sizeof(T));
     SetLengthUnsafe (ncount);
@@ -849,8 +864,8 @@ public:
   /// Delete the given element from vector.
   bool Delete (T const& item)
   {
-    int const n = Find (item);
-    if (n >= 0)
+    size_t const n = Find (item);
+    if (n != csArrayItemNotFound)
       return DeleteIndex (n);
     return false;
   }
@@ -885,7 +900,7 @@ public:
     friend class csArray<T, ElementHandler>;
     
   private:
-    int currentelem;
+    size_t currentelem;
     const csArray<T, ElementHandler>& array;
   };
 
@@ -910,7 +925,7 @@ public:
    * Initialize object to hold initially 'ilimit' elements, and increase
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
-  csSafeCopyArray (int ilimit = 0, int ithreshold = 0)
+  csSafeCopyArray (size_t ilimit = 0, size_t ithreshold = 0)
   	: csArray<T, csArrayElementHandler<T>,
 		     csSafeCopyArrayMemoryAllocator<T> > (ilimit, ithreshold)
   {

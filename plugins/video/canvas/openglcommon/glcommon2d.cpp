@@ -756,7 +756,7 @@ bool csGraphics2DGLCommon::DebugCommand (const char* cmdstr)
     ((csGLFontCache*)fontCache)->DumpFontCache (images);
 
     csString outfn;
-    for (int i = 0; i < images.Length(); i++)
+    for (size_t i = 0; i < images.Length(); i++)
     {
       csRef<iDataBuffer> buf = imgsaver->Save (images[i], "image/png");
       if (!buf)

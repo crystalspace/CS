@@ -437,9 +437,9 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
       color_buffer->SetStride (sizeof(i_vertex));
 
       unsigned int *indices = new unsigned int[buffer_length];
-      for (int i = 0; i < buffer_length; i++)
+      for (size_t i = 0; i < buffer_length; i++)
       {
-        indices[i] = i;
+        indices[i] = (uint)i;
       }
       index_buffer = pFactory->g3d->CreateIndexRenderBuffer (
         sizeof (unsigned int) * buffer_length, CS_BUF_STATIC,
@@ -577,7 +577,7 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview,
   int vertnum = 0;
   float new_radius = 0.0f;
 
-  int i;
+  size_t i;
   for (i=0 ; i<point_data->Length () ; i++)
   {
     const csParticlesData &point = point_data->Get(i);

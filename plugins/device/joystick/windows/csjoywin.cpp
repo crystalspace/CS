@@ -83,7 +83,7 @@ bool csWindowsJoystick::HandleEvent (iEvent &)
 {
   HRESULT hr;
   int nstate, last_state;
-  for (int i = 0; i < joystick.Length (); i++)
+  for (size_t i = 0; i < joystick.Length (); i++)
   {
     joystick[i].device->Poll ();
     nstate = joystick[i].nstate;
@@ -179,7 +179,7 @@ bool csWindowsJoystick::Init ()
     // Only enum attached Joysticks, get Details of Devices
     lpdin->EnumDevices (DIDEVTYPE_JOYSTICK, &DIEnumDevicesCallback,
       (LPVOID)this,  DIEDFL_ATTACHEDONLY);
-    int i;
+    size_t i;
     for (i = 0; i < joystick.Length (); i++) 
     {
       DIDEVICEINSTANCEA devInfo;
@@ -242,7 +242,7 @@ bool csWindowsJoystick::Close ()
     eq = 0;
   }
   EventOutlet = 0;
-  for (int i = 0; i < joystick.Length (); i++)
+  for (size_t i = 0; i < joystick.Length (); i++)
   {  
     joystick[i].device->Unacquire ();
     joystick[i].device->Release ();

@@ -54,7 +54,7 @@ public:
   ///
   csTriangle& GetTriangle (int i) { return triangles[i]; }
   /// Query the number of triangles.
-  int GetTriangleCount () const { return triangles.Length (); }
+  size_t GetTriangleCount () const { return triangles.Length (); }
 
   /// Clear the mesh of triangles.
   void Clear ();
@@ -78,7 +78,7 @@ public:
   int idx;
 
   /// Triangles that this vertex is connected to.
-  csArray<int> con_triangles;
+  csArray<size_t> con_triangles;
 
   /// Other vertices that this vertex is connected to.
   csArray<int> con_vertices;
@@ -88,7 +88,7 @@ public:
   ///
   ~csTriangleVertex () { }
   ///
-  void AddTriangle (int idx);
+  void AddTriangle (size_t idx);
   ///
   void AddVertex (int idx);
 };

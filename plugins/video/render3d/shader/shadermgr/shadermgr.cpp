@@ -237,7 +237,7 @@ void csShaderManager::RegisterShader (iShader* shader)
 
 iShader* csShaderManager::GetShader(const char* name)
 {
-  int i;
+  size_t i;
   for (i = 0; i < shaders.Length(); ++i)
   {
     iShader* shader = shaders.Get(i);
@@ -254,7 +254,7 @@ void csShaderManager::RegisterCompiler(iShaderCompiler* compiler)
 
 iShaderCompiler* csShaderManager::GetCompiler(const char* name)
 {
-  int i;
+  size_t i;
   for (i = 0; i < compilers.Length(); ++i)
   {
     iShaderCompiler* compiler = compilers.Get(i);

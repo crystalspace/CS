@@ -158,8 +158,8 @@ csSparseGrid::csGridRow::csGridRow (int theCol)
 
 void csSparseGrid::csGridRow::SetAt (int col, void* data)
 {
-  int key = FindSortedKey (KeyCmp(col));
-  if (key == -1 && data)
+  size_t key = FindSortedKey (KeyCmp(col));
+  if (key == (size_t)-1 && data)
     key = InsertSorted (new csGridRowEntry(col, data), Compare);
   else
     if (data)
@@ -362,7 +362,8 @@ void csGridView::PlaceItems ()
   // (exact would be the minimum of cells in a row in the visible area)
   csArray<csRegionTree2D*> vRegionList;
   csRect rc;
-  int i = 0, w1 = 0, w2 = 0;
+  size_t i = 0;
+  int w1 = 0, w2 = 0;
   int nRowCells = 0, nColCells = 0;
   csRegionTree2D *r;
 
@@ -450,7 +451,7 @@ static bool DrawCellComponents (csComponent *child, void *param)
 
 void csGridView::CooAt (int theX, int theY, int &theRow, int &theCol)
 {
-  int y = 0, x, n, c;
+  int y = 0, x, c;
   int actRow = row;
   int actCol = col;
   csRect rc;
@@ -464,7 +465,7 @@ void csGridView::CooAt (int theX, int theY, int &theRow, int &theCol)
   rc.Set (actCol, actRow, actCol+1, area.ymax);
   vRegions.DeleteAll ();
   pGrid->regions->FindRegion (rc, vRegions);
-  n = 0;
+  size_t n = 0;
   c = actRow;
   while (y < bound.Height () && y < theY && n < vRegions.Length ())
   {
@@ -511,7 +512,8 @@ void csGridView::Draw ()
   if (fPlaceItems)
     PlaceItems ();
 
-  int y = GRIDVIEW_BORDER_SIZE, x, n;
+  int y = GRIDVIEW_BORDER_SIZE, x;
+  size_t n;
   int c, actRow = row;
   csRect rc;
   csRegionTree2D *r;
@@ -737,7 +739,7 @@ void csGrid::init (csComponent *pParent, csRect &rc, int iStyle, csGridCell *gc)
 
 csGrid::~csGrid ()
 {
-  int i, j;
+  size_t i, j;
 
   for (i = 0; i < grid->rows.Length (); i++)
   {

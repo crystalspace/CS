@@ -763,7 +763,8 @@ void awsNotebookButtonBar::SetTopBottom (bool to_top)
 
 void awsNotebookButtonBar::DoLayout ()
 {
-  int i, x=0;
+  size_t i;
+  int x=0;
   csRect r = Frame ();
   csRect cr = Parent ()->Frame ();
 
@@ -930,24 +931,25 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
 
 bool awsNotebookButtonBar::Remove (iAwsComponent *comp)
 {
-  int idx = vTabs.Find ((awsNotebookButtonBar::tabEntry*)comp);
+  size_t idx = vTabs.Find ((awsNotebookButtonBar::tabEntry*)comp);
 
-  if (idx!=-1)
+  if (idx != csArrayItemNotFound)
   {
-    if (idx == active)
-      if (vTabs.Length () -1 == active)
+    if (idx == (size_t)active)
+      if (vTabs.Length () - 1 == (size_t)active)
         Activate (active-1);
       else
         Activate (active+1);
 
     vTabs.Get (first)->button->SetFirst (false);
-    if ((idx < first) || (idx == first && (first > 0 || vTabs.Length () < 2)))
+    if ((idx < (size_t)first) || (idx == (size_t)first && 
+      (first > 0 || vTabs.Length () < 2)))
       first--;
 
     if (first > -1)
       vTabs.Get (first)->button->SetFirst (true);
 
-    if (idx < active)
+    if (idx < (size_t)active)
       active--;
 
     vTabs.FreeItem (vTabs[idx]);
@@ -994,11 +996,11 @@ void awsNotebookButtonBar::OnDraw (csRect)
 
 void awsNotebookButtonBar::ScrollLeft ()
 {
-  if (vTabs.Length () && first != vTabs.Length ()-1)
+  if (vTabs.Length () && (size_t)first != vTabs.Length ()-1)
   {
     int xdelta = vTabs.Get (first)->button->Frame ().Width ()+1;
     vTabs.Get (first)->button->SetFirst (false);
-    for (int i=0; i < vTabs.Length (); i++)
+    for (size_t i = 0; i < vTabs.Length (); i++)
     {
       awsNotebookButton *btn = vTabs.Get (i)->button;
       csRect f = btn->Frame ();
@@ -1019,7 +1021,7 @@ void awsNotebookButtonBar::ScrollRight ()
   {
     int xdelta = vTabs.Get (first-1)->button->Frame ().Width ()+1;
     vTabs.Get (first)->button->SetFirst (false);
-    for (int i=0; i < vTabs.Length (); i++)
+    for (size_t i=0; i < vTabs.Length (); i++)
     {
       awsNotebookButton *btn = vTabs.Get (i)->button;
       csRect f = btn->Frame ();

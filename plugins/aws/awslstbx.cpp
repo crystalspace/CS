@@ -327,7 +327,7 @@ void awsListBox::UpdateMap ()
 
 int awsListBox::CountVisibleItems (awsListRowVector *v)
 {
-  int i;
+  size_t i;
   int count = 0;
   for (i = 0; i < v->Length (); ++i)
   {
@@ -348,7 +348,7 @@ void awsListBox::MapVisibleItems (
   int &start,
   awsListRow **map)
 {
-  int i;
+  size_t i;
   for (i = 0; i < v->Length (); ++i)
   {
     awsListRow *r = (awsListRow *) ((*v)[i]);
@@ -373,8 +373,8 @@ static int DoFindItem (awsListRowVector *v, iString *text, bool with_delete)
   }
   else
   {
-    int j;
-    for (i = 0; i < v->Length (); ++i)
+    size_t j;
+    for (i = 0; i < (int)v->Length (); ++i)
     {
       awsListRow *r = (awsListRow *) ((*v)[i]);
       if (r->children &&
@@ -392,7 +392,7 @@ static int DoFindItem (awsListRowVector *v, iString *text, bool with_delete)
 
 static void DoRecursiveClearList (awsListRowVector *v)
 {
-  int i;
+  size_t i;
 
   for (i = 0; i < v->Length (); ++i)
   {
@@ -510,17 +510,17 @@ void awsListBox::DeleteItem (void *owner, iAwsParmList* parmlist)
   if (i == selidx && selidx > -1)
   {
     int startidx=selidx;
-    while (selidx < lb->rows.Length () && !((awsListRow*)lb->rows[selidx])->selectable)
+    while (selidx < (int)lb->rows.Length () && !((awsListRow*)lb->rows[selidx])->selectable)
       selidx++;
 
-    if (selidx >= lb->rows.Length ())
+    if (selidx >= (int)lb->rows.Length ())
     {
-      selidx = MIN (startidx, lb->rows.Length ()-1);
+      selidx = MIN (startidx, (int)lb->rows.Length ()-1);
       while (selidx >= 0 && !((awsListRow*)lb->rows[selidx])->selectable)
         selidx--;
     }
 
-    if (selidx > -1 && selidx < lb->rows.Length ())
+    if (selidx > -1 && (size_t)selidx < lb->rows.Length ())
     {
       lb->sel = (awsListRow*) lb->rows[selidx];
       lb->Broadcast (awsListBox::signalSelected);
@@ -551,7 +551,7 @@ void awsListBox::GetItem (void *owner, iAwsParmList* parmlist)
   
   awsListBox *lb = (awsListBox *)owner;
   int row=-1;
-  if (parmlist->GetInt ("row", &row) && row >= -1 && row < lb->rows.Length ())
+  if (parmlist->GetInt ("row", &row) && row >= -1 && (size_t)row < lb->rows.Length ())
     parmlist->AddBool ("success", lb->GetItems ((awsListRow*)lb->rows[row], parmlist));
   else
     parmlist->AddBool ("success", false);
@@ -691,7 +691,7 @@ bool awsListBox::RecursiveClearPeers (awsListItem *itm, awsListRow *row)
     {
       if (row->parent)
       {
-        int j;
+        size_t j;
         for (j = 0; j < row->parent->children->Length (); ++j)
         {
           awsListRow *crow = (awsListRow *)row->parent->children->Get (j);
@@ -704,7 +704,7 @@ bool awsListBox::RecursiveClearPeers (awsListItem *itm, awsListRow *row)
     else if (row->children)
     {
       // Otherwise, recusively descend the tree.
-      int j;
+      size_t j;
 
       // Search through list for this guy, and clear his peers
       for (j = 0; j < row->children->Length (); ++j)
@@ -720,7 +720,7 @@ bool awsListBox::RecursiveClearPeers (awsListItem *itm, awsListRow *row)
 
 void awsListBox::ClearPeers (awsListItem *itm)
 {
-  int j;
+  size_t j;
 
   // Search through list for this guy, and clear his peers
   for (j = 0; j < rows.Length (); ++j)
@@ -773,7 +773,7 @@ int awsListBox::GetRowDepth (awsListRow *row)
 bool awsListBox::IsLastChild (awsListRow *row)
 {
   awsListRow *v = row->parent;
-  int i;
+  size_t i;
 
   if (!v)
   {
@@ -930,7 +930,7 @@ void awsListBox::OnDraw (csRect clip)
           ++i;
 
         // If we're done, leave
-        if (i >= rows.Length ())
+        if ((size_t)i >= rows.Length ())
           break;
         else
           row = (awsListRow *)rows[i];
@@ -948,7 +948,7 @@ void awsListBox::OnDraw (csRect clip)
         else
           ++i;
 
-        if (i >= parent->children->Length ())
+        if ((size_t)i >= parent->children->Length ())
         {
           row = parent;
           draw_this_time = false;
@@ -1333,10 +1333,10 @@ bool awsListBox::DrawItemsRecursively (
   // Draw children
   if (row->children && row->expanded)
   {
-    for (i = 0; i < row->children->Length (); ++i)
+    for (size_t j = 0; j < row->children->Length (); ++j)
     {
       int cx = orgx;
-      awsListRow *newrow = (awsListRow *)row->children->Get (i);
+      awsListRow *newrow = (awsListRow *)row->children->Get (j);
 
       if (
         DrawItemsRecursively (
@@ -1345,7 +1345,7 @@ bool awsListBox::DrawItemsRecursively (
             y,
             border,
             (depth ? depth + 2 : depth + 1),
-            (i == row->children->Length () - 1 ? true : false)))
+            ((size_t)i == row->children->Length () - 1 ? true : false)))
         return true;
     }
   }
@@ -1358,7 +1358,7 @@ bool awsListBox::OnMouseDown (int
 
 /*button*/, int x, int y)
 {
-  int i;
+  size_t i;
 
   for (i = 0; i < hotspots.Length (); ++i)
   {
@@ -1433,7 +1433,7 @@ bool awsListBox::OnKeyboard (const csKeyEventData& eventData)
       { 
 	int i = rows.Find (sel);
 	
-	if(i < rows.Length() -1 && rows.Length() > 0)
+	if(i < (int)rows.Length() -1 && rows.Length() > 0)
 	{
 	  ++i;
 	  sel = (awsListRow *)rows[i];

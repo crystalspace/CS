@@ -78,7 +78,7 @@ void csPS1xTo14Converter::ResetState()
   neededRegs.Empty();
 }
 
-const char* csPS1xTo14Converter::GetTempReg (int oldReg, int instrIndex, 
+const char* csPS1xTo14Converter::GetTempReg (int oldReg, size_t instrIndex, 
 					     uint usedBits, int& newReg)
 {
   newReg = -1;
@@ -114,7 +114,7 @@ const char* csPS1xTo14Converter::GetTempReg (int oldReg, int instrIndex,
   }
 
   // Determine timespan the original temp reg was used.
-  int firstNeeded = instrIndex + 1, lastNeeded = firstNeeded;
+  size_t firstNeeded = instrIndex + 1, lastNeeded = firstNeeded;
   while ((lastNeeded < neededRegs.Length()) && 
     (neededRegs[lastNeeded] & TEMPREG_BIT(oldReg, BIT_RGBA)))
     lastNeeded++;
@@ -136,7 +136,7 @@ const char* csPS1xTo14Converter::GetTempReg (int oldReg, int instrIndex,
     // (r0-r3 double as texture registers)
     bool isFree = true;
     
-    for (int i = firstNeeded; i < lastNeeded; i++)
+    for (size_t i = firstNeeded; i < lastNeeded; i++)
     {
       if (neededRegs[i] & TEXREG_BIT(r, BIT_RGBA))
       {
@@ -170,7 +170,7 @@ const char* csPS1xTo14Converter::GetTempReg (int oldReg, int instrIndex,
       if (realTempUsed[r])
       {
 	uint bits = TEMPREG_BIT(/*tempRegisterMap[*/r/*]*/, BIT_RGBA);
-	for (int i = firstNeeded; i < lastNeeded; i++)
+	for (size_t i = firstNeeded; i < lastNeeded; i++)
 	{
 	  if (neededRegs[i] & bits)
 	  {
@@ -200,7 +200,7 @@ const char* csPS1xTo14Converter::GetTempReg (int oldReg, int instrIndex,
   return 0;
 }
 
-const char* csPS1xTo14Converter::GetTexTempReg (int oldReg, int instrIndex, 
+const char* csPS1xTo14Converter::GetTexTempReg (int oldReg, size_t instrIndex, 
 						int& newReg)
 {
   newReg = oldReg;
@@ -208,7 +208,7 @@ const char* csPS1xTo14Converter::GetTexTempReg (int oldReg, int instrIndex,
 }
 
 const char* csPS1xTo14Converter::AddInstruction (
-  const csPSProgramInstruction &instr, int instrIndex)
+  const csPSProgramInstruction &instr, size_t instrIndex)
 {
   switch (instr.instruction)
   {
@@ -246,7 +246,7 @@ const char* csPS1xTo14Converter::AddInstruction (
 }
 
 const char* csPS1xTo14Converter::AddArithmetic (
-  const csPSProgramInstruction &instr, int instrIndex)
+  const csPSProgramInstruction &instr, size_t instrIndex)
 {
   csPSProgramInstruction newInstr (instr);
   const char* err;
@@ -321,7 +321,7 @@ const char* csPS1xTo14Converter::AddArithmetic (
 }
 
 const char* csPS1xTo14Converter::AddTEX (const csPSProgramInstruction &instr, 
-					 int instrIndex)
+					 size_t instrIndex)
 {
   if (instr.dest_reg != CS_PS_REG_TEX)
   {
@@ -353,7 +353,7 @@ const char* csPS1xTo14Converter::CollectUsage (
     A register is 'used' if it was written to and later read from.
    */
 
-  int i;
+  size_t i;
   uint currentBits = 0;
   int lastTempUse[2] = {-1, -1};
   int lastTexUse[4] = {-1, -1, -1, -1};
@@ -446,7 +446,7 @@ const char* csPS1xTo14Converter::GetNewInstructions (
   if ((err = CollectUsage (instrs)) != 0)
     return err;
 
-  for (int i = 0; i < instrs->Length(); i++)
+  for (size_t i = 0; i < instrs->Length(); i++)
   {
     if ((err = AddInstruction (instrs->Get (i), i)) != 0)
       return err;

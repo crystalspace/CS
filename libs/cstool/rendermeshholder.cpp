@@ -45,9 +45,9 @@ csRenderMesh*& csRenderMeshHolderSingle::GetUnusedMesh (bool& created,
   if ((meshes.Length() == 0) || 
     (meshes[lastMesh]->lastFrame == frameNumber))
   {
-    lastMesh = -1;
+    lastMesh = (size_t)-1;
     //check the list
-    int i;
+    size_t i;
     for(i = 0; i<meshes.Length (); i++)
     {
       if (meshes[i]->lastFrame != frameNumber)
@@ -56,7 +56,7 @@ csRenderMesh*& csRenderMeshHolderSingle::GetUnusedMesh (bool& created,
         break;
       }
     }
-    if (lastMesh == -1)
+    if (lastMesh == (size_t)-1)
     {
       lastMesh = meshes.Push (new csRenderMesh);
       created = true;
@@ -92,7 +92,7 @@ csRenderMeshHolderMultiple::~csRenderMeshHolderMultiple ()
     csDirtyAccessArray<csRenderMesh*>* holder = rmHolderList.Pop();
     if (deleteMeshes)
     {
-      for (int j = 0; j < holder->Length(); j++)
+      for (size_t j = 0; j < holder->Length(); j++)
       {
 	csRenderMesh* rm = (*holder)[j];
 	delete rm;
@@ -109,9 +109,9 @@ csRenderMeshHolderMultiple::GetUnusedMeshes(uint frameNumber)
 
   if (rmH->Length() > 0 && ((*rmH)[0]->lastFrame == frameNumber))
   {
-    rmHolderListIndex = -1;
+    rmHolderListIndex = (size_t)-1;
     //find an empty rmH
-    for(int i = 0; i < rmHolderList.Length(); i++)
+    for (size_t i = 0; i < rmHolderList.Length(); i++)
     {
       rmH = rmHolderList[i];
       if ((rmH->Length() == 0) || ((*rmH)[0]->lastFrame != frameNumber))
@@ -120,7 +120,7 @@ csRenderMeshHolderMultiple::GetUnusedMeshes(uint frameNumber)
         break;
       }
     }
-    if (rmHolderListIndex == -1)
+    if (rmHolderListIndex == (size_t)-1)
     {
       rmH = new csDirtyAccessArray<csRenderMesh*>;
       rmHolderListIndex = rmHolderList.Push (rmH);
@@ -129,7 +129,7 @@ csRenderMeshHolderMultiple::GetUnusedMeshes(uint frameNumber)
 
   if (clearQueue.Length() > 0)
   {
-    int i = 0;
+    size_t i = 0;
     while (i < clearQueue.Length())
     {
       csDirtyAccessArray<csRenderMesh*>* clearArray = clearQueue[i];
@@ -137,7 +137,7 @@ csRenderMeshHolderMultiple::GetUnusedMeshes(uint frameNumber)
       {
 	if (deleteMeshes)
 	{
-	  for (int j = 0; j < clearArray->Length(); j++)
+	  for (size_t j = 0; j < clearArray->Length(); j++)
 	  {
 	    csRenderMesh* rm = (*clearArray)[j];
 	    delete rm;

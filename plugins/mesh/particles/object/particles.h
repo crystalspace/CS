@@ -543,7 +543,7 @@ private:
   };
   csDirtyAccessArray<i_vertex> vertex_data;
 
-  int buffer_length;
+  size_t buffer_length;
 
   bool point_sprites;
 

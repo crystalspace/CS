@@ -243,8 +243,8 @@ private:
   csConfigDomain *FindConfig(const char *name) const;
   void ClearKeyAboveDynamic(const char *Key);
   void RemoveIterator(csConfigManagerIterator *it);
-  void FlushRemoved(int n);
-  int FindRemoved(const char *Filename) const;
+  void FlushRemoved(size_t n);
+  size_t FindRemoved(const char *Filename) const;
   void RemoveDomain(class csConfigDomain *cfg);
 };
 

@@ -301,12 +301,12 @@ bool Demo::Initialize (int argc, const char* const argv[],
   else
   {
     do_demo = 0;
-    selected_demo = -1;
+    selected_demo = (size_t)-1;
     // Here we can't do the demo because no data file was given.
     // However we scan for possible data files and present them to the
     // user.
     csRef<iStringArray> zips = myVFS->FindFiles ("/this/*");
-    int i;
+    size_t i;
     for (i = 0 ; i < zips->Length () ; i++)
     {
       const char* zip = zips->Get (i);
@@ -442,7 +442,7 @@ void Demo::SetupFrame ()
     	"You can select one to run that demo or press ESC to exit this program."); ty += 10;
       ty += 10;
       first_y = ty;
-      int i;
+      size_t i;
       for (i = 0 ; i < demos.Length () ; i++)
       {
 	int bg = col_bg;
@@ -1270,7 +1270,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
     if (do_demo == 0)
     {
       selected_demo = (Event.Mouse.y - first_y) / 10;
-      if (selected_demo >= 0 && selected_demo < demos.Length ())
+      if ((selected_demo != (size_t)-1) && selected_demo < demos.Length ())
         do_demo = 1;
     }
     else if (do_demo < 3)
@@ -1316,8 +1316,8 @@ bool Demo::DemoHandleEvent (iEvent &Event)
     if (do_demo == 0)
     {
       selected_demo = (Event.Mouse.y - first_y) / 10;
-      if (!(selected_demo >= 0 && selected_demo < demos.Length ()))
-        selected_demo = -1;
+      if (!((selected_demo != (size_t)-1) && selected_demo < demos.Length ()))
+        selected_demo = (size_t)-1;
     }
   }
 

@@ -70,7 +70,7 @@ class csFrustVisObjIt : public iVisibilityObjectIterator
 {
 private:
   csArray<iVisibilityObject*>* vector;
-  int position;
+  size_t position;
   bool* vistest_objects_inuse;
 
 public:
@@ -103,21 +103,21 @@ public:
     iVisibilityObject* vo = vector->Get (position);
     position++;
     if (position == vector->Length ())
-      position = -1;
+      position = (size_t)-1;
     return vo;
   }
 
   virtual void Reset()
   {
     if (vector == 0 || vector->Length () < 1)
-      position = -1;
+      position = (size_t)-1;
     else
       position = 0;
   }
 
   virtual bool HasNext () const
   {
-    return (position >= 0 && position <= vector->Length ());
+    return ((position != (size_t)-1) && position <= vector->Length ());
   }
 };
 
@@ -228,7 +228,7 @@ void csFrustumVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox)
 void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
 {
 #ifdef CS_DEBUG
-  int i;
+  size_t i;
   for (i = 0 ; i < visobj_vector.Length () ; i++)
   {
     if (visobj_vector[i]->visobj == visobj)
@@ -269,7 +269,7 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
 
 void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < visobj_vector.Length () ; i++)
   {
     csFrustVisObjectWrapper* visobj_wrap = visobj_vector[i];

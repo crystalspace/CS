@@ -198,7 +198,7 @@ csGLTextureHandle::csGLTextureHandle (int target, GLuint Handle,
 
 csGLTextureHandle::~csGLTextureHandle()
 {
-  for (int i=0; i<vTex.Length(); i++)
+  for (size_t i=0; i<vTex.Length(); i++)
     delete vTex[i];
   SCF_DESTRUCT_IBASE()
 }
@@ -363,7 +363,7 @@ void csGLTextureHandle::GetKeyColor (uint8 &red, uint8 &green, uint8 &blue)
 
 bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &w, int &h)
 {
-  if (mipmap < vTex.Length ())
+  if ((size_t)mipmap < vTex.Length ())
   {
     w = vTex[mipmap]->get_width () << txtmgr->texture_downsample;
     h = vTex[mipmap]->get_height () << txtmgr->texture_downsample;
@@ -453,7 +453,7 @@ void csGLTextureHandle::Prepare ()
   AdjustSizePo2 ();
 
   // Set the alpha of keycolored images to 0.
-  int i;
+  size_t i;
   for(i = 0; i < images->Length(); i++)
   {
     csAlphaMode::AlphaType newAlphaType = csAlphaMode::alphaNone;
@@ -477,7 +477,7 @@ void csGLTextureHandle::Prepare ()
 
 void csGLTextureHandle::AdjustSizePo2 ()
 {
-  int i;
+  size_t i;
   for(i = 0; i < images->Length(); i++)
   {
     orig_width  = images->GetImage (i)->GetWidth();
@@ -529,7 +529,7 @@ void csGLTextureHandle::CreateMipMaps()
 
   //  printf ("delete old\n");
   // Delete existing mipmaps, if any
-  int i;
+  size_t i;
   for(i=0; i<vTex.Length(); i++)
     delete vTex[i];
   vTex.DeleteAll ();
@@ -1193,7 +1193,7 @@ void csGLTextureManager::AlterTargetFormat (const char *oldTarget,
 
 void csGLTextureManager::Clear()
 {
-  int i;
+  size_t i;
   for (i=0; i < textures.Length (); i++)
   {
     csGLTextureHandle* tex = textures[i];
@@ -1273,7 +1273,7 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImageVector *image,
 void csGLTextureManager::PrepareTextures ()
 {
   // Create mipmaps for all textures
-  int i;
+  size_t i;
   for (i = 0; i < textures.Length (); i++)
   {
     csGLTextureHandle* tex = textures[i];
@@ -1283,7 +1283,7 @@ void csGLTextureManager::PrepareTextures ()
 
 void csGLTextureManager::FreeImages ()
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < textures.Length () ; i++)
   {
     csGLTextureHandle* tex = textures[i];
@@ -1333,7 +1333,7 @@ void csGLTextureManager::PrepareMaterials ()
 
 void csGLTextureManager::FreeMaterials ()
 {
-  int i;
+  size_t i;
   for (i = 0; i < materials.Length (); i++)
   {
     csGLMaterialHandle* mat = materials[i];
@@ -1371,7 +1371,7 @@ void csGLTextureManager::DumpSuperLightmaps (iVFS* VFS, iImageIO* iio,
 					     const char* dir)
 {
   csString outfn;
-  for (int i = 0; i < superLMs.Length(); i++)
+  for (size_t i = 0; i < superLMs.Length(); i++)
   {
     csRef<iImage> img = superLMs[i]->Dump ();
     if (img)

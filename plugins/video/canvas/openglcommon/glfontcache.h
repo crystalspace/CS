@@ -36,15 +36,16 @@ class csGLFontCache : public csFontCache
   {
     csSubRect2* subrect;
     float tx1, ty1, tx2, ty2;
-    int texNum;
+    size_t texNum;
     csBitmapMetrics bmetrics;
   };
 
   csGraphics2DGLCommon* G2D;
   csGLStateCache* statecache;
 
-  int texSize, maxTxts;
-  uint32 usedTexs;
+  int texSize;
+  size_t maxTxts;
+  size_t usedTexs;
   bool compressPages;
   int glyphAlign;
   GLuint texWhite;
@@ -74,7 +75,7 @@ class csGLFontCache : public csFontCache
   {
     GLuint texture;
     int fg, bg;
-    int vertOffset, vertCount, bgVertOffset, bgVertCount;
+    size_t vertOffset, vertCount, bgVertOffset, bgVertCount;
 
     void ClearRanges()
     {
@@ -82,17 +83,17 @@ class csGLFontCache : public csFontCache
     }
   };
   csArray<TextJob> jobs;
-  int jobCount;
+  size_t jobCount;
   bool textWriting;
   bool needStates;
   int envColor;
-  int numFloats;
-  int maxFloats;
+  size_t numFloats;
+  size_t maxFloats;
   bool tcaEnabled, vaEnabled, caEnabled;
   csDirtyAccessArray<float> verts2d;
   csDirtyAccessArray<float> texcoords;
 
-  TextJob& GetJob (int fg, int bg, GLuint texture, int bgOffset);
+  TextJob& GetJob (int fg, int bg, GLuint texture, size_t bgOffset);
 
   inline void FlushArrays ();
   void BeginText ();
@@ -101,7 +102,7 @@ protected:
     utf32_char glyph, uint flags);
   virtual void InternalUncacheGlyph (GlyphCacheData* cacheData);
 
-  void CopyGlyphData (iFont* font, utf32_char glyph, int tex, 
+  void CopyGlyphData (iFont* font, utf32_char glyph, size_t tex, 
     const csBitmapMetrics& bmetrics, const csRect& texRect, 
     iDataBuffer* bitmapDataBuf, iDataBuffer* alphaDataBuf);
 public:

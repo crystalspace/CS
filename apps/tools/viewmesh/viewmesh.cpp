@@ -620,7 +620,7 @@ bool ViewMesh::SaveSprite(const char *filename)
 
 void ViewMesh::ConstructMenu()
 {
-  int i;
+  size_t i;
 
   if (menu)
     delete menu;
@@ -834,6 +834,7 @@ void ViewMesh::Draw()
     }
   }
 
+  //pplBeginDraw(CSDRAW_2DGRAPHICS);
   csApp::Draw();
   pplBeginDraw(CSDRAW_3DGRAPHICS);
   view->Draw();
@@ -965,7 +966,7 @@ bool ViewMesh::Initialize ()
   {
     if (!loader->LoadLibraryFile(libname))
     {
-      Printf (CS_REPORTER_SEVERITY_ERROR, "Couldn load lib %s.", libname);
+      Printf (CS_REPORTER_SEVERITY_ERROR, "Couldn't load lib %s.", libname);
     }
   }
   if (i>0)

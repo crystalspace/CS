@@ -33,7 +33,7 @@ SCF_VERSION (iStringArray, 0, 0, 2);
 struct iStringArray : public iBase
 {
   /// Query array length.
-  virtual int Length () const = 0;
+  virtual size_t Length () const = 0;
 
   /// Push a string onto the stack.
   virtual void Push (const char *value) = 0;
@@ -42,31 +42,31 @@ struct iStringArray : public iBase
   virtual char *Pop () = 0;
 
   /// Get Nth string in vector.
-  virtual char const *Get (int n) const = 0;
+  virtual char const *Get (size_t n) const = 0;
 
   /**
    * Find a string, case-sensitive. Returns -1 if not found, else item index.
    * Works with unsorted arrays.  For sorted arrays, FindSortedKey() is faster.
    */
-  virtual int Find (const char *value) const = 0;
+  virtual size_t Find (const char *value) const = 0;
 
   /**
    * Find a string, case-insensitive. Returns -1 if not found, else item index.
    * Works with unsorted arrays.  For sorted arrays, FindSortedKey() is faster.
    */
-  virtual int FindCaseInsensitive (const char *value) const = 0;
+  virtual size_t FindCaseInsensitive (const char *value) const = 0;
 
   /// Find index of a string in a pre-sorted string array.
-  virtual int FindSortedKey (const char *value) const = 0;
+  virtual size_t FindSortedKey (const char *value) const = 0;
 
   /// Sort the string array.
   virtual void Sort () = 0;
 
   /// Delete Nth string in the array.
-  virtual bool DeleteIndex (int n) = 0;
+  virtual bool DeleteIndex (size_t n) = 0;
 
   /// Insert a string before Nth string in the array.
-  virtual bool Insert (int n, char const *value) = 0;
+  virtual bool Insert (size_t n, char const *value) = 0;
 
   /// Delete all strings in array.
   virtual void DeleteAll () = 0;

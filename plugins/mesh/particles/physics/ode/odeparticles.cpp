@@ -152,7 +152,7 @@ bool csODEParticlePhysics::Initialize (iObjectRegistry* reg)
 
 void csODEParticlePhysics::Execute (float stepsize)
 {
-  for (int i = 0; i < partobjects.Length(); i ++)
+  for (size_t i = 0; i < partobjects.Length(); i ++)
   {
     ParticleObjects &po = partobjects[i];
 
@@ -312,10 +312,10 @@ bool csODEParticlePhysics::HandleEvent (iEvent &event)
   }
 
 
-  for (int i = 0; i < partobjects.Length(); i ++)
+  for (size_t i = 0; i < partobjects.Length(); i ++)
   { 
     ParticleObjects &po = partobjects[i];
-    for (int j = 0; j < (po.data.Length() - po.dead_particles); j ++)
+    for (size_t j = 0; j < (po.data.Length() - po.dead_particles); j ++)
     {
       csParticlesData &part = po.data.Get (j);
       CS_ASSERT (part.time_to_live > 0);
@@ -342,7 +342,7 @@ bool csODEParticlePhysics::HandleEvent (iEvent &event)
         if (grad.Length())
 	{
 	  float cref = (1.0 - normaltime) * (float)grad.Length();
-	  int index = (int)floor (cref);
+	  size_t index = (size_t)floor (cref);
 	  csColor c1 = grad[index];
 	  csColor c2 = grad[(index == grad.Length()-1)?index:index+1];
 	  float interp = cref - floor(cref);
@@ -386,7 +386,7 @@ const csArray<csParticlesData> *csODEParticlePhysics::RegisterParticles (iPartic
 
 void csODEParticlePhysics::RemoveParticles (iParticlesObjectState *particles)
 {
-  for (int i = 0; i < partobjects.Length(); i ++) {
+  for (size_t i = 0; i < partobjects.Length(); i ++) {
     if (partobjects[i].particles == particles) {
       partobjects[i].bodies.SetLength (0);
       dyn->RemoveSystem (partobjects[i].dynsys);

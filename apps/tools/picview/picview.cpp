@@ -242,7 +242,7 @@ void PicViewApp::LoadNextImage (int idx, int step)
   if (idx) cur_idx = idx;
   else cur_idx += step;
   if (cur_idx < 0) cur_idx = files->Length ()-1;
-  if (cur_idx >= files->Length ()) cur_idx = 0;
+  if ((size_t)cur_idx >= files->Length ()) cur_idx = 0;
   i = cur_idx;
   printf ("loading file '%s' (%d/%d)\n", files->Get (i), i+1, files->Length ());
   char sbuf[255];

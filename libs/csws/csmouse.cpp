@@ -171,7 +171,7 @@ bool csMouse::SetCursor (csMouseCursorID ID)
     ((VirtualX != MouseX) || (VirtualY != MouseY));
 
   ActiveCursor = 0;
-  int i;
+  size_t i;
   for (i = 0; i < Pointers.Length (); i++)
     if (Pointers.Get (i)->id == ID)
     {

@@ -47,7 +47,7 @@ void csRenderMeshList::AddRenderMeshes (csRenderMesh** meshes, int num,
   renderMeshListInfo* entry;
 
   //check if we have rp or need to add it
-  if (renderPriority > renderList.Length () - 1 || renderList.Get
+  if ((size_t)(renderPriority + 1) > renderList.Length () || renderList.Get
     ((uint32)renderPriority) == 0)
   {
     entry = new renderMeshListInfo;
@@ -80,12 +80,12 @@ void csRenderMeshList::CullToSphere (const csSphere& sphere)
   csVector3 sphCenter (sphere.GetCenter ());
   float sphSqRadius = sphere.GetRadius ();
 
-  for (int i = 0; i < renderList.Length(); i++)
+  for (size_t i = 0; i < renderList.Length(); i++)
   {
     renderMeshListInfo*& mli = renderList[i];
     if (!mli) continue;
 
-    for (int j = mli->meshList.Length(); --j >= 0;)
+    for (size_t j = mli->meshList.Length(); j-- > 0;)
     {
       const meshListEntry& entry = mli->meshList[j];
       if (!csIntersect3::BoxSphere (entry.bbox, sphCenter,
@@ -170,9 +170,9 @@ int csRenderMeshList::SortMeshFront2Back(meshListEntry const& me1,
   return SortMeshMaterial (me1, me2);
 }
 
-int csRenderMeshList::SortMeshLists ()
+size_t csRenderMeshList::SortMeshLists ()
 {
-  int numObjects = 0;
+  size_t numObjects = 0;
   csPDelArray < renderMeshListInfo >::Iterator it = renderList.GetIterator ();
   while (it.HasNext ())
   {
@@ -205,8 +205,8 @@ void csRenderMeshList::GetSortedMeshes (csRenderMesh** meshes)
     renderMeshListInfo* listEnt = it.Next ();
     if (listEnt)
     {
-      int numObjects = listEnt->meshList.Length ();
-      for (int j = 0 ; j < numObjects ; j++)
+      size_t numObjects = listEnt->meshList.Length ();
+      for (size_t j = 0 ; j < numObjects ; j++)
 	*meshes++ = listEnt->meshList[j].rm;
     }
   }

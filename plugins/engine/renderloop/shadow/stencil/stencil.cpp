@@ -550,7 +550,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
   iShader* shadow;
   if ((shadow = type->GetShadow ()) == 0)
   {
-    for (int i = 0; i < steps.Length (); i++)
+    for (size_t i = 0; i < steps.Length (); i++)
     {
       steps[i]->Perform (rview, sector, light, stacks);
     }
@@ -685,7 +685,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
 
   g3d->SetShadowState (CS_SHADOW_VOLUME_USE);
 
-  for (int i = 0; i < steps.Length (); i++)
+  for (size_t i = 0; i < steps.Length (); i++)
   {
     steps[i]->Perform (rview, sector, light, stacks);
   }

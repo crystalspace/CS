@@ -146,7 +146,7 @@ void CIWorld::GenerateDefaultsector()
 
 void CIWorld::FindPortals()
 {
-  int i, j;
+  size_t i, j;
   for (i=0; i<m_Sectors.Length(); i++)
   {
     CISector* pSector1 = m_Sectors[i];
@@ -167,7 +167,7 @@ void CIWorld::FindPortals()
 
 void CIWorld::InsertThings()
 {
-  int i;
+  size_t i;
   for (i=0; i<m_Sectors.Length(); i++)
   {
     CISector* pSector = m_Sectors[i];
@@ -179,7 +179,7 @@ void CIWorld::InsertThings()
 
 CISector* CIWorld::FindSectorForPoint(CdVector3& v)
 {
-  int i;
+  size_t i;
   for (i=0; i<m_Sectors.Length(); i++)
   {
     CISector* pSector = m_Sectors[i];
@@ -197,7 +197,8 @@ CISector* CIWorld::FindSectorForPoint(CdVector3& v)
 
 void CIWorld::BuildTexturelist()
 {
-  int i, j, c;
+  int i, c;
+  size_t j;
 
   for (i=0; i<m_pMap->GetPlaneCount(); i++)
   {

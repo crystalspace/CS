@@ -189,7 +189,7 @@ public:
   bool Flush ();
 
   /// Get Nth file in archive or 0
-  void *GetFile (int no)
+  void *GetFile (size_t no)
   { return (no >= 0) && (no < dir.Length ()) ? dir.Get (no) : 0; }
 
   /// Find a file in archive; returns a handle or 0

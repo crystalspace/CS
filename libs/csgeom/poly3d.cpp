@@ -701,7 +701,7 @@ static int compare_vt_orig (const void *p1, const void *p2)
 
 template <class T>
 static csCompressVertex* TemplatedCompressVertices (T& vertices,
-	int num_vertices, csVector3*& new_vertices, int& new_count)
+	size_t num_vertices, csVector3*& new_vertices, size_t& new_count)
 {
   new_vertices = 0;
   new_count = 0;
@@ -709,7 +709,7 @@ static csCompressVertex* TemplatedCompressVertices (T& vertices,
 
   // Copy all the vertices.
   csCompressVertex *vt = new csCompressVertex[num_vertices];
-  int i, j;
+  size_t i, j;
   for (i = 0; i < num_vertices; i++)
   {
     vt[i].orig_idx = i;
@@ -724,7 +724,7 @@ static csCompressVertex* TemplatedCompressVertices (T& vertices,
   // Count unique values and tag all doubles with the index of the unique one.
   // new_idx in the vt table will be the index inside vt to the unique vector.
   new_count = 1;
-  int last_unique = 0;
+  size_t last_unique = 0;
   vt[0].new_idx = last_unique;
   for (i = 1; i < num_vertices; i++)
   {
@@ -778,7 +778,7 @@ static csCompressVertex* TemplatedCompressVertices (T& vertices,
 }
 
 csCompressVertex* csVector3Array::CompressVertices (csVector3* vertices,
-	int num_vertices, csVector3*& new_vertices, int& new_count)
+	size_t num_vertices, csVector3*& new_vertices, size_t& new_count)
 {
   return TemplatedCompressVertices (vertices, num_vertices,
   	new_vertices, new_count);
@@ -788,12 +788,12 @@ csCompressVertex* csVector3Array::CompressVertices (
 	csArray<csVector3>& vertices)
 {
   csVector3* new_vertices;
-  int new_count;
+  size_t new_count;
   csCompressVertex* vt = TemplatedCompressVertices (vertices,
   	vertices.Length (), new_vertices, new_count);
   if (vt == 0) return 0;
 
-  int i;
+  size_t i;
   vertices.DeleteAll ();
   for (i = 0 ; i < new_count ; i++)
     vertices.Push (new_vertices[i]);

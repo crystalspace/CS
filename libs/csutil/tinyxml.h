@@ -446,8 +446,8 @@ public:
   csArray<TiDocumentAttribute> set;
 
   TiDocumentAttributeSet() : set (0, 4) { }
-  int Find (const char * name) const;
-  int FindExact (const char * reg_name) const;
+  size_t Find (const char * name) const;
+  size_t FindExact (const char * reg_name) const;
 };
 
 
@@ -495,14 +495,14 @@ public:
   void SetAttribute( TiDocument* document, const char * name, int value );
 
   /// Get number of attributes.
-  int GetAttributeCount () const { return attributeSet.set.Length (); }
+  size_t GetAttributeCount () const { return attributeSet.set.Length (); }
   /// Get attribute.
-  const TiDocumentAttribute& GetAttribute (int idx) const
+  const TiDocumentAttribute& GetAttribute (size_t idx) const
   {
     return attributeSet.set[idx];
   }
   /// Get attribute.
-  TiDocumentAttribute& GetAttribute (int idx)
+  TiDocumentAttribute& GetAttribute (size_t idx)
   {
     return attributeSet.set[idx];
   }

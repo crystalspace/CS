@@ -1478,7 +1478,7 @@ void csGraphics3DOGLCommon::DrawTriangleMeshEdges (G3DTriangleMesh& mesh)
   csVector3* f1 = mesh.buffers[0]->GetVertices ();
   csVector3* work_verts;
 
-  if (num_vertices > tr_verts->Length ())
+  if ((size_t)num_vertices > tr_verts->Length ())
   {
     tr_verts->SetLength (num_vertices);
     uv_verts->SetLength (num_vertices);
@@ -3322,7 +3322,7 @@ bool csGraphics3DOGLCommon::ClassifyForClipTriangleMesh (
 {
   int i;
 
-  if (num_vertices > clipped_plane->Length ())
+  if ((size_t)num_vertices > clipped_plane->Length ())
     clipped_plane->SetLength (num_vertices); // Used for original vertices.
 
   int* ct = clipped_plane->GetArray ();
@@ -3377,7 +3377,7 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
   int i;
 
   // Make sure our worktables are big enough for the clipped mesh.
-  int num_tri = num_triangles*2+50;
+  size_t num_tri = num_triangles*2+50;
   if (num_tri > clipped_triangles->Length ())
   {
     // Use two times as many triangles. Hopefully this is enough.
@@ -3442,17 +3442,17 @@ void csGraphics3DOGLCommon::ClipTriangleMeshExact (
   int i, j;
 
   // Make sure our worktables are big enough for the clipped mesh.
-  int num_tri = num_triangles*2+50;
+  size_t num_tri = num_triangles*2+50;
   if (num_tri > clipped_triangles->Length ())
   {
     // Use two times as many triangles. Hopefully this is enough.
     clipped_triangles->SetLength (num_tri);
   }
 
-  if (num_vertices > clipped_translate->Length ())
+  if ((size_t)num_vertices > clipped_translate->Length ())
     clipped_translate->SetLength (num_vertices); // Used for original vertices.
 
-  int num_vts = num_vertices*2+100;
+  size_t num_vts = num_vertices*2+100;
   if (num_vts > clipped_vertices->Length ())
   {
     clipped_vertices->SetLength (num_vts);
@@ -4517,7 +4517,7 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   //===========
   int num_vertices = mesh.buffers[0]->GetVertexCount ();
   int num_triangles = mesh.num_triangles;
-  if (num_vertices > tr_verts->Length ())
+  if ((size_t)num_vertices > tr_verts->Length ())
   {
     tr_verts->SetLength (num_vertices);
     uv_verts->SetLength (num_vertices);
@@ -4685,7 +4685,7 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       ///@@@HACK.. THESE SHOULD BE CHANGED
       //set all constants
 
-      for(int i = 0; i<pass_data->vertex_constants.Length(); i++)
+      for(size_t i = 0; i<pass_data->vertex_constants.Length(); i++)
       {
         csOpenGlVPConstant* c = (csOpenGlVPConstant*)pass_data
 		->vertex_constants[i];
@@ -4957,7 +4957,7 @@ bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
   // Update work tables.
   //===========
   int num_triangles = mesh.num_triangles;
-  if (num_vertices > tr_verts->Length ())
+  if ((size_t)num_vertices > tr_verts->Length ())
   {
     tr_verts->SetLength (num_vertices);
     uv_verts->SetLength (num_vertices);
@@ -5148,7 +5148,7 @@ bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
     // special hack for transparent meshes
     if (mesh.mixmode & CS_FX_ALPHA)
     {
-      if ((num_vertices*4) > rgba_verts->Length ())
+      if ((size_t)(num_vertices*4) > rgba_verts->Length ())
         rgba_verts->SetLength (num_vertices*4);
       if (do_multiply_color)
       {
@@ -5187,7 +5187,7 @@ bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
       else
       {
         csColor* old = work_colors;
-	if (num_vertices > color_verts->Length())
+	if ((size_t)num_vertices > color_verts->Length())
 	  color_verts->SetLength(num_vertices);
 	work_colors = color_verts->GetArray ();
 	for (i = 0 ; i < num_vertices ; i++)
@@ -5241,7 +5241,7 @@ bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
   {
     statecache->SetShadeModel (GL_FLAT);
     SetClientStates (CS_CLIENTSTATE_VT);
-    if (num_vertices > uv_mul_verts->Length ())
+    if ((size_t)num_vertices > uv_mul_verts->Length ())
       uv_mul_verts->SetLength (num_vertices);
 
     int j;
@@ -5394,7 +5394,7 @@ void csGraphics3DOGLCommon::FogDrawTriangleMesh (G3DTriangleMesh& mesh,
   // Update work tables.
   //===========
   int num_triangles = mesh.num_triangles;
-  if (num_vertices > tr_verts->Length ())
+  if ((size_t)num_vertices > tr_verts->Length ())
   {
     tr_verts->SetLength (num_vertices);
     uv_verts->SetLength (num_vertices);

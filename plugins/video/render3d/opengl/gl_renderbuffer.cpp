@@ -43,7 +43,7 @@ static const GLenum compGLtypes[] =
   GL_DOUBLE
 };
 
-csGLRenderBuffer::csGLRenderBuffer (int size, csRenderBufferType type,
+csGLRenderBuffer::csGLRenderBuffer (size_t size, csRenderBufferType type,
 	csRenderBufferComponentType comptype, int compcount)
 {
   SCF_CONSTRUCT_IBASE (0)
@@ -94,7 +94,7 @@ void* csVBORenderBuffer::RenderLock (csGLRenderBufferLockType type)
 
 //-----------------------------------------------------------------
 
-csPtr<iRenderBuffer> csGLGraphics3D::CreateRenderBuffer (int size, 
+csPtr<iRenderBuffer> csGLGraphics3D::CreateRenderBuffer (size_t size, 
   csRenderBufferType type, csRenderBufferComponentType componentType,
   int componentCount)
 {
@@ -113,7 +113,7 @@ csPtr<iRenderBuffer> csGLGraphics3D::CreateRenderBuffer (int size,
   return csPtr<iRenderBuffer> (0);
 }
 
-csPtr<iRenderBuffer> csGLGraphics3D::CreateIndexRenderBuffer (int size, 
+csPtr<iRenderBuffer> csGLGraphics3D::CreateIndexRenderBuffer (size_t size, 
     csRenderBufferType type, csRenderBufferComponentType componentType,
     size_t rangeStart, size_t rangeEnd)
 {
@@ -134,7 +134,7 @@ csPtr<iRenderBuffer> csGLGraphics3D::CreateIndexRenderBuffer (int size,
   return csPtr<iRenderBuffer> (0);
 }
 
-void csGLGraphics3D::CreateInterleavedRenderBuffers (int size,
+void csGLGraphics3D::CreateInterleavedRenderBuffers (size_t size,
   csRenderBufferType type, int count, csRefArray<iRenderBuffer>& buffers)
 {
   csRef<iRenderBuffer> buf;

@@ -39,13 +39,13 @@ protected:
 public:
   virtual void Free() { delete this; }
   
-  virtual int GetEntryCount () = 0;
-  virtual bool GetFunctionName (int num, csString& str) = 0;
-  virtual bool GetLineNumber (int num, csString& str) = 0;
-  virtual bool GetParameters (int num, csString& str) = 0;
+  virtual size_t GetEntryCount () = 0;
+  virtual bool GetFunctionName (size_t num, csString& str) = 0;
+  virtual bool GetLineNumber (size_t num, csString& str) = 0;
+  virtual bool GetParameters (size_t num, csString& str) = 0;
   void Print (FILE* f = stdout, bool Short = false)
   {
-    for (int i = 0; i < GetEntryCount(); i++)
+    for (size_t i = 0; i < GetEntryCount(); i++)
     {
       csString s;
       bool hasFunc = GetFunctionName (i, s);

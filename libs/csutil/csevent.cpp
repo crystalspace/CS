@@ -799,7 +799,7 @@ bool csEvent::Print(int level)
     if (v)
     {
       attribute *object = 0;
-      int32 index = 0;
+      size_t index = 0;
       while(index < v->Length())
       {
         if ((object = (attribute *) v->Get(index)) != 0)
@@ -844,8 +844,7 @@ bool csEvent::Print(int level)
           }
           if (object->type == attribute::tag_databuffer)
           {
-	    // @@@ FIXME 64bit: pointer truncation
-            IndentLevel(level); printf(" Value: 0x%X\n",(int32)object->String);
+            IndentLevel(level); printf(" Value: 0x%p\n",(void*)object->String);
             IndentLevel(level); printf(" Length: %d\n", object->length);
           }
           if (object->type == attribute::tag_string)
@@ -889,7 +888,7 @@ uint32 csEvent::FlattenSizeCrystal()
     if (v)
     {
       attribute *object = 0;
-      int index = 0;
+      size_t index = 0;
       while(index < v->Length())
       {
         if ((object = (attribute *) v->Get(index)) != 0)
@@ -1078,7 +1077,7 @@ bool csEvent::FlattenCrystal(char * buffer)
     if (v)
     {
       attribute *object = 0;
-      int index = 0;
+      size_t index = 0;
       while(index < v->Length())
       {
         if ((object = (attribute *) v->Get(index)) != 0)

@@ -91,7 +91,7 @@ bool csShaderGLCGFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
   csString programStr;
   programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
 
-  int i;
+  size_t i;
 
   // See if we want to wrap through the PS plugin
   // (psplg will be 0 if wrapping isn't wanted)

@@ -402,7 +402,8 @@ void awsTabCtrl::SetTopBottom (bool to_top)
 
 void awsTabCtrl::DoLayout ()
 {
-  int i, x = 0;
+  size_t i;
+  int x = 0;
   csRect r = Frame ();
 
   for (i = first - 1; i >= 0; i--)
@@ -534,7 +535,7 @@ void awsTabCtrl::RemoveTab (int index)
   {
     if (index == active)
     {
-      if (vTabs.Length () - 1 == active)
+      if (vTabs.Length () - 1 == (size_t)active)
         ActivateTab (active - 1);
       else
         ActivateTab (active + 1);
@@ -595,12 +596,12 @@ void awsTabCtrl::OnDraw (csRect clip)
 
 void awsTabCtrl::ScrollLeft ()
 {
-  if (vTabs.Length () && first != vTabs.Length () - 1)
+  if (vTabs.Length () && (size_t)first != vTabs.Length () - 1)
   {
     int xdelta = vTabs.Get (first)->Frame ().Width () + 1;
     vTabs.Get (first)->SetFirst (false);
     
-    int i;
+    size_t i;
     for (i = 0; i < vTabs.Length (); i++)
       vTabs.Get (i)->Move (-xdelta, 0);
     first++;
@@ -616,7 +617,7 @@ void awsTabCtrl::ScrollRight ()
     int xdelta = vTabs.Get (first - 1)->Frame ().Width () + 1;
     vTabs.Get (first)->SetFirst (false);
     
-    int i;
+    size_t i;
     for (i = 0; i < vTabs.Length (); i++)
       vTabs.Get (i)->Move (xdelta, 0);
     first--;
@@ -646,7 +647,7 @@ void awsTabCtrl::MakeVisible (int idx)
 
 int awsTabCtrl::FindTab (void* user_param)
 {
-  int i;
+  size_t i;
   for (i = 0; i < vTabs.Length (); i++)
   {
     void* p;
@@ -687,7 +688,8 @@ csRect awsTabCtrl::getPreferredSize ()
 {
   if (set_preferred_size)
     return preferred_size;
-  int i, width = 0;
+  size_t i;
+  int width = 0;
   for(i = 0; i < vTabs.Length (); i++)
   {
     width += vTabs.Get (i)->getPreferredSize ().Width ();

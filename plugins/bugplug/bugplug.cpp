@@ -368,7 +368,6 @@ void csBugPlug::SwitchCuller (iSector* sector, const char* culler)
   sector->SetVisibilityCullerPlugin (culler);
 }
 
-
 void csBugPlug::SelectMesh (iSector* sector, const char* meshname)
 {
   iMeshList* ml = sector->GetMeshes ();
@@ -407,8 +406,8 @@ void csBugPlug::SelectMesh (iSector* sector, const char* meshname)
 
 void csBugPlug::AddSelectedMesh (iMeshWrapper* m)
 {
-  int i;
-  int count = selected_meshes.Length ();
+  size_t i;
+  size_t count = selected_meshes.Length ();
   for (i = 0 ; i < count ; i++)
   {
     // Assign selected_mesh[i] to temporary variable to avoid an
@@ -422,8 +421,8 @@ void csBugPlug::AddSelectedMesh (iMeshWrapper* m)
 
 void csBugPlug::RemoveSelectedMesh (iMeshWrapper* m)
 {
-  int i;
-  int count = selected_meshes.Length ();
+  size_t i;
+  size_t count = selected_meshes.Length ();
   for (i = 0 ; i < count ; i++)
   {
     // Assign selected_mesh[i] to temporary variable to avoid an
@@ -1308,7 +1307,7 @@ bool csBugPlug::EatKey (iEvent& event)
       case DEBUGCMD_HIDESELECTED:
         if (HasSelectedMeshes ())
 	{
-	  int j;
+	  size_t j;
 	  for (j = 0 ; j < selected_meshes.Length () ; j++)
 	  {
 	    if (selected_meshes[j])
@@ -1324,7 +1323,7 @@ bool csBugPlug::EatKey (iEvent& event)
       case DEBUGCMD_UNDOHIDE:
         if (HasSelectedMeshes ())
 	{
-	  int j;
+	  size_t j;
 	  for (j = 0 ; j < selected_meshes.Length () ; j++)
 	  {
 	    if (selected_meshes[j])
@@ -1576,7 +1575,7 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
   if (HasSelectedMeshes () && shadow && shadow->GetCamera () &&
 		  !debug_view.show && !debug_sector.show)
   {
-    int k;
+    size_t k;
     iCamera* cam = shadow->GetCamera ();
     csTransform tr_w2c = cam->GetTransform ();
     float fov = G3D->GetPerspectiveAspect ();
@@ -2649,7 +2648,7 @@ void csBugPlug::SwitchDebugView ()
 
 int csBugPlug::FindCounter (const char* countername)
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < counters.Length () ; i++)
     if (!strcmp (counters[i]->countername, countername))
       return i;
@@ -2658,7 +2657,7 @@ int csBugPlug::FindCounter (const char* countername)
 
 void csBugPlug::FullResetCounters ()
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < counters.Length () ; i++)
   {
     int j;
@@ -2685,7 +2684,7 @@ void csBugPlug::ShowCounters ()
   int fgcolor = G2D->FindRGB (0, 0, 0);
 
   if (!counter_freeze) counter_frames++;
-  int i;
+  size_t i;
   int cur_y = 10;
   for (i = 0 ; i < counters.Length () ; i++)
   {

@@ -172,7 +172,7 @@ public:
   /// Query the frame number f.
   csSpriteFrame* GetCsFrame (int f)
   {
-    return (f < frames.Length ())
+    return ((size_t)f < frames.Length ())
     	? frames [f]
 	: (csSpriteFrame*)0;
 	}
@@ -182,7 +182,7 @@ public:
     if (!reverse_action)
     {
       f++;
-      return f<frames.Length() ? frames[f] : frames[0];
+      return (size_t)f<frames.Length() ? frames[f] : frames[0];
     }
     else
     {
@@ -195,7 +195,7 @@ public:
   /// Query the frame number f.
   virtual iSpriteFrame* GetFrame (int f)
   {
-    return (iSpriteFrame*)((f < frames.Length ())
+    return (iSpriteFrame*)(((size_t)f < frames.Length ())
     	? frames [f]
 	: (csSpriteFrame*)0);
   }
@@ -205,7 +205,7 @@ public:
     if (!reverse_action)
     {
       f++;
-      return (iSpriteFrame*)(f<frames.Length()
+      return (iSpriteFrame*)((size_t)f<frames.Length()
       	? frames[f]
 	: frames[0]);
     }
@@ -530,7 +530,7 @@ public:
   /// Query the frame number f
   csSpriteFrame* GetFrame (int f) const
   {
-    return (f < frames.Length ())
+    return ((size_t)f < frames.Length ())
   	? (csSpriteFrame *)frames [f]
 	: (csSpriteFrame*)0;
   }
@@ -560,7 +560,7 @@ public:
   /// Query the socket number f
   csSpriteSocket* GetSocket (int f) const
   {
-    return (f < sockets.Length ())
+    return ((size_t)f < sockets.Length ())
   	? (csSpriteSocket *)sockets [f]
 	: (csSpriteSocket*)0;
   }
@@ -1656,7 +1656,7 @@ public:
   /// Query the socket number f
   csSpriteSocket* GetSocket (int f) const
   {
-    return (f < sockets.Length ())
+    return ((size_t)f < sockets.Length ())
   	? (csSpriteSocket *)sockets [f]
 	: (csSpriteSocket*)0;
   }

@@ -531,7 +531,7 @@ void csPixelShaderParser::WriteProgram (
 	const csArray<csPSProgramInstruction>& instrs, 
 	csString& str)
 {
-  for(int i = 0; i < instrs.Length (); i++)
+  for(size_t i = 0; i < instrs.Length (); i++)
   {
     const csPSProgramInstruction& instr = instrs.Get (i);
 

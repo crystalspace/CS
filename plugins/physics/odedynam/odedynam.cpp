@@ -207,10 +207,10 @@ void csODEDynamics::Step (float elapsed_time)
   while (total_elapsed > stepsize) 
   {
     total_elapsed -= stepsize;
-    for (long i=0; i<systems.Length(); i++)
+    for (size_t i=0; i<systems.Length(); i++)
     {
       systems.Get (i)->Step (stepsize);
-      for (long j = 0; j < updates.Length(); j ++) 
+      for (size_t j = 0; j < updates.Length(); j ++) 
       {
         updates[i]->Execute (stepsize);
       }
@@ -421,7 +421,8 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
 
   csPolyMeshList polycollide;
   // test for overlap
-  int i, j, k;
+  size_t i;
+  int j, k;
   for (i = 0; i < polyidx.Length (); i ++)
   {
     csBox3 polybox;
@@ -549,7 +550,8 @@ int csODEDynamics::CollideMeshCylinder (dGeomID mesh, dGeomID cyl, int flags,
 
   csPolyMeshList polycollide;
   // test for overlap
-  int i, j, k;
+  size_t i;
+  int j, k;
   for (i = 0; i < polyidx.Length (); i ++)
   {
     csBox3 polybox;
@@ -657,7 +659,7 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
   csArray<int> polyidx;
   tree->IntersectSphere (polyidx, mesht.Other2This (center), rad*rad);
   tree->RemoveDoubles (polyidx);
-  for (int i = 0; i < polyidx.Length () && outcount < N; i ++)
+  for (size_t i = 0; i < polyidx.Length () && outcount < N; i ++)
   {
     csMeshedPolygon& poly = polygon_list[polyidx[i]];
     csPlane3 plane(vertex_table[poly.vertices[0]] / mesht,
@@ -896,7 +898,7 @@ void csODEDynamics::SetGlobalERP (float erp)
 {
   csODEDynamics::erp = erp;
 
-  for (int i = 0; i < systems.Length(); i ++) 
+  for (size_t i = 0; i < systems.Length(); i ++) 
   {
     csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
 	   iODEDynamicSystemState);
@@ -907,7 +909,7 @@ void csODEDynamics::SetGlobalERP (float erp)
 void csODEDynamics::SetGlobalCFM (float cfm)
 {
   csODEDynamics::cfm = cfm;
-  for (int i = 0; i < systems.Length(); i ++) 
+  for (size_t i = 0; i < systems.Length(); i ++) 
   {
     csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
       iODEDynamicSystemState);
@@ -919,7 +921,7 @@ void csODEDynamics::EnableStepFast (bool enable)
 {
   stepfast = enable;
 
-  for (int i = 0; i < systems.Length(); i ++) 
+  for (size_t i = 0; i < systems.Length(); i ++) 
   {
     csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
 	   iODEDynamicSystemState);
@@ -931,7 +933,7 @@ void csODEDynamics::SetStepFastIterations (int iter)
 {
   sfiter = iter;
 
-  for (int i = 0; i < systems.Length(); i ++) 
+  for (size_t i = 0; i < systems.Length(); i ++) 
   {
     csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
       iODEDynamicSystemState);
@@ -975,10 +977,10 @@ bool csODEDynamics::HandleEvent (iEvent& Event)
     while (total_elapsed > stepsize) 
     {
       total_elapsed -= stepsize;
-      for (long i=0; i<systems.Length(); i++)
+      for (size_t i=0; i<systems.Length(); i++)
       {
         systems.Get (i)->Step (stepsize);
-        for (long j = 0; j < updates.Length(); j ++) 
+        for (size_t j = 0; j < updates.Length(); j ++) 
         {
           updates[i]->Execute (stepsize);
         }
@@ -1114,19 +1116,19 @@ void csODEDynamicSystem::Step (float elapsed_time)
     {
       dWorldStepFast1 (worldID, stepsize, sfiter);
     }
-    for (long i = 0; i < bodies.Length(); i ++) 
+    for (size_t i = 0; i < bodies.Length(); i ++) 
     {
         iRigidBody *b = bodies.Get(i);
         b->SetAngularVelocity (b->GetAngularVelocity () * roll_damp);
         b->SetLinearVelocity (b->GetLinearVelocity () * lin_damp);
     }
-    for (long j = 0; j < updates.Length(); j ++) 
+    for (size_t j = 0; j < updates.Length(); j ++) 
     {
       updates[j]->Execute (stepsize);
     }
   }
 
-  for (long i=0; i<bodies.Length(); i++)
+  for (size_t i=0; i<bodies.Length(); i++)
   {
     iRigidBody *b = bodies.Get(i);
     b->Update ();
@@ -1248,7 +1250,7 @@ csODEBodyGroup::csODEBodyGroup (csODEDynamicSystem* sys)
 
 csODEBodyGroup::~csODEBodyGroup ()
 {
-  for (int i = 0; i < bodies.Length(); i ++)
+  for (size_t i = 0; i < bodies.Length(); i ++)
   {
     ((csODERigidBody *)(iRigidBody*)bodies[i])->UnsetGroup ();
   }
@@ -1270,7 +1272,7 @@ void csODEBodyGroup::RemoveBody (iRigidBody *body)
 
 bool csODEBodyGroup::BodyInGroup (iRigidBody *body)
 {
-  return bodies.Find (body) != -1;
+  return bodies.Find (body) != csArrayItemNotFound;
 }
 
 csODERigidBody::csODERigidBody (csODEDynamicSystem* sys) : geoms (1,4)
@@ -1306,7 +1308,7 @@ csODERigidBody::~csODERigidBody ()
 void DestroyGeoms( csGeomList & geoms )
 {
   dGeomID tempID;
-  int i=0;
+  size_t i=0;
 
   for (;i < geoms.Length(); i++)
   {

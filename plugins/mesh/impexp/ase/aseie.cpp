@@ -254,7 +254,7 @@ bool csASEInterpreter_GEOMOBJECT (csModelConverterASE *conv, csDataStream &in,
     // @@@ transform object
 
     // fill missing colors or texels
-    int vc = conv->Vertices->GetVertexCount ();
+    size_t vc = conv->Vertices->GetVertexCount ();
     while (conv->Vertices->GetColorCount () < vc)
       conv->Vertices->AddColor (csColor (1, 1, 1));
     while (conv->Vertices->GetTexelCount () < vc)
@@ -404,7 +404,7 @@ bool csASEInterpreter_MESH_NORMALS (csModelConverterASE *conv, csDataStream &in,
 {
   if (CS_ASE_CHECK_TOKEN ("*MESH_FACENORMAL"))
   {
-    int n = in.ReadTextInt ();
+    size_t n = in.ReadTextInt ();
     if (n<0 || n>=conv->Polygons.Length ()) return false;
     conv->CurrentPolygon = conv->Polygons.Get (n);
     conv->CurrentVertex = 0;
@@ -584,7 +584,7 @@ csPtr<iDataBuffer> csModelConverterASE::Save (iModelData *Data, const char *Form
 
 */
 
-  int i, j;
+  size_t i, j;
 
   // only the first object is saved
   csRef<iModelDataObject> obj (
@@ -611,7 +611,7 @@ csPtr<iDataBuffer> csModelConverterASE::Save (iModelData *Data, const char *Form
     int v1 = VertexTexelSet.Add (poly->GetVertex (0), -1, -1, poly->GetTexel (0));
     int vprev = VertexTexelSet.Add (poly->GetVertex (1), -1, -1, poly->GetTexel (1));
 
-	int i;
+    size_t i;
     for (i=2; i<poly->GetVertexCount (); i++)
     {
       int vn = VertexTexelSet.Add (poly->GetVertex (i), -1, -1, poly->GetTexel (i));

@@ -77,8 +77,8 @@ csLayoutConstraint *csLayout::AddLayoutComponent (csComponent* comp)
 
 void csLayout::RemoveLayoutComponent (csComponent* comp)
 {
-  int idx = vConstraints.FindKey (vConstraints.KeyCmp(comp));
-  if (idx != -1)
+  size_t idx = vConstraints.FindKey (vConstraints.KeyCmp(comp));
+  if (idx != (size_t)-1)
     vConstraints.DeleteIndex (idx);
   InvalidateLayout ();
 }

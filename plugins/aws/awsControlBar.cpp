@@ -107,7 +107,7 @@ void awsControlBar::DoLayout ()
   {
     // Pass once through all the components to find the max width.
     int max_width = 0;
-    int i;
+    size_t i;
     for (i = 0; i < comps.Length (); i++)
     {
       if (comps.Get (i)->isHidden ()) continue;
@@ -162,7 +162,7 @@ void awsControlBar::DoLayout ()
   {
     // Pass once through all the components to find the max height.
     int max_height = 0;
-    int i;
+    size_t i;
     for (i = 0; i < comps.Length (); i++)
     {
       if(comps.Get (i)->isHidden ()) continue;

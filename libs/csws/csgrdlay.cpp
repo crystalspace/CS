@@ -25,7 +25,7 @@ csGridLayout::csGridLayout (csComponent *pParent, int rows, int cols, int hgap, 
 
 void csGridLayout::SuggestSize (int &sugw, int &sugh)
 {
-  int i=0, cnt=vConstraints.Length ();
+  size_t i=0, cnt=vConstraints.Length ();
   sugw = sugh = 0;
 
   if (!cnt) return;
@@ -39,30 +39,30 @@ void csGridLayout::SuggestSize (int &sugw, int &sugh)
     if (h > sugh) sugh = w;
   }
 
-  int nRows = cnt / mCols + ((cnt % mCols) ? 1 : 0);
-  int nCols = (nRows != 0) ? mCols : cnt;
+  size_t nRows = cnt / mCols + ((cnt % mCols) ? 1 : 0);
+  size_t nCols = (nRows != 0) ? mCols : cnt;
 
   if (nRows > mRows) nRows = mRows;
 
-  int hgaps = (nCols > 1) ? (nCols - 1) * mHgap : 0;
-  int vgaps = (nRows > 1) ? (nRows - 1) * mVgap : 0;
+  int hgaps = (nCols > 1) ? (int)(nCols - 1) * mHgap : 0;
+  int vgaps = (nRows > 1) ? (int)(nRows - 1) * mVgap : 0;
 
-  sugw = sugw * nCols + hgaps + insets.xmin + insets.xmax;
-  sugh = sugh * nRows + vgaps + insets.ymin + insets.ymax;
+  sugw = sugw * (int)nCols + hgaps + insets.xmin + insets.xmax;
+  sugh = sugh * (int)nRows + vgaps + insets.ymin + insets.ymax;
 }
 
 void csGridLayout::LayoutContainer ()
 {
-  int i=0, cnt=vConstraints.Length ();
+  size_t i=0, cnt=vConstraints.Length ();
   if (!cnt) return;
 
-  int nRows = cnt / mCols + ((cnt % mCols) ? 1 : 0);
-  int nCols = (nRows != 0) ? mCols : cnt;
+  size_t nRows = cnt / mCols + ((cnt % mCols) ? 1 : 0);
+  size_t nCols = (nRows != 0) ? mCols : cnt;
 
   if (nRows > mRows) nRows = mRows;
 
-  int hgaps = (nCols > 1) ? (nCols - 1) * mHgap : 0;
-  int vgaps = (nRows > 1) ? (nRows - 1) * mVgap : 0;
+  int hgaps = (nCols > 1) ? (int)(nCols - 1) * mHgap : 0;
+  int vgaps = (nRows > 1) ? (int)(nRows - 1) * mVgap : 0;
 
   // actual layouting
 
@@ -80,18 +80,18 @@ void csGridLayout::LayoutContainer ()
   dimWidth  -= insets.xmin + insets.xmax;
   dimHeight -= insets.ymin + insets.ymax;
 
-  int colWidth  = (dimWidth  - hgaps) / nCols;
-  int rowHeight = (dimHeight - vgaps) / nRows;
+  int colWidth  = (dimWidth  - hgaps) / (int)nCols;
+  int rowHeight = (dimHeight - vgaps) / (int)nRows;
 
   i = 0;
 
-  int row, col;
+  size_t row, col;
   for (row = 0; row != nRows; ++row, y += (rowHeight + ((row == 0) ? 0 : mVgap)))
     for (col = 0; col != nCols; ++col)
     {
       if ( i < cnt )
       {
-	vConstraints.Get (i)->comp->SetPos (x + col*colWidth + col * mHgap, y);
+	vConstraints.Get (i)->comp->SetPos (x + (int)col*colWidth + (int)col * mHgap, y);
 	vConstraints.Get (i)->comp->SetSize (colWidth, rowHeight );
 	++i;
       }

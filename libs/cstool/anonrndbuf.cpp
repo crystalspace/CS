@@ -31,7 +31,7 @@ csAnonRenderBufferManager::csAnonRenderBufferManager(iObjectRegistry *object_reg
 
 csAnonRenderBufferManager::~csAnonRenderBufferManager()
 {
-  for(int i = 0; i < anon_buffers.Length(); i++)
+  for(size_t i = 0; i < anon_buffers.Length(); i++)
   {
     anon_buffers[i]->buf->Release();
     delete anon_buffers[i];
@@ -40,7 +40,7 @@ csAnonRenderBufferManager::~csAnonRenderBufferManager()
 
 iRenderBuffer * csAnonRenderBufferManager::GetRenderBuffer(csStringID name)
 {
-  for(int i = 0; i < anon_buffers.Length(); i++)
+  for(size_t i = 0; i < anon_buffers.Length(); i++)
   {
     if(name == anon_buffers[i]->name)
       return anon_buffers[i]->buf;
@@ -102,7 +102,7 @@ bool csAnonRenderBufferManager::SetRenderBufferComponent (const char *name, int 
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
     "crystalspace.shared.stringset", iStringSet);
   csStringID nameid = strings->Request (name);
-  int i;
+  size_t i;
   for (i = 0; i < anon_buffers.Length(); i ++)
   {
     if (nameid == anon_buffers[i]->name) break;
@@ -121,7 +121,7 @@ bool csAnonRenderBufferManager::SetRenderBufferComponent (const char *name, int 
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
     "crystalspace.shared.stringset", iStringSet);
   csStringID nameid = strings->Request (name);
-  int i;
+  size_t i;
   for (i = 0; i < anon_buffers.Length(); i ++)
   {
     if (nameid == anon_buffers[i]->name) break;
@@ -141,7 +141,7 @@ bool csAnonRenderBufferManager::SetRenderBuffer (const char *name, float *value,
     "crystalspace.shared.stringset", iStringSet);
 
   csStringID nameid = strings->Request (name);
-  int i;
+  size_t i;
   for (i = 0; i < anon_buffers.Length(); i ++)
   {
     if (nameid == anon_buffers[i]->name) break;
@@ -159,7 +159,7 @@ bool csAnonRenderBufferManager::SetRenderBuffer (const char *name, int *value, i
     "crystalspace.shared.stringset", iStringSet);
 
   csStringID nameid = strings->Request (name);
-  int i;
+  size_t i;
   for (i = 0; i < anon_buffers.Length(); i ++)
   {
     if (nameid == anon_buffers[i]->name) break;

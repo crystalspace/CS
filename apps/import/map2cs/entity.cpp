@@ -223,7 +223,7 @@ bool CMapEntity::GetOrigin(CdVector3& v)
 
 void CMapEntity::CreatePolygons()
 {
-  int i;
+  size_t i;
   for (i=0; i<m_Brushes.Length(); i++)
   {
     m_Brushes[i]->CreatePolygons();

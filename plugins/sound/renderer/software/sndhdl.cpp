@@ -48,7 +48,7 @@ csPtr<iSoundSource> csSoundHandleSoftware::CreateSource(int Mode3d)
 
 void csSoundHandleSoftware::vUpdate(void *buf, long Num)
 {
-  for (long i=0; i<SoundRender->Sources.Length(); i++)
+  for (size_t i=0; i<SoundRender->Sources.Length(); i++)
   {
     csSoundSourceSoftware *src = (csSoundSourceSoftware*)SoundRender->
       Sources.Get(i);

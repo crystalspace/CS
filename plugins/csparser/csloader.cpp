@@ -4975,7 +4975,7 @@ bool csLoader::ParseShaderList (iDocumentNode* node)
 void csLoader::CollectAllChildren (iMeshWrapper* meshWrapper, csRefArray<iMeshWrapper>&
   meshesArray)
 {  
-  int lastMeshVisited = 0;
+  size_t lastMeshVisited = 0;
   meshesArray.Push (meshWrapper);
     
   while (lastMeshVisited < meshesArray.Length ())
@@ -4985,7 +4985,7 @@ void csLoader::CollectAllChildren (iMeshWrapper* meshWrapper, csRefArray<iMeshWr
     csRef<iMeshList> mL = meshesArray[lastMeshVisited++]->GetChildren ();
     int i;
     for (i = 0; i < mL->GetCount (); i++)
-        meshesArray.Push (mL->Get (i));
+      meshesArray.Push (mL->Get (i));
   }//while
 
   return;

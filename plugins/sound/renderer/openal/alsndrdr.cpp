@@ -288,7 +288,7 @@ void csSoundRenderOpenAL::MixingFunction()
 
 void csSoundRenderOpenAL::Update()
 {
-  int i;
+  size_t i;
   csTicks ct, et;
   ct = csGetTicks ();
 

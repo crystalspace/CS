@@ -43,7 +43,7 @@ private:
   iEventHandler* handler;
   csRef<iVirtualClock> vc;
 
-  int FindTimerEvent (iTimerEvent* ev);
+  size_t FindTimerEvent (iTimerEvent* ev);
 
   // Optimization: to prevent having to loop over all timer events
   // all the time we keep the minimum time needed before the first

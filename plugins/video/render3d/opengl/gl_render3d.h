@@ -282,15 +282,15 @@ public:
   float GetAspect () const { return aspect; }
 
   /// Create a renderbuffer
-  virtual csPtr<iRenderBuffer> CreateRenderBuffer (int size, 
+  virtual csPtr<iRenderBuffer> CreateRenderBuffer (size_t size, 
     csRenderBufferType type, csRenderBufferComponentType componentType, 
     int componentCount);
-  virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (int size, 
+  virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (size_t size, 
     csRenderBufferType type, csRenderBufferComponentType componentType,
     size_t rangeStart, size_t rangeEnd);
 
   /// Create interleaved renderbuffers
-  virtual void CreateInterleavedRenderBuffers (int size, 
+  virtual void CreateInterleavedRenderBuffers (size_t size, 
     csRenderBufferType type, int count, csRefArray<iRenderBuffer>& buffers);
 
   /// Activate a vertex buffer

@@ -709,7 +709,7 @@ public:
   /// Removes all window definitions from the list.
   void RemoveAllWindowDefs ()
   {
-    int i;
+    size_t i;
     for (i = 0; i < win_defs.Length (); i++)
       win_defs[i]->RemoveAll ();
     win_defs.DeleteAll ();
@@ -732,7 +732,7 @@ public:
   /// Removes all skin definitions from the list
   void RemoveAllSkinDefs ()
   {
-    int i;
+    size_t i;
     for (i = 0; i < skin_defs.Length (); i++)
       skin_defs[i]->RemoveAll ();
     skin_defs.DeleteAll ();

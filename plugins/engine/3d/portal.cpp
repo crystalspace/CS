@@ -224,7 +224,7 @@ bool csPortal::PointOnPolygon (const csVector3& v)
   if (ABS (dot) >= EPSILON) return false;
 
   // Check if 'v' is on the same side of all edges.
-  int i, i1;
+  size_t i, i1;
   bool neg = false, pos = false;
   i1 = vertex_indices.Length () - 1;
   for (i = 0; i < vertex_indices.Length (); i++)
@@ -266,14 +266,14 @@ void csPortal::CastShadows (iMovable* movable, iFrustumView* fview)
   fview->CreateFrustumContext ();
   csFrustumContext *new_ctxt = fview->GetFrustumContext ();
 
-  int num_vertices = vertex_indices.Length ();
+  size_t num_vertices = vertex_indices.Length ();
   if (num_vertices > VectorArray->Length ())
     VectorArray->SetLength (num_vertices);
 
   csVector3 *poly = VectorArray->GetArray ();
 
   csDirtyAccessArray<csVector3>* vt = parent->GetWorldVertices ();
-  int j;
+  size_t j;
   if (old_ctxt->IsMirrored ())
     for (j = 0; j < num_vertices; j++)
       poly[j] = (*vt)[vertex_indices[num_vertices - j - 1]] - center;
@@ -316,7 +316,7 @@ bool csPortal::IntersectRay (const csVector3 &start,
   relend -= start;
 
   csDirtyAccessArray<csVector3>* vt = parent->GetVertices ();
-  int i, i1;
+  size_t i, i1;
   i1 = vertex_indices.Length () - 1;
   for (i = 0; i < vertex_indices.Length (); i++)
   {

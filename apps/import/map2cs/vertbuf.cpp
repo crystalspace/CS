@@ -71,7 +71,7 @@ void CVertexBuffer::AddVertices(CMapPolygonSet* pPolySet)
 
 void CVertexBuffer::AddVertices(CMapPolygonSetVector* pPolySetVector)
 {
-  int i;
+  size_t i;
   for (i=0; i<pPolySetVector->Length(); i++)
   {
     AddVertices(pPolySetVector->Get(i));
@@ -80,7 +80,7 @@ void CVertexBuffer::AddVertices(CMapPolygonSetVector* pPolySetVector)
 
 void CVertexBuffer::AddVertices(CIPortalVector* pPortalVector)
 {
-  int i;
+  size_t i;
   for (i=0; i<pPortalVector->Length(); i++)
   {
     AddVertices(pPortalVector->Get(i));
@@ -90,7 +90,7 @@ void CVertexBuffer::AddVertices(CIPortalVector* pPortalVector)
 int CVertexBuffer::GetIndex(CdVector3 Vertex) const
 {
   //search for the vertex in the buffer
-  int i;
+  size_t i;
   for (i=0; i<m_Vertices.Length(); i++)
   {
     if (Vertex == (*m_Vertices[i]))
@@ -110,7 +110,7 @@ bool CVertexBuffer::WriteCS(csRef<iDocumentNode> node, CIWorld* pWorld)
 
   double ScaleFactor = pWorld->GetScalefactor();
 
-  int i;
+  size_t i;
   for (i=0; i<m_Vertices.Length(); i++)
   {
     DocNode v = CreateNode (node, "v");

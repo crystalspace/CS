@@ -34,7 +34,7 @@ csButton::csButton (csComponent *iParent, int iCommandCode,
   ImageNormal (0), ImagePressed (0),
   FrameNormal (0), FramePressed (0), FrameHighlighted (0),
   delImages (false), delFrameImages(false),
-  CommandCode (iCommandCode), underline_pos (-1),
+  CommandCode (iCommandCode), underline_pos ((size_t)-1),
   ButtonStyle (iButtonStyle), FrameStyle (iFrameStyle),
   ButtonAlpha(0), DrawTextOnHighlightOnly (false),
   Pressed (false), Highlighted (false)
@@ -297,7 +297,7 @@ bool csButton::HandleEvent (iEvent &Event)
       else
       {
 	if (app->KeyboardOwner)
-	  if (((underline_pos >= 0)
+	  if (((underline_pos != (size_t)-1)
 	    && (toupper ((char)csKeyEventHelper::GetCookedCode (&Event)) == 
 	    toupper (text [underline_pos])))
 	  || ((csKeyEventHelper::GetCookedCode (&Event) == CSKEY_SPACE)
@@ -332,7 +332,7 @@ bool csButton::HandleKeyPress (iEvent &Event)
   csKeyEventHelper::GetModifiers (&Event, m);
   // Check hot key
   if (!GetState (CSS_DISABLED))
-    if (((underline_pos >= 0)
+    if (((underline_pos != (size_t)-1)
       && (app->KeyboardOwner == 0)
       && CheckHotKey (Event, text [underline_pos]))
      || ((GetState (CSS_FOCUSED))

@@ -518,7 +518,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
   sv = svcontext->GetVariableAdd (terr->indices_name);
   sv->SetValue (terr->mesh_indices[idx]);
 
-  for (int i=0; i<=(baseonly?0:terr->palette.Length ()); ++i)
+  for (size_t i=0; i<=(baseonly?0:terr->palette.Length ()); ++i)
   {
     if ((i > 0) && !IsMaterialUsed (i - 1)) continue;
 
@@ -753,7 +753,7 @@ csTerrainObject::~csTerrainObject ()
 
 void csTerrainObject::FireListeners ()
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < listeners.Length () ; i++)
     listeners[i]->ObjectModelChanged (&scfiObjectModel);
 }
@@ -847,7 +847,7 @@ bool csTerrainObject::SetMaterialPalette (
   const csArray<iMaterialWrapper*>& pal)
 {
   palette.SetLength (pal.Length());
-  for (int i = 0; i < pal.Length(); i++)
+  for (size_t i = 0; i < pal.Length(); i++)
   {
     palette[i] = pal[i];
   }
@@ -879,7 +879,7 @@ bool csTerrainObject::SetMaterialMap (const csArray<char>& data, int w, int h)
   lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
   matwrap->GetMaterial()->AddVariable (lod_var);
 
-  for (int i = 0; i < palette.Length(); i ++) 
+  for (size_t i = 0; i < palette.Length(); i ++) 
   {
     csRef<iImage> alpha = csPtr<iImage> (new csImageMemory (w, h, 
       CS_IMGFMT_ALPHA | CS_IMGFMT_TRUECOLOR));
@@ -890,7 +890,7 @@ bool csTerrainObject::SetMaterialMap (const csArray<char>& data, int w, int h)
     {
       for (x = 0; x < w; x ++) 
       {
-        int v = (data[x + y * w] == i) ? 255 : 0;
+        int v = ((unsigned char)data[x + y * w] == i) ? 255 : 0;
         map[x + y * w].Set (v, v, v, v);
       }
     }

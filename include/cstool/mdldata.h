@@ -31,14 +31,14 @@
   void Set##name (type);
 
 #define CS_DECLARE_ARRAY_INTERFACE_NONUM(type,sing_name)		\
-  type Get##sing_name (int n) const;					\
-  void Set##sing_name (int n, type);
+  type Get##sing_name (size_t n) const;					\
+  void Set##sing_name (size_t n, type);
 
 #define CS_DECLARE_ARRAY_INTERFACE(type,sing_name)			\
   CS_DECLARE_ARRAY_INTERFACE_NONUM (type, sing_name)			\
-  int Get##sing_name##Count () const;					\
-  int Add##sing_name (type obj);					\
-  void Delete##sing_name (int n);
+  size_t Get##sing_name##Count () const;				\
+  size_t Add##sing_name (type obj);					\
+  void Delete##sing_name (size_t n);
 
 #define CS_DECLARE_OBJECT_INTERFACE					\
   CS_DECLARE_EMBEDDED_OBJECT (csObject, iObject);			\
@@ -165,10 +165,10 @@ public:
   CS_DECLARE_ARRAY_INTERFACE (const csVector3 &, Normal);
   CS_DECLARE_ARRAY_INTERFACE (const csColor &, Color);
   CS_DECLARE_ARRAY_INTERFACE (const csVector2 &, Texel);
-  virtual int FindVertex (const csVector3 &v) const;
-  virtual int FindNormal (const csVector3 &v) const;
-  virtual int FindColor (const csColor &v) const;
-  virtual int FindTexel (const csVector2 &v) const;
+  virtual size_t FindVertex (const csVector3 &v) const;
+  virtual size_t FindNormal (const csVector3 &v) const;
+  virtual size_t FindColor (const csColor &v) const;
+  virtual size_t FindTexel (const csVector2 &v) const;
 
   iModelDataVertices *Clone () const;
 };
@@ -190,19 +190,19 @@ public:
   virtual ~csModelDataAction ();
 
   /// Return the number of key frames
-  virtual int GetFrameCount () const;
+  virtual size_t GetFrameCount () const;
   /// Get the time value for a frame
-  virtual float GetTime (int Frame) const;
+  virtual float GetTime (size_t Frame) const;
   /// Get the state information for a frame
-  virtual iObject *GetState (int Frame) const;
+  virtual iObject *GetState (size_t Frame) const;
   /// Set the time value for a frame
-  virtual void SetTime (int Frame, float NewTime);
+  virtual void SetTime (size_t Frame, float NewTime);
   /// Set the state information for a frame
-  virtual void SetState (int Frame, iObject *State);
+  virtual void SetState (size_t Frame, iObject *State);
   /// Add a frame
   virtual void AddFrame (float Time, iObject *State);
   /// Delete a frame
-  virtual void DeleteFrame (int Frame);
+  virtual void DeleteFrame (size_t Frame);
   /// Return the total time of one animation cycle
   virtual float GetTotalTime () const;
 };
@@ -227,11 +227,11 @@ public:
   virtual ~csModelDataPolygon ();
 
   /// Add a vertex
-  int AddVertex (int ver, int nrm, int col, int tex);
+  size_t AddVertex (int ver, int nrm, int col, int tex);
   /// Return the number of vertices
-  int GetVertexCount () const;
+  size_t GetVertexCount () const;
   /// Delete a vertex
-  void DeleteVertex (int n);
+  void DeleteVertex (size_t n);
 
   CS_DECLARE_ARRAY_INTERFACE_NONUM (int, Vertex);
   CS_DECLARE_ARRAY_INTERFACE_NONUM (int, Normal);

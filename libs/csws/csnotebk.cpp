@@ -270,7 +270,8 @@ void csNotebook::Draw ()
         break;
     }
 
-  int delta, color;
+  size_t delta;
+  int color;
   switch (style & CSNBS_TABPOS_MASK)
   {
     case CSNBS_TABPOS_LEFT:
@@ -294,7 +295,8 @@ void csNotebook::Draw ()
     pages.Get (delta)->zorder = -1;
 
   // Draw the tabs in two passes: first unselected and then selected
-  int zorder = 0, tab, selected;
+  int zorder = 0, selected;
+  size_t tab;
   for (selected = 0; selected < 2; selected++)
   {
     int pos = (((style & CSNBS_TABPOS_MASK) < CSNBS_TABPOS_LEFT) ? tabx : taby) + lastpos;
@@ -569,7 +571,7 @@ bool csNotebook::SetRect (int xmin, int ymin, int xmax, int ymax)
   return rc;
 }
 
-bool csNotebook::InsideTab (int iIndex, int x, int y)
+bool csNotebook::InsideTab (size_t iIndex, int x, int y)
 {
   if (iIndex < 0 || iIndex >= pages.Length ())
     return false;
@@ -597,15 +599,17 @@ bool csNotebook::HandleEvent (iEvent &Event)
       if (Event.Mouse.Button == 1)
       {
         // Find the "topmost" tab under the mouse
-        int zmax = -1, pageno = -1, i;
-        for (i = pages.Length () - 1; i >= 0; i--)
+        int zmax = -1;
+	size_t pageno = (size_t)-1;
+	size_t i;
+        for (i = pages.Length (); i-- > 0;)
           if (InsideTab (i, Event.Mouse.x, Event.Mouse.y))
           {
             cspPageData *data = pages.Get (i);
             if (data->zorder > zmax)
             { pageno = i; zmax = data->zorder; }
           }
-        if (pageno >= 0)
+        if (pageno != (size_t)-1)
         {
           SelectTab (pageno);
           return true;
@@ -638,7 +642,7 @@ bool csNotebook::HandleEvent (iEvent &Event)
 	      ((csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_CTRL) == 0) && 
 	      (!csKeyEventHelper::GetAutoRepeat (&Event)))
 	    {
-	      int i;
+	      size_t i;
 	      for (i = 0; i < pages.Length (); i++)
 		if (pages.Get (i)->IsHotKey (
 		  csKeyEventHelper::GetCookedCode (&Event)))
@@ -662,7 +666,7 @@ bool csNotebook::HandleEvent (iEvent &Event)
           return true;
         case cscmdNotebookScrollTabsForward:
         {
-          int np = firsttab + 1;
+          size_t np = firsttab + 1;
           while (np < pages.Length ()
               && !(pages.Get (np)->flags & NOTEBOOK_PAGE_PRIMARY))
             np++;
@@ -677,17 +681,20 @@ bool csNotebook::HandleEvent (iEvent &Event)
         }
         case cscmdNotebookScrollTabsBackward:
         {
-          int np = firsttab - 1;
-          while (np > 0
-              && !(pages.Get (np)->flags & NOTEBOOK_PAGE_PRIMARY))
-            np--;
-          if ((np < firsttab) && (np >= 0)
-           && (pages.Get (np)->flags & NOTEBOOK_PAGE_PRIMARY))
-          {
-            firsttab = np;
-            fReposition = true;
-            Invalidate ();
-          }
+	  if (firsttab > 0)
+	  {
+	    size_t np = firsttab - 1;
+	    while (np > 0
+		&& !(pages.Get (np)->flags & NOTEBOOK_PAGE_PRIMARY))
+	      np--;
+	    if ((np < firsttab) && (np >= 0)
+	    && (pages.Get (np)->flags & NOTEBOOK_PAGE_PRIMARY))
+	    {
+	      firsttab = np;
+	      fReposition = true;
+	      Invalidate ();
+	    }
+	  }
           return true;
         }
       }
@@ -704,16 +711,16 @@ bool csNotebook::HandleEvent (iEvent &Event)
   return csComponent::HandleEvent (Event);
 }
 
-int csNotebook::FindPage (csComponent *iComponent)
+size_t csNotebook::FindPage (csComponent *iComponent)
 {
-  int idx;
+  size_t idx;
   for (idx = 0; idx < pages.Length (); idx++)
     if (pages.Get (idx)->page == iComponent)
       return idx;
-  return -1;
+  return (size_t)-1;
 }
 
-bool csNotebook::SelectTab (int iIndex)
+bool csNotebook::SelectTab (size_t iIndex)
 {
   if (iIndex < 0 || iIndex >= pages.Length ())
     return false;
@@ -740,7 +747,7 @@ bool csNotebook::DeleteTab (csComponent *iComponent)
   return pages.DeleteIndex (FindPage (iComponent));
 }
 
-bool csNotebook::DeleteTab (int iIndex)
+bool csNotebook::DeleteTab (size_t iIndex)
 {
   fReposition = true;
   return pages.DeleteIndex (iIndex);
@@ -764,8 +771,8 @@ bool csNotebook::AddTab (cspPageData *iPageData, const char *iInfo,
     iPageData->page->Select ();
 
   // Find the page to insert before
-  int idx = iBefore ? FindPage (iBefore) : -1;
-  if (idx < 0)
+  size_t idx = iBefore ? FindPage (iBefore) : (size_t)-1;
+  if (idx == (size_t)-1)
     pages.Push (iPageData);
   else
     pages.Insert (idx, iPageData);
@@ -827,7 +834,7 @@ void csNotebook::GetClientRect (csRect &oRect)
 {
   struct { int w, h; } maxsize;
   maxsize.w = maxsize.h = 0;
-  int i;
+  size_t i;
   for (i = 0; i < pages.Length (); i++)
   {
     cspPageData *data = pages.Get (i);
@@ -900,7 +907,7 @@ int csNotebook::InfoHeight ()
   return h;
 }
 
-bool csNotebook::GetTabSize (int iTab, int &oW, int &oH)
+bool csNotebook::GetTabSize (size_t iTab, int &oW, int &oH)
 {
   cspPageData *data = pages.Get (iTab);
   if (data->flags & NOTEBOOK_PAGE_PIXMAP)

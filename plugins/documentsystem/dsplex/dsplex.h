@@ -35,8 +35,8 @@ private:
   csRef<iStringArray> classlist;
   csRef<iPluginManager> plugin_mgr;
 
-  csRef<iDocumentSystem> LoadNextPlugin (int num);
-  void RewardPlugin (int num);
+  csRef<iDocumentSystem> LoadNextPlugin (size_t num);
+  void RewardPlugin (size_t num);
 public:
   SCF_DECLARE_IBASE;
   

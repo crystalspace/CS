@@ -48,7 +48,7 @@ void csInputLine::SetText (const char *iText)
   if (!iText)
     iText = "";
 
-  int sl = strlen (iText);
+  size_t sl = strlen (iText);
   if (sl > maxlen)
     sl = maxlen;
   memcpy (text, iText, sl);
@@ -62,7 +62,7 @@ void csInputLine::SetText (const char *iText)
 
 void csInputLine::SetTextExt (const char *iText)
 {
-  int sl = strlen (iText);
+  size_t sl = strlen (iText);
   if (sl > maxlen)
     sl = maxlen;
   memcpy (text, iText, sl);
@@ -112,7 +112,7 @@ void csInputLine::Draw ()
   textx = dx;
   texty = dy + (clip.Height () - fonth) / 2;
 
-  int sels = selstart, sele = selend;
+  size_t sels = selstart, sele = selend;
   if (sels > sele)
   {
     sels = selend;
@@ -140,7 +140,7 @@ void csInputLine::Draw ()
   {
     int cx = GetCharX (cursorpos);
     if (cx < clip.xmax)
-      if (app->InsertMode || (cursorpos == (int)strlen (text)))
+      if (app->InsertMode || (cursorpos == strlen (text)))
         cursorrect.Set (cx - 1, texty - 1, cx + 1, texty + fonth + 1);
       else
       {
@@ -168,7 +168,7 @@ void csInputLine::Draw ()
 
   if (sels != sele)
   {
-    int sc = sels < firstchar ? firstchar : sels;
+    size_t sc = sels < firstchar ? firstchar : sels;
     int cx = textx;
     char tmp = text [sc];
     text [sc] = 0;
@@ -180,7 +180,7 @@ void csInputLine::Draw ()
     Text (cx, texty, CSPAL_INPUTLINE_SELTEXT, -1, &text [sc]);
     cx += GetTextSize (&text [sc]);
     text [sele] = tmp;
-    if (sele < (int)strlen (text))
+    if (sele < strlen (text))
       Text (cx, texty, CSPAL_INPUTLINE_TEXT, -1, &text [sele]);
   }
   else
@@ -220,7 +220,7 @@ bool csInputLine::HandleEvent (iEvent &Event)
     case csevMouseMove:
       if (app->MouseOwner == this)
       {
-        int i, sl = strlen (text);
+        size_t i, sl = strlen (text);
         if ((Event.Mouse.x < textx) && (firstchar > 0))
           i = firstchar - 1;
         else
@@ -254,7 +254,7 @@ bool csInputLine::HandleEvent (iEvent &Event)
 	      break;
 	    if (cursorpos == 0)
 	      return true;
-	    int newpos = cursorpos;
+	    size_t newpos = cursorpos;
 	    if (csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_CTRL)
 	      newpos = WordLeft (text, newpos);
 	    else
@@ -267,9 +267,9 @@ bool csInputLine::HandleEvent (iEvent &Event)
 	  {
 	    if (csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_ALT)
 	      break;
-	    if (cursorpos >= (int)strlen (text))
+	    if (cursorpos >= strlen (text))
 	      return true;
-	    int newpos = cursorpos;
+	    size_t newpos = cursorpos;
 	    if (csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_CTRL)
 	      newpos = WordRight (text, newpos);
 	    else
@@ -348,7 +348,7 @@ bool csInputLine::HandleEvent (iEvent &Event)
 	    DeleteSelection ();
 	    CS_ALLOC_STACK_ARRAY (char, tmp, maxlen + 1);
 	    strcpy (tmp, text);
-	    int sl = strlen (tmp);
+	    size_t sl = strlen (tmp);
 	    if (app->InsertMode)
 	    {
 	      if (sl >= maxlen)
@@ -390,12 +390,12 @@ void csInputLine::SetState (int mask, bool enable)
   } /* endif */
 }
 
-void csInputLine::SetSelection (int iStart, int iEnd)
+void csInputLine::SetSelection (size_t iStart, size_t iEnd)
 {
   if ((selstart != iStart)
    || (selend != iEnd))
   {
-    int sl = strlen (text);
+    size_t sl = strlen (text);
     if (iStart > sl)
       iStart = sl;
     if (iEnd > sl)
@@ -407,7 +407,7 @@ void csInputLine::SetSelection (int iStart, int iEnd)
   } /* endif */
 }
 
-int csInputLine::GetCharX (int iNum)
+int csInputLine::GetCharX (size_t iNum)
 {
   if (iNum > maxlen)
     iNum = maxlen;
@@ -422,7 +422,7 @@ int csInputLine::GetCharX (int iNum)
   return textx + x;
 }
 
-void csInputLine::SetCursorPos (int NewPos, bool ExtendSel)
+void csInputLine::SetCursorPos (size_t NewPos, bool ExtendSel)
 {
   if (NewPos == cursorpos)
   {
@@ -480,9 +480,9 @@ void csInputLine::SuggestSize (int &w, int &h)
   h = MAX (h, bound.Height ());
 }
 
-bool csInputLine::IsValidPos (int NewPos)
+bool csInputLine::IsValidPos (size_t NewPos)
 {
-  return (NewPos >= 0) && (NewPos <= (int)strlen (text));
+  return (NewPos >= 0) && (NewPos <= strlen (text));
 }
 
 bool csInputLine::IsValidString (const char *iText)
@@ -501,7 +501,7 @@ void csInputLine::DeleteSelection ()
 {
   if (selstart != selend)
   {
-    int ss = selstart, se = selend;
+    size_t ss = selstart, se = selend;
     if (ss > se)
     { ss = selend; se = selstart; }
     CS_ALLOC_STACK_ARRAY (char, tmp, maxlen + 1);

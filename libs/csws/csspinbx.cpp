@@ -247,9 +247,9 @@ void csSpinBox::Spin (int iDelta)
   if (Values.Length ())
   {
     if (NewValue < 0)
-      NewValue += Values.Length ();
-    if (NewValue >= Values.Length ())
-      NewValue -= Values.Length ();
+      NewValue += (int)Values.Length ();
+    if ((size_t)NewValue >= Values.Length ())
+      NewValue -= (int)Values.Length ();
   }
   else
   {
@@ -265,7 +265,7 @@ void csSpinBox::Spin ()
 {
   AutoRepeats++;
   int Delta;
-  int NumValues = Values.Length ();
+  size_t NumValues = Values.Length ();
   if (!NumValues)
     NumValues = (NumLimits.MaxValue - NumLimits.MinValue) + 1;
   if ((NumValues >= 40) && (AutoRepeats >= 40))
@@ -291,8 +291,8 @@ void csSpinBox::SetValue (int iValue)
 {
   if (Values.Length ())
   {
-    if (iValue >= Values.Length ())
-      iValue = Values.Length () - 1;
+    if (iValue >= (int)Values.Length ())
+      iValue = (int)Values.Length () - 1;
     if (iValue < 0)
       iValue = 0;
     SetText (Values [iValue]);
@@ -328,7 +328,7 @@ void csSpinBox::SetLimits (int iMin, int iMax, char *iFormat)
 int csSpinBox::InsertItem (char *iValue, int iPosition)
 {
   if (iPosition == CSSB_ITEM_AFTERALL)
-    iPosition = Values.Length ();
+    iPosition = (int)Values.Length ();
   Values.Insert (iPosition, iValue);
   return iPosition;
 }

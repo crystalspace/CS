@@ -228,7 +228,7 @@ public:
   /// Query the socket number f
   csSpriteCal3DSocket* GetSocket (int f) const
   {
-    return (f < sockets.Length ())
+    return ((size_t)f < sockets.Length ())
       ? (csSpriteCal3DSocket *)sockets [f]
       : (csSpriteCal3DSocket*)0;
   }
@@ -826,7 +826,7 @@ public:
   /// Query the socket number f
   csSpriteCal3DSocket* GetSocket (int f) const
   {
-    return (f < sockets.Length ())
+    return ((size_t)f < sockets.Length ())
       ? (csSpriteCal3DSocket *)sockets [f]
       : (csSpriteCal3DSocket*)0;
   }

@@ -311,7 +311,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
   csReversibleTransform& o2c, iClipper2D* clipper, bool lazyclip, float aspect,
   int width2, int height2)
 {
-  int i;
+  size_t i;
 
   if (!z_verts)
   {
@@ -333,7 +333,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
 
   // @@@ Currently we don't implement multi-texture
   // in the generic implementation. This is a todo...
-  int num_vertices = mesh.buffers[0]->GetVertexCount ();
+  size_t num_vertices = mesh.buffers[0]->GetVertexCount ();
 
   // Update work tables.
   if (num_vertices > tr_verts->Capacity ())
@@ -452,7 +452,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
 
   // Draw all triangles.
   csTriangle* triangles = mesh.triangles;
-  for (i = 0 ; i < mesh.num_triangles ; i++)
+  for (i = 0 ; i < (size_t)mesh.num_triangles ; i++)
   {
     int a = triangles[i].a;
     int b = triangles[i].b;

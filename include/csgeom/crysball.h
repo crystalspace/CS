@@ -71,20 +71,20 @@ class CS_CSGEOM_EXPORT csCrystalBall
       OUTSIDE = 1
     };
 
-    int from, len; // contains <len> points in vPoints starting at <from>
-    int divider; // index to point that divides this triangle
-    csTriNode (csTriNode *theParent=0, int from=-1, int len=0) : csTreeNode (theParent)
+    size_t from, len; // contains <len> points in vPoints starting at <from>
+    size_t divider; // index to point that divides this triangle
+    csTriNode (csTriNode *theParent=0, size_t from=(size_t)-1, size_t len=0) : csTreeNode (theParent)
       {this->from = from; this->len = len;}
 
     // find a triangle for <normal> and return the index where its been inserted into vP
-    int Add (csCrystalBallVec *normal, int tri1, int tri2, int tri3,
+    int Add (csCrystalBallVec *normal, size_t tri1, size_t tri2, size_t tri3,
 	      csArray<csCrystalBallVec*> *vP, csArray<csVector3*> *vTP);
 
     // adjust (from,len) pairs after a new point was inserted
-    void Adjust (int nPos);
+    void Adjust (size_t nPos);
 
     // classify a point to lie inside or outside the spherical triangle
-    int Classify (const csVector3 &n, int i1, int i2, int i3,
+    int Classify (const csVector3 &n, size_t i1, size_t i2, size_t i3,
 		  const csArray<csVector3*> *vTP) const;
 
     // are all 3 normals on the side <useSign>

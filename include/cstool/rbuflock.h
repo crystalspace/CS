@@ -88,13 +88,13 @@ public:
   }
 
   /// Retrieve an item in the render buffer.
-  T& operator [] (int n)
+  T& operator [] (size_t n)
   {
     return *(Lock() + n);
   }
 
   /// Retrieve an item in the render buffer.
-  T& Get (int n)
+  T& Get (size_t n)
   {
     return *(Lock() + n);
   }

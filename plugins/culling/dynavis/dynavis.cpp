@@ -85,7 +85,7 @@ class csDynVisObjIt : public iVisibilityObjectIterator
 {
 private:
   csArray<iVisibilityObject*>* vector;
-  int position;
+  size_t position;
   bool* vistest_objects_inuse;
 
 public:
@@ -116,21 +116,21 @@ public:
     iVisibilityObject* vo = vector->Get (position);
     position++;
     if (position == vector->Length ())
-      position = -1;
+      position = (size_t)-1;
     return vo;
   }
 
   virtual void Reset()
   {
     if (vector == 0 || vector->Length () < 1)
-      position = -1;
+      position = (size_t)-1;
     else
       position = 0;
   }
 
   virtual bool HasNext () const
   {
-    return (position >= 0 && position <= vector->Length ());
+    return ((position != (size_t)-1) && position <= vector->Length ());
   }
 };
 
@@ -348,7 +348,7 @@ void csDynaVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox,
 void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
 {
 #ifdef CS_DEBUG
-  int i;
+  size_t i;
   for (i = 0 ; i < visobj_vector.Length () ; i++)
   {
     if (visobj_vector[i]->visobj == visobj)
@@ -417,7 +417,7 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
 
 void csDynaVis::UnregisterVisObject (iVisibilityObject* visobj)
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < visobj_vector.Length () ; i++)
   {
     csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
@@ -796,8 +796,8 @@ void csDynaVis::UpdateCoverageBuffer (csVisibilityObjectWrapper* obj)
   iPolygonMesh* polymesh = visobj->GetObjectModel ()->GetPolygonMeshViscull ();
 
   const csVector3* verts = polymesh->GetVertices ();
-  int vertex_count = polymesh->GetVertexCount ();
-  int poly_count = polymesh->GetPolygonCount ();
+  size_t vertex_count = polymesh->GetVertexCount ();
+  size_t poly_count = polymesh->GetPolygonCount ();
 
   csReversibleTransform trans = cam_trans;
   // Camera position in object space.
@@ -813,7 +813,7 @@ void csDynaVis::UpdateCoverageBuffer (csVisibilityObjectWrapper* obj)
     trans /= movtrans;
   }
 
-  int i;
+  size_t i;
 
   // First transform all vertices.
   dynavis_tr_verts *tr_verts = GetTrVerts();
@@ -1764,7 +1764,7 @@ bool csDynaVis::VisTest (iRenderView* rview,
   // Just keep vis information from last frame.
   if (do_freeze_vis)
   {
-    int i;
+    size_t i;
     for (i = 0 ; i < visobj_vector.Length () ; i++)
     {
       csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
@@ -2641,7 +2641,7 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
     if (cfg_view_mode == VIEWMODE_STATSOVERLAY
     	|| cfg_view_mode == VIEWMODE_CLEARSTATSOVERLAY)
     {
-      int i;
+      size_t i;
       int reason_cols[LAST_REASON];
       for (i = 0 ; i < LAST_REASON ; i++)
       {
@@ -2721,7 +2721,7 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
     }
     else if (cfg_view_mode == VIEWMODE_OUTLINES)
     {
-      int i;
+      size_t i;
       for (i = 0 ; i < visobj_vector.Length () ; i++)
       {
 	csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
@@ -2969,7 +2969,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     if (bugplug)
     {
       bugplug->SetupDebugSector ();
-      int i;
+      size_t i;
       for (i = 0 ; i < visobj_vector.Length () ; i++)
       {
         csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
@@ -3121,7 +3121,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
   {
     do_freeze_vis = true;
     csExactCuller* excul = new csExactCuller (scr_width, scr_height);
-    int i;
+    size_t i;
     for (i = 0 ; i < visobj_vector.Length () ; i++)
     {
       csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
@@ -3220,7 +3220,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
     	"Analyze visibility status.");
     csExactCuller* excul = new csExactCuller (scr_width, scr_height);
-    int i;
+    size_t i;
     for (i = 0 ; i < visobj_vector.Length () ; i++)
     {
       csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];

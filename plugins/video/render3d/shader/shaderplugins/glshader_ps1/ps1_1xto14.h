@@ -32,22 +32,22 @@ protected:
   csArray<uint> neededRegs;
 
   int tempRegisterMap[2][2];
-  int tempRegisterExpire[2][2];
+  size_t tempRegisterExpire[2][2];
 
   const char* SetLastError (const char* fmt, ...);
   void ResetState();
 
-  const char* GetTempReg (int oldReg, int instrIndex, uint usedBits,
+  const char* GetTempReg (int oldReg, size_t instrIndex, uint usedBits,
     int& newReg);
-  const char* GetTexTempReg (int oldReg, int instrIndex, int& newReg);
+  const char* GetTexTempReg (int oldReg, size_t instrIndex, int& newReg);
 
   const char* AddInstruction (const csPSProgramInstruction &instr,
-    int instrIndex);
+    size_t instrIndex);
 
   const char* AddArithmetic (const csPSProgramInstruction &instr,
-    int instrIndex);
+    size_t instrIndex);
   const char* AddTEX (const csPSProgramInstruction &instr,
-    int instrIndex);
+    size_t instrIndex);
 
   const char* CollectUsage (const csArray<csPSProgramInstruction>*& instrs);
 public:

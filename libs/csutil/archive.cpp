@@ -89,7 +89,7 @@ csArchive::~csArchive ()
   delete [] comment;
   if (file) fclose (file);
 
-  int i;
+  size_t i;
   for (i = 0; i < lazy.Length (); i++)
   {
     ArchiveEntry* e = lazy[i];
@@ -141,7 +141,7 @@ void csArchive::ReadDirectory ()
   // First, make a list of all possible directory components.
   csString filename;
   csSet<char*, csConstCharHashKeyHandler> dset;
-  for (int i = 0, n = dir.Length(); i < n; i++)
+  for (size_t i = 0, n = dir.Length(); i < n; i++)
   {
     ArchiveEntry const* e = dir.Get (i);
     filename = e->filename;
@@ -311,10 +311,10 @@ void csArchive::ReadZipEntries (FILE *infile)
 csArchive::ArchiveEntry *csArchive::InsertEntry (const char *name,
   ZIP_central_directory_file_header &cdfh)
 {
-  int dupentry;
+  size_t dupentry;
   ArchiveEntry *e = new ArchiveEntry (name, cdfh);
   dir.InsertSorted (e, ArchiveEntryVector::Compare, &dupentry);
-  if (dupentry >= 0)
+  if (dupentry != (size_t)-1)
     dir.DeleteIndex (dupentry);
   return e;
 }
@@ -341,7 +341,7 @@ void csArchive::Dir () const
   printf (" Comp |Uncomp| File |CheckSum| File\n");
   printf (" size | size |offset| (CRC32)| name\n");
   printf ("------+------+------+--------+------\n");
-  int fn;
+  size_t fn;
   for (fn = 0; fn < dir.Length (); fn++)
   {
     ArchiveEntry *e = dir.Get (fn);
@@ -352,9 +352,9 @@ void csArchive::Dir () const
 
 void *csArchive::FindName (const char *name) const
 {
-  int idx = dir.FindSortedKey(csArrayCmp<ArchiveEntry*,char const*>(name,
+  size_t idx = dir.FindSortedKey(csArrayCmp<ArchiveEntry*,char const*>(name,
     ArchiveEntryVector::CompareKey));
-  if (idx < 0)
+  if (idx == (size_t)-1)
     return 0;
   return dir.Get (idx);
 }
@@ -464,10 +464,10 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
 void *csArchive::NewFile (const char *name, size_t size, bool pack)
 {
   DeleteFile (name);
-  int idx = lazy.FindKey (csArrayCmp<ArchiveEntry*,char const*>(name,
+  size_t idx = lazy.FindKey (csArrayCmp<ArchiveEntry*,char const*>(name,
     ArchiveEntryVector::CompareKey));
   ArchiveEntry *f;
-  if (idx >= 0)
+  if (idx != csArrayItemNotFound)
   {
     // If already added without flushing, reuse the previously added
     // entry and just reset the write pointer and compression method.
@@ -525,7 +525,7 @@ bool csArchive::WriteZipArchive ()
   FILE *temp;
   char buff [16 * 1024];
   bool success = false;
-  int n = 0;
+  size_t n = 0;
 
   // Check if file is opened for reading first
   if (!file) return false;
@@ -702,7 +702,7 @@ temp_failed:
 
 bool csArchive::WriteCentralDirectory (FILE *temp)
 {
-  int n, count = 0;
+  size_t n, count = 0;
   size_t cdroffs = ftell (temp);
 
   for (n = 0; n < dir.Length (); n++)
@@ -728,8 +728,8 @@ bool csArchive::WriteCentralDirectory (FILE *temp)
   ZIP_end_central_dir_record ecdr;
 
   memset (&ecdr, 0, sizeof (ecdr));
-  ecdr.num_entries_centrl_dir_ths_disk = count;
-  ecdr.total_entries_central_dir = count;
+  ecdr.num_entries_centrl_dir_ths_disk = (ush)count;
+  ecdr.total_entries_central_dir = (ush)count;
   ecdr.size_central_directory = (u32)(ftell (temp) - cdroffs);
   ecdr.offset_start_central_directory = (u32)cdroffs;
   ecdr.zipfile_comment_length = (ush)comment_length;
@@ -741,12 +741,12 @@ bool csArchive::WriteCentralDirectory (FILE *temp)
 void csArchive::UpdateDirectory ()
 {
   /* Update archive directory: remove deleted entries first */
-  int n;
-  for (n = dir.Length () - 1; n >= 0; n--)
+  size_t n;
+  for (n = dir.Length (); n > 0; n--)
   {
-    ArchiveEntry *e = dir.Get (n);
+    ArchiveEntry *e = dir.Get (n - 1);
     if (IsDeleted (e->filename))
-      dir.DeleteIndex (n);
+      dir.DeleteIndex (n - 1);
   }
   del.DeleteAll ();
 
@@ -762,7 +762,7 @@ void csArchive::UpdateDirectory ()
 
 bool csArchive::IsDeleted (const char *name) const
 {
-  return (del.FindSortedKey (name) >= 0);
+  return (del.FindSortedKey (name) != csArrayItemNotFound);
 }
 
 void csArchive::UnpackTime (ush zdate, ush ztime, csFileTime & rtime) const

@@ -351,7 +351,7 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget (
 	const char *filename,
 	const char *name)
 {
-  if(mesh_index < 0|| submeshes.Length() <= mesh_index)
+  if(mesh_index < 0 || submeshes.Length() <= (size_t)mesh_index)
   {
     return -1;
   }
@@ -394,7 +394,7 @@ bool csSpriteCal3DMeshObjectFactory::AddMorphTarget(
      return false;
   }
   csArray<csString>& morph_target = submeshes[mesh_index]->morph_target_name;
-  int i;
+  size_t i;
   for (i=0; i<morph_target.Length(); i++)
   {
     if (morph_target[i] == morphtarget_name)
@@ -411,7 +411,7 @@ bool csSpriteCal3DMeshObjectFactory::AddMorphTarget(
 
 int csSpriteCal3DMeshObjectFactory::GetMorphTargetCount(int mesh_id)
 {
-  if(mesh_id < 0|| submeshes.Length() <= mesh_id)
+  if(mesh_id < 0|| submeshes.Length() <= (size_t)mesh_id)
   {
     return -1;
   }
@@ -420,7 +420,7 @@ int csSpriteCal3DMeshObjectFactory::GetMorphTargetCount(int mesh_id)
 
 const char *csSpriteCal3DMeshObjectFactory::GetMeshName(int idx)
 {
-  if (idx >= submeshes.Length())
+  if ((size_t)idx >= submeshes.Length())
     return 0;
 
   return submeshes[idx]->name;
@@ -428,7 +428,7 @@ const char *csSpriteCal3DMeshObjectFactory::GetMeshName(int idx)
 
 bool csSpriteCal3DMeshObjectFactory::IsMeshDefault(int idx)
 {
-  if (idx >= submeshes.Length())
+  if ((size_t)idx >= submeshes.Length())
     return 0;
 
   return submeshes[idx]->attach_by_default;
@@ -465,10 +465,10 @@ csSpriteCal3DSocket* csSpriteCal3DMeshObjectFactory::FindSocket (
 
 int csSpriteCal3DMeshObjectFactory::FindMeshName (const char *meshName)
 {
-  for (int i=0; i<submeshes.Length(); i++)
+  for (size_t i=0; i<submeshes.Length(); i++)
   {
     if (submeshes[i]->name == meshName)
-      return i;
+      return (int)i;
   }
   return -1;
 }
@@ -490,7 +490,7 @@ const char* csSpriteCal3DMeshObjectFactory::GetDefaultMaterial (
 
 const char *csSpriteCal3DMeshObjectFactory::GetMorphAnimationName(int idx)
 {
-  if (idx >= morph_animation_names.Length())
+  if ((size_t)idx >= morph_animation_names.Length())
     return 0;
 
   return morph_animation_names[idx];
@@ -499,10 +499,10 @@ const char *csSpriteCal3DMeshObjectFactory::GetMorphAnimationName(int idx)
 int csSpriteCal3DMeshObjectFactory::FindMorphAnimationName (
 	const char *meshName)
 {
-  for (int i=0; i<morph_animation_names.Length(); i++)
+  for (size_t i=0; i<morph_animation_names.Length(); i++)
   {
     if (morph_animation_names[i] == meshName)
-      return i;
+      return (int)i;
   }
   return -1;
 }
@@ -721,10 +721,10 @@ csSpriteCal3DMeshObject::~csSpriteCal3DMeshObject ()
 {
   if (vertices_allocated)
   {
-    int m;
+    size_t m;
     for (m=0;m<vertices.Length();m++)
     {
-      int s; 
+      size_t s; 
       for (s=0;s<vertices[m].Length();s++)
       {
 	delete[] vertices[m][s];
@@ -1080,7 +1080,7 @@ void csSpriteCal3DMeshObject::UpdateLighting (iMovable* movable,
   {
     const csArray<iLight*>& relevant_lights = factory->light_mgr
       ->GetRelevantLights (logparent, -1, false);
-    int num_lights = relevant_lights.Length ();
+    size_t num_lights = relevant_lights.Length ();
     
     // loop through all meshes of the model 
     int meshId;
@@ -1195,16 +1195,17 @@ void csSpriteCal3DMeshObject::SetupVertices()
   if(!vertices_allocated)
   {
     vertices.SetLength( attached_ids.Length() );
-    int m;
-    for (m=0;m<vertices.Length();m++)
+    size_t m;
+    for (m = 0; m < vertices.Length(); m++)
     {
       vertices[m].SetLength(calModel.getMesh(m)->getSubmeshCount());
-      int s;
-      for (s=0;s<vertices[m].Length();s++)
+      size_t s;
+      for (s = 0; s < vertices[m].Length(); s++)
       {
-	vertices[m][s] = new csVector3[calModel.getMesh(m)->getSubmesh(s)->getVertexCount ()];
+	vertices[m][s] = 
+	  new csVector3[calModel.getMesh(m)->getSubmesh(s)->getVertexCount ()];
 	int v;
-	for(v=0;v<calModel.getMesh(m)->getSubmesh(s)->getVertexCount ();v++)
+	for(v = 0; v < calModel.getMesh(m)->getSubmesh(s)->getVertexCount (); v++)
 	{
 	  vertices[m][s][v].x = 0;
 	  vertices[m][s][v].y = 0;
@@ -1217,14 +1218,15 @@ void csSpriteCal3DMeshObject::SetupVertices()
   }
   if(vertices_dirty)
   {
-    int m;
-    for (m=0;m<vertices.Length();m++)
+    size_t m;
+    for (m = 0; m < vertices.Length(); m++)
     {
-      int s;
-      for (s=0;s<vertices[m].Length();s++)
+      size_t s;
+      for (s = 0; s < vertices[m].Length(); s++)
       {
 	int v;
-	for(v=0;v<calModel.getMesh(m)->getSubmesh(s)->getVertexCount ();v++)
+	for(v = 0; v < calModel.getMesh(m)->getSubmesh(s)->getVertexCount ();
+	  v++)
 	{
 	  vertices[m][s][v].x = 0;
 	  vertices[m][s][v].y = 0;
@@ -1284,11 +1286,11 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
     float dist, temp, max;
     temp = dist = max = csSquaredDist::PointPoint (start, end);
     csVector3 tsect;
-    int m;
-    for (m=0;m<vertices.Length();m++)
+    size_t m;
+    for (m = 0; m < vertices.Length(); m++)
     {
-      int s;
-      for (s=0;s<vertices[m].Length();s++)
+      size_t s;
+      for (s = 0; s < vertices[m].Length(); s++)
       {
 	std::vector<CalCoreSubmesh::Face>& vectorFace = calModel.getMesh(m)->getSubmesh(s)
 	  ->getCoreSubmesh()->getVectorFace();
@@ -1404,11 +1406,11 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
     temp = dist = max = csSquaredDist::PointPoint (start, end);
     csVector3 tsect;
 
-    int m;
-    for (m=0;m<vertices.Length();m++)
+    size_t m;
+    for (m = 0; m < vertices.Length(); m++)
     {
-      int s;
-      for (s=0;s<vertices[m].Length();s++)
+      size_t s;
+      for (s = 0; s < vertices[m].Length(); s++)
       {
 	std::vector<CalCoreSubmesh::Face>& vectorFace = calModel.getMesh(m)->getSubmesh(s)
 	  ->getCoreSubmesh()->getVectorFace();
@@ -1484,8 +1486,8 @@ void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,
 	csTicks current_time)
 {
   iSpriteCal3DSocket* socket = 0;
-  int i;
-  for(i=0;i<sockets.Length();i++)
+  size_t i;
+  for ( i = 0; i < sockets.Length(); i++)
   {
     if(sockets[i]->GetMeshWrapper())
     {
@@ -1496,7 +1498,7 @@ void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,
       }
     }
   }
-  if(socket)
+  if (socket)
   {
     iMovable* movable = socket->GetMeshWrapper()->GetMovable();
     Advance(current_time);
@@ -1640,7 +1642,7 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
   csDirtyAccessArray<csRenderMesh*>& meshes = 
     rmHolder.GetUnusedMeshes (rview->GetCurrentFrameNumber ());
 
-  for (int m = 0; m < allRenderMeshes.Length(); m++)
+  for (size_t m = 0; m < allRenderMeshes.Length(); m++)
   {
     csRenderMesh* rm;
     if (m >= meshes.Length())
@@ -1740,9 +1742,9 @@ void csSpriteCal3DMeshObject::SetupRenderMeshes ()
   if (rmeshesSetup)
     return;
 
-  for (int m = 0; m < renderMeshes.Length(); m++)
+  for (size_t m = 0; m < renderMeshes.Length(); m++)
   {
-    for (int s = 0; s < renderMeshes[m].Length(); s++)
+    for (size_t s = 0; s < renderMeshes[m].Length(); s++)
     {
       CalSubmesh* submesh = calModel.getMesh (m)->getSubmesh (s);
       csRenderMesh& rm = renderMeshes[m][s];
@@ -1984,7 +1986,8 @@ int csSpriteCal3DMeshObject::GetActiveAnimCount()
 
 int csSpriteCal3DMeshObject::GetActiveAnims(char *buffer,int max_length)
 {
-  int count=0,i;
+  int count=0;
+  size_t i;
 
   for (i=0; i<active_anims.Length() && count<max_length-1; i++)
   {
@@ -2008,7 +2011,7 @@ void csSpriteCal3DMeshObject::SetActiveAnims(const char *buffer,int anim_count)
 bool csSpriteCal3DMeshObject::SetAnimAction(int idx, float delayIn,
 	                                        float delayOut)
 {
-  if (idx < 0 || idx >=factory->anims.Length() )
+  if (idx < 0 || (size_t)idx >=factory->anims.Length() )
     return false;
 
   calModel.getMixer()->executeAction(idx,delayIn,delayOut,
@@ -2151,7 +2154,7 @@ bool csSpriteCal3DMeshObject::AttachCoreMesh(const char *meshname)
 
 bool csSpriteCal3DMeshObject::AttachCoreMesh(int mesh_id,int iMatWrapID)
 {  
-  if ( attached_ids.Find( mesh_id ) != -1 )
+  if ( attached_ids.Find( mesh_id ) != csArrayItemNotFound )
     return true;
     
   if (!calModel.attachMesh(mesh_id))
@@ -2195,7 +2198,7 @@ bool csSpriteCal3DMeshObject::DetachCoreMesh (int mesh_id)
 
   // Now that the submesh is removed from the model, we must
   // remove all the CS rendering structures as well.
-  int i;
+  size_t i;
   for (i=0; i<attached_ids.Length(); i++)
   {
     if (attached_ids[i] == mesh_id)
@@ -2204,7 +2207,7 @@ bool csSpriteCal3DMeshObject::DetachCoreMesh (int mesh_id)
       is_initialized[i].DeleteAll();
       meshes_colors[i].DeleteAll();
 
-      int j;
+      size_t j;
       for (j=i+1; j<attached_ids.Length(); j++)
       {
         meshes[j-1] = meshes[j];
@@ -2228,7 +2231,7 @@ bool csSpriteCal3DMeshObject::BlendMorphTarget(int morph_animation_id,
 	float weight, float delay)
 {
   if(morph_animation_id < 0||
-  	factory->morph_animation_names.Length() <= morph_animation_id)
+  	factory->morph_animation_names.Length() <= (size_t)morph_animation_id)
   {
     return false;
   }
@@ -2239,7 +2242,7 @@ bool csSpriteCal3DMeshObject::ClearMorphTarget(int morph_animation_id,
 	float delay)
 {
   if(morph_animation_id < 0||
-  	factory->morph_animation_names.Length() <= morph_animation_id)
+  	factory->morph_animation_names.Length() <= (size_t)morph_animation_id)
   {
     return false;
   }
@@ -2281,7 +2284,8 @@ bool csSpriteCal3DMeshObject::SetMaterial(const char *mesh_name,
   if (idx == -1)
     return false;
           
-  int i,j;
+  size_t i;
+  int j;
   for (i=0; i<attached_ids.Length(); i++)
   {
     if (attached_ids[i] == idx)

@@ -152,7 +152,7 @@ class CS_CSWS_EXPORT csNotebook : public csComponent
     // The text on this tab
     char *text;
     // The underline position
-    int underline_pos;
+    size_t underline_pos;
 
     // Constructor
     cspPageData (csComponent *ipage, unsigned char iflags);
@@ -173,7 +173,7 @@ class CS_CSWS_EXPORT csNotebook : public csComponent
   /// Flag: true if we should re-position knobs
   bool fReposition;
   /// The first visible tab and the active tab
-  int firsttab, activetab;
+  size_t firsttab, activetab;
   /// This array contains the per-page information
   csPDelArray<cspPageData> pages;
 
@@ -207,18 +207,21 @@ public:
     csComponent *iBefore = 0);
 
   /// Delete a tab and associated component by index
-  bool DeleteTab (int iIndex);
+  bool DeleteTab (size_t iIndex);
   /// Delete a tab and associated component
   bool DeleteTab (csComponent *iComponent);
 
   /// Select a particular tab (by index)
-  bool SelectTab (int iIndex);
+  bool SelectTab (size_t iIndex);
   /// Select a particular tab (by component)
   bool SelectTab (csComponent *iComponent);
 
 protected:
   /// Secondary data (can be derived from other data but is cached for speed)
-  int tabx, taby, tabw, tabh, lasttab, lastpos, primary;
+  int tabx, taby, tabw, tabh;
+  size_t lasttab;
+  int lastpos;
+  size_t primary;
 
   /// Reposition current page, forward/backward buttons etc
   void PlaceGadgets ();
@@ -230,11 +233,11 @@ protected:
   /// Compute the height of information line
   int InfoHeight ();
   /// Compute the size of a single tab
-  bool GetTabSize (int iTab, int &oW, int &oH);
+  bool GetTabSize (size_t iTab, int &oW, int &oH);
   /// Check if given x,y lies inside a tab
-  bool InsideTab (int iIndex, int x, int y);
+  bool InsideTab (size_t iIndex, int x, int y);
   /// Find page index given page pointer
-  int FindPage (csComponent *iComponent);
+  size_t FindPage (csComponent *iComponent);
 };
 
 /** @} */

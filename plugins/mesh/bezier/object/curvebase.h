@@ -61,9 +61,9 @@ private:
   csTriangle* Triangles;
 
   // Number of vertices
-  int NumVertices;
+  size_t NumVertices;
   // Number of triangles
-  int NumTriangles;
+  size_t NumTriangles;
   // A flag which indicates if the color table is filled in.
   bool ColorsValid;
 
@@ -72,14 +72,14 @@ public:
    * Allocate a new tesselated curve with the given
    * number of vertices and triangles.
    */
-  csCurveTesselated (int NumVertices, int NumTriangles);
+  csCurveTesselated (size_t NumVertices, size_t NumTriangles);
   /// destructor
   ~csCurveTesselated ();
 
   /// Return the number of vertices
-  inline int GetVertexCount () const;
+  inline size_t GetVertexCount () const;
   /// Return the number of triangles
-  inline int GetTriangleCount () const;
+  inline size_t GetTriangleCount () const;
   /// Return the array of vertices
   inline csVector3* GetVertices ();
   /// Return the array of texture coordinates
@@ -91,7 +91,7 @@ public:
   /// Return the array of triangles
   inline csTriangle* GetTriangles ();
   /// Return a single triangle @@@ why?
-  inline csTriangle& GetTriangle (int i);
+  inline csTriangle& GetTriangle (size_t i);
   /// Return true if the colors table is valid.
   inline bool AreColorsValid () const;
 
@@ -397,9 +397,9 @@ public:
  * Implementation of inline functions
  */
 
-inline int csCurveTesselated::GetVertexCount () const
+inline size_t csCurveTesselated::GetVertexCount () const
 { return NumVertices; }
-inline int csCurveTesselated::GetTriangleCount () const
+inline size_t csCurveTesselated::GetTriangleCount () const
 { return NumTriangles; }
 inline csVector3* csCurveTesselated::GetVertices ()
 { return ObjectCoords; }
@@ -411,7 +411,7 @@ inline csColor* csCurveTesselated::GetColors ()
 { return Colors; }
 inline csTriangle* csCurveTesselated::GetTriangles ()
 { return Triangles; }
-inline csTriangle& csCurveTesselated::GetTriangle (int i)
+inline csTriangle& csCurveTesselated::GetTriangle (size_t i)
 { return Triangles[i]; }
 inline bool csCurveTesselated::AreColorsValid () const
 { return ColorsValid; }

@@ -537,7 +537,7 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
 	aSize = aMetrics[i].width * aMetrics[i].height;
       }
 
-      int gidx1 = glyph >> GLYPH_INDEX_UPPER_SHIFT, 
+      size_t gidx1 = glyph >> GLYPH_INDEX_UPPER_SHIFT, 
 	gidx2 = glyph & GLYPH_INDEX_LOWER_MASK;
 
       if (Glyphs.Length () <= gidx1)
@@ -584,7 +584,7 @@ csDefaultFont::~csDefaultFont ()
   Parent->NotifyDelete (this);
   delete [] Name;
 
-  for (int j = 0; j < Glyphs.Length(); j++)
+  for (size_t j = 0; j < Glyphs.Length(); j++)
   {
     delete Glyphs[j];
   }
@@ -610,7 +610,7 @@ void csDefaultFont::GetMaxSize (int &oW, int &oH)
 
 bool csDefaultFont::GetGlyphMetrics (utf32_char c, csGlyphMetrics& metrics)
 {
-  int gidx1 = c >> GLYPH_INDEX_UPPER_SHIFT, 
+  size_t gidx1 = c >> GLYPH_INDEX_UPPER_SHIFT, 
     gidx2 = c & GLYPH_INDEX_LOWER_MASK;
 
   if (Glyphs.Length () <= gidx1)
@@ -640,7 +640,7 @@ csPtr<iDataBuffer> csDefaultFont::GetGlyphBitmap (utf32_char c,
 {
   if (bitData == 0) return 0;
 
-  int gidx1 = c >> GLYPH_INDEX_UPPER_SHIFT, 
+  size_t gidx1 = c >> GLYPH_INDEX_UPPER_SHIFT, 
     gidx2 = c & GLYPH_INDEX_LOWER_MASK;
 
   if (Glyphs.Length () <= gidx1)
@@ -670,7 +670,7 @@ csPtr<iDataBuffer> csDefaultFont::GetGlyphAlphaBitmap (utf32_char c,
 {
   if (alphaData == 0) return 0;
 
-  int gidx1 = c >> GLYPH_INDEX_UPPER_SHIFT, 
+  size_t gidx1 = c >> GLYPH_INDEX_UPPER_SHIFT, 
     gidx2 = c & GLYPH_INDEX_LOWER_MASK;
 
   if (Glyphs.Length () <= gidx1)
@@ -733,7 +733,7 @@ void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH,
     text += skip;
     textLen -= skip;
 
-    int gidx1 = glyph >> GLYPH_INDEX_UPPER_SHIFT, 
+    size_t gidx1 = glyph >> GLYPH_INDEX_UPPER_SHIFT, 
       gidx2 = glyph & GLYPH_INDEX_LOWER_MASK;
 
     if (Glyphs.Length () <= gidx1)
@@ -787,7 +787,7 @@ int csDefaultFont::GetLength (const char *text, int maxwidth)
 
     int charW = defW;
 
-    int gidx1 = glyph >> GLYPH_INDEX_UPPER_SHIFT, 
+    size_t gidx1 = glyph >> GLYPH_INDEX_UPPER_SHIFT, 
       gidx2 = glyph & GLYPH_INDEX_LOWER_MASK;
 
     if (Glyphs.Length () > gidx1)
@@ -843,7 +843,7 @@ int csDefaultFont::GetDescent ()
 
 bool csDefaultFont::HasGlyph (utf32_char c)
 {
-  int gidx1 = c >> GLYPH_INDEX_UPPER_SHIFT, 
+  size_t gidx1 = c >> GLYPH_INDEX_UPPER_SHIFT, 
     gidx2 = c & GLYPH_INDEX_LOWER_MASK;
 
   if (Glyphs.Length () <= gidx1)

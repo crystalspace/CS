@@ -56,7 +56,7 @@ void csPortalContainerPolyMeshHelper::Setup ()
     // Count number of needed polygons.
     num_poly = 0;
 
-    int i;
+    size_t i;
     const csRefArray<csPortal>& portals = parent->GetPortals ();
     for (i = 0 ; i < portals.Length () ; i++)
     {
@@ -159,11 +159,11 @@ void csPortalContainer::Prepare ()
   movable_identity = false;
   data_nr++;
   csCompressVertex* vt = csVector3Array::CompressVertices (vertices);
-  int i;
+  size_t i;
   for (i = 0 ; i < portals.Length () ; i++)
   {
     csPortal* prt = portals[i];
-    int j;
+    size_t j;
     csArray<int>& vidx = prt->GetVertexIndices ();
     csPoly3D poly;
     for (j = 0 ; j < vidx.Length () ; j++)
@@ -224,7 +224,7 @@ void csPortalContainer::ObjectToWorld (const csMovable& movable,
 {
   movable_nr = movable.GetUpdateNumber ();
   movable_identity = movable.IsFullTransformIdentity ();
-  int i;
+  size_t i;
   world_vertices.SetLength (vertices.Length ());
   if (movable_identity)
   {
@@ -255,7 +255,7 @@ void csPortalContainer::WorldToCamera (iCamera*,
 	const csReversibleTransform& camtrans)
 {
   camera_vertices.SetLength (world_vertices.Length ());
-  int i;
+  size_t i;
   for (i = 0 ; i < world_vertices.Length () ; i++)
     camera_vertices[i] = camtrans.Other2This (world_vertices[i]);
   camera_planes.Empty ();
@@ -840,7 +840,7 @@ void csPortalContainer::CastShadows (iMovable* movable, iFrustumView* fview)
   Prepare ();
   CheckMovable ();
 
-  int i;
+  size_t i;
   for (i = 0 ; i < portals.Length () ; i++)
   {
     csPortal *p = portals[i];
@@ -923,7 +923,7 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* movable,
   const csReversibleTransform movtrans = 
     meshwrapper->GetCsMovable ().GetFullTransform ();
 
-  int i;
+  size_t i;
   if (clip_plane || clip_portal || clip_z_plane || do_portal_plane || farplane)
   {
     for (i = 0 ; i < portals.Length () ; i++)
@@ -971,7 +971,7 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* movable,
 
 void csPortalContainer::HardTransform (const csReversibleTransform& t)
 {
-  int i;
+  size_t i;
   world_vertices.SetLength (vertices.Length ());
   for (i = 0 ; i < vertices.Length () ; i++)
   {
@@ -997,7 +997,7 @@ bool csPortalContainer::HitBeamOutline (const csVector3& start,
   	const csVector3& end, csVector3& isect, float* pr)
 {
   Prepare ();
-  int i;
+  size_t i;
   for (i = 0; i < portals.Length (); i++)
   {
     csPortal *p = portals[i];
@@ -1015,7 +1015,7 @@ bool csPortalContainer::HitBeamObject (const csVector3& start,
 	int* polygon_idx)
 {
   Prepare ();
-  int i;
+  size_t i;
   float best_r = 2000000000.;
   int best_p = -1;
 

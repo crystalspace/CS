@@ -125,7 +125,7 @@ DemoSequenceLoader::~DemoSequenceLoader ()
 
 iSequence* DemoSequenceLoader::GetSequence (const char* name)
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < sequences.Length () ; i++)
   {
     NamedSequence* ns = sequences[i];

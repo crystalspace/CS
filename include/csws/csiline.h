@@ -63,17 +63,17 @@ class CS_CSWS_EXPORT csInputLine : public csComponent
   /// Input line frame style
   csInputLineFrameStyle FrameStyle;
   /// Maximal text line length
-  int maxlen;
+  size_t maxlen;
   /// Number of first visible text character
-  int firstchar;
+  size_t firstchar;
   /// Cursor character
-  int cursorpos;
+  size_t cursorpos;
   /// Cursor coordinates
   csRect cursorrect;
   /// true if cursor is visible
   bool cursorvis;
   /// Text selection
-  int selstart, selend;
+  size_t selstart, selend;
   /// true if in insert mode
   bool insert;
   /// Top-Left corner of text
@@ -99,16 +99,16 @@ public:
   virtual void SetState (int mask, bool enable);
 
   /// Select text from character iStart to character iEnd
-  void SetSelection (int iStart, int iEnd);
+  void SetSelection (size_t iStart, size_t iEnd);
 
   /// Set new cursor position and extend selection if extendsel == true
-  void SetCursorPos (int NewPos, bool ExtendSel);
+  void SetCursorPos (size_t NewPos, bool ExtendSel);
 
   /// Report the minimal size of inputline
   virtual void SuggestSize (int &w, int &h);
 
   /// Check whenever new cursor position is valid
-  virtual bool IsValidPos (int NewPos);
+  virtual bool IsValidPos (size_t NewPos);
 
   /// Check whenever a character is valid for inserting into string
   virtual bool IsValidChar (char iChar);
@@ -121,7 +121,7 @@ public:
 
 protected:
   /// Query character X position within component
-  int GetCharX (int iNum);
+  int GetCharX (size_t iNum);
   /// Set text, drop the selection and don't move the cursor
   void SetTextExt (const char *iText);
 };

@@ -96,7 +96,7 @@ csCrossBuilder::~csCrossBuilder ()
 bool csCrossBuilder::BuildThing (iModelDataObject *Object,
 	iThingFactoryState *tgt, iMaterialWrapper *DefaultMaterial) const
 {
-  int i;
+  size_t i;
 
   // copy the vertices
   iModelDataVertices *Vertices = Object->GetDefaultVertices ();

@@ -533,7 +533,7 @@ void csConfigFile::Clear()
   // delete all nodes but the first and last one
   FirstNode->DeleteDataNodes();
   // rewind all iterators
-  for (long i = 0; i < Iterators->Length(); i++)
+  for (size_t i = 0; i < Iterators->Length(); i++)
   {
     csConfigIterator *it = Iterators->Get(i);
     it->Rewind();
@@ -663,7 +663,7 @@ void csConfigFile::DeleteKey(const char *Name)
   if (!Node) return;
 
   // look for iterators on that node
-  for (long i = 0; i < Iterators->Length(); i++)
+  for (size_t i = 0; i < Iterators->Length(); i++)
   {
     csConfigIterator *it = (csConfigIterator*)Iterators->Get(i);
     if (it->Node == Node) it->Prev();
@@ -811,8 +811,8 @@ csConfigNode *csConfigFile::CreateNode(const char *Name)
 
 void csConfigFile::RemoveIterator(csConfigIterator *it) const
 {
-  int n = Iterators->Find(it);
-  CS_ASSERT(n != -1);
+  size_t n = Iterators->Find(it);
+  CS_ASSERT(n != csArrayItemNotFound);
   Iterators->DeleteIndex(n);
 }
 

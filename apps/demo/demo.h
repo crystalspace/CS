@@ -68,7 +68,7 @@ public:
   bool message_error;
 
   int do_demo;
-  int selected_demo;
+  size_t selected_demo;
   csStringArray demos;
   int first_y;	// First y location where list of demo files start.
 

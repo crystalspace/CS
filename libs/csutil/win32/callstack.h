@@ -52,10 +52,10 @@ public:
 
   void AddFrame (const STACKFRAME64& frame);
 
-  virtual int GetEntryCount ();
-  virtual bool GetFunctionName (int num, csString& str);
-  virtual bool GetLineNumber (int num, csString& str);
-  virtual bool GetParameters (int num, csString& str);
+  virtual size_t GetEntryCount ();
+  virtual bool GetFunctionName (size_t num, csString& str);
+  virtual bool GetLineNumber (size_t num, csString& str);
+  virtual bool GetParameters (size_t num, csString& str);
 };
 
 #endif // __CS_LIBS_UTIL_WIN32_CALLSTACK_H__

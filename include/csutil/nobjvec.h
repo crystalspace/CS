@@ -49,9 +49,9 @@ public:
   {
   }
 
-  int GetIndexByName (const char* name) const
+  size_t GetIndexByName (const char* name) const
   {
-    int i;
+    size_t i;
     for (i = 0 ; i < this->Length () ; i++) // see *1*
     {
       T* o = (*this)[i];
@@ -59,7 +59,7 @@ public:
       if (n && !strcmp (n, name))
         return i;
     }
-    return -1;
+    return csArrayItemNotFound;
   }
 
   T* FindByName (const char* name) const

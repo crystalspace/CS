@@ -284,9 +284,9 @@ public:
 /// This structure is used by csVector3Array::CompressVertices().
 struct csCompressVertex
 {
-  int orig_idx;
+  size_t orig_idx;
   float x, y, z;
-  int new_idx;
+  size_t new_idx;
   bool used;
 };
 
@@ -326,7 +326,7 @@ public:
    * vertices). Otherwise you have to 'delete[]' the returned array.
    */
   static csCompressVertex* CompressVertices (csVector3* vertices,
-	int num_vertices, csVector3*& new_vertices, int& new_count);
+	size_t num_vertices, csVector3*& new_vertices, size_t& new_count);
 
   /**
    * Compress an array of vertices (i.e. remove all duplicated

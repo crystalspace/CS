@@ -68,7 +68,7 @@ void csGLShaderFVP::Deactivate()
 void csGLShaderFVP::SetupState (const csRenderMesh *mesh, 
 				const csShaderVarStack &stacks)
 {
-  int i;
+  size_t i;
 
   csRef<csShaderVariable> var;
 
@@ -267,11 +267,11 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
     }
 
 
-	if (layers[i].texMatrixOps.Length() > 0)
+    if (layers[i].texMatrixOps.Length() > 0)
     {
       statecache->SetMatrixMode (GL_TEXTURE);
 
-      for (int j = 0; j < layers[i].texMatrixOps.Length(); j++)
+      for (size_t j = 0; j < layers[i].texMatrixOps.Length(); j++)
       {
 	TexMatrixOp& op = layers[i].texMatrixOps[j];
 
@@ -353,7 +353,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
 
 void csGLShaderFVP::ResetState ()
 {
-  int i;
+  size_t i;
   if (do_lighting)
   {
     for (i = 0; i < lights.Length(); ++i)
@@ -542,7 +542,7 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
           {
 	    // @@@ Realize as var mapping?
             int layer = child->GetAttributeValueAsInt ("layer");
-            if (layers.Length ()<=layer)
+            if (layers.Length ()<= (size_t)layer)
               layers.SetLength (layer+1);
 	    if (!ParseProgramParam (child, layers[layer].constcolor, ParamFloat | 
 	      ParamVector3 | ParamVector4))
@@ -572,7 +572,7 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
                   if (!strcasecmp(str, "cube"))
                   {
                     int layer = child->GetAttributeValueAsInt ("layer");
-                    if (layers.Length ()<=layer)
+                    if (layers.Length () <= (size_t)layer)
                       layers.SetLength (layer+1);
                     layers[layer].texgen = TEXGEN_REFLECT_CUBE;
                   }
@@ -580,7 +580,7 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
                   if (!strcasecmp(str, "sphere"))
                   {
                     int layer = child->GetAttributeValueAsInt ("layer");
-                    if (layers.Length ()<=layer)
+                    if (layers.Length () <= (size_t)layer)
                       layers.SetLength (layer+1);
                     layers[layer].texgen = TEXGEN_REFLECT_SPHERE;
                   }
@@ -613,7 +613,7 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
 	     @@@ Would be nice to somehow utilize the 'Resolve TU' function 
 	         of the FP.
 	     */
-            if (layers.Length () <= unit)
+            if (layers.Length () <= (size_t)unit)
               layers.SetLength (unit + 1);
 	    if (!ParseTexMatrix (child, layers[unit].texMatrixOps))
 	      return false;
@@ -650,7 +650,7 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
   csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (objectReg, iGraphics2D);
   g2d->PerformExtension ("getstatecache", &statecache);
 
-  int i, j;
+  size_t i, j;
 
   for (i=0; i<layers.Length (); i++)
     if ((layers[i].texgen == TEXGEN_REFLECT_CUBE) &&

@@ -48,7 +48,7 @@ void csPolygonTree::Clear ()
 void csPolygonTree::CalculateBBox (csArray<int>& polyidx,
 	iPolygonMesh* mesh)
 {
-  int i;
+  size_t i;
   csVector3* vertices = mesh->GetVertices ();
   csMeshedPolygon* polys = mesh->GetPolygons ();
   bbox.StartBoundingBox ();
@@ -97,7 +97,7 @@ void csPolygonTree::Build (csArray<int>& polyidx,
     split_location = (bbox.MaxZ () + bbox.MinZ ()) / 2.0;
   }
 
-  int i;
+  size_t i;
   csArray<int> left;
   csArray<int> right;
   csMeshedPolygon* polys = mesh->GetPolygons ();
@@ -147,7 +147,7 @@ void csPolygonTree::IntersectBox (csArray<int>& polyidx, const csBox3& box)
 {
   if (box.TestIntersect (bbox))
   {
-    int i;
+    size_t i;
     for (i = 0 ; i < polygons.Length () ; i++)
       polyidx.Push (polygons[i]);
     if (child1) child1->IntersectBox (polyidx, box);
@@ -160,7 +160,7 @@ void csPolygonTree::IntersectSphere (csArray<int>& polyidx,
 {
   if (csIntersect3::BoxSphere (bbox, center, sqradius))
   {
-    int i;
+    size_t i;
     for (i = 0 ; i < polygons.Length () ; i++)
       polyidx.Push (polygons[i]);
     if (child1) child1->IntersectSphere (polyidx, center, sqradius);
@@ -178,7 +178,7 @@ static int intsort (int const& i1, int const& i2)
 void csPolygonTree::RemoveDoubles (csArray<int>& polyidx)
 {
   polyidx.Sort (intsort);
-  int i;
+  size_t i;
   int i1 = 0;
   int prev = -1;
   for (i = 0 ; i < polyidx.Length () ; i++)

@@ -716,7 +716,7 @@ bool LevTool::IsAddonAPlane (iDocumentNode* addonnode)
     // Very weird. Should not happen.
     return false;
   }
-  int i;
+  size_t i;
   for (i = 0 ; i < plane_plugins.Length () ; i++)
   {
     csString* str = plane_plugins.Get (i);
@@ -740,7 +740,7 @@ bool LevTool::IsMeshAThing (iDocumentNode* meshnode)
     // Very weird. Should not happen.
     return false;
   }
-  int i;
+  size_t i;
   for (i = 0 ; i < thing_plugins.Length () ; i++)
   {
     csString* str = thing_plugins.Get (i);
@@ -1022,7 +1022,7 @@ void LevTool::WriteOutThing (iDocumentNode* params_node, ltThing* th,
 
 void LevTool::SplitThing (iDocumentNode* meshnode, iDocumentNode* parentnode)
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < things.Length () ; i++)
   {
     ltThing* th = things.Get (i);
@@ -1246,7 +1246,7 @@ void LevTool::CloneAndMovePlanes (iDocumentNode* node, iDocumentNode* newnode)
       if (child->GetType () == CS_NODE_ELEMENT && (!strcmp (value, "plane")))
       {
         const char* planename = child->GetContentsValue ();
-	int i;
+	size_t i;
 	for (i = 0 ; i < planes.Length () ; i++)
 	{
 	  ltPlane* pl = planes[i];
@@ -1406,7 +1406,7 @@ void LevTool::CloneAndChangeFlags (iDocumentNode* node, iDocumentNode* newnode,
   if (is_thing)
   {
     ltThing* th = 0;
-    int i;
+    size_t i;
     for (i = 0 ; i < things.Length () ; i++)
     {
       th = things.Get (i);
@@ -1605,7 +1605,7 @@ void LevTool::ValidateContents (ltThing* thing)
 
 void LevTool::ValidateContents ()
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < things.Length () ; i++)
   {
     ltThing* th = things.Get (i);
@@ -1913,7 +1913,7 @@ void LevTool::Main ()
 	FindAllThings (doc);
 	csBox3 global_bbox;
 	global_bbox.StartBoundingBox ();
-	int i;
+	size_t i;
 	for (i = 0 ; i < things.Length () ; i++)
 	{
 	  ltThing* th = things.Get (i);
@@ -1977,7 +1977,7 @@ void LevTool::Main ()
 	FindAllThings (doc);
 	csRef<iDocument> newdoc = newsys->CreateDocument ();
 
-	int i;
+	size_t i;
 	for (i = 0 ; i < things.Length () ; i++)
 	{
 	  ltThing* th = things.Get (i);
@@ -2001,7 +2001,7 @@ void LevTool::Main ()
 	FindAllThings (doc);
 	csRef<iDocument> newdoc = newsys->CreateDocument ();
 
-	int i;
+	size_t i;
 	for (i = 0 ; i < things.Length () ; i++)
 	{
 	  ltThing* th = things.Get (i);
@@ -2030,7 +2030,7 @@ void LevTool::Main ()
 
 	csBox3 global_bbox;
 	global_bbox.StartBoundingBox ();
-	int i;
+	size_t i;
 	for (i = 0 ; i < things.Length () ; i++)
 	{
 	  ltThing* th = things.Get (i);
@@ -2080,7 +2080,7 @@ void LevTool::Main ()
 
 	csBox3 global_bbox;
 	global_bbox.StartBoundingBox ();
-	int i;
+	size_t i;
 	for (i = 0 ; i < things.Length () ; i++)
 	{
 	  ltThing* th = things.Get (i);
@@ -2131,7 +2131,7 @@ void LevTool::Main ()
 
 	csBox3 global_bbox;
 	global_bbox.StartBoundingBox ();
-	int i;
+	size_t i;
 	for (i = 0 ; i < things.Length () ; i++)
 	{
 	  ltThing* th = things.Get (i);

@@ -448,8 +448,8 @@ csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory)
   origin = factory->GetOrigin();
   directional = factory->GetDirectional();
   csPDelArray<csHazeLayer> *factlayers = factory->GetLayers();
-  int i;
-  for(i=0; i<factlayers->Length(); i++)
+  size_t i;
+  for(i = 0; i < factlayers->Length(); i++)
   {
     csHazeLayer *p = new csHazeLayer (factlayers->Get(i)->hull,
       factlayers->Get(i)->scale);
@@ -472,7 +472,8 @@ void csHazeMeshObject::SetupObject ()
   {
     bbox.StartBoundingBox( origin );
     csVector3 pos;
-	int l, i;
+    size_t l;
+    int i;
     for(l=0; l<layers.Length(); l++)
       for(i=0; i<layers[l]->hull->GetVerticeCount(); i++)
       {

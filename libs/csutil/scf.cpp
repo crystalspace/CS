@@ -108,7 +108,7 @@ class scfLibraryVector : public csPDelArray<scfSharedLibrary>
 {
 public:
   static int CompareName (scfSharedLibrary* const& x, char const* const& n);
-  int FindLibrary(char const* name) const
+  size_t FindLibrary(char const* name) const
   {
     return FindKey(
       csArrayCmp<scfSharedLibrary*,char const*>(name, CompareName));
@@ -282,7 +282,7 @@ public:
   scfClassRegistry () : superclass(16, 16) {}
   static int CompareClass (scfFactory* const& Item, char const* const& key)
   { return strcmp (Item->ClassID, key); }
-  int FindClass(char const* name, bool assume_sorted = false) const
+  size_t FindClass(char const* name, bool assume_sorted = false) const
   {
     if (assume_sorted)
       return FindSortedKey(csArrayCmp<scfFactory*,char const*>(name,
@@ -349,8 +349,8 @@ void scfFactory::IncRef ()
 #ifndef CS_STATIC_LINKED
   if (!Library && LibraryName)
   {
-    int libidx = LibraryRegistry->FindLibrary(LibraryName);
-    if (libidx >= 0)
+    size_t libidx = LibraryRegistry->FindLibrary(LibraryName);
+    if (libidx != (size_t)-1)
       Library = (scfSharedLibrary *)LibraryRegistry->Get (libidx);
     else
       Library = new scfSharedLibrary (LibraryName, FactoryClass);
@@ -486,7 +486,7 @@ static void scfScanPlugins (csPluginPaths* pluginPaths, const char* context)
     // Search plugins in pluginpaths
     csRef<iStringArray> plugins;
 
-    int i, j;
+    size_t i, j;
     for (i = 0; i < pluginPaths->GetCount(); i++)
     {
       if (plugins) plugins->DeleteAll();
@@ -703,10 +703,10 @@ void *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
     SortClassRegistry = false;
   }
 
-  int idx = ClassRegistry->FindClass(iClassID, true);
+  size_t idx = ClassRegistry->FindClass(iClassID, true);
   void *instance = 0;
 
-  if (idx >= 0)
+  if (idx != (size_t)-1)
   {
     iFactory *cf = (iFactory *)ClassRegistry->Get (idx);
     iBase *object = (iBase *)cf->CreateInstance ();
@@ -732,9 +732,9 @@ void csSCF::UnloadUnusedModules ()
 {
 #ifndef CS_STATIC_LINKED
   csScopedMutexLock lock (mutex);
-  for (int i = LibraryRegistry->Length () - 1; i >= 0; i--)
+  for (size_t i = LibraryRegistry->Length (); i > 0; i--)
   {
-    scfSharedLibrary *sl = (scfSharedLibrary *)LibraryRegistry->Get (i);
+    scfSharedLibrary *sl = (scfSharedLibrary *)LibraryRegistry->Get (i - 1);
     sl->TryUnload ();
   }
 #endif
@@ -753,10 +753,10 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
   const char* context)
 {
   csScopedMutexLock lock (mutex);
-  int idx;
+  size_t idx;
   csStringID contextID = 
     context ? contexts.Request (context) : csInvalidStringID;
-  if ((idx = ClassRegistry->FindClass(iClassID)) >= 0)
+  if ((idx = ClassRegistry->FindClass(iClassID)) != (size_t)-1)
   {
     scfFactory *cf = (scfFactory *)ClassRegistry->Get (idx);
     if (ContextClash (cf->classContext, contextID))
@@ -798,10 +798,10 @@ bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
   const char *Desc, const char *Dependencies, const char* context)
 {
   csScopedMutexLock lock (mutex);
-  int idx;
+  size_t idx;
   csStringID contextID = 
     context ? contexts.Request (context) : csInvalidStringID;
-  if ((idx = ClassRegistry->FindClass(iClassID)) >= 0)
+  if ((idx = ClassRegistry->FindClass(iClassID)) != (size_t)-1)
   {
     scfFactory *cf = (scfFactory *)ClassRegistry->Get (idx);
     if (ContextClash (cf->classContext, contextID))
@@ -842,7 +842,7 @@ bool csSCF::RegisterFactoryFunc (scfFactoryFunc Func, const char *FactClass)
 {
   bool ok = false;
   csScopedMutexLock lock (mutex);
-  for (int i = 0, n = ClassRegistry->Length(); i < n; i++)
+  for (size_t i = 0, n = ClassRegistry->Length(); i < n; i++)
   {
     scfFactory* fact = (scfFactory*)ClassRegistry->Get(i);
     if (fact->FactoryClass != 0 && strcmp(fact->FactoryClass, FactClass) == 0)
@@ -872,9 +872,9 @@ bool csSCF::UnregisterClass (const char *iClassID)
   if (!ClassRegistry)
     return false;
 
-  int idx = ClassRegistry->FindClass(iClassID);
+  size_t idx = ClassRegistry->FindClass(iClassID);
 
-  if (idx < 0)
+  if (idx == (size_t)-1)
     return false;
 
   ClassRegistry->DeleteIndex (idx);
@@ -912,8 +912,8 @@ const char *csSCF::GetClassDescription (const char *iClassID)
 {
   csScopedMutexLock lock (mutex);
 
-  int idx = ClassRegistry->FindClass(iClassID);
-  if (idx >= 0)
+  size_t idx = ClassRegistry->FindClass(iClassID);
+  if (idx != (size_t)-1)
   {
     iFactory *cf = (iFactory *)ClassRegistry->Get (idx);
     return cf->QueryDescription ();
@@ -926,8 +926,8 @@ const char *csSCF::GetClassDependencies (const char *iClassID)
 {
   csScopedMutexLock lock (mutex);
 
-  int idx = ClassRegistry->FindClass(iClassID);
-  if (idx >= 0)
+  size_t idx = ClassRegistry->FindClass(iClassID);
+  if (idx != (size_t)-1)
   {
     iFactory *cf = (iFactory *)ClassRegistry->Get (idx);
     return cf->QueryDependencies ();
@@ -941,8 +941,8 @@ csRef<iDocument> csSCF::GetPluginMetadata (char const *iClassID)
   csRef<iDocument> metadata;
 #ifndef CS_STATIC_LINKED
   csScopedMutexLock lock (mutex);
-  int idx = ClassRegistry->FindClass(iClassID);
-  if (idx >= 0)
+  size_t idx = ClassRegistry->FindClass(iClassID);
+  if (idx != (size_t)-1)
   {
     scfFactory *cf = ClassRegistry->Get (idx);
     if (cf->LibraryName != 0)
@@ -988,11 +988,11 @@ csRef<iStringArray> csSCF::QueryClassList (char const* pattern)
   iStringArray* v = new scfStringArray();
 
   csScopedMutexLock lock (mutex);
-  int const rlen = ClassRegistry->Length();
+  size_t const rlen = ClassRegistry->Length();
   if (rlen != 0)
   {
     size_t const plen = (pattern ? strlen(pattern) : 0);
-    for (int i = 0; i < rlen; i++)
+    for (size_t i = 0; i < rlen; i++)
     {
       char const* s = ((iFactory*)ClassRegistry->Get(i))->QueryClassID();
       if (plen == 0 || strncasecmp(pattern, s, plen) == 0)

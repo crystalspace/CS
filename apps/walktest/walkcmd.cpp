@@ -90,7 +90,7 @@ void SaveRecording (iVFS* vfs, const char* fName)
   int32 l = Sys->recording.Length();
   l = convert_endian (l);
   cf->Write ((char*)&l, sizeof (l));
-  int i;
+  size_t i;
   csRecordedCameraFile camint;
   iSector* prev_sector = 0;
   for (i = 0 ; i < Sys->recording.Length () ; i++)
@@ -2234,7 +2234,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       if (l->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
       {
         ll->Remove (l);
-	int j;
+	size_t j;
 	for (j = 0 ; j < Sys->dynamic_lights.Length () ; j++)
 	{
 	  if (Sys->dynamic_lights[j] == l)
@@ -2259,7 +2259,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       if (l->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
       {
         ll->Remove (l);
-	int j;
+	size_t j;
 	for (j = 0 ; j < Sys->dynamic_lights.Length () ; j++)
 	{
 	  if (Sys->dynamic_lights[j] == l)

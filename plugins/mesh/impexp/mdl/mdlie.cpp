@@ -357,8 +357,8 @@ csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, uint32 Size)
       }
 
       // store texel positions
-      for (k=0; k<Texels.Length (); k++)
-        Vertices->AddTexel (Texels [k]);
+      for (size_t l=0; l<Texels.Length (); l++)
+        Vertices->AddTexel (Texels [l]);
 
       Vertices->DecRef ();
     }

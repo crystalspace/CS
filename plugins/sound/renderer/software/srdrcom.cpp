@@ -311,7 +311,7 @@ void csSoundRenderSoftware::RemoveSource(csSoundSourceSoftware *src)
 
 void csSoundRenderSoftware::MixingFunction()
 {
-  long i;
+  size_t i;
 
   // look if this function is activated
   if (!ActivateMixing) return;

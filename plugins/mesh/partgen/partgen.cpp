@@ -130,7 +130,7 @@ void csParticleSystem::SetupObject ()
 #endif
 }
 
-void csParticleSystem::SetupBuffers (int part_sides)
+void csParticleSystem::SetupBuffers (size_t part_sides)
 {
 #ifdef CS_USE_NEW_RENDERER
   if (csParticleSystem::part_sides == part_sides) return;
@@ -176,15 +176,16 @@ void csParticleSystem::SetupBuffers (int part_sides)
   {
     csRenderBufferLock<csTriangle> trianglesLock (index_buffer);
 
-    int i;
+    size_t i;
     csTriangle* tri = trianglesLock.Lock(); 
     for (i = 0 ; i < number ; i++)
     {
       // fill the triangle table
-      int j;
+      size_t j;
       for (j = 2 ; j < part_sides ; j++)
       {
-	*tri++ = csTriangle (i*part_sides+0, i*part_sides+j-1, i*part_sides+j);
+	*tri++ = csTriangle ((int)(i*part_sides+0), 
+	  (int)(i*part_sides+j-1), (int)(i*part_sides+j));
       }
     }
   }
@@ -258,7 +259,7 @@ void csParticleSystem::AppendRegularSprite (int n, float radius,
 
 void csParticleSystem::SetupMixMode ()
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < particles.Length () ; i++)
     GetParticle (i)->SetMixMode (MixMode);
 }
@@ -266,7 +267,7 @@ void csParticleSystem::SetupMixMode ()
 
 void csParticleSystem::SetupColor ()
 {
-  int i;
+  size_t i;
   for(i = 0 ; i < particles.Length () ; i++)
     GetParticle (i)->SetColor (color);
 }
@@ -274,7 +275,7 @@ void csParticleSystem::SetupColor ()
 
 void csParticleSystem::AddColor (const csColor& col)
 {
-  int i;
+  size_t i;
   for(i = 0; i<particles.Length(); i++)
     GetParticle(i)->AddColor(col);
 }
@@ -296,7 +297,7 @@ void csParticleSystem::AddColor (const csColor& col)
 
 void csParticleSystem::ScaleBy (float factor)
 {
-  int i;
+  size_t i;
   for (i = 0 ; i<particles.Length () ; i++)
     GetParticle (i)->ScaleBy (factor);
   scfiObjectModel.ShapeChanged ();
@@ -305,7 +306,7 @@ void csParticleSystem::ScaleBy (float factor)
 
 void csParticleSystem::Rotate (float angle)
 {
-  int i;
+  size_t i;
   for (i = 0 ; i<particles.Length () ; i++)
     GetParticle (i)->Rotate (angle);
   scfiObjectModel.ShapeChanged ();
@@ -383,7 +384,7 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
 
   SetupBuffers (sprite2ds[0]->GetVertices ().Length ());
 
-  int i;
+  size_t i;
   csColor* c = colors;
   csVector3* vt = vertices;
   csVector2* txt = texels;
@@ -393,7 +394,7 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
     // transform to eye coordinates
     csVector3 pos = trans.Other2This (particles[i]->GetPosition ());
 
-    int j;
+    size_t j;
     for (j = 0 ; j < part_sides ; j++)
     {
       *vt++ = pos + csVector3 (sprvt[j].pos.x, sprvt[j].pos.y, 0);
@@ -432,7 +433,7 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
      */
   rm->meshtype = CS_MESHTYPE_TRIANGLES;
   rm->indexstart = 0;
-  rm->indexend = TriangleCount * 3;
+  rm->indexend = (uint)TriangleCount * 3;
   rm->material = m;
   rm->object2camera = csReversibleTransform ();
   rm->camera_origin = vertices[0];
@@ -451,7 +452,7 @@ bool csParticleSystem::Draw (iRenderView* rview, iMovable* movable,
 {
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
   csReversibleTransform trans = movable->GetFullTransform ();
-  int i;
+  size_t i;
   for (i = 0 ; i < particles.Length() ; i++)
     GetParticle (i)->Draw (rview, trans, mode);
   return true;
@@ -462,7 +463,7 @@ void csParticleSystem::UpdateLighting (const csArray<iLight*>& lights,
 {
   SetupObject ();
   csReversibleTransform trans = movable->GetFullTransform ();
-  int i;
+  size_t i;
   for (i = 0 ; i < particles.Length () ; i++)
     GetParticle (i)->UpdateLighting (lights, trans);
 }
@@ -538,7 +539,7 @@ void csNewtonianParticleSystem::Update (csTicks elapsed_time)
   csParticleSystem::Update (elapsed_time);
   // time passed; together with CS 1 unit = 1 meter makes units right.
   float delta_t = elapsed_time / 1000.0f; // in seconds
-  int i;
+  size_t i;
   for (i=0 ; i < particles.Length () ; i++)
   {
     // notice that the ordering of the lines (1) and (2) makes the

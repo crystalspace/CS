@@ -314,7 +314,7 @@ public:
       float distance = qsqrt (cmesh->GetSquaredDistance (rview));
       float lod = static_lod->GetLODValue (distance);
       csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
-      int i;
+      size_t i;
       for (i = 0 ; i < meshes.Length () ; i++)
         MarkMeshAndChildrenVisible (meshes[i], frustum_mask);
     }
@@ -387,7 +387,7 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
 
   return visibleMeshCache;*/
 
-  int i;
+  size_t i;
   uint32 cur_framenr = engine->GetCurrentFrameNumber ();
   uint32 cur_context_id = rview->GetRenderContext ()->context_id;
   for (i = 0 ; i < visibleMeshCache.Length () ; i++)
@@ -631,12 +631,11 @@ void csSector::PrepareDraw (iRenderView *rview)
   csRenderView* csrview = (csRenderView*)rview;
   csrview->SetThisSector (&scfiSector);
 
-  int i = sector_cb_vector.Length ()-1;
-  while (i >= 0)
+  size_t i = sector_cb_vector.Length ();
+  while (i-- > 0)
   {
     iSectorCallback* cb = sector_cb_vector.Get (i);
     cb->Traverse (&scfiSector, rview);
-    i--;
   }
 
   // CS_ENTITY_CAMERA meshes have to be moved to right position first.
@@ -1104,7 +1103,7 @@ bool csSectorList::Remove (int n)
 
 void csSectorList::RemoveAll ()
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < list.Length () ; i++)
   {
     FreeSector (list[i]);

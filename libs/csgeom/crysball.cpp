@@ -23,9 +23,9 @@
 
 int csCrystalBall::csTriNode::Add (
   csCrystalBallVec *normal,
-  int tri1,
-  int tri2,
-  int tri3,
+  size_t tri1,
+  size_t tri2,
+  size_t tri3,
   csArray<csCrystalBallVec*> *vP,
   csArray<csVector3*> *vTP)
 {
@@ -61,7 +61,7 @@ int csCrystalBall::csTriNode::Add (
         divider = vTP->Push (mc);
 
         bool newStuffed = false, oldStuffed = false;
-        int tripoint[4] = {tri1, tri2, tri3, tri1};
+        size_t tripoint[4] = {tri1, tri2, tri3, tri1};
 
         // now decide which triangle the old and the new point(s) will go into
         for (int i=0; i<3; i++)
@@ -120,7 +120,7 @@ int csCrystalBall::csTriNode::Add (
   return nPos;
 }
 
-void csCrystalBall::csTriNode::Adjust (int nPos)
+void csCrystalBall::csTriNode::Adjust (size_t nPos)
 {
   bool bDive = true;
   if (from > nPos)
@@ -140,9 +140,9 @@ void csCrystalBall::csTriNode::Adjust (int nPos)
 
 int csCrystalBall::csTriNode::Classify (
   const csVector3 &n,
-  int i1,
-  int i2,
-  int i3,
+  size_t i1,
+  size_t i2,
+  size_t i3,
   const csArray<csVector3*> *vTP) const
 {
   csVector3 origo (0, 0, 0);
@@ -180,8 +180,8 @@ void csCrystalBall::csTriNode::Transform (
       if (SignMatches (&tn, useSign))
       {
         // add all polygon indices
-        int to = from + len;
-        int i;
+        size_t to = from + len;
+        size_t i;
         for (i = from; i < to; i++)
           indexVector.Push (
               ((csCrystalBallVec *)vP->Get (i))->GetIndex ());
@@ -203,8 +203,8 @@ void csCrystalBall::csTriNode::Transform (
       {
         // all in same half of sphere, sp add them all
         csTriNode *tri = (csTriNode *)children.Get (i);
-        int to = tri->from + tri->len;
-        int j;
+        size_t to = tri->from + tri->len;
+        size_t j;
         for (j = tri->from; j < to; j++)
           indexVector.Push (
               ((csCrystalBallVec *)vP->Get (j))->GetIndex ());
@@ -281,7 +281,7 @@ csCrystalBall::csCrystalBall ()
 
 csCrystalBall::~csCrystalBall ()
 {
-  int i;
+  size_t i;
   for (i = 0; i < vTrianglePoints.Length (); i++)
     delete (csVector3 *)vTrianglePoints.Get (i);
   for (i = 0; i < vPoints.Length (); i++)

@@ -4450,7 +4450,7 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
   csSoftPolygonRenderer* polyRender = (csSoftPolygonRenderer*)source;
   */
 
-  int i;
+  size_t i;
   CS_ASSERT (string_indices<(csStringID)stacks.Length ()
       && stacks[string_indices].Length () > 0);
   csShaderVariable* indexBufSV = stacks[string_indices].Top ();

@@ -193,7 +193,7 @@ bool Simple::Initialize ()
   {
     csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (object_reg,
       iPluginManager);
-    for (int i = 0; i < joystickClasses->Length (); i++)
+    for (size_t i = 0; i < joystickClasses->Length (); i++)
     {
       const char* className = joystickClasses->Get (i);
       iBase* b = plugmgr->LoadPlugin (className);

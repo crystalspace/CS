@@ -94,7 +94,7 @@ csGLFontCache::~csGLFontCache ()
   CleanupCache ();
 
   statecache->SetTexture (GL_TEXTURE_2D, 0);
-  int tex;
+  size_t tex;
   for (tex = 0; tex < textures.Length (); tex++)
   {
     glDeleteTextures (1, &textures[tex].handle);
@@ -133,7 +133,7 @@ csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
     ((bmetrics.width + glyphAlign - 1) / glyphAlign) * glyphAlign;
   const int allocHeight = 
     ((bmetrics.height + glyphAlign - 1) / glyphAlign) * glyphAlign;
-  int tex = 0;
+  size_t tex = 0;
   while (tex < textures.Length ())
   {
     sr = textures[tex].glyphRects->Alloc (allocWidth, allocHeight, 
@@ -218,7 +218,7 @@ csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
 void csGLFontCache::InternalUncacheGlyph (GlyphCacheData* cacheData)
 {
   GLGlyphCacheData* glCacheData = (GLGlyphCacheData*)cacheData;
-  const int texNum = glCacheData->texNum;
+  const size_t texNum = glCacheData->texNum;
   if (usedTexs & (1 << texNum))
   {
     FlushArrays ();
@@ -228,7 +228,7 @@ void csGLFontCache::InternalUncacheGlyph (GlyphCacheData* cacheData)
   cacheDataAlloc.Free (glCacheData);
 }
 
-void csGLFontCache::CopyGlyphData (iFont* font, utf32_char glyph, int tex, 
+void csGLFontCache::CopyGlyphData (iFont* font, utf32_char glyph, size_t tex, 
 				   const csBitmapMetrics& bmetrics, 
 				   const csRect& texRect, iDataBuffer* bitmapDataBuf, 
 				   iDataBuffer* alphaDataBuf)
@@ -328,7 +328,7 @@ void csGLFontCache::FlushArrays ()
   }
   glTexCoordPointer(2, GL_FLOAT, sizeof (float) * 2, texcoords.GetArray ());
   glVertexPointer(2, GL_FLOAT, sizeof (float) * 2, verts2d.GetArray ());
-  for (int j = 0; j < jobCount; j++)
+  for (size_t j = 0; j < jobCount; j++)
   {
     const TextJob& job = jobs[j];
     const bool doFG = (job.vertCount != 0);
@@ -350,7 +350,7 @@ void csGLFontCache::FlushArrays ()
 
 	if (doBG)
 	{
-	  glDrawArrays(GL_QUADS, job.bgVertOffset, job.bgVertCount);
+	  glDrawArrays(GL_QUADS, (GLsizei)job.bgVertOffset, (GLsizei)job.bgVertCount);
 	}
       }
       else
@@ -371,7 +371,7 @@ void csGLFontCache::FlushArrays ()
       if (doFG)
       {
 	G2D->setGLColorfromint (job.fg);
-	glDrawArrays (GL_QUADS, job.vertOffset, job.vertCount);
+	glDrawArrays (GL_QUADS, (GLsizei)job.vertOffset, (GLsizei)job.vertCount);
       }
     }
   }
@@ -380,7 +380,8 @@ void csGLFontCache::FlushArrays ()
 }
 
 csGLFontCache::TextJob& csGLFontCache::GetJob (int fg, int bg, 
-					       GLuint texture, int bgOffset)
+					       GLuint texture, 
+					       size_t bgOffset)
 {
   TextJob& newJob = jobs.GetExtend (jobCount);
   jobCount++;
@@ -411,7 +412,7 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
   if (pen_y <= ClipY1) return;
   pen_y = G2D->Height - pen_y/* - maxheight*/;
 
-  int textLen = strlen ((char*)text);
+  size_t textLen = strlen ((char*)text);
 
   if (bg >= 0)
   {
@@ -423,7 +424,7 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
     texcoords.GetExtend (numFloats + textLen * 8);
     verts2d.GetExtend (numFloats + textLen * 8);
   }
-  int bgVertOffset = (textLen + 1) * 8;
+  size_t bgVertOffset = (textLen + 1) * 8;
   float* tcPtr = 0;
   float* vertPtr = 0;
   float* bgTcPtr = 0;
@@ -461,7 +462,7 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
       if (!cacheData->hasGlyph) continue;
     }
 
-    const int newTexNum = cacheData->texNum;
+    const size_t newTexNum = cacheData->texNum;
     const GLuint newHandle = textures[newTexNum].handle;
     if (!job || (job->texture != newHandle) || !(usedTexs & (1 << newTexNum)))
     {
@@ -694,7 +695,7 @@ void csGLFontCache::FlushText ()
 
 void csGLFontCache::DumpFontCache (csRefArray<iImage>& pages)
 {
-  for (int t = 0; t < textures.Length(); t++)
+  for (size_t t = 0; t < textures.Length(); t++)
   {
     csRef<iImage> page;
     page.AttachNew (new csImageMemory (texSize, texSize, 

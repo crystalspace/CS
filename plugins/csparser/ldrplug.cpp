@@ -71,7 +71,7 @@ csLoader::csLoadedPluginVector::~csLoadedPluginVector ()
 void csLoader::csLoadedPluginVector::DeleteAll ()
 {
   csScopedMutexLock lock (mutex);
-  int i;
+  size_t i;
   for (i = 0 ; i < vector.Length () ; i++)
   {
     csLoaderPluginRec* rec = vector[i];
@@ -88,7 +88,7 @@ csLoaderPluginRec* csLoader::csLoadedPluginVector::FindPluginRec (
 	const char* name)
 {
   csScopedMutexLock lock (mutex);
-  int i;
+  size_t i;
   for (i=0 ; i<vector.Length () ; i++)
   {
     csLoaderPluginRec* pl = vector.Get (i);

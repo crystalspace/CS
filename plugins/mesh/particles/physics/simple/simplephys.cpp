@@ -146,7 +146,7 @@ bool csParticlesPhysicsSimple::HandleEvent (iEvent &event)
     leftover_time = (elapsed + leftover_time) - (updates * 20);
 
     float elapsedSecs = (float)elapsed * 0.001f;
-    for (int i=0; i < partobjects.Length (); i++)
+    for (size_t i=0; i < partobjects.Length (); i++)
     {
       StepPhysics (elapsedSecs, partobjects[i]);
     }
@@ -157,7 +157,7 @@ bool csParticlesPhysicsSimple::HandleEvent (iEvent &event)
 void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
   particles_object *part)
 {
-  int i;
+  size_t i;
   float emit_time = part->particles->GetEmitTime ();
   if (part->total_elapsed_time < emit_time)
   {
@@ -174,7 +174,7 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
       oldlen << 1 : (int)part->new_particles << 1;
     part->data.SetLength (newlen);
     part->dead_particles += part->data.Length() - oldlen;
-    for(i=oldlen;i<part->data.Length ();i++) {
+    for(i = oldlen; i < part->data.Length (); i++) {
       csParticlesData &p = part->data.Get (i);
       p.sort = -FLT_MAX;
       p.color.w = 0.0f;
@@ -189,12 +189,12 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
     part->dead_particles -= oldlen - part->data.Length();
   }
 
-  int dead_offset = part->data.Length() - part->dead_particles;
+  size_t dead_offset = part->data.Length() - part->dead_particles;
 
   csVector3 emitter;
   part->particles->GetEmitPosition (emitter);
 
-  for (i = 0; i < (int)part->new_particles; i++)
+  for (i = 0; i < (size_t)part->new_particles; i++)
   {
     csParticlesData &point = part->data.Get(i + dead_offset);
     // Emission
@@ -260,7 +260,7 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
   float elapsed_time = 0.0f;
 
   float force_range = part->particles->GetForceRange ();
-  for (i=0;i<dead_offset;i++)
+  for (i=0; i < dead_offset; i++)
   {
     if(elapsed_time < true_elapsed_time - time_increment)
     {
@@ -423,8 +423,10 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
 csParticlesPhysicsSimple::particles_object*
   csParticlesPhysicsSimple::FindParticles(iParticlesObjectState *p)
 {
-  for (int i=0;i<partobjects.Length ();i++) {
-    if (partobjects[i]->particles == p) {
+  for (size_t i = 0; i < partobjects.Length (); i++) 
+  {
+    if (partobjects[i]->particles == p) 
+    {
       return partobjects[i];
     }
   }

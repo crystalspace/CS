@@ -259,9 +259,9 @@ bool csShaderGLPS1_ATI::LoadProgramStringToGL ()
 
   const csArray<csPSConstant> &constants = parser.GetConstants ();
 
-  int i;
+  size_t i;
 
-  for(i=0;i<constants.Length();i++)
+  for(i = 0; i < constants.Length(); i++)
   {
     const csPSConstant& constant = constants.Get (i);
 

@@ -39,7 +39,7 @@ CMapPolygon::CMapPolygon(const CMapPolygon& poly)
   m_pBrush          = poly.m_pBrush;
   m_BrushLineNumber = poly.m_BrushLineNumber;
   m_PlaneNumber     = poly.m_PlaneNumber;
-  int i;
+  size_t i;
   for (i=0; i<poly.m_Planes.Length(); i++)
   {
     m_Planes.Push(poly.m_Planes[i]); //only stored by reference
@@ -72,7 +72,7 @@ void CMapPolygon::Create(CMapTexturedPlane*              pBaseplane,
   //for the upcoming handling, we copy planes into a reduced array of planes
   //this will help us to change order and to remove already used planes.
   //Also we will remove all planes that don't create an edge right here.
-  int p=0;
+  size_t p=0;
   CMapTexturedPlaneVector RedplanesStage1;
   for (p=0; p<planes.Length(); p++)
   {
@@ -143,7 +143,7 @@ void CMapPolygon::Create(CMapTexturedPlane*              pBaseplane,
     pPlane1 = m_Planes[m_Planes.Length()-1];
     //pPlane1 = pPlane2;
 
-    int NumPlanes = redplanes.Length();
+    size_t NumPlanes = redplanes.Length();
 
     //Check all planes, if they will form a new legal vertex
     //with the baseplane and plane1 (the last found plane)
@@ -263,7 +263,7 @@ double CMapPolygon::GetArea()
   CdVector3 Normal = m_pBaseplane->GetNormal().Unit();
   CdVector3 Sum(0,0,0);
 
-  int i;
+  size_t i;
   for (i=0; i<(m_Vertices.Length()-1); i++)
   {
     Sum += (*(m_Vertices[i])) % (*(m_Vertices[i+1]));
@@ -306,7 +306,7 @@ void CMapPolygon::SetPolygon(CMapPolygon* pPoly)
 {
   m_pBaseplane = pPoly->m_pBaseplane;;
 
-  int i=0;
+  size_t i=0;
   for (i=0; i<pPoly->m_Vertices.Length(); i++)
   {
     m_Vertices.Push(new CdVector3(*pPoly->m_Vertices[i]));
@@ -322,7 +322,7 @@ void CMapPolygon::FlipSide()
 {
   m_pBaseplane = m_pBaseplane->GetMirror();
 
-  int i=0;
+  size_t i=0;
   for (i=0; i<m_Vertices.Length()/2; i++)
   {
     CdVector3* pHelp                    = m_Vertices[i];
@@ -484,7 +484,7 @@ void CMapPolygon::SetErrorInfo(int BrushLineNumber, int PlaneNumber)
 void CMapPolygon::DumpPolyinfo(CMapTexturedPlane*             pBaseplane,
                                const CMapTexturedPlaneVector& planes)
 {
-  int j, i, y, c, x;
+  size_t j, i, y, c, x;
   for (j=0; j<m_Planes.Length(); j++)
   {
     for (i=0; i<planes.Length(); i++)

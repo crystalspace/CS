@@ -41,7 +41,7 @@ class csAVIFormat : public iStreamFormat
   protected:
     streamiterator (iBase *pBase);
     csAVIFormat *pAVI;
-    int pos;
+    size_t pos;
   public:
     SCF_DECLARE_IBASE;
     virtual ~streamiterator ();

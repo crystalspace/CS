@@ -95,7 +95,7 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
   if (renderBufferNum != polysNum)
   {
     int num_verts = 0, num_indices = 0, max_vc = 0;
-    int i;
+    size_t i;
 
     for (i = 0; i < polys.Length(); i++)
     {
@@ -352,7 +352,7 @@ void csGLPolygonRenderer::FogAccesor::PreGetValue (csShaderVariable *variable)
   if (fogVerticesNum != renderer->polysNum)
   {
     int num_verts = 0;
-    int i;
+    size_t i;
 
     for (i = 0; i < renderer->polys.Length(); i++)
     {
@@ -376,7 +376,7 @@ void csGLPolygonRenderer::FogAccesor::PreGetValue (csShaderVariable *variable)
   csVector3 planeNormal = fogPlane.Normal ();
   csVector3 refpos = rt.GetO2TTranslation();
   
-  for (int i = 0; i < renderer->polys.Length(); i++)
+  for (size_t i = 0; i < renderer->polys.Length(); i++)
   {
     csPolygonRenderData* static_data = renderer->polys[i];
 

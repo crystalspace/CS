@@ -123,8 +123,8 @@ public:
   /// Find a texture by name
   csWSTexture *FindTexture (const char *name) const
   {
-    int idx = FindKey (csArrayCmp<csWSTexture*,char const*>(name, CompareKey));
-    return idx >= 0 ? Get (idx) : (csWSTexture*)0;
+    size_t idx = FindKey (csArrayCmp<csWSTexture*,char const*>(name, CompareKey));
+    return idx != csArrayItemNotFound ? Get (idx) : (csWSTexture*)0;
   }
 };
 

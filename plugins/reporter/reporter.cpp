@@ -35,7 +35,7 @@ class csReporterIterator : public iReporterIterator
 {
 public:
   csPDelArray<csReporterMessage> messages;
-  int idx;
+  size_t idx;
 
 public:
   SCF_DECLARE_IBASE;
@@ -134,7 +134,7 @@ void csReporter::ReportV (int severity, const char* msgId,
   csRefArray<iReporterListener> copy;
   {
     csScopedMutexLock lock (mutex);
-    int i;
+    size_t i;
     for (i = 0 ; i < listeners.Length () ; i++)
     {
       iReporterListener* listener = listeners[i];
@@ -143,7 +143,7 @@ void csReporter::ReportV (int severity, const char* msgId,
   }
 
   bool add_msg = true;
-  int i;
+  size_t i;
   for (i = 0 ; i < copy.Length () ; i++)
   {
     iReporterListener* listener = copy[i];
@@ -216,7 +216,7 @@ csPtr<iReporterIterator> csReporter::GetMessageIterator ()
 {
   csScopedMutexLock lock (mutex);
   csReporterIterator* it = new csReporterIterator ();
-  int i;
+  size_t i;
   for (i = 0 ; i < messages.Length () ; i++)
   {
     csReporterMessage* msg = new csReporterMessage ();

@@ -53,7 +53,7 @@ class csPluginIterator : public iPluginIterator
 {
 public:
   csArray<iBase*> pointers;
-  int idx;
+  size_t idx;
 
 public:
   csPluginIterator ()
@@ -111,8 +111,8 @@ void csPluginManager::Clear ()
   OptionList.DeleteAll ();
 
   // Free all plugins.
-  for (int i = Plugins.Length()-1 ; i >= 0 ; i--)
-    UnloadPlugin ((iComponent *)Plugins.Get(i)->Plugin);
+  for (size_t i = Plugins.Length() ; i > 0 ; i--)
+    UnloadPlugin ((iComponent *)Plugins.Get(i - 1)->Plugin);
 }
 
 void csPluginManager::QueryOptions (iComponent *obj)
@@ -123,7 +123,7 @@ void csPluginManager::QueryOptions (iComponent *obj)
   csRef<iConfig> Config (SCF_QUERY_INTERFACE (obj, iConfig));
   if (Config)
   {
-    int on = OptionList.Length ();
+    size_t on = OptionList.Length ();
     for (int i = 0 ; ; i++)
     {
       csOptionDescription option;
@@ -200,9 +200,9 @@ iBase *csPluginManager::LoadPlugin (const char *classID,
   else
   {
     csScopedMutexLock lock (mutex);
-    int index = -1;
+    size_t index = (size_t)-1;
     // See if the plugin is already in our plugin list.
-    for (int i = 0 ; i < Plugins.Length () ; i++)
+    for (size_t i = 0 ; i < Plugins.Length () ; i++)
     {
       csPlugin* pl = Plugins.Get (i);
       if (pl->ClassID)
@@ -214,7 +214,7 @@ iBase *csPluginManager::LoadPlugin (const char *classID,
     }
 
     bool added_here = false;
-    if (index == -1)
+    if (index == (size_t)-1)
     {
       // The plugin wasn't in our plugin list yet. Add it here.
       index = Plugins.Push (new csPlugin (p, classID));
@@ -267,7 +267,7 @@ bool csPluginManager::RegisterPlugin (const char *classID,
   iComponent *obj)
 {
   csScopedMutexLock lock (mutex);
-  int index = Plugins.Push (new csPlugin (obj, classID));
+  size_t index = Plugins.Push (new csPlugin (obj, classID));
   if (obj->Initialize (object_reg))
   {
     QueryOptions (obj);
@@ -288,7 +288,7 @@ csPtr<iPluginIterator> csPluginManager::GetPlugins ()
 {
   csScopedMutexLock lock (mutex);
   csPluginIterator* it = new csPluginIterator ();
-  int i;
+  size_t i;
   for (i = 0 ; i < Plugins.Length () ; i++)
   {
     it->pointers.Push (Plugins.Get (i)->Plugin);
@@ -300,7 +300,7 @@ iBase *csPluginManager::QueryPlugin (const char *iInterface, int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
   csScopedMutexLock lock (mutex);
-  for (int i = 0; i < Plugins.Length (); i++)
+  for (size_t i = 0; i < Plugins.Length (); i++)
   {
     iBase *ret =
       (iBase *)Plugins.Get (i)->Plugin->QueryInterface (ifID, iVersion);
@@ -315,7 +315,7 @@ iBase *csPluginManager::QueryPlugin (const char* classID,
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
   csScopedMutexLock lock (mutex);
-  for (int i = 0 ; i < Plugins.Length () ; i++)
+  for (size_t i = 0 ; i < Plugins.Length () ; i++)
   {
     csPlugin* pl = Plugins.Get (i);
     if (pl->ClassID)
@@ -330,7 +330,7 @@ iBase *csPluginManager::QueryPlugin (const char* classID,
 bool csPluginManager::UnloadPlugin (iComponent* obj)
 {
   csScopedMutexLock lock (mutex);
-  int idx = Plugins.FindKey (
+  size_t idx = Plugins.FindKey (
     csArrayCmp<csPlugin*,iComponent*>(obj, csPluginsVector::CompareAddress));
   if (idx < 0)
     return false;
@@ -338,11 +338,11 @@ bool csPluginManager::UnloadPlugin (iComponent* obj)
   csRef<iConfig> config (SCF_QUERY_INTERFACE (obj, iConfig));
   if (config)
   {
-    for (int i = OptionList.Length () - 1; i >= 0; i--)
+    for (size_t i = OptionList.Length (); i > 0; i--)
     {
-      csPluginOption *pio = (csPluginOption *)OptionList.Get (i);
+      csPluginOption *pio = (csPluginOption *)OptionList.Get (i - 1);
       if (pio->Config == config)
-        OptionList.DeleteIndex (i);
+        OptionList.DeleteIndex (i - 1);
     }
   }
 

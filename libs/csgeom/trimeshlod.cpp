@@ -23,8 +23,8 @@
 
 bool csTriangleVertexCost::DelVertex (int idx)
 {
-  int idxidx = con_vertices.Find (idx);
-  if (idxidx == -1)
+  size_t idxidx = con_vertices.Find (idx);
+  if (idxidx == csArrayItemNotFound)
     return false;
   con_vertices.DeleteIndex (idxidx);
   return true;
@@ -37,7 +37,7 @@ void csTriangleVertexCost::ReplaceVertex (int old, int replace)
 
 void csTriangleVertexCost::CalculateCost (csTriangleVerticesCost* vertices)
 {
-  int i;
+  size_t i;
   to_vertex = -1;
   float min_sq_dist = 1000000.;
   if (deleted)
@@ -70,7 +70,8 @@ csTriangleVerticesCost::csTriangleVerticesCost (csTriangleMesh* mesh,
 
   // Build connectivity information for all vertices in this mesh.
   csTriangle* triangles = mesh->GetTriangles ();
-  int i, j;
+  int i;
+  size_t j;
   for (i = 0 ; i < num_vertices ; i++)
   {
     vertices[i].pos = verts[i];
@@ -122,7 +123,8 @@ void csTriangleVerticesCost::CalculateCost ()
 void csTriangleVerticesCost::Dump ()
 {
   printf ("=== Dump ===\n");
-  int i, j;
+  int i;
+  size_t j;
   for (i = 0 ; i < num_vertices ; i++)
   {
     printf ("  %d idx=%d del=%d cost=%f to=%d tri=[ ", i,
@@ -147,7 +149,7 @@ void csTriangleVerticesCost::Dump ()
 void csTriangleMeshLOD::CalculateLOD (csTriangleMesh* mesh,
 	csTriangleVerticesCost* verts, int* translate, int* emerge_from)
 {
-  int i;
+  size_t i;
   // Calculate the cost for all vertices for the first time.
   // This information will change locally whenever vertices are collapsed.
   verts->CalculateCost ();
@@ -185,7 +187,7 @@ void csTriangleMeshLOD::CalculateLOD (csTriangleMesh* mesh,
     // Fix connectivity information after moving the 'from' vertex to 'to'.
     for (i = 0 ; i < vt_from->con_triangles.Length () ; i++)
     {
-      int id = vt_from->con_triangles[i];
+      size_t id = vt_from->con_triangles[i];
       csTriangle& tr = mesh->GetTriangles ()[id];
       if (tr.a == from) { tr.a = to; vt_to->AddTriangle (id); }
       if (tr.b == from) { tr.b = to; vt_to->AddTriangle (id); }
@@ -223,11 +225,12 @@ void csTriangleMeshLOD::CalculateLOD (csTriangleMesh* mesh,
   emerge_from[0] = -1;
   col_idx--;
 
+  int j;
   // Fill the output arrays.
-  for (i = 1 ; i < verts->GetVertexCount () ; i++)
+  for (j = 1 ; j < verts->GetVertexCount () ; j++)
   {
-    translate[from_vertices[col_idx]] = i;
-    emerge_from[i] = translate[to_vertices[col_idx]];
+    translate[from_vertices[col_idx]] = j;
+    emerge_from[j] = translate[to_vertices[col_idx]];
     col_idx--;
   }
 

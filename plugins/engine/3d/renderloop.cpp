@@ -71,7 +71,7 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s)
     s->IncRecLevel ();
     s->PrepareDraw (rview);
 
-    int i;
+    size_t i;
     for (i = 0; i < steps.Length(); i++)
     {
       steps[i]->Perform (rview, s, varStack);
@@ -81,7 +81,7 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s)
 
     // @@@ See above note about halos.
     iLightList* lights = s->GetLights();
-    for (i = lights->GetCount () - 1; i >= 0; i--)
+    for (i = lights->GetCount (); i-- > 0;)
       // Tell the engine to try to add this light into the halo queue
       engine->AddHalo (rview->GetCamera(), 
         lights->Get (i)->GetPrivateObject ());

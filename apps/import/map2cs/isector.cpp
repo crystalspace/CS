@@ -78,7 +78,8 @@ bool CISector::IsInside(CdVector3& v)
 void CISector::CreatePortal(CISector* pOtherSector)
 {
   assert(pOtherSector != this);
-  int i, j;
+  int i;
+  size_t j;
 
   //Check all pairs of this sectors walls and the other sectors walls. We are using
   //the original brush for this operation, to avoid having portals that are already
@@ -135,7 +136,7 @@ CMapPolygonSet* CISector::GetCorrespondingWall(CMapTexturedPlane* pPlane,
 {
   if (!pPlane) return 0;
 
-  int i;
+  size_t i;
   for (i=0; i<m_Walls.Length(); i++)
   {
     CMapPolygonSet*    pOwnWall  = m_Walls[i];

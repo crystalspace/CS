@@ -146,56 +146,56 @@ struct iModelDataVertices : public iBase
   virtual iObject* QueryObject () = 0;
 
   /// Return the number of contained vertices
-  virtual int GetVertexCount () const = 0;
+  virtual size_t GetVertexCount () const = 0;
   /// Return the coordinates of a vertex
-  virtual const csVector3 &GetVertex (int n) const = 0;
+  virtual const csVector3 &GetVertex (size_t n) const = 0;
   /// Set the coordinates of a vertex
-  virtual void SetVertex (int n, const csVector3 &v) = 0;
+  virtual void SetVertex (size_t n, const csVector3 &v) = 0;
   /// Add a vertex
-  virtual int AddVertex (const csVector3 &v) = 0;
+  virtual size_t AddVertex (const csVector3 &v) = 0;
   /// Delete a vertex
-  virtual void DeleteVertex (int n) = 0;
+  virtual void DeleteVertex (size_t n) = 0;
   /// Find a vertex
-  virtual int FindVertex (const csVector3 &v) const = 0;
+  virtual size_t FindVertex (const csVector3 &v) const = 0;
 
   /// Return the number of contained normals
-  virtual int GetNormalCount () const = 0;
+  virtual size_t GetNormalCount () const = 0;
   /// Return a normal
-  virtual const csVector3 &GetNormal (int n) const = 0;
+  virtual const csVector3 &GetNormal (size_t n) const = 0;
   /// Set a normal
-  virtual void SetNormal (int n, const csVector3 &v) = 0;
+  virtual void SetNormal (size_t n, const csVector3 &v) = 0;
   /// Add a normal
-  virtual int AddNormal (const csVector3 &v) = 0;
+  virtual size_t AddNormal (const csVector3 &v) = 0;
   /// Delete a normal
-  virtual void DeleteNormal (int n) = 0;
+  virtual void DeleteNormal (size_t n) = 0;
   /// Find a normal
-  virtual int FindNormal (const csVector3 &v) const = 0;
+  virtual size_t FindNormal (const csVector3 &v) const = 0;
 
   /// Return the number of contained colors
-  virtual int GetColorCount () const = 0;
+  virtual size_t GetColorCount () const = 0;
   /// Return a color
-  virtual const csColor &GetColor (int n) const = 0;
+  virtual const csColor &GetColor (size_t n) const = 0;
   /// Set a color
-  virtual void SetColor (int n, const csColor &v) = 0;
+  virtual void SetColor (size_t n, const csColor &v) = 0;
   /// Add a color
-  virtual int AddColor (const csColor &v) = 0;
+  virtual size_t AddColor (const csColor &v) = 0;
   /// Delete a color
-  virtual void DeleteColor (int n) = 0;
+  virtual void DeleteColor (size_t n) = 0;
   /// Find a color
-  virtual int FindColor (const csColor &v) const = 0;
+  virtual size_t FindColor (const csColor &v) const = 0;
 
   /// Return the number of contained texels
-  virtual int GetTexelCount () const = 0;
+  virtual size_t GetTexelCount () const = 0;
   /// Return a texel
-  virtual const csVector2 &GetTexel (int n) const = 0;
+  virtual const csVector2 &GetTexel (size_t n) const = 0;
   /// Set a texel
-  virtual void SetTexel (int n, const csVector2 &v) = 0;
+  virtual void SetTexel (size_t n, const csVector2 &v) = 0;
   /// Add a texel
-  virtual int AddTexel (const csVector2 &v) = 0;
+  virtual size_t AddTexel (const csVector2 &v) = 0;
   /// Delete a texel
-  virtual void DeleteTexel (int n) = 0;
+  virtual void DeleteTexel (size_t n) = 0;
   /// Find a texel
-  virtual int FindTexel (const csVector2 &v) const = 0;
+  virtual size_t FindTexel (const csVector2 &v) const = 0;
 
   /// Add all data from another vertex frame to this one
   virtual void CopyFrom (const iModelDataVertices *Other) = 0;
@@ -238,19 +238,19 @@ struct iModelDataAction : public iBase
   virtual iObject* QueryObject () = 0;
 
   /// Return the number of key frames
-  virtual int GetFrameCount () const = 0;
+  virtual size_t GetFrameCount () const = 0;
   /// Get the time value for a frame
-  virtual float GetTime (int Frame) const = 0;
+  virtual float GetTime (size_t Frame) const = 0;
   /// Get the state information for a frame
-  virtual iObject *GetState (int Frame) const = 0;
+  virtual iObject *GetState (size_t Frame) const = 0;
   /// Set the time value for a frame
-  virtual void SetTime (int Frame, float NewTime) = 0;
+  virtual void SetTime (size_t Frame, float NewTime) = 0;
   /// Set the state information for a frame
-  virtual void SetState (int Frame, iObject *State) = 0;
+  virtual void SetState (size_t Frame, iObject *State) = 0;
   /// Add a frame
   virtual void AddFrame (float Time, iObject *State) = 0;
   /// Delete a frame
-  virtual void DeleteFrame (int Frame) = 0;
+  virtual void DeleteFrame (size_t Frame) = 0;
   /// Return the length (in time) of a complete animation cycle
   virtual float GetTotalTime () const = 0;
 };
@@ -269,28 +269,28 @@ struct iModelDataPolygon : public iBase
   virtual iObject* QueryObject () = 0;
 
   /// return the number of vertices
-  virtual int GetVertexCount () const = 0;
+  virtual size_t GetVertexCount () const = 0;
   /// Add a vertex
-  virtual int AddVertex (int Vertex, int Normal, int Color, int Texel) = 0;
+  virtual size_t AddVertex (int Vertex, int Normal, int Color, int Texel) = 0;
   /// Delete a vertex
-  virtual void DeleteVertex (int n) = 0;
+  virtual void DeleteVertex (size_t n) = 0;
 
   /// return the index of a vertex
-  virtual int GetVertex (int n) const = 0;
+  virtual int GetVertex (size_t n) const = 0;
   /// set the index of a vertex
-  virtual void SetVertex (int n, int Index) = 0;
+  virtual void SetVertex (size_t n, int Index) = 0;
   /// return the index of a normal
-  virtual int GetNormal (int n) const = 0;
+  virtual int GetNormal (size_t n) const = 0;
   /// set the index of a normal
-  virtual void SetNormal (int n, int Index) = 0;
+  virtual void SetNormal (size_t n, int Index) = 0;
   /// return the index of a color
-  virtual int GetColor (int n) const = 0;
+  virtual int GetColor (size_t n) const = 0;
   /// set the index of a color
-  virtual void SetColor (int n, int Index) = 0;
+  virtual void SetColor (size_t n, int Index) = 0;
   /// return the index of a texel
-  virtual int GetTexel (int n) const = 0;
+  virtual int GetTexel (size_t n) const = 0;
   /// set the index of a texel
-  virtual void SetTexel (int n, int Index) = 0;
+  virtual void SetTexel (size_t n, int Index) = 0;
 
   /// return the current material
   virtual iModelDataMaterial *GetMaterial () const = 0;

@@ -247,7 +247,7 @@ csPtr<iDataBuffer> csModelConverterPOV::Save (iModelData *Data, const char *Form
     {
       iModelDataPolygon *Polygon = it2.Next ();
 
-	  int i;
+      size_t i;
       for (i=2; i<Polygon->GetVertexCount (); i++)
       {
         /* @@@ is the vertex order correct ??? */

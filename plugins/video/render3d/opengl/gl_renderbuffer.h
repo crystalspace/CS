@@ -44,7 +44,7 @@ protected:
 public:
   SCF_DECLARE_IBASE;
 
-  csGLRenderBuffer (int size, csRenderBufferType type,
+  csGLRenderBuffer (size_t size, csRenderBufferType type,
     csRenderBufferComponentType comptype, int compcount);
   
   virtual ~csGLRenderBuffer ();
@@ -53,7 +53,7 @@ public:
   virtual csRenderBufferType GetBufferType() const { return type; }
 
   /// Get the size of the buffer (in bytes)
-  virtual int GetSize() const { return size; }
+  virtual size_t GetSize() const { return size; }
 
   /// Sets the number of components per element
   virtual void SetComponentCount (int count)
@@ -100,7 +100,7 @@ private:
   void *buffer;
   bool locked;
 public:
-  csSysRenderBuffer (void *buffer, int size, csRenderBufferType type,
+  csSysRenderBuffer (void *buffer, size_t size, csRenderBufferType type,
     csRenderBufferComponentType comptype, int compcount) :
     csGLRenderBuffer (size, type, comptype, compcount)
   {
@@ -127,7 +127,7 @@ public:
   /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release() { locked = false; }
 
-  virtual void CopyToBuffer(const void *data, int length)
+  virtual void CopyToBuffer(const void *data, size_t length)
   {
     memcpy(buffer, data, length);
   }
@@ -154,7 +154,7 @@ private:
   GLenum bufferTarget;
   GLenum bufferUsage;
 public:
-  csVBORenderBuffer (int size, csRenderBufferType type,
+  csVBORenderBuffer (size_t size, csRenderBufferType type,
     csRenderBufferComponentType comptype, int compcount, 
     bool index, csGLExtensionManager *ext) :
     csGLRenderBuffer (size, type, comptype, compcount)
@@ -240,7 +240,7 @@ public:
     lastLock = CS_BUF_LOCK_NOLOCK;
   }
 
-  virtual void CopyToBuffer(const void *data, int length)
+  virtual void CopyToBuffer(const void *data, size_t length)
   {
     ext->glBindBufferARB (bufferTarget, bufferId);
     ext->glBufferDataARB (bufferTarget, length, data, bufferUsage);

@@ -69,7 +69,7 @@ public:
    * Sort the list of meshes by render priority and within every render
    * priority. Return number of total meshes.
    */
-  int SortMeshLists ();
+  size_t SortMeshLists ();
 
   /**
    * After sorting the meshes fetch them with this function.

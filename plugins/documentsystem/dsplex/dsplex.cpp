@@ -313,7 +313,7 @@ bool csMplexDocumentSystem::Initialize (iObjectRegistry* object_reg)
   return false;
 }
 
-csRef<iDocumentSystem> csMplexDocumentSystem::LoadNextPlugin (int num)
+csRef<iDocumentSystem> csMplexDocumentSystem::LoadNextPlugin (size_t num)
 {
   csRef<iDocumentSystem> res;
   if (num < orderedlist.Length())
@@ -322,7 +322,7 @@ csRef<iDocumentSystem> csMplexDocumentSystem::LoadNextPlugin (int num)
   }
   else
   {
-    int anum = num - orderedlist.Length();
+    size_t anum = num - orderedlist.Length();
     if (anum < autolist.Length())
     {
       res = autolist[anum];
@@ -360,11 +360,11 @@ csRef<iDocumentSystem> csMplexDocumentSystem::LoadNextPlugin (int num)
   return res;
 }
 
-void csMplexDocumentSystem::RewardPlugin (int num)
+void csMplexDocumentSystem::RewardPlugin (size_t num)
 {
-  int anum = num - orderedlist.Length();
-  if ((anum >= 0) && 
-    (autolist.Length() - anum > 4))
+  size_t anum;
+  if ((num >= orderedlist.Length()) && 
+    (autolist.Length() - (anum = num - orderedlist.Length()) > 4))
   {
     csRef<iDocumentSystem> plugin = autolist[anum];
     autolist.Push (plugin);

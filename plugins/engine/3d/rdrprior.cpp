@@ -34,7 +34,7 @@ csRenderQueueSet::~csRenderQueueSet ()
 
 void csRenderQueueSet::ClearVisible ()
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < visible.Length () ; i++)
     if (visible[i])
       visible[i]->SetLength (0);
@@ -46,7 +46,7 @@ void csRenderQueueSet::AddVisible (csMeshWrapper *mesh, uint32 frustum_mask)
 
   // look if the desired priority queue exists, and possibly
   // extend the list of visible.
-  if (pri >= visible.Length ())
+  if ((size_t)pri >= visible.Length ())
     visible.SetLength (pri+1);
 
   // look if the desired queue exists, and create it if not
@@ -84,7 +84,7 @@ static int comp_mesh (const void *el1, const void *el2)
 void csRenderQueueSet::SortAll (csArrayMeshMask& meshes, iRenderView* rview)
 {
   int tot_objects = 0;
-  int priority;
+  size_t priority;
   for (priority = 0 ; priority < visible.Length () ; priority++)
   {
     Sort (rview, priority);
@@ -98,7 +98,7 @@ void csRenderQueueSet::SortAll (csArrayMeshMask& meshes, iRenderView* rview)
   {
     csArrayMeshMask* v = visible[priority];
     if (v)
-      for (int i = 0 ; i < v->Length () ; i++)
+      for (size_t i = 0 ; i < v->Length () ; i++)
         meshes.Push ((*v)[i]);
   }
 }
@@ -117,7 +117,7 @@ void csRenderQueueSet::Sort (iRenderView *rview, int priority)
     comp_mesh_z.SetLength (v->Length ());
 
   const csReversibleTransform &camtrans = rview->GetCamera ()->GetTransform ();
-  int i;
+  size_t i;
   for (i = 0; i < v->Length (); i++)
   {
     csMeshWithMask& mesh_with_mask = v->Get (i);

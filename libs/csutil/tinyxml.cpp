@@ -342,8 +342,8 @@ TiDocumentNode* TiDocumentNodeChildren::FirstChild( const char * value ) const
 
 void TiXmlElement::RemoveAttribute( const char * name )
 {
-  int nodeidx = attributeSet.Find (name);
-  if ( nodeidx != -1 )
+  size_t nodeidx = attributeSet.Find (name);
+  if ( nodeidx != (size_t)-1 )
   {
     attributeSet.set.DeleteIndex (nodeidx);
   }
@@ -420,9 +420,9 @@ void TiXmlElement::SetValue (const char * name)
 
 const char * TiXmlElement::Attribute( const char * name ) const
 {
-  int nodeidx = attributeSet.Find (name);
+  size_t nodeidx = attributeSet.Find (name);
 
-  if (nodeidx != -1)
+  if (nodeidx != (size_t)-1)
     return attributeSet.set[nodeidx].Value ();
 
   return 0;
@@ -455,14 +455,14 @@ void TiXmlElement::SetAttribute( TiDocument* document,
 TiDocumentAttribute& TiXmlElement::GetAttributeRegistered (
   const char * reg_name)
 {
-  int nodeidx = attributeSet.FindExact (reg_name);
-  if (nodeidx != -1)
+  size_t nodeidx = attributeSet.FindExact (reg_name);
+  if (nodeidx != (size_t)-1)
   {
     return attributeSet.set[nodeidx];
   }
 
   TiDocumentAttribute at;
-  int idx = attributeSet.set.Push (at);
+  size_t idx = attributeSet.set.Push (at);
   attributeSet.set[idx].SetName (reg_name);
   return attributeSet.set[idx];
 }
@@ -493,15 +493,15 @@ static void StrPuts (const char* msg, iString* file)
 
 void TiXmlElement::Print( iString* cfile, int depth ) const
 {
-  int i;
-  for ( i=0; i<depth; i++ )
+  int d;
+  for ( d=0; d<depth; d++ )
   {
     StrPrintf ( cfile, "    " );
   }
 
   StrPrintf ( cfile, "<%s", value );
 
-  for (i = 0 ; i < attributeSet.set.Length () ; i++)
+  for (size_t i = 0 ; i < attributeSet.set.Length () ; i++)
   {
     const TiDocumentAttribute& attrib = attributeSet.set[i];
     StrPrintf ( cfile, " " );
@@ -536,7 +536,7 @@ void TiXmlElement::Print( iString* cfile, int depth ) const
       node->Print( cfile, depth+1 );
     }
     StrPrintf ( cfile, "\n" );
-    for( i=0; i<depth; ++i )
+    for( d=0; d<depth; ++d )
     StrPrintf ( cfile, "    " );
     StrPrintf ( cfile, "</%s>", value );
   }
@@ -552,7 +552,7 @@ TiDocumentNode* TiXmlElement::Clone(TiDocument* document) const
   CopyToClone( clone );
 
   // Clone the attributes, then clone the children.
-  int i;
+  size_t i;
   for (i = 0 ; i < attributeSet.set.Length () ; i++)
   {
     const TiDocumentAttribute& attrib = attributeSet.set[i];
@@ -780,23 +780,23 @@ TiDocumentNode* TiXmlUnknown::Clone(TiDocument* document) const
 }
 
 
-int TiDocumentAttributeSet::Find (const char * name) const
+size_t TiDocumentAttributeSet::Find (const char * name) const
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < set.Length () ; i++)
   {
     if (strcmp (set[i].name, name) == 0) return i;
   }
-  return -1;
+  return (size_t)-1;
 }
 
-int TiDocumentAttributeSet::FindExact (const char * reg_name) const
+size_t TiDocumentAttributeSet::FindExact (const char * reg_name) const
 {
-  int i;
+  size_t i;
   for (i = 0 ; i < set.Length () ; i++)
   {
     if (set[i].name == reg_name) return i;
   }
-  return -1;
+  return (size_t)-1;
 }
 

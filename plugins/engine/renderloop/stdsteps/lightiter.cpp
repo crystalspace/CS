@@ -276,7 +276,7 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
     csSphere lightSphere (lightPos, light->GetInfluenceRadius ());
     if (rview->TestBSphere (camTransR, lightSphere))
     {
-      int i;
+      size_t i;
       for (i = 0; i < steps.Length(); i++)
       {
         steps[i]->Perform (rview, sector, light, stacks);

@@ -110,13 +110,13 @@ public:
   bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
   long GetRenderState (G3D_RENDERSTATEOPTION op) const;
   bool SetOption (const char*, const char*);
-  csPtr<iRenderBuffer> CreateRenderBuffer (int size,
+  csPtr<iRenderBuffer> CreateRenderBuffer (size_t size,
     csRenderBufferType type, csRenderBufferComponentType componentType,
     int componentCount);
-  virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (int size, 
+  virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (size_t size, 
     csRenderBufferType type, csRenderBufferComponentType componentType,
     size_t rangeStart, size_t rangeEnd);
-  void CreateInterleavedRenderBuffers (int size, csRenderBufferType type,
+  void CreateInterleavedRenderBuffers (size_t size, csRenderBufferType type,
     int count, csRefArray<iRenderBuffer>& buffers);
   void SetBufferState (csVertexAttrib* attribs, iRenderBuffer** buffers, 
     int count);

@@ -117,7 +117,7 @@ protected:
     {
     }
 
-    static void InitRegion (PlaneGlyphs** address, int count)
+    static void InitRegion (PlaneGlyphs** address, size_t count)
     {
       memset (address, 0, count * sizeof (PlaneGlyphs*));
     }

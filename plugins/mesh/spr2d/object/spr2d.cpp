@@ -109,7 +109,7 @@ void csSprite2DMeshObject::SetupObject ()
   {
     initialized = true;
     float max_sq_dist = 0;
-    int i;
+    size_t i;
     bbox_2d.StartBoundingBox(vertices[0].pos);
     for (i = 0 ; i < vertices.Length () ; i++)
     {
@@ -213,10 +213,10 @@ void csSprite2DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
     light_color *= cosinus * lights [i]->GetBrightnessAtDistance (wor_dist);
     color += light_color;
   }
-  for (i = 0 ; i < vertices.Length () ; i++)
+  for (size_t j = 0 ; j < vertices.Length () ; j++)
   {
-    vertices[i].color = vertices[i].color_init + color;
-    vertices[i].color.Clamp (2, 2, 2);
+    vertices[j].color = vertices[j].color_init + color;
+    vertices[j].color.Clamp (2, 2, 2);
   }
 #ifdef CS_USE_NEW_RENDERER
   colors_dirty = true;
@@ -394,7 +394,7 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   float iz = 1. / cam.z;
   float iza = iz * camera->GetFOV ();
 
-  int i;
+  size_t i;
 
   for (i = 0; i < vertices.Length (); i++)
   {
@@ -416,7 +416,7 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   }
   else
   {
-    int n;
+    int i, n;
     const csVector2 *uv = uvani->GetVertices (n);
     for (i = 0; i < n; i++)
     {
@@ -530,9 +530,9 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
       csRenderBufferLock<uint> indexLock (index_buffer);
       uint* ptr = indexLock;
 
-      for (int i = 0; i < vertices.Length(); i++)
+      for (size_t i = 0; i < vertices.Length(); i++)
       {
-	*ptr++ = i;
+	*ptr++ = (uint)i;
       }
       indicesSize = indexSize;
     }
@@ -560,20 +560,20 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
 
       csRenderBufferLock<csVector2> texelLock (texel_buffer);
 
-	  for (int i = 0; i < texels_count; i++)
-	  {
-	  	csVector2& v = texelLock[i];
-	  	if (!uvani)
-		{
-			v.x = vertices[i].u;
-			v.y = vertices[i].v;
-		}
-		else
-		{
-			v.x = uvani_uv[i].x;
-			v.y = uvani_uv[i].y;
-		}
-	  }
+      for (size_t i = 0; i < (size_t)texels_count; i++)
+      {
+	csVector2& v = texelLock[i];
+	if (!uvani)
+	{
+	  v.x = vertices[i].u;
+	  v.y = vertices[i].v;
+	}
+	else
+	{
+	  v.x = uvani_uv[i].x;
+	  v.y = uvani_uv[i].y;
+	}
+      }
       texels_dirty = false;
     }
   }
@@ -593,7 +593,7 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
 
       csRenderBufferLock<csColor> colorLock (color_buffer);
 
-      for (int i = 0; i < vertices.Length(); i++)
+      for (size_t i = 0; i < vertices.Length(); i++)
       {
 	colorLock[i] = vertices[i].color;
       }
@@ -616,7 +616,7 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
 
       csRenderBufferLock<csVector3> vertexLock (vertex_buffer);
 
-      for (int i = 0; i < vertices.Length(); i++)
+      for (size_t i = 0; i < vertices.Length(); i++)
       {
 	vertexLock[i].Set (vertices[i].pos.x, vertices[i].pos.y, 0.0f);
       }
@@ -643,7 +643,7 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
   double angle_inc = TWO_PI / n;
   double angle = 0.0;
   vertices.SetLength (n);
-  int i;
+  size_t i;
   for (i = 0; i < vertices.Length (); i++, angle += angle_inc)
   {
     vertices [i].pos.y = cos (angle);
@@ -707,7 +707,7 @@ csRenderMesh** csSprite2DMeshObject::Particle::GetRenderMeshes (int& n,
 void csSprite2DMeshObject::Particle::SetColor (const csColor& col)
 {
   csColoredVertices& vertices = scfParent->GetVertices ();
-  int i;
+  size_t i;
   for (i = 0 ; i < vertices.Length () ; i++)
     vertices[i].color_init = col;
   if (!scfParent->lighting)
@@ -721,7 +721,7 @@ void csSprite2DMeshObject::Particle::SetColor (const csColor& col)
 void csSprite2DMeshObject::Particle::AddColor (const csColor& col)
 {
   csColoredVertices& vertices = scfParent->GetVertices ();
-  int i;
+  size_t i;
   for (i = 0 ; i < vertices.Length () ; i++)
     vertices[i].color_init += col;
   if (!scfParent->lighting)
@@ -735,7 +735,7 @@ void csSprite2DMeshObject::Particle::AddColor (const csColor& col)
 void csSprite2DMeshObject::Particle::ScaleBy (float factor)
 {
   csColoredVertices& vertices = scfParent->GetVertices ();
-  int i;
+  size_t i;
   for (i = 0; i < vertices.Length (); i++)
     vertices[i].pos *= factor;
 #ifdef CS_USE_NEW_RENDERER
@@ -747,7 +747,7 @@ void csSprite2DMeshObject::Particle::ScaleBy (float factor)
 void csSprite2DMeshObject::Particle::Rotate (float angle)
 {
   csColoredVertices& vertices = scfParent->GetVertices ();
-  int i;
+  size_t i;
   for (i = 0; i < vertices.Length (); i++)
     vertices[i].pos.Rotate (angle);
 #ifdef CS_USE_NEW_RENDERER

@@ -804,7 +804,7 @@ bool CCSWorld::WriteSettings(csRef<iDocumentNode> node)
 
 bool CCSWorld::WriteSectors(csRef<iDocumentNode> node)
 {
-  int i;
+  size_t i;
   for (i=0; i<m_Sectors.Length(); i++)
   {
     if (!m_Sectors[i]->Write(node, this)) return false;

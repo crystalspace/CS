@@ -51,7 +51,7 @@ csRefTracker::~csRefTracker ()
       riAlloc.Free (info);
     }
 
-    for (int i = 0; i < oldData.Length(); i++)
+    for (size_t i = 0; i < oldData.Length(); i++)
     {
       const OldRefInfo& oldInfo = oldData[i];
 
@@ -143,7 +143,7 @@ void csRefTracker::MatchIncRef (void* object, int refCount, void* tag)
 
   RefInfo& refInfo = GetObjRefInfo (object);
   bool foundAction = false;
-  int i;
+  size_t i;
   for (i = refInfo.actions.Length() - 1; i >= 0; i--)
   {
     if (refInfo.actions[i].refCount == refCount)
@@ -173,7 +173,7 @@ void csRefTracker::MatchDecRef (void* object, int refCount, void* tag)
 
   RefInfo& refInfo = GetObjRefInfo (object);
   bool foundAction = false;
-  int i;
+  size_t i;
   for (i = refInfo.actions.Length() - 1; i >= 0; i--)
   {
     if (refInfo.actions[i].refCount == refCount)
@@ -241,16 +241,16 @@ void csRefTracker::ReportOnObj (void* obj, RefInfo* info)
     (info->destructed && (info->refCount <= 1));
   if (!okay)
   {
-    csPrintf ("object %.8x (%s), refcount %d, %s\n",
-      (unsigned int)obj, // @@@ FIXME 64bit: pointer truncation
+    csPrintf ("object %p (%s), refcount %d, %s\n",
+      (void*)obj, 
       info->descr ? info->descr : "<unknown>",
       info->refCount,
       info->destructed ? "destructed" : "not destructed");
-    for (int i = 0; i < info->actions.Length(); i++)
+    for (size_t i = 0; i < info->actions.Length(); i++)
     {
-      csPrintf ("%s by %.8x from %d\n",
+      csPrintf ("%s by %p from %d\n",
 	(info->actions[i].type == Increased) ? "Increase" : "Decrease",
-	(unsigned int)info->actions[i].tag, // @@@ FIXME 64bit: pointer truncation
+	(void*)info->actions[i].tag, 
 	info->actions[i].refCount);
       if (info->actions[i].stack != 0)
 	info->actions[i].stack->Print ();
@@ -263,7 +263,7 @@ void csRefTracker::Report ()
 {
   csScopedMutexLock lock (mutex);
 
-  for (int i = 0; i < oldData.Length(); i++)
+  for (size_t i = 0; i < oldData.Length(); i++)
   {
     const OldRefInfo& oldInfo = oldData[i];
 

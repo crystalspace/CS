@@ -112,7 +112,7 @@ void csSoundHandleDS3D::UpdateCount(long NumSamples)
     if (!Data->IsStatic())
     {
       // Find any sources associated with us
-      for (long i=0; i<SoundRender->ActiveSources.Length(); i++)
+      for (size_t i=0; i<SoundRender->ActiveSources.Length(); i++)
       {
         src = (csSoundSourceDS3D*)SoundRender->ActiveSources.Get(i);
         if (src->GetSoundHandle()==this && src->IsPlaying())
@@ -129,7 +129,7 @@ void csSoundHandleDS3D::UpdateCount(long NumSamples)
   */
   mutex_WriteCursor->LockWait();
   freespace=0;
-  for (long i=0; i<SoundRender->ActiveSources.Length(); i++)
+  for (size_t i=0; i<SoundRender->ActiveSources.Length(); i++)
   {
     src = (csSoundSourceDS3D*)SoundRender->ActiveSources.Get(i);
     if (src->GetSoundHandle()==this && src->IsPlaying())
@@ -221,7 +221,7 @@ void csSoundHandleDS3D::UpdateCount(long NumSamples)
         {
           ActiveStream=false; // Stream is done playing
           // Notify all sources that this stream has ended
-          for (long i=0; i<SoundRender->ActiveSources.Length(); i++)
+          for (size_t i=0; i<SoundRender->ActiveSources.Length(); i++)
           {
             src = (csSoundSourceDS3D*)SoundRender->ActiveSources.Get(i);
             if (src->GetSoundHandle()==this && src->IsPlaying())
@@ -251,7 +251,7 @@ long csSoundHandleDS3D::GetPlayCursorPosition()
   if (ActiveStream)
   {
     // Find a source playing our stream
-    for (long i=0; i<SoundRender->ActiveSources.Length(); i++)
+    for (size_t i=0; i<SoundRender->ActiveSources.Length(); i++)
     {
       src = (csSoundSourceDS3D*)SoundRender->ActiveSources.Get(i);
       if (src->GetSoundHandle()==this && src->IsPlaying())
@@ -268,7 +268,7 @@ long csSoundHandleDS3D::GetPlayCursorPosition()
 void csSoundHandleDS3D::vUpdate(void *buf, long Num)
 {
   long NumBytes = Num * Data->GetFormat()->Bits/8 * Data->GetFormat()->Channels;
-  for (long i=0; i<SoundRender->ActiveSources.Length(); i++)
+  for (size_t i=0; i<SoundRender->ActiveSources.Length(); i++)
   {
     csSoundSourceDS3D *src = (csSoundSourceDS3D*)SoundRender->ActiveSources.Get(i);
     if (src->GetSoundHandle()==this && src->IsPlaying())

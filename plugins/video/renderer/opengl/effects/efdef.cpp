@@ -64,7 +64,7 @@ const char* csEffectDefinition::GetName()
 
 float csEffectDefinition::GetVariableFloat(int variableID)
 {
-  if ( (variableID < 0 ) || (variableID > variables.Length() ) )
+  if ( (variableID < 0 ) || ((size_t)variableID > variables.Length() ) )
     return 0.0f;
 
   if ( (variables[variableID])->type == CS_EFVARIABLETYPE_FLOAT )
@@ -75,7 +75,7 @@ float csEffectDefinition::GetVariableFloat(int variableID)
 
 csEffectVector4 csEffectDefinition::GetVariableVector4(int variableID)
 {
-  if ( (variableID < 0 ) || (variableID > variables.Length() ) )
+  if ( (variableID < 0 ) || ((size_t)variableID > variables.Length() ) )
     return csEffectVector4();
 
   if ( (variables[variableID])->type == CS_EFVARIABLETYPE_VECTOR4 )
@@ -86,7 +86,7 @@ csEffectVector4 csEffectDefinition::GetVariableVector4(int variableID)
 
 void csEffectDefinition::SetVariableFloat(int variableID, float value)
 {
-  if ( (variableID < 0 ) || (variableID > variables.Length() ) )
+  if ( (variableID < 0 ) || ((size_t)variableID > variables.Length() ) )
     return;
 
   if ( (variables[variableID])->type == CS_EFVARIABLETYPE_FLOAT )
@@ -100,7 +100,7 @@ void csEffectDefinition::SetVariableFloat(int variableID, float value)
 
 void csEffectDefinition::SetVariableVector4(int variableID, csEffectVector4 value)
 {
-  if ( (variableID < 0 ) || (variableID > variables.Length() ) )
+  if ( (variableID < 0 ) || ((size_t)variableID > variables.Length() ) )
   return;
 
   if ( (variables[variableID])->type == CS_EFVARIABLETYPE_VECTOR4 )
@@ -114,7 +114,7 @@ void csEffectDefinition::SetVariableVector4(int variableID, csEffectVector4 valu
 
 int csEffectDefinition::GetTopmostVariableID(int id)
 {
-  if ((id < 0) || (id > variables.Length() ) )
+  if ((id < 0) || ((size_t)id > variables.Length() ) )
     return -1;
 
   int curid = id;
@@ -129,7 +129,7 @@ int csEffectDefinition::GetTopmostVariableID(int id)
 
 int csEffectDefinition::GetVariableID(csStringID string, bool create )
 {
-  for (int i = 0; i<variables.Length();i++)
+  for (size_t i = 0; i<variables.Length();i++)
   {
     if ( (variables[i])->id ==  string )
     {
@@ -156,7 +156,7 @@ int csEffectDefinition::GetVariableID(csStringID string, bool create )
 
 char csEffectDefinition::GetVariableType(int variableID)
 {
-  if ( (variableID < 0 ) || (variableID > variables.Length() ) )
+  if ( (variableID < 0 ) || ((size_t)variableID > variables.Length() ) )
     return CS_EFVARIABLETYPE_UNDEFINED;
 
   return (variables[variableID])->type;

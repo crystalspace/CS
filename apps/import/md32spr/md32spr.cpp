@@ -180,7 +180,7 @@ MD32spr::~MD32spr()
 void MD32spr::Main()
 {
   char *fileName, *dirName, *mountName, *weaponPath;
-  int i = 0;
+  size_t i = 0;
   bool head = false, torso = false, leg = false;
   //csString baseName;
 
@@ -414,9 +414,10 @@ bool MD3Model::ReadHeader(char **buf)
 bool MD32spr::ReadVfsDir()
 {
   char *str;
-  int i = 0;
+  size_t i = 0;
 
-  for (i = 0; i < fileNames->Length(); i++) {
+  for (i = 0; i < fileNames->Length(); i++) 
+  {
     str = (char*)fileNames->Get(i);
 
     if (str) {
@@ -632,7 +633,7 @@ bool MD32spr::LoadAnimation(char *animFile)
 
 void MD32spr::Write()
 {
-  int i = 0;
+  size_t i = 0;
   char* vfspath = 0;
   char* fileName = 0;
   char* mdlName = 0;
@@ -1041,14 +1042,16 @@ void MD32spr::WriteGeneric(md3Model * model,
 
 void MD32spr::WriteTextures(const char *inPath, const char *outPath)
 {
-  int i = 0;
+  size_t i = 0;
   size_t fileSize;
   csRef <iStringArray> files = vfs->FindFiles(inPath);
   char fileName[100];
-  for(i = 0; i < files->Length(); i++) {
+  for(i = 0; i < files->Length(); i++) 
+  {
     char *str = (char*)files->Get(i);
 
-    if(stristr(str,".jpg") || stristr(str, ".png") || stristr(str, ".bmp") || stristr(str, ".tga")) { 
+    if(stristr(str,".jpg") || stristr(str, ".png") || stristr(str, ".bmp") || stristr(str, ".tga")) 
+    {
       filename(str, fileName);
       lowercase(fileName);
       csString csStr(outPath);

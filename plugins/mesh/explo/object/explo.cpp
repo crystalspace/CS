@@ -46,7 +46,7 @@ void csExploMeshObject::SetupObject ()
     csNewtonianParticleSystem::SetupObject ();
     initialized = true;
     RemoveParticles ();
-    int i;
+    size_t i;
     csVector3 pos;
     /// add particles
     bbox.StartBoundingBox (center);

@@ -38,7 +38,7 @@ public:
     delete[] (char*)*address;
   }
 
-  static void InitRegion (const char** address, int count)
+  static void InitRegion (const char** address, size_t count)
   {
     memset (address, 0, count*sizeof (const char*));
   }
@@ -96,8 +96,8 @@ public:
    * Find an element based on some key, using a comparison function.
    * The array must be sorted. Returns -1 if element does not exist.
    */
-  int FindSortedKey (csArrayCmpDecl(char const*, char const*) comparekey,
-    int* candidate = 0) const
+  size_t FindSortedKey (csArrayCmpDecl(char const*, char const*) comparekey,
+    size_t* candidate = 0) const
   {
     return superclass::FindSortedKey(comparekey, candidate);
   }
@@ -106,8 +106,8 @@ public:
    * Find an element.  The array must be sorted.  Returns -1 if element does
    * not exist.
    */
-  int FindSortedKey (char const* key, bool case_sensitive = true,
-    int* candidate = 0) const
+  size_t FindSortedKey (char const* key, bool case_sensitive = true,
+    size_t* candidate = 0) const
   {
     int(*cf)(char const* const&, char const* const&) =
       case_sensitive ? CaseSensitiveCompare : CaseInsensitiveCompare;
@@ -122,7 +122,7 @@ public:
   char* Pop ()
   {
     CS_ASSERT (Length () > 0);
-    int l = Length () - 1;
+    size_t l = Length () - 1;
     char* ret = (char*)Get (l);
     InitRegion (l, 1);
     SetLength (l);
@@ -133,24 +133,24 @@ public:
    * Find a string, case-sensitive. Returns -1 if not found, else item index.
    * Works with unsorted arrays.  For sorted arrays, FindSortedKey() is faster.
    */
-  int Find (const char* what) const
+  size_t Find (const char* what) const
   {
-    for (int i = 0; i < Length (); i++)
+    for (size_t i = 0; i < Length (); i++)
       if (! strcmp (Get (i), what))
         return i;
-    return -1;
+    return (size_t)-1;
   }
 
   /**
    * Find a string, case-insensitive. Returns -1 if not found, else item index.
    * Works with unsorted arrays.  For sorted arrays, FindSortedKey() is faster.
    */
-  int FindCaseInsensitive (const char* what) const
+  size_t FindCaseInsensitive (const char* what) const
   {
-    for (int i = 0; i < Length (); i++)
+    for (size_t i = 0; i < Length (); i++)
       if (!strcasecmp (Get (i), what))
         return i;
-    return -1;
+    return (size_t)-1;
   }
 };
 

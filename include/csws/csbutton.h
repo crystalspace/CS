@@ -155,7 +155,7 @@ protected:
   /// Command code emmited when button is pressed
   int CommandCode;
   /// Character number that should be underlined (-1 == none)
-  int underline_pos;
+  size_t underline_pos;
   /// Button style
   int ButtonStyle;
   /// Button frame style
@@ -256,7 +256,7 @@ public:
   { return FrameStyle; }
 
   /// Get the character number to be underlined (hotkey)
-  inline int GetUnderlinePos ()
+  inline size_t GetUnderlinePos ()
   { return underline_pos; }
 
   /// Get the alpha-ness of the button

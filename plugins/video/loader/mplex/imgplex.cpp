@@ -80,8 +80,8 @@ void csMultiplexImageIO::StoreDesc (
 	const csImageIOFileFormatDescriptions& format)
 {
   // add the formats coming in to our ever growing list
-  int i;
-  for (i=0; i < format.Length (); i++)
+  size_t i;
+  for (i = 0; i < format.Length (); i++)
     formats.Push (format[i]);
 }
 
@@ -129,7 +129,7 @@ const csImageIOFileFormatDescriptions& csMultiplexImageIO::GetDescription ()
 void csMultiplexImageIO::SetDithering (bool iEnable)
 {
   global_dither = iEnable;
-  for (int i = 0; i < list.Length (); i++)
+  for (size_t i = 0; i < list.Length (); i++)
     list[i]->SetDithering (global_dither);
 }
 

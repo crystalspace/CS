@@ -66,7 +66,7 @@ void csFlowLayout::SuggestSize (int &sugw, int& sugh)
   int width = 0;
   int maxHeight = 0;
 
-  int i;
+  size_t i;
   for (i = 0; i < vConstraints.Length (); i++)
   {
     if (i != 0 )
@@ -86,7 +86,7 @@ void csFlowLayout::SuggestSize (int &sugw, int& sugh)
 
 void csFlowLayout::LayoutContainer ()
 {
-  int i, cnt = vConstraints.Length ();
+  size_t i, cnt = vConstraints.Length ();
   if (cnt == 0) return;
 
   int x = 0, y =0;
@@ -109,7 +109,7 @@ void csFlowLayout::LayoutContainer ()
     int rowWidth = 0;
     int col = 0;
     int maxHeight = 0;
-    int i1 = i;
+    size_t i1 = i;
 
     // estimate # of items in current row, and set their sizes
 

@@ -35,8 +35,8 @@ public:
   /// Remove a child node.
   void RemoveChild (csTreeNode *child)
   {
-    int idx = children.Find (child);
-    if (idx != -1) children.DeleteIndex (idx);
+    size_t idx = children.Find (child);
+    if (idx != csArrayItemNotFound) children.DeleteIndex (idx);
   }
 
   /// Add a child node.
@@ -49,9 +49,9 @@ public:
 
   virtual ~csTreeNode ()
   {
-    int i;
-    for(i=children.Length ()-1; i>=0; i--)
-      delete children.Get (i);
+    size_t i;
+    for(i=children.Length (); i>0; i--)
+      delete children.Get (i - 1);
     if (parent)
       parent->RemoveChild (this);
   }
@@ -72,7 +72,7 @@ public:
 		   			bool stopOnSuccess)
   {
     csTreeNode *foundNode = 0;
-    int i=0;
+    size_t i=0;
     bool dive;
     if (TreeFunc (this, param, stopOnSuccess))
       foundNode = this;
@@ -113,7 +113,7 @@ public:
         foundNode = node;
       if (!node->IsLeaf () && (SelBranch==0 || SelBranch (node)))
       {
-	int i;
+	size_t i;
         for (i=0; i < node->children.Length (); i++ )
           fifo.Push (node->children[i]);
       }

@@ -86,7 +86,7 @@ void csShaderGLPS1_NV::SetupState (const csRenderMesh *mesh,
       csVector4 v4;
       if (lvar->GetValue (v4))
       {
-        for(int j=0;j<constant_pairs.Length ();j++)
+        for(size_t j = 0; j < constant_pairs.Length (); j++)
         {
           nv_constant_pair &pair = constant_pairs.Get (j);
           if(pair.first == i)
@@ -128,8 +128,8 @@ void csShaderGLPS1_NV::ActivateTextureShaders ()
 
   csGLExtensionManager *ext = shaderPlug->ext;
 
-  int i;
-  for(i=0;i<4;i++)
+  size_t i;
+  for(i = 0; i < 4; i++)
   {
     ext->glActiveTextureARB (GL_TEXTURE0_ARB + i);
     glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
@@ -137,7 +137,7 @@ void csShaderGLPS1_NV::ActivateTextureShaders ()
   }
 
 
-  for(i=0;i<texture_shader_stages.Length ();i++)
+  for(i = 0; i < texture_shader_stages.Length (); i++)
   {
     const nv_texture_shader_stage &shader = texture_shader_stages.Get(i);
 
@@ -270,7 +270,7 @@ GLenum csShaderGLPS1_NV::GetTexTarget()
 bool csShaderGLPS1_NV::GetTextureShaderInstructions (
   const csArray<csPSProgramInstruction> &instrs)
 {
-  for(int i=0;i<instrs.Length ();i++)
+  for(size_t i = 0; i < instrs.Length (); i++)
   {
     const csPSProgramInstruction &inst = instrs.Get (i);
 
@@ -317,7 +317,7 @@ bool csShaderGLPS1_NV::GetNVInstructions (csPixelShaderParser& parser,
 					  csArray<nv_combiner_stage> &stages,
 					  const csArray<csPSProgramInstruction> &instrs)
 {
-  for(int i=0;i<instrs.Length ();i++)
+  for(size_t i = 0; i < instrs.Length (); i++)
   {
     const csPSProgramInstruction &inst = instrs.Get(i);
 
@@ -599,9 +599,9 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL ()
 
   const csArray<csPSConstant> &constants = parser.GetConstants ();
 
-  int i;
+  size_t i;
 
-  for(i=0;i<constants.Length();i++)
+  for(i = 0; i < constants.Length(); i++)
   {
     const csPSConstant& constant = constants.Get (i);
 
@@ -635,7 +635,7 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL ()
 
   int num_combiners = 1;
   int prev_combiner = 0;
-  for(i=0;i<stages.Length ();i++)
+  for(i = 0; i < stages.Length (); i++)
   {
     const nv_combiner_stage &stage = stages.Get (i);
     if(prev_combiner != num_combiners)
@@ -668,10 +668,10 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL ()
 
   GLenum glstage = GL_COMBINER0_NV;
 
-  for(i=0;i<stages.Length ();i++)
+  for(i = 0; i < stages.Length (); i++)
   {
     const nv_combiner_stage &stage = stages.Get (i);
-    for(int j=0;j<stage.inputs.Length();j++)
+    for(size_t j = 0; j < stage.inputs.Length(); j++)
     {
       const nv_input &input = stage.inputs.Get (j);
       ext->glCombinerInputNV (glstage, input.portion, input.variable,

@@ -241,7 +241,7 @@ public:
   /// Get the specified shadow.
   csFrustum* GetShadow (int idx)
   {
-    return (idx < shadows.Length () ? (csFrustum*)shadows[idx] : 0);
+    return ((size_t)idx < shadows.Length () ? (csFrustum*)shadows[idx] : 0);
   }
 
   /**
@@ -249,7 +249,7 @@ public:
    */
   void Transform (csTransform* trans)
   {
-    int i;
+    size_t i;
     for (i = 0 ; i < shadows.Length () ; i++)
     {
       csShadowFrustum* sf = shadows[i];

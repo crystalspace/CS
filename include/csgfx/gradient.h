@@ -126,7 +126,7 @@ public:
    *  the gradient (i.e. both smaller/large than the first resp. last
    *  shade's position.)
    */
-  bool Render (csRGBcolor* pal, int count, float begin = 0.0f, 
+  bool Render (csRGBcolor* pal, size_t count, float begin = 0.0f, 
     float end = 1.0f) const;
 };
 

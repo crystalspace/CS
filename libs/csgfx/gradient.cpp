@@ -50,8 +50,8 @@ csGradient::csGradient (csColor first, csColor last)
 
 void csGradient::AddShade (csGradientShade shade)
 {
-  int lo = 0, hi = shades.Length() - 1;
-  int mid = 0;
+  size_t lo = 0, hi = shades.Length() - 1;
+  size_t mid = 0;
   while (lo <= hi)
   {
     mid = (lo + hi) / 2;
@@ -74,7 +74,7 @@ void csGradient::Clear ()
 
 #define CLAMP(x) ((x<EPSILON)?0.0f:(((x-1.0f)>EPSILON)?1.0f:x))
 
-bool csGradient::Render (csRGBcolor* pal, int count,
+bool csGradient::Render (csRGBcolor* pal, size_t count,
 			 float begin, float end) const
 {
   if (shades.Length() == 0) return false;
@@ -88,11 +88,11 @@ bool csGradient::Render (csRGBcolor* pal, int count,
   float gradpos = begin;
 
   // current shade index
-  int csi = 0;
+  size_t csi = 0;
   const csGradientShade* currshade = 0;
   const csGradientShade* nextshade = &shades[0];
 
-  for (int i = 0; i < count; i++)
+  for (size_t i = 0; i < count; i++)
   {
     while (csi < shades.Length() && 
       (gradpos >= nextshade->position))

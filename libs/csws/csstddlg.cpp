@@ -147,7 +147,7 @@ void csMessageBox (csComponent *iParent, const char *iTitle,
     if ((*iMessage == '\n') || (*iMessage == 0))
     {
       char line [200];
-      unsigned int count = (int)iMessage - (int)MsgStart;
+      size_t count = iMessage - MsgStart;
       if (count > sizeof (line) - 1)
         count = sizeof (line) - 1;
       strncpy (line, MsgStart, count);
@@ -406,7 +406,7 @@ bool cspFileDialog::BuildAndSetPath ()
     char *tmp = new char[maxlen + 1];
     strcpy (tmp, buff);
     strcpy (buff, cur->GetText ());
-    int sl = strlen (buff);
+    size_t sl = strlen (buff);
     if ((tmp [0] != 0)
    	&& (buff [sl - 1] != '/')
       	&& (buff [sl - 1] != pathsep))
@@ -506,7 +506,7 @@ void cspFileDialog::Reread ()
     delete[] name;
   } /* endwhile */
 
-  int i,n;
+  size_t i,n;
   csStringArray dirs;
   csStringArray files;
 
@@ -545,11 +545,11 @@ void cspFileDialog::Reread ()
 
     if (filelist->Length() != 0)
     {
-      for (int i=0; i<filelist->Length(); i++)
+      for (size_t i=0; i<filelist->Length(); i++)
       {
 	// extract filename from complete path
 	char *fname = (char*) filelist->Get(i);
-	int dirlen = strlen(fname);
+	size_t dirlen = strlen(fname);
 	if (dirlen)
 	  dirlen--;
 	while (dirlen && fname[dirlen-1]!= VFS_PATH_SEPARATOR)

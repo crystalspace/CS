@@ -110,7 +110,7 @@ iEffectTechnique* csEffectServer::SelectAppropriateTechnique(
 
 iEffectDefinition* csEffectServer::GetEffect(const char* name)
 {
-  for (int i = 0; i < effects.Length(); i++)
+  for (size_t i = 0; i < effects.Length(); i++)
   {
     if (strcasecmp(name, effects.Get(i)->GetName()) == 0)
       //is this, return it

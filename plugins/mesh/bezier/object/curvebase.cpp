@@ -72,7 +72,7 @@ static void Perspective (
 }
 
 // --- csCurveTesselated -----------------------------------------------------
-csCurveTesselated::csCurveTesselated (int num_v, int num_t)
+csCurveTesselated::csCurveTesselated (size_t num_v, size_t num_t)
 {
   NumVertices = num_v;
   ObjectCoords = new csVector3[num_v];
@@ -106,7 +106,7 @@ void csCurveTesselated::UpdateColors (csCurveLightMap *LightMap)
   int lm_width = LightMap->GetWidth ();
   int lm_height = LightMap->GetWidth ();
 
-  int j;
+  size_t j;
   for (j = 0; j < GetTriangleCount (); j++)
   {
     csTriangle &ct = Triangles[j];
@@ -720,7 +720,7 @@ float csCurve::GetArea ()
   csTriangle t;
 
   // loop through all of our triangles and sum thier areas
-  int i;
+  size_t i;
   for (i = 0; i < ct->GetTriangleCount (); i++)
   {
     t = ct->GetTriangle (i);
