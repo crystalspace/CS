@@ -533,7 +533,7 @@ void csRadPoly::Lumel2World (csVector3 &res, int x, int y)
   res = lumel_origin + x * lumel_x_axis + y * lumel_y_axis;
 }
 
-csColor csRadPoly::GetFlatColor () const
+csColor csRadPoly::GetFlatColor ()
 {
   csRGBpixel color;
   polygon->GetMaterialHandle ()->GetFlatColor (color);

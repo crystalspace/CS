@@ -166,17 +166,14 @@ protected:
   int num_repeats;
 
 protected:
-
   /// return the material handle
   virtual iMaterialWrapper* GetMaterialWrapper () = 0;
 
   /// return the flat color value
-  virtual csColor GetFlatColor() const = 0;
+  virtual csColor GetFlatColor() = 0;
 
   // setup some necessary values
   virtual void Setup() {};
-
-
 
 public:
   csRadElement();
@@ -338,7 +335,7 @@ protected:
   { return polygon->GetMaterialWrapper (); }
 
   /// return the flat color for the polygons texture
-  virtual csColor GetFlatColor() const;
+  virtual csColor GetFlatColor();
 
   // setup some necessary values
   virtual void Setup();
@@ -395,7 +392,7 @@ protected:
   { return curve->Material; }
 
   /// return the flat color for the polygons texture
-  virtual csColor GetFlatColor() const
+  virtual csColor GetFlatColor()
   {
     /// @@@ I'm not sure why curves don't have a flat color, so for now
     /// @@@ just return a default color of mid-gray

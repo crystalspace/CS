@@ -334,13 +334,13 @@ public:
    * Get the flat color. If the material has a texture assigned, this
    * will return the mean texture color.
    */
-  virtual void GetFlatColor (csRGBpixel &oColor) const;
+  virtual void GetFlatColor (csRGBpixel &oColor);
 
   /**
    * Get light reflection parameters for this material.
    */
   virtual void GetReflection (float &oDiffuse, float &oAmbient,
-    float &oReflection) const;
+    float &oReflection);
 };
 
 class csGLSuperLightmap;

@@ -1184,7 +1184,7 @@ iTextureHandle* csGLMaterialHandle::GetTexture ()
   }
 }
 
-void csGLMaterialHandle::GetFlatColor (csRGBpixel &oColor) const
+void csGLMaterialHandle::GetFlatColor (csRGBpixel &oColor)
 { 
   if (material)
   {
@@ -1197,7 +1197,7 @@ void csGLMaterialHandle::GetFlatColor (csRGBpixel &oColor) const
 }
 
 void csGLMaterialHandle::GetReflection (float &oDiffuse, float &oAmbient,
-  float &oReflection) const
+  float &oReflection)
 { 
   if (material)
   {
