@@ -209,10 +209,15 @@ void add_particles (csSector* sector, const csVector3& center, char* txtname)
   }
 
   CHK (csParSysExplosion* exp = new csParSysExplosion (20,
-  	center, csVector3 (0, 0, 0), txt, .6, .8, 2.));
+  	center, csVector3 (0, 0, 0), txt, 4, 0.15, .6, 2., 2.));
   exp->MoveToSector (sector);
   exp->SetSelfDestruct (3000);
-  exp->SetMixmodes (CS_FX_SETALPHA (0.75));
+  exp->SetMixmodes (CS_FX_SETALPHA (0.50));
+  exp->SetChangeRotation(5.0);
+  exp->SetChangeSize (1.25);
+  exp->SetFadeSprites (500);
+  exp->SetColors( csColor(1,1,0) );
+  exp->SetChangeColor( csColor(0,-1.0/3.2,0) );
   exp->AddLight (Sys->world, sector, 1000);
 }
 
@@ -833,7 +838,7 @@ void HandleDynLight (csDynLight* dyn)
       }
       dyn->Resize (es->radius);
       dyn->Setup ();
-      add_particles (dyn->GetSector (), dyn->GetCenter (), "green.gif");
+      add_particles (dyn->GetSector (), dyn->GetCenter (), "white.gif");
       break;
     }
     case DYN_TYPE_RANDOM:
@@ -2137,7 +2142,7 @@ void WalkTest::NextFrame (time_t elapsed_time, time_t current_time)
   // The following will fetch all events from queue and handle them
   SysSystemDriver::NextFrame (elapsed_time, current_time);
 
-  csParticleSystem::UpdateAll (elapsed_time);
+  Sys->world->UpdateParticleSystems(elapsed_time);
 
   // Record the first time this routine is called.
   if (do_bots)
