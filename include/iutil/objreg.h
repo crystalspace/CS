@@ -29,14 +29,14 @@
 #include "csutil/scf.h"
 #include "csutil/ref.h"
 
-#define CS_QUERY_REGISTRY_TAG(Reg,Tag)				\
-  csPtr<iBase> ((Reg)->Get (Tag))
-#define CS_QUERY_REGISTRY(Reg,Interface)			\
-  csPtr<Interface> ((Interface*)((Reg)->Get (#Interface,	\
-  	Interface##_scfGetID (), Interface##_VERSION)))
-#define CS_QUERY_REGISTRY_TAG_INTERFACE(Reg,Tag,Interface)	\
-  csPtr<Interface> ((Interface*)((Reg)->Get (Tag,		\
-  	Interface##_scfGetID (), Interface##_VERSION)))
+#define CS_QUERY_REGISTRY_TAG(Reg, Tag)       \
+  csPtr<iBase> ((iBase*) (CS_IMPLICIT_PTR_CAST(iObjectRegistry, Reg)->Get (Tag)))
+#define CS_QUERY_REGISTRY(Reg,Interface)      \
+  csPtr<Interface> ((Interface*)(CS_IMPLICIT_PTR_CAST(iObjectRegistry, Reg)->Get (#Interface, \
+    Interface##_scfGetID (), Interface##_VERSION)))
+#define CS_QUERY_REGISTRY_TAG_INTERFACE(Reg, Tag, Interface)  \
+  csPtr<Interface> ((Interface*)(CS_IMPLICIT_PTR_CAST(iObjectRegistry, Reg)->Get (Tag,    \
+    Interface##_scfGetID (), Interface##_VERSION)))
 
 struct iObjectRegistryIterator;
 
@@ -47,6 +47,9 @@ SCF_VERSION (iObjectRegistry, 0, 0, 4);
  */
 struct iObjectRegistry : public iBase
 {
+  // Allow implicit casts through static function.
+  CS_IMPLEMENT_IMPLICIT_PTR_CAST (iObjectRegistry);
+
   /**
    * Clear the object registry and release all references.
    */
