@@ -452,7 +452,7 @@ void csStencil::Start (iVisibilityCuller* cul)
 
 void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light, iMeshWrapper *mesh, iShaderPass *pass)
 {
-float s, e;
+  //float s, e;
   iCamera* camera = rview->GetCamera ();
   // First create the transformation from object to camera space directly:
   //   W = Mow * O - Vow;
