@@ -37,6 +37,12 @@ chronological order.
 	  the keyboard event changes.
 	- Rhad fixed a documentation error regarding awsListBox. The 
 	  "selectable" property applies to the entire row and not each column. 
+	- res enhanced csSubRectangles2 with the ability to enlarge the 
+	  region.
+	- res augmented the Thing lightmap layouter with the ability to enlarge
+	  an existing super lightmap. This is done if the lightmaps to be 
+	  distributed would fit onto the enlarged super lightmap and less than
+	  a specified area of the SLM would be unused.
 17-Oct-2003
 	- res added some files he forgot with his recent commit.
 	- Jorrit fixed the engine sequence manager a better way. With

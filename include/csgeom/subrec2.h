@@ -47,6 +47,8 @@ protected:
   csBlockAllocator<csSubRect2> alloc;
 
   csSubRect2* AllocSubrect ();
+  
+  void Grow (csSubRect2* sr, int ow, int oh, int nw, int nh);
 public:
   /// Allocate a new empty region with the given size.
   csSubRectangles2 (const csRect& region);
@@ -71,6 +73,12 @@ public:
    * Reclaim a subrectangle.
    */
   void Reclaim (csSubRect2* subrect);
+
+  /**
+   * Increase the size of the region.
+   * You can only grow upwards.
+   */
+  bool Grow (int newWidth, int newHeight);
 
   /**
    * For debugging: dump all free rectangles.

@@ -586,23 +586,50 @@ void csThingStatic::DistributePolyLMs (
       curQueue ^= 1;
     }
 
-    // Add a new empty SLM. Not all polys could be stuffed away, 
-    // so we possibly need more space.
+    // Not all polys could be stuffed away, so we possibly need more space.
     if (inputQueues[curQueue].polys.Length () > 0)
     {
-      int lmW = csFindNearestPowerOf2 (inputQueues[curQueue].maxlmw);
-      int lmH = csFindNearestPowerOf2 (inputQueues[curQueue].maxlmh);
-
-      while (inputQueues[curQueue].totalLumels > (lmW * lmH))
+      // Try if enlarging an existing SLM suffices.
+      bool foundNew = false;
+      s = superLMs.Length ();
+      while (s > 0)
       {
-	if (lmH < lmW)
-	  lmH *= 2;
-	else
-	  lmW *= 2;
-      }
-      StaticSuperLM* newslm = new StaticSuperLM (lmW, lmH);
-      superLMs.InsertSorted (newslm, CompareStaticSuperLM);
+	s--;
 
+	StaticSuperLM* slm = superLMs[s];
+	int usedLumels = (slm->width * slm->height) - slm->freeLumels;
+
+	int neww = (slm->width > slm->height) ? slm->width : slm->width*2;
+	int newh = (slm->width > slm->height) ? slm->height*2 : slm->height;
+
+	if ((((neww * newh) - usedLumels) >= inputQueues[curQueue].totalLumels) &&
+	  (((float)(usedLumels + inputQueues[curQueue].totalLumels) / 
+	  (float)(neww * newh)) > (1.0f - thing_type->maxSLMSpaceWaste)))
+	{
+	  superLMs.DeleteIndex (s);
+	  slm->Grow (neww, newh);
+	  superLMs.InsertSorted (slm, CompareStaticSuperLM);
+	  foundNew = true;
+	  break;
+	}
+      }
+
+      // Otherwise, add a new empty SLM. 
+      if (!foundNew)
+      {
+	int lmW = csFindNearestPowerOf2 (inputQueues[curQueue].maxlmw);
+	int lmH = csFindNearestPowerOf2 (inputQueues[curQueue].maxlmh);
+
+	while (inputQueues[curQueue].totalLumels > (lmW * lmH))
+	{
+	  if (lmH < lmW)
+	    lmH *= 2;
+	  else
+	    lmW *= 2;
+	}
+	StaticSuperLM* newslm = new StaticSuperLM (lmW, lmH);
+	superLMs.InsertSorted (newslm, CompareStaticSuperLM);
+      }
     }
   }
   delete curOutputPolys;
@@ -3064,6 +3091,8 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
   maxLightmapH = 
     cfg->GetInt ("Mesh.Thing.MaxSuperlightmapHeight", maxLightmapSize);
   maxLightmapH = MIN (maxLightmapH, maxTH);
+  maxSLMSpaceWaste =
+    cfg->GetFloat ("Mesh.Thing.MaxSuperlightmapWaste", 0.6f);
 
   return true;
 }

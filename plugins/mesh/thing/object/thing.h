@@ -262,6 +262,17 @@ public:
       }
       return rects;
     }
+
+    void Grow (int newWidth, int newHeight)
+    {
+      int usedLumels = (width * height) - freeLumels;
+     
+      width = newWidth; height = newHeight;
+      if (rects != 0)
+	rects->Grow (width, height);
+
+      freeLumels = (width * height) - usedLumels;
+    }
   };
 
   /// The array of static polygon data (csPolygon3DStatic).
@@ -303,7 +314,6 @@ public:
   static csStringID tangent_name;
   static csStringID binormal_name;*/
 #endif
-
 
 public:
   csThingStatic (iBase* parent, csThingObjectType* thing_type);
@@ -1193,6 +1203,7 @@ public:
   csBlockAllocator<intar60>* blk_polidx60;
 
   int maxLightmapW, maxLightmapH;
+  float maxSLMSpaceWaste;
 public:
   SCF_DECLARE_IBASE;
 

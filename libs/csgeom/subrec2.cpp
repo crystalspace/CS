@@ -524,6 +524,30 @@ void csSubRectangles2::Reclaim (csSubRect2* subrect)
   if (subrect) subrect->Reclaim ();
 }
 
+void csSubRectangles2::Grow (csSubRect2* sr, int ow, int oh, int nw, int nh)
+{
+  if (sr == 0) return;
+
+  if (sr->rect.xmax == ow) sr->rect.xmax = nw;
+  if (sr->rect.ymax == oh) sr->rect.ymax = nh;
+
+  if (sr->splitType != csSubRect2::SPLIT_UNSPLIT)
+  {
+    Grow (sr->children[0], ow, oh, nw, nh);
+    Grow (sr->children[1], ow, oh, nw, nh);
+  }
+}
+
+bool csSubRectangles2::Grow (int newWidth, int newHeight)
+{
+  if ((newWidth < region.Width ()) || (newHeight < region.Height ()))
+    return false;
+
+  Grow (root, region.Width (), region.Height (), newWidth, newHeight);
+  region.SetSize (newWidth, newHeight);
+  return true;
+}
+
 #if defined(DUMP_TO_IMAGES)
 static void FillImgRect (uint8* data, uint8 color, int imgW, int imgH, 
 			 const csRect& r)
