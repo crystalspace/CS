@@ -29,7 +29,7 @@
 #include "csengine/sysitf.h"
 #include "csengine/lppool.h"
 #include "csengine/camera.h"
-#include "csengine/polyplan.h"
+#include "csengine/polytmap.h"
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
@@ -82,10 +82,10 @@ void Dumper::dump (csCamera* c)
   dump (&c->m_o2t, "Camera matrix");
 }
 
-void Dumper::dump (csPolyPlane* p)
+void Dumper::dump (csPolyTxtPlane* p)
 {
   const char* pl_name = p->GetName ();
-  CsPrintf (MSG_DEBUG_0, "PolyPlane '%s' id=%ld:\n", pl_name ? pl_name : "(no name)",
+  CsPrintf (MSG_DEBUG_0, "PolyTxtPlane '%s' id=%ld:\n", pl_name ? pl_name : "(no name)",
             p->GetID ());
   dump (&p->m_obj2tex, "Mot");
   dump (&p->v_obj2tex, "Vot");
@@ -93,9 +93,6 @@ void Dumper::dump (csPolyPlane* p)
   dump (&p->v_world2tex, "Vwt");
   dump (&p->m_cam2tex, "Mct");
   dump (&p->v_cam2tex, "Vct");
-  CsPrintf (MSG_DEBUG_0, "    Plane normal (object): "); dump (&p->plane_obj);
-  CsPrintf (MSG_DEBUG_0, "    Plane normal (world):  "); dump (&p->plane_wor);
-  CsPrintf (MSG_DEBUG_0, "    Plane normal (camera): "); dump (&p->plane_cam);
 }
 
 void Dumper::dump (csPolygon3D* p)
@@ -133,10 +130,10 @@ void Dumper::dump (csPolygon3D* p)
     	p->Vwor (i).x, p->Vwor (i).y, p->Vwor (i).z,
     	p->Vcam (i).x, p->Vcam (i).y, p->Vcam (i).z);
   }
-  dump (p->plane);
   if (p->GetTextureType () == POLYTXT_LIGHTMAP)
   {
     csLightMapped* lmi = p->GetLightMapInfo ();
+    dump (lmi->GetTxtPlane ());
     if (lmi->GetPolyTex (0)) dump (lmi->GetPolyTex (0), "PolyTexture 1");
     if (lmi->GetPolyTex (1)) dump (lmi->GetPolyTex (1), "PolyTexture 2");
     if (lmi->GetPolyTex (2)) dump (lmi->GetPolyTex (2), "PolyTexture 3");

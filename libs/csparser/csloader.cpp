@@ -30,6 +30,7 @@
 #include "csengine/cssprite.h"
 #include "csengine/skeleton.h"
 #include "csengine/polygon.h"
+#include "csengine/polytmap.h"
 #include "csengine/dynlight.h"
 #include "csengine/textrans.h"
 #include "csengine/world.h"
@@ -305,7 +306,7 @@ csVector3 csLoader::load_vector (char* buf)
 
 //---------------------------------------------------------------------------
 
-csPolyPlane* csLoader::load_polyplane (char* buf, char* name)
+csPolyTxtPlane* csLoader::load_polyplane (char* buf, char* name)
 {
   TOKEN_TABLE_START(commands)
     TOKEN_TABLE (ORIG)
@@ -320,7 +321,7 @@ csPolyPlane* csLoader::load_polyplane (char* buf, char* name)
   char* xname;
   long cmd;
   char* params;
-  CHK( csPolyPlane* ppl = new csPolyPlane() );
+  CHK( csPolyTxtPlane* ppl = new csPolyTxtPlane() );
   ppl->SetName (name);
 
   bool tx1_given = false, tx2_given = false;
@@ -1581,7 +1582,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
     poly3d->SetTextureSpace (tx1_orig.x, tx1_orig.y, tx1_orig.z,
                              tx1.x, tx1.y, tx1.z, tx1_len);
   else if (plane_name[0])
-    poly3d->SetTextureSpace ((csPolyPlane*)w->planes.FindByName (plane_name));
+    poly3d->SetTextureSpace ((csPolyTxtPlane*)w->planes.FindByName (plane_name));
   else if (tx_len)
   {
     // If a length is given (with 'LEN') we will take the first two vertices
@@ -1594,9 +1595,10 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
 
   if (uv_shift_given)
   {
-    poly3d->GetPlane ()->GetTextureSpace (tx_matrix, tx_vector);
+    poly3d->GetLightMapInfo ()->GetTxtPlane ()->
+    	GetTextureSpace (tx_matrix, tx_vector);
     // T = Mot * (O - Vot)
-    // T = Mot * (O - Vot) + Vuv                ; Add shift Vuv to final texture map
+    // T = Mot * (O - Vot) + Vuv      ; Add shift Vuv to final texture map
     // T = Mot * (O - Vot) + Mot * Mot-1 * Vuv
     // T = Mot * (O - Vot + Mot-1 * Vuv)
     csVector3 shift (u_shift, v_shift, 0);
@@ -1605,7 +1607,8 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
   }
 
   if (do_mirror)
-    poly3d->GetPortal ()->SetWarp (csTransform::GetReflect ( *(poly3d->GetPolyPlane ()) ));
+    poly3d->GetPortal ()->SetWarp (csTransform::GetReflect (
+    	*(poly3d->GetPolyPlane ()) ));
 
   return poly3d;
 }
@@ -3296,7 +3299,7 @@ csSector* csLoader::load_room (char* secname, csWorld* w, char* buf,
         p->SetTextureSpace (sector->Vwor (todo[done].tv1),
                               sector->Vwor (todo[done].tv2), len);
       else
-        p->SetTextureSpace ((csPolyPlane*)w->planes.FindByName (colors[idx].plane));
+        p->SetTextureSpace ((csPolyTxtPlane*)w->planes.FindByName (colors[idx].plane));
       p->SetFlags (CS_POLY_MIPMAP|CS_POLY_LIGHTING,
         (no_mipmap ? 0 : CS_POLY_MIPMAP) | (no_lighting ? 0 : CS_POLY_LIGHTING));
       csLightMapped* pol_lm = p->GetLightMapInfo ();

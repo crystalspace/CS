@@ -19,6 +19,7 @@
 #include "sysdef.h"
 #include "csengine/polyset.h"
 #include "csengine/polygon.h"
+#include "csengine/polytmap.h"
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
 #include "csengine/dynlight.h"
@@ -398,6 +399,7 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
   Stats::polygons_drawn++;
 
   csPortal* po = p->GetPortal ();
+  csLightMapped* lmi = p->GetLightMapInfo ();
   if (csSector::do_portals && po)
   {
     bool filtered = false;
@@ -409,6 +411,7 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
     // been drawn. The texture plane needs to be kept because this polygon
     // may be rendered again (through mirrors) possibly overwriting the plane.
     csPolyPlane* keep_plane = NULL;
+    csPolyTxtPlane* keep_txt_plane = NULL;
 
     if (d->g3d->GetRenderState (G3DRENDERSTATE_TRANSPARENCYENABLE))
       filtered = p->IsTransparent ();
@@ -416,6 +419,10 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
     if (filtered || is_this_fog)
     {
       CHK (keep_plane = new csPolyPlane (*(p->GetPlane ())));
+      // @@@ We should not have to keep the txt plane. We only need
+      // to transform this right before drawing the polygon!!!
+      if (lmi)
+        CHKB (keep_txt_plane = new csPolyTxtPlane (*(lmi->GetTxtPlane ())));
     }
 
     // Draw through the portal. If this fails we draw the original polygon
@@ -425,19 +432,23 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
     {
       if (!d->callback)
       {
-	if (filtered) poly->DrawFilled (d, p, keep_plane, use_z_buf);
+	if (filtered) poly->DrawFilled (d, p, keep_plane, keep_txt_plane,
+		use_z_buf);
 	if (is_this_fog) poly->AddFogPolygon (d->g3d, p, keep_plane,
 		d->IsMirrored (), sector->GetID (), CS_FOG_BACK);
       }
     }
     else if (!d->callback)
-      poly->DrawFilled (d, p, p->GetPlane (), use_z_buf);
+      poly->DrawFilled (d, p, p->GetPlane (), lmi ? lmi->GetTxtPlane () : NULL,
+      	use_z_buf);
 
     // Cleanup.
-    CHK (delete keep_plane);
+    if (keep_plane) keep_plane->DecRef ();
+    if (keep_txt_plane) keep_txt_plane->DecRef ();
   }
   else if (!d->callback)
-    poly->DrawFilled (d, p, p->GetPlane (), use_z_buf);
+    poly->DrawFilled (d, p, p->GetPlane (), lmi ? lmi->GetTxtPlane () : NULL,
+    	use_z_buf);
 }
 
 void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
@@ -463,6 +474,9 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
          clip->ClipAgainst (d->view) )
     {
       p->GetPlane ()->WorldToCamera (*d, verts[0]);
+      csLightMapped* lmi = p->GetLightMapInfo ();
+      if (lmi)
+        lmi->GetTxtPlane ()->WorldToCamera (*d, verts[0]);
       DrawOnePolygon (p, clip, d, use_z_buf);
     }
     render_pool->Free (clip);

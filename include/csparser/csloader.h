@@ -28,6 +28,7 @@ class csPolygonTemplate;
 class csThingTemplate;
 class csTextureList;
 class csPolyPlane;
+class csPolyTxtPlane;
 class csCollection;
 class csStatLight;
 class csThing;
@@ -56,7 +57,7 @@ public:
   ///
   static csVector3 load_vector (char* buf);
   ///
-  static csPolyPlane* load_polyplane (char* buf, char* name = NULL);
+  static csPolyTxtPlane* load_polyplane (char* buf, char* name = NULL);
   ///
   static csCollection* load_collection (char* name, csWorld* world, char* buf);
   ///

@@ -20,16 +20,15 @@
 #define POLYPLANE_H
 
 #include "csgeom/transfrm.h"
-#include "csobject/csobject.h"
 
 class Dumper;
 
 /**
- * This class represents a texture plane. This is a plane
- * that defines the orientation and offset of a texture. It can
- * be used by several polygons to let the textures fit perfectly.
+ * This class represents a polygon plane.
+ * Never 'delete' an instance of this class directly
+ * but instead call 'DecRef()'.
  */
-class csPolyPlane : public csObject
+class csPolyPlane
 {
   ///
   friend class csPolygon2D;
@@ -45,31 +44,20 @@ private:
   csPlane plane_wor;
   /// The camera space plane equation.
   csPlane plane_cam;
+  /// Reference count.
+  int ref_count;
 
-  /// Transformation from object to texture space.
-  csMatrix3 m_obj2tex;
-  /// Translation from object to texture space.
-  csVector3 v_obj2tex;
-
-  /// Transformation from world to texture space.
-  csMatrix3 m_world2tex;
-  /// Translation from world to texture space.
-  csVector3 v_world2tex;
-
-  /**
-   * Transformed texture space transformation. This transforms a
-   * coordinate from camera space to texture space. This transformation
-   * is obtained by using m_world2tex and v_world2tex with the camera transformation.
-   */
-  csMatrix3 m_cam2tex;
-  ///
-  csVector3 v_cam2tex;
+  /// Destructor is private.
+  virtual ~csPolyPlane ();
 
 public:
-  ///
+  /// Constructor. Reference count is initialized to 1.
   csPolyPlane ();
-  ///
-  virtual ~csPolyPlane ();
+
+  /// Maintain a reference counter for texture type objects
+  void IncRef () { ref_count++; }
+  /// Decrement usage counter
+  void DecRef () { if (!--ref_count) delete this; }
 
   /**
    * Transform this plane from object space to world space using
@@ -77,46 +65,25 @@ public:
    * that we can more easily recompute the 'D' component of the plane.
    * The given vertex should be in world space.
    */
-  void ObjectToWorld (const csReversibleTransform& obj, csVector3& vertex1);
+  void ObjectToWorld (
+  	const csReversibleTransform& obj,
+  	const csVector3& vertex1);
 
   /**
-   * Transform the same way from world space to camera space.
+   * Transform this plane from world space to camera space using
+   * the given matrices. One vertex on the plane is also given so
+   * that we can more easily recompute the 'D' component of the plane.
    * The given vertex should be in camera space.
    */
-  void WorldToCamera (const csReversibleTransform& t, csVector3& vertex1);
-
-  ///
-  void SetTextureSpace (csVector3& v_orig,
-  			  csVector3& v1, float len1,
-  			  csVector3& v2, float len2);
-  ///
-  void SetTextureSpace (float xo, float yo, float zo,
-  			  float x1, float y1, float z1,
-  			  float len);
-  ///
-  void SetTextureSpace (csVector3& v_orig, csVector3& v1, float len);
-  ///
-  void SetTextureSpace (csVector3& v_orig, csVector3& v_u, csVector3& v_v);
-  ///
-  void SetTextureSpace (float xo, float yo, float zo,
-  			  float xu, float yu, float zu,
-  			  float xv, float yv, float zv);
-  ///
-  void SetTextureSpace (float xo, float yo, float zo,
-  			  float xu, float yu, float zu,
-  			  float xv, float yv, float zv,
-  			  float xw, float yw, float zw);
-  ///
-  void SetTextureSpace (csMatrix3& tx_matrix, csVector3& tx_vector);
-
-  /// Get the transformation from object to texture space.
-  void GetTextureSpace (csMatrix3& tx_matrix, csVector3& tx_vector);
+  void WorldToCamera (
+  	const csReversibleTransform& t,
+	const csVector3& vertex1);
 
   /**
    * Check if the plane in world space is visible from the given point.
    * To do this it will only do back-face culling.
    */
-  bool VisibleFromPoint (const csVector3& p)
+  bool VisibleFromPoint (const csVector3& p) const
   {
     return csMath3::Visible (p, plane_wor);
   }
@@ -125,13 +92,17 @@ public:
    * Return the minimum squared distance from the plane to
    * a point in 3D space (using world coordinates).
    */
-  float SquaredDistance (csVector3& v) { float d = Distance (v); return d*d; }
+  float SquaredDistance (csVector3& v) const
+  {
+    float d = Distance (v);
+    return d*d;
+  }
 
   /**
    * Return the minimum distance from the plane to
    * a point in 3D space (using world coordinates).
    */
-  float Distance (csVector3& v)
+  float Distance (csVector3& v) const
   {
     // The normal is normalized so...
     return plane_wor.Distance (v);
@@ -142,7 +113,7 @@ public:
    * world space coordinates (it only checks on the component
    * values. The planes are not normalized).
    */
-  bool NearlyEqual (csPolyPlane* plane)
+  bool NearlyEqual (csPolyPlane* plane) const
   {
     return csMath3::PlanesEqual (plane_wor, plane->plane_wor);
   }
@@ -150,7 +121,7 @@ public:
   /**
    * Classify a vector with regards to this plane in world space.
    */
-  float Classify (const csVector3& pt)
+  float Classify (const csVector3& pt) const
   {
     return plane_wor.Classify (pt);
   }
@@ -159,7 +130,7 @@ public:
    * Return the closest point on the plane to a point
    * in 3D space (using world coordinates).
    */
-  void ClosestPoint (csVector3& v, csVector3& isect);
+  void ClosestPoint (csVector3& v, csVector3& isect) const;
 
   /**
    * Run a segment through this plane (in world space) and
@@ -169,7 +140,7 @@ public:
    * no intersection.
    */
   bool IntersectSegment (const csVector3& start, const csVector3& end, 
-                          csVector3& isect, float* pr);
+                          csVector3& isect, float* pr) const;
 
   /**
    * Get the object version of the plane.
@@ -189,19 +160,17 @@ public:
   /**
    * Get the normal in object space.
    */
-  void GetObjectNormal (float* p_A, float* p_B, float* p_C, float* p_D);
+  void GetObjectNormal (float* p_A, float* p_B, float* p_C, float* p_D) const;
 
   /**
    * Get the normal in world space.
    */
-  void GetWorldNormal (float* p_A, float* p_B, float* p_C, float* p_D);
+  void GetWorldNormal (float* p_A, float* p_B, float* p_C, float* p_D) const;
 
   /**
    * Get the normal in camera space.
    */
-  void GetCameraNormal (float* p_A, float* p_B, float* p_C, float* p_D);
-
-  CSOBJTYPE;
+  void GetCameraNormal (float* p_A, float* p_B, float* p_C, float* p_D) const;
 };
 
 #endif /*POLYPLANE_H*/

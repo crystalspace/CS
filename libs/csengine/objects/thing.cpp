@@ -22,6 +22,7 @@
 #include "csengine/thing.h"
 #include "csengine/thingtpl.h"
 #include "csengine/polygon.h"
+#include "csengine/polytmap.h"
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
 #include "csengine/light.h"
@@ -398,6 +399,9 @@ void csThing::DrawFoggy (csRenderView& d)
         clip->ClipAgainst (d.view))
       {
         p->GetPlane ()->WorldToCamera (d, verts[0]);
+	csLightMapped* lmi = p->GetLightMapInfo ();
+	if (lmi)
+          lmi->GetTxtPlane ()->WorldToCamera (d, verts[0]);
 	if (d.callback)
 	{
           d.callback (&d, CALLBACK_POLYGON, (void*)p);
@@ -427,6 +431,9 @@ void csThing::DrawFoggy (csRenderView& d)
         clip->ClipAgainst (d.view))
       {
         p->GetPlane ()->WorldToCamera (d, verts[0]);
+	csLightMapped* lmi = p->GetLightMapInfo ();
+	if (lmi)
+          lmi->GetTxtPlane ()->WorldToCamera (d, verts[0]);
 	if (d.callback)
 	{
           d.callback (&d, CALLBACK_POLYGON, (void*)p);

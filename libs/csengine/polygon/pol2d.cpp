@@ -22,6 +22,7 @@
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
+#include "csengine/polytmap.h"
 #include "csengine/texture.h"
 #include "csengine/polyplan.h"
 #include "csengine/sector.h"
@@ -500,7 +501,8 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDPFX& poly)
 
 //---------------------------------------------------------------------------
 
-void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly, csPolyPlane* plane,
+void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
+	csPolyPlane* plane, csPolyTxtPlane* txt_plane,
 	bool use_z_buf)
 {
   //@@@
@@ -524,7 +526,8 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly, csPolyPlan
     rview->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
   }
 
-  if (poly->GetTextureType () == POLYTXT_GOURAUD || poly->CheckFlags (CS_POLY_FLATSHADING))
+  if (poly->GetTextureType () == POLYTXT_GOURAUD ||
+  	poly->CheckFlags (CS_POLY_FLATSHADING))
   {
     // We have a gouraud shaded polygon.
     // Add all dynamic lights if polygon is dirty.
@@ -543,8 +546,8 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly, csPolyPlan
           bool reset = true;
           while (lp)
           {
-            unsplit->UpdateVertexLighting (lp->GetLight (), lp->GetLight ()->GetColor (),
-      	      true, reset);
+            unsplit->UpdateVertexLighting (lp->GetLight (),
+	    	lp->GetLight ()->GetColor (), true, reset);
 	    reset = false;
             lp = lp->GetNextPoly ();
           }
@@ -660,10 +663,11 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly, csPolyPlan
     g3dpoly.z_value         = poly->Vcam(0).z;
 
     for (int mipmaplevel = 0; mipmaplevel<4; mipmaplevel++)
-      g3dpoly.poly_texture[mipmaplevel] = poly->GetLightMapInfo ()->GetPolyTex (mipmaplevel);
+      g3dpoly.poly_texture[mipmaplevel] = poly->GetLightMapInfo ()->GetPolyTex
+      	(mipmaplevel);
 
-    g3dpoly.plane.m_cam2tex = &plane->m_cam2tex;
-    g3dpoly.plane.v_cam2tex = &plane->v_cam2tex;
+    g3dpoly.plane.m_cam2tex = &txt_plane->m_cam2tex;
+    g3dpoly.plane.v_cam2tex = &txt_plane->v_cam2tex;
 
     float Ac, Bc, Cc, Dc;
     plane->GetCameraNormal (&Ac, &Bc, &Cc, &Dc);
@@ -682,7 +686,8 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly, csPolyPlan
   }
 }
 
-void csPolygon2D::AddFogPolygon (iGraphics3D* g3d, csPolygon3D* /*poly*/, csPolyPlane* plane, bool mirror, CS_ID id, int fogtype)
+void csPolygon2D::AddFogPolygon (iGraphics3D* g3d, csPolygon3D* /*poly*/,
+	csPolyPlane* plane, bool mirror, CS_ID id, int fogtype)
 {
   int i;
 

@@ -24,6 +24,7 @@
 #include "csengine/polytext.h"
 #include "csengine/texture.h"
 #include "csengine/polyplan.h"
+#include "csengine/polytmap.h"
 #include "csengine/sector.h"
 #include "csengine/world.h"
 #include "csengine/light.h"
@@ -61,6 +62,7 @@ DECLARE_GROWING_ARRAY (static, VectorArray, csVector3)
 csLightMapped::csLightMapped () : csPolygonTextureType ()
 {
   lightmap = lightmap1 = lightmap2 = lightmap3 = NULL;
+  txt_plane = NULL;
   theDynLight = NULL;
   CHK (tex = new csPolyTexture ());
   CHK (tex1 = new csPolyTexture ());
@@ -79,6 +81,7 @@ csLightMapped::~csLightMapped ()
   if (lightmap1) lightmap1->DecRef ();
   if (lightmap2) lightmap2->DecRef ();
   if (lightmap3) lightmap3->DecRef ();
+  if (txt_plane) txt_plane->DecRef ();
 }
 
 void csLightMapped::Setup (csPolygon3D* poly3d, csTextureHandle* txtMM)
@@ -116,6 +119,19 @@ csPolyTexture* csLightMapped::GetPolyTex (int mipmap)
     case 3: return tex3;
   }
   return tex;
+}
+
+void csLightMapped::SetTxtPlane (csPolyTxtPlane* txt_pl)
+{
+  if (txt_plane) txt_plane->DecRef ();
+  txt_plane = txt_pl;
+  txt_plane->IncRef ();
+}
+
+void csLightMapped::NewTxtPlane ()
+{
+  if (txt_plane) txt_plane->DecRef ();
+  CHK (txt_plane = new csPolyTxtPlane ());
 }
 
 //---------------------------------------------------------------------------
@@ -246,7 +262,6 @@ csPolygon3D::csPolygon3D (csTextureHandle* texture) : csObject (),
   txt_info = NULL;
 
   plane = NULL;
-  delete_plane = false;
 
   portal = NULL;
   delete_portal = false;
@@ -282,7 +297,7 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt (),
   delete_portal = false;	// This polygon is no owner
 
   plane = poly.plane;
-  delete_plane = false;		// This polygon is no owner
+  plane->IncRef ();
 
   txtMM = poly.txtMM;
 
@@ -306,12 +321,9 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt (),
 
 csPolygon3D::~csPolygon3D ()
 {
-  if (txt_info)
-    txt_info->DecRef (); 
-  if (delete_plane)
-    CHKB (delete plane);
-  if (delete_portal)
-    CHKB (delete portal);
+  if (txt_info) txt_info->DecRef (); 
+  if (plane) plane->DecRef ();
+  if (delete_portal) CHKB (delete portal);
   while (light_info.lightpatches)
     csWorld::current_world->lightpatch_pool->Free (light_info.lightpatches);
   VectorArray.DecRef ();
@@ -518,6 +530,8 @@ void csPolygon3D::ComputeNormal ()
   PlaneNormal (&A, &B, &C);
   D = -A*Vobj (0).x - B*Vobj (0).y - C*Vobj (0).z;
 
+  if (!plane) CHKB (plane = new csPolyPlane ());
+
   // By default the world space normal is equal to the object space normal.
   plane->GetObjectPlane ().Set (A, B, C, D);
   plane->GetWorldPlane ().Set (A, B, C, D);
@@ -526,6 +540,8 @@ void csPolygon3D::ComputeNormal ()
 void csPolygon3D::ObjectToWorld (const csReversibleTransform& t)
 {
   plane->ObjectToWorld (t, Vwor (0));
+  csLightMapped* lmi = GetLightMapInfo ();
+  if (lmi) lmi->GetTxtPlane ()->ObjectToWorld (t, Vwor (0));
   if (portal) portal->ObjectToWorld (t);
 }
 
@@ -631,32 +647,40 @@ void csPolygon3D::CreateLightMaps (iGraphics3D* g3d)
   if (lmi->lightmap3) lmi->lightmap3->ConvertFor3dDriver (po2, aspect);
 }
 
-void csPolygon3D::SetTextureSpace (csPolyPlane* pl)
+void csPolygon3D::SetTextureSpace (csPolyTxtPlane* txt_pl)
 {
-  if (plane && delete_plane) CHKB (delete plane);
-  plane = pl;
-  delete_plane = false;
-
   ComputeNormal ();
+  if (GetTextureType () == POLYTXT_LIGHTMAP)
+  {
+    csLightMapped* lmi = GetLightMapInfo ();
+    if (lmi) lmi->SetTxtPlane (txt_pl);
+  }
 }
 
 void csPolygon3D::SetTextureSpace (csPolygon3D* copy_from)
 {
-  if (plane && delete_plane) CHKB (delete plane);
-  plane = copy_from->plane;
-  delete_plane = false;
-
   ComputeNormal ();
+  if (GetTextureType () == POLYTXT_LIGHTMAP)
+  {
+    csLightMapped* lmi = GetLightMapInfo ();
+    if (lmi) lmi->SetTxtPlane (copy_from->GetLightMapInfo ()->GetTxtPlane ());
+  }
 }
 
-void csPolygon3D::SetTextureSpace (csMatrix3& tx_matrix, csVector3& tx_vector)
+void csPolygon3D::SetTextureSpace (
+	const csMatrix3& tx_matrix,
+	const csVector3& tx_vector)
 {
-  if (plane && delete_plane) CHKB (delete plane);
-  CHK (plane = new csPolyPlane ());
-  delete_plane = true;
-
   ComputeNormal ();
-  plane->SetTextureSpace (tx_matrix, tx_vector);
+  if (GetTextureType () == POLYTXT_LIGHTMAP)
+  {
+    csLightMapped* lmi = GetLightMapInfo ();
+    if (lmi)
+    {
+      lmi->NewTxtPlane ();
+      lmi->GetTxtPlane() ->SetTextureSpace (tx_matrix, tx_vector);
+    }
+  }
 }
 
 void csPolygon3D::SetTextureSpace (csVector3& v_orig, csVector3& v1, float len1)
@@ -675,12 +699,18 @@ void csPolygon3D::SetTextureSpace (
 	float x1, float y1, float z1,
 	float len1)
 {
-  if (plane && delete_plane) CHKB (delete plane);
-  CHK (plane = new csPolyPlane ());
-  delete_plane = true;
-
   ComputeNormal ();
-  plane->SetTextureSpace (xo, yo, zo, x1, y1, z1, len1);
+  if (GetTextureType () == POLYTXT_LIGHTMAP)
+  {
+    csLightMapped* lmi = GetLightMapInfo ();
+    if (lmi)
+    {
+      lmi->NewTxtPlane ();
+      lmi->GetTxtPlane() ->SetTextureSpace (
+	plane->GetWorldPlane (),
+  	xo, yo, zo, x1, y1, z1, len1);
+    }
+  }
 }
 
 void csPolygon3D::SetTextureSpace (
@@ -690,15 +720,18 @@ void csPolygon3D::SetTextureSpace (
 	float x2, float y2, float z2,
 	float len2)
 {
-  if (plane && delete_plane) CHKB (delete plane);
-  CHK (plane = new csPolyPlane ());
-  delete_plane = true;
-
   ComputeNormal ();
-
-  csVector3 v1(xo, yo, zo), v2(x1, y1, z1), v3(x2, y2, z2);
-
-  plane->SetTextureSpace (v1, v2, len1, v3, len2);
+  if (GetTextureType () == POLYTXT_LIGHTMAP)
+  {
+    csLightMapped* lmi = GetLightMapInfo ();
+    if (lmi)
+    {
+      lmi->NewTxtPlane ();
+      csVector3 v1(xo, yo, zo), v2(x1, y1, z1), v3(x2, y2, z2);
+      lmi->GetTxtPlane() ->SetTextureSpace (
+  	v1, v2, len1, v3, len2);
+    }
+  }
 }
 
 

@@ -26,6 +26,7 @@
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
+#include "csengine/polytmap.h"
 #include "csengine/dynlight.h"
 #include "csengine/light.h"
 #include "csengine/camera.h"
@@ -279,14 +280,13 @@ csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius,
   float d, min_d = radius;
   int i;
   csPolygon3D* p, * min_p = NULL;
-  csPolyPlane* pl;
   csVector3 hit;
   float A, B, C, D;
 
   for (i = 0 ; i < polygons.Length () ; i++)
   {
     p = polygons.Get (i);
-    pl = p->GetPlane ();
+    const csPolyPlane* pl = p->GetPlane ();
     d = pl->Distance (center);
     if (d < min_d && pl->VisibleFromPoint (center))
     {
@@ -376,6 +376,9 @@ void csSector::DrawPolygonsFromQueue (csPolygon2DQueue* queue,
   {
     poly3d->CamUpdate ();
     poly3d->GetPlane ()->WorldToCamera (*rview, poly3d->Vcam (0));
+    csLightMapped* lmi = poly3d->GetLightMapInfo ();
+    if (lmi)
+      lmi->GetTxtPlane ()->WorldToCamera (*rview, poly3d->Vcam (0));
     DrawOnePolygon (poly3d, poly2d, rview, false);
     render_pool->Free (poly2d);
   }

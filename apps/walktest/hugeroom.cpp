@@ -77,7 +77,7 @@ void HugeRoom::create_wall (csSector* sector, csPolygonSet* thing,
 {
   int i, j;
   csPolygon3D* p;
-  csPolyPlane* plane = NULL;
+  csPolyTxtPlane* txt_plane = NULL;
   for (i = 0 ; i < hor_res ; i++)
     for (j = 0 ; j < ver_res ; j++)
     {
@@ -89,15 +89,15 @@ void HugeRoom::create_wall (csSector* sector, csPolygonSet* thing,
       csVector3 v2 = v12b + ((float)j/(float)ver_res) * (v43b-v12b);
       csVector3 v3 = v12b + ((float)(j+1)/(float)ver_res) * (v43b-v12b);
       csVector3 v4 = v12a + ((float)(j+1)/(float)ver_res) * (v43a-v12a);
-      p = create_polygon (sector, thing, v1, v2, v3, txt, plane);
-      if (!plane) plane = p->GetPlane ();
-      create_polygon (sector, thing, v1, v3, v4, txt, plane);
+      p = create_polygon (sector, thing, v1, v2, v3, txt, txt_plane);
+      if (!txt_plane) txt_plane = p->GetLightMapInfo ()->GetTxtPlane ();
+      create_polygon (sector, thing, v1, v3, v4, txt, txt_plane);
     }
 }
 
 csPolygon3D* HugeRoom::create_polygon (csSector* sector, csPolygonSet* thing,
 	const csVector3& p1, const csVector3& p2, const csVector3& p3,
-	int txt, csPolyPlane* plane)
+	int txt, csPolyTxtPlane* txt_plane)
 {
   csMatrix3 t_m;
   csVector3 t_v (0, 0, 0);
@@ -136,8 +136,8 @@ csPolygon3D* HugeRoom::create_polygon (csSector* sector, csPolygonSet* thing,
     	rand1 (wall_max_green-wall_min_green)+wall_min_green,
     	rand1 (wall_max_blue-wall_min_blue)+wall_min_blue);
 
-  if (plane)
-    p->SetTextureSpace (plane);
+  if (txt_plane)
+    p->SetTextureSpace (txt_plane);
   else
     p->SetTextureSpace (t_m, t_v);
 

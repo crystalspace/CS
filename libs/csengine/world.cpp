@@ -27,6 +27,7 @@
 #include "csengine/light.h"
 #include "csengine/dynlight.h"
 #include "csengine/polyplan.h"
+#include "csengine/polytmap.h"
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
@@ -254,6 +255,13 @@ csWorld::~csWorld ()
 
 bool csWorld::Initialize (iSystem* sys)
 {
+printf ("csPolygon3D %d\n", sizeof (csPolygon3D));
+printf ("csPolyPlane %d\n", sizeof (csPolyPlane));
+printf ("csPolyTexture %d\n", sizeof (csPolyTexture));
+printf ("csPolygonSet %d\n", sizeof (csPolygonSet));
+printf ("csLightMapped %d\n", sizeof (csLightMapped));
+printf ("csGouraudShaded %d\n", sizeof (csGouraudShaded));
+
   System = sys;
 
   if (!(G3D = QUERY_PLUGIN (sys, iGraphics3D)))
@@ -313,8 +321,15 @@ void csWorld::Clear ()
   sprite_templates.DeleteAll ();
   thing_templates.DeleteAll ();
   sectors.DeleteAll ();
-  planes.DeleteAll ();
   CLights::DeleteAll ();
+  int i;
+  for (i = 0 ; i < planes.Length () ; i++)
+  {
+    csPolyTxtPlane* p = (csPolyTxtPlane*)planes[i];
+    planes[i] = NULL;
+    p->DecRef ();
+  }
+  planes.DeleteAll ();
 
   while (first_dyn_lights)
   {
@@ -508,6 +523,55 @@ bool csWorld::Prepare ()
 
 void csWorld::ShineLights ()
 {
+#if CS_COV_STATS
+  extern int cnt_TestPolygonNotEmpty;
+  extern int cnt_TestPolygonNotEmpty_loop;
+  extern int cnt_TestPolygonNotEmpty_child;
+  extern int cnt_TestPolygonNotEmpty0;
+  extern int cnt_InsertPolygon;
+  extern int cnt_InsertPolygon_loop;
+  extern int cnt_InsertPolygon_child;
+  extern int cnt_InsertPolygon0;
+  extern int cnt_UpdatePolygon;
+  extern int cnt_UpdatePolygon_loop;
+  extern int cnt_UpdatePolygon_child;
+  extern int cnt_UpdatePolygon0;
+  extern int cnt_UpdatePolygonInverted;
+  extern int cnt_UpdatePolygonInverted_loop;
+  extern int cnt_UpdatePolygonInverted_child;
+  extern int cnt_UpdatePolygonInverted0;
+  extern int cnt_TestPolygon;
+  extern int cnt_TestPolygon_loop;
+  extern int cnt_TestPolygon_child;
+  extern int cnt_TestPolygon0;
+  extern int cnt_GetIndex;
+  extern int cnt_GetIndex_hor;
+  extern int cnt_GetIndex_ver;
+  cnt_TestPolygonNotEmpty = 0;
+  cnt_TestPolygonNotEmpty_loop = 0;
+  cnt_TestPolygonNotEmpty_child = 0;
+  cnt_TestPolygonNotEmpty0 = 0;
+  cnt_InsertPolygon = 0;
+  cnt_InsertPolygon_loop = 0;
+  cnt_InsertPolygon_child = 0;
+  cnt_InsertPolygon0 = 0;
+  cnt_UpdatePolygon = 0;
+  cnt_UpdatePolygon_loop = 0;
+  cnt_UpdatePolygon_child = 0;
+  cnt_UpdatePolygon0 = 0;
+  cnt_UpdatePolygonInverted = 0;
+  cnt_UpdatePolygonInverted_loop = 0;
+  cnt_UpdatePolygonInverted_child = 0;
+  cnt_UpdatePolygonInverted0 = 0;
+  cnt_TestPolygon = 0;
+  cnt_TestPolygon_loop = 0;
+  cnt_TestPolygon_child = 0;
+  cnt_TestPolygon0 = 0;
+  cnt_GetIndex = 0;
+  cnt_GetIndex_hor = 0;
+  cnt_GetIndex_ver = 0;
+#endif
+
   tr_manager.NewFrame ();
 
   if (!csPolygon3D::do_not_force_recalc)
@@ -713,6 +777,38 @@ void csWorld::ShineLights ()
 
   CHK (delete pit);
   CHK (delete lit);
+
+#if CS_COV_STATS
+  printf ("TestPolygonNotEmpty: %d loop=%d child=%d 0=%d\n",
+  cnt_TestPolygonNotEmpty,
+  cnt_TestPolygonNotEmpty_loop,
+  cnt_TestPolygonNotEmpty_child,
+  cnt_TestPolygonNotEmpty0);
+  printf ("InsertPolygon: %d loop=%d child=%d 0=%d\n",
+  cnt_InsertPolygon,
+  cnt_InsertPolygon_loop,
+  cnt_InsertPolygon_child,
+  cnt_InsertPolygon0);
+  printf ("UpdatePolygon: %d loop=%d child=%d 0=%d\n",
+  cnt_UpdatePolygon,
+  cnt_UpdatePolygon_loop,
+  cnt_UpdatePolygon_child,
+  cnt_UpdatePolygon0);
+  printf ("UpdatePolygonInverted: %d loop=%d child=%d 0=%d\n",
+  cnt_UpdatePolygonInverted,
+  cnt_UpdatePolygonInverted_loop,
+  cnt_UpdatePolygonInverted_child,
+  cnt_UpdatePolygonInverted0);
+  printf ("TestPolygon: %d loop=%d child=%d 0=%d\n",
+  cnt_TestPolygon,
+  cnt_TestPolygon_loop,
+  cnt_TestPolygon_child,
+  cnt_TestPolygon0);
+  printf ("GetIndex: %d hor=%d ver=%d\n",
+  cnt_GetIndex,
+  cnt_GetIndex_hor,
+  cnt_GetIndex_ver);
+#endif
 }
 
 bool csWorld::CheckConsistency ()
@@ -766,6 +862,55 @@ void csWorld::StartWorld ()
 
 void csWorld::Draw (csCamera* c, csClipper* view)
 {
+#if CS_COV_STATS
+  extern int cnt_TestPolygonNotEmpty;
+  extern int cnt_TestPolygonNotEmpty_loop;
+  extern int cnt_TestPolygonNotEmpty_child;
+  extern int cnt_TestPolygonNotEmpty0;
+  extern int cnt_InsertPolygon;
+  extern int cnt_InsertPolygon_loop;
+  extern int cnt_InsertPolygon_child;
+  extern int cnt_InsertPolygon0;
+  extern int cnt_UpdatePolygon;
+  extern int cnt_UpdatePolygon_loop;
+  extern int cnt_UpdatePolygon_child;
+  extern int cnt_UpdatePolygon0;
+  extern int cnt_UpdatePolygonInverted;
+  extern int cnt_UpdatePolygonInverted_loop;
+  extern int cnt_UpdatePolygonInverted_child;
+  extern int cnt_UpdatePolygonInverted0;
+  extern int cnt_TestPolygon;
+  extern int cnt_TestPolygon_loop;
+  extern int cnt_TestPolygon_child;
+  extern int cnt_TestPolygon0;
+  extern int cnt_GetIndex;
+  extern int cnt_GetIndex_hor;
+  extern int cnt_GetIndex_ver;
+  cnt_TestPolygonNotEmpty = 0;
+  cnt_TestPolygonNotEmpty_loop = 0;
+  cnt_TestPolygonNotEmpty_child = 0;
+  cnt_TestPolygonNotEmpty0 = 0;
+  cnt_InsertPolygon = 0;
+  cnt_InsertPolygon_loop = 0;
+  cnt_InsertPolygon_child = 0;
+  cnt_InsertPolygon0 = 0;
+  cnt_UpdatePolygon = 0;
+  cnt_UpdatePolygon_loop = 0;
+  cnt_UpdatePolygon_child = 0;
+  cnt_UpdatePolygon0 = 0;
+  cnt_UpdatePolygonInverted = 0;
+  cnt_UpdatePolygonInverted_loop = 0;
+  cnt_UpdatePolygonInverted_child = 0;
+  cnt_UpdatePolygonInverted0 = 0;
+  cnt_TestPolygon = 0;
+  cnt_TestPolygon_loop = 0;
+  cnt_TestPolygon_child = 0;
+  cnt_TestPolygon0 = 0;
+  cnt_GetIndex = 0;
+  cnt_GetIndex_hor = 0;
+  cnt_GetIndex_ver = 0;
+#endif
+
   Stats::polygons_considered = 0;
   Stats::polygons_drawn = 0;
   Stats::portals_drawn = 0;
@@ -817,6 +962,37 @@ stop_processing = false;
   for (int halo = halos.Length () - 1; halo >= 0; halo--)
     if (!ProcessHalo (halos.Get (halo)))
       halos.Delete (halo);
+#if CS_COV_STATS
+  printf ("TestPolygonNotEmpty: %d loop=%d child=%d 0=%d\n",
+  cnt_TestPolygonNotEmpty,
+  cnt_TestPolygonNotEmpty_loop,
+  cnt_TestPolygonNotEmpty_child,
+  cnt_TestPolygonNotEmpty0);
+  printf ("InsertPolygon: %d loop=%d child=%d 0=%d\n",
+  cnt_InsertPolygon,
+  cnt_InsertPolygon_loop,
+  cnt_InsertPolygon_child,
+  cnt_InsertPolygon0);
+  printf ("UpdatePolygon: %d loop=%d child=%d 0=%d\n",
+  cnt_UpdatePolygon,
+  cnt_UpdatePolygon_loop,
+  cnt_UpdatePolygon_child,
+  cnt_UpdatePolygon0);
+  printf ("UpdatePolygonInverted: %d loop=%d child=%d 0=%d\n",
+  cnt_UpdatePolygonInverted,
+  cnt_UpdatePolygonInverted_loop,
+  cnt_UpdatePolygonInverted_child,
+  cnt_UpdatePolygonInverted0);
+  printf ("TestPolygon: %d loop=%d child=%d 0=%d\n",
+  cnt_TestPolygon,
+  cnt_TestPolygon_loop,
+  cnt_TestPolygon_child,
+  cnt_TestPolygon0);
+  printf ("GetIndex: %d hor=%d ver=%d\n",
+  cnt_GetIndex,
+  cnt_GetIndex_hor,
+  cnt_GetIndex_ver);
+#endif
 }
 
 void csWorld::DrawFunc (csCamera* c, csClipper* view,

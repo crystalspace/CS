@@ -197,7 +197,7 @@ public:
 
   /**
    * List of planes. This vector contains objects of type
-   * csPolyPlane*. Note that this vector only contains named
+   * csPolyTxtPlane*. Note that this vector only contains named
    * planes. Default planes which are created for polygons
    * are not in this list.
    */

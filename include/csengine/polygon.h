@@ -35,6 +35,7 @@ class StatLight;
 class CLights;
 class csTextureHandle;
 class csPolyPlane;
+class csPolyTxtPlane;
 class csPolygon2D;
 class csPolygon3D;
 class csLightMap;
@@ -108,23 +109,21 @@ class csPolygonTextureType
 {
 protected:
   /// Common constructor for derived classes
-  csPolygonTextureType ()
-  { RefCount = 1; }
+  csPolygonTextureType () { ref_count = 1; }
   /// Destructor is virtual to be able to delete derived objects
-  virtual ~csPolygonTextureType ()
-  { }
+  virtual ~csPolygonTextureType () { }
+
 private:
   /// Reference counter
-  int RefCount;
+  int ref_count;
+
 public:
   /// Return a type for the kind of texturing used.
   virtual int GetTextureType () = 0;
   /// Maintain a reference counter for texture type objects
-  void IncRef ()
-  { RefCount++; }
+  void IncRef () { ref_count++; }
   /// Decrement usage counter
-  void DecRef ()
-  { if (!--RefCount) delete this; }
+  void DecRef () { if (!--ref_count) delete this; }
 };
 
 /**
@@ -156,6 +155,11 @@ private:
   csLightMap* lightmap3;
 
   /**
+   * The csPolyTxtPlane for this polygon.
+   */
+  csPolyTxtPlane* txt_plane;
+
+  /**
    * This bool indicates if the lightmap is up-to-date (read from the
    * cache). If set to false the polygon still needs to be recalculated.
    */
@@ -183,9 +187,25 @@ public:
   virtual int GetTextureType () { return POLYTXT_LIGHTMAP; }
 
   /**
-   * Get the polytexture (lighted texture) with a given mipmap level (0, 1, 2 or 3).
+   * Get the polytexture (lighted texture) with a given mipmap level
+   * (0, 1, 2 or 3).
    */
   csPolyTexture* GetPolyTex (int mipmap);
+
+  /**
+   * Return the texture plane of this polygon.
+   */
+  csPolyTxtPlane* GetTxtPlane () const { return txt_plane; }
+
+  /**
+   * Set the texture plane.
+   */
+  void SetTxtPlane (csPolyTxtPlane* txt_pl);
+
+  /**
+   * Create a new texture plane.
+   */
+  void NewTxtPlane ();
 
   /**
    * Get the lightmap belonging with this polygon.
@@ -381,12 +401,6 @@ private:
    * The PolygonPlane for this polygon.
    */
   csPolyPlane* plane;
-
-  /**
-   * If 'delete_plane' is true this plane was allocated by
-   * this Polygon and it should also be deleted by it.
-   */
-  bool delete_plane;
 
   /*
    * The 3D engine texture reference (contains the handle as returned
@@ -657,7 +671,8 @@ public:
    * Set the warping transformation for the portal.
    * If there is no portal this function does nothing.
    */
-  void SetWarp (const csMatrix3& m_w, const csVector3& v_w_before, const csVector3& v_w_after)
+  void SetWarp (const csMatrix3& m_w, const csVector3& v_w_before,
+  	const csVector3& v_w_after)
   {
     if (portal) portal->SetWarp (m_w, v_w_before, v_w_after);
   }
@@ -667,21 +682,24 @@ public:
    * This index is translated to the index in the parent container and
    * a reference to the vertex in world-space is returned.
    */
-  csVector3& Vwor (int idx) { return poly_set->Vwor (vertices.GetVertexIndices ()[idx]); }
+  csVector3& Vwor (int idx)
+  { return poly_set->Vwor (vertices.GetVertexIndices ()[idx]); }
 
   /**
    * 'idx' is a local index into the vertices table of the polygon.
    * This index is translated to the index in the parent container and
    * a reference to the vertex in object-space is returned.
    */
-  csVector3& Vobj (int idx) { return poly_set->Vobj (vertices.GetVertexIndices ()[idx]); }
+  csVector3& Vobj (int idx)
+  { return poly_set->Vobj (vertices.GetVertexIndices ()[idx]); }
 
   /**
    * 'idx' is a local index into the vertices table of the polygon.
    * This index is translated to the index in the parent container and
    * a reference to the vertex in camera-space is returned.
    */
-  csVector3& Vcam (int idx) { return poly_set->Vcam (vertices.GetVertexIndices ()[idx]); }
+  csVector3& Vcam (int idx)
+  { return poly_set->Vcam (vertices.GetVertexIndices ()[idx]); }
 
   /**
    * Before calling a series of Vcam() you should call
@@ -760,7 +778,7 @@ public:
    * can use the same plane for several polygons. This polygon
    * is not responsible for cleaning this plane.
    */
-  void SetTextureSpace (csPolyPlane* plane);
+  void SetTextureSpace (csPolyTxtPlane* txt_pl);
 
   /**
    * Calculate the matrix using two vertices (which are preferably on the
@@ -805,7 +823,7 @@ public:
    * The most general function. With these you provide the matrix
    * directly.
    */
-  void SetTextureSpace (csMatrix3& tx_matrix, csVector3& tx_vector);
+  void SetTextureSpace (const csMatrix3& tx_matrix, const csVector3& tx_vector);
 
   /**
    * Prepare the lightmaps for use (different mipmap levels).
@@ -823,7 +841,8 @@ public:
    * Return the pointer to the original polygon (before any BSP splits).
    * If polygon was not split this will return current poly.
    */
-  csPolygon3D* GetBasePolygon () { return orig_poly ? (csPolygon3D*)orig_poly : this; }
+  csPolygon3D* GetBasePolygon ()
+  { return orig_poly ? (csPolygon3D*)orig_poly : this; }
 
   /**
    * A dynamic light has changed (this can be either an
@@ -866,14 +885,16 @@ public:
    * away. Otherwise it will allocated a new array
    * of csVector3 in dest.
    */
-  bool ClipPoly (csVector3* frustrum, int num_frustrum, bool mirror, csVector3** dest, int* num_dest);
+  bool ClipPoly (csVector3* frustrum, int num_frustrum,
+	bool mirror, csVector3** dest, int* num_dest);
 
   /**
    * Clip a polygon against a plane (in camera space).
    * The plane is defined as going through v1, v2, and (0,0,0).
    * The 'verts' array is modified and 'num' is also modified if needed.
    */
-  void ClipPolyPlane (csVector3* verts, int* num, bool mirror, csVector3& v1, csVector3& v2);
+  void ClipPolyPlane (csVector3* verts, int* num, bool mirror,
+  	csVector3& v1, csVector3& v2);
 
   /**
    * See if a polygon is visible from the given center (in world space
@@ -881,11 +902,12 @@ public:
    * a new frustrum (in camera space with the frustrum center at (0,0,0)).
    * This function returns false if the polygon is completely clipped away
    * or if it is not visible. No new_frustrum will be allocated in that case.
-   * If 'mirror' is true the given frustrum is mirrored (vertices in anti-clockwise
-   * order). This function correctly handles that case and will return a new
-   * frustrum that is also mirrored.
+   * If 'mirror' is true the given frustrum is mirrored (vertices in
+   * anti-clockwise order). This function correctly handles that case and
+   * will return a new frustrum that is also mirrored.
    */
-  bool ClipFrustrum (csVector3& center, csVector3* frustrum, int num_frustrum, bool mirror,
+  bool ClipFrustrum (csVector3& center, csVector3* frustrum,
+  	int num_frustrum, bool mirror,
   	csVector3** new_frustrum, int* new_num_frustrum);
 
   /**
@@ -989,8 +1011,8 @@ public:
    * If 'cw' is true the polygon has to be oriented clockwise in order to be
    * visible. Otherwise it is the other way around.
    */
-  bool ClipToPlane (csPlane* portal_plane, const csVector3& v_w2c, csVector3*& pverts,
-    int& num_verts, bool cw = true);
+  bool ClipToPlane (csPlane* portal_plane, const csVector3& v_w2c,
+  	csVector3*& pverts, int& num_verts, bool cw = true);
 
   /**
    * This is the link between csPolygon3D and csPolygon2D (see below for

@@ -23,6 +23,7 @@
 #include "csengine/sysitf.h"
 #include "csengine/polytext.h"
 #include "csengine/polyplan.h"
+#include "csengine/polytmap.h"
 #include "csengine/polygon.h"
 #include "csengine/light.h"
 #include "csengine/sector.h"
@@ -87,15 +88,15 @@ void csPolyTexture::CreateBoundingTextureBox ()
   float max_u = -1000000000.;
   float max_v = -1000000000.;
 
-  csPolyPlane* pl = polygon->GetPlane ();
+  csPolyTxtPlane* txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
 
   int i;
   csVector3 v1, v2;
   for (i = 0 ; i < polygon->GetVertices ().GetNumVertices () ; i++)
   {
     v1 = polygon->Vwor (i);   // Coordinates of vertex in world space.
-    v1 -= pl->v_world2tex;
-    v2 = (pl->m_world2tex) * v1;  // Coordinates of vertex in texture space.
+    v1 -= txt_pl->v_world2tex;
+    v2 = (txt_pl->m_world2tex) * v1;  // Coordinates of vertex in texture space.
     if (v2.x < min_u) min_u = v2.x;
     if (v2.x > max_u) max_u = v2.x;
     if (v2.y < min_v) min_v = v2.y;
@@ -595,6 +596,7 @@ void csPolyTexture::FillLightMap (csLightView& lview)
   int ww, hh;
   txt_handle->GetMipMapDimensions (mipmap_level, ww, hh);
 
+  csPolyTxtPlane* txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
   csPolyPlane* pl = polygon->GetPlane ();
   float cosfact = polygon->GetCosinusFactor ();
   if (cosfact == -1) cosfact = cfg_cosinus_factor;
@@ -603,8 +605,8 @@ void csPolyTexture::FillLightMap (csLightView& lview)
   // ===>
   // Mtw * T = W - Vwt
   // Mtw * T + Vwt = W
-  csMatrix3 m_t2w = pl->m_world2tex.GetInverse ();
-  csVector3 vv = pl->v_world2tex;
+  csMatrix3 m_t2w = txt_pl->m_world2tex.GetInverse ();
+  csVector3 vv = txt_pl->v_world2tex;
 
   // From: Ax+By+Cz+D = 0
   // From: T = Mwt * (W - Vwt)
@@ -618,7 +620,7 @@ void csPolyTexture::FillLightMap (csLightView& lview)
   float txt_A = A*m_t2w.m11 + B*m_t2w.m21 + C*m_t2w.m31;
   float txt_B = A*m_t2w.m12 + B*m_t2w.m22 + C*m_t2w.m32;
   float txt_C = A*m_t2w.m13 + B*m_t2w.m23 + C*m_t2w.m33;
-  float txt_D = A*pl->v_world2tex.x + B*pl->v_world2tex.y + C*pl->v_world2tex.z + D;
+  float txt_D = A*txt_pl->v_world2tex.x + B*txt_pl->v_world2tex.y + C*txt_pl->v_world2tex.z + D;
 
   csVector3 v1, v2(0);
 
@@ -682,7 +684,7 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 
   for(i=0;i<rpv;i++)
   {
-    projector=pl->m_world2tex * (polygon->Vwor(i) - pl->v_world2tex);
+    projector=txt_pl->m_world2tex * (polygon->Vwor(i) - txt_pl->v_world2tex);
     rp[i].x=(projector.x*ww-Imin_u) / (mipmap_size)+0.5;
     rp[i].y=(projector.y*hh-Imin_v) / (mipmap_size)+0.5;
   }
@@ -693,7 +695,7 @@ void csPolyTexture::FillLightMap (csLightView& lview)
     else mi = i;
 
     // T = Mwt * (W - Vwt)
-    v1 = pl->m_world2tex * (frustrum[mi] + light_frustrum->GetOrigin () - pl->v_world2tex);
+    v1 = txt_pl->m_world2tex * (frustrum[mi] + light_frustrum->GetOrigin () - txt_pl->v_world2tex);
     f_uv[i].x = (v1.x*ww-Imin_u) / (mipmap_size) + 0.5;
     f_uv[i].y = (v1.y*hh-Imin_v) / (mipmap_size) + 0.5;
     if (f_uv[i].y < miny) miny = f_uv[MinIndex = i].y;
@@ -913,6 +915,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
   int ww, hh;
   txt_handle->GetMipMapDimensions (mipmap_level, ww, hh);
 
+  csPolyTxtPlane* txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
   csPolyPlane* pl = polygon->GetPlane ();
   float cosfact = polygon->GetCosinusFactor ();
   if (cosfact == -1) cosfact = cfg_cosinus_factor;
@@ -921,8 +924,8 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
   // ===>
   // Mtw * T = W - Vwt
   // Mtw * T + Vwt = W
-  csMatrix3 m_t2w = pl->m_world2tex.GetInverse();
-  csVector3 vv = pl->v_world2tex;
+  csMatrix3 m_t2w = txt_pl->m_world2tex.GetInverse();
+  csVector3 vv = txt_pl->v_world2tex;
 
   // From: Ax+By+Cz+D = 0
   // From: T = Mwt * (W - Vwt)
@@ -936,7 +939,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
   float txt_A = A*m_t2w.m11 + B*m_t2w.m21 + C*m_t2w.m31;
   float txt_B = A*m_t2w.m12 + B*m_t2w.m22 + C*m_t2w.m32;
   float txt_C = A*m_t2w.m13 + B*m_t2w.m23 + C*m_t2w.m33;
-  float txt_D = A*pl->v_world2tex.x + B*pl->v_world2tex.y + C*pl->v_world2tex.z + D;
+  float txt_D = A*txt_pl->v_world2tex.x + B*txt_pl->v_world2tex.y + C*txt_pl->v_world2tex.z + D;
 
   csVector3 v1, v2;
 
@@ -972,7 +975,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
       // T = Mwt * (W - Vwt)
       //v1 = pl->m_world2tex * (lp->vertices[mi] + lp->center - pl->v_world2tex);
       //@@@ This is only right if we don't allow reflections on dynamic lights
-      v1 = pl->m_world2tex * (lp->vertices[mi] + light->GetCenter () - pl->v_world2tex);
+      v1 = txt_pl->m_world2tex * (lp->vertices[mi] + light->GetCenter () - txt_pl->v_world2tex);
       f_uv[i].x = (v1.x*ww-Imin_u) / mipmap_size;
       f_uv[i].y = (v1.y*hh-Imin_v) / mipmap_size;
       if (f_uv[i].y < miny) miny = f_uv[MinIndex = i].y;
