@@ -62,12 +62,14 @@ rule SystemLinkApplication
     if [ IsElem console : $(3) ]
     {
         LinkApplicationConsole $(target) : $(>) ;
-        Clean clean $(<)clean : $(target) ;
+        Clean clean : $(target) ;
+        Clean $(<)clean : $(target) ;
     }
     else
     {
         CreateApplicationWrapper $(target) : $(>) ;
-        CleanDir clean $(<)clean : [ Wrapper $(<) : app ] ;
+        CleanDir clean : [ Wrapper $(<) : app ] ;
+        CleanDir $(<)clean : [ Wrapper $(<) : app ] ;
     }
 }
 
