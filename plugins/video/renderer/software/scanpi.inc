@@ -118,7 +118,7 @@ void PI_SCANFUNC (void *dest, int len, unsigned long *zbuff,
 #ifdef PI_FLAT
   // if flat shading is desired, we will just use one color
   (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
-  #ifndef PI_GOURAUD
+  #if !defined (PI_GOURAUD) && !defined (PI_BLEND)
   unsigned pixel = Scan.FlatColor;
   #endif
 #endif

@@ -29,12 +29,12 @@ csWSTexture::csWSTexture (const char *iName, iImage *inImage, int iFlags)
 {
   (Image = inImage)->IncRef ();
   Flags = iFlags;
-  IsTransp = false;
+  HasKey = false;
   Name = strnew (iName);
   FileName = strnew (Image->GetName ());
   Handle = NULL;
   TexMan = NULL;
-  TranspChanged = false;
+  KeyChanged = false;
   tr = tg = tb = 255;
 }
 
@@ -49,34 +49,34 @@ csWSTexture::~csWSTexture ()
     Handle->DecRef ();
 }
 
-void csWSTexture::SetTransparent (int iR, int iG, int iB)
+void csWSTexture::SetKeyColor (int iR, int iG, int iB)
 {
-  IsTransp = true;
-  TranspChanged = true;
+  HasKey = true;
+  KeyChanged = true;
   tr = iR; tg = iG; tb = iB;
   if (Handle)
   {
-    Handle->SetTransparent (tr, tg, tb);
-    Handle->SetTransparent (IsTransp);
+    Handle->SetKeyColor (tr, tg, tb);
+    Handle->SetKeyColor (HasKey);
   }
 }
 
-void csWSTexture::SetTransparent (bool iTransparent)
+void csWSTexture::SetKeyColor (bool iEnable)
 {
-  IsTransp = iTransparent;
+  HasKey = iEnable;
   if (Handle)
   {
-    Handle->SetTransparent (tr, tg, tb);
-    Handle->SetTransparent (IsTransp);
+    Handle->SetKeyColor (tr, tg, tb);
+    Handle->SetKeyColor (HasKey);
   }
 }
 
-void csWSTexture::FixTransparency ()
+void csWSTexture::FixKeyColor ()
 {
-  if (!IsTransp || !TranspChanged || !Image)
+  if (!HasKey || !KeyChanged || !Image)
     return;
 
-  TranspChanged = false;
+  KeyChanged = false;
 
   RGBPixel color;
   RGBPixel *src;
@@ -115,7 +115,7 @@ void csWSTexture::Register (iTextureManager *iTexMan)
   Unregister ();
   TexMan = iTexMan;
   Handle = iTexMan->RegisterTexture (Image, Flags);
-  SetTransparent (IsTransp);
+  SetKeyColor (HasKey);
 }
 
 void csWSTexture::Unregister ()
@@ -133,8 +133,8 @@ void csWSTexture::Refresh ()
 {
   if (!TexMan || !Handle)
     return;
-  FixTransparency ();
-  SetTransparent (IsTransp);
+  FixKeyColor ();
+  SetKeyColor (HasKey);
   TexMan->PrepareTexture (Handle);
 }
 

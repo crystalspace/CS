@@ -146,6 +146,10 @@ bool ImageSGIFile::Load (UByte* iBuffer, ULong iSize)
   }
 
   convert_rgba (buffer);
+
+  // Check if the alpha channel is valid
+  CheckAlpha ();
+
   return true;
 }
 

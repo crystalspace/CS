@@ -1574,7 +1574,7 @@ bool csWorld::CreateTexture (const char *iName, const char *iFileName,
   ifile->DecRef ();
 
   if (iTransp)
-    tex->SetTransparent (QInt (iTransp->red * 255.2),
+    tex->SetKeyColor (QInt (iTransp->red * 255.2),
       QInt (iTransp->green * 255.2), QInt (iTransp->blue * 255.2));
 
   return true;

@@ -51,7 +51,7 @@ bool csGraphics2DMGL::Initialize (iSystem *pSystem)
   if (!csGraphics2D::Initialize (pSystem))
     return false;
 
-  if (Depth != 8 && Depth != 16 && Depth != 32)
+  if (Depth != 8 && Depth != 15 && Depth != 16 && Depth != 32)
   {
     System->Printf (MSG_FATAL_ERROR, "Invalid color bit depth (%d)!\n", Depth);
     return false;
@@ -124,7 +124,7 @@ bool csGraphics2DMGL::Open (const char *Title)
   MGL_getPixelFormat (dc, &pf);
 
   pfmt.PalEntries = (Depth > 8) ? 0 : 256;
-  pfmt.PixelBytes = Depth / 8;
+  pfmt.PixelBytes = (Depth + 7) / 8;
   pfmt.RedMask = pf.redMask << pf.redPos;
   pfmt.GreenMask = pf.greenMask << pf.greenPos;
   pfmt.BlueMask = pf.blueMask << pf.bluePos;

@@ -1028,7 +1028,7 @@ void csTreeCtrl::Delete (csComponent *comp)
   csComponent::Delete (comp);
 }
 
-bool CompareTreeCtrlNode ( csTreeNode *node, csSome param, bool stopOnSuccess)
+bool csTreeCtrl::CompareTreeCtrlNode (csTreeNode *node, csSome param, bool stopOnSuccess)
 {
   (void)stopOnSuccess;
   return ((csTreeCtrl::TreeCtrlNode*)node)->item == (csComponent*)param;
@@ -1103,12 +1103,12 @@ csTreeCtrl::TreeCtrlNode *csTreeCtrl::TreeCtrlNode::Prev (TreeCtrlNode* before)
   return foundNode;
 }
 
-bool BranchOpen (csTreeNode *node)
+bool csTreeCtrl::BranchOpen (csTreeNode *node)
 {
   return ((csTreeCtrl::TreeCtrlNode*)node)->open || node->IsLeaf ();
 }
 
-bool TreeItemSelected (csTreeNode *node, csSome param, bool stopOnSuccess)
+bool csTreeCtrl::TreeItemSelected (csTreeNode *node, csSome param, bool stopOnSuccess)
 {
   (void)param;
   (void)stopOnSuccess;
@@ -1178,7 +1178,7 @@ void csTreeCtrl::RemoveChild (csComponent *item)
     delete node;
 }
 
-bool ZipTreeItemCanvas (csTreeNode *node, csSome param, bool stopOnSuccess)
+bool csTreeCtrl::ZipTreeItemCanvas (csTreeNode *node, csSome param, bool stopOnSuccess)
 {
   (void)param;
   (void)stopOnSuccess;
@@ -1211,7 +1211,7 @@ void csTreeCtrl::OpenItem (csComponent *item)
   }
 }
 
-bool OpenAllItems (csTreeNode *node, csSome param, bool stopOnSuccess)
+bool csTreeCtrl::OpenAllItems (csTreeNode *node, csSome param, bool stopOnSuccess)
 {
   (void)param;
   (void)stopOnSuccess;
@@ -1239,7 +1239,7 @@ void csTreeCtrl::CollapseItem (csComponent *item)
   }
 }
 
-bool CollapsAllItems (csTreeNode *node, csSome param, bool stopOnSuccess)
+bool csTreeCtrl::CollapsAllItems (csTreeNode *node, csSome param, bool stopOnSuccess)
 {
   (void)param;
   (void)stopOnSuccess;

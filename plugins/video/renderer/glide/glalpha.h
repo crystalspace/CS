@@ -74,15 +74,13 @@ public:
   DECLARE_IBASE;
   
   /// The following doesnt matter since we have an alphamap anyway
-  virtual void SetTransparent (bool ){};
-  virtual void SetTransparent (UByte, UByte, UByte ){};
-  virtual bool GetTransparent (){ return true; }
+  virtual void SetKeyColor (bool ){};
+  virtual void SetKeyColor (UByte, UByte, UByte ){};
+  virtual bool GetKeyColor (){ return true; }
 
   /// Get the transparent color
-  virtual void GetTransparent (UByte &red, UByte &green, UByte &blue)
-  {
-   GetMeanColor ( red, green, blue );
-  }
+  virtual void GetKeyColor (UByte &red, UByte &green, UByte &blue)
+  { GetMeanColor ( red, green, blue ); }
   /**
    * Get the dimensions for a given mipmap level (0 to 3).
    * If the texture was registered just for 2D usage, mipmap levels above

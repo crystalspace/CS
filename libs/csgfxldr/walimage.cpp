@@ -76,6 +76,8 @@ bool ImageWALFile::Load (UByte* iBuffer, ULong iSize)
   head.height = little_endian_long (head.height);
   head.offsets [0] = little_endian_long (head.offsets [0]);
   head.offsets [3] = little_endian_long (head.offsets [3]);
+
+  Format &= ~CS_IMGFMT_ALPHA;
   
   // There's no id-tag in .WAL files, so the only way I know to check
   // if it's a wal, is to use this method. Hope it works

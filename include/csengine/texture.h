@@ -39,7 +39,7 @@ private:
   iImage* image;
   /// The handle as returned by iTextureManager.
   iTextureHandle* handle;
-  // Transparent color
+  // key color
   int transp_r, transp_g, transp_b;
 
 public:
@@ -62,10 +62,10 @@ public:
   iImage* GetImageFile () { return image; }
 
   /// Set the transparent color.
-  void SetTransparent (int red, int green, int blue);
+  void SetKeyColor (int red, int green, int blue);
 
   /// Query the transparent color.
-  void GetTransparent (int &red, int &green, int &blue)
+  void GetKeyColor (int &red, int &green, int &blue)
   { red = transp_r; green = transp_g; blue = transp_b; }
 
   /// Register the texture with the texture manager

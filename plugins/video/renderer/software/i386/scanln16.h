@@ -2,7 +2,7 @@
     Crystal Space 16-bit software driver assembler-optimized routines
     Copyright (C) 1998 by Jorrit Tyberghein
     Contributors:
-       draw_scanline_map by David N. Arnold <derek_arnold@fuse.net>
+       scan_map by David N. Arnold <derek_arnold@fuse.net>
        MMX support and other by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -152,8 +152,8 @@
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define NO_draw_scanline_map_zfil
-#define SCANFUNC csScan_16_draw_scanline_map_zfil
+#define NO_scan_map_zfil
+#define SCANFUNC csScan_16_scan_map_zfil
 #define SCANMAP
 #define SCANLOOP I386_SCANLINE_MAP16
 #define SCANEND \
@@ -169,8 +169,8 @@
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define NO_draw_scanline_map_zuse
-#define SCANFUNC csScan_16_draw_scanline_map_zuse
+#define NO_scan_map_zuse
+#define SCANFUNC csScan_16_scan_map_zuse
 #define SCANMAP
 #define SCANLOOP \
     int uFrac, duFrac, vFrac, dvFrac;					\
@@ -343,8 +343,8 @@
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define NO_draw_scanline_map_alpha50
-#define SCANFUNC csScan_16_draw_scanline_map_alpha50
+#define NO_scan_map_fixalpha50
+#define SCANFUNC csScan_16_scan_map_fixalpha50
 #define SCANMAP
 #define SCANLOOP I386_SCANLINE_MAP_ALPHA50_16
 #include "video/renderer/software/scanln.inc"
@@ -355,8 +355,8 @@
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define NO_mmx_draw_scanline_map_zfil
-#define SCANFUNC csScan_16_mmx_draw_scanline_map_zfil
+#define NO_mmx_scan_map_zfil
+#define SCANFUNC csScan_16_mmx_scan_map_zfil
 #define SCANMAP
 #define SCANLOOP I386_SCANLINE_MAP16
 #define SCANEND MMX_FILLZBUFFER
@@ -366,8 +366,8 @@
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define NO_mmx_draw_scanline_tex_zfil
-#define SCANFUNC csScan_16_mmx_draw_scanline_tex_zfil
+#define NO_mmx_scan_tex_zfil
+#define SCANFUNC csScan_16_mmx_scan_tex_zfil
 #define SCANLOOP \
     do									\
     {									\
@@ -382,8 +382,8 @@
 
 #endif
 
-#define NO_draw_pi_scanline_tex_zuse
-void csScan_16_draw_pi_scanline_tex_zuse (void *dest, int len,
+#define NO_scan_pi_tex_zuse
+void csScan_16_scan_pi_tex_zuse (void *dest, int len,
   unsigned long *zbuff, long u, long du, long v, long dv,
   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w)
 {

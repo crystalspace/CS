@@ -297,7 +297,7 @@ void csListBox::PlaceItems (bool setscrollbars)
     do
     {
       cur = cur->next;
-      if (ULong (cur->SendCommand (cscmdListBoxItemCheck, NULL)) == CS_LISTBOXITEMCHECK_SELECTED)
+      if (unsigned (cur->SendCommand (cscmdListBoxItemCheck, NULL)) == CS_LISTBOXITEMCHECK_SELECTED)
         break;
     } while (cur != focused);
     if (cur == focused)
@@ -777,7 +777,7 @@ csComponent *csListBox::ForEachItem (bool (*func) (csComponent *child,
   {
     csComponent *next = cur->next;
 
-    ULong reply = (long)cur->SendCommand (cscmdListBoxItemCheck, NULL);
+    unsigned reply = (long)cur->SendCommand (cscmdListBoxItemCheck, NULL);
     bool ok;
     if (iSelected)
       ok = (reply == CS_LISTBOXITEMCHECK_SELECTED);
@@ -810,7 +810,13 @@ bool csListBox::SetFocused (csComponent *comp)
   if (!csComponent::SetFocused (comp))
     return false;
   if (parent)
-    parent->SendCommand (cscmdListBoxItemFocused, comp);
+  {
+    // Check if it is for real a list box item
+    unsigned rc = (unsigned)comp->SendCommand (cscmdListBoxItemCheck, NULL);
+    if (rc == CS_LISTBOXITEMCHECK_SELECTED
+     || rc == CS_LISTBOXITEMCHECK_UNSELECTED)
+      parent->SendCommand (cscmdListBoxItemFocused, comp);
+  }
   return true;
 }
 

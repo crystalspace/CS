@@ -155,14 +155,12 @@ protected:
   /// Gamma correction value (16.16 format)
   int Gamma;
 
-  /// draw_scanline_xxx routines
-  csDrawScanline* ScanProc [0x13];
-  /// draw_pi_scanline_xxx routines
-  csDrawPIScanline* ScanProcPI [4];
-  /// draw_pi_scanline_gouraud_xxx routines
-  csDrawPIScanlineGouraud* ScanProcPIG [4];
-  /// draw_pi_scanline_fx_xxx routines
-  csDrawPIScanlineGouraud* ScanProcPIFX [4];
+  /// scan_xxx routines
+  csDrawScanline* ScanProc [15];
+  /// scan_pi_xxx routines
+  csDrawPIScanline* ScanProcPI [13];
+  /// scan_pi_xxx routines
+  csDrawPIScanlineGouraud* ScanProcPIG [13];
 
   /// The routine for getting the address of needed scanline_xxx_alpha
   csDrawScanline* (*ScanProc_Alpha) (csGraphics3DSoftwareCommon*, int alpha);
@@ -218,8 +216,8 @@ public:
 
   /// Option variable: do texture lighting?
   bool do_lighting;
-  /// Option variable: render transparent textures?
-  bool do_transp;
+  /// Option variable: render alpha-transparent textures?
+  bool do_alpha;
   /// Option variable: render textures?
   bool do_textured;
   /// Option variable: do very expensive bilinear filtering? (0/1/2)

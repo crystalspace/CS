@@ -53,13 +53,13 @@ csTextureDirect3D::csTextureDirect3D (csTextureMM*             Parent,
   RGBPixel* pPixels   = (RGBPixel *)Image->GetImageData();
   int       NumPixels = get_size ();
 
-  bool transp = Parent->GetTransparent ();
+  bool transp = Parent->GetKeyColor ();
   UByte Transp_Red   = 0;
   UByte Transp_Green = 0;
   UByte Transp_Blue  = 0;
   if (transp)
   {
-    Parent->GetTransparent(Transp_Red, Transp_Green, Transp_Blue);
+    Parent->GetKeyColor(Transp_Red, Transp_Green, Transp_Blue);
   }
 
   switch (For2d ? 

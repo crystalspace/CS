@@ -243,5 +243,7 @@ bool ImageBMPFile::LoadWindowsBitmap (UByte* iBuffer, ULong iSize)
     return true;
   }
 
+  Format &= ~CS_IMGFMT_ALPHA;
+
   return false;
 }

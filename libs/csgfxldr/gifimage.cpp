@@ -371,6 +371,7 @@ int ImageGifFile::decode_gif (UByte* iBuffer, long iSize, int* Prefix,
     code = gptr.nextcode(code_size);
   }
 
+  Format &= ~CS_IMGFMT_ALPHA;
   convert_pal8 (optr.get_image (), palette.get_palette ());
 
   return 0;

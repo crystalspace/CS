@@ -249,5 +249,8 @@ nomem2:
   // Free the row pointers array that is not needed anymore
   delete [] row_pointers;
 
+  // Check if the alpha channel is valid
+  CheckAlpha ();
+
   return true;
 }

@@ -481,9 +481,9 @@ bool csPolygon3D::Poly3D::SetPlane (const char *iName)
 
 bool csPolygon3D::IsTransparent ()
 {
-  if (GetAlpha ())
-    return true;
-  return GetTextureHandle ()->GetTransparent ();
+  return (GetAlpha ()
+       || GetTextureHandle ()->GetAlphaMap ()
+       || GetTextureHandle ()->GetKeyColor ());
 }
 
 int csPolygon3D::Classify (const csPlane3& pl)

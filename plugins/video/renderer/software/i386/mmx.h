@@ -35,7 +35,7 @@ inline void mmxEnd ()
 }
 
 /**
- * The following macros can be used by draw_scanline_XXXX methods
+ * The following macros can be used by scan_XXXX methods
  * to provide high-speed assembly implementations using MMX...
  */
 

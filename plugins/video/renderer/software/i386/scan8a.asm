@@ -25,12 +25,12 @@
 
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 ; Summary:
-;   The internal scanloop for draw_scanline_map_zfil
+;   The internal scanloop for scan_map_zfil
 ;   Draw one horizontal scanline (with lighting)
 ; Arguments:
 ;   none
 ; Example:
-;   scanproc 8,draw_scanline_map_zfil,SCANPROC_MAP,scanloop_map
+;   scanproc 8,scan_map_zfil,SCANPROC_MAP,scanloop_map
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %define		scanloop_map_args 16
 %macro		scanloop_map_init 0
@@ -199,12 +199,12 @@
 
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 ; Summary:
-;   The internal scanloop for mmx_draw_scanline_map_zfil
+;   The internal scanloop for mmx_scan_map_zfil
 ;   Draw one horizontal scanline (with lighting) using MMX
 ; Arguments:
 ;   none
 ; Example:
-;   scanproc 8,mmx_draw_scanline_map_zfil,SCANPROC_MAP|SCANPROC_MMX,mmx_scanloop_map
+;   scanproc 8,mmx_scan_map_zfil,SCANPROC_MAP|SCANPROC_MMX,mmx_scanloop_map
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %define		mmx_scanloop_map_args scanloop_map_args
 %define		mmx_scanloop_map_init scanloop_map_init
@@ -213,12 +213,12 @@
 
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 ; Summary:
-;   The internal scanloop for draw_scanline_map_zuse
+;   The internal scanloop for scan_map_zuse
 ;   Draw one horizontal scanline (Z buffer and lighting).
 ; Arguments:
 ;   none
 ; Example:
-;   scanproc 8,draw_scanline_map_zuse,SCANPROC_MAP,scanloop_map_z
+;   scanproc 8,scan_map_zuse,SCANPROC_MAP,scanloop_map_z
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %define		scanloop_map_z_args 16
 %macro		scanloop_map_z_init 0
@@ -308,12 +308,12 @@
 
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 ; Summary:
-;   The internal scanloop for draw_scanline_map_alpha1
+;   The internal scanloop for scan_map_fixalpha1
 ;   Draw one horizontal scanline (lighting and alpha transparency).
 ; Arguments:
 ;   none
 ; Example:
-;   scanproc 8,draw_scanline_map_alpha1,SCANPROC_MAP,scanloop_map_a1
+;   scanproc 8,scan_map_fixalpha1,SCANPROC_MAP,scanloop_map_a1
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %define		scanloop_map_a1_args 20
 %macro		scanloop_map_a1_init 0
@@ -502,12 +502,12 @@
 
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 ; Summary:
-;   The internal scanloop for draw_scanline_map_alpha2
+;   The internal scanloop for scan_map_fixalpha2
 ;   Draw one horizontal scanline (lighting and alpha transparency).
 ; Arguments:
 ;   none
 ; Example:
-;   scanproc 8,draw_scanline_map_alpha2,SCANPROC_MAP,scanloop_map_a2
+;   scanproc 8,scan_map_fixalpha2,SCANPROC_MAP,scanloop_map_a2
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %define		scanloop_map_a2_args scanloop_map_a1_args
 %define		scanloop_map_a2_init scanloop_map_a1_init
@@ -691,12 +691,12 @@
 
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 ; Summary:
-;   The internal scanloop for draw_scanline_tex_zfil
+;   The internal scanloop for scan_tex_zfil
 ;   Draw one horizontal scanline (no lighting)
 ; Arguments:
 ;   none
 ; Example:
-;   scanproc 8,draw_scanline_tex_zfil,SCANPROC_MAP,scanloop_tex
+;   scanproc 8,scan_tex_zfil,SCANPROC_MAP,scanloop_tex
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %define		scanloop_tex_args 12
 %macro		scanloop_tex_init 0
@@ -760,12 +760,12 @@
 
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 ; Summary:
-;   The internal scanloop for mmx_draw_scanline_tex_zfil
+;   The internal scanloop for mmx_scan_tex_zfil
 ;   Draw one horizontal scanline (no lighting) using MMX
 ; Arguments:
 ;   none
 ; Example:
-;   scanproc 8,mmx_draw_scanline_tex_zfil,SCANPROC_MAP,mmx_scanloop
+;   scanproc 8,mmx_scan_tex_zfil,SCANPROC_MAP,mmx_scanloop
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %define		mmx_scanloop_tex_args scanloop_tex_args
 %define		mmx_scanloop_tex_init scanloop_tex_init
@@ -780,7 +780,7 @@
 ;   long u, long du, long v, long dv, unsigned long z, long dz,
 ;   unsigned char *bitmap, int bitmap_log2w
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
-proc		csScan_8_draw_pi_scanline_tex_zuse,24,ebx,esi,edi,ebp
+proc		csScan_8_scan_pi_tex_zuse,24,ebx,esi,edi,ebp
 		targ	%$dest		; void *dest
 		targ	%$width		; int width
 		targ	%$zbuff		; long *zbuff
@@ -880,10 +880,10 @@ proc		csScan_8_draw_pi_scanline_tex_zuse,24,ebx,esi,edi,ebp
 endproc
 
 ; Create the scanline routines using above defined macros
-scanproc 8,draw_scanline_map_zfil,SCANPROC_MAP,scanloop_map
-scanproc 8,mmx_draw_scanline_map_zfil,SCANPROC_MAP|SCANPROC_MMX,mmx_scanloop_map
-scanproc 8,draw_scanline_map_zuse,SCANPROC_MAP,scanloop_map_z
-scanproc 8,draw_scanline_map_alpha1,SCANPROC_MAP,scanloop_map_a1
-scanproc 8,draw_scanline_map_alpha2,SCANPROC_MAP,scanloop_map_a2
-scanproc 8,draw_scanline_tex_zfil,SCANPROC_TEX,scanloop_tex
-scanproc 8,mmx_draw_scanline_tex_zfil,SCANPROC_TEX|SCANPROC_MMX,mmx_scanloop_tex
+scanproc 8,scan_map_zfil,SCANPROC_MAP,scanloop_map
+scanproc 8,mmx_scan_map_zfil,SCANPROC_MAP|SCANPROC_MMX,mmx_scanloop_map
+scanproc 8,scan_map_zuse,SCANPROC_MAP,scanloop_map_z
+scanproc 8,scan_map_fixalpha1,SCANPROC_MAP,scanloop_map_a1
+scanproc 8,scan_map_fixalpha2,SCANPROC_MAP,scanloop_map_a2
+scanproc 8,scan_tex_zfil,SCANPROC_TEX,scanloop_tex
+scanproc 8,mmx_scan_tex_zfil,SCANPROC_TEX|SCANPROC_MMX,mmx_scanloop_tex

@@ -229,6 +229,10 @@ bool ImageTgaFile::Load (UByte* iBuffer, ULong iSize)
 
   // Convert image from RGB to requested format
   convert_rgba (pixels);
+
+  // Check if the alpha channel is valid
+  CheckAlpha ();
+
   return true;
 }
 

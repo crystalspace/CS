@@ -382,7 +382,7 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
     // the original mipmap by a factor of 2 in both directions.  You must keep
     //  reducing the mipmap size until you get down to the 1x1 size mipmap.
     int mipmaplevel = 0;
-    transp = txt_handle->GetTransparent () ? txt_mm->get_transparent () : NULL;
+    transp = txt_handle->GetKeyColor () ? txt_mm->get_transparent () : NULL;
     iImage *previmg = NULL;
     int twhack = 0, thhack = 0;
     while (true)
@@ -478,7 +478,7 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
   {
     // Non-mipmapped texture
     csTextureOpenGL *txt = (csTextureOpenGL *)txt_mm->get_texture (0);
-    transp = txt_handle->GetTransparent () ? txt_mm->get_transparent () : NULL;
+    transp = txt_handle->GetKeyColor () ? txt_mm->get_transparent () : NULL;
     if (txt)
     {
       tw = txt->get_width ();

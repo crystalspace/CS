@@ -32,9 +32,9 @@ csScanSetup Scan;
 
 //---------------------- This routine is pixel-depth independent ---
 
-#ifndef NO_draw_scanline_zfil
+#ifndef NO_scan_zfil
 
-void csScan_draw_scanline_zfil (int xx, unsigned char* d,
+void csScan_scan_zfil (int xx, unsigned char* d,
   ULong* z_buf, float inv_z, float u_div_z, float v_div_z PIXEL_ADJUST)
 {
   (void)u_div_z; (void)v_div_z; (void)inv_z; (void)d;
@@ -51,11 +51,11 @@ void csScan_draw_scanline_zfil (int xx, unsigned char* d,
   while (z_buf <= lastZbuf);
 }
 
-#endif // NO_draw_scanline_zfil
+#endif // NO_scan_zfil
 
 //------------------------------------------------------------------
 
-void csScan_draw_pi_scanline_zfil (void *dest, int len, unsigned long *zbuff,
+void csScan_scan_pi_zfil (void *dest, int len, unsigned long *zbuff,
   long u, long du, long v, long dv, unsigned long z, long dz,
   unsigned char *bitmap, int bitmap_log2w)
 {
@@ -156,7 +156,6 @@ void csScan_CalcBlendTables (int rbits, int gbits, int bbits)
         CALC (BLENDTABLE_ADD,       dst + src);
         CALC (BLENDTABLE_MULTIPLY,  ((dst * src) + (max_val / 2)) >> max_bits);
         CALC (BLENDTABLE_MULTIPLY2, ((dst * src * 2) + (max_val / 2)) >> max_bits);
-        CALC (BLENDTABLE_ALPHA00,   src);
         CALC (BLENDTABLE_ALPHA25,   (dst + src * 3 + 2) / 4);
         CALC (BLENDTABLE_ALPHA50,   (dst + src + 1) / 2);
         CALC (BLENDTABLE_ALPHA75,   (dst * 3 + src + 2) / 4);
@@ -185,10 +184,13 @@ void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
   Scan.and_w = untxt->get_w_mask ();
   Scan.shf_h = untxt->get_h_shift ();
   Scan.and_h = untxt->get_h_mask ();
+  Scan.PaletteTable = texture->GetPaletteToGlobal ();
+  Scan.PrivateCMap = texture->GetPaletteToGlobal8 ();
 
   UByte r, g, b;
   texture->GetMeanColor (r, g, b);
   Scan.FlatColor = g3d->texman->FindRGB (r, g, b);
+  Scan.inv_cmap = g3d->texman->inv_cmap;
 
   if (g3d->do_lighting)
   {

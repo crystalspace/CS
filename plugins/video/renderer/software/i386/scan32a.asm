@@ -25,12 +25,12 @@
 
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 ; Summary:
-;   The internal scanloop for draw_scanline_map_zfil
+;   The internal scanloop for scan_map_zfil
 ;   Draw one horizontal scanline (with lighting)
 ; Arguments:
 ;   none
 ; Example:
-;   scanproc 32,draw_scanline_map_zfil,SCANPROC_MAP,scanloop_map
+;   scanproc 32,scan_map_zfil,SCANPROC_MAP,scanloop_map
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %define		scanloop_map_args 24
 %macro		scanloop_map_init 0
@@ -199,12 +199,12 @@
 
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 ; Summary:
-;   The internal scanloop for mmx_draw_scanline_map_zfil
+;   The internal scanloop for mmx_scan_map_zfil
 ;   Draw one horizontal scanline (with lighting) using MMX
 ; Arguments:
 ;   none
 ; Example:
-;   scanproc 32,mmx_draw_scanline_map_zfil,SCANPROC_MAP|SCANPROC_MMX,mmx_scanloop_map
+;   scanproc 32,mmx_scan_map_zfil,SCANPROC_MAP|SCANPROC_MMX,mmx_scanloop_map
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %define		mmx_scanloop_map_args scanloop_map_args
 %define		mmx_scanloop_map_init scanloop_map_init
@@ -213,12 +213,12 @@
 
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 ; Summary:
-;   The internal scanloop for draw_scanline_map_zuse
+;   The internal scanloop for scan_map_zuse
 ;   Draw one horizontal scanline (Z buffer and lighting).
 ; Arguments:
 ;   none
 ; Example:
-;   scanproc 32,draw_scanline_map_zuse,SCANPROC_MAP,scanloop_map_z
+;   scanproc 32,scan_map_zuse,SCANPROC_MAP,scanloop_map_z
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %define		scanloop_map_z_args 24
 %macro		scanloop_map_z_init 0
@@ -314,12 +314,12 @@
 
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 ; Summary:
-;   The internal scanloop for draw_scanline_map_alpha50
+;   The internal scanloop for scan_map_fixalpha50
 ;   Draw one horizontal scanline (transparency and lighting).
 ; Arguments:
 ;   none
 ; Example:
-;   scanproc 32,draw_scanline_map_alpha50,SCANPROC_MAP,scanloop_map_a50
+;   scanproc 32,scan_map_fixalpha50,SCANPROC_MAP,scanloop_map_a50
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %define		scanloop_map_a50_args 28
 %macro		scanloop_map_a50_init 0
@@ -494,12 +494,12 @@
 
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 ; Summary:
-;   The internal scanloop for draw_scanline_tex_zfil
+;   The internal scanloop for scan_tex_zfil
 ;   Draw one horizontal scanline (no lighting)
 ; Arguments:
 ;   none
 ; Example:
-;   scanproc 32,draw_scanline_tex_zfil,0,scanloop_tex
+;   scanproc 32,scan_tex_zfil,0,scanloop_tex
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %define		scanloop_tex_args 8
 %macro		scanloop_tex_init 0
@@ -558,12 +558,12 @@
 
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 ; Summary:
-;   The internal scanloop for mmx_draw_scanline_tex_zfil
+;   The internal scanloop for mmx_scan_tex_zfil
 ;   Draw one horizontal scanline (no lighting) using MMX
 ; Arguments:
 ;   none
 ; Example:
-;   scanproc 32,mmx_draw_scanline_tex_zfil,SCANPROC_MAP,mmx_scanloop_tex
+;   scanproc 32,mmx_scan_tex_zfil,SCANPROC_MAP,mmx_scanloop_tex
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %define		mmx_scanloop_tex_args scanloop_tex_args
 %define		mmx_scanloop_tex_init scanloop_tex_init
@@ -577,7 +577,7 @@
 ;   int xx, unsigned char *d, unsigned long *z_buf,
 ;   float inv_z, float u_div_z, float v_div_z
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
-proc		csScan_32_draw_scanline_fog,36,ebx,esi,edi,ebp
+proc		csScan_32_scan_fog,36,ebx,esi,edi,ebp
 		targ	%$width		; int
 		targ	%$dest		; unsigned char *
 		targ	%$zbuff		; unsigned long *
@@ -742,7 +742,7 @@ endproc
 ;   int xx, unsigned char *d, unsigned long *z_buf,
 ;   float inv_z, float u_div_z, float v_div_z
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
-proc		csScan_32_draw_scanline_fog_view,28,ebx,esi,edi,ebp
+proc		csScan_32_scan_fog_view,28,ebx,esi,edi,ebp
 		targ	%$width		; int
 		targ	%$dest		; unsigned char *
 		targ	%$zbuff		; unsigned long *
@@ -845,9 +845,9 @@ proc		csScan_32_draw_scanline_fog_view,28,ebx,esi,edi,ebp
 %$fogexit:
 endproc
 
-scanproc 32,draw_scanline_map_zfil,SCANPROC_MAP,scanloop_map
-scanproc 32,mmx_draw_scanline_map_zfil,SCANPROC_MAP|SCANPROC_MMX,mmx_scanloop_map
-scanproc 32,draw_scanline_map_zuse,SCANPROC_MAP,scanloop_map_z
-scanproc 32,draw_scanline_map_alpha50,SCANPROC_MAP,scanloop_map_a50
-scanproc 32,draw_scanline_tex_zfil,SCANPROC_TEX,scanloop_tex
-scanproc 32,mmx_draw_scanline_tex_zfil,SCANPROC_TEX|SCANPROC_MMX,mmx_scanloop_tex
+scanproc 32,scan_map_zfil,SCANPROC_MAP,scanloop_map
+scanproc 32,mmx_scan_map_zfil,SCANPROC_MAP|SCANPROC_MMX,mmx_scanloop_map
+scanproc 32,scan_map_zuse,SCANPROC_MAP,scanloop_map_z
+scanproc 32,scan_map_fixalpha50,SCANPROC_MAP,scanloop_map_a50
+scanproc 32,scan_tex_zfil,SCANPROC_TEX,scanloop_tex
+scanproc 32,mmx_scan_tex_zfil,SCANPROC_TEX|SCANPROC_MMX,mmx_scanloop_tex

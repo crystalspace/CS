@@ -183,6 +183,13 @@ bool ImageJpgFile::Load (UByte* iBuffer, ULong iSize)
   struct my_error_mgr jerr;
   int row_stride;		/* physical row width in output buffer */
 
+  // For now we don't support alpha-map images
+  // The libjpeg docs are unclear on this subject, it seems that alpha
+  // mapped images could be supported by libjpeg (it supports a random
+  // number of abstract color channels) but I (A.Z.) just don't have
+  // alpha-mapped JPEG images and can't test it.
+  Format &= ~CS_IMGFMT_ALPHA;
+
   int i;
 
   /* ==== Step 1: allocate and initialize JPEG decompression object */

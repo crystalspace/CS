@@ -372,7 +372,7 @@ void funConsole::PrepPix( csIniFile *ini, const char *sect, ConDecoBorder &borde
 	  const char *kc = ini->GetStr( sect, "keycolor", "0,0,0" );
 	  sscanf( kc, "%d,%d,%d", &r, &g, &b );
 	  border.kr=r; border.kg=g; border.kb=b;
-	  border.txt->SetTransparent ( border.kr, border.kg, border.kb );
+	  border.txt->SetKeyColor ( border.kr, border.kg, border.kb );
 	}
 
 	border.do_stretch = ini->GetYesNo( sect, "do_stretch", false );

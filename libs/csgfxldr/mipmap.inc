@@ -11,7 +11,7 @@
     MIPMAP_ALPHA	- Process image as alpha channel (i.e. like paletted
 			  image without an actual palette).
     MIPMAP_TRANSPARENT	- Accept an additional parameter that specifies an
-			  transparent color. Transparent colors are handled
+			  transparent color. Key colors are handled
 			  in a special way.
 */
 

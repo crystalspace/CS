@@ -31,17 +31,17 @@ struct iGraphics3D;
  */
 struct iTextureHandle : public iBase
 {
-  /// Enable transparent color
-  virtual void SetTransparent (bool Enable) = 0;
+  /// Enable key color
+  virtual void SetKeyColor (bool Enable) = 0;
 
-  /// Set the transparent color.
-  virtual void SetTransparent (UByte red, UByte green, UByte blue) = 0;
+  /// Set the key color.
+  virtual void SetKeyColor (UByte red, UByte green, UByte blue) = 0;
 
-  /// Get the transparent status (false if no transparency, true if transparency).
-  virtual bool GetTransparent () = 0;
+  /// Get the key color status (false if disabled, true if enabled).
+  virtual bool GetKeyColor () = 0;
 
-  /// Get the transparent color
-  virtual void GetTransparent (UByte &red, UByte &green, UByte &blue) = 0;
+  /// Get the key color
+  virtual void GetKeyColor (UByte &red, UByte &green, UByte &blue) = 0;
 
   /**
    * Get the dimensions for a given mipmap level (0 to 3).
@@ -80,6 +80,13 @@ struct iTextureHandle : public iBase
    * (currently unimplemented)
    */
   virtual void ProcTextureSync () = 0;
+
+  /**
+   * Query if the texture has an alpha channel.<p>
+   * This depends both on whenever the original image had an alpha channel
+   * and of the fact whenever the renderer supports alpha maps at all.
+   */
+  virtual bool GetAlphaMap () = 0;
 };
 
 #endif //ITEXTURE_H

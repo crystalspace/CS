@@ -109,16 +109,16 @@ public:
   DECLARE_IBASE;
 
   /// Enable transparent color
-  virtual void SetTransparent (bool Enable);
+  virtual void SetKeyColor (bool Enable);
 
   /// Set the transparent color.
-  virtual void SetTransparent (UByte red, UByte green, UByte blue);
+  virtual void SetKeyColor (UByte red, UByte green, UByte blue);
 
   /// Get the transparent status (false if no transparency, true if transparency).
-  virtual bool GetTransparent ();
+  virtual bool GetKeyColor ();
 
   /// Get the transparent color
-  virtual void GetTransparent (UByte &r, UByte &g, UByte &b);
+  virtual void GetKeyColor (UByte &r, UByte &g, UByte &b);
 
   /**
    * Get the dimensions for a given mipmap level (0 to 3).
@@ -286,6 +286,14 @@ public:
   virtual void ReserveColor (int r, int g, int b);
   /// Really allocate the palette on the system.
   virtual void SetPalette ();
+
+  /**
+   * Query if the texture has an alpha channel.<p>
+   * This depends both on whenever the original image had an alpha channel
+   * and of the fact whenever the renderer supports alpha maps at all.
+   */
+  virtual bool GetAlphaMap ()
+  { return false; }
 };
 
 #endif // __TXTMGR_H__

@@ -287,13 +287,7 @@ class csTreeCtrl : public csComponent
     csComponent *item;
     bool open;
   };
-
-friend bool CompareTreeCtrlNode (csTreeNode *node, csSome param, bool stopOnSuccess);
-friend bool TreeItemSelected (csTreeNode *node, csSome param, bool stopOnSuccess);
-friend bool ZipTreeItemCanvas (csTreeNode *node, csSome param, bool stopOnSuccess);
-friend bool OpenAllItems (csTreeNode *node, csSome param, bool stopOnSuccess);
-friend bool CollapsAllItems (csTreeNode *node, csSome param, bool stopOnSuccess);
-friend bool BranchOpen (csTreeNode *node);
+  friend class TreeCtrlNode;
 
   TreeCtrlNode *treeroot;
   /// Tree style
@@ -398,7 +392,13 @@ protected:
   /// Draw the branches of the tree
   void DrawBranches ();
 
-
+private:
+  static bool CompareTreeCtrlNode (csTreeNode *node, csSome param, bool stopOnSuccess);
+  static bool TreeItemSelected (csTreeNode *node, csSome param, bool stopOnSuccess);
+  static bool ZipTreeItemCanvas (csTreeNode *node, csSome param, bool stopOnSuccess);
+  static bool OpenAllItems (csTreeNode *node, csSome param, bool stopOnSuccess);
+  static bool CollapsAllItems (csTreeNode *node, csSome param, bool stopOnSuccess);
+  static bool BranchOpen (csTreeNode *node);
 };
 
 #endif

@@ -175,7 +175,7 @@ class csGraphics3DDirect3DDx6 : public iGraphics3D
   /// do we batch up polygons for PolygonFX calls?
   bool m_bBatchPolygonFX;
   /// do we render as translucent when requested?
-  bool m_bRenderTransparent;
+  bool m_bRenderKeyColor;
   /// do we render lightmaps?
   bool m_bRenderLightmap;
   /// can we use multitexturing?

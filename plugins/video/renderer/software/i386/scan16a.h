@@ -21,17 +21,17 @@
 #ifndef __SCAN16A_H__
 #define __SCAN16A_H__
 
-#define NO_draw_scanline_map_zfil
-#define NO_mmx_draw_scanline_map_zfil
-#define NO_draw_scanline_map_zuse
-#define NO_draw_scanline_map_alpha50
-#define NO_draw_scanline_tex_zfil
-#define NO_mmx_draw_scanline_tex_zfil
-#define NO_draw_pi_scanline_tex_zuse
-#define NO_mmx_draw_pi_scanline_tex_zuse
-#define NO_draw_scanline_fog_555
-#define NO_draw_scanline_fog_565
-#define NO_draw_scanline_fog_view_555
-#define NO_draw_scanline_fog_view_565
+#define NO_scan_map_zfil
+#define NO_mmx_scan_map_zfil
+#define NO_scan_map_zuse
+#define NO_scan_map_fixalpha50
+#define NO_scan_tex_zfil
+#define NO_mmx_scan_tex_zfil
+#define NO_scan_pi_tex_zuse
+#define NO_mmx_scan_pi_tex_zuse
+#define NO_scan_fog_555
+#define NO_scan_fog_565
+#define NO_scan_fog_view_555
+#define NO_scan_fog_view_565
 
 #endif // __SCAN16A_H__

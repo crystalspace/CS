@@ -115,6 +115,9 @@ struct iImage : public iBase
 
   /// Create a new image and copy a subpart of the actual image into the new image.
   virtual iImage *Crop (int x, int y, int width, int height) = 0;
+
+  /// Check if all alpha values are "non-transparent" and if so, discard alpha
+  virtual void CheckAlpha () = 0;
 };
 
 #endif // __IIMAGE_H__

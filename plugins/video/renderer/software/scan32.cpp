@@ -33,7 +33,7 @@
 #  endif //PROC_INTEL
 #endif //!NO_ASSEMBLER
 
-//--//--//--//--//--//--//--//--//--//--//--//--//-- draw_scanline_XXXX --//--//
+//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--/ scan_XXXX --//--//
 
 #include "scanxx.inc"
 
@@ -47,9 +47,9 @@
 #  define PIXEL_POSTPROC(x) (x)
 #endif
 
-#ifndef NO_draw_scanline_fog
+#ifndef NO_scan_fog
 
-void csScan_32_draw_scanline_fog (int xx, unsigned char* d,
+void csScan_32_scan_fog (int xx, unsigned char* d,
   unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z PIXEL_ADJUST)
 {
   if (xx <= 0) return;
@@ -99,13 +99,13 @@ fd_done:
   while (_dest < _destend);
 }
 
-#endif // NO_draw_scanline_fog
+#endif // NO_scan_fog
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_scanline_fog_view
+#ifndef NO_scan_fog_view
 
-void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
+void csScan_32_scan_fog_view (int xx, unsigned char* d,
   unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z PIXEL_ADJUST)
 {
   if (xx <= 0) return;
@@ -139,13 +139,13 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
   while (_dest < _destend);
 }
 
-#endif // NO_draw_scanline_fog_view
+#endif // NO_scan_fog_view
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_scanline_map_alpha50
+#ifndef NO_scan_map_fixalpha50
 
-#define SCANFUNC csScan_32_draw_scanline_map_alpha50
+#define SCANFUNC csScan_32_scan_map_fixalpha50
 #define SCANMAP
 #define SCANLOOP \
     do									\
@@ -159,17 +159,17 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
     while (_dest <= _destend)
 #include "scanln.inc"
 
-#endif // NO_draw_scanline_map_alpha50
+#endif // NO_scan_map_fixalpha50
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_scanline_map_alpha
+#ifndef NO_scan_map_fixalpha
 
 // Note that we don't actually need separate procedures for RGB and BGR
 // encodings: the cause is that R,G and B variables below are named so
 // not because they will always contain respective values, but just
 // for cleaner understanding how the procedure works.
-#define SCANFUNC csScan_32_draw_scanline_map_alpha
+#define SCANFUNC csScan_32_scan_map_fixalpha
 #define SCANMAP
 #define SCANLOOP \
     do									\
@@ -188,11 +188,11 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
     while (_dest <= _destend)
 #include "scanln.inc"
 
-#endif // NO_draw_scanline_map_alpha
+#endif // NO_scan_map_fixalpha
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_scanline_map_filt2_zfil
+#ifndef NO_scan_map_filt2_zfil
 
 /*
     Strangely enough, but 16 interpolation steps are quite enough
@@ -201,7 +201,7 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
     puzzle with same 6 multiplies per pixel as in 16-bit modes (!)
 */
 
-#define SCANFUNC csScan_32_draw_scanline_map_filt2_zfil
+#define SCANFUNC csScan_32_scan_map_filt2_zfil
 #define SCANMAP
 #define SCANLOOP							\
     if ((duu > 0xffff) || (dvv > 0xffff))				\
@@ -247,13 +247,13 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
     while (z_buffer <= lastZbuf)
 #include "scanln.inc"
 
-#endif // NO_draw_scanline_map_filt2_zfil
+#endif // NO_scan_map_filt2_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_scanline_map_filt2_zuse
+#ifndef NO_scan_map_filt2_zuse
 
-#define SCANFUNC csScan_32_draw_scanline_map_filt2_zuse
+#define SCANFUNC csScan_32_scan_map_filt2_zuse
 #define SCANMAP
 #define SCANLOOP							\
     if ((duu > 0xffff) || (dvv > 0xffff))				\
@@ -305,154 +305,340 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
       while (_dest <= _destend);
 #include "scanln.inc"
 
-#endif // NO_draw_scanline_map_filt2_zuse
+#endif // NO_scan_map_filt2_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pi_scanline_tex_zfil
+#ifndef NO_scan_map_alpha
 
-#define PI_SCANFUNC csScan_32_draw_pi_scanline_tex_zfil
-#define PI_ZFILL
-#define PI_R8G8B8
-#include "scanpi.inc"
+#define A_SCANFUNC csScan_32_scan_map_alpha
+#define A_MAP
+#define A_R8G8B8
+#include "scanalph.inc"
 
-#endif // NO_draw_pi_scanline_tex_zfil
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_pi_scanline_tex_zuse
-
-#define PI_SCANFUNC csScan_32_draw_pi_scanline_tex_zuse
-#define PI_ZUSE
-#define PI_R8G8B8
-#include "scanpi.inc"
-
-#endif // NO_draw_pi_scanline_tex_zuse
+#endif // NO_scan_map_alpha
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pi_scanline_tex_gouraud_zfil
+#ifndef NO_scan_tex_alpha
 
-#define PI_SCANFUNC csScan_32_draw_pi_scanline_tex_gouraud_zfil
-#define PI_ZFILL
-#define PI_GOURAUD
-#define PI_R8G8B8
-#include "scanpi.inc"
+#define A_SCANFUNC csScan_32_scan_tex_alpha
+#define A_R8G8B8
+#include "scanalph.inc"
 
-#endif // NO_draw_pi_scanline_tex_gouraud_zfil
+#endif // NO_scan_tex_alpha
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pi_scanline_tex_gouraud_zuse
+#ifndef NO_scan_pi_tex_alpha
 
-#define PI_SCANFUNC csScan_32_draw_pi_scanline_tex_gouraud_zuse
-#define PI_ZUSE
-#define PI_GOURAUD
-#define PI_R8G8B8
-#include "scanpi.inc"
+#define A_SCANFUNC csScan_32_scan_pi_tex_alpha
+#define A_PI
+#define A_R8G8B8
+#include "scanalph.inc"
 
-#endif // NO_draw_pi_scanline_tex_gouraud_zuse
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_pi_scanline_flat_gouraud_zfil
-
-#define PI_SCANFUNC csScan_32_draw_pi_scanline_flat_gouraud_zfil
-#define PI_FLAT
-#define PI_ZFILL
-#define PI_GOURAUD
-#define PI_R8G8B8
-#include "scanpi.inc"
-
-#endif // NO_draw_pi_scanline_flat_gouraud_zfil
+#endif // NO_scan_pi_tex_alpha
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pi_scanline_flat_gouraud_zuse
+#ifndef NO_scan_pi_flat_zfil
 
-#define PI_SCANFUNC csScan_32_draw_pi_scanline_flat_gouraud_zuse
-#define PI_FLAT
-#define PI_ZUSE
-#define PI_GOURAUD
-#define PI_R8G8B8
-#include "scanpi.inc"
-
-#endif // NO_draw_pi_scanline_flat_gouraud_zuse
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_pi_scanline_flat_zfil
-
-#define PI_SCANFUNC csScan_32_draw_pi_scanline_flat_zfil
+#define PI_SCANFUNC csScan_32_scan_pi_flat_zfil
 #define PI_FLAT
 #define PI_ZFILL
 #define PI_R8G8B8
 #include "scanpi.inc"
 
-#endif // NO_draw_pi_scanline_flat_zfil
+#endif // NO_scan_pi_flat_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pi_scanline_flat_zuse
+#ifndef NO_scan_pi_flat_zuse
 
-#define PI_SCANFUNC csScan_32_draw_pi_scanline_flat_zuse
+#define PI_SCANFUNC csScan_32_scan_pi_flat_zuse
 #define PI_FLAT
 #define PI_ZUSE
 #define PI_R8G8B8
 #include "scanpi.inc"
 
-#endif // NO_draw_pi_scanline_flat_zuse
+#endif // NO_scan_pi_flat_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pifx_scanline_tex_zfil
+#ifndef NO_scan_pi_tex_zfil
 
-#define PI_SCANFUNC csScan_32_draw_pifx_scanline_tex_zfil
+#define PI_SCANFUNC csScan_32_scan_pi_tex_zfil
 #define PI_ZFILL
-#define PI_GOURAUD
 #define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_zuse
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_zuse
+#define PI_ZUSE
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_key_zfil
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_key_zfil
+#define PI_ZFILL
+#define PI_COLORKEY
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_key_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_key_zuse
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_key_zuse
+#define PI_ZUSE
+#define PI_COLORKEY
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_key_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_flat_fx_zfil
+
+#define PI_SCANFUNC csScan_32_scan_pi_flat_fx_zfil
+#define PI_FLAT
+#define PI_ZFILL
 #define PI_BLEND
+#define PI_R8G8B8
 #include "scanpi.inc"
 
-#endif
+#endif // NO_scan_pi_flat_fx_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pifx_scanline_tex_zuse
+#ifndef NO_scan_pi_flat_fx_zuse
 
-#define PI_SCANFUNC csScan_32_draw_pifx_scanline_tex_zuse
+#define PI_SCANFUNC csScan_32_scan_pi_flat_fx_zuse
+#define PI_FLAT
+#define PI_ZUSE
+#define PI_BLEND
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_flat_fx_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_fx_zfil
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_fx_zfil
+#define PI_ZFILL
+#define PI_BLEND
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_fx_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_fx_zuse
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_fx_zuse
+#define PI_ZUSE
+#define PI_BLEND
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_fx_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_fxkey_zfil
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_fxkey_zfil
+#define PI_ZFILL
+#define PI_COLORKEY
+#define PI_BLEND
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_fxkey_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_fxkey_zuse
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_fxkey_zuse
+#define PI_ZUSE
+#define PI_COLORKEY
+#define PI_BLEND
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_fxkey_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_flat_gou_zfil
+
+#define PI_SCANFUNC csScan_32_scan_pi_flat_gou_zfil
+#define PI_FLAT
+#define PI_ZFILL
+#define PI_GOURAUD
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_flat_gou_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_flat_gou_zuse
+
+#define PI_SCANFUNC csScan_32_scan_pi_flat_gou_zuse
+#define PI_FLAT
 #define PI_ZUSE
 #define PI_GOURAUD
 #define PI_R8G8B8
-#define PI_BLEND
 #include "scanpi.inc"
 
-#endif
+#endif // NO_scan_pi_flat_gou_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pifx_scanline_tex_transp_zfil
+#ifndef NO_scan_pi_tex_gou_zfil
 
-#define PI_SCANFUNC csScan_32_draw_pifx_scanline_tex_transp_zfil
+#define PI_SCANFUNC csScan_32_scan_pi_tex_gou_zfil
+#define PI_ZFILL
+#define PI_GOURAUD
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_gou_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_gou_zuse
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_gou_zuse
+#define PI_ZUSE
+#define PI_GOURAUD
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_gou_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_goukey_zfil
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_goukey_zfil
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_COLORKEY
 #define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_goukey_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_goukey_zuse
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_goukey_zuse
+#define PI_ZUSE
+#define PI_GOURAUD
+#define PI_COLORKEY
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_goukey_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_flat_goufx_zfil
+
+#define PI_SCANFUNC csScan_32_scan_pi_flat_goufx_zfil
+#define PI_FLAT
+#define PI_ZFILL
+#define PI_GOURAUD
 #define PI_BLEND
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_flat_goufx_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_flat_goufx_zuse
+
+#define PI_SCANFUNC csScan_32_scan_pi_flat_goufx_zuse
+#define PI_FLAT
+#define PI_ZUSE
+#define PI_GOURAUD
+#define PI_BLEND
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_flat_goufx_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_goufx_zfil
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_goufx_zfil
+#define PI_ZFILL
+#define PI_GOURAUD
+#define PI_BLEND
+#define PI_R8G8B8
 #include "scanpi.inc"
 
 #endif
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pifx_scanline_tex_transp_zuse
+#ifndef NO_scan_pi_tex_goufx_zuse
 
-#define PI_SCANFUNC csScan_32_draw_pifx_scanline_tex_transp_zuse
+#define PI_SCANFUNC csScan_32_scan_pi_tex_goufx_zuse
+#define PI_ZUSE
+#define PI_GOURAUD
+#define PI_BLEND
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_goufxkey_zfil
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_goufxkey_zfil
+#define PI_ZFILL
+#define PI_GOURAUD
+#define PI_COLORKEY
+#define PI_BLEND
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_goufxkey_zuse
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_goufxkey_zuse
 #define PI_ZUSE
 #define PI_GOURAUD
 #define PI_COLORKEY
-#define PI_R8G8B8
 #define PI_BLEND
+#define PI_R8G8B8
 #include "scanpi.inc"
 
 #endif

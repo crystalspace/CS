@@ -1044,7 +1044,7 @@ void csGraphics3DGlide::StartPolygonFX (iTextureHandle *handle,  UInt mode)
   if ( mode & CS_FX_KEYCOLOR )
   {
     GlideLib_grChromakeyMode (GR_CHROMAKEY_ENABLE);
-    handle->GetTransparent ( r, g, b );
+    handle->GetKeyColor ( r, g, b );
     GlideLib_grChromakeyValue (0xff << 24 | r << 16 | g << 8 | b );
   }
   
@@ -1416,7 +1416,7 @@ void csGraphics3DGlide::DrawPixmap ( iTextureHandle *hTex,
   spr2d.vertices[3].z = 1;
   
   spr2d.txt_handle = hTex;
-  StartPolygonFX ( hTex, CS_FX_COPY | ( hTex->GetTransparent() ? CS_FX_KEYCOLOR : 0 ) );
+  StartPolygonFX ( hTex, CS_FX_COPY | ( hTex->GetKeyColor() ? CS_FX_KEYCOLOR : 0 ) );
   DrawPolygonFX ( spr2d );
   FinishPolygonFX ();
 }

@@ -136,6 +136,7 @@ csTextureMMSoftware::csTextureMMSoftware (csTextureManagerSoftware *texman,
   iImage *image, int flags) : csTextureMM (image, flags)
 {
   pal2glob = NULL;
+  pal2glob8 = NULL;
   if (flags & CS_TEXTURE_3D)
     AdjustSizePo2 ();
   orig_palette = NULL;
@@ -145,8 +146,9 @@ csTextureMMSoftware::csTextureMMSoftware (csTextureManagerSoftware *texman,
 csTextureMMSoftware::~csTextureMMSoftware ()
 {
   delete [] (UByte *)pal2glob;
+  delete [] pal2glob8;
   delete [] orig_palette;
-  if (((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC) && 
+  if (((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC) &&
       (texman->pfmt.PixelBytes == 1))
     texman->UnRegister8BitCanvas 
                       (((csTextureSoftwareProc *)tex[0])->texG3D->GetDriver2D ());
@@ -216,6 +218,23 @@ void csTextureMMSoftware::ComputeMeanColor ()
         csQuantizeRemap ((RGBPixel *)t->image->GetImageData (),
           t->get_size (), t->bitmap, tc);
 
+      // Get the alpha map for the texture, if present
+      if (t->image->GetFormat () & CS_IMGFMT_ALPHA)
+      {
+        RGBPixel *srcimg = (RGBPixel *)t->image->GetImageData ();
+        size_t imgsize = t->get_size ();
+        uint8 *dstalpha = t->alphamap = new uint8 [imgsize];
+        // In 8- and 16-bit modes we limit the alpha to 5 bits (32 values)
+        // This is related to the internal implementation of alphamap
+        // routine and is quite enough for 5-5-5 and 5-6-5 modes.
+        if (texman->pfmt.PixelBytes != 4)
+          while (imgsize--)
+            *dstalpha++ = srcimg++->alpha >> 3;
+        else
+          while (imgsize--)
+            *dstalpha++ = srcimg++->alpha;
+      }
+
       if (destroy_image)
       {
 	// Very well, we don't need the iImage anymore, so free it
@@ -277,9 +296,15 @@ void csTextureMMSoftware::remap_texture ()
     case 1:
       delete [] (UByte *)pal2glob;
       pal2glob = new UByte [palette_size * sizeof (UByte)];
+      delete [] pal2glob8;
+      pal2glob8 = new uint16 [palette_size];
       for (i = 0; i < palette_size; i++)
+      {
         ((UByte *)pal2glob) [i] = texman->cmap.find_rgb (palette [i].red,
           palette [i].green, palette [i].blue);
+        pal2glob8 [i] = texman->encode_rgb (palette [i].red,
+          palette [i].green, palette [i].blue);
+      }
       break;
     case 2:
       delete [] (UShort *)pal2glob;
@@ -359,6 +384,9 @@ void csTextureMMSoftware::MapToGlobalPalette (RGBPixel* pal_8bit)
   memcpy (palette, pal_8bit, sizeof(RGBPixel)*256);
   pal2glob = new UByte [256 * sizeof (UByte)];
   memcpy (pal2glob, texman->inv_cmap, sizeof (UByte) * 256);
+  for (int i = 0; i < palette_size; i++)
+    pal2glob8 [i] = texman->encode_rgb (palette [i].red,
+      palette [i].green, palette [i].blue);
 }
 
 void csTextureMMSoftware::RePrepareProcTexture ()
@@ -396,6 +424,7 @@ csTextureManagerSoftware::csTextureManagerSoftware (iSystem *iSys,
   inv_cmap = NULL;
   alone_proc_tex = NULL;
   mG2D = NULL;
+  Scan.GlobalCMap = NULL;
 }
 
 void csTextureManagerSoftware::SetGamma (float iGamma)
@@ -436,6 +465,9 @@ void csTextureManagerSoftware::SetPixelFormat (csPixelFormat &PixelFormat)
     lightmap_tables [2] = lightmap_tables [1];
   else
     lightmap_tables [2] = GenLightmapTable (pfmt.BlueBits);
+
+  if (pfmt.PixelBytes == 1)
+    Scan.GlobalCMap = new uint16 [256];
 }
 
 void csTextureManagerSoftware::read_config (csIniFile *config)
@@ -525,6 +557,10 @@ void csTextureManagerSoftware::create_inv_cmap ()
   // Color number 0 is reserved for transparency
   inv_cmap [encode_rgb (cmap [0].red, cmap [0].green, cmap [0].blue)] =
     cmap.find_rgb (cmap [0].red, cmap [0].green, cmap [0].blue);
+
+  // Now we'll encode the palette into 16-bit values
+  for (int i = 0; i < 256; i++)
+    Scan.GlobalCMap [i] = encode_rgb (cmap [i].red, cmap [i].green, cmap [i].blue);
 }
 
 void csTextureManagerSoftware::create_alpha_tables ()
@@ -583,7 +619,7 @@ void csTextureManagerSoftware::compute_palette ()
     int colormapsize;
     txt->GetOriginalColormap (colormap, colormapsize);
     RGBPixel *cmap = colormap;
-    if (txt->GetTransparent ())
+    if (txt->GetKeyColor ())
       cmap++, colormapsize--;
     csQuantizeCount (cmap, colormapsize);
   }
@@ -659,6 +695,7 @@ void csTextureManagerSoftware::PrepareTextures ()
 	 == (CS_TEXTURE_PROC | CS_TEXTURE_PROC_ALONE_HINT)))
 	((csTextureMMSoftware*)txt)->MapToGlobalPalette (&cmap.palette[0]);
   }
+  delete [] Scan.GlobalCMap;
 }
 
 iTextureHandle *csTextureManagerSoftware::RegisterTexture (iImage* image,

@@ -29,18 +29,18 @@ class TxtHandleVector;
 struct iSoftProcTexture;
 
 /**
- * This class implements the functionality required to utilise a software 
+ * This class implements the functionality required to utilise a software
  * renderer for its procedural textures. The reason for having this option is
  * that under some circumstances this will be faster than the back buffer
- * and auxiliary buffer implementations. glCopyTexSubImage2D and 
- * glCopyTexImage2D are notoriously underoptimised/disfunctional among some 
+ * and auxiliary buffer implementations. glCopyTexSubImage2D and
+ * glCopyTexImage2D are notoriously underoptimised/disfunctional among some
  * opengl implementations/drivers/gfx-cards.
  *
  * How it works: There are the stand alone and sharing modes. It is strongly 
  * recommended that this implementation is not used in 'sharing' mode. Sharing
- *  mode is implemented mostly for consistency among procedural texture 
+ * mode is implemented mostly for consistency among procedural texture 
  * implementations so the engine can render to it if necessary transparently.
- *  Sharing mode also adds a further layer of complexity to the stand alone 
+ * Sharing mode also adds a further layer of complexity to the stand alone 
  * mode, but without performance penalty.
  */
 

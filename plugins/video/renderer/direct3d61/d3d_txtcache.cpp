@@ -308,12 +308,12 @@ void D3DTextureCache::Load (csD3DCacheData* cached_texture)
 
   txt_handle->IncRef();
 
-  bool transp = txt_handle->GetTransparent ();
+  bool transp = txt_handle->GetKeyColor ();
   //DDCOLORKEY key;
   if (transp)
   {
     //UByte r, g, b;
-    //txt_handle->GetTransparent (r, g, b);
+    //txt_handle->GetKeyColor (r, g, b);
     //key.dwColorSpaceLowValue = key.dwColorSpaceHighValue = D3DRGB (r, g, b);
   }
 

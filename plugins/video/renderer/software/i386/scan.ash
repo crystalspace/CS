@@ -195,7 +195,7 @@ struc csScanSetup
 
   ;
   ; The following fields are only used when drawing
-  ; unlighted tiled textures (the draw_scanline_..._map_...
+  ; unlighted tiled textures (the scan_..._map_...
   ; routines don't need them).
   ;
 
@@ -224,6 +224,11 @@ struc csScanSetup
 
   ; The inverse colormap (extracted from texture manager)
   unsigned_char_P inv_cmap;
+
+  ; This is the global palette -> uint16 conversion table (for 8-bit modes)
+  unsigned_short_P GlobalCMap;
+  ; And this one is the texture private palette -> uint16 conversion table
+  unsigned_short_P PrivateCMap;
 
   ; 4096 1/z values where z is in fixed-point 0.12 format
   unsigned_int_P one_div_z;
@@ -312,7 +317,7 @@ extvar	Scan
 ;   - The basename of scanline routine
 ;	(appended suffixes: _args,_init,_body,_fini)
 ; Example:
-;   scanproc 8,draw_scanline_map_zfill,SCANPROC_MAP,scanloop_map
+;   scanproc 8,scan_map_zfill,SCANPROC_MAP,scanloop_map
 ; Comments:
 ;   The following variables are placed in registers (and
 ;   should not be changed by scanline loop macro):

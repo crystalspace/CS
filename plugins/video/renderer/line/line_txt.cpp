@@ -394,7 +394,7 @@ void csTextureManagerLine::compute_palette ()
     csTextureMMLine *txt = (csTextureMMLine *)textures [t];
     RGBPixel *colormap = txt->GetColorMap ();
     int colormapsize = txt->GetColorMapSize ();
-    if (txt->GetTransparent ())
+    if (txt->GetKeyColor ())
       colormap++, colormapsize--;
     csQuantizeCount (colormap, colormapsize);
   }

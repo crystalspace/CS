@@ -2514,7 +2514,7 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
         else if (strcasecmp (params, "no") == 0)
           flags &= ~CS_TEXTURE_DITHER;
         else
-          CsPrintf (MSG_WARNING, "Warning! Invalid MIPMAP() value, 'yes' or 'no' expected\n");
+          CsPrintf (MSG_WARNING, "Warning! Invalid DITHER() value, 'yes' or 'no' expected\n");
         break;
     }
   }
@@ -2550,7 +2550,7 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
   image->DecRef ();
 
   if (do_transp)
-    tex->SetTransparent (QInt (transp.red * 255.2),
+    tex->SetKeyColor (QInt (transp.red * 255.2),
       QInt (transp.green * 255.2), QInt (transp.blue * 255.2));
 }
 

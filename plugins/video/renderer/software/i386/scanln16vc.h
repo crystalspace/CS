@@ -2,7 +2,7 @@
     Crystal Space 16-bit software driver assembler-optimized routines
     Copyright (C) 1998 by Jorrit Tyberghein
     Contributors:
-       draw_scanline_map by David N. Arnold <derek_arnold@fuse.net>
+       scan_map by David N. Arnold <derek_arnold@fuse.net>
        MMX support and other by Andrew Zabolotny <bit@eltech.ru>
 
 	   VC++ port by Olivier Langlois <olanglois@sympatico.ca>
@@ -158,8 +158,8 @@ __asm   mov     _dest,edi                   \
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define NO_draw_scanline_map_zfil
-#define SCANFUNC draw_scanline_map_zfil
+#define NO_scan_map_zfil
+#define SCANFUNC scan_map_zfil
 #define SCANMAP
 #define SCANLOOP I386_SCANLINE_MAP16
 #define SCANEND \
@@ -176,8 +176,8 @@ __asm   mov     _dest,edi                   \
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define NO_draw_scanline_map_zuse
-#define SCANFUNC draw_scanline_map_zuse
+#define NO_scan_map_zuse
+#define SCANFUNC scan_map_zuse
 #define SCANMAP
 #define SCANLOOP                                            \
     s = srcTex + ((vv >> 16) << shifter) + (uu >> 16);      \
@@ -409,9 +409,9 @@ __asm   mov     _dest, edi         }                \
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#pragma message( "draw_scanline_map_alpha50" )
-#define NO_draw_scanline_map_alpha50
-#define SCANFUNC draw_scanline_map_alpha50
+#pragma message( "scan_map_fixalpha50" )
+#define NO_scan_map_fixalpha50
+#define SCANFUNC scan_map_fixalpha50
 #define SCANMAP
 #define SCANLOOP I386_SCANLINE_MAP_ALPHA50_16
 #include "video/renderer/software/scanln.inc"
@@ -422,8 +422,8 @@ __asm   mov     _dest, edi         }                \
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define NO_mmx_draw_scanline_map_zfil
-#define SCANFUNC mmx_draw_scanline_map_zfil
+#define NO_mmx_scan_map_zfil
+#define SCANFUNC mmx_scan_map_zfil
 #define SCANMAP
 #define SCANLOOP I386_SCANLINE_MAP16
 #define SCANEND MMX_FILLZBUFFER
@@ -433,8 +433,8 @@ __asm   mov     _dest, edi         }                \
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define NO_mmx_draw_scanline_tex_zfil
-#define SCANFUNC mmx_draw_scanline_tex_zfil
+#define NO_mmx_scan_tex_zfil
+#define SCANFUNC mmx_scan_tex_zfil
 #define SCANLOOP \
     do									\
     {									\
@@ -449,8 +449,8 @@ __asm   mov     _dest, edi         }                \
 
 #endif
 
-#define NO_draw_pi_scanline_tex_zuse
-void csScan_16_draw_pi_scanline_tex_zuse (void *_dest, int len, long *zbuff, long uu, long duu,
+#define NO_scan_pi_tex_zuse
+void csScan_16_scan_pi_tex_zuse (void *_dest, int len, long *zbuff, long uu, long duu,
   long vv, long dvv, long z, long dz, unsigned char *srcTex, int shifter)
 {
   if (len <= 0)

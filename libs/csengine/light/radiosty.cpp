@@ -301,7 +301,7 @@ csRGBLightMap * csRadPoly :: ComputeTextureLumelSized()
   if(txthandle == NULL) // no texture: flatcol is enough.
     return map;
   int transr, transg, transb; // transparent color
-  txthandle->GetTransparent(transr, transg, transb);
+  txthandle->GetKeyColor (transr, transg, transb);
   iImage *txtimage = txthandle->GetImageFile();
   iImage *rgbimage = txtimage->Clone(); 
   rgbimage->SetFormat(CS_IMGFMT_TRUECOLOR); // get rgb

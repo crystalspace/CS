@@ -52,7 +52,7 @@ struct iTextureHandle;
  * Currently this flag is acted upon by the 16/32bit software renderer and the
  * opengl software texture implementation only. 
  * It has no performance penalty for the other drivers, so set it when you can,
- *  which practically speaking will be most of the time. 
+ * which practically speaking will be most of the time. 
  * Set this flag when you can safely allocate the procedural textures their
  * own set of textures which will not be referred to when calling the main 
  * renderer. This means that the engine for example will not be able to render
@@ -103,7 +103,7 @@ struct iTextureManager : public iBase
    * make sure you have called IncRef yourselves.
    *<p>
    * The texture is not converted immediately. Instead, you can make
-   * intermediate calls to iTextureHandle::SetTransparent (). Finally,
+   * intermediate calls to iTextureHandle::SetKeyColor (). Finally,
    * if you want to merge the texture into the current environment, you
    * should call PrepareTexture (). Alternatively you can call the
    * PrepareTextures () method to compute a optimal palette and convert

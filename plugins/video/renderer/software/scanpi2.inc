@@ -1,6 +1,6 @@
 /*
     This is a subinclude file for scanpi.inc
-    It does what draw_pi_scanline_xxx is supposed to do with or
+    It does what scan_pi_xxx is supposed to do with or
     without clamping texture R,G,B after multiplication to 1.0
     (so that 2*SRC lighting will work correctly)
 */
@@ -22,8 +22,14 @@
 #if defined (PI_ZUSE) || defined (PI_ZFILL)
         *zbuff = z;
 #endif
-#if (defined (PI_GOURAUD) || defined (PI_BLEND)) && !defined (PI_FLAT)
+#if defined (PI_GOURAUD) || defined (PI_BLEND)
+  #if defined (PI_FLAT)
+    #if defined (PI_BLEND)
+        RGBPixel rgbtexel = Scan.FlatRGB;
+    #endif
+  #else
         RGBPixel rgbtexel = Scan.TexturePalette [texel];
+  #endif
 #endif
 #if defined (PI_BLEND)
         // The color of the source texel (SRC)

@@ -75,6 +75,9 @@ public:
   /// Create another image holding a subimage of current image
   virtual iImage *Crop (int /*x*/, int /*y*/, int /*width*/, int /*height*/ )
   { return NULL; }
+  /// Check if the alpha channel is valid
+  virtual void CheckAlpha ()
+  { }
 };
 
 #endif // __SCRSHOT_H__

@@ -39,12 +39,12 @@ class csWSTexture
   iImage *Image;
   // Will be this texture used for 3D and/or for 2D operations?
   int Flags;
-  // Red,Green and Blue components of transparent color
+  // Red,Green and Blue components of key color
   UByte tr, tg, tb;
-  // has texture transparent areas?
-  bool IsTransp;
+  // texture has key color?
+  bool HasKey;
   // Has transparent color changed?
-  bool TranspChanged;
+  bool KeyChanged;
   // texture handle for the 3D/2D driver
   iTextureHandle *Handle;
   // texture name
@@ -60,15 +60,15 @@ public:
   /// Destroy the texture object
   ~csWSTexture ();
   /// Set texture transparent color
-  void SetTransparent (int iR, int iG, int iB);
+  void SetKeyColor (int iR, int iG, int iB);
   /// Set whenever texture has transparent holes or not
-  void SetTransparent (bool iTransparent);
+  void SetKeyColor (bool iEnable);
   /// Get texture transparent color
-  void GetTransparent (int &oR, int &oG, int &oB)
+  void GetKeyColor (int &oR, int &oG, int &oB)
   { oR = tr; oG = tg; oB = tb; }
   /// Query whenever texture has transparent areas
-  bool IsTransparent ()
-  { return IsTransp; }
+  bool HasKeyColor ()
+  { return HasKey; }
   /// Register the texture with texture manager
   void Register (iTextureManager *iTexMan);
   /// Unregister the texture
@@ -97,10 +97,10 @@ public:
   /// Set texture file name
   void SetFileName (const char *iFileName);
   /// Find nearest transparent color in image
-  void FixTransparency ();
+  void FixKeyColor ();
   /// Tell texture that transparent color has already been fixed
-  void DontFixTransparency ()
-  { TranspChanged = false; }
+  void DontFixKeyColor ()
+  { KeyChanged = false; }
   /// Query texture width
   int GetWidth ();
   /// Query texture height

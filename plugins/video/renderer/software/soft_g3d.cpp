@@ -105,7 +105,7 @@ static const csOptionDescription config_options [NUM_OPTIONS] =
 {
   { 0, "ilace", "Interlacing", CSVAR_BOOL },
   { 1, "light", "Texture lighting", CSVAR_BOOL },
-  { 2, "transp", "Transparent textures", CSVAR_BOOL },
+  { 2, "alpha", "Semi-transparent textures", CSVAR_BOOL },
   { 3, "txtmap", "Texture mapping", CSVAR_BOOL },
   { 4, "mmx", "MMX support", CSVAR_BOOL },
   { 5, "gamma", "Gamma value", CSVAR_FLOAT },
@@ -121,7 +121,7 @@ bool csGraphics3DSoftware::csSoftConfig::SetOption (int id, csVariant* value)
   {
     case 0: scfParent->do_interlaced = value->v.b ? 0 : -1; break;
     case 1: scfParent->do_lighting = value->v.b; break;
-    case 2: scfParent->do_transp = value->v.b; break;
+    case 2: scfParent->do_alpha = value->v.b; break;
     case 3: scfParent->do_textured = value->v.b; break;
 #ifdef DO_MMX
     case 4: scfParent->do_mmx = value->v.b; break;
@@ -142,7 +142,7 @@ bool csGraphics3DSoftware::csSoftConfig::GetOption (int id, csVariant* value)
   {
     case 0: value->v.b = scfParent->do_interlaced != -1; break;
     case 1: value->v.b = scfParent->do_lighting; break;
-    case 2: value->v.b = scfParent->do_transp; break;
+    case 2: value->v.b = scfParent->do_alpha; break;
     case 3: value->v.b = scfParent->do_textured; break;
 #ifdef DO_MMX
     case 4: value->v.b = scfParent->do_mmx; break;

@@ -156,6 +156,8 @@ public:
   virtual iImage *Clone ();
   /// Create another image and copy a subpart of this image into the new image.
   virtual iImage *Crop (int x, int y, int width, int height);
+  /// Check if all alpha values are "non-transparent" and if so, discard alpha
+  virtual void CheckAlpha ();
 };
 
 /**

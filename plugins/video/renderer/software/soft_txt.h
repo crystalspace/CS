@@ -99,7 +99,9 @@ class csTextureSoftware : public csTexture
 {
 public:
   /// The bitmap
-  UByte *bitmap;
+  uint8 *bitmap;
+  /// The alpha map (NULL if no alphamap)
+  uint8 *alphamap;
   /// The image (temporary storage)
   iImage *image;
 
@@ -107,6 +109,7 @@ public:
   csTextureSoftware (csTextureMM *Parent, iImage *Image) : csTexture (Parent)
   {
     bitmap = NULL;
+    alphamap = NULL;
     image = Image;
     w = Image->GetWidth ();
     h = Image->GetHeight ();
@@ -117,8 +120,11 @@ public:
   { delete [] bitmap; if (image) image->DecRef (); }
 
   /// Return a pointer to texture data
-  UByte *get_bitmap ()
+  uint8 *get_bitmap ()
   { return bitmap; }
+  /// Return a pointer to alpha map data
+  uint8 *get_alphamap ()
+  { return alphamap; }
 };
 
 /**
@@ -157,6 +163,9 @@ protected:
    * paletted format to the native pixel format.
    */
   void *pal2glob;
+
+  /// Same but for 8-bit modes (8bit to 16bit values)
+  uint16 *pal2glob8;
 
   /// The private palette for this texture (compressed a little)
   UByte *orig_palette;
@@ -201,6 +210,9 @@ public:
   /// Query palette -> native format table
   void *GetPaletteToGlobal () { return pal2glob; }
 
+  /// Query palette -> 16-bit values table for 8-bit modes
+  uint16 *GetPaletteToGlobal8 () { return pal2glob8; }
+
   /// Apply gamma correction to private palette
   void ApplyGamma (UByte *GammaTable);
 
@@ -217,6 +229,14 @@ public:
   /// context and in either 16 or 32bit. The 8bit version doesn't require 
   /// repreparing.
   void RePrepareProcTexture ();
+
+  /**
+   * Query if the texture has an alpha channel.<p>
+   * This depends both on whenever the original image had an alpha channel
+   * and of the fact whenever the renderer supports alpha maps at all.
+   */
+  virtual bool GetAlphaMap ()
+  { return !!((csTextureSoftware *)get_texture (0))->get_alphamap (); }
 };
 
 

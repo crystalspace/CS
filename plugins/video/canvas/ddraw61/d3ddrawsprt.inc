@@ -31,7 +31,7 @@
 void csGraphics2DDDraw6::DRAWSPRITE_NAME (csGraphics2D *This, iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
 {
-  bool transp = hTex->GetTransparent ();
+  bool transp = hTex->GetKeyColor ();
 
   int bw, bh;
   hTex->GetMipMapDimensions (0, bw, bh);

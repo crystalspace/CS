@@ -21,13 +21,13 @@
 #ifndef __SCAN32A_H__
 #define __SCAN32A_H__
 
-#define NO_draw_scanline_map_zfil
-#define NO_mmx_draw_scanline_map_zfil
-#define NO_draw_scanline_map_zuse
-#define NO_draw_scanline_map_alpha50
-#define NO_draw_scanline_tex_zfil
-#define NO_mmx_draw_scanline_tex_zfil
-#define NO_draw_scanline_fog
-#define NO_draw_scanline_fog_view
+#define NO_scan_map_zfil
+#define NO_mmx_scan_map_zfil
+#define NO_scan_map_zuse
+#define NO_scan_map_fixalpha50
+#define NO_scan_tex_zfil
+#define NO_mmx_scan_tex_zfil
+#define NO_scan_fog
+#define NO_scan_fog_view
 
 #endif // __SCAN32A_H__

@@ -387,6 +387,42 @@ int csImageFile::closest_index (RGBPixel *iColor)
   return closest_idx;
 }
 
+void csImageFile::CheckAlpha ()
+{
+  if (!(Format & CS_IMGFMT_ALPHA))
+    return;
+
+  int i, pixels = Width * Height;
+  bool noalpha = true;
+  switch (Format & CS_IMGFMT_MASK)
+  {
+    case CS_IMGFMT_NONE:
+    case CS_IMGFMT_PALETTED8:
+      if (Alpha)
+        for (i = 0; i < pixels; i++)
+          if (Alpha [i] != 255)
+          {
+            noalpha = false;
+            break;
+          }
+      break;
+    case CS_IMGFMT_TRUECOLOR:
+      for (i = 0; i < pixels; i++)
+        if (((RGBPixel *)Image) [i].alpha != 255)
+        {
+          noalpha = false;
+          break;
+        }
+      break;
+  }
+  if (noalpha)
+  {
+    if (Alpha)
+    { delete [] Alpha; Alpha = NULL; }
+    Format &= ~CS_IMGFMT_ALPHA;
+  }
+}
+
 void csImageFile::convert_rgba (RGBPixel *iImage)
 {
   int pixels = Width * Height;
@@ -425,13 +461,11 @@ void csImageFile::convert_rgba (RGBPixel *iImage)
 void csImageFile::convert_pal8 (UByte *iImage, RGBPixel *iPalette,
   int /*nPalColors*/)
 {
+  int pixels = Width * Height;
+
   if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_ANY)
     Format = (Format & ~CS_IMGFMT_MASK) | CS_IMGFMT_PALETTED8;
 
-  if ((Format & CS_IMGFMT_ALPHA) && !Alpha)
-    Format &= ~CS_IMGFMT_ALPHA;
-
-  int pixels = Width * Height;
   switch (Format & CS_IMGFMT_MASK)
   {
     case CS_IMGFMT_NONE:
@@ -451,7 +485,7 @@ void csImageFile::convert_pal8 (UByte *iImage, RGBPixel *iPalette,
       else
         Image = out = new RGBPixel [pixels];
 
-      if (Format & CS_IMGFMT_ALPHA)
+      if ((Format & CS_IMGFMT_ALPHA) && Alpha)
       {
         UByte *a = Alpha;
         while (pixels--)

@@ -91,13 +91,13 @@ void csTextureMM::CreateMipmaps ()
   ComputeMeanColor ();
 }
 
-void csTextureMM::SetTransparent (bool Enable)
+void csTextureMM::SetKeyColor (bool Enable)
 {
   transp = Enable;
 }
 
 // This function must be called BEFORE calling TextureManager::Update().
-void csTextureMM::SetTransparent (UByte red, UByte green, UByte blue)
+void csTextureMM::SetKeyColor (UByte red, UByte green, UByte blue)
 {
   transp_color.red = red;
   transp_color.green = green;
@@ -106,14 +106,14 @@ void csTextureMM::SetTransparent (UByte red, UByte green, UByte blue)
 }
 
 /// Get the transparent color
-void csTextureMM::GetTransparent (UByte &r, UByte &g, UByte &b)
+void csTextureMM::GetKeyColor (UByte &r, UByte &g, UByte &b)
 {
   r = transp_color.red;
   g = transp_color.green;
   b = transp_color.blue;
 }
 
-bool csTextureMM::GetTransparent ()
+bool csTextureMM::GetKeyColor ()
 {
   return transp;
 }
@@ -194,7 +194,7 @@ void csTextureManager::FreeImages ()
 
 int csTextureManager::GetTextureFormat ()
 {
-  return CS_IMGFMT_TRUECOLOR;
+  return CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA;
 }
 
 int csTextureManager::FindRGB (int r, int g, int b)

@@ -682,7 +682,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
 
   csGLCacheData *texturecache_data;
   texturecache_data = (csGLCacheData *)txt_mm->GetCacheData ();
-  tex_transp = txt_mm->GetTransparent ();
+  tex_transp = txt_mm->GetKeyColor ();
   GLuint texturehandle = texturecache_data->Handle;
 
   float flat_r = 1., flat_g = 1., flat_b = 1.;
@@ -1821,7 +1821,7 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
 
   csGLCacheData *texturecache_data;
   texturecache_data = (csGLCacheData *)txt_mm->GetCacheData ();
-  tex_transp = txt_mm->GetTransparent ();
+  tex_transp = txt_mm->GetKeyColor ();
   GLuint texturehandle = texturecache_data->Handle;
 
   // configure base texture for texure unit 0
@@ -1978,7 +1978,7 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
 
   // if the texture has transparent bits, we have to tweak the
   // OpenGL blend mode so that it handles the transparent pixels correctly
-  if (hTex->GetTransparent ())
+  if (hTex->GetKeyColor ())
   {
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

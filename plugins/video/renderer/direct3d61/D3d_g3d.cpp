@@ -852,7 +852,7 @@ void csGraphics3DDirect3DDx6::ConfigureRendering()
     m_bMultiTexture = false;
 
   // start up with minimum settings
-  m_bRenderTransparent = false;
+  m_bRenderKeyColor = false;
   m_bRenderLightmap = false;
 
   // set filters  
@@ -1032,7 +1032,7 @@ void csGraphics3DDirect3DDx6::ConfigureRendering()
     if ((lpD3dDeviceDesc->dpcTriCaps.dwSrcBlendCaps  & TransList[i].SrcFlag) &&
         (lpD3dDeviceDesc->dpcTriCaps.dwDestBlendCaps & TransList[i].DstFlag))
     {
-      m_bRenderTransparent = true;
+      m_bRenderKeyColor = true;
 
       m_TransSrcBlend = TransList[i].Src;
       m_TransDstBlend = TransList[i].Dst;
@@ -1245,7 +1245,7 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
 
   bool bLightmapExists = true,
   bColorKeyed = false,
-  bTransparent;
+  bKeyColor;
   
   int  poly_alpha;
   
@@ -1266,10 +1266,10 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
   SetupPolygon( poly, J1, J2, J3, K1, K2, K3, M, N, O );
 
   poly_alpha = poly.alpha;
-  if ((poly_alpha > 0) && m_bRenderTransparent)
-    bTransparent = true;
+  if ((poly_alpha > 0) && m_bRenderKeyColor)
+    bKeyColor = true;
   else
-    bTransparent = false;
+    bKeyColor = false;
 
   //Mipmapping is done for us by DirectX, so we will always select the texture with
   //the highest resolution.
@@ -1285,7 +1285,7 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
   csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)poly.txt_handle->GetPrivateObject ();
   pTexCache = (csD3DCacheData *)txt_mm->GetCacheData ();
 
-  bColorKeyed = txt_mm->GetTransparent ();
+  bColorKeyed = txt_mm->GetKeyColor ();
 
   // retrieve the lightmap from the cache.
   iLightMap* piLM = pTex->GetLightMap ();
@@ -1306,7 +1306,7 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
   if(m_iTypeLightmap == 0)
     bLightmapExists = false;
 
-  if ( bTransparent )
+  if ( bKeyColor )
   {
     m_States.SetAlphaBlendEnable(true);
     m_States.SetDstBlend(m_TransDstBlend);
@@ -1360,7 +1360,7 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
 
   D3DCOLOR vertex_color;
 
-  if (bTransparent)
+  if (bKeyColor)
   {
     vertex_color = RGBA_MAKE(0xFF, 0xFF, 0xFF, QInt(poly_alpha * (255.0f / 100.0f)));
   }
@@ -1473,7 +1473,7 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
 
   bool bLightmapExists = true,
   bColorKeyed = false,
-  bTransparent;
+  bKeyColor;
   
   int  poly_alpha;
   
@@ -1496,10 +1496,10 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
   SetupPolygon( poly, J1, J2, J3, K1, K2, K3, M, N, O );
 
   poly_alpha = poly.alpha;
-  if ((poly_alpha > 0) && m_bRenderTransparent)
-    bTransparent = true;
+  if ((poly_alpha > 0) && m_bRenderKeyColor)
+    bKeyColor = true;
   else
-    bTransparent = false;
+    bKeyColor = false;
 
   //Mipmapping is done for us by DirectX, so we will always select the texture with
   //the highest resolution.
@@ -1515,7 +1515,7 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
   csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)poly.txt_handle->GetPrivateObject ();
   pTexCache = (csD3DCacheData *)txt_mm->GetCacheData ();
 
-  bColorKeyed = txt_mm->GetTransparent ();
+  bColorKeyed = txt_mm->GetKeyColor ();
 
   // retrieve the lightmap from the cache.
   iLightMap* piLM = pTex->GetLightMap ();
@@ -1536,7 +1536,7 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
   if (m_iTypeLightmap == 0)
     bLightmapExists = false;
 
-  if ( bTransparent )
+  if ( bKeyColor )
   {
     m_States.SetAlphaBlendEnable(true);
     m_States.SetDstBlend(m_TransDstBlend);
@@ -1560,8 +1560,8 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
 
   D3DCOLOR vertex_color;
 
-//  if (bTransparent && bLightmapExists)
-  if (bTransparent)
+//  if (bKeyColor && bLightmapExists)
+  if (bKeyColor)
   {
     vertex_color = D3DRGBA_(1.0f, 1.0f, 1.0f, (float)poly_alpha * (1.0f / 100.0f));
   }
@@ -1686,7 +1686,7 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
     m_pTextureCache->cache_texture (handle);
 
     pTexData = (csD3DCacheData *)txt_mm->GetCacheData ();
-    m_States.SetColorKeyEnable(txt_mm->GetTransparent ());
+    m_States.SetColorKeyEnable(txt_mm->GetKeyColor ());
 
     m_textured = true;
   }

@@ -46,7 +46,7 @@ csTextureHandle::csTextureHandle (csTextureHandle &th) :
   handle = th.GetTextureHandle ();
   SetName (th.GetName ());
   if (handle)
-    SetTransparent (transp_r, transp_g, transp_b);
+    SetKeyColor (transp_r, transp_g, transp_b);
 }
 
 csTextureHandle::~csTextureHandle ()
@@ -64,13 +64,13 @@ void csTextureHandle::SetImageFile (iImage *Image)
   (image = Image)->IncRef ();
 }
 
-void csTextureHandle::SetTransparent (int red, int green, int blue)
+void csTextureHandle::SetKeyColor (int red, int green, int blue)
 {
   if (handle)
     if (red >= 0)
-      handle->SetTransparent (red, green, blue);
+      handle->SetKeyColor (red, green, blue);
     else
-      handle->SetTransparent (false);
+      handle->SetKeyColor (false);
   transp_r = red;
   transp_g = green;
   transp_b = blue;
@@ -98,7 +98,7 @@ void csTextureHandle::Register (iTextureManager *txtmgr)
 
   handle = txtmgr->RegisterTexture (image, flags);
   if (handle)
-    SetTransparent (transp_r, transp_g, transp_b);
+    SetKeyColor (transp_r, transp_g, transp_b);
 }
 
 //-------------------------------------------------------- csTextureList -----//
