@@ -69,7 +69,7 @@ endif
 # General flags for the linker which are used in any case.
 # <cs-config>
 LFLAGS.GENERAL = $(LFLAGS.L)/usr/local/lib $(LFLAGS.SYSTEM) \
-$(CSTHREAD.LFLAGS) $(LIBBFD.LFLAGS)
+  $(CSTHREAD.LFLAGS) $(LIBBFD.LFLAGS)
 # </cs-config>
 
 # Flags for the linker which are used when profiling.
@@ -86,8 +86,9 @@ LFLAGS.DLL = -shared -Wl,-soname -Wl,$@
 NASMFLAGS.SYSTEM = -f elf
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = \
-  $(filter-out bfdplugins.cpp,$(wildcard $(SRCDIR)/libs/cssys/unix/*.cpp)) \
+INC.SYS_CSSYS = $(wildcard $(SRCDIR)/libs/cssys/unix/*.h) $(CSTHREAD.INC)
+UNIX_SRC.SYS_CSSYS = \
+  $(wildcard $(SRCDIR)/libs/cssys/unix/*.cpp) \
   $(SRCDIR)/libs/cssys/general/appdir.cpp \
   $(SRCDIR)/libs/cssys/general/apppath.cpp \
   $(SRCDIR)/libs/cssys/general/csprocessorcap.cpp \
@@ -100,18 +101,29 @@ SRC.SYS_CSSYS = \
   $(SRCDIR)/libs/cssys/general/runloop.cpp \
   $(SRCDIR)/libs/cssys/general/sysroot.cpp \
   $(CSTHREAD.SRC)
-#ifeq (LIBBFD.AVAILABLE,yes)
-  #ifeq (OBJCOPY.AVAILABLE,yes)
-    SRC.SYS_CSSYS += $(SRCDIR)/libs/cssys/general/bfdplugins.cpp
-  #else
-    SRC.SYS_CSSYS += $(SRCDIR)/libs/cssys/general/scanplugins.cpp
-  #endif
-#else
-  SRC.SYS_CSSYS += $(SRCDIR)/libs/cssys/general/scanplugins.cpp
-#endif
-INC.SYS_CSSYS = $(wildcard $(SRCDIR)/libs/cssys/unix/*.h) $(CSTHREAD.INC)
+
+ifeq ($(LIBBFD.AVAILABLE)$(OBJCOPY.AVAILABLE),yesyes)
+  SRC.SYS_CSSYS = $(UNIX_SRC.SYS_CSSYS)
+else
+  SRC.SYS_CSSYS = $(filter-out $(SRCDIR)/libs/cssys/unix/bfdplugins.cpp, \
+    $(UNIX_SRC.SYS_CSSYS)) $(SRCDIR)/libs/cssys/general/scanplugins.cpp
+endif
 
 # Use makedep to build dependencies
 DEPEND_TOOL = mkdep
 
 endif # ifeq ($(MAKESECTION),defines)
+
+#------------------------------------------------------------- postdefines ---#
+ifeq ($(MAKESECTION),postdefines)
+
+ifeq ($(LIBBFD.AVAILABLE)$(OBJCOPY.AVAILABLE),yesyes)
+  DO.SHARED.PLUGIN.PREAMBLE =
+  # Blank line in macro is relevant; do not remove.
+  define DO.SHARED.PLUGIN.POSTAMBLE
+
+    $(CMD.OBJCOPY) --add-section .crystal=$(INF.INFILE) $(@)
+  endef
+endif
+
+endif # ifeq ($(MAKESECTION),postdefines)

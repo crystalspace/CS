@@ -85,6 +85,13 @@ chronological order.
 	  new renderer enabled) but it fixes it for all the rest :-)
 	- Anders Stenberg now added the csplugin, jam and makefiles for new 
 	  software renderer, which were forgotten last time.
+	- Eric Sunshine fixed the following build-time problems with the recent
+	  changes to support BFD embedding of metainfo in plugins:
+	    - Fixed totally broken makefile syntax in unix.mak.
+	    - Fixed broken logic in unix.mak which caused wrong files to be
+	      built.
+	    - Moved Unix-specific makefile goop out of general mk/cs.mak and
+	      into unix.mak where it belongs.
 28-Aug-2003
 	- Jorrit fixed the x2d plugin so it actually reports an error if the
 	  'xwin' plugin cannot be found.

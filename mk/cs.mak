@@ -144,26 +144,17 @@ INF.OUTFILE = $(OUTDLL)/$(basename $(notdir $@)).csplugin
 # preamble fails for some reason, it will abort the build, thus the remaining
 # commands (core and postamble) will not be invoked (which is the correct
 # behavior).
-  define DO.SHARED.PLUGIN.PREAMBLE
-    if ! diff $(INF.INFILE) $(INF.OUTFILE) > /dev/null 2>&1 ; \
-    then \
-      $(RM) $(INF.OUTFILE) ; \
-      $(CP) $(INF.INFILE) $(INF.OUTFILE) ; \
-    fi
+define DO.SHARED.PLUGIN.PREAMBLE
+  if ! diff $(INF.INFILE) $(INF.OUTFILE) > /dev/null 2>&1 ; \
+  then \
+    $(RM) $(INF.OUTFILE) ; \
+    $(CP) $(INF.INFILE) $(INF.OUTFILE) ; \
+  fi
 
-  endef
-ifeq ($(LIBBFD.AVAILABLE),yes)
-ifeq ($(OBJCOPY.AVAILABLE),yes)
-  DO.SHARED.PLUGIN.PREAMBLE =
-
-  define DO.SHARED.PLUGIN.POSTAMBLE
-
-    $(CMD.OBJCOPY) --add-section .crystal=$(INF.INFILE) $(@)
-  endef
-endif # OBJCOPY
-endif # LIBBFD
+endef
 DO.SHARED.PLUGIN.CORE = \
   $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS)
+DO.SHARED.PLUGIN.POSTAMBLE =
 # How to link a console executable
 DO.LINK.CONSOLE.EXE = $(LINK) $(LFLAGS) $(LFLAGS.CONSOLE.EXE) $(LFLAGS.@) \
   $(^^) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
