@@ -20,26 +20,24 @@
 #include "cssysdef.h"
 #include <math.h>
 
-#include "ivideo/graph2d.h"
-#include "ivideo/graph3d.h"
-#include "igraphic/image.h"
-#include "iutil/plugin.h"
-#include "ivideo/txtmgr.h"
-#include "ivideo/material.h"
-
 #include "csgfx/memimage.h"
-#include "iengine/texture.h"
-#include "iengine/material.h"
+#include "cstool/proctex.h"
+#include "csutil/hash.h"
 #include "iengine/engine.h"
-#include "iutil/objreg.h"
+#include "iengine/material.h"
+#include "iengine/texture.h"
+#include "igraphic/image.h"
+#include "iutil/comp.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"
-#include "iutil/comp.h"
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
 #include "iutil/virtclk.h"
-#include "csutil/hashmap.h"
-
-#include "cstool/proctex.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/material.h"
+#include "ivideo/txtmgr.h"
 
 //---------------------------------------------------------------------------
 
@@ -47,20 +45,20 @@
  * Event handler that takes care of updating all procedural
  * textures that were visible last frame.
  */
-class ProcEventHandler : public iEventHandler
+class csProcTexEventHandler : public iEventHandler
 {
 private:
   iObjectRegistry* object_reg;
   // Set of textures that needs updating next frame.
-  csHashSet textures;
+  csSet<csProcTexture*> textures;
 
 public:
-  ProcEventHandler (iObjectRegistry* object_reg)
+  csProcTexEventHandler (iObjectRegistry* r)
   {
     SCF_CONSTRUCT_IBASE (0);
-    ProcEventHandler::object_reg = object_reg;
+    object_reg = r;
   }
-  virtual ~ProcEventHandler ()
+  virtual ~csProcTexEventHandler ()
   {
     SCF_DESTRUCT_IBASE ();
   }
@@ -78,24 +76,24 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE (ProcEventHandler)
+SCF_IMPLEMENT_IBASE (csProcTexEventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-bool ProcEventHandler::HandleEvent (iEvent& event)
+bool csProcTexEventHandler::HandleEvent (iEvent& event)
 {
   csRef<iVirtualClock> vc (CS_QUERY_REGISTRY (object_reg, iVirtualClock));
   csTicks elapsed_time, current_time;
   elapsed_time = vc->GetElapsedTicks ();
   current_time = vc->GetCurrentTicks ();
-  csHashSet keep_tex;
+  csSet<csProcTexture*> keep_tex;
   if (event.Type == csevBroadcast && event.Command.Code == cscmdPreProcess)
   {
     {
-      csGlobalHashIterator it (textures.GetHashMap ());
+      csSet<csProcTexture*>::GlobalIterator it = textures.GetIterator();
       while (it.HasNext ())
       {
-        csProcTexture* pt = (csProcTexture*)it.Next ();
+        csProcTexture* pt = it.Next ();
 	if (!pt->anim_prepared)
 	  pt->PrepareAnim();
 	if (pt->anim_prepared)
@@ -107,10 +105,10 @@ bool ProcEventHandler::HandleEvent (iEvent& event)
     }
     textures.DeleteAll ();
     // enqueue 'always animate' textures for next cycle
-    csGlobalHashIterator it (keep_tex.GetHashMap ());
+    csSet<csProcTexture*>::GlobalIterator it = keep_tex.GetIterator();
     while (it.HasNext ())
     {
-      csProcTexture* pt = (csProcTexture*)it.Next ();
+      csProcTexture* pt = it.Next ();
       textures.Add (pt);
     }
     return true;
@@ -147,7 +145,7 @@ csProcTexture::csProcTexture (iTextureFactory* p, iImage* image)
 csProcTexture::~csProcTexture ()
 {
   if (proceh != 0)
-    ((ProcEventHandler*)(iEventHandler*)(proceh))->PopTexture (this);
+    ((csProcTexEventHandler*)(iEventHandler*)(proceh))->PopTexture (this);
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiProcTexture);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
@@ -159,7 +157,7 @@ iEventHandler* csProcTexture::SetupProcEventHandler (
   csRef<iEventHandler> proceh = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
   	"crystalspace.proctex.eventhandler", iEventHandler);
   if (proceh) return proceh;
-  proceh = csPtr<iEventHandler> (new ProcEventHandler (object_reg));
+  proceh = csPtr<iEventHandler> (new csProcTexEventHandler (object_reg));
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (q != 0)
   {
@@ -188,7 +186,7 @@ void csProcTexCallback::UseTexture (iTextureWrapper*)
 {
   if (!pt->PrepareAnim ()) return;
   pt->visible = true;
-  ((ProcEventHandler*)(iEventHandler*)(pt->proceh))->PushTexture (pt);
+  ((csProcTexEventHandler*)(iEventHandler*)(pt->proceh))->PushTexture (pt);
 }
 iProcTexture* csProcTexCallback::GetProcTexture() const
 {
@@ -267,7 +265,7 @@ void csProcTexture::SetAlwaysAnimate (bool enable)
   always_animate = enable;
   if (always_animate)
   {
-    ((ProcEventHandler*)(iEventHandler*)proceh)->PushTexture (this);
+    ((csProcTexEventHandler*)(iEventHandler*)proceh)->PushTexture (this);
   }
 }
 

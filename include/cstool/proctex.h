@@ -39,7 +39,7 @@ struct iObjectRegistry;
 struct iTextureManager;
 struct iTextureWrapper;
 
-class ProcEventHandler;
+class csProcTexEventHandler;
 
 SCF_VERSION (iProcTexCallback, 0, 0, 1);
 
@@ -59,7 +59,7 @@ struct iProcTexCallback : public iBase
 class CS_CRYSTALSPACE_EXPORT csProcTexture : public csObject
 {
   friend struct csProcTexCallback;
-  friend class ProcEventHandler;
+  friend class csProcTexEventHandler;
 
 private:
   // Setup the procedural event handler (used for updating visible
