@@ -4,18 +4,19 @@
 # Driver description
 DESCRIPTION.csdive = Crystal Space OS/2 DIVE driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make csdive       Make the $(DESCRIPTION.csdive)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make csdive       Make the $(DESCRIPTION.csdive)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: csdive
+.PHONY: csdive csdiveclean
 
 all plugins drivers drivers2d: csdive
 
@@ -26,7 +27,7 @@ csdiveclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # Resource file for DIVE library
@@ -50,7 +51,7 @@ OBJ.CSDIVE = $(addprefix $(OUT),$(notdir $(SRC.CSDIVE:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp plugins/video/canvas/csdive
@@ -72,7 +73,7 @@ $(DIVE2D.RES): plugins/video/canvas/csdive/libDIVE.rc
 	$(RC) $(RCFLAGS) $< $@
 
 csdiveclean:
-	$(RM) $(CSDIVE) $(OBJ.CSDIVE)
+	$(RM) $(CSDIVE) $(OBJ.CSDIVE) $(OUTOS)csdive.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)csdive.dep

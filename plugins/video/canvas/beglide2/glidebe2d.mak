@@ -6,18 +6,19 @@ DESCRIPTION.glidebe2d = Crystal Space BeOS/Glide 2D driver
 
 include plugins/video/canvas/glide2common/glide2common2d.mak
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make glidebe2d    Make the $(DESCRIPTION.glidebe2d)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make glidebe2d    Make the $(DESCRIPTION.glidebe2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: glidebe2d
+.PHONY: glidebe2d glidebe2dclean
 
 all plugins drivers drivers2d: glidebe2d
 
@@ -28,7 +29,7 @@ glidebe2dclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # local CFLAGS
@@ -52,7 +53,7 @@ OBJ.GLIDEBE2D = $(addprefix $(OUT),$(notdir $(SRC.GLIDEBE2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: glidebe2d glidebeclean
@@ -69,7 +70,7 @@ $(GLIDEBE2D): $(OBJ.GLIDEBE2D) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 	$(DO.PLUGIN) $(LIBS.GLIDEBE2D)
 
 glidebeclean:
-	$(RM) $(GLIDEBE2D) $(OBJ.GLIDEBE2D)
+	$(RM) $(GLIDEBE2D) $(OBJ.GLIDEBE2D) $(OUTOS)glidebe2d.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)glidebe2d.dep

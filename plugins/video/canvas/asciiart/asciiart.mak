@@ -4,18 +4,19 @@
 # Driver description
 DESCRIPTION.asciiart = Crystal Space Ascii Art driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make asciiart     Make the $(DESCRIPTION.asciiart)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make asciiart     Make the $(DESCRIPTION.asciiart)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: asciiart
+.PHONY: asciiart asciiartclean
 
 all plugins drivers drivers2d: asciiart
 
@@ -26,7 +27,7 @@ asciiartclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # The AsciiArt library
@@ -48,12 +49,13 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_ASCII2D
 endif
 DESCRIPTION.$(ASCIIART)=$(DESCRIPTION.asciiart)
-SRC.ASCIIART = $(wildcard plugins/video/canvas/asciiart/*.cpp $(SRC.COMMON.DRV2D))
+SRC.ASCIIART = $(wildcard plugins/video/canvas/asciiart/*.cpp \
+  $(SRC.COMMON.DRV2D))
 OBJ.ASCIIART = $(addprefix $(OUT),$(notdir $(SRC.ASCIIART:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp plugins/video/canvas/asciiart
@@ -69,7 +71,7 @@ $(ASCIIART): $(OBJ.ASCIIART) $(DEP.ASCIIART)
 	$(DO.PLUGIN) $(LIBS.LOCAL.ASCIIART)
 
 asciiartclean:
-	$(RM) $(ASCIIART) $(OBJ.ASCIIART)
+	$(RM) $(ASCIIART) $(OBJ.ASCIIART) $(OUTOS)asciiart.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)asciiart.dep

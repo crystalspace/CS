@@ -4,18 +4,19 @@
 # Driver description
 DESCRIPTION.be2d = Crystal Space BeLib 2D driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make be2d         Make the $(DESCRIPTION.be2d)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make be2d         Make the $(DESCRIPTION.be2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: be2d
+.PHONY: be2d be2dclean
 
 all plugins drivers drivers2d: be2d
 
@@ -26,7 +27,7 @@ be2dclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/video/canvas/be
@@ -46,7 +47,7 @@ OBJ.BE2D = $(addprefix $(OUT),$(notdir $(SRC.BE2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp plugins/video/canvas/be
@@ -62,7 +63,7 @@ $(BE2D): $(OBJ.BE2D) $(DEP.BE2D)
 	$(DO.PLUGIN)
 
 be2dclean:
-	$(RM) $(BE2D) $(OBJ.BE2D)
+	$(RM) $(BE2D) $(OBJ.BE2D) $(OUTOS)be2d.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)be2d.dep
