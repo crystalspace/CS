@@ -21,8 +21,8 @@
 #ifndef __MATH3D_D_H__
 #define __MATH3D_D_H__
 
+#include <float.h>
 #include "types.h"
-#include "float.h"
 
 #ifndef ABS
 #define ABS(x) ((x)<0?-(x):(x))

@@ -18,6 +18,7 @@
 */
 
 #include <math.h>
+#include <float.h>
 #include "sysdef.h"
 #include "qint.h"
 #include "csgeom/math3d.h"

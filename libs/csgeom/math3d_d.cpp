@@ -19,7 +19,6 @@
 */
 
 #include <math.h>
-//#include "qint.h"
 #include "csgeom/math3d_d.h"
 #include "csgeom/math3d.h"
 
