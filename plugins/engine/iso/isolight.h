@@ -22,6 +22,7 @@
 #include "csutil/csvector.h"
 #include "ivaria/iso.h"
 #include "iengine/light.h"
+#include "csutil/refarr.h"
 
 class csIsoFakeLight;
 
@@ -149,6 +150,11 @@ public:
   virtual iLightCallback* GetLightCallback (int idx) const
   {
     return (iLightCallback*)light_cb_vector.Get (idx);
+  }
+
+  virtual uint32 GetLightNumber () const
+  {
+    return 0;
   }
 };
 
