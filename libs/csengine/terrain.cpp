@@ -73,7 +73,7 @@ bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
   context = new ddgContext ();
   context->control( &control );
   context->clipbox()->min.set(0,0,0.6);
-  context->clipbox()->max.set(800, 600, 5100);
+  context->clipbox()->max.set(640, 480, 200);
 
   vbuf = new ddgVArray ();
 
@@ -217,7 +217,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   // Get the FOV in angles.
   context->fov (rview.GetFOVAngle ());
   // TODO: JORRIT IS THIS RIGHT?
-  context->aspect (1.0 /*rview.GetInvFOV ()*/);
+  context->aspect (640.0/480.0 /*rview.GetInvFOV ()*/);
 
   // Construct some clipping planes.
   context->extractPlanes(context->frustrum());
