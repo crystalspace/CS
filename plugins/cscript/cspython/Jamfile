@@ -28,6 +28,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   ;
   LinkWith cspython : cstool csgfx csgeom csutil cssys ;
   ExternalLibs cspython : PYTHON ;
+  CFlags cspython : -DSWIG_GLOBAL ;
   Help cspython : "Crystal Script Python plug-in" ;
 }
 
