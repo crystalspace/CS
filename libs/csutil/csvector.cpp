@@ -32,8 +32,7 @@ csBasicVector::csBasicVector (int ilimit, int ithreshold) : count(0), root(0)
 
 csBasicVector::~csBasicVector ()
 {
-  if (root)
-    free (root);
+  free (root);
 }
 
 void csBasicVector::SetLength (int n)
@@ -44,8 +43,7 @@ void csBasicVector::SetLength (int n)
     n = ((n + threshold - 1) / threshold ) * threshold;
     if (!n)
     {
-      if (root)
-        free (root);
+      free (root);
       root = NULL;
     }
     else if (root == 0)
@@ -58,10 +56,10 @@ void csBasicVector::SetLength (int n)
 
 int csBasicVector::Find (csSome which) const
 {
-  int i;
-  for (i = 0; i < Length (); i++)
+  for (int i = 0; i < Length (); i++)
     if (root [i] == which)
       return i;
+
   return -1;
 }
 
@@ -105,7 +103,7 @@ bool csBasicVector::InsertChunk (int n, int size , csSome* Item)
   if (nmove > 0)
     memmove ( &root [ n + size ] , &root [ n ] , nmove * sizeof (csSome) );
     
-   memcpy  ( &root [ n ] , Item , size * sizeof (csSome) );    
+  memcpy  ( &root [ n ] , Item , size * sizeof (csSome) );    
   return true;  
 }
 
@@ -124,17 +122,10 @@ bool csBasicVector::DeleteChunk (int n, int size)
 void csVector::DeleteAll (bool FreeThem)
 {
   if (FreeThem)
-  {
-    int idx;
-    for (idx = count - 1; idx >= 0; idx--)
-      if (!FreeItem (root [idx]))
-        break;
-    SetLength (idx + 1);
-    while (idx >= 0)
-      Delete (idx--);
-  }
-  else
-    SetLength (0);
+    for (int i = 0; i < count; i++)
+      FreeItem (root [i]);
+  
+  SetLength (0);
 }
 
 bool csVector::FreeItem (csSome Item)
@@ -145,33 +136,31 @@ bool csVector::FreeItem (csSome Item)
 
 bool csVector::Delete (int n, bool FreeIt)
 {
-  if (n >= 0 && n < count)
-  {
-    if (FreeIt)
-    {
-      if (!FreeItem (root [n]))
-        return false;
-    }
-    return csBasicVector::Delete(n);
-  }
-  else
+  if (n < 0 || n >= count)
     return false;
+
+  if (FreeIt)
+  {
+    if (!FreeItem (root [n]))
+      return false;
+  }
+
+  return csBasicVector::Delete(n);
 }
 
 bool csVector::Replace (int n, csSome what, bool FreePrevious)
 {
-  if (n < count)
-  {
-    if (FreePrevious)
-    {
-      if (!FreeItem (root [n]))
-        return false;
-    }
-    root [n] = what;
-    return true;
-  }
-  else
+  if (n >= count)
     return false;
+
+  if (FreePrevious)
+  {
+    if (!FreeItem (root [n]))
+      return false;
+  }
+
+  root [n] = what;
+  return true;
 }
 
 int csVector::FindKey (csConstSome Key, int Mode) const
