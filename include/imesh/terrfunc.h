@@ -54,7 +54,7 @@ struct iTerrainNormalFunction : public iBase
   virtual csVector3 GetNormal (float dx, float dy) = 0;
 };
 
-SCF_VERSION (iTerrFuncState, 0, 0, 10);
+SCF_VERSION (iTerrFuncState, 0, 0, 11);
 
 /**
  * This interface describes the API for the terrain object.
@@ -96,6 +96,10 @@ struct iTerrFuncState : public iBase
   virtual void SetNormalFunction (iTerrainNormalFunction* func) = 0;
   /// Use the given iImage to get a height function from.
   virtual void SetHeightMap (iImage* im, float hscale, float hshift) = 0;
+  /// Get the function to use for the terrain.
+  virtual iTerrainHeightFunction* GetHeightFunction () const = 0;
+  /// Get the normal function to use for the terrain.
+  virtual iTerrainNormalFunction* GetNormalFunction () const = 0;
 
   /**
    * Set the distance at which to switch to the given lod level

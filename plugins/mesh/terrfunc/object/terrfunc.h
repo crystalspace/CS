@@ -609,6 +609,14 @@ public:
     {
       scfParent->SetHeightMap (im, hscale, hshift);
     }
+    virtual iTerrainHeightFunction* GetHeightFunction () const
+    {
+      return scfParent->height_func;
+    }
+    virtual iTerrainNormalFunction* GetNormalFunction () const
+    {
+      return scfParent->normal_func;
+    }
     virtual void SetLODDistance (int lod, float dist)
     {
       scfParent->SetLODDistance (lod, dist);

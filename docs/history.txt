@@ -6,7 +6,10 @@ The history order is reversed so that new features are at the top.
 	  of the transforms that are given.
 	- Jonathan Tarbox suggested a minor optimization in
 	  csGraphics2DGLCommon::Write().
-17-Jul-2002
+	- Added iTerrFuncState::GetHeightFunction() and GetNormalFunction()
+	  so that you can retrieve the functions used by the landscape
+	  engine.
+height_func17-Jul-2002
 	- Added unittest for RAPID plugin. Extended unittest app so that it
 	  calls this unittest. This test now fails but I don't know why.
 	  Some help would be helpful here.
