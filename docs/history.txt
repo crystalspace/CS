@@ -1,5 +1,16 @@
 The history order has been reversed so that new features are at the top.
 
+19-Apr-2000
+	- Andrew Zabolotny did a few changes to the windows port to
+	  try to get it working after his large changes from a few
+	  days ago.
+18-Apr-2000
+	- Norman Kramer added QueueExtendedKeyEvent to support regional
+	  keyboardlayouts. For an example see HandleEvent in x2d.cpp.
+	- Robert Bate did several updates to the Macintosh port to get it
+	  working again.
+	- Andrew Zabolotny fixed the crash for "walktest -help" due to
+	  texture manager not initialized.
 17-Apr-2000
 	- Big changes from Andrew Zabolotny again:
 	    - Moved (yet again :-) get_driver_2d() to unix/csosdefs.h.
