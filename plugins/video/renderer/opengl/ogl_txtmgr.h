@@ -41,6 +41,7 @@ public:
   GLint compressed;
   GLint internalFormat;
   GLint size;
+  csTextureHandle *parent;
 
   /// Create a csTexture object
   csTextureOpenGL (csTextureHandle *Parent, iImage *Image);
@@ -49,7 +50,7 @@ public:
   /// Get image data
   uint8 *&get_image_data ()
   { return image_data; }
-  virtual bool Compressable (){ return true;}
+  virtual bool Compressable (){ return !(parent->GetFlags() & CS_TEXTURE_2D); }
 };
 
 /**
@@ -88,6 +89,8 @@ public:
   bool has_alpha;
   texVector vTex;
   long size;
+  /// true if texture has already been used as a render target
+  bool was_render_target;
 
   /// Initialize the object
   csTextureHandleOpenGL (iImage *image, int flags, GLenum sourceFormat,

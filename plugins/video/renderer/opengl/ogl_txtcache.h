@@ -73,6 +73,8 @@ protected:
   int num;
   /// Total size of all loaded textures
   long total_size;
+  /// Peak total size of all loaded textures
+  long peak_total_size;
 public:
   /// Takes the maximum size of the cache.
   OpenGLTextureCache (int max_size, csGraphics3DOGLCommon* g3d);
@@ -91,6 +93,11 @@ public:
   void SetBilinearMapping (bool m) { rstate_bilinearmap = m; }
   ///
   bool GetBilinearMapping () { return rstate_bilinearmap; }
+
+  /// returns the total amount of cached textures.
+  int GetTotalTextureSize() { return total_size; }
+  /// returns the total amount of cached textures.
+  int GetPeakTotalTextureSize() { return peak_total_size; }
 
 protected:
 

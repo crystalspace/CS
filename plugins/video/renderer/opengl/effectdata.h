@@ -62,6 +62,11 @@ public:
   //alpha operation
   int alphap;
 
+  // rgb scale
+  float scale_rgb[3];
+  // alpha scale
+  float scale_alpha;
+
   SCF_DECLARE_IBASE;
 
   csOpenGlEffectLayerData()
@@ -81,6 +86,9 @@ public:
     alphasource[0] = GL_PREVIOUS_ARB; alphasource[1] = GL_TEXTURE; alphasource[2] = -1; alphasource[3] = -1;
     alphamod[0] = GL_SRC_ALPHA; alphamod[1] = GL_SRC_ALPHA; alphamod[2] = GL_SRC_ALPHA; alphamod[3] = GL_SRC_ALPHA;
     alphap = GL_MODULATE;
+
+    scale_rgb[0] = scale_rgb[1] = scale_rgb[2] = 1.0f;
+    scale_alpha = 1.0f;
   }
 };
 

@@ -39,7 +39,7 @@ csEngineProcTex::csEngineProcTex() : csProcTexture ()
   mat_w = 256;
   mat_h = 256;
 
-  texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
+  texFlags = CS_TEXTURE_3D/* | CS_TEXTURE_NOMIPMAPS*/;
 }
 
 csEngineProcTex::~csEngineProcTex ()
@@ -78,7 +78,7 @@ bool csEngineProcTex::PrepareAnim ()
 void csEngineProcTex::Animate (csTicks CurrentTime)
 {
   // move the camera
-  csVector3 Position (-0.5, 0, 3 + sin (CurrentTime / (10*1000.0))*1);
+  csVector3 Position (-0.5, 0, 3 + sin (CurrentTime / (10*1000.0))*3);
   View->GetCamera ()->Move (Position - View->GetCamera ()
   	->GetTransform ().GetOrigin ());
 

@@ -443,13 +443,20 @@ protected:
    */
   struct
   {
-    bool dither; // dither colors?
-    bool trilinearmap; // texel/mipmap interpolate?
-    bool gouraud; // gouraud shading on polygons?
-    bool alphablend; // enable transparency?
-    int  mipmap;    // enable mipmapping?
-    bool lighting; // Option variable: do texture lighting? (lightmaps)
-    bool textured; // Option variable: render textures?
+    /// dither colors?
+    bool dither; 
+    /// texel/mipmap interpolate?
+    bool trilinearmap; 
+    /// gouraud shading on polygons?
+    bool gouraud; 
+    /// enable transparency?
+    bool alphablend; 
+    /// enable mipmapping?
+    int  mipmap;    
+    /// Option variable: do texture lighting? (lightmaps)
+    bool lighting; 
+    /// Option variable: render textures?
+    bool textured; 
   } m_renderstate;
 
   // load-time configuration options

@@ -37,6 +37,7 @@ csTextureOpenGL::csTextureOpenGL (csTextureHandle *Parent, iImage *Image)
   : csTexture (Parent)
 {
   DG_TYPE (this, "csTextureOpenGL");
+  parent = Parent;
   image_data = NULL;
   w = Image->GetWidth ();
   h = Image->GetHeight ();
@@ -426,6 +427,7 @@ csTextureHandleOpenGL::csTextureHandleOpenGL (
   this->sourceFormat = sourceFormat;
   this->bpp = bpp;
   size = 0;
+  was_render_target = false;
   DG_TYPE (this, "csTextureHandleOpenGL");
 }
 

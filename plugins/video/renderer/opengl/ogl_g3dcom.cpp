@@ -738,6 +738,8 @@ void csGraphics3DOGLCommon::PerfTest ()
 
 void csGraphics3DOGLCommon::SharedInitialize (csGraphics3DOGLCommon *d)
 {
+  config.AddConfig(object_reg, "/config/opengl.cfg");
+
   txtmgr = d->txtmgr;
   vbufmgr = d->vbufmgr;
   z_buf_mode = CS_ZBUF_NONE;
@@ -834,6 +836,7 @@ bool csGraphics3DOGLCommon::NewOpen ()
   vbufmgr = new csTriangleArrayVertexBufferManager (object_reg);
 
   m_renderstate.dither = config->GetBool ("Video.OpenGL.EnableDither", false);
+
   z_buf_mode = CS_ZBUF_NONE;
   Caps.CanClip = config->GetBool("Video.OpenGL.Caps.CanClip", false);
   Caps.minTexHeight = config->GetInt("Video.OpenGL.Caps.MinTexHeight", 2);
@@ -1025,7 +1028,8 @@ bool csGraphics3DOGLCommon::NewOpen ()
   if(Caps.maxTexHeight < max_texture_size)
     max_texture_size = Caps.maxTexHeight;
 
-  int max_cache_size = 1024*1024*16; // 32mb combined cache
+  int max_cache_size = // 128mb combined cache per default
+    config->GetInt("Video.OpenGL.MaxTextureCache", 128) * 1024*1024; 
   texture_cache = new OpenGLTextureCache (max_cache_size, this);
   lightmap_cache = new OpenGLLightmapCache (this);
   texture_cache->SetBilinearMapping (config->GetBool
@@ -1136,6 +1140,10 @@ void csGraphics3DOGLCommon::Close ()
   {
     vbufmgr->DecRef (); vbufmgr = NULL;
   }
+
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+    "Peak GL texture cache size: %1.2f MB",
+    ((float)texture_cache->GetPeakTotalTextureSize() / (1024.0f * 1024.0f)));
 
   delete texture_cache; texture_cache = NULL;
   delete lightmap_cache; lightmap_cache = NULL;
@@ -1408,13 +1416,31 @@ void csGraphics3DOGLCommon::FinishDraw ()
       {
         // Texture is in tha cache, update texture directly.
         statecache->SetTexture (GL_TEXTURE_2D, tex_data->Handle);
+	// Texture was not used as a render target before.
+	// Make some necessary adjustments.
+	if (!tex_mm->was_render_target)
+	{
+	  if (!(tex_mm->GetFlags() & CS_TEXTURE_NOMIPMAPS))
+	  {
+	    if (SGIS_generate_mipmap)
+	    {
+	      glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+	    }
+	    else
+	    {
+	      glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+		texture_cache->GetBilinearMapping() ? GL_LINEAR : GL_NEAREST);
+	    }
+	  }
+	  tex_mm->was_render_target = true;
+	}
         glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 1, height-txt_h,
       	  txt_w, txt_h, 0);
       }
       else
       {
         // Not in cache.
-#       ifdef GL_VERSION_1_2x
+       #ifdef GL_VERSION_1_2x
         if (pfmt.PixelBytes == 2)
         {
           char* buffer = new char[2*txt_w*txt_h]; // @@@ Alloc elsewhere!!!
@@ -1438,10 +1464,10 @@ void csGraphics3DOGLCommon::FinishDraw ()
         else
           glReadPixels (1, height-txt_h, txt_w, txt_h,
             GL_RGBA, GL_UNSIGNED_BYTE, tex_0->get_image_data());
-#       else
+       #else
         glReadPixels (1, height-txt_h, txt_w, txt_h, tex_mm->SourceFormat (),
           tex_mm->SourceType (), tex_0->get_image_data ());
-#       endif
+       #endif
       }
     }
   }
@@ -3289,6 +3315,7 @@ csStringID csGraphics3DOGLCommon::GLBlendToString (GLenum blend)
   pass->SetStateString( efstrings->blending, efstrings->enabled ); \
   pass->SetStateString( efstrings->source_blend_mode, efstrings->source_alpha ); \
   pass->SetStateString( efstrings->destination_blend_mode, efstrings->inverted_source_alpha ); \
+  /*pass->SetStateFloat( efstrings->scale_alpha, 0.5f);*/ \
   layer = pass->CreateLayer(); \
   layer->SetStateFloat( efstrings->texture_source, 1 ); \
   layer->SetStateString( efstrings->texture_coordinate_source, efstrings->mesh );
@@ -3535,6 +3562,7 @@ iEffectTechnique* csGraphics3DOGLCommon::GetStockTechnique (
       !mesh.mat_handle->GetTexture() )
     return NULL;
 
+  iEffectTechnique* tech = NULL;
   switch (mesh.mixmode & (CS_FX_MASK_MIXMODE | CS_FX_EXTRA_MODES))
   {
     case CS_FX_SRCDST:
@@ -3554,7 +3582,7 @@ iEffectTechnique* csGraphics3DOGLCommon::GetStockTechnique (
         StockEffects[0][mesh.do_fog?1:0][4] );
     case CS_FX_ALPHA:
       return NULL;/*effectserver->SelectAppropriateTechnique(
-        StockEffects[0][mesh.do_fog?1:0][5] );*/
+         StockEffects[0][mesh.do_fog?1:0][5] );*/
     case CS_FX_TRANSPARENT:
       return effectserver->SelectAppropriateTechnique(
         StockEffects[0][mesh.do_fog?1:0][6] );
@@ -4134,6 +4162,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
           glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB_ARB, layer_data->colormod[2]);
         }
         glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, layer_data->colorp );
+	glTexEnvfv(GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, layer_data->scale_rgb);
 
         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, layer_data->alphasource[0]);
         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, layer_data->alphamod[0]);
@@ -4145,6 +4174,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
           glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_ALPHA_ARB, layer_data->alphamod[2]);
         }
         glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, layer_data->alphap);
+	glTexEnvf(GL_TEXTURE_ENV, GL_ALPHA_SCALE, layer_data->scale_alpha);
       }
     }
     glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
@@ -5680,6 +5710,20 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
           else
             layer_data->ccsource = ED_SOURCE_NONE;
         }
+	else if ((layer_state == efstrings->scale_rgb))
+	{
+	  csEffectVector4 layer_scale_rgb = layer->GetStateVector4 (layer_state);
+
+	  layer_data->scale_rgb[0] = layer_scale_rgb.x;
+	  layer_data->scale_rgb[1] = layer_scale_rgb.y;
+	  layer_data->scale_rgb[2] = layer_scale_rgb.z;
+	}
+	else if ((layer_state == efstrings->scale_alpha))
+	{
+	  float layer_scale_alpha = layer->GetStateFloat (layer_state);
+
+	  layer_data->scale_alpha = layer_scale_alpha;
+	}
         else
           return false;
         layer_state = layer->GetNextState();

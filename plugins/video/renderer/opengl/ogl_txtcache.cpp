@@ -85,6 +85,7 @@ OpenGLTextureCache::OpenGLTextureCache (int max_size,
   num = 0;
   head = tail = NULL;
   total_size = 0;
+  peak_total_size = 0;
   OpenGLTextureCache::g3d = g3d;
 }
 
@@ -127,13 +128,14 @@ void OpenGLTextureCache::Cache (iTextureHandle *txt_handle)
       txt_handle->GetPrivateObject ();
 
     // unit is not in memory. load it into the cache
-    while (total_size + txt_mm->size >= cache_size)
+    while (cache_size && (total_size + txt_mm->size >= cache_size))
       // out of memory. remove units from bottom of list.
       Unload (tail);
 
     // now load the unit.
     num++;
     total_size += txt_mm->size;
+    peak_total_size = MAX(peak_total_size, total_size);
 
     cached_texture = new csTxtCacheData;
 
