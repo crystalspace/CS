@@ -794,9 +794,9 @@ void csSector::Draw (iRenderView *rview)
     {
       r3d->SetObjectToCamera (&rview->GetCamera ()->GetTransform ());
       r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
-  	alllights.Get (i)->GetCenter ());
+  	    alllights.Get (i)->GetCenter ());
       r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
-  	alllights.Get (i)->GetAttenuationVector() );
+  	    alllights.Get (i)->GetAttenuationVector() );
 
       r3d->SetWriteMask (false, false, false, false);
       r3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
@@ -875,10 +875,9 @@ void csSector::DrawZ (iRenderView* rview)
 
   if (prev_sector)
   {
-    draw_prev_sector = 
-      rview->GetPortalPolygon ()->IsTransparent () ||
-      rview->GetPortalPolygon ()->GetPortal ()->GetFlags ().Check (
-          CS_PORTAL_WARP);
+    iPolygon3DStatic* st = rview->GetPortalPolygon ()->GetStaticData ();
+      draw_prev_sector =  st->IsTransparent () ||
+        st->GetPortal ()->GetFlags ().Check (CS_PORTAL_WARP);
   }
 
   for (i = 0; i < num_objects; i ++)

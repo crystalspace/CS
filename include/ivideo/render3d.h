@@ -263,7 +263,7 @@ enum csVertexAttrib
  * in combination with a vertex or edge table. 'a', 'b', and 'c' are then
  * indices in that table (either vertices or edges).
  */
-struct csTriangle
+/*struct csTriangle
 {
   int a, b, c;
 
@@ -273,7 +273,7 @@ struct csTriangle
   /// Convenience constructor, builds a triangle with initializers
   csTriangle(int _a, int _b, int _c):a(_a), b(_b), c(_c) {}
 };
-
+*/
 
 class csRender3dCaps
 {
