@@ -22,6 +22,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/vector4.h"
 #include "csutil/csstring.h"
 #include "csutil/strset.h"
+#include "iutil/objreg.h"
 #include "iutil/string.h"
 
 #include "ps1_instr.h"
@@ -94,7 +95,7 @@ struct csPSConstant
 class csPixelShaderParser
 {
 private:
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
   csStringSet strings;
 
   struct PS_InstructionData : public csPixelShaderInstructionData

@@ -389,14 +389,14 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
         case XMLTOKEN_VERTEX_COLOR:
           {
             const char* str;
-            if (str = child->GetContentsValue ())
+            if ((str = child->GetContentsValue ()) != 0)
               primcolvar = strings->Request (str);
           }
           break;
         case XMLTOKEN_CONSTANT_COLOR:
           {
             const char* str;
-            if (str = child->GetContentsValue ())
+            if ((str = child->GetContentsValue ()) != 0)
             {
               int layer = child->GetAttributeValueAsInt ("layer");
               if (layers.Length ()<=layer)
@@ -481,8 +481,6 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 
   for (i = 0; i < lights.Length (); i++)
   {
-    lightingentry &ent = lights.Get (i);
-
     lights[i].positionVarRef = 0;
     lights[i].diffuseVarRef = 0;
     lights[i].specularVarRef = 0;

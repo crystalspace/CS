@@ -19,6 +19,8 @@ chronological order.
 	  from csArray's sorting and searching methods.  Now, all arguments to
 	  these functions and their comparison helpers are type-specific and
 	  type-safe.
+	- Eric Sunshine fixed compilation errors and warnings in the various
+	  shader plugins.  Also added 'softshader' to user.mak.
 25-Mar-2004
 	- res ported code to properly handle keycolored procedural textures
 	  over from the OR.
