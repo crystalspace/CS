@@ -16,7 +16,9 @@
 # TO_INSTALL.INCLUDE does not exist, the entire include/ hierarchy is copied
 #               to include/. (max 3 levels deep now)
 # TO_INSTALL.DOCS also does not exist, the docs/html dir is copied (all .htm)
-#               to docs/. , as well as all subdirs (2 deep) with gif,jpg,png.
+#               to docs/html, as well as all subdirs (2 deep) with gif,jpg,png.
+#               also docs/README.htm is copied, and docs/pubapi is copied,
+#               (all .htm, .gif, .css )
 
 .PHONY: install_config install_data install_dynamiclibs install_staticlibs \
   install_exe install_include install_root install_logfile install_docs
@@ -84,24 +86,25 @@ install_include: $(INSTALL_DIR)/include $(INSTALL_INCLUDE.DIR) \
   $(INSTALL_INCLUDE.DESTFILES)
 
 
-# install docs/html into INSTALL_DIR/docs
-INSTALL_DOCS.FILES = $(wildcard docs/html/*htm \
+# install docs/html into INSTALL_DIR/docs/html,
+#  docs/pubapi to INSTALL_DIR/docs/pubapi and copy docs/README.htm as well.
+INSTALL_DOCS.FILES = docs/README.htm $(wildcard docs/html/*htm \
   docs/html/*/*jpg docs/html/*/*gif docs/html/*/*png  \
-  docs/html/*/*/*jpg docs/html/*/*/*gif docs/html/*/*/*png)
+  docs/html/*/*/*jpg docs/html/*/*/*gif docs/html/*/*/*png \
+  docs/pubapi/*htm docs/pubapi/*gif docs/pubapi/*css )
 INSTALL_DOCS.DIR1 = $(addprefix $(INSTALL_DIR)/,  \
-  $(patsubst %/, %, \
-  $(patsubst docs/html/%, docs/%, $(sort $(dir $(INSTALL_DOCS.FILES))))))
+  $(patsubst %/, %, $(sort $(dir $(INSTALL_DOCS.FILES)))))
 # also include parent dirs in dirlist, for tutorial/mapcs 
 INSTALL_DOCS.DIR = $(filter-out $(INSTALL_DIR), $(sort $(INSTALL_DOCS.DIR1) \
   $(patsubst %/, %, $(dir $(INSTALL_DOCS.DIR1)))))
 INSTALL_DOCS.DESTFILES = $(addprefix $(INSTALL_DIR)/,  \
-  $(patsubst docs/html/%, docs/%,$(sort $(INSTALL_DOCS.FILES))))
+  $(sort $(INSTALL_DOCS.FILES)))
 
 $(INSTALL_DOCS.DIR): 
 	$(MKDIR)
 	@echo $@/deleteme.dir >> $(INSTALL_LOG)
 
-$(INSTALL_DOCS.DESTFILES): $(INSTALL_DIR)/docs/% : docs/html/%
+$(INSTALL_DOCS.DESTFILES): $(INSTALL_DIR)/docs/% : docs/%
 	$(CP) $< $@
 	@echo $@ >> $(INSTALL_LOG)
 
