@@ -88,7 +88,7 @@ static struct csKeyMaskDef
   { NULL,	0		}
 };
 
-bool csParseInputDef (const char *name, iEvent* ev, bool use_shift = true)
+bool csParseInputDef (const char *name, iEvent* ev, bool use_shift)
 {
   int mod = 0;
   bool ismask;
@@ -134,12 +134,12 @@ bool csParseInputDef (const char *name, iEvent* ev, bool use_shift = true)
   return true;
 }
 
-bool csParseInputDef (const char* name, csEvent& ev, bool use_shift = true)
+bool csParseInputDef (const char* name, csEvent& ev, bool use_shift)
 {
   return csParseInputDef (name, &ev, use_shift);
 }
 
-bool csParseKeyDef (const char *name, int &key, int &shift, bool use_shift = true)
+bool csParseKeyDef (const char *name, int &key, int &shift, bool use_shift)
 {
   csEvent ev;
   bool ret = csParseInputDef (name, ev, use_shift);
@@ -151,7 +151,7 @@ bool csParseKeyDef (const char *name, int &key, int &shift, bool use_shift = tru
   return ret;
 }
 
-bool csParseMouseDef (const char *name, int &button, int &shift, bool use_shift = true)
+bool csParseMouseDef (const char *name, int &button, int &shift, bool use_shift)
 {
   csEvent ev;
   bool ret = csParseInputDef (name, ev, use_shift);
@@ -165,7 +165,7 @@ bool csParseMouseDef (const char *name, int &button, int &shift, bool use_shift 
   return ret;
 }
 
-bool csParseJoyDef (const char *name, int &button, int &shift, bool use_shift = true)
+bool csParseJoyDef (const char *name, int &button, int &shift, bool use_shift)
 {
   csEvent ev;
   bool ret = csParseInputDef (name, ev, use_shift);
@@ -179,7 +179,7 @@ bool csParseJoyDef (const char *name, int &button, int &shift, bool use_shift = 
   return ret;
 }
 
-bool csGetInputDesc (iEvent *ev, char *buf, bool use_shift = true)
+bool csGetInputDesc (iEvent *ev, char *buf, bool use_shift)
 {
   if (use_shift)
   {
@@ -271,12 +271,12 @@ bool csGetInputDesc (iEvent *ev, char *buf, bool use_shift = true)
   return false;
 }
 
-bool csGetInputDesc (csEvent &ev, char *buf, bool use_shift = true)
+bool csGetInputDesc (csEvent &ev, char *buf, bool use_shift)
 {
   return csGetInputDesc (&ev, buf, use_shift);
 }
 
-bool csGetKeyDesc (int key, int shift, char *buf, bool use_shift = true)
+bool csGetKeyDesc (int key, int shift, char *buf, bool use_shift)
 {
   csEvent ev (0, csevKeyDown,
     key >= CSKEY_FIRST ? key : 0,
@@ -285,7 +285,7 @@ bool csGetKeyDesc (int key, int shift, char *buf, bool use_shift = true)
   return csGetInputDesc (ev, buf, use_shift);
 }
 
-bool csGetMouseDesc (int button, int shift, char *buf, bool use_shift = true)
+bool csGetMouseDesc (int button, int shift, char *buf, bool use_shift)
 {
   csEvent ev (0,
     button == CSAXIS_X || button == CSAXIS_Y ? csevMouseMove : csevMouseDown,
@@ -295,7 +295,7 @@ bool csGetMouseDesc (int button, int shift, char *buf, bool use_shift = true)
   return csGetInputDesc (ev, buf, use_shift);
 }
 
-bool csGetJoyDesc (int button, int shift, char *buf, bool use_shift = true)
+bool csGetJoyDesc (int button, int shift, char *buf, bool use_shift)
 {
   csEvent ev (0,
     button == CSAXIS_X || button == CSAXIS_Y ? csevJoystickMove : csevJoystickDown,
