@@ -25,6 +25,56 @@ chronological order.
 	  between different types on the same memory address. This is not
 	  guaranteed to work in C++. This fixes a falling through the floor
 	  problem in walktest.
+	- Eric Sunshine made the following changes to msvcgen:
+	    - Added --set option to msvcgen.pl which allows clients to
+	      create their own template interoplation variables. For example,
+	      --set=cflags='/D "__CRYSTAL_SPACE__"' creates a variable which
+	      can be interpolated into template files as %cflags%.
+	    - Eliminated hard-coded knowledge of almost all template variables
+	      from msvcgen.pl.  (The only ones still remaining are those which
+	      msvcgen.pl creates itself for referencing generated material.)
+	      Instead, clients now create, via --set, whichever variables they
+	      require.  Consequently, removed the following options and related
+	      interpolation variables:
+                  --build-root          %buildroot%
+                  --cflags              %cflags%
+                  --debugcflags         %debugcflags%
+                  --debuglflags         %debuglflags%
+                  --debuglibrary        %debuglibs%
+                  --lflags              %lflags%
+                  --library             %libs%
+                  --meta-file           %metafile%
+                  --name                %name%, %upcasename%
+                  --project-extension
+                  --project-name        %project%
+                  --source-root         %sourceroot%
+                  --target              %target%
+                  --workspace-extension
+	    - Worked around corruption in generated files caused by MSYS
+	      shell's insistence upon transmogrifying absolute-path-like
+	      command arguments into Windows format pathnames.  For example, /D
+	      would be corrupted into something like C:/Path/To/Msys/Root/D.
+	      This caused havoc with MSVC compiler and linker options, such as
+	      /D, /I, /nologo, etc., which were passed to msvcgen.pl on the
+	      command-line.  To side-step this issue, msvcgen.jam now prepends
+	      the literal "%null%" to any values passed to msvcgen.pl on the
+	      command-line which are likely to trigger this unfortunate MSYS
+	      behavior.  msvcgen.pl treats the %null% as just another
+	      interpolation variable reference, and replaces it with the null
+	      string (since %null% happens to be undefined).
+	    - Changed msvcgen.jam so that it no longer passes tuples created
+	      with MsvcGenConfig from msvcgen phase 1 to phase 2 via the
+	      command-line since these tuples were subject to the same MSYS
+	      corruption as the information passed to msvcgen.pl via the
+	      command-line.  Instead, MsvcGenConfig tuples are now collected
+	      directly by phase 2.
+	    - Augmented the MsvcGenConfigFile rule in msvcgen.jam so that it
+	      can be invoked multiple times to specify additional configuration
+	      files.  Previously, clients were restricted to specifying only a
+	      single configuration file.
+	    - Added MSVCGEN_VERBOSE option to msvcgen.jam which makes the
+	      msvcgen process very verbose when set to 'yes'.  This complements
+	      the existing MSVCGEN_SILENT option.
 1-Jun-2004
 	- Jorrit fixed a bug in the particles loader. The test to see if a
 	  factory is ok was wrong.

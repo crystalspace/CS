@@ -99,7 +99,9 @@ rule MsvcJamconfig
     Depends $(i) : $(target) ;
   }
 
-  return [ ConcatDirs $(sourcedir) $(target:G=) ] ;
+  local fullpath = [ ConcatDirs $(sourcedir) $(target:G=) ] ;
+  MSVCGEN_JAMOPTIONS += -sJAMCONFIG='$(fullpath)' ;
+  return $(fullpath) ;
 }
 
 actions MsvcJamconfig1 bind BOILERPLATE
@@ -109,6 +111,5 @@ actions MsvcJamconfig1 bind BOILERPLATE
 }
 
 MsvcGenConfig USE_PLUGINS : yes ;
-MsvcGenConfig JAMCONFIG :
-  [ MsvcJamconfig Jamconfig.msvcgen : $(JAMCONFIG:BS) : $(JAMCONFIG:D) :
-    config.jam : $(SUBDIR) : AVAILABLE CFLAGS C++FLAGS LFLAGS ] ;
+MsvcJamconfig Jamconfig.msvcgen : $(JAMCONFIG:BS) : $(JAMCONFIG:D) :
+    config.jam : $(SUBDIR) : AVAILABLE CFLAGS C++FLAGS LFLAGS ;

@@ -79,8 +79,9 @@ rule MsvcGenConfig1 { }
 ## MsvcGenConfigFile file
 ##   Similar to MsvcGenConfig, except that the configuration is provided via a
 ##   file containing Jam statements.  In the common case, the file will contain
-##   a series of simple variable assignment statements.  It is legal to use
-##   this rule in conjunction with MsvcGenConfig; they are not mutually
+##   a series of simple variable assignment statements.  May be invoked
+##   multiple times to specify additional configuration files.  It is legal to
+##   use this rule in conjunction with MsvcGenConfig; they are not mutually
 ##   exclusive.
 rule MsvcGenConfigFile { MsvcGenConfigFile1 $(1) : $(2) ; }
 rule MsvcGenConfigFile1 { }
@@ -191,21 +192,23 @@ rule msvcgen_version_check
 
 if ! $(DO_MSVCGEN)
 {
-MSVCGEN_SILENT ?= no ;
 JAM ?= jam ;
-if $(MSVCGEN_SILENT) = yes { JAM += -d0 ; }
-
-## MsvcGenConfig variable : value
-##   (See documentation above.)
-rule MsvcGenConfig1
+MSVCGEN_JAMOPTIONS ?= ;
+MSVCGEN_SILENT ?= no ;
+MSVCGEN_VERBOSE ?= no ;
+if $(MSVCGEN_SILENT) = yes
 {
-  if $(>)
+  MSVCGEN_JAMOPTIONS += -d0 ;
+}
+else if $(MSVCGEN_VERBOSE) = yes
+{
+  if $(JAMVERSION) <= 2.4
   {
-    MSVCGEN_CONFIG_TUPLES += "-s$(<)='$(>)'" ;
+    MSVCGEN_JAMOPTIONS += -d+2 ;
   }
   else
   {
-    MSVCGEN_CONFIG_TUPLES += "-s$(<)=''" ;
+    MSVCGEN_JAMOPTIONS += -dx ;
   }
 }
 
@@ -213,7 +216,7 @@ rule MsvcGenConfig1
 ##   (See documentation above.)
 rule MsvcGenConfigFile1
 {
-  MSVCGEN_CONFIG = $(<) ;
+  MSVCGEN_CONFIG_FILES += $(<) ;
 }
 
 ## MsvcGenSubDir dircomponents [ : version ]
@@ -257,10 +260,13 @@ rule MsvcGenTarget
   Help msvc$(version)clean : "Remove built MSVC$(version) project files" ;
 }
 
-actions MsvcGen
+actions MsvcGen bind MSVCGEN_CONFIG
 {
-  $(JAM) -sDO_MSVCGEN=yes -sMSVCGEN_CONFIG=$(MSVCGEN_CONFIG) \
-    -sMSVC_VERSION=$(MSVC_VERSION) -sTARGET.OS=WIN32 $(MSVCGEN_CONFIG_TUPLES) \
+  $(JAM) $(MSVCGEN_JAMOPTIONS) \
+    -sDO_MSVCGEN=yes \
+    -sMSVC_VERSION=$(MSVC_VERSION) \
+    -sMSVCGEN_CONFIG_FILES='$(MSVCGEN_CONFIG_FILES)' \
+    -sTARGET.OS=WIN32 \
     msvcgen
 }
 
@@ -291,9 +297,13 @@ else
 #------------------------------------------------------------------------------
 # Phase 2
 
-if $(MSVCGEN_CONFIG)
+if $(MSVCGEN_CONFIG_FILES)
 {
-  include $(MSVCGEN_CONFIG) ;
+  local f ;
+  for f in $(MSVCGEN_CONFIG_FILES)
+  {
+    include $(f) ;
+  }
 }
 
 PERL ?= perl ;
@@ -321,17 +331,13 @@ MSVC_VERSION ?= 7 ;
 if $(MSVC_VERSION) = 6
 {
   MSVCGEN_EXTRA_OPTS = ;
-  SSUFPRJ = dsp ;
-  SSUFWSP = dsw ;
   SUFPRJ = .dsp ;
   SUFWSP = .dsw ;
 }
 else if $(MSVC_VERSION) = 7
 {
   MSVCGEN_EXTRA_OPTS = --xml-protect ;
-  SSUFPRJ = vcproj ;
   SUFPRJ = .vcproj ;
-  SSUFWSP = sln ;
   SUFWSP = .sln ;
 }
 else
@@ -386,6 +392,13 @@ SetProperty build : projgen_version : $(MSVC_VERSION) ;
 #----------------------------------------------------------------------------
 # Override some rules
 
+## MsvcGenConfig variable [ : value ]
+##   (See documentation above.)
+rule MsvcGenConfig
+{
+  $(<) = $(>) ;
+}
+
 ## MsvcGenWorkspace name [ : accepts [ : rejects ]]
 ##   (See documentation above.)
 rule MsvcGenWorkspace1
@@ -402,8 +415,23 @@ rule MsvcGenSubDir1
 {
   local path = $(1) ;
   local version = $(2) ;
+
+  local relpath ;
+  if ! $(path[2])
+  {
+    relpath = $(DOT) ;
+  }
+  else
+  {
+    local i ;
+    for i in $(path[2-])
+    {
+      relpath += $(DOTDOT) ;
+    }
+  }
+
   SetProperty msvcgen : outdir$(version) : [ msvcgen_target_dir $(path) ] ;
-  SetProperty msvcgen : relpath$(version) : [ FSubDir $(path[2-]) ] ;
+  SetProperty msvcgen : relpath$(version) : $(relpath) ;
 }
 
 ## MsvcGenTemplateDir dircomponents [ : version ]
@@ -500,6 +528,7 @@ rule MsvcProject
       MakeLocate $(metarc) : $(outdir) ;
       SEARCH on $(metarc) = $(SEARCH_SOURCE) ;
     
+      files += $($(rawname)_METAFILE) ;
       Depends $(metarc) : $($(rawname)_METAFILE) ;
       GenerateWin32MetadataRc $(metarc) : $($(rawname)_METAFILE) ;
       Always $(metarc) ;
@@ -542,7 +571,6 @@ rule MsvcProject
   }
   
   local relpath = [ Property msvcgen : relpath$(MSVC_VERSION) ] ;
-  RAWNAME on $(target) = $(rawname) ;
   PROJECTNAME on $(target) = $(msvcname) ;
   TARGET on $(target) = $(decorated) ;
   TYPE on $(target) = $(type) ;
@@ -557,7 +585,7 @@ rule MsvcProject
   CFLAGS on $(target) += $(MSVC.CFLAGS) $(MSVC.CFLAGS.$(type)) ;
   CFLAGS_DEBUG on $(target) +=
     $(MSVC.CFLAGS_DEBUG) $(MSVC.CFLAGS_DEBUG.$(type)) ;
-  RELPATH on $(target) = [ ConcatDirs $(relpath) ] ;
+  RELPATH on $(target) = $(relpath:J=\\) ;
 
   local incdirs ;
   for incdirs in $(MSVC.INCDIRS) $(MSVC.INCDIRS.$(rawname))
@@ -569,10 +597,9 @@ rule MsvcProject
     }
     else
     {
-      incdir = [ ConcatDirs $(relpath) $(incdirs) ] ;
+      incdir = $(relpath) $(incdirs) ;
     }
-    INCDIRS on $(target) +=
-      "/I `echo '\"$(incdir)\"' | $(SED) 's:/:\\\\\\:g'`" ;
+    INCDIRS on $(target) += "/I \"$(incdir:J=\\)\"" ;
   }
 
   local templatedir = [ Property msvcgen : templatedir$(MSVC_VERSION) ] ;
@@ -846,35 +873,46 @@ rule Win32Resource
 
 #----------------------------------------------------------------------------
 
+# Implementation: Command arguments with a leading slash (or a slash following
+# some punctuation, such as ', ", =, etc.) are interpreted by the MSYS shell as
+# if they are MSYS absolute pathnames which need to be transmogrified into
+# Windows pathnames.  This is a problem if arguments we pass to msvcgen.pl
+# contain MSVC compiler or linker flags, such as /D, /I, etc., since MSYS will
+# incorrectly think that they are pathnames, and change them to something along
+# the lines of C:/Path/To/Msys/Root/D.  To avoid this problem, we prepend the
+# literal"%null%" to values which are likely to trigger this problem.
+# msvcgen.pl will see the %null% as just another interpolation variable
+# reference and replace it with its value (the empty string in this case since
+# it is undefined), which restores the value to its original form before we
+# prepended %null%.
 actions MsvcProjectGen
 {
   $(RUN_MSVCGEN) \
   --quiet \
   --project \
   $(MSVCGEN_EXTRA_OPTS) \
-  --project-extension=$(SSUFPRJ) \
-  --name=$(RAWNAME) \
   --template=$(TYPE) \
   --template-dir=$(MSVCGEN_TEMPLATEDIR) \
-  --project-name=$(PROJECTNAME) \
   --output=$(<[1]) \
-  --target=$(TARGET) \
   --fragment=$(FRAGMENT_ROOT) \
   --depend=$(DEPEND) \
-  --library=$(LIBRARIES) \
-  --lflags='$(LFLAGS)' \
-  --cflags='$(CFLAGS)' \
-  --cflags="$(INCDIRS)" \
-  --debuglibrary=$(LIBRARIES_DEBUG) \
-  --debuglflags='$(LFLAGS_DEBUG)' \
-  --debugcflags='$(CFLAGS_DEBUG)' \
-  --debugcflags="$(INCDIRS)" \
-  --source-root='$(RELPATH)' \
-  --build-root='$(RELPATH)' \
   --strip-root='$(MSVCGEN_STRIP_ROOT)' \
-  --accept='$(ACCEPTS)' \
-  --reject='$(REJECTS)' \
-  --response-file=$(>)
+  --accept='%null%$(ACCEPTS)' \
+  --reject='%null%$(REJECTS)' \
+  --response-file=$(>) \
+  --set=project=$(PROJECTNAME) \
+  --set=target=$(TARGET) \
+  --set=makefile=$(<[1]:BS=.mak) \
+  --set=libs='$(LIBRARIES:S=.lib)' \
+  --set=lflags='%null%$(LFLAGS)' \
+  --set=cflags='%null%$(CFLAGS)' \
+  --set=cflags='%null%$(INCDIRS)' \
+  --set=debuglibs='$(LIBRARIES_DEBUG:S=.lib)' \
+  --set=debuglflags='%null%$(LFLAGS_DEBUG)' \
+  --set=debugcflags='%null%$(CFLAGS_DEBUG)' \
+  --set=debugcflags='%null%$(INCDIRS)' \
+  --set=sourceroot='$(RELPATH)' \
+  --set=buildroot='$(RELPATH)'
 }
 
 actions together MsvcWorkspaceGen
@@ -883,11 +921,10 @@ actions together MsvcWorkspaceGen
   --quiet \
   --workspace \
   $(MSVCGEN_EXTRA_OPTS) \
-  --workspace-extension=$(SSUFWSP) \
   --output=$(<) \
   --template-dir=$(MSVCGEN_TEMPLATEDIR) \
-  --accept='$(MSVC.ACCEPTS.$(RAWNAME))' \
-  --reject='$(MSVC.REJECTS.$(RAWNAME))' \
+  --accept='%null%$(MSVC.ACCEPTS.$(RAWNAME))' \
+  --reject='%null%$(MSVC.REJECTS.$(RAWNAME))' \
   --response-file=$(>)
 }
 

@@ -34,56 +34,25 @@ use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'msvcgen.pl';
-my $PROG_VERSION = 9;
+my $PROG_VERSION = 10;
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000-2004 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 
 $main::opt_project = 0;
-$main::opt_p = 0;	# Alias for 'project'.
-$main::opt_project_extension = '';
-$main::opt_P = '';	# Alias for 'project-extension'.
 $main::opt_workspace = 0;
-$main::opt_w = 0;	# Alias for 'workspace'.
-$main::opt_workspace_extension = '';
-$main::opt_W = '';	# Alias for 'workspace-extension'.
-$main::opt_name = '';
-$main::opt_N = '';	# Alias for 'name'.
 $main::opt_template = '';
-$main::opt_t = '';	# Alias for 'template'.
-$main::opt_project_name = '';
 $main::opt_xml_protect = 0;
-$main::opt_X = 0;	# Alias for 'xml-protect'.
-$main::opt_target = '';
-$main::opt_g = '';	# Alias for 'target'.
-$main::opt_meta_file = '';
-$main::opt_M = '';	# Alias for 'meta-file'.
-@main::opt_library = ();
-@main::opt_debuglibrary = ();
-@main::opt_L = ();	# Alias for 'library'.
 @main::opt_delaylib = ();
-@main::opt_Y = ();	# Alias for 'delaylib'.
-@main::opt_lflags = ();
-@main::opt_debuglflags = ();
-@main::opt_l = ();	# Alias for 'lflags'.
-@main::opt_cflags = ();
-@main::opt_debugcflags = ();
 $main::opt_output = '';
 $main::opt_fragment = undef;
 @main::opt_depend = ();
-@main::opt_D = ();	# Alias for 'depend'.
 $main::opt_template_dir = '';
-$main::opt_T = '';	# Alias for 'template-dir'.
 @main::opt_strip_root = ();
-@main::opt_S = ();	# Alias for 'strip-root'.
 @main::opt_accept = ();
-@main::opt_a = ();	# Alias for 'accept'.
 @main::opt_reject = ();
-@main::opt_r = ();	# Alias for 'reject'.
 @main::opt_response_file = ();
-@main::opt_R = ();	# Alias for 'response-file'.
-$main::opt_source_root = '.';
-$main::opt_build_root = '.';
+@main::opt_set = ();
 $main::opt_verbose = 0;
 $main::opt_v = 0;	# Alias for 'verbose'.
 $main::opt_quiet = 0;
@@ -93,50 +62,19 @@ $main::opt_help = 0;
 
 my @script_options = (
     'project',
-    'p',		# Alias for 'project'.
-    'project-extension=s',
-    'P=s', 		# Alias for 'project-extension'.
     'workspace',
-    'w',		# Alias for 'workspace'.
-    'workspace-extension=s',
-    'W=s',		# Alias for 'workspace-extension'.
-    'name=s',
-    'N=s',		# Alias for 'name'.
     'template=s',
-    't=s',		# Alias for 'template'.
-    'project-name=s',
     'xml-protect',
-    'X',		# Alias for 'xml-protect'.
-    'target=s',
-    'g=s',		# Alias for 'target'.
-    'meta-file=s',
-    'M=s',		# Alias for 'meta-file'.
-    'library=s@',
-    'debuglibrary=s@',
-    'L=s@',		# Alias for 'library'.
     'delaylib=s@',
-    'Y=s@',		# Alias for 'delaylib'.
-    'lflags=s@',
-    'debuglflags=s@',
-    'l=s@',		# Alias for 'lflags'.
-    'cflags=s@',
-    'debugcflags=s@',
     'output=s',
     'fragment:s',
     'depend=s@',
-    'D=s@',		# Alias for 'depend'.
     'template-dir=s',
-    'T=s',		# Alias for 'template-dir'.
     'strip-root=s@',
-    'S=s@',		# Alias for 'strip-root'.
     'accept=s@',
-    'a=s@',		# Alias for 'accept'.
     'reject=s@',
-    'r=s@',		# Alias for 'reject'.
     'response-file=s@',
-    'R=s@',		# Alias for 'response-file'.
-    'source-root=s',
-    'build-root=s',
+    'set=s@',
     'verbose!',
     'v!',		# Alias for 'verbose'.
     'quiet!',
@@ -148,7 +86,7 @@ my @script_options = (
 $main::verbosity = 0;
 $main::accept_patterns = '';
 $main::reject_patterns = '';
-$main::makefile = '';
+$main::variables = {};
 $main::guid = '';
 $main::groups = {};
 @main::pjf_fragments = ();
@@ -165,6 +103,23 @@ $main::workspace_project_template = '';
 $main::workspace_depend_template = '';
 $main::workspace_config_template = '';
 
+$main::reserved_variables = qr/^(?:
+    configs     |
+    delaylib    |
+    delaylibs   |
+    depend      |
+    depends     |
+    depguid     |
+    depnum      |
+    file        |
+    files       |
+    group       |
+    groups      |
+    guid        |
+    projects    |
+    projfile
+)$/x;
+
 $main::patterns = {
     'sources'     => {
 	'name'    => 'Source Files',
@@ -176,24 +131,6 @@ $main::patterns = {
     },
     'resources'   => {
 	'name'    => 'Resource Files'
-    }
-};
-
-$main::targets = {
-    'appgui' => {
-	'suffix' => 'exe'
-    },
-    'appcon' => {
-	'suffix' => 'exe'
-    },
-    'plugin' => {
-	'suffix' => 'dll'
-    },
-    'library' => {
-	'suffix' => 'lib'
-    },
-    'group' => {
-	'suffix' => ''
     }
 };
 
@@ -241,16 +178,16 @@ sub print_title {
 sub add_suffix {
     my ($name, $suffix) = @_;
     $name .= ".$suffix" unless $name =~ /(?i)\.$suffix$/;
-    $_[0] = $name;
+    return $name;
 }
 
 #------------------------------------------------------------------------------
 # Remove a suffix from a filename if present.
 #------------------------------------------------------------------------------
 sub remove_suffix {
-    my ($name, $suffix) = @_;
-    $name =~ s/(?i)\.$suffix$//;
-    $_[0] = $name;
+    my $name = shift;
+    $name =~ s:\.[^/\\.]*$::;
+    return $name;
 }
 
 #------------------------------------------------------------------------------
@@ -352,10 +289,37 @@ sub load_templates {
 # compose a string out of the array elements and use the result as the
 # replacement value.  Otherwise assume that the value is a simple string.
 #------------------------------------------------------------------------------
-sub interpolate {
-    my ($pattern, $value, $buffer) = @_;
+sub interpolate_variable {
+    my ($buffer, $pattern, $value) = @_;
     $value = join(' ', @{$value}) if ref($value) and ref($value) eq 'ARRAY';
     ${$buffer} =~ s/$pattern/$value/g;
+}
+
+#------------------------------------------------------------------------------
+# Interpolate a set of variables into a string.  The set of variables is
+# gleaned from the received hash reference where the hash keys are variable
+# names, and the hash values are variable values.
+#------------------------------------------------------------------------------
+sub interpolate_variables {
+    my ($buffer, $vars) = @_;
+    my $key;
+    foreach $key (sort(keys(%{$vars}))) {
+	interpolate_variable($buffer, "\%$key\%", $vars->{$key});
+    }
+}
+
+#------------------------------------------------------------------------------
+# Interpolate a set of variables into a string.  The set of variables is
+# composed of the global variable list (constructed via --set) and the received
+# hash reference where the hash keys are variable names, and the hash values
+# are variable values.  Undefined %variable% references in the string are
+# removed (as if %variable% expanded to the null string).
+#------------------------------------------------------------------------------
+sub interpolate {
+    my ($buffer, $other_vars) = @_;
+    interpolate_variables($buffer, $main::variables);
+    interpolate_variables($buffer, $other_vars);
+    ${$buffer} =~ s/\%\w+?\%//ig;
 }
 
 #------------------------------------------------------------------------------
@@ -363,12 +327,12 @@ sub interpolate {
 # a pattern string, and return the concatenation of all resulting buffers.
 #------------------------------------------------------------------------------
 sub interpolate_items {
-    my ($items, $pattern, $template) = @_;
+    my ($template, $pattern, $items) = @_;
     my $result = '';
     my $item;
     foreach $item (sort(@{$items})) {
 	my $buffer = $template;
-	interpolate($pattern, $item, \$buffer);
+	interpolate(\$buffer, { $pattern => $item });
 	$result .= $buffer;
     }
     return $result;
@@ -381,20 +345,14 @@ sub interpolate_project_group {
     my $group = shift;
     my $files = $main::groups->{$group};
     my $files_buffer =
-	interpolate_items($files, '%file%', $main::project_file_template);
-    interpolate('%name%', $main::opt_name, \$files_buffer);
-    interpolate('%sourceroot%', $main::opt_source_root, \$files_buffer);
-    interpolate('%buildroot%', $main::opt_build_root, \$files_buffer);
-    interpolate('%metafile%', $main::opt_meta_file, \$files_buffer);
+	interpolate_items($main::project_file_template, 'file', $files);
 
     my $group_name = $main::patterns->{$group}->{'name'};
     my $result = $main::project_group_template;
-    interpolate('%name%', $main::opt_name, \$result);
-    interpolate('%sourceroot%', $main::opt_source_root, \$result);
-    interpolate('%buildroot%', $main::opt_build_root, \$result);
-    interpolate('%metafile%', $main::opt_meta_file, \$result);
-    interpolate('%group%', $group_name, \$result);
-    interpolate('%files%', $files_buffer, \$result);
+    interpolate(\$result, {
+	'group' => $group_name,
+	'files' => $files_buffer
+    });
     return $result;
 }
 
@@ -415,29 +373,12 @@ sub interpolate_project_groups {
 #------------------------------------------------------------------------------
 sub interpolate_project {
     my $result = $main::project_template;
-    my $delaylibs = '';
-    my $delaylib;
-    foreach $delaylib (@main::opt_delaylib) {
-    	$delaylibs .= $main::project_delaylib_template;
-    	interpolate('%name%', $main::opt_name, \$delaylibs);
-    	interpolate('%delaylib%', $delaylib, \$delaylibs);
-    }
-    interpolate('%name%',      	xmlprotect($main::opt_name),        \$result);
-    interpolate('%upcasename%',	xmlprotect(uc($main::opt_name)),    \$result);
-    interpolate('%sourceroot%', xmlprotect($main::opt_source_root), \$result);
-    interpolate('%buildroot%',  xmlprotect($main::opt_build_root),  \$result);
-    interpolate('%project%',   	xmlprotect($main::opt_project_name),\$result);
-    interpolate('%makefile%',   xmlprotect($main::makefile),        \$result);
-    interpolate('%target%',     xmlprotect($main::opt_target),      \$result);
-    interpolate('%metafile%',   xmlprotect($main::opt_meta_file),   \$result);
-    interpolate('%libs%',      	xmlprotect(\@main::opt_library),    \$result);
-    interpolate('%debuglibs%', 	xmlprotect(\@main::opt_debuglibrary),\$result);
-    interpolate('%delaylibs%', 	xmlprotect($delaylibs), 	    \$result);
-    interpolate('%lflags%', 	xmlprotect(\@main::opt_lflags),     \$result);
-    interpolate('%debuglflags%',xmlprotect(\@main::opt_debuglflags),\$result);
-    interpolate('%cflags%', 	xmlprotect(\@main::opt_cflags),     \$result);
-    interpolate('%debugcflags%',xmlprotect(\@main::opt_debugcflags),\$result);
-    interpolate('%groups%',     interpolate_project_groups(),       \$result);
+    my $delaylibs = interpolate_items(
+	$main::project_delaylib_template, 'delaylib', \@main::opt_delaylib);
+    interpolate(\$result, {
+	'delaylibs' => xmlprotect($delaylibs),
+	'groups'    => interpolate_project_groups()
+    });
     return $result;
 }
 
@@ -450,13 +391,12 @@ sub interpolate_ws_dependency {
     my $dependency;
     foreach $dependency (sort(@main::opt_depend)) {
 	my $buffer = $main::workspace_depend_template;
-	interpolate('%name%', $main::opt_name, \$buffer);
-	interpolate('%sourceroot%', $main::opt_source_root, \$buffer);
-	interpolate('%buildroot%', $main::opt_build_root, \$buffer);
-	interpolate('%depnum%', $depcnt, \$buffer);
-	interpolate('%guid%', $main::guid, \$buffer);
-	interpolate('%depguid%', guid_from_name($dependency), \$buffer);
-	interpolate('%depend%', $dependency, \$buffer);
+	interpolate(\$buffer, {
+	    'depnum'  => $depcnt,
+	    'guid'    => $main::guid,
+	    'depguid' => guid_from_name($dependency),
+	    'depend'  => $dependency
+	});
 	$result .= $buffer;
 	$depcnt++;
     }
@@ -469,13 +409,11 @@ sub interpolate_ws_dependency {
 sub interpolate_ws_project {
     my $depends_buffer = shift;
     my $result = $main::workspace_project_template;
-    interpolate('%name%', $main::opt_name, \$result);
-    interpolate('%sourceroot%', $main::opt_source_root, \$result);
-    interpolate('%buildroot%', $main::opt_build_root, \$result);
-    interpolate('%project%', $main::opt_project_name, \$result);
-    interpolate('%projfile%', basename($main::opt_output), \$result);
-    interpolate('%depends%', $depends_buffer, \$result);
-    interpolate('%guid%', $main::guid, \$result);
+    interpolate(\$result, {
+	'projfile' => basename($main::opt_output),
+	'depends'  => $depends_buffer,
+	'guid'     => $main::guid
+    });
     return $result;
 }
 
@@ -484,10 +422,7 @@ sub interpolate_ws_project {
 #------------------------------------------------------------------------------
 sub interpolate_ws_config {
     my $result = $main::workspace_config_template;
-    interpolate('%name%', $main::opt_name, \$result);
-    interpolate('%sourceroot%', $main::opt_source_root, \$result);
-    interpolate('%buildroot%', $main::opt_build_root, \$result);
-    interpolate('%guid%', $main::guid, \$result);
+    interpolate(\$result, { 'guid' => $main::guid });
     return $result;
 }
 
@@ -509,12 +444,11 @@ sub interpolate_workspace {
 	$config_buffer .= load_file($fragment);
     }
     my $result = $main::workspace_template;
-    interpolate('%name%', $main::opt_name, \$result);
-    interpolate('%sourceroot%', $main::opt_source_root, \$result);
-    interpolate('%buildroot%', $main::opt_build_root, \$result);
-    interpolate('%projects%', $proj_buffer, \$result);
-    interpolate('%depends%', $depends_buffer, \$result);
-    interpolate('%configs%', $config_buffer, \$result);
+    interpolate(\$result, {
+	'projects'   => $proj_buffer,
+	'depends'    => $depends_buffer,
+	'configs'    => $config_buffer
+    });
     return $result;
 }
 
@@ -526,21 +460,16 @@ sub create_project {
     print "Generated: $main::opt_output\n" unless quiet();
 
     if (defined($main::opt_fragment)) {
-    	$main::guid = guid_from_name($main::opt_project_name);
-
     	my $dependencies = interpolate_ws_dependency();
-    	my $dpf_frag = $main::opt_fragment;
-    	add_suffix ($dpf_frag, 'dpf');
+    	my $dpf_frag = add_suffix($main::opt_fragment, 'dpf');
 	save_file($dpf_frag, $dependencies);
 	print "Generated: $dpf_frag\n" unless quiet();
 
-    	my $pjf_frag = $main::opt_fragment;
-    	add_suffix ($pjf_frag, 'pjf');
+    	my $pjf_frag = add_suffix($main::opt_fragment, 'pjf');
 	save_file($pjf_frag, interpolate_ws_project($dependencies));
 	print "Generated: $pjf_frag\n" unless quiet();
 
-    	my $cff_frag = $main::opt_fragment;
-    	add_suffix ($cff_frag, 'cff');
+    	my $cff_frag = add_suffix($main::opt_fragment, 'cff');
 	save_file($cff_frag, interpolate_ws_config());
 	print "Generated: $cff_frag\n" unless quiet();
     }
@@ -555,82 +484,13 @@ sub create_workspace {
 }
 
 #------------------------------------------------------------------------------
-# Display DSW/SLN option summary.
-#------------------------------------------------------------------------------
-sub summarize_workspace_options {
-    print "Mode:      workspace\n";
-    print "Name:      $main::opt_name\n" if $main::opt_name;
-    print "Output:    $main::opt_output\n";
-    print "Extension: $main::opt_workspace_extension\n";
-}
-
-#------------------------------------------------------------------------------
-# Display project option summary.
-#------------------------------------------------------------------------------
-sub summarize_project_options {
-    print <<"EOT";
-Mode:        project
-Name:        $main::opt_name
-Output:      $main::opt_output
-Extension:   $main::opt_project_extension
-EOT
-    print <<"EOT" if $main::opt_source_root;
-Source root: $main::opt_source_root
-EOT
-    print <<"EOT" if $main::opt_build_root;
-Build root:  $main::opt_build_root
-EOT
-    print <<"EOT" if defined($main::opt_fragment);
-Fragment:    $main::opt_fragment
-EOT
-    print <<"EOT";
-Template:    $main::opt_template
-Project:     $main::opt_project_name
-Target:      $main::opt_target
-Makefile:    $main::makefile
-EOT
-    print <<"EOT" if $main::opt_meta_file;
-Libraries:   $main::opt_meta_file
-EOT
-    print <<"EOT" if @main::opt_library;
-Libraries:   @main::opt_library
-EOT
-    print <<"EOT" if @main::opt_lflags;
-LFLAGS:      @main::opt_lflags
-EOT
-    print <<"EOT" if @main::opt_cflags;
-CFLAGS:      @main::opt_cflags
-EOT
-    my @groups = sort(keys(%{$main::groups}));
-    print <<"EOT" if @groups;
-Groups:      @groups
-EOT
-}
-
-#------------------------------------------------------------------------------
-# Display an option summary.
-#------------------------------------------------------------------------------
-sub summarize_options {
-    print_title("Option Summary");
-    summarize_workspace_options() if $main::opt_workspace;
-    summarize_project_options() if $main::opt_project;
-    print "\n";
-}
-
-#------------------------------------------------------------------------------
 # Validate project options.
 #------------------------------------------------------------------------------
 sub validate_project_options {
     usage_error("The --depend option can be used only with --fragment.")
 	if !defined($main::opt_fragment) and @main::opt_depend;
     usage_error("Must specify a template type.") unless $main::opt_template;
-    usage_error("Unrecognized template type.")
-	unless $main::targets->{$main::opt_template};
-    usage_error("Must specify a name for the project.") unless $main::opt_name;
-    usage_error("Must specify --project-extension.")
-	unless $main::opt_project_extension;
-    usage_error("The option --workspace-extension can be used only with " .
-	"--workspace") if $main::opt_workspace_extension;
+    usage_error("Must specify --output.") unless $main::opt_output;
 }
 
 #------------------------------------------------------------------------------
@@ -639,22 +499,6 @@ sub validate_project_options {
 sub validate_workspace_options {
     usage_error("The --template option can be used only with --project.")
 	if $main::opt_template;
-    usage_error("The --target option can be used only with --project.")
-	if $main::opt_target;
-    usage_error("The --meta-file option can be used only with --project.")
-	if $main::opt_meta_file;
-    usage_error("The --library option can be used only with --project.")
-	if @main::opt_library;
-    usage_error("The --debuglibrary option can be used only with --project.")
-	if @main::opt_debuglibrary;
-    usage_error("The --lflags option can be used only with --project.")
-	if @main::opt_lflags;
-    usage_error("The --debuglflags option can be used only with --project.")
-	if @main::opt_debuglflags;
-    usage_error("The --cflags option can be used only with --project.")
-	if @main::opt_cflags;
-    usage_error("The --debugcflags option can be used only with --project.")
-	if @main::opt_debugcflags;
     usage_error("The --fragment option can be used only with --project.")
 	if defined($main::opt_fragment);
     usage_error("The --depend option can be used only with --project.")
@@ -663,18 +507,7 @@ sub validate_workspace_options {
 	if @main::opt_delaylib;
     usage_error("The --strip-root option can be used only with --project.")
 	if @main::opt_strip_root;
-    usage_error("The --source-root option can be used only with --project.")
-        if @main::opt_source_root;
-    usage_error("The --build-root option can be used only with --project.")
-        if @main::opt_build_root;
-    usage_error("Must specify --name or --output.")
-	unless $main::opt_name or $main::opt_output;
-    usage_error("Must specify --name or --output, but not both.")
-	if $main::opt_name and $main::opt_output;
-    usage_error("Must specify --workspace-extension.")
-    	unless $main::opt_workspace_extension;
-    usage_error("The option --project-extension can be used only with " .
-	"--project") if $main::opt_project_extension;
+    usage_error("Must specify --output.") unless $main::opt_output;
 }
 
 #------------------------------------------------------------------------------
@@ -698,12 +531,55 @@ sub validate_options {
 sub synthesize_pattern {
     my ($patterns, $fallback_pattern) = @_;
     my $composite;
-    foreach my $pattern (@{$patterns}) {
+    my $pattern;
+    foreach $pattern (@{$patterns}) {
 	$composite .= '|' if $composite;
 	$composite .= $pattern;
     }
     $composite = $fallback_pattern unless $composite;
     return $composite;
+}
+
+#------------------------------------------------------------------------------
+# Collect interpolation variables created by --set option.
+#------------------------------------------------------------------------------
+sub collect_variables {
+    my $tuple;
+    foreach $tuple (@main::opt_set) {
+	my ($key, $val) = split(/\s*=\s*/, $tuple);
+	$key =~ s/^\s*// if $key;
+	next unless $key;
+	$val = '' unless $val;
+	$val =~ s/\s*$//;
+	unless ($key =~ $main::reserved_variables) {
+	    $val = xmlprotect($val);
+	    if (exists($main::variables->{$key})) {
+		$main::variables->{$key} .= " $val";
+	    }
+	    else {
+		$main::variables->{$key} = "$val";
+	    }
+	}
+	else {
+	    warning "Reserved variable: \%$key\%; ignoring --set=$key=$val\n";
+	}
+    }
+}
+
+#------------------------------------------------------------------------------
+# Interpolate variables created by --set into other variables created by --set.
+#------------------------------------------------------------------------------
+sub expand_variables {
+    my $key;
+    foreach $key (keys(%{$main::variables})) {
+	my %vars = %{$main::variables};
+	my $val = $vars{$key};
+	delete $vars{$key};
+	interpolate_variables(\$val, \%vars);
+	$val =~ s/\%\w+?\%//ig;
+	$main::variables->{$key} = $val
+	    unless $val eq $main::variables->{$key};
+    }
 }
 
 #------------------------------------------------------------------------------
@@ -715,6 +591,9 @@ sub process_global_options {
     $main::opt_template_dir = '.' unless $main::opt_template_dir;
     $main::accept_patterns = synthesize_pattern(\@main::opt_accept, '.+');
     $main::reject_patterns = synthesize_pattern(\@main::opt_reject, '^$');
+
+    collect_variables();
+    expand_variables();
 }
 
 #------------------------------------------------------------------------------
@@ -723,26 +602,6 @@ sub process_global_options {
 sub process_option_aliases {
     $main::opt_verbose = 1 if $main::opt_v;
     $main::opt_version = 1 if $main::opt_V;
-    $main::opt_project = 1 if $main::opt_p;
-    $main::opt_workspace = 1 if $main::opt_w;
-    $main::opt_project_extension = $main::opt_P
-	unless $main::opt_project_extension;
-    $main::opt_workspace_extension = $main::opt_W
-	unless $main::opt_workspace_extension;
-    $main::opt_name = $main::opt_N unless $main::opt_name;
-    $main::opt_target = $main::opt_g unless $main::opt_target;
-    $main::opt_meta_file = $main::opt_M unless $main::opt_meta_file;
-    $main::opt_template = $main::opt_t unless $main::opt_template;
-    $main::opt_template_dir = $main::opt_T unless $main::opt_template_dir;
-    $main::opt_xml_protect = 1 if $main::opt_X;
-    push(@main::opt_library, @main::opt_L);
-    push(@main::opt_delaylib, @main::opt_Y);
-    push(@main::opt_lflags, @main::opt_l);
-    push(@main::opt_depend, @main::opt_D);
-    push(@main::opt_strip_root, @main::opt_S);
-    push(@main::opt_accept, @main::opt_a);
-    push(@main::opt_reject, @main::opt_r);
-    push(@main::opt_response_file, @main::opt_R);
 }
 
 #------------------------------------------------------------------------------
@@ -759,9 +618,11 @@ sub filter {
 sub massage_paths {
     my @infiles = @_;
     my @outfiles;
-    foreach my $file (@infiles) {
+    my $file;
+    foreach $file (@infiles) {
 	$file =~ tr:/:\\:;
-	foreach my $root (@main::opt_strip_root) {
+	my $root;
+	foreach $root (@main::opt_strip_root) {
 	    last if $file =~ s/^$root//;
 	}
 	push(@outfiles, $file);
@@ -806,38 +667,22 @@ sub input_files {
 # Process DSP/VCPROJ project command-line options.
 #------------------------------------------------------------------------------
 sub process_project_options {
-    $main::opt_output = $main::opt_name unless $main::opt_output;
-    add_suffix($main::opt_output, $main::opt_project_extension);
-    ($main::makefile = basename($main::opt_output)) =~ s/(?i)\.dsp$/\.mak/;
-    $main::opt_project = $main::opt_name unless $main::opt_project;
+    my $outraw = remove_suffix($main::opt_output);
 
-    my $target_ext = $main::targets->{$main::opt_template}->{'suffix'};
-    $main::opt_target = $main::opt_name unless $main::opt_target;
-    add_suffix($main::opt_target, $target_ext) if $target_ext;
-
-    $main::opt_project_name = $main::opt_name unless $main::opt_project_name;
-
-    $main::opt_fragment = $main::opt_name
+    $main::opt_fragment = $outraw
 	if defined($main::opt_fragment) and !$main::opt_fragment;
 
-    my @libraries;
-    my $library;
-    foreach $library (@main::opt_library) {
-	add_suffix($library, 'lib');
-	push(@libraries, $library);
-    }
-    @main::opt_library = @libraries;
+    $main::guid = guid_from_name(basename($outraw));
 
     my %depends;
     my $depend;
     foreach $depend (filter(@main::opt_depend)) {
-	remove_suffix($depend, $main::opt_project_extension);
-	if (!exists ($depends{$depend})) { $depends{$depend} = 1; }
+	$depend = remove_suffix($depend);
+	unless (exists($depends{$depend})) {
+	    $depends{$depend} = 1;
+	}
     }
     @main::opt_depend = keys(%depends);
-
-    $main::opt_source_root =~ tr:/:\\:;
-    $main::opt_build_root =~ tr:/:\\:;
 
     my @roots;
     my $root;
@@ -848,11 +693,6 @@ sub process_project_options {
     @main::opt_strip_root = @roots;
 
     my @files = massage_paths(filter(input_files()));
-    ($main::opt_meta_file) = massage_paths($main::opt_meta_file);
-    if ($main::opt_meta_file) {
-	my $metafile_rx = quotemeta($main::opt_meta_file);
-	push(@files, $main::opt_meta_file) if (!grep(/$metafile_rx/, @files));
-    }
 
     my $default_type = '';
     my $type;
@@ -872,24 +712,11 @@ sub process_project_options {
 # Process DSW/SLN workspace command-line options.
 #------------------------------------------------------------------------------
 sub process_workspace_options {
-    $main::opt_name = $main::opt_output unless $main::opt_name;
-    remove_suffix($main::opt_name, $main::opt_workspace_extension);
-    $main::opt_output = $main::opt_name unless $main::opt_output;
-    add_suffix($main::opt_output, $main::opt_workspace_extension);
-
     my $fragment;
     foreach $fragment (filter(input_files())) {
-	my $pjf_frag = $fragment;
-	add_suffix($pjf_frag, 'pjf');
-	push(@main::pjf_fragments, $pjf_frag);
-
-	my $dpf_frag = $fragment;
-	add_suffix($dpf_frag, 'dpf');
-	push(@main::dpf_fragments, $dpf_frag);
-
-	my $cff_frag = $fragment;
-	add_suffix($cff_frag, 'cff');
-	push(@main::cff_fragments, $cff_frag);
+	push(@main::pjf_fragments, add_suffix($fragment, 'pjf'));
+	push(@main::dpf_fragments, add_suffix($fragment, 'dpf'));
+	push(@main::cff_fragments, add_suffix($fragment, 'cff'));
     }
 }
 
@@ -911,19 +738,19 @@ sub print_usage {
     banner($stream);
     print $stream <<"EOT";
 Given a set of input files and project dependencies, generates Microsoft
-Visual C++ workspace and project project files from a set of templates.
+Visual C++ workspace and project files from a set of templates.
 
 Project files and workspaces can be built for both MSVC 6 and 7, given the
 appropriate templates.  The command line options are the same for each version.
 The MSVC version for which to generate files is controlled by providing a
-suitable set of templates via --template-dir; and via --project-extension and
---workspace-extension to set the filename suffixes for the generated files.
-For MSVC 6, 'dsp' should be used as the suffix for project files, and 'dsw' for
-workspace files.  For MSVC 7, use 'vcproj' and 'sln' for project and workspace
-files, respectively.  The --xml-protect option should be used when creating
-MSVC 7 project files in order to ensure that special characters (such as ", <,
-and >) get encoded via XML character references.  This is required since MSVC 7
-files are stored in XML format.
+suitable set of templates via --template-dir; and by providing the proper file
+extension for the project or workspace file named by the --output option.  For
+MSVC 6, '.dsp' should be used as the suffix for project files, and '.dsw' for
+workspace files.  For MSVC 7, '.vcproj' and '.sln' should be used for project
+and workspace files, respectively.  The --xml-protect option should be used
+when creating MSVC 7 project files in order to ensure that special characters
+(such as ", <, and >) get encoded via XML character references.  This is
+needed since MSVC 7 files are stored in XML format.
 
 A project file is generated when --project is specified.  The type of project
 represented by the project file is selected using the --template option.  The
@@ -936,40 +763,30 @@ workspace but does not actually generate any resources.
 Template files are loaded from the current working directory or from the
 directory named via --template-dir.  The template files appgui.tpl, appcon.tpl,
 plugin.tpl, library.tpl, and group.tpl correspond to the project types
-available via the --template option.  Template files may contain the variables
-\%name\%, \%project\%, \%target\%, \%metafile\%, \%makefile\%, \%groups\%,
-\%libs\%, \%debuglibs\%, %delaylibs%, \%lflags\%, \%debuglflags\%, \%cflags\%
-and \%debugcflags\%.  The variables \%name\%, \%project\%, \%target\%,
-\%libs\%, \%debuglibs\%, \%cflags\%, \%debugcflags\%, \%lflags\%,
-\%debuglflags\%, \%sourceroot\%, and \%buildroot\% are replaced with values
-specified via the --name, --project-name, --target, --library, --debuglibrary,
---cflags, --debugcflags, --lflags, --debuglflags, --source-root, and
---build-root options, respectively.  The \%name\%, variable can be used in any
-template file.  Additionally, \%sourceroot\%, and \%buildroot\% can be used in
-any project-related (but not workspace-related) template.  The replacement
-value for \%makefile\% is the same as the name of the generated project file
-except that .mak is substituted for the suffix.
+available via the --template option.  In addition to interpolation variables
+created with the --set option, which are available globally, template files may
+reference the variables \%groups\%, and %delaylibs%.
 
 The template prjgroup.tpi is used multiple times to build a value for the
 \%groups\% variable mentioned above.  This template is used to create the file
 groups "Source Files", "Header Files", and "Resource Files", as needed, within
-the generated project file.  This template may contain the variables \%group\%
-and \%files\%, in addition to the variables available to all templates.  The
-\%group\% variable is automatically replaced by the name of the group being
-generated (for instance "Source Files").
+the generated project file.  This template may reference the variables
+\%group\% and \%files\%, in addition to the variables available to all
+templates.  The \%group\% variable is automatically replaced by the name of the
+group being generated (for instance "Source Files").
 
 The template prjfile.tpi is used multiple times to build a value for the
 \%files\% variable mentioned above.  This template is used to specify each file
 which makes up a file group (represented by prjgroup.tpi).  This template may
-contain the variable \%file\% which represents a file name provided as an
-argument to this script during DSP/VCPROJ generation, as well as the globally
-available variables.
+reference globally available variables, as well as the variable \%file\% which
+represents a file name provided as an argument to this script during DSP/VCPROJ
+generation.
 
 The template prjdelay.tpi is used multiple times to bulid a value for the
 \%delaylibs\% variable mentioned above.  This template is used to specify each
 delayed-load library given via the --delaylib option.  The entire content of
 this template should be placed on a single line and should not end with a line
-terminator.  This template may contain the variable \%delaylib\%, as well as
+terminator.  This template may reference the variable \%delaylib\%, as well as
 the globally available variables.  The value of \%delaylib\% will be a name of
 a DLL specified with --delaylib.
 
@@ -983,36 +800,36 @@ project files generated individually).  Note: MSVC 6 projects require only the
 dependency information; the templates for the other fragments may be empty.
 
 The project fragment file is created from the template wsgroup.tpi.  This
-template may contain the variables \%project\%, \%projfile\%, \%depends\%, and
-\%guid\%, as well as the globally available variables.  The \%project\%
-variable has the same meaning as it does when used with the templates specified
-via --template.  The \%projfile\% variable is replaced by the name of the
-generated project file (see --output), except that the directory portion of the
-path is stripped off.  The \%depends\% variable contains a collection of
-inter-project dependency information for projects contained in the workspace.
-The value of \%guid\% is a unique identifier which is required by every MSVC 7
-project.  This value is composed automatically from the project name.
+template may reference the variables \%projfile\%, \%depends\%, and \%guid\%,
+as well as the globally available variables.  The \%projfile\% variable is
+replaced by the name of the generated project file (see --output), except that
+the directory portion of the path is stripped off.  The \%depends\% variable
+contains a collection of inter-project dependency information for projects
+contained in the workspace.  The value of \%guid\% is a unique identifier which
+is required by every MSVC 7 project.  This value is composed automatically from
+the output name.
 
 To create configuration fragments, the template wscfg.tpi is used.  It may
-contain the variable \%guid\%, in addition to the globally available variables.
-This template is required only by MSVC 7, but it must also be present when
-creating MSVC 6 files, though it may left empty.
+reference the variable \%guid\%, in addition to the globally available
+variables.  This template is required only by MSVC 7, but it must also be
+present when creating MSVC 6 files, though it may left empty.
 
 The template wsdep.tpi is used multiple times to build a value for the
 \%depends\% variable mentioned above.  This template is used to specify
-inter-project dependencies within a workspace file.  This template may contain
-the variables \%guid\%, \%depguid\%, \%depnum\%, \%depend\%, and the globally
-available variables.  \%guid\% is the unique project identifier discussed
-above.  \%depguid\% is the unique project identifier of a project upon which
-this project depends (see --depend), \%depend\% is the name of a project upon
-which this project depends (see --depend).  Each project named by --depend is
-also assigned a small number (starting at zero with the first --depend
-encountered).  When processing the named dependency, the associated number is
-available as \%depnum\%.
+inter-project dependencies within a workspace file.  This template may
+reference the variables \%guid\%, \%depguid\%, \%depnum\%, \%depend\%, and the
+globally available variables.  \%guid\% is the unique project identifier
+discussed above.  \%depguid\% is the unique project identifier of a project
+upon which this project depends (see --depend) and is useful for MSVC 7
+synthesis, whereas \%depend\% is the name of a project upon which this project
+depends (see --depend) and is useful for MSVC 6 synthesis.  Each project named
+by --depend is also assigned a small number (starting at zero with the first
+--depend encountered).  When processing the named dependency, the associated
+number is available as \%depnum\%.
 
 Finally, a workspace file is generated when --workspace is specified.  The
 DSW/SLN file is created by merging the contents of fragment files into the
-template ws.tpl.  This template may contain the variable \%projects\%,
+template ws.tpl.  This template may reference the variables \%projects\%,
 \%depends\% and \%configs\%, which are replaced by the collected contents of
 all project, dependency, and configuration fragments named as arguments to this
 script for workspace synthesis.
@@ -1020,18 +837,33 @@ script for workspace synthesis.
 Usage: $PROG_NAME [options] <file> ...
 
 Global Options:
-    -p --project Generate a project file.
-    -w --workspace
-                 Generate a workspace file.
-    -X --xml-protect
+    --project    Generate a project file.
+    --workspace  Generate a workspace file.
+    --set=<variable>=<value>
+                 Create an interpolation variable which can be substituted into
+                 template files.  For example, --set=cflags='/D "__DEBUG__"'
+                 creates the variable 'cflags' which can be referenced in a
+                 template as '\%cflags\%'.  If 'value' is omitted, then
+                 'variable' expands to the null string.  Undefined variables
+                 also expand to the null string, thus "foo\%notset\%bar"
+                 becomes "foobar" if the variable 'notset' is undefined.  This
+                 option may be invoked any number of times to create multiple
+                 interpolation variables.  If it is invoked multiple times with
+                 the same 'variable' name, however, then the individually
+                 specified values are collected into a single value, delimited
+                 by whitespace.  For instance, "--set=foo=fish --set=foo=stick"
+                 gives 'foo' the value "fish stick".  Variable interpolation
+                 also occurs within variables created with --set, thus
+                 "--set=foo=\%bar\%stick --set=bar=fish" results in 'foo'
+                 having the value "fishstick".
+    --xml-protect
                  Use XML character references in strings inserted into
-                 generated files in place of "special" characters.
-    -T <path>
+                 generated files in place of "special" characters.  Specify
+                 this option when creating MSVC 7 project files and workspaces.
     --template-dir=<path>
                  Specifies the directory where the template files reside.  If
                  not specified, then template files are assumed to exist in the
                  current working directory.
-    -a <pattern>
     --accept=<pattern>
                  Specifies a Perl regular-expression used as a filter against
                  each named <file>.  Filenames which match the pattern will be
@@ -1040,7 +872,6 @@ Global Options:
                  number of times in order to specify any number of patterns.
                  This is a useful option for clients unable to filter the list
                  filenames themselves.  Example: --accept='\\.cc\$'
-    -r <pattern>
     --reject=<pattern>
                  Specifies a Perl regular-expression used as a filter against
                  each named <file>.  Filenames which match the pattern will not
@@ -1050,7 +881,6 @@ Global Options:
                  number of patterns.  This is a useful option for clients
                  unable to filter the list of filenames themselves.
                  Example: --reject='\\.txt\$'
-    -R <path>
     --response-file=<path>
                  Specifies a file containing pathnames, one per line, which are
                  treated exactly as if they had been mentioned on the
@@ -1058,7 +888,7 @@ Global Options:
                  given any number of times, and is allowed in combination with
                  <file> arguments actually specified on the command-line.
                  Comments in the response file begin with '#' and extend to the
-                 end of line.
+                 end of line.  Blank lines are ignored.
     -v --verbose Emit informational messages about the processing.  Can be
                  negated with --noverbose.  Deafult is --noverbose.
     -q --quiet   Suppress all output except for error messages.  Can be
@@ -1075,86 +905,17 @@ Project Options:
                  are placed in the "Header Files" group; and all other files
                  are placed in the "Resource Files" group.  Each mentioned file
                  replaces the variable \%file\% in the prjfile.tpi template.
-    -N <name>
-    --name=<name>
-                 The basic name associated with this project file.  This name
-                 is used for automatic generation of other required names (such
-                 as output name, target name, fragment name) if those names are
-                 not explicitly specified.  It is also available in template
-                 files as the \%name\% variable.
-    -o <path>
     --output=<path>
-                 Specifies the full path of the generated project file.  A
-                 suffix (see --project-extension) is automatically appended if
-                 absent.  If this option is not specified, then the name given
-                 with --name (plus extension) is used as the output name and
-                 the file is written to the current working directory.
-    -P <ext>
-    --project-extension=<ext>
-                 Use <ext> as suffix for project file.  The extension 'dsp'
-                 should be used for MSVC 6 project files; and 'vcproj' for
-                 MSVC 7 project files.
-    -t <type>
+                 Specifies the full path of the generated project file.  For an
+                 MSVC 6 project file, the file extension should be '.dsp'.  For
+                 an MSVC 7 project, it should be '.vcproj'.  This option is
+                 mandatory.
     --template=<type>
                  Specifies the template type for this project.  The type may be
                  one of "appgui", "appcon", "plugin", "library", or "group".
                  See the discussion of project generation (above) for an
-                 explanation of the various template types.
-    -p <name>
-    --project-name=<name>
-                 Specifies the display name of the project for the Microsoft
-                 Visual C++ IDE.  This is the replacement value for the
-                 \%project\% variable in template files.  If not specified,
-                 then the name given with --name is used as the project name.
-    -g <name>
-    --target=<name>
-                 Specifies the name of the actual target generated by this
-                 project.  This is the replacement value for the \%target\%
-                 variable in the template files.  For applications, this is the
-                 name of the resultant executable (EXE); for plugins it is the
-                 dynamic link library (DLL); and for libraries, it is the
-                 static library (LIB).  If not specified, then the name given
-                 with --name is used as the target name.  If the name does not
-                 end with an appropriate suffix (one of .exe, .dll, or .lib),
-                 then the suffix is added automatically.
-    -M <path>
-    --meta-file=<path>
-                 Specifies the path of a file containing meta-data related to
-                 this target.  This is the replacement value for the
-                 \%metafile\% variable in template files.  For convenience, the
-                 named file is also inserted into the "Resource Files" group
-                 within the generated project file.  If not specified, then no
-                 meta-data file is associated with the generated project.  The
-                 meta-data file for a "plugin", for example, might contain
-                 information about the interfaces published by the plugin
-                 module.  How the project utilizes this information is specific
-                 to the template, however one typical scheme is to copy the
-                 meta-data file alongside the generated target.  It is common
-                 for the meta-data file to have the same base name as the
-                 generated target, but a different file extension.
-    -L <name>
-    --library=<name>
-                 Specifies the name of an extra Windows library with which the
-                 project should be linked in addition to those which are
-                 already mentioned in the template file.  The named library
-                 will become part of the replacement value for the \%libs\%
-                 variable in the template files.  Typically, libraries are only
-                 specified for executable and plug-in templates.  A .lib suffix
-                 is added to the name automatically if absent.  The --library
-                 option may be given any number of times to specify any number
-                 of additional libraries, or not at all if no additional
-                 libraries are required.  The --library option differs from the
-                 --depend option in that it refers to libraries which exist
-                 outside of the project graph, whereas --depend always refers
-                 to projects which are members of the project graph.
-    --debuglibrary=<name>
-                 Specifies the name of an extra Windows library with which the
-                 project should be linked in addition to those which are
-                 already mentioned in the template file.  The named library
-                 will become part of the replacement value for the
-		 \%debuglibs\% variable in the template files. This can be used
-		 if another set of libraries is to be used for debug purposes.
-    -Y <name>
+                 explanation of the various template types.  This option is
+		 mandatory.
     --delaylib=<name>
                  Specifies the name of a DLL which should be delay-loaded.  In
                  prjdelay.tpi, \%delaylib\% is replaced with this value.  The
@@ -1163,56 +924,6 @@ Project Options:
                  (see --template).  The --delaylib option may be given any
                  number of times to specify any number of delay-loaded DLLs, or
                  not at all if no such DLLs are required.
-    -l <flags>
-    --lflags=<flags>
-                 Specifies extra linker options which should be used in
-                 addition to those already mentioned in the template file.
-                 This is the replacement value for the \%lflags\% variable in
-                 the project template files.  Typically, linker options are
-                 only specified for executable and plug-in templates.  The
-                 --lflags option may be specified any number of times, in which
-                 case the effects are cumulative, or not at all if no extra
-                 linker options are required.
-    --debuglflags=<flags>
-                 Specifies extra linker options which should be used in
-                 addition to those already mentioned in the template file.
-                 This is the replacement value for the \%debuglflags\% variable
-		 in the project template files.  This can be used if another
-		 set of flags is to be used for debug purposes.
-    -c <flags>
-    --cflags=<flags>
-                 Specifies extra compiler options which should be used in
-                 addition to those already mentioned in the template file.
-                 This is the replacement value for the \%cflags\% variable in
-                 the project template files.  The --cflags option may be
-                 specified any number of times, in which case the effects are
-                 cumulative, or not at all if no extra compiler options are
-                 required.  As an example, a pre-processor macro named
-                 __FOOBAR__ can be defined with: --cflags='/D "__FOOBAR__"'
-    --debugcflags=<flags>
-                 Specifies extra compiler options which should be used in
-                 addition to those already mentioned in the template file.
-                 This is the replacement value for the \%debugcflags\%
-		 variable in the project template files.  This can be used
-		 if another set of flags is to be used for debug purposes.
-    --source-root=<path>
-                 Specifies a (typically relative) path from the location where
-                 the project files will reside back to the root of the source
-                 tree in which they live. This is the replacement value for the
-                 \%sourceroot\% variable in project template files.  This
-                 information might be useful, for instance, when composing MSVC
-                 /I directives for specifying header locations.  Example: /I
-                 "%sourceroot\\include"
-    --build-root=<path>
-                 Specifies a (typically relative) path from the location where
-                 the project files will reside to the root of the build tree in
-                 which built targets may be placed.  This is the replacement
-                 value for the \%buildroot\% variable in project template
-                 files.  This information might be useful, for instance, when
-                 composing MSVC post-build rules if built files need to be
-                 copied to some final resting place.
-    -f
-    -f <path>
     --fragment
     --fragment=<path>
                  Specifies whether or not to generate workspace fragment files
@@ -1220,15 +931,15 @@ Project Options:
                  projects upon which this project relies, as well as other
                  information needed to fully synthesize workspace files.  If
                  not specified, then no fragments are generated.  If specified,
-                 but no path is given, then the name given with --name is used
-                 as the fragment name.  Fragment files are given the suffixes
-                 .pjf, .cff and .dpf.  The suffixes are added automatically to
-                 the specified path.  Generated fragments can later be
-                 incorporated into a workspace file collectively to define a
-                 complete workspace for the entire project.  Each dependency
-                 specified with the --depend option is listed in the generated
-                 depedency fragment.
-    -D <project>
+                 but no path is given, then the path (sans suffix) given with
+                 --output is used as the fragment path.  Project, dependency,
+                 and configuration fragment files are given the suffixes .pjf,
+                 .dpf, and .cff, respectively.  The suffixes are added
+                 automatically to the specified path.  Generated fragments can
+                 later be incorporated into a workspace file collectively to
+                 define a complete workspace for the entire project.  Each
+                 dependency specified with the --depend option is listed in the
+                 generated depedency fragment.
     --depend=<project>
                  Specifies the name of a project upon which this project
                  depends.  Each project name is written to the workspace
@@ -1239,7 +950,6 @@ Project Options:
                  is often the case for "library" projects).  Dependencies are
                  subject to filtering by --accept and --reject.  This option
                  can be used only in conjunction with the --fragment option.
-    -S <prefix>
     --strip-root=<prefix>
                  It is generally wise for the source, header, and resource
                  files mentioned by the generated project file, and referenced
@@ -1254,36 +964,23 @@ Project Options:
                  absolute pathnames are given, then the --strip-root option can
                  be used to remove a prefix portion of each mentioned file.
                  The --strip-root option may be specified any number of times,
-                 providing a different prefix on each occassion, or not at all,
+                 providing a different prefix on each occassion, or not at all.
                  if all mentioned files are specified via relative pathnames.
 
 Workspace Options:
     <file>       Path of a fragment file emitted during a project generation
                  phase.  This is the basename for fragment files, as specified
                  via the --fragment option during project file generation.  The
-                 name should not have a .pjf, .cff, or .dpf extension; the
+                 name should not have a .pjf, .dpf, or .cff extension; the
                  appropriate extension will be added automatically to the
                  basename in order to locate the actual fragment files.  See
                  the discussion of fragment file generation (above) for
                  details.
-    -N <name>
-    --name=<name>
-                 Specifies the base name of the generated workspace file.  A
-                 suffix (see --workspace-extension) is automatically appended
-                 to generate the final output name and the file is created in
-                 the current working directory.  This option and the --output
-                 option are mutually exclusive.
-    -o <path>
     --output=<path>
                  Specifies the full path of the generated DSW/SLN workspace
-                 file.  A suffix (see --workspace-extension) is automatically
-                 appended if absent.  This option and the --name option are
-                 mutually exclusive.
-    -W <ext>
-    --workspace-extension=<ext>
-                 Use <ext> as suffix for workspace file.  The extension 'dsw'
-                 should be used for MSVC 6 workspace files; and 'sln' for
-                 MSVC 7 workspace files.
+                 file.  For an MSVC 6 workspace file, the file extension should
+                 be '.dsw'.  For an MSVC 7 workspace, it should be '.sln'.
+                 This option is mandatory.
 EOT
 }
 
@@ -1323,7 +1020,6 @@ sub usage_error {
 # Perform the complete repair process.
 #------------------------------------------------------------------------------
 process_options();
-summarize_options() if verbose();
 load_templates();
 create_project() if $main::opt_project;
 create_workspace() if $main::opt_workspace;
