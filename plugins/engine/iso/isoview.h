@@ -158,7 +158,8 @@ public:
     /// @@@ not done yet.... use the screen Z value to compute z,x.
     (void)z;
   }
-
+  virtual void OnlyPortals (bool) { }
+  virtual bool GetOnlyPortals () { return true; }
 };
 
 
