@@ -22,7 +22,7 @@
 #include "csutil/scf.h"
 #include "video/canvas/common/x11comm.h"
 #include "video/canvas/common/scancode.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "isys/system.h"
 #include "isys/event.h"
 #include "x2d.h"

@@ -45,7 +45,7 @@ endif
 INC.SIMPCON = $(wildcard plugins/console/output/simple/*.h)
 SRC.SIMPCON = $(wildcard plugins/console/output/simple/*.cpp)
 OBJ.SIMPCON = $(addprefix $(OUT),$(notdir $(SRC.SIMPCON:.cpp=$O)))
-DEP.SIMPCON = CSSYS CSUTIL
+DEP.SIMPCON = CSSYS CSUTIL CSGEOM
 
 MSVC.DSP += SIMPCON
 DSP.SIMPCON.NAME = simpcon
