@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+24-Feb-2003
+	- Andrew Craig fixed error in csMeshMeshList::FreeItem where
+          the meshes were not being unprepared from sectors.
 23-Feb-2003
 	- Christian Bayle fixed menu in debian package
 	- Eric Sunshine made the following changes:

@@ -833,6 +833,14 @@ void csMeshMeshList::PrepareItem (iMeshWrapper* child)
 void csMeshMeshList::FreeItem (iMeshWrapper* item)
 {
   CS_ASSERT (mesh != NULL);
+
+  for (int i = 0 ; i < mesh->GetMovable().GetSectors()->GetCount() ; i++)
+  {
+    csSector* sector = mesh->GetMovable ().GetSectors ()->Get (i)
+        ->GetPrivateObject ();
+    sector->UnprepareMesh (item);
+  }
+
   item->SetParentContainer (NULL);
   item->GetMovable ()->SetParent (NULL);
   csMeshList::FreeItem (item);
