@@ -2,8 +2,8 @@
 #==============================================================================
 # Copyright (C)2002 by Eric Sunshine <sunshine@sunshineco.com>
 #
-# Determine if Posix pthread capability is available and, if so, which link
-# flags are required.
+# Determine if Posix pthread capability is available and, if so, which compiler
+# and link flags are required.
 #
 # IMPORTS
 #    LINK

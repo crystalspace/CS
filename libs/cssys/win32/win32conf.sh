@@ -28,6 +28,15 @@ BIN_DIR=bin
 # test for endianess
 . ${BIN_DIR}/endtest.sh
 
+# Check for zlib.
+. ${BIN_DIR}/chkzlib.sh
+
+# Check for libpng.
+. ${BIN_DIR}/chkpng.sh
+
+# Check for libjpeg.
+. ${BIN_DIR}/chkjpeg.sh
+
 # Check for Readline (required by some Python installations).
 . ${BIN_DIR}/chkrdlin.sh
 

@@ -31,6 +31,15 @@ msg_result "${CXX}"
 # Analyze system header files.
 . ${BIN_DIR}/chkheadr.sh
 
+# Check for zlib.
+. ${BIN_DIR}/chkzlib.sh
+
+# Check for libpng.
+. ${BIN_DIR}/chkpng.sh
+
+# Check for libjpeg.
+. ${BIN_DIR}/chkjpeg.sh
+
 # Check for Pthread (required by some Python installations).
 . ${BIN_DIR}/chkpthrd.sh
 

@@ -3,7 +3,7 @@
 # Copyright (C)2002 by Eric Sunshine <sunshine@sunshineco.com>
 #
 # Determine if the readline and history facilities are available and, if so,
-# which link flags are required.
+# which compiler and link flags are required.
 #
 # IMPORTS
 #    LINK

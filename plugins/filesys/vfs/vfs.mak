@@ -28,15 +28,17 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/filesys/vfs
+LIB.VFS.LOCAL += $(ZLIB.LFLAGS)
 
 ifeq ($(USE_PLUGINS),yes)
   VFS = $(OUTDLL)/vfs$(DLL)
   LIB.VFS = $(foreach d,$(DEP.VFS),$($d.LIB))
+  LIB.VFS.SPECIAL += $(LIB.VFS.LOCAL)
   TO_INSTALL.DYNAMIC_LIBS += $(VFS)
 else
   VFS = $(OUT)/$(LIB_PREFIX)vfs$(LIB)
   DEP.EXE += $(VFS)
+  LIBS.EXE += $(LIB.VFS.LOCAL)
   SCF.STATIC += vfs
   TO_INSTALL.STATIC_LIBS += $(VFS)
 endif
@@ -65,8 +67,13 @@ clean: vfsclean
 
 vfs: $(OUTDIRS) $(VFS)
 
+$(OUT)/%$O: plugins/filesys/vfs/%.cpp
+	$(DO.COMPILE.CPP) $(ZLIB.CFLAGS)
+
 $(VFS): $(OBJ.VFS) $(LIB.VFS)
-	$(DO.PLUGIN)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(LIB.VFS.SPECIAL) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 vfsclean:
 	$(RM) $(VFS) $(OBJ.VFS)
@@ -74,7 +81,7 @@ vfsclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)/vfs.dep
 $(OUTOS)/vfs.dep: $(SRC.VFS)
-	$(DO.DEP)
+	$(DO.DEP1) $(ZLIB.CFLAGS) $(DO.DEP2)
 else
 -include $(OUTOS)/vfs.dep
 endif

@@ -39,8 +39,8 @@ else
 endif
 
 INC.AWS = $(wildcard plugins/aws/*.h) $(wildcard include/iaws/*.h)
-SRC.AWS = $(filter-out plugins/aws/sllex.cpp plugins/aws/slp.cpp, $(wildcard plugins/aws/*.cpp)) \
-          plugins/aws/sllex.cpp plugins/aws/slp.cpp
+SRC.AWS = $(filter-out plugins/aws/sllex.cpp plugins/aws/slp.cpp, \
+  $(wildcard plugins/aws/*.cpp)) plugins/aws/sllex.cpp plugins/aws/slp.cpp
 OBJ.AWS = $(addprefix $(OUT)/,$(notdir $(SRC.AWS:.cpp=$O)))
 DEP.AWS = CSUTIL CSSYS CSUTIL CSGEOM CSTOOL CSGFX
 
@@ -64,14 +64,19 @@ $(AWS): $(OBJ.AWS) $(LIB.AWS)
 ifneq (,$(FLEXBIN))
 ifneq (,$(BISONBIN))
 
-plugins/aws/sllex.cpp: plugins/aws/slp.hpp plugins/aws/skinlang.flx plugins/aws/slp.cpp
-	flex -L -Splugins/aws/flex.skl -t plugins/aws/skinlang.flx > plugins/aws/sllex.cpp
+plugins/aws/sllex.cpp: \
+plugins/aws/slp.hpp plugins/aws/skinlang.flx plugins/aws/slp.cpp
+	flex -L -Splugins/aws/flex.skl -t plugins/aws/skinlang.flx > \
+	plugins/aws/sllex.cpp
 
 plugins/aws/slp.cpp: plugins/aws/skinlang.bsn
-	bison --no-lines -d -p aws -o plugins/aws/slp.cpp plugins/aws/skinlang.bsn
+	bison --no-lines -d -p aws -o plugins/aws/slp.cpp \
+	plugins/aws/skinlang.bsn
 
 plugins/aws/slp.hpp: plugins/aws/slp.cpp
-	-$(MV) plugins/aws/slp.cpp.h plugins/aws/slp.hpp
+	@if [ -f "plugins/aws/slp.cpp.h" ]; then \
+	$(MV) plugins/aws/slp.cpp.h plugins/aws/slp.hpp; \
+	fi
 endif
 endif
 clean: awsclean

@@ -95,4 +95,11 @@ if not /%1/ == /mingw32/ goto nomingwex
 :noremovequote
   del conftest.* >nul
 
+  echo ZLIB.AVAILABLE = yes>>config.tmp
+  echo ZLIB.LFLAGS = -lz>>config.tmp
+  echo PNG.AVAILABLE = yes>>config.tmp
+  echo PNG.LFLAGS = -lpng -lz>>config.tmp
+  echo JPEG.AVAILABLE = yes>>config.tmp
+  echo JPEG.LFLAGS = -ljpeg>>config.tmp
+
 :exit

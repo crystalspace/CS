@@ -52,15 +52,6 @@ LIBS.EXE=$(LFLAGS.l)dl $(LFLAGS.l)m
 # Socket library
 LIBS.SOCKET.SYSTEM=$(LFLAGS.l)socket
 
-# Where can the Zlib library be found on this system?
-Z_LIBS=$(LFLAGS.l)z
-
-# Where can the PNG library be found on this system?
-PNG_LIBS=$(LFLAGS.l)png
-
-# Where can the JPG library be found on this system?
-JPG_LIBS=$(LFLAGS.l)jpeg
-
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
 

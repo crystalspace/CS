@@ -2,7 +2,7 @@
 # Optionally works with the MSYS environment.
 
 # Friendly names for building environment
-DESCRIPTION.win32gcc = Windows with MinGW32 GNU C/C++
+DESCRIPTION.win32gcc = Windows with Mingw
 DESCRIPTION.OS.win32gcc = Win32
 
 # Choose which drivers you want to build/use
@@ -78,25 +78,12 @@ LIBS.CSLUA.SYSTEM=$(LFLAGS.l)lua $(LFLAGS.l)lualib
 # Freetype library
 LIBS.FREETYPE.SYSTEM=$(LFLAGS.l)ttf
 
-# Where can the Zlib library be found on this system?
-Z_LIBS=$(LFLAGS.L)libs/zlib $(LFLAGS.l)z
-
-# Where can the PNG library be found on this system?
-PNG_LIBS=$(LFLAGS.L)libs/libpng $(LFLAGS.l)png
-
-# Where can the JPG library be found on this system?
-JPG_LIBS=$(LFLAGS.L)libs/libjpeg $(LFLAGS.l)jpeg
-
-# Where can the MNG library be found on this system?
-MNG_LIBS=$(LFLAGS.L)libs/libmng $(LFLAGS.l)mng
-
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
 
 # Indicate where special include files can be found.
 # for instance where your dx includes are
-CFLAGS.INCLUDE=$(CFLAGS.I)/usr/include/directx \
-  $(CFLAGS.I)libs/zlib $(CFLAGS.I)libs/libpng $(CFLAGS.I)libs/libjpeg
+CFLAGS.INCLUDE=$(CFLAGS.I)/usr/include/directx
 # $(CFLAGS.I)/dx7asdk/dxf/include
 
 # General flags for the compiler which are used in any case.

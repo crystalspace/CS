@@ -113,18 +113,6 @@ LIBS.EXE.PLATFORM = $(NEXT.LIBS)
 # Socket library
 LIBS.SOCKET.SYSTEM =
 
-# The name of the zlib library.
-Z_LIBS = $(LFLAGS.l)z
-
-# The name of the PNG library.
-PNG_LIBS = $(LFLAGS.l)png
-
-# The name of the JPEG library.
-JPG_LIBS = $(LFLAGS.l)jpeg
-
-# The name of the JNG/MNG library.
-MNG_LIBS = $(LFLAGS.l)mng
-
 # Additional audio libraries.
 SOUND_LIBS =
 
@@ -299,40 +287,6 @@ endif
 SYSCONFIG += \
   $(NEWLINE)sh libs/cssys/next/nextconf.sh>>config.tmp
   $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
-
-NEXT.DIR.ZLIB    = $(wildcard libs/zlib*)
-NEXT.DIR.LIBPNG  = $(wildcard libs/libpng*)
-NEXT.DIR.LIBJPEG = $(wildcard libs/libjpeg* libs/jpeg*)
-NEXT.DIR.LIBMNG  = $(wildcard libs/libmng*)
-
-# Unfortunately, these are not yet defined, so we do so manually.
-ifeq (,$(CFLAGS.I))
-  CFLAGS.I = -I
-endif
-ifeq (,$(LFLAGS.L))
-  LFLAGS.L = -L
-endif
-
-ifneq (,$(NEXT.DIR.ZLIB))
-  SYSCONFIG += \
-    $(NEWLINE)echo NEXT.CFLAGS.CONFIG += $(CFLAGS.I)$(NEXT.DIR.ZLIB)>>config.tmp \
-    $(NEWLINE)echo NEXT.LFLAGS.CONFIG += $(LFLAGS.L)$(NEXT.DIR.ZLIB)>>config.tmp
-endif
-ifneq (,$(NEXT.DIR.LIBPNG))
-  SYSCONFIG += \
-    $(NEWLINE)echo NEXT.CFLAGS.CONFIG += $(CFLAGS.I)$(NEXT.DIR.LIBPNG)>>config.tmp \
-    $(NEWLINE)echo NEXT.LFLAGS.CONFIG += $(LFLAGS.L)$(NEXT.DIR.LIBPNG)>>config.tmp
-endif
-ifneq (,$(NEXT.DIR.LIBJPEG))
-  SYSCONFIG += \
-    $(NEWLINE)echo NEXT.CFLAGS.CONFIG += $(CFLAGS.I)$(NEXT.DIR.LIBJPEG)>>config.tmp \
-    $(NEWLINE)echo NEXT.LFLAGS.CONFIG += $(LFLAGS.L)$(NEXT.DIR.LIBJPEG)>>config.tmp
-endif
-ifneq (,$(NEXT.DIR.LIBMNG))
-  SYSCONFIG += \
-    $(NEWLINE)echo NEXT.CFLAGS.CONFIG += $(CFLAGS.I)$(NEXT.DIR.LIBMNG)>>config.tmp \
-    $(NEWLINE)echo NEXT.LFLAGS.CONFIG += $(LFLAGS.L)$(NEXT.DIR.LIBMNG)>>config.tmp
-endif
 
 endif # ifeq ($(ROOTCONFIG),config)
 

@@ -54,6 +54,9 @@ all: $(CSUTIL.LIB)
 csutil: $(OUTDIRS) $(CSUTIL.LIB)
 clean: csutilclean
 
+$(OUT)/archive$O: libs/csutil/archive.cpp
+	$(DO.COMPILE.CPP) $(ZLIB.CFLAGS)
+
 $(CSUTIL.LIB): $(OBJ.CSUTIL)
 	$(DO.LIBRARY)
 
@@ -63,7 +66,7 @@ csutilclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)/csutil.dep
 $(OUTOS)/csutil.dep: $(SRC.CSUTIL)
-	$(DO.DEP)
+	$(DO.DEP1) $(ZLIB.CFLAGS) $(DO.DEP2)
 else
 -include $(OUTOS)/csutil.dep
 endif

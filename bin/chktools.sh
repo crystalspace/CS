@@ -47,16 +47,16 @@ msg_result "mkdir"
 msg_checking "how to create a directory tree"
 MKDIRS="no"
 rm -rf mkdtest
-mkdir -p mkdtest/mkdtest/mkdtest >/dev/null 2>&1
+mkdir -p mkdtest1/mkdtest2/mkdtest3 >/dev/null 2>&1
 if [ $? -eq 0 ]; then
   MKDIRS="mkdir -p"
 elif [ -n `checkprog "mkdirs"` ]; then
-  mkdirs mkdtest/mkdtest/mkdtest >/dev/null 2>&1
+  mkdirs mkdtest1/mkdtest2/mkdtest3 >/dev/null 2>&1
   if [ $? -eq 0 ]; then
     MKDIRS="mkdirs"
   fi
 fi
-rm -rf ./-p mkdtest
+rm -rf ./-p mkdtest*
 
 if [ "${MKDIRS}" != "no" ]; then
   echo "CMD.MKDIRS = ${MKDIRS}"

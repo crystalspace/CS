@@ -1,7 +1,7 @@
 # This is the makefile for Cygwin32 compiler (gcc for Win32)
 
 # Friendly names for building environment
-DESCRIPTION.cygwin = Windows with Cygwin32 GNU C/C++
+DESCRIPTION.cygwin = Windows with Cygwin32
 DESCRIPTION.OS.cygwin = Win32
 
 # Choose which drivers you want to build/use
@@ -74,15 +74,6 @@ LIBS.SOUND.SYSTEM=$(LFLAGS.l)dsound $(LFLAGS.l)winmm
 
 # Freetype library
 LIBS.FREETYPE.SYSTEM=$(LFLAGS.l)ttf
-
-# Where can the Zlib library be found on this system?
-Z_LIBS=$(LFLAGS.l)z
-
-# Where can the PNG library be found on this system?
-PNG_LIBS=$(LFLAGS.l)png
-
-# Where can the JPG library be found on this system?
-JPG_LIBS=$(LFLAGS.l)jpeg
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=

@@ -30,6 +30,35 @@ The history order is reversed so that new features are at the top.
 	  csRGBpixel to employ the 4-byte packing macros.  Thanks to Ferris
 	  McCormick <fmccor@inforead.com> for reporting the packing problem
 	  afflicting Sparc.
+	- Eric Sunshine fixed aws.mak so that it no longer reports an error
+	  about missing "plugins/aws/slp.cpp.h".
+	- Eric Sunshine made the following changes to the project configuration
+	  phase and makefiles:
+	    - Libraries zlib, libpng, and libjpeg are now auto-detected.
+	    - CFLAGS and LFLAGS for zlib, libpng, and libjpeg are now
+	      determined automatically.
+	    - In addition to the default paths (/usr/include, /usr/local/lib,
+	      etc.), auto-detection will now check the CS/libs directory and
+	      the /sw directory which is the default package installation
+	      location of Fink, the MacOS/X package management facility.
+	    - Auto-detection now works correctly even if directory names are
+	      decorated with version numbers (for example,
+	      CS/libs/libpng-1.2.4).  For libjpeg, auto-detection will
+	      recognize both CS/libs/libjpeg* and CS/libs/jpeg* (which matches
+	      the "jpeg-6b" directory into which the standard libjpeg archive
+	      unpacks).
+	    - Removed hard-coded CFLAGS and LFLAGS from platform-specific
+	      makefiles.
+	    - Fixed client makefiles to use the new auto-detected CFLAGS and
+	      LFLAGS.
+	    - zlib -I, -L, and -l directives are now used only where needed
+	      rather than globally throughout the project.  In particular, they
+	      are used for the vfs, pngldr, and jngldr plugins, and for csutil
+	      (which contains csArchive).
+	    - Worked around a bizarre bug in the Mingw/Msys "mkdir" command
+	      which caused the check for "mkdir -p" in chktools.sh to fail.
+	      Specifically, given the path "mkdir -p mkdtest/mkdtest/mkdtest",
+	      it would mysteriously fail (creating only the topmost directory).
 12-Oct-2002
 	- Jonathan Tarbox eliminated some MSVC warnings from the opcode plugin.
 11-Oct-2002

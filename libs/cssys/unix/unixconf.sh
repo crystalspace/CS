@@ -34,6 +34,15 @@ UNIX_DIR=libs/cssys/unix
 # test for endianess
 . ${BIN_DIR}/endtest.sh
 
+# Check for zlib.
+. ${BIN_DIR}/chkzlib.sh
+
+# Check for libpng.
+. ${BIN_DIR}/chkpng.sh
+
+# Check for libjpeg.
+. ${BIN_DIR}/chkjpeg.sh
+
 # Check for Pthread
 . ${BIN_DIR}/chkpthrd.sh
 

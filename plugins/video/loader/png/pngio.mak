@@ -26,9 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/loader/png
-
-LIB.CSPNGIMG.LOCAL += $(PNG_LIBS) $(Z_LIBS)
+LIB.CSPNGIMG.LOCAL += $(PNG.LFLAGS)
 
 ifeq ($(USE_PLUGINS),yes)
   CSPNGIMG = $(OUTDLL)/cspngimg$(DLL)
@@ -64,6 +62,9 @@ ifeq ($(MAKESECTION),targets)
 
 cspngimg: $(OUTDIRS) $(CSPNGIMG)
 
+$(OUT)/%$O: plugins/video/loader/png/%.cpp
+	$(DO.COMPILE.CPP) $(PNG.CFLAGS)
+
 $(CSPNGIMG): $(OBJ.CSPNGIMG) $(LIB.CSPNGIMG)
 	$(DO.PLUGIN.PREAMBLE) \
 	$(DO.PLUGIN.CORE) $(LIB.CSPNGIMG.SPECIAL) \
@@ -76,10 +77,9 @@ cspngimgclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)/pngimg.dep
 $(OUTOS)/pngimg.dep: $(SRC.CSPNGIMG)
-	$(DO.DEP)
+	$(DO.DEP1) $(PNG.CFLAGS) $(DO.DEP2)
 else
 -include $(OUTOS)/pngimg.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
-

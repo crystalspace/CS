@@ -64,21 +64,11 @@ LIBS.EXE=$(LFLAGS.l)dl $(LFLAGS.l)nsl $(LFLAGS.l)m
 # Socket library
 LIBS.SOCKET.SYSTEM=$(LFLAGS.l)socket
 
-# Where can the Zlib library be found on this system?
-Z_LIBS=$(LFLAGS.L)/usr/local/lib $(LFLAGS.L)libs/zlib $(LFLAGS.l)z
-
-# Where can the PNG library be found on this system?
-PNG_LIBS=$(LFLAGS.L)/usr/local/lib $(LFLAGS.L)libs/libpng $(LFLAGS.l)png
-
-# Where can the JPG library be found on this system?
-JPG_LIBS=$(LFLAGS.L)/usr/local/lib $(LFLAGS.L)libs/libjpeg $(LFLAGS.l)jpeg
-
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
 
 # Indicate where special include files can be found.
-CFLAGS.INCLUDE=$(CFLAGS.I)/usr/local/include $(CFLAGS.I)libs/zlib \
-  $(CFLAGS.I)libs/libpng $(CFLAGS.I)libs/libjpeg
+CFLAGS.INCLUDE=$(CFLAGS.I)/usr/local/include
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS)
@@ -96,7 +86,7 @@ CFLAGS.profile=-pg -O -g
 CFLAGS.DLL=
 
 # General flags for the linker which are used in any case.
-LFLAGS.GENERAL=$(CSTHREAD.LFLAGS)
+LFLAGS.GENERAL=$(LFLAGS.L)/usr/local/lib $(CSTHREAD.LFLAGS)
 
 # Flags for the linker which are used when debugging.
 LFLAGS.debug=-g3
