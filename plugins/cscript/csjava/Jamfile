@@ -5,7 +5,7 @@ if ! $(CSJAVA.MODULE.PREFIX) && ! $(CSJAVA.MODULE.SUFFIX)
   switch $(TARGET.OS)
   {
   case WIN32 :
-    CSJAVA.MODULE.PREFIX = ;
+    CSJAVA.MODULE.PREFIX = "" ; # Empty string lets interpolation work (below).
     CSJAVA.MODULE.SUFFIX = .dll ;
   case MACOS_X :
     CSJAVA.MODULE.PREFIX = lib ;
@@ -49,7 +49,7 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(CMD.SWIG) &&
   Help csjava : "Build the $(desc)" ;
 
   local javamod = "$(CSJAVA.MODULE.PREFIX)csjava$(CSJAVA.MODULE.SUFFIX)" ;
-  local javamodsrc = $(common) [ Wildcard *.cpp ] ;
+  local javamodsrc = $(common) [ DoSourceGrist [ Wildcard *.cpp ] ] ;
   local javamodobj = [ CompileObjects $(javamodsrc) ] ;
   javamod_TARGET = $(javamod) ;
   javamod_SOURCES = $(javamodsrc) ;
