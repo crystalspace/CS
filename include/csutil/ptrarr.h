@@ -59,7 +59,7 @@ public:
     {
       free (root);
       root = NULL;
-      count = 0;
+      limit = count = 0;
     }
   }
 

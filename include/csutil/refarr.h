@@ -60,7 +60,7 @@ public:
         root[i] = NULL;	// Clear ref.
       free (root);
       root = NULL;
-      count = 0;
+      limit = count = 0;
     }
   }
 
