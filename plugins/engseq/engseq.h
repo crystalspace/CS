@@ -354,7 +354,7 @@ public:
   csTimedOperation (iSequenceTimedOperation* op, iBase* params) : ref (1)
   {
     csTimedOperation::op = op;
-    csTimedOperation::params = params;
+    params = params;
   }
   virtual ~csTimedOperation () { }
   iBase* GetParams () { return params; }
