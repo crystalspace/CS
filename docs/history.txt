@@ -127,6 +127,7 @@ The history order has been reversed so that new features are at the top.
 	  video-related plugins.  Also fixed formatting of help message.
 	- Eric Sunshine fixed several compilation problems in MazeD and CSWS.
 	  Also resolved some const vs. non-const problems in these modules.
+	- Eric Sunshine fixed a slew of compilation warnings in cswstest.cpp.
 30-Jan-2001
 	- Norman Kramer did further work on the video plugins:
 	    - Removed some debug code and a stupid comment.
