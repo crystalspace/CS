@@ -6862,14 +6862,17 @@ echo "${ECHO_T}$cs_cv_python_sdk" >&6
     # basename with a few decorations (for example, libpython2.2.a), however
     # some Windows libraries lack the decimal point (for example, libpython22.a
     # or python22.lib), so we must check for both variations.  Furthermore,
-    # Python on MacOS/X still uses a one-level linker namespace, which means
-    # that loadable Python modules do not link against the Python library;
-    # instead, unresolved symbols in the modules are satisfied automatically by
-    # the Python executable when the module is loaded into the executable.  For
-    # this reason, Python on MacOS/X does not even provide a Python link
-    # library.
+    # MacOS/X 10.3 supplies a Python.framework, however, earlier releases did
+    # not.  Instead, Python on MacOS/X pre-10.3 uses a one-level linker
+    # namespace, which means that loadable Python modules do not link against
+    # the Python library; instead, unresolved symbols in the modules are
+    # satisfied automatically by the Python executable when the module is
+    # loaded into the executable.  For this reason, Python on MacOS/X does not
+    # even provide a Python link library.  We account for this by trying
+    # -bundle, rather than linking against the library.
     if test $cs_cv_python_sdk = yes; then
   cs_pywinlib=`echo "$cs_cv_pybase" | sed 's/\.//g'`
+	cs_pytuples="$cs_pytuples `echo @@@-framework Python | sed 'y% %#%'`"
 	cs_pytuples="$cs_pytuples `echo @@@-l$cs_cv_pybase | sed 'y% %#%'`"
 	cs_pytuples="$cs_pytuples `echo @@@-l$cs_pywinlib | sed 'y% %#%'`"
 	cs_pytuples="$cs_pytuples `echo @@-bundle -flat_namespace -undefined suppress@ | sed 'y% %#%'`"

@@ -700,14 +700,17 @@ AS_IF([test -n "$PYTHON" && test "$with_python" != no],
     # basename with a few decorations (for example, libpython2.2.a), however
     # some Windows libraries lack the decimal point (for example, libpython22.a
     # or python22.lib), so we must check for both variations.  Furthermore,
-    # Python on MacOS/X still uses a one-level linker namespace, which means
-    # that loadable Python modules do not link against the Python library;
-    # instead, unresolved symbols in the modules are satisfied automatically by
-    # the Python executable when the module is loaded into the executable.  For
-    # this reason, Python on MacOS/X does not even provide a Python link
-    # library.
+    # MacOS/X 10.3 supplies a Python.framework, however, earlier releases did
+    # not.  Instead, Python on MacOS/X pre-10.3 uses a one-level linker
+    # namespace, which means that loadable Python modules do not link against
+    # the Python library; instead, unresolved symbols in the modules are
+    # satisfied automatically by the Python executable when the module is
+    # loaded into the executable.  For this reason, Python on MacOS/X does not
+    # even provide a Python link library.  We account for this by trying
+    # -bundle, rather than linking against the library.
     AS_IF([test $cs_cv_python_sdk = yes],
 	[cs_pywinlib=`echo "$cs_cv_pybase" | sed 's/\.//g'`
+	cs_pytuples="$cs_pytuples CS_CREATE_TUPLE([],[],[-framework Python])"
 	cs_pytuples="$cs_pytuples CS_CREATE_TUPLE([],[],[-l$cs_cv_pybase])"
 	cs_pytuples="$cs_pytuples CS_CREATE_TUPLE([],[],[-l$cs_pywinlib])"
 	cs_pytuples="$cs_pytuples CS_CREATE_TUPLE(
