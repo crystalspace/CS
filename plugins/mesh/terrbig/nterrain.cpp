@@ -146,6 +146,7 @@ csBigTerrainObject::Draw (iRenderView* rview, iMovable* movable, csZBufMode zbuf
   for(i=0; i<nTextures; ++i)
   {
     info->mesh[i].buffers[0]=vbuf;
+    info->mesh[i].num_triangles = info->triq[i].triangles.Length();
     pG3D->DrawTriangleMesh(info->mesh[i]);    
   }
 
