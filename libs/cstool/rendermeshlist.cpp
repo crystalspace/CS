@@ -198,7 +198,7 @@ void csRenderMeshList::GetSortedMeshList (
     numObjects += listEnt->meshList.Length ();
   }
 
-  meshes.DeleteAll ();
+  meshes.Empty ();
   meshes.SetCapacity (numObjects);
   int currentElement;
   

@@ -340,7 +340,7 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
   {
     visibleMeshCacheHolder& entry = visibleMeshCache[i];
     if (entry.cachedFrameNumber == cur_framenr &&
-        true)//entry.cachedRenderContext == rview->GetRenderContext ())
+        entry.cachedRenderContext == rview->GetRenderContext ())
     {
       return entry.meshList;
     }
