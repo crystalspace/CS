@@ -16,6 +16,9 @@ The history order has been reversed so that new features are at the top.
 	  file. With these you can make a texture procedural. If you make a
 	  texture PERSISTENT as well as PROCEDURAL you can render on parts
 	  of the texture and the previous contents will still be there.
+	- Wouter Wijngaards added csMaterial class. Is now used by polygons.
+	  The API is backwards compatible though, only resulting in a
+	  seperate material for each polygon if used the old way.
 12-Jul-2000
 	- Added new csHashSet class. This is a class that you can use
 	  to add objects and to test if some object is already in the
