@@ -4,7 +4,7 @@ The history order has been reversed so that new features are at the top.
 	- Philip Wyett fixed a small VC compiler warning.
 	- Wouter Wijngaards fixed a compile warning.
 	- Completed a fix Eric Sunshine did (previous millenium) with regards
-	  to CalculateFogMesh. Eric's fix was still not completely ok.
+	  to CalculateFogMesh. Eric missed a tiny detail. Oops! :-)
 	- Added an extra level of abstraction in the mesh object system.
 	  Created a plugin called iMeshObjectType which represents a type
 	  of mesh objects. From this you can created instances of
@@ -41,6 +41,7 @@ The history order has been reversed so that new features are at the top.
 	- Added 'confset' console command to WalkTest with which you can
 	  set a config option to some value. Arguments are <plugnr>,<name>,<val>
 	  with <plugnr> the number you get from the 'plugins' command.
+	- Eric Sunshine eliminated a compilation warning from walkcmd.cpp.
 1-Jan-2001
 	- Added 'children' array to csMeshWrapper. By this we will support
 	  hierarchical objects and transformations.
