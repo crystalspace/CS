@@ -277,14 +277,14 @@ bool csButton::HandleEvent (iEvent &Event)
       
     case csevMouseEnter:
       Highlighted=true;
-      if (GetState(CSS_TRANSPARENT))  	   parent->Invalidate();
+      if (GetState(CSS_TRANSPARENT))  	   parent->Invalidate(true);
       Invalidate();
     return true;
     break;
     	
     case csevMouseExit:
       Highlighted=false;
-      if (GetState(CSS_TRANSPARENT)) 	   parent->Invalidate();
+      if (GetState(CSS_TRANSPARENT)) 	   parent->Invalidate(true);
       Invalidate();
     return true;
     break;
@@ -371,7 +371,7 @@ void csButton::SetPressed (bool state)
     parent->SendCommand (Pressed ? cscmdButtonDown : cscmdButtonUp,
       (void *)this);
    
-    if (GetState(CSS_TRANSPARENT)) parent->Invalidate();
+    if (GetState(CSS_TRANSPARENT)) parent->Invalidate(true);
       
   }
       

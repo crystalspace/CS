@@ -23,6 +23,7 @@
 #include "csws/cstimer.h"
 #include "csws/csscrbar.h"
 #include "csws/csapp.h"
+#include "csws/csskin.h"
 
 // Amount of space at left and at right of each listbox item
 #define LISTBOXITEM_XSPACE              2
@@ -44,6 +45,7 @@ csListBoxItem::csListBoxItem (csComponent *iParent, const char *iText, int iID,
   id = iID; 
   SetText (iText);
   SetPalette (CSPAL_LISTBOXITEM);
+  ApplySkin (GetSkin ());
 }
 
 csListBoxItem::~csListBoxItem ()
@@ -125,7 +127,11 @@ bool csListBoxItem::HandleEvent (iEvent &Event)
           if (deltax != (int)Event.Command.Info)
           {
             deltax = (int)Event.Command.Info;
-            if (GetState(CSS_TRANSPARENT)) parent->Invalidate();
+            if (parent->GetState(CSS_TRANSPARENT))
+            {
+               parent->parent->Invalidate();
+               parent->Invalidate(true);
+             }
             Invalidate ();
           } /* endif */
           return true;
@@ -141,14 +147,22 @@ void csListBoxItem::SetState (int mask, bool enable)
   csComponent::SetState (mask, enable);
   if ((oldstate ^ state) & CSS_LISTBOXITEM_SELECTED)
   {
-    if (GetState(CSS_TRANSPARENT)) parent->Invalidate();
+    if (parent->GetState(CSS_TRANSPARENT)) 
+    {
+      parent->parent->Invalidate();
+      parent->Invalidate(true);
+    }
     Invalidate ();
     parent->SendCommand (GetState (CSS_LISTBOXITEM_SELECTED) ?
       cscmdListBoxItemSelected : cscmdListBoxItemDeselected, this);
   } /* endif */
   if ((oldstate ^ state) & CSS_FOCUSED)
   {
-    if (GetState(CSS_TRANSPARENT)) parent->Invalidate();
+    if (parent->GetState(CSS_TRANSPARENT)) 
+    {
+      parent->parent->Invalidate();
+      parent->Invalidate(true);
+    }
     Invalidate ();
     if (GetState (CSS_FOCUSED))
       parent->SendCommand (cscmdListBoxMakeVisible, this);
@@ -162,7 +176,11 @@ void csListBoxItem::SetBitmap (csPixmap *iBitmap, bool iDelete)
   ItemBitmap = iBitmap;
   DeleteBitmap = iDelete;
   
-  if (GetState(CSS_TRANSPARENT)) parent->Invalidate();
+  if (parent->GetState(CSS_TRANSPARENT)) 
+  {
+    parent->parent->Invalidate();
+    parent->Invalidate(true);
+  }
   Invalidate ();
 }
 
@@ -215,6 +233,9 @@ csListBox::csListBox (csComponent *iParent, int iStyle,
     vscroll = new csScrollBar (this, sbsty);
   else
     vscroll = NULL;
+    
+    
+   ApplySkin (GetSkin ());
 }
 
 csListBox::~csListBox() 
@@ -741,17 +762,37 @@ bool csListBox::SetFocused (csComponent *comp)
 void csListBox::Insert (csComponent *comp)
 {
   fPlaceItems = true;
-  if (GetState(CSS_TRANSPARENT)) parent->Invalidate();
-  Invalidate ();
+  if (GetState(CSS_TRANSPARENT)) 
+  {
+    parent->Invalidate();
+    //if (hscroll) hscroll->Invalidate();
+    //if (vscroll) vscroll->Invalidate();  
+  }
+  Invalidate (true, this);
   csComponent::Insert (comp);
 }
 
 void csListBox::Delete (csComponent *comp)
 {
   fPlaceItems = true;
-  if (GetState(CSS_TRANSPARENT)) parent->Invalidate();
-  Invalidate ();
+  if (GetState(CSS_TRANSPARENT)) 
+  {
+    parent->Invalidate();
+    //if (hscroll) hscroll->Invalidate();
+    //if (vscroll) vscroll->Invalidate();  
+  }
+
+  Invalidate (true, this);
   csComponent::Delete (comp);
+}
+
+void csListBox::SuggestSize (int &w, int &h)
+{
+#define SKIN ((csListBoxSkin *)skinslice)
+ 
+  SKIN->SuggestSize (*this, w, h);
+  
+#undef SKIN
 }
 
 void csListBox::GetBorderSize(int *iBorderWidth,  int *iBorderHeight) 

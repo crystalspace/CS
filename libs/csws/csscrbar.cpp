@@ -22,13 +22,13 @@
 #include "csws/csapp.h"
 
 // Minimal scroll button size
-#define CSSB_MINIMAL_KNOBSIZE   (3+3+8)
+#define CSSB_MINIMAL_KNOBSIZE	(3+3+8)
 /// Minimal scroll bar size
-#define CSSB_MINIMAL_SIZE       (2+2+7)
+#define CSSB_MINIMAL_SIZE	(2+2+7)
 
 // Scrolling state
-#define SCROLL_UL		1001	// scroll up or left (h/v scrollbars)
-#define SCROLL_DR		1002	// scroll down or right
+#define SCROLL_UL			1001	// scroll up or left (h/v scrollbars)
+#define SCROLL_DR			1002	// scroll down or right
 #define SCROLL_PAGE_UL		1003	// scroll up or left by pages
 #define SCROLL_PAGE_DR		1004	// scroll down or right by pages
 
@@ -79,6 +79,8 @@ csScrollBar::csScrollBar (csComponent *iParent, csScrollBarFrameStyle iFrameStyl
 
   // create repeat timer
   timer = new csTimer (this, SCROLL_REPEAT_INTERVAL);
+  
+  ApplySkin (GetSkin ());
 }
 
 csScrollBar::~csScrollBar ()
@@ -93,49 +95,6 @@ csScrollBar::~csScrollBar ()
     delete sprscroller [0]; sprscroller[0] = NULL;
     delete sprscroller [1]; sprscroller[1] = NULL;
   } /* endif */
-}
-
-void csScrollBar::Draw ()
-{
-  int dx, dy;
-  switch (FrameStyle)
-  {
-    case cssfsThickRect:
-      Rect3D (0, 0, bound.Width (), bound.Height (),
-        CSPAL_SCROLLBAR_LIGHT3D, CSPAL_SCROLLBAR_DARK3D);
-      Rect3D (1, 1, bound.Width () - 1, bound.Height () - 1,
-        CSPAL_SCROLLBAR_LIGHT3D, CSPAL_SCROLLBAR_DARK3D);
-      dx = dy = 2;
-      break;
-    case cssfsThinRect:
-      Rect3D (0, 0, bound.Width (), bound.Height (),
-        CSPAL_SCROLLBAR_LIGHT3D, CSPAL_SCROLLBAR_DARK3D);
-      dx = dy = 1;
-      break;
-    default:
-      return;
-  } /* endswitch */
-
-  int c1 = CSPAL_SCROLLBAR_BACKGROUND;
-  int c2 = CSPAL_SCROLLBAR_BACKGROUND;
-
-  if (active_button == SCROLL_PAGE_UL)
-    c1 = CSPAL_SCROLLBAR_SELBACKGROUND;
-  else if (active_button == SCROLL_PAGE_DR)
-    c2 = CSPAL_SCROLLBAR_SELBACKGROUND;
-
-  if (IsHorizontal)
-  {
-    Box (dx, dy, scroller->bound.xmin, bound.Height () - dy, c1);
-    Box (scroller->bound.xmax, dy, bound.Width () - 1, bound.Height () - dy, c2);
-  } else
-  {
-    Box (dx, dy, bound.Width () - dx, scroller->bound.ymin, c1);
-    Box (dx, scroller->bound.ymax, bound.Width () - dx, bound.Height () - 1, c2);
-  } /* endif */
-
-  csComponent::Draw ();
-  return;
 }
 
 bool csScrollBar::HandleEvent (iEvent &Event)
