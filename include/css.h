@@ -33,7 +33,6 @@
 //SCF
 #ifndef NO_CSSCF
 #include "csutil/scf.h"
-#include "itxtmgr.h"
 #endif
 
 //CS Sys
@@ -45,6 +44,7 @@
 #ifndef NO_CSINTERFACE
 #include "ipolygon.h"
 #include "ithing.h"
+#include "itxtmgr.h"
 #endif
 
 //CS Geom

@@ -13,6 +13,22 @@ class iBase(iBasePtr):
 
 
 
+class iSCFPtr(iBasePtr):
+    def __init__(self,this):
+        self.this = this
+        self.thisown = 0
+    def CreateInstance(self,arg0,arg1,arg2):
+        val = cspacec.iSCF_CreateInstance(self.this,arg0,arg1,arg2)
+        return val
+    def __repr__(self):
+        return "<C iSCF instance>"
+class iSCF(iSCFPtr):
+    def __init__(self,this):
+        self.this = this
+
+
+
+
 class iPlugInPtr(iBasePtr):
     def __init__(self,this):
         self.this = this
@@ -338,6 +354,10 @@ class iSystemPtr(iBasePtr):
     def __init__(self,this):
         self.this = this
         self.thisown = 0
+    def GetSCF(self):
+        val = cspacec.iSystem_GetSCF(self.this)
+        val = iSCFPtr(val)
+        return val
     def Query_csWorld(self):
         val = cspacec.iSystem_Query_csWorld(self.this)
         val = csWorldPtr(val)
@@ -373,17 +393,14 @@ ptradd = cspacec.ptradd
 
 ptrmap = cspacec.ptrmap
 
-def new_csThing():
-    val = cspacec.new_csThing()
-    val = iThingPtr(val)
-    return val
-
-GetMyPtr = cspacec.GetMyPtr
+MakeVersion = cspacec.MakeVersion
 
 def GetSystem():
     val = cspacec.GetSystem()
     val = iSystemPtr(val)
     return val
+
+GetMyPtr = cspacec.GetMyPtr
 
 
 

@@ -479,3 +479,28 @@ bool scfClassRegistered (const char *iClassID)
 {
   return (ClassRegistry->FindKey (iClassID) >= 0);
 }
+
+//***** iSCF
+
+csSCF::csSCF(iBase *iParent) {
+  CONSTRUCT_IBASE(iParent);
+}
+
+csSCF::~csSCF() {}
+
+void *csSCF::CreateInstance (const char *iClassID, const char *iInterfaceID,
+    int iVersion) {
+  return scfCreateInstance(iClassID, iInterfaceID, iVersion);  
+}
+
+IMPLEMENT_IBASE(csSCF)
+  IMPLEMENTS_INTERFACE(iBase)
+  IMPLEMENTS_INTERFACE(iSCF)
+IMPLEMENT_IBASE_END
+/*
+IMPLEMENT_FACTORY(csSCF)
+
+EXPORT_CLASS_TABLE(scf)
+  EXPORT_CLASS(csSCF, "crystalspace.engine.scf", "Crystal Space SCF")
+EXPORT_CLASS_TABLE_END
+*/

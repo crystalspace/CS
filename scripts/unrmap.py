@@ -60,9 +60,16 @@ class Brush(Actor):
     	def MakeGeom(self, vecs, room, tm):
 		if not self.attrib.has_key('CsgOper'):
 			poly=room.NewPolygon(tm)
-#		elif self.attrib['CsgOper']=='CSG_Add':
-#			poly=room.NewPolygon(tm)
-#		elif self.attrib['CsgOper']=='CSG_Add':
+		elif self.attrib['CsgOper']=='CSG_Add':
+			ptr=scf.CreateInstance('crystalclear.entitymanager.standard', 
+				'iEntityManager', MakeVersion(0,0,1))
+			if ptr=="NULL":
+				print "SCF is broken!"
+				return
+			print 'iEntityManager:', ptr
+			return
+			room.AddThing(poly)
+#		elif self.attrib['CsgOper']=='CSG_Subtract':
 #			poly=room.NewPolygon(tm)
 		else:
 			if(warn):
@@ -103,10 +110,15 @@ class Map(Actor):
 		self.counts[type]=self.counts[type]+1
 	def Load(self):
 		self.counts={'Brush':0,'PlayerStart':0}
+		global system, scf
 		system=GetSystem()
+		scf=system.GetSCF()
 		room=csSector(roomptr)
+		room.thisown=0
 		view=csView(viewptr)
+		view.thisown=0
 		tm=csTextureHandle(tmptr)
+		tm.thisown=0
 		for x in self.stack:
 			if isinstance(x, Brush):
 				self.Inc('Brush')

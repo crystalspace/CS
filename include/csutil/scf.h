@@ -456,6 +456,28 @@ static inline bool scfCompatibleVersion (int iVersion, int iItfVersion)
       && ((iVersion & 0x00ffffff) <= (iItfVersion & 0x00ffffff));
 }
 
+//***** iSCF
+
+SCF_VERSION(iSCF, 0, 0, 1);
+
+//Wrapper for use by DLL's to use SCF
+struct iSCF:public iBase {
+  virtual void *CreateInstance (const char *iClassID, const char *iInterfaceID,
+    int iVersion)=0;
+};
+
+//Class that implements iSCF
+class csSCF:public iSCF {
+public:
+  csSCF(iBase* iParent=NULL);
+  virtual ~csSCF();
+
+  void *CreateInstance (const char *iClassID, const char *iInterfaceID,
+    int iVersion);
+
+  DECLARE_IBASE;
+};
+
 //--------------------------------------------- System-dependent defines -----//
 
 // A macro to declare a symbol that should be exported from shared libraries

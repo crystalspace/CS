@@ -332,6 +332,9 @@ protected:
    */
   void SetMode (const char* mode);
 
+  /// Remote SCF interface
+  iSCF* scf;
+  
 public:
   /**************************** iSystem interface ****************************/
 
@@ -393,9 +396,8 @@ public:
   virtual void AddOptionCL (const char *iName, const char *iValue);
   /// Add a command-line name to the command-line names array
   virtual void AddNameCL (const char *iName);
-
-//TODO Python HACK
-  csSystemDriver* GetSystemDriver();
+  /// Remove SCF interface
+  iSCF* GetSCF();
 };
 
 // Shortcuts for compatibility

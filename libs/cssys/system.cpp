@@ -283,6 +283,8 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8), OptionList (16, 16),
   EventQueue = NULL;
   Console = NULL;
   ConfigName = NULL;
+
+  scf=NULL;
 }
 
 csSystemDriver::~csSystemDriver ()
@@ -328,6 +330,10 @@ csSystemDriver::~csSystemDriver ()
   CHK (delete Mouse);
   CHK (delete Keyboard);
   CHK (delete EventQueue);
+
+//TODO Azverkan this should be a scf->Release()
+  if(scf)
+    CHK(delete scf);
 
   scfFinish ();
   console_close ();
@@ -1098,7 +1104,8 @@ void csSystemDriver::AddNameCL (const char *iName)
   CommandLineNames.Push (strnew (iName));
 }
 
-//TODO Python HACK
-csSystemDriver* csSystemDriver::GetSystemDriver() { 
-  return this; 
+iSCF* csSystemDriver::GetSCF() {
+  if(!scf)
+    CHK(scf=new csSCF());
+  return scf;
 }
