@@ -4,6 +4,39 @@ The history order has been reversed so that new features are at the top.
 	- Fixed the bug when that could cause severe problems when
 	  loading a world for which the octree isn't valid anymore. The
 	  partially loaded octree was not cleaned up properly.
+	- As from a suggestion from Terrence Stewart I implemented
+	  csPolygon2D::FillZBuf() which will fill the Z buffer for
+	  that polygon (and not do texture mapping). This is now used
+	  after drawing a portal so that sprites drawn in the same
+	  sector as the portal cannot accidently go inside the portal
+	  contents (Z buffer cannot be used in case of floating portals
+	  for example). This z filling for portals is optional though.
+	  It is a (slight) overhead and it is not needed for many
+	  kinds of portals (like outgoing portals on sector walls).
+	  WARNING! Currently only the software renderer supports this
+	  Z-buffer filling.
+	  WARNING! If you enable this option it requires sprites to
+	  be correctly placed in all the sectors that you want the sprite
+	  to be visible in. If you don't do that and you use a ZFIL portal
+	  then you'll get the effect that the sprite will be clipped to
+	  the portal.
+	- Removed a number of 'bool' settings in csPortal and replaced them
+	  with a single public 'flags' field. Also removed a lot of the API
+	  calls to set those flags. All access should be through the 'flags'
+	  field instead. A portal now accepts the following flags:
+	  	CS_PORTAL_CLIPDEST:	clip geometry in destination sector.
+		CS_PORTAL_ZFILL:	do z-fill after rendering portal.
+		CS_PORTAL_WARP:		warp space (set with SetWarp()).
+		CS_PORTAL_MIRROR:	mirror space (automatically set).
+		CS_PORTAL_STATICDEST:	static destination for portal.
+	- Added support for new ZFILL keyword in world files. This can
+	  be used inside a WARP statement (which is actually a bit badly
+	  named but this describes various portal settings).
+	- Moved CLIP from polygon to WARP because it belongs with the other
+	  portal settings. This will break the 'room.zip' level but it
+	  is easy to fix.
+	- Added csFlags::SetBool(unsigned,bool) to set all values in a mask
+	  to either 1 or 0 depending on the bool value.
 26-Jun-2000
 	- Fixed memory leak while building BSP/octree.
 	- Eric Sunshine eliminated a slew of compilation warning in cstree.cpp

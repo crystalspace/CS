@@ -48,6 +48,13 @@ public:
   void Set (unsigned mask, unsigned value)
   { flags = (flags & ~mask) | value; }
 
+  /// Set all flags with the given value.
+  void SetBool (unsigned mask, bool value)
+  {
+    if (value) flags = (flags & ~mask) | mask;
+    else flags = (flags & ~mask);
+  }
+
   /// Get flags.
   unsigned Get ()
   { return flags; }

@@ -391,7 +391,7 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
     if (d->g3d->GetRenderState (G3DRENDERSTATE_TRANSPARENCYENABLE))
       filtered = p->IsTransparent ();
               
-    if (filtered || is_this_fog)
+    if (filtered || is_this_fog || (po && po->flags.Check (CS_PORTAL_ZFILL)))
     {
       keep_plane = new csPolyPlane (*(p->GetPlane ()));
     }
@@ -406,6 +406,11 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
 	if (filtered) poly->DrawFilled (d, p, keep_plane, use_z_buf);
 	if (is_this_fog) poly->AddFogPolygon (d->g3d, p, keep_plane,
 		d->IsMirrored (), sector->GetID (), CS_FOG_BACK);
+	// Here we z-fill the portal contents to make sure that sprites
+	// that are drawn outside of this portal cannot accidently cross
+	// into the others sector space (we cannot trust the Z-buffer here).
+	if (po->flags.Check (CS_PORTAL_ZFILL))
+	  poly->FillZBuf (d, p, keep_plane);
       }
     }
     else if (!d->callback)

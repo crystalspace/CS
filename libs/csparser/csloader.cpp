@@ -248,6 +248,7 @@ TOKEN_DEF_START
   TOKEN_DEF (W)
   TOKEN_DEF (WARP)
   TOKEN_DEF (WORLD)
+  TOKEN_DEF (ZFILL)
 TOKEN_DEF_END
 
 //---------------------------------------------------------------------------
@@ -1887,7 +1888,6 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
     TOKEN_TABLE (FOG)
     TOKEN_TABLE (COSFACT)
     TOKEN_TABLE (GOURAUD)
-    TOKEN_TABLE (CLIP)
   TOKEN_TABLE_END
 
   TOKEN_TABLE_START (tex_commands)
@@ -1911,6 +1911,8 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
     TOKEN_TABLE (W)
     TOKEN_TABLE (MIRROR)
     TOKEN_TABLE (STATIC)
+    TOKEN_TABLE (ZFILL)
+    TOKEN_TABLE (CLIP)
   TOKEN_TABLE_END
 
   char* name;
@@ -1997,16 +1999,12 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
           csLoaderStat::portals_loaded++;
         }
         break;
-      case TOKEN_CLIP:
-	if (poly3d->GetPortal ()) poly3d->GetPortal ()->SetClippingPortal (true);
-        break;
       case TOKEN_WARP:
         if (poly3d->GetPortal ())
         {
           csMatrix3 m_w; m_w.Identity ();
           csVector3 v_w_before (0, 0, 0);
           csVector3 v_w_after (0, 0, 0);
-          bool do_static = false;
           while ((cmd = csGetObject (&params, portal_commands, &name, &params2)) > 0)
           {
     	    if (!params2)
@@ -2033,13 +2031,18 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
                 do_mirror = true;
                 break;
               case TOKEN_STATIC:
-                do_static = true;
+                poly3d->GetPortal ()->flags.Set (CS_PORTAL_STATICDEST);
                 break;
+      	      case TOKEN_ZFILL:
+		poly3d->GetPortal ()->flags.Set (CS_PORTAL_ZFILL);
+        	break;
+      	      case TOKEN_CLIP:
+		poly3d->GetPortal ()->flags.Set (CS_PORTAL_CLIPDEST);
+        	break;
             }
           }
           if (!do_mirror)
             poly3d->GetPortal ()->SetWarp (m_w, v_w_before, v_w_after);
-          poly3d->GetPortal ()->SetStaticDest (do_static);
         }
         break;
       case TOKEN_LIGHTX:
@@ -4058,7 +4061,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
     }
 
     // This will later be defined correctly
-     portal = new csSector () ;
+    portal = new csSector () ;
     portal->SetName (portals[i].sector);
     p->SetCSPortal (portal);
     csLoaderStat::portals_loaded++;
@@ -4068,7 +4071,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
         p->SetWarp (csTransform::GetReflect ( *(p->GetPolyPlane ()) ));
       else p->SetWarp (portals[i].m_warp, portals[i].v_warp_before,
                         portals[i].v_warp_after);
-      p->GetPortal  ()->SetStaticDest (portals[i].do_static);
+      p->GetPortal ()->flags.SetBool (CS_PORTAL_STATICDEST, portals[i].do_static);
     }
     p->SetAlpha (portals[i].alpha);
   }

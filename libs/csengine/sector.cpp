@@ -1002,8 +1002,7 @@ void csSector::Draw (csRenderView& rview)
 	  	== csThing::Type ||
 	  previous_sector->HasFog () ||
 	  rview.portal_polygon->IsTransparent () ||
-	  rview.portal_polygon->GetPortal ()->IsSpaceWarped ()
-	  )
+	  rview.portal_polygon->GetPortal ()->flags.Check (CS_PORTAL_WARP))
 	{
 	  // @@@ Here we should draw clipped to the portal.
           sp->Draw (rview);

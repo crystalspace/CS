@@ -926,6 +926,42 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
   }
 }
 
+void csPolygon2D::FillZBuf (csRenderView* rview, csPolygon3D* poly,
+  csPolyPlane* plane)
+{
+  rview->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILLONLY);
+
+  static G3DPolygonDP g3dpoly;
+  g3dpoly.num = num_vertices;
+  g3dpoly.inv_aspect = rview->GetInvFOV ();
+
+  // We are going to use DrawPolygon.
+  int i;
+  if (rview->IsMirrored ())
+    for (i = 0 ; i < num_vertices ; i++)
+    {
+      g3dpoly.vertices[num_vertices-i-1].sx = vertices[i].x;
+      g3dpoly.vertices[num_vertices-i-1].sy = vertices[i].y;
+    }
+  else
+    for (i = 0 ; i < num_vertices ; i++)
+    {
+      g3dpoly.vertices[i].sx = vertices[i].x;
+      g3dpoly.vertices[i].sy = vertices[i].y;
+    }
+
+  g3dpoly.z_value         = poly->Vcam(0).z;
+
+  float Ac, Bc, Cc, Dc;
+  plane->GetCameraNormal (&Ac, &Bc, &Cc, &Dc);
+  g3dpoly.normal.A () = Ac;
+  g3dpoly.normal.B () = Bc;
+  g3dpoly.normal.C () = Cc;
+  g3dpoly.normal.D () = Dc;
+
+  rview->g3d->DrawPolygon (g3dpoly);
+}
+
 void csPolygon2D::AddFogPolygon (iGraphics3D* g3d, csPolygon3D* /*poly*/,
   csPolyPlane* plane, bool mirror, CS_ID id, int fogtype)
 {

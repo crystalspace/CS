@@ -97,6 +97,12 @@ public:
   	bool use_z_buf = false);
 
   /**
+   * Z fill the Z buffer for this polygon.
+   * Nothing else is rendered.
+   */
+  void FillZBuf (csRenderView* rview, csPolygon3D* poly, csPolyPlane* plane);
+
+  /**
    * Add this polygon as a back or front polygon of a fog object.
    * NOTE! Don't forget to open the fog object first with g3d->OpenFogObject ();
    */

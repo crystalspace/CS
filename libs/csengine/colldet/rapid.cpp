@@ -127,7 +127,7 @@ void csRAPIDCollider::PolygonInitialize (csPolygonSet *ps)
   {
     csPolygon3D *p = ps->GetPolygon3D (i);
     // Handle solid walls and mirrors.
-    if (!p->GetPortal () || p->GetPortal ()->IsSpaceWarped ())
+    if (!p->GetPortal () || p->GetPortal ()->flags.Check (CS_PORTAL_WARP))
       tri_count += p->GetVertices ().GetNumVertices () - 2;
   }
 
@@ -141,7 +141,7 @@ void csRAPIDCollider::PolygonInitialize (csPolygonSet *ps)
     {
       csPolygon3D *p = ps->GetPolygon3D (i);
       // Handle solid walls and mirrors.
-      if (!p->GetPortal () || p->GetPortal ()->IsSpaceWarped ())
+      if (!p->GetPortal () || p->GetPortal ()->flags.Check (CS_PORTAL_WARP))
       {
         // Collision detection only works with triangles.
         int *vt = p->GetVertices ().GetVertexIndices ();

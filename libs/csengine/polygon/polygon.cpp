@@ -340,7 +340,7 @@ void csPolygon3D::SetCSPortal (csSector* sector)
   if (!sector) return;
   portal = new csPortal;
   flags.Set (CS_POLY_DELETE_PORTAL);
-  portal->DisableSpaceWarping ();
+  portal->flags.Reset (CS_PORTAL_WARP);
   portal->SetSector (sector);
   //portal->SetTexture (texh->get_texture_handle ());
 }

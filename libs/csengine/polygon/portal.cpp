@@ -29,20 +29,16 @@
 csPortal::csPortal ()
 {
   cfg_alpha = 0;
-  do_warp_space = false;
-  do_mirror = false;
   filter_texture = NULL;
   filter_r = 1;
   filter_g = 1;
   filter_b = 1;
-  static_dest = false;
   sector = NULL;
-  do_clip_portal = false;
 }
 
 void csPortal::ObjectToWorld (const csReversibleTransform& t)
 {
-  if (static_dest)
+  if (flags.Check (CS_PORTAL_STATICDEST))
     warp_wor = warp_obj * t;
   else
     warp_wor = t.GetInverse () * warp_obj * t;
@@ -50,17 +46,17 @@ void csPortal::ObjectToWorld (const csReversibleTransform& t)
 
 void csPortal::SetWarp (const csTransform& t)
 {
-  do_warp_space = true;
+  flags.Set (CS_PORTAL_WARP);
   warp_obj = t;
   csMatrix3 m = warp_obj.GetO2T ();
-  do_mirror = ( ( ( m.Col1() % m.Col2() ) * m.Col3() ) < 0 );
+  flags.SetBool (CS_PORTAL_MIRROR, ( ( ( m.Col1() % m.Col2() ) * m.Col3() ) < 0 ));
 
   warp_wor = warp_obj;
 }
 
 void csPortal::SetWarp (const csMatrix3& m_w, const csVector3& v_w_before, const csVector3& v_w_after)
 {
-  do_warp_space = true;
+  flags.Set (CS_PORTAL_WARP);
 
   warp_obj = csTransform (m_w.GetInverse (), v_w_after - m_w * v_w_before);
 
@@ -71,7 +67,7 @@ void csPortal::SetWarp (const csMatrix3& m_w, const csVector3& v_w_before, const
   // will equal +1 or -1, depending on whether the transform is
   // mirroring.
   csMatrix3 m = warp_obj.GetO2T ();
-  do_mirror = ( ( ( m.Col1() % m.Col2() ) * m.Col3() ) < 0 );
+  flags.SetBool (CS_PORTAL_MIRROR, ( ( ( m.Col1() % m.Col2() ) * m.Col3() ) < 0 ));
 
   warp_wor = warp_obj;
 }
@@ -83,7 +79,7 @@ void csPortal::WarpSpace (csReversibleTransform& t, bool& mirror)
   // Set t to equal a warp -> camera space transformation by
   // reversing warp and then applying the old t.
   t /= warp_wor;
-  if (do_mirror) mirror = !mirror;
+  if (flags.Check (CS_PORTAL_MIRROR)) mirror = !mirror;
 }
 
 bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
@@ -104,10 +100,10 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
   new_rview.portal_polygon = portal_polygon;
   new_rview.clip_plane = portal_polygon->GetPlane ()->GetCameraPlane();
   new_rview.clip_plane.Invert ();
-  if (do_clip_portal) new_rview.do_clip_plane = true;
+  if (flags.Check (CS_PORTAL_CLIPDEST)) new_rview.do_clip_plane = true;
 
   csTranCookie old_cookie = 0;
-  if (do_warp_space)
+  if (flags.Check (CS_PORTAL_WARP))
   {
     bool mirror = new_rview.IsMirrored ();
     WarpSpace (new_rview, mirror);
@@ -117,7 +113,7 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
 
   sector->Draw (new_rview);
 
-  if (do_warp_space)
+  if (flags.Check (CS_PORTAL_WARP))
     csWorld::current_world->tr_manager.RestoreCameraFrame (old_cookie);
 
   return true;
@@ -128,7 +124,7 @@ csPolygon3D* csPortal::HitBeam (const csVector3& start, const csVector3& end,
 {
   if (sector->draw_busy >= 5)
     return NULL;
-  if (do_warp_space)
+  if (flags.Check (CS_PORTAL_WARP))
   {
     csVector3 new_start = warp_wor.Other2This (start);
     csVector3 new_end = warp_wor.Other2This (end);
@@ -149,7 +145,7 @@ csPolygon3D* csPortal::IntersectSphere (csVector3& center, float radius, float* 
 csSector* csPortal::FollowSegment (csReversibleTransform& t,
 				  csVector3& new_position, bool& mirror)
 {
-  if (do_warp_space)
+  if (flags.Check (CS_PORTAL_WARP))
   {
     WarpSpace (t, mirror); 
     new_position = warp_wor.Other2This (new_position);
@@ -170,12 +166,12 @@ void csPortal::CheckFrustum (csFrustumView& lview)
   bool copied_frustums = false;
 
   csTranCookie old_cookie = 0;
-  if (do_warp_space)
+  if (flags.Check (CS_PORTAL_WARP))
   {
     old_cookie = csWorld::current_world->tr_manager.NewCameraFrame ();
     new_lview.light_frustum->Transform (&warp_wor);
 
-    if (do_mirror) new_lview.mirror = !lview.mirror;
+    if (flags.Check (CS_PORTAL_MIRROR)) new_lview.mirror = !lview.mirror;
     new_lview.light_frustum->SetMirrored (new_lview.mirror);
 
     // Transform all shadow frustums. First make a copy.
@@ -250,7 +246,7 @@ void csPortal::CheckFrustum (csFrustumView& lview)
 
   sector->RealCheckFrustum (new_lview);
 
-  if (do_warp_space)
+  if (flags.Check (CS_PORTAL_WARP))
     csWorld::current_world->tr_manager.RestoreCameraFrame (old_cookie);
 
   if (copied_frustums)

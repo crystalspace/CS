@@ -21,12 +21,53 @@
 
 #include "csgeom/transfrm.h"
 #include "csengine/rview.h"
+#include "csutil/flags.h"
 
 class csSector;
 class csPolygon2D;
 class csPolygon3D;
 class csStatLight;
 struct iTextureHandle;
+
+/**
+ * If this flag is set then this portal will clip all geometry in
+ * the destination sector. This must be used for portals which arrive
+ * in the middle of a sector.
+ */
+#define CS_PORTAL_CLIPDEST 0x00000001
+
+/**
+ * If this flag is set then this portal will do a Z-fill after
+ * rendering the contents. This is mainly useful for floating portals
+ * where it is possible that there is geometry in the same sector
+ * that will be rendered behind the portal (and does could accidently
+ * get written in the portal sector because the Z-buffer cannot
+ * be trusted).
+ */
+#define CS_PORTAL_ZFILL 0x00000002
+
+/**
+ * If this flag is set then this portal will do space warping.
+ * You can use this to implement mirrors or other weird portal effects.
+ * Don't set this flag directly. Use SetWarp() instead. It is safe
+ * to disable and query this flag though.
+ */
+#define CS_PORTAL_WARP 0x00000004
+
+/**
+ * If this flag is set then this portal mirrors space (changes order
+ * of the vertices of polygons). Don't set this flag directly. It will
+ * be automatically set if a mirroring space warp is used with SetWarp().
+ */
+#define CS_PORTAL_MIRROR 0x00000008
+
+/**
+ * A flag which indicates if the destination of this portal should not be
+ * transformed from object to world space. For mirrors you should
+ * disable this flag because you want the destination to move with the
+ * source.
+ */
+#define CS_PORTAL_STATICDEST 0x00000010
 
 /**
  * This class represents a portal. It belongs to some polygon
@@ -38,33 +79,16 @@ private:
   /// The sector that this portal points to.
   csSector* sector;
 
+public:
+  /// Set of flags
+  csFlags flags;
+
 protected:
   /**
    * 0 is no alpha, 25 is 25% see through and
    * 75% texture, ... Possible values are 0, 25, 50, and 75.
    */
   int cfg_alpha;
-
-  /**
-   * If this polygon is a portal it possibly has a transformation matrix and
-   * vector to warp space in some way. This way mirrors can be implemented.
-   * If true the space should be warped through the portal.
-   */
-  bool do_warp_space;
-
-  /**
-   * A flag which indicates if this portal mirrors space (changes the order
-   * of the vertices). A normal space warping transformation which just
-   * relocates space does not mirror space. A reflecting wall mirrors space.
-   */
-  bool do_mirror;
-
-  /**
-   * If true then this portal will clip geometry in the destination sector.
-   * This must be used for portals which arrive in the middle of a sector.
-   * But don't use it otherwise because it decreases efficiency.
-   */
-  bool do_clip_portal;
 
   /**
    * A flag which indicates if the destination of this portal should not be
@@ -128,50 +152,6 @@ public:
    * Get the warping transformation in object space.
    */
   const csReversibleTransform& GetWarp () { return warp_obj; }
-
-  /**
-   * Check if space is warped by this portal.
-   */
-  bool IsSpaceWarped () { return do_warp_space; }
-
-  /**
-   * Check if space warp transformation is mirroring
-   */
-  bool IsMirroring () { return do_mirror; }
-
-  /**
-   * Disable space warping.
-   */
-  void DisableSpaceWarping () { do_warp_space = false; }
-
-  /**
-   * Disable/enable clipping portal.
-   * If true then this portal will clip geometry in the destination sector.
-   * This must be used for portals which arrive in the middle of a sector.
-   * But don't use it otherwise because it decreases efficiency.
-   */
-  void SetClippingPortal (bool c) { do_clip_portal = c; }
-
-  /**
-   * Is this a clipping portal?
-   */
-  bool IsClippingPortal () { return do_clip_portal; }
-
-  /**
-   * Set static destination. If this field is true
-   * then the portal points to a static destination. This
-   * means that when the portal moves (because it is part
-   * of a thing that moves for example) then the destination
-   * of the portal will remain fixed. For mirrors you want
-   * this to be false so that the destination moves with the
-   * portal.
-   */
-  void SetStaticDest (bool sd) { static_dest = sd; }
-
-  /**
-   * Get static destination.
-   */
-  bool IsStaticDest () { return static_dest; }
 
   /**
    * Set the texture (used for filtering).
