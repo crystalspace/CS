@@ -19,7 +19,9 @@ configure-stamp:
 	# Activate all plugins
 	perl -pi -e "s/^#PLUGINS/PLUGINS/" $(CURDIR)/CS/mk/user.mak
 	cd CS; make linux
-	# CPU=i386 make linux 
+	# Make it not cpu specific (Intel)
+	# CPU=i386 make linux (this was too intel specific)
+	perl -pi -e "s/CFLAGS.SYSTEM.*mcpu.*\n//" $(CURDIR)/CS/config.mak
 	# Install as much as possible
 	perl -pi -e "s/#TO_INSTALL/TO_INSTALL/" $(CURDIR)/CS/cache.mak
 	# Activating scripts

@@ -196,7 +196,8 @@ gensgmloptnodsc(){
 }
 #=============================================================================
 rm -f $CURDIR/debian/man/*.txt
-rm -f $CURDIR/debian/sgml/*.sgml*
+#rm -f $CURDIR/debian/sgml/*.sgml*
+[ ! -d $CURDIR/debian/man ] && mkdir $CURDIR/debian/man
 for package in $PACKAGES
 do
 	for bintype in $BINTYPE
