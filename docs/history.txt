@@ -12,6 +12,9 @@ chronological order.
 	- res changed the VFS cache to read files not null terminated.
         - Philip Wyett eliminated warnings by bad casting to float right
           before initialization of an integer.
+	- Marten Svanfeldt changed the ways shader variables work in new renderer.
+	  The current way works, but is somewhat messy code and unclean design.
+	  It should be fixed in the following week(s).
 25-Oct-2003
 	- Rhad moved emitter list initialization into the
 	  RecreateParticleSystem() member function of partedit.  This fixes the

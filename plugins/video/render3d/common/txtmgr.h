@@ -259,7 +259,7 @@ public:
   /**
    * Get shader associated with a shader type
    */
-  virtual iShaderWrapper *GetShader (csStringID type) 
+  virtual iShader *GetShader (csStringID type) 
   { return material->GetShader(type); }
 
   /**

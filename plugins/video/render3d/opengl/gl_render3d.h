@@ -166,7 +166,7 @@ private:
 
   // Enables offsetting of Z values
   void EnableZOffset ()
-  { glPolygonOffset (-0.05, -2); 
+  { glPolygonOffset (-0.05f, -2.0f); 
   statecache->Enable_GL_POLYGON_OFFSET_FILL (); }
 
   // Disables offsetting of Z values

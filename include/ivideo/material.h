@@ -91,17 +91,17 @@ SCF_VERSION (iMaterial, 0, 0, 6);
  * plays same role related to iMaterialHandle as iImage plays
  * related to iTextureHandle.
  */
-struct iMaterial : public iShaderBranch
+struct iMaterial : public iShaderVariableContext
 {
   /**
    * Associate a shader with a shader type
    */
-  virtual void SetShader (csStringID type, iShaderWrapper* shader) = 0;
+  virtual void SetShader (csStringID type, iShader* shader) = 0;
 
   /**
    * Get shader associated with a shader type
    */
-  virtual iShaderWrapper* GetShader (csStringID type) = 0;
+  virtual iShader* GetShader (csStringID type) = 0;
 
 #ifndef CS_USE_NEW_RENDERER
   /**
@@ -172,7 +172,7 @@ struct iMaterialHandle : public iBase
   /**
    * Get shader associated with a shader type
    */
-  virtual iShaderWrapper* GetShader (csStringID type) = 0;
+  virtual iShader* GetShader (csStringID type) = 0;
 
   /**
    * Get a texture from the material.

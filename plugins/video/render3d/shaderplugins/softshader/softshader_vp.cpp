@@ -43,11 +43,11 @@ SCF_IMPLEMENT_IBASE(csSoftShader_VP)
   SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
 SCF_IMPLEMENT_IBASE_END
 
-void csSoftShader_VP::Activate(iShaderPass* current, csRenderMesh* mesh)
+void csSoftShader_VP::Activate(csRenderMesh* mesh)
 {
 }
 
-void csSoftShader_VP::Deactivate(iShaderPass* current)
+void csSoftShader_VP::Deactivate()
 {
 }
 
@@ -110,7 +110,7 @@ bool csSoftShader_VP::Load(iDocumentNode* program)
 }
 
   
-bool csSoftShader_VP::Prepare()
+bool csSoftShader_VP::Prepare(iShaderPass *pass)
 {
   return true;
 }

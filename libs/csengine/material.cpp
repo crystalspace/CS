@@ -26,7 +26,6 @@
 
 SCF_IMPLEMENT_IBASE(csMaterial)
   SCF_IMPLEMENTS_INTERFACE(iMaterial)
-  SCF_IMPLEMENTS_INTERFACE(iShaderBranch)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMaterialEngine)
 SCF_IMPLEMENT_IBASE_END
 
@@ -349,11 +348,10 @@ iEffectDefinition *csMaterial::GetEffect ()
 }
 #endif
 
-void csMaterial::SetShader (csStringID type, iShaderWrapper* shd)
+void csMaterial::SetShader (csStringID type, iShader* shd)
 {
 #ifdef CS_USE_NEW_RENDERER
   shd->IncRef ();
-  AddChild (shd);
   shaders->Put (type, shd);
 #else
   (void)type;
@@ -361,10 +359,10 @@ void csMaterial::SetShader (csStringID type, iShaderWrapper* shd)
 #endif
 }
 
-iShaderWrapper* csMaterial::GetShader(csStringID type)
+iShader* csMaterial::GetShader(csStringID type)
 {
 #ifdef CS_USE_NEW_RENDERER
-  return (iShaderWrapper *) shaders->Get (type);
+  return (iShader *) shaders->Get (type);
 #else
   return 0;
 #endif

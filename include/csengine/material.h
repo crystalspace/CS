@@ -28,7 +28,6 @@
 #include "ivideo/effects/efdef.h"
 
 #include "csengine/engine.h"
-#include "csutil/symtable.h"
 
 struct iTextureWrapper;
 struct iTextureManager;
@@ -105,7 +104,6 @@ private:
 
   /// Shader associated with material
   csHashMap* shaders;
-  csSymbolTable symtab;
   csEngine* engine;
 
 #ifdef CS_USE_NEW_RENDERER
@@ -122,6 +120,9 @@ private:
   static csStringID nameTextureLayer2;
   static csStringID nameTextureLayer3;
   static csStringID nameTextureLayer4;
+
+  csShaderVariableContextHelper svContextHelper;
+
 
 public:
   /**
@@ -184,27 +185,9 @@ public:
   //--------------------- iMaterial implementation ---------------------
 
   /// Associate a shader with a shader type
-  virtual void SetShader (csStringID type, iShaderWrapper* shader);
+  virtual void SetShader (csStringID type, iShader* shader);
   /// Get shader associated with a shader type
-  virtual iShaderWrapper* GetShader (csStringID type);
-
-  virtual void AddChild (iShaderBranch *c)
-  {
-    csRef<iShaderWrapper> w = SCF_QUERY_INTERFACE (c, iShaderWrapper);
-    if (w) w->SelectMaterial (this);
-    symtab.AddChild (c->GetSymbolTable ());
-  }
-  virtual void AddVariable (csShaderVariable *v)
-  {
-    symtab.SetSymbol (v->GetName (), v);
-  }
-  virtual csShaderVariable* GetVariable (csStringID name)
-  {
-    return (csShaderVariable *) symtab.GetSymbol (name);
-  }
-  virtual csSymbolTable* GetSymbolTable () { return & symtab; }
-  virtual csSymbolTable* GetSymbolTable (int i) { return & symtab; }
-  virtual void SelectSymbolTable (int i) {}
+  virtual iShader* GetShader (csStringID type);
 
 #ifndef CS_USE_NEW_RENDERER
   /// Set effect.
@@ -265,6 +248,29 @@ public:
     }
   } scfiMaterialEngine;
   friend struct MaterialEngine;
+
+
+  //=================== iShaderVariableContext ================//
+  /// Add a variable to this context
+  virtual void AddVariable (csShaderVariable *variable)
+  { svContextHelper.AddVariable (variable); }
+
+  /// Get a named variable from this context
+  virtual csShaderVariable* GetVariable (csStringID name) const
+  { return svContextHelper.GetVariable (name); }
+
+  /// Get a named variable from this context, and any context above/outer
+  virtual csShaderVariable* GetVariableRecursive (csStringID name) const
+  {
+    csShaderVariable* var;
+    var=GetVariable (name);
+    if(var) return var;
+    return 0;
+  }
+
+  /// Fill a csShaderVariableList
+  virtual void FillVariableList (csShaderVariableList *list) const
+  { svContextHelper.FillVariableList (list); }
 };
 
 /**

@@ -32,7 +32,6 @@
 #include "csutil/util.h"
 #include "csgfx/csimgvec.h"
 #include "csutil/array.h"
-#include "cstool/shaderbranch.h"
 #include "igraphic/image.h"
 #include "../common/txtmgr.h"
 
@@ -808,7 +807,6 @@ csGLMaterialHandle::csGLMaterialHandle (iMaterial* m,
 {
   SCF_CONSTRUCT_IBASE (0);
   material = m;
-  branch = SCF_QUERY_INTERFACE (m, iShaderBranch);
   texman = parent;
 }
 
@@ -817,7 +815,6 @@ csGLMaterialHandle::csGLMaterialHandle (iTextureHandle* t,
 {
   SCF_CONSTRUCT_IBASE (0);
   texman = parent;
-  branch = csPtr<iShaderBranch> (new csShaderBranch ());
   texture = t;
 }
 
@@ -832,7 +829,7 @@ void csGLMaterialHandle::FreeMaterial ()
   material = 0;
 }
 
-iShaderWrapper* csGLMaterialHandle::GetShader (csStringID type)
+iShader* csGLMaterialHandle::GetShader (csStringID type)
 { 
   return material ? material->GetShader (type) : 0; 
 }
@@ -889,10 +886,6 @@ void csGLMaterialHandle::Prepare ()
   }*/
 }
 
-iShaderBranch* csGLMaterialHandle::QueryShaderBranch ()
-{ 
-  return branch;
-} 
 
 /*
  * New iTextureManager Implementation
@@ -1122,7 +1115,7 @@ csPtr<iMaterialHandle> csGLTextureManager::RegisterMaterial (
   // @@@ Dunno if this should be _here_ really.
   csRef<iShaderManager> shadman = 
     CS_QUERY_REGISTRY (object_reg, iShaderManager);
-  shadman->AddChild (material);
+  //shadman->AddChild (material);
   
   return csPtr<iMaterialHandle> (mat);
 }
@@ -1137,7 +1130,7 @@ csPtr<iMaterialHandle> csGLTextureManager::RegisterMaterial (
   // @@@ Dunno if this should be _here_ really.
   csRef<iShaderManager> shadman = 
     SCF_QUERY_INTERFACE (object_reg, iShaderManager);
-  shadman->AddChild (mat->GetMaterial ());
+  //shadman->AddChild (mat->GetMaterial ());
 
   return csPtr<iMaterialHandle> (mat);
 }

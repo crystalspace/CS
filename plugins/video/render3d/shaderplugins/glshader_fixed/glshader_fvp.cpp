@@ -46,12 +46,31 @@ SCF_IMPLEMENT_IBASE(csGLShaderFVP)
   SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
 SCF_IMPLEMENT_IBASE_END
 
-void csGLShaderFVP::Activate(iShaderPass* current, csRenderMesh* mesh)
+void csGLShaderFVP::Activate(csRenderMesh* mesh)
 {
-  int i;
+
+}
+
+void csGLShaderFVP::Deactivate()
+{
+
+}
+
+void csGLShaderFVP::SetupState (csRenderMesh *mesh,
+                                csArray<iShaderVariableContext*> &dynamicDomains)
+{
+  int i,j;
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, "crystalspace.renderer.stringset", iStringSet);
+
+  if (dynamicVars.Length() > 0)
+  {
+    for(i=0;i<dynamicDomains.Length();i++)
+    {
+      dynamicDomains[i]->FillVariableList(&dynamicVars);
+    }
+  }
 
   if (do_lighting)
   {
@@ -63,14 +82,22 @@ void csGLShaderFVP::Activate(iShaderPass* current, csRenderMesh* mesh)
 
     for(i = 0; i < lights.Length(); ++i)
     {
+
+      //fix vars for this light
+      for(j = 0; j < lights[i].dynVars.Length (); j++)
+      {
+        *((csRef<csShaderVariable>*)lights[i].dynVars.Get(j).userData) = 
+          lights[i].dynVars.Get(j).shaderVariable;
+        lights[i].dynVars.Get(j).shaderVariable = 0;
+      }
+
       int l = lights[i].lightnum;
       glEnable (GL_LIGHT0+l);
 
-      var = GetVariable(lights[i].positionvar);
-      if (var)
+      if (lights[i].positionVarRef)
       {
         csVector4 v;
-        var->GetValue (v);
+        lights[i].positionVarRef->GetValue (v);
         glLightfv (GL_LIGHT0+l, GL_POSITION, (float*)&v);
       }
       else
@@ -79,11 +106,10 @@ void csGLShaderFVP::Activate(iShaderPass* current, csRenderMesh* mesh)
         glLightfv (GL_LIGHT0+l, GL_POSITION, (float*)&v);
       }
 
-      var = GetVariable(lights[i].diffusevar);
-      if (var)
+      if (lights[i].diffuseVarRef)
       {
         csVector4 v;
-        var->GetValue (v);
+        lights[i].diffuseVarRef->GetValue (v);
         glLightfv (GL_LIGHT0+l, GL_DIFFUSE, (float*)&v);
       }
       else
@@ -92,11 +118,10 @@ void csGLShaderFVP::Activate(iShaderPass* current, csRenderMesh* mesh)
         glLightfv (GL_LIGHT0+l, GL_DIFFUSE, (float*)&v);
       }
 
-      var = GetVariable(lights[i].specularvar);
-      if (var)
+      if (lights[i].specularVarRef)
       {
         csVector4 v;
-        var->GetValue (v);
+        lights[i].specularVarRef->GetValue (v);
         glLightfv (GL_LIGHT0+l, GL_SPECULAR, (float*)&v);
       }
       else
@@ -105,11 +130,10 @@ void csGLShaderFVP::Activate(iShaderPass* current, csRenderMesh* mesh)
         glLightfv (GL_LIGHT0+l, GL_SPECULAR, (float*)&v);
       }
 
-      var = GetVariable(lights[i].attenuationvar);
-      if (var)
+      if (lights[i].attenuationVarRef)
       {
         csVector4 v;
-        var->GetValue (v);
+        lights[i].attenuationVarRef->GetValue (v);
         glLightf (GL_LIGHT0+l, GL_CONSTANT_ATTENUATION, v.x);
         glLightf (GL_LIGHT0+l, GL_LINEAR_ATTENUATION, v.y);
         glLightf (GL_LIGHT0+l, GL_QUADRATIC_ATTENUATION, v.z);
@@ -129,33 +153,16 @@ void csGLShaderFVP::Activate(iShaderPass* current, csRenderMesh* mesh)
     glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, (float*)&v);
     glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, (float*)&v);
 
-    if (ambientvar != csInvalidStringID && 
-        (var = GetVariable(ambientvar)))
-      var->GetValue (v);
+    if (ambientvar != csInvalidStringID)
+      ambientVarRef->GetValue (v);
     else
       v = csVector4 (0, 0, 0, 1);
     glLightModelfv (GL_LIGHT_MODEL_AMBIENT, (float*)&v);
-    
+
     glEnable (GL_LIGHTING);
     glDisable (GL_COLOR_MATERIAL);
   }
-}
 
-void csGLShaderFVP::Deactivate(iShaderPass* current)
-{
-  int i;
-
-  if (do_lighting)
-  {
-    for (i = 0; i < lights.Length(); ++i)
-      glDisable (GL_LIGHT0+lights[i].lightnum);
-
-    glDisable (GL_LIGHTING);
-  }
-}
-
-void csGLShaderFVP::SetupState (iShaderPass *current, csRenderMesh *mesh)
-{
   if (environment == ENVIRON_REFLECT_CUBE && ext->CS_GL_ARB_texture_cube_map)
   {
     //setup for environmental cubemapping
@@ -197,6 +204,16 @@ void csGLShaderFVP::SetupState (iShaderPass *current, csRenderMesh *mesh)
 
 void csGLShaderFVP::ResetState ()
 {
+  int i;
+
+  if (do_lighting)
+  {
+    for (i = 0; i < lights.Length(); ++i)
+      glDisable (GL_LIGHT0+lights[i].lightnum);
+
+    glDisable (GL_LIGHTING);
+  }
+
   if (environment == ENVIRON_REFLECT_CUBE && ext->CS_GL_ARB_texture_cube_map)
   {
     glDisable(GL_TEXTURE_GEN_S);
@@ -353,7 +370,40 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
 }
 
   
-bool csGLShaderFVP::Prepare()
+bool csGLShaderFVP::Prepare(iShaderPass* pass)
 {
+  //go through the lights and get direct refs (if we can)
+  dynamicVars.Empty ();
+  unsigned int i;
+
+  for (i = 0; i < lights.Length (); i++)
+  {
+    lightingentry &ent = lights.Get (i);
+    //query, it turn current and all levels above
+    ent.positionVarRef = svContextHelper.GetVariable (ent.positionvar);
+    if(!ent.positionVarRef)
+      ent.positionVarRef = pass->GetVariableRecursive (ent.positionvar);
+    if(!ent.positionVarRef)
+      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.positionvar, (int)&ent.positionVarRef));
+
+    ent.diffuseVarRef = svContextHelper.GetVariable (ent.diffusevar);
+    if(!ent.diffuseVarRef)
+      ent.diffuseVarRef = pass->GetVariableRecursive (ent.diffusevar);
+    if(!ent.diffuseVarRef)
+      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.diffusevar, (int)&ent.diffuseVarRef));
+
+    ent.specularVarRef = svContextHelper.GetVariable (ent.specularvar);
+    if(!ent.specularVarRef)
+      ent.specularVarRef = pass->GetVariableRecursive (ent.specularvar);
+    if(!ent.specularVarRef)
+      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.specularvar, (int)&ent.specularVarRef));
+
+    ent.attenuationVarRef = svContextHelper.GetVariable (ent.attenuationvar);
+    if(!ent.attenuationVarRef)
+      ent.attenuationVarRef = pass->GetVariableRecursive (ent.attenuationvar);
+    if(!ent.attenuationVarRef)
+      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.attenuationvar, (int)&ent.attenuationVarRef));
+  }
+
   return true;
 }

@@ -28,7 +28,6 @@
 #include "csutil/strhash.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rendermesh.h"
-#include "csutil/symtable.h"
 #include "csgfx/shadervar.h"
 
 struct iString;
@@ -39,44 +38,31 @@ struct iMaterial;
 struct iShaderManager;
 struct iShaderRenderInterface;
 struct iShader;
-struct iShaderWrapper;
 struct iShaderTechnique;
 struct iShaderPass;
 struct iShaderProgram;
 struct iShaderProgramPlugin;
 struct iShaderRenderInterface;
 
-SCF_VERSION (iShaderBranch, 0, 0, 1);
+SCF_VERSION (iShaderVariableContext, 0,1,0);
 
 /**
- * Any class that wants in on the shader variable system
- * must implement this interface.
+ * This is a baseclass for all interfaces which provides shadervariables
+ * both dynamically and static
  */
-struct iShaderBranch : public iBase
+struct iShaderVariableContext : iBase
 {
-  /// Add a child to this branch
-  virtual void AddChild(iShaderBranch *child) = 0;
-
   /// Add a variable to this context
-  virtual void AddVariable(csShaderVariable* variable) = 0;
+  virtual void AddVariable (csShaderVariable *variable) = 0;
+  
+  /// Get a named variable from this context
+  virtual csShaderVariable* GetVariable (csStringID name) const = 0;
 
-  /// Get variable
-  virtual csShaderVariable* GetVariable(csStringID name) = 0;
+  /// Get a named variable from this context, and any context above/outer
+  virtual csShaderVariable* GetVariableRecursive (csStringID name) const = 0;
 
-  /// Get the symbol table (used by the implementation to store the variables)
-  virtual csSymbolTable* GetSymbolTable() = 0;
-
-  /**
-   * Get a symbol table from the array of symbol tables.
-   * If there is only one symbol table, return that one.
-   */
-  virtual csSymbolTable* GetSymbolTable(int index) = 0;
-
-  /**
-   * Select the current symbol table from the array of symbol tables.
-   * If there is only one symbol table, this is a no-op.
-   */
-  virtual void SelectSymbolTable(int index) = 0;
+  /// Fill a csShaderVariableList
+  virtual void FillVariableList (csShaderVariableList *list) const = 0;
 };
 
 SCF_VERSION (iShaderManager, 0, 1, 0);
@@ -84,16 +70,14 @@ SCF_VERSION (iShaderManager, 0, 1, 0);
 /**
  * A manager for all shaders. Will only be one at a given time
  */
-struct iShaderManager : iShaderBranch
+struct iShaderManager : iShaderVariableContext
 {
   /// Create an empty shader
   virtual csPtr<iShader> CreateShader() = 0;
   /// Get a shader by name
-  virtual iShaderWrapper* GetShader(const char* name) = 0;
-  /// Create a wrapper for a new shader
-  virtual csPtr<iShaderWrapper> CreateWrapper(iShader* shader) = 0;
+  virtual iShader* GetShader(const char* name) = 0;
   /// Returns all shaders that have been created
-  virtual const csRefArray<iShaderWrapper> &GetShaders () = 0;
+  virtual const csRefArray<iShader> &GetShaders ()  = 0;
 
   /// Create variable
   virtual csPtr<csShaderVariable> CreateVariable(csStringID name) const = 0;
@@ -119,7 +103,7 @@ SCF_VERSION (iShader, 0,0,1);
 /**
  * Specific shader. Can/will be either render-specific or general
  */
-struct iShader : iShaderBranch
+struct iShader : iShaderVariableContext
 {
   /// Set this shader's name
   virtual void SetName(const char* name) = 0;
@@ -154,27 +138,13 @@ struct iShader : iShaderBranch
   virtual bool Prepare() = 0;
 };
 
-SCF_VERSION(iShaderWrapper, 0, 0, 1);
-
-/**
- * A thin wrapper over iShader to do dynamic selection of which iMaterial
- * the shader is acting on.
- */
-struct iShaderWrapper : iShaderBranch
-{
-  /// Get the wrapped shader.
-  virtual iShader* GetShader() = 0;
-
-  /// Select the material we are about to act on.
-  virtual void SelectMaterial(iMaterial *mat) = 0;
-};
 
 SCF_VERSION (iShaderTechnique, 0,0,1);
 
 /**
  * One specific technique used by shader.
  */
-struct iShaderTechnique : iShaderBranch
+struct iShaderTechnique : iShaderVariableContext
 {
   /**
    * Get technique priority. If there are several valid techniques
@@ -210,7 +180,7 @@ SCF_VERSION (iShaderPass, 0,0,1);
 /**
  * Description of a single pass in  a shader
  */
-struct iShaderPass : iShaderBranch
+struct iShaderPass : iShaderVariableContext
 {
   /// Add a stream mapping
   virtual void AddStreamMapping (csStringID name, csVertexAttrib attribute) = 0;
@@ -247,7 +217,8 @@ struct iShaderPass : iShaderBranch
   virtual void Deactivate() = 0;
 
   /// Setup states needed for proper operation of the shader
-  virtual void SetupState (csRenderMesh* mesh) = 0;
+  virtual void SetupState (csRenderMesh* mesh,
+    csArray<iShaderVariableContext*> &dynamicDomains) = 0;
 
   /// Reset states to original
   virtual void ResetState () = 0;
@@ -268,16 +239,17 @@ SCF_VERSION (iShaderProgram, 0,0,2);
  * A shader-program is either a vertexprogram, fragmentprogram or any
  * other type of "program" utilizied by shader.
  */
-struct iShaderProgram : iShaderBranch
+struct iShaderProgram : iShaderVariableContext
 {
   /// Sets this program to be the one used when rendering
-  virtual void Activate(iShaderPass* current, csRenderMesh* mesh) = 0;
+  virtual void Activate(csRenderMesh* mesh) = 0;
 
   /// Deactivate program so that it's not used in next rendering
-  virtual void Deactivate(iShaderPass* current) = 0;
+  virtual void Deactivate() = 0;
 
   /// Setup states needed for proper operation of the shader
-  virtual void SetupState (iShaderPass* current, csRenderMesh* mesh) = 0;
+  virtual void SetupState (csRenderMesh* mesh, 
+    csArray<iShaderVariableContext*> &dynamicDomains) = 0;
 
   /// Reset states to original
   virtual void ResetState () = 0;
@@ -295,7 +267,7 @@ struct iShaderProgram : iShaderBranch
    * Prepares the shaderprogram for usage.
    * Must be called before the shader is assigned to a material.
    */
-  virtual bool Prepare() = 0;
+  virtual bool Prepare(iShaderPass* pass) = 0;
 };
 
 SCF_VERSION(iShaderProgramPlugin, 0,0,1);

@@ -35,14 +35,12 @@ private:
     XMLTOKEN_DESCRIPTION
   };
 
-  csPDelArray<csSymbolTable> symtabs;
-  csSymbolTable *symtab;
-
   struct variablemapentry
   {
     variablemapentry() { name = csInvalidStringID; }
     csStringID name;
     int registernum;
+    csRef<csShaderVariable> ref;
   };
 
   csArray<variablemapentry> variablemap;
@@ -61,6 +59,9 @@ private:
   bool validProgram;
 
   void Report (int severity, const char* msg, ...);
+  csShaderVariableContextHelper svContextHelper;
+  csShaderVariableList dynamicVars;
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -72,13 +73,11 @@ public:
     this->ext = ext;
     programstring = 0;
     description = 0;
-    symtab = new csSymbolTable;
   }
   virtual ~csShaderGLAFP ()
   {
     delete[] programstring;
     delete[] description;
-    delete symtab;
   }
 
   bool LoadProgramStringToGL( const char* programstring );
@@ -90,32 +89,17 @@ public:
   ////////////////////////////////////////////////////////////////////
 
   /// Sets this program to be the one used when rendering
-  virtual void Activate(iShaderPass* current, csRenderMesh* mesh);
+  virtual void Activate(csRenderMesh* mesh);
 
   /// Deactivate program so that it's not used in next rendering
-  virtual void Deactivate(iShaderPass* current);
+  virtual void Deactivate();
 
   /// Setup states needed for proper operation of the shader
-  virtual void SetupState (iShaderPass* current, csRenderMesh* mesh);
+  virtual void SetupState (csRenderMesh* mesh,
+    csArray<iShaderVariableContext*> &dynamicDomains);
 
   /// Reset states to original
   virtual void ResetState ();
-
-  virtual void AddChild(iShaderBranch *b) {}
-  virtual void AddVariable(csShaderVariable* variable) {}
-  virtual csShaderVariable* GetVariable(csStringID s)
-  { return symtab->GetSymbol(s); }
-  virtual csSymbolTable* GetSymbolTable() { return symtab; }
-  virtual csSymbolTable* GetSymbolTable(int i)
-  {
-    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
-    return symtabs[i];
-  }
-  virtual void SelectSymbolTable(int i)
-  {
-    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
-    symtab = symtabs[i];
-  }
 
   /// Check if valid
   virtual bool IsValid() { return validProgram;} 
@@ -130,7 +114,29 @@ public:
    * Prepares the shaderprogram for usage. Must be called before the shader
    * is assigned to a material.
    */
-  virtual bool Prepare();
+  virtual bool Prepare(iShaderPass *pass);
+
+  //=================== iShaderVariableContext ================//
+  /// Add a variable to this context
+  virtual void AddVariable (csShaderVariable *variable)
+  { svContextHelper.AddVariable (variable); }
+
+  /// Get a named variable from this context
+  virtual csShaderVariable* GetVariable (csStringID name) const
+  { return svContextHelper.GetVariable (name); }
+
+  /// Fill a csShaderVariableList
+  virtual void FillVariableList (csShaderVariableList *list) const
+  { svContextHelper.FillVariableList (list); }
+
+  /// Get a named variable from this context, and any context above/outer
+  virtual csShaderVariable* GetVariableRecursive (csStringID name) const
+  {
+    csShaderVariable* var;
+    var=GetVariable (name);
+    if(var) return var;
+    return 0;
+  }
 };
 
 

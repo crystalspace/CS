@@ -267,8 +267,6 @@ class csGLMaterialHandle : public iMaterialHandle
 protected:
   /// Original material.
   csRef<iMaterial> material;
-  /// Shader branch
-  csRef<iShaderBranch> branch;
   /// Texture handle, if created from one
   csRef<iTextureHandle> texture;
   /// Parent texture manager
@@ -295,7 +293,7 @@ public:
   /**
    * Get associated shader
    */
-  virtual iShaderWrapper* GetShader (csStringID type);
+  virtual iShader* GetShader (csStringID type);
 
   /**
    * Get a texture from the material.
@@ -321,8 +319,6 @@ public:
    * is associated with given material handle.
    */
   virtual void Prepare ();
-
-  virtual iShaderBranch* QueryShaderBranch ();
 };
 
 class csGLSuperLightmap;

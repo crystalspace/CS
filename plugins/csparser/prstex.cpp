@@ -459,7 +459,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   bool shaders_mentioned = false;	// If true there were shaders.
   csArray<csStringID> shadertypes;
   //csArray<iShader*> shaders;
-  csArray<iShaderWrapper*> shaders;
+  csArray<iShader*> shaders;
   csRefArray<csShaderVariable> shadervars;
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
@@ -615,7 +615,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
             break;
           }
           const char* shadername = child->GetContentsValue ();
-          iShaderWrapper* shader = shaderMgr->GetShader (shadername);
+          iShader* shader = shaderMgr->GetShader (shadername);
           if (!shader)
           {
             ReportNotify (
@@ -678,13 +678,13 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 	  	iShaderManager);
     if (shaderMgr)
     {
-      iShaderWrapper* shader_ambient = shaderMgr->GetShader ("ambient");
+      iShader* shader_ambient = shaderMgr->GetShader ("ambient");
       if (shader_ambient)
       {
         shadertypes.Push (strings->Request ("ambient"));
 	shaders.Push (shader_ambient);
       }
-      iShaderWrapper* shader_light = shaderMgr->GetShader ("light");
+      iShader* shader_light = shaderMgr->GetShader ("light");
       if (shader_light)
       {
         shadertypes.Push (strings->Request ("diffuse"));
@@ -728,7 +728,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
     //if (shaders[i]->Prepare ())
       material->SetShader (shadertypes[i], shaders[i]);
   for (i=0; i<shadervars.Length (); i++)
-    material->AddVariable (shadervars[i]);
+    //material->AddVariable (shadervars[i]);
 #endif // CS_USE_NEW_RENDERER
   // dereference material since mat already incremented it
 

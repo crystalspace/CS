@@ -549,8 +549,9 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
   // but just in case, no need to draw if no edges are drawn
   if (edge_start < index_range) 
   {
+    static csArray<iShaderVariableContext*> emptyArr;
     // shadowWrapper->SelectMaterial (0);
-    pass->SetupState (&rmesh);
+    pass->SetupState (&rmesh, emptyArr);
     if (shadowCacheEntry->ShadowCaps())
     {
       rmesh.indexstart = 0;
@@ -858,11 +859,6 @@ iShader* csStencilShadowType::GetShadow ()
     }
     shadow->Prepare ();
 
-    shadowWrapper = shmgr->GetShader (shadow->GetName ());
-    shadowWrapper->SelectMaterial (0);
-
-    // @@@ Dunno if this should be _here_ really.
-    shmgr->AddChild (shadowWrapper);
   }
   return shadow;
 }

@@ -224,22 +224,25 @@ csFullScreenQuadRenderStep::~csFullScreenQuadRenderStep ()
 void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
 {
   csRef<iGraphics3D> g3d = rview->GetGraphics3D();
+  csArray<iShaderVariableContext*> dynDomain;
 
   //g3d->BeginDraw (CSDRAW_3DGRAPHICS);
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (material);
   if (mat != 0)
   {
     mat->Visit(); // @@@ here?
-    iShaderWrapper* wrapper = 
+    iShader* shader = 
       mat->GetMaterialHandle()->GetShader(shadertype);
-    iShader* shader = wrapper->GetShader ();
-    wrapper->SelectMaterial (mat->GetMaterial ());
+    
     iShaderTechnique *tech = shader->GetBestTechnique ();
 
     if (tech != 0)
     {
       for (int p=0; p<tech->GetPassCount (); p++)
       {
+        dynDomain.Empty ();
+        dynDomain.Push (mat->GetMaterial ());
+
         iShaderPass *pass = tech->GetPass (p);
 
         csRenderMesh mesh;
@@ -264,7 +267,7 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
           mesh.mixmode = CS_FX_COPY;
 
         pass->Activate (0);
-        pass->SetupState (&mesh);
+        pass->SetupState (&mesh, dynDomain);
         g3d->DrawMesh (&mesh);
         pass->ResetState ();
         pass->Deactivate ();

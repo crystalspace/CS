@@ -179,7 +179,6 @@ public:
 class csStencilShadowType : public csBaseRenderStepType
 {
   csRef<iShader> shadow;
-  csRef<iShaderWrapper> shadowWrapper;
   bool shadowLoaded;
 
   void Report (int severity, const char* msg, ...);

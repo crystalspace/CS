@@ -26,7 +26,6 @@
 #include "csutil/objreg.h"
 #include "csutil/csstring.h"
 #include "csutil/util.h"
-#include "csutil/symtable.h"
 #include "csutil/parray.h"
 
 #include "iutil/event.h"
@@ -46,46 +45,6 @@
 #define STREAMMAX 16  // @@@ Hardcoded max streams to 16 
 #define TEXMAX 16  // @@@ Hardcoded max texture units to 16
 
-class csShaderWrapper : public iShaderWrapper
-{
-  csRef<iShader> shader;
-  csSymbolTable *symtab;
-  iTextureManager *txtmgr;
-
-  int matnum;
-  csHashMap materials;
-
-public:
-  SCF_DECLARE_IBASE;
-
-  csShaderWrapper (iShader* shader0, iTextureManager* txtmgr0)
-  	: shader (shader0), symtab (0),
-	  txtmgr (txtmgr0), matnum (1), materials (5)
-  {
-    SCF_CONSTRUCT_IBASE (shader);
-  }
-  virtual ~csShaderWrapper () {}
-
-  virtual iShader* GetShader() { return shader; }
-  virtual void SelectMaterial(iMaterial *mat)
-  {
-    int index = (int) materials.Get((csHashKey) mat);
-    if (!index)
-      materials.Put((csHashKey) mat, (csHashObject) (index = matnum++));
-    shader->SelectSymbolTable(index - 1);
-    symtab = shader->GetSymbolTable();
-  }
-
-  virtual void AddChild (iShaderBranch *b) { shader->AddChild(b); }
-  virtual void AddVariable (csShaderVariable *v) { shader->AddVariable(v); }
-  virtual csShaderVariable* GetVariable (csStringID i)
-  {
-    return shader->GetVariable(i);
-  }
-  virtual csSymbolTable* GetSymbolTable() { return symtab; }
-  virtual csSymbolTable* GetSymbolTable(int i) { return symtab; }
-  virtual void SelectSymbolTable(int i) {}
-};
 
 class csShaderManager : public iShaderManager
 {
@@ -94,7 +53,7 @@ private:
   csRef<iVirtualClock> vc;
   csRef<iTextureManager> txtmgr;
 
-  csRefArray<iShaderWrapper> shaders;
+  csRefArray<iShader> shaders;
 
   int seqnumber;
 
@@ -103,9 +62,9 @@ private:
   csRef<csShaderVariable> sv_time;
   void UpdateStandardVariables();
 
-  csSymbolTable symtab;
-
   csRefArray<iShaderProgramPlugin> pluginlist;
+
+  csShaderVariableContextHelper svContextHelper;
 public:
   SCF_DECLARE_IBASE;
 
@@ -120,24 +79,14 @@ public:
   /// Create a empty shader
   virtual csPtr<iShader> CreateShader() ;
   /// Get a shader by name
-  virtual iShaderWrapper* GetShader(const char* name) ;
+  virtual iShader* GetShader(const char* name) ;
   /// Returns all shaders that have been created
-  virtual const csRefArray<iShaderWrapper> &GetShaders () { return shaders; }
-  /// Create a wrapper for a shader
-  virtual csPtr<iShaderWrapper> CreateWrapper(iShader* shader)
-  { return csPtr<iShaderWrapper> (new csShaderWrapper (shader, txtmgr)); }
+  virtual const csRefArray<iShader> &GetShaders () { return shaders; }
 
   virtual csPtr<csShaderVariable> CreateVariable(csStringID name) const
-  { return csPtr<csShaderVariable> (new csShaderVariable (name)); }
-  virtual void AddChild(iShaderBranch *b)
-  { symtab.AddChild(b->GetSymbolTable()); }
-  virtual void AddVariable(csShaderVariable* variable)
-  { symtab.SetSymbol(variable->GetName(), variable); }
-  virtual csShaderVariable* GetVariable(csStringID s)
-  { return symtab.GetSymbol(s); }
-  virtual csSymbolTable* GetSymbolTable() { return & symtab; }
-  virtual csSymbolTable* GetSymbolTable(int i) { return & symtab; }
-  virtual void SelectSymbolTable(int i) {}
+  {
+    return new csShaderVariable(name);
+  }
 
   /// Report a message.
   void Report (int severity, const char* msg, ...);
@@ -147,6 +96,28 @@ public:
 
   /// Prepare all created shaders
   virtual void PrepareShaders ();
+
+  //=================== iShaderVariableContext ================//
+  /// Add a variable to this context
+  virtual void AddVariable (csShaderVariable *variable)
+    { svContextHelper.AddVariable (variable); }
+
+  /// Get a named variable from this context
+  virtual csShaderVariable* GetVariable (csStringID name) const
+    { return svContextHelper.GetVariable (name); }
+
+  /// Get a named variable from this context, and any context above/outer
+  virtual csShaderVariable* GetVariableRecursive (csStringID name) const
+  {
+    csShaderVariable* var;
+    var=GetVariable (name);
+    if(var) return var;
+    return 0;
+  }
+
+  /// Fill a csShaderVariableList
+  virtual void FillVariableList (csShaderVariableList *list) const
+    { svContextHelper.FillVariableList (list); }
 
   //==================== iComponent ====================//
   bool Initialize(iObjectRegistry* objreg);
@@ -188,16 +159,10 @@ class csShader : public iShader
 {
 private:
   csRef<iObjectRegistry> objectreg;
-  csHashMap* variables;
-  // @@@ Strongly reconsider this. The code is using both 'delete'
-  // and DecRef() on the objects inside. NOT good!
-  csArray<iShaderTechnique*>* techniques;
+  
+  csRefArray<iShaderTechnique> techniques;
   csShaderManager* parent;
   char* name;
-
-  csRefArray<iShaderBranch> children;
-  csSymbolTable *symtab;
-  csPDelArray<csSymbolTable> symtabs;
 
   //loading related
   enum
@@ -210,6 +175,7 @@ private:
   csStringHash xmltokens;
   void BuildTokenHash();
 
+  csShaderVariableContextHelper svContextHelper;
 public:
   SCF_DECLARE_IBASE;
 
@@ -239,48 +205,11 @@ public:
   /// Create a new technique
   virtual csPtr<iShaderTechnique> CreateTechnique();
   /// Get number of techniques
-  virtual int GetTechniqueCount() const { return techniques->Length(); }
+  virtual int GetTechniqueCount() const { return techniques.Length(); }
   /// Retrieve a technique
   virtual iShaderTechnique* GetTechnique( int technique );
   /// Retrieve the best technique in this shader
   virtual iShaderTechnique* GetBestTechnique();
-
-  virtual void AddChild(iShaderBranch *b)
-  {
-    children.Push (b);
-    for (int i = 0; i < symtabs.Length (); i++)
-      symtabs[i]->AddChild (b->GetSymbolTable (i));
-  }
-  virtual void AddVariable(csShaderVariable* variable)
-  {
-    for (int i = 0; i < symtabs.Length (); i++)
-      symtabs[i]->SetSymbol (variable->GetName (), variable);
-  }
-  virtual csShaderVariable* GetVariable(csStringID s)
-  { return symtab->GetSymbol (s); }
-  virtual csSymbolTable* GetSymbolTable() { return symtab; }
-  virtual csSymbolTable* GetSymbolTable(int i)
-  {
-    if (symtabs.Length () <= i) 
-    {
-      symtabs.SetLength (i + 1, * symtabs[0]);
-      for (int j = 0; j < children.Length (); j++)
-        symtabs[i]->AddChild (children[j]->GetSymbolTable (i));
-    }
-    return symtabs[i];
-  }
-  virtual void SelectSymbolTable(int i)
-  {
-    if (symtabs.Length () <= i) 
-    {
-      symtabs.SetLength (i + 1, * symtabs[0]);
-      for (int j = 0; j < children.Length (); j++)
-        symtabs[i]->AddChild (children[j]->GetSymbolTable (i));
-    }
-    symtab = symtabs[i];
-    for (int j = 0; j < children.Length (); j++)
-      children[j]->SelectSymbolTable (i);
-  }
 
   /// Loads a shader from buffer
   virtual bool Load(iDataBuffer* program);
@@ -293,21 +222,37 @@ public:
    * assigned to a material.
    */
   virtual bool Prepare();
+
+  //=================== iShaderVariableContext ================//
+  /// Add a variable to this context
+  virtual void AddVariable (csShaderVariable *variable)
+  { svContextHelper.AddVariable (variable); }
+
+  /// Get a named variable from this context
+  virtual csShaderVariable* GetVariable (csStringID name) const
+  { return svContextHelper.GetVariable (name); }
+
+  /// Fill a csShaderVariableList
+  virtual void FillVariableList (csShaderVariableList *list) const
+  { svContextHelper.FillVariableList (list); }
+
+  /// Get a named variable from this context, and any context above/outer
+  virtual csShaderVariable* GetVariableRecursive (csStringID name) const
+  {
+    csShaderVariable* var;
+    var=GetVariable (name);
+    if(var) return var;
+    return parent->GetVariableRecursive (name);
+  }
 };
 
 class csShaderTechnique : public iShaderTechnique
 {
 private:
   int priority;
-  // @@@ Strongly reconsider this. The code is using both 'delete'
-  // and DecRef() on the objects inside. NOT good!
-  csArray<iShaderPass*>* passes;
+  csRefArray<iShaderPass> passes;
   csShader* parent;
   csRef<iObjectRegistry> objectreg;
-
-  csRefArray<iShaderBranch> children;
-  csSymbolTable *symtab;
-  csPDelArray<csSymbolTable> symtabs;
 
   //loading related
   enum
@@ -319,6 +264,7 @@ private:
   csStringHash xmltokens;
   void BuildTokenHash();
 
+  csShaderVariableContextHelper svContextHelper;
 public:
   SCF_DECLARE_IBASE;
 
@@ -341,46 +287,9 @@ public:
   /// Create a pass
   virtual csPtr<iShaderPass> CreatePass();
   /// Get number of passes
-  virtual int GetPassCount() const {return passes->Length(); }
+  virtual int GetPassCount() const {return passes.Length(); }
   /// Retrieve a pass
   virtual iShaderPass* GetPass( int pass );
-
-  virtual void AddChild(iShaderBranch *b)
-  {
-    children.Push (b);
-    for (int i = 0; i < symtabs.Length (); i++)
-      symtabs[i]->AddChild (b->GetSymbolTable (i));
-  }
-  virtual void AddVariable(csShaderVariable* variable)
-  {
-    for (int i = 0; i < symtabs.Length (); i++)
-      symtabs[i]->SetSymbol (variable->GetName (), variable);
-  }
-  virtual csShaderVariable* GetVariable(csStringID s)
-  { return symtab->GetSymbol (s); }
-  virtual csSymbolTable* GetSymbolTable() { return symtab; }
-  virtual csSymbolTable* GetSymbolTable(int i)
-  {
-    if (symtabs.Length () <= i) 
-    {
-      symtabs.SetLength (i + 1, * symtabs[0]);
-      for (int j = 0; j < children.Length (); j++)
-        symtabs[i]->AddChild (children[j]->GetSymbolTable (i));
-    }
-    return symtabs[i];
-  }
-  virtual void SelectSymbolTable(int i)
-  {
-    if (symtabs.Length () <= i) 
-    {
-      symtabs.SetLength (i + 1, * symtabs[0]);
-      for (int j = 0; j < children.Length (); j++)
-        symtabs[i]->AddChild (children[j]->GetSymbolTable (i));
-    }
-    symtab = symtabs[i];
-    for (int j = 0; j < children.Length (); j++)
-      children[j]->SelectSymbolTable (i);
-  }
 
   /**
    * Check if valid (normally a shader is valid if there is at least one
@@ -399,6 +308,28 @@ public:
    * assigned to a material.
    */
   virtual bool Prepare();
+
+  //=================== iShaderVariableContext ================//
+  /// Add a variable to this context
+  virtual void AddVariable (csShaderVariable *variable)
+  { svContextHelper.AddVariable (variable); }
+
+  /// Get a named variable from this context
+  virtual csShaderVariable* GetVariable (csStringID name) const
+  { return svContextHelper.GetVariable (name); }
+
+  /// Fill a csShaderVariableList
+  virtual void FillVariableList (csShaderVariableList *list) const
+  { svContextHelper.FillVariableList (list); }
+
+  /// Get a named variable from this context, and any context above/outer
+  virtual csShaderVariable* GetVariableRecursive (csStringID name) const
+  {
+    csShaderVariable* var;
+    var=GetVariable (name);
+    if(var) return var;
+    return parent->GetVariableRecursive (name);
+  }
 };
 
 class csShaderPass : public iShaderPass
@@ -409,13 +340,10 @@ private:
   csRef<iObjectRegistry> objectreg;
   csShaderTechnique* parent;
 
-  csRefArray<iShaderBranch> children;
-  csPDelArray<csSymbolTable> symtabs;
-  csSymbolTable *symtab;
 
   // Optimization fields for SetupState.
   static int buffercount;
-  static int texturecount;
+  int texturecount;
   static csVertexAttrib attribs[STREAMMAX*2];
   static iRenderBuffer* buffers[STREAMMAX*2];
   static csStringID buffernames[STREAMMAX*2];
@@ -429,6 +357,7 @@ private:
   csStringID streammapping[STREAMMAX];
   bool streammappinggeneric[STREAMMAX];
   csStringID texmapping[TEXMAX];
+  csRef<csShaderVariable> texmappingRef[TEXMAX];
 
 
   //loading related
@@ -454,6 +383,8 @@ private:
   
   csRef<iGraphics3D> g3d;
 
+  csShaderVariableContextHelper svContextHelper;
+  csShaderVariableList dynamicVars;
 public:
   SCF_DECLARE_IBASE;
 
@@ -488,7 +419,6 @@ public:
     writemaskBlue = true;
     writemaskAlpha = true;
 
-    symtabs.SetLength (1, csSymbolTable());
   }
   virtual ~csShaderPass () {}
 
@@ -511,14 +441,14 @@ public:
 
   /// Set vertex-program
   virtual void SetVertexProgram(iShaderProgram* program) 
-  { vp = program; AddChild (program); }
+  { vp = program; }
 
   /// Get fragment-program
   virtual iShaderProgram* GetFragmentProgram() { return fp; }
 
   /// Set fragment-program
   virtual void SetFragmentProgram(iShaderProgram* program) 
-  { fp = program; AddChild (program); }
+  { fp = program; }
 
   /// Check if valid
   virtual bool IsValid() const
@@ -536,47 +466,11 @@ public:
   virtual void Deactivate();
 
   /// Setup states needed for proper operation of the shader
-  virtual void SetupState (csRenderMesh* mesh);
+  virtual void SetupState (csRenderMesh* mesh, 
+    csArray<iShaderVariableContext*> &dynamicDomains);
 
   /// Reset states to original
   virtual void ResetState ();
-
-  virtual void AddChild(iShaderBranch *b)
-  {
-    children.Push (b);
-    for (int i = 0; i < symtabs.Length (); i++)
-      symtabs[i]->AddChild (b->GetSymbolTable (i));
-  }
-  virtual void AddVariable(csShaderVariable* variable)
-  {
-    for (int i = 0; i < symtabs.Length (); i++)
-      symtabs[i]->SetSymbol (variable->GetName (), variable);
-  }
-  virtual csShaderVariable* GetVariable(csStringID s)
-  { return symtab->GetSymbol (s); }
-  virtual csSymbolTable* GetSymbolTable() { return symtab; }
-  virtual csSymbolTable* GetSymbolTable(int i)
-  {
-    if (symtabs.Length () <= i) 
-    {
-      symtabs.SetLength (i + 1, * symtabs[0]);
-      for (int j = 0; j < children.Length (); j++)
-        symtabs[i]->AddChild (children[j]->GetSymbolTable (i));
-    }
-    return symtabs[i];
-  }
-  virtual void SelectSymbolTable(int i)
-  {
-    if (symtabs.Length () <= i) 
-    {
-      symtabs.SetLength (i + 1, * symtabs[0]);
-      for (int j = 0; j < children.Length (); j++)
-        symtabs[i]->AddChild (children[j]->GetSymbolTable (i));
-    }
-    symtab = symtabs[i];
-    for (int j = 0; j < children.Length (); j++)
-      children[j]->SelectSymbolTable (i);
-  }
 
   /// Loads a shader from buffer
   virtual bool Load(iDataBuffer* program);
@@ -589,6 +483,28 @@ public:
    * assigned to a material.
    */
   virtual bool Prepare();
+
+  //=================== iShaderVariableContext ================//
+  /// Add a variable to this context
+  virtual void AddVariable (csShaderVariable *variable)
+  { svContextHelper.AddVariable (variable); }
+
+  /// Get a named variable from this context
+  virtual csShaderVariable* GetVariable (csStringID name) const
+  { return svContextHelper.GetVariable (name); }
+
+  /// Fill a csShaderVariableList
+  virtual void FillVariableList (csShaderVariableList *list) const
+  { svContextHelper.FillVariableList (list); }
+
+  /// Get a named variable from this context, and any context above/outer
+  virtual csShaderVariable* GetVariableRecursive (csStringID name) const
+  {
+    csShaderVariable* var;
+    var=GetVariable (name);
+    if(var) return var;
+    return parent->GetVariableRecursive (name);
+  }
 };
 
 #endif //__SHADERMGR_H__

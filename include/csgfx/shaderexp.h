@@ -25,7 +25,7 @@
 
 struct iObjectRegistry;
 class csShaderVariable;
-class csSymbolTable;
+struct iShaderVariableContext;
 struct iStringSet;
 struct iDocumentNode;
 struct cons;
@@ -67,8 +67,8 @@ private:
   static bool loaded;
   /// Various internal hash tables
   static csStringHash xmltokens, sexptokens, xmltypes, mnemonics;
-  /// Attached symbol table
-  csSymbolTable * symtab;
+  /// Attached iShaderVariableContext
+  iShaderVariableContext * varContext;
   /// String set for producing String IDs
   csRef<iStringSet> strset;
   /// Compiled array of opcodes for evaluation
@@ -164,7 +164,7 @@ public:
   ~csShaderExpression();
 
   /// Parse in the XML in the context of a symbol table.
-  bool Parse(iDocumentNode *, csSymbolTable *);
+  bool Parse(iDocumentNode *, iShaderVariableContext *);
   /// Evaluate this expression into a variable.
   /**
    * It will use the symbol table it was initialized with.

@@ -437,9 +437,8 @@ bool R3DTest::Initialize ()
       {
         for (int i=0; i<engine->GetMaterialList ()->GetCount (); i++)
         {
-	  csRef<iShaderWrapper> wrapper (shmgr->CreateWrapper (shader));
           engine->GetMaterialList ()->Get (i)->GetMaterial ()->
-            SetShader(strings->Request ("ambient"), wrapper);
+            SetShader(strings->Request ("ambient"), shader);
         }
       }
     }
@@ -452,9 +451,8 @@ bool R3DTest::Initialize ()
       {
         for (int i=0; i<engine->GetMaterialList ()->GetCount (); i++)
         {
-	  csRef<iShaderWrapper> wrapper (shmgr->CreateWrapper (shader));
           engine->GetMaterialList ()->Get (i)->GetMaterial ()->
-            SetShader(strings->Request ("diffuse"), wrapper);
+            SetShader(strings->Request ("diffuse"), shader);
         }
       }
     }
@@ -465,8 +463,7 @@ bool R3DTest::Initialize ()
       shader->Load(csRef<iDataBuffer>(vfs->ReadFile("/shader/shadow.xml")));
       if(shader->Prepare())
       {
-	csRef<iShaderWrapper> wrapper (shmgr->CreateWrapper (shader));
-        shadow->SetShader(strings->Request ("shadow volume"), wrapper);
+        shadow->SetShader(strings->Request ("shadow volume"), shader);
       }
     }
   }

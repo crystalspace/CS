@@ -124,14 +124,12 @@ public:
   }
 
   // @@@NR@@@
-  virtual void SetShader (csStringID, iShaderWrapper*) { }
-  virtual iShaderWrapper* GetShader (csStringID) { return 0; }
-  virtual void AddChild (iShaderBranch *) { }
-  virtual void AddVariable (csShaderVariable *) { }
-  virtual csShaderVariable* GetVariable (csStringID) { return 0; }
-  virtual csSymbolTable* GetSymbolTable () { return 0; }
-  virtual csSymbolTable* GetSymbolTable (int) { return 0; }
-  virtual void SelectSymbolTable (int) {}
+  virtual void SetShader (csStringID, iShader*) { }
+  virtual iShader* GetShader (csStringID) { return 0; }
+  virtual void AddVariable (csShaderVariable *variable) {}
+  virtual csShaderVariable* GetVariable (csStringID name) const { return 0; }
+  virtual csShaderVariable* GetVariableRecursive (csStringID name) const { return 0; }
+  virtual void FillVariableList (csShaderVariableList *list) const {};
 };
 
 /**

@@ -21,6 +21,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __GLSHADER_FVP_H__
 
 #include "ivideo/shader/shader.h"
+#include "csgfx/shadervar.h"
 #include "csutil/strhash.h"
 
 class csGLShaderFVP : public iShaderProgram
@@ -44,9 +45,6 @@ private:
     ENVIRON_REFLECT_CUBE
   };
 
-  csPDelArray<csSymbolTable> symtabs;
-  csSymbolTable *symtab;
-
   struct lightingentry
   {
     lightingentry()
@@ -56,14 +54,18 @@ private:
       specularvar = csInvalidStringID; 
       attenuationvar = csInvalidStringID;
     }
-    csStringID positionvar;
-    csStringID diffusevar;
-    csStringID specularvar;
-    csStringID attenuationvar;
+    csStringID positionvar;     csRef<csShaderVariable> positionVarRef;
+    csStringID diffusevar;      csRef<csShaderVariable> diffuseVarRef;
+    csStringID specularvar;     csRef<csShaderVariable> specularVarRef;
+    csStringID attenuationvar;  csRef<csShaderVariable> attenuationVarRef;
     int lightnum;
+    csShaderVariableList dynVars;
   };
 
+  
+
   csStringID ambientvar;
+  csRef<csShaderVariable> ambientVarRef;
   csArray<lightingentry> lights;
   bool do_lighting;
 
@@ -78,6 +80,8 @@ private:
 
   bool validProgram;
 
+  csShaderVariableContextHelper svContextHelper;
+  csShaderVariableList dynamicVars;
 public:
   SCF_DECLARE_IBASE;
 
@@ -87,14 +91,12 @@ public:
     SCF_CONSTRUCT_IBASE (0);
     this->object_reg = object_reg;
     this->ext = ext;
-    symtab = new csSymbolTable;
   
     environment = ENVIRON_NONE;
     g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   }
   virtual ~csGLShaderFVP ()
   {
-    delete symtab;
   }
 
   void SetValid(bool val) { validProgram = val; }
@@ -104,32 +106,17 @@ public:
   ////////////////////////////////////////////////////////////////////
 
   /// Sets this program to be the one used when rendering
-  virtual void Activate(iShaderPass* current, csRenderMesh* mesh);
+  virtual void Activate(csRenderMesh* mesh);
 
   /// Deactivate program so that it's not used in next rendering
-  virtual void Deactivate(iShaderPass* current);
+  virtual void Deactivate();
 
   /// Setup states needed for proper operation of the shader
-  virtual void SetupState (iShaderPass* current, csRenderMesh* mesh);
+  virtual void SetupState (csRenderMesh* mesh,
+    csArray<iShaderVariableContext*> &dynamicDomains);
 
   /// Reset states to original
   virtual void ResetState ();
-
-  virtual void AddChild(iShaderBranch *b) {}
-  virtual void AddVariable(csShaderVariable* variable) {}
-  virtual csShaderVariable* GetVariable(csStringID s)
-  { return symtab->GetSymbol(s); }
-  virtual csSymbolTable* GetSymbolTable() { return symtab; }
-  virtual csSymbolTable* GetSymbolTable(int i)
-  {
-    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
-    return symtabs[i];
-  }
-  virtual void SelectSymbolTable(int i)
-  {
-    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
-    symtab = symtabs[i];
-  }
 
   /// Check if valid
   virtual bool IsValid() { return validProgram;} 
@@ -144,7 +131,29 @@ public:
    * Prepares the shaderprogram for usage. Must be called before the shader
    * is assigned to a material.
    */
-  virtual bool Prepare();
+  virtual bool Prepare(iShaderPass *pass);
+
+  //=================== iShaderVariableContext ================//
+  /// Add a variable to this context
+  virtual void AddVariable (csShaderVariable *variable)
+  { svContextHelper.AddVariable (variable); }
+
+  /// Get a named variable from this context
+  virtual csShaderVariable* GetVariable (csStringID name) const
+  { return svContextHelper.GetVariable (name); }
+
+  /// Fill a csShaderVariableList
+  virtual void FillVariableList (csShaderVariableList *list) const
+  { svContextHelper.FillVariableList (list); }
+
+  /// Get a named variable from this context, and any context above/outer
+  virtual csShaderVariable* GetVariableRecursive (csStringID name) const
+  {
+    csShaderVariable* var;
+    var=GetVariable (name);
+    if(var) return var;
+    return 0;
+  }
 };
 
 

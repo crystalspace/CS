@@ -31,7 +31,7 @@
 
 #include "csgfx/shaderexp.h"
 #include "csgfx/shadervar.h"
-#include "csutil/symtable.h"
+#include "ivideo/shader/shader.h"
 
 #if defined(CS_DEBUG)
 #define DEBUG_PRINTF csPrintf
@@ -162,7 +162,7 @@ csStringHash csShaderExpression::xmltypes;
 csStringHash csShaderExpression::mnemonics;
 
 csShaderExpression::csShaderExpression(iObjectRegistry * objr) :
-  symtab(NULL), accstack_max(0)
+  varContext(NULL), accstack_max(0)
 {
   obj_reg = objr;
 
@@ -257,11 +257,11 @@ csShaderExpression::~csShaderExpression() {
   
 }
 
-bool csShaderExpression::Parse(iDocumentNode * node, csSymbolTable * stab) {
+bool csShaderExpression::Parse(iDocumentNode * node, iShaderVariableContext * stab) {
   cons * head = new cons;
 
   if (stab)
-    symtab = stab;
+    varContext = stab;
 
   strset = CS_QUERY_REGISTRY(obj_reg, iStringSet);
   if (!strset) {
@@ -666,7 +666,7 @@ bool csShaderExpression::eval_argument(const oper_arg & arg, csShaderVariable * 
 
 bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg arg2, oper_arg & output) {
   if (arg1.type == TYPE_VARIABLE) {
-    csShaderVariable * var = symtab->GetSymbol(arg1.var);
+    csShaderVariable * var = varContext->GetVariable(arg1.var);
     if (!var) {
       DEBUG_PRINTF("Cannot resolve variable name %s in symbol table.\n", strset->Request(arg1.var));
 
@@ -680,7 +680,7 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg arg2, oper_
   }
 
   if (arg2.type == TYPE_VARIABLE) {
-    csShaderVariable * var = symtab->GetSymbol(arg2.var);
+    csShaderVariable * var = varContext->GetVariable(arg2.var);
     if (!var) {
       DEBUG_PRINTF("Cannot resolve variable name %s in symbol table.\n", strset->Request(arg2.var));
 
@@ -712,7 +712,7 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg arg2, oper_
 
 bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg & output) {
   if (arg1.type == TYPE_VARIABLE) {
-    csShaderVariable * var = symtab->GetSymbol(arg1.var);
+    csShaderVariable * var = varContext->GetVariable(arg1.var);
     if (!var) {
       DEBUG_PRINTF("Cannot resolve variable name %s in symbol table.\n", strset->Request(arg1.var));
 

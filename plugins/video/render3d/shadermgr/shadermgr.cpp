@@ -81,12 +81,6 @@ SCF_IMPLEMENT_IBASE (csShaderPass)
   SCF_IMPLEMENTS_INTERFACE (iShaderPass)
 SCF_IMPLEMENT_IBASE_END
 
-//=================== csShaderWrapper ================//
-
-SCF_IMPLEMENT_IBASE (csShaderWrapper)
-  SCF_IMPLEMENTS_INTERFACE (iShaderWrapper)
-SCF_IMPLEMENT_IBASE_END
-
 //=================== csShaderManager ================//
 
 // General stuff
@@ -102,11 +96,6 @@ csShaderManager::csShaderManager(iBase* parent)
 csShaderManager::~csShaderManager()
 {
   //clear all shaders
-  /*while(shaders.Length() > 0)
-  {
-    delete (csShader*)shaders->Pop();
-  }
-  delete shaders;*/
   shaders.DeleteAll ();
   if (scfiEventHandler) scfiEventHandler->DecRef();
 }
@@ -207,19 +196,18 @@ csPtr<iShader> csShaderManager::CreateShader()
   csShader* cshader = new csShader(name, this, objectreg);
   //cshader->IncRef();
 
-  csRef<iShaderWrapper> wrap = CreateWrapper (cshader);
-  shaders.Push(wrap);
+  shaders.Push(cshader);
   
   return csPtr<iShader> (cshader);
 }
 
-iShaderWrapper* csShaderManager::GetShader(const char* name)
+iShader* csShaderManager::GetShader(const char* name)
 {
   int i;
   for (i = 0; i < shaders.Length(); ++i)
   {
-    iShaderWrapper* shader = shaders.Get(i);
-    if (strcasecmp(shader->GetShader()->GetName(), name) == 0)
+    iShader* shader = shaders.Get(i);
+    if (strcasecmp(shader->GetName(), name) == 0)
       return shader;
   }
   return 0;
@@ -243,7 +231,7 @@ void csShaderManager::PrepareShaders ()
 {
   int i;
   for (i = 0; i < shaders.Length(); ++i)
-    shaders[i]->GetShader ()->Prepare ();
+    shaders[i]->Prepare ();
 }
 
 
@@ -253,12 +241,8 @@ csShader::csShader (csShaderManager* owner, iObjectRegistry* reg)
 {
   SCF_CONSTRUCT_IBASE( 0 );
   this->name = 0;
-  variables = new csHashMap();
-  techniques = new csArray<iShaderTechnique*>();
   parent = owner;
   objectreg = reg;
-
-  symtabs.SetLength (1, csSymbolTable());
 }
 
 csShader::csShader (const char* name, csShaderManager* owner,
@@ -266,45 +250,22 @@ csShader::csShader (const char* name, csShaderManager* owner,
 {
   SCF_CONSTRUCT_IBASE( 0 );
   csShader::name = 0;
-  variables = new csHashMap();
-  techniques = new csArray<iShaderTechnique*>();
   parent = owner;
   objectreg = reg;
   SetName(name);
-
-  symtabs.SetLength (1, csSymbolTable());
-  symtab = symtabs[0];
 }
 
 csShader::~csShader()
 {
   delete name;
-
-  //Clear variables
-  csGlobalHashIterator cIter (variables);
-
-  while (cIter.HasNext())
-  {
-    csShaderVariable* i = (csShaderVariable*)cIter.Next();
-    i->DecRef();
-  }
-
-  variables->DeleteAll();
-  delete variables;
-
-  while (techniques->Length() > 0)
-  {
-    delete (csShaderTechnique*)techniques->Pop();
-  }
-  delete techniques;
 }
 
 bool csShader::IsValid() const
 {
   //is valid if there are at least one valid technique
-  for(int i = 0; i < techniques->Length(); ++i)
+  for(int i = 0; i < techniques.Length(); ++i)
   {
-    iShaderTechnique* t = techniques->Get(i);
+    iShaderTechnique* t = techniques.Get(i);
     if(t->IsValid())
       return true;
   }
@@ -315,18 +276,15 @@ bool csShader::IsValid() const
 csPtr<iShaderTechnique> csShader::CreateTechnique()
 {
   iShaderTechnique* mytech = new csShaderTechnique (this, objectreg);
-  mytech->IncRef();
-
-  techniques->Push(mytech);
-  AddChild (mytech);
+  techniques.Push(mytech);
   return mytech;
 }
 
 iShaderTechnique* csShader::GetTechnique(int technique)
 {
-  if( technique >= techniques->Length()) return 0;
+  if( technique >= techniques.Length()) return 0;
 
-  return techniques->Get(technique);
+  return techniques.Get(technique);
 }
 
 iShaderTechnique* csShader::GetBestTechnique()
@@ -335,12 +293,12 @@ iShaderTechnique* csShader::GetBestTechnique()
   int maxpriority = INT_MIN;
   iShaderTechnique* tech = 0;
 
-  for (i = 0; i < techniques->Length(); ++i)
+  for (i = 0; i < techniques.Length(); ++i)
   {
-    if( techniques->Get(i)->IsValid() &&
-        techniques->Get(i)->GetPriority() > maxpriority)
+    if( techniques.Get(i)->IsValid() &&
+        techniques.Get(i)->GetPriority() > maxpriority)
     {
-      tech = techniques->Get(i);
+      tech = techniques.Get(i);
       maxpriority = tech->GetPriority();
     }
   }
@@ -470,46 +428,39 @@ bool csShader::Prepare()
 
   //go through the technques in priority order
   //fill priority struct
-  priority_mapping* primap = new priority_mapping[techniques->Length()];
+  priority_mapping* primap = new priority_mapping[techniques.Length()];
   
-  for(i = 0; i < techniques->Length(); ++i)
+  for(i = 0; i < techniques.Length(); ++i)
   {
     primap[i].technique = i;
-    primap[i].priority = techniques->Get(i)->GetPriority();
+    primap[i].priority = techniques.Get(i)->GetPriority();
   }
 
-  if (techniques->Length()>1)
-    qsort(primap, techniques->Length()-1, sizeof(priority_mapping), pricompare);
+  if (techniques.Length()>1)
+    qsort(primap, techniques.Length()-1, sizeof(priority_mapping), pricompare);
 
   bool isPrep = false;
   //int prepNr;
 
-  csArray<iShaderTechnique*>* newTArr = new csArray<iShaderTechnique*>;
+  csRefArray<iShaderTechnique> newTArr;
 
-  for(i = 0; i < techniques->Length() && !isPrep; ++i)
+  for(i = 0; i < techniques.Length() && !isPrep; ++i)
   {
-    iShaderTechnique* t = techniques->Get(primap[i].technique);
+    iShaderTechnique* t = techniques.Get(primap[i].technique);
     if ( t->Prepare() )
     {
-      t->IncRef();
-      newTArr->Push(t);
+      newTArr.Push(t);
     }
   }
   
-  while(techniques->Length() > 0)
-  {
-    (techniques->Pop())->DecRef();
-  }
-  delete techniques;
-
-  techniques = newTArr;
+  techniques.Empty ();
+  newTArr.TransferTo (techniques);
 
   return true;
 }
 
 //==================== csShaderPass ==============//
 int csShaderPass::buffercount = 0;
-int csShaderPass::texturecount = 0;
 csVertexAttrib csShaderPass::attribs[STREAMMAX*2];
 iRenderBuffer* csShaderPass::buffers[STREAMMAX*2];
 csStringID csShaderPass::buffernames[STREAMMAX*2];
@@ -520,8 +471,8 @@ iTextureHandle* csShaderPass::clear_textures[TEXMAX];
 
 void csShaderPass::Activate(csRenderMesh* mesh)
 {
-  if(vp) vp->Activate(this, mesh);
-  if(fp) fp->Activate(this, mesh);
+  if(vp) vp->Activate(mesh);
+  if(fp) fp->Activate(mesh);
 
   buffercount = 0;
   int i;
@@ -537,24 +488,23 @@ void csShaderPass::Activate(csRenderMesh* mesh)
     }
   }
 
-  texturecount = 0;
-  for (i=0; i<TEXMAX; i++)
-    if (texmapping[i] != csInvalidStringID)
-      units[texturecount++] = i;
+  
 }
 
 void csShaderPass::Deactivate()
 {
-  if(vp) vp->Deactivate(this);
-  if(fp) fp->Deactivate(this);
+  if(vp) vp->Deactivate();
+  if(fp) fp->Deactivate();
 
   g3d->SetTextureState (units, clear_textures, texturecount);
   g3d->SetBufferState (attribs, clear_buffers, buffercount);
-  texturecount = buffercount = 0;
+  buffercount = 0;
 }
 
-void csShaderPass::SetupState (csRenderMesh *mesh)
+void csShaderPass::SetupState (csRenderMesh *mesh, 
+                               csArray<iShaderVariableContext*> &dynamicDomains)
 {
+  dynamicDomains.Insert(0, (iShaderVariableContext*)parent->GetParent ()->GetParent ());
   int i;
   for (i=0; i<buffercount; i++)
     buffers[i] = mesh->buffersource->GetRenderBuffer (buffernames[i]);
@@ -565,37 +515,38 @@ void csShaderPass::SetupState (csRenderMesh *mesh)
 
   for (i=0; i<texturecount; i++)
   {
-    csShaderVariable* var = GetVariable (texmapping[units[i]]);
+    csShaderVariable* var = texmappingRef[units[i]];
     if (var)
       var->GetValue (textures[i]);
   }
+
+  if (dynamicVars.Length() > 0)
+  {
+    for(i=0;i<dynamicDomains.Length();i++)
+    {
+      dynamicDomains[i]->FillVariableList(&dynamicVars);
+    }
+  }
+
+  for (i=0;i<dynamicVars.Length ();i++)
+  {
+    csShaderVariable* var = dynamicVars.Get (i).shaderVariable;
+    if (var)
+      var->GetValue (textures[dynamicVars.Get (i).userData]);
+    dynamicVars.Get (i).shaderVariable = 0;
+  }
+
   g3d->SetTextureState (units, textures, texturecount);
 
   g3d->GetWriteMask (OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha);
   g3d->SetWriteMask (writemaskRed, writemaskGreen, writemaskBlue, writemaskAlpha);
   
-  if (vp) vp->SetupState (this, mesh);
-  if (fp) fp->SetupState (this, mesh);
+  if (vp) vp->SetupState (mesh,dynamicDomains);
+  if (fp) fp->SetupState (mesh,dynamicDomains);
 }
 
 void csShaderPass::ResetState ()
 {
-  //int i;
-  /*for (i=0; i<STREAMMAX; i++)
-  {
-    if (streammapping[i] != csInvalidStringID)
-    {
-      g3d->DeactivateBuffer ((csVertexAttrib)i);
-    }
-  }*/
-  /*
-  for (i=TEXMAX-1; i>=0; i--)
-  {
-    if (texmappingdirect[i] || texmappinglayer[i] != -1)
-    {
-      g3d->DeactivateTexture (i);
-    }
-  }*/
   if (vp) vp->ResetState ();
   if (fp) fp->ResetState ();
 
@@ -872,12 +823,41 @@ bool csShaderPass::Load(iDataBuffer* program)
 
 bool csShaderPass::Prepare()
 {
+  //prepare tex
+  int i;
+  csShaderVariable *var;
+  csShaderVariableProxy prox;
+
+  texturecount = 0;
+  for (i=0; i<TEXMAX; i++)
+    if (texmapping[i] != csInvalidStringID)
+      units[texturecount++] = i;
+
+  for (i=0;i<texturecount; i++)
+  {
+    if (texmapping[i] == csInvalidStringID)
+      continue;
+
+    var = GetVariable (texmapping[i]);
+    if (!var)
+      var = parent->GetVariableRecursive (texmapping[i]);
+
+    if (var)
+      texmappingRef[i] = var;
+    else
+    {
+      prox.Name = texmapping[i];
+      prox.userData = i;
+      dynamicVars.InsertSorted (prox);
+    }
+  }
+
   if(vp) 
-    if(!vp->Prepare())
+    if(!vp->Prepare(this))
       return false;
 
   if(fp)
-    if(!fp->Prepare())
+    if(!fp->Prepare(this))
       return false;
 
   return true;
@@ -887,46 +867,37 @@ bool csShaderPass::Prepare()
 csShaderTechnique::csShaderTechnique(csShader* owner, iObjectRegistry* reg)
 {
   SCF_CONSTRUCT_IBASE( 0 );
-  passes = new csArray<iShaderPass*>();
   parent = owner;
   objectreg = reg;
 
-  symtabs.SetLength (1, csSymbolTable());
 }
 
 csShaderTechnique::~csShaderTechnique()
 {
-  while(passes->Length() > 0)
-  {
-    delete (csShaderPass*)passes->Pop();
-  }
-  delete passes;
 }
 
 csPtr<iShaderPass> csShaderTechnique::CreatePass()
 {
   iShaderPass* mpass = new csShaderPass(this, objectreg);
-  mpass->IncRef();
+  passes.Push(mpass);
 
-  passes->Push(mpass);
-  AddChild (mpass);
   return mpass;
 }
 
 iShaderPass* csShaderTechnique::GetPass(int pass)
 {
-  if( pass >= passes->Length()) return 0;
+  if( pass >= passes.Length()) return 0;
 
-  return passes->Get(pass);
+  return passes.Get(pass);
 }
 
 bool csShaderTechnique::IsValid() const
 {
   bool valid = false;
   //returns true if all passes are valid
-  for(int i = 0; i < passes->Length(); ++i)
+  for(int i = 0; i < passes.Length(); ++i)
   {
-    iShaderPass* p = passes->Get(i);
+    iShaderPass* p = passes.Get(i);
     valid = p->IsValid();
   }
   
@@ -1011,7 +982,7 @@ bool csShaderTechnique::Load (iDocumentNode* node)
                 var->SetValue( v );
                 break;
             }
-            AddVariable (var);
+            //add var
           }
           break;
       }
@@ -1027,9 +998,9 @@ bool csShaderTechnique::Load(iDataBuffer* program)
 
 bool csShaderTechnique::Prepare()
 {
-  for (int i = 0; i < passes->Length(); ++i)
+  for (int i = 0; i < passes.Length(); ++i)
   {
-    iShaderPass* p = passes->Get(i);
+    iShaderPass* p = passes.Get(i);
     if (!p->Prepare())
       return false;
   }

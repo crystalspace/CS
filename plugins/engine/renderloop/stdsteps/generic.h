@@ -122,7 +122,7 @@ public:
   virtual void SetZBufMode (csZBufMode zmode);
   virtual csZBufMode GetZBufMode ();
 
-  inline static void RenderMeshes (iGraphics3D* g3d, iShaderWrapper* shader, 
+  inline static void RenderMeshes (iGraphics3D* g3d, iShader* shader, 
     csRenderMesh** meshes, int num);
 };
 

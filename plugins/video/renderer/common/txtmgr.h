@@ -280,7 +280,7 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Dummy for new renderer. @@@NR@@@
-  virtual iShaderWrapper* GetShader (csStringID) { return 0; }
+  virtual iShader* GetShader (csStringID) { return 0; }
 
   /**
    * Get a texture from the material.

@@ -262,7 +262,7 @@ bool csGLShaderFFP::Load(iDataBuffer* program)
   return Load(doc->GetRoot());
 }
 
-bool csGLShaderFFP::Prepare()
+bool csGLShaderFFP::Prepare(iShaderPass* pass)
 {
   maxlayers = shaderPlug->texUnits;
 
@@ -283,7 +283,7 @@ bool csGLShaderFFP::Prepare()
   return true;
 }
 
-void csGLShaderFFP::Activate(iShaderPass* current, csRenderMesh* mesh)
+void csGLShaderFFP::Activate(csRenderMesh* mesh)
 {
   for(int i = 0; i < MIN(maxlayers, texlayers.Length()); ++i)
   {
@@ -338,7 +338,7 @@ void csGLShaderFFP::Activate(iShaderPass* current, csRenderMesh* mesh)
   }
 }
 
-void csGLShaderFFP::Deactivate(iShaderPass* current)
+void csGLShaderFFP::Deactivate()
 {
   for (int i=maxlayers-1; i>=0; --i)
   {
@@ -348,7 +348,8 @@ void csGLShaderFFP::Deactivate(iShaderPass* current)
   }
 }
 
-void csGLShaderFFP::SetupState (iShaderPass *current, csRenderMesh *mesh)
+void csGLShaderFFP::SetupState (csRenderMesh *mesh,
+                                csArray<iShaderVariableContext*> &dynamicDomains)
 {
 }
 

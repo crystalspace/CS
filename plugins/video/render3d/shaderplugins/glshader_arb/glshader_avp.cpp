@@ -55,26 +55,27 @@ void csShaderGLAVP::Report (int severity, const char* msg, ...)
   va_end (args);
 }
 
-void csShaderGLAVP::Activate(iShaderPass* current, csRenderMesh* mesh)
+void csShaderGLAVP::Activate(csRenderMesh* mesh)
 {
   //enable it
   glEnable(GL_VERTEX_PROGRAM_ARB);
   ext->glBindProgramARB(GL_VERTEX_PROGRAM_ARB, program_num);
 }
 
-void csShaderGLAVP::Deactivate(iShaderPass* current)
+void csShaderGLAVP::Deactivate()
 {
   glDisable (GL_VERTEX_PROGRAM_ARB);
 }
 
-void csShaderGLAVP::SetupState (iShaderPass *current, csRenderMesh *mesh)
+void csShaderGLAVP::SetupState ( csRenderMesh *mesh, 
+                                csArray<iShaderVariableContext*> &dynamicDomains)
 {
   int i;
 
   // set variables
   for(i = 0; i < variablemap.Length(); ++i)
   {
-    csShaderVariable* lvar = GetVariable(variablemap[i].name);
+    csShaderVariable* lvar = variablemap[i].ref;
 
     if(lvar)
     {
@@ -82,8 +83,32 @@ void csShaderGLAVP::SetupState (iShaderPass *current, csRenderMesh *mesh)
       if (lvar->GetValue (v4))
       {
         ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, 
-	  variablemap[i].registernum, &v4.x);
+          variablemap[i].registernum, &v4.x);
       }
+    }
+  }
+
+  if (dynamicVars.Length() > 0)
+  {
+    for(i=0;i<dynamicDomains.Length();i++)
+    {
+      dynamicDomains[i]->FillVariableList(&dynamicVars);
+    }
+  }
+
+  for(i = 0; i < dynamicVars.Length(); ++i)
+  {
+    csShaderVariable* lvar = dynamicVars.Get(i).shaderVariable;
+
+    if(lvar)
+    {
+      csVector4 v4;
+      if (lvar->GetValue (v4))
+      {
+        ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, 
+          dynamicVars.Get(i).userData, &v4.x);
+      }
+      dynamicVars.Get (i).shaderVariable = 0;
     }
   }
 }
@@ -279,7 +304,37 @@ bool csShaderGLAVP::Load (iDocumentNode* program)
 }
 
   
-bool csShaderGLAVP::Prepare ()
+bool csShaderGLAVP::Prepare (iShaderPass *pass)
 {
+  //compile variables
+  variablemapentry tempEntry;
+  csShaderVariableProxy tempProx;
+  csArray<variablemapentry> newStat;
+  csShaderVariable *var;
+  int i;
+
+  for (i = 0; i < variablemap.Length (); i++)
+  {
+    var = GetVariable(variablemap[i].name);
+    if (!var)
+      var = pass->GetVariableRecursive (variablemap[i].name);
+    if (var)
+    {
+      //static
+      tempEntry = variablemap[i];
+      tempEntry.ref = var;
+      newStat.Push (tempEntry);
+    }
+    else
+    {
+      //dynamic
+      tempProx.Name = variablemap[i].name;
+      tempProx.userData = variablemap[i].registernum;
+      dynamicVars.InsertSorted (tempProx);
+    }
+  }
+  variablemap.Empty ();
+  newStat.TransferTo (variablemap);
+
   return LoadProgramStringToGL(programstring);
 }

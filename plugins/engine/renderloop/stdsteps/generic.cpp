@@ -161,13 +161,15 @@ csGenericRenderStep::~csGenericRenderStep ()
 }
 
 void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
-                                        iShaderWrapper* shader, 
+                                        iShader* shader, 
                                         csRenderMesh** meshes, 
                                         int num)
 {
   if (num == 0) return;
+  csArray<iShaderVariableContext*> dynDomain;
+  
 
-  iShaderTechnique *tech = shader->GetShader()->GetBestTechnique ();
+  iShaderTechnique *tech = shader->GetBestTechnique ();
 
   if (tech == 0) return;
 
@@ -179,11 +181,13 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
     int j;
     for (j = 0; j < num; j++)
     {
+      dynDomain.Empty ();
       csRenderMesh* mesh = meshes[j];
+      dynDomain.Push (mesh->material->GetMaterial ());
 
-      shader->SelectMaterial (mesh->material->GetMaterial ());
+      //shader->SelectMaterial (mesh->material->GetMaterial ());
 
-      pass->SetupState (mesh);
+      pass->SetupState (mesh, dynDomain);
 
       uint mixsave = mesh->mixmode;
       uint mixmode = pass->GetMixmodeOverride ();
@@ -222,13 +226,13 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
  
   CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, num);
   int numSSM = 0;
-  iShaderWrapper* shader = 0;
+  iShader* shader = 0;
 
   for (int n = 0; n < num; n++)
   {
     csRenderMesh* mesh = meshes[n];
 
-    iShaderWrapper* meshShader = 
+    iShader* meshShader = 
       mesh->material->GetMaterialHandle()->GetShader(shadertype);
     if (meshShader != shader)
     {

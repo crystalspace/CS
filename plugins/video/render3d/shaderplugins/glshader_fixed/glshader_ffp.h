@@ -21,6 +21,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __GLSHADER_FIXEDFP_H__
 
 #include "ivideo/shader/shader.h"
+#include "csgfx/shadervar.h"
 #include "imap/services.h"
 
 class csGLShader_FIXED;
@@ -39,9 +40,6 @@ private:
   csGLStateCache* statecache;
 
   char* programstring;
-
-  csPDelArray<csSymbolTable> symtabs;
-  csSymbolTable *symtab;
 
   csHashMap variables;
   bool validProgram;
@@ -144,6 +142,7 @@ private:
   bool LoadLayer(mtexlayer* layer, iDocumentNode* node);
   bool LoadEnvironment(mtexlayer* layer, iDocumentNode* node);
 
+  csShaderVariableContextHelper svContextHelper;
 public:
   SCF_DECLARE_IBASE;
 
@@ -151,7 +150,7 @@ public:
 
   virtual ~csGLShaderFFP ()
   {
-    Deactivate(0);
+    Deactivate();
     if(programstring) delete programstring;
   }
 
@@ -160,13 +159,14 @@ public:
   ////////////////////////////////////////////////////////////////////
 
   /// Sets this program to be the one used when rendering
-  virtual void Activate(iShaderPass* current, csRenderMesh* mesh);
+  virtual void Activate(csRenderMesh* mesh);
 
   /// Deactivate program so that it's not used in next rendering
-  virtual void Deactivate(iShaderPass* current);
+  virtual void Deactivate();
 
     /// Setup states needed for proper operation of the shader
-  virtual void SetupState (iShaderPass* current, csRenderMesh* mesh);
+  virtual void SetupState (csRenderMesh* mesh,
+    csArray<iShaderVariableContext*> &dynamicDomains);
 
   /// Reset states to original
   virtual void ResetState ();
@@ -187,22 +187,6 @@ public:
   virtual bool SetProperty(const char* name, csVector3* string) {return false;};
 //  virtual bool SetProperty(const char* name, csVector4* string) {return false;};
 
-  virtual void AddChild(iShaderBranch *b) {}
-  virtual void AddVariable(csShaderVariable* variable) {}
-  virtual csShaderVariable* GetVariable(csStringID s)
-  { return symtab->GetSymbol(s); }
-  virtual csSymbolTable* GetSymbolTable() { return symtab; }
-  virtual csSymbolTable* GetSymbolTable(int i)
-  {
-    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
-    return symtabs[i];
-  }
-  virtual void SelectSymbolTable(int i)
-  {
-    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
-    symtab = symtabs[i];
-  }
-
   /// Check if valid
   virtual bool IsValid() { return validProgram;} 
 
@@ -216,7 +200,29 @@ public:
    * Prepares the shaderprogram for usage. Must be called before the shader
    * is assigned to a material.
    */
-  virtual bool Prepare();
+  virtual bool Prepare(iShaderPass *pass);
+
+  //=================== iShaderVariableContext ================//
+  /// Add a variable to this context
+  virtual void AddVariable (csShaderVariable *variable)
+  { svContextHelper.AddVariable (variable); }
+
+  /// Get a named variable from this context
+  virtual csShaderVariable* GetVariable (csStringID name) const
+  { return svContextHelper.GetVariable (name); }
+
+  /// Fill a csShaderVariableList
+  virtual void FillVariableList (csShaderVariableList *list) const
+  { svContextHelper.FillVariableList (list); }
+
+  /// Get a named variable from this context, and any context above/outer
+  virtual csShaderVariable* GetVariableRecursive (csStringID name) const
+  {
+    csShaderVariable* var;
+    var=GetVariable (name);
+    if(var) return var;
+    return 0;
+  }
 };
 
 
