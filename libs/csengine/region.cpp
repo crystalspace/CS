@@ -182,23 +182,6 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
-      csRef<iCurveTemplate> o (SCF_QUERY_INTERFACE (obj, iCurveTemplate));
-      if (!o) continue;
-      ObjRemove (obj);
-      copy[i] = NULL;
-
-      csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (
-          engine->GetThingType (),
-          iThingEnvironment));
-      te->RemoveCurveTemplate (o);
-    }
-  }
-
-  for (i = 0; i < copy.Length (); i++)
-  {
-    if (copy[i])
-    {
-      iObject *obj = copy[i];
       csRef<iPolyTxtPlane> o (SCF_QUERY_INTERFACE (obj, iPolyTxtPlane));
       if (!o) continue;
       ObjRemove (obj);

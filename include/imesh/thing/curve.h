@@ -21,12 +21,11 @@
 
 #include "csutil/scf.h"
 
-struct iCurveTemplate;
 struct iMaterialWrapper;
 class csCurve;
 struct iObject;
 
-SCF_VERSION (iCurve, 0, 0, 1);
+SCF_VERSION (iCurve, 0, 1, 0);
 
 /**
  * This is the interface for a curve.
@@ -37,31 +36,13 @@ struct iCurve : public iBase
   virtual csCurve* GetOriginalObject () = 0;
   /// Get the iObject for this curve.
   virtual iObject *QueryObject() = 0;
-  /// Get the parent curve template.
-  virtual iCurveTemplate* GetParentTemplate () = 0;
   /// Set the material wrapper.
   virtual void SetMaterial (iMaterialWrapper* mat) = 0;
   /// Get the material wrapper.
   virtual iMaterialWrapper* GetMaterial () = 0;
   /// Set a control point.
   virtual void SetControlPoint (int idx, int control_id) = 0;
-};
 
-SCF_VERSION (iCurveTemplate, 0, 0, 2);
-
-/**
- * This is a interface for a curve template.
- */
-struct iCurveTemplate : public iBase
-{
-  /// Get the iObject for this curve template.
-  virtual iObject *QueryObject() = 0;
-  /// Set the material wrapper.
-  virtual void SetMaterial (iMaterialWrapper* mat) = 0;
-  /// Get the material wrapper.
-  virtual iMaterialWrapper* GetMaterial () = 0;
-  /// Make a curve from this template.
-  virtual iCurve* MakeCurve () = 0;
   /// Get the number of vertices.
   virtual int GetVertexCount () const = 0;
   /// Get a vertex.

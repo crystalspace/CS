@@ -124,9 +124,6 @@ private:
   /// Material for this curve
   csRef<iMaterialWrapper> Material;
 
-  /// Pointer to the template for this curve
-  csCurveTemplate* CurveTemplate;
-
   /// list of light patches
   csLightPatch* LightPatches;
 
@@ -187,7 +184,7 @@ public:
 public:
 
   /// Constructor
-  csCurve (csCurveTemplate* parent_tmpl, csThingObjectType* thing_type);
+  csCurve (csThingObjectType* thing_type);
   /// Destructor
   virtual ~csCurve ();
 
@@ -202,9 +199,6 @@ public:
   inline iMaterialWrapper* GetMaterial () const;
   /// Set the material wrapper for this curve
   void SetMaterial (iMaterialWrapper* h);
-
-  /// Get the parent template used for this curve.
-  inline csCurveTemplate* GetParentTemplate () const;
 
   /// @@@
   void DynamicLightDisconnect (iDynLight* dynlight);
@@ -305,6 +299,13 @@ public:
   /// Do a hard transform on this curve.
   virtual void HardTransform (const csReversibleTransform& trans);
 
+  /// Set a vertex of the template.
+  virtual void SetVertex (int index, int ver_ind) = 0;
+  /// Return a vertex of the template.
+  virtual int GetVertex (int index)  = 0;
+  /// Return the number of vertices in the template.
+  virtual int GetVertexCount () = 0;
+
   SCF_DECLARE_IBASE_EXT (csObject);
 
   //----------------------- iCurve interface implementation -----------------
@@ -317,105 +318,23 @@ public:
     { return scfParent; }
     virtual iObject *QueryObject()
     { return scfParent; }
-    virtual iCurveTemplate* GetParentTemplate ();
     virtual void SetMaterial (iMaterialWrapper* mat)
     { scfParent->SetMaterial (mat); }
     virtual iMaterialWrapper* GetMaterial ()
     { return scfParent->GetMaterial (); }
-    virtual void SetName (const char* name)
-    { scfParent->SetName (name); }
-    virtual const char* GetName () const
-    { return scfParent->GetName (); }
     virtual void SetControlPoint (int idx, int control_id)
     { scfParent->SetControlPoint (idx, control_id); }
-  } scfiCurve;
-  friend struct Curve;
-};
 
-
-SCF_VERSION (csCurveTemplate, 0, 0, 1);
-
-/**
- * A curve template.
- */
-class csCurveTemplate : public csObject
-{
-protected:
-  csRef<iMaterialWrapper> Material;
-  csThingObjectType* thing_type;
-
-protected:
-  ///
-  virtual ~csCurveTemplate ();
-
-public:
-  ///
-  csCurveTemplate(csThingObjectType* thing_type);
-
-  /// Create an instance of this template.
-  virtual csCurve* MakeCurve () = 0;
-
-  /// Set a vertex of the template
-  virtual void SetVertex (int index, int ver_ind) = 0;
-  /// Return a vertex of the template
-  virtual int GetVertex (int index)  = 0;
-  /// Return the number of vertices in the template
-  virtual int GetVertexCount () = 0;
-
-  /// Return the current material.
-  iMaterialWrapper* GetMaterial () { return Material; }
-  /// Set the current material.
-  void SetMaterial (iMaterialWrapper* h);
-
-  SCF_DECLARE_IBASE_EXT (csObject);
-
-  //------------------ iCurveTemplate interface implementation --------------
-  /// iCurveTemplate implementation
-  struct CurveTemplate : public iCurveTemplate
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csCurveTemplate);
-    virtual iObject *QueryObject()
-    { return scfParent; }
-    virtual void SetMaterial (iMaterialWrapper* mat)
-    { scfParent->SetMaterial (mat); }
-    virtual iMaterialWrapper* GetMaterial ()
-    { return scfParent->GetMaterial (); }
-    virtual iCurve* MakeCurve ()
-    { return &(scfParent->MakeCurve ()->scfiCurve); }
     virtual int GetVertexCount () const
     { return scfParent->GetVertexCount (); }
     virtual int GetVertex (int idx) const
     { return scfParent->GetVertex (idx); }
     virtual void SetVertex (int idx, int vt)
     { scfParent->SetVertex (idx, vt); }
-  } scfiCurveTemplate;
-  friend struct CurveTemplate;
+  } scfiCurve;
+  friend struct Curve;
 };
 
-/**
- * A specific curve implementation for Bezier curve template.
- */
-class csBezierTemplate : public csCurveTemplate
-{
-private:
-  int ver_id[9];
-
-public:
-  csBezierTemplate(csThingObjectType* thing_type);
-
-  virtual csCurve* MakeCurve();
-
-  /// Tesselate this curve.
-  virtual void SetVertex (int index, int ver_ind);
-  ///
-  virtual int GetVertex (int index);
-  virtual int GetVertexCount ();
-
-  // Should not be necessary, but without this buggy NextStep compiler
-  // incorrectly calls csObject::QueryInterface() rather than correctly
-  // calling csCurveTemplate::QueryInterface().
-  SCF_DECLARE_IBASE_EXT(csCurveTemplate);
-};
 
 /**
  * A specific curve implementation for Bezier curves.
@@ -438,9 +357,11 @@ private:
   /// If true then the object bbox is valid.
   bool valid_bbox;
 
+  int ver_id[9];
+
 public:
   ///
-  csBezierCurve (csBezierTemplate* parent_tmpl, csThingObjectType* thing_type);
+  csBezierCurve (csThingObjectType* thing_type);
   ///
   ~csBezierCurve ();
 
@@ -467,6 +388,12 @@ public:
 
   /// Do a hard transform on this curve.
   virtual void HardTransform (const csReversibleTransform& trans);
+
+  /// Tesselate this curve.
+  virtual void SetVertex (int index, int ver_ind);
+  ///
+  virtual int GetVertex (int index);
+  virtual int GetVertexCount ();
 };
 
 /*
@@ -498,8 +425,6 @@ inline iMaterialHandle* csCurve::GetMaterialHandle () const
 { return Material ? Material->GetMaterialHandle() : NULL; }
 inline iMaterialWrapper* csCurve::GetMaterial () const
 { return Material; }
-inline csCurveTemplate* csCurve::GetParentTemplate () const
-{ return CurveTemplate; }
 inline csLightMap* csCurve::GetLightMap () const
 { return LightMap; }
 inline void csCurve::SetParentThing (csThing* p)
@@ -510,3 +435,4 @@ inline const csReversibleTransform *csCurve::GetObject2World () const
 { return O2W; }
 
 #endif // __CS_CURVE_H__
+

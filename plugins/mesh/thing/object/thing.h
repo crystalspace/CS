@@ -568,7 +568,7 @@ public:
   { return curves.Get (idx); }
 
   /// Create a curve from a template.
-  iCurve* CreateCurve (iCurveTemplate* tmpl);
+  iCurve* CreateCurve ();
 
   /// Find a curve index.
   int FindCurveIndex (iCurve* curve) const;
@@ -1043,8 +1043,8 @@ public:
     virtual void ClearCurveVertices ()
     { scfParent->ClearCurveVertices (); }
     virtual iCurve* GetCurve (int idx) const;
-    virtual iCurve* CreateCurve (iCurveTemplate* tmpl)
-    { return scfParent->CreateCurve (tmpl); }
+    virtual iCurve* CreateCurve ()
+    { return scfParent->CreateCurve (); }
     virtual int FindCurveIndex (iCurve* curve) const
     { return scfParent->FindCurveIndex (curve); }
     virtual void RemoveCurve (int idx)
@@ -1323,12 +1323,6 @@ private:
    */
   csRefArrayObject<iPolyTxtPlane> planes;
 
-  /**
-   * List of curve templates (bezier templates). This vector contains objects of
-   * type csCurveTemplate*.
-   */
-  csRefArrayObject<iCurveTemplate> curve_templates;
-
 public:
   iObjectRegistry* object_reg;
   bool do_verbose;	// Verbose error reporting.
@@ -1366,12 +1360,8 @@ public:
 
   csPtr<iPolyTxtPlane> CreatePolyTxtPlane (const char* name = NULL);
   iPolyTxtPlane* FindPolyTxtPlane (const char* name);
-  csPtr<iCurveTemplate> CreateBezierTemplate (const char* name = NULL);
-  iCurveTemplate* FindCurveTemplate (const char *iName);
   void RemovePolyTxtPlane (iPolyTxtPlane* pl);
-  void RemoveCurveTemplate (iCurveTemplate* ct);
   void ClearPolyTxtPlanes ();
-  void ClearCurveTemplates ();
 
   /// iThingEnvironment implementation.
   struct eiThingEnvironment : public iThingEnvironment
@@ -1389,29 +1379,13 @@ public:
     {
       return scfParent->FindPolyTxtPlane (name);
     }
-    virtual csPtr<iCurveTemplate> CreateBezierTemplate (const char* name = NULL)
-    {
-      return scfParent->CreateBezierTemplate (name);
-    }
-    virtual iCurveTemplate* FindCurveTemplate (const char* name)
-    {
-      return scfParent->FindCurveTemplate (name);
-    }
     virtual void RemovePolyTxtPlane (iPolyTxtPlane* pl)
     {
       scfParent->RemovePolyTxtPlane (pl);
     }
-    virtual void RemoveCurveTemplate (iCurveTemplate* ct)
-    {
-      scfParent->RemoveCurveTemplate (ct);
-    }
     virtual void ClearPolyTxtPlanes ()
     {
       scfParent->ClearPolyTxtPlanes ();
-    }
-    virtual void ClearCurveTemplates ()
-    {
-      scfParent->ClearCurveTemplates ();
     }
     virtual int GetLightmapCellSize () const
     {

@@ -1,5 +1,49 @@
 The history order is reversed so that new features are at the top.
 
+6-Mar-2003
+	- Reworked the notion of curve templates. The iCurveTemplate has
+	  been removed and it's functionality has moved to iCurve itself.
+	  The notion of curve templates has always been a bit curious
+	  as a curve template is just a list of nine vertex indices. So
+	  it didn't make sense to seperate it. As a consequence of this
+	  change the bezier addon loader has been removed. A curve like this
+	  in the past:
+		<addon>
+		    <plugin>crystalspace.mesh.loader.thing.bezier</plugin>
+		    <params>
+		        <name>b1</name>
+		        <material>mosaic</material>
+			<v>0</v> <v>1</v> <v>2</v>
+			<v>3</v> <v>4</v> <v>5</v>
+			<v>6</v> <v>7</v> <v>8</v>
+		    </params>
+		</addon>
+		<meshfact name="tunnel">
+		    <plugin>crystalspace.mesh.loader.factory.thing</plugin>
+		    <params>
+			<curvecenter x="0" y="0" z="0" />
+			<curvescale>80</curvescale>
+			<curvecontrol x="5" y="2" z="0" u="1" v="0" />
+			...
+			<curve name="bez">b1</curve>
+		    </params>
+		</meshfact>
+	  should now become:
+		<meshfact name="tunnel">
+		    <plugin>crystalspace.mesh.loader.factory.thing</plugin>
+		    <params>
+			<curvecenter x="0" y="0" z="0" />
+			<curvescale>80</curvescale>
+			<curvecontrol x="5" y="2" z="0" u="1" v="0" />
+			...
+			<curve name="b1">
+		            <material>mosaic</material>
+			    <v>0</v> <v>1</v> <v>2</v>
+			    <v>3</v> <v>4</v> <v>5</v>
+			    <v>6</v> <v>7</v> <v>8</v>
+			</curve>
+		    </params>
+		</meshfact>
 5-Mar-2003
 	- Worked a bit further on blocks: now no longer uses gouraud shaded
 	  polygons.

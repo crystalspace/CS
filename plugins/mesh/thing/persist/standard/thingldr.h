@@ -66,6 +66,8 @@ private:
   csRef<iReporter> reporter;
   csStringHash xmltokens;
 
+  bool ParseCurve (iCurve* curve, iLoaderContext* ldr_context,
+  	iDocumentNode* node);
   bool LoadThingPart (iThingEnvironment* te,
   	iDocumentNode* node, iLoaderContext* ldr_context,
 	iObjectRegistry* object_reg, iReporter* reporter,
@@ -186,70 +188,6 @@ public:
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csPlaneSaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
-};
-
-/**
- * Bezier template loader.
- */
-class csBezierLoader : public iLoaderPlugin
-{
-private:
-  iObjectRegistry* object_reg;
-  csRef<iReporter> reporter;
-  csStringHash xmltokens;
-
-public:
-  SCF_DECLARE_IBASE;
-
-  /// Constructor.
-  csBezierLoader (iBase*);
-  /// Destructor.
-  virtual ~csBezierLoader ();
-
-  bool Initialize (iObjectRegistry* p);
-
-  /// Parse a given node and return a new object for it.
-  virtual csPtr<iBase> Parse (iDocumentNode* node,
-    iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csBezierLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
-};
-
-/**
- * Bezier template saver.
- */
-class csBezierSaver : public iSaverPlugin
-{
-private:
-  iObjectRegistry* object_reg;
-  csRef<iReporter> reporter;
-
-public:
-  SCF_DECLARE_IBASE;
-
-  /// Constructor.
-  csBezierSaver (iBase*);
-  /// Destructor.
-  virtual ~csBezierSaver ();
-
-  bool Initialize (iObjectRegistry* p);
-
-  /// Write down given object and add to string vector.
-  virtual void WriteDown (iBase *obj, iFile *file);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csBezierSaver);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize (p); }
   } scfiComponent;

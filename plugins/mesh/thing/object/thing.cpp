@@ -1062,17 +1062,12 @@ void csThing::AddCurve (csCurve *curve)
   bbox = NULL;
 }
 
-iCurve *csThing::CreateCurve (iCurveTemplate *tmpl)
+iCurve *csThing::CreateCurve ()
 {
-  iCurve *curve = tmpl->MakeCurve ();
-  csCurve *c = curve->GetOriginalObject ();
+  csCurve *c = new csBezierCurve (thing_type);
   c->SetParentThing (this);
-
-  int i;
-  for (i = 0; i < tmpl->GetVertexCount (); i++)
-    curve->SetControlPoint (i, tmpl->GetVertex (i));
   AddCurve (c);
-  return curve;
+  return &(c->scfiCurve);
 }
 
 int csThing::FindCurveIndex (iCurve *curve) const
@@ -2878,7 +2873,10 @@ void csThing::MergeTemplate (
   for (i = 0; i < tpl->GetCurveCount (); i++)
   {
     iCurve *orig_curve = tpl->GetCurve (i);
-    iCurve *p = CreateCurve (orig_curve->GetParentTemplate ());
+    iCurve *p = CreateCurve ();
+    int j;
+    for (j = 0 ; j < orig_curve->GetVertexCount () ; j++)
+      p->SetVertex (j, orig_curve->GetVertex (j));
     p->QueryObject ()->SetName (orig_curve->QueryObject ()->GetName ());
     if (orig_curve->GetMaterial ())
       p->SetMaterial (orig_curve->GetMaterial ());
@@ -3044,7 +3042,6 @@ csThingObjectType::csThingObjectType (
 csThingObjectType::~csThingObjectType ()
 {
   ClearPolyTxtPlanes ();
-  ClearCurveTemplates ();
   delete render_pol2d_pool;
   delete lightpatch_pool;
 }
@@ -3077,7 +3074,6 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
 void csThingObjectType::Clear ()
 {
   ClearPolyTxtPlanes ();
-  ClearCurveTemplates ();
   delete lightpatch_pool;
   delete render_pol2d_pool;
   lightpatch_pool = new csLightPatchPool ();
@@ -3106,21 +3102,6 @@ iPolyTxtPlane *csThingObjectType::FindPolyTxtPlane (const char *name)
   return planes.FindByName (name);
 }
 
-csPtr<iCurveTemplate> csThingObjectType::CreateBezierTemplate (const char *name)
-{
-  csBezierTemplate *ptemplate = new csBezierTemplate (this);
-  if (name) ptemplate->SetName (name);
-  csRef<iCurveTemplate> tmp = SCF_QUERY_INTERFACE (ptemplate, iCurveTemplate);
-  curve_templates.Push (tmp);
-  tmp->DecRef ();
-  return csPtr<iCurveTemplate> (tmp);
-}
-
-iCurveTemplate *csThingObjectType::FindCurveTemplate (const char *name)
-{
-  return curve_templates.FindByName (name);
-}
-
 void csThingObjectType::RemovePolyTxtPlane (iPolyTxtPlane *pl)
 {
   int i;
@@ -3135,28 +3116,9 @@ void csThingObjectType::RemovePolyTxtPlane (iPolyTxtPlane *pl)
   }
 }
 
-void csThingObjectType::RemoveCurveTemplate (iCurveTemplate *ct)
-{
-  int i;
-  for (i = 0; i < curve_templates.Length (); i++)
-  {
-    iCurveTemplate *cti = curve_templates[i];
-    if (ct == cti)
-    {
-      curve_templates.Delete (i);
-      return ;
-    }
-  }
-}
-
 void csThingObjectType::ClearPolyTxtPlanes ()
 {
   planes.DeleteAll ();
-}
-
-void csThingObjectType::ClearCurveTemplates ()
-{
-  curve_templates.DeleteAll ();
 }
 
 void csThingObjectType::Warn (const char *description, ...)

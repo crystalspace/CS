@@ -163,9 +163,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csCurve::eiVertexBufferManagerClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 #endif // CS_USE_NEW_RENDERER
 
-csCurve::csCurve (csCurveTemplate *parent_tmpl, csThingObjectType* thing_type) :
+csCurve::csCurve (csThingObjectType* thing_type) :
   csObject(),
-  CurveTemplate(parent_tmpl),
   LightPatches(NULL),
   O2W(NULL),
   uv2World(NULL),
@@ -852,14 +851,9 @@ void csCurve::HardTransform (const csReversibleTransform &/*trans*/ )
 {
   /// @@@ where must the transformation be used???
   int i;
-  for (i = 0; i < GetParentTemplate ()->GetVertexCount (); i++)
-    SetControlPoint (i, GetParentTemplate ()->GetVertex (i));
+  for (i = 0; i < GetVertexCount (); i++)
+    SetControlPoint (i, GetVertex (i));
   if (uv2World) CalcUVBuffers ();
-}
-
-iCurveTemplate *csCurve::Curve::GetParentTemplate ()
-{
-  return &(scfParent->GetParentTemplate ()->scfiCurveTemplate);
 }
 
 #ifndef CS_USE_NEW_RENDERER
@@ -873,43 +867,9 @@ void csCurve::eiVertexBufferManagerClient::ManagerClosing ()
 }
 #endif // CS_USE_NEW_RENDERER
 
-// --- csCurveTemplate -------------------------------------------------------
-SCF_IMPLEMENT_IBASE_EXT(csCurveTemplate)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iCurveTemplate)
-  SCF_IMPLEMENTS_INTERFACE(csCurveTemplate)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csCurveTemplate::CurveTemplate)
-  SCF_IMPLEMENTS_INTERFACE(iCurveTemplate)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csCurveTemplate::csCurveTemplate (csThingObjectType* thing_type) :
-  csObject()
-{
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCurveTemplate);
-  thing_type->engine->AddToCurrentRegion (this);
-  csCurveTemplate::thing_type = thing_type;
-}
-
-csCurveTemplate::~csCurveTemplate ()
-{
-}
-
-void csCurveTemplate::SetMaterial (iMaterialWrapper *m)
-{
-  Material = m;
-}
-
 // --- code for Bezier curves follows ----------------------------------------
 
-// This SCF goop should not be necessary, but without it, the buggy NextStep
-// compiler incorrectly calls csObject::QueryInterface() rather than correctly
-// calling csCurveTemplate::QueryInterface().
-SCF_IMPLEMENT_IBASE_EXT(csBezierTemplate)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-csCurveTesselated *csBezierCurve::Tesselate (
-  int res)
+csCurveTesselated *csBezierCurve::Tesselate (int res)
 {
   if (res < 2)
     res = 2;
@@ -1007,8 +967,8 @@ void csBezierCurve::GetObjectBoundingBox (csBox3 &bbox)
   bbox = object_bbox;
 }
 
-csBezierCurve::csBezierCurve (csBezierTemplate *parent_tmpl,
-	csThingObjectType* thing_type) : csCurve(parent_tmpl, thing_type)
+csBezierCurve::csBezierCurve (csThingObjectType* thing_type)
+	: csCurve (thing_type)
 {
   int i, j;
   for (i = 0; i < 3; i++)
@@ -1021,6 +981,8 @@ csBezierCurve::csBezierCurve (csBezierTemplate *parent_tmpl,
   previous_tesselation = NULL;
   previous_resolution = -1;
   valid_bbox = false;
+
+  for (i = 0; i < 9; i++) ver_id[i] = 0;
 }
 
 csBezierCurve::~csBezierCurve ()
@@ -1085,32 +1047,19 @@ void csBezierCurve::HardTransform (const csReversibleTransform &trans)
   csCurve::HardTransform (trans);
 }
 
-//------------------------------------------------------------------
-csBezierTemplate::csBezierTemplate (csThingObjectType* thing_type) :
-  csCurveTemplate(thing_type)
-{
-  int i;
-  for (i = 0; i < 9; i++) ver_id[i] = 0;
-}
-
-void csBezierTemplate::SetVertex (int index, int ver_ind)
+void csBezierCurve::SetVertex (int index, int ver_ind)
 {
   ver_id[index] = ver_ind;
+  SetControlPoint (index, ver_ind);
 }
 
-int csBezierTemplate::GetVertex (int index)
+int csBezierCurve::GetVertex (int index)
 {
   return ver_id[index];
 }
 
-int csBezierTemplate::GetVertexCount ()
+int csBezierCurve::GetVertexCount ()
 {
   return 9;
 }
 
-csCurve *csBezierTemplate::MakeCurve ()
-{
-  csBezierCurve *p = new csBezierCurve (this, thing_type);
-  p->SetMaterial (Material);
-  return p;
-}

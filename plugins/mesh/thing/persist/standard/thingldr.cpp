@@ -123,30 +123,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csPlaneSaver::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_IBASE (csBezierLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csBezierSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csThingLoader)
 SCF_IMPLEMENT_FACTORY (csThingSaver)
 SCF_IMPLEMENT_FACTORY (csPlaneLoader)
 SCF_IMPLEMENT_FACTORY (csPlaneSaver)
-SCF_IMPLEMENT_FACTORY (csBezierLoader)
-SCF_IMPLEMENT_FACTORY (csBezierSaver)
 
 SCF_EXPORT_CLASS_TABLE (thingldr)
   SCF_EXPORT_CLASS (csThingLoader, "crystalspace.mesh.loader.factory.thing",
@@ -161,10 +141,6 @@ SCF_EXPORT_CLASS_TABLE (thingldr)
     "Crystal Space Thing Plane Loader")
   SCF_EXPORT_CLASS (csPlaneSaver, "crystalspace.mesh.saver.thing.plane",
     "Crystal Space Thing Plane Saver")
-  SCF_EXPORT_CLASS (csBezierLoader, "crystalspace.mesh.loader.thing.bezier",
-    "Crystal Space Thing Bezier Loader")
-  SCF_EXPORT_CLASS (csBezierSaver, "crystalspace.mesh.saver.thing.bezier",
-    "Crystal Space Thing Bezier Saver")
 SCF_EXPORT_CLASS_TABLE_END
 
 #define MAXLINE 200 /* max number of chars per line... */
@@ -206,6 +182,62 @@ bool csThingLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("texlen", XMLTOKEN_TEXLEN);
   xmltokens.Register ("vistree", XMLTOKEN_VISTREE);
   xmltokens.Register ("v", XMLTOKEN_V);
+  return true;
+}
+
+bool csThingLoader::ParseCurve (iCurve* curve, iLoaderContext* ldr_context,
+	iDocumentNode* node)
+{
+  int num_v = 0;
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_MATERIAL:
+	{
+	  const char* matname = child->GetContentsValue ();
+          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+          if (mat == NULL)
+          {
+	    synldr->ReportError (
+	      "crystalspace.bezierloader.parse.material",
+              child, "Couldn't find material named '%s'!", matname);
+            return false;
+          }
+          curve->SetMaterial (mat);
+	}
+        break;
+      case XMLTOKEN_V:
+        {
+          if (num_v >= 9)
+          {
+	    synldr->ReportError (
+	      "crystalspace.bezierloader.parse.vertices",
+              child, "Wrong number of vertices to bezier! Should be 9!");
+            return false;
+          }
+	  curve->SetVertex (num_v, child->GetContentsValueAsInt ());
+	  num_v++;
+        }
+        break;
+      default:
+	synldr->ReportBadToken (child);
+	return false;
+    }
+  }
+  
+  if (num_v != 9)
+  {
+    synldr->ReportError (
+      "crystalspace.bezierloader.parse.vertices",
+      node, "Wrong number of vertices to bezier! %d should be 9!", num_v);
+    return false;
+  }
   return true;
 }
 
@@ -387,12 +419,10 @@ Nag to Jorrit about this feature if you want it.");
 
       case XMLTOKEN_CURVE:
         {
-	  const char* cname = child->GetContentsValue ();
-	  iCurveTemplate* ct = te->FindCurveTemplate (cname);
-	  iCurve* p = thing_state->CreateCurve (ct);
-	  p->QueryObject()->SetName (cname);
-          if (!ct->GetMaterial ())
-	    p->SetMaterial (info.default_material);
+	  iCurve* p = thing_state->CreateCurve ();
+	  p->QueryObject()->SetName (child->GetAttributeValue ("name"));
+	  if (!ParseCurve (p, ldr_context, child))
+	    return false;
         }
         break;
 
@@ -706,131 +736,3 @@ void csPlaneSaver::WriteDown (iBase* /*obj*/, iFile* /*file*/)
 {
 }
 
-//---------------------------------------------------------------------------
-
-csBezierLoader::csBezierLoader (iBase* pParent)
-{
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-}
-
-csBezierLoader::~csBezierLoader ()
-{
-}
-
-bool csBezierLoader::Initialize (iObjectRegistry* object_reg)
-{
-  csBezierLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  xmltokens.Register ("v", XMLTOKEN_V);
-  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
-  xmltokens.Register ("name", XMLTOKEN_NAME);
-  return true;
-}
-
-csPtr<iBase> csBezierLoader::Parse (iDocumentNode* node,
-			      iLoaderContext* ldr_context, iBase* /*context*/)
-{
-  csRef<iSyntaxService> synldr (CS_QUERY_REGISTRY (object_reg, iSyntaxService));
-
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.thing", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.thing",
-    	iMeshObjectType);
-  }
-  if (!type)
-  {
-    synldr->ReportError (
-		"crystalspace.thingloader.setup.objecttype",
-		node, "Could not load the thing mesh object plugin!");
-    return NULL;
-  }
-  csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (type,
-  	iThingEnvironment);
-  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-
-  csRef<iCurveTemplate> tmpl (te->CreateBezierTemplate ());
-  iMaterialWrapper* mat = NULL;
-
-  int num_v = 0;
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext ())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_NAME:
-	tmpl->QueryObject()->SetName (child->GetContentsValue ());
-        break;
-      case XMLTOKEN_MATERIAL:
-	{
-	  const char* matname = child->GetContentsValue ();
-          mat = ldr_context->FindMaterial (matname);
-          if (mat == NULL)
-          {
-	    synldr->ReportError (
-	      "crystalspace.bezierloader.parse.material",
-              child, "Couldn't find material named '%s'!", matname);
-            return NULL;
-          }
-          tmpl->SetMaterial (mat);
-	}
-        break;
-      case XMLTOKEN_V:
-        {
-          if (num_v >= 9)
-          {
-	    synldr->ReportError (
-	      "crystalspace.bezierloader.parse.vertices",
-              child, "Wrong number of vertices to bezier! Should be 9!");
-            return NULL;
-          }
-	  tmpl->SetVertex (num_v, child->GetContentsValueAsInt ());
-	  num_v++;
-        }
-        break;
-      default:
-	synldr->ReportBadToken (child);
-	return NULL;
-    }
-  }
-  
-  if (num_v != 9)
-  {
-    synldr->ReportError (
-      "crystalspace.bezierloader.parse.vertices",
-      node, "Wrong number of vertices to bezier! %d should be 9!", num_v);
-    return NULL;
-  }
-  return csPtr<iBase> (tmpl);
-}
-
-//---------------------------------------------------------------------------
-
-csBezierSaver::csBezierSaver (iBase* pParent)
-{
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-}
-
-csBezierSaver::~csBezierSaver ()
-{
-}
-
-bool csBezierSaver::Initialize (iObjectRegistry* object_reg)
-{
-  csBezierSaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  return true;
-}
-
-void csBezierSaver::WriteDown (iBase* /*obj*/, iFile* /*file*/)
-{
-}

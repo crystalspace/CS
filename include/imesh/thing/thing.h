@@ -31,13 +31,11 @@ struct iPortal;
 struct iGraphics3D;
 struct iFrustumView;
 struct iCurve;
-struct iCurveTemplate;
 struct iMaterialWrapper;
 struct iMaterialList;
 struct iMovable;
 struct iObject;
 struct iPolyTxtPlane;
-struct iCurveTemplate;
 struct csFog;
 
 /**
@@ -62,7 +60,7 @@ struct csFog;
 #define CS_THING_MOVE_OFTEN 1
 #define CS_THING_MOVE_OCCASIONAL 2
 
-SCF_VERSION (iThingState, 0, 3, 1);
+SCF_VERSION (iThingState, 0, 4, 0);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -226,8 +224,8 @@ struct iThingState : public iBase
   /// Clear all curve vertices (and texels too).
   virtual void ClearCurveVertices () = 0;
 
-  /// Create a new curve for this thing from the given template.
-  virtual iCurve* CreateCurve (iCurveTemplate* tmpl) = 0;
+  /// Create a new curve for this thing.
+  virtual iCurve* CreateCurve () = 0;
   /// Find the index for a curve. Returns -1 if curve cannot be found.
   virtual int FindCurveIndex (iCurve* curve) const = 0;
   /// Delete a curve given an index.
@@ -305,7 +303,7 @@ struct iThingState : public iBase
   virtual void SetCosinusFactor (float cosfact) = 0;
 };
 
-SCF_VERSION (iThingEnvironment, 0, 1, 1);
+SCF_VERSION (iThingEnvironment, 0, 2, 0);
 
 /**
  * This interface is implemented by the iObjectType for things.
@@ -328,19 +326,10 @@ struct iThingEnvironment : public iBase
   virtual csPtr<iPolyTxtPlane> CreatePolyTxtPlane (const char* name = NULL) = 0;
   /// Find a plane with the given name.
   virtual iPolyTxtPlane* FindPolyTxtPlane (const char* name) = 0;
-  /// Create a bezier template with the given name.
-  virtual csPtr<iCurveTemplate> CreateBezierTemplate (
-  	const char* name = NULL) = 0;
-  /// Find a bezier template.
-  virtual iCurveTemplate* FindCurveTemplate (const char *iName) = 0;
   /// Remove the given polygon texture mapping plane.
   virtual void RemovePolyTxtPlane (iPolyTxtPlane* pl) = 0;
-  /// Remove the given curve template.
-  virtual void RemoveCurveTemplate (iCurveTemplate* ct) = 0;
   /// Remove all polygon texture mapping planes.
   virtual void ClearPolyTxtPlanes () = 0;
-  /// Remove all curve templates.
-  virtual void ClearCurveTemplates () = 0;
 
   /// Return the current lightmap cell size
   virtual int GetLightmapCellSize () const = 0;

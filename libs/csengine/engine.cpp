@@ -2862,19 +2862,6 @@ bool csEngine::RemoveObject (iBase *object)
       return true;
     }
   }
-  {
-    csRef<iCurveTemplate> ct (SCF_QUERY_INTERFACE (object, iCurveTemplate));
-    if (ct)
-    {
-      if (region) region->QueryObject ()->ObjRemove (ct->QueryObject ());
-
-      csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (
-          GetThingType (),
-          iThingEnvironment));
-      te->RemoveCurveTemplate (ct);
-      return true;
-    }
-  }
 
   return false;
 }
