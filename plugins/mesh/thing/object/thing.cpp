@@ -1161,6 +1161,14 @@ iRenderBuffer* csThingStatic::GetRenderBuffer (csStringID name)
   {
     return index_buffer;
   }
+  else if (name == tangent_name)
+  {
+    return tangent_buffer;
+  }
+  else if (name == binormal_name)
+  {
+    return binormal_buffer;
+  }
   else
   {
     return 0;
@@ -1284,16 +1292,15 @@ void csThingStatic::FillRenderMeshes (
          But it's simpler for now :)
        */
       csVector3 tex_t0 = transform.This2Other (csVector3 (0, 0, 0));
-      csVector3 tex_t1 = transform.This2Other (csVector3 (0, 1, 0));
+      csVector3 tex_t1 = transform.This2Other (csVector3 (1, 0, 0));
       csVector3 tangent (tex_t1 - tex_t0);
       tangent.Normalize ();
 
       /*
-        Calculate the 'binormal' vector of this poly, needed for dot3.
-        It's simply the cross product of the tangent and the normal.
+      Calculate the 'binormal' vector of this poly, needed for dot3.
       */
-      
-      csVector3 binormal (tangent % polynormal);
+      tex_t1 = transform.This2Other (csVector3 (0, 1, 0));
+      csVector3 binormal (tex_t1 - tex_t0);
       binormal.Normalize ();
 
       // First, fill the normal/texel/vertex buffers.

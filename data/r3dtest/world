@@ -46,24 +46,51 @@
         <texture name="CRETE3_CEIL02A">
             <file>/lib/stdtex/blobby.jpg</file>
         </texture>
+        <texture name="CRETE3_CEIL02A_NORM">
+            <file>/lib/stdtex/blobbyDOT3.png</file>
+        </texture>
+        
         <texture name="CRETE2_FLR01">
             <file>/lib/stdtex/blobby.jpg</file>
         </texture>
+        <texture name="CRETE2_FLR01_NORM">
+            <file>/lib/stdtex/blobbyDOT3.png</file>
+        </texture>
+        
         <texture name="C2A1_W1">
             <file>/lib/stdtex/oldbrick.jpg</file>
         </texture>
+        <texture name="C2A1_W1_NORM">
+            <file>/lib/stdtex/oldbrickDOT3.png</file>
+        </texture>
+        
         <texture name="CRATE02B">
             <file>/lib/stdtex/parket.jpg</file>
         </texture>
+        <texture name="CRATE02B_NORM">
+            <file>/lib/stdtex/parketDOT3.png</file>
+        </texture>
+
         <texture name="CRATE02">
             <file>/lib/stdtex/parket.jpg</file>
         </texture>
+        <texture name="CRATE02_NORM">
+            <file>/lib/stdtex/parketDOT3.png</file>
+        </texture>
+
         <texture name="{GRATE2A">
             <file>/lib/stdtex/oldmetal.jpg</file>
             <transparent red="0" green="0" blue="1" />
         </texture>
+        <texture name="{GRATE2A_NORM">
+            <file>/lib/stdtex/oldmetalDOT3.png</file>
+        </texture>
+
         <texture name="C2A2_SATORB">
             <file>/lib/stdtex/bricks.jpg</file>
+        </texture>
+        <texture name="C2A2_SATORB_NORM">
+            <file>/lib/stdtex/bricksDOT3.png</file>
         </texture>
     </textures>
     <shaders>
@@ -71,41 +98,48 @@
 	<shader><file>/shader/light.xml</file></shader>
     </shaders>
     <materials>
-        <material name="CRETE3_CEIL02A">
-            <texture>CRETE3_CEIL02A</texture>
-	    <shader type="ambient">ambient</shader>
-	    <shader type="diffuse">light</shader>
-        </material>
-        <material name="CRETE2_FLR01">
-            <texture>CRETE2_FLR01</texture>
-	    <shader type="ambient">ambient</shader>
-	    <shader type="diffuse">light</shader>
-        </material>
-        <material name="C2A1_W1">
-            <texture>C2A1_W1</texture>
-	    <shader type="ambient">ambient</shader>
-	    <shader type="diffuse">light</shader>
-        </material>
-        <material name="CRATE02B">
-            <texture>CRATE02B</texture>
-	    <shader type="ambient">ambient</shader>
-	    <shader type="diffuse">light</shader>
-        </material>
-        <material name="CRATE02">
-            <texture>CRATE02</texture>
-	    <shader type="ambient">ambient</shader>
-	    <shader type="diffuse">light</shader>
-        </material>
-        <material name="{GRATE2A">
-            <texture>{GRATE2A</texture>
-	    <shader type="ambient">ambient</shader>
-	    <shader type="diffuse">light</shader>
-        </material>
-        <material name="C2A2_SATORB">
-            <texture>C2A2_SATORB</texture>
-	    <shader type="ambient">ambient</shader>
-	    <shader type="diffuse">light</shader>
-        </material>
+      <material name="CRETE3_CEIL02A">
+        <texture>CRETE3_CEIL02A</texture>
+        <shaderparam name="tex normal" type="texture">CRETE3_CEIL02A_NORM</shaderparam>
+        <shader type="ambient">ambient</shader>
+        <shader type="diffuse">light</shader>
+      </material>
+      <material name="CRETE2_FLR01">
+        <texture>CRETE2_FLR01</texture>
+        <shaderparam name="tex normal" type="texture">CRETE2_FLR01_NORM</shaderparam>
+        <shader type="ambient">ambient</shader>
+        <shader type="diffuse">light</shader>
+      </material>
+      <material name="C2A1_W1">
+        <texture>C2A1_W1</texture>
+        <shaderparam name="tex normal" type="texture">C2A1_W1_NORM</shaderparam>
+        <shader type="ambient">ambient</shader>
+        <shader type="diffuse">light</shader>
+      </material>
+      <material name="CRATE02B">
+        <texture>CRATE02B</texture>
+        <shaderparam name="tex normal" type="texture">CRATE02B_NORM</shaderparam>
+        <shader type="ambient">ambient</shader>
+        <shader type="diffuse">light</shader>
+      </material>
+      <material name="CRATE02">
+        <texture>CRATE02</texture>
+        <shaderparam name="tex normal" type="texture">CRATE02_NORM</shaderparam>
+        <shader type="ambient">ambient</shader>
+        <shader type="diffuse">light</shader>
+      </material>
+      <material name="{GRATE2A">
+        <texture>{GRATE2A</texture>
+        <shaderparam name="tex normal" type="texture">{GRATE2A_NORM</shaderparam>
+        <shader type="ambient">ambient</shader>
+        <shader type="diffuse">light</shader>
+      </material>
+      <material name="C2A2_SATORB">
+        <texture>C2A2_SATORB</texture>
+        <shaderparam name="tex normal" type="texture">C2A2_SATORB_NORM</shaderparam>
+        <shader type="ambient">ambient</shader>
+        <shader type="diffuse">light</shader>
+      </material>
     </materials>
     <renderpriorities>
         <priority name="sky">
@@ -851,11 +885,11 @@
             <radius>5</radius>
             <color red="1.5625" green="1.5625" blue="0.784314" />
         </light>
-        <light>
+        <!--<light>
             <center x="1.8" y="-12" z="-8.2" />
             <radius>5</radius>
             <color red="1.5625" green="0.784314" blue="0.392157" />
-        </light>
+        </light>-->
         <meshobj name="e6">
             <plugin>thing</plugin>
             <zuse />

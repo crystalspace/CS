@@ -93,6 +93,8 @@ public:
 			    int vt_offset);
   virtual bool ParseGradient (iDocumentNode* node,
 			      csGradient& gradient);
+  virtual bool ParseShaderParam (iDocumentNode* node,
+                                 csShaderVariable* var);
 
   virtual void ReportError (const char* msgid, iDocumentNode* errornode,
 	const char* msg, ...);

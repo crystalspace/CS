@@ -449,6 +449,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   csArray<csStringID> shadertypes;
   //csArray<iShader*> shaders;
   csArray<iShaderWrapper*> shaders;
+  csRefArray<csShaderVariable> shadervars;
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, "crystalspace.renderer.stringset", iStringSet);
@@ -626,6 +627,31 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
         }
 #endif //CS_USE_NEW_RENDERER
         break;
+      case XMLTOKEN_SHADERPARAM:
+#ifdef CS_USE_NEW_RENDERER
+        {
+          csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (object_reg,
+            iShaderManager);
+          if (!shaderMgr)
+          {
+            ReportNotify ("iShaderManager not found, ignoring shaderparam!");
+            break;
+          }
+          //create a new variable
+          const char* varname = child->GetAttributeValue ("name");
+          csRef<csShaderVariable> var = 
+            shaderMgr->CreateVariable (strings->Request (varname));
+
+          if (!SyntaxService->ParseShaderParam (child, var))
+          {
+            ReportNotify ("Error loading shader parameter '%s' in material '%s'.", 
+              varname, matname);
+            break;
+          }
+          shadervars.Push (var);
+        }
+#endif //CS_USE_NEW_RENDERER
+        break;
       default:
 	SyntaxService->ReportBadToken (child);
 	return 0;
@@ -686,9 +712,12 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
     mat->QueryObject()->SetName (matname);
   }
 #ifdef CS_USE_NEW_RENDERER
-  for (int i=0; i<shaders.Length (); i++)
+  int i;
+  for (i=0; i<shaders.Length (); i++)
     //if (shaders[i]->Prepare ())
       material->SetShader (shadertypes[i], shaders[i]);
+  for (i=0; i<shadervars.Length (); i++)
+    material->AddVariable (shadervars[i]);
 #endif // CS_USE_NEW_RENDERER
   // dereference material since mat already incremented it
 

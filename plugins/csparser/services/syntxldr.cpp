@@ -31,6 +31,7 @@
 #include "csgeom/vector2.h"
 #include "csgeom/transfrm.h"
 #include "csgfx/gradient.h"
+#include "csgfx/shadervar.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "iengine/engine.h"
@@ -136,7 +137,7 @@ enum
   XMLTOKEN_LEFT,
   XMLTOKEN_RIGHT,
   //XMLTOKEN_COLOR,
-  XMLTOKEN_POS
+  XMLTOKEN_POS,
 };
 
 csTextSyntaxService::csTextSyntaxService (iBase *parent)
@@ -218,6 +219,14 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("left", XMLTOKEN_LEFT);
   xmltokens.Register ("right", XMLTOKEN_RIGHT);
   xmltokens.Register ("pos", XMLTOKEN_POS);
+
+  xmltokens.Register("integer", 1000+csShaderVariable::INT);
+  xmltokens.Register("float", 1000+csShaderVariable::FLOAT);
+  xmltokens.Register("string", 1000+csShaderVariable::STRING);
+  xmltokens.Register("vector2", 1000+csShaderVariable::VECTOR2);
+  xmltokens.Register("vector3", 1000+csShaderVariable::VECTOR3);
+  xmltokens.Register("vector4", 1000+csShaderVariable::VECTOR4);
+  xmltokens.Register("texture", 1000+csShaderVariable::TEXTURE);
   return true;
 }
 
@@ -1201,6 +1210,83 @@ bool csTextSyntaxService::ParseGradient (iDocumentNode* node,
   }
   return true;
 }
+
+bool csTextSyntaxService::ParseShaderParam (iDocumentNode* node,
+                       csShaderVariable* var)
+{
+  const char *type = node->GetAttributeValue("type");
+  if (!type)
+    return false;
+  csStringID idtype = xmltokens.Request (type);
+  idtype -= 1000;
+  var->SetType ((csShaderVariable::VariableType) idtype);
+  switch (idtype)
+  {
+  case csShaderVariable::INT:
+    var->SetValue (node->GetContentsValueAsInt ());
+    break;
+  case csShaderVariable::FLOAT:
+    var->SetValue (node->GetContentsValueAsFloat ());
+    break;
+  case csShaderVariable::STRING:
+    var->SetValue (new scfString(node->GetContentsValueAsFloat ()));
+    break;
+  case csShaderVariable::VECTOR2:
+    {
+      const char* def = node->GetContentsValue ();
+      csVector2 v;
+      sscanf (def, "%f,%f", &v.x, &v.y);
+      var->SetValue (v);
+    }
+    break;
+  case csShaderVariable::VECTOR3:
+    {
+      const char* def = node->GetContentsValue ();
+      csVector3 v;
+      sscanf (def, "%f,%f,%f", &v.x, &v.y, &v.z);
+      var->SetValue (v);
+    }
+    break;
+  case csShaderVariable::VECTOR4:
+    {
+      const char* def = node->GetContentsValue ();
+      csVector4 v;
+      sscanf (def, "%f,%f,%f,%f", &v.x, &v.y, &v.z, &v.w);
+      var->SetValue (v);
+    }
+    break;
+  case csShaderVariable::TEXTURE:
+    {
+      // @@@ This should be done in a better way...
+      csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
+      if (eng)
+      {
+        const char* texname = node->GetContentsValue ();
+        csRef<iTextureWrapper> tex = eng->FindTexture (texname);
+        if (tex)
+        {
+          var->SetValue (tex);
+        } else {
+          Report (
+            "crystalspace.syntax.shadervariable",
+            CS_REPORTER_SEVERITY_WARNING,
+            node,
+            "Texture '%s' not found.", texname);
+        }
+      } else {
+        Report (
+          "crystalspace.syntax.shadervariable",
+          CS_REPORTER_SEVERITY_WARNING,
+          node,
+          "Engine not found.");
+      }
+    }
+    break;
+  }
+
+  return true;
+}
+
 
 void csTextSyntaxService::ReportError (const char* msgid,
 	iDocumentNode* errornode, const char* msg, ...)

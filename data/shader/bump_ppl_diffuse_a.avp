@@ -1,0 +1,79 @@
+  <arbvp>
+  <variablemap variable="STANDARD_LIGHT_0_POSITION" register="0"/>
+  <variablemap variable="STANDARD_LIGHT_0_DIFFUSE" register="1"/>
+  <variablemap variable="STANDARD_LIGHT_0_SPECULAR" register="2"/>
+  <variablemap variable="STANDARD_LIGHT_0_ATTENUATION" register="3"/>
+  
+  <variablemap variable="mat diffuse" register="4"/>
+  <variablemap variable="mat ambient" register="5"/>
+  <variablemap variable="mat reflection" register="6"/>
+  <variablemap variable="mat flatcolor" register="7"/>
+  
+  <variablemap variable="mat specular" register="8"/>
+  <program>
+    <![CDATA[
+      !!ARBvp1.0
+      #---------------------------------------
+      # Simple Vertex Lighting Program
+      #---------------------------------------
+      #Parameter definition
+      PARAM mv[4]	     	= { state.matrix.modelview };
+      PARAM mvi[4]	 	= { state.matrix.modelview.inverse };
+      PARAM mvp[4]	     	= { state.matrix.mvp };
+      PARAM lightPos   		= program.local[0];
+      PARAM lightDiffuse 	= program.local[1];
+      PARAM lightSpecular 	= program.local[2];
+      PARAM lightAttenuation 	= program.local[3];
+      PARAM z 	= {0, 0, 1, 0};
+      
+      PARAM materialDiffuse	= program.local[4];
+      PARAM materialAmbient	= program.local[5];
+      PARAM materialReflection	= program.local[6];
+      PARAM materialFlatColor 	= program.local[7];
+      PARAM materialSpecular 	= program.local[8];
+      # Per vertex inputs
+      ATTRIB iPos		= vertex.position;
+      ATTRIB iCol0		= vertex.attrib[1];
+      ATTRIB iNorm		= vertex.attrib[2];
+      ATTRIB iTex0		= vertex.attrib[3];
+      ATTRIB iTang		= vertex.attrib[4];
+      ATTRIB iBiNorm	= vertex.attrib[5];
+      # Outputs
+      OUTPUT oPos		    = result.position;
+      OUTPUT oCol0		  = result.color;
+      OUTPUT oLightDir	= result.texcoord[0];
+      OUTPUT oNormal		= result.texcoord[1];
+      # Temporaries
+      TEMP objLight;
+      TEMP tangLight;
+      
+      #Transform vertex to viewspace
+      DP4 oPos.x, mvp[0], iPos;
+      DP4 oPos.y, mvp[1], iPos;
+      DP4 oPos.z, mvp[2], iPos;
+      DP4 oPos.w, mvp[3], iPos;
+      
+      #Transform light to object space
+      DP4 objLight.x, mvi[0], lightPos;
+      DP4 objLight.y, mvi[1], lightPos;
+      DP4 objLight.z, mvi[2], lightPos;
+      DP4 objLight.w, mvi[3], lightPos;
+
+      ADD objLight, objLight, -iPos;
+
+      #Transform light to tangent space
+      DP4 tangLight.x, iTang, objLight;
+      DP4 tangLight.y, iBiNorm, objLight;
+      DP4 tangLight.z, iNorm, objLight;
+      SGE tangLight.w, tangLight.x, tangLight.x;
+
+      #Just pass on normal
+      MOV oNormal, iTex0;
+      
+      #calculate vector from vertex to light in object-space
+      MOV oLightDir, tangLight;
+      
+      END
+    ]]>
+  </program>
+</arbvp>

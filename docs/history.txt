@@ -60,6 +60,11 @@ chronological order.
 	  indicates that the polygon mesh prefers to give a triangle mesh.
 	  Added this flag to all iPolygonMesh implementations that need
 	  this.
+	- Anders Stenberg added a ParseShaderParam to syntax services, and
+	  made material use this to load parameters. Other parts of the 
+	  shader system should also use this, but don't right now.
+	- Anders Stenberg added a bumpmapping shader, and fixed tangent
+	  and binormal calculations in thing.
 8-Sep-2003
 	- Jorrit added csgfx to the stdsteps renderloop plugin (for Jam).
 	- Jorrit did the following changes to bring new and old renderer

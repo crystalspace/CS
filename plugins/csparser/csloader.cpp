@@ -963,6 +963,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("casthwshadow", XMLTOKEN_CAST_HW_SHADOW);
   xmltokens.Register ("shaders", XMLTOKEN_SHADERS);
   xmltokens.Register ("shader", XMLTOKEN_SHADER);
+  xmltokens.Register ("shaderparam", XMLTOKEN_SHADERPARAM);
   xmltokens.Register ("renderloop", XMLTOKEN_RENDERLOOP);
 
   return true;

@@ -26,6 +26,7 @@
 #include "csutil/scf.h"
 #include "csutil/ref.h"
 
+class csShaderVariable;
 class csMatrix3;
 class csVector3;
 class csVector2;
@@ -161,6 +162,12 @@ struct iSyntaxService : public iBase
    */
   virtual bool ParseGradient (iDocumentNode* node,
 			      csGradient& gradient) = 0;
+
+  /**
+   * Parse a shader variable declaration
+   */
+  virtual bool ParseShaderParam (iDocumentNode* node,
+                                 csShaderVariable* var) = 0;
 			    
   /**
    * Report an error and also gives a path in the XML tree.
