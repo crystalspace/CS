@@ -21,7 +21,7 @@ Always help ;
 
 actions quietly PrintHelp
 {
-  # target width:12, description width:40
-  echo " jam ->$(<)             <- Build the =>$(>)                                        <=" | \
-    sed 's/->\(.............\).*<-/\1/;s/=>\(........................................\).*<=/\1/'
+  # target width:13, description width:51
+  echo "jam ->$(<)              <- Build the =>$(>)                                                   <=" | \
+    sed 's/->\(..............\).*<-/\1/;s/=>\(...................................................\).*<=/\1/'
 }
