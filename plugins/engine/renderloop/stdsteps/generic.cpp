@@ -137,10 +137,6 @@ SCF_IMPLEMENT_IBASE(csGenericRenderStep)
   SCF_IMPLEMENTS_INTERFACE(iLightRenderStep)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_IBASE(csGenericRenderStep::ViscullCallback)
-  SCF_IMPLEMENTS_INTERFACE(iVisibilityCullerListener)
-SCF_IMPLEMENT_IBASE_END
-
 csGenericRenderStep::csGenericRenderStep (
   iObjectRegistry* object_reg)
 {
@@ -293,25 +289,3 @@ csZBufMode csGenericRenderStep::GetZBufMode ()
   return zmode;
 }
 
-csGenericRenderStep::ViscullCallback::ViscullCallback (iRenderView *rview, 
-                                                       iObjectRegistry *objreg)
-                                                       : meshList (objreg)
-{
-  SCF_CONSTRUCT_IBASE(0);
-  ViscullCallback::rview = rview;
-}
-
-csGenericRenderStep::ViscullCallback::~ViscullCallback()
-{
-  SCF_DESTRUCT_IBASE();
-}
-
-void csGenericRenderStep::ViscullCallback::ObjectVisible (
-  iVisibilityObject *visobject, iMeshWrapper *mesh)
-{
-  if (!mesh->GetMeshObject ()->DrawTest (rview, mesh->GetMovable ())) return;
-
-  int num;
-  csRenderMesh** meshes = mesh->GetRenderMeshes (num);
-  meshList.AddRenderMeshes (meshes, num, mesh->GetRenderPriority ());
-}

@@ -19,6 +19,10 @@ chronological order.
 	  dependency logic to fail.  The new method will allow scripting
 	  interfaces to correctly invoke RequestPlugins() once only with the
 	  full list of requested plugins.
+	- Jorrit removed some old callback code from the generic renderloop
+	  plugin.
+	- Jorrit removed some warnings from stdrep and also fixed a wrong
+	  printf statement (%0.77s is not valid).
 18-Dec-2003
 	- Jorrit added two new methods to iAwsComponent. One to set the
 	  preferred size and one to clear it again. This way one can forcibly

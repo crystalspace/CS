@@ -219,8 +219,11 @@ bool csReporterListener::Report (iReporter*, int severity,
         str.Truncate (linebreak);
         csPrintf ("  %s\n", str.GetData ());
         offset += linebreak+1;
-      } else {
-        csPrintf ("  %0.77s\n", str.GetData ());
+      }
+      else
+      {
+        //csPrintf ("  %0.77s\n", str.GetData ());
+        csPrintf ("  %.77s\n", str.GetData ());
         offset += 77;
       }
     }
@@ -293,8 +296,10 @@ bool csReporterListener::HandleEvent (iEvent& event)
 	    fnt->GetMaxSize (fw, fh);
 	    int fg = g2d->FindRGB (0, 0, 0);
             int bg[2] = {g2d->FindRGB (255, 255, 180),
-                         g2d->FindRGB (255*0.9, 255*0.9, 180*0.9)};
-            int sep = g2d->FindRGB (255*0.7, 255*0.7, 180*0.7);
+                         g2d->FindRGB (int (255*0.9), int (255*0.9),
+			 	int (180*0.9))};
+            int sep = g2d->FindRGB (int (255*0.7), int (255*0.7),
+	    	int (180*0.7));
 
 	    int max_l = (sh-4-6-4-6) / (fh+6);
 	    if (l > max_l) l = max_l;
@@ -311,13 +316,15 @@ bool csReporterListener::HandleEvent (iEvent& event)
                 g2d->DrawBox (4, 4+h*(fh+6), sw-8, fh+6, bg[c]);
                 g2d->DrawLine (4, 4+h*(fh+6), 4+sw-8-1, 4+h*(fh+6), sep);
                 g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], tm->msg);
-              } else {
+              }
+	      else
+	      {
                 csString msg (tm->msg+1);
                 int chars;
                 csString str;
                 str.Format ("  %s", msg.GetData ());
                 while ((chars = fnt->GetLength (str.GetData (), sw-20)) <
-                  msg.Length ())
+                  (int) msg.Length ())
                 {
                   str.Truncate (chars);
                   g2d->DrawBox (4, 4+h*(fh+6), sw-8, fh+6, bg[c]);
@@ -328,7 +335,9 @@ bool csReporterListener::HandleEvent (iEvent& event)
                     g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], 
                       str.GetData ());
                     msg = msg.GetData ()+linebreak-1;
-                  } else {
+                  }
+		  else
+		  {
                     g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], 
                       str.GetData ());
                     msg = msg.GetData ()+chars-2;

@@ -85,25 +85,6 @@ private:
   // This is a work array we use for getting all meshes.
   csArray<csRenderMesh*> meshes;
 
-  // helperclass for the visculling. this creates a list
-  // of meshes, which we later render
-  class ViscullCallback : public iVisibilityCullerListener
-  {
-  public:
-    SCF_DECLARE_IBASE;
-
-    ViscullCallback (iRenderView* rview, iObjectRegistry* objreg);
-    virtual ~ViscullCallback ();
-
-    void ObjectVisible (iVisibilityObject *visobject, 
-      iMeshWrapper *mesh);
-
-    csRenderMeshList meshList;
-
-  private:
-    iRenderView* rview;
-  };
-
 public:
   SCF_DECLARE_IBASE;
 
