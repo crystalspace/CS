@@ -7,14 +7,15 @@
 
 #include <stdio.h>
 
-static enum radiostate {none,speed,accel,position,rectangle,numparticle,particletime,addage};
+enum radiostate {none,speed,accel,position,rectangle,numparticle,particletime,addage};
 static radiostate r_state = none;
-static enum inputstate {nostate,textbox,scrollbar};
+enum inputstate {nostate,textbox,scrollbar};
 static inputstate i_state = nostate;
 
 awsSink * awsSink::asink = NULL;
 
-awsSink::awsSink() : wmgr(0), test(0),getinput1(0),getinput2(0),getinput3(0),getinput4(0)
+awsSink::awsSink() : wmgr(0), getinput1(0), getinput2(0), 
+  getinput3(0), getinput4(0), test(0)
 {
 	asink = this;
 	valueX = new float[5];

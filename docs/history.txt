@@ -5,6 +5,11 @@ The overall history is in reverse (descending) chronological order, so that
 each new day's apears before the previous day's entry.  The individual changes
 for each given day, however, are in normal (ascending) chronological order.
 
+26-Jul-2003
+	- Wouter Wijngaards fixed the partedit awssink.cpp file, removed
+	  'static' from enums and put initializers for a constructor
+	  in declaration order to remove compiler errors and warnings.
+
 25-Jul-2003
 	- Norman Kraemer fixed pythmod_setup.py for cases with no lib entries
 	  between the enclosing '--'.
