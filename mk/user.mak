@@ -50,7 +50,7 @@ PLUGINS += mesh/emit/object        mesh/emit/persist/classic
 PLUGINS += mesh/metaball/object    mesh/metaball/persist/classic
 PLUGINS += mesh/stars/object
 PLUGINS += mesh/thing/persist/classic
-PLUGINS += terrain/object/terrfunc terrain/loader/terrfunc
+PLUGINS += terrain/function/object terrain/function/persist/classic
 PLUGINS += motion/standard/object  motion/standard/persist/classic
 
 PLUGINS.DYNAMIC += engine/3d

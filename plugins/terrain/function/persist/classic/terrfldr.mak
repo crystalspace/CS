@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/terrain/loader/terrfunc
+vpath %.cpp plugins/terrain/function/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
   TERRFLDR = $(OUTDLL)terrfldr$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(TERRFLDR)
 endif
 
-INC.TERRFLDR = $(wildcard plugins/terrain/loader/terrfunc/*.h)
-SRC.TERRFLDR = $(wildcard plugins/terrain/loader/terrfunc/*.cpp)
+INC.TERRFLDR = $(wildcard plugins/terrain/function/persist/classic/*.h)
+SRC.TERRFLDR = $(wildcard plugins/terrain/function/persist/classic/*.cpp)
 OBJ.TERRFLDR = $(addprefix $(OUT),$(notdir $(SRC.TERRFLDR:.cpp=$O)))
 DEP.TERRFLDR = CSGEOM CSUTIL CSSYS CSUTIL
 

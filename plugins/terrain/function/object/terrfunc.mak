@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/terrain/object/terrfunc
+vpath %.cpp plugins/terrain/function/object
 
 ifeq ($(USE_PLUGINS),yes)
   TERRFUNC = $(OUTDLL)terrfunc$(DLL)
@@ -35,11 +35,11 @@ else
   TO_INSTALL.STATIC_LIBS += $(TERRFUNC)
 endif
 
-INC.TERRFUNC = $(wildcard plugins/terrain/object/terrfunc/*.h)
-SRC.TERRFUNC = $(wildcard plugins/terrain/object/terrfunc/*.cpp)
+INC.TERRFUNC = $(wildcard plugins/terrain/function/object/*.h)
+SRC.TERRFUNC = $(wildcard plugins/terrain/function/object/*.cpp)
 OBJ.TERRFUNC = $(addprefix $(OUT),$(notdir $(SRC.TERRFUNC:.cpp=$O)))
 DEP.TERRFUNC = CSGEOM CSUTIL CSSYS CSUTIL
-CFLAGS.TERRFUNC = $(CFLAGS.I)plugins/terrain/object/terrfunc
+CFLAGS.TERRFUNC = $(CFLAGS.I)plugins/terrain/function/object
 
 MSVC.DSP += TERRFUNC
 DSP.TERRFUNC.NAME = terrfunc
@@ -57,7 +57,7 @@ clean: terrfuncclean
 terrfuncclean:
 	-$(RM) $(TERRFUNC) $(OBJ.TERRFUNC)
 
-$(OUT)%$O: plugins/terrain/object/terrfunc/%.cpp
+$(OUT)%$O: plugins/terrain/function/object/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.TERRFUNC)
 
 # Some (broken) versions of GNU make appear to be sensitive to the order in
