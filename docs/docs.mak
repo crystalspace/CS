@@ -30,8 +30,8 @@
 #------------------------------------------------------------------------------
 
 # Target descriptions
-DESCRIPTION.devapi = developer API reference via Doc++
-DESCRIPTION.pubapi = public API reference via Doc++
+DESCRIPTION.devapi = developer API reference via Doxygen
+DESCRIPTION.pubapi = public API reference via Doxygen
 DESCRIPTION.htmldoc = documentation as HTML
 DESCRIPTION.dvidoc = documentation as DVI
 DESCRIPTION.psdoc = documentation as PostScript
@@ -89,11 +89,15 @@ DVIPS = dvips
 PS2PDF = ps2pdf
 MAKEINFO = makeinfo
 PWD = pwd
-DOCXX = doc++
+DOXYGEN = doxygen
 
 # Root of the entire Crystal Space manual.
 CSMANUAL_DIR  = docs/texinfo
 CSMANUAL_FILE = cs-unix.txi
+
+# Doxygen configuration files.
+DOXYGEN_PUBAPI = docs/support/pubapi.dox
+DOXYGEN_DEVAPI = docs/support/devapi.dox
 
 # Root of the target directory hierarchy.
 OUT.DOC = $(OUTBASE)docs
@@ -111,10 +115,6 @@ OUT.DOC.DVI     = $(OUT.DOC)/dvi
 OUT.DOC.PS      = $(OUT.DOC)/ps
 OUT.DOC.PDF     = $(OUT.DOC)/pdf
 OUT.DOC.INFO    = $(OUT.DOC)/info
-
-# Header files used to generate public API and developer API references.
-API.DEV.FILES = $(wildcard *.h */*.h */*/*.h */*/*/*.h */*/*/*/*.h)
-API.PUB.FILES = $(wildcard include/*.h include/*/*.h include/*/*/*.h)
 
 # List of potential image types understood by Texinfo's @image{} directive.
 DOC.IMAGE.EXTS = png jpg gif eps txt
@@ -238,18 +238,16 @@ endif
 endif
 
 # Rules to generate developer API documentation from all header files.
-$(OUT.DOC.API.DEV)/index.htm: $(OUT.DOC.API.DEV)
-	$(DOCXX) -F -j -H -d $(OUT.DOC.API.DEV) -f -x .htm $(API.DEV.FILES)
-	$(RM) $(OUT.DOC.API.DEV)/.*.htm # Buggy Doc++ junk.
+$(OUT.DOC.API.DEV)/index.html: $(OUT.DOC.API.DEV)
+	$(DOXYGEN) $(DOXYGEN_DEVAPI)
 
-devapi: $(OUT.DOC.API.DEV).CLEAN $(OUT.DOC.API.DEV)/index.htm
+devapi: $(OUT.DOC.API.DEV).CLEAN $(OUT.DOC.API.DEV)/index.html
 
 # Rules to generate public API documentation from public header files.
-$(OUT.DOC.API.PUB)/index.htm: $(OUT.DOC.API.PUB)
-	$(DOCXX) -F -j -H -d $(OUT.DOC.API.PUB) -f -x .htm $(API.PUB.FILES)
-	$(RM) $(OUT.DOC.API.PUB)/.*.htm # Buggy Doc++ junk.
+$(OUT.DOC.API.PUB)/index.html: $(OUT.DOC.API.PUB)
+	$(DOXYGEN) $(DOXYGEN_PUBAPI)
 
-pubapi: $(OUT.DOC.API.PUB).CLEAN $(OUT.DOC.API.PUB)/index.htm
+pubapi: $(OUT.DOC.API.PUB).CLEAN $(OUT.DOC.API.PUB)/index.html
 
 # Rule to perform actual HTML conversion of $(CSMANUAL_FILE).
 do-htmldoc:
