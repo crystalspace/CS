@@ -25,6 +25,8 @@ The history order is reversed so that new features are at the top.
 	  the iterator was not used to the end.
 	- Removed a few csPtr casts for LoadFont(). LoadFont() already
 	  returns a csPtr.
+	- Made csTypedObjectIterator::FetchObject() none recursive
+	  (and faster). Thanks to Dave Ray for suggesting this.
 5-Sep-2002
 	- Fixed a very subtle bug in the csRef assignement operators.
 	  It is very important FIRST to assign the new value to the
