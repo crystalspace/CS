@@ -28,6 +28,7 @@
 #include "imesh/fountain.h"
 #include "imesh/genmesh.h"
 #include "imesh/gmeshanim.h"
+#include "imesh/gmeshskel.h"
 #include "imesh/haze.h"
 #include "imesh/lghtng.h"
 #include "imesh/lighting.h"
