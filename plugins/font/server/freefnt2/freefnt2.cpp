@@ -630,3 +630,48 @@ bool csFreeType2Font::HasGlyph (utf32_char c)
   return (FT_Get_Char_Index (face->face, (FT_ULong)c) != 0);
 }
 
+int csFreeType2Font::GetTextHeight ()
+{
+	FT_Short height = face->face->height;
+
+	// Need to convert from font units to pixel units.
+	return height * size->metrics.y_ppem / face->face->units_per_EM;
+}
+
+int csFreeType2Font::GetUnderlinePosition ()
+{
+	FT_Short underline_position = face->face->underline_position;
+
+	// Need to convert from font units to pixel units.
+	float temp = underline_position * size->metrics.y_ppem / (float)face->face->units_per_EM;
+
+	// The value returned from freetype is the opposite of what we want.
+	temp *= -1;
+
+	// Round to the nearest integer.
+	if(temp > 0)
+	{
+		temp += 0.5;
+	}
+	else
+	{
+		temp -= 0.5;
+	}
+	return (int)temp;
+}
+
+int csFreeType2Font::GetUnderlineThickness ()
+{
+	FT_Short underline_thickness = face->face->underline_thickness;
+
+	// Need to convert from font units to pixel units.
+	underline_thickness = (int)(underline_thickness * size->metrics.y_ppem / (float)face->face->units_per_EM + 0.5);
+
+	// The thicknes should never be 0.
+	if(underline_thickness == 0)
+	{
+		underline_thickness = 1;
+	}
+	return underline_thickness;
+}
+

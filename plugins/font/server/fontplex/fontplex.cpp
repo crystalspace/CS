@@ -595,3 +595,17 @@ bool csFontPlexer::HasGlyph (utf32_char c)
   return false;
 }
 
+int csFontPlexer::GetTextHeight ()
+{
+	return primaryFont->GetTextHeight();
+}
+
+int csFontPlexer::GetUnderlinePosition ()
+{
+	return primaryFont->GetUnderlinePosition();
+}
+
+int csFontPlexer::GetUnderlineThickness ()
+{
+	return primaryFont->GetUnderlineThickness();
+}

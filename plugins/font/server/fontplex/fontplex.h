@@ -98,6 +98,11 @@ public:
   virtual int GetDescent (); 
   virtual int GetAscent (); 
   virtual bool HasGlyph (utf32_char c); 
+
+  virtual int GetTextHeight ();
+  virtual int GetUnderlinePosition ();
+  virtual int GetUnderlineThickness ();
+
 };
 
 /**
@@ -110,7 +115,7 @@ public:
  * to auxiliary font servers. Example extract from config file:
  * <code>
  * ...
- * System.Plugins.iFontServer = crystalspace.font.server.multiplexor
+ * System.Plugins.iFontServer = crystalspace.font.server.multiplexer
  * System.Plugins.iFontServer.1 = crystalspace.font.server.freetype2
  * System.Plugins.iFontServer.2 = crystalspace.font.server.default
  * ...

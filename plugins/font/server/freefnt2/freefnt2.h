@@ -148,6 +148,29 @@ public:
    * Returns whether a specific glyph is present in this font.
    */
   virtual bool HasGlyph (utf32_char c); 
+
+  /** 
+   * Gets the default baseline to baseline distance between 
+   * two lines of text using this font.
+   */
+  virtual int GetTextHeight ();
+
+  /**
+   * When displaying or rendering underlined text, this 
+   * value corresponds to the vertical position, relative 
+   * to the baseline, of the underline bar. It is positive 
+   * if the underline it is below the baseline. The position
+   * returned is to the top of the underline bar/rectagle.
+   */
+  virtual int GetUnderlinePosition ();
+
+  /**
+   * When displaying or rendering underlined text, this value 
+   * corresponds to the vertical thickness of the underline
+   * bar/rectangle.
+   */
+  virtual int GetUnderlineThickness ();
+
 };
 
 /**

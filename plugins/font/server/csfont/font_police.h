@@ -386,3 +386,9 @@ csDefaultFont::CharRange ranges_Police[] =
   {0xFFFD,  1}, 
   {0, 0}
 };
+
+int underline_position_Police = 1;
+
+int underline_thickness_Police = 1;
+
+int text_height_Police = 13;

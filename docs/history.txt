@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+01-Dec-2004
+        - res added a patch from Brendan Costa adding support for underline
+          position, underline thickness and line height to iFont.
+        - res fixed the Win32 keyboard handling to emit Shift autorepeat 
+          events.
 30-Nov-2004
 	- Eric Sunshine changed the `friend class csHash' mentions in the hash
 	  iterators so that they once again specify the full templated name:

@@ -389,3 +389,10 @@ csDefaultFont::CharRange ranges_Courier[] =
   {0xFFFD,  1}, 
   {0, 0}
 };
+
+int underline_position_Courier = 1;
+
+int underline_thickness_Courier = 1;
+
+int text_height_Courier = 13;
+

@@ -54,18 +54,21 @@ struct csFontDef
   size_t bitmapSize;
   uint8 *IndividualWidth;
   csDefaultFont::CharRange* ranges;
+  int underline_position;
+  int underline_thickness;
+  int text_height;
 };
 
 static csFontDef const FontList [] =
 {
   { CSFONT_LARGE,	8, 1, font_Police,  sizeof (font_Police),  
-    width_Police,  ranges_Police  },
+    width_Police,  ranges_Police, underline_position_Police, underline_thickness_Police, text_height_Police },
   { CSFONT_ITALIC,	8, 1, font_Italic,  sizeof (font_Italic),  
-    width_Italic,  ranges_Italic  },
+    width_Italic,  ranges_Italic, underline_position_Italic, underline_thickness_Italic, text_height_Italic },
   { CSFONT_COURIER,	8, 1, font_Courier, sizeof (font_Courier),  
-    width_Courier, ranges_Courier },
+    width_Courier, ranges_Courier, underline_position_Courier, underline_thickness_Courier, text_height_Courier },
   { CSFONT_SMALL,	6, 1, font_Tiny,    sizeof (font_Tiny),  
-    width_Tiny,    ranges_Tiny    }
+    width_Tiny,    ranges_Tiny, underline_position_Tiny, underline_thickness_Tiny, text_height_Tiny }
 };
 
 int const FontListCount = sizeof (FontList) / sizeof (csFontDef);
@@ -142,6 +145,7 @@ csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename, int size)
           FontList [i].ranges,
 	  FontList [i].Height, FontList [i].Height-FontList [i].Baseline,
 	  FontList [i].Baseline,
+	  FontList[i].text_height, FontList[i].underline_position, FontList[i].underline_thickness,
 	  gMetrics.GetArray (), db, bMetrics.GetArray ()));
 	break;
       }
@@ -207,6 +211,10 @@ error:
   int fontdefGlyphs = 256;
   int fontdefFirst = 0;
   bool fontdefAlpha = false;
+  bool hasTextHeight = false;
+  int text_height = 0;
+  fontdef.underline_position = 1;
+  fontdef.underline_thickness = 1;
 
   char *end = strchr (data, '\n');
   char *cur = strchr (data, '[');
@@ -276,6 +284,15 @@ error:
 	hasBitmapMetrics = (n != 0);
       else if (!strcmp (kw, "HasGlyphAdvance"))
 	hasGlyphAdvance = (n != 0);
+      else if (!strcmp (kw, "TextHeight"))
+	  {
+        fontdef.text_height = n;
+        hasTextHeight = true;
+	  }
+      else if (!strcmp (kw, "UnderlinePosition"))
+        fontdef.underline_position = n;
+      else if (!strcmp (kw, "UnderlineThickness"))
+        fontdef.underline_thickness = n;
       else
       {
 	csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
@@ -284,6 +301,12 @@ error:
       }
 
     }
+  }
+
+  if(!hasTextHeight)
+  {
+	  // Default text height looks good at about 1.75times the fonts actual hieght. 
+	  fontdef.text_height = (int)(fontdef.Height * 1.75);
   }
 
   bool newStyleFont = (hasCharRanges | hasBitmapMetrics | hasGlyphAdvance);
@@ -427,6 +450,8 @@ error:
     }
     return new csDefaultFont (this, fontdef.Name, ranges.GetArray (), 
       fontdef.Height, ascent, descent,
+	  fontdef.text_height, fontdef.underline_position, fontdef.underline_thickness,
+
       gMetrics.GetArray (), bitmapData, bMetrics.GetArray (),
       alphaData, fontdefAlpha ? aMetrics.GetArray () : 0);
   }
@@ -483,6 +508,7 @@ error:
     }
     return new csDefaultFont (this, fontdef.Name, ranges, fontdef.Height,
       fontdef.Height - fontdef.Baseline, fontdef.Baseline,
+	  fontdef.text_height, fontdef.underline_position, fontdef.underline_thickness,
       gMetrics.GetArray (), bitmapData, bMetrics.GetArray (),
       alphaData, fontdefAlpha ? bMetrics.GetArray () : 0);
   }
@@ -498,6 +524,7 @@ SCF_IMPLEMENT_IBASE_END
 csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name, 
 			      CharRange* glyphRanges, int height, 
 			      int ascent, int descent,
+			      int text_height, int underline_position, int underline_thickness,
 			      csGlyphMetrics* gMetrics,
 			      iDataBuffer* bitmap, csBitmapMetrics* bMetrics,
 			      iDataBuffer* alpha, csBitmapMetrics* aMetrics) 
@@ -513,6 +540,9 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
   Descent = descent;
   bitData = bitmap;
   alphaData = alpha;
+  TextHeight = text_height;
+  UnderlinePosition = underline_position;
+  UnderlineThickness = underline_thickness;
 
   int i = 0;
   int n = 0;
@@ -769,4 +799,19 @@ bool csDefaultFont::HasGlyph (utf32_char c)
   return ((glyphData != 0) 
     && ((glyphData->bitmapSize != (size_t)~0) 
     || (glyphData->alphaSize != (size_t)~0)));
+}
+
+int csDefaultFont::GetTextHeight ()
+{
+	return TextHeight;
+}
+
+int csDefaultFont::GetUnderlinePosition ()
+{
+	return UnderlinePosition;
+}
+
+int csDefaultFont::GetUnderlineThickness ()
+{
+	return UnderlineThickness;
 }

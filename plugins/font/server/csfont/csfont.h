@@ -120,6 +120,10 @@ public:
   int Ascent, Descent;
   int MaxWidth;
   int Height;
+  int TextHeight;
+  int UnderlinePosition;
+  int UnderlineThickness;
+
   csRef<iDataBuffer> bitData;
   csRef<iDataBuffer> alphaData;
   csRef<csDefaultFontServer> Parent;
@@ -130,6 +134,7 @@ public:
   /// Create the font object
   csDefaultFont (csDefaultFontServer *parent, const char *name, 
     CharRange* glyphs, int height, int ascent, int descent,
+	int text_height, int underline_position, int underline_thickness,
     csGlyphMetrics* gMetrics,
     iDataBuffer* bitmap, csBitmapMetrics* bMetrics,
     iDataBuffer* alpha = 0, csBitmapMetrics* aMetrics = 0);
@@ -207,6 +212,29 @@ public:
   virtual int GetAscent (); 
 
   virtual bool HasGlyph (utf32_char c); 
+
+  /** 
+   * Gets the default baseline to baseline distance between 
+   * two lines of text using this font.
+   */
+  virtual int GetTextHeight ();
+
+  /**
+   * When displaying or rendering underlined text, this 
+   * value corresponds to the vertical position, relative 
+   * to the baseline, of the underline bar. It is positive 
+   * if the underline it is below the baseline. The position
+   * returned is to the top of the underline bar/rectagle.
+   */
+  virtual int GetUnderlinePosition ();
+
+  /**
+   * When displaying or rendering underlined text, this value 
+   * corresponds to the vertical thickness of the underline
+   * bar/rectangle.
+   */
+  virtual int GetUnderlineThickness ();
+
 };
 
 /**

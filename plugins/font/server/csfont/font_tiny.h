@@ -315,3 +315,10 @@ csDefaultFont::CharRange ranges_Tiny[] =
   {0xFFFD,  1}, 
   {0, 0}
 };
+
+int underline_position_Tiny = 1;
+
+int underline_thickness_Tiny = 1;
+
+int text_height_Tiny = 10;
+

@@ -385,3 +385,9 @@ csDefaultFont::CharRange ranges_Italic[] =
   {0xFFFD,  1}, 
   {0, 0}
 };
+
+int underline_position_Italic = 1;
+
+int underline_thickness_Italic = 1;
+
+int text_height_Italic = 13;

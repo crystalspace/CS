@@ -449,14 +449,14 @@ bool csWin32KeyboardDriver::HandleKeyMessage (HWND hWnd, UINT message,
 	    bool rshiftState = keyStates.Get (CSKEY_SHIFT_RIGHT, false);
 	    bool rshiftDown = ::GetKeyState (VK_RSHIFT) & 0x8000;
 
-	    if (lshiftState != lshiftDown)
+	    if ((lshiftState != lshiftDown) || lshiftDown)
 	    {
 	    #ifdef CS_KEY_DEBUG_ENABLE
 	      if (IsKeyboardDebugging()) csPrintf ("Shift quirk: ");
 	    #endif
 	      DoKey (CSKEY_SHIFT_LEFT, CSKEY_SHIFT, lshiftDown, autoRep, type);
 	    }
-	    if (rshiftState != rshiftDown)
+	    if ((rshiftState != rshiftDown) || rshiftDown)
 	    {
 	    #ifdef CS_KEY_DEBUG_ENABLE
 	      if (IsKeyboardDebugging()) csPrintf ("Shift quirk: ");
