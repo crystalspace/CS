@@ -291,7 +291,7 @@ int ImageGifFile::decode_gif (UByte* iBuffer, long iSize, int* Prefix,
   int code = gptr.nextcode(code_size);
   int code_write = 0, code_old = 0;
 
-  while (code != val_EOF)
+  while (code != val_EOF && !gptr.isEOF ())
   {
     if (code == val_clear)
     {
