@@ -86,8 +86,6 @@ CS_IMPLEMENT_APPLICATION
 
 REGISTER_STATIC_LIBRARY (lvlload)
 
-//-----------------------------------------------------------------------------
-
 Simple::Simple ()
 @{
   view = NULL;
@@ -138,7 +136,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
     abort ();
   @}
 
-  // Open the main system. This will open all the previously loaded plug-ins.
+  // Open the main system. This will open all the previously
+  // loaded plug-ins.
   if (!Open ("Simple Crystal Space Application"))
   @{
     Printf (MSG_FATAL_ERROR, "Error opening system!\n");
@@ -189,18 +188,19 @@ void Simple::NextFrame ()
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
 
+  iCamera* c = view->GetCamera();
   if (GetKeyState (CSKEY_RIGHT))
-    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
+    c->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
   if (GetKeyState (CSKEY_LEFT))
-    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
+    c->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
   if (GetKeyState (CSKEY_PGUP))
-    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_UP, speed);
+    c->GetTransform ().RotateThis (VEC_TILT_UP, speed);
   if (GetKeyState (CSKEY_PGDN))
-    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
+    c->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
   if (GetKeyState (CSKEY_UP))
-    view->GetCamera ()->Move (VEC_FORWARD * 4 * speed);
+    c->Move (VEC_FORWARD * 4 * speed);
   if (GetKeyState (CSKEY_DOWN))
-    view->GetCamera ()->Move (VEC_BACKWARD * 4 * speed);
+    c->Move (VEC_BACKWARD * 4 * speed);
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (
@@ -216,9 +216,9 @@ void Simple::NextFrame ()
   g3d->Print (NULL);
 @}
 
-/*---------------------------------------------------------------------*
+/*---------------*
  * Main function
- *---------------------------------------------------------------------*/
+ *---------------*/
 int main (int argc, char* argv[])
 @{
   srand (time (NULL));
@@ -227,12 +227,18 @@ int main (int argc, char* argv[])
   System = new Simple ();
 
   // We want at least the minimal set of plugins
-  System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
-  System->RequestPlugin ("crystalspace.font.server.default:FontServer");
-  System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
-  System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-  System->RequestPlugin ("crystalspace.engine.core:Engine");
-  System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
+  System->RequestPlugin (
+    "crystalspace.kernel.vfs:VFS");
+  System->RequestPlugin (
+    "crystalspace.font.server.default:FontServer");
+  System->RequestPlugin (
+    "crystalspace.graphic.image.io.multiplex:ImageLoader");
+  System->RequestPlugin (
+    "crystalspace.graphics3d.software:VideoDriver");
+  System->RequestPlugin (
+    "crystalspace.engine.core:Engine");
+  System->RequestPlugin (
+    "crystalspace.level.loader:LevelLoader");
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.

@@ -17,6 +17,11 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine repaired a problem with plugins/chapter.txi where it
 	  was referencing plugins/anim/anim.txi even though that file does not
 	  (yet) exist.
+	- Eric Sunshine eliminated a slew of TeX `hbox' warnings from the
+	  Texinfo documentation.
+	- Eric Sunshine expanded several sections in apimod19.txi.
+	- Eric Sunshine added a discussion of CS_IMPLEMENT_APPLICATION and
+	  CS_IMPLEMENT_PLUGIN to apimod19.txi.
 17-Jun-2001
 	- Fixed a bug in 'facedown'/'faceup' commands (walktest). Reported
 	  by Thiago Ramon.

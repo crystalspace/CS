@@ -270,18 +270,19 @@ void Simple::NextFrame ()
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
 
+  iCamera* c = view->GetCamera();
   if (GetKeyState (CSKEY_RIGHT))
-    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
+    c->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
   if (GetKeyState (CSKEY_LEFT))
-    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
+    c->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
   if (GetKeyState (CSKEY_PGUP))
-    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_UP, speed);
+    c->GetTransform ().RotateThis (VEC_TILT_UP, speed);
   if (GetKeyState (CSKEY_PGDN))
-    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
+    c->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
   if (GetKeyState (CSKEY_UP))
-    view->GetCamera ()->Move (VEC_FORWARD * 4 * speed);
+    c->Move (VEC_FORWARD * 4 * speed);
   if (GetKeyState (CSKEY_DOWN))
-    view->GetCamera ()->Move (VEC_BACKWARD * 4 * speed);
+    c->Move (VEC_BACKWARD * 4 * speed);
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (

@@ -6,6 +6,53 @@
 This section documents the major changes between versions 0.18 and 0.19 of of
 Crystal Space.
 
+@subheading Platform Portability Encapsulation
+
+The new macro @samp{CS_IMPLEMENT_APPLICATION} must now be invoked by exactly
+one compilation unit of each application.  This macro encapsulates
+platform-specific implementation details for any given platform.  For instance,
+on Windows, this macro defines the @code{WinMain()} function required by all
+Windows @sc{gui} applications.
+
+The new macro @samp{CS_IMPLEMENT_PLUGIN} must now be invoked by exactly one
+compilation unit of each plugin module.  This macro encapsulates
+platform-specific implementation details for any given platform.  For instance,
+on Windows, this macro defins the @code{DllMain()} function required by all
+Windows @sc{dll} modules.
+
+These macros alleviate the need to link applications with specially prepared
+object files or libraries.  The summary below explains what this means for
+various platforms.
+
+@itemize @bullet
+@item
+Unix
+
+No longer required to link plugin modules against the @file{dummy.o} file.
+
+@item
+Visual-C++
+
+No longer required to link applications against Crystal Space's
+@file{win32exe.lib} library.  No longer required to link plugin modules
+(@sc{dll}'s) against the @file{win32dll.lib} library.  Also, the
+@file{libwin32exe.dsp} and @file{libwin32dll.dsp} project files have been
+removed.
+
+@item
+Mingw
+
+No longer required to link applications with the @file{exeentry.o} object file.
+No longer required to link plugin modules (@sc{dll}'s) with the
+@file{dllentry.o} object file.
+
+@item
+@sc{os/2}
+
+No longer required to link plugin modules with the @file{dllentry.o} object
+file.
+@end itemize
+
 @subheading Image Loading
 @cindex @code{csImageLoader}
 @cindex @code{iImageIO}
@@ -73,23 +120,27 @@ There are functions to load a map, textures, mesh objects, etc.
 
 @@@@@@ TODO
 
-@subheading String Server
-
-@@@@@@ TODO
-
 @subheading Map File Changes
 
 @@@@@@ TODO
-@example
-PLANE -> ADDON
-THING -> MESHOBJ
-SKY -> MESHOBJ + RENDPRI
-MESHOBJ -> MESHFACT @r{(for factories)}
-BEZIER -> ADDON
-MATERIALS
-RENDERPRIORITIES
-PLUGINS
-@end example
+@itemize @bullet
+@item
+@code{PLANE} @result{} @code{ADDON}
+@item
+@code{THING} @result{} @code{MESHOBJ}
+@item
+@code{SKY} @result{} @code{MESHOBJ + RENDPRI}
+@item
+@code{MESHOBJ} @result{} @code{MESHFACT} --- (for factories)
+@item
+@code{BEZIER} @result{} @code{ADDON}
+@item
+@code{MATERIALS}
+@item
+@code{RENDERPRIORITIES}
+@item
+@code{PLUGINS}
+@end itemize
 
 @subheading Sky Objects Gone
 
@@ -130,96 +181,208 @@ iMeshWrapper* mesh =
   engine->CreateSectorWallsMesh (sector, "walls");
 @end example
 
-@subheading Global API Changes
+@subheading Global @sc{api} Changes
 
-GetMiniBspNumVerts  -->  GetMiniBspVertexCount
-GetNumActions  -->  GetActionCount
-GetNumChars  -->  GetCharCount
-GetNumCameraPositions  -->  GetCameraPositionCount
-GetNumPolyTxtPlanes  -->  GetPolyTxtPlaneCount
-GetNumCollections  -->  GetCollectionCount
-GetNumCollisionPairs  -->  GetCollisionPairCount
-GetNumCurveVertices  -->  GetCurveVertexCount
-GetNumCurves  -->  GetCurveCount
-GetNumDimensions  -->  GetDimensionCount
-GetNumEdges  -->  GetEdgeCount
-GetNumElements  -->  GetElementCount
-GetNumFonts  -->  GetFontCount
-GetNumFormats  -->  GetFormatCount
-GetNumFrames  -->  GetFrameCount
-GetNumMaterials  -->  GetMaterialCount
-GetNumMeshFactories  -->  GetMeshFactoryCount
-GetNumMeshObjects  -->  GetMeshObjectCount
-GetNumNormals  -->  GetNormalCount
-GetNumObjects  -->  GetObjectCount
-GetNumPalEntries  -->  GetPalEntryCount
-GetNumPlanes  -->  GetPlaneCount
-GetNumPlugIns  -->  GetPlugInCount
-GetNumPoints  -->  GetPointCount
-GetNumPolygons  -->  GetPolygonCount
-GetNumRepeats  -->  GetRepeatCount
-GetNumShadows  -->  GetShadowCount
-GetNumSpokes  -->  GetSpokeCount
-GetNumTexels  -->  GetTexelCount
-GetNumTextureLayers  -->  GetTextureLayerCount
-GetNumTextures  -->  GetTextureCount
-GetNumTriangles  -->  GetTriangleCount
-GetNumVertices  -->  GetVertexCount
-GetNumberMetaBalls  -->  GetMetaBallCount
-GetNumberParticles  -->  GetParticleCount
-NumVertices  -->  GetVertexCount
-ReportNumberTriangles  -->  ReportTriangleCount
-SetNumEdges  -->  SetEdgeCount
-SetNumPolygons  -->  SetPolygonCount
-SetNumSpokes  -->  SetSpokeCount
-SetNumVertices  -->  SetVertexCount
-SetNumberMetaBalls  -->  SetMetaBallCount
-GetNumberEmitters  -->  GetEmitterCount
-GetNumberAging  -->  GetAgingCount
-SetNumberParticles  -->  SetParticleCount
-GetNumVertsToLight  -->  GetVertexToLightCount
-GetStaticNumSamples  -->  GetStaticSampleCount
-Update_Num  -->  UpdateCount
-SetNumber  -->  SetCount
+Methods in many classes and @sc{scf} interfaces have been renamed in order to
+improve naming consistency throughout the project.
 
-======= global functions ========
-RndNum  -->  csRndNum
-strnew  -->  csStrNew
-Combinations  -->  csCombinations
-expandname  -->  csExpandName
-splitpath  -->  csSplitPath
-fnamematches  -->  csFilenameMatches
-ScanStr  -->  csScanStr
-iSwap  -->  csSwapInt
-fSwap  -->  csSwapFloat
-fSquare  -->  csSquareFloat
-ByteSwap32bit  -->  csByteSwap32bit
-ByteSwap16bit  -->  csByteSwap16bit
-ByteSwap32bitBuffer  -->  csByteSwap32bitBuffer
-ByteSwap16bitBuffer  -->  csByteSwap16bitBuffer
-FindNearestPowerOf2  -->  csFindNearestPowerOf2
-IsPowerOf2  -->  csIsPowerOf2
-GenerateHalo  -->  csGenerateHalo
-GenerateNova  -->  csGenerateNova
-get_token  -->  csGetToken
-get_token_float  -->  csGetTokenFloat
-get_token_int  -->  csGetTokenInt
-skip_token  -->  csSkipToken
+The following method names changes follow the pattern where
+@code{GetNumSomething()} became @code{GetSomethingCount()}.
 
-@subheading csfx
+@itemize @bullet
+@item
+@code{GetMiniBspNumVerts()} @result{} @code{GetMiniBspVertexCount()}
+@item
+@code{GetNumActions()} @result{} @code{GetActionCount()}
+@item
+@code{GetNumChars()} @result{} @code{GetCharCount()}
+@item
+@code{GetNumCameraPositions()} @result{} @code{GetCameraPositionCount()}
+@item
+@code{GetNumPolyTxtPlanes()} @result{} @code{GetPolyTxtPlaneCount()}
+@item
+@code{GetNumCollections()} @result{} @code{GetCollectionCount()}
+@item
+@code{GetNumCollisionPairs()} @result{} @code{GetCollisionPairCount()}
+@item
+@code{GetNumCurveVertices()} @result{} @code{GetCurveVertexCount()}
+@item
+@code{GetNumCurves()} @result{} @code{GetCurveCount()}
+@item
+@code{GetNumDimensions()} @result{} @code{GetDimensionCount()}
+@item
+@code{GetNumEdges()} @result{} @code{GetEdgeCount()}
+@item
+@code{GetNumElements()} @result{} @code{GetElementCount()}
+@item
+@code{GetNumFonts()} @result{} @code{GetFontCount()}
+@item
+@code{GetNumFormats()} @result{} @code{GetFormatCount()}
+@item
+@code{GetNumFrames()} @result{} @code{GetFrameCount()}
+@item
+@code{GetNumMaterials()} @result{} @code{GetMaterialCount()}
+@item
+@code{GetNumMeshFactories()} @result{} @code{GetMeshFactoryCount()}
+@item
+@code{GetNumMeshObjects()} @result{} @code{GetMeshObjectCount()}
+@item
+@code{GetNumNormals()} @result{} @code{GetNormalCount()}
+@item
+@code{GetNumObjects()} @result{} @code{GetObjectCount()}
+@item
+@code{GetNumPalEntries()} @result{} @code{GetPalEntryCount()}
+@item
+@code{GetNumPlanes()} @result{} @code{GetPlaneCount()}
+@item
+@code{GetNumPlugIns()} @result{} @code{GetPlugInCount()}
+@item
+@code{GetNumPoints()} @result{} @code{GetPointCount()}
+@item
+@code{GetNumPolygons()} @result{} @code{GetPolygonCount()}
+@item
+@code{GetNumRepeats()} @result{} @code{GetRepeatCount()}
+@item
+@code{GetNumShadows()} @result{} @code{GetShadowCount()}
+@item
+@code{GetNumSpokes()} @result{} @code{GetSpokeCount()}
+@item
+@code{GetNumTexels()} @result{} @code{GetTexelCount()}
+@item
+@code{GetNumTextureLayers()} @result{} @code{GetTextureLayerCount()}
+@item
+@code{GetNumTextures()} @result{} @code{GetTextureCount()}
+@item
+@code{GetNumTriangles()} @result{} @code{GetTriangleCount()}
+@item
+@code{GetNumVertices()} @result{} @code{GetVertexCount()}
+@item
+@code{GetNumberMetaBalls()} @result{} @code{GetMetaBallCount()}
+@item
+@code{GetNumberParticles()} @result{} @code{GetParticleCount()}
+@item
+@code{NumVertices()} @result{} @code{GetVertexCount()}
+@item
+@code{ReportNumberTriangles()} @result{} @code{ReportTriangleCount()}
+@item
+@code{SetNumEdges()} @result{} @code{SetEdgeCount()}
+@item
+@code{SetNumPolygons()} @result{} @code{SetPolygonCount()}
+@item
+@code{SetNumSpokes()} @result{} @code{SetSpokeCount()}
+@item
+@code{SetNumVertices()} @result{} @code{SetVertexCount()}
+@item
+@code{SetNumberMetaBalls()} @result{} @code{SetMetaBallCount()}
+@item
+@code{GetNumberEmitters()} @result{} @code{GetEmitterCount()}
+@item
+@code{GetNumberAging()} @result{} @code{GetAgingCount()}
+@item
+@code{SetNumberParticles()} @result{} @code{SetParticleCount()}
+@item
+@code{GetNumVertsToLight()} @result{} @code{GetVertexToLightCount()}
+@item
+@code{GetStaticNumSamples()} @result{} @code{GetStaticSampleCount()}
+@item
+@code{Update_Num()} @result{} @code{UpdateCount()}
+@item
+@code{SetNumber()} @result{} @code{SetCount()}
+@end itemize
 
-csfx is renamed to cstool.
+The prefix @samp{cs} was added to the following list of functions, and their
+names were also normalized.
 
-@subheading csCollider
+@itemize @bullet
+@item
+@code{RndNum()} @result{} @code{csRndNum()}
+@item
+@code{strnew()} @result{} @code{csStrNew()}
+@item
+@code{Combinations()} @result{} @code{csCombinations()}
+@item
+@code{expandname()} @result{} @code{csExpandName()}
+@item
+@code{splitpath()} @result{} @code{csSplitPath()}
+@item
+@code{fnamematches()} @result{} @code{csFilenameMatches()}
+@item
+@code{ScanStr()} @result{} @code{csScanStr()}
+@item
+@code{iSwap()} @result{} @code{csSwapInt()}
+@item
+@code{fSwap()} @result{} @code{csSwapFloat()}
+@item
+@code{fSquare()} @result{} @code{csSquareFloat()}
+@item
+@code{ByteSwap32bit()} @result{} @code{csByteSwap32bit()}
+@item
+@code{ByteSwap16bit()} @result{} @code{csByteSwap16bit()}
+@item
+@code{ByteSwap32bitBuffer()} @result{} @code{csByteSwap32bitBuffer()}
+@item
+@code{ByteSwap16bitBuffer()} @result{} @code{csByteSwap16bitBuffer()}
+@item
+@code{FindNearestPowerOf2()} @result{} @code{csFindNearestPowerOf2()}
+@item
+@code{IsPowerOf2()} @result{} @code{csIsPowerOf2()}
+@item
+@code{GenerateHalo()} @result{} @code{csGenerateHalo()}
+@item
+@code{GenerateNova()} @result{} @code{csGenerateNova()}
+@item
+@code{get_token()} @result{} @code{csGetToken()}
+@item
+@code{get_token_float()} @result{} @code{csGetTokenFloat()}
+@item
+@code{get_token_int()} @result{} @code{csGetTokenInt()}
+@item
+@code{skip_token()} @result{} @code{csSkipToken()}
+@end itemize
 
-csCollider moved from csengine to cstool and is renamed
-to csColliderWrapper.
+@subheading @code{csfx} Library Renamed
 
-@subheading Key/Node System
+The @samp{csfx} library was renamed to @samp{cstool}.
 
-The Key/Node system moved from csengine to cstool.
+@subheading @code{csCollider}
 
-@subheading G3D/G2D ... private
+@samp{csCollider} moved from the @samp{csengine} library to the @samp{cstool}
+library and wasn renamed to @samp{csColliderWrapper.}
 
-These vars are now private in csSystemDriver.
+@subheading Key/Node Mechanism
 
+The key/node mechanism moved from the @samp{csengine} to @samp{cstool} library.
+
+@subheading System Driver Variables
+
+The following instance variables in @samp{csSystemDriver} are now private and
+are slated for removal:
+
+@itemize @bullet
+@item
+@code{Config}
+@item
+@code{VFS}
+@item
+@code{G3D}
+@item
+@code{G2D}
+@item
+@code{Sound}
+@item
+@code{NetDrv}
+@item
+@code{Console}
+@item
+@code{MotionMan}
+@end itemize
+
+In most cases, applications should now maintain these variables themselves
+rather than relying upon the system driver to do so.  Currently, in the case
+of @samp{VFS}, code can invoke the @code{QUERY_INTERFACE()} macro to obtain a
+pointer to the shared @sc{vfs} instance.  For example:
+
+@example
+iSystem* sys = @dots{};
+iVFS* vfs = QUERY_INTERFACE(sys, iVFS);
+@end example

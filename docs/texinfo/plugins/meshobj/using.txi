@@ -165,7 +165,8 @@ void SetupWorld ()
   ballState->SetMaterialWrapper (material);
   ballState->SetRimVertices (12);
 
-  iMeshWrapper* ball = engine->CreateMeshObject (ballMesh, "MyBall", room);
+  iMeshWrapper* ball =
+    engine->CreateMeshObject (ballMesh, "MyBall", room);
   ballMesh->DecRef ();
   m.Identity ();
   ball->GetMovable ().SetTransform (m);

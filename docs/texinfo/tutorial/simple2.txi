@@ -74,7 +74,8 @@ bool Simple::Initialize(int argc, char const* const argv[],
   @}
   txt->Register (txtmgr);
   txt->GetTextureHandle()->Prepare ();
-  iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
+  iMaterialWrapper* mat =
+    engine->GetMaterialList ()->FindByName ("spark");
   mat->Register (txtmgr);
   mat->GetMaterialHandle ()->Prepare ();
 

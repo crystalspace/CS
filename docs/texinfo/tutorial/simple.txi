@@ -217,12 +217,18 @@ int main (int argc, char* argv[])
   System = new Simple ();
 
   // We want at least the minimal set of plugins
-  System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
-  System->RequestPlugin ("crystalspace.font.server.default:FontServer");
-  System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
-  System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-  System->RequestPlugin ("crystalspace.engine.core:Engine");
-  System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
+  System->RequestPlugin (
+    "crystalspace.kernel.vfs:VFS");
+  System->RequestPlugin (
+    "crystalspace.font.server.default:FontServer");
+  System->RequestPlugin (
+    "crystalspace.graphic.image.io.multiplex:ImageLoader");
+  System->RequestPlugin (
+    "crystalspace.graphics3d.software:VideoDriver");
+  System->RequestPlugin (
+    "crystalspace.engine.core:Engine");
+  System->RequestPlugin (
+    "crystalspace.level.loader:LevelLoader");
 
   // Initialize the main system. This will load all needed
   // plug-ins (3D, 2D, network, etc.) and initialize them.
@@ -250,13 +256,13 @@ started running.
 Before we start making this application more useful lets have a look at what
 actually happens here.
 
-Before doing anything at all we first need to use a few macros.
-CS_IMPLEMENT_APPLICATION is essential for every application using CS.
-It makes sure that the @code{main()} routine is correctly linked and
-called on every platform. REGISTER_STATIC_LIBRARY is a temporary macro
-which is now needed because the level loader already tries very hard
-to be a plugin but it really isn't. Once the level loader is a plugin
-you only have to remove this macro call.
+Before doing anything at all, after including the necessary header files, we
+first need to use a few macros.  The CS_IMPLEMENT_APPLICATION macro is
+essential for every application using CS.  It makes sure that the @code{main()}
+routine is correctly linked and called on every platform.
+REGISTER_STATIC_LIBRARY is a temporary macro which is now needed because the
+level loader already tries very hard to be a plugin but it really isn't.  Once
+the level loader is a plugin you only have to remove this macro call.
 
 The main routine first creates an instance of our
 @samp{Simple} class.  The next step is the creation of the world.  The world
@@ -396,7 +402,8 @@ bool Simple::Initialize (int argc, const char const* const argv[],
     cleanup ();
     exit (1);
   @}
-  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
+  iMaterialWrapper* tm =
+    engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
   iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
@@ -691,18 +698,19 @@ void Simple::NextFrame ()
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
 
+  iCamera* c = view->GetCamera();
   if (GetKeyState (CSKEY_RIGHT))
-    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
+    c->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
   if (GetKeyState (CSKEY_LEFT))
-    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
+    c->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
   if (GetKeyState (CSKEY_PGUP))
-    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_UP, speed);
+    c->GetTransform ().RotateThis (VEC_TILT_UP, speed);
   if (GetKeyState (CSKEY_PGDN))
-    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
+    c->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
   if (GetKeyState (CSKEY_UP))
-    view->GetCamera ()->Move (VEC_FORWARD * 4 * speed);
+    c->Move (VEC_FORWARD * 4 * speed);
   if (GetKeyState (CSKEY_DOWN))
-    view->GetCamera ()->Move (VEC_BACKWARD * 4 * speed);
+    c->Move (VEC_BACKWARD * 4 * speed);
   @dots{}
 @}
 @end example
