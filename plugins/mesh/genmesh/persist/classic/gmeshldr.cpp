@@ -455,7 +455,6 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
   if (auto_normals)
     state->CalculateNormals ();
 
-  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -616,8 +615,6 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
   if (auto_normals)
     state->CalculateNormals ();
 
-  // Incref to prevent smart pointer from releasing object.
-  if (fact) fact->IncRef ();
   return csPtr<iBase> (fact);
 }
 //---------------------------------------------------------------------------
@@ -771,7 +768,6 @@ csPtr<iBase> csGeneralMeshLoader::Parse (const char* string,
     }
   }
 
-  if (mesh) mesh->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -857,8 +853,6 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
     }
   }
 
-  // Incref to avoid smart pointer from releasing.
-  if (mesh) mesh->IncRef ();
   return csPtr<iBase> (mesh);
 }
 

@@ -1525,7 +1525,6 @@ csPtr<iDataBuffer> csVFS::ReadFile (const char *FileName)
   csRef<iDataBuffer> data (F->GetAllData ());
   if (data)
   {
-    data->IncRef ();	// Avoid smart pointer cleanup.
     return csPtr<iDataBuffer> (data);
   }
 

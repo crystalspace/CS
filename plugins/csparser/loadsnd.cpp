@@ -61,7 +61,6 @@ csPtr<iSoundData> csLoader::LoadSoundData(const char* filename)
   else
     Stats->sounds_loaded++;
 
-  if (Sound) Sound->IncRef ();	// To prevent release from smart pointer.
   return csPtr<iSoundData> (Sound);
 }
 
@@ -82,7 +81,6 @@ csPtr<iSoundHandle> csLoader::LoadSound(const char* filename)
 	      "Cannot register sound '%s'!", filename);
   }
 
-  if (hdl) hdl->IncRef ();	// To prevent release from smart pointer.
   return csPtr<iSoundHandle> (hdl);
 }
 

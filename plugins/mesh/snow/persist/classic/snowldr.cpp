@@ -153,7 +153,6 @@ csPtr<iBase> csSnowFactoryLoader::Parse (const char* /*string*/,
     	iMeshObjectType);
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -170,7 +169,6 @@ csPtr<iBase> csSnowFactoryLoader::Parse (iDocumentNode* /*node*/,
     	iMeshObjectType);
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -351,7 +349,6 @@ csPtr<iBase> csSnowLoader::Parse (const char* string,
     }
   }
 
-  if (mesh) mesh->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -461,8 +458,6 @@ csPtr<iBase> csSnowLoader::Parse (iDocumentNode* node,
     }
   }
 
-  // Incref to prevent smart pointer from releasing.
-  if (mesh) mesh->IncRef ();
   return csPtr<iBase> (mesh);
 }
 

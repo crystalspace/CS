@@ -1215,7 +1215,6 @@ static csPtr<iMeshWrapper> CreateMeshWrapper (const char* name)
 
   csRef<iMeshWrapper> mesh_wrap (
   	Sys->Engine->CreateMeshWrapper (mesh_obj, name));
-  if (mesh_wrap) mesh_wrap->IncRef ();	// Prevent smart pointer release.
   return csPtr<iMeshWrapper> (mesh_wrap);
 }
 
@@ -1419,7 +1418,6 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
   room->ShineLights (thing);
   linfo->PrepareLighting ();
 
-  thing->IncRef ();	// Prevent smart pointer release.
   return csPtr<iMeshWrapper> (thing);
 }
 

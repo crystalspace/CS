@@ -76,7 +76,6 @@ csPtr<iImage> csLoader::LoadImage (const char* fname, int Format)
   csRef<iDataBuffer> xname (VFS->ExpandPath (fname));
   image->SetName (**xname);
 
-  image->IncRef ();	// To avoid smart pointer release.
   return csPtr<iImage> (image);
 }
 
@@ -108,7 +107,6 @@ csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
   if (!tm)
     return NULL;
   
-  // we need to return an IncRefed object, so no csRef here
   csRef<iTextureHandle> TexHandle (tm->RegisterTexture (Image, Flags));
   if (!TexHandle)
   {
@@ -118,7 +116,6 @@ csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
     return NULL;
   }
 
-  TexHandle->IncRef ();	// Avoid smart pointer release.
   return csPtr<iTextureHandle> (TexHandle);
 }
 

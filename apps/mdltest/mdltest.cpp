@@ -259,7 +259,6 @@ csPtr<iModelData> Simple::ImportModel (const char *fn)
     exit (1);
   }
 
-  mdl->IncRef ();	// Avoid smart pointer release.
   return csPtr<iModelData> (mdl);
 }
 

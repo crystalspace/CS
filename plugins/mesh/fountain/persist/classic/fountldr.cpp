@@ -162,7 +162,6 @@ csPtr<iBase> csFountainFactoryLoader::Parse (const char* /*string*/,
     	iMeshObjectType);
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -179,7 +178,6 @@ csPtr<iBase> csFountainFactoryLoader::Parse (iDocumentNode* /*node*/,
     	iMeshObjectType);
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -395,7 +393,6 @@ csPtr<iBase> csFountainLoader::Parse (const char* string,
     }
   }
 
-  if (mesh) mesh->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -519,8 +516,6 @@ csPtr<iBase> csFountainLoader::Parse (iDocumentNode* node,
     }
   }
 
-  // Incref to prevent smart pointer from cleaning up.
-  if (mesh) mesh->IncRef ();
   return csPtr<iBase> (mesh);
 }
 

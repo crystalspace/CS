@@ -883,7 +883,7 @@ void csEngine::DeleteAll ()
   for (i = GetMeshes ()->GetCount () - 1; i >= 0; i--)
   {
     iMeshWrapper *imw = GetMeshes ()->Get (i);
-    GetMeshes ()->Remove (imw);                 // this will IncRef before removal and DecRef afterward
+    GetMeshes ()->Remove (imw);   // this will IncRef before removal and DecRef afterward
   }
 
   mesh_factories.DeleteAll ();
@@ -2336,7 +2336,6 @@ csPtr<iMeshWrapper> csEngine::CreateThingMesh (
   	"crystalspace.mesh.object.thing", name, sector));
   thing_wrap->SetZBufMode (CS_ZBUF_USE);
   thing_wrap->SetRenderPriority (GetObjectRenderPriority ());
-  if (thing_wrap) thing_wrap->IncRef ();	// Avoid smart pointer release.
   return csPtr<iMeshWrapper> (thing_wrap);
 }
 
@@ -2349,7 +2348,6 @@ csPtr<iMeshWrapper> csEngine::CreateSectorWallsMesh (
   thing_wrap->GetFlags ().Set (CS_ENTITY_CONVEX);
   thing_wrap->SetZBufMode (CS_ZBUF_FILL);
   thing_wrap->SetRenderPriority (GetWallRenderPriority ());
-  if (thing_wrap) thing_wrap->IncRef ();	// Avoid smart pointer release.
   return csPtr<iMeshWrapper> (thing_wrap);
 }
 
@@ -2488,7 +2486,6 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
   // don't pass the name to avoid a second search
   csRef<iMeshFactoryWrapper> fwrap (CreateMeshFactory (fact, NULL));
   if (fwrap && name) fwrap->QueryObject ()->SetName (name);
-  if (fwrap) fwrap->IncRef ();	// Avoid smart pointer release.
   return csPtr<iMeshFactoryWrapper> (fwrap);
 }
 
@@ -2646,7 +2643,6 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   fact->SetMeshObjectFactory (mof2);
   mof2->SetLogicalParent (fact);
 
-  fact->IncRef (); // Avoid cleanup of smart pointer.
   return csPtr<iMeshFactoryWrapper> (fact);
 }
 

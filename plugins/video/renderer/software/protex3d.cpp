@@ -252,3 +252,4 @@ iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer
   // Return the software texture managers handle for this procedural texture.
   return soft_tex_mm;
 }
+

@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+18-Sep-2002
+	- Fixed several memory leaks in CS introduced by the new
+	  csPtr(csRef) constructor added yesterday.
 17-Sep-2002
 	- Clarified some iMovable Doxygen comments.
 	- Fixed a serious bug in the csRef assignment operator for

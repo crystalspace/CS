@@ -142,18 +142,15 @@ bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
   return true;
 }
 
-csPtr<iSoundData>
-csSoundLoaderMultiplexer::LoadSound(void *Data, unsigned long Size) const
+csPtr<iSoundData> csSoundLoaderMultiplexer::LoadSound (
+	void *Data, unsigned long Size) const
 {
   for (long i=0;i<Loaders.Length();i++)
   {
     iSoundLoader *Ldr=(iSoundLoader*)(Loaders.Get(i));
     csRef<iSoundData> snd (Ldr->LoadSound(Data, Size));
     if (snd)
-    {
-      snd->IncRef ();	// Avoid smart pointer release.
       return csPtr<iSoundData> (snd);
-    }
   }
   return NULL;
 }

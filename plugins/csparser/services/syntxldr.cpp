@@ -751,7 +751,7 @@ void csTextSyntaxService::OptimizePolygon (iPolygon3D *p)
 class MissingSectorCallback : public iPortalCallback
 {
 public:
-  iLoaderContext* ldr_context;
+  csRef<iLoaderContext> ldr_context;
   char* sectorname;
 
   SCF_DECLARE_IBASE;
@@ -760,12 +760,10 @@ public:
     SCF_CONSTRUCT_IBASE (NULL);
     MissingSectorCallback::ldr_context = ldr_context;
     sectorname = csStrNew (sector);
-    if (ldr_context) ldr_context->IncRef ();
   }
   virtual ~MissingSectorCallback ()
   {
     delete[] sectorname;
-    if (ldr_context) ldr_context->DecRef ();
   }
   
   virtual bool Traverse (iPortal* portal, iBase* /*context*/)
@@ -2358,7 +2356,6 @@ void csTextSyntaxService::ReportBadToken (iDocumentNode* badtokennode)
     ss.Format ("Syntax services failure (%d,%s): %s\n", int(__LINE__), \
     	#msg, #test); \
     str.Append (ss); \
-    rc->IncRef (); /* Prevent smart pointer release */ \
     return csPtr<iString> (rc); \
   }
 

@@ -171,7 +171,6 @@ csPtr<iBase> csStarFactoryLoader::Parse (const char* /*string*/,
     return NULL;
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  if (fact) fact->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -195,7 +194,6 @@ csPtr<iBase> csStarFactoryLoader::Parse (iDocumentNode* /*node*/,
     return NULL;
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  if (fact) fact->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -342,7 +340,6 @@ csPtr<iBase> csStarLoader::Parse (const char* string,
     }
   }
 
-  if (mesh) mesh->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -412,8 +409,6 @@ csPtr<iBase> csStarLoader::Parse (iDocumentNode* node,
     }
   }
 
-  // Incref to prevent smart pointer from deleting it.
-  if (mesh) mesh->IncRef ();
   return csPtr<iBase> (mesh);
 }
 

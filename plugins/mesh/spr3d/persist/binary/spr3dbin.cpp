@@ -351,7 +351,6 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
   // Read the 1 byte tween value
   spr3dLook->EnableTweening (*p++);
 
-  if (fact) fact->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (fact);
 }
 

@@ -304,8 +304,8 @@ static void jpeg_buffer_dest (j_compress_ptr cinfo, jpg_datastore *ds)
   dest->ds = ds;
 }
 
-csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *,
-  const char* extraoptions)
+csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image,
+	iImageIO::FileFormatDescription *, const char* extraoptions)
 {
   // we need to get a RGB/RGBA version of the image.
   switch (Image->GetFormat() & CS_IMGFMT_MASK)
@@ -695,7 +695,6 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
 
   delete outfile;
 
-  db->IncRef ();	// Avoid smart pointer cleanup.
   return csPtr<iDataBuffer> (db);
 }
 

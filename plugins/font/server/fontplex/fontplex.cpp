@@ -98,10 +98,7 @@ csPtr<iFont> csFontServerMultiplexor::LoadFont (const char *filename)
   {
     csRef<iFont> font (fontservers.Get (i)->LoadFont (filename));
     if (font)
-    {
-      font->IncRef ();	// Prevent smart pointer release.
       return csPtr<iFont> (font);
-    }
   }
   return NULL;
 }

@@ -124,7 +124,8 @@ csPtr<iModelData> csModelConverterSPR::Load (uint8 * /*Buffer*/, uint32 /*Size*/
   Modified by Martin Geisse to work with the new converter interface.
 */
 
-csPtr<iDataBuffer> csModelConverterSPR::Save (iModelData *Data, const char *Format)
+csPtr<iDataBuffer> csModelConverterSPR::Save (iModelData *Data,
+	const char *Format)
 {
   if (strcasecmp (Format, "spr"))
     return NULL;
@@ -136,7 +137,6 @@ csPtr<iDataBuffer> csModelConverterSPR::Save (iModelData *Data, const char *Form
 
   csSpriteBuilderFile Builder;
   csRef<iDataBuffer> buf (Builder.Build (obj));
-  buf->IncRef ();	// Avoid smart pointer release.
   return csPtr<iDataBuffer> (buf);
 }
 

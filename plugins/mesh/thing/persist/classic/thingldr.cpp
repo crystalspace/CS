@@ -627,7 +627,6 @@ csPtr<iBase> csThingLoader::Parse (const char* string,
   {
     fact = NULL;
   }
-  if (fact) fact->IncRef ();	// Prevent smart pointer cleanup.
   return csPtr<iBase> (fact);
 }
 
@@ -881,7 +880,6 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
   {
     fact = NULL;
   }
-  if (fact) fact->IncRef ();	// Avoid smart pointer cleanup.
   return csPtr<iBase> (fact);
 }
 
@@ -1083,7 +1081,6 @@ csPtr<iBase> csPlaneLoader::Parse (const char* string,
   else
     ppl->SetTextureSpace (tx_matrix, tx_vector);
 
-  ppl->IncRef ();	// Prevent smart pointer from releasing.
   return csPtr<iBase> (ppl);
 }
 
@@ -1197,7 +1194,6 @@ csPtr<iBase> csPlaneLoader::Parse (iDocumentNode* node,
   else
     ppl->SetTextureSpace (tx_matrix, tx_vector);
 
-  ppl->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (ppl);
 }
 
@@ -1332,7 +1328,6 @@ csPtr<iBase> csBezierLoader::Parse (const char* string,
     	  parser->GetLastOffender ());
     return NULL;
   }
-  tmpl->IncRef ();	// Prevent smart pointer from releasing.
   return csPtr<iBase> (tmpl);
 }
 
@@ -1403,7 +1398,6 @@ csPtr<iBase> csBezierLoader::Parse (iDocumentNode* node,
       node, "Wrong number of vertices to bezier! %d should be 9!", num_v);
     return NULL;
   }
-  tmpl->IncRef ();	// Prevent smart pointer from releasing.
   return csPtr<iBase> (tmpl);
 }
 

@@ -672,7 +672,6 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (const char* string,
       break;
     }
   }
-  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -908,8 +907,6 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
         return NULL;
     }
   }
-  // IncRef() to make sure it doesn't get deleted.
-  if (fact) fact->IncRef ();
   return csPtr<iBase> (fact);
 }
 
@@ -1239,7 +1236,6 @@ csPtr<iBase> csSprite3DLoader::Parse (const char* string,
     }
   }
 
-  if (mesh) mesh->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -1383,8 +1379,6 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
     }
   }
 
-  // Prevent deletion by smart pointer.
-  mesh->IncRef ();
   return csPtr<iBase> (mesh);
 }
 

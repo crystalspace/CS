@@ -267,7 +267,6 @@ csPtr<iBase> csBCTerrFactoryLoader::Parse (const char* pString,
     }
   }
   //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"Factory Loader","Created  Factory ");
-  if (pFactory) pFactory->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (pFactory);
 }
 
@@ -383,8 +382,6 @@ csPtr<iBase> csBCTerrFactoryLoader::Parse (iDocumentNode* node,
 	return NULL;
     }
   }
-  // To avoid smart pointer release.
-  if (pFactory) pFactory->IncRef ();
   return csPtr<iBase> (pFactory);
 }
 
@@ -655,7 +652,6 @@ csPtr<iBase> csBCTerrLoader::Parse (const char* pString,
       break;
     }
   }
-  if (iTerrObj) iTerrObj->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (iTerrObj);
 }
 
@@ -865,8 +861,6 @@ csPtr<iBase> csBCTerrLoader::Parse (iDocumentNode* node,
 	return NULL;
     }
   }
-  // To avoid smart pointer from releasing.
-  if (iTerrObj) iTerrObj->IncRef ();
   return csPtr<iBase> (iTerrObj);
 }
 

@@ -763,7 +763,6 @@ printf ("tri:%d vt:%d\n", construction->GetTriangleCount (),
   state->CalculateNormals ();
   delete construction;
 
-  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -874,8 +873,6 @@ printf ("tri:%d vt:%d\n", construction->GetTriangleCount (),
   state->CalculateNormals ();
   delete construction;
 
-  // Incref to prevent smart pointer from deleting it.
-  if (fact) fact->IncRef ();
   return csPtr<iBase> (fact);
 }
 

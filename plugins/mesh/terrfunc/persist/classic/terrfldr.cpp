@@ -158,7 +158,6 @@ csPtr<iBase> csTerrFuncFactoryLoader::Parse (const char* /*string*/,
       return NULL;
   }
   csRef<iMeshObjectFactory> pFactory (pType->NewFactory ());
-  if (pFactory) pFactory->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (pFactory);
 }
 
@@ -183,7 +182,6 @@ csPtr<iBase> csTerrFuncFactoryLoader::Parse (iDocumentNode* /*node*/,
     }
   }
   csRef<iMeshObjectFactory> pFactory (pType->NewFactory ());
-  if (pFactory) pFactory->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (pFactory);
 }
 
@@ -435,7 +433,6 @@ csPtr<iBase> csTerrFuncLoader::Parse (const char* pString,
     }
   }
 
-  if (mesh) mesh->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -664,8 +661,6 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
     }
   }
 
-  // Incref to avoid smart pointer from cleaning up.
-  if (mesh) mesh->IncRef ();
   return csPtr<iBase> (mesh);
 }
 

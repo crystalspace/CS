@@ -162,7 +162,6 @@ csPtr<iBase> csExplosionFactoryLoader::Parse (const char* /*string*/,
     	iMeshObjectType);
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  if (fact) fact->IncRef ();	// Prevent smart pointer cleanup.
   return csPtr<iBase> (fact);
 }
 
@@ -179,7 +178,6 @@ csPtr<iBase> csExplosionFactoryLoader::Parse (iDocumentNode* /*node*/,
     	iMeshObjectType);
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  if (fact) fact->IncRef ();	// Prevent smart pointer cleanup.
   return csPtr<iBase> (fact);
 }
 
@@ -394,7 +392,6 @@ csPtr<iBase> csExplosionLoader::Parse (const char* string,
     }
   }
 
-  if (mesh) mesh->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -509,8 +506,6 @@ csPtr<iBase> csExplosionLoader::Parse (iDocumentNode* node,
     }
   }
 
-  // IncRef() to avoid smart pointer releasing mesh.
-  if (mesh) mesh->IncRef ();
   return csPtr<iBase> (mesh);
 }
 

@@ -147,25 +147,20 @@ csPtr<iModelData> csModelConverterMultiplexer::Load (uint8* Buffer, uint32 Size)
   {
     csRef<iModelData> mdl (Converters.Get(i)->Load (Buffer, Size));
     if (mdl)
-    {
-      mdl->IncRef ();	// Avoid smart pointer release.
       return csPtr<iModelData> (mdl);
-    }
   }
   return NULL;
 }
 
-csPtr<iDataBuffer> csModelConverterMultiplexer::Save (iModelData *mdl, const char *Format)
+csPtr<iDataBuffer> csModelConverterMultiplexer::Save (iModelData *mdl,
+	const char *Format)
 {
   int i;
   for (i=0; i<Converters.Length (); i++)
   {
     csRef<iDataBuffer> dbuf (Converters.Get(i)->Save (mdl, Format));
     if (dbuf)
-    {
-      dbuf->IncRef ();	// Avoid smart pointer release.
       return csPtr<iDataBuffer> (dbuf);
-    }
   }
   return NULL;
 }

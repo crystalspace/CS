@@ -337,7 +337,8 @@ iTextureWrapper* csLoader::ParseTexture (char *name, char* buf)
   return tex;
 }
 
-iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *prefix)
+iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf,
+	const char *prefix)
 {
   if (!Engine) return NULL;
 

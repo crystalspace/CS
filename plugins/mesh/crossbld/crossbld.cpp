@@ -149,7 +149,8 @@ bool csCrossBuilder::BuildSpriteFactory (iModelDataObject *Object,
 }
 
 iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
-	iModelData *Scene, iEngine *Engine, iMaterialWrapper *DefaultMaterial) const
+	iModelData *Scene, iEngine *Engine,
+	iMaterialWrapper *DefaultMaterial) const
 {
   csRef<iMeshFactoryWrapper> MainWrapper;
 

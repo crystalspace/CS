@@ -159,7 +159,6 @@ csPtr<iBase> csFireFactoryLoader::Parse (const char* /*string*/,
     	iMeshObjectType);
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -176,7 +175,6 @@ csPtr<iBase> csFireFactoryLoader::Parse (iDocumentNode* /*node*/,
     	iMeshObjectType);
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -386,7 +384,6 @@ csPtr<iBase> csFireLoader::Parse (const char* string,
     }
   }
 
-  if (mesh) mesh->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -509,8 +506,6 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
     }
   }
 
-  // Incref so that smart pointer doesn't release reference.
-  if (mesh) mesh->IncRef ();
   return csPtr<iBase> (mesh);
 }
 

@@ -118,10 +118,7 @@ csPtr<iImage> csMultiplexImageIO::Load (uint8* iBuffer, uint32 iSize, int iForma
     iImageIO *pIO = (iImageIO*)list.Get(i);
     csRef<iImage> img (pIO->Load(iBuffer, iSize, iFormat));
     if (img)
-    {
-      img->IncRef ();	// Avoid smart pointer release.
       return csPtr<iImage> (img);
-    }
   }
   return NULL;
 }
@@ -148,10 +145,7 @@ csPtr<iDataBuffer> csMultiplexImageIO::Save (
     iImageIO *pIO = (iImageIO*)list.Get(i);
     csRef<iDataBuffer> buf (pIO->Save(image, format, extraoptions));
     if (buf)
-    {
-      buf->IncRef ();	// Avoid smart pointer release.
       return csPtr<iDataBuffer> (buf);
-    }
   }
   return NULL;
 }
@@ -165,10 +159,7 @@ csPtr<iDataBuffer> csMultiplexImageIO::Save (iImage *image, const char *mime,
     iImageIO *pIO = (iImageIO*)list.Get(i);
     csRef<iDataBuffer> buf (pIO->Save(image, mime, extraoptions));
     if (buf)
-    {
-      buf->IncRef ();	// Avoid smart pointer release.
       return csPtr<iDataBuffer> (buf);
-    }
   }
   return NULL;
 }

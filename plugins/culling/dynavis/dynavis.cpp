@@ -1418,7 +1418,6 @@ csPtr<iString> csDynaVis::Debug_UnitTest ()
     if (rc)
     {
       delete kdtree;
-      rc->IncRef ();	// To prevent smart pointer release.
       return csPtr<iString> (rc);
     }
   }
@@ -1432,7 +1431,6 @@ csPtr<iString> csDynaVis::Debug_UnitTest ()
     if (rc)
     {
       delete covbuf;
-      rc->IncRef ();	// To prevent smart pointer release.
       return csPtr<iString> (rc);
     }
   }
@@ -1446,7 +1444,6 @@ csPtr<iString> csDynaVis::Debug_UnitTest ()
     if (rc)
     {
       delete tcovbuf;
-      rc->IncRef ();	// To prevent smart pointer release.
       return csPtr<iString> (rc);
     }
   }

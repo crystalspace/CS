@@ -155,7 +155,6 @@ csPtr<iBase> csMetaBallFactoryLoader::Parse (const char* /*string*/,
     	iMeshObjectType);
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  if (fact) fact->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -172,7 +171,6 @@ csPtr<iBase> csMetaBallFactoryLoader::Parse (iDocumentNode*,
     	iMeshObjectType);
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  if (fact) fact->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -360,7 +358,6 @@ csPtr<iBase> csMetaBallLoader::Parse (const char* string,
     }
   }
 
-  if (mesh) mesh->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -529,8 +526,6 @@ csPtr<iBase> csMetaBallLoader::Parse (iDocumentNode* node,
     }
   }
 
-  // Incref to avoid smart pointer release.
-  if (mesh) mesh->IncRef ();
   return csPtr<iBase> (mesh);
 }
 

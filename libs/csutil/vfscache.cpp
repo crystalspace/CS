@@ -131,7 +131,6 @@ csPtr<iDataBuffer> csVfsCacheManager::ReadCache (
     return NULL;
   }
 
-  data->IncRef();	// To make sure smart pointer doesn't release.
   return csPtr<iDataBuffer> (data);
 }
 

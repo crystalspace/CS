@@ -105,7 +105,6 @@ csPtr<iDynamicSystem> csODEDynamics::CreateSystem ()
   csODEDynamicSystem* system = new csODEDynamicSystem ();
   csRef<iDynamicSystem> isystem (SCF_QUERY_INTERFACE (system, iDynamicSystem));
   systems.Push (isystem);
-  isystem->IncRef ();	// Avoid smart pointer release.
   return csPtr<iDynamicSystem> (isystem);
 }
 

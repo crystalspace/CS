@@ -182,7 +182,6 @@ csPtr<iBase> csEmitFactoryLoader::Parse (const char* /*string*/,
     printf ("Load TYPE plugin crystalspace.mesh.object.emit\n");
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  if (fact) fact->IncRef ();	// To prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -200,7 +199,6 @@ csPtr<iBase> csEmitFactoryLoader::Parse (iDocumentNode* /*node*/,
     printf ("Load TYPE plugin crystalspace.mesh.object.emit\n");
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  if (fact) fact->IncRef ();	// To prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -725,7 +723,6 @@ csPtr<iBase> csEmitLoader::Parse (const char* string,
     }
   }
 
-  if (mesh) mesh->IncRef ();	// To avoid smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -904,8 +901,6 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
     }
   }
 
-  // Incref so smart pointer doesn't release.
-  if (mesh) mesh->IncRef ();
   return csPtr<iBase> (mesh);
 }
 

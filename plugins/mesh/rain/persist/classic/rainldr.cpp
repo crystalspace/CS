@@ -152,7 +152,6 @@ csPtr<iBase> csRainFactoryLoader::Parse (const char* /*string*/,
     	iMeshObjectType);
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -169,7 +168,6 @@ csPtr<iBase> csRainFactoryLoader::Parse (iDocumentNode* /*node*/,
     	iMeshObjectType);
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -341,7 +339,6 @@ csPtr<iBase> csRainLoader::Parse (const char* string,
     }
   }
 
-  if (mesh) mesh->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -456,8 +453,6 @@ csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
     }
   }
 
-  // Incref to avoid smart pointer from releasing reference.
-  if (mesh) mesh->IncRef ();
   return csPtr<iBase> (mesh);
 }
 

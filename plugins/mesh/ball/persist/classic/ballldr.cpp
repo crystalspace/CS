@@ -184,8 +184,6 @@ csPtr<iBase> csBallFactoryLoader::Parse (const char* /*string*/,
     return NULL;
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  // Incref so that smart pointer doesn't delete.
-  if (fact) fact->IncRef ();
   return csPtr<iBase> (fact);
 }
 
@@ -209,8 +207,6 @@ csPtr<iBase> csBallFactoryLoader::Parse (iDocumentNode*,
     return NULL;
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  // Incref so that smart pointer doesn't delete.
-  if (fact) fact->IncRef ();
   return csPtr<iBase> (fact);
 }
 
@@ -409,7 +405,6 @@ csPtr<iBase> csBallLoader::Parse (const char* string,
     }
   }
 
-  if (mesh) mesh->IncRef ();	// To prevent smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -532,8 +527,6 @@ csPtr<iBase> csBallLoader::Parse (iDocumentNode* node,
     }
   }
 
-  // IncRef() because otherwise our smart pointer will clean things up.
-  mesh->IncRef ();
   return csPtr<iBase> (mesh);
 }
 

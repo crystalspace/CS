@@ -357,7 +357,6 @@ csPtr<iBase> csHazeFactoryLoader::Parse (const char* string,
     }
   }
 
-  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -438,8 +437,6 @@ csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
     }
   }
 
-  // Incref to make sure smart pointer doesn't release reference.
-  if (fact) fact->IncRef ();
   return csPtr<iBase> (fact);
 }
 
@@ -643,7 +640,6 @@ csPtr<iBase> csHazeLoader::Parse (const char* string,
     }
   }
 
-  if (mesh) mesh->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -727,8 +723,6 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
     }
   }
 
-  // Incref to prevent smart pointer from releasing it.
-  if (mesh) mesh->IncRef ();
   return csPtr<iBase> (mesh);
 }
 
