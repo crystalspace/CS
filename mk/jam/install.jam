@@ -24,7 +24,7 @@ INSTALL_DATA ?= "$(INSTALL) -m 644" ;
 
 # set some paths
 appdatadir ?= [ ConcatDirs $(datadir) $(PACKAGE_NAME) ] ;
-appdocdir ?= [ ConcatDirs $(datadir) doc $(PACKAGE_NAME) ] ;
+appdocdir ?= [ ConcatDirs $(datadir) doc $(PACKAGE_NAME)-$(PACKAGE_VERSION) ] ;
 appconfdir ?= [ ConcatDirs $(sysconfdir) $(PACKAGE_NAME) ] ;
 plugindir ?= [ ConcatDirs $(libdir) $(PACKAGE_NAME) ] ;
 

@@ -41,7 +41,8 @@ m4_define([cs_lib_paths_default],
 #==============================================================================
 # INITIALIZATION
 #==============================================================================
-AC_INIT([crystal], [cs_version_number], [crystal-main@lists.sourceforge.net])
+AC_INIT([crystalspace], [cs_version_number],
+        [crystal-main@lists.sourceforge.net])
 CS_PACKAGEINFO([Crystal Space],
     [Copyright (C)1998-2004 Jorrit Tyberghein and others],
     [http://crystal.sourceforge.net/])

@@ -8,6 +8,9 @@ chronological order.
 
 8-Jul-2004
 	- Jorrit fixed a compile error in partgen.
+        - Matze changed some jam/configure things:
+            - install docu in $datadir/doc/$PACKAGE_NAME-$PACKAGE_VERSION
+            - change PACKAGE_NAME to crystalspace
 7-Jul-2004
 	- Jorrit fixed several compile errors for gcc 2.95 as reported by
 	  Darius Dawidowski. Darius also reported a warning in spr2d
