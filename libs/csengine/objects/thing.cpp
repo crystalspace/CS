@@ -2283,42 +2283,67 @@ void csThing::CreateBoundingBox ()
   bbox = NULL;
   if (num_vertices <= 0 && num_curve_vertices <= 0) return ;
   bbox = new csThingBBox ();
-  minx = maxx = obj_verts[0].x;
-  miny = maxy = obj_verts[0].y;
-  minz = maxz = obj_verts[0].z;
-
   int i;
-  for (i = 1; i < num_vertices; i++)
+  if (num_vertices > 0)
   {
-    if (obj_verts[i].x < minx)
-      minx = obj_verts[i].x;
-    else if (obj_verts[i].x > maxx)
-      maxx = obj_verts[i].x;
-    if (obj_verts[i].y < miny)
-      miny = obj_verts[i].y;
-    else if (obj_verts[i].y > maxy)
-      maxy = obj_verts[i].y;
-    if (obj_verts[i].z < minz)
-      minz = obj_verts[i].z;
-    else if (obj_verts[i].z > maxz)
-      maxz = obj_verts[i].z;
+    minx = maxx = obj_verts[0].x;
+    miny = maxy = obj_verts[0].y;
+    minz = maxz = obj_verts[0].z;
+
+    for (i = 1; i < num_vertices; i++)
+    {
+      if (obj_verts[i].x < minx)
+        minx = obj_verts[i].x;
+      else if (obj_verts[i].x > maxx)
+        maxx = obj_verts[i].x;
+      if (obj_verts[i].y < miny)
+        miny = obj_verts[i].y;
+      else if (obj_verts[i].y > maxy)
+        maxy = obj_verts[i].y;
+      if (obj_verts[i].z < minz)
+        minz = obj_verts[i].z;
+      else if (obj_verts[i].z > maxz)
+        maxz = obj_verts[i].z;
+    }
+  }
+  else if (num_curve_vertices == 0)
+  {
+    minx = 10000000.;
+    miny = 10000000.;
+    minz = 10000000.;
+    maxx = -10000000.;
+    maxy = -10000000.;
+    maxz = -10000000.;
   }
 
-  for (i = 0; i < num_curve_vertices; i++)
+  if (num_curve_vertices > 0)
   {
-    csVector3 &cv = curve_vertices[i];
-    if (cv.x < minx)
-      minx = cv.x;
-    else if (cv.x > maxx)
-      maxx = cv.x;
-    if (cv.y < miny)
-      miny = cv.y;
-    else if (cv.y > maxy)
-      maxy = cv.y;
-    if (cv.z < minz)
-      minz = cv.z;
-    else if (cv.z > maxz)
-      maxz = cv.z;
+    int stidx = 0;
+    if (num_vertices == 0)
+    {
+      csVector3 &cv = curve_vertices[0];
+      minx = maxx = cv.x;
+      miny = maxy = cv.y;
+      minz = maxz = cv.z;
+      stidx = 1;
+    }
+
+    for (i = stidx ; i < num_curve_vertices ; i++)
+    {
+      csVector3 &cv = curve_vertices[i];
+      if (cv.x < minx)
+        minx = cv.x;
+      else if (cv.x > maxx)
+        maxx = cv.x;
+      if (cv.y < miny)
+        miny = cv.y;
+      else if (cv.y > maxy)
+        maxy = cv.y;
+      if (cv.z < minz)
+        minz = cv.z;
+      else if (cv.z > maxz)
+        maxz = cv.z;
+    }
   }
 
   bbox->i7 = AddVertex (minx, miny, minz);
