@@ -62,7 +62,6 @@ DSP.WIN32SYS.RESOURCES = \
   include/cssys/win32/csosdefs.h \
   include/cssys/win32/volatile.h \
   include/cssys/win32/win32.h \
-  include/cssys/win32/winhelp.h \
   libs/cssys/general/findlib.cpp \
   libs/cssys/general/getopt.cpp \
   libs/cssys/general/printf.cpp \
