@@ -54,10 +54,10 @@ public:
   csVector3 (float m) : x(m), y(m), z(m) {}
 
   /// Make a new vector and initialize with the given values.
-  csVector3 (float ix, float iy, float iz = 0) { x = ix; y = iy; z = iz; }
+  csVector3 (float ix, float iy, float iz = 0) : x(ix), y(iy), z(iz) {}
 
   /// Copy Constructor.
-  csVector3 (const csVector3& v) { x = v.x; y = v.y; z = v.z; }
+  csVector3 (const csVector3& v) : x(v.x), y(v.y), z(v.z) {}
 
   /// Conversion from double precision vector to single.
   csVector3 (const csDVector3&);
