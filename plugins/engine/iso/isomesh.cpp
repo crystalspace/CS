@@ -307,6 +307,14 @@ public:
       //clip_plane, clip_z_plane);
     return true;
   }
+  virtual bool ClipBBox (const csBox3& /*cbox*/,
+          int& clip_portal, int& clip_plane, int& clip_z_plane)
+  {
+    clip_plane = CS_CLIP_NOT;
+    clip_portal = CS_CLIP_NOT;
+    clip_z_plane = CS_CLIP_NOT;
+    return true;
+  }
 
   virtual iSector* GetThisSector () {return 0;}
   virtual void SetThisSector (iSector* ) {}
