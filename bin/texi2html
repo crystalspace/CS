@@ -54,7 +54,7 @@ Send bugs and suggestions to <texi2html\@mathematik.uni-kl.de>
 EOT
 
 # Version: set in configure.in
-$THISVERSION = '1.62';
+$THISVERSION = '1.64';
 $THISPROG = "texi2html $THISVERSION";	# program name and version
   
 # The man page for this program is included at the end of this file and can be
@@ -70,7 +70,7 @@ eval { ($T2H_USER = (getpwuid ($<))[6]) =~ s/,.*//;}; # Who am i
 #+++############################################################################
 #                                                                              #
 # Initialization                                                               #
-# Pasted content of File $(srcdir)/texi2html.init                              #
+# Pasted content of File $(srcdir)/texi2html.init: Default initializations     # 
 #                                                                              #
 #---############################################################################
 
@@ -103,27 +103,62 @@ eval { ($T2H_USER = (getpwuid ($<))[6]) =~ s/,.*//;}; # Who am i
 # command-line arguments following the -init_file option
 #
 
-# -debug
-# debugging: 0 -- no debugging, other values: see beginning of texi2html
+# T2H_OPTIONS is a hash whose keys are the (long) names of valid
+# command-line options and whose values are a hash with the following keys:
+# type    ==> one of !|=i|:i|=s|:s (see GetOpt::Long for more info)
+# linkage ==> ref to scalar, array, or subroutine (see GetOpt::Long for more info)
+# verbose ==> short description of option (displayed by -h)
+# noHelp  ==> if 1 -> for "not so important options": only print description on -h 1
+#                2 -> for obsolete options: only print description on -h 2
+
 $T2H_DEBUG = 0;
+$T2H_OPTIONS -> {debug} =
+{
+ type => '=i',
+ linkage => \$main::T2H_DEBUG,
+ verbose => 'output HTML with debuging information',
+};
 
-# -doctype
-# document type which is specified in header of html files
 $T2H_DOCTYPE = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'; 
+$T2H_OPTIONS -> {doctype} = 
+{
+ type => '=s',
+ linkage => \$main::T2H_DOCTYPE,
+ verbose => 'document type which is output in header of HTML files',
+ noHelp => 1
+};
 
-# -check
-# if set, only check files and give the list of all things that may be 
-# Texinfo commands
 $T2H_CHECK = 0;
+$T2H_OPTIONS -> {check} =
+{
+ type => '!',
+ linkage => \$main::T2H_CHECK,
+ verbose => 'if set, only check files and output all things that may be Texinfo commands',
+ noHelp => 1
+};
 
 # -expand
 # if set to "tex" (or, "info") expand @iftex and @tex (or, @ifinfo) sections
 # else, neither expand @iftex, @tex, nor @ifinfo sections
 $T2H_EXPAND = "info";
+$T2H_OPTIONS -> {expand} = 
+{
+ type => '=s',
+ linkage => \$T2H_EXPAND,
+ verbose => 'Expand info|tex|none section of texinfo source',
+};
 
 # - glossary
 #if set, uses section named `Footnotes' for glossary
 $T2H_USE_GLOSSARY = 0;
+T2H_OPTIONS -> {glossary} =
+{
+ type => '!',
+ linkage => \$T2H_USE_GLOSSARY,
+ verbose => "if set, uses section named `Footnotes' for glossary",
+ noHelp  => 1,
+};
+
 
 # -invisible
 # $T2H_INVISIBLE_MARK is the text used to create invisible destination
@@ -134,15 +169,35 @@ $T2H_USE_GLOSSARY = 0;
 # inserts space between headers and start of text (obachman 3/99)
 $T2H_INVISIBLE_MARK = '';
 # $T2H_INVISIBLE_MARK = '&#160;';
+$T2H_OPTIONS -> {invisible} =
+{
+ type => '=s',
+ linkage => \$T2H_INVISIBLE_MARK,
+ verbose => 'use text in invisble anchot',
+ noHelp  => 1,
+};
 
 # -iso
 # if set, ISO8879 characters are used for special symbols (like copyright, etc)
 $T2H_USE_ISO = 0;
+$T2H_OPTIONS -> {iso} =
+{
+ type => 'iso',
+ linkage => \$T2H_USE_ISO,
+ verbose => 'if set, ISO8879 characters are used for special symbols (like copyright, etc)',
+ noHelp => 1,
+};
 
 # -I
 # list directories where @include files are searched for (besides the
 # directory of the doc file) additional '-I' args add to this list
 @T2H_INCLUDE_DIRS = (".");
+$T2H_OPTIONS -> {I} =
+{
+ type => '=s',
+ linkage => \@T2H_INCLUDE_DIRS,
+ verbose => 'append $s to the @include search path',
+};
 
 # -top_file
 # uses file of this name for top-level file
@@ -150,15 +205,58 @@ $T2H_USE_ISO = 0;
 # If empty, <basename of document>.html is used
 # Typically, you would set this to "index.html".
 $T2H_TOP_FILE = '';
+$T2H_OPTIONS -> {top_file} =
+{
+ type => '=s',
+ linkage => \$T2H_TOP_FILE,
+ verbose => 'use $s as top file, instead of <docname>.html',
+};
 
-# -menu
+
+# -toc_file
+# uses file of this name for table of contents file
+# extension is manipulated appropriately, if necessary.
+# If empty, <basename of document>_toc.html is used
+$T2H_TOC_FILE = '';
+$T2H_OPTIONS -> {toc_file} =
+{
+ type => '=s',
+ linkage => \$T2H_TOC_FILE,
+ verbose => 'use $s as ToC file, instead of <docname>_toc.html',
+};
+
+# -frames
+# if set, output two additional files which use HTML 4.0 "frames".
+$T2H_FRAMES = 0;
+$T2H_OPTIONS -> {frames} =
+{
+ type => '!',
+ linkage => \$T2H_FRAMES,
+ verbose => 'output files which use HTML 4.0 frames (experimental)',
+ noHelp => 1,
+};
+
+
+# -menu | -nomenu
 # if set, show the Texinfo menus
 $T2H_SHOW_MENU = 1;
+$T2H_OPTIONS -> {menu} =
+{
+ type => '!',
+ linkage => \$T2H_SHOW_MENU,
+ verbose => 'ouput Texinfo menus',
+};
 
-# -number
+# -number | -nonumber
 # if set, number sections and show section names and numbers in references 
 # and menus
 $T2H_NUMBER_SECTIONS = 1;
+$T2H_OPTIONS -> {number} =
+{
+ type => '!',
+ linkage => \$T2H_NUMBER_SECTIONS,
+ verbose => 'use numbered sections'
+};
 
 # if set, and T2H_NUMBER_SECTIONS is set, then use node names in menu
 # entries, instead of section names
@@ -174,7 +272,13 @@ $T2H_AVOID_MENU_REDUNDANCY = 1;
 # Glossary, About.
 # otherwise, create monolithic html file which contains whole document
 #$T2H_SPLIT = 'section';
-$T2H_SPLIT = undef;
+$T2H_SPLIT = '';
+$T2H_OPTIONS -> {split} =
+{
+ type => '=s',
+ linkage => \$T2H_SPLIT,
+ verbose => 'split document on section|chapter else no splitting',
+};
 
 # -section_navigation|-no-section_navigation
 # if set, then navigation panels are printed at the beginning of each section
@@ -183,49 +287,114 @@ $T2H_SPLIT = undef;
 # This is most useful if you do not want to have section navigation 
 # on -split chapter
 $T2H_SECTION_NAVIGATION = 1;
+$T2H_OPTIONS -> {sec_nav} =
+{
+ type => '!',
+ linkage => \$T2H_SECTION_NAVIGATION,
+ verbose => 'output navigation panels for each section',
+};
 
 # -subdir
 # if set put result files in this directory
 # if not set result files are put into current directory
 #$T2H_SUBDIR = 'html';
-$T2H_SUBDIR = undef;
+$T2H_SUBDIR = '';
+$T2H_OPTIONS -> {subdir} =
+{
+ type => '=s',
+ linkage => \$T2H_SUBDIR,
+ verbose => 'put HTML files in directory $s, instead of $cwd',
+};
 
 # -short_extn
 # If this is set all HTML file will have extension ".htm" instead of
 # ".html". This is helpful when shipping the document to PC systems.
 $T2H_SHORTEXTN = 0;
+$T2H_OPTIONS -> {short_ext} =
+{
+ type => '!',
+ linkage => \$T2H_SHORTEXTN,
+ verbose => 'use "htm" extension for output HTML files',
+};
+
 
 # -prefix
 # Set the output file prefix, prepended to all .html, .gif and .pl files.
 # By default, this is the basename of the document
 $T2H_PREFIX = '';
+$T2H_OPTIONS -> {prefix} =
+{
+ type => '=s',
+ linkage => \$T2H_PREFIX,
+ verbose => 'use as prefix for output files, instead of <docname>',
+};
 
 # -o filename
 # If set, generate monolithic document output html into $filename
 $T2H_OUT = '';
+$T2H_OPTIONS -> {out_file} =
+{
+ type => '=s',
+ linkage => sub {$main::T2H_OUT = @_[1]; $T2H_SPLIT = '';},
+ verbose => 'if set, all HTML output goes into file $s',
+};
 
 # -short_ref
 #if set cross-references are given without section numbers
-$T2H_SHORT_REF = 0;
+$T2H_SHORT_REF = '';
+$T2H_OPTIONS -> {short_ref} =
+{
+ type => '!',
+ linkage => \$T2H_SHORT_REF,
+ verbose => 'if set, references are without section numbers',
+};
 
 # -idx_sum
 # if value is set, then for each @prinindex $what
 # $docu_name_$what.idx is created which contains lines of the form
 # $key\t$ref sorted alphabetically (case matters)
 $T2H_IDX_SUMMARY = 0;
+$T2H_OPTIONS -> {idx_sum} =
+{
+ type => '!',
+ linkage => \$T2H_IDX_SUMMARY,
+ verbose => 'if set, also output index summary',
+ noHelp  => 1,
+};
 
 # -verbose
 # if set, chatter about what we are doing
-$T2H_VERBOSE = 0;
+$T2H_VERBOSE = '';
+$T2H_OPTIONS -> {Verbose} =
+{
+ type => '!',
+ linkage => \$T2H_VERBOSE,
+ verbose => 'print progress info to stdout',
+};
 
 # -lang
 # For page titles use $T2H_WORDS->{$T2H_LANG}->{...} as title.
 # To add a new language, supply list of titles (see $T2H_WORDS below).
-$T2H_LANG = 'english';
+# and use ISO 639 language codes (see e.g. perl module Locale-Codes-1.02 
+# for  definitions)
+# Default's to 'en' if not set or no @documentlanguage is specified
+$T2H_LANG = '';
+$T2H_OPTIONS -> {lang} =
+{
+ type => '=s',
+ linkage => sub {SetDocumentLanguage($_[1])},
+ verbose => 'use $s as document language (ISO 639 encoding)',
+};
 
 # -l2h
 # if set, uses latex2html for generation of math content 
-$T2H_L2H = 0;
+$T2H_L2H = '';
+$T2H_OPTIONS -> {l2h} =
+{
+ type => '!',
+ linkage => \$T2H_L2H,
+ verbose => 'if set, uses latex2html for @math and @tex',
+};
 
 ######################
 # The following options are only relevant if $T2H_L2H is set
@@ -233,22 +402,65 @@ $T2H_L2H = 0;
 # -l2h_l2h
 # name/location of latex2html progam
 $T2H_L2H_L2H = "latex2html";
+$T2H_OPTIONS -> {l2h_l2h} =
+{
+ type => '=s',
+ linkage => \$T2H_L2H_L2H,
+ verbose => 'program to use for latex2html translation',
+ noHelp => 1,
+};
 
 # -l2h_skip
-# if set, skips actual call to latex2htm tries to reuse previously generated 
+# if set, skips actual call to latex2html tries to reuse previously generated 
 # content, instead
-$T2H_L2H_SKIP = 0;
+$T2H_L2H_SKIP = '';
+$T2H_OPTIONS -> {l2h_skip} =
+{
+ type => '!',
+ linkage => \$T2H_L2H_SKIP,
+ verbose => 'if set, tries to reuse previously latex2html output',
+ noHelp => 1,
+};
 
 # -l2h_tmp
 # if set, l2h uses this directory for temporarary files. The path
 # leading to this directory may not contain a dot (i.e., a "."),
 # otherwise, l2h will fail
 $T2H_L2H_TMP = '';
+$T2H_OPTIONS -> {l2h_tmp} =
+{
+ type => '=s',
+ linkage => \$T2H_L2H_TMP,
+ verbose => 'if set, uses $s as temporary latex2html directory',
+ noHelp => 1,
+};
 
-# -l2h_keep
-# if set, keeps intermediate files (they all have the prefix $doc_l2h_) 
-# of l2h for later reuse
-$T2H_L2H_KEEP = 1;
+# if set, cleans intermediate files (they all have the prefix $doc_l2h_) 
+# of l2h 
+$T2H_L2H_CLEAN = 1;
+$T2H_OPTIONS -> {l2h_clean} =
+{
+ type => '!',
+ linkage => \$T2H_L2H_CLEAN,
+ verbose => 'if set, do not keep intermediate latex2html files for later reuse',
+ noHelp => 1,
+};
+
+$T2H_OPTIONS -> {D} =
+{
+ type => '=s',
+ linkage => sub {$main::value{@_[1]} = 1;},
+ verbose => 'equivalent to Texinfo "@set $s 1"',
+ noHelp => 1,
+};
+
+$T2H_OPTIONS -> {init_file} =
+{
+ type => '=s',
+ linkage => \&LoadInitFile,
+ verbose => 'load init file $s'
+};
+
 
 ##############################################################################
 #
@@ -281,13 +493,17 @@ $T2H_INDEX_CHAPTER = '';
 # after they have more than that many entries
 $T2H_SPLIT_INDEX = 100;
 
+# if set (e.g., to index.html) replace hrefs to this file 
+# (i.e., to index.html) by ./
+$T2H_HREF_DIR_INSTEAD_FILE = '';
+
 ########################################################################
 # Language dependencies: 
 # To add a new language extend T2H_WORDS hash and create $T2H_<...>_WORDS hash
 # To redefine one word, simply do:
 # $T2H_WORDS->{<language>}->{<word>} = 'whatever' in your personal init file.
 #
-$T2H_ENGLISH_WORDS =
+$T2H_WORDS_EN =
 {
  # titles  of pages
  'ToC_Title' => 'Table of Contents',
@@ -316,7 +532,7 @@ $T2H_ENGLISH_WORDS =
 #  'About_Button' => 'About'
 };
 
-$T2H_GERMAN_WORDS =
+$T2H_WORD_DE =
 {
  'ToC_Title' => 'Inhaltsverzeichniss',
  'Overview_Title' => 'Kurzes Inhaltsverzeichniss',
@@ -328,12 +544,117 @@ $T2H_GERMAN_WORDS =
  'section' => 'Abschnitt',
 };
 
-$T2H_WORDS =
+$T2H_WORD_NL =
 {
- 'english' => $T2H_ENGLISH_WORDS,
- 'german' => $T2H_GERMAN_WORDS
+ 'ToC_Title' => 'Inhoudsopgave',
+ 'Overview_Title' => 'Korte inhoudsopgave',
+ 'Index_Title' => 'Index', #Not sure ;-)
+ 'About_Title' => 'No translation available!', #No translation available!
+ 'Footnotes_Title' => 'No translation available!', #No translation available!
+ 'See' => 'Zie',
+ 'see' => 'zie',
+ 'section' => 'sectie',
 };
 
+$T2H_WORD_ES =
+{
+ 'ToC_Title' => '&iacute;ndice General',
+ 'Overview_Title' => 'Resumen del Contenido',
+ 'Index_Title' => 'Index', #Not sure ;-)
+ 'About_Title' => 'No translation available!', #No translation available!
+ 'Footnotes_Title' => 'Fu&szlig;noten',
+ 'See' => 'V&eacute;ase',
+ 'see' => 'v&eacute;ase',
+ 'section' => 'secci&oacute;n',
+};
+
+$T2H_WORD_NO =
+{
+ 'ToC_Title' => 'Innholdsfortegnelse',
+ 'Overview_Title' => 'Kort innholdsfortegnelse',
+ 'Index_Title' => 'Indeks', #Not sure ;-)
+ 'About_Title' => 'No translation available!', #No translation available!
+ 'Footnotes_Title' => 'No translation available!',
+ 'See' => 'Se',
+ 'see' => 'se',
+ 'section' => 'avsnitt',
+};
+
+$T2H_WORD_PT =
+{
+ 'ToC_Title' => 'Sum&aacute;rio',
+ 'Overview_Title' => 'Breve Sum&aacute;rio',
+ 'Index_Title' => '&Iacute;ndice', #Not sure ;-)
+ 'About_Title' => 'No translation available!', #No translation available!
+ 'Footnotes_Title' => 'No translation available!',
+ 'See' => 'Veja',
+ 'see' => 'veja',
+ 'section' => 'Se&ccedil;&atilde;o',
+};
+
+$T2H_WORDS =
+{
+ 'en' => $T2H_WORDS_EN,
+ 'de' => $T2H_WORDS_DE,
+ 'nl' => $T2H_WORDS_NL,
+ 'es' => $T2H_WORDS_ES,
+ 'no' => $T2H_WORDS_NO,
+ 'pt' => $T2H_WORDS_PT
+};
+
+@MONTH_NAMES_EN =
+(
+ 'January', 'February', 'March', 'April', 'May',
+ 'June', 'July', 'August', 'September', 'October',
+ 'November', 'December'
+);
+
+@MONTH_NAMES_DE =
+(
+ 'Januar', 'Februar', 'M&auml;rz', 'April', 'Mai',
+ 'Juni', 'Juli', 'August', 'September', 'Oktober',
+ 'November', 'Dezember'
+);
+
+@MONTH_NAMES_NL =
+(
+ 'Januari', 'Februari', 'Maart', 'April', 'Mei',
+ 'Juni', 'Juli', 'Augustus', 'September', 'Oktober',
+ 'November', 'December'
+);
+
+@MONTH_NAMES_ES =
+(
+ 'enero', 'febrero', 'marzo', 'abril', 'mayo',
+ 'junio', 'julio', 'agosto', 'septiembre', 'octubre',
+ 'noviembre', 'diciembre'
+);
+
+@MONTH_NAMES_NO =
+(
+
+ 'januar', 'februar', 'mars', 'april', 'mai',
+ 'juni', 'juli', 'august', 'september', 'oktober',
+ 'november', 'desember'
+);
+
+@MONTH_NAMES_PT =
+(
+ 'Janeiro', 'Fevereiro', 'Mar&ccedil;o', 'Abril', 'Maio',
+ 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro',
+ 'Novembro', 'Dezembro'
+);
+
+
+$MONTH_NAMES =
+{
+    'en' => \@MONTH_NAMES_EN,
+    'de' => \@MONTH_NAMES_DE,
+    'es' => \@MONTH_NAMES_ES,
+    'nl' => \@MONTH_NAMES_NL,
+    'no' => \@MONTH_NAMES_NO,
+    'pt' => \@MONTH_NAMES_PT
+};
 ########################################################################
 # Control of Page layout:
 # You can make changes of the Page layout at two levels:
@@ -399,6 +720,8 @@ $T2H_print_foot_navigation    = \&T2H_DEFAULT_print_foot_navigation;
 $T2H_button_icon_img	      = \&T2H_DEFAULT_button_icon_img;        
 $T2H_print_navigation	      = \&T2H_DEFAULT_print_navigation;       
 $T2H_about_body		      = \&T2H_DEFAULT_about_body;            
+$T2H_print_frame              = \&T2H_DEFAULT_print_frame;
+$T2H_print_toc_frame          = \&T2H_DEFAULT_print_toc_frame;
 
 ########################################################################
 # Layout for html for every sections
@@ -556,11 +879,25 @@ sub T2H_DEFAULT_print_chapter_footer
   &$T2H_print_navigation(@_);
 }
 ###################################################################
+$T2H_TODAY = &pretty_date;		# like "20 September 1993"
+
+sub pretty_date {
+    local($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst);
+
+    ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime(time);
+    $year += ($year < 70) ? 2000 : 1900;
+    # obachman: Let's do it as the Americans do
+    return($MONTH_NAMES->{$T2H_LANG}[$mon] . ", " . $mday . " " . $year);
+}
+
+
+###################################################################
 # Layout of standard header and footer
 #
 
 # Set the default body text, inserted between <BODY ... > 
-$T2H_BODYTEXT = 'LANG="EN" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000"';
+###$T2H_BODYTEXT = 'LANG="EN" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000"';
+$T2H_BODYTEXT = 'LANG="' . $T2H_LANG . '" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000"';
 # text inserted after <BODY ...>
 $T2H_AFTER_BODY_OPEN = '';
 #text inserted before </BODY>
@@ -577,12 +914,12 @@ sub T2H_DEFAULT_print_page_head
   my $fh = shift; 
   my $longtitle = "$T2H_THISDOC{title}: $T2H_NAME{This}";
   print $fh <<EOT;
+<HTML>
 $T2H_DOCTYPE
 <!-- Created on $T2H_TODAY by $THISPROG -->
 <!-- 
 $T2H_AUTHORS 
 -->
-<HTML>
 <HEAD>
 <TITLE>$longtitle</TITLE>
 
@@ -801,6 +1138,35 @@ sub T2H_DEFAULT_print_navigation
   }
   print $fh "</TR>" unless $vertical;
   print $fh "</TABLE>\n";
+}
+
+######################################################################
+# Frames: this is from "Richard Y. Kim" <ryk@coho.net>
+# Should be improved to be more conforming to other _print* functions
+
+sub T2H_DEFAULT_print_frame
+{
+  my $fh = shift;
+  print $fh <<EOT;
+<HTML>
+<HEAD><TITLE>$T2H_THISDOC{title}</TITLE></HEAD>
+<FRAMESET cols="140,*"> 
+  <FRAME name=toc  src="$docu_toc_frame_file">
+  <FRAME name=main src="$docu_doc">
+</FRAMESET> 
+</HTML>
+EOT
+}
+
+sub T2H_DEFAULT_print_toc_frame
+{
+  my $fh = shift;
+  &$T2H_print_page_head($fh);
+  print $fh <<EOT;
+<H2>Content</H2>
+EOT
+  print $fh map {s/HREF=/target=\"main\" HREF=/; $_;} @stoc_lines;
+  print $fh "</BODY></HTML>\n";
 }
 
 ######################################################################
@@ -1105,9 +1471,263 @@ $TITLES_LANGUAGE = "english";
 # End File texi2html.init
 ######################################################################
 
+
 require "$ENV{T2H_HOME}/texi2html.init" 
   if ($0 =~ /\.pl$/ &&
       -e "$ENV{T2H_HOME}/texi2html.init" && -r "$ENV{T2H_HOME}/texi2html.init");
+
+#+++############################################################################
+#                                                                              #
+# Initialization                                                               #
+# Pasted content of File $(srcdir)/MySimple.pm: Command-line processing        #
+#                                                                              #
+#---############################################################################
+
+# leave this within comments, and keep the require statement
+# This way, you can directly run texi2html.pl, if $ENV{T2H_HOME}/texi2html.init
+# exists.
+
+# 
+package Getopt::MySimple;
+
+# Name:
+#	Getopt::MySimple.
+#
+# Documentation:
+#	POD-style (incomplete) documentation is in file MySimple.pod
+#
+# Tabs:
+#	4 spaces || die.
+#
+# Author:
+#	Ron Savage	rpsavage@ozemail.com.au.
+#	1.00	19-Aug-97	Initial version.
+#	1.10	13-Oct-97	Add arrays of switches (eg '=s@').
+#	1.20	 3-Dec-97	Add 'Help' on a per-switch basis.
+#	1.30	11-Dec-97	Change 'Help' to 'verbose'. Make all hash keys lowercase.
+#	1.40	10-Nov-98	Change width of help report. Restructure tests.
+#               1-Jul-00        Modifications for Texi2html
+
+# --------------------------------------------------------------------------
+# Locally modified by obachman (Display type instead of env, order by cmp)
+# $Id$
+
+# use strict;
+# no strict 'refs';
+
+use vars qw(@EXPORT @EXPORT_OK @ISA);
+use vars qw($fieldWidth $opt $VERSION);
+
+use Exporter();
+use Getopt::Long;
+
+@ISA		= qw(Exporter);
+@EXPORT		= qw();
+@EXPORT_OK	= qw($opt);	# An alias for $self -> {'opt'}.
+
+# --------------------------------------------------------------------------
+
+$fieldWidth	= 20;
+$VERSION	= '1.41';
+
+# --------------------------------------------------------------------------
+
+sub byOrder
+{
+	my($self) = @_;
+	
+	return uc($a) cmp (uc($b));
+}
+
+# --------------------------------------------------------------------------
+
+sub dumpOptions
+{
+	my($self) = @_;
+
+	print 'Option', ' ' x ($fieldWidth - length('Option') ), "Value\n";
+
+	for (sort byOrder keys(%{$self -> {'opt'} }) )
+	{
+	  print "-$_", ' ' x ($fieldWidth - (1 + length) ), "${$self->{'opt'} }{$_}\n";
+	}
+
+	print "\n";
+
+}	# End of dumpOptions.
+
+# --------------------------------------------------------------------------
+# Return:
+#	0 -> Error.
+#	1 -> Ok.
+
+sub getOptions
+{
+	push(@_, 0) if ($#_ == 2);	# Default for $ignoreCase is 0.
+	push(@_, 1) if ($#_ == 3);	# Default for $helpThenExit is 1.
+
+	my($self, $default, $helpText, $versionText, 
+	   $helpThenExit, $versionThenExit, $ignoreCase) = @_;
+	
+	$helpThenExit = 1 unless (defined($helpThenExit));
+	$versionThenExit = 1 unless (defined($versionThenExit));
+	$ignoreCase = 0 unless (defined($ignoreCase));
+
+	$self -> {'default'}		= $default;
+	$self -> {'helpText'}		= $helpText;
+	$self -> {'versionText'}        = $versionText;
+	$Getopt::Long::ignorecase	= $ignoreCase;
+
+	unless (defined($self -> {'default'}{'help'}))
+	{
+	  $self -> {'default'}{'help'} = 
+	  { 
+	   type => ':i', 
+	   default => '',
+	   linkage => sub {$self->helpOptions($_[1]); exit (0) if $helpThenExit;},
+	   verbose => "print help and exit"
+	  };
+	}
+
+	unless (defined($self -> {'default'}{'version'}))
+	{
+	  $self -> {'default'}{'version'} = 
+	  { 
+	   type => '', 
+	   default => '',
+	   linkage => sub {print $self->{'versionText'};  exit (0) if versionTheExit;},
+	   verbose => "print version and exit"
+	  };
+	}
+
+	for (keys(%{$self -> {'default'} }) )
+	{
+	  my $type = ${$self -> {'default'} }{$_}{'type'};
+	  push(@{$self -> {'type'} }, "$_$type");
+	  $self->{'opt'}->{$_} =  ${$self -> {'default'} }{$_}{'linkage'}
+            if ${$self -> {'default'} }{$_}{'linkage'};
+	}
+
+	my($result) = &GetOptions($self -> {'opt'}, @{$self -> {'type'} });
+
+        return $result unless $result;
+
+	for (keys(%{$self -> {'default'} }) )
+	{
+ 	   if (! defined(${$self -> {'opt'} }{$_})) #{
+            {
+ 	     ${$self -> {'opt'} }{$_} = ${$self -> {'default'} }{$_}{'default'};
+            }
+	}
+
+	$result;
+}	# End of getOptions.
+
+# --------------------------------------------------------------------------
+
+sub helpOptions
+{
+	my($self) = shift;
+	my($noHelp) = shift;
+	$noHelp = 0 unless $noHelp;
+	my($optwidth, $typewidth, $defaultwidth, $maxlinewidth, $valind, $valwidth) 
+	  = (10, 5, 9, 78, 4, 11);
+
+	print "$self->{'helpText'}" if ($self -> {'helpText'});
+
+	print ' Option', ' ' x ($optwidth - length('Option') -1 ),
+		'Type', ' ' x ($typewidth - length('Type') + 1),
+		'Default', ' ' x ($defaultwidth - length('Default') ),
+	        "Description\n";
+
+	for (sort byOrder keys(%{$self -> {'default'} }) )
+	{
+	  my($line, $help, $option, $val);
+	  $option = $_;
+	  next if ${$self->{'default'} }{$_}{'noHelp'} && ${$self->{'default'} }{$_}{'noHelp'} > $noHelp;
+		$line = " -$_ " . ' ' x ($optwidth - (2 + length) ) .
+			"${$self->{'default'} }{$_}{'type'} ".
+			' ' x ($typewidth - (1+length(${$self -> {'default'} }{$_}{'type'}) ));
+
+                 $val = ${$self->{'default'} }{$_}{'linkage'};
+                if ($val)
+                {
+                  if (ref($val) eq 'SCALAR')
+		  {
+		    $val = $$val; 
+		  }
+		  else
+		  {
+		    $val = '';
+		  }
+                }
+		else
+		{
+		  $val = ${$self->{'default'} }{$_}{'default'};
+		}
+	        $line .= "$val  ";
+		$line .= ' ' x ($optwidth + $typewidth + $defaultwidth + 1 - length($line));
+		
+		if (defined(${$self -> {'default'} }{$_}{'verbose'}) &&
+		  ${$self -> {'default'} }{$_}{'verbose'} ne '')
+	      {
+		$help = "${$self->{'default'} }{$_}{'verbose'}";
+	      }
+	      else
+	      {
+		$help = ' ';
+	      }
+	      if ((length("$line") + length($help)) < $maxlinewidth)
+	      {
+		print $line , $help, "\n";
+	      }
+	      else
+	      {
+		print $line, "\n", ' ' x $valind, $help, "\n";
+	      }
+	      for $val (sort byOrder keys(%{${$self->{'default'}}{$option}{'values'}}))
+	      {
+	        print ' ' x ($valind + 2);
+	        print $val, '  ', ' ' x ($valwidth - length($val) - 2);
+	        print ${$self->{'default'}}{$option}{'values'}{$val}, "\n";
+	      }
+	}
+
+	print <<EOT;
+Note: 'Options' may be abbreviated. 'Type' specifications mean:
+ <none>| !    no argument: variable is set to 1 on -foo (or, to 0 on -nofoo)
+    =s | :s   mandatory (or, optional)  string argument
+    =i | :i   mandatory (or, optional)  integer argument
+EOT
+}	# End of helpOptions.
+
+#-------------------------------------------------------------------
+
+sub new
+{
+	my($class)				= @_;
+	my($self)				= {};
+	$self -> {'default'}	= {};
+	$self -> {'helpText'}	= '';
+	$self -> {'opt'}		= {};
+	$opt					= $self -> {'opt'};	 # An alias for $self -> {'opt'}.
+	$self -> {'type'}		= ();
+
+	return bless $self, $class;
+
+}	# End of new.
+
+# --------------------------------------------------------------------------
+
+1;
+
+# End MySimple.pm
+
+require "$ENV{T2H_HOME}/MySimple.pm" 
+  if ($0 =~ /\.pl$/ &&
+      -e "$ENV{T2H_HOME}/texi2html.init" && -r "$ENV{T2H_HOME}/texi2html.init");
+
+package main;
 
 #+++############################################################################
 #                                                                              #
@@ -1332,22 +1952,22 @@ $complex_format_map =
 {
  example => 
  [
-  q{"<TABLE><tr>$T2H_EXAMPLE_INDENT_CELL<td><pre>"},
+  q{"<TABLE><tr>$T2H_EXAMPLE_INDENT_CELL<td class=example><pre>"},
   q{'</pre></td></tr></table>'}
  ],
  smallexample => 
  [
-  q{"<TABLE><tr>$T2H_SMALL_EXAMPLE_INDENT_CELL<td><FONT SIZE=$T2H_SMALL_FONT_SIZE><pre>"},
+  q{"<TABLE><tr>$T2H_SMALL_EXAMPLE_INDENT_CELL<td class=smallexample><FONT SIZE=$T2H_SMALL_FONT_SIZE><pre>"},
   q{'</FONT></pre></td></tr></table>'}
  ],
  display =>
  [
-  q{"<TABLE><tr>$T2H_EXAMPLE_INDENT_CELL<td><pre " . 'style="font-family: serif">'},
+  q{"<TABLE><tr>$T2H_EXAMPLE_INDENT_CELL<td class=display><pre " . 'style="font-family: serif">'},
   q{'</pre></td></tr></table>'}
  ],
  smalldisplay =>
  [
-  q{"<TABLE><tr>$T2H_SMALL_EXAMPLE_INDENT_CELL<td><FONT SIZE=$T2H_SMALL_FONT_SIZE><pre " . 'style="font-family: serif">'},
+  q{"<TABLE><tr>$T2H_SMALL_EXAMPLE_INDENT_CELL<td class=smalldisplay><FONT SIZE=$T2H_SMALL_FONT_SIZE><pre " . 'style="font-family: serif">'},
   q{'</pre></FONT></td></tr></table>'}
  ]
 };
@@ -1386,7 +2006,9 @@ $complex_format_map->{smallformat} = $complex_format_map->{smalldisplay};
 	    'deftypefun', 'deftypefn Function',
 	    'deftypevar', 'deftypevr Variable',
 	    'defivar', 'defcv {Instance Variable}',
+	    'deftypeivar', 'defcv {Instance Variable}', # NEW: FIXME
 	    'defmethod', 'defop Method',
+	    'deftypemethod', 'defop Method', # NEW:FIXME
 	    # x shortcuts
 	    'defunx', 'deffnx Function',
 	    'defmacx', 'deffnx Macro',
@@ -1463,46 +2085,132 @@ $| = 1;
 select(STDOUT);
 $| = 1;
 
-%value = ();				# hold texinfo variables, see also -D
 
+%value = ();				# hold texinfo variables, see also -D
 $use_bibliography = 1;
 $use_acc = 1;
-$usage = <<EOT;
-This is $THISPROG
-To convert a Texinfo file to HMTL: $0 [options] file
- where options can be:
-  -expand [info,tex]     : expand info/tex sections
-  -glossary              : handle a glossary
-  -invisible <name>      : use <name> as an invisible anchor
-  -D<name>               : define <name> as if with \@set
-  -I <dir>               : search also for files in <dir>
-  -init_file <file>      : use <file> for texi2html and latex2html initialization 
-  -index_file <file>     : use <file> as index file
-  -menu                  : handle menus
-  -monolithic            : cancels out -split option
-  -l2h                   : use latex2html for \@math, \@tex, and \@sc 
-  -l2h_latex2html <prog> : use <prog> as latex2html program 
-                           (default: 'latex2html')
-  -l2h_tmp <dir>         : use <dir> as temp dir for latex2html
-  -l2h_clean             : remove temporary files generated by l2h extension
-  -l2h_skip              : skip latex2html run (needs temporary files)
-  -number                : number sections
-  -o file                : output into monlithic <file>
-  -section_navigation    : use navigation panel for section
-  -no-section_navigation : do not use navigation panel for sections
-  -split section|chapter : split on section or chapter
-  -split_{node|chapter}  : split on section or chapter
-  -short_ref             : cross references without section numbers
-  -subdir dir            : put HTML files into subdir <dir>
-                           (default 'html')
-  -usage, --help         : display these usage instructions and exit immediately
-  -verbose               : verbose output
-  -version, --version    : display version number and exit immediately
-To check converted files: $0 -check [-verbose] files
-EOT
-# Not currently usaged
-#  -sidx                  : index jump label to top of section
 
+#
+# called on -init-file
+sub LoadInitFile
+{
+  my $init_file = shift;
+  # second argument is value of options
+  $init_file = shift;
+  if (-f $init_file)
+  {
+    print "# reading initialization file from $init_file\n" 
+      if ($T2H_VERBOSE);
+    require($init_file);
+  }
+  else
+  {
+    print "$ERROR Error: can't read init file $int_file\n";
+    $init_file = '';
+  }
+}
+
+#
+# called on -lang
+sub SetDocumentLanguage
+{
+  my $lang = shift;
+  if (! exists($T2H_WORDS->{$lang}))
+  {
+    warn "$ERROR: Language specs for '$lang' do not exists. Reverting to '" . 
+      ($T2H_LANG ? T2H_LANG : "en") . "'\n";
+  }
+  else
+  {
+    print "# using '$lang' as document language\n" if ($T2H_VERBOSE);
+    $T2H_LANG = $lang;
+  }
+}
+
+##
+## obsolete cmd line options
+##
+$T2H_OBSOLETE_OPTIONS -> {'no-section_navigation'} =
+{
+ type => '!',
+ linkage => sub {$main::T2H_SECTION_NAVIGATION = 0;},
+ verbose => 'obsolete, use -nosec_nav',
+ noHelp => 2,
+};
+$T2H_OBSOLETE_OPTIONS -> {use_acc} =
+{
+ type => '!',
+ linkage => \$use_acc,
+ verbose => 'obsolete',
+ noHelp => 2
+};
+$T2H_OBSOLETE_OPTIONS -> {expandinfo} =
+{
+ type => '!',
+ linkage => sub {$main::T2H_EXPAND = 'info';},
+ verbose => 'obsolete, use "-expand info" instead',
+ noHelp => 2,
+};
+$T2H_OBSOLETE_OPTIONS -> {expandtex} =
+{
+ type => '!',
+ linkage => sub {$main::T2H_EXPAND = 'tex';},
+ verbose => 'obsolete, use "-expand tex" instead',
+ noHelp => 2,
+};
+$T2H_OBSOLETE_OPTIONS -> {monolithic} =
+{
+ type => '!',
+ linkage => sub {$main::T2H_SPLIT = '';},
+ verbose => 'obsolete, use "-split no" instead',
+ noHelp => 2
+};
+$T2H_OBSOLETE_OPTIONS -> {split_node} =
+{
+ type => '!',
+ linkage => sub{$main::T2H_SPLIT = 'section';},
+ verbose => 'obsolete, use "-split section" instead',
+ noHelp => 2,
+};
+$T2H_OBSOLETE_OPTIONS -> {split_chapter} =
+{
+ type => '!',
+ linkage => sub{$main::T2H_SPLIT = 'chapter';},
+ verbose => 'obsolete, use "-split chapter" instead',
+ noHelp => 2,
+};
+$T2H_OBSOLETE_OPTIONS -> {no_verbose} =
+{
+ type => '!',
+ linkage => sub {$main::T2H_VERBOSE = 0;},
+ verbose => 'obsolete, use -noverbose instead',
+ noHelp => 2,
+};
+$T2H_OBSOLETE_OPTIONS -> {output_file} =
+{
+ type => '=s',
+ linkage => sub {$main::T2H_OUT = @_[1]; $T2H_SPLIT = '';},
+ verbose => 'obsolete, use -out_file instead',
+ noHelp => 2
+};
+
+$T2H_OBSOLETE_OPTIONS -> {section_navigation} =
+{
+ type => '!',
+ linkage => \$T2H_SECTION_NAVIGATION,
+ verbose => 'obsolete, use -sec_nav instead',
+ noHelp => 2,
+};
+
+$T2H_OBSOLETE_OPTIONS -> {verbose} =
+{
+ type => '!',
+ linkage => \$T2H_VERBOSE,
+ verbose => 'obsolete, use -Verbose instead',
+ noHelp => 2
+};
+
+# read initialzation from $sysconfdir/texi2htmlrc or $HOME/.texi2htmlrc
 my $home = $ENV{HOME};
 defined($home) or $home = '';
 foreach $i ('/usr/local/etc/texi2htmlrc', "$home/.texi2htmlrc") {
@@ -1513,83 +2221,58 @@ foreach $i ('/usr/local/etc/texi2htmlrc', "$home/.texi2htmlrc") {
     }
 }
 
-while (@ARGV && $ARGV[0] =~ /^-/) {
-    $_ = shift(@ARGV);
-    if (/^-acc$/)            { $use_acc = 1; next; }
-    if (/^-D(.+)?$/)         { $value{$1 || shift(@ARGV)} = 1; next; }
-    if (/^-d(?:ebug)?(\d+)?$/) { $T2H_DEBUG = $1 || shift(@ARGV); next; }
-    if (/^-doctype$/)        { $T2H_DOCTYPE = shift(@ARGV); next; }
-    if (/^-c(?:heck)?$/)       { $T2H_CHECK = 1; next; }
-    if (/^-e(?:xpand)?$/)      { $T2H_EXPAND = shift(@ARGV); next; }
-    if (/^-g(?:lossary)?$/)    { $T2H_USE_GLOSSARY = 1; next; }
-    if (/^-id(?:x_sum)?$/)     { $T2H_IDX_SUMMARY = 1; next; }
-    if (/^-i(?:nvisible)?$/)   { $T2H_INVISIBLE_MARK = shift(@ARGV); next; }
-    if (/^-I(.+)?$/)         { push(@T2H_INCLUDE_DIRS, $1 || shift(@ARGV)); next; }
-    if (/^-iso$/)            { $T2H_USE_ISO = 1; next; }
-    if (/^-init_file$/)      
-    { 
-      $init_file = shift(@ARGV); 
-      if (-f $init_file)
-      {
-	print "# reading initialization file from $init_file\n" 
-	  if ($T2H_VERBOSE);
-	require($init_file);
-      }
-      else
-      {
-	print "$ERROR Error: can't read init file $int_file\n";
-	$init_file = '';
-      }
-      next; 
-    }
-    if (/^-l(ang)?$/)        { $T2H_LANG = shift(@ARGV); next;}
-    if (/^-l2h$/)            { $T2H_L2H     = 1;            next; }
-    if (/^-l2h_l2h$/)        { $T2H_L2H_L2H = shift(@ARGV); next; }
-    if (/^-l2h_skip$/)       { $T2H_L2H_SKIP= 1;            next; }
-    if (/^-l2h_tmp$/)        { $T2H_L2H_TMP = shift(@ARGV); next; }
-    if (/^-l2h_clean$/)      { $T2H_L2H_CLEAN= 1;            next; }
-    if (/^-m(?:enu)?$/)        { $T2H_SHOW_MENU = 1; next; }
-    if (/^-nu(?:mber)?$/)      { $T2H_NUMBER_SECTIONS = 1; next; }
-    if (/^-o(?:ut_file)?$/)    { $T2H_OUT = shift (@ARGV); 
-                               undef $T2H_SPLIT; next;}    
-    if (/^-p(?:refix)?$/)      { $T2H_PREFIX = shift(@ARGV); next; }
-    if (/^-su(?:bdir)?$/)      { $T2H_SUBDIR = shift(@ARGV); next; }
-    if (/^-short_e(?:xtn)?$/)  { $T2H_SHORTEXTN = 1; next; }
-    if (/^-short_r(?:ef)?$/)   { $T2H_SHORT_REF = 1; next; }
-    # The following is because we want to remain compatible with
-    # texi2html versions 1.5x and earlier while also allowing
-    # `-s(plit)? (n(ode)?|c(hapter)?)' which 1.60beta used.  It's
-    # important to remain compatible with 1.5x because many build
-    # scripts use its syntax.  If anything, the 1.60beta syntax could
-    # be dropped.
-    if (/^-mono(?:lith(?:ic)?)?$/) { $T2H_SPLIT = undef; next; }
-    if (/^-s(?:plit)?(_?)(n(?:ode)?|c(?:hapter)?)?$/) {
-	if ($2 =~ /^n/) {
-	    # 1.5x syntax.
-	    $T2H_SPLIT = 'node';
-	} elsif (("$1$2" eq '') && ($ARGV[0] =~ /^(?:no|none|node|section|chapter)$/i)) {
-	    # 1.60beta syntax.
-	    $T2H_SPLIT = shift(@ARGV);
-	} else {
-	    # 1.5x syntax.
-	    $T2H_SPLIT = 'chapter';
-	}
-	next;
-    }
-    if (/^-t(?:op_file)?$/)    { $T2H_TOP_FILE = shift (@ARGV); next;}    
-    if (/^-v(?:erbose)?$/)     { $T2H_VERBOSE = 1; next; }
-    if (/^-no_v(?:erbose)?$/)  { $T2H_VERBOSE = 0; next; }
-    if (/^-section_navigation$/)  { $T2H_SECTION_NAVIGATION = 1; next; }
-    if (/^-no-section_navigation$/)  { undef $T2H_SECTION_NAVIGATION; next; }
-    if (/^--?vers(?:ion)?$/)   { print "$THISPROG\n"; exit;}
-    if (/^-(?:usage|-help)/)   { print "$usage"; exit; }
-    die "Unknown option: $_\n$usage";
+
+#+++############################################################################
+#                                                                              #
+# parse command-line options
+#                                                                              #
+#---############################################################################
+$T2H_USAGE_TEXT = <<EOT;
+Usage: texi2html  [OPTIONS] TEXINFO-FILE
+Translates Texinfo source documentation to HTML.
+EOT
+$T2H_FAILURE_TEXT = <<EOT;
+Try 'texi2html -help' for usage instructions.
+EOT
+$options = new Getopt::MySimple;
+
+# some older version of GetOpt::Long don't have 
+# Getopt::Long::Configure("pass_through")
+eval {Getopt::Long::Configure("pass_through");};
+$Configure_failed = $@ && <<EOT;
+**WARNING: Parsing of obsolete command-line options could have failed. 
+           Consider to use only documented command-line options (run
+           'texi2html -help 2' for a complete list) or upgrade to perl 
+           version 5.005 or higher.
+EOT
+
+if (! $options->getOptions($T2H_OPTIONS, $T2H_USAGE_TEXT, "$THISVERSION\n"))
+{
+  print $Configure_failed if $Configure_failed;
+  die $T2H_FAILURE_TEXT;
 }
+
+if (@ARGV > 1)
+{
+  eval {Getopt::Long::Configure("no_pass_through");};
+  if (! $options->getOptions($T2H_OBSOLETE_OPTIONS, $T2H_USAGE_TEXT, "$THISVERSION\n"))
+  {
+    print $Configure_failed if $Configure_failed;
+    die $T2H_FAILURE_TEXT;
+  }
+}
+
 if ($T2H_CHECK) {
-    die "Need file to check\n$usage" unless @ARGV > 0;
+    die "Need file to check\n$T2H_FAILURE_TEXT" unless @ARGV > 0;
     &check;
     exit;
 }
+
+#+++############################################################################
+#                                                                              #
+# evaluation of cmd line options
+#                                                                              #
+#---############################################################################
 
 if ($T2H_EXPAND eq 'info') 
 {
@@ -1608,7 +2291,7 @@ $T2H_INVISIBLE_MARK = '<IMG SRC="invisible.xbm">' if $T2H_INVISIBLE_MARK eq 'xbm
 #
 # file name buisness
 #
-die "Need exactly one file to translate\n$usage" unless @ARGV == 1;
+die "Need exactly one file to translate\n$T2H_FAILURE_TEXT" unless @ARGV == 1;
 $docu = shift(@ARGV);
 if ($docu =~ /.*\//) {
     chop($docu_dir = $&);
@@ -1690,7 +2373,7 @@ $docu_doc = "$docu_name.$docu_ext";		# document's contents
 $docu_doc_file = "$docu_rdir$docu_doc";
 if ($T2H_SPLIT) 
 {
-  $docu_toc  = "${docu_name}_toc.$docu_ext"; # document's table of contents
+  $docu_toc  = $T2H_TOC_FILE || "${docu_name}_toc.$docu_ext"; # document's table of contents
   $docu_stoc = "${docu_name}_ovr.$docu_ext"; # document's short toc
   $docu_foot = "${docu_name}_fot.$docu_ext"; # document's footnotes
   $docu_about = "${docu_name}_abt.$docu_ext"; # about this document
@@ -1711,6 +2394,9 @@ $docu_stoc_file = "$docu_rdir$docu_stoc";
 $docu_foot_file = "$docu_rdir$docu_foot";
 $docu_about_file = "$docu_rdir$docu_about";
 $docu_top_file  = "$docu_rdir$docu_top";
+
+$docu_frame_file =     "$docu_rdir${docu_name}_frame.$docu_ext";
+$docu_toc_frame_file = "$docu_rdir${docu_name}_toc_frame.$docu_ext";
 
 #
 # variables
@@ -1778,14 +2464,6 @@ if ($progdir && ($progdir ne './')) {
 }
 
 
-#
-# Check Language
-#
-if (! exists $T2H_WORDS->{$T2H_LANG})
-{
-  warn "$ERROR: Language specs for '$T2H_LANG' do not exists. Reverting to 'english'\n";
-  $T2H_LANG = 'english'
-}
 print "# reading from $docu\n" if $T2H_VERBOSE;
 
 #########################################################################
@@ -2369,6 +3047,11 @@ INPUT_LINE: while ($_ = &next_line) {
 #     s/^(.*)\@comment /$1/;
 
     #############################################################
+    # value substitution before macro expansion, so that
+    # it works in macro arguments			    
+    s/\@value{($VARRE)}/$value{$1}/eg;
+			    
+    #############################################################
     # macro substitution
     while (/\@(\w+)/g)
     {
@@ -2378,10 +3061,32 @@ INPUT_LINE: while ($_ = &next_line) {
 	my $name = $1;
 	my $after = $';
 	my @args;
-	if ($after =~ /^\s*{(.*?)}(.*)/)
+	my $args;
+	if ($after =~ /^\s*{(.*?[^\\])}(.*)/)  
 	{
-	  @args = split(/\s*,\s*/, $1);
+	  $args = $1;
 	  $after = $2;
+	}
+	elsif (@{$macros->{$name}->{Args}} == 1)
+	{
+	  $args = $after;
+	  $args =~ s/^\s*//;
+	  $args =~ s/\s*$//;
+	  $after = '';
+	}
+	$args =~ s|\\\\|\\|g;
+	$args =~ s|\\{|{|g;
+        $args =~ s|\\}|}|g;
+	if (@{$macros->{$name}->{Args}} > 1)
+	{
+	  $args =~ s/(^|[^\\]),/$1$;/g ;
+	  $args =~ s|\\,|,|g;
+	  @args = split(/$;\s*/, $args) if (@{$macros->{$name}->{Args}} > 1);
+	}
+	else
+	{
+	  $args =~ s|\\,|,|g;
+	  @args = ($args);
 	}
 	my $macrobody = $macros->{$name}->{Body};
 	for ($i=0; $i<=$#args; $i++)
@@ -2400,10 +3105,12 @@ INPUT_LINE: while ($_ = &next_line) {
     # try to skip the line
     #
     if ($end_tag) {
+        $in_titlepage = 0 if $end_tag eq 'titlepage';
 	next if $to_skip{"end $end_tag"};
     } elsif ($tag) {
-	next if $to_skip{$tag};
-	last if $tag eq 'bye';
+      $in_titlepage = 1 if $tag eq 'titlepage';
+      next if $to_skip{$tag};
+      last if $tag eq 'bye';
     }
     if ($in_top) {
 	# parsing the top node
@@ -2449,6 +3156,10 @@ INPUT_LINE: while ($_ = &next_line) {
 	  }
 	  next;
 	}
+	if ($tag eq 'titlepage')
+	{
+	  next;
+	}
 	# handle special tables
 	if ($tag =~ /^(|f|v|multi)table$/) {
 	    $table_type = $1;
@@ -2468,13 +3179,17 @@ INPUT_LINE: while ($_ = &next_line) {
 	    push(@lines, $TOPEND);
 	  }
 	  warn "$ERROR Bad node line: $_" unless $_ =~ /^\@node\s$NODESRE$/o;
-	  $_ = &protect_html($_); # if node contains '&' for instance
+	  # request of "Richard Y. Kim" <ryk@ap.com>
 	  s/^\@node\s+//;
+	  $_ = &protect_html($_); # if node contains '&' for instance
 	  ($node, $node_next, $node_prev, $node_up) = split(/,/);
 	  &normalise_node($node);
 	  &normalise_node($node_next);
 	  &normalise_node($node_prev);
 	  &normalise_node($node_up);
+	  $node =~ /\"/ ?
+	    push @lines, &html_debug("<A NAME='$node'></A>\n", __LINE__) :
+	    push @lines, &html_debug("<A NAME=\"$node\"></A>\n", __LINE__);
 	  next;
 	} elsif ($tag eq 'include') {
 	    if (/^\@include\s+($FILERE)\s*$/o) {
@@ -2483,7 +3198,7 @@ INPUT_LINE: while ($_ = &next_line) {
 		    &open($file);
 		    print "# including $file\n" if $T2H_VERBOSE;
 		} else {
-		    warn "$ERROR Can't find $file, skipping";
+		    warn "$ERROR Can't find $1, skipping";
 		}
 	    } else {
 		warn "$ERROR Bad include line: $_";
@@ -2604,11 +3319,6 @@ INPUT_LINE: while ($_ = &next_line) {
 	  push (@lines, "<!--::${section}::-->$_");
 	  next;
 	}
-	elsif (/^\@(\w+?)index\s+/) 
-	{
-	  EnterIndexEntry($1, $', $docu_doc, $section, \@lines);
-	  next;
-	}
 	elsif ($tag eq 'sp') {
 	    push(@lines, &debug("<P>\n", __LINE__));
 	    next;
@@ -2652,10 +3362,12 @@ INPUT_LINE: while ($_ = &next_line) {
 	    
 	    $macros->{$name}->{Args} = \@args;
 	    $macros->{$name}->{Body} = '';
-	    while (($_ = &next_line) !~ /\@end $tag/)
+	    while (($_ = &next_line) && $_ !~ /\@end $tag/)
 	    {
 	      $macros->{$name}->{Body} .= $_;
 	    }
+	    die "ERROR: No closing '\@end $tag' found for macro definition of '$name'\n"
+	      unless (/\@end $tag/);
 	    chomp $macros->{$name}->{Body};
 	  }
 	  else
@@ -2668,6 +3380,10 @@ INPUT_LINE: while ($_ = &next_line) {
 	{
 	  delete $macros->{$1} if (/^\@unmacro\s*(\w+)/);
 	  next;
+	}
+	elsif ($tag eq 'documentlanguage')
+	{
+	  SetDocumentLanguage($1) if (!$T2H_LANG && /documentlanguage\s*(\w+)/);
 	}
 	elsif (defined($def_map{$tag})) {
 	    if ($def_map{$tag}) {
@@ -2741,13 +3457,17 @@ INPUT_LINE: while ($_ = &next_line) {
  	    $_ .= &debug("\n<DD>", __LINE__);
 	    $name = &unprotect_html($name);
 	    if ($tag eq 'deffn' || $tag eq 'deftypefn') {
-		unshift(@input_spool, "\@findex $name\n");
+	      EnterIndexEntry('f', $name, $docu_doc, $section, \@lines);
+#		unshift(@input_spool, "\@findex $name\n");
 	    } elsif ($tag eq 'defop') {
-		unshift(@input_spool, "\@findex $name on $ftype\n");
+	      EnterIndexEntry('f', "$name on $ftype", $docu_doc, $section, \@lines);
+#		unshift(@input_spool, "\@findex $name on $ftype\n");
 	    } elsif ($tag eq 'defvr' || $tag eq 'deftypevr' || $tag eq 'defcv') {
-		unshift(@input_spool, "\@vindex $name\n");
+	      EnterIndexEntry('v', $name, $docu_doc, $section, \@lines);
+#		unshift(@input_spool, "\@vindex $name\n");
 	    } else {
-		unshift(@input_spool, "\@tindex $name\n");
+	      EnterIndexEntry('t', $name, $docu_doc, $section, \@lines);
+#		unshift(@input_spool, "\@tindex $name\n");
 	    }
 	    $dont_html = 1;
 	}
@@ -2812,9 +3532,16 @@ INPUT_LINE: while ($_ = &next_line) {
       $anchor = &normalise_node($anchor);
       push @lines, &html_debug("<A NAME=\"$anchor\"></A>\n");
       $node2href{$anchor} = "$docu_doc#$anchor";
-      next INPUT_LINE if $_ = /^\s*$/;
+      next INPUT_LINE if $_ =~ /^\s*$/;
     }
 
+    #############################################################
+    # index entry generation, after value substitutions
+    if (/^\@(\w+?)index\s+/)
+    {
+      EnterIndexEntry($1, $', $docu_doc, $section, \@lines);
+      next;
+    }
     #
     # protect texi and HTML things
     &protect_texi;
@@ -2826,7 +3553,6 @@ INPUT_LINE: while ($_ = &next_line) {
     s/\@refill\s+//g;
     # other substitutions
     &simple_substitutions;
-    s/\@value{($VARRE)}/$value{$1}/eg;
     s/\@footnote\{/\@footnote$docu_doc\{/g; # mark footnotes, cf. pass 4
     #
     # analyze the tag again
@@ -2962,6 +3688,7 @@ INPUT_LINE: while ($_ = &next_line) {
 	    $value{'_author'}   .= Unprotect_texi($1)."\n", next if /^\@author\s+(.*)$/;
 	    $value{'_subtitle'} .= Unprotect_texi($1)."\n", next if /^\@subtitle\s+(.*)$/;
 	    $value{'_title'}    .= Unprotect_texi($1)."\n", next if /^\@title\s+(.*)$/;
+
 	    # list item
 	    if (/^\s*\@itemx?\s+/) {
 		$what = $';
@@ -3040,8 +3767,7 @@ INPUT_LINE: while ($_ = &next_line) {
 	}
       }
     # otherwise
-    push(@lines, $_);
-
+    push(@lines, $_) unless $in_titlepage;
     push(@lines, &debug("</center>\n", __LINE__))  if ($tag eq 'center');
 }
 
@@ -3054,6 +3780,7 @@ while ($level < $curlevel) {
 
 print "# end of pass 1\n" if $T2H_VERBOSE;
 
+SetDocumentLanguage('en') unless ($T2H_LANG);
 #+++############################################################################
 #                                                                              #
 # Stuff related to Index generation                                            #
@@ -3256,7 +3983,7 @@ sub PrintIndexPage
   my $summary = shift;
   my $page = shift;
   my $name = shift;
-  
+
   push @$lines, $summary;
 
   push @$lines , <<EOT;
@@ -3337,7 +4064,7 @@ sub PrintIndex
 
     while (@sections && $sections[$#sections] ne $section)
     {
-      push @after, pop @sections;
+      unshift @after, pop @sections;
     }
 
     for $page (@$Pages)
@@ -3519,7 +4246,7 @@ while (@lines) {
 	@args = split(/\s*,\s*/, $nodes);
 	$node = $args[0]; # the node is always the first arg
 	$node = &normalise_node($node);
-	$sec = $node2sec{$node};
+	$sec = $args[2] || $args[1] || $node2sec{$node};
 	$href = $node2href{$node};
 	if (@args == 5) { # reference to another manual
 	    $sec = $args[2] || $node;
@@ -3530,12 +4257,15 @@ while (@lines) {
 	    ($nn, $_, $in) = @args;
 	    $_ = "${before}${type} file `$in', node `$nn'$after";
 	} elsif ($sec && $href && ! $T2H_SHORT_REF) {
-	    $_ = "${before}${type}$T2H_WORDS->{$T2H_LANG}->{'section'} " . 
-	      &t2h_anchor('', $href, $sec) . $after;
+	    $_  = "${before}${type}";
+	    $_ .= "$T2H_WORDS->{$T2H_LANG}->{'section'} " if ${type};
+	    $_ .= &t2h_anchor('', $href, $sec) . $after;
 	} 
 	elsif ($href)
 	{
-	  $_ = "${before}${type} " . &t2h_anchor('', $href, $node) . $after;
+	  $_ = "${before}${type} " . 
+	    &t2h_anchor('', $href, $args[2] || $args[1] || $node) . 
+	      $after;
 	}
 	else {
 	    warn "$ERROR Undefined node ($node): $_";
@@ -3826,6 +4556,25 @@ print "# Using '" . clean_name($T2H_INDEX_CHAPTER) . "' as index page\n"
   );
 
 #############################################################################
+# print frame and frame toc file
+#
+if ( $T2H_FRAMES )
+{
+  open(FILE, "> $docu_frame_file") 
+    || die "$ERROR: Can't open $docu_frame_file for writing: $!\n";
+  print "# Creating frame in $docu_frame_file ...\n" if $T2H_VERBOSE;
+  &$T2H_print_frame(\*FILE);
+  close(FILE);
+
+  open(FILE, "> $docu_toc_frame_file") 
+    || die "$ERROR: Can't open $docu_toc_frame_file for writing: $!\n";
+  print "# Creating toc frame in $docu_frame_file ...\n" if $T2H_VERBOSE;
+   &$T2H_print_toc_frame(\*FILE);
+  close(FILE);
+}
+
+
+#############################################################################
 # print Top
 #
 open(FILE, "> $docu_top_file") 
@@ -3855,9 +4604,7 @@ $T2H_HREF{This} = $T2H_HREF{Top};
 if ($T2H_SPLIT)
 {
   print "# writing " . scalar(@sections) . 
-    " sections in $docu_rdir$docu_name"."_[1.." . 
-      ($T2H_SPLIT eq 'section' ? scalar(@sections) : scalar(@$T2H_OVERVIEW) ) . 
-	"]"  
+    " sections in $docu_rdir$docu_name"."_[1..$doc_num]"
 	  if $T2H_VERBOSE;
   $previous = ($T2H_SPLIT eq 'chapter' ? $CHAPTEREND : $SECTIONEND);
   undef $FH;
@@ -4409,7 +5156,10 @@ sub menu_entry
     {
       my $clean_entry = $entry;
       $clean_entry =~ s/^.*? // if ($clean_entry =~ /^([A-Z]|\d+)\.[\d\.]* /);
-      $descr = '' if ($clean_entry eq $descr)
+      $clean_entry =~ s/[^\w]//g;
+      my $clean_descr = $descr;
+      $clean_descr =~ s/[^\w]//g;
+      $descr = '' if ($clean_entry eq $clean_descr)
     }
     push(@lines2,&debug('<TR><TD ALIGN="left" VALIGN="TOP">' . 
 			&t2h_anchor('', $href, $entry) . 
@@ -4477,7 +5227,7 @@ sub do_accent
   return "$_[0]_" if $_[1] eq 'ubaraccent';
   return ".$_[0]" if $_[1] eq 'udotaccent';
   return "$_[0]&lt;" if $_[1] eq 'v';
-  return "$_[0]," if $_[1] eq ',';
+  return "&$_[0]cedil;" if $_[1] eq ',';
   return "$_[0]" if $_[1] eq 'dotless';
   return undef;
 }
@@ -4549,8 +5299,12 @@ sub t2h_anchor {
 
     $result = "<A";
     $result .= " NAME=\"$name\"" if $name;
-    $result .= ($href =~ /\"/ ? " HREF='$href'"  : " HREF=\"$href\"")
-      if ($href);
+    if ($href)
+    {
+      $href =~ s|^$T2H_HREF_DIR_INSTEAD_FILE|./| 
+	if ($T2H_HREF_DIR_INSTEAD_FILE);
+      $result .= ($href =~ /\"/ ? " HREF='$href'"  : " HREF=\"$href\"");
+    }
     $result .= " $extra_attribs" if $extra_attribs;
     $result .= ">$text</A>";
     $result .= "\n" if $newline;
