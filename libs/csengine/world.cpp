@@ -45,6 +45,7 @@
 #include "csengine/cbuffer.h"
 #include "csengine/lppool.h"
 #include "csengine/covtree.h"
+#include "csengine/particle.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/polypool.h"
 #include "csinput/csevent.h"
@@ -328,6 +329,7 @@ void csWorld::Clear ()
   sprite_templates.DeleteAll ();
   thing_templates.DeleteAll ();
   sectors.DeleteAll ();
+  particle_systems.DeleteAll ();
   CLights::DeleteAll ();
   int i;
   for (i = 0 ; i < planes.Length () ; i++)
@@ -1184,6 +1186,29 @@ void csWorld::RemoveDynLight (csDynLight* dyn)
   else if (dyn == first_dyn_lights) first_dyn_lights = dyn->GetNext ();
   dyn->SetNext (NULL);
   dyn->SetPrev (NULL);
+}
+
+void csWorld::UpdateParticleSystems (time_t elapsed_time)
+{
+  int i;
+  for (i = 0 ; i < particle_systems.Length () ; i++)
+  {
+    csParticleSystem* ps = (csParticleSystem*)particle_systems[i];
+    ps->Update (elapsed_time);
+  }
+  // delete particle systems that self-destructed now.
+  for (i = 0 ; i < particle_systems.Length () ; i++)
+  {
+    csParticleSystem* ps = (csParticleSystem*)particle_systems[i];
+    while(i< particle_systems.Length () && ps->GetDelete())
+    {
+      particle_systems.Delete(i);
+      // process the new element at i .
+      if(i < particle_systems.Length ())
+        ps = (csParticleSystem*)particle_systems[i];
+    }
+  }
+
 }
 
 void csWorld::AdvanceSpriteFrames (time_t current_time)

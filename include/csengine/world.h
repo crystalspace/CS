@@ -236,6 +236,13 @@ public:
    */
   csNamedObjVector sprites;
 
+  /**
+   * List of all particle systems in the world. This vector contains
+   * objects of type csParticleSystem*. Note that the sprites of a
+   * particle system are in the sprites list. 
+   */
+  csNamedObjVector particle_systems;
+
   /// Remember dimensions of display.
   static int frame_width, frame_height;
   /// Remember iSystem interface.
@@ -610,9 +617,14 @@ public:
   csStatLight* FindLight (float x, float y, float z, float dist);
 
   /**
-   * Advance the frames of all sprites given an elapsed time.
+   * Advance the frames of all sprites given the current time.
    */
   void AdvanceSpriteFrames (time_t current_time);
+
+  /**
+   * Update the particle systemns given an elapsed time.
+   */
+  void UpdateParticleSystems (time_t elapsed_time);
 
   /**
    * Unlink a sprite from the world (but do not delete it).
