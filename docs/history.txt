@@ -27,6 +27,12 @@ chronological order.
 	  huge z-fighting on GF4 Go.
 	- Jorrit attempted to implement HitBeamObject/HitBeamOutline for
 	  bruteblock plugin. Untested at this moment.
+	- res made the following changes:
+	    - Updated OR renderers for the recent iGraphics3D changes.
+	    - Fixed plugins/video/canvas/glwin32/directdriver.cpp to compile 
+	      on Cygwin. Thanks to Calvin Finch for spotting this.
+	    - Made some changes to bindoc to reduce bloat (ie create smaller 
+	      files). File format is incompatible to earlier versions, tho.
 24-Jun-2004
 	- Jorrit fixed a bug in the GL renderer where it would fail to test
 	  for the existance of a clipper in some cases.

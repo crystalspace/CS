@@ -18,6 +18,7 @@
 */
 
 #include "iutil/document.h"
+#include "csutil/csendian.h"
 #include "csutil/parray.h"
 #include "csutil/strset.h"
 #include "csutil/blockallocator.h"
@@ -31,7 +32,7 @@ class csMemFile;
    structure, unless noted otherwise.
 
    All integers are stored in little endian.
-   Flags are big endian. Currently 10bits are used, should
+   Flags are big endian. Currently 8bits are used, should
    not exceed 16bit. 
 
    Strings are saved within a table, or if possible,
@@ -54,7 +55,7 @@ class csMemFile;
 #endif
 
 /// The Binary Document magic ID
-#define BD_HEADER_MAGIC	      LE (0x20048319)
+#define BD_HEADER_MAGIC	      LE (0x7ada70fa)
 
 /*
    bd* structures: data as it appears on disk.
@@ -87,20 +88,20 @@ typedef struct
 } bdDocument;
 
 /// mask for a node/attr value type
-#define BD_VALUE_TYPE_MASK	    BE (0x000000c0)
+#define BD_VALUE_TYPE_MASK	    BE (0x00000003)
 /// node/attr value is string
-#define BD_VALUE_TYPE_STR	    BE (0x00000000)
-/// node/attr value is integer
-#define BD_VALUE_TYPE_INT	    BE (0x00000040)
+#define BD_VALUE_TYPE_STR	    BE (0x00000001)
+/// node/attr value is 32 bit integer
+#define BD_VALUE_TYPE_INT	    BE (0x00000002)
 /// node/attr value is float
-#define BD_VALUE_TYPE_FLOAT	    BE (0x00000080)
+#define BD_VALUE_TYPE_FLOAT	    BE (0x00000003)
 /**
  * node/attr value is a string and shorter than 4 chars and
  * cranked into the 'value' field
  */
-#define BD_VALUE_STR_IMMEDIATE	    BE (0x00000020)
+#define BD_VALUE_TYPE_STR_IMMEDIATE BE (0x00000000)
 /// maximum length of an immediate node value, incl. 0
-#define MAX_IMM_NODE_VALUE_STR	    6
+#define MAX_IMM_NODE_VALUE_STR	    7
 
 /// mask for a node type
 #define BD_NODE_TYPE_MASK	    BE (0x0000001c)
@@ -118,20 +119,40 @@ typedef struct
 #define BD_NODE_TYPE_DECLARATION    BE (0x00000014)
 
 /// node has attributes
-#define BD_NODE_HAS_ATTR	    BE (0x00000001)
+#define BD_NODE_HAS_ATTR	    BE (0x00000020)
 /// node has children
-#define BD_NODE_HAS_CHILDREN	    BE (0x00000002)
+#define BD_NODE_HAS_CHILDREN	    BE (0x00000040)
 
 /**
  * attr name is a string and shorter than 4 chars and
  * cranked into the 'value' field
  */
-#define BD_ATTR_NAME_IMMEDIATE	    BE (0x00000100)
+#define BD_ATTR_NAME_IMMEDIATE	    BE (0x00000004)
 #define MAX_IMM_ATTR_VALUE_STR	    3
-#define MAX_IMM_ATTR_NAME_STR	    6
+#define MAX_IMM_ATTR_NAME_STR	    7
+#define MAX_IMM_ATTR_NAME_STR_W_FLAGS	    3
+
+/**
+ * Bit in the attribute name that's set when the attributes
+ * are stored in the name, too
+ */
+#define BD_ATTR_FLAGS_IN_NAME	    BE (0x00000080)
+#define BD_ATTR_FLAGS_IN_NAME_MASK  BE (0x00000070)
+/*
+ * NB: with the current value, endiannes can be ignored when shifting around
+ * the flags. Pay attention if you change the 'SHIFT' value.
+ */
+#define BD_ATTR_FLAGS_IN_NAME_SHIFT 4
+/**
+ * Bitmasks to obtain real name/attribute flags from an attr name.
+ * Attention! Host endianness!
+ */
+#define BD_ATTR_MAX_NAME_ID_WITH_FLAGS	0x0fffffff
+#define BD_ATTR_MAX_NAME_ID	    0x7fffffff
+#define BD_ATTR_NAME_ID_WITH_FLAGS_MASK	    0x0fffffff
 
 /// mask of the flags that can be stored on disk.
-#define BD_DISK_FLAGS_MASK	    BE (0x0000ffff)
+#define BD_DISK_FLAGS_MASK	    BE (0x000000ff)
 
 /**
  * node has been changed. must be always 0 on disk.
@@ -154,12 +175,10 @@ typedef struct
   uint32 value;
   /// Flags of this node
   uint32 flags;
-  /**
-   * Offsets to children/attribute tables
-   *  [0] - attr 
-   *  [flags & NODE_HAS_ATTR] - children
+  /*
+   * After this struct, the attribute offset table (if the attr flag is set)
+   * and child offset table (if the child flag is set) follow.
    */
-  uint32 offsets[2]; 
 } bdNode;
 
 /// Binary document node child table
@@ -176,12 +195,12 @@ typedef struct
 /// Binary document node attribute
 typedef struct
 {
+  /// Value, same as in node value
+  uint32 value;
   /// string table offset of the name or immediate
   uint32 nameID;
   /// Attribute flags
   uint32 flags;
-  /// Value, same as in node value
-  uint32 value;
 } bdNodeAttribute;
 
 /// Binary document node attribute table
@@ -247,15 +266,27 @@ public:
   /// value
   char* vstr;
 private:
+  uint32 GetRealNameID() const
+  {
+    return (nameID & BD_ATTR_FLAGS_IN_NAME) ? 
+      (little_endian_long (nameID) & BD_ATTR_NAME_ID_WITH_FLAGS_MASK) : 
+      little_endian_long (nameID);
+  }
 public:
+  uint32 GetRealFlags() const
+  { 
+    return (nameID & BD_ATTR_FLAGS_IN_NAME) ? 
+      (nameID & BD_ATTR_FLAGS_IN_NAME_MASK) >> BD_ATTR_FLAGS_IN_NAME_SHIFT : flags;
+  }
+
   csBdAttr (const char* name);
   csBdAttr ();
   ~csBdAttr ();
 
   void SetName (const char* name);
 
-  const char* GetValueStr (csBinaryDocument* doc);
-  const char* GetNameStr (csBinaryDocument* doc);
+  const char* GetValueStr (csBinaryDocument* doc) const;
+  const char* GetNameStr (csBinaryDocument* doc) const;
 };
 
 struct csBinaryDocAttribute : public iDocumentAttribute
@@ -349,10 +380,20 @@ public:
   csArray<csBdNode*>* nodes;
   csBinaryDocument* doc;
 private:
-  void* GetFromOffset (uint32 offset)
+  void* GetFromOffset (uint32 offset) const
   { return (void*)((uint8*)this + offset); }
-  bdNodeAttrTab* GetAttrTab ();
-  bdNodeChildTab* GetChildTab ();
+  bdNodeAttrTab* GetAttrTab () const;
+  bdNodeChildTab* GetChildTab () const;
+  uint32 GetAttrTabOffset() const
+  { return (sizeof (bdNode)); }
+  uint32 GetChildTabOffset() const
+  {
+    if (flags & BD_NODE_HAS_ATTR)
+      return (sizeof (bdNode) + sizeof (bdNodeAttrTab) + 
+	(little_endian_long (GetAttrTab()->num) * sizeof (uint32)));
+    else
+      return (sizeof (bdNode));
+  }
 public:
   csBdNode (uint32 newType);
   csBdNode (csBdNode* copyFrom);
@@ -362,7 +403,7 @@ public:
   void SetType (uint32 newType);
   void SetDoc (csBinaryDocument* doc);
 
-  const char* GetValueStr (csBinaryDocument* doc);
+  const char* GetValueStr (csBinaryDocument* doc) const;
 
   csBdAttr* atGetItem (int pos);
   void atSetItem (csBdAttr* item, int pos);
@@ -497,7 +538,7 @@ public:
    */
   uint32 GetOutStringID (const char* str);
   /// Get a string for an ID in the input string table
-  const char* GetInIDString (uint32 ID);
+  const char* GetInIDString (uint32 ID) const;
 
   virtual void Clear ();
   virtual csRef<iDocumentNode> CreateRoot ();

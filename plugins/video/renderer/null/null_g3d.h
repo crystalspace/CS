@@ -267,9 +267,12 @@ public:
   //========================================================================
   virtual csPtr<iRenderBuffer> CreateRenderBuffer (int, 
     csRenderBufferType, csRenderBufferComponentType, 
-    int, bool) { return 0; }
+    int) { return 0; }
+  virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (int, 
+    csRenderBufferType, csRenderBufferComponentType, 
+    size_t, size_t) { return 0; }
   virtual void CreateInterleavedRenderBuffers (int size, 
-    csRenderBufferType type, int count, csArray<iRenderBuffer*> &buffers) { }
+    csRenderBufferType type, int count, csRefArray<iRenderBuffer>& buffers) { }
   virtual void SetBufferState (csVertexAttrib*,
   	iRenderBuffer**, int count) { }
   virtual void SetTextureState (int*, iTextureHandle**,

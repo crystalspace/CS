@@ -28,8 +28,8 @@
 #ifndef MONITOR_DEFAULTTONEAREST
 // "guess" whether multimon types/#defs are present already
 
-#ifndef __MINGW32__
-// MinGW already has them defined
+#if !defined(__MINGW32__) && !defined(__CYGWIN__)
+// MinGW & Cygwin(more exactly, the w32api headers) already have them defined
 
 struct MONITORINFOEXA
 {  

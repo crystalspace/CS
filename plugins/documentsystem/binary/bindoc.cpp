@@ -19,7 +19,6 @@
 
 #include "cssysdef.h"
 
-#include "csutil/csendian.h"
 #include "iutil/document.h"
 #include "iutil/databuff.h"
 #include "iutil/vfs.h"
@@ -88,6 +87,7 @@ csRef<iDocumentAttribute> csBinaryDocAttributeIterator::Next ()
 csBdAttr::csBdAttr (const char* name)
 {
   flags = BD_ATTR_MODIFIED;
+  nameID = 0;
   value = 0;
   vstr = 0;
   nstr = csStrNew (name);
@@ -96,6 +96,7 @@ csBdAttr::csBdAttr (const char* name)
 csBdAttr::csBdAttr ()
 {
   flags = BD_ATTR_MODIFIED;
+  nameID = 0;
   value = 0;
   vstr = 0;
   nstr = 0;
@@ -117,27 +118,26 @@ void csBdAttr::SetName (const char* name)
   nstr = csStrNew (name);
 }
 
-const char* csBdAttr::GetNameStr (csBinaryDocument* doc)
+const char* csBdAttr::GetNameStr (csBinaryDocument* doc) const
 {
-  if (flags & BD_ATTR_MODIFIED)
+  if (GetRealFlags() & BD_ATTR_MODIFIED)
   {
     return nstr;
   }
   else
   {
-    if (flags & BD_ATTR_NAME_IMMEDIATE)
+    if (GetRealFlags() & BD_ATTR_NAME_IMMEDIATE)
     {
       return (char*)&nameID;
     }
     else
     {
-      return doc->GetInIDString (
-	little_endian_long (nameID));
+      return doc->GetInIDString (GetRealNameID());
     }
   }
 }
 
-const char* csBdAttr::GetValueStr (csBinaryDocument* doc)
+const char* csBdAttr::GetValueStr (csBinaryDocument* doc) const
 {
   if (flags & BD_ATTR_MODIFIED)
   {
@@ -145,7 +145,7 @@ const char* csBdAttr::GetValueStr (csBinaryDocument* doc)
   }
   else
   {
-    if (flags & BD_VALUE_STR_IMMEDIATE)
+    if ((GetRealFlags() & BD_VALUE_TYPE_MASK) == BD_VALUE_TYPE_STR_IMMEDIATE)
     {
       return (char*)&value;
     }
@@ -217,9 +217,10 @@ const char* csBinaryDocAttribute::GetName ()
 
 const char* csBinaryDocAttribute::GetValue ()
 {
-  switch (attrPtr->flags & BD_VALUE_TYPE_MASK)
+  switch (attrPtr->GetRealFlags() & BD_VALUE_TYPE_MASK)
   {
     case BD_VALUE_TYPE_STR:
+    case BD_VALUE_TYPE_STR_IMMEDIATE:
       {
 	return attrPtr->GetValueStr (node->doc);
       }
@@ -256,9 +257,10 @@ const char* csBinaryDocAttribute::GetValue ()
 
 int csBinaryDocAttribute::GetValueAsInt ()
 {
-  switch (attrPtr->flags & BD_VALUE_TYPE_MASK)
+  switch (attrPtr->GetRealFlags() & BD_VALUE_TYPE_MASK)
   {
     case BD_VALUE_TYPE_STR:
+    case BD_VALUE_TYPE_STR_IMMEDIATE:
       {
 	if (!attrPtr->GetValueStr (node->doc)) return 0;
 	int val = 0;
@@ -280,9 +282,10 @@ int csBinaryDocAttribute::GetValueAsInt ()
 
 float csBinaryDocAttribute::GetValueAsFloat ()
 {
-  switch (attrPtr->flags & BD_VALUE_TYPE_MASK)
+  switch (attrPtr->GetRealFlags() & BD_VALUE_TYPE_MASK)
   {
     case BD_VALUE_TYPE_STR:
+    case BD_VALUE_TYPE_STR_IMMEDIATE:
       {
 	if (!attrPtr->GetValueStr (node->doc)) return 0.0f;
 	float val = 0.0f;
@@ -304,9 +307,10 @@ float csBinaryDocAttribute::GetValueAsFloat ()
 
 bool csBinaryDocAttribute::GetValueAsBool ()
 {
-  switch (attrPtr->flags & BD_VALUE_TYPE_MASK)
+  switch (attrPtr->GetRealFlags() & BD_VALUE_TYPE_MASK)
   {
     case BD_VALUE_TYPE_STR:
+    case BD_VALUE_TYPE_STR_IMMEDIATE:
       {
 	if (!attrPtr->GetValueStr (node->doc)) return false;
 	const char *val = attrPtr->GetValueStr (node->doc);
@@ -359,17 +363,16 @@ static inline bool checkFloat (const char* str, float &v)
 {
   const char *c = str;
   if (*c == 0) return false;
-  bool firstchar = true;
   while (*c)
   {
-    if (!(isdigit (*c)) && (*c != '-') && (*c != '.') && 
-      ((firstchar && (*c == 'e' )) || (*c != 'e')))
+    if (!(isdigit (*c)) && (*c != '-') && (*c != '.') &&
+      (*c != 'e') && (*c != 'E'))
       return false;
     c++;
-    firstchar = false;
   }
-  int ret = sscanf (str, "%g", &v);
-  return (ret > 0);
+  char dummy;
+  int ret = sscanf (str, "%g%c", &v, &dummy);
+  return (ret == 1);
 }
 
 void csBinaryDocAttribute::SetValue (const char* val)
@@ -430,13 +433,15 @@ void csBinaryDocAttribute::SetValueAsFloat (float f)
 void csBinaryDocAttribute::Store (csMemFile* nodesFile)
 {
   bdNodeAttribute diskAttr;
+  size_t attrSize = sizeof (diskAttr);
 
   diskAttr.flags = attrPtr->flags & BD_VALUE_TYPE_MASK;
   if ((diskAttr.flags & BD_VALUE_TYPE_MASK) == BD_VALUE_TYPE_STR)
   {
     if (strlen (attrPtr->GetValueStr (node->doc)) < MAX_IMM_ATTR_VALUE_STR)
     {
-      diskAttr.flags |= BD_VALUE_STR_IMMEDIATE;
+      diskAttr.flags = 
+	(diskAttr.flags & ~BD_VALUE_TYPE_MASK) | BD_VALUE_TYPE_STR_IMMEDIATE;
       diskAttr.value = 0;
       strcpy ((char*)&diskAttr.value, attrPtr->GetValueStr (node->doc));
     }
@@ -449,18 +454,30 @@ void csBinaryDocAttribute::Store (csMemFile* nodesFile)
   else
     diskAttr.value = attrPtr->value;
 
-  if (strlen (attrPtr->GetNameStr (node->doc)) < MAX_IMM_ATTR_NAME_STR)
+  bool putFlagsInName = false;
+  const size_t nameLen = strlen (attrPtr->GetNameStr (node->doc));
+  if (nameLen < MAX_IMM_ATTR_NAME_STR)
   {
     diskAttr.flags |= BD_ATTR_NAME_IMMEDIATE;
     diskAttr.nameID = 0;
     strcpy ((char*)&diskAttr.nameID, attrPtr->GetNameStr (node->doc));
+    putFlagsInName = (nameLen < MAX_IMM_ATTR_NAME_STR_W_FLAGS);
   }
   else
   {
     diskAttr.nameID = little_endian_long (
       node->doc->GetOutStringID (attrPtr->GetNameStr (node->doc)));
+    // @@@ What to do if nameID > BD_ATTR_MAX_NAME_ID?
+    putFlagsInName = 
+      little_endian_long (diskAttr.nameID) <= BD_ATTR_MAX_NAME_ID_WITH_FLAGS;
   }
-  nodesFile->Write ((char*)&diskAttr, sizeof (diskAttr));
+  if (putFlagsInName)
+  {
+    diskAttr.nameID |= BD_ATTR_FLAGS_IN_NAME;
+    diskAttr.nameID |= (diskAttr.flags << BD_ATTR_FLAGS_IN_NAME_SHIFT);
+    attrSize -= sizeof (uint32);
+  }
+  nodesFile->Write ((char*)&diskAttr, attrSize);
 }
 
 // =================================================
@@ -594,32 +611,29 @@ void csBdNode::SetDoc (csBinaryDocument* doc)
   csBdNode::doc = doc;
 }
 
-bdNodeChildTab* csBdNode::GetChildTab ()
+bdNodeChildTab* csBdNode::GetChildTab () const
 {
   if ((flags & (BD_NODE_HAS_CHILDREN | BD_NODE_MODIFIED))
     == BD_NODE_HAS_CHILDREN)
   {
-    const int offsetnum = big_endian_long (flags & BD_NODE_HAS_ATTR);
-    return (bdNodeChildTab*)GetFromOffset 
-      (little_endian_long (offsets[offsetnum]));
+    return (bdNodeChildTab*)GetFromOffset (GetChildTabOffset());
   }
   else
     return 0;
 }
 
-bdNodeAttrTab* csBdNode::GetAttrTab ()
+bdNodeAttrTab* csBdNode::GetAttrTab () const
 {
   if ((flags & (BD_NODE_HAS_ATTR | BD_NODE_MODIFIED))
     == BD_NODE_HAS_ATTR)
   {
-    return (bdNodeAttrTab*)GetFromOffset 
-      (little_endian_long (offsets[0]));
+    return (bdNodeAttrTab*)GetFromOffset (GetAttrTabOffset());
   }
   else
     return 0;
 }
 
-const char* csBdNode::GetValueStr (csBinaryDocument* doc)
+const char* csBdNode::GetValueStr (csBinaryDocument* doc) const
 {
   if (flags & BD_NODE_MODIFIED)
   {
@@ -627,7 +641,7 @@ const char* csBdNode::GetValueStr (csBinaryDocument* doc)
   }
   else
   {
-    if (flags & BD_VALUE_STR_IMMEDIATE)
+    if ((flags & BD_VALUE_TYPE_MASK) == BD_VALUE_TYPE_STR_IMMEDIATE)
     {
       return (char*)&value;
     }
@@ -860,6 +874,7 @@ const char* csBinaryDocNode::nodeValueStr (csBdNode* nodeData)
   switch (nodeData->flags & BD_VALUE_TYPE_MASK)
   {
     case BD_VALUE_TYPE_STR:
+    case BD_VALUE_TYPE_STR_IMMEDIATE:
       {
 	return nodeData->GetValueStr(doc);
       }
@@ -899,6 +914,7 @@ int csBinaryDocNode::nodeValueInt (csBdNode* nodeData)
   switch (nodeData->flags & BD_VALUE_TYPE_MASK)
   {
     case BD_VALUE_TYPE_STR:
+    case BD_VALUE_TYPE_STR_IMMEDIATE:
       {
 	if (!nodeData->GetValueStr (doc)) return 0;
 	int val = 0;
@@ -923,6 +939,7 @@ float csBinaryDocNode::nodeValueFloat (csBdNode* nodeData)
   switch (nodeData->flags & BD_VALUE_TYPE_MASK)
   {
     case BD_VALUE_TYPE_STR:
+    case BD_VALUE_TYPE_STR_IMMEDIATE:
       {
 	if (!nodeData->GetValueStr (doc)) return 0.0f;
 	float val = 0.0f;
@@ -1421,23 +1438,26 @@ void csBinaryDocNode::SetAttributeAsFloat (const char* name, float value)
 void csBinaryDocNode::Store (csMemFile* nodesFile)
 {
   bdNode diskNode;
-  size_t nodeSize = sizeof(bdNode) - 2 * sizeof(uint32);
+  size_t nodeSize = sizeof(bdNode);
 
   memcpy (&diskNode, nodeData, nodeSize);
   diskNode.flags &= ~(BD_NODE_HAS_ATTR | 
-    BD_NODE_HAS_CHILDREN | BD_VALUE_STR_IMMEDIATE);
+    BD_NODE_HAS_CHILDREN);
   diskNode.flags &= BD_DISK_FLAGS_MASK;
 
   if ((nodeData->flags & BD_VALUE_TYPE_MASK) == BD_VALUE_TYPE_STR) 
   {
     unsigned int maximmvalue = MAX_IMM_NODE_VALUE_STR;
+    const uint32 newFlags = 
+	(diskNode.flags & ~BD_VALUE_TYPE_MASK) | BD_VALUE_TYPE_STR_IMMEDIATE;
     // Hack: cram one more byte into value, if possible
-    if ((diskNode.flags & BE (0xff00)) == 0) maximmvalue++;
+    if ((newFlags & BE (0xff)) == 0) maximmvalue++;
     if (strlen (nodeData->vstr) < maximmvalue)
     {
       diskNode.value = 0;
       strcpy ((char*)&diskNode.value, nodeData->vstr);
-      diskNode.flags |= BD_VALUE_STR_IMMEDIATE;
+      diskNode.flags = (diskNode.flags & ~BD_VALUE_TYPE_MASK) | 
+	BD_VALUE_TYPE_STR_IMMEDIATE;
     }
     else
     {
@@ -1449,13 +1469,11 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
   if (nodeData->flags & BD_NODE_HAS_ATTR)
   {
     diskNode.flags |= BD_NODE_HAS_ATTR;
-    nodeSize += sizeof (uint32);
   }
 
   if (nodeData->flags & BD_NODE_HAS_CHILDREN)
   {
     diskNode.flags |= BD_NODE_HAS_CHILDREN;
-    nodeSize += sizeof (uint32);
   }
 
   size_t nodeStart = nodesFile->GetPos ();
@@ -1468,13 +1486,28 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
     
   CS_ALLOC_STACK_ARRAY(uint32, startsScratch, scratchSize);
   
+  size_t attrStart;
+  uint32 attrCount;
   if (nodeData->flags & BD_NODE_HAS_ATTR)
   {
-    size_t attrStart = nodesFile->GetPos();
-    uint32 attrCount = nodeData->atNum();
+    attrStart = nodesFile->GetPos();
+    attrCount = nodeData->atNum();
     nodesFile->Write ((char*)&attrCount, sizeof(uint32));
     nodesFile->Write ((char*)startsScratch, sizeof(uint32) * attrCount);
+  }
 
+  size_t childStart;
+  uint32 childCount;
+  if (nodeData->flags & BD_NODE_HAS_CHILDREN)
+  {
+    childStart = nodesFile->GetPos();
+    childCount = nodeData->ctNum();
+    nodesFile->Write ((char*)&childCount, sizeof(uint32));
+    nodesFile->Write ((char*)startsScratch, sizeof(uint32) * childCount);
+  }
+
+  if (nodeData->flags & BD_NODE_HAS_ATTR)
+  {
     unsigned int i;
     for (i = 0; i < attrCount; i++)
     {
@@ -1486,17 +1519,11 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
     size_t attrEnd = nodesFile->GetPos ();
     nodesFile->SetPos (attrStart + sizeof(uint32));
     nodesFile->Write ((char*)startsScratch, sizeof(uint32) * attrCount);
-    diskNode.offsets[0] = little_endian_long (attrStart - nodeStart);
     nodesFile->SetPos (attrEnd);
   }
 
   if (nodeData->flags & BD_NODE_HAS_CHILDREN)
   {
-    size_t childStart = nodesFile->GetPos();
-    uint32 childCount = nodeData->ctNum();
-    nodesFile->Write ((char*)&childCount, sizeof(uint32));
-    nodesFile->Write ((char*)startsScratch, sizeof(uint32) * childCount);
-
     unsigned int i;
     for (i = 0; i < childCount; i++)
     {
@@ -1508,8 +1535,6 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
     size_t childEnd = nodesFile->GetPos ();
     nodesFile->SetPos (childStart + sizeof(uint32));
     nodesFile->Write ((char*)startsScratch, sizeof(uint32) * childCount);
-    diskNode.offsets[big_endian_long (diskNode.flags & BD_NODE_HAS_ATTR)] = 
-      little_endian_long (childStart - nodeStart);
     nodesFile->SetPos (childEnd);
   }    
 
@@ -1595,7 +1620,7 @@ csBinaryDocNode* csBinaryDocument::GetPoolNode ()
     node->doc = this;
     // the node has to keep a ref on us. But to avoid
     // a virtual function call, we increase our refcount
-    // 'by hand'.
+    // 'manually'.
     scfRefCount++;
     return node;
   }
@@ -1677,8 +1702,7 @@ uint32 csBinaryDocument::GetOutStringID (const char* str)
   return val;
 }
 
-
-const char* csBinaryDocument::GetInIDString (uint32 ID)
+const char* csBinaryDocument::GetInIDString (uint32 ID) const
 {
   if (ID == BD_OFFSET_INVALID) return 0;
   return (char*)(dataStart + inStrTabOfs + 
