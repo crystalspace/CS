@@ -33,7 +33,6 @@ IMPLEMENT_CSOBJTYPE (csTerrain,csObject);
 
 csTerrain::csTerrain () : csObject()
 {
-  clipbox = NULL;
   heightMap = NULL;
   mesh = NULL;
   vbuf = NULL;
@@ -44,7 +43,6 @@ csTerrain::~csTerrain ()
 {
   delete mesh;
   delete heightMap;
-  delete clipbox;
   delete vbuf;
   delete _textureMap;
 }
@@ -55,7 +53,7 @@ void csTerrain::SetDetail( unsigned int detail)
   mesh->maxDetail((unsigned int)(detail*1.1));
   mesh->absMaxDetail((unsigned int)(detail * 1.25));
   mesh->nearClip(1.0);
-  mesh->farClip(150.0);
+  mesh->farClip(200.0);
 }
 
 int csTerrain::GetNumTextures ()
@@ -71,9 +69,10 @@ bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
     return false;
 
   mesh = new ddgTBinMesh (heightMap);
-  clipbox = new ddgBBox3 (ddgVector3(0,0,3),ddgVector3(640, 480, 15000));
   context = new ddgContext ();
   context->control( &control );
+  context->clipbox()->min.set(0,0,0.6);
+  context->clipbox()->max.set(800, 600, 5100);
 
   vbuf = new ddgVArray ();
 
@@ -98,13 +97,13 @@ bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
 /// Number of entries in the Most Recently Used cache.
 #define	_MRUsize 12
 /// Vertices cached.
-unsigned int _MRUvertex[_MRUsize];
+unsigned int	_MRUvertex[_MRUsize];
 /// Buffer indexes corresponding to those vertices.
-int			_MRUindex[_MRUsize];
+int				_MRUindex[_MRUsize];
 /// Position of last entry added into the cache.
-unsigned int			_MRUcursor;
+unsigned int	_MRUcursor;
 /// Number or items currently in the cache.
-unsigned int			_MRUinuse;
+unsigned int	_MRUinuse;
 
 static int lut[24] = {0,1,2,3,4,5,6,7,8,9,10,11,0,1,2,3,4,5,6,7,8,9,10,11};
 #define ddgInvalidBufferIndex	0xFFFF
@@ -149,7 +148,6 @@ bool csTerrain::drawTriangle( ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf )
 		// We could just call.
 		bt->vertex(tv[i],&p[i]);
 		bt->textureC(tv[i],&(t[i]));
-
 		// Push the vertex.
 		bufindex[i] = vbuf->pushVT(&p[i],&t[i]);
 		if (_MRUinuse < _MRUsize)
@@ -214,8 +212,6 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   context->forward(&f);
   context->up (&u);
   context->right (&r);
-  // TODO: JORRIT IS THIS RIGHT?
-  context->nearfar (1,100);
 
   // Get the FOV in angles.
   context->fov (rview.GetFOVAngle ());

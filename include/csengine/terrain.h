@@ -26,7 +26,6 @@
 class ddgTBinMesh;
 class ddgTBinTree;
 class ddgHeightMap;
-class ddgBBox3;
 class ddgVArray;
 class ddgContext;
 class csTextureHandle;
@@ -44,8 +43,6 @@ private:
   ddgTBinMesh* mesh;
   ///
   ddgHeightMap* heightMap;
-  ///
-  ddgBBox3* clipbox;
   ///
   ddgVArray *vbuf;
   ///
@@ -72,8 +69,6 @@ public:
   ddgTBinMesh* GetMesh () { return mesh; }
   ///
   ddgHeightMap* GetHeightMap () { return heightMap; }
-  ///
-  ddgBBox3* GetBBox () { return clipbox; }
 
   /// Load the heightmap.
   bool Initialize (const void* heightMapFile, unsigned long size);
