@@ -26840,7 +26840,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in `echo @$cs_qsqrt_cflags@@ | sed 'y% %#%'`
+    for cs_build_item in `echo @$cs_qsqrt_cflags -I$srcdir@@ | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -26908,7 +26908,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #define PROC_$cs_host_cpu_normalized
 		    #define COMP_GCC
-		    #include "include/qsqrt.h"
+		    #include <include/qsqrt.h>
 int
 main ()
 {

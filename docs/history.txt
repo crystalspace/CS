@@ -29,6 +29,9 @@ chronological order.
 	    - Added a check for -fno-common to configure.ac for MacOS/X.
 	    - Fixed bug: Jam build on MacOS/X failed to utilize
 	      -force_cpusubtype_ALL and -fno-common.
+	- Eric Sunshine fixed bug in qsqrt() check in configure.ac where it
+	  would always fail if configuring outside the source directory because
+	  it failed to locate CS/include/qsqrt.h.
 20-Oct-2003
         - Philip Wyett added 'joytest' to CS/ root .cvsignore file.
 	- Jorrit added thing.cfg.

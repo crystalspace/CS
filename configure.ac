@@ -1902,9 +1902,9 @@ AC_DEFUN([CS_CHECK_QSQRT],
 		[AC_LANG_PROGRAM(
 		    [#define PROC_$cs_host_cpu_normalized
 		    #define COMP_GCC
-		    #include "include/qsqrt.h"],
+		    #include <include/qsqrt.h>],
 		    [float n = qsqrt(1.0f); (void)n;])],
-		[CS_CREATE_TUPLE([$cs_qsqrt_cflags])], [C++],
+		[CS_CREATE_TUPLE([$cs_qsqrt_cflags -I$srcdir])], [C++],
 		[cs_cv_cxx_qsqrt_ok=yes], [cs_cv_cxx_qsqrt_ok=no])])],
 	[cs_cv_cxx_qsqrt_ok=no])])
 
