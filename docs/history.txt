@@ -15,49 +15,47 @@ Short-term cleanups that need to be done:
 13-Mar-2000
 	- Further implemented csSolidBsp.
 	- Added the new csSolidBsp as a new 2D culler next to the quadtree,
-	  coverage mask tree and c-buffer. I don't expect it to be better
-	  than the c-buffer but I'm going to have to test if it works ok.
-	  The main use of the csSolidBsp will be for visibility and maybe
-	  for lighting.
+	  coverage mask tree and c-buffer.  I don't expect it to be better
+	  than the c-buffer but I'm going to have to test if it works ok.  The
+	  main use of the csSolidBsp will be for visibility and maybe for
+	  lighting.
 	- Added 'solidbsp' command to test the above feature.
 	  DON'T DO THIS YET. It will crash CS.
 	- Andrew Zabolotny did another set of changes:
-	    - Serious change: Re-implemented DECLARE_TYPED_VECTOR so that
-	      it defines a *correct* overriden vector. Previously it
-	      worked incorrectly, that is, FreeItem() was incorrect.
-	      Because of this declared vectors missed the auto-clean
-	      feature. Note that map2cs used that much (mis-)features of the
-	      old DECLARE_TYPED_VECTOR that I had to make a local copy
-	      of the old-behavioured DECLARE_TYPED_VECTOR inside map2cs.
-	      Another user of DECLARE_TYPED_VECTOR is Crystal Clear, but
-	      I did not seen any manual cleanup of vectors: this is
-	      either a memory leak or possibly a design issue. In the
-	      later case Crystal Clear is slightly broken: you should
-	      decide whenever you want the auto-clean feature or not, and
-	      if not you should override FreeItem() with an empty
-	      declaration.
+	    - Serious change: Re-implemented DECLARE_TYPED_VECTOR so that it
+	      defines a *correct* overriden vector.  Previously it worked
+	      incorrectly, that is, FreeItem() was incorrect.  Because of this
+	      declared vectors missed the auto-clean feature.  Note that
+	      map2cs used that much (mis-)features of the old
+	      DECLARE_TYPED_VECTOR that I had to make a local copy of the
+	      old-behavioured DECLARE_TYPED_VECTOR inside map2cs.  Another
+	      user of DECLARE_TYPED_VECTOR is Crystal Clear, but I did not
+	      seen any manual cleanup of vectors: this is either a memory leak
+	      or possibly a design issue.  In the later case Crystal Clear is
+	      slightly broken: you should decide whenever you want the
+	      auto-clean feature or not, and if not you should override
+	      FreeItem() with an empty declaration.
 	    - cskeys.h & cskeys.cpp: Two new routines for parsing a
-	      free-format string into a keyboard event and vice versa.
-	      Useful for supporting user-defined hot-keys.
+	      free-format string into a keyboard event and vice versa.  Useful
+	      for supporting user-defined hot-keys.
 	    - I've added four new key codes to csinput: CSKEY_PADPLUS,
-	      CSKEY_PADMINUS, CSKEY_PADMULT, CSKEY_PADDIV. I've
-	      implemented support for them in OS/2, DOS/DJGPP, Win32.
-	      Other platforms will have to implement it. Note that
-	      MazeD already uses these keys, so you can use it as a test
-	      tool :)
-	    - Added fully configurable keyboard support in MazeD. You can
-	      assign any key combination supported by CS to any of more
-	      than 100 commands. You can have different layouts in
-	      MazeD.cfg file.
-	    - Implemented some more of the texture mapping dialog.
-	      Not complete yet but already something to look at :-)
+	      CSKEY_PADMINUS, CSKEY_PADMULT, CSKEY_PADDIV.  I've implemented
+	      support for them in OS/2, DOS/DJGPP, Win32.  Other platforms
+	      will have to implement it.  Note that MazeD already uses these
+	      keys, so you can use it as a test tool :)
+	    - Added fully configurable keyboard support in MazeD.  You can
+	      assign any key combination supported by CS to any of more than
+	      100 commands.  You can have different layouts in MazeD.cfg file.
+	    - Implemented some more of the texture mapping dialog.  Not
+	      complete yet but already something to look at :-)
+	- Texinfo update from Martin Geisse.  Conversions for authors.html,
+	  cvsguid.txt, and Makefile.txt.  Updated msdos.txi.
 12-Mar-2000
 	- Paul Garceau restored several of the changes he did yesterday
-	  because his changes are broken a little.
+	  because his changes are broken.
 	- Eric Sunshine further reverted Paul's changes and he also
 	  removed a bunch of compilation warnings.
-	- Michael Dale Long elminiated several compilation warnings in
-	  cctest and did some other changes to Crystal Clear.
+	- Michael Dale Long elminiated made changes to Crystal Clear.
 	- Added csPlane2 to csgeom similar to csPlane.
 	- Added csPoly2D::Intersect() to intersect with a csPlane2.
 	- Added csPoly2D::UpdateBoundingBox().
@@ -66,7 +64,8 @@ Short-term cleanups that need to be done:
 	  of using vertices it uses edges.
 11-Mar-2000
 	- Paul Garceau commited some changes to make the Mingw/NT4 port
-	  possible. Unfortunatelly his changes broke things a little.
+	  possible.  Unfortunatelly his changes were based upon a fairly old
+	  snapshot of CS and broke things somewhat severely.
 	- Thomas Hieber added support for skydome and skybox in Map2CS.
 	- Started work on new solid 2D bsp for culling/PVS.
 10-Mar-2000
@@ -132,15 +131,13 @@ Short-term cleanups that need to be done:
 	  modes when NASM assembly is used.
 	- Thomas Hieber started support for skydome in Map2CS.
 8-Mar-2000
-	- Decreased glOrtho setting in OpenGL renderer from 150 to 10 to
-	  make Z buffering precision better. This breaks the terrain engine
-	  on OpenGL right now but we need a better solution for that.
-	- Fixed deletion of sprites so that they clean up their entry
-	  in the world list at deletion. So it is now safe to do
-	  'delete spr'.
+	- Decreased glOrtho setting in OpenGL renderer from 150 to 10 to make
+	  Z buffering precision better.  This breaks the terrain engine on
+	  OpenGL right now but we need a better solution for that.
+	- Fixed deletion of sprites so that they clean up their entry in the
+	  world list at deletion.  So it is now safe to do 'delete spr'.
 	- Martin Geisse provided another update to the Texinfo documents.
-	- Daniel Fannar Gudbjartsson started cleaning up collision
-	  detection.
+	- Daniel Fannar Gudbjartsson started cleaning up collision detection.
 	- Thomas Hieber fixed the changes from Daniel so that it compiles
 	  again on VC.
 	- Thomas also updated the VC project files.
@@ -199,12 +196,12 @@ Short-term cleanups that need to be done:
 	  the project files.
 	- Thomas reenabled Startup console text. (Was a wrong
 	  implementation for FindRGB in the texture manager base class).
-	- The Microsoft sorcerers cast a spell to prevent VC++ from compiling 
-	  valid C++, so Eric Sunshine derived a counter-spell to undermine 
-	  their Black Magic.  
+	- The Microsoft sorcerers cast a spell to prevent VC++ from compiling
+	  valid C++, so Eric Sunshine derived a counter-spell to undermine
+	  their Black Magic.
 	- Norman Kramer added a Crop() method to iImage.
-	- Eric Sunshine made ColliderType public so that it is possible to 
-	  call GetType() (which is also public).  
+	- Eric Sunshine made ColliderType public so that it is possible to
+	  call GetType() (which is also public).
 	- Seth Galbraith did some changes to sprites again: mergetexels
 	  and mergenormals now measure the number of redundant vertices
 	  which can be merged. Also commited some disabled code which
