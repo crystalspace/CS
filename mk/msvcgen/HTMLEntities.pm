@@ -76,7 +76,7 @@ require Exporter;
 $VERSION = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 sub Version { $VERSION; }
 
-require HTML::Parser;  # for fast XS implemented decode_entities
+#require HTML::Parser;  # for fast XS implemented decode_entities
 
 
 %entity2char = (
