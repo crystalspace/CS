@@ -170,7 +170,7 @@ struct iConfigManager;
 struct iCommandLineParser;
 
 
-SCF_VERSION (iSystem, 4, 0, 1);
+SCF_VERSION (iSystem, 4, 1, 0);
 
 /**
  * This interface serves as a way for plug-ins to query Crystal Space about
@@ -218,8 +218,6 @@ struct iSystem : public iBase
 
   //------------------------------ Miscellaneous -----------------------------//
 
-  /// Returns the basic configuration parameters.
-  virtual void GetSettings (int &oWidth, int &oHeight, int &oDepth, bool &oFullScreen) = 0;
   /// Get the time in milliseconds.
   virtual csTime GetTime () = 0;
   /// Print a string to the specified device.

@@ -482,16 +482,16 @@ static const csOptionDescription config_options [NUM_OPTIONS] =
 
 bool csCubeMeshObjectType::csCubeConfig::SetOption (int id, csVariant* value)
 {
-  if (value->type != config_options[id].type)
+  if (value->GetType () != config_options[id].type)
     return false;
   switch (id)
   {
-    case 0: scfParent->default_sizex = value->v.f; break;
-    case 1: scfParent->default_sizey = value->v.f; break;
-    case 2: scfParent->default_sizez = value->v.f; break;
-    case 3: scfParent->default_shift.x = value->v.f; break;
-    case 4: scfParent->default_shift.y = value->v.f; break;
-    case 5: scfParent->default_shift.z = value->v.f; break;
+    case 0: scfParent->default_sizex = value->GetFloat (); break;
+    case 1: scfParent->default_sizey = value->GetFloat (); break;
+    case 2: scfParent->default_sizez = value->GetFloat (); break;
+    case 3: scfParent->default_shift.x = value->GetFloat (); break;
+    case 4: scfParent->default_shift.y = value->GetFloat (); break;
+    case 5: scfParent->default_shift.z = value->GetFloat (); break;
     default: return false;
   }
   return true;
@@ -499,15 +499,14 @@ bool csCubeMeshObjectType::csCubeConfig::SetOption (int id, csVariant* value)
 
 bool csCubeMeshObjectType::csCubeConfig::GetOption (int id, csVariant* value)
 {
-  value->type = config_options[id].type;
   switch (id)
   {
-    case 0: value->v.f = scfParent->default_sizex; break;
-    case 1: value->v.f = scfParent->default_sizey; break;
-    case 2: value->v.f = scfParent->default_sizez; break;
-    case 3: value->v.f = scfParent->default_shift.x; break;
-    case 4: value->v.f = scfParent->default_shift.y; break;
-    case 5: value->v.f = scfParent->default_shift.z; break;
+    case 0: value->SetFloat (scfParent->default_sizex); break;
+    case 1: value->SetFloat (scfParent->default_sizey); break;
+    case 2: value->SetFloat (scfParent->default_sizez); break;
+    case 3: value->SetFloat (scfParent->default_shift.x); break;
+    case 4: value->SetFloat (scfParent->default_shift.y); break;
+    case 5: value->SetFloat (scfParent->default_shift.z); break;
     default: return false;
   }
   return true;

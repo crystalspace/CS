@@ -387,12 +387,12 @@ static const csOptionDescription config_options [NUM_OPTIONS] =
 bool
 csGraphics3DInfinite::eiInfiniteConfig::SetOption (int id, csVariant* value)
 {
-  if (value->type != config_options[id].type)
+  if (value->GetType () != config_options[id].type)
     return false;
   switch (id)
   {
-    case 0: scfParent->do_overdraw = value->v.b; break;
-    case 1: scfParent->do_fastmesh = value->v.b; break;
+    case 0: scfParent->do_overdraw = value->GetBool (); break;
+    case 1: scfParent->do_fastmesh = value->GetBool (); break;
     default: return false;
   }
   return true;
@@ -401,11 +401,10 @@ csGraphics3DInfinite::eiInfiniteConfig::SetOption (int id, csVariant* value)
 bool
 csGraphics3DInfinite::eiInfiniteConfig::GetOption (int id, csVariant* value)
 {
-  value->type = config_options[id].type;
   switch (id)
   {
-    case 0: value->v.b = scfParent->do_overdraw; break;
-    case 1: value->v.b = scfParent->do_fastmesh; break;
+    case 0: value->SetBool (scfParent->do_overdraw); break;
+    case 1: value->SetBool (scfParent->do_fastmesh); break;
     default: return false;
   }
   return true;

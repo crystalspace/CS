@@ -32,27 +32,41 @@
 SCF_IMPLEMENT_IBASE(csGraphics2D)
   SCF_IMPLEMENTS_INTERFACE(iGraphics2D)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iConfig)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::eiPlugin)
   SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::CanvasConfig)
+  SCF_IMPLEMENTS_INTERFACE (iConfig)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 csGraphics2D::csGraphics2D (iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   Memory = NULL;
   FontServer = NULL;
   LineAddress = NULL;
   Palette = NULL;
+  Width = 640;
+  Height = 480;
+  Depth = 16;
+  FullScreen = false;
 }
 
 bool csGraphics2D::Initialize (iSystem* pSystem)
 {
   System = pSystem;
   // Get the system parameters
-  System->GetSettings (Width, Height, Depth, FullScreen);
+  config.AddConfig (System, "/config/video.cfg");
+  Width = config->GetInt ("Video.ScreenWidth", Width);
+  Height = config->GetInt ("Video.ScreenHeight", Height);
+  Depth = config->GetInt ("Video.ScreenDepth", Depth);
+  FullScreen = config->GetBool ("Video.FullScreen", FullScreen);
 
   // Get the font server: A missing font server is NOT an error
   if (!FontServer)
@@ -82,6 +96,43 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
   }
 
   return true;
+}
+
+void csGraphics2D::ChangeDimension (int w, int h)
+{
+  if (Width == w && Height == h) return;
+  Width = w;
+  Height = h;
+  return;
+#if 0
+// @@@ Enable this code later when we have proper support
+// for changing dimension after Open() has been called!
+  delete [] LineAddress;
+  LineAddress = NULL;
+
+  // Allocate buffer for address of each scan line to avoid multuplication
+  LineAddress = new int [Height];
+  CS_ASSERT (LineAddress != NULL);
+
+  // Initialize scanline address array
+  int i,addr,bpl = Width * pfmt.PixelBytes;
+  for (i = 0, addr = 0; i < Height; i++, addr += bpl)
+    LineAddress[i] = addr;
+
+  SetClipRect (0, 0, Width - 1, Height - 1);
+#endif
+}
+
+void csGraphics2D::ChangeDepth (int d)
+{
+  if (Depth == d) return;
+  Depth = d;
+}
+
+void csGraphics2D::ChangeFullscreen (bool b)
+{
+  if (FullScreen == b) return;
+  FullScreen = b;
 }
 
 csGraphics2D::~csGraphics2D ()
@@ -593,3 +644,65 @@ iGraphics2D *csGraphics2D::CreateOffScreenCanvas
   return tex->CreateOffScreenCanvas (width, height, buffer, alone_hint,
 				     pfmt, palette, pal_size);
 }
+
+//---------------------------------------------------------------------------
+
+#define NUM_OPTIONS 3
+
+static const csOptionDescription config_options [NUM_OPTIONS] =
+{
+  { 0, "depth", "Display depth", CSVAR_LONG },
+  { 1, "fs", "Fullscreen if available", CSVAR_BOOL },
+  { 2, "mode", "Window size or resolution", CSVAR_STRING },
+};
+
+bool csGraphics2D::CanvasConfig::SetOption (int id, csVariant* value)
+{
+  if (value->GetType () != config_options[id].type)
+    return false;
+  switch (id)
+  {
+    case 0: scfParent->ChangeDepth (value->GetLong ()); break;
+    case 1: scfParent->ChangeFullscreen (value->GetBool ()); break;
+    case 2:
+    {
+      const char* buf = value->GetString ();
+      int wres, hres;
+      if (sscanf (buf, "%dx%d", &wres, &hres) == 2)
+      {
+        scfParent->ChangeDimension (wres, hres);
+      }
+      break;
+    }
+    default: return false;
+  }
+  return true;
+}
+
+bool csGraphics2D::CanvasConfig::GetOption (int id, csVariant* value)
+{
+  switch (id)
+  {
+    case 0: value->SetLong (scfParent->Depth); break;
+    case 1: value->SetBool (scfParent->FullScreen); break;
+    case 2:
+    {
+      char buf[100];
+      sprintf (buf, "%dx%d", scfParent->GetWidth (), scfParent->GetHeight ());
+      value->SetString (buf);
+      break;
+    }
+    default: return false;
+  }
+  return true;
+}
+
+bool csGraphics2D::CanvasConfig::GetOptionDescription
+  (int idx, csOptionDescription* option)
+{
+  if (idx < 0 || idx >= NUM_OPTIONS)
+    return false;
+  *option = config_options[idx];
+  return true;
+}
+

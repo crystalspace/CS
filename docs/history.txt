@@ -5,6 +5,58 @@ The history order is reversed so that new features are at the top.
 	  mesh wrappers on your own. This can be useful if you want to display
 	  an object in a CSWS window for example. Normally applications
 	  will rarely use this function.
+	- Martin Geisse added to 3d sprite factories the possibility to set
+	  a default mixing mode for new sprites. The model crossbuilder uses
+	  this feature to enable tiling for generated sprite factories if
+	  required.
+	- Wouter Wijngaards did the following:
+	    - Changed isotest debug condition. The invisble grid is now
+	      positioned at the old maze position.
+	    - Fixed isocell traverse, which was broken when > 2 elements were
+	      present.
+	    - Made emitter particle system draw sort the particles back to
+	      front when this is needed (In CS_FX_ADD mixmode no sorting is
+	      needed). Uses qsort to do it.
+	    - Added new texture fpart.png to stdtex.zip.
+	    - New fire in the yellow room of 'walktest partsys' now has a
+	      nicer texture.  (Currently only works in opengl, software does
+	      not seem to like the alpha channel & mixmodes).
+	    - Added a patch from Jeff Cours (jeff@penguin.moriarti.org) that
+	      fixes win32gcc compilation on the winME platform.
+	- Added CSVAR_STRING for the csVariantType enum. This allows iConfig
+	  to use string type options. Made csVariant safer by not allowing
+	  access to the variable anymore. Instead use Set<Type>()
+	  and Get<Type>(). Fixed all plugins that implemented iConfig
+	  for this change. Get<Type>() will also fail (using CS_ASSERT)
+	  if type doesn't match.
+	- Added ChangeDimension() to csGraphics2D. This is a virtual function
+	  that is only accessible to implementations of csGraphics2D
+	  (canvases) and is called whenever the width/height changes
+	  (through the config interface). Specific canvas implementations
+	  can do their own processing in that function to actually change
+	  the size of the canvas.
+	  Also added ChangeDepth() and ChangeFullscreen().
+	  Note that none of the canvases currently override this method
+	  so calling any of these routines after the canvas is already
+	  Open() will most likely fail horribly.
+	- Removed the -mode,-depth, and -fs commandline options from the
+	  system driver and moved them to the canvases (in
+	  plugins/video/canvas/common/graph2d.cpp). csGraphics2D now
+	  implements iConfig through which these settings can be queried.
+	  The system driver will now treat these options like all
+	  plugin specific options (i.e. not). This change has a few
+	  consequences:
+	    - The windows driver will no longer switch to non-fullscreen
+	      when an alert appears in fullscreen mode. This needs to be
+	      fixed.
+	    - The FrameWidth, FrameHeight, Depth, and FullScreen variables
+	      are removed from SysSystemDriver which means that apps
+	      have to store them on their own if they need them.
+	    - iSystem::GetSettings() has been removed. Instead you should
+	      ask the canvas (G2D) for the appropriate values.
+	  This is a fairly dangerous modification and I could only test
+	  the MingW port (which means the ddraw and OpenGLwin canvases).
+	  Please let me know if there are problems.
 19-Jul-2001
 	- Added iMeshList and iMeshFactoryList. Added iEngine::GetMeshes()
 	  and GetMeshFactories() and removed several mesh/mesh factory

@@ -344,7 +344,9 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
       	  "MeshObj", iMeshObjectType);
     csVariant lod_level;
     GetConfigOption (type, "sprlod", lod_level);
-    change_float (arg, &lod_level.v.f, "LOD detail", -1, 1000000);
+    float f = lod_level.GetFloat ();
+    change_float (arg, &f, "LOD detail", -1, 1000000);
+    lod_level.SetFloat (f);
     SetConfigOption (type, "sprlod", lod_level);
   }
   else if (!strcasecmp (cmd, "sprlight"))
@@ -353,7 +355,9 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
       	  "MeshObj", iMeshObjectType);
     csVariant lqual;
     GetConfigOption (type, "sprlq", lqual);
-    change_long (arg, &lqual.v.l, "sprite lighting quality", 0, 3);
+    long l = lqual.GetLong ();
+    change_long (arg, &l, "sprite lighting quality", 0, 3);
+    lqual.SetLong (l);
     SetConfigOption (type, "sprlq", lqual);
   }
   else if (!strcasecmp (cmd, "dnl"))

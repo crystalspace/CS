@@ -376,7 +376,7 @@ static const csOptionDescription config_options [NUM_OPTIONS] =
 
 bool csGraphics3DLine::eiLineConfig::SetOption (int id, csVariant* value)
 {
-  if (value->type != config_options[id].type)
+  if (value->GetType () != config_options[id].type)
     return false;
   switch (id)
   {
@@ -388,10 +388,9 @@ bool csGraphics3DLine::eiLineConfig::SetOption (int id, csVariant* value)
 
 bool csGraphics3DLine::eiLineConfig::GetOption (int id, csVariant* value)
 {
-  value->type = config_options[id].type;
   switch (id)
   {
-    case 0: value->v.b = false; break;
+    case 0: value->SetBool (false); break;
     default: return false;
   }
   return true;

@@ -232,8 +232,6 @@ bool csGraphics2DOpenGL::Initialize (iSystem *pSystem)
   m_hInstance = m_piWin32System->GetInstance();
   m_nCmdShow  = m_piWin32System->GetCmdShow();
 
-  System->GetSettings(Width, Height, Depth, FullScreen);
-    
   if (Depth == 8)
   {
     pfmt.PalEntries = 256;

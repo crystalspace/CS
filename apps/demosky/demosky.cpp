@@ -289,7 +289,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   view = new csView (engine, myG3D);
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, 0));
-  view->SetRectangle (0, 0, FrameWidth, FrameHeight);
+  view->SetRectangle (0, 0, myG2D->GetWidth (), myG2D->GetHeight ());
 
   txtmgr->SetPalette ();
 

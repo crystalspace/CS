@@ -311,6 +311,7 @@ public:
   iTextureManager* txtmgr;
   iGraphics2D *myG2D;
   iGraphics3D *myG3D;
+  int FrameWidth, FrameHeight;
   iVFS *myVFS;
   iNetworkDriver *myNetDrv;
   iSoundSource *backsound;

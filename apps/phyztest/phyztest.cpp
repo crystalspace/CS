@@ -322,7 +322,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   view = new csView (engine, myG3D);
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -4));
-  view->SetRectangle (2, 2, FrameWidth - 4, FrameHeight - 4);
+  view->SetRectangle (2, 2, myG2D->GetWidth () - 4, myG2D->GetHeight () - 4);
 
   txtmgr->SetPalette ();
   write_colour = txtmgr->FindRGB (255, 150, 100);

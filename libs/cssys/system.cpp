@@ -292,8 +292,6 @@ csSystemDriver::csSystemDriver () : Plugins (8, 8), EventQueue (),
   // Create the default system event outlet
   EventOutlets.Push (new csEventOutlet (NULL, this));
 
-  FullScreen = false;
-
   VFS = NULL;
   G3D = NULL;
   G2D = NULL;
@@ -512,14 +510,6 @@ bool csSystemDriver::Open (const char *Title)
   if ((G3D && !G3D->Open (Title))
    || (!G3D && G2D && !G2D->Open (Title)))
     return false;
-  // Query frame width/height/depth as it possibly has been adjusted after open
-  if (G2D)
-  {
-    FrameWidth = G2D->GetWidth ();
-    FrameHeight = G2D->GetHeight ();
-    Depth = G2D->GetPixelBytes ();
-    Depth *= 8;
-  }
 
   // Now pass the open event to all plugins
   csEvent Event (GetTime (), csevBroadcast, cscmdSystemOpen);
@@ -622,46 +612,13 @@ void csSystemDriver::SetSystemDefaults (iConfigManager *Config)
 {
   // First look in .cfg file
   csConfigAccess cfg;
-  cfg.AddConfig(this, "/config/video.cfg");
   cfg.AddConfig(this, "/config/system.cfg");
-
-  FrameWidth = Config->GetInt ("Video.ScreenWidth", 640);
-  FrameHeight = Config->GetInt ("Video.ScreenHeight", 480);
-  Depth = Config->GetInt ("Video.ScreenDepth", 16);
-  FullScreen = Config->GetBool ("Video.FullScreen", false);
 
   // Now analyze command line
   const char *val;
 
   if ((val = CommandLine->GetOption ("debug")))
     debug_level = atoi(val);
-
-  if ((val = CommandLine->GetOption ("mode")))
-  {
-    int wres, hres;
-    if (sscanf(val, "%dx%d", &wres, &hres) != 2)
-    {
-      Printf (CS_MSG_INITIALIZATION, "Mode %s unknown : assuming '-mode %dx%d'\n", val,
-        FrameWidth, FrameHeight);
-    }
-    else
-    {
-      FrameWidth = wres;
-      FrameHeight = hres;
-    }
-  }
-
-  if ((val = CommandLine->GetOption ("depth")))
-    Depth = atoi (val);
-
-  if ((val = CommandLine->GetOption ("fs")))
-    if (!strcmp (val, "no"))
-      FullScreen = false;
-    else if (!val [0] || !strcmp (val, "yes"))
-      FullScreen = true;
-    else
-      Printf (CS_MSG_INITIALIZATION, "Unknown value `%s' for -fs switch: "
-        "`yes' or `no' expected\n", val);
 
   Mouse.SetDoubleClickTime (
     Config->GetInt ("MouseDriver.DoubleClickTime", 300),
@@ -691,7 +648,8 @@ void csSystemDriver::Help (iConfig* Config)
     {
       case CSVAR_BOOL:
         sprintf (opt, "  -[no]%s", option.name);
-	sprintf (desc, "%s (%s) ", option.description, def.v.b ? "yes" : "no");
+	sprintf (desc, "%s (%s) ", option.description, def.GetBool ()
+		? "yes" : "no");
 	break;
       case CSVAR_CMD:
         sprintf (opt, "  -%s", option.name);
@@ -699,11 +657,16 @@ void csSystemDriver::Help (iConfig* Config)
 	break;
       case CSVAR_FLOAT:
         sprintf (opt, "  -%s=<val>", option.name);
-	sprintf (desc, "%s (%g)", option.description, def.v.f);
+	sprintf (desc, "%s (%g)", option.description, def.GetFloat ());
 	break;
       case CSVAR_LONG:
         sprintf (opt, "  -%s=<val>", option.name);
-	sprintf (desc, "%s (%ld)", option.description, def.v.l);
+	sprintf (desc, "%s (%ld)", option.description, def.GetLong ());
+	break;
+      case CSVAR_STRING:
+        sprintf (opt, "  -%s=<val>", option.name);
+	sprintf (desc, "%s (%s)", option.description, def.GetString ()
+		? def.GetString () : "none");
 	break;
     }
     Printf (CS_MSG_STDOUT, "%-21s%s\n", opt, desc);
@@ -729,9 +692,6 @@ void csSystemDriver::Help ()
 
   Printf (CS_MSG_STDOUT, "General options:\n");
   Printf (CS_MSG_STDOUT, "  -help              this help\n");
-  Printf (CS_MSG_STDOUT, "  -mode=<w>x<h>      set resolution (default=%dx%d)\n", FrameWidth, FrameHeight);
-  Printf (CS_MSG_STDOUT, "  -depth=<d>         set depth (default=%d bpp)\n", Depth);
-  Printf (CS_MSG_STDOUT, "  -[no]fs            use fullscreen videomode if available (default=%s)\n", FullScreen ? "yes" : "no");
   Printf (CS_MSG_STDOUT, "  -video=<s>         the 3D rendering driver (opengl, software, ...)\n");
   Printf (CS_MSG_STDOUT, "  -canvas=<s>        the 2D canvas driver (asciiart, x2d, ...)\n");
   Printf (CS_MSG_STDOUT, "  -plugin=<s>        load the plugin after all others\n");
@@ -794,21 +754,26 @@ void csSystemDriver::QueryOptions (iPlugin *iObject)
       if ((val = CommandLine->GetOption (pio->Name)))
       {
         csVariant optval;
-        optval.type = pio->Type;
         switch (pio->Type)
         {
-          case CSVAR_BOOL:
           case CSVAR_CMD:
-            optval.v.b = pio->Value;
+	    optval.SetCommand ();
+	    break;
+          case CSVAR_BOOL:
+            optval.SetBool (pio->Value);
             break;
           case CSVAR_LONG:
             if (!val) continue;
-            optval.v.l = atol (val);
+            optval.SetLong (atol (val));
             break;
           case CSVAR_FLOAT:
             if (!val) continue;
-            optval.v.f = atof (val);
+            optval.SetFloat (atof (val));
             break;
+	  case CSVAR_STRING:
+	    if (!val) continue;
+	    optval.SetString (val);
+	    break;
         }
         pio->Config->SetOption (pio->ID, &optval);
       }
@@ -823,15 +788,6 @@ void csSystemDriver::RequestPlugin (const char *iPluginName)
 }
 
 //--------------------------------- iSystem interface for csSystemDriver -----//
-
-void csSystemDriver::GetSettings (int &oWidth, int &oHeight, int &oDepth,
-  bool &oFullScreen)
-{
-  oWidth = FrameWidth;
-  oHeight = FrameHeight;
-  oDepth = Depth;
-  oFullScreen = FullScreen;
-}
 
 csTime csSystemDriver::GetTime ()
 {

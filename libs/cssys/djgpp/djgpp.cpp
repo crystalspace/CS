@@ -155,7 +155,11 @@ bool SysSystemDriver::Open (const char *Title)
   // Query screen size
   int FrameWidth, FrameHeight, Depth;
   bool FullScreen;
-  GetSettings (FrameWidth, FrameHeight, Depth, FullScreen);
+  //@@@ THIS IS BROKEN: Should get information from canvas!
+  //@@@GetSettings (FrameWidth, FrameHeight, Depth, FullScreen);
+  FrameWidth = 640;
+  FrameHeight = 480;
+  //@@@
 
   // Query mouse sensivity
   __dpmi_regs regs;

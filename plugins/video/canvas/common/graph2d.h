@@ -24,6 +24,8 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/fontserv.h"
 #include "isys/plugin.h"
+#include "iutil/config.h"
+#include "csutil/cfgacc.h"
 
 #define CsPrintf System->Printf
 
@@ -37,6 +39,9 @@
 class csGraphics2D : public iGraphics2D
 {
 public:
+  /// The configuration file
+  csConfigAccess config;
+
   /// The clipping rectangle
   int ClipX1, ClipX2, ClipY1, ClipY2;
 
@@ -68,6 +73,19 @@ public:
    * FinishDraw().
    */
   int FrameBufferLocked;
+  /**
+   * Change the size of the canvas.
+   * Subclasses can override this to do special processing.
+   */
+  virtual void ChangeDimension (int w, int h);
+  /**
+   * Change the depth of the canvas.
+   */
+  virtual void ChangeDepth (int d);
+  /**
+   * Change the fullscreen state of the canvas.
+   */
+  virtual void ChangeFullscreen (bool b);
 
 public:
   SCF_DECLARE_IBASE;
@@ -280,6 +298,15 @@ protected:
     int fg, int bg, const char *text);
   /// Return address of a 32-bit pixel
   static unsigned char *GetPixelAt32 (csGraphics2D *This, int x, int y);
+
+  struct CanvasConfig : public iConfig
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csGraphics2D);
+    virtual bool GetOptionDescription (int idx, csOptionDescription*);
+    virtual bool SetOption (int id, csVariant* value);
+    virtual bool GetOption (int id, csVariant* value);
+  } scfiConfig;
+  friend struct CanvasConfig;
 };
 
 #endif // __GRAPH2D_H__

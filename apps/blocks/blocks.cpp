@@ -3091,6 +3091,9 @@ int main (int argc, char* argv[])
     fatal_exit (0, false);
   }
 
+  Sys->FrameWidth = Gfx2D->GetWidth ();
+  Sys->FrameHeight = Gfx2D->GetHeight ();
+
   // Find the pointer to engine plugin
   QUERY_PLUG_ID (Sys->engine, CS_FUNCID_ENGINE, iEngine, "No iEngine plugin!\n");
 

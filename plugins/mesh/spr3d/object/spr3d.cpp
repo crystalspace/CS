@@ -1666,26 +1666,29 @@ static const csOptionDescription config_options [NUM_OPTIONS] =
   { 1, "sprlq", "Sprite Lighting Quality", CSVAR_LONG },
 };
 
-bool csSprite3DMeshObjectType::csSprite3DConfig::SetOption (int id, csVariant* value)
+bool csSprite3DMeshObjectType::csSprite3DConfig::SetOption (int id,
+	csVariant* value)
 {
-  if (value->type != config_options[id].type)
+  if (value->GetType () != config_options[id].type)
     return false;
   switch (id)
   {
-    case 0: csSprite3DMeshObject::global_lod_level = value->v.f; break;
-    case 1: csSprite3DMeshObject::global_lighting_quality = value->v.l; break;
+    case 0: csSprite3DMeshObject::global_lod_level = value->GetFloat (); break;
+    case 1: csSprite3DMeshObject::global_lighting_quality = value->GetLong ();
+    	break;
     default: return false;
   }
   return true;
 }
 
-bool csSprite3DMeshObjectType::csSprite3DConfig::GetOption (int id, csVariant* value)
+bool csSprite3DMeshObjectType::csSprite3DConfig::GetOption (int id,
+	csVariant* value)
 {
-  value->type = config_options[id].type;
   switch (id)
   {
-    case 0: value->v.f = csSprite3DMeshObject::global_lod_level; break;
-    case 1: value->v.l = csSprite3DMeshObject::global_lighting_quality; break;
+    case 0: value->SetFloat (csSprite3DMeshObject::global_lod_level); break;
+    case 1: value->SetLong (csSprite3DMeshObject::global_lighting_quality);
+    	break;
     default: return false;
   }
   return true;

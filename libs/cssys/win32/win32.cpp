@@ -514,9 +514,10 @@ void SysSystemDriver::NextFrame ()
 void SysSystemDriver::Alert (const char* s)
 {
   bool FullScreen = false;
-  int width, height, depth;
+  //int width, height, depth;
 
-  GetSettings(width, height, depth, FullScreen);
+// @@@ IMPORTANT: FIX ME: HAVE TO GO TO CANVAS FOR THIS!!!
+  //GetSettings(width, height, depth, FullScreen);
 
   if (FullScreen)
   {

@@ -200,7 +200,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
   view = new csView (engine, g3d);
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
-  view->SetRectangle (0, 0, FrameWidth, FrameHeight);
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   txtmgr->SetPalette ();
   return true;

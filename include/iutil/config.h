@@ -20,24 +20,86 @@
 #define __IUTIL_CONFIG_H__
 
 #include "csutil/scf.h"
+#include "csutil/util.h"
 
 enum csVariantType
 {
   CSVAR_LONG,
   CSVAR_BOOL,
   CSVAR_CMD,
-  CSVAR_FLOAT
+  CSVAR_FLOAT,
+  CSVAR_STRING
 };
 
 struct csVariant
 {
+private:
   csVariantType type;
   union value
   {
     long l;
     bool b;
     float f;
+    char* s;
   } v;
+
+public:
+  csVariant () { type = CSVAR_LONG; v.s = NULL; }
+  ~csVariant () { if (type == CSVAR_STRING) delete[] v.s; }
+  void SetLong (long l)
+  {
+    if (type == CSVAR_STRING) delete[] v.s;
+    type = CSVAR_LONG;
+    v.l = l;
+  }
+  void SetBool (bool b)
+  {
+    if (type == CSVAR_STRING) delete[] v.s;
+    type = CSVAR_BOOL;
+    v.b = b;
+  }
+  void SetFloat (float f)
+  {
+    if (type == CSVAR_STRING) delete[] v.s;
+    type = CSVAR_FLOAT;
+    v.f = f;
+  }
+  void SetString (const char* s)
+  {
+    if (type == CSVAR_STRING) delete[] v.s;
+    type = CSVAR_STRING;
+    if (s)
+      v.s = csStrNew (s);
+    else
+      v.s = NULL;
+  }
+  void SetCommand ()
+  {
+    if (type == CSVAR_STRING) delete[] v.s;
+    type = CSVAR_CMD;
+  }
+
+  long GetLong () const
+  {
+    CS_ASSERT (type == CSVAR_LONG);
+    return v.l;
+  }
+  bool GetBool () const
+  {
+    CS_ASSERT (type == CSVAR_BOOL);
+    return v.b;
+  }
+  float GetFloat () const
+  {
+    CS_ASSERT (type == CSVAR_FLOAT);
+    return v.f;
+  }
+  const char* GetString () const
+  {
+    CS_ASSERT (type == CSVAR_STRING);
+    return v.s;
+  }
+  csVariantType GetType () const { return type; }
 };
 
 struct csOptionDescription

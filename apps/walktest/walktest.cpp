@@ -1334,6 +1334,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     return false;
   }
 
+  FrameWidth = Gfx2D->GetWidth ();
+  FrameHeight = Gfx2D->GetHeight ();
+
   // Find the font we'll use
   Font = Gfx2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
 

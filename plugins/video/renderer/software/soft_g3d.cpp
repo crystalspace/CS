@@ -120,20 +120,20 @@ static const csOptionDescription config_options [NUM_OPTIONS] =
 
 bool csGraphics3DSoftware::eiSoftConfig::SetOption (int id, csVariant* value)
 {
-  if (value->type != config_options[id].type)
+  if (value->GetType () != config_options[id].type)
     return false;
   switch (id)
   {
-    case 0: scfParent->do_interlaced = value->v.b ? 0 : -1; break;
-    case 1: scfParent->do_lighting = value->v.b; break;
-    case 2: scfParent->do_alpha = value->v.b; break;
-    case 3: scfParent->do_textured = value->v.b; break;
+    case 0: scfParent->do_interlaced = value->GetBool () ? 0 : -1; break;
+    case 1: scfParent->do_lighting = value->GetBool (); break;
+    case 2: scfParent->do_alpha = value->GetBool (); break;
+    case 3: scfParent->do_textured = value->GetBool (); break;
 #ifdef DO_MMX
-    case 4: scfParent->do_mmx = value->v.b; break;
+    case 4: scfParent->do_mmx = value->GetBool (); break;
 #endif
-    case 5: scfParent->texman->Gamma = value->v.f; break;
-    case 6: scfParent->do_gouraud = value->v.b; break;
-    case 7: scfParent->do_smaller_rendering = value->v.b; break;
+    case 5: scfParent->texman->Gamma = value->GetFloat (); break;
+    case 6: scfParent->do_gouraud = value->GetBool (); break;
+    case 7: scfParent->do_smaller_rendering = value->GetBool (); break;
     default: return false;
   }
   scfParent->ScanSetup ();
@@ -142,19 +142,20 @@ bool csGraphics3DSoftware::eiSoftConfig::SetOption (int id, csVariant* value)
 
 bool csGraphics3DSoftware::eiSoftConfig::GetOption (int id, csVariant* value)
 {
-  value->type = config_options[id].type;
   switch (id)
   {
-    case 0: value->v.b = scfParent->do_interlaced != -1; break;
-    case 1: value->v.b = scfParent->do_lighting; break;
-    case 2: value->v.b = scfParent->do_alpha; break;
-    case 3: value->v.b = scfParent->do_textured; break;
+    case 0: value->SetBool (scfParent->do_interlaced != -1); break;
+    case 1: value->SetBool (scfParent->do_lighting); break;
+    case 2: value->SetBool (scfParent->do_alpha); break;
+    case 3: value->SetBool (scfParent->do_textured); break;
 #ifdef DO_MMX
-    case 4: value->v.b = scfParent->do_mmx; break;
+    case 4: value->SetBool (scfParent->do_mmx); break;
+#else
+    case 4: value->SetBool (false); break;
 #endif
-    case 5: value->v.f = scfParent->Gamma / 65536.; break;
-    case 6: value->v.b = scfParent->do_gouraud; break;
-    case 7: value->v.b = scfParent->do_smaller_rendering; break;
+    case 5: value->SetFloat (scfParent->Gamma / 65536.); break;
+    case 6: value->SetBool (scfParent->do_gouraud); break;
+    case 7: value->SetBool (scfParent->do_smaller_rendering); break;
     default: return false;
   }
   return true;

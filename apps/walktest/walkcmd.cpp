@@ -384,9 +384,28 @@ void SetConfigOption (iBase* plugin, const char* optName, const char* optValue)
 	csVariant var;
 	switch (odesc.type)
 	{
-	  case CSVAR_LONG: sscanf (optValue, "%ld", &var.v.l); break;
-	  case CSVAR_BOOL: csScanStr (optValue, "%b", &var.v.b); break;
-	  case CSVAR_FLOAT: csScanStr (optValue, "%f", &var.v.f); break;
+	  case CSVAR_LONG:
+	  {
+	    long l;
+	    csScanStr (optValue, "%ld", &l);
+	    var.SetLong (l);
+	    break;
+	  }
+	  case CSVAR_BOOL:
+	  {
+	    bool b;
+	    csScanStr (optValue, "%b", &b);
+	    var.SetBool (b);
+	    break;
+	  }
+	  case CSVAR_FLOAT:
+	  {
+	    float f;
+	    csScanStr (optValue, "%f", &f);
+	    var.SetFloat (f);
+	    break;
+	  }
+	  case CSVAR_STRING: var.SetString (optValue); break;
 	  default: break;
 	}
 	config->SetOption (i, &var);
@@ -736,15 +755,18 @@ bool CommandHandler (const char *cmd, const char *arg)
 	    switch (odesc.type)
 	    {
 	      case CSVAR_LONG: Sys->Printf (CS_MSG_CONSOLE, "LONG=%ld\n",
-				   var.v.l);
+				   var.GetLong ());
 			       break;
 	      case CSVAR_BOOL: Sys->Printf (CS_MSG_CONSOLE, "BOOL=%d\n",
-				   var.v.b);
+				   var.GetBool ());
 			       break;
 	      case CSVAR_CMD: Sys->Printf (CS_MSG_CONSOLE, "CMD\n");
 			       break;
 	      case CSVAR_FLOAT: Sys->Printf (CS_MSG_CONSOLE, "FLOAT=%g\n",
-				   var.v.f);
+				   var.GetFloat ());
+			       break;
+	      case CSVAR_STRING: Sys->Printf (CS_MSG_CONSOLE, "STRING=%s\n",
+				   var.GetString ());
 			       break;
 	      default: Sys->Printf (CS_MSG_CONSOLE, "<unknown type>\n");
 		       break;

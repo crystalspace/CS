@@ -227,7 +227,8 @@ bool Video::Initialize (int argc, const char* const argv[],
   view = new csView (engine, myG3D);
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
-  view->SetRectangle (0, 0, FrameWidth, FrameHeight);
+  iGraphics2D* g2d = myG3D->GetDriver2D ();
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   txtmgr->SetPalette ();
 
@@ -284,8 +285,9 @@ bool Video::Initialize (int argc, const char* const argv[],
 	  // show the video in the center of the window
 	  int vw = desc.width/2, vh = desc.height/2;
 	  //	  vw = 750, vh =580;
-	  int x = (FrameWidth  - vw)/2;
-	  int y = (FrameHeight  - vh)/2;
+	  iGraphics2D* g2d = myG3D->GetDriver2D ();
+	  int x = (g2d->GetWidth ()  - vw)/2;
+	  int y = (g2d->GetHeight ()  - vh)/2;
 	  //pVStream->SetRect (x, y, desc.width, desc.height);
 	  pVStream->SetRect (x, y, vw, vh);
  	}

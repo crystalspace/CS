@@ -134,6 +134,8 @@ class WalkTest : public SysSystemDriver
   typedef SysSystemDriver superclass;
 
 public:
+  int FrameWidth, FrameHeight;
+
   /// The startup directory on VFS with needed map file
   static char map_dir [100];
   /// A script to execute at startup.

@@ -224,14 +224,6 @@ public:
   /// The list of all plug-ins
   csPluginsVector Plugins;
 
-  /// the width of this frame
-  int FrameWidth;
-  /// the height of this frame
-  int FrameHeight;
-  /// whether this device is full-screen or not.
-  bool FullScreen;
-  /// the bits-per-pixel of the display.
-  int Depth;
   /// The event queue
   csEventQueue EventQueue;
   /// Keyboard driver
@@ -358,8 +350,6 @@ public:
 
   /**************************** iSystem interface ****************************/
 
-  /// Returns the configuration.
-  virtual void GetSettings (int &oWidth, int &oHeight, int &oDepth, bool &oFullScreen);
   /// Get the time in milliseconds.
   virtual csTime GetTime ();
   /**

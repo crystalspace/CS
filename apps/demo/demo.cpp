@@ -819,7 +819,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -900));
   view->GetCamera ()->GetTransform ().RotateThis (csVector3 (0, 1, 0), .8);
-  view->SetRectangle (0, 0, FrameWidth, FrameHeight);
+  view->SetRectangle (0, 0, myG2D->GetWidth (), myG2D->GetHeight ());
 
   txtmgr->SetPalette ();
   col_red = txtmgr->FindRGB (255, 0, 0);

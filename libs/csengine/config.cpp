@@ -32,7 +32,7 @@ static const csOptionDescription config_options [] =
   {  1, "rad",      "Pseudo-radiosity system", CSVAR_BOOL },
   {  2, "cosfact",  "Cosinus factor for lighting", CSVAR_FLOAT },
   {  3, "reflect",  "Max number of reflections for radiosity", CSVAR_LONG },
-  {  4, "recalc",   "Force/inhibit recalculation of all cached information",
+  {  4, "recalc",   "Force/inhibit recalculation of cached information",
                      CSVAR_BOOL },
   {  5, "relight",  "Force/inhibit recalculation of lightmaps", CSVAR_BOOL },
   {  6, "lightqual","Lighting quality", CSVAR_LONG },
@@ -73,16 +73,17 @@ bool csEngineConfig::SetOption (int id, csVariant* value)
 {
   switch (id)
   {
-    case 0:  csCamera::SetDefaultFOV (value->v.l, scfParent->G3D->GetWidth ());
+    case 0:  csCamera::SetDefaultFOV (value->GetLong (),
+    	     scfParent->G3D->GetWidth ());
              break;
-    case 1:  csSector::do_radiosity = value->v.b; break;
-    case 2:  csPolyTexture::cfg_cosinus_factor = value->v.f; break;
-    case 3:  csSector::cfg_reflections = value->v.l; break;
-    case 4:  config_recalc  (value->v.b); break;
-    case 5:  config_relight (value->v.b); break;
-    case 6:  csEngine::lightmap_quality = value->v.l; break;
-    case 7:  config_revis   (value->v.b); break;
-    case 8:  csEngine::do_rad_debug = value->v.b; break;
+    case 1:  csSector::do_radiosity = value->GetBool (); break;
+    case 2:  csPolyTexture::cfg_cosinus_factor = value->GetFloat (); break;
+    case 3:  csSector::cfg_reflections = value->GetLong (); break;
+    case 4:  config_recalc  (value->GetBool ()); break;
+    case 5:  config_relight (value->GetBool ()); break;
+    case 6:  csEngine::lightmap_quality = value->GetLong (); break;
+    case 7:  config_revis   (value->GetBool ()); break;
+    case 8:  csEngine::do_rad_debug = value->GetBool (); break;
     default: return false;
   }
   return true;
@@ -90,18 +91,17 @@ bool csEngineConfig::SetOption (int id, csVariant* value)
 
 bool csEngineConfig::GetOption (int id, csVariant* value)
 {
-  value->type = config_options[id].type;
   switch (id)
   {
-    case 0:  value->v.l = csCamera::GetDefaultFOV (); break;
-    case 1:  value->v.b = csSector::do_radiosity; break;
-    case 2:  value->v.f = csPolyTexture::cfg_cosinus_factor; break;
-    case 3:  value->v.l = csSector::cfg_reflections; break;
-    case 4:  value->v.b = config_recalc (); break;
-    case 5:  value->v.b = config_relight(); break;
-    case 6:  value->v.l = csEngine::lightmap_quality; break;
-    case 7:  value->v.b = config_revis  (); break;
-    case 8:  value->v.b = csEngine::do_rad_debug; break;
+    case 0:  value->SetLong (csCamera::GetDefaultFOV ()); break;
+    case 1:  value->SetBool (csSector::do_radiosity); break;
+    case 2:  value->SetFloat (csPolyTexture::cfg_cosinus_factor); break;
+    case 3:  value->SetLong (csSector::cfg_reflections); break;
+    case 4:  value->SetBool (config_recalc ()); break;
+    case 5:  value->SetBool (config_relight()); break;
+    case 6:  value->SetLong (csEngine::lightmap_quality); break;
+    case 7:  value->SetBool (config_revis ()); break;
+    case 8:  value->SetBool (csEngine::do_rad_debug); break;
     default: return false;
   }
   return true;
