@@ -208,13 +208,14 @@ Describes how to create Cal3D meshes in 3D Studio @sc{max}.
 Escribes how to create maps and Cal3D meshes in Blender.
 @end table
 
-@emph{Note}: The Crystal Space Cal3D plugin requires a skeleton system to
+@strong{Note}: The Crystal Space Cal3D plugin requires a skeleton system to
 function properly even if the mesh is not going to be animated.  If your mesh
-does not require animation, you must still place at least one bone in the mesh,
-bind it to a part of the mesh (e.g., the body of a space ship), name it
-correctly (see @uref{http://www.cs.indiana.edu/~joellis/} for more
-information), and export the skeleton along with the mesh.  If you do not
-create the skeleton and export it.
+does not require animation, you still @emph{must} place at least one bone in
+the mesh, bind it to a part of the mesh (e.g., the body of a space ship), name
+it correctly (see @uref{http://www.cs.indiana.edu/~joellis/} for more
+information), and export the skeleton along with the mesh. If you fail to
+create at least one bone, the @samp{sprcal3d} plugin either will fail to load
+the model or will otherwise misbehave.
 
 @subsubheading Common @file{viewmesh} Errors
 
