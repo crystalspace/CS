@@ -21,6 +21,7 @@
 #include <string.h>
 
 #define CS_SYSDEF_PROVIDE_GETCWD
+#define CS_SYSDEF_PROVIDE_EXPAND_PATH
 #include "cssysdef.h"
 
 // return a random number from minRange to maxRange inclusive
@@ -78,6 +79,17 @@ void csCombinations (int m, int n, bool (*callback) (int *vector, int count,
   delete [] vector;
 }
 
+#if defined (OS_OS2) || defined (OS_DOS)
+  #define IS_PATH_SEPARATOR(c)	\
+    (((c) == PATH_SEPARATOR) || ((c) == '/') || ((c) == ':'))
+#else
+  #define IS_PATH_SEPARATOR(c)	\
+    (((c) == PATH_SEPARATOR) || ((c) == '/'))
+#endif
+
+#ifndef CS_PROVIDES_EXPAND_PATH
+// generic csExpandName for all platforms
+
 #ifdef COMP_BC
 static int __getcwd (char drive, char *buffer, int buffersize) {
   _getdcwd(drive, buffer, buffersize);
@@ -85,12 +97,7 @@ static int __getcwd (char drive, char *buffer, int buffersize) {
 }
 #endif
 
-// cygwin doesn't behave like windows for files
-#if defined(__CYGWIN__)
-#undef OS_WIN32
-#endif
-
-#if defined (OS_OS2) || defined (OS_WIN32) && !defined(COMP_BC)
+#if defined (OS_OS2) && !defined(COMP_BC)
 // We need a function to retrieve current working directory on specific drive
 
 static int __getcwd (char drive, char *buffer, int buffersize)
@@ -102,7 +109,7 @@ static int __getcwd (char drive, char *buffer, int buffersize)
   return strlen (buffer);
 }
 
-#endif // defined (OS_OS2) || defined (OS_WIN32)
+#endif // defined (OS_OS2)
 
 #if defined (OS_DOS)
 // We need a function to retrieve current working directory on specific drive
@@ -128,13 +135,7 @@ char *csExpandName (const char *iName)
   {
     char tmp [CS_MAXPATHLEN + 1];
     int ptmp = 0;
-    while ((inp < namelen)
-        && (iName [inp] != '/')
-        && (iName [inp] != PATH_SEPARATOR)
-#if defined (OS_OS2) || defined (OS_DOS) || defined (OS_WIN32)
-        && (iName [inp] != ':')
-#endif
-          )
+    while ((inp < namelen) && (!IS_PATH_SEPARATOR(iName[inp]) ))
       tmp [ptmp++] = iName [inp++];
     tmp [ptmp] = 0;
 
@@ -230,18 +231,24 @@ char *csExpandName (const char *iName)
   return ret;
 }
 
+#else
+// platform has it's own path expansion routines
+
+char *csExpandName (const char *iName)
+{
+  char outname [CS_MAXPATHLEN + 1];
+  csPlatformExpandPath (iName, outname, sizeof(outname));
+  return csStrNew (outname);
+}
+
+#endif
+
 void csSplitPath (const char *iPathName, char *oPath, size_t iPathSize,
   char *oName, size_t iNameSize)
 {
   size_t sl = strlen (iPathName);
   size_t maxl = sl;
-  while (sl
-      && (iPathName [sl - 1] != '/')
-      && (iPathName [sl - 1] != PATH_SEPARATOR)
-#if defined (OS_OS2) || defined (OS_DOS) || defined (OS_WIN32)
-      && (iPathName [sl - 1] != ':')
-#endif
-        )
+  while (sl && (!IS_PATH_SEPARATOR (iPathName [sl - 1])))
     sl--;
 
   if (iPathSize)

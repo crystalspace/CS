@@ -270,6 +270,17 @@ struct mmioInfo
   extern const char* csCheckPlatformVFSVar(const char* VarName);
 #endif
 
+#ifdef CS_SYSDEF_PROVIDE_EXPAND_PATH
+  #define CS_PROVIDES_EXPAND_PATH 1
+
+  inline void
+  csPlatformExpandPath(const char* path, char* buffer, int bufsize)
+  {
+    GetFullPathName (path, bufsize, buffer, NULL);
+  }
+
+#endif
+
 // COMP_GCC has generic opendir(), readdir(), closedir()
 
 #if defined(CS_SYSDEF_PROVIDE_DIR)
