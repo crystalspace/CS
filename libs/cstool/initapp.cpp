@@ -382,10 +382,12 @@ bool csInitializer::OpenApplication (iObjectRegistry* r)
   SetupConfigManager (r, 0);
 
   // Pass the open event to all interested listeners.
-  csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemOpen);
   csRef<iEventQueue> EventQueue (CS_QUERY_REGISTRY (r, iEventQueue));
   CS_ASSERT (EventQueue != 0);
-  EventQueue->Dispatch (Event);
+  csRef<iEvent> e(EventQueue->CreateEvent(csevBroadcast));
+  e->Command.Code = cscmdSystemOpen;
+  e->Command.Info = 0;
+  EventQueue->Dispatch(*e);
 
   return true;
 }
@@ -396,8 +398,10 @@ void csInitializer::CloseApplication (iObjectRegistry* r)
   csRef<iEventQueue> EventQueue (CS_QUERY_REGISTRY (r, iEventQueue));
   if (EventQueue)
   {
-    csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemClose);
-    EventQueue->Dispatch (Event);
+    csRef<iEvent> e(EventQueue->CreateEvent(csevBroadcast));
+    e->Command.Code = cscmdSystemClose;
+    e->Command.Info = 0;
+    EventQueue->Dispatch(*e);
   }
 }
 
