@@ -23,8 +23,11 @@ inline void csSymbolTable::SetParent (csSymbolTable *p)
 {
   Parent = p;
   csGlobalHashIterator i (& Parent->Hash);
-  Symbol *s;
-  while ((s = (Symbol *) i.Next ())) SetSymbolSafe (s->Name, s->Val);
+  while (i.HasNext ())
+  {
+    Symbol *s = (Symbol *) i.Next ();
+    SetSymbolSafe (s->Name, s->Val);
+  }
 }
 
 inline void csSymbolTable::PropagateSymbol (csStringID name, void *value)
