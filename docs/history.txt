@@ -13,6 +13,8 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+13-Oct-1999
+	- Andrew Zabolotny added keyboard support to CSWS scroll bars.
 12-Oct-1999
 	- Andrew Zabolotny did more work on MazeD:
 	  - New color wheel control.
