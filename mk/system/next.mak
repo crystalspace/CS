@@ -237,6 +237,7 @@ ifeq ($(MAKESECTION),rootdefines) # Makefile includes us twice with valid
 ifeq ($(ROOTCONFIG),config)	  # ROOTCONFIG, but we only need to run once.
 
 SYSCONFIG += $(NEWLINE)bin/booltest.sh "cc -ObjC++" >> config.tmp
+SYSCONFIG += $(NEWLINE)bin/haspythn.sh >> config.tmp
 SYSCONFIG += $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 ifneq ($(strip $(TARGET_ARCHS)),)
   SYSCONFIG += $(NEWLINE)echo TARGET_ARCHS = $(NEXT.TARGET_ARCHS)>>config.tmp

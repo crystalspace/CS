@@ -153,6 +153,7 @@ endif # ifeq ($(MAKESECTION),confighelp)
 #---------------------------------------------------------------- configure ---#
 ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/config)
 
+SYSCONFIG += $(NEWLINE)bin/haspythn.sh >> config.tmp
 SYSCONFIG += $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 SYSCONFIG += $(NEWLINE)echo override BUGGY_EGCS_COMPILER = $(BUGGY_EGCS_COMPILER)>>config.tmp
 
