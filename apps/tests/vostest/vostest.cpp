@@ -77,21 +77,38 @@ void Vostest::SetupFrame ()
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
   // Now rotate the camera according to keyboard state
-  float speed = (elapsed_time / 1000.0) * (0.03 * 20);
+  float speed = (elapsed_time / 1000.0) * (0.06 * 20);
 
   iCamera* c = view->GetCamera();
-  if (kbd->GetKeyState (CSKEY_RIGHT))
-    c->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
-  if (kbd->GetKeyState (CSKEY_LEFT))
-    c->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
-  if (kbd->GetKeyState (CSKEY_PGUP))
-    c->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
-  if (kbd->GetKeyState (CSKEY_PGDN))
-    c->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
-  if (kbd->GetKeyState (CSKEY_UP))
-    c->Move (CS_VEC_FORWARD * 4 * speed);
-  if (kbd->GetKeyState (CSKEY_DOWN))
-    c->Move (CS_VEC_BACKWARD * 4 * speed);
+
+  if (kbd->GetKeyState (CSKEY_SHIFT)) {
+      if (kbd->GetKeyState (CSKEY_RIGHT))
+          c->Move (CS_VEC_RIGHT * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_LEFT))
+          c->Move (CS_VEC_LEFT * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_UP))
+          c->Move (CS_VEC_UP * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_DOWN))
+          c->Move (CS_VEC_DOWN * 4 * speed);
+  } else {
+      if (kbd->GetKeyState (CSKEY_RIGHT))
+          rotY += speed;
+      if (kbd->GetKeyState (CSKEY_LEFT))
+          rotY -= speed;
+      if (kbd->GetKeyState (CSKEY_PGUP))
+          rotX += speed;
+      if (kbd->GetKeyState (CSKEY_PGDN))
+          rotX -= speed;
+      if (kbd->GetKeyState (CSKEY_UP))
+          c->Move (CS_VEC_FORWARD * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_DOWN))
+          c->Move (CS_VEC_BACKWARD * 4 * speed);
+  }
+
+  csMatrix3 rot =  csXRotMatrix3(rotX) * csYRotMatrix3(rotY);
+  csOrthoTransform ot(rot, c->GetTransform().GetOrigin());
+  c->SetTransform(ot);
+
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
@@ -236,7 +253,10 @@ bool Vostest::Initialize ()
     return false;
   }
 
-  // First disable the lighting cache. Our app is vostest enough
+  rotY = 0;
+  rotX = 0;
+
+  // First disable the lighting cache. Our app is simple enough
   // not to need this.
   engine->SetLightingCacheMode (0);
 

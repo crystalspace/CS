@@ -44,6 +44,9 @@ private:
   csRef<iView> view;
   iSector* room;
 
+  float rotY;
+  float rotX;
+
   static bool SimpleEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);
   void SetupFrame ();

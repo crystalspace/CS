@@ -46,6 +46,9 @@ private:
   csRef<iVosA3DL> vosa3dl;
   iSector* room;
 
+  float rotY;
+  float rotX;
+
   static bool VostestEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);
   void SetupFrame ();

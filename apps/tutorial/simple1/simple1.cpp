@@ -75,21 +75,53 @@ void Simple::SetupFrame ()
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
   // Now rotate the camera according to keyboard state
-  float speed = (elapsed_time / 1000.0) * (0.03 * 20);
+  float speed = (elapsed_time / 1000.0) * (0.06 * 20);
 
   iCamera* c = view->GetCamera();
-  if (kbd->GetKeyState (CSKEY_RIGHT))
-    c->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
-  if (kbd->GetKeyState (CSKEY_LEFT))
-    c->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
-  if (kbd->GetKeyState (CSKEY_PGUP))
-    c->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
-  if (kbd->GetKeyState (CSKEY_PGDN))
-    c->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
-  if (kbd->GetKeyState (CSKEY_UP))
-    c->Move (CS_VEC_FORWARD * 4 * speed);
-  if (kbd->GetKeyState (CSKEY_DOWN))
-    c->Move (CS_VEC_BACKWARD * 4 * speed);
+
+  if (kbd->GetKeyState (CSKEY_SHIFT)) {
+      // If the user is holding down shift, the arrow keys will cause
+      // the camera to strafe up, down, left or right from it's
+      // current position.
+      if (kbd->GetKeyState (CSKEY_RIGHT))
+          c->Move (CS_VEC_RIGHT * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_LEFT))
+          c->Move (CS_VEC_LEFT * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_UP))
+          c->Move (CS_VEC_UP * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_DOWN))
+          c->Move (CS_VEC_DOWN * 4 * speed);
+  } else {
+      // left and right cause the camera to rotate on the global Y
+      // axis; page up and page down cause the camera to rotate on the
+      // _camera's_ X axis (more on this in a second) and up and down
+      // arrows cause the camera to go forwards and backwards.
+      if (kbd->GetKeyState (CSKEY_RIGHT))
+          rotY += speed;
+      if (kbd->GetKeyState (CSKEY_LEFT))
+          rotY -= speed;
+      if (kbd->GetKeyState (CSKEY_PGUP))
+          rotX += speed;
+      if (kbd->GetKeyState (CSKEY_PGDN))
+          rotX -= speed;
+      if (kbd->GetKeyState (CSKEY_UP))
+          c->Move (CS_VEC_FORWARD * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_DOWN))
+          c->Move (CS_VEC_BACKWARD * 4 * speed);
+  }
+
+  // We now assign a new rotation transformation to the camera.  You
+  // can think of the rotation this way: starting from the zero
+  // position, you first rotate "rotY" radians on your Y axis to get
+  // the first rotation.  From there you rotate "rotX" radians on the
+  // your X axis to get the final rotation.  We multiply the
+  // individual rotations on each axis together to get a single
+  // rotation matrix.  The rotations are applied in right to left
+  // order .
+  csMatrix3 rot =  csXRotMatrix3(rotX) * csYRotMatrix3(rotY);
+  csOrthoTransform ot(rot, c->GetTransform().GetOrigin());
+  c->SetTransform(ot);
+
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
@@ -117,7 +149,7 @@ bool Simple::HandleEvent (iEvent& ev)
     simple->FinishFrame ();
     return true;
   }
-  else if ((ev.Type == csevKeyboard) && 
+  else if ((ev.Type == csevKeyboard) &&
     (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown) &&
     (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
   {
@@ -137,27 +169,27 @@ bool Simple::SimpleEventHandler (iEvent& ev)
 bool Simple::Initialize ()
 {
   if (!csInitializer::RequestPlugins (object_reg,
-  	CS_REQUEST_VFS,
-	CS_REQUEST_OPENGL3D,
-	CS_REQUEST_ENGINE,
-	CS_REQUEST_FONTSERVER,
-	CS_REQUEST_IMAGELOADER,
-	CS_REQUEST_LEVELLOADER,
-	CS_REQUEST_REPORTER,
-	CS_REQUEST_REPORTERLISTENER,
-	CS_REQUEST_END))
+    CS_REQUEST_VFS,
+    CS_REQUEST_OPENGL3D,
+    CS_REQUEST_ENGINE,
+    CS_REQUEST_FONTSERVER,
+    CS_REQUEST_IMAGELOADER,
+    CS_REQUEST_LEVELLOADER,
+    CS_REQUEST_REPORTER,
+    CS_REQUEST_REPORTERLISTENER,
+    CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-	"Can't initialize plugins!");
+        "crystalspace.application.simple1",
+    "Can't initialize plugins!");
     return false;
   }
 
   if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-	"Can't initialize event handler!");
+        "crystalspace.application.simple1",
+    "Can't initialize event handler!");
     return false;
   }
 
@@ -173,8 +205,8 @@ bool Simple::Initialize ()
   if (vc == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-	"Can't find the virtual clock!");
+        "crystalspace.application.simple1",
+    "Can't find the virtual clock!");
     return false;
   }
 
@@ -183,8 +215,8 @@ bool Simple::Initialize ()
   if (engine == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-	"No iEngine plugin!");
+        "crystalspace.application.simple1",
+    "No iEngine plugin!");
     return false;
   }
 
@@ -192,8 +224,8 @@ bool Simple::Initialize ()
   if (loader == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-    	"No iLoader plugin!");
+        "crystalspace.application.simple1",
+        "No iLoader plugin!");
     return false;
   }
 
@@ -201,8 +233,8 @@ bool Simple::Initialize ()
   if (g3d == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-    	"No iGraphics3D plugin!");
+        "crystalspace.application.simple1",
+        "No iGraphics3D plugin!");
     return false;
   }
 
@@ -210,8 +242,8 @@ bool Simple::Initialize ()
   if (kbd == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-    	"No iKeyboardDriver plugin!");
+        "crystalspace.application.simple1",
+        "No iKeyboardDriver plugin!");
     return false;
   }
 
@@ -219,8 +251,8 @@ bool Simple::Initialize ()
   if (!csInitializer::OpenApplication (object_reg))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-    	"Error opening system!");
+        "crystalspace.application.simple1",
+        "Error opening system!");
     return false;
   }
 
@@ -228,19 +260,24 @@ bool Simple::Initialize ()
   // not to need this.
   engine->SetLightingCacheMode (0);
 
+  // Load the texture from the standard library.  This is located in
+  // CS/data/standard.zip and mounted as /lib/std using the Virtual
+  // File System (VFS) plugin.
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-    	"Error loading 'stone4' texture!");
+        "crystalspace.application.simple1",
+        "Error loading 'stone4' texture!");
     return false;
   }
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
+  // these are used store the current orientation of the camera
+  rotY = rotX = 0;
+
   room = engine->CreateSector ("room");
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingState> ws =
-  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
+  csRef<iThingState> ws = SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
   csRef<iThingFactoryState> walls_state = ws->GetFactory ();
   walls_state->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
   walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
@@ -250,15 +287,15 @@ bool Simple::Initialize ()
   iLightList* ll = room->GetLights ();
 
   light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10,
-  	csColor (1, 0, 0), false);
+    csColor (1, 0, 0), false);
   ll->Add (light->QueryLight ());
 
   light = engine->CreateLight (0, csVector3 (3, 5,  0), 10,
-  	csColor (0, 0, 1), false);
+    csColor (0, 0, 1), false);
   ll->Add (light->QueryLight ());
 
   light = engine->CreateLight (0, csVector3 (0, 5, -3), 10,
-  	csColor (0, 1, 0), false);
+    csColor (0, 1, 0), false);
   ll->Add (light->QueryLight ());
 
   engine->Prepare ();

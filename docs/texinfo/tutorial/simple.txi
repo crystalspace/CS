@@ -78,6 +78,8 @@ private:
   csRef<iGraphics3D> g3d;
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
+
+  float rotX, rotY;
  
 public:
   Simple (iObjectRegistry* object_reg);
@@ -468,6 +470,9 @@ bool Simple::Initialize ()
   // not to need this.
   engine->SetLightingCacheMode (0);
 
+  // Load the texture from the standard library.  This is located in
+  // CS/data/standard.zip and mounted as /lib/std using the Virtual
+  // File System (VFS) plugin.
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -477,6 +482,9 @@ bool Simple::Initialize ()
   @}
   iMaterialWrapper* tm =
     engine->GetMaterialList ()->FindByName ("stone");
+
+  // these are used store the current orientation of the camera
+  rotY = rotX = 0;
 
   room = engine->CreateSector ("room");
   csRef<iMeshWrapper> walls (
@@ -768,23 +776,54 @@ void Simple::SetupFrame ()
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
 
   iCamera* c = view->GetCamera();
-  if (kbd->GetKeyState (CSKEY_RIGHT))
-    c->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
-  if (kbd->GetKeyState (CSKEY_LEFT))
-    c->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
-  if (kbd->GetKeyState (CSKEY_PGUP))
-    c->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
-  if (kbd->GetKeyState (CSKEY_PGDN))
-    c->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
-  if (kbd->GetKeyState (CSKEY_UP))
-    c->Move (CS_VEC_FORWARD * 4 * speed);
-  if (kbd->GetKeyState (CSKEY_DOWN))
-    c->Move (CS_VEC_BACKWARD * 4 * speed);
+  if (kbd->GetKeyState (CSKEY_SHIFT)) @{
+      // If the user is holding down shift, the arrow keys will cause
+      // the camera to strafe up, down, left or right from it's
+      // current position.
+      if (kbd->GetKeyState (CSKEY_RIGHT))
+          c->Move (CS_VEC_RIGHT * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_LEFT))
+          c->Move (CS_VEC_LEFT * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_UP))
+          c->Move (CS_VEC_UP * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_DOWN))
+          c->Move (CS_VEC_DOWN * 4 * speed);
+  @} else @{
+      // left and right cause the camera to rotate on the global Y
+      // axis; page up and page down cause the camera to rotate on the
+      // _camera's_ X axis (more on this in a second) and up and down
+      // arrows cause the camera to go forwards and backwards.
+      if (kbd->GetKeyState (CSKEY_RIGHT))
+          rotY += speed;
+      if (kbd->GetKeyState (CSKEY_LEFT))
+          rotY -= speed;
+      if (kbd->GetKeyState (CSKEY_PGUP))
+          rotX += speed;
+      if (kbd->GetKeyState (CSKEY_PGDN))
+          rotX -= speed;
+      if (kbd->GetKeyState (CSKEY_UP))
+          c->Move (CS_VEC_FORWARD * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_DOWN))
+          c->Move (CS_VEC_BACKWARD * 4 * speed);
+  @}
+
+  // We now assign a new rotation transformation to the camera.  You
+  // can think of the rotation this way: starting from the zero
+  // position, you first rotate "rotY" radians on your Y axis to get
+  // the first rotation.  From there you rotate "rotX" radians on the
+  // your X axis to get the final rotation.  We multiply the
+  // individual rotations on each axis together to get a single
+  // rotation matrix.  The rotations are applied in right to left
+  // order .
+  csMatrix3 rot =  csXRotMatrix3(rotX) * csYRotMatrix3(rotY);
+  csOrthoTransform ot(rot, c->GetTransform().GetOrigin());
+  c->SetTransform(ot);
+
   @dots{}
 @}
 @end example
 
-That's all!  With this simple change you can rotate the camera with the left
+With this change you can rotate the camera with the left
 and right arrow keys and move forward and backward with the up and down arrow
 keys.  Try it out to see the effect.  To rotate the camera we use
 @code{RotateThis()} which expects a vector to rotate along and an angle given
