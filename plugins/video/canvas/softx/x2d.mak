@@ -29,9 +29,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-CFLAGS.X2D += -I$(X11_PATH)/include
-LIB.X2D.SYSTEM += -L$(X11_PATH)/lib -lX11
-#LIB.X2D.SYSTEM += -L$(X11_PATH)/lib -lXext -lX11
+CFLAGS.X2D += $(X_CFLAGS)
+LIB.X2D.SYSTEM += $(X_PRE_LIBS) $(X_LIBS) -lX11 $(X_EXTRA_LIBS)
 
 ifeq ($(USE_PLUGINS),yes)
   X2D = $(OUTDLL)/x2d$(DLL)

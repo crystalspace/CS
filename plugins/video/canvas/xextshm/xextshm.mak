@@ -29,8 +29,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-CFLAGS.XEXTSHM += -I$(X11_PATH)/include
-LIB.XEXTSHM.SYSTEM += -L$(X11_PATH)/lib -lXext -lX11
+CFLAGS.XEXTSHM += $(X_CFLAGS)
+LIB.XEXTSHM.SYSTEM += $(X_PRE_LIBS) $(X_LIBS) -lXext -lX11 $(X_EXTRA_LIBS)
 
 ifeq ($(USE_PLUGINS),yes)
   XEXTSHM = $(OUTDLL)/xextshm$(DLL)

@@ -30,9 +30,9 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 
-CFLAGS.XEXT86VM += -I$(X11_PATH)/include
-LIB.XEXT86VM.SYSTEM += -L$(X11_PATH)/lib  \
-  -lXxf86vm -lXext -lX11 $(X11_EXTRA_LIBS)
+CFLAGS.XEXT86VM += $(X_CFLAGS)
+LIB.XEXT86VM.SYSTEM += \
+  $(X_PRE_LIBS) $(X_LIBS) -lXxf86vm -lXext -lX11 $(X11_EXTRA_LIBS)
 
 ifeq ($(USE_PLUGINS),yes)
   XEXT86VM = $(OUTDLL)/xext86vm$(DLL)

@@ -5,7 +5,7 @@
 DESCRIPTION.hurd = Debian GNU/Hurd
 DESCRIPTION.OS.hurd = Debian GNU/Hurd
 
-ifneq (,$(X11_PATH))
+ifeq ($(X11.AVAILABLE),yes)
   PLUGINS+=video/canvas/softx
   PLUGINS+=video/canvas/linex
   ifneq (,$(OPENGL_PATH))

@@ -30,8 +30,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 # Local CFLAGS and libraries
-LIB.GLX2D.SYSTEM += -L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
-CFLAGS.GLX2D += -I$(X11_PATH)/include
+LIB.GLX2D.SYSTEM += $(X_PRE_LIBS) $(X_LIBS) -lXext -lX11 $(X11_EXTRA_LIBS)
+CFLAGS.GLX2D += $(X_CFLAGS)
 
 ifeq ($(USE_MESA),1)
   ifdef MESA_PATH

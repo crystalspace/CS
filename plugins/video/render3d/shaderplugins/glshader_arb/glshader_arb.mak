@@ -34,9 +34,10 @@ vpath %.cpp plugins/video/render3d/shaderplugins/glshader_arb
 ifneq (,$(strip $(LIBS.OPENGL.SYSTEM)))
   LIB.GLSHADER_ARB.LOCAL += $(LIBS.OPENGL.SYSTEM)
 else
-  ifdef X11_PATH
-    CFLAGS.GLSHADER_ARB += -I$(X11_PATH)/include
-    LIB.GLSHADER_ARB.LOCAL += -L$(X11_PATH)/lib -lXext -lX11
+  ifeq ($(X11.AVAILABLE),yes)
+    CFLAGS.GLSHADER_ARB += $(X_CFLAGS)
+    LIB.GLSHADER_ARB.LOCAL += \
+      $(X_PRE_LIBS) $(X_LIBS) -lXext -lX11 $(X_EXTRA_LIBS)
   endif
 
   ifeq ($(USE_MESA),1)

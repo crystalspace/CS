@@ -35,8 +35,8 @@ ifeq ($(USE_XFREE86VM),yes)
   LIB.XWIN.SYSTEM += -lXxf86vm
 endif
 
-CFLAGS.XWIN += -I$(X11_PATH)/include
-LIB.XWIN.SYSTEM += -L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
+CFLAGS.XWIN += $(X_CFLAGS)
+LIB.XWIN.SYSTEM += $(X_PRE_LIBS) $(X_LIBS) -lXext -lX11 $(X11_EXTRA_LIBS)
 
 ifeq ($(USE_PLUGINS),yes)
   XWIN = $(OUTDLL)/xwin$(DLL)

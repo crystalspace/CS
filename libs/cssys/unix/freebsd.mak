@@ -7,7 +7,7 @@ DESCRIPTION.OS.freebsd = FreeBSD
 
 # Choose which drivers you want to build/use
 PLUGINS+=sound/renderer/software sound/driver/oss
-ifneq (,$(X11_PATH))
+ifeq ($(X11.AVAILABLE),yes)
   PLUGINS+=video/canvas/softx
   PLUGINS+=video/canvas/linex
   ifneq (,$(OPENGL_PATH))

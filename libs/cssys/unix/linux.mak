@@ -12,7 +12,7 @@ DESCRIPTION.OS.linux = Linux
 PLUGINS+=net/driver/ensocket
 
 # Choose which 2D/3D driver combinations you want to build/use
-ifneq (,$(X11_PATH))
+ifeq ($(X11.AVAILABLE),yes)
   PLUGINS+=video/canvas/softx
   PLUGINS+=video/canvas/linex
   ifneq (,$(OPENGL_PATH))

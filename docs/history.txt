@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+31-Dec-2002
+	- Eric Sunshine made the following configuration and makefile changes:
+	    - chkxfree.sh now publishes the additonal makefile variables
+	      X11.AVAILABLE, X_CFLAGS, X_LIBS, X_PRE_LIBS, and X_EXTRA_LIBS.
+	    - chkogl.sh now looks for the OpenGL headers and libraries inside
+	      the X11 directory tree if the OpenGL resources were not found
+	      elsewhere.  This logic was suggested by Rudolf Potucek
+	      <potucek@ucalgary.ca>.
 30-Dec-2002
 	- Eric Sunshine added "-Xlinker --export-all-symbols" to DFLAGS.debug
 	  in win32gcc.mak, as suggested by Paul Garceau <pgarceau@attbi.com>.

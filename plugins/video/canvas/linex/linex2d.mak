@@ -30,8 +30,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 # We need also the X libs
-CFLAGS.LINEX2D += -I$(X11_PATH)/include
-LIB.LINEX2D.SYSTEM += -L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
+CFLAGS.LINEX2D += $(X_CFLAGS)
+LIB.LINEX2D.SYSTEM += $(X_PRE_LIBS) $(X_LIBS) -lXext -lX11 $(X11_EXTRA_LIBS)
 
 # The 2D Xlib driver
 ifeq ($(USE_PLUGINS),yes)

@@ -32,9 +32,9 @@ ifeq ($(MAKESECTION),postdefines)
 ifneq (,$(strip $(LIBS.OPENGL.SYSTEM)))
   LIB.GLRENDER3D.LOCAL += $(LIBS.OPENGL.SYSTEM)
 else
-  ifdef X11_PATH
-    CFLAGS.GLRENDER3D += -I$(X11_PATH)/include
-    LIB.GLRENDER3D.LOCAL += -L$(X11_PATH)/lib -lXext -lX11
+  ifeq ($(X11.AVAILABLE),yes)
+    CFLAGS.GLRENDER3D += $(X_CFLAGS)
+    LIB.GLRENDER3D.LOCAL += $(X_LIBS) -lXext -lX11 $(X_EXTRA_LIBS)
   endif
 
   ifeq ($(USE_MESA),1)

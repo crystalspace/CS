@@ -5,6 +5,9 @@
 # IMPORTS
 #    CXX
 #	Shell or environment variable used to compile a program.
+#    X11_PATH
+#	Shell or environment variable specifying root of X11 installation if
+#	present.
 #    msg_*()
 #	Functions for reporting progress to users.
 #
@@ -19,6 +22,9 @@
 #	is not set.
 #==============================================================================
 
+precondition '-n "${CXX}"'
+precondition '${X11_OK} -eq 0 -o ${X11_OK} -eq 1'
+
 # Find the OpenGL header directory.
 
 msg_checking "for OpenGL"
@@ -30,6 +36,8 @@ elif [ -d /usr/include/GL ]; then
   OPENGL_PATH="/usr/include"
 elif [ -d /usr/openwin/include/GL ]; then
   OPENGL_PATH="/usr/openwin/include"
+elif [ ${X11_OK} -eq 1 -a -d ${X11_PATH}/include/GL ]; then
+  OPENGL_PATH="${X11_PATH}/include"
 fi
 
 if [ -n "${OPENGL_PATH}" ]; then
