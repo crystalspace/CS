@@ -30,6 +30,7 @@
 #include "csutil/hashmap.h"
 #include "csutil/hashmapr.h"
 #include "csutil/snprintf.h"
+#include "csutil/sysfunc.h"
 
 #include "bindoc.h"
 
@@ -269,7 +270,7 @@ int csBinaryDocAttribute::GetValueAsInt ()
       }
     case BD_VALUE_TYPE_INT:
       {
-	return (int)(little_endian_long (attrPtr->value));
+	return (int)((int32)little_endian_long (attrPtr->value));
       }
     case BD_VALUE_TYPE_FLOAT:
       {
@@ -637,7 +638,7 @@ const char* csBdNode::GetValueStr (csBinaryDocument* doc) const
 {
   if (flags & BD_NODE_MODIFIED)
   {
-    return (char*)value;
+    return vstr;
   }
   else
   {
@@ -884,7 +885,7 @@ const char* csBinaryDocNode::nodeValueStr (csBdNode* nodeData)
 	{
   	  char buf[50];
 	  cs_snprintf (buf, sizeof (buf) - 1, "%d", 
-	    (int)little_endian_long (nodeData->value));
+	    (int)((int32)little_endian_long (nodeData->value)));
 	  delete[] vstr; 
 	  vstr = csStrNew (buf);
 	  vsptr = nodeData;
@@ -923,7 +924,7 @@ int csBinaryDocNode::nodeValueInt (csBdNode* nodeData)
       }
     case BD_VALUE_TYPE_INT:
       {
-	return little_endian_long (nodeData->value);
+	return (int32)little_endian_long (nodeData->value);
       }
     case BD_VALUE_TYPE_FLOAT:
       {
@@ -948,7 +949,7 @@ float csBinaryDocNode::nodeValueFloat (csBdNode* nodeData)
       }
     case BD_VALUE_TYPE_INT:
       {
-	return (float)little_endian_long (nodeData->value);
+	return (float)((int32)little_endian_long (nodeData->value));
       }
     case BD_VALUE_TYPE_FLOAT:
       {
@@ -1098,7 +1099,7 @@ void csBinaryDocNode::SetValueAsInt (int value)
     delete[] vstr; vstr = 0;
     nodeData->flags = (nodeData->flags & ~BD_VALUE_TYPE_MASK) |
       BD_VALUE_TYPE_INT;
-    nodeData->value = little_endian_long (value);
+    nodeData->value = little_endian_long ((int32)value);
   }
 }
 

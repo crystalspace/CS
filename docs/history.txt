@@ -26,6 +26,8 @@ chronological order.
 	- PK fixed a msvc6 bug in bezierdlr.
 	- res applied patch 1038181 (operators < & > in csString) with some
 	  modifications.
+	- res fixed a bug in bindoc where requesting a float value when it was
+	  stored as an int could return bogus results.
 30-Sep-2004
 	- Jorrit added a new 'copy' flag to CreateRenderBuffer() and
 	  CreateIndexRenderBuffer() which is default to true. Meshes can
