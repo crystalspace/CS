@@ -27,12 +27,10 @@
 #
 #-------------------------------------------------------------------------------
 
-# Friendly names for building environment
-DESCRIPTION.openstep = OpenStep 4.2
-
+NEXT.TARGET=openstep
 NEXT.FLAVOR=OPENSTEP
 NEXT.DESCRIPTION=OpenStep
-NEXT.ARCHS=m68k i386 sparc
+NEXT.ARCHS=i386 m68k sparc
 NEXT.SOURCE_DIRS=openstep
 NEXT.INCLUDE_DIRS=-FAppKit -FFoundation
 NEXT.CFLAGS.GENERAL=-Wmost -D_POSIX_SOURCE -D__STRICT_ANSI__
@@ -40,4 +38,6 @@ NEXT.CFLAGS.DEBUG=-finline-functions
 NEXT.LIBS=
 NEXT.LFLAGS.GENERAL=-framework AppKit -framework Foundation
 
+NEXT.FRIEND=yes
 include mk/system/next.mak
+NEXT.FRIEND=no

@@ -27,9 +27,7 @@
 #
 #-------------------------------------------------------------------------------
 
-# Friendly names for building environment
-DESCRIPTION.macosxs = MacOS/X Server
-
+NEXT.TARGET=macosxs$(SPACE)
 NEXT.FLAVOR=MACOSXS
 NEXT.DESCRIPTION=MacOS/X Server
 NEXT.ARCHS=i386 ppc
@@ -40,4 +38,6 @@ NEXT.CFLAGS.DEBUG=-finline-functions
 NEXT.LIBS=
 NEXT.LFLAGS.GENERAL=-framework AppKit -framework Foundation
 
+NEXT.FRIEND=yes
 include mk/system/next.mak
+NEXT.FRIEND=no

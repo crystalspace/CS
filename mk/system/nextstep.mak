@@ -16,12 +16,10 @@
 #
 #-------------------------------------------------------------------------------
 
-# Friendly names for building environment
-DESCRIPTION.nextstep = NextStep 3.3
-
+NEXT.TARGET=nextstep
 NEXT.FLAVOR=NEXTSTEP
 NEXT.DESCRIPTION=NextStep
-NEXT.ARCHS=m68k i386 sparc hppa
+NEXT.ARCHS=i386 m68k sparc hppa
 NEXT.SOURCE_DIRS=nextstep
 NEXT.INCLUDE_DIRS=
 NEXT.CFLAGS.GENERAL=-Wall -DNO_BOOL_TYPE -D_POSIX_SOURCE -D__STRICT_ANSI__
@@ -29,4 +27,6 @@ NEXT.CFLAGS.DEBUG=
 NEXT.LIBS=-lNeXT_s -lsys_s
 NEXT.LFLAGS.GENERAL=
 
+NEXT.FRIEND=yes
 include mk/system/next.mak
+NEXT.FRIEND=no
