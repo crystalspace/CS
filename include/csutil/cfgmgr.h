@@ -140,7 +140,7 @@ public:
   /**
    * FlushRemoved() and delete all domains.
    */
-  virtual void CleanUp ();
+  void CleanUp ();
 
   /**
    * Enumerate selected keys.  If a subsection is given, only those keys which

@@ -19,6 +19,8 @@ The history order is reversed so that new features are at the top.
 	  of returned canvas.
 	- Added iConfigManager::CleanUp(). This will flush all removed
 	  config files and also clean up all loaded domains.
+	- Removed iConfigManager::CleanUp() again. This is not the right
+	  way to do this.
 14-Feb-2002
 	- Fixed new gridbag constraints in AWS so that it is an enum
 	  (static const int is not legal in C++) and also renamed
