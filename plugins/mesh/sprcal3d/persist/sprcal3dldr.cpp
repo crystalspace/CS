@@ -214,7 +214,7 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
       {
 	float scale = child->GetAttributeValueAsFloat("value");
 	if (scale)
-	  newspr->SetRenderScale(scale);
+	  newspr->RescaleFactory(scale);
 	else
 	{
 	  synldr->ReportError (
@@ -312,7 +312,11 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 
 	  if (animID == -1)
 	  {
-	    newspr->ReportLastError();
+        synldr->ReportError (
+  	      "crystalspace.spritecal3dfactoryloader.parse.badfile",
+	      child,"Could not load cal3d anim file <%s>.",file);
+
+        newspr->ReportLastError();
 	    return 0;
 	  }
 	}

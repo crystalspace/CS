@@ -106,15 +106,10 @@ struct iSpriteCal3DFactoryState : public iBase
   virtual bool LoadCoreSkeleton(iVFS *vfs,const char *filename) = 0;
 
   /**
-   * This function sets the scale by which the mesh will be multiplied when
-   * rendered.  1.0 is actual size.
+   * This function resizes all instances of this factory permanently.
+   * Factor=1 means no change.
    */
-  virtual void SetRenderScale(float scale) = 0;
-
-  /**
-   *
-   */
-  virtual float GetRenderScale() = 0;
+  virtual void RescaleFactory(float factor) = 0;
 
   /**
    * This loads the supplied file as one animation action for the sprite.

@@ -12,6 +12,10 @@ chronological order.
 	  the physics plugin. This will allow better control over the particles
 	  and especially make the ODE particle physics plugin a lot easier and
 	  cleaner.
+	- Re-enabled factory scaling in sprcal3d.  Using a <scale> tag in the
+	  .cal3d file now rescales the bones, meshes and all anims for you.
+	  Put it after all the other items are loaded in your file.
+	- Fixed an error message on bad mesh name in sprcal3dldr.
 26-Jan-2004
 	- Eric Sunshine updated CS/scripts/jamtemplate/cs_check_host.m4 to
 	  reflect all the MacOS/X-specific fixes Eric applied to
