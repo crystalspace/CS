@@ -297,7 +297,7 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
     if (nodeMixMode != 0)
     {
       uint mm;
-      if (synldr->ParseMixmode (nodeMixMode, mm))
+      if (synldr->ParseMixmode (nodeMixMode, mm, true))
 	pass->mixMode = mm;
     }
 
