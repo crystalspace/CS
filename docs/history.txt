@@ -14,6 +14,9 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine added FT_UINT_MAX and FT_ULONG_MAX defines to freefont2
 	  "make depend" flags to work around problem reported by David Calkins
 	  <dcalk@verizon.net>.
+	- Eric Sunshine applied a patch to ensocket plugin from Frank Michler
+	  <Michler@students.uni-marburg.de> fixing a problem where the return
+	  value from accept() was being misinterpreted.
 4-Feb-2003
 	- Eric Sunshine augmented the ODE check in configure.ac so that it
 	  works in two phases.  First it checks for libode.  Second, it checks
