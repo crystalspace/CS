@@ -1817,6 +1817,7 @@ void csEngine::ReadConfig (iConfigFile *Config)
   default_fastmesh_thresshold = Config->GetInt (
       "Engine.FastMeshThresshold",
       500);
+  fastmesh_thresshold = default_fastmesh_thresshold;
 
   csEngine::lightmap_quality = Config->GetInt (
       "Engine.Lighting.LightmapQuality",
