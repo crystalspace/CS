@@ -130,7 +130,8 @@ found:
 		delete f;
 	}
 	f=allocatedSpace;
-	chunck *a[2]; 
+    /* initialize a to something to avoid compiler warning */
+	chunck *a[2]={NULL};
 	int nb=0;
 	while(f)
 	{
@@ -247,7 +248,8 @@ void FixedTextureMemoryManager::freeSpaceMem(textMemSpace entry) {
 	}
 	
 	// find the free chunck(s) involved
-	chunck * f[2];
+    // initialize f to something to avoid compiler warning
+	chunck * f[2]={NULL};
 	int nb=0;
 	c=freeSpace;
 	while(c)
