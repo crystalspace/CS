@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "motion.h"
 #include "csgeom/transfrm.h"
 #include "csutil/hashmap.h"

@@ -26,7 +26,7 @@
 #include "iutil/eventh.h"
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
-#include "cssys/thread.h"
+#include "csutil/thread.h"
 
 #if defined(CS_OPENAL_PATH)
 #include CS_HEADER_GLOBAL(CS_OPENAL_PATH,al.h)

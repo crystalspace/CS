@@ -19,7 +19,7 @@
 #include <string.h>
 #include "cssysdef.h"
 #include "csver.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "csutil/scf.h"
 #include "csutil/util.h"
 #include "csutil/scfstr.h"

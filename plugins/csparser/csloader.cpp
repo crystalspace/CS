@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "qint.h"
 #include "qsqrt.h"
 #include "ivideo/graph3d.h"

@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/csendian.h"
+#include "csutil/csendian.h"
 
 #include "csutil/scf.h"
 #include "glcommon2d.h"

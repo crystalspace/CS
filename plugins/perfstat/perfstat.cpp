@@ -18,7 +18,7 @@
 
 #include <string.h>
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "csutil/scf.h"
 #include "csver.h"
 #include "perfstat.h"

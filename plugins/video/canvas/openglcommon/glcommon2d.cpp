@@ -18,7 +18,7 @@
 
 #include "cssysdef.h"
 #include "glcommon2d.h"
-#include "cssys/csendian.h"
+#include "csutil/csendian.h"
 #include "video/canvas/common/scrshot.h"
 #include "csgeom/csrect.h"
 #include "iutil/objreg.h"

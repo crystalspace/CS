@@ -23,7 +23,7 @@
 // and __declspec()s
 #include "cssysdef.h"
 #include "csutil/scf.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "csgeom/csrect.h"
 #include "csgfx/rgbpixel.h"
 #include "csgfx/packrgb.h"

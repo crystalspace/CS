@@ -20,8 +20,8 @@
 
 #include "cssysdef.h"
 #include "csfont.h"
-#include "cssys/csuctransform.h"
-#include "cssys/csendian.h"
+#include "csutil/csuctransform.h"
+#include "csutil/csendian.h"
 #include "iutil/vfs.h"
 #include "csutil/util.h"
 #include "csutil/databuf.h"

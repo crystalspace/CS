@@ -27,7 +27,7 @@ if $(PERL5.AVAILABLE) = "yes"
   {
     actions PerlEmbedGlueFile
     {
-      echo '#include "cssys/csperlxs_fallback.inc"' > $(<)
+      echo '#include "csutil/csperlxs_fallback.inc"' > $(<)
     }
   }
 

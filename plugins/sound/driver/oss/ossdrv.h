@@ -23,7 +23,7 @@
 #define __CS_OSSDRV_H__
 
 #include "csutil/scf.h"
-#include "cssys/thread.h"
+#include "csutil/thread.h"
 #include "isound/driver.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"

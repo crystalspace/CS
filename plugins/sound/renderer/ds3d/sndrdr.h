@@ -28,8 +28,8 @@
 #include "csutil/cfgacc.h"
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
-#include "cssys/thread.h"
-#include "cssys/win32/win32.h"
+#include "csutil/thread.h"
+#include "csutil/win32/win32.h"
 
 #include "dsound.h"
 

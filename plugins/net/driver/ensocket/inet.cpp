@@ -19,7 +19,7 @@
 
 #define CS_SYSDEF_PROVIDE_SELECT
 #include "cssysdef.h"
-#include "cssys/sockets.h"
+#include "csutil/sockets.h"
 #include "inet.h"
 #include "inetwork/sockerr.h"
 

@@ -20,7 +20,7 @@
 
 #if defined(__cplusplus)
 
-#include "cssys/macosx/OSXAssistant.h"
+#include "csutil/macosx/OSXAssistant.h"
 #include "video/canvas/common/graph2d.h"
 
 #include <CoreFoundation/CoreFoundation.h>

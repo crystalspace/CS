@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/csunicode.h"
+#include "csutil/csunicode.h"
 #include "csutil/csstring.h"
 #include "csutil/util.h"
 #include "iutil/objreg.h"
@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include <windows.h>
 
-#include "cssys/win32/wintools.h"
+#include "csutil/win32/wintools.h"
 
 //
 //To compile this canvas on a plain MSVC6 compiler

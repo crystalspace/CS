@@ -19,7 +19,7 @@
 #ifndef __CS_SNDHDLOPENAL_H__
 #define __CS_SNDHDLOPENAL_H__
 
-#include "cssys/thread.h"
+#include "csutil/thread.h"
 #include "../common/shdl.h"
 
 class csSoundRenderOpenAL;

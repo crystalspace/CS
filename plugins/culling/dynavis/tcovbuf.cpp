@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "csutil/scfstr.h"
 #include "iutil/string.h"
 #include "ivaria/bugplug.h"
@@ -31,7 +31,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
-#include "cssys/csprocessorcap.h"
+#include "csutil/csprocessorcap.h"
 
 //---------------------------------------------------------------------------
 

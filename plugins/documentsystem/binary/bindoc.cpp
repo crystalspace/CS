@@ -19,7 +19,7 @@
 
 #include "cssysdef.h"
 
-#include "cssys/csendian.h"
+#include "csutil/csendian.h"
 #include "iutil/document.h"
 #include "iutil/databuff.h"
 #include "iutil/vfs.h"

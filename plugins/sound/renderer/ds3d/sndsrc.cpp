@@ -19,7 +19,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "csutil/scf.h"
 
 #include "dsound.h"

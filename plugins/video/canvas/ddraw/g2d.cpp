@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
 #include "csgeom/csrect.h"
@@ -25,13 +25,13 @@
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "cssys/win32/win32.h"
+#include "csutil/win32/win32.h"
 #include "iutil/cmdline.h"
 
 #define INITGUID
 #include "video/canvas/directxcommon/directdetection.h"
 
-#include "cssys/win32/wintools.h"
+#include "csutil/win32/wintools.h"
 #include "video/canvas/common/softfontcache.h"
 
 #include "g2d.h"

@@ -26,7 +26,7 @@
 #include "csutil/array.h"
 #include "csutil/parray.h"
 #include "csutil/refarr.h"
-#include "cssys/csendian.h"
+#include "csutil/csendian.h"
 
 struct iObjectRegistry;
 class csAVIStreamVideo;

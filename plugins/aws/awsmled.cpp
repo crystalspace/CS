@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/csuctransform.h"
+#include "csutil/csuctransform.h"
 #include "csutil/csstring.h"
 #include "csutil/inpnames.h"
 #include "ivideo/fontserv.h"

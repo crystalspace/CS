@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "fancycon.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph2d.h"

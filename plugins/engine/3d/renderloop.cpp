@@ -22,7 +22,7 @@
 #include "cssysdef.h"
 #include "plugins/engine/3d/renderloop.h"
 
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"

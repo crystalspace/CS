@@ -22,8 +22,8 @@
 #include <string.h>
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
-#include "cssys/csuctransform.h"
+#include "csutil/sysfunc.h"
+#include "csutil/csuctransform.h"
 #include "simpcon.h"
 #include "csutil/util.h"
 #include "csgeom/csrect.h"

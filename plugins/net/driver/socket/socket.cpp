@@ -23,7 +23,7 @@
 
 #define CS_SYSDEF_PROVIDE_SELECT
 #include "cssysdef.h"
-#include "cssys/sockets.h"
+#include "csutil/sockets.h"
 
 #include "socket.h"
 #include "iutil/event.h"

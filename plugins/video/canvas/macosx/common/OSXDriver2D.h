@@ -19,7 +19,7 @@
 #include "OSXDelegate2D.h"
 
 #include "csgeom/csrect.h"
-#include "cssys/macosx/OSXAssistant.h"
+#include "csutil/macosx/OSXAssistant.h"
 #include "iutil/eventh.h"
 #include "ivideo/graph2d.h"
 #include "plugins/video/canvas/common/graph2d.h"

@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "csconout.h"
 #include "conbuff.h"
 #include "ivaria/conout.h"

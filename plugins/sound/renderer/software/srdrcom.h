@@ -25,7 +25,7 @@
 #include "csutil/scf.h"
 #include "csutil/array.h"
 #include "csutil/cfgacc.h"
-#include "cssys/thread.h"
+#include "csutil/thread.h"
 #include "isound/data.h"
 #include "isound/renderer.h"
 #include "iutil/eventh.h"

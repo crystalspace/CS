@@ -15,7 +15,7 @@
 
 #if defined(__cplusplus)
 
-#include "cssys/macosx/OSXAssistant.h"
+#include "csutil/macosx/OSXAssistant.h"
 #include "csutil/scf.h"
 #include "video/canvas/openglcommon/glcommon2d.h"
 #include "video/canvas/openglcommon/iogl.h"

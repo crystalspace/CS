@@ -22,7 +22,7 @@
 #include <stdio.h>
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "iutil/plugin.h"
 #include "iutil/cfgfile.h"
 #include "iutil/event.h"

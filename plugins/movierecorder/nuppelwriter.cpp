@@ -31,7 +31,7 @@
 #include "nuppelvideo.h"
 //#include <string.h>
 
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 
 /* Colorspace conversion routines from rgb2yuv420.cpp */
 void InitLookupTable();

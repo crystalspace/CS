@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "isomesh.h"
 #include "csutil/scf.h"
 #include "ivideo/graph3d.h"

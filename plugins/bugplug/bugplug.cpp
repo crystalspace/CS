@@ -19,8 +19,8 @@
 
 #include <string.h>
 
-#include "cssys/sysfunc.h"
-#include "cssys/csuctransform.h"
+#include "csutil/sysfunc.h"
+#include "csutil/csuctransform.h"
 #include "csver.h"
 #include "csutil/scf.h"
 #include "csutil/scanstr.h"

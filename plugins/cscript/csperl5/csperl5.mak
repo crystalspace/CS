@@ -144,7 +144,7 @@ ifeq ($(PERL5.EXTUTILS.EMBED.AVAILABLE),yes)
     -o $(PERLXSI.C) -std cspace
   endif
 else
-  PERLXSI.MK = echo "\#include \"cssys/csperlxs_fallback.inc\"" > $(PERLXSI.C)
+  PERLXSI.MK = echo "\#include \"csutil/csperlxs_fallback.inc\"" > $(PERLXSI.C)
 endif
 
 $(PERLXSI.C):

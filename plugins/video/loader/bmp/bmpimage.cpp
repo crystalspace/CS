@@ -23,7 +23,7 @@
 #include "cstypes.h"
 #include "csgeom/math3d.h"
 #include "bmpimage.h"
-#include "cssys/csendian.h"
+#include "csutil/csendian.h"
 #include "csgfx/rgbpixel.h"
 #include "csutil/databuf.h"
 

@@ -32,7 +32,7 @@
 #include <stdio.h>
 
 #include "cssysdef.h"
-#include "cssys/csendian.h"
+#include "csutil/csendian.h"
 #include "csgfx/packrgb.h"
 
 #include "walimage.h"

@@ -26,7 +26,7 @@
 #include "csutil/debug.h"
 #include "csutil/csmd5.h"
 #include "csutil/memfile.h"
-#include "cssys/csendian.h"
+#include "csutil/csendian.h"
 
 int csLight::ambient_red = CS_DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_green = CS_DEFAULT_LIGHT_LEVEL;

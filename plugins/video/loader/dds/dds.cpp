@@ -21,7 +21,7 @@
 */
 #include "cssysdef.h"
 
-#include "cssys/csendian.h"
+#include "csutil/csendian.h"
 #include "dds.h"
 
 namespace dds

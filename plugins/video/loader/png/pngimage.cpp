@@ -21,7 +21,7 @@
 #include "csgfx/rgbpixel.h"
 #include "csgfx/packrgb.h"
 #include "csutil/databuf.h"
-#include "cssys/csendian.h"
+#include "csutil/csendian.h"
 #include <math.h>
 
 extern "C"

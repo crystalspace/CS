@@ -24,7 +24,7 @@
 #if defined(__cplusplus)
 
 #include "video/canvas/common/graph2d.h"
-#include "cssys/macosx/OSXAssistant.h"
+#include "csutil/macosx/OSXAssistant.h"
 #include "CocoaDelegate2D.h"
 class CocoaFrameBuffer;
 

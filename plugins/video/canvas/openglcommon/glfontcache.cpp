@@ -27,7 +27,7 @@
 #include <GL/gl.h>
 #endif
 
-#include "cssys/csuctransform.h"
+#include "csutil/csuctransform.h"
 #include "iutil/databuff.h"
 #include "ivideo/fontserv.h"
 

@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "motldr.h"
 #include "iengine/motion.h"
 #include "iutil/plugin.h"

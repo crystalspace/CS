@@ -22,7 +22,7 @@
 #include "csver.h"
 #include "csutil/scf.h"
 #include "csutil/util.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"

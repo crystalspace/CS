@@ -20,7 +20,7 @@
 #ifndef __CS_CANVAS_COMMON_FONTCACHE_H__
 #define __CS_CANVAS_COMMON_FONTCACHE_H__
 
-#include "cssys/csunicode.h"
+#include "csutil/csunicode.h"
 #include "csutil/list.h"
 #include "csutil/hashmap.h"
 #include "csutil/blockallocator.h"

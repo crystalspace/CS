@@ -18,7 +18,7 @@
 #include <string.h>
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/box.h"
 #include "csgeom/sphere.h"

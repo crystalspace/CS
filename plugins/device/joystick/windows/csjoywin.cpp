@@ -27,8 +27,8 @@
 // using DirectInput -- included from csjoywin.h
 #include "csjoywin.h"
 
-#include "cssys/win32/wintools.h"
-#include "cssys/win32/win32.h"
+#include "csutil/win32/wintools.h"
+#include "csutil/win32/win32.h"
 
 // no config yet
 // #define CS_WINDOWS_JOYSTICK_CFG "/config/joywin.cfg"

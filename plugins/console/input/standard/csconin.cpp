@@ -19,7 +19,7 @@
 
 #include "cssysdef.h"
 #include "csconin.h"
-#include "cssys/csuctransform.h"
+#include "csutil/csuctransform.h"
 #include "csutil/util.h"
 #include "csutil/objreg.h"
 #include "ivaria/conout.h"

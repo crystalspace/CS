@@ -22,7 +22,7 @@
 #include <string.h>
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "qint.h"
 #include "csutil/scf.h"
 #include "csgeom/math2d.h"

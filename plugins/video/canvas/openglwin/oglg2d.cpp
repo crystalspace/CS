@@ -17,18 +17,18 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <GL/gl.h>
 
-#include "cssys/win32/wintools.h"
+#include "csutil/win32/wintools.h"
 
 #include "csutil/scf.h"
 #include "oglg2d.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "cssys/win32/win32.h"
+#include "csutil/win32/win32.h"
 #include "iutil/cmdline.h"
 #include "iutil/eventq.h"
 
