@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+30-Dec-2002
+	- Eric Sunshine added "-Xlinker --export-all-symbols" to DFLAGS.debug
+	  in win32gcc.mak, as suggested by Paul Garceau <pgarceau@attbi.com>.
+	  Hopefully, this change will allow DLLs to be once again debugged
+	  sucessfully with Mingw's gdb.
 28-Dec-2002
 	- Eric Sunshine changed chktools.sh so that it records the path of
 	  makedep in config.mak, if found.  This is consistent with its

@@ -95,7 +95,7 @@ CFLAGS.optimize += -fomit-frame-pointer
 endif
 
 # Flags for the compiler which are used when debugging.
-CFLAGS.debug=-g
+CFLAGS.debug=-g3
 
 # Flags for the compiler which are used when profiling.
 CFLAGS.profile=-pg -O -g
@@ -120,14 +120,13 @@ LFLAGS.debug=-g
 # Flags for the linker which are used when profiling.
 LFLAGS.profile=-pg
 
-# Flags for dllwrap in optimize mode
+# Flags for linking DLLs in optimize mode
 DFLAGS.optimize = -s
 
-# Flags for dllwrap in debug mode
-DFLAGS.debug = -g3
+# Flags for linking DLLs in debug mode
+DFLAGS.debug = -Xlinker --export-all-symbols
 
 # Flags for the linker which are used when building a shared library.
-
 LFLAGS.DLL=$(DFLAGS.$(MODE)) -shared
 
 # Typical extension for objects and static libraries
