@@ -586,7 +586,6 @@ public:
   /**
    * Intersect a 3D segment with a plane.  Returns true if there is an
    * intersection, with the intersection point returned in isect.
-   * The distance from u to the intersection point is returned in dist.
    */
   static void Plane (
     const csVector3& u, const csVector3& v, // segment
@@ -606,7 +605,7 @@ public:
 
   /**
    * Intersect a 3D segment with a plane.  Returns true if there is an
-   * interection, with the intersection point returned in isect.
+   * intersection, with the intersection point returned in isect.
    * The distance from u to the intersection point is returned in dist.
    */
   static bool Plane (
