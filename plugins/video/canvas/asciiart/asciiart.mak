@@ -31,6 +31,10 @@ ifeq ($(MAKESECTION),postdefines)
 
 # The AsciiArt library
 LIBS.ASCIIART+=$(LFLAGS.l)aa
+# On Unix we need additional libraries
+ifdef X11_PATH
+  LIBS.ASCIIART+=-lgpm -lslang -L$(X11_PATH)/lib -lXext -lX11
+endif
 
 # The 2D Ascii Art driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
