@@ -578,17 +578,18 @@ awsManager::HandleEvent(iEvent& Event)
       // If the mouse is locked into the top window, keep it there
       if (mouse_captured) 
       {
-        if (GetTopWindow()->HandleEvent(Event)) return true;
-        else return RecursiveBroadcastToChildren(GetTopWindow(), Event);
-
+        if (RecursiveBroadcastToChildren(GetTopWindow(), Event)) return true;
+        else return GetTopWindow()->HandleEvent(Event);
+        
         break;
       }
       
       // If the top window still contains the mouse, it stays on top
       if (GetTopWindow()->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
       {
-        if (GetTopWindow()->HandleEvent(Event)) return true;
-        else return RecursiveBroadcastToChildren(GetTopWindow(), Event);
+        if (RecursiveBroadcastToChildren(GetTopWindow(), Event)) return true;
+        else return GetTopWindow()->HandleEvent(Event);
+        
         break;
       }
       
@@ -607,8 +608,8 @@ awsManager::HandleEvent(iEvent& Event)
           if (win->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
           {
             win->Raise();
-            if (win->HandleEvent(Event)) return true;
-            else return RecursiveBroadcastToChildren(win, Event);
+            if (RecursiveBroadcastToChildren(win, Event)) return true;
+            else return win->HandleEvent(Event);
             break;
           }
           else
@@ -622,8 +623,8 @@ awsManager::HandleEvent(iEvent& Event)
   case csevKeyDown:
     if (GetTopWindow()) 
     {
-      if (GetTopWindow()->HandleEvent(Event)) return true;
-      else return RecursiveBroadcastToChildren(GetTopWindow(), Event);
+      if (RecursiveBroadcastToChildren(GetTopWindow(), Event)) return true;
+      else return GetTopWindow()->HandleEvent(Event);
     }
 
   break;
@@ -642,6 +643,12 @@ awsManager::RecursiveBroadcastToChildren(awsComponent *cmp, iEvent &Event)
    {
 
     child = cmp->GetChildAt(i);
+
+    // If it has children, broadcast to them (depth-first recursion)
+    if (child->HasChildren()) 
+      if (RecursiveBroadcastToChildren(child, Event))
+        return true;
+
    
     switch(Event.Type)
     {
@@ -683,13 +690,8 @@ awsManager::RecursiveBroadcastToChildren(awsComponent *cmp, iEvent &Event)
       
       break;
     }  // End switch
-
-    // If it has children, broadcast to them
-    if (child->HasChildren()) 
-      if (RecursiveBroadcastToChildren(child, Event))
-        return true;
    
-    } // End for
+   } // End for
 
   return false;
 

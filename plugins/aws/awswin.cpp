@@ -219,31 +219,29 @@ awsWindow::OnMouseDown(int button, int x, int y)
       printf("mousedown: x=%d, y=%d, fx=%d, fy=%d\n", x,y,Frame().xmax, Frame().ymax);
 
     // check controls first
-    if (minp.Contains(x, y))
+    if ((frame_options & foMin) && minp.Contains(x, y))
     {
       min_down=true;
       Invalidate();
       return true;
     }
 
-    if (maxp.Contains(x, y))
+    if ((frame_options & foZoom) && maxp.Contains(x, y))
     {
       max_down=true;
       Invalidate();
       return true;
     }
 
-    if (closep.Contains(x, y))
+    if ((frame_options & foClose) && closep.Contains(x, y))
     {
       close_down=true;
       Invalidate();
       return true;
     }
 
-
-
-
-    if (x<Frame().xmax && x>Frame().xmax-grip_size &&
+    if ((frame_options & foGrip) &&
+        x<Frame().xmax && x>Frame().xmax-grip_size &&
         y<Frame().ymax && y>Frame().ymax-grip_size)
     {
       resizing_mode=true;
@@ -254,8 +252,18 @@ awsWindow::OnMouseDown(int button, int x, int y)
         printf("aws-debug: Window resize mode=true\n");
 
       return true;
-    } else if (x<Frame().xmax && x>Frame().xmin &&
-               y<Frame().ymin + title_bar_height  && y>Frame().ymin)
+    } else if (
+                // Move using titlebar if it's a normal window
+               ((frame_style==fsNormal && !(frame_options & foBeveledBorder)) && 
+               (x<Frame().xmax && x>Frame().xmin && 
+                y<Frame().ymin + title_bar_height  && y>Frame().ymin))
+
+                ||
+
+                // Move using whole window frame if it's not
+                (frame_style!=fsNormal || (frame_options & foBeveledBorder))                          
+               
+               )
     {
       moving_mode=true;
       WindowManager()->CaptureMouse();
@@ -600,24 +608,33 @@ awsWindow::OnDraw(csRect clip)
       }
 
       
+      // Draw min/max/close buttons
       int mtw, mth, mxtw, mxth, ctw, cth;
 
       min_button->GetOriginalDimensions(mtw, mth);
       max_button->GetOriginalDimensions(mxtw, mxth);
       close_button->GetOriginalDimensions(ctw, cth);
 
-      // Draw min/max/close buttons
-      g3d->DrawPixmap(min_button, minp.xmin+min_down, minp.ymin+min_down, mtw, mth, 0,0, mtw, mth, 0);
-      if (min_down) Draw3DRect(g2d, minp, lo2, hi2);
-      else          Draw3DRect(g2d, minp, hi2, lo2);
+      if (frame_options & foMin)
+      {
+        g3d->DrawPixmap(min_button, minp.xmin+min_down, minp.ymin+min_down, mtw, mth, 0,0, mtw, mth, 0);
+        if (min_down) Draw3DRect(g2d, minp, lo2, hi2);
+        else          Draw3DRect(g2d, minp, hi2, lo2);
+      }
 
-      g3d->DrawPixmap(max_button, maxp.xmin+max_down, maxp.ymin+max_down, mxtw, mth, 0,0, mxtw, mxth, 0);
-      if (max_down) Draw3DRect(g2d, maxp, lo2, hi2);
-      else          Draw3DRect(g2d, maxp, hi2, lo2);
+      if (frame_options & foZoom)
+      {
+        g3d->DrawPixmap(max_button, maxp.xmin+max_down, maxp.ymin+max_down, mxtw, mth, 0,0, mxtw, mxth, 0);
+        if (max_down) Draw3DRect(g2d, maxp, lo2, hi2);
+        else          Draw3DRect(g2d, maxp, hi2, lo2);
+      }
 
-      g3d->DrawPixmap(close_button, closep.xmin+close_down, closep.ymin+close_down, ctw, cth, 0,0, ctw, cth, 0);
-      if (close_down) Draw3DRect(g2d, closep, lo2, hi2);
-      else            Draw3DRect(g2d, closep, hi2, lo2);
+      if (frame_options & foClose)
+      {
+        g3d->DrawPixmap(close_button, closep.xmin+close_down, closep.ymin+close_down, ctw, cth, 0,0, ctw, cth, 0);
+        if (close_down) Draw3DRect(g2d, closep, lo2, hi2);
+        else            Draw3DRect(g2d, closep, hi2, lo2);
+      }
       
     } 
     break;
