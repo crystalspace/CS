@@ -6,6 +6,20 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Sep-2004
+	- Eric Sunshine added an `UNCONDITIONAL' argument to
+	  CS_EMIT_BUILD_PROPERTY(). This is analogous to the like-named
+	  argument accepted by CS_JAMCONFIG_PROPERTY.
+	- Eric Sunshine updated configure.ac so that it sets RANLIB
+	  unconditionally (via `=') in Jamconfig, rather than conditionally
+	  (via `?='). This is needed because the default RANLIB in Jambase is
+	  incorrect on some platforms (such as on MacOS/X with Jam 2.4), and
+	  because the default setting is inappropriate during
+	  cross-compilation. If necessary, despite being set unconditionally,
+	  users can still provide a custom value at configuration time:
+            ./configure RANLIB=my-ranlib
+	  Also removed the MacOS/X-specific work-around for this problem from
+	  macosx.jam.
 14-Sep-2004
 	- Eric Sunshine fixed bug in msvcgen.jam's LinkWith override where it
 	  did not distinguish between release and debug libraries & linker

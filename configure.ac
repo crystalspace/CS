@@ -71,8 +71,11 @@ CS_EMIT_BUILD_PROPERTY([COMPILER.TYPE], [$cs_compiler_name])
 CS_HEADER_PROPERTY([CS_COMPILER_NAME],
     [AS_ESCAPE(["])$cs_compiler_name[]AS_ESCAPE(["])])
 
+# The default RANLIB in Jambase is wrong on some platforms, and is also
+# unsuitable during cross-compilation, so we set the value unconditionally
+# (sixth argument of CS_EMIT_BUILD_PROPERTY).
 AC_PROG_RANLIB
-CS_EMIT_BUILD_PROPERTY([RANLIB], [$RANLIB])
+CS_EMIT_BUILD_PROPERTY([RANLIB], [$RANLIB], [], [], [], [Y])
 
 AC_CHECK_TOOLS([DLLTOOL], [dlltool])
 CS_EMIT_BUILD_PROPERTY([CMD.DLLTOOL], [$DLLTOOL])
