@@ -1376,6 +1376,7 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
     FlushDrawPolygon ();
     clipportal_stack.DeleteAll ();
     clipportal_dirty = true;
+    statecache->Disable_GL_STENCIL_TEST ();
   }
 
   // If we go to 2D mode then we do as if several modes are disabled.
@@ -1886,7 +1887,7 @@ void csGraphics3DOGLCommon::SetupStencil ()
 {
   if (stencil_init) return;
   stencil_init = true;
-  if (clipper && GLCaps.use_stencil && !clipportal_stack.Length () <= 0)
+  if (clipper && GLCaps.use_stencil && clipportal_stack.Length () <= 0)
   {
     // First set up the stencil area.
     statecache->Enable_GL_STENCIL_TEST ();
@@ -4473,6 +4474,8 @@ void csGraphics3DOGLCommon::SetupDTMClipping (G3DTriangleMesh& mesh)
   //===========
   // First setup the clipper that we need.
   //===========
+  ci.stencil_enabled = false;
+  ci.clip_planes_enabled = false;
   if (ci.how_clip == 's' && !use_clip_portals)
   {
     SetupStencil ();
@@ -4499,10 +4502,16 @@ void csGraphics3DOGLCommon::RestoreDTMClipping ()
 {
   int i;
   if (ci.stencil_enabled)
+  {
     statecache->Disable_GL_STENCIL_TEST ();
+    ci.stencil_enabled = false;
+  }
   if (ci.clip_planes_enabled)
+  {
     for (i = 0 ; i < frustum.GetVertexCount ()+ci.reserved_planes ; i++)
       glDisable ((GLenum)(GL_CLIP_PLANE0+i));
+    ci.clip_planes_enabled = false;
+  }
 }
 
 void csGraphics3DOGLCommon::SetupDTMEffect (G3DTriangleMesh& mesh)

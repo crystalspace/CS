@@ -13,6 +13,10 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in spr3d. When there one action had only one frame
 	  and that action was selected then tweening would be disabled
 	  permanently. Now it is only disabled for that action.
+	- Fixed a few stencil related init bugs in the OpenGL renderer.
+	  These could cause some clipping errors in some cases.
+	- Disable stencil in BeginDraw() now. That solves a problem with
+	  the new OpenPortals() feature.
 24-Mar-2003
 	- Cleaned up indentation in new event code. Note to Jonathan:
 	  a tab == 8 spaces. Indentation == 2 spaces.
