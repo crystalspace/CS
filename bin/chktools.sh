@@ -11,6 +11,7 @@ if [ -n "${NASMBIN}" ]; then
   # Well, we really should check here for obj format...
   # but we'll use ELF as it really doesn't matter
   ${NASMBIN} -f elf conftest.asm -o conftest.o 2>/dev/null && echo "NASM.INSTALLED = yes"
+  rm -f conftest.asm conftest.o
 fi
 
 # Check if makedep is installed and is the right version

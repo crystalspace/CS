@@ -59,20 +59,20 @@ echo "LINK = ${CXX}"
 # Check for optimisation flags
 #-----------------------------------------------------------------------------
 # Create a dummy C++ program
-echo "int main () {}" >conftest.cpp
+echo "int main () {}" >comptest.cpp
 
 # Check for machine-specific C compiler flags
-(echo "$CPU" | grep -s 686 >/dev/null && ${CXX} -c -mcpu=pentiumpro -march=i686 conftest.cpp && echo "CFLAGS.SYSTEM += -mcpu=pentiumpro -march=i686") || \
-(echo "$CPU" | grep -s 686 >/dev/null && ${CXX} -c -mpentiumpro -march=i686 conftest.cpp && echo "CFLAGS.SYSTEM += -mpentiumpro -march=i686") || \
-(echo "$CPU" | grep -s [5-6]86 >/dev/null && ${CXX} -c -mcpu=pentium -march=i586 conftest.cpp && echo "CFLAGS.SYSTEM += -mcpu=pentium -march=i586") || \
-(echo "$CPU" | grep -s [5-6]86 >/dev/null && ${CXX} -c -mpentium -march=i586 conftest.cpp && echo "CFLAGS.SYSTEM += -mpentium -march=i586") || \
-(echo "$CPU" | grep -s [3-9]86 >/dev/null && ${CXX} -c -mcpu=i486 conftest.cpp && echo "CFLAGS.SYSTEM += -mcpu=i486") || \
-(echo "$CPU" | grep -s [3-9]86 >/dev/null && ${CXX} -c -m486 conftest.cpp && echo "CFLAGS.SYSTEM += -m486") || \
-(echo "$MACHINE" | grep -s alpha >/dev/null && ${CXX} -c -mieee conftest.cpp && echo "CFLAGS.SYSTEM += -mieee")
+(echo "$CPU" | grep -s 686 >/dev/null && ${CXX} -c -mcpu=pentiumpro -march=i686 comptest.cpp && echo "CFLAGS.SYSTEM += -mcpu=pentiumpro -march=i686") || \
+(echo "$CPU" | grep -s 686 >/dev/null && ${CXX} -c -mpentiumpro -march=i686 comptest.cpp && echo "CFLAGS.SYSTEM += -mpentiumpro -march=i686") || \
+(echo "$CPU" | grep -s [5-6]86 >/dev/null && ${CXX} -c -mcpu=pentium -march=i586 comptest.cpp && echo "CFLAGS.SYSTEM += -mcpu=pentium -march=i586") || \
+(echo "$CPU" | grep -s [5-6]86 >/dev/null && ${CXX} -c -mpentium -march=i586 comptest.cpp && echo "CFLAGS.SYSTEM += -mpentium -march=i586") || \
+(echo "$CPU" | grep -s [3-9]86 >/dev/null && ${CXX} -c -mcpu=i486 comptest.cpp && echo "CFLAGS.SYSTEM += -mcpu=i486") || \
+(echo "$CPU" | grep -s [3-9]86 >/dev/null && ${CXX} -c -m486 comptest.cpp && echo "CFLAGS.SYSTEM += -m486") || \
+(echo "$MACHINE" | grep -s alpha >/dev/null && ${CXX} -c -mieee comptest.cpp && echo "CFLAGS.SYSTEM += -mieee")
 
 # Check for GCC-version-specific command-line options
-${CXX} -c -fno-exceptions conftest.cpp 2>/dev/null && echo "CFLAGS.SYSTEM += -fno-exceptions"
-${CXX} -c -fno-rtti conftest.cpp 2>/dev/null && echo "CFLAGS.SYSTEM += -fno-rtti"
+${CXX} -c -fno-exceptions comptest.cpp 2>/dev/null && echo "CFLAGS.SYSTEM += -fno-exceptions"
+${CXX} -c -fno-rtti comptest.cpp 2>/dev/null && echo "CFLAGS.SYSTEM += -fno-rtti"
 
 #------------------------------------------------------------------------------
 # Check if C++ compiler has a built-in 'bool' type.
