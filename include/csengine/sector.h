@@ -28,6 +28,7 @@ struct LightInfo;
 class csThing;
 class csStatLight;
 class csPolygon3D;
+class csPolygonBspContainer;
 class Polygon2D;
 class csCamera;
 class csDynLight;
@@ -78,6 +79,12 @@ private:
    * sector which includes all static (non-moving) csThings.
    */
   csBspTree* static_bsp;
+
+  /**
+   * If static_bsp is not NULL then this is a pointer to a BSP container
+   * which holds all polygons of the non-moving csTThings.
+   */
+  csPolygonBspContainer* static_container;
 
   /**
    * If static_bsp is not NULL then this is a pointer to the csThing

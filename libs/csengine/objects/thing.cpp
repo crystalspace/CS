@@ -341,10 +341,9 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 void csThing::Draw (csRenderView& rview, bool use_z_buf)
 {
   draw_busy++;
-  csVector3* old;
-  NewTransformation (old);
+  UpdateTransformation (rview);
 
-  if (TransformWorld2Cam (rview))
+  // @@@ Wouldn't it be nice if we checked if all vertices are behind the view plane?
   {
     if (rview.callback) rview.callback (&rview, CALLBACK_THING, (void*)this);
     Stats::polygons_considered += num_polygon;
@@ -373,15 +372,13 @@ void csThing::Draw (csRenderView& rview, bool use_z_buf)
     if (rview.callback) rview.callback (&rview, CALLBACK_THINGEXIT, (void*)this);
   }
 
-  RestoreTransformation (old);
   draw_busy--;
 }
 
 void csThing::DrawFoggy (csRenderView& d)
 {
   draw_busy++;
-  csVector3* old;
-  NewTransformation (old);
+  UpdateTransformation (d);
   csPolygon3D* p;
   csVector3* verts;
   int num_verts;
@@ -389,7 +386,7 @@ void csThing::DrawFoggy (csRenderView& d)
   csPolygon2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
   csPolygon2D* clip;
 
-  if (TransformWorld2Cam (d))
+  // @@@ Wouldn't it be nice if we checked all vertices against the Z plane?
   {
     csVector2 orig_triangle[3];
     if (!d.callback) d.g3d->OpenFogObject (GetID (), &GetFog ());
@@ -452,7 +449,6 @@ void csThing::DrawFoggy (csRenderView& d)
     if (!d.callback) d.g3d->CloseFogObject (GetID ());
   }
 
-  RestoreTransformation (old);
   draw_busy--;
 }
 
@@ -463,10 +459,7 @@ void csThing::CalculateLighting (csLightView& lview)
   int i;
 
   draw_busy++;
-  csVector3* old;
-  NewTransformation (old);
-
-  TranslateVector (lview.light_frustrum->GetOrigin ());
+  UpdateTransformation (lview.light_frustrum->GetOrigin ());
 
   if (light_frame_number != current_light_frame_number)
   {
@@ -478,6 +471,7 @@ void csThing::CalculateLighting (csLightView& lview)
   for (i = 0 ; i < num_polygon ; i++)
   {
     p = (csPolygon3D*)polygons[i];
+    p->CamUpdate ();
     p->CalculateLighting (&lview);
   }
 
@@ -489,7 +483,6 @@ void csThing::CalculateLighting (csLightView& lview)
     c->CalculateLighting (lview);
   }
 
-  RestoreTransformation (old);
   draw_busy--;
 }
 

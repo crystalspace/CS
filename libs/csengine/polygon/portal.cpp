@@ -21,6 +21,8 @@
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/sector.h"
+#include "csengine/world.h"
+#include "csengine/tranman.h"
 #include "csengine/stats.h"
 #include "itexture.h"
 
@@ -106,14 +108,19 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
   new_rview.clip_plane.Invert ();
   if (do_clip_portal) new_rview.do_clip_plane = true;
 
+  csTranCookie old_cookie = 0;
   if (do_warp_space)
   {
     bool mirror = new_rview.IsMirrored ();
     WarpSpace (new_rview, mirror);
     new_rview.SetMirrored (mirror);
+    old_cookie = csWorld::current_world->tr_manager.NewCameraFrame ();
   }
 
   sector->Draw (new_rview);
+
+  if (do_warp_space)
+    csWorld::current_world->tr_manager.RestoreCameraFrame (old_cookie);
 
   return true;
 }
@@ -151,8 +158,10 @@ void csPortal::CalculateLighting (csLightView& lview)
   // later.
   bool copied_frustrums = false;
 
+  csTranCookie old_cookie = 0;
   if (do_warp_space)
   {
+    old_cookie = csWorld::current_world->tr_manager.NewCameraFrame ();
     new_lview.light_frustrum->Transform (&warp_wor);
 
     if (do_mirror) new_lview.mirror = !lview.mirror;
@@ -227,6 +236,9 @@ void csPortal::CalculateLighting (csLightView& lview)
   }
 
   sector->CalculateLighting (new_lview);
+
+  if (do_warp_space)
+    csWorld::current_world->tr_manager.RestoreCameraFrame (old_cookie);
 
   if (copied_frustrums)
   {

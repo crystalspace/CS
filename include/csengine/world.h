@@ -24,6 +24,7 @@
 #include "csengine/csobjvec.h"
 #include "csengine/rview.h"
 #include "csengine/pool.h"
+#include "csengine/tranman.h"
 #include "csobject/csobj.h"
 #include "csutil/cleanup.h"
 
@@ -164,6 +165,8 @@ public:
   static csWorld* current_world;
   // An object pool for 2D polygons used by the rendering process.
   csPolygon2DPool* render_pol2d_pool;
+  // The transformation manager.
+  csTransformationManager tr_manager;
 
 private:
   /// Texture and color information object.

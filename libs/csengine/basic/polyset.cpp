@@ -92,13 +92,14 @@ csPolygonSet::csPolygonSet () : csObject(), csPolygonParentInt ()
   bbox = NULL;
 
   light_frame_number = -1;
+
+  cam_verts_set.SetTransformationManager (&csWorld::current_world->tr_manager);
 }
 
 csPolygonSet::~csPolygonSet ()
 {
   CHK (delete [] wor_verts);
   CHK (delete [] obj_verts);
-  CHK (delete [] cam_verts);
   if (polygons)
   {
     for (int i = 0 ; i < num_polygon ; i++)
@@ -161,25 +162,20 @@ int csPolygonSet::AddVertex (float x, float y, float z)
     max_vertices = 10;
     CHK (wor_verts = new csVector3 [max_vertices]);
     CHK (obj_verts = new csVector3 [max_vertices]);
-    CHK (cam_verts = new csVector3 [max_vertices]);
   }
   while (num_vertices >= max_vertices)
   {
     max_vertices += 10;
     CHK (csVector3* new_wor_verts = new csVector3 [max_vertices]);
     CHK (csVector3* new_obj_verts = new csVector3 [max_vertices]);
-    CHK (csVector3* new_cam_verts = new csVector3 [max_vertices]);
     memcpy (new_wor_verts, wor_verts, sizeof (csVector3)*num_vertices);
     memcpy (new_obj_verts, obj_verts, sizeof (csVector3)*num_vertices);
-    memcpy (new_cam_verts, cam_verts, sizeof (csVector3)*num_vertices);
 
     CHK (delete [] wor_verts);
     CHK (delete [] obj_verts);
-    CHK (delete [] cam_verts);
 
     wor_verts = new_wor_verts;
     obj_verts = new_obj_verts;
-    cam_verts = new_cam_verts;
   }
 
   // By default all vertices are set with the same object space and world space.
@@ -338,96 +334,6 @@ csPolygon3D* csPolygonSet::IntersectSegment (const csVector3& start,
   return NULL;
 }
 
-void csPolygonSet::TranslateVector (csVector3& trans)
-{
-  int i;
-  for (i = 0 ; i < num_vertices ; i++)
-    cam_verts[i] = wor_verts[i]-trans;
-}
-
-#if 1
-bool csPolygonSet::TransformWorld2Cam (csCamera& c)
-{
-  int i;
-  for (i = 0 ; i < num_vertices ; i++)
-    cam_verts[i] = c.Other2This (wor_verts[i]);
-
-  return true;
-}
-#else
-bool csPolygonSet::TransformWorld2Cam (csCamera& c)
-{
-  // This loop has been made explicit because this makes better
-  // usage of the cache.
-  int i;
- 
-  float dx, dy, dz;
-  float cx, cy, cz;
- 
-  const csMatrix3& m_o2t = c.GetO2T ();
-  const csVector3& v_o2t = c.GetO2TTranslation ();
-
-  float m11 = m_o2t.m11;
-  float m21 = m_o2t.m21;
-  float m31 = m_o2t.m31;
- 
-  float m12 = m_o2t.m12;
-  float m22 = m_o2t.m22;
-  float m32 = m_o2t.m32;
-  
-  float m13 = m_o2t.m13;
-  float m23 = m_o2t.m23;
-  float m33 = m_o2t.m33;
- 
-  cx = v_o2t.x;
-  cy = v_o2t.y;
-  cz = v_o2t.z;
- 
-  csVector3* world_verts = wor_verts;
-  csVector3* camra_verts = cam_verts;
-  for (i = 0 ; i < num_vertices ; i++)
-  {        
-    dx = world_verts->x - cx;
-    dy = world_verts->y - cy;
-    dz = world_verts->z - cz; 
- 
-    camra_verts->x  = m11 * dx + m12 * dy + m13 *dz;
-    camra_verts->y  = m21 * dx + m22 * dy + m23 *dz;
-    camra_verts->z  = m31 * dx + m32 * dy + m33 *dz;
-
-    world_verts++;
-    camra_verts++;
-  }
- 
-  return true;
-}
-#endif
-
-void csPolygonSet::NewTransformation (csVector3*& old_tr3)
-{
-  if (draw_busy == 1)
-  {
-    // This is the first time we need a transformation this session.
-    // Just return NULL and use the default cam_verts array.
-    old_tr3 = NULL;
-  }
-  else
-  {
-    // Allocate a new cam_verts array.
-    old_tr3 = cam_verts;
-    CHK (cam_verts = new csVector3 [max_vertices]);
-  }
-}
-
-void csPolygonSet::RestoreTransformation (csVector3* old_tr3)
-{
-  if (old_tr3)
-  {
-    CHKB (delete [] cam_verts);
-    cam_verts = old_tr3;
-  }
-}
-
 void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly, csRenderView* d,
 	bool use_z_buf)
 {
@@ -508,6 +414,7 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num, csRenderVi
   {
     clip = render_pool->Alloc ();
     p = (csPolygon3D*)polygon[i];
+    p->CamUpdate ();
     if ( !p->dont_draw &&
          p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane*)NULL, d->GetOrigin (),
 	 	verts, num_verts) && //@@@Use pool for verts?

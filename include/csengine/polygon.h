@@ -42,12 +42,6 @@ class csPolygonSet;
 interface IGraphics2D;
 interface IGraphics3D;
 
-// Values returned by classify.
-#define POL_SAME_PLANE 0
-#define POL_FRONT 1
-#define POL_BACK 2
-#define POL_SPLIT_NEEDED 3
-
 /**
  * If CS_POLY_MIPMAP is set for a polygon then mipmapping will be used.
  * It is set by default.
@@ -537,6 +531,13 @@ public:
   csVector3& Vcam (int idx) { return poly_set->Vcam (vertices_idx[idx]); }
 
   /**
+   * Before calling a series of Vcam() you should call
+   * CamUpdate() first to make sure that the camera vertex set
+   * is up-to-date.
+   */
+  void CamUpdate () { poly_set->CamUpdate (); }
+
+  /**
    * Set the texture for this polygon.
    * This texture handle will only be used as soon as 'Finish()'
    * is called. So you can safely wait preparing the textures
@@ -934,69 +935,5 @@ public:
 
 #define GetIPolygon3DFromcsPolygon3D( poly3d )  &poly3d->m_xPolygon3D;
 #define GetcsPolygon3DFromIPolygon3D( iP3d )  ((csPolygon3D*)((size_t)iP3d - offsetof(csPolygon3D, m_xPolygon3D)))
-
-
-/**
- * This special class of polygon is only used by the BSP tree. In order to
- * avoid having to split csPolygon3D instances (which caused a lot of troubles
- * in the past) we build a BSP tree based on this structure which only contains
- * an array of vertices and a pointer back to the original polygon.
- */
-class csPolygonBsp : public csPolygonInt
-{
-private:
-  /// A table of vertices.
-  csVector3* vertices;
-  /// Number of vertices.
-  int num_vertices;
-  /// Maximum number of vertices.
-  int max_vertices;
-  /// Original polygon.
-  csPolygon3D* poly3d;
-
-public:
-  /// Construct an empty polygon.
-  csPolygonBsp ();
-  /// Construct a polygon based on a csPolygon3D.
-  csPolygonBsp (csPolygon3D* orig_poly3d);
-  /// Destroy this polygon.
-  virtual ~csPolygonBsp ();
-
-  /// Set original polygon.
-  void SetPolygon3D (csPolygon3D* orig_poly3d) { poly3d = orig_poly3d; }
-  /// Get original polygon.
-  csPolygon3D* GetPolygon3D () { return poly3d; }
-
-  /// Add a vertex.
-  void AddVertex (const csVector3& v);
-
-  /// Get the plane of this polygon.
-  virtual csPlane* GetPolyPlane () { return poly3d->GetPolyPlane (); }
-
-  /**
-   * Classify a polygon with regards to this one. If the poly is on same
-   * plane as this one it returns POL_SAME_PLANE. If this poly is
-   * completely in front of the given poly it returnes POL_FRONT. If this poly
-   * is completely back of the given poly it returnes POL_BACK. Otherwise it
-   * returns POL_SPLIT_NEEDED.
-   */
-  virtual int Classify (csPolygonInt* poly);
-
-  /**
-   * Split this polygon with the given plane (A,B,C,D) and return the
-   * two resulting new polygons in 'front' and 'back'. The new polygons will
-   * mimic the behaviour of the parent polygon as good as possible.
-   * This function is mainly used by the BSP splitter.
-   */
-  virtual void SplitWithPlane (csPolygonInt** front, csPolygonInt** back, csPlane& plane);
-
-  /**
-   * Return true if this polygon and the given polygon are on the same
-   * plane. If their planes are shared this is automatically the case.
-   * Otherwise this function will check their respective plane equations
-   * to test for equality.
-   */
-  virtual bool SamePlane (csPolygonInt* p);
-};
 
 #endif /*POLYGON_H*/

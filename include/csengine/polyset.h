@@ -25,6 +25,7 @@
 #include "csgeom/polyint.h"
 #include "csobject/csobj.h"
 #include "csengine/fog.h"
+#include "csengine/tranman.h"
 #include "ipolygon.h"
 
 class csPolygonInt;
@@ -121,6 +122,8 @@ protected:
   csVector3* obj_verts;
   /// Vertices in camera space.
   csVector3* cam_verts;
+  /// Camera space vertices.
+  csTransformedSet cam_verts_set;
 
   /// Table of ptr to polygons forming the outside of the set
   csPolygonInt** polygons;
@@ -150,29 +153,6 @@ protected:
    * vertices have been initialized already.
    */
   long light_frame_number;
-
-  /**
-   * Get a new transformation set of vertices (camera space) and return
-   * the old set. This function is required when transforming to camera
-   * space because this polyset may already have been transformed to
-   * camera space in some other way. It is important to restore the
-   * transformation set if you are done with it.
-   * The new transformation set is automatically put in the standard
-   * 'cam_verts' array and accessible using 'vcam'.
-   * Do not use the result from this function except for giving it
-   * to restore_transformation. The result is not meaningfull.
-   * This function also depends on the correct value of 'draw_busy'.
-   * 'draw_busy' should be equal to 1 for the first time you call
-   * this 'new_transformation' and should also be equal to 1 when
-   * you restore the set for the last time.
-   */
-  void NewTransformation (csVector3*& old_tr3);
-
-  /**
-   * After calling 'new_transformation' you MUST call this
-   * function with the result from 'new_transformation'!
-   */
-  void RestoreTransformation (csVector3* old_tr3);
 
   /**
    * Draw one 3D/2D polygon combination. The 2D polygon is the transformed
@@ -295,8 +275,19 @@ public:
 
   /**
    * Return the camera space vector for the vertex.
+   * Make sure you recently called CamUpdate(). Otherwise it is
+   * possible that this coordinate will not be valid.
    */
   csVector3& Vcam (int idx) { return cam_verts[idx]; }
+
+  /**
+   * Make sure the camera vertices are up-to-date to the current camera frame.
+   */
+  void CamUpdate ()
+  {
+    cam_verts_set.CheckUpdate ();
+    cam_verts = cam_verts_set.GetVertexArray ()->GetVertices ();
+  }
 
   /**
    * Return the number of vertices.
@@ -394,21 +385,24 @@ public:
 				       float* pr = NULL);
 
   /**
-   * Transform all polygon vertices in this polygonset from world
-   * to camera space (don't transform curve vertices).
-   * Return false if none of the vertices of this sector is in front
-   * of the camera.
+   * Transform to the given camera if needed. This function works
+   * via the transformation manager and will only transform if needed.
    */
-  bool TransformWorld2Cam (csCamera& c);
+  void UpdateTransformation (const csCamera& c)
+  {
+    cam_verts_set.Transform (wor_verts, num_vertices, (const csTransform&)c);
+    cam_verts = cam_verts_set.GetVertexArray ()->GetVertices ();
+  }
 
   /**
-   * Translate the vertices of this polygonset so that the given
-   * vector is at the origin. The resulting transformation is
-   * put in the 'camera' section. This function is similar to
-   * TransformWorld2Cam() except that there is no rotation of the
-   * camera, only a translation.
+   * Translate with the given vector if needed. This function works
+   * via the transformation manager and will only translate if needed.
    */
-  void TranslateVector (csVector3& trans);
+  void UpdateTransformation (const csVector3& trans)
+  {
+    cam_verts_set.Translate (wor_verts, num_vertices, trans);
+    cam_verts = cam_verts_set.GetVertexArray ()->GetVertices ();
+  }
 
   /**
    * Get the next polygonset in its linked list.

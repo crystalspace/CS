@@ -120,6 +120,13 @@ public:
   bool IsMerged () { return !!merged; }
 
   /**
+   * Set merged to true. This happens if the polygons of the thing
+   * are added to a BSP tree. The polygons in this things are unmodified
+   * though.
+   */
+  void SetMerged () { merged = (csThing*)1; }
+
+  /**
    * Merge the given Thing into this one. The other Thing is marked
    * as being merged. Note that the polygons of the other Thing will
    * not be copied but only a reference is copied. This Thing will

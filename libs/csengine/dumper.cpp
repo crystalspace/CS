@@ -144,7 +144,7 @@ void Dumper::dump (csPolygonSet* p)
     CsPrintf (MSG_DEBUG_0, "    Vertex[%d]=\n", i);
     dump (&p->wor_verts[i], "world");
     dump (&p->obj_verts[i], "object");
-    dump (&p->cam_verts[i], "camera");
+    //dump (&p->cam_verts[i], "camera");
     CsPrintf (MSG_DEBUG_0, "\n");
   }
   CsPrintf (MSG_DEBUG_0, "  Polygons:\n");

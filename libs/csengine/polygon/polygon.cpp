@@ -753,7 +753,8 @@ void csPolygon3D::PlaneNormal (float* yz, float* zx, float* xy)
 }
 
 
-bool csPolygon3D::ClipPoly (csVector3* frustrum, int m, bool mirror, csVector3** dest, int* num_dest)
+bool csPolygon3D::ClipPoly (csVector3* frustrum, int m, bool mirror,
+	csVector3** dest, int* num_dest)
 {
   int i, i1;
   if (!frustrum)
@@ -869,11 +870,13 @@ void csPolygon3D::ClipPolyPlane (csVector3* verts, int* num, bool mirror,
   }
 }
 
-bool csPolygon3D::ClipFrustrum (csVector3& center, csVector3* frustrum, int num_frustrum, bool mirror,
+bool csPolygon3D::ClipFrustrum (csVector3& center, csVector3* frustrum,
+	int num_frustrum, bool mirror,
 	csVector3** new_frustrum, int* new_num_frustrum)
 {
   //if (!plane->VisibleFromPoint (center)) return false;
-  if (!plane->VisibleFromPoint (center) || ABS (plane->Classify (center)) < SMALL_EPSILON) return false;
+  if (!plane->VisibleFromPoint (center) ||
+  	ABS (plane->Classify (center)) < SMALL_EPSILON) return false;
   return ClipPoly (frustrum, num_frustrum, mirror, new_frustrum, new_num_frustrum);
 }
 
@@ -901,7 +904,8 @@ bool csPolygon3D::ClipToPlane (csPlane* portal_plane, const csVector3& v_w2c,
   // Perform backface culling.
   // Note! The plane normal needs to be correctly calculated for this
   // to work! @@@ can be optimized
-  if (plane->VisibleFromPoint (v_w2c) != cw && plane->Classify (v_w2c) != 0) return false;
+  if (plane->VisibleFromPoint (v_w2c) != cw && plane->Classify (v_w2c) != 0)
+    return false;
 
   // Copy the vertices to verts.
   for (i = 0 ; i < num_vertices ; i++) verts[i] = Vcam (i);
@@ -1481,12 +1485,14 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
   // If plane is not visible then return.
   if (!plane->VisibleFromPoint (center)) return;
 
-  // Compute the distance from the center of the light to the plane of the polygon.
+  // Compute the distance from the center of the light to the plane of the
+  // polygon.
   float dist_to_plane = GetPolyPlane ()->Distance (center);
 
-  // If distance is too small or greater than the radius of the light then we have a
-  // trivial case (no hit).
-  if (dist_to_plane < SMALL_EPSILON || dist_to_plane >= lview->l->GetRadius ()) return;
+  // If distance is too small or greater than the radius of the light then we
+  // have a trivial case (no hit).
+  if (dist_to_plane < SMALL_EPSILON || dist_to_plane >= lview->l->GetRadius ())
+    return;
 
   // Calculate the new frustrum for this polygon.
 
@@ -1506,11 +1512,13 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
 
     // The light is close enough to the plane of the polygon. Now we calculate
     // an accurate minimum squared distance from the light to the polygon. Note
-    // that we use the new_frustrum which is relative to the center of the light.
+    // that we use the new_frustrum which is relative to the center of the
+    // light.
     // So this algorithm works with the light position at (0,0,0) (@@@ we should
     // use this to optimize this algorithm further).
     csVector3 o (0, 0, 0);
-    float min_sqdist = csSquaredDist::PointPoly (o, new_light_frustrum->GetVertices (),
+    float min_sqdist = csSquaredDist::PointPoly (o,
+    		new_light_frustrum->GetVertices (),
 		new_light_frustrum->GetNumVertices (),
 		*(GetPolyPlane ()), dist_to_plane*dist_to_plane);
     if (min_sqdist < lview->l->GetSquaredRadius ())
@@ -1522,15 +1530,17 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
       // which are inside the light frustrum and are not obscured (shadowed)
       // by other shadow frustrums.
       // We also give the polygon plane to MarkRelevantShadowFrustrums so that
-      // all shadow frustrums which start at the same plane are discarded as well.
-      // FillLightmap() will use this information and csPortal::CalculateLighting()
-      // will also use it!!
+      // all shadow frustrums which start at the same plane are discarded as
+      // well.
+      // FillLightmap() will use this information and
+      // csPortal::CalculateLighting() will also use it!!
       csPlane poly_plane = *GetPolyPlane ();
-      poly_plane.DD += poly_plane.norm * center;	// First translate plane to center of frustrum.
+      // First translate plane to center of frustrum.
+      poly_plane.DD += poly_plane.norm * center;
       poly_plane.Invert ();
       if (MarkRelevantShadowFrustrums (new_lview, poly_plane))
       {
-        // Update the lightmap given the light and shadow frustrums in new_lview.
+        // Update the lightmap given light and shadow frustrums in new_lview.
         FillLightmap (new_lview);
 
         po = GetPortal ();
@@ -2274,130 +2284,3 @@ bool csPolygon2DQueue::Pop (csPolygon3D** poly3d, csPolygon2D** poly2d)
 }
 
 //---------------------------------------------------------------------------
-
-csPolygonBsp::csPolygonBsp ()
-{
-  max_vertices = 4;
-  CHK (vertices = new csVector3 [max_vertices]);
-  num_vertices = 0;
-  poly3d = NULL;
-}
-
-csPolygonBsp::csPolygonBsp (csPolygon3D* orig_poly3d)
-{
-  max_vertices = num_vertices = orig_poly3d->GetNumVertices ();
-  CHK (vertices = new csVector3 [max_vertices]);
-  int i;
-  for (i = 0 ; i < num_vertices ; i++)
-    vertices[i] = orig_poly3d->Vwor (i);
-  poly3d = orig_poly3d;
-}
-
-csPolygonBsp::~csPolygonBsp ()
-{
-  CHK (delete [] vertices);
-}
-
-
-void csPolygonBsp::AddVertex (const csVector3& v)
-{
-  if (num_vertices >= max_vertices)
-  {
-    max_vertices += 2;
-    CHK (csVector3* new_vertices = new csVector3 [max_vertices]);
-    memcpy (new_vertices, vertices, sizeof (csVector3)*num_vertices);
-    CHK (delete [] vertices);
-    vertices = new_vertices;
-  }
-  vertices[num_vertices++] = v;
-}
-
-int csPolygonBsp::Classify (csPolygonInt* spoly)
-{
-  if (SamePlane (spoly)) return POL_SAME_PLANE;
-
-  int i;
-  int front = 0, back = 0;
-  csPolygonBsp* poly = (csPolygonBsp*)spoly;
-  csPolyPlane* pl = poly->poly3d->GetPlane ();
-
-  for (i = 0 ; i < num_vertices ; i++)
-  {
-    float dot = pl->Classify (vertices[i]);
-    if (ABS (dot) < SMALL_EPSILON) dot = 0;
-    if (dot > 0) back++;
-    else if (dot < 0) front++;
-  }
-  if (back == 0) return POL_FRONT;
-  if (front == 0) return POL_BACK;
-  return POL_SPLIT_NEEDED;
-}
-
-void csPolygonBsp::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
-				   csPlane& plane)
-{
-  CHK (csPolygonBsp* np1 = new csPolygonBsp ());
-  CHK (csPolygonBsp* np2 = new csPolygonBsp ());
-  *poly1 = (csPolygonInt*)np1; // Front
-  *poly2 = (csPolygonInt*)np2; // Back
-  np1->SetPolygon3D (poly3d);
-  np2->SetPolygon3D (poly3d);
-
-  csVector3 ptB;
-  float sideA, sideB;
-  csVector3 ptA = vertices[num_vertices - 1];
-  sideA = plane.Classify (ptA);
-
-  for (int i = -1 ; ++i < num_vertices ; )
-  {
-    ptB = vertices[i];
-    sideB = plane.Classify (ptB);
-    if (sideB > 0)
-    {
-      if (sideA < 0)
-      {
-	// Compute the intersection point of the line
-	// from point A to point B with the partition
-	// plane. This is a simple ray-plane intersection.
-	csVector3 v = ptB; v -= ptA;
-	float sect = - plane.Classify (ptA) / ( plane.Normal () * v ) ;
-	v *= sect; v += ptA;
-	np1->AddVertex (v);
-	np2->AddVertex (v);
-      }
-      np2->AddVertex (ptB);
-    }
-    else if (sideB < 0)
-    {
-      if (sideA > 0)
-      {
-	// Compute the intersection point of the line
-	// from point A to point B with the partition
-	// plane. This is a simple ray-plane intersection.
-	csVector3 v = ptB; v -= ptA;
-	float sect = - plane.Classify (ptA) / ( plane.Normal () * v );
-	v *= sect; v += ptA;
-	np1->AddVertex (v);
-	np2->AddVertex (v);
-      }
-      np1->AddVertex (ptB);
-    }
-    else
-    {
-      np1->AddVertex (ptB);
-      np2->AddVertex (ptB);
-    }
-    ptA = ptB;
-    sideA = sideB;
-  }
-}
-
-bool csPolygonBsp::SamePlane (csPolygonInt* p)
-{
-  if (((csPolygonBsp*)p)->GetPolyPlane () == GetPolyPlane ()) return true;
-  return csMath3::PlanesEqual (*((csPolygonBsp*)p)->GetPolyPlane (), *GetPolyPlane ());
-}
-
-
-//---------------------------------------------------------------------------
-
