@@ -24,6 +24,7 @@
 #include "math/ddgbbox.h"
 #include "math/ddgchull.h"
 #include "struct/ddgcntrl.h"
+
 class ddgClock;
 class ddgPath;
 /**

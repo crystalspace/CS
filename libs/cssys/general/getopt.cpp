@@ -654,7 +654,7 @@ _getopt_internal (int argc, char *const *argv, const char *optstring,
 
   {
     char c = *nextchar++;
-    char *temp = my_index (optstring, c);
+    const char *temp = my_index (optstring, c);
 
     /* Increment `optind' when we start to process its last character.  */
     if (*nextchar == '\0')

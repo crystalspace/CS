@@ -24,7 +24,7 @@
 #include "cstypes.h"
 #endif
 
-#if !defined(WIN32) || (defined(OS_WIN32) && defined (COMP_GCC))
+#if !defined(WIN32) || (__BORLANDC__) ||  (defined(OS_WIN32) && defined (COMP_GCC))
 #ifdef DDG
 #include <strstream.h> 
 #endif

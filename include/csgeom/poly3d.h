@@ -188,9 +188,9 @@ public:
   {
     switch (plane_nr)
     {
-      case 0: return ProjectXPlane (point, plane_pos, poly2d); break;
-      case 1: return ProjectYPlane (point, plane_pos, poly2d); break;
-      case 2: return ProjectZPlane (point, plane_pos, poly2d); break;
+      case 0: return ProjectXPlane (point, plane_pos, poly2d); 
+      case 1: return ProjectYPlane (point, plane_pos, poly2d); 
+      case 2: return ProjectZPlane (point, plane_pos, poly2d); 
     }
     return false;
   }

@@ -392,9 +392,9 @@ public:
   {
     switch (nr)
     {
-      case 0: return PlaneXPlane (p1, pos, isect); break;
-      case 1: return PlaneYPlane (p1, pos, isect); break;
-      case 2: return PlaneZPlane (p1, pos, isect); break;
+      case 0: return PlaneXPlane (p1, pos, isect); 
+      case 1: return PlaneYPlane (p1, pos, isect); 
+      case 2: return PlaneZPlane (p1, pos, isect); 
     }
     return false;
   }
