@@ -293,11 +293,13 @@ bool CCSSector::WriteLights(csRef<iDocumentNode> node, CIWorld* pWorld)
 	  //in GtkRadiant.
 
           bool   LightOk         = false;
-	  bool	 ColorOk		 = false;
+	  bool	 ColorOk	 = false;
           double r               = 255;
           double g               = 255;
           double b               = 255;
           double radius          = 200;
+	  double influenceRadius = -1;
+	  double brightness      = 1.0;
           bool   dynamic         = false;
           double halo            = 0;
           double halointen       = 0;
@@ -344,6 +346,10 @@ bool CCSSector::WriteLights(csRef<iDocumentNode> node, CIWorld* pWorld)
 	    }
           }
 
+	  brightness = pEntity->GetNumValueOfKey("brightness", 1.0);
+
+	  influenceRadius = pEntity->GetNumValueOfKey("influence", -1.0);
+
           //dynamic light key
           dynamic = pEntity->GetBoolValueOfKey("dynamic", false);
 
@@ -360,7 +366,7 @@ bool CCSSector::WriteLights(csRef<iDocumentNode> node, CIWorld* pWorld)
               if (!(strcmp(attenuation,"none") ||
 	            strcmp(attenuation,"linear") ||
                     strcmp(attenuation,"inverse") ||
-		    strcmp(attenuation,"realistic")))
+		    strcmp(attenuation,"realistic") ))
               {
                 strcpy( attenuation , "realistic" );
               }
@@ -385,14 +391,31 @@ bool CCSSector::WriteLights(csRef<iDocumentNode> node, CIWorld* pWorld)
 	  center->SetAttributeAsFloat ("x", origin.x*ScaleFactor);
 	  center->SetAttributeAsFloat ("y", origin.z*ScaleFactor);
 	  center->SetAttributeAsFloat ("z", origin.y*ScaleFactor);
+	  
+	  // New Radius / Color code
+	  DocNode radiusNode = CreateNode (light, "radius", (float)(radius*lightscale*ScaleFactor));
+	  radiusNode->SetAttributeAsFloat ("brightness", brightness);
+	  
+	  DocNode color = CreateNode (light, "color");
+	  color->SetAttributeAsFloat("red", (r/255));
+	  color->SetAttributeAsFloat("green", (g/255));
+	  color->SetAttributeAsFloat("blue", (b/255));
+
+	  /* This code is Old (keeping it incase it somehow stops working)
 	  CreateNode (light, "radius", 
 	    (float)(radius*ScaleFactor*lightscale));
 	  DocNode color = CreateNode (light, "color");
 	  color->SetAttributeAsFloat ("red", (r/255) * (radius/128));
 	  color->SetAttributeAsFloat ("green", (g/255) * (radius/128));
 	  color->SetAttributeAsFloat ("blue", (b/255) * (radius/128));
+	  */
 
-          if (dynamic)
+	  if (influenceRadius != -1.0)
+	  {
+	    CreateNode (light, "influenceradius", (float)(influenceRadius*ScaleFactor*lightscale));
+	  }
+
+	  if (dynamic)
           {
             CreateNode (light, "dynamic");
           }

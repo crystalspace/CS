@@ -11,6 +11,8 @@ chronological order.
 	  on entities ('priority' tag in the .map) and fixed map2cs to support 
 	  new alpha flag under <mixmode> instead of under each polygon. ('alpha'
 	  tag in the .map)
+	- Aren Blondahl patched map2cs's light format to comply with <radius> tag,
+	  and added in brightness / influence radius support.
 
 16-Apr-2004
 	- Jorrit fixed a crash at exit for genmesh with NR.
