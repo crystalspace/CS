@@ -151,10 +151,6 @@ void PI_SCANFUNC (void *dest, int len,
             b2 =  Screen  & BLUEMASK;
             //Now r2, g2 and b2 contain the color of the old pixel on screen
             #ifdef BPP16
-              //r1 = 0x10;
-              //g1 = 0x20;
-              //b1 = 0x10;
-
               r1 = BlendingTable[r1*2+r2*128]/2;
               #ifdef COLOR555
               g1 = BlendingTable[g1*2+g2*128]/2;
