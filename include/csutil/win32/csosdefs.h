@@ -38,7 +38,7 @@
   #pragma warning(disable:4201)   // structure/ union without name. (Only relevant on MSVC 5.0)
   #pragma warning(disable:4244)   // conversion from 'double' to 'float'
   #pragma warning(disable:4251)   // class needs to have dll-interface to be used by clients
-  #pragma warning(disable:4275)   // non – DLL-interface used as base for DLL-interface
+  #pragma warning(disable:4275)   // non-DLL-interface used as base for DLL-interface
   #pragma warning(disable:4291)   // no matching operator delete found
   #pragma warning(disable:4312)	  // 'variable' : conversion from 'type' to 'type' of greater size
   #pragma warning(disable:4390)   // Empty control statement
