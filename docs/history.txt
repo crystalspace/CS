@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+24-May-2001
+	- Eric Sunshine fixed several problems in lexan.mak.
 23-May-2001
 	- Added 'virtual' before the csView destructor and also fixed a
 	  warning in the csView constructor.

@@ -1,13 +1,13 @@
 #------------------------------------------------------------------------------
 # Lexical Analyzer plugin submakefile
 #------------------------------------------------------------------------------
-DESCRIPTION.lexan = Crystal Space 3D Lexical Analyzer plug-in
+DESCRIPTION.lexan = Crystal Space lexical analyzer plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make lexan       Make the $(DESCRIPTION.lexan)$"
+  $(NEWLINE)echo $"  make lexan        Make the $(DESCRIPTION.lexan)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
@@ -41,8 +41,7 @@ endif
 INC.LEXAN = $(wildcard plugins/cslexan/*.h)
 SRC.LEXAN = $(wildcard plugins/cslexan/*.cpp)
 OBJ.LEXAN = $(addprefix $(OUT),$(notdir $(SRC.LEXAN:.cpp=$O)))
-DEP.LEXAN = CSUTIL CSSYS CSOBJECT CSUTIL CSSYS
-LEXAN.FORCE_LINK = $(OUT)lexan$(O)
+DEP.LEXAN = CSUTIL CSSYS
 
 MSVC.DSP += LEXAN
 DSP.LEXAN.NAME = lexan
@@ -55,7 +54,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: lexan lexanclean
 lexan: $(OUTDIRS) $(LEXAN)
 
-$(LEXAN): $(OBJ.LEXAN) $(LEXAN.FORCE_LINK) $(LIB.LEXAN)
+$(LEXAN): $(OBJ.LEXAN) $(LIB.LEXAN)
 	$(DO.PLUGIN)
 
 clean: lexanclean
