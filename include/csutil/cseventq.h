@@ -153,6 +153,11 @@ public:
   virtual void RegisterListener(iEventHandler*, unsigned int trigger);
   /// Unregister a listener.
   virtual void RemoveListener(iEventHandler*);
+  /**
+   * Unregister all listeners.
+   * \copydoc iEventQueue::RemoveAllListeners()
+   */
+  virtual void RemoveAllListeners();
   /// Change a listener's trigger.
   virtual void ChangeListenerTrigger(iEventHandler*, unsigned int trigger);
 

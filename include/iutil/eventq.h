@@ -151,6 +151,19 @@ struct iEventQueue : public iBase
 
   /// Query if queue is empty.
   virtual bool IsEmpty () = 0;
+
+  /**
+   * Unregister all listeners.
+   * \remarks
+   * This function is used to clear all listeners from the event queue stack.
+   * You should only call this function at the end of your program after the
+   * event queue processing has terminated.
+   * \par
+   * If you make use of csInitializer::DestroyApplication(), this is done for
+   * you by that call.
+   */
+  virtual void RemoveAllListeners () = 0;
+
 };
 
 /** @} */
