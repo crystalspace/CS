@@ -150,7 +150,6 @@ endif # rootdefines & config
 ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/volatile)
 
 MAKE_VOLATILE_H += \
-  $(NEWLINE)echo $"\#define CS_SYSDEF_PROVIDE_PATH$">>volatile.tmp \
   $(NEWLINE)echo $"\#include <SupportDefs.h>$">>volatile.tmp
 
 endif # ifeq ($(ROOTCONFIG),volatile)

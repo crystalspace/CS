@@ -4,8 +4,6 @@
     Created by Matt Reda <mreda@mac.com>
     Copyright (c) 2002 Matt Reda. All rights reserved.
  */
-
-#define CS_SYSDEF_PROVIDE_PATH
 #include "cssysdef.h"
 
 

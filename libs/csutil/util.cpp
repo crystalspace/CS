@@ -15,13 +15,11 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
 
-#define CS_SYSDEF_PROVIDE_PATH
 #define CS_SYSDEF_PROVIDE_GETCWD
 #include "cssysdef.h"
 
