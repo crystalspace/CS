@@ -500,6 +500,7 @@ bool awsPrefManager::GetString (
 awsComponentNode *awsPrefManager::FindWindowDef (char *name)
 {
   awsComponentNode *win = (awsComponentNode *)win_defs.GetFirstItem ();
+  awsComponentNode *firstwin = win;
   unsigned long id = NameToId (name);
 
   while (win)
@@ -507,6 +508,8 @@ awsComponentNode *awsPrefManager::FindWindowDef (char *name)
     if (win && win->Name () == id) return win;
 
     win = (awsComponentNode *)win_defs.GetNextItem ();
+    if (win == firstwin)
+      break;
   }
 
   return NULL;

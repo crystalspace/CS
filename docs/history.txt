@@ -4,8 +4,25 @@ The history order is reversed so that new features are at the top.
 	- Philip Wyett eliminated some minor MSVC compiler warnings
 	  in 3ds2lev. Phil Also improved the memcpy replacement for MSVC
 	  and it's handling of the 'short' type.
+	- Norman Kramer fixed AWS: lookup for windowdefinition looped forever
+	  if def is not present, because the double linked list is a circular
+	  list :)
 13-Apr-2002
 	- Philip Wyett fixed a Window style problem in the win32 GL canvas.
+	- In one version of csTextureTrans::compute_texture_space()
+	  there were two calls to qisqrt() (equivalent to 1/sqrt()).
+	  With gcc 2.96 on linux and optimize -O2 compile the second
+	  qisqrt() would fail unless the first one is replaced with
+	  1/qsqrt() (debug mode and -O are fine). I have no idea
+	  why this is. For now I just replaced the first qisqrt()
+	  with 1/qsqrt() but this needs further investigation.
+	- 'res' fixed OpenGL windows canvas so that it is only set
+	  topmost in FullScreen mode.
+12-Apr-2002
+	- 'res' disabled multi-texturing in OpenGL config file for the
+	  GeForce style cards.
+	- 'res' also fixed some transparency issues in OpenGL.
+	- 'res' fixed garbled metablobs in flarge basement.
 8-Apr-2002
 	- Release of CS 0.94.
 7-Apr-2002
