@@ -41,6 +41,7 @@ The history order is reversed so that new features are at the top.
 	      newlines, missing external libs and such.)
 	    - Added a new compile group 'walkall'.
 	    - Added a Jamfile for partedit.
+	- Eric Sunshine corrected `hbox' warnings reported by TeX.
 21-Jul-2003
 	- Oktal added missing doxygen comment at the top of csSymbolTable.
         - Philip Wyett removed CVS conflict data from gl_render3d.cpp.
