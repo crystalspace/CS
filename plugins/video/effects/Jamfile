@@ -1,10 +1,11 @@
 SubDir TOP plugins video effects ;
 
+Help effects : "Crystal Space Effects plug-in" ;
+
 Plugin effects
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith effects : csgeom cstool csutil ;
 
-Help effects : "Crystal Space Effects plug-in" ;
 CompileGroups effects :  drivers2d ;
 

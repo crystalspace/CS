@@ -1,10 +1,11 @@
 SubDir TOP plugins mesh thing persist standard ;
 
+Help thingldr : "Thing mesh object loader" ;
+
 Plugin thingldr
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith thingldr : csgeom csutil ;
 
-Help thingldr : "Thing mesh object loader" ;
 CompileGroups thingldr :  meshes ;
 

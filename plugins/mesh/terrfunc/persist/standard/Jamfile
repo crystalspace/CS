@@ -1,10 +1,11 @@
 SubDir TOP plugins mesh terrfunc persist standard ;
 
+Help terrfldr : "TerrFunc Terrain object loader" ;
+
 Plugin terrfldr
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith terrfldr : csgeom csutil ;
 
-Help terrfldr : "TerrFunc Terrain object loader" ;
 CompileGroups terrfldr :  meshes ;
 

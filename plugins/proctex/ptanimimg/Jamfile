@@ -1,9 +1,10 @@
 SubDir TOP plugins proctex ptanimimg ;
 
+Help ptanimimg : "Crystal Space animated image procedural texture" ;
+
 Plugin ptanimimg
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith ptanimimg : cstool csgfx csgeom csutil ;
 
-Help ptanimimg : "Crystal Space animated image procedural texture" ;
 CompileGroups ptanimimg : proctexes ;

@@ -2,6 +2,7 @@ SubDir TOP plugins sound driver coreaudio ;
 
 if $(COREAUDIO.AVAILABLE) = "yes"
 {
+Help casnddrv : "Crystal Space MacOS/X CoreAudio sound driver" ;
 
 Plugin casnddrv
 	: [ Wildcard *.cpp *.h ]
@@ -9,7 +10,6 @@ Plugin casnddrv
 LinkWith casnddrv : csutil ;
 ExternalLibs casnddrv : COREAUDIO ;
 
-Help casnddrv : "Crystal Space MacOS/X CoreAudio sound driver" ;
 CompileGroups casnddrv :  sounddrivers ;
 
 }

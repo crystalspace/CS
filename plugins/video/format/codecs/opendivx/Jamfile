@@ -2,13 +2,13 @@ SubDir TOP plugins video format codecs opendivx ;
 
 if $(DIVX.AVAILABLE) = "yes" 
 {
+Help odivx : "Crystal Space OpenDivX codec" ;
+
 Plugin odivx
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith odivx : csutil ;
 ExternalLibs odivx :  DIVX ;
-
-Help odivx : "Crystal Space OpenDivX codec" ;
 
 }
 

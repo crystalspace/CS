@@ -1,10 +1,11 @@
 SubDir TOP plugins mesh spr3d object ;
 
+Help spr3d : "3D Sprite mesh object plug-in" ;
+
 Plugin spr3d
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith spr3d : csgeom csutil cstool ;
+LinkWith spr3d : csgfx csgeom csutil cstool ;
 
-Help spr3d : "3D Sprite mesh object plug-in" ;
 CompileGroups spr3d :  meshes ;
 

@@ -1,9 +1,8 @@
 SubDir TOP plugins mesh spr3d persist binary ;
 
+Help spr3dbin : "Sprite 3D mesh object loader" ;
+
 Plugin spr3dbin
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith spr3dbin : csgeom csutil ;
-
-Help spr3dbin : "Sprite 3D mesh object loader" ;
-

@@ -2,13 +2,14 @@ SubDir TOP plugins sound driver oss ;
 
 if $(OSS.AVAILABLE) = "yes" && $(TARGET.OS) != "WIN32" 
 {
+Help ossdrv : "Crystal Space OSS sound driver" ;
+
 Plugin ossdrv
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith ossdrv : csutil ;
 ExternalLibs ossdrv :  OSS ;
 
-Help ossdrv : "Crystal Space OSS sound driver" ;
 CompileGroups ossdrv :  sounddrivers ;
 
 }

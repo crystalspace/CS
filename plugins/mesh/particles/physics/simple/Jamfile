@@ -1,10 +1,11 @@
 SubDir TOP plugins mesh particles physics simple ;
 
+Help partphys_simple : "Particle Simple Physics plug-in" ;
+
 Plugin partphys_simple
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith partphys_simple : csutil csgeom ;
 
-Help partphys_simple : "Particle Simple Physics plug-in" ;
 CompileGroups partphys_simple :  meshes ;
 

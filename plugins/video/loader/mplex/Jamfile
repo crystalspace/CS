@@ -1,10 +1,11 @@
 SubDir TOP plugins video loader mplex ;
 
+Help imgplex : "Crystal Space imgplex image I/O multiplexer" ;
+
 Plugin imgplex
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith imgplex : csgfx csutil ;
 
-Help imgplex : "Crystal Space imgplex image I/O multiplexer" ;
 CompileGroups imgplex :  imageloaders ;
 

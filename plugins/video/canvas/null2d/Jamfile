@@ -1,10 +1,11 @@
 SubDir TOP plugins video canvas null2d ;
 
+Help null2d : "Crystal Space null 2D driver" ;
+
 Plugin null2d
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith null2d : canvascommon csgeom csutil ;
 
-Help null2d : "Crystal Space null 2D driver" ;
 CompileGroups null2d :  drivers2d ;
 

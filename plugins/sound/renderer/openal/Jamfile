@@ -2,13 +2,14 @@ SubDir TOP plugins sound renderer openal ;
 
 if $(OPENAL.AVAILABLE) = "yes" 
 {
+Help sndoal : "Crystal Space OpenAL sound renderer" ;
+
 Plugin sndoal
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith sndoal : soundrendercommon csgeom csutil ;
 ExternalLibs sndoal :  OPENAL ;
 
-Help sndoal : "Crystal Space OpenAL sound renderer" ;
 CompileGroups sndoal :  sounddrivers ;
 
 }

@@ -2,11 +2,11 @@ SubDir TOP plugins physics loader ;
 
 if $(ODE.AVAILABLE) = "yes" 
 {
+Help physldr : "Crystal Space Physics Loader plug-in" ;
+
 Plugin physldr
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith physldr : csgeom csutil ;
-
-Help physldr : "Crystal Space Physics Loader plug-in" ;
 
 }

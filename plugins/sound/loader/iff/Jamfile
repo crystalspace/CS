@@ -1,10 +1,11 @@
 SubDir TOP plugins sound loader iff ;
 
+Help sndiff : "Crystal Space iff sound loader" ;
+
 Plugin sndiff
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith sndiff : soundloadercommon csutil ;
 
-Help sndiff : "Crystal Space iff sound loader" ;
 CompileGroups sndiff :  soundloaders ;
 

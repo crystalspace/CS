@@ -1,10 +1,11 @@
 SubDir TOP plugins video loader wal ;
 
+Help cswalimg : "Crystal Space wal image loader" ;
+
 Plugin cswalimg
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith cswalimg : csgfx csutil ;
 
-Help cswalimg : "Crystal Space wal image loader" ;
 CompileGroups cswalimg :  imageloaders ;
 

@@ -2,13 +2,14 @@ SubDir TOP plugins sound loader mod ;
 
 if $(MIKMOD.AVAILABLE) = "yes" 
 {
+Help sndiff : "Crystal Space iff sound loader" ;
+
 Plugin sndmod
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith sndmod : soundloadercommon csutil ;
 ExternalLibs sndmod :  MIKMOD ;
 
-Help sndmod : "Crystal Space mod MikMod sound loader" ;
 CompileGroups sndmod :  soundloaders ;
 
 }

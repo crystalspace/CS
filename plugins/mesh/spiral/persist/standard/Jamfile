@@ -1,10 +1,11 @@
 SubDir TOP plugins mesh spiral persist standard ;
 
+Help spirldr : "Spiral mesh object loader" ;
+
 Plugin spirldr
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith spirldr : csgeom csutil ;
 
-Help spirldr : "Spiral mesh object loader" ;
 CompileGroups spirldr : meshes ;
 

@@ -1,10 +1,11 @@
 SubDir TOP plugins mesh snow persist standard ;
 
+Help snowldr : "Snow mesh object loader" ;
+
 Plugin snowldr
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith snowldr : csgeom csutil ;
 
-Help snowldr : "Snow mesh object loader" ;
 CompileGroups snowldr :  meshes ;
 

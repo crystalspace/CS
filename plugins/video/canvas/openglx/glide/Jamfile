@@ -2,12 +2,12 @@ SubDir TOP plugins video canvas openglx glide ;
 
 if $TARGET_DISABLED && "" 
 {
+Help oglglide : "Crystal Space Glide GL/X 2D driver" ;
+
 Plugin oglglide
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith oglglide : csutil ;
-
-Help oglglide : "Crystal Space Glide GL/X 2D driver" ;
 
 }
 

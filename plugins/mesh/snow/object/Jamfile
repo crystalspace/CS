@@ -1,10 +1,11 @@
 SubDir TOP plugins mesh snow object ;
 
+Help snow : "Snow mesh object plug-in" ;
+
 Plugin snow
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith snow : partgen cstool csgeom csutil ;
 
-Help snow : "Snow mesh object plug-in" ;
 CompileGroups snow :  meshes ;
 

@@ -1,10 +1,11 @@
 SubDir TOP plugins mesh spiral object ;
 
+Help spiral : "Spiral mesh object plug-in" ;
+
 Plugin spiral
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith spiral : partgen cstool csgeom csutil ;
 
-Help spiral : "Spiral mesh object plug-in" ;
 CompileGroups spiral :  meshes ;
 

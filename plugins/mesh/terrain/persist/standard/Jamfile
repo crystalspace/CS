@@ -1,10 +1,11 @@
 SubDir TOP plugins mesh terrain persist standard ;
 
+Help terrainldr : "CLOD Terrain object loader" ;
+
 Plugin terrainldr
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith terrainldr : csgeom csutil ;
 
-Help terrainldr : "CLOD Terrain object loader" ;
 CompileGroups terrainldr :  meshes ;
 

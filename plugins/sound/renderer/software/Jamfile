@@ -1,10 +1,11 @@
 SubDir TOP plugins sound renderer software ;
 
+Help sndsoft : "Crystal Space software sound renderer" ;
+
 Plugin sndsoft
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith sndsoft : soundrendercommon csgeom csutil ;
 
-Help sndsoft : "Crystal Space software sound renderer" ;
 CompileGroups sndsoft :  sounddrivers ;
 

@@ -2,13 +2,14 @@ SubDir TOP plugins net driver ensocket ;
 
 if $(SOCKET.AVAILABLE) = "yes" 
 {
+Help ensocket : "Crystal Space ensocket network driver" ;
+
 Plugin ensocket
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith ensocket : csutil ;
 ExternalLibs ensocket :  SOCKET ;
 
-Help ensocket : "Crystal Space ensocket network driver" ;
 CompileGroups ensocket :  netdrivers ;
 
 }
