@@ -150,10 +150,12 @@ static void destroy_data_stream( DataStream* s )
     free(s);
     }
 
+#if defined(END_OF_STREAM_USED)
 static int end_of_stream( DataStream* s )
     {
     return (s->data >= s->data_end);
     }
+#endif
 
 static void expect_nbytes( DataStream* s, int nbytes )
     {
