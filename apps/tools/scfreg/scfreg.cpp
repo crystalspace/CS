@@ -153,7 +153,6 @@ static bool RegisterServer (char *SharedLibraryFilename, bool Register,
     if (i>0)
       configfile.DeleteAt(i, configfile.Length()-i);
     configfile += ".scf";
-    printf ("Condiffile. %s\n", (const char*) configfile);
   }
   
   csConfigFile cfg (configfile);
