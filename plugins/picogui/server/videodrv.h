@@ -36,8 +36,6 @@ class csPGVideoDriver
  private:
   static csRef<iGraphics2D> Gfx2D;
 
-
-
  protected:
   static bool Construct (iGraphics2D *);
   friend class csPicoGUIServer;

@@ -56,7 +56,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csPicoGUIServer)
 
-
 csPicoGUIServer::csPicoGUIServer (iBase *parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
@@ -66,8 +65,6 @@ csPicoGUIServer::csPicoGUIServer (iBase *parent)
 
 inline bool csPicoGUIServer::Initialize (iObjectRegistry *objreg)
 {
-  g_error e;
-
   csRef<iEventQueue> evq = CS_QUERY_REGISTRY (objreg, iEventQueue);
   if (! evq) return false;
 
@@ -83,11 +80,11 @@ inline bool csPicoGUIServer::Initialize (iObjectRegistry *objreg)
 
   if (! csPGInputDriver::Construct (evq)) return false;
 
-  //append_param_str("pgserver","themes"," ", "lucid.th");
+  //append_param_str("pgserver", "themes", " ", "lucid.th");
 
-  e = pgserver_init (PGINIT_NO_COMMANDLINE | PGINIT_NO_CONFIGFILE, 0, 0);
-  if (iserror(e)) {
-    os_show_error(e);
+  g_error e = pgserver_init (PGINIT_NO_COMMANDLINE|PGINIT_NO_CONFIGFILE, 0, 0);
+  if (iserror (e)) {
+    os_show_error (e);
     return false;
   }
 

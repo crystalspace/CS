@@ -42,47 +42,22 @@ class csHwrBitmap
 {
  private:
   csRef<iGraphics2D> g2d;
-  groprender grop;
+  struct groprender grop;
+  int shmid;
 
  public:
-  /// Construct a canvas.
-  inline csHwrBitmap (iGraphics2D *g2d0) : g2d (g2d0) {}
-
   /// Construct a bitmap.
-  //inline csHwrBitmap (iImage *image0) : image (image0) {}
+  inline csHwrBitmap (iGraphics2D *g2d0, int shmid0 = 0)
+    : g2d (g2d0), shmid (shmid0) {}
 
   /// Get the CS 2d graphics class stored in this canvas.
-  inline csRef<iGraphics2D> G2D ()
-    { return g2d; }
-
-  /// Get the CS image class stored in this bitmap,
-  /// or take a screenshot if it is a canvas.
-  inline csRef<iImage> Image ()
-    { /*return image; if (image) return image; else */return g2d->ScreenShot (); }
+  inline csRef<iGraphics2D> G2D () { return g2d; }
 
   /// Get the "grop render" structure associated with this bitmap.
-  inline groprender* Grop ()
-    { return & grop; }
+  inline groprender* Grop () { return & grop; }
 
-  /*inline void SetPixel (int x, int y, uint32 color)
-  {
-    if (image->GetFormat () == CS_IMGFMT_PALETTED8)
-    {
-      ((char*)image->GetImageData ())[x+y*image->GetWidth ()] = color;
-    } else {
-      ((uint32*)image->GetImageData ())[x+y*image->GetWidth ()] = color;
-    }
-  }
-
-  inline uint32 GetPixel (int x, int y)
-  {
-    if (image->GetFormat () == CS_IMGFMT_PALETTED8)
-    {
-      return ((char*)image->GetImageData ())[x+y*image->GetWidth ()];
-    } else {
-      return ((uint32*)image->GetImageData ())[x+y*image->GetWidth ()];
-    }
-  }*/
+  /// Get the ID for a bitmap in shared memory.
+  inline int ShmID () { return shmid; }
 };
 
 /// Cast a PicoGUI hwrbitmap (like a void*) to a csHwrBitmap pointer
