@@ -9,6 +9,9 @@ chronological order.
 12-Sep-2003
 	- Jorrit moved the progressive LOD calculation classes from sprite3d
 	  to csgeom.
+	- res changed r3dtest so the twisted torii aren't bump mapped for now.
+	  genmesh currently doesn't provide all the informations required for
+	  dot3 at the moment, causing visual glitches on some hardware.
 11-Sep-2003
 	- Jorrit cleaned up some sources in the stencil renderloop.
 	- Jorrit did the following optimizations with regards to

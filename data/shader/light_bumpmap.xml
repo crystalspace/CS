@@ -1,4 +1,4 @@
-<shader name="light">
+<shader name="light_bumpmap">
     <technique priority="350">
         <pass>
             <mixmode><srcalphaadd /></mixmode>

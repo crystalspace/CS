@@ -96,47 +96,53 @@
     <shaders>
 	<shader><file>/shader/ambient.xml</file></shader>
 	<shader><file>/shader/light_bumpmap.xml</file></shader>
+	<shader><file>/shader/light.xml</file></shader>
     </shaders>
     <materials>
       <material name="CRETE3_CEIL02A">
         <texture>CRETE3_CEIL02A</texture>
         <shaderparam name="tex normal" type="texture">CRETE3_CEIL02A_NORM</shaderparam>
         <shader type="ambient">ambient</shader>
-        <shader type="diffuse">light</shader>
+        <shader type="diffuse">light_bumpmap</shader>
       </material>
       <material name="CRETE2_FLR01">
         <texture>CRETE2_FLR01</texture>
         <shaderparam name="tex normal" type="texture">CRETE2_FLR01_NORM</shaderparam>
         <shader type="ambient">ambient</shader>
-        <shader type="diffuse">light</shader>
+        <shader type="diffuse">light_bumpmap</shader>
       </material>
       <material name="C2A1_W1">
         <texture>C2A1_W1</texture>
         <shaderparam name="tex normal" type="texture">C2A1_W1_NORM</shaderparam>
         <shader type="ambient">ambient</shader>
-        <shader type="diffuse">light</shader>
+        <shader type="diffuse">light_bumpmap</shader>
       </material>
       <material name="CRATE02B">
         <texture>CRATE02B</texture>
         <shaderparam name="tex normal" type="texture">CRATE02B_NORM</shaderparam>
         <shader type="ambient">ambient</shader>
-        <shader type="diffuse">light</shader>
+        <shader type="diffuse">light_bumpmap</shader>
       </material>
       <material name="CRATE02">
         <texture>CRATE02</texture>
         <shaderparam name="tex normal" type="texture">CRATE02_NORM</shaderparam>
         <shader type="ambient">ambient</shader>
-        <shader type="diffuse">light</shader>
+        <shader type="diffuse">light_bumpmap</shader>
       </material>
       <material name="{GRATE2A">
         <texture>{GRATE2A</texture>
         <shaderparam name="tex normal" type="texture">{GRATE2A_NORM</shaderparam>
         <shader type="ambient">ambient</shader>
-        <shader type="diffuse">light</shader>
+        <shader type="diffuse">light_bumpmap</shader>
       </material>
       <material name="C2A2_SATORB">
         <texture>C2A2_SATORB</texture>
         <shaderparam name="tex normal" type="texture">C2A2_SATORB_NORM</shaderparam>
+        <shader type="ambient">ambient</shader>
+        <shader type="diffuse">light_bumpmap</shader>
+      </material>
+      <material name="Torus">
+        <texture>C2A1_W1</texture>
         <shader type="ambient">ambient</shader>
         <shader type="diffuse">light</shader>
       </material>
@@ -981,7 +987,7 @@
 		<plugin>genmesh</plugin>
 		<params>
 		  <factory>Torus01FACT</factory>
-		  <material>C2A1_W1</material>
+		  <material>Torus</material>
 		</params>
 		<priority>object</priority>
 		<move> <v x="0" y="-12" z="-4" /> </move>
@@ -990,7 +996,7 @@
 		<plugin>genmesh</plugin>
 		<params>
 		  <factory>Torus01FACT</factory>
-		  <material>C2A1_W1</material>
+		  <material>Torus</material>
 		</params>
 		<priority>object</priority>
 		<move> <v x="1" y="-13" z="-4" /> </move>
@@ -999,7 +1005,7 @@
 		<plugin>genmesh</plugin>
 		<params>
 		  <factory>Torus01FACT</factory>
-		  <material>C2A1_W1</material>
+		  <material>Torus</material>
 		</params>
 		<priority>object</priority>
 		<move> <v x="-1" y="-11" z="-3" /> </move>
