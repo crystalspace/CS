@@ -45,7 +45,7 @@ struct iGraphics3D;
  * A sector is a convex hull of polygons. It is
  * one of the base classes for the portal engine.
  */
-class csSector : public csPolygonSet, public iSector
+class csSector : public csPolygonSet
 {
   friend class Dumper;
 
@@ -240,13 +240,15 @@ public:
   /**
    * Get ambient color valid in this sector.
    */
-  void GetAmbientColor (int& r, int& g, int& b) { r = level_r; g = level_g; b = level_b; }
+  void GetAmbientColor (int& r, int& g, int& b)
+  { r = level_r; g = level_g; b = level_b; }
 
   /**
    * Set the ambient color for this sector. This is only useful
    * before lighting is calculated.
    */
-  void SetAmbientColor (int r, int g, int b) { level_r = r; level_g = g; level_b = b; }
+  void SetAmbientColor (int r, int g, int b)
+  { level_r = r; level_g = g; level_b = b; }
 
   /**
    * Follow a beam from start to end and return the first polygon that
@@ -306,7 +308,8 @@ public:
    * Note. This function correctly accounts for portal polygons
    * and could thus return a polygon not belonging to this sector.
    */
-  csPolygon3D* IntersectSphere (csVector3& center, float radius, float* pr = NULL);
+  csPolygon3D* IntersectSphere (csVector3& center, float radius,
+                               float* pr = NULL);
 
   /**
    * Follow a segment starting at this sector. If the segment intersects
@@ -360,8 +363,11 @@ public:
 
   CSOBJTYPE;
 
-  //------------------------- iSector interface --------------------------------
-  DECLARE_IBASE;
+  //------------------------- iSector interface -------------------------------
+  struct SectorInterface : public iSector
+  {
+    DECLARE_EMBEDDED_IBASE (csSector);
+  } scfiSector;
 };
 
 #endif /*SECTOR_H*/
