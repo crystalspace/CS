@@ -81,11 +81,14 @@ public:
    *  pointed to by \p isValid will be set to false. The parameter can be 0,
    *  but in this case the information whether the decoded char is the 
    *  replacement character because the source data is errorneous is lost.
+   * \param returnNonChar Whether decoded non-character or high and low 
+   *  surrogates are returned as such. Normally, those code points are replaced
+   *  with #CS_UC_CHAR_REPLACER to signal an invalid encoded code point.
    * \return The number of characters in str that have to be skipped to 
    *  retrieve the next encoding character.
    */
   inline static int UTF8Decode (const utf8_char* str, size_t strlen, 
-    utf32_char& ch, bool* isValid = 0)
+    utf32_char& ch, bool* isValid = 0, bool returnNonChar = false)
   {
     if (str == 0)
     {
@@ -130,6 +133,12 @@ public:
 	}
       }
       
+      // Check if in Unicode range.
+      if (ch > CS_UC_LAST_CHAR)
+      {
+        FAIL(chUsed);
+      }
+
       // Check for "overlong" codes.
       if ((ch < 0x80) && (n > 0))
       {
@@ -147,6 +156,7 @@ public:
       {
         FAIL(chUsed);
       }
+      /* 
       else if ((ch < 0x4000000) && (n > 5))
       {
         FAIL(chUsed);
@@ -155,8 +165,10 @@ public:
       {
         FAIL(chUsed);
       }
+      */
       
-      if (CS_UC_IS_INVALID(ch) || CS_UC_IS_SURROGATE(ch))
+      if (!returnNonChar && (CS_UC_IS_NONCHARACTER(ch) 
+	|| CS_UC_IS_SURROGATE(ch)))
 	FAIL(chUsed);
       SUCCEED;
     }
@@ -164,10 +176,10 @@ public:
   
   /**
    * Decode an Unicode character encoded in UTF-16.
-   * \copydoc UTF8Decode(const utf8_char*,size_t,utf32_char&,bool*)
+   * \copydoc UTF8Decode(const utf8_char*,size_t,utf32_char&,bool*,bool)
    */
   inline static int UTF16Decode (const utf16_char* str, size_t strlen, 
-    utf32_char& ch, bool* isValid = 0)
+    utf32_char& ch, bool* isValid = 0, bool returnNonChar = false)
   {
     if (str == 0)
     {
@@ -185,7 +197,7 @@ public:
       {
 	FAIL(chUsed);
       }
-      ch = (curCh & 0x03ff) << 10;
+      ch = 0x10000 + ((curCh & 0x03ff) << 10);
       GET_NEXT(curCh);
       // Invalid code
       if (!CS_UC_IS_LOW_SURROGATE (curCh))
@@ -194,25 +206,23 @@ public:
 	FAIL(1);
       }
       ch |= (curCh & 0x3ff);
-      // Check for "overlong" codes
-      if ((ch == 0) || (ch < 0x10000))
-	FAIL(chUsed);
     }
     else
     {
       ch = curCh;
     }
-    if (CS_UC_IS_INVALID(ch))
+    if (!returnNonChar && (CS_UC_IS_NONCHARACTER(ch) 
+      || CS_UC_IS_SURROGATE(ch)))
       FAIL(chUsed);
     SUCCEED;
   }
   
   /**
    * Decode an Unicode character encoded in UTF-32.
-   * \copydoc UTF8Decode(const utf8_char*,size_t,utf32_char&,bool*)
+   * \copydoc UTF8Decode(const utf8_char*,size_t,utf32_char&,bool*,bool)
    */
   inline static int UTF32Decode (const utf32_char* str, size_t strlen, 
-    utf32_char& ch, bool* isValid = 0)
+    utf32_char& ch, bool* isValid = 0, bool returnNonChar = false)
   {
     if (str == 0)
     {
@@ -221,15 +231,47 @@ public:
     int chUsed = 0;
     
     GET_NEXT(ch);
-    if (CS_UC_IS_INVALID(ch))
+    if ((!returnNonChar && (CS_UC_IS_NONCHARACTER(ch) 
+      || CS_UC_IS_SURROGATE(ch))) || (ch > CS_UC_LAST_CHAR))
       FAIL(chUsed);
     SUCCEED;
   }
+
+  /**
+   * Decode an Unicode character encoded in UTF-8.
+   * \copydoc UTF8Decode(const utf8_char*,size_t,utf32_char&,bool*,bool)
+   */
+  inline static int Decode (const utf8_char* str, size_t strlen, 
+    utf32_char& ch, bool* isValid = 0, bool returnNonChar = false)
+  {
+    return UTF8Decode (str, strlen, ch, isValid, returnNonChar);
+  }
+  /**
+   * Decode an Unicode character encoded in UTF-16.
+   * \copydoc UTF8Decode(const utf8_char*,size_t,utf32_char&,bool*,bool)
+   */
+  inline static int Decode (const utf16_char* str, size_t strlen, 
+    utf32_char& ch, bool* isValid = 0, bool returnNonChar = false)
+  {
+    return UTF16Decode (str, strlen, ch, isValid, returnNonChar);
+  }
+  /**
+   * Decode an Unicode character encoded in UTF-32.
+   * \copydoc UTF8Decode(const utf8_char*,size_t,utf32_char&,bool*,bool)
+   */
+  inline static int Decode (const utf32_char* str, size_t strlen, 
+    utf32_char& ch, bool* isValid = 0, bool returnNonChar = false)
+  {
+    return UTF32Decode (str, strlen, ch, isValid, returnNonChar);
+  }
+
   /** @} */
 #undef FAIL
 #undef SUCCEED
 #undef GET_NEXT
 
+  /**\name UTF Encoders
+   * @{ */
 #define _OUTPUT_CHAR(buf, chr)				\
   if (bufRemaining > 0)					\
   {							\
@@ -240,22 +282,24 @@ public:
 
 #define OUTPUT_CHAR(chr) _OUTPUT_CHAR(buf, chr)
   
-  /**\name UTF Encoders
-   * @{ */
   /**
    * Encode an Unicode character to UTF-8.
    * \param ch Character to encode.
    * \param buf Pointer to the buffer receiving the encoded character.
    * \param bufsize Number of chars in the buffer.
+   * \param allowNonchars Whether non-character or high and low surrogates
+   *  are encoded. Normally, those code points are rejected to prevent the
+   *  generation of invalid encoded strings.
    * \return The number of characters needed to encode \p ch.
    * \remark The buffer will be filled up as much as possible.
    *  Check the returned value whether the encoded character fit into the
    *  buffer.
    */
   inline static int EncodeUTF8 (const utf32_char ch, utf8_char* buf, 
-    size_t bufsize)
+    size_t bufsize, bool allowNonchars = false)
   {
-    if ((CS_UC_IS_INVALID(ch)) || (CS_UC_IS_SURROGATE(ch))) 
+    if ((!allowNonchars && ((CS_UC_IS_NONCHARACTER(ch)) 
+      || (CS_UC_IS_SURROGATE(ch)))) || (ch > CS_UC_LAST_CHAR))
       return 0;
     size_t bufRemaining = bufsize;
     int encodedLen = 0;
@@ -282,6 +326,7 @@ public:
       OUTPUT_CHAR ((utf8_char)(0x80 | ((ch >> 6) & 0x3f)));
       OUTPUT_CHAR ((utf8_char)(0x80 | (ch & 0x3f)));
     }
+    /*
     else if (ch < 0x4000000)
     {
       OUTPUT_CHAR ((utf8_char)(0xf8 | (ch >> 24)));
@@ -299,17 +344,19 @@ public:
       OUTPUT_CHAR ((utf8_char)(0x80 | ((ch >> 6) & 0x3f)));
       OUTPUT_CHAR ((utf8_char)(0x80 | (ch & 0x3f)));
     }
+    */
     return encodedLen;
   }
     
   /**
    * Encode an Unicode character to UTF-16.
-   * \copydoc EncodeUTF8(const utf32_char,utf8_char*,size_t)
+   * \copydoc EncodeUTF8(const utf32_char,utf8_char*,size_t,bool)
    */
   inline static int EncodeUTF16 (const utf32_char ch, utf16_char* buf, 
-    size_t bufsize)
+    size_t bufsize, bool allowNonchars = false)
   {
-    if ((CS_UC_IS_INVALID(ch)) || (CS_UC_IS_SURROGATE(ch))) 
+    if ((!allowNonchars && ((CS_UC_IS_NONCHARACTER(ch)) 
+      || (CS_UC_IS_SURROGATE(ch)))) || (ch > CS_UC_LAST_CHAR))
       return 0;
     size_t bufRemaining = bufsize;
     int encodedLen = 0;
@@ -320,8 +367,11 @@ public:
     }
     else if (ch < 0x100000)
     {
-      OUTPUT_CHAR((utf16_char)((ch >> 10) | CS_UC_CHAR_HIGH_SURROGATE_FIRST));
-      OUTPUT_CHAR((utf16_char)((ch & 0x3ff) | CS_UC_CHAR_LOW_SURROGATE_FIRST));
+      utf32_char ch_shifted = ch - 0x10000;
+      OUTPUT_CHAR((utf16_char)((ch_shifted >> 10) 
+	| CS_UC_CHAR_HIGH_SURROGATE_FIRST));
+      OUTPUT_CHAR((utf16_char)((ch_shifted & 0x3ff) 
+	| CS_UC_CHAR_LOW_SURROGATE_FIRST));
     }
     else
       return 0;
@@ -331,12 +381,13 @@ public:
 
   /**
    * Encode an Unicode character to UTF-32.
-   * \copydoc EncodeUTF8(const utf32_char,utf8_char*,size_t)
+   * \copydoc EncodeUTF8(const utf32_char,utf8_char*,size_t,bool)
    */
   inline static int EncodeUTF32 (const utf32_char ch, utf32_char* buf, 
-    size_t bufsize)
+    size_t bufsize, bool allowNonchars = false)
   {
-    if ((CS_UC_IS_INVALID(ch)) || (CS_UC_IS_SURROGATE(ch))) 
+    if ((!allowNonchars && ((CS_UC_IS_NONCHARACTER(ch)) 
+      || (CS_UC_IS_SURROGATE(ch)))) || (ch > CS_UC_LAST_CHAR))
       return 0;
     size_t bufRemaining = bufsize;
     int encodedLen = 0;
@@ -345,9 +396,39 @@ public:
     
     return encodedLen;
   }
+
+  /**
+   * Encode an Unicode character to UTF-8.
+   * \copydoc EncodeUTF8(const utf32_char,utf8_char*,size_t,bool)
+   */
+  inline static int Encode (const utf32_char ch, utf8_char* buf, 
+    size_t bufsize, bool allowNonchars = false)
+  {
+    return EncodeUTF8 (ch, buf, bufsize, allowNonchars);
+  }
+  /**
+   * Encode an Unicode character to UTF-16.
+   * \copydoc EncodeUTF8(const utf32_char,utf8_char*,size_t,bool)
+   */
+  inline static int Encode (const utf32_char ch, utf16_char* buf, 
+    size_t bufsize, bool allowNonchars = false)
+  {
+    return EncodeUTF16 (ch, buf, bufsize, allowNonchars);
+  }
+  /**
+   * Encode an Unicode character to UTF-32.
+   * \copydoc EncodeUTF8(const utf32_char,utf8_char*,size_t,bool)
+   */
+  inline static int Encode (const utf32_char ch, utf32_char* buf, 
+    size_t bufsize, bool allowNonchars = false)
+  {
+    return EncodeUTF32 (ch, buf, bufsize, allowNonchars);
+  }
   /** @} */
 #undef OUTPUT_CHAR
   
+  /**\name Converters between strings in different UTF encodings
+   * @{ */
 #define OUTPUT_CHAR(chr) _OUTPUT_CHAR(dest, chr)
   
 #define UCTF_CONVERTER(funcName, fromType, decoder, toType, encoder)	\
@@ -401,8 +482,6 @@ public:
     return encodedLen + 1;						\
   }
 
-  /**\name Converters between strings in different UTF encodings
-   * @{ */
   /**
    * Convert UTF-8 to UTF-16.
    * \param dest Destination buffer.
@@ -514,6 +593,17 @@ public:
   {
     return UTF8to32 (dest, destSize, source, srcSize);
   };
+
+  inline static int Decode (const wchar_t* str, size_t strlen, 
+    utf32_char& ch, bool* isValid = 0, bool returnNonChar = false)
+  {
+    return UTF8Decode ((utf8_char*)str, strlen, ch, isValid, returnNonChar);
+  }
+  inline static int Encode (const utf32_char ch, wchar_t* buf, 
+    size_t bufsize, bool allowNonchars = false)
+  {
+    return EncodeUTF8 (ch, (utf8_char*)buf, bufsize, allowNonchars);
+  }
 #elif (CS_WCHAR_T_SIZE == 2)
   // Methods below for doxygen documentation are here as the size '2' is 
   // default.
@@ -605,6 +695,29 @@ public:
   {
     return UTF16to32 (dest, destSize, (utf16_char*)source, srcSize);
   };
+
+#if !defined(CS_COMPILER_MSVC) || (_MSC_VER >= 1300)
+  /* @@@ For VC6, utf16_char == wchar_t, complains below. (Can be avoided on 
+   * VC7 with  "Builtin wchar_t") */
+  /**
+   * Decode an Unicode character encoded from wchar_t.
+   * \copydoc UTF8Decode(const utf8_char*,size_t,utf32_char&,bool*,bool)
+   */
+  inline static int Decode (const wchar_t* str, size_t strlen, 
+    utf32_char& ch, bool* isValid = 0, bool returnNonChar = false)
+  {
+    return UTF16Decode ((utf16_char*)str, strlen, ch, isValid, returnNonChar);
+  }
+  /**
+   * Encode an Unicode character to wchar_t.
+   * \copydoc EncodeUTF8(const utf32_char,utf8_char*,size_t,bool)
+   */
+  inline static int Encode (const utf32_char ch, wchar_t* buf, 
+    size_t bufsize, bool allowNonchars = false)
+  {
+    return EncodeUTF16 (ch, (utf16_char*)buf, bufsize, allowNonchars);
+  }
+#endif
   /** @} */
 #elif (CS_WCHAR_T_SIZE == 4)
   inline static size_t UTF8toWC (wchar_t* dest, size_t destSize, 
@@ -668,6 +781,17 @@ public:
     }
     return srcChars + 1;
   };
+
+  inline static int Decode (const wchar_t* str, size_t strlen, 
+    utf32_char& ch, bool* isValid = 0, bool returnNonChar = false)
+  {
+    return UTF32Decode ((utf32_char*)str, strlen, ch, isValid, returnNonChar);
+  }
+  inline static int Encode (const utf32_char ch, wchar_t* buf, 
+    size_t bufsize, bool allowNonchars = false)
+  {
+    return EncodeUTF32 (ch, (utf32_char*)buf, bufsize, allowNonchars);
+  }
 #else
   #error Odd-sized, unsupported wchar_t!
 #endif

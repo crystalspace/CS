@@ -39,7 +39,7 @@ class CS_CSUTIL_EXPORT csObject : public iObject
 protected:
   friend class csObjectIterator;
   /// Each object has a unique ID associated with it
-  CS_ID csid;
+  uint csid;
 
   /// The array of child nodes
   csObjectContainer *Children;
@@ -76,7 +76,7 @@ public:
   virtual const char *GetName () const;
 
   /// Get the unique ID associated with this object
-  virtual CS_ID GetID () const;
+  virtual uint GetID () const;
 
   /// Set the parent csObject.
   virtual void SetObjectParent (iObject *);

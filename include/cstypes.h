@@ -118,6 +118,11 @@ typedef int64_t int64;
 
 #endif // CS_HAS_INT64_C
 
+/** @} */
+
+/**\name Other types
+ * @{ */
+
 // Provide intptr_t and uintptr_t. If the configure script determined that
 // these types exist in the standard headers, then just employ those types.
 // For MSVC, where the configure script is not used, check <stddef.h>, which is
@@ -127,18 +132,51 @@ typedef int64_t int64;
 // all else fails, then we fake up these types on our own.
 #include <stddef.h>
 #if !defined(CS_HAS_INTPTR_T) && !defined(_INTPTR_T_DEFINED)
-/// Integer as wide as a pointer
+/// Integer at least as wide as a pointer
 typedef int intptr_t;
-/// Unsigned integer as wide as a pointer
+/// Unsigned integer at least as wide as a pointer
 typedef unsigned int uintptr_t;
+/// Difference of 2 pointers
+typedef int ptrdiff_t;
 #define _INTPTR_T_DEFINED
 #define _UINTPTR_T_DEFINED
+#define _PTRDIFF_T_DEFINED
 #endif
 
-/** @} */
+#if !defined(CS_HAS_INTMAX_T)
+/// Greatest-width integer
+typedef int64 intmax_t;
+/// Greatest-width unsigned integer
+typedef uint64 uintmax_t;
+#endif
 
-/// Used for uniquely generated id numbers XXX: remove this sometime
-typedef uint32 CS_ID;
+
+#if defined(CS_COMPILER_GCC)
+#ifndef __STRICT_ANSI__
+/**
+ * Type to pass to cs_snprintf() as an argument to the "%lld" format specifier.
+ */
+typedef long long longlong;
+/**
+ * Type to pass to cs_snprintf() as an argument to the "%llu" format specifier.
+ */
+typedef unsigned long long ulonglong;
+#else
+// @@@ Correct?
+typedef int64 longlong;
+typedef uint64 ulonglong;
+#endif
+#elif defined(CS_COMPILER_MSVC) || defined(CS_COMPILER_BCC)
+typedef int64 longlong;
+typedef uint64 ulonglong;
+#else
+#ifdef CS_HAS_STDINT_H
+typedef int_least64_t longlong;
+typedef uint_least64_t ulonglong;
+#else 
+#warning Do not know how to declare (u)longlong types
+#endif 
+#endif 
 
 /**
  * A time value measured in milliseconds (1/1000 of a second).  Ticks do not
@@ -148,9 +186,7 @@ typedef uint32 CS_ID;
  */
 typedef unsigned int csTicks;
 
-/**\name Shortcuts for normal C types
- * @{ */
-/// Default unsigned int.
+/// Shortcut for default unsigned int.
 typedef unsigned int uint;
 /** @} */
 

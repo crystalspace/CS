@@ -54,16 +54,22 @@ typedef uint32 utf32_char;
 #define CS_UC_CHAR_REPLACER		0xFFFD
 /// Invalid char
 #define CS_UC_INVALID			0xFFFF
+/// Byte-order mark
+#define CS_UC_BOM			0xFFFE
+/// Highest valid Unicode codepoint
+#define CS_UC_LAST_CHAR			0x10FFFF
 
 /// Check whether a code is in the "high" or "low surrogate" range.
-#define CS_UC_IS_SURROGATE(C)		((C & 0xFFFFF800) == 0x0000D800)
+#define CS_UC_IS_SURROGATE(C)		(((C) & 0xFFFFF800) == 0x0000D800)
 /// Check whether a code is in the "high surrogate" range.
-#define CS_UC_IS_HIGH_SURROGATE(C)	((C & 0xFFFFFC00) == 0x0000DC00)
+#define CS_UC_IS_HIGH_SURROGATE(C)	(((C) & 0xFFFFFC00) == 0x0000DC00)
 /// Check whether a code is in the "low surrogate" range.
-#define CS_UC_IS_LOW_SURROGATE(C)	((C & 0xFFFFFC00) == 0x0000D800)
+#define CS_UC_IS_LOW_SURROGATE(C)	(((C) & 0xFFFFFC00) == 0x0000D800)
 
-/// Test whether a character code is invalid.
-#define CS_UC_IS_INVALID(C)		((C == CS_UC_INVALID) || (C == 0))
+/// Test whether a code point is a Unicode noncharacter
+#define CS_UC_IS_NONCHARACTER(C)	(((C) == CS_UC_INVALID) || ((C) == CS_UC_BOM) \
+					 || (((C) >= 0xFDD0) && ((C) <= 0xFDEF))      \
+					 || ((C) > CS_UC_LAST_CHAR))
 
 /// First char in the "high surrogate" range.
 #define CS_UC_CHAR_HIGH_SURROGATE_FIRST		0xD800

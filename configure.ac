@@ -1964,11 +1964,19 @@ AC_CHECK_HEADERS([stdint.h],
 
 
 #------------------------------------------------------------------------------
-# Check if intptr_t and uintptr_t are available.
+# Check if intptr_t, uintptr_t, intmax_t and uintmax_t are available.
 #------------------------------------------------------------------------------
 AC_CHECK_HEADERS([stdint.h])
 AC_CHECK_HEADERS([inttypes.h], [CS_HEADER_PROPERTY([CS_HAS_INTTYPES_H])])
 AC_CHECK_TYPE([intptr_t], [CS_HEADER_PROPERTY([CS_HAS_INTPTR_T])], [],
+    [[#include <stddef.h>
+    #ifdef HAVE_INTTYPES_H
+    #include <inttypes.h>
+    #endif
+    #ifdef HAVE_STDINT_H
+    #include <stdint.h>
+    #endif]])
+AC_CHECK_TYPE([intmax_t], [CS_HEADER_PROPERTY([CS_HAS_INTMAX_T])], [],
     [[#include <stddef.h>
     #ifdef HAVE_INTTYPES_H
     #include <inttypes.h>

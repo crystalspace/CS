@@ -183,4 +183,4 @@ enum cswinWindowsVersion
  */
 extern CS_CSUTIL_EXPORT bool cswinIsWinNT (cswinWindowsVersion* version = 0);
 
-#endif
+#endif // __CS_CSSYS_WIN32_WINTOOLS_H__

@@ -95,7 +95,7 @@ SCF_IMPLEMENT_IBASE_END
 
 void csObject::InitializeObject ()
 {
-  static CS_ID id = 0;
+  static uint id = 0;
   csid = id++;
   ParentObject = 0;
   DG_ADDI (this, 0);
@@ -162,7 +162,7 @@ const char *csObject::GetName () const
   return Name;
 }
 
-CS_ID csObject::GetID () const
+uint csObject::GetID () const
 {
   return csid;
 }

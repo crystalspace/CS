@@ -85,7 +85,7 @@ struct iObject : public iBase
   virtual const char *GetName () const = 0;
 
   /// Get the unique ID associated with this object.
-  virtual CS_ID GetID () const = 0;
+  virtual uint GetID () const = 0;
 
   /**
    * Set the parent iObject. Note that this only sets the 'parent' pointer but

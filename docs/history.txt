@@ -9,6 +9,25 @@ chronological order.
 5-Mar-2005
 	- res added some terrain-related interfaces to cspace.i.
 	- res made more -ansi -pedantic compile fixes on Win32. 
+	- res made the following changes:
+	    - Removed some ancient, now unused files from data/effectsys.
+	    - Removed CS_ID type.
+	    - Added cs_asprintf() and cs_vasprintf() functions.
+	    - Applied patch #1157081, "Fix DirectX support under Cygwin", from
+	      Michael D. Adams <mdmkolbe@users.sf.net>.
+	    - Fixed totally wrong surrogate handling in csUnicodeTransform.
+	      Also, code points outside the Unicode range (0-0x10ffff) now
+	      won't be encoded or decoded.
+	    - Made some doc changes to cstool/tokenlist.h.
+	    - Added an implementation of cs_snprintf() from scratch. It accepts
+	      the same format specifiers as glibc. This allows a consistent
+	      format syntax across platforms (for e.g. 64 bit numbers) and
+	      alleviates us from worries about license compatibility issues.
+	      The old cs_snprintf() can be re-enabled by removing NEW_SNPRINTF
+	      from the top of snprintf.cpp.
+	    - Added ptrdiff_t, (u)intmax_t and (u)longlong types to cstypes.h,
+	      used by the new cs_snprintf(). ((u)longlong is intended as a
+	      size-agnostic type for %lld(%llu) formats.)
 4-Mar-2005
 	- Eric Sunshine applied patch from <obi666@users.sourceforge.net>
 	  (patch #1155282), which adds iAnimTimeUpdateHandler for

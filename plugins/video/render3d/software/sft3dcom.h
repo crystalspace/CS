@@ -1009,13 +1009,6 @@ public:
   // last case they will be removed as soon as we permanently switch
   // to the new renderer. @@@NR@@@
   //=========================================================================
-  //virtual void DrawPolygon (G3DPolygonDP&) { CS_ASSERT (false); }
-  virtual void DrawPolygonDebug (G3DPolygonDP&) { CS_ASSERT (false); }
-  virtual void DrawTriangleMesh (G3DTriangleMesh&) { CS_ASSERT (false); }
-  virtual void DrawPolygonMesh (G3DPolygonMesh&) { CS_ASSERT (false); }
-  virtual void OpenFogObject (CS_ID, csFog*) { CS_ASSERT (false); }
-  virtual void DrawFogPolygon (CS_ID, G3DPolygonDFP&,int) { CS_ASSERT (false); }
-  virtual void CloseFogObject (CS_ID) { CS_ASSERT (false); }
   virtual iHalo *CreateHalo (float, float, float,
     unsigned char *, int, int) { return 0; }
   virtual bool IsLightmapOK (int, int, int) { return true; }

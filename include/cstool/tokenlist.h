@@ -32,20 +32,20 @@
  * external file, with each token the argument to a '#CS_TOKEN_LIST_TOKEN()'
  * invocation. The name of the file (full path!) has to be put in a macro named
  * CS_TOKEN_ITEM_FILE.  Optionally, the name of the function to initialize the
- * token table can be set via CS_INIT_TOKEN_TABLE_NAME; the default is
+ * token table can be set via #CS_INIT_TOKEN_TABLE_NAME; the default is
  * 'InitTokenTable'.  In addition to invoking the initialization function to
  * populate the string hash, an enumeration is also created. Elements of the
  * enumeration are named XMLTOKEN_FOO (where 'FOO' represents the argument to
  * #CS_TOKEN_LIST_TOKEN()). If you prefer a prefix other than 'XMLTOKEN_',
- * define CS_TOKEN_LIST_TOKEN_PREFIX with the prefix of your choice.  As a
+ * define #CS_TOKEN_LIST_TOKEN_PREFIX with the prefix of your choice.  As a
  * convenience, in addition to entries for each #CS_TOKEN_LIST_TOKEN
  * invocation, a final item is added to the enumeration with the name provided
- * by CS_TOKEN_LIST_TOKEN_LAST. If you do not \#define this macro, then the
+ * by #CS_TOKEN_LIST_TOKEN_LAST. If you do not \#define this macro, then the
  * name XMLTOKEN_TOKEN_COUNT is given to the last item in the enumeration.
  * This value will equate to the count of items in the enumeration (not
  * including this automatically added item).  Note that the client defines
- * CS_TOKEN_ITEM_FILE, CS_INIT_TOKEN_TABLE_NAME, CS_TOKEN_LIST_TOKEN_PREFIX,
- * and CS_TOKEN_LIST_TOKEN_LAST, and they will not be undefined by this file;
+ * CS_TOKEN_ITEM_FILE, #CS_INIT_TOKEN_TABLE_NAME, #CS_TOKEN_LIST_TOKEN_PREFIX,
+ * and #CS_TOKEN_LIST_TOKEN_LAST, and they will not be undefined by this file;
  * hence, if you want to build multiple token lists, you may redefine those
  * macros and include <cstool/tokenlist.h> again.
  *
@@ -104,6 +104,10 @@
 
 #ifndef CS_TOKEN_LIST_TOKEN_LAST
 #define CS_TOKEN_LIST_TOKEN_LAST_DEFAULT
+/**\def CS_TOKEN_LIST_TOKEN_LAST
+ * Name for the "token count" enumeration value. Can be overridden by the user
+ * by defining it prior to CS_TOKEN_LIST_TOKEN use.
+ */
 #define CS_TOKEN_LIST_TOKEN_LAST TOKEN_COUNT
 #endif
 
