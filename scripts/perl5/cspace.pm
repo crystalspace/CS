@@ -9857,7 +9857,8 @@ package cspace::iGraphics3D;
 *CreateRenderBuffer = *cspacec::iGraphics3D_CreateRenderBuffer;
 *CreateIndexRenderBuffer = *cspacec::iGraphics3D_CreateIndexRenderBuffer;
 *CreateInterleavedRenderBuffers = *cspacec::iGraphics3D_CreateInterleavedRenderBuffers;
-*SetBufferState = *cspacec::iGraphics3D_SetBufferState;
+*ActivateBuffers = *cspacec::iGraphics3D_ActivateBuffers;
+*DeactivateBuffers = *cspacec::iGraphics3D_DeactivateBuffers;
 *SetTextureState = *cspacec::iGraphics3D_SetTextureState;
 *DrawMesh = *cspacec::iGraphics3D_DrawMesh;
 *SetWriteMask = *cspacec::iGraphics3D_SetWriteMask;
@@ -12884,26 +12885,10 @@ sub CS_ZBUF_EQUAL () { $cspacec::CS_ZBUF_EQUAL }
 sub CS_ZBUF_INVERT () { $cspacec::CS_ZBUF_INVERT }
 sub CS_ZBUF_MESH () { $cspacec::CS_ZBUF_MESH }
 sub CS_ZBUF_MESH2 () { $cspacec::CS_ZBUF_MESH2 }
-sub CS_VATTRIB_GENERIC_FIRST () { $cspacec::CS_VATTRIB_GENERIC_FIRST }
-sub CS_VATTRIB_GENERIC_LAST () { $cspacec::CS_VATTRIB_GENERIC_LAST }
 sub CS_VATTRIB_SPECIFIC_FIRST () { $cspacec::CS_VATTRIB_SPECIFIC_FIRST }
 sub CS_VATTRIB_SPECIFIC_LAST () { $cspacec::CS_VATTRIB_SPECIFIC_LAST }
-sub CS_VATTRIB_0 () { $cspacec::CS_VATTRIB_0 }
-sub CS_VATTRIB_1 () { $cspacec::CS_VATTRIB_1 }
-sub CS_VATTRIB_2 () { $cspacec::CS_VATTRIB_2 }
-sub CS_VATTRIB_3 () { $cspacec::CS_VATTRIB_3 }
-sub CS_VATTRIB_4 () { $cspacec::CS_VATTRIB_4 }
-sub CS_VATTRIB_5 () { $cspacec::CS_VATTRIB_5 }
-sub CS_VATTRIB_6 () { $cspacec::CS_VATTRIB_6 }
-sub CS_VATTRIB_7 () { $cspacec::CS_VATTRIB_7 }
-sub CS_VATTRIB_8 () { $cspacec::CS_VATTRIB_8 }
-sub CS_VATTRIB_9 () { $cspacec::CS_VATTRIB_9 }
-sub CS_VATTRIB_10 () { $cspacec::CS_VATTRIB_10 }
-sub CS_VATTRIB_11 () { $cspacec::CS_VATTRIB_11 }
-sub CS_VATTRIB_12 () { $cspacec::CS_VATTRIB_12 }
-sub CS_VATTRIB_13 () { $cspacec::CS_VATTRIB_13 }
-sub CS_VATTRIB_14 () { $cspacec::CS_VATTRIB_14 }
-sub CS_VATTRIB_15 () { $cspacec::CS_VATTRIB_15 }
+sub CS_VATTRIB_GENERIC_FIRST () { $cspacec::CS_VATTRIB_GENERIC_FIRST }
+sub CS_VATTRIB_GENERIC_LAST () { $cspacec::CS_VATTRIB_GENERIC_LAST }
 sub CS_VATTRIB_POSITION () { $cspacec::CS_VATTRIB_POSITION }
 sub CS_VATTRIB_WEIGHT () { $cspacec::CS_VATTRIB_WEIGHT }
 sub CS_VATTRIB_NORMAL () { $cspacec::CS_VATTRIB_NORMAL }
@@ -12920,6 +12905,22 @@ sub CS_VATTRIB_TEXCOORD4 () { $cspacec::CS_VATTRIB_TEXCOORD4 }
 sub CS_VATTRIB_TEXCOORD5 () { $cspacec::CS_VATTRIB_TEXCOORD5 }
 sub CS_VATTRIB_TEXCOORD6 () { $cspacec::CS_VATTRIB_TEXCOORD6 }
 sub CS_VATTRIB_TEXCOORD7 () { $cspacec::CS_VATTRIB_TEXCOORD7 }
+sub CS_VATTRIB_0 () { $cspacec::CS_VATTRIB_0 }
+sub CS_VATTRIB_1 () { $cspacec::CS_VATTRIB_1 }
+sub CS_VATTRIB_2 () { $cspacec::CS_VATTRIB_2 }
+sub CS_VATTRIB_3 () { $cspacec::CS_VATTRIB_3 }
+sub CS_VATTRIB_4 () { $cspacec::CS_VATTRIB_4 }
+sub CS_VATTRIB_5 () { $cspacec::CS_VATTRIB_5 }
+sub CS_VATTRIB_6 () { $cspacec::CS_VATTRIB_6 }
+sub CS_VATTRIB_7 () { $cspacec::CS_VATTRIB_7 }
+sub CS_VATTRIB_8 () { $cspacec::CS_VATTRIB_8 }
+sub CS_VATTRIB_9 () { $cspacec::CS_VATTRIB_9 }
+sub CS_VATTRIB_10 () { $cspacec::CS_VATTRIB_10 }
+sub CS_VATTRIB_11 () { $cspacec::CS_VATTRIB_11 }
+sub CS_VATTRIB_12 () { $cspacec::CS_VATTRIB_12 }
+sub CS_VATTRIB_13 () { $cspacec::CS_VATTRIB_13 }
+sub CS_VATTRIB_14 () { $cspacec::CS_VATTRIB_14 }
+sub CS_VATTRIB_15 () { $cspacec::CS_VATTRIB_15 }
 sub G3DFOGMETHOD_NONE () { $cspacec::G3DFOGMETHOD_NONE }
 sub G3DFOGMETHOD_ZBUFFER () { $cspacec::G3DFOGMETHOD_ZBUFFER }
 sub G3DFOGMETHOD_VERTEX () { $cspacec::G3DFOGMETHOD_VERTEX }
