@@ -10,6 +10,7 @@ struct iAws;
 struct iAwsPrefs;
 class  awsWindow;
 class  awsComponentNode;
+class  awsComponent;
             
 
 SCF_VERSION (iAws, 0, 0, 1);
@@ -73,5 +74,30 @@ public:
   virtual bool GetString(awsComponentNode *node, char *name, iString *&val)=0;
 
 };
+
+SCF_VERSION (iAwsSlot, 0, 0, 1);
+
+struct iAwsSlot : public iBase
+{
+  /** This initializes a slot for a given component.  This slot may connect to any number of signal sources, and
+   * all signals will be delivered back to this initialized slot.  Need only be intialized ONCE.
+   */
+  virtual void Initialize(awsComponent *sink, void (awsComponent::*Slot)(awsComponent &source, unsigned long signal))=0;
+  
+  /** Connect sets us up to receive signals from some other component.  You can connect to as many different sources 
+    and signals as you'd like.  You may connect to multiple signals from the same source.
+  */
+  virtual void Connect(awsComponent &source, unsigned long signal)=0;
+  
+  /**  Disconnects us from the specified source and signal.  This may happen automatically if the signal source
+   *  goes away.  You will receive disconnect notification always (even if you request the disconnection.)
+   */
+  virtual void Disconnect(awsComponent &source, unsigned long signal)=0;
+
+  /** Invoked by a source to emit the signal to this slot's sink.
+   */
+  virtual void Emit(awsComponent &source, unsigned long signal)=0;
+};
+
 
 #endif // __IVARIA_AWS_H__
