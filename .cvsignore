@@ -4,6 +4,7 @@
 *.log
 *.zip
 *.txt
+csconfig.tmp
 config.mak*
 cache.mak*
 coord*
