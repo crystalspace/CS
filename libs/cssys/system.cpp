@@ -1132,7 +1132,7 @@ bool csSystemDriver::Register (iBase*, char const* tag)
   return false;
 }
 
-void csSystemDriver::Unregister (iBase*, char const* tag = NULL)
+void csSystemDriver::Unregister (iBase*, char const* tag)
 {
   // @@@ TODO
 }
