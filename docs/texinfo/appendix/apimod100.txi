@@ -702,10 +702,17 @@ texture are released by the renderer as soon as the image data is converted
 into the internal texture format (that is, uploaded to the graphics hardware).
 
 @subheading Java Bindings
+@cindex Java
 
 The Java bindings for Crystal Space have been fully integrated into the project
 and are now well-supported. It is now possible to write Crystal Space program
 entirely in Java. @xref{Java Bindings}.
+
+The Crystal Space Java classes now reside in a package named
+@samp{org.crystalspace3d} in order to reflect Crystal Space's new official
+domain name ``crystalspace3d.org''. This replaces the older package name
+@samp{com.crystalspace}, which itself replaced the much older name
+@samp{net.sourceforge.crystal}.
 
 @subheading @sc{vfs} Changes
 @cindex @sc{vfs} Configuration File

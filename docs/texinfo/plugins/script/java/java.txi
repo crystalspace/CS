@@ -8,7 +8,7 @@
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}}.
 
 The csJava module provides access to Crystal Space from Java in the form of a
-set of classes in the package @samp{com.crystalspace} which can be imported
+set of classes in the package @samp{org.crystalspace3d} which can be imported
 into pure Java programs. The csJava module consists of a @sc{jar} package,
 @file{crystalspace.jar}, and a shared library, @file{csjava}.
 

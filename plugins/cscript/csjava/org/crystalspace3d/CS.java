@@ -17,9 +17,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-package com.crystalspace;
+package org.crystalspace3d;
 
-import com.crystalspace.csPluginRequest;
+import org.crystalspace3d.csPluginRequest;
 import java.util.Enumeration;
 import java.util.Vector;
 

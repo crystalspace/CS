@@ -40,9 +40,9 @@
 {
     const char * s = jenv->GetStringUTFChars($input, 0);
     const char * dot = strrchr(s, '.');
-    strcpy(className, "com/crystalspace/");
+    strcpy(className, "org/crystalspace3d/");
     strcat(className, dot?dot+1:s);
-    $1 = className + sizeof("com/crystalspace/") - 1;
+    $1 = className + sizeof("org/crystalspace3d/") - 1;
     jenv->ReleaseStringUTFChars($input, s);
     jclass cls = jenv->FindClass(className);
     jmethodID mid = jenv->GetStaticMethodID(cls, "scfGetVersion", "()I");
@@ -186,10 +186,10 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
         {
             JNIEnv * env = 0;
             _the_jvm->AttachCurrentThread((void **)&env, NULL);
-            jclass event_class = env->FindClass("com/crystalspace/iEvent");
-            jclass handler_class = env->FindClass("com/crystalspace/csJEventHandler");
+            jclass event_class = env->FindClass("org/crystalspace3d/iEvent");
+            jclass handler_class = env->FindClass("org/crystalspace3d/csJEventHandler");
             jmethodID event_ctr_mid = env->GetMethodID(event_class, "<init>", "(JZ)V");
-            jmethodID handle_event_mid = env->GetMethodID(handler_class, "HandleEvent", "(Lcom/crystalspace/iEvent;)Z");
+            jmethodID handle_event_mid = env->GetMethodID(handler_class, "HandleEvent", "(Lorg/crystalspace3d/iEvent;)Z");
             jlong cptr = 0;
             *(iEvent **)&cptr = &event; 
             jobject event_object = env->NewObject(event_class, event_ctr_mid, cptr, false);
@@ -218,11 +218,11 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
     jobject _csJEventHandler::_csJEventHandler_jobject;
 
     extern "C" {
-        JNIEXPORT void JNICALL Java_com_crystalspace_csJEventHandler__1exportJEventHandler
+        JNIEXPORT void JNICALL Java_org_crystalspace3d_csJEventHandler__1exportJEventHandler
             (JNIEnv *, jclass, jobject);
     }
                                                                                                               
-    JNIEXPORT void JNICALL Java_com_crystalspace_csJEventHandler__1exportJEventHandler
+    JNIEXPORT void JNICALL Java_org_crystalspace3d_csJEventHandler__1exportJEventHandler
         (JNIEnv * env, jclass, jobject obj)
     {
         if (!_the_jvm)

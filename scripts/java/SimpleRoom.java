@@ -17,7 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-import com.crystalspace.*;
+import org.crystalspace3d.*;
 import java.util.Vector;
 
 class EventHandler extends csJEventHandler

@@ -48,19 +48,19 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(JAVA) && $(JAVAC) && $(CMD.SWIG) &&
   local common = [ DoSourceGrist csjava.cpp ] ;
 
   local javabase = [ ConcatDirs $(LOCATE_TARGET) src ] ;
-  local javadir = [ ConcatDirs $(javabase) com crystalspace ] ;
+  local javadir = [ ConcatDirs $(javabase) org crystalspace3d ] ;
   Depends $(common) : $(javadir:G=dir) ;
   MkDir $(javadir:G=dir) ;
 
   Swig $(common) :
     [ DoSourceGrist cspace.i ] :
     java :
-    -c++ -java -package com.crystalspace :
+    -c++ -java -package org.crystalspace3d :
     [ ConcatDirs $(TOP) include ] :
     [ ConcatDirs $(TOP) include ivaria ] :
     :
     :
-    $(LOCATE_TARGET) src com crystalspace ;
+    $(LOCATE_TARGET) src org crystalspace3d ;
   CleanDir javaswigclean : $(javabase) ;
   Depends csjavaclean : javaswigclean ;
 
@@ -87,7 +87,7 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(JAVA) && $(JAVAC) && $(CMD.SWIG) &&
   LinkPlugin $(javamod) : $(javamodobj) ;
   Clean csjavaclean : $(javamod) ;
 
-  local jar_extra = [ Wildcard [ ConcatDirs com crystalspace ] : *.java ] ;
+  local jar_extra = [ Wildcard [ ConcatDirs org crystalspace3d ] : *.java ] ;
   SEARCH on $(jar_extra) = $(SEARCH_SOURCE) ;
   MakeLocate $(jar_extra:BSG=built) : $(javadir) ;
   Clean csjavaclean : $(jar_extra:BSG=built) ;

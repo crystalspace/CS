@@ -17,7 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-package com.crystalspace;
+package org.crystalspace3d;
 
 public class csJEventHandler extends _csJEventHandler
 {

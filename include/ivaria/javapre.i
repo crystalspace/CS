@@ -145,7 +145,7 @@ jobject _csRef_to_Java(const csRef<iBase>& ref, void* ptr, const char* name,
   ptr   : either a csRef<type> or csPtr<type>
   name  : type name, e.g. "iEngine *"
   type  : type of pointer
-  clazz : class name, e.g. "com/crystalspace/iEngine"
+  clazz : class name, e.g. "org/crystalspace3d/iEngine"
 
   In actual practice, 'ptr' is really of type SwigValueWrapper<csRef<T>> or
   SwigValueWrapper<csPtr<T>>.  The SwigValueWrapper wrapper is added
@@ -167,7 +167,7 @@ jobject _csRef_to_Java(const csRef<iBase>& ref, void* ptr, const char* name,
 %define TYPEMAP_OUT_csRef(T)
   %typemap(out) csRef<T>
   {
-    TYPEMAP_OUT_csRef_BODY($1, #T " *", T, csRef, "com/crystalspace/" #T)
+    TYPEMAP_OUT_csRef_BODY($1, #T " *", T, csRef, "org/crystalspace3d/" #T)
   }
   %typemap(jni) csRef<T> "jobject";
   %typemap(jtype) csRef<T> #T;
@@ -180,7 +180,7 @@ jobject _csRef_to_Java(const csRef<iBase>& ref, void* ptr, const char* name,
 %define TYPEMAP_OUT_csPtr(T)
   %typemap(out) csPtr<T>
   {
-    TYPEMAP_OUT_csRef_BODY($1, #T " *", T, csPtr, "com/crystalspace/" #T)
+    TYPEMAP_OUT_csRef_BODY($1, #T " *", T, csPtr, "org/crystalspace3d/" #T)
   }
   //%typemap(out) csPtr<T> %{ $result = $1; %}
   %typemap(jni) csPtr<T> "jobject";
@@ -207,7 +207,7 @@ jobject _csRef_to_Java(const csRef<iBase>& ref, void* ptr, const char* name,
       jlong cptr = 0;
       *(void **)&cptr = ptr;
       char cls_name[1024];
-      strcat(strcpy(cls_name, "com/crystalspace/"), $1.Type);
+      strcat(strcpy(cls_name, "org/crystalspace3d/"), $1.Type);
       jclass cls = jenv->FindClass(cls_name);
       jmethodID mid = jenv->GetMethodID(cls, "<init>", "(JZ)V");
       $result = jenv->NewObject(cls, mid, cptr, false);
