@@ -66,7 +66,7 @@ $(CSGFX.LIB): $(OBJ.CSGFX)
 	$(DO.LIBRARY)
 
 csgfxclean:
-        -$(RM) $(CSGFX.LIB) $(OBJ.CSGFX)
+	-$(RM) $(CSGFX.LIB) $(OBJ.CSGFX)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)csgfx.dep
