@@ -3,6 +3,8 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+02-June-2003
+	- Philip Wyett updated the docs to reflect a new msvc_libs release.
 01-June-2003
 	- res made some minor optimizations to the movie recorder.
 	- res added output of some statistics when a movie finished recording.

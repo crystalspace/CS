@@ -36,11 +36,11 @@ The latest version of this archive can be downloaded from:
 
 @noindent
 @ifnottex
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.97dev003.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.97dev004.zip}
 @end ifnottex
 @iftex
 @code{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/}@*
-@code{msvc7_libs_0.97dev003.zip}
+@code{msvc7_libs_0.97dev004.zip}
 @end iftex
 
 Once you have downloaded the msvc_libs package, extract it too your @file{CS\}
@@ -88,6 +88,10 @@ can see those files. If you wish to compile with Python support you must install
 Python 2.2 or later, which can be obtained from:
 
 @uref{http://www.python.org}
+
+@sc{note}: To have parity with the latest version of msvc_libs and take full
+advantage of the debug elements - you should have Python 2.2.3 installed on
+your system.
 
 @subsubheading Creative EAX 2.0
 
