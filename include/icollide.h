@@ -45,9 +45,8 @@ SCF_VERSION (iCollideSystem, 0, 0, 1);
  * collision detection world. It uses the geometry data as given by
  * iPolygonMesh.
  */
-class iCollideSystem : public iPlugIn
+struct iCollideSystem : public iPlugIn
 {
-public:
   /// Create an iCollider for the given geometry.
   virtual iCollider* CreateCollider (iPolygonMesh* mesh) = 0;
 
