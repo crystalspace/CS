@@ -169,7 +169,7 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_TREEITEM		        16
 /// Tree control palette index
 #define CSPAL_TREEBOX		        17
-/// Hine component palette index
+/// Hint component palette index
 #define CSPAL_HINT			18
 /** @} */
 
@@ -347,7 +347,7 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 
 /**
  * \name csWindow class color palette indices
- */
+ * @{ */
 /// 3D border dark
 #define CSPAL_WINDOW_DARK3D		0
 /// 3D border light
@@ -415,7 +415,7 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 /** @} */
 
 /**
- * \name csNotebook class color palete indices
+ * \name csNotebook class color palette indices
  * @{ */
 /// Notebook background
 #define CSPAL_NOTEBOOK_BACKGROUND	0
@@ -452,7 +452,7 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 /** @} */
 
 /**
- * \name csGridCell class color palete indices
+ * \name csGridCell class color palette indices
  * @{ */
 /// background
 #define CSPAL_GRIDCELL_BACKGROUND	0
@@ -477,7 +477,7 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 /** @} */
 
 /**
- * \name csGridView class color palete indices
+ * \name csGridView class color palette indices
  * @{ */
 /// background
 #define CSPAL_GRIDVIEW_BACKGROUND	0
@@ -492,7 +492,7 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 /** @} */
 
 /**
- * \name csSplitter class color palete indices
+ * \name csSplitter class color palette indices
  * @{ */
 /// Splitter inactive background
 #define CSPAL_SPLITTER_IBACKGROUND	0
@@ -509,7 +509,7 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 /** @} */
 
 /**
- * \name csTip class color palete indices
+ * \name csTip class color palette indices
  * @{ */
 /// Background tip color
 #define CSPAL_HINT_BACKGROUND		0

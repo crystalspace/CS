@@ -82,7 +82,7 @@ public:
 };
 
 /**
- * \page What are layouts for ?
+ * \page WhatAreLayoutsFor What are layouts for?
  *
  * Usually one designs dialogs, forms etc. by placing components like
  * listcontrols, inputlines, treecontrols and so on at absolute locations
@@ -129,9 +129,11 @@ public:
   /// preserve space at the 4 borders of a layout
   csRect insets;
   enum LAYOUTING_PHASES {PHASE_0 = 0, PHASE_1 = 1};
-  /// Here we have the constraint a components will be layout with.
-  /// When a component is added a copy of this will be made and
-  /// attached to the component.
+  /**
+   * Here we have the constraint a components will be layout with.
+   * When a component is added a copy of this will be made and
+   * attached to the component.
+   */
   csLayoutConstraint c;
 
 public:
