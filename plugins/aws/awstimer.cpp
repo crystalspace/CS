@@ -53,7 +53,6 @@ awsTimer::~awsTimer ()
   }
 
   SCF_DEC_REF (vc);
-  printf("destr\n");
 }
 
 bool awsTimer::Setup ()
