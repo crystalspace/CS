@@ -6,8 +6,8 @@
 #endif
 
 #define CS_VERSION	"0.14"
-#define CS_SUBVERSION	"001"
-#define RELEASE_DATE	"Tue, 24-Aug-1999"
+#define CS_SUBVERSION	"002"
+#define RELEASE_DATE	"Fri, 10-Sep-1999"
 
 #if defined(OS_SOLARIS)
 #  define OS_VERSION "Solaris"

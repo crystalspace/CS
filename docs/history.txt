@@ -13,6 +13,8 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+10-Sep-1999
+        - *** Release of 0.14_002 ***
 30-Aug-1999
 	- Eric Sunshine fixed a compilation problem in the BeOS port and also
 	  removed more unused code.
@@ -29,6 +31,8 @@ Short-term cleanups that need to be done:
 	  in common.mak.
 	- Siu-Hang Or sent a patch to fix another crasher in MazeD which
 	  occurred when adding 3D volumes to an already-existing world.
+25-Aug-1999
+        - *** Release of 0.14_001 ***
 24-Aug-1999
 	- Jorrit fixed deletion of curve information in thing templates. It
 	  used the wrong type of 'delete []'.
