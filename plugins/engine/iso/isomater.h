@@ -26,6 +26,7 @@
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "ivaria/iso.h"
+#include "ivideo/effects/efdef.h"
 
 class csTextureWrapper;
 struct iTextureManager;
@@ -47,6 +48,9 @@ private:
   float ambient;
   /// The reflectiveness of the material
   float reflection;
+  
+  /// The effect associated with this material
+  iEffectDefinition* effect;
 
 public:
   /**

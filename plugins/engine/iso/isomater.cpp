@@ -51,6 +51,16 @@ csIsoMaterial::~csIsoMaterial ()
 //  delete texture;
 }
 
+void csIsoMaterial::SetEffect (iEffectDefinition *ed)
+{
+  effect = ed;
+}
+
+iEffectDefinition *csIsoMaterial::GetEffect ()
+{
+  return effect;
+}
+
 iTextureHandle *csIsoMaterial::GetTexture ()
 {
   return texture;
