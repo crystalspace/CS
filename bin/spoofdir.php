@@ -85,7 +85,7 @@
 //-----------------------------------------------------------------------------
 
 $prog_name = 'spoofdir.php';
-$prog_version = '1.1';
+$prog_version = '1.3';
 $author_name = 'Eric Sunshine';
 $author_email = 'sunshine@sunshineco.com';
 
@@ -105,11 +105,14 @@ $author_email = 'sunshine@sunshineco.com';
 //    the global configuration file.
 //
 // $ignore
-//    An array of regular-expresions which constitute the set of files to
-//    omit from the generated directory listing.  By default, the $ignore
-//    array is seeded with patterns matching the names of this script and its
-//    configuration files, thus the directory listing will automatically be
-//    purged of these administrative entries.
+//    An associative array where the keys are regular-expresions which
+//    constitute the set of files to omit from the generated directory
+//    listing, and the values are boolean flags which control whether or not
+//    the match is case-sensitive; 1 (true) specifies case-sensitive matching,
+//    and 0 (false) specifies case-insensitive matching.  By default, the
+//    $ignore array is seeded with patterns matching the names of this script
+//    and its configuration files, thus the directory listing will
+//    automatically be purged of these administrative entries.
 //
 // $title
 //    The human-readable title for the directory.  The title is displayed in
@@ -148,11 +151,12 @@ $author_email = 'sunshine@sunshineco.com';
 //
 // $mimetype, $default_mimetype
 //    When sending files to the client's browser, the file's MIME-type (also
-//    known as content-type) is derived from the file's extension.   $mimetype
-//    is an associative array where the keys are file extensions (sans the '.')
-//    and the values are the MIME-types.  $default_mimetype will be used if
-//    the file's extension does not appear in $mimetype or if the file has no
-//    extension.
+//    known as content-type) is derived from the file's extension.  $mimetype
+//    is an associative array where the keys are file extensions and the
+//    values are the MIME-types.  The file extensions are canonicalized by
+//    conversion to lower-case and removal the leading period (if present)
+//    before being used as keys.  $default_mimetype will be used if the file's
+//    extension does not appear in $mimetype or if the file has no extension.
 //
 // $disposition, $default_disposition
 //    When sending files to the client's browser, the file's MIME-type is used
@@ -174,10 +178,12 @@ $author_email = 'sunshine@sunshineco.com';
 //    is considered uncacheable.
 //
 // $indexfile
-//    An associative array where the keys are potential index-like filenames,
-//    and the values are boolean values; 1 for true, or 0 for false.  If a
-//    file exists with one of these names in the directory being browsed, and
-//    if the associated value is 'true' then that file will be sent to the
+//    An associative array where the keys are regular-expressions which
+//    constitute the set of potential index-like filenames, and the values are
+//    boolean flags which control whether or not the match is case-sensitive;
+//    1 (true) specifies case-sensitive matching, and 0 (false) specifies
+//    case-insensitive matching.  If a filename in the directory being browsed
+//    matches one of these patterns then that file will be sent to the
 //    client's browser instead of a directory listing.  This emulates the
 //    behavior of most HTTP servers where the presence of an index-like file
 //    (such as 'index.html') within a directory results in the transmission of
@@ -207,17 +213,13 @@ $disposition['text/plain'] = 'inline';
 $cacheable['text/html' ] = 1;
 $cacheable['text/plain'] = 1;
 
-$ignore[] = '^index\..+$';
-$ignore[] = "$prog_name\$";
-$ignore[] = "$globalconfig\$";
-$ignore[] = "$localconfig\$";
+$ignore['^index\..+$'     ] = 1;
+$ignore["^$prog_name\$"   ] = 1;
+$ignore["^$globalconfig\$"] = 1;
+$ignore["^$localconfig\$" ] = 1;
 
-$indexfile['index.htm'  ] = 1;
-$indexfile['index.html' ] = 1;
-$indexfile['index.shtml'] = 1;
-$indexfile['index.php'  ] = 1;
-$indexfile['index.php3' ] = 1;
-$indexfile['index.php4' ] = 1;
+$indexfile['^index.s?html?$'  ] = 1; // index.htm, index.html, index.shtml
+$indexfile['^index.php[1-9]?$'] = 1; // index.php, index.php3, index.php4
 
 //-----------------------------------------------------------------------------
 // Private Configuration
@@ -234,12 +236,6 @@ $copyright = "Copyright &copy;2000 by $author_name " .
 //-----------------------------------------------------------------------------
 // Utility Functions
 //-----------------------------------------------------------------------------
-function sort_array(&$a)
-{
-    if (count($a) > 1)
-	usort($a, strcasecmp);
-}
-
 function solidify($s)
 {
     return strtr($s, array(' ' => '&nbsp;'));
@@ -266,13 +262,39 @@ function pretty_size($bytes)
     return $s;
 }
 
+function sort_array(&$a)
+{
+    if (count($a) > 1)
+	usort($a, strcasecmp);
+}
+
+function array_pattern_match($target, &$patterns)
+{
+    $n = count($patterns);
+    reset($patterns);
+    for ($i = 0; $i < $n; $i++, next($patterns))
+    {
+	$matched = 0;
+	$pattern = key($patterns);
+	$case_sensitive = current($patterns);
+	if ($case_sensitive)
+	    $matched = ereg ($pattern, $target);
+	else
+	    $matched = eregi($pattern, $target);
+	if ($matched)
+	    return 1;
+    }
+    return 0;
+}
+
 function find_mimetype($file)
 {
     global $mimetype, $default_mimetype;
     $type = '';
     $ext = strrchr($file, '.');
-    if ($ext && strlen($ext) > 1) // Not empty and not just '.'.
-	$type = $mimetype[substr($ext, 1)]; // Remove leading period from ext.
+    if ($ext) // Canonicalize; strip leading '.', down-case.
+	$ext = strtolower(substr($ext, 1));
+    $type = $mimetype[$ext];
     if (!$type)
 	$type = $default_mimetype;
     return $type;
@@ -287,12 +309,6 @@ function find_disposition($type)
     return $s;
 }
 
-function is_indexfile($file)
-{
-    global $indexfile;
-    return $indexfile[basename($file)];
-}
-
 function is_cacheable($type)
 {
     global $cacheable;
@@ -302,10 +318,13 @@ function is_cacheable($type)
 function is_ignored($file)
 {
     global $ignore;
-    for ($s = reset($ignore); $s; $s = next($ignore))
-	if (ereg($s, $file))
-	    return 1;
-    return 0;
+    return array_pattern_match($file, $ignore);
+}
+
+function is_indexfile($file)
+{
+    global $indexfile;
+    return array_pattern_match(basename($file), $indexfile);
 }
 
 //-----------------------------------------------------------------------------
@@ -387,7 +406,7 @@ function send_file($path)
 //-----------------------------------------------------------------------------
 function send_indexfile($path, $file)
 {
-    if (!ereg('\.php[0-9]?$', $file))
+    if (!eregi('\.php[0-9]?$', $file))
 	send_file("$path/$file"); // Never returns.
     else
     {
