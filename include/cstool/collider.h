@@ -22,6 +22,7 @@
 #include "csextern.h"
 
 #include "csutil/csobject.h"
+#include "csutil/leakguard.h"
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/vector3.h"
@@ -57,6 +58,8 @@ private:
   csRef<iCollider> collider;
 
 public:
+  CS_LEAKGUARD_DECLARE (csColliderWrapper);
+
   /// Create a collider based on a mesh.
   csColliderWrapper (csObject& parent, iCollideSystem* collide_system,
   	iPolygonMesh* mesh);

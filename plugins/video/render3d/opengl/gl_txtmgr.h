@@ -35,6 +35,7 @@
 #include "csutil/weakref.h"
 #include "csutil/weakrefarr.h"
 #include "csutil/blockallocator.h"
+#include "csutil/leakguard.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "iutil/vfs.h"
@@ -50,6 +51,8 @@ class csGLTextureCache;
 class csGLTexture
 {
 public:
+  CS_LEAKGUARD_DECLARE(csGLTexture);
+
   csGLTexture (csGLTextureHandle *p, iImage* Image);
   virtual ~csGLTexture();
 
@@ -79,6 +82,8 @@ public:
 class csGLTextureHandle : public iTextureHandle
 {
 private:
+  CS_LEAKGUARD_DECLARE(csGLTextureHandle);
+
   /// texturemanager handle
   csRef<csGLTextureManager> txtmgr;
 

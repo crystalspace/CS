@@ -28,6 +28,8 @@
 #include "csutil/util.h"
 #include "csutil/debug.h"
 
+CS_LEAKGUARD_IMPLEMENT (csImageFile)
+
 //---------------------- Helper functions ---------------------------
 
 #define MIPMAP_NAME	mipmap_0

@@ -23,6 +23,7 @@
 #include "csextern.h"
 #include "cstypes.h"
 #include "util.h"
+#include "csutil/leakguard.h"
 #include "iutil/object.h"
 #include "refarr.h"
 
@@ -53,6 +54,8 @@ protected:
   void InitializeObject ();
 
 public:
+  CS_LEAKGUARD_DECLARE (csObject);
+
   /// Initialize the csObject.
   csObject (iBase* pParent = 0);
 

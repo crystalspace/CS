@@ -23,6 +23,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+CS_LEAKGUARD_IMPLEMENT (csObject)
+
 /*** Object Iterators ***/
 class csObjectIterator : public iObjectIterator
 {

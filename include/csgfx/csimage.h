@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include "csgfx/rgbpixel.h"
+#include "csutil/leakguard.h"
 #include "cstypes.h"
 #include "igraphic/image.h"
 
@@ -111,6 +112,8 @@ protected:
 
 public:
   SCF_DECLARE_IBASE;
+
+  CS_LEAKGUARD_DECLARE (csImageFile);
 
   /// Destroy the image file object and free all associated storage
   virtual ~csImageFile ();

@@ -37,6 +37,9 @@
 
 #include "plugins/video/canvas/openglcommon/glextmanager.h"
 
+CS_LEAKGUARD_IMPLEMENT(csGLTexture)
+CS_LEAKGUARD_IMPLEMENT(csGLTextureHandle)
+
 //---------------------------------------------------------------------------
 
 class csRLMAlloc : public csBlockAllocator<csGLRendererLightmap>
