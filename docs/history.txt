@@ -17,7 +17,7 @@ The history order is reversed so that new features are at the top.
 	  relights all lightmaps in the engine. The second version updates
 	  the lightmaps for a given light (i.e. useful after adding
 	  a static or pseudo-dynamic light).
-	- Jorrit fixed a problem with the engine would always attempt
+	- Jorrit fixed a problem where the engine would always attempt
 	  to read precalc_info even if reading from the cache was disabled.
 	- Jorrit added a new 'addstlight' command to Walktest. This command
 	  adds a static light and uses the new ForceRelight() function to
