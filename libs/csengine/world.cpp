@@ -948,8 +948,14 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   rview.clip_plane.Set (0, 0, 1, -1);   //@@@CHECK!!!
   rview.callback = NULL;
 
-  tr_manager.NewFrame ();
+  // Calculate frustrum for screen dimensions (at z=1).
+  float leftx = - c->shift_x * c->inv_aspect;
+  float rightx = (G2D->GetWidth () - c->shift_x) * c->inv_aspect;
+  float topy = - c->shift_y * c->inv_aspect;
+  float boty = (G2D->GetHeight () - c->shift_y) * c->inv_aspect;
+  rview.SetFrustrum (leftx, rightx, topy, boty);
 
+  tr_manager.NewFrame ();
 
   if (c_buffer)
   {
@@ -979,6 +985,7 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   for (int halo = halos.Length () - 1; halo >= 0; halo--)
     if (!ProcessHalo (halos.Get (halo)))
       halos.Delete (halo);
+
 #if CS_COV_STATS
   printf ("TestPolygonNotEmpty: %d loop=%d child=%d 0=%d\n",
   cnt_TestPolygonNotEmpty,
@@ -1020,6 +1027,13 @@ void csWorld::DrawFunc (csCamera* c, csClipper* view,
   rview.clip_plane.Set (0, 0, 1, -1);   //@@@CHECK!!!
   rview.callback = callback;
   rview.callback_data = callback_data;
+
+  // Calculate frustrum for screen dimensions (at z=1).
+  float leftx = - c->shift_x * c->inv_aspect;
+  float rightx = (G2D->GetWidth () - c->shift_x) * c->inv_aspect;
+  float topy = - c->shift_y * c->inv_aspect;
+  float boty = (G2D->GetHeight () - c->shift_y) * c->inv_aspect;
+  rview.SetFrustrum (leftx, rightx, topy, boty);
 
   tr_manager.NewFrame ();
 

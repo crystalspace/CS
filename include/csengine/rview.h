@@ -98,6 +98,9 @@ public:
   /// The 2D graphics subsystem used for drawing.
   iGraphics2D* g2d;
 
+  /// The view frustrum as defined at z=1.
+  float leftx, rightx, topy, boty;
+
   /**
    * The portal polygon (or NULL if the first sector).
    */
@@ -173,6 +176,14 @@ public:
   void SetView (csClipper* v) { view = v; }
   ///
   void SetClipPlane (csPlane& p) { clip_plane = p; }
+  /// Set the view frustrum at z=1.
+  void SetFrustrum (float lx, float rx, float ty, float by)
+  {
+    leftx = lx;
+    rightx = rx;
+    topy = ty;
+    boty = by;
+  }
 };
 
 /**

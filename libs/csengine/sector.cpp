@@ -404,12 +404,20 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
     // If all vertices are behind z plane then the node is
     // not visible. If some vertices are behind z plane then we
     // need to clip the polygon.
+    // We also test the node against the view frustrum here.
     int num_z_0 = 0;
+    bool left = true, right = true, top = true, bot = true;
     for (i = 0 ; i < num_array ; i++)
     {
       cam[i] = rview->Other2This (array[i]);
       if (cam[i].z < SMALL_EPSILON) num_z_0++;
+      if (left && cam[i].x >= cam[i].z * rview->leftx) left = false;
+      if (right && cam[i].x <= cam[i].z * rview->rightx) right = false;
+      if (top && cam[i].y >= cam[i].z * rview->topy) top = false;
+      if (bot && cam[i].y <= cam[i].z * rview->boty) bot = false;
     }
+    if (left || right || top || bot) return false;
+
     if (num_z_0 == num_array)
     {
       // Node behind camera.
