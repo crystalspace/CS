@@ -192,9 +192,9 @@ walktest flarge
 @end example
 
 If you wish this map to be used by default whenever you launch WalkTest without
-otherwise explicitly mentioning a map file, you may want to edit
-@file{CS/data/config/walktest.cfg} to set the
-@samp{Walktest.Settings.WorldFile} variable to the chosen map.
+otherwise explicitly mentioning a map file, you may want to change the
+@samp{WorldFile} option in WalkTest's configuration file
+@file{CS/data/config/walktest.cfg}.
 
 @example
 Walktest.Settings.WorldFile=flarge

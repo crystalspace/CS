@@ -41,6 +41,8 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine renamed WalkTest's configuration file from cryst.cfg to
 	  walktest.cfg.  Updated all documentation, source code, and other
 	  references to reflect this change.
+	- Eric Sunshine eliminated a couple `hbox' warnings reported by TeX for
+	  the Texinfo documentation.
 20-Feb-2001
 	- Wouter Wijngaards applied fix to demosky as suggested by Seth
 	  Galbraith. This fixed the crackes in the skydome. It aligns
