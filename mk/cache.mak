@@ -108,7 +108,7 @@ endif
 
 # Do not remove blank lines; they force needed newlines in the output file.
 define CACHE.BODY.NAME
-  echo $r \\>>$(MAKEFILE_CACHE)
+  echo SUBMAKEFILES += $r>>$(MAKEFILE_CACHE)
 
 endef
 
@@ -118,7 +118,7 @@ define CACHE.BODY.CONTENT
 endef
 
 define CACHE.BODY
-  echo SUBMAKEFILES = \\>$(MAKEFILE_CACHE)
+  echo SUBMAKEFILES = >$(MAKEFILE_CACHE)
   $(foreach r,$(SUBMAKEFILES),$(CACHE.BODY.NAME))
   echo >>$(MAKEFILE_CACHE)
   $(foreach r,$(SUBMAKEFILES),$(CACHE.BODY.CONTENT))
