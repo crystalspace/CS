@@ -28,7 +28,6 @@
 #include "csengine/sector.h"
 #include "csengine/world.h"
 #include "csengine/light/lghtmap.h"
-#include "csengine/dumper.h"
 #include "igraph3d.h"
 #include "itexture.h"
 
