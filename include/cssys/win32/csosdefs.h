@@ -63,6 +63,7 @@
   #define ASSERT(expression) assert(expression)
   #define VERIFY_SUCCESS(expression) assert(SUCCEEDED(expression))
   #define VERIFY_RESULT(expression, result) assert(expression == result)
+  #define CS_DEBUG
 #else
   #define ASSERT(expression)
   #define VERIFY_SUCCESS(expression) expression
