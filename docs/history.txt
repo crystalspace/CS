@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 4-Jan-2004
+	- Luca fixed a compilation error for the VC6 compiler.
 	- res added the creation of a global string set to InitApplication().
 	  Previously, code to create such string set could be found at multiple
 	  places throughout CS.
