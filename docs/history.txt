@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+29-Apr-2002
+	- Eric Sunshine renamed OSXDelegate2D_CGBLit.h to
+	  OSXDelegate2D_CGBlit.h (notice the case distinction) so that #include
+	  "OSXDelegate2D_CGBlit.h" will work correctly on UFS filesystems which
+	  are case-sensitive.  (This was not an issue for HFS+ filesystems
+	  since they are case-insensitive.)
 28-Apr-2002
 	- Fixed another initialization bug in the OpenGL renderer found
 	  by valgrind.
