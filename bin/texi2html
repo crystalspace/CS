@@ -1840,10 +1840,10 @@ $index_properties =
 %simple_map = (
 	       # cf. makeinfo.c
 	       "*", "<BR>",		# HTML+
-	       " ", " ",
-	       "\t", " ",
+	       " ", "&nbsp;",
+	       "\t", "&nbsp;",
   	       "-", "&#173;",	# soft hyphen
-	       "\n", "\n",
+	       "\n", "&nbsp;",
 	       "|", "",
 	       'tab', '<\/TD><TD>',
 	       # spacing commands
@@ -1861,7 +1861,7 @@ $index_properties =
 	       'TeX', 'TeX',
 	       'br', '<P>',		# paragraph break
 	       'bullet', '*',
-	       'copyright', '(C)',
+	       'copyright', '&copy;',
 	       'dots', '<small>...<\/small>',
 	       'enddots', '<small>....<\/small>',
 	       'equiv', '==',
@@ -3062,12 +3062,55 @@ INPUT_LINE: while ($_ = &next_line) {
 	my $after = $';
 	my @args;
 	my $args;
-	if ($after =~ /^\s*{(.*?[^\\])}(.*)/)  
+	#####################################################
+	# Support for multi-line macro invocations and nested
+	# '{' and '}' within macro invocations added by
+	# Eric Sunshine <sunshine@sunshineco.com> 2000/09/10.
+	#####################################################
+	if ($after =~ /^\s*{/) # Macro arguments delimited by '{' and '}'?
 	{
-	  $args = $1;
-	  $after = $2;
+	  my ($protect, $start, $end, $depth, $c) = (0, 0, 0, 0, 0);
+	  foreach $c (unpack('C*', $after))
+	  {
+	    if ($protect)
+	    { # Character protected by '\' or '@'; pass through unmolested.
+	      $protect = 0;
+	    }
+	    elsif ($c == ord('\\') || $c == ord('@'))
+	    { # '\' and '@' remove special meaning of next character.
+	      $protect = 1;
+	    }
+	    elsif ($c == ord('{')) # Allow '{' and '}' to nest.
+	    {
+	      $depth++;
+	    }
+	    elsif ($c == ord('}'))
+	    {
+	      $depth--;
+	      last if $depth == 0;
+	    }
+	    $start++ if !$depth; # Position of opening brace.
+	    $end++;              # Position of closing brace.
+	  }
+	
+	  # '{' & '}' did not completely unnest; append next line; try again.
+	  if ($depth > 0)
+	  {
+	    my $paste = &next_line;
+	    die "$ERROR Missing closing brace '}' for invocation of macro " .
+	      "\"\@$name\" on line:\n", substr($_,0,70), "...\n" unless $paste;
+	    s/\n$/ /;
+	    unshift @input_spool, $_ . $paste;
+	    next INPUT_LINE;
+	  }
+	
+	  # Extract macro arguments from within '{' and '}'.
+	  $len = $end - $start - 1;
+	  $args = ($len > 0) ? substr($after, $start + 1, $len) : '';
+	  $after = substr($after, $end + 1);
 	}
-	elsif (@{$macros->{$name}->{Args}} == 1)
+	############ End Sunshine Modifications #############
+	elsif (@{$macros->{$name}->{Args}} == 1) # Macro arg extends to EOL.
 	{
 	  $args = $after;
 	  $args =~ s/^\s*//;
@@ -3234,8 +3277,8 @@ INPUT_LINE: while ($_ = &next_line) {
 	    $in_list++ if $format_map{$tag} eq 'UL' || $format_map{$tag} eq 'OL' ;
 #	    push(@lines, &debug("<BLOCKQUOTE>\n", __LINE__))
 #	      if $tag =~ /example/i;
-	    # sunshine@sunshineco.com: <PRE>bla</PRE> looks better than
-	    # <PRE>\nbla</PRE> (at least on NeXTstep browser
+	    # Eric Sunshine <sunshine@sunshineco.com>: <PRE>blah</PRE> looks
+	    # better than <PRE>\nblah</PRE> on OmniWeb2 NextStep browser.
 	    push(@lines, &debug("<$format_map{$tag}>" . 
 				($in_pre ? '' : "\n"), __LINE__));
 	    next;
@@ -5238,9 +5281,10 @@ sub apply_style {
 
     $style = $style_map{$texi_style};
     if (defined($style)) { # known style
+	my $do_quotes = 0;
 	if ($style =~ /^\"/) { # add quotes
 	    $style = $';
-	    $text = "\`$text\'";
+	    $do_quotes = 1;
 	}
 	if ($style =~ /^\&/) { # custom
 	    $style = $';
@@ -5249,6 +5293,7 @@ sub apply_style {
 	    $text = "<$style>$text</$style>";
 	} else { # no style
 	}
+	$text = "\`$text\'" if $do_quotes;
     } else { # unknown style
 	$text = undef;
     }

@@ -25,7 +25,7 @@ Scripting
 * SCF:: Shared Class Facility (@sc{scf})
 * VFS:: Virtual File System (@sc{vfs})
 * World Components:: Components of a World
-* World File Format:: Format of the World File
+* World File Format:: Format of World File
 * Memory Debugger:: Crystal Space Memory Debugger
 * ProcTextures:: Procedural Texture System
 * Platform Details:: Platform-Specific Details

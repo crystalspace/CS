@@ -83,7 +83,6 @@ ifeq ($(MAKESECTION),postdefines)
 PERL = perl
 NODEFIX = bin/nodefix.pl
 TEXI2HTML = bin/texi2html
-TEXI2HTMLINIT = bin/texi2html.init
 TEXI2DVI = texi2dvi
 DVIPS = dvips
 PS2PDF = ps2pdf
@@ -95,6 +94,9 @@ DOXYGEN = doxygen
 # Root of the entire Crystal Space manual.
 CSMANUAL_DIR  = docs/texinfo
 CSMANUAL_FILE = cs-unix.txi
+
+# texi2html configuration file.
+TEXI2HTMLINIT = docs/support/texi2html.init
 
 # Doxygen configuration files.
 DOXYGEN_PUBAPI = docs/support/pubapi.dox
@@ -296,7 +298,7 @@ htmldoc: \
 # Rule to perform actual DVI conversion of $(CSMANUAL_FILE).
 do-dvidoc:
 	$(CP) $(CSMANUAL_DIR)/texinfo.tex $(OUT.DOC.DVI)
-	cd $(OUT.DOC.DVI); $(TEXI2DVI) --batch --clean \
+	cd $(OUT.DOC.DVI); $(TEXI2DVI) --batch --quiet \
 	-I `cd $(OUT.DOC.UNDO)/$(CSMANUAL_DIR); $(PWD)` $(CSMANUAL_FILE)
 	$(MV) $(OUT.DOC.DVI)/$(addsuffix .dvi,$(basename $(CSMANUAL_FILE))) \
 	$(OUT.DOC.DVI)/cs.dvi
@@ -315,7 +317,7 @@ dvidoc: \
 
 # Rule to perform actual PS conversion from DVI file.
 do-psdoc:
-	cd $(OUT.DOC.DVI); $(DVIPS) -o $(OUT.DOC.UNDO)/$(OUT.DOC.PS)/cs.ps \
+	cd $(OUT.DOC.DVI); $(DVIPS) -q -o $(OUT.DOC.UNDO)/$(OUT.DOC.PS)/cs.ps \
 	cs.dvi
 
 # Rule to generate PS format output.  Target images are incorporated directly
