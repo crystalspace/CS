@@ -362,8 +362,11 @@ struct iRenderView : public iBase
    * on wether or not clipping is wanted. This function also does far
    * plane clipping. Use SetupClipPlanes() to get the clipping planes
    * for this function.
+   * The frustum_mask will be modified according to all clip planes
+   * that were relevant for the given box. That can be used to hierarchically
+   * cull smaller objects.
    */
-  virtual bool ClipBBox (csPlane3* planes, uint32 frustum_mask,
+  virtual bool ClipBBox (csPlane3* planes, uint32& frustum_mask,
   	csPlane3* top_planes, const csBox3& obox,
       	int& clip_portal, int& clip_plane, int& clip_z_plane) = 0;
 

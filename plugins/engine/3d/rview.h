@@ -266,7 +266,7 @@ public:
         int& clip_portal, int& clip_plane, int& clip_z_plane);
   virtual bool ClipBBox (const csBox3& cbox,
         int& clip_portal, int& clip_plane, int& clip_z_plane);
-  virtual bool ClipBBox (csPlane3* planes, uint32 frustum_mask,
+  virtual bool ClipBBox (csPlane3* planes, uint32& frustum_mask,
   	csPlane3* top_planes, const csBox3& obox,
         int& clip_portal, int& clip_plane, int& clip_z_plane);
   virtual void SetupClipPlanes (const csReversibleTransform& tr_o2c,

@@ -63,6 +63,9 @@ chronological order.
 	  iRenderView->SetupClipPlanes() and ClipBBox(). That way it is
 	  possible to call SetupClipPlanes() in advance and then reuse
 	  it multiple times. Chunklod now uses this technique.
+	- Jorrit made iRenderView->ClipBBox() return a modified frustum
+	  mask so it can be used for hierarchically culling bbox trees.
+	  Chunklod now uses this.
 19-Apr-2004
 	- Eric Sunshine added LGPL license notice to the .m4 and .jam files.
 	- Jorrit fixed a bug in iEngine->CreatePortalContainer(). If there

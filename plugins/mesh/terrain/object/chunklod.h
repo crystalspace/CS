@@ -274,7 +274,6 @@ private:
   // Use for clipping during rendering.
   csPlane3 planes[10];
   csPlane3 top_planes[10];
-  uint32 frustum_mask;
 
   int tricount;
   csFlags flags;
@@ -298,7 +297,8 @@ public:
    * tree should be drawn
    */
   bool DrawTestQuad (iRenderView* rv, 
-	csChunkLodTerrainFactory::MeshTreeNode* node, float kappa);
+	csChunkLodTerrainFactory::MeshTreeNode* node, float kappa,
+	uint32 frustum_mask);
   bool DrawTest (iRenderView* rview, iMovable* movable);
 
   bool Draw (iRenderView*, iMovable*, csZBufMode) 

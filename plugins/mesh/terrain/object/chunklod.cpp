@@ -831,7 +831,8 @@ csChunkLodTerrainObject::~csChunkLodTerrainObject ()
 int optimized_meshes;
 
 bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv, 
-	csChunkLodTerrainFactory::MeshTreeNode* node, float kappa) 
+	csChunkLodTerrainFactory::MeshTreeNode* node, float kappa,
+	uint32 frustum_mask)
 {
   int clip_portal, clip_plane, clip_z_plane;
   if (!rv->ClipBBox (planes, frustum_mask, top_planes,
@@ -844,10 +845,10 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
   error_projection *= error_projection;
   if (error_projection > sq_dist && node->GetChild(0) != 0)
   {
-    DrawTestQuad (rv, node->GetChild (0), kappa);
-    DrawTestQuad (rv, node->GetChild (1), kappa);
-    DrawTestQuad (rv, node->GetChild (2), kappa);
-    DrawTestQuad (rv, node->GetChild (3), kappa);
+    DrawTestQuad (rv, node->GetChild (0), kappa, frustum_mask);
+    DrawTestQuad (rv, node->GetChild (1), kappa, frustum_mask);
+    DrawTestQuad (rv, node->GetChild (2), kappa, frustum_mask);
+    DrawTestQuad (rv, node->GetChild (3), kappa, frustum_mask);
   } 
   else 
   {
@@ -914,8 +915,9 @@ bool csChunkLodTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
     palette_meshes[i].SetLength(0);
   }
   tricount = 0;
+  uint32 frustum_mask;
   rview->SetupClipPlanes (tr_o2c, planes, frustum_mask, top_planes);
-  if (!DrawTestQuad (rview, pFactory->root, kappa)) 
+  if (!DrawTestQuad (rview, pFactory->root, kappa, frustum_mask)) 
     return false;
   if (meshes.Length () == 0)
     return false;

@@ -315,7 +315,7 @@ public:
     clip_z_plane = CS_CLIP_NOT;
     return true;
   }
-  virtual bool ClipBBox (csPlane3*, uint32, csPlane3*, const csBox3& /*obox*/,
+  virtual bool ClipBBox (csPlane3*, uint32&, csPlane3*, const csBox3& /*obox*/,
           int& clip_portal, int& clip_plane, int& clip_z_plane)
   {
     clip_plane = CS_CLIP_NOT;

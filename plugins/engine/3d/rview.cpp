@@ -1200,7 +1200,7 @@ void csRenderView::SetupClipPlanes (const csReversibleTransform& tr_o2c,
 
 bool csRenderView::ClipBBox (
   csPlane3* planes,
-  uint32 frustum_mask,
+  uint32& frustum_mask,
   csPlane3* top_planes,
   const csBox3 &obox,
   int &clip_portal,
@@ -1210,6 +1210,7 @@ bool csRenderView::ClipBBox (
   uint32 outClipMask;
   if (!csIntersect3::BoxFrustum (obox, planes, frustum_mask, outClipMask))
     return false;	// Not visible.
+  frustum_mask = outClipMask;
 
   if (outClipMask & 0xf == 0xf)
     clip_portal = CS_CLIP_NOT;
