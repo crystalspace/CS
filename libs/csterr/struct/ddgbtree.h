@@ -109,6 +109,10 @@ class WEXP ddgTBinTree {
 	static float _nearClip;
 	/// Squared far clipping distance.
 	static float _farClipSQ;
+	/// Number of clip planes to test.
+	static int	_clipPlanes;
+	/// Cosine of the field of view / 2;
+	static float _cosHalfFOV;
 	/**
 	 * This property is used to scale a wedgie's absolute variance
 	 * into the available variance range.
@@ -314,11 +318,6 @@ public:
     /// Set the priority of this triangle.
     void priorityFactor(ddgTriIndex tindex, float pf)		{ snode(tindex)->priorityFactor( pf ); }
 
-	/// Return flags.
-	unsigned char vbufferIndex(ddgTriIndex tindex){ return gnode( tindex)->vbufferIndex(); }
-	/// Set flags.
-	void vbufferIndex(ddgTriIndex tindex, unsigned int i) { snode( tindex)->vbufferIndex(i); }
-
 	/// Return split cache index if any.
 	ddgCacheIndex qscacheIndex(ddgTriIndex tindex){ return gnode( tindex)->qscacheIndex(); }
 	/// Set split cache index if any.
@@ -411,6 +410,7 @@ public:
 	 * Returns false otherwise.
 	 */
 	bool rayTest( ddgVector3 p1, ddgVector3 p2, ddgTriIndex tindex, int depth = -1 );
+
 };
 
 #ifdef DDGSTREAM

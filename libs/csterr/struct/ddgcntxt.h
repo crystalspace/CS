@@ -102,7 +102,7 @@ public:
 	/// Set the near clipping plane.
 	void nearfar (float n, float f) { _clipbox.setz(n,f); _dirty = true; }
 	/// Modify the field of vision angle of the view.
-	void fov( float f) { _fov = f; _dirty = true; }
+	void fov( float f) { _fov = f; _tanHalfFOV = f/2.0; _dirty = true; }
 	/// Return the field of vision angle of the view.
 	float fov( void ) { return _fov; }
     /// Set aspect ratio of the view, width/height.

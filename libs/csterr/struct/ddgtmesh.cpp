@@ -19,8 +19,6 @@
 //
 #include "struct/ddgtmesh.h"
 #include "struct/ddgbtree.h"
-// Size should be (# of tiles + #of triangles/frame ) *3 + 10 %
-
 // ----------------------------------------------------------------------
 //const unsigned int TBinMesh_size = 64;	// 64 seems to be a good size.
 ddgTBinMesh::ddgTBinMesh( ddgHeightMap * h )
@@ -41,8 +39,7 @@ ddgTBinMesh::ddgTBinMesh( ddgHeightMap * h )
 	_absDiffHeight = 0;
 	// Note Z axis is negative into the screen (Right Handed coord sys).
 	farClip(200);
-	// $TODO get merge working again.
-	_merge = false;
+	_merge = true;
 	_splitRun = true;	// 1st run should be a split only run.
 	_nearClip = 1;
 	// Allocate memory for active triangles.
@@ -53,7 +50,6 @@ ddgTBinMesh::ddgTBinMesh( ddgHeightMap * h )
 	tn->tindex(0);
 	tn->priority(0);
 	tn->vis(0);
-	tn->vbufferIndex(0);
 	// Allocate scratch entry.
 	_tcache.allocNode();
 
@@ -290,7 +286,7 @@ void ddgTBinMesh::initNeighbours( void )
                 stri[klk+t].neighbour = stri[lk+t].neighbour + lk + b;
             }
     	    // Check Edge cases
-			else if ((b = edge(kt)))
+			else if (b = edge(kt))
 			{
 				if (b==3) // Diagonal.
 				{
@@ -465,29 +461,18 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 				}
 		}
 */
+
 		// Validate the merge queue.
 		ddgCacheIndex ci = qmcache()->head();
-		// $TODO Dynamically allocate this.
-		static ddgTBinTree * btl[5000];
-		static ddgTriIndex til[5000];
-		int i = 0;
 		while (ci)
 		{
 			// Note cannot iterate over this and update directly since
 			// updateMerge modifies the order of items in the queue
 			ddgQNode *qn = qmcache()->get(ci);
-			btl[i] = getBinTree(qn->tree());
-			til[i] = qn->tindex();
 			ci = qmcache()->next(ci);
-			i++;
+			getBinTree(qn->tree())->updateMerge(qn->tindex(),ddgMAXPRI);
 			ddgAssert(i < 5000);
 		}
-		while(i)
-		{
-			i--;
-			btl[i]->updateMerge(til[i],ddgMAXPRI);
-		}
-
 	}
 
 	// Get the optimal number of visible triangles by balancing the queue.
@@ -520,11 +505,6 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 			si = qn->tindex();
 			// Split priority is stored in the tcache.
 			sp = sbt->priority(si);
-#ifdef _DEBUG
-			ddgAssert(sbt->tcacheId(qn->tindex()));
-			ddgTNode *tns = _tcache.get(sbt->tcacheId(qn->tindex()));
-			(void)tns;
-#endif
 		}
 		if (merge())
 		{
@@ -536,11 +516,6 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 				mi = qn->tindex();
 				// Note merge priority is stored in the queue itself.
 				mp = qmcache()->convert(qn->bucket());
-#ifdef _DEBUG
-				ddgAssert(mbt->tcacheId(qn->tindex()));
-				ddgTNode *tnm = _tcache.get(mbt->tcacheId(qn->tindex()));
-				(void)tnm;
-#endif
 				ddgAssert(sp == 0 || sp == qscache()->convert(qscache()->get(csi)->bucket()));
 				if (( _triVis > _maxDetail) // We have too many triangles.
 					|| (mp == 0)			// We have useless merge diamonds, merge these 1st.

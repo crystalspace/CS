@@ -146,7 +146,7 @@ bool ddgImage::readRGB( const char *filename  )
     _rows = h;
     _channels = d;
 #ifdef _DEBUG
-#ifdef DDG
+#ifdef DDGSTREAM
     cerr <<"Loaded RGB texture " << (char*)fullName << " (" << _cols << 'x' << _rows << ")\n";
 #endif
 #endif
@@ -171,7 +171,7 @@ bool ddgImage::readBW( const char *filename  )
     _rows = h;
     _channels = 1;
 #ifdef _DEBUG
-#ifdef DDG
+#ifdef DDGSTREAM
     cerr <<"Loaded BW texture " << (char*)fullName << " (" << _cols << 'x' << _rows << ")\n";
 #endif
 #endif
@@ -221,7 +221,7 @@ bool ddgImage::_readBWold( char *filename  )
     _rows = h;
     _channels = 1;
 #ifdef _DEBUG
-#ifdef DDG
+#ifdef DDGSTREAM
     cerr <<"Loaded BW old texture " << (char*)fullName << " (" << _cols << 'x' << _rows << ")\n";
 #endif
 #endif
@@ -356,7 +356,7 @@ bool ddgImage::readTGA(const char *filename)
 
     fclose(fptr);
 #ifdef _DEBUG
-#ifdef DDG
+#ifdef DDGSTREAM
     cerr <<"Loaded TGA texture " << (char*)fullName << " (" << _cols << 'x' << _rows << ":" << _channels <<")\n";
 #endif
 #endif

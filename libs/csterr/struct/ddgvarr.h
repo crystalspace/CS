@@ -28,6 +28,7 @@ typedef int ddgVBIndex;
  * A class supporting vertex array buffers.
  * It can allocate memory and supports pushing data into
  * buffers in various convenient configurations.
+ * Entry 0 is unused.
  */
 class WEXP ddgVArray 
  {

@@ -96,22 +96,13 @@ private:
 	 * Only 2 bits are currently used.
 	 */
 	ddgVisState _vis;
-	/// Index into the render buffer.					(4 byte)
-	ddgVBIndex	_vbufferIndex;
 	/// Index into the split queue cache if applicable.	(2 byte)
 	ddgCacheIndex	_qscacheIndex;
 	/// Index into the merge queue cache if applicable. (2 byte)
 	ddgCacheIndex	_qmcacheIndex;
 	/// Multiplier for priority recomputation. (4 byte)
 	float		_priorityFactor;
-/*
-	/// World space height value. (4 byte)
-	float		_height;
-	/// World space min height value. (4 byte)
-	float		_minHeight;
-	/// World space max height value. (4 byte)
-	float		_maxHeight;
-*/
+
 public:
 	/// Set the queue cache index.
 	void qscacheIndex( ddgCacheIndex ci ) { _qscacheIndex = ci; }
@@ -137,27 +128,10 @@ public:
 	inline ddgVisState vis(void) { return _vis; }
 
 	///
-	inline void vbufferIndex(ddgVBIndex p ) { _vbufferIndex = p; }
-	///
-	inline ddgVBIndex vbufferIndex(void) { return _vbufferIndex; }
-	///
 	inline void priorityFactor(float pf) { _priorityFactor = pf; }
 	///
 	inline float priorityFactor(void) { return _priorityFactor; }
-/*
-	///
-	inline float height(void) { return _height; }
-	///
-	inline float minHeight(void) { return _minHeight; }
-	///
-	inline float maxHeight(void) { return _maxHeight; }
-	///
-	inline void height(float h) { _height = h; }
-	///
-	inline void minHeight(float h) { _minHeight = h; }
-	///
-	inline void maxHeight(float h) { _maxHeight = h; }
-*/
+
 };
 
 /**
@@ -245,6 +219,14 @@ public:
 		qn->tree(t);
 		qn->tindex(ti);
 		return ci;
+	}
+	/**
+	 * Move a node from one position to another in the queue.
+	 */
+	inline void move(ddgCacheIndex ci, short b)
+	{
+		super::remove(ci);
+		super::insert(b);
 	}
 };
 /**
