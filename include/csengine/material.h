@@ -127,6 +127,7 @@ public:
   virtual iShaderVariable* GetVariable (csStringID name)
     { return (iShaderVariable *) symtab.GetSymbol (name); }
   virtual csSymbolTable* GetSymbolTable () { return & symtab; }
+  virtual csSymbolTable* GetSymbolTable (int i) { return & symtab; }
   virtual void SelectSymbolTable (int i) {}
 #endif
 

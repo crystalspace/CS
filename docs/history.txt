@@ -23,6 +23,8 @@ The history order is reversed so that new features are at the top.
 	      to get an extension symbol table without selecting it.
 	    - Rewrote the implementations of iShaderBranch::AddChild to make
 	      it add children to all symbol tables, not just the selected one.
+	- Oktal implemented no-op GetSymbolTable(int) in csMaterial (fixed
+	  new renderer compile error).
 18-Jul-2003
 	- Anders Stenberg fixed compile errors introduced by Oktal. New
 	  renderer should compile, although variable functionality is
