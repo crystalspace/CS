@@ -62,14 +62,25 @@ bool csFontServerMultiplexor::Initialize (iObjectRegistry *object_reg)
   // Query the auxiliary font servers in turn
   char tag [20];
   int idx;
+  int errorcount = 0;
   for (idx = 1; ; idx++)
   {
     sprintf (tag, "FontServer.%d", idx);
     iBase* b = CS_QUERY_REGISTRY_TAG (object_reg, tag);
-    if (!b) break;
-    iFontServer* fs = SCF_QUERY_INTERFACE (b, iFontServer);
-    fontservers.Push (fs);
-    b->DecRef ();
+    if (!b) 
+    {
+      // in cases where just one entry in the server list doesn't work
+      // but later ones would those are loaded, too
+      errorcount++;
+      if (errorcount == 2) break;
+    }
+    else
+    {
+      errorcount = 0;	
+      iFontServer* fs = SCF_QUERY_INTERFACE (b, iFontServer);
+      fontservers.Push (fs);
+      b->DecRef ();
+    }
   }
   if (!fontservers.Length ())
   {
