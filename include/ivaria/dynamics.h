@@ -26,6 +26,7 @@
 class csVector3;
 class csOrthoTransform;
 class csMatrix3;
+class csPlane3;
 struct iMeshWrapper;
 struct iSkeletonBone;
 
