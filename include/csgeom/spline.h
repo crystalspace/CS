@@ -20,16 +20,96 @@
 #define __SPLINE_H__
 
 /**
- * A cubic spline.
+ * A spline superclass.
  * This spline can control several dimensions at once.
  */
-class csCubicSpline
+class csSpline
 {
-private:
+protected:
   int dimensions;
   int num_points;
   float* time_points;
   float* points;
+  bool precalculation_valid;
+
+public:
+  /// Create a spline with d dimensions and p points.
+  csSpline (int d, int p);
+
+  /// Destroy the spline.
+  virtual ~csSpline ();
+
+  /// Get the number of dimensions.
+  int GetNumDimensions () { return dimensions; }
+
+  /// Get the number of points.
+  int GetNumPoints () { return num_points; }
+
+  /**
+   * Insert a point after some index. If index == -1 add a point before all
+   * others.
+   */
+  void InsertPoint (int idx);
+
+  /**
+   * Remove a point at the index.
+   */
+  void RemovePoint (int idx);
+
+  /**
+   * Set the time values. 't' should point to an array containing
+   * 'num_points' values. These values typically start with 0 and end
+   * with 1. Other values are also possible the but the values should
+   * rise. The given array is copied.
+   */
+  void SetTimeValues (float* t);
+
+  /**
+   * Set one time point.
+   */
+  void SetTimeValue (int idx, float t);
+
+  /**
+   * Get the time values.
+   */
+  float* GetTimeValues () { return time_points; }
+
+  /**
+   * Set the values for some dimension.
+   * 'd' should point to an array containing 'num_points' values.
+   * These are the values that will be interpolated. The given
+   * array is copied.
+   */
+  void SetDimensionValues (int dim, float* d);
+
+  /**
+   * Set a value for some dimension.
+   */
+  void SetDimensionValue (int dim, int idx, float d);
+
+  /**
+   * Get the values for some dimension.
+   */
+  float* GetDimensionValues (int dim) { return &points[dim*num_points]; }
+
+  /**
+   * Calculate internal values for this spline given some time value.
+   */
+  virtual void Calculate (float time) = 0;
+
+  /**
+   * After calling Calculate() you can use this to fetch the value of
+   * some dimension.
+   */
+  virtual float GetInterpolatedDimension (int dim) = 0;
+};
+
+/**
+ * A cubic spline.
+ */
+class csCubicSpline : public csSpline
+{
+private:
   bool derivatives_valid;
   float* derivative_points;
 
@@ -47,50 +127,67 @@ public:
   csCubicSpline (int d, int p);
 
   /// Destroy the spline.
-  ~csCubicSpline ();
-
-  /// Get the number of dimensions.
-  int GetNumDimensions () { return dimensions; }
-
-  /// Get the number of points.
-  int GetNumPoints () { return num_points; }
-
-  /**
-   * Set the time values. 't' should point to an array containing
-   * 'num_points' values. These values typically start with 0 and end
-   * with 1. Other values are also possible the but the values should
-   * rise. The given array is copied.
-   */
-  void SetTimeValues (float* t);
-
-  /**
-   * Get the time values.
-   */
-  float* GetTimeValues () { return time_points; }
-
-  /**
-   * Set the values for some dimension.
-   * 'd' should point to an array containing 'num_points' values.
-   * These are the values that will be interpolated. The given
-   * array is copied.
-   */
-  void SetDimensionValues (int dim, float* d);
-
-  /**
-   * Get the values for some dimension.
-   */
-  float* GetDimensionValues (int dim) { return &points[dim*num_points]; }
+  virtual ~csCubicSpline ();
 
   /**
    * Calculate internal values for this spline given some time value.
    */
-  void Calculate (float time);
+  virtual void Calculate (float time);
 
   /**
    * After calling Calculate() you can use this to fetch the value of
    * some dimension.
    */
-  float GetInterpolatedDimension (int dim);
+  virtual float GetInterpolatedDimension (int dim);
+};
+
+/**
+ * A B-spline.
+ */
+class csBSpline : public csSpline
+{
+private:
+  // The following values are calculated by Calculate() and
+  // are used later by GetInterpolatedDimension().
+  int idx;
+  float t;
+
+protected:
+  /// Base function for a cubic B-spline (i=-2..1).
+  virtual float BaseFunction (int i, float t);
+
+public:
+  /// Create a B-spline with d dimensions and p points.
+  csBSpline (int d, int p);
+
+  /// Destroy the spline.
+  virtual ~csBSpline ();
+
+  /**
+   * Calculate internal values for this spline given some time value.
+   */
+  virtual void Calculate (float time);
+
+  /**
+   * After calling Calculate() you can use this to fetch the value of
+   * some dimension.
+   */
+  virtual float GetInterpolatedDimension (int dim);
+};
+
+/**
+ * A CatmullRom spline.
+ */
+class csCatmullRomSpline : public csBSpline
+{
+protected:
+  /// Base function for a cubic CatmullRom spline (i=-2..1).
+  virtual float BaseFunction (int i, float t);
+
+public:
+  /// Create a CatmullRom spline with d dimensions and p points.
+  csCatmullRomSpline (int d, int p) : csBSpline (d, p) { }
 };
 
 #endif // __SPLINE_H__
+

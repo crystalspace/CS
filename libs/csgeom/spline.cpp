@@ -22,18 +22,120 @@
 
 //---------------------------------------------------------------------------
 
-csCubicSpline::csCubicSpline (int d, int p) : dimensions (d), num_points (p)
+csSpline::csSpline (int d, int p) : dimensions (d), num_points (p)
 {
   time_points = new float [p];
   points = new float [d*p];
+  precalculation_valid = false;
+}
+
+csSpline::~csSpline ()
+{
+  delete[] time_points;
+  delete[] points;
+}
+
+static void InsertFloat (float* dst, float* src, int idx, int num)
+{
+  if (idx == -1)
+  {
+    memcpy (dst+1, src, num*sizeof (float));
+  }
+  else if (idx >= num-1)
+  {
+    memcpy (dst, src, num*sizeof (float));
+  }
+  else
+  {
+    memcpy (dst, src, (idx+1)*sizeof (float));
+    memcpy (dst+idx+2, src+idx+1, (num-idx-1)*sizeof (float));
+  }
+}
+
+void csSpline::InsertPoint (int idx)
+{
+  float* time_points2 = new float [num_points+1];
+  float* points2 = new float [dimensions*(num_points+1)];
+  InsertFloat (time_points2, time_points, idx, num_points);
+  int dim;
+  for (dim = 0 ; dim < dimensions ; dim++)
+  {
+    float* d2 = &points2[dim*(num_points+1)];
+    float* d = &points[dim*num_points];
+    InsertFloat (d2, d, idx, num_points);
+  }
+  delete[] time_points; time_points = time_points2;
+  delete[] points; points = points2;
+  num_points++;
+  precalculation_valid = false;
+}
+
+static void RemoveFloat (float* dst, float* src, int idx, int num)
+{
+  if (idx <= 0)
+  {
+    memcpy (dst, src+1, (num-1)*sizeof (float));
+  }
+  else if (idx < num-1)
+  {
+    memcpy (dst, src, idx*sizeof (float));
+    memcpy (dst+idx, src+idx+1, (num-idx-1)*sizeof (float));
+  }
+}
+
+void csSpline::RemovePoint (int idx)
+{
+  float* time_points2 = new float [num_points-1];
+  float* points2 = new float [dimensions*(num_points-1)];
+  RemoveFloat (time_points2, time_points, idx, num_points);
+  int dim;
+  for (dim = 0 ; dim < dimensions ; dim++)
+  {
+    float* d2 = &points2[dim*(num_points+1)];
+    float* d = &points[dim*num_points];
+    RemoveFloat (d2, d, idx, num_points);
+  }
+  delete[] time_points; time_points = time_points2;
+  delete[] points; points = points2;
+  num_points--;
+  precalculation_valid = false;
+}
+
+void csSpline::SetTimeValues (float* t)
+{
+  memcpy (time_points, t, sizeof (float) * num_points);
+  precalculation_valid = false;
+}
+
+void csSpline::SetTimeValue (int idx, float t)
+{
+  time_points[idx] = t;
+  precalculation_valid = false;
+}
+
+void csSpline::SetDimensionValues (int dim, float* d)
+{
+  memcpy (&points[dim*num_points], d, sizeof (float) * num_points);
+  precalculation_valid = false;
+}
+
+void csSpline::SetDimensionValue (int dim, int idx, float d)
+{
+  float* p = &points[dim*num_points];
+  p[idx] = d;
+  precalculation_valid = false;
+}
+
+//---------------------------------------------------------------------------
+
+csCubicSpline::csCubicSpline (int d, int p) : csSpline (d, p)
+{
   derivative_points = new float [d*p];
-  derivatives_valid = false;
+  precalculation_valid = false;
 }
 
 csCubicSpline::~csCubicSpline ()
 {
-  delete[] time_points;
-  delete[] points;
   delete[] derivative_points;
 }
 
@@ -83,23 +185,13 @@ void csCubicSpline::PrecalculateDerivatives (int dim)
 
 void csCubicSpline::PrecalculateDerivatives ()
 {
-  if (derivatives_valid) return;
-  derivatives_valid = true;
+  if (precalculation_valid) return;
+  precalculation_valid = true;
+  delete[] derivative_points;
+  derivative_points = new float [dimensions*num_points];
   int dim;
   for (dim = 0 ; dim < dimensions ; dim++)
     PrecalculateDerivatives (dim);
-}
-
-void csCubicSpline::SetTimeValues (float* t)
-{
-  memcpy (time_points, t, sizeof (float) * num_points);
-  derivatives_valid = false;
-}
-
-void csCubicSpline::SetDimensionValues (int dim, float* d)
-{
-  memcpy (&points[dim*num_points], d, sizeof (float) * num_points);
-  derivatives_valid = false;
 }
 
 void csCubicSpline::Calculate (float time)
@@ -123,15 +215,86 @@ void csCubicSpline::Calculate (float time)
 
 float csCubicSpline::GetInterpolatedDimension (int dim)
 {
-  //@@@ TEMPORARY
   float* p = &points[dim*num_points];
 #if 0
+  //@@@ TEMPORARY
   return A*p[idx] + B*p[idx+1];
 #else
   float* dp = &derivative_points[dim*num_points];
   return A*p[idx] + B*p[idx+1] +
   	 C*dp[idx] + D*dp[idx+1];
 #endif
+}
+
+//---------------------------------------------------------------------------
+
+csBSpline::csBSpline (int d, int p) : csSpline (d, p)
+{
+}
+
+csBSpline::~csBSpline ()
+{
+}
+
+float csBSpline::BaseFunction (int i, float t)
+{
+  switch (i)
+  {
+    case -2: return (((-t+3)*t-3)*t+1)/6;
+    case -1: return (((3*t-6)*t)*t+4)/6;
+    case 0: return (((-3*t+3)*t+3)*t+1)/6;
+    case 1: return (t*t*t)/6;
+  }
+  return 0; // We only get here if an invalid i is specified.
+}
+
+void csBSpline::Calculate (float time)
+{
+  // First find the current 'idx'.
+  for (idx = 0 ; idx < num_points-1 ; idx++)
+  {
+    if (time >= time_points[idx] && time <= time_points[idx+1])
+      break;
+  }
+  t = 1. - (time_points[idx+1]-time) / (time_points[idx+1]-time_points[idx]);
+}
+
+float csBSpline::GetInterpolatedDimension (int dim)
+{
+  float* p = &points[dim*num_points];
+  float val = 0;
+  int j;
+  for (j = -2 ; j <= 1 ; j++)
+  {
+    // @@@ Not very efficient but it will do for now...
+    // We would need to cache p[-1] and p[-2]
+    float pp;
+    int id = idx+j+1;
+    if (id == -1)
+      pp = p[0] - (p[1]-p[0]);
+    else if (id == -2)
+      pp = p[0] - 2*(p[1]-p[0]);
+    else if (id == num_points)
+      pp = p[num_points-1] - (p[num_points-2]-p[num_points-1]);
+    else
+      pp = p[id];
+    val += BaseFunction (j, t) * pp;
+  }
+  return val;
+}
+
+//---------------------------------------------------------------------------
+
+float csCatmullRomSpline::BaseFunction (int i, float t)
+{
+  switch (i)
+  {
+    case -2: return ((-t+2)*t-1)*t/2;
+    case -1: return (((3*t-5)*t)*t+2)/2;
+    case 0: return ((-3*t+4)*t+1)*t/2;
+    case 1: return ((t-1)*t*t)/2;
+  }
+  return 0; // We only get here if an invalid i is specified.
 }
 
 //---------------------------------------------------------------------------

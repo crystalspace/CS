@@ -5,6 +5,11 @@ The history order is reversed so that new features are at the top.
 	  to work, but the spring falls through the sector walls.
 	- Fixed 'walkall' target. Removed obsolete 'imgload' target and
 	  added 'imgplex', 'gifimg', 'jpgimg', 'pngimg', and 'bmpimg'.
+	- Added csCubicSpline::InsertPoint(), RemovePoint(), SetTimeValue(),
+	  and SetDimensionValue().
+	- Made a csSpline superclass. Let csCubicSpline inherit from this.
+	  Added csBSpline and csCatmullRomSpline.
+	- csPath now inherits from csCatmullRomSpline. This is much nicer.
 22-Apr-2001
 	- Norman Kramer split the image loader into several plugins
 	  (iImageIO). Also added support for image saving (currently only

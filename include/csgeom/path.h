@@ -27,7 +27,7 @@
  * This is particularly useful in combination with
  * csReversibleTransform::LookAt().
  */
-class csPath : public csCubicSpline
+class csPath : public csCatmullRomSpline
 {
 private:
   void SetVectorAsDimensionValues (int dim, csVector3* v)
@@ -53,10 +53,10 @@ private:
 
 public:
   /// Create a path with p points.
-  csPath (int p) : csCubicSpline (9, p) { }
+  csPath (int p) : csCatmullRomSpline (9, p) { }
 
   /// Destroy the path.
-  ~csPath () { }
+  virtual ~csPath () { }
 
   /// Set the position vectors (first three dimensions of the cubic spline).
   void SetPositionVectors (csVector3* v)
