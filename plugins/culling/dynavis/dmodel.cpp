@@ -113,7 +113,7 @@ csObjectModelManager::csObjectModelManager () : models (12263)
 
 csObjectModelManager::~csObjectModelManager ()
 {
-  csHashIterator it (&models);
+  csGlobalHashIterator it (&models);
   while (it.HasNext ())
   {
     csObjectModel* model = (csObjectModel*)it.Next ();

@@ -62,11 +62,15 @@ typedef csArray<csHashBucket> csHashBucketVector;
 class csGlobalHashIterator
 {
   friend class csHashMap;
-  friend class csHashIteratorReversible;
+  friend class csGlobalHashIteratorReversible;
 
 private:
   /// Next bucket we are iterating over. NULL if no more elements.
   csHashBucket* bucket;
+  /// Current bucket we are iterating over. NULL if no more elements.
+  csHashBucket* current_bucket;
+  /// Current index in bucket.
+  int current_index;
   /// index of next item in bucket.
   int element_index;
   /// Current bucket index in hashmap.
@@ -113,16 +117,12 @@ class csHashIterator
 private:
   /// Next bucket we are iterating over. NULL if no more elements.
   csHashBucket* bucket;
-  /// Current bucket we are iterating over. NULL if no more elements.
-  csHashBucket* current_bucket;
   /// index of next item in bucket.
   int element_index;
   /// Current index in bucket.
   int current_index;
   /// Current bucket index in hashmap.
   uint32 bucket_index;
-  /// If true we are iterating over a key.
-  bool do_iterate_key;
   /// Key to iterate over.
   csHashKey key;
   /// Pointer to the hashmap.
@@ -131,16 +131,8 @@ private:
 private:
   /// Go to next element with same key.
   void GotoNextSameKey ();
-  /// Go to next element.
-  void GotoNextElement ();
 
 public:
-  /**
-   * Constructor for an iterator to iterate over all elements in a hashmap.
-   * Note that you should not do changes on the hashmap when you have
-   * open iterators.
-   */
-  csHashIterator (csHashMap* hash);
   /**
    * Constructor for an iterator to iterate over all elements with the
    * given key. Note that you should not do changes on the hashmap when

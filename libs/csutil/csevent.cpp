@@ -717,7 +717,7 @@ bool csEvent::Remove(const char *name, int index)
 
 bool csEvent::RemoveAll()
 {
-  csHashIteratorReversible iter(&attributes);
+  csGlobalHashIteratorReversible iter(&attributes);
   while (iter.HasNext())
   {
     csVector *v = (csVector *) iter.Next();
@@ -753,7 +753,7 @@ void IndentLevel(int level)
 
 bool csEvent::Print(int32 level)
 {
-  csHashIteratorReversible iter(&attributes);
+  csGlobalHashIteratorReversible iter(&attributes);
   while (iter.HasNext())
   {
     csVector *v = (csVector *) iter.Next();
@@ -837,7 +837,7 @@ uint32 csEvent::FlattenSize(int format)
 
 uint32 csEvent::FlattenSizeCrystal()
 {
-  csHashIteratorReversible iter(&attributes);
+  csGlobalHashIteratorReversible iter(&attributes);
   // Start count with the initial header
   // Version(4) + packet length(4) + Type(1) + Cat(1) + SubCat(1) 
   //    + Flags(1) + Time(4) + Joystick(5*4)
@@ -992,7 +992,7 @@ bool csEvent::FlattenXML(char * buffer)
 
 bool csEvent::FlattenCrystal(char * buffer)
 {
-  csHashIteratorReversible iter(&attributes);
+  csGlobalHashIteratorReversible iter(&attributes);
   uint8 ui8;
   int8 i8;
   uint16 ui16;

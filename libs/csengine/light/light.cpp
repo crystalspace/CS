@@ -426,7 +426,7 @@ csStatLight::csStatLight (
 
 csStatLight::~csStatLight ()
 {
-  csHashIterator it (lightinginfos.GetHashMap ());
+  csGlobalHashIterator it (lightinginfos.GetHashMap ());
   while (it.HasNext ())
   {
     iLightingInfo* linfo = (iLightingInfo*)it.Next ();
@@ -507,7 +507,7 @@ void csStatLight::AddAffectedLightingInfo (iLightingInfo* li)
 void csStatLight::SetColor (const csColor &col)
 {
   csLight::SetColor (col);
-  csHashIterator it (lightinginfos.GetHashMap ());
+  csGlobalHashIterator it (lightinginfos.GetHashMap ());
   while (it.HasNext ())
   {
     iLightingInfo* linfo = (iLightingInfo*)it.Next ();
@@ -543,7 +543,7 @@ csDynLight::~csDynLight ()
 {
   //csEngine::current_engine->RemoveDynLight (this);
 
-  csHashIterator it (lightinginfos.GetHashMap ());
+  csGlobalHashIterator it (lightinginfos.GetHashMap ());
   while (it.HasNext ())
   {
     iLightingInfo* linfo = (iLightingInfo*)it.Next ();
@@ -555,7 +555,7 @@ csDynLight::~csDynLight ()
 
 void csDynLight::Setup ()
 {
-  csHashIterator it (lightinginfos.GetHashMap ());
+  csGlobalHashIterator it (lightinginfos.GetHashMap ());
   while (it.HasNext ())
   {
     iLightingInfo* linfo = (iLightingInfo*)it.Next ();
@@ -604,7 +604,7 @@ void csDynLight::SetColor (const csColor &col)
 {
   csLight::SetColor (col);
 
-  csHashIterator it (lightinginfos.GetHashMap ());
+  csGlobalHashIterator it (lightinginfos.GetHashMap ());
   while (it.HasNext ())
   {
     iLightingInfo* linfo = (iLightingInfo*)it.Next ();

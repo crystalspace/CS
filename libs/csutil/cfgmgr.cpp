@@ -85,7 +85,7 @@ public:
 
   void ClearIterated()
   {
-    csHashIterator it (&Iterated);
+    csGlobalHashIterator it (&Iterated);
     while (it.HasNext())
     {
       char *n = (char*)it.Next();

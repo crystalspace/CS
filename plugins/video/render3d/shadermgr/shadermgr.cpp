@@ -108,7 +108,7 @@ csShaderManager::csShaderManager(iBase* parent)
 csShaderManager::~csShaderManager()
 {
   //Clear variables
-  csHashIterator cIter( variables);
+  csGlobalHashIterator cIter( variables);
 
   while(cIter.HasNext() )
   {
@@ -205,7 +205,7 @@ csBasicVector csShaderManager::GetAllVariableNames()
 {
   csBasicVector vReturnValue;
 
-  csHashIterator cIter (variables);
+  csGlobalHashIterator cIter (variables);
   while(cIter.HasNext())
   {
     vReturnValue.Push( (void*) ((iShaderVariable*)cIter.Next())->GetName() );
@@ -308,7 +308,7 @@ csShader::~csShader()
     delete name;
 
   //Clear variables
-  csHashIterator cIter( variables);
+  csGlobalHashIterator cIter( variables);
 
   while(cIter.HasNext() )
   {
@@ -371,7 +371,7 @@ csBasicVector csShader::GetAllVariableNames()
 {
   csBasicVector vReturnValue;
 
-  csHashIterator cIter (variables);
+  csGlobalHashIterator cIter (variables);
   while(cIter.HasNext())
   {
     vReturnValue.Push( (void*) ((iShaderVariable*)cIter.Next())->GetName() );

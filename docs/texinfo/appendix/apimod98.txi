@@ -161,3 +161,12 @@ Several methods in @code{iPortal} have changed slightly. For example
 
 The @code{csSome}, @code{csConstSome} and @code{uint} types have been removed.
 Use @code{void*}, @code{const void*} and @code{usigned int} instead.
+
+@subheading csHashMap changes
+@cindex @code{csHashMap}
+@cindex @code{csHashIterator}
+@cindex @code{csGlobalHashIterator}
+
+@code{csHashIterator} can no longer iterate over all objects. To do that
+you need to use @code{csGlobalHashIterator}.
+

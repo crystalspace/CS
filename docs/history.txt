@@ -22,6 +22,10 @@ The history order is reversed so that new features are at the top.
 	- Optimized csHashMap again.
 	- Added csGlobalHashIterator to iterate over all elements in a hashmap.
 	  This is more efficient then using csHashIterator for this.
+	- csHashIterator can no longer iterate over the entire hash. If you
+	  want that you need csGlobalHashIterator instead. That way it
+	  is possible to more efficiently optimize the two different
+	  ways to iterator. The same is true for csHashIteratorReversible.
 24-Apr-2003
 	- Eric Sunshine made the following changes:
 	    - Improved robustness of --with-x check for Darwin/Macintosh, since

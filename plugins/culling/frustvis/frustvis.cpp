@@ -318,7 +318,7 @@ void csFrustumVis::UpdateObjects ()
 {
   updating = true;
   {
-    csHashIterator it (update_queue.GetHashMap ());
+    csGlobalHashIterator it (update_queue.GetHashMap ());
     while (it.HasNext ())
     {
       csFrustVisObjectWrapper* vw = (csFrustVisObjectWrapper*)it.Next ();

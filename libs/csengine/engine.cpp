@@ -1653,7 +1653,7 @@ void csEngine::ControlMeshes ()
   nextframe_pending = virtual_clock->GetCurrentTicks ();
 
   // Delete particle systems that self-destructed now.
-  csHashIterator it (want_to_die.GetHashMap ());
+  csGlobalHashIterator it (want_to_die.GetHashMap ());
   while (it.HasNext ())
   {
     iMeshWrapper* mesh = (iMeshWrapper*)it.Next ();

@@ -83,7 +83,7 @@ const char* csStringHash::Request (csStringID id)
 {
   csRegisteredString *itf;
 
-  csHashIterator it (&Registry);
+  csGlobalHashIterator it (&Registry);
   while (it.HasNext ())
   {
     itf = (csRegisteredString*) it.Next ();
@@ -96,7 +96,7 @@ const char* csStringHash::Request (csStringID id)
 
 void csStringHash::Clear ()
 {
-  csHashIterator it (&Registry);
+  csGlobalHashIterator it (&Registry);
 
   while (it.HasNext ())
   {
@@ -108,7 +108,7 @@ void csStringHash::Clear ()
 
 csStringHashIterator::csStringHashIterator (csStringHash* hash)
 {
-  hashIt = new csHashIterator (&hash->Registry);
+  hashIt = new csGlobalHashIterator (&hash->Registry);
 }
 
 bool csStringHashIterator::HasNext ()

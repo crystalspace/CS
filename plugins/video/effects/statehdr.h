@@ -54,7 +54,7 @@ class csStateHandler
 {
 private:
   csHashMap *states;
-  csHashIterator* iterator;
+  csGlobalHashIterator* iterator;
 
 public:
   csStateHandler();

@@ -28,11 +28,11 @@ class csHashMapReversible : public csHashMap
 {
   friend class csHashIteratorReversible;
 
-  protected:
+protected:
   csHashMap *Reverse;
   csHashMap *HalfReverse;
 
-  public:
+public:
   csHashMapReversible (uint32 size = 211);
 
   virtual ~csHashMapReversible ();
@@ -49,19 +49,32 @@ class csHashMapReversible : public csHashMap
 };
 
 /// A csHashIterator that knows about csHashMapReversible's reverse hash.
+class csGlobalHashIteratorReversible : public csGlobalHashIterator
+{
+  friend class csHashMapReversible;
+
+private:
+  csHashMapReversible *hashr;
+
+public:
+  /// Construct an iterator over specific elements of a reversible hash
+  csGlobalHashIteratorReversible (csHashMapReversible *hash);
+
+  /// Get the key of the current value.
+  const char* GetKey () const;
+};
+
+/// A csHashIterator that knows about csHashMapReversible's reverse hash.
 class csHashIteratorReversible : public csHashIterator
 {
   friend class csHashMapReversible;
 
-  private:
+private:
   csHashMapReversible *hashr;
   const char *iterr;
   csHashKey keyr;
 
-  public:
-  /// Construct an iterator over all elements of a reversible hash
-  csHashIteratorReversible (csHashMapReversible *hash);
-
+public:
   /// Construct an iterator over specific elements of a reversible hash
   csHashIteratorReversible (csHashMapReversible *hash, csHashKey key);
 

@@ -45,7 +45,7 @@ class csStringHashIterator
   friend class csStringHash;
 
 private:
-  csHashIterator* hashIt;
+  csGlobalHashIterator* hashIt;
 
 public:
 

@@ -52,12 +52,7 @@ const char* csHashMapReversible::GetKey (csHashKey key) const
   return (char *) HalfReverse->Get (key);
 }
 
-csHashIteratorReversible::csHashIteratorReversible (csHashMapReversible *r)
-  : csHashIterator (r)
-{
-  hashr = r;
-  iterr = NULL;
-}
+//----------------------------------------------------------------------------
 
 csHashIteratorReversible::csHashIteratorReversible (csHashMapReversible *r,
   csHashKey k) : csHashIterator (r, k)
@@ -85,6 +80,23 @@ csHashObject csHashIteratorReversible::Next ()
 }
 
 const char* csHashIteratorReversible::GetKey () const
+{
+  if ((bucket != NULL) && (current_index > -1)
+  	&& (current_index <= bucket->Length())) 
+    return hashr->GetKey ( ((*bucket) [current_index]) .key);
+  else
+    return NULL;
+}
+
+//----------------------------------------------------------------------------
+
+csGlobalHashIteratorReversible::csGlobalHashIteratorReversible (
+	csHashMapReversible *r) : csGlobalHashIterator (r)
+{
+  hashr = r;
+}
+
+const char* csGlobalHashIteratorReversible::GetKey () const
 {
   if ((current_bucket != NULL) && (current_index > -1)
   	&& (current_index <= current_bucket->Length())) 

@@ -38,7 +38,7 @@ csStateHandler::~csStateHandler()
   if (iterator != NULL)
     delete iterator;
 
-  csHashIterator cIterator (states);
+  csGlobalHashIterator cIterator (states);
   while (cIterator.HasNext())
   {
     delete (statedata*)cIterator.Next();
@@ -159,7 +159,7 @@ csStringID csStateHandler::GetFirstState()
   if (iterator != NULL)
     delete iterator;
 
-  iterator = new csHashIterator (states);
+  iterator = new csGlobalHashIterator (states);
   if (iterator->HasNext())
     return ((statedata*)(iterator->Next()))->name;
   return csInvalidStringID;

@@ -315,7 +315,7 @@ bool csGenmeshMeshObject::WriteToCache (iCacheManager* cache_mgr)
   bool rc = false;
   csMemFile mf;
   mf.Write (LMMAGIC, 4);
-  csHashIterator it (affecting_lights.GetHashMap ());
+  csGlobalHashIterator it (affecting_lights.GetHashMap ());
   while (it.HasNext ())
   {
     iLight* l = (iLight*)it.Next ();
@@ -578,7 +578,7 @@ void csGenmeshMeshObject::UpdateLighting2 (iMovable* movable)
     colors[i] = col;
 
   csReversibleTransform trans = movable->GetFullTransform ();
-  csHashIterator it (affecting_lights.GetHashMap ());
+  csGlobalHashIterator it (affecting_lights.GetHashMap ());
   while (it.HasNext ())
   {
     iLight* l = (iLight*)it.Next ();

@@ -85,7 +85,7 @@ bool ProcEventHandler::HandleEvent (iEvent& event)
   if (event.Type == csevBroadcast && event.Command.Code == cscmdPreProcess)
   {
     {
-      csHashIterator it (textures.GetHashMap ());
+      csGlobalHashIterator it (textures.GetHashMap ());
       while (it.HasNext ())
       {
         csProcTexture* pt = (csProcTexture*)it.Next ();

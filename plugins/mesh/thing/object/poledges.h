@@ -79,7 +79,7 @@ class csEdgeIterator
 
 private:
   /// Hash iterator.
-  csHashIterator* iterator;
+  csGlobalHashIterator* iterator;
   /// Current poledge structure.
   csPolEdge* current;
 

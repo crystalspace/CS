@@ -264,7 +264,7 @@ csBasicVector csShaderGLCGFP::GetAllVariableNames()
 {
   csBasicVector res;
 
-  csHashIterator c( &variables);
+  csGlobalHashIterator c( &variables);
   while(c.HasNext())
   {
     res.PushSmart( (void*)((iShaderVariable*)c.Next())->GetName());

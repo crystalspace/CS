@@ -59,7 +59,7 @@ csGlobalHashIterator::csGlobalHashIterator (csHashMap *hm)
 
 bool csGlobalHashIterator::HasNext ()
 {
-  return bucket && bucket->Length () > 0;
+  return bucket != NULL;
 }
 
 void csGlobalHashIterator::GotoNextElement ()
@@ -86,6 +86,8 @@ csHashObject csGlobalHashIterator::Next ()
 {
   if (bucket == NULL) return NULL;
   csHashObject obj = ((*bucket)[element_index]).object;
+  current_index = element_index;
+  current_bucket = bucket;
   GotoNextElement ();
   return obj;
 }
@@ -97,54 +99,22 @@ void csGlobalHashIterator::DeleteNext ()
 
 //-----------------------------------------------------------------------------
 
-csHashIterator::csHashIterator (csHashMap *hm)
-{
-  hash = hm;
-  bucket = NULL;
-  element_index = 0;
-  bucket_index = (uint32)-1;
-  do_iterate_key = false;
-  GotoNextElement ();
-}
-
 csHashIterator::csHashIterator (csHashMap *hm, csHashKey hkey)
 {
   uint32 idx = hkey % hm->NumBuckets;
 
   hash = hm;
-  bucket = &(hm->Buckets[idx]); // NULL if bucket is empty.
+  bucket = &(hm->Buckets[idx]);
   element_index = -1;
-  current_bucket = NULL;
   current_index = -1;
   bucket_index = idx;
   key = hkey;
-  do_iterate_key = true;
   GotoNextSameKey ();
 }
 
 bool csHashIterator::HasNext ()
 {
   return bucket && bucket->Length () > 0;
-}
-
-void csHashIterator::GotoNextElement ()
-{
-  element_index++;
-  if (!bucket || element_index >= bucket->Length ())
-  {
-    // Next bucket.
-    bucket_index++;
-    uint32 const nbuckets = (uint32)hash->Buckets.Length();
-    while (bucket_index < nbuckets && (hash->Buckets[bucket_index].Length()==0))
-      bucket_index++;
-    if (bucket_index >= nbuckets)
-      bucket = NULL;	// The end
-    else
-    {
-      bucket = &(hash->Buckets[bucket_index]);
-      element_index = 0;
-    }
-  }
 }
 
 void csHashIterator::GotoNextSameKey ()
@@ -164,9 +134,7 @@ csHashObject csHashIterator::Next ()
   if (bucket == NULL) return NULL;
   csHashObject obj = ((*bucket)[element_index]).object;
   current_index = element_index;
-  current_bucket = bucket;
-  if (do_iterate_key) GotoNextSameKey ();
-  else GotoNextElement ();
+  GotoNextSameKey ();
   return obj;
 }
 

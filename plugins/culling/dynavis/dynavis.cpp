@@ -388,7 +388,7 @@ void csDynaVis::UpdateObjects ()
 {
   updating = true;
   {
-    csHashIterator it (update_queue.GetHashMap ());
+    csGlobalHashIterator it (update_queue.GetHashMap ());
     while (it.HasNext ())
     {
       csVisibilityObjectWrapper* vw = (csVisibilityObjectWrapper*)it.Next ();

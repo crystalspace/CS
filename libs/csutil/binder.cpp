@@ -229,7 +229,7 @@ bool csInputBinder::Unbind (iEvent &ev)
 
 bool csInputBinder::UnbindAll ()
 {
-  csHashIterator iter (& Hash);
+  csGlobalHashIterator iter (& Hash);
   if (! iter.HasNext ()) return false;
   while (iter.HasNext ())
     delete (csEvBind *) iter.Next ();
