@@ -178,7 +178,7 @@ csapi/index.html: $(CSAPI) newdoc/html/docxxbanner.html
 api: csapi/index.html pics
 
 csdoc/index.html: $(CSDOC) newdoc/html/docxxbanner.html
-	doc++ -F -B newdoc/html/docxxbanner.html -j -H -d csdoc -f $(CSDOC)
+	doc++ -F -T newdoc/html/docxxbanner.html -j -H -d csdoc -f $(CSDOC)
 	rm -f csdoc/HIERjava.html
 	
 doc: csdoc/index.html pics
