@@ -142,7 +142,7 @@ endif
 SED_DEPEND=-e "s/^\([^ ].*\)/$$\(OUT\)\1/" $(SYS_SED_DEPEND)
 # How to build a source dependency file
 ifndef DO.DEP
-  DO.DEP = -$(CC) -MM $(CFLAGS) $(CFLAGS.INCLUDE) $^ | sed $(SED_DEPEND) >$@
+  DO.DEP = -$(CC) -MM $(CFLAGS) $(CFLAGS.INCLUDE) $(filter-out %.asm,$^) | sed $(SED_DEPEND) >$@
 endif
 
 # Directories for output files
