@@ -11,17 +11,26 @@ ExternalLibs vfs : ZLIB ;
 
 Help vfs : "Virtual File System plug-in" ;
 
+rule VfsCfgGen
+{
+  Depends $(<) : $(>) ;
+  Always $(<) ;
+  NotFile $(<) ;
+}
+
 actions VfsCfgGen
 {
-  cat $(SUBDIR)/vfs.cfg.template > $(<)
+  cat $(>) > $(<)
   echo "VFS.Unix.CS_DATADIR = $(DATADIR) " >> $(<)
   echo "VFS.Unix.CS_CONFIGDIR = $(SYSCONFDIR) " >> $(<)
   echo "VFS.Unix.CS_MAPDIR = $(MAPDIR) " >> $(<)
 }
 
 # Build our own vfs.cfg
-LOCATE on <config>vfs.cfg = $(LOCATE_TARGET) ;
-VfsCfgGen <config>vfs.cfg ;
+VFS_CONFIGFILE = vfs.cfg ;
+LOCATE on vfs.cfg = $(LOCATE_TARGET) ;
+SEARCH on vfs.cfg = $(LOCATE_TARGET) ;
+VfsCfgGen vfs.cfg : $(SUBDIR)/vfs.cfg.template ;
 InstallConfig vfs.cfg ;
 
 }

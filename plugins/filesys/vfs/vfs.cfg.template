@@ -1,0 +1,63 @@
+; Some basic mount points
+VFS.Mount.~ = $(HOME)$/
+VFS.Mount.this = $.$/
+VFS.Mount.cdrom = $(CS_CDROM)$/
+VFS.Mount.tmp = $(CS_TMP)$/
+VFS.Mount.temp = $.$/data$/temp$/
+
+; Configuration repository
+VFS.Mount.config = $(CS_CONFIGDIR)$/
+VFS.Mount.data = $(CS_DATADIR)$/
+;VFS.Mount.config = $
+
+VFS.Mount.shader = $(CS_DATADIR)$/shader$/
+; The TTF font library
+VFS.Mount.fonts/ttf   = $(CS_DATADIR)$/ttf$/, $(TTF_PATH:$.$/)
+
+VFS.Mount.lev/flarge   = $(CS_MAPDIR)$/flarge$/
+VFS.Mount.lev/isomap   = $(CS_MAPDIR)$/isomap.zip, $(CS_DATADIR)$/isomap$/
+VFS.Mount.lev/mdltest  = $(CS_MAPDIR)$/mdltest$/
+VFS.Mount.lev/partsys  = $(CS_MAPDIR)$/partsys$/
+VFS.Mount.lev/terrain  = $(CS_MAPDIR)$/terrain$/
+
+VFS.Mount.data/blocks   = $(CS_DATADIR)$/blocks.zip
+
+; Mount all libraries under the /lib/ directory
+VFS.Mount.lib/std      = $(CS_DATADIR)$/standard.zip
+VFS.Mount.lib/stdtex   = $(CS_DATADIR)$/stdtex.zip
+VFS.Mount.lib/csws     = $(CS_DATADIR)$/csws.zip
+
+; Mount for AWS
+VFS.Mount.aws     = $(CS_DATADIR)$/awsdef.zip
+
+; Mount for unittest
+VFS.Mount.lev/unittest   = $(CS_DATADIR)$/unittest$/
+
+; The following should not change too often...
+; The idea is that everything that should be changed (such as CDROM variable)
+; is set by some sort of setup (installation) program.
+; Note that variables in VFS.Platform. section will override any
+; variables in VFS.PlatformAlias. section.
+VFS.Alias.Unix = VFS.Unix
+VFS.Alias.MacOS/X = VFS.Unix
+VFS.Alias.Win32 = VFS.CP/M
+
+; strange key names follow:
+; VFS.Unix.. means key '.' in section VFS.Unix.*
+; VFS.Unix... means key '..' in section VFS.Unix.*
+VFS.Unix.. = .
+VFS.Unix... = ..
+VFS.Unix.CS_CDROM = /mnt/cdrom
+VFS.Unix.CS_TMP = /tmp
+; This is true at least for systems using XFree86
+VFS.Unix.CS_TTF_PATH = /usr/X11R6/lib/X11/fonts/Truetype/
+
+VFS.CP/M.. = .
+VFS.CP/M... = ..
+VFS.CP/M.HOME = $(HOMEDIR:$(HOMEPATH:.))
+VFS.CP/M.CDROM = x:
+VFS.CP/M.TMP = $(TEMP:$(TMP:$(SYSTEMROOT)$/temp))
+
+; The standard location of TTF fonts is the X:\Windows\fonts directory
+VFS.Win32.TTF_PATH = $(SYSTEMROOT)$/fonts$/
+
