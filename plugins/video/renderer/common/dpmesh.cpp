@@ -49,7 +49,7 @@ static CS_DECLARE_GROWING_ARRAY (visible, bool);
  */
 void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
 	const csReversibleTransform& o2c,
-	iClipper2D* clipper, bool lazyclip, float aspect,
+	iClipper2D* clipper, bool /*lazyclip*/, float aspect,
 	int width2, int height2)
 {
   csPolArrayPolygonBuffer* polbuf = (csPolArrayPolygonBuffer*)mesh.polybuf;

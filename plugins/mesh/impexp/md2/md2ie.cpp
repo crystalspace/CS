@@ -130,7 +130,7 @@ csModelConverterMD2::~csModelConverterMD2 ()
 {
 }
 
-bool csModelConverterMD2::Initialize (iObjectRegistry *objreg)
+bool csModelConverterMD2::Initialize (iObjectRegistry *)
 {
   return true;
 }
@@ -329,7 +329,7 @@ iModelData *csModelConverterMD2::Load (UByte *Buffer, ULong Size)
   return Scene;
 }
 
-iDataBuffer *csModelConverterMD2::Save (iModelData *Data, const char *Format)
+iDataBuffer *csModelConverterMD2::Save (iModelData *, const char *Format)
 {
   if (strcasecmp (Format, "md2"))
     return NULL;

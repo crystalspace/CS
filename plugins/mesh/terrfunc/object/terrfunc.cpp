@@ -861,7 +861,7 @@ void csTerrFuncObject::ComputeLODLevel (
   delete verts;
 }
 
-void csTerrFuncObject::ComputeNormals (const G3DTriangleMesh& mesh,
+void csTerrFuncObject::ComputeNormals (const G3DTriangleMesh& /*mesh*/,
 	csVector3* mesh_vertices,
 	int num_mesh_vertices,
     	csVector3** pNormals)
@@ -921,7 +921,7 @@ void csTerrFuncObject::ComputeNormals ()
       }
 }
 
-void csTerrFuncObject::ComputeBBox (const G3DTriangleMesh& mesh,
+void csTerrFuncObject::ComputeBBox (const G3DTriangleMesh& /*mesh*/,
 	csVector3* mesh_vertices,
 	int num_mesh_vertices, csBox3& bbox)
 {

@@ -95,7 +95,7 @@ csModelConverterPOV::~csModelConverterPOV ()
 {
 }
 
-bool csModelConverterPOV::Initialize (iObjectRegistry *objreg)
+bool csModelConverterPOV::Initialize (iObjectRegistry *)
 {
   return true;
 }

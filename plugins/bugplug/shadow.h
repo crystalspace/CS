@@ -108,6 +108,7 @@ public:
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const { return NULL; }
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
   {
+    (void)type;
     bbox.Set (-100000, -100000, -100000, 100000, 100000, 100000);
     return;
   }

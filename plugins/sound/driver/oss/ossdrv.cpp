@@ -67,7 +67,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 static int lasterr=0;
 static int gaudio;
-static bool inUse=false;
 static const char *err[]=
 {
   "no error", "get semaphore", "dec semaphore", "inc semaphore",

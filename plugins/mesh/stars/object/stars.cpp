@@ -75,7 +75,7 @@ void csStarsMeshObject::SetupObject ()
   }
 }
 
-bool csStarsMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
+bool csStarsMeshObject::DrawTest (iRenderView*, iMovable*)
 {
   SetupObject ();
   return true;
@@ -101,7 +101,7 @@ static void Perspective (const csVector3& v, csVector2& p, float fov,
 */
 
 bool csStarsMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
-	csZBufMode mode)
+	csZBufMode)
 {
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 

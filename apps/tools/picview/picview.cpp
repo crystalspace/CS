@@ -47,7 +47,7 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
-ceImageView::ceImageView (csComponent *iParent, iGraphics3D *G3D)
+ceImageView::ceImageView (csComponent *iParent, iGraphics3D * /*G3D*/)
   	: csComponent (iParent)
 {
   image = NULL;

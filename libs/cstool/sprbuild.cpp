@@ -223,7 +223,7 @@ void csSpriteBuilderFile::StoreTriangle (int a, int b, int c)
   Out << "    TRIANGLE (" << a << ',' << b << ',' << c << ")\n";
 }
 
-void csSpriteBuilderFile::StoreMaterial (iModelDataMaterial *mat)
+void csSpriteBuilderFile::StoreMaterial (iModelDataMaterial * /*mat*/)
 {
   char *name = "obj";
   Out << "    MATERIAL ('" << name << "skin')\n";
@@ -250,7 +250,7 @@ void csSpriteBuilderFile::FinishFrame ()
 }
 
 void csSpriteBuilderFile::AddVertex (const csVector3 &pos,
-	const csVector3 &nrm, const csVector2 &tex)
+	const csVector3 & /*nrm*/, const csVector2 &tex)
 {
   Out << "      V (" << pos.x << ',' << pos.y << ',' << pos.z;
   Out << ':' << tex.x << ',' << tex.y << ")\n";

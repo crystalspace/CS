@@ -126,7 +126,7 @@ csModelConverterMDL::~csModelConverterMDL ()
 {
 }
 
-bool csModelConverterMDL::Initialize (iObjectRegistry *objreg)
+bool csModelConverterMDL::Initialize (iObjectRegistry *)
 {
   return true;
 }
@@ -376,7 +376,7 @@ iModelData *csModelConverterMDL::Load (UByte *Buffer, ULong Size)
   return Scene;
 }
 
-iDataBuffer *csModelConverterMDL::Save (iModelData *Data, const char *Format)
+iDataBuffer *csModelConverterMDL::Save (iModelData *, const char *Format)
 {
   if (strcasecmp (Format, "mdl"))
     return NULL;

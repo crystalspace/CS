@@ -713,7 +713,7 @@ csSprite3DMeshObject::~csSprite3DMeshObject ()
 
 int csSprite3DMeshObject::GetLODPolygonCount (float lod) const
 {
-  return QInt (factory->GetTriangleCount () * GetLodLevel ());
+  return QInt (factory->GetTriangleCount () * lod);
 }
 
 void csSprite3DMeshObject::SetFactory (csSprite3DMeshObjectFactory* tmpl)

@@ -1529,7 +1529,7 @@ public:
     {
       return csSprite3DMeshObject::global_lod_level;
     }
-    virtual int GetLODPolygonCount (float lod) const
+    virtual int GetLODPolygonCount (float /*lod*/) const
     {
       return 0;
     }

@@ -122,7 +122,7 @@ csModelConverterASE::~csModelConverterASE ()
 {
 }
 
-bool csModelConverterASE::Initialize (iObjectRegistry *objreg)
+bool csModelConverterASE::Initialize (iObjectRegistry *)
 {
   return true;
 }
@@ -230,7 +230,7 @@ bool csASEInterpreter_MAIN (csModelConverterASE *conv, csDataStream &in,
   return false;
 }
 
-bool csASEInterpreter_SCENE (csModelConverterASE *conv, csDataStream &in,
+bool csASEInterpreter_SCENE (csModelConverterASE *conv, csDataStream &/*in*/,
   const char *Token)
 {
   CS_ASE_READ_IGNORE ("*SCENE_AMBIENT_STATIC");
@@ -436,7 +436,8 @@ bool csASEInterpreter_MESH_NORMALS (csModelConverterASE *conv, csDataStream &in,
   return false;
 }
 
-bool csASEInterpreter_MESH_CFACELIST (csModelConverterASE *conv, csDataStream &in,
+bool csASEInterpreter_MESH_CFACELIST (csModelConverterASE *conv,
+  csDataStream &/*in*/,
   const char *Token)
 {
   CS_ASE_READ_IGNORE ("*MESH_CFACE");
@@ -463,7 +464,7 @@ bool csASEInterpreter_MESH_CVERTLIST (csModelConverterASE *conv, csDataStream &i
   return false;
 }
 
-bool csASEInterpreter_MESH_TFACELIST (csModelConverterASE *conv, csDataStream &in,
+bool csASEInterpreter_MESH_TFACELIST (csModelConverterASE *conv, csDataStream &/*in*/,
   const char *Token)
 {
   CS_ASE_READ_IGNORE ("*MESH_TFACE");

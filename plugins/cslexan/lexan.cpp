@@ -111,7 +111,7 @@ csLexicalAnalyzer::GetMatchedText()
 }
 
 bool 
-csLexicalAnalyzer::PushStream(iDataBuffer &buf)
+csLexicalAnalyzer::PushStream(iDataBuffer &/*buf*/)
 {
  return false;
 }

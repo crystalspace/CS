@@ -94,7 +94,7 @@ csModelConverterOBJ::~csModelConverterOBJ ()
 {
 }
 
-bool csModelConverterOBJ::Initialize (iObjectRegistry *objreg)
+bool csModelConverterOBJ::Initialize (iObjectRegistry *)
 {
   return true;
 }

@@ -66,7 +66,7 @@ void csGfxProgressMeter::SetProgressDescription (const char* id,
   va_end (arg);
 }
 
-void csGfxProgressMeter::SetProgressDescriptionV (const char* id,
+void csGfxProgressMeter::SetProgressDescriptionV (const char* /*id*/,
 	const char* description, va_list list)
 {
   vsprintf (cur_description, description, list);

@@ -87,7 +87,7 @@ csModelConverterSPR::~csModelConverterSPR ()
 {
 }
 
-bool csModelConverterSPR::Initialize (iObjectRegistry *objreg)
+bool csModelConverterSPR::Initialize (iObjectRegistry *)
 {
   return true;
 }

@@ -62,7 +62,7 @@ private:
     // Destroy the vector.
     virtual ~csPluginsVector () { DeleteAll (); }
     // Find a plugin by its address
-    virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const
+    virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
     {
       return ((csPlugin *)Item)->Plugin == Key ? 0 : 1;
     }
