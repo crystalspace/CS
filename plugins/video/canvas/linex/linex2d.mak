@@ -56,7 +56,7 @@ INC.LINEX2D = $(wildcard plugins/video/canvas/linex/*.h   $(INC.COMMON.DRV2D))
 SRC.LINEX2D = $(wildcard plugins/video/canvas/linex/*.cpp $(SRC.COMMON.DRV2D))\
   plugins/video/canvas/common/x11-keys.cpp
 OBJ.LINEX2D = $(addprefix $(OUT),$(notdir $(SRC.LINEX2D:.cpp=$O)))
-DEP.LINEX2D = CSUTIL CSSYS CSUTIL
+DEP.LINEX2D = CSUTIL CSSYS CSUTIL CSGEOM
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
