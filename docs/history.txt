@@ -1,6 +1,15 @@
 The history order is reversed so that new features are at the top.
 
 1-Feb-2003
+	- Marten Svanfeldt completly rewrote the renderbuffer manager using
+	  the VAR extension on Nvidia-cards
+	- Marten Svanfeldt added a very lightweight template for a double
+	  linked list.
+	- Marten Svanfeldt renamed iShaderRenderInterface::GetObject to
+	  GetPrivateObject to avoid a error with #define GetObject GetObjectA
+	  which exsists somewhere in the windows-headers.
+	- Marten Svanfeldt renamed iRenderBufferManager::GetBuffer to
+	  CreateBuffer to better show what it does.
 	- Lightmaps with DrawPolygonMesh were not correctly aligned. This
 	  is a very old bug that was fixed for normal lightmap rendering
 	  but not for DrawPolygonMesh.
