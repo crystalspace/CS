@@ -145,6 +145,14 @@ AR = libtool
 ARFLAGS = -static -o
 # </cs-config>
 
+# MacOS/X Panther expects us to use the -s option with ranlib.
+# <cs-config>
+ifeq (,$(RANLIB))
+RANLIB = ranlib
+endif
+RANLIB += -s
+# </cs-config>
+
 # The stripper :-)
 STRIP = strip
 

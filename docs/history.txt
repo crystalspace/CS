@@ -14,6 +14,12 @@ chronological order.
 	- Eric Sunshine made minor Texinfo mark-up changes to creategenmesh.txi
 	  and converted tabs in @example blocks to spaces in order to ensure
 	  proper formatted output.
+	- Eric Sunshine moved handling of special `ranlib' requirements out of
+	  configure script and m4 fragments, and into macosx.jam and
+	  macosx.mak.  Specifically, work-around for Jam 2.4 bug which sets
+	  RANLIB to "", and use of "-s" option with ranlib for MacOS/X Panther.
+	  This allows the issues to be addressed in centralized locations, thus
+	  giving external simpler access to the solutions.
 7-Feb-2004
         - Philip Wyett fixed make build of gl3d plugin after recent effects
 	  changes.  Make did not know how to build the source files from the

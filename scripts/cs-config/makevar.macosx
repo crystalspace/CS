@@ -16,6 +16,10 @@ LFLAGS.DLL = -bundle -framework AppKit -framework Foundation
 LIBS.EXE.PLATFORM=$(LFLAGS.GENERAL) $(LFLAGS.EXE)
 AR = libtool
 ARFLAGS = -static -o
+ifeq (,$(RANLIB))
+RANLIB = ranlib
+endif
+RANLIB += -s
 define DO.LINK.EXE
   sh $(SRCDIR)/libs/csutil/macosx/appwrap.sh $(notdir $(basename $@)) $(MACOSX.APP_DIR) $(MACOSX.APP_ICON) $(SRCDIR)/include/csver.h
   $(NEWLINE)$(LINK) $(LFLAGS) $(LFLAGS.EXE) -o $(MACOSX.APP_EXE) $(^^) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)

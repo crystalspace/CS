@@ -182,6 +182,9 @@ CS_JAMCONFIG_PROPERTY([COMPILER.TYPE], [$cs_compiler_name])
 CS_HEADER_PROPERTY([CS_COMPILER_NAME],
     [AS_ESCAPE(["])$cs_compiler_name[]AS_ESCAPE(["])])
 
+AC_PROG_RANLIB
+CS_BUILD_PROPERTY([RANLIB], [$RANLIB])
+
 AC_CHECK_TOOLS([DLLTOOL], [dlltool])
 CS_BUILD_PROPERTY([CMD.DLLTOOL], [$DLLTOOL])
 
@@ -230,18 +233,6 @@ AS_IF([test -n "$SWIG"],
 AC_CHECK_PROGS([JAM], [jam])
 AC_CHECK_PROGS([MAKE], [gnumake gmake make])
 AC_PROG_MAKE_SET
-
-# Jambase in Jam 2.4 has a bug where it incorrectly defines RANLIB as "" for
-# MacOS/X, and this bogus value will override a RANLIB set via ?= in Jamconfig,
-# thus we must use CS_JAMCONFIG_PROPERTY()'s "unconditional" option to force a
-# correct value for RANLIB.  This is especially important for MacOS/X Panther
-# which expects us to use the -s option with ranlib, which we can accomplish
-# via "RANLIB += -s"; but this will work correctly only if RANLIB has a
-# meaningful value in the first place.
-AC_PROG_RANLIB
-AS_IF([test -n "$RANLIB"],
-    [CS_MAKEFILE_PROPERTY([RANLIB], [$RANLIB])
-    CS_JAMCONFIG_PROPERTY([RANLIB], [$RANLIB], [], [Y])])
 
 
 
@@ -1013,9 +1004,6 @@ AC_DEFUN([CS_CHECK_HOST],
 AC_DEFUN([_CS_CHECK_HOST_DARWIN],
     [AC_REQUIRE([AC_PROG_CC])
     AC_REQUIRE([AC_PROG_CXX])
-
-    # MacOS/X Panther ranlib complains if -s option is omitted.
-    AS_IF([test -n "$RANLIB"], [CS_BUILD_PROPERTY([RANLIB], [-s], [+])])
 
     # Both MacOS/X and Darwin are identified via $host_os as "darwin".  We need
     # a way to distinguish between the two.  If Carbon.h is present, then
