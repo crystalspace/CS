@@ -162,7 +162,7 @@ struct csColorBox
       } /* endfor */
   }
   // Move Rm up until we find pixels that contain this value
-  bool csColorBox::ShrinkRm ()
+  bool ShrinkRm ()
   {
     UByte iRm = Rm;
     for (; Rm <= Rx; Rm++)
@@ -175,7 +175,7 @@ struct csColorBox
     return (Rm != iRm);
   }
   // Move Rx down until we find pixels that contain this value
-  bool csColorBox::ShrinkRx ()
+  bool ShrinkRx ()
   {
     UByte iRx = Rx;
     for (; Rx >= Rm; Rx--)
@@ -188,7 +188,7 @@ struct csColorBox
     return (Rx != iRx);
   }
   // Move Gm up until we find pixels that contain this value
-  bool csColorBox::ShrinkGm ()
+  bool ShrinkGm ()
   {
     UByte iGm = Gm;
     for (; Gm <= Gx; Gm++)
@@ -201,7 +201,7 @@ struct csColorBox
     return (Gm != iGm);
   }
   // Move Gx down until we find pixels that contain this value
-  bool csColorBox::ShrinkGx ()
+  bool ShrinkGx ()
   {
     UByte iGx = Gx;
     for (; Gx >= Gm; Gx--)
@@ -214,7 +214,7 @@ struct csColorBox
     return (Gx != iGx);
   }
   // Move Bm up until we find pixels that contain this value
-  bool csColorBox::ShrinkBm ()
+  bool ShrinkBm ()
   {
     UByte iBm = Bm;
     for (; Bm <= Bx; Bm++)
@@ -227,7 +227,7 @@ struct csColorBox
     return (Bm != iBm);
   }
   // Move Bx down until we find pixels that contain this value
-  bool csColorBox::ShrinkBx ()
+  bool ShrinkBx ()
   {
     UByte iBx = Bx;
     for (; Bx >= Bm; Bx--)
