@@ -55,6 +55,7 @@
 
 #include "csplugincommon/opengl/glstates.h"
 #include "gl_renderbuffer.h"
+
 class csGLTextureHandle;
 class csGLTextureManager;
 class csGLPolygonRenderer;

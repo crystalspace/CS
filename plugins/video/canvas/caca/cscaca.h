@@ -27,7 +27,7 @@
 #include "iutil/event.h"
 
 /**
- * The Colour Ascii Art driver. This is a cross-platform graphics driver which
+ * The Colour AsCii Art driver. This is a cross-platform graphics driver which
  * implements drawing using characters and (depending on platform)
  * different intensities.
  */

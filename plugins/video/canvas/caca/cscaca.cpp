@@ -68,13 +68,14 @@ bool csGraphics2DCaca::Initialize (iObjectRegistry *object_reg)
 
   // set internal render format
   Depth = 32;
-  pfmt.RedMask   = 0xff << 24;
-  pfmt.GreenMask = 0xff << 16;
-  pfmt.BlueMask  = 0xff << 8;
+  pfmt.RedMask   = 0xff << 16;
+  pfmt.GreenMask = 0xff << 8;
+  pfmt.BlueMask  = 0xff;
   pfmt.AlphaMask = 0;
   pfmt.PalEntries = 0;
   pfmt.PixelBytes = 4;
   pfmt.complete ();
+  _GetPixelAt = GetPixelAt32;
 
   // create event outlet
   csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
@@ -96,27 +97,29 @@ bool csGraphics2DCaca::Open ()
 
   bool overwrite = false; // overwrite existing env vars.
   if(config->KeyExists("Video.ASCII.Console.Size"))
-    setenv("CACA_GEOMETRY", 
+    setenv ("CACA_GEOMETRY", 
       config->GetStr("Video.ASCII.Console.Size", "80x24"), overwrite);
   if(config->KeyExists("Video.ASCII.Console.Driver"))
-    setenv("CACA_DRIVER", 
+    setenv ("CACA_DRIVER", 
       config->GetStr("Video.ASCII.Console.Driver", "x11"), overwrite);
   if(config->KeyExists("Video.ASCII.Console.Font"))
-    setenv("CACA_FONT", 
+    setenv ("CACA_FONT", 
       config->GetStr("Video.ASCII.Console.Font", "fixed"), overwrite);
   if(config->KeyExists("Video.ASCII.Console.Background"))
-    setenv("CACA_BACKGROUND", 
+    setenv ("CACA_BACKGROUND", 
       config->GetStr("Video.ASCII.Console.Background", "solid"), overwrite);
   if(config->KeyExists("Video.ASCII.Console.AntiAlias"))
-    setenv("CACA_ANTIALIASING", 
+    setenv ("CACA_ANTIALIASING", 
       config->GetStr("Video.ASCII.Console.AntiAlias", "prefilter"), overwrite);
   if(config->KeyExists("Video.ASCII.Console.Dither"))
-    setenv("CACA_DITHERING", 
+    setenv ("CACA_DITHERING", 
       config->GetStr("Video.ASCII.Console.Dither", "ordered4"), overwrite);
 
-  if(caca_init()!=0)
+  if (caca_init() != 0)
   {
-    printf("Cannot initialize libcaca.\n");
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.graphics2d.cacacanvas",
+      "Cannot initialize libcaca.");
     return false;
   }
   caca_clear();

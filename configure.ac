@@ -1849,6 +1849,21 @@ CS_CHECK_BUILD([for backtrace() support], [cs_cv_backtrace],
 
 
 #------------------------------------------------------------------------------
+# Check if setenv() is available.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([for setenv() support], [cs_cv_setenv],
+    [AC_LANG_PROGRAM(
+	[[#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+	#endif
+	#include <stdlib.h>]],
+	[setenv(0, 0, 0);])],
+    [], [],
+    [CS_HEADER_PROPERTY([CS_HAVE_SETENV])])
+
+
+
+#------------------------------------------------------------------------------
 # Check if TemplateToolkit2 is installed (needed for MSVC project generation).
 #------------------------------------------------------------------------------
 CS_CHECK_TEMPLATE_TOOLKIT2([emit])

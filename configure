@@ -868,123 +868,165 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-cpu-specific-optimizations=level
                           enable CPU-specific optimizations; recognized levels
-                          are `no', `minimum' or `min', `maximum' or `max'
-                          (default MINIMUM); the `minimum' option selects
+                          are `no',
+ `minimum' or `min', `maximum' or `max'
+                          (default MINIMUM); the `minimum'
+ option selects
                           optimizations which are likely to be supported by
                           reasonably modern hardware, thus making the
-                          resulting executables fairly portable; use the
-                          `maximum' option with caution since code for one
+                          resulting executables
+ fairly portable; use the
+                          `maximum' option with caution since code for
+ one
                           processor will not work with earlier processors (for
-                          example, Intel 686-specific code will not work with
+                          example, Intel
+ 686-specific code will not work with
                           a 586)
   --enable-meta-info-embedding
                           store plugin meta-information directly inside plugin
-                          modules if supported by platform; if disabled,
-                          meta-information is stored in stand-alone .csplugin
-                          files; this is enabled by default for non-Unix
+                          modules if
+ supported by platform; if disabled,
+                          meta-information is stored in
+ stand-alone .csplugin
+                          files; this is enabled by default for
+ non-Unix
                           platforms, and disabled by default for Unix
-                          platforms since the Unix implementation requires the
-                          GPL-licensed libbfd library; enable this option on
-                          Unix only if you are certain you want a GPL-licensed
-                          library infecting your project
-  --enable-optimize       build with optimizations enabled (default YES); same
-                          as --enable-mode=optimize
-  --enable-debug          build with debugging information (default NO); same
+                          platforms
+ since the Unix implementation requires
+                          the GPL-licensed libbfd
+ library; enable this option
+                          on Unix only if you are certain you
+ want a
+                          GPL-licensed library infecting your project
+  --enable-optimize       build with optimizations enabled (default YES);
+                          same as --enable-mode=optimize
+  --enable-debug          build with debugging information (default NO);
+ same
                           as --enable-mode=debug
-  --enable-profile        build with profiling information (default NO); same
+  --enable-profile        build with profiling information (default NO);
+ same
                           as --enable-mode=profile
   --enable-mode=mode      set build mode; recognized modes are `optimize',
-                          `debug', `profile' (default OPTIMIZE)
+                          `debug', `profile'
+ (default OPTIMIZE)
   --enable-extensive-memory-debugger
                           enable the extensive memory debugger which catches
-                          common memory management mistakes (default NO)
+                          common memory
+ management mistakes (default NO)
   --enable-memory-tracker enable the memory tracker which checks memory usage
-                          per source file (default NO)
+                          per
+ source file (default NO)
   --enable-leak-guard     enable the leak guard protection which warns about
-                          objects not freed at program exit (default NO)
+                          objects not freed
+ at program exit (default NO)
   --enable-shared         enable creation of shared libraries
                           (_EXPERIMENTAL_!) (default NO)
   --enable-make-emulation enable emulation layer allowing project to be built
-                          with `make', in addition to `jam' (default YES)
+                          with `make', in
+ addition to `jam' (default YES)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-perl             use Perl5 scripting interface (default NO)
-  --without-python        do not use Python scripting interface
+  --without-python        do not use
+ Python scripting interface
   --with-java             use Java scripting interface (default YES)
   --with-x                use the X Window System
   --with-libXxf86vm=dir   specify location of libXxf86vm if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libXaw=dir       specify location of libXaw if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-mesa             use Mesa OpenGL library if available (default YES)
   --with-libz=dir         specify location of libz if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libpng=dir       specify location of libpng if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libjpeg=dir      specify location of libjpeg if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-liblcms=dir      specify location of liblcms if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libmng=dir       specify location of libmng if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libmikmod=dir    specify location of libmikmod if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libogg=dir       specify location of libogg if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libvorbis=dir    specify location of libvorbis if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libvorbisfile=dir
                           specify location of libvorbisfile if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-lib3ds=dir       specify location of lib3ds if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libode=dir       specify location of libode if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libfreetype2=dir specify location of libfreetype2 if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libcal3d=dir     specify location of libcal3d if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libsdl=dir       specify location of libsdl if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-vos=dir          specify location of VOS pkg-config files
   --with-libCg=dir        specify location of libCg if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libCgGL=dir      specify location of libCgGL if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libasound=dir    specify location of libasound if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libaa=dir        specify location of libaa if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libcaca=dir      specify location of libcaca if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libcppunit=dir   specify location of libcppunit if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libbfd=dir       specify location of libbfd if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
 
 Some influential environment variables:
@@ -50932,6 +50974,334 @@ fi
 
 
 #------------------------------------------------------------------------------
+# Check if setenv() is available.
+#------------------------------------------------------------------------------
+if test "" != yes; then
+  echo "$as_me:$LINENO: checking for setenv() support" >&5
+echo $ECHO_N "checking for setenv() support... $ECHO_C" >&6
+if test "${cs_cv_setenv+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+	#endif
+	#include <stdlib.h>
+int
+main ()
+{
+setenv(0, 0, 0);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_setenv=yes
+		cs_cv_setenv_cflags=$cs_build_cflags
+		cs_cv_setenv_lflags=$cs_build_lflags
+		cs_cv_setenv_libs=$cs_build_libs
+else
+  cs_cv_setenv=no
+fi
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_setenv" >&5
+echo "${ECHO_T}$cs_cv_setenv" >&6
+else
+  echo "$as_me:$LINENO: checking for setenv() support" >&5
+echo $ECHO_N "checking for setenv() support... $ECHO_C" >&6
+	    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+	#endif
+	#include <stdlib.h>
+int
+main ()
+{
+setenv(0, 0, 0);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_setenv=yes
+		cs_cv_setenv_cflags=$cs_build_cflags
+		cs_cv_setenv_lflags=$cs_build_lflags
+		cs_cv_setenv_libs=$cs_build_libs
+else
+  cs_cv_setenv=no
+fi
+
+	    echo "$as_me:$LINENO: result: $cs_cv_setenv" >&5
+echo "${ECHO_T}$cs_cv_setenv" >&6
+fi
+
+    if test $cs_cv_setenv = yes; then
+  cs_header_text="${cs_header_text}#define CS_HAVE_SETENV
+"
+else
+  cs_cv_setenv_cflags=''
+	cs_cv_setenv_lflags=''
+	cs_cv_setenv_libs=''
+
+fi
+
+
+
+
+#------------------------------------------------------------------------------
 # Check if TemplateToolkit2 is installed (needed for MSVC project generation).
 #------------------------------------------------------------------------------
 
@@ -55650,6 +56020,12 @@ done
 
 
 
+
+
+
+
+
+
 for ac_header in unistd.h \
     sys/types.h \
     sys/socket.h \
@@ -58574,9 +58950,11 @@ if diff $cache_file confcache >/dev/null 2>&1; then :; else
   fi
 fi
 rm -f confcache
-    { { echo "$as_me:$LINENO: error: unrecognized mode --enable-mode=$enableval; use
+    { { echo "$as_me:$LINENO: error: unrecognized mode --enable-mode=$enableval;
+ use
     \`optimize', \`debug', or \`profile'" >&5
-echo "$as_me: error: unrecognized mode --enable-mode=$enableval; use
+echo "$as_me: error: unrecognized mode --enable-mode=$enableval;
+ use
     \`optimize', \`debug', or \`profile'" >&2;}
    { (exit 1); exit 1; }; } ;;
     esac

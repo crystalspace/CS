@@ -470,7 +470,9 @@ public:
         glGetIntegerv (GL_TEXTURE_COORD_ARRAY_TYPE, (GLint*)&parameter_ttype[i]);
         glGetPointerv (GL_TEXTURE_COORD_ARRAY_POINTER, &parameter_tpointer[i]);
       }
-    } else {
+    } 
+    else 
+    {
       enabled_GL_TEXTURE_1D[0] = glIsEnabled (GL_TEXTURE_1D);
       enabled_GL_TEXTURE_2D[0] = glIsEnabled (GL_TEXTURE_2D);
       enabled_GL_TEXTURE_3D[0] = glIsEnabled (GL_TEXTURE_3D);

@@ -1470,10 +1470,9 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
   buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_TEXCOORD0]);
   if (buffer)
   {
-    //csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
     AssignSpecBuffer (CS_VATTRIB_TEXCOORD0, buffer);
     GLenum compType;
-    data = //glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+    data = 
       RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
     if (data != (void*)-1)
     {
@@ -1503,10 +1502,9 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
       buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_TEXCOORD0+i]);
       if (buffer)
       {
-        //csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
         AssignSpecBuffer (CS_VATTRIB_TEXCOORD0+i, buffer);
 	GLenum compType;
-	data = //glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+	data = 
 	  RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
         if (data != (void*)-1)
         {

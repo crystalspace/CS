@@ -6,7 +6,7 @@
       <class>
         <name>crystalspace.graphics2d.cacacanvas</name>
         <implementation>csGraphics2DCaca</implementation>
-        <description>Colour Ascii Art 2D graphics driver for Crystal Space</description>
+        <description>Colour AsCii Art 2D graphics driver for Crystal Space</description>
         <requires>
           <class>crystalspace.font.server.</class>
         </requires>
