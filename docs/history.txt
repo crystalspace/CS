@@ -1,5 +1,20 @@
 The history order has been reversed so that new features are at the top.
 
+11-Aug-2000
+	- Andrew Zabolotny removed console_open and console_close from all
+	  ports. Every system driver has lots of opportunities for
+	  initializing/shutting down its printf system, so there is no need
+	  in these. The console in Win32 port is driven by the cryst.cfg
+	  file as well as the command line. You may use the -[no]console
+	  switch to turn on/off the debug console, and you may set the
+	  DebugConsole=yes|no option in the [Microsoft Windows] section
+	  of the respective .cfg file.
+	- Andrew also added zlib/libpng/libjpeg to linkage command.
+	- Andrew fixed one msvc-specific error (for (int i = ...)) and
+	  removed a few msvc warnings.
+	- Andrew also added dxguid library to dx6 driver linkage command.
+	- Andrew fixed a small work-around so that Matrix Millenium II
+	  AGP will work with the Direct3D driver (45 fps but no lighting).
 10-Aug-2000
 	- Michael Dale Long did more fixes on cctest. Can quit and fire
 	  rockets again. Still no console.
