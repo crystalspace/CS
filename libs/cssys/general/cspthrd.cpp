@@ -138,13 +138,14 @@ bool csPosixMutexRecursive::LockTry ()
 {
   int rc = pthread_mutex_trylock (&mutex); 
 
+  pthread_t self = pthread_self ();
   if (rc == 0)
   {
     owner = self;
     count = 1;
     return true;
   }
-  else if (owner = self)
+  else if (owner == self)
   {
     count += 1;
     return true;
@@ -155,8 +156,10 @@ bool csPosixMutexRecursive::LockTry ()
   return false;
 }
 
-void csPosixMutexRecursive::Release ()
+bool csPosixMutexRecursive::Release ()
 {
+  pthread_t self = pthread_self ();
+  
   if (owner != self)
   {
     lasterr = EPERM;

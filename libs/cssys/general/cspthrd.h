@@ -98,7 +98,7 @@ protected:
   friend class csPosixCondition;
 };
 
-#ifndef PTHREAD_HAS_RECURSIVE_NP
+#ifndef CS_PTHREAD_NUTEX_RECURSIVE
 class csPosixMutexRecursive : public csPosixMutex
 {
 public:
@@ -114,7 +114,7 @@ protected:
 
 private:
   int count;
-  pthread_t owner;  
+  pthread_t owner;
 };
 #endif
 
