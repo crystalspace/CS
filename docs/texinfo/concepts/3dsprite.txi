@@ -139,9 +139,83 @@ can find a way to connect vertex normals without connecting skin vertices
 @node Example 4
 @subsection A Solution
 
-@c--+----1----+----2----+----3----+----4----+----5----+----6----+----7----+
+Splitting vertices for texturing (@xref{Example 2}), has a few drawbacks:
 
-Blah blah blah.
+@itemize @bullet
+
+@item Extra vertices have to be transformed every frame
+
+@item Extra vertices are duplicated for every precalculated vertex animation frame
+
+@item Split edges can have sharp, unwanted seams (@xref{Example 3})
+
+@end itemize
+
+These problems can be solved by removing the one-to-one association between
+texture vertices, 3D coordinates (animation vertices), and vertex normals.
+(hereafter called "texels", "vertices", and "normals") When we have a
+different number of each type of coordinate, we still need to have a
+"superset" of all coordinate types for 3D hardware compatibility* and to
+keep the triangle data simple.
+
+(* I know very little about 3D hardware or the APIs used with them,
+so I'm making assumptions based on hearsay.)
+
+Usually texels are not animated and don't have to be transformed. If a few
+texels that could be merged on the skin are seperated to create a sharp
+edge or so that they can be animated seperately, it doesn't cost much or
+limit the effects which can be created. This makes them a good "superset"
+of all coordinate types.
+
+Each normal can be associated with one or more texels. Each vertex can be
+associated with one or more texels. Each texel is associated with one
+normal and one vertex, so we can use two arrays of indices to map texels
+to normals and vertices.  (These arrays are members called
+"texel_to_normal" and "texel_to_vertex" in the csSpriteTemplate class.)
+
+Now let us return to our cylinder sprite (@xref{Example 1}.)  With the new
+system we will have 96 triangles.  Each triangle will have three indices.
+Each index will point to one of the 98 texels.  The texel_to_vertex array
+will have 98 indices to the 48 vertices.  The texel_to_normals array will
+have 98 indices to the 96 normals ... 96?
+
+If we only merge the minimum number of normals to eliminate the unwanted
+seam we will have 96 normals.  That's a lot of normals to keep track of
+and do transformations on - and many of them will be exactly the same.
+All of the vertices on one end of the cylinder will have the same normal
+values.  both vertices on each end of the long edges of the cylinder sides
+will have the same normal values.  In this sprite there are actually only
+26 unique normals! Fortunately, our texel_to_normals array already allows
+this compression.
+
+Now we have painted ourselves into a corner:  we have a powerful 3D Sprite
+system which is not fully supported by any known modeling packages or file
+formats!  (This is how you know we've stumbled onto something good here :-)
+The best way to deal with this problem is to develop a simple, robust
+system for creating optimized 3D sprites which is not tied to any specific
+model format.
+
+We should at least be able to import our cylinder as raw triangles (three
+3D coordinates for each triangle)  This is all of the information we need
+to construct the sprite:
+
+@enumerate
+
+@item Load a raw triangle model.  In this model the X and Y coordinates
+are actually U and V coordinates for texturing.
+
+@item Load a raw triangle model with the cylinder's 3D shape - in other
+words the vertices.  If a 3D sprite needs animation, we can load several
+of these models as animation frames.
+
+@item Load a raw triangle model where the ends of the cylinder have been
+moved away from the sides.  The shape of this model is not important.
+Wherever triangles share vertices in this model, the vertex normals will
+be merged.
+
+@end enumerate
+
+@c--+----1----+----2----+----3----+----4----+----5----+----6----+----7----+
 
 @ifnottex
 @pictures{concepts,split}
