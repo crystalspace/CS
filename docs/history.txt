@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+17-Feb-2003
+	- milk2spr now mentions apps/tests/mottest as it's code example.
+
 16-Feb-2003
 	- Significant optimization in the dynamic/pseudo-dynamic lighting
 	  system for things. In the past, when a dynamic light or
