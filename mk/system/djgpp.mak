@@ -62,11 +62,10 @@ SOUND_LIBS=
 CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-Wall -m486 -fno-rtti $(CFLAGS.SYSTEM)
+CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM)
 
 # Flags for the compiler which are used when optimizing.
-CFLAGS.optimize=-O6 -s -fomit-frame-pointer -mno-ieee-fp \
- -malign-loops=2 -malign-jumps=2 -malign-functions=2
+CFLAGS.optimize=-s -O6 -fomit-frame-pointer
 
 # Flags for the compiler which are used when debugging.
 CFLAGS.debug=-g3
