@@ -389,7 +389,7 @@ void *csArchive::NewFile (const char *name, size_t size, bool pack)
 
   ArchiveEntry *f = new ArchiveEntry (name, cdfh);
 
-  cs_time curtime = time (NULL);
+  time_t curtime = time (NULL);
   struct tm *curtm = localtime (&curtime);
   SetFileTime ((void *)f, *curtm);
 
