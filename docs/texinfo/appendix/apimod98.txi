@@ -787,9 +787,12 @@ makefiles, or project files.
 
 @subheading csString and iString Changes
 
-The @code{strlwr()} method was renamed to @code{Downcase()}.  A complementary
-@code{Upcase()} method was added for completeness.  Added @code{Slice()}
-which copies a sub-portion of a string.
+The @code{csString::strlwr()} method was renamed to @code{Downcase()}.  A
+complementary @code{Upcase()} method was added for completeness.  These methods
+were also added to @samp{iString}.  Added a @code{Slice()} method to
+@samp{iString} and @samp{csString} which copies a sub-portion of a string.
+Several @samp{iString} methods which were incorrectly returning raw
+@samp{iString*} or @samp{iString&} now correctly return @code{csRef<iString>}.
 
 @subheading csMD5 Changes
 
