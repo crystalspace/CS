@@ -5,7 +5,7 @@
 DESCRIPTION.freebsd = FreeBSD
 
 # Choose which drivers you want to build/use
-DRIVERS+=cs2d/softx cs3d/software cssndrdr/software cssnddrv/oss
+PLUGINS+=cs2d/softx cs3d/software cssndrdr/software cssnddrv/oss
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))

@@ -5,16 +5,16 @@
 DESCRIPTION.solaris = Solaris
 
 # Choose which 2D/3D driver combinations you want to build/use
-DRIVERS+=cs3d/software cs2d/softx
-DRIVERS+=cs3d/opengl cs2d/openglx
-DRIVERS+=cs3d/line cs2d/linex
-DRIVERS+=cs3d/inf
+PLUGINS+=cs3d/software cs2d/softx
+PLUGINS+=cs3d/opengl cs2d/openglx
+PLUGINS+=cs3d/line cs2d/linex
+PLUGINS+=cs3d/inf
 
 # Uncomment the following to build GGI 2D driver
-#DRIVERS+=cs2d/ggi
+#PLUGINS+=cs2d/ggi
 
 # Uncomment the following to build sound renderer
-#DRIVERS+=cssndrdr/software
+#PLUGINS+=cssndrdr/software
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
