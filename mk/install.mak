@@ -133,13 +133,20 @@ INSTALL_DATA.DIR = $(addprefix $(INSTALL_DIR)/, \
 # exists.  The empty line in this macro is important since it results in
 # inclusion of a newline.  This is desirable because we expect this macro to be
 # invoked from $(foreach) for a set of files, and we want the expansion to be a
-# series of copy commands, one per line.
+# series of copy commands, one per line.  IMPLEMENTATION NOTE: We conditionally
+# copy the .csplugin file only if it is present.  This is a convenience for
+# platforms which merge the metainformation directory into the plugin itself.
+# This allows those platforms to use this default intallation macro, instead of
+# a customized one.
 ifeq (,$(strip $(INSTALL.DO_PLUGIN)))
 define INSTALL.DO_PLUGIN
   $(CP) $(F) $(INSTALL_DLL.DIR)
-  $(CP) $(patsubst %$(DLL),%.csplugin,$(F)) $(INSTALL_DLL.DIR)
+  @echo $(addprefix $(INSTALL_DLL.DIR)/,$(notdir $(F))) >> $(INSTALL_LOG)
+  if test -f $(patsubst %$(DLL),%.csplugin,$(F)); then \
+  $(CP) $(patsubst %$(DLL),%.csplugin,$(F)) $(INSTALL_DLL.DIR); \
   @echo $(addprefix $(INSTALL_DLL.DIR)/, \
-    $(notdir $(F) $(patsubst %$(DLL),%.csplugin,$(F)))) >> $(INSTALL_LOG)
+    $(notdir $(patsubst %$(DLL),%.csplugin,$(F)))) >> $(INSTALL_LOG); \
+  fi
 
 endef
 endif

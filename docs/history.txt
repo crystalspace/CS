@@ -18,6 +18,20 @@ The history order is reversed so that new features are at the top.
 	  CS_WIN32_ARGV are defined always (previously they were not defined
 	  for Cygwin).  This fixes problem on Cygwin where win32.cpp was
 	  utilizing these macros.
+	- Eric Sunshine fixed the default plugin install macro in install.mak
+	  so that it only installs the .csplugin file if present.  This is a
+	  convenience for platforms which bundle the meta-information directly
+	  into the plugin module rather than maintaining it in a separate
+	  .csplugin file.  It allows such platforms to utilize the default
+	  macro rather than creating a custom one.  This also fixes the
+	  "install" target for Windows, since meta-information is bundled into
+	  the .dll on Windows.  Finally, as a side-effect, it fixes the problem
+	  where installation of the Python plugin _cspace.so (.dll) caused the
+	  "install" target to fail because no .csplugin file was present (lack
+	  of .csplugin is correct since this is a Python plugin, not a CS
+	  plugin).  This is not a "clean" solution to the _cspace.so problem,
+	  and it we should devise a better one, but it works well enough for
+	  the interim.
 9-Jul-2003
 	- Jorrit fixed PlaceMesh() so that it now uses
 	  engine->GetNearbyObjects(). That makes it a lot more efficient
