@@ -63,7 +63,7 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(CMD.SWIG) &&
   LinkWith javamod : cstool csgfx csgeom csutil ;
   ExternalLibs javamod : JAVA ;
   CFlags javamod : $(PLUGIN.CFLAGS) $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
-  LFlags javamod : $(PLUGIN.LFLAGS) $(LINKLIBS) ;
+  LFlags javamod : $(PLUGIN.LFLAGS) $(LINKLIBS) $(CSJAVA.LFLAGS) ;
   Depends csjava : $(javamod) ;
   MakeLocate $(javamod) : $(LOCATE.TARGETS) ;
   Depends $(javamod) : $(javamodobj) ;

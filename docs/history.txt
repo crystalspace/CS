@@ -6,24 +6,30 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-23-Oct-2004
-	- res fixed the GL iGraphics3D::DrawPixmap() disabling blending, which
-	  messed up subsequent text writing.
-	- Andrew Robberts fixed some bugs in cal3d sockets.
+24-Oct-2004
 	- Eric Sunshine simplified the 22-Oct-2004 change to DDS loader so that
 	  it no longer Clone()'s the image when returning a mipmap.  It is
 	  instead sufficient simply to return a reference to the existing image
 	  (as done by the original code).  The difference now, however, is that
 	  the reference counting logic is obvious and clear rather than obscure
 	  and hidden.  Also, the Clone() was unnecessarily expensive.
-	- Luca reverted the last change of Eric to the DDS loader, and put 
+	- Luca reverted the last change of Eric to the DDS loader, and put
 	  again his C++ code which were creating a new image using the Clone()
-	  method. 
-	  The problem is with the Eric code is that a new image was not 
-	  created, but the method MipMap must return a new image, so that the
-	  method caller could work on it without affecting the original image: 
-	  in fact subsequent MipMap calls must return the original image, not
-	  the modified one.
+	  method.  The problem is with the Eric code is that a new image was
+	  not created, but the method MipMap must return a new image, so that
+	  the method caller could work on it without affecting the original
+	  image: in fact subsequent MipMap calls must return the original
+	  image, not the modified one.
+	- Eric Sunshine augmented configure.ac to check if the linker
+	  recognizes --kill-at.  This is needed when linking csjava.dll on
+	  Windows in order to make the DLL compatible with JNI.  Without this
+	  option, JNI is unable to locate the JNI glue functions exported by
+	  the Swig-generated code.  csjava now works properly on Unix and
+	  Windows.
+23-Oct-2004
+	- res fixed the GL iGraphics3D::DrawPixmap() disabling blending, which
+	  messed up subsequent text writing.
+	- Andrew Robberts fixed some bugs in cal3d sockets.
 22-Oct-2004
 	- Eric Sunshine fixed a bug in the replacement MakeLocate rule in
 	  subdir.jam where it failed to set the LOCATE variable for the target

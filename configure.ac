@@ -726,6 +726,17 @@ CS_CHECK_BUILD([if -soname is accepted], [cs_cv_prog_link_soname], [],
 
 
 #------------------------------------------------------------------------------
+# Check if linker recognizes --kill-at which is needed to make csjava.dll
+# usable by JNI on Windows.  Without this, JNI is unable to find the exported
+# JNI glue functions in csjava.dll.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([if --kill-at is accepted], [cs_cv_prog_link_kill_at], [],
+    [CS_CREATE_TUPLE([-Wl,--kill-at])], [C++],
+    [CS_EMIT_BUILD_PROPERTY([CSJAVA.LFLAGS], [-Wl,--kill-at])])
+
+
+
+#------------------------------------------------------------------------------
 # Check if compiler recognizes -fPIC directive, which is needed by some
 # platforms when building plugin modules and shared libraries.
 #------------------------------------------------------------------------------
