@@ -75,6 +75,7 @@ void csEngine::Report (const char* description, ...)
   else
   {
     System->PrintfV (CS_MSG_CONSOLE, description, arg);
+    System->Printf (CS_MSG_CONSOLE, "\n");
   }
   va_end (arg);
 }
@@ -92,6 +93,7 @@ void csEngine::Warn (const char* description, ...)
   else
   {
     System->PrintfV (CS_MSG_WARNING, description, arg);
+    System->Printf (CS_MSG_WARNING, "\n");
   }
   va_end (arg);
 }
@@ -109,6 +111,7 @@ void csEngine::ReportBug (const char* description, ...)
   else
   {
     System->PrintfV (CS_MSG_INTERNAL_ERROR, description, arg);
+    System->Printf (CS_MSG_INTERNAL_ERROR, "\n");
   }
   va_end (arg);
 }
