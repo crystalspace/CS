@@ -21,6 +21,7 @@
 #include "csutil/databuf.h"
 #include "csutil/csstring.h"
 #include "csutil/util.h"
+#include "csutil/snprintf.h"
 #include "iutil/vfs.h"
 #include <ctype.h>
 
@@ -129,14 +130,14 @@ void csConfigNode::SetStr(const char *s)
 void csConfigNode::SetInt(int n)
 {
   char output [32];
-  sprintf (output, "%d", n);
+  cs_snprintf (output, 32, "%d", n);
   SetStr (output);
 }
 
 void csConfigNode::SetFloat(float f)
 {
   char output [64];
-  sprintf (output, "%g", f);
+  cs_snprintf (output, 32, "%g", f);
   SetStr (output);
 }
 

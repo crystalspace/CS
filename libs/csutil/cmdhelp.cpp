@@ -21,11 +21,13 @@
 #include "cssysdef.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/csevent.h"
+#include "csutil/snprintf.h"
 #include "iutil/objreg.h"
 #include "iutil/cmdline.h"
 #include "iutil/config.h"
 #include "iutil/eventq.h"
 #include "iutil/plugin.h"
+
 
 void csCommandLineHelper::Help (iConfig* config)
 {
@@ -41,25 +43,25 @@ void csCommandLineHelper::Help (iConfig* config)
     switch (option.type)
     {
       case CSVAR_BOOL:
-        sprintf (opt, "  -[no]%s", option.name);
-	sprintf (desc, "%s (%s) ", option.description, def.GetBool ()
+        cs_snprintf (opt,  30, "  -[no]%s", option.name);
+	cs_snprintf (desc, 80, "%s (%s) ", option.description, def.GetBool ()
 		? "yes" : "no");
 	break;
       case CSVAR_CMD:
-        sprintf (opt, "  -%s", option.name);
+        cs_snprintf (opt,  30, "  -%s", option.name);
 	strcpy (desc, option.description);
 	break;
       case CSVAR_FLOAT:
-        sprintf (opt, "  -%s=<val>", option.name);
-	sprintf (desc, "%s (%g)", option.description, def.GetFloat ());
+        cs_snprintf (opt,  30, "  -%s=<val>", option.name);
+	cs_snprintf (desc, 80, "%s (%g)", option.description, def.GetFloat ());
 	break;
       case CSVAR_LONG:
-        sprintf (opt, "  -%s=<val>", option.name);
-	sprintf (desc, "%s (%ld)", option.description, def.GetLong ());
+        cs_snprintf (opt,  30, "  -%s=<val>", option.name);
+	cs_snprintf (desc, 80, "%s (%ld)", option.description, def.GetLong ());
 	break;
       case CSVAR_STRING:
-        sprintf (opt, "  -%s=<val>", option.name);
-	sprintf (desc, "%s (%s)", option.description, def.GetString ()
+        cs_snprintf (opt,  30, "  -%s=<val>", option.name);
+	cs_snprintf (desc, 80, "%s (%s)", option.description, def.GetString ()
 		? def.GetString () : "none");
 	break;
     }
