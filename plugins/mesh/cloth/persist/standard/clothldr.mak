@@ -27,12 +27,12 @@ vpath %.cpp $(SRCDIR)/plugins/mesh/cloth/persist/standard
 ifeq ($(USE_PLUGINS),yes)
   CLOTHLDR = $(OUTDLL)/clothldr$(DLL)
   LIB.CLOTHLDR = $(foreach d,$(DEP.CLOTHLDR),$($d.LIB))
-  TO_INSTALL.DYNAMIC_LIBS += $(CLOTHLDR)
+#  TO_INSTALL.DYNAMIC_LIBS += $(CLOTHLDR)
 else
   CLOTHLDR = $(OUT)/$(LIB_PREFIX)clothldr$(LIB)
   DEP.EXE += $(CLOTHLDR)
   SCF.STATIC += clothldr
-  TO_INSTALL.STATIC_LIBS += $(CLOTHLDR)
+#  TO_INSTALL.STATIC_LIBS += $(CLOTHLDR)
 endif
 
 INF.CLOTHLDR = $(SRCDIR)/plugins/mesh/cloth/persist/standard/clothldr.csplugin

@@ -2,6 +2,7 @@ SubDir TOP plugins mesh cloth persist standard ;
 
 Plugin clothldr
 	: [ Wildcard *.cpp *.h ]
+	: noinstall
 ;
 LinkWith clothldr : csgeom csutil ;
 

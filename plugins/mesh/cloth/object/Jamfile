@@ -2,6 +2,7 @@ SubDir TOP plugins mesh cloth object ;
 
 Plugin cloth
 	: [ Wildcard *.cpp *.h ]
+	: noinstall
 ;
 LinkWith cloth : csgeom csutil ;
 
