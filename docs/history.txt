@@ -25,7 +25,7 @@ chronological order.
 	  the older /usr/X11R6/libs/X11/fonts/TrueType.
 	- Eric Sunshine renamed the Crystal Space Java package from
 	  "com.crystalspace" to "org.crystalspace3d" in order to reflect the
-	  new official Crystal Space domain name (crystalspac3d.org).
+	  new official Crystal Space domain name (crystalspace3d.org).
 17-Dec-2004
 	- Peter Amstutz updated the csvosa3dl plugin to compile with
 	  the current VOS CVS code.
