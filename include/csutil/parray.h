@@ -125,6 +125,18 @@ public:
     return limit;
   }
 
+  /// Get the pointer to the start of the array.
+  T** GetArray ()
+  {
+    return root;
+  }
+
+  /// Get the pointer to the start of the array.
+  const T** GetArray () const
+  {
+    return root;
+  }
+
   /// Get a pointer.
   T* Get (int n) const
   {

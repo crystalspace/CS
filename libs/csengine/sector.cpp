@@ -1153,6 +1153,158 @@ void csSector::DrawLight (iRenderView* rview, iLight* light, bool drawAfter)
 
 
 }
+
+void csSector::CollectMeshes (iRenderView* rview, csRenderMeshList& meshes)
+{
+  /*
+    @@@ Doesn't consider yet it can be called multiple times (in case of
+    e.g. portals)
+    @@@ Optimize, optimize, OPTIMIZE!
+    @@@ Cleanup.
+   */
+  int i;
+
+  // get a pointer to the previous sector
+/*  iSector *prev_sector = rview->GetPreviousSector ();
+
+  // look if meshes from the previous sector should be drawn
+  bool draw_prev_sector = false;
+
+  if (prev_sector)
+  {
+    iPolygon3DStatic* st = rview->GetPortalPolygon ()->GetStaticData ();
+      draw_prev_sector =  st->IsTransparent () ||
+        st->GetPortal ()->GetFlags ().Check (CS_PORTAL_WARP);
+  }*/
+
+  collected.meshes.DeleteAll();
+  int mesh_offset = collected.meshes.Length();
+  collected.lights.DeleteAll();
+  int light_offset = collected.lights.Length();
+
+  csRef<iSectorList> secs = csEngine::current_engine->GetSectors ();
+
+  meshes.lightnum = 0;
+  const csOrthoTransform camTransO = rview->GetCamera()->GetTransform();
+  csReversibleTransform ct = rview->GetCamera ()->GetTransform ();
+  const csVector3 camPlaneZ = ct.GetT2O().Col3 ();
+  const csVector3 camPos = ct.GetOrigin ();
+  for (i = secs->GetCount () - 1; i >= 0; i --)
+  {
+    csRef<iLightList> seclights = secs->Get(i)->GetLights ();
+    int j;
+    for (j = seclights->GetCount() - 1; j >= 0; j --)
+    {
+      // Sphere check against rview before adding it.
+      iLight* light = seclights->Get (j);
+      csSphere s (light->GetCenter (), light->GetInfluenceRadius ());
+      if (rview->TestBSphere (camTransO, s))
+      {
+	collected.lights.Push (light);
+	meshes.lightnum++;
+      }
+    }
+  }
+
+  // Mark visible objects.
+  culler->VisTest (rview);
+  uint32 current_visnr = culler->GetCurrentVisibilityNumber ();
+
+  objects = RenderQueues.SortAll (rview, num_objects, current_visnr);
+
+  meshes.num = 0;
+  for (i = 0; i < num_objects; i ++)
+  {
+    iMeshWrapper *sp = objects[i];
+/*    if (
+          !prev_sector ||
+          sp->GetMovable ()->GetSectors ()->Find (prev_sector) == -1 ||
+          draw_prev_sector)*/
+    {
+      // Mesh is not in the previous sector or there is no previous
+      // sector.
+      csRenderMesh *r = sp->GetRenderMesh (rview);
+      if (r)
+      {
+        collected.meshes.Push (r);
+	collected.meshIndices.Put ((csHashKey)sp, (csHashObject)(meshes.num + 1));
+	meshes.num++;
+      }
+    }
+  }
+
+  collected.lightflags.SetLength (meshes.lightnum,
+    csBitSet ());
+  for (i = 0; i < meshes.lightnum; i++)
+  {
+    collected.lightflags[i].Resize (meshes.num);
+    collected.lightflags[i].Reset ();
+    iLight* light = collected.lights[i];
+    const csVector3 lightPos = light->GetCenter ();
+    csVector3 v = lightPos - camPos;
+    bool lightBehindCamera = (camPlaneZ * v <= 0);
+
+    csSphere lightSphere (lightPos, light->GetInfluenceRadius ());
+    csRef<iVisibilityObjectIterator> objInLight = culler->VisTest (lightSphere);
+    
+    csVector3 rad, center;
+    float maxRadius = 0;
+    while (!objInLight->IsFinished ())
+    {
+      iMeshWrapper *sp = objInLight->GetObject() ->GetMeshWrapper ();
+      int meshIndex = sp ? ((int)collected.meshIndices.Get ((csHashKey)sp) - 1) : -1;
+      if (meshIndex != -1) 
+      {
+	sp->GetRadius (rad, center);
+        
+	csVector3 pos = sp->GetMovable() ->GetTransform ().This2Other (center); //transform it
+	csVector3 radWorld = sp->GetMovable ()->GetTransform ().This2Other (rad);
+	maxRadius = MAX(radWorld.x, MAX(radWorld.y, radWorld.z));
+
+	if (!lightBehindCamera) {
+	  // light is in front of camera
+	  //test if mesh is behind camera
+	  v = pos - camPos;
+	  if (!(camPlaneZ*v < -maxRadius))
+	  {
+	    collected.lightflags[i].Set (meshIndex);
+	  }
+	}
+	else {
+	  // light is behind camera
+	  // if mesh is behind the light we don't draw it
+	  v = pos - lightPos;
+	  if (!(camPlaneZ*v < -maxRadius))
+	  {
+	    collected.lightflags[i].Set (meshIndex);
+	  }
+	} 
+      }
+      objInLight->Next ();
+    }
+  }
+
+  if (meshes.num)
+  {
+    meshes.meshes = collected.meshes.GetArray() + mesh_offset; //collected.meshes.Get (mesh_offset);
+    meshes.lightflags = collected.lightflags.GetArray() + mesh_offset;
+    meshes.lights = collected.lights.GetArray() + light_offset;
+  }
+  delete[] objects;
+/*  for (i = 0; i < draw_objects.Length(); i ++) 
+  {
+	iMaterialHandle *matsave;
+    matsave = draw_objects[i]->mathandle;
+    draw_objects[i]->mathandle = NULL;
+    uint mixsave = draw_objects[i]->mixmode;
+	draw_objects[i]->mixmode = CS_FX_COPY;
+    r3d->DrawMesh (draw_objects[i]);
+    draw_objects[i]->mathandle = matsave;
+	draw_objects[i]->mixmode = mixsave;
+  }*/
+};
+
+
 #endif // CS_USE_NEW_RENDERER
 
 void csSector::CheckFrustum (iFrustumView *lview)

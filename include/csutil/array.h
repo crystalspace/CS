@@ -242,6 +242,18 @@ public:
     }
   }
 
+  /// Get the pointer to the start of the array.
+  T* GetArray ()
+  {
+    return root;
+  }
+
+  /// Get the pointer to the start of the array.
+  const T* GetArray () const
+  {
+    return root;
+  }
+
   /// Get an element (const).
   T const& Get (int n) const
   {

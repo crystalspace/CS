@@ -35,6 +35,7 @@
 #include "csengine/region.h"
 #include "csengine/radiosty.h"
 #include "csengine/objwatch.h"
+#include "csengine/renderloop.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/sphere.h"
 #include "csgeom/kdtree.h"
@@ -1451,6 +1452,7 @@ iEngineSequenceManager* csEngine::GetEngineSequenceManager ()
   return eseqmgr;
 }
 
+#if !defined(CS_USE_NEW_RENDERER) || !defined(CS_NR_ALTERNATE_RENDERLOOP)
 void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
 {
   Stats::polygons_considered = 0;
@@ -1515,6 +1517,7 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
 
   G3D->SetClipper (NULL, CS_CLIPPER_NONE);
 }
+#endif
 
 void csEngine::AddHalo (csLight *Light)
 {

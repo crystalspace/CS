@@ -33,6 +33,7 @@
 #ifdef CS_USE_NEW_RENDERER
 #include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
+#include "csutil/bitset.h"
 #endif
 
 class csEngine;
@@ -92,6 +93,34 @@ public:
   virtual void FreeItem (iMeshWrapper* item);
 };
 
+#ifdef CS_USE_NEW_RENDERER  
+struct csRenderMeshList
+{
+  /*
+    @@@ Check whether to return the originating sector
+     and an index in its mesh list instead of 
+     csRenderMesh*es each time.
+   */
+
+  /// number of meshes in this list
+  int num;
+  /// pointer to actual mesh array
+  csRenderMesh** meshes;
+  /// number of lights used
+  int lightnum;
+  /// pointer to lightflags array
+  // <number of lights> bit sets contain <number of meshes> bits
+  // which are set if a light influences a mesh
+  csBitSet* lightflags;
+  /// lights used here
+  iLight** lights;
+
+  /*
+    @@@ Prolly some more info containing portals and views,
+    returned from child meshes.
+   */
+};
+#endif
 
 SCF_VERSION (csSector, 0, 0, 2);
 
@@ -119,6 +148,14 @@ private:
   csGrowingArray<csRenderMesh*> draw_objects;
   csRef<iRender3D> r3d;
   csRef<iShaderManager> shmgr;
+
+  struct CollectedMeshData
+  {
+    csPArray<csRenderMesh> meshes;
+    csArray<csBitSet> lightflags;
+    csPArray<iLight> lights;
+    csHashMap meshIndices;
+  } collected;
 #endif
 
   /**
@@ -323,6 +360,9 @@ public:
   void DrawShadow (iRenderView* rview, iLight *light);
   /// Third pass
   void DrawLight (iRenderView* rview, iLight *light, bool drawAfter = false);
+
+  ///
+  void CollectMeshes (iRenderView* rview, csRenderMeshList& meshes);
 #endif
 
   //----------------------------------------------------------------------
@@ -541,6 +581,10 @@ public:
       { scfParent->DrawShadow (rview, light); }
     virtual void DrawLight (iRenderView* rview, iLight* light)
       { scfParent->DrawLight (rview, light); }
+    virtual void CollectMeshes (iRenderView* rview, csRenderMeshList& meshes)
+    {
+      scfParent->CollectMeshes (rview, meshes);
+    }
 #endif // CS_USE_NEW_RENDERER
     virtual void SetSectorCallback (iSectorCallback* cb)
     {

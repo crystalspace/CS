@@ -58,6 +58,14 @@ The history order is reversed so that new features are at the top.
 	  size without applied downsampling (via 
 	  Video.OpenGL.TextureDownsample cfg. This is done in addition to po2
 	  adjustments)
+	- res added GetArray() methods to csArray and csPArray.
+	- res made the following changes related to the new renderer:
+	  - started working on new render loop. csEngine::Draw() is in a 
+	    different file now for NR builds. Also, drawing isn't done in 
+	    csSector::Draw() any more, csSector now merely returns a list of
+	    meshes in this sector. Currently, the loop isn't doing much more 
+	    than the old stuff, and has to be activated by uncommenting a line
+	    in renderloop.h.
 18-May-2003
 	- res made the following changes in and around render3d:
 	    - ATI/NV only exts can be disabled all at once via cfg.

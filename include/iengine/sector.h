@@ -50,6 +50,8 @@ struct iRenderView;
 struct iFrustumView;
 struct iSector;
 
+struct csRenderMeshList;
+
 SCF_VERSION (iSectorCallback, 0, 0, 1);
 
 /**
@@ -207,6 +209,10 @@ struct iSector : public iBase
    * to enable the shadows.
    */
   virtual void DrawLight (iRenderView* rview, iLight *light) = 0;
+  
+  ///
+  virtual void CollectMeshes (iRenderView* rview, 
+			      csRenderMeshList& meshes) = 0;
 #endif
 
   /**
