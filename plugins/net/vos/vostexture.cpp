@@ -30,6 +30,7 @@
 #include "ivideo/txtmgr.h"
 #include "igraphic/imageio.h"
 #include "iutil/vfs.h"
+#include "csutil/databuf.h"
 
 #ifdef IMOZILLA_SUPPORT
 #include "itexture/imozilla.h"
@@ -87,9 +88,8 @@ void ConstructTextureTask::doTask()
     return;
   }
 
-  csRef<iImage> image (io->Load ((uint8*) texturedata.c_str(),
-                   texturedata.size(),
-                 engine->GetTextureFormat()));
+  csDataBuffer db((char*)texturedata.c_str(), texturedata.size(), false);
+  csRef<iImage> image (io->Load (&db, engine->GetTextureFormat()));
 
   csRef<iTextureHandle> handle (txtmgr->RegisterTexture (image, CS_TEXTURE_3D));
 
