@@ -32,6 +32,12 @@ window "Splash"
   Frame: (100,200)-(400,300)
   Style: wfsNormal
   Options: wfoBeveledBorder
+
+  component "TestLabel" is "Label"
+  {
+    Frame: (20, 30) - (200, 45)
+    Caption: "This is a test label."
+  }
 }
 
 window "Another"
