@@ -91,10 +91,31 @@ The Perl bindings automatically correctly handle csRef and csPtr.
 
 @subheading Implementing Interfaces
 
-The feature of writing your own implementions of certain interfaces in Perl is
-not yet supported. For instance, you may want to write an implementation of
-@code{iEventHandler} or @code{iAwsSink}, purely in script. Work is progressing
-on this feature.
+You can write your own Perl class and have it inherit from a CS interface,
+then use instances of that class wherever an implementation of that interface
+is expected. Currently the interfaces that support this feature are
+@code{iEventHandler iEventPlug iAwsSink} but it is easy to add more.
+
+@example
+package MyPerlEventHandler;
+use Exporter;
+@ISA = qw{ cspace::iEventHandler };
+sub new
+{
+  bless ($x, "MyPerlEventHandler");
+  return $x = 1;
+}
+sub HandleEvent
+{
+  ($self, $ev) = @_;
+  # your event handler here...
+}
+
+package main;
+$eventq = cspace::CS_QUERY_REGISTRY ($object_reg, "iEventQueue");
+$handler = new MyPerlEventHandler;
+$eventq->RegisterListener ($handler);
+@end example
 
 @subheading Special Cases
 

@@ -776,6 +776,11 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
       csWrap_##TYPE (SV *sv0) : sv (sv0)
       {
         SCF_CONSTRUCT_IBASE (0);
+        SvREFCNT_inc (sv);
+      }
+      virtual ~csWrap_##TYPE ()
+      {
+        SvREFCNT_dec (sv);
       }
 
       BODY
