@@ -18,6 +18,10 @@ chronological order.
 	- Jorrit changed the csArray and csBlockAllocator memory tracker stuff
 	  to use the 'typeid' RTTI function to get the type information. This
 	  way we can produce better output.
+	- Jorrit fixed another case where a 0-sized memory chunk is allocated.
+	  This time in Dynavis.
+	- Jorrit fixed csPolygonMeshTools::CalculateEdges() so it doesn't
+	  allocate 0-sized chunks.
 16-Feb-2004
 	- Jorrit fixed rain mesh object so it now has a reasonably default
 	  box in case the user doesn't call SetBox().

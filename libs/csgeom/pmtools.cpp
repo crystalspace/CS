@@ -153,6 +153,7 @@ csPolygonMeshEdge* csPolygonMeshTools::CalculateEdges (iPolygonMesh* mesh,
 {
   int num_vertices = mesh->GetVertexCount ();
   int num_polygons = mesh->GetPolygonCount ();
+  if (num_polygons == 0 || num_vertices == 0) return 0;
   _FreeEdge* FreeEdge = GetEdgeList ();
 
   // First we create a table indexed by the first vertex index of every

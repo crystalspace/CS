@@ -178,7 +178,10 @@ bool csObjectModelManager::CheckObjectModel (csDynavisObjectModel* model,
       {
         delete[] model->planes;
         model->num_planes = mesh->GetPolygonCount ();
-        model->planes = new csPlane3 [model->num_planes];
+	if (model->num_planes)
+          model->planes = new csPlane3 [model->num_planes];
+        else
+          model->planes = 0;
       }
       csPolygonMeshTools::CalculatePlanes (mesh, model->planes);
       delete[] model->edges;
