@@ -30,10 +30,14 @@ WORLD (
     PROCTEX 'water' (TYPE (WATER))
     PROCTEX 'dots' (TYPE (DOTS))
     PROCTEX 'plasma' (TYPE (PLASMA))
+    TEXTURE 'billboard' (FILE (/lib/std/cslogods.png))
+    TEXTURE 'snow2' (FILE (/lib/std/snow.png))
+    TEXTURE 'seagull' (FILE (/lib/std/seagull.gif))
   )
   MATERIALS (
     MATERIAL 'tree' (TEXTURE ('tree'))
     MATERIAL 'snow' (TEXTURE ('snow'))
+    MATERIAL 'snow2' (TEXTURE ('snow2'))
     MATERIAL 'spark' (TEXTURE ('spark'))
     MATERIAL 'mosholes' (TEXTURE ('mosholes.gif'))
     MATERIAL 'robot' (TEXTURE ('oldmetal.gif'))
@@ -69,7 +73,9 @@ WORLD (
     MATERIAL 'sky' (TEXTURE ('sky.gif'))
     MATERIAL 'misty' (TEXTURE ('misty.gif'))
     MATERIAL 'blobby' (TEXTURE ('blobby.jpg'))
+    MATERIAL 'billboard' (TEXTURE('billboard'))
     MATERIAL 'green_color' (COLOR (0,1,0))
+    MATERIAL 'seagull' (TEXTURE ('seagull'))
   )
   RENDERPRIORITIES (
     PRIORITY 'sky' (1,NONE)
@@ -827,6 +833,14 @@ WORLD (
   )
   MESHFACT 'metablobfact' (
     PLUGIN('metafact')
+    PARAMS()
+  )
+  MESHFACT 'billboard' (
+    PLUGIN ('spr2dFact')
+    PARAMS()
+  )
+  MESHFACT 'seagull' (
+    PLUGIN ('spr2dFact')
     PARAMS()
   )
   SECTOR 'room' (
@@ -2624,6 +2638,32 @@ WORLD (
           )
         )
       )
+    )
+    MESHOBJ 'billboard' (
+      PLUGIN ('spr2d')
+      PRIORITY (alpha)
+      PARAMS (
+        FACTORY ('billboard')
+        VERTICES (-1.2,.3,1.2,.3,1.2,-.3,-1.2,-.3)
+        UV (0,0,1,0,1,1,0,1)
+        LIGHTING = NO
+        COLORS(1,1,1, 1,1,1, 1,1,1, 1,1,1)
+    	MATERIAL(billboard)
+      )
+      MOVE (V (-4,0,8))
+    )
+    MESHOBJ 'seagull' (
+      PLUGIN ('spr2d')
+      PRIORITY (alpha)
+      PARAMS (
+        FACTORY ('billboard')
+        VERTICES (-1.0,.5,1.0,.5,1.0,-.5,-1.0,-.5)
+        UV (0,0,1,0,1,1,0,1)
+        LIGHTING = NO
+        COLORS(1,1,1, 1,1,1, 1,1,1, 1,1,1)
+    	MATERIAL(seagull)
+      )
+      MOVE (V (-4,0,12))
     )
     LIGHT 'l1' (
       CENTER (-19,4,16)
@@ -5670,7 +5710,7 @@ WORLD (
       PLUGIN ('crystalspace.mesh.loader.snow')
       PARAMS (
         FACTORY ('snowFactory')
-        BOX (-43,-1,-10,-3,11,5)
+        BOX (-43,-1,-10,-25,11,5)
         NUMBER (1000)
         MATERIAL ('snow')
 	MIXMODE (ADD ())
@@ -5679,6 +5719,24 @@ WORLD (
 	FALLSPEED (0,-.3,0)
 	SWIRL (0.2)
 	COLOR (.25,.25,.25)
+      )
+      MOVE (V (0,0,0))
+      ZTEST ()
+      PRIORITY ('alpha')
+    )
+    MESHOBJ 'snow2' (
+      PLUGIN ('crystalspace.mesh.loader.snow')
+      PARAMS (
+        FACTORY ('snowFactory')
+        BOX (-23,-1,-10,-3,11,5)
+        NUMBER (1000)
+        MATERIAL ('snow2')
+	MIXMODE (ALPHA(64))
+	DROPSIZE (0.07,0.07)
+	LIGHTING (off)
+	FALLSPEED (0,-.3,0)
+	SWIRL (0.2)
+	COLOR (.9,.9,1)
       )
       MOVE (V (0,0,0))
       ZTEST ()
