@@ -280,12 +280,24 @@ class awsPrefManager : public iAwsPrefs
   /// default font
   iFont *default_font;
 
+  /// constant value heap
+  csBasicVector constants;
+
+  /// container of constants
+  struct constant_entry
+  {
+    /// Name of constant
+    unsigned int name;
+
+    /// Integer value
+    int value;
+  };
+
 public:
     SCF_DECLARE_IBASE;
 
     awsPrefManager(iBase *iParent);
     virtual ~awsPrefManager();
- 
 
     /// Invokes the parser to load a definitions file.
     virtual void Load(const char *def_file);
@@ -372,9 +384,17 @@ public:
     virtual void SetupPalette();
 
     /** Performs whatever initialization is necessary.  For now, it simply initializes the
-     * texture loader.
-     */
+     * texture loader. */
     virtual void Setup(iObjectRegistry *obj_reg);
+
+    /** Allows a component to specify it's own constant values for parsing. */
+    virtual void RegisterConstant(char *name, int value);
+
+    /** Returns true if the constant has been registered, false otherwise.  */
+    virtual bool ConstantExists(char *name);
+
+    /** Allows a component to retrieve the value of a constant, or the parser as well. */
+    virtual int  GetConstantValue(char *name);
     
 };
  

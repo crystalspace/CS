@@ -64,6 +64,21 @@ awsPrefManager::Setup(iObjectRegistry *obj_reg)
   if (DEBUG_INIT) printf("aws-debug: initing texture manager\n");
 
   if (awstxtmgr) awstxtmgr->Initialize(obj_reg); 
+
+  // We setup the window's registered constants here, because windows are special components, and
+  //   do not obey the normal construction rules.
+
+  RegisterConstant("wfsNormal",0x0);
+  RegisterConstant("wfsToolbar",0x1);
+  RegisterConstant("wfsBitmap",0x2);
+  RegisterConstant("wfoControl",0x1);
+  RegisterConstant("wfoZoom",0x2);
+  RegisterConstant("wfoMin",0x4);
+  RegisterConstant("wfoClose",0x8);
+  RegisterConstant("wfoTitle",0x10);
+  RegisterConstant("wfoGrip",0x20);
+  RegisterConstant("wfoRoundBorder",0x0);
+  RegisterConstant("wfoBeveledBorder",0x40);
 }
 
 unsigned long 
@@ -426,7 +441,7 @@ awsPrefManager::FindWindowDef(char *name)
   {
     awsComponentNode *win = (awsComponentNode *)p;
     
-    if (win->Name() == id)
+    if (win && win->Name() == id)
       return win;
     else
       p=win_defs.GetNextItem();
@@ -435,6 +450,51 @@ awsPrefManager::FindWindowDef(char *name)
   
   return NULL;
  
+}
+
+void 
+awsPrefManager::RegisterConstant(char *name, int value)
+{
+  constant_entry *c = new constant_entry;
+
+  c->name = NameToId(name);
+  c->value = value;
+
+  constants.Push(c);
+}
+
+int
+awsPrefManager::GetConstantValue(char *name)
+{
+  unsigned int namev = NameToId(name);
+
+  int i;
+  for(i=0; i<constants.Length(); ++i)
+  {
+    constant_entry *c = (constant_entry *)constants.Get(i);
+
+    if (c->name == namev)
+      return c->value;
+  }
+
+  return 0;
+}
+
+bool 
+awsPrefManager::ConstantExists(char *name)
+{
+  unsigned int namev = NameToId(name);
+
+  int i;
+  for(i=0; i<constants.Length(); ++i)
+  {
+    constant_entry *c = (constant_entry *)constants.Get(i);
+
+    if (c->name == namev)
+      return true;
+  }
+
+  return false;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
