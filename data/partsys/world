@@ -348,7 +348,7 @@
             </params>
             <lmcache>room_walls</lmcache>
         </meshobj>
-        <light name="light1">
+        <light>
             <center x="0" y="0" z="0" />
             <radius>40</radius>
             <color red="1" green="1" blue="1" />
@@ -445,7 +445,7 @@
             </params>
             <ztest />
             <move>
-                <v x="15" y="-0" z="-15" />
+                <v x="15" y="0" z="-15" />
             </move>
         </meshobj>
     </sector>
@@ -630,7 +630,7 @@
             </hardmove>
             <lmcache>room0_1_walls</lmcache>
         </meshobj>
-        <light name="light2">
+        <light>
             <center x="0" y="0" z="40" />
             <radius>40</radius>
             <color red="0" green="0" blue="1" />
@@ -1076,7 +1076,7 @@
             </hardmove>
             <lmcache>room0_2_walls</lmcache>
         </meshobj>
-        <light name="light3">
+        <light>
             <center x="0" y="0" z="80" />
             <radius>40</radius>
             <color red="1" green="0" blue="1" />
@@ -1142,13 +1142,13 @@
                 <lighting>yes</lighting>
                 <totaltime>2500</totaltime>
                 <startpos>
-                    <emitcylinder p="-1.99261" q="0.8">
+                    <emitcylinder p="1" q="1">
                         <min x="0" y="0" z="0" />
                         <max x="0" y="2" z="0" />
                     </emitcylinder>
                 </startpos>
                 <startspeed>
-                    <emitcylindertangent p="-1.99261" q="0.8">
+                    <emitcylindertangent p="1.7" q="1.7">
                         <min x="0" y="0" z="0" />
                         <max x="0" y="2" z="0" />
                     </emitcylindertangent>
@@ -1213,7 +1213,7 @@
                 <lighting>no</lighting>
                 <totaltime>1000</totaltime>
                 <startpos>
-                    <emitcylinder p="-1.99261" q="0">
+                    <emitcylinder p="2.9" q="3">
                         <min x="0" y="0" z="0" />
                         <max x="0" y="0.2" z="0" />
                     </emitcylinder>
@@ -1441,7 +1441,7 @@
             </hardmove>
             <lmcache>room-1_2_walls</lmcache>
         </meshobj>
-        <light name="light4">
+        <light>
             <center x="-40" y="0" z="80" />
             <radius>40</radius>
             <color red="1" green="1" blue="0" />
@@ -1950,7 +1950,7 @@
             </hardmove>
             <lmcache>room1_0_walls</lmcache>
         </meshobj>
-        <light name="light5">
+        <light>
             <center x="40" y="0" z="0" />
             <radius>40</radius>
             <color red="1" green="0" blue="0" />
@@ -2254,7 +2254,7 @@
                 </layer>
             </params>
         </meshobj>
-        <light name="light6">
+        <light>
             <center x="80" y="0" z="0" />
             <radius>40</radius>
             <color red="0" green="1" blue="0" />

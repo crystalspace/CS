@@ -2,6 +2,21 @@ The history order is reversed so that new features are at the top.
 
 26-Aug-2002
 	- Removed some debug stuff from OpenGL canvas code which used iostream.
+	- Added support for proper conversion of HEIGHTGEN keyword (and
+	  everything that goes with that) to XML in Cs2Xml.
+	- Added support for proper conversion of terrfunc keywords in
+	  Cs2Xml.
+	- Converted the terrfunc loader to XML.
+	- Added support for UVA in cs2xml.
+	- Added support for UV and COLOR loading in the syntax services.
+	- Fixed a bug in Cs2Xml and 'uv' specification in 'texmap'.
+	- Fixed a bug in the parsing of <uv> in <texmap> in the syntax
+	  services.
+	- Fixed handling of SPEED again in Cs2Xml. It was broken since
+	  adding support for SPEED in sequences.
+	- Fixed support for emitcylinder in Cs2Xml.
+	- Removed support for flarge.zip and partsys.zip from vfs.cfg.
+	- Made a few fixes to flarge and partsys.
 23-Aug-2002
 	- Cs2Xml now supports old-style START keyword.
 	- Fixed Cs2Xml so that it only adds the name attribute to some node

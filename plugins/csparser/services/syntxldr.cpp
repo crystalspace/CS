@@ -166,6 +166,7 @@ enum
   XMLTOKEN_SHADING,
   XMLTOKEN_UVA,
   XMLTOKEN_UV,
+  XMLTOKEN_COLOR,
   XMLTOKEN_COLORS,
   XMLTOKEN_COLLDET,
   XMLTOKEN_COSFACT,
@@ -267,6 +268,7 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("shading", XMLTOKEN_SHADING);
   xmltokens.Register ("uva", XMLTOKEN_UVA);
   xmltokens.Register ("uv", XMLTOKEN_UV);
+  xmltokens.Register ("color", XMLTOKEN_COLOR);
   xmltokens.Register ("colors", XMLTOKEN_COLORS);
   xmltokens.Register ("colldet", XMLTOKEN_COLLDET);
   xmltokens.Register ("cosfact", XMLTOKEN_COSFACT);
@@ -1613,6 +1615,8 @@ bool csTextSyntaxService::ParseTextureMapping (
 	int &idx3, csVector2 &uv3,
 	char *plane, const char *polyname)
 {
+  int cur_uvidx = 0;
+
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -1713,36 +1717,20 @@ bool csTextSyntaxService::ParseTextureMapping (
       case XMLTOKEN_UV:
         {
           texspec |= CSTEX_UV;
-	  csRef<iDocumentNode> spec = child->GetNode ("vt1");
-	  if (!spec)
+	  int idx = child->GetAttributeValueAsInt ("idx");
+	  float x = child->GetAttributeValueAsFloat ("u");
+	  float y = child->GetAttributeValueAsFloat ("v");
+	  switch (cur_uvidx)
 	  {
-            ReportError ("crystalspace.syntax.texture", child,
-              "Couldn't find 'vt1'!", value);
-            return false;
+	    case 0: idx1 = idx; uv1.x = x; uv1.y = y; break;
+	    case 1: idx2 = idx; uv2.x = x; uv2.y = y; break;
+	    case 2: idx3 = idx; uv3.x = x; uv3.y = y; break;
+	    default:
+              ReportError ("crystalspace.syntax.texture", child,
+                "Too many <uv> nodes inside <texmap>! Only 3 allowed");
+	      return false;
 	  }
-	  idx1 = spec->GetAttributeValueAsInt ("idx");
-	  uv1.x = spec->GetAttributeValueAsFloat ("u");
-	  uv1.y = spec->GetAttributeValueAsFloat ("v");
-	  spec = child->GetNode ("vt2");
-	  if (!spec)
-	  {
-            ReportError ("crystalspace.syntax.texture", child,
-              "Couldn't find 'vt2'!", value);
-            return false;
-	  }
-	  idx2 = spec->GetAttributeValueAsInt ("idx");
-	  uv2.x = spec->GetAttributeValueAsFloat ("u");
-	  uv2.y = spec->GetAttributeValueAsFloat ("v");
-	  spec = child->GetNode ("vt3");
-	  if (!spec)
-	  {
-            ReportError ("crystalspace.syntax.texture", child,
-              "Couldn't find 'vt3'!", value);
-            return false;
-	  }
-	  idx3 = spec->GetAttributeValueAsInt ("idx");
-	  uv3.x = spec->GetAttributeValueAsFloat ("u");
-	  uv3.y = spec->GetAttributeValueAsFloat ("v");
+	  cur_uvidx++;
 	}
         break;
       default:
@@ -1902,7 +1890,11 @@ bool csTextSyntaxService::ParsePoly3d (
   bool do_mirror = false;
   int set_colldet = 0; // If 1 then set, if -1 then reset, else default.
 
-  char str[255];
+  bool init_gouraud_poly = false;
+  csRef<iPolyTexFlat> fs;
+  csRef<iPolyTexGouraud> gs;
+  int num_uv = 0;
+  int num_col = 0;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -1918,7 +1910,7 @@ bool csTextSyntaxService::ParsePoly3d (
         if (mat == NULL)
         {
           ReportError ("crystalspace.syntax.polygon", child,
-            "Couldn't find material named '%s'!", str);
+            "Couldn't find material named '%s'!", child->GetContentsValue ());
           return false;
         }
         poly3d->SetMaterial (mat);
@@ -2042,62 +2034,84 @@ bool csTextSyntaxService::ParsePoly3d (
 	  }
 	}
         break;
-#if 0
-	// @@@ TODO
       case XMLTOKEN_UV:
         {
-          poly3d->SetTextureType (POLYTXT_GOURAUD);
-	  iPolyTexType* ptt = poly3d->GetPolyTexType ();
-	  iPolyTexFlat* fs = SCF_QUERY_INTERFACE (ptt, iPolyTexFlat);
-          int num, nv = poly3d->GetVertexCount ();
-	  fs->Setup (poly3d);
-          float list [2 * 100];
-          csScanStr (params, "%F", list, &num);
-          if (num > nv)
-	    num = nv;
-          for (int i = 0; i < num; i++)
-            fs->SetUV (i, list [i * 2], list [i * 2 + 1]);
-	  fs->DecRef ();
-        }
-        break;
-      case CS_TOKEN_COLORS:
+	  float u = child->GetAttributeValueAsFloat ("u");
+	  float v = child->GetAttributeValueAsFloat ("v");
+	  if (!init_gouraud_poly)
+	  {
+            poly3d->SetTextureType (POLYTXT_GOURAUD);
+	    init_gouraud_poly = true;
+	  }
+	  if (!fs)
+	  {
+	    iPolyTexType* ptt = poly3d->GetPolyTexType ();
+	    fs.Take (SCF_QUERY_INTERFACE (ptt, iPolyTexFlat));
+	    fs->Setup (poly3d);
+	  }
+	  if (num_uv >= poly3d->GetVertexCount ())
+	  {
+	    ReportError ("crystalspace.syntax.polygon", child,
+	      "Too many <uv> statements in polygon!");
+	    return false;
+	  }
+	  fs->SetUV (num_uv, u, v);
+	  num_uv++;
+	}
+	break;
+      case XMLTOKEN_UVA:
         {
-          poly3d->SetTextureType (POLYTXT_GOURAUD);
-	  iPolyTexType* ptt = poly3d->GetPolyTexType ();
-	  iPolyTexGouraud* gs = SCF_QUERY_INTERFACE (ptt, iPolyTexGouraud);
-          int num, nv = poly3d->GetVertexCount ();
-	  gs->Setup (poly3d);
-          float list [3 * 100];
-          csScanStr (params, "%F", list, &num);
-          if (num > nv)
-	    num = nv;
-          for (int i = 0; i < num; i++)
-            gs->SetColor (i, csColor (list [i * 3], list [i * 3 + 1],
-				      list [i * 3 + 2]));
-	  gs->DecRef ();
-        }
-        break;
-      case CS_TOKEN_UVA:
+	  float angle = child->GetAttributeValueAsFloat ("angle");
+	  float scale = child->GetAttributeValueAsFloat ("scale");
+	  float shift = child->GetAttributeValueAsFloat ("shift");
+	  if (!init_gouraud_poly)
+	  {
+            poly3d->SetTextureType (POLYTXT_GOURAUD);
+	    init_gouraud_poly = true;
+	  }
+	  if (!fs)
+	  {
+	    iPolyTexType* ptt = poly3d->GetPolyTexType ();
+	    fs.Take (SCF_QUERY_INTERFACE (ptt, iPolyTexFlat));
+	    fs->Setup (poly3d);
+	  }
+	  if (num_uv >= poly3d->GetVertexCount ())
+	  {
+	    ReportError ("crystalspace.syntax.polygon", child,
+	      "Too many <uva> statements in polygon!");
+	    return false;
+	  }
+          float a = angle * TWO_PI / 360.;
+          fs->SetUV (num_uv, cos (a) * scale + shift, sin (a) * scale + shift);
+	  num_uv++;
+	}
+	break;
+      case XMLTOKEN_COLOR:
         {
-          poly3d->SetTextureType (POLYTXT_GOURAUD);
-	  iPolyTexType* ptt = poly3d->GetPolyTexType ();
-	  iPolyTexFlat* fs = SCF_QUERY_INTERFACE (ptt, iPolyTexFlat);
-          int num, nv = poly3d->GetVertexCount ();
-	  fs->Setup (poly3d);
-          float list [3 * 100];
-          csScanStr (params, "%F", list, &num);
-          if (num > nv)
-	    num = nv;
-          for (int i = 0; i < num; i++)
-          {
-            float a = list [i * 3] * TWO_PI / 360.;
-            fs->SetUV (i, cos (a) * list [i * 3 + 1] + list [i * 3 + 2],
-                          sin (a) * list [i * 3 + 1] + list [i * 3 + 2]);
-          }
-	  fs->DecRef ();
-        }
-        break;
-#endif
+	  float r = child->GetAttributeValueAsFloat ("red");
+	  float g = child->GetAttributeValueAsFloat ("green");
+	  float b = child->GetAttributeValueAsFloat ("blue");
+	  if (!init_gouraud_poly)
+	  {
+            poly3d->SetTextureType (POLYTXT_GOURAUD);
+	    init_gouraud_poly = true;
+	  }
+	  if (!gs)
+	  {
+	    iPolyTexType* ptt = poly3d->GetPolyTexType ();
+	    gs.Take (SCF_QUERY_INTERFACE (ptt, iPolyTexGouraud));
+	    gs->Setup (poly3d);
+	  }
+	  if (num_col >= poly3d->GetVertexCount ())
+	  {
+	    ReportError ("crystalspace.syntax.polygon", child,
+	      "Too many <color> statements in polygon!");
+	    return false;
+	  }
+	  gs->SetColor (num_col, csColor (r, g, b));
+	  num_col++;
+	}
+	break;
       default:
         ReportBadToken (child);
         return false;

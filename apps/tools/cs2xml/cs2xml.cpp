@@ -22,6 +22,7 @@
 #include "cssysdef.h"
 #include "cs2xml.h"
 #include "csgeom/vector3.h"
+#include "csgeom/vector2.h"
 #include "csutil/cscolor.h"
 #include "csutil/util.h"
 #include "csutil/parser.h"
@@ -58,16 +59,20 @@ void Cs2Xml::ReportError (const char* description, ...)
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ACCEL)
   CS_TOKEN_DEF (AGING)
+  CS_TOKEN_DEF (ALLMATERIAL)
   CS_TOKEN_DEF (ATTACH)
   CS_TOKEN_DEF (BASECOLOR)
+  CS_TOKEN_DEF (BLOCKS)
   CS_TOKEN_DEF (BOX)
   CS_TOKEN_DEF (CENTER)
   CS_TOKEN_DEF (CURVECENTER)
   CS_TOKEN_DEF (CURVECONTROL)
   CS_TOKEN_DEF (COLOR)
   CS_TOKEN_DEF (COLORS)
+  CS_TOKEN_DEF (CORRECTSEAMS)
   CS_TOKEN_DEF (DIRECTION)
   CS_TOKEN_DEF (DIRECTIONAL)
+  CS_TOKEN_DEF (DIRLIGHT)
   CS_TOKEN_DEF (DROPSIZE)
   CS_TOKEN_DEF (DURATION)
   CS_TOKEN_DEF (EMITBOX)
@@ -83,19 +88,28 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (FIRST)
   CS_TOKEN_DEF (FOG)
   CS_TOKEN_DEF (FRAME)
+  CS_TOKEN_DEF (GENERATE)
+  CS_TOKEN_DEF (GRID)
+  CS_TOKEN_DEF (GROUPMATERIAL)
   CS_TOKEN_DEF (HALO)
   CS_TOKEN_DEF (HAZEBOX)
   CS_TOKEN_DEF (HAZECONE)
+  CS_TOKEN_DEF (HEIGHTMAP)
   CS_TOKEN_DEF (IDENTITY)
   CS_TOKEN_DEF (KEY)
   CS_TOKEN_DEF (LIGHT)
+  CS_TOKEN_DEF (LODCOST)
+  CS_TOKEN_DEF (LODDIST)
   CS_TOKEN_DEF (MATRIX)
+  CS_TOKEN_DEF (MATERIAL)
   CS_TOKEN_DEF (MAXCOLOR)
+  CS_TOKEN_DEF (MULTIPLY)
   CS_TOKEN_DEF (NUM)
   CS_TOKEN_DEF (ORIG)
   CS_TOKEN_DEF (ORIGIN)
   CS_TOKEN_DEF (ORIGINBOX)
   CS_TOKEN_DEF (PATH)
+  CS_TOKEN_DEF (PARTSIZE)
   CS_TOKEN_DEF (POLYGON)
   CS_TOKEN_DEF (PORTAL)
   CS_TOKEN_DEF (POS)
@@ -117,17 +131,23 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SECOND)
   CS_TOKEN_DEF (SETUPMESH)
   CS_TOKEN_DEF (SHIFT)
+  CS_TOKEN_DEF (SINGLE)
+  CS_TOKEN_DEF (SIZE)
+  CS_TOKEN_DEF (SLOPE)
+  CS_TOKEN_DEF (SOLID)
   CS_TOKEN_DEF (SOURCE)
   CS_TOKEN_DEF (SPEED)
   CS_TOKEN_DEF (START)
   CS_TOKEN_DEF (T)
   CS_TOKEN_DEF (TEXTURE)
   CS_TOKEN_DEF (TIMES)
+  CS_TOKEN_DEF (TOPLEFT)
   CS_TOKEN_DEF (TRANSPARENT)
   CS_TOKEN_DEF (TRIANGLE)
   CS_TOKEN_DEF (TRIANGLES)
   CS_TOKEN_DEF (TYPE)
   CS_TOKEN_DEF (UV)
+  CS_TOKEN_DEF (UVA)
   CS_TOKEN_DEF (V)
   CS_TOKEN_DEF (VERTEX)
   CS_TOKEN_DEF (VERTICES)
@@ -463,16 +483,20 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
   CS_TOKEN_TABLE_START (tokens)
     CS_TOKEN_TABLE (ACCEL)
     CS_TOKEN_TABLE (AGING)
+    CS_TOKEN_TABLE (ALLMATERIAL)
     CS_TOKEN_TABLE (ATTACH)
     CS_TOKEN_TABLE (BASECOLOR)
+    CS_TOKEN_TABLE (BLOCKS)
     CS_TOKEN_TABLE (BOX)
     CS_TOKEN_TABLE (CENTER)
     CS_TOKEN_TABLE (CURVECENTER)
     CS_TOKEN_TABLE (CURVECONTROL)
     CS_TOKEN_TABLE (COLOR)
     CS_TOKEN_TABLE (COLORS)
+    CS_TOKEN_TABLE (CORRECTSEAMS)
     CS_TOKEN_TABLE (DIRECTION)
     CS_TOKEN_TABLE (DIRECTIONAL)
+    CS_TOKEN_TABLE (DIRLIGHT)
     CS_TOKEN_TABLE (DROPSIZE)
     CS_TOKEN_TABLE (DURATION)
     CS_TOKEN_TABLE (EMITBOX)
@@ -488,18 +512,27 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (FIRST)
     CS_TOKEN_TABLE (FOG)
     CS_TOKEN_TABLE (FRAME)
+    CS_TOKEN_TABLE (GENERATE)
+    CS_TOKEN_TABLE (GRID)
+    CS_TOKEN_TABLE (GROUPMATERIAL)
     CS_TOKEN_TABLE (HALO)
     CS_TOKEN_TABLE (HAZEBOX)
     CS_TOKEN_TABLE (HAZECONE)
+    CS_TOKEN_TABLE (HEIGHTMAP)
     CS_TOKEN_TABLE (KEY)
     CS_TOKEN_TABLE (LIGHT)
+    CS_TOKEN_TABLE (LODCOST)
+    CS_TOKEN_TABLE (LODDIST)
     CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (MAXCOLOR)
+    CS_TOKEN_TABLE (MULTIPLY)
     CS_TOKEN_TABLE (NUM)
     CS_TOKEN_TABLE (ORIG)
     CS_TOKEN_TABLE (ORIGIN)
     CS_TOKEN_TABLE (ORIGINBOX)
     CS_TOKEN_TABLE (PATH)
+    CS_TOKEN_TABLE (PARTSIZE)
     CS_TOKEN_TABLE (POLYGON)
     CS_TOKEN_TABLE (PORTAL)
     CS_TOKEN_TABLE (POS)
@@ -515,17 +548,23 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (SECOND)
     CS_TOKEN_TABLE (SETUPMESH)
     CS_TOKEN_TABLE (SHIFT)
+    CS_TOKEN_TABLE (SINGLE)
+    CS_TOKEN_TABLE (SIZE)
+    CS_TOKEN_TABLE (SLOPE)
+    CS_TOKEN_TABLE (SOLID)
     CS_TOKEN_TABLE (SOURCE)
     CS_TOKEN_TABLE (SPEED)
     CS_TOKEN_TABLE (START)
     CS_TOKEN_TABLE (T)
     CS_TOKEN_TABLE (TEXTURE)
     CS_TOKEN_TABLE (TIMES)
+    CS_TOKEN_TABLE (TOPLEFT)
     CS_TOKEN_TABLE (TRANSPARENT)
     CS_TOKEN_TABLE (TRIANGLE)
     CS_TOKEN_TABLE (TRIANGLES)
     CS_TOKEN_TABLE (TYPE)
     CS_TOKEN_TABLE (UV)
+    CS_TOKEN_TABLE (UVA)
     CS_TOKEN_TABLE (V)
     CS_TOKEN_TABLE (VERTEX)
     CS_TOKEN_TABLE (VERTICES)
@@ -565,6 +604,53 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
             ParseGeneral ("portal", parser, portal_node, params);
 	  }
 	  break;
+	case CS_TOKEN_ALLMATERIAL:
+	case CS_TOKEN_MATERIAL:
+	  {
+	    if (!strcmp (parent_token, "materials"))
+	    {
+	      csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	    CS_NODE_ELEMENT, NULL);
+	      child->SetValue ("material");
+	      if (name && *name) child->SetAttribute ("name", name);
+              ParseGeneral (tokname, parser, child, params);
+	    }
+	    else
+	    {
+	      int i;
+	      char buf[512];
+              int num = csScanStr (params, "%d,%s", &i, buf);
+	      if (num < 2)
+	      {
+                csScanStr (params, "%s", buf);
+	        csRef<iDocumentNode> child = CreateValueNode (parent,
+			"material", buf);
+	        if (name && *name) child->SetAttribute ("name", name);
+	      }
+	      else
+	      {
+                num = csScanStr (params, "%s", buf);
+	        csRef<iDocumentNode> child = CreateValueNode (parent,
+			"material", buf);
+	        if (name && *name) child->SetAttribute ("name", name);
+	        child->SetAttributeAsInt ("index", i);
+	      }
+	    }
+	  }
+	  break;
+	case CS_TOKEN_GROUPMATERIAL:
+	  {
+	    int rangeStart, rangeEnd;
+	    char buf[512];
+	    csScanStr (params, "%s,%d,%d", buf, &rangeStart, &rangeEnd);
+	    csRef<iDocumentNode> child = CreateValueNode (parent, "material",
+	      	buf);
+	    if (name && *name) child->SetAttribute ("name", name);
+	    child->SetAttributeAsInt ("start", rangeStart);
+	    child->SetAttributeAsInt ("end", rangeEnd);
+	  }
+	  break;
+        case CS_TOKEN_SOLID:
         case CS_TOKEN_BASECOLOR:
         case CS_TOKEN_MAXCOLOR:
         case CS_TOKEN_COLOR:
@@ -627,11 +713,11 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    }
 	    else
 	    {
-	      csRef<iDocumentNode> child = parent->CreateNodeBefore (
-	    	CS_NODE_ELEMENT, NULL);
-	      child->SetValue (tokname);
+	      float f;
+	      csScanStr (params, "%f", &f);
+	      csRef<iDocumentNode> child = CreateValueNodeAsFloat (
+	    	  parent, tokname, f);
 	      if (name && *name) child->SetAttribute ("name", name);
-              ParseGeneral (tokname, parser, child, params);
 	    }
 	  }
 	  break;
@@ -722,6 +808,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	  }
 	  break;
         case CS_TOKEN_W:
+        case CS_TOKEN_TOPLEFT:
         case CS_TOKEN_DIRECTION:
         case CS_TOKEN_DIRECTIONAL:
         case CS_TOKEN_SOURCE:
@@ -885,6 +972,23 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    }
 	  }
 	  break;
+        case CS_TOKEN_UVA:
+	  {
+	    int i;
+	    float list[300];
+	    int num;
+	    csScanStr (params, "%F", list, &num);
+	    for (i = 0 ; i < num/3 ; i++)
+	    {
+	      csRef<iDocumentNode> uvnode = parent->CreateNodeBefore (
+			CS_NODE_ELEMENT, NULL);
+	      uvnode->SetValue ("uva");
+	      uvnode->SetAttributeAsFloat ("angle", list[i*3+0]);
+	      uvnode->SetAttributeAsFloat ("scale", list[i*3+1]);
+	      uvnode->SetAttributeAsFloat ("shift", list[i*3+2]);
+	    }
+	  }
+	  break;
         case CS_TOKEN_UV:
 	  {
 	    if (!strcmp (parent_token, "p"))
@@ -903,7 +1007,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 		uvnode->SetAttributeAsFloat ("v", list[i*2+1]);
 	      }
 	    }
-	    else if (!strcmp (parent_token, "texture"))
+	    else if (!strcmp (parent_token, "texmap"))
 	    {
 	      // UV inside texture.
 	      int idx1, idx2, idx3;
@@ -1037,9 +1141,23 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    }
 	    else if (!strcmp (parent_token, "layer"))
 	    {
-	      char buf[2048];
-              csScanStr (params, "%s", buf);
-	      CreateValueNode (parent, "texture", buf);
+	      csRef<iDocumentNode> parparnode = parent->GetParent ();
+	      if (!strcmp (parparnode->GetValue (), "material"))
+	      {
+	        // Layer in a material.
+	        char buf[2048];
+                csScanStr (params, "%s", buf);
+	        CreateValueNode (parent, "texture", buf);
+	      }
+	      else
+	      {
+	        // Layer in a heightgen.
+	        csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+	        child->SetValue ("texture");
+	        if (name && *name) child->SetAttribute ("name", name);
+                ParseGeneral ("texture", parser, child, params);
+	      }
 	    }
 	    else
 	    {
@@ -1079,6 +1197,59 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    child->SetAttributeAsInt ("v1", list[0]);
 	    child->SetAttributeAsInt ("v2", list[1]);
 	    child->SetAttributeAsInt ("v3", list[2]);
+	    if (name && *name) child->SetAttribute ("name", name);
+	  }
+	  break;
+        case CS_TOKEN_SINGLE:
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name && *name) child->SetAttribute ("name", name);
+
+	    char imagename[255];
+	    csVector2 scale, offset;
+            csScanStr (params, "%s,%f,%f,%f,%f",
+		imagename, &scale.x, &scale.y,
+		&offset.x, &offset.y);
+	    CreateValueNode (child, "image", imagename);
+	    csRef<iDocumentNode> scalenode = child->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    scalenode->SetValue ("scale");
+	    scalenode->SetAttributeAsFloat ("x", scale.x);
+	    scalenode->SetAttributeAsFloat ("y", scale.y);
+	    csRef<iDocumentNode> offsetnode = child->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    offsetnode->SetValue ("offset");
+	    offsetnode->SetAttributeAsFloat ("x", offset.x);
+	    offsetnode->SetAttributeAsFloat ("y", offset.y);
+	  }
+	  break;
+        case CS_TOKEN_SLOPE:
+        case CS_TOKEN_HEIGHTMAP:
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name && *name) child->SetAttribute ("name", name);
+
+	    char heightmap[255];
+	    float hscale, hshift;
+            csScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
+	    CreateValueNode (child, "image", heightmap);
+	    CreateValueNodeAsFloat (child, "scale", hscale);
+	    CreateValueNodeAsFloat (child, "shift", hshift);
+	  }
+	  break;
+	case CS_TOKEN_GENERATE:
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    int x, y;
+	    csScanStr (params, "%d,%d", &x, &y);
+	    child->SetAttributeAsInt ("x", x);
+	    child->SetAttributeAsInt ("y", y);
 	    if (name && *name) child->SetAttribute ("name", name);
 	  }
 	  break;
@@ -1209,6 +1380,32 @@ defaulthalo:
 	    child->SetAttributeAsFloat ("radius", radius);
 	  }
 	  break;
+        case CS_TOKEN_SIZE:
+        case CS_TOKEN_PARTSIZE:
+        case CS_TOKEN_MULTIPLY:
+	  {
+	    if (!strcmp (parent_token, "mixmode"))
+	    {
+	      // Should be only for multiply.
+	      csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+	      child->SetValue (tokname);
+	      if (name && *name) child->SetAttribute ("name", name);
+              ParseGeneral (tokname, parser, child, params);
+	    }
+	    else
+	    {
+	      csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	  	  CS_NODE_ELEMENT, NULL);
+	      child->SetValue (tokname);
+	      if (name && *name) child->SetAttribute ("name", name);
+	      int w, h;
+	      csScanStr (params, "%d,%d", &w, &h);
+	      child->SetAttributeAsInt ("w", w);
+	      child->SetAttributeAsInt ("h", h);
+	    }
+	  }
+	  break;
         case CS_TOKEN_RECTPARTICLES:
         case CS_TOKEN_DROPSIZE:
 	  {
@@ -1222,11 +1419,36 @@ defaulthalo:
 	    child->SetAttributeAsFloat ("h", h);
 	  }
 	  break;
+        case CS_TOKEN_CORRECTSEAMS:
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	  	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name && *name) child->SetAttribute ("name", name);
+	    int w, h;
+	    csScanStr (params, "%d,%d", &w, &h);
+	    child->SetAttributeAsInt ("w", w);
+	    child->SetAttributeAsInt ("h", h);
+	  }
+	  break;
+        case CS_TOKEN_BLOCKS:
+        case CS_TOKEN_GRID:
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	  	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name && *name) child->SetAttribute ("name", name);
+	    int x, y;
+	    csScanStr (params, "%d,%d", &x, &y);
+	    child->SetAttributeAsInt ("x", x);
+	    child->SetAttributeAsInt ("y", y);
+	  }
+	  break;
         case CS_TOKEN_EMITCYLINDER:
         case CS_TOKEN_EMITCYLINDERTANGENT:
 	  {
 	    float x1, y1, z1, x2, y2, z2, p, q;
-	    csScanStr (params, "%f,%f,%f,%f,%f,%f,&f,&f", &x1, &y1, &z1,
+	    csScanStr (params, "%f,%f,%f,%f,%f,%f,%f,%f", &x1, &y1, &z1,
 	    	&x2, &y2, &z2, &p, &q);
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	  	CS_NODE_ELEMENT, NULL);
@@ -1410,6 +1632,56 @@ defaulthalo:
 	    }
 	  }
 	  break;
+        case CS_TOKEN_LODDIST:
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name && *name) child->SetAttribute ("name", name);
+	    int lod;
+	    float dist;
+	    csScanStr (params, "%d,%f", &lod, &dist);
+	    child->SetAttributeAsInt ("level", lod);
+	    child->SetAttributeAsFloat ("distance", dist);
+	  }
+	  break;
+        case CS_TOKEN_LODCOST:
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name && *name) child->SetAttribute ("name", name);
+	    int lod;
+	    float cost;
+	    csScanStr (params, "%d,%f", &lod, &cost);
+	    child->SetAttributeAsInt ("level", lod);
+	    child->SetAttributeAsFloat ("cost", cost);
+	  }
+	  break;
+        case CS_TOKEN_DIRLIGHT:
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name && *name) child->SetAttribute ("name", name);
+	    csVector3 pos;
+	    csColor col;
+	    csScanStr (params, "%f,%f,%f:%f,%f,%f",
+		&pos.x, &pos.y, &pos.z,
+		&col.red, &col.green, &col.blue);
+	    csRef<iDocumentNode> childchild;
+	    childchild = child->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+	    childchild->SetValue ("position");
+	    childchild->SetAttributeAsFloat ("x", pos.x);
+	    childchild->SetAttributeAsFloat ("y", pos.y);
+	    childchild->SetAttributeAsFloat ("z", pos.z);
+	    childchild = child->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+	    childchild->SetValue ("color");
+	    childchild->SetAttributeAsFloat ("red", col.red);
+	    childchild->SetAttributeAsFloat ("green", col.green);
+	    childchild->SetAttributeAsFloat ("blue", col.blue);
+	  }
+	  break;
         case CS_TOKEN_LIGHT:
 	  {
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
@@ -1466,18 +1738,30 @@ defaulthalo:
         case CS_TOKEN_SCALE:
 	  {
 	    csRef<iDocumentNode> child;
-	    float x, y;
-	    int num = csScanStr (params, "%f,%f", &x, &y);
-	    if (num == 2)
+	    float x, y, z;
+	    int num = csScanStr (params, "%f,%f,%f", &x, &y, &z);
+	    if (num == 3)
 	    {
 	      child = parent->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
 	      child->SetValue (tokname);
 	      child->SetAttributeAsFloat ("x", x);
 	      child->SetAttributeAsFloat ("y", y);
+	      child->SetAttributeAsFloat ("z", z);
 	    }
 	    else
 	    {
-	      child = CreateValueNodeAsFloat (parent, tokname, x);
+	      num = csScanStr (params, "%f,%f", &x, &y);
+	      if (num == 2)
+	      {
+	        child = parent->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+	        child->SetValue (tokname);
+	        child->SetAttributeAsFloat ("x", x);
+	        child->SetAttributeAsFloat ("y", y);
+	      }
+	      else
+	      {
+	        child = CreateValueNodeAsFloat (parent, tokname, x);
+	      }
 	    }
 	  }
 	  break;

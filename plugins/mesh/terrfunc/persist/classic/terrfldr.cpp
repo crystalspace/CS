@@ -24,6 +24,7 @@
 #include "csutil/scanstr.h"
 #include "iengine/engine.h"
 #include "iutil/plugin.h"
+#include "iutil/document.h"
 #include "iutil/vfs.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
@@ -35,6 +36,8 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "imap/ldrctxt.h"
+#include "imap/services.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -56,6 +59,24 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (VISTEST)
   CS_TOKEN_DEF (ALLMATERIAL) // For testing purposes. Use after BLOCKS and GRID are set
 CS_TOKEN_DEF_END
+
+enum
+{
+  XMLTOKEN_FACTORY = 1,
+  XMLTOKEN_COLOR,
+  XMLTOKEN_CORRECTSEAMS,
+  XMLTOKEN_MATERIAL,
+  XMLTOKEN_BLOCKS,
+  XMLTOKEN_GRID,
+  XMLTOKEN_HEIGHTMAP,
+  XMLTOKEN_TOPLEFT,
+  XMLTOKEN_SCALE,
+  XMLTOKEN_DIRLIGHT,
+  XMLTOKEN_LODDIST,
+  XMLTOKEN_LODCOST,
+  XMLTOKEN_QUADDEPTH,
+  XMLTOKEN_VISTEST
+};
 
 SCF_IMPLEMENT_IBASE (csTerrFuncFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
@@ -85,6 +106,26 @@ SCF_EXPORT_CLASS_TABLE (terrfldr)
   SCF_EXPORT_CLASS (csTerrFuncLoader, "crystalspace.mesh.loader.terrfunc",
     "Crystal Space Function Terrain Loader")
 SCF_EXPORT_CLASS_TABLE_END
+
+static void ReportError (iReporter* reporter, const char* id,
+	const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  if (reporter)
+  {
+    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
+  }
+  else
+  {
+    char buf[1024];
+    vsprintf (buf, description, arg);
+    csPrintf ("Error ID: %s\n", id);
+    csPrintf ("Description: %s\n", buf);
+  }
+  va_end (arg);
+}
 
 csTerrFuncFactoryLoader::csTerrFuncFactoryLoader (iBase* pParent)
 {
@@ -123,6 +164,30 @@ iBase* csTerrFuncFactoryLoader::Parse (const char* /*string*/,
   return pFactory;
 }
 
+iBase* csTerrFuncFactoryLoader::Parse (iDocumentNode* /*node*/,
+	iLoaderContext*, iBase* /* context */)
+{
+  iMeshObjectType* pType = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.terrfunc", iMeshObjectType);
+  if (!pType)
+  {
+    pType = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.terrfunc",
+    	iMeshObjectType);
+    if (!pType)
+    {
+      iReporter* reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+      ReportError (reporter,
+		"crystalspace.terrfuncloader.setup.objecttype",
+		"Could not load the terrfunc mesh object plugin!");
+      if (reporter) reporter->DecRef ();
+      return NULL;
+    }
+  }
+  iMeshObjectFactory* pFactory = pType->NewFactory ();
+  pType->DecRef ();
+  return pFactory;
+}
+
 //---------------------------------------------------------------------------
 
 csTerrFuncLoader::csTerrFuncLoader (iBase* pParent)
@@ -130,17 +195,39 @@ csTerrFuncLoader::csTerrFuncLoader (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   plugin_mgr = NULL;
+  synldr = NULL;
+  reporter = NULL;
 }
 
 csTerrFuncLoader::~csTerrFuncLoader ()
 {
   SCF_DEC_REF (plugin_mgr);
+  SCF_DEC_REF (synldr);
+  SCF_DEC_REF (reporter);
 }
 
 bool csTerrFuncLoader::Initialize (iObjectRegistry* object_reg)
 {
   csTerrFuncLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+
+  xmltokens.Register ("factory", XMLTOKEN_FACTORY);
+  xmltokens.Register ("color", XMLTOKEN_COLOR);
+  xmltokens.Register ("correctseams", XMLTOKEN_CORRECTSEAMS);
+  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
+  xmltokens.Register ("blocks", XMLTOKEN_BLOCKS);
+  xmltokens.Register ("grid", XMLTOKEN_GRID);
+  xmltokens.Register ("heightmap", XMLTOKEN_HEIGHTMAP);
+  xmltokens.Register ("topleft", XMLTOKEN_TOPLEFT);
+  xmltokens.Register ("scale", XMLTOKEN_SCALE);
+  xmltokens.Register ("dirlight", XMLTOKEN_DIRLIGHT);
+  xmltokens.Register ("loddist", XMLTOKEN_LODDIST);
+  xmltokens.Register ("lodcost", XMLTOKEN_LODCOST);
+  xmltokens.Register ("quaddepth", XMLTOKEN_QUADDEPTH);
+  xmltokens.Register ("vistest", XMLTOKEN_VISTEST);
+
   return true;
 }
 
@@ -171,8 +258,8 @@ iBase* csTerrFuncLoader::Parse (const char* pString,
   char *pParams;
   char pStr[255];
 
-  iMeshObject* iTerrObj = NULL;
-  iTerrFuncState* iTerrainState = NULL;
+  iMeshObject* mesh = NULL;
+  iTerrFuncState* terrstate = NULL;
 
   csParser* parser = ldr_context->GetParser ();
 
@@ -195,8 +282,8 @@ iBase* csTerrFuncLoader::Parse (const char* pString,
 	    // @@@ Error handling!
 	    return NULL;
 	  }
-	  iTerrObj = iFactory->GetMeshObjectFactory()->NewInstance();
-          iTerrainState = SCF_QUERY_INTERFACE (iTerrObj, iTerrFuncState);
+	  mesh = iFactory->GetMeshObjectFactory()->NewInstance();
+          terrstate = SCF_QUERY_INTERFACE (mesh, iTerrFuncState);
 	}
 	break;
       case CS_TOKEN_MATERIAL:
@@ -210,12 +297,12 @@ iBase* csTerrFuncLoader::Parse (const char* pString,
             printf("Terrain func loader: Can't find requested material '%s'\n",pStr);
             return NULL;
 	  }
-	  iTerrainState->SetMaterial (i, mat);
+	  terrstate->SetMaterial (i, mat);
 	}
         break;
 	  case CS_TOKEN_ALLMATERIAL:
 	  {
-		int i, j = iTerrainState->GetXResolution();
+		int i, j = terrstate->GetXResolution();
 		j = j * j;
 		csScanStr( pParams, "%s", pStr);
 		iMaterialWrapper *mat = ldr_context->FindMaterial (pStr);
@@ -224,14 +311,14 @@ iBase* csTerrFuncLoader::Parse (const char* pString,
 		  printf("Terrain func loader: Cant find requested material '%s'\n",pStr);
 		  return NULL;
 		}
-		for (i = 0; i < j; i++) iTerrainState->SetMaterial(i,mat);
+		for (i = 0; i < j; i++) terrstate->SetMaterial(i,mat);
 	  }
 	  break;
       case CS_TOKEN_GROUPMATERIAL:
 	{
 	  int rangeStart, rangeEnd;
 	  csScanStr (pParams, "%s,%d,%d", pStr, &rangeStart, &rangeEnd);
-	  iTerrainState->LoadMaterialGroup (ldr_context, pStr,
+	  terrstate->LoadMaterialGroup (ldr_context, pStr,
 	  	rangeStart, rangeEnd);
 	}
     	break;
@@ -239,42 +326,42 @@ iBase* csTerrFuncLoader::Parse (const char* pString,
 	{
 	  int tw, th;
 	  csScanStr (pParams, "%d,%d", &tw, &th);
-          iTerrainState->CorrectSeams (tw, th);
+          terrstate->CorrectSeams (tw, th);
         }
         break;
       case CS_TOKEN_BLOCKS:
 	{
 	  int bx, by;
 	  csScanStr (pParams, "%d,%d", &bx, &by);
-          iTerrainState->SetResolution (bx, by);
+          terrstate->SetResolution (bx, by);
         }
         break;
       case CS_TOKEN_GRID:
 	{
 	  int bx, by;
 	  csScanStr (pParams, "%d,%d", &bx, &by);
-          iTerrainState->SetGridResolution (bx, by);
+          terrstate->SetGridResolution (bx, by);
         }
         break;
       case CS_TOKEN_TOPLEFT:
 	{
 	  csVector3 tl;
 	  csScanStr (pParams, "%f,%f,%f", &tl.x, &tl.y, &tl.z);
-          iTerrainState->SetTopLeftCorner (tl);
+          terrstate->SetTopLeftCorner (tl);
         }
         break;
       case CS_TOKEN_SCALE:
 	{
 	  csVector3 s;
 	  csScanStr (pParams, "%f,%f,%f", &s.x, &s.y, &s.z);
-          iTerrainState->SetScale (s);
+          terrstate->SetScale (s);
         }
         break;
       case CS_TOKEN_COLOR:
         {
 	  csColor col;
 	  csScanStr (pParams, "%f,%f,%f", &col.red, &col.green, &col.blue);
-	  iTerrainState->SetColor (col);
+	  terrstate->SetColor (col);
 	}
 	break;
       case CS_TOKEN_DIRLIGHT:
@@ -283,7 +370,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString,
 	  csColor col;
 	  csScanStr (pParams, "%f,%f,%f:%f,%f,%f", &pos.x, &pos.y, &pos.z,
 	  	&col.red, &col.green, &col.blue);
-	  iTerrainState->SetDirLight (pos, col);
+	  terrstate->SetDirLight (pos, col);
 	}
 	break;
       case CS_TOKEN_LODDIST:
@@ -291,7 +378,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString,
 	  int lod;
 	  float dist;
 	  csScanStr (pParams, "%d,%f", &lod, &dist);
-	  iTerrainState->SetLODDistance (lod, dist);
+	  terrstate->SetLODDistance (lod, dist);
 	}
 	break;
       case CS_TOKEN_LODCOST:
@@ -299,21 +386,21 @@ iBase* csTerrFuncLoader::Parse (const char* pString,
 	  int lod;
 	  float cost;
 	  csScanStr (pParams, "%d,%f", &lod, &cost);
-	  iTerrainState->SetMaximumLODCost (lod, cost);
+	  terrstate->SetMaximumLODCost (lod, cost);
 	}
 	break;
       case CS_TOKEN_QUADDEPTH:
         {
 	  int qd;
 	  csScanStr (pParams, "%d", &qd);
-	  iTerrainState->SetQuadDepth (qd);
+	  terrstate->SetQuadDepth (qd);
 	}
         break;
       case CS_TOKEN_VISTEST:
         {
 	  bool vt;
 	  csScanStr (pParams, "%b", &vt);
-	  iTerrainState->SetVisTesting (vt);
+	  terrstate->SetVisTesting (vt);
 	}
         break;
       case CS_TOKEN_HEIGHTMAP:
@@ -355,17 +442,252 @@ iBase* csTerrFuncLoader::Parse (const char* pString,
 	    printf ("Error loading image '%s'!\n", pStr);
 	    return NULL;
 	  }
-	  iTerrainState->SetHeightMap (ifile, hscale, hshift);
+	  terrstate->SetHeightMap (ifile, hscale, hshift);
 	  ifile->DecRef ();
 	  buf->DecRef ();
 	}
 	break;
     }
   }
-  iTerrainState->DecRef ();
+  terrstate->DecRef ();
 
-  return iTerrObj;
+  return mesh;
 }
+
+iBase* csTerrFuncLoader::Parse (iDocumentNode* node,
+	iLoaderContext* ldr_context, iBase* /* context */)
+{
+  csRef<iMeshObject> mesh;
+  csRef<iTerrFuncState> terrstate;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_FACTORY:
+	{
+	  const char* factname = child->GetContentsValue ();
+	  iMeshFactoryWrapper* iFactory = ldr_context->FindMeshFactory (
+	  	factname);
+	  if (!iFactory)
+	  {
+      	    synldr->ReportError (
+	    	"crystalspace.terrfuncloader.parse.unknownfactory",
+		child, "Couldn't find factory '%s'!", factname);
+	    return NULL;
+	  }
+	  mesh.Take (iFactory->GetMeshObjectFactory()->NewInstance());
+          terrstate.Take (SCF_QUERY_INTERFACE (mesh, iTerrFuncState));
+	}
+	break;
+      case XMLTOKEN_MATERIAL:
+	{
+	  const char* matname = child->GetContentsValue ();
+	  csRef<iDocumentAttribute> attr;
+	  attr = child->GetAttribute ("index");
+	  if (attr != NULL)
+	  {
+	    // Set a single material for one index.
+            iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+	    if (!mat)
+	    {
+      	      synldr->ReportError (
+	    	"crystalspace.terrfuncloader.parse.unknownmaterial",
+		child, "Couldn't find material '%s'!", matname);
+              return NULL;
+	    }
+	    terrstate->SetMaterial (attr->GetValueAsInt (), mat);
+	  }
+	  else
+	  {
+	    attr = child->GetAttribute ("start");
+	    if (attr != NULL)
+	    {
+	      // Set a range of materials.
+	      int start = attr->GetValueAsInt ();
+	      attr = child->GetAttribute ("end");
+	      if (attr == NULL)
+	      {
+      	        synldr->ReportError (
+	    	  "crystalspace.terrfuncloader.parse",
+		  child, "'end' attribute missing!");
+                return NULL;
+	      }
+	      int end = attr->GetValueAsInt ();
+	      terrstate->LoadMaterialGroup (ldr_context, matname, start, end);
+	    }
+	    else
+	    {
+	      // Set all materials.
+	      int i, j = terrstate->GetXResolution();
+	      j = j * j;
+              iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+	      if (!mat)
+	      {
+      	        synldr->ReportError (
+	    	  "crystalspace.terrfuncloader.parse.unknownmaterial",
+		  child, "Couldn't find material '%s'!", matname);
+                return NULL;
+	      }
+	      for (i = 0 ; i < j ; i++) terrstate->SetMaterial (i, mat);
+	    }
+	  }
+	}
+	break;
+      case XMLTOKEN_CORRECTSEAMS:
+        terrstate->CorrectSeams (child->GetAttributeValueAsInt ("w"),
+	  	child->GetAttributeValueAsInt ("h"));
+        break;
+      case XMLTOKEN_BLOCKS:
+        terrstate->SetResolution (child->GetAttributeValueAsInt ("x"),
+		child->GetAttributeValueAsInt ("y"));
+        break;
+      case XMLTOKEN_GRID:
+        terrstate->SetGridResolution (child->GetAttributeValueAsInt ("x"),
+		child->GetAttributeValueAsInt ("y"));
+        break;
+      case XMLTOKEN_TOPLEFT:
+	{
+	  csVector3 tl;
+	  if (!synldr->ParseVector (child, tl))
+	    return NULL;
+          terrstate->SetTopLeftCorner (tl);
+        }
+        break;
+      case XMLTOKEN_SCALE:
+	{
+	  csVector3 s;
+	  if (!synldr->ParseVector (child, s))
+	    return NULL;
+          terrstate->SetScale (s);
+        }
+        break;
+      case XMLTOKEN_COLOR:
+        {
+	  csColor col;
+	  if (!synldr->ParseColor (child, col))
+	    return NULL;
+	  terrstate->SetColor (col);
+	}
+	break;
+      case XMLTOKEN_DIRLIGHT:
+        {
+	  csRef<iDocumentNode> posnode = child->GetNode ("position");
+	  if (posnode == NULL)
+	  {
+      	    synldr->ReportError (
+	    	"crystalspace.terrfuncloader.parse",
+		child, "<position> missing in <dirlight>!");
+	    return NULL;
+	  }
+	  csVector3 pos;
+	  pos.x = posnode->GetAttributeValueAsFloat ("x");
+	  pos.y = posnode->GetAttributeValueAsFloat ("y");
+	  pos.z = posnode->GetAttributeValueAsFloat ("z");
+	  csRef<iDocumentNode> colnode = child->GetNode ("color");
+	  csColor col (1, 1, 1);
+	  if (colnode != NULL)
+	  {
+	    col.red = colnode->GetAttributeValueAsFloat ("red");
+	    col.green = colnode->GetAttributeValueAsFloat ("green");
+	    col.blue = colnode->GetAttributeValueAsFloat ("blue");
+	  }
+	  terrstate->SetDirLight (pos, col);
+	}
+	break;
+      case XMLTOKEN_LODDIST:
+	terrstate->SetLODDistance (child->GetAttributeValueAsInt ("level"),
+	  child->GetAttributeValueAsFloat ("distance"));
+	break;
+      case XMLTOKEN_LODCOST:
+	terrstate->SetMaximumLODCost (child->GetAttributeValueAsInt ("level"),
+	  child->GetAttributeValueAsFloat ("cost"));
+	break;
+      case XMLTOKEN_QUADDEPTH:
+	terrstate->SetQuadDepth (child->GetContentsValueAsInt ());
+        break;
+      case XMLTOKEN_VISTEST:
+        {
+	  bool vt;
+	  if (!synldr->ParseBool (child, vt, true))
+	    return NULL;
+	  terrstate->SetVisTesting (vt);
+	}
+        break;
+      case XMLTOKEN_HEIGHTMAP:
+        {
+	  float hscale = 1, hshift = 0;
+	  csRef<iDocumentNode> imgnode = child->GetNode ("image");
+	  if (!imgnode)
+	  {
+      	    synldr->ReportError (
+	    	"crystalspace.terrfuncloader.parse",
+		child, "<image> missing in <heightmap>!");
+	    return NULL;
+	  }
+	  const char* imgname = imgnode->GetContentsValue ();
+	  csRef<iDocumentNode> scalenode = child->GetNode ("scale");
+	  if (scalenode) hscale = scalenode->GetContentsValueAsFloat ();
+	  csRef<iDocumentNode> shiftnode = child->GetNode ("shift");
+	  if (shiftnode) hshift = shiftnode->GetContentsValueAsFloat ();
+
+	  csRef<iVFS> vfs;
+	  vfs.Take (CS_QUERY_REGISTRY (object_reg, iVFS));
+	  if (!vfs)
+	  {
+      	    synldr->ReportError (
+	    	"crystalspace.terrfuncloader.parse",
+		child, "VFS is missing!");
+	    return NULL;
+	  }
+	  csRef<iImageIO> loader;
+	  loader.Take (CS_QUERY_REGISTRY (object_reg, iImageIO));
+	  if (!loader)
+	  {
+      	    synldr->ReportError (
+	    	"crystalspace.terrfuncloader.parse",
+		child, "Image loader is missing!");
+	    return NULL;
+	  }
+
+	  csRef<iDataBuffer> buf;
+	  buf.Take (vfs->ReadFile (imgname));
+	  if (!buf || !buf->GetSize ())
+	  {
+      	    synldr->ReportError (
+	    	"crystalspace.terrfuncloader.parse",
+		child, "Cannot read file '%s' on VFS!", imgname);
+	    return NULL;
+	  }
+	  csRef<iImage> ifile;
+	  ifile.Take (loader->Load (buf->GetUint8 (), buf->GetSize (),
+	  	CS_IMGFMT_TRUECOLOR));
+	  if (!ifile)
+	  {
+      	    synldr->ReportError (
+	    	"crystalspace.terrfuncloader.parse",
+		child, "Error reading image '%s'!", imgname);
+	    return NULL;
+	  }
+	  terrstate->SetHeightMap (ifile, hscale, hshift);
+	}
+	break;
+      default:
+        synldr->ReportBadToken (child);
+	return NULL;
+    }
+  }
+
+  // Incref to avoid smart pointer from cleaning up.
+  if (mesh) mesh->IncRef ();
+  return mesh;
+}
+
 
 //---------------------------------------------------------------------------
 

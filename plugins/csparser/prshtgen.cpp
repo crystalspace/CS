@@ -595,7 +595,8 @@ csGenerateImageTexture* csLoader::ParseHeightgenTexture (iDocumentNode* node)
 	        {
 		  float height = 0;
 		  csGenerateImageTexture* txt = NULL;
-		  csRef<iDocumentNode> texturenode = blend_child->GetNode ("texture");
+		  csRef<iDocumentNode> texturenode = blend_child->GetNode (
+		  	"texture");
 		  if (!texturenode)
 		  {
 		    ReportError (
@@ -611,7 +612,8 @@ csGenerateImageTexture* csLoader::ParseHeightgenTexture (iDocumentNode* node)
 			    "Problem with returned texture!");
 		    return NULL;
 		  }
-		  csRef<iDocumentNode> heightnode = blend_child->GetNode ("height");
+		  csRef<iDocumentNode> heightnode = blend_child->GetNode (
+		  	"height");
 		  if (heightnode)
 		  {
 		    height = heightnode->GetContentsValueAsFloat ();
@@ -658,16 +660,16 @@ bool csLoader::ParseHeightgen (iDocumentNode* node)
     switch (id)
     {
       case XMLTOKEN_SIZE:
-	totalw = child->GetAttributeValueAsInt ("width");
-	totalh = child->GetAttributeValueAsInt ("height");
+	totalw = child->GetAttributeValueAsInt ("w");
+	totalh = child->GetAttributeValueAsInt ("h");
 	break;
       case XMLTOKEN_MULTIPLY:
-	mw = child->GetAttributeValueAsInt ("width");
-	mh = child->GetAttributeValueAsInt ("height");
+	mw = child->GetAttributeValueAsInt ("w");
+	mh = child->GetAttributeValueAsInt ("h");
 	break;
       case XMLTOKEN_PARTSIZE:
-	partw = child->GetAttributeValueAsInt ("width");
-	parth = child->GetAttributeValueAsInt ("height");
+	partw = child->GetAttributeValueAsInt ("w");
+	parth = child->GetAttributeValueAsInt ("h");
 	break;
       case XMLTOKEN_TEXTURE:
         {
@@ -695,7 +697,8 @@ bool csLoader::ParseHeightgen (iDocumentNode* node)
 	  }
 	  iTextureWrapper *TexWrapper = Engine->GetTextureList ()
 	  	->NewTexture (TexHandle);
-	  TexWrapper->QueryObject ()->SetName (child->GetAttributeValue ("name"));
+	  TexWrapper->QueryObject ()->SetName (
+	  	child->GetAttributeValue ("name"));
 	}
 	break;
       default:

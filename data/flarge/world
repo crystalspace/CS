@@ -329,7 +329,7 @@
     </meshfact>
     <meshfact name="paramsFileTest">
         <plugin>spr3dFact</plugin>
-        <paramsfile>/lib/std/sprite3</paramsfile>
+	<paramsfile>/lib/std/sprite3</paramsfile>
     </meshfact>
     <meshfact name="treeFact">
         <plugin>treeFact</plugin>
@@ -6027,7 +6027,7 @@
         </meshobj>
         <light name="l1">
             <center x="-19" y="4" z="16" />
-            <radius x="10" y="4" z="16" />
+            <radius>10</radius>
             <color red="0.7" green="0.7" blue="0.8" />
             <dynamic />
             <key name="cmd_AnimateDynLight" value="" />
@@ -6049,7 +6049,7 @@
         </light>
         <light>
             <center x="10" y="10" z="18" />
-            <radius x="10" y="10" z="18" />
+            <radius>10</radius>
             <color red="1" green="1.2" blue="1.4" />
             <halo>
                 <type>nova</type>
@@ -6060,7 +6060,7 @@
         </light>
         <light>
             <center x="16" y="8" z="8" />
-            <radius x="20" y="8" z="8" />
+            <radius>20</radius>
             <color red="1" green="0.7" blue="0.7" />
             <halo>
                 <type>cross</type>
@@ -9888,27 +9888,27 @@
         </meshobj>
         <light>
             <center x="-10" y="9" z="25" />
-            <radius x="8" y="9" z="25" />
+            <radius>8</radius>
             <color red="0.3" green="0.3" blue="0.3" />
         </light>
         <light>
             <center x="0" y="9" z="25" />
-            <radius x="8" y="9" z="25" />
+            <radius>8</radius>
             <color red="0.3" green="0.3" blue="0.3" />
         </light>
         <light>
             <center x="10" y="9" z="25" />
-            <radius x="8" y="9" z="25" />
+            <radius>8</radius>
             <color red="0.3" green="0.3" blue="0.3" />
         </light>
         <light>
             <center x="20" y="9" z="25" />
-            <radius x="8" y="9" z="25" />
+            <radius>8</radius>
             <color red="0.3" green="0.3" blue="0.3" />
         </light>
         <light>
             <center x="30" y="9" z="25" />
-            <radius x="7" y="9" z="25" />
+            <radius>7</radius>
             <color red="1" green="0" blue="0" />
         </light>
     </sector>
@@ -17383,7 +17383,7 @@
         </meshobj>
         <light>
             <center x="-30" y="70" z="-75" />
-            <radius x="10000" y="70" z="-75" />
+            <radius>10000</radius>
             <color red="0.8" green="0.8" blue="0.8" />
             <halo>
                 <type>flare</type>
@@ -17397,7 +17397,7 @@
         </light>
         <light>
             <center x="-10" y="100" z="0" />
-            <radius x="10000" y="100" z="0" />
+            <radius>10000</radius>
             <color red="0.2" green="0.2" blue="0.25" />
         </light>
     </sector>
@@ -19231,7 +19231,7 @@
         </meshobj>
         <light>
             <center x="-23" y="2.8" z="15" />
-            <radius x="7" y="2.8" z="15" />
+            <radius>7</radius>
             <color red="0.9" green="0.7" blue="0.7" />
         </light>
     </sector>
@@ -19848,7 +19848,7 @@
         </meshobj>
         <light>
             <center x="-29.8" y="2" z="26" />
-            <radius x="7" y="2" z="26" />
+            <radius>7</radius>
             <color red="0.7" green="0.7" blue="0.9" />
         </light>
     </sector>
@@ -21493,17 +21493,17 @@
         </meshobj>
         <light>
             <center x="-5" y="2" z="37.4" />
-            <radius x="6" y="2" z="37.4" />
+            <radius>6</radius>
             <color red="0.9" green="0.6" blue="0.6" />
         </light>
         <light>
             <center x="-15" y="2" z="37.4" />
-            <radius x="6" y="2" z="37.4" />
+            <radius>6</radius>
             <color red="0.9" green="0.6" blue="0.6" />
         </light>
         <light>
             <center x="-25" y="2" z="37.4" />
-            <radius x="6" y="2" z="37.4" />
+            <radius>6</radius>
             <color red="0.9" green="0.6" blue="0.6" />
         </light>
     </sector>
