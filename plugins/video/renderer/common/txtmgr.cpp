@@ -44,20 +44,8 @@ csTextureMM::csTextureMM (iImageFile* image)
   usage = NULL;
   istransp = false;
 
-  if (IsPowerOf2(image->GetWidth()) && 
-      IsPowerOf2(image->GetHeight()))
-  {
-    ifile = image;
-    ifile->IncRef ();
-  }
-  else
-  {
-    //The images size is not a power of two. CS can only handle sizes, that
-    //are a power of two, so we resize the texture now. We choose the next
-    //size, that is a power of two and smaller that the current size.
-    ifile = image->Resize(FindNearestPowerOf2(image->GetWidth())/2,
-                          FindNearestPowerOf2(image->GetHeight())/2);
-  }
+  ifile = image;
+  ifile->IncRef ();
 }
 
 csTextureMM::~csTextureMM ()
@@ -97,6 +85,8 @@ void csTextureMM::create_blended_mipmap (csTextureManager* tex, unsigned char* b
 void csTextureMM::alloc_mipmaps (csTextureManager* tex)
 {
   if (!ifile) return;
+
+  AdjustSize();
 
   CHK (delete t1); t1 = NULL;
   CHK (delete t2); t2 = NULL;
@@ -421,9 +411,33 @@ void csTextureMM::GetMeanColor (float& r, float& g, float& b)
 /// Get the transparent color
 void csTextureMM::GetTransparent (int &red, int &green, int &blue)
 {
-  red = transp_color.red;
+  red   = transp_color.red;
   green = transp_color.green;
-  blue = transp_color.blue;
+  blue  = transp_color.blue;
+}
+
+void csTextureMM::AdjustSize()
+{
+  int newwidth  = ifile->GetWidth();
+  int newheight = ifile->GetHeight();
+
+  if (!IsPowerOf2(newwidth))
+  {
+    newwidth  = FindNearestPowerOf2(ifile->GetWidth()) /2;
+  }
+
+  if (!IsPowerOf2(newheight))
+  {
+    newheight = FindNearestPowerOf2(ifile->GetHeight())/2;
+  }
+
+  if (newwidth  != ifile->GetWidth() ||
+      newheight != ifile->GetHeight())
+  {
+    iImageFile* oldimage = ifile;
+    ifile                = oldimage->Resize(newwidth, newheight);
+    oldimage->DecRef();
+  }
 }
 
 void csHardwareAcceleratedTextureMM::convert_to_internal

@@ -452,7 +452,7 @@ void csWorld::PrepareTextures ()
 
       if (!IsPowerOf2(Width) || !IsPowerOf2(Height))
         CsPrintf (MSG_WARNING,
-          "Invalid texture image '%s' dimenstions!\n"
+          "Inefficient texture image '%s' dimenstions!\n"
           "The width (%d) and height (%d) should be a power of two.\n",
           th->GetName (), Width, Height);
     }

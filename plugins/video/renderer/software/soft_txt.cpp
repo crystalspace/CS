@@ -169,6 +169,7 @@ void csTextureMMSoftware::convert_to_internal_private (csTextureManagerSoftware*
 void csTextureMMSoftware::remap_texture (csTextureManager* new_palette)
 {
   if (!ifile) return;
+
   csTextureManagerSoftware* psoft = (csTextureManagerSoftware*)new_palette;
 
   // If we're running at 32bpp, save R,G,B shift values

@@ -80,7 +80,9 @@ public:
    : csHardwareAcceleratedTextureMM (image) {}
   ///
   virtual void remap_texture(csTextureManager *new_palette) 
-    { remap_palette_24bit(new_palette); }
+  { 
+    remap_palette_24bit(new_palette); 
+  }
 };
 
 /**

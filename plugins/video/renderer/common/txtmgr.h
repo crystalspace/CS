@@ -95,6 +95,9 @@ protected:
   /// Convert ImageFile to internal format.
   virtual void convert_to_internal (csTextureManager* tex, iImageFile* imfile, unsigned char* bm) = 0;
 
+  /// Adjusts the textures size, to ensure some restrictions like power of two dimension are met.
+  void AdjustSize();
+
 public:
   ///
   csTextureMM (iImageFile* image);
