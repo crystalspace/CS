@@ -959,7 +959,7 @@ bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
   float friction, float density, float elasticity)
 {
   dSpaceID space = dynsys->GetSpaceID();
-  dGeomID id = dCreatePlane (space, plane.A(), plane.B(), plane.C(), plane.D());
+  dGeomID id = dCreatePlane (space, plane.A(), -plane.B(), plane.C(), plane.D());
 
   dGeomSetBody (id, bodyID);
 
