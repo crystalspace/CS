@@ -157,14 +157,20 @@ void csVisibilityObjectWrapper::MovableChanged (iMovable* /*movable*/)
 // This function defines the amount to use for keeping
 // an object/node visible after it was marked visible
 // for some other reason.
-static int distribute()
+static int dist_history ()
 {
   static int cnt = 0;
   cnt++;
   cnt = cnt & 7;
-  return cnt;
+  return 6+cnt;
 }
-#define RAND_HISTORY (6+distribute ())
+static int dist_nowritequeue ()
+{
+  static int cnt = 0;
+  cnt++;
+  cnt = cnt & 7;
+  return 12+cnt;
+}
 
 csDynaVis::csDynaVis (iBase *iParent)
 {
@@ -496,7 +502,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
   if (node_bbox.Contains (pos))
   {
     hist->reason = VISIBLE_INSIDE;
-    hist->vis_cnt = history_frame_cnt + RAND_HISTORY;
+    hist->vis_cnt = history_frame_cnt + dist_history ();
     hist->history_frustum_mask = frustum_mask;
     cnt_node_visible++;
     goto end;
@@ -572,7 +578,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
   }
 
   hist->reason = VISIBLE;
-  hist->vis_cnt = history_frame_cnt + RAND_HISTORY;
+  hist->vis_cnt = history_frame_cnt + dist_history ();
   hist->history_frustum_mask = frustum_mask;
   cnt_node_visible++;
 
@@ -975,7 +981,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   }
   else if (obj_bbox.Contains (pos))
   {
-    obj->MarkVisible (VISIBLE_INSIDE, RAND_HISTORY, current_vistest_nr,
+    obj->MarkVisible (VISIBLE_INSIDE, dist_history (), 0, current_vistest_nr,
 		      history_frame_cnt);
     data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
     cnt_visible++;
@@ -984,8 +990,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   else if (do_cull_frustum && !csIntersect3::BoxFrustum (obj_bbox,
 	data->frustum, frustum_mask, new_mask2))
   {
-    hist->reason = INVISIBLE_FRUSTUM;
-    hist->has_vpt_point = false;
+    obj->MarkInvisible (INVISIBLE_FRUSTUM);
     goto end;
   }
 
@@ -1022,8 +1027,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   if (!sbox_rc || sbox.MaxX () <= 0 || sbox.MaxY () <= 0 ||
         sbox.MinX () >= scr_width || sbox.MinY () >= scr_height)
   {
-    hist->reason = INVISIBLE_FRUSTUM;
-    hist->has_vpt_point = false;
+    obj->MarkInvisible (INVISIBLE_FRUSTUM);
     goto end;
   }
 
@@ -1057,7 +1061,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	if (rc)
 	{
 	  // Point is visible. So we know the entire object is visible.
-	  obj->MarkVisible (VISIBLE_VPT, RAND_HISTORY, current_vistest_nr,
+	  obj->MarkVisible (VISIBLE_VPT, dist_history (), 0, current_vistest_nr,
 	      	  history_frame_cnt);
 	  data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
 	  cnt_visible++;
@@ -1098,7 +1102,8 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       // Object is visible. If we have a write queue we will first
       // test if there are objects in the queue that may mark the
       // object as non-visible.
-      if (do_cull_writequeue)
+      if (do_cull_writequeue &&
+      	 hist->no_writequeue_vis_cnt <= history_frame_cnt)
       {
 	// If the write queue is enabled we try to see if there
 	// are occluders that are relevant (intersect with this object
@@ -1132,8 +1137,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
             if (!rc)
 	    {
 	      // It really is invisible.
-              hist->reason = INVISIBLE_TESTRECT;
-	      hist->has_vpt_point = false;
+	      obj->MarkInvisible (INVISIBLE_TESTRECT);
 	      vis = false;
               goto end;
 	    }
@@ -1146,8 +1150,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     }
     else
     {
-      hist->reason = INVISIBLE_TESTRECT;
-      hist->has_vpt_point = false;
+      obj->MarkInvisible (INVISIBLE_TESTRECT);
       vis = false;
       goto end;
     }
@@ -1202,8 +1205,8 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 
   //---------------------------------------------------------------
   // Object is visible so we should write it to the coverage buffer.
-  obj->MarkVisible (VISIBLE, RAND_HISTORY, current_vistest_nr,
-    	history_frame_cnt);
+  obj->MarkVisible (VISIBLE, dist_history (), dist_nowritequeue (),
+  	current_vistest_nr, history_frame_cnt);
   data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
   cnt_visible++;
 
@@ -1309,10 +1312,6 @@ bool csDynaVis::VisTest (iRenderView* rview,
   UpdateObjects ();
   current_vistest_nr++;
   history_frame_cnt++;	// Only for history culling.
-  if (history_frame_cnt > 4000000000)
-  {
-    // Correct for the unlikely event that we have a wrap-arround.
-  }
   cnt_visible = 0;
   cnt_node_visible = 0;
 

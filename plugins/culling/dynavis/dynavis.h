@@ -100,12 +100,23 @@ public:
     history->DecRef ();
   }
 
-  void MarkVisible (csVisReason reason, int cnt, uint32 current_vistest_nr,
-		uint32 history_frame_cnt)
+  void MarkInvisible (csVisReason reason)
+  {
+    history->reason = reason;
+    history->no_writequeue_vis_cnt = 0;
+    history->has_vpt_point = false;
+  }
+
+  void MarkVisible (csVisReason reason, int cnt, int no_writequeue_cnt,
+  	uint32 current_vistest_nr, uint32 history_frame_cnt)
   {
     last_visible_vistestnr = current_vistest_nr;
     history->reason = reason;
     history->vis_cnt = history_frame_cnt+cnt;
+    if (no_writequeue_cnt == 0)
+      history->no_writequeue_vis_cnt = 0;
+    else
+      history->no_writequeue_vis_cnt = history_frame_cnt+cnt+no_writequeue_cnt;
     history->history_frame_cnt = history_frame_cnt;
   }
 

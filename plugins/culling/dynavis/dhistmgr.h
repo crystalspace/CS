@@ -35,7 +35,7 @@ enum csVisReason
   VISIBLE,		// Just visible.
   VISIBLE_INSIDE,	// Visible because camera is inside bbox.
   VISIBLE_HISTORY,	// Visible because it was visible last frame.
-  VISIBLE_VPT,		// Visible because of VPT tracking (visible point tracking).
+  VISIBLE_VPT,		// Visible because of VPT (visible point tracking).
   LAST_REASON
 };
 
@@ -49,9 +49,14 @@ class csVisibilityObjectHistory : public iBase
 public:
   csVisReason reason;	// Reason object is visible/invisible.
 
-  // If the folloging counter > 0 then the object will be assumed visible
-  // automatically. The counter will be decremented then.
+  // If the following value is less then the global history_frame_cnt
+  // then the object will be assumed visible automatically.
   uint32 vis_cnt;
+
+  // If the following value is less then the global history_frame_cnt
+  // then we will not do write queue tests because they are not useful
+  // most likely.
+  uint32 no_writequeue_vis_cnt;
 
   // When this object was last made visible.
   uint32 history_frame_cnt;
@@ -70,6 +75,7 @@ public:
   {
     SCF_CONSTRUCT_IBASE (0);
     vis_cnt = 0;
+    no_writequeue_vis_cnt = 0;
     history_frame_cnt = 0;
     reason = LAST_REASON;
     has_vpt_point = false;

@@ -13,6 +13,23 @@ chronological order.
 	  called. So if the node itself is not visible then it would not
 	  get decremented. Solved this by comparing with the global history
 	  frame counter instead.
+	- Jorrit did an optimization to the usage of the write queue in
+	  Dynavis. The write queue is the module in Dynavis that is responsible
+	  for delaying writes to the coverage buffer. This is good for two
+	  reasons:
+	    - A write to the coverage buffer is an expensive operation. So
+	      delaying that until really needed is good because sometimes it
+	      is not needed at all.
+	    - A write to the coverage buffer disrupts the depth buffer because
+	      the depth buffer in Dynavis is always updated to highest values
+	      (in contrast with a usual Z buffer). So by delaying writes to
+	      the coverage/depth buffer we can often improve culling efficiency.
+	  The current optimizations reflects the fact that an object that
+	  was calculated to be visible the previous frame (after testing the
+	  write queue) will most likely not benefit from the write queue the
+	  next frame either. So we don't flush the write queue. To make sure
+	  we sometimes recheck the write queue for a given object we sometimes
+	  flush anyway.
 3-Nov-2003
 	- Chris Matuszewski added some explicit type casts to stop msvc6 from
 	  emitting warning messages in csgfx/rgbpixel.h and shadervar.h.
