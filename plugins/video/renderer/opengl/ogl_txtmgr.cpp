@@ -592,6 +592,9 @@ void csTextureHandleOpenGL::CreateMipmaps ()
     int h = prevImage->GetHeight ();
     int nTex = 0;
 
+    ComputeMeanColor (vTex[nTex]->get_width (), vTex[nTex]->get_height (),
+		      (csRGBpixel *)prevImage->GetImageData ());
+
     prevImage->IncRef ();
     while (w != 1 || h != 1)
     {
@@ -609,10 +612,6 @@ void csTextureHandleOpenGL::CreateMipmaps ()
       prevImage->DecRef ();
       prevImage = thisImage;
     }
-
-    //  printf ("meancolor\n");
-    ComputeMeanColor (vTex[nTex]->get_width (), vTex[nTex]->get_height (),
-		      (csRGBpixel *)prevImage->GetImageData ());
 
     prevImage->DecRef ();
   }

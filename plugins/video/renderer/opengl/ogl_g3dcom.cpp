@@ -1825,10 +1825,10 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   if (m_renderstate.textured && txt_handle)
   {
     glEnable (GL_TEXTURE_2D);
-    if (txt_mm->GetKeyColor() && !(alpha < 0.8f))
+    if (txt_mm->GetKeyColor() && !(alpha < OPENGL_KEYCOLOR_MIN_ALPHA))
     {
       glEnable (GL_ALPHA_TEST);
-      glAlphaFunc (GL_GEQUAL, 0.8);
+      glAlphaFunc (GL_GEQUAL, OPENGL_KEYCOLOR_MIN_ALPHA);
       SetupBlend (queue.mixmode, 1.0f, false);
     }
     else
@@ -2125,6 +2125,13 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
 
   float flat_r = 1., flat_g = 1., flat_b = 1.;
 
+  iTextureHandle *txt = poly.mat_handle?poly.mat_handle->GetTexture():NULL;
+  float alpha = ((poly.mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)?
+    (poly.mixmode & CS_FX_MASK_ALPHA)/255.0f:1.0f;
+
+  bool flatlighting = (txt && txt->GetAlphaMap() && 
+    !(txt->GetKeyColor() && (alpha >= OPENGL_KEYCOLOR_MIN_ALPHA) ) );
+
   //========
   // First check if this polygon is different from the current polygons
   // in the queue. If so we need to flush the queue.
@@ -2137,7 +2144,10 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
       flat_b != queue.flat_color_b)
   {
     FlushDrawPolygon ();
-    lightmap_cache->FlushIfNeeded ();
+    if (flatlighting || ((poly.mixmode & CS_FX_MASK_MIXMODE) != CS_FX_COPY))
+      lightmap_cache->Flush ();
+    else
+      lightmap_cache->FlushIfNeeded ();
     if (!CompatibleZBufModes (fog_queue.z_buf_mode, z_buf_mode))
       FlushDrawFog ();
 
@@ -2234,9 +2244,13 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
 
   float sx, sy, sz, one_over_sz, u_over_sz, v_over_sz;
 
+  iPolygonTexture *tex = poly.poly_texture;
+  iLightMap* lm = tex->GetLightMap ();
+
   int idx = queue.AddVertices (poly.num);
   GLfloat* glverts = queue.GetGLVerts (idx);
   GLfloat* gltxt = queue.GetGLTxt (idx);
+  GLfloat* glcol = queue.GetGLCol (idx);
   for (i = 0; i < poly.num; i++)
   {
     sx = poly.vertices[i].x - asp_center_x;
@@ -2255,6 +2269,22 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     *glverts++ = -1.0;
     *glverts++ = sz;
   }
+  if (flatlighting)
+  {
+    queue.mixmode |= CS_FX_GOURAUD; 
+
+    int ir = 255, ig = 255, ib = 255;
+    if (lm) lm->GetMeanLighting(ir, ig, ib);
+    float lgt_r = ir/128.0f, lgt_g = ig/128.0f, lgt_b = ib/128.0f;
+
+    for (i = 0; i < poly.num; i++)
+    {
+      *glcol++ = lgt_r;
+      *glcol++ = lgt_g;
+      *glcol++ = lgt_b;
+      *glcol++ = alpha;
+    }
+  }
 
   // Triangulate.
   for (i = 2 ; i < poly.num ; i++)
@@ -2262,9 +2292,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     queue.AddTriangle (idx+0, idx+i-1, idx+i);
   }
 
-  iPolygonTexture *tex = poly.poly_texture;
-  iLightMap* lm = tex->GetLightMap ();
-  if (!poly.do_fullbright && m_renderstate.lighting && lm)
+  if (!flatlighting && !poly.do_fullbright && m_renderstate.lighting && lm)
   {
     lightmap_cache->Cache (tex);
     csLMCacheData* clm = (csLMCacheData *)lm->GetCacheData ();
@@ -2438,6 +2466,17 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
     flat_b = BYTE_TO_FLOAT (poly.flat_color_b);
   }
 
+  bool gouraud = (poly.mixmode & CS_FX_GOURAUD) != 0;
+  float alpha = 1.0f - BYTE_TO_FLOAT (poly.mixmode & CS_FX_MASK_ALPHA);
+  bool txt_alpha = false;
+  if (poly.mat_handle)
+  {
+    iTextureHandle* txt_handle = poly.mat_handle->GetTexture ();
+    if (txt_handle)
+      txt_alpha = txt_handle->GetKeyColor () || txt_handle->GetAlphaMap ();
+  }
+  alpha = GetAlpha (poly.mixmode, alpha, txt_alpha);
+
   //========
   // First check if this polygon is different from the current polygons
   // in the queue. If so we need to flush the queue.
@@ -2450,7 +2489,7 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
       flat_b != queue.flat_color_b)
   {
     FlushDrawPolygon ();
-    lightmap_cache->FlushIfNeeded ();
+    lightmap_cache->Flush ();
     if (!CompatibleZBufModes (fog_queue.z_buf_mode, z_buf_mode))
       FlushDrawFog ();
   }
@@ -2464,17 +2503,6 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
   queue.flat_color_r = flat_r;
   queue.flat_color_g = flat_g;
   queue.flat_color_b = flat_b;
-
-  bool gouraud = (queue.mixmode & CS_FX_GOURAUD) != 0;
-  float alpha = 1.0f - BYTE_TO_FLOAT (queue.mixmode & CS_FX_MASK_ALPHA);
-  bool txt_alpha = false;
-  if (poly.mat_handle)
-  {
-    iTextureHandle* txt_handle = poly.mat_handle->GetTexture ();
-    if (txt_handle)
-      txt_alpha = txt_handle->GetKeyColor () || txt_handle->GetAlphaMap ();
-  }
-  alpha = GetAlpha (queue.mixmode, alpha, txt_alpha);
 
   //========
   // Update polygon info in queue.
@@ -2493,6 +2521,7 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
       *glcol++ = flat_b * poly.vertices[i].b;
       *glcol++ = alpha;
     }
+
     float sz = poly.vertices[i].z;
     if (ABS (sz) < SMALL_EPSILON) sz = 1. / SMALL_EPSILON;
     else sz = 1./sz;
@@ -4122,14 +4151,14 @@ void csGraphics3DOGLCommon::ClipUnlitPolys (
     fog_indices);
 
 	  (*clipped_lightmap_vertices)[num_clipped_vertices].x = 
-      poly[j].x+frust_origin.x;
-    (*clipped_lightmap_vertices)[num_clipped_vertices].y = 
-      poly[j].y+frust_origin.y;
-    (*clipped_lightmap_vertices)[num_clipped_vertices].z = 
-      poly[j].z+frust_origin.z;
-    (*clipped_lightmap_vertices)[num_clipped_vertices].w = 1.0;
-	  clipinfo[j].original.idx = num_clipped_vertices;
-	  num_clipped_vertices++;
+            poly[j].x+frust_origin.x;
+          (*clipped_lightmap_vertices)[num_clipped_vertices].y = 
+            poly[j].y+frust_origin.y;
+          (*clipped_lightmap_vertices)[num_clipped_vertices].z = 
+            poly[j].z+frust_origin.z;
+          (*clipped_lightmap_vertices)[num_clipped_vertices].w = 1.0;
+          clipinfo[j].original.idx = num_clipped_vertices;
+          num_clipped_vertices++;
 	}
       }
 
@@ -4950,7 +4979,11 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   int num_vertices = mesh.buffers[0]->GetVertexCount ();
 
   FlushDrawPolygon ();
-  lightmap_cache->FlushIfNeeded ();
+  iTextureHandle *tex = mesh.mat_handle?mesh.mat_handle->GetTexture():NULL;
+  if (tex && tex->GetAlphaMap())
+    lightmap_cache->Flush ();
+  else
+    lightmap_cache->FlushIfNeeded ();
   if (!CompatibleZBufModes (fog_queue.z_buf_mode, z_buf_mode))
     FlushDrawFog ();
 
@@ -5413,7 +5446,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     glShadeModel (GL_SMOOTH);
     SetClientStates (CS_CLIENTSTATE_ALL);
     if (mesh.mixmode & CS_FX_ALPHA)
-      glColorPointer (4, GL_FLOAT, 0, & rgba_verts[0]);
+      glColorPointer (4, GL_FLOAT, 0, rgba_verts->GetArray() );
     else
       glColorPointer (3, GL_FLOAT, 0, & work_colors[0]);
   }
@@ -5956,11 +5989,10 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   glBindTexture (GL_TEXTURE_2D, texturehandle);
   float alpha = BYTE_TO_FLOAT (poly.mixmode & CS_FX_MASK_ALPHA);
   alpha = SetupBlend (poly.mixmode, alpha, tex_transp);
-  if (txt_mm->GetKeyColor() && !(alpha < 0.8f))
+  if (txt_mm->GetKeyColor() && !(alpha < OPENGL_KEYCOLOR_MIN_ALPHA))
   {
     glEnable (GL_ALPHA_TEST);
-    glAlphaFunc (GL_GEQUAL, 0.8);
-    SetupBlend (queue.mixmode, 1.0f, false);
+    glAlphaFunc (GL_GEQUAL, OPENGL_KEYCOLOR_MIN_ALPHA);
   }
   if (ARB_texture_env_combine)
   {
