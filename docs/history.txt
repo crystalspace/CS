@@ -32,6 +32,7 @@ The history order has been reversed so that new features are at the top.
 	  With this keyword you set the basename for all the textures
 	  used by the terrain. The base should be something like
 	  'MyTexture%d.jpg'. %d will be replaced with 0 to 127 for example.
+	- Thomas Riemer added stubs for AddWorld and AddSector.
 14-May-2000
 	- Added csPoly3D::ClassifyXYZ() routines.
 	- Started work on new optimization for PVS.
