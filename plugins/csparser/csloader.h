@@ -579,6 +579,7 @@ private:
   	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* child,
 	csStringID id, bool& handled, char*& priority,
 	bool do_portal_container, bool& staticpos, bool& staticshape,
+	bool& zmodeChanged, bool& prioChanged,
 	bool recursive = false);
   /**
    * Load the mesh object from the map file.
@@ -665,7 +666,7 @@ private:
    * Handle the result of a mesh object plugin loader.
    */
   bool HandleMeshObjectPluginResult (iBase* mo, iDocumentNode* child,
-	iMeshWrapper* mesh);
+	iMeshWrapper* mesh, bool keepZbuf, bool keepPrio);
 
   /**
    * Add the given object to the region in the context (if there is

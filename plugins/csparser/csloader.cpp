@@ -2488,6 +2488,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* child,
 	csStringID id, bool& handled, char*& priority,
 	bool do_portal_container, bool& staticpos, bool& staticshape,
+	bool& zmodeChanged, bool& prioChanged,
 	bool recursive)
 {
 #undef TEST_MISSING_MESH
@@ -2571,6 +2572,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
       else
         mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+      prioChanged = true;
       break;
     case XMLTOKEN_ADDON:
       TEST_MISSING_MESH
@@ -2637,6 +2639,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
         mesh->SetZBufMode (CS_ZBUF_FILL);
       }
+      zmodeChanged = true;
       break;
     case XMLTOKEN_ZUSE:
       TEST_MISSING_MESH
@@ -2651,6 +2654,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
         mesh->SetZBufMode (CS_ZBUF_USE);
       }
+      zmodeChanged = true;
       break;
     case XMLTOKEN_ZNONE:
       TEST_MISSING_MESH
@@ -2665,6 +2669,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
         mesh->SetZBufMode (CS_ZBUF_NONE);
       }
+      zmodeChanged = true;
       break;
     case XMLTOKEN_ZTEST:
       TEST_MISSING_MESH
@@ -2679,6 +2684,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
         mesh->SetZBufMode (CS_ZBUF_TEST);
       }
+      zmodeChanged = true;
       break;
     case XMLTOKEN_CAMERA:
       TEST_MISSING_MESH
@@ -2876,6 +2882,8 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
   iMeshWrapper* mesh = 0;
   bool staticpos = false;
   bool staticshape = false;
+  bool zbufSet = false;
+  bool prioSet = false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -2886,7 +2894,8 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
     csStringID id = xmltokens.Request (value);
     bool handled;
     if (!HandleMeshParameter (ldr_context, mesh, 0, child, id,
-    	handled, priority, false, staticpos, staticshape, true))
+    	handled, priority, false, staticpos, staticshape, zbufSet,
+	prioSet, true))
       goto error;
     if (!handled) switch (id)
     {
@@ -3070,7 +3079,7 @@ bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
 }
 
 bool csLoader::HandleMeshObjectPluginResult (iBase* mo, iDocumentNode* child,
-	iMeshWrapper* mesh)
+	iMeshWrapper* mesh, bool keepZbuf, bool keepPrio)
 {
   csRef<iMeshObject> mo2 = SCF_QUERY_INTERFACE (mo, iMeshObject);
   if (!mo2)
@@ -3090,8 +3099,8 @@ bool csLoader::HandleMeshObjectPluginResult (iBase* mo, iDocumentNode* child,
     if (mfw)
     {
       mesh->SetFactory (mfw);
-      mesh->SetZBufMode (mfw->GetZBufMode ());
-      mesh->SetRenderPriority (mfw->GetRenderPriority ());
+      if (!keepZbuf) mesh->SetZBufMode (mfw->GetZBufMode ());
+      if (!keepPrio) mesh->SetRenderPriority (mfw->GetRenderPriority ());
     }
   }
   return true;
@@ -3108,6 +3117,8 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
   iBinaryLoaderPlugin* binplug = 0;
   bool staticpos = false;
   bool staticshape = false;
+  bool zbufSet = false;
+  bool prioSet = false;
 
   csRef<iDocumentNodeIterator> prev_it;
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -3129,7 +3140,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
     csStringID id = xmltokens.Request (value);
     bool handled;
     if (!HandleMeshParameter (ldr_context, mesh, parent, child, id,
-    	handled, priority, false, staticpos, staticshape))
+      handled, priority, false, staticpos, staticshape, zbufSet, prioSet))
       goto error;
     if (!handled) switch (id)
     {
@@ -3230,7 +3241,8 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	else
 	{
 	  csRef<iBase> mo = plug->Parse (child, ldr_context, mesh);
-          if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh))
+          if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh, zbufSet, 
+	    prioSet))
 	    goto error;	// Error already reported.
 	}
         break;
@@ -3281,7 +3293,8 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	      mo = binplug->Parse ((void*)(dbuf->GetUint8 ()),
 	  	  ldr_context, mesh);
 	    }
-            if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh))
+            if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh,
+	      zbufSet, prioSet))
 	      goto error;	// Error already reported.
 	    break;
 	  }
@@ -3360,7 +3373,8 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	    mo = binplug->Parse ((void*)(dbuf->GetUint8 ()),
 	  	ldr_context, mesh);
 	  }
-          if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh))
+          if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh,
+	      zbufSet, prioSet))
 	    goto error;	// Error already reported.
 	}
         break;
@@ -4625,6 +4639,8 @@ bool csLoader::ParsePortals (iLoaderContext* ldr_context,
   char* priority = 0;
   bool staticpos = false;
   bool staticshape = false;
+  bool zbufSet = false;
+  bool prioSet = false;
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -4634,7 +4650,7 @@ bool csLoader::ParsePortals (iLoaderContext* ldr_context,
     csStringID id = xmltokens.Request (value);
     bool handled;
     if (!HandleMeshParameter (ldr_context, container_mesh, parent, child, id,
-    	handled, priority, true, staticpos, staticshape))
+    	handled, priority, true, staticpos, staticshape, zbufSet, prioSet))
       goto error;
     if (!handled) switch (id)
     {

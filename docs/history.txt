@@ -35,6 +35,8 @@ chronological order.
 	- Eric Sunshine added a `GLhandleARB' type check to configure.ac.  A
 	  few modern GL headers are starting to declare this type, so we need
 	  to avoid re-declaring it in our own glextmanager.h for those cases.
+	- res changed the loader to let the <meshobj>s Z buffer mode and render
+	  priority always override the <factory> settings.
 14-Nov-2004
 	- Eric Sunshine updated cspace.i to take csPoly2D decomposition into
 	  account.
