@@ -109,14 +109,11 @@
     <params />
   </meshfact>
 
-  <addon>
-    <plugin>crystalspace.terraformer.simple.loader</plugin>
-    <params>
+  <addon plugin="crystalspace.terraformer.simple.loader">
       <name>simple</name>
       <heightmap>/lev/terrain/heightmap_257x257.png</heightmap>
       <!--<heightmap image="/lev/terrain/heightmap_2049x2049.png"/>-->
       <scale x="256" y="32" z="256" />
-    </params>
   </addon>
 
   <meshfact name="TerrainFact">
