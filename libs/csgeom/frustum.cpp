@@ -449,3 +449,74 @@ int csFrustum::Classify (csVector3* frustum, int num_frust,
   return CS_FRUST_COVERED;
 }
 
+/**
+ * This is like the above version except that it takes a vector of precalculated frustum plane normals.
+ * Use this if you have to classify a batch of polygons against the same frustum.
+ */
+int csFrustum::BatchClassify (csVector3* frustum, csVector3* frustumNormals, int num_frust,
+  csVector3* poly, int num_poly)
+{
+  // All poly vertices are inside frustum?
+  bool all_inside = true;
+
+  // Loop through all planes that makes the frustum
+  for (int fv = 0, fvp = num_frust - 1; fv < num_frust; fvp = fv++)
+  {
+    csVector3 &v1 = frustum [fvp];
+    csVector3 &v2 = frustum [fv];
+    csVector3 &fn = frustumNormals[fvp];
+
+    float prev_d = fn * poly [num_poly - 1];
+    for (int pv = 0, pvp = num_poly - 1; pv < num_poly; pvp = pv++)
+    {
+      // The distance from plane to polygon vertex
+      float d = fn * poly [pv];
+      if (all_inside && d > 0) all_inside = false;
+
+      if ((prev_d < 0 && d > 0)
+       || (prev_d > 0 && d < 0))
+      {
+#if 1
+	// This version should be faster.
+	if (((poly [pvp] % v1) * poly [pv])*prev_d  >= 0)
+	  if (((v2 % poly [pvp]) * poly [pv])*prev_d >= 0)
+	    return CS_FRUST_PARTIAL;
+
+#else
+        // If the segment intersects with the frustum plane somewhere
+        // between two limiting lines, we have the CS_FRUST_PARTIAL case.
+        csVector3 p = poly [pvp] - (poly [pv] - poly [pvp])
+		* (prev_d / (d - prev_d));
+        // If the vector product between both vectors making the frustum
+        // plane and the intersection point between polygon edge and plane
+        // have same sign, the intersection point is outside frustum
+        //@@@ This is the old code but I think this code
+	// should test against the frustum.
+	//--- if ((poly [pvp] % p) * (poly [pv] % p) < 0)
+        if ((v1 % p) * (v2 % p) <= 0)
+          return CS_FRUST_PARTIAL;
+#endif
+      }
+      prev_d = d;
+    }
+  }
+
+  if (all_inside) return CS_FRUST_INSIDE;
+
+  // Now we know that all polygon vertices are outside frustum and no polygon
+  // edge crosses the frustum. We should choose between CS_FRUST_OUTSIDE and
+  // CS_FRUST_COVERED cases. For this we check if all frustum vertices are
+  // inside the frustum created by polygon (reverse roles). In fact it is
+  // enough to check just the first vertex of frustum is outside polygon
+  // frustum: this lets us make the right decision.
+
+  for (int pv = 0, pvp = num_poly - 1; pv < num_poly; pvp = pv++)
+  {
+    csVector3 pn = poly [pvp] % poly [pv];
+    if (pn * frustum [0] >= 0)
+      return CS_FRUST_OUTSIDE;
+  }
+
+  return CS_FRUST_COVERED;
+}
+

@@ -222,6 +222,13 @@ public:
     csVector3* poly, int num_poly);
 
   /**
+   * This is like the above version except that it takes a vector of precalculated frustum plane normals.
+   * Use this if you have to classify a batch of polygons against the same frustum.
+   */
+  static int BatchClassify (csVector3* frustum, csVector3* frustumNormals, int num_frust,
+			    csVector3* poly, int num_poly);
+
+  /**
    * Check if a point (given relative to the origin of the frustum)
    * is inside the frustum.
    */
