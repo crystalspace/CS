@@ -74,13 +74,17 @@ LFLAGS.profile = -pg
 DFLAGS.optimize += -s
 
 # Flags for linking DLLs in debug mode
-DFLAGS.debug =
+DFLAGS.debug = -g3
 
 # Flags for the linker which are used when building a shared library.
 # <cs-config>
 TARGET.RAW = $(basename $(notdir $@))
-LFLAGS.DLL = $(DFLAGS.$(MODE)) -q --def=$(OUT)/$(TARGET.RAW).def \
-  --no-export-all-symbols --dllname $(TARGET.RAW)
+
+#LFLAGS.DLL = $(DFLAGS.$(MODE)) -q --def=$(OUT)/$(TARGET.RAW).def \
+#  --no-export-all-symbols --dllname $(TARGET.RAW)
+
+LFLAGS.DLL = -shared $(DFLAGS.$(MODE))
+
 # </cs-config>
 
 # Typical extension for objects and static libraries
@@ -121,8 +125,16 @@ ifeq ($(MAKESECTION),postdefines)
 
 # How to make shared libs for cs-config
 # <cs-config>
-LINK.PLUGIN = dllwrap
-PLUGIN.POSTFLAGS = -mwindows -mconsole -lstdc++
+
+#LINK.PLUGIN = dllwrap
+LINK.PLUGIN = $(LINK)
+
+# next line for dllwrap useage.
+#PLUGIN.POSTFLAGS = -mwindows -mconsole -lstdc++
+
+# next line for gxx -shared
+PLUGIN.POSTFLAGS = -mwindows -mconsole
+
 COMMAND_DELIM = ;
 # </cs-config>
 
@@ -156,8 +168,14 @@ DO.SHARED.PLUGIN.PREAMBLE += \
 DO.SHARED.PLUGIN.CORE = \
   $(LINK.PLUGIN) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
     $(OUT)/$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS)
+    
 # <cs-config>
-DO.SHARED.PLUGIN.POSTAMBLE = -mwindows -lstdc++
+# dllwrap:
+#DO.PLUGIN.POSTAMBLE = -mwindows -lstdc++
+
+#gxx -shared
+DO.PLUGIN.POSTAMBLE = -mwindows
+
 # </cs-config>
 
 # Commenting out the following line will make the -noconsole option work
