@@ -50,6 +50,14 @@ awsPrefManager::~awsPrefManager()
   SCF_DEC_REF (default_font);
   SCF_DEC_REF (fontsvr);
   delete awstxtmgr;
+
+  // empty the constants list
+  int i;
+  for(i=0; i<constants.Length(); ++i)
+  {
+    constant_entry *c = (constant_entry *)constants.Get(i);
+    delete c;
+  }
 }
 
 void 

@@ -42,6 +42,7 @@ awsManager::~awsManager()
     delete (awsComponentFactoryMap *)p;
     component_factories.RemoveItem ();
   }
+
 }
 
 bool 
