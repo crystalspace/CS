@@ -101,9 +101,8 @@ public:
 
   /**
    * Remove all stored strings.
-   * \deprecated Use Empty() instead.
    */
-  /*CS_DEPRECATED_METHOD*/ virtual void Clear()
+  virtual void Clear()
   { Empty(); }
 
   /// Get the number of elements in the hash.

@@ -33,7 +33,8 @@
 #include "csgeom/transfrm.h"
 #include "csgfx/gradient.h"
 #include "csgfx/renderbuffer.h"
-#include "csgfx/shadervar.h"
+#include "csgfx/shaderexp.h"
+#include "csgfx/shaderexpaccessor.h"
 #include "cstool/keyval.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
@@ -819,6 +820,16 @@ bool csTextSyntaxService::ParseShaderVar (iDocumentNode* node,
         var.SetValue (tex);
       }
       break;
+    case XMLTOKEN_EXPR:
+    case XMLTOKEN_EXPRESSION:
+      {
+	csRef<iShaderVariableAccessor> acc = ParseShaderVarExpr (node);
+	if (!acc.IsValid())
+	  return false;
+	var.SetType (csShaderVariable::VECTOR4);
+	var.SetAccessor (acc);
+      }
+      break;
     default:
       Report (
         "crystalspace.syntax.shadervariable",
@@ -829,6 +840,45 @@ bool csTextSyntaxService::ParseShaderVar (iDocumentNode* node,
   }
 
   return true;
+}
+
+csRef<iShaderVariableAccessor> csTextSyntaxService::ParseShaderVarExpr (
+  iDocumentNode* node)
+{
+  csRef<iDocumentNode> exprNode;
+  csRef<iDocumentNodeIterator> nodeIt = node->GetNodes();
+  while (nodeIt->HasNext())
+  {
+    csRef<iDocumentNode> child = nodeIt->Next();
+    if (child->GetType() != CS_NODE_ELEMENT) continue;
+    exprNode = child;
+    break;
+  }
+
+  if (!exprNode)
+  {
+    Report ("crystalspace.syntax.shadervariable.expression",
+      CS_REPORTER_SEVERITY_WARNING,
+      node, "Can't find expression node");
+    return 0;
+  }
+
+  csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
+  csShaderExpression* expression = new csShaderExpression (object_reg);
+  // @@@ Find a way to allow use of SVs available at shader render time
+  if (!expression->Parse (exprNode, shmgr))
+  {
+    Report ("crystalspace.syntax.shadervariable.expression",
+      CS_REPORTER_SEVERITY_WARNING,
+      node, "Error parsing expression: %s", expression->GetError());
+    delete expression;
+    return 0;
+  }
+  csRef<csShaderVariable> var;
+  var.AttachNew (new csShaderVariable (csInvalidStringID));
+  csRef<csShaderExpressionAccessor> acc;
+  acc.AttachNew (new csShaderExpressionAccessor (expression));
+  return acc;
 }
 
 bool csTextSyntaxService::WriteShaderVar (iDocumentNode* node,

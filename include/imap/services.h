@@ -25,9 +25,9 @@
  * @{ */
 #include "csutil/scf.h"
 #include "csutil/ref.h"
+#include "csgfx/shadervar.h"
 #include "ivideo/graph3d.h"
 
-class csShaderVariable;
 class csMatrix3;
 class csVector3;
 class csVector2;
@@ -57,7 +57,7 @@ struct iKeyValuePair;
 #define CSTEX_UV_SHIFT 8 
 /** @} */
 
-SCF_VERSION (iSyntaxService, 1, 6, 0);
+SCF_VERSION (iSyntaxService, 1, 7, 0);
 
 /**
  * This component provides services for other loaders to easily parse
@@ -202,6 +202,12 @@ struct iSyntaxService : public iBase
    */
   virtual bool ParseShaderVar (iDocumentNode* node, 
     csShaderVariable& var) = 0;
+  /**
+   * Parse a shader variable expression. Returns an acessor that can be set
+   * on a shader variable. The accessor subsequently evaluates the expression.
+   */
+  virtual csRef<iShaderVariableAccessor> ParseShaderVarExpr (
+    iDocumentNode* node) = 0;
 			    
   /**
    * Write a shader variable declaration

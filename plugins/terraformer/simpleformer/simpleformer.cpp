@@ -342,7 +342,7 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
   heightData = new float[width*height];
 
   // Check what type of image we got
-  if (heightmap->GetFormat () & CS_IMGFMT_TRUECOLOR)
+  if ((heightmap->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
   {
     // It's a RGBA image
     csRGBpixel *data = (csRGBpixel *)heightmap->GetImageData ();
@@ -351,43 +351,49 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
     // Loop through the data
     for (y = 0; y < height; ++y)
     {
+      // Keep an index to avoid uneccesary x+y*w calculations
+      uint index1 = (height-y-1)*width;
+      uint index2 = y*width;
       for (x = 0; x < width; ++x)
       {
         // Grab height from R,G,B (triplet is effectively a 24-bit number)
         // We're reversing Y to later get negative Y in heightmap image 
         // to positive Z in terrain - sampler space has an inverted Y
 	// axis in comparison to image space.
-	const csRGBpixel& heixel = data[x+y*width];
+	const csRGBpixel& heixel = data[index2++];
 	int h = heixel.red * 65536 + heixel.green * 256 + heixel.blue;
-        heightData[x+(height-y-1)*width] = (float)h/16777215.0;
+        heightData[index1++] = (float)h/16777215.0;
       }
     }
   }
-  else if (heightmap->GetFormat () & CS_IMGFMT_PALETTED8)
+  else if ((heightmap->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
   {
     // It's a paletted image, so we grab data & palette
     unsigned char *data = (unsigned char*)heightmap->GetImageData ();
-    const csRGBpixel *palette = heightmap->GetPalette ();
-
-    // Keep an index to avoid uneccesary x+y*w calculations
-    // Start at last line, since we're gonna want it reversed in Y later
-    // (negative Y in heightmap image goes to positive Z in terrain)
-    //int idx = (height-1)*width;
 
     unsigned int x, y;
     // Loop through the data
     for (y = 0; y < height; ++y)
     {
+      // Keep an index to avoid uneccesary x+y*w calculations
+      uint index1 = (height-y-1)*width;
+      uint index2 = y*width;
       for (x = 0; x < width; ++x)
       {
-        // Grab the intensity as height
+        // Grab the index value as height
         // We're reversing Y to later get negative Y in heightmap image 
         // to positive Z in terrain - sampler space has an inverted Y
 	// axis in comparison to image space.
-        heightData[x+(height-y-1)*width] = 
-          palette[data[x+y*width]].Intensity () / 255.0;
+        heightData[index1++] = (float)data[index2++] / 255.0;
       }
     }
+  }
+  else
+  {
+    // Well...
+    memset (heightData, 0, sizeof(float) * width * height);
+    csReport (objectRegistry, CS_REPORTER_SEVERITY_WARNING,
+      "crystalspace.terraformer.simple", "Odd image format");
   }
 }
 

@@ -239,7 +239,7 @@ const char* csCurveLightMap::ReadFromCache (
       	"Cached lightmap base texture mismatch (got size=%" PRId32 ", expected %" PRId32 ")!",
 	ps.lm_size, pswanted.lm_size);
   }
-  if (*error_buf)
+  if (!error_buf.IsEmpty())
   {
     // Invalid.
     // First try to skip the cached lightmap.

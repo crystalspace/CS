@@ -258,7 +258,7 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
 	synldr->Report ("crystalspace.texture.loader.func",
 	  CS_REPORTER_SEVERITY_WARNING,
 	  exprNode,
-	  "Error parsing expression");
+	  "Error parsing expression: %s", expr.GetError());
     }
 
     Image.AttachNew (new csImageMemory (w, h, pixdata, true));

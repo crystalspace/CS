@@ -122,7 +122,7 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
       {
         const char *image = child->GetContentsValue ();
 	csRef<iLoader> loader = CS_QUERY_REGISTRY (objreg, iLoader);
-        csRef<iImage> map = loader->LoadImage (image);
+	csRef<iImage> map = loader->LoadImage (image, CS_IMGFMT_ANY);
         if (map == 0) 
         {
           synldr->ReportError ("crystalspace.terraformer.simple.loader",

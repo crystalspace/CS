@@ -6,9 +6,24 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Apr-2005
+	- res made the following changes:
+	    - The simpleformer loader now doesn't let the loader choose the
+	      image format (which is the renderers preferred format) but
+	      rather requests the images original format.
+	    - The simpleformer loader now uses the index instead of color 
+	      intensity for paletted images.
+	    - Made some fixes and improvements to shader expressions: the
+	      make-vector instruction now generates correctly-sized vectors
+	      (e.g. vector2 when 2 arguments are passed) (thanks DeSigna),
+	      error messages are recorded and can be queried, XML comments
+	      don't confuse the parser any more.
+	    - <shadervar>s now also support expression. Added example to flarge
+	      where the scale of the overlay texture on some walls in the 
+	      starting rooms varies over time.
+	    - Fixed crash in csInputDefinition for input strings like "-".
+	    - Un-deprecated some csString methods.
 5-Apr-2005
-	- mdmkolbe fixed some slight string format errors in
-	  CS/libs/csutil/win32/callstack.cpp
 	- res replaced use of printf() and relatives with csPrintf() and 
 	  relatives and use of sprintf() with use of csStrings.
 	- res fixed some 64bit warnings on VC7.0.
@@ -26,6 +41,8 @@ chronological order.
 	    csIndPrint
 	- Eric Sunshine fixed some MSVC6 build problems which arose with recent
 	  changes.
+	- mdmkolbe fixed some slight string format errors in
+	  CS/libs/csutil/win32/callstack.cpp
 4-Apr-2005
 	- res made the following changes:
 	    - Changed some internals of shader program variable mappings; now

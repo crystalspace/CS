@@ -394,9 +394,9 @@ const char* cswinMinidumpWriter::WriteWrappedMinidump (
   {
     char tempPath[MAX_PATH];
     GetTempPath (sizeof (tempPath), tempPath);
-    static char reportName[MAX_PATH+32];
-    cs_snprintf (reportName, sizeof (reportName), "%s\\cscrash%" PRIu32 ".zip", 
-      tempPath, GetCurrentProcessId ());
+    csStringFast<MAX_PATH+32> reportName;
+    reportName.Format ("%s\\cscrash%" PRIu32 ".zip", tempPath, 
+      (uint32)GetCurrentProcessId ());
 
     csArchive* reportZip = new csArchive (reportName);
     CopyPhysicalToArchive (dumpFileName, reportZip, "crash.dmp");

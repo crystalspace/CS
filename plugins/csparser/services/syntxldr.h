@@ -87,6 +87,8 @@ public:
   virtual bool ParseGradient (iDocumentNode* node, csGradient& gradient);
   virtual bool WriteGradient (iDocumentNode* node, csGradient* gradient);
   virtual bool ParseShaderVar (iDocumentNode* node, csShaderVariable& var);
+  virtual csRef<iShaderVariableAccessor> ParseShaderVarExpr (
+    iDocumentNode* node);
   virtual bool WriteShaderVar (iDocumentNode* node, csShaderVariable* var);
   virtual bool ParseAlphaMode (iDocumentNode* node, iStringSet* strings,
     csAlphaMode& alphaMode, bool allowAutoMode);

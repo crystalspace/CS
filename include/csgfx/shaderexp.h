@@ -200,6 +200,11 @@ private:
 
   inline const char * get_type_name(csStringID) const;
 
+  csString* parseError;
+  csString* evalError;
+  csString errorMsg;
+  void ParseError (const char* message, ...) const;
+  void EvalError (const char* message, ...) const;
 public:
   csShaderExpression(iObjectRegistry *);
   ~csShaderExpression();
@@ -211,6 +216,9 @@ public:
    * It will use the symbol table it was initialized with.
    */
   bool Evaluate(csShaderVariable *);
+
+  /// Retrieve the error message if the evaluation or parsing failed.
+  const char* GetError() const { return errorMsg; }
 };
 
 inline const char * csShaderExpression::get_type_name(csStringID id) const 

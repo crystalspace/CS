@@ -259,6 +259,7 @@ csInputDefinition::csInputDefinition (const char *_s, uint32 mods, bool cook)
   while ((end = str.FindFirst ("+-", pos)) != (size_t)-1)
   {
     csString mod (str.Slice (pos, end - pos));
+    if (mod.IsEmpty()) break;
 
     csKeyModifierType type;
     csKeyModifierNumType num;

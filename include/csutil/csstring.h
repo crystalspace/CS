@@ -292,8 +292,7 @@ public:
   /**
    * Clear the string (so that it contains only a null terminator).
    * \return Reference to itself.
-   * \remarks This is rigidly equivalent to Truncate(0), but more idiomatic in
-   *   terms of human language.
+   * \remarks This is rigidly equivalent to Truncate(0).
    */
   csStringBase& Empty() { return Truncate (0); }
 
@@ -316,20 +315,16 @@ public:
    *   zero, then this is equivalent to an invocation of Free(), which means
    *   that GetData() and 'operator char const*' will return a null pointer
    *   after reclamation.
-   * \deprecated Use ShrinkBestFit() instead.
    */
-  /*CS_DEPRECATED_METHOD*/
   csStringBase& Reclaim () { ShrinkBestFit(); return *this; }
 
   /**
    * Clear the string (so that it contains only a null terminator).
    * \return Reference to itself.
-   * \remarks This is rigidly equivalent to Truncate(0), but more idiomatic in
+   * \remarks This is rigidly equivalent to Empty(), but more idiomatic in
    *   terms of human language.
-   * \deprecated Use Empty() instead.
    */
-  /*CS_DEPRECATED_METHOD*/ csStringBase& Clear ()
-  { return Truncate (0); }
+  csStringBase& Clear () { return Empty(); }
 
   /**
    * Get a pointer to the null-terminated character array.

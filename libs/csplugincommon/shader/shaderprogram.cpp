@@ -23,7 +23,6 @@
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
 #include "csgfx/shaderexp.h"
-#include "csgfx/shaderexpaccessor.h"
 
 #include "iutil/verbositymanager.h"
 #include "ivaria/reporter.h"
@@ -126,38 +125,11 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
   {
     paramType = ParamMatrix;
   }
-  else if (strcmp (type, "expression") == 0)
+  else if ((strcmp (type, "expression") == 0) || (strcmp (type, "expr") == 0))
   {
-    csRef<iDocumentNode> exprNode;
-    csRef<iDocumentNodeIterator> nodeIt = node->GetNodes();
-    while (nodeIt->HasNext())
-    {
-      csRef<iDocumentNode> child = nodeIt->Next();
-      if (child->GetType() != CS_NODE_ELEMENT) continue;
-      exprNode = child;
-      break;
-    }
-
-    if (!exprNode)
-    {
-      synsrv->Report ("crystalspace.graphics3d.shader.common",
-	CS_REPORTER_SEVERITY_WARNING,
-	node, "Can't find expression node");
-      return false;
-    }
-
-    csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY(objectReg, iShaderManager);
-    csShaderExpression* expression = new csShaderExpression (objectReg);
-    // @@@ Find a way to allow use of SVs available at shader render time
-    if (!expression->Parse (exprNode, shmgr))
-    {
-      delete expression;
-      return false;
-    }
     csRef<csShaderVariable> var;
     var.AttachNew (new csShaderVariable (csInvalidStringID));
-    csRef<csShaderExpressionAccessor> acc;
-    acc.AttachNew (new csShaderExpressionAccessor (expression));
+    csRef<iShaderVariableAccessor> acc = synsrv->ParseShaderVarExpr (node);
     var->SetType (csShaderVariable::VECTOR4);
     var->SetAccessor (acc);
     param.var = var;

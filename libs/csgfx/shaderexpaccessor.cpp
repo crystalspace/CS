@@ -19,6 +19,7 @@
 
 
 #include "cssysdef.h"
+#include "csutil/sysfunc.h"
 
 #include "csgfx/shaderexpaccessor.h"
 
@@ -44,7 +45,10 @@ void csShaderExpressionAccessor::PreGetValue (csShaderVariable *variable)
   {
     if (!expression->Evaluate (variable))
     {
-      // Prevent stdout flooding with errors...
+      // @@@ Use stdout
+      csPrintf ("csShaderExpressionAccessor: eval error: %s\n", 
+	expression->GetError());
+      // Prevent flooding with errors...
       delete expression; expression = 0;
     }
   }
