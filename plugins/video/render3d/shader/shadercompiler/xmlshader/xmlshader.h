@@ -411,26 +411,6 @@ public:
   void Report (int severity, const char* msg, ...);
 
   bool LoadSVBlock (iDocumentNode *node, iShaderVariableContext *context);
-private:
-  
-  // struct to hold all techniques, until we decide which to use
-  /*struct TechniqueKeeper
-  {
-    TechniqueKeeper(iDocumentNode *n, unsigned int p) : 
-      node(n), priority(p), tagPriority(0)
-    {}
-    csRef<iDocumentNode> node;
-    unsigned int priority;
-    int tagPriority;
-  };
-
-  // Scan all techniques in the document.
-  void ScanForTechniques (iDocumentNode* templ,
-	csArray<TechniqueKeeper>& techniquesTmp, int forcepriority);
-  
-  static int CompareTechniqueKeeper (TechniqueKeeper const&,
-				     TechniqueKeeper const&);*/
-  
 public:
   bool do_verbose;
   /// XML Token and management
@@ -442,7 +422,6 @@ public:
   csWeakRef<iGraphics3D> g3d;
   csRef<iSyntaxService> synldr;
   csRef<iVFS> vfs;
-  //csWeakRef<iShaderManager> shadermgr;
 
 #define CS_TOKEN_ITEM_FILE \
   "plugins/video/render3d/shader/shadercompiler/xmlshader/xmlshader.tok"
