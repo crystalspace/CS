@@ -10,6 +10,10 @@ chronological order.
 	- res added a graphical alert box to the xwindow plugin. It is based 
 	  upon the xmessage program, utilizes the Xaw toolkit and is enabled
 	  if the latter is detected by configure.
+	- Vincent Knecht updated vfs.cfg.template:
+	    - Added $(CS_DATADIR)$/ttf-vera.zip to VFS.Mount.fonts/ttf.
+	    - Added $(CS_DATADIR)$/aws$/ to VFS.Mount.aws.
+	    - Fixed VFS.Mount.lev/parallaxtest.
 14-Dec-2004
 	- PK replaced the old, CSWS-based viewmesh with a new AWS-based
 	  version.

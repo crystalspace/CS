@@ -24,11 +24,11 @@ VFS.Mount.shader = $(CS_DATADIR)$/shader$/
 ; The Unifont
 VFS.Mount.fonts/unifont = $(CS_DATADIR)$/unifont.zip
 ; The TTF font library
-VFS.Mount.fonts/ttf   = $(CS_DATADIR)$/ttf$/, $(TTF_PATH:$.$/)
+VFS.Mount.fonts/ttf   = $(CS_DATADIR)$/ttf$/, $(TTF_PATH:$.$/), $(CS_DATADIR)$/ttf-vera.zip
 
 VFS.Mount.lev/flarge   = $(CS_MAPDIR)$/flarge$/
 VFS.Mount.lev/r3dtest  = $(CS_DATADIR)$/r3dtest$/
-VFS.Mount.lev/parallaxtest = $$(CS_DATADIR)/parallaxtest$/
+VFS.Mount.lev/parallaxtest = $(CS_DATADIR)$/parallaxtest$/
 VFS.Mount.lev/stenciltest = $(CS_DATADIR)$/stenciltest$/
 VFS.Mount.lev/isomap   = $(CS_MAPDIR)$/isomap.zip, $(CS_DATADIR)$/isomap$/
 VFS.Mount.lev/mdltest  = $(CS_MAPDIR)$/mdltest$/
@@ -44,7 +44,7 @@ VFS.Mount.lib/csws     = $(CS_DATADIR)$/csws.zip
 VFS.Mount.lib/cubemap  = $(CS_DATADIR)$/cube$/
 
 ; Mount for AWS
-VFS.Mount.aws = $(CS_DATADIR)$/awsdef.zip
+VFS.Mount.aws = $(CS_DATADIR)$/awsdef.zip, $(CS_DATADIR)$/aws$/
 
 ; Mount for unittest
 VFS.Mount.lev/unittest = $(CS_DATADIR)$/unittest$/
