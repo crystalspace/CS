@@ -40,6 +40,8 @@ Now fill in this dialog box to match the screenshot below.
 username.  Developers also need to change the @emph{Authentication} field to
 @emph{@sc{ssh} Server}.
 
+@emph{Note}: Replace @samp{cvs.crystal.sourceforge.net} with @samp{cvs.sourceforge.net}!
+
 Next, click on the property sheet tab @emph{Globals} and edit to match the
 screenshot below.
 
