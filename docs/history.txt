@@ -19,6 +19,20 @@ chronological order.
 	  SetAnimationControl() on the mesh factory.
 	- Jorrit started work on a new gmeshanim plugin that is a script
 	  based animation plugin for genmesh. Doesn't work yet.
+	- Eric Sunshine removed the 'ignoresubdir" option from the IncludeDir
+	  rule (helper.jam) and replaced it with the more generalized 'literal'
+	  option.  Also added a 'transient' option which indicates that the
+	  specified header directory should not be recorded in generated
+	  resources, such as project files.
+	- Eric Sunshine upgraded jamtemplate so that MSVC project files
+	  generated via 'msvcgen' will now search for CS and CEL headers in the
+	  following additional locations:
+	    ../CS/include
+	    $(CRYSTAL)/include
+	    $(CRYSTAL)/include/crystalspace
+	    ../cel/include
+	    $(CEL)/include
+	    $(CEL)/include/cel
 9-Sep-2004
 	- Jorrit fixed a potential bug in csLoader::LoadMeshObjectFactory()
 	  where it would destroy the wrong factory after unsuccessful

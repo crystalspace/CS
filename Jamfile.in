@@ -5,7 +5,7 @@ SubDir TOP ;
 
 # Common include directories.
 IncludeDir ;
-IncludeDir $(BUILDTOP) include : : ignoresubdir ;
+IncludeDir $(BUILDTOP) include : : literal transient ;
 IncludeDir "include" ;
 
 # Create some clean targets

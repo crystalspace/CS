@@ -5,7 +5,7 @@ SubDir TOP ;
 
 IncludeDir ;
 IncludeDir src ;
-IncludeDir $(BUILDTOP) : : ignoresubdir ;
+IncludeDir $(BUILDTOP) : : literal transient ;
 
 CleanDir clean :
     out ;
@@ -47,23 +47,40 @@ MsvcGenConfig CRYSTAL.CFLAGS.DEBUG ;
 MsvcGenConfig CRYSTAL.LFLAGS.DEBUG ;
 MsvcGenConfig CRYSTAL.LIBS.DEBUG : 
   "libcstool_d.lib libcsgfx_d.lib libcsgeom_d.lib libcsutil_d.lib" ;
+if [ Property build : projgen ]
+{
+  local hash = "\$" ;
+  IncludeDir .. .. CS include : : literal ;
+  IncludeDir "$(hash)(CRYSTAL)" include : : literal ;
+  IncludeDir "$(hash)(CRYSTAL)" include crystalspace : : literal ;
+}
 
 if $(CEL.DESIRED) = yes
 {
-MsvcGenConfig CEL.AVAILABLE : yes ;
-MsvcGenConfig CEL.CFLAGS : "/D \"USE_CEL\"" ;
-MsvcGenConfig CEL.LFLAGS ;
-MsvcGenConfig CEL.LIBS : "libceltool.lib" ;
-MsvcGenConfig CEL.CFLAGS.DEBUG : "/D \"USE_CEL\"" ;
-MsvcGenConfig CEL.LFLAGS.DEBUG ;
-MsvcGenConfig CEL.LIBS.DEBUG : "libceltool_d.lib" ;
+  MsvcGenConfig CEL.AVAILABLE : yes ;
+  MsvcGenConfig CEL.CFLAGS : "/D \"USE_CEL\"" ;
+  MsvcGenConfig CEL.LFLAGS ;
+  MsvcGenConfig CEL.LIBS : "libceltool.lib" ;
+  MsvcGenConfig CEL.CFLAGS.DEBUG : "/D \"USE_CEL\"" ;
+  MsvcGenConfig CEL.LFLAGS.DEBUG ;
+  MsvcGenConfig CEL.LIBS.DEBUG : "libceltool_d.lib" ;
+  if [ Property build : projgen ]
+  {
+    local hash = "\$" ;
+    IncludeDir .. .. cel include : : literal ;
+    IncludeDir "$(hash)(CEL)" include : : literal ;
+    IncludeDir "$(hash)(CEL)" include cel : : literal ;
+  }
 }
 
 # Set project-specific compiler and linker options for msvcgen.
-#MsvcGenConfig MSVC.CFLAGS : "/D \"MY_DEFINE\"" ;
-#MsvcGenConfig MSVC.CFLAGS_DEBUG : "/D \"MY_DEBUG_DEFINE\"" ;
-#MsvcGenConfig MSVC.LFLAGS : "/libpath:\"my\\lib\\path\"" ;
-#MsvcGenConfig MSVC.LFLAGS_DEBUG : "/libpath:\"my\\debuglib\\path\"" ;
+#MsvcDefine MY_DEFINE : "my value" ;
+#MsvcDefine MY_RELEASE_DEFINE : "my release value" : release ;
+#MsvcDefine MY_DEBUG_DEFINE : "my debug value" : debug ;
+#MsvcCFlags : "/I \"my\\inc\\path\"" : release ;
+#MsvcCFlags : "/I \"my\\debuginc\\path\"" : debug ;
+#MsvcLFlags : "/libpath:\"my\\lib\\path\"" : release ;
+#MsvcLFlags : "/libpath:\"my\\debuglib\\path\"" : debug ;
 #MsvcGenConfig MSVC.LIBRARY : supercool.lib ;
 #MsvcGenConfig MSVC.LIBRARY_DEBUG : supercooldebug.lib ;
 

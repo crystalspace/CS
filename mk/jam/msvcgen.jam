@@ -716,17 +716,20 @@ rule MsvcProject
     Always $(resource) ;
   }
   
-  local incdirs ;
-  for incdirs in $(MSVC.INCDIRS) $(MSVC.INCDIRS.$(rawname))
+  local incdir ;
+  for incdir in $(MSVC.INCDIRS_LITERAL) $(MSVC.INCDIRS_LITERAL.$(rawname))
   {
-    local incdir ;
-    if $(incdirs) = "."
+    ResponseFile $(respfile) : "include|$(incdir)" : notfile : $(respdir) ;
+  }
+  for incdir in $(MSVC.INCDIRS) $(MSVC.INCDIRS.$(rawname))
+  {
+    if $(incdir) = "."
     {
       incdir = [ ConcatDirs $(relpath) ] ;
     }
     else
     {
-      incdir = [ ConcatDirs $(relpath) $(incdirs) ] ;
+      incdir = [ ConcatDirs $(relpath) $(incdir) ] ;
     }
     ResponseFile $(respfile) : "include|$(incdir)" : notfile : $(respdir) ;
   }
@@ -1005,9 +1008,11 @@ rule IncludeDir
   local target = $(2) ;
   local options = $(3) ;
 
-  # We prefer directories in source tree and ignore others.
-  if ! [ IsElem ignoresubdir : $(options) ]
+  if ! [ IsElem transient : $(options) ]
   {
+    local tag = "INCDIRS" ;
+    if [ IsElem literal : $(options) ] { tag = "INCDIRS_LITERAL" ; }
+
     if $(dir)
     {
       dir = [ ConcatDirs $(dir) ] ;
@@ -1019,11 +1024,11 @@ rule IncludeDir
 
     if $(target)
     {
-      MSVC.INCDIRS.$(target) += $(dir) ;
+      MSVC.$(tag).$(target) += $(dir) ;
     }
     else
     {
-      MSVC.INCDIRS += $(dir) ;
+      MSVC.$(tag) += $(dir) ;
     }
   }
 }
