@@ -4,8 +4,8 @@
 
 ##  CompileGroups target : groups
 ##    Adds a target to a list of compile groups. A compile group is a virtual
-##    target which combines several targets. This is usefull for things like a
-##    creating a target which compiles all image loaders, all renderers, ...
+##    target which combines several targets. This is useful for things like a
+##    creating a target which compiles all image loaders, all renderers, etc.
 rule CompileGroups
 {
   local _i ;
@@ -21,7 +21,7 @@ rule CompileGroups
 }
 
 ##  RegisterCompileGroups
-##    Registers compilegroups. You must specify all compile groups here before
+##    Registers compile groups. You must specify all compile groups here before
 ##    can use them.
 rule RegisterCompileGroups
 {
