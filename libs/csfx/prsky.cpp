@@ -331,8 +331,8 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex)
       int cloud;
       if(!below)
       {
-        float cloudx = 1024.+(isect.x - center.x)/radius*255.*20.;
-        float cloudy = 1024.+(isect.z - center.z)/radius*255.*20.;
+        float cloudx = 1024.+(isect.x - center.x)/radius*255.*40.;
+        float cloudy = 1024.+(isect.z - center.z)/radius*255.*40.;
         if(cloudx<0.0)cloudx = -cloudx;
         if(cloudy<0.0)cloudy = -cloudy;
         cloud = GetCloudVal((int)cloudx, (int)cloudy ); /* 80 msec */
