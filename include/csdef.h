@@ -59,19 +59,14 @@
   #define SIGN(x) ((x) < 0 ? -1 : ((x) > 0 ? 1 : 0))
 #endif
 
-// PI - These changes add more flexiblity and offer improvements
-// on both low and high end systems in varying performance instances
 #ifndef PI
-  const float PI = 4.0f * (float) atan (1.0f);
+ #define PI 3.1415926535897932385f
 #endif
 #ifndef HALF_PI
-  const float HALF_PI = 0.5f * PI;	// PI / 2
+  #define HALF_PI PI / 2.0f
 #endif
 #ifndef TWO_PI
-	const float TWO_PI = 2.0f * PI;
-#endif
-#ifndef INV_TWO_PI
-	const float INV_TWO_PI = 1.0f / TWO_PI;
+  #define TWO_PI PI * 2.0f
 #endif
 
 #undef EPSILON
