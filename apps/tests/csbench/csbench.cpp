@@ -114,52 +114,14 @@ static void Cleanup ()
   csInitializer::DestroyApplication (object_reg);
 }
 
-bool CsBench::CreateGeometry ()
+iMeshFactoryWrapper* CsBench::CreateGenmeshLattice (int dim, float size,
+	const char* name)
 {
-  // First disable the lighting cache. Our app is simple enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
-
-  // Load the texture from the standard library.  This is located in
-  // CS/data/standard.zip and mounted as /lib/std using the Virtual
-  // File System (VFS) plugin.
-  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.simple1",
-        "Error loading 'stone4' texture!");
-    return false;
-  }
-  if (!loader->LoadTexture ("stone_normal", "/lib/stdtex/stone2DOT3.png", 
-  	CS_TEXTURE_3D, 0, false, false))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.simple1",
-        "Error loading 'stone2DOT3' texture!");
-    return false;
-  }
-  material = engine->GetMaterialList ()->FindByName ("stone");
-  csShaderVariable* normalSV = 
-    material->GetMaterial()->GetVariableAdd (strings->Request ("tex normal"));
-  normalSV->SetValue (engine->GetTextureList()->FindByName ("stone_normal"));
-
-  room2 = engine->CreateSector ("room2");
-  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room2, "walls"));
-  csRef<iThingState> ws =
-    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
-  csRef<iThingFactoryState> walls_state = ws->GetFactory ();
-  walls_state->AddInsideBox (csVector3 (-5, -5, 5), csVector3 (5, 5, 15));
-  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, material);
-  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
-
   // Create our object.
   csRef<iMeshFactoryWrapper> fact = engine->CreateMeshFactory (
-    "crystalspace.mesh.object.genmesh", "complexmesh");
+    "crystalspace.mesh.object.genmesh", name);
   csRef<iGeneralFactoryState> factstate = SCF_QUERY_INTERFACE (
     fact->GetMeshObjectFactory (), iGeneralFactoryState);
-  int dim = 128;
-  //int dim = 64;
-  float size = 5.0f;
   factstate->SetVertexCount (dim * dim);
   factstate->SetTriangleCount (2 * (dim-1) * (dim-1));
   int x, y;
@@ -185,6 +147,58 @@ bool CsBench::CreateGeometry ()
     }
 
   factstate->CalculateNormals ();
+  return fact;
+}
+
+bool CsBench::SetupMaterials ()
+{
+  // Load the texture from the standard library.  This is located in
+  // CS/data/standard.zip and mounted as /lib/std using the Virtual
+  // File System (VFS) plugin.
+  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+        "crystalspace.application.simple1",
+        "Error loading 'stone4' texture!");
+    return false;
+  }
+  if (!loader->LoadTexture ("stone_normal", "/lib/stdtex/stone2DOT3.png", 
+  	CS_TEXTURE_3D, 0, false, false))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+        "crystalspace.application.simple1",
+        "Error loading 'stone2DOT3' texture!");
+    return false;
+  }
+  material = engine->GetMaterialList ()->FindByName ("stone");
+  csShaderVariable* normalSV = 
+    material->GetMaterial()->GetVariableAdd (strings->Request ("tex normal"));
+  normalSV->SetValue (engine->GetTextureList()->FindByName ("stone_normal"));
+  return true;
+}
+
+iSector* CsBench::CreateRoom (const char* name,
+	const csVector3& p1, const csVector3& p2)
+{
+  iSector* room2 = engine->CreateSector (name);
+  csRef<iMeshWrapper> walls = engine->CreateSectorWallsMesh (room2, "walls");
+  csRef<iThingState> ws =
+    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
+  csRef<iThingFactoryState> walls_state = ws->GetFactory ();
+  walls_state->AddInsideBox (p1, p2);
+  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, material);
+  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+  return room2;
+}
+
+bool CsBench::CreateTestCaseSingleBigObject ()
+{
+  iSector* room2 = CreateRoom ("room2_single",
+  	csVector3 (-5, -5, 5), csVector3 (5, 5, 15));
+  // Create our factory.
+  iMeshFactoryWrapper* fact = CreateGenmeshLattice (BIGOBJECT_DIM,
+  	5.0f, "complexmesh");
+  if (!fact) return false;
 
   // Now create an instance:
   csRef<iMeshWrapper> mesh =
@@ -192,22 +206,16 @@ bool CsBench::CreateGeometry ()
   genmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iGeneralMeshState);
   genmesh->SetMaterialWrapper (material);
 
-  csRef<iLight> light;
+  csRef<iLight> l;
   iLightList* ll = room2->GetLights ();
+  l = engine->CreateLight (0, csVector3 (-3, 3, 10), 10, csColor (1, 0, 0));
+  ll->Add (l);
+  l = engine->CreateLight (0, csVector3 (3, 3,  10), 10, csColor (0, 0, 1));
+  ll->Add (l);
+  l = engine->CreateLight (0, csVector3 (0, 3, 7), 10, csColor (0, 1, 0));
+  ll->Add (l);
 
-  light = engine->CreateLight (0, csVector3 (-3, 3, 10), 10,
-    csColor (1, 0, 0));
-  ll->Add (light);
-
-  light = engine->CreateLight (0, csVector3 (3, 3,  10), 10,
-    csColor (0, 0, 1));
-  ll->Add (light);
-
-  light = engine->CreateLight (0, csVector3 (0, 3, 7), 10,
-    csColor (0, 1, 0));
-  ll->Add (light);
-
-  room1 = engine->CreateSector ("room1");
+  room_single = engine->CreateSector ("room_single");
   csVector3 portal_vts[4];
   portal_vts[0].Set (-1.5, 1.5, 0);
   portal_vts[1].Set (1.5, 1.5, 0);
@@ -215,16 +223,52 @@ bool CsBench::CreateGeometry ()
   portal_vts[3].Set (-1.5, -1.5, 0);
   iPortal* portal;
   csRef<iMeshWrapper> portal_mesh = engine->CreatePortal (
-  	"portal_room2", room1, csVector3 (0, 0, 5),
+  	"portal_room2", room_single, csVector3 (0, 0, 5),
   	room2, portal_vts, 4, portal);
+  return true;
+}
 
-  engine->Prepare ();
+bool CsBench::CreateTestCaseMultipleObjects ()
+{
+  iSector* room2 = CreateRoom ("room2_multi",
+  	csVector3 (-5, -5, 5), csVector3 (5, 5, 15));
+  // Create our factory.
+  iMeshFactoryWrapper* fact = CreateGenmeshLattice (SMALLOBJECT_DIM,
+  	2.0f, "smallmesh");
+  if (!fact) return false;
 
-  view = csPtr<iView> (new csView (engine, g3d));
-  view->GetCamera ()->SetSector (room1);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, 0));
-  iGraphics2D* g2d = g3d->GetDriver2D ();
-  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+  // Now create the instances:
+  int i;
+  for (i = 0 ; i < SMALLOBJECT_NUM ; i++)
+  {
+    csVector3 p (
+    	0.0, 0.0, 10.0
+    	);
+    csRef<iMeshWrapper> mesh =
+      engine->CreateMeshWrapper (fact, "small", room2, p);
+    genmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iGeneralMeshState);
+    genmesh->SetMaterialWrapper (material);
+  }
+
+  csRef<iLight> l;
+  iLightList* ll = room2->GetLights ();
+  l = engine->CreateLight (0, csVector3 (-3, 3, 10), 10, csColor (1, 0, 0));
+  ll->Add (l);
+  l = engine->CreateLight (0, csVector3 (3, 3,  10), 10, csColor (0, 0, 1));
+  ll->Add (l);
+  l = engine->CreateLight (0, csVector3 (0, 3, 7), 10, csColor (0, 1, 0));
+  ll->Add (l);
+
+  room_multi = engine->CreateSector ("room_multi");
+  csVector3 portal_vts[4];
+  portal_vts[0].Set (-1.5, 1.5, 0);
+  portal_vts[1].Set (1.5, 1.5, 0);
+  portal_vts[2].Set (1.5, -1.5, 0);
+  portal_vts[3].Set (-1.5, -1.5, 0);
+  iPortal* portal;
+  csRef<iMeshWrapper> portal_mesh = engine->CreatePortal (
+  	"portal_room2", room_multi, csVector3 (0, 0, 5),
+  	room2, portal_vts, 4, portal);
   return true;
 }
 
@@ -295,13 +339,23 @@ bool CsBench::Initialize (int argc, const char* const argv[],
   if (!csInitializer::OpenApplication (object_reg))
     return ReportError ("Error opening system!");
 
-  if (!CreateGeometry ())
-    return false;
+  // First disable the lighting cache. Our app is simple enough
+  // not to need this.
+  engine->SetLightingCacheMode (0);
+
+  if (!SetupMaterials ()) return false;
+  if (!CreateTestCaseSingleBigObject ()) return false;
+  if (!CreateTestCaseMultipleObjects ()) return false;
+
+  engine->Prepare ();
+
+  view = csPtr<iView> (new csView (engine, g3d));
+  view->GetCamera ()->SetSector (room_single);
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, 0));
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   return true;
 }
-
-#define BENCHTIME 2000
 
 float CsBench::BenchMark (const char* name, const char* description, 
 			 uint drawFlags)
@@ -394,7 +448,8 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
     csRef<iDocument> shaderDoc2 = GetDocumentSystem ()->CreateDocument ();
     csRef<iFile> shaderFile2 = vfs->Open (shaderPath2, VFS_FILE_READ);
     shaderDoc2->Parse (shaderFile2);
-    csRef<iDocumentNode> shadernode2 = shaderDoc2->GetRoot ()->GetNode ("shader");
+    csRef<iDocumentNode> shadernode2 = shaderDoc2->GetRoot ()
+    	->GetNode ("shader");
     shadertype2 = strings->Request (shtype2);
     shader2 = shcom->CompileShader (shadernode2);
   }
@@ -415,11 +470,13 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
 	engine->GetTextureList ()->FindByName ("stone"));
       csShaderVariable* normalSV = 
 	matinput->GetVariableAdd (strings->Request ("tex normal"));
-      normalSV->SetValue (engine->GetTextureList()->FindByName ("stone_normal"));
+      normalSV->SetValue (engine->GetTextureList()->FindByName (
+      	"stone_normal"));
       matinput->SetShader (shadertype, shader);
       if (shader2)
 	matinput->SetShader (shadertype2, shader2);
-      iMaterialWrapper* mat = engine->GetMaterialList ()->NewMaterial (matinput);
+      iMaterialWrapper* mat = engine->GetMaterialList ()->NewMaterial (
+      	matinput);
       mat->Register (g3d->GetTextureManager ());
       genmesh->SetMaterialWrapper (mat);
       ws->ReplaceMaterial (oldmat, mat);
@@ -427,7 +484,8 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
       char name[256];
       sprintf (name, "%s_%d", shader->GetName(), pri);
       char description[256];
-      sprintf (description, "Shader %s with priority %d", shader->GetName(), pri);
+      sprintf (description, "Shader %s with priority %d", shader->GetName(),
+      	pri);
       BenchMark (name, description, CSDRAW_CLEARZBUFFER);
       ws->ClearReplacedMaterials();
     }
@@ -450,6 +508,10 @@ void CsBench::PerformTests ()
 #ifdef CS_NO_QSQRT
   Report ("qsqrt() disabled!");
 #endif
+  Report ("Big object in test has %d triangles.",
+  	2*(BIGOBJECT_DIM-1)*(BIGOBJECT_DIM-1));
+  Report ("Small object in test has %d triangles. We use %d of them.",
+  	2*(SMALLOBJECT_DIM-1)*(SMALLOBJECT_DIM-1), SMALLOBJECT_NUM);
 
   g3d->SetOption ("StencilThreshold", "0");
   float stencil0 = BenchMark ("stencilclip", "Stencil clipping is used");

@@ -37,6 +37,11 @@ struct iDocumentSystem;
 struct iGeneralMeshState;
 struct iStringSet;
 
+#define BIGOBJECT_DIM 128
+#define SMALLOBJECT_DIM 24
+#define SMALLOBJECT_NUM 100
+#define BENCHTIME 2000
+
 class CsBench
 {
 public:
@@ -55,11 +60,19 @@ private:
   csRef<iView> view;
   csRef<iGeneralMeshState> genmesh;
   csRef<iStringSet> strings;
-  iSector* room1;
-  iSector* room2;
+  iSector* room_single;
+  iSector* room_multi;
   iMaterialWrapper* material;
 
-  bool CreateGeometry ();
+  iMeshFactoryWrapper* CreateGenmeshLattice (int dim, float size,
+  	const char* name);
+
+  bool SetupMaterials ();
+  iSector* CreateRoom (const char* name,
+  	const csVector3& p1, const csVector3& p2);
+  bool CreateTestCaseSingleBigObject ();
+  bool CreateTestCaseMultipleObjects ();
+
   float BenchMark (const char* name, const char* description,
   	uint drawFlags = 0);
   iDocumentSystem* GetDocumentSystem ();

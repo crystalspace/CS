@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Jul-2004
+	- Jorrit started work on adding a new test to csbench to test lots
+	  of smaller objects.
 20-Jul-2004
 	- PK added GetMeshObjectType() to iMeshObjectFactory.
 	- PK worked a bit on iSaver.
