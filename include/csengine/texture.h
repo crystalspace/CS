@@ -26,7 +26,7 @@
 #include "igraph2d.h"
 #include "itexture.h"
 
-struct csTextureWrapper;
+class csTextureWrapper;
 struct iTextureManager;
 struct iTextureHandle;
 struct iImage;
