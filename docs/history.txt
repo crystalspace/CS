@@ -24,6 +24,11 @@ The history order is reversed so that new features are at the top.
 	  not be correctly initialized which means that the initial lighting
 	  step would not be able to see them (i.e. detail objects got no
 	  lighting).
+	- Philip Wyett removed all 'foreign' includes and libraries from
+	  include/cssys/win32 and libs/cssys/win32. Those libraries are not
+	  part of CS and should not be in CS CVS. You can download all needed
+	  files from thew new winlibs0.19b.zip which you can find
+	  at ftp:://sunsite.dk/projects/crystal/support/win32
 8-Jul-2001
 	- Fixed a bug in the destructor of the emit particle system
 	  which could cause crashes at exit.
