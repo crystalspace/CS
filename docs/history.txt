@@ -53,6 +53,10 @@ chronological order.
 	  SCF_IMPLEMENT_EMBEDDED_IBASE_END.
 	- Jorrit fixed a stupid bug he introduced with his more recent
 	  changes.
+	- Eric Sunshined moved getopt.h include to bottom of css.h since it
+	  aliases getopt to __getopt on some platforms, which causes problems
+	  for other includes (for instance, on MacOS/X, it is reported that it
+	  was breaking <unistd.h> in some fashion).
 31-Aug-2003
         - Philip Wyett changed #include "GL/glu.h" to <GL/glu.h>, in the new
           GL renderer gl_txtcache.cpp, eliminating the warning messages within

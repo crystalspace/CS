@@ -65,7 +65,6 @@
 #ifndef NO_CSSYS
 #include "cssys/csendian.h"
 #include "cssys/csshlib.h"
-#include "cssys/getopt.h"
 #include "cssys/sysfunc.h"
 #include "cssys/sockets.h"
 #endif
@@ -321,6 +320,14 @@
 // CSWS
 #ifndef NO_CSWS
 #include "csws/csws.h"
+#endif
+
+// CS Sys
+#ifndef NO_CSSYS
+// Include this last because it aliases getopt to __getopt on some platforms,
+// which causes problems for other includes (for instance, on MacOS/X, it is
+// reported that it was breaking <unistd.h> in some fashion).
+#include "cssys/getopt.h"
 #endif
 
 #endif // CS_INCLUDE_NOTHING
