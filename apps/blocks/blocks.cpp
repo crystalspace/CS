@@ -2223,7 +2223,7 @@ void Blocks::StartDemo ()
   dynlight->QueryLight ()->SetSector (demo_room);
   dynlight->Setup ();
 
-  view->SetSector (demo_room);
+  view->GetCamera ()->SetSector (demo_room);
   csVector3 pos (0, 3, -5);
   view->GetCamera ()->GetTransform ().SetOrigin (pos);
   cam_move_up = csVector3 (0, 1, 0);
@@ -2277,7 +2277,7 @@ void Blocks::StartNewGame ()
   Sys->StartNewShape ();
 
   cam_move_up = csVector3 (0, 1, 0);
-  view->SetSector (room);
+  view->GetCamera ()->SetSector (room);
   Sys->HandleCameraMovement ();
   view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);
 

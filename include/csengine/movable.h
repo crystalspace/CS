@@ -276,7 +276,7 @@ public:
     {
       scfParent->MovePosition (v);
     }
-    virtual void Transform (csMatrix3& matrix)
+    virtual void Transform (const csMatrix3& matrix)
     {
       scfParent->Transform (matrix);
     }

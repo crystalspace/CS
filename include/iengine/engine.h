@@ -22,6 +22,7 @@
 
 #include "csutil/scf.h"
 #include "isys/plugin.h"
+#include "csgeom/vector3.h"
 
 class csEngine;
 class csVector3;
@@ -175,6 +176,8 @@ struct iEngine : public iPlugIn
    * region is selected).
    */
   virtual iRegion* GetCurrentRegion () = 0;
+  /// Find a region by name
+  virtual iRegion* FindRegion (const char *name) = 0;
 
   /**
    * Create or select a new object library (name can be NULL for engine).
@@ -410,10 +413,12 @@ struct iEngine : public iPlugIn
    * have the same name (in contrast with factory objects).
    */
   virtual iMeshWrapper* CreateMeshObject (iMeshFactoryWrapper* factory,
-  	const char* name, iSector* sector, const csVector3& pos) = 0;
+  	const char* name, iSector* sector = NULL,
+	const csVector3& pos = csVector3(0, 0, 0)) = 0;
   /// Create a mesh wrapper for an existing mesh object
   virtual iMeshWrapper* CreateMeshObject (iMeshObject*,
-  	const char* name, iSector* sector, const csVector3& pos) = 0;
+  	const char* name, iSector* sector = NULL,
+	const csVector3& pos = csVector3(0, 0, 0)) = 0;
   /// Create an uninitialized mesh wrapper
   virtual iMeshWrapper* CreateMeshObject (const char* name) = 0;
   /**
@@ -424,6 +429,11 @@ struct iEngine : public iPlugIn
   	const char* classId, const char* name,
 	const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos) = 0;
+
+  /// return the number of mesh objects
+  virtual int GetNumMeshObjects () = 0;
+  /// return a mesh object by index
+  virtual iMeshWrapper *GetMeshObject (int n) = 0;
 
   /**
    * Conveniance function to create a terrain factory from a given type.
@@ -450,11 +460,12 @@ struct iEngine : public iPlugIn
    * 'name' can be NULL if no name is wanted. Different mesh objects can
    * have the same name (in contrast with factory objects).
    */
-  virtual iTerrainWrapper* CreateTerrainObject (iTerrainFactoryWrapper* factory,
-  	const char* name, iSector* sector) = 0;
+  virtual iTerrainWrapper* CreateTerrainObject
+	(iTerrainFactoryWrapper* factory, const char* name,
+	 iSector* sector = NULL) = 0;
   /// Create a terrain wrapper for an existing terrain object
   virtual iTerrainWrapper* CreateTerrainObject (iTerrainObject*,
-  	const char* name, iSector* sector) = 0;
+  	const char* name, iSector* sector = NULL) = 0;
   /// Create an uninitialized terrain wrapper
   virtual iTerrainWrapper* CreateTerrainObject (const char* name) = 0;
 

@@ -215,7 +215,7 @@ void LoadRecording (iVFS* vfs, const char* fName)
 void SaveCamera (iVFS* vfs, const char *fName)
 {
   if (!Sys->view) return;
-  csCamera *c = Sys->view->GetCamera ();
+  csCamera *c = Sys->view->GetCamera ()->GetPrivateObject ();
   if (!c) return;
   const csMatrix3& m_o2t = c->GetO2T ();
   const csVector3& v_o2t = c->GetOrigin ();
@@ -276,11 +276,11 @@ bool LoadCamera (iVFS* vfs, const char *fName)
     return false;
   }
 
-  csCamera *c = Sys->view->GetCamera ();
-  c->SetSector (s);
+  iCamera *c = Sys->view->GetCamera ();
+  c->SetSector (&s->scfiSector);
   c->SetMirrored ((bool)imirror);
-  c->SetO2T (m);
-  c->SetOrigin (v);
+  c->GetTransform ().SetO2T (m);
+  c->GetTransform ().SetOrigin (v);
   return true;
 }
 
@@ -296,7 +296,7 @@ void move_mesh (csMeshWrapper* sprite, csSector* where, csVector3 const& pos)
 void load_meshobj (char *filename, char *templatename, char* txtname)
 {
   // First check if the texture exists.
-  if (!Sys->view->GetEngine ()->GetMaterials ()->FindByName (txtname))
+  if (!Sys->view->GetEngine ()->FindMaterial (txtname))
   {
     Sys->Printf (MSG_CONSOLE, "Can't find material '%s' in memory!\n", txtname);
     return;
@@ -769,8 +769,8 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "action"))
   {
-    csVector3 where = Sys->view->GetCamera ()->This2Other(3.0f*VEC_FORWARD);
-    csPolygon3D* p = Sys->view->GetCamera ()->GetHit (where);
+    csVector3 where = Sys->view->GetCamera ()->GetTransform ().This2Other(3.0f*VEC_FORWARD);
+    csPolygon3D* p = Sys->view->GetCamera ()->GetPrivateObject ()->GetHit (where);
     if (p)
     {
       CsPrintf (MSG_CONSOLE, "Action polygon '%s' ", p->GetName ());
@@ -912,7 +912,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     dump_visible_indent = 0;
     Sys->Printf (MSG_DEBUG_0, "====================================================================\n");
     extern void dump_visible (csRenderView* rview, int type, void* entity);
-    Sys->view->GetEngine ()->DrawFunc (Sys->view->GetCamera (), Sys->view->GetClipper (), dump_visible);
+    Sys->view->GetEngine ()->GetCsEngine ()->DrawFunc (Sys->view->GetCamera ()->GetPrivateObject (), Sys->view->GetClipper (), dump_visible);
     Sys->Printf (MSG_DEBUG_0, "====================================================================\n");
   }
   else if (!strcasecmp (cmd, "bind"))
@@ -939,9 +939,9 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "db_boxshow"))
     csCommandProcessor::change_boolean (arg, &Sys->do_show_debug_boxes, "show debug boxes");
   else if (!strcasecmp (cmd, "db_boxcam1"))
-    Sys->debug_box1.SetCenter (Sys->view->GetCamera ()->GetOrigin ());
+    Sys->debug_box1.SetCenter (Sys->view->GetCamera ()->GetTransform ().GetOrigin ());
   else if (!strcasecmp (cmd, "db_boxcam2"))
-    Sys->debug_box2.SetCenter (Sys->view->GetCamera ()->GetOrigin ());
+    Sys->debug_box2.SetCenter (Sys->view->GetCamera ()->GetTransform ().GetOrigin ());
   else if (!strcasecmp (cmd, "db_boxsize1"))
   {
     float size = Sys->debug_box1.MaxX ()-Sys->debug_box1.MinX ();
@@ -1138,7 +1138,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     bool en = Sys->engine->IsPVSFrozen ();
     csCommandProcessor::change_boolean (arg, &en, "freeze pvs");
     if (en) 
-      Sys->engine->FreezePVS (Sys->view->GetCamera ()->GetOrigin ());
+      Sys->engine->FreezePVS (Sys->view->GetCamera ()->GetTransform ().GetOrigin ());
     else
       Sys->engine->UnfreezePVS ();
   }
@@ -1203,11 +1203,11 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "s_fog"))
   {
-    csFog& f = Sys->view->GetCamera ()->GetSector ()->GetFog ();
+    csFog* f = Sys->view->GetCamera ()->GetSector ()->GetFog ();
     if (!arg)
     {
       Sys->Printf (MSG_CONSOLE, "Fog in current sector (%f,%f,%f) density=%f\n",
-      	f.red, f.green, f.blue, f.density);
+      	f->red, f->green, f->blue, f->density);
     }
     else
     {
@@ -1217,11 +1217,11 @@ bool CommandHandler (const char *cmd, const char *arg)
         Sys->Printf (MSG_CONSOLE, "Expected r,g,b,density. Got something else!\n");
         return false;
       }
-      f.enabled = true;
-      f.density = dens;
-      f.red = r;
-      f.green = g;
-      f.blue = b;
+      f->enabled = true;
+      f->density = dens;
+      f->red = r;
+      f->green = g;
+      f->blue = b;
     }
   }
   else if (!strcasecmp (cmd, "capture"))
@@ -1281,8 +1281,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       char buf[255];
       *buf = 0;
       if (arg) ScanStr (arg, "%s", buf);
-      csMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterials ()->
-      	FindByName (buf);
+      iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (buf);
       if (mat)
       {
         Sys->fs_fadetxt_mat = mat->GetMaterialHandle ();
@@ -1529,7 +1528,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (cnt <= 2) speed = 2;
     if (cnt <= 1) num = 500;
     if (cnt <= 0) strcpy (txtname, "raindrop");
-    add_particles_rain (Sys->view->GetCamera ()->GetSector (),
+    add_particles_rain (Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (),
     	txtname, num, speed);
   }
   else if (!strcasecmp (cmd, "snow"))
@@ -1546,7 +1545,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (cnt <= 2) speed = .3;
     if (cnt <= 1) num = 500;
     if (cnt <= 0) strcpy (txtname, "snow");
-    add_particles_snow (Sys->view->GetCamera ()->GetSector (),
+    add_particles_snow (Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (),
     	txtname, num, speed);
   }
   else if (!strcasecmp (cmd, "flame"))
@@ -1560,8 +1559,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     	int num, const csVector3& origin);
     if (cnt <= 1) num = 200;
     if (cnt <= 0) strcpy (txtname, "raindrop");
-    add_particles_fire (Sys->view->GetCamera ()->GetSector (),
-    	txtname, num, Sys->view->GetCamera ()->GetOrigin ()-
+    add_particles_fire (Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (),
+    	txtname, num, Sys->view->GetCamera ()->GetTransform ().GetOrigin ()-
 	csVector3 (0, Sys->cfg_body_height, 0));
   }
   else if (!strcasecmp (cmd, "fountain"))
@@ -1575,8 +1574,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     	int num, const csVector3& origin);
     if (cnt <= 1) num = 400;
     if (cnt <= 0) strcpy (txtname, "spark");
-    add_particles_fountain (Sys->view->GetCamera ()->GetSector (),
-    	txtname, num, Sys->view->GetCamera ()->GetOrigin ()-
+    add_particles_fountain (Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (),
+    	txtname, num, Sys->view->GetCamera ()->GetTransform ().GetOrigin ()-
 	csVector3 (0, Sys->cfg_body_height, 0));
   }
   else if (!strcasecmp (cmd, "explosion"))
@@ -1591,8 +1590,8 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->Printf (MSG_CONSOLE, "Expected parameter 'texture'!\n");
     }
     else
-      add_particles_explosion (Sys->view->GetCamera ()->GetSector (),
-    	Sys->view->GetCamera ()->GetOrigin (), txtname);
+      add_particles_explosion (Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (),
+    	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), txtname);
   }
   else if (!strcasecmp (cmd, "spiral"))
   {
@@ -1606,8 +1605,8 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->Printf (MSG_CONSOLE, "Expected parameter 'texture'!\n");
     }
     else
-      add_particles_spiral (Sys->view->GetCamera ()->GetSector (),
-    	Sys->view->GetCamera ()->GetOrigin (), txtname);
+      add_particles_spiral (Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (),
+    	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), txtname);
   }
   else if (!strcasecmp (cmd, "loadmesh"))
   {
@@ -1634,8 +1633,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     else
     {
-      add_meshobj (tname, sname, Sys->view->GetCamera ()->GetSector (),
-    	          Sys->view->GetCamera ()->GetOrigin (), size);
+      add_meshobj (tname, sname, Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (),
+    	          Sys->view->GetCamera ()->GetTransform ().GetOrigin (), size);
     }
   }
   else if (!strcasecmp (cmd, "delmesh"))
@@ -1644,9 +1643,9 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg)
     {
       ScanStr (arg, "%s", name);
-      csObject* obj = Sys->view->GetEngine ()->meshes.FindByName (name);
+      csObject* obj = Sys->view->GetEngine ()->GetCsEngine ()->meshes.FindByName (name);
       if (obj)
-        Sys->view->GetEngine ()->RemoveMesh ((csMeshWrapper*)obj);
+        Sys->view->GetEngine ()->GetCsEngine ()->RemoveMesh ((csMeshWrapper*)obj);
       else
         CsPrintf (MSG_CONSOLE, "Can't find mesh with that name!\n");
     }
@@ -1785,8 +1784,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (width < 1) width = 3;
     extern void add_skeleton_tree (csSector* where, csVector3 const& pos,
     	int depth, int width);
-    add_skeleton_tree (Sys->view->GetCamera ()->GetSector (),
-    	Sys->view->GetCamera ()->GetOrigin (), depth, width);
+    add_skeleton_tree (Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (),
+    	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), depth, width);
   }
   else if (!strcasecmp (cmd, "addghost"))
   {
@@ -1796,8 +1795,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     else { depth = 5; width = 8; }
     extern void add_skeleton_ghost (csSector* where, csVector3 const& pos,
     	int maxdepth, int width);
-    add_skeleton_ghost (Sys->view->GetCamera ()->GetSector (),
-    	Sys->view->GetCamera ()->GetOrigin (), depth, width);
+    add_skeleton_ghost (Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (),
+    	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), depth, width);
   }
   else if (!strcasecmp (cmd, "addbot"))
   {
@@ -1806,8 +1805,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg) ScanStr (arg, "%f", &radius);
     extern void add_bot (float size, csSector* where, csVector3 const& pos,
 	float dyn_radius);
-    add_bot (2, Sys->view->GetCamera ()->GetSector (),
-    	Sys->view->GetCamera ()->GetOrigin (), radius);
+    add_bot (2, Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (),
+    	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), radius);
   }
   else if (!strcasecmp (cmd, "delbot"))
   {
@@ -1817,7 +1816,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "clrlights"))
   {
     RECORD_CMD (cmd);
-    csLightIt* lit = Sys->view->GetEngine ()->NewLightIterator ();
+    csLightIt* lit = Sys->view->GetEngine ()->GetCsEngine ()->NewLightIterator ();
     csLight* l;
     while ((l = lit->Fetch ()) != NULL)
     {
@@ -1841,7 +1840,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     RECORD_ARGS (cmd, arg);
     csVector3 dir (0,0,0);
-    csVector3 pos = Sys->view->GetCamera ()->Camera2World (dir);
+    csVector3 pos = Sys->view->GetCamera ()->GetTransform ().This2Other (dir);
     csDynLight* dyn;
 
     bool rnd;
@@ -1859,8 +1858,8 @@ bool CommandHandler (const char *cmd, const char *arg)
       dyn = new csDynLight (pos.x, pos.y, pos.z, 6, 1, 1, 1);
       rnd = true;
     }
-    Sys->view->GetEngine ()->AddDynLight (dyn);
-    dyn->SetSector (Sys->view->GetCamera ()->GetSector ());
+    Sys->view->GetEngine ()->GetCsEngine ()->AddDynLight (dyn);
+    dyn->SetSector (Sys->view->GetCamera ()->GetSector ()->GetPrivateObject ());
     dyn->Setup ();
     extern void AttachRandomLight (csDynLight* light);
     if (rnd)
@@ -1870,9 +1869,9 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "dellight"))
   {
     csDynLight* dyn;
-    if ((dyn = Sys->view->GetEngine ()->GetFirstDynLight ()) != NULL)
+    if ((dyn = Sys->view->GetEngine ()->GetCsEngine ()->GetFirstDynLight ()) != NULL)
     {
-      Sys->view->GetEngine ()->RemoveDynLight (dyn);
+      Sys->view->GetEngine ()->GetCsEngine ()->RemoveDynLight (dyn);
       delete dyn;
       Sys->Printf (MSG_CONSOLE, "Dynamic light deleted.\n");
     }
@@ -1881,9 +1880,9 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     RECORD_CMD (cmd);
     csDynLight* dyn;
-    while ((dyn = Sys->view->GetEngine ()->GetFirstDynLight ()) != NULL)
+    while ((dyn = Sys->view->GetEngine ()->GetCsEngine ()->GetFirstDynLight ()) != NULL)
     {
-      Sys->view->GetEngine ()->RemoveDynLight (dyn);
+      Sys->view->GetEngine ()->GetCsEngine ()->RemoveDynLight (dyn);
       delete dyn;
     }
     Sys->Printf (MSG_CONSOLE, "All dynamic lights deleted.\n");

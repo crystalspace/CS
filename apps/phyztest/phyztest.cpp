@@ -99,8 +99,8 @@ csMeshWrapper *add_test_mesh( csMeshFactoryWrapper *tmpl, csSector *aroom, csVie
 {
   csMeshWrapper *tsprt;
   
-  tsprt = tmpl->NewMeshObject (view->GetEngine ());
-  view->GetEngine ()->meshes.Push (tsprt);
+  tsprt = tmpl->NewMeshObject (view->GetEngine ()->GetCsEngine ());
+  view->GetEngine ()->GetCsEngine ()->meshes.Push (tsprt);
   tsprt->GetMovable ().SetSector (aroom);
   csXScaleMatrix3 m (2);
   tsprt->GetMovable ().SetTransform (m);
@@ -303,8 +303,8 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   // manually creating a camera and a clipper but it makes things a little
   // easier.
   view = new csView (engine, G3D);
-  view->SetSector (room);
-  view->GetCamera ()->SetPosition (csVector3 (0, 0, -4));
+  view->GetCamera ()->SetSector (&room->scfiSector);
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -4));
   view->SetRectangle (2, 2, FrameWidth - 4, FrameHeight - 4);
 
   txtmgr->SetPalette ();
@@ -326,13 +326,13 @@ void Phyztest::NextFrame ()
   float speed = (elapsed_time / 1000.) * (0.03 * 20);
 
   if (GetKeyState (CSKEY_RIGHT))
-    view->GetCamera ()->RotateThis (VEC_ROT_RIGHT, speed);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
   if (GetKeyState (CSKEY_LEFT))
-    view->GetCamera ()->RotateThis (VEC_ROT_LEFT, speed);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
   if (GetKeyState (CSKEY_PGUP))
-    view->GetCamera ()->RotateThis (VEC_TILT_UP, speed);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_UP, speed);
   if (GetKeyState (CSKEY_PGDN))
-    view->GetCamera ()->RotateThis (VEC_TILT_DOWN, speed);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
   if (GetKeyState (CSKEY_UP))
     view->GetCamera ()->Move (VEC_FORWARD * 4.0f * speed);
   if (GetKeyState (CSKEY_DOWN))
@@ -345,7 +345,7 @@ void Phyztest::NextFrame ()
     // use box template
 
     csMeshFactoryWrapper* bxtmpl = (csMeshFactoryWrapper*)
-      view->GetEngine ()->mesh_factories.FindByName ("box");
+      view->GetEngine ()->GetCsEngine ()->mesh_factories.FindByName ("box");
     if (!bxtmpl)
     {  
       Printf (MSG_INITIALIZATION, "couldn't load template 'box'\n");
@@ -404,15 +404,15 @@ void Phyztest::NextFrame ()
     {
       // add a mesh
       csMeshFactoryWrapper* tmpl = (csMeshFactoryWrapper*)
-	view->GetEngine ()->mesh_factories.FindByName ("box");
+	view->GetEngine ()->GetCsEngine ()->mesh_factories.FindByName ("box");
       if (!tmpl)
       {     
 	Printf (MSG_INITIALIZATION, "couldn't load template 'bot'\n");
 	return;
       }
 
-      bot = tmpl->NewMeshObject (view->GetEngine ());
-      view->GetEngine ()->meshes.Push (bot);
+      bot = tmpl->NewMeshObject (view->GetEngine ()->GetCsEngine ());
+      view->GetEngine ()->GetCsEngine ()->meshes.Push (bot);
       bot->GetMovable ().SetSector (room);
       iSprite3DState* state = QUERY_INTERFACE (bot->GetMeshObject (), iSprite3DState);
       state->SetAction ("default");

@@ -22,10 +22,11 @@
 
 #include "csutil/scf.h"
 
-SCF_VERSION (iView, 0, 0, 2);
+SCF_VERSION (iView, 0, 1, 0);
 
 struct iCamera;
-struct iSector;
+struct iEngine;
+struct iGraphics3D;
 
 /**
  * The iView class encapsulates the top-level Crystal Space
@@ -33,19 +34,34 @@ struct iSector;
  */
 struct iView : public iBase
 {
-  /// Set sector for this view.
-  virtual void SetSector (iSector* sector) = 0;
+  /// Get engine handle.
+  virtual iEngine* GetEngine () = 0;
+  /// Set engine handle.
+  virtual void SetEngine (iEngine* e) = 0;
+
   /// Get current camera.
   virtual iCamera* GetCamera () = 0;
   /// Set current camera.
   virtual void SetCamera (iCamera* c) = 0;
-  /// Clear clipping polygon.
-  virtual void ClearView () = 0;
+
+  /// Get Context
+  virtual iGraphics3D* GetContext () = 0;
+  /// Set Context
+  virtual void SetContext (iGraphics3D *ig3d) = 0;
+
   /// Set clipping rectangle.
   virtual void SetRectangle (int x, int y, int w, int h) = 0;
+  /// Clear clipper in order to start building a polygon-based clipper.
+  virtual void ClearView () = 0;
+  /// Add a vertex to clipping polygon (non-rectangular clipping).
+  virtual void AddViewVertex (int x, int y) = 0;
+  /// Clip the view clipper to the screen boundaries
+  virtual void RestrictClipperToScreen () = 0;
+
+  /// Update the Clipper. This is usually called from Draw.
+  virtual void UpdateClipper() = 0;
   /// Draw 3D world as seen from the camera.
   virtual void Draw () = 0;
 };
 
 #endif
-

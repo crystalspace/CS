@@ -1763,6 +1763,12 @@ iRegion* csEngine::GetCurrentRegion ()
   return region ? &region->scfiRegion : NULL;
 }
 
+iRegion* csEngine::FindRegion (const char *name)
+{
+  csRegion *r = (csRegion*)regions.FindByName (name);
+  return r ? &r->scfiRegion : NULL;
+}
+
 void csEngine::AddToCurrentRegion (csObject* obj)
 {
   if (region)
@@ -2351,6 +2357,17 @@ iMeshWrapper* csEngine::CreateMeshObject (const char* name)
   return &meshwrap->scfiMeshWrapper;
 }
 
+int csEngine::GetNumMeshObjects ()
+{
+  return meshes.Length ();
+}
+
+iMeshWrapper *csEngine::GetMeshObject (int n)
+{
+  return &((csMeshWrapper*)meshes.Get(n))->scfiMeshWrapper;
+}
+
+
 iTerrainFactoryWrapper* csEngine::CreateTerrainFactory (const char* pClassId,
 	const char* pName)
 {
@@ -2412,8 +2429,9 @@ iTerrainFactoryWrapper* csEngine::CreateTerrainFactory(const char* pName)
   return &fwrap->scfiTerrainFactoryWrapper;
 }
 
-iTerrainWrapper* csEngine::CreateTerrainObject (iTerrainFactoryWrapper* pFactWrap,
-  	const char *pName, iSector *iSector)
+iTerrainWrapper* csEngine::CreateTerrainObject (
+	iTerrainFactoryWrapper* pFactWrap, const char *pName,
+	iSector *iSector)
 {
   iTerrainObjectFactory *iTObjFact = pFactWrap->GetTerrainObjectFactory ();
   iTerrainObject *iTerrObj = iTObjFact->NewInstance ();
@@ -2431,7 +2449,8 @@ iTerrainWrapper* csEngine::CreateTerrainObject (iTerrainObject *terr,
   terrains.Push (twrap);
 
   // add new terrain to sector
-  iSector->AddTerrain (&twrap->scfiTerrainWrapper);
+  if (iSector)
+    iSector->AddTerrain (&twrap->scfiTerrainWrapper);
 
   return &twrap->scfiTerrainWrapper;
 }

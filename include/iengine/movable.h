@@ -146,7 +146,7 @@ struct iMovable : public iBase
   /**
    * Relative transform.
    */
-  virtual void Transform (csMatrix3& matrix) = 0;
+  virtual void Transform (const csMatrix3& matrix) = 0;
 
   /**
    * Add a listener to this movable. This listener will be called whenever

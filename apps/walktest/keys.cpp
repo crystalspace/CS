@@ -457,22 +457,22 @@ void WalkTest::imm_rot_left_camera (float speed, bool slow, bool fast)
   if (map_mode == MAP_TXT) { wf->KeyLeftStrafe (speed, slow, fast); return; }
   if (map_mode) { wf->KeyLeft (speed, slow, fast); return; }
   if (slow)
-    view->GetCamera ()->RotateThis (VEC_ROT_LEFT, speed * .01);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_LEFT, speed * .01);
   else if (fast)
-    view->GetCamera ()->RotateThis (VEC_ROT_LEFT, speed * .4);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_LEFT, speed * .4);
   else
-    view->GetCamera ()->RotateThis (VEC_ROT_LEFT, speed * .2);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_LEFT, speed * .2);
 }
 
 void WalkTest::imm_rot_left_world (float speed, bool slow, bool fast)
 {
   if (map_mode) return;
   if (slow)
-    view->GetCamera ()->RotateOther (VEC_ROT_LEFT, speed * .01);
+    view->GetCamera ()->GetTransform ().RotateOther (VEC_ROT_LEFT, speed * .01);
   else if (fast)
-    view->GetCamera ()->RotateOther (VEC_ROT_LEFT, speed * .4);
+    view->GetCamera ()->GetTransform ().RotateOther (VEC_ROT_LEFT, speed * .4);
   else
-    view->GetCamera ()->RotateOther (VEC_ROT_LEFT, speed * .2);
+    view->GetCamera ()->GetTransform ().RotateOther (VEC_ROT_LEFT, speed * .2);
 }
 
 void WalkTest::imm_rot_right_camera (float speed, bool slow, bool fast)
@@ -480,66 +480,66 @@ void WalkTest::imm_rot_right_camera (float speed, bool slow, bool fast)
   if (map_mode == MAP_TXT) { wf->KeyRightStrafe (speed, slow, fast); return; }
   if (map_mode) { wf->KeyRight (speed, slow, fast); return; }
   if (slow)
-    view->GetCamera ()->RotateThis (VEC_ROT_RIGHT, speed * .01);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed * .01);
   else if (fast)
-    view->GetCamera ()->RotateThis (VEC_ROT_RIGHT, speed * .4);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed * .4);
   else
-    view->GetCamera ()->RotateThis (VEC_ROT_RIGHT, speed * .2);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed * .2);
 }
 
 void WalkTest::imm_rot_right_world (float speed, bool slow, bool fast)
 {
   if (map_mode) return;
   if (slow)
-    view->GetCamera ()->RotateOther (VEC_ROT_RIGHT, speed * .01);
+    view->GetCamera ()->GetTransform ().RotateOther (VEC_ROT_RIGHT, speed * .01);
   else if (fast)
-    view->GetCamera ()->RotateOther (VEC_ROT_RIGHT, speed * .4);
+    view->GetCamera ()->GetTransform ().RotateOther (VEC_ROT_RIGHT, speed * .4);
   else
-    view->GetCamera ()->RotateOther (VEC_ROT_RIGHT, speed * .2);
+    view->GetCamera ()->GetTransform ().RotateOther (VEC_ROT_RIGHT, speed * .2);
 }
 
 void WalkTest::imm_rot_left_xaxis (float speed, bool slow, bool fast)
 {
   if (map_mode) { wf->KeyPgDn (speed, slow, fast); return; }
   if (slow)
-    view->GetCamera ()->RotateThis (VEC_TILT_DOWN, speed * .01);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_DOWN, speed * .01);
   else if (fast)
-    view->GetCamera ()->RotateThis (VEC_TILT_DOWN, speed * .4);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_DOWN, speed * .4);
   else
-    view->GetCamera ()->RotateThis (VEC_TILT_DOWN, speed * .2);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_DOWN, speed * .2);
 }
 
 void WalkTest::imm_rot_right_xaxis (float speed, bool slow, bool fast)
 {
   if (map_mode) { wf->KeyPgUp (speed, slow, fast); return; }
   if (slow)
-    view->GetCamera ()->RotateThis (VEC_TILT_UP, speed * .01);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_UP, speed * .01);
   else if (fast)
-    view->GetCamera ()->RotateThis (VEC_TILT_UP, speed * .4);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_UP, speed * .4);
   else
-    view->GetCamera ()->RotateThis (VEC_TILT_UP, speed * .2);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_UP, speed * .2);
 }
 
 void WalkTest::imm_rot_left_zaxis (float speed, bool slow, bool fast)
 {
   if (map_mode) return;
   if (slow)
-    view->GetCamera ()->RotateThis (VEC_TILT_LEFT, speed * .01);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_LEFT, speed * .01);
   else if (fast)
-    view->GetCamera ()->RotateThis (VEC_TILT_LEFT, speed * .4);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_LEFT, speed * .4);
   else
-    view->GetCamera ()->RotateThis (VEC_TILT_LEFT, speed * .2);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_LEFT, speed * .2);
 }
 
 void WalkTest::imm_rot_right_zaxis (float speed, bool slow, bool fast)
 {
   if (map_mode) return;
   if (slow)
-    view->GetCamera ()->RotateThis (VEC_TILT_RIGHT, speed * .01);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_RIGHT, speed * .01);
   else if (fast)
-    view->GetCamera ()->RotateThis (VEC_TILT_RIGHT, speed * .4);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_RIGHT, speed * .4);
   else
-    view->GetCamera ()->RotateThis (VEC_TILT_RIGHT, speed * .2);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_RIGHT, speed * .2);
 }
 
 void WalkTest::eatkeypress (iEvent &Event)
@@ -611,15 +611,15 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
   csVector2 p (Event.Mouse.x, FRAME_HEIGHT-Event.Mouse.y);
 
   view->GetCamera ()->InvPerspective (p, 1, v);
-  csVector3 vw = view->GetCamera ()->Camera2World (v);
+  csVector3 vw = view->GetCamera ()->GetTransform ().This2Other (v);
 
-  csSector* sector = view->GetCamera ()->GetSector ();
-  csVector3 origin = view->GetCamera ()->GetW2CTranslation ();
+  csSector* sector = view->GetCamera ()->GetSector ()->GetPrivateObject ();
+  csVector3 origin = view->GetCamera ()->GetTransform ().GetO2TTranslation ();
   csVector3 isect;
   csPolygon3D* sel = sector->HitBeam (origin, origin + (vw-origin) * 20, isect);
 
   vw = isect;
-  v = view->GetCamera ()->World2Camera (vw);
+  v = view->GetCamera ()->GetTransform ().Other2This (vw);
   Sys->Printf (MSG_CONSOLE, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);
   Sys->Printf (MSG_DEBUG_0, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);
 
@@ -641,7 +641,7 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
   extern bool check_light;
   extern void select_object (csRenderView* rview, int type, void* entity);
   check_light = true;
-  view->GetEngine ()->DrawFunc (view->GetCamera (), view->GetClipper (), select_object);
+  view->GetEngine ()->GetCsEngine ()->DrawFunc (view->GetCamera ()->GetPrivateObject (), view->GetClipper (), select_object);
 }
 
 // right mouse button
@@ -652,7 +652,7 @@ void WalkTest::MouseClick3Handler(iEvent &Event)
 
   screenPoint.x = Event.Mouse.x;
   screenPoint.y = Event.Mouse.y;
-  closestMesh = FindNextClosestMesh (NULL, view->GetCamera(), &screenPoint);
+  closestMesh = FindNextClosestMesh (NULL, view->GetCamera()->GetPrivateObject (), &screenPoint);
   if (closestMesh)
     Sys->Printf (MSG_CONSOLE, "Selected mesh %s\n", closestMesh->GetName ());
   else

@@ -26,10 +26,9 @@
 #include "iengine/view.h"
 
 class csPolygon2D;
-class csCamera;
-class csEngine;
-class csSector;
 class csClipper;
+struct iCamera;
+struct iEngine;
 struct iGraphics3D;
 struct iCamera;
 
@@ -37,96 +36,68 @@ struct iCamera;
  * The csView class encapsulates the top-level Crystal Space
  * renderer interface. It is basicly a camera and a clipper.
  */
-class csView : public csBase, public iBase
+class csView : public iView
 {
 private:
-  // csClipper.
-  csClipper* clipper;
-  //
+  /// the engine
+  iEngine *Engine;
+  /// rendering context
   iGraphics3D* G3D;
+  /// context size at the time the clipper was created
+  int OldWidth, OldHeight;
 
-  int orig_width, orig_height;
+  /// the camera
+  iCamera* Camera;
 
-  // Clipping rectangle.
-  csBox2 *bview;
-  // Clipping region.
-  csPolygon2D *pview;
+  /// Rect clipping region (NULL if this is a polygon-based clipper)
+  csBox2 *RectView;
+  /// Poly clipping region (NULL if this is a rectangular clipper)
+  csPolygon2D *PolyView;
+  /// The prepared clipper
+  csClipper* Clipper;
 
-  // csCamera.
-  csCamera *camera;
-  // iCamera.
-  iCamera* icamera;
-  // Engine handle.
-  csEngine *engine;
-
-  /// Update view on context rescale or change (automatic)
+  /// Rescale the clipper to deal with a context resize
   void UpdateView ();
 
 public:
   /// Constructor.
-  csView (csEngine *iEngine, iGraphics3D* ig3d);
+  csView (iEngine *iEngine, iGraphics3D* ig3d);
   /// Destructor.
   ~csView ();
 
   /// Get engine handle.
-  csEngine* GetEngine () { return engine; }
+  virtual iEngine* GetEngine ();
   /// Set engine handle.
-  void SetEngine (csEngine* e) { engine = e; }
-  /// Get current camera.
-  csCamera* GetCamera () { return camera; }
-  /// Set current camera.
-  void SetCamera (csCamera* c);
+  virtual void SetEngine (iEngine* e);
 
-  /// Clear clipping polygon.
-  virtual void ClearView ();
+  /// Get current camera.
+  virtual iCamera* GetCamera ();
+  /// Set current camera.
+  virtual void SetCamera (iCamera* c);
+
+  /// Get Context
+  virtual iGraphics3D* GetContext ();
+  /// Set Context
+  virtual void SetContext (iGraphics3D *ig3d);
+
   /// Set clipping rectangle.
   virtual void SetRectangle (int x, int y, int w, int h);
-  /// Set Context
-  void SetContext (iGraphics3D *ig3d);
+  /// Clear clipper in order to start building a polygon-based clipper.
+  virtual void ClearView ();
   /// Add a vertex to clipping polygon (non-rectangular clipping).
-  void AddViewVertex (int x, int y);
+  virtual void AddViewVertex (int x, int y);
+  /// Clip the view clipper to the screen boundaries
+  virtual void RestrictClipperToScreen ();
+
   /// Update the Clipper. This is usually called from Draw.
-  void UpdateClipper();
+  virtual void UpdateClipper();
   /// Draw 3D world as seen from the camera.
-  void Draw ();
-  /// Set sector for the current camera.
-  void SetSector (csSector *sector);
+  virtual void Draw ();
 
   /// Return the clipper.
-  csClipper* GetClipper () { return clipper; }
-
-  /**
-   * Change the shift for perspective correction.
-   */
-  void SetPerspectiveCenter (float x, float y);
+  csClipper* GetClipper ();
 
   DECLARE_IBASE;
-
-  //------------------------- iView implementation -----------------------//
-  class View : public iView
-  {
-  public:
-    DECLARE_EMBEDDED_IBASE (csView);
-    virtual void SetSector (iSector* sector);
-    virtual iCamera* GetCamera ()
-    {
-      return scfParent->icamera;
-    }
-    virtual void SetCamera (iCamera* c);
-    virtual void ClearView ()
-    {
-      scfParent->ClearView ();
-    }
-    virtual void SetRectangle (int x, int y, int w, int h)
-    {
-      scfParent->SetRectangle (x, y, w, h);
-    }
-    virtual void Draw ()
-    {
-      scfParent->Draw ();
-    }
-  } scfiView;
-  friend class View;
 };
 
 #endif // __CS_CSVIEW_H__

@@ -431,8 +431,8 @@ void WalkTest::MoveSystems (cs_time elapsed_time, cs_time current_time)
     {
       extern void add_bot (float size, csSector* where, csVector3 const& pos,
 	                        float dyn_radius);
-      add_bot (2, view->GetCamera ()->GetSector (),
-               view->GetCamera ()->GetOrigin (), 0);
+      add_bot (2, view->GetCamera ()->GetSector ()->GetPrivateObject (),
+               view->GetCamera ()->GetTransform ().GetOrigin (), 0);
       next_bot_at = current_time+1000*10;
     }
   }
@@ -461,8 +461,8 @@ void WalkTest::MoveSystems (cs_time elapsed_time, cs_time current_time)
       if(sndListener)
       {
         // take position/direction from view->GetCamera ()
-        csVector3 v = view->GetCamera ()->GetOrigin ();
-        csMatrix3 m = view->GetCamera ()->GetC2W();
+        csVector3 v = view->GetCamera ()->GetTransform ().GetOrigin ();
+        csMatrix3 m = view->GetCamera ()->GetTransform ().GetT2O();
         csVector3 f = m.Col3();
         csVector3 t = m.Col2();
         sndListener->SetPosition(v);
@@ -501,12 +501,12 @@ void WalkTest::DrawFrameDebug ()
   extern void draw_edges (csRenderView*, int, void*);
   if (do_edges)
   {
-    view->GetEngine ()->DrawFunc (view->GetCamera (), view->GetClipper (),
-    	draw_edges);
+    view->GetEngine ()->GetCsEngine ()->DrawFunc (view->GetCamera ()->
+      GetPrivateObject (), view->GetClipper (), draw_edges);
   }
   if (selected_polygon || selected_light)
-    view->GetEngine ()->DrawFunc (view->GetCamera (), view->GetClipper (),
-	draw_edges, (void*)1);
+    view->GetEngine ()->GetCsEngine ()->DrawFunc (view->GetCamera ()->
+      GetPrivateObject (), view->GetClipper (), draw_edges, (void*)1);
   if (do_light_frust && selected_light)
   {
     extern void show_frustum (csFrustumView*, int, void*);
@@ -521,12 +521,12 @@ void WalkTest::DrawFrameDebug ()
   {
     extern void ShowCheckFrustum (csView* view, csSector* room,
     	const csVector3& pos, int num_vis);
-    ShowCheckFrustum (view, view->GetCamera ()->GetSector (),
-    	view->GetCamera ()->GetOrigin (), cfg_debug_check_frustum);
+    ShowCheckFrustum (view, view->GetCamera ()->GetSector ()->GetPrivateObject (),
+    	view->GetCamera ()->GetTransform ().GetOrigin (), cfg_debug_check_frustum);
   }
   if (do_show_cbuffer)
   {
-    csCBuffer* cbuf = view->GetEngine ()->GetCBuffer ();
+    csCBuffer* cbuf = view->GetEngine ()->GetCsEngine ()->GetCBuffer ();
     if (cbuf)
     {
       cbuf->GfxDump (Gfx2D, Gfx3D);
@@ -535,7 +535,7 @@ void WalkTest::DrawFrameDebug ()
   if (do_show_debug_boxes)
   {
     extern void DrawDebugBoxes (csCamera* cam, bool do3d);
-    DrawDebugBoxes (view->GetCamera (), false);
+    DrawDebugBoxes (view->GetCamera ()->GetPrivateObject (), false);
   }
 }
 
@@ -550,7 +550,7 @@ void WalkTest::DrawFrameExtraDebug ()
 #   else
     //covtree->MakeInvalid ();
     covtree->MakeEmpty ();
-    csCamera* c = view->GetCamera ();
+    csCamera* c = view->GetCamera ()->GetPrivateObject ();
     csPolygon2D poly1, poly2, poly3;
     poly1.AddPerspective (c->Other2This (csVector3 (-1.6, 1, 5)));
     poly1.AddPerspective (c->Other2This (csVector3 (1, 1.6, 5)));
@@ -587,7 +587,7 @@ void WalkTest::DrawFrameDebug3D ()
   if (do_show_debug_boxes)
   {
     extern void DrawDebugBoxes (csCamera* cam, bool do3d);
-    DrawDebugBoxes (view->GetCamera (), true);
+    DrawDebugBoxes (view->GetCamera ()->GetPrivateObject (), true);
   }
 }
 
@@ -633,10 +633,10 @@ void WalkTest::DrawFrameConsole ()
     {
       char buffer[100];
       sprintf (buffer, "%2.2f,%2.2f,%2.2f: %s",
-        view->GetCamera ()->GetW2CTranslation ().x,
-	view->GetCamera ()->GetW2CTranslation ().y,
-        view->GetCamera ()->GetW2CTranslation ().z,
-	view->GetCamera ()->GetSector()->GetName ());
+        view->GetCamera ()->GetTransform ().GetO2TTranslation ().x,
+	view->GetCamera ()->GetTransform ().GetO2TTranslation ().y,
+        view->GetCamera ()->GetTransform ().GetO2TTranslation ().z,
+	view->GetCamera ()->GetSector()->QueryObject ()->GetName ());
       GfxWrite (FRAME_WIDTH - 24 * 8 - 1, FRAME_HEIGHT - fh - 3, 0, -1, buffer);
       GfxWrite (FRAME_WIDTH - 24 * 8, FRAME_HEIGHT - fh - 2, fgcolor_stats, -1, buffer);
     }
@@ -888,7 +888,7 @@ void WalkTest::DrawFrame (cs_time elapsed_time, cs_time current_time)
     {
       // @@@ Memory leak!
       csRecordedCamera* reccam = new csRecordedCamera ();
-      csCamera* c = view->GetCamera ();
+      csCamera* c = view->GetCamera ()->GetPrivateObject ();
       const csMatrix3& m = c->GetO2T ();
       const csVector3& v = c->GetOrigin ();
       reccam->mat = m;
@@ -920,7 +920,7 @@ void WalkTest::DrawFrame (cs_time elapsed_time, cs_time current_time)
 		       recorded_perf_stats_name);
 	}
       }
-      csCamera* c = view->GetCamera ();
+      csCamera* c = view->GetCamera ()->GetPrivateObject ();
       Sys->angle = reccam->angle;
       c->SetSector (reccam->sector);
       c->SetMirrored (reccam->mirror);
@@ -1016,13 +1016,13 @@ void WalkTest::PrepareFrame (cs_time elapsed_time, cs_time current_time)
       }
       else
       {
-        view->GetCamera ()->SetT2O (csMatrix3 ());
-        view->GetCamera ()->RotateOther (csVector3 (0,1,0), angle.y);
+        view->GetCamera ()->GetTransform ().SetT2O (csMatrix3 ());
+        view->GetCamera ()->GetTransform ().RotateOther (csVector3 (0,1,0), angle.y);
         if (!do_gravity)
-          view->GetCamera ()->RotateThis (csVector3 (1,0,0), angle.x);
+          view->GetCamera ()->GetTransform ().RotateThis (csVector3 (1,0,0), angle.x);
       }
 
-      csVector3 vel = view->GetCamera ()->GetT2O ()*velocity;
+      csVector3 vel = view->GetCamera ()->GetTransform ().GetT2O ()*velocity;
 
       static bool check_once = false;
       if (ABS (vel.x) < SMALL_EPSILON && ABS (vel.y) < SMALL_EPSILON && ABS (vel.z) < SMALL_EPSILON)
@@ -1036,7 +1036,7 @@ void WalkTest::PrepareFrame (cs_time elapsed_time, cs_time current_time)
       else { check_once = false; DoGravity (pos, vel); }
 
       if (do_gravity && !move_3d)
-        view->GetCamera ()->RotateThis (csVector3 (1,0,0), angle.x);
+        view->GetCamera ()->GetTransform ().RotateThis (csVector3 (1,0,0), angle.x);
 
       // Apply angle velocity to camera angle
       angle += angle_velocity;
@@ -1137,7 +1137,7 @@ void debug_dump ()
   if (Sys->VFS)
     SaveCamera (Sys->VFS, "/temp/walktest.bug");
   Sys->Printf (MSG_DEBUG_0, "Camera saved in /temp/walktest.bug\n");
-  Dumper::dump (Sys->view->GetCamera ());
+  Dumper::dump (Sys->view->GetCamera ()->GetPrivateObject ());
   Sys->Printf (MSG_DEBUG_0, "Camera dumped in debug.txt\n");
   Dumper::dump (Sys->engine);
   Sys->Printf (MSG_DEBUG_0, "Engine dumped in debug.txt\n");
@@ -1382,7 +1382,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   }
 
   // Initialize the command processor with the engine and camera.
-  csCommandProcessor::Initialize (engine, view->GetCamera (), Gfx3D, System->Console, System);
+  csCommandProcessor::Initialize (engine,
+    view->GetCamera ()->GetPrivateObject (), Gfx3D,
+    System->Console, System);
 
   // Now we have two choices. Either we create an infinite
   // maze (random). This happens when the '-infinite' commandline
@@ -1515,7 +1517,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     if (cp)
     {
       room_name = cp->Sector;
-      if (!cp->Load (*view->GetCamera (), engine))
+      if (!cp->Load (*view->GetCamera ()->GetPrivateObject (), engine))
         room_name = "room";
     }
     else
@@ -1582,7 +1584,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   if (Console) Console->Clear ();
 
   // Initialize our 3D view.
-  view->SetSector (room);
+  view->GetCamera ()->SetSector (&room->scfiSector);
   // We use the width and height from the 3D renderer because this
   // can be different from the frame size (rendering in less res than
   // real window for example).

@@ -107,7 +107,7 @@ void show_frustum (csFrustumView* lview, int type, void* /*entity*/)
 
   if (type == CALLBACK_POLYGON)
   {
-    csCamera* cam = Sys->view->GetCamera ();
+    csCamera* cam = Sys->view->GetCamera ()->GetPrivateObject ();
     csFrustumContext* ctxt = lview->GetFrustumContext ();
     csFrustum* fr = ctxt->GetLightFrustum ();
     csVector3 v0, v1, v2;
@@ -780,7 +780,7 @@ void DrawOctreeBoxes (csOctreeNode* node,
   if (draw_level != -1 && level > draw_level) return;
   if (level == draw_level || (draw_level == -1 && node->IsLeaf ()))
   {
-    csCamera* cam = Sys->view->GetCamera ();
+    csCamera* cam = Sys->view->GetCamera ()->GetPrivateObject ();
     const csBox3& box = node->GetBox ();
     DrawLineDepth (cam->Other2This (box.GetCorner (0)),
   		   cam->Other2This (box.GetCorner (1)), cam->GetFOV ());
@@ -1005,7 +1005,7 @@ void ShowCheckFrustum (csView* view,
   ctxt->SetLightFrustum (new csFrustum (pos));
   ctxt->GetLightFrustum ()->MakeInfinite ();
   room->CheckFrustum ((iFrustumView*)&lview);
-  view->GetEngine ()->DrawFunc (view->GetCamera (), view->GetClipper (),
-    	draw_frust_edges);
+  view->GetEngine ()->GetCsEngine ()->DrawFunc (view->GetCamera ()->
+    GetPrivateObject (), view->GetClipper (), draw_frust_edges);
 }
 

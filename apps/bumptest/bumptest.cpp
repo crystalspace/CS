@@ -447,7 +447,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   // manually creating a camera and a clipper but it makes things a little
   // easier.
   view = engine->CreateView (G3D);
-  view->SetSector (room);
+  view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   view->SetRectangle (0, 0, FrameWidth, FrameHeight);
 

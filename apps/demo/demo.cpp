@@ -782,7 +782,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
   Printf (MSG_INITIALIZATION, "--------------------------------------\n");
 
   view = engine->CreateView (G3D);
-  view->SetSector (room);
+  view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -900));
   view->GetCamera ()->GetTransform ().RotateThis (csVector3 (0, 1, 0), .8);
   view->SetRectangle (0, 0, FrameWidth, FrameHeight);

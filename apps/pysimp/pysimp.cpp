@@ -153,8 +153,8 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   // manually creating a camera and a clipper but it makes things a little
   // easier.
   view = new csView (engine, G3D);
-  view->SetSector((csSector*)engine->sectors[0]);
-  view->GetCamera()->SetPosition (csVector3 (0, 2, 0));
+  view->GetCamera ()->SetSector(&((csSector*)engine->sectors[0])->scfiSector);
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 2, 0));
   view->SetRectangle (2, 2, FrameWidth - 4, FrameHeight - 4);
 
   txtmgr->SetPalette ();
@@ -171,13 +171,13 @@ void PySimple::NextFrame ()
   float speed = (elapsed_time / 1000.) * (0.03 * 20);
 
   if (GetKeyState (CSKEY_RIGHT))
-    view->GetCamera ()->RotateThis (VEC_ROT_RIGHT, speed);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
   if (GetKeyState (CSKEY_LEFT))
-    view->GetCamera ()->RotateThis (VEC_ROT_LEFT, speed);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
   if (GetKeyState (CSKEY_PGUP))
-    view->GetCamera ()->RotateThis (VEC_TILT_UP, speed);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_UP, speed);
   if (GetKeyState (CSKEY_PGDN))
-    view->GetCamera ()->RotateThis (VEC_TILT_DOWN, speed);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
   if (GetKeyState (CSKEY_UP))
     view->GetCamera ()->Move (VEC_FORWARD * 4 * speed);
   if (GetKeyState (CSKEY_DOWN))

@@ -1079,6 +1079,9 @@ public:
    */
   virtual iRegion* GetCurrentRegion ();
 
+  /// find a region by name
+  virtual iRegion* FindRegion (const char *name);
+
   /**
    * Create or select a new object library (name can be NULL for engine).
    * All new objects will be marked as belonging to this library.
@@ -1180,10 +1183,12 @@ public:
 
   /// Create a mesh wrapper from a mesh factory wrapper
   virtual iMeshWrapper* CreateMeshObject (iMeshFactoryWrapper* factory,
-  	const char* name, iSector* sector, const csVector3& pos);
+  	const char* name, iSector* sector = NULL,
+	const csVector3& pos = csVector3(0, 0, 0));
   /// Create a mesh wrapper for an existing mesh object
   virtual iMeshWrapper* CreateMeshObject (iMeshObject*,
-  	const char* name, iSector* sector, const csVector3& pos);
+  	const char* name, iSector* sector = NULL,
+	const csVector3& pos = csVector3(0, 0, 0));
   /// Create an uninitialized mesh wrapper
   virtual iMeshWrapper* CreateMeshObject (const char* name);
   /// Load mesh object.
@@ -1191,6 +1196,11 @@ public:
   	const char* classId, const char* name,
 	const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos);
+
+  /// return the number of mesh objects
+  virtual int GetNumMeshObjects ();
+  /// return a mesh object by index
+  virtual iMeshWrapper *GetMeshObject (int n);
 
   /// Create a terrain factory wrapper from a terrain plugin
   virtual iTerrainFactoryWrapper* CreateTerrainFactory (const char* pClassId,

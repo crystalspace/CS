@@ -251,7 +251,7 @@ int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
 
 void DoGravity (csVector3& pos, csVector3& vel)
 {
-  pos=Sys->view->GetCamera ()->GetOrigin ();
+  pos=Sys->view->GetCamera ()->GetTransform ().GetOrigin ();
 
   csVector3 new_pos = pos+vel;
   csMatrix3 m;
@@ -259,7 +259,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
 
   csSector *n[MAXSECTORSOCCUPIED];
   int num_sectors = FindSectors (new_pos, 4.0f*Sys->body_radius,
-    Sys->view->GetCamera()->GetSector(), n);
+    Sys->view->GetCamera()->GetSector()->GetPrivateObject (), n);
 
   num_our_cd = 0;
   Sys->collide_system->SetOneHitOnly (false);
@@ -310,7 +310,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
     test = csOrthoTransform (csMatrix3(), new_pos);
 
     num_sectors = FindSectors (new_pos, 4.0f*Sys->legs_radius, 
-		Sys->view->GetCamera()->GetSector(), n);
+		Sys->view->GetCamera()->GetSector()->GetPrivateObject (), n);
 
     num_our_cd = 0;
     Sys->collide_system->SetOneHitOnly (false);
@@ -364,9 +364,9 @@ void DoGravity (csVector3& pos, csVector3& vel)
       Sys->on_ground = true;
     }
   }
-  new_pos -= Sys->view->GetCamera ()->GetOrigin ();
+  new_pos -= Sys->view->GetCamera ()->GetTransform ().GetOrigin ();
   Sys->view->GetCamera ()->MoveWorld (new_pos);
-  Sys->velocity = Sys->view->GetCamera ()->GetO2T ()*vel;
+  Sys->velocity = Sys->view->GetCamera ()->GetTransform ().GetO2T ()*vel;
 
   if(!Sys->do_gravity)
     Sys->velocity.y -= SIGN (Sys->velocity.y) * MIN (0.017, ABS (Sys->velocity.y));
