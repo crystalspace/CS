@@ -146,7 +146,7 @@ public:
  * The world! This class basicly represents the 3D engine.
  * It is the main anchor class for working with Crystal Space.
  */
-class csWorld : public csObject, IWorld
+class csWorld : public csObject
 {
   friend class Dumper;
 
