@@ -92,6 +92,7 @@ PLUGINS.DYNAMIC += video/loader/wal
 #PLUGINS.DYNAMIC += video/loader/jng
 PLUGINS.DYNAMIC += net/driver/socket
 PLUGINS.DYNAMIC += net/driver/ensocket
+PLUGINS.DYNAMIC += net/netman
 PLUGINS.DYNAMIC += console/output/standard
 PLUGINS.DYNAMIC += console/output/fancy
 PLUGINS.DYNAMIC += mesh/impexp/ase

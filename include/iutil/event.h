@@ -32,7 +32,10 @@
 
 struct iEventHandler;
 
-SCF_VERSION (iEvent, 0, 0, 1);
+struct iNetworkSocket2;
+struct iNetworkPacket;
+
+SCF_VERSION (iEvent, 0, 0, 2);
 
 /**
  * This interface describes any system event.<p>
@@ -82,6 +85,11 @@ struct iEvent : public iBase
       uint Code;		// Command code
       void *Info;		// Command info
     } Command;
+    struct
+    {
+      iNetworkSocket2 *From;	// Socket data recieved on
+      iNetworkPacket *Data;	// Packet of data recieved
+    } Network;
   };
 };
 
