@@ -100,7 +100,7 @@ private:
   };
 
   csBasicVector shadowCache;
-
+  csReversibleTransform tr_o2c;
 #endif
   csGenmeshMeshObjectFactory* factory;
   iBase* logparent;
@@ -222,18 +222,18 @@ public:
   }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
 #ifdef CS_USE_NEW_RENDERER
-  virtual void EnableShadowCaps ()
-  { shadow_caps = true; }
-  virtual void DisableShadowCaps ()
-  { shadow_caps = false; }
+  // virtual void EnableShadowCaps ()
+  // { shadow_caps = true; }
+  // virtual void DisableShadowCaps ()
+  // { shadow_caps = false; }
 #endif
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
 #ifdef CS_USE_NEW_RENDERER
-  virtual bool DrawZ (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
-  virtual bool DrawShadow (iRenderView* rview, iMovable* movable, csZBufMode zbufMode, iLight *light);
-  virtual bool DrawLight (iRenderView* rview, iMovable* movable, csZBufMode zbufMode, iLight *light);
+  virtual csRenderMesh *GetRenderMesh (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
+  // virtual bool DrawShadow (iRenderView* rview, iMovable* movable, csZBufMode zbufMode, iLight *light);
+  // virtual bool DrawLight (iRenderView* rview, iMovable* movable, csZBufMode zbufMode, iLight *light);
 #endif // CS_USE_NEW_RENDERER
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {

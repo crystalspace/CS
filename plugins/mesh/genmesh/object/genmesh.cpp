@@ -189,10 +189,10 @@ char* csGenmeshMeshObject::GenerateCacheName ()
 
   csMemFile mf;
   mf.Write ("genmesh", 7);
-  int32 l;
-  l = convert_endian ((int32)factory->GetVertexCount ());
+  long l;
+  l = convert_endian (factory->GetVertexCount ());
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)factory->GetTriangleCount ());
+  l = convert_endian (factory->GetTriangleCount ());
   mf.Write ((char*)&l, 4);
 
   if (logparent)
@@ -209,46 +209,46 @@ char* csGenmeshMeshObject::GenerateCacheName ()
         mf.Write (sect->QueryObject ()->GetName (),
 		strlen (sect->QueryObject ()->GetName ()));
       csVector3 pos = movable->GetFullPosition ();
-      l = convert_endian ((int32)QInt ((pos.x * 1000)+.5));
+      l = convert_endian ((int)QInt ((pos.x * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((pos.y * 1000)+.5));
+      l = convert_endian ((int)QInt ((pos.y * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((pos.z * 1000)+.5));
+      l = convert_endian ((int)QInt ((pos.z * 1000)+.5));
       mf.Write ((char*)&l, 4);
       csReversibleTransform tr = movable->GetFullTransform ();
       const csMatrix3& o2t = tr.GetO2T ();
-      l = convert_endian ((int32)QInt ((o2t.m11 * 1000)+.5));
+      l = convert_endian ((int)QInt ((o2t.m11 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m12 * 1000)+.5));
+      l = convert_endian ((int)QInt ((o2t.m12 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m13 * 1000)+.5));
+      l = convert_endian ((int)QInt ((o2t.m13 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m21 * 1000)+.5));
+      l = convert_endian ((int)QInt ((o2t.m21 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m22 * 1000)+.5));
+      l = convert_endian ((int)QInt ((o2t.m22 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m23 * 1000)+.5));
+      l = convert_endian ((int)QInt ((o2t.m23 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m31 * 1000)+.5));
+      l = convert_endian ((int)QInt ((o2t.m31 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m32 * 1000)+.5));
+      l = convert_endian ((int)QInt ((o2t.m32 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m33 * 1000)+.5));
+      l = convert_endian ((int)QInt ((o2t.m33 * 1000)+.5));
       mf.Write ((char*)&l, 4);
     }
   }
 
-  l = convert_endian ((int32)QInt ((b.MinX () * 1000)+.5));
+  l = convert_endian ((int)QInt ((b.MinX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MinY () * 1000)+.5));
+  l = convert_endian ((int)QInt ((b.MinY () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MinZ () * 1000)+.5));
+  l = convert_endian ((int)QInt ((b.MinZ () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MaxX () * 1000)+.5));
+  l = convert_endian ((int)QInt ((b.MaxX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MaxY () * 1000)+.5));
+  l = convert_endian ((int)QInt ((b.MaxY () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MaxZ () * 1000)+.5));
+  l = convert_endian ((int)QInt ((b.MaxZ () * 1000)+.5));
   mf.Write ((char*)&l, 4);
 
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
@@ -468,7 +468,7 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   m.clip_z_plane = clip_z_plane;
   m.do_mirror = camera->IsMirrored ();
 #else
-  r3d->SetObjectToCamera (&tr_o2c);
+  mesh.transform = &tr_o2c;
   mesh.clip_portal = clip_portal;
   mesh.clip_plane = clip_plane;
   mesh.clip_z_plane = clip_z_plane;
@@ -692,11 +692,12 @@ bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* movable,
   g3d->DrawTriangleMesh (m);
   vbufmgr->UnlockBuffer (vbuf);
 #else
-  mesh.SetIndexRange (0, factory->GetTriangleCount () * 3);
-  mesh.SetMaterialHandle (mater->GetMaterialHandle ());
+  mesh.indexstart = 0;
+  mesh.indexend = factory->GetTriangleCount () * 3;
+  mesh.mathandle = mater->GetMaterialHandle ();
   csRef<iStreamSource> stream = SCF_QUERY_INTERFACE (factory, iStreamSource);
-  mesh.SetStreamSource (stream);
-  mesh.SetType (csRenderMesh::MESHTYPE_TRIANGLES);
+  mesh.streamsource = stream;
+  mesh.meshtype = CS_MESHTYPE_TRIANGLES;
   r3d->DrawMesh (&mesh);
 #endif
 
@@ -712,27 +713,51 @@ iRenderBuffer *csGenmeshMeshObject::GetBuffer (csStringID name)
   return factory->GetBuffer (name);
 }
 
-bool csGenmeshMeshObject::DrawZ (iRenderView* rview, iMovable* /*movable*/,
+csRenderMesh *csGenmeshMeshObject::GetRenderMesh (iRenderView* rview, iMovable* movable,
 	csZBufMode mode)
 {
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
-  iRender3D* r3d = rview->GetGraphics3D ();
+  // iRender3D* r3d = rview->GetGraphics3D ();
+
+  iCamera* camera = rview->GetCamera ();
+  tr_o2c = camera->GetTransform ();
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movable->GetFullTransform ();
+  if (hard_transform)
+    tr_o2c /= *hard_transform;
+
+  iMaterialWrapper* mater = material;
+  if (!mater) mater = factory->GetMaterialWrapper ();
+  if (!mater)
+  {
+    printf ("INTERNAL ERROR: mesh used without material!\n");
+    return false;
+  }
+
+  // iRender3D* r3d = rview->GetGraphics3D ();
+
+  mater->Visit ();
+  mesh.transform = &tr_o2c;
 
   // Prepare for rendering.
   mesh.z_buf_mode = mode;
-  mesh.mixmode = CS_FX_COPY;
+  mesh.mixmode = MixMode;
 
-  mesh.SetIndexRange (0, factory->GetTriangleCount () * 3);
-  mesh.SetMaterialHandle (NULL);
+  mesh.indexstart = 0;
+  mesh.indexend = factory->GetTriangleCount () * 3;
+  mesh.mathandle = mater->GetMaterialHandle();
   csRef<iStreamSource> stream = SCF_QUERY_INTERFACE (factory, iStreamSource);
-  mesh.SetStreamSource (stream);
-  mesh.SetType (csRenderMesh::MESHTYPE_TRIANGLES);
+  mesh.streamsource = stream;
+  mesh.meshtype = CS_MESHTYPE_TRIANGLES;
+  return &mesh;
+  /*
   r3d->DrawMesh (&mesh);
-
   return true;
+  */
 }
 
+#if 0
 bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
 	csZBufMode mode, iLight* light)
 {
@@ -753,7 +778,8 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
   csRef<iMaterialWrapper> mater = factory->shadowmat;
 
   iRender3D* r3d = rview->GetGraphics3D ();
-  r3d->SetObjectToCamera (&tr_o2c);
+  //r3d->SetObjectToCamera (&tr_o2c);
+  mesh.transform = &tr_o2c;
 
   mater->Visit ();
   if(!factory->GetEdgeMidpoint()) return false; //bad hack.. EdgeMidpoint might not be initialized on first rendering
@@ -763,9 +789,9 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
   mesh.mixmode = CS_FX_COPY;
   
 
-  mesh.SetMaterialHandle (mater->GetMaterialHandle ());
-  mesh.SetStreamSource (&scfiStreamSource);
-  mesh.SetType (csRenderMesh::MESHTYPE_TRIANGLES);
+  mesh.mathandle = mater->GetMaterialHandle ();
+  mesh.streamsource = &scfiStreamSource;
+  mesh.meshtype = CS_MESHTYPE_TRIANGLES;
 
   unsigned int *ibuf = ( unsigned int *)factory->GetEdgeIndices();
   if (!shadow_index_buffer)
@@ -785,7 +811,7 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
   for (i = 0; i < shadowCache.Length (); i++)
   {
     shadowCacheEntry = (csGenmeshShadowCacheEntry*) shadowCache.Get (i);
-    if (shadowCacheEntry->lightID = lightID )
+    if (shadowCacheEntry->lightID == lightID )
     {
       if ( (shadowCacheEntry->lightPos - lightpos).SquaredNorm () < 0.02 ) //make configurable
       {
@@ -927,10 +953,16 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
     edge_start = shadowCacheEntry->edge_start;
   }
 
-  if (shadow_caps) 
-    mesh.SetIndexRange (0, index_range);
+  if (shadow_caps)
+  {
+    mesh.indexstart = 0;
+    mesh.indexend = index_range;
+  }
   else 
-    mesh.SetIndexRange (edge_start, index_range);
+  {
+    mesh.indexstart = edge_start;
+    mesh.indexend = index_range;
+  }
 
   if (shadow_caps)
     r3d->SetShadowState (CS_SHADOW_VOLUME_FAIL1);
@@ -951,6 +983,7 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
 bool csGenmeshMeshObject::DrawLight (iRenderView* rview, iMovable* movable,
 	csZBufMode mode, iLight *light)
 {
+  /*
   iCamera* camera = rview->GetCamera ();
   // First create the transformation from object to camera space directly:
   //   W = Mow * O - Vow;
@@ -971,14 +1004,8 @@ bool csGenmeshMeshObject::DrawLight (iRenderView* rview, iMovable* movable,
     printf ("INTERNAL ERROR: mesh used without material!\n");
     return false;
   }
-  iMaterialHandle* mat = mater->GetMaterialHandle ();
-  if (!mat)
-  {
-    printf ("INTERNAL ERROR: mesh used without valid material handle!\n");
-    return false;
-  }
 
-  iRender3D* r3d = rview->GetGraphics3D ();
+  // iRender3D* r3d = rview->GetGraphics3D ();
 
   mater->Visit ();
 
@@ -1004,16 +1031,19 @@ bool csGenmeshMeshObject::DrawLight (iRenderView* rview, iMovable* movable,
   mesh.z_buf_mode = CS_ZBUF_TEST;
   mesh.mixmode = MixMode;
 
-  r3d->SetObjectToCamera (&tr_o2c);
-  mesh.SetIndexRange (0, factory->GetTriangleCount () * 3);
-  mesh.SetMaterialHandle (mater->GetMaterialHandle ());
+  //r3d->SetObjectToCamera (&tr_o2c);
+  mesh.transform = &tr_o2c;
+  mesh.indexstart = 0;
+  mesh.indexend = factory->GetTriangleCount () * 3;
+  mesh.mathandle = mater->GetMaterialHandle ();
   csRef<iStreamSource> stream = SCF_QUERY_INTERFACE (factory, iStreamSource);
-  mesh.SetStreamSource (stream);
-  mesh.SetType (csRenderMesh::MESHTYPE_TRIANGLES);
+  mesh.streamsource = stream;
+  mesh.meshtype = CS_MESHTYPE_TRIANGLES;
   r3d->DrawMesh (&mesh);
-
+  */
   return true;
 }
+#endif // if 0
 #endif // CS_USE_NEW_RENDERER
 
 void csGenmeshMeshObject::CalculateBBoxRadiusHard ()
@@ -1823,8 +1853,8 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
             EdgeStack.Push (c);
           }
         }
-        index_buffer->Release ();
       }
+      index_buffer->Release ();
       index_buffer->CanDiscard(false); 
       return index_buffer;
     }
@@ -1832,7 +1862,11 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
   }
   for (int i = 0; i < anon_names.Length(); i ++)
   {
-    if (anon_names[i] == name) return anon_buffers[i];
+    if (anon_names[i] == name) 
+    {
+      anon_buffers[i]->CanDiscard(false);
+      return anon_buffers[i];
+    }
   }
   return NULL;
 }
