@@ -683,9 +683,9 @@ different return value semantics. Rather than returning a mere boolean result,
 it now returns one of the @samp{csEventError) enumeration constants.  Of
 particular note, in the case of success, @code{csEventErrNone} is returned,
 which has a value of 0. This success value could be misinterpreted as ``false''
-by the unwary when changing code to deal with this change. Conditionals which
-test if retrieval of an attribute succeeded must be changed to take this new
-semantic into account. For instance, code such as the following:
+by the unwary when fixing code to deal with this semantic change. Conditionals
+which test if retrieval of an attribute succeeded must be changed to take this
+new semantic into account. For instance, code such as the following:
 
 @example
 iEvent* ev = @dots{};
@@ -706,84 +706,91 @@ if (ev->Retrieve(@dots{}) == csEventErrNone)
 @}
 @end example
 
-@subheading Old renderer architecture removed
-The old rendering architecture, togheter with the old renderer plugins are now
-removed. Togheter with this a few plugins, applications, classes and methods
-have been deprecated because they either isn't needed, or makes no sense to have
-for the new rendering architecture.
+@subheading Old Renderer Architecture Removed
 
-At the same time a few things in the new renderer (now the only renderer) also
-have changed.
+The old rendering architecture along with the old renderer plugins have been
+removed. Additionally, a few plugins, applications, classes, and methods have
+been deprecated because they are not applicable to the new rendering
+architecture. The results of the old renderer removal are summarized below.
 
 @subsubheading Removed plugins
-@itemize @bullet
-@item
-terrfunc (@code{crystalspace.mesh.object.terrfunc})
-@item
-gl3d (@file{plugins/video/renderer/opengl})
-@item
-soft3d (@file{plugins/video/renderer/software})
-@item
-null3d (@file{plugins/video/renderer/null})
-@end itemize
 
-@subsubheading Removed application
-The perftest application have been removed, as it is no longer have any purpose.
-For the future the csbench application should be extended to provide more 
-information.
-
-@subsubheading Removed and renamed files
-Following additional files have been removed or renamed
+The following plugin modules have been removed:
 
 @itemize @bullet
 @item
-@file{include/ivideo/vbufmgr.h} @result{} Removed
+@code{terrfunc} (@code{crystalspace.mesh.object.terrfunc})
 @item
-@file{data/shader/or_lighting*.xml} @result{} @file{data/shader/std_lighting*.xml}
+Old @code{gl3d} (@file{plugins/video/renderer/opengl})
+@item
+Old @code{soft3d} (@file{plugins/video/renderer/software})
+@item
+Old @code{null3d} (@file{plugins/video/renderer/null})
 @end itemize
 
-@subsubheading Removed methods and classes
-Within the @code{iGraphics3D} interface and its implementations the following
-methods have been removed.
+@subsubheading Removed Application
+
+The @samp{perftest} application has been removed, since it is no longer has any
+purpose.  For the future the @samp{csbench} application should be extended to
+provide more information.
+
+@subsubheading Removed and Renamed Files
+
+The following additional files have been removed or renamed:
+
 @itemize @bullet
 @item
-@code{GetZBuffAt ()}
+@file{include/ivideo/vbufmgr.h} @result{} (removed)
 @item
-@code{DrawPolygonDebug ()}
-@item
-@code{DrawPolygonFX ()}
-@item
-@code{DrawTriangleMesh ()}
-@item
-@code{DrawPolygonMesh ()}
-@item
-@code{OpenFogObject ()}
-@item
-@code{DrawFogPolygon ()}
-@item
-@code{CloseFogObject ()}
-@item
-@code{DumpCache ()}
-@item
-@code{ClearCache ()}
-@item
-@code{GetVertexBufferManager ()}
+@file{data/shader/or_lighting*.xml} @result{}
+@file{data/shader/std_lighting*.xml}
 @end itemize
 
-From @code{iRenderView} following fog-related methods have been removed.
+@subsubheading Removed Methods and Classes
+
+The following methods have been removed from the @samp{iGraphics3D} interface:
+
+@itemize @bullet
+@item
+@code{GetZBuffAt()}
+@item
+@code{DrawPolygonDebug()}
+@item
+@code{DrawPolygonFX()}
+@item
+@code{DrawTriangleMesh()}
+@item
+@code{DrawPolygonMesh()}
+@item
+@code{OpenFogObject()}
+@item
+@code{DrawFogPolygon()}
+@item
+@code{CloseFogObject()}
+@item
+@code{DumpCache()}
+@item
+@code{ClearCache()}
+@item
+@code{GetVertexBufferManager()}
+@end itemize
+
+From @samp{iRenderView} following fog-related methods have been removed.
 Fog is now calculated within the renderer.
+
 @itemize @bullet
 @item
-@code{CalculateFogPolygon ()}
+@code{CalculateFogPolygon()}
 @item
-@code{CalculateFogMesh ()}
+@code{CalculateFogMesh()}
 @end itemize
 
-The old methods used for rendering (@code{Draw ()} and @code{DrawTest ()})
-have been removed from @code{iMeshObject} and @code{iParticle}
+The old methods for rendering (@code{Draw()} and @code{DrawTest()})
+have been removed from @code{iMeshObject} and @code{iParticle} interfaces.
 
-Apart from these methods, the following classes/structs have been removed
-or relocalized from public headers into plugin-private headers.
+Apart from these methods, the following classes and structs have been removed
+or have become private, and are no longer available to client code:
+
 @itemize @bullet
 @item
 @code{G3DFogInfo}
@@ -799,3 +806,4 @@ or relocalized from public headers into plugin-private headers.
 @code{G3DTriangleMesh}
 @item
 @code{G3DPolygonMesh}
+@end itemize
