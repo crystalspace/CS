@@ -114,7 +114,7 @@ struct iThingState : public iBase
   virtual int GetVertexCount () const = 0;
   /// Get the given vertex coordinates in object space
   virtual const csVector3 &GetVertex (int idx) const = 0;
-  /// Get the vertiex coordinates in object space
+  /// Get the vertex coordinates in object space
   virtual const csVector3* GetVertices () const = 0;
   /// Get the given vertex coordinates in world space
   virtual const csVector3 &GetVertexW (int idx) const = 0;
