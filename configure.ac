@@ -188,9 +188,8 @@ CS_HEADER_PROPERTY([CS_COMPILER_NAME],
 AC_CHECK_PROGS([FLEXBIN], [flex])
 AS_IF([test -n "$FLEXBIN"], [CS_BUILD_PROPERTY([FLEXBIN], [$FLEXBIN])])
 
-# Bison check disabled temporarily until we have a test for bison >= 1.35.
-#AC_CHECK_PROGS([BISONBIN], [bison])
-#AS_IF([test -n "$BISONBIN"], [CS_BUILD_PROPERTY([BISONBIN], [$BISONBIN])])
+AC_CHECK_PROGS([BISONBIN], [bison])
+AS_IF([test -n "$BISONBIN"], [AC_CHECK_BISON([1.35], [CS_BUILD_PROPERTY([BISONBIN], [$BISONBIN])])])
 
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
 AS_IF([test -n "$DOXYGEN"], [CS_BUILD_PROPERTY([CMD.DOXYGEN], [$DOXYGEN])])
