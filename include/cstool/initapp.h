@@ -31,9 +31,9 @@ struct iVirtualClock;
 struct iCommandLineParser;
 struct iConfigManager;
 
-// Defines to select what plugins you want to have.
-#define CS_REQUEST_PLUGIN(Name,Interface)	\
-  Name, #Interface, iSCF::SCF->GetInterfaceID (#Interface), VERSION_##Interface
+// Utility macros to select what plugins you want to have loaded.
+#define CS_REQUEST_PLUGIN(Name,Interface) \
+  Name, #Interface, iSCF::SCF->GetInterfaceID(#Interface), VERSION_##Interface
 #define CS_REQUEST_END \
   NULL
 #define CS_REQUEST_VFS \
@@ -87,7 +87,7 @@ public:
    * This function will return the pointer to the object registry where
    * all the created objects will be registered.
    */
-  static iObjectRegistry* CreateEnvironment (int argc, const char* const argv[]);
+  static iObjectRegistry* CreateEnvironment(int argc, char const* const argv[]);
 
   /**
    * This very important function initializes the SCF sub-system.
@@ -131,7 +131,8 @@ public:
    * commandline parser with the object registry as the default
    * parser (using NULL tag).
    */
-  static iCommandLineParser* CreateCommandLineParser (iObjectRegistry*);
+  static iCommandLineParser* CreateCommandLineParser (
+    iObjectRegistry*, int argc, char const* const argv[]);
 
   /**
    * Create the config manager. This function will register the created

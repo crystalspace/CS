@@ -34,6 +34,20 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine reverted Jorrit's reversion to Eric's changes to SCF.
 	  Also, fixed the bug which was causing SCF to crash when a plugin
 	  module failed to load (if, for example, it didn't exist).
+	- Eric Sunshine reverted res' <resqu@gmx.ch> changes to
+	  CreateEnvironment() and `initapp' for a couple reasons.  First, his
+	  changes were not sufficiently generalized for applications which
+	  perform their own initialization -- those that don't invoke
+	  CreateEnvironment() -- to benefit from them.  Second, his changes
+	  would leak a reference to iObjectRegistry if csPlatformStartup()
+	  failed.  Instead, Eric merged CreateCommandLineParser() and
+	  SetupCommandLineParser() the correct way; such that the result is
+	  sufficiently generalized that it is as useful for applications which
+	  do not use the CreateEnvironment() convenience function, as it is for
+	  those which do.
+	- Eric Sunshined fixed csdemo so that it no longer requires that the
+	  "simple" console be loaded; since it wasn't making use of the console
+	  anyhow.
 8-Nov-2001
 	- Jorge Acereda fixed a leak in ieplex.cpp where the result of a
 	  SCF::QueryClassList() wasn't DecRef()ed.

@@ -98,7 +98,6 @@ Demo::Demo ()
   myG2D = NULL;
   myVFS = NULL;
   kbd = NULL;
-  myConsole = NULL;
   view = NULL;
   message[0] = 0;
   font = NULL;
@@ -114,7 +113,6 @@ Demo::~Demo ()
   if (myG2D) myG2D->DecRef ();
   if (myVFS) myVFS->DecRef ();
   if (kbd) kbd->DecRef ();
-  if (myConsole) myConsole->DecRef ();
   delete seqmgr;
 }
 
@@ -929,13 +927,6 @@ bool Demo::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  myConsole = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
-  if (!myConsole)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "No console!");
-    return false;
-  }
-
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = myG2D->GetNativeWindow ();
   if (nw) nw->SetTitle ("The Crystal Space Demo.");
@@ -952,23 +943,9 @@ bool Demo::Initialize (int argc, const char* const argv[],
 
   // Initialize the texture manager
   txtmgr->ResetPalette ();
-  
-  // Allocate a uniformly distributed in R,G,B space palette for console
-  // The console will crash on some platforms if this isn't initialize properly
-  int r,g,b;
-  for (r = 0; r < 8; r++)
-    for (g = 0; g < 8; g++)
-      for (b = 0; b < 4; b++)
-	txtmgr->ReserveColor (r * 32, g * 32, b * 64);
-
   txtmgr->SetPalette ();
 
   font = myG2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
-
-  // Initialize the console
-  if (myConsole != NULL)
-    // Don't let messages before this one appear
-    myConsole->Clear ();
 
   // Some commercials...
   Report (CS_REPORTER_SEVERITY_NOTIFY,

@@ -71,7 +71,8 @@ static bool config_done = false;
 static bool sys_init_done = false;
 static iEventHandler* installed_event_handler = NULL;
 
-iObjectRegistry* csInitializer::CreateEnvironment (int argc, const char* const argv[])
+iObjectRegistry* csInitializer::CreateEnvironment (
+  int argc, char const* const argv[])
 {
   iObjectRegistry* reg = 0;
   if (InitializeSCF())
@@ -82,17 +83,11 @@ iObjectRegistry* csInitializer::CreateEnvironment (int argc, const char* const a
       if (CreatePluginManager(r) &&
           CreateEventQueue(r) &&
           CreateVirtualClock(r) &&
-          CreateCommandLineParser(r) &&
+          CreateCommandLineParser(r, argc, argv) &&
           CreateConfigManager(r) &&
-          CreateInputDrivers(r))
-      {
-	iCommandLineParser* c = CS_QUERY_REGISTRY (r, iCommandLineParser);
-	CS_ASSERT (c != NULL);
-	c->Initialize (argc, argv);
-	c->DecRef ();
-	if (csPlatformStartup(r))
-	  reg = r;
-      }
+          CreateInputDrivers(r) &&
+	  csPlatformStartup(r))
+        reg = r;
       else
         r->DecRef();
     }
@@ -214,12 +209,13 @@ iVirtualClock* csInitializer::CreateVirtualClock (iObjectRegistry* r)
   return vc;
 }
 
-iCommandLineParser* csInitializer::CreateCommandLineParser(iObjectRegistry* r)
+iCommandLineParser* csInitializer::CreateCommandLineParser(
+  iObjectRegistry* r, int argc, char const* const argv[])
 {
-  iCommandLineParser* cmdline = new csCommandLineParser ();
-  r->Register (cmdline, "iCommandLineParser");
-  cmdline->DecRef ();
-  return cmdline;
+  iCommandLineParser* c = new csCommandLineParser (argc, argv);
+  r->Register (c, "iCommandLineParser");
+  c->DecRef ();
+  return c;
 }
 
 iConfigManager* csInitializer::CreateConfigManager (iObjectRegistry* r)
