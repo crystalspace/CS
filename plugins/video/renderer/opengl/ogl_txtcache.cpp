@@ -64,9 +64,10 @@ void OpenGLTextureCache::Unload (csTxtCacheData *d)
 
 //----------------------------------------------------------------------------//
 
-OpenGLTextureCache::OpenGLTextureCache (int max_size, int bpp)
+OpenGLTextureCache::OpenGLTextureCache (GLint internalRGBFormat, int max_size, int bpp)
 {
   OpenGLTextureCache::bpp = bpp;
+  this->internalRGBFormat = internalRGBFormat;
   cache_size = max_size;
   num = 0;
   head = tail = NULL;
@@ -266,10 +267,9 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 	th = thhack;
       }
 
-      int src_mode = GL_RGB16;
+      int src_mode = internalRGBFormat;
       if (transp) src_mode = GL_RGBA;
-      //else if (bpp <= 16) src_mode = GL_RGB16;
-      //else src_mode = GL_RGB;
+
       if (transp && !(txt && txt->KeyColorSet ()))
       {
 	int pixels = tw * th;
@@ -315,10 +315,8 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
       tw = txt->get_width ();
       th = txt->get_height ();
       src = txt->get_image_data ();
-      int src_mode = GL_RGB16;
+      int src_mode = internalRGBFormat;
       if (transp) src_mode = GL_RGBA;
-      //else if (bpp <= 16) src_mode = GL_RGB16;
-      //else src_mode = GL_RGB;
       if (transp && !txt->KeyColorSet ())
       {
 	int pixels = tw * th;

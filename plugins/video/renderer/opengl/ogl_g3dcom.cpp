@@ -62,7 +62,7 @@
 
 // Whether or not we should try  and use OpenGL extensions. This should be
 // removed eventually, when all platforms have been updated.
-//#define USE_EXTENSIONS 1
+// #define USE_EXTENSIONS 1
 
 // ---------------------------------------------------------------------------
 
@@ -168,6 +168,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
 
   // Default extension state is for all extensions to be OFF
   ARB_multitexture = false;
+  ARB_texture_compression = false;
   clipper = NULL;
   cliptype = CS_CLIPPER_NONE;
   toplevel_init = false;
@@ -657,6 +658,8 @@ void csGraphics3DOGLCommon::SharedInitialize (csGraphics3DOGLCommon *d)
 
   m_config_options.do_multitexture_level = 0;
   m_config_options.do_extra_bright = false;
+
+  internalRGBFormat = d->internalRGBFormat;
 }
 
 bool csGraphics3DOGLCommon::NewOpen ()
@@ -687,6 +690,14 @@ bool csGraphics3DOGLCommon::NewOpen ()
     glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
   else
     glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+  if (!strcmp (config->GetStr ("Video.OpenGL.Internal.RGB", "GL_RGB"), "GL_RGB"))
+    internalRGBFormat = GL_RGB;
+  else
+    internalRGBFormat = GL_RGB16;
+
+  if (ARB_texture_compression && config->GetBool ("Video.OpenGL.Internal.RGB.Compressed", false))
+    internalRGBFormat = GL_COMPRESSED_RGB_ARB;
 
   m_config_options.do_extra_bright = config->GetBool
         ("Video.OpenGL.ExtraBright", false);
@@ -793,7 +804,7 @@ bool csGraphics3DOGLCommon::NewOpen ()
     max_texture_size = Caps.maxTexHeight;
 
   int max_cache_size = 1024*1024*16; // 32mb combined cache
-  texture_cache = new OpenGLTextureCache (max_cache_size, 24);
+  texture_cache = new OpenGLTextureCache (internalRGBFormat, max_cache_size, 24);
   lightmap_cache = new OpenGLLightmapCache (this);
   texture_cache->SetBilinearMapping (config->GetBool
         ("Video.OpenGL.EnableBilinearMap", true));

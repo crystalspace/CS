@@ -23,7 +23,8 @@ static char const* const knownExtensions[] =
 {
   "GL_ARB_multitexture",
   "GL_EXT_compiled_vertex_array",
-  "GLX_ARB_get_proc_address"
+  "GLX_ARB_get_proc_address",
+  "GL_ARB_texture_compression"
 };
 #define NUM_EXTENSIONS (sizeof(knownExtensions) / sizeof(knownExtensions[0]))
 
@@ -35,7 +36,7 @@ void csGraphics3DOGLCommon::DetectExtensions()
     return;	//No luck, no extensions on this machine.
 
   // check the extension string for each extension in turn
-  for (int i = 0; i < NUM_EXTENSIONS; i++)
+  for (unsigned int i = 0; i < NUM_EXTENSIONS; i++)
   {
     const char* searchresult =
       strstr((const char*)extensions, knownExtensions[i]);
@@ -53,6 +54,8 @@ void csGraphics3DOGLCommon::DetectExtensions()
         {
           case 0:
 	    ARB_multitexture = true;
+          case 3:
+	    ARB_texture_compression = true;
           default:
 	    break;
         }

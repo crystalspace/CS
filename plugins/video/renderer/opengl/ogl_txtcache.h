@@ -71,10 +71,11 @@ protected:
   int num;
   /// Total size of all loaded textures
   long total_size;
-
+  /// internal rgb storage format
+  GLint internalRGBFormat;
 public:
   /// Takes the maximum size of the cache.
-  OpenGLTextureCache (int max_size, int bpp);
+  OpenGLTextureCache (GLint internalRGBFormat, int max_size, int bpp);
   ///
   ~OpenGLTextureCache ();
 

@@ -467,6 +467,10 @@ protected:
   /// DrawFlags on last BeginDraw ()
   int DrawMode;
 
+  /// internal color representation
+  GLint internalRGBFormat;
+  bool ARB_texture_compression;
+
 public:
   SCF_DECLARE_IBASE;
 
