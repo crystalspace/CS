@@ -46,7 +46,7 @@ public:
   /**
    * Compute the perspective transformation of a 3D vertex and add it to the polygon.
    */
-  void AddPerspective (csVector3& v) { AddPerspective (v.x, v.y, v.z); }
+  void AddPerspective (const csVector3& v) { AddPerspective (v.x, v.y, v.z); }
 
   /**
    * Compute the perspective transformation of a 3D vertex and add it to the polygon.

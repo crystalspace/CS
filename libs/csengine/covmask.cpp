@@ -260,8 +260,8 @@ int csCovMaskLUT::GetIndex (const csVector2& start,
   float fbox_hor = (float)box_hor;	// Optimal?@@@
   float fbox_ver = (float)box_ver;	// Optimal?@@@
   float fdim = (float)dimension; 	// Optimal?@@@
-  float x_top, x_bot;
-  float y_left, y_right;
+  float x_top=0, x_bot=0;
+  float y_left=0, y_right=0;
   int from = 0, to = 0;
   csVector2 sta (start.x-fhor_offs, start.y-fver_offs);
   csVector2 sto (stop.x-fhor_offs, stop.y-fver_offs);

@@ -587,7 +587,7 @@ again:
   return modified;
 }
 
-void csCovTreeNode0::GfxDump (iGraphics2D* ig2d, int level,
+void csCovTreeNode0::GfxDump (iGraphics2D* ig2d, int /*level*/,
 	int hor_offs, int ver_offs)
 {
   // Scan all bits of the mask and dump them.
