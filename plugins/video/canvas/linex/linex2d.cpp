@@ -397,8 +397,8 @@ void csGraphics2DLineXLib::DrawLine (float x1, float y1, float x2, float y2, int
 void csGraphics2DLineXLib::Write (iFont *font, int x, int y, int fg, int bg,
   const char *text)
 {
-  int FontW, FontH;
-  XFontStruct *xfont = (XFontStruct *)font->GetGlyphBitmap (' ', FontW, FontH);
+  int FontW, FontH, d1, d2, d3;
+  XFontStruct *xfont = (XFontStruct *)font->GetGlyphBitmap (' ', FontW, FontH, d1, d2, d3);
   XSetFont (dpy, gc_back, xfont->fid);
 
   if (bg >= 0)
@@ -508,6 +508,21 @@ bool csLineX2DFontServer::csLineX2DFont::GetGlyphSize (uint8 c, int &oW, int &oH
   return true;
 }
 
+bool csLineX2DFontServer::csLineX2DFont::GetGlyphSize (uint8 c, int &oW, int &oH, int &adv, int &left, int &top)
+{
+  XCharStruct *cs = &xfont->per_char [c - xfont->min_char_or_byte2];
+  oW = cs->width;
+  oH = cs->ascent + cs->descent;
+  return true;
+}
+
+uint8 *csLineX2DFontServer::csLineX2DFont::GetGlyphBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top)
+{
+  (void)c;
+  oW = FontW; oH = FontH;
+  return (uint8 *)xfont;
+}
+
 uint8 *csLineX2DFontServer::csLineX2DFont::GetGlyphBitmap (uint8 c, int &oW, int &oH)
 {
   (void)c;
@@ -516,6 +531,12 @@ uint8 *csLineX2DFontServer::csLineX2DFont::GetGlyphBitmap (uint8 c, int &oW, int
 }
 
 void csLineX2DFontServer::csLineX2DFont::GetDimensions (const char *text, int &oW, int &oH)
+{
+  oW = XTextWidth (xfont, text, strlen (text));
+  oH = FontH;
+}
+
+void csLineX2DFontServer::csLineX2DFont::GetDimensions (const char *text, int &oW, int &oH, int &desc)
 {
   oW = XTextWidth (xfont, text, strlen (text));
   oH = FontH;

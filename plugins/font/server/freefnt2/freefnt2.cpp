@@ -99,7 +99,7 @@ bool csFreeType2Server::Initialize (iObjectRegistry *object_reg)
   encoding_id = ftconfig->GetInt ("Freetype2.Settings.EncodingID", 1);
 
   fontset = ftconfig->GetStr ("Freetype2.Settings.FontSet", NULL);
-
+  //  DEBUG_BREAK;
   csString s;
   s << fontset << '.';
   iConfigIterator *fontenum = ftconfig->Enumerate (s);
@@ -121,15 +121,11 @@ iFont *csFreeType2Server::LoadFont (const char *filename)
     const char *s = ftconfig->GetStr (Keyname, NULL);
     if (s) filename = s;
   }
-  // Okay, now convert the VFS path into a real path
-  iDataBuffer *db = VFS->GetRealPath (filename);
-  if (db) filename = (const char *)db->GetData ();
 
   // see if we already loaded that font
   int idx = fonts.FindKey (filename);
   if (idx >= 0)
   {
-    if (db) db->DecRef ();
     csFreeType2Font *font = fonts.Get (idx);
     font->IncRef ();
     return font;
@@ -137,8 +133,7 @@ iFont *csFreeType2Server::LoadFont (const char *filename)
 
   // not yet loaded, so do it now
   csFreeType2Font *font = new csFreeType2Font (filename);
-  if (db) db->DecRef ();
-  if (!font->Load (this))
+  if (!font->Load (VFS, this))
   {
     delete font;
     return NULL;
@@ -170,6 +165,7 @@ csFreeType2Font::csFreeType2Font (const char *filename) : DeleteCallbacks (4, 4)
   name = csStrNew (filename);
   face = NULL;
   current = NULL;
+  fontdata = NULL;
 }
 
 csFreeType2Font::~csFreeType2Font ()
@@ -185,6 +181,7 @@ csFreeType2Font::~csFreeType2Font ()
   {
     FT_Done_Face (face);
   }
+  delete [] fontdata;
 }
 
 void csFreeType2Font::SetSize (int iSize)
@@ -209,21 +206,74 @@ void csFreeType2Font::GetMaxSize (int &oW, int &oH)
     oW = oH = 0;
 }
 
+bool csFreeType2Font::GetGlyphSize (uint8 c, int &oW, int &oH, int &adv, int &left, int &top)
+{
+  if (!current || !current->glyphs[c].isOk) return false;
+  
+  const GlyphBitmap &glyph = current->glyphs[c];
+  oW = MAX( glyph.advance, glyph.width);
+  oH = glyph.rows;
+  adv = glyph.advance;
+  left = glyph.left;
+  top = glyph.top;
+  return true;
+}
+
 bool csFreeType2Font::GetGlyphSize (uint8 c, int &oW, int &oH)
 {
   if (!current || !current->glyphs[c].isOk) return false;
   
-  oW = ((FT_BitmapGlyph)current->glyphs[c].glyph)->bitmap.width;
-  oH = ((FT_BitmapGlyph)current->glyphs[c].glyph)->bitmap.rows;
+  const GlyphBitmap &glyph = current->glyphs[c];
+
+  oW = MAX( glyph.advance, glyph.width);
+  oH = current->maxH;
   return true;
+}
+
+uint8 *csFreeType2Font::GetGlyphBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top)
+{
+  if (!current || !current->glyphs[c].isOk) return NULL;
+
+  const GlyphBitmap &glyph = current->glyphs[c];
+  oW = MAX( glyph.advance, glyph.width);
+  oH = glyph.rows;
+  adv = glyph.advance;
+  left = glyph.left;
+  top = glyph.top;
+  return glyph.bitmap;
 }
 
 uint8 *csFreeType2Font::GetGlyphBitmap (uint8 c, int &oW, int &oH)
 {
   if (!current || !current->glyphs[c].isOk) return NULL;
-  oW = ((FT_BitmapGlyph)current->glyphs[c].glyph)->bitmap.width;
-  oH = ((FT_BitmapGlyph)current->glyphs[c].glyph)->bitmap.rows;
-  return ((FT_BitmapGlyph)current->glyphs[c].glyph)->bitmap.buffer;
+
+  const GlyphBitmap &glyph = current->glyphs[c];
+  oW = MAX( glyph.advance, glyph.width);
+  oH = current->maxH;
+  return glyph.bitmap;
+}
+
+void csFreeType2Font::GetDimensions (const char *text, int &oW, int &oH, int &desc)
+{
+  if (!text || !current)
+  {
+    oW = oH = 0;
+    return;
+  }
+
+  oW = 0; oH = 0; desc = 0;
+  int h, d;
+  while (*text)
+  {
+    const GlyphBitmap &glyph = current->glyphs[*(const uint8 *)text];
+    oW += glyph.advance;
+    h = glyph.top;
+    d = h-glyph.rows;
+    h -=  MIN(0, d); // add the descender
+    oH = MAX (oH, h);
+    desc = MAX (desc, -d);
+    text++;
+  }
 }
 
 void csFreeType2Font::GetDimensions (const char *text, int &oW, int &oH)
@@ -237,7 +287,8 @@ void csFreeType2Font::GetDimensions (const char *text, int &oW, int &oH)
   oW = 0; oH = current->maxH;
   while (*text)
   {
-    oW += ((FT_BitmapGlyph)current->glyphs[*(const uint8 *)text].glyph)->bitmap.width;
+    const GlyphBitmap &glyph = current->glyphs[*(const uint8 *)text];
+    oW += MAX(glyph.advance, glyph.width);
     text++;
   }
 }
@@ -250,7 +301,7 @@ int csFreeType2Font::GetLength (const char *text, int maxwidth)
   int count = 0, w = 0;
   while (*text)
   {
-    w += ((FT_BitmapGlyph)current->glyphs[*(const uint8 *)text].glyph)->bitmap.width;
+    w += current->glyphs[*(const uint8 *)text].advance;
     if (w > maxwidth)
       break;
     text++; count++;
@@ -258,15 +309,50 @@ int csFreeType2Font::GetLength (const char *text, int maxwidth)
   return count;
 }
 
-bool csFreeType2Font::Load (csFreeType2Server *server)
+bool csFreeType2Font::Load (iVFS *pVFS, csFreeType2Server *server)
 {
   int error;
-  if ((error=FT_New_Face (server->library, name, 0, &face)))
+  iFile *file = pVFS->Open (name, VFS_FILE_READ);
+  if (file)
+  {
+    size_t size = file->GetSize ();
+    if (size)
+    {
+      delete [] fontdata;
+      fontdata = NULL;
+      fontdata = new FT_Byte[size];
+      if (file->Read ((char*)fontdata, size) != size)
+      {
+        file->DecRef ();
+        server->Report (CS_REPORTER_SEVERITY_WARNING,
+                        "Font file %s could not be read!\n", name);
+        return false;
+        
+      }
+      if ((error=FT_New_Memory_Face (server->library, fontdata, size, 0, &face)))
+      {
+        file->DecRef ();
+        server->Report (CS_REPORTER_SEVERITY_WARNING,
+                        "Font file %s could not be loaded - FreeType2 errorcode for FT_New_Face = %d!\n", name, error);
+        return false;
+      }
+    }
+    else
+    {
+      file->DecRef ();
+      server->Report (CS_REPORTER_SEVERITY_WARNING,
+                      "Could not determine filesize for fontfile %s!\n", name);
+      return false;
+    }
+  }
+  else
   {
     server->Report (CS_REPORTER_SEVERITY_WARNING,
-      "Font file %s could not be loaded - FreeType2 errorcode for FT_New_Face = %d!", name, error);
+                    "Could not open fontfile %s!\n", name);
     return false;
   }
+
+  file->DecRef ();
 
   // we do not change the default values of the new instance
   // ( 96 dpi, 10 pt. size, no trafo flags )
@@ -315,26 +401,49 @@ bool csFreeType2Font::CreateGlyphBitmaps (int size)
 
   if (FT_Set_Char_Size (face, size * 64, size * 64, 0, 0))
     return false;
-
+  //    DEBUG_BREAK;
   // Create the glyphset
   GlyphSet *glyphset;
   glyphset = new GlyphSet;
   glyphset->size = size;
-  glyphset->maxW = glyphset->maxH = 0;
+  int baseline;
+  int maxrows = (-face->size->metrics.descender + face->size->metrics.ascender + 63)>>6;
+  glyphset->maxW = (face->size->metrics.max_advance + 63) >> 6;
+  glyphset->maxH = maxrows;
+  int bitmapsize, stride;
+
+  baseline = (-face->size->metrics.descender)>>6;
+
   memset (glyphset->glyphs, 0, sizeof (glyphset->glyphs));
   cache.Push (glyphset);
 
   for (FT_UShort iso_char = 0; iso_char < 256; iso_char++)
   {
-    FT_Glyph &glyph = glyphset->glyphs[iso_char].glyph;
-    if (FT_Load_Char (face, iso_char, FT_LOAD_RENDER) || FT_Get_Glyph (face->glyph, &glyph))
+    FT_Glyph glyph;
+    if (FT_Load_Char (face, iso_char, FT_LOAD_RENDER|FT_LOAD_MONOCHROME) || FT_Get_Glyph (face->glyph, &glyph))
       continue;
 
-    if (glyph->format != ft_glyph_format_bitmap)
-    {
-      if (FT_Glyph_To_Bitmap (&glyph, ft_render_mode_mono, 0, 1)) continue;
-      glyphset->glyphs[iso_char].isOk = true;
-    }
+    GlyphBitmap &g = glyphset->glyphs[iso_char];
+    g.isOk = true;
+    g.advance = glyph->advance.x >> 16;
+    stride = MAX((g.advance+7)/8, ((FT_BitmapGlyph)glyph)->bitmap.pitch);
+    g.bitmap = new unsigned char [bitmapsize=maxrows*stride];
+    memset (g.bitmap, 0, bitmapsize);
+    int startrow = maxrows-(baseline + ((FT_BitmapGlyph)glyph)->top);
+    int endrow = startrow+((FT_BitmapGlyph)glyph)->bitmap.rows;
+    for (int n=0,i=startrow; i < endrow; i++,n++)
+      memcpy (g.bitmap + stride*i, 
+              ((FT_BitmapGlyph)glyph)->bitmap.buffer + n*((FT_BitmapGlyph)glyph)->bitmap.pitch,
+              ((FT_BitmapGlyph)glyph)->bitmap.pitch);
+
+    g.width = ((FT_BitmapGlyph)glyph)->bitmap.width;
+    //    g.rows = ((FT_BitmapGlyph)glyph)->bitmap.rows;
+    g.rows = maxrows;
+    g.left = ((FT_BitmapGlyph)glyph)->left;
+    //    g.top = ((FT_BitmapGlyph)glyph)->top;
+    g.top = maxrows-baseline;
+
+    //    FT_Done_Glyph (glyph);
   }
 
   current = glyphset;

@@ -70,6 +70,7 @@ private:
 	{(void) i; (void) r; (void) g; (void) b; };
     /// Write a text string
     virtual void Write (iFont*, int x, int y, int fg, int bg, const char *text);
+    virtual void WriteBaseline (iFont*, int x, int y, int fg, int bg, const char *text);
 
     /**
      * Get address of video RAM at given x,y coordinates.

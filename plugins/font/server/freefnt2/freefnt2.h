@@ -36,12 +36,14 @@ class csFreeType2Font : public iFont
   // A single glyph bitmap
   struct GlyphBitmap
   {
-    FT_Glyph glyph;
+    unsigned char *bitmap;
+    int rows, width, stride;
+    int descender, ascender, advance, left, top;
     bool isOk;
 
-    GlyphBitmap (){isOk=false;}
+    GlyphBitmap (){isOk=false; bitmap = NULL;}
     ~GlyphBitmap ()
-    { if (isOk) FT_Done_Glyph (glyph); }
+    { if (isOk) delete [] bitmap; }
   };
 
   // A set of glyphs with same point size
@@ -79,6 +81,9 @@ class csFreeType2Font : public iFont
 
   bool CreateGlyphBitmaps (int size);
 
+ protected:
+  FT_Byte  *fontdata;
+
 public:
   // font filename (for identification)
   char *name;
@@ -102,7 +107,7 @@ public:
   virtual ~csFreeType2Font ();
 
   /// Load the font
-  bool Load (csFreeType2Server *server);
+  bool Load (iVFS *pVFS, csFreeType2Server *server);
 
   /**
    * Set the size for this font.
@@ -129,6 +134,7 @@ public:
    * Returns false if values could not be determined.
    */
   virtual bool GetGlyphSize (uint8 c, int &oW, int &oH);
+  virtual bool GetGlyphSize (uint8 c, int &oW, int &oH, int &adv, int &left, int &top);
 
   /**
    * Return a pointer to a bitmap containing a rendered character.
@@ -136,11 +142,13 @@ public:
    * filled with bitmap width and height.
    */
   virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH);
+  virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top);
 
   /**
    * Return the width and height of text written with this font.
    */
   virtual void GetDimensions (const char *text, int &oW, int &oH);
+  virtual void GetDimensions (const char *text, int &oW, int &oH, int &desc);
 
   /**
    * Determine how much characters from this string can be written

@@ -216,6 +216,36 @@ void awsMultiProctexCanvas::awscG2D::Write (iFont *font, int x, int y, int fg, i
    }
 }
 
+void awsMultiProctexCanvas::awscG2D::WriteBaseline (iFont *font, int x, int y, int fg, int bg,
+                                            const char *text)
+{
+  if (!font)
+    return;
+
+  int tW, tH;
+
+  font->GetDimensions(text, tW, tH);
+
+  csRect clipRect (ClipX1, ClipY1, ClipX2+1, ClipY2+1);
+  csRect textRect (x, y, x+tW+1, y+tH+1);
+
+  if (!textRect.Intersects(clipRect))
+    return;
+
+  int i,count=awsc->GetFlatCanvasCount();
+
+  for (i=0; i<count; ++i)
+  {
+      csRect *canvasRect = awsc->GetFlatCanvasRect(i);
+
+      if (canvasRect->Intersects(textRect))
+      {
+        awsSimpleCanvas *canvas = awsc->GetFlatCanvas(i);
+        canvas->G2D()->WriteBaseline(font, x-canvasRect->xmin, y-canvasRect->ymin, fg, bg, text);
+      }
+   }
+}
+
 unsigned char* awsMultiProctexCanvas::awscG2D::GetPixelAt (int x, int y)
 {
   int i,count=awsc->GetFlatCanvasCount();
