@@ -40,6 +40,7 @@
 #include "isystem.h"
 #include "isndlstn.h"
 #include "isndsrc.h"
+#include "isndrdr.h"
 
 IMPLEMENT_FACTORY(csSoundDriverOSS)
 
