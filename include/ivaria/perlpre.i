@@ -20,9 +20,10 @@
 
 /****************************************************************************
  * Renaming operators is the first stage of wrapping them.
- * We ignore operator [] and () since these will have to be wrapped manually.
+ * We ignore operator [] and () and unary *
+ * since these will have to be wrapped manually.
  ****************************************************************************/
-%ignore			*::operator[], *::operator();
+%ignore			*::operator[], *::operator(), *::operator* ();
 
 %rename(__add__)	*::operator+;
 %rename(__subtr__)	*::operator-;

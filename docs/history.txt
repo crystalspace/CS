@@ -6,6 +6,9 @@ The history order is reversed so that new features are at the top.
 15-Jun-2003
 	- Oktal rearranged the documentation of the scripting language stuff
 	  in the manual, and added Perl docs.
+	- Oktal moved from cspace.i to pythpre.i the rename directive of
+	  iDataBuffer::operator*() to iDataBuffer::asString(), and added a
+	  Perl-specific wrapper for that method to perlpost.i.
 14-Jun-2003
 	- Jorrit got a fix from Arthur K. (nemerle@lsk.pl) for two memory
 	  leaks in AWS.

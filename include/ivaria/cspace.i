@@ -582,7 +582,6 @@ TYPEMAP_OUT_csWrapPtr
 
 %include "csutil/xmltiny.h"
 
-%rename(asString) iDataBuffer::operator * () const;
 %ignore iDataBuffer::GetInt8;
 %include "iutil/databuff.h"
 

@@ -710,6 +710,21 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
 }
 
 /****************************************************************************
+ * Some extra operator overloads for iDataBuffer.
+ ****************************************************************************/
+%extend iDataBuffer
+{
+  const char* __string__ ()
+  {
+    return self->operator* ();
+  }
+  const char* __sv__ ()
+  {
+    return self->operator* ();
+  }
+}
+
+/****************************************************************************
  * An extra operator overload for csHashMapReversible.
  * This one converts it to a native Perl hash.
  ****************************************************************************/

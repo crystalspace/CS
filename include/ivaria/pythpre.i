@@ -26,6 +26,8 @@
 
 %rename(assign) *::operator=;
 
+%rename(asString) iDataBuffer::operator * () const;
+
 %{
 PyObject *
 _csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
