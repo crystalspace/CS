@@ -5,7 +5,7 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -28,6 +28,7 @@
 #include "cs3d/opengl/ogl_txtcache.h"
 #include "cs3d/opengl/ogl_txtmgr.h"
 #include "cs3d/opengl/ogl_hicache.h"
+#include "cs3d/opengl/ogl_g3d.h"
 #include "isystem.h"
 #include "ilghtmap.h"
 #include "igraph3d.h"
@@ -51,7 +52,7 @@ void OpenGLTextureCache::Dump()
 {
 }
 
-  
+
 void OpenGLTextureCache::Load (HighColorCache_Data *d)
 {
     ITextureHandle* txt_handle = (ITextureHandle*)d->pSource;
@@ -61,7 +62,7 @@ void OpenGLTextureCache::Load (HighColorCache_Data *d)
     texture_width = txt_unl->get_width ();
     texture_height = txt_unl->get_height ();
     bool transparent = txt_mm->get_transparent ();
-   
+
     CHK (GLuint *texturehandle = new GLuint);
     glGenTextures (1,texturehandle);
 
@@ -105,7 +106,7 @@ void OpenGLTextureCache::Load (HighColorCache_Data *d)
     delete []tempdata;
 
     d->pData = texturehandle;
-    
+
 }
 
 ///
@@ -236,9 +237,11 @@ void OpenGLLightmapCache::Load(HighColorCache_Data *d)
   GLenum errtest;
   errtest = glGetError();
   if (errtest != GL_NO_ERROR)
-  {/* CsPrintf(MSG_DEBUG_0,"openGL error string: %s\n",gluErrorString(errtest) );*/ }
+  {
+    //SysPrintf (MSG_DEBUG_0,"openGL error string: %s\n",gluErrorString(errtest) );
+  }
 
-  delete []lm_data; 
+  delete []lm_data;
 
 /*
     CsPrintf(MSG_DEBUG_0,"caching lightmap in handle %d\n",*lightmaphandle);
@@ -246,7 +249,7 @@ void OpenGLLightmapCache::Load(HighColorCache_Data *d)
     CsPrintf(MSG_DEBUG_0,"lightmap data location %x\n",lightmap_info);
     */
 
-  d->pData = lightmaphandle;    
+  d->pData = lightmaphandle;
 }
 
 ///
