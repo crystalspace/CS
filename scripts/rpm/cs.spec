@@ -1,6 +1,6 @@
 %define name    crystalspace
-%define version 20040511
-%define release 1
+%define version 20040531
+%define release 2
 %define prefix	/usr
 Group: Applications/Development
 Source: http://crystal.sourceforge.net/cvs-snapshots/bzip2/cs-current-snapshot.tar.bz2
@@ -95,7 +95,10 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/csgeom/*.h
 %{prefix}/include/cstool/*.h
 %{prefix}/include/csutil/*.h
+%{prefix}/include/csutil/*.inc
 %{prefix}/include/csutil/win32/*.h
+%{prefix}/include/csutil/win32/*.inc
+%{prefix}/include/csutil/win32/*.fun
 %{prefix}/include/csutil/macosx/*.h
 %{prefix}/include/csutil/unix/*.h
 
@@ -111,6 +114,9 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/igraphic/*.h
 
 %changelog
+* Mon May 31 2004 Vincent Knecht <vknecht@users.sourceforge.net> 20040531-2
+- Added %files entries for .inc and .fun files in include/csutil/
+
 * Tue May 11 2004 Vincent Knecht <vknecht@users.sourceforge.net> 20040511-1
 - Prefixed source file name with URL.
 - Building is done by the make emulation layer, which will automatically
