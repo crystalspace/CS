@@ -37,7 +37,6 @@ extern const IID IID_ISystem;
 #define MSG_DEBUG_0F 10         // Show message if debug level is 0, 1, or 2 (no debug) and flush
 #define MSG_DEBUG_1F 11         // Show message if debug level is 1 or 2 (debug mode) and flush
 #define MSG_DEBUG_2F 12         // Show message if debug level 2 (verbose mode) and flush
-#define MSG_TICKER 13		// Show user that we're not hanging -- uses 'scon.cpp' specific function
 
 /**
  * This interface serves as a way for plug-ins to query Crystal Space about settings,
