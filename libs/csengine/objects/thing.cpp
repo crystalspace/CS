@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998,2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -29,6 +29,7 @@
 #include "csengine/sector.h"
 #include "csengine/cbufcube.h"
 #include "csengine/covcube.h"
+#include "csengine/bspbbox.h"
 #include "csengine/curve.h"
 #include "csengine/texture.h"
 #include "csengine/material.h"
@@ -52,6 +53,8 @@ IMPLEMENT_IBASE_EXT (csThing)
   IMPLEMENTS_EMBEDDED_INTERFACE (iThing)
   IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
   IMPLEMENTS_EMBEDDED_INTERFACE (iVisibilityCuller)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iVisibilityObject)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iMovableListener)
 IMPLEMENT_IBASE_EXT_END
 
 IMPLEMENT_EMBEDDED_IBASE (csThing::eiThing)
@@ -66,14 +69,22 @@ IMPLEMENT_EMBEDDED_IBASE(csThing::VisCull)
   IMPLEMENTS_INTERFACE(iVisibilityCuller)
 IMPLEMENT_EMBEDDED_IBASE_END
 
+IMPLEMENT_EMBEDDED_IBASE(csThing::VisObject)
+  IMPLEMENTS_INTERFACE(iVisibilityObject)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE(csThing::MovListener)
+  IMPLEMENTS_INTERFACE(iMovableListener)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 csThing::csThing (csEngine* engine, bool is_sky, bool is_template) :
-	csPObject (),
-	polygons (64, 64), curves (16, 16),
-	tree_bbox (NULL), movable ()
+	csPObject (), polygons (64, 64), curves (16, 16), movable ()
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiThing);
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityCuller);
+  CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityObject);
+  CONSTRUCT_EMBEDDED_IBASE (scfiMovableListener);
 
   max_vertices = num_vertices = 0;
 
@@ -100,7 +111,6 @@ csThing::csThing (csEngine* engine, bool is_sky, bool is_template) :
   movable.scfParent = &scfiThing;
   center_idx = -1;
   ParentTemplate = NULL;
-  tree_bbox.SetOwner (this);
   csThing::is_sky = is_sky;
   csThing::is_template = is_template;
   if (is_sky) flags.Set (CS_ENTITY_ZFILL);
@@ -125,15 +135,12 @@ csThing::~csThing ()
   int i;
   for (i = 0 ; i < visobjects.Length () ; i++)
   {
-    iVisibilityObject* vo = (iVisibilityObject*)visobjects[i];
-    vo->GetMovable ()->RemoveListener (MovableListener, (void*)this);
-    vo->DecRef ();
+    csVisObjInfo* vinf = (csVisObjInfo*)visobjects[i];
+    delete vinf->bbox;
+    vinf->visobj->GetMovable ()->RemoveListener (&scfiMovableListener);
+    vinf->visobj->DecRef ();
+    delete vinf;
   }
-}
-
-void csThing::MovableListener (iMovable* movable, int action, void* userdata)
-{
-  csThing* th = (csThing*)userdata;
 }
 
 void csThing::Prepare (csSector* sector)
@@ -693,21 +700,9 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
     {
       // We're dealing with a csBspPolygon.
       csBspPolygon* bsppol = (csBspPolygon*)polygon[i];
-      csObject* obj = bsppol->GetOriginator ();
-      bool obj_vis;
-      csPolyTreeBBox* tbb;
-      if (obj->GetType () >= csMeshWrapper::Type)
-      {
-        csMeshWrapper* sp = (csMeshWrapper*)obj;
-	obj_vis = sp->IsVisible ();
-	tbb = (csPolyTreeBBox*)(sp->GetPolyTreeObject ());
-      }
-      else
-      {
-        csThing* th = (csThing*)obj;
-	obj_vis = th->IsVisible ();
-	tbb = (csPolyTreeBBox*)(th->GetPolyTreeObject ());
-      }
+      csVisObjInfo* obj = bsppol->GetOriginator ();
+      bool obj_vis = obj->visobj->IsVisible ();
+      csPolyTreeBBox* tbb = obj->bbox;
 
       // If the object is already marked visible then we don't have
       // to do any of the other processing for this polygon.
@@ -763,18 +758,7 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	  }    
 	}
 	if (mark_vis)
-	{
-          if (obj->GetType () >= csMeshWrapper::Type)
-          {
-            csMeshWrapper* sp = (csMeshWrapper*)obj;
-            sp->MarkVisible ();
-	  }
-	  else
-	  {
-            csThing* th = (csThing*)obj;
-            th->MarkVisible ();
-	  }
-	}
+          obj->visobj->MarkVisible ();
         if (clip) render_pool->Free (clip);
       }
     }
@@ -1300,15 +1284,15 @@ void csThing::UpdateMove ()
 void csThing::MoveToSector (csSector* s)
 {
   if (is_sky)
-    s->skies.Push (this);
+    s->AddSky (this);
   else
-    s->things.Push (this);
+    s->AddThing (this);
 }
 
 void csThing::RemoveFromSectors ()
 {
-  if (GetPolyTreeObject ())
-    GetPolyTreeObject ()->RemoveFromTree ();
+  //@@@@@@if (GetPolyTreeObject ())
+    //@@@@@@GetPolyTreeObject ()->RemoveFromTree ();
   int i;
   csVector& sectors = movable.GetSectors ();
   for (i = 0 ; i < sectors.Length () ; i++)
@@ -1317,23 +1301,9 @@ void csThing::RemoveFromSectors ()
     if (ss)
     {
       if (is_sky)
-      {
-        int idx = ss->skies.Find (this);
-        if (idx >= 0)
-        {
-          ss->skies[idx] = NULL;
-          ss->skies.Delete (idx);
-        }
-      }
+        ss->UnlinkSky (this);
       else
-      {
-        int idx = ss->things.Find (this);
-        if (idx >= 0)
-        {
-          ss->things[idx] = NULL;
-          ss->things.Delete (idx);
-        }
-      }
+        ss->UnlinkThing (this);
     }
   }
 }
@@ -1748,40 +1718,6 @@ void csThing::DrawInt (csRenderView& rview)
     // are three possibilities.
     if (engine_mode == CS_ENGINE_FRONT2BACK)
     {
-      //-----
-      // In this part of the rendering we use the c-buffer or another
-      // 2D/3D visibility culler.
-      //-----
-
-      // Using the PVS, mark all sectors and polygons that are visible
-      // from the current node.
-      if (rview.GetEngine ()->IsPVS ())
-      {
-        csOctree* otree = (csOctree*)static_tree;
-	if (rview.GetEngine ()->IsPVSFrozen ())
-	  otree->MarkVisibleFromPVS (rview.GetEngine ()->GetFrozenPosition ());
-	else
-	  otree->MarkVisibleFromPVS (rview.GetOrigin ());
-      }
-
-      // Initialize a queue on which all visible polygons will be pushed.
-      // The octree is traversed front to back but we want to render
-      // back to front. That's one of the reasons for this queue.
-      poly_queue = new csPolygon2DQueue (GetNumPolygons ());
-
-      // Update the transformation for the static tree. This will
-      // not actually transform all vertices from world to camera but
-      // it will make sure that when a node (octree node) is visited,
-      // the transformation will happen at that time.
-      UpdateTransformation ();
-
-      // Traverse the tree front to back and push all visible polygons
-      // on the queue. This traversal will also mark all visible
-      // meshes and things. They will be put on a queue later.
-      static_tree->Front2Back (rview.GetOrigin (), &TestQueuePolygons,
-      	&rview, CullOctreeNode, &rview);
-
-//@@@@ SPLIT HERE
       csPolygon2DQueue* queue = poly_queue;
       // Render all polygons that are visible back to front.
       DrawPolygonsFromQueue (queue, &rview);
@@ -1793,7 +1729,6 @@ void csThing::DrawInt (csRenderView& rview)
       // Here we don't use the c-buffer or 2D culler but just render back
       // to front.
       //-----
-      UpdateTransformation (rview);
       static_tree->Back2Front (rview.GetOrigin (), &DrawPolygons, (void*)&rview);
     }
     else
@@ -1801,7 +1736,6 @@ void csThing::DrawInt (csRenderView& rview)
       //-----
       // Here we render using the Z-buffer.
       //-----
-      UpdateTransformation (rview);
       csOctree* otree = (csOctree*)static_tree;
       csPolygonIntArray& unsplit = otree->GetRoot ()->GetUnsplitPolygons (); 
       DrawPolygonArray (unsplit.GetPolygons (), unsplit.GetNumPolygons (),
@@ -1932,17 +1866,140 @@ void csThing::DrawFoggy (csRenderView& d)
 
 void csThing::RegisterVisObject (iVisibilityObject* visobj)
 {
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  csVisObjInfo* vinf = new csVisObjInfo ();
+  vinf->visobj = visobj;
+  vinf->bbox = new csPolyTreeBBox ();
+  visobjects.Push (vinf);
+  visobj->GetMovable ()->AddListener (&scfiMovableListener, (void*)vinf);
+  visobj->IncRef ();
 }
 
 void csThing::UnregisterVisObject (iVisibilityObject* visobj)
 {
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  int idx;
+  csVisObjInfo* vinf = NULL;
+  for (idx = 0 ; idx < visobjects.Length () ; idx++)
+  {
+    vinf = (csVisObjInfo*)visobjects[idx];
+    if (vinf->visobj == visobj) break;
+    vinf = NULL;
+  }
+  if (vinf == NULL) return;
+  visobjects.Delete (idx);
+  delete vinf->bbox;
+  delete vinf;
+  visobj->GetMovable()->RemoveListener (&scfiMovableListener);
+  visobj->DecRef ();
 }
 
-void csThing::VisTest (iCamera* camera)
+void csThing::MovableChanged (iMovable* movable, void* userdata)
 {
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  csVisObjInfo* vinf = (csVisObjInfo*)userdata;
+  iVisibilityObject* visobj = vinf->visobj;
+  csPolyTreeBBox* bbox = vinf->bbox;
+
+  // If object has not been placed in a sector we do nothing here.
+  if (!movable->InSector ()) return;
+
+  csBox3 b;
+  visobj->GetBoundingBox (b);
+
+  csReversibleTransform trans = movable->GetFullTransform ().GetInverse ();
+  bbox->Update (b, trans, vinf);
+
+  // Temporarily increase reference to prevent free.
+  bbox->GetBaseStub ()->IncRef ();
+  static_tree->AddObject (bbox);
+  bbox->GetBaseStub ()->DecRef ();
+}
+
+void csThing::MovableDestroyed (iMovable* /*movable*/, void* userdata)
+{
+  csVisObjInfo* vinf = (csVisObjInfo*)userdata;
+  iVisibilityObject* visobj = vinf->visobj;
+  UnregisterVisObject (visobj);
+}
+
+bool csThing::VisTest (iRenderView* irview)
+{
+  if (!static_tree) return false;
+  iEngine* iengine = irview->GetEngine ();
+  int engine_mode = iengine->GetEngineMode ();
+
+  // If this thing has a static polygon tree (octree) there
+  // are three possibilities.
+  if (engine_mode == CS_ENGINE_FRONT2BACK)
+  {
+    //-----
+    // In this part of the rendering we use the c-buffer or another
+    // 2D/3D visibility culler.
+    //-----
+
+    csOrthoTransform& camtrans = irview->GetCamera ()->GetTransform ();
+    const csVector3& origin = camtrans.GetOrigin ();
+
+    int i;
+    for (i = 0 ; i < visobjects.Length () ; i++)
+    {
+      csVisObjInfo* vinf = (csVisObjInfo*)visobjects[i];
+      iVisibilityObject* vo = vinf->visobj;
+      // If the current viewpoint is inside the bounding box of the
+      // object then we consider the object visible.
+      csBox3 bbox;
+      vo->GetBoundingBox (bbox);
+      if (bbox.In (origin))
+        vo->MarkVisible ();
+      else
+        vo->MarkInvisible ();
+      vinf->bbox->ClearTransform ();
+    }
+
+    // Using the PVS, mark all sectors and polygons that are visible
+    // from the current node.
+    if (engine->IsPVS ())
+    {
+      csOctree* otree = (csOctree*)static_tree;
+      //@@@if (engine->IsPVSFrozen ())
+	//@@@otree->MarkVisibleFromPVS (engine->GetFrozenPosition ());
+      //@@@else
+      otree->MarkVisibleFromPVS (origin);
+    }
+
+    // Initialize a queue on which all visible polygons will be pushed.
+    // The octree is traversed front to back but we want to render
+    // back to front. That's one of the reasons for this queue.
+    poly_queue = new csPolygon2DQueue (GetNumPolygons ());
+
+    // Update the transformation for the static tree. This will
+    // not actually transform all vertices from world to camera but
+    // it will make sure that when a node (octree node) is visited,
+    // the transformation will happen at that time.
+    UpdateTransformation ();
+
+    // Traverse the tree front to back and push all visible polygons
+    // on the queue. This traversal will also mark all visible
+    // meshes and things. They will be put on a queue later.
+    static_tree->Front2Back (origin, &TestQueuePolygons,
+      	irview->GetPrivateObject (), CullOctreeNode, irview->GetPrivateObject ());
+    return true;
+  }
+  else if (engine_mode == CS_ENGINE_BACK2FRONT)
+  {
+    //-----
+    // Here we don't use the c-buffer or 2D culler but just render back
+    // to front.
+    //-----
+    UpdateTransformation (irview->GetPrivateObject ());
+    return false;
+  }
+  else
+  {
+    //-----
+    // Here we render using the Z-buffer.
+    //-----
+    UpdateTransformation (irview->GetPrivateObject ());
+    return false;
+  }
 }
 
 void csThing::CheckFrustum (csFrustumView& lview)
@@ -2162,6 +2219,8 @@ void csThing::MergeTemplate (csThing* tpl, csSector* sector, csMaterialList* mat
 
 void csThing::UpdateInPolygonTrees ()
 {
+return;//@@@@@@@@@@@@@@@@@@@@@
+#if 0
   // If thing has not been placed in a sector we do nothing here.
   if (!movable.InSector ()) return;
 
@@ -2193,6 +2252,7 @@ void csThing::UpdateInPolygonTrees ()
     tree->AddObject (&tree_bbox);
     tree_bbox.GetBaseStub ()->DecRef ();
   }
+#endif
 }
 
 iPolygon3D *csThing::eiThing::GetPolygon (int idx)

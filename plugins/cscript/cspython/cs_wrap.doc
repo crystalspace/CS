@@ -291,8 +291,15 @@ GetFOV()
 
 GetInvFOV()
 
-1.11.  class iPolygonSet
-------------------------
+1.11.  class iSector
+--------------------
+
+CreateBSP()
+
+Query_iPolygonSet()
+
+1.12.  class iThing
+-------------------
 
 GetName()
 
@@ -318,17 +325,7 @@ CreateVertex(iVertex)
 
 CreateKey(iName,iValue)
 
-1.12.  class iSector
---------------------
-
-CreateBSP()
-
-Query_iPolygonSet()
-
-1.13.  class iThing
--------------------
-
-1.14.  class iPolygon3D
+1.13.  class iPolygon3D
 -----------------------
 
 GetName()
@@ -367,7 +364,7 @@ SetPlane(iName)
 
 SetTextureSpace(v_orig,v1,len1)
 
-1.15.  class iImage
+1.14.  class iImage
 -------------------
 
 GetImageData()
@@ -398,7 +395,7 @@ Clone()
 
 Crop(x,y,width,height)
 
-1.16.  class iTextureManager
+1.15.  class iTextureManager
 ----------------------------
 
 RegisterTexture(image,flags)
@@ -419,7 +416,7 @@ SetVerbose(vb)
 
 GetTextureFormat()
 
-1.17.  class iPolygonTexture
+1.16.  class iPolygonTexture
 ----------------------------
 
 GetMaterialHandle()
@@ -459,7 +456,7 @@ GetCacheData(idx)
 
 SetCacheData(idx,d)
 
-1.18.  class iEngine
+1.17.  class iEngine
 --------------------
 
 GetTextureFormat()
@@ -488,7 +485,7 @@ CreateThing(iName,iParent)
 
 FindMaterial(iName,regionOnly)
 
-1.19.  class iSystem
+1.18.  class iSystem
 --------------------
 
 Query_iEngine()

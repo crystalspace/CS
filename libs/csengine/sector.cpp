@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -28,6 +28,7 @@
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
 #include "csengine/polytmap.h"
+#include "csengine/cscoll.h"
 #include "csengine/light.h"
 #include "csengine/camera.h"
 #include "csengine/engine.h"
@@ -48,6 +49,7 @@
 #include "itexture.h"
 #include "ivfs.h"
 #include "istlight.h"
+#include "iviscull.h"
 
 // Option variable: render portals?
 bool csSector::do_portals = true;
@@ -80,6 +82,7 @@ csSector::csSector (csEngine* engine) : csPObject ()
   engine->AddToCurrentRegion (this);
   fog.enabled = false;
   draw_busy = 0;
+  culler = NULL;
 }
 
 csSector::~csSector ()
@@ -95,7 +98,7 @@ csSector::~csSector ()
   terrains.DeleteAll ();
 }
 
-void csSector::Prepare (csSector*)
+void csSector::Prepare (csSector*)  //@@@@@ UNNEEDED PARM
 {
   int i;
   for (i = 0 ; i < things.Length () ; i++)
@@ -110,11 +113,205 @@ void csSector::Prepare (csSector*)
   }
 }
 
+//----------------------------------------------------------------------
+
+void csSector::AddMesh (csMeshWrapper* mesh)
+{
+  meshes.Push ((csSome)mesh);
+  if (culler)
+  {
+    iVisibilityObject* vo = QUERY_INTERFACE (mesh, iVisibilityObject);
+    vo->DecRef ();
+    culler->RegisterVisObject (vo);
+  }
+}
+
+void csSector::UnlinkMesh (csMeshWrapper* mesh)
+{
+  int idx = meshes.Find ((csSome)mesh);
+  if (idx != -1)
+  {
+    meshes.Delete (idx);
+    if (culler)
+    {
+      iVisibilityObject* vo = QUERY_INTERFACE (mesh, iVisibilityObject);
+      vo->DecRef ();
+      culler->UnregisterVisObject (vo);
+    }
+  }
+}
+
+csMeshWrapper* csSector::GetMesh (const char* name)
+{
+  int i;
+  for (i = 0 ; i < meshes.Length () ; i++)
+  {
+    csMeshWrapper* s = (csMeshWrapper*)meshes[i];
+    if (!strcmp (name, s->GetName ()))
+      return s;
+  }
+  return NULL;
+}
+
+//----------------------------------------------------------------------
+
+void csSector::AddThing (csThing* thing)
+{
+  things.Push ((csSome)thing);
+  if (culler)
+  {
+    iVisibilityObject* vo = QUERY_INTERFACE (thing, iVisibilityObject);
+    vo->DecRef ();
+    culler->RegisterVisObject (vo);
+  }
+}
+
+void csSector::UnlinkThing (csThing* thing)
+{
+  int idx = things.Find ((csSome)thing);
+  if (idx != -1)
+  {
+    things.Delete (idx);
+    if (culler)
+    {
+      iVisibilityObject* vo = QUERY_INTERFACE (thing, iVisibilityObject);
+      vo->DecRef ();
+      culler->UnregisterVisObject (vo);
+    }
+  }
+}
+
+csThing* csSector::GetThing (const char* name)
+{
+  int i;
+  for (i = 0 ; i < things.Length () ; i++)
+  {
+    csThing* s = (csThing*)things[i];
+    if (!strcmp (name, s->GetName ()))
+      return s;
+  }
+  return NULL;
+}
+
+//----------------------------------------------------------------------
+
+void csSector::AddSky (csThing* thing)
+{
+  skies.Push ((csSome)thing);
+  if (culler)
+  {
+    iVisibilityObject* vo = QUERY_INTERFACE (thing, iVisibilityObject);
+    vo->DecRef ();
+    culler->RegisterVisObject (vo);
+  }
+}
+
+void csSector::UnlinkSky (csThing* thing)
+{
+  int idx = skies.Find ((csSome)thing);
+  if (idx != -1)
+  {
+    skies.Delete (idx);
+    if (culler)
+    {
+      iVisibilityObject* vo = QUERY_INTERFACE (thing, iVisibilityObject);
+      vo->DecRef ();
+      culler->UnregisterVisObject (vo);
+    }
+  }
+}
+
+csThing* csSector::GetSky (const char* name)
+{
+  int i;
+  for (i = 0 ; i < skies.Length () ; i++)
+  {
+    csThing* s = (csThing*)skies[i];
+    if (!strcmp (name, s->GetName ()))
+      return s;
+  }
+  return NULL;
+}
+
+//----------------------------------------------------------------------
+
+void csSector::AddCollection (csCollection* col)
+{
+  collections.Push ((csSome)col);
+}
+
+void csSector::UnlinkCollection (csCollection* col)
+{
+  int idx = collections.Find ((csSome)col);
+  if (idx != -1) collections.Delete (idx);
+}
+
+csCollection* csSector::GetCollection (const char* name)
+{
+  int i;
+  for (i = 0 ; i < collections.Length () ; i++)
+  {
+    csCollection* s = (csCollection*)collections[i];
+    if (!strcmp (name, s->GetName ()))
+      return s;
+  }
+  return NULL;
+}
+
+//----------------------------------------------------------------------
+
 void csSector::AddLight (csStatLight* light)
 {
-  lights.Push (light);
+  lights.Push ((csSome)light);
   light->SetSector (this);
 }
+
+void csSector::UnlinkLight (csStatLight* light)
+{
+  int idx = lights.Find ((csSome)light);
+  if (idx != -1) { lights[idx] = NULL; lights.Delete (idx); }
+}
+
+csStatLight* csSector::FindLight (float x, float y, float z, float dist)
+{
+  int i;
+  for (i = 0 ; i < lights.Length () ; i++)
+  {
+    csStatLight* l = (csStatLight*)lights[i];
+    if (ABS (x-l->GetCenter ().x) < SMALL_EPSILON &&
+        ABS (y-l->GetCenter ().y) < SMALL_EPSILON &&
+        ABS (z-l->GetCenter ().z) < SMALL_EPSILON &&
+        ABS (dist-l->GetRadius ()) < SMALL_EPSILON)
+      return l;
+  }
+  return NULL;
+}
+
+csStatLight* csSector::FindLight (CS_ID id)
+{
+  int i;
+  for (i = 0 ; i < lights.Length () ; i++)
+  {
+    csStatLight* l = (csStatLight*)lights[i];
+    if (l->GetID () == id) return l;
+  }
+  return NULL;
+}
+
+//----------------------------------------------------------------------
+
+void csSector::AddTerrain (csTerrain* terrain)
+{
+  terrains.Push ((csSome)terrain);
+}
+
+void csSector::UnlinkTerrain (csTerrain* terrain)
+{
+  int idx = terrains.Find ((csSome)terrain);
+  if (idx != -1) { terrains[idx] = NULL; terrains.Delete (idx); }
+}
+
+//----------------------------------------------------------------------
 
 void csSector::UseStaticTree (int mode, bool octree)
 {
@@ -127,6 +324,8 @@ void csSector::UseStaticTree (int mode, bool octree)
     {
       static_thing = th;
       static_thing->BuildStaticTree (mode, octree);
+      culler = QUERY_INTERFACE (static_thing, iVisibilityCuller);
+      culler->DecRef ();
       break;//@@@@@@ Only support one static_thing for now!!!
     }
   }
@@ -550,49 +749,13 @@ void csSector::Draw (csRenderView& rview)
   // If the following flag is true the queues are actually used.
   bool use_object_queues = false;
 
-  int engine_mode = rview.GetEngine ()->GetEngineMode ();
-  if (static_thing)
+  // If we have a visibility culler in this sector we use it here.
+  if (culler)
   {
-    // If this sector has a static polygon tree (octree) there
-    // are three possibilities.
-    if (engine_mode == CS_ENGINE_FRONT2BACK)
+    if (culler->VisTest (&rview.scfiRenderView))
     {
-      //-----
-      // In this part of the rendering we use the c-buffer or another
-      // 2D/3D visibility culler.
-      //-----
-
-      // @@@ We should make a pool for queues. The number of queues allocated
-      // at the same time is bounded by the recursion through portals. So a
-      // pool would be ideal.
-      // Mark all meshes as invisible and clear the camera transformation
-      // for their bounding boxes.
-      if (meshes.Length () > 0)
-        for (i = 0 ; i < meshes.Length () ; i++)
-        {
-          csMeshWrapper* sp = (csMeshWrapper*)meshes[i];
-	  csPolyTreeObject* pt = sp->GetPolyTreeObject ();
-	  if (pt->GetWorldBoundingBox ().In (rview.GetOrigin ()))
-	    sp->MarkVisible ();
-	  else
-	    sp->MarkInvisible ();
-	  sp->VisTestReset ();
-        }
-      // Similarly mark all things as invisible and clear the camera
-      // transformation for their bounding boxes.
-      for (i = 0 ; i < things.Length () ; i++)
-      {
-        csThing* th = (csThing*)things[i];
-	csPolyTreeObject* pt = th->GetPolyTreeObject ();
-	if (pt->GetWorldBoundingBox ().In (rview.GetOrigin ()))
-	  th->MarkVisible ();
-	else
-	  th->MarkInvisible ();
-	th->VisTestReset ();
-      }
-
-      // Draw and do the visibility testing.
-      static_thing->Draw (rview);
+      // The visibility culler worked and marked all registered
+      // visible things as visible.
 
       // Fill the mesh and thing queues for all meshes and things
       // that were visible.
@@ -624,9 +787,15 @@ void csSector::Draw (csRenderView& rview)
     }
     else
     {
-      static_thing->Draw (rview);
+      // The visibility culler was either disabled or decided visibility
+      // culling was not useful given some circumstances. In this case
+      // all objects should be considered visible.
     }
   }
+
+  // If we have a static thing we draw it here.
+  if (static_thing)
+    static_thing->Draw (rview);
 
   if (do_things)
   {
@@ -865,6 +1034,9 @@ static int frust_cnt = 50;
 void* CheckFrustumPolygonsFB (csThing* thing,
   csPolygonInt** polygon, int num, bool /*same_plane*/, void* data)
 {
+  iThing* ithing = QUERY_INTERFACE (thing, iThing);//@@@@@@@@
+  ithing->DecRef ();
+
   csPolygon3D* p;
   CheckFrustData* fdata = (CheckFrustData*)data;
   csFrustumView* lview = fdata->lview;
@@ -881,11 +1053,12 @@ void* CheckFrustumPolygonsFB (csThing* thing,
     {
       // A BSP polygon. Used for testing visibility of things.
       csBspPolygon* bsppol = (csBspPolygon*)polygon[i];
-      csObject* obj = bsppol->GetOriginator ();
-      if (obj->GetType () == csThing::Type)
+      csVisObjInfo* obj = bsppol->GetOriginator ();
+      iThing* ith = QUERY_INTERFACE (obj->visobj, iThing);
+      if (ith)
       {
-        csThing* th = (csThing*)obj;
-	if (!fdata->visible_things.In (th))
+        ith->DecRef ();
+	if (!fdata->visible_things.In (ith))
 	{
 	  csPolyIndexed& pi = bsppol->GetPolygon ();
 	  csPolyTreeBBox* pi_par = bsppol->GetParent ();
@@ -904,8 +1077,9 @@ void* CheckFrustumPolygonsFB (csThing* thing,
 	      // The thing is visible and we want things to cast
 	      // shadows. So we add all shadows generated by this
 	      // thing to the shadow list.
-	      if (th != thing)
+	      if (ith != ithing)
 	      {
+	        csThing* th = ith->GetPrivateObject ();
 		if ((th->flags.Get () & lview->shadow_thing_mask) == lview->shadow_thing_value)
 		{
 		  csSector* sector = thing->GetMovable ().GetSector (0);
@@ -914,7 +1088,7 @@ void* CheckFrustumPolygonsFB (csThing* thing,
 	          delete shadows;
 		}
 	      }
-	    fdata->visible_things.AddNoTest (th);
+	    fdata->visible_things.AddNoTest (ith);
 	  }
 	}
       }
@@ -1281,30 +1455,6 @@ void csSector::CacheLightMaps ()
   }
 }
 
-csThing* csSector::GetThing (const char* name)
-{
-  int i;
-  for (i = 0 ; i < things.Length () ; i++)
-  {
-    csThing* s = (csThing*)things[i];
-    if (!strcmp (name, s->GetName ()))
-      return s;
-  }
-  return NULL;
-}
-
-csThing* csSector::GetSky (const char* name)
-{
-  int i;
-  for (i = 0 ; i < skies.Length () ; i++)
-  {
-    csThing* s = (csThing*)skies[i];
-    if (!strcmp (name, s->GetName ()))
-      return s;
-  }
-  return NULL;
-}
-
 void csSector::ShineLights (csProgressPulse* pulse)
 {
   for (int i = 0 ; i < lights.Length () ; i++)
@@ -1325,34 +1475,8 @@ void csSector::ShineLights (csThing* th, csProgressPulse* pulse)
   }
 }
 
-csStatLight* csSector::FindLight (float x, float y, float z, float dist)
-{
-  int i;
-  for (i = 0 ; i < lights.Length () ; i++)
-  {
-    csStatLight* l = (csStatLight*)lights[i];
-    if (ABS (x-l->GetCenter ().x) < SMALL_EPSILON &&
-        ABS (y-l->GetCenter ().y) < SMALL_EPSILON &&
-        ABS (z-l->GetCenter ().z) < SMALL_EPSILON &&
-        ABS (dist-l->GetRadius ()) < SMALL_EPSILON)
-      return l;
-  }
-  return NULL;
-}
-
-csStatLight* csSector::FindLight (CS_ID id)
-{
-  int i;
-  for (i = 0 ; i < lights.Length () ; i++)
-  {
-    csStatLight* l = (csStatLight*)lights[i];
-    if (l->GetID () == id) return l;
-  }
-  return NULL;
-}
-
 void csSector::CalculateSectorBBox (csBox3& bbox,
-	bool do_things, bool do_meshes, bool do_terrain)
+	bool do_things, bool do_meshes, bool /*do_terrain*/)
 {
   bbox.StartBoundingBox ();
   int i;

@@ -32,6 +32,7 @@ class csPolyTreeBBox;
 class csPolygonTree;
 class csTransform;
 class csBox3;
+struct iVisibilityObject;
 
 /**
  * A factor for creating instances of csBspPolygon.
@@ -42,6 +43,16 @@ class csBspPolygonFactory : public csPolygonIntFactory
   virtual csPolygonInt* Create ();
   /// Initialize a csBspPolygon.
   virtual void Init (csPolygonInt* pi);
+};
+
+/**
+ * Structure that is used by the visisibility
+ * culler to attach extra information to every bsp polygon.
+ */
+struct csVisObjInfo
+{
+  iVisibilityObject* visobj;
+  csPolyTreeBBox* bbox;
 };
 
 /**
@@ -61,8 +72,8 @@ private:
   csPlane3 plane;
   /// The parent.
   csPolyTreeBBox* parent;
-  /// The original object for which this polygon is a bounding box polygon.
-  csObject* originator;
+  /// Originator in the visibility culler.
+  csVisObjInfo* originator;
 
 public:
   /// A pool of csBspPolygon.
@@ -86,12 +97,12 @@ public:
   void SetParent (csPolyTreeBBox* par) { parent = par; }
 
   /**
-   * Get the original object for which this polygon is a bounding box polygon.
+   * Get originator.
    */
-  csObject* GetOriginator () { return originator; }
+  csVisObjInfo* GetOriginator () { return originator; }
 
-  /// Set the original object.
-  void SetOriginator (csObject* orig) { originator = orig; }
+  /// Set originator.
+  void SetOriginator (csVisObjInfo* org) { originator = org; }
 
   /// Get the reference to the polygon.
   csPolyIndexed& GetPolygon () { return polygon; }
@@ -191,7 +202,7 @@ public:
 
 public:
   /// Constructor.
-  csPolyTreeBBox (csObject* owner);
+  csPolyTreeBBox ();
   /// Destructor.
   virtual ~csPolyTreeBBox ();
 
@@ -209,13 +220,13 @@ public:
    * and a transformation.
    */
   void Update (const csBox3& object_bbox, const csTransform& o2w,
-  	csObject* originator);
+  	csVisObjInfo* vinf);
 
   /**
    * Update this object using a world space bounding box.
    */
   void Update (const csBox3& world_bbox,
-  	csObject* originator);
+  	csVisObjInfo* vinf);
 
   /// Add a polygon to this container.
   void AddPolygon (csPolygonInt* poly)
@@ -296,7 +307,7 @@ public:
 
 public:
   /// Constructor.
-  csSphereTreeObject (csObject* owner, const csVector3& center, float rad);
+  csSphereTreeObject (const csVector3& center, float rad);
   /// Destructor.
   virtual ~csSphereTreeObject () { }
 

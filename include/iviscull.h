@@ -22,7 +22,7 @@
 
 #include "csutil/scf.h"
 
-struct iCamera;
+struct iRenderView;
 struct iVisibilityObject;
 struct iMovable;
 class csBox3;
@@ -43,9 +43,12 @@ struct iVisibilityCuller : public iBase
   /**
    * Do the visibility test from a given viewpoint. This will first
    * clear the visible flag on all registered objects and then it will
-   * mark all visible objects.
+   * mark all visible objects. If this function returns false then
+   * the visibility test could not happen for some reason (disabled
+   * or circumstances are not right). In this case all objects should
+   * be considered visible.
    */
-  virtual void VisTest (iCamera* camera) = 0;
+  virtual bool VisTest (iRenderView* irview) = 0;
 };
 
 SCF_VERSION (iVisibilityObject, 0, 0, 1);

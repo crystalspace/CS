@@ -53,7 +53,7 @@ void csCollection::UpdateMove ()
 
 void csCollection::MoveToSector (csSector* s)
 {
-  s->collections.Push (this);
+  s->AddCollection (this);
 }
 
 void csCollection::RemoveFromSectors ()
@@ -64,13 +64,6 @@ void csCollection::RemoveFromSectors ()
   {
     csSector* ss = (csSector*)sectors[i];
     if (ss)
-    {
-      int idx = ss->collections.Find (this);
-      if (idx >= 0)
-      {
-        ss->things[idx] = NULL;
-        ss->things.Delete (idx);
-      }
-    }
+      ss->UnlinkCollection (this);
   }
 }

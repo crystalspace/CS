@@ -24,6 +24,7 @@
 #include "csgeom/polyclip.h"
 #include "csgeom/polypool.h"
 #include "csgeom/frustum.h"
+#include "csengine/bspbbox.h"
 #include "csengine/dumper.h"
 #include "csengine/bsp.h"
 #include "csengine/bsp2d.h"

@@ -43,7 +43,7 @@ struct iView;
 struct iGraphics3D;
 struct iTransformationManager;
 
-SCF_VERSION (iEngine, 0, 1, 11);
+SCF_VERSION (iEngine, 0, 1, 12);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -215,6 +215,13 @@ struct iEngine : public iPlugIn
    * flags that the application might be interested in.
    */
   virtual int GetBeginDrawFlags () = 0;
+
+  /**
+   * Get the current engine mode.
+   * If called between SetEngineMode() and the first Draw() it is
+   * possible that this mode will still be CS_ENGINE_AUTODETECT.
+   */
+  virtual int GetEngineMode () = 0;
 
   /// Get the transformation manager.
   virtual iTransformationManager* GetTransformationManager () = 0;

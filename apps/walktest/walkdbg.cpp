@@ -159,9 +159,9 @@ void select_object (csRenderView* rview, int type, void* entity)
     csVector3 v;
     float iz;
     int px, py, r;
-    for (i = 0 ; i < sector->lights.Length () ; i++)
+    for (i = 0 ; i < sector->GetNumberLights () ; i++)
     {
-      v = rview->Other2This (((csStatLight*)sector->lights[i])->GetCenter ());
+      v = rview->Other2This (sector->GetLight (i)->GetCenter ());
       if (v.z > SMALL_Z)
       {
         iz = rview->GetFOV ()/v.z;
@@ -171,7 +171,7 @@ void select_object (csRenderView* rview, int type, void* entity)
         if (ABS (coord_check_vector.x - px) < 5 &&
 		ABS (coord_check_vector.y - (csEngine::frame_height-1-py)) < 5)
         {
-	  csLight* light = (csLight*)sector->lights[i];
+	  csLight* light = sector->GetLight (i);
 	  if (check_light)
 	  {
             if (Sys->selected_light == light) Sys->selected_light = NULL;
@@ -422,9 +422,9 @@ void draw_edges (csRenderView* rview, int type, void* entity)
     csVector3 v;
     float iz;
     int px, py, r;
-    for (i = 0 ; i < sector->lights.Length () ; i++)
+    for (i = 0 ; i < sector->GetNumberLights () ; i++)
     {
-      csStatLight* light = (csStatLight*)(sector->lights[i]);
+      csStatLight* light = sector->GetLight (i);
       if (!hilighted_only || Sys->selected_light == light)
       {
         v = rview->Other2This (light->GetCenter ());
@@ -463,9 +463,9 @@ void draw_map (csRenderView* /*rview*/, int type, void* entity)
   {
     csSector* sector = (csSector*)entity;
     int i;
-    for (i = 0 ; i < sector->lights.Length () ; i++)
+    for (i = 0 ; i < sector->GetNumberLights () ; i++)
     {
-      csWfVertex* vt = wf->AddVertex (((csStatLight*)sector->lights[i])->GetCenter ());
+      csWfVertex* vt = wf->AddVertex (sector->GetLight (i)->GetCenter ());
       vt->SetColor (wf->GetRed ());
     }
   }
@@ -914,7 +914,7 @@ void CreateSolidThings (csEngine* engine, csSector* room, csOctreeNode* node, in
   	    gs->SetUV (0, 0, 0); gs->SetUV (1, 1, 0); gs->SetUV (2, 1, 1);
 	    gs->AddColor (0, 1, 0, 0); gs->AddColor (1, 0, 1, 0); gs->AddColor (2, 0, 0, 1);
 
-	    room->things.Push (thing);
+	    room->AddThing (thing);
 	  }
 	}
     }

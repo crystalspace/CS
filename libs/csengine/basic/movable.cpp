@@ -50,18 +50,26 @@ csMovable::~csMovable ()
   int i;
   for (i = 0 ; i < listeners.Length () ; i++)
   {
-    csMovableListener* ml = (csMovableListener*)listeners[i];
+    iMovableListener* ml = (iMovableListener*)listeners[i];
     void* ml_data = listener_userdata[i];
-    ml (&scfiMovable, CS_MOVABLE_DESTROYED, ml_data);
+    ml->MovableDestroyed (&scfiMovable, ml_data);
   }
-  if (iparent) iparent->DecRef ();
+  //@@@
+  // The following DecRef() is not possible because we
+  // actually have a circular reference here (parent -> this and
+  // this -> parent).
+  //if (iparent) iparent->DecRef ();
 }
 
 void csMovable::SetParent (csMovable* parent)
 {
-  iMovable* ipar = QUERY_INTERFACE_SAFE (parent, iMovable);
+  //@@@ (see comment above)
+  //iMovable* ipar = QUERY_INTERFACE_SAFE (parent, iMovable);
+  //if (iparent) iparent->DecRef ();
+  //iparent = ipar;
+  iparent = QUERY_INTERFACE_SAFE (parent, iMovable);
   if (iparent) iparent->DecRef ();
-  iparent = ipar;
+
   csMovable::parent = parent;
 }
 
@@ -84,6 +92,14 @@ void csMovable::MovePosition (const csVector3& rel)
 void csMovable::Transform (const csMatrix3& matrix)
 {
   obj.SetT2O (matrix * obj.GetT2O ());
+}
+
+void csMovable::SetSector (csSector* sector)
+{
+  if (sectors.Length () == 1 && sector == (csSector*)sectors[0])
+    return;
+  ClearSectors ();
+  AddSector (sector);
 }
 
 void csMovable::ClearSectors ()
@@ -133,30 +149,19 @@ void csMovable::AddSector (csSector* sector)
   }
 }
 
-void csMovable::AddListener (csMovableListener* listener, void* userdata)
+void csMovable::AddListener (iMovableListener* listener, void* userdata)
 {
-  RemoveListener (listener, userdata);
+  RemoveListener (listener);
   listeners.Push ((csSome)listener);
   listener_userdata.Push (userdata);
 }
 
-void csMovable::RemoveListener (csMovableListener* listener, void* userdata)
+void csMovable::RemoveListener (iMovableListener* listener)
 {
-  int idx;
-  for (idx = 0 ; idx < listeners.Length () ; idx++)
-  {
-    csMovableListener* ml = (csMovableListener*)listeners[idx];
-    if (ml == listener)
-    {
-      void* ml_data = listener_userdata[idx];
-      if (ml_data == userdata)
-      {
-	listeners.Delete (idx);
-	listener_userdata.Delete (idx);
-	return;
-      }
-    }
-  }
+  int idx = listeners.Find ((csSome)listener);
+  if (idx == -1) return;
+  listeners.Delete (idx);
+  listener_userdata.Delete (idx);
 }
 
 void csMovable::UpdateMove ()
@@ -181,9 +186,9 @@ void csMovable::UpdateMove ()
   int i;
   for (i = 0 ; i < listeners.Length () ; i++)
   {
-    csMovableListener* ml = (csMovableListener*)listeners[i];
+    iMovableListener* ml = (iMovableListener*)listeners[i];
     void* ml_data = listener_userdata[i];
-    ml (&scfiMovable, CS_MOVABLE_CHANGED, ml_data);
+    ml->MovableChanged (&scfiMovable, ml_data);
   }
 }
 

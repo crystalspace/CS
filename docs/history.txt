@@ -1,6 +1,59 @@
 The history order has been reversed so that new features are at the top.
 
+19-Feb-2001
+	- Martin Geisse modified the system driver to use the config
+	  manager as its main config object. Currently the manager uses
+	  the application config as its dynamic config, but no other
+	  config files. So this modification should not change any behaviour.
+	- Wouter Wijngaards changed procedural sky so that it can now run
+	  in a special non-animated mode. With this setting demosky is
+	  now a LOT faster.
+	- Fixed a bug in csMeshWrapper::SetMeshObject().
+	- Fixed a bug in csMovable. The parent reference should not
+	  be incref'ed/decref'ed as that creates a circular reference.
+	- Fixed a bug in the handling of iMovable by csMeshWrapper. This
+	  caused simple to crash at exit.
+	- Fixed an additional bug in simple which would cause another
+	  crash at exit.
+	- Fixed a bug in WalkTest. If you pressed the mouse button WalkTest
+	  would just continue going forward even after releasing it again.
+	  Bug fixed by Navdeep S. Tinna.
+	- Added iMovableListener interface instead of the
+	  csMovableListener callback function.
+	- csThing now implements iMovableListener.
+	- Added GetEngineMode() to iEngine.
+	- Added GetVisibilityCuller() to csSector and iSector.
+	- csThing and csMeshWrapper now implement iVisibilityObject.
+	- Made all the object vectors in csSector private and added
+	  accessor functions to add or remove objects from them. The
+	  reason for this is that the sector may want to do extra processing
+	  on the objects (like registering them to the culler for example).
+	  These are the accessor functions that are added:
+	      - AddMesh, UnlinkMesh, GetNumberMeshes, GetMesh(1), GetMesh(2).
+	      - AddThing, UnlinkThing, GetNumberThing, GetThing(1)
+	      - AddSky, UnlinkSky, GetNumberSkies, GetSky(1)
+	      - AddCollection, UnlinkCollection, GetNumberCollections,
+	      	GetCollection(1), GetCollection(2).
+	      - UnlinkLight, GetNumberLights, GetLight(1), GetLight(2).
+	      - AddTerrain, UnlinkTerrain, GetNumberTerrains,
+	        GetTerrain(1), GetTerrain(2).
+	- Fixed all the CS apps to work with the above functions.
+	- Optimized csMovable::SetSector() so that it does not do anything
+	  if the object is already in that sector.
+	- Removed 'owner' from csPolyTreeObject since it is actually not
+	  used and we will not be able to give it anyway with the new
+	  system.
+	- Removed the csPolyTreeObject's from csThing and csMeshWrapper.
+	  This is now the responsibility of the visibility culler.
+	- Continued working on the visibility plugin system. It is now
+	  working mostly. The next step will be to really seperate it
+	  more cleanly from the engine. Note that there are still bugs
+	  in the vis system. It sometimes says something is invisible
+	  when it is visible.
+	- Fixed crasher in phyztest.
 18-Feb-2001
+	- Martin Geisse added some missing 'volatile' keywords to the
+	  waveout driver.
 	- Renamed csPolygonSetBBox to csThingBBox.
 	- Moved the octree from csSector to csThing. Added
 	  csThing::BuildStaticTree() to create this tree.

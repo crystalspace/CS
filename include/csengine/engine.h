@@ -741,7 +741,7 @@ public:
    * If called between SetEngineMode() and the first Draw() it is
    * possible that this mode will still be CS_ENGINE_AUTODETECT.
    */
-  int GetEngineMode () { return engine_mode; }
+  virtual int GetEngineMode () { return engine_mode; }
 
   /**
    * Get the required flags for 3D->BeginDraw() which should be called

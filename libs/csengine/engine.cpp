@@ -109,10 +109,10 @@ csPolygon3D* csPolyIt::Fetch ()
     // We are busy scanning the things of this sector.
     // See if the current thing has the indicated polygon number.
     // If not then we try the next thing.
-    while (polygon_idx >= ((csThing*)(sector->things[thing_idx]))->GetNumPolygons ())
+    while (polygon_idx >= sector->GetThing (thing_idx)->GetNumPolygons ())
     {
       thing_idx++;
-      if (thing_idx >= sector->things.Length ())
+      if (thing_idx >= sector->GetNumberThings ())
       {
         thing_idx = -1;
 	break;
@@ -135,7 +135,7 @@ csPolygon3D* csPolyIt::Fetch ()
     polygon_idx = -1;
     thing_idx = 0;
     // Recurse.
-    if (thing_idx < sector->things.Length ())
+    if (thing_idx < sector->GetNumberThings ())
       return Fetch ();
     // No things. Go to next sector.
     if (!NextSector ()) return NULL;
@@ -144,8 +144,7 @@ csPolygon3D* csPolyIt::Fetch ()
     return Fetch ();
   }
 
-  return
-    ((csThing*)(sector->things[thing_idx]))->GetPolygon3D (polygon_idx);
+  return sector->GetThing (thing_idx)->GetPolygon3D (polygon_idx);
 }
 
 csSector* csPolyIt::GetLastSector ()
@@ -199,10 +198,10 @@ csCurve* csCurveIt::Fetch ()
     // We are busy scanning the things of this sector.
     // See if the current thing has the indicated curve number.
     // If not then we try the next thing.
-    while (curve_idx >= ((csThing*)(sector->things[thing_idx]))->GetNumCurves ())
+    while (curve_idx >= sector->GetThing (thing_idx)->GetNumCurves ())
     {
       thing_idx++;
-      if (thing_idx >= sector->things.Length ())
+      if (thing_idx >= sector->GetNumberThings ())
       {
         thing_idx = -1;
 	break;
@@ -226,7 +225,7 @@ csCurve* csCurveIt::Fetch ()
     thing_idx = 0;
 
     // Recurse.
-    if (thing_idx < sector->things.Length ())
+    if (thing_idx < sector->GetNumberThings ())
       return Fetch ();
 
     // No things. Go to next sector.
@@ -237,8 +236,7 @@ csCurve* csCurveIt::Fetch ()
     return Fetch ();
   }
 
-  return
-    ((csThing*)(sector->things[thing_idx]))->GetCurve (curve_idx);
+  return sector->GetThing (thing_idx)->GetCurve (curve_idx);
 }
 
 csSector* csCurveIt::GetLastSector ()
@@ -285,7 +283,7 @@ csLight* csLightIt::Fetch ()
   // Try next light.
   light_idx++;
 
-  if (light_idx >= sector->lights.Length ())
+  if (light_idx >= sector->GetNumberLights ())
   {
     // Go to next sector.
     light_idx = -1;
@@ -294,9 +292,7 @@ csLight* csLightIt::Fetch ()
     return Fetch ();
   }
 
-  csLight* light;
-  light = (csLight*)(sector->lights[light_idx]);
-  return light;
+  return sector->GetLight (light_idx);
 }
 
 csSector* csLightIt::GetLastSector ()
@@ -502,11 +498,11 @@ csObject* csObjectIt::Fetch ()
   {
     if (CheckType (cur_type))
     {
-      if (cur_idx >= cur_sector->things.Length ())
+      if (cur_idx >= cur_sector->GetNumberThings ())
         StartStatLights ();
       else
       {
-        csObject* rc = (csObject*)cur_sector->things[cur_idx];
+        csObject* rc = (csObject*)cur_sector->GetThing (cur_idx);
 	cur_idx++;
         return rc;
       }
@@ -519,21 +515,21 @@ csObject* csObjectIt::Fetch ()
   {
     if (CheckType (cur_type))
     {
-      if (cur_idx >= cur_sector->lights.Length ())
+      if (cur_idx >= cur_sector->GetNumberLights ())
         StartMeshes ();
       else
       {
         do
 	{
-          csObject* rc = (csObject*)cur_sector->lights[cur_idx];
+          csObject* rc = (csObject*)cur_sector->GetLight (cur_idx);
 	  cur_idx++;
 	  float r = ((csLight*)rc)->GetRadius () + radius;
 	  if (csSquaredDist::PointPoint (((csLight*)rc)->GetCenter (),
 		  cur_pos) <= r*r)
             return rc;
 	}
-	while (cur_idx < cur_sector->lights.Length ());
-        if (cur_idx >= cur_sector->lights.Length ())
+	while (cur_idx < cur_sector->GetNumberLights ());
+        if (cur_idx >= cur_sector->GetNumberLights ())
           StartMeshes ();
       }
     }
@@ -545,11 +541,11 @@ csObject* csObjectIt::Fetch ()
   {
     if (CheckType (cur_type))
     {
-      if (cur_idx >= cur_sector->meshes.Length ())
+      if (cur_idx >= cur_sector->GetNumberMeshes ())
         cur_type = &csSector::Type;
       else
       {
-        csObject* rc = (csObject*)cur_sector->meshes[cur_idx];
+        csObject* rc = (csObject*)cur_sector->GetMesh (cur_idx);
 	cur_idx++;
         return rc;
       }
@@ -1443,7 +1439,7 @@ csStatLight* csEngine::FindLight (const char* name, bool /*regionOnly*/)
   {
     sn--;
     csSector* s = (csSector*)sectors[sn];
-    l = (csStatLight*)s->lights.FindByName (name);
+    l = s->GetLight (name);
     if (l) return l;
   }
   return NULL;
@@ -1701,9 +1697,9 @@ int csEngine::GetNearbyLights (csSector* sector, const csVector3& pos, ULong fla
   // Add all static lights to the array (if CS_NLIGHT_STATIC is set).
   if (flags & CS_NLIGHT_STATIC)
   {
-    for (i = 0 ; i < sector->lights.Length () ; i++)
+    for (i = 0 ; i < sector->GetNumberLights () ; i++)
     {
-      csStatLight* sl = (csStatLight*)sector->lights[i];
+      csStatLight* sl = sector->GetLight (i);
       sqdist = csSquaredDist::PointPoint (pos, sl->GetCenter ());
       if (sqdist < sl->GetSquaredRadius ())
       {

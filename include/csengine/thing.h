@@ -21,7 +21,6 @@
 
 #include "csgeom/transfrm.h"
 #include "csobject/pobject.h"
-#include "csengine/bspbbox.h"
 #include "csengine/rview.h"
 #include "csengine/movable.h"
 #include "csengine/tranman.h"
@@ -29,6 +28,7 @@
 #include "csutil/flags.h"
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
+#include "csutil/garray.h"
 #include "ithing.h"
 #include "imovable.h"
 #include "ipolmesh.h"
@@ -39,8 +39,12 @@ class csEngine;
 class csStatLight;
 class csMaterialWrapper;
 class csMaterialList;
+class csThing;
 class csPolygon3D;
+class csPolygonInt;
 class csPolygonTree;
+class csPolygon2D;
+class csPolygon2DQueue;
 struct iGraphics3D;
 class Dumper;
 
@@ -248,9 +252,6 @@ private:
   /// Internal draw function.
   void DrawInt (csRenderView& rview);
 
-  /// Bounding box for polygon trees.
-  csPolyTreeBBox tree_bbox;
-
   /// If true this thing is visible.
   bool is_visible;
 
@@ -335,12 +336,6 @@ public:
    */
   static void* DrawPolygons (csThing*, csPolygonInt** polygon,
   	int num, bool same_plane, void* data);
-
-  /**
-   * Callback that is called whenever a movable that we're interested in
-   * changes.
-   */
-  static void MovableListener (iMovable* movable, int action, void* userdata);
 
   /**
    * Current light frame number. This is used for seeing
@@ -534,15 +529,6 @@ public:
    */
   int GetCenter () { return center_idx; }
 
-  /**
-   * Do some initialization needed for visibility testing.
-   * i.e. clear camera transformation.
-   */
-  void VisTestReset ()
-  {
-    tree_bbox.ClearTransform ();
-  }
-
   /// Mark this thing as visible.
   void MarkVisible () { is_visible = true; }
 
@@ -566,12 +552,6 @@ public:
    * trees instead of a BSP tree alone.
    */
   void BuildStaticTree (int mode = BSP_MINIMIZE_SPLITS, bool octree = false);
-
-  /// Get the pointer to the object to place in the polygon tree.
-  csPolyTreeObject* GetPolyTreeObject ()
-  {
-    return &tree_bbox;
-  }
 
   /**
    * Merge the given Thing into this one. The other polygons and
@@ -808,7 +788,12 @@ public:
    * clear the visible flag on all registered objects and then it will
    * mark all visible objects.
    */
-  void VisTest (iCamera* camera);
+  bool VisTest (iRenderView* irview);
+
+  /// The movable has changed.
+  void MovableChanged (iMovable* movable, void* userdata);
+  /// The movable is about to be destroyed.
+  void MovableDestroyed (iMovable* movable, void* userdata);
 
   CSOBJTYPE;
   DECLARE_IBASE_EXT (csPObject);
@@ -870,12 +855,42 @@ public:
     {
       scfParent->UnregisterVisObject (visobj);
     }
-    virtual void VisTest (iCamera* camera)
+    virtual bool VisTest (iRenderView* irview)
     {
-      scfParent->VisTest (camera);
+      return scfParent->VisTest (irview);
     }
   } scfiVisibilityCuller;
   friend struct VisCull;
+
+  //-------------------- iVisibilityObject interface implementation ------------------
+  struct VisObject : public iVisibilityObject
+  {
+    DECLARE_EMBEDDED_IBASE (csThing);
+    virtual iMovable* GetMovable () { return &scfParent->GetMovable ().scfiMovable; }
+    virtual void GetBoundingBox (csBox3& bbox)
+    {
+      scfParent->GetBoundingBox (bbox);
+    }
+    virtual void MarkVisible () { scfParent->MarkVisible (); }
+    virtual void MarkInvisible () { scfParent->MarkInvisible (); }
+    virtual bool IsVisible () { return scfParent->IsVisible (); }
+  } scfiVisibilityObject;
+  friend struct VisObject;
+
+  //-------------------- iMovableListener interface implementation ------------------
+  struct MovListener : public iMovableListener
+  {
+    DECLARE_EMBEDDED_IBASE (csThing);
+    virtual void MovableChanged (iMovable* movable, void* userdata)
+    {
+      scfParent->MovableChanged (movable, userdata);
+    }
+    virtual void MovableDestroyed (iMovable* movable, void* userdata)
+    {
+      scfParent->MovableDestroyed (movable, userdata);
+    }
+  } scfiMovableListener;
+  friend struct MovListener;
 };
 
 #endif // __CS_THING_H__

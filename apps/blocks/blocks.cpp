@@ -2178,13 +2178,13 @@ void Blocks::StartNewGame ()
 
   // First delete all cubes that may still be in the engine.
   int i = 0;
-  while (i < room->things.Length ())
+  while (i < room->GetNumberThings ())
   {
-    csThing* cube = (csThing*)room->things[i];
+    csThing* cube = room->GetThing (i);
     if (!strncmp (cube->GetName (), "cube", 4))
     {
+      room->UnlinkThing (cube);
       delete cube;
-      room->things.Delete (i);
     }
     else
       i++;

@@ -29,14 +29,19 @@ class csThing;
 struct iSector;
 struct iMovable;
 
-#define CS_MOVABLE_DESTROYED 0
-#define CS_MOVABLE_CHANGED 1
+SCF_VERSION (iMovableListener, 0, 0, 1);
 
 /**
- * This function is called when the movable changes.
+ * Implement this class if you're interested in hearing about
+ * movable changes.
  */
-typedef void (csMovableListener)(iMovable* movable, int action, void* userdata);
-
+struct iMovableListener : public iBase
+{
+  /// The movable has changed.
+  virtual void MovableChanged (iMovable* movable, void* userdata) = 0;
+  /// The movable is about to be destroyed.
+  virtual void MovableDestroyed (iMovable* movable, void* userdata) = 0;
+};
 
 SCF_VERSION (iMovable, 0, 0, 7);
 
@@ -146,14 +151,13 @@ struct iMovable : public iBase
   /**
    * Add a listener to this movable. This listener will be called whenever
    * the movable changes or right before the movable is destroyed.
-   * The given 'action' will be CS_MOVABLE_DESTROYED or CS_MOVABLE_CHANGED.
    */
-  virtual void AddListener (csMovableListener* listener, void* userdata) = 0;
+  virtual void AddListener (iMovableListener* listener, void* userdata) = 0;
 
   /**
    * Remove a listener from this movable.
    */
-  virtual void RemoveListener (csMovableListener* listener, void* userdata) = 0;
+  virtual void RemoveListener (iMovableListener* listener) = 0;
 
   /**
    * After all movement has been done you need to

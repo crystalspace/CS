@@ -220,9 +220,9 @@ int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
     return 1;
 
   // Check collision with the things in this sector.
-  for (i = 0 ; i < sp->things.Length () ; i++)
+  for (i = 0 ; i < sp->GetNumberThings () ; i++)
   {
-    csThing* tp = (csThing*)(sp->things[i]);
+    csThing* tp = sp->GetThing (i);
     Sys->collide_system->ResetCollisionPairs ();
     if (c->Collide (*tp, cdt, &tp->GetMovable ().GetTransform ())) hit++;
 
@@ -260,12 +260,12 @@ void DoGravity (csVector3& pos, csVector3& vel)
   int k;
   for ( k = 0; k < num_sectors ; k++)
   {
-    if (n[k]->terrains.Length () > 0)
+    if (n[k]->GetNumberTerrains () > 0)
     {
       int i;
-      for (i = 0 ; i < n[k]->terrains.Length () ; i++)
+      for (i = 0 ; i < n[k]->GetNumberTerrains () ; i++)
       {
-	csTerrain* terrain = (csTerrain*)n[k]->terrains[i];
+	csTerrain* terrain = n[k]->GetTerrain (i);
 	hits += terrain->CollisionDetect (&test);
       }
     }

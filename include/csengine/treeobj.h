@@ -229,9 +229,6 @@ class csPolyTreeObject
   friend class Dumper;
 
 private:
-  /// Owner (original dynamic object).
-  csObject* owner;
-
   /**
    * A linked list for all object stubs that are added
    * to the tree. These stubs represents parts of
@@ -255,14 +252,9 @@ protected:
 
 public:
   /// Constructor.
-  csPolyTreeObject (csObject* owner, csObjectStubFactory* factory);
+  csPolyTreeObject (csObjectStubFactory* factory);
   /// Destructor.
   virtual ~csPolyTreeObject ();
-
-  /// Get owner.
-  csObject* GetOwner () const { return owner; }
-  /// Set owner.
-  void SetOwner (csObject* newOwner) { owner = newOwner; }
 
   /**
    * Remove this object from its tree.
@@ -356,8 +348,8 @@ class csDetailedPolyTreeObject : public csPolyTreeObject
 
 public:
   /// Constructor.
-  csDetailedPolyTreeObject (csObject* owner, csObjectStubFactory* stub_fact) :
-  	csPolyTreeObject (owner, stub_fact) { }
+  csDetailedPolyTreeObject (csObjectStubFactory* stub_fact) :
+  	csPolyTreeObject (stub_fact) { }
   /// Destructor.
   virtual ~csDetailedPolyTreeObject () { }
 

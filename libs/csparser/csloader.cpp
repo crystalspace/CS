@@ -2536,7 +2536,7 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf)
   terr->SetDetail (detail);
 
   heightmap->DecRef ();
-  sector.terrains.Push (terr);
+  sector.AddTerrain (terr);
 }
 
 //---------------------------------------------------------------------------
@@ -2784,11 +2784,11 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
     csSector* s = (csSector*)(Engine->sectors)[sn];
     if (cur_region && !cur_region->IsInRegion (s))
       continue;
-    int st = s->things.Length ();
+    int st = s->GetNumberThings ();
     int j = 0;
     while (j < st)
     {
-      csThing* ps = (csThing*)s->things[j];
+      csThing* ps = s->GetThing (j);
       j++;
       for (int i=0;  i < ps->GetNumPolygons ();  i++)
       {

@@ -250,8 +250,8 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   light = new csStatLight (0, -4, -3, 10, 0, 1, 0, false);
   room->AddLight (light);
 
-  iPolygonMesh* mesh = QUERY_INTERFACE (room, iPolygonMesh);
-  (void)new csCollider(*room, cdsys, mesh);
+  iPolygonMesh* mesh = QUERY_INTERFACE (walls, iPolygonMesh);
+  (void)new csCollider(*walls, cdsys, mesh);
   mesh->DecRef ();
 
   engine->Prepare ();

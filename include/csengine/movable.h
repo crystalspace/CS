@@ -86,15 +86,9 @@ public:
   /**
    * Initialize the list of sectors to one sector where
    * this thing is. This is a conveniance funcion.
-   * This function does not update the corresponding list in
-   * the sector. It only does a local update here.
    * This function does not do anything if the parent is not NULL.
    */
-  void SetSector (csSector* sector)
-  {
-    ClearSectors ();
-    AddSector (sector);
-  }
+  void SetSector (csSector* sector);
 
   /**
    * Clear the list of sectors.
@@ -206,14 +200,13 @@ public:
   /**
    * Add a listener to this movable. This listener will be called whenever
    * the movable changes or right before the movable is destroyed.
-   * The given 'action' will be CS_MOVABLE_DESTROYED or CS_MOVABLE_CHANGED.
    */
-  void AddListener (csMovableListener* listener, void* userdata);
+  void AddListener (iMovableListener* listener, void* userdata);
 
   /**
    * Remove a listener from this movable.
    */
-  void RemoveListener (csMovableListener* listener, void* userdata);
+  void RemoveListener (iMovableListener* listener);
 
   DECLARE_IBASE;
 
@@ -277,13 +270,13 @@ public:
     {
       scfParent->Transform (matrix);
     }
-    virtual void AddListener (csMovableListener* listener, void* userdata)
+    virtual void AddListener (iMovableListener* listener, void* userdata)
     {
       scfParent->AddListener (listener, userdata);
     }
-    virtual void RemoveListener (csMovableListener* listener, void* userdata)
+    virtual void RemoveListener (iMovableListener* listener)
     {
-      scfParent->RemoveListener (listener, userdata);
+      scfParent->RemoveListener (listener);
     }
     virtual void UpdateMove ()
     {

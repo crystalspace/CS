@@ -22,9 +22,8 @@
 
 csObjectStubPool csPolyTreeObject::stub_pool;
 
-csPolyTreeObject::csPolyTreeObject (csObject* owner, csObjectStubFactory* factory)
+csPolyTreeObject::csPolyTreeObject (csObjectStubFactory* factory)
 {
-  this->owner = owner;
   first_stub = NULL;
   stub_factory = factory;
 }

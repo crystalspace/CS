@@ -25,8 +25,9 @@
 class csSector;
 struct iThing;
 struct iStatLight;
+struct iVisibilityCuller;
 
-SCF_VERSION (iSector, 0, 1, 2);
+SCF_VERSION (iSector, 0, 1, 3);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -69,6 +70,12 @@ struct iSector : public iBase
    */
   virtual void CalculateSectorBBox (csBox3& bbox, bool do_things, bool do_meshes,
   	bool do_terrain) = 0;
+
+  /**
+   * Get the visibility culler that is used for this sector.
+   * NULL if none.
+   */
+  virtual iVisibilityCuller* GetVisibilityCuller () = 0;
 };
 
 #endif // __ISECTOR_H__

@@ -31,15 +31,18 @@ struct LightInfo;
 class csThing;
 class csEngine;
 class csStatLight;
+class csMeshWrapper;
 class csPolygon3D;
-class Polygon2D;
+class csCollection;
 class csCamera;
+class csTerrain;
 class csDynLight;
 class Dumper;
 class csPolygon2DQueue;
 class csProgressPulse;
 struct iGraphics3D;
 struct iStatLight;
+struct iVisibilityCuller;
 
 /**
  * A sector is a container for objects. It is one of
@@ -49,7 +52,7 @@ class csSector : public csPObject
 {
   friend class Dumper;
 
-public:
+private:
   /**
    * List of meshes in this sector. Note that meshes also
    * need to be in the engine list. This vector contains objects
@@ -84,7 +87,6 @@ public:
    */
   csNamedObjVector terrains;
 
-private:
   /// Engine handle.
   csEngine* engine;
 
@@ -106,6 +108,12 @@ private:
    * which holds all polygons of the non-moving csThings.
    */
   csThing* static_thing;
+
+  /**
+   * The visibility culler for this sector or NULL if none.
+   * In future we should support more than one visibility culler probably.
+   */
+  iVisibilityCuller* culler;
 
   /**
    * This function is called by the BSP tree traversal routine
@@ -178,10 +186,164 @@ public:
   /// Get the engine for this sector.
   csEngine* GetEngine () { return engine; }
 
+  //----------------------------------------------------------------------
+  /**
+   * Add a mesh to this sector and register it to the culler.
+   */
+  void AddMesh (csMeshWrapper* mesh);
+
+  /**
+   * Unlink a mesh from this sector and remove it from the culler.
+   */
+  void UnlinkMesh (csMeshWrapper* mesh);
+
+  /**
+   * Get the number of meshes in this sector.
+   */
+  int GetNumberMeshes ()
+  {
+    return meshes.Length ();
+  }
+
+  /**
+   * Get the specified mesh.
+   */
+  csMeshWrapper* GetMesh (int idx)
+  {
+    return (csMeshWrapper*)meshes[idx];
+  }
+
+  /**
+   * Find the given mesh by name.
+   */
+  csMeshWrapper* GetMesh (const char* name);
+  //----------------------------------------------------------------------
+  /**
+   * Add a thing to this sector and register it to the culler.
+   */
+  void AddThing (csThing* thing);
+
+  /**
+   * Unlink a thing from this sector and remove it from the culler.
+   */
+  void UnlinkThing (csThing* thing);
+
+  /**
+   * Get the number of things in this sector.
+   */
+  int GetNumberThings ()
+  {
+    return things.Length ();
+  }
+
+  /**
+   * Get the specified thing.
+   */
+  csThing* GetThing (int idx)
+  {
+    return (csThing*)things[idx];
+  }
+
+  /**
+   * Find a thing with the given name.
+   */
+  csThing* GetThing (const char* name);
+  //----------------------------------------------------------------------
+  /**
+   * Add a sky thing to this sector and register it to the culler.
+   */
+  void AddSky (csThing* thing);
+
+  /**
+   * Unlink a sky thing from this sector and remove it from the culler.
+   */
+  void UnlinkSky (csThing* thing);
+
+  /**
+   * Get the number of skies in this sector.
+   */
+  int GetNumberSkies ()
+  {
+    return things.Length ();
+  }
+
+  /**
+   * Get the specified sky.
+   */
+  csThing* GetSky (int idx)
+  {
+    return (csThing*)skies[idx];
+  }
+
+  /**
+   * Find a sky thing with the given name.
+   */
+  csThing* GetSky (const char* name);
+  //----------------------------------------------------------------------
+  /**
+   * Add a collection to this sector.
+   */
+  void AddCollection (csCollection* col);
+
+  /**
+   * Unlink a collection from this sector.
+   */
+  void UnlinkCollection (csCollection* col);
+
+  /**
+   * Get the number of collections in this sector.
+   */
+  int GetNumberCollections ()
+  {
+    return collections.Length ();
+  }
+
+  /**
+   * Get the specified collection.
+   */
+  csCollection* GetCollection (int idx)
+  {
+    return (csCollection*)collections[idx];
+  }
+
+  /**
+   * Find a collection with the given name.
+   */
+  csCollection* GetCollection (const char* name);
+  //----------------------------------------------------------------------
   /**
    * Add a static or pseudo-dynamic light to this sector.
    */
   void AddLight (csStatLight* light);
+
+  /**
+   * Unlink a light from this sector.
+   */
+  void UnlinkLight (csStatLight* light);
+
+  /**
+   * Get the number of lights in this sector.
+   */
+  int GetNumberLights ()
+  {
+    return lights.Length ();
+  }
+
+  /**
+   * Get the specified light.
+   */
+  csStatLight* GetLight (int idx)
+  {
+    return (csStatLight*)lights[idx];
+  }
+
+  /**
+   * Find a light with the given name.
+   */
+  csStatLight* GetLight (const char* name)
+  {
+    return (csStatLight*)lights.FindByName (name);
+  }
 
   /**
    * Find a light with the given position and radius.
@@ -192,22 +354,53 @@ public:
    * Find the light with the given object id.
    */
   csStatLight* FindLight (CS_ID id);
+  //----------------------------------------------------------------------
+  /**
+   * Add a terrain to this sector.
+   */
+  void AddTerrain (csTerrain* terrain);
 
   /**
-   * Find a thing with the given name.
+   * Unlink a terrain from this sector.
    */
-  csThing* GetThing (const char* name);
+  void UnlinkTerrain (csTerrain* col);
 
   /**
-   * Find a sky with the given name.
+   * Get the number of terrains in this sector.
    */
-  csThing* GetSky (const char* name);
+  int GetNumberTerrains ()
+  {
+    return terrains.Length ();
+  }
+
+  /**
+   * Get the specified terrain.
+   */
+  csTerrain* GetTerrain (int idx)
+  {
+    return (csTerrain*)terrains[idx];
+  }
+
+  /**
+   * Find a terrain with the given name.
+   */
+  csTerrain* GetTerrains (const char* name)
+  {
+    return (csTerrain*)terrains.FindByName (name);
+  }
+  //----------------------------------------------------------------------
 
   /**
    * Get the thing representing all non-moving things (all
    * things which are moved into this thing will return IsMerged()==true).
    */
   csThing* GetStaticThing () { return static_thing; }
+
+  /**
+   * Get the visibility culler that is used for this sector.
+   * NULL if none.
+   */
+  iVisibilityCuller* GetVisibilityCuller () { return culler; }
 
   /**
    * Call this function to generate a polygon tree for all csThings
@@ -402,6 +595,10 @@ public:
     { return scfParent; }
     virtual void CreateBSP ()
     { scfParent->UseStaticTree (); }
+    virtual iVisibilityCuller* GetVisibilityCuller ()
+    {
+      return scfParent->GetVisibilityCuller ();
+    }
     virtual iThing *GetSkyThing (const char *name);
     virtual int GetNumSkyThings ()
     { return scfParent->skies.Length (); }

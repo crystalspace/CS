@@ -513,7 +513,7 @@ void WalkTest::ParseKeyCmds (csObject* src)
 	}
 	else
 	{
-	  csLight* l = (csLight*)sect->lights.FindByName (light_name);
+	  csLight* l = (csLight*)sect->GetLight (light_name);
 	  if (!l)
 	  {
 	    CsPrintf (MSG_WARNING, "Light '%s' not found! 'entity_Light' is ignored!\n",
@@ -556,14 +556,14 @@ void WalkTest::ParseKeyCmds ()
     ParseKeyCmds (sector);
 
     int j;
-    for (j = 0 ; j < sector->things.Length () ; j++)
+    for (j = 0 ; j < sector->GetNumberThings () ; j++)
     {
-      csThing* thing = (csThing*)(sector->things[j]);
+      csThing* thing = sector->GetThing (j);
       ParseKeyCmds (thing);
     }
-    for (j = 0 ; j < sector->meshes.Length () ; j++)
+    for (j = 0 ; j < sector->GetNumberMeshes () ; j++)
     {
-      csMeshWrapper* sprite = (csMeshWrapper*)(sector->meshes[j]);
+      csMeshWrapper* sprite = sector->GetMesh (j);
       ParseKeyCmds (sprite);
     }
   }
@@ -1020,7 +1020,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     csMeshWrapper* spr = (csMeshWrapper*)Sys->engine->meshes[0];
     if (spr)
     {
-      Dumper::dump_stubs (spr->GetPolyTreeObject ());
+      //@@@@@Dumper::dump_stubs (spr->GetPolyTreeObject ());
     }
     CsPrintf (MSG_DEBUG_0F, "======\n");
   }
@@ -1211,7 +1211,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       for (i = 0 ; i < meshes.Length () ; i++)
       {
         csMeshWrapper* spr = (csMeshWrapper*)meshes[i];
-	Dumper::dump_stubs (spr->GetPolyTreeObject ());
+	//@@@@Dumper::dump_stubs (spr->GetPolyTreeObject ());
       }
     }
     //Sys->Printf (MSG_CONSOLE, "No debug0 implementation in this version.\n");

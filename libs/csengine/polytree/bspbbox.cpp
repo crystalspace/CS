@@ -764,8 +764,7 @@ bool csBspPolygon::DoPerspective (const csTransform& trans,
 
 csPolygonStubFactory csPolyTreeBBox::stub_fact (&csBspPolygon::GetPolygonPool());
 
-csPolyTreeBBox::csPolyTreeBBox (csObject* owner) :
-	csDetailedPolyTreeObject (owner, &stub_fact)
+csPolyTreeBBox::csPolyTreeBBox () : csDetailedPolyTreeObject (&stub_fact)
 {
   base_stub = (csPolygonStub*)csDetailedPolyTreeObject::stub_pool.Alloc (&stub_fact);
   base_stub->IncRef (); // Make sure this object is locked.
@@ -791,7 +790,7 @@ void csPolyTreeBBox::World2Camera (const csTransform& trans)
 }
 
 void csPolyTreeBBox::Update (const csBox3& object_bbox, const csTransform& o2w,
-	csObject* originator)
+	csVisObjInfo* originator)
 {
   RemoveFromTree ();
 
@@ -894,7 +893,7 @@ void csPolyTreeBBox::Update (const csBox3& object_bbox, const csTransform& o2w,
   poly->Transform (o2w);
 }
 
-void csPolyTreeBBox::Update (const csBox3& world_bbox, csObject* originator)
+void csPolyTreeBBox::Update (const csBox3& world_bbox, csVisObjInfo* originator)
 {
   csPolyTreeObject::world_bbox = world_bbox;
 // printf ("%f,%f,%f %f,%f,%f\n", world_bbox.MinX (), world_bbox.MinY (), world_bbox.MinZ (),
@@ -994,9 +993,8 @@ void* csSphereStub::Visit (csThing* sector, csTreeVisitFunc* func, void* data)
 csSphereStubFactory csSphereTreeObject::stub_fact;
 csObjectStubPool csSphereTreeObject::stub_pool;
 
-csSphereTreeObject::csSphereTreeObject (csObject* owner,
-	const csVector3& center, float rad) : csPolyTreeObject (owner,
-		&stub_fact), radius (rad), center (center)
+csSphereTreeObject::csSphereTreeObject (const csVector3& center, float rad)
+	: csPolyTreeObject (&stub_fact), radius (rad), center (center)
 {
   base_stub = (csSphereStub*)stub_pool.Alloc (&stub_fact);
   base_stub->IncRef (); // Make sure this object is locked.

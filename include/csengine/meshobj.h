@@ -23,8 +23,8 @@
 #include "csobject/nobjvec.h"
 #include "csengine/movable.h"
 #include "csengine/tranman.h"
-#include "csengine/bspbbox.h"
 #include "imeshobj.h"
+#include "iviscull.h"
 
 struct iMeshWrapper;
 struct iRenderView;
@@ -83,21 +83,11 @@ protected:
    * Position in the world.
    */
   csMovable movable;
-  /// SCF pointer to movable.
-  iMovable* imovable;
-
-  /**
-   * Pointer to the object to place in the polygon tree.
-   */
-  csPolyTreeObject* ptree_obj;
 
   /// Update defered lighting.
   void UpdateDeferedLighting (const csVector3& pos);
 
 private:
-  /// Bounding box for polygon trees.
-  csPolyTreeBBox bbox;
-
   /// Mesh object corresponding with this csMeshWrapper.
   iMeshObject* mesh;
 
@@ -167,12 +157,6 @@ public:
   /// Get the mesh object.
   iMeshObject* GetMeshObject () const {return mesh;}
 
-  /// Get the pointer to the object to place in the polygon tree.
-  csPolyTreeObject* GetPolyTreeObject ()
-  {
-    return ptree_obj;
-  }
-
   /**
    * Set a callback which is called just before the object is drawn.
    * This is useful to do some expensive computations which only need
@@ -191,15 +175,6 @@ public:
   csDrawCallback* GetDrawCallback ()
   {
     return draw_cb;
-  }
-
-  /**
-   * Do some initialization needed for visibility testing.
-   * i.e. clear camera transformation.
-   */
-  void VisTestReset ()
-  {
-    bbox.ClearTransform ();
   }
 
   /// Mark this object as visible.
@@ -323,7 +298,7 @@ public:
     }
     virtual iMovable* GetMovable ()
     {
-      return scfParent->imovable;
+      return &(scfParent->movable.scfiMovable);
     }
     virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr)
@@ -345,6 +320,24 @@ public:
     }
   } scfiMeshWrapper;
   friend struct MeshWrapper;
+
+  //-------------------- iVisibilityObject interface implementation ------------------
+  struct VisObject : public iVisibilityObject
+  {
+    DECLARE_EMBEDDED_IBASE (csMeshWrapper);
+    virtual iMovable* GetMovable ()
+    {
+      return &(scfParent->movable.scfiMovable);
+    }
+    virtual void GetBoundingBox (csBox3& bbox)
+    {
+      scfParent->mesh->GetObjectBoundingBox (bbox, false);
+    }
+    virtual void MarkVisible () { scfParent->MarkVisible (); }
+    virtual void MarkInvisible () { scfParent->MarkInvisible (); }
+    virtual bool IsVisible () { return scfParent->IsVisible (); }
+  } scfiVisibilityObject;
+  friend struct VisObject;
 };
 
 /**
