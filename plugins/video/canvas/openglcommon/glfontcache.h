@@ -48,6 +48,7 @@ class csGLFontCache : public csFontCache
   size_t usedTexs;
   int glyphAlign;
   GLuint texWhite;
+  bool multiTexText;
 
   struct CacheTexture
   {

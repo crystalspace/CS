@@ -139,6 +139,15 @@
 	</OpenGL>
       </Video>
     </config>
+    <config name="disableMTtext">
+      <Video>
+	<OpenGL>
+	  <FontCache>
+	    <UseMultiTexturing>no</UseMultiTexturing>
+	  </FontCache>
+	</OpenGL>
+      </Video>
+    </config>
   </configs>
   <rules>
     <!-- rule description="Some more examples">

@@ -132,7 +132,8 @@ void csDetectDriver::DetermineDriver (const char* monitorName)
   }
   if (glDllName.IsEmpty())
   {
-    csPrintf ("csDetectDriver: trying to find *some* driver\n");
+    if (verbose)
+      csPrintf ("csDetectDriver: trying to find *some* driver\n");
     /*
       Could not determine display driver name. Just fetch the first in the
       registry

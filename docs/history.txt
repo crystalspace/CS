@@ -20,6 +20,12 @@ chronological order.
 	  the verbosity manager instead.
 	- res made the Win32 GL driver detector to search harder for a name.
 	- res added verbosity to the Win32 GL driver detector.
+	- res changed the Win32 shift quirk to at least work somewhat on
+	  Win9x - you can't really distinguish between left and right shift
+	  there...
+	- res fixed AltGr support for Win32 cooked key code computation.
+	- res added a tweak for correct text display on hardware that can't
+	  grok the particular TU setup for text drawing.
 25-Dec-2004
 	- PK fixed a small bug: changed 'i' to 'm' in thing.cpp:1084
 	  for (int m = 0; i < repMaterials.Length(); m++)

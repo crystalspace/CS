@@ -165,7 +165,8 @@ csKeyComposeResult csWin32KeyComposer::HandleKey (
       Urg. Windows saves the dead key state in a variable somewhere
       when ToAscii() or ToUnicode() is called with one.
       So to get a properly composed char, we need to first call
-      ToAscii() with the dead key, so the 
+      ToAscii() with the dead key, so that internal variable is 
+      properly set.
       */
     char outCh[2];
     int ret = ToAscii (lastDeadVk, MapVirtualKey (lastDeadVk, 0), 
@@ -445,9 +446,20 @@ bool csWin32KeyboardDriver::HandleKeyMessage (HWND hWnd, UINT message,
 	      appropriately.
 	    */
 	    bool lshiftState = keyStates.Get (CSKEY_SHIFT_LEFT, false);
-	    bool lshiftDown = ::GetKeyState (VK_LSHIFT) & 0x8000;
 	    bool rshiftState = keyStates.Get (CSKEY_SHIFT_RIGHT, false);
-	    bool rshiftDown = ::GetKeyState (VK_RSHIFT) & 0x8000;
+	    bool lshiftDown, rshiftDown;
+            if (cswinIsWinNT())
+            {
+              lshiftDown = ::GetKeyState (VK_LSHIFT) & 0x8000;
+              rshiftDown = ::GetKeyState (VK_RSHIFT) & 0x8000;
+            }
+            else
+            {
+              /* @@@ Bah. Win9x can't really distinguish between left and right shift.
+                Can't help it. Only emit LShift in all cases. */
+              lshiftDown = ::GetKeyState (VK_SHIFT) & 0x8000;
+              rshiftDown = false;
+            }
 
 	    if ((lshiftState != lshiftDown) || lshiftDown)
 	    {
@@ -769,6 +781,13 @@ bool csWin32KeyboardDriver::Win32KeyToCSKey (LONG vKey, LONG keyFlags,
 
 	// Set up modifiers
 	ModifiersToKeyState (modifiersState, keystate);
+        /* "Inverse ALtGr quirk": to get proper AltGr combos, Ctrl+Alt must be 
+         * "pressed", too */
+        if (modifiersState.modifiers[csKeyModifierTypeAlt] & 
+          (1 << csKeyModifierNumRight))
+        {
+          keystate[VK_CONTROL] |= 0x80;
+        }
 
 	if (cswinIsWinNT ())
 	{

@@ -46,6 +46,9 @@ csGLFontCache::csGLFontCache (csGraphics2DGLCommon* G2D) :
   GLint maxtex = 256;
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, &maxtex);
 
+  multiTexText = G2D->config->GetBool ("Video.OpenGL.FontCache.UseMultiTexturing", true)
+    && G2D->useCombineTE;
+  
   texSize = G2D->config->GetInt ("Video.OpenGL.FontCache.TextureSize", 256);
   texSize = MAX (texSize, 64);
   texSize = MIN (texSize, maxtex);
@@ -284,7 +287,7 @@ void csGLFontCache::FlushArrays ()
   if (needStates)
   {
     statecache->Enable_GL_TEXTURE_2D ();
-    if (G2D->useCombineTE)
+    if (multiTexText)
     {
       glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_PRIMARY_COLOR);
       glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
@@ -305,7 +308,9 @@ void csGLFontCache::FlushArrays ()
       glTexEnvf (GL_TEXTURE_ENV, GL_ALPHA_SCALE, 1.0f);
     }
     else
+    {
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
+    }
     statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     static float envTransparent[4] = {1.0f, 1.0f, 1.0f, 0.0f};
@@ -644,7 +649,7 @@ void csGLFontCache::FlushText ()
   if (!tcaEnabled) statecache->Disable_GL_TEXTURE_COORD_ARRAY();
   if (caEnabled) statecache->Enable_GL_COLOR_ARRAY();
 
-  if (G2D->useCombineTE)
+  if (multiTexText)
   {
     glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_TEXTURE);
     glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
@@ -660,6 +665,8 @@ void csGLFontCache::FlushText ()
     glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_MODULATE);
     glTexEnvf (GL_TEXTURE_ENV, GL_ALPHA_SCALE, 1.0f);
   }
+  else if (G2D->useCombineTE)
+    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
   else
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
