@@ -356,7 +356,6 @@ Tester* MeshTester::NextTester ()
   delete [] mesh.triangles;
   delete [] mesh_vertices;
   delete [] mesh_texels;
-  vbuf->DecRef ();
   return new PixmapTester ();
 }
 

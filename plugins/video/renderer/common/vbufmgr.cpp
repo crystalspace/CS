@@ -90,12 +90,12 @@ void csVertexBufferManager::RemoveVBuf (iVertexBuffer* buf)
   if (idx >= 0) buffers.Delete (idx);
 }
 
-iVertexBuffer* csVertexBufferManager::CreateBuffer (int priority)
+csPtr<iVertexBuffer> csVertexBufferManager::CreateBuffer (int priority)
 {
   csVertexBuffer* buf = new csVertexBuffer (this);
   buf->SetPriority (priority);
   buffers.Push (buf);
-  return buf;
+  return csPtr<iVertexBuffer> (buf);
 }
 
 void csVertexBufferManager::ChangePriority (iVertexBuffer* buf,

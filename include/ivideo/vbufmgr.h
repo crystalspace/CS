@@ -180,7 +180,7 @@ struct iVertexBufferManager : public iBase
    * visible often. Low priority vertex buffers should be used for objects
    * that are rarely visible.
    */
-  virtual iVertexBuffer* CreateBuffer (int priority) = 0;
+  virtual csPtr<iVertexBuffer> CreateBuffer (int priority) = 0;
 
   /**
    * Change the priority of a vertex buffer. This can be used when some

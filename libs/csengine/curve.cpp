@@ -158,7 +158,6 @@ csCurve::csCurve (csCurveTemplate *parent_tmpl) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
 
   CurveID = LastCurveID++;
-  vbuf = NULL;
   vbufmgr = NULL;
   SetupVertexBuffer ();
 
@@ -175,7 +174,6 @@ csCurve::~csCurve ()
   delete[] uv2World;
   delete[] uv2Normal;
   if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
-  if (vbuf) vbuf->DecRef ();
 }
 
 void csCurve::SetupVertexBuffer ()
@@ -829,7 +827,6 @@ void csCurve::eiVertexBufferManagerClient::ManagerClosing ()
 {
   if (scfParent->vbuf)
   {
-    scfParent->vbuf->DecRef ();
     scfParent->vbuf = NULL;
     scfParent->vbufmgr = NULL;
   }

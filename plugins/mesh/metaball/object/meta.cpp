@@ -93,14 +93,12 @@ csMetaBall::csMetaBall (iMeshObjectFactory *fact)
   mp.rate = 0.03;
   current_lod = 1;
   current_features = 0;
-  vbuf = NULL;
   vbufmgr = NULL;
   num_mesh_vertices = 0;
 }
 
 csMetaBall::~csMetaBall ()
 {
-  if (vbuf) vbuf->DecRef ();
   if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
   if (vis_cb) vis_cb->DecRef ();
   delete [] meta_balls;
@@ -532,7 +530,6 @@ void csMetaBall::eiVertexBufferManagerClient::ManagerClosing ()
 {
   if (scfParent->vbuf)
   {
-    scfParent->vbuf->DecRef ();
     scfParent->vbuf = NULL;
     scfParent->vbufmgr = NULL;
   }

@@ -63,20 +63,12 @@ IsoTest *System;
 
 IsoTest::IsoTest ()
 {
-  view = NULL;
-  world = NULL;
-  light = NULL;
-  player = NULL;
   lastclick.Set(0,0,0);
   walking = false;
 }
 
 IsoTest::~IsoTest ()
 {
-  if (player) player->DecRef ();
-  if (light) light->DecRef();
-  if (view) view->DecRef();
-  if (world) world->DecRef();
 }
 
 void IsoTest::Report (int severity, const char* msg, ...)
@@ -271,8 +263,8 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   Report (CS_REPORTER_SEVERITY_NOTIFY, "------------------------------");
 
   // create our world to play in, and a view on it.
-  world = engine->CreateWorld();
-  view = engine->CreateView(world);
+  world = csPtr<iIsoWorld> (engine->CreateWorld());
+  view = csPtr<iIsoView> (engine->CreateView(world));
 
   iMaterialWrapper *math1 = engine->CreateMaterialWrapper(
     "/lib/std/stone4.gif", "floor1");
@@ -312,7 +304,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
 
 
   // add the player sprite to the world
-  player = engine->CreateFrontSprite(startpos, 1.3, 2.7);
+  player = csPtr<iIsoSprite> (engine->CreateFrontSprite(startpos, 1.3, 2.7));
   player->SetMaterialWrapper(snow);
   player->SetMixMode(CS_FX_ADD);
   world->AddSprite(player);
@@ -322,7 +314,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   cb->DecRef ();
 
   // add a light to the scene.
-  iIsoLight *scenelight = engine->CreateLight();
+  csRef<iIsoLight> scenelight (csPtr<iIsoLight> (engine->CreateLight()));
   scenelight->SetPosition(csVector3(3,2,6));
   scenelight->SetGrid(grid);
   scenelight->SetAttenuation(CSISO_ATTN_INVERSE);
@@ -335,11 +327,10 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   sprite->SetMaterialWrapper(halo);
   sprite->SetMixMode(CS_FX_ADD);
   world->AddSprite(sprite);
-  scenelight->DecRef ();
   sprite->DecRef ();
 
   // add a dynamic light for the player, above players head.
-  light = engine->CreateLight();
+  light = csPtr<iIsoLight> (engine->CreateLight());
   light->Flags().Set(CSISO_LIGHT_DYNAMIC);
   light->SetPosition(startpos+csVector3(0,5,0));
   light->SetGrid(grid);
@@ -481,21 +472,19 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
     }
 
   // add a light
-  scenelight = engine->CreateLight();
+  scenelight = csPtr<iIsoLight> (engine->CreateLight());
   scenelight->SetPosition(csVector3(13,2,26));
   scenelight->SetGrid(grid2);
   scenelight->SetAttenuation(CSISO_ATTN_INVERSE);
   scenelight->SetRadius(5.0);
   scenelight->SetColor(csColor(0.0, 0.4, 1.0));
-  scenelight->DecRef ();
   // add the light to both grids to make it look right.
-  scenelight = engine->CreateLight();
+  scenelight = csPtr<iIsoLight> (engine->CreateLight());
   scenelight->SetPosition(csVector3(13,2,26));
   scenelight->SetGrid(grid);
   scenelight->SetAttenuation(CSISO_ATTN_INVERSE);
   scenelight->SetRadius(5.0);
   scenelight->SetColor(csColor(0.0, 0.4, 1.0));
-  scenelight->DecRef ();
 
 
   /// add maze grid
@@ -585,13 +574,12 @@ void IsoTest::AddMazeGrid(iIsoWorld *world, float posx, float posy,
   mazegrid->SetGroundMult(multx, multy);
 
   // add a light
-  iIsoLight* scenelight = engine->CreateLight();
+  csRef<iIsoLight> scenelight (csPtr<iIsoLight> (engine->CreateLight()));
   scenelight->SetPosition(csVector3(posy+height+0.5,10,posx+width+0.5));
   scenelight->SetGrid(mazegrid);
   scenelight->SetAttenuation(CSISO_ATTN_INVERSE);
   scenelight->SetRadius(10.0 + width/2 + height/2);
   scenelight->SetColor(csColor(0.0, 0.4, 1.0));
-  scenelight->DecRef ();
 
   // add walls
 

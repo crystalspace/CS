@@ -151,7 +151,7 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  virtual iVertexBuffer* CreateBuffer (int priority);
+  virtual csPtr<iVertexBuffer> CreateBuffer (int priority);
   virtual void ChangePriority (iVertexBuffer* buf, int new_priority);
   virtual bool LockBuffer (iVertexBuffer* buf,
   	csVector3* verts,

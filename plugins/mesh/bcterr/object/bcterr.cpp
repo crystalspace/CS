@@ -222,7 +222,6 @@ void csBCTerrBlock::FreeLOD ()
   {
     if (current_lod->buf->IsLocked ())
       owner->vbufmgr->UnlockBuffer (current_lod->buf);
-    current_lod->buf->DecRef ();
     current_lod->buf = NULL;
   }
   if (current_lod->mesh->vertex_fog) delete current_lod->mesh->vertex_fog;
@@ -238,7 +237,6 @@ bool csBCTerrBlock::FreeSharedLOD ()
   {
     if (current_lod->buf->IsLocked ())
       owner->vbufmgr->UnlockBuffer (current_lod->buf);
-    current_lod->buf->DecRef ();
     current_lod->buf = NULL;
   }
   if (current_lod->mesh->vertex_fog) delete current_lod->mesh->vertex_fog;
@@ -287,7 +285,7 @@ csBCTerrBlock::~csBCTerrBlock ()
   if (default_lod)
   {
     if (default_lod->buf)
-      default_lod->buf->DecRef ();
+      default_lod->buf = NULL;
     if (default_lod->mesh->vertex_fog)
       delete default_lod->mesh->vertex_fog;
   }
@@ -372,7 +370,7 @@ void csBCTerrBlock::SetupBaseMesh ()
       owner->correct_sv;
   }
   draw_mesh.mat_handle = material->GetMaterialHandle ();
-  owner->SetupVertexBuffer (buf, buf);
+  owner->SetupVertexBuffer (buf, NULL);
   /*if (buf)
   {
     if (owner->vbufmgr)
@@ -618,7 +616,7 @@ void csBCTerrBlock::Build (csVector3* cntrl,
   // Setup vertex buffer / g3dTriangleMesh
   //if (default_lod->buf) csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Vertex Buffer Error");
   //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Vertex Buffer");
-  owner->SetupVertexBuffer ( default_lod->buf, default_lod->mesh->buffers[0] );
+  owner->SetupVertexBuffer ( default_lod->buf, &default_lod->mesh->buffers[0] );
   //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Finished");
   // lock mesh?
   //if (owner->vbufmgr)
@@ -1152,7 +1150,7 @@ void csBCTerrBlock::CreateNewMesh (int level)
   owner->ComputeSharedMesh (newmesh, controlpoint);
   AddEdgeTriangles (current_lod);
   current_lod->buf = NULL; // make sure, can cause memory leak?
-  owner->SetupVertexBuffer ( current_lod->buf, current_lod->mesh->buffers[0] );
+  owner->SetupVertexBuffer ( current_lod->buf, &current_lod->mesh->buffers[0] );
   // lock buffer?
   end = current_lod->x_verts * current_lod->z_verts;
   //if (owner->vbufmgr)
@@ -1278,7 +1276,7 @@ void csBCTerrBlock::Draw (iRenderView *rview, iCamera* camera, int level)
       if (!current_lod->mesh->mat_handle)
         current_lod->mesh->mat_handle = material->GetMaterialHandle ();
       if (!current_lod->buf)
-        owner->SetupVertexBuffer ( current_lod->buf, current_lod->mesh->buffers[0] );
+        owner->SetupVertexBuffer ( current_lod->buf, &current_lod->mesh->buffers[0] );
       //if (!current_lod->buf->IsLocked ())
       //{
         end = current_lod->x_verts * current_lod->z_verts;
@@ -1300,7 +1298,7 @@ void csBCTerrBlock::Draw (iRenderView *rview, iCamera* camera, int level)
       if (!default_lod->mesh->mat_handle)
         default_lod->mesh->mat_handle = material->GetMaterialHandle ();
       if (!default_lod->buf)
-        owner->SetupVertexBuffer ( default_lod->buf, default_lod->mesh->buffers[0] );
+        owner->SetupVertexBuffer ( default_lod->buf, &default_lod->mesh->buffers[0] );
       //if (!default_lod->buf->IsLocked ())
       //{
         end = default_lod->x_verts * default_lod->z_verts;
@@ -1322,7 +1320,7 @@ void csBCTerrBlock::Draw (iRenderView *rview, iCamera* camera, int level)
       if (!draw_mesh.mat_handle)
         draw_mesh.mat_handle = material->GetMaterialHandle ();
       if (!buf)
-        owner->SetupVertexBuffer (buf , draw_mesh.buffers[0]);
+        owner->SetupVertexBuffer (buf , &draw_mesh.buffers[0]);
       else
         draw_mesh.buffers[0] = buf;
       //if (!buf->IsLocked ())
@@ -1348,7 +1346,7 @@ void csBCTerrBlock::Draw (iRenderView *rview, iCamera* camera, int level)
       if (!draw_mesh.mat_handle)
         draw_mesh.mat_handle = material->GetMaterialHandle ();
       if (!buf)
-        owner->SetupVertexBuffer (buf , draw_mesh.buffers[0]);
+        owner->SetupVertexBuffer (buf , &draw_mesh.buffers[0]);
       else
         draw_mesh.buffers[0] = buf;
       //if (!buf->IsLocked ())
@@ -2193,7 +2191,7 @@ void csBCTerrObject::eiVertexBufferManagerClient::ManagerClosing ()
   }
 }
 
-void csBCTerrObject::SetupVertexBuffer (iVertexBuffer *&vbuf1, iVertexBuffer *&vbuf2)
+void csBCTerrObject::SetupVertexBuffer (csRef<iVertexBuffer> &vbuf1, iVertexBuffer** vbuf2)
 {
   if (!vbuf1)
   {
@@ -2204,7 +2202,7 @@ void csBCTerrObject::SetupVertexBuffer (iVertexBuffer *&vbuf1, iVertexBuffer *&v
       vbufmgr->AddClient (&scfiVertexBufferManagerClient);
     }
     vbuf1 = vbufmgr->CreateBuffer (1);
-    vbuf2 = vbuf1;
+    if (vbuf2) *vbuf2 = vbuf1;
   }
 }
 

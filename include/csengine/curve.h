@@ -152,7 +152,7 @@ private:
   csVector3* uv2Normal;
 
   /// Vertex buffer.
-  iVertexBuffer* vbuf;
+  csRef<iVertexBuffer> vbuf;
   iVertexBufferManager* vbufmgr;
 
   /// retrieve a vertexbuffer from the manager if not done already

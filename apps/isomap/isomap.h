@@ -76,9 +76,9 @@ private:
   /// the font for text display
   csRef<iFont> font;
   /// the player sprite
-  iIsoSprite *player;
+  csRef<iIsoSprite> player;
   /// the light above the players head
-  iIsoLight *light;
+  csRef<iIsoLight> light;
 
   /// to keep track of mouseclicks and actions. last click pos in world space.
   csVector3 lastclick;

@@ -42,7 +42,7 @@ private:
   /// number of colours in palette
   int palsize;
   /// the bumpmap
-  iImage *bumpmap;
+  csRef<iImage> bumpmap;
 
   /// bumpmap representation for RecalcFast (slopevalues are +128)
   unsigned char *fastdhdx, *fastdhdy;

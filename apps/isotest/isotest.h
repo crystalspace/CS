@@ -48,9 +48,9 @@ private:
   /// the iso engine
   csRef<iIsoEngine> engine;
   /// world to display, the 'level'
-  iIsoWorld *world;
+  csRef<iIsoWorld> world;
   /// view on the world, the 'camera'
-  iIsoView *view;
+  csRef<iIsoView> view;
   /// G2D plugin
   csRef<iGraphics2D> myG2D;
   /// G3D plugin
@@ -64,9 +64,9 @@ private:
   /// the font for text display
   csRef<iFont> font;
   /// the player sprite
-  iIsoSprite *player;
+  csRef<iIsoSprite> player;
   /// the light
-  iIsoLight *light;
+  csRef<iIsoLight> light;
 
   /// to keep track of mouseclicks and actions. last click pos in world space.
   csVector3 lastclick;

@@ -446,7 +446,6 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   mesh_colors = NULL;
   mesh_normals = NULL;
   vbufmgr = NULL;
-  vbuf = NULL;
   material = NULL;
   polygons = NULL;
 }
@@ -454,7 +453,6 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
 csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
 {
   if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
-  if (vbuf) vbuf->DecRef ();
   delete[] mesh_normals;
   delete[] mesh_vertices;
   delete[] mesh_colors;
@@ -658,7 +656,6 @@ void csGenmeshMeshObjectFactory::eiVertexBufferManagerClient::ManagerClosing ()
 {
   if (scfParent->vbuf)
   {
-    scfParent->vbuf->DecRef ();
     scfParent->vbuf = NULL;
     scfParent->vbufmgr = NULL;
   }

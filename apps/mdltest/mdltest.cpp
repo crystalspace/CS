@@ -120,7 +120,7 @@ void Simple::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-iModelData *Simple::CreateDefaultModel ()
+csPtr<iModelData> Simple::CreateDefaultModel ()
 {
   iMaterialWrapper *m1 = engine->GetMaterialList ()
   	->FindByName ("material1");
@@ -226,7 +226,7 @@ iModelData *Simple::CreateDefaultModel ()
   Polygon->AddVertex (4, 2, 0, 3);
   Polygon->SetMaterial (mat3);
 
-  return Model;
+  return csPtr<iModelData> (Model);
 }
 
 iMaterialWrapper *Simple::LoadTexture (const char *name, const char *fn)
@@ -240,7 +240,7 @@ iMaterialWrapper *Simple::LoadTexture (const char *name, const char *fn)
   return engine->GetMaterialList ()->FindByName (name);
 }
 
-iModelData *Simple::ImportModel (const char *fn)
+csPtr<iModelData> Simple::ImportModel (const char *fn)
 {
   csRef<iDataBuffer> filebuf (vfs->ReadFile (fn));
   if (!filebuf)
@@ -260,7 +260,7 @@ iModelData *Simple::ImportModel (const char *fn)
   }
 
   mdl->IncRef ();	// Avoid smart pointer release.
-  return mdl;
+  return csPtr<iModelData> (mdl);
 }
 
 //-----------------------------------------------------------------------------
@@ -431,7 +431,11 @@ bool Simple::Initialize (const char *iConfigName)
   csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser));
   const char *Filename = cmdline->GetName (0);
-  iModelData *Model = Filename ? ImportModel (Filename) : CreateDefaultModel ();
+  csRef<iModelData> Model;
+  if (Filename)
+    Model = ImportModel (Filename);
+  else
+    Model = CreateDefaultModel ();
 
   csModelDataTools::MergeObjects (Model, true);
 
@@ -462,7 +466,6 @@ bool Simple::Initialize (const char *iConfigName)
   csModelDataTools::SplitObjectsByMaterial (Model);
   iMeshFactoryWrapper *sfWrapper = crossbuilder->BuildSpriteFactoryHierarchy (
   	Model, engine, tm);
-  Model->DecRef ();
 
   csRef<iMeshObject> ThingObject (ThingFactory->NewInstance ());
   csRef<iMeshWrapper> ThingWrapper (engine->CreateMeshWrapper (ThingObject, "thing"));

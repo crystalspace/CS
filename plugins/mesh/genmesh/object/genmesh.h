@@ -213,7 +213,7 @@ public:
 class csGenmeshMeshObjectFactory : public iMeshObjectFactory
 {
 private:
-  iVertexBuffer* vbuf;
+  csRef<iVertexBuffer> vbuf;
   iVertexBufferManager* vbufmgr;
 
   iMaterialWrapper* material;

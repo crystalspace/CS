@@ -47,7 +47,7 @@ class csTerrFuncObject;
 class csTerrBlock
 {
 public:
-  iVertexBuffer* vbuf[LOD_LEVELS];	// Vertex buffer for every LOD level.
+  csRef<iVertexBuffer> vbuf[LOD_LEVELS];	// Vertex buffer for every LOD level.
   csVector3* mesh_vertices[LOD_LEVELS];
   csVector2* mesh_texels[LOD_LEVELS];
   csColor* mesh_colors[LOD_LEVELS];
@@ -260,7 +260,7 @@ public:
 	int& clip_portal, int& clip_plane, int& clip_z_plane);
 
   /// retrieve a vertexbuffer from the manager if not done already
-  void SetupVertexBuffer (iVertexBuffer *&vbuf1, iVertexBuffer *&vbuf2);
+  void SetupVertexBuffer (csRef<iVertexBuffer> &vbuf1, iVertexBuffer** vbuf2);
 
   /// interface to receive state of vertexbuffermanager
   struct eiVertexBufferManagerClient : public iVertexBufferManagerClient

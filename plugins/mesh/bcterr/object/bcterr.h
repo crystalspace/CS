@@ -51,7 +51,7 @@ class csBCTerrFactoryObject;
 class csSharedLODMesh
 {
 public:
-  iVertexBuffer* buf;
+  csRef<iVertexBuffer> buf;
   csVector3* verts;
   csVector3* normals;
   csVector2* texels;
@@ -81,7 +81,7 @@ public:
   G3DTriangleMesh draw_mesh;
   csTriangle small_tri[2];
   csTriangle* large_tri;
-  iVertexBuffer* buf;
+  csRef<iVertexBuffer> buf;
   csVector3* verts;
   csVector3* normals;
   csVector2* texels;
@@ -215,7 +215,7 @@ public:
   void SetupMesh ();
   void SetupCollisionQuads ();
   bool ComputeSharedMesh (csSharedLODMesh* mesh, csVector3* cntrl_pts);
-  void SetupVertexBuffer (iVertexBuffer *&vbuf1, iVertexBuffer *&vbuf2);
+  void SetupVertexBuffer (csRef<iVertexBuffer> &vbuf1, iVertexBuffer **vbuf2);
   void GetRadius (csVector3& rad, csVector3& cent);
   int HeightTest (csVector3 *point);
   int HeightTestExt (csVector3 *point);

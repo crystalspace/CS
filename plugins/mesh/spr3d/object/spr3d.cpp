@@ -891,16 +891,12 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   loopaction = true;
   fullstop = false;
 
-  vbuf = NULL;
-  vbuf_tween = NULL;
   vbufmgr = NULL;
 }
 
 csSprite3DMeshObject::~csSprite3DMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
-  if (vbuf) vbuf->DecRef ();
-  if (vbuf_tween) vbuf_tween->DecRef ();
   if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
   uv_verts->DecRef ();
   tr_verts->DecRef ();
@@ -2059,15 +2055,8 @@ iSkeletonState* csSprite3DMeshObject::Sprite3DState::GetSkeletonState () const
 
 void csSprite3DMeshObject::eiVertexBufferManagerClient::ManagerClosing ()
 {
-  if (scfParent->vbuf)
-    scfParent->vbuf->DecRef ();
-  if (scfParent->vbuf_tween)
-    scfParent->vbuf_tween->DecRef ();
-  if (scfParent->vbuf || scfParent->vbuf_tween)
-  {
-    scfParent->vbuf = scfParent->vbuf_tween = NULL;
-    scfParent->vbufmgr = NULL;
-  }
+  scfParent->vbuf = scfParent->vbuf_tween = NULL;
+  scfParent->vbufmgr = NULL;
 }
 
 //----------------------------------------------------------------------

@@ -80,7 +80,7 @@ public:
    * visible often. Low priority vertex buffers should be used for objects
    * that are rarely visible.
    */
-  virtual iVertexBuffer* CreateBuffer (int priority);
+  virtual csPtr<iVertexBuffer> CreateBuffer (int priority);
 
   /**
    * Change the priority of a vertex buffer. This can be used when some

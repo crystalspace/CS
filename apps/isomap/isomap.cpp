@@ -66,17 +66,13 @@ IsoMap1 *System;
 
 IsoMap1::IsoMap1 ()
 {
-  light = NULL;
   mouse = NULL;
-  player = NULL;
   lastclick.Set(0,0,0);
   walking = false;
 }
 
 IsoMap1::~IsoMap1 ()
 {
-  if (player) player->DecRef ();
-  if (light) light->DecRef();
 }
 
 void IsoMap1::Report (int severity, const char* msg, ...)
@@ -288,7 +284,7 @@ bool IsoMap1::Initialize (int argc, const char* const argv[],
   iIsoGrid *grid = world->FindGrid(startpos);
 
   // add a dynamic light for the player, above players head.
-  light = engine->CreateLight();
+  light = csPtr<iIsoLight> (engine->CreateLight());
   light->Flags().Set(CSISO_LIGHT_DYNAMIC);
   light->SetPosition(startpos+csVector3(0,5,0));
   light->SetGrid(grid);
@@ -300,7 +296,7 @@ bool IsoMap1::Initialize (int argc, const char* const argv[],
   iMaterialWrapper *halo = mats->FindByName("halo");
 
   // add the player sprite to the world
-  player = engine->CreateFrontSprite(startpos, 1.3, 2.7);
+  player = csPtr<iIsoSprite> (engine->CreateFrontSprite(startpos, 1.3, 2.7));
   player->SetMaterialWrapper(halo);
   player->SetMixMode(CS_FX_ADD);
   world->AddSprite(player);

@@ -1138,9 +1138,9 @@ private:
    * @@@
    */
   iVertexBufferManager* vbufmgr;
-  iVertexBuffer* vbuf;
+  csRef<iVertexBuffer> vbuf;
   /// Vertex buffer for tweening.
-  iVertexBuffer* vbuf_tween;
+  csRef<iVertexBuffer> vbuf_tween;
   /// Data for vertex buffer (initialize by DrawTest, needed by Draw).
   csVector3* vbuf_verts, * vbuf_tween_verts;
   csVector2* vbuf_texels, * vbuf_tween_texels;

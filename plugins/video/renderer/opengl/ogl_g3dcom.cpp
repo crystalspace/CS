@@ -639,7 +639,7 @@ void csGraphics3DOGLCommon::PerfTest ()
     test_modes[test_mode_cnt++].pref_order = 4;
   }
 
-  iVertexBuffer* vbuf = GetVertexBufferManager ()->CreateBuffer (0);
+  csRef<iVertexBuffer> vbuf (GetVertexBufferManager ()->CreateBuffer (0));
   GetVertexBufferManager ()->LockBuffer (vbuf, vertices, texels,
     colors, num_vertices, 0);
   mesh.buffers[0] = vbuf;
@@ -725,7 +725,6 @@ void csGraphics3DOGLCommon::PerfTest ()
       test_modes[i].mode); fflush (stdout);
   }
   GetVertexBufferManager ()->UnlockBuffer (vbuf);
-  vbuf->DecRef ();
 
   // Sort the results.
   qsort (test_modes, test_mode_cnt, sizeof (ModRes), compare_mode);

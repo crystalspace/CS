@@ -146,7 +146,7 @@ private:
   int num_mesh_vertices;
   csVector3* mesh_vertices;
   csVector2* mesh_texels;
-  iVertexBuffer* vbuf;
+  csRef<iVertexBuffer> vbuf;
 
 public:
   virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);

@@ -91,7 +91,6 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   color.blue = 0.0f;
   current_lod = 1.0f;
   current_features = 0;
-  vbuf = NULL;
   vbufmgr = NULL;
 }
 
@@ -99,7 +98,6 @@ csBallMeshObject::~csBallMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
   if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
-  if (vbuf) vbuf->DecRef ();
   delete[] top_normals;
   delete[] ball_vertices;
   delete[] ball_colors;
@@ -699,7 +697,6 @@ void csBallMeshObject::eiVertexBufferManagerClient::ManagerClosing ()
 {
   if (scfParent->vbuf)
   {
-    scfParent->vbuf->DecRef ();
     scfParent->vbuf = NULL;
     scfParent->vbufmgr = NULL;
   }

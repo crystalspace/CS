@@ -78,7 +78,7 @@ csVector2* texels;
 iMaterialWrapper* material;
 csColor* colors;
  uint MixMode;
-iVertexBuffer* vbuf;
+csRef<iVertexBuffer> vbuf;
   iVertexBufferManager* vbufmgr;
   
    iMeshObjectDrawCallback* vis_cb;

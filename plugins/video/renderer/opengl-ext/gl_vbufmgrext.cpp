@@ -86,12 +86,12 @@ csVertexBufferManagerEXT::~csVertexBufferManagerEXT()
   * visible often. Low priority vertex buffers should be used for objects
   * that are rarely visible.
   */
-iVertexBuffer* csVertexBufferManagerEXT::CreateBuffer (int priority)
+csPtr<iVertexBuffer> csVertexBufferManagerEXT::CreateBuffer (int priority)
 {
   csVertexBufferEXT* buf = new csVertexBufferEXT (this);
   buf->SetPriority (priority);
   buffers.Push (buf);
-  return buf;
+  return csPtr<iVertexBuffer> (buf);
 }
 
 /**

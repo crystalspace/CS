@@ -59,7 +59,7 @@ class csMetaBall : public iMeshObject
   iObjectRegistry *object_reg;
   iMaterialWrapper *th;
 
-  iVertexBuffer* vbuf;
+  csRef<iVertexBuffer> vbuf;
   iVertexBufferManager* vbufmgr;
   csVector3* mesh_vertices;
   csVector2* mesh_texels;

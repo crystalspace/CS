@@ -65,8 +65,8 @@ public:
   void SetupFrame ();
   void FinishFrame ();
   iModelDataVertices *CreateDefaultModelVertexFrame ();
-  iModelData *ImportModel (const char *Filename);
-  iModelData *CreateDefaultModel ();
+  csPtr<iModelData> ImportModel (const char *Filename);
+  csPtr<iModelData> CreateDefaultModel ();
   iMaterialWrapper *LoadTexture (const char *Name, const char *Filename);
 };
 

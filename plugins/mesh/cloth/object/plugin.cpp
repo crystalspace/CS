@@ -232,7 +232,6 @@ time+=0.05;
 csStuffObject::csStuffObject(iMeshObjectFactory *fact) {
 printf("creator \n");
 factory = fact;
-vbuf=NULL;
 vbufmgr=NULL;
 
 SCF_CONSTRUCT_IBASE(fact);

@@ -59,7 +59,7 @@ private:
   uint32 current_features;
 
   int verts_circle;
-  iVertexBuffer* vbuf;
+  csRef<iVertexBuffer> vbuf;
   iVertexBufferManager* vbufmgr;
 
   G3DTriangleMesh top_mesh;

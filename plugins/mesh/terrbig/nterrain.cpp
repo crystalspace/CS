@@ -414,7 +414,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-csBigTerrainObject::csBigTerrainObject(iObjectRegistry* _obj_reg, iMeshObjectFactory *_pFactory):vbufmgr(0), vbuf(0), pFactory(_pFactory), object_reg(_obj_reg), terrain(NULL), nTextures(0) 
+csBigTerrainObject::csBigTerrainObject(iObjectRegistry* _obj_reg, iMeshObjectFactory *_pFactory):vbufmgr(0), pFactory(_pFactory), object_reg(_obj_reg), terrain(NULL), nTextures(0) 
 {
   SCF_CONSTRUCT_IBASE (_pFactory)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTerrBigState);
@@ -459,7 +459,7 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
 	"Unable to read from input file\n");
     return false;
   }
-  iImage *image (imageio->Load (raw, input->GetSize(), CS_IMGFMT_ANY));
+  csRef<iImage> image (imageio->Load (raw, input->GetSize(), CS_IMGFMT_ANY));
   delete raw;
   if (!image) {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, 
@@ -492,7 +492,6 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
       heightmap[i] = ((float)data[i].Intensity()) / 255.0;
     }
   }
-  image->DecRef ();
   csVector3 *norms = new csVector3[image->GetSize ()];
   for  (int i = 0; i < size; i ++) {
     int ind = i - width;
@@ -524,7 +523,7 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
 }
 
 void 
-csBigTerrainObject::SetupVertexBuffer (iVertexBuffer *&vbuf1)
+csBigTerrainObject::SetupVertexBuffer (csRef<iVertexBuffer> &vbuf1)
 {
  if (!vbuf1)
  {

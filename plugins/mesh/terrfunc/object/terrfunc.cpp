@@ -76,7 +76,6 @@ csTerrBlock::csTerrBlock ()
     mesh_vertices[i] = NULL;
     mesh_texels[i] = NULL;
     mesh_colors[i] = NULL;
-    vbuf[i] = NULL;
   }
   material = NULL;
   node = NULL;
@@ -92,7 +91,6 @@ csTerrBlock::~csTerrBlock ()
   int i;
   for (i = 0 ; i < LOD_LEVELS ; i++)
   {
-    if (vbuf[i]) vbuf[i]->DecRef ();
     delete[] mesh_vertices[i];
     delete[] mesh_colors[i];
     delete[] mesh_texels[i];
@@ -1530,7 +1528,7 @@ void csTerrFuncObject::SetupObject ()
 	  int blidx = by*blockxy+bx;
 	  csTerrBlock& block = blocks[blidx];
 	  block.dirlight_numbers[lod] = -1;
-	  SetupVertexBuffer (block.vbuf[lod], block.mesh[lod].buffers[0]);
+	  SetupVertexBuffer (block.vbuf[lod], &block.mesh[lod].buffers[0]);
 	  InitMesh (block.mesh[lod], block.mesh_vertices[lod],
 	  	block.mesh_texels[lod], block.mesh_colors[lod]);
 	  if (lod == 0)
@@ -1568,8 +1566,8 @@ void csTerrFuncObject::SetupObject ()
   }
 }
 
-void csTerrFuncObject::SetupVertexBuffer (iVertexBuffer *&vbuf1,
-					  iVertexBuffer *&vbuf2)
+void csTerrFuncObject::SetupVertexBuffer (csRef<iVertexBuffer> &vbuf1,
+					  iVertexBuffer** vbuf2)
 {
  if (!vbuf1)
  {
@@ -1583,7 +1581,7 @@ void csTerrFuncObject::SetupVertexBuffer (iVertexBuffer *&vbuf1,
      vbufmgr->AddClient (&scfiVertexBufferManagerClient);
    }
    vbuf1 = vbufmgr->CreateBuffer (1);
-   vbuf2 = vbuf1;
+   if (vbuf2) *vbuf2 = vbuf1;
  }
 }
 
@@ -1828,7 +1826,7 @@ void csTerrFuncObject::QuadDivDraw (iRenderView* rview, csZBufMode zbufMode)
       if(block.quaddiv_visible)
       {
         //if((bx!=0&&bx!=1) || by!=0) continue; // one block only
-        SetupVertexBuffer (block.vbuf[0], block.vbuf[0]);
+        SetupVertexBuffer (block.vbuf[0], NULL);
         block.Draw(rview, block.qd_portal, block.qd_plane, block.qd_z_plane,
           correct_du, correct_su, correct_dv, correct_sv, this, qd_framenum);
 	block.quaddiv_visible = false;
@@ -1892,7 +1890,7 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 	m->clip_portal = clip_portal;
 	m->clip_plane = clip_plane;
 	m->clip_z_plane = clip_z_plane;
-	SetupVertexBuffer (block.vbuf[lod], block.vbuf[lod]);
+	SetupVertexBuffer (block.vbuf[lod], NULL);
 	CS_ASSERT (block.vbuf[lod]);
 	CS_ASSERT (!block.vbuf[lod]->IsLocked ());
 	CS_ASSERT (block.mesh_vertices[lod] != NULL);
@@ -2092,7 +2090,6 @@ void csTerrFuncObject::eiVertexBufferManagerClient::ManagerClosing ()
       csTerrBlock& block = scfParent->blocks[i];
       for (int lod = 0; lod < 4; lod++)
       {
-	block.vbuf[lod]->DecRef ();
 	block.vbuf[lod] = NULL;
       }
     }

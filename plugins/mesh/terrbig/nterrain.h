@@ -320,7 +320,7 @@ private:
   iVertexBufferManager *vbufmgr;
 
   /// Pointer to vertex buffer for this mesh.
-  iVertexBuffer *vbuf;
+  csRef<iVertexBuffer> vbuf;
 
   /// Logical parent
   iBase* logparent;
@@ -346,7 +346,7 @@ private:
   
 protected:
   /// Creates and sets up a vertex buffer.
-  void SetupVertexBuffer (iVertexBuffer *&vbuf1);
+  void SetupVertexBuffer (csRef<iVertexBuffer> &vbuf1);
 
   /// Initializes a mesh structure
   void InitMesh (nTerrainInfo *info);

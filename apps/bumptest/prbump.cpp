@@ -34,7 +34,6 @@
 
 csProcBump::csProcBump () : csProcTexture()
 {
-  bumpmap = NULL;
   palsize = 0;
   palette = NULL;
   mat_w = 256;
@@ -47,7 +46,7 @@ csProcBump::csProcBump () : csProcTexture()
 
 csProcBump::csProcBump (iImage *map) : csProcTexture()
 {
-  (bumpmap = map)->IncRef ();
+  bumpmap = map;
   palsize = 0;
   palette = NULL;
   mat_w = map->GetWidth();
@@ -60,7 +59,6 @@ csProcBump::csProcBump (iImage *map) : csProcTexture()
 
 csProcBump::~csProcBump ()
 {
-  bumpmap->DecRef ();
   delete[] palette;
   delete[] fastdhdx;
   delete[] fastdhdy;

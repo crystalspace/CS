@@ -51,21 +51,16 @@ SCF_IMPLEMENT_IBASE_EXT_END
 
 
 csGraphics2DXLib::csGraphics2DXLib (iBase *iParent) :
-  csGraphics2D (iParent), xshm (NULL),  xim (NULL),
+  csGraphics2D (iParent), xim (NULL),
   dpy (NULL), cmap (0), real_Memory (NULL),
   sim_lt8 (NULL), sim_lt16 (NULL)
 {
-  xshm = NULL;
   EventOutlet = NULL;
 }
 
 csGraphics2DXLib::~csGraphics2DXLib(void)
 {
-  if (xshm)
-  {
-    xshm->DecRef (); // decref before we close the win since we use the dpy in xshm
-    xshm = NULL;
-  }
+  xshm = NULL;
 
   Close();
 
@@ -855,7 +850,6 @@ bool csGraphics2DXLib::AllocateMemory ()
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY,
 	    "SHM available but could not allocate. Trying without SHM.");
-    xshm->DecRef ();
     xshm = NULL;
     mem_valid = TryAllocateMemory();
   }

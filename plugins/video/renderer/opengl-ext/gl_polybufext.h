@@ -63,7 +63,7 @@ public:
   {
     /// it's better to have smaller vertex buffers
     /// otherwise we'd copy all the vertices to AGP memory every frame
-    iVertexBuffer *m_vbuf;
+    csRef<iVertexBuffer> m_vbuf;
 
     iMaterialHandle *m_mat_handle;
     CS_DECLARE_GROWING_ARRAY (m_lightmaps, csPolygonBufferEXTLightmap);
