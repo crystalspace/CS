@@ -104,7 +104,7 @@
 //-----------------------------------------------------------------------------
 
 $prog_name = 'spoofdir.php';
-$prog_version = '7';
+$prog_version = '8';
 $author_name = 'Eric Sunshine';
 $author_email = 'sunshine@sunshineco.com';
 
@@ -125,13 +125,21 @@ $author_email = 'sunshine@sunshineco.com';
 //
 // $ignore
 //    An associative array where the keys are regular-expresions which
-//    constitute the set of files to omit from the generated directory
-//    listing, and the values are boolean flags which control whether or not
-//    the match is case-sensitive; 1 (true) specifies case-sensitive matching,
-//    and 0 (false) specifies case-insensitive matching.  By default, the
-//    $ignore array is seeded with patterns matching the names of this script
-//    and its configuration files, thus the directory listing will
-//    automatically be purged of these administrative entries.
+//    constitute the set of files to omit from the generated directory listing,
+//    and the values are boolean flags which control whether or not the match
+//    is case-sensitive; `true' specifies case-sensitive matching, and `false'
+//    specifies case-insensitive matching.  By default, the $ignore array is
+//    seeded with patterns matching the names of this script and its
+//    configuration files, thus the directory listing will automatically be
+//    purged of these administrative entries.
+//
+// $recurse
+//    A boolean variable controlling whether or not subdirectory entries are
+//    included in the pretty-printed directory listing.  If true, then links to
+//    subdirectories of the current directory are listed along with all other
+//    non-ignored files.  If false, then subdirectory entries are omitted from
+//    the listing, thus preventing further downward navigation into the
+//    directory hierarchy.  This value is true, by default.
 //
 // $title
 //    The human-readable title for the directory.  The title is displayed in
@@ -192,21 +200,21 @@ $author_email = 'sunshine@sunshineco.com';
 //    to determine if the browser should be able to cache the file.  Typically
 //    files with disposition type "inline" are cacheable, whereas other types
 //    are not.  $cacheable is an associative array where the keys are
-//    MIME-types and the values are boolean values; 1 for true, or 0 for false.
-//    By default, if a file's MIME-type does not appear in $cacheable, then it
-//    is considered uncacheable.
+//    MIME-types and the values are boolean values, true or false.  By default,
+//    if a file's MIME-type does not appear in $cacheable, then it is
+//    considered uncacheable.
 //
 // $indexfile
 //    An associative array where the keys are regular-expressions which
 //    constitute the set of potential index-like filenames, and the values are
 //    boolean flags which control whether or not the match is case-sensitive;
-//    1 (true) specifies case-sensitive matching, and 0 (false) specifies
+//    `true' specifies case-sensitive matching, and `false' specifies
 //    case-insensitive matching.  If a filename in the directory being browsed
-//    matches one of these patterns then that file will be sent to the
-//    client's browser instead of a directory listing.  This emulates the
-//    behavior of most HTTP servers where the presence of an index-like file
-//    (such as 'index.html') within a directory results in the transmission of
-//    that file rather than a listing of the directory.
+//    matches one of these patterns then that file will be sent to the client's
+//    browser instead of a directory listing.  This emulates the behavior of
+//    most HTTP servers where the presence of an index-like file (such as
+//    'index.html') within a directory results in the transmission of that file
+//    rather than a listing of the directory.
 //-----------------------------------------------------------------------------
 
 $globalconfig = 'spoofdir.cfg';
@@ -216,6 +224,8 @@ $banner_bgcolor = '#5544ff';
 $banner_fgcolor = '#ffff00';
 $banner_linkcolor = '#ffffff';
 $row_colors = array('#ccccee', '#ffffff');
+
+$recurse = true;
 
 $default_mimetype = 'application/octet-stream';
 $mimetype['ai'     ] = 'application/postscript';
@@ -387,48 +397,49 @@ $disposition['text/sgml'] = 'inline';
 $disposition['text/tab-separated-values'] = 'inline';
 $disposition['text/xml'] = 'inline';
 
-$cacheable['audio/basic'] = 1;
-$cacheable['audio/midi'] = 1;
-$cacheable['audio/mpeg'] = 1;
-$cacheable['audio/x-aiff'] = 1;
-$cacheable['audio/x-mpegurl'] = 1;
-$cacheable['audio/x-pn-realaudio'] = 1;
-$cacheable['audio/x-pn-realaudio-plugin'] = 1;
-$cacheable['audio/x-realaudio'] = 1;
-$cacheable['audio/x-wav'] = 1;
-$cacheable['image/bmp'] = 1;
-$cacheable['image/gif'] = 1;
-$cacheable['image/ief'] = 1;
-$cacheable['image/jpeg'] = 1;
-$cacheable['image/png'] = 1;
-$cacheable['image/tiff'] = 1;
-$cacheable['image/vnd.wap.wbmp'] = 1;
-$cacheable['image/x-cmu-raster'] = 1;
-$cacheable['image/x-portable-anymap'] = 1;
-$cacheable['image/x-portable-bitmap'] = 1;
-$cacheable['image/x-portable-graymap'] = 1;
-$cacheable['image/x-portable-pixmap'] = 1;
-$cacheable['image/x-rgb'] = 1;
-$cacheable['image/x-xbitmap'] = 1;
-$cacheable['image/x-xpixmap'] = 1;
-$cacheable['image/x-xwindowdump'] = 1;
-$cacheable['text/css'] = 1;
-$cacheable['text/html'] = 1;
-$cacheable['text/plain'] = 1;
-$cacheable['text/richtext'] = 1;
-$cacheable['text/rtf'] = 1;
-$cacheable['text/sgml'] = 1;
-$cacheable['text/tab-separated-values'] = 1;
-$cacheable['text/xml'] = 1;
+$cacheable['audio/basic'] = true;
+$cacheable['audio/midi'] = true;
+$cacheable['audio/mpeg'] = true;
+$cacheable['audio/x-aiff'] = true;
+$cacheable['audio/x-mpegurl'] = true;
+$cacheable['audio/x-pn-realaudio'] = true;
+$cacheable['audio/x-pn-realaudio-plugin'] = true;
+$cacheable['audio/x-realaudio'] = true;
+$cacheable['audio/x-wav'] = true;
+$cacheable['image/bmp'] = true;
+$cacheable['image/gif'] = true;
+$cacheable['image/ief'] = true;
+$cacheable['image/jpeg'] = true;
+$cacheable['image/png'] = true;
+$cacheable['image/tiff'] = true;
+$cacheable['image/vnd.wap.wbmp'] = true;
+$cacheable['image/x-cmu-raster'] = true;
+$cacheable['image/x-portable-anymap'] = true;
+$cacheable['image/x-portable-bitmap'] = true;
+$cacheable['image/x-portable-graymap'] = true;
+$cacheable['image/x-portable-pixmap'] = true;
+$cacheable['image/x-rgb'] = true;
+$cacheable['image/x-xbitmap'] = true;
+$cacheable['image/x-xpixmap'] = true;
+$cacheable['image/x-xwindowdump'] = true;
+$cacheable['text/css'] = true;
+$cacheable['text/html'] = true;
+$cacheable['text/plain'] = true;
+$cacheable['text/richtext'] = true;
+$cacheable['text/rtf'] = true;
+$cacheable['text/sgml'] = true;
+$cacheable['text/tab-separated-values'] = true;
+$cacheable['text/xml'] = true;
 
-$ignore['^index\..+$'     ] = 1;
-$ignore["^$prog_name\$"   ] = 1;
-$ignore["^$globalconfig\$"] = 1;
-$ignore["^$localconfig\$" ] = 1;
-$ignore['^CVS$'           ] = 1;
+$ignore['^index\..+$'     ] = true;
+$ignore["^$prog_name\$"   ] = true;
+$ignore["^$globalconfig\$"] = true;
+$ignore["^$localconfig\$" ] = true;
+$ignore['^CVS$'           ] = true;
+$ignore['^RCS$'           ] = true;
 
-$indexfile['^index.s?html?$'  ] = 1; // index.htm, index.html, index.shtml
-$indexfile['^index.php[1-9]?$'] = 1; // index.php, index.php3, index.php4
+$indexfile['^index.s?html?$'  ] = true; // index.htm, index.html, index.shtml
+$indexfile['^index.php[1-9]?$'] = true; // index.php, index.php3, index.php4
 
 //-----------------------------------------------------------------------------
 // Private Configuration
@@ -490,7 +501,6 @@ function array_pattern_match($target, &$patterns)
     reset($patterns);
     for ($i = 0; $i < $n; $i++, next($patterns))
     {
-	$matched = 0;
 	$pattern = key($patterns);
 	$case_sensitive = current($patterns);
 	if ($case_sensitive)
@@ -498,9 +508,9 @@ function array_pattern_match($target, &$patterns)
 	else
 	    $matched = eregi($pattern, $target);
 	if ($matched)
-	    return 1;
+	    return true;
     }
-    return 0;
+    return false;
 }
 
 function find_mimetype($file)
@@ -715,7 +725,7 @@ function list_directory($display_name, $path)
 {
     global $localconfig;
     // Allow local configuration file to override any of these globals.
-    global $mimetype, $disposition, $cacheable, $ignore, $indexfile;
+    global $mimetype, $disposition, $cacheable, $ignore, $recurse, $indexfile;
     // And these locals.
     $title = '';
     $annotation = '';
@@ -735,10 +745,10 @@ function list_directory($display_name, $path)
 	}
 	elseif ($entry != '..' && $entry != '.' && !is_ignored($entry))
 	{
-	    if (is_dir("$path/$entry"))
-		$subdirs[] = $entry;
-	    else
+	    if (!is_dir("$path/$entry"))
 		$files[] = $entry;
+	    elseif ($recurse)
+		$subdirs[] = $entry;
 	}
     }
     closedir($handle);
