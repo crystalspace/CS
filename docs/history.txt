@@ -72,6 +72,12 @@ chronological order.
 	  CS/plugins/mesh and CS/plugins/video.
 	- Eric Sunshine eliminated numerous ambiguous operator overload errors
 	  from partedit.
+	- Eric Sunshine worked around bizarre preprocessor error on CompileFarm
+	  Linux 2.2 (Alpha) installations where it fails to search
+	  CS/plugins/aws for headers #included by aws/skinpars.cpp (at least
+	  when building outside the source tree).  Work-around in aws.mak and
+	  Jamfile involves explicitly adding -I$(SRCDIR)/plugins/aws to CFLAGS
+	  for skinpars.cpp.
 6-Nov-2003
 	- res bumped the version of the iGraphics2D interface and updated some
 	  Doxygen comments in include/graph2d.h (basically, the differences

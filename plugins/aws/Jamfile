@@ -19,11 +19,14 @@ Plugin aws :
 C++FLAGS on [ DoObjectGrist skinlex$(SUFOBJ) skinpars$(SUFOBJ) ] +=
   -Wno-unused ;
 
-# Work around bizarre preprocessor bug on older MacOS/X installations where
-# it fails to search the CS/plugins/aws directory for headers #included by
-# skinpars.cpp.  @@@ FIXME: The configure script should check if compiler
-# recognizes -I rather than hard-coding it here.
-C++FLAGS on [ DoObjectGrist skinpars$(SUFOBJ) ] += -I$(SEARCH_SOURCE) ;
+# Work around bizarre bug on older CompileFarm MacOS/X installation and
+# CompileFarm Linux 2.2 (Alpha) installation where preprocessor fails to search
+# the CS/plugins/aws directory for headers #included by skinpars.cpp and
+# skinlex.cpp.
+# @@@ FIXME: The configure script should check if compiler recognizes -I rather
+# than hard-coding it here.
+C++FLAGS on [ DoObjectGrist skinpars$(SUFOBJ) skinlex$(SUFOBJ) ] +=
+  -I$(SEARCH_SOURCE) ;
 
 LinkWith aws : csgeom csgfx cstool csutil ;
 
