@@ -46,6 +46,11 @@ public:
       csPoint *p;
       void *v;
     } parm;
+    parmItem () : type (INT) { parm.i = 0; }
+    ~parmItem ()
+    {
+      if (type == STRING) parm.s->DecRef ();
+    }
   };
 private:
   parmItem *FindParm (const char *name, int type);

@@ -19,6 +19,7 @@ The history order is reversed so that new features are at the top.
 	  the same constraints as the csperl5 Jamfile (that is, perl5tst is
 	  only enabled if a usable Perl installation was discoverd during the
 	  configuration process).
+	- Fixed a memory leak in AWS reported by Gersh.
 6-May-2003
 	- Eric Sunshine made the following changes:
 	    - Fixed Linux joystick makefile so that makefile target and
