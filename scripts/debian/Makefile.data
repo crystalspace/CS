@@ -1,8 +1,7 @@
 BUILDDIR=$(HOME)/debian/crystal
 DATE=$(shell date '+%Y%m%d')
-VERSION=0.93
-TAG=R0_92_001
-#DATE=20020313
+VERSION=0.94
+TAG=R0_94_001
 MINOR=1
 SITE=ftp://sunsite.dk/projects/crystal/cs092/levels
 LEVELS=castle.zip dmburg.zip maze.zip room.zip mazedex.zip newsky.zip sydney.zip demodata.zip 
