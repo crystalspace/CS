@@ -142,6 +142,7 @@ public:
   virtual uint32 GetChangeNumber() const { return 0; }
 
   void Cleanup ();
+  void ForceCleanup ();
 
 private:
   csThingStatic* thing;

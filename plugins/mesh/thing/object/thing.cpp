@@ -2223,7 +2223,7 @@ void PolyMeshHelper::Setup ()
   if (static_data_nr != thing->GetStaticDataNumber ())
   {
     static_data_nr = thing->GetStaticDataNumber ();
-    Cleanup ();
+    ForceCleanup ();
   }
 
   if (polygons)
@@ -2293,6 +2293,11 @@ void PolyMeshHelper::Unlock ()
 void PolyMeshHelper::Cleanup ()
 {
   if (locked) return;
+  ForceCleanup ();
+}
+
+void PolyMeshHelper::ForceCleanup ()
+{
   delete[] polygons;
   polygons = 0;
   vertices = 0;
