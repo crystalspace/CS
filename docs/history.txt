@@ -46,6 +46,8 @@ The history order has been reversed so that new features are at the top.
 	- Norman Kramer changed config for Glide to access Glide section
 	  instead of Glide2x.
 	- Split octree.h into octree.h and pvs.h. Was getting a bit big.
+	- Fixed bug 106203 on SF. Test for coplanar polygons at startup
+	  was wrong. Should be ok now.
 1-Jun-2000
 	- Experiment with new octree generation method. Instead of only
 	  favoring a center with few splits I also try to favor centers which

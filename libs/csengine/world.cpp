@@ -841,20 +841,33 @@ bool csWorld::CheckConsistency ()
     }
     else if (p->GetNumVertices () > 3)
     {
-      csVector3 normal;
-      float D;
-      csMath3::CalcPlane (p->Vobj (0), p->Vobj (1), p->Vobj (2), normal, D);
-      csPlane3 pl (normal, D);
-      int i;
-      for (i = 3 ; i < p->GetNumVertices () ; i++)
-      {
-        if (ABS (pl.Classify (p->Vobj (i))) > EPSILON)
+      csVector3 poly[3];
+      int i, j;
+      poly[0] = p->Vobj (0);
+      j = 1;
+      for (i = 1 ; i < p->GetNumVertices () ; i++)
+        if (!((poly[j-1] - p->Vobj (i)) < SMALL_EPSILON))
 	{
-          CsPrintf (MSG_WARNING, "  Non-coplanar polygon! (id=%d)\n", p->GetID ());
-          CsPrintf (MSG_DEBUG_0, "============ Non-coplanar polygon (id=%d)!\n", p->GetID ());
-          Dumper::dump (p);
-          error = true;
-	  break;
+	  poly[j] = p->Vobj (i);
+	  j++;
+	  if (j > 2) break;
+	}
+      if (j > 2)
+      {
+        csVector3 normal;
+        float D;
+        csMath3::CalcPlane (poly[0], poly[1], poly[2], normal, D);
+        csPlane3 pl (normal, D);
+        for (i = 3 ; i < p->GetNumVertices () ; i++)
+        {
+          if (ABS (pl.Classify (p->Vobj (i))) > EPSILON)
+	  {
+            CsPrintf (MSG_WARNING, "  Non-coplanar polygon! (id=%d)\n", p->GetID ());
+            CsPrintf (MSG_DEBUG_0, "============ Non-coplanar polygon (id=%d)!\n", p->GetID ());
+            Dumper::dump (p);
+            error = true;
+	    break;
+	  }
 	}
       }
     }
