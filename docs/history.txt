@@ -1,5 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
+18-Mar-2001
+	- Fixed skydomes so that they need to be in the same part. Without
+	  this fix the circle command could only correctly be specified in the
+	  first part.
 16-Mar-2001
 	- Eric Sunshine renamed all of the pure SCF interface header files.
 	  Considering that that these files were recently organized into

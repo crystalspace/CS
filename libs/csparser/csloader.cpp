@@ -1122,7 +1122,8 @@ void csLoader::load_thing_part (csThing* thing, csSector* sec, PSLoadInfo& info,
 		thing->GetNumVertices (), false);
         break;
       case CS_TOKEN_SKYDOME:
-        skydome_process (*thing, name, params, info.default_material);
+        skydome_process (*thing, name, params, info.default_material,
+	    vt_offset);
         break;
       case CS_TOKEN_VERTEX:
         {
@@ -2274,7 +2275,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
 }
 
 void csLoader::skydome_process (csThing& thing, char* name, char* buf,
-        csMaterialWrapper* material)
+        csMaterialWrapper* material, int vt_offset)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (RADIUS)
@@ -2308,6 +2309,8 @@ void csLoader::skydome_process (csThing& thing, char* name, char* buf,
         break;
       case CS_TOKEN_VERTICES:
         ScanStr (params, "%D", prev_vertices, &num);
+	for (i = 0 ; i < num ; i++)
+	  prev_vertices[i] += vt_offset;
         break;
       case CS_TOKEN_LIGHTING:
         {

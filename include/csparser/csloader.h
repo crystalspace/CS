@@ -122,7 +122,7 @@ class csLoader
   static csMapNode* load_node (char* name, char* buf, csSector* sec);
   /// Parse the definition for a skydome and create the corresponding objects
   static void skydome_process (csThing& thing, char* name, char* buf,
-    csMaterialWrapper* material);
+    csMaterialWrapper* material, int vt_offset);
   /// Parse the definition for a thing and create a thing object
   static csThing* load_thing (char* name, char* buf, csSector*, bool is_sky,
       	bool is_template);
