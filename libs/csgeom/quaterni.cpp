@@ -234,3 +234,10 @@ void csQuaternion::SetWithAxisAngle(csVector3 axis, float phi)
     y = axis.y * ss;
     z = axis.z * ss;
 }
+
+void csQuaternion::GetEulerAngles (csVector3& angles)
+{
+  angles.y = atan (2.0f * (x*y + r*z) / (r*r + x*x - y*y - z*z));
+  angles.x = asin (-2.0f * (x*z - r*y));
+  angles.z = atan (2.0f * (r*x + y*z) / (r*r - x*x - y*y + z*z));
+}

@@ -158,6 +158,12 @@ public:
   void SetWithEuler(const csVector3 &rot);
 
   /**
+   * Convert a Quaternion to a set of Euler angles.
+   * Returns a (X,Y,Z) rather than Yaw-Pitch-Roll (Y,X,Z).
+   */
+  void GetEulerAngles (csVector3& angles);
+
+  /**
    * Return an Axis Angle representation of this Quaternion
    */
   csQuaternion ToAxisAngle() const;
