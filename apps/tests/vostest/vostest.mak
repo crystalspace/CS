@@ -29,7 +29,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-VOSTEST.CFLAGS = $(CFLAGS.D)_REENTRANT $(CXXFLAGS.EXCEPTIONS.ENABLE) $(VOS.CFLAGS)
+VOSTEST.CFLAGS = \
+  $(CFLAGS.D)_REENTRANT $(CXXFLAGS.EXCEPTIONS.ENABLE) $(VOS.CFLAGS)
 
 VOSTEST.EXE = vostest$(EXE)
 DIR.VOSTEST = apps/tests/vostest
@@ -76,7 +77,7 @@ vostestcleandep:
 ifdef DO_DEPEND
 dep: $(OUT.VOSTEST) $(OUT.VOSTEST)/vostest.dep
 $(OUT.VOSTEST)/vostest.dep: $(SRC.VOSTEST)
-	$(DO.DEPEND)
+	$(DO.DEPEND1) $(VOSTEST.CFLAGS) $(DO.DEPEND2)
 else
 -include $(OUT.VOSTEST)/vostest.dep
 endif
