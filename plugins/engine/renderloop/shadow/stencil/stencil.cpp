@@ -308,7 +308,7 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
 
   // Try to get a MeshShadow polygonmesh
   csRef<iPolygonMesh> mesh = model->GetPolygonMeshShadows ();
-  if (mesh)
+  if (mesh && mesh->GetPolygonCount () > 0)
   {
     // Stencil shadows need closed meshes.
     const csFlags& meshFlags = mesh->GetFlags ();

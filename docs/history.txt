@@ -27,6 +27,8 @@ chronological order.
 	  iCommandLineParser to complement the existing GetAppDir() method.
 	  These methods correspond to the lower-level platform-specific
 	  functions csGetResourceDir(), csGetAppDir(), and csGetAppPath().
+	- Marten fixed a crash in stencil shadow plugin. Added test to see that
+	  we don't try to create a shadow for a meshobject without polygons.
 9-oct-2003
 	- Jorrit added the following new functions to iThingFactoryState:
 	    - FindPolygonByName (const char*)
