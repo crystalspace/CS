@@ -22,6 +22,8 @@ chronological order.
 	- Jorrit implemented iMeshWrapper->PlaceMesh() so that it works with
 	  the new portal containers. In addition it now also works on portals
 	  that move. This wasn't the case in the past.
+	- Jorrit updated the apimod documentation for all recent beam
+	  intersection related changes.
 30-Sep-2003
 	- Jorrit fixed a bug in thing polygon mesh helper where it would not
 	  clean up old data if the thing changes and at the same time the

@@ -801,3 +801,27 @@ existing @code{csMD5{char const*)} constructor.  The new method
 @code{csMD5::Digest:HexString()} returns a hexadecimal string representation of
 the @sc{md5} digest using lowercase hexadecimal characters.
 @code{csMD5::Digest::HEXString()} returns uppercase hexadecimal characters.
+
+@subheading Beam Intersection Changes
+
+@code{IntersectSegment} for @code{iThingFactoryState} and @code{iThingState}
+has been removed. Use @code{iMeshObject::HitBeamObject()} instead.
+
+@code{iMeshObject::HitBeamObject()} now has an optional polygon index
+parameter so you can get the index of the polygon that was hit.
+
+@code{iSector::HitBeam()} which doesn't support portals now returns a polygon
+index instead of a polygon pointer.
+
+@code{iSector::HitBeam()} that supports portals has been renamed
+to @code{HitBeamPortals()}. It additionally returns a polygon index.
+Same for @code{iPortal::HitBeam()} which has also been renamed
+to @code{HitBeamPortals()}.
+
+@code{iCamera::GetHit()} has been removed. It is completely equivalent
+to @code{iSector::HitBeamPortals()}.
+
+@code{iVisibilityCuller::IntersectSegment()} now returns a polygon index
+instead of a portal.
+
+
