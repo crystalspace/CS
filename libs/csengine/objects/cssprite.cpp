@@ -1534,7 +1534,7 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights)
 	float in_obj_dist = 0.0f;
 
 	// FIX: Check for divide by zero
-	if(obj_sq_dist > 1)
+	if(obj_sq_dist > 0.0)
 	{
 		in_obj_dist = qisqrt (obj_sq_dist);
 	}
