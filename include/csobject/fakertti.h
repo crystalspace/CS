@@ -22,8 +22,6 @@
 
 // Pseudo-RTTI, since AFAIK we still allow gcc 2.7.x which has buggy RTTI
 
-#include "sysdef.h"
-
 typedef const char* csIdStr;
 
 

@@ -18,6 +18,7 @@
 */
 
 #include <string.h>
+#include "sysdef.h"
 #include "csobject/nameobj.h"
 #include "csobject/dataobj.h"
 #include "csobject/pobject.h"

@@ -22,6 +22,7 @@
 
 #define __USE_CS_ID_CODE
 
+#include "types.h"
 #include "csobject/fakertti.h"
 #include "csobject/treeitr.h"
 #include "csutil/csbase.h"

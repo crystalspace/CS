@@ -19,6 +19,7 @@
 */
 
 #include <string.h>
+#include "sysdef.h"
 #include "cssndldr/common/sndbuf.h"
 #include "csparser/sndbufo.h"
 #include "csobject/nameobj.h"

@@ -13,6 +13,9 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+15-Sep-1999
+        - Ivan Avramovic fixed a few spots where "sysdef.h" was not included,
+          but should have been.
 14-Sep-1999
 	- Eric Sunshine fixed a bug in VFS where csFile::GetSize() was
 	  incorrectly reporting the file's size for "real" disk-based files.

@@ -16,6 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "sysdef.h"
 #include "csscript/objtrig.h"
 #include "csscript/csscript.h"
 

@@ -18,6 +18,7 @@
 */
 
 #include <string.h>
+#include "sysdef.h"
 #include "csengine/cdobj.h"
 #include "csengine/collider.h"
 
