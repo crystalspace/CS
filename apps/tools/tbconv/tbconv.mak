@@ -25,7 +25,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tools/tbconvert
+vpath %.cpp apps/tools/tbconv
 
 TBCONVERT.EXE = tbconvert$(EXE)
 INC.TBCONVERT = $(wildcard apps/tools/tbconv/*.h)
