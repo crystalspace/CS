@@ -78,7 +78,7 @@ int main (int argc, char* argv[])
   csPrintf ("chars printed: %d\n", nchar);
   csPrintf ("\n");
 
-  int i;
+  uint i;
   {
     const int intTest[] = {0, 1, -1, 100000};
     for (i = 0; i < sizeof (intTest) / sizeof (int); i++)

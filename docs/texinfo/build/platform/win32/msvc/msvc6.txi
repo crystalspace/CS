@@ -33,8 +33,8 @@ projects from the Crystal Space build process.
 Before you attempt to compile Crystal Space, you must download
 and install the ``cs-win32libs'' archive.  This archive contains alot of the
 third party header, pre-built libraries and dll files used by Crystal
-Space, i.e. @file{libz.dll}, @file{libjpeg.dll}, @file{libpng.dll}, etc.
-@xref{cs-win32libs}.
+Space, i.e. @file{libz-cs.dll}, @file{libjpeg-cs.dll}, @file{libpng-cs.dll}, 
+etc. @xref{cs-win32libs}.
 
 Once you have downloaded the cs-win32libs package, execute the binary and
 follow the setup instructions.  You may want to select ``VC typical'' in the

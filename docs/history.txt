@@ -48,6 +48,9 @@ chronological order.
 	  in some detail:
 	    http://article.gmane.org/gmane.comp.graphics.crystalspace.general/
 	         6447/
+	- res fixed cs_snprintf() long double support.
+	- res made a mini-update to the VC build instructions (correct DLL 
+	  names).
 5-Mar-2005
 	- res added some terrain-related interfaces to cspace.i.
 	- res made more -ansi -pedantic compile fixes on Win32. 

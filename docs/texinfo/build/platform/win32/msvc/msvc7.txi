@@ -32,8 +32,8 @@ projects from the Crystal Space build process.
 Before you attempt to compile Crystal Space, you must download
 and install the ``cs-win32libs'' archive.  This archive contains alot of the
 third party header, pre-built libraries and dll files used by Crystal
-Space, i.e. @file{libz.dll}, @file{libjpeg.dll}, @file{libpng.dll}, etc.
-@xref{cs-win32libs}.
+Space, i.e. @file{libz-cs.dll}, @file{libjpeg-cs.dll}, @file{libpng-cs.dll}, 
+etc. @xref{cs-win32libs}.
 
 Once you have downloaded the cs-win32libs package, execute the binary and
 follow the setup instructions.  You may want to select ``VC typical'' in the
@@ -52,8 +52,8 @@ in-order to build Crystal Space.
 
 The ``cs-win32libs'' package also come with minimum headers and libraries that 
 suffice to compile the parts of Crystal Space that utilize DirectX. However, 
-the version included in cs-win32libs is DirectX 7, so may want to stick to 
-DirectX 8.1 shipped with VC++ 7.
+the version included in cs-win32libs is DirectX 7, so you may want to stick to 
+the DirectX 8.1 shipped with VC++ 7.
 
 You can optionally download the latest DirectX Software Development Kit 
 (@sc{sdk}), which can be obtained from:

@@ -25,6 +25,8 @@
 
 #include "csutil/csuctransform.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/util.h"
+#include "csutil/sysfunc.h"
 #include "csgeom/math.h"
 
 /**\addtogroup csutil
@@ -796,7 +798,7 @@ class csPrintfFormatter
       + (sizeof(currentFormat.width) * 24) / 10 + 2 + strlen (precStr) + 2);
     sprintf (formatStr, "%%%s%d%s%s", flags, currentFormat.width, precStr,
       type);
-    char formattedStr[32];
+    char formattedStr[256];
     sprintf (formattedStr, formatStr, value);
 
     char* p = formattedStr;
@@ -849,10 +851,11 @@ class csPrintfFormatter
 
     IEEEFloatMantissa<T, Tbase> mantissa;
 
-    IEEEFloatSplitter (const T& val, const int mantissaBits) 
+    IEEEFloatSplitter (const T& val, const int mantissaBits,
+      const int expBits) 
     {
       const int baseBits = sizeof(Tbase) * 8;
-      const int expBits = sizeof(T) * 8 - mantissaBits - 1;
+      const int signBit = mantissaBits + expBits;
 
       union
       {
@@ -869,14 +872,15 @@ class csPrintfFormatter
       const int lo = (sizeof (T) / sizeof (Tbase)) - 1;
       const int d = -1;
   #endif
-      sign = toBase.vB[hi] & (1 << (baseBits - 1));
+      sign = toBase.vB[lo + (signBit / baseBits) * d]
+	& (1 << (signBit % baseBits));
       exp = (toBase.vB[hi] >> (mantissaBits % (baseBits)))
 	& ((1 << expBits) - 1);
       for (int n = lo, p = 0; n != hi + d; n += d, p++)
       {
 	const int bit = p * baseBits;
-	const Tbase mask = ((bit + baseBits) < mantissaBits) ? ~0 
-	  : ((1 << mantissaBits) - 1);
+	const Tbase mask = ((bit + baseBits) <= mantissaBits) ? ~0 
+	  : ((1 << (mantissaBits % baseBits)) - 1);
 	mantissa[p] = toBase.vB[n] & mask;
       }
     }
@@ -884,12 +888,19 @@ class csPrintfFormatter
   /// Output a float in hex format
   template <class T>
   void OutputFloatHex (Twriter& writer, const FormatSpec& currentFormat,
-    const T& value, const int mantissaBits, const int bias)
+    const T& value, const int vMantissaBits, const int expBits, const int bias)
   {
     const utf32_char letterFirst = currentFormat.uppercase ? 'A' : 'a';
 
 #ifdef CS_IEEE_DOUBLE_FORMAT
-    IEEEFloatSplitter<T, uint> vSplit (value, mantissaBits);
+#ifdef CS_PROCESSOR_X86
+    // @@@ x86 long double uses explicit mantissa MSB
+    const bool hiddenBit = !(vMantissaBits >= 63);
+#else
+    const bool hiddenBit = false;
+#endif
+    const int mantissaBits = vMantissaBits - (hiddenBit ? 1 : 0);
+    IEEEFloatSplitter<T, uint> vSplit (value, mantissaBits, expBits);
     const uint expMax = (1 << (sizeof(T) * 8 - mantissaBits - 1)) - 1;
 
     if ((vSplit.exp == expMax) && vSplit.mantissa.Eq0())
@@ -942,10 +953,22 @@ class csPrintfFormatter
     }
     scratch.Push ('0');
     scratch.Push (currentFormat.uppercase ? 'X' : 'x');
-    if (vSplit.exp == 0)
-      scratch.Push ('0');
+    if (hiddenBit)
+    {
+      if (vSplit.exp == 0)
+	scratch.Push ('0');
+      else
+	scratch.Push ('1');
+    }
     else
-      scratch.Push ('1');
+    {
+      const int bitNum = mantissaBits - 1;
+      const int baseBits = sizeof (uint) * 8;
+      const int bitIndex = bitNum / baseBits;
+      scratch.Push ('0' + ((vSplit.mantissa[bitIndex] 
+	>> (bitNum % baseBits)) & 1));
+      vSplit.mantissa <<= 1;
+    }
     if ((currentFormat.precision > 0) || (!vSplit.mantissa.Eq0()))
     {
       scratch.Push ('.');
@@ -1179,8 +1202,18 @@ public:
 	case convFloatFix:
 	  {
 	    if (currentFormat.type == typeLongLong)
+	    {
+#if defined(__MINGW32__) || defined(CS_COMPILER_MSVC)
+	      // @@@ MinGW uses MS CRT, but it can't grok long double.
+	      // VC doesn't have long double, but CRT printf() doesn't know
+	      // %Lf either.
+	      OutputFloat (writer, currentFormat, 
+	      (double)params[currentFormat.paramIdx].vLongDbl, "f");
+#else
 	      OutputFloat (writer, currentFormat, 
 	      params[currentFormat.paramIdx].vLongDbl, "Lf");
+#endif
+	    }
 	    else
 	      OutputFloat (writer, currentFormat, 
 	      params[currentFormat.paramIdx].vDbl, "f");
@@ -1189,9 +1222,20 @@ public:
 	case convFloatExp:
 	  {
 	    if (currentFormat.type == typeLongLong)
+	    {
+#if defined(__MINGW32__) || defined(CS_COMPILER_MSVC)
+	      // @@@ MinGW uses MS CRT, but it can't grok long double.
+	      // VC doesn't have long double, but CRT printf() doesn't know
+	      // %Le either.
+	      OutputFloat (writer, currentFormat, 
+	      (double)params[currentFormat.paramIdx].vLongDbl, 
+	      currentFormat.uppercase ? "E" : "e");
+#else
 	      OutputFloat (writer, currentFormat, 
 	      params[currentFormat.paramIdx].vLongDbl, 
 	      currentFormat.uppercase ? "LE" : "Le");
+#endif
+	    }
 	    else
 	      OutputFloat (writer, currentFormat, 
 	      params[currentFormat.paramIdx].vDbl, 
@@ -1201,9 +1245,20 @@ public:
 	case convFloatGeneral:
 	  {
 	    if (currentFormat.type == typeLongLong)
+	    {
+#if defined(__MINGW32__) || defined(CS_COMPILER_MSVC)
+	      // @@@ MinGW uses MS CRT, but it can't grok long double.
+	      // VC doesn't have long double, but CRT printf() doesn't know
+	      // %Lg either.
+	      OutputFloat (writer, currentFormat, 
+	      (double)params[currentFormat.paramIdx].vLongDbl, 
+	      currentFormat.uppercase ? "G" : "g");
+#else
 	      OutputFloat (writer, currentFormat, 
 	      params[currentFormat.paramIdx].vLongDbl, 
 	      currentFormat.uppercase ? "LG" : "Lg");
+#endif
+	    }
 	    else
 	      OutputFloat (writer, currentFormat, 
 	      params[currentFormat.paramIdx].vDbl, 
@@ -1214,12 +1269,12 @@ public:
 	  {
 	    if (currentFormat.type == typeLongLong)
 	      OutputFloatHex (writer, currentFormat, 
-	      params[currentFormat.paramIdx].vLongDbl, LDBL_MANT_DIG-1, 
-	      -(LDBL_MAX_EXP - 1));
+	      params[currentFormat.paramIdx].vLongDbl, LDBL_MANT_DIG, 
+	      csLog2 (LDBL_MAX_EXP) + 1, -(LDBL_MAX_EXP - 1));
 	    else
 	      OutputFloatHex (writer, currentFormat, 
-	      params[currentFormat.paramIdx].vDbl, DBL_MANT_DIG-1, 
-	      -(DBL_MAX_EXP - 1));
+	      params[currentFormat.paramIdx].vDbl, DBL_MANT_DIG, 
+	      csLog2 (DBL_MAX_EXP) + 1, -(DBL_MAX_EXP - 1));
 	  }
 	  break;
 	default:
