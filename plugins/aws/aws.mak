@@ -59,15 +59,16 @@ DIR.AWS = plugins/aws
 OUT.AWS = $(OUT)/$(DIR.AWS)
 INF.AWS = $(SRCDIR)/$(DIR.AWS)/aws.csplugin
 ifeq ($(DO_MSVCGEN),yes)
-INC.AWS = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.AWS)/*.h include/iaws/*.h))
+INC.AWS = $(wildcard $(addprefix $(SRCDIR)/,
+  $(DIR.AWS)/*.h $(DIR.AWS)/*.hpp include/iaws/*.h))
 SRC.AWS = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.AWS)/*.cpp))
 else
 INC.AWS = $(AWS.DERIVED.DIR)/skinpars.hpp \
-  $(filter-out $(SRCDIR)/$(DIR.AWS)/skinpars.hpp, \
-  $(wildcard $(addprefix $(SRCDIR)/,$(DIR.AWS)/*.h include/iaws/*.h)))
+  $(filter-out $(SRCDIR)/$(DIR.AWS)/skinpars.hpp,$(wildcard $(addprefix \
+  $(SRCDIR)/,$(DIR.AWS)/*.h $(DIR.AWS)/*.hpp include/iaws/*.h)))
 SRC.AWS = $(AWS.DERIVED.DIR)/skinlex.cpp $(AWS.DERIVED.DIR)/skinpars.cpp \
   $(filter-out $(addprefix $(SRCDIR)/$(DIR.AWS)/,skinlex.cpp skinpars.cpp), \
-  $(wildcard $(SRCDIR)/$(DIR.AWS)/*.eep))
+  $(wildcard $(SRCDIR)/$(DIR.AWS)/*.cpp))
 endif
 OBJ.AWS = $(addprefix $(OUT.AWS)/,$(notdir $(SRC.AWS:.cpp=$O)))
 DEP.AWS = CSTOOL CSGFX CSGEOM CSUTIL
