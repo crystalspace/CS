@@ -26,7 +26,7 @@
 				AdditionalIncludeDirectories="..\..\plugins,..\..,..\..\include\cssys\win32,..\..\include,..\..\libs,..\..\support,..\..\apps"
 				PreprocessorDefinitions="_DEBUG,WIN32,_CONSOLE,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG"
 				MinimalRebuild="TRUE"
-				RuntimeLibrary="1"
+				RuntimeLibrary="3"
 				PrecompiledHeaderFile=".\csdebug\temp\%project%/%project%.pch"
 				AssemblerListingLocation=".\csdebug\temp\%project%/"
 				ObjectFile=".\csdebug\temp\%project%/"
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="TRUE"
-				AdditionalOptions="/MACHINE:I386 %lflags%"
+				AdditionalOptions="%lflags%"
 				AdditionalDependencies="%libs%"
 				OutputFile="csdebug\temp\%project%\%target%"
 				LinkIncremental="2"
@@ -50,7 +50,8 @@
 				IgnoreDefaultLibraryNames="LIBC"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\csdebug\temp\%project%/%project%.pdb"
-				SubSystem="1"/>
+				SubSystem="1"
+				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
 				TypeLibraryName=".\csdebug\temp\%project%/%project%.tlb"/>
@@ -94,7 +95,7 @@ copy $(TargetPath)  csdebug\bin
 				AdditionalOptions="%cflags%"
 				AdditionalIncludeDirectories="..\..,..\..\include\cssys\win32,..\..\include,..\..\libs,..\..\support,..\..\apps,..\..\plugins"
 				PreprocessorDefinitions="NDEBUG,_CONSOLE,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				PrecompiledHeaderFile=".\csrelease\temp\%project%/%project%.pch"
 				AssemblerListingLocation=".\csrelease\temp\%project%/"
 				ObjectFile=".\csrelease\temp\%project%/"
@@ -106,7 +107,7 @@ copy $(TargetPath)  csdebug\bin
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/MACHINE:I386 %lflags%"
+				AdditionalOptions="%lflags%"
 				AdditionalDependencies="%libs%"
 				OutputFile="csrelease\temp\%project%\%target%"
 				LinkIncremental="1"
@@ -115,7 +116,8 @@ copy $(TargetPath)  csdebug\bin
 				IgnoreDefaultLibraryNames="LIBC"
 				ProgramDatabaseFile=".\csrelease\temp\%project%/%project%.pdb"
 				SubSystem="1"
-				OptimizeReferences="1"/>
+				OptimizeReferences="1"
+				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
 				TypeLibraryName=".\csrelease\temp\%project%/%project%.tlb"/>

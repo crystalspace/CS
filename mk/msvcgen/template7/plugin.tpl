@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="TRUE"
-				AdditionalOptions="/MACHINE:I386 %lflags%"
+				AdditionalOptions="%lflags%"
 				AdditionalDependencies="%libs%"
 				OutputFile="csrelease\temp\%project%\%target%"
 				Version="4.0"
@@ -55,7 +55,8 @@
 				ProgramDatabaseFile=".\csrelease\temp\%project%/%project%.pdb"
 				SubSystem="2"
 				OptimizeReferences="1"
-				ImportLibrary=".\csrelease\temp\%project%/%project%.lib"/>
+				ImportLibrary=".\csrelease\temp\%project%/%project%.lib"
+				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
@@ -113,7 +114,7 @@ copy $(TargetPath)  csrelease\bin
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="TRUE"
-				AdditionalOptions="/MACHINE:I386 %libs%"
+				AdditionalOptions="%libs%"
 				AdditionalDependencies="%lflags%"
 				OutputFile="csdebug\temp\%project%\%target%"
 				Version="1.0"
@@ -124,7 +125,8 @@ copy $(TargetPath)  csrelease\bin
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\csdebug\temp\%project%/%project%.pdb"
 				SubSystem="2"
-				ImportLibrary=".\csdebug\temp\%project%/%project%.lib"/>
+				ImportLibrary=".\csdebug\temp\%project%/%project%.lib"
+				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
