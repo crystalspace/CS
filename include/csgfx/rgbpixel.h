@@ -104,15 +104,15 @@ struct csRGBpixel
   /// Copy constructor
   csRGBpixel (const csRGBpixel& p) :
     red (p.red), green (p.green), blue (p.blue), alpha (p.alpha) {}
-  /// Yet another copy constructor
+  /// Construct from a csRGBcolor object; sets alpha to 255.
   csRGBpixel (const csRGBcolor& c) :
     red (c.red), green (c.green), blue (c.blue), alpha (255) {}
-  /// Initialize the pixel with some R/G/B value
-  csRGBpixel (int r, int g, int b) :
+  /// Initialize the pixel with some R/G/B/A value.
+  csRGBpixel (int r, int g, int b, int a = 255) :
     red ((unsigned char)r),
     green ((unsigned char)g),
     blue ((unsigned char)b),
-    alpha ((unsigned char)255) {}
+    alpha ((unsigned char)a) {}
   /// Compare with an csRGBcolor
   bool operator == (const csRGBcolor& c) const
   { return (c.red == red) && (c.green == green) && (c.blue == blue); }
@@ -142,16 +142,8 @@ struct csRGBpixel
   {
     return (unsigned char)(((int)red*30 + (int)green*59 + (int)blue*11) / 100);
   }
-  /// Assign given red/green/blue values to this pixel
-  void Set (const int r, const int g, const int b)
-  {
-    red = (unsigned char)r;
-    green = (unsigned char)g;
-    blue = (unsigned char)b;
-    alpha = (unsigned char)255;
-  }
   /// Assign given red/green/blue/alpha values to this pixel
-  void Set (const int r, const int g, const int b, const int a)
+  void Set (const int r, const int g, const int b, const int a = 255)
   {
     red = (unsigned char)r;
     green = (unsigned char)g;
