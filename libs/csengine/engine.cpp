@@ -145,6 +145,7 @@ iCameraPosition* csCameraPositionList::NewCameraPosition (const char* name)
   csCameraPosition* newcp = new csCameraPosition (name, "", v, v, v);
   iCameraPosition* cp = &(newcp->scfiCameraPosition);
   Push (cp);
+  cp->DecRef ();
   return cp;
 }
 

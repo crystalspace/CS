@@ -16,6 +16,7 @@ The history order is reversed so that new features are at the top.
 	  iEngine::DeleteAll() will now call these two functions to further
 	  clean up. This fixes several memory leaks when reloading a map
 	  file.
+	- Fixed another memory leak in the engine with the START keyword.
 22-Nov-2001
 	- Further work on documentation. Created a 'Documentation Guide'
 	  section which guides the CS game writer through some of the more
