@@ -4553,6 +4553,11 @@ void csGraphics3DOGLCommon::SetupDTMEffect (G3DTriangleMesh& mesh)
   if (mesh.mat_handle)
   {
     iMaterial* material = ((csMaterialHandle*)(mesh.mat_handle))->GetMaterial();
+    if (!material)
+    {
+      ci.technique = GetStockTechnique (mesh);
+      return;
+    }
     ci.effect = material->GetEffect();
     ci.technique = effectserver->SelectAppropriateTechnique (ci.effect);
   }

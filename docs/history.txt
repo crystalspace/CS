@@ -18,6 +18,12 @@ The history order is reversed so that new features are at the top.
 	  mode (for unittest app) in case there is a g3d but the g3d isn't
 	  initialized yet. This happens when you do 'unittest -video=software'
 	  or 'unittest -video=opengl'.
+	- Jorrit fixed OpenGL renderer so it no longer crashes if you create
+	  a material directly out a texture handle as opposed to going through
+	  the usual iMaterial way. The function to fetch a technique for
+	  a given material assumed that when mat_handle is given then there
+	  is always an iMaterial but that assumption is not true.
+	  This fixes a crash with perftest with OpenGL.
 2-June-2003
 	- Philip Wyett updated the docs to reflect a new msvc_libs release.
 	- Jorrit fixed genmesh in case the genmesh object (not the factory)

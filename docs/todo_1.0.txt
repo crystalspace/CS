@@ -28,10 +28,6 @@ Bugs to fix:
 	[F]  Re-implement locking in csEventQueue using csMutex rather than the
 	     fallible spin-lock which is presently in use.  Ditto for
 	     csEventCord.
-	[**] CAMERA entity bug and vis culling causes bizarre HOM effects and
-	     disappearing/reappearing stars in csdemo.  Also probably affects
-	     other programs and maps, in which sudden and drastic pops in
-	     rendering occur.
 	[S]  Using either renderer, go to the main hall in flarge and add a
 	     light with shift-L.  The framerate immediately drops to between
 	     0.5 and 1.5 fps (on my computer) when facing into the room (not at
@@ -39,23 +35,6 @@ Bugs to fix:
 	     (optimize mode)
 	     Note by Jorrit: this will most likely not be fixed soon as it is
 	     a rather fundamental problem.
-	[**] Using software renderer, go to the room in flarge with the spinning
-	     blocks and rings.  Add a light with shift-L.  The software
-	     renderer immediately crashes while trying to dereference a null
-	     pointer.  (optimize mode)
-	[**] Blocks crashes at exit time dereferencing a garbage pointer
-	     (sometimes null, sometimes not).  To reproduce: 1) Launch.  2)
-	     Start new game.  3) Press ESC to get back to menu.  4) Select Quit
-	     item.  5) Crash.  Note that this crash occurs randomly.  (optimize
-	     mode)
-	[**] walktest crashes randomly at exit time if a static light is added
-	     using either renderer.  To reproduce: 1) Launch walktest with
-	     flarge.  2) Go to main hall.  3) Add a light (shift-L).  4) Quit
-	     (press Q).  5) Crash (7 out of 10 times).  (optimize mode)
-	[**] About 50% of the rockets fired in walktest fail to collide with a
-	     wall; and instead pass right through the wall.  Consequently, the
-	     rocket object is never removed from the world, nor is its dynamic
-	     light removed. (optimize mode)
 	[S]  In walktest, if you fire a rocket and manually delete its dynamic
 	     light, walktest crashes when the rocket later tries to delete the
 	     light itself.  To reproduce: a) Launch walktest.  b) Fire a
@@ -64,23 +43,6 @@ Bugs to fix:
 	     momentarily for the rocket to delete its own light.  e) Crash.
 	     (optimize mode)
 	     [Bug 747978]
-	[**] cswseng crashes dereferencing a null pointer.  To reproduce: 1)
-	     Launch cswseng.  2) Press "New View".  3) Press "Quit".  4) Crash.
-	     (optimize and debug mode)
-	[**] cswstest crashes with dereference of null pointer.  To reproduce:
-	     1) Launch cswstest.  2) Open Grid test window.  3) Close Grid test
-	     window (or quit app).  4) Crash. (optimize and debug mode)
-	[**] mottest crashes dereferencing a null pointer.  To reproduce: 1)
-	     Launch mottest.  2) Press ESC.  3) Crash.
-	     (optimize and debug mode)  Also reported in Bugs tracker as
-	     670281.
-	[**] OpenGL renderer crashes dereferencing null pointer if font manager
-	     is not present.  To reproduce: 1) Launch netmtst with OpenGL
-	     renderer: ./netmtst -video=opengl.  2) Crash.
-	[S]  perftest crashes dereferencing a null pointer when using OpenGL.
-	     To reproduce: 1) Launch perftest with OpenGL.  2) Press space-bar
-	     several times.  3) Crash.  (optimize and debug mode)
-	     [Bug 747980]
 	[S]  perftest used to print a message at the bottom of the window
 	     briefly describing each test.  These messages are no longer
 	     present.
@@ -96,10 +58,6 @@ Bugs to fix:
 	     <domahoneyii@users.sourceforget.net> reports that the crash is on
 	     line 95 of scanp2.inc.
 	     [Bug 747983]
-	[**] Starting walktest with infinite renderer leads to direct crash
-	     (infinte renderer is removed now)
-	[**] simpvs crashes immediately at startup dereferencing a null pointer.
-	     (optimize mode)
 	[S]  tbtut crashes after moving a bit in software mode.  Also, the
 	     program seems very incomplete.  Matze Braun <matze@braunis.de>
 	     reports: "I always start the app move 2 or 3 seconds forward
@@ -123,17 +81,6 @@ Bugs to fix:
 	     memory).  This shows with BugPlug and also with AWS in some cases.
 	     Is this related to incorrect clipping?  (See above item.)
 	     [Bug 747988]
-	[**] cs2xml crashes when trying to convert castle.zip.  (optimize mode)
-	     (note by Jorrit: cannot reproduce).
-	[**] levtool fails to convert castle.zip (after it has been converted
-		with cs2xml)  Matze: Please clarify this item.
-	[**] unittest crashes and/or hangs:
-		./unittest -video=software
-		...
-		plugins/culling/dynavis/tcovbuf.cpp:707:
-			failed assertion 'w_shift >= 0'
-		Trace/Breakpoint ausgelst
-	     [Bug 747989]
 	[S]  Cloth plugin has a culling problem.  If any corner of the cloth's
 	     bbox is above the top border of the screen, then the entire cloth
 	     is culled.  Charles James Leonardo Quarra Cappiello
@@ -154,16 +101,8 @@ Bugs to fix:
 	     [Bug 747995]
 	[S]  The frame around the fancy console looks "strange" (Matze's
 	     phrasing).
-	[**] Restoration of dllwrap uses $* which gets eaten by cs-config.
-	     Need to figure out some way to prevent $* from being eaten.  The
-	     technique for protecting $@ does not seem to work for $*.
-	[**] Add the ability to get different kinds of polygon meshes from
-	     objects: lower-lod version for culling, version for collision
-	     detection, version for lighting (casting shadows), ...
 	[O]  Mark polygons as being visible, used for shadow casting, used for
 	     culling, used for collision detection, ... (more general system).
-	[**] Remove old octree based culler when Dynavis is ok and levtool can
-	     convert to Dynavis levels.
 	[O]  Implement splatting in Dynavis.
 	[O]  Implement 3-bit outline renderer in Dynavis.
 	[O]  Implement better kd-tree balancing in Dynavis.
@@ -180,8 +119,6 @@ Bugs to fix:
 	     table.
 	[V]  Static lighting no longer goes through space-warping portals.
 	     [Bug 748001]
-	[**] One of the halos in flarge seems to disappear in some cases with
-	     OpenGL.
 	[V]  Walktest + newsky: it appears that there are some visibility
 	     culling problems in some rare cases.  Solution: try to find a spot
 	     that doesn't work right and remember with 'C'.  Later on you can
@@ -222,12 +159,6 @@ Bugs to fix:
 	     vertices that are connected to triangles that have vertices from
 	     other limbs.
 	     [Bug 493454]
-	[**] Mesh objects outside the global bounding box of an infinite sector
-	     will not be visible.  There is a work-around for this bug which is
-	     why this bug is not that bad.  You can easily add small dummy
-	     geometry very far away to make the bounding box work.  Problem is
-	     that this dummy geometry has to be part of the static mesh!
-	     [Bug 216698]
 	[V]  Light with explosion particle system is not correctly positioned.
 	     The question is if this light is a desired feature.
 	     [Bug 231392]
@@ -250,6 +181,30 @@ Bugs to fix:
 	     That is, the last '/' has to be preceeded with '$'.  This needs to
 	     be fixed.
 	     [Bug 747998]
+	[F]  Support space warping portals for GetNearbyObjects(), for
+	     PlaceMesh() and for lighting.
+	[F]  Support lights for GetNearbyObjects().
+	[**] CAMERA entity bug and vis culling causes bizarre HOM effects and
+	     disappearing/reappearing stars in csdemo.  Also probably affects
+	     other programs and maps, in which sudden and drastic pops in
+	     rendering occur.
+	[**] Using software renderer, go to the room in flarge with the spinning
+	     blocks and rings.  Add a light with shift-L.  The software
+	     renderer immediately crashes while trying to dereference a null
+	     pointer.  (optimize mode)
+	[**] Blocks crashes at exit time dereferencing a garbage pointer
+	     (sometimes null, sometimes not).  To reproduce: 1) Launch.  2)
+	     Start new game.  3) Press ESC to get back to menu.  4) Select Quit
+	     item.  5) Crash.  Note that this crash occurs randomly.  (optimize
+	     mode)
+	[**] walktest crashes randomly at exit time if a static light is added
+	     using either renderer.  To reproduce: 1) Launch walktest with
+	     flarge.  2) Go to main hall.  3) Add a light (shift-L).  4) Quit
+	     (press Q).  5) Crash (7 out of 10 times).  (optimize mode)
+	[**] About 50% of the rockets fired in walktest fail to collide with a
+	     wall; and instead pass right through the wall.  Consequently, the
+	     rocket object is never removed from the world, nor is its dynamic
+	     light removed. (optimize mode)
 	[**] With OpenGL the lightmaps are not mapped correctly.  This is very
 	     visible if you have two adjacent polygons which have a different
 	     size and a shadow going over those two polygons (in dmburg this
@@ -298,9 +253,54 @@ Bugs to fix:
 	     from back to front in relation to other objects in the same
 	     sector.
 	     [Bug 409067]
-	[F]  Support space warping portals for GetNearbyObjects(), for
-	     PlaceMesh() and for lighting.
-	[F]  Support lights for GetNearbyObjects().
+	[**] Mesh objects outside the global bounding box of an infinite sector
+	     will not be visible.  There is a work-around for this bug which is
+	     why this bug is not that bad.  You can easily add small dummy
+	     geometry very far away to make the bounding box work.  Problem is
+	     that this dummy geometry has to be part of the static mesh!
+	     [Bug 216698]
+	[**] One of the halos in flarge seems to disappear in some cases with
+	     OpenGL.
+	[**] Restoration of dllwrap uses $* which gets eaten by cs-config.
+	     Need to figure out some way to prevent $* from being eaten.  The
+	     technique for protecting $@ does not seem to work for $*.
+	[**] Add the ability to get different kinds of polygon meshes from
+	     objects: lower-lod version for culling, version for collision
+	     detection, version for lighting (casting shadows), ...
+	[**] Remove old octree based culler when Dynavis is ok and levtool can
+	     convert to Dynavis levels.
+	[**] cs2xml crashes when trying to convert castle.zip.  (optimize mode)
+	     (note by Jorrit: cannot reproduce).
+	[**] levtool fails to convert castle.zip (after it has been converted
+		with cs2xml)  Matze: Please clarify this item.
+	[**] unittest crashes and/or hangs:
+		./unittest -video=software
+		...
+		plugins/culling/dynavis/tcovbuf.cpp:707:
+			failed assertion 'w_shift >= 0'
+		Trace/Breakpoint ausgelst
+	     [Bug 747989]
+	[**] Starting walktest with infinite renderer leads to direct crash
+	     (infinte renderer is removed now)
+	[**] simpvs crashes immediately at startup dereferencing a null pointer.
+	     (optimize mode)
+	[**] cswseng crashes dereferencing a null pointer.  To reproduce: 1)
+	     Launch cswseng.  2) Press "New View".  3) Press "Quit".  4) Crash.
+	     (optimize and debug mode)
+	[**] cswstest crashes with dereference of null pointer.  To reproduce:
+	     1) Launch cswstest.  2) Open Grid test window.  3) Close Grid test
+	     window (or quit app).  4) Crash. (optimize and debug mode)
+	[**] mottest crashes dereferencing a null pointer.  To reproduce: 1)
+	     Launch mottest.  2) Press ESC.  3) Crash.
+	     (optimize and debug mode)  Also reported in Bugs tracker as
+	     670281.
+	[**] OpenGL renderer crashes dereferencing null pointer if font manager
+	     is not present.  To reproduce: 1) Launch netmtst with OpenGL
+	     renderer: ./netmtst -video=opengl.  2) Crash.
+	[**] perftest crashes dereferencing a null pointer when using OpenGL.
+	     To reproduce: 1) Launch perftest with OpenGL.  2) Press space-bar
+	     several times.  3) Crash.  (optimize and debug mode)
+	     [Bug 747980]
 
 API and Small Feature Additions:
 	[F]  Translate point on polygon to texture space/object space
