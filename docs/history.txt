@@ -31,6 +31,8 @@ chronological order.
 	  read output to the console and to the yellow popup.
 	- Anders Stenberg fixed one more off-by-one problem in GL canvas with 
 	  NR. Blit was off one pixel along Y.
+	- res added GL_ARB_shading_language_100 and GL_ARB_shader_objects exts
+	  to the GL extension manager.
 17-Dec-2003
 	- Jorrit fixed an initialition bug in the xmlshader compiler.
 	  It would not initialize the writemask which means that you could

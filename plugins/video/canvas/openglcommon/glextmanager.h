@@ -98,7 +98,12 @@
 #include <GL/gl.h>
 #endif
 
-#include "iutil/cmdline.h"
+/*
+  Appear in the ARB_shader_objects ext spec.
+ */
+typedef char GLcharARB;
+typedef uint32 GLhandleARB;
+
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include "video/canvas/openglcommon/iogl.h"
@@ -7830,6 +7835,155 @@ typedef GLvoid (csAPIENTRY* csGLSTENCILFUNCSEPARATEATI) (GLenum frontfunc, GLenu
 
 
 
+// GL_ARB_shading_language_100
+
+
+// GL_ARB_shader_objects
+#ifndef GL_PROGRAM_OBJECT_ARB
+#define GL_PROGRAM_OBJECT_ARB                                        0x8B40
+#endif
+
+#ifndef GL_OBJECT_TYPE_ARB
+#define GL_OBJECT_TYPE_ARB                                           0x8B4E
+#endif
+
+#ifndef GL_OBJECT_SUBTYPE_ARB
+#define GL_OBJECT_SUBTYPE_ARB                                        0x8B4F
+#endif
+
+#ifndef GL_OBJECT_DELETE_STATUS_ARB
+#define GL_OBJECT_DELETE_STATUS_ARB                                  0x8B80
+#endif
+
+#ifndef GL_OBJECT_COMPILE_STATUS_ARB
+#define GL_OBJECT_COMPILE_STATUS_ARB                                 0x8B81
+#endif
+
+#ifndef GL_OBJECT_LINK_STATUS_ARB
+#define GL_OBJECT_LINK_STATUS_ARB                                    0x8B82
+#endif
+
+#ifndef GL_OBJECT_VALIDATE_STATUS_ARB
+#define GL_OBJECT_VALIDATE_STATUS_ARB                                0x8B83
+#endif
+
+#ifndef GL_OBJECT_INFO_LOG_LENGTH_ARB
+#define GL_OBJECT_INFO_LOG_LENGTH_ARB                                0x8B84
+#endif
+
+#ifndef GL_OBJECT_ATTACHED_OBJECTS_ARB
+#define GL_OBJECT_ATTACHED_OBJECTS_ARB                               0x8B85
+#endif
+
+#ifndef GL_OBJECT_ACTIVE_UNIFORMS_ARB
+#define GL_OBJECT_ACTIVE_UNIFORMS_ARB                                0x8B86
+#endif
+
+#ifndef GL_OBJECT_ACTIVE_UNIFORMS_MAX_LENGTH_ARB
+#define GL_OBJECT_ACTIVE_UNIFORMS_MAX_LENGTH_ARB                     0x8B87
+#endif
+
+#ifndef GL_OBJECT_SHADER_SOURCE_LENGTH_ARB
+#define GL_OBJECT_SHADER_SOURCE_LENGTH_ARB                           0x8B88
+#endif
+
+#ifndef GL_SHADER_OBJECT_ARB
+#define GL_SHADER_OBJECT_ARB                                         0x8B48
+#endif
+
+#ifndef GL_FLOAT_VEC2_ARB
+#define GL_FLOAT_VEC2_ARB                                            0x8B50
+#endif
+
+#ifndef GL_FLOAT_VEC3_ARB
+#define GL_FLOAT_VEC3_ARB                                            0x8B51
+#endif
+
+#ifndef GL_FLOAT_VEC4_ARB
+#define GL_FLOAT_VEC4_ARB                                            0x8B52
+#endif
+
+#ifndef GL_INT_VEC2_ARB
+#define GL_INT_VEC2_ARB                                              0x8B53
+#endif
+
+#ifndef GL_INT_VEC3_ARB
+#define GL_INT_VEC3_ARB                                              0x8B54
+#endif
+
+#ifndef GL_INT_VEC4_ARB
+#define GL_INT_VEC4_ARB                                              0x8B55
+#endif
+
+#ifndef GL_BOOL
+#define GL_BOOL                                                      0x8B56
+#endif
+
+#ifndef GL_BOOL_VEC2_ARB
+#define GL_BOOL_VEC2_ARB                                             0x8B57
+#endif
+
+#ifndef GL_BOOL_VEC3_ARB
+#define GL_BOOL_VEC3_ARB                                             0x8B58
+#endif
+
+#ifndef GL_BOOL_VEC4_ARB
+#define GL_BOOL_VEC4_ARB                                             0x8B59
+#endif
+
+#ifndef GL_FLOAT_MAT2_ARB
+#define GL_FLOAT_MAT2_ARB                                            0x8B5A
+#endif
+
+#ifndef GL_FLOAT_MAT3_ARB
+#define GL_FLOAT_MAT3_ARB                                            0x8B5B
+#endif
+
+#ifndef GL_FLOAT_MAT4_ARB
+#define GL_FLOAT_MAT4_ARB                                            0x8B5C
+#endif
+
+
+typedef GLvoid (csAPIENTRY* csDELETEOBJECTARB) (GLhandleARB obj);
+typedef GLhandleARB (csAPIENTRY* csGETHANDLEARB) (GLenum pname);
+typedef GLvoid (csAPIENTRY* csDETACHOBJECTARB) (GLhandleARB containerObj, GLhandleARB attachedObj);
+typedef GLhandleARB (csAPIENTRY* csCREATESHADEROBJECTARB) (GLenum shaderType);
+typedef GLvoid (csAPIENTRY* csSHADERSOURCEARB) (GLhandleARB shaderObj, GLsizei count, GLcharARB** string, GLint* length);
+typedef GLvoid (csAPIENTRY* csCOMPILESHADERARB) (GLhandleARB shaderObj);
+typedef GLhandleARB (csAPIENTRY* csCREATEPROGRAMOBJECTARB) ();
+typedef GLvoid (csAPIENTRY* csATTACHOBJECTARB) (GLhandleARB containerObj, GLhandleARB Obj);
+typedef GLvoid (csAPIENTRY* csLINKPROGRAMARB) (GLhandleARB programObj);
+typedef GLvoid (csAPIENTRY* csUSEPROGRAMOBJECTARB) (GLhandleARB programObj);
+typedef GLvoid (csAPIENTRY* csVALIDATEPROGRAMARB) (GLhandleARB programObj);
+typedef GLvoid (csAPIENTRY* csUNIFORM1FARB) (GLint location, GLfloat v0);
+typedef GLvoid (csAPIENTRY* csUNIFORM2FARB) (GLint location, GLfloat v0, GLfloat v1);
+typedef GLvoid (csAPIENTRY* csUNIFORM3FARB) (GLint location, GLfloat v0, GLfloat v1, GLfloat v2);
+typedef GLvoid (csAPIENTRY* csUNIFORM4FARB) (GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+typedef GLvoid (csAPIENTRY* csUNIFORM1IARB) (GLint location, GLint v0);
+typedef GLvoid (csAPIENTRY* csUNIFORM2IARB) (GLint location, GLint v0, GLint v1);
+typedef GLvoid (csAPIENTRY* csUNIFORM3IARB) (GLint location, GLint v0, GLint v1, GLint v2);
+typedef GLvoid (csAPIENTRY* csUNIFORM4IARB) (GLint location, GLint v0, GLint v1, GLint v2, GLint v3);
+typedef GLvoid (csAPIENTRY* csUNIFORM1FVARB) (GLint location, GLsizei count, GLfloat* value);
+typedef GLvoid (csAPIENTRY* csUNIFORM2FVARB) (GLint location, GLsizei count, GLfloat* value);
+typedef GLvoid (csAPIENTRY* csUNIFORM3FVARB) (GLint location, GLsizei count, GLfloat* value);
+typedef GLvoid (csAPIENTRY* csUNIFORM4FVARB) (GLint location, GLsizei count, GLfloat* value);
+typedef GLvoid (csAPIENTRY* csUNIFORM1IVARB) (GLint location, GLsizei count, GLint* value);
+typedef GLvoid (csAPIENTRY* csUNIFORM2IVARB) (GLint location, GLsizei count, GLint* value);
+typedef GLvoid (csAPIENTRY* csUNIFORM3IVARB) (GLint location, GLsizei count, GLint* value);
+typedef GLvoid (csAPIENTRY* csUNIFORM4IVARB) (GLint location, GLsizei count, GLint* value);
+typedef GLvoid (csAPIENTRY* csUNIFORMMATRIX2FVARB) (GLint location, GLsizei count, GLboolean transpose, GLfloat* value);
+typedef GLvoid (csAPIENTRY* csUNIFORMMATRIX3FVARB) (GLint location, GLsizei count, GLboolean transpose, GLfloat* value);
+typedef GLvoid (csAPIENTRY* csUNIFORMMATRIX4FVARB) (GLint location, GLsizei count, GLboolean transpose, GLfloat* value);
+typedef GLvoid (csAPIENTRY* csGETOBJECTPARAMETERFVARB) (GLhandleARB obj, GLenum pname, GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGETOBJECTPARAMETERIVARB) (GLhandleARB obj, GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGETINFOLOGARB) (GLhandleARB obj, GLsizei maxLength, GLsizei* length, GLcharARB* infoLog);
+typedef GLvoid (csAPIENTRY* csGETATTACHEDOBJECTSARB) (GLhandleARB containerObj, GLsizei maxCount, GLsizei* count, GLhandleARB* obj);
+typedef GLint (csAPIENTRY* csGETUNIFORMLOCATIONARB) (GLhandleARB programObj, GLcharARB* name);
+typedef GLvoid (csAPIENTRY* csGETACTIVEUNIFORMARB) (GLhandleARB programObj, GLuint index, GLsizei maxLength, GLsizei* length, GLint* size, GLenum* type, GLcharARB* name);
+typedef GLint (csAPIENTRY* csGETUNIFORMFVARB) (GLhandleARB programObj, GLint location, GLfloat* params);
+typedef GLint (csAPIENTRY* csGETUNIFORMIVARB) (GLhandleARB programObj, GLint location, GLint* params);
+typedef GLvoid (csAPIENTRY* csGETSHADERSOURCEARB) (GLhandleARB obj, GLsizei maxLength, GLsizei* length, GLcharARB* source);
+
 
 
 // end of definitions
@@ -11898,6 +12052,205 @@ public:
 
   // GL_ARB_point_sprite
 
+  // GL_ARB_shading_language_100
+
+  // GL_ARB_shader_objects
+  #ifndef DELETEOBJECTARB_DECL
+  #define DELETEOBJECTARB_DECL
+  csDELETEOBJECTARB DeleteObjectARB;
+  #endif
+
+  #ifndef GETHANDLEARB_DECL
+  #define GETHANDLEARB_DECL
+  csGETHANDLEARB GetHandleARB;
+  #endif
+
+  #ifndef DETACHOBJECTARB_DECL
+  #define DETACHOBJECTARB_DECL
+  csDETACHOBJECTARB DetachObjectARB;
+  #endif
+
+  #ifndef CREATESHADEROBJECTARB_DECL
+  #define CREATESHADEROBJECTARB_DECL
+  csCREATESHADEROBJECTARB CreateShaderObjectARB;
+  #endif
+
+  #ifndef SHADERSOURCEARB_DECL
+  #define SHADERSOURCEARB_DECL
+  csSHADERSOURCEARB ShaderSourceARB;
+  #endif
+
+  #ifndef COMPILESHADERARB_DECL
+  #define COMPILESHADERARB_DECL
+  csCOMPILESHADERARB CompileShaderARB;
+  #endif
+
+  #ifndef CREATEPROGRAMOBJECTARB_DECL
+  #define CREATEPROGRAMOBJECTARB_DECL
+  csCREATEPROGRAMOBJECTARB CreateProgramObjectARB;
+  #endif
+
+  #ifndef ATTACHOBJECTARB_DECL
+  #define ATTACHOBJECTARB_DECL
+  csATTACHOBJECTARB AttachObjectARB;
+  #endif
+
+  #ifndef LINKPROGRAMARB_DECL
+  #define LINKPROGRAMARB_DECL
+  csLINKPROGRAMARB LinkProgramARB;
+  #endif
+
+  #ifndef USEPROGRAMOBJECTARB_DECL
+  #define USEPROGRAMOBJECTARB_DECL
+  csUSEPROGRAMOBJECTARB UseProgramObjectARB;
+  #endif
+
+  #ifndef VALIDATEPROGRAMARB_DECL
+  #define VALIDATEPROGRAMARB_DECL
+  csVALIDATEPROGRAMARB ValidateProgramARB;
+  #endif
+
+  #ifndef UNIFORM1FARB_DECL
+  #define UNIFORM1FARB_DECL
+  csUNIFORM1FARB Uniform1fARB;
+  #endif
+
+  #ifndef UNIFORM2FARB_DECL
+  #define UNIFORM2FARB_DECL
+  csUNIFORM2FARB Uniform2fARB;
+  #endif
+
+  #ifndef UNIFORM3FARB_DECL
+  #define UNIFORM3FARB_DECL
+  csUNIFORM3FARB Uniform3fARB;
+  #endif
+
+  #ifndef UNIFORM4FARB_DECL
+  #define UNIFORM4FARB_DECL
+  csUNIFORM4FARB Uniform4fARB;
+  #endif
+
+  #ifndef UNIFORM1IARB_DECL
+  #define UNIFORM1IARB_DECL
+  csUNIFORM1IARB Uniform1iARB;
+  #endif
+
+  #ifndef UNIFORM2IARB_DECL
+  #define UNIFORM2IARB_DECL
+  csUNIFORM2IARB Uniform2iARB;
+  #endif
+
+  #ifndef UNIFORM3IARB_DECL
+  #define UNIFORM3IARB_DECL
+  csUNIFORM3IARB Uniform3iARB;
+  #endif
+
+  #ifndef UNIFORM4IARB_DECL
+  #define UNIFORM4IARB_DECL
+  csUNIFORM4IARB Uniform4iARB;
+  #endif
+
+  #ifndef UNIFORM1FVARB_DECL
+  #define UNIFORM1FVARB_DECL
+  csUNIFORM1FVARB Uniform1fvARB;
+  #endif
+
+  #ifndef UNIFORM2FVARB_DECL
+  #define UNIFORM2FVARB_DECL
+  csUNIFORM2FVARB Uniform2fvARB;
+  #endif
+
+  #ifndef UNIFORM3FVARB_DECL
+  #define UNIFORM3FVARB_DECL
+  csUNIFORM3FVARB Uniform3fvARB;
+  #endif
+
+  #ifndef UNIFORM4FVARB_DECL
+  #define UNIFORM4FVARB_DECL
+  csUNIFORM4FVARB Uniform4fvARB;
+  #endif
+
+  #ifndef UNIFORM1IVARB_DECL
+  #define UNIFORM1IVARB_DECL
+  csUNIFORM1IVARB Uniform1ivARB;
+  #endif
+
+  #ifndef UNIFORM2IVARB_DECL
+  #define UNIFORM2IVARB_DECL
+  csUNIFORM2IVARB Uniform2ivARB;
+  #endif
+
+  #ifndef UNIFORM3IVARB_DECL
+  #define UNIFORM3IVARB_DECL
+  csUNIFORM3IVARB Uniform3ivARB;
+  #endif
+
+  #ifndef UNIFORM4IVARB_DECL
+  #define UNIFORM4IVARB_DECL
+  csUNIFORM4IVARB Uniform4ivARB;
+  #endif
+
+  #ifndef UNIFORMMATRIX2FVARB_DECL
+  #define UNIFORMMATRIX2FVARB_DECL
+  csUNIFORMMATRIX2FVARB UniformMatrix2fvARB;
+  #endif
+
+  #ifndef UNIFORMMATRIX3FVARB_DECL
+  #define UNIFORMMATRIX3FVARB_DECL
+  csUNIFORMMATRIX3FVARB UniformMatrix3fvARB;
+  #endif
+
+  #ifndef UNIFORMMATRIX4FVARB_DECL
+  #define UNIFORMMATRIX4FVARB_DECL
+  csUNIFORMMATRIX4FVARB UniformMatrix4fvARB;
+  #endif
+
+  #ifndef GETOBJECTPARAMETERFVARB_DECL
+  #define GETOBJECTPARAMETERFVARB_DECL
+  csGETOBJECTPARAMETERFVARB GetObjectParameterfvARB;
+  #endif
+
+  #ifndef GETOBJECTPARAMETERIVARB_DECL
+  #define GETOBJECTPARAMETERIVARB_DECL
+  csGETOBJECTPARAMETERIVARB GetObjectParameterivARB;
+  #endif
+
+  #ifndef GETINFOLOGARB_DECL
+  #define GETINFOLOGARB_DECL
+  csGETINFOLOGARB GetInfoLogARB;
+  #endif
+
+  #ifndef GETATTACHEDOBJECTSARB_DECL
+  #define GETATTACHEDOBJECTSARB_DECL
+  csGETATTACHEDOBJECTSARB GetAttachedObjectsARB;
+  #endif
+
+  #ifndef GETUNIFORMLOCATIONARB_DECL
+  #define GETUNIFORMLOCATIONARB_DECL
+  csGETUNIFORMLOCATIONARB GetUniformLocationARB;
+  #endif
+
+  #ifndef GETACTIVEUNIFORMARB_DECL
+  #define GETACTIVEUNIFORMARB_DECL
+  csGETACTIVEUNIFORMARB GetActiveUniformARB;
+  #endif
+
+  #ifndef GETUNIFORMFVARB_DECL
+  #define GETUNIFORMFVARB_DECL
+  csGETUNIFORMFVARB GetUniformfvARB;
+  #endif
+
+  #ifndef GETUNIFORMIVARB_DECL
+  #define GETUNIFORMIVARB_DECL
+  csGETUNIFORMIVARB GetUniformivARB;
+  #endif
+
+  #ifndef GETSHADERSOURCEARB_DECL
+  #define GETSHADERSOURCEARB_DECL
+  csGETSHADERSOURCEARB GetShaderSourceARB;
+  #endif
+
+
 
 // end of functions
 };
@@ -12057,6 +12410,8 @@ public:
   bool CS_GL_ATI_separate_stencil;
   bool CS_GL_ARB_texture_non_power_of_two;
   bool CS_GL_ARB_point_sprite;
+  bool CS_GL_ARB_shading_language_100;
+  bool CS_GL_ARB_shader_objects;
 
 protected:
   bool tested_CS_GL_version_1_2;
@@ -12211,6 +12566,8 @@ protected:
   bool tested_CS_GL_ATI_separate_stencil;
   bool tested_CS_GL_ARB_texture_non_power_of_two;
   bool tested_CS_GL_ARB_point_sprite;
+  bool tested_CS_GL_ARB_shading_language_100;
+  bool tested_CS_GL_ARB_shader_objects;
 
 };
 
@@ -12249,12 +12606,6 @@ private:
 
   void Report (const char* msg, ...)
   {
-    csRef<iCommandLineParser> cmdline (
-      CS_QUERY_REGISTRY (object_reg, iCommandLineParser));
-    
-    if (cmdline->GetOption ("verbose") == 0)
-      return;
-    
     va_list arg;
     va_start (arg, msg);
     csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
@@ -16913,6 +17264,95 @@ public:
     if (init)
     {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_point_sprite)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  void InitGL_ARB_shading_language_100 ()
+  {
+    if (tested_CS_GL_ARB_shading_language_100) return;
+    tested_CS_GL_ARB_shading_language_100 = true;
+    const char* ext = "GL_ARB_shading_language_100";
+    char cfgkey[26 + 27 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_shading_language_100 = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_shading_language_100;
+    allclear = true;
+
+    if (init)
+    {
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_shading_language_100)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  void InitGL_ARB_shader_objects ()
+  {
+    if (tested_CS_GL_ARB_shader_objects) return;
+    tested_CS_GL_ARB_shader_objects = true;
+    const char* ext = "GL_ARB_shader_objects";
+    char cfgkey[26 + 21 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_shader_objects = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_shader_objects;
+    allclear = true;
+      EXTMGR_FUNC_INIT(DeleteObjectARB, DELETEOBJECTARB);
+      EXTMGR_FUNC_INIT(GetHandleARB, GETHANDLEARB);
+      EXTMGR_FUNC_INIT(DetachObjectARB, DETACHOBJECTARB);
+      EXTMGR_FUNC_INIT(CreateShaderObjectARB, CREATESHADEROBJECTARB);
+      EXTMGR_FUNC_INIT(ShaderSourceARB, SHADERSOURCEARB);
+      EXTMGR_FUNC_INIT(CompileShaderARB, COMPILESHADERARB);
+      EXTMGR_FUNC_INIT(CreateProgramObjectARB, CREATEPROGRAMOBJECTARB);
+      EXTMGR_FUNC_INIT(AttachObjectARB, ATTACHOBJECTARB);
+      EXTMGR_FUNC_INIT(LinkProgramARB, LINKPROGRAMARB);
+      EXTMGR_FUNC_INIT(UseProgramObjectARB, USEPROGRAMOBJECTARB);
+      EXTMGR_FUNC_INIT(ValidateProgramARB, VALIDATEPROGRAMARB);
+      EXTMGR_FUNC_INIT(Uniform1fARB, UNIFORM1FARB);
+      EXTMGR_FUNC_INIT(Uniform2fARB, UNIFORM2FARB);
+      EXTMGR_FUNC_INIT(Uniform3fARB, UNIFORM3FARB);
+      EXTMGR_FUNC_INIT(Uniform4fARB, UNIFORM4FARB);
+      EXTMGR_FUNC_INIT(Uniform1iARB, UNIFORM1IARB);
+      EXTMGR_FUNC_INIT(Uniform2iARB, UNIFORM2IARB);
+      EXTMGR_FUNC_INIT(Uniform3iARB, UNIFORM3IARB);
+      EXTMGR_FUNC_INIT(Uniform4iARB, UNIFORM4IARB);
+      EXTMGR_FUNC_INIT(Uniform1fvARB, UNIFORM1FVARB);
+      EXTMGR_FUNC_INIT(Uniform2fvARB, UNIFORM2FVARB);
+      EXTMGR_FUNC_INIT(Uniform3fvARB, UNIFORM3FVARB);
+      EXTMGR_FUNC_INIT(Uniform4fvARB, UNIFORM4FVARB);
+      EXTMGR_FUNC_INIT(Uniform1ivARB, UNIFORM1IVARB);
+      EXTMGR_FUNC_INIT(Uniform2ivARB, UNIFORM2IVARB);
+      EXTMGR_FUNC_INIT(Uniform3ivARB, UNIFORM3IVARB);
+      EXTMGR_FUNC_INIT(Uniform4ivARB, UNIFORM4IVARB);
+      EXTMGR_FUNC_INIT(UniformMatrix2fvARB, UNIFORMMATRIX2FVARB);
+      EXTMGR_FUNC_INIT(UniformMatrix3fvARB, UNIFORMMATRIX3FVARB);
+      EXTMGR_FUNC_INIT(UniformMatrix4fvARB, UNIFORMMATRIX4FVARB);
+      EXTMGR_FUNC_INIT(GetObjectParameterfvARB, GETOBJECTPARAMETERFVARB);
+      EXTMGR_FUNC_INIT(GetObjectParameterivARB, GETOBJECTPARAMETERIVARB);
+      EXTMGR_FUNC_INIT(GetInfoLogARB, GETINFOLOGARB);
+      EXTMGR_FUNC_INIT(GetAttachedObjectsARB, GETATTACHEDOBJECTSARB);
+      EXTMGR_FUNC_INIT(GetUniformLocationARB, GETUNIFORMLOCATIONARB);
+      EXTMGR_FUNC_INIT(GetActiveUniformARB, GETACTIVEUNIFORMARB);
+      EXTMGR_FUNC_INIT(GetUniformfvARB, GETUNIFORMFVARB);
+      EXTMGR_FUNC_INIT(GetUniformivARB, GETUNIFORMIVARB);
+      EXTMGR_FUNC_INIT(GetShaderSourceARB, GETSHADERSOURCEARB);
+
+    if (init)
+    {
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_shader_objects)
     }
     else
     {

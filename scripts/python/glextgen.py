@@ -85,10 +85,7 @@ def getArgument (arg, prevarg):
       values["comma"] = ", ";
     else:
       values["comma"] = "";
-    if arg.getAttribute("type").startswith("GL"):
-        values["type"] = "GL" + arg.getAttribute("type").lstrip ("GL").lower ();
-    else:
-        values["type"] = arg.getAttribute("type");
+    values["type"] = arg.getAttribute("type");
     if (arg.getAttribute ("pointer") == "true"):
       values["pointer"] = "*";
     else:
