@@ -29,7 +29,8 @@ struct iVFS;
 struct iCommandLineParser;
 struct iObjectRegistry;
 struct iFile;
-class csParser;
+struct iDocument;
+struct iDocumentNode;
 class csVector3;
 
 /**
@@ -59,6 +60,7 @@ public:
 class ltPolygon
 {
 private:
+  csRef<iDocumentNode> polynode;
   char* name;
 
   int* vertices;
@@ -66,7 +68,7 @@ private:
   int max_vertices;
 
 public:
-  ltPolygon ();
+  ltPolygon (iDocumentNode* polynode);
   ~ltPolygon ();
 
   void AddVertex (int idx);
@@ -78,6 +80,8 @@ public:
 
   void SetName (const char* name);
   const char* GetName () const { return name; }
+
+  iDocumentNode* GetNode () const { return polynode; }
 };
 
 /**
@@ -86,6 +90,8 @@ public:
 class ltThing
 {
 private:
+  csRef<iDocumentNode> meshnode;	// The original 'meshobj' node.
+  csRef<iDocumentNode> partnode;	// The 'part' or 'params' node.
   char* name;
 
   ltVertex** vertices;
@@ -99,14 +105,14 @@ private:
   csBox3 bbox;
 
 public:
-  ltThing ();
+  ltThing (iDocumentNode* meshnode, iDocumentNode* partnode);
   ~ltThing ();
 
   void AddVertex (const csVector3& vt);
   int GetVertexCount () const { return num_vertices; }
-  const csVector3& GetVertex (int idx) const { return *vertices[idx]; }
+  const ltVertex& GetVertex (int idx) const { return *vertices[idx]; }
 
-  ltPolygon* AddPolygon ();
+  ltPolygon* AddPolygon (iDocumentNode* polynode);
   int GetPolygonCount () const { return num_polygons; }
   ltPolygon* GetPolygon (int idx) const { return polygons[idx]; }
 
@@ -140,6 +146,9 @@ public:
    * a table of all polygon indices that use these vertices.
    */
   void CreateVertexInfo ();
+
+  iDocumentNode* GetMeshNode () const { return meshnode; }
+  iDocumentNode* GetPartNode () const { return partnode; }
 };
 
 /**
@@ -152,17 +161,58 @@ public:
   csRef<iVFS> vfs;
   csRef<iCommandLineParser> cmdline;
   csVector things;
+  csVector thing_nodes;
+
+  // A vector with all strings that represent 'thing' mesh objects.
+  csVector thing_plugins;
 
   void ReportError (const char* description, ...);
 
-  void ParseWorld (csParser* parser, iFile* fout, char* buf);
-  void ParseSector (csParser* parser, iFile* fout, char* buf);
-  void ParseMeshObj (csParser* parser, iFile* fout,
-  	const char* thname, char* buf);
-  void ParseThingParams (csParser* parser, iFile* fout,
-  	const char* thname, char* buf);
-  void ParsePolygonParams (csParser* parser, iFile* fout,
-  	ltPolygon* polygon, char* buf);
+  /**
+   * This is this appears to be a valid XML world file.
+   */
+  bool TestValidXML (iDocument* doc);
+
+  /**
+   * Analyze the plugins section of the loaded world to see what
+   * plugin strings represent thing mesh objects.
+   */
+  void AnalyzePluginSection (iDocument* doc);
+
+  /**
+   * Test if a mesh object is a thing.
+   */
+  bool IsMeshAThing (iDocumentNode* meshnode);
+
+  /**
+   * Scan all sectors and find all thing objects and push them
+   * on the things vector.
+   */
+  void FindAllThings (iDocument* doc);
+
+  /**
+   * Parse one part (or params) node for a thing.
+   * vector (called by ParseThing()).
+   */
+  void ParsePart (ltThing* thing, iDocumentNode* partnode,
+  	iDocumentNode* meshnode);
+
+  /**
+   * Parse one meshobj node and add a thing to the 'things'
+   * vector (called by FindAllThings()).
+   */
+  void ParseThing (iDocumentNode* meshnode);
+
+  /**
+   * Clone a node and children.
+   */
+  void CloneNode (iDocumentNode* from, iDocumentNode* to);
+
+  /**
+   * Write the thing back into the XML structure. Perform the
+   * required modifications.
+   */
+  void RewriteThing (ltThing* thing, iDocumentNode* newthing);
 
 public:
   LevTool ();

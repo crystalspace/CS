@@ -21,66 +21,18 @@
 #include "cssysdef.h"
 #include "levtool.h"
 #include "csutil/util.h"
-#include "csutil/parser.h"
-#include "csutil/indprint.h"
-#include "csutil/scanstr.h"
+#include "csutil/xmltiny.h"
 #include "csutil/csstring.h"
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
 #include "iutil/cmdline.h"
+#include "iutil/document.h"
 #include "cstool/initapp.h"
 #include "ivaria/reporter.h"
 
 //-----------------------------------------------------------------------------
 
 CS_IMPLEMENT_APPLICATION
-
-//-----------------------------------------------------------------------------
-
-static void Write (iFile* fout, const char* description, ...)
-{
-  va_list arg;
-  va_start (arg, description);
-
-  csString str;
-  str.FormatV (description, arg);
-
-  va_end (arg);
-
-  fout->Write (str.GetData (), str.Length ());
-}
-
-static void WriteStr (iFile* fout, const char* str)
-{
-  fout->Write (str, strlen (str));
-}
-
-static void WriteStruct (iFile* fout, int spaces, const char* token,
-	const char* name, const char* params)
-{
-  while (spaces > 4) { WriteStr (fout, "    "); spaces -= 4; }
-  while (spaces > 0) { WriteStr (fout, " "); spaces--; }
-  if (name == NULL)
-    Write (fout, "%s (%s)\n", token, params);
-  else
-    Write (fout, "%s '%s' (%s)\n", token, name, params);
-}
-
-//-----------------------------------------------------------------------------
-
-// Define all tokens used through this file
-CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (MESHOBJ)
-  CS_TOKEN_DEF (SECTOR)
-  CS_TOKEN_DEF (WORLD)
-  CS_TOKEN_DEF (PARAMS)
-  CS_TOKEN_DEF (V)
-  CS_TOKEN_DEF (VERTEX)
-  CS_TOKEN_DEF (VERTICES)
-  CS_TOKEN_DEF (P)
-  CS_TOKEN_DEF (POLYGON)
-  CS_TOKEN_DEF (PART)
-CS_TOKEN_DEF_END
 
 //-----------------------------------------------------------------------------
 
@@ -141,12 +93,13 @@ void ltVertex::AddPolygon (int idx)
 
 //-----------------------------------------------------------------------------
 
-ltPolygon::ltPolygon ()
+ltPolygon::ltPolygon (iDocumentNode* polynode)
 {
   name = NULL;
   num_vertices = 0;
   max_vertices = 0;
   vertices = NULL;
+  ltPolygon::polynode = polynode;
 }
 
 ltPolygon::~ltPolygon ()
@@ -199,7 +152,7 @@ void ltPolygon::RemoveDuplicateVertices ()
 
 //-----------------------------------------------------------------------------
 
-ltThing::ltThing ()
+ltThing::ltThing (iDocumentNode* meshnode, iDocumentNode* partnode)
 {
   name = NULL;
   vertices = NULL;
@@ -208,6 +161,8 @@ ltThing::ltThing ()
   polygons = NULL;
   num_polygons = 0;
   max_polygons = 0;
+  ltThing::meshnode = meshnode;
+  ltThing::partnode = partnode;
 }
 
 ltThing::~ltThing ()
@@ -246,7 +201,7 @@ void ltThing::AddVertex (const csVector3& vt)
   vertices[num_vertices++]->Set (vt);
 }
 
-ltPolygon* ltThing::AddPolygon ()
+ltPolygon* ltThing::AddPolygon (iDocumentNode* polynode)
 {
   if (num_polygons >= max_polygons)
   {
@@ -262,8 +217,10 @@ ltPolygon* ltThing::AddPolygon ()
     delete[] polygons;
     polygons = new_poly;
   }
-  ltPolygon* np = new ltPolygon ();
+  ltPolygon* np = new ltPolygon (polynode);
   polygons[num_polygons++] = np;
+  const char* name = polynode->GetAttributeValue ("name");
+  if (name) np->SetName (name);
   return np;
 }
 
@@ -506,6 +463,224 @@ void ltThing::CreateVertexInfo ()
 
 //-----------------------------------------------------------------------------
 
+bool LevTool::TestValidXML (iDocument* doc)
+{
+  csRef<iDocumentNode> root = doc->GetRoot ();
+  csRef<iDocumentNode> worldnode = root->GetNode ("world");
+  if (!worldnode)
+  {
+    ReportError ("The <world> node seems to be missing!");
+    return false;
+  }
+  csRef<iDocumentNode> sector = worldnode->GetNode ("sector");
+  if (!sector)
+  {
+    ReportError ("There appear to be no sectors in this world!");
+    return false;
+  }
+  return true;
+}
+
+void LevTool::AnalyzePluginSection (iDocument* doc)
+{
+  thing_plugins.Push (new csString ("crystalspace.mesh.loader.thing"));
+  csRef<iDocumentNode> root = doc->GetRoot ();
+  csRef<iDocumentNode> worldnode = root->GetNode ("world");
+  csRef<iDocumentNode> pluginsnode = worldnode->GetNode ("plugins");
+  if (pluginsnode)
+  {
+    csRef<iDocumentNodeIterator> it = pluginsnode->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      if (!strcmp (value, "plugin"))
+      {
+        const char* plugname = child->GetContentsValue ();
+        if (plugname && !strcmp (plugname, "crystalspace.mesh.loader.thing"))
+	{
+	  thing_plugins.Push (new csString (child->GetAttributeValue ("name")));
+	}
+      }
+    }
+  }
+}
+
+bool LevTool::IsMeshAThing (iDocumentNode* meshnode)
+{
+  csRef<iDocumentNode> pluginnode = meshnode->GetNode ("plugin");
+  if (!pluginnode)
+  {
+    // Very weird. Should not happen.
+    return false;
+  }
+  const char* plugname = pluginnode->GetContentsValue ();
+  if (!plugname)
+  {
+    // Very weird. Should not happen.
+    return false;
+  }
+  int i;
+  for (i = 0 ; i < thing_plugins.Length () ; i++)
+  {
+    csString* str = (csString*)thing_plugins.Get (i);
+    if (str->Compare (plugname))
+      return true;
+  }
+  return false;
+}
+
+void LevTool::ParsePart (ltThing* thing, iDocumentNode* partnode,
+	iDocumentNode* meshnode)
+{
+  csRef<iDocumentNodeIterator> it = partnode->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    if (!strcmp (value, "v"))
+    {
+      csVector3 v;
+      v.x = child->GetAttributeValueAsFloat ("x");
+      v.y = child->GetAttributeValueAsFloat ("y");
+      v.z = child->GetAttributeValueAsFloat ("z");
+      thing->AddVertex (v);
+    }
+    else if (!strcmp (value, "p"))
+    {
+      ltPolygon* p = thing->AddPolygon (child);
+      csRef<iDocumentNodeIterator> it2 = child->GetNodes ();
+      while (it2->HasNext ())
+      {
+	csRef<iDocumentNode> child2 = it2->Next ();
+	if (child2->GetType () != CS_NODE_ELEMENT) continue;
+	const char* value2 = child2->GetValue ();
+	if (!strcmp (value2, "v"))
+	{
+	  int vtidx = child2->GetContentsValueAsInt ();
+	  p->AddVertex (vtidx);
+	}
+      }
+    }
+    else if (!strcmp (value, "part"))
+    {
+      ltThing* partthing = new ltThing (meshnode, child);
+      const char* childname = child->GetAttributeValue ("name");
+      if (childname)
+        partthing->SetName (childname);
+      else
+      {
+        csString newname (thing->GetName ());
+	newname += "_part";
+        partthing->SetName (newname);
+      }
+      things.Push (partthing);
+      ParsePart (partthing, child, 0);
+    }
+  }
+}
+
+void LevTool::ParseThing (iDocumentNode* meshnode)
+{
+  csRef<iDocumentNode> paramsnode = meshnode->GetNode ("params");
+  if (!paramsnode) return;	// Very weird!
+
+  ltThing* th = new ltThing (meshnode, paramsnode);
+  const char* name = meshnode->GetAttributeValue ("name");
+  if (name) th->SetName (name);
+  things.Push (th);
+  thing_nodes.Push ((iDocumentNode*)meshnode);
+
+  ParsePart (th, paramsnode, meshnode);
+}
+
+void LevTool::FindAllThings (iDocument* doc)
+{
+  csRef<iDocumentNode> root = doc->GetRoot ();
+  csRef<iDocumentNode> worldnode = root->GetNode ("world");
+  csRef<iDocumentNodeIterator> it = worldnode->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    if (!strcmp (value, "sector"))
+    {
+      csRef<iDocumentNodeIterator> it2 = child->GetNodes ();
+      while (it2->HasNext ())
+      {
+        csRef<iDocumentNode> child2 = it2->Next ();
+        if (child2->GetType () != CS_NODE_ELEMENT) continue;
+        const char* value2 = child2->GetValue ();
+	if (!strcmp (value2, "meshobj") && IsMeshAThing (child2))
+	{
+	  ParseThing (child2);
+	}
+      }
+    }
+  }
+}
+
+void LevTool::CloneNode (iDocumentNode* from, iDocumentNode* to)
+{
+  to->SetValue (from->GetValue ());
+  csRef<iDocumentNodeIterator> it = from->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
+    	child->GetType (), NULL);
+    CloneNode (child, child_clone);
+  }
+  csRef<iDocumentAttributeIterator> atit = from->GetAttributes ();
+  while (atit->HasNext ())
+  {
+    csRef<iDocumentAttribute> attr = atit->Next ();
+    to->SetAttribute (attr->GetName (), attr->GetValue ());
+  }
+}
+
+void LevTool::RewriteThing (ltThing* thing, iDocumentNode* newthing)
+{
+  csRef<iDocumentNode> meshnode = thing->GetMeshNode ();
+  csRef<iDocumentNode> partnode = thing->GetPartNode ();
+
+  CloneNode (meshnode, newthing);
+  csRef<iDocumentNode> oldparams = newthing->GetNode ("params");
+  csRef<iDocumentNode> newparams = newthing->CreateNodeBefore (
+  	CS_NODE_ELEMENT, NULL);
+  CloneNode (partnode, newparams);
+  newthing->RemoveNode (oldparams);
+
+  newparams->SetValue ("params");
+  newthing->SetAttribute ("name", thing->GetName ());
+  csRef<iDocumentNode> vnode = newparams->GetNode ("v");
+  while (vnode != NULL)
+  {
+    newparams->RemoveNode (vnode);
+    vnode = newparams->GetNode ("v");
+  }
+  csRef<iDocumentNodeIterator> it = newparams->GetNodes ();
+  // We will add all vertices before 'firstchild'.
+  csRef<iDocumentNode> firstchild = it->Next ();
+
+  int i;
+  for (i = 0 ; i < thing->GetVertexCount () ; i++)
+  {
+    const ltVertex& vt = thing->GetVertex (i);
+    csRef<iDocumentNode> newv = newparams->CreateNodeBefore (
+    	CS_NODE_ELEMENT, firstchild);
+    newv->SetAttributeAsFloat ("x", vt.x);
+    newv->SetAttributeAsFloat ("y", vt.y);
+    newv->SetAttributeAsFloat ("z", vt.z);
+    newv->SetValue ("v");
+  }
+}
+
+//-----------------------------------------------------------------------------
+
 LevTool::LevTool ()
 {
   object_reg = NULL;
@@ -519,227 +694,10 @@ LevTool::~LevTool ()
     ltThing* th = (ltThing*)things.Get (i);
     delete th;
   }
-}
-
-void LevTool::ParseWorld (csParser* parser, iFile* fout, char* buf)
-{
-  CS_TOKEN_TABLE_START (tokens)
-    CS_TOKEN_TABLE (SECTOR)
-  CS_TOKEN_TABLE_END
-
-  char *name, *params;
-  long cmd;
-
-  while ((cmd = parser->GetObject (&buf, tokens, &name, &params))
-  	!= CS_PARSERR_EOF)
+  for (i = 0 ; i < thing_plugins.Length () ; i++)
   {
-    if (params && cmd == CS_TOKEN_SECTOR)
-    {
-      Write (fout, "  SECTOR '%s' (\n", name);
-      ParseSector (parser, fout, params);
-      WriteStr (fout, "  )\n");
-    }
-    else
-    {
-      WriteStruct (fout, 2, parser->GetUnknownToken (), name, params);
-    }
-  }
-}
-
-void LevTool::ParseSector (csParser* parser, iFile* fout, char* buf)
-{
-  CS_TOKEN_TABLE_START (tokens)
-    CS_TOKEN_TABLE (MESHOBJ)
-  CS_TOKEN_TABLE_END
-
-  char *name, *params;
-  long cmd;
-
-  while ((cmd = parser->GetObject (&buf, tokens, &name, &params))
-  	!= CS_PARSERR_EOF)
-  {
-    if (params && cmd == CS_TOKEN_MESHOBJ)
-    {
-      Write (fout, "    MESHOBJ '%s' (\n", name);
-      ParseMeshObj (parser, fout, name, params);
-      WriteStr (fout, "    )\n");
-    }
-    else
-    {
-      WriteStruct (fout, 4, parser->GetUnknownToken (), name, params);
-    }
-  }
-}
-
-void LevTool::ParseMeshObj (csParser* parser, iFile* fout,
-	const char* thname, char* buf)
-{
-  CS_TOKEN_TABLE_START (tokens)
-    CS_TOKEN_TABLE (PARAMS)
-  CS_TOKEN_TABLE_END
-
-  char *name, *params;
-  long cmd;
-
-  while ((cmd = parser->GetObject (&buf, tokens, &name, &params))
-  	!= CS_PARSERR_EOF)
-  {
-    if (params && cmd == CS_TOKEN_PARAMS)
-    {
-      Write (fout, "      PARAMS (\n");
-      ParseThingParams (parser, fout, thname, params);
-      Write (fout, "      )\n");
-    }
-    else
-    {
-      WriteStruct (fout, 6, parser->GetUnknownToken (), name, params);
-    }
-  }
-}
-
-void LevTool::ParseThingParams (csParser* parser, iFile* fout,
-	const char* thname, char* buf)
-{
-  CS_TOKEN_TABLE_START (tokens)
-    CS_TOKEN_TABLE (V)
-    CS_TOKEN_TABLE (VERTEX)
-    CS_TOKEN_TABLE (P)
-    CS_TOKEN_TABLE (POLYGON)
-    CS_TOKEN_TABLE (PART)
-  CS_TOKEN_TABLE_END
-
-  char *name, *params;
-  long cmd;
-
-  ltThing* th = new ltThing ();
-  th->SetName (thname);
-  things.Push (th);
-
-  while ((cmd = parser->GetObject (&buf, tokens, &name, &params))
-  	!= CS_PARSERR_EOF)
-  {
-    if (!params) continue;
-    switch (cmd)
-    {
-      case CS_TOKEN_V:
-      case CS_TOKEN_VERTEX:
-      {
-	csVector3 v;
-        csScanStr (params, "%f,%f,%f", &v.x, &v.y, &v.z);
-	th->AddVertex (v);
-	break;
-      }
-      case CS_TOKEN_P:
-      case CS_TOKEN_POLYGON:
-      {
-	ltPolygon* p = th->AddPolygon ();
-	p->SetName (name);
-	ParsePolygonParams (parser, fout, p, params);
-	break;
-      }
-      case CS_TOKEN_PART:
-      {
-        ParseThingParams (parser, fout, name, params);
-        break;
-      }
-      case CS_PARSERR_TOKENNOTFOUND:
-      {
-        WriteStruct (fout, 8, parser->GetUnknownToken (), name, params);
-	break;
-      }
-    }
-  }
-}
-
-void LevTool::ParsePolygonParams (csParser* parser, iFile* fout,
-	ltPolygon* polygon, char* buf)
-{
-  CS_TOKEN_TABLE_START (tokens)
-    CS_TOKEN_TABLE (V)
-    CS_TOKEN_TABLE (VERTICES)
-  CS_TOKEN_TABLE_END
-
-  char *name, *params;
-  long cmd;
-
-  while ((cmd = parser->GetObject (&buf, tokens, &name, &params))
-  	!= CS_PARSERR_EOF)
-  {
-    if (!params) continue;
-    switch (cmd)
-    {
-      case CS_TOKEN_V:
-      case CS_TOKEN_VERTICES:
-      {
-	char* p = params;
-	while (*p && *p == ' ') p++;
-	if (*p < '0' || *p > '9')
-	{
-#if 0
-// @@@ TODO
-	  // We have a special vertex selection depending on
-	  // a VBLOCK or VROOM command previously generated.
-	  int vtidx;
-	  if (*(p+1) == ',')
-	  {
-	    csScanStr (p+2, "%d", &vtidx);
-	    vtidx += vt_offset;
-	  }
-	  else
-	    vtidx = thing_state->GetVertexCount ()-8;
-	  switch (*p)
-	  {
-	    case 'w':
-	      poly3d->CreateVertex (vtidx+6);
-	      poly3d->CreateVertex (vtidx+4);
-	      poly3d->CreateVertex (vtidx+0);
-	      poly3d->CreateVertex (vtidx+2);
-	      break;
-	    case 'e':
-	      poly3d->CreateVertex (vtidx+5);
-	      poly3d->CreateVertex (vtidx+7);
-	      poly3d->CreateVertex (vtidx+3);
-	      poly3d->CreateVertex (vtidx+1);
-	      break;
-	    case 'n':
-	      poly3d->CreateVertex (vtidx+7);
-	      poly3d->CreateVertex (vtidx+6);
-	      poly3d->CreateVertex (vtidx+2);
-	      poly3d->CreateVertex (vtidx+3);
-	      break;
-	    case 's':
-	      poly3d->CreateVertex (vtidx+4);
-	      poly3d->CreateVertex (vtidx+5);
-	      poly3d->CreateVertex (vtidx+1);
-	      poly3d->CreateVertex (vtidx+0);
-	      break;
-	    case 'u':
-	      poly3d->CreateVertex (vtidx+6);
-	      poly3d->CreateVertex (vtidx+7);
-	      poly3d->CreateVertex (vtidx+5);
-	      poly3d->CreateVertex (vtidx+4);
-	      break;
-	    case 'd':
-	      poly3d->CreateVertex (vtidx+0);
-	      poly3d->CreateVertex (vtidx+1);
-	      poly3d->CreateVertex (vtidx+3);
-	      poly3d->CreateVertex (vtidx+2);
-	      break;
-	  }
-#endif
-	}
-	else
-	{
-          int list[100], num;
-          csScanStr (params, "%D", list, &num);
-          for (int i = 0 ; i < num ; i++)
-	  {
-	    //polygon->AddVertex (list[i]);
-	  }
-        }
-	break;
-      }
-    }
+    csString* str = (csString*)thing_plugins.Get (i);
+    delete str;
   }
 }
 
@@ -779,50 +737,54 @@ void LevTool::Main ()
     }
   }
 
-  csRef<iFile> fout (vfs->Open ("/this/world", VFS_FILE_WRITE));
-  if (!fout)
+  csRef<iDocumentSystem> xml (csPtr<iDocumentSystem> (
+  	new csTinyDocumentSystem ()));
+  csRef<iDocument> doc (xml->CreateDocument ());
+  const char* error = doc->Parse (buf);
+  if (error != NULL)
   {
-    ReportError ("Could not open file '/this/world'!");
+    ReportError ("Error parsing XML: %s!", error);
     return;
   }
 
-  csParser* parser = new csParser (true);
-  parser->ResetParserLine ();
+  //---------------------------------------------------------------
 
-  CS_TOKEN_TABLE_START (tokens)
-    CS_TOKEN_TABLE (WORLD)
-  CS_TOKEN_TABLE_END
+  if (!TestValidXML (doc))
+    return;
+  AnalyzePluginSection (doc);
+  FindAllThings (doc);
 
-  char *data = **buf;
-  char *name, *params;
-  long cmd;
-
-  if ((cmd = parser->GetObject (&data, tokens, &name, &params))
-  	!= CS_PARSERR_EOF)
+  csRef<iDocumentNode> root = doc->GetRoot ();
+  csRef<iDocumentNode> worldnode = root->GetNode ("world");
+  int i;
+  for (i = 0 ; i < things.Length () ; i++)
   {
-    if (params)
-    {
-      WriteStr (fout, "WORLD (\n");
-      ParseWorld (parser, fout, params);
-      WriteStr (fout, ")\n");
-    }
-    int i;
-    for (i = 0 ; i < things.Length () ; i++)
-    {
-      ltThing* th = (ltThing*)things.Get (i);
-      printf ("found thing %s\n", th->GetName ());
-      th->CompressVertices ();
-      th->RemoveUnusedVertices ();
-      th->RemoveDuplicateVertices ();
-      th->CreateVertexInfo ();
-    }
+    ltThing* th = (ltThing*)things.Get (i);
+    printf ("found thing %s\n", th->GetName ());
+    th->CompressVertices ();
+    th->RemoveUnusedVertices ();
+    th->RemoveDuplicateVertices ();
+    th->CreateVertexInfo ();
+
+    csRef<iDocumentNode> newnode = worldnode->CreateNodeBefore (
+    	CS_NODE_ELEMENT, NULL);
+    RewriteThing (th, newnode);
   }
-  else
+  for (i = 0 ; i < thing_nodes.Length () ; i++)
   {
-    ReportError ("Error parsing 'WORLD'!");
+    iDocumentNode* node = (iDocumentNode*)thing_nodes.Get (i);
+    csRef<iDocumentNode> parent = node->GetParent ();
+    parent->RemoveNode (node);
   }
 
-  delete parser;
+  //---------------------------------------------------------------
+
+  error = doc->Write (vfs, "/this/world");
+  if (error != NULL)
+  {
+    ReportError ("Error writing /this/world: %s!", error);
+    return;
+  }
 }
 
 /*---------------------------------------------------------------------*
