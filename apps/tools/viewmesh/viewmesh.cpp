@@ -392,6 +392,8 @@ bool ViewMesh::SaveSprite(const char *filename)
 
 void ViewMesh::ConstructMenu()
 {
+  int i;
+
   if (menu)
     delete menu;
 
@@ -410,7 +412,7 @@ void ViewMesh::ConstructMenu()
 
   // StateMenu
   csMenu *statesmenu = new csMenu(NULL);
-  for (int i=0;i<stateslist.Length();i++)
+  for (i=0;i<stateslist.Length();i++)
   {
     (void)new csMenuItem(statesmenu, stateslist.Get(i),
 			 VIEWMESH_STATES_SELECT_START+i);
@@ -419,7 +421,7 @@ void ViewMesh::ConstructMenu()
 
   // OverrideActionMenu
   csMenu *overridemenu = new csMenu(NULL);
-  for (int i=0;i<stateslist.Length();i++)
+  for (i=0;i<stateslist.Length();i++)
   {
     (void)new csMenuItem(overridemenu, stateslist.Get(i),
 			 VIEWMESH_OVERRIDE_SELECT_START+i);
