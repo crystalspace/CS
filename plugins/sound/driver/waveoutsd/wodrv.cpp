@@ -28,25 +28,6 @@
 #include "icfgfile.h"
 #include "wodrv.h"
 
-typedef struct {
-  csSoundDriverWaveOut *driver;
-  HGLOBAL hHeader;
-  LPBYTE lpSoundData;
-} SoundBlock;
-
-typedef struct {
-  int Priority;
-  char *Name;
-} ThreadPriorityDefinition;
-
-#define NumThreadPriorityLevels 3
-
-ThreadPriorityDefinition ThreadPriorityLevels[NumThreadPriorityLevels] = {
-  { THREAD_PRIORITY_LOWEST, "lowest"},
-  { THREAD_PRIORITY_NORMAL, "normal"},
-  { THREAD_PRIORITY_HIGHEST, "highest"}
-};
-
 IMPLEMENT_FACTORY (csSoundDriverWaveOut)
 
 EXPORT_CLASS_TABLE (sndwaveout)
@@ -55,8 +36,8 @@ EXPORT_CLASS_TABLE (sndwaveout)
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE(csSoundDriverWaveOut)
-	IMPLEMENTS_INTERFACE(iPlugIn)
-	IMPLEMENTS_INTERFACE(iSoundDriver)
+  IMPLEMENTS_INTERFACE(iPlugIn)
+  IMPLEMENTS_INTERFACE(iSoundDriver)
 IMPLEMENT_IBASE_END
 
 csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
@@ -68,8 +49,6 @@ csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
   MemorySize = 0;
   Memory = NULL;
   WaveOut = NULL;
-  ThreadHandle = NULL;
-  ThreadID = 0;
   Config = 0;
 }
 
@@ -112,73 +91,24 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
   Format.cbSize = 0;
 
   // read settings from the config file
-  const char *CallbackMethodString=Config->GetStr
-    ("Sound.WaveOut", "Callback", "function");
-  const char *ThreadPriorityString=Config->GetStr
-    ("Sound.WaveOut", "ThreadPriority", "normal");
   unsigned int RefreshRate=Config->GetInt("Sound.WaveOut", "Refresh", 5);
-
-  // interpret callback method string
-  bool Threading;
-  if (stricmp(CallbackMethodString, "thread")==0) Threading = true;
-  else if (stricmp(CallbackMethodString, "function")==0) Threading = false;
-  else {
-    Threading = false;
-    System->Printf(MSG_INITIALIZATION, "  unknown callback method: %s\n",
-      CallbackMethodString);
-  }
+  System->Printf (MSG_INITIALIZATION, "  updating %d times per second\n",
+    RefreshRate);
 
   // setup misc member variables
   MemorySize = Format.nAvgBytesPerSec/RefreshRate;
   MemorySize -=(MemorySize%Format.nBlockAlign);
   Memory = NULL;
   SoundProcLocked = false;
+  NumSoundBlocksToWrite = 0;
 
-  // initialize sound output
-  MMRESULT res;
-  if (Threading) {
-    System->Printf (MSG_INITIALIZATION, "  using thread method\n");
-
-    // create the thread
-    ThreadHandle =
-      CreateThread(NULL, 0, &waveOutThreadProc, this, 0, &ThreadID);
-    if (!ThreadHandle) {
-      System->Printf(MSG_INITIALIZATION, "  could not create thread "
-        "(code %lu).\n", GetLastError());
-      return false;
-    }
-
-    // interpret priority string and set priority
-    int p;
-    for (p=0; p<NumThreadPriorityLevels; p++) {
-      if (stricmp(ThreadPriorityLevels[p].Name,
-        ThreadPriorityString) == 0) break;
-    }
-    if (p == NumThreadPriorityLevels) {
-      System->Printf(MSG_INITIALIZATION, "  unknown thread priority: %s\n",
-        ThreadPriorityString);
-    } else {
-      if (SetThreadPriority(ThreadHandle, ThreadPriorityLevels[p].Priority)!=0)
-        System->Printf(MSG_INITIALIZATION, "  thread set to %s priority\n",
-          ThreadPriorityLevels[p].Name);
-      else
-        System->Printf(MSG_INITIALIZATION, "  could not set thread "
-          "priority (code %lu).\n", GetLastError());
-    }
-
-    // open the wave-out system
-    res = waveOutOpen(&WaveOut, WAVE_MAPPER, &Format, (LONG)ThreadID, 0L, CALLBACK_THREAD);
-
-  } else {
-    System->Printf (MSG_INITIALIZATION, "  using function callback method\n");
-    res = waveOutOpen(&WaveOut, WAVE_MAPPER, &Format, (LONG)&waveOutProc, 0L, CALLBACK_FUNCTION);
-  }
+  // initialize sound output.
+  // @@@ must this be called from within another thread for multi-processor
+  // support?
+  MMRESULT res = waveOutOpen(&WaveOut, WAVE_MAPPER, &Format,
+    (LONG)&waveOutProc, 0L, CALLBACK_FUNCTION);
   if (res != MMSYSERR_NOERROR) System->Printf(MSG_INITIALIZATION,
     "  could not open Wave-Out system (%s).\n", GetMMError(res));
-
-  // print refresh rate
-  System->Printf (MSG_INITIALIZATION, "  updating %d times per second\n",
-    RefreshRate);
 
   // Store old volume and set full volume because the software sound renderer
   // will apply volume internally. If this device does not allow volume
@@ -187,7 +117,11 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
   waveOutGetVolume(WaveOut, &OldVolume);
   waveOutSetVolume(WaveOut, 0xffffffff);
 
-  // write an empty sound block to start playback
+  // write empty sound blocks to start playback. Three sound blocks should
+  // be enough to prevent sound gaps; if not, make this an option in the
+  // config file.
+  SoundProc(NULL);
+  SoundProc(NULL);
   SoundProc(NULL);
 
   return S_OK;
@@ -222,55 +156,18 @@ void csSoundDriverWaveOut::LockMemory(void **mem, int *memsize)
   *memsize = MemorySize;
 }
 
-void csSoundDriverWaveOut::UnlockMemory()
-{
-}
+void csSoundDriverWaveOut::UnlockMemory() {}
+bool csSoundDriverWaveOut::IsBackground() {return true;}
+bool csSoundDriverWaveOut::Is16Bits() {return Bit16;}
+bool csSoundDriverWaveOut::IsStereo() {return Stereo;}
+bool csSoundDriverWaveOut::IsHandleVoidSound() {return false;}
+int csSoundDriverWaveOut::GetFrequency() {return Frequency;}
 
-bool csSoundDriverWaveOut::IsBackground()
-{
-  return true;
-}
-
-bool csSoundDriverWaveOut::Is16Bits()
-{
-  return Bit16;
-}
-
-bool csSoundDriverWaveOut::IsStereo()
-{
-  return Stereo;
-}
-
-bool csSoundDriverWaveOut::IsHandleVoidSound()
-{
-  return false;
-}
-
-int csSoundDriverWaveOut::GetFrequency()
-{
-  return Frequency;
-}
-
-/* @@@ error checking */
-DWORD WINAPI csSoundDriverWaveOut::waveOutThreadProc( LPVOID dwParam)
-{
-  csSoundDriverWaveOut *snd = (csSoundDriverWaveOut *)dwParam;
-  MSG msg;
-
-  while (1) {
-    WaitMessage();
-    if (GetMessage( &msg, NULL, 0, 0 ) ) {
-      if (msg.message==MM_WOM_DONE) {
-        if (snd==NULL || snd->WaveOut==NULL) continue;
-        LPWAVEHDR OldHeader=(LPWAVEHDR)(msg.lParam);
-        snd->SoundProc(OldHeader);
-      }
-      TranslateMessage(&msg); 
-      DispatchMessage(&msg);
-    } else return msg.wParam;
-  }
-  return 0xFFFFFFFF;
-}
+typedef struct {
+  csSoundDriverWaveOut *Driver;
+  HGLOBAL DataHandle;
+  unsigned char *Data;
+} SoundBlock;
 
 void CALLBACK csSoundDriverWaveOut::waveOutProc(HWAVEOUT /*WaveOut*/,
   UINT uMsg, DWORD /*dwInstance*/, DWORD dwParam1, DWORD /*dwParam2*/)
@@ -280,25 +177,17 @@ void CALLBACK csSoundDriverWaveOut::waveOutProc(HWAVEOUT /*WaveOut*/,
 
     LPWAVEHDR OldHeader = (LPWAVEHDR)dwParam1;
     if (OldHeader->dwUser==NULL) return;
-    SoundBlock *block = (SoundBlock *)OldHeader->dwUser;
-    csSoundDriverWaveOut *Driver = block->driver;
-    Driver->SoundProc(OldHeader);
+    SoundBlock *Block = (SoundBlock *)OldHeader->dwUser;
+    Block->Driver->SoundProc(OldHeader);
   }
 }
 
 // @@@ error checking
 void csSoundDriverWaveOut::SoundProc(LPWAVEHDR OldHeader) {
-  // wait for the previous call to exit
-  // @@@ In callback mode this will crash!!!
-  while (SoundProcLocked);
-  // lock this function
-  SoundProcLocked = true;
-
-  SoundBlock *Block;
-
+  // get rid of the previous header
   if (OldHeader) {
     // get the previous sound block
-    Block = (SoundBlock *)(OldHeader->dwUser);
+    SoundBlock *Block = (SoundBlock *)(OldHeader->dwUser);
 
     // Free this block up
     MMRESULT res;
@@ -306,47 +195,59 @@ void csSoundDriverWaveOut::SoundProc(LPWAVEHDR OldHeader) {
     if (res != MMSYSERR_NOERROR) System->Printf(MSG_WARNING,
       "cannot unprepare wave-out header (%s).\n", GetMMError(res));
     
-    GlobalUnlock(Block->hHeader);
-    GlobalFree(Block->hHeader);
+    GlobalUnlock(Block->DataHandle);
+    GlobalFree(Block->DataHandle);
     delete Block;
   }
 
-  // create a new block
-  Block = new SoundBlock();
-  Block->driver = this;
-  Block->hHeader = GlobalAlloc(GMEM_MOVEABLE | GMEM_SHARE, sizeof(WAVEHDR)+MemorySize);
-  Block->lpSoundData = (LPBYTE)GlobalLock(Block->hHeader);
+  // if there is already an instance of this function, tell it to write our
+  // block as well and return
+  NumSoundBlocksToWrite++;
+  if (SoundProcLocked) return;
 
-  // Set up various pointers
-  LPWAVEHDR lpWaveHdr = (LPWAVEHDR)Block->lpSoundData;
-  Memory = (unsigned char *)&Block->lpSoundData[sizeof(WAVEHDR)];
-  if (Memory == NULL) return;
+  // lock this function
+  SoundProcLocked = true;
 
-  // call the sound renderer mixing function
-  SoundRender->MixingFunction();
+  while (NumSoundBlocksToWrite > 0) {
+    NumSoundBlocksToWrite--;
+
+    // create a new block
+    SoundBlock *Block = new SoundBlock();
+    Block->Driver = this;
+    Block->DataHandle = GlobalAlloc(GMEM_MOVEABLE |
+        GMEM_SHARE, sizeof(WAVEHDR)+MemorySize);
+    Block->Data = (unsigned char *)GlobalLock(Block->DataHandle);
+
+    // Set up various pointers
+    LPWAVEHDR lpWaveHdr = (LPWAVEHDR)Block->Data;
+    Memory = Block->Data + sizeof(WAVEHDR);
+
+    // call the sound renderer mixing function
+    SoundRender->MixingFunction();
   
-  // Set up and prepare header. 
-  lpWaveHdr->lpData = (char *)Memory;
-  lpWaveHdr->dwBufferLength = MemorySize;
-  lpWaveHdr->dwFlags = 0L;
-  lpWaveHdr->dwLoops = 0L;
-  lpWaveHdr->dwUser = (DWORD)Block;
-  waveOutPrepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
+    // Set up and prepare header. 
+    lpWaveHdr->lpData = (char *)Memory;
+    lpWaveHdr->dwBufferLength = MemorySize;
+    lpWaveHdr->dwFlags = 0L;
+    lpWaveHdr->dwLoops = 0L;
+    lpWaveHdr->dwUser = (DWORD)Block;
+    waveOutPrepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
 
-  // Now the data block can be sent to the output device. The 
-  // waveOutWrite function returns immediately and waveform 
-  // data is sent to the output device in the background.
-  MMRESULT result = waveOutWrite(WaveOut, lpWaveHdr, sizeof(WAVEHDR)); 
-  if (result != MMSYSERR_NOERROR) {
-    System->Printf(MSG_WARNING, "cannot write sound block to wave-out "
-      "(%s).\n", GetMMError(result));
+    // Now the data block can be sent to the output device. The 
+    // waveOutWrite function returns immediately and waveform 
+    // data is sent to the output device in the background.
+    MMRESULT result = waveOutWrite(WaveOut, lpWaveHdr, sizeof(WAVEHDR)); 
+    if (result != MMSYSERR_NOERROR) {
+      System->Printf(MSG_WARNING, "cannot write sound block to wave-out "
+        "(%s).\n", GetMMError(result));
 
-    result = waveOutUnprepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
-    if (result != MMSYSERR_NOERROR) System->Printf(MSG_WARNING, "cannot "
-      "unprepare sound block (%s).\n", GetMMError(result));
-    GlobalUnlock(Block->hHeader);
-    GlobalFree(Block->hHeader);
-    delete Block;
+      result = waveOutUnprepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
+      if (result != MMSYSERR_NOERROR) System->Printf(MSG_WARNING, "cannot "
+        "unprepare sound block (%s).\n", GetMMError(result));
+      GlobalUnlock(Block->DataHandle);
+      GlobalFree(Block->DataHandle);
+      delete Block;
+    }
   }
   
   // unlock this function

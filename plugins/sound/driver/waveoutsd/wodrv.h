@@ -72,19 +72,17 @@ protected:
 
   // is the sound proc locked?
   bool SoundProcLocked;
+  // number of sound blocks to write
+  int NumSoundBlocksToWrite;
 
-  // this function is called again and again in 'function' playback
-  static void CALLBACK waveOutProc(HWAVEOUT hwo, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2);
-  // this function is called once in 'thread' playback
-  static DWORD CALLBACK waveOutThreadProc( LPVOID dwParam); 
-  // this actually sends the sound data to wave-out (used by both of the above functions).
+  // this function is called when a sound block is returned by wave-out
+  static void CALLBACK waveOutProc(HWAVEOUT hwo, UINT uMsg, DWORD dwInstance,
+    DWORD dwParam1, DWORD dwParam2);
+  // this function writes a new sound block to wave-out
   void SoundProc(LPWAVEHDR OldHeader);
 
   // wave-out device
   HWAVEOUT WaveOut;
-  // thread handle and ID
-  HANDLE ThreadHandle;
-  DWORD ThreadID;
   // old system volume
   DWORD OldVolume;
 };
