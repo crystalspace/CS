@@ -27,7 +27,7 @@
 // resolve dynamics
 void ctFeatherstoneAlgorithm::solve( real t )
 {
-	if( ab.is_grounded ){
+  if( ab.is_grounded ){
 		fsolve_grounded( t );
 	}else{
 		fsolve_floating( t );
@@ -98,6 +98,7 @@ ctFeatherstoneAlgorithm *out_link_solver;
 
 	// propagate velocity of links ( w & v ) from base to leaves
 	if( ab.handle ){
+    //!me hmmmm.... what effect does w and v of base have here
 		out_link = ab.outboard_links.get_first();
 		while( out_link ){
 			out_link->compute_link_velocities();
@@ -121,8 +122,9 @@ ctFeatherstoneAlgorithm *out_link_solver;
 	
 	// linear a and alpha for link 0 is calculated by solving for spatial a:
 	// Ia*a = -Za
-	Ia.solve( a, Za*(-1.0) );
+  Ia.solve( a, Za*(-1.0) );
 
+ // 	a.zero();
 	out_link = ab.outboard_links.get_first();
 	while( out_link ){
 		out_link_solver = (ctFeatherstoneAlgorithm *)out_link->solver;
@@ -143,7 +145,7 @@ ctRigidBody *pe_g;
 ctFeatherstoneAlgorithm *out_link_solver;
 
 	// spatial transform matrix from f to g.  Used later on
-	gXf.form_spatial_transformation( ab.R_fg, ab.r_fg );
+	gXf.form_spatial_transformation( ab.T_fg, ab.r_fg );
 
 	pe_g = ab.handle;
 
@@ -171,12 +173,9 @@ ctFeatherstoneAlgorithm *out_link_solver;
 	}else{
 
 		pe_f = jnt->inboard->handle;
-		if( !pe_f ){
-			return;
-		}
 
 		if( pe_f ){
-			jnt->calc_coriolus( ab.r_fg, ab.R_fg*pe_f->get_angular_v(), c );
+			jnt->calc_coriolus( ab.r_fg, ab.T_fg*pe_f->get_angular_v(), c );
 		}else{
 			ctSpatialVector ct( 0.0,0.0,0.0,0.0,0.0,0.0 );
 			c = ct;
@@ -214,7 +213,7 @@ ctFeatherstoneAlgorithm *svr_f;
 	// from link n to link 2
 
 	ctSpatialMatrix fXg;
-	fXg.form_spatial_transformation( ab.R_fg.get_transpose(), ab.R_fg.get_transpose()*ab.r_fg * -1 );
+	fXg.form_spatial_transformation( ab.T_fg.get_transpose(), ab.T_fg.get_transpose()*ab.r_fg * -1 );
 
 	jnt = ab.inboard_joint;
 	if( jnt == NULL )
