@@ -9,6 +9,9 @@ chronological order.
 26-Jan-2005
 	- Eric Sunshine fixed more boundary-condition bugs in csMouseDriver and
 	  csJoystickDriver.
+	- Eric Sunshined committed an enhancement from C. J. Collier
+	  <cjcollier@colliertech.org> to csutil/t/objreg.t which adds tests for
+	  iObjectRegistry::Get().
 25-Jan-2005
 	- Jorrit fixed a bug that could come up in case you are relighting
 	  several maps at the same time and a certain polygon was affected
