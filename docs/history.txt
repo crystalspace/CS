@@ -17,12 +17,15 @@ The history order is reversed so that new features are at the top.
 	- Oktal added a test to the csperl5 makefile, so it will only attempt
 	  to rebuild the Swig-generated files if the required version of Swig
 	  was detected by configure.
+	- Philip Wyett updated MSVC 6 project files. Lowered warning level
+          (developers can raise locally). This eliminates alot of spurious
+          warnings. Also enabled C++ exeception handling, which I thought
+          was enabled, but whatever.
 	- Philip Wyett made the following changes:
 	    - Updated MSVC 6 project files.  Lowered warning level (developers
 	      can raise locally).  This eliminates alot of spurious warnings.
 	      Also enabled C++ exeception handling, which I thought was
 	      enabled, but whatever.
-            - Made awscG2D public for some unknown reason.
 	- Eric Sunshine made the following changes:
 	    - Added the new variable %name% to msvcgen.pl which can be
 	      interpolated into any template file.  The value of this variable
