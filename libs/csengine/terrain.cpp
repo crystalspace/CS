@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1999 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -45,9 +45,9 @@ csTerrain::~csTerrain ()
   CHK (delete clipbox);
 }
 
-csRenderView *grview = NULL;
+static csRenderView *grview = NULL;
 // Perform coord transformation using CS instead of DDG.
-void csTransform(ddgVector3 vin, ddgVector3 *vout)
+static void transformer(ddgVector3 vin, ddgVector3 *vout)
 {
 	if (grview)
 	{
@@ -88,7 +88,7 @@ bool csTerrain::Initialize (char* heightmap)
   wtoc[14] = 0;
   wtoc[15] = 1;
   float fov = 90.0;
-  mesh->settransform(csTransform); 
+  mesh->settransform(transformer); 
   mesh->init (wtoc, clipbox, fov);
   return true;
 }
@@ -96,9 +96,9 @@ bool csTerrain::Initialize (char* heightmap)
 void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
 {
   // Initialize.
+  /*
   const csMatrix3& m_o2t = rview.GetO2T ();
   const csVector3& v_o2t = rview.GetO2TTranslation ();
-  /*
   wtoc[0] = m_o2t.m11;
   wtoc[4] = m_o2t.m12;
   wtoc[8] = m_o2t.m13;
@@ -130,7 +130,6 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
   // Update the wtoc.
   mesh->calculate ();
   // Render
-  unsigned int i = mesh->qs()->size ();
   mesh->qsi()->reset ();
   while (!mesh->qsi ()->end ())
   {
@@ -150,12 +149,14 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
 		bt->vertex(bt->v0 (tvc),&w1);
 		bt->vertex(bt->v1 (tvc),&w2);
 		bt->vertex(bt->parent (tvc),&w3);
+#if 0
 		csVector3 csp1(w1.v[0],w1.v[1],w1.v[2]);
 		csVector3 csp2(w2.v[0],w2.v[1],w2.v[2]);
 		csVector3 csp3(w3.v[0],w3.v[1],w3.v[2]);
 	    csVector3 csw1 = rview.World2Camera( csp1 );
 	    csVector3 csw2 = rview.World2Camera( csp2 );
 	    csVector3 csw3 = rview.World2Camera( csp3 );
+#endif
 	  
       // DDG vectors work with negative Z pointing forwards.
       float iz;
