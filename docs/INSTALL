@@ -58,15 +58,14 @@ note that the level files should NOT be extracted. Crystal Space
 can read zip files directly.
 
 To run Crystal Space with a specific level you have two
-possibilities (lets assume that you have put the level in a
-directory called 'data' and this directory is located in the
+possibilities (lets assume that you have put the level in the
 same directory as the executable):
 
-    walktest data/level.zip
+    walktest level
 
-(Replace level.zip with any level you want).
+(Replace level with any level you want).
 
-Otherwise you can edit cryst.cfg and set WORLDFILE=data/level.zip
+Otherwise you can edit cryst.cfg and set WORLDFILE=level.zip
 as a configuration option.
 
 Note that Crystal Space currently only supports 256-color displays

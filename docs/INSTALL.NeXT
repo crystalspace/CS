@@ -286,11 +286,11 @@ occurrence and should not cause alarm.
 
 To run WalkTest on a level for the very first time, for example, type:
 
-    % ./walktest -recalc data/large.zip
+    % ./walktest -recalc large
 
 Subsequent uses of the level file do not require "-recalc", so you may type:
 
-    % ./walktest data/large.zip
+    % ./walktest large
 
 Using this command, you will be able to explore the level file large.zip.  To
 explore a different level, substitute its name in place of large.zip.

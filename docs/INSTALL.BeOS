@@ -57,7 +57,7 @@ Program settings
 You will need to have a world file to do anything.  I suggest downloading flarge.zip.  Place this file in the CS/data directory.
 
 Edit cryst.cfg to set the world file accordingly (used by walktest):
-WORLDFILE=data/flarge.zip
+WORLDFILE=flarge
 
 The rest of the settings are mostly self evident and can often be overridden at the command line.
 
@@ -77,11 +77,11 @@ Alt-f will switch you in and out of full screen.  (Note, the software driver doe
 
 Note that walktest requires a good world file to show off effectively (like flarge.zip).  Make sure that cryst.cfg is correctly set to identify this file or type it on the command line:
 
-walktest data/flarge.zip
+walktest flarge
 
 You may have to adjust the AMBIENT_WHITE level in cryst.cfg if the levels appear too dark.  After adjusting the ambient level, specify -recalc on the command line, as in:
 
-walktest -recalc data/flarge.zip
+walktest -recalc flarge
 
 Other interesting example applications which you can run are blocks, metademo, shooter, and mazed.
 

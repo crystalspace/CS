@@ -37,7 +37,7 @@ To compile Crystal Space, you'll have to perform the following steps:
    in the CrystalSpace project) to the following (or whatever you like more):
 
      DRIVER = crystalspace.graphics3d.software
-     WORLDFILE = data/large.zip
+     WORLDFILE = large.zip
 
    This will set up CrystalSpace to run in software mode using the worldfile
    "large.zip". Make sure that you have downloaded a worldfile from the 
