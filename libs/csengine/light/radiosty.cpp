@@ -858,6 +858,8 @@ void csRadiosity :: DoRadiosity()
     iterations++;
     // shoot the light off of RadPoly.
     CsPrintf(MSG_STDOUT, "(priority at %f).\n", shoot->GetPriority() );
+//@@@
+//memset (shoot->csmap->GetStaticMap ().GetRed (), 255, shoot->csmap->GetStaticMap ().GetMaxSize ());
     pulse->Step();
     // prepare to shoot from source (visibility, precompute, etc)
    PrepareShootSource(shoot);
@@ -1183,13 +1185,15 @@ bool csRadiosity :: PrepareShootDest(csRadElement *dest, csFrustumView *lview)
 void csRadiosity :: ShootRadiosityToElement(csRadElement* dest)
 {
   // shoot from each lumel, also a radiosity patch, to each lumel on other.
-#if 0
+#if 1
+  csRadPoly* rp_src = (csRadPoly*)shoot_src;
+  csRadPoly* rp_dest = (csRadPoly*)dest;
   CsPrintf(MSG_STDOUT, "Shooting from RadPoly %x (%s in %s sz %d) to %x (%s in %s sz %d).\n",
-  	(int)shoot_src, shoot_src->GetPolygon3D()->GetName(), 
-	shoot_src->GetPolygon3D()->GetSector()->GetName(), 
+  	(int)shoot_src, rp_src->GetPolygon3D()->GetName(), 
+	rp_src->GetSector()->GetName(), 
 	shoot_src->GetSize(), 
-	(int)dest, dest->GetPolygon3D()->GetName(), 
-	dest->GetPolygon3D()->GetSector()->GetName(), dest->GetSize());
+	(int)dest, rp_dest->GetPolygon3D()->GetName(), 
+	rp_dest->GetSector()->GetName(), dest->GetSize());
 #endif
 
   int sx, sy, rx, ry; // shoot x,y, receive x,y
@@ -1295,7 +1299,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 
   float sqdistance = path.SquaredNorm ();
   float sqdistance_real = sqdistance;
-  if (sqdistance < 1.0f) sqdistance = 1.0f;
+  //@@@if (sqdistance < 1.0f) sqdistance = 1.0f;
 
   float totalfactor = cossrcangle * cosdestangle * 
     source_patch_area * visibility / (sqdistance_real * sqdistance);
@@ -1304,6 +1308,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 
 #if 1
   if(totalfactor > 10.0f)
+  //if(totalfactor > 0.001f)
     CsPrintf(MSG_STDOUT, "totalfactor %g = "
   	"cosshoot %g * cosdest %g * area %g * vis %g / sqdis %g.  "
 	"srclumelcolor (%g, %g, %g), deltacolor (%g, %g, %g)\n", 
@@ -1315,7 +1320,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 
   //shoot_dest->AddDelta(shoot_src, src_uv, ruv, totalfactor, src_lumel_color);
   if(totalfactor > 0.000001) 
-    shoot_dest->AddToDelta(ruv, delta_color * totalfactor);
+    shoot_dest->AddToDelta(ruv, delta_color * totalfactor * 255.);
 
   // specular gloss
   // direction of the 'light' on dest is -path
