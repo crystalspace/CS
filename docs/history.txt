@@ -1,6 +1,11 @@
 The history order has been reversed so that new features are at the top.
 
 6-Oct-2000
+	- Andrew Zabolotny added a check for empty scf.cfg file so that
+	  it will not bomb out.
+	- Wouter Wijngaards added scripts/python/*.py for installation.
+	  Expensive operations are guarded.
+	- Philip Wyett fixed a compile error in csfont plugin.
 	- Eric Sunshine made the following changes to csVector:
 	    - No longer tries to malloc() zero bytes, as that will crash on
 	      some platforms.
