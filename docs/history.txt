@@ -21,8 +21,8 @@ chronological order.
 	- Eric Sunshine fixed problem in plugins/filesys/vfs/vfs.cfg.template
 	  where the TTF_PATH variable was misnamed on Unix. Also augmented
 	  mount information to take into account fact that TrueType fonts under
-	  X-Windows are now found in /usr/X11R6/libs/X11/fonts/TTF rather than
-	  the older /usr/X11R6/libs/X11/fonts/TrueType.
+	  X-Windows may now be found in /usr/X11R6/libs/X11/fonts/TTF in
+	  addition to the older /usr/X11R6/libs/X11/fonts/TrueType.
 	- Eric Sunshine renamed the Crystal Space Java package from
 	  "com.crystalspace" to "org.crystalspace3d" in order to reflect the
 	  new official Crystal Space domain name (crystalspace3d.org).
