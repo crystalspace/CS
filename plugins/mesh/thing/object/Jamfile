@@ -6,5 +6,5 @@ Plugin thing
 LinkWith thing : csgeom csutil ;
 
 Help thing : "Thing mesh object plug-in" ;
+InstallConfig thing.cfg ;
 CompileGroups thing :  meshes ;
-

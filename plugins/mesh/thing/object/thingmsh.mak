@@ -40,6 +40,9 @@ INC.THING = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.THING)/*.h))
 SRC.THING = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.THING)/*.cpp))
 OBJ.THING = $(addprefix $(OUT.THING)/,$(notdir $(SRC.THING:.cpp=$O)))
 DEP.THING = CSGEOM CSUTIL CSUTIL
+CFG.THING = $(SRCDIR)/data/config/thing.cfg
+
+TO_INSTALL.CONFIG += $(CFG.THING)
 
 OUTDIRS += $(OUT.THING)
 

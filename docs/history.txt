@@ -9,6 +9,8 @@ chronological order.
 20-Oct-2003
         - Philip Wyett added 'joytest' to CS/ root .cvsignore file.
 	- Jorrit added thing.cfg.
+	- Eric Sunshine augmented "thing" makefile and Jamfile to ensure that
+	  the new thing.cfg gets installed.
 19-Oct-2003
 	- res fixed a bug in the OR polygon buffers: when two polygons 
 	  subsequently passed into AddPolygon() would have different lightmaps,
