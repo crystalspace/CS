@@ -54,6 +54,9 @@ The history order is reversed so that new features are at the top.
 	    - Upgraded configure.ac to utilize CS_CHECK_PROG_VERSION() for
 	      Bison and Swig tests.
 	    - Eliminated now obsolete bison.m4 (AC_CHECK_BISON).
+	- Norman Kraemer modified configure.ac to fix the case when 
+	  distutils.sysconfig.get_config_var() return None so concatenation 
+	  with a string would fail fails
 29-Apr-2003
 	- Matze fixed bad filepermission for jam install
 	- Matze moved crystal.m4 around to mk/autoconf and merged to make and
