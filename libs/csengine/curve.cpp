@@ -895,11 +895,9 @@ CS_IMPLEMENT_STATIC_VAR(GetBezierCache,csBezier2,())
 
 // static csBezier2 &bezierCache = *GetBezierCache ();
 
-// Should not be necessary, but without this buggy NextStep compiler
-
-// incorrectly calls csObject::QueryInterface() rather than correctly calling
-
-// csCurveTemplate::QueryInterface().
+// This SCF goop should not be necessary, but without it, the buggy NextStep
+// compiler incorrectly calls csObject::QueryInterface() rather than correctly
+// calling csCurveTemplate::QueryInterface().
 SCF_IMPLEMENT_IBASE_EXT(csBezierTemplate)
 SCF_IMPLEMENT_IBASE_EXT_END
 
