@@ -1,5 +1,5 @@
 /*
-    Crystal Space Shared String Vector class
+    Crystal Space String Vector interface
     Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -17,42 +17,43 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_ISTRVEC_H_
-#define __CS_ISTRVEC_H_
+#ifndef __ISTRVEC_H__
+#define __ISTRVEC_H__
 
 #include "csutil/scf.h"
 
+/// This is a SCF-compatible interface for csStrVector
 SCF_INTERFACE (iStrVector, 0, 0, 1) : public iBase
 {
   /// Query array length
   virtual int Length () const = 0;
 
   /// Push a string onto the stack
-  virtual void Push (char*) = 0;
+  virtual void Push (char *iValue) = 0;
 
   /// Pop a string from the top of stack
   virtual char *Pop () = 0;
 
   /// Get Nth string in vector
-  virtual char *Get (int) const = 0;
+  virtual char *Get (int iIndex) const = 0;
 
   /// Find index of given string
-  virtual int Find (const char*) const = 0;
+  virtual int Find (const char *iValue) const = 0;
 
   /// Find index of a string in a pre-sorted string array
-  virtual int FindSorted (const char*) const = 0;
+  virtual int FindSorted (const char *iValue) const = 0;
 
   /// Sort the string array
   virtual void QuickSort () = 0;
 
   /// Delete Nth string in the array
-  virtual void Delete (int) = 0;
+  virtual void Delete (int iIndex) = 0;
 
   /// Insert a string before Nth string in the array
-  virtual void Insert (int, char*) = 0;
+  virtual void Insert (int iIndex, char *iValue) = 0;
 
   /// Delete all strings in array
   virtual void DeleteAll () = 0;
 };
 
-#endif // __CS_ISTRVEC_H_
+#endif // __ISTRVEC_H__
