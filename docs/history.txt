@@ -8,6 +8,7 @@ chronological order.
 
 19-Mar-2004
 	- res fixed compilation of the aseie plugin.
+	- duhprey overrided the correct Write in null2d (from Jorrit)
 18-Mar-2004
 	- Anders Stenberg changed the terraformer interface a bit (made Sample
 	  functions return pointers to data instead of filling out supplied
