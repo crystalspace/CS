@@ -1,14 +1,22 @@
 #============================================================================
-# Rules for cleaning up after an autoconf run
+# Rules for cleaning build detritus.
 #============================================================================
 
-# Override the Jambase Clean rule in order to delete directories (the Jambase
-# rule deletes only files).  This is a hack.  It is needed for rules which
-# create entire directory trees, such LinkApplication for MacOS/X, rather than
-# a single file.  We can remove this hack once LinkApplication for MacOS/X is
-# updated so that Jam has full knowledge of the generated .app wrapper.
-actions piecemeal together existing Clean
+DELTREE ?= rm -rf ;
+
+# CleanDir <tag> : <dir> ...
+#   Forcibly delete a set of directories, even if they are not empty.
+#   Tag is one of the standard targets used with the "Clean" rule, such as
+#   "clean" or "distclean".
+rule CleanDir
 {
-  $(RM) -rf $(>)
+  Always $(<) ;
+  NotFile $(<) ;
+  NoCare $(>) ;
+  Depends $(<) : $(>) ;
 }
 
+actions piecemeal together existing CleanDir
+{
+  $(DELTREE) $(>)
+}

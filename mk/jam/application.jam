@@ -69,6 +69,11 @@ rule Application
 rule ApplicationFromObjects
 {
   local target ;
+  local apptype = GUI ;
+  if $(CONSOLEAPP_$(<))
+  {
+    apptype = CONSOLE ;
+  }
   
   target = $($(<)_target) ;
 
@@ -92,12 +97,17 @@ rule ApplicationFromObjects
   }
 
   # construct Clean Targets
-  Clean clean : $(target) ;
-  Clean $(<)clean : $(target) ;
+  local cleanrule = "Clean" ;
+  if $(APPLICATION.CLEAN.$(apptype))
+  {
+    cleanrule = $(APPLICATION.CLEAN.$(apptype)) ;
+  }
+  $(cleanrule) clean : $(target) ;
+  $(cleanrule) $(<)clean : $(target) ;
 
   # Invoke Link rule
   NAME on $(target) = $(<) ;
-  if $(CONSOLEAPP_$(<)) = "yes"
+  if $(apptype) = CONSOLE
   {
     LinkApplicationConsole $(target) : $(>) ;
   }

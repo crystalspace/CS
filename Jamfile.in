@@ -15,17 +15,24 @@ Help drivers3d	  : "3d renderers compilegroup" ;
 Help meshes	  : "mesh plugin and loader compilegroup" ;
 
 # Create some clean targets
+CleanDir clean : out ;
+
 Clean distclean : Jamconfig Jamfile
 		  cache.mak config.mak Makefile
 		  config.log config.status config.cache
 		  include/volatile.h
 		  [ Wildcard *.scf ]
-		  [ Wildcard *.cex ]
-		  out ;
+		  [ Wildcard *.cex ] ;
 Depends distclean : clean ;
+# When build directory differs from source directory, also remove `include'
+# directory created by configure.
+if $(TOP) != "."
+{
+  CleanDir distclean : include ;
+}
 
-Clean maintainerclean : autom4te.cache aclocal.m4
-			configure configure.scan ;
+Clean maintainerclean : aclocal.m4 configure configure.scan ;
+CleanDir maintainerclean : autom4te.cache ;
 Depends maintainerclean : distclean ;
 
 # Process subdirectories

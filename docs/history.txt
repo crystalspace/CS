@@ -16,6 +16,26 @@ The history order is reversed so that new features are at the top.
 	- Oktal added `%ignore csGetPlatformConfig;' to cspace.i, since this
 	  function is only defined for Win32, it caused a link error on other
 	  platforms when building the scripting modules.
+	- Eric Sunshine made the following change to the Jam build facility:
+	    - Added CleanDir rule which is used to forcibly delete a directory
+	      even if not empty.  This is used much like the Clean rule.  For
+	      example "CleanDir clean : out".
+	    - The "clean" target once again removes the "out" directory.
+	    - The "distclean" target now removes the "include" directory
+	      created by configure if the build directory differs from the
+	      source directory.  This means that "distclean" now cleans the
+	      build directory completely.
+	    - The Application rule now respects APPLICATION.CLEAN.GUI and
+	      APPLICATION.CLEAN.CONSOLE which tell the Application rule how to
+	      clean a built application.  On MacOS/X, APPLICATION.CLEAN.GUI
+	      instructs the rule to use CleanDir for GUI applications, since an
+	      application is actually a directory hierarchy "wrapping" the
+	      application resources.
+	    - Removed the hacky Clean rule override from clean.jam which
+	      transmogrified the Clean action to use "rm -rf" rather than the
+	      normal $(RM).  This used to be necessary because of the
+	      application "wrapper" on MacOS/X, but is no longer needed since
+	      the new CleanDir rule is now used for GUI application on MacOS/X.
 13-May-2003
 	- res added an iAnimatedImage interface to support animnated images.
 	- res added a plugin for a proctex for animated images.
