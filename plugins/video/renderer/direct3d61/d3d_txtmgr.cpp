@@ -326,7 +326,6 @@ void csTextureManagerDirect3D::PrepareTexture (iTextureHandle *handle)
   if (!handle) return;
 
   csTextureMMDirect3D *txt = (csTextureMMDirect3D *)handle->GetPrivateObject ();
-  txt->ApplyGamma ();
   txt->CreateMipmaps ();
 }
 

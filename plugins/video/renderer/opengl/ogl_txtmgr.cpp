@@ -148,7 +148,6 @@ void csTextureManagerOpenGL::PrepareTexture (iTextureHandle *handle)
   if (!handle) return;
 
   csTextureMMOpenGL *txt = (csTextureMMOpenGL *)handle->GetPrivateObject ();
-  txt->ApplyGamma ();
   txt->CreateMipmaps ();
 }
 

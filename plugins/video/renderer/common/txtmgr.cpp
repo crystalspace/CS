@@ -188,7 +188,7 @@ csTextureManager::~csTextureManager()
   Clear ();
 }
 
-void csTextureManager::read_config (csIniFile *config)
+void csTextureManager::read_config (csIniFile* /*config*/)
 {
 }
 

@@ -1078,7 +1078,7 @@ bool csGraphics3DOpenGL::SetRenderState (G3D_RENDERSTATEOPTION op, long value)
   switch (op)
   {
     case G3DRENDERSTATE_ZBUFFERMODE:
-      z_buf_mode = value;
+      z_buf_mode = (csZBufMode) value;
       break;
     case G3DRENDERSTATE_DITHERENABLE:
       m_renderstate.dither = value;
