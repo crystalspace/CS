@@ -164,6 +164,8 @@ public:
   virtual const char *QueryDescription ();
   /// Query class dependency strings
   virtual const char *QueryDependencies ();
+  /// Query class ID
+  virtual const char *QueryClassID();
 };
 
 /// This class holds a number of scfFactory structures
@@ -314,6 +316,11 @@ const char *scfFactory::QueryDescription ()
 const char *scfFactory::QueryDependencies ()
 {
   return Dependencies;
+}
+
+const char *scfFactory::QueryClassID ()
+{
+  return ClassID;
 }
 
 //------------------------------------------------- Client SCF functions ----//

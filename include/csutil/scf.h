@@ -419,6 +419,8 @@ struct iFactory : public iBase
   virtual const char *QueryDescription () = 0;
   /// Query class dependency strings.
   virtual const char *QueryDependencies () = 0;
+  /// Query class ID
+  virtual const char *QueryClassID () = 0;
 };
 
 //----------------------------------------------- Client-side functions -----//
