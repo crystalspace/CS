@@ -14,6 +14,7 @@
 
 #include "csgeom/vector3.h"
 #include "csgeom/plane3.h"
+#include "csgeom/math3d.h"
 
 // includes for lib3ds
 #include <lib3ds/camera.h>
@@ -106,6 +107,7 @@ CSWriter::CSWriter(FILE* f, Lib3dsFile* data3d)
 {
   newpointmap = NULL;
   vectors = NULL;
+  planes = NULL;
 }
 
 CSWriter::~CSWriter()
@@ -114,6 +116,8 @@ CSWriter::~CSWriter()
     delete[] newpointmap;
   if (vectors)
     delete[] vectors;  
+  if (planes)
+    delete[] planes;
 }
 
 void CSWriter::SetScale(float x, float y, float z)
@@ -231,9 +235,15 @@ void CSWriter::WriteFooter ()
       } else {
         WriteL ("LIGHT (");
 	Indent();
-        WriteL ("CENTER (%g,%g,%g)",pCurLight->position[0], pCurLight->position[1], pCurLight->position[2]);
-        WriteL ("RADIUS (%g)",pCurLight->outer_range);
-        WriteL ("COLOR (%g,%g,%g)",pCurLight->color[0], pCurLight->color[1], pCurLight->color[2]);
+        WriteL ("CENTER (%g,%g,%g)",
+	    pCurLight->position[0] * xscale + xrelocate, 
+	    pCurLight->position[1] * yscale + yrelocate,
+	    pCurLight->position[2] * zscale + zrelocate);
+        WriteL ("RADIUS (%g)",pCurLight->outer_range * xscale);
+        WriteL ("COLOR (%g,%g,%g)",
+	    pCurLight->color[0],
+	    pCurLight->color[1],
+	    pCurLight->color[2]);
 	UnIndent();
 	WriteL (")");
       }
@@ -274,12 +284,12 @@ void CSWriter::WriteVertices (Lib3dsMesh* mesh)
   else
   {
     if (newpointmap)
-    {
       delete[] newpointmap;
-      delete[] vectors;
-    }
     newpointmap = new int [mesh->points];
-    vectors = new csVector3 [mesh->points];
+    if (vectors)
+	delete[] vectors;
+    vectors = new csDVector3 [mesh->points];
+    
     for (unsigned int i=0;i<mesh->points;i++)
       newpointmap[i]=-1;
 
@@ -298,11 +308,10 @@ void CSWriter::WriteVertices (Lib3dsMesh* mesh)
 	if (xyz1[0] == xyz2[0] && xyz1[1]==xyz2[1] && xyz1[2] == xyz2[2])
 	{
 	  newpointmap[v2] = newpoint;
-	  vectors[v2].Set(xyz1[0], xyz1[1], xyz1[2]);
 	}
       }
       newpointmap[v] = newpoint;
-      vectors[v].Set(xyz1[0], xyz1[1], xyz1[2]);
+      vectors[newpoint].Set(xyz1[0], xyz1[1], xyz1[2]);
       WriteL ("VERTEX (%g,%g,%g)    ; %d",
 	      xyz1[0]*xscale + xrelocate,
 	      xyz1[1]*yscale + yrelocate,
@@ -318,7 +327,13 @@ void CSWriter::WriteVertices (Lib3dsMesh* mesh)
  */
 typedef unsigned short facenum;
 
-bool CSWriter::CombineTriangle (Lib3dsMesh* mesh, csPlane3*& plane, int* poly,
+bool RelaxedPlanesEqual(const csDPlane& p1, const csDPlane& p2)
+{
+    return (( p1.norm - p2.norm) < (double) 13. ) &&
+	    ( ABS(p1.DD - p2.DD) < (double) 13. );
+}
+
+bool CSWriter::CombineTriangle (Lib3dsMesh* mesh, csDPlane*& plane, int* poly,
 	int& plen, int trinum)
 {
   facenum* ppoints = mesh->faceL[trinum].points;
@@ -369,22 +384,12 @@ pointfound:
   if (!found)
     return false;
 
-  // all points on the same plane?
-  if (!plane)
+  if (!RelaxedPlanesEqual (*plane, planes[trinum]) )
   {
-    plane = new csPlane3(vectors[poly[0]], vectors[poly[1]],
-	vectors[poly[2]]);
-    plane->Normalize();
-  }
-
-  if (plane->Distance (vectors[nonshared]) > 0.1)
-  {
-    printf ("PlaneTestFailed: %g\n", plane->Distance (vectors[nonshared]));
     return false;
   }
 
-  // combine the triangle with the poly (insert the nonshared triangle point
-  // between the 2 shared points in the poly
+  // check if the poly shares 3 vertices
   int p;
   for (p=0; p < plen; p++)
   {
@@ -392,27 +397,23 @@ pointfound:
     {
       printf ("Warning!!! object '%s' contains a face that overlapps another"
 	  "face!\n", mesh->name);
+      used[trinum]=true;
       return false;
     }
+  }
+
+  // combine the triangle with the poly (insert the nonshared triangle point
+  // between the 2 shared points in the poly
+  for (p=0; p < plen; p++)
+  {
     if (poly[p]==sharedfaces[0])
       break;
   }
   plen++;
   p++;
   for (int p2=plen; p2>p; p2--)
-  {
     poly[p2]=poly[p2-1];
-    if (poly[2]==nonshared)
-    {
-      printf ("Error!!! object '%s' contains a face that overlapps "
-  	  "another face! This poly will be eventually invalid!\n", mesh->name);
-      poly[0]=sharedfaces[0];
-      poly[1]=sharedfaces[1];
-      poly[2]=nonshared;
-      plen=3;
-      return true;
-    }	  
-  }
+
   poly[p]=nonshared;
 
   // check if the 
@@ -431,7 +432,7 @@ void CSWriter::WriteFaces(Lib3dsMesh* mesh, bool lighting, unsigned int numMesh)
   }
   else
   {
-    bool *used = new bool[mesh->faces];
+    used = new bool[mesh->faces];
     memset (used, 0, sizeof(bool) * mesh->faces);
 
     // check if the object is mapped with a method we support
@@ -444,6 +445,27 @@ void CSWriter::WriteFaces(Lib3dsMesh* mesh, bool lighting, unsigned int numMesh)
     {
       printf ("Mesh Object '%s' uses an unsupported mapping type."
 	 " Mapping for this object is ignored\n", mesh->name);
+    }
+
+    // precalculate normals of the triangles
+    if (flags & FLAG_COMBINEFACES)
+    {
+      if (planes)
+	delete[] planes;
+      planes = new csDPlane [mesh->faces];
+      unsigned int f;
+      for (f = 0; f < mesh->faces; f++)
+      {
+	int p1,p2,p3;
+	unsigned short* ppp = mesh->faceL[f].points;
+	p1 = newpointmap [ ppp[0] ];
+	p2 = newpointmap [ ppp[1] ];
+	p3 = newpointmap [ ppp[2] ];
+	
+	csDMath3::CalcPlane (vectors[p1], vectors[p2], vectors[p3], 
+	    planes[f].norm, planes[f].DD);
+	planes[f].Normalize();
+      }
     }
 
     for (unsigned int f = 0; f < mesh->faces; f++)
@@ -459,7 +481,7 @@ void CSWriter::WriteFaces(Lib3dsMesh* mesh, bool lighting, unsigned int numMesh)
       poly[0] = newpointmap[ppp[0]];
       poly[1] = newpointmap[ppp[1]];
       poly[2] = newpointmap[ppp[2]];
-      csPlane3* plane=NULL;
+      csDPlane* plane = &planes[f];
 
       // iterate over triangles and try to combine some to make more efficient
       // polgons
@@ -479,7 +501,7 @@ void CSWriter::WriteFaces(Lib3dsMesh* mesh, bool lighting, unsigned int numMesh)
       int mappoints[3]; int np=0;
       for (int i=0; i<plen; i++)
       {
-	if (poly[i] == newpointmap[ppp[np]])
+	if (np<3 && poly[i] == newpointmap[ppp[np]])
 	  mappoints[np++]=i;
 	Write ("%d%s", poly[i], i!=plen-1 ? "," : "");
       }

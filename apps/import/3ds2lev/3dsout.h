@@ -14,8 +14,8 @@
 #include <lib3ds/node.h>
 #include <lib3ds/vector.h>
 
-class csVector3;
-class csPlane3;
+class csDVector3;
+class csDPlane;
 
 class Writer
 {
@@ -54,12 +54,14 @@ public:
   void SetScale(float x, float y, float z);
   void SetTranslate(float x, float y, float z);
 protected:
-  inline bool CombineTriangle (Lib3dsMesh* mesh, csPlane3*& plane, int* poly,
+  inline bool CombineTriangle (Lib3dsMesh* mesh, csDPlane*& plane, int* poly,
       int& plen, int trinum);
     
   Lib3dsFile* p3dsFile;
   int* newpointmap;
-  csVector3* vectors;
+  csDVector3* vectors;
+  csDPlane* planes;
+  bool* used;
   float xscale, yscale, zscale;
   float xrelocate, yrelocate, zrelocate;
 };
