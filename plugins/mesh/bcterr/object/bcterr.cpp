@@ -356,8 +356,8 @@ void csBCTerrBlock::SetupBaseMesh ()
     {
       u = (float)j / divu;
       verts[pos] = BezierCompute (u, temp);
-      if (j == 3) u = 1.0f;
-      if (i == 3) v = 1.0f;
+      if (j == divu) u = 1.0f;
+      if (i == divv) v = 1.0f;
       texels[pos].Set (u,v);
       color[pos].Set (1,1,1);
       normals[pos].Set(1,1,1);
@@ -394,13 +394,13 @@ void csBCTerrBlock::SetupBaseMesh ()
   {
     for (j = 0; j < (owner->sys_inc - 1); j++)
     {
-      a = (4 * i) + j;
+      a = (owner->sys_inc * i) + j;
       large_tri[pos].a = a;
-      large_tri[pos].b = a + 4;
+      large_tri[pos].b = a + owner->sys_inc;
       large_tri[pos].c = a + 1;
       pos++;
-      large_tri[pos].a = a + 4;
-      large_tri[pos].b = a + 4 + 1;
+      large_tri[pos].a = a + owner->sys_inc;
+      large_tri[pos].b = a + owner->sys_inc + 1;
       large_tri[pos].c = a + 1;
       pos++;
     }
