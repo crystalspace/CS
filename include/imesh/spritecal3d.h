@@ -99,20 +99,74 @@ struct iSpriteCal3DFactoryState : public iBase
 
 SCF_VERSION (iSpriteCal3DState, 0, 0, 1);
 
+
 /**
- * This interface describes the API for the 3D sprite mesh object.
+ * This interface describes the API for changing the Cal3D sprite 
+ * mesh object's animations playing and other current traits.
  */
 struct iSpriteCal3DState : public iBase
 {
-    virtual int GetAnimCount() = 0;
-    virtual const char *GetAnimName(int idx) = 0;
-    virtual void ClearAllAnims() = 0;
-    virtual bool SetAnimCycle(const char *name, float pct) = 0;
-    virtual bool AddAnimCycle(const char *name, float pct, float delay) = 0;
-    virtual bool ClearAnimCycle(const char *name, float delay) = 0;
-    virtual bool SetAnimAction(const char *name, float delayIn, float delayOut) = 0;
-    virtual bool SetVelocity(float vel) = 0;
-    virtual void SetLOD(float lod) = 0;
+  /// List of current animation types, used for introspection mostly.
+  enum
+  {
+    C3D_ANIM_TYPE_NONE,
+    C3D_ANIM_TYPE_TRAVEL,
+    C3D_ANIM_TYPE_CYCLE,
+    C3D_ANIM_TYPE_STYLE_CYCLE,
+    C3D_ANIM_TYPE_ACTION
+  };
+
+  /// Returns the number of animations currently loaded for the core model.
+  virtual int GetAnimCount() = 0;
+
+  /// Returns the name, from the xml file, of the indexed anim, or NULL if out of bounds.
+  virtual const char *GetAnimName(int idx) = 0;
+
+  /// Returns the type from the enum above, as specified in the XML.
+  virtual int  GetAnimType(int idx) = 0;
+
+  /// This resets all currently blended animations and stops the sprite.
+  virtual void ClearAllAnims() = 0;
+
+  /// This clears the active anims for this sprite and sets it to use only the specified anim. 
+  virtual bool SetAnimCycle(const char *name, float weight) = 0;
+
+  /**
+   * This adds the specified animation to the ones already being blended by cal3d.
+   * The weight value is dependent on other weights used, and is only relative.
+   * The delay is the period in seconds over which the blended weight will be 
+   * interpolated from 0 to "weight" value.  A cal3d anim cycle, by definition,
+   * is a looping animation (see SetAnimAction for non-looping anims).
+   */
+  virtual bool AddAnimCycle(const char *name, float weight, float delay) = 0;
+
+  /**
+   * This removes the specified anim from the current blend set over the period
+   * of time specifed by "delay" parm in seconds.
+   */
+  virtual bool ClearAnimCycle(const char *name, float delay) = 0;
+
+  /**
+   * This adds a non-looping animation to the blend set for the cal3d Mixer.
+   * This animation will play one time overlaid on top of the other currently
+   * active animations.  delayIn and delayOut allow you to fade in and fade
+   * out the action for smoothness of response.
+   */
+  virtual bool SetAnimAction(const char *name, float delayIn, float delayOut) = 0;
+
+  /**
+   * This function searches all actions specified as type TRAVEL, and uses their
+   * preferred velocities to create a set of blended animations which will equate
+   * in velocity to the specified parm "vel".  The calling program is still
+   * responsible for actually moving the sprite.
+   */
+  virtual bool SetVelocity(float vel) = 0;
+
+  /**
+   * This function sets the Level of Detail used by the sprite.  This is used to 
+   * reduce the polygon count and simplify the scene for the renderer.
+   */
+  virtual void SetLOD(float lod) = 0;
 };
 
 #endif // __CS_IMESH_SPRITE3D_H__

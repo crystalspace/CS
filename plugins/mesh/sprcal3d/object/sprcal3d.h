@@ -60,14 +60,6 @@ struct iEngine;
 
 #define ALL_LOD_FEATURES (CS_LOD_TRIANGLE_REDUCTION|CS_LOD_DISTANCE_REDUCTION)
 
-enum
-{
-    C3D_ANIM_TYPE_NONE,
-    C3D_ANIM_TYPE_TRAVEL,
-    C3D_ANIM_TYPE_CYCLE,
-    C3D_ANIM_TYPE_STYLE_CYCLE,
-    C3D_ANIM_TYPE_ACTION
-};
 
 struct csCal3DAnimation
 {
@@ -477,6 +469,7 @@ public:
   //--------------------- iSpriteCal3DState implementation -------------//
   int GetAnimCount();
   const char *GetAnimName(int idx);
+  int  GetAnimType(int idx);
   int  FindAnim(const char *name);
   void ClearAllAnims();
   bool SetAnimCycle(const char *name, float weight);
@@ -498,6 +491,10 @@ public:
     virtual const char *GetAnimName(int idx)
     {
 	return scfParent->GetAnimName(idx);
+    }
+    virtual int GetAnimType(int idx)
+    {
+	return scfParent->GetAnimType(idx);
     }
 
     virtual void ClearAllAnims()

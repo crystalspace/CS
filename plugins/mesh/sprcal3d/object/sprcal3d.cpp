@@ -816,6 +816,14 @@ const char *csSpriteCal3DMeshObject::GetAnimName(int idx)
     return factory->anims[idx]->name;
 }
 
+int csSpriteCal3DMeshObject::GetAnimType(int idx)
+{
+    if (idx >= GetAnimCount())
+	return NULL;
+
+    return factory->anims[idx]->type;
+}
+
 int csSpriteCal3DMeshObject::FindAnim(const char *name)
 {
     int count = GetAnimCount();
@@ -889,7 +897,7 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel)
 
     for (int i=0; i<count; i++)
     {
-	if (factory->anims[i]->type == C3D_ANIM_TYPE_TRAVEL)
+	if (factory->anims[i]->type == iSpriteCal3DState::C3D_ANIM_TYPE_TRAVEL)
 	{
 	    if (vel < factory->anims[i]->min_velocity ||
 		vel > factory->anims[i]->max_velocity)
