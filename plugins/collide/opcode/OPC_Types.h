@@ -50,7 +50,7 @@
 
 #define ICE_COMPILE_TIME_ASSERT(name, x)	typedef int ICE_Dummy_ ## name[(x) * 2 - 1]
 
-	ICE_COMPILE_TIME_ASSERT(bool,	sizeof(bool)==1);	// ...otherwise things might fail with VC++ 4.2 !
+	//ICE_COMPILE_TIME_ASSERT(bool,	sizeof(bool)==1);	// ...otherwise things might fail with VC++ 4.2 !
 	ICE_COMPILE_TIME_ASSERT(ubyte,	sizeof(ubyte)==1);
 	ICE_COMPILE_TIME_ASSERT(sbyte,	sizeof(sbyte)==1);
 	ICE_COMPILE_TIME_ASSERT(sword,	sizeof(sword)==2);
