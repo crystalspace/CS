@@ -29,7 +29,7 @@
 // incorporated, then it will be much more difficult to link a simple console
 // application.
 //-----------------------------------------------------------------------------
-cs_time csSystemDriver::Time()
+csTime csSystemDriver::Time()
 {
   return system_time() / 1000;
 }

@@ -104,7 +104,7 @@ bool csPerfStats::HandleEvent (iEvent &event)
   {
     frame_count++;
 
-    cs_time current_time = System->GetTime ();
+    csTime current_time = System->GetTime ();
 
     if (!frame_start)
     {
@@ -112,11 +112,11 @@ bool csPerfStats::HandleEvent (iEvent &event)
       frame_count = 0;
     }
 
-    cs_time elapsed_time = current_time - frame_start;
+    csTime elapsed_time = current_time - frame_start;
 
     AccumulateTotals (current_time - frame_start);
     float new_fps = -1;
-    if (elapsed_time > cs_time (resolution))
+    if (elapsed_time > csTime (resolution))
     {
       frame->fps = new_fps = frame_count ?
         frame_count * 1000.0f / elapsed_time :
@@ -180,7 +180,7 @@ void csPerfStats::SetResolution (int iMilSecs)
     sub_section->SetResolution (iMilSecs);
 }
 
-void csPerfStats::SubsectionNextFrame (cs_time elapsed_time, float fps)
+void csPerfStats::SubsectionNextFrame (csTime elapsed_time, float fps)
 {
   AccumulateTotals (elapsed_time);
   if (fps != -1)
@@ -193,7 +193,7 @@ void csPerfStats::SubsectionNextFrame (cs_time elapsed_time, float fps)
 }
 
 
-void csPerfStats::AccumulateTotals (cs_time elapsed_time)
+void csPerfStats::AccumulateTotals (csTime elapsed_time)
 {
   frame_num++;
 #ifdef CS_DEBUG

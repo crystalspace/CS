@@ -480,7 +480,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
 void BumpTest::NextFrame ()
 {
   SysSystemDriver::NextFrame ();
-  cs_time elapsed_time, current_time;
+  csTime elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
   //printf("elapsed_time %d\n", (int)elapsed_time);
 

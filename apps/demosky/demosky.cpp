@@ -301,7 +301,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
 void Simple::NextFrame ()
 {
   SysSystemDriver::NextFrame ();
-  cs_time elapsed_time, current_time;
+  csTime elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
 
   flock->Update(elapsed_time);
@@ -446,7 +446,7 @@ static void Clamp( float &val, float max)
   else if(val<-max) val=-max;
 }
 
-void Flock::Update(cs_time elapsed)
+void Flock::Update(csTime elapsed)
 {
   float dt = float(elapsed)*0.001; /// delta t in seconds
   /// move focus

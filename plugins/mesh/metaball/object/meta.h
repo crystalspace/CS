@@ -134,7 +134,7 @@ public:
     const csReversibleTransform& trans, csBox3& cbox);
   void CreateBoundingBox();
   virtual void GetObjectBoundingBox ( csBox3& bbox, int type = CS_BBOX_NORMAL );
-  virtual void NextFrame( cs_time /* current_time */ );
+  virtual void NextFrame(csTime /* current_time */ );
   virtual bool WantToDie() const { return false; }
   virtual void HardTransform( const csReversibleTransform &t );
   virtual bool SupportsHardTransform() const { return false; }

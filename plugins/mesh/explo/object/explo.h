@@ -48,10 +48,10 @@ protected:
   // iLight interface.
   iDynLight* explight;
   iLight* ilight;
-  cs_time light_fade;
+  csTime light_fade;
   /// scaling of particles.
   bool scale_particles;
-  cs_time fade_particles;
+  csTime fade_particles;
   /// starting bbox.
   csBox3 startbox;
   float maxspeed, maxaccel, radiusnow;
@@ -158,10 +158,10 @@ public:
    * Set particles to be scaled to nothing starting at fade_particles msec
    * before self-destruct.
    */
-  void SetFadeSprites (cs_time fade_time)
+  void SetFadeSprites (csTime fade_time)
   { scale_particles = true; fade_particles = fade_time; }
   /// See if particles are faded (returns true), and returns fade time too.
-  bool GetFadeSprites (cs_time& fade_time) const
+  bool GetFadeSprites (csTime& fade_time) const
   {
     if(!scale_particles) return false;
     fade_time = fade_particles; return true;
@@ -173,12 +173,12 @@ public:
    * Add a light at explosion center. add msec when light starts fading,
    * which is used when time_to_live is set / SelfDestruct is used.
    */
-  void AddLight (iEngine*, iSector*, cs_time fade = 200);
+  void AddLight (iEngine*, iSector*, csTime fade = 200);
   /// Remove the light.
   void RemoveLight ();
 
   /// Update the particle system.
-  virtual void Update (cs_time elapsed_time);
+  virtual void Update (csTime elapsed_time);
 
   /// For iMeshObject.
   virtual void HardTransform (const csReversibleTransform& t);
@@ -262,15 +262,15 @@ public:
     {
       return scfParent->GetSpreadAcceleration ();
     }
-    virtual void SetFadeSprites (cs_time fade_time)
+    virtual void SetFadeSprites (csTime fade_time)
     {
       scfParent->SetFadeSprites (fade_time);
     }
-    virtual bool GetFadeSprites (cs_time& fade_time) const
+    virtual bool GetFadeSprites (csTime& fade_time) const
     {
       return scfParent->GetFadeSprites (fade_time);
     }
-    virtual void AddLight (iEngine* engine, iSector* sector, cs_time fade = 200)
+    virtual void AddLight (iEngine* engine, iSector* sector, csTime fade = 200)
     {
       scfParent->AddLight (engine, sector, fade);
     }

@@ -90,7 +90,7 @@ bool csKeyboardDriver::GetKeyState (int iKey)
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--> Mouse driver <--//--/
 
-cs_time csMouseDriver::DoubleClickTime;
+csTime csMouseDriver::DoubleClickTime;
 size_t csMouseDriver::DoubleClickDist;
 
 csMouseDriver::csMouseDriver (csSystemDriver *system)
@@ -122,7 +122,7 @@ void csMouseDriver::DoButton (int button, bool down, int x, int y)
 
   Button [button - 1] = down;
 
-  cs_time evtime = System->GetTime ();
+  csTime evtime = System->GetTime ();
   System->EventQueue.Put (new csEvent (evtime,
     down ? csevMouseDown : csevMouseUp, x, y, button, smask));
 

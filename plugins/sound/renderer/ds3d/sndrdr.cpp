@@ -113,7 +113,7 @@ bool csSoundRenderDS3D::Open()
   if (vol>=0) SetVolume(vol);
   System->Printf (CS_MSG_INITIALIZATION, "  Volume: %g\n", GetVolume());
 
-  cs_time et, ct;
+  csTime et, ct;
   System->GetElapsedTime(et, ct);
   LastTime = ct;
   
@@ -183,9 +183,9 @@ iSoundListener *csSoundRenderDS3D::GetListener()
 void csSoundRenderDS3D::Update()
 {
   int i;
-  cs_time et, ct;
+  csTime et, ct;
   System->GetElapsedTime(et, ct);
-  cs_time ETime = ct - LastTime;
+  csTime ETime = ct - LastTime;
   LastTime = ct;
 
   Listener->Prepare();

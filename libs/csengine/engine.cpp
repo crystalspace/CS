@@ -948,7 +948,7 @@ void csEngine::ShineLights (csRegion* region)
     if (do_relight) meter.Step();
   }
 
-  cs_time start, stop;
+  csTime start, stop;
   start = System->GetTime ();
   if (do_relight)
   {
@@ -1170,7 +1170,7 @@ void csEngine::Draw (iCamera* c, iClipper2D* view)
   s->Draw (&rview);
 
   // draw all halos on the screen
-  cs_time Elapsed, Current;
+  csTime Elapsed, Current;
   System->GetElapsedTime (Elapsed, Current);
   for (int halo = halos.Length () - 1; halo >= 0; halo--)
     if (!halos.Get (halo)->Process (Elapsed, *this))
@@ -1327,7 +1327,7 @@ void csEngine::RemoveDynLight (csDynLight* dyn)
 
 void csEngine::ControlMeshes ()
 {
-  cs_time elapsed_time, current_time;
+  csTime elapsed_time, current_time;
   System->GetElapsedTime (elapsed_time, current_time);
 
   nextframe_pending = current_time;

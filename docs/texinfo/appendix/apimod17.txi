@@ -20,7 +20,7 @@ the order below (only if you need the elapsed and current time, of course):
 void MySubclass::NextFrame()
 @{
   SysSystemDriver::NextFrame();
-  cs_time elapsed_time, current_time;
+  csTime elapsed_time, current_time;
   GetElapsedTime(elapsed_time,current_time);
   @dots{}
 @end example

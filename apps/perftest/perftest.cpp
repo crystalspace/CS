@@ -158,12 +158,12 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   return true;
 }
 
-static cs_time last_time;
+static csTime last_time;
 
 void PerfTest::NextFrame ()
 {
   SysSystemDriver::NextFrame ();
-  cs_time elapsed_time, current_time;
+  csTime elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
 
   // Tell 3D driver we're going to display 3D things.

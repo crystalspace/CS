@@ -303,7 +303,7 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8), EventQueue (),
 
   debug_level = 0;
   Shutdown = false;
-  CurrentTime = cs_time (-1);
+  CurrentTime = csTime (-1);
 
   CommandLine = new csCommandLineParser ();
 }
@@ -545,8 +545,8 @@ void csSystemDriver::NextFrame ()
   int i;
 
   // Update elapsed time first
-  cs_time cur_time = Time ();
-  ElapsedTime = (CurrentTime == cs_time (-1)) ? 0 : cur_time - CurrentTime;
+  csTime cur_time = Time ();
+  ElapsedTime = (CurrentTime == csTime (-1)) ? 0 : cur_time - CurrentTime;
   CurrentTime = cur_time;
 
   // See if any plugin wants to be called every frame
@@ -833,7 +833,7 @@ void csSystemDriver::GetSettings (int &oWidth, int &oHeight, int &oDepth,
   oFullScreen = FullScreen;
 }
 
-cs_time csSystemDriver::GetTime ()
+csTime csSystemDriver::GetTime ()
 {
   return Time ();
 }

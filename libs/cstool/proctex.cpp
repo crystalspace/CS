@@ -57,7 +57,7 @@ void csProcTexture::ProcCallback (iTextureWrapper*, void* data)
 {
   csProcTexture* pt = (csProcTexture*)data;
   pt->PrepareAnim ();
-  cs_time elapsed_time, current_time;
+  csTime elapsed_time, current_time;
   pt->sys->GetElapsedTime (elapsed_time, current_time);
   if (pt->last_cur_time == current_time) return;
   pt->Animate (current_time);

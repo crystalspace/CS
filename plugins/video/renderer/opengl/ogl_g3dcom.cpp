@@ -453,7 +453,7 @@ void csGraphics3DOGLCommon::PerfTest ()
     {
       clip_outer[0] = test_modes[i].mode;
       int cnt = 0;
-      cs_time end = System->GetTime () + 1000;
+      csTime end = System->GetTime () + 1000;
       while (System->GetTime () < end)
       {
         glDepthMask (GL_TRUE);
@@ -508,7 +508,7 @@ void csGraphics3DOGLCommon::PerfTest ()
     else if (test_modes[i].mode == 'Z') test_modes[i].mode = 'N';
     clip_optional[0] = test_modes[i].mode;
     int cnt = 0;
-    cs_time end = System->GetTime () + 1000;
+    csTime end = System->GetTime () + 1000;
     while (System->GetTime () < end)
     {
       glDepthMask (GL_TRUE);
@@ -1006,7 +1006,7 @@ void csGraphics3DOGLCommon::Print (csRect * area)
 {
   if (fps_limit)
   {
-    cs_time elapsed_time, current_time;
+    csTime elapsed_time, current_time;
     System->GetElapsedTime (elapsed_time, current_time);
     /// Smooth last n frames, to avoid jitter when objects appear/disappear.
     static int num = 10;

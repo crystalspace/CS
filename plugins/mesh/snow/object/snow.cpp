@@ -95,7 +95,7 @@ csSnowMeshObject::~csSnowMeshObject()
 }
 
 
-void csSnowMeshObject::Update (cs_time elapsed_time)
+void csSnowMeshObject::Update (csTime elapsed_time)
 {
   SetupObject ();
   csParticleSystem::Update (elapsed_time);

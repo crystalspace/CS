@@ -45,7 +45,7 @@ public:
   virtual bool PrepareAnim ();
 
   /// Draw the next frame.
-  virtual void Animate (cs_time current_time);
+  virtual void Animate (csTime current_time);
 };
 
 #endif // __PROCDOTSTEX_H__

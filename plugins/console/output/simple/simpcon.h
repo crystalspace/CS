@@ -219,11 +219,11 @@ public:
 
 private:
   /// Time left until messages will scroll up
-  cs_time LineTime;
+  csTime LineTime;
   /// Cursor state
   bool CursorState;
   /// Cursor switch time
-  cs_time CursorTime;
+  csTime CursorTime;
 
   /// Console contents
   char **Line;

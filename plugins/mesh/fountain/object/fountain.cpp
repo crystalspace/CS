@@ -146,7 +146,7 @@ int csFountainMeshObject::FindOldest ()
   return ret;
 }
 
-void csFountainMeshObject::Update (cs_time elapsed_time)
+void csFountainMeshObject::Update (csTime elapsed_time)
 {
   SetupObject ();
   csParticleSystem::Update (elapsed_time);

@@ -22,7 +22,7 @@
 #include "cssys/sysdriv.h"
 
 // This function should return milliseconds since some specific time
-cs_time csSystemDriver::Time ()
+csTime csSystemDriver::Time ()
 {
 #if 0
   struct timeval tv;

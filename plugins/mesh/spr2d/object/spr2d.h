@@ -48,11 +48,11 @@ class csSprite2DMeshObject : public iMeshObject
   public:
     uvAnimationControl (){animate=false;}
     bool animate, loop, halted;
-    cs_time last_time;
+    csTime last_time;
     int frameindex, framecount, style, counter;
     iSprite2DUVAnimation *ani;
     iSprite2DUVAnimationFrame *frame;
-    void Advance (cs_time current_time);
+    void Advance (csTime current_time);
     const csVector2 *GetVertices (int &num);
   };
 
@@ -131,7 +131,7 @@ public:
   }
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   virtual csVector3 GetRadius () { return radius; }
-  virtual void NextFrame (cs_time current_time);
+  virtual void NextFrame (csTime current_time);
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return false; }

@@ -295,7 +295,7 @@ void csConsoleOutput::Draw2D (csRect *area)
   // Test for a change in the flash state
   if (flash_interval > 0)
   {
-    cs_time cur_time = System->GetTime ();
+    csTime cur_time = System->GetTime ();
     if (cur_time > flash_time + flash_interval || cur_time < flash_time)
     {
       cursor_visible = !cursor_visible;
@@ -548,7 +548,7 @@ bool csConsoleOutput::PerformExtensionV (const char *iCommand, va_list args)
 {
   bool rc = true;
   if (!strcmp (iCommand, "FlashTime"))
-    flash_interval = va_arg (args, cs_time);
+    flash_interval = va_arg (args, csTime);
   else if (!strcmp (iCommand, "GetPos"))
   {
     int *x = va_arg (args, int *);

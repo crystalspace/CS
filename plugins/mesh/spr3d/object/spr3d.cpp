@@ -1134,7 +1134,7 @@ void csSprite3DMeshObject::InitSprite ()
   last_time = factory->System->GetTime ();
 }
 
-bool csSprite3DMeshObject::OldNextFrame (cs_time current_time, bool onestep, bool stoptoend)
+bool csSprite3DMeshObject::OldNextFrame (csTime current_time, bool onestep, bool stoptoend)
 {
   bool ret = false;
 

@@ -115,7 +115,7 @@ public:
   {
     return csVector3 (200000, 200000, 200000);
   }
-  virtual void NextFrame (cs_time) { }
+  virtual void NextFrame (csTime) { }
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }

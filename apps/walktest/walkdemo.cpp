@@ -968,7 +968,7 @@ void del_bot ()
   }
 }
 
-void move_bots (cs_time elapsed_time)
+void move_bots (csTime elapsed_time)
 {
   if (first_bot)
   {

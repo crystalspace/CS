@@ -430,7 +430,7 @@ void csMotionManager::UpdateAppliedFrame(csAppliedFrame *fr)
 }
 
 //TODO Azverkan support frame interpolation & make looping optional
-bool csMotionManager::UpdateAppliedMotion(csAppliedMotion *am, cs_time elapsedtime)
+bool csMotionManager::UpdateAppliedMotion(csAppliedMotion *am, csTime elapsedtime)
 {
 #ifdef MOTION_DEBUG
   printf("Updating motion on Loop: %d, Sweep: %d, Rate: %f\n",
@@ -505,7 +505,7 @@ bool csMotionManager::UpdateAppliedMotion(csAppliedMotion *am, cs_time elapsedti
 
 void csMotionManager::UpdateAll()
 {
-  cs_time newtime = iSys->GetTime();
+  csTime newtime = iSys->GetTime();
   UpdateAll( newtime );
 }
 
@@ -515,7 +515,7 @@ void csMotionManager::UpdateAll( int time )
   printf("Update all: time %d numskels %d\n",time,skels.Length());
 #endif
   if (oldtime == 0) oldtime = time;
-  cs_time elapsed_time = time - oldtime;
+  csTime elapsed_time = time - oldtime;
   oldtime = time;
   int size = skels.Length();
   int i;

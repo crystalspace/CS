@@ -130,7 +130,7 @@ void csProcWater::PressAt (int sx, int sy, int rad, int val)
 }
 
 
-void csProcWater::Animate (cs_time current_time)
+void csProcWater::Animate (csTime current_time)
 {
   (void)current_time;
   int i,x,y;

@@ -332,7 +332,7 @@ void csSimpleConsole::Clear (bool)
 void csSimpleConsole::Draw2D (csRect* area)
 {
   int i;
-  cs_time CurrentTime = System->GetTime ();
+  csTime CurrentTime = System->GetTime ();
 
 #define WRITE(x,y,fc,bc,s,changed)				\
   {								\

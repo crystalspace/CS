@@ -27,7 +27,7 @@
 // time. If you don't have milliseconds easily just rewrite by
 // using 'time (NULL)*1000' or something like that.
 
-cs_time csSystemDriver::Time ()
+csTime csSystemDriver::Time ()
 {
   //03/20/1999 Thomas Hieber: completely redone to get true Millisecond 
   //accuracy instead of very rough ticks. This routine will also provide

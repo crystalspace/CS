@@ -348,7 +348,7 @@ bool csMetaBall::HitBeamObject( const csVector3& start, const csVector3& end,
   return false;
 }
 
-void csMetaBall::NextFrame( cs_time )
+void csMetaBall::NextFrame(csTime)
 {
   if ((mesh.num_vertices == 0) || (mp.rate != 0))
   {

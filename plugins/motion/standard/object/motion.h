@@ -44,7 +44,7 @@ struct csMotionFrame
 
 struct csAppliedFrame
 {
-  cs_time keyframe;
+  csTime keyframe;
 
   csQuaternion **qlinks;
   int numqlinks;
@@ -140,7 +140,7 @@ class csMotionManager : public iMotionManager
   csMotionVector motions;
   csAppliedMotionVector skels;
   csAppliedMotionVector cache;
-  cs_time oldtime;
+  csTime oldtime;
   bool slerp;
   iSystem* iSys;
   
@@ -224,7 +224,7 @@ public:
 		csVector3 vec2, float ratio );
   void UpdateAppliedFrame(csAppliedFrame *fr);
   void UpdateAppliedFrame(csAppliedFrame *fr, csAppliedFrame *next, float ratio);
-  bool UpdateAppliedMotion(csAppliedMotion *am, cs_time elapsedtime);
+  bool UpdateAppliedMotion(csAppliedMotion *am, csTime elapsedtime);
   void CompileMotion( csAppliedMotion *motion );
 
   struct eiPlugIn : public iPlugIn

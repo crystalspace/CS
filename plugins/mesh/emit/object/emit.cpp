@@ -720,7 +720,7 @@ void csEmitMeshObject::MoveAgeParticle (int i, int elapsed, float delta_t)
   bbox.AddBoundingVertexSmart(part_pos[i]);
 }
 
-void csEmitMeshObject::Update (cs_time elapsed_time)
+void csEmitMeshObject::Update (csTime elapsed_time)
 {
   SetupObject ();
   /// do particle system stuff.

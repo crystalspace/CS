@@ -67,7 +67,7 @@ void csSequence::DeleteFirstSequence ()
   }
 }
 
-void csSequence::AddOperation (cs_time time, iSequenceOperation* operation)
+void csSequence::AddOperation (csTime time, iSequenceOperation* operation)
 {
   csSequenceOp* op = new csSequenceOp ();
   op->time = time;
@@ -107,19 +107,19 @@ void csSequence::AddOperation (cs_time time, iSequenceOperation* operation)
   }
 }
 
-void csSequence::AddRunSequence (cs_time time, iSequence* sequence)
+void csSequence::AddRunSequence (csTime time, iSequence* sequence)
 {
   RunSequenceOp* op = new RunSequenceOp (seqmgr, sequence);
   AddOperation (time, op);
   op->DecRef ();
 }
 
-void csSequence::RunSequenceOp::Do (cs_time dt)
+void csSequence::RunSequenceOp::Do (csTime dt)
 {
   seqmgr->RunSequence (-(signed)dt, sequence);
 }
 
-void csSequence::AddCondition (cs_time time, iSequenceCondition* condition,
+void csSequence::AddCondition (csTime time, iSequenceCondition* condition,
   	iSequence* trueSequence, iSequence* falseSequence)
 {
   RunCondition* op = new RunCondition (seqmgr, condition, trueSequence,
@@ -128,7 +128,7 @@ void csSequence::AddCondition (cs_time time, iSequenceCondition* condition,
   op->DecRef ();
 }
 
-void csSequence::RunCondition::Do (cs_time dt)
+void csSequence::RunCondition::Do (csTime dt)
 {
   if (condition->Condition (dt))
     seqmgr->RunSequence (-(signed)dt, trueSequence);
@@ -136,7 +136,7 @@ void csSequence::RunCondition::Do (cs_time dt)
     seqmgr->RunSequence (-(signed)dt, falseSequence);
 }
 
-void csSequence::AddLoop (cs_time time, iSequenceCondition* condition,
+void csSequence::AddLoop (csTime time, iSequenceCondition* condition,
   	iSequence* sequence)
 {
   RunLoop* op = new RunLoop (seqmgr, condition, sequence);
@@ -144,7 +144,7 @@ void csSequence::AddLoop (cs_time time, iSequenceCondition* condition,
   op->DecRef ();
 }
 
-void csSequence::RunLoop::Do (cs_time dt)
+void csSequence::RunLoop::Do (csTime dt)
 {
   while (condition->Condition (dt))
     seqmgr->RunSequence (-(signed)dt, sequence);
@@ -200,7 +200,7 @@ bool csSequenceManager::HandleEvent (iEvent &event)
 
   if (!suspended)
   {
-    cs_time current_time = System->GetTime ();
+    csTime current_time = System->GetTime ();
     if (!previous_time_valid)
     {
       previous_time = current_time;
@@ -233,7 +233,7 @@ void csSequenceManager::Resume ()
   }
 }
 
-void csSequenceManager::TimeWarp (cs_time time, bool skip)
+void csSequenceManager::TimeWarp (csTime time, bool skip)
 {
   main_time += time;
   csSequenceOp* seqOp = main_sequence->GetFirstSequence ();
@@ -244,7 +244,7 @@ void csSequenceManager::TimeWarp (cs_time time, bool skip)
     // before performing it. Because DeleteFirstSequence() does a
     // DecRef() we first IncRef() it.
     iSequenceOperation* op = seqOp->operation;
-    cs_time opt = seqOp->time;
+    csTime opt = seqOp->time;
     op->IncRef ();
     main_sequence->DeleteFirstSequence ();
 
@@ -265,7 +265,7 @@ iSequence* csSequenceManager::NewSequence ()
   return n;
 }
 
-void csSequenceManager::RunSequence (cs_time time, iSequence* sequence)
+void csSequenceManager::RunSequence (csTime time, iSequence* sequence)
 {
   csSequence* seq = (csSequence*)sequence;
   csSequenceOp* op = seq->GetFirstSequence ();

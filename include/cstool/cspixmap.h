@@ -49,7 +49,7 @@ public:
   /// return current height of this pixmap
   virtual int Height() = 0;
   /// advance in time
-  virtual void Advance(cs_time ElapsedTime) = 0;
+  virtual void Advance(csTime ElapsedTime) = 0;
   /// return current texture handle
   virtual iTextureHandle *GetTextureHandle() = 0;
 
@@ -110,7 +110,7 @@ public:
     int orgx, int orgy, uint8 Alpha = 0);
   virtual int Width ();
   virtual int Height ();
-  virtual void Advance(cs_time /*ElapsedTime*/) {}
+  virtual void Advance(csTime /*ElapsedTime*/) {}
   virtual iTextureHandle *GetTextureHandle ();
 };
 

@@ -39,13 +39,13 @@
 
 //-----------------------------------------------------------------------------
 
-void FadeOp::Do (cs_time dt)
+void FadeOp::Do (csTime dt)
 {
   DemoSequenceManager::demoseq->SetupFade (start_fade,
   	end_fade, total_fade_time, dt);
 }
 
-RotatePartOp::RotatePartOp (const char* meshName, cs_time total,
+RotatePartOp::RotatePartOp (const char* meshName, csTime total,
 	float aspeed) : total_rotate_time (total), angle_speed (aspeed)
 {
   mesh = DemoSequenceManager::demo->engine->FindMeshObject (meshName);
@@ -57,7 +57,7 @@ RotatePartOp::RotatePartOp (const char* meshName, cs_time total,
   }
 }
 
-void RotatePartOp::Do (cs_time dt)
+void RotatePartOp::Do (csTime dt)
 {
   DemoSequenceManager::demoseq->SetupRotatePart (mesh, angle_speed,
   	total_rotate_time, dt);
@@ -86,12 +86,12 @@ AttachOp::AttachOp (const char* meshName, const char* pathName)
   }
 }
 
-void AttachOp::Do (cs_time /*dt*/)
+void AttachOp::Do (csTime /*dt*/)
 {
   DemoSequenceManager::demoseq->ReplacePathObject (path, mesh);
 }
 
-PathOp::PathOp (cs_time t, const char* meshName, const char* pathName)
+PathOp::PathOp (csTime t, const char* meshName, const char* pathName)
 {
   total_path_time = t;
   if (meshName)
@@ -115,7 +115,7 @@ PathOp::PathOp (cs_time t, const char* meshName, const char* pathName)
   }
 }
 
-void PathOp::Do (cs_time dt)
+void PathOp::Do (csTime dt)
 {
   DemoSequenceManager::demoseq->SetupPath (path, mesh,
   	total_path_time, dt);
@@ -141,7 +141,7 @@ SetupMeshOp::SetupMeshOp (const char* meshName, const char* sectName,
   }
 }
 
-void SetupMeshOp::Do (cs_time /*dt*/)
+void SetupMeshOp::Do (csTime /*dt*/)
 {
   if (mesh)
   {
@@ -164,7 +164,7 @@ ShowMeshOp::ShowMeshOp (const char* meshName)
   }
 }
 
-void ShowMeshOp::Do (cs_time /*dt*/)
+void ShowMeshOp::Do (csTime /*dt*/)
 {
   if (mesh)
   {
@@ -184,7 +184,7 @@ HideMeshOp::HideMeshOp (const char* meshName)
   }
 }
 
-void HideMeshOp::Do (cs_time /*dt*/)
+void HideMeshOp::Do (csTime /*dt*/)
 {
   if (mesh)
   {
@@ -192,7 +192,7 @@ void HideMeshOp::Do (cs_time /*dt*/)
   }
 }
 
-void TestOp::Do (cs_time dt)
+void TestOp::Do (csTime dt)
 {
   printf ("dt=%ld fps=%g\n", (long)dt,
   	DemoSequenceManager::demoseq->GetFPS ()); fflush (stdout);

@@ -387,7 +387,7 @@ public:
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   virtual csVector3 GetRadius ();
 
-  virtual void NextFrame (cs_time) { }
+  virtual void NextFrame (csTime) { }
   virtual bool WantToDie () const { return false; }
 
   virtual void HardTransform (const csReversibleTransform&) { }

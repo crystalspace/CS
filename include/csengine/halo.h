@@ -209,7 +209,7 @@ public:
   iHalo *Handle;
 
   /// Last time we were updated
-  cs_time LastTime;
+  csTime LastTime;
 
   /// Create an light halo object
   csLightHalo (csLight *iLight, iHalo *iHandle);
@@ -223,7 +223,7 @@ public:
    * reached zero intensity and should be removed from halo queue.
    * The function also actually projects, clips and draws the halo.
    */
-  virtual bool Process (cs_time ElapsedTime, csEngine const&);
+  virtual bool Process (csTime ElapsedTime, csEngine const&);
 
   /**
    * see if camera position is visible, returns it projected onto screen.
@@ -238,7 +238,7 @@ public:
    * when the halo is completely faded out.
    * Called by Process.
    */
-  bool ComputeNewIntensity(cs_time ElapsedTime, float& hintensity, 
+  bool ComputeNewIntensity(csTime ElapsedTime, float& hintensity, 
     bool halo_vis);
 };
 
@@ -262,7 +262,7 @@ public:
   virtual ~csLightFlareHalo();
 
   /// process the halo.
-  virtual bool Process (cs_time elapsed_time, csEngine const& engine);
+  virtual bool Process (csTime elapsed_time, csEngine const& engine);
   /// process a flare component (clip and draw it).
   void ProcessFlareComponent(csEngine const& engine, csFlareComponent *comp,
     csVector2 const& start, csVector2 const& deltapos);

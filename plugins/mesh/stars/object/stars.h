@@ -126,7 +126,7 @@ public:
   }
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   virtual csVector3 GetRadius () { return max_radius; }
-  virtual void NextFrame (cs_time /*current_time*/) { }
+  virtual void NextFrame (csTime /*current_time*/) { }
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }

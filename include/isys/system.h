@@ -221,7 +221,7 @@ struct iSystem : public iBase
   /// Returns the basic configuration parameters.
   virtual void GetSettings (int &oWidth, int &oHeight, int &oDepth, bool &oFullScreen) = 0;
   /// Get the time in milliseconds.
-  virtual cs_time GetTime () = 0;
+  virtual csTime GetTime () = 0;
   /// Print a string to the specified device.
   virtual void Printf (int mode, char const* format, ...) = 0;
   /**
@@ -271,7 +271,7 @@ struct iSystem : public iBase
    * to NextFrame(). The time is updated once at the beginning of every
    * NextFrame(), thus you may call this function as much as you wish.
    */
-  virtual void GetElapsedTime (cs_time &oElapsedTime, cs_time &oCurrentTime) = 0;
+  virtual void GetElapsedTime (csTime &oElapsedTime, csTime &oCurrentTime) = 0;
 
   /**
    * This function will freeze your application for given number of 1/1000

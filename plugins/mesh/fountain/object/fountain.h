@@ -160,7 +160,7 @@ public:
   float GetFallTime () const { return fall_time; }
 
   /// Update the particle system.
-  virtual void Update (cs_time elapsed_time);
+  virtual void Update (csTime elapsed_time);
 
   /// For iMeshObject.
   virtual void HardTransform (const csReversibleTransform& t);

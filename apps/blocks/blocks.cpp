@@ -249,7 +249,7 @@ void TextEntryMenu::ReplaceSelected (const char* txt, const char* entry,
   delete old_entry;
 }
 
-void TextEntryMenu::Draw (cs_time elapsed_time)
+void TextEntryMenu::Draw (csTime elapsed_time)
 {
   float elapsed = (float)elapsed_time/1000.;
   if (elapsed > time_left) elapsed = time_left;
@@ -1631,7 +1631,7 @@ bool Blocks::check_new_shape_rotation (const csMatrix3& rot)
   return true;
 }
 
-void Blocks::HandleStartupMovement (cs_time elapsed_time)
+void Blocks::HandleStartupMovement (csTime elapsed_time)
 {
   float elapsed = (float)elapsed_time/1000.;
   if (menu_todo)
@@ -1661,7 +1661,7 @@ void Blocks::HandleStartupMovement (cs_time elapsed_time)
   dynlight->Setup ();
 }
 
-void Blocks::HandleGameMovement (cs_time elapsed_time)
+void Blocks::HandleGameMovement (csTime elapsed_time)
 {
   int i;
   float elapsed = (float)elapsed_time/1000.;
@@ -1779,7 +1779,7 @@ void Blocks::HandleGameMovement (cs_time elapsed_time)
   csThing::current_light_frame_number++;
 }
 
-void Blocks::HandleMovement (cs_time elapsed_time)
+void Blocks::HandleMovement (csTime elapsed_time)
 {
   float elapsed = (float)elapsed_time/1000.;
 
@@ -2369,7 +2369,7 @@ void Blocks::removePlanesVisual (States* player)
   }
 }
 
-void Blocks::HandleTransition (cs_time elapsed_time)
+void Blocks::HandleTransition (csTime elapsed_time)
 {
   if (screen == SCREEN_GAMEOVER) return;
   player1->transition = false;
@@ -2396,7 +2396,7 @@ void Blocks::HandleTransition (cs_time elapsed_time)
   }
 }
 
-void Blocks::HandleLoweringPlanes (cs_time elapsed_time)
+void Blocks::HandleLoweringPlanes (csTime elapsed_time)
 {
   if (pause) return;
 
@@ -2476,7 +2476,7 @@ void Blocks::HandleLoweringPlanes (cs_time elapsed_time)
 void Blocks::NextFrame ()
 {
   SysSystemDriver::NextFrame ();
-  cs_time elapsed_time, current_time;
+  csTime elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
 
   // -----------------------------------------------------------------

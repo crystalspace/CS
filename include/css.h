@@ -45,7 +45,6 @@
 #include "igraphic/image.h"
 #include "imesh/thing/thing.h"
 #include "ivideo/txtmgr.h"
-#include "iengine/view.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "iengine/engine.h"
@@ -60,7 +59,6 @@
 
 // CS Engine
 #ifndef NO_CSENGINE
-#include "csengine/csview.h"
 #include "csengine/light.h"
 #include "csengine/sector.h"
 #include "csengine/thing.h"

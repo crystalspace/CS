@@ -72,14 +72,14 @@ struct iExplosionState : public iBase
    * Set particles to be scaled to nothing starting at fade_particles msec 
    * before self-destruct.
    */
-  virtual void SetFadeSprites (cs_time fade_time) = 0;
+  virtual void SetFadeSprites (csTime fade_time) = 0;
   /// See if particles are faded (returns true), and returns fade time too.
-  virtual bool GetFadeSprites (cs_time& fade_time) const = 0;
+  virtual bool GetFadeSprites (csTime& fade_time) const = 0;
   /**
    * Add a light at explosion center. add msec when light starts fading,
    * which is used when time_to_live is set / SelfDestruct is used.
    */
-  virtual void AddLight (iEngine*, iSector*, cs_time fade = 200) = 0;
+  virtual void AddLight (iEngine*, iSector*, csTime fade = 200) = 0;
 };
 
 #endif

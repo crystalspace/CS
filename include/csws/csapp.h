@@ -83,7 +83,7 @@ protected:
   /// This is equal to 8 if any of physical r,g,b masks is 0xff000000
   int PhysColorShift;
   /// The time at the start of current frame
-  cs_time CurrentTime;
+  csTime CurrentTime;
   /// The system event outlet
   iEventOutlet *EventOutlet;
   /// Application background style
@@ -246,7 +246,7 @@ public:
   bool GetKeyState (int iKey);
 
   /// Query current time
-  cs_time GetCurrentTime ()
+  csTime GetCurrentTime ()
   { return CurrentTime; }
 
   /// Show window list

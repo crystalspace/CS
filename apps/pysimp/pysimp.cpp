@@ -175,7 +175,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
 void PySimple::NextFrame ()
 {
   SysSystemDriver::NextFrame ();
-  cs_time elapsed_time, current_time;
+  csTime elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
 
   // Now rotate the camera according to keyboard state

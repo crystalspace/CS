@@ -944,7 +944,7 @@ public:
       scfParent->GetBoundingBox (bbox);
     }
     virtual csVector3 GetRadius () { return scfParent->GetRadius (); }
-    virtual void NextFrame (cs_time /*current_time*/) { }
+    virtual void NextFrame (csTime /*current_time*/) { }
     virtual bool WantToDie () const { return false; }
     virtual void HardTransform (const csReversibleTransform& t)
     {

@@ -465,7 +465,7 @@ void csExplosionSaver::WriteDown (iBase* obj, iStrVector *str,
   str->Push(csStrNew(buf));
   sprintf(buf, "LIGHTING (%s)\n", explostate->GetLighting()?"true":"false");
   str->Push(csStrNew(buf));
-  cs_time fade_time = 0;
+  csTime fade_time = 0;
   if(explostate->GetFadeSprites(fade_time))
   {
     sprintf(buf, "FADE (%d)\n", (int)fade_time);

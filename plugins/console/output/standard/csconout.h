@@ -172,7 +172,7 @@ private:
   csRect size, invalid;
   int cursor, cx, cy;
   iFont *font;
-  cs_time flash_time, flash_interval;
+  csTime flash_time, flash_interval;
   bool cursor_visible;
   bool clear_input;
   bool auto_update;

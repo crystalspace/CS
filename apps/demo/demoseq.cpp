@@ -148,7 +148,7 @@ void DemoSequenceManager::Restart (const char* sequenceFileName)
   Setup (sequenceFileName);
 }
 
-void DemoSequenceManager::TimeWarp (cs_time dt, bool restart)
+void DemoSequenceManager::TimeWarp (csTime dt, bool restart)
 {
   // Temporarily resume everything to make sure our data is ok.
   bool sus = suspended;
@@ -192,7 +192,7 @@ void DemoSequenceManager::TimeWarp (cs_time dt, bool restart)
 void DemoSequenceManager::Draw3DEffects (iGraphics3D* g3d)
 {
   num_frames++;
-  cs_time current_time = seqmgr->GetMainTime ();
+  csTime current_time = seqmgr->GetMainTime ();
   if (!suspended)
   {
     if (do_fade)
@@ -217,7 +217,7 @@ void DemoSequenceManager::Draw2DEffects (iGraphics2D* /*g2d*/)
 }
 
 void DemoSequenceManager::SetupFade (float start_fade, float end_fade,
-  	cs_time total_fade_time, cs_time already_elapsed)
+  	csTime total_fade_time, csTime already_elapsed)
 {
   DemoSequenceManager::start_fade = start_fade;
   DemoSequenceManager::end_fade = end_fade;
@@ -253,8 +253,8 @@ void DemoSequenceManager::ReplacePathObject (csNamedPath* path,
 
 void DemoSequenceManager::SetupPath (csNamedPath* path,
 	iMeshWrapper* mesh,
-	cs_time total_path_time,
-  	cs_time already_elapsed)
+	csTime total_path_time,
+  	csTime already_elapsed)
 {
   PathForMesh* pfm = new PathForMesh ();
   pfm->path = path;
@@ -264,10 +264,10 @@ void DemoSequenceManager::SetupPath (csNamedPath* path,
   pathForMesh.Push (pfm);
 }
 
-void DemoSequenceManager::ControlPaths (iCamera* camera, cs_time elapsed_time)
+void DemoSequenceManager::ControlPaths (iCamera* camera, csTime elapsed_time)
 {
   if (suspended) return;
-  cs_time current_time = seqmgr->GetMainTime ();
+  csTime current_time = seqmgr->GetMainTime ();
   int i = 0;
   int len = pathForMesh.Length ();
   while (i < len)
@@ -331,7 +331,7 @@ void DemoSequenceManager::ControlPaths (iCamera* camera, cs_time elapsed_time)
 }
 
 void DemoSequenceManager::DebugPositionObjects (iCamera* camera,
-    cs_time debug_time)
+    csTime debug_time)
 {
   int i = 0;
   int len = pathForMesh.Length ();
@@ -447,7 +447,7 @@ void DemoSequenceManager::DebugDrawPaths (iCamera* camera,
 {
   int i;
   int len = pathForMesh.Length ();
-  cs_time current_time = seqmgr->GetMainTime ();
+  csTime current_time = seqmgr->GetMainTime ();
 
   //=====
   // Draw the border around the map.
@@ -469,14 +469,14 @@ void DemoSequenceManager::DebugDrawPaths (iCamera* camera,
   //=====
   // Get the current selected path.
   //=====
-  cs_time start = 0, total = 0, seltime = 0;
+  csTime start = 0, total = 0, seltime = 0;
   csNamedPath* selnp = NULL;
   if (hilight) selnp = GetSelectedPath (hilight, start, total);
   if (selnp)
   {
     // Calculate where we are in time on the selected path.
     float t = selnp->GetTimeValue (selpoint);
-    seltime = cs_time (start + total*t);
+    seltime = csTime (start + total*t);
   }
 
   //=====
@@ -503,7 +503,7 @@ void DemoSequenceManager::DebugDrawPaths (iCamera* camera,
     bool hi = (pfm->path == selnp);
 
     // Fetch the current time.
-    cs_time ct = current_time;
+    csTime ct = current_time;
 
     // Calculate where we are on this path at the moment.
     // r should be between 0 and 1.
@@ -612,12 +612,12 @@ void DemoSequenceManager::SelectNextPath (char* hilight)
 
 csNamedPath* DemoSequenceManager::GetSelectedPath (const char* hilight)
 {
-  cs_time s, t;
+  csTime s, t;
   return GetSelectedPath (hilight, s, t);
 }
 
 csNamedPath* DemoSequenceManager::GetSelectedPath (const char* hilight,
-	cs_time& start, cs_time& total)
+	csTime& start, csTime& total)
 {
   int i = 0;
   int len = pathForMesh.Length ();
@@ -638,7 +638,7 @@ csNamedPath* DemoSequenceManager::GetSelectedPath (const char* hilight,
 }
 
 void DemoSequenceManager::SetupRotatePart (iMeshWrapper* mesh,
-	float angle_speed, cs_time total_rotate_time, cs_time already_elapsed)
+	float angle_speed, csTime total_rotate_time, csTime already_elapsed)
 {
   MeshRotation* mrot = new MeshRotation ();
   mrot->particle = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iParticle);
@@ -656,8 +656,8 @@ void DemoSequenceManager::SetupRotatePart (iMeshWrapper* mesh,
 
 float DemoSequenceManager::GetFPS ()
 {
-  cs_time cur_time = seqmgr->GetMainTime ();
-  cs_time dt = cur_time-main_start_time;
+  csTime cur_time = seqmgr->GetMainTime ();
+  csTime dt = cur_time-main_start_time;
   return (float (num_frames) / float (dt)) * 1000.;
 }
 

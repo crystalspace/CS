@@ -242,6 +242,6 @@ awsManager::awsCanvas::~awsCanvas ()
 }
  
 void 
-awsManager::awsCanvas::Animate (cs_time current_time)
+awsManager::awsCanvas::Animate (csTime current_time)
 {
 }

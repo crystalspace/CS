@@ -31,7 +31,7 @@ csAnimationTemplate::~csAnimationTemplate() {
   }
 }
 
-csPixmap *csAnimationTemplate::GetFrameByTime(cs_time Time) {
+csPixmap *csAnimationTemplate::GetFrameByTime(csTime Time) {
   // test for empty animation
   if (GetFrameCount() == 0) return NULL;
   // wrap time
@@ -39,7 +39,7 @@ csPixmap *csAnimationTemplate::GetFrameByTime(cs_time Time) {
   // search for frame (@@@ optimize this!)
   long i;
   for (i=0; i<GetFrameCount(); i++) {
-    if (Time < (cs_time)FinishTimes.Get(i))
+    if (Time < (csTime)FinishTimes.Get(i))
       return GetFrame(i);
   }
   // this should never happen because it means that this class is buggy
@@ -86,7 +86,7 @@ void csAnimatedPixmap::DrawTiled (iGraphics3D* g3d, int sx, int sy, int sw, int 
   if (CurrentFrame) CurrentFrame->DrawTiled(g3d, sx, sy, sw, sh, orgx, orgy, Alpha);
 }
 
-void csAnimatedPixmap::Advance(cs_time ElapsedTime)
+void csAnimatedPixmap::Advance(csTime ElapsedTime)
 {
   CurrentTime += ElapsedTime;
   CurrentFrame = Template->GetFrameByTime(CurrentTime);

@@ -385,7 +385,7 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
   shapenr++;
 }
 
-void csSprite2DMeshObject::NextFrame (cs_time current_time)
+void csSprite2DMeshObject::NextFrame (csTime current_time)
 {
   if (uvani.animate && !uvani.halted)
     uvani.Advance (current_time);
@@ -516,7 +516,7 @@ iSprite2DUVAnimation *csSprite2DMeshObject::Sprite2DState::GetUVAnimation (int i
 { return scfParent->factory->GetUVAnimation (idx); }
 
 
-void csSprite2DMeshObject::uvAnimationControl::Advance (cs_time current_time)
+void csSprite2DMeshObject::uvAnimationControl::Advance (csTime current_time)
 {
   int oldframeindex = frameindex;
   // the goal is to find the next frame to show

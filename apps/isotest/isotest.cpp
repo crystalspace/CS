@@ -551,7 +551,7 @@ void IsoTest::NextFrame ()
 {
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
   SysSystemDriver::NextFrame ();
-  cs_time elapsed_time, current_time;
+  csTime elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
 
   // keep track of fps.

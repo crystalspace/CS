@@ -122,7 +122,7 @@ bool csSoundRenderSoftware::Open()
     getFrequency(), (is16Bits())?16:8, (isStereo())?"Stereo":"Mono");
   System->Printf (CS_MSG_INITIALIZATION, "  Volume: %g\n", Volume);
 
-  cs_time et, ct;
+  csTime et, ct;
   System->GetElapsedTime(et, ct);
   LastTime = ct;
 

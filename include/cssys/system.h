@@ -201,7 +201,7 @@ class csSystemDriver : public iSystem
   void QueryOptions (iPlugIn *iObject);
 
   // Elapsed time between last two frames and absolute time in milliseconds
-  cs_time ElapsedTime, CurrentTime;
+  csTime ElapsedTime, CurrentTime;
   
 protected:
   /// The command line parser
@@ -300,7 +300,7 @@ public:
    * Return time in milliseconds (if not supported by a system
    * just return the time in seconds multiplied by 1000).
    */
-  static cs_time Time ();
+  static csTime Time ();
 
   /// Get the installation path.
   static bool InstallPath (char *oInstallPath, size_t iBufferSize);
@@ -360,7 +360,7 @@ public:
   /// Returns the configuration.
   virtual void GetSettings (int &oWidth, int &oHeight, int &oDepth, bool &oFullScreen);
   /// Get the time in milliseconds.
-  virtual cs_time GetTime ();
+  virtual csTime GetTime ();
   /**
    * Print a string to the specified device.  This is implemented as a thin
    * wrapper over PrintfV().
@@ -387,9 +387,9 @@ public:
   /// Suspend the engine's virtual-time clock.
   virtual void SuspendVirtualTimeClock() {}
   /// Resume the engine's virtual-time clock.
-  virtual void ResumeVirtualTimeClock() { CurrentTime = cs_time(-1); }
+  virtual void ResumeVirtualTimeClock() { CurrentTime = csTime(-1); }
   /// Query the elapsed time between last frames and absolute time.
-  virtual void GetElapsedTime (cs_time &oElapsedTime, cs_time &oCurrentTime)
+  virtual void GetElapsedTime (csTime &oElapsedTime, csTime &oCurrentTime)
   { oElapsedTime = ElapsedTime; oCurrentTime = CurrentTime; }
   /// Get the installation path.
   virtual bool GetInstallPath (char *oInstallPath, size_t iBufferSize);
