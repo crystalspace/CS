@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Directory Hierarchy, Makefile How-To, Dependencies, Anatomy
+@node Directory Hierarchy, SCF, Dependencies, Anatomy
 @section Directory Hierarchy
 @cindex Directory Hierarchy
 @cindex Hierarchy, Directory

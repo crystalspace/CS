@@ -1,4 +1,4 @@
-@node SCF, VFS, Makefile How-To, Anatomy
+@node SCF, VFS, Directory Hierarchy, Anatomy
 @section Shared Class Facility (@sc{scf})
 @cindex @sc{scf}, Shared Class Facility
 @cindex Shared Class Facility (@sc{scf})

@@ -1,4 +1,4 @@
-@node Internals
+@node Internals, Contributing, Plug-In Drivers, Top
 @chapter The Internal Structure of the Project
 @cindex Internal Structure
 

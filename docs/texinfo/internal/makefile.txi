@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Makefile How-To, SCF, Directory Hierarchy, Anatomy
+@node Makefile How-To, , Internals, Internals
 @section Makefile How-To
 @cindex Makefile How-To
 
