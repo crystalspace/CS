@@ -106,8 +106,8 @@ static void RescanModules ()
   while (res)
   {
     SetLastError (ERROR_SUCCESS);
-    if (DbgHelp::SymLoadModule64 (symInit.GetSymProcessHandle (), 0, me.szExePath,
-      /*me.szExePath*/0, (LONG_PTR)me.modBaseAddr, 0) == 0)
+    if (DbgHelp::SymLoadModule64 (symInit.GetSymProcessHandle (), 0,
+      me.szExePath, /*me.szExePath*/0, (LONG_PTR)me.modBaseAddr, 0) == 0)
     {
       DWORD err = GetLastError ();
       if (err != ERROR_SUCCESS)
@@ -225,21 +225,21 @@ bool cswinCallStack::GetFunctionName (size_t num, csString& str)
   symbolInfo->SizeOfStruct = sizeof (SYMBOL_INFO);
   symbolInfo->MaxNameLen = MaxSymbolLen;
   uint64 displace;
-  if (!DbgHelp::SymFromAddr (symInit.GetSymProcessHandle (), entries[num].instrPtr,
-    &displace, symbolInfo))
+  if (!DbgHelp::SymFromAddr (symInit.GetSymProcessHandle (),
+    entries[num].instrPtr, &displace, symbolInfo))
   {
     // Bit hackish: if SymFromAddr() failed, scan the loaded DLLs
     // and try to load their debug info.
     RescanModules ();
-    DbgHelp::SymFromAddr (symInit.GetSymProcessHandle (), entries[num].instrPtr,
-      &displace, symbolInfo);
+    DbgHelp::SymFromAddr (symInit.GetSymProcessHandle (),
+      entries[num].instrPtr, &displace, symbolInfo);
   }
 
   IMAGEHLP_MODULE64 module;
   memset (&module, 0, sizeof (IMAGEHLP_MODULE64));
   module.SizeOfStruct = sizeof (IMAGEHLP_MODULE64);
-  DbgHelp::SymGetModuleInfo64 (symInit.GetSymProcessHandle (), entries[num].instrPtr,
-    &module);
+  DbgHelp::SymGetModuleInfo64 (symInit.GetSymProcessHandle (),
+    entries[num].instrPtr, &module);
 
   if (symbolInfo->Name[0] != 0)
   {
@@ -405,8 +405,8 @@ csCallStack* cswinCallStackHelper::CreateCallStackThreaded (int skip)
   {
     WaitForSingleObject (contextHelper.mutex, INFINITE);
 
-    /* GetThreadContext() doesn't work reliably for the current thread, so do it
-     * from another thread while the real current one is suspended. */
+    /* GetThreadContext() doesn't work reliably for the current thread, so do
+     * it from another thread while the real current one is suspended. */
     if (contextHelper.hThread == 0)
     {
       contextHelper.evStartWork = CreateEvent (0, false, false, 0);
@@ -501,12 +501,13 @@ static LONG WINAPI ExceptionFilter (struct _EXCEPTION_POINTERS* ExceptionInfo)
 
 // Work around lack of ULONG_PTR on older platform SDKs
 #if !defined(__int3264) || (_MSC_VER < 1300)
+#undef ULONG_PTR
 #define ULONG_PTR ULONG
 #endif
 
-/* A slightly odd method to get a thread context, deliberately raising an exception
- * to get to the exception handler... but a bit quicker than the "use 2nd thread"
- * method. */
+/* A slightly odd method to get a thread context, deliberately raising an
+ * exception to get to the exception handler... but a bit quicker than the "use
+ * 2nd thread" method. */
 csCallStack* cswinCallStackHelper::CreateCallStackExcept (int skip)
 {
   ExceptStackSection.Enter();
