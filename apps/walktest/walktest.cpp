@@ -351,8 +351,45 @@ void WalkTest::Help ()
 //-----------------------------------------------------------------------------
 extern bool CommandHandler (const char *cmd, const char *arg);
 
+#include "csengine/xorbuf.h"
+
 void WalkTest::SetupFrame ()
 {
+#if 0
+  // Tell 3D driver we're going to display 3D things.
+  if (!Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS))
+    return;
+  csXORBuffer* buf = new csXORBuffer (256, 256);
+  buf->Initialize ();
+#if 1
+  csVector2 poly[4];
+  poly[0].Set (128, 10);
+  poly[1].Set (150, 200);
+  poly[2].Set (130, 210);
+  poly[3].Set (10, 30);
+  buf->DrawPolygon (poly, 4);
+  buf->XORSweep ();
+#else
+  static int cnt = 0;
+  cnt++;
+  if (((cnt>>4) & 0x1) == 0)
+  {
+    printf ("L");
+    buf->DrawLeftLine (10, 10, 50, 100);
+    buf->DrawLeftLine (12, 10, 100, 20);
+    buf->DrawLeftLine (200, 10, 100, 200);
+  }
+  else
+  {
+    printf ("R");
+    buf->DrawRightLine (10, 10, 50, 100);
+    buf->DrawRightLine (12, 10, 100, 20);
+    buf->DrawRightLine (200, 10, 100, 200);
+  }
+#endif
+  buf->GfxDump (Gfx3D->GetDriver2D (), Gfx3D);
+  delete buf;
+#else
   csTicks elapsed_time, current_time;
   elapsed_time = vc->GetElapsedTicks ();
   current_time = vc->GetCurrentTicks ();
@@ -396,6 +433,7 @@ void WalkTest::SetupFrame ()
     char buf[256];
     if (csCommandProcessor::get_script_line (buf, 255)) csCommandProcessor::perform_line (buf);
   }
+#endif
 }
 
 void WalkTest::FinishFrame ()

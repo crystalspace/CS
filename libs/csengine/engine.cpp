@@ -89,6 +89,7 @@ void csEngine::Report (const char *description, ...)
   {
     csPrintfV (description, arg);
     csPrintf ("\n");
+    fflush (stdout);
   }
 
   va_end (arg);
