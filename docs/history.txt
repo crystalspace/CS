@@ -3,6 +3,22 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+22-Jun-2003
+	- Luca did the following:
+	  - fixed a bug in the label component of AWS: in fact the method
+	    awsLabel::OnKeypress was returning always 'true', although the 
+	    event was not eaten at all; we must instead let it be passed
+	    along to other listeners which could instead use and eat it.
+	  - fixed a bug when the glwin32 canvas is receiving WM_SIZE windows 
+	    message: in fact if the resizing flag is SIZE_MINIMIZED, then the
+	    Height and the Width of the canvas was wrongly being set to 1!
+	    Instead we have to preserve the current Height and Width values,
+	    and just set the correct clipping rect to an empty region.
+	    Besides, when we receive the WM_SIZE windows message, the old 
+	    behaviour was to 'return 0' wrongly, because we must instead
+	    pass the message to the iWin32Assistant window procedure which 
+	    handles the WM_SIZE message as well (it can send to the CS event
+	    queue messages like csevCanvasHidden and csevCanvasExposed).
 21-Jun-2003
         - Philip Wyett updated win32.mak to reflect changes/additions in
           the general cssys library affecting MSVC port(s).

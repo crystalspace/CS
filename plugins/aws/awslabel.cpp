@@ -199,17 +199,19 @@ bool awsLabel::OnMouseEnter ()
 
 bool awsLabel::OnKeypress (int key, int cha, int modifiers)
 {
- char chr = (char)key;
- switch(chr)
- {
-  case CSKEY_ENTER:
-		Broadcast (signalClicked);
-		break;
- }
+  char chr = (char)key;
+  switch(chr)
+  {
+    case CSKEY_ENTER:
+		  Broadcast (signalClicked);
+    return true;//'true' means event was eaten.
+  }
 
 	Invalidate ();
 
-	return true;
+  //Only the CSKEY_ENTER is eaten here, so for any other keys pressed
+  //we must return false. Luca (groton@gmx.net)
+  return false;
 }
 
 void awsLabel::OnSetFocus()

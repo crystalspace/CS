@@ -775,11 +775,26 @@ LRESULT CALLBACK csGraphics2DOpenGL::WindowProc (HWND hWnd, UINT message,
       }
     case WM_SIZE:
       {
+      //If the resizing flag is SIZE_MINIMIZED, then we must not set the Height
+      //and the Width of this canvas to 1!
+      //Instead we have to set an empty clip rect size. Notice that
+      //the clipping rectangle is inclusive the top and left edges and
+      //exclusive for the right and bottom borders. 
+      //So in the SIZE_MINIMZED case the call to Resize must be avoided.
+      //Besides we must let the old window procedure be called,
+      //which handles the WM_SIZE message as well.
+      // Luca (groton@gmx.net)
+        if (wParam == SIZE_MINIMIZED)
+        {
+          This->SetClipRect (0, 0, 1, 1);
+        }
+        else
+        {
 	RECT R;
 	GetClientRect (hWnd, &R);
 	This->Resize (R.right - R.left + 1, R.bottom - R.top + 1);
+        }
       }
-      return 0;
       break;
   }
   return CallWindowProc (This->m_OldWndProc, hWnd, message, wParam, lParam);
