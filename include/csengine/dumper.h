@@ -40,6 +40,9 @@ class csPolygonClipper;
 class csFrustrum;
 class csPoly2DPool;
 class csLightPatchPool;
+class csQuadcube;
+class csQuadtree;
+class csQuadtreeNode;
 
 /**
  * This class knows how to dump debug information about several
@@ -51,6 +54,8 @@ class Dumper
 {
 private:
   static void dump (csBspTree* tree, csBspNode* node, int indent);
+  static void dump (csQuadtreeNode* node, char* buf, int bufdim,
+  	int depth, int x1, int y1, int x2, int y2);
 
 public:
   static void dump (csMatrix3* m, char* name);
@@ -73,6 +78,8 @@ public:
   static void dump (csFrustrum* frustrum, char* name);
   static void dump (csPoly2DPool* pool, char* name);
   static void dump (csLightPatchPool* pool, char* name);
+  static void dump (csQuadcube* cube);
+  static void dump (csQuadtree* tree);
 };
 
 #endif

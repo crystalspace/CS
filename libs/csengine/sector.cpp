@@ -37,6 +37,7 @@
 #include "csengine/bspbbox.h"
 #include "csgeom/bsp.h"
 #include "csgeom/octree.h"
+#include "csgeom/quadcube.h"
 #include "csobject/nameobj.h"
 #include "ihalo.h"
 #include "igraph3d.h"
@@ -840,13 +841,25 @@ void* csSector::CalculateLightingPolygons (csPolygonParentInt*,
 {
   csPolygon3D* p;
   csLightView* lview = (csLightView*)data;
-  int i;
+  int i, j;
   for (i = 0 ; i < num ; i++)
   {
     p = (csPolygon3D*)polygon[i];
     if (p->GetUnsplitPolygon ()) p = (csPolygon3D*)(p->GetUnsplitPolygon ());
     p->CamUpdate ();
-    p->CalculateLighting (lview);
+
+    csVector3 poly[50];	// @@@ HARDCODED! BAD!
+    for (j = 0 ; j < p->GetNumVertices () ; j++)
+      poly[j] = p->Vcam (j);
+    if (p->GetPortal ())
+    {
+      p->CalculateLighting (lview);
+    }
+    else
+    {
+      csWorld::current_world->GetQuadcube ()->InsertPolygon (poly, p->GetNumVertices ());
+      p->CalculateLighting (lview);
+    }
   }
   return NULL;
 }
@@ -864,31 +877,44 @@ void* CalculateLightingPolygonsFB (csPolygonParentInt*,
   {
     p = (csPolygon3D*)polygon[i];
     p->CamUpdate ();
-    p->CalculateLighting (lview);
 
-    if (p->GetPlane ()->VisibleFromPoint (center) != cw) continue;
-    csShadowFrustrum* frust;
-    CHK (frust = new csShadowFrustrum (center));
-    csPlane pl = p->GetPlane ()->GetWorldPlane ();
-    pl.DD += center * pl.norm;
-    pl.Invert ();
-    frust->SetBackPlane (pl);
-    frust->polygon = p;
-    for (j = 0 ; j < p->GetVertices ().GetNumVertices () ; j++)
-      frust->AddVertex (p->Vwor (j)-center);
-    lview->shadows.AddLast (frust);
+    csVector3 poly[50];	// @@@ HARDCODED! BAD!
+    for (j = 0 ; j < p->GetNumVertices () ; j++)
+      poly[j] = p->Vcam (j);
+    bool vis = false;
+    if (p->GetPortal ())
+      vis = csWorld::current_world->GetQuadcube ()->TestPolygon (poly, p->GetNumVertices ());
+    else
+      vis = csWorld::current_world->GetQuadcube ()->InsertPolygon (poly, p->GetNumVertices ());
+    if (vis)
+    {
+      p->CalculateLighting (lview);
+
+      if (p->GetPlane ()->VisibleFromPoint (center) != cw) continue;
+      csShadowFrustrum* frust;
+      CHK (frust = new csShadowFrustrum (center));
+      csPlane pl = p->GetPlane ()->GetWorldPlane ();
+      pl.DD += center * pl.norm;
+      pl.Invert ();
+      frust->SetBackPlane (pl);
+      frust->polygon = p;
+      for (j = 0 ; j < p->GetVertices ().GetNumVertices () ; j++)
+        frust->AddVertex (p->Vwor (j)-center);
+      lview->shadows.AddLast (frust);
+    }
   }
   return NULL;
 }
 
 // @@@ This routine need to be cleaned up!!! It needs to
 // be part of the class.
-bool CullOctreeNodeLighting (csPolygonTree* /*tree*/, csPolygonTreeNode* node,
+bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
 	const csVector3& /*pos*/, void* data)
 {
   if (!node) return false;
   if (node->Type () != NODE_OCTREE) return true;
 
+  csOctree* otree = (csOctree*)tree;
   csOctreeNode* onode = (csOctreeNode*)node;
   csLightView* lview = (csLightView*)data;
 
@@ -907,6 +933,22 @@ bool CullOctreeNodeLighting (csPolygonTree* /*tree*/, csPolygonTreeNode* node,
   float dist = result.Norm ();
   float radius = lview->l->GetRadius ();
   if (radius < dist) return false;
+
+  // Test node against quad-tree.
+  csVector3 outline[6];
+  int num_outline;
+  otree->GetConvexOutline (onode, center, outline, num_outline);
+  if (num_outline)
+  {
+    int i;
+    for (i = 0 ; i < num_outline ; i++)
+      outline[i] -= center;
+    if (!csWorld::current_world->GetQuadcube ()->TestPolygon (outline, num_outline))
+{
+printf("CULL!\n");
+      return false;
+}
+  }
 
   csShadowFrustrum* sf = lview->shadows.GetFirst ();
   for ( ; sf ; sf = sf->next)

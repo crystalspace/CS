@@ -42,6 +42,7 @@
 #include "csengine/lppool.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/polypool.h"
+#include "csgeom/quadcube.h"
 #include "csobject/nameobj.h"
 #include "csutil/util.h"
 #include "csutil/inifile.h"
@@ -190,6 +191,11 @@ csWorld::csWorld () : csObject (), start_vec (0, 0, 0)
   piHR = NULL;
   textures = NULL;
   c_buffer = NULL;
+
+  csVector3 min_qbox (-10, -10, -10);
+  csVector3 max_qbox (10, 10, 10);
+  CHK (quadcube = new csQuadcube (min_qbox, max_qbox, 5)); //@@@ SET HIGHER
+
   CHK (render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory()));
   CHK (lightpatch_pool = new csLightPatchPool ());
   CHK (cfg_engine = new csEngineConfig ());
@@ -204,6 +210,7 @@ csWorld::~csWorld ()
   CHK (delete cfg_engine);
   CHK (delete render_pol2d_pool);
   CHK (delete lightpatch_pool);
+  CHK (delete quadcube);
 }
 
 void csWorld::Clear ()
@@ -317,6 +324,22 @@ bool csWorld::Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config, csV
   csCamera::default_inv_aspect = 1./csCamera::default_aspect;
 
   StartWorld ();
+
+
+//quadcube->MakeEmpty ();
+//csVector3 poly[10];
+//poly[0] = csVector3 (-50, 50, 10);
+//poly[1] = csVector3 (50, 50, 10);
+//poly[2] = csVector3 (50, -50, 10);
+//poly[3] = csVector3 (-50, -50, 10);
+
+//poly[0] = csVector3 (-5, -5, -10);
+//poly[1] = csVector3 (5, -5, -10);
+//poly[2] = csVector3 (5, 5, -10);
+//poly[3] = csVector3 (-5, 5, -10);
+//quadcube->InsertPolygon (poly, 4);
+//Dumper::dump (quadcube);
+
 
   return true;
 }

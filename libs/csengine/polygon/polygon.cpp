@@ -1467,6 +1467,24 @@ bool csPolygon3D::MarkRelevantShadowFrustrums (csLightView& lview,
       // Assume that the shadow frustrum is relevant.
       sf->relevant = true;
 
+#if 1
+      // First we test a special case. If all vertices of the light
+      // frustrum are contained in the shadow frustrum then we don't
+      // need to process the light frustrum at all. In that case we
+      // return NULL.
+      bool fully_shadowed = true;
+      for (i = 0 ; i < lview.light_frustrum->GetNumVertices () ; i++)
+        if (!sf->Contains (lview.light_frustrum->GetVertex (i)))
+	{
+	  fully_shadowed = false;
+	  break;
+	}
+      if (fully_shadowed) return false;
+
+      if (!csFrustrum::IsVisible (lview.light_frustrum->GetVertices (),
+      	  lview.light_frustrum->GetNumVertices (), sf->GetVertices (), sf->GetNumVertices ()))
+	sf->relevant = false;
+#else
       // Check if any of the vertices of the shadow polygon is inside the
       // light frustrum. If that is the case then the shadow frustrum is
       // indeed relevant.
@@ -1502,6 +1520,7 @@ bool csPolygon3D::MarkRelevantShadowFrustrums (csLightView& lview,
 	  return false;
         }
       }
+#endif
     }
     sf = sf->next;
   }

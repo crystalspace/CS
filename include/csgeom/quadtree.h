@@ -30,6 +30,7 @@
 
 class csVector3;
 class csQuadtree;
+class Dumper;
 
 /**
  * A quadtree node.
@@ -37,11 +38,12 @@ class csQuadtree;
 class csQuadtreeNode
 {
   friend class csQuadtree;
+  friend class Dumper;
 
 private:
   /**
    * Children.
-   * 0 = topleft, 1=topright, 2=bottomleft, 3=bottomright.
+   * 0 = topleft, 1=topright, 2=bottomright, 3=bottomleft.
    */
   csQuadtreeNode* children[4];
 
@@ -67,7 +69,7 @@ private:
 
   /// Set box.
   void SetBox (const csVector3& corner00, const csVector3& corner01,
-  	const csVector3& corner10, const csVector3& corner11);
+  	const csVector3& corner11, const csVector3& corner10);
 
 public:
   /// Get center.
@@ -88,27 +90,39 @@ public:
  */
 class csQuadtree
 {
+  friend class Dumper;
+
 private:
   /// The root of the tree.
   csQuadtreeNode* root;
+  /// The plane normal of the tree.
+  csPlane plane_normal;
 
 private:
   /// Build the tree with a given depth.
   void Build (csQuadtreeNode* node, const csVector3& corner00,
-  	const csVector3& corner01, const csVector3& corner10,
-	const csVector3& corner11, int depth);
+  	const csVector3& corner01, const csVector3& corner11,
+	const csVector3& corner10, int depth);
 
   /// Insert a polygon in the node.
   bool InsertPolygon (csQuadtreeNode* node,
 	csVector3* verts, int num_verts,
-	bool i00, bool i01, bool i10, bool i11);
+	bool i00, bool i01, bool i11, bool i10);
+
+  /// Test a polygon in the node.
+  bool TestPolygon (csQuadtreeNode* node,
+	csVector3* verts, int num_verts,
+	bool i00, bool i01, bool i11, bool i10);
+
 public:
   /**
    * Create an empty tree. Although a quadtree is a 2D structure
    * the corners are still given in 3D coordinates. The quadtree
    * generates a 2D tree on the plane defined by those corners.
    * 'corners' is an array of the four corners of the 2D quadtree
-   * in 3D space.
+   * in 3D space.<p>
+   * Corners are defined as:<br>
+   * 0 = topleft, 1=topright, 2=bottomright, 3=bottomleft.
    */
   csQuadtree (csVector3* corners, int depth);
 
@@ -136,6 +150,15 @@ public:
    * to start at (0,0,0).
    */
   bool InsertPolygon (csVector3* verts, int num_verts);
+
+  /**
+   * Test for polygon visibility with the quad-tree.
+   * Return true if polygon is visible.<p>
+   * The polygon does not actually need to be a polygon. It can
+   * be a general frustrum. Note that the frustrum is assumed
+   * to start at (0,0,0).
+   */
+  bool TestPolygon (csVector3* verts, int num_verts);
 };
 
 #endif /*QUADTREE_H*/

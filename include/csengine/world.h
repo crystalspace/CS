@@ -39,6 +39,7 @@ class csStatLight;
 class csDynLight;
 class csSpriteTemplate;
 class csClipper;
+class csQuadcube;
 class csWorld;
 class Dumper;
 class csLight;
@@ -245,6 +246,9 @@ private:
   /// Optional c-buffer used for rendering.
   csCBuffer* c_buffer;
 
+  /// Quad-cube used for lighting.
+  csQuadcube* quadcube;
+
   ///
   void ShineLights ();
   ///
@@ -329,6 +333,11 @@ public:
    * Return c-buffer (or NULL if not used).
    */
   csCBuffer* GetCBuffer () { return c_buffer; }
+
+  /**
+   * Return quad-cube.
+   */
+  csQuadcube* GetQuadcube () { return quadcube; }
 
   /**
    * Cache lighting. If true (default) then lighting will be cached in

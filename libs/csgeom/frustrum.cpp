@@ -331,17 +331,8 @@ csFrustrum* csFrustrum::Intersect (csVector3* poly, int num)
 bool csFrustrum::Contains (const csVector3& point)
 {
   if (backplane)
-  {
-    if (!csMath3::Visible (point, *backplane)) return false;
-  }
-  int i, i1;
-  i1 = num_vertices-1;
-  for (i = 0 ; i < num_vertices ; i++)
-  {
-    if (csMath3::WhichSide3D (point, vertices[i], vertices[i1]) > 0) return false;
-    i1 = i;
-  }
-  return true;
+    return Contains (vertices, num_vertices, *backplane, point);
+  return Contains (vertices, num_vertices, point);
 }
 
 bool csFrustrum::Contains (csVector3* frustrum, int num_frust, const csVector3& point)
@@ -355,4 +346,69 @@ bool csFrustrum::Contains (csVector3* frustrum, int num_frust, const csVector3& 
   }
   return true;
 }
+
+bool csFrustrum::Contains (csVector3* frustrum, int num_frust,
+	const csPlane& plane, const csVector3& point)
+{
+  if (!csMath3::Visible (point, plane)) return false;
+  int i, i1;
+  i1 = num_frust-1;
+  for (i = 0 ; i < num_frust ; i++)
+  {
+    if (csMath3::WhichSide3D (point, frustrum[i], frustrum[i1]) > 0) return false;
+    i1 = i;
+  }
+  return true;
+}
+
+bool csFrustrum::IsVisible (csVector3* frustrum, int num_frust,
+  	csVector3* poly, int num_poly)
+{
+  int i1, j1, i, j;
+
+  // If any of the polygon vertices is in the frustrum then
+  // the polygon is visible.
+  for (i = 0 ; i < num_poly ; i++)
+    if (Contains (frustrum, num_frust, poly[i])) return true;
+
+  // If any of the frustrum vertices is in the polygon (reverse
+  // roles) then the polygon is visible.
+  for (i = 0 ; i < num_frust ; i++)
+    if (Contains (poly, num_poly, frustrum[i])) return true;
+
+  return IsVisibleFull (frustrum, num_frust, poly, num_poly);
+}
+
+bool csFrustrum::IsVisibleFull (csVector3* frustrum, int num_frust,
+  	csVector3* poly, int num_poly)
+{
+  int i1, j1, i, j;
+
+  // Here is the difficult case. We need to see if there is an
+  // edge from the polygon which intersects a frustrum plane.
+  // If so then polygon is visible. Otherwise not.
+  //@@@ opt by reversing loops!!
+  i1 = num_poly-1;
+  for (i = 0 ; i < num_poly ; i++)
+  {
+    j1 = num_frust-1;
+    for (j = 0 ; j < num_frust ; j++)
+    {
+      int s1 = csMath3::WhichSide3D (poly[i], frustrum[j], frustrum[j1]);
+      int s2 = csMath3::WhichSide3D (poly[i1], frustrum[j], frustrum[j1]);
+      if ((s1 < 0 && s2 > 0) || (s1 > 0 && s2 < 0))
+      {
+        s1 = csMath3::WhichSide3D (frustrum[j], poly[i], poly[i1]);
+        s2 = csMath3::WhichSide3D (frustrum[j1], poly[i], poly[i1]);
+        if ((s1 < 0 && s2 > 0) || (s1 > 0 && s2 < 0))
+          return true;
+      }
+      j1 = j;
+    }
+    i1 = i;
+  }
+
+  return false;
+}
+
 

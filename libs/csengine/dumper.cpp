@@ -24,6 +24,8 @@
 #include "csgeom/polyclip.h"
 #include "csgeom/polypool.h"
 #include "csgeom/frustrum.h"
+#include "csgeom/quadcube.h"
+#include "csgeom/quadtree.h"
 #include "csengine/sysitf.h"
 #include "csengine/lppool.h"
 #include "csengine/camera.h"
@@ -374,4 +376,100 @@ void Dumper::dump (csLightPatchPool* pool, char* name)
   CsPrintf (MSG_DEBUG_0, "%d freed.\n", cnt);
 }
 
+void Dumper::dump (csQuadtreeNode* node, char* buf, int bufdim, int depth,
+  	int x1, int y1, int x2, int y2)
+{
+  if (node->GetState () == CS_QUAD_PARTIAL && node->children[0])
+  {
+    int cx = x1+(x2-x1+1)/2;
+    int cy = y1+(y2-y1+1)/2;
+    dump (node->children[0], buf, bufdim, depth-1, x1, y1, cx-1, cy-1);
+    dump (node->children[1], buf, bufdim, depth-1, cx, y1, x2, cy-1);
+    dump (node->children[2], buf, bufdim, depth-1, cx, cy, x2, y2);
+    dump (node->children[3], buf, bufdim, depth-1, x1, cy, cx-1, y2);
+  }
+  else
+  {
+    char fchar;
+    if (node->GetState () == CS_QUAD_EMPTY) fchar = '.';
+    else if (node->GetState () == CS_QUAD_FULL) fchar = '#';
+    else fchar = 'x';
+    int i, j;
+    for (i = x1 ; i <= x2 ; i++)
+      for (j = y1 ; j <= y2 ; j++)
+        buf[j*bufdim+i] = fchar;
+  }
+}
+
+void Dumper::dump (csQuadcube* cube)
+{
+  CsPrintf (MSG_DEBUG_0, "---------------------------------------\n");
+  CsPrintf (MSG_DEBUG_0, "Quadtree 0:\n"); dump (cube->quad[0]);
+  CsPrintf (MSG_DEBUG_0, "Quadtree 1:\n"); dump (cube->quad[1]);
+  CsPrintf (MSG_DEBUG_0, "Quadtree 2:\n"); dump (cube->quad[2]);
+  CsPrintf (MSG_DEBUG_0, "Quadtree 3:\n"); dump (cube->quad[3]);
+  CsPrintf (MSG_DEBUG_0, "Quadtree 4:\n"); dump (cube->quad[4]);
+  CsPrintf (MSG_DEBUG_0, "Quadtree 5:\n"); dump (cube->quad[5]);
+  CsPrintf (MSG_DEBUG_0, "---------------------------------------\n");
+}
+
+void Dumper::dump (csQuadtree* tree)
+{
+  // First calculate depth of tree.
+  int depth = 0;
+  csQuadtreeNode* n = tree->root;
+  while (n)
+  {
+    depth++;
+    n = n->children[0];
+  }
+
+  // Calculate 2^depth.
+  int depthp = 1;
+  int depth2 = depth-1;
+  while (depth2 > 0)
+  {
+    depthp <<= 1;
+    depth2--;
+  }
+
+  char* buf;
+  CHK (buf = new char [depthp*depthp]);
+
+  CsPrintf (MSG_DEBUG_0, "Depth=%d depthp=%d\n", depth, depthp);
+  CsPrintf (MSG_DEBUG_0, "plane_normal=%f,%f,%f\n",
+  	tree->plane_normal.A (),
+  	tree->plane_normal.B (),
+  	tree->plane_normal.C ());
+  CsPrintf (MSG_DEBUG_0, "Corners for root:\n");
+  CsPrintf (MSG_DEBUG_0, "  0: %f,%f,%f\n",
+  	tree->root->corners[0].x,
+  	tree->root->corners[0].y,
+  	tree->root->corners[0].z);
+  CsPrintf (MSG_DEBUG_0, "  1: %f,%f,%f\n",
+  	tree->root->corners[1].x,
+  	tree->root->corners[1].y,
+  	tree->root->corners[1].z);
+  CsPrintf (MSG_DEBUG_0, "  2: %f,%f,%f\n",
+  	tree->root->corners[2].x,
+  	tree->root->corners[2].y,
+  	tree->root->corners[2].z);
+  CsPrintf (MSG_DEBUG_0, "  3: %f,%f,%f\n",
+  	tree->root->corners[3].x,
+  	tree->root->corners[3].y,
+  	tree->root->corners[3].z);
+  memset (buf, '?', depthp*depthp);
+  dump (tree->root, buf, depthp, depth-1,
+  	0, 0, depthp-1, depthp-1);
+  char buf2[255];
+  int y;
+  for (y = 0 ; y < depthp ; y++)
+  {
+    memcpy (buf2, &buf[y*depthp], depthp);
+    buf2[depthp] = 0;
+    CsPrintf (MSG_DEBUG_0, "%s\n", buf2);
+  }
+
+  CHK (delete [] buf);
+}
 

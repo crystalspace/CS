@@ -183,17 +183,48 @@ public:
   csFrustrum* Intersect (csVector3* poly, int num);
 
   /**
+   * Check if a polygon intersects with the frustrum (i.e.
+   * is visible in the frustrum). Returns true if visible.
+   * Frustrum and polygon should be given relative to (0,0,0).
+   */
+  static bool IsVisible (csVector3* frustrum, int num_frust,
+  	csVector3* poly, int num_poly);
+
+  /**
+   * Check if a polygon intersects with the frustrum.
+   * This function differs from IsVisible() in that it will
+   * only return true if the polygon intersects with the
+   * frustrum. It will not return true if the polygon
+   * is completely inside the frustrum or if the frustrum is
+   * completely inside the polygon. This function is mainly
+   * useful when those above trivial cases are already
+   * accounted for.
+   */
+  static bool IsVisibleFull (csVector3* frustrum, int num_frust,
+  	csVector3* poly, int num_poly);
+
+  /**
    * Check if a point (given relative to the origin of the frustrum)
    * is inside the frustrum.
    */
   bool Contains (const csVector3& point);
 
   /**
-   * Check if a point is inside the frustrum. The point and
-   * frustrum are relative to (0,0,0).
+   * Check if a point is inside a frustrum. The point and
+   * frustrum are relative to (0,0,0). Note that this function
+   * does not work correctly if the point is in the other direction
+   * from the average direction of the frustrum.
    */
   static bool Contains (csVector3* frustrum, int num_frust,
   	const csVector3& point);
+
+  /**
+   * Check if a point is inside a frustrum. The point and
+   * frustrum are relative to (0,0,0). This function also
+   * checks if point is in front of given plane.
+   */
+  static bool Contains (csVector3* frustrum, int num_frust,
+  	const csPlane& plane, const csVector3& point);
 
   /// Return true if frustrum is empty.
   bool IsEmpty () const { return !wide && vertices == NULL; }
