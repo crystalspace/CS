@@ -24,19 +24,17 @@
 
 #import <Foundation/Foundation.h>
 
-class csDefaultsIterator;
-
 /**
- * An iConfigFile, storing the settings in the MacOS/X NSUserDefaults system.
+ * An iConfigFile which stores settings via Cocoa's NSUserDefaults facility.
  */
 class csDefaultsConfig : public iConfigFile
 {
 private:
   friend class csDefaultsIterator;
 
-  NSString       *domain;
-  NSUserDefaults *defaults;
-  NSMutableDictionary   *dict;
+  NSString* domain;
+  NSUserDefaults* defaults;
+  NSMutableDictionary* dict;
 
 public:
   SCF_DECLARE_IBASE;
@@ -49,31 +47,31 @@ public:
   virtual const char* GetFileName () const;
   virtual iVFS* GetVFS () const;
   virtual void SetFileName (const char*, iVFS*);
-  virtual bool Load (const char* iFileName, iVFS* = 0, bool Merge = false,
-    bool NewWins = true);
+  virtual bool Load (
+    const char* iFileName, iVFS* = 0, bool Merge = false, bool NewWins = true);
   virtual bool Save ();
-  virtual bool Save (const char *iFileName, iVFS* = 0);
+  virtual bool Save (const char* iFileName, iVFS* = 0);
   
   virtual void Clear ();
   
-  virtual csPtr<iConfigIterator> Enumerate (const char *Subsection = 0);
-  virtual bool KeyExists (const char *Key) const;
-  virtual bool SubsectionExists (const char *Subsection) const;
+  virtual csPtr<iConfigIterator> Enumerate (const char* Subsection = 0);
+  virtual bool KeyExists (const char* Key) const;
+  virtual bool SubsectionExists (const char* Subsection) const;
   
-  virtual int GetInt (const char *Key, int Def = 0) const;
-  virtual float GetFloat (const char *Key, float Def = 0.0) const;
-  virtual const char *GetStr (const char *Key, const char *Def = "") const;
-  virtual bool GetBool (const char *Key, bool Def = false) const;
-  virtual const char *GetComment (const char *Key) const;
+  virtual int GetInt (const char* Key, int Def = 0) const;
+  virtual float GetFloat (const char* Key, float Def = 0.0) const;
+  virtual const char* GetStr (const char* Key, const char* Def = "") const;
+  virtual bool GetBool (const char* Key, bool Def = false) const;
+  virtual const char* GetComment (const char* Key) const;
 
-  virtual void SetStr (const char *Key, const char *Val);
-  virtual void SetInt (const char *Key, int Value);
-  virtual void SetFloat (const char *Key, float Value);
-  virtual void SetBool (const char *Key, bool Value);
-  virtual bool SetComment (const char *Key, const char *Text);
-  virtual void DeleteKey (const char *Key);
-  virtual const char *GetEOFComment () const;
-  virtual void SetEOFComment (const char *Text);
+  virtual void SetStr (const char* Key, const char* Val);
+  virtual void SetInt (const char* Key, int Value);
+  virtual void SetFloat (const char* Key, float Value);
+  virtual void SetBool (const char* Key, bool Value);
+  virtual bool SetComment (const char* Key, const char* Text);
+  virtual void DeleteKey (const char* Key);
+  virtual const char* GetEOFComment () const;
+  virtual void SetEOFComment (const char* Text);
 };
 
 /**
@@ -82,31 +80,31 @@ public:
 class csDefaultsIterator : public iConfigIterator
 {
   csRef<csDefaultsConfig> owner;
-  NSString *name;
-  NSString *domain;
+  NSString* name;
+  NSString* domain;
 
-  csDefaultsConfig *config;
+  csDefaultsConfig* config;
   
-  NSEnumerator *keyenum;
-  NSString *currentkey;
+  NSEnumerator* keyenum;
+  NSString* currentkey;
 public:
   SCF_DECLARE_IBASE;
 
-  csDefaultsIterator (csDefaultsConfig* Owner, 
-    const char* Subsection);
+  csDefaultsIterator (csDefaultsConfig* Owner, const char* Subsection);
   virtual ~csDefaultsIterator();
 
-  virtual iConfigFile *GetConfigFile () const;
-  virtual const char *GetSubsection () const;
+  virtual iConfigFile* GetConfigFile () const;
+  virtual const char* GetSubsection () const;
 
   virtual void Rewind ();
   virtual bool Next();
 
-  virtual const char *GetKey (bool Local = false) const;
+  virtual const char* GetKey (bool Local = false) const;
   virtual int GetInt () const;
   virtual float GetFloat () const;
-  virtual const char *GetStr () const;
+  virtual const char* GetStr () const;
   virtual bool GetBool () const;
-  virtual const char *GetComment () const;
+  virtual const char* GetComment () const;
 };
+
 #endif
