@@ -6,12 +6,14 @@
 #include "csutil/garray.h"
 #include "plugins/video/renderer/common/vbufmgr.h"
 #include "ivideo/graph3d.h"
+#include "csgeom/subrec.h"
 
 struct csPolyBufMatExtPolygon
 {
   iPolygonTexture *m_lmhandle;
   int             *m_indices;
   int              m_index_count;
+  csRect           m_lightmaprect;
 };
 
 struct csRealVertexBuffer
@@ -36,11 +38,14 @@ public:
       iPolygonTexture* poly_texture);
 
   void MarkLightmapsDirty();
+private:
+  bool CreateLightmap(int width, int height);
 
 
   CS_DECLARE_GROWING_ARRAY(m_polygons, csPolyBufMatExtPolygon);
-  csRealVertexBuffer &vbuf;
-
+  csRealVertexBuffer &m_realvbuf;
+  bool                m_dirty;
+  unsigned int        m_texhandle;
 };
 
 
