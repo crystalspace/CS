@@ -166,6 +166,15 @@ The history order has been reversed so that new features are at the top.
 	      csEventQueue::Lock().  The compiler did not like the empty
 	      statement following the while() loop.
 	- Eric Sunshine fixed a overfull hbox TeX warning in meshobj/using.txi.
+	- Martin Geisse changed csConfigFile and iConfigFileNew so that
+	  comments at the end of a file are now preserved and can be modified
+	  by the application.
+	- Eric Sunshine fixed the following problems in csConfigFile introduced
+	  by Martin's changes:
+	    - Fixed a dangling-pointer bug in csConfigFile::Clear().
+	    - Fixed several problem spots in csConfigFile::LoadFromBuffer()
+	      where it could assign the wrong comment as the "end-of-file"
+	      comment.
 28-Jan-2001
 	- Eric Sunshine fixed a crasher in PTLab where it was trying to
 	  access a texture (cslogo.gif) which it had never loaded.

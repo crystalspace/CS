@@ -548,7 +548,11 @@ void csConfigFile::Clear()
     csConfigIterator *it = (csConfigIterator*)Iterators->Get(i);
     it->Rewind();
   }
-  if (EOFComment) delete[] EOFComment;
+  if (EOFComment)
+  {
+    delete[] EOFComment;
+    EOFComment = NULL;
+  }
   Dirty = true;
 }
 
@@ -716,6 +720,7 @@ void csConfigFile::LoadFromBuffer(char *Filedata, bool overwrite)
       {
         fprintf(stderr, "Missing `=' on line %d of %s\n", Line,
 	  (Filename ? Filename : "configuration data"));
+        CurrentComment.Clear();
         continue;
       }
       // check for missing key name
@@ -723,6 +728,7 @@ void csConfigFile::LoadFromBuffer(char *Filedata, bool overwrite)
       {
         fprintf(stderr, "Missing key name (before `=') on line %d of %s\n",
 	  Line, (Filename ? Filename : "configuration data"));
+        CurrentComment.Clear();
         continue;
       }
       // delete whitespace before equal sign
@@ -731,7 +737,11 @@ void csConfigFile::LoadFromBuffer(char *Filedata, bool overwrite)
       *u = 0;
       // check if node already exists and create node
       csConfigNode *Node = FindNode(Filedata);
-      if (Node && !overwrite) continue;
+      if (Node && !overwrite)
+      {
+        CurrentComment.Clear();
+        continue;
+      }
       if (!Node) Node = CreateNode(Filedata);
       // skip whitespace after equal sign
       Filedata = t+1;
@@ -789,8 +799,7 @@ void csConfigFile::RemoveIterator(csConfigIterator *it) const
 void csConfigFile::SetEOFComment(const char *text)
 {
   if (EOFComment) delete[] EOFComment;
-  if (text) EOFComment = strnew(text);
-  else EOFComment = NULL;
+  EOFComment = (text ? strnew(text) : NULL);
 }
 
 const char *csConfigFile::GetEOFComment() const
