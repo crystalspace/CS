@@ -42,6 +42,14 @@ chronological order.
 	- Eric Sunshine fixed a lot of Texinfo markup problems in recently
 	  added material.  Also fixed numerous grammatical and spelling
 	  mistakes.
+	- Jorrit did several particle system related changes:
+	    - csNewParticleSystem now also implements iParticleState.
+	    - csNewParticleSystem supports all the features of iParticleState
+	      (more in particular: the rotation, scale, color, alpha, and
+	      the self destruct).
+	    - The fountain particle system now works through
+	      csNewParticleSystem. This means that it is faster and also
+	      works with the new renderer.
 11-Feb-2004
 	- Jorrit optimized the csNewParticleSystem slightly (used by the
 	  rain mesh plugin) and also cleaned it up a bit.

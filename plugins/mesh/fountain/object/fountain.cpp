@@ -41,51 +41,29 @@ void csFountainMeshObject::SetupObject ()
 {
   if (!initialized)
   {
-    initialized = true;
-    RemoveParticles ();
-    delete[] part_pos;
+    csNewParticleSystem::SetupObject ();
     delete[] part_speed;
     delete[] part_age;
 
-    part_pos = new csVector3[number];
-    part_speed = new csVector3[number];
-    part_age = new float[number];
-    amt = number;
+    part_speed = new csVector3[ParticleCount];
+    part_age = new float[ParticleCount];
 
-    float fradius = 10.0; // guessed radius of the fountain
-    float height = 10.0; // guessed height
-    bbox.Set(origin - csVector3(fradius,0,fradius),
-      origin + csVector3(+fradius, +height, +fradius) );
-
-    // Calculate the maximum radius.
-    csVector3 size = bbox.Max () - bbox.Min ();
-    float max_size = size.x;
-    if (size.y > max_size) max_size = size.y;
-    if (size.z > max_size) max_size = size.z;
-    float a = max_size/2.;
-    radius = qsqrt (a*a + a*a);
-
-    // create particles
-	int i;
-    for (i=0 ; i<number ; i++)
-    {
-      AppendRectSprite (drop_width, drop_height, mat, lighted_particles);
-      GetParticle(i)->SetMixMode(MixMode);
-      RestartParticle(i, (fall_time / float(number)) * float(number-i));
-      bbox.AddBoundingVertexSmart( part_pos[i] );
-    }
     time_left = 0.0;
     next_oldest = 0;
-    SetupColor ();
-    SetupMixMode ();
+    int i;
+    for (i = 0 ; i < ParticleCount ; i++)
+    {
+      RestartParticle (i, (fall_time / float (ParticleCount))
+      	* float (ParticleCount-i));
+    }
   }
 }
 
-csFountainMeshObject::csFountainMeshObject (iObjectRegistry* object_reg,
-  iMeshObjectFactory* factory) : csParticleSystem (object_reg, factory)
+csFountainMeshObject::csFountainMeshObject (iEngine* engine,
+	iMeshObjectFactory* factory)
+	: csNewParticleSystem (engine, factory, CS_PARTICLE_SCALE)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiFountainState);
-  part_pos = 0;
   part_speed = 0;
   part_age = 0;
   accel.Set (0, -1, 0);
@@ -95,13 +73,12 @@ csFountainMeshObject::csFountainMeshObject (iObjectRegistry* object_reg,
   opening = 1;
   azimuth = 1;
   elevation = 1;
-  number = 50;
-  lighted_particles = false;
+  SetCount (50);
+  SetDropSize (0.1, 0.1);
 }
 
 csFountainMeshObject::~csFountainMeshObject()
 {
-  delete[] part_pos;
   delete[] part_speed;
   delete[] part_age;
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiFountainState);
@@ -130,42 +107,38 @@ void csFountainMeshObject::RestartParticle (int index, float pre_move)
 
   // now dest points to the exit speed of the spout if that spout was
   // at 0,0,0.
-  part_pos[index] = origin;
+  PositionArray[index] = origin;
   part_speed[index] = dest;
 
   // pre move a bit (in a perfect arc)
   part_speed[index] += accel * pre_move;
-  part_pos[index] += part_speed[index] * pre_move;
+  PositionArray[index] += part_speed[index] * pre_move;
   part_age[index] = pre_move;
-
-  GetParticle(index)->SetPosition(part_pos[index]);
 }
 
 
 int csFountainMeshObject::FindOldest ()
 {
   int ret = next_oldest;
-  next_oldest = (next_oldest + 1 ) % amt;
+  next_oldest = (next_oldest + 1 ) % ParticleCount;
   return ret;
 }
 
 void csFountainMeshObject::Update (csTicks elapsed_time)
 {
-  SetupObject ();
-  csParticleSystem::Update (elapsed_time);
+  csNewParticleSystem::Update (elapsed_time);
   float delta_t = elapsed_time / 1000.0f; // in seconds
   // move particles;
   int i;
-  for (i=0 ; i < particles.Length() ; i++)
+  for (i=0 ; i < ParticleCount ; i++)
   {
     part_speed[i] += accel * delta_t;
-    part_pos[i] += part_speed[i] * delta_t;
-    GetParticle(i)->SetPosition (part_pos[i]);
+    PositionArray[i] += part_speed[i] * delta_t;
     part_age[i] += delta_t;
   }
 
   // restart a number of particles
-  float intersperse = fall_time / (float)amt;
+  float intersperse = fall_time / (float)ParticleCount;
   float todo_time = delta_t + time_left;
   while (todo_time > intersperse)
   {
@@ -184,65 +157,10 @@ void csFountainMeshObject::HardTransform (const csReversibleTransform& t)
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csFountainMeshObjectFactory)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-SCF_IMPLEMENT_IBASE_END
-
-csFountainMeshObjectFactory::csFountainMeshObjectFactory (iBase *p,
-	iObjectRegistry* s)
-{
-  SCF_CONSTRUCT_IBASE (p);
-  logparent = 0;
-  object_reg = s;
-}
-
-csFountainMeshObjectFactory::~csFountainMeshObjectFactory ()
-{
-  SCF_DESTRUCT_IBASE ();
-}
-
-csPtr<iMeshObject> csFountainMeshObjectFactory::NewInstance ()
-{
-  csFountainMeshObject* cm =
-    new csFountainMeshObject (object_reg, (iMeshObjectFactory*)this);
-  csRef<iMeshObject> im (SCF_QUERY_INTERFACE (cm, iMeshObject));
-  cm->DecRef ();
-  return csPtr<iMeshObject> (im);
-}
-
-//----------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE (csFountainMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFountainMeshObjectType::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+CS_DECLARE_SIMPLE_MESH_FACTORY (csFountainFactory, csFountainMeshObject);
+CS_DECLARE_SIMPLE_MESH_PLUGIN (csFountainMeshObjectType, csFountainFactory);
 
 SCF_IMPLEMENT_FACTORY (csFountainMeshObjectType)
 
-
-csFountainMeshObjectType::csFountainMeshObjectType (iBase* pParent)
-{
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-}
-
-csFountainMeshObjectType::~csFountainMeshObjectType ()
-{
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
-}
-
-csPtr<iMeshObjectFactory> csFountainMeshObjectType::NewFactory ()
-{
-  csFountainMeshObjectFactory* cm =
-    new csFountainMeshObjectFactory (this, object_reg);
-  csRef<iMeshObjectFactory> ifact (
-  	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
-  cm->DecRef ();
-  return csPtr<iMeshObjectFactory> (ifact);
-}
+//----------------------------------------------------------------------
 

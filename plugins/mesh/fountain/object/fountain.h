@@ -23,7 +23,7 @@
 #include "csgeom/box.h"
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
-#include "plugins/mesh/partgen/partgen.h"
+#include "plugins/mesh/partgen/particle.h"
 #include "imesh/fountain.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -39,25 +39,21 @@ struct iMaterialWrapper;
  * sin(elevation)*speed*fall_time + accel.y*fall_time*fall_time + spot.y
  * i.e. the world y height of the pool of the fountain.
  */
-class csFountainMeshObject : public csParticleSystem
+class csFountainMeshObject : public csNewParticleSystem
 {
 protected:
-  int amt;
   csVector3 origin;
   csVector3 accel;
-  csVector3* part_pos;
   csVector3* part_speed;
   float *part_age;
   float speed, opening, azimuth, elevation, fall_time;
   float time_left; // from previous update
   int next_oldest;
-  int number;
   float drop_width, drop_height;
-  bool lighted_particles;
 
   int FindOldest();
   void RestartParticle (int index, float pre_move);
-  void SetupObject ();
+  virtual void SetupObject ();
 
 public:
   /**
@@ -75,26 +71,24 @@ public:
    * elevation is the angle of the direction (up/down) of the stream.
    *   angles in radians (TWO_PI is 360 degrees)
    */
-  csFountainMeshObject (iObjectRegistry* object_reg,
-  	iMeshObjectFactory* factory);
+  csFountainMeshObject (iEngine* engine, iMeshObjectFactory* factory);
   /// Destructor.
   virtual ~csFountainMeshObject ();
 
   /// Set the number of particles to use.
   void SetParticleCount (int num)
   {
-    initialized = false;
-    number = num;
-    scfiObjectModel.ShapeChanged ();
+    SetCount (num);
   }
   /// Get the number of particles used.
-  int GetParticleCount () const { return number; }
+  int GetParticleCount () const { return ParticleCount; }
   /// Set the size of the particles.
   void SetDropSize (float dropwidth, float dropheight)
   {
     initialized = false;
     drop_width = dropwidth;
     drop_height = dropheight;
+    Scale.Set (drop_width, drop_height);
     scfiObjectModel.ShapeChanged ();
   }
   /// Get the size of the particles.
@@ -112,14 +106,6 @@ public:
   }
   /// Get origin of the fountain.
   const csVector3& GetOrigin () const { return origin; }
-  /// Enable or disable lighting.
-  void SetLighting (bool l)
-  {
-    initialized = false;
-    lighted_particles = l;
-  }
-  /// See if lighting is enabled.
-  bool GetLighting () const { return lighted_particles; }
   /// Set acceleration.
   void SetAcceleration (const csVector3& accel)
   {
@@ -182,7 +168,7 @@ public:
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
 
-  SCF_DECLARE_IBASE_EXT (csParticleSystem);
+  SCF_DECLARE_IBASE_EXT (csNewParticleSystem);
 
   //------------------------- iFountainState implementation ----------------
   class FountainState : public iFountainState
@@ -271,62 +257,6 @@ public:
   } scfiFountainState;
   friend class FountainState;
 };
-
-/**
- * Factory for fountains.
- */
-class csFountainMeshObjectFactory : public iMeshObjectFactory
-{
-private:
-  iObjectRegistry* object_reg;
-  iBase* logparent;
-
-public:
-  /// Constructor.
-  csFountainMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
-
-  /// Destructor.
-  virtual ~csFountainMeshObjectFactory ();
-
-  //------------------------ iMeshObjectFactory implementation --------------
-  SCF_DECLARE_IBASE;
-
-  virtual csPtr<iMeshObject> NewInstance ();
-  virtual void HardTransform (const csReversibleTransform&) { }
-  virtual bool SupportsHardTransform () const { return false; }
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
-  virtual iObjectModel* GetObjectModel () { return 0; }
-};
-
-/**
- * Fountain type. This is the plugin you have to use to create instances
- * of csFountainMeshObjectFactory.
- */
-class csFountainMeshObjectType : public iMeshObjectType
-{
-private:
-  iObjectRegistry* object_reg;
-
-public:
-  SCF_DECLARE_IBASE;
-
-  /// Constructor.
-  csFountainMeshObjectType (iBase*);
-  /// Destructor.
-  virtual ~csFountainMeshObjectType ();
-  /// Draw.
-  virtual csPtr<iMeshObjectFactory> NewFactory ();
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csFountainMeshObjectType);
-    virtual bool Initialize (iObjectRegistry* p)
-    { scfParent->object_reg = p; return true; }
-  } scfiComponent;
-  friend struct eiComponent;
-};
-
 
 #endif // __CS_FOUNTAIN_H__
 

@@ -31,6 +31,7 @@ SCF_IMPLEMENT_IBASE_EXT (csNewParticleSystem)
 #ifndef CS_USE_NEW_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
 #endif
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iParticleState)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 #ifndef CS_USE_NEW_RENDERER
@@ -39,12 +40,17 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csNewParticleSystem::eiVertexBufferManagerClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 #endif
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csNewParticleSystem::eiParticleState)
+  SCF_IMPLEMENTS_INTERFACE (iParticleState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 csNewParticleSystem::csNewParticleSystem (
 	iEngine *eng, iMeshObjectFactory *fact, int flags) : csMeshObject (eng)
 {
 #ifndef CS_USE_NEW_RENDERER 
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
 #endif
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticleState);
   Factory = fact;
   ParticleFlags = flags;
   ParticleCount = 0;
@@ -57,11 +63,21 @@ csNewParticleSystem::csNewParticleSystem (
   Axis = csVector3 (0, 1, 0);
   PrevTime = 0;
   MixMode = CS_FX_COPY;
-  Lighting = true;
+  Lighting = false;
   LitColors = 0;
   csMeshFactory* mf = (csMeshFactory*)fact;
   iObjectRegistry* object_reg = mf->GetObjectRegistry ();
   light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
+
+  self_destruct = false;
+  time_to_live = 0;
+
+  change_size = false;
+  change_color = false;
+  change_alpha = false;
+  change_rotation = false;
+  alphapersecond = 0.0f;
+  alpha_now = 1.0f;
 
 #ifdef CS_USE_NEW_RENDERER 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
@@ -92,6 +108,7 @@ csNewParticleSystem::~csNewParticleSystem ()
 #else
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
 #endif
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiParticleState);
 }
 
 #define UPDATE_ARRAY_ALWAYS(NAME,TYPE) {                                \
@@ -99,6 +116,46 @@ csNewParticleSystem::~csNewParticleSystem ()
   NAME = new TYPE [newsize];                                            \
   memcpy (NAME, old, sizeof (TYPE) * copysize);                         \
   delete[] old;                                                         \
+}
+
+void csNewParticleSystem::Update (csTicks elapsed_time)
+{
+  SetupObject ();
+  if (self_destruct)
+  {
+    if (elapsed_time >= time_to_live)
+    {
+      if (Engine)
+      {
+        csRef<iMeshWrapper> m = SCF_QUERY_INTERFACE (LogParent, iMeshWrapper);
+	if (m)
+          Engine->WantToDie (m);
+      }
+      time_to_live = 0;
+      /// and a calling virtual function can process without crashing
+      return;
+    }
+    time_to_live -= elapsed_time;
+  }
+  float elapsed_seconds = ((float)elapsed_time) / 1000.0;
+  if (change_color)
+    AddColor (colorpersecond * elapsed_seconds);
+  if (change_size)
+  {
+    Scale.x *= pow (scalepersecond, elapsed_seconds);
+    Scale.y *= pow (scalepersecond, elapsed_seconds);
+  }
+  if (change_alpha)
+  {
+    alpha_now += alphapersecond * elapsed_seconds;
+    if (alpha_now < 0.0f) alpha_now = 0.0f;
+    else if (alpha_now > 1.0f) alpha_now = 1.0f;
+    MixMode = CS_FX_SETALPHA (alpha_now);
+  }
+  if (change_rotation)
+  {
+    Angle += anglepersecond * elapsed_seconds;
+  }
 }
 
 void csNewParticleSystem::Allocate (int newsize, int copysize)
@@ -526,10 +583,22 @@ bool csNewParticleSystem::SetColor (const csColor& c)
   return true;
 }
 
-bool csNewParticleSystem::GetColor (csColor& c) const
+void csNewParticleSystem::AddColor (const csColor& c)
 {
-  c = Color;
-  return true;
+  SetColor (Color + c);
+  if (LitColors)
+  {
+    int i;
+    for (i = 0 ; i < ParticleCount ; i++)
+    {
+      LitColors[i] += c;
+    }
+  }
+}
+
+const csColor& csNewParticleSystem::GetColor () const
+{
+  return Color;
 }
 
 bool csNewParticleSystem::SetMaterialWrapper (iMaterialWrapper* m)
@@ -554,5 +623,6 @@ void csNewParticleSystem::SetLighting (bool enable)
   Lighting = enable;
   if (Lighting) LitColors = new csColor [StorageCount];
   else LitColors = 0;
+  initialized = false;
 }
 

@@ -129,6 +129,19 @@ protected:
   // lighting data
   csColor *LitColors;
 
+  /// Self destruct and when.
+  bool self_destruct;
+  csTicks time_to_live; // msec
+
+  /// Color change
+  bool change_color; csColor colorpersecond;
+  /// Size change
+  bool change_size; float scalepersecond;
+  /// Alpha change
+  bool change_alpha; float alphapersecond; float alpha_now;
+  /// Rotate particles, angle in radians.
+  bool change_rotation; float anglepersecond;
+
   /**
    * This function re-allocates the data arrays to 'newsize' and copies
    * 'copysize' items from the old arrays. Subclasses can override this
@@ -136,7 +149,7 @@ protected:
    */
   virtual void Allocate (int newsize, int copysize);
 
-  void SetupObject ();
+  virtual void SetupObject ();
 
   /**
    * Setup particles in the given tables right before they are drawn.
@@ -165,7 +178,7 @@ public:
   void UpdateBounds ();
 
   /// update the system.
-  virtual void Update (csTicks passedTime) = 0;
+  virtual void Update (csTicks passedTime);
 
   /// Returns 0 since there is no factory for a particle system
   virtual iMeshObjectFactory* GetFactory () const;
@@ -186,8 +199,11 @@ public:
   /// Set the base color
   virtual bool SetColor (const csColor& color);
 
+  /// Add to the current color
+  virtual void AddColor (const csColor& color);
+
   /// Return the base color
-  virtual bool GetColor (csColor& color) const;
+  virtual const csColor& GetColor () const;
 
   /// Set the material to use
   virtual bool SetMaterialWrapper (iMaterialWrapper* material);
@@ -206,15 +222,158 @@ public:
     bbox = Bounds;
   }
 
+  /// Set selfdestruct mode on, and msec to live.
+  inline void SetSelfDestruct (csTicks t)
+  { self_destruct=true; time_to_live = t; };
+  /// system will no longer self destruct
+  inline void UnSetSelfDestruct () { self_destruct=false; }
+  /// returns whether the system will self destruct
+  inline bool GetSelfDestruct () const { return self_destruct; }
+  /// if the system will self destruct, returns the time to live in msec.
+  inline csTicks GetTimeToLive () const { return time_to_live; }
+
+  /// Change color of all particles, by col per second.
+  inline void SetChangeColor(const csColor& col)
+  {change_color = true; colorpersecond = col;}
+  /// Stop change of color
+  inline void UnsetChangeColor() {change_color=false;}
+  /// see if change color is enabled, and get a copy if so.
+  inline bool GetChangeColor (csColor& col) const
+  { if(!change_color) return false; col = colorpersecond; return true; }
+
+  /// Change size of all particles, by factor per second.
+  inline void SetChangeSize(float factor)
+  {change_size = true; scalepersecond = factor;}
+  /// Stop change of size
+  inline void UnsetChangeSize() {change_size=false;}
+  /// see if change size is enabled, and get the value if so.
+  inline bool GetChangeSize (float& factor) const
+  { if(!change_size) return false; factor = scalepersecond; return true; }
+
+  /// Set the alpha of particles.
+  inline void SetAlpha(float alpha)
+  {alpha_now = alpha; MixMode = CS_FX_SETALPHA (alpha); }
+  /// Get the probable alpha of the particles
+  inline float GetAlpha() const {return alpha_now;}
+  /// Change alpha of all particles, by factor per second.
+  inline void SetChangeAlpha(float factor)
+  {change_alpha = true; alphapersecond = factor;}
+  /// Stop change of alpha
+  inline void UnsetChangeAlpha() {change_alpha=false;}
+  /// see if change alpha is enabled, and get the value if so.
+  inline bool GetChangeAlpha (float& factor) const
+  { if(!change_alpha) return false; factor = alphapersecond; return true; }
+
+  /// Change rotation of all particles, by angle in radians per second.
+  inline void SetChangeRotation(float angle)
+  {
+    change_rotation = true;
+    anglepersecond = angle;
+    // @@@??? Ok?
+    ParticleFlags |= CS_PARTICLE_ROTATE;
+  }
+  /// Stop change of rotation
+  inline void UnsetChangeRotation() { change_rotation=false; }
+  /// see if change rotation is enabled, and get the angle if so.
+  inline bool GetChangeRotation (float& angle) const
+  { if(!change_rotation) return false; angle = anglepersecond; return true; }
+
 #ifndef CS_USE_NEW_RENDERER
   /// interface to receive state of vertexbuffermanager
   struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
   {
     SCF_DECLARE_EMBEDDED_IBASE (csNewParticleSystem);
     virtual void ManagerClosing ();
-  }scfiVertexBufferManagerClient;
+  } scfiVertexBufferManagerClient;
   friend struct eiVertexBufferManagerClient;
 #endif
+
+  struct eiParticleState : public iParticleState
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csNewParticleSystem);
+    virtual void SetMaterialWrapper (iMaterialWrapper* material)
+    {
+      scfParent->SetMaterialWrapper (material);
+    }
+    virtual iMaterialWrapper* GetMaterialWrapper () const
+    { 
+      return scfParent->GetMaterialWrapper ();
+    }
+    virtual void SetMixMode (uint mode)
+    {
+      scfParent->MixMode = mode;
+    }
+    virtual uint GetMixMode () const
+    {
+      return scfParent->MixMode;
+    }
+    virtual void SetColor (const csColor& color)
+    {
+      scfParent->SetColor (color);
+    }
+    virtual const csColor& GetColor () const
+    {
+      return scfParent->GetColor ();
+    }
+    virtual void SetAlpha(float alpha) { scfParent->SetAlpha(alpha); }
+    virtual float GetAlpha() const { return scfParent->GetAlpha (); }
+    virtual void SetChangeColor (const csColor& color)
+    {
+      scfParent->SetChangeColor (color);
+    }
+    virtual void UnsetChangeColor ()
+    {
+      scfParent->UnsetChangeColor ();
+    }
+    virtual bool GetChangeColor (csColor& col) const
+    {
+      return scfParent->GetChangeColor(col); }
+    virtual void SetChangeSize (float factor)
+    {
+      scfParent->SetChangeSize (factor);
+    }
+    virtual void UnsetChangeSize ()
+    {
+      scfParent->UnsetChangeSize ();
+    }
+    virtual bool GetChangeSize (float& factor) const
+    {
+      return scfParent->GetChangeSize(factor);
+    }
+    virtual void SetChangeRotation (float angle)
+    {
+      scfParent->SetChangeRotation (angle);
+    }
+    virtual void UnsetChangeRotation ()
+    {
+      scfParent->UnsetChangeRotation ();
+    }
+    virtual bool GetChangeRotation (float& angle) const
+    {
+      return scfParent->GetChangeRotation(angle);
+    }
+    virtual void SetChangeAlpha (float factor)
+    {
+      scfParent->SetChangeAlpha (factor);
+    }
+    virtual void UnsetChangeAlpha ()
+    {
+      scfParent->UnsetChangeAlpha ();
+    }
+    virtual bool GetChangeAlpha (float& factor) const
+    {
+      return scfParent->GetChangeAlpha(factor);
+    }
+    virtual void SetSelfDestruct (csTicks t)
+    {
+      scfParent->SetSelfDestruct (t);
+    }
+    virtual void UnSetSelfDestruct ()
+    {
+      scfParent->UnSetSelfDestruct ();
+    }
+  } scfiParticleState;
+  friend struct eiParticleState;
 };
 
 #endif // __CS_PARTICLE_H__

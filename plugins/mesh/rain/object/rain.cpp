@@ -75,6 +75,7 @@ void csRainMeshObject::Spread (int first, int limit)
 
 void csRainMeshObject::Update (csTicks elapsed_time)
 {
+  csNewParticleSystem::Update (elapsed_time);
   for (int i=0; i<ParticleCount; i++)
   {
     csVector3& v = PositionArray[i];
