@@ -708,13 +708,18 @@ awsWindow::OnDraw(csRect clip)
 
         if (title)
         {
-        // now draw the title
-        g2d->Write(WindowManager()->GetPrefMgr()->GetDefaultFont(),
-                   Frame().xmin+10,
-                   Frame().ymin+(step>>1)+toff,
-                   WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE),
-                   -1,
-                   title->GetData());
+          int mcc = WindowManager()->GetPrefMgr()->GetDefaultFont()->GetLength(title->GetData(), Frame().Width()-15);
+
+          scfString tmp(title->GetData());
+          tmp.Truncate(mcc);
+        
+          // now draw the title
+          g2d->Write(WindowManager()->GetPrefMgr()->GetDefaultFont(),
+                     Frame().xmin+10,
+                     Frame().ymin+(step>>1)+toff,
+                     WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE),
+                     -1,
+                     tmp.GetData());
         }
 
       } // end if title bar

@@ -176,8 +176,11 @@ awsComponent::Execute(char *action, awsParmList &parmlist)
   }
   else if (strcmp("HideWindow", action)==0)
   {
-    Window()->Hide();
-    WindowManager()->InvalidateUpdateStore();
+    if (Window())
+    {
+      Window()->Hide();
+      WindowManager()->InvalidateUpdateStore();
+    }
     return true;
   }
   else if (strcmp("Overlaps", action)==0)
