@@ -617,3 +617,13 @@ following @samp{iImage} methods have been renamed:
 @item
 @code{HasKeycolor()} @result{} @code{HasKeyColor()}
 @end itemize
+
+For consistency with related method (such as @code{HasPrevious()}) in the same
+template, the following @code{csList<>} methods have been renamed:
+
+@itemize @bullet
+@item
+@code{FetchPrev()} @result{} @code{FetchPrevious()}
+@item
+@code{HasPrev()} @result{} @code{HasPrevious()}
+@end itemize
