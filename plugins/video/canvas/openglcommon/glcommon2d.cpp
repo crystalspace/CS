@@ -135,7 +135,8 @@ bool csGraphics2DGLCommon::BeginDraw ()
 void csGraphics2DGLCommon::SetClipRect (int xmin, int ymin, int xmax, int ymax)
 {
   csGraphics2D::SetClipRect (xmin, ymin, xmax, ymax);
-  FontCache->SetClipRect (xmin, Height - ymax, xmax, Height - ymin);
+  if (FontCache)
+    FontCache->SetClipRect (xmin, Height - ymax, xmax, Height - ymin);
 }
 
 void csGraphics2DGLCommon::DecomposeColor (int iColor,
@@ -440,4 +441,21 @@ bool csGraphics2DGLCommon::PerformExtensionV (char const* command, va_list)
     return true;
   }
   return false;
+}
+
+bool csGraphics2DGLCommon::Resize (int width, int height)
+{
+  if (!is_open)
+  {
+    Width = width;
+    Height = height;
+    SetClipRect (0, 0, Width - 1, Height - 1);
+    return true;
+  }
+  if (!AllowResizing)
+    return false;
+  Width = width;
+  Height = height;
+  EventOutlet->Broadcast (cscmdContextResize, (iGraphics2D *)this);
+  return true;
 }

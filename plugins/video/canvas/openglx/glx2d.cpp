@@ -351,22 +351,6 @@ void csGraphics2DGLX::Print (csRect * /*area*/)
 }
 
 
-bool csGraphics2DGLX::Resize (int width, int height)
-{
-  if (!is_open)
-  {
-    Width = width;
-    Height = height;
-    return true;
-  }
-  if (!AllowResizing)
-    return false;
-  Width = width;
-  Height = height;
-  EventOutlet->Broadcast (cscmdContextResize, (iGraphics2D *)this);
-  return true;
-}
-
 void csGraphics2DGLX::SetFullScreen (bool yesno)
 { 
   csGraphics2D::SetFullScreen (yesno); 

@@ -69,8 +69,6 @@ public:
 
   virtual void AllowResize (bool iAllow);
 
-  virtual bool Resize (int width, int height);
-
   virtual void SetTitle (const char* title)
   { xwin->SetTitle (title); }
 
