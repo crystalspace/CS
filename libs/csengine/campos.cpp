@@ -52,7 +52,7 @@ void csCameraPosition::Set (const char *iSector, const csVector3 &iPosition,
   const csVector3 &iForward, const csVector3 &iUpward)
 {
   delete [] Sector;
-  Sector = strdup (iSector);
+  Sector = csStrNew (iSector);
   Position = iPosition;
   Forward = iForward;
   Upward = iUpward;

@@ -22,6 +22,7 @@
 #include "csws/cshints.h"
 #include "csws/csapp.h"
 #include "csws/cswspal.h"
+#include "csutil/util.h"
 
 csHint::csHint (csComponent *iParent, const char *iText, iFont *Font,
   int FontSize) : csComponent (iParent)
@@ -63,7 +64,7 @@ void csHint::SetText (const char *iText)
   }
 
   // Split the text (preferably between words) to approximatively given width
-  char *textcopy = strdup (iText);
+  char *textcopy = csStrNew (iText);
   char *txt = textcopy;
   char *lasttxt = strchr (txt, 0);
   const int max_splits = 20;

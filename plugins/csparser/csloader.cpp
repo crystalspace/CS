@@ -104,6 +104,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (FACTORY)
   CS_TOKEN_DEF (FILE)
   CS_TOKEN_DEF (FOG)
+  CS_TOKEN_DEF (FORWARD)
   CS_TOKEN_DEF (HALO)
   CS_TOKEN_DEF (HARDMOVE)
   CS_TOKEN_DEF (INVISIBLE)
@@ -137,6 +138,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (START)
   CS_TOKEN_DEF (TEXTURES)
   CS_TOKEN_DEF (MAT_SET)
+  CS_TOKEN_DEF (UP)
   CS_TOKEN_DEF (V)
   CS_TOKEN_DEF (WORLD)
   CS_TOKEN_DEF (ZFILL)
@@ -400,13 +402,10 @@ bool csLoader::LoadMap (char* buf)
           break;
         case CS_TOKEN_START:
         {
-          char start_sector [100];
-          csVector3 pos (0, 0, 0);
-          csScanStr (params, "%s,%f,%f,%f", &start_sector, &pos.x, &pos.y, &pos.z);
 	  iCameraPosition* campos = Engine->GetCameraPositions ()->
 	  	NewCameraPosition (name ? name : "Start");
-	  campos->Set (start_sector, pos, csVector3 (0, 0, 1),
-	  	csVector3 (0, 1, 0));
+	  if (!ParseStart (params, campos))
+	    return false;
           break;
         }
         case CS_TOKEN_KEY:
@@ -2144,6 +2143,60 @@ iCollection* csLoader::ParseCollection (char* name, char* buf)
     TokenError ("a collection");
 
   return collection;
+}
+
+bool csLoader::ParseStart (char* buf, iCameraPosition* campos)
+{
+  CS_TOKEN_TABLE_START(commands)
+    CS_TOKEN_TABLE (SECTOR)
+    CS_TOKEN_TABLE (POSITION)
+    CS_TOKEN_TABLE (UP)
+    CS_TOKEN_TABLE (FORWARD)
+  CS_TOKEN_TABLE_END
+
+  long cmd;
+  char* params;
+
+  char start_sector [100];
+  strcpy (start_sector, "room");
+  csVector3 pos (0, 0, 0);
+  csVector3 up (0, 1, 0);
+  csVector3 forward (0, 0, 1);
+  if (strchr (buf, '('))
+  {
+    // New syntax.
+    while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
+    {
+      switch (cmd)
+      {
+        case CS_TOKEN_SECTOR:
+          csScanStr (params, "%s", start_sector);
+          break;
+        case CS_TOKEN_POSITION:
+	  csScanStr (params, "%f,%f,%f", &pos.x, &pos.y, &pos.z);
+	  break;
+        case CS_TOKEN_UP:
+	  csScanStr (params, "%f,%f,%f", &up.x, &up.y, &up.z);
+	  break;
+        case CS_TOKEN_FORWARD:
+	  csScanStr (params, "%f,%f,%f", &forward.x, &forward.y, &forward.z);
+	  break;
+      }
+    }
+    if (cmd == CS_PARSERR_TOKENNOTFOUND)
+    {
+      TokenError ("a camera position");
+      return false;
+    }
+  }
+  else
+  {
+    csScanStr (params, "%s,%f,%f,%f", &start_sector,
+      &pos.x, &pos.y, &pos.z);
+  }
+
+  campos->Set (start_sector, pos, forward, up);
+  return true;
 }
 
 iStatLight* csLoader::ParseStatlight (char* name, char* buf)

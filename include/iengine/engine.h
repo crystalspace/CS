@@ -147,7 +147,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 6, 4);
+SCF_VERSION (iEngine, 0, 6, 5);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -174,6 +174,22 @@ struct iEngine : public iBase
    * report progress.
    */
   virtual bool Prepare (iProgressMeter* meter = NULL) = 0;
+
+  /**
+   * Prepare the textures. It will initialise all loaded textures
+   * for the texture manager. (Normally you shouldn't call this function
+   * directly, because it will be called by Prepare() for you.
+   * This function will also prepare all loaded materials after preparing
+   * the textures.
+   */
+  virtual void PrepareTextures () = 0;
+
+  /**
+   * Calls UpdateMove for all meshes to initialise bsp bounding boxes.
+   * Call this after creating a BSP tree. Prepare() will call
+   * this function automatically so you normally don't have to call it.
+   */
+  virtual void PrepareMeshes () = 0;
 
   /**
    * Calculate all lighting information. Normally you shouldn't call
@@ -385,7 +401,10 @@ struct iEngine : public iBase
 	const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos) = 0;
 
-  /// @@@ Temporary function until things are moved to a plugin.
+  /**
+   * @@@ This function is deprecated! Please don't use it!
+   * Only the engine and thing mesh objects should use this now.
+   */
   virtual iMeshObjectType* GetThingType () const = 0;
 
   /**

@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include <ctype.h>
+#include "csutil/util.h"
 
 /*****************************************************************************
     Copyright (C) 2001 by Christopher Nelson
@@ -271,10 +272,10 @@
    
  public:
    csRETableLeaf(unsigned char *s, bool invert=false):invert_match(invert) 
-   { set = (unsigned char *)strdup((char *)s);  };
+   { set = (unsigned char *)csStrNew((char *)s);  };
    
    virtual ~csRETableLeaf() 
-   { if (set) delete set; };
+   { delete[] set; };
    
  public:
    virtual unsigned char Type()

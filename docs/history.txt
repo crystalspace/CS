@@ -1,5 +1,25 @@
 The history order is reversed so that new features are at the top.
 
+5-Dec-2001
+	- Added a new HOWTO to explain how to attach game objects to Crystal
+	  Space objects.
+	- Added iEngine::PrepareTextures() and PrepareMeshes().
+	- Fixed a leak in the engine which wasn't destroying the default
+	  render priorities in the destructor (note that iEngine::DeleteAll()
+	  will delete all render priorities and then create the four
+	  default ones again).
+	- Extended 'START' keyword in map loader so it now has a new syntax:
+	    START (SECTOR ('mySector') POSITION (x,y,z)
+	    	UP (x,y,z) FORWARD (x,y,z))
+	  This new syntax means that you can now also specify up and forward
+	  vector in the map file. The old syntax (sector,x,y,z) is still
+	  supported. Note that walktest will not respect the up and forward
+	  vector because it has its own way to express view direction and I
+	  have not yet converted this.
+	- Also updated the map format documentation for this change.
+	- Fixed a bug in csCameraPosition. It was using strdup() instead
+	  of csStrNew().
+	- Fixed two other strdup bugs in csws and cslexan.
 4-Dec-2001
 	- Enabled aws in user.mak.
 	- Created a dummy thing object plugin. This plugin allows applications

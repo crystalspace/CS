@@ -21,6 +21,7 @@ code.
 * HOWTO Level Loading:: Loading a Level
 * HOWTO Pixmaps:: Loading Images for Pixmaps
 * HOWTO Render Priorities:: Render Priorities and Objects in Sectors
+* HOWTO User Objects:: Attaching User Objects to CS Objects
 * HOWTO CS Project:: Creating an External Crystal Space Application
 * HOWTO Creating External MSVC Application:: Creating an External @sc{msvc} Application
 @end menu
@@ -33,5 +34,6 @@ code.
 @importss{tutorial,howto,levload.txi}
 @importss{tutorial,howto,pixmap.txi}
 @importss{tutorial,howto,rendpri.txi}
+@importss{tutorial,howto,userobj.txi}
 @importss{tutorial,howto,project.txi}
 @importsss{tutorial,howto,msvcproj,msvcproj.txi}

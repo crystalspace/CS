@@ -480,14 +480,14 @@ public:
    * This function will also prepare all loaded materials after preparing
    * the textures.
    */
-  void PrepareTextures ();
+  virtual void PrepareTextures ();
 
   /**
    * Calls UpdateMove for all meshes to initialise bsp bounding boxes.
    * Call this after creating a BSP tree. csEngine::Prepare() will call
    * this function automatically so you normally don't have to call it.
    */
-  void PrepareMeshes ();
+  virtual void PrepareMeshes ();
 
   /**
    * Calculate all lighting information. Normally you shouldn't call

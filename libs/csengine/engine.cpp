@@ -750,6 +750,14 @@ iCamera* camera_hack = NULL;
 csEngine::~csEngine ()
 {
   DeleteAll ();
+  int i;
+  for (i = 0 ; i < render_priorities.Length () ; i++)
+  {
+    char* n = (char*)render_priorities[i];
+    delete[] n;
+  }
+  render_priorities.DeleteAll ();
+
   if (plugin_mgr) plugin_mgr->DecRef ();
   if (G3D) G3D->DecRef ();
   if (ImageLoader) ImageLoader->DecRef();
@@ -763,7 +771,7 @@ csEngine::~csEngine ()
   delete cbufcube;
   delete rad_debug;
   delete c_buffer;
-  
+
   // @@@ temp hack
   if (camera_hack)
     camera_hack->DecRef ();
@@ -806,7 +814,7 @@ bool csEngine::Initialize (iObjectRegistry* object_reg)
     q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
     q->DecRef ();
   }
-  
+
   csConfigAccess cfg (object_reg, "/config/engine.cfg");
   ReadConfig (cfg);
 
@@ -904,9 +912,9 @@ void csEngine::DeleteAll ()
   collections.DeleteAll ();
   int i;
   // @@ instead of simply calling DeleteAll() we do this loop, because:
-  // if a mesh is not held by anything outside the engine, it will get 
+  // if a mesh is not held by anything outside the engine, it will get
   // destructed (RefCounter hits 0 and destructor is called). Unfortunatly
-  // upon destruction the meshobject checks if it is still in a meshlist. 
+  // upon destruction the meshobject checks if it is still in a meshlist.
   // But this is even more unfortunately true, since the entry is removed
   // from the meshlist vector after the DecRef/Destruction happens.
   // With the loop below we simply make sure that the mesh is not destructed
@@ -934,9 +942,9 @@ void csEngine::DeleteAll ()
     delete first_dyn_lights;
     first_dyn_lights = dyn;
   }
-  delete materials; 
+  delete materials;
   materials = new csMaterialList ();
-  delete textures; 
+  delete textures;
   textures = new csTextureList ();
 
   iThingEnvironment* te = SCF_QUERY_INTERFACE (thing_type, iThingEnvironment);
@@ -967,7 +975,7 @@ void csEngine::DeleteAll ()
 
   // Clear all render priorities.
   ClearRenderPriorities ();
-  
+
   // remove objects
   QueryObject ()->ObjRemoveAll ();
 }
@@ -1460,7 +1468,7 @@ void csEngine::Draw (iCamera* c, iClipper2D* view)
   G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);	// We are at top-level.
   G3D->ResetNearPlane ();
   G3D->SetPerspectiveAspect (c->GetFOV ());
-  
+
   iSector* s = c->GetSector ();
   s->Draw (&rview);
 
@@ -1531,7 +1539,7 @@ void csEngine::AddHalo (csLight* Light)
   {
     // put a new light flare into the queue
     // the cast is safe because of the type check above
-    halos.Push (new csLightFlareHalo (Light, (csFlareHalo*)Light->GetHalo(), 
+    halos.Push (new csLightFlareHalo (Light, (csFlareHalo*)Light->GetHalo(),
       hs));
     return;
   }
@@ -1697,7 +1705,7 @@ class csLightArray : public iBase
 {
 public:
   SCF_DECLARE_IBASE;
-  
+
   LightAndDist* array;
   // Size is the physical size of the array. num_lights is the number of lights in it.
   int size, num_lights;
@@ -2138,10 +2146,10 @@ iMeshFactoryWrapper* csEngine::LoadMeshFactory (
   char* buf = **input;
   iBase* mof = plug->Parse (buf, this, fact);
   plug->DecRef ();
-  if (!mof) 
-  { 
-    GetMeshFactories ()->Remove (fact); 
-    return NULL; 
+  if (!mof)
+  {
+    GetMeshFactories ()->Remove (fact);
+    return NULL;
   }
   fact->SetMeshObjectFactory ((iMeshObjectFactory*)mof);
   mof->DecRef ();

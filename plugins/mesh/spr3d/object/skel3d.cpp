@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "spr3d.h"
 #include "qsqrt.h"
+#include "csutil/util.h"
 
 SCF_IMPLEMENT_IBASE (csSkelLimb)
   SCF_IMPLEMENTS_INTERFACE (iSkeletonLimb)
@@ -39,8 +40,7 @@ csSkelLimb::~csSkelLimb ()
     delete children;
     children = n;
   }
-  if (name)
-    free (name);
+  delete[] name;
 }
 
 void csSkelLimb::AddVertex (int v)
@@ -135,9 +135,8 @@ void csSkelLimb::ComputeBoundingBox (csPoly3D* source)
 
 void csSkelLimb::SetName (const char *newname)
 {
-  if (name)
-    free (name);
-  name = strdup (newname);
+  delete[] name;
+  name = csStrNew (newname);
 }
 
 iSkeletonConnection* csSkelLimb::CreateConnection ()
@@ -239,9 +238,8 @@ void csSkelLimbState::Transform (const csTransform& tr, csVector3* source,
 
 void csSkelLimbState::SetName (const char *newname)
 {
-  if (name)
-    free (name);
-  name = strdup (newname);
+  delete[] name;
+  name = csStrNew (newname);
 }
 
 void csSkelConnectionState::Transform (const csTransform& tr,

@@ -480,8 +480,19 @@ internal list first.  For usage of @samp{MAT_SET} see the description of
     @token{LIBRARY} @nonterm{library-name} @LP{} @nonterm{file-name} @RP{}}
 
 @subsubheading Starting Position
+@production{start-sector, @token{SECTOR} @LP{} @nonterm{sector-name} @RP{}}@*
+@production{start-position, @token{POSITION} @LP{} @nonterm{coordinate} @RP{}}@*
+@production{start-up, @token{UP} @LP{} @nonterm{vector-3d} @RP{}}@*
+@production{start-forward, @token{FORWARD} @LP{} @nonterm{vector-3d} @RP{}}@*
+@production{start-comp, @nonterm{start-sector}}@*
+    @prodnext{@nonterm{start-position}}@*
+    @prodnext{@nonterm{start-up}}@*
+    @prodnext{@nonterm{start-forward}}@*
+@production{start-newsyntax, [ @nonterm{start-comp} @dots{} ]}
+@production{start-oldsyntax, @nonterm{sector-name} @COMMA{}
+	@nonter{coordinate}
 @production{start, @token{START}
-    @LP{} @nonterm{sector-name} @COMMA{} @nonterm{coordinate} @RP{}}
+    @LP{} @nonterm{start-oldsyntax} | @nonterm{start-newsyntax} @RP{}}
 
 @subsubheading For Loader Plug-Ins
 @production{plugin-id, @nonterm{plugin-name} | @nonterm{plugin-shortname}}@*

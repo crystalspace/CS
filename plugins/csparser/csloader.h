@@ -44,6 +44,7 @@ struct iObjectRegistry;
 struct iPluginManager;
 struct iModelConverter;
 struct iCrossBuilder;
+struct iCameraPosition;
 
 struct iObject;
 struct iThingState;
@@ -145,6 +146,8 @@ private:
   iMaterialWrapper* ParseMaterial (char *name, char* buf, const char* prefix = NULL);
   /// Parse a collection definition and add the collection to the engine
   iCollection* ParseCollection (char* name, char* buf);
+  /// Parse a camera position.
+  bool ParseStart (char* buf, iCameraPosition* campos);
   /// Parse a static light definition and add the light to the engine
   iStatLight* ParseStatlight (char* name, char* buf);
   /// Parse a key definition and add the key to the given object

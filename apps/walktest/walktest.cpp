@@ -1617,13 +1617,15 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     room = Engine->GetSectors ()->FindByName (room_name);
     if (!room)
     {
-      Report (CS_REPORTER_SEVERITY_ERROR,  "Map does not contain a room called '%s'"
+      Report (CS_REPORTER_SEVERITY_ERROR,
+        "Map does not contain a room called '%s'"
         " which is used\nas a starting point!", room_name);
       return false;
     }
   }
 
-  // Initialize collision detection system (even if disabled so that we can enable it later).
+  // Initialize collision detection system (even if disabled so
+  // that we can enable it later).
   InitCollDet (Engine, NULL);
 
   // Create a wireframe object which will be used for debugging.
@@ -1632,8 +1634,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // Load a few sounds.
   if (mySound)
   {
-    iSoundWrapper *w = CS_GET_NAMED_CHILD_OBJECT_FAST (Engine->QueryObject (),
-						       iSoundWrapper, "boom.wav");
+    iSoundWrapper *w = CS_GET_NAMED_CHILD_OBJECT_FAST (
+    	Engine->QueryObject (), iSoundWrapper, "boom.wav");
     wMissile_boom = w ? w->GetSound () : NULL;
     SCF_DEC_REF (w);
     w = CS_GET_NAMED_CHILD_OBJECT_FAST (Engine->QueryObject (),
@@ -1642,7 +1644,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     SCF_DEC_REF (w);
    }
 
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------");
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+  	"--------------------------------------");
   if (myConsole)
   {
     myConsole->SetVisible (false);

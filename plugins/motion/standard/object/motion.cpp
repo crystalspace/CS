@@ -21,6 +21,7 @@
 #include "motion.h"
 #include "csgeom/transfrm.h"
 #include "csutil/hashmap.h"
+#include "csutil/util.h"
 
 //#define MOTION_DEBUG
 
@@ -550,7 +551,7 @@ csMotion::csMotion()
 
 csMotion::~csMotion()
 {
-  if (name) free (name);
+  delete[] name;
   if (transquat) free (transquat);
   if (transmat) free (transmat);
   if (translate) free (translate);
@@ -582,8 +583,8 @@ csMotion::~csMotion()
 
 void csMotion::SetName (const char* newname)
 {
-  if (name) free (name);
-  name = strdup (newname);
+  delete[] name;
+  name = csStrNew (newname);
   hash = csHashCompute (name);
 }
 
