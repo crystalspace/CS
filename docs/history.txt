@@ -22,6 +22,8 @@ chronological order.
 	  a const char* input buffer as input and will split that buffer
 	  in lines. You can then read the lines one by one. It will correctly
 	  read lines for both CR and CR/LF format.
+	- Marten made chunkedlod display something again. It does not yet work
+	  with mirrors. Maybe someone who understands the plugin can fix that.
 24-Mar-2004
 	- Jorrit extended the standard output console so that it now also
 	  supports setting of the font through the config file. Added

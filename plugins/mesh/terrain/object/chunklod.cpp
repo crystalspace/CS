@@ -975,6 +975,11 @@ csRenderMesh** csChunkLodTerrainObject::GetRenderMeshes (
 	int &n, iRenderView* rview, 
 	iMovable* movable)
 {
+  if (!DrawTest(rview, movable))
+  {
+    n = 0;
+    return 0;
+  }
   int i;
   n = meshes.Length();
   for (i = 0; i < palette_meshes.Length(); i ++)
