@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+7-Mar-2001
+	- Eric Sunshine added `autoexec.cfg' to CFG.WALKTEST in walktest.mak.
+	  This ensures that it will get installed with `make install'.
 20-Feb-2001
 	- Eric Sunshine resolved several compilation problems on MacOS/X which
 	  were reported in a series of build-logs sent by Travis McLane

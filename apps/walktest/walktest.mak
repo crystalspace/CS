@@ -39,7 +39,7 @@ OBJ.WALKTEST = $(addprefix $(OUT),$(notdir $(SRC.WALKTEST:.cpp=$O)))
 DEP.WALKTEST = \
   CSPARSER CSENGINE CSTERR CSGEOM CSGFXLDR CSSYS CSUTIL CSOBJECT CSFX
 LIB.WALKTEST = $(foreach d,$(DEP.WALKTEST),$($d.LIB))
-CFG.WALKTEST = data/config/cryst.cfg
+CFG.WALKTEST = data/config/cryst.cfg data/config/autoexec.cfg
 
 TO_INSTALL.EXE    += $(WALKTEST.EXE)
 TO_INSTALL.CONFIG += $(CFG.WALKTEST)
