@@ -8,6 +8,20 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine repaird the project enough that it builds on NextStep
 	  once again.  Most of the programs even run, though some suffer from
 	  link problems when loading plug-in modules.
+	- Eric Sunshine made NeXTFrameBuffer15 more robust and tolerant of
+	  bugs elsewhere in Crystal Space.  The 15-to-16 bit lookup table
+	  which is used to convert CS format 15-bit RGB to NeXT format 16-bit
+	  RGBA is now allocated twice as large as necessary since CS does not
+	  always respect the request for 15-bit colors.  By allocating the
+	  table twice as large as necessary for 15 bits, errant 16-bit values
+	  will no longer access memory beyond the end of table (potentially
+	  causing a segmentation fault).  This problem has arisen when CS's
+	  software renderer incorrectly paints polygons from garbage memory
+	  rather than using properly prepared 15-bit textures.  (This is a bug
+	  in the software renderer.)  It is also possible for poorly written
+	  programs to use hard-coded 16-bit color values in a 15-bit
+	  environment.  Thus the NeXT 2D driver now tolerate such buggy
+	  behavior.
 30-Apr-2000
 	- More work on the PVS.
 	- Added csBox2 and csBox3::GetCenter().
