@@ -92,14 +92,27 @@ aws: $(OUTDIRS) $(AWS)
 
 # Auto-generated files (skinlex.cpp and skinpars.cpp) are compiled from within
 # $(OUTDERIVED), so we need to use -I to let them know where the AWS headers
-# are.  Also silence compiler warnings via -Wno-unused (if available) in
-# auto-generated code, over which we have no control.
+# are.  Also, we ensure that skinlex.cpp searches the derived directory first
+# because it needs to locate the generated skinpars.hpp rather than the
+# factory-supplied one in the AWS source directory.  (In reality, it will
+# search the derived directory automatically because #include "skinpars.hpp" is
+# used, and the derived directory is the "current directory" in this case, but
+# we do this for that extra measure of insurance.)  Finally, silence compiler
+# warnings via -Wno-unused (if available) in auto-generated code, over which we
+# have no control.
 $(OUT.AWS)/skinpars$O: $(AWS.DERIVED.DIR)/skinpars.cpp
 	$(DO.COMPILE.CPP) $(CXXFLAGS.WARNING.NO_UNUSED) \
+	$(CFLAGS.I)$(AWS.DERIVED.DIR) \
 	$(CFLAGS.I)$(SRCDIR)/$(DIR.AWS)
 $(OUT.AWS)/skinlex$O: $(AWS.DERIVED.DIR)/skinlex.cpp
 	$(DO.COMPILE.CPP) $(CXXFLAGS.WARNING.NO_UNUSED) \
+	$(CFLAGS.I)$(AWS.DERIVED.DIR) \
 	$(CFLAGS.I)$(SRCDIR)/$(DIR.AWS)
+
+# Dependency: skinlex.cpp includes skinpars.hpp, so we must ensure that
+# skinpars.hpp is generated before skinlex.cpp is compiled since we do not want
+# skinlex.cpp to find the factory-supplied skinpars.hpp in CS/plugins/aws.
+$(AWS.DERIVED.DIR)/skinlex.cpp: $(AWS.DERIVED.DIR)/skinpars.hpp
 
 $(OUT.AWS)/%$O: $(SRCDIR)/$(DIR.AWS)/%.cpp
 	$(DO.COMPILE.CPP)
@@ -139,7 +152,7 @@ $(AWS.DERIVED.DIR)/skinpars.cpp: $(SRCDIR)/$(DIR.AWS)/skinpars.yy
 	$(CMD.BISON) --no-lines -d -p aws -o $@ $(<)
 
 $(AWS.DERIVED.DIR)/skinpars.hpp: $(AWS.DERIVED.DIR)/skinpars.cpp
-	@if [ -f "$(SRCDIR)/$(DIR.AWS)/skinpars.cpp.hpp" ]; then \
+	if [ -f "$(SRCDIR)/$(DIR.AWS)/skinpars.cpp.hpp" ]; then \
 	$(MV) $(AWS.DERIVED.DIR)/skinpars.cpp.hpp \
 	$(AWS.DERIVED.DIR)/skinpars.hpp; \
 	fi

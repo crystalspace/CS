@@ -15,17 +15,32 @@ Plugin aws :
 	$(FILES)
 ;
 
-if "$(COMPILER.C++FLAGS.WARNING.NO_UNUSED)"
+if $(CMD.BISON) && $(CMD.FLEX)
 {
-# Silence the compiler (we can't avoid the warnings in auto-generated code).
-C++FLAGS on [ DoObjectGrist skinlex$(SUFOBJ) skinpars$(SUFOBJ) ] +=
-  $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) ;
+  # skinlex.cpp includes the generated skinpars.hpp, so we must ensure that
+  # skinpars.hpp is generated before skinlex.cpp, since we do not want
+  # skinlex.cpp accidentally including the factory-supplied skinpars.hpp from
+  # the source directory.
+  local lex = [ DoObjectGrist skinlex.cpp ] ;
+  local parse = [ DoObjectGrist skinpars.cpp ] ;
+  Depends $(lex) : $(parse) ;
 }
 
-# Work around bizarre bug on older CompileFarm MacOS/X installation and
-# CompileFarm Linux 2.2 (Alpha) installation where preprocessor fails to search
-# the CS/plugins/aws directory for headers #included by skinpars.cpp and
-# skinlex.cpp.
+if "$(COMPILER.C++FLAGS.WARNING.NO_UNUSED)"
+{
+  # We can't avoid unused variables in auto-generated code, so disable warning.
+  C++FLAGS on [ DoObjectGrist skinlex$(SUFOBJ) skinpars$(SUFOBJ) ] +=
+    $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) ;
+}
+
+# If Bison and Flex are installed, then skinpars.cpp and skinlex.cpp reside in
+# $(LOCATE_TARGET) rather than CS/plugins/aws, so we need to tell those files
+# that some headers they require reside in CS/plugins/aws.  Also, we ensure
+# that skinlex.cpp searches $(LOCATE_TARGET) first because it needs to locate
+# the generated skinpars.hpp rather than the factory-supplied one in
+# CS/plugins/aws.  (In reality, LOCATE_TARGET should be searched automatically
+# since #include "skinpars.hpp" is used, and LOCATE_TARGET is the "current
+# directory" in this case, but we do this for that extra measure of insurance.)
 # @@@ FIXME: The configure script should check if compiler recognizes -I rather
 # than hard-coding it here.
 C++FLAGS on [ DoObjectGrist skinpars$(SUFOBJ) skinlex$(SUFOBJ) ] +=
