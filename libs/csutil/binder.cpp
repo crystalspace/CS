@@ -110,6 +110,8 @@ csInputBinder::csInputBinder (iBase *parent, int size)
 csInputBinder::~csInputBinder ()
 {
   UnbindAll ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiEventHandler);
+  SCF_DESTRUCT_IBASE ();
 }
 
 inline bool csInputBinder::HandleEvent (iEvent &ev)
@@ -240,4 +242,3 @@ bool csInputBinder::UnbindAll ()
   Hash.DeleteAll ();
   return true;
 }
-

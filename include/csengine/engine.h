@@ -777,7 +777,7 @@ public:
 
   virtual csPtr<iMeshWrapper> CreateSectorWallsMesh (iSector* sector,
       const char* name);
-  virtual csPtr<iMeshWrapper> CreateThingMesh (iSector* sector, const char* name);
+  virtual csPtr<iMeshWrapper> CreateThingMesh (iSector*, const char* name);
 
   /**
    * Add a dynamic light to the engine.
@@ -940,6 +940,7 @@ public:
       SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
+    virtual ~EventHandler() { SCF_DESTRUCT_IBASE(); }
     virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
   } * scfiEventHandler;
 

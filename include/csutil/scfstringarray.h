@@ -37,7 +37,7 @@ public:
 
   /// Destructor - nothing to do.
   virtual ~scfStringArray ()
-  { }
+  { SCF_DESTRUCT_IBASE(); }
 
   /// Query array length.
   virtual int Length () const

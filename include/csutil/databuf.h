@@ -42,13 +42,17 @@ public:
 
   /// Construct an preallocated data buffer (filled with garbage initially)
   csDataBuffer (size_t iSize)
-  { SCF_CONSTRUCT_IBASE (0); 
-    Data = new char [Size = iSize]; 
-    do_delete = true; }
+  {
+    SCF_CONSTRUCT_IBASE (0); 
+    Size = iSize;
+    Data = new char [Size]; 
+    do_delete = true;
+  }
 
   /// Construct an data buffer object given a existing (new char []) pointer
   csDataBuffer (char *iData, size_t iSize, bool should_delete = true)
-  { SCF_CONSTRUCT_IBASE (0); 
+  {
+    SCF_CONSTRUCT_IBASE (0); 
     Data = iData; 
     Size = iSize; 
     do_delete = should_delete;
@@ -58,17 +62,25 @@ public:
   csDataBuffer (iDataBuffer *source)
   {
     SCF_CONSTRUCT_IBASE (0); 
-    Data = new char [(Size = source->GetSize()) + 1];
+    Size = source->GetSize();
+    Data = new char [Size + 1];
     memcpy (Data, source->GetData(), Size);
     Data[Size] = 0;
     do_delete = true;
   }
+
   /// Destroy (free) the buffer
-  virtual ~csDataBuffer ();
+  virtual ~csDataBuffer ()
+  {
+    if (do_delete)
+      delete [] Data;
+    SCF_DESTRUCT_IBASE();
+  }
 
   /// Query the buffer size
   virtual size_t GetSize () const
   { return Size; }
+
   /// Get the buffer as an abstract pointer
   virtual char* GetData () const
   { return Data; }

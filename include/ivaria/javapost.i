@@ -148,11 +148,12 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 		SCF_DECLARE_IBASE;
 		_csJEventHandler () : my_jobject(0)
 		{
-			SCF_CONSTRUCT_IBASE(NULL);
+			SCF_CONSTRUCT_IBASE(0);
 			IncRef();
 		}
 		virtual ~_csJEventHandler ()
         {
+	    SCF_DESTRUCT_IBASE();
             DecRef();
             JNIEnv * env = 0;
             _the_jvm->AttachCurrentThread((void **)&env, NULL);

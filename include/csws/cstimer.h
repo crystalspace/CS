@@ -75,6 +75,7 @@ class csTimer : public csComponent
   {
     SCF_DECLARE_IBASE;
     csTimerEvent () { SCF_CONSTRUCT_IBASE(0); }
+    virtual ~csTimerEvent() { SCF_DESTRUCT_IBASE(); }
   } TimerEvent;
   
 public:

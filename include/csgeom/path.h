@@ -71,7 +71,7 @@ public:
   }
 
   /// Destroy the path.
-  virtual ~csPath () { }
+  virtual ~csPath () { SCF_DESTRUCT_IBASE(); }
 
   /// Get the number of vector points in this spline
   int Length ()

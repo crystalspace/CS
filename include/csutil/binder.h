@@ -114,7 +114,8 @@ public:
   csInputBinderPosition (iInputBinderPosition *pp) : p (pp->Get ())
   { SCF_CONSTRUCT_IBASE (0); }
   /// Destructor.
-  virtual ~csInputBinderPosition () {}
+  virtual ~csInputBinderPosition ()
+  { SCF_DESTRUCT_IBASE(); }
 
   /// Set the position; called by csInputBinder.
   virtual void Set (int pp) { p = pp; }
@@ -145,7 +146,8 @@ public:
   csInputBinderBoolean (iInputBinderBoolean *ss) : s (ss->Get ())
   { SCF_CONSTRUCT_IBASE (0); }
   /// Destructor.
-  virtual ~csInputBinderBoolean () {}
+  virtual ~csInputBinderBoolean ()
+  { SCF_DESTRUCT_IBASE(); }
 
   /// Set the state; called by csInputBinder.
   virtual void Set (bool ss) { s = ss; }

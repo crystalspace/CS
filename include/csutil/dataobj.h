@@ -38,7 +38,16 @@ protected:
 public:
   /// Initialize this object with data pointer initialized to 'd'
   csDataObject (void *d) : csObject (), data (d)
-  { SCF_CONSTRUCT_IBASE (0); SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDataObject); }
+  {
+    SCF_CONSTRUCT_IBASE (0);
+    SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDataObject);
+  }
+  /// Destroy object.
+  ~csDataObject ()
+  {
+    SCF_DESTRUCT_EMBEDDED_IBASE (scfiDataObject);
+    SCF_DESTRUCT_IBASE ();
+  }
   /// Get the data associated with this object
   void* GetData () const
   { return data; }

@@ -57,6 +57,11 @@ public:
     type = iSharedVariable::SV_UNKNOWN;
   }
 
+  virtual ~csSharedVariable()
+  {
+    SCF_DESTRUCT_EMBEDDED_IBASE (scfiSharedVariable);
+  }
+
   void Set (float val)
   {
     value = val;

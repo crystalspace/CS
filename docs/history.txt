@@ -13,10 +13,13 @@ chronological order.
 	  cut objects as opposed to balanced tree.
 	- res changed the fire proctex to set an alpha of 255 on the output
 	  image, instead of 0.
-	- res removed the superflouos 'texture' parameter from 
+	- res removed the superfluous 'texture' parameter from 
 	  csGLStateCache::GetTexture().
-	- res fixed the GL renderer to properly deal with keycolored 
-	  procedural textures.
+	- res fixed the GL renderer to properly deal with keycolored procedural
+	  textures.
+	- Eric Sunshine added SCF_DESTRUCT_IBASE() invocations for each of the
+	  corresponding SCF_CONSTRUCT_IBASE() invocations in inline methods in
+	  CS/include.
 4-Nov-2003
 	- Jorrit fixed a bug in Dynavis history culling. In some cases objects
 	  could remain visible for longer then expected because the history

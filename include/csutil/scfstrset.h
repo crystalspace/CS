@@ -22,7 +22,12 @@
 #include "iutil/strset.h"
 #include "csutil/strset.h"
 
-/// This is a thin SCF wrapper around csStringSet
+/**
+ * The string set is a list of strings, all with different content. Each
+ * string has an ID number. The most important operation is to request a
+ * string, which means to return the ID for the string, adding it to the
+ * list if it is not already there.
+ */
 class csScfStringSet : public iStringSet
 {
   csStringSet set;
@@ -39,14 +44,26 @@ public:
   { SCF_CONSTRUCT_IBASE (0); }
 
   /// Destructor.
-  virtual ~csScfStringSet() {}
+  virtual ~csScfStringSet()
+  { SCF_DESTRUCT_IBASE(); }
 
+  /**
+   * Request the ID for the given string. Create a new ID
+   * if the string was never requested before.
+   */
   virtual csStringID Request (const char *s);
 
+  /**
+   * Request the string for a given ID. Return 0 if the string
+   * has not been requested (yet).
+   */
   virtual const char* Request (csStringID id);
 
+  /**
+   * Delete all stored strings. When new strings are registered again, new
+   * ID values will be used, not the old ones reused.
+   */
   virtual void Clear ();
 };
 
 #endif // __CS_SCFSTRSET_H__
-

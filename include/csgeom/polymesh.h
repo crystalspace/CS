@@ -84,6 +84,7 @@ public:
     if (delete_po) delete[] po;
     if (delete_po_indices) delete[] po_indices;
     delete[] triangles;
+    SCF_DESTRUCT_IBASE();
   }
 
   /**
@@ -259,6 +260,7 @@ public:
   virtual ~csPolygonMeshBox ()
   {
     delete[] triangles;
+    SCF_DESTRUCT_IBASE();
   }
 
   /**

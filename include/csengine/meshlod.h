@@ -44,6 +44,8 @@ public:
     csLODListener::variable = variable;
   }
 
+  virtual ~csLODListener() { SCF_DESTRUCT_IBASE(); }
+
   virtual void VariableChanged (iSharedVariable* var)
   {
     *variable = var->Get ();

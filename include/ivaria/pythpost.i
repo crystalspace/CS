@@ -69,7 +69,11 @@ struct _csPyEventHandler : public iEventHandler
 			SCF_CONSTRUCT_IBASE(0);
 			IncRef();
 		}
-		virtual ~_csPyEventHandler () { DecRef(); }
+		virtual ~_csPyEventHandler ()
+		{
+			SCF_DESTRUCT_IBASE();
+			DecRef();
+		}
 		virtual bool HandleEvent (iEvent & event)
 		{
 			PyObject * event_obj = SWIG_NewPointerObj(

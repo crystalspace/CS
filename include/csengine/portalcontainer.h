@@ -47,8 +47,8 @@ public:
   }
   virtual ~csPortalContainerPolyMeshHelper ()
   {
-    SCF_DESTRUCT_IBASE ();
     Cleanup ();
+    SCF_DESTRUCT_IBASE ();
   }
 
   void Setup ();

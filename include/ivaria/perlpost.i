@@ -746,6 +746,7 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
       }
       virtual ~csWrap_##TYPE ()
       {
+	SCF_DESTRUCT_IBASE();
         SvREFCNT_dec (sv);
       }
 

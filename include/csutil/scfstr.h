@@ -48,7 +48,8 @@ public:
   { SCF_CONSTRUCT_IBASE (0); }
 
   /// Destroy a scfString object
-  virtual ~scfString () {}
+  virtual ~scfString ()
+  { SCF_DESTRUCT_IBASE(); }
 
   /// Get the pointer to the internal csString.
   const csString& GetCsString () const { return s; }
