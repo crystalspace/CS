@@ -120,7 +120,7 @@ public:
 	///
 	void normalize( void )               { divide(size()); }
 	/// Returns the angle between 2 normalized vectors.
-	float angle( const ddgVector2 *u )            { return ddgAngle::radtodeg(acosf(dot(u))); }
+	float angle( const ddgVector2 *u ){ return ddgAngle::radtodeg(acosf(dot(u))); }
 
 
 	/// Calculate the dot product of this and u.

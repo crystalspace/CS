@@ -18,17 +18,37 @@
 */
 #ifndef _ddgUtil_Class_
 #define _ddgUtil_Class_
+
 #ifdef DDG
 #include "ddg.h"
 #else
+//begin else for ifdef DDG
 #include "csterr/ddg.h"
 #include "types.h"
 #endif
+//
 #ifndef M_PI
 #define M_PI      3.1415926535897932384626433832795028841971693993751
 #endif
-#ifdef WIN32
+//
 #define MAXFLOAT  99999999
+//
+#if defined(COMP_GCC)
+//COMP_GCC/OS_WIN32 defines
+#ifdef DDG
+#	include <strstream.h> 
+#endif
+//
+#include <stdlib.h>
+#define sqrtf	sqrt
+#define cosf	cos
+#define sinf	sin
+#define atan2f	atan2
+#define fabsf	fabs
+#define acosf	acos
+#define logf	log
+#define powf	pow
+//  End of COMP_GCC Defines
 #else
 // Linux defines
 #ifdef DDG

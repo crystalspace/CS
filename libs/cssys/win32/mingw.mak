@@ -8,12 +8,14 @@ DESCRIPTION.mingw = Win32 with Mingw GCC
 # video/canvas/ddraw6 video/canvas/ddraw video/renderer/direct3d5
 # video/renderer/direct3d6 video/renderer/opengl
 #
-PLUGINS+= video/canvas/ddraw video/renderer/software
+PLUGINS+= video/canvas/ddraw video/renderer/software \
+	font/renderer/csfont
+# font/renderer/csfont font/renderer/freefont
 # sound/renderer/software video/canvas/ddraw video/renderer/direct3d5 \
 # video/renderer/direct3d6 video/renderer/opengl
 #
 #  Uncomment the following to get a startup console window
-#CONSOLE_FLAGS = -DWIN32_USECONSOLE
+CONSOLE_FLAGS = -DWIN32_USECONSOLE
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
@@ -73,7 +75,7 @@ CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
 
 # General flags for the compiler which are used in any case.
 # Default is Ix386:
-CFLAGS.GENERAL+=-fomit-frame-pointer -fvtable-thunks \
+CFLAGS.GENERAL+= -fomit-frame-pointer -fvtable-thunks \
 		-DWIN32_VOLATILE -Wall $(CFLAGS.SYSTEM)
 
 # If using Pentium II

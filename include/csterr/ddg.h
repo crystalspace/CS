@@ -27,16 +27,21 @@
 #define ddgVector3	csVector3
 #endif
 
-#ifdef WIN32
+#ifdef OS_WIN32
 // Windows defines
+#if defined (COMP_VC) || defined (COMP_BC)
+// incorrect GCC/G++ pragmas
 #pragma warning (disable:4244)	// Disable bogus conversion warnings. 
 #pragma warning (disable:4305)  // VC++ 5.0 version of above warning. 
 #include "strstrea.h"
 #include "stdlib.h"			// For exit()
+#endif
+//
 #ifdef DDG
 #define WEXP	__declspec(dllexport)
 #define WFEXP	__cdecl
 #endif
+//
 #else
 // Linux defines
 #ifdef DDG
@@ -59,7 +64,7 @@
 #define ddgSuccess false
 #define ddgFailure true
 #endif
-#ifndef WIN32
+#ifndef OS_WIN32
 #ifndef OPTIM
 #define _DEBUG
 #endif

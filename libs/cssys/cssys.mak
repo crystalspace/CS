@@ -50,8 +50,17 @@ ifeq ($(MAKE_DLL),yes)
   CSSYS.LIB = $(OUT)$(LIB_PREFIX)cssys_D$(LIB_SUFFIX)
   SRC.CSSYS += $(SRC.SYS_CSSYS_DLL)
 else
-  CSSYS.LIB = $(OUT)$(LIB_PREFIX)cssys$(LIB_SUFFIX)
-  SRC.CSSYS += $(SRC.SYS_CSSYS_EXE)
+# not a dll library
+ ifneq ($(OS),WIN32)
+   CSSYS.LIB = $(OUT)$(LIB_PREFIX)cssys$(LIB_SUFFIX)
+ else
+    CSSYS.LIB = $(OUT)$(LIB_PREFIX)cssys$(LIB)
+    DEP.EXE+= $(CSSYS.LIB)
+#    LIBS.DXINPUT = $(LFLAGS.l)dinput$
+#    LIBS.DXGUID = $(LFLAGS.l)dxguid$
+    LIBS.EXE+= $(LIBS.DXINPUT) $(LIBS.DXGUID)
+ endif
+ SRC.CSSYS += $(SRC.SYS_CSSYS_EXE)
 endif
 OBJ.CSSYS = $(addprefix $(OUT),$(notdir $(subst .s,$O,$(subst .c,$O,$(SRC.CSSYS:.cpp=$O)))))
 

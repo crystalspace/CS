@@ -136,7 +136,7 @@
     extern "C" dirent *readdir (DIR *dirp);
     extern "C" int closedir (DIR *dirp);
 
-  #endif // end if !(defined(COMP_BC)...(COMP_WCC))
+#	endif // end if !(defined(COMP_BC)...(COMP_WCC))
 # endif
 #endif
 
