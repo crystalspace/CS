@@ -75,8 +75,12 @@ class csGenmeshMeshObject : public iMeshObject
 private:
 #ifdef CS_USE_NEW_RENDERER
   csRenderMesh mesh;
-  csRef<iRenderBuffer> shadow_index_buffer;
+  csRefArray<iRenderBuffer> shadow_index_buffers;
   csStringID shadow_index_name;
+  int last_triangle_count;
+  int current_light_index;
+  csGrowingArray<iLight*> current_lights;
+  csGrowingArray<int> index_ranges;
   csRef<iRender3D> r3d;
 #endif
   csGenmeshMeshObjectFactory* factory;

@@ -133,8 +133,10 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
 
 #ifdef CS_USE_NEW_RENDERER
   r3d = CS_QUERY_REGISTRY (factory->object_reg, iRender3D);
-  shadow_index_buffer = NULL;
+  // shadow_index_buffers = NULL;
   shadow_index_name = r3d->GetStringContainer ()->Request ("indices");
+  last_triangle_count = 0;
+  current_light_index = -1;
 #endif
 }
 
@@ -670,6 +672,7 @@ void csGenmeshMeshObject::UpdateLighting2 (iMovable* movable)
 void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
     iMovable* movable)
 {
+#ifndef CS_USE_NEW_RENDERER
   SetupObject ();
   CheckLitColors ();
 
@@ -713,6 +716,55 @@ void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
   // Clamp all vertex colors to 2.
   for (i = 0 ; i < factory->GetVertexCount () ; i++)
     colors[i].Clamp (2., 2., 2.);
+#else
+  csRef<iRender3D> r3d = CS_QUERY_REGISTRY (factory->object_reg, iRender3D);
+
+  shadow_index_buffers.SetLength(num_lights);
+  current_lights.SetLength(num_lights);
+  index_ranges.SetLength(num_lights);
+
+  if (factory->GetTriangleCount() != last_triangle_count) {
+    last_triangle_count = factory->GetTriangleCount();
+	for (int n = 0; n < num_lights; n ++) {
+      shadow_index_buffers[n] = r3d->GetBufferManager ()->CreateBuffer (
+        sizeof (unsigned int)*last_triangle_count*12, CS_BUF_INDEX, 
+		CS_BUFCOMP_UNSIGNED_INT, 1);
+    }
+  }
+
+  factory->GetBuffer(r3d->GetStringContainer ()->Request ("indices"));
+  int *ibuf = factory->GetEdgeIndices();
+  CS_ASSERT(ibuf);
+
+  for (int n = 0; n < num_lights; n ++) {
+    iLight *light = lights[n];
+	current_lights[n] = light;
+
+    unsigned int *buf = (unsigned int *)shadow_index_buffers[n]->Lock(CS_BUF_LOCK_NORMAL);
+
+    csVector3 lightpos = light->GetCenter() * movable->GetFullTransform();
+    int edge_start = factory->GetTriangleCount()*3;
+    index_ranges[n] = edge_start;
+
+    memcpy (buf, ibuf, edge_start*sizeof(int));
+
+    for (int i = 0; i < edge_start; i += 2)
+    {
+      csVector3 lightdir = lightpos - factory->GetEdgeMidpoint()[i];
+      if (((lightdir * factory->GetEdgeNormals()[i]) * 
+           (lightdir * factory->GetEdgeNormals()[i+1])) < 0) 
+      {
+        buf[index_ranges[n] ++] = ibuf[edge_start + i*3 + 0];
+        buf[index_ranges[n] ++] = ibuf[edge_start + i*3 + 1];
+        buf[index_ranges[n] ++] = ibuf[edge_start + i*3 + 2];
+        buf[index_ranges[n] ++] = ibuf[edge_start + i*3 + 3];
+        buf[index_ranges[n] ++] = ibuf[edge_start + i*3 + 4];
+        buf[index_ranges[n] ++] = ibuf[edge_start + i*3 + 5];
+      }
+    }
+    shadow_index_buffers[n]->Release ();
+  }
+#endif
 }
 
 bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* movable,
@@ -783,7 +835,7 @@ bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* movable,
 iRenderBuffer *csGenmeshMeshObject::GetBuffer (csStringID name)
 {
   if (name == shadow_index_name) {
-    return shadow_index_buffer;
+    return shadow_index_buffers[current_light_index];
   }
   return factory->GetBuffer (name);
 }
@@ -813,6 +865,14 @@ bool csGenmeshMeshObject::DrawZ (iRenderView* rview, iMovable* /*movable*/,
 bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
 	csZBufMode mode, iLight* light)
 {
+  current_light_index = -1;
+  for (int i = 0; i < current_lights.Length(); i ++) {
+    if (current_lights[i] == light) {
+	  current_light_index = i;
+	  break;
+	}
+  }
+  if (current_light_index < 0) { return false; }
 
   iCamera* camera = rview->GetCamera ();
   // First create the transformation from object to camera space directly:
@@ -844,42 +904,14 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
   mesh.SetStreamSource (&scfiStreamSource);
   mesh.SetType (csRenderMesh::MESHTYPE_TRIANGLES);
 
-  int *ibuf = factory->GetEdgeIndices();
-  if (!shadow_index_buffer)
-    shadow_index_buffer = r3d->GetBufferManager ()->CreateBuffer (
-      sizeof (unsigned int)*factory->GetTriangleCount()*12, CS_BUF_INDEX,
-      CS_BUFCOMP_UNSIGNED_INT, 1);
-
-
-  unsigned int *buf = (unsigned int *)shadow_index_buffer->Lock(CS_BUF_LOCK_NORMAL);
-  csVector3 lightpos = light->GetCenter() * movable->GetFullTransform();
-  int i;
   int edge_start = factory->GetTriangleCount()*3;
-  int index_range = edge_start;
-
-  memcpy (buf, ibuf, edge_start*sizeof(int));
-  
-  for (i = 0; i < edge_start; i += 2)
-  {
-    csVector3 lightdir = lightpos - factory->GetEdgeMidpoint()[i];
-    if (((lightdir * factory->GetEdgeNormals()[i]) * 
-         (lightdir * factory->GetEdgeNormals()[i+1])) < 0) 
-    {
-      buf[index_range ++] = ibuf[edge_start + i*3 + 0];
-      buf[index_range ++] = ibuf[edge_start + i*3 + 1];
-      buf[index_range ++] = ibuf[edge_start + i*3 + 2];
-      buf[index_range ++] = ibuf[edge_start + i*3 + 3];
-      buf[index_range ++] = ibuf[edge_start + i*3 + 4];
-      buf[index_range ++] = ibuf[edge_start + i*3 + 5];
-    }
-  }
-
-  shadow_index_buffer->Release ();
 
   if (shadow_caps) 
-    mesh.SetIndexRange (0, index_range);
+    mesh.SetIndexRange (0, index_ranges[current_light_index]);
   else 
-    mesh.SetIndexRange (edge_start, index_range);
+    mesh.SetIndexRange (edge_start, index_ranges[current_light_index]);
+
+printf ("index_range %d\n", index_ranges[current_light_index]);
 
   r3d->SetObjectToCamera (&tr_o2c);
   if (shadow_caps)
@@ -1464,6 +1496,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
           edge_indices[i * 3 + 0] = TriIndex ++;
           edge_indices[i * 3 + 1] = TriIndex ++;
           edge_indices[i * 3 + 2] = TriIndex ++;
+
           bool found_a = false, found_b = false, found_c = false;
           for (int j = EdgeStack.Length()-1; j >= 0; j --) {
             Edge *e = (Edge *)EdgeStack[j];
@@ -1792,6 +1825,7 @@ void csGenmeshMeshObjectFactory::CalculateNormals ()
   int num_triangles = top_mesh.num_triangles;
 #else
   int num_triangles = num_mesh_triangles;
+  mesh_normals_dirty_flag = true;
 #endif
   csTriangle* tris;
   csVector3* new_verts;
