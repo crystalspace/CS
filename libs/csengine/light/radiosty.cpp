@@ -1062,7 +1062,7 @@ csRadElement* csRadiosity :: FetchNext()
     CsPrintf(MSG_INITIALIZATION, "\n");
     CsPrintf(MSG_INITIALIZATION, "Finished radiosity (%s).\n", reason);
     
-    list->InsertElement(element); // to prevent memory leak.
+    if(element) list->InsertElement(element); // to prevent memory leak.
     
     return NULL;
   }
@@ -1292,7 +1292,7 @@ bool csRadiosity :: PrepareShootDest(csRadElement *dest, csFrustumView *lview)
 void csRadiosity :: ShootRadiosityToElement(csRadElement* dest)
 {
   // shoot from each lumel, also a radiosity patch, to each lumel on other.
-#if 0
+#if 1
   csRadPoly* rp_src = (csRadPoly*)shoot_src;
   csRadPoly* rp_dest = (csRadPoly*)dest;
   CsPrintf(MSG_STDOUT, "Shooting from RadPoly %x (%s in %s sz %d) to %x (%s in %s sz %d).\n",
@@ -1461,7 +1461,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
     //CsPrintf(MSG_STDOUT, "totalfactor was %g\n", totalfactor);
     totalfactor = -totalfactor;
   }
-#if 0
+#if 1
   //if(totalfactor > 10.0f)
   //if(totalfactor > 0.001f)
     CsPrintf(MSG_STDOUT, "totalfactor %g = "
