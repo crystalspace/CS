@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+17-Jun-2001
+	- Fixed a bug in 'facedown'/'faceup' commands (walktest). Reported
+	  by Thiago Ramon.
 15-Jun-2001
 	- Added the ability to the parser to load proc textures (fire,
 	  water, dots, and plasma). Instead of saying 'TEXTURE' in the

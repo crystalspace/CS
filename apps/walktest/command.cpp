@@ -430,11 +430,11 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
   else if (!strcasecmp (cmd, "facedown"))
    camera->SetO2T ( csMatrix3 (  1,  0,  0,
                                0,  0,  1,
-                               1, -1,  0 ) );
+                               0, -1,  0 ) );
   else if (!strcasecmp (cmd, "faceup"))
    camera->SetO2T ( csMatrix3 (  1,  0,  0,
                                0,  0, -1,
-                               1,  1,  0 ) );
+                               0,  1,  0 ) );
   else
   {
     CsPrintf (MSG_CONSOLE, "Unknown command: `%s'\n", cmd);
