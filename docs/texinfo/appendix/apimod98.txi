@@ -1546,3 +1546,11 @@ following related interfaces.
 @item
 @code{iSkeletonBone}
 @end itemize
+
+@subheading Skyboxes
+@cindex @code{CS_ENTITY_CAMERA}
+
+Meshes that use the @code{CS_ENTITY_CAMERA} flag no longer have to be placed
+in a render priority that has the @samp{camera} flag set. This render
+priority flag is no longer required (but @code{CS_ENTITY_CAMERA} still is!).
+

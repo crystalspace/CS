@@ -21,6 +21,7 @@ Currently only some separate documents about the engine are available:
 * Level of Detail::
 * Sequence Manager::
 * Map Creation:: How to Create Optimal Maps for Crystal Space
+* Internal Workings:: The Engine Internals Explained
 @end menu
 
 @importss{plugins,engine,worldcmp.txi}
@@ -36,4 +37,5 @@ Currently only some separate documents about the engine are available:
 @importss{plugins,engine,lod.txi}
 @importss{plugins,engine,sequence.txi}
 @importss{plugins,engine,levbuilding.txi}
+@importss{plugins,engine,internal.txi}
 
