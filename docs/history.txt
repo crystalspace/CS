@@ -1,8 +1,21 @@
 The history order has been reversed so that new features are at the top.
 
 7-Feb-2001
+	- Martin Geisse removed sound volume division by number of sources
+	  from software sound because it did not sound very good.
+	- Martin also fixed an old bug with distorted 8-bit software sound.
+	- Philip Wyett added missing line: "virtual void NextFrame ();"
+	  dec into section 5.2.4 of the Simple tutorial.
+	  The fact of this ommission was brought to my attention
+	  by Menachem Pastreich - Thanks :-)
+	- Philip also fixed a compile error in gamecore with regards to
+	  the move of cspixmap.h from csengine to csfx.
 	- Wouter Wijngaards added missing CreateInstance routine to
 	  csAnimationTemplate.
+	- Wouter also ixed another bug: the order of pushes in
+	  csAnimationTemplate::AddFrame was wrong. Also fixed the
+	  GetLength(). csAnimationTemplate and csAnimatedPixmap
+	  work now. (Tested in Tunnel Fighter).
 	- Converted the missile in walktest to use the new mesh object
 	  spr3d plugin instead of csSprite3D. Also modified standard.zip
 	  accordingly.
