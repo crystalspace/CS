@@ -23,6 +23,11 @@ chronological order.
 	- Jorrit fixed castshadows for chunklod. It was using a
 	  CS_ALLOC_STACK_ARRAY but with a huge array. So the stack would
 	  overflow. It now uses a normal memory allocation instead.
+	- Jorrit removed several tests in the software renderer to correct
+	  for inaccurate clipper. As far as I can see these tests are not
+	  needed and they cause entire polygons to be removed if such a test
+	  succeeds. This could cause severe render errors when using the
+	  software renderer.
 24-May-2004
 	- Jorrit added a proper copy constructor to csHashMapReversible.
 	  Without that copy constructor doing a copy of such a hashmap

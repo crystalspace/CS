@@ -1504,9 +1504,12 @@ void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
     // Sometimes double precision in the clipper is not enough.
     // Do an epsilon fuzz so not to reject cases when bounds exceeded
     // by less than epsilon.
-    if (((poly.vertices[i].x + EPSILON) < 0) ||
-	((poly.vertices[i].x - EPSILON) > width))
-      return;
+
+    // Jorrit: Removed the test below because it causes polygons
+    // to disappear.
+    //if (((poly.vertices[i].x + EPSILON) < 0) ||
+	//((poly.vertices[i].x - EPSILON) > width))
+      //return;
 
     if (poly.vertices[i].y > max_y)
     {
@@ -1530,9 +1533,11 @@ void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
     // p6   p5   p4
   }
 
-  if (((min_y + EPSILON) < 0) ||
-      ((max_y - EPSILON) > height))
-    return;
+  // Jorrit: Removed the test below because it causes polygons
+  // to disappear.
+  //if (((min_y + EPSILON) < 0) ||
+      //((max_y - EPSILON) > height))
+    //return;
 
   // if this is a 'degenerate' polygon, skip it.
   if (num_vertices < 3)
@@ -1777,9 +1782,12 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
 
   // Sometimes double precision in the clipper is not enough. Do an epsilon fuzz
   // so not to reject cases when bounds exceeded by less than epsilon. smgh
-  if (((poly.vertices[0].x + EPSILON) < 0) ||
-      ((poly.vertices[0].x - EPSILON) > width))
-    return;
+
+  // Jorrit: Removed the test below because it causes polygons
+  // to disappear.
+  //if (((poly.vertices[0].x + EPSILON) < 0) ||
+      //((poly.vertices[0].x - EPSILON) > width))
+    //return;
 
   min_i = max_i = min_z_i = 0;
   min_y = max_y = poly.vertices[0].y;
@@ -1793,9 +1801,11 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
   int num_vertices = 1;
   for (i = 1 ; i < poly.num ; i++)
   {
-    if (((poly.vertices[i].x + EPSILON) < 0) ||
-	((poly.vertices[i].x - EPSILON) > width))
-      return;
+    // Jorrit: Removed the test below because it causes polygons
+    // to disappear.
+    //if (((poly.vertices[i].x + EPSILON) < 0) ||
+	//((poly.vertices[i].x - EPSILON) > width))
+      //return;
 
     if (poly.vertices[i].y > max_y)
     {
@@ -1822,9 +1832,11 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
       num_vertices++;
   }
 
-  if (((min_y + EPSILON) < 0) ||
-      ((max_y - EPSILON) > height))
-    return;
+  // Jorrit: Removed the test below because it causes polygons
+  // to disappear.
+  //if (((min_y + EPSILON) < 0) ||
+      //((max_y - EPSILON) > height))
+    //return;
 
   min_z = M * (poly.vertices[min_z_i].x - width2)
         + N * (poly.vertices[min_z_i].y - height2) + O;
@@ -2891,9 +2903,12 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
   }
 
   // If the polygon exceeds the screen, it is an engine failure
-  if (((bot_y + EPSILON) < 0) ||
-      ((top_y - EPSILON) > height))
-    return;
+
+  // Jorrit: Removed the test below because it causes polygons
+  // to disappear.
+  //if (((bot_y + EPSILON) < 0) ||
+      //((top_y - EPSILON) > height))
+    //return;
 
   //-----
   // Scan from top to bottom.
