@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "cssys/csshlib.h"
+#include "csutil/csstring.h"
 
 #ifdef CS_DEBUG
 #  ifdef CS_RTLD_NOW_AVAILABLE
@@ -63,12 +64,19 @@ void csPrintLibraryError (const char *iModule)
 {
   const char* dlerr = dlerror();
   if (dlerr)
-    fprintf (stderr, "DLERROR (%s): %s\n", iModule? iModule : "(null)", dlerr);
+    fprintf (stderr, "DLERROR (%s): %s\n", iModule? iModule : "", dlerr);
 }
 
 void *csGetLibrarySymbol (csLibraryHandle Handle, const char *iName)
 {
-  return dlsym (Handle, iName);
+  void* p = dlsym (Handle, iName);
+  if (p == 0)
+  {
+    csString sym;
+    sym << '_' << iName;
+    p = dlsym (Handle, sym);
+  }
+  return p;
 }
 
 bool csUnloadLibrary (csLibraryHandle Handle)

@@ -18,6 +18,10 @@ chronological order.
           be missing.
 	- Eric Sunshine removed the last couple references to luaswig and
           cslua.
+	- Eric Sunshine augmented csGetLibrarySymbol() for Unix so that it
+	  looks for both `sym' and `_sym', rather than only `sym'.  This allows
+	  it to work correctly on OpenBSD which still uses b.out format for
+	  object files.
 26-Oct-2003
 	- Eric Sunshine updated `simple1' tutorial in the user manual to
 	  reflect recent changes to keyboard-related event handling.
