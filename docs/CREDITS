@@ -410,6 +410,9 @@ driver.
 Sylvain Rochette <srochette@telweb.com> gave me a few fixes for the Windows
 port.
 
+Siu-Hang <shor@cse.cuhk.edu.hk> updated MazeD to add functionality for
+sector, portals, lights, textures, ...
+
 Many thanks to various other people whose suggestions and ideas helped
 shape Crystal Space.
 

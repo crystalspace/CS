@@ -19,6 +19,15 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+26-May-99:
+	- Received update to MazeD from Siu-Hang <shor@cse.cuhk.edu.hk>.
+	  It enables the creation of sectors and portals so that you can
+	  start to edit real worlds. It is not a powerful addition in the
+	  sense that there is no automatic portal generation and you have
+	  to do everything manually but at least it allows to create portals.
+	  There are still some problems which we are investigating.
+	  He also added several other things like lights and texture
+	  support.
 25-May-99:
 	- Serguei Narojnyi (Snaar) fixed a Win32 specific bug in the sockets
 	  networking driver.
