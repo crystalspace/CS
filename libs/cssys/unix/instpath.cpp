@@ -92,7 +92,7 @@ char* csGetConfigPath ()
   return 0;
 }
 
-csPluginPaths* csGetPluginPaths ()
+csPluginPaths* csGetPluginPaths (const char* argv0)
 {
   csPluginPaths* paths = new csPluginPaths;
   const char* crystal = getenv ("CRYSTAL");
