@@ -1756,6 +1756,7 @@ sub DESTROY {
 *ProjectYPlane = *cspacec::csPoly3D_ProjectYPlane;
 *ProjectZPlane = *cspacec::csPoly3D_ProjectZPlane;
 *ProjectAxisPlane = *cspacec::csPoly3D_ProjectAxisPlane;
+*ClassifyPolygon = *cspacec::csPoly3D_ClassifyPolygon;
 *Classify = *cspacec::csPoly3D_Classify;
 *ClassifyX = *cspacec::csPoly3D_ClassifyX;
 *ClassifyY = *cspacec::csPoly3D_ClassifyY;
@@ -1765,7 +1766,9 @@ sub DESTROY {
 *SplitWithPlaneX = *cspacec::csPoly3D_SplitWithPlaneX;
 *SplitWithPlaneY = *cspacec::csPoly3D_SplitWithPlaneY;
 *SplitWithPlaneZ = *cspacec::csPoly3D_SplitWithPlaneZ;
+*ComputePolygonNormal = *cspacec::csPoly3D_ComputePolygonNormal;
 *ComputeNormal = *cspacec::csPoly3D_ComputeNormal;
+*ComputePolygonPlane = *cspacec::csPoly3D_ComputePolygonPlane;
 *ComputePlane = *cspacec::csPoly3D_ComputePlane;
 *GetSignedArea = *cspacec::csPoly3D_GetSignedArea;
 *GetCenter = *cspacec::csPoly3D_GetCenter;

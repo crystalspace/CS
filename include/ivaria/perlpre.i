@@ -484,4 +484,19 @@ _TYPEMAP_csArray(double,		newSVnv,	SvNV)
  ****************************************************************************/
 %ignore scfInitialize(int argc, const char * const argv []);
 
+/****************************************************************************
+ * Modern versions of Swig generate garbage Perl C interface code when a class
+ * has both static and instance methods with the same name. In addition to
+ * referencing non-existent variables (such as argv[n]), the flow and logic of
+ * the generated code is entirely quite corrupt.  It will also generate garbage
+ * code if one overload of an instance method accepts a variable number of
+ * arguments.  We work around the problem by renaming one of the methods; in
+ * the case of class versus instance method, we choose always to rename the
+ * class method.
+ ****************************************************************************/
+%rename (ClassifyPolygon) Classify(const csPlane3&, csVector3*, int);
+%rename (ComputePolygonNormal) ComputeNormal(csVector3*, int);
+%rename (ComputePolygonPlane) ComputePlane(csVector3*, int);
+%ignore iThingFactoryState::AddPolygon(int, ...);
+
 #endif // SWIGPERL5

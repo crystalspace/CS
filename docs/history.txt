@@ -19,6 +19,11 @@ chronological order.
 	- Eric Sunshine eliminated several gcc 2.95.4 compiler warnings in
 	  chunklod.cpp.  Also a couple places in csTerrainObjectLoader::Parse()
 	  where code was returning a boolean when a csPtr<> was called for.
+	- Eric Sunshine worked around a bug in Swig's Perl5 module where it
+	  generates garbage code when a class and instance method have the same
+	  name, and when an overload of an instance method accepts variable
+	  arguments.  The garbage code takes the form of accesses to
+	  non-existent variables and completely illogical control flow.
 4-May-2004
 	- Eric Sunshine made the following changes to the build system:
 	    - Added ApplicationIconDefault and ApplicationIcon rules to
@@ -38,10 +43,10 @@ chronological order.
 	      ApplicationIconOSX rules.  Instead, macosx.jam now respect icons
 	      assigned by the generic ApplicationIconDefault and
 	      ApplicationIcon.
-	- Jorrit changed iMeshWrapper->GetShadowCaster() and GetShadowReceiver()
-	  so that they now only query for the respective interfaces when
-	  being called. That will make it easier later to build those
-	  multiplexing versions for static lod on demand.
+	- Jorrit changed iMeshWrapper->GetShadowCaster() and
+	  GetShadowReceiver() so that they now only query for the respective
+	  interfaces when being called. That will make it easier later to build
+	  those multiplexing versions for static lod on demand.
 	- Jorrit fixed a bug in the engine when it would try to do lighting.
 	  It would also attempt to init and cache lighting for meshes that
 	  were not in any sector. This could cause crashes as some meshes
