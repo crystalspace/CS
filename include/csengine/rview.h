@@ -69,6 +69,11 @@ public:
   IGraphics2D* g2d;
 
   /**
+   * The portal polygon (or NULL if the first sector).
+   */
+  csPolygon3D* portal_polygon;
+
+  /**
    * This variable holds the plane of the portal through which the camera
    * is looking.
    */
@@ -96,12 +101,15 @@ public:
   void* callback_data;
 
   ///
-  csRenderView () : csCamera (), view (NULL), g3d (NULL), g2d (NULL), do_clip_plane (false), callback (NULL), callback_data (NULL) {}
+  csRenderView () : csCamera (), view (NULL), g3d (NULL), g2d (NULL),
+  	portal_polygon (NULL), do_clip_plane (false), callback (NULL), callback_data (NULL) {}
   ///
-  csRenderView (const csCamera& c) : csCamera (c), view (NULL), g3d (NULL), g2d (NULL), do_clip_plane (false), callback (NULL), callback_data (NULL) {}
+  csRenderView (const csCamera& c) : csCamera (c), view (NULL), g3d (NULL), g2d (NULL),
+  	portal_polygon (NULL), do_clip_plane (false), callback (NULL), callback_data (NULL) {}
   ///
   csRenderView (const csCamera& c, csClipper* v, IGraphics3D* ig3d, IGraphics2D* ig2d) :
-   csCamera (c), view (v), g3d (ig3d), g2d (ig2d), do_clip_plane (false), callback (NULL), callback_data (NULL) {}
+   csCamera (c), view (v), g3d (ig3d), g2d (ig2d),
+   portal_polygon (NULL), do_clip_plane (false), callback (NULL), callback_data (NULL) {}
 
   ///
   void SetView (csClipper* v) { view = v; }

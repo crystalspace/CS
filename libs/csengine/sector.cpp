@@ -404,10 +404,39 @@ void csSector::Draw (csRenderView& rview)
     }
 
     // Draw sprites.
-    for (i = 0 ; i < sprites.Length (); i++)
+    // To correctly support sprites in multiple sectors we only draw a
+    // sprite if the sprite is not in the sector we came from. If the
+    // sprite is also present in the previous sector then we will still
+    // draw it in any of the following cases:
+    //    - the previous sector has fog
+    //    - the portal we just came through has alpha transparency
+    //    - the portal is a portal on a thing (i.e. a floating portal)
+    //    - the portal does space warping
+    // In those cases we draw the sprite anyway. @@@ Note that we should
+    // draw it clipped (in 3D) to the portal polygon. This is currently not
+    // done.
+    csSector* previous_sector = rview.portal_polygon ? rview.portal_polygon->GetSector () : NULL;
+    for (i = 0 ; i < sprites.Length () ; i++)
     {
       csSprite3D* sp3d = (csSprite3D*)sprites[i];
-      sp3d->Draw (rview);
+      if (!previous_sector || sp3d->sectors.Find (previous_sector) == -1)
+      {
+        // Sprite is not in the previous sector or there is no previous sector.
+        sp3d->Draw (rview);
+      }
+      else
+      {
+        if (
+	  ((csPolygonSet*)rview.portal_polygon->GetParent ())->GetType () == csThing::Type () ||
+	  previous_sector->HasFog () ||
+	  rview.portal_polygon->IsTransparent () ||
+	  rview.portal_polygon->GetPortal ()->IsSpaceWarped ()
+	  )
+	{
+	  // @@@ Here we should draw clipped to the portal.
+          sp3d->Draw (rview);
+	}
+      }
     }
   }
 

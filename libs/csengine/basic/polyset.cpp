@@ -483,11 +483,7 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num, csRenderVi
         // Draw through the portal. If this fails we draw the original polygon
         // instead. Drawing through a portal can fail because we have reached
         // the maximum number that a sector is drawn (for mirrors).
-	// Note that use_z_buf is given to this routine as well but this
-	// parameter has nothing to do with the Z buffer but with the fact that
-	// we have a portal in the middle of a sector. use_z_buf happens to be
-	// true for Things and false for sectors so this works now.
-        if (po->Draw (&csPolygon2D::clipped, &p->GetPlane ()->GetCameraPlane (), use_z_buf, *d))
+        if (po->Draw (&csPolygon2D::clipped, p, *d))
         {
 	  if (!d->callback)
 	  {
