@@ -262,6 +262,7 @@ void csLight::SetAttenuationConstants (const csVector3& attenv)
   /*attenuation = CS_ATTN_CLQ;
   attenuationvec.Set (attenv);
   influenceValid = false;*/
+  attenuationConstants = attenv;
 
   int i = light_cb_vector.Length ()-1;
   while (i >= 0)

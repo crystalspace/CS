@@ -1727,13 +1727,15 @@
         </meshobj>
         <light name="bumplight">
             <center x="-4.2" y="-11" z="-1.4" />
-            <radius>5</radius>
+            <radius>50</radius>
             <color red="1.5625" green="1.5625" blue="0.784314" />
+            <attenuation c="1" l="0.2" q="0">clq</attenuation>
         </light>
         <light>
             <center x="1.8" y="-12" z="-8.2" />
-            <radius>5</radius>
+            <radius>50</radius>
             <color red="1.5625" green="0.784314" blue="0.392157" />
+            <attenuation c="1" l="0.15" q="0">clq</attenuation>
         </light>
         <meshobj name="e6">
             <plugin>thing</plugin>
@@ -1869,8 +1871,8 @@
 	    <delay time="1000" />
 	    <enable trigger="moveLight" />
         </sequence>
-        <sequence name="rotateTorus">
-	    <!--<rotate mesh="Torus02" duration="3000">
+        <!-- <sequence name="rotateTorus">
+	    <rotate mesh="Torus02" duration="3000">
 	      <rotx>1</rotx>
 	      <v x="1" y="-13" z="-4" />
 	    </rotate>
@@ -1888,8 +1890,8 @@
 	      <v x="0" y="-12" z="-4" />
 	    </rotate>
 	    <delay time="1500" />
-	    <enable trigger="rotateTorus" />-->
-        </sequence>
+	    <enable trigger="rotateTorus" />
+        </sequence> -->
     </sequences>
     <triggers>
         <trigger name="animLight">
@@ -1900,9 +1902,9 @@
             <sectorvis sector="room" />
             <fire delay="0" sequence="moveLight" />
 	</trigger>
-        <trigger name="rotateTorus">
+        <!-- <trigger name="rotateTorus">
             <sectorvis sector="room" />
             <fire delay="0" sequence="rotateTorus" />
-	</trigger>
+	</trigger> -->
     </triggers>
 </world>

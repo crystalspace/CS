@@ -272,7 +272,17 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
       csVector3 (color.red, color.green, color.blue));
 
     shvar_light_0_specular->SetValue (csVector3 (1));
-    shvar_light_0_attenuation->SetValue (light->GetAttenuationConstants ());
+
+    csLightAttenuationMode attnMode = light->GetAttenuationMode ();
+    if (attnMode == CS_ATTN_LINEAR)
+    {
+      float r = light->GetAttenuationConstants ().x;
+      shvar_light_0_attenuation->SetValue (csVector3(r, 1/r, 0));
+    }
+    else
+    {
+      shvar_light_0_attenuation->SetValue (light->GetAttenuationConstants ());
+    }
     shvar_light_0_position->SetValue (lightPos * camTransR);
     shvar_light_0_position_world->SetValue (lightPos);
 

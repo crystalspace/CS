@@ -24282,7 +24282,7 @@
                 </p>
             </params>
         </meshobj>
-        <fog red="0" green="1" blue="1" density="0.05" />
+        <fog red="0" green="1" blue="1" density="0.02" />
     </sector>
     <sector name="gang5">
         <meshobj name="walls">
@@ -24458,7 +24458,7 @@
             <radius>28</radius>
             <color red="0.9" green="0.6" blue="0.6" />
         </light>
-        <fog red="0" green="1" blue="1" density="0.05" />
+        <fog red="0" green="1" blue="1" density="0.02" />
     </sector>
     <sector name="gang5a">
         <meshobj name="walls">
@@ -24599,7 +24599,7 @@
                 </p>
             </params>
         </meshobj>
-        <fog red="0" green="1" blue="1" density="0.05" />
+        <fog red="0" green="1" blue="1" density="0.02" />
     </sector>
     <sector name="gang5b">
         <meshobj name="walls">
@@ -24740,7 +24740,7 @@
                 </p>
             </params>
         </meshobj>
-        <fog red="0" green="1" blue="1" density="0.05" />
+        <fog red="0" green="1" blue="1" density="0.02" />
     </sector>
     <sector name="biglight">
         <meshobj name="walls">
@@ -25099,7 +25099,7 @@
             <key name="entity_WavePortal" value="south,3,.01,24000" />
             <key name="entity_WavePortal" value="east,1,.01,29000" />
         </meshobj>
-        <fog red="0.2" green="0.3" blue="0.5" density="0.08" />
+        <fog red="0.2" green="0.3" blue="0.5" density="0.03" />
     </sector>
     <sequences>
         <sequence name="fogloop">
