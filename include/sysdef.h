@@ -294,7 +294,8 @@
 #  include <sys/types.h>
 #  include <sys/socket.h>
 #  if defined (OS_UNIX)
-#    include <sys/filio.h>
+#    define BSD_COMP 1
+#    include <sys/ioctl.h>
 #  endif
 #  include <netinet/in.h>
 #  include <netdb.h>
