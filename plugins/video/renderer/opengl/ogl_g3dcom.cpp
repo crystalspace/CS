@@ -1775,7 +1775,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   glPopMatrix ();
 
 #if EXP_STENCIL
-  //@@@if (mesh.do_clip && clipper)
+  if (mesh.do_clip && clipper)
   {
     if (true)
     {
