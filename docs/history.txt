@@ -2,6 +2,26 @@ The history order is reversed so that new features are at the top.
 
 5-Sep-2001
 	- Eric Sunshine eliminated several compilation warnings from aseie.cpp.
+	- Eric Sunshine removed the obsolete igame/csgame.h.
+	- Norman Kramer did the following:
+	    - Attempt to fix that crash in the eventhandler that occurs for
+	      csws progs. the problem seems to be that the csws app does not
+	      exist anymore (removed from stack before the systemdriver is)
+	      if the close event is posted. also the csApp was modified to
+	      remove the listener from the eventqueue when the csApp object
+	      is deleted.
+	    - Plugins variable in system driver is now really emptied.
+	    - Added decref'ing of VFS in AddConfig().
+	    - Removed the IncRef() on the reporter related stuff in
+	      csInitializeApplication(). The CS_LOAD_PLUGIN already
+	      IncRef's it.
+	    - Added test if returned configmanager is null in the destructor.
+	      It is not assured that the configmanager is still available
+	      at this time.
+	    - Added decref() of xf86vm in xwindow.cpp.
+	- Fixed a bug in iLoader::LoadTexture(). This function would still
+	  return a texture wrapper even if no texture handle could be loaded.
+	  Now it will return NULL.
 4-Sep-2001
 	- Fixed the ASE importer plugin for missing 'isspace'.
 	- Fixed the cslua plugin by regenerating the swig file with luaswig.

@@ -127,9 +127,7 @@ iTextureWrapper *csLoader::LoadTexture (const char *name, const char *fname,
     return NULL;
 
   iTextureHandle *TexHandle = LoadTexture(fname, Flags, tm);
-  // Only return an error if we have a texture manager. Otherwise
-  // we will work with a NULL texture handle.
-  if (tm && !TexHandle)
+  if (!TexHandle)
     return NULL;
 
   iTextureWrapper *TexWrapper =
