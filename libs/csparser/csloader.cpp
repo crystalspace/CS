@@ -1337,11 +1337,17 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
           {
             case TOKEN_ORIG:
               tx1_given = true;
-              tx1_orig = load_vector (params2);
+              int num;
+              float flist[100];
+              ScanStr (params2, "%F", flist, &num);
+              if (num == 1) tx1_orig = parent->Vobj ((int)flist[0]);
+              if (num == 3) tx1_orig = csVector3(flist[0],flist[1],flist[2]);
               break;
             case TOKEN_FIRST:
               tx1_given = true;
-              tx1 = load_vector (params2);
+              ScanStr (params2, "%F", flist, &num);
+              if (num == 1) tx1 = parent->Vobj ((int)flist[0]);
+              if (num == 3) tx1 = csVector3(flist[0],flist[1],flist[2]);
               break;
             case TOKEN_FIRST_LEN:
               ScanStr (params2, "%f", &tx1_len);
@@ -1349,7 +1355,9 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
               break;
             case TOKEN_SECOND:
               tx2_given = true;
-              tx2 = load_vector (params2);
+              ScanStr (params2, "%F", flist, &num);
+              if (num == 1) tx2 = parent->Vobj ((int)flist[0]);
+              if (num == 3) tx2 = csVector3(flist[0],flist[1],flist[2]);
               break;
             case TOKEN_SECOND_LEN:
               ScanStr (params2, "%f", &tx2_len);
