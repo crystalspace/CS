@@ -450,6 +450,7 @@ void* csPosixThread::ThreadRun (void* param)
   thread->runnable->Run ();
   thread->running = false;
   pthread_exit (NULL);
+  return NULL;
 }
 
 #undef CS_SHOW_ERROR
