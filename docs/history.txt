@@ -7,10 +7,14 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 21-Aug-2003
-	- Jorrit fixed a bug in the mesh-sphere intersection code. The bug
+	- Jorrit fixed a bug in the mesh-sphere intersection code (ODE). The bug
 	  was that intersection with triangles used <0. But that means something
 	  can slip between two triangles if you are unlucky. Fixed this by
 	  using < SMALL_EPSILON instead. Also cleaned up the code a lot.
+	- Jorrit optimized ODE mesh-box intersection code using the polygon
+	  tree.
+	- Jorrit optimized ODE mesh-box and mesh-sphere by avoiding the
+	  Normalize() on all polygon edges.
 20-Aug-2003
 	- Jorrit moved the engine sequence manager documentation out of
 	  the xml format description. Also extended that documentation with
