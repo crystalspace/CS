@@ -57,6 +57,7 @@ ctWorld::ctWorld()
   y1 = new real[max_state_size];
   y_save = new real[max_state_size];
   y_save_size = 0;
+  was_catastrophe_last_frame = false;
 }
 
 //!me delete _lists and ode
@@ -180,32 +181,34 @@ errorcode ctWorld::evolve( real t1, real t2 )
 {
   real ta, tb;
   ctCatastropheManager *cat;
-  ctLinkList<ctCatastropheManager> recent_cat;
+  ctLinkList<ctCatastropheManager> *this_slice_cat = new ctLinkList<ctCatastropheManager>();
+  ctLinkList<ctCatastropheManager> *recent_cat = new ctLinkList<ctCatastropheManager>();
+  ctLinkList<ctCatastropheManager> *swap_cat;
 
-  long loops = 300;  //make sure we don't go into an infinite loop
+  long loops = 1000;  //make sure we don't go into an infinite loop
 
   ta = t1;
   tb = t2;
   real max_cat_dist, this_cat_dist;
-
+  bool is_unhandled_catastrophe = false;
+  bool simul_check_done = false;
 //!me no rewind option is probably a bad idea...
 #ifdef __CT_NOREWINDENABLED__
   apply_function_to_body_list( fcn_set_no_rewind );
 #endif
-  
+
   while( ta < t2 && loops-- > 0){
  
     do_time_step( ta, tb );
 
-    //!me min_col_dist = collision_check( space_world );
     max_cat_dist = 0;
-    recent_cat.remove_all();
+    this_slice_cat->remove_all();
     cat = catastrophe_list.get_first();
     bool no_great_cat_dist = true;
     while( cat != NULL ){
       this_cat_dist = cat->check_catastrophe();
       if( this_cat_dist > 0 ){
-        recent_cat.add_link( cat );
+        this_slice_cat->add_link( cat );
         if( this_cat_dist > max_cat_dist ){
           max_cat_dist = this_cat_dist;
         }
@@ -216,47 +219,58 @@ errorcode ctWorld::evolve( real t1, real t2 )
       cat = catastrophe_list.get_next();
     }
     
-    // if there are objects intersecting
+    // if there is a catastrophe
     if( max_cat_dist > 0 ){
-      // if interpenetrations distance is very small => time of impact found
-      // or if the time step is really small
-      if( no_great_cat_dist || ( tb - ta ) <= TIME_EPSILON ){
-        // respond to collision
-        //!me collision_response( space_world );
-        
-        // resolve all catastrophes that occurred at this approx point in time.
-        cat = recent_cat.get_first();
-        while( cat ){
-          cat->handle_catastrophe();
-          cat = recent_cat.get_next();
-        }
-        
-        ta = tb;
-        tb = t2;
-      }else{
+        is_unhandled_catastrophe = true;
+        swap_cat = recent_cat;
+        recent_cat = this_slice_cat;
+        this_slice_cat = swap_cat;
         // bisect time backwards to search for time of impact
         rewind(ta, tb);   // rewind state back to ta
-        tb -= (tb - ta)*0.5;
-      }
-    // if we have not arrived at the end of our time interval 
-    }else if( tb < t2 ){
-      // search forward in time for time of impact for collision(s)
-      ta = tb;
-      // if we are at our min time step, just finish this time step, collision
-      // will get resolved next time.
-      if( (t2 - ta) <= TIME_EPSILON ){
-        tb = t2;
-        do_time_step( ta, tb );
 
-        ta = tb;
+        // if there was a collision last frame it is likely followed by another
+        // one almost immediately.
+        if( ta == t1 && was_catastrophe_last_frame && !simul_check_done ){
+          tb = ta + 2.0*TIME_EPSILON;
+          simul_check_done = true;
+        }else{
+          tb -= (tb - ta)*0.5;
+        }
+        //}
+    // if we have not arrived at the end of our time interval 
+    }else if( is_unhandled_catastrophe ){
+      // search forward in time for time of impact for collision(s)
+      real last_ta = ta;
+
+      // we have found a time close to when catastrpohe happened
+      if( ( tb - ta ) <= TIME_EPSILON ){
+        
+        // resolve all catastrophes that occurred at this approx point in time.
+        cat = recent_cat->get_first();
+        while( cat ){
+          cat->handle_catastrophe();
+          cat = recent_cat->get_next();
+        }
+        recent_cat->remove_all();
+        was_catastrophe_last_frame = is_unhandled_catastrophe;
+        is_unhandled_catastrophe = false;
+
+        tb = t2;
       }else{
-        tb += (t2 - tb)*0.5;
+        ta = tb;
+        tb += (tb - last_ta)*0.5;
+        if( tb > t2 ){
+          tb = t2;
+        }
       }
-    }else{
+    }else{  // we are finished, there were no catasprophes
       ta = tb;
       tb = t2;
     }
   }
+
+  delete this_slice_cat;
+  delete recent_cat;
 
   return WORLD_NOERR;
 }
