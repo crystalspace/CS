@@ -8,6 +8,13 @@ chronological order.
 
 30-Aug-2003
 	- Old_Belge added the morph target support to sprcal3d.
+	- Eric Sunshine augmented configure.ac so that it emits the appropriate
+	  libbfd linker flags to LIB.EXE and APPLICATION.LFLAGS.  unix.mak and
+	  cssys/Jamfile are no longer responsible for inserting these flags
+	  into the build process.  This fixes a problem where applications
+	  built with the GNU make system failed to link because the libraries
+	  were specified in the wrong order (they were listed far too early in
+	  the link invocation).
 29-Aug-2003
 	- renej added support for using CS from Java. SWIG is needed since
 	  no generated files are in the CVS repository. Building is done

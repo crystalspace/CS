@@ -1331,7 +1331,9 @@ CS_CHECK_BUILD([for Linux joystick API], [cs_cv_sys_linux_joystick],
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([bfd],
     [AC_LANG_PROGRAM([#include <bfd.h>], [bfd_init();])], [], [],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libbfd], [LIBBFD])], [], [], [], [-liberty])
+    [CS_EMIT_BUILD_RESULT([cs_cv_libbfd], [LIBBFD])
+    CS_BUILD_PROPERTY([LIBS.EXE], [$cs_cv_libbfd_libs], [+])],
+    [], [], [], [-liberty])
 
 
 

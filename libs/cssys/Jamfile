@@ -49,8 +49,6 @@ case * :		# posix/unix/linux mode
   if $(LIBBFD.AVAILABLE) = "yes"
   {
     SYSFILES += bfdplugins.cpp ;
-    LibExternalLibs cssys : LIBBFD ;
-    TAG_METADATA_WITH_BFD = yes ;
   }
   else
   {

@@ -68,8 +68,7 @@ endif
 
 # General flags for the linker which are used in any case.
 # <cs-config>
-LFLAGS.GENERAL = $(LFLAGS.L)/usr/local/lib $(LFLAGS.SYSTEM) \
-  $(CSTHREAD.LFLAGS) $(LIBBFD.LFLAGS)
+LFLAGS.GENERAL = $(LFLAGS.L)/usr/local/lib $(LFLAGS.SYSTEM) $(CSTHREAD.LFLAGS)
 # </cs-config>
 
 # Flags for the linker which are used when profiling.

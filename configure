@@ -20697,6 +20697,10 @@ fi
 
 fi
 
+    cs_makefile_text="${cs_makefile_text}LIBS.EXE += $cs_cv_libbfd_libs
+"
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_cv_libbfd_libs\" ;
+"
 else
   :
 fi
