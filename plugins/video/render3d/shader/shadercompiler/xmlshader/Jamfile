@@ -1,0 +1,9 @@
+SubDir TOP plugins video render3d shader shadercompiler xmlshader ;
+
+Plugin xmlshader
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith xmlshader : csgfx csgeom cstool csutil ;
+
+Help xmlshader : "Crystal Space XML-format shader compiler" ;
+
