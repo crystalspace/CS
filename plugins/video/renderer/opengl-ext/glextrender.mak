@@ -110,7 +110,7 @@ $(GL3D_EXT): $(OBJ.GL3D_EXT) $(LIB.GL3D_EXT)
 	$(DO.PLUGIN.CORE) $(LIB.GL3D_EXT.SPECIAL) \
 	$(DO.PLUGIN.POSTAMBLE)
 
-gl3dclean:
+gl3d_extclean:
 	$(RM) $(GL3D_EXT) $(OBJ.GL3D_EXT)
 
 ifdef DO_DEPEND
