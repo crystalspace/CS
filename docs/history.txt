@@ -12,6 +12,8 @@ The history order is reversed so that new features are at the top.
 	- DeSigna fixed a single word error in manual section 5.2.3,
 	  pointed out by Aner (crystalspace@myway.com)
 	- DeSigna fixed some minor diagnostic message bugs in nettut.
+	- Duhprey fixed bug #710229: bad indexing in nterrain and fixed
+	  for lighting in tbtut, but its too slow so its commented out.
 5-June-2003
 	- Oktal removed the setting to 0 of event category and subcategory
 	  now that the event queue does that for us.
