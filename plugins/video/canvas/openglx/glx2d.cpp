@@ -164,7 +164,9 @@ bool csGraphics2DGLX::Open()
   // some more contexts and switch around between several of them...
   // but we use only one here.
   glXMakeCurrent (dpy, window, active_GLContext);
-
+  
+  XSync (dpy, False);
+  
   // Open your graphic interface
   if (!csGraphics2DGLCommon::Open ())
     return false;
@@ -354,8 +356,6 @@ bool csGraphics2DGLX::PerformExtensionV (char const* command, va_list args)
 void csGraphics2DGLX::Print (csRect * /*area*/)
 {
   glXSwapBuffers (dpy,window);
-  //glFlush (); // not needed?
-  XSync (dpy, False);
 }
 
 
