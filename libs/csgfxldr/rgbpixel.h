@@ -62,7 +62,7 @@ struct RGBcolor
   RGBcolor () : red(0), green(0), blue(0) {}
   RGBcolor (unsigned char r, unsigned char g, unsigned char b) :
     red(r), green(g), blue(b) {}
-  void Set (unsigned char r, unsigned char g, unsigned char b) :
+  void Set (unsigned char r, unsigned char g, unsigned char b)
   { red = r; green = g; blue = b; }
   bool operator == (const RGBcolor& c) const
   { return (c.red == red) && (c.green == green) && (c.blue == blue); }
