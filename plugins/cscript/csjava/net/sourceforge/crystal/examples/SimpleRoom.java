@@ -124,7 +124,8 @@ class SimpleRoom extends CS
 	    fact.SetPolygonMaterial(CS_POLYRANGE_LAST, material);
 	    //thingstate.DecRef();
 
-        iLight light = engine.CreateLight("", new csVector3(0, 5, 0), 10f, new csColor(1, 0, 0), false);
+        iLight light = engine.CreateLight("", new csVector3(0, 5, 0), 10f, new csColor(1, 0, 0),
+		CS_LIGHT_DYNAMICTYPE_STATIC);
         room.GetLights().Add(light);
 
         engine.Prepare(null);

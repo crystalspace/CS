@@ -286,7 +286,7 @@ bool Simple::Initialize ()
   iLightList* ll = room->GetLights ();
 
   light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10,
-  	csColor (1, 1, 1), false);
+  	csColor (1, 1, 1));
   ll->Add (light);
 
   engine->Prepare ();

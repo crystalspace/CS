@@ -321,19 +321,19 @@ bool Simple::Initialize ()
   iLightList* ll = room->GetLights ();
 
   light = engine->CreateLight (0, csVector3 (3, 0, 0), 8,
-    csColor (1, 0, 0), false);
+    csColor (1, 0, 0));
   ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (-3, 0,  0), 8,
-    csColor (0, 0, 1), false);
+    csColor (0, 0, 1));
   ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (0, 0, 3), 8,
-    csColor (0, 1, 0), false);
+    csColor (0, 1, 0));
   ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (0, -3, 0), 8,
-    csColor (1, 1, 0), false);
+    csColor (1, 1, 0));
   ll->Add (light);
 
   engine->Prepare ();

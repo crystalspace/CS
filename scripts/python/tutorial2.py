@@ -105,12 +105,12 @@ class MyCsApp:
     def CreateLights(self,room):
         # lights
         ll = room.GetLights ()
-        light = self.engine.CreateLight ("", csVector3 (-3, 5, 0), 10,csColor (1, 0, 0), 0)
-        ll.Add (light.QueryLight())
-        light = self.engine.CreateLight ("", csVector3 (3, 5,  0), 10,csColor (0, 0, 1), 0)
-        ll.Add (light.QueryLight ())
-        light = self.engine.CreateLight ("", csVector3 (0, 5, -3), 10,csColor (0, 1, 0), 0)
-        ll.Add (light.QueryLight ())
+        light = self.engine.CreateLight ("", csVector3 (-3, 5, 0), 10,csColor (1, 0, 0), CS_LIGHT_DYNAMICTYPE_STATIC)
+        ll.Add (light)
+        light = self.engine.CreateLight ("", csVector3 (3, 5,  0), 10,csColor (0, 0, 1), CS_LIGHT_DYNAMICTYPE_STATIC)
+        ll.Add (light)
+        light = self.engine.CreateLight ("", csVector3 (0, 5, -3), 10,csColor (0, 1, 0), CS_LIGHT_DYNAMICTYPE_STATIC)
+        ll.Add (light)
     
     def LoadSprites(self,room):
         # Load a texture for our sprite.

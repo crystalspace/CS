@@ -198,9 +198,9 @@ if 0:
 else:
     CreateRoom('stone')
 
-light = engine.CreateLight("", csVector3(0, 5, 0), 10, csColor(1, 0, 0), 0)
+light = engine.CreateLight("", csVector3(0, 5, 0), 10, csColor(1, 0, 0), CS_LIGHT_DYNAMICTYPE_STATIC)
 if DEBUG: print 'light=',light
-room.GetLights().Add(light.QueryLight())
+room.GetLights().Add(light)
 
 if DEBUG: print 'calling engine.Prepare()'
 

@@ -377,8 +377,6 @@ private:
   csTextureList* textures;
   /// Material objects.
   csMaterialList* materials;
-  /// Linked list of dynamic lights.
-  csLight* first_dyn_lights;
   /// The list of all shared variables in the engine.
   csSharedVariableList* shared_variables;
   /// List of halos (csHaloInformation).
@@ -784,21 +782,6 @@ public:
       const char* name);
   virtual csPtr<iMeshWrapper> CreateThingMesh (iSector*, const char* name);
 
-  /**
-   * Add a dynamic light to the engine.
-   */
-  void AddDynLight (csLight* dyn);
-
-  /**
-   * Remove a dynamic light from the engine.
-   */
-  void RemoveDynLight (csLight* dyn);
-
-  /**
-   * Return the first dynamic light in this engine.
-   */
-  virtual iLight* GetFirstDynLight () const;
-
   /// Get all nearby lights.
   virtual int GetNearbyLights (iSector* sector, const csVector3& pos,
   	uint32 flags, iLight** lights, int max_num_lights);
@@ -994,17 +977,12 @@ public:
   /// Create a static/pseudo-dynamic light.
   virtual csPtr<iLight> CreateLight (const char* name,
   	const csVector3& pos, float radius,
-  	const csColor& color, bool pseudoDyn);
+  	const csColor& color, int dyntype = CS_LIGHT_DYNAMICTYPE_STATIC);
   /// Find a static/pseudo-dynamic light by ID.
   virtual iLight* FindLightID (const char* light_id) const;
   /// Find a static/pseudo-dynamic light by name.
   virtual iLight* FindLight (const char *Name, bool RegionOnly = false)
     const;
-  /// Create a dynamic light.
-  virtual csPtr<iLight> CreateDynLight (const csVector3& pos, float radius,
-  	const csColor& color);
-  /// Remove a dynamic light.
-  virtual void RemoveDynLight (iLight*);
 
   /// Create a mesh factory wrapper from a mesh plugin
   virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* classId,

@@ -909,19 +909,19 @@ bool ViewMesh::Initialize ()
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
   light = engine->CreateLight (0, csVector3 (-3, 10, 0), 10,
-  	csColor (0.8f, 0.8f, 0.8f), false);
+  	csColor (0.8f, 0.8f, 0.8f));
   ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (3, 10,  0), 10,
-  	csColor (0.8f, 0.8f, 0.8f), false);
+  	csColor (0.8f, 0.8f, 0.8f));
   ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (0, 10, -3), 10,
-  	csColor (0.8f, 0.8f, 0.8f), false);
+  	csColor (0.8f, 0.8f, 0.8f));
   ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (0, 10,  3), 10,
-  	csColor (0.8f, 0.8f, 0.8f), false);
+  	csColor (0.8f, 0.8f, 0.8f));
   ll->Add (light);
 
   engine->Prepare ();

@@ -763,7 +763,6 @@ csEngine::csEngine (iBase *iParent) :
   DG_TYPE (&scfiObject, "csEngine");
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
   //rad_debug = 0;
-  first_dyn_lights = 0;
   object_reg = 0;
   textures = 0;
   materials = 0;
@@ -1020,13 +1019,6 @@ void csEngine::DeleteAll ()
   mesh_factories.RemoveAll ();
   sectors.RemoveAll ();
   camera_positions.DeleteAll ();
-
-  while (first_dyn_lights)
-  {
-    csLight *dyn = first_dyn_lights->GetCsNext ();
-    delete first_dyn_lights;
-    first_dyn_lights = dyn;
-  }
 
   delete materials;
   materials = new csMaterialList ();
@@ -1335,9 +1327,7 @@ void csEngine::RemoveLight (iLight* light)
     iMeshWrapper *s = meshes.Get (sn);
     iLightingInfo* linfo = s->GetLightingInfo ();
     if (linfo)
-    {
       linfo->LightDisconnect (light);
-    }
   }
   light->GetSector ()->GetLights ()->Remove (light);
 }
@@ -1945,32 +1935,6 @@ iLight *csEngine::FindLight (const char *name, bool regionOnly) const
   return 0;
 }
 
-void csEngine::AddDynLight (csLight *dyn)
-{
-  dyn->SetNext (first_dyn_lights);
-  dyn->SetPrev (0);
-  if (first_dyn_lights) first_dyn_lights->SetPrev (dyn);
-  first_dyn_lights = dyn;
-  dyn->IncRef ();
-}
-
-void csEngine::RemoveDynLight (csLight *dyn)
-{
-  if (dyn->GetCsNext ()) dyn->GetCsNext ()->SetPrev (dyn->GetCsPrev ());
-  if (dyn->GetCsPrev ())
-    dyn->GetCsPrev ()->SetNext (dyn->GetCsNext ());
-  else if (dyn == first_dyn_lights)
-    first_dyn_lights = dyn->GetCsNext ();
-  dyn->SetNext (0);
-  dyn->SetPrev (0);
-  dyn->DecRef ();
-}
-
-iLight* csEngine::GetFirstDynLight () const
-{
-  return first_dyn_lights ? &(first_dyn_lights->scfiLight) : 0;
-}
-
 void csEngine::ControlMeshes ()
 {
   nextframe_pending = virtual_clock->GetCurrentTicks ();
@@ -2396,28 +2360,8 @@ int csEngine::GetNearbyLights (
 
   light_array->Reset ();
 
-  // Add all dynamic lights to the array (if CS_NLIGHT_DYNAMIC is set).
-  if (flags & CS_NLIGHT_DYNAMIC)
-  {
-    csLight *dl = first_dyn_lights;
-    while (dl)
-    {
-      if (dl->GetSector () == sector)
-      {
-        sqdist = csSquaredDist::PointPoint (pos, dl->GetCenter ());
-        if (sqdist < dl->GetInfluenceRadiusSq ())
-        {
-          csRef<iLight> il (SCF_QUERY_INTERFACE (dl, iLight));
-          light_array->AddLight (il, sqdist);
-        }
-      }
-
-      dl = dl->GetCsNext ();
-    }
-  }
-
-  // Add all static lights to the array (if CS_NLIGHT_STATIC is set).
-  if (flags & CS_NLIGHT_STATIC)
+  // Add all dynamic and static lights.
+  //@@@ Ignore flags? if ((flags & CS_NLIGHT_STATIC) || (flags & CS_NLIGHT_DYNAMIC))
   {
     csKDTree* kdtree = sector->GetPrivateObject ()->GetLightKDTree ();
     csVector3 position = pos;
@@ -2467,29 +2411,8 @@ int csEngine::GetNearbyLights (
 
   light_array->Reset ();
 
-  // Add all dynamic lights to the array (if CS_NLIGHT_DYNAMIC is set).
-  if (flags & CS_NLIGHT_DYNAMIC)
-  {
-    csLight *dl = first_dyn_lights;
-    while (dl)
-    {
-      if (dl->GetSector () == sector)
-      {
-        csBox3 b (box.Min () - dl->GetCenter (), box.Max () - dl->GetCenter ());
-        sqdist = b.SquaredOriginDist ();
-        if (sqdist < dl->GetInfluenceRadiusSq ())
-        {
-          iLight* il = &(dl->scfiLight);
-          light_array->AddLight (il, sqdist);
-        }
-      }
-
-      dl = dl->GetCsNext ();
-    }
-  }
-
-  // Add all static lights to the array (if CS_NLIGHT_STATIC is set).
-  if (flags & CS_NLIGHT_STATIC)
+  // Add all lights to the array.
+  //@@@ Ignore flags? if (flags & CS_NLIGHT_STATIC)
   {
     csKDTree* kdtree = sector->GetPrivateObject ()->GetLightKDTree ();
     csBox3 bbox = box;
@@ -2960,44 +2883,16 @@ csPtr<iLight> csEngine::CreateLight (
   const csVector3 &pos,
   float radius,
   const csColor &color,
-  bool pseudoDyn)
+  int dyntype)
 {
   csLight *light = new csLight (
-      pos.x,
-      pos.y,
-      pos.z,
+      pos.x, pos.y, pos.z,
       radius,
-      color.red,
-      color.green,
-      color.blue,
-      pseudoDyn ? CS_LIGHT_DYNAMICTYPE_PSEUDO : CS_LIGHT_DYNAMICTYPE_STATIC);
+      color.red, color.green, color.blue,
+      dyntype);
   if (name) light->SetName (name);
 
   return csPtr<iLight> (&(light->scfiLight));
-}
-
-csPtr<iLight> csEngine::CreateDynLight (
-  const csVector3 &pos,
-  float radius,
-  const csColor &color)
-{
-  csLight *light = new csLight (
-      pos.x,
-      pos.y,
-      pos.z,
-      radius,
-      color.red,
-      color.green,
-      color.blue,
-      CS_LIGHT_DYNAMICTYPE_DYNAMIC);
-  AddDynLight (light);
-
-  return csPtr<iLight> (&(light->scfiLight));
-}
-
-void csEngine::RemoveDynLight (iLight *light)
-{
-  RemoveDynLight (light->GetPrivateObject ());
 }
 
 csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
@@ -3453,7 +3348,8 @@ bool csEngine::RemoveObject (iBase *object)
 	dl->QueryObject ()->GetObjectParent ()->ObjRemove (
 		dl->QueryObject ());
       }
-      RemoveDynLight (dl);
+      if (dl->GetSector ())
+        dl->GetSector ()->GetLights ()->Remove (dl);
       return true;
     }
   }

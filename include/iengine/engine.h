@@ -30,6 +30,7 @@
  
 #include "csutil/scf.h"
 #include "csgeom/vector3.h"
+#include "iengine/light.h"
 
 class csEngine;
 class csVector3;
@@ -205,7 +206,7 @@ struct iEngine : public iBase
 
   /**
    * Remove a light and update all lightmaps. This function only works
-   * correctly for pseudo-dynamic static lights. If you give a normal
+   * correctly for dynamic or pseudo-dynamic static lights. If you give a normal
    * static light then the light will be removed but lightmaps will not
    * be affected. You can call ForceRelight() to force relighting then.
    * <p>
@@ -646,11 +647,20 @@ struct iEngine : public iBase
    * \param radius the maximum distance at which this light will affect
    * objects 
    * \param color the color of this light (also affects light intensity)
-   * \param pseudoDyn create a pseudo-dynamic light 
-   * (an unmoving light which can efficiently change intensity or color)
+   * \param dyntype is the type of the light. This can be #CS_LIGHT_DYNAMICTYPE_DYNAMIC,
+   * #CS_LIGHT_DYNAMICTYPE_PSEUDO, or #CS_LIGHT_DYNAMICTYPE_STATIC.
+   * Note that after creating a light you must add it to a sector
+   * by calling sector->GetLights ()->Add (light);
+   * If the light is dynamic you also must call Setup() to calculate lighting.
+   * Otherwise you must use engine->ForceRelight() if you create a light
+   * after calling engine->Prepare(). Otherwise you can let engine->Prepare()
+   * do it.
+   * <p>
+   * Note! If you are using a system with hardware accelerated lighting
+   * (i.e. no lightmaps) then the discussion above is not relevant.
    */
   virtual csPtr<iLight> CreateLight (const char* name, const csVector3& pos,
-  	float radius, const csColor& color, bool pseudoDyn) = 0;
+  	float radius, const csColor& color, int dyntype = CS_LIGHT_DYNAMICTYPE_STATIC) = 0;
 
   /** Find a static/pseudo-dynamic light by name.
    * \param Name the engine name of the desired light
@@ -672,29 +682,6 @@ struct iEngine : public iBase
    * (otherwise iterate over all lights)
    */
   virtual csPtr<iLightIterator> GetLightIterator (iRegion* region = 0) = 0;
-
-  /**
-   * Create a dynamic light. After creating a dynamic light you have to
-   * call SetSector() on it. Do NOT add the light to the list of lights
-   * in a sector. That list is only for static or pseudo-dynamic lights.
-   * You also have to call Setup() on the dynamic light to actually calculate
-   * the lighting. This must be redone everytime the radius or the position
-   * changes (but not the color).
-   * \param pos the position of the light in the sector
-   * \param radius the greatest distance at which this light will 
-   * affect an object 
-   * \param color the color of the light (also affects intensity)
-   */
-  virtual csPtr<iLight> CreateDynLight (const csVector3& pos, float radius,
-  	const csColor& color) = 0;
-
-  /** Remove a dynamic light.
-   * \param light light to remove
-   */
-  virtual void RemoveDynLight (iLight* light) = 0;
-
-  /// Return the first dynamic light in this engine.
-  virtual iLight* GetFirstDynLight () const = 0;
 
   /**
    * Get the required flags for 3D->BeginDraw() which should be called
@@ -1056,7 +1043,7 @@ struct iEngine : public iBase
    * This will not clear the object but it will remove all references
    * to that object that the engine itself keeps. This function works
    * for: iSector, iCollection, iMeshWrapper, iMeshFactoryWrapper,
-   * iCameraPosition, iLight (dynamic only @@@), iMaterialWrapper, and iTextureWrapper.
+   * iCameraPosition, iLight, iMaterialWrapper, and iTextureWrapper.
    * Note that the object is only removed if the resulting ref count will
    * become zero. So basically this function only releases the references
    * that the engine holds.

@@ -138,7 +138,7 @@ csFireMeshObject::~csFireMeshObject()
 {
   if (dynlight && delete_light)
   {
-    light_engine->RemoveDynLight (dynlight);
+    light_engine->RemoveLight (dynlight);
   }
   delete[] part_pos;
   delete[] part_speed;
@@ -241,8 +241,11 @@ void csFireMeshObject::Update (csTicks elapsed_time)
 void csFireMeshObject::AddLight (iEngine *engine, iSector *sec)
 {
   if (dynlight) return;
-  dynlight = engine->CreateDynLight (origin.GetCenter(), 5, csColor (1, 1, 0));
-  dynlight->SetSector (sec);
+  dynlight = engine->CreateLight ("", origin.GetCenter(), 5, csColor (1, 1, 0),
+  	CS_LIGHT_DYNAMICTYPE_DYNAMIC);
+  sec->GetLights ()->Add (dynlight);
+  dynlight->Setup ();
+  // @@@ BUG!
   dynlight->Setup ();
   delete_light = true;
   light_engine = engine;

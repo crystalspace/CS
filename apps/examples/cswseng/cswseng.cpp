@@ -291,13 +291,13 @@ void ceCswsEngineApp::SetupDefaultWorld ()
   iLightList* ll = room->GetLights ();
   csRef<iLight> light;
   light = engine->CreateLight (0, csVector3(-3, 5, 0), 10,
-  	csColor(1, 0, 0), false);
+  	csColor(1, 0, 0));
   ll->Add (light);
   light = engine->CreateLight (0, csVector3(3, 5, 0), 10,
-  	csColor(0, 0, 1), false);
+  	csColor(0, 0, 1));
   ll->Add (light);
   light = engine->CreateLight (0, csVector3(0, 5, -3), 10,
-  	csColor(0, 1, 0), false);
+  	csColor(0, 1, 0));
   ll->Add (light);
 }
 

@@ -216,15 +216,15 @@ bool TerrBigTut::Initialize ()
   iLightList* ll = room->GetLights ();
 
   light = engine->CreateLight (0, csVector3 (-50, 20, 0), 50,
-  	csColor (1, 0, 0), false);
+  	csColor (1, 0, 0));
   ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (50, 20,  0), 50,
-  	csColor (0, 0, 1), false);
+  	csColor (0, 0, 1));
   ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (0, 20, -50), 50,
-  	csColor (0, 1, 0), false);
+  	csColor (0, 1, 0));
   ll->Add (light);
 
   engine->Prepare ();

@@ -180,14 +180,20 @@ instead of @code{iStatLight} and @code{iDynLight}:
 @item
 @code{iEngine::FindLight()}.
 @item
-@code{iEngine::CreateDynLight()}.
-@item
-@code{iEngine::RemoveDynLight()}.
-@item
-@code{iEngine::GetFirstDynLight()}.
-@item
 @code{iEngine::ForceRelight()}.
 @end itemize
+
+The last parameter of @code{iEngine::CreateLight()} routine has
+changed to be the dynamic type of the light (one of
+@code{CS_LIGHT_DYNAMICTYPE} constants) instead of a boolean. The
+@code{iEngine::CreateDynLight()} has thus been superceded by this
+function.
+
+All functions related to dynamic lights have been removed. Dynamic
+lights are now treated exactly like static lights. i.e. you have to
+call @code{iSector::GetLights()} and @code{Add()} the light to the
+sector. The @code{iLight::Setup()} function remains however and is
+specific to dynamic lights.
 
 @subheading Polygon Texture Mapping Changes
 @cindex @code{iPolyTexNone}

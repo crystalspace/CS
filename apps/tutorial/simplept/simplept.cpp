@@ -397,7 +397,7 @@ bool Simple::Initialize ()
 
   csRef<iLight> light;
   light = engine->CreateLight (0, csVector3 (0, 0, 0), 20,
-  	csColor (1, 1, 1), false);
+  	csColor (1, 1, 1));
   room->GetLights ()->Add (light);
 
   engine->Prepare ();

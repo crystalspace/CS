@@ -701,16 +701,19 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
     return;
 
   // Apply lighting BEFORE the very first frame
-  iLight* dyn = Engine->GetFirstDynLight ();
-  while (dyn)
+  int i;
+  for (i = 0 ; i < dynamic_lights.Length () ; i++)
   {
-    extern void HandleDynLight (iLight*);
-    iLight* dn = dyn->GetNext ();
+    iLight* dyn = dynamic_lights[i];
+    extern bool HandleDynLight (iLight*);
     csRef<iDataObject> dao (
     	CS_GET_CHILD_OBJECT (dyn->QueryObject (), iDataObject));
     if (dao)
-      HandleDynLight (dyn);
-    dyn = dn;
+      if (HandleDynLight (dyn))
+      {
+        dynamic_lights.DeleteIndex (i);
+	i--;
+      }
   }
   // Apply lighting to all meshes
   light_statics ();

@@ -127,6 +127,8 @@ public:
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
 
+  csRefArray<iLight> dynamic_lights;
+
   int FrameWidth, FrameHeight;
 
   /// All maps we want to load.

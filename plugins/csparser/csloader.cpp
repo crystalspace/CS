@@ -3524,7 +3524,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   float dist = 0;
 
   csColor color;
-  bool dyn;
+  int dyn;
   struct csHaloDef
   {
     int type;
@@ -3561,7 +3561,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   // New format.
   pos.x = pos.y = pos.z = 0;
   color.red = color.green = color.blue = 1;
-  dyn = false;
+  dyn = CS_LIGHT_DYNAMICTYPE_STATIC;
 //#ifndef CS_USE_NEW_RENDERER
   dist = 1;
 //#endif
@@ -3594,8 +3594,15 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	  return 0;
         break;
       case XMLTOKEN_DYNAMIC:
-	if (!SyntaxService->ParseBool (child, dyn, true))
-	  return 0;
+        {
+	  bool d;
+	  if (!SyntaxService->ParseBool (child, d, true))
+	    return 0;
+	  if (d)
+	    dyn = CS_LIGHT_DYNAMICTYPE_PSEUDO;
+	  else
+	    dyn = CS_LIGHT_DYNAMICTYPE_STATIC;
+	}
         break;
       case XMLTOKEN_KEY:
 	{

@@ -2288,19 +2288,23 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg && csScanStr (arg, "%f,%f,%f,%f,%d", &r, &g, &b, &radius,
     	&thing_shadows) == 5)
     {
-      dyn = Sys->view->GetEngine ()->CreateDynLight (pos,
-      	radius, csColor (r, g, b));
+      dyn = Sys->view->GetEngine ()->CreateLight ("", pos,
+      	radius, csColor (r, g, b), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
       if (thing_shadows)
         dyn->GetFlags ().Set (CS_LIGHT_THINGSHADOWS, CS_LIGHT_THINGSHADOWS);
       rnd = false;
     }
     else
     {
-      dyn = Sys->view->GetEngine ()->CreateDynLight (pos,
-      	6, csColor (1, 1, 1));
+      dyn = Sys->view->GetEngine ()->CreateLight ("", pos,
+      	6, csColor (1, 1, 1), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
       rnd = true;
     }
-    dyn->SetSector (Sys->view->GetCamera ()->GetSector ());
+    iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
+    ll->Add (dyn);
+    dyn->Setup ();
+    Sys->dynamic_lights.Push (dyn);
+    // @@@ BUG: for some reason it is needed to call Setup() twice!!!!
     dyn->Setup ();
     extern void AttachRandomLight (iLight* light);
     if (rnd)
@@ -2344,12 +2348,12 @@ bool CommandHandler (const char *cmd, const char *arg)
     	&radius) == 5)
     {
       light = Sys->view->GetEngine ()->CreateLight (name,
-        pos, radius, csColor (r, g, b), true);
+        pos, radius, csColor (r, g, b), CS_LIGHT_DYNAMICTYPE_PSEUDO);
     }
     else
     {
       light = Sys->view->GetEngine ()->CreateLight ("deflight",
-        pos, 12, csColor (0, 0, 1), true);
+        pos, 12, csColor (0, 0, 1), CS_LIGHT_DYNAMICTYPE_PSEUDO);
     }
     iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
     ll->Add (light);
@@ -2358,20 +2362,51 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "dellight"))
   {
-    iLight* dyn;
-    if ((dyn = Sys->view->GetEngine ()->GetFirstDynLight ()) != 0)
+    RECORD_CMD (cmd);
+    iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
+    int i;
+    for (i = 0 ; i < ll->GetCount () ; i++)
     {
-      Sys->view->GetEngine ()->RemoveDynLight (dyn);
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Dynamic light deleted.");
+      iLight* l = ll->Get (i);
+      if (l->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
+      {
+        ll->Remove (l);
+	int j;
+	for (j = 0 ; j < Sys->dynamic_lights.Length () ; j++)
+	{
+	  if (Sys->dynamic_lights[j] == l)
+	  {
+	    Sys->dynamic_lights.DeleteIndex (j);
+	    break;
+	  }
+	}
+	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Dynamic light removed.");
+        break;
+      }
     }
   }
   else if (!strcasecmp (cmd, "dellights"))
   {
     RECORD_CMD (cmd);
-    iLight* dyn;
-    while ((dyn = Sys->view->GetEngine ()->GetFirstDynLight ()) != 0)
+    iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
+    int i;
+    for (i = 0 ; i < ll->GetCount () ; i++)
     {
-      Sys->view->GetEngine ()->RemoveDynLight (dyn);
+      iLight* l = ll->Get (i);
+      if (l->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
+      {
+        ll->Remove (l);
+	int j;
+	for (j = 0 ; j < Sys->dynamic_lights.Length () ; j++)
+	{
+	  if (Sys->dynamic_lights[j] == l)
+	  {
+	    Sys->dynamic_lights.DeleteIndex (j);
+	    break;
+	  }
+	}
+	i--;
+      }
     }
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "All dynamic lights deleted.");
   }

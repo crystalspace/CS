@@ -150,8 +150,7 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
   csRef<iLight> light (engine->CreateLight ("",
   	csVector3 (dx+rand2 (.9*s), dy+rand2 (.9*s), dz+rand2 (.9*s)),
 	1+rand1 (3),
-  	csColor (rand1 (1), rand1 (1), rand1 (1)),
-	false));
+  	csColor (rand1 (1), rand1 (1), rand1 (1))));
   room->GetLights ()->Add (light);
 
   InfRoomData* ird = new InfRoomData ();

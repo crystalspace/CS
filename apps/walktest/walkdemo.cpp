@@ -935,10 +935,13 @@ void add_bot (float size, iSector* where, csVector3 const& pos,
   {
     float r, g, b;
     RandomColor (r, g, b);
-    dyn = Sys->view->GetEngine ()->CreateDynLight (
-    	pos, dyn_radius, csColor(r, g, b));
-    dyn->SetSector (where);
+    dyn = Sys->view->GetEngine ()->CreateLight ("",
+    	pos, dyn_radius, csColor(r, g, b), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
+    where->GetLights ()->Add (dyn);
     dyn->Setup ();
+    //@@@ BUG! Calling twice is needed.
+    dyn->Setup ();
+    Sys->dynamic_lights.Push (dyn);
   }
   iMeshFactoryWrapper* tmpl = Sys->view->GetEngine ()->GetMeshFactories ()
   	->FindByName ("bot");
@@ -1021,7 +1024,7 @@ struct RandomLight
   float dyn_r1, dyn_g1, dyn_b1;
 };
 
-void HandleDynLight (iLight* dyn)
+bool HandleDynLight (iLight* dyn)
 {
   LightStruct* ls = (LightStruct*)(csDataObject::GetData(dyn->QueryObject ()));
   switch (ls->type)
@@ -1080,10 +1083,16 @@ void HandleDynLight (iLight* dyn)
         dyn->QueryObject ()->ObjAdd (esdata);
 	esdata->DecRef ();
         add_particles_explosion (dyn->GetSector (), dyn->GetCenter (), "explo");
-        return;
+        return false;
       }
       else ms->dir.SetOrigin (v);
-      dyn->SetSector (s);
+      if (dyn->GetSector () != s)
+      {
+	dyn->IncRef ();
+        dyn->GetSector ()->GetLights ()->Remove (dyn);
+        s->GetLights ()->Add (dyn);
+	dyn->DecRef ();
+      }
       dyn->SetCenter (v);
       dyn->Setup ();
       if (ms->sprite) move_mesh (ms->sprite, s, v);
@@ -1108,8 +1117,8 @@ void HandleDynLight (iLight* dyn)
 	  	CS_GET_CHILD_OBJECT (dyn->QueryObject (), iDataObject));
 	  dyn->QueryObject ()->ObjRemove (ido->QueryObject ());
 	  delete es;
-          Sys->view->GetEngine ()->RemoveDynLight (dyn);
-	  return;
+	  dyn->GetSector ()->GetLights ()->Remove (dyn);
+	  return true;
 	}
       }
       dyn->SetInfluenceRadius (es->radius);
@@ -1136,6 +1145,7 @@ void HandleDynLight (iLight* dyn)
       break;
     }
   }
+  return false;
 }
 
 void show_lightning ()
@@ -1168,10 +1178,14 @@ void fire_missile ()
   csVector3 pos = Sys->view->GetCamera ()->GetTransform ().This2Other (dir);
   float r, g, b;
   RandomColor (r, g, b);
-  csRef<iLight> dyn (
-  	Sys->view->GetEngine ()->CreateDynLight (pos, 4, csColor (r, g, b)));
-  dyn->SetSector (Sys->view->GetCamera ()->GetSector ());
+  csRef<iLight> dyn =
+  	Sys->view->GetEngine ()->CreateLight ("", pos, 4, csColor (r, g, b),
+		CS_LIGHT_DYNAMICTYPE_DYNAMIC);
+  Sys->view->GetCamera ()->GetSector ()->GetLights ()->Add (dyn);
   dyn->Setup ();
+  // @@@ BUG!!! Calling twice is needed.
+  dyn->Setup ();
+  Sys->dynamic_lights.Push (dyn);
 
   MissileStruct* ms = new MissileStruct;
   ms->snd = 0;
