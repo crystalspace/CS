@@ -111,7 +111,7 @@ ifeq (,$(SWIGBIN))
   SWIGBIN = swig
 endif
 
-$(SWIG.PERL5.PM) $(SWIG.PERL5.C): $(SWIG.I)
+$(SWIG.PERL5.PM) $(SWIG.PERL5.C):
 	-$(SWIGBIN) -perl5 -c++ -v -shadow -Iinclude \
 	-module $(SWIG.MOD) -o $(SWIG.PERL5.C) $(SWIG.I)
 	$(MV) $(SRCDIR)/plugins/cscript/csperl5/$(SWIG.MOD).pm $(SWIG.PERL5.PM)

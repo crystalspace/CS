@@ -19,6 +19,11 @@ The history order is reversed so that new features are at the top.
 	  to awsScrollBar::Setup() to correct the placement of the horizontal
 	  scroll bar left/right buttons.  Eric also corrected the initial
 	  position of the "knob" for horzontal scrollers.
+	- In the csperl5 makefile, Oktal removed the Perl module's dependency
+	  on the SWIG interface file, so that it will not try to rebuild the
+	  module (which will fail if users do not have SWIG installed) when
+	  this interface file is updated (the module will be updated with the
+	  same changes when the interface file is modified).
 4-May-2003
 	- Eric Sunshine made the following changes:
 	    - Updated Swig test in configure.ac to utilize new optional version
