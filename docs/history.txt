@@ -17,6 +17,7 @@ The history order is reversed so that new features are at the top.
 	  the real polygons are traversed after the bounding box polygons
 	  because the real polygons update the c-buffer and the bounding
 	  box polygons test against it.
+	- Eric Sunshine fixed the new meta.cpp so that it compiles on NextStep.
 6-Jun-2001
 	- Removed support for the quadtree, coverage mask tree, coverage mask
 	  cube, and solid tree from CS. I parked the code locally and it will

@@ -37,7 +37,6 @@
 
 #include "meta.h"
 
-
 IMPLEMENT_IBASE (csMetaBall)
   IMPLEMENTS_INTERFACE (iMeshObject)
   IMPLEMENTS_EMBEDDED_INTERFACE (iMetaBallState)
@@ -116,21 +115,27 @@ bool csMetaBall::Initialize ()
 {
   if (!initialize)
   {
-  initialize = true;
-  mesh = new G3DTriangleMesh();
-  memset(mesh,0,sizeof(G3DTriangleMesh));
-  meta_balls = new MetaBall[num_meta_balls];
-  mesh->triangles = new csTriangle[int(max_vertices/3)];
-  mesh->vertices[0] = new csVector3[max_vertices](0.0,0.0,0.0);
-  mesh->texels[0] = new csVector2[max_vertices](0.0,0.0);
-  mesh->vertex_colors[0] = new csColor[max_vertices](1.0,1.0,1.0);
-  InitTables();
-  mesh->do_fog = false;
-  mesh->do_mirror = false;
-  mesh->do_morph_texels = false;
-  mesh->do_morph_colors = false;
-  mesh->vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-  NextFrame(0);
+    initialize = true;
+    mesh = new G3DTriangleMesh();
+    memset(mesh,0,sizeof(G3DTriangleMesh));
+    meta_balls = new MetaBall[num_meta_balls];
+    mesh->triangles = new csTriangle[int(max_vertices/3)];
+    mesh->vertices[0] = new csVector3[max_vertices];
+    mesh->texels[0] = new csVector2[max_vertices];
+    mesh->vertex_colors[0] = new csColor[max_vertices];
+    for (int i = 0; i < max_vertices; i++)
+    {
+      mesh->vertices[i].Set(0,0,0);
+      mesh->texels[i].Set(0,0);
+      mesh->vertex_colors[i].Set(1,1,1);
+    }
+    InitTables();
+    mesh->do_fog = false;
+    mesh->do_mirror = false;
+    mesh->do_morph_texels = false;
+    mesh->do_morph_colors = false;
+    mesh->vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
+    NextFrame(0);
   }
   return true;
 }
