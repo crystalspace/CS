@@ -57,7 +57,7 @@ else
   endif
   SRC.CSSYS += $(SRC.SYS_CSSYS_EXE)
 endif
-OBJ.CSSYS ?= $(addprefix $(OUT),$(notdir \
+OBJ.CSSYS = $(addprefix $(OUT),$(notdir \
   $(subst .s,$O,$(subst .c,$O,$(SRC.CSSYS:.cpp=$O)))))
 
 TO_INSTALL.STATIC_LIBS += $(CSSYS.LIB)
@@ -77,7 +77,7 @@ $(CSSYS.LIB): $(OBJ.CSSYS)
 	$(DO.LIBRARY) 
 
 cssysclean:
-	-$(RM) $(CSSYS.LIB) $(OBJ.CSSYS) dep: $(OUTOS)cssys.dep
+	-$(RM) $(CSSYS.LIB) $(OBJ.CSSYS)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)cssys.dep
