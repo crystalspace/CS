@@ -5,13 +5,18 @@
 #ifndef __VOLATILE_H__
 #define __VOLATILE_H__
 
-  #define OS_WIN32
-  #define PROC_INTEL
+#define OS_WIN32
+#define PROC_INTEL
+
 #if defined(__BORLANDC__)
   #define COMP_BC
   #define __NEED_GENERIC_ISDIR
 #else
-  #define COMP_VC
+# if defined(__MINGW32__)
+#	define COMP_GCC
+# else
+#	define COMP_VC
+# endif
 #endif
   #define DO_SOUND
   #define DO_GIF
