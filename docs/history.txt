@@ -38,6 +38,11 @@ chronological order.
 	- Anders Stenberg fixed pico->pico internal drawing in pgserver
 	  for real this time. Includes a very nasty, but unfortunately
 	  necessary hack in the pgserver plugin.
+	- res fixed a problem with library loading error reporting on Win32:
+	  under certain circumstances, csPrintLibraryError() popped strings 
+	  from an empty string array, which triggers an assertion.
+	- res augmented SCF to emit an error in case a symbol couldn't be 
+	  retrieved from a library.
 29-Aug-2003
 	- renej added support for using CS from Java. SWIG is needed since
 	  no generated files are in the CVS repository. Building is done

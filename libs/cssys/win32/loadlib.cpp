@@ -155,9 +155,10 @@ bool csUnloadLibrary (csLibraryHandle Handle)
 void csPrintLibraryError (const char *iModule)
 {
   char *str;
-  while((str = (char*)ErrorMessages.Pop()) != 0)
+  while (ErrorMessages.Length () > 0)
   {
-    fprintf (stderr, "  %s", str);
+    str = (char*)ErrorMessages.Pop();
+    if (str != 0) fprintf (stderr, "  %s", str);
     delete[] str;
   }
 }

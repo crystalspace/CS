@@ -175,7 +175,10 @@ scfSharedLibrary::scfSharedLibrary (const char *lib, const char *core)
     if (initfunc)
       initfunc(PrivateSCF);
     else
+    {
+      fprintf (stderr, "SCF ERROR: '%s' doesn't export '%s'\n", sym.GetData ());
       csPrintLibraryError(sym);
+    }
   }
   else
     csPrintLibraryError(LibraryName);
@@ -192,7 +195,10 @@ scfSharedLibrary::~scfSharedLibrary ()
     if (func)
       func();
     else
+    {
+      fprintf (stderr, "SCF ERROR: '%s' doesn't export '%s'\n", sym.GetData ());
       csPrintLibraryError(sym);
+    }
     csUnloadLibrary (LibraryHandle);
   }
   delete [] FuncCoreName;
