@@ -18,6 +18,12 @@ chronological order.
 	  those classes so it doesn't make sense to have the additional
 	  overhead (more pointer redirection, more object management) for this.
 	  Also I'm planning a big redesign of this anyway.
+	- Jorrit removed several of the methods in iRenderView and put them
+	  non-virtual and private to the engine in csRenderView instead.
+	  All these methods are internal for the engine and should not be
+	  exposed to the outside (methods like CreateRenderContext and so on).
+	  This has the nice benefit of making the engine a bit faster again
+	  (less virtual function calls).
 20-Apr-2004
 	- Jorrit added 'camera_origin' to csRenderMesh. The meshes will
 	  fill this field with the origin of that mesh in camera space. This
