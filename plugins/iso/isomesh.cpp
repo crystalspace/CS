@@ -186,6 +186,7 @@ IMPLEMENT_IBASE_END
 
 IMPLEMENT_IBASE (csIsoMeshSprite)
   IMPLEMENTS_INTERFACE (iIsoMeshSprite)
+  IMPLEMENTS_INTERFACE (iIsoSprite)
 IMPLEMENT_IBASE_END
 
 csIsoMeshSprite::csIsoMeshSprite (iBase *iParent)
@@ -215,8 +216,8 @@ void csIsoMeshSprite::SetMeshObject(iMeshObject *mesh)
 
 void csIsoMeshSprite::Draw(iIsoRenderView *rview)
 {
-  printf("isomeshsprite::Draw(%g, %g, %g)\n", position.x, position.y,
-    position.z);
+  //printf("isomeshsprite::Draw(%g, %g, %g)\n", position.x, position.y,
+    //position.z);
 
   /// update animation
   mesh->NextFrame(rview->GetView()->GetEngine()->GetSystem()->GetTime());
@@ -266,11 +267,11 @@ void csIsoMeshSprite::Draw(iIsoRenderView *rview)
 
   if(mesh->DrawTest(fakerview, movable))
   {
-    printf("mesh draw()\n");
+    //printf("mesh draw()\n");
     /// UpdateLighting ....
     if(mesh->Draw(fakerview, movable, zbufmode))
     {
-      printf("mesh prob vis\n");
+      //printf("mesh prob vis\n");
       /// was probably visible
     }
   }
@@ -326,7 +327,12 @@ void csIsoMeshSprite::SetMixMode(UInt /*mode*/)
 
 UInt csIsoMeshSprite::GetMixMode() const
 {
-  return 0;
+  /// CS_FX_COPY -> rendered in main pass,
+  /// CS_FX_ADD -> in alpha pass
+  if((zbufmode == CS_ZBUF_USE)
+     ||(zbufmode == CS_ZBUF_FILL))
+     return CS_FX_COPY;
+  return CS_FX_ADD;
 }
 
 void csIsoMeshSprite::SetGrid(iIsoGrid *grid)

@@ -106,10 +106,12 @@ class csIsoFakeCamera : public iCamera
   bool mirror;
   // camera number for keep track of changes
   long camnum;
+  /// the scale of the view
+  float scale;
 public:
   DECLARE_IBASE;
   csIsoFakeCamera();
-  virtual ~csIsoFakeCamera() {}
+  virtual ~csIsoFakeCamera();
 
   /// precalc values for this view
   void SetIsoView(const csVector2& scroll, const csVector2& x_axis, 

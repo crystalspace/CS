@@ -81,7 +81,15 @@ void csIsoGrid::RemoveSprite(iIsoSprite *sprite)
 void csIsoGrid::MoveSprite(iIsoSprite *sprite, const csVector3& oldpos,
     const csVector3& newpos)
 {
-  if(box.In(newpos))
+  /// same as below, but detect edging errors.
+  //if(box.In(newpos)), must be epsilon from the border at least.
+  if( (newpos.x - box.MinX() > EPSILON)
+    && (newpos.y - box.MinY() > EPSILON)
+    && (newpos.z - box.MinZ() > EPSILON)
+    && (box.MaxX() - newpos.x > EPSILON)
+    && (box.MaxY() - newpos.y > EPSILON)
+    && (box.MaxZ() - newpos.z > EPSILON)
+    )
   {
     //printf("Sprite moved to new pos\n");
     GetCell(oldpos)->RemoveSprite(sprite, oldpos);

@@ -105,6 +105,11 @@ void csIsoView::Draw()
     world->Draw(rview);
     if(pass == CSISO_RENDERPASS_MAIN)
       rview->DrawBuckets();
+    if(pass == CSISO_RENDERPASS_PRE)
+    {
+      /// precalc camera
+      fakecam->SetIsoView(scroll, x_axis, y_axis, z_axis);
+    }
   }
   delete clipper;
 }
@@ -177,7 +182,6 @@ void csIsoView::SetAxes(float xscale, float yscale, float zscale, float zskew,
 iCamera* csIsoView::GetFakeCamera(const csVector3& center,
     iIsoRenderView *rview)
 {
-  fakecam->SetIsoView(scroll, x_axis, y_axis, z_axis);
   fakecam->IsoReady(center, rview, scroll);
   return fakecam;
 }
@@ -195,11 +199,18 @@ csIsoFakeCamera::csIsoFakeCamera()
   view = 0;
   mirror = false;
   camnum = 0;
+  scale = 1.0;
+}
+
+csIsoFakeCamera::~csIsoFakeCamera()
+{
+  //printf("delete camera!\n");
 }
 
 void csIsoFakeCamera::SetIsoView(const csVector2& scroll,
   const csVector2& x_axis, const csVector2& y_axis, const csVector2& z_axis)
 {
+  //printf("SetIsoView\n");
   mirror = false;
   fovangle = 180.;
   camnum ++;
@@ -215,21 +226,37 @@ void csIsoFakeCamera::SetIsoView(const csVector2& scroll,
     x_axis.y, y_axis.y, z_axis.y,
     -1.0, 0.0, 1.0
   );
+
+  /// adjust to make camera space lengths about 1.0
+  /// divide the camera x,y rows of the matrix by the scale,
+  /// later multiply the fov by the scale, so that iz = fov/z,
+  /// will the scale times larger - and thus transform nicely.
+  scale = (x_axis.x + y_axis.y)*0.5;
+  float div = 1./scale;
+  m.m11 *= div;
+  //m.m12 *= div; // is zero
+  m.m13 *= div;
+  m.m21 *= div;
+  m.m22 *= div;
+  m.m23 *= div;
+
   //printf("M (%7g %7g %7g)\n", m.m11, m.m12, m.m13);
   //printf("M (%7g %7g %7g)\n", m.m21, m.m22, m.m23);
   //printf("M (%7g %7g %7g)\n", m.m31, m.m32, m.m33);
 
   //// testing m.
-  //csVector3 pos = csVector3(12, 1, 4) - csVector3(.25, .25, .25);
-  //csVector3 res = m * pos;
-  //printf("Scroll %g,%g  \n", scroll.x, scroll.y);
-  //printf("MTEST %g, %g, %g   ->  %g, %g, %g\n", pos.x, pos.y, pos.z,
-    //scroll.x + res.x, scroll.y + res.y, res.z);
-  //res.x=scroll.x+ pos.x*x_axis.x + pos.z*z_axis.x;
-  //res.y=scroll.y+ pos.x*x_axis.y + pos.y*y_axis.y + pos.z*z_axis.y;
-  //res.z= 1.0*pos.z - 1.0*pos.x;
-  //printf("MTEST %g, %g, %g   ->  %g, %g, %g\n", pos.x, pos.y, pos.z,
-    //res.x, res.y, res.z);
+  /*
+  csVector3 pos = csVector3(12, 1, 4) - csVector3(.25, .25, .25);
+  csVector3 res = m * pos;
+  printf("Scroll %g,%g  \n", scroll.x, scroll.y);
+  printf("MTEST %g, %g, %g   ->  %g, %g, %g\n", pos.x, pos.y, pos.z,
+    scroll.x + res.x, scroll.y + res.y, res.z);
+  res.x=scroll.x+ pos.x*x_axis.x + pos.z*z_axis.x;
+  res.y=scroll.y+ pos.x*x_axis.y + pos.y*y_axis.y + pos.z*z_axis.y;
+  res.z= 1.0*pos.z - 1.0*pos.x;
+  printf("MTEST %g, %g, %g   ->  %g, %g, %g\n", pos.x, pos.y, pos.z,
+    res.x, res.y, res.z);
+  */
 
   trans.SetO2T( m );
   trans.SetO2TTranslation( csVector3(0, 0, 0) );
@@ -243,31 +270,36 @@ void csIsoFakeCamera::SetIsoView(const csVector2& scroll,
 void csIsoFakeCamera::IsoReady(const csVector3& position, 
   iIsoRenderView *rview, const csVector2& scroll)
 {
+  //printf("IsoReady %g,%g,%g\n", position.x, position.y, position.z);
   camnum++;
   /// correct for position and renderview (minimum z bound)
   float minz = rview->GetMinZ();
   //// fov is an int!
-  fov = QInt(position.z - position.x - minz);
+  //fov = QInt(position.z - position.x - minz);
+  /// adjust fov by scale, to make the iz=fov/z scaled larger.
+  fov = QInt( (position.z - position.x - minz)*scale );
   invfov = 1. / (position.z - position.x - minz);
   //trans.SetO2TTranslation( csVector3(0, 0, -minz) );
   //trans.SetO2TTranslation( trans.This2Other(csVector3(0, 0, -minz)) );
   // shift Z by the zlowerbound
   trans.SetO2TTranslation( csVector3(0,0, +minz) );
   // compensate for the z shift in the x,y shift in screenspace.
-  shiftx = scroll.x + minz * trans.GetO2T().m13;
-  shifty = scroll.y + minz * trans.GetO2T().m23;
+  shiftx = scroll.x + scale * minz * trans.GetO2T().m13;
+  shifty = scroll.y + scale * minz * trans.GetO2T().m23;
 
   rview->GetG3D()->SetPerspectiveCenter((int)shiftx, (int)shifty);
-  rview->GetG3D()->SetClipper( rview->GetClipper(), CS_CLIPPER_TOPLEVEL);
+  //rview->GetG3D()->SetClipper( rview->GetClipper(), CS_CLIPPER_TOPLEVEL);
 
-  //csMatrix3 bb = trans.GetO2T();
-  //bb.Transpose();
-  //csVector3 b = bb * csVector3(0,0,-1);
-  //printf("diff is %g, %g, %g ?\n", b.x, b.y, b.z);
-  //printf("minz %g\n", minz);
-  //csVector3 pos = csVector3(12, 1, 4) - csVector3(.25, .25, .25);
-  //csVector3 res = trans * pos;
-  //printf("MTESTB %g, %g, %g  ->  %g, %g, %g\n", pos.x, pos.y, pos.z,
-    //res.x + shiftx, res.y + shifty, res.z);
+  /*
+  csMatrix3 bb = trans.GetO2T();
+  bb.Transpose();
+  csVector3 b = bb * csVector3(0,0,-1);
+  printf("diff is %g, %g, %g ?\n", b.x, b.y, b.z);
+  printf("minz %g\n", minz);
+  csVector3 pos = csVector3(12, 1, 4) - csVector3(.25, .25, .25);
+  csVector3 res = trans * pos;
+  printf("MTESTB %g, %g, %g  ->  %g, %g, %g\n", pos.x, pos.y, pos.z,
+    res.x + shiftx, res.y + shifty, res.z);
+  */
 }
 
