@@ -54,7 +54,7 @@ rule ConstructPluginTarget
 
 rule SystemLinkApplication
 {
-  local target = $($(>)_TARGET) ;
+  local target = $($(<)_TARGET) ;
 
   if [ IsElem console : $(3) ]
   {
