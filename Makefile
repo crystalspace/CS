@@ -63,7 +63,7 @@ help: banner showconfig drvhelp libhelp apphelp pseudohelp
 depend:
 	@$(MAKE) --no-print-directory -f mk/cs.mak $@ DO_DEPEND=yes
 
-doc api clean cleanlib cleandep distclean:
+doc api pdf cleandoc html detex clean cleanlib cleandep distclean:
 	@$(MAKE) --no-print-directory -f mk/cs.mak $@
 
 unknown:
