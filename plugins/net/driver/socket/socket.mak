@@ -60,7 +60,9 @@ ifeq ($(MAKESECTION),targets)
 cssocket: $(OUTDIRS) $(CSSOCKET)
 
 $(CSSOCKET): $(OBJ.CSSOCKET) $(LIB.CSSOCKET)
-	$(DO.PLUGIN) $(SOCKET.LFLAGS)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(SOCKET.LFLAGS) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 clean: cssocketclean
 cssocketclean:

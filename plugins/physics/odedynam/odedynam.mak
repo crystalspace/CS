@@ -62,7 +62,9 @@ $(OUT)/%$O: plugins/physics/odedynam/%.cpp
 	$(DO.COMPILE.CPP) $(ODE.CFLAGS)
 
 $(ODEDYNAM): $(OBJ.ODEDYNAM) $(LIB.ODEDYNAM)
-	$(DO.PLUGIN) $(ODE.LFLAGS)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(ODE.LFLAGS) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 clean: odedynamclean
 odedynamclean:
