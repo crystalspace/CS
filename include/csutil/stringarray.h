@@ -393,6 +393,16 @@ public:
     return m;
   }
 
+  static int CaseSensitiveCompare (char const* item, void* key)
+  {
+    return strcmp (item, (char*)key);
+  }
+
+  static int CaseInsensitiveCompare (char const* item, void* key)
+  {
+    return strcasecmp (item, (char*)key);
+  }
+
   static int CaseSensitiveCompare (char const* item1, char const* item2)
   {
     return strcmp (item1, item2);
@@ -413,6 +423,14 @@ public:
     return strcasecmp (*(char const**)item1, *(char const**)item2);
   }
  
+  /**
+   * Find an element in a case sensitive way.
+   */
+  int FindSortedKey (void* key) const
+  {
+    return FindSortedKey (key, CaseSensitiveCompare);
+  }
+
   /**
    * Insert an element at a sorted position.
    * Assumes array is already sorted.

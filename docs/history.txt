@@ -33,6 +33,12 @@ for each given day, however, are in normal (ascending) chronological order.
 	      csArray<csComponent*>.
 	    - Replaced 'vViews' in csGrid with a csArray<csGridView*>.
 	    - Replaced 'vRegionStyles' in csGrid with a csArray<csGridCell*>.
+	- Jorrit added csStringArray::FindSortedKey() with only one argument.
+	  This will use default case sensitive key find.
+	- Jorrit removed some usages of csStrVector:
+	    - Replaced 'del' in csArchive.
+	    - Replaced 'Names' in csCommandLineParser.
+	    - Replaced 'Values' in csSpinBox.
 27-Jul-2003
 	- Philipp Aumayr added Cubemap and Texture3d Parser/Loader
 	- Marten Svanfeldt made a few changes related to new renderer

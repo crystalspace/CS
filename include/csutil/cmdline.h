@@ -22,7 +22,7 @@
 #include "iutil/cmdline.h"
 #include "csutil/csvector.h"
 #include "csutil/parray.h"
-#include "csutil/csstrvec.h"
+#include "csutil/stringarray.h"
 #include "csutil/util.h"
 
 /// Representation of a commandline option.
@@ -54,7 +54,7 @@ private:
   /// The array of all command-line options.
   csCommandLineOptionVector Options;
   /// The list of raw filenames on the command line (i.e. without any switches)
-  csStrVector Names;
+  csStringArray Names;
 
   /// Find Nth command-line option and return a pointer to the object (or 0)
   csCommandLineOption *FindOption (const char *iName, int iIndex) const;

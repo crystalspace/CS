@@ -22,7 +22,8 @@
 
 #include <stdio.h>
 #include "csutil/zip.h"
-#include "csutil/csstrvec.h"
+#include "csutil/csvector.h"
+#include "csutil/stringarray.h"
 
 struct csFileTime;
 
@@ -96,7 +97,7 @@ private:
   };
 
   ArchiveEntryVector dir;	// Archive directory: chain head (sorted)
-  csStrVector del;		// Files that should be deleted (sorted)
+  csStringArray del;		// Files that should be deleted (sorted)
   ArchiveEntryVector lazy;	// Lazy operations (unsorted)
 
   char *filename;		// Archive file name

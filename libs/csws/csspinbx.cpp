@@ -290,7 +290,7 @@ void csSpinBox::SetValue (int iValue)
       iValue = Values.Length () - 1;
     if (iValue < 0)
       iValue = 0;
-    SetText ((char *)Values [iValue]);
+    SetText (Values [iValue]);
   }
   else
   {
@@ -324,7 +324,7 @@ int csSpinBox::InsertItem (char *iValue, int iPosition)
 {
   if (iPosition == CSSB_ITEM_AFTERALL)
     iPosition = Values.Length ();
-  Values.Insert (iPosition, csStrNew (iValue));
+  Values.Insert (iPosition, iValue);
   return iPosition;
 }
 

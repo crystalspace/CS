@@ -418,7 +418,7 @@ bool csArchive::DeleteFile (const char *name)
   if (!FileExists (name))
     return false;
 
-  del.InsertSorted (csStrNew (name));
+  del.InsertSorted (name);
   return true;
 }
 
@@ -692,7 +692,7 @@ void csArchive::UpdateDirectory ()
 
 bool csArchive::IsDeleted (const char *name) const
 {
-  return (del.FindSortedKey (name) >= 0);
+  return (del.FindSortedKey ((void*)name) >= 0);
 }
 
 void csArchive::UnpackTime (ush zdate, ush ztime, csFileTime & rtime) const

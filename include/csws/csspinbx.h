@@ -31,7 +31,7 @@
 #include "cscomp.h"
 #include "cstimer.h"
 #include "csiline.h"
-#include "csutil/csstrvec.h"
+#include "csutil/stringarray.h"
 
 /// Spin box item structure
 struct csSpinBoxItem
@@ -109,7 +109,7 @@ class csSpinBox : public csInputLine
   /// Current spin box value
   int Value;
   /// The list of allowed values; if list is empty, spin box is numerical
-  csStrVector Values;
+  csStringArray Values;
   /// Alternative value limits for numerical content
   csSpinBoxLimits NumLimits;
   /// Spin box state

@@ -65,7 +65,7 @@ void csCommandLineParser::Initialize (int argc, const char* const argv[])
       Options.Push (new csCommandLineOption (opt, arg));
     }
     else
-      Names.Push (csStrNew (opt));
+      Names.Push (opt);
   }
   
   appDir = csGetAppDir (argv[0]);
@@ -121,7 +121,7 @@ bool csCommandLineParser::ReplaceName (const char *iValue, int iIndex)
 {
   if ((iIndex >= 0) && (iIndex < Names.Length ()))
   {
-    Names.Replace (iIndex, csStrNew (iValue));
+    Names.Put (iIndex, iValue);
     return true;
   }
   else
@@ -137,7 +137,7 @@ const char *csCommandLineParser::GetOption(const char *iName, int iIndex) const
 const char *csCommandLineParser::GetName (int iIndex) const
 {
   if ((iIndex >= 0) && (iIndex < Names.Length ()))
-    return (const char *)Names.Get (iIndex);
+    return Names[iIndex];
   return 0;
 }
 
@@ -148,7 +148,7 @@ void csCommandLineParser::AddOption (const char *iName, const char *iValue)
 
 void csCommandLineParser::AddName (const char *iName)
 {
-  Names.Push (csStrNew (iName));
+  Names.Push (iName);
 }
 
 bool csCommandLineParser::GetBoolOption(const char *iName, bool defaultValue)
