@@ -113,6 +113,12 @@ void TextureTrans::compute_texture_space (
   m.m11 = xu; m.m12 = xv; m.m13 = xw;
   m.m21 = yu; m.m22 = yv; m.m23 = yw;
   m.m31 = zu; m.m32 = zv; m.m33 = zw;
-  m.Invert ();
+  float det = m.Determinant ();
+  if (ABS (det) < SMALL_EPSILON)
+  {
+    // @@@ Warning?
+  }
+  else
+    m.Invert ();
   v.x = xo; v.y = yo; v.z = zo;
 }

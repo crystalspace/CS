@@ -903,7 +903,16 @@ void csPolygon3D::SetTextureSpace (
   	uv2.x - uv1.x, uv3.x - uv1.x,
   	uv2.y - uv1.y, uv3.y - uv1.y
   	);
-  m.Invert ();
+  float det = m.Determinant ();
+  if (ABS (det) < SMALL_EPSILON)
+  {
+    printf ("Warning: badly specified UV coordinates for polygon '%s'!\n",
+      GetName ());
+    SetTextureSpace (p1, p2, 1);
+    return;
+  }
+  else
+    m.Invert ();
   csVector2 pl;
   csVector3 po, pu, pv;
   // For (0,0) and Po

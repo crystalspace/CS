@@ -5,6 +5,11 @@ The history order is reversed so that new features are at the top.
 	  and GetMeshFactories() and removed several mesh/mesh factory
 	  related routines (like RemoveMeshWrapper(), GetMeshWrapperCount(),
 	  ...). This is similar to iSectorList.
+	- Made the UV syntax for specifying a texture a little bit more
+	  robust by testing if it is actually a valid texture mapping
+	  specification. This avoids a crash. It will print a warning
+	  if invalid. In addition it will select some default valid
+	  texture mapping.
 18-Jul-2001
 	- Reworked the cstool texture generation tool to also use a
 	  SCF structure for the slope and height function instead of a
