@@ -24,6 +24,10 @@ Short-term cleanups that need to be done:
 	  by change from Long to ULong in pfmt.
 	- Added doc on how to use new octree system.
 	- Fix from Seth Galbraith on the DOS port.
+	- Fix from Brandon Ehle which could cause WalkTest to crash
+	  at cleanup (especially with OpenGL).
+	- Fixed the creation of the texture mapping transformation matrix.
+	  Now 45 degree polygons will work in all cases.
 20-Sep-1999
 	- Eric Sunshine fixed an accidental sign-extension problem in
 	  csPixelFormat.
