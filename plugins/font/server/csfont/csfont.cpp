@@ -158,6 +158,34 @@ bool csDefaultFontServer::ReadFntFile(const char *file, csFontDef *&fontdef)
   /// alloc
   fontdef->FontBitmap = new unsigned char [256 * fontdef->BytesPerChar ];
   fontdef->IndividualWidth = new unsigned char [256];
+  
+  int i;
+  int byte = 0;
+  int bitmaplen = 256*fontdef->BytesPerChar;
+
+  /// if this is a binary fnt file we can do it faster
+  if(strncmp(fntfile, "FNTBINARY", 9) == 0)
+  {
+    const char * startstr = "STARTBINARY";
+    cp = fntfile;
+    cp = strstr(cp, startstr);
+    if(!cp)
+    {
+      System->Printf(MSG_FATAL_ERROR, "File %s has no binary part.\n", file);
+      return false;
+    }
+    cp += strlen(startstr) +1; /// also skip \n
+    if( fsize - (cp-fntfile) < (unsigned int)( bitmaplen + 256 ) )
+    {
+      System->Printf(MSG_FATAL_ERROR, "File %s is too short.\n", file);
+      return false;
+    }
+    memcpy(fontdef->FontBitmap, cp, bitmaplen);
+    cp += bitmaplen;
+    for(i=0; i<256; i++)
+      fontdef->IndividualWidth[i] = cp[i];
+    return true;
+  }
 
   /// read fontbitmaps
   /// find first 'unsigned char' then the '{' after that.
@@ -172,9 +200,6 @@ bool csDefaultFontServer::ReadFntFile(const char *file, csFontDef *&fontdef)
   }
   cp++; /// skip the {
 
-  int i;
-  int byte = 0;
-  int bitmaplen = 256*fontdef->BytesPerChar;
   for(i=0; i<bitmaplen; i++)
   {
     if(sscanf(cp, " %x%n", &byte, &skip)==1)
