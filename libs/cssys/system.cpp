@@ -112,16 +112,18 @@ csSystemDriver::~csSystemDriver ()
     CHKB (delete Config);
   if (ConfigName)
     CHKB (delete [] ConfigName);
+  // Free all plugin options (also decrefs their iConfig interfaces)
+  OptionList.DeleteAll ();
 
   System = NULL;
 
   // NOTE: We should not decrement reference count for known drivers
   // since we suppose they will deregister themself during their
-  // shutdown sequence. If they won't do, they won't not be unloaded.
+  // shutdown sequence. If they won't do, they won't be unloaded.
 
   // Free all plugins
   PlugIns.DeleteAll ();
-  
+
   CHK (delete Console);
   CHK (delete Mouse);
   CHK (delete Keyboard);

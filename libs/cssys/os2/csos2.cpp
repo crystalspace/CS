@@ -40,7 +40,7 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
   CONSTRUCT_IBASE (NULL)
   /* Set main thread to idle priority */
-  DosSetPriority (PRTYS_THREAD, PRTYC_IDLETIME, PRTYD_MAXIMUM, 0L);
+//  DosSetPriority (PRTYS_THREAD, PRTYC_IDLETIME, PRTYD_MAXIMUM, 0L);
 }
 
 void SysSystemDriver::SetSystemDefaults (csIniFile *config)

@@ -256,7 +256,7 @@ public:
   /// Wait until buffer redraw is complete. Recommended before calling Switch()
   inline void WaitSwitch ()
   {
-    DosWaitEventSem (sRedrawComplete, 100);
+    DosWaitEventSem (sRedrawComplete, 1000);
   }
 
   /// Return active buffer
