@@ -51,13 +51,10 @@ class csMemoryMappedIO
   /// Minimum size of a single block 
   unsigned int block_size;
   
-  /// Size of file in bytes to memory map
-  unsigned int file_size;
-
   /// Set to true if this object is valid
   bool valid_mmio_object;
 
-#ifndef _HAS_MEMORY_MAPPED_IO_
+#ifndef CS_HAS_MEMORY_MAPPED_IO
 
   /// Size of a cache block in block_size blocks (software emulation)
   unsigned cache_block_size;
@@ -98,27 +95,24 @@ class csMemoryMappedIO
 
   /// Hash table for active blocks
   CacheBlock *cache[csmmioDefaultHashSize];
-  
-#else
 
-  /// Holds information specific to the platform for hardware paging.
-  struct PlatformData
-  {
-
-#if defined WIN32
-    /// Handle to the mapped file (windows)
-    HANDLE hMappedFile;
-        
-#elif defined _LINUX
-    /// Handle to the mapped file (linux)
-    int hMappedFile;
-
-#endif // platform specific data defines
+  // Software specific mmioInfo struct, should only be defined for platforms w/o hardware mmio.
+  struct mmioInfo 
+  {          
+    /// Handle to the mapped file 
+    FILE *hMappedFile;
 
     /// Base pointer to the data
     unsigned char *data;
 
+    /// File size
+    unsigned int file_size;
   } platform;
+  
+#else
+
+  /// Holds information specific to the platform for hardware paging.
+  mmioInfo platform;
 
 #endif // end else doesn't have memory-mapped i/o
 
@@ -139,6 +133,14 @@ public:
 private:
   /// Reads a cache-page in from the disk.
   void CachePage(unsigned int page);
+
+#ifndef CS_HAS_MEMORY_MAPPED_IO
+  /// Maps file into memory
+  bool MemoryMapFile(mmioInfo *platform, char *filename);
+
+  /// Unmaps file from memory
+  void UnMemoryMapFile(mmioInfo *platform);
+#endif
 
 };
 

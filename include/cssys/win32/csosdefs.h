@@ -81,6 +81,57 @@
   #define VERIFY_RESULT(expression, result) expression
 #endif
 
+
+#ifdef CS_SYSDEF_PROVIDE_HARDWARE_MMIO
+
+// Defines that this platform supports hardware memory-mapped i/o
+#define CS_HAS_MEMORY_MAPPED_IO 1
+
+// Windows specific memory-mapped I/O stuff.
+struct mmioInfo
+{
+    /// Handle to the mapped file 
+    HANDLE hMappedFile;
+  
+    /// Base pointer to the data
+    unsigned char *data;
+
+    /// File size
+    unsigned int file_size;
+};
+
+// Fills in the mmioInfo struct by mapping in filename.  Returns true on success, false otherwise.
+inline 
+bool
+MemoryMapFile(mmioInfo *platform, char *filename)
+{
+  if (
+      (platform->hMappedFile = OpenFileMapping(FILE_MAP_READ, false, filename)) == NULL ||          
+      (platform->file_size=GetFileSize(platform->hMappedFile, NULL)) == 0xFFFFFFFF                 ||          
+      (platform->data = (unsigned char *)MapViewOfFile(platform->hMappedFile, FILE_MAP_READ, 0, 0, platform->file_size))==NULL 
+     )                                                                                              
+  {                                                                                                 
+    return false;                                                                        
+  }                                                                                                 
+  else                                                                                              
+  {
+    return true;                                                                         
+  }
+}
+
+inline 
+void
+UnMemoryMapFile(mmioInfo *platform)
+{
+  if (platform->data!=NULL)
+    UnmapViewOfFile(platform->data);
+
+  if (platform->hMappedFile!=NULL)
+    CloseHandle(platform->hMappedFile);
+}
+
+#endif
+
 // The 2D graphics driver used by software renderer on this platform
 #define CS_SOFTWARE_2D_DRIVER "crystalspace.graphics2d.directdraw"
 #define CS_OPENGL_2D_DRIVER "crystalspace.graphics2d.glwin32"
