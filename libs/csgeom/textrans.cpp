@@ -103,14 +103,7 @@ void csTextureTrans::compute_texture_space (
   const csVector3 &v2,
   float len2)
 {
-  // @@@@@@@ WARNING!
-  // If the following line is computed with qisqrt() instead of 1/qsqrt()
-  // then the computation of invl2 will fail in some cases.
-  // This happens with gcc 2.96 on linux in optimize -O2 mode (not in
-  // normal -O optimize mode and also not in debug mode).
-  // I have no clue why at this moment. This may be a bug in the
-  // compiler or else in qisqrt() itself. To be investigated.
-  float invl1 = 1.0/qsqrt (csSquaredDist::PointPoint (v_orig, v1));
+  float invl1 = qisqrt (csSquaredDist::PointPoint (v_orig, v1));
 
   //if (ABS (l1) < SMALL_EPSILON) l1 = SMALL_EPSILON;
   float invl2 = qisqrt (csSquaredDist::PointPoint (v_orig, v2));
