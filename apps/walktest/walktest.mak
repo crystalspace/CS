@@ -1,5 +1,5 @@
 # Application description
-DESCRIPTION.walk = Crystal Space WalkTest demo
+DESCRIPTION.walk = Crystal Space WalkTest demo executable
 
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -44,8 +44,8 @@ clean: walkclean
 
 $(WALKTEST.EXE): $(DEP.EXE) $(OBJ.WALKTEST) \
   $(CSTOOLS.LIB) $(CSPARSER.LIB) $(CSENGINE.LIB) $(CSTERR.LIB) $(CSSCRIPT.LIB) \
-  $(CSGEOM.LIB) $(CSSFXLDR.LIB) $(CSGFXLDR.LIB) $(CSSYS.LIB) $(CSINPUT.LIB) \
-  $(CSOBJECT.LIB) $(CSUTIL.LIB)
+  $(CSGEOM.LIB) $(CSSFXLDR.LIB) $(CSGFXLDR.LIB) $(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB) \
+  $(CSINPUT.LIB) $(CSOBJECT.LIB)
 	$(DO.LINK.EXE)
 
 walkclean:
