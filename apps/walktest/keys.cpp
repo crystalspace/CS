@@ -17,13 +17,11 @@
 */
 
 #include "cssysdef.h"
-#include "qint.h"
-#include "cssys/system.h"
-#include "walktest/walktest.h"
-#include "walktest/bot.h"
-#include "walktest/infmaze.h"
-#include "walktest/hugeroom.h"
-#include "apps/support/command.h"
+#include "walktest.h"
+#include "bot.h"
+#include "infmaze.h"
+#include "hugeroom.h"
+#include "command.h"
 #include "csengine/dumper.h"
 #include "csengine/camera.h"
 #include "csengine/octree.h"
@@ -47,6 +45,8 @@
 #include "csparser/csloader.h"
 #include "csparser/crossbld.h"
 #include "csgeom/math3d.h"
+#include "cssys/system.h"
+#include "qint.h"
 #include "igraph3d.h"
 #include "igraph2d.h"
 

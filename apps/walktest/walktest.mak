@@ -29,9 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp apps/walktest apps/support
 
 WALKTEST.EXE = walktest$(EXE)
-INC.WALKTEST = $(wildcard apps/walktest/*.h) apps/support/command.h
-SRC.WALKTEST = $(wildcard apps/walktest/*.cpp) \
-  apps/support/static.cpp apps/support/command.cpp
+INC.WALKTEST = $(wildcard apps/walktest/*.h)
+SRC.WALKTEST = $(wildcard apps/walktest/*.cpp) apps/support/static.cpp
 OBJ.WALKTEST = $(addprefix $(OUT),$(notdir $(SRC.WALKTEST:.cpp=$O)))
 DEP.WALKTEST = CSPARSER CSENGINE CSTERR CSGEOM CSGFXLDR CSSYS CSUTIL CSOBJECT
 LIB.WALKTEST = $(foreach d,$(DEP.WALKTEST),$($d.LIB))

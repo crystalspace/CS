@@ -10,8 +10,11 @@ The history order has been reversed so that new features are at the top.
 	      block object.
 	    - Changed the room to be a cube of 10 units each side centred
 	      on the origin.
-	- Fixed a bug in cs.i for python. Eric Sunshine accidently removed
+	- Fixed a bug in cs.i for python. Eric Sunshine accidentally removed
 	  the essential '3' after csVector3 :-)
+	- Eric Sunshine moved command.cpp and command.h from apps/support to
+	  apps/walktest since these files are only used by WalkTest. Updated
+	  makefile and other source files to reflect this change.
 7-Dec-2000
 	- Wouter Wijngaards made the fire polygon unlit in ptlab. This
 	  looks better.
