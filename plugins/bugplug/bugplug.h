@@ -27,6 +27,7 @@
 #include "csutil/parray.h"
 #include "csutil/cfgacc.h"
 #include "csutil/weakref.h"
+#include "csutil/weakrefarr.h"
 #include "iutil/plugin.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
@@ -249,11 +250,10 @@ private:
   void ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name);
 
   // The selected mesh.
-  csWeakRef<iMeshWrapper> selected_mesh;
-  // Previous selected mesh (after DEBUGCMD_HIDESELECTED).
-  csWeakRef<iMeshWrapper> prev_selected_mesh;
-  int mesh_num_sectors;
-  iSector* mesh_sectors[10];
+  csWeakRefArray<iMeshWrapper> selected_meshes;
+  void AddSelectedMesh (iMeshWrapper* m);
+  void RemoveSelectedMesh (iMeshWrapper* m);
+  bool HasSelectedMeshes () const { return selected_meshes.Length () > 0; }
 
   // Shadow!
   csShadow* shadow;

@@ -41,7 +41,6 @@ csShadow::csShadow ()
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   wrap = 0;
-  shadow_mesh = 0;
   do_bbox = true;
   do_rad = true;
   logparent = 0;
@@ -56,25 +55,11 @@ csShadow::~csShadow ()
 
 bool csShadow::DrawTest (iRenderView* rview, iMovable*, uint32)
 {
-  if (!shadow_mesh) return false;
-  // See if we are in the same sector as the mesh.
-  iMovable* shadow_movable = shadow_mesh->GetMovable ();
-  iSector* sector = rview->GetCamera ()->GetSector ();
-  int i;
-  for (i = 0 ; i < shadow_movable->GetSectors ()->GetCount () ; i++)
-  {
-    iSector* sec = shadow_movable->GetSectors ()->Get (i);
-    if (sec == sector)
-    {
-      return true;
-    }
-  }
-  return false;
+  return true;
 }
 
 bool csShadow::Draw (iRenderView* rview, iMovable*, csZBufMode)
 {
-  if (!shadow_mesh) return false;
   keep_camera = rview->GetOriginalCamera ();
   return true;
 }
@@ -85,11 +70,6 @@ csRenderMesh** csShadow::GetRenderMeshes (int& n, iRenderView* rview,
   keep_camera = rview->GetOriginalCamera ();
   n = 0;
   return 0;
-}
-
-void csShadow::SetShadowMesh (iMeshWrapper* sh)
-{
-  shadow_mesh = sh;
 }
 
 bool csShadow::AddToEngine (iEngine* engine)

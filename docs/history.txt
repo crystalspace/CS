@@ -9,6 +9,12 @@ chronological order.
 27-Jun-2004
 	- res worked around a possible VC7 64bit warning in 
 	  csIntegralHashKeyHandler<>.
+	- Jorrit changed bugplug so that it hides meshes by setting the
+	  CS_ENTITY_INVISIBLE flag instead of attempting to remove it from
+	  the sectors.
+	- Jorrit added the ability to have multiple selected meshes in bugplug.
+	  ctrl-alt-m will now accept a regexp pattern which will be used to
+	  match all meshes in the current sector.
 26-Jun-2004
 	- Jorrit added a new bugplug command to switch visibility culler of
 	  the current sector. ctrl-shift-1 is assigned to switch to frustvis

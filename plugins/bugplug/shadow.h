@@ -48,7 +48,6 @@ class csShadow : public iMeshObject
 private:
   iBase* logparent;
   iMeshWrapper* wrap;
-  iMeshWrapper* shadow_mesh;
   bool do_bbox;	// Show bounding box.
   bool do_rad;	// Show bounding sphere.
   csFlags flags;
@@ -78,11 +77,6 @@ public:
    * Remove the shadow from the engine.
    */
   void RemoveFromEngine (iEngine* engine);
-
-  /**
-   * Set the mesh that we are shadowing.
-   */
-  void SetShadowMesh (iMeshWrapper* sh);
 
   /**
    * Set what we are showing.

@@ -21,6 +21,7 @@
 
 #include "csutil/sysfunc.h"
 #include "csutil/csuctransform.h"
+#include "csutil/regexp.h"
 #include "csver.h"
 #include "csutil/scf.h"
 #include "csutil/scanstr.h"
@@ -119,11 +120,8 @@ csBugPlug::csBugPlug (iBase *iParent)
   initialized = false;
   spider = new csSpider ();
   shadow = new csShadow ();
-  selected_mesh = 0;
-  shadow->SetShadowMesh (selected_mesh);
   spider_hunting = false;
   spider_args = 0;
-  prev_selected_mesh = 0;
   scfiEventHandler = 0;
 
   do_fps = true;
@@ -162,16 +160,6 @@ csBugPlug::~csBugPlug ()
   CleanDebugSector ();
   CleanDebugView ();
 
-  //if (spider)
-  //{
-    //if (Engine) spider->UnweaveWeb (Engine);
-    //delete spider;
-  //}
-  //if (shadow)
-  //{
-    //if (Engine) shadow->RemoveFromEngine (Engine);
-    //delete shadow;
-  //}
   while (mappings)
   {
     csKeyMap* n = mappings->next;
@@ -380,18 +368,48 @@ void csBugPlug::SwitchCuller (iSector* sector, const char* culler)
   sector->SetVisibilityCullerPlugin (culler);
 }
 
+void csBugPlug::AddSelectedMesh (iMeshWrapper* m)
+{
+  int i;
+  for (i = 0 ; i < selected_meshes.Length () ; i++)
+    if (selected_meshes[i] == m) return;
+  selected_meshes.Push (m);
+}
+
+void csBugPlug::RemoveSelectedMesh (iMeshWrapper* m)
+{
+  int i;
+  for (i = 0 ; i < selected_meshes.Length () ; i++)
+    if (selected_meshes[i] == m)
+    {
+      selected_meshes.DeleteIndex (i);
+      return;
+    }
+}
+
 void csBugPlug::SelectMesh (iSector* sector, const char* meshname)
 {
   iMeshList* ml = sector->GetMeshes ();
-  iMeshWrapper* mesh = ml->FindByName (meshname);
-  if (mesh)
+
+  selected_meshes.Empty ();
+  csRegExpMatcher matcher (meshname);
+  int i;
+  int cnt = 0;
+  for (i = 0 ; i < ml->GetCount () ; i++)
+  {
+    iMeshWrapper* mesh = ml->Get (i);
+    if (NoError == matcher.Match (mesh->QueryObject ()->GetName ()))
+    {
+      cnt++;
+      AddSelectedMesh (mesh);
+    }
+  }
+  if (cnt > 0)
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Selecting mesh '%s'.", meshname);
-    selected_mesh = mesh;
+        "Selecting %d mesh(es).", cnt);
     bool bbox, rad;
     shadow->GetShowOptions (bbox, rad);
-    shadow->SetShadowMesh (selected_mesh);
 
     if (bbox || rad || show_polymesh != BUGPLUG_POLYMESH_NO)
       shadow->AddToEngine (Engine);
@@ -401,7 +419,7 @@ void csBugPlug::SelectMesh (iSector* sector, const char* meshname)
   else
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Couldn't find mesh '%s'.", meshname);
+      "Couldn't find matching meshes for pattern '%s'.", meshname);
   }
 }
 
@@ -577,13 +595,13 @@ void csBugPlug::MouseButton3 (iCamera* camera)
 
   if (sel)
   {
-    selected_mesh = sel;
-    const char* n = selected_mesh->QueryObject ()->GetName ();
+    selected_meshes.Empty ();
+    AddSelectedMesh (sel);
+    const char* n = sel->QueryObject ()->GetName ();
     Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug found mesh '%s'!",
       	n ? n : "<noname>");
     bool bbox, rad;
     shadow->GetShowOptions (bbox, rad);
-    shadow->SetShadowMesh (selected_mesh);
 
     if (bbox || rad || show_polymesh != BUGPLUG_POLYMESH_NO)
       shadow->AddToEngine (Engine);
@@ -1003,7 +1021,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	}
         break;
       case DEBUGCMD_SELECTMESH:
-        EnterEditMode (cmd, "Enter mesh name:", "");
+        EnterEditMode (cmd, "Enter mesh name regexp pattern:", "");
         break;
       case DEBUGCMD_DBLBUFF:
         {
@@ -1138,7 +1156,8 @@ bool csBugPlug::EatKey (iEvent& event)
 	    	"BugPlug %s bounding box display.",
 		bbox ? "enabled" : "disabled");
 	  shadow->SetShowOptions (bbox, rad);
-	  if ((bbox || rad || show_polymesh != BUGPLUG_POLYMESH_NO) && selected_mesh)
+	  if ((bbox || rad || show_polymesh != BUGPLUG_POLYMESH_NO)
+			  && HasSelectedMeshes ())
 	    shadow->AddToEngine (Engine);
 	  else
 	    shadow->RemoveFromEngine (Engine);
@@ -1153,7 +1172,8 @@ bool csBugPlug::EatKey (iEvent& event)
 	    	"BugPlug %s bounding sphere display.",
 		rad ? "enabled" : "disabled");
 	  shadow->SetShowOptions (bbox, rad);
-	  if ((bbox || rad || show_polymesh != BUGPLUG_POLYMESH_NO) && selected_mesh)
+	  if ((bbox || rad || show_polymesh != BUGPLUG_POLYMESH_NO)
+			  && HasSelectedMeshes ())
 	    shadow->AddToEngine (Engine);
 	  else
 	    shadow->RemoveFromEngine (Engine);
@@ -1272,35 +1292,30 @@ bool csBugPlug::EatKey (iEvent& event)
 	fps_cur = -1;
         break;
       case DEBUGCMD_HIDESELECTED:
-        if (selected_mesh)
+        if (HasSelectedMeshes ())
 	{
-	  iMovable* m = selected_mesh->GetMovable ();
-	  iSectorList* sl = m->GetSectors ();
-	  int i;
-	  for (i = 0 ; i < sl->GetCount () ; i++)
-	    mesh_sectors[i] = sl->Get (i);
-	  mesh_num_sectors = sl->GetCount ();
-	  m->ClearSectors ();
-	  m->UpdateMove ();
-	  prev_selected_mesh = selected_mesh;
-	  selected_mesh = 0;
+	  int j;
+	  for (j = 0 ; j < selected_meshes.Length () ; j++)
+	  {
+	    if (selected_meshes[j])
+	      selected_meshes[j]->GetFlags ().Set (CS_ENTITY_INVISIBLE);
+	  }
 	}
 	else
 	{
 	  Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"There is no selected mesh to hide!");
+	    	"There are no selected meshes to hide!");
 	}
         break;
       case DEBUGCMD_UNDOHIDE:
-        if (prev_selected_mesh)
+        if (HasSelectedMeshes ())
 	{
-	  iMovable* m = prev_selected_mesh->GetMovable ();
-	  iSectorList* sl = m->GetSectors ();
-	  int i;
-	  for (i = 0 ; i < mesh_num_sectors ; i++)
-	    sl->Add (mesh_sectors[i]);
-	  m->UpdateMove ();
-	  prev_selected_mesh = 0;
+	  int j;
+	  for (j = 0 ; j < selected_meshes.Length () ; j++)
+	  {
+	    if (selected_meshes[j])
+	      selected_meshes[j]->GetFlags ().Reset (CS_ENTITY_INVISIBLE);
+	  }
 	}
         break;
       case DEBUGCMD_COUNTERRESET:
@@ -1544,103 +1559,108 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
     }
   }
 
-  if (selected_mesh && shadow && shadow->GetCamera () &&
+  if (HasSelectedMeshes () && shadow && shadow->GetCamera () &&
 		  !debug_view.show && !debug_sector.show)
   {
-    iMovable* mov = selected_mesh->GetMovable ();
+    int k;
     iCamera* cam = shadow->GetCamera ();
-    G3D->BeginDraw (CSDRAW_2DGRAPHICS);
-
     csTransform tr_w2c = cam->GetTransform ();
-    csReversibleTransform tr_o2c = tr_w2c / mov->GetFullTransform ();
     float fov = G3D->GetPerspectiveAspect ();
     bool do_bbox, do_rad;
     shadow->GetShowOptions (do_bbox, do_rad);
-    if (do_bbox)
+    G3D->BeginDraw (CSDRAW_2DGRAPHICS);
+    for (k = 0 ; k < selected_meshes.Length () ; k++)
     {
-      int bbox_color = G3D->GetDriver2D ()->FindRGB (0, 255, 255);
-      csBox3 bbox;
-      selected_mesh->GetMeshObject ()->GetObjectModel ()->
+      if (!selected_meshes[k]) continue;
+      iMovable* mov = selected_meshes[k]->GetMovable ();
+      csReversibleTransform tr_o2c = tr_w2c / mov->GetFullTransform ();
+      if (do_bbox)
+      {
+        int bbox_color = G3D->GetDriver2D ()->FindRGB (0, 255, 255);
+        csBox3 bbox;
+        selected_meshes[k]->GetMeshObject ()->GetObjectModel ()->
     	  GetObjectBoundingBox (bbox);
-      csVector3 vxyz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xyz);
-      csVector3 vXyz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_Xyz);
-      csVector3 vxYz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xYz);
-      csVector3 vxyZ = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xyZ);
-      csVector3 vXYz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_XYz);
-      csVector3 vXyZ = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_XyZ);
-      csVector3 vxYZ = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xYZ);
-      csVector3 vXYZ = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_XYZ);
-      G3D->DrawLine (vxyz, vXyz, fov, bbox_color);
-      G3D->DrawLine (vXyz, vXYz, fov, bbox_color);
-      G3D->DrawLine (vXYz, vxYz, fov, bbox_color);
-      G3D->DrawLine (vxYz, vxyz, fov, bbox_color);
-      G3D->DrawLine (vxyZ, vXyZ, fov, bbox_color);
-      G3D->DrawLine (vXyZ, vXYZ, fov, bbox_color);
-      G3D->DrawLine (vXYZ, vxYZ, fov, bbox_color);
-      G3D->DrawLine (vxYZ, vxyZ, fov, bbox_color);
-      G3D->DrawLine (vxyz, vxyZ, fov, bbox_color);
-      G3D->DrawLine (vxYz, vxYZ, fov, bbox_color);
-      G3D->DrawLine (vXyz, vXyZ, fov, bbox_color);
-      G3D->DrawLine (vXYz, vXYZ, fov, bbox_color);
-    }
-    if (do_rad)
-    {
-      int rad_color = G3D->GetDriver2D ()->FindRGB (0, 255, 0);
-      csVector3 radius, r, center;
-      selected_mesh->GetMeshObject ()->GetObjectModel ()->GetRadius (radius,center);
-      csVector3 trans_o = tr_o2c * center;
-      r.Set (radius.x, 0, 0);
-      G3D->DrawLine (trans_o-r, trans_o+r, fov, rad_color);
-      r.Set (0, radius.y, 0);
-      G3D->DrawLine (trans_o-r, trans_o+r, fov, rad_color);
-      r.Set (0, 0, radius.z);
-      G3D->DrawLine (trans_o-r, trans_o+r, fov, rad_color);
-    }
-    if (show_polymesh != BUGPLUG_POLYMESH_NO)
-    {
-      iPolygonMesh* pm = 0;
-      switch (show_polymesh)
-      {
-	case BUGPLUG_POLYMESH_CD:
-	  pm = selected_mesh->GetMeshObject ()->GetObjectModel ()->
-		  GetPolygonMeshColldet ();
-	  break;
-	case BUGPLUG_POLYMESH_VIS:
-	  pm = selected_mesh->GetMeshObject ()->GetObjectModel ()->
-		  GetPolygonMeshViscull ();
-	  break;
-	case BUGPLUG_POLYMESH_SHAD:
-	  pm = selected_mesh->GetMeshObject ()->GetObjectModel ()->
-		  GetPolygonMeshShadows ();
-	  break;
-	case BUGPLUG_POLYMESH_BASE:
-	  pm = selected_mesh->GetMeshObject ()->GetObjectModel ()->
-		  GetPolygonMeshBase ();
-	  break;
+        csVector3 vxyz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xyz);
+        csVector3 vXyz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_Xyz);
+        csVector3 vxYz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xYz);
+        csVector3 vxyZ = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xyZ);
+        csVector3 vXYz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_XYz);
+        csVector3 vXyZ = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_XyZ);
+        csVector3 vxYZ = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xYZ);
+        csVector3 vXYZ = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_XYZ);
+        G3D->DrawLine (vxyz, vXyz, fov, bbox_color);
+        G3D->DrawLine (vXyz, vXYz, fov, bbox_color);
+        G3D->DrawLine (vXYz, vxYz, fov, bbox_color);
+        G3D->DrawLine (vxYz, vxyz, fov, bbox_color);
+        G3D->DrawLine (vxyZ, vXyZ, fov, bbox_color);
+        G3D->DrawLine (vXyZ, vXYZ, fov, bbox_color);
+        G3D->DrawLine (vXYZ, vxYZ, fov, bbox_color);
+        G3D->DrawLine (vxYZ, vxyZ, fov, bbox_color);
+        G3D->DrawLine (vxyz, vxyZ, fov, bbox_color);
+        G3D->DrawLine (vxYz, vxYZ, fov, bbox_color);
+        G3D->DrawLine (vXyz, vXyZ, fov, bbox_color);
+        G3D->DrawLine (vXYz, vXYZ, fov, bbox_color);
       }
-      if (pm)
+      if (do_rad)
       {
-        int pm_color = G3D->GetDriver2D ()->FindRGB (255, 255, 128);
-	int vtcount = pm->GetVertexCount ();
-	csVector3* vt = pm->GetVertices ();
-	int pocount = pm->GetPolygonCount ();
-	csMeshedPolygon* po = pm->GetPolygons ();
-	csVector3* vtt = new csVector3[vtcount];
-	int i;
-	for (i = 0 ; i < vtcount ; i++)
-	  vtt[i] = tr_o2c * vt[i];
-	for (i = 0 ; i < pocount ; i++)
-	{
-	  csMeshedPolygon& pol = po[i];
-	  int j, j1;
-	  j1 = pol.num_vertices - 1;
-	  for (j = 0 ; j < pol.num_vertices ; j++)
+        int rad_color = G3D->GetDriver2D ()->FindRGB (0, 255, 0);
+        csVector3 radius, r, center;
+        selected_meshes[k]->GetMeshObject ()->GetObjectModel ()
+		->GetRadius (radius,center);
+        csVector3 trans_o = tr_o2c * center;
+        r.Set (radius.x, 0, 0);
+        G3D->DrawLine (trans_o-r, trans_o+r, fov, rad_color);
+        r.Set (0, radius.y, 0);
+        G3D->DrawLine (trans_o-r, trans_o+r, fov, rad_color);
+        r.Set (0, 0, radius.z);
+        G3D->DrawLine (trans_o-r, trans_o+r, fov, rad_color);
+      }
+      if (show_polymesh != BUGPLUG_POLYMESH_NO)
+      {
+        iPolygonMesh* pm = 0;
+        switch (show_polymesh)
+        {
+	  case BUGPLUG_POLYMESH_CD:
+	    pm = selected_meshes[k]->GetMeshObject ()->GetObjectModel ()->
+		  GetPolygonMeshColldet ();
+	    break;
+	  case BUGPLUG_POLYMESH_VIS:
+	    pm = selected_meshes[k]->GetMeshObject ()->GetObjectModel ()->
+		  GetPolygonMeshViscull ();
+	    break;
+	  case BUGPLUG_POLYMESH_SHAD:
+	    pm = selected_meshes[k]->GetMeshObject ()->GetObjectModel ()->
+		  GetPolygonMeshShadows ();
+	    break;
+	  case BUGPLUG_POLYMESH_BASE:
+	    pm = selected_meshes[k]->GetMeshObject ()->GetObjectModel ()->
+		  GetPolygonMeshBase ();
+	    break;
+        }
+        if (pm)
+        {
+          int pm_color = G3D->GetDriver2D ()->FindRGB (255, 255, 128);
+	  int vtcount = pm->GetVertexCount ();
+	  csVector3* vt = pm->GetVertices ();
+	  int pocount = pm->GetPolygonCount ();
+	  csMeshedPolygon* po = pm->GetPolygons ();
+	  csVector3* vtt = new csVector3[vtcount];
+	  int i;
+	  for (i = 0 ; i < vtcount ; i++)
+	    vtt[i] = tr_o2c * vt[i];
+	  for (i = 0 ; i < pocount ; i++)
 	  {
-            G3D->DrawLine (vtt[pol.vertices[j]], vtt[pol.vertices[j1]], fov, pm_color);
-	    j1 = j;
+	    csMeshedPolygon& pol = po[i];
+	    int j, j1;
+	    j1 = pol.num_vertices - 1;
+	    for (j = 0 ; j < pol.num_vertices ; j++)
+	    {
+              G3D->DrawLine (vtt[pol.vertices[j]], vtt[pol.vertices[j1]], fov, pm_color);
+	      j1 = j;
+	    }
 	  }
-	}
-        delete[] vtt;
+          delete[] vtt;
+        }
       }
     }
   }
