@@ -24,7 +24,8 @@
 #define TYPEDEF_GROWING_ARRAY_EXT(Name, Type, ExtraConstructor, Extra)	\
   class Name								\
   {									\
-    Type *root;								\
+    typedef Type ga_type;						\
+    ga_type *root;							\
     int limit;								\
     int length;								\
   public:								\
@@ -34,7 +35,7 @@
     {									\
       if (limit == iLimit) return;					\
       if ((limit = iLimit)!=0)						\
-        root = (Type *)realloc (root, limit * sizeof (Type));		\
+        root = (ga_type *)realloc (root, limit * sizeof (ga_type));	\
       else								\
       { if (root) { free (root); root = NULL; } }			\
     }									\
@@ -50,20 +51,20 @@
       int newlimit = ((length + (iGrowStep - 1)) / iGrowStep) * iGrowStep;\
       if (newlimit != limit) SetLimit (newlimit);			\
     }									\
-    Type &operator [] (int n)						\
+    ga_type &operator [] (int n)					\
     { CS_ASSERT (n >= 0 && n < limit); return root [n]; }		\
-    const Type &operator [] (int n) const				\
+    const ga_type &operator [] (int n) const				\
     { CS_ASSERT (n >= 0 && n < limit); return root [n]; }		\
-    Type &Get (int n)							\
+    ga_type &Get (int n)						\
     { CS_ASSERT (n >= 0 && n < limit); return root [n]; }		\
     void Delete (int n)							\
-    { CS_ASSERT (n >= 0 && n < limit); memmove (root + n, root + n + 1, (limit - n - 1) * sizeof (Type)); }\
-    Type *GetArray ()							\
+    { CS_ASSERT (n >= 0 && n < limit); memmove (root + n, root + n + 1, (limit - n - 1) * sizeof (ga_type)); }\
+    ga_type *GetArray ()						\
     { return root; }							\
-    void Push (const Type &val, int iGrowStep = 8)			\
+    void Push (const ga_type &val, int iGrowStep = 8)			\
     {									\
       SetLength (length + 1, iGrowStep);				\
-      memcpy (root + length - 1, &val, sizeof (Type));			\
+      memcpy (root + length - 1, &val, sizeof (ga_type));		\
     }									\
     Extra								\
   }
