@@ -52,7 +52,7 @@ csRect awsBorderLayout::AddComponent (
 
 void awsBorderLayout::LayoutComponents ()
 {
-  csRect r = owner->getPreferredSize();
+  csRect r(owner->Frame());
   csRect i = owner->getInsets();
   iAwsComponent *cmp;
 
@@ -65,10 +65,12 @@ void awsBorderLayout::LayoutComponents ()
 
     csRect cr = cmp->getPreferredSize();
 
-    cmp->Frame().xmin=0+i.xmin;
-    cmp->Frame().ymin=0+i.ymin;
+    cmp->Frame().xmin=r.xmin+i.xmin;
+    cmp->Frame().ymin=r.ymin+i.ymin;
     cmp->Frame().xmax=r.xmax-i.xmax;
     cmp->Frame().ymax=cmp->Frame().ymin+cr.ymax;
+
+    cmp->OnResized();
   }
 
   if (components[GBS_SOUTH])
@@ -78,10 +80,12 @@ void awsBorderLayout::LayoutComponents ()
 
     csRect cr = cmp->getPreferredSize();
 
-    cmp->Frame().xmin=0+i.xmin;
+    cmp->Frame().xmin=r.xmin+i.xmin;
     cmp->Frame().ymin=r.ymax-i.ymax-cr.ymax;
     cmp->Frame().xmax=r.xmax-i.xmax;
     cmp->Frame().ymax=r.ymax-i.ymax;
+
+    cmp->OnResized();
   }
 
   if (components[GBS_EAST])
@@ -91,10 +95,12 @@ void awsBorderLayout::LayoutComponents ()
 
     csRect cr = cmp->getPreferredSize();
 
-    cmp->Frame().xmin=0+i.xmin;
-    cmp->Frame().ymin=0+i.ymin+(has_north ? components[GBS_NORTH]->Frame().Height() : 0);
-    cmp->Frame().xmax=0+r.xmin+i.xmin+cr.xmax;
+    cmp->Frame().xmin=r.xmin+i.xmin;
+    cmp->Frame().ymin=r.ymin+i.ymin+(has_north ? components[GBS_NORTH]->Frame().Height() : 0);
+    cmp->Frame().xmax=r.xmin+r.xmin+i.xmin+cr.xmax;
     cmp->Frame().ymax=r.ymax-i.ymax-(has_south ? components[GBS_SOUTH]->Frame().Height() : 0);
+
+    cmp->OnResized();
   }
 
   if (components[GBS_WEST])
@@ -105,9 +111,11 @@ void awsBorderLayout::LayoutComponents ()
     csRect cr = cmp->getPreferredSize();
 
     cmp->Frame().xmin=r.xmax-i.xmax-cr.xmax;
-    cmp->Frame().ymin=0+i.ymin+(has_north ? components[GBS_NORTH]->Frame().Height() : 0);
+    cmp->Frame().ymin=r.ymin+i.ymin+(has_north ? components[GBS_NORTH]->Frame().Height() : 0);
     cmp->Frame().xmax=r.xmax-i.xmax;
     cmp->Frame().ymax=r.ymax-i.ymax-(has_south ? components[GBS_SOUTH]->Frame().Height() : 0);
+
+    cmp->OnResized();
   }
 
   if (components[GBS_CENTER])
@@ -116,9 +124,11 @@ void awsBorderLayout::LayoutComponents ()
 
     csRect cr = cmp->getPreferredSize();
 
-    cmp->Frame().xmin=i.xmin + (has_east ? components[GBS_EAST]->Frame().Width() : 0);
-    cmp->Frame().ymin=0+i.ymin + (has_north ? components[GBS_NORTH]->Frame().Height() : 0);
+    cmp->Frame().xmin=r.xmin+i.xmin + (has_east ? components[GBS_EAST]->Frame().Width() : 0);
+    cmp->Frame().ymin=r.ymin+i.ymin + (has_north ? components[GBS_NORTH]->Frame().Height() : 0);
     cmp->Frame().xmax=r.xmax-i.xmax - (has_west ? components[GBS_WEST]->Frame().Width() : 0);
     cmp->Frame().ymax=r.ymax-i.ymax - (has_south ? components[GBS_SOUTH]->Frame().Height() : 0);
+
+    cmp->OnResized();
   }
 }
