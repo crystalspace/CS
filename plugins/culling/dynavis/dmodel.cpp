@@ -36,6 +36,7 @@ csObjectModel::csObjectModel ()
   edges = NULL;
   num_edges = -1;
   dirty_obb = true;
+  has_obb = false;
 }
 
 csObjectModel::~csObjectModel ()
@@ -76,14 +77,28 @@ void csObjectModel::UpdateOutline (const csVector3& pos)
   }
 }
 
+bool csObjectModel::HasOBB ()
+{
+  GetOBB ();
+  return has_obb;
+}
+
 const csOBB& csObjectModel::GetOBB ()
 {
   if (dirty_obb)
   {
-    int num_vertices = imodel->GetSmallerPolygonMesh ()->GetVertexCount ();
-    csVector3* verts = imodel->GetSmallerPolygonMesh ()->GetVertices ();
-    obb.FindOBB (verts, num_vertices);
     dirty_obb = false;
+    if (imodel->GetSmallerPolygonMesh ())
+    {
+      int num_vertices = imodel->GetSmallerPolygonMesh ()->GetVertexCount ();
+      csVector3* verts = imodel->GetSmallerPolygonMesh ()->GetVertices ();
+      obb.FindOBB (verts, num_vertices);
+      has_obb = true;
+    }
+    else
+    {
+      has_obb = false;
+    }
   }
   return obb;
 }

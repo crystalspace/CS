@@ -79,6 +79,7 @@ private:
   csPlane3* planes;	// Planes for this model.
 
   bool dirty_obb;	// If true obb is dirty and requires calculation.
+  bool has_obb;		// If false then this model doesn't have an obb.
   csOBB obb;		// OBB for this model.
 
   csPolygonMeshEdge* edges;
@@ -104,6 +105,9 @@ public:
   /// Get outline information.
   const csOutlineInfo& GetOutlineInfo () const { return outline_info; }
 
+  /// Return true if this model has an OBB.
+  bool HasOBB ();
+  
   /// Get the OBB for this model.
   const csOBB& GetOBB ();
 };

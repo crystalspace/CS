@@ -54,6 +54,7 @@ void csCoverageTile::MakePrecalcTables ()
 
 csLineOperation& csCoverageTile::AddOperation ()
 {
+  CS_ASSERT (num_operations <= max_operations);
   if (num_operations >= max_operations)
   {
     if (max_operations < 100)
@@ -61,7 +62,8 @@ csLineOperation& csCoverageTile::AddOperation ()
     else
       max_operations += 100;
     csLineOperation* new_op = new csLineOperation [max_operations];
-    memcpy (new_op, operations, sizeof (csLineOperation)*num_operations);
+    if (num_operations > 0)
+      memcpy (new_op, operations, sizeof (csLineOperation)*num_operations);
     delete[] operations;
     operations = new_op;
   }
@@ -845,6 +847,10 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
 
 # define xmask ((32<<16)-1)
 
+  //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  // WARNING! Here it is still possible that tile_x1 goes too far!!!!
+  // Need to clip on the right and left here!!!!!!!!!!!!!!!!
+  //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   if (tile_x1 == tile_x2 && tile_y1 == tile_y2)
   {
 //printf ("    ONE TILE\n");

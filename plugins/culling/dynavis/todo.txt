@@ -5,12 +5,6 @@
   Implement an outline cache which IS attached to csObjectModel and let
   model instances use an entry from that cache.
 
-- Instead of taking world space AABB and then transforming that into
-  another camera AABB (which may make the AABB a lot too big) we should
-  take the world space OBB and transform that to camera AABB instead.
-  This is for TestRectangle and also AppendWriteQueue. Should improve
-  visibility culling a bit.
-
 - Improve filling of outline in coverage buffer. Clamp outline to Z=0
   plane instead of rejecting write objects that are clipped by that plane.
 
@@ -22,7 +16,7 @@
 
 - Automatic rebalancing of KD-tree.
 
-- Only calculate OBB, planes, edges, active edges in model when REALLY
+- Only calculate planes, edges, active edges in model when REALLY
   needed (i.e. delay).
 
 - Also process history and VPT for kdtree nodes.
@@ -37,4 +31,6 @@
 	  independent from the camera but depends on the movable and will
 	  be updated when the movable is updated.
 	- Information depending on camera position.
+
+- 3 Bit coverage flush.
 

@@ -608,8 +608,10 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
 }
 
 void csDynaVis::AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
-  	csObjectModel* model, csVisibilityObjectWrapper* obj)
+  	csObjectModel* /*model*/, csVisibilityObjectWrapper* obj)
 {
+  if (!obj->model->HasOBB ()) return;	// Object is not ment for writing.
+
   iMovable* movable = visobj->GetMovable ();
   csReversibleTransform movtrans = movable->GetFullTransform ();
   const csReversibleTransform& camtrans = camera->GetTransform ();
@@ -691,72 +693,81 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       const csReversibleTransform& camtrans = camera->GetTransform ();
       csReversibleTransform trans = camtrans / movtrans;
 
-      const csOBB& obb = obj->model->GetOBB ();
-      csOBBFrozen frozen_obb (obb, trans);
-
       float max_depth;
-
-      if (frozen_obb.ProjectOBB (camera->GetFOV (),
-    	  camera->GetShiftX (), camera->GetShiftY (), sbox,
-	  min_depth, max_depth))
+      bool rc = false;
+      if (obj->model->HasOBB ())
       {
-	bool rc;
+        const csOBB& obb = obj->model->GetOBB ();
+        csOBBFrozen frozen_obb (obb, trans);
+        rc = frozen_obb.ProjectOBB (camera->GetFOV (),
+    	    camera->GetShiftX (), camera->GetShiftY (), sbox,
+	    min_depth, max_depth);
+      }
+      else
+      {
+	// No OBB, so use AABB instead.
+        rc = obj_bbox.ProjectBox (camtrans, camera->GetFOV (),
+    	    camera->GetShiftX (), camera->GetShiftY (), sbox,
+	    min_depth, max_depth);
+      }
+      if (rc)
+      {
         if (do_cull_tiled)
 	  rc = tcovbuf->TestRectangle (sbox, min_depth);
 	else
 	  rc = covbuf->TestRectangle (sbox, min_depth);
+      }
 
-        if (rc)
-        {
-	  // Object is visible. If we have a write queue we will first
-	  // test if there are objects in the queue that may mark the
-	  // object as non-visible.
-	  if (do_cull_writequeue)
-	  {
-	    // If the write queue is enabled we try to see if there
-	    // are occluders that are relevant (intersect with this object
-	    // to test). We will insert those object with the coverage
-	    // buffer and test again.
-	    float out_depth;
-	    csVisibilityObjectWrapper* qobj = (csVisibilityObjectWrapper*)
+      if (rc)
+      {
+	// Object is visible. If we have a write queue we will first
+	// test if there are objects in the queue that may mark the
+	// object as non-visible.
+	if (do_cull_writequeue)
+	{
+	  // If the write queue is enabled we try to see if there
+	  // are occluders that are relevant (intersect with this object
+	  // to test). We will insert those object with the coverage
+	  // buffer and test again.
+	  float out_depth;
+	  csVisibilityObjectWrapper* qobj = (csVisibilityObjectWrapper*)
 	    	write_queue->Fetch (sbox, min_depth, out_depth);
-	    if (qobj)
+	  if (qobj)
+	  {
+	    // We have found one such object. Insert them all.
+	    do
 	    {
-	      // We have found one such object. Insert them all.
-	      do
-	      {
-	        // Yes! We found such an object. Insert it now.
-	        if (do_cull_coverage == COVERAGE_POLYGON)
+	      // Yes! We found such an object. Insert it now.
+	      if (do_cull_coverage == COVERAGE_POLYGON)
 		  UpdateCoverageBuffer (data->rview->GetCamera (), qobj->visobj,
 		    qobj->model);
-	        else
+	      else
 		  UpdateCoverageBufferOutline (data->rview->GetCamera (),
 			  qobj->visobj, qobj->model);
-	        qobj = (csVisibilityObjectWrapper*)
+	      qobj = (csVisibilityObjectWrapper*)
 	    	  write_queue->Fetch (sbox, min_depth, out_depth);
-	      }
-	      while (qobj);
-	      // Now try again.
-	      if (do_cull_tiled)
-                rc = tcovbuf->TestRectangle (sbox, min_depth);
-	      else
-                rc = covbuf->TestRectangle (sbox, min_depth);
-              if (!rc)
-	      {
-	        // It really is invisible.
-                hist->reason = INVISIBLE_TESTRECT;
-	        vis = false;
-                goto end;
-	      }
+	    }
+	    while (qobj);
+	    // Now try again.
+	    if (do_cull_tiled)
+              rc = tcovbuf->TestRectangle (sbox, min_depth);
+	    else
+              rc = covbuf->TestRectangle (sbox, min_depth);
+            if (!rc)
+	    {
+	      // It really is invisible.
+              hist->reason = INVISIBLE_TESTRECT;
+	      vis = false;
+              goto end;
 	    }
 	  }
 	}
-	else
-	{
-          hist->reason = INVISIBLE_TESTRECT;
-	  vis = false;
-          goto end;
-        }
+      }
+      else
+      {
+        hist->reason = INVISIBLE_TESTRECT;
+	vis = false;
+        goto end;
       }
     }
 
@@ -1072,6 +1083,7 @@ iPolygon3D* csDynaVis::IntersectSegment (const csVector3& start,
 
   if (p_mesh) *p_mesh = data.mesh;
   if (pr) *pr = data.r;
+  isect = data.isect;
 
   return data.polygon;
 }
