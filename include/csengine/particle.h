@@ -414,7 +414,57 @@ public:
   virtual ~csSnowParticleSystem();
 
   /**
-   * Update and light is flickered as well. particles will be scaled.
+   * Update 
+   */
+  virtual void Update (time_t elapsed_time);
+
+  CSOBJTYPE;
+};
+
+/**
+ * A Fountain particle system. Each x msec n particles shoot out of a spout, 
+ * falling down after that. Thus some particles may not reach the floor if
+ * x is too small. If n is too small you will see not many particles.
+ * Note that the 'spout' means the spot where the fountain originates.
+ */
+class csFountainParticleSystem : public csParticleSystem {
+protected:
+  int amt;
+  csVector3 origin;
+  csVector3 accel;
+  csVector3* part_pos;
+  csVector3* part_speed;
+  float speed, opening, azimuth, elevation, fall_time;
+  int next_restart; // index 
+  float time_left; // from previous update
+
+  void RestartParticle(int index, float pre_move);
+
+public:
+  /** creates a fountain particle system given parameters.
+    * number : number of raindrops visible at one time
+    * txt: texture of raindrops. mixmode = mixmode used.
+    * lighted: the particles will be lighted if true.
+    * drop_width, drop_height: size of rectangular waterdrops.
+    * spot is the origin of the fountain
+    * accel is the particle acceleration, in m/s^2, the gravity.
+    * fall_time is the seconds a particle gets to fall.
+    * speed in m/s of the drops on exiting the spout.
+    * opening is the angle controlling the width of the stream.
+    * azimuth is the angle of the direction (horizontally) of the stream.
+    * elevation is the angle of the direction (up/down) of the stream.
+    */
+  csFountainParticleSystem(csObject* theParent, int number, 
+    csTextureHandle* txt, UInt mixmode,
+    bool lighted_particles, float drop_width, float drop_height, 
+    const csVector3& spot, const csVector3& accel, float fall_time,
+    float speed, float opening, float azimuth, float elevation
+    );
+  /// 
+  virtual ~csFountainParticleSystem();
+
+  /**
+   * Update
    */
   virtual void Update (time_t elapsed_time);
 

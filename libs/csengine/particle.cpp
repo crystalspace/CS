@@ -23,6 +23,7 @@
 #include "csengine/world.h"
 #include "csengine/particle.h"
 #include "csengine/rview.h"
+#include "csgeom/matrix3.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -33,6 +34,7 @@ IMPLEMENT_CSOBJTYPE (csSpiralParticleSystem, csNewtonianParticleSystem)
 IMPLEMENT_CSOBJTYPE (csParSysExplosion, csNewtonianParticleSystem)
 IMPLEMENT_CSOBJTYPE (csRainParticleSystem, csParticleSystem)
 IMPLEMENT_CSOBJTYPE (csSnowParticleSystem, csParticleSystem)
+IMPLEMENT_CSOBJTYPE (csFountainParticleSystem, csParticleSystem)
 
 
 csParticleSystem :: csParticleSystem(csObject* theParent)
@@ -578,3 +580,98 @@ void csSnowParticleSystem :: Update(time_t elapsed_time)
   }
 }
 
+
+//-- csFountainParticleSystem --------------------------------------------------
+
+csFountainParticleSystem :: csFountainParticleSystem(csObject* theParent, 
+  int number, csTextureHandle* txt, UInt mixmode, 
+  bool lighted_particles, float drop_width, float drop_height,
+  const csVector3& spot, const csVector3& accel, float fall_time,
+  float speed, float opening, float azimuth, float elevation)
+  : csParticleSystem(theParent)
+{
+  part_pos = new csVector3[number];
+  part_speed = new csVector3[number];
+  origin = spot;
+  csFountainParticleSystem::accel = accel;
+  csFountainParticleSystem::fall_time = fall_time;
+  csFountainParticleSystem::speed = speed;
+  csFountainParticleSystem::opening = opening;
+  csFountainParticleSystem::azimuth = azimuth;
+  csFountainParticleSystem::elevation = elevation;
+  amt = number;
+  // create particles
+  for(int i=0; i<number; i++)
+  {
+    AppendRectSprite(drop_width, drop_height, txt, lighted_particles);
+    GetParticle(i)->SetMixmode(mixmode);
+    RestartParticle(i, (fall_time / float(number)) * float(number-i));
+  }
+  next_restart = 0; // first one is now the oldest one
+  time_left = 0.0;
+}
+
+csFountainParticleSystem :: ~csFountainParticleSystem()
+{
+  delete[] part_pos;
+  delete[] part_speed;
+}
+
+
+void csFountainParticleSystem :: RestartParticle(int index, float pre_move)
+{
+  csVector3 dest; // destination spot of particle (for speed at start)
+  dest.Set(speed, 0.0f, 0.0f);
+  /// now make it shoot to a circle in the x direction
+  float rotz_open = 2.0 * opening * (rand() / (1.0+RAND_MAX)) - opening;
+  csZRotMatrix3 openrot(rotz_open);
+  dest = openrot * dest;
+  float rot_around = 2.0 * PI * (rand() / (1.0+RAND_MAX));
+  csXRotMatrix3 xaround(rot_around);
+  dest = xaround * dest;
+  /// now dest point to somewhere in a circular cur of a sphere around the 
+  /// x axis.
+
+  /// direct the fountain to the users dirction
+  csZRotMatrix3 elev(elevation);
+  dest = elev * dest;
+  csYRotMatrix3 compassdir(azimuth);
+  dest = compassdir * dest;
+
+  /// now dest points to the exit speed of the spout if that spout was
+  /// at 0,0,0.
+  part_pos[index] = origin;
+  part_speed[index] = dest;
+
+  // pre move a bit (in a perfect arc)
+  part_speed[index] += accel * pre_move;
+  part_pos[index] += part_speed[index] * pre_move;
+
+  GetParticle(index)->SetPosition(part_pos[index]);
+}
+
+
+void csFountainParticleSystem :: Update(time_t elapsed_time)
+{
+  csParticleSystem::Update(elapsed_time);
+  float delta_t = elapsed_time / 1000.0f; // in seconds
+  // move particles;
+  int i;
+  for(i=0; i<particles.Length(); i++)
+  {
+    part_speed[i] += accel * delta_t;
+    part_pos[i] += part_speed[i] * delta_t;
+    GetParticle(i)->SetPosition (part_pos[i]); 
+  }
+
+  /// restart a number of particles
+  float intersperse = fall_time / (float)amt;
+  float todo_time = elapsed_time + time_left;
+  while(todo_time > intersperse)
+  {
+    RestartParticle(next_restart, todo_time);
+    next_restart++;
+    todo_time -= intersperse;
+  }
+  time_left = todo_time;
+}
