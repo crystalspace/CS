@@ -25,7 +25,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivaria/conout.h"
-#include "igraphic/loader.h"
+#include "igraphic/imageio.h"
 #include "igraphic/image.h"
 
 //-----------------------------------------------------------------------------
@@ -83,7 +83,7 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
     exit (1);
   }
 
-  ImageLoader = QUERY_PLUGIN_ID(this, CS_FUNCID_IMGLOADER, iImageLoader);
+  ImageLoader = QUERY_PLUGIN_ID(this, CS_FUNCID_IMGLOADER, iImageIO);
   if (!ImageLoader) {
     Printf (MSG_FATAL_ERROR, "No image loader plugin!\n");
     return false;
@@ -240,7 +240,7 @@ int main (int argc, char* argv[])
   // We want at least the minimal set of plugins
   System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
   System->RequestPlugin ("crystalspace.font.server.default:FontServer");
-  System->RequestPlugin ("crystalspace.image.loader:ImageLoader");
+  System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
   System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
   System->RequestPlugin ("crystalspace.console.output.standard:Console.Output");
 

@@ -26,13 +26,13 @@
 #include "csgfx/pngsave.h"
 #include "csutil/util.h"
 #include "csutil/cfgfile.h"
-#include "igraphic/loader.h"
+#include "igraphic/imageio.h"
 
 #include <string.h>
 
 char *programversion = "0.0.1";
 char *programname;
-iImageLoader *ImageLoader = NULL;
+iImageIO *ImageLoader = NULL;
 
 /*
 
@@ -424,7 +424,7 @@ int main (int argc, char *argv[])
   // because the image loader doesn't ever use the system driver!
   // If this changes then gfxtest needs a system driver too!
   scfInitialize(new csConfigFile("scf.cfg"));
-  ImageLoader = CREATE_INSTANCE("crystalspace.image.loader", iImageLoader);
+  ImageLoader = CREATE_INSTANCE("crystalspace.graphic.image.io.multiplex", iImageIO);
   if (!ImageLoader)
   {
     printf("could not load image loader");

@@ -52,7 +52,6 @@
 #include "csobject/dataobj.h"
 #include "csobject/csobject.h"
 #include "csobject/objiter.h"
-#include "csgfx/pngsave.h"
 #include "csparser/snddatao.h"
 #include "cssys/system.h"
 #include "csfx/cspixmap.h"
@@ -68,6 +67,7 @@
 #include "isound/source.h"
 #include "isound/renderer.h"
 #include "igraphic/image.h"
+#include "igraphic/imageio.h"
 #include "iengine/collider.h"
 #include "iengine/motion.h"
 #include "ivaria/perfstat.h"
@@ -1076,11 +1076,11 @@ void perf_test (int num)
 void CaptureScreen ()
 {
   int i = 0;
-  char name [20];
+  char name [25];
   do
   {
-    sprintf (name, "cryst%03d.png", i++);
-  } while (i < 1000 && (access (name, 0) == 0));
+    sprintf (name, "/this/cryst%03d.png", i++);
+  } while (i < 1000 && Sys->VFS->Exists(name));
   if (i >= 1000)
   {
     System->Printf (MSG_CONSOLE, "Too many screenshot files in current directory\n");
@@ -1093,10 +1093,19 @@ void CaptureScreen ()
     Sys->Printf (MSG_CONSOLE, "The 2D graphics driver does not support screen shots\n");
     return;
   }
-
-  Sys->Printf (MSG_CONSOLE, "Screenshot: %s\n", name);
-  if (!csSavePNG (name, img))
-    Sys->Printf (MSG_CONSOLE, "There was an error while writing screen shot\n");
+  iImageIO *imageio = QUERY_PLUGIN (Sys, iImageIO);
+  if (imageio)
+  {
+    iDataBuffer *db = imageio->Save (img, "image/png");
+    if (db)
+    {
+       Sys->Printf (MSG_CONSOLE, "Screenshot: %s\n", name);
+      if (!Sys->VFS->WriteFile (name, (const char*)db->GetData (), db->GetSize ()))
+        Sys->Printf (MSG_CONSOLE, "There was an error while writing screen shot\n");
+      db->DecRef ();
+    }
+    imageio->DecRef ();
+  }
   img->DecRef ();
 }
 
