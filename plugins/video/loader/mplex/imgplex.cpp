@@ -128,8 +128,9 @@ csPtr<iImage> csMultiplexImageIO::Load (uint8* iBuffer, uint32 iSize,
  */
 void csMultiplexImageIO::SetDithering (bool iEnable)
 {
-  //extern bool csImage_dither;
-  //csImage_dither = iEnable;
+  global_dither = iEnable;
+  for (int i = 0; i < list.Length(); i++)
+    list[i]->SetDithering (iEnable);
 }
 
 csPtr<iDataBuffer> csMultiplexImageIO::Save (

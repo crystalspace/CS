@@ -68,6 +68,8 @@ chronological order.
 	- Keith Fulton added a skeleton update as soon as an animation cycle is
 	  added, which makes the bbox update. This enables accurate colliders
 	  to be created.
+	- res changed the imgplex plugin to set the dither flag on all image
+	  loaders.
 17-Mar-2004
 	- Duhprey added a simple terraformer loader plugin
 	- Eric Sunshine fixed copy/paste error in terraformer loader makefile
