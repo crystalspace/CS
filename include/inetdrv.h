@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1999 by Eric Sunshine <sunshine@sunshineco.com>
+    Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
     Written by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
@@ -17,36 +17,30 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_INETWORK_H__
-#define __CS_INETWORK_H__
+#ifndef __CS_INETDRV_H__
+#define __CS_INETDRV_H__
 
 #include "csutil/scf.h"
 #include "iplugin.h"
 
-/*
- *  Random things you need for various systems.
- */
-
-
-#define CS_NET_SOCKETS_MAX 64
-
-#define CS_NET_LISTEN_QUEUE_SIZE 5
-
-#if defined(OS_MACOS)
-	typedef unsigned int csNetworkSocket;
-	#define CS_NET_SOCKET_INVALID ((csNetworkSocket)~0)
-	typedef unsigned long fd_set;
-#elif !defined(OS_WIN32)
-	#include <sys/select.h>
-	typedef unsigned int csNetworkSocket;
-	#define CS_NET_SOCKET_INVALID ((csNetworkSocket)~0)
+#if defined(OS_WIN32)
+  #include <winsock.h>
+  typedef SOCKET csNetworkSocket;
+  #define CS_NET_SOCKET_INVALID INVALID_SOCKET
+  #define _WINSOCKAPI_
 #else
-	#include <WINSOCK.H>
-	typedef SOCKET csNetworkSocket;
-	#define CS_NET_SOCKET_INVALID INVALID_SOCKET
-	#define _WINSOCKAPI_
+  typedef unsigned int csNetworkSocket;
+  #define CS_NET_SOCKET_INVALID ((csNetworkSocket)~0)
+  #if defined(OS_MACOS)
+    typedef unsigned long fd_set;
+  #elif defined(OS_NEXT)
+    #include <libc.h>   // For FD_*, select()
+    #include <string.h> // For memset()
+    #define bzero(b,len) memset(b,0,len) /* bzero used by FD_ZERO */
+  #else
+    #include <sys/select.h>
+  #endif
 #endif
-
 
 /**
  * Potential network driver error codes.
@@ -178,7 +172,7 @@ struct iNetworkDriver : public iPlugIn
    * blocks while when called.  The 'blockingConnection' flag determines
    * whether or not methods in the resulting connection object block.
    */
-  virtual iNetworkListener* NewListener( const char* source,
+  virtual iNetworkListener* NewListener(const char* source,
     bool reliable, bool blockingListener, bool blockingConnection) = 0;
 
   /**
@@ -188,16 +182,16 @@ struct iNetworkDriver : public iPlugIn
   virtual csNetworkDriverCapabilities GetCapabilities() const = 0;
 
   /// Retrieve the code for the last error encountered.
-  virtual csNetworkDriverError GetLastError () const = 0;
+  virtual csNetworkDriverError GetLastError() const = 0;
 
-  // Detect an event
-  virtual bool DetectEvents(int maxsock, fd_set *ReadMask, fd_set *ExceptMask) =0;
+  /// Detect an event.
+  virtual bool DetectEvents(int maxsock, fd_set* ReadMask,
+    fd_set* ExceptMask) = 0;
 
   // iPlugIn interface.
-  virtual bool Initialize (iSystem*) = 0;
-  virtual bool Open () = 0;
-  virtual bool Close () = 0;
+  virtual bool Initialize(iSystem*) = 0;
+  virtual bool Open() = 0;
+  virtual bool Close() = 0;
 };
 
-#endif // __CS_INETWORK_H__
-
+#endif // __CS_INETDRV_H__
