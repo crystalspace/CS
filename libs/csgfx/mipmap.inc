@@ -49,7 +49,7 @@
 #if defined (MIPMAP_PALETTED) || defined (MIPMAP_ALPHA)
 #  define MIPMAP_PIXTYPE	UByte
 #else
-#  define MIPMAP_PIXTYPE	ULong
+#  define MIPMAP_PIXTYPE	uint32
 #endif
 
 static void MIPMAP_NAME (unsigned w, unsigned h
@@ -80,7 +80,7 @@ static void MIPMAP_NAME (unsigned w, unsigned h
      {									\
        UByte pix = p;							\
        if (pix == transp) { *dst++ = pal [src2 [1]]; FINALLY; continue; }\
-       ULong rgb = *(ULong *)&pal [pix];				\
+       uint32 rgb = *(uint32 *)&pal [pix];				\
        rb += (rgb & 0x00ff00ff) * m;					\
        ga += ((rgb >> 8) & 0x00ff00ff) * m;				\
      }
@@ -88,15 +88,15 @@ static void MIPMAP_NAME (unsigned w, unsigned h
 #    define ACCUMULATE_PIXEL(p, m)					\
      {									\
        UByte pix = p;							\
-       ULong rgb = *(ULong *)&pal [pix];				\
-       if (pix == transp) { *(ULong *)dst++ = rgb; FINALLY; continue; }	\
+       uint32 rgb = *(uint32 *)&pal [pix];				\
+       if (pix == transp) { *(uint32 *)dst++ = rgb; FINALLY; continue; }	\
        rb += (rgb & 0x00ff00ff) * m;					\
        ga += ((rgb >> 8) & 0x00ff00ff) * m;				\
      }
 #  else
 #    define ACCUMULATE_PIXEL(p, m)					\
      {									\
-       ULong rgb = *(ULong *)&pal [p];					\
+       uint32 rgb = *(uint32 *)&pal [p];					\
        rb += (rgb & 0x00ff00ff) * m;					\
        ga += ((rgb >> 8) & 0x00ff00ff) * m;				\
      }
@@ -105,23 +105,23 @@ static void MIPMAP_NAME (unsigned w, unsigned h
 #  if defined (MIPMAP_TRANSPARENT) && (MIPMAP_LEVEL == 0)
 #    define ACCUMULATE_PIXEL(p, m)		    			\
      {									\
-       ULong rgb = *(ULong *)&p;					\
-       if (rgb == *(ULong *)&transp) { *(ULong *)dst++ = src2 [1]; FINALLY; continue; }\
+       uint32 rgb = *(uint32 *)&p;					\
+       if (rgb == *(uint32 *)&transp) { *(uint32 *)dst++ = src2 [1]; FINALLY; continue; }\
        rb += (rgb & 0x00ff00ff) * m;					\
        ga += ((rgb >> 8) & 0x00ff00ff) * m;				\
      }
 #  elif defined (MIPMAP_TRANSPARENT)
 #    define ACCUMULATE_PIXEL(p, m)		    			\
      {									\
-       ULong rgb = *(ULong *)&p;					\
-       if (rgb == *(ULong *)&transp) { *(ULong *)dst++ = rgb; FINALLY; continue; }\
+       uint32 rgb = *(uint32 *)&p;					\
+       if (rgb == *(uint32 *)&transp) { *(uint32 *)dst++ = rgb; FINALLY; continue; }\
        rb += (rgb & 0x00ff00ff) * m;					\
        ga += ((rgb >> 8) & 0x00ff00ff) * m;				\
      }
 #  else
 #    define ACCUMULATE_PIXEL(p, m)		    			\
      {									\
-       ULong rgb = *(ULong *)&p;					\
+       uint32 rgb = *(uint32 *)&p;					\
        rb += (rgb & 0x00ff00ff) * m;					\
        ga += ((rgb >> 8) & 0x00ff00ff) * m;				\
      }
@@ -133,7 +133,7 @@ static void MIPMAP_NAME (unsigned w, unsigned h
     *dst++ = a / MIPMAP_DIVIDER;
 #else
 #define MIPMAP_OUTPUT							\
-    *(ULong *)dst++ = ((rb / MIPMAP_DIVIDER) & 0x00ff00ff) |		\
+    *(uint32 *)dst++ = ((rb / MIPMAP_DIVIDER) & 0x00ff00ff) |		\
                       (((ga / MIPMAP_DIVIDER) << 8) & 0xff00ff00);
 #endif
 
