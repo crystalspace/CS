@@ -798,6 +798,9 @@ void csODEJoint::BuildSlider (const csVector3 &axis, float min, float max)
 
 void csODEJoint::BuildJoint () 
 {
+  if (!(bodyID[0] && bodyID[1])) {
+    return;
+  }
   if (jointID) {
     dJointDestroy (jointID);
   }
@@ -810,16 +813,12 @@ void csODEJoint::BuildJoint ()
     switch (rotcount) {
       case 0:
         jointID = dJointCreateFixed (dynsys->GetWorldID(), 0);
-        if (bodyID[0] && bodyID[1]) {
           dJointAttach (jointID, bodyID[0], bodyID[1]);
           dJointSetFixed (jointID);
-        }
         break;
       case 1:
         jointID = dJointCreateHinge (dynsys->GetWorldID(), 0);
-        if (bodyID[0] && bodyID[1]) {
           dJointAttach (jointID, bodyID[0], bodyID[1]);
-        }
         pos = transform.GetOrigin();
         dJointSetHingeAnchor (jointID, pos.x, pos.y, pos.z);
         rot = transform.GetO2T();
@@ -834,9 +833,7 @@ void csODEJoint::BuildJoint ()
         break;
       case 2:
         jointID = dJointCreateHinge2 (dynsys->GetWorldID(), 0);
-        if (bodyID[0] && bodyID[1]) {
           dJointAttach (jointID, bodyID[0], bodyID[1]);
-        }
         pos = transform.GetOrigin();
         dJointSetHingeAnchor (jointID, pos.x, pos.y, pos.z);
         rot = transform.GetO2T();
@@ -856,9 +853,7 @@ void csODEJoint::BuildJoint ()
         break;
       case 3:
         jointID = dJointCreateBall (dynsys->GetWorldID(), 0);
-        if (bodyID[0] && bodyID[1]) {
           dJointAttach (jointID, bodyID[0], bodyID[1]);
-        }
         pos = transform.GetOrigin();
         dJointSetBallAnchor (jointID, pos.x, pos.y, pos.z);
         break;
@@ -869,9 +864,7 @@ void csODEJoint::BuildJoint ()
       /* 0 is accounted for in the previous condition */
       case 1:
         jointID = dJointCreateSlider (dynsys->GetWorldID(), 0);
-        if (bodyID[0] && bodyID[1]) {
           dJointAttach (jointID, bodyID[0], bodyID[1]);
-        }
         rot = transform.GetO2T();
         if (transConstraint[0]) {
           BuildSlider (rot.Col1(), minTrans.x, maxTrans.x);
