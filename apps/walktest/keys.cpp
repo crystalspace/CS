@@ -218,7 +218,7 @@ void add_tree_limbs (csSpriteTemplate* tmpl, csFrame* frame, csSkeletonLimb* par
   tmpl->GetVertex(frame, par_vertex_idx+2) = csVector3(0, 0, .05);
   tmpl->GetVertex(frame, par_vertex_idx+3) = csVector3(-.05, .45, -.05);
   tmpl->GetVertex(frame, par_vertex_idx+4) = csVector3(.05, .45, -.05);
-  tmpl->GetVertex(frame, par_vertex_idx+5) = csVector3(.45, .05);
+  tmpl->GetVertex(frame, par_vertex_idx+5) = csVector3(0, .45, .05);
 
   tmpl->GetTexel(frame, par_vertex_idx+0) = csVector2(0, 0);
   tmpl->GetTexel(frame, par_vertex_idx+1) = csVector2(.99, 0);
