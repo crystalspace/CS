@@ -1,6 +1,14 @@
 The history order has been reversed so that new features are at the top.
 
+22-Jun-2000
+	- Got a new patch from Travis McIntosh.  This patch finished
+	  dynamic lighting for curved surfaces. Still a bit slow but it
+	  works very well already. WARNING! Please do -relight or -recalc
+	  on levels that have curved surfaces! The lightmap format has
+	  changed (lightmap got bigger).
 21-Jun-2000
+	- Norman Kramer added new SetViewArea for gridviews to retsrict the
+	  area they can show.
 	- Added 'colors' to the tesselated version of a curve so that
 	  drawing curves will be much more optimal. This means that we'll
 	  have to update this whenever the lightmap or tesselation changes

@@ -429,6 +429,7 @@ public:
 class csLightPatch
 {
   friend class csPolygon3D;
+  friend class csCurve;
   friend class csPolyTexture;
   friend class csDynLight;
   friend class Dumper;
@@ -449,6 +450,9 @@ private:
 
   /// Polygon that this light patch is for.
   csPolygon3D* polygon;
+  /// Curve that this light patch is for
+  csCurve* curve;
+
   /// Light that this light patch originates from.
   csDynLight* light;
 
@@ -483,6 +487,11 @@ public:
    * Get the polygon that this light patch belongs too.
    */
   csPolygon3D* GetPolygon () { return polygon; }
+
+  /**
+   * Get the curve that this light patch belongs too.
+   */
+  csCurve* GetCurve () { return curve; }
 
   /**
    * Get the light that this light patch belongs too.

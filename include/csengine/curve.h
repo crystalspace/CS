@@ -97,6 +97,7 @@ public:
 class csPolygonSet;
 class csThingTemplate;
 class csCurveTemplate;
+class csLightPatch;
 
 /**
  * This is an abstract class for all curves in Crystal Space.
@@ -107,6 +108,13 @@ private:
   csTextureHandle* cstxt;
   // Pointer to the parent template.
   csCurveTemplate* parent_template;
+  
+  // list of light patches
+  csLightPatch* lightpatches;
+
+  // Object to world transformation (Needed by CalculateLighting & 
+  // ShineDynLight)
+  csTransform* _o2w;
 
 public:
   /// The polygon set parent.
@@ -119,13 +127,17 @@ public:
 public:
   ///
   csCurve (csCurveTemplate* parent_tmpl) : csObject (), cstxt (NULL),
-  	parent_template (parent_tmpl),
+  	parent_template (parent_tmpl), lightpatches(NULL), _o2w(NULL),
   	parent (NULL), lightmap (NULL), lightmap_up_to_date (false) {} 
   ///
   virtual ~csCurve ();
 
+
+  void SetObject2World (csTransform* o2w) { if (_o2w) delete _o2w; _o2w = o2w; }
   ///
   void SetParent (csPolygonSet* p) { parent = p; }
+
+  void MakeDirtyDynamicLights ();
 
   /// Get the parent template used for this curve.
   csCurveTemplate* GetParentTemplate () { return parent_template; }
@@ -187,8 +199,22 @@ public:
   virtual void Normal (csVector3& vec, double u, double v);
   ///
   void InitLightMaps (csPolygonSet* owner, bool do_cache, int index);
-  ///
+
+  /// Add a lightpatch to this curves list of light patches
+  void AddLightPatch (csLightPatch* lp);
+
+  /// Remove a lightpatch from this curves list
+  void UnlinkLightPatch (csLightPatch* lp);
+
+  /// update the real lightmap with all light info
+  bool RecalculateDynamicLights ();
+
+  /// update the real lightmap with info from the lightpatch
+  void ShineDynLight (csLightPatch* lp);
+
+  /// calculate the lighting for this curve
   void CalculateLighting (csFrustumView& lview);
+
   ///
   void CacheLightMaps (csPolygonSet* owner, int index);
   

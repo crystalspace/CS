@@ -215,6 +215,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     int box_class;
     box_class = rview.view->ClassifyBox (bbox);
     if (box_class == -1) continue; // Not visible.
+
     bool do_clip = false;
     if (rview.do_clip_plane || rview.do_clip_frustum)
     {
@@ -235,11 +236,10 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     }
 
     // If we have a dirty lightmap recombine the curves and the shadow maps.
-    bool updated_lm = c->lightmap->UpdateRealLightMap();
+    bool updated_lm = c->RecalculateDynamicLights ();
 
     // Create a new tesselation reuse an old one.
     csCurveTesselated* tess = c->Tesselate (res);
-
     // If the lightmap was updated or the new tesselation doesn't yet
     // have a valid colors table we need to update colors here.
     if (updated_lm || !tess->AreColorsValid ())
@@ -250,6 +250,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     {
       fog_verts.SetLimit (tess->GetNumVertices ());
     }
+
     mesh.txt_handle[0] = c->GetTextureHandle ();
     mesh.num_vertices = tess->GetNumVertices ();
     mesh.vertices[0] = tess->GetVertices ();
@@ -432,10 +433,10 @@ void csThing::RealCheckFrustum (csFrustumView& lview)
     lview.poly_func ((csObject*)p, &lview);
   }
 
-  // Loop over all curves
   for (i = 0 ; i < GetNumCurves () ; i++)
   {
     csCurve* c = curves.Get (i);
+    c->SetObject2World(new csTransform(obj.GetT2O(), obj.GetT2OTranslation()));
     lview.curve_func ((csObject*)c, &lview);
   }
 

@@ -322,6 +322,7 @@ csLightPatch::~csLightPatch ()
 void csLightPatch::RemovePatch ()
 {
   if (polygon) polygon->UnlinkLightpatch (this);
+  if (curve) curve->UnlinkLightPatch (this);
   if (light) light->UnlinkLightpatch (this);
   shadows.DeleteFrustums ();
 }
@@ -385,7 +386,11 @@ void csDynLight::SetColor (const csColor& col)
   csLightPatch* lp = lightpatches;
   while (lp)
   {
-    lp->GetPolygon ()->MakeDirtyDynamicLights ();
+    if (lp->GetPolygon ())
+      lp->GetPolygon()->MakeDirtyDynamicLights ();
+    else
+      lp->GetCurve()->MakeDirtyDynamicLights ();
+
     lp = lp->GetNextLight ();
   }
 }

@@ -771,6 +771,7 @@ void csPolygon3D::AddLightpatch (csLightPatch* lp)
   if (light_info.lightpatches) light_info.lightpatches->prev_poly = lp;
   light_info.lightpatches = lp;
   lp->polygon = this;
+  lp->curve = NULL;
   MakeDirtyDynamicLights ();
 }
 

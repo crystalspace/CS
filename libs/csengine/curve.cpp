@@ -28,6 +28,7 @@
 #include "csengine/thing.h"
 #include "csengine/sector.h"
 #include "csengine/world.h"
+#include "csengine/lppool.h"
 
 static csBezierCache theBezierCache;
 
@@ -241,6 +242,9 @@ void csBezier::GetObjectBoundingBox (csBox3& bbox)
 
 csCurve::~csCurve ()
 {
+  while (lightpatches)
+    csWorld::current_world->lightpatch_pool->Free (lightpatches);
+  delete _o2w;
   delete lightmap;
 }
 
@@ -263,7 +267,8 @@ void csCurve::Normal (csVector3& /*vec*/, double /*u*/, double /*v*/)
   return;
 }
 
-#define CURVE_LM_SIZE 32
+// #define CURVE_LM_SIZE 32
+#define CURVE_LM_SIZE 64
 
 void csCurve::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
 {
@@ -284,95 +289,119 @@ void csCurve::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
   else lightmap_up_to_date = true;
 }
 
-void csCurve::CalculateLighting (csFrustumView& lview)
+void csCurve::MakeDirtyDynamicLights () 
+{ 
+  lightmap_up_to_date = false;
+  lightmap->MakeDirtyDynamicLights (); 
+};
+
+
+void csCurve::AddLightPatch(csLightPatch* lp)
 {
-  if (!lightmap || lightmap_up_to_date) 
-    return;
+  lp->next_poly = lightpatches;
+  lp->prev_poly = NULL;
+
+  if (lightpatches) 
+    lightpatches->prev_poly = lp;
   
-  int lm_width = lightmap->GetWidth ();
-  int lm_height = lightmap->GetHeight ();
+  lightpatches = lp;
+  lp->polygon = NULL;
+  lp->curve = this;
 
-  csStatLight *light = (csStatLight *)lview.userdata;
+  /// set the dynamic lights to dirty
+  lightmap->MakeDirtyDynamicLights ();
+}
 
-  bool dyn = light->IsDynamic();
+void csCurve::UnlinkLightPatch (csLightPatch* lp)
+{
+  if (lp->next_poly) lp->next_poly->prev_poly = lp->prev_poly;
+  if (lp->prev_poly) lp->prev_poly->next_poly = lp->next_poly;
+  else lightpatches = lp->next_poly;
+  lp->prev_poly = lp->next_poly = NULL;
+  lp->curve = NULL;
+  lightmap->MakeDirtyDynamicLights ();
+}
 
-  UByte *mapR, *mapG, *mapB;
-  csShadowFrustum* sf = NULL;
-  csShadowMap* smap;
+bool csCurve::RecalculateDynamicLights ()
+{
+  // first combine the static and pseudo-dynamic lights
+  if (!lightmap || !lightmap->UpdateRealLightMap() )
+    return false;
 
-  /* initialize color to something to avoid compiler warnings */
-  csColor color(0,0,0);
-
-  if (dyn)
+  //---
+  // Now add all dynamic lights.
+  //---
+  csLightPatch* lp = lightpatches;
+  while (lp)
   {
-    smap = lightmap->FindShadowMap( light );
-    if (!smap)
-    {
-      smap = lightmap->NewShadowMap(light, CURVE_LM_SIZE, CURVE_LM_SIZE );
-    }
-    
-    mapR = smap->map;
-    mapG = NULL;
-    mapB = NULL;
-  
-    sf = lview.shadows.GetFirst();
+    ShineDynLight (lp);
+    lp = lp->GetNextPoly ();
   }
-  else
-  {
-    mapR = lightmap->GetStaticMap ().GetRed ();
-    mapG = lightmap->GetStaticMap ().GetGreen ();
-    mapB = lightmap->GetStaticMap ().GetBlue ();
-    color = csColor (lview.r, lview.g, lview.b) * NORMAL_LIGHT_LEVEL;
-  }
+
+  return true;
+}
+
+void csCurve::ShineDynLight (csLightPatch* lp)
+{
+  CS_ASSERT(_o2w);
+
+  int lm_width = lightmap->GetWidth () - 2;
+  int lm_height = lightmap->GetHeight () - 2;
+
+  csDynLight *light = lp->light;
+
+  csShadowFrustum* sf = lp->shadows.GetFirst ();
+
+  csColor color = light->GetColor() * NORMAL_LIGHT_LEVEL;
+
+  UByte *mapR = lightmap->GetRealMap().GetRed();
+  UByte *mapG = lightmap->GetRealMap().GetGreen();
+  UByte *mapB = lightmap->GetRealMap().GetBlue();
 
   int lval;
-
   float cosfact = csPolyTexture::cfg_cosinus_factor;
 
-  // calculate the static lightmap
+  // now add to the map
   csVector3 pos;
   csVector3 normal;
   float d;
   float u, v;
   int ui, vi;
   int uv;
-  for (ui = 0 ; ui < lm_width ; ui++)
+  for (ui = 0 ; ui <= lm_width ; ui++)
   {
     u = ((float)ui)/(float)lm_width;
-    for (vi = 0 ; vi < lm_height ; vi++)
+    for (vi = 0 ; vi <= lm_height ; vi++)
     {
       v = ((float)vi)/(float)lm_height;
-      uv = vi*lm_width+ui;
+      uv = vi*(lm_width + 2) + ui;
       PosInSpace (pos, u, v);
+      pos = _o2w->Other2This(pos);
 
-      /*if (dyn)
+      // is the point contained within the light frustrum? 
+      //if (!lp->lview.light_frustum->Contains(pos - lview.light_frustum->GetOrigin()))
+        // No, skip it
+        //continue;
+
+      // if we have any shadow frustrums
+      if (sf != NULL)
       {
-        // is the point contained within the light frustrum? 
-        if (!lview.light_frustum->Contains(pos - lview.light_frustum->GetOrigin()))
-          // No, skip it
-          continue;
-
-        // if we have any shadow frustrums
-        if (sf != NULL)
+        csShadowFrustum* csf;
+        for(csf=sf; csf != NULL; csf=csf->next)
         {
-          for(csShadowFrustum* csf=sf; csf != NULL; csf=csf->next)
-          {
-            // is this point in shadow
-            if (sf->Contains(pos - sf->GetOrigin()))
-              break;
-          }
-          
-          // if it was found in shadow skip it
-          if (csf != NULL)
-            continue;
+          // is this point in shadow
+          if (csf->Contains(pos - csf->GetOrigin()))
+            break;
         }
-      }*/
+                  
+        // if it was found in shadow skip it
+        if (csf != NULL)
+          continue;
+      }
 
       d = csSquaredDist::PointPoint (light->GetCenter (), pos);
       if (d >= light->GetSquaredRadius ()) continue;
       d = FastSqrt (d);
-      // @@@: Normals are returning 0,0,0.  I'm 90% positive that this
-      //      should never happen
       Normal (normal, u, v);
       float cosinus = (pos-light->GetCenter ())*normal;
       cosinus /= d;
@@ -382,31 +411,191 @@ void csCurve::CalculateLighting (csFrustumView& lview)
 
       float brightness = cosinus * light->GetBrightnessAtDistance (d);
 
-      if (dyn)
+      //@@@: Do the tests for >0 increase or decrease performance?
+      if (color.red > 0)
       {
-        lval = mapR[uv] + QRound (NORMAL_LIGHT_LEVEL * brightness);
+        lval = mapR[uv] + QRound (color.red * brightness);
         if (lval > 255) lval = 255;
         mapR[uv] = lval;
       }
-      else
+      if (color.green > 0)
       {
-        if (lview.r > 0)
+        lval = mapG[uv] + QRound (color.green * brightness);
+        if (lval > 255) lval = 255;
+        mapG[uv] = lval;
+      }
+      if (color.blue > 0)
+      {
+        lval = mapB[uv] + QRound (color.blue * brightness);
+        if (lval > 255) lval = 255;
+        mapB[uv] = lval;
+      }
+    }
+  }
+}
+
+void csCurve::CalculateLighting (csFrustumView& lview)
+{
+  CS_ASSERT(_o2w);
+
+  if (lview.dynamic)
+  {
+    // We are working for a dynamic light. In this case we create
+    // a light patch for this polygon.
+    csLightPatch* lp = csWorld::current_world->lightpatch_pool->Alloc ();
+
+    AddLightPatch (lp);
+  
+    csDynLight* dl = (csDynLight*)lview.userdata;
+    dl->AddLightpatch (lp);
+
+    // this light patch has exactly 4 vertices because it fits around our lightmap
+    lp->Initialize (4);
+
+    // Copy shadow frustums.
+    csShadowFrustum* sf, * copy_sf;
+    sf = lview.shadows.GetFirst ();
+    while (sf)
+    {
+      //if (sf->relevant) @@@: It would be nice if we could optimize earlier 
+      //                       to determine relative shadow frustums in curves
+      copy_sf = new csShadowFrustum (*sf);
+      lp->shadows.AddLast (copy_sf);
+      sf = sf->next;
+    }
+
+    /*
+    int i, mi;
+    for (i = 0 ; i < lp->num_vertices ; i++)
+    {
+      mi = lview.mirror ? lp->num_vertices-i-1 : i;
+      //lp->vertices[i] = lview.frustum[mi] + lview.center;
+      lp->vertices[i] = lview.light_frustum->GetVertex (mi);
+    }*/
+
+    MakeDirtyDynamicLights ();
+  }
+  else
+  {
+    if (!lightmap || lightmap_up_to_date) 
+      return;
+
+    int lm_width = lightmap->GetWidth () - 2;
+    int lm_height = lightmap->GetHeight () - 2;
+
+    csStatLight *light = (csStatLight *)lview.userdata;
+
+    bool dyn = light->IsDynamic();
+
+    UByte *mapR, *mapG, *mapB;
+    csShadowFrustum* sf = lview.shadows.GetFirst ();
+    csShadowMap* smap;
+
+    /* initialize color to something to avoid compiler warnings */
+    csColor color(0,0,0);
+
+    if (dyn)
+    {
+      smap = lightmap->FindShadowMap( light );
+      if (!smap)
+      {
+        smap = lightmap->NewShadowMap(light, CURVE_LM_SIZE, CURVE_LM_SIZE );
+      }
+  
+      mapR = smap->map;
+      mapG = NULL;
+      mapB = NULL;
+    }
+    else
+    {
+      mapR = lightmap->GetStaticMap ().GetRed ();
+      mapG = lightmap->GetStaticMap ().GetGreen ();
+      mapB = lightmap->GetStaticMap ().GetBlue ();
+      color = csColor (lview.r, lview.g, lview.b) * NORMAL_LIGHT_LEVEL;
+    }
+
+    int lval;
+
+    float cosfact = csPolyTexture::cfg_cosinus_factor;
+
+    // calculate the static lightmap
+    csVector3 pos;
+    csVector3 normal;
+    float d;
+    float u, v;
+    int ui, vi;
+    int uv;
+    for (ui = 0 ; ui <= lm_width ; ui++)
+    {
+      u = ((float)ui)/(float)lm_width;
+      for (vi = 0 ; vi <= lm_height ; vi++)
+      {
+        v = ((float)vi)/(float)lm_height;
+        uv = vi*(lm_width + 2) + ui;
+        PosInSpace (pos, u, v);
+        pos = _o2w->Other2This(pos);
+
+        // is the point contained within the light frustrum? 
+        if (!lview.light_frustum->Contains(pos - lview.light_frustum->GetOrigin()))
+          // No, skip it
+          continue;
+
+        // if we have any shadow frustrums
+        if (sf != NULL)
         {
-          lval = mapR[uv] + QRound (color.red * brightness);
+          csShadowFrustum* csf;
+          for(csf=sf; csf != NULL; csf=csf->next)
+          {
+            // is this point in shadow
+            if (csf->Contains(pos - csf->GetOrigin()))
+              break;
+          }
+                
+          // if it was found in shadow skip it
+          if (csf != NULL)
+            continue;
+        }
+
+        d = csSquaredDist::PointPoint (light->GetCenter (), pos);
+        if (d >= light->GetSquaredRadius ()) continue;
+        d = FastSqrt (d);
+        // @@@: Normals are returning 0,0,0.  I'm 90% positive that this
+        //      should never happen
+        Normal (normal, u, v);
+        float cosinus = (pos-light->GetCenter ())*normal;
+        cosinus /= d;
+        cosinus += cosfact;
+        if (cosinus < 0) cosinus = 0;
+        else if (cosinus > 1) cosinus = 1;
+
+        float brightness = cosinus * light->GetBrightnessAtDistance (d);
+
+        if (dyn)
+        {
+          lval = mapR[uv] + QRound (NORMAL_LIGHT_LEVEL * brightness);
           if (lval > 255) lval = 255;
           mapR[uv] = lval;
         }
-        if (lview.g > 0 && mapG)
+        else
         {
-          lval = mapG[uv] + QRound (color.green * brightness);
-          if (lval > 255) lval = 255;
-          mapG[uv] = lval;
-        }
-        if (lview.b > 0 && mapB)
-        {
-          lval = mapB[uv] + QRound (color.blue * brightness);
-          if (lval > 255) lval = 255;
-          mapB[uv] = lval;
+          if (lview.r > 0)
+          {
+            lval = mapR[uv] + QRound (color.red * brightness);
+            if (lval > 255) lval = 255;
+            mapR[uv] = lval;
+          }
+          if (lview.g > 0 && mapG)
+          {
+            lval = mapG[uv] + QRound (color.green * brightness);
+            if (lval > 255) lval = 255;
+            mapG[uv] = lval;
+          }
+          if (lview.b > 0 && mapB)
+          {
+            lval = mapB[uv] + QRound (color.blue * brightness);
+            if (lval > 255) lval = 255;
+            mapB[uv] = lval;
+          }
         }
       }
     }
