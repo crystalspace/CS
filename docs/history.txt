@@ -28,8 +28,22 @@ Short-term cleanups that need to be done:
 	  name and filename.
 	- Thomas also fixed the release mode name for the Windows OpenGL
 	  2D driver.
+	- Eric Sunshine modified the CVS snapshot-generation script to patch
+	  the CVS/Root files ("cvs1" --> "cvs.crystal.sourceforge.net") such
+	  that the resulting snapshot can be used later for an anonymous
+	  cvs update.
+	- Eric Sunshine fixed DECLARE_GROWING_ARRAY() so that it is compilable
+	  on all platforms.  Recent changes to appease MSVC (the addition of a
+	  floating semi-colon) were not grokked by the NextStep compiler, so
+	  he resolved the issue by eliminating the problem altogether. :-)
+	- Eric Sunshine applied a patch to blocks.cpp from Artur
+	  Biesiadowski <abies@pg.gda.pl> to correct a bug where the
+	  orientation of a piece was different on-screen versus in-memory.
+	- Eric Sunshine fixed several compilation errors in map2cs.  He also
+	  eliminated some compilation warnings.
+	- Eric Sunshine removed all of the remaining, obsolete references to
+	  csregsvr from the documentation.
 3-Jan-2000
-	- Some changes to python scripts from Eric Sunshine.
 	- Thomas Hieber fixed a few things to make CS compilable again with
 	  MSVC.
 	- Norman Kramer added new keywords to world format TEX_SET and
@@ -50,6 +64,10 @@ Short-term cleanups that need to be done:
 	- Changes to Map2CS from Thomas Hieber (new lightscale option).
 	- Norman Kramer added a farplane to csCamera object such that
 	  everything is clipped to that plane. Default is no clipping.
+	- Eric Sunshine wrote a script (bin/snapshot.py) which generates
+	  snapshots and diffs of the CVS repository.  The script currently
+	  runs daily and deposits the snapshots at:
+	  ftp://crystal.sourceforge.net/pub/crystal/cvs-snapshots.
 1-Jan-2000
 	- My computer is still working :-)
 	  And so is Crystal Space.
