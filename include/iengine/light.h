@@ -32,6 +32,7 @@
 class csLight;
 class csColor;
 class csFlags;
+struct iLight;
 struct iSector;
 struct iObject;
 struct iCrossHalo;
@@ -80,7 +81,7 @@ struct iFlareHalo;
 #define CS_ATTN_REALISTIC 3
 /** @} */
 
-SCF_VERSION (iLightCallback, 0, 1, 1);
+SCF_VERSION (iLightCallback, 0, 2, 0);
 
 /**
  * Set a callback which is called when this light color is changed.
@@ -93,31 +94,31 @@ struct iLightCallback : public iBase
    * Light color will be changed. It is safe to delete this callback
    * in this function.
    */
-  virtual void OnColorChange (const csColor& newcolor) = 0;
+  virtual void OnColorChange (iLight* light, const csColor& newcolor) = 0;
 
   /**
    * Light position will be changed. It is safe to delete this callback
    * in this function.
    */
-  virtual void OnPositionChange (const csVector3& newpos) = 0;
+  virtual void OnPositionChange (iLight* light, const csVector3& newpos) = 0;
 
   /**
    * Sector will be changed. It is safe to delete this callback
    * in this function.
    */
-  virtual void OnSectorChange (iSector* newsector) = 0;
+  virtual void OnSectorChange (iLight* light, iSector* newsector) = 0;
 
   /**
    * Radius will be changed.
    * It is safe to delete this callback in this function.
    */
-  virtual void OnRadiusChange (float newradius) = 0;
+  virtual void OnRadiusChange (iLight* light, float newradius) = 0;
 
   /**
    * Light will be destroyed.
    * It is safe to delete this callback in this function.
    */
-  virtual void OnDestroy () = 0;
+  virtual void OnDestroy (iLight* light) = 0;
 };
 
 

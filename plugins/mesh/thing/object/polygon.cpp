@@ -296,10 +296,7 @@ csPolygon3D::csPolygon3D (iMaterialWrapper *material) :
   thing = NULL;
   polygon_id = 0;
 
-  if (material)
-    csPolygon3D::material = material;
-  else
-    csPolygon3D::material = NULL;
+  csPolygon3D::material = material;
 
   txt_info = NULL;
 

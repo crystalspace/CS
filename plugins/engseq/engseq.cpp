@@ -1304,7 +1304,7 @@ public:
     return (col.red + col.blue + col.green)/3;
   }
 
-  virtual void OnColorChange (const csColor& col)
+  virtual void OnColorChange (iLight*, const csColor& col)
   {
     uint32 global_framenr = trigger->GetEngineSequenceManager ()
       	->GetGlobalFrameNr ();
@@ -1325,10 +1325,10 @@ public:
     }
   }
 
-  virtual void OnPositionChange (const csVector3&) { }
-  virtual void OnSectorChange (iSector*) { }
-  virtual void OnRadiusChange (float) { }
-  virtual void OnDestroy () { }
+  virtual void OnPositionChange (iLight*, const csVector3&) { }
+  virtual void OnSectorChange (iLight*, iSector*) { }
+  virtual void OnRadiusChange (iLight*, float) { }
+  virtual void OnDestroy (iLight*) { }
 };
 
 SCF_IMPLEMENT_IBASE (csTriggerLightCallback)

@@ -133,11 +133,12 @@ csMovable::csMovable ()
 
 csMovable::~csMovable ()
 {
-  int i;
-  for (i = 0; i < listeners.Length (); i++)
+  int i = listeners.Length ()-1;
+  while (i >= 0)
   {
     iMovableListener *ml = listeners[i];
     ml->MovableDestroyed (&scfiMovable);
+    i--;
   }
 }
 
@@ -197,11 +198,12 @@ void csMovable::UpdateMove ()
   updatenr++;
   if (object) object->UpdateMove ();
 
-  int i;
-  for (i = 0; i < listeners.Length (); i++)
+  int i = listeners.Length ()-1;
+  while (i >= 0)
   {
     iMovableListener *ml = listeners[i];
     ml->MovableChanged (&scfiMovable);
+    i--;
   }
 
   is_identity = obj.IsIdentity ();

@@ -642,6 +642,7 @@ public:
   virtual int GetMaxLightmapAspectRatio () const { return MaxAspectRatio; }
   
   virtual csPtr<iFrustumView> CreateFrustumView ();
+  virtual csPtr<iObjectWatcher> CreateObjectWatcher ();
 
   /**
    * Reset a subset of flags/settings (which may differ from one world/map to 

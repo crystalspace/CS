@@ -64,6 +64,7 @@ struct iRegion;
 struct iGraphics3D;
 struct iClipper2D;
 struct iObject;
+struct iObjectWatcher;
 struct iCollection;
 struct iCollectionList;
 struct iDataBuffer;
@@ -173,7 +174,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 13, 0);
+SCF_VERSION (iEngine, 0, 13, 1);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -793,6 +794,12 @@ struct iEngine : public iBase
    * that is being visited.
    */
   virtual csPtr<iFrustumView> CreateFrustumView () = 0;
+
+  /**
+   * Create an object watcher instance that you can use to watch
+   * other objects. The engine will not keep a reference to this object.
+   */
+  virtual csPtr<iObjectWatcher> CreateObjectWatcher () = 0;
 };
 
 /** @} */

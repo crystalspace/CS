@@ -1,5 +1,22 @@
 The history order is reversed so that new features are at the top.
 
+10-Jan-2002
+	- Made the calling of the movable callbacks safe so that they now
+	  can delete themselves from the movable. This basically amounts
+	  to walking the callback list in reverse order.
+	- Changed the loops in all iLightCallback functions to go in reverse
+	  order instead of the solution that is now used.
+	- Added iLight parameter to the functions in iLightCallback. That
+	  way you can use the same callback instance for listening to
+	  multiple lights at once.
+	- Added iObjectWatcher interface. This is a new system so that you
+	  can easily watch a number of objects at the same time. Currently
+	  this system supports lights and movables.
+	- Added iEngine->CreateObjectWatcher(). This will create an empty
+	  object watcher for your own personal use.
+	- Added csPtrArray. This is a templated array similar to csRefArray.
+	  The main difference is that no reference counting is used.
+	  The difference with csVector is that csPtrArray is type-safe.
 9-Jan-2002
 	- Fixed a bug in the iLight version of IsDynamic(). This caused
 	  pseudo-dynamic lights to be broken since the recent move of thing

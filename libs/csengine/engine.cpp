@@ -33,6 +33,8 @@
 #include "csengine/material.h"
 #include "csengine/stats.h"
 #include "csengine/region.h"
+#include "csengine/radiosty.h"
+#include "csengine/objwatch.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/sphere.h"
 #include "csgfx/csimage.h"
@@ -62,7 +64,6 @@
 #include "ivaria/engseq.h"
 #include "iutil/plugin.h"
 #include "iutil/virtclk.h"
-#include "csengine/radiosty.h"
 #include "imesh/thing/curve.h"
 #include "imesh/thing/polytmap.h"
 #include "imesh/thing/polygon.h"
@@ -2920,6 +2921,12 @@ csPtr<iFrustumView> csEngine::CreateFrustumView ()
   lview->SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview->SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
   return csPtr<iFrustumView> (lview);
+}
+
+csPtr<iObjectWatcher> csEngine::CreateObjectWatcher ()
+{
+  csObjectWatcher* watch = new csObjectWatcher ();
+  return csPtr<iObjectWatcher> (watch);
 }
 
 bool csEngine::DebugCommand (const char* cmd)
