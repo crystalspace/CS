@@ -46,14 +46,14 @@ if "$(COMPILER.C++FLAGS.WARNING.NO_UNUSED)"
 C++FLAGS on [ DoObjectGrist skinpars$(SUFOBJ) skinlex$(SUFOBJ) ] +=
   -I$(LOCATE_TARGET) -I$(SEARCH_SOURCE) ;
 
-LinkWith aws : csgeom csgfx cstool csutil ;
+LinkWith aws : cstool csgfx csgeom csutil ;
 
 if $(CMD.BISON) && $(CMD.FLEX)
 {
   # Construct a rule for copying the generated sources from Bison and Flex into
   # the source directories.
   FILES = skinpars.cpp skinpars.hpp skinlex.cpp ;
-  FILES = $(FILES:G=copybisonflex) ;
+  FILES = $(FILES:G=awsfreeze) ;
   for i in $(FILES)
   {
     SEARCH on $(i) = $(LOCATE_TARGET) ;
@@ -61,6 +61,10 @@ if $(CMD.BISON) && $(CMD.FLEX)
     
     Copy $(targetfile) : $(i) ;
     Depends $(targetfile) : $(i) ;
-    Depends copybisonflex : $(targetfile) ;
+    Depends awsfreeze : $(targetfile) ;
   }
+
+  NotFile awsfreeze ;
+  Help awsfreeze : "Copy generated Bison/Flex files to source directory" :
+    verbatim ;
 }
