@@ -255,7 +255,9 @@ char* __WindowsDirectory()
 #endif
 
 #ifdef CS_SYSDEF_PROVIDE_SOCKETS
+#ifndef socklen_t
    typedef int socklen_t;
+#endif
    typedef SOCKET csNetworkSocket;
 #  define CS_NET_SOCKET_INVALID INVALID_SOCKET
 #  define CS_IOCTLSOCKET ioctlsocket

@@ -63,8 +63,6 @@ public:
    //
    // Operators
    //
-
-   class TwoBitProxy;
    
    csTwoBitArray &operator=(const csTwoBitArray &that)
    {

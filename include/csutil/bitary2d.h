@@ -58,8 +58,6 @@ public:
    //
    // Operators
    //
-
-   class ArrayProxy;
    
    csBitArray2D &operator=(const csBitArray2D &that)
    {
