@@ -307,6 +307,13 @@ public:
     return root [count - 1];
   }
 
+  /// Return the top element but do not remove it.
+  T& Top ()
+  {
+    CS_ASSERT (count > 0);
+    return root [count - 1];
+  }
+
   /// Insert element 'item' before element 'n'.
   bool Insert (int n, T const& item)
   {
