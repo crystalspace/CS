@@ -1236,7 +1236,6 @@ void csKDTree::Debug_Dump (csString& str, int indent)
 	GetNodeBBox ().MinZ (), GetNodeBBox ().MaxX (),
 	GetNodeBBox ().MaxY (), GetNodeBBox ().MaxZ (),
   	spaces, stats->GetData ());
-  stats->DecRef ();
   str.Append (ss);
   if (child1)
   {

@@ -14,6 +14,8 @@ The history order is reversed so that new features are at the top.
 	  ctrl-d h the selected mesh will be removed from all sectors.
 	  With ctrl-d shift-h the last removed mesh will be put back (works
 	  only once).
+	- Fixed a bug in Dynavis debugging module. The code was changed
+	  to use csRef but the DecRef() wasn't removed.
 9-Feb-2003
 	- res augmented flarge to contain a notice that the flickering in
 	  the street is intentional.
