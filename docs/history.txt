@@ -20,6 +20,8 @@ chronological order.
 	  Positioning of the components is now completely independent of magic
 	  constants, and is also entirely consistent with the way the
 	  components of the vertical scrollbar are positioned.
+	- Norman Kraemer changed Frame's Height access from Frame.Height() to 
+	  Frame().Height()
 13-Jan-2004
 	- Jorrit added a version of Top() to csArray that is not const.
 	- Jorrit multiplied the values in the two glPolygonOffset() calls
