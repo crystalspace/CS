@@ -681,9 +681,26 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 	}
 	break;
       case XMLTOKEN_ACTION:
+	if (!spr3dLook)
+	{
+      	  synldr->ReportError (
+		"crystalspace.sprite3dloader.parse.motion.missingfactory",
+		child,
+		"No Factory! Please define 'factory' before 'applymotion'!");
+	  return NULL;
+	}
 	spr3dLook->SetAction (child->GetContentsValue ());
         break;
       case XMLTOKEN_BASECOLOR:
+	if (!spr3dLook)
+	{
+      	  synldr->ReportError (
+		"crystalspace.sprite3dloader.parse.motion.missingfactory",
+		child,
+		"No Factory! Please define 'factory' before 'applymotion'!");
+	  return NULL;
+	}
+	else
 	{
 	  csColor col;
 	  if (!synldr->ParseColor (child, col))
@@ -692,6 +709,15 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 	}
         break;
       case XMLTOKEN_LIGHTING:
+	if (!spr3dLook)
+	{
+      	  synldr->ReportError (
+		"crystalspace.sprite3dloader.parse.motion.missingfactory",
+		child,
+		"No Factory! Please define 'factory' before 'applymotion'!");
+	  return NULL;
+	}
+	else
 	{
 	  bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
@@ -700,6 +726,15 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 	}
         break;
       case XMLTOKEN_MATERIAL:
+	if (!spr3dLook)
+	{
+      	  synldr->ReportError (
+		"crystalspace.sprite3dloader.parse.motion.missingfactory",
+		child,
+		"No Factory! Please define 'factory' before 'applymotion'!");
+	  return NULL;
+	}
+	else
 	{
 	  const char* matname = child->GetContentsValue ();
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
@@ -714,6 +749,15 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 	}
 	break;
       case XMLTOKEN_MIXMODE:
+	if (!spr3dLook)
+	{
+      	  synldr->ReportError (
+		"crystalspace.sprite3dloader.parse.motion.missingfactory",
+		child,
+		"No Factory! Please define 'factory' before 'applymotion'!");
+	  return NULL;
+	}
+	else
         {
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
@@ -777,6 +821,15 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 	}
 	break;
       case XMLTOKEN_TWEEN:
+	if (!spr3dLook)
+	{
+      	  synldr->ReportError (
+		"crystalspace.sprite3dloader.parse.motion.missingfactory",
+		child,
+		"No Factory! Please define 'factory' before 'applymotion'!");
+	  return NULL;
+	}
+	else
 	{
 	  bool do_tween;
 	  if (!synldr->ParseBool (child, do_tween, true))
