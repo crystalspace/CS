@@ -292,7 +292,11 @@ BOOL WINAPI DirectDetectionDDrawEnumCallback(GUID FAR * lpGUID, LPSTR lpDriverDe
     dd2d.Can3D = true;
   
   // can run in windowed mode
+#if (DIRECTDRAW_VERSION < 0x0600)
   if(DriverCaps.dwCaps & DDCAPS_GDI)
+#else
+  if(DriverCaps.dwCaps2 & DDCAPS2_CANRENDERWINDOWED)
+#endif
     dd2d.Windowed = true;
   
   // can have mipmapped surfaces
