@@ -17,6 +17,8 @@ chronological order.
 	  ctrl-alt-o (don't forget ctrl-d first).
 	- Jorrit increased resolution of object in csbench to have a better
 	  test for high poly object (roughly 32000 tris now).
+	- dfryer fixed a bug (or possibly feature) in VFS where $* in vfs.cfg
+	  was being treated as the app dir, not the resource dir
 19-Jul-2004
 	- PK made the following changes:
 	    - Changed viewmesh to support the iBinarySaverPlugin.

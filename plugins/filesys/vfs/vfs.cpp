@@ -1119,7 +1119,7 @@ const char *VfsNode::GetValue (csVFS *Parent, const char *VarName)
   }
 
   if (strcmp (VarName, "*") == 0) // Resource directory?
-    return Parent->appdir;
+    return Parent->resdir;
     
   if (strcmp (VarName, "^") == 0) // Application or Cocoa wrapper directory?
     return Parent->appdir;
@@ -1528,7 +1528,7 @@ bool csVFS::Initialize (iObjectRegistry *object_reg)
     resdir = alloc_normalized_path(cmdline->GetResourceDir());
     appdir = alloc_normalized_path(cmdline->GetAppDir());
   }
-
+  
   if (!load_vfs_config(config, resdir) &&
       !load_vfs_config(config, appdir))
        load_vfs_config(config, basedir);
@@ -1844,7 +1844,6 @@ csPtr<iFile> csVFS::Open (const char *FileName, int Mode)
 {
   if (!FileName)
     return 0;
-
   VfsNode *node;
   char suffix [VFS_MAX_PATH_LEN + 1];
   csScopedMutexLock lock (mutex);
@@ -1928,7 +1927,9 @@ bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
 
   if (!VirtualPath || !RealPath)
     return false;
-
+#ifdef VFS_DEBUG
+  printf("Mounted VFS dir: Vpath %s, Rpath %s",VirtualPath, RealPath);
+#endif
   VfsNode *node;
   char suffix [2];
   if (!PreparePath (VirtualPath, true, node, suffix, sizeof (suffix))
