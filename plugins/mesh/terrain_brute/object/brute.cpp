@@ -40,6 +40,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
 #include "iutil/object.h"
+#include "iutil/cmdline.h"
 #include "iutil/cache.h"
 #include "brute.h"
 #include "csqsqrt.h"
@@ -1342,9 +1343,20 @@ void csTerrainObject::CastShadows (iMovable* movable, iFrustumView* fview)
   const csVector3* lm_normals = terrasampler->SampleVector3 (normals_name);
 
   csColor col;
+  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (pFactory->object_reg,
+  	iCommandLineParser);
+  bool verbose = cmdline->GetOption ("verbose") != 0;
   size_t i;
   for (i = 0 ; i < staticLights.Length() ; i++)
   {
+    if (verbose)
+    {
+      if (i % 10000 == 0)
+      {
+        printf ("%d out of %d\n", i, staticLights.Length ());
+	fflush (stdout);
+      }
+    }
     /*
       A small fraction of the normal is added to prevent unwanted
       self-shadowing (due small inaccuracies, the tri(s) this vertex
