@@ -15,9 +15,9 @@ Here is a table of the control keys.
 Up/Down move forward and backwards, left/right turn in those directions.
 @item @key{PAGE-UP}, @key{PAGE-DOWN}
 Look up/down.
-@item s
+@item w
 Move forward.
-@item x
+@item s
 Move backward.
 @item a
 Strafe left.
