@@ -422,7 +422,7 @@ csRainParticleSystem :: csRainParticleSystem(int number, csTextureHandle* txt,
   {
     AppendRectSprite(drop_width, drop_height, txt, lighted_particles);
     GetParticle(i)->SetMixmode(mixmode);
-    pos = GetRandomDirection(rainbox.Min(), size) ;
+    pos = GetRandomDirection(size, rainbox.Min()) ;
     GetParticle(i)->SetPosition(pos);
     part_pos[i] = pos;
   }
@@ -457,9 +457,8 @@ void csRainParticleSystem :: Update(time_t elapsed_time)
       // constant another particle will appear in sight now.
       // @@@ rain only appears in box ceiling now, should appear on
       // opposite side of rain_dir... 
-      pos = GetRandomDirection( rainbox.Min(), csVector3 (
-        rainbox.MaxX() - rainbox.MinX(), 0.0f,
-        rainbox.MaxZ() - rainbox.MinZ()) );
+      pos = GetRandomDirection( csVector3 (rainbox.MaxX() - rainbox.MinX(), 
+        0.0f, rainbox.MaxZ() - rainbox.MinZ()), rainbox.Min() );
       pos.y = rainbox.MaxY();
       GetParticle(i)->SetPosition(pos);
       part_pos[i] = pos;
