@@ -32,6 +32,7 @@
 #include <X11/Xutil.h>
 #include <X11/keysymdef.h>
 #include <X11/cursorfont.h>
+#include <X11/Xatom.h>
 
 #ifdef DO_SHM
 #  include <X11/extensions/XShm.h>
@@ -51,6 +52,7 @@ private:
   XImage* xim;
   GC gc;
   XVisualInfo *active_GLVisual;
+  Atom wm_delete_window;
   
   // Window colormap
   Colormap cmap;

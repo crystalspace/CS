@@ -158,6 +158,7 @@ bool csGraphics2DGlideX::Open(const char *Title)
     window = XCreateSimpleWindow (dpy, DefaultRootWindow (dpy), 0, 0,
                                       display_width, display_height, 4, 0, 0);
 
+  XRaiseWindow (dpy,window);
   XMapWindow (dpy, window);
   XStoreName (dpy, window, Title);
   XGCValues values;
@@ -165,8 +166,14 @@ bool csGraphics2DGlideX::Open(const char *Title)
   XSetGraphicsExposures (dpy, gc, False);
   XSetWindowAttributes attr;
   attr.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask |
-       FocusChangeMask | PointerMotionMask | ButtonPressMask | ButtonReleaseMask;
+       FocusChangeMask | PointerMotionMask | ButtonPressMask | ButtonReleaseMask 
+       | StructureNotifyMask;
   XChangeWindowAttributes (dpy, window, CWEventMask, &attr);
+
+  // Intern WM_DELETE_WINDOW and set window manager protocol
+  // (Needed to catch user using window manager "delete window" button)
+  wm_delete_window = XInternAtom (dpy, "WM_DELETE_WINDOW", False);
+  XSetWMProtocols (dpy, window, &wm_delete_window, 1);
 
 
   // Wait for expose event (why not ?)
@@ -321,6 +328,13 @@ bool csGraphics2DGlideX::HandleEvent (csEvent &/*Event*/)
         System->QueueMouseEvent (button_mapping [event.xbutton.button],
           true, event.xbutton.x, event.xbutton.y);
           break;
+      case ClientMessage:
+	if (static_cast<Atom>(event.xclient.data.l[0]) == wm_delete_window)
+	{
+	  System->QueueContextCloseEvent ((void*)this);
+	  System->StartShutdown();
+	}
+	break;
       case ButtonRelease:
         System->QueueMouseEvent (button_mapping [event.xbutton.button],
           false, event.xbutton.x, event.xbutton.y);
@@ -417,3 +431,4 @@ bool csGraphics2DGlideX::HandleEvent (csEvent &/*Event*/)
     }
   return false;
 }
+
