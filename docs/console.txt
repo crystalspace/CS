@@ -57,6 +57,7 @@ Command: colldet
 Type:    boolean command
 Action:  Enable/disable new collision detection (using RAPID library).
          Corresponds to -colldet/-nocolldet commandline options.
+	 COMMAND NOT USEFUL CURRENTLY.
 
 Command: fclear
 Type:    boolean command
@@ -158,10 +159,6 @@ Command: cacheclr
 Type:    general command
 Action:  Clear the texture cache.
 
-Command: turn
-Type:    general command
-Action:  Turn arround (so that the camera looks the other way).
-
 Command: activate
 Type:    general command
 Action:  Activate the object that is right in front of you.
@@ -180,7 +177,9 @@ Action:  Save the current position to the 'coord' file.
 
 Command: coordload
 Type:    general command
-Action:  Restore the position from the 'coord' file.
+Action:  Restore the position from the 'coord' file. Note that the
+         position will always be restored but the orientation of
+	 the camera will only be restored if 'move3d' is set.
 
 Command: coordshow
 Type:    boolean command
@@ -300,8 +299,9 @@ Type:    general command
 Action:  Add a dynamic light at the position of the camera.
          With no arguments the color of this dynamic light will
 	 be random and the light will move up and down slightly.
-	 But you can also say 'addlight r,g,b,radius' for a more
-	 controlled light.
+	 But you can also say 'addlight r,g,b,radius,st' for a more
+	 controlled light. The 'st' flag can be 0 or 1. If 1 things
+	 will also cast shadows.
 
 Command: dellight
 Type:    general command
@@ -465,7 +465,77 @@ Type:    boolean command
 Action:  Toggle between between pure 3D movement (the old way) and
          'comfortable' movement (Quake-like). The latter is now default. This
 	 basicly affects the left and right arrow keys which now rotate the
-	 camera how you would expect it.
+	 camera how you would expect it and also includes a gravity system.
+	 When you enable 3D movement the gravity system is also disabled.
+
+Command: do_gravity
+Type:    boolean command
+Action:  Enable/disable gravity (enabled by default).
+
+Command: turn
+Type:    general command
+Action:  Turn arround (so that the camera looks the other way).
+         This command only works if 'move3d' is enabled.
+
+Command: jump
+Type:    general command
+Action:  Jump upwards. Only works if the gravity system is enabled.
+
+Command: step_forward
+Type:    general command
+Action:  Move forwards. Uses gravity system if 'move3d' is disabled.
+
+Command: step_backward
+Type:    general command
+Action:  Move backwards. Uses gravity system if 'move3d' is disabled.
+
+Command: strafe_left
+Type:    general command
+Action:  Move left. Uses gravity system if 'move3d' is disabled.
+
+Command: strafe_right
+Type:    general command
+Action:  Move right. Uses gravity system if 'move3d' is disabled.
+
+Command: look_up
+Type:    general command
+Action:  Look up. Uses gravity system if 'move3d' is disabled.
+
+Command: look_down
+Type:    general command
+Action:  Look down. Uses gravity system if 'move3d' is disabled.
+
+Command: rotate_left
+Type:    general command
+Action:  Rotate player left. Uses gravity system if 'move3d' is disabled.
+
+Command: rotate_right
+Type:    general command
+Action:  Rotate player right. Uses gravity system if 'move3d' is disabled.
+
+Command: i_forward, i_backward, i_left, i_right, i_up, i_down
+Type:    general command
+Action:  Move. The first argument is 0 or 1. If 1 we will
+         move VERY VERY slowly (for debugging). The second argument
+	 is 0 or 1. If 1 we will move very fast. This command only
+	 works if 'move3d' is enabled.
+
+Command: i_rotleftc, i_rotleftw, i_rotrightc, i_rotrightw
+Type:    general command
+Action:  Rotate left or right. The 'c' versions rotate along the
+         camera axis. The 'w' version along the world axis.
+	 The first argument is 0 or 1. If 1 we will
+         move VERY VERY slowly (for debugging). The second argument
+	 is 0 or 1. If 1 we will move very fast. This command only
+	 works if 'move3d' is enabled.
+
+Command: i_rotleftx, i_rotleftz, i_rotrightx, i_rotrightz
+Type:    general command
+Action:  Rotate the camera.
+	 The first argument is 0 or 1. If 1 we will
+         move VERY VERY slowly (for debugging). The second argument
+	 is 0 or 1. If 1 we will move very fast. This command only
+	 works if 'move3d' is enabled.
 
 Command: freelook
 Type:    boolean command
@@ -484,8 +554,8 @@ Command: addsprite
 Type:    general command
 Action:  Add a sprite from a template already in memory.
 	 'addsprite <name>,<size>'. <name> is the name of
-	  a sprite template which needs to be loaded in memory (either
-	  from standard.zip or from the level). The <size> is a scale
-	  factor for the sprite. The sprite is put at the current
-	  location.
+	 a sprite template which needs to be loaded in memory (either
+	 from standard.zip or from the level). The <size> is a scale
+	 factor for the sprite. The sprite is put at the current
+	 location.
 
