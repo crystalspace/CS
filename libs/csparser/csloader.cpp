@@ -5202,7 +5202,7 @@ bool csLoader::LoadMotion (iMotion* mot, char* buf)
 				{
 					int framenumber;
 					ScanStr(name, "%d", &framenumber);
-					mot->AddFrame(framenumber);
+					int index=mot->AddFrame(framenumber);
 					while((cmd = csGetObject (&params, tok_frame, &name, &params2))>0) {
 						if(cmd!=CS_TOKEN_LINK) {
 							CsPrintf (MSG_FATAL_ERROR, "Expected LINK instead of '%s'!\n", buf);
@@ -5210,7 +5210,7 @@ bool csLoader::LoadMotion (iMotion* mot, char* buf)
 						}
 						int link;
 						ScanStr(params2, "%d", &link);
-						mot->AddFrameLink(framenumber, name, link);
+						mot->AddFrameLink(index, name, link);
 					}
 				}
 			break;

@@ -63,9 +63,9 @@ public:
 	///
 	virtual bool AddAnim (const csMatrix3 &mat);
 	///
-	virtual void AddFrame (int framenumber);
+	virtual int AddFrame (int framenumber);
 	///
-	virtual void AddFrameLink (int framenumber, const char* affector, int link);
+	virtual void AddFrameLink (int frameindex, const char* affector, int link);
 };
 
 class csMotionVectorBase:public csVector {

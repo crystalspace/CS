@@ -107,6 +107,8 @@ const char* csMotion::GetName() {
 }
 
 bool csMotion::AddAnim (const csQuaternion &quat) {
+//	printf("AddAnim(%g, %g, %g, %g)\n", quat.x, quat.y, quat.z, quat.r);
+
 	if(matrixmode==-1) {
 		matrixmode=0;
 	} else if(matrixmode==1) {
@@ -141,6 +143,8 @@ bool csMotion::AddAnim (const csMatrix3 &mat) {
 }
 
 int csMotion::AddFrame (int framenumber) {
+//	printf("AddFrame(%d) %d\n", framenumber, numframes);
+
 	if(!frames) {
 		frames=(csMotionFrame*)malloc(sizeof(csMotionFrame));
 	} else {
@@ -153,6 +157,8 @@ int csMotion::AddFrame (int framenumber) {
 }
 
 void csMotion::AddFrameLink (int frameindex, const char* affector, int link) {
+//	printf("AddFrameLink(%d, '%s', %d)\n", frameindex, affector, link);
+
 	CS_ASSERT(frameindex>=0);
 	CS_ASSERT(frameindex<numframes);
 
