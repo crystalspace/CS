@@ -177,7 +177,7 @@ pythmodclean:
 	-$(RMDIR) $(SWIG.CSPYTHON) $(PYTHMOD) $(PYTHMOD.BUILDBASE)
 
 
-ifeq ($(DO_SWIGHPYTHINST),yes)
+ifeq ($(DO_SWIGPYTHINST),yes)
 swigpythinst: $(SWIG.CSPYTHON.CVS) $(SRCDIR)/scripts/python/cspace.py
 
 $(SWIG.CSPYTHON.CVS): $(SWIG.OUTDIR)/cs_pyth.cpp

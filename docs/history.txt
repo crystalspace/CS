@@ -25,6 +25,10 @@ The history order is reversed so that new features are at the top.
 	  already been made to the LinkApplication rule's invocation of
 	  mergeres.sh as part of Eric's changes yesterday, but LinkPlugin
 	  slipped by unaltered.
+	- Oktal fixed a typo in cspython.mak (extra "h" in "swighpythinst")
+	  that was causing it not to find the swigpythinst target, and then
+	  regenerated the Swig Python module to keep it up-to-date with my
+	  recent changes to the network API.
 11-May-2003
 	- Oktal removed one of two instances of the same phony target,
 	  swigperl5gen, in the csperl5 makefile.
