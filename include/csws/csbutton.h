@@ -155,8 +155,6 @@ public:
   bool Pressed;
   /// Highlight state
   bool Highlighted;
-  ///
-  bool DrawTextOnHighlightOnly;
   /// Create button object
   csButton (csComponent *iParent, int iCommandCode, int iButtonStyle =
     CSBS_DEFAULTVALUE, csButtonFrameStyle iFrameStyle = csbfsOblique);
@@ -169,7 +167,7 @@ public:
 
  /// Set text draw to highlight only
  void SetDrawTextOnHighlightOnly(bool iTOHO)
- { DrawTextOnHigh:qlightOnly = iTOHO; }
+ { DrawTextOnHighlightOnly = iTOHO; }
  
  /// Return value of DrawTextOnHighlightOnly
  bool GetDrawTextOnHighlightOnly()
