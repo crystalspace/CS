@@ -5,10 +5,14 @@
 #include "ivaria/aws.h"
 #include "awsprefs.h"
 
+extern unsigned long aws_adler32(unsigned long adler,  const unsigned char *buf,  unsigned int len);
+
 awsKey *
-awsKeyContainer::Find(iString *name)
+awsKeyContainer::Find(iString *n)
 {
    void *p = children.GetFirstItem();
+
+   unsigned long idname = aws_adler32(aws_adler32(0, NULL, 0), (unsigned char *)n->GetData(), n->Length());
 
    while(p) 
    {
@@ -16,7 +20,7 @@ awsKeyContainer::Find(iString *name)
 
      if (key) 
      {
-       if (key->Name() == name)
+       if (key->Name() == idname)
        {
           return key;
        }

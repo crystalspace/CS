@@ -436,6 +436,8 @@ char *yytext;
 #include <string.h>
 
 #include "slparse.cpp.h"
+
+#define YY_DECL int yylex YY_PROTO(( YYSTYPE *awslval ))
                                 
 #define YY_NEVER_INTERACTIVE 1
 
@@ -564,7 +566,7 @@ YY_MALLOC_DECL
  * easily add parameters.
  */
 #ifndef YY_DECL
-#define YY_DECL int yylex YY_PROTO(( YYSTYPE *awslval ))
+#define YY_DECL int yylex YY_PROTO(( void ))
 #endif
 
 /* Code executed at the beginning of each rule, after yytext and yyleng

@@ -41,16 +41,17 @@ const unsigned char KEY_RECT = 2;
 const unsigned char KEY_WIN  = 3;
 const unsigned char KEY_SKIN = 4;
 const unsigned char KEY_COMPONENT = 5;
- 
+
 /// Abstract key interface
 class awsKey
 {
   /// The name of the key
-  iString *name;
+  unsigned long name; 
+  //iString *name;
 
 public:
   /// Simple constructor creates new key with name "n"
-  awsKey(iString *n):name(n) {};
+  awsKey(iString *n);
 
   /// Simple destructor does nothing
   virtual ~awsKey()         {};
@@ -59,7 +60,7 @@ public:
   virtual unsigned char Type()=0;
 
   /// Accessor function gets name of key
-  iString              *Name() { return name; }
+  unsigned long Name() { return name; }
   
 };
 
@@ -189,13 +190,24 @@ public:
     /// So that we know this is a skin node
     virtual unsigned char Type() 
     { return KEY_COMPONENT; }
-}; 
-
+};
 
 //////////////////////////////////  Preference Manager ////////////////////////////////////////////////////////////////
 
 class awsPrefManager : public iAwsPrefs
 {
+   /// list of window definitions
+  csDLinkList win_defs;
+
+  /// list of skin definitions
+  csDLinkList skin_defs;
+
+  /// count of window defintions loaded
+  unsigned int n_win_defs;
+
+  /// count of skin defintions loaded
+  unsigned int n_skin_defs;
+
 public:
     DECLARE_IBASE;
 
@@ -203,6 +215,15 @@ public:
     virtual ~awsPrefManager();
 
     virtual void Load(const char *def_file);
+
+public:
+    /// This function is called by internal code to add a parsed out tree of window components.
+    void AddWindowDef(awsComponentNode *win)
+    { win_defs.AddItem(win); n_win_defs++; }
+
+    /// This function is called by internal code to add a parsed out tree of skin defintions.
+    void AddSkinDef(awsSkinNode *skin)
+    { skin_defs.AddItem(skin); n_skin_defs++; }
 };
  
 #endif

@@ -13,6 +13,8 @@
 #include <string.h>
 
 #include "slparse.cpp.h"
+
+#define YY_DECL int yylex YY_PROTO(( YYSTYPE *awslval ))
                                 
 %}
 
