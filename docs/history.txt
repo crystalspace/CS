@@ -26,6 +26,21 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed a bug introduced into csSystemDriver::Print()
 	  during the SCF conversion which caused Print() to generate garbage
 	  if the printed string contained percent "%" characters.
+	- Added terrain loading patch from Alex Pfaffe.
+	- Fixes to terrain for big-endian.
+	- Fixes to WalkTest makefile for new SCF system.
+	- Fixes to Unix port and X2D driver. Not fully functional yet but
+	  at least it compiles now. There is still a crash at startup related
+	  to multiple inheritance and bad casting.
+	- Changes to MazeD from Andrew Zabolotny:
+	   - Full-blown light editing capability.
+	   - Started to implement texture manager.
+	   - Lots of fixes.
+	- Andrew also added the REAL files for SCF which Eric
+	  reverse engineered.
+	- Andrew added a new scftutor app and a few fixes for Unix.
+	- Fixed bug in sofware texture manager which COULD in some cases
+	  cause startup to fail miserably.
 9-Nov-1999
 	- Eric Sunshine removed many, many obsolete COM references from
 	  documentation and source code comments.
