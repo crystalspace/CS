@@ -33,35 +33,108 @@ class csSector;
 class csKeyValuePair : public csObject
 {
 public:
+  /// The constructor. Requires both key and value. Data is being copied!
   csKeyValuePair(const char* Key, const char* Value);
+  /// The destructor as usual
   ~csKeyValuePair();
 
+  /// Get the key string of the pair.
+  const char* GetKey()   const {return GetName();}
+
+  /// Get the value string of the pair
   const char* GetValue() const {return m_Value;}
+
+  /// Get the value of a key in an object. (shortcut)
+  static const char* GetValue(csObject* pObject, const char* key);
+
 private:
   char* m_Value;
   CSOBJTYPE;
 };
 
+class csKeyValueIterator
+{
+public:
+  /// The constructor. Requires the Object to search within!
+  csKeyValueIterator(const csObject* pObject);
+  /// The destructor as usual
+  ~csKeyValueIterator();
+
+  /// Reuse the iterator for an other search
+  void Reset(const csObject* pObject);
+  /// Get the object we are pointing at
+  csKeyValuePair* GetPair();
+  /// Move forward
+  void Next();
+  /// Check if there are other keys
+  bool IsFinished () const;
+  /// Search for a key
+  bool FindKey(const char* Name) {return m_Iterator.FindName(Name);}
+
+protected:
+  csObjIterator   m_Iterator;
+};
+
 class csMapNode : public csObject
 {
 public:
+  /// The constructor. Requires the Nodes name!
   csMapNode(const char* Name);
+  /// The destructor as usual
   ~csMapNode();
 
   void      SetPosition(csVector3 pos)   {m_Position = pos;}
   csVector3 GetPosition()                {return m_Position;}
 
-  void      SetAngle(float Angle)        {m_Angle = Angle;}
-  float     GetAngle()                   {return m_Angle;}
-  
   void      SetSector(csSector* pSector) {m_pSector = pSector;}
   csSector* GetSector()                  {return m_pSector;}
+
+  /// Get a node with the given name and a given classname. (shortcut)
+  static csMapNode* GetNode(csSector*   pSector, 
+                            const char* name,
+                            const char* classname=NULL);
 
 private:
   csSector* m_pSector;
   csVector3 m_Position;
-  float     m_Angle;
   CSOBJTYPE;
+};
+
+class csNodeIterator
+{
+public:
+  /**
+    * The constructor. Theorectially, we could handle any csObject, but
+    * that doesn't make sense for the current implementation, so we 
+    * restrict it to csObject to abvoid some pitfalls.
+    * 
+    * if a classname is given, search is restricted to nodes, in which
+    * the key "classname" has the same value as the given classname.
+    * the classname string is _not_ duplicated, so the caller is
+    * responsible to take care, that the string is available while
+    * the Iterator is alive.
+    */
+  csNodeIterator(const csSector* pSector, const char* classname=NULL);
+  
+  /// The destructor as usual
+  ~csNodeIterator();
+
+  /// Reuse the iterator for an other search
+  void Reset(const csSector* pSector, const char* classname=NULL);
+  /// Get the object we are pointing at
+  csMapNode* GetNode();
+  /// Move forward
+  void Next();
+  /// Check if there are other nodes
+  bool IsFinished () const;
+
+protected:
+  /// Skip all nodes with wrong classname
+  void SkipWrongClassname();
+
+  csObjIterator   m_Iterator;
+  const char*     m_Classname;
+  csMapNode*      m_pCurrentNode;
 };
 
 #endif /*KEYVAL_H*/
