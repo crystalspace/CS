@@ -35,9 +35,9 @@
 #include "csengine/bspbbox.h"
 #include "csengine/cssprite.h"
 #include "csengine/quadcube.h"
-#include "csgeom/bsp.h"
+#include "csengine/quadtree.h"
+#include "csengine/bsp.h"
 #include "csgeom/polypool.h"
-#include "csgeom/quadtree.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
 

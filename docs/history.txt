@@ -20,6 +20,17 @@ Short-term cleanups that need to be done:
 	  creates a symbolic link to the most recent 'diff' file in addition
 	  to creating a link to the most recent package.  (This feature was
 	  requested by a user.)
+	- Fixed bug in the destructor of csPolygon3D. After freeing some
+	  of the internal resources functions were called that still depended
+	  on those resources. Solved this by setting the pointer to the
+	  resources to NULL so that those functions can detect that case.
+	  This fixes the bug when CS is exited while a dynamic light
+	  is active.
+	- Moved all 2D cullers to libs/csengine/culler (coverage mask
+	  tree, quadtree, and c-buffer).
+	- Also moved quadtree.cpp from csgeom to csengine/culler.
+	- Created new csengine/polytree and moved BSP and octree stuff
+	  from csgeom to csengine.
 7-Jan-2000
 	- Fixed colored static lighting for OpenGL and Direct3D.
 	- Some fixes on lightmap deallocation. Now use DecRef()

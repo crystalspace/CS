@@ -23,10 +23,10 @@
 #include "csutil/csvector.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h" // texel coords
-#include "csgeom/polyint.h"
 #include "csobject/csobject.h"
 #include "csengine/tranman.h"
 #include "csengine/arrays.h"
+#include "csengine/polyint.h"
 #include "igraph3d.h"
 #include "ipolygon.h"
 

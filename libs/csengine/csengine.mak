@@ -27,7 +27,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csengine libs/csengine/2d libs/csengine/basic \
   libs/csengine/colldet libs/csengine/light libs/csengine/objects \
-  libs/csengine/polygon
+  libs/csengine/polygon libs/csengine/polytree libs/csengine/culler
 
 CSENGINE.LIB = $(OUT)$(LIB_PREFIX)csengine$(LIB_SUFFIX)
 SRC.CSENGINE = $(wildcard libs/csengine/*.cpp libs/csengine/*/*.cpp)

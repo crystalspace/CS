@@ -22,7 +22,7 @@
 class Dumper;
 class csClipper;
 
-#include "csgeom/quadtree.h"
+#include "csengine/quadtree.h"
 #include "csengine/pol2d.h"
 
 /**

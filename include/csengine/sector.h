@@ -22,8 +22,8 @@
 #include "csobject/nobjvec.h"
 #include "csengine/polyset.h"
 #include "csengine/rview.h"
+#include "csengine/bsp.h"
 #include "csgeom/math3d.h"
-#include "csgeom/bsp.h"
 
 struct LightInfo;
 class csThing;

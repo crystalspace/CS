@@ -20,10 +20,10 @@
 #define BSPBBOX_H
 
 #include "csgeom/math3d.h"
-#include "csgeom/polyint.h"
 #include "csgeom/polyidx.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/transfrm.h"
+#include "csengine/polyint.h"
 #include "csengine/pol2d.h"
 #include "csobject/csobject.h"
 

@@ -17,14 +17,14 @@
 */
 
 #include "sysdef.h"
-#include "csengine/dumper.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
-#include "csgeom/bsp.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/polypool.h"
 #include "csgeom/frustrum.h"
-#include "csgeom/quadtree.h"
+#include "csengine/dumper.h"
+#include "csengine/bsp.h"
+#include "csengine/quadtree.h"
 #include "csengine/quadcube.h"
 #include "csengine/sysitf.h"
 #include "csengine/lppool.h"

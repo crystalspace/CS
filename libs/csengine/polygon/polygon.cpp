@@ -314,9 +314,9 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt (),
 
 csPolygon3D::~csPolygon3D ()
 {
-  if (txt_info) txt_info->DecRef (); 
-  if (plane) plane->DecRef ();
-  if (delete_portal) CHKB (delete portal);
+  if (txt_info) { txt_info->DecRef (); txt_info = NULL; }
+  if (plane) { plane->DecRef (); plane = NULL; }
+  if (delete_portal) { CHKB (delete portal); portal = NULL; }
   while (light_info.lightpatches)
     csWorld::current_world->lightpatch_pool->Free (light_info.lightpatches);
   VectorArray.DecRef ();

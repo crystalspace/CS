@@ -21,9 +21,9 @@
 
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
-#include "csgeom/polyint.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/polyidx.h"
+#include "csengine/polyint.h"
 #include "csengine/polyplan.h"
 #include "csengine/polyset.h"
 #include "csengine/portal.h"
