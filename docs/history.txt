@@ -7,13 +7,6 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 4-Feb-2004
-	- Neil Mosafi changed csvosa3dl plygin:
-	   - No longer store iObjectRegistry in a csRef<>
-	   - Use size_t to iterate against STL classes as it's portable
-	   - Use pointer instead of csRef<> as arguments to functions
-	- Neil Mosafi added support for a3dl:clone class to csvosa3dl plugin.
-	  This new type of object will construct a mesh using the factory of 
-	  the template mesh
 	- Jorrit started the removal of the old effect system (used in OR).
 	  This is unused and doesn't work properly as well.  Removed support
 	  for the 'effect' and 'effects' keywords in the loader.  Removed
@@ -71,6 +64,13 @@ chronological order.
 	- res fixed a leak in VFS MountRoot(). A string allocated with 
 	  csStrNew() was passed to an scfStringArray, which howeverallocates 
 	  the strings itself.
+	- Neil Mosafi changed csvosa3dl plygin:
+	   - No longer store iObjectRegistry in a csRef<>.
+	   - Use size_t to iterate against STL classes as it's portable.
+	   - Use pointer instead of csRef<> as arguments to functions.
+	- Neil Mosafi added support for a3dl:clone class to csvosa3dl plugin.
+	  This new type of object will construct a mesh using the factory of 
+	  the template mesh.
 3-Feb-2004
 	- Eric Sunshine fixed syntax error in aws.mak introduced yesterday
 	  which manifested when running 'msvcgen' targets.
