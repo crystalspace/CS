@@ -2730,8 +2730,8 @@ void Blocks::WriteConfig ()
 	  keys.SetStr("HighScores",key,highscores[level][size-3].GetName (i));
         }
     }
-  if (keys.IsDirty())
-    keys.Save();
+  if (keys.IsDirty ())
+    keys.Save ();
 }
 
 // -----------------------------------------------------------------
