@@ -16,17 +16,21 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_FOGCALC_H__
-#define __CS_FOGCALC_H__
+#ifndef __CS_CSTOOL_FOGMATH_H__
+#define __CS_CSTOOL_FOGMATH_H__
+
+/**\file
+ * Fog math utilities.
+ */
 
 /**
  * Calculates fog density for a certain depth in the range [0..1]
  */
-inline float FogRamp (float depth)
+inline float csFogRamp (float depth)
 {
   return 1.0 - exp (-depth*7);
   //return depth;
 }
 
-#endif // __CS_FOGCALC_H__
+#endif // __CS_CSTOOL_FOGMATH_H__
 
