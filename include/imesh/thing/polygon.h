@@ -299,20 +299,21 @@ struct iPolygonTexture : public iBase
 {
   /// Get the material handle associated with this polygon
   virtual iMaterialHandle *GetMaterialHandle () = 0;
-  /// Get FDU :-)
+  /// Get the u-value of the textures bounding box' lower left corner
   virtual float GetFDU () = 0;
-  /// Get FDV :-)
+  /// Get the v-value of the textures bounding box' lower left corner
   virtual float GetFDV () = 0;
   /// Get width of lighted texture (power of 2)
   virtual int GetWidth () = 0;
   /// Get height of lighted texture.
   virtual int GetHeight () = 0;
-  ///Get ShiftU :-)
+  ///Get the degree of the lowest power of 2 that is not smaller than the texture bounding box' width
+  /// that is: 2^shift_u >= texbbox-width > 2^(shift_u-1)
   virtual int GetShiftU () = 0;
 
-  /// Get IMinU :-)
+  /// Get the rounded u-value of the textures bounding box' lower left corner
   virtual int GetIMinU () = 0;
-  /// Get IMinV :-)
+  /// Get the rounded v-value of the textures bounding box' lower left corner
   virtual int GetIMinV () = 0;
   /// Get texture box.
   virtual void GetTextureBox (float& fMinU, float& fMinV,
