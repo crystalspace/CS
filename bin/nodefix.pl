@@ -35,35 +35,29 @@
 #
 #------------------------------------------------------------------------------
 use strict;
-use FileHandle;
 use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'nodefix.pl';
-my $PROG_VERSION = '1.1';
+my $PROG_VERSION = '1.2';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 
-my @include_dirs = ();
-my $verbose = 0;
-my $debug = 0;
+@main::opt_include_dir = ();
+$main::opt_verbose = 0;
+$main::opt_debug = 0;
+$main::opt_help = 0;
 
-my @script_options = (
-    'include-dir|I=s@' => \@include_dirs,
-    'verbose!'         => \$verbose,
-    'debug!'           => \$debug,
-    'help'             => \&print_help
-);
+my @script_options = ('include-dir|I=s@', 'verbose!', 'debug!', 'help' );
 
 my $broken_nodes = 0;
 my $broken_menus = 0;
 my $broken_files = 0;
 
-use vars qw($current_file $line_number $scan_depth);
-$current_file = undef;
-$line_number = 0;
-$scan_depth = 0;
+$main::current_file = undef;
+$main::line_number = 0;
+$main::scan_depth = 0;
 
 my $current_node = undef;
 my $current_depth = 0;
@@ -134,10 +128,20 @@ sub print_title {
 sub find_include_file {
     my $file = shift;
     return $file if -f "$file";
-    foreach my $dir (@include_dirs) {
+    my $dir;
+    foreach $dir (@main::opt_include_dir) {
 	return "$dir/$file" if -f "$dir/$file";
     }
     return undef;
+}
+
+#------------------------------------------------------------------------------
+# For older versions of Perl which lack FileHandle, we fake up a unique file
+# handle type object.
+#------------------------------------------------------------------------------
+*main::file_handle_template = 'FH0000';
+sub new_file_handle {
+    return $main::file_handle_template++;
 }
 
 #------------------------------------------------------------------------------
@@ -148,16 +152,16 @@ sub open_input_file {
     my $file = shift;
     my $path = find_include_file($file)
 	or fatal "Unable to locate file: $file";
-    my $handle = new FileHandle($path, "r")
-	or fatal "Failed to open file: $path";
-    $current_file = {
+    local *handle = new_file_handle();
+    open(*handle, $path) or fatal "Failed to open file: $path";
+    $main::current_file = {
 	'path'  => $path,
 	'nodes' => [],
 	'menus' => [],
     };
-    push(@file_list, $current_file);
-    $line_number = 0;
-    return $handle;
+    push(@file_list, $main::current_file);
+    $main::line_number = 0;
+    return *handle;
 }
 
 #------------------------------------------------------------------------------
@@ -167,7 +171,7 @@ sub open_input_file {
 sub input_line {
     my $handle = shift;
     my $line = <$handle>;
-    return () unless $line;
+    close($handle), return () unless $line;
     my ($key, $option) = ('', '');
     if ($line =~ /^\@(\w+)\s*(.*)$/) {		# Got a @directive?
 	($key, $option) = ($1, $2);		# Extract components.
@@ -208,21 +212,21 @@ sub parse_node {
 sub scan_node {
     my $node_line = shift;
     my ($nname, $nnext, $nprev, $nup) = parse_node($node_line);
-    fatal "Malformed \@node at line $line_number in $current_file->{'path'}."
-	unless $nname;
+    fatal "Malformed \@node at line $main::line_number in " .
+	"$main::current_file->{'path'}." unless $nname;
     $current_node = {
 	'name'  => $nname,
 	'old'   => { 'next' => $nnext, 'prev' => $nprev, 'up' => $nup, },
 	'new'   => { 'next' => '',     'prev' => '',     'up' => '',   },
 	'title' => $nname,
-	'file'  => $current_file,
+	'file'  => $main::current_file,
 	'depth' => $current_depth,
 	'menu'  => undef,
 	'dirty' => 0,
     };
     $node_map{$nname} = $current_node;
     push(@node_list, $current_node);
-    push(@{$current_file->{'nodes'}}, $current_node);
+    push(@{$main::current_file->{'nodes'}}, $current_node);
 }
 
 #------------------------------------------------------------------------------
@@ -254,32 +258,35 @@ sub parse_menu_item {
 # contained within the menu.
 #------------------------------------------------------------------------------
 sub scan_menu {
-    fatal "Orphaned \@menu outside of \@node block at line $line_number in " .
-	"$current_file->{'path'}" unless $current_node;
+    fatal "Orphaned \@menu outside of \@node block at line " .
+	"$main::line_number in $main::current_file->{'path'}"
+	unless $current_node;
     fatal "Mutiple \@menus in node \"$current_node->{'name'}\" at line " .
-	"$line_number in $current_file->{'path'}" if $current_node->{'menu'};
+	"$main::line_number in $main::current_file->{'path'}"
+	if $current_node->{'menu'};
 
     my $handle = shift;
-    my $start_line = $line_number;
+    my $start_line = $main::line_number;
     my $menu = {
 	'node'   => $current_node,
-	'file'   => $current_file,
+	'file'   => $main::current_file,
 	'items'  => [],
 	'detail' => undef,
 	'dirty'  => 0,
     };
     $current_node->{'menu'} = $menu;
     push(@menu_list, $menu);
-    push(@{$current_file->{'menus'}}, $menu);
+    push(@{$main::current_file->{'menus'}}, $menu);
 
-    while (my ($line, $key, $option) = input_line($handle)) {
-	$line_number++;
+    my ($line, $key, $option) = (undef, undef, undef);
+    while (($line, $key, $option) = input_line($handle)) {
+	$main::line_number++;
 	return if $key eq 'end' && $option eq 'menu';
 	next unless my ($node, $title) = parse_menu_item($line);
 	add_menu_item($menu->{'items'}, $node, $title);
     }
     fatal "Missing \"\@end menu\" near line $start_line in " .
-	"$current_file->{'path'}.";
+	"$main::current_file->{'path'}.";
 }
 
 #------------------------------------------------------------------------------
@@ -287,14 +294,14 @@ sub scan_menu {
 #------------------------------------------------------------------------------
 sub scan_ignored {
     my ($key, $handle) = @_;
-    my $start_line = $line_number;
+    my $start_line = $main::line_number;
     while (<$handle>) {
-	$line_number++;
+	$main::line_number++;
 	next unless /\@end\s+(\w+)\b/;
 	return if $key eq $1;
     }
     fatal "Missing \"\@end $key\" near line $start_line in " .
-	"$current_file->{'path'}.";
+	"$main::current_file->{'path'}.";
 }
 
 #------------------------------------------------------------------------------
@@ -323,7 +330,7 @@ sub scan_include {
     $line =~ /^\@include\s+(.+)$/ && do { $child = $1; };
     $line =~ /^\@imports*\s*\{(.+)\}/ && do { $child = $1; $child =~ tr|,|/| };
     fatal "Missing filename following \@include or \@import{} at line " .
-	"$line_number in $current_file->{'path'}" unless $child;
+	"$main::line_number in $main::current_file->{'path'}" unless $child;
     return scan_file($child);
 }
 
@@ -333,16 +340,17 @@ sub scan_include {
 # are its siblings, children, and parent).  Recursively scan included files.
 #------------------------------------------------------------------------------
 sub scan_file {
-    local ($current_file, $line_number);
+    local ($main::current_file, $main::line_number);
     my $file = shift;
     my $handle = open_input_file($file);
-    my $path = $current_file->{'path'};
+    my $path = $main::current_file->{'path'};
 
-    local $scan_depth = $scan_depth + 1;
-    print ' ' x ($scan_depth - 1) . "$path\n" if $verbose;
+    local $main::scan_depth = $main::scan_depth + 1;
+    print ' ' x ($main::scan_depth - 1) . "$path\n" if $main::opt_verbose;
 
-    LINE: while (my ($line, $key, $option) = input_line($handle)) {
-	$line_number++;
+    my ($line, $key, $option) = (undef, undef, undef);
+    LINE: while (($line, $key, $option) = input_line($handle)) {
+	$main::line_number++;
 	next LINE unless $key;				# Got a @directive?
 	next LINE if $key eq 'c' || $key eq 'comment';	# Ignore @comments.
 	return undef if $key eq 'bye';			# @bye terminates.
@@ -352,7 +360,7 @@ sub scan_file {
 	scan_ignored($key, $handle), next LINE if exists $ignored_blocks{$key};
 	scan_node($option), next LINE if $key eq 'node';
 	scan_menu($handle), next LINE if $key eq 'menu';
-	warning("Orphaned \@detailmenu at line $line_number in $path."),
+	warning("Orphaned \@detailmenu at line $main::line_number in $path."),
 	    next LINE if $key eq 'detailmenu';
 
 	if ($key =~ /include|imports*/) {
@@ -368,9 +376,9 @@ sub scan_file {
 #------------------------------------------------------------------------------
 sub scan_root_file {
     my $file = shift;
-    print_title("Scanning") if $verbose;
+    print_title("Scanning") if $main::opt_verbose;
     scan_file($file) and warning "Missing \"\@bye\" directive.";
-    print "\n" if $verbose;
+    print "\n" if $main::opt_verbose;
 }
 
 #------------------------------------------------------------------------------
@@ -397,12 +405,14 @@ sub node_set_up   { node_set(shift, 'up'  , shift); }
 sub repair_nodes {
     my @prev_at_depth;
     my $last_depth = -1;
-    foreach my $node (@node_list) {
+    my $node;
+    foreach $node (@node_list) {
 	my $depth = $node->{'depth'};
 	my $parent_depth = ($depth > 0 ? $depth - 1 : 0);
 
 	if ($depth < $last_depth) {
-	    foreach my $i ($depth + 1..$last_depth) {
+	    my $i;
+	    foreach $i ($depth + 1..$last_depth) {
 		$prev_at_depth[$i] = undef;
 	    }
 	}
@@ -426,7 +436,7 @@ sub repair_nodes {
 	$last_depth = $depth;
     }
 
-    foreach my $node (@node_list) {
+    foreach $node (@node_list) {
 	$node->{'dirty'} = 1 if
 	    $node->{'new'}{'next'} ne $node->{'old'}{'next'} ||
 	    $node->{'new'}{'prev'} ne $node->{'old'}{'prev'} ||
@@ -440,7 +450,8 @@ sub repair_nodes {
 sub menus_differ {
     my ($old_items, $new_items) = @_;
     return 1 unless scalar(@{$old_items}) == scalar(@{$new_items});
-    for (my $i = 0; $i < @{$new_items}; $i++) {
+    my $i;
+    for ($i = 0; $i < @{$new_items}; $i++) {
 	my $old_item = @{$old_items}[$i];
 	my $new_item = @{$new_items}[$i];
 	return 1 if ($old_item->{'node'} ne $new_item->{'node'} ||
@@ -455,14 +466,16 @@ sub menus_differ {
 # old menu with the new one if the two menus differ in any way.
 #------------------------------------------------------------------------------
 sub repair_menus {
-    for (my $i = 0; $i < @node_list; $i++) {
+    my $i;
+    for ($i = 0; $i < @node_list; $i++) {
 	my $menu_node = $node_list[$i];
 	my $menu = $menu_node->{'menu'};
 	next unless $menu;
 
 	my $item_depth = $menu_node->{'depth'} + 1; # Node depth of menu items.
 	my $items = [];
-	for (my $j = $i + 1; $j < @node_list; $j++) {
+	my $j;
+	for ($j = $i + 1; $j < @node_list; $j++) {
 	    my $node = $node_list[$j];
 	    my $node_depth = $node->{'depth'};
 	    next if $node_depth > $item_depth;
@@ -507,7 +520,8 @@ sub patch_menu {
     push(@{$lines}, "\@menu\n"); # Always emit whether dirty or not.
     if ($menu->{'dirty'}) {
 	scan_ignored('menu', $handle);		 # Skip the old menu.
-	foreach my $item (@{$menu->{'items'}}) { # Emit the new menu.
+	my $item;
+	foreach $item (@{$menu->{'items'}}) { # Emit the new menu.
 	    my $line = "* $item->{'node'}::" .
 		($item->{'title'} ? " $item->{'title'}" : '') . "\n";
 	    push(@{$lines}, $line);
@@ -524,25 +538,25 @@ sub patch_file {
     my $file = shift;
     my $path = $file->{'path'};
     my $menu_number = 0;
-    print "$path\n" if $verbose;
+    print "$path\n" if $main::opt_verbose;
     $broken_files++;
 
-    my $handle = new FileHandle($path, "r")
-	or fatal "Failed to open file: $path";
+    local *handle = new_file_handle();
+    open(*handle, $path) or fatal "Failed to open file: $path";
     my $lines = [];
-    while (my ($line, $key, $option) = input_line($handle)) {
+    my ($line, $key, $option) = (undef, undef, undef);
+    while (($line, $key, $option) = input_line(*handle)) {
 	patch_node($lines, $option), next if $key eq 'node';
-	patch_menu($lines, $file->{'menus'}[$menu_number++], $handle), next
+	patch_menu($lines, $file->{'menus'}[$menu_number++], *handle), next
 	    if $key eq 'menu';
 	push(@{$lines}, $line);
     }
-    $handle->close();
+    close(*handle);
 
-    unless ($debug) {
-	$handle = new FileHandle($path, "w")
-	    or fatal "Failed to truncate file: $path";
-	print $handle @{$lines} or fatal "Failed to write file: $path";
-	$handle->close();
+    unless ($main::opt_debug) {
+	open(*handle, ">$path") or fatal "Failed to truncate file: $path";
+	print {*handle} @{$lines} or fatal "Failed to write file: $path";
+        close(*handle);
     }
 }
 
@@ -550,16 +564,19 @@ sub patch_file {
 # Patch all files which contain broken nodes or menus.
 #------------------------------------------------------------------------------
 sub patch_files {
-    print_title("Repairing") if $verbose;
-    FILE: foreach my $file (@file_list) {
-	foreach my $node (@{$file->{'nodes'}}) {
+    print_title("Repairing") if $main::opt_verbose;
+    my $file;
+    FILE: foreach $file (@file_list) {
+	my $node;
+	foreach $node (@{$file->{'nodes'}}) {
 	    patch_file($file), next FILE if $node->{'dirty'};
 	}
-	foreach my $menu (@{$file->{'menus'}}) {
+	my $menu;
+	foreach $menu (@{$file->{'menus'}}) {
 	    patch_file($file), next FILE if $menu->{'dirty'};
 	}
     }
-    print "\n" if $verbose;
+    print "\n" if $main::opt_verbose;
 }
 
 #------------------------------------------------------------------------------
@@ -611,9 +628,10 @@ EOT
 #------------------------------------------------------------------------------
 sub process_options {
     GetOptions(@script_options) or usage_error('');
+    print_help() if $main::opt_help;
     usage_error("Must specify exactly one input file.\n") unless @ARGV == 1;
     print "$PROG_NAME version $PROG_VERSION\n$COPYRIGHT\n\n";
-    print "Debugging enabled.\n\n" if $debug;
+    print "Debugging enabled.\n\n" if $main::opt_debug;
 }
 
 sub print_help {
