@@ -100,9 +100,21 @@ void csBallMeshObject::GetTransformedBoundingBox (long cameranr,
   cur_movablenr = movablenr;
 
   camera_bbox.StartBoundingBox (
-    trans * csVector3 (-radiusx, -radiusy, -radiusz) + shift);
+    trans * csVector3 (-radiusx, -radiusy, -radiusz));
   camera_bbox.AddBoundingVertexSmart (
-    trans * csVector3 ( radiusx,  radiusy,  radiusz) + shift);
+    trans * csVector3 ( radiusx,  radiusy,  radiusz));
+  camera_bbox.AddBoundingVertexSmart (
+    trans * csVector3 (-radiusx,  radiusy,  radiusz));
+  camera_bbox.AddBoundingVertexSmart (
+    trans * csVector3 ( radiusx, -radiusy,  radiusz));
+  camera_bbox.AddBoundingVertexSmart (
+    trans * csVector3 ( radiusx,  radiusy, -radiusz));
+  camera_bbox.AddBoundingVertexSmart (
+    trans * csVector3 ( radiusx, -radiusy, -radiusz));
+  camera_bbox.AddBoundingVertexSmart (
+    trans * csVector3 (-radiusx,  radiusy, -radiusz));
+  camera_bbox.AddBoundingVertexSmart (
+    trans * csVector3 (-radiusx, -radiusy,  radiusz));
 
   cbox = camera_bbox;
 }
@@ -463,7 +475,6 @@ bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   	clip_z_plane) == false)
     return false;
 
-  iClipper2D* clipper; clipper = rview->GetClipper ();
   g3d->SetObjectToCamera (&tr_o2c);
   top_mesh.clip_portal = clip_portal;
   top_mesh.clip_plane = clip_plane;
@@ -533,8 +544,6 @@ void csBallMeshObject::UpdateLighting (iLight** lights, int num_lights,
 bool csBallMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 	csZBufMode mode)
 {
-// @@@ TODO:
-//     - Z fill vs Z use
   if (!material)
   {
     printf ("INTERNAL ERROR: ball used without material!\n");
@@ -558,7 +567,6 @@ bool csBallMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   top_mesh.mat_handle = mat;
   top_mesh.use_vertex_color = true;
   top_mesh.fxmode = MixMode | CS_FX_GOURAUD;
-  //top_mesh.do_clip = true;
   rview->CalculateFogMesh (g3d->GetObjectToCamera (), top_mesh);
   g3d->DrawTriangleMesh (top_mesh);
 
