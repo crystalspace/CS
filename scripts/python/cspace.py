@@ -6484,6 +6484,7 @@ VFS_MAX_PATH_LEN = _cspace.VFS_MAX_PATH_LEN
 VFS_FILE_MODE = _cspace.VFS_FILE_MODE
 VFS_FILE_READ = _cspace.VFS_FILE_READ
 VFS_FILE_WRITE = _cspace.VFS_FILE_WRITE
+VFS_FILE_APPEND = _cspace.VFS_FILE_APPEND
 VFS_FILE_UNCOMPRESSED = _cspace.VFS_FILE_UNCOMPRESSED
 VFS_STATUS_OK = _cspace.VFS_STATUS_OK
 VFS_STATUS_OTHER = _cspace.VFS_STATUS_OTHER
@@ -6553,6 +6554,7 @@ class iVFS(iBase):
     def Unmount(*args): return _cspace.iVFS_Unmount(*args)
     def MountRoot(*args): return _cspace.iVFS_MountRoot(*args)
     def SaveMounts(*args): return _cspace.iVFS_SaveMounts(*args)
+    def LoadMountsFromFile(*args): return _cspace.iVFS_LoadMountsFromFile(*args)
     def GetFileTime(*args): return _cspace.iVFS_GetFileTime(*args)
     def SetFileTime(*args): return _cspace.iVFS_SetFileTime(*args)
     def GetFileSize(*args): return _cspace.iVFS_GetFileSize(*args)
@@ -7433,6 +7435,8 @@ class iMouseDriver(iBase):
         try:
             if self.thisown: destroy(self)
         except: pass
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMouseDriver_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iMouseDriver_scfGetVersion)
 
 class iMouseDriverPtr(iMouseDriver):
     def __init__(self, this):
@@ -7440,6 +7444,8 @@ class iMouseDriverPtr(iMouseDriver):
         if not hasattr(self,"thisown"): _swig_setattr(self, iMouseDriver, 'thisown', 0)
         _swig_setattr(self, iMouseDriver,self.__class__,iMouseDriver)
 _cspace.iMouseDriver_swigregister(iMouseDriverPtr)
+
+iMouseDriver_scfGetVersion = _cspace.iMouseDriver_scfGetVersion
 
 class iJoystickDriver(iBase):
     __swig_setmethods__ = {}
@@ -9292,7 +9298,6 @@ class iTextureHandle(iBase):
     def SetCacheData(*args): return _cspace.iTextureHandle_SetCacheData(*args)
     def GetPrivateObject(*args): return _cspace.iTextureHandle_GetPrivateObject(*args)
     def GetAlphaMap(*args): return _cspace.iTextureHandle_GetAlphaMap(*args)
-    def Prepare(*args): return _cspace.iTextureHandle_Prepare(*args)
     def GetCanvas(*args): return _cspace.iTextureHandle_GetCanvas(*args)
     def GetAlphaType(*args): return _cspace.iTextureHandle_GetAlphaType(*args)
     def __del__(self, destroy=_cspace.delete_iTextureHandle):
@@ -9378,10 +9383,8 @@ class iTextureManager(iBase):
     def __repr__(self):
         return "<C iTextureManager instance at %s>" % (self.this,)
     def RegisterTexture(*args): return _cspace.iTextureManager_RegisterTexture(*args)
-    def PrepareTextures(*args): return _cspace.iTextureManager_PrepareTextures(*args)
     def FreeImages(*args): return _cspace.iTextureManager_FreeImages(*args)
     def RegisterMaterial(*args): return _cspace.iTextureManager_RegisterMaterial(*args)
-    def PrepareMaterials(*args): return _cspace.iTextureManager_PrepareMaterials(*args)
     def FreeMaterials(*args): return _cspace.iTextureManager_FreeMaterials(*args)
     def GetTextureFormat(*args): return _cspace.iTextureManager_GetTextureFormat(*args)
     def CreateSuperLightmap(*args): return _cspace.iTextureManager_CreateSuperLightmap(*args)
@@ -9622,7 +9625,6 @@ class iMaterialHandle(iBase):
     def GetTexture(*args): return _cspace.iMaterialHandle_GetTexture(*args)
     def GetFlatColor(*args): return _cspace.iMaterialHandle_GetFlatColor(*args)
     def GetReflection(*args): return _cspace.iMaterialHandle_GetReflection(*args)
-    def Prepare(*args): return _cspace.iMaterialHandle_Prepare(*args)
     def __del__(self, destroy=_cspace.delete_iMaterialHandle):
         try:
             if self.thisown: destroy(self)
