@@ -12,6 +12,10 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+5-Feb-2000
+	- Fixed bug with clipping portals (i.e. portals that clip geometry
+	  in 3D; only room.zip has such portals on the spinning cube). They
+	  could cause severe crashes.
 4-Feb-2000
 	- Michael Ewert added new csDVector3 and csDMatrix3 to csgeom.  These
 	  are equivalen tto csVector3 and csMatrix3 but they use 'double'

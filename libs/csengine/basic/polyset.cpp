@@ -436,21 +436,24 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
   for (i = 0 ; i < num ; i++)
   {
     if (polygon[i]->GetType () != 1) continue;
-    clip = (csPolygon2D*)(render_pool->Alloc ());
     p = (csPolygon3D*)polygon[i];
+    if (p->dont_draw) continue;
     p->CamUpdate ();
-    if ( !p->dont_draw &&
-         p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane*)NULL,
-	 	d->GetOrigin (), verts, num_verts) && //@@@Use pool for verts?
-	 ( !d->UseFarPlane() || d->GetFarPlane()->ClipPolygon( verts, num_verts ) ) &&
-         p->DoPerspective (*d, verts, num_verts, clip, NULL,
-	 	d->IsMirrored ())  &&
-         clip->ClipAgainst (d->view) )
+    if (p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane*)NULL,
+	 	d->GetOrigin (), verts, num_verts)) //@@@Use pool for verts?
     {
-      p->GetPlane ()->WorldToCamera (*d, verts[0]);
-      DrawOnePolygon (p, clip, d, use_z_buf);
+      if (!d->UseFarPlane() || d->GetFarPlane()->ClipPolygon (verts, num_verts))
+      {
+        clip = (csPolygon2D*)(render_pool->Alloc ());
+	if (p->DoPerspective (*d, verts, num_verts, clip, NULL, d->IsMirrored ()) &&
+            clip->ClipAgainst (d->view))
+        {
+          p->GetPlane ()->WorldToCamera (*d, verts[0]);
+          DrawOnePolygon (p, clip, d, use_z_buf);
+        }
+        render_pool->Free (clip);
+      }
     }
-    render_pool->Free (clip);
   }
 }
 
