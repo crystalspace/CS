@@ -22,28 +22,22 @@
 #include "csutil/scf.h"
 #include "isys/plugin.h"
 
-enum ResultType
-{
-  rtDouble=0,
-  rtPointer
-};
-
 struct iSystem;
 
 SCF_VERSION (iScript, 0, 0, 1);
 
 /**
- * @@@ Please document me using Doc++!
+ * @@@ Please document iScript with Doxygen comments.
  */
 struct iScript : public iPlugIn
 {
-  ///
+  /// Initialize
   virtual bool Initialize (iSystem *iSys) = 0;
-  ///
+  /// RunText
   virtual bool RunText (const char *iStr) = 0;
-  ///
+  /// LoadModule
   virtual bool LoadModule (const char *iStr) = 0;
-  ///
+  /// Store
   virtual bool Store (const char* type, const char* name, void* data) = 0;
 };
 

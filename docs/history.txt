@@ -31,6 +31,8 @@ The history order is reversed so that new features are at the top.
 	  count of the returned object is consistent in all cases, and the
 	  caller must _always_ invoke DecRef() to dispose of the returned
 	  object.
+	- Eric Sunshine removed the unused and namespace-polluting ResultType
+	  enumeration from ivaria/script.h
 21-Jun-2001
 	- Fixed a bug in the cleanup of sectors in the engine.  The portal
 	  references were not cleaned up.
