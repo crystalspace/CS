@@ -123,7 +123,7 @@ install: build
 	dh_movefiles
 
 	# Adding home made xpm
-	cp $(CURDIR)/debian/xpm/*.xpm \
+	cp $(CURDIR)/xpm/*.xpm \
 		$(CURDIR)/debian/crystalspace-demos/usr/share/pixmaps
 
 	# Autogenerate man
