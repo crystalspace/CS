@@ -19,8 +19,8 @@
 #ifndef __CS_AWS_KCFCT_H__
 #define __CS_AWS_KCFCT_H__
 
-# include "iaws/aws.h"
-# include "awsprefs.h"
+#include "iaws/aws.h"
+#include "awsprefs.h"
 
 /**
  * Allows you to manually create a hierarchical arrangement of keys to
