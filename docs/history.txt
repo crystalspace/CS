@@ -6,6 +6,11 @@ The history order is reversed so that new features are at the top.
 10-Jun-2003
         - Philip Wyett eliminated signed/unsigned mismatch warning in
           function csString::SubString ().
+        - DeSigna fixed an AWS bug reported by Gersh:
+	  <Gersh> DeSigna: in awswin.cpp's OnMouseMove function, change 
+          the return false to a return true. 
+          (It was not possible to tell if aws deals with a move event if 
+           the mouse is over a window) 
 9-Jun-2003
 	- Jorrit made a new csStringArray class.
 	- res made the following changes:

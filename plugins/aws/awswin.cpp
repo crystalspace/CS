@@ -458,7 +458,7 @@ bool awsWindow::OnMouseMove (int button, int x, int y)
   else if (moving_mode)
     MoveTo(orig_x + x - down_x, orig_y + y - down_y);
 
-  return false;
+  return true;
 }
 
 void awsWindow::OnDraw (csRect clip)
