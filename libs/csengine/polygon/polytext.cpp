@@ -16,7 +16,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include <math.h>
-#define CS_SYSDEF_PROVIDE_ALLOCA
 #include "cssysdef.h"
 #include "qint.h"
 #include "qsqrt.h"

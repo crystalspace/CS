@@ -5,7 +5,6 @@
  *                     Spencer Kimball, Federico Mena Quintero
  */
 
-#define CS_SYSDEF_PROVIDE_ALLOCA
 #include "cssysdef.h"
 #include "qint.h"
 #include "csutil/rng.h"
