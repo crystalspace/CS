@@ -20,6 +20,17 @@ The history order is reversed so that new features are at the top.
 	  In order to find the changes, just do a search for
 	  "redeye", which marks all the changes.
 	- More work on a better way to select mesh clippers for OpenGL.
+	- Added Video.OpenGL.Caps.HWPlanes to opengl.cfg to select the
+	  number of hardware OpenGL planes. Set to 0 if you don't have
+	  any or don't want to use this.
+	- Implemented hardware plane clipping in OpenGL.
+	- Implemented additional lazy clipping phase.
+	- Finished a totally new clipping selection system for OpenGL.
+	  Read data/config/opengl.cfg for more info. The default is to
+	  run a performance test (setting 'auto') which takes 14 seconds.
+	  To avoid this delay you can copy the three lines that are
+	  put on screen after this performance test to data/config/opengl.cfg.
+	  The lines are the one with Video.OpenGL.Clip*.
 8-May-2001
 	- Martin Geisse did some changes in the RTTI macros:
 	    - Extended object interfaces now use DECLARE_OBJECT_INTERFACE,

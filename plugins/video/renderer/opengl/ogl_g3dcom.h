@@ -48,10 +48,13 @@ struct csOpenGLCaps
 {
   // Can we use stencil buffer?
   bool use_stencil;
+  // Can we use OpenGL clipping planes? And if yes, for how many planes?
+  int nr_hardware_planes;
   // Do we have broken driver that requires clipping to screen boundaries?
   bool need_screen_clipping;
 };
 
+#define OPENGL_CLIP_AUTO		'a'	// Used for auto-detection.
 #define OPENGL_CLIP_NONE		'n'
 #define OPENGL_CLIP_ZBUF		'z'
 #define OPENGL_CLIP_STENCIL		's'
@@ -142,6 +145,13 @@ private:
 
   /// Make sure the frustum is correct.
   void CalculateFrustum ();
+  /// Make sure the stencil is correct for the current clipper.
+  void SetupStencil ();
+  /// Make sure the OpenGL clipping planes are correct for the current clipper.
+  void SetupClipPlanes ();
+
+  /// Do a performance test to find out the best configuration for OpenGL.
+  void PerfTest ();
 
   /**
    * Given information from a mesh, clip the mesh to the frustum.
@@ -156,7 +166,8 @@ private:
     csColor* vertex_colors,
     G3DFogInfo* vertex_fog,
     int& num_clipped_triangles,
-    int& num_clipped_vertices);
+    int& num_clipped_vertices,
+    bool exact_clipping);
 
 protected:
   friend class csOpenGLHalo;
@@ -218,6 +229,14 @@ protected:
    * by the first call to SetClipper with type CS_CLIPPER_TOPLEVEL.
    */
   bool toplevel_init;
+  /**
+   * If true then the stencil is initialized for this clipper.
+   */
+  bool stencil_init;
+  /**
+   * If true then the OpenGL clipping planes are initialized for this clipper.
+   */
+  bool planes_init;
 
   /// The current near plane.
   csPlane3 near_plane;
@@ -292,9 +311,6 @@ protected:
 
   /// DrawFlags on last BeginDraw ()
   int DrawMode;
-
-  /// Number of bits that are supported by stencil buffer.
-  GLint stencil_bits;
 
 public:
   /// The maximum texture size

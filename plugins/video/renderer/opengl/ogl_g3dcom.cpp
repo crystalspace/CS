@@ -19,6 +19,7 @@
 #include <stdarg.h>
 
 #include <stdio.h>
+#include <ctype.h>
 
 #include "cssysdef.h"
 #include "cssys/sysdriv.h"
@@ -191,17 +192,23 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
   Caps.MaxAspectRatio = 32768;
   GLCaps.need_screen_clipping = false;
   GLCaps.use_stencil = false;
-  clip_optional[0] = OPENGL_CLIP_NONE;
+  clip_optional[0] = OPENGL_CLIP_AUTO;
   clip_optional[1] = OPENGL_CLIP_SOFTWARE;
-  clip_required[0] = OPENGL_CLIP_SOFTWARE;
-  clip_outer[0] = OPENGL_CLIP_ZBUF;
+  clip_optional[2] = OPENGL_CLIP_SOFTWARE;
+  clip_required[0] = OPENGL_CLIP_AUTO;
+  clip_required[1] = OPENGL_CLIP_SOFTWARE;
+  clip_required[2] = OPENGL_CLIP_SOFTWARE;
+  clip_outer[0] = OPENGL_CLIP_AUTO;
   clip_outer[1] = OPENGL_CLIP_SOFTWARE;
+  clip_outer[2] = OPENGL_CLIP_SOFTWARE;
 
   // default extension state is for all extensions to be OFF
   ARB_multitexture = false;
   clipper = NULL;
   cliptype = CS_CLIPPER_NONE;
   toplevel_init = false;
+  stencil_init = false;
+  planes_init = false;
   frustum_valid = false;
 
   // see note above
@@ -276,48 +283,68 @@ bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
   GLCaps.use_stencil = config->GetBool ("Video.OpenGL.Caps.Stencil", false);
   GLCaps.need_screen_clipping =
   	config->GetBool ("Video.OpenGL.Caps.NeedScreenClipping", false);
+  GLCaps.nr_hardware_planes = config->GetInt ("Video.OpenGL.Caps.HWPlanes", 6);
 
   unsigned int i, j;
-  const char* clip_opt = config->GetStr ("Video.OpenGL.ClipOptional", "nsp0");
-  for (j = i = 0 ; i < strlen (clip_opt) ; i++)
+  const char* clip_opt = config->GetStr ("Video.OpenGL.ClipOptional", "auto");
+  if (!strcmp (clip_opt, "auto"))
+    clip_optional[0] = OPENGL_CLIP_AUTO;
+  else
   {
-    char c = clip_opt[i];
-    if ((c == 's' || c == 'S') && !GLCaps.use_stencil) continue;
-    if (c == 'z' || c == 'Z') continue;
-    clip_optional[j++] = c;
-    if (j >= 3) break;
-  }
-  while (j < 3) clip_optional[j++] = '0';
-  SysPrintf (MSG_INITIALIZATION, "  Optional Clipping: %c%c%c\n",
+    for (j = i = 0 ; i < strlen (clip_opt) ; i++)
+    {
+      char c = clip_opt[i];
+      if ((c == 's' || c == 'S') && !GLCaps.use_stencil) continue;
+      if ((c == 'p' || c == 'P') && GLCaps.nr_hardware_planes <= 0) continue;
+      if (c == 'z' || c == 'Z') continue;
+      clip_optional[j++] = c;
+      if (j >= 3) break;
+    }
+    while (j < 3) clip_optional[j++] = '0';
+    SysPrintf (MSG_INITIALIZATION, "  Optional Clipping: %c%c%c\n",
       clip_optional[0], clip_optional[1], clip_optional[2]);
-
-  const char* clip_req = config->GetStr ("Video.OpenGL.ClipRequired", "sp0");
-  for (j = i = 0 ; i < strlen (clip_req) ; i++)
-  {
-    char c = clip_req[i];
-    if ((c == 's' || c == 'S') && !GLCaps.use_stencil) continue;
-    if (c == 'z' || c == 'Z') continue;
-    if (c == 'n' || c == 'N') continue;
-    clip_required[j++] = c;
-    if (j >= 3) break;
   }
-  while (j < 3) clip_required[j++] = '0';
-  SysPrintf (MSG_INITIALIZATION, "  Required Clipping: %c%c%c\n",
-      clip_required[0], clip_required[1], clip_required[2]);
+
+  const char* clip_req = config->GetStr ("Video.OpenGL.ClipRequired", "auto");
+  if (!strcmp (clip_req, "auto"))
+    clip_required[0] = OPENGL_CLIP_AUTO;
+  else
+  {
+    for (j = i = 0 ; i < strlen (clip_req) ; i++)
+    {
+      char c = clip_req[i];
+      if ((c == 's' || c == 'S') && !GLCaps.use_stencil) continue;
+      if ((c == 'p' || c == 'P') && GLCaps.nr_hardware_planes <= 0) continue;
+      if (c == 'z' || c == 'Z') continue;
+      if (c == 'n' || c == 'N') continue;
+      clip_required[j++] = c;
+      if (j >= 3) break;
+    }
+    while (j < 3) clip_required[j++] = '0';
+    SysPrintf (MSG_INITIALIZATION, "  Required Clipping: %c%c%c\n",
+        clip_required[0], clip_required[1], clip_required[2]);
+  }
 
   const char* clip_out = config->GetStr ("Video.OpenGL.ClipOuter", "zsp0");
-  for (j = i = 0 ; i < strlen (clip_out) ; i++)
+  if (!strcmp (clip_out, "auto"))
+    clip_outer[0] = OPENGL_CLIP_AUTO;
+  else
   {
-    char c = clip_out[i];
-    if ((c == 's' || c == 'S') && !GLCaps.use_stencil) continue;
-    if (c == 'n' || c == 'N') continue;
-    clip_outer[j++] = c;
-    if (j >= 3) break;
+    for (j = i = 0 ; i < strlen (clip_out) ; i++)
+    {
+      char c = clip_out[i];
+      if ((c == 's' || c == 'S') && !GLCaps.use_stencil) continue;
+      if ((c == 'p' || c == 'P') && GLCaps.nr_hardware_planes <= 0) continue;
+      if ((c == 'z' || c == 'Z' || c == 's' || c == 'S' || c == 'p' || c == 'P')
+    	  && GLCaps.need_screen_clipping) continue;
+      if (c == 'n' || c == 'N') continue;
+      clip_outer[j++] = c;
+      if (j >= 3) break;
+    }
+    while (j < 3) clip_outer[j++] = '0';
+    SysPrintf (MSG_INITIALIZATION, "  Outer Clipping: %c%c%c\n",
+        clip_outer[0], clip_outer[1], clip_outer[2]);
   }
-  while (j < 3) clip_outer[j++] = '0';
-  SysPrintf (MSG_INITIALIZATION, "  Outer Clipping: %c%c%c\n",
-      clip_outer[0], clip_outer[1], clip_outer[2]);
-
 
   m_renderstate.alphablend = true;
   m_renderstate.mipmap = 0;
@@ -329,6 +356,246 @@ bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
   m_config_options.do_extra_bright = false;
 
   return true;
+}
+
+struct ModRes
+{
+  char mode;
+  int pref_order;
+  int cnt;
+};
+
+static int compare_mode (const void* el1, const void* el2)
+{
+  ModRes* m1 = (ModRes*)el1;
+  ModRes* m2 = (ModRes*)el2;
+  if (m1->cnt < m2->cnt) return 1;
+  else if (m1->cnt > m2->cnt) return -1;
+  else if (m1->pref_order < m2->pref_order) return 1;
+  else if (m1->pref_order > m2->pref_order) return -1;
+  else return 0;
+}
+
+void csGraphics3DOGLCommon::PerfTest ()
+{
+  bool compute_optional = clip_optional[0] == OPENGL_CLIP_AUTO;
+  bool compute_outer = clip_outer[0] == OPENGL_CLIP_AUTO;
+  bool compute_required = clip_required[0] == OPENGL_CLIP_AUTO;
+  if (!compute_optional && !compute_outer && !compute_required)
+    return;
+
+  SetPerspectiveAspect (height);
+  SetPerspectiveCenter (width/2, height/2);
+
+  G3DTriangleMesh mesh;
+  int res = 64;
+  mesh.num_vertices = (res+1)*(res+1);
+  mesh.num_triangles = res*res*2;
+  mesh.num_vertices_pool = 1;
+  mesh.clip_portal = CS_CLIP_NEEDED;
+  mesh.clip_plane = CS_CLIP_NOT;
+  mesh.use_vertex_color = true;
+  mesh.do_fog = false;
+  mesh.do_morph_texels = false;
+  mesh.do_morph_colors = false;
+  mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
+  mesh.fxmode = CS_FX_GOURAUD;
+  mesh.morph_factor = 0;
+  mesh.mat_handle = NULL;
+  mesh.vertex_fog = NULL;
+  mesh.triangles = new csTriangle [mesh.num_triangles];
+  mesh.vertices[0] = new csVector3 [mesh.num_vertices];
+  mesh.texels[0] = new csVector2 [mesh.num_vertices];
+  mesh.vertex_colors[0] = new csColor [mesh.num_vertices];
+
+  float zx, zy, z;
+  // First we calculate the z which will bring the top-left vertex
+  // further than (-width2,-height2).
+  zx = -5. / ((-width2-width2) * inv_aspect);
+  zy = -5. / ((-height2-height2) * inv_aspect);
+  if (zy < zx) z = zy;
+  else z = zx;
+
+  int x, y, i, t;
+  float fx, fy;
+  i = 0;
+  for (y = 0 ; y <= res ; y++)
+  {
+    fy = float (y) / float (res) - .5;
+    for (x = 0 ; x <= res ; x++)
+    {
+      fx = float (x) / float (res) - .5;
+      mesh.vertices[0][i].Set (10.*fx, 10.*fy, z);
+      mesh.texels[0][i].Set (0, 0);
+      mesh.vertex_colors[0][i].Set (1, 0, 0);
+      i++;
+    }
+  }
+  i = 0;
+  t = 0;
+  for (y = 0 ; y < res ; y++)
+  {
+    for (x = 0 ; x < res ; x++)
+    {
+      mesh.triangles[t].c = i;
+      mesh.triangles[t].b = i+1;
+      mesh.triangles[t].a = i+res+1;
+      t++;
+      mesh.triangles[t].c = i+1;
+      mesh.triangles[t].b = i+res+1+1;
+      mesh.triangles[t].a = i+res+1;
+      t++;
+      i++;
+    }
+    i++;
+  }
+
+  BeginDraw (CSDRAW_3DGRAPHICS);
+
+  int dw = width / 20;
+  int dh = height / 20;
+  csBoxClipper clipper (dw, dh, width-dw, height-dh);
+  SetClipper ((iClipper2D*)&clipper, CS_CLIPPER_TOPLEVEL);
+  ResetNearPlane ();
+
+  ModRes test_modes[9];
+  int test_mode_cnt = 0;
+  test_modes[test_mode_cnt].mode = '0';
+  test_modes[test_mode_cnt++].pref_order = 3;
+  test_modes[test_mode_cnt].mode = 'z';
+  test_modes[test_mode_cnt++].pref_order = 7;
+  test_modes[test_mode_cnt].mode = 'Z';
+  test_modes[test_mode_cnt++].pref_order = 6;
+  if (GLCaps.use_stencil)
+  {
+    test_modes[test_mode_cnt].mode = 's';
+    test_modes[test_mode_cnt++].pref_order = 2;
+    test_modes[test_mode_cnt].mode = 'S';
+    test_modes[test_mode_cnt++].pref_order = 1;
+  }
+  if (GLCaps.nr_hardware_planes > 0)
+  {
+    test_modes[test_mode_cnt].mode = 'p';
+    test_modes[test_mode_cnt++].pref_order = 5;
+    test_modes[test_mode_cnt].mode = 'P';
+    test_modes[test_mode_cnt++].pref_order = 4;
+  }
+
+  if (compute_outer && !GLCaps.need_screen_clipping)
+  {
+    //========
+    // First test clipping geometry against the outer portal (close
+    // to screen boundaries).
+    //========
+    for (i = 0 ; i < test_mode_cnt ; i++)
+    {
+      clip_outer[0] = test_modes[i].mode;
+      int cnt = 0;
+      cs_time end = System->GetTime () + 1000;
+      while (System->GetTime () < end)
+      {
+        glDepthMask (GL_TRUE);
+        glClear (GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
+        csReversibleTransform o2c;	// Identity transform.
+        SetObjectToCamera (&o2c);
+        DrawTriangleMesh (mesh);
+        cnt++;
+      }
+      test_modes[i].cnt = cnt;
+      printf ("    %d FPS for %c\n", cnt,
+    	  test_modes[i].mode); fflush (stdout);
+    }
+    // Sort the results.
+    qsort (test_modes, test_mode_cnt, sizeof (ModRes), compare_mode);
+    clip_outer[0] = test_modes[0].mode;
+    if (test_mode_cnt > 1) clip_outer[1] = test_modes[1].mode;
+    else clip_outer[1] = '0';
+    if (test_mode_cnt > 2) clip_outer[2] = test_modes[2].mode;
+    else clip_outer[2] = '0';
+  }
+  else
+  {
+    if (compute_outer)
+    {
+      clip_outer[0] = '0';
+      clip_outer[1] = '0';
+      clip_outer[2] = '0';
+    }
+  }
+
+  //========
+  // Now test again for a very small clipper. This test is to see if
+  // it is beneficial to even enable clipping on optional portals.
+  //========
+  csBoxClipper clipper2 (width/2-dw, height/2-dh, width/2+dw, height/2+dh);
+  SetClipper ((iClipper2D*)&clipper2, CS_CLIPPER_OPTIONAL);
+  // First relocate all vertices so that the mesh fits on screen
+  // but not in the small clipper.
+  // First we calculate the z which will bring the top-left vertex
+  // beyond (dw,dh).
+  zx = -5. / ((dw-width2) * inv_aspect);
+  zy = -5. / ((dh-height2) * inv_aspect);
+  if (zy > zx) z = zy;
+  else z = zx;
+  for (i = 0 ; i < mesh.num_vertices ; i++)
+    mesh.vertices[0][i].z = z;
+  for (i = 0 ; i < test_mode_cnt ; i++)
+  {
+    clip_optional[0] = test_modes[i].mode;
+    int cnt = 0;
+    cs_time end = System->GetTime () + 1000;
+    while (System->GetTime () < end)
+    {
+      glDepthMask (GL_TRUE);
+      glClear (GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+      SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
+      csReversibleTransform o2c;	// Identity transform.
+      SetObjectToCamera (&o2c);
+      DrawTriangleMesh (mesh);
+      cnt++;
+    }
+    test_modes[i].cnt = cnt;
+    printf ("    %d FPS for %c (small clipper)\n", cnt,
+    	test_modes[i].mode); fflush (stdout);
+  }
+
+  // Sort the results.
+  qsort (test_modes, test_mode_cnt, sizeof (ModRes), compare_mode);
+  int j;
+  if (compute_required)
+  {
+    j = 0;
+    for (i = 0 ; i < 3 ; i++)
+    {
+      while (j < test_mode_cnt &&
+    	  (test_modes[j].mode == 'z' || test_modes[j].mode == 'Z')) j++;
+      if (j >= test_mode_cnt) clip_required[i] = '0';
+      else clip_required[i] = test_modes[j].mode;
+      j++;
+    }
+  }
+  if (compute_optional)
+  {
+    j = 0;
+    for (i = 0 ; i < 3 ; i++)
+    {
+      if (j >= test_mode_cnt) clip_optional[i] = '0';
+      else clip_optional[i] = test_modes[j].mode;
+      j++;
+    }
+  }
+  printf ("    Video.OpenGL.ClipOuter = %c%c%c\n", clip_outer[0],
+  	clip_outer[1], clip_outer[2]);
+  printf ("    Video.OpenGL.ClipRequired = %c%c%c\n", clip_required[0],
+  	clip_required[1], clip_required[2]);
+  printf ("    Video.OpenGL.ClipOptional = %c%c%c\n", clip_optional[0],
+  	clip_optional[1], clip_optional[2]);
+
+  SetClipper (NULL, CS_CLIPPER_NONE);
+
+  FinishDraw ();
+  Print (NULL);
 }
 
 void csGraphics3DOGLCommon::SharedInitialize (csGraphics3DOGLCommon *d)
@@ -514,11 +781,7 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   // now that we know what pixelformat we use, clue the texture manager in
   txtmgr->SetPixelFormat (*G2D->GetPixelFormat ());
 
-  // Get the number of stencil bits that are supported.
-  // @@@ Commented because just requesting the number of bits already
-  // causes problems on some 3D cards!!!???
-  //glGetIntegerv (GL_STENCIL_BITS, &stencil_bits);
-  //SysPrintf (MSG_INITIALIZATION, "Number of stencil bits: %d\n", stencil_bits);
+  PerfTest ();
 
   return true;
 }
@@ -582,6 +845,65 @@ void csGraphics3DOGLCommon::SetDimensions (int width, int height)
   frustum_valid = false;
 }
 
+void csGraphics3DOGLCommon::SetupStencil ()
+{
+  if (stencil_init) return;
+  stencil_init = true;
+  if (clipper && GLCaps.use_stencil)
+  {
+    // First set up the stencil area.
+    glEnable (GL_STENCIL_TEST);
+    glClearStencil (0);
+    glClear (GL_STENCIL_BUFFER_BIT);
+    glStencilFunc (GL_ALWAYS, 1, 1);
+    glStencilOp (GL_REPLACE, GL_REPLACE, GL_REPLACE);
+    int nv = clipper->GetNumVertices ();
+    csVector2* v = clipper->GetClipPoly ();
+    glColor4f (0, 0, 0, 0);
+    glShadeModel (GL_FLAT);
+    glDisable (GL_TEXTURE_2D);
+    glDisable (GL_DEPTH_TEST);
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_ZERO, GL_ONE);
+    glBegin (GL_TRIANGLE_FAN);
+    for (int i = 0 ; i < nv ; i++)
+      glVertex2f (v[i].x, v[i].y);
+    glEnd ();
+    glDisable (GL_STENCIL_TEST);
+  }
+}
+
+void csGraphics3DOGLCommon::SetupClipPlanes ()
+{
+  if (planes_init) return;
+  planes_init = true;
+  // This routine assumes the hardware planes can handle the
+  // required number of planes from the clipper.
+  if (clipper && GLCaps.nr_hardware_planes >= 0)
+  {
+    CalculateFrustum ();
+    csPlane3 pl;
+    GLdouble plane_eq[4];
+    int i, i1;
+    i1 = frustum.GetNumVertices ()-1;
+    for (i = 0 ; i < frustum.GetNumVertices () ; i++)
+    {
+      pl.Set (csVector3 (0), frustum[i], frustum[i1]);
+      plane_eq[0] = pl.A ();
+      plane_eq[1] = pl.B ();
+      plane_eq[2] = pl.C ();
+      plane_eq[3] = pl.D ();
+      glClipPlane (GL_CLIP_PLANE0+i, plane_eq);
+      i1 = i;
+    }
+    plane_eq[0] = 0;
+    plane_eq[1] = 0;
+    plane_eq[2] = 1;
+    plane_eq[3] = -.001;
+    glClipPlane (GL_CLIP_PLANE0+i, plane_eq);
+  }
+}
+
 void csGraphics3DOGLCommon::CalculateFrustum ()
 {
   if (frustum_valid) return;
@@ -613,6 +935,8 @@ void csGraphics3DOGLCommon::SetClipper (iClipper2D* clip, int cliptype)
   if (!clipper) cliptype = CS_CLIPPER_NONE;
   csGraphics3DOGLCommon::cliptype = cliptype;
   frustum_valid = false;
+  stencil_init = false;
+  planes_init = false;
 
 #if 0
 // @@@ TODO: init z-buffer
@@ -634,29 +958,6 @@ void csGraphics3DOGLCommon::SetClipper (iClipper2D* clip, int cliptype)
     }
   }
 #endif
-
-  if (clipper && GLCaps.use_stencil)
-  {
-    // First set up the stencil area.
-    glEnable (GL_STENCIL_TEST);
-    glClearStencil (0);
-    glClear (GL_STENCIL_BUFFER_BIT);
-    glStencilFunc (GL_ALWAYS, 1, 1);
-    glStencilOp (GL_REPLACE, GL_REPLACE, GL_REPLACE);
-    int nv = clipper->GetNumVertices ();
-    csVector2* v = clipper->GetClipPoly ();
-    glColor4f (0, 0, 0, 0);
-    glShadeModel (GL_FLAT);
-    glDisable (GL_TEXTURE_2D);
-    glDisable (GL_DEPTH_TEST);
-    glEnable (GL_BLEND);
-    glBlendFunc (GL_ZERO, GL_ONE);
-    glBegin (GL_TRIANGLE_FAN);
-    for (int i = 0 ; i < nv ; i++)
-      glVertex2f (v[i].x, v[i].y);
-    glEnd ();
-    glDisable (GL_STENCIL_TEST);
-  }
 }
 
 bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
@@ -1605,7 +1906,8 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     csColor* vertex_colors,
     G3DFogInfo* vertex_fog,
     int& num_clipped_triangles,
-    int& num_clipped_vertices)
+    int& num_clipped_vertices,
+    bool exact_clipping)
 {
   // Make sure the frustum is ok.
   CalculateFrustum ();
@@ -1616,19 +1918,37 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
   csPoly3D obj_frustum;
   int i, j, j1;
   for (i = 0 ; i < frustum.GetNumVertices () ; i++)
-  {
     obj_frustum.AddVertex (o2c.This2OtherRelative (frustum[i]));
-  }
-  j1 = frustum.GetNumVertices ()-1;
-  for (j = 0 ; j < frustum.GetNumVertices () ; j++)
+  int num_frust = frustum.GetNumVertices ();
+  j1 = num_frust-1;
+  for (j = 0 ; j < num_frust ; j++)
   {
     frustum_planes[j].Set (csVector3 (0), obj_frustum[j], obj_frustum[j1]);
     j1 = j;
   }
   csVector3 frust_origin = o2c.This2Other (csVector3 (0));
+  // In addition to the frustum planes itself we also calculate all
+  // diagonal planes which go from one side of the frustum to the other.
+  // These are going to be used to detect the special case of a triangle
+  // that has none of its vertices in the frustum. But this triangle can
+  // still be visible. To detect this we test if there is one of these
+  // extra planes that cuts the triangle in two. Since the number of diagonal
+  // planes is half the number of frustum planes we can save some
+  // calculation here.
+  csPlane3 diagonal_planes[50];	// @@@ Arbitrary number.
+  int num_diagonal_planes = 0;
+  if (num_frust > 3)
+    // Use (num_frust+1)/2 to make sure that odd frustums get one extra plane.
+    for (j = 0 ; j < (num_frust+1) / 2 ; j++)
+    {
+      j1 = j + (num_frust+1) / 2;
+      j1 = j1 % num_frust;
+      diagonal_planes[num_diagonal_planes++].Set
+      	(csVector3 (0), obj_frustum[j], obj_frustum[j1]);
+    }
 
   // Setup the viewing plane.
-  //@@@frustum_planes[frustum.GetNumVertices ()].Set (0, 0, -1, .01);
+  //@@@frustum_planes[num_frust].Set (0, 0, -1, .01);
 
   // Make sure our worktables are big enough for the clipped mesh.
   int num_tri = num_triangles*2;
@@ -1638,7 +1958,7 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     // Use two times as many triangles. Hopefully this is enough.
     clipped_triangles.SetLimit (num_tri);
   }
-  if (num_vertices*2 > clipped_vertices.Limit ())
+  if (num_vertices > clipped_translate.Limit ())
   {
     clipped_translate.SetLimit (num_vertices);	// Used for original vertices.
     clipped_vertices.SetLimit (num_vertices*2);
@@ -1657,8 +1977,8 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
   {
     const csVector3& v = vertices[i];
     bool inside = true;
-    j1 = obj_frustum.GetNumVertices ()-1;
-    for (j = 0 ; j < obj_frustum.GetNumVertices () ; j++)
+    j1 = num_frust-1;
+    for (j = 0 ; j < num_frust ; j++)
     {
       if (csMath3::WhichSide3D (v-frust_origin, obj_frustum[j],
 	    obj_frustum[j1]) >= 0)
@@ -1670,14 +1990,19 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     }
     if (inside)
     {
-      clipped_translate[i] = num_clipped_vertices;
-      clipped_vertices[num_clipped_vertices] = v;
-      clipped_texels[num_clipped_vertices] = texels[i];
-      if (vertex_colors)
-        clipped_colors[num_clipped_vertices] = vertex_colors[i];
-      if (vertex_fog)
-        clipped_fog[num_clipped_vertices] = vertex_fog[i];
-      num_clipped_vertices++;
+      if (exact_clipping)
+      {
+        clipped_translate[i] = num_clipped_vertices;
+        clipped_vertices[num_clipped_vertices] = v;
+        clipped_texels[num_clipped_vertices] = texels[i];
+        if (vertex_colors)
+          clipped_colors[num_clipped_vertices] = vertex_colors[i];
+        if (vertex_fog)
+          clipped_fog[num_clipped_vertices] = vertex_fog[i];
+        num_clipped_vertices++;
+      }
+      else
+        clipped_translate[i] = i;
     }
     else
       clipped_translate[i] = -1;
@@ -1690,19 +2015,34 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     int cnt = int (clipped_translate[tri.a] != -1)
       	+ int (clipped_translate[tri.b] != -1)
 	+ int (clipped_translate[tri.c] != -1);
-    if (false && cnt == 0)
+    if (cnt == 0)
+    {
+      //=====
+      // Here we have a special case where we need to test if the
+      // triangle is cut by the diagonal planes. If yes then we have
+      // to clip anyway.
+      //=====
+      for (j = 0 ; j < num_diagonal_planes ; j++)
+      {
+        csPlane3& pl = diagonal_planes[j];
+        csVector3 v0 = vertices[tri.a] - frust_origin;
+        csVector3 v1 = vertices[tri.b] - frust_origin;
+        csVector3 v2 = vertices[tri.c] - frust_origin;
+	float c0 = pl.Classify (v0);
+	float c1 = pl.Classify (v1);
+	// Set cnt to 1 so that we will clip in the next part.
+	if ((c0 < 0 && c1 > 0) || (c0 > 0 && c1 < 0)) { cnt = 1; break; }
+	float c2 = pl.Classify (v2);
+	if ((c0 < 0 && c2 > 0) || (c0 > 0 && c2 < 0)) { cnt = 1; break; }
+	if ((c1 < 0 && c2 > 0) || (c1 > 0 && c2 < 0)) { cnt = 1; break; }
+      }
+    }
+
+    if (cnt == 0)
     {
       //=====
       // Easiest case: triangle is not visible.
       //=====
-      //@@@ NOTE! There are two pathological cases which are not
-      //correctly handled at this moment:
-      //  1. The view frustum is entire in the triangle. In this
-      //     case the triangle is obviously visible.
-      //  2. The view triangle intersects with the view frustum but
-      //     none of the triangle vertices is in the frustum and none
-      //     of the frustum vertices is in the triangle. This case is
-      //     most complicated to detect.
     }
     else if (cnt == 3)
     {
@@ -1719,6 +2059,16 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       //=====
       // Difficult case: clipping will result in several triangles.
       //=====
+      if (!exact_clipping)
+      {
+        // If we have lazy clipping then we just add the triangle.
+        clipped_triangles[num_clipped_triangles].a = tri.a;
+        clipped_triangles[num_clipped_triangles].b = tri.b;
+        clipped_triangles[num_clipped_triangles].c = tri.c;
+        num_clipped_triangles++;
+	continue;
+      }
+
       csVector3 poly[100];	// @@@ Arbitrary limit
       static csClipInfo clipinfo[100];
       poly[0] = vertices[tri.a] - frust_origin;
@@ -1734,8 +2084,8 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       // This will result in a polygon. The clipper keeps information
       // (in clipinfo) about what happens to all the vertices.
       //-----
-      j1 = obj_frustum.GetNumVertices ()-1;
-      for (j = 0 ; j < obj_frustum.GetNumVertices () ; j++)
+      j1 = num_frust-1;
+      for (j = 0 ; j < num_frust ; j++)
       {
         csVector3& v1 = obj_frustum[j1];
         csVector3& v2 = obj_frustum[j];
@@ -1786,9 +2136,19 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 {
   end_draw_poly ();
 
-#if 0
-  //@@@ Work in progress...
+  bool stencil_enabled = false;
+  bool clip_planes_enabled = false;
+
+  //===========
+  // First we are going to find out what kind of clipping (if any)
+  // we need. This depends on various factors including what the engine
+  // says about the mesh (the clip_portal and clip_plane flags in the
+  // mesh), what the current clipper is (the current cliptype), what
+  // the current z-buf render mode is, and what the settings are to use
+  // for the clipper on the current type of hardware (the clip_... arrays).
+  //===========
   char how_clip = OPENGL_CLIP_NONE;
+  bool use_lazy_clipping = false;
 
   // @@@ Todo: what to do with clip_plane?
   if (mesh.clip_portal != CS_CLIP_NOT)
@@ -1797,13 +2157,17 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
     // In some z-buf modes we cannot use clipping modes that depend on
     // zbuffer ('n','N', 'z', or 'Z').
-    bool no_zbuf_clipping = (z_buf_mode == CS_ZBUF_NONE || z_buf_mode = CS_ZBUF_FILL
-      	|| z_buf_mode == CS_ZBUF_FILLONLY);
+    bool no_zbuf_clipping = (z_buf_mode == CS_ZBUF_NONE
+    	|| z_buf_mode == CS_ZBUF_FILL || z_buf_mode == CS_ZBUF_FILLONLY);
 
     // Select the right clipping mode variable depending on the
     // type of clipper.
+    int ct = cliptype;
+    // If clip_portal in the mesh indicates that we might need toplevel
+    // clipping then we do as if the current clipper type is toplevel.
+    if (mesh.clip_portal == CS_CLIP_TOPLEVEL) ct = CS_CLIPPER_TOPLEVEL;
     char* clip_modes;
-    switch (cliptype)
+    switch (ct)
     {
       case CS_CLIPPER_OPTIONAL: clip_modes = clip_optional; break;
       case CS_CLIPPER_REQUIRED: clip_modes = clip_required; break;
@@ -1811,61 +2175,54 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       default: clip_modes = clip_optional;
     }
 
-    // Go through all the modes and select the first one that is
-    // appropriate.
+    // Go through all the modes and select the first one that is appropriate.
     int i;
     for (i = 0 ; i < 3 ; i++)
     {
-      switch (clip_modes[i])
-      {
-	case 'n':
-	case 'N':
-	case 'z':
-	case 'Z':
-	  if (!no_zbuf_clipping) break;
-      }
+      char c = clip_modes[i];
+      // We cannot use n,N,z, or Z if no_zbuf_clipping is true.
+      if ((c == 'n' || c == 'N' || c == 'z' || c == 'Z') && no_zbuf_clipping)
+        continue;
+      // We cannot use p or P if the clipper has more vertices than the
+      // number of hardware planes minus one (for the view plane).
+      if ((c == 'p' || c == 'P') &&
+      		clipper->GetNumVertices () >= GLCaps.nr_hardware_planes-1)
+        continue;
+      how_clip = c;
+      break;
     }
-  }
-
-#endif
-
-  
-  bool stencil_enabled = false;
-  bool want_clipping = false;
-
-  if (mesh.clip_portal != CS_CLIP_NOT &&
-      (mesh.clip_portal == CS_CLIP_NEEDED && cliptype != CS_CLIPPER_OPTIONAL))
-    want_clipping = true;
-  if (mesh.clip_portal == CS_CLIP_TOPLEVEL)
-  {
-    // If we have broken hardware/OpenGL driver then we will clip anyway.
-    if (GLCaps.need_screen_clipping)
-      want_clipping = true;
-    else
+    if (how_clip != '0' && toupper (how_clip) == how_clip)
     {
-      // @@@ Temporary: for this case I would like to use the z-buffer border
-      // around the toplevel portal.
-    }
-  }
-  // @@@ Temporary.
-  if (mesh.clip_plane == CS_CLIP_NEEDED)
-    want_clipping = true;
-  if (want_clipping)
-  {
-    if (GLCaps.use_stencil)
-    {
-      stencil_enabled = true;
-      want_clipping = false;
-      // Use the stencil area.
-      glEnable (GL_STENCIL_TEST);
-      glStencilFunc (GL_EQUAL, 1, 1);
-      glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
+      use_lazy_clipping = true;
+      how_clip = tolower (how_clip);
     }
   }
 
   int i,k;
 
+  //===========
+  // First setup the clipper that we need.
+  //===========
+  if (how_clip == 's')
+  {
+    SetupStencil ();
+    stencil_enabled = true;
+    // Use the stencil area.
+    glEnable (GL_STENCIL_TEST);
+    glStencilFunc (GL_EQUAL, 1, 1);
+    glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
+  }
+  else if (how_clip == 'p')
+  {
+    SetupClipPlanes ();
+    clip_planes_enabled = true;
+    for (i = 0 ; i <= frustum.GetNumVertices () ; i++)	// One extra!
+      glEnable (GL_CLIP_PLANE0+i);
+  }
+
+  //===========
   // Update work tables.
+  //===========
   int num_vertices = mesh.num_vertices;
   int num_triangles = mesh.num_triangles;
   if (num_vertices > tr_verts.Limit ())
@@ -1879,9 +2236,11 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     fog_color_verts.SetLimit (num_vertices);
   }
 
+  //===========
   // Do vertex tweening and/or transformation to camera space
   // if any of those are needed. When this is done 'verts' will
   // point to an array of camera vertices.
+  //===========
   csVector3* f1 = mesh.vertices[0];
   csVector2* uv1 = mesh.texels[0];
   csColor* col1 = mesh.vertex_colors[0];
@@ -1892,21 +2251,21 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   if (mesh.num_vertices_pool > 1)
   {
     // Vertex morphing.
-    float tween_ratio = mesh.morph_factor;
-    float remainder = 1 - tween_ratio;
+    float tr = mesh.morph_factor;
+    float remainder = 1 - tr;
     csVector3* f2 = mesh.vertices[1];
     csVector2* uv2 = mesh.texels[1];
     csColor* col2 = mesh.vertex_colors[1];
     for (i = 0 ; i < num_vertices ; i++)
     {
-      tr_verts[i] = tween_ratio * f2[i] + remainder * f1[i];
+      tr_verts[i] = tr * f2[i] + remainder * f1[i];
       if (mesh.do_morph_texels)
-        uv_verts[i] = tween_ratio * uv2[i] + remainder * uv1[i];
+        uv_verts[i] = tr * uv2[i] + remainder * uv1[i];
       if (mesh.do_morph_colors)
       {
-        color_verts[i].red = tween_ratio * col2[i].red + remainder * col1[i].red;
-	color_verts[i].green = tween_ratio * col2[i].green + remainder * col1[i].green;
-	color_verts[i].blue = tween_ratio * col2[i].blue + remainder * col1[i].blue;
+        color_verts[i].red = tr * col2[i].red + remainder * col1[i].red;
+	color_verts[i].green = tr * col2[i].green + remainder * col1[i].green;
+	color_verts[i].blue = tr * col2[i].blue + remainder * col1[i].blue;
       }
     }
     work_verts = tr_verts.GetArray ();
@@ -1928,8 +2287,10 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   csTriangle *triangles = mesh.triangles;
   G3DFogInfo* work_fog = mesh.vertex_fog;
 
-  // If we need clipping then we do this here.
-  if (want_clipping)
+  //===========
+  // Here we perform lazy or software clipping if needed.
+  //===========
+  if (how_clip == '0' || use_lazy_clipping)
   {
     ClipTriangleMesh (
 	num_triangles,
@@ -1940,11 +2301,15 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 	work_colors,
 	work_fog,
 	num_triangles,
-	num_vertices);
-    work_verts = clipped_vertices.GetArray ();
-    work_uv_verts = clipped_texels.GetArray ();
-    work_colors = clipped_colors.GetArray ();
-    work_fog = clipped_fog.GetArray ();
+	num_vertices,
+	!use_lazy_clipping);
+    if (!use_lazy_clipping)
+    {
+      work_verts = clipped_vertices.GetArray ();
+      work_uv_verts = clipped_texels.GetArray ();
+      work_colors = clipped_colors.GetArray ();
+      work_fog = clipped_fog.GetArray ();
+    }
     triangles = clipped_triangles.GetArray ();
   }
   
@@ -1955,7 +2320,9 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   glPushMatrix ();
   glLoadIdentity ();
 
+  //===========
   // set up world->camera transform, if needed
+  //===========
   if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
   {
     // we basically have to duplicate the
@@ -1997,12 +2364,14 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     glTranslatef (-translation.x, -translation.y, -translation.z);
   }
 
+  //===========
   // Set up perspective transform.
   // we have to change the standard projection matrix used for
   // drawing in other parts of CS.  Normally an orthogonal projection
   // is used since CS does the perspective projection for us.
   // Here, we need to reproduce CS's perspective projection using
   // OpenGL matrices.
+  //===========
 
   glMatrixMode (GL_PROJECTION);
   glPushMatrix ();
@@ -2023,6 +2392,9 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   matrixholder[14] = -inv_aspect;
   glMultMatrixf (matrixholder);
 
+  //===========
+  // Prepare the fog tables for later.
+  //===========
   if (mesh.do_fog)
   {
     for (i=0 ; i < num_vertices ; i++)
@@ -2044,10 +2416,17 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     }
   }
 
-  // Draw all triangles.
+  //===========
+  // Draw the base mesh.
+  //===========
   StartPolygonFX (mesh.mat_handle, mesh.fxmode);
-  csMaterialHandle* mat = (csMaterialHandle*)mesh.mat_handle;
-  bool multitex = mat->GetNumTextureLayers () > 0;
+  csMaterialHandle* mat = NULL;
+  bool multitex = false;
+  if (mesh.mat_handle)
+  {
+    mat = (csMaterialHandle*)mesh.mat_handle;
+    multitex = mat->GetNumTextureLayers () > 0;
+  }
   bool colstate_enabled = false;
   bool do_gouraud = m_gouraud && work_colors;
 
@@ -2070,7 +2449,10 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     {
       // Fill flat color if renderer decide to paint it flat-shaded
       UByte r,g,b;
-      mesh.mat_handle->GetTexture ()->GetMeanColor (r, g, b);
+      if (mesh.mat_handle)
+        mesh.mat_handle->GetTexture ()->GetMeanColor (r, g, b);
+      else
+        r = g = b = 1;
       flat_r = BYTE_TO_FLOAT (r);
       flat_g = BYTE_TO_FLOAT (g);
       flat_b = BYTE_TO_FLOAT (b);
@@ -2098,14 +2480,16 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     glShadeModel (GL_FLAT);
     glColor4f (flat_r, flat_g, flat_b, m_alpha);
   }
-  glDrawElements (GL_TRIANGLES, num_triangles*3 , GL_UNSIGNED_INT, & triangles[0]);
+  glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
   // If we have multi-texturing or fog we set the second pass Z-buffer
   // mode here.
   if (multitex || mesh.do_fog)
     SetGLZBufferFlagsPass2 (true);
 
+  //===========
   // Here we perform multi-texturing.
+  //===========
   if (multitex)
   {
     glShadeModel (GL_FLAT);
@@ -2119,7 +2503,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     {
       csTextureLayer* layer = mat->GetTextureLayer (j);
       iTextureHandle* txt_handle = layer->txt_handle;
-      csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *) txt_handle->GetPrivateObject ();
+      csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)
+      	txt_handle->GetPrivateObject ();
       csGLCacheData *texturecache_data;
       texturecache_data = (csGLCacheData *)txt_mm->GetCacheData ();
       //tex_transp = txt_mm->GetKeyColor () || txt_mm->GetAlphaMap ();
@@ -2144,7 +2529,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       }
       glVertexPointer (3, GL_FLOAT, 0, & work_verts[0]);
       glTexCoordPointer (2, GL_FLOAT, 0, mul_uv);
-      glDrawElements (GL_TRIANGLES, num_triangles*3 , GL_UNSIGNED_INT, & triangles[0]);
+      glDrawElements (GL_TRIANGLES, num_triangles*3,
+      	GL_UNSIGNED_INT, triangles);
     }
  
     // If we have to do gouraud shading we do it here.
@@ -2165,11 +2551,14 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       else
         glColorPointer (3, GL_FLOAT, 0, & work_colors[0]);
       glVertexPointer (3, GL_FLOAT, 0, & work_verts[0]);
-      glDrawElements (GL_TRIANGLES, num_triangles*3 , GL_UNSIGNED_INT, & triangles[0]);
+      glDrawElements (GL_TRIANGLES, num_triangles*3,
+      	GL_UNSIGNED_INT, triangles);
     }
   }
 
+  //===========
   // If there is vertex fog then we apply that last.
+  //===========
   if (mesh.do_fog)
   {
     // we need to texture and blend, with vertex color
@@ -2193,7 +2582,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     glTexCoordPointer (2, GL_FLOAT, 0, & fog_intensities[0]);
     glColorPointer (3, GL_FLOAT, 0, & fog_color_verts[0]);
 
-    glDrawElements (GL_TRIANGLES, num_triangles*3 , GL_UNSIGNED_INT, & triangles[0]);
+    glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
     if (!m_textured)
       glDisable (GL_TEXTURE_2D);
@@ -2213,10 +2602,14 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   glMatrixMode (GL_PROJECTION);
   glPopMatrix ();
 
+  //===========
+  // Disable/cleanup all clipping stuff.
+  //===========
   if (stencil_enabled)
-  {
     glDisable (GL_STENCIL_TEST);
-  }
+  if (clip_planes_enabled)
+    for (i = 0 ; i <= frustum.GetNumVertices () ; i++)	// One extra!
+      glDisable (GL_CLIP_PLANE0+i);
 }
 
 
