@@ -23372,29 +23372,32 @@ ac_abs_top_srcdir=`cd "$ac_dir" && cd $ac_top_srcdir && pwd`
 echo "$as_me: executing $ac_dest commands" >&6;}
   case $ac_dest in
     include/volatile.h ) echo $ECHO_N "$cs_header_text$ECHO_C" > $tmp/tcache
-	    if diff include/volatile.h $tmp/tcache >/dev/null 2>&1; then
-		{ echo "$as_me:$LINENO: include/volatile.h is unchanged" >&5
+	if diff include/volatile.h $tmp/tcache >/dev/null 2>&1; then
+  { echo "$as_me:$LINENO: include/volatile.h is unchanged" >&5
 echo "$as_me: include/volatile.h is unchanged" >&6;}
-	    else
-		rm -f include/volatile.h
-		mv $tmp/tcache include/volatile.h
-	    fi ;;
+else
+  rm -f include/volatile.h
+	    mv $tmp/tcache include/volatile.h
+fi
+ ;;
     config.mak ) echo $ECHO_N "$cs_makefile_text$ECHO_C" > $tmp/tcache
-	    if diff config.mak $tmp/tcache >/dev/null 2>&1; then
-		{ echo "$as_me:$LINENO: config.mak is unchanged" >&5
+	if diff config.mak $tmp/tcache >/dev/null 2>&1; then
+  { echo "$as_me:$LINENO: config.mak is unchanged" >&5
 echo "$as_me: config.mak is unchanged" >&6;}
-	    else
-		rm -f config.mak
-		mv $tmp/tcache config.mak
-	    fi ;;
+else
+  rm -f config.mak
+	    mv $tmp/tcache config.mak
+fi
+ ;;
     Jamconfig ) echo $ECHO_N "$cs_jamconfig_text$ECHO_C" > $tmp/tcache
-	    if diff Jamconfig $tmp/tcache >/dev/null 2>&1; then
-		{ echo "$as_me:$LINENO: Jamconfig is unchanged" >&5
+	if diff Jamconfig $tmp/tcache >/dev/null 2>&1; then
+  { echo "$as_me:$LINENO: Jamconfig is unchanged" >&5
 echo "$as_me: Jamconfig is unchanged" >&6;}
-	    else
-		rm -f Jamconfig
-		mv $tmp/tcache Jamconfig
-	    fi ;;
+else
+  rm -f Jamconfig
+	    mv $tmp/tcache Jamconfig
+fi
+ ;;
     cache.mak ) rm -f cache.mak ; ${MAKE} recache ;;
   esac
 done

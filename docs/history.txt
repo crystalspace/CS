@@ -4,26 +4,33 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 30-Apr-2003
-	- Philip Wyett removed MSVC external references to /MT and /MTd
-          as these params are not valid and will cause problems if used
-          when creating an application with current CS.
+	- Philip Wyett removed MSVC external references to /MT and /MTd as
+	  these params are not valid and will cause problems if used when
+	  creating an application with current CS.
+	- Eric Sunshine made the following changes:
+	    - Removed the ugly FILTER argument from CS_TEXT_CACHE_OUTPUT() in
+	      textcache.m4.  This was a nasty hack to allow
+	      CS_JAMCONFIG_OUTPUT() to do global post-processing of the cache
+	      before otuput.  Fortunately, however, the Jam-related
+	      installation-paths code has been refactored so that this is no
+	      longer needed, and is no longer used by CS_JAMCONFIG_OUTPUT().
+	    - Upgraded textcache.m4 to use AS_IF() rather than raw `if'.
 29-Apr-2003
 	- Matze fixed bad filepermission for jam install
 	- Matze moved crystal.m4 around to mk/autoconf and merged to make and
 	  jam versions of the script.
-	- Norman Kraemer fixed version detection. 
-	  The right result is now also found if not all parts of the version 
-	  string return the same result in comparision with the supplied 
-	  version, e.g. That is not only "1.3.16 >= 1.2.13" will yield true, 
-	  but also "1.3.16 >= 1.2.20".
-	  He also changed some of the variable names to comply with Autoconf 
+	- Norman Kraemer fixed version detection.  The right result is now also
+	  found if not all parts of the version string return the same result
+	  in comparision with the supplied version, e.g.  That is not only
+	  "1.3.16 >= 1.2.13" will yield true, but also "1.3.16 >= 1.2.20".  He
+	  also changed some of the variable names to comply with Autoconf
 	  rules.
-	- Norman also added recognition of "Change" and "BigChange" property
-	  to aws scrollbar's setup. This enhancement was submitted by
-	  Logan Gabriel <gersh@sonn.com>. He also fixed documentation of
-	  aws scrollbat as hinted by Logan.
-	- Matze disabled csperl5 Jamfile, until it is fixed, but I don't want to
-	  mess around here without having a working example (a working
+	- Norman also added recognition of "Change" and "BigChange" property to
+	  aws scrollbar's setup.  This enhancement was submitted by Logan
+	  Gabriel <gersh@sonn.com>.  He also fixed documentation of aws
+	  scrollbat as hinted by Logan.
+	- Matze disabled csperl5 Jamfile, until it is fixed, but I don't want
+	  to mess around here without having a working example (a working
 	  makefile).
 	- Matze separated installation path handling for Jamconfig and moved
 	  the filter stuff to the install macros.
@@ -75,9 +82,9 @@ The history order is reversed so that new features are at the top.
 	      assumptions of the macros in the Perl API.
 	    - Fixed the incorrectly-defined function prototype of the xs_init
 	      function, which only worked by chance before 5.8.
-	- res made the following changes to the script-generated extension 
+	- res made the following changes to the script-generated extension
 	  manager (from scripts/python):
-	    - Extension to be used now must be explicitly requested via 
+	    - Extension to be used now must be explicitly requested via
 	      Init<ext>() (e.g. InitGL_ARB_multitexture())
 	    - Only check once for every extension
 	    - Emit names of functions not found
@@ -85,9 +92,9 @@ The history order is reversed so that new features are at the top.
 	- res changed the OpenGL canvases to use the extension manager (to ease
 	  use of OpenGL extensions)
 	- res moved the imaging subset functions in the XML GL extensions list
-	  over to ARB_imaging. Although the subset is part of the OpenGL 1.2 spec,
-	  it states that it might not be supported by implementations. It is 
-	  indeed not supported by the ATI Catalyst drivers, causing the 
+	  over to ARB_imaging.  Although the subset is part of the OpenGL 1.2
+	  spec, it states that it might not be supported by implementations.
+	  It is indeed not supported by the ATI Catalyst drivers, causing the
 	  GL_version_1_2 pseudo-extension to fail initialization.
 	- Duhprey (and also Dentoid) did the following (new renderer only):
 	    - Changed sector so the engine is now responsible for coordinating
@@ -241,8 +248,8 @@ The history order is reversed so that new features are at the top.
 	  iReporter->GetMessageIterator().
 	- Removed the loaderthread.h header again. This is going to be done
 	  differently.
-	- res added a facility to thje glwin32 canvas to check whether 
-	  hardware acceleration is present. Usage is: PerformExtension 
+	- res added a facility to thje glwin32 canvas to check whether
+	  hardware acceleration is present. Usage is: PerformExtension
 	    ("hardware_accelerated", &hasAccel) where hasAccel is a bool.
 	- res fixed some flawed doxygen comments, removed all doxygen-specific
 	  files from docs/support and changed docs/docs.mak to utilize the
@@ -398,7 +405,7 @@ The history order is reversed so that new features are at the top.
 	  breaking existing code.
 	- Rhad altered the rapid triangle collision test to ignore
 	  degenerate triangles.
-	    - Added a couple tests for degenerate tris that should 
+	    - Added a couple tests for degenerate tris that should
 	      be very fast. A degenerate tri in a test never collides.
 	- Bart Boatwright added csApplicationFramework class.
 	- Rhad fixed csList so that it functions to at least a greater
@@ -409,7 +416,7 @@ The history order is reversed so that new features are at the top.
 	      Iterator::HasCurrent() instead which returns true if the
 	      iterator currently points to a valid element.
 	    - csList::Delete(Iterator it) has been changed to progress
-	      the iterator forward or backward (depending on how the 
+	      the iterator forward or backward (depending on how the
 	      iterator was created) prior to deleting the element data
 	      that the iterator operates on.  Existing code should require
 	      no change since calling this function caused the iterator to
@@ -585,7 +592,7 @@ The history order is reversed so that new features are at the top.
 	- Added note about the new InitializeCollisionWrapper() function
 	  in the collision detection howto.
 	- res changed mk/jam/win32.jam to manually create a .def file
-	  for plugins to get rid of that "dllwrap.exe: no export definition 
+	  for plugins to get rid of that "dllwrap.exe: no export definition
 	  file provided" message. Also fixed missing deletion of some
 	  tempoary files.
 	- Matze added a workaround to the configure scripts which collapses
@@ -644,15 +651,15 @@ The history order is reversed so that new features are at the top.
 	  for buggy OpenAL implementations (a windows openal32.dll dated
 	  9/2/2002 specifically).
 	- Rhad added frequency adjustment capabilities to the software
-	  sound renderer.  These changes only take effect if 
-	  SetFrequencyFactor() is called with a value >0.0 and !=1.0.  
+	  sound renderer.  These changes only take effect if
+	  SetFrequencyFactor() is called with a value >0.0 and !=1.0.
 	- Philip Wyett fixed clean of 'CS' root dir for 'jam distclean'
 	  after recent configure merge/changes.
 	    - Eliminated DO_ASM redefinition in jam build.
 	- Matze changed autoconf script to use ?= instead of = in Jamconfig.
 	  This allows to override values on the jam commandline.
 	  (Example: jam -sMODE=optimize)
-	- res modified csendian.h the 3rd time to utilize CONST_INT64(). 
+	- res modified csendian.h the 3rd time to utilize CONST_INT64().
 	  The configure-time int64 test did the trick.
 11-Apr-2003
 	- Fixed a problem with portals in combination with <hardmove>
@@ -684,9 +691,9 @@ The history order is reversed so that new features are at the top.
 	  reset all replaced materials to default (i.e. use from factory).
 	- Philip Wyett fixed glut detection in Jam configure process.
 	- Wouter Wijngaards fixed a problem with the software sound
-	  renderer, where it would malfunction if multiple sounds caused 
-	  the maximum volume for samples to be exceeded. The results are 
-	  clamped, both in 16 and 8 bit mode. The speed decrease is 
+	  renderer, where it would malfunction if multiple sounds caused
+	  the maximum volume for samples to be exceeded. The results are
+	  clamped, both in 16 and 8 bit mode. The speed decrease is
 	  negligible.
 	- Added new csColliderHelper class with static methods to help
 	  implement some common collision detection functions. Currently
@@ -773,7 +780,7 @@ The history order is reversed so that new features are at the top.
 	- Reverted endian changes from res again because they cause a
 	  compile error with mingw/msys.
 	- res augmented the configure process to check for a working INT64_C
-	  macro in <stdint.h>. It seems that it's broken on some GCC/stdint.h 
+	  macro in <stdint.h>. It seems that it's broken on some GCC/stdint.h
 	  combos. If such is detected, stdint.h is treated as 'not  present'.
 	- Renamed PolyMeshHelper class in bezier mesh plugin so that it
 	  doesn't conflict with PolyMeshHelper in thing plugin when doing
@@ -817,12 +824,12 @@ The history order is reversed so that new features are at the top.
 	- Fixed csArray assignment operator so that it returns a ref to the
 	  caller and also is safe when doing 'a=a'.
 	- Added csPolyIndexed assignment operator.
-	- res changed csendian.h to utilize CONST_INT64() again. The missing 
+	- res changed csendian.h to utilize CONST_INT64() again. The missing
 	  identifiers are fixed with a #define __STDC_LIMIT_MACROS in cstypes.h
 	  prior to the inclusion of <stdint.h>.
 8-Apr-2003
         - Boyan fixed error in lightning plugin.
-	- Anders Stenberg fixed two cases where WaitForSingleObject used a 
+	- Anders Stenberg fixed two cases where WaitForSingleObject used a
 	  timeout value of 1ms, although 0ms is a valid argument and causes
 	  it to return directly (which was intended)
 	- Bart Boatwright (tulebast).
@@ -854,13 +861,13 @@ The history order is reversed so that new features are at the top.
 	    - Fixed a problem with compiling outside source directory when the
 	      sources had already been configured and contained a
 	      include/volatile.h
-	- res added a check to -plugin cmd line switch handler for 
-	  the plugin specified being registered in the class registry. 
-	  If not, 'crystalspace.utilities.' is added to the beginning of 
-	  plugin name. This makes it possible for lazy people to just 
+	- res added a check to -plugin cmd line switch handler for
+	  the plugin specified being registered in the class registry.
+	  If not, 'crystalspace.utilities.' is added to the beginning of
+	  plugin name. This makes it possible for lazy people to just
 	  specify e.g. '-plugin=bugplug'.
 	- res added a shadow debugging aid for the new renderer to bugplug;
-	  the shadow extruder shader is swapped at runtime with a version 
+	  the shadow extruder shader is swapped at runtime with a version
 	  where the volume more visible.
 7-Apr-2003
         - Rhad changed MSVC specific CopyMemory to memcpy() in OpenAL
@@ -905,8 +912,8 @@ The history order is reversed so that new features are at the top.
           Read the source if interested, too many changes to list here.
         - Rhad improved the OpenAL sound renderer.
           Major overhaul of implementation.
-          A background thread is now used to support streaming audio 
-          data. 
+          A background thread is now used to support streaming audio
+          data.
           Read the source if interested, too many changes to list here.
 	- Rhad fixed some issues with oggdata.cpp.
           Initialize() member function now handles channels and frequency
@@ -914,7 +921,7 @@ The history order is reversed so that new features are at the top.
           ReadStreamed() member function now conforms to iSoundData specs
           and only returns less than the requested number of samples if
           end of stream is reached.
-        - Rhad removed double include protection from 
+        - Rhad removed double include protection from
           /include/ivideo/effects/effectstrings.h since that file needs to
           be included twice in a row with macro redefinitions to work
           correctly.  Fixes rendering errors with OpenGL using certain
@@ -984,15 +991,15 @@ The history order is reversed so that new features are at the top.
 	- Matze reverted the namespace stuff as this is creating unexpected
 	  problems when the user declares classes and structs ahead of their
 	  real declaration.
-	- res modified the common GL canvas code to only allocate the 
-	  screenshot buffer the first time a screenshot is requested and not 
+	- res modified the common GL canvas code to only allocate the
+	  screenshot buffer the first time a screenshot is requested and not
 	  allocate/deallocate it everytime.
 	- res made the following changes to the movie recorder:
 	    - Fake clock ticks are stored as float internally to reduce round
 	      off errors.
 	    - The tick count doesn't "jump" any more when the fake clock is
 	      activated/deactivated.
-	    - Waiting when frames can be rendered faster than the movie FPS 
+	    - Waiting when frames can be rendered faster than the movie FPS
 	      rate requires can now be activated/deactivated via config.
 	- res #ifdef'd out #warnings. MSVC doesn't like them.
 2-Apr-2003
@@ -1012,7 +1019,7 @@ The history order is reversed so that new features are at the top.
 	  System.Plugins.iDocumentSystem = crystalspace.documentsystem.xmlread
 	  Walktest already has this line now.
 	- Optimized memory usage in the new 'xmlread' plugin.
-	- res added CONST_I64() and CONST_UI64() macros to cstypes.h for 
+	- res added CONST_I64() and CONST_UI64() macros to cstypes.h for
 	  specifying 64bit constants on all platforms.
 	- Changed csloader plugin to use iFile instead of iDataBuffer for
 	  reading. The reason is that the new 'xmlread' plugin can save
@@ -1023,7 +1030,7 @@ The history order is reversed so that new features are at the top.
 	- Matze removed some unused/rarely used function from util.h
 	- Matze added some namespaces in util.h for testing
 	- res made the following changes to the newly arrived movie recorder:
-	    - use of CS types (uint8 etc.) instead of custom typedefs 
+	    - use of CS types (uint8 etc.) instead of custom typedefs
 	    - use of 64bit portability macros and some other fixes to make it
 	      compile on MSVC.
 	    - added mmx.h from original NuppelVideo sources.
@@ -1045,7 +1052,7 @@ The history order is reversed so that new features are at the top.
 	- res fixed mismatching de-/allocation of CDATA nodes in TinyXML
 	  (block allocator vs. new).
 	- res made following changes to render3d:
-	    - Moved some features of the old texture manager over, namely: 
+	    - Moved some features of the old texture manager over, namely:
 	      mipmap sharpening, texture downsampling, anisotropic filtering,
 	      use of prerendered mipmaps.
 	    - Texture LOD bias can be set via cfgvar
@@ -1079,7 +1086,7 @@ The history order is reversed so that new features are at the top.
 	    - Partly rewritten & much improved binary document system.
 	    - Modified document systems makefiles according to latest
 	      bugplug.mak changes.
-	    - added iDocument::Changeable() which returns whether a 
+	    - added iDocument::Changeable() which returns whether a
 	      can be changed or not.
 	    - added the document system makefiles to user.mak.
 	- res fixed a NULL pointer access under circumstances in binary DS.
@@ -1106,12 +1113,12 @@ The history order is reversed so that new features are at the top.
 	      or crashes, email your .ma and your command line you tried
   	      to keith@paqrat.com and I will try to fix your problems.
 	- Changed iPortal->SetMirror() to accept a plane instead of a polygon.
-  	- res worked around a problem in csutil/array.h caused by the 
+  	- res worked around a problem in csutil/array.h caused by the
   	  redefinition of 'new' when memory debugging is enabled.
   	- res made the following changes to levtool:
   	    - reformatted command line help
   	    - leaks fixed
-        - Andrew Craig removed <conio.h> from the maya2spr tool since it 
+        - Andrew Craig removed <conio.h> from the maya2spr tool since it
           is not a cross platform include.
 29-Mar-2003
 	- Oktal added double2longlong and longlong2double functions to
@@ -1409,7 +1416,7 @@ The history order is reversed so that new features are at the top.
 	    - map2cs used to write sky info twice if there was only the default
 	      sector.
 	- res fixed csTinyXmlAttributeIterator which caused an error when the
-	  attribute count was 0. 
+	  attribute count was 0.
 14-Mar-2003
 	- Eric Sunshine corrected spelling mistake in Doxygen comment for
 	  iMovable which was noted by <shri@vitalstate.co.uk>.
@@ -1444,7 +1451,7 @@ The history order is reversed so that new features are at the top.
 	    * changed levtool to just write from input to output docsys if one
 	      of those and no other operation is specified.
 	    * levtool reports times for some actions.
-	    * levtool used to make backups even on operations which did not 
+	    * levtool used to make backups even on operations which did not
 	      modify a world.
 	    * added a simple TinyXML wrapping document system plugin.
 	    * added a binary document system plugin.
@@ -1594,7 +1601,7 @@ The history order is reversed so that new features are at the top.
 	  volatile.h.  This macro is only needed when building the zlib.dll
 	  itself, thus it was superfluous for volatile.h to define it.
 	- res made the following changes to map2cs:
-	  * Fixed: output of things w/o polys 
+	  * Fixed: output of things w/o polys
 	  * Hopefully fixed texture alignment/rotation this time.
 	- res fixed the GL renderer so polys w/ keycolor textures are lit
 	  properly again
@@ -1650,7 +1657,7 @@ The history order is reversed so that new features are at the top.
 	    * A sky portal can now be created by assigning the "sky" texture
 	      to a brush face.
 	    * Less <part>s, more <meshobj>s are written.
-	    * Can now be instructed to specify dynavis as the culler (through 
+	    * Can now be instructed to specify dynavis as the culler (through
 	      Hammer)
 	    * Lighmap cell size can now also be specified in the map file.
 	    * Various other small tweaks.
@@ -1711,8 +1718,8 @@ The history order is reversed so that new features are at the top.
 	    * converted HalfLife textures are written out as PNG instead of BMP
 	- res changed csImageMemory so it isn't limited to truecolor images only
 4-Mar-2003
-        - Andrew Craig fixed coordshow text drawing in walktest.  If you had 
-          a long sector name it was often cut off.  
+        - Andrew Craig fixed coordshow text drawing in walktest.  If you had
+          a long sector name it was often cut off.
 	- Fixed a bug in the OpenGL canvas text drawer where the
 	  state of GL_TEXTURE_COORD_ARRAY was not properly queried.
 	- Fixed another mixup in the OpenGL canvas text drawer where
@@ -1802,15 +1809,15 @@ The history order is reversed so that new features are at the top.
 	      Right now these are the name of the keybinding file and some
 	      screen capture options.
 	    * Slightly changed appearance of the "Press key" box
-	- res fixed a bug in stdrep where format qualifiers contained in 
-	  messages output via console or nativewm where errorneously 
+	- res fixed a bug in stdrep where format qualifiers contained in
+	  messages output via console or nativewm where errorneously
 	  expanded.
 	- res changed the bugplug makefile to be in the same style as the
 	  ISO plugin after ES' recent changes.
 2-Mar-2003
-        - Rudolf Potucek updated makefiles in the apps/ directory to 
-	  remove vpath and generate object files in individual 
-	  subdirectories of $(OUT). This should allow identical 
+        - Rudolf Potucek updated makefiles in the apps/ directory to
+	  remove vpath and generate object files in individual
+	  subdirectories of $(OUT). This should allow identical
 	  filenames to coexist in different directories of the
 	  build tree. Also added a rule to remove the console output
 	  *.txt files generated on the windows platform. There may be an
@@ -1826,7 +1833,7 @@ The history order is reversed so that new features are at the top.
 	  support the necessary CS interfaces for loading extensions and being
 	  recognized as the correct SCF type.
 	- Philip Wyett added OpenAL plugin to MSVC build process. He also
-	  updated msvc_libs and the links too msvc_libs in the docs. 
+	  updated msvc_libs and the links too msvc_libs in the docs.
 	- Eric Sunshine committed the CS/scripts/worldcraft/crystal.fgd
 	  submission from Leandro Ezequiel Lovisolo <lovisolo@datafull.com>.
 	- Eric Sunshine fixed a memory leak in csGetPluginPaths() for MacOS/X.
@@ -1852,7 +1859,7 @@ The history order is reversed so that new features are at the top.
 	  and instead left the old value ("no") in place.
 	- De-obfuscated a loop in csHashMap::Delete().
 	- res made the following changes to the Win32 port:
-	  * csGetInstallPath() now always returns a path without trailing 
+	  * csGetInstallPath() now always returns a path without trailing
 	    delimiter.
 	  * all plugin directories are added to the PATH env var on startup.
 	  * the install path is cached between calls to csGetInstallPath().
@@ -1878,7 +1885,7 @@ The history order is reversed so that new features are at the top.
 	    - Improved the routine which calculate the influence-radius for
 	      lights.
 	    - Fixed a bug in the loading of <casthardwareshadow> tag.
-	    - Improved the csGLRender3D::ActivateTexture and 
+	    - Improved the csGLRender3D::ActivateTexture and
 	      csGLRender3D::DeactivateTexture methods.
 	    - Reverted Duhpreys changes to genmesh as they don't work.
 	- Marten Svanfeldt fixed a bug in glshader_mtex which made a shader
@@ -1926,7 +1933,7 @@ The history order is reversed so that new features are at the top.
 	- Daniel Duhprey updated genmesh with the UpdateLighting cache
 27-Feb-2003
 	- res fixed the "shifted alpha map" bug in the software renderer.
-	- Marten Svanfeldt once again fiddled with the light/shadow culling. 
+	- Marten Svanfeldt once again fiddled with the light/shadow culling.
 	  Still it isn't failsaife though, but works in most cases.
 	- Added iVisibilityCuller::VisTest() version which takes a set of
 	  planes and returns all objects that are (partially) inside the
@@ -2005,7 +2012,7 @@ The history order is reversed so that new features are at the top.
 	- Matze fixed socket problems on cygwin where winsock.h redefines
 	  fdset. You can define __USE_W32_SOCKETS before including any headers
 	  to avoid this problem.
-	- Anders Stenberg made the following changes related to the new 
+	- Anders Stenberg made the following changes related to the new
 	  renderer.
 	    - Fixed a bug in mtex plugin causing crashes at shutdown
 	    - Fixed an erroneous buffer release in the renderer causing VAR
@@ -2014,7 +2021,7 @@ The history order is reversed so that new features are at the top.
 	    - Made the windows GL canvas force alpha in framebuffer when using
 	      new renderer. Probably something similar needs to be done in
 	      other canvases.
-	    - Fixed some errors in shader loading. Shaders wasn't prepared 
+	    - Fixed some errors in shader loading. Shaders wasn't prepared
 	      correctly.
 	    - Added possibility to override blendmode per shader pass, and a new
 	      blendmode in new renderer. (DESTALPHAADD)

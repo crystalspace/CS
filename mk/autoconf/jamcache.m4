@@ -35,4 +35,5 @@ AC_DEFUN([CS_JAMCONFIG_PREPEND],
 AC_DEFUN([CS_JAMCONFIG_PROPERTY],
     [CS_JAMCONFIG_APPEND([$1 m4_ifval([$3], [+=], [?=]) \"$2\" ;
 ])])
-AC_DEFUN([CS_JAMCONFIG_OUTPUT],[CS_TEXT_CACHE_OUTPUT([cs_jamconfig_text], [$1])])
+AC_DEFUN([CS_JAMCONFIG_OUTPUT],
+    [CS_TEXT_CACHE_OUTPUT([cs_jamconfig_text], [$1])])
