@@ -637,7 +637,18 @@ PREDEFINED             = "CS_GNUC_PRINTF(a,b)=" \
 # The macro definition that is found in the sources will be used. 
 # Use the PREDEFINED tag if you want to use a different macro definition. 
 
-EXPAND_AS_DEFINED      = 
+EXPAND_AS_DEFINED      =  STR_APPEND		\
+			  STR_REPLACE		\
+			  STR_FORMAT		\
+			  STR_FORMAT_INT	\
+			  STR_FORMAT_FLOAT	\
+			  STR_PADLEFT		\
+			  STR_PADRIGHT		\
+			  STR_PADCENTER		\
+			  STR_ASSIGN		\
+			  STR_SHIFT		\
+			  STR_OP_APPEND
+
 
 #---------------------------------------------------------------------------
 # Configuration::addtions related to external references   
