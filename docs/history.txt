@@ -15,6 +15,10 @@ chronological order.
 	- Jorrit fixed iso engine for latest light and material changes.
 	- Jorrit and res2k fixed data/shader/vertexlight.avp so that it now
 	  compiles on at least one additional OpenGL implementation.
+	- Jorrit added some extra debug code (number of rendered meshes)
+	  to glrender3d.
+	- Jorrit added stenciltest level to CVS. This is for the new
+	  renderer.
 3-Sep-2003
 	- Peter Amstutz changed nullmesh to properly initialize it's
 	  bounding box to a legal (albeit extremely small) value.

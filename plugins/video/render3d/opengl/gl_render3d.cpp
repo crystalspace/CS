@@ -1505,14 +1505,19 @@ void csGLGraphics3D::DrawMesh(csRenderMesh* mymesh)
     SetMixMode (mymesh->mixmode);
 
     if (bugplug)
-      bugplug->AddCounter ("Triangle Count", (mymesh->indexend-mymesh->indexstart)/3);
+    {
+      int num_tri = (mymesh->indexend-mymesh->indexstart)/3;
+      bugplug->AddCounter ("Triangle Count", num_tri);
+      bugplug->AddCounter ("Mesh Count", 1);
+    }
 
     glColor4f (1, 1, 1, 1);
     glDrawElements (
       primitivetype,
       mymesh->indexend - mymesh->indexstart,
       indexbuf->compGLType,
-      ((uint8*)bufData) + (indexbuf->compcount * indexbuf->compSize * mymesh->indexstart));
+      ((uint8*)bufData) +
+      	(indexbuf->compcount * indexbuf->compSize * mymesh->indexstart));
 
     indexbuf->Release();
   }
