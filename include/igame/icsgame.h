@@ -1,6 +1,6 @@
 /*
     Crystal Space Gaming Library
-    Copyright (C) 2000 by Thomas Hieber
+    Copyright (C) 2001 by Thomas Hieber
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -35,7 +35,7 @@ struct iAttributeArray;
 struct iAttributeList;
 struct iAttributeIterator;
 struct iCollider;
-struct iDataLoader;
+struct iDataContext;
 struct iDataSaver; 
 struct iSector;
 
@@ -475,7 +475,7 @@ struct iEntityClass : public iBase
    * file. Normally all information needed to define this class should 
    * be contained there. For all missing data we will use defaults.
    */
-  virtual void ReadDefinition(iDataLoader* pDefinition) = 0;
+  virtual void ReadDefinition(iDataContext* pDefinition) = 0;
 };
 
 //---------------------------------------------------------------------------
@@ -617,35 +617,72 @@ struct iColliderSelector : public iBase
    * will be described later. (And will of course be specific for any class
    * that implements this selector.)
    */
-  virtual void LoadDefinition(iDataLoader* pLoader) = 0;
+  virtual void LoadDefinition(iDataContext* pLoader) = 0;
 };
 
 
 //---------------------------------------------------------------------------
 
-SCF_VERSION (iDataLoader, 0, 1, 0);
+SCF_VERSION (iDataContext, 0, 1, 0);
 
 /**
  * A Data Loader allows entites to structured data. Where the data
  * comes from, is not important for this interface.
  */
-struct iDataLoader : public iBase
+struct iDataContext : public iBase
 {
   /**
    * return the name of the current context
    */
   virtual const char* GetName() = 0;
 
+  /// Set the name of the Context
+  virtual void SetName(const char* Name) = 0;
+
   /**
    * return the data of the current context
    */
   virtual const char* GetData() = 0;
 
+  /// Set the data of the Context
+  virtual void SetData(const char* Data) = 0;
+
   /**
    * Gets a specific contained Data Context. This function returns 
    * NULL, if the given context does not exist.
    */
-  virtual iDataLoader* GetContext(const char* Context) = 0;
+  virtual iDataContext* GetContext(const char* Context) = 0;
+
+  /**
+   * Get the parent context of this context, or NULL if this is
+   * the top level context
+   */
+  virtual iDataContext* GetParent() = 0;
+
+  /**
+   * Add the given context to this context. The name of the context
+   * must already be set, any may not be changed after adding it.
+   */
+  virtual void AddContext(iDataContext* pContext) = 0;
+
+  /**
+   * Removes the given context from this context. The context to be 
+   * removed will only be deleted if it reference count goes down to
+   * zero, otherwise, it is just no longer part of this context
+   * returns false, if the given context doesn't exist.
+   */
+  virtual bool RemoveContext(const char* Context) = 0;
+  
+  /**
+   * Add the given Attribute with the given value to the context
+   */
+  virtual void AddAttribute(const char* Key, const char* Value) = 0;
+
+  /**
+   * Removes the given attribute from this context. returns false,
+   * if the given Attribute did not exist
+   */
+  virtual bool DeleteAttribute(const char* Key) = 0;
   
   /**
    * Gets the value of the Element with the given name
@@ -661,13 +698,13 @@ struct iDataLoader : public iBase
    * Gets the name of the first context in the current context, or NULL 
    * if there is no Context at all
    */
-  virtual iDataLoader* GetFirstContext(geMAPITERATOR& iter) = 0;
+  virtual iDataContext* GetFirstContext(geMAPITERATOR& iter) = 0;
 
   /**
    * Gets the name of the next context in the current context, or NULL 
    * if there is no further Context.
    */
-  virtual iDataLoader* GetNextContext(geMAPITERATOR& iter) = 0;
+  virtual iDataContext* GetNextContext(geMAPITERATOR& iter) = 0;
 
   /**
    * Gets the name and value of the first attribute in the current context, 
@@ -689,26 +726,30 @@ struct iDataLoader : public iBase
 
 //---------------------------------------------------------------------------
 
-SCF_VERSION (iDataLoaderFile, 0, 1, 0);
+SCF_VERSION (iDataContextFile, 0, 1, 0);
 
 /**
- * A Data Loader File ins an interface, that allows you to read structured 
+ * A Data Loader File is an interface, that allows you to read structured 
  * Data from a file. 
- * Normally this is an additional interface of a class that supports the
- * iDataFile interface.
  */
-struct iDataLoaderFile : public iBase
+struct iDataContextFile : public iBase
 {
   /**
    * Opens a Data File. The file is read completely and is being closed again.
    * After a call to Read(), you can read the contained data by using the
-   * iDataLoader interface. The function will return false, if something
+   * iDataContext interface. The function will return NULL, if something
    * went wrong loading the file.
    */
-  virtual bool Read(iVFS* pVFS, const char* filename) = 0;
+  virtual iDataContext* Read(iVFS*       pVFS, 
+                             const char* filename) = 0;
 
-  /// Get the root context of the file.
-  virtual iDataLoader* GetContext() = 0;
+  /**
+   * Write the contained Data to a file. returns false, if some error 
+   * occurs.
+   */
+  virtual bool Write(iVFS*         pVFS, 
+                     const char*   filename, 
+                     iDataContext* pContext) = 0;
 };
 
 //---------------------------------------------------------------------------
@@ -857,7 +898,7 @@ struct iGameCore : public iPlugIn
    * It is assumed that the caller has already set the proper 
    * context for loading, by using pLoader->OpenContext()
    */
-  virtual void RegisterSprite3DModel(iDataLoader* pLoader);
+  virtual void RegisterSprite3DModel(iDataContext* pLoader);
 
   /**
    * Starts moving an entity to a new position and automatically stops the
@@ -962,7 +1003,7 @@ struct iGameCore : public iPlugIn
    * has already set the proper context for loading, by using 
    * pLoader->OpenContext()
    */
-  virtual iEntity* LoadEntity(iDataLoader* pLoader) = 0;
+  virtual iEntity* LoadEntity(iDataContext* pLoader) = 0;
 
 #endif 
 };
