@@ -183,7 +183,7 @@ csString &csString::Append (const char *iStr, size_t iCount)
 
 void csString::SubString (csString& sub, size_t x, size_t len)
 {
-  int y = x + len;
+  size_t y = x + len;
 
   if (x < 0 || x >= Size || y < 0 || y > Size || y <= x) 
   {

@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+10-Jun-2003
+        - Philip Wyett eliminated signed/unsigned mismatch warning in
+          function csString::SubString ().
 9-Jun-2003
 	- Jorrit made a new csStringArray class.
 	- res made the following changes:
