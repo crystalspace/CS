@@ -67,7 +67,7 @@ csoggclean:
 
 ifdef DO_DEPEND
 dep: $(OUTOS)sndogg.dep
-$(OUTOS)sndcsogg.dep: $(SRC.CSOGG)
+$(OUTOS)sndogg.dep: $(SRC.CSOGG)
 	$(DO.DEP)
 else
 -include $(OUTOS)sndogg.dep
