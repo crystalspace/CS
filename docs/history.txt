@@ -4,6 +4,18 @@ The history order has been reversed so that new features are at the top.
 	- Let csShadowIterator implement iShadowIterator.
 	- Let csShadowBlock implement iShadowBlock.
 	- Let csShadowBlockList implement iShadowBlockList.
+	- Philip Wyett fixed on exit errors under VC6 builds/Windows for
+	  demosky. Removed cleanup function from app and moved
+	  delete System; to apps destructor.
+	- Wouter Wijngaards fixed a bug in the procedural sky - when you
+	  stopped animation, different polygons could be out of synch.
+	  Now all skytextures of a procedural sky are set to a forced
+	  rerender for the next time they become visible.
+	- Wouter also got animated sky to work correctly.
+	  SetAnimated(false, ...) now takes a *lot* of time. (like a second
+	  or so). But during this time all sky textures are brought
+	  up to date. This makes the sky look seamless, and you are
+	  guaranteed no more slowdowns.
 14-Mar-2001
 	- Fixed a bug in csRenderView. IncRef() should be DecRef(). Thanks
 	  to Norman Kramer for spotting this.
