@@ -61,6 +61,12 @@ extern csPaletteExport cswsPalette[];
 #define CSPAL_SCROLLBAR			10
 /// Notebook palette index
 #define CSPAL_NOTEBOOK			11
+/// GridCell palette index
+#define CSPAL_GRIDCELL			12
+/// GridView palette index
+#define CSPAL_GRIDVIEW  		13
+/// Slider palette index
+#define CSPAL_SLIDER		        14
 
 /**
  * csApp class color palette indices.<p>
@@ -295,5 +301,33 @@ extern csPaletteExport cswsPalette[];
 #define CSPAL_NOTEBOOK_2DARK3D		14
 /// 3D border middle light
 #define CSPAL_NOTEBOOK_2LIGHT3D		15
+
+/**
+ * csGridCell class color palete indices.<p>
+ */
+#define CSPAL_GRIDCELL_BACKGROUND	0
+#define CSPAL_GRIDCELL_BORDER_FG	1
+#define CSPAL_GRIDCELL_BORDER_BG	2
+#define CSPAL_GRIDCELL_SEL_BACKGROUND	3
+#define CSPAL_GRIDCELL_SEL_BORDER_FG	4
+#define CSPAL_GRIDCELL_SEL_BORDER_BG	5
+#define CSPAL_GRIDCELL_DATA_FG	        6
+#define CSPAL_GRIDCELL_DATA_BG	        7
+
+/**
+ * csGridView class color palete indices.<p>
+ */
+#define CSPAL_GRIDVIEW_BACKGROUND	0
+/// 3D border dark
+#define CSPAL_GRIDVIEW_DARK3D	1
+/// 3D border light
+#define CSPAL_GRIDVIEW_LIGHT3D	2
+
+/**
+ * csSlider class color palete indices.<p>
+ */
+#define CSPAL_SLIDER_BACKGROUND	0
+#define CSPAL_SLIDER_FILL	CSPAL_SLIDER_BACKGROUND
+#define CSPAL_SLIDER_ACTIVE_FILL	1
 
 #endif // __CSWSPAL_H__

@@ -173,8 +173,9 @@ public:
   int GetMenuHeight ()
   { return MenuHeight; }
 
-  /// Transform client window size into window size
+  /// Transform client window size into window size and back
   void ClientToWindow (int &ClientW, int &ClientH);
+  void WindowToClient (int &ClientW, int &ClientH);
 
 protected:
   /// Set button bitmaps to one of those read from csws.cfg

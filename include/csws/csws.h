@@ -48,6 +48,8 @@
  *        |    +--[ csSpinBox ]		// spin box control
  *        +--[ csListBox ]		// list box control
  *        +--[ csNotebook ]		// notebook control
+ *        +--[ csGrid ]			// grid control
+ *        +--[ csSlider ]		// slider control
  * </pre>
  */
 
@@ -106,6 +108,8 @@ class csApp;
 #include "csmenu.h"			// Menu class
 #include "cslistbx.h"			// List box class
 #include "csnotebk.h"			// Notebook class
+#include "csgrid.h"			// Grid class
+#include "csslider.h"			// Slider class
 #include "csdialog.h"			// User dialogs
 #include "cswindow.h"			// Window class
 #include "cswstex.h"			// Windowing System textures
