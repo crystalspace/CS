@@ -1112,7 +1112,13 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
 
 bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
 {
-  if (!Engine) return false;
+  if (!Engine)
+  {
+    SyntaxService->ReportError (
+		"crystalspace.maploader.parse",
+		node, "The engine plugin is missing!");
+    return false;
+  }
 
   // Will be set to true if we find a <shader> section.
   bool shader_given = false;

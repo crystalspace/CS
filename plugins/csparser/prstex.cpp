@@ -78,7 +78,13 @@ bool csLoader::ParseMaterialList (iLoaderContext* ldr_context,
 bool csLoader::ParseTextureList (iLoaderContext* ldr_context,
 	iDocumentNode* node)
 {
-  if (!Engine || !ImageLoader) return false;
+  if (!ImageLoader)
+  {
+    SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.textures",
+	      node, "Image loader is missing!");
+    return false;
+  }
   static bool proctex_deprecated_warned = false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
