@@ -224,7 +224,7 @@
 		//! Computes square magnitude
 		inline_	float			SquareMagnitude()	const		{ return x*x + y*y + z*z;												}
 		//! Computes magnitude
-		inline_	float			Magnitude()			const		{ return sqrtf(x*x + y*y + z*z);										}
+		inline_	float			Magnitude()			const		{ return sqrt(x*x + y*y + z*z);										}
 		//! Computes volume
 		inline_	float			Volume()			const		{ return x * y * z;														}
 
@@ -263,7 +263,7 @@
 									float M = x*x + y*y + z*z;
 									if(M)
 									{
-										M = 1.0f / sqrtf(M);
+										M = 1.0f / sqrt(M);
 										x *= M;
 										y *= M;
 										z *= M;
@@ -284,7 +284,7 @@
 		//! Computes distance to another point
 		inline_	float			Distance(const Point& b)			const
 								{
-									return sqrtf((x - b.x)*(x - b.x) + (y - b.y)*(y - b.y) + (z - b.z)*(z - b.z));
+									return sqrt((x - b.x)*(x - b.x) + (y - b.y)*(y - b.y) + (z - b.z)*(z - b.z));
 								}
 
 		//! Computes square distance to another point

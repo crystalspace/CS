@@ -93,7 +93,7 @@ Point& Point::Unfold(Plane& p, Point& a, Point& b)
 
 	// Compute rotation angle
 	float CosAngle = p.n|TriPlane.n;
-	float Angle = acosf(CosAngle);
+	float Angle = acos(CosAngle);
 	if(FastFabs(Angle)<0.0001f)	return *this;	// Point is already on plane // ## project
 
 	// Rotate around (a,b)

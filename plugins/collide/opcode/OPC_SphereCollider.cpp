@@ -198,7 +198,7 @@ BOOL SphereCollider::InitQuery(SphereCache& cache, const Sphere& sphere, const M
 		else
 		{
 			// We're interested in all contacts =>test the new real sphere N(ew) against the previous fat sphere P(revious):
-			float r = sqrtf(cache.FatRadius2) - sphere.mRadius;
+			float r = sqrt(cache.FatRadius2) - sphere.mRadius;
 			if(cache.Center.SquareDistance(mCenter) < r*r)
 			{
 				// - if N is included in P, return previous list

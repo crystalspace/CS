@@ -246,11 +246,11 @@
 				Matrix3x3&		FromTo(const Point& from, const Point& to);
 
 		//! Set a rotation matrix around the X axis.
-				void			RotX(float angle)	{ float Cos = cosf(angle), Sin = sinf(angle); Identity(); m[1][1] = m[2][2] = Cos; m[2][1] = -Sin;	m[1][2] = Sin;	}
+				void			RotX(float angle)	{ float Cos = cos(angle), Sin = sin(angle); Identity(); m[1][1] = m[2][2] = Cos; m[2][1] = -Sin;	m[1][2] = Sin;	}
 		//! Set a rotation matrix around the Y axis.
-				void			RotY(float angle)	{ float Cos = cosf(angle), Sin = sinf(angle); Identity(); m[0][0] = m[2][2] = Cos; m[2][0] = Sin;	m[0][2] = -Sin;	}
+				void			RotY(float angle)	{ float Cos = cos(angle), Sin = sin(angle); Identity(); m[0][0] = m[2][2] = Cos; m[2][0] = Sin;	m[0][2] = -Sin;	}
 		//! Set a rotation matrix around the Z axis.
-				void			RotZ(float angle)	{ float Cos = cosf(angle), Sin = sinf(angle); Identity(); m[0][0] = m[1][1] = Cos; m[1][0] = -Sin;	m[0][1] = Sin;	}
+				void			RotZ(float angle)	{ float Cos = cos(angle), Sin = sin(angle); Identity(); m[0][0] = m[1][1] = Cos; m[1][0] = -Sin;	m[0][1] = Sin;	}
 
 		//! Make a rotation matrix about an arbitrary angle
 				Matrix3x3&		Rot(float angle, const Point& axis);

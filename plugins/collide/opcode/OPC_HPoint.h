@@ -62,7 +62,7 @@
 		//! Computes square magnitude
 		inline_	float		SquareMagnitude()					const		{ return x*x + y*y + z*z + w*w;											}
 		//! Computes magnitude
-		inline_	float		Magnitude()							const		{ return sqrtf(x*x + y*y + z*z + w*w);									}
+		inline_	float		Magnitude()							const		{ return sqrt(x*x + y*y + z*z + w*w);									}
 
 		//! Normalize the vector
 		inline_	HPoint&		Normalize()

@@ -4,7 +4,7 @@ DESCRIPTION.opcode = OPCODE collision detection plug-in
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make opcode        Make the $(DESCRIPTION.opcode)$"
+  $(NEWLINE)echo $"  make opcode       Make the $(DESCRIPTION.opcode)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
@@ -13,9 +13,9 @@ ifeq ($(MAKESECTION),roottargets)
 .PHONY: opcode opcodeclean
 plugins all: opcode
 
-rapidclean:
+opcodeclean:
 	$(MAKE_CLEAN)
-rapid:
+opcode:
 	$(MAKE_TARGET) MAKE_DLL=yes
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -25,7 +25,7 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/collide/opcode
 
 ifeq ($(USE_PLUGINS),yes)
-  OPCODE = $(OUTDLL)/rapid$(DLL)
+  OPCODE = $(OUTDLL)/opcode$(DLL)
   LIB.OPCODE = $(foreach d,$(DEP.OPCODE),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(OPCODE)
 else

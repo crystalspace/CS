@@ -254,7 +254,7 @@ Matrix4x4& Matrix4x4::Rot(float angle, Point& p1, Point& p2)
 
 	Matrix4x4 Rx, InvRx;
 	Rx.Identity();
-	float d = sqrtf(Axis.y*Axis.y + Axis.z*Axis.z);
+	float d = sqrt(Axis.y*Axis.y + Axis.z*Axis.z);
 	if(d!=0.0f)
 	{
 		float CosAngle = Axis.z / d;
