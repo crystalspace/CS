@@ -28,7 +28,6 @@ DataBuffer::DataBuffer(char *d, int sz)
   buffSize = sz;
   position = 0;
   maxline = 0;
-  int lineLength = 0, first = 1;
   while (position < buffSize) {
     if((strchr((data + position), '\n') - (data + position)) > maxline)
       maxline = strchr((data + position), '\n') - (data + position);

@@ -38,7 +38,6 @@
 #include "cstool/initapp.h"
 #include "csutil/xmltiny.h"
 #include "csutil/csstring.h"
-//#include "csutil/util.h"
 #include "csutil/memfile.h"
 #include "csutil/csvector.h"
 #include "csutil/archive.h"
@@ -54,13 +53,16 @@ CS_IMPLEMENT_APPLICATION
     (((c) == PATH_SEPARATOR) || ((c) == '\\') || ((c) == '/'))
 #endif
 
+#define THRESHOLD 0.0000001
+
 /* This is csplitpath with no modifications for our use. */
 void splitpath (const char *iPathName, char *oPath, size_t iPathSize,
-  char *oName, size_t iNameSize);
+		char *oName, size_t iNameSize);
 char *stristr(const char *String, const char *Pattern);
 char *basename(char *path, char *base);
 char *filename(char *path, char *file);
 char *lowercase(char *str);
+
 void Usage() {
   printf("MD3 to CS XML converter\n");
   printf("by Manjunath Sripadarao\n");
@@ -627,7 +629,7 @@ void MD32spr::Write()
       csArchive *zipFile = new csArchive(outZipName.GetData());
       delete zipFile;
       vfspath = new char[outZipName.Length() + 12];
-      fileName = new char[outZipName.Length()];
+      fileName = new char[outZipName.Length() + 1];
       basename(outZipName.GetData(), fileName);
       sprintf(vfspath, "/tmp/%s_out/", fileName);
       if (!out->Mount(vfspath, outZipName.GetData())) {
@@ -640,7 +642,7 @@ void MD32spr::Write()
     if (generic.Length()) {
       for (i = 0; i < generic.Length(); i++) {
 	md3Model *mdl = (md3Model *) generic.Get(i);
-	mdlName = new char[strlen(mdl->GetFileName())];
+	mdlName = new char[strlen(mdl->GetFileName()) + 1];
 	basename(mdl->GetFileName(), mdlName);
 	csRef < iDocumentSystem > xml(csPtr < iDocumentSystem >
 				      (new csTinyDocumentSystem()));
@@ -660,8 +662,11 @@ void MD32spr::Write()
 
   if (player) {
     if (headModel) {
-      char *headName = new char[strlen(headModel->GetFileName())];
+      char *headName = new char[strlen(headModel->GetFileName()) + 1];
+      char *tagFileName = new char[strlen(headModel->GetFileName()) + strlen(vfspath) + strlen(".tag") + 1];
       basename(headModel->GetFileName(), headName);
+      sprintf(tagFileName,"%s%s.tag", vfspath, headName);
+      WriteXMLTags(headModel, tagFileName);
       csRef < iDocumentSystem > xml(csPtr < iDocumentSystem >
 				    (new csTinyDocumentSystem()));
       csRef < iDocument > doc = xml->CreateDocument();
@@ -669,15 +674,17 @@ void MD32spr::Write()
       csRef < iDocumentNode > parent =
 	root->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
       parent->SetValue("library");
-
       WriteGeneric(headModel, parent);
       csString outFile(vfspath);
       outFile += headName;
       doc->Write(out, outFile.GetData());
     }
     if (upperModel) {
-      char *upperName = new char[strlen(headModel->GetFileName())];
+      char *upperName = new char[strlen(headModel->GetFileName()) + 1];
+      char *tagFileName = new char[strlen(upperModel->GetFileName()) + strlen(vfspath) + strlen(".tag") + 1];
       basename(upperModel->GetFileName(), upperName);
+      sprintf(tagFileName,"%s%s.tag", vfspath, upperName);
+      WriteXMLTags(upperModel, tagFileName);
       csRef < iDocumentSystem > xml(csPtr < iDocumentSystem >
 				    (new csTinyDocumentSystem()));
       csRef < iDocument > doc = xml->CreateDocument();
@@ -692,8 +699,11 @@ void MD32spr::Write()
       doc->Write(out, outFile.GetData());
     }
     if (lowerModel) {
-      char *lowerName = new char[strlen(headModel->GetFileName())];
+      char *lowerName = new char[strlen(headModel->GetFileName()) + 1];
+      char *tagFileName = new char[strlen(upperModel->GetFileName()) + strlen(vfspath) + strlen(".tag") + 1];
       basename(lowerModel->GetFileName(), lowerName);
+      sprintf(tagFileName,"%s%s.tag", vfspath, lowerName);
+      WriteXMLTags(lowerModel, tagFileName);
       csRef < iDocumentSystem > xml(csPtr < iDocumentSystem >
 				    (new csTinyDocumentSystem()));
       csRef < iDocument > doc = xml->CreateDocument();
@@ -719,13 +729,21 @@ void MD32spr::Write()
 	parent->SetValue("library");
 
 	WriteGeneric(mdl, parent);
-	char *fileName = new char[mdl->fileName.Length()];
+	char *fileName = new char[mdl->fileName.Length() + 1];
+	char *tagFileName = new char[strlen(vfspath) + 
+				     strlen(weaponDir) + 
+				     strlen("/") + mdl->fileName.Length() + 
+				     strlen(".tag") + 1];
 	basename(mdl->fileName.GetData(), fileName);
+
+
 	csString outFile(vfspath);
 	outFile += weaponDir;
 	outFile += "/";
 	outFile += fileName;
 	doc->Write(out, outFile.GetData());
+	sprintf(tagFileName,"%s%s/%s.tag", vfspath, weaponDir.GetData(), fileName);
+	WriteXMLTags(mdl, tagFileName);
       }
     }
   }
@@ -742,37 +760,41 @@ void MD32spr::Write()
 }
 
 void MD32spr::WriteXMLTags(md3Model * model,
-			csRef < iDocumentNode > &parent) 
+			char *tagFileName) 
 {
   int i = 0, j = 0, k = 0;
   float *rotationMatrix, *translationVector;
+  csRef < iDocumentSystem > xml(csPtr < iDocumentSystem >
+				(new csTinyDocumentSystem()));
+  csRef < iDocument > doc = xml->CreateDocument();
+  csRef < iDocumentNode > root = doc->CreateRoot();
+  csRef < iDocumentNode > child;
+
   for (i = 0; i < model->header->numFrames; i++)
     for(j = 0; j < model->header->numTags; j++) {
       csString rotation;
       csString position;
       csString taginfo;
-      csRef<iDocumentNode> child = 
-	parent->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+      child = 
+	root->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
       child->SetValue("key");
       child->SetAttribute("name", "md3tag");
       rotationMatrix = &model->tags[i * model->header->numTags + j].rotation[0][0];
       translationVector = &model->tags[i * model->header->numTags + j].position[0];
       // Convert rotation matrix to string.
-      rotation += rotationMatrix[0];
       k = 0;
-      do {
+      while (k < 9) {
 	rotation += ' ';
-	rotation += rotationMatrix[k];
+	rotation += (fabs(rotationMatrix[k]) < THRESHOLD) ? 0 : rotationMatrix[k];
 	k++;
-      } while (k < 8);
+      }
       // Convert position vector to string.
-      position += translationVector[0];
       k = 0;
-      do {
+      while (k < 3) {
 	position += ' ';
-	position += translationVector[k];
+	position += (fabs(translationVector[k]) < THRESHOLD) ? 0 : translationVector[k];
 	k++;
-      } while (k < 2);
+      }
       // Merge tag name, frame num, tag num, rotation matrix and position vector into one string.
       taginfo += model->tags[i * model->header->numTags + j].name;
       taginfo += ' ';
@@ -786,6 +808,7 @@ void MD32spr::WriteXMLTags(md3Model * model,
       // Write out tag info.
       child->SetAttribute("tag", taginfo);
     }
+  doc->Write(out, tagFileName);
 }
 
 void MD32spr::WriteXMLTextures(md3Model * model,
@@ -853,7 +876,7 @@ void MD32spr::WriteGeneric(md3Model * model,
       localParent->SetAttribute("name", model->meshes[i].meshHeader->name);
       CreateValueNode(localParent, "plugin",
 		      "crystalspace.mesh.loader.factory.sprite.3d");
-      WriteXMLTags(model, localParent);
+      //WriteXMLTags(model, localParent);
       csRef < iDocumentNode > child =
 	localParent->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
       child->SetValue("params");

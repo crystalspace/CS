@@ -214,7 +214,7 @@ class MD32spr {
   int md3Files;
 
  private:
-  void WriteXMLTags(md3Model *model, csRef<iDocumentNode>&);
+  void WriteXMLTags(md3Model *model, char *fileName);
   void WriteXMLTextures(md3Model *model, csRef<iDocumentNode>&);
   void WriteXMLMaterials(md3Model *model, csRef<iDocumentNode>&);
 
