@@ -20,18 +20,17 @@
 #define __IMGLOAD_H__
 
 /**
- * This class handles everything related to image loading.
- * All image loaders are chained in a list and you can register new
- * image handlers even at runtime. You can request the image to be loaded
- * in a specific format (see CS_IMG_XXX constants).
- * Extend this class to support a particular type of image loading.
+ * This class is a superclass for all image file format loaders. Every
+ * subclass of this class is responsible for loading a specific file
+ * format. You can request the image to be loaded in a specific internal
+ * format (see CS_IMG_XXX constants).
  */
 class csImageLoader
 {
-  /// A pointer to next image loader (loaders are chained in a list)
-  csImageLoader *Next;
+public:
+  /// this class needs a virtual destructor
+  virtual ~csImageLoader() {}
 
-protected:
   /**
    * Load an image from the given buffer.
    * Attempts to read an image from the buffer 'buf' of length 'size'.
@@ -39,50 +38,6 @@ protected:
    * returns NULL.
    */
   virtual csImageFile* LoadImage (UByte* iBuffer, ULong iSize, int iFormat) = 0;
-
-  /*
-   * WARNING: This class should have NO destructor otherwise the image loader
-   * won't work as a plugin because on most platforms static objects (see bool
-   * RegisterXXX()) will register an atexit() callback for the destructor, and
-   * during program exit sequence the plugins won't be present in memory (they
-   * are unloaded in ~SystemDriver).
-   */
-
-public:
-  
-  /// Return the next loader in the chain
-  csImageLoader *GetNext()
-  {
-    return Next;
-  }
-
-  /**
-   * Register a loader for a given image type.<p>
-   * Adds 'loader' to the list of image formats to be checked during an
-   * csImageLoader::load(...) call.
-   */
-  static bool Register (csImageLoader *loader);
-
-  /**
-   * Load an image from a buffer.<p>
-   * This routine will read from the buffer buf of length size, try to
-   * recognize the type of image contained within, and return an csImageFile
-   * of the appropriate type.  Returns a pointer to the iImage on
-   * success, or NULL on failure. The bits that fit the CS_IMGFMT_MASK
-   * mask are mandatory: the image always will be loaded in the
-   * appropiate format; the bits outside that mask (i.e. CS_IMGFMT_ALPHA)
-   * are optional: if the image does not contain alpha mask, the GetFormat()
-   * method of the image will return a value without that bit set.
-   */
-  static iImage *Load (UByte* iBuffer, ULong iSize, int iFormat);
-
-  /**
-   * Set global image dithering option.<p>
-   * By default this option is disabled. If you enable it, all images will
-   * be dithered both after loading and after mipmapping/scaling. This will
-   * affect all truecolor->paletted image conversions.
-   */
-  static void SetDithering (bool iEnable);
 };
 
 #endif // __IMGLOAD_H__

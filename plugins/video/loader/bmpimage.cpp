@@ -25,9 +25,9 @@
 #include "bmpimage.h"
 #include "cssys/csendian.h"
 
-bool RegisterBMP ()
+csImageLoader *csCreateImageLoader_BMP ()
 {
-  return csImageLoader::Register (new csBMPImageLoader());
+  return new csBMPImageLoader();
 }
 
 csImageFile* csBMPImageLoader::LoadImage (UByte* iBuffer, ULong iSize,

@@ -31,9 +31,9 @@ extern "C"
 
 //---------------------------------------------------------------------------
 
-bool RegisterPNG ()
+csImageLoader *csCreateImageLoader_PNG ()
 {
-  return csImageLoader::Register (new csPNGImageLoader());
+  return new csPNGImageLoader();
 }
 
 csImageFile* csPNGImageLoader::LoadImage (UByte* iBuffer, ULong iSize,

@@ -36,9 +36,9 @@
 
 //---------------------------------------------------------------------------
 
-bool RegisterTGA ()
+csImageLoader *csCreateImageLoader_TGA ()
 {
-  return csImageLoader::Register (new csTGAImageLoader());
+  return new csTGAImageLoader();
 }
 
 csImageFile* csTGAImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)

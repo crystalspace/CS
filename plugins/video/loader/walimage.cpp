@@ -50,9 +50,9 @@ struct WALHeader
 } _WALHeader;
 
 //---------------------------------------------------------------------------
-bool RegisterWAL ()
+csImageLoader *csCreateImageLoader_WAL ()
 {
-  return csImageLoader::Register (new csWALImageLoader());
+  return new csWALImageLoader();
 }
 
 csImageFile* csWALImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)

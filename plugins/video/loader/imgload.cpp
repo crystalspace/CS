@@ -25,43 +25,13 @@
 #include "igraphic/loader.h"
 #include "csgfx/csimage.h"
 #include "csutil/util.h"
+#include "csutil/csvector.h"
 #include "imgload.h"
-
-static csImageLoader *loaderlist = NULL;
-
-bool csImageLoader::Register (csImageLoader* loader)
-{
-  // check if already present
-  for (csImageLoader *l = loaderlist; l; l = l->Next)
-    if(l == loader)
-      return true;
-  // add it
-  loader->Next = loaderlist;
-  loaderlist = loader;
-  return true;
-}
-
-iImage* csImageLoader::Load (UByte* iBuffer, ULong iSize, int iFormat)
-{
-  for (csImageLoader *l = loaderlist; l; l = l->Next)
-  {
-    csImageFile *img = l->LoadImage (iBuffer, iSize, iFormat);
-    if (img) return img;
-  }
-  return NULL;
-}
-
-void csImageLoader::SetDithering (bool iEnable)
-{
-  extern bool csImage_dither;
-  csImage_dither = iEnable;
-}
-
-//------------------------------------------------------ Plug-in stuff --------
 
 class csImageLoaderPlugin : public iImageLoader {
 public:
   DECLARE_IBASE;
+  csVector Loaders;
 
   csImageLoaderPlugin(iBase *p)
   {
@@ -70,21 +40,19 @@ public:
 
   virtual ~csImageLoaderPlugin()
   {
-    csImageLoader *ldr, *next;
-    for (ldr = loaderlist; ldr != NULL; ldr = next)
+    while (Loaders.Length()>0)
     {
-      next = ldr->GetNext();
+      csImageLoader *ldr = (csImageLoader*)Loaders.Pop();
       delete ldr;
     }
-    loaderlist = NULL;
   }
 
   virtual bool Initialize(iSystem *)
   {
     // Register all file formats we want
     #define REGISTER_FORMAT(format) \
-    extern bool Register##format (); \
-    Register##format();
+    extern csImageLoader *csCreateImageLoader_##format (); \
+    Loaders.Push(csCreateImageLoader_##format());
 
     #if defined (DO_GIF)
       REGISTER_FORMAT (GIF)
@@ -113,7 +81,15 @@ public:
 
   virtual iImage *Load (UByte* iBuffer, ULong iSize, int iFormat)
   {
-    return csImageLoader::Load(iBuffer, iSize, iFormat);
+    long i;
+
+    for (i=0; i<Loaders.Length(); i++)
+    {
+      csImageLoader *ldr = (csImageLoader*)Loaders.Get(i);
+      iImage *img = ldr->LoadImage(iBuffer, iSize, iFormat);
+      if (img) return img;
+    }
+    return NULL;
   }
 
   /**
@@ -124,7 +100,8 @@ public:
    */
   virtual void SetDithering (bool iEnable)
   {
-    csImageLoader::SetDithering(iEnable);
+    extern bool csImage_dither;
+    csImage_dither = iEnable;
   }
 };
 

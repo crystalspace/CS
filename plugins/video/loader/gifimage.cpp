@@ -24,9 +24,9 @@
 #include "gifimage.h"
 
 //---------------------------------------------------------------------------
-bool RegisterGIF ()
+csImageLoader *csCreateImageLoader_GIF ()
 {
-  return csImageLoader::Register (new csGIFImageLoader());
+  return new csGIFImageLoader();
 }
 
 csImageFile* csGIFImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)

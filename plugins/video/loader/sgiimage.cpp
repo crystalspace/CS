@@ -46,9 +46,9 @@ static struct SGIHeader
   ULong Colormap;	// who knows... maybe support for paletted images?
 } header;
 
-bool RegisterSGI ()
+csImageLoader *csCreateImageLoader_SGI ()
 {
-  return csImageLoader::Register (new csSGIImageLoader());
+  return new csSGIImageLoader();
 }
 
 csImageFile* csSGIImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)

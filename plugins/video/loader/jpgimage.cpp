@@ -37,9 +37,9 @@ extern "C"
 }
 
 //---------------------------------------------------------------------------
-bool RegisterJPG ()
+csImageLoader *csCreateImageLoader_JPG ()
 {
-  return csImageLoader::Register (new csJPGImageLoader());
+  return new csJPGImageLoader();
 }
 
 csImageFile* csJPGImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)
