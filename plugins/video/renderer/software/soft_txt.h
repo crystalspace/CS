@@ -264,6 +264,7 @@ public:
  */
 class csTextureManagerSoftware : public csTextureManager
 {
+  friend class csTextureHandleSoftware;
 private:
   /// How strong texture manager should push 128 colors towards 
   /// a uniform palette
@@ -386,7 +387,7 @@ public:
   void SetProcTextureManager (csTextureManagerSoftware *proc_txt_mgr) 
   { proc_txtmgr =  proc_txt_mgr; }
 
-private:
+protected:
   /**
    * When in 16/32bit mode and a dedicated 8bit procedural texture manager is 
    * present, its' textures are remapped to the global palette.

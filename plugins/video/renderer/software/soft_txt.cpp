@@ -383,8 +383,7 @@ iGraphics3D *csTextureHandleSoftware::GetProcTextureInterface ()
     csSoftProcTexture3D *stex = new csSoftProcTexture3D (texman->G3D);
     void *imd = ((csTextureSoftware*) tex[0])->image ? 
       ((csTextureSoftware*) tex[0])->image->GetImageData () : NULL;
-    if (!stex->Prepare (texman, this,
-			imd,
+    if (!stex->Prepare (texman, this, imd,
 			((csTextureSoftware*) tex[0])->bitmap))
       delete stex;
     else
@@ -408,11 +407,15 @@ iGraphics3D *csTextureHandleSoftware::GetProcTextureInterface ()
 void csTextureHandleSoftware::Prepare ()
 {
   CreateMipmaps ();
-  if ((texman->pfmt.PixelBytes == 1)
-   && (flags & CS_TEXTURE_PROC))
-    RemapProcToGlobalPalette (texman);
-  else
-    remap_texture ();
+  if (flags & CS_TEXTURE_PROC)
+  {
+    if (texman->pfmt.PixelBytes == 1)
+      RemapProcToGlobalPalette (texman);
+    else
+      remap_texture ();
+    if (texman->main_txtmgr)
+      texman->main_txtmgr->Reprepare8BitProcs ();
+  }
 }
 
 //----------------------------------------------- csTextureManagerSoftware ---//

@@ -37,7 +37,7 @@ class csSoftProcTexture3D : public csGraphics3DSoftwareCommon,
   /// The parent procedural texture as registered with the main texture manager
   csTextureHandleSoftware *parent_tex_mm;
   /// The main gfx contexts texture cache
-  csTextureCacheSoftware *parent_tcache;
+  csTextureCacheSoftware *main_tcache;
 
 public:
   DECLARE_IBASE;
@@ -45,7 +45,7 @@ public:
   csSoftProcTexture3D (iBase *iParent);
   virtual ~csSoftProcTexture3D ();
 
-  bool Prepare (csTextureManagerSoftware *parent_texman, 
+  bool Prepare (csTextureManagerSoftware *main_texman, 
 		csTextureHandleSoftware *tex_mm, 
 		void *buffer, uint8 *bitmap);
 
