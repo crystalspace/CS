@@ -2,7 +2,7 @@
   Crystal Space Generic Array Template
   Copyright (C) 2003 by Matze Braun
   Copyright (C) 2003 by Jorrit Tyberghein
-  Copyright (C) 2003 by Eric Sunshine
+  Copyright (C) 2003,2004 by Eric Sunshine
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -31,6 +31,34 @@
 #include "csutil/memdebug.h"
 #include <typeinfo>
 #endif
+
+/**
+ * A template providing various comparison and ordering functions.
+ */
+template <class T1, class T2>
+class csOrdering
+{
+public:
+  /**
+   * Compare two objects of the same type or different types (T1 and T2).
+   * \param r1 Reference to first object.
+   * \param r2 Reference to second object.
+   * \return Zero if the objects are equal; less-than-zero if the first object
+   *   is less than the second; or greater-than-zero if the first object is
+   *   greater than the second.
+   * \remarks Assumes the existence of T1::operator<(T2) and T2::operator<(T1).
+   *   If T1 and T2 are the same type T, then only T::operator<(T) is assumed
+   *   (of course).  This is the default comparison function used by csArray
+   *   for searching and sorting if the client does not provide a custom
+   *   function.
+   */
+  static int Compare(T1 const &r1, T2 const &r2)
+  {
+    if (r1 < r2) return -1;
+    else if (r2 < r1) return 1;
+    else return 0;
+  }
+};
 
 // Define CSARRAY_INHIBIT_TYPED_KEYS if the compiler is too old or too buggy to
 // properly support templated functions within a templated class.  When this is
@@ -64,7 +92,7 @@ public:
    */
   typedef int(*CF)(T const&, K const&);
   /// Construct a functor from a search key and a comparison function.
-  csArrayCmp(K const& k, CF c) : key(k), cmp(c) {}
+  csArrayCmp(K const& k, CF c = DefaultCompare) : key(k), cmp(c) {}
   /// Construct a functor from another functor.
   csArrayCmp(csArrayCmp const& o) : key(o.key), cmp(o.cmp) {}
   /// Assign another functor to this one.
@@ -72,8 +100,8 @@ public:
     { key = o.key; cmp = o.cmp; return *this; }
   /**
    * Invoke the functor.
-   * \param r Reference to the element to which the key with which this functor
-   *   was constructed should be compared.
+   * \param r Reference to the element to which the stored key should be
+   *   compared.
    * \return Zero if the key matches the element; less-than-zero if the element
    *   is less than the key; greater-than-zero if the element is greater than
    *   the key.
@@ -83,6 +111,18 @@ public:
   operator CF() const { return cmp; }
   /// Return the key with which this functor was constructed.
   operator K const&() const { return key; }
+  /**
+   * Compare two objects of the same type or different types (T and K).
+   * \param r Reference to the element to which the key should be compared.
+   * \param k Reference to the key to which the element should be compared.
+   * \return Zero if the key matches the element; less-than-zero if the element
+   *   is less than the key; greater-than-zero if the element is greater than
+   *   the key.
+   * \remarks Assumes the presence of T::operator<(K) and K::operator<(T).
+   *   Default comparison function if client does not supply one.
+   */
+  static int DefaultCompare(T const& r, K const& k)
+    { return csOrdering<T,K>::Compare(r,k); }
 private:
   K key;
   CF cmp;
@@ -106,13 +146,16 @@ template <class T, class K>
 class csArrayCmp : public csArrayCmpAbstract
 {
 public:
-  csArrayCmp(K const& k, int(*c)(T const&, K const&)) : key(k), cmp(CF(c)) {}
+  typedef int(*CFTyped)(T const&, K const&);
+  csArrayCmp(K const& k, CFTyped c = DefaultCompare) : key(k), cmp(CF(c)) {}
   csArrayCmp(csArrayCmp const& o) : key(o.key), cmp(o.cmp) {}
   csArrayCmp& operator=(csArrayCmp const& o)
     { key = o.key; cmp = o.cmp; return *this; }
   virtual int operator()(void const* p) const { return cmp(p, &key); }
   virtual operator CF() const { return cmp; }
   operator K const&() const { return key; }
+  static int DefaultCompare(T const& r, K const& k)
+    { return csOrdering<T,K>::Compare(r,k); }
 private:
   K key;
   CF cmp;
@@ -316,14 +359,19 @@ private:
 
 public:
   /**
-   * The default comparison function for searching; assumes that both elements
-   * are of the same type, and that they can be compared with < and >.
+   * Compare two objects of the same type.
+   * \param r1 Reference to first object.
+   * \param r2 Reference to second object.
+   * \return Zero if the objects are equal; less-than-zero if the first object
+   *   is less than the second; or greater-than-zero if the first object is
+   *   greater than the second.
+   * \remarks Assumes the existence of T::operator<(T).  This is the default
+   *   comparison function used by csArray for sorting if the client does not
+   *   provide a custom function.
    */
-  static int DefaultCompare (T const &item1, T const &item2)
+  static int DefaultCompare(T const& r1, T const& r2)
   {
-    if (item1 < item2) return -1;
-    else if (item1 > item2) return 1;
-    else return 0;
+    return csOrdering<T,T>::Compare(r1,r2);
   }
 
   /**

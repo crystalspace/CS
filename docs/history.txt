@@ -16,6 +16,13 @@ chronological order.
 	      class.
 	- res augmented the Cg configure check to use pthread, required by
 	  Cg for Linux.
+	- Eric Sunshine added a "default" comparison function to csArrayCmp,
+	  and made the "comparision function" argument to the csArrayCmp
+	  contructor optional.  If the client does not supply a function to the
+	  constructor, then the default function is used.  This makes it much
+	  simpler to perform searches in csArrays in cases when the element and
+	  keys can be compared via standard comparison semantics (such as when
+	  their types are the same, though type equivalence is not required).
 1-Apr-2004
 	- Eric Sunshine fixed include/Jamfile so that it installs Swig (*.i)
 	  files.  These are needed by CEL, for instance.

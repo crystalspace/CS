@@ -486,7 +486,7 @@ bool csArchive::DeleteFile (const char *name)
   if (!FileExists (name))
     return false;
 
-  del.InsertSorted ((char*)name);
+  del.InsertSorted (name);
   return true;
 }
 
