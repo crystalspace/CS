@@ -39,8 +39,8 @@ DESCRIPTION.$(DOG.DLL) = Sample Dog class
 DESCRIPTION.$(WORM.DLL) = Sample Worm class
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  DOG.DLL = Dog$(DLL)
-  WORM.DLL = Worm$(DLL)
+  DOG.DLL = $(OUTDLL)Dog$(DLL)
+  WORM.DLL = $(OUTDLL)Worm$(DLL)
 else
   SRC.ZOO += $(SRC.DOG) $(SRC.WORM)
 endif
