@@ -38,7 +38,7 @@ void csfxInterference(iGraphics2D *g2d, iTextureManager *txtmgr,
     float skipnow = skipwidth * anim; SEMIRAND;
     float donow = length * anim; SEMIRAND;
     int col = 255 - int(255.0f * anim); SEMIRAND;
-    int colour = txtmgr->FindRGB(col, col, col);
+    int colour = g2d->FindRGB(col, col, col);
     while(donow+xpos >= width)
     {
       g2d->DrawLine(xpos, ypos, width-1, ypos, colour);

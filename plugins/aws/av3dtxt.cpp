@@ -233,7 +233,6 @@ csTextureManagerNull::csTextureManagerNull (
   iConfigFile *config) :
     csTextureManager(object_reg, iG2D)
 {
-  ResetPalette ();
   read_config (config);
   G2D = iG2D;
 }
@@ -263,12 +262,6 @@ uint32 csTextureManagerNull::encode_rgb (int r, int g, int b)
   return ((r >> (8 - pfmt.RedBits)) << pfmt.RedShift) |
     ((g >> (8 - pfmt.GreenBits)) << pfmt.GreenShift) |
       ((b >> (8 - pfmt.BlueBits)) << pfmt.BlueShift);
-}
-
-int csTextureManagerNull::FindRGB (int r, int g, int b)
-{
-  CLIP_RGB;
-  return encode_rgb (r, g, b);
 }
 
 void csTextureManagerNull::PrepareTextures ()
@@ -301,17 +294,5 @@ void csTextureManagerNull::UnregisterTexture (csTextureHandleNull *handle)
 {
   int idx = textures.Find (handle);
   if (idx >= 0) textures.Delete (idx);
-}
-
-void csTextureManagerNull::ResetPalette ()
-{
-}
-
-void csTextureManagerNull::ReserveColor (int, int, int)
-{
-}
-
-void csTextureManagerNull::SetPalette ()
-{
 }
 

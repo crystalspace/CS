@@ -1473,7 +1473,7 @@ void csGraphics3DOGLCommon::Print (csRect * area)
 void csGraphics3DOGLCommon::DrawTriangleMeshEdges (G3DTriangleMesh& mesh)
 {
   int i;
-  int color = txtmgr->FindRGB (255, 255, 255);
+  int color = G2D->FindRGB (255, 255, 255);
   int num_vertices = mesh.buffers[0]->GetVertexCount ();
 
   //===========
@@ -1991,7 +1991,7 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   if (debug_edges)
     DebugDrawElements (G2D,
       queue.num_triangles*3, queue.tris, queue.glverts,
-      txtmgr->FindRGB (255, 255, 255), false, false);
+      G2D->FindRGB (255, 255, 255), false, false);
 
   queue.Reset ();
 
@@ -4803,7 +4803,7 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
     DrawTriangleMeshEdges (mesh);
     //DebugDrawElements (G2D,
   //num_triangles*3, (int*)triangles, (GLfloat*)& work_verts[0],
-    //txtmgr->FindRGB (255, 0, 0), true,
+    //G2D->FindRGB (255, 0, 0), true,
     //mesh.vertex_mode == G3DTriangleMesh::VM_VIEWSPACE);
 
   SetMirrorMode (false);

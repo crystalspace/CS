@@ -1030,7 +1030,7 @@ bool csBugPlug::HandleStartFrame (iEvent& /*event*/)
   if (do_clear)
   {
     G3D->BeginDraw (CSDRAW_2DGRAPHICS);
-    int bgcolor_clear = G3D->GetTextureManager ()->FindRGB (0, 255, 255);
+    int bgcolor_clear = G2D->FindRGB (0, 255, 255);
     G2D->Clear (bgcolor_clear);
   }
   if (selected_mesh)
@@ -1100,8 +1100,8 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
     	(debug_view.clear ? CSDRAW_CLEARSCREEN : 0));
     if (debug_view.object)
       debug_view.object->Render (G3D, &scfiBugPlug);
-    int pointcol = G3D->GetTextureManager ()->FindRGB (255, 255, 0);
-    int linecol = G3D->GetTextureManager ()->FindRGB (255, 255, 255);
+    int pointcol = G2D->FindRGB (255, 255, 0);
+    int linecol = G2D->FindRGB (255, 255, 255);
     int i;
     for (i = 0 ; i < debug_view.num_lines ; i++)
     {
@@ -1151,9 +1151,9 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
     int y = sh/2 - (fh+5*2)/2;
     int w = 200;
     int h = fh+5*2;
-    int bgcolor = G3D->GetTextureManager ()->FindRGB (255, 255, 0);
+    int bgcolor = G2D->FindRGB (255, 255, 0);
     G2D->DrawBox (x, y, w, h, bgcolor);
-    int fgcolor = G3D->GetTextureManager ()->FindRGB (0, 0, 0);
+    int fgcolor = G2D->FindRGB (0, 0, 0);
     char* msg;
     if (process_next_key) msg = "Press a BugPlug key...";
     else msg = "Click on screen...";
@@ -1179,9 +1179,9 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
     int y = sh/2 - (fh*2+5*3)/2;
     int w = sw-20;
     int h = fh*2+5*3;
-    int bgcolor = G3D->GetTextureManager ()->FindRGB (255, 255, 0);
+    int bgcolor = G2D->FindRGB (255, 255, 0);
     G2D->DrawBox (x, y, w, h, bgcolor);
-    int fgcolor = G3D->GetTextureManager ()->FindRGB (0, 0, 0);
+    int fgcolor = G2D->FindRGB (0, 0, 0);
     int maxlen = fnt->GetLength (msg_string, w-10);
     if (maxlen < 80) msg_string[maxlen] = 0;
     G2D->Write (fnt, x+5, y+5, fgcolor, bgcolor, msg_string);
@@ -1209,7 +1209,7 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
     int sh = G2D->GetHeight ();
     int fw, fh;
     fnt->GetMaxSize (fw, fh);
-    int fgcolor = G3D->GetTextureManager ()->FindRGB (255, 255, 255);
+    int fgcolor = G2D->FindRGB (255, 255, 255);
     GfxWrite (G2D, fnt, 11, sh - fh - 3, 0, -1, "FPS=%.2f", fps_cur);
     GfxWrite (G2D, fnt, 10, sh - fh - 2, fgcolor, -1, "FPS=%.2f", fps_cur);
   }

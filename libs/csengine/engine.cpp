@@ -1085,7 +1085,6 @@ void csEngine::PrepareTextures ()
   int i;
 
   iTextureManager *txtmgr = G3D->GetTextureManager ();
-  txtmgr->ResetPalette ();
 
   // First register all textures to the texture manager.
   for (i = 0; i < textures->Length (); i++)

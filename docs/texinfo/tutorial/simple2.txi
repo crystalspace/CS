@@ -54,13 +54,12 @@ loaded @emph{after} the other setup of the texture manager has been done.
 This is not really needed but it illustrates how a game might load materials
 dynamically later when the application is already running.  So first we edit
 @file{simple.cpp} and add the following in @code{Simple::Initialize()}
-(between @code{txtmgr->SetPalette()} and @samp{return true}):
+(before @samp{return true}):
 
 @example
 bool Simple::Initialize()
 @{
   @dots{}
-  txtmgr->SetPalette ();
 
   // Load a texture for our sprite.
   iTextureWrapper* txt = loader->LoadTexture ("spark",

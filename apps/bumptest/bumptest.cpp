@@ -350,18 +350,6 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
-  // Initialize the texture manager
-  txtmgr->ResetPalette ();
-
-  // Allocate a uniformly distributed in R,G,B space palette for console
-  // The console will crash on some platforms if this isn't initialize properly
-  int r,g,b;
-  for (r = 0; r < 8; r++)
-    for (g = 0; g < 8; g++)
-      for (b = 0; b < 4; b++)
-	txtmgr->ReserveColor (r * 32, g * 32, b * 64);
-  txtmgr->SetPalette ();
-
   // Some commercials...
   Report (CS_REPORTER_SEVERITY_NOTIFY,
     "BumpTest Crystal Space Application version 0.1.");
@@ -458,8 +446,6 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   iGraphics2D* g2d = myG3D->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
-
-  txtmgr->SetPalette ();
 
   return true;
 }

@@ -289,8 +289,7 @@ void DrawDebugBoxSide (iCamera* cam, bool do3d,
   }
   else
   {
-    iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
-    int color = txtmgr->FindRGB (QInt (255.*c1.red*2), 0, QInt (255.*c1.blue*2));
+    int color = Gfx2D->FindRGB (QInt (255.*c1.red*2), 0, QInt (255.*c1.blue*2));
     Gfx2D->DrawLine (poly.vertices[0].x, FRAME_HEIGHT-poly.vertices[0].y, poly.vertices[1].x, FRAME_HEIGHT-poly.vertices[1].y, color);
     Gfx2D->DrawLine (poly.vertices[1].x, FRAME_HEIGHT-poly.vertices[1].y, poly.vertices[2].x, FRAME_HEIGHT-poly.vertices[2].y, color);
     Gfx2D->DrawLine (poly.vertices[2].x, FRAME_HEIGHT-poly.vertices[2].y, poly.vertices[3].x, FRAME_HEIGHT-poly.vertices[3].y, color);
@@ -379,11 +378,10 @@ void DrawLineDepth (const csVector3& v1, const csVector3& v2,
   int px2 = QInt (x2 * iz2 + (FRAME_WIDTH/2));
   int py2 = FRAME_HEIGHT - 1 - QInt (y2 * iz2 + (FRAME_HEIGHT/2));
 
-  iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
   int col = (int)((40.0-z1)*(255./40.));
   if (col < 0) col = 0;
   else if (col > 255) col = 255;
-  int color = txtmgr->FindRGB (col, col, col);
+  int color = Gfx2D->FindRGB (col, col, col);
 
   Gfx2D->DrawLine (px1, py1, px2, py2, color);
 }

@@ -197,13 +197,12 @@ void csAVIStreamVideo::PrepImageArea ()
 
   csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
   char *p = pIA->data;
-  iTextureManager *pTexMgr = pG3D->GetTextureManager();
 
   int row, col;
   for (row=0; row<rc.Height (); row++)
     for (col=0; col<rc.Width (); col++)
     {
-      int color = pTexMgr->FindRGB (pixel->red, pixel->green, pixel->blue);
+      int color = pG2D->FindRGB (pixel->red, pixel->green, pixel->blue);
       memcpy (p, ((char*)&color), nPB);
       p += nPB;
       pixel++;

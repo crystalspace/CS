@@ -24,6 +24,7 @@
 #include "csgeom/math2d.h"
 
 struct iGraphics3D;
+struct iGraphics2D;
 struct iTextureManager;
 class csCamera;
 
@@ -48,7 +49,7 @@ public:
 
 public:
   ///
-  csWfColor (iTextureManager* txtmgr, int r, int g, int b);
+  csWfColor (iGraphics2D* g2d, int r, int g, int b);
   /// Get a color based on depth.
   int GetColor (float z);
 };
@@ -181,7 +182,7 @@ class csWireFrame
 {
 private:
   csWfObject* objects;
-  iTextureManager* txtmgr;
+  iGraphics2D* g2d;
   csWfColor* colors;
   csWfColor* white;
   csWfColor* red;
@@ -193,7 +194,7 @@ private:
 
 public:
   ///
-  csWireFrame (iTextureManager* txtmgr);
+  csWireFrame (iGraphics2D* g2d);
   ///
   virtual ~csWireFrame ();
 
@@ -258,7 +259,7 @@ private:
 
 public:
   ///
-  csWireFrameCam (iTextureManager* txtmgr);
+  csWireFrameCam (iGraphics2D* g2d);
   ///
   virtual ~csWireFrameCam ();
 

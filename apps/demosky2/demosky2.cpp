@@ -208,18 +208,6 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
-  // Initialize the texture manager
-  txtmgr->ResetPalette ();
-
-  // Allocate a uniformly distributed in R,G,B space palette for console
-  // The console will crash on some platforms if this isn't initialize properly
-  int r,g,b;
-  for (r = 0; r < 8; r++)
-    for (g = 0; g < 8; g++)
-      for (b = 0; b < 4; b++)
-	txtmgr->ReserveColor (r * 32, g * 32, b * 64);
-  txtmgr->SetPalette ();
-
   font = myG2D->GetFontServer()->LoadFont(CSFONT_LARGE);
 
   // Some commercials...
@@ -315,8 +303,6 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, 0));
   view->SetRectangle (0, 0, myG2D->GetWidth (), myG2D->GetHeight ());
 
-  txtmgr->SetPalette ();
-
   return true;
 }
 
@@ -368,9 +354,9 @@ void DemoSky::SetupFrame ()
   int txtx = 10;
   int txty = myG2D->GetHeight() - 20;
   myG2D->Write(font, txtx+1, txty+1,
-    myG3D->GetTextureManager()->FindRGB(0,0,0), -1, buf);
+    myG2D->FindRGB(0,0,0), -1, buf);
   myG2D->Write(font, txtx, txty,
-    myG3D->GetTextureManager()->FindRGB(192,192,192), -1, buf);
+    myG2D->FindRGB(192,192,192), -1, buf);
 }
 
 void DemoSky::FinishFrame ()

@@ -123,7 +123,7 @@ public:
    * <dt>dither<dd>Use/do not use Floyd-Steinberg dithering
    * </dl>
    */
-  void RGB (csRGBpixel *image, int pixels, int pixperline,
+  void DoRGB (csRGBpixel *image, int pixels, int pixperline,
     uint8 *&outimage, csRGBpixel *&outpalette, int &maxcolors, bool dither);
 
   /**

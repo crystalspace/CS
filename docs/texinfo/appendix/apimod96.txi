@@ -85,3 +85,14 @@ The @code{iLoader->LoadSound()} that returns an @code{iSoundWrapper}
 now returns a pointer that is increffed (one ref count more compared
 to before).
 
+@subheading iTextureManager changes
+@code{iTextureManager->FindRGB()} has been moved to
+@code{iGraphics2D->FindRGB()}.
+Additionally removed @code{iTextureManager->SetPalette()},
+@code{iTextureManager->ResetPalette()}, and
+@code{iTextureManager->ReserveColor()}.
+
+@subheading Procedural Textures
+The procedural texture system has been rewritten. Check out
+@code{iGraphics3D->SetRenderTarget()}.
+

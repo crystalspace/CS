@@ -111,7 +111,7 @@ struct csImageArea
   { x = sx; y = sy; w = sw; h = sh; data = NULL; }
 };
 
-SCF_VERSION (iGraphics2D, 2, 2, 1);
+SCF_VERSION (iGraphics2D, 2, 3, 0);
 
 /**
  * This is the interface for 2D renderer. The 2D renderer is responsible
@@ -165,6 +165,8 @@ struct iGraphics2D : public iBase
 
   /// Set a color index to given R,G,B (0..255) values
   virtual void SetRGB (int i, int r, int g, int b) = 0;
+  /// Find an RGB color.
+  virtual int FindRGB (int r, int g, int b) = 0;
 
   /**
    * Set clipping rectangle.

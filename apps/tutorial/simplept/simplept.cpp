@@ -189,9 +189,6 @@ bool Simple::Initialize ()
   iTextureManager* txtmgr = g3d->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
-  // Initialize the texture manager
-  txtmgr->ResetPalette ();
-
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
     	"crystalspace.application.simplept",
   	"Simple Procedural Texture Crystal Space Application version 0.1.");
@@ -273,8 +270,6 @@ bool Simple::Initialize ()
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, 0));
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
-
-  txtmgr->SetPalette ();
 
   return true;
 }

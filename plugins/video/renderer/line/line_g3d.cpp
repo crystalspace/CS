@@ -204,21 +204,6 @@ bool csGraphics3DLine::Open ()
   bool bFullScreen = G2D->GetFullScreen ();
 
   csPixelFormat pfmt = *G2D->GetPixelFormat ();
-  if (pfmt.PalEntries)
-  {
-    // If we don't have truecolor we simulate 5:6:5 bits
-    // for R:G:B in the masks anyway because we still need the
-    // 16-bit format for our light mixing
-    pfmt.RedShift   = RGB2PAL_BITS_G + RGB2PAL_BITS_B;
-    pfmt.GreenShift = RGB2PAL_BITS_B;
-    pfmt.BlueShift  = 0;
-    pfmt.RedMask    = ((1 << RGB2PAL_BITS_G) - 1) << pfmt.RedShift;
-    pfmt.GreenMask  = ((1 << RGB2PAL_BITS_G) - 1) << pfmt.GreenShift;
-    pfmt.BlueMask   = ((1 << RGB2PAL_BITS_B) - 1);
-    pfmt.RedBits    = RGB2PAL_BITS_R;
-    pfmt.GreenBits  = RGB2PAL_BITS_G;
-    pfmt.BlueBits   = RGB2PAL_BITS_B;
-  }
   texman->SetPixelFormat (pfmt);
 
   SetDimensions (nWidth, nHeight);
@@ -321,9 +306,9 @@ void csGraphics3DLine::DrawPolygon (G3DPolygonDP& poly)
   poly.mat_handle->GetTexture ()->GetMeanColor (flat_r, flat_g, flat_b);
 
   if (flat_r < 50 && flat_g < 50 && flat_b < 50)
-    color = texman->FindRGB (50, 50, 50);
+    color = G2D->FindRGB (50, 50, 50);
   else
-    color = texman->FindRGB (flat_r, flat_g, flat_b);
+    color = G2D->FindRGB (flat_r, flat_g, flat_b);
 
   for (i = 0 ; i < poly.num ; i++)
   {
@@ -353,9 +338,9 @@ void csGraphics3DLine::DrawPolygonFX (G3DPolygonDPFX& poly)
   }
 
   if (flat_r < 50 && flat_g < 50 && flat_b < 50)
-    color = texman->FindRGB (50, 50, 50);
+    color = G2D->FindRGB (50, 50, 50);
   else
-    color = texman->FindRGB (flat_r, flat_g, flat_b);
+    color = G2D->FindRGB (flat_r, flat_g, flat_b);
 
   for (i = 0 ; i < poly.num ; i++)
   {

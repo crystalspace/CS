@@ -337,7 +337,6 @@ csTextureManagerSoftware::csTextureManagerSoftware (
   csGraphics3DSoftwareCommon *iG3D, iConfigFile *config)
   : csTextureManager (object_reg, iG3D->GetDriver2D())
 {
-  ResetPalette ();
   read_config (config);
   G3D = iG3D;
 }
@@ -393,12 +392,6 @@ uint32 csTextureManagerSoftware::encode_rgb (int r, int g, int b)
     ((r >> (8 - pfmt.RedBits))   << pfmt.RedShift) |
     ((g >> (8 - pfmt.GreenBits)) << pfmt.GreenShift) |
     ((b >> (8 - pfmt.BlueBits))  << pfmt.BlueShift);
-}
-
-int csTextureManagerSoftware::FindRGB (int r, int g, int b)
-{
-  CLIP_RGB;
-  return encode_rgb (r, g, b);
 }
 
 void csTextureManagerSoftware::PrepareTextures ()

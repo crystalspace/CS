@@ -291,7 +291,6 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   iGraphics2D* g2d = myG3D->GetDriver2D ();
   view->SetRectangle (2, 2, g2d->GetWidth () - 4, g2d->GetHeight () - 4);
 
-  txtmgr->SetPalette ();
   return true;
 }
 

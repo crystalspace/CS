@@ -1040,8 +1040,7 @@ csPtr<iString> csCoverageBuffer::Debug_Dump ()
 void csCoverageBuffer::Debug_Dump (iGraphics3D* g3d, int zoom)
 {
   iGraphics2D* g2d = g3d->GetDriver2D ();
-  iTextureManager *txtmgr = g3d->GetTextureManager ();
-  int col = txtmgr->FindRGB (200, 200, 200);
+  int col = g2d->FindRGB (200, 200, 200);
   int x, y, i;
   for (i = 0 ; i < numrows ; i++)
   {

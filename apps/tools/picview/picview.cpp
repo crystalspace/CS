@@ -141,9 +141,6 @@ bool PicViewApp::Initialize ()
   iTextureManager* txtmgr = pG3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
-  // Initialize the texture manager
-  txtmgr->ResetPalette ();
-
   // Change to other directory before doing Prepare()
   // because otherwise precalc_info file will be written into MazeD.zip
   // The /tmp dir is fine for this.
@@ -151,8 +148,6 @@ bool PicViewApp::Initialize ()
   VFS->ChDir ("/tmp");
   files = VFS->FindFiles ("/this/*");
   cur_idx = 0;
-
-  txtmgr->SetPalette ();
 
   //------------------------------- ok, now initialize the CSWS application ---
 
@@ -275,9 +270,7 @@ void PicViewApp::LoadNextImage (int idx, int step)
     csRef<iTextureHandle> txt (txtmgr->RegisterTexture (ifile, CS_TEXTURE_2D
     	| CS_TEXTURE_DITHER));
     txt->IncRef ();	// Avoid DecRef from smart pointer.
-    txtmgr->ResetPalette ();
     txtmgr->PrepareTextures ();
-    txtmgr->SetPalette ();
     csSimplePixmap* pm = new csSimplePixmap (txt);
     image_view->image = pm;
     //int w = pm->Width ();

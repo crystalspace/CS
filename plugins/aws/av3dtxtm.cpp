@@ -360,43 +360,6 @@ int csTextureManager::GetTextureFormat ()
   return CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA;
 }
 
-int csTextureManager::FindRGB (int r, int g, int b)
-{
-  if (r > 255)
-    r = 255;
-  else if (r < 0)
-    r = 0;
-  if (g > 255)
-    g = 255;
-  else if (g < 0)
-    g = 0;
-  if (b > 255)
-    b = 255;
-  else if (b < 0)
-    b = 0;
-  return ((r >> (8 - pfmt.RedBits)) << pfmt.RedShift) |
-    ((g >> (8 - pfmt.GreenBits)) << pfmt.GreenShift) |
-      ((b >> (8 - pfmt.BlueBits)) << pfmt.BlueShift);
-}
-
-void csTextureManager::ReserveColor (int
-
-/*r*/, int
-
-/*g*/, int
-
-/*b*/ )
-{
-}
-
-void csTextureManager::SetPalette ()
-{
-}
-
-void csTextureManager::ResetPalette ()
-{
-}
-
 csPtr<iMaterialHandle> csTextureManager::RegisterMaterial (iMaterial *material)
 {
   if (!material) return NULL;

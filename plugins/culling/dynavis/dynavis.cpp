@@ -1517,11 +1517,10 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
         fnt = fntsvr->LoadFont (CSFONT_COURIER);
     }
 
-    iTextureManager* txtmgr = g3d->GetTextureManager ();
     g3d->BeginDraw (CSDRAW_2DGRAPHICS);
-    int col_cam = txtmgr->FindRGB (0, 255, 0);
-    int col_fgtext = txtmgr->FindRGB (0, 0, 0);
-    int col_bgtext = txtmgr->FindRGB (255, 255, 255);
+    int col_cam = g2d->FindRGB (0, 255, 0);
+    int col_fgtext = g2d->FindRGB (0, 0, 0);
+    int col_bgtext = g2d->FindRGB (255, 255, 255);
 
     if (cfg_view_mode == VIEWMODE_CLEARSTATSOVERLAY)
     {
@@ -1553,7 +1552,7 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
       int reason_cols[LAST_REASON];
       for (i = 0 ; i < LAST_REASON ; i++)
       {
-        reason_cols[i] = txtmgr->FindRGB (reason_colors[i].r,
+        reason_cols[i] = g2d->FindRGB (reason_colors[i].r,
       	  reason_colors[i].g, reason_colors[i].b);
       }
       csReversibleTransform trans = debug_camera->GetTransform ();
@@ -1855,7 +1854,7 @@ public:
     bool rc = tcovbuf->TestRectangle (box, 100);
     if (rc)
     {
-      int colred = g3d->GetTextureManager ()->FindRGB (255, 0, 0);
+      int colred = g3d->GetDriver2D ()->FindRGB (255, 0, 0);
       g3d->GetDriver2D ()->DrawBox (5, 5, 10, 10, colred);
     }
     tcovbuf->Debug_Dump (g3d);

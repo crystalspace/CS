@@ -69,6 +69,7 @@ bool awsPrefManager::Setup (iObjectRegistry *obj_reg)
   if (DEBUG_INIT) printf ("aws-debug: initializing AWS Texture Manager\n");
   if (DEBUG_INIT) printf ("aws-debug: creating texture manager.\n");
 
+  g2d = CS_QUERY_REGISTRY (obj_reg, iGraphics2D);
   awstxtmgr = new awsTextureManager ();
   if (!awstxtmgr) return false;
   if (DEBUG_INIT) printf ("aws-debug: initing texture manager\n");
@@ -109,7 +110,7 @@ int awsPrefManager::GetColor (int index)
 
 int awsPrefManager::FindColor(unsigned char r, unsigned char g, unsigned char b)
 {
-  return awstxtmgr->GetTextureManager ()->FindRGB (r, g, b);
+  return g2d->FindRGB (r, g, b);
 }
 
 iTextureHandle *awsPrefManager::GetTexture (const char* name, const char* filename)
@@ -169,28 +170,28 @@ void awsPrefManager::SetupPalette ()
   if (awstxtmgr) txtmgr = awstxtmgr->GetTextureManager ();
 
   LookupRGBKey ("HighlightColor", red, green, blue);
-  sys_colors[AC_HIGHLIGHT] = txtmgr->FindRGB (red, green, blue);
+  sys_colors[AC_HIGHLIGHT] = g2d->FindRGB (red, green, blue);
 
   // Create a slightly darker highlight
-  sys_colors[AC_HIGHLIGHT2] = txtmgr->FindRGB (
+  sys_colors[AC_HIGHLIGHT2] = g2d->FindRGB (
       (red > GRADIENT_STEP ? red - GRADIENT_STEP : 0),
       (green > GRADIENT_STEP ? green - GRADIENT_STEP : 0),
       (blue > GRADIENT_STEP ? blue - GRADIENT_STEP : 0));
 
   LookupRGBKey ("ShadowColor", red, green, blue);
-  sys_colors[AC_SHADOW] = txtmgr->FindRGB (red, green, blue);
+  sys_colors[AC_SHADOW] = g2d->FindRGB (red, green, blue);
 
   // Create a slightly lighter shadow
-  sys_colors[AC_SHADOW2] = txtmgr->FindRGB (
+  sys_colors[AC_SHADOW2] = g2d->FindRGB (
       (255 - red > GRADIENT_STEP ? red + GRADIENT_STEP : 255),
       (255 - green > GRADIENT_STEP ? green + GRADIENT_STEP : 255),
       (255 - blue > GRADIENT_STEP ? blue + GRADIENT_STEP : 255));
 
   LookupRGBKey ("FillColor", red, green, blue);
-  sys_colors[AC_FILL] = txtmgr->FindRGB (red, green, blue);
+  sys_colors[AC_FILL] = g2d->FindRGB (red, green, blue);
 
   // Create a slightly darker fill
-  sys_colors[AC_DARKFILL] = txtmgr->FindRGB (
+  sys_colors[AC_DARKFILL] = g2d->FindRGB (
       (red > GRADIENT_STEP ? red - GRADIENT_STEP : 0),
       (green > GRADIENT_STEP ? green - GRADIENT_STEP : 0),
       (blue > GRADIENT_STEP ? blue - GRADIENT_STEP : 0));
@@ -198,41 +199,41 @@ void awsPrefManager::SetupPalette ()
 
 
   LookupRGBKey ("TextForeColor", red, green, blue);
-  sys_colors[AC_TEXTFORE] = txtmgr->FindRGB (red, green, blue);
+  sys_colors[AC_TEXTFORE] = g2d->FindRGB (red, green, blue);
 
   LookupRGBKey ("TextBackColor", red, green, blue);
-  sys_colors[AC_TEXTBACK] = txtmgr->FindRGB (red, green, blue);
+  sys_colors[AC_TEXTBACK] = g2d->FindRGB (red, green, blue);
 
   LookupRGBKey ("TextDisabledColor", red, green, blue);
-  sys_colors[AC_TEXTDISABLED] = txtmgr->FindRGB (red, green, blue);
+  sys_colors[AC_TEXTDISABLED] = g2d->FindRGB (red, green, blue);
 
   if(LookupRGBKey ("TextSelectedForeColor", red, green, blue))
-    sys_colors[AC_SELECTTEXTFORE] = txtmgr->FindRGB (red, green, blue);
+    sys_colors[AC_SELECTTEXTFORE] = g2d->FindRGB (red, green, blue);
   else
     sys_colors[AC_SELECTTEXTFORE] = sys_colors[AC_TEXTBACK];
 
   if(LookupRGBKey ("TextSelectedBackColor", red, green, blue))
-    sys_colors[AC_SELECTTEXTBACK] = txtmgr->FindRGB (red, green, blue);
+    sys_colors[AC_SELECTTEXTBACK] = g2d->FindRGB (red, green, blue);
   else
     sys_colors[AC_SELECTTEXTBACK] = sys_colors[AC_TEXTFORE];
 
   LookupRGBKey ("ButtonTextColor", red, green, blue);
-  sys_colors[AC_BUTTONTEXT] = txtmgr->FindRGB (red, green, blue);
+  sys_colors[AC_BUTTONTEXT] = g2d->FindRGB (red, green, blue);
 
   if (LookupRGBKey ("TransparentColor", red, green, blue))
-    sys_colors[AC_TRANSPARENT] = txtmgr->FindRGB (red, green, blue);
+    sys_colors[AC_TRANSPARENT] = g2d->FindRGB (red, green, blue);
   else
-    sys_colors[AC_TRANSPARENT] = txtmgr->FindRGB (255, 0, 255);
+    sys_colors[AC_TRANSPARENT] = g2d->FindRGB (255, 0, 255);
 
-  sys_colors[AC_BLACK] = txtmgr->FindRGB (0, 0, 0);
-  sys_colors[AC_WHITE] = txtmgr->FindRGB (255, 255, 255);
-  sys_colors[AC_RED] = txtmgr->FindRGB (128, 0, 0);
-  sys_colors[AC_GREEN] = txtmgr->FindRGB (0, 128, 0);
-  sys_colors[AC_BLUE] = txtmgr->FindRGB (0, 0, 128);
+  sys_colors[AC_BLACK] = g2d->FindRGB (0, 0, 0);
+  sys_colors[AC_WHITE] = g2d->FindRGB (255, 255, 255);
+  sys_colors[AC_RED] = g2d->FindRGB (128, 0, 0);
+  sys_colors[AC_GREEN] = g2d->FindRGB (0, 128, 0);
+  sys_colors[AC_BLUE] = g2d->FindRGB (0, 0, 128);
 
 
   if(LookupRGBKey ("BackgroundColor", red, green, blue))
-	  sys_colors[AC_BACKFILL] = txtmgr->FindRGB(red, green, blue);
+	  sys_colors[AC_BACKFILL] = g2d->FindRGB(red, green, blue);
   else
 	  sys_colors[AC_BACKFILL] = sys_colors[AC_FILL];
 

@@ -236,7 +236,6 @@ bool csRegion::PrepareTextures ()
   csRef<iObjectIterator> iter;
   iTextureManager *txtmgr = csEngine::current_engine->G3D->GetTextureManager ();
 
-  //txtmgr->ResetPalette ();
   // First register all textures to the texture manager.
   {
     iter = GetIterator ();

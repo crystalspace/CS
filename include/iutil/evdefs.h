@@ -381,15 +381,6 @@ enum
   cscmdCommandLineHelp,
 
   /**
-   * This event is broadcasted by the texture manager when the SetPalette
-   * method is called.
-   *<pre>
-   * IN: (iTextureManager *) the texture manager object
-   *</pre>
-   */
-  cscmdPaletteChanged,
-
-  /**
    * Broadcasted before cscmdProcess -- on every frame --
    * as Event.Command.Code of a broadcast event.
    */

@@ -24,6 +24,12 @@ The history order is reversed so that new features are at the top.
 	- Also removed 8-bit support from the internal AWS renderer
 	  and from the null3d renderer. For some reason it doesn't look
 	  like the null renderer needs 8-bit display support :-)
+	- Removed 8-bit support from the line renderer.
+	- Moved iTextureManager->FindRGB() to iGraphics2D where it belongs.
+	- Additionally removed iTextureManager->SetPalette(), ResetPalette(),
+	  and ReserveColor().
+	- Renamed csColorQuantizer::RGB() to DoRGB() to avoid a conflict
+	  with a define.
 17-Oct-2002
 	- Removed a few additional procedural texture functions from the
 	  iGraphics3D/iGraphics2D interfaces.

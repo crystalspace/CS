@@ -1054,19 +1054,7 @@ void Cleanup ()
 void start_console ()
 {
   iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
-
-  // Initialize the texture manager
-  txtmgr->ResetPalette ();
-
-  // Allocate a uniformly distributed in R,G,B space palette for console
-  int r,g,b;
-  for (r = 0; r < 8; r++)
-    for (g = 0; g < 8; g++)
-      for (b = 0; b < 4; b++)
-        txtmgr->ReserveColor (r * 32, g * 32, b * 64);
-
   txtmgr->PrepareTextures ();
-  txtmgr->SetPalette ();
 }
 
 void WalkTest::EndEngine ()
@@ -1560,7 +1548,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   InitCollDet (Engine, NULL);
 
   // Create a wireframe object which will be used for debugging.
-  wf = new csWireFrameCam (txtmgr);
+  wf = new csWireFrameCam (myG2D);
 
   // Load a few sounds.
   if (mySound)
@@ -1602,10 +1590,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   while (csGetTicks () < t) ;
 
   // Allocate the palette as calculated by the texture manager.
-  txtmgr->SetPalette ();
-  bgcolor_txtmap = txtmgr->FindRGB (128, 128, 128);
+  bgcolor_txtmap = myG2D->FindRGB (128, 128, 128);
   bgcolor_map = 0;
-  fgcolor_stats = txtmgr->FindRGB (255, 255, 255);
+  fgcolor_stats = myG2D->FindRGB (255, 255, 255);
 
   // Reinit console object for 3D engine use.
   if (myConsole) myConsole->Clear ();
@@ -1623,7 +1610,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 #endif
   // clear all backbuffers to black
   myG2D->BeginDraw ();
-  myG2D->ClearAll (txtmgr->FindRGB(0,0,0));
+  myG2D->ClearAll (myG2D->FindRGB(0,0,0));
   myG2D->FinishDraw ();
 
   return true;

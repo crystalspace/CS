@@ -474,9 +474,8 @@ void csSimpleConsole::Draw2D (csRect* area)
 
 void csSimpleConsole::CacheColors ()
 {
-  iTextureManager *txtmgr = G3D->GetTextureManager ();
-  console_fg = txtmgr->FindRGB (console_fg_r, console_fg_g, console_fg_b);
-  console_bg = txtmgr->FindRGB (console_bg_r, console_bg_g, console_bg_b);
+  console_fg = G2D->FindRGB (console_fg_r, console_fg_g, console_fg_b);
+  console_bg = G2D->FindRGB (console_bg_r, console_bg_g, console_bg_b);
 }
 
 void csSimpleConsole::GfxWrite (int x, int y, int fg, int bg, char *iText, ...)
@@ -518,9 +517,6 @@ bool csSimpleConsole::HandleEvent (iEvent &Event)
         case cscmdSystemClose:
           SystemReady = false;
           return true;
-        case cscmdPaletteChanged:
-          CacheColors ();
-          break;
       }
       break;
   }

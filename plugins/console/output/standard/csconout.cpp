@@ -378,10 +378,8 @@ void csConsoleOutput::Draw2D (csRect *area)
 
 void csConsoleOutput::CacheColors ()
 {
-  // Update the colors from the texture manager
-  iTextureManager *txtmgr = G3D->GetTextureManager ();
-  fg = txtmgr->FindRGB (fg_rgb.red, fg_rgb.green, fg_rgb.blue);
-  bg = txtmgr->FindRGB (bg_rgb.red, bg_rgb.green, bg_rgb.blue);
+  fg = G2D->FindRGB (fg_rgb.red, fg_rgb.green, fg_rgb.blue);
+  bg = G2D->FindRGB (bg_rgb.red, bg_rgb.green, bg_rgb.blue);
 }
 
 void
@@ -605,9 +603,6 @@ bool csConsoleOutput::HandleEvent (iEvent &Event)
         case cscmdSystemClose:
           system_ready = false;
           return true;
-        case cscmdPaletteChanged:
-          CacheColors ();
-          break;
       }
       break;
   }

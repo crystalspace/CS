@@ -160,6 +160,16 @@ public:
   virtual void DrawBox (int x, int y, int w, int h, int color);
   /// (*) Set a color index to given R,G,B (0..255) values
   virtual void SetRGB (int i, int r, int g, int b);
+  virtual int FindRGB (int r, int g, int b)
+  {
+    if (r < 0) r = 0; else if (r > 255) r = 255;
+    if (g < 0) g = 0; else if (g > 255) g = 255;
+    if (b < 0) b = 0; else if (b > 255) b = 255;
+    return
+      ((r >> (8 - pfmt.RedBits))   << pfmt.RedShift) |
+      ((g >> (8 - pfmt.GreenBits)) << pfmt.GreenShift) |
+      ((b >> (8 - pfmt.BlueBits))  << pfmt.BlueShift);
+  }
   /// Write a text string into the back buffer
   virtual void Write (iFont *font , int x, int y, int fg, int bg,
     const char *text) { _WriteString (this, font, x, y, fg, bg, text); }

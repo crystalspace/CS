@@ -116,14 +116,6 @@ public:
   /// Encode RGB values to a 16-bit word (for 16-bit mode).
   uint32 encode_rgb (int r, int g, int b);
 
-  /**
-   * Return the index for some color. This works in 8-bit
-   * (returns an index in the 256-color table), in 15/16-bit
-   * (returns a 15/16-bit encoded RGB value) and in 32-bit
-   * modes as well.
-   */
-  virtual int FindRGB (int r, int g, int b) { return encode_rgb (r, g, b); }
-
   virtual void PrepareTextures ();
   virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
   virtual void UnregisterTexture (csTextureHandleInfinite* handle);

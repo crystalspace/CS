@@ -232,9 +232,6 @@ bool csVideoPreferences::Setup (iObjectRegistry* object_reg)
     return false;
   }
 
-  iTextureManager* txtmgr = g3d->GetTextureManager ();
-  txtmgr->SetPalette ();
-
   //---------
   // The window
   //---------

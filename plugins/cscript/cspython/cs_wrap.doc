@@ -394,6 +394,8 @@ ScreenShot()
 
 AllowResize(iAllow)
 
+FindRGB(r,g,b)
+
 1.17.  class iHalo
 ------------------
 
@@ -589,14 +591,6 @@ RegisterTexture(image,flags)
 PrepareTextures()
 
 FreeImages()
-
-ResetPalette()
-
-ReserveColor(r,g,b)
-
-FindRGB(r,g,b)
-
-SetPalette()
 
 SetVerbose(vb)
 

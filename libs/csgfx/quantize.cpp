@@ -788,7 +788,7 @@ void csColorQuantizer::RemapDither (
   }
 }
 
-void csColorQuantizer::RGB (csRGBpixel *image, int pixels, int pixperline,
+void csColorQuantizer::DoRGB (csRGBpixel *image, int pixels, int pixperline,
   uint8 *&outimage, csRGBpixel *&outpalette, int &maxcolors, bool dither)
 {
   Begin ();

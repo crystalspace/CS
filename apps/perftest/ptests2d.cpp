@@ -31,14 +31,14 @@ void Tester2D::Setup (iGraphics3D* g3d, PerfTest* /*perftest*/)
   max_w = G2D->GetWidth () - 10;
   max_h = G2D->GetHeight () - 10;
   inc_h = max_h/5;
-  colour[0] = g3d->GetTextureManager ()->FindRGB (0,0,255);
-  colour[1] = g3d->GetTextureManager ()->FindRGB (0,150,0);
-  colour[2] = g3d->GetTextureManager ()->FindRGB (255,0,0);
-  colour[3] = g3d->GetTextureManager ()->FindRGB (0,0,150);
-  colour[4] = g3d->GetTextureManager ()->FindRGB (150,150,150);
-  colour[5] = g3d->GetTextureManager ()->FindRGB (0,255,0);
-  colour[6] = g3d->GetTextureManager ()->FindRGB (150,0,0);
-  colour[7] = g3d->GetTextureManager ()->FindRGB (255,255,255);
+  colour[0] = G2D->FindRGB (0,0,255);
+  colour[1] = G2D->FindRGB (0,150,0);
+  colour[2] = G2D->FindRGB (255,0,0);
+  colour[3] = G2D->FindRGB (0,0,150);
+  colour[4] = G2D->FindRGB (150,150,150);
+  colour[5] = G2D->FindRGB (0,255,0);
+  colour[6] = G2D->FindRGB (150,0,0);
+  colour[7] = G2D->FindRGB (255,255,255);
 }
 
 

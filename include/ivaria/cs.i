@@ -205,6 +205,7 @@ struct iGraphics2D : public iBase
 //  virtual bool PerformExtensionV (char const* command, va_list) = 0;
   virtual csPtr<iImage> ScreenShot () = 0;
   virtual void AllowResize (bool iAllow) = 0;
+  virtual int FindRGB (int r, int g, int b) = 0;
 };
 
 struct iHalo : public iBase
@@ -344,10 +345,6 @@ struct iTextureManager : public iBase
   csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags);
   void PrepareTextures ();
   void FreeImages ();
-  void ResetPalette ();
-  void ReserveColor (int r, int g, int b);
-  int FindRGB (int r, int g, int b);
-  void SetPalette ();
   void SetVerbose (bool vb);
   int GetTextureFormat ();
 };

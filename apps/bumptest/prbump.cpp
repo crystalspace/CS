@@ -86,7 +86,7 @@ void csProcBump::MakePalette (int max)
   if (palette) delete[] palette;
   palsize = max;
   palette = new int[palsize];
-  palette[0] = g3d->GetTextureManager ()->FindRGB(0,0,0);
+  palette[0] = g3d->GetDriver2D ()->FindRGB(0,0,0);
   for (i=0 ; i<palsize ; i++)
     palette[i] = palette[0];
   /// fill the palette
@@ -107,7 +107,7 @@ void csProcBump::MakePalette (int max)
     b = (int) col.blue;
     */
     r = g = b = i;
-    palette[i] = g3d->GetTextureManager ()->FindRGB (r,g,b);
+    palette[i] = g3d->GetDriver2D ()->FindRGB (r,g,b);
   }
 }
 

@@ -284,9 +284,6 @@ void csGraphics2D::DrawPixels (csPixelCoord* pixels, int num_pixels, int color)
 void csGraphics2D::Blit (int x, int y, int w, int h,
 	unsigned char* data)
 {
-  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  if (!g3d) return;
-
   bool hor_clip_needed = false;
   bool ver_clip_needed = false;
   int orig_x = x;
@@ -314,7 +311,6 @@ void csGraphics2D::Blit (int x, int y, int w, int h,
 
   int r, g, b;
   unsigned char* d;
-  iTextureManager* txtmgr = g3d->GetTextureManager ();
   switch (pfmt.PixelBytes)
   {
     case 1:
@@ -326,7 +322,7 @@ void csGraphics2D::Blit (int x, int y, int w, int h,
 	while (w2 > 0)
 	{
 	  r = *d++; g = *d++; b = *d++; d++;
-	  *vram++ = txtmgr->FindRGB (r, g, b);
+	  *vram++ = FindRGB (r, g, b);
 	  w2--;
 	}
         data += 4*orig_w;
@@ -342,7 +338,7 @@ void csGraphics2D::Blit (int x, int y, int w, int h,
 	while (w2 > 0)
 	{
 	  r = *d++; g = *d++; b = *d++; d++;
-	  *vram++ = txtmgr->FindRGB (r, g, b);
+	  *vram++ = FindRGB (r, g, b);
 	  w2--;
 	}
         data += 4*orig_w;
@@ -358,7 +354,7 @@ void csGraphics2D::Blit (int x, int y, int w, int h,
 	while (w2 > 0)
 	{
 	  r = *d++; g = *d++; b = *d++; d++;
-	  *vram++ = txtmgr->FindRGB (r, g, b);
+	  *vram++ = FindRGB (r, g, b);
 	  w2--;
 	}
         data += 4*orig_w;

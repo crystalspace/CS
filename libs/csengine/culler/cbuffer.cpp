@@ -578,10 +578,9 @@ bool csCBuffer::TestPoint (const csVector2 &point)
       QRound (point.x));
 }
 
-void csCBuffer::GfxDump (iGraphics2D *ig2d, iGraphics3D *ig3d)
+void csCBuffer::GfxDump (iGraphics2D *ig2d, iGraphics3D *)
 {
-  iTextureManager *txtmgr = ig3d->GetTextureManager ();
-  int col = txtmgr->FindRGB (255, 255, 0);
+  int col = ig2d->FindRGB (255, 255, 0);
   int y, yy;
   for (y = 0; y < num_lines; y++)
   {

@@ -231,7 +231,7 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
   //printf("position %g,%g,%g to %g,%g,%g\n",
     //position.x, position.y, position.z, screenpos.x, screenpos.y, screenpos.z);
   //g3d->DrawLine(screenpos, screenpos+csVector3(5,5,0), g3dpolyfx.inv_aspect,
-    //g3d->GetTextureManager()->FindRGB(255,255,255));
+    //g2d->FindRGB(255,255,255));
 
   for (i = 0; i < g3dpolyfx.num; i++)
   {

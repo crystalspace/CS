@@ -288,10 +288,6 @@ bool Demo::Initialize (int argc, const char* const argv[],
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
-  // Initialize the texture manager
-  txtmgr->ResetPalette ();
-  txtmgr->SetPalette ();
-
   font = myG2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
 
   // Some commercials...
@@ -334,15 +330,14 @@ bool Demo::Initialize (int argc, const char* const argv[],
     myVFS->Unmount ("/tmp/csdemo_datadir", NULL);
   }
 
-  txtmgr->SetPalette ();
-  col_red = txtmgr->FindRGB (255, 0, 0);
-  col_blue = txtmgr->FindRGB (0, 0, 255);
-  col_white = txtmgr->FindRGB (255, 255, 255);
-  col_gray = txtmgr->FindRGB (50, 50, 50);
-  col_black = txtmgr->FindRGB (0, 0, 0);
-  col_yellow = txtmgr->FindRGB (255, 255, 0);
-  col_cyan = txtmgr->FindRGB (0, 255, 255);
-  col_green = txtmgr->FindRGB (0, 255, 0);
+  col_red = myG2D->FindRGB (255, 0, 0);
+  col_blue = myG2D->FindRGB (0, 0, 255);
+  col_white = myG2D->FindRGB (255, 255, 255);
+  col_gray = myG2D->FindRGB (50, 50, 50);
+  col_black = myG2D->FindRGB (0, 0, 0);
+  col_yellow = myG2D->FindRGB (255, 255, 0);
+  col_cyan = myG2D->FindRGB (0, 255, 255);
+  col_green = myG2D->FindRGB (0, 255, 0);
 
   return true;
 }
@@ -409,10 +404,10 @@ void Demo::SetupFrame ()
     // where to get all stuff.
     if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
     iTextureManager* txtmgr = myG3D->GetTextureManager ();
-    int col_bg = txtmgr->FindRGB (200, 180, 180);
-    int col_fgdata = txtmgr->FindRGB (20, 70, 20);
-    int col_bgsel = txtmgr->FindRGB (255, 255, 255);
-    int col_fgsel = txtmgr->FindRGB (0, 0, 0);
+    int col_bg = myG2D->FindRGB (200, 180, 180);
+    int col_fgdata = myG2D->FindRGB (20, 70, 20);
+    int col_bgsel = myG2D->FindRGB (255, 255, 255);
+    int col_fgsel = myG2D->FindRGB (0, 0, 0);
     myG2D->Clear (col_bg);
     int tx = 10;
     int ty = 10;

@@ -3247,10 +3247,9 @@ int main (int argc, char* argv[])
   Sys->ReadConfig ();
   Sys->InitEngine ();
 
-  Sys->txtmgr->SetPalette ();
-  Sys->white = Sys->txtmgr->FindRGB (255, 255, 255);
-  Sys->black = Sys->txtmgr->FindRGB (0, 0, 0);
-  Sys->red = Sys->txtmgr->FindRGB (255, 0, 0);
+  Sys->white = Sys->myG2D->FindRGB (255, 255, 255);
+  Sys->black = Sys->myG2D->FindRGB (0, 0, 0);
+  Sys->red = Sys->myG2D->FindRGB (255, 0, 0);
 
 #if defined(BLOCKS_NETWORKING)
   do_network = Sys->InitNet();

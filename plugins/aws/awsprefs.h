@@ -24,6 +24,7 @@
 # include "csutil/csdllist.h"
 # include "csutil/csvector.h"
 # include "csutil/scfstr.h"
+# include "ivideo/graph2d.h"
 
 # include "awstex.h"
 
@@ -546,6 +547,8 @@ enum AWS_COLORS
 
 class awsPrefManager : public iAwsPrefManager
 {
+  csRef<iGraphics2D> g2d;
+
   /// list of window definitions
   csDLinkList win_defs;
 

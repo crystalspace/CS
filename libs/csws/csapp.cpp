@@ -437,16 +437,6 @@ void csApp::PrepareTextures ()
 {
   iTextureManager *txtmgr = GfxPpl.G3D->GetTextureManager ();
 
-  // Clear all textures from texture manager
-  txtmgr->ResetPalette ();
-
-  // Create a uniform palette: r(3)g(3)b(2)
-  int r,g,b;
-  for (r = 0; r < 8; r++)
-    for (g = 0; g < 8; g++)
-      for (b = 0; b < 4; b++)
-        txtmgr->ReserveColor (r * 32, g * 32, b * 64);
-
   // Register all CSWS textures to the texture manager
   int i;
   for (i = 0; i < Textures.Length (); i++)
@@ -454,8 +444,6 @@ void csApp::PrepareTextures ()
 
   // Prepare all the textures.
   txtmgr->PrepareTextures ();
-  // Set the palette (256-color mode)
-  txtmgr->SetPalette ();
   // Look in palette for colors we need for windowing system
   SetupPalette ();
   // Finally, set up mouse pointer images
@@ -470,35 +458,33 @@ void csApp::SetupPalette ()
   PhysColorShift = ((pfmt->RedShift >= 24) || (pfmt->GreenShift >= 24)
     || (pfmt->BlueShift >= 24)) ? 8 : 0;
 
-  iTextureManager* txtmgr = GfxPpl.G3D->GetTextureManager ();
-  Pal [cs_Color_Black]   = txtmgr->FindRGB (  0,   0,   0);
-  Pal [cs_Color_White]   = txtmgr->FindRGB (255, 255, 255);
-  Pal [cs_Color_Gray_D]  = txtmgr->FindRGB (128, 128, 128);
-  Pal [cs_Color_Gray_M]  = txtmgr->FindRGB (160, 160, 160);
-  Pal [cs_Color_Gray_L]  = txtmgr->FindRGB (204, 204, 204);
-  Pal [cs_Color_Blue_D]  = txtmgr->FindRGB (  0,  20,  80);
-  Pal [cs_Color_Blue_M]  = txtmgr->FindRGB (  0,  44, 176);
-  Pal [cs_Color_Blue_L]  = txtmgr->FindRGB (  0,  64, 255);
-  Pal [cs_Color_Green_D] = txtmgr->FindRGB ( 20,  80,  20);
-  Pal [cs_Color_Green_M] = txtmgr->FindRGB ( 44, 176,  44);
-  Pal [cs_Color_Green_L] = txtmgr->FindRGB ( 64, 255,  64);
-  Pal [cs_Color_Red_D]   = txtmgr->FindRGB ( 80,   0,   0);
-  Pal [cs_Color_Red_M]   = txtmgr->FindRGB (176,   0,   0);
-  Pal [cs_Color_Red_L]   = txtmgr->FindRGB (255,   0,   0);
-  Pal [cs_Color_Cyan_D]  = txtmgr->FindRGB (  0,  60,  80);
-  Pal [cs_Color_Cyan_M]  = txtmgr->FindRGB (  0, 132, 176);
-  Pal [cs_Color_Cyan_L]  = txtmgr->FindRGB (  0, 192, 255);
-  Pal [cs_Color_Brown_D] = txtmgr->FindRGB ( 80,  60,  20);
-  Pal [cs_Color_Brown_M] = txtmgr->FindRGB (176, 132,  44);
-  Pal [cs_Color_Brown_L] = txtmgr->FindRGB (255, 192,  64);
-  Pal [cs_Color_Lemon]   = txtmgr->FindRGB (255, 250, 205);
+  Pal [cs_Color_Black]   = GfxPpl.G2D->FindRGB (  0,   0,   0);
+  Pal [cs_Color_White]   = GfxPpl.G2D->FindRGB (255, 255, 255);
+  Pal [cs_Color_Gray_D]  = GfxPpl.G2D->FindRGB (128, 128, 128);
+  Pal [cs_Color_Gray_M]  = GfxPpl.G2D->FindRGB (160, 160, 160);
+  Pal [cs_Color_Gray_L]  = GfxPpl.G2D->FindRGB (204, 204, 204);
+  Pal [cs_Color_Blue_D]  = GfxPpl.G2D->FindRGB (  0,  20,  80);
+  Pal [cs_Color_Blue_M]  = GfxPpl.G2D->FindRGB (  0,  44, 176);
+  Pal [cs_Color_Blue_L]  = GfxPpl.G2D->FindRGB (  0,  64, 255);
+  Pal [cs_Color_Green_D] = GfxPpl.G2D->FindRGB ( 20,  80,  20);
+  Pal [cs_Color_Green_M] = GfxPpl.G2D->FindRGB ( 44, 176,  44);
+  Pal [cs_Color_Green_L] = GfxPpl.G2D->FindRGB ( 64, 255,  64);
+  Pal [cs_Color_Red_D]   = GfxPpl.G2D->FindRGB ( 80,   0,   0);
+  Pal [cs_Color_Red_M]   = GfxPpl.G2D->FindRGB (176,   0,   0);
+  Pal [cs_Color_Red_L]   = GfxPpl.G2D->FindRGB (255,   0,   0);
+  Pal [cs_Color_Cyan_D]  = GfxPpl.G2D->FindRGB (  0,  60,  80);
+  Pal [cs_Color_Cyan_M]  = GfxPpl.G2D->FindRGB (  0, 132, 176);
+  Pal [cs_Color_Cyan_L]  = GfxPpl.G2D->FindRGB (  0, 192, 255);
+  Pal [cs_Color_Brown_D] = GfxPpl.G2D->FindRGB ( 80,  60,  20);
+  Pal [cs_Color_Brown_M] = GfxPpl.G2D->FindRGB (176, 132,  44);
+  Pal [cs_Color_Brown_L] = GfxPpl.G2D->FindRGB (255, 192,  64);
+  Pal [cs_Color_Lemon]   = GfxPpl.G2D->FindRGB (255, 250, 205);
 }
 
 int csApp::FindColor (int r, int g, int b)
 {
   int color;
-  iTextureManager *txtmgr = GfxPpl.G3D->GetTextureManager ();
-  color = txtmgr->FindRGB (r, g, b);
+  color = GfxPpl.G2D->FindRGB (r, g, b);
   return (color >> PhysColorShift) | 0x80000000;
 }
 

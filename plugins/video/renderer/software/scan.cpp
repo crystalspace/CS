@@ -176,7 +176,8 @@ void csScan_Finalize ()
 }
 
 void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
-  iPolygonTexture* tex, csTextureHandleSoftware* texture, csTextureSoftware *untxt)
+  iPolygonTexture* tex, csTextureHandleSoftware* texture,
+  csTextureSoftware *untxt)
 {
   Scan.Texture = texture;
   Scan.bitmap = untxt->get_bitmap ();
@@ -188,7 +189,7 @@ void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
 
   uint8 r, g, b;
   texture->GetMeanColor (r, g, b);
-  Scan.FlatColor = g3d->texman->FindRGB (r, g, b);
+  Scan.FlatColor = g3d->GetDriver2D ()->FindRGB (r, g, b);
 
   if (g3d->do_lighting)
   {

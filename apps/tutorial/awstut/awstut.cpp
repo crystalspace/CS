@@ -152,7 +152,6 @@ bool AwsTutorial::Initialize (int argc, const char* const argv[])
 
   // Setup the texture manager.
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
-  txtmgr->SetPalette();
 
   awsCanvas = csPtr<iAwsCanvas> (aws->CreateCustomCanvas (myG2D, myG3D));
 

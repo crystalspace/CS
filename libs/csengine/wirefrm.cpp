@@ -25,9 +25,8 @@
 #include "csengine/camera.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
-#include "ivideo/txtmgr.h"
 
-csWfColor::csWfColor (iTextureManager *txtmgr, int r, int g, int b)
+csWfColor::csWfColor (iGraphics2D *g2d, int r, int g, int b)
 {
   csWfColor::r = r;
   csWfColor::g = g;
@@ -35,7 +34,7 @@ csWfColor::csWfColor (iTextureManager *txtmgr, int r, int g, int b)
 
   int i;
   for (i = 0; i < 16; i++)
-    col_idx[i] = txtmgr->FindRGB (
+    col_idx[i] = g2d->FindRGB (
         r * (20 - i) / 20,
         g * (20 - i) / 20,
         b * (20 - i) / 20);
@@ -285,12 +284,12 @@ void csWfPolygon::Draw (iGraphics3D *g, csCamera *c, int ortho)
   }
 }
 
-//=================================================================================================
-csWireFrame::csWireFrame (iTextureManager *txtmgr)
+//============================================================================
+csWireFrame::csWireFrame (iGraphics2D *g2d)
 {
   objects = NULL;
   numObjects = 0;
-  csWireFrame::txtmgr = txtmgr;
+  csWireFrame::g2d = g2d;
   colors = NULL;
   white = RegisterColor (255, 255, 255);
   red = RegisterColor (255, 0, 0);
@@ -338,7 +337,7 @@ csWfColor *csWireFrame::RegisterColor (int r, int g, int b)
 {
   csWfColor *c = FindColor (r, g, b);
   if (c) return c;
-  c = new csWfColor (txtmgr, r, g, b);
+  c = new csWfColor (g2d, r, g, b);
   c->next = colors;
   colors = c;
   return c;
@@ -405,9 +404,9 @@ void csWireFrame::Apply (void (*func) (csWfObject *, void *), void *param)
   }
 }
 
-csWireFrameCam::csWireFrameCam (iTextureManager *txtmgr)
+csWireFrameCam::csWireFrameCam (iGraphics2D *g2d)
 {
-  wf = new csWireFrame (txtmgr);
+  wf = new csWireFrame (g2d);
   c = new csCamera ();
 }
 

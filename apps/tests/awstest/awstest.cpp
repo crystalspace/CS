@@ -207,19 +207,6 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
-  // Initialize the texture manager
-  txtmgr->ResetPalette ();
-
-  // Allocate a uniformly distributed in R,G,B space palette for console
-  // The console will crash on some platforms if this isn't initialize properly
-  int r,g,b;
-  for (r = 0; r < 8; r++)
-    for (g = 0; g < 8; g++)
-      for (b = 0; b < 4; b++)
-	txtmgr->ReserveColor(r * 32, g * 32, b * 64);
-
-  txtmgr->SetPalette();
-
   font = myG2D->GetFontServer()->LoadFont (CSFONT_LARGE);
 
   // Initialize the console
@@ -325,15 +312,14 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   wview->GetCamera ()->SetSector (room);
   wview->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
 
-  txtmgr->SetPalette ();
-  col_red = txtmgr->FindRGB (255, 0, 0);
-  col_blue = txtmgr->FindRGB (0, 0, 255);
-  col_white = txtmgr->FindRGB (255, 255, 255);
-  col_gray = txtmgr->FindRGB (50, 50, 50);
-  col_black = txtmgr->FindRGB (0, 0, 0);
-  col_yellow = txtmgr->FindRGB (255, 255, 0);
-  col_cyan = txtmgr->FindRGB (0, 255, 255);
-  col_green = txtmgr->FindRGB (0, 255, 0);
+  col_red = myG2D->FindRGB (255, 0, 0);
+  col_blue = myG2D->FindRGB (0, 0, 255);
+  col_white = myG2D->FindRGB (255, 255, 255);
+  col_gray = myG2D->FindRGB (50, 50, 50);
+  col_black = myG2D->FindRGB (0, 0, 0);
+  col_yellow = myG2D->FindRGB (255, 255, 0);
+  col_cyan = myG2D->FindRGB (0, 255, 255);
+  col_green = myG2D->FindRGB (0, 255, 0);
 
   if (AWSTEST_CANVAS == AWSTEST_SINGLEPROC)
   {

@@ -221,21 +221,10 @@ public:
   ///
   virtual void Clear ();
 
-  /**
-   * Return the index for some color. This works in all display modes.
-   */
-  virtual int FindRGB (int r, int g, int b);
-
   ///
   virtual void PrepareTextures ();
   ///
   virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
-  /// Clear the palette (including all reserved colors)
-  virtual void ResetPalette () { }
-  /// Reserve a color in palette (if any)
-  virtual void ReserveColor (int, int, int) { }
-  /// Really allocate the palette on the system.
-  virtual void SetPalette () { }
 };
 
 #endif // __SOFT_TXT_H__

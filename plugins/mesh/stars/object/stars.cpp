@@ -133,7 +133,7 @@ void csStarsMeshObject::DrawPoint(iRenderView *rview,
   }
 
   // draw
-  int colidx = g3d->GetTextureManager()->FindRGB(QInt(col.red * 255),
+  int colidx = g2d->FindRGB(QInt(col.red * 255),
     QInt(col.green*255), QInt(col.blue*255));
   g2d->DrawPixel(x, y, colidx);
 

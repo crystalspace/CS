@@ -164,26 +164,12 @@ public:
   ///
   virtual void Clear ();
 
-  /**
-   * Return the index for some color. This works in 8-bit
-   * (returns an index in the 256-color table), in 15/16-bit
-   * (returns a 15/16-bit encoded RGB value) and in 32-bit
-   * modes as well.
-   */
-  virtual int FindRGB (int r, int g, int b);
-
   ///
   virtual void PrepareTextures ();
   ///
   virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
   ///
   virtual void UnregisterTexture (csTextureHandleNull* handle);
-  /// Clear the palette (including all reserved colors)
-  virtual void ResetPalette ();
-  /// Reserve a color in palette (if any)
-  virtual void ReserveColor (int r, int g, int b);
-  /// Really allocate the palette on the system.
-  virtual void SetPalette ();
 };
 
 #endif // __NULL_TXT_H__

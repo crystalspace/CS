@@ -200,9 +200,6 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
-  // Initialize the texture manager
-  txtmgr->ResetPalette ();
-
   // Initialize textures.
   materials[0] = LoadMaterial ("/lib/std/stone4.gif");
   materials[1] = LoadMaterial ("/lib/std/mystone2.gif");
@@ -210,20 +207,9 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   materials[3] = LoadMaterial ("/lib/std/andrew_wood.gif");
   txtmgr->PrepareTextures ();
 
-  // Allocate a uniformly distributed in R,G,B space palette for console
-  // The console will crash on some platforms if this isn't initialize properly
-  int r,g,b;
-  for (r = 0; r < 8; r++)
-    for (g = 0; g < 8; g++)
-      for (b = 0; b < 4; b++)
-	txtmgr->ReserveColor (r * 32, g * 32, b * 64);
-  txtmgr->SetPalette ();
-
   // Some commercials...
   Report (CS_REPORTER_SEVERITY_NOTIFY,
     "Crystal Space 3D Performance Tester 0.1.");
-
-  txtmgr->SetPalette ();
 
   const char *val;
   csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,

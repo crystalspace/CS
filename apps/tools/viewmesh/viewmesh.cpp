@@ -494,9 +494,6 @@ bool ViewMesh::Initialize ()
   iTextureManager* txtmgr = g3d->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
-  // Initialize the texture manager
-  txtmgr->ResetPalette ();
-
   Printf (CS_REPORTER_SEVERITY_NOTIFY,
     "View Mesh version 0.1.");
 
@@ -592,8 +589,6 @@ bool ViewMesh::Initialize ()
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 10, -4));
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
-
-  txtmgr->SetPalette ();
 
   csRef<iCommandLineParser> cmdline;
   VM_QUERYPLUGIN (cmdline, iCommandLineParser, "iCommandLineParser");

@@ -253,18 +253,6 @@ bool IsoMap1::Initialize (int argc, const char* const argv[],
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
-  // Initialize the texture manager
-  txtmgr->ResetPalette ();
-
-  // Allocate a uniformly distributed in R,G,B space palette for console
-  // The console will crash on some platforms if this isn't initialize properly
-  int r,g,b;
-  for (r = 0; r < 8; r++)
-    for (g = 0; g < 8; g++)
-      for (b = 0; b < 4; b++)
-	txtmgr->ReserveColor (r * 32, g * 32, b * 64);
-  txtmgr->SetPalette ();
-
   // Some commercials...
   Report (CS_REPORTER_SEVERITY_NOTIFY, 
 	  "IsoMap1 Crystal Space Application version 0.1.");
@@ -309,7 +297,6 @@ bool IsoMap1::Initialize (int argc, const char* const argv[],
   // prepare texture manager
   txtmgr->PrepareTextures ();
   txtmgr->PrepareMaterials ();
-  txtmgr->SetPalette ();
 
   // scroll view to show player position at center of screen
   view->SetScroll(
@@ -442,7 +429,7 @@ void IsoMap1::SetupFrame ()
   char buf[255];
   sprintf(buf, "FPS: %g    loc(%g,%g,%g)", fps, player->GetPosition().x,
     player->GetPosition().y, player->GetPosition().z);
-  myG2D->Write(font, 10, myG2D->GetHeight() - 20, txtmgr->FindRGB(255,255,255),
+  myG2D->Write(font, 10, myG2D->GetHeight() - 20, myG2D->FindRGB(255,255,255),
     -1, buf);
 }
 

@@ -406,9 +406,6 @@ bool Simple::Initialize (const char *iConfigName)
   iTextureManager* txtmgr = g3d->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
-  // Initialize the texture manager
-  txtmgr->ResetPalette ();
-
   Report (CS_REPORTER_SEVERITY_NOTIFY,
     "Simple Crystal Space Application version 0.1.");
 
@@ -504,7 +501,6 @@ bool Simple::Initialize (const char *iConfigName)
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
-  txtmgr->SetPalette ();
   return true;
 }
 

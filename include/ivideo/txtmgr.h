@@ -65,7 +65,7 @@ struct iMaterialHandle;
 #define CS_TEXTURE_NOMIPMAPS		0x00000008
 /** @} */
 
-SCF_VERSION (iTextureManager, 2, 0, 0);
+SCF_VERSION (iTextureManager, 2, 1, 0);
 
 /**
  * This is the standard texture manager interface.
@@ -155,37 +155,6 @@ struct iTextureManager : public iBase
    * given to this texture manager.
    */
   virtual void FreeMaterials () = 0;
-
-  /**
-   * Reset all reserved colors in palette. This function should be called
-   * if you want to reverse the effect of all ReserveColor() calls.
-   * The function will have effect on next call to PrepareTextures ().
-   */
-  virtual void ResetPalette () = 0;
-
-  /**
-   * Reserve RGB. Call this function to reserve a color
-   * from the palette (if any). This function only takes effect after
-   * the next call to Prepare (). Note that black (0) and white (255)
-   * are already preallocated colors.
-   */
-  virtual void ReserveColor (int r, int g, int b) = 0;
-
-  /**
-   * Return a color. Find the color in palette and return the palette
-   * index that contains the nearest color. For 15-, 16- and 32-bit modes
-   * this returns a encoded RGB color as needed by both 2D and 3D drivers.
-   */
-  virtual int FindRGB (int r, int g, int b) = 0;
-
-  /**
-   * Switch to the new palette. This function should be called
-   * after you called the PrepareTextures() method which will compute
-   * a optimal palette for all textures. Of course, it is not neccessarily
-   * to call it directly after PrepareTextures() but you should call it before
-   * using any texture, otherwise they will look garbled.
-   */
-  virtual void SetPalette () = 0;
 
   /**
    * Set verbose mode on/off. In verbose mode, texture manager will

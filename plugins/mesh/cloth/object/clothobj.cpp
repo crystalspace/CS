@@ -215,7 +215,6 @@ bool csStuffObject::Draw(iRenderView *rview, iMovable*, csZBufMode zbufmode){
 	  //csRef<iComponent> plugin ( CS_REQUEST_PLUGIN( CS_REQUEST_IMAGELOADER ) );
 	  csRef<iLoader> loader = CS_QUERY_REGISTRY ( Obj_Reg , iLoader  );
 	  iTextureManager* txtmgr = g3d->GetTextureManager ();
-  txtmgr->SetPalette ();
 
     printf ("INTERNAL ERROR: cloth used without material!\n");
 	  iTextureWrapper* txt = loader->LoadTexture ("spark",

@@ -25,7 +25,7 @@
 #include "iengine/sector.h"
 #include "iengine/movable.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/txtmgr.h"
+#include "ivideo/graph2d.h"
 
 SCF_IMPLEMENT_IBASE (csShadow)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
@@ -85,7 +85,7 @@ bool csShadow::Draw (iRenderView* rview, iMovable*, csZBufMode)
   float fov = G3D->GetPerspectiveAspect ();
   if (do_bbox)
   {
-    int bbox_color = G3D->GetTextureManager ()->FindRGB (0, 255, 255);
+    int bbox_color = G3D->GetDriver2D ()->FindRGB (0, 255, 255);
     csBox3 bbox;
     shadow_mesh->GetMeshObject ()->GetObjectModel ()->
     	GetObjectBoundingBox (bbox);
@@ -112,7 +112,7 @@ bool csShadow::Draw (iRenderView* rview, iMovable*, csZBufMode)
   }
   if (do_rad)
   {
-    int rad_color = G3D->GetTextureManager ()->FindRGB (0, 255, 0);
+    int rad_color = G3D->GetDriver2D ()->FindRGB (0, 255, 0);
     csVector3 radius, r, center;
     shadow_mesh->GetMeshObject ()->GetObjectModel ()->GetRadius (radius,center);
     csVector3 trans_o = tr_o2c * center;
@@ -125,9 +125,10 @@ bool csShadow::Draw (iRenderView* rview, iMovable*, csZBufMode)
   }
   if (do_beam)
   {
-    int beam_color = G3D->GetTextureManager ()->FindRGB (0, 255, 0);
-    int isec_color = G3D->GetTextureManager ()->FindRGB (255, 255, 0);
-    int isec2_color = G3D->GetTextureManager ()->FindRGB (255, 0, 0);
+    iGraphics2D* G2D = G3D->GetDriver2D ();
+    int beam_color = G2D->FindRGB (0, 255, 0);
+    int isec_color = G2D->FindRGB (255, 255, 0);
+    int isec2_color = G2D->FindRGB (255, 0, 0);
     csVector3 st = tr_w2c * beam[0], fin = tr_w2c * beam[1],
 	  isc = tr_w2c * isec;
     G3D->DrawLine (st, isc, fov, isec_color);

@@ -312,7 +312,6 @@ bool Simple::Initialize ()
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   iTextureManager* txtmgr = g3d->GetTextureManager ();
-  txtmgr->SetPalette ();
 
   // Load a texture for our sprite.
   iTextureWrapper* txt = loader->LoadTexture ("spark",

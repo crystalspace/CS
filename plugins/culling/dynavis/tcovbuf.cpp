@@ -1569,7 +1569,7 @@ csPtr<iString> csTiledCoverageBuffer::Debug_Dump ()
 void csTiledCoverageBuffer::Debug_Dump (iGraphics3D* g3d, int /*zoom*/)
 {
   iGraphics2D* g2d = g3d->GetDriver2D ();
-  int colpoint = g3d->GetTextureManager ()->FindRGB (255, 0, 0);
+  int colpoint = g2d->FindRGB (255, 0, 0);
 
   int x, y, tx, ty, i, j;
   for (ty = 0 ; ty < num_tile_rows ; ty++)
@@ -1596,7 +1596,7 @@ void csTiledCoverageBuffer::Debug_Dump (iGraphics3D* g3d, int /*zoom*/)
 	      {
 	        int c = 255-int (depth);
 		if (c < 50) c = 50;
-		int col = g3d->GetTextureManager ()->FindRGB (c, c, c);
+		int col = g2d->FindRGB (c, c, c);
 	        g2d->DrawPixel (tx*32+x*8+i, ty*64+y*8+j, col);
 	      }
 	    }

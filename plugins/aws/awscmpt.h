@@ -86,6 +86,10 @@ public:
       (void)g;
       (void)b;
     };
+    virtual int FindRGB (int r, int g, int b)
+    {
+      return 0;	// @@@ TODO
+    }
 
     /// Write a text string
     virtual void Write (

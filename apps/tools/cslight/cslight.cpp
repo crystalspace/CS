@@ -263,11 +263,10 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   // Setup the texture manager.
   iTextureManager* txtmgr = g3d->GetTextureManager ();
   txtmgr->SetVerbose (true);
-  txtmgr->ResetPalette ();
-  color_bg = txtmgr->FindRGB (0, 0, 0);
-  color_text = txtmgr->FindRGB (200, 220, 255);
-  color_done = txtmgr->FindRGB (255, 0, 0);
-  color_todo = txtmgr->FindRGB (0, 200, 200);
+  color_bg = g2d->FindRGB (0, 0, 0);
+  color_text = g2d->FindRGB (200, 220, 255);
+  color_done = g2d->FindRGB (255, 0, 0);
+  color_todo = g2d->FindRGB (0, 200, 200);
 
   // Setup font.
   iFontServer* fntsvr = g2d->GetFontServer ();
@@ -374,7 +373,6 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   engine->Prepare (meter);
   delete meter;
 
-  txtmgr->SetPalette ();
   return true;
 }
 

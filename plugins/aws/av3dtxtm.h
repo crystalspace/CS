@@ -387,22 +387,6 @@ public:
   virtual int GetTextureFormat ();
 
   /**
-   * Return the index for some color. This works in 8-bit
-   * (returns an index in the 256-color table) and in 15/16-bit
-   * (returns a 15/16-bit encoded RGB value).
-   */
-  virtual int FindRGB (int r, int g, int b);
-
-  /// Clear the palette (including all reserved colors)
-  virtual void ResetPalette ();
-
-  /// Reserve a color in palette (if any)
-  virtual void ReserveColor (int r, int g, int b);
-
-  /// Really allocate the palette on the system.
-  virtual void SetPalette ();
-
-  /**
    * Register a material. The input material wrapper is IncRef'd and DecRef'ed
    * later when FreeMaterials () is called or the material handle is destroyed
    * by calling DecRef on it enough times. If you want to keep the input

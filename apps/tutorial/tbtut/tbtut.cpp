@@ -270,9 +270,6 @@ bool TerrBigTut::Initialize ()
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
   view->GetCamera()->Move (csVector3 (0, 20, 0));
-
-  iTextureManager* txtmgr = g3d->GetTextureManager ();
-  txtmgr->SetPalette ();
   return true;
 }
 

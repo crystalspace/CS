@@ -183,9 +183,6 @@ bool Simple::LoadMap ()
 
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (pos);
-
-  iTextureManager* txtmgr = g3d->GetTextureManager ();
-  txtmgr->SetPalette ();
   return true;
 }
 

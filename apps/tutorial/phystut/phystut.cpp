@@ -372,7 +372,6 @@ bool Simple::Initialize ()
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   iTextureManager* txtmgr = g3d->GetTextureManager ();
-  txtmgr->SetPalette ();
 
   iTextureWrapper* txt = loader->LoadTexture ("spark",
   	"/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, true);

@@ -86,8 +86,7 @@ void csProcWater::MakePalette (int max)
   if (palette) delete[] palette;
   palsize = max;
   palette = new int[palsize];
-  iTextureManager* ptTxtMgr = g3d->GetTextureManager ();
-  palette[0] = ptTxtMgr->FindRGB(0,0,0);
+  palette[0] = g2d->FindRGB(0,0,0);
   for (i=0 ; i<palsize ; i++)
     palette[i] = palette[0];
   /// fill the palette
@@ -105,7 +104,7 @@ void csProcWater::MakePalette (int max)
     r = (int) col.red;
     g = (int) col.green;
     b = (int) col.blue;
-    palette[i] = ptTxtMgr->FindRGB (r,g,b);
+    palette[i] = g2d->FindRGB (r,g,b);
   }
 }
 
