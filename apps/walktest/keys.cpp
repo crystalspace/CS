@@ -38,6 +38,7 @@
 #include "ivaria/view.h"
 #include "iutil/event.h"
 #include "iutil/csinput.h"
+#include "iutil/virtclk.h"
 
 extern WalkTest* Sys;
 
@@ -237,9 +238,9 @@ void WalkTest::strafe (float speed,int keep_old)
   if (move_3d) return;
   static bool pressed = false;
   static float strafe_speed = 0;
-  static long start_time = csGetTicks ();
+  static long start_time = vc->GetCurrentTicks ();
 
-  long cur_time = csGetTicks ();
+  long cur_time = vc->GetCurrentTicks ();
   if (!keep_old)
   {
     bool new_pressed = ABS (speed) > 0.001;
@@ -279,9 +280,9 @@ void WalkTest::step (float speed,int keep_old)
 
   static bool pressed = false;
   static float step_speed = 0;
-  static long start_time = csGetTicks ();
+  static long start_time = vc->GetCurrentTicks ();
 
-  long cur_time = csGetTicks ();
+  long cur_time = vc->GetCurrentTicks ();
   if (!keep_old)
   {
     bool new_pressed = ABS (speed) > 0.001;
@@ -325,9 +326,9 @@ void WalkTest::rotate (float speed,int keep_old)
 
   static bool pressed = false;
   static float angle_accel = 0;
-  static long start_time = csGetTicks ();
+  static long start_time = vc->GetCurrentTicks ();
 
-  long cur_time = csGetTicks ();
+  long cur_time = vc->GetCurrentTicks ();
   if (!keep_old)
   {
     bool new_pressed = ABS (speed) > 0.001;

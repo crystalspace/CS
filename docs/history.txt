@@ -15,6 +15,8 @@ The history order is reversed so that new features are at the top.
 	    - spr3d
 	    - motion manager
 	    - sequence manager
+	- Additionally replaced a few csGetTicks() calls in walktest movement
+	  code with the virtual clock.
 6-Apr-2003
         - Rhad fixed some thread syncronization issues in the OpenAL
           and Direct Sound 3d sound renderers.
