@@ -1,0 +1,50 @@
+<!--
+#
+# CS cal3d model xml file
+#
+# model: cally
+#
+-->
+
+<meshfact name="cally">
+   <plugin>crystalspace.mesh.loader.factory.sprite.cal3d</plugin>
+   <params>
+
+	<path dir="../cal3d/cal3d_data/cally/" />
+	<scale value=".01" />
+
+	<skeleton file="cally.csf" />
+
+	<animation file="cally_idle.caf" />
+	<animation file="cally_tornado_kick.caf" />
+	<animation file="cally_walk.caf" />
+	<animation file="cally_strut.caf" />
+	<animation file="cally_jog.caf" />
+	<animation file="cally_shoot_arrow.caf" />
+	<animation file="cally_wave.caf" />
+
+	<mesh file="cally_calf_left.cmf" />
+	<mesh file="cally_calf_right.cmf" />
+	<mesh file="cally_chest.cmf" />
+	<mesh file="cally_foot_left.cmf" />
+	<mesh file="cally_foot_right.cmf" />
+	<mesh file="cally_hand_left.cmf" />
+	<mesh file="cally_hand_right.cmf" />
+	<mesh file="cally_head.cmf" />
+	<mesh file="cally_lowerarm_left.cmf" />
+	<mesh file="cally_lowerarm_right.cmf" />
+	<mesh file="cally_neck.cmf" />
+	<mesh file="cally_pelvis.cmf" />
+	<mesh file="cally_ponytail.cmf" />
+	<mesh file="cally_thigh_left.cmf" />
+	<mesh file="cally_thigh_right.cmf" />
+	<mesh file="cally_upperarm_left.cmf" />
+	<mesh file="cally_upperarm_right.cmf" />
+
+	<material file="cally_skin.crf" />
+	<material file="cally_ponytail.crf" />
+	<material file="cally_chest.crf" />
+	<material file="cally_pelvis.crf" />
+
+    </params>
+</meshfact>
