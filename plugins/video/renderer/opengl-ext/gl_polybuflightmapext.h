@@ -1,5 +1,11 @@
 #ifndef POLYBUFLIGHTMAPEXT_H_INCLUDED
 #define POLYBUFLIGHTMAPEXT_H_INCLUDED
+// Look for the CS OPENGL PATH
+#if defined(CS_OPENGL_PATH)
+#include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+#else
+#include <GL/gl.h>
+#endif
 
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"

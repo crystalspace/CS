@@ -15,7 +15,7 @@ csPolyBufMatLightmap::csPolyBufMatLightmap(iGraphics3D &g3d, csRealVertexBuffer 
 }
 
 csPolyBufMatLightmap::csPolyBufMatLightmap(int width, int height, csRealVertexBuffer &vbuf)
-      : m_realvbuf(vbuf);
+      : m_realvbuf(vbuf)
 {
 }
 
