@@ -20,7 +20,7 @@
 #define __CS_POLYTEXT_H__
 
 #include "csgeom/math3d.h"
-#include "csengine/rview.h"
+#include "csengine/lview.h"
 #include "iengine/polygon.h"
 
 class csPolygon3D;

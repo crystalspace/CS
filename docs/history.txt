@@ -9,6 +9,9 @@ The history order has been reversed so that new features are at the top.
 	- Wouter also added a method GetColor() to iParticleState, to get
 	  the particle color.
 	- Wouter added the ExplosionSaver and ExplosionFactorySaver PlugIns.
+	- Split rview.cpp and rview.h into rview and lview. rview contains
+	  csRenderView and lview contains everything related to the
+	  shadow calculations.
 18-Mar-2001
 	- Fixed skydomes so that they need to be in the same part. Without
 	  this fix the circle command could only correctly be specified in the

@@ -23,6 +23,7 @@
 #include "csutil/scf.h"
 
 struct iShadowBlock;
+struct iSector;
 class csFrustum;
 
 SCF_VERSION (iShadowIterator, 0, 0, 1);

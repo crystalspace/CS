@@ -23,7 +23,7 @@
 #include "csobject/csobject.h"
 #include "csutil/cscolor.h"
 #include "csutil/flags.h"
-#include "csengine/rview.h"
+#include "csengine/lview.h"
 #include "iengine/light.h"
 #include "iengine/statlght.h"
 #include "iengine/dynlight.h"

@@ -34,6 +34,7 @@
 
 struct iMaterialHandle;
 class csBspContainer;
+class csFrustumView;
 
 /**
  * Tesselated curve. This is basicly a list of triangles.
