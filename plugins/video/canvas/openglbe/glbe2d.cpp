@@ -24,6 +24,7 @@
 #include "csutil/scf.h"
 #include "glbe2d.h"
 #include "CrystGLWindow.h"
+#include "video/canvas/common/dyntex2d.h"
 #include "isystem.h"
 
 IMPLEMENT_FACTORY (csGraphics2DGLBe)
@@ -130,6 +131,14 @@ void csGraphics2DGLBe::Print (csRect*)
     view->UnlockGL();
     glFinish();
   }
+}
+
+iGraphics2D* csGraphics2DGLBe::CreateOffScreenCanvas(int width, int height,
+  csPixelFormat* pfmt, void* buffer, RGBPixel* palette, int pal_size)
+{
+  csDynamicTexture2D* tex = new csDynamicTexture2D(System);
+  return tex->CreateOffScreenCanvas(width, height, pfmt, buffer,
+    palette, pal_size);
 }
 
 void csGraphics2DGLBe::ApplyDepthInfo(color_space cs)
