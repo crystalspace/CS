@@ -2,6 +2,30 @@ The history order is reversed so that new features are at the top.
 
 6-Jun-2002
 	- Changed 'double' to 'float' in OpenGL renderer texture cache.
+	- Added 'toggle_queue' command to Dynavis. Assigned this command
+	  to '4' in BugPlug.
+	- Added csBox2::TestIntersect() and csBox3::TestIntersect(). These
+	  functions test if two boxes have an intersection without
+	  actually computing the intersection. So it complements the
+	  *= operator in csBox2 and csBox3 which actually computes the
+	  intersection.
+	- Made the first implementation of the write queue in Dynavis. This
+	  queue will prevent occlusion writes (which are expensive) unless
+	  they are really needed. This seems to work rather well and gives
+	  a noticable speed increase.
+	- Updated faq.txi with some technical questions and answers.
+	- Fixed an error in the collision detection howto.
+	- Added new 'origin_z' command to Dynavis. With this command you can
+	  change the distance at which the origin is rendered in the debug
+	  view. By default this is 50. origin_z can have the following
+	  parameters:
+	  	origin_z +	(add 1 to z)
+		origin_z ++	(add 10 to z)
+		origin_z -	(subtract 1 from z)
+		origin_z --	(subtract 10 from z)
+		origin_z 30.3	(set z to 30.3)
+	  Assigned shift-1 to origin_z -- and shift-2 to origin_z ++ in
+	  BugPlug.
 5-Jun-2002
 	- Thanks to the extensive research and coding efforts of Toni
 	  I managed to fix up static lighting so that it gives more correct

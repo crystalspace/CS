@@ -7,6 +7,9 @@
 This is a list of frequently asked questions and their answers.  If you have
 some questions about Crystal Space, try consulting this list first.
 
+The first section contains practical questions and answers. The second
+section (see later) contains more technical questions.
+
 @itemize @bullet
 @item
 From where can I download Crystal Space?
@@ -70,8 +73,7 @@ Finally you need at least one map file.  The map file is also typically a
 @file{maze.zip}, and @file{room.zip}).  In addition to these map files you
 also need the standard texture archive @file{stdtex.zip}. You should
 @emph{not} unpack these files.  Note that @file{standard.zip} is not a
-map file, nor is @file{mazed.zip}, which is a resource file for MazeD, the
-Crystal Space map editor. All map files and related data files are usually
+map file. All map files and related data files are usually
 located in the @file{data} directory.
 @end itemize
 
@@ -143,7 +145,7 @@ uses a Z-buffer of 1,228,800 bytes.
 @strong{A3}: If you are still low on memory there is only one thing you can
 do: decrease the complexity of the map.  For every polygon in the world a lot
 of memory used.  If you just want to try the engine you can run Crystal Space
-with some of the simpler worlds such as @file{perf.zip} or @file{rgb.zip}.
+with some of the simpler worlds such as @file{room.zip} or @file{maze.zip}.
 
 @item
 Crystal Space is really slow on my computer.  What can I do to speed it up?
@@ -236,5 +238,31 @@ How stable is the @sc{api} for Crystal Space?
 @strong{A}: The API which you can find in the 0.90 release should be about
 95% stable as compared to the 1.0 release. After 1.0 we will make sure
 to keep backwards compatibility (until we release 2.0 :-)
+@end itemize
+
+The following section lists some more technical questions.
+
+@itemize @bullet
+@item
+I updated Crystal Space from @sc{cvs} (with either @samp{WinCVS} or
+commandline) but it seems some files are missing.
+
+@strong{A}: When doing an update from @sc{cvs} it is important not to
+forget the @samp{-d} and @samp{-P} commandline options. Otherwise you
+will not get new directories and old empty directories will be
+everywhere. Using @samp{WinCVS} it is also possible to set these
+options. @xref{WinCVS Tutorial}
+
+@item
+Why isn't my object lit correctly (all black) and why doesn't lighting
+update when I move it?
+
+@strong{A}: Keep in mind that things don't automatically update their
+static lightmaps as that is expensive. But for dynamic lighting and other
+mesh objects you can dynamically let the object be lit. But in order to
+actually make this work you need to call @code{DeferUpdateLighting()}
+on the object when it is first created, when lights in the vicinity move,
+or when the object itself moves. @xref{HOWTO Mesh LightAnim}
+
 @end itemize
 

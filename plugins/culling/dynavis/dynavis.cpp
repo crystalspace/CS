@@ -42,6 +42,7 @@
 #include "dynavis.h"
 #include "kdtree.h"
 #include "covbuf.h"
+#include "wqueue.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -76,6 +77,7 @@ csDynaVis::csDynaVis (iBase *iParent)
   covbuf = NULL;
   debug_camera = NULL;
   model_mgr = new csObjectModelManager ();
+  write_queue = new csWriteQueue ();
 
   stats_cnt_vistest = 0;
   stats_total_vistest_time = 0;
@@ -83,9 +85,12 @@ csDynaVis::csDynaVis (iBase *iParent)
 
   do_cull_frustum = true;
   do_cull_coverage = COVERAGE_OUTLINE;
+  do_cull_history = true;
+  do_cull_writequeue = true;
+
   cfg_view_mode = VIEWMODE_STATS;
   do_state_dump = false;
-  do_cull_history = true;
+  debug_origin_z = 50;
 }
 
 csDynaVis::~csDynaVis ()
@@ -101,6 +106,7 @@ csDynaVis::~csDynaVis ()
   delete kdtree;
   delete covbuf;
   delete model_mgr;
+  delete write_queue;
 }
 
 bool csDynaVis::Initialize (iObjectRegistry *object_reg)
@@ -111,22 +117,21 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
   delete covbuf;
 
   iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  int w, h;
   if (g3d)
   {
-    w = g3d->GetWidth ();
-    h = g3d->GetHeight ();
+    scr_width = g3d->GetWidth ();
+    scr_height = g3d->GetHeight ();
     g3d->DecRef ();
   }
   else
   {
     // If there is no g3d we currently assume we are testing.
-    w = 640;
-    h = 480;
+    scr_width = 640;
+    scr_height = 480;
   }
 
   kdtree = new csKDTree (NULL);
-  covbuf = new csCoverageBuffer (w, h);
+  covbuf = new csCoverageBuffer (scr_width, scr_height);
 
   return true;
 }
@@ -519,6 +524,64 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
   delete[] tr_verts;
 }
 
+void csDynaVis::AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
+  	csObjectModel* model, csVisibilityObjectWrapper* obj)
+{
+  iMovable* movable = visobj->GetMovable ();
+  iPolygonMesh* polymesh = visobj->GetObjectModel ()->GetSmallerPolygonMesh ();
+
+  const csVector3* verts = polymesh->GetVertices ();
+  int vertex_count = polymesh->GetVertexCount ();
+
+  csReversibleTransform movtrans = movable->GetFullTransform ();
+  const csReversibleTransform& camtrans = camera->GetTransform ();
+  csReversibleTransform trans = camtrans / movtrans;
+  float fov = camera->GetFOV ();
+  float sx = camera->GetShiftX ();
+  float sy = camera->GetShiftY ();
+
+  int i;
+  // First calculate the bounding box of this occluder in 2D.
+  csBox2 box;
+  box.StartBoundingBox ();
+  float max_depth = -1.0;
+  for (i = 0 ; i < vertex_count ; i++)
+  {
+    csVector3 camv = trans.Other2This (verts[i]);
+    if (camv.z <= 0.0)
+    {
+      // @@@ Later we should clamp instead of ignoring this outline.
+      return;
+    }
+    if (camv.z > max_depth) max_depth = camv.z;
+    //@@@@@@@@ If we have up-to-date outline information
+    // we could use that here to prevent perspective projection
+    // @@@@@@@ if (outline_info.outline_verts[i])
+    csVector2 tr_vert;
+    Perspective (camv, tr_vert, fov, sx, sy);
+    box.AddBoundingVertex (tr_vert);
+  }
+
+  if (do_state_dump)
+  {
+    iObject* iobj = SCF_QUERY_INTERFACE (visobj, iObject);
+    if (iobj)
+    {
+      printf ("AppendWriteQueue of object %s (max_depth=%g)\n",
+      	iobj->GetName () ? iobj->GetName () : "<noname>",
+	max_depth);
+      iobj->DecRef ();
+    }
+  }
+
+  // Then append to queue if box is actually on screen.
+  if (box.MaxX () > 0 && box.MaxY () > 0 &&
+      box.MinX () < scr_width && box.MinY () < scr_height)
+  {
+    write_queue->Append (box, max_depth, obj);
+  }
+}
+
 bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   	VisTest_Front2BackData* data)
 {
@@ -563,8 +626,49 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       if (obj_bbox.ProjectBox (camera->GetTransform (), camera->GetFOV (),
     	  camera->GetShiftX (), camera->GetShiftY (), sbox,
 	  min_depth, max_depth))
-        if (!covbuf->TestRectangle (sbox, min_depth))
+        if (covbuf->TestRectangle (sbox, min_depth))
         {
+	  // Object is visible. If we have a write queue we will first
+	  // test if there are objects in the queue that may mark the
+	  // object as non-visible.
+	  if (do_cull_writequeue)
+	  {
+	    // If the write queue is enabled we try to see if there
+	    // are occluders that are relevant (intersect with this object
+	    // to test). We will insert those object with the coverage
+	    // buffer and test again.
+	    float out_depth;
+	    csVisibilityObjectWrapper* qobj = (csVisibilityObjectWrapper*)
+	    	write_queue->Fetch (sbox, min_depth, out_depth);
+	    if (qobj)
+	    {
+	      // We have found one such object. Insert them all.
+	      do
+	      {
+	        // Yes! We found such an object. Insert it now.
+	        if (do_cull_coverage == COVERAGE_POLYGON)
+		  UpdateCoverageBuffer (data->rview->GetCamera (), qobj->visobj,
+		    qobj->model);
+	        else
+		  UpdateCoverageBufferOutline (data->rview->GetCamera (),
+			  qobj->visobj, qobj->model);
+	        qobj = (csVisibilityObjectWrapper*)
+	    	  write_queue->Fetch (sbox, min_depth, out_depth);
+	      }
+	      while (qobj);
+	      // Now try again.
+              if (!covbuf->TestRectangle (sbox, min_depth))
+	      {
+	        // It really is invisible.
+                obj->reason = INVISIBLE_TESTRECT;
+	        vis = false;
+                goto end;
+	      }
+	    }
+	  }
+	}
+	else
+	{
           obj->reason = INVISIBLE_TESTRECT;
 	  vis = false;
           goto end;
@@ -582,14 +686,25 @@ end:
   if (do_write_object && do_cull_coverage != COVERAGE_NONE &&
   	obj->visobj->GetObjectModel ()->GetSmallerPolygonMesh ())
   {
-    // Object is visible. Let it update the coverage buffer if we
-    // are using do_cull_coverage.
-    if (do_cull_coverage == COVERAGE_POLYGON)
-      UpdateCoverageBuffer (data->rview->GetCamera (), obj->visobj,
-    	  obj->model);
+    // Object is visible.
+    if (do_cull_writequeue)
+    {
+      // We are using the write queue so we insert the object there
+      // for later culling.
+      AppendWriteQueue (data->rview->GetCamera (), obj->visobj, obj->model,
+      	obj);
+    }
     else
-      UpdateCoverageBufferOutline (data->rview->GetCamera (), obj->visobj,
-      	  obj->model);
+    {
+      // Let it update the coverage buffer if we
+      // are using do_cull_coverage.
+      if (do_cull_coverage == COVERAGE_POLYGON)
+        UpdateCoverageBuffer (data->rview->GetCamera (), obj->visobj,
+    	    obj->model);
+      else
+        UpdateCoverageBufferOutline (data->rview->GetCamera (), obj->visobj,
+      	    obj->model);
+    }
   }
 
   if (do_state_dump)
@@ -676,6 +791,9 @@ bool csDynaVis::VisTest (iRenderView* rview)
 
   // Initialize the coverage buffer to all empty.
   covbuf->Initialize ();
+
+  // Initialize the write queue to empty.
+  write_queue->Initialize ();
 
   // Update all objects (mark them invisible and update in kdtree if needed).
   UpdateObjects ();
@@ -861,7 +979,7 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
 
       csVector3 view_origin;
       // This is the z at which we want to view the origin.
-      view_origin.z = 50;
+      view_origin.z = debug_origin_z;
       // The x,y values are then calculated with inverse perspective
       // projection given that we want the view origin to be visualized
       // at view_persp_x and view_persp_y.
@@ -988,6 +1106,13 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     	"%s frustum culling!", do_cull_frustum ? "Enabled" : "Disabled");
     return true;
   }
+  else if (!strcmp (cmd, "toggle_queue"))
+  {
+    do_cull_writequeue = !do_cull_writequeue;
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
+    	"%s write queue!", do_cull_writequeue ? "Enabled" : "Disabled");
+    return true;
+  }
   else if (!strcmp (cmd, "toggle_history"))
   {
     do_cull_history = !do_cull_history;
@@ -1005,6 +1130,19 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
 	do_cull_coverage == COVERAGE_POLYGON ? "Polygon" :
 	"Outline");
     return true;
+  }
+  else if (!strncmp (cmd, "origin_z", 8))
+  {
+    if (!strcmp (cmd+9, "+"))
+      debug_origin_z += 1.0;
+    else if (!strcmp (cmd+9, "++"))
+      debug_origin_z += 10.0;
+    else if (!strcmp (cmd+9, "-"))
+      debug_origin_z -= 1.0;
+    else if (!strcmp (cmd+9, "--"))
+      debug_origin_z -= 10.0;
+    else
+      sscanf (cmd+9, "%f", &debug_origin_z);
   }
   else if (!strcmp (cmd, "clear_stats"))
   {

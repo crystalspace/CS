@@ -31,6 +31,7 @@
 class csKDTree;
 class csKDTreeChild;
 class csCoverageBuffer;
+class csWriteQueue;
 struct iPolygonMesh;
 struct iMovable;
 struct iMeshWrapper;
@@ -101,6 +102,8 @@ private:
   csCoverageBuffer* covbuf;
   csVector visobj_vector;
   csObjectModelManager* model_mgr;
+  csWriteQueue* write_queue;
+  int scr_width, scr_height;	// Screen dimensions.
 
   // For Debug_Dump(g3d): keep the last original camera.
   iCamera* debug_camera;
@@ -116,9 +119,14 @@ private:
   bool do_cull_frustum;
   int do_cull_coverage;
   bool do_cull_history;
+  bool do_cull_writequeue;
 
   // View mode for debugging (one of VIEWMODE_... constants).
   int cfg_view_mode;
+
+  // Depth we will use for showing the object debug view.
+  // This is the depth of the origin on screen.
+  float debug_origin_z;
 
   // If this flag is true we will do an extensive dump of the current
   // visibility culling proceedings during the next frame. This flag
@@ -139,6 +147,10 @@ private:
   // Given an occluder, update it in the coverage buffer. Using the outline.
   void UpdateCoverageBufferOutline (iCamera* camera, iVisibilityObject* visobj,
   	csObjectModel* model);
+
+  // Append an occluder to the write queue.
+  void AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
+  	csObjectModel* model, csVisibilityObjectWrapper* obj);
 
 public:
   SCF_DECLARE_IBASE;

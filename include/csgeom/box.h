@@ -346,6 +346,8 @@ public:
   csBox2& operator+= (const csVector2& point);
   /// Compute the intersection of two bounding boxes.
   csBox2& operator*= (const csBox2& box);
+  /// Test if the two boxes have an intersection.
+  bool TestIntersect (const csBox2& box) const;
 
   /// Compute the union of two bounding boxes.
   friend csBox2 operator+ (const csBox2& box1, const csBox2& box2);
@@ -811,6 +813,8 @@ public:
   csBox3& operator+= (const csVector3& point);
   /// Compute the intersection of two bounding boxes.
   csBox3& operator*= (const csBox3& box);
+  /// Test if the two boxes have an intersection.
+  bool TestIntersect (const csBox3& box) const;
 
   /// Compute the union of two bounding boxes.
   friend csBox3 operator+ (const csBox3& box1, const csBox3& box2);

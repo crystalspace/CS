@@ -89,6 +89,15 @@ csBox2 &csBox2::operator*= (const csBox2 &box)
   return *this;
 }
 
+bool csBox2::TestIntersect (const csBox2& box) const
+{
+  if (box.minbox.x >= maxbox.x) return false;
+  if (box.minbox.y >= maxbox.y) return false;
+  if (box.maxbox.x <= minbox.x) return false;
+  if (box.maxbox.y <= minbox.y) return false;
+  return true;
+}
+
 csBox2 operator+ (const csBox2 &box1, const csBox2 &box2)
 {
   return csBox2 (
@@ -790,6 +799,17 @@ csBox3 &csBox3::operator*= (const csBox3 &box)
   if (box.maxbox.y < maxbox.y) maxbox.y = box.maxbox.y;
   if (box.maxbox.z < maxbox.z) maxbox.z = box.maxbox.z;
   return *this;
+}
+
+bool csBox3::TestIntersect (const csBox3& box) const
+{
+  if (box.minbox.x >= maxbox.x) return false;
+  if (box.minbox.y >= maxbox.y) return false;
+  if (box.minbox.z >= maxbox.z) return false;
+  if (box.maxbox.x <= minbox.x) return false;
+  if (box.maxbox.y <= minbox.y) return false;
+  if (box.maxbox.z <= minbox.z) return false;
+  return true;
 }
 
 csBox3 operator+ (const csBox3 &box1, const csBox3 &box2)
