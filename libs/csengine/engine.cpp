@@ -1795,6 +1795,7 @@ iMaterialWrapper* csEngine::CreateMaterial (const char *iName, iTextureWrapper* 
   csMaterial* mat = new csMaterial (texture);
   iMaterialWrapper* wrapper = materials->NewMaterial (mat);
   wrapper->QueryObject ()->SetName (iName);
+  mat->DecRef ();
   return wrapper;
 }
 
