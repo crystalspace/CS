@@ -1,5 +1,5 @@
 #ifndef __AWS_GROUP_FRAME_H__
-# define __AWS_GROUP_FRAME_H__
+#define __AWS_GROUP_FRAME_H__
 
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson

@@ -1,5 +1,5 @@
-#ifndef __AWS_COMMAND_BUTTON_H__
-#define __AWS_COMMAND_BUTTON_H__
+#ifndef __AWS_BAR_CHART_H__
+#define __AWS_BAR_CHART_H__
 
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson
@@ -20,56 +20,98 @@
 *****************************************************************************/
 # include "awscomp.h"
 
-class awsCmdButton :
+class awsBarChart :
   public awsComponent
 {
-protected:
-  /// True when button is down, false if up
-  bool is_down;
-
-  /// True if the component has the mouse over it
-  bool mouse_is_over;
-
-  /// True if this acts as a push-button switch (like tool-bar mode)
-  bool is_switch;
-
-  /// True if button was down, and button is in switch mode (toggle=yes)
-  bool was_down;
-
-  /** Multipurpose: holds the texture and image bitmaps for normal and toolbar buttons, also
-    * holds the normal, highlighted, and clicked images for bitmap buttons.
-    */
-  iTextureHandle *tex[3];
-
   /// Flags for frame style.
   int frame_style;
+
+  /// Flag for inner frame style.
+  int inner_frame_style;
+
+  /// Flags for chart options.
+  int chart_options;
 
   /// Alpha level for this component
   int alpha_level;
 
+  /// Handle for texture background
+  iTextureHandle *bkg;
+
   /// Caption text for this component
   iString *caption;
-protected:
-  void ClearGroup ();
+
+  /// Text for "Y" legend
+  iString *yText;
+
+  /// Text for "X" legend
+  iString *xText;
+
+  /// Each item has a value and label.
+  struct BarItem
+  {
+    float value;
+    iString *label;
+  };
+
+  /// Keeps track of all chart items
+  csBasicVector items;
+
+  /// Maximum number of items to include in chart
+  int max_items;
+
 public:
-  awsCmdButton ();
-  virtual ~awsCmdButton ();
+  awsBarChart ();
+  virtual ~awsBarChart();
 
   /******* Frame Styles **********************/
 
-  /// A "normal" button.  Is textured if there is a background texture.
-  static const int fsNormal;
+  /// A frame that's a bump
+  static const int fsBump;
 
-  /// A toolbar button.  Cannot have text, only an image.
-  static const int fsToolbar;
+  /// A simple frame
+  static const int fsSimple;
 
-  /// A button entirely drawn from bitmap images.  Must specify normal, focused and clicked.
-  static const int fsBitmap;
+  /// A frame that looks like a sunk button
+  static const int fsSunken;
+
+  /// A frame that looks like a raised button
+  static const int fsRaised;
+
+  /// A frame that looks flat
+  static const int fsFlat;
+
+  /// no frame at all
+  static const int fsNone;
+
+  /******* Chart Options **********************/
+  
+  /** The chart rolls, so that when it has reached MaxItems width, the oldest item
+   * in the chart falls off the edge and the new one is added to the other side.
+   */
+  static const int coRolling;
+
+  /// Chart rolls left
+  static const int coRollLeft;
+
+  /// Chart rolls right
+  static const int coRollRight;
+
+  /// Chart has vertical gridlines
+  static const int coVertGridLines;
+
+  /// Chart has horizontal gridlines
+  static const int coHorzGridLines;
+
+  /// Chart is vertical rather than horizontal
+  static const int coVerticalChart;
+
 
   /******* Signals **********************/
 
   /// An up and down motion for the button
   static const int signalClicked;
+
 public:
   /// Get's the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, awsComponentNode *settings);
@@ -80,18 +122,17 @@ public:
   /// Sets properties
   bool SetProperty (char *name, void *parm);
 
+  /// Performs "scripted" execution.
+  bool Execute (char *action, iAwsParmList &parmlist);
+
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual char *Type ();
+
+  /// Gets the insets of the frame depending on what style it's in.
+  virtual csRect getInsets();
+
 public:
   SCF_DECLARE_IBASE;
-
-  bool HandleEvent (iEvent &Event);
-
-  /// Gets how big this button should ideally be.
-  csRect getPreferredSize ();
-
-  /// Gets the smallest this button can be.
-  csRect getMinimumSize ();
 
   /// Triggered when the component needs to draw
   virtual void OnDraw (csRect clip);
@@ -127,17 +168,17 @@ public:
   virtual bool OnGainFocus ();
 };
 
-class awsCmdButtonFactory :
+class awsBarChartFactory :
   public awsComponentFactory
 {
 public:
   SCF_DECLARE_IBASE;
 
   /// Calls register to register the component that it builds with the window manager
-  awsCmdButtonFactory (iAws *wmgr);
+  awsBarChartFactory (iAws *wmgr);
 
   /// Does nothing
-  virtual ~awsCmdButtonFactory ();
+  virtual ~awsBarChartFactory ();
 
   /// Returns a newly created component of the type this factory handles.
   virtual iAwsComponent *Create ();

@@ -33,6 +33,7 @@
 #include "awsgrpfr.h"
 #include "awslistbx.h"
 #include "awsscrbr.h"
+#include "awsbarct.h"
 
 #include "awscmpt.h"
 #include "awscscr.h"
@@ -940,6 +941,7 @@ void awsManager::RegisterCommonComponents ()
   (void)new awsGroupFrameFactory (this);
   (void)new awsListBoxFactory (this);
   (void)new awsScrollBarFactory (this);
+  (void)new awsBarChartFactory (this);
 
   // Standard sink
   GetSinkMgr ()->RegisterSink ("awsStandardSink", new awsStandardSink ());
