@@ -17,6 +17,16 @@ chronological order.
 	      with a real fast random function instead of a counter.
 	- Jorrit did an optimization in Dynavis by caching the state
 	  of movable->IsFullTransformIdentity().
+	- Jorrit fixed a slight bug in one of the coverage tile flush routines
+	  of Dynavis. This bug would not cause errors but it could cause
+	  slight performance degradation in some cases.
+	- Jorrit optimized FlushForFull() in Dynavis by decreasing the depth
+	  wherever a 8x8 block is fully covered. This improves culling
+	  efficiency at the slight cost of some more work. This optimization
+	  could be done in some of the other flush routines as well.
+	- Jorrit started work on an optimization in Dynavis which detects
+	  if an object actually modifies the coverage buffer. This is
+	  not finished yet though.
 13-Nov-2003
 	- Keith Fulton committed updated versions of the scripts for 3ds Max
  	  exporting.  I've had these for two months and forgot to commit them

@@ -910,7 +910,8 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
 # endif
 
   // Then insert the outline.
-  tcovbuf->InsertOutline (trans, camera->GetFOV (), camera->GetShiftX (),
+  bool rc = tcovbuf->InsertOutline (
+  	trans, camera->GetFOV (), camera->GetShiftX (),
   	camera->GetShiftY (), verts, vertex_count,
   	outline_info.outline_verts,
   	outline_info.outline_edges, outline_info.num_outline_edges,

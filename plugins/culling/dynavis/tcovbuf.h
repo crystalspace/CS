@@ -249,27 +249,30 @@ public:
    * the current tile is full. In that case only the fvalue will be
    * updated.
    */
-  void Flush (csTileCol& fvalue, float maxdepth);
+  void Flush (csTileCol& fvalue, float maxdepth, bool& modified);
 
   /**
    * Version of Flush that handles the case where the tile is empty.
    */
-  void FlushForEmpty (csTileCol& fvalue, float maxdepth);
+  void FlushForEmpty (csTileCol& fvalue, float maxdepth,
+  	bool& modified);
 
   /**
    * Version of Flush that handles the case where the tile is full.
    */
-  void FlushForFull (csTileCol& fvalue, float maxdepth);
+  void FlushForFull (csTileCol& fvalue, float maxdepth,
+  	bool& modified);
 
   /**
    * Version of Flush that handles the case where there is no depth checking.
    */
-  void FlushNoDepth (csTileCol& fvalue, float maxdepth);
+  void FlushNoDepth (csTileCol& fvalue, float maxdepth,
+  	bool& modified);
 
   /**
    * General Flush (slowest version).
    */
-  void FlushGeneral (csTileCol& fvalue, float maxdepth);
+  void FlushGeneral (csTileCol& fvalue, float maxdepth, bool& modified);
 
   /**
    * Version of Flush that handles the case where the tile is empty.
@@ -287,13 +290,15 @@ public:
    * Version of Flush that handles the case where there is no depth checking.
    * This version is for a constant fvalue for the entire tile.
    */
-  void FlushNoDepthConstFValue (csTileCol& fvalue, float maxdepth);
+  void FlushNoDepthConstFValue (csTileCol& fvalue, float maxdepth,
+  	bool& modified);
 
   /**
    * General Flush (slowest version).
    * This version is for a constant fvalue for the entire tile.
    */
-  void FlushGeneralConstFValue (csTileCol& fvalue, float maxdepth);
+  void FlushGeneralConstFValue (csTileCol& fvalue, float maxdepth,
+  	bool& modified);
 
   //-----------------------------------------------------------------
 
@@ -499,10 +504,11 @@ public:
    * This function will not do any backface culling and it will work
    * perfectly in all orientations. Polygon has to be convex.
    * It will update the screen buffer.
-   * Function returns false if polygon was not visible (i.e.
-   * screen buffer was not modified).
+   * <p>
+   * If this function returns false it means that the coverage buffer
+   * wasn't modified which means the object is not visible.
    */
-  void InsertPolygon (csVector2* verts, int num_verts, float max_depth);
+  bool InsertPolygon (csVector2* verts, int num_verts, float max_depth);
 
   /**
    * Insert an outline in the coverage buffer.
@@ -513,8 +519,11 @@ public:
    * per edge.
    * The 'used_verts' contains true for all vertices that are used.
    * If 'splat_outline' is true then outline splatting is used.
+   * <p>
+   * If this function returns false it means that the coverage buffer
+   * wasn't modified which means the object is not visible.
    */
-  void InsertOutline (const csReversibleTransform& trans,
+  bool InsertOutline (const csReversibleTransform& trans,
   	float fov, float sx, float sy, csVector3* verts, int num_verts,
   	bool* used_verts,
   	int* edges, int num_edges, bool splat_outline);
