@@ -170,7 +170,7 @@ csBasicVector csShaderManager::GetAllVariableNames()
 
 bool csShaderManager::HandleEvent(iEvent& event)
 {
-  if (event.Type = csevBroadcast)
+  if (event.Type == csevBroadcast)
   {
     switch(event.Command.Code)
     {
@@ -447,3 +447,4 @@ bool csShaderTechnique::IsValid()
 {
   return true;
 }
+

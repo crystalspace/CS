@@ -258,3 +258,4 @@ iShaderVariable* csShaderGLAVP::GetVariable(const char* string)
 
   return NULL;
 }
+

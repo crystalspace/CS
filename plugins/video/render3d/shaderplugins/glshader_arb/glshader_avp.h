@@ -62,6 +62,7 @@ public:
     this->object_reg = objreg;
     this->ext = ext;
   }
+  virtual ~csShaderGLAVP () {}
 
   bool LoadProgram( const char* programstring );
   bool LoadProgramStringToGL( const char* programstring );
@@ -101,4 +102,6 @@ public:
   virtual csBasicVector GetAllVariableNames(); 
 };
 
+
 #endif //__GLSHADER_AVP_H__
+

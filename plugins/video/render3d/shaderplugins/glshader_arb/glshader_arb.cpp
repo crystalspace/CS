@@ -113,3 +113,4 @@ bool csGLShader_ARB::Initialize(iObjectRegistry* reg)
   object_reg = reg;
   return true;
 }
+

@@ -26,6 +26,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/strset.h"
+#include "csutil/csctype.h"
 
 #include "igeom/clip2d.h"
 
@@ -360,7 +361,7 @@ void csGLRender3D::SetupStencil ()
       glClear (GL_STENCIL_BUFFER_BIT);
       stencilclipnum = 1;
     }
-    statecache->SetStencilFunc (GL_ALWAYS, stencilclipnum, -1);
+    statecache->SetStencilFunc (GL_ALWAYS, stencilclipnum, (unsigned)-1);
     statecache->SetStencilOp (GL_REPLACE, GL_REPLACE, GL_REPLACE);
     int nv = clipper->GetVertexCount ();
     csVector2* v = clipper->GetClipPoly ();
@@ -1042,7 +1043,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
       glPushMatrix ();
       glLoadIdentity ();
       GLfloat scalematrix[16];
-      for (i = 0 ; i < 16 ; i++) scalematrix[i] = 0.0;
+      for (int k = 0 ; k < 16 ; k++) scalematrix[k] = 0.0;
       scalematrix[0] = layer->uscale;
       scalematrix[5] = layer->vscale;
       scalematrix[10] = 1;

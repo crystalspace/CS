@@ -250,6 +250,7 @@ public:
     vp = 0; fp = 0;
     parent = owner;
   }
+  virtual ~csShaderPass () {}
 
   /// Get vertex-program
   virtual iShaderProgram* GetVertexProgram() {return vp; }
@@ -294,3 +295,4 @@ public:
 };
 
 #endif //__SHADERMGR_H__
+

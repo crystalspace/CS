@@ -103,7 +103,7 @@ public:
   SCF_DECLARE_IBASE;
 
   csVARRenderBuffer(void *buffer, int size, CS_RENDERBUFFER_TYPE type, csVARRenderBufferManager* bm);
-  ~csVARRenderBuffer ();
+  virtual ~csVARRenderBuffer ();
   
   /**
    * Lock the buffer to allow writing and give us a pointer to the data
@@ -142,7 +142,7 @@ public:
   bool Initialize(csGLRender3D* render3d);
 
   /// Kill it
-  ~csVARRenderBufferManager();
+  virtual ~csVARRenderBufferManager();
 
   /// Allocate a buffer of the specified type and return it
   csPtr<iRenderBuffer> GetBuffer(int buffersize, CS_RENDERBUFFER_TYPE location);
@@ -150,3 +150,4 @@ public:
 };
 
 #endif //  __GL_VARBUFMGR_H__
+

@@ -206,3 +206,4 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
   togl->size, togl->image_data);
   }
 }
+

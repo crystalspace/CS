@@ -114,9 +114,9 @@ void csBuddyAllocator::traverse(int i, char level)
   assert(i<2*m_Size-1&&i>=0);
   assert(level<m_Height);
   if(m_Tree[i]==level)
-    printf("#%6d, at %08x, size %6d, Free\n",block_no,block_addr,block_sz);
+    printf("#%6d, at %08x, size %6d, Free\n",block_no,(unsigned)block_addr,block_sz);
   else if(m_Tree[i]<0)
-    printf("#%6d, at %08x, size %6d, Busy\n",block_no,block_addr,block_sz);
+    printf("#%6d, at %08x, size %6d, Busy\n",block_no,(unsigned)block_addr,block_sz);
   else
   {
     traverse(2*i+1,level-1);
@@ -288,7 +288,7 @@ csVARRenderBuffer::~csVARRenderBuffer()
   if (memblock)
   {
     bm->render3d->ext.glFinishFenceNV(memblock->fence_id);
-    delete memblock->buffer;
+    delete [] (char *)memblock->buffer;
     delete memblock;
   }
 }
@@ -355,3 +355,4 @@ void csVARRenderBuffer::Release()
   lastlock = CS_BUF_LOCK_NOLOCK;
   locked = false;
 }
+
