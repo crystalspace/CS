@@ -11,7 +11,14 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine augmented configure.ac so that it emits PYTHON makefile
 	  and Jam variables.  This variable is now required by cspython.mak
 	  which uses it to invoke pythmod_setup.py.
-	- Philip Wyett disabled 'csperl5' plugin from build process.
+	- Philip Wyett disabled 'csperl5' plugin from build process since it
+	  still fails to build on many platforms, thus resulting in a lot of
+	  support-related grief.
+	- Eric Sunshine augmented configure.ac so that it emits
+	  PYTHON.DISTUTILS=yes to config.mak and Jamconfig if the Python
+	  installation includes the distutils module.  This variable can be
+	  used by the cspython module to adjust its build script for the
+	  environment.
 20-Apr-2003
 	- Micah updated the .cvsignore files to include flarge's cache and
 	  the completed binaries without a special extension.

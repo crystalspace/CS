@@ -369,10 +369,17 @@ AS_IF([test -n "$PERL"],
 # set, then use those values.
 #------------------------------------------------------------------------------
 AC_CHECK_PROGS([PYTHON], [python])
-AS_IF([test -n "$PYTHON"], [CS_BUILD_PROPERTY([PYTHON], [$PYTHON])])
+AS_IF([test -n "$PYTHON"],
+    [CS_BUILD_PROPERTY([PYTHON], [$PYTHON])
+    AC_CACHE_CHECK([for python distutils module], [cs_cv_python_distutils],
+	[AS_IF([AC_RUN_LOG([$PYTHON -c 'import distutils.sysconfig' 1>&2])],
+	    [cs_cv_python_distutils=yes], [cs_cv_python_distutils=no])])
+    AS_IF([test $cs_cv_python_distutils = yes],
+	[CS_BUILD_PROPERTY([PYTHON.DISTUTILS], [yes])])])
 
-AC_CACHE_CHECK([for Python SDK], [cs_cv_python_sdk],
+AC_CACHE_CHECK([for python SDK], [cs_cv_python_sdk],
     [cs_cv_python_sdk=no
+    cs_cv_python_distutils=no
     cs_python_lib_dir=''
     cs_python_makefile=''
 
@@ -397,6 +404,7 @@ AC_CACHE_CHECK([for Python SDK], [cs_cv_python_sdk],
 	    cs_cv_python_base_cflags=CS_TRIM([$cs_cv_python_base_cflags])
 	    cs_cv_python_base_lflags=CS_TRIM([$cs_cv_python_base_lflags])
 	    cs_cv_python_base_libs=CS_TRIM([$cs_cv_python_base_libs])
+	    cs_cv_python_distutils=yes
 	    cs_cv_python_sdk=yes])
 
 	# Not Python 2.x; try Python 1.x.
@@ -476,7 +484,7 @@ for p in sys.path: print p'])`
 # both variations.
 cs_pylib1="-l$cs_cv_python_base"
 cs_pylib2=`echo "-l$cs_cv_python_base" | sed 's/\.//g'`
-CS_CHECK_BUILD([if Python SDK is usable], [cs_cv_python],
+CS_CHECK_BUILD([if python SDK is usable], [cs_cv_python],
     [AC_LANG_PROGRAM([#include <Python.h>],[Py_Initialize(); Py_Finalize();])],
     [CS_CREATE_TUPLE([],[],[$cs_pylib1]) CS_CREATE_TUPLE([],[],[$cs_pylib2])],
     [], [CS_EMIT_BUILD_RESULT([cs_cv_python], [PYTHON])], [], [],
