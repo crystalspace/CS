@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Aug-2004
+	- PK implemented the SaverPlugin in genmesh, spr3dmesh and fixed a
+	  bug in the write down order of the other SaverPlugins.
 10-Aug-2004
 	- PK implemented the csThingFactorySaver.
 	- Jorrit fixed a few places in CS where a reverse size_t loop was done

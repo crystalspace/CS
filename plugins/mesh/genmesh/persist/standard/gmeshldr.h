@@ -79,6 +79,7 @@ class csGeneralFactorySaver : public iSaverPlugin
 private:
   iObjectRegistry* object_reg;
   csRef<iReporter> reporter;
+  csRef<iSyntaxService> synldr;
 
 public:
   SCF_DECLARE_IBASE;

@@ -154,11 +154,11 @@ bool csSnowFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-#define MAXLINE 100 /* max number of chars per line... */
-
 bool csSnowFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent)
 {
   //Nothing gets parsed in the loader, so nothing gets saved here!
+  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  paramsNode->SetValue("params");
   return true;
 }
 
@@ -346,6 +346,21 @@ bool csSnowSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 
   if ( partstate && snowstate && mesh )
   {
+    //Writedown Factory tag
+    csRef<iMeshFactoryWrapper> fact = 
+      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
+    if (fact)
+    {
+      const char* factname = fact->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        csRef<iDocumentNode> factnameNode = factNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        factnameNode->SetValue(factname);
+      }    
+    }    
+
     //Writedown Color tag
     csColor col = partstate->GetColor();
     csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
@@ -379,21 +394,6 @@ bool csSnowSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     csRef<iDocumentNode> swirlNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     swirlNode->SetValue("swirl");
     swirlNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(swirl);
-
-    //Writedown Factory tag
-    csRef<iMeshFactoryWrapper> fact = 
-      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
-    if (fact)
-    {
-      const char* factname = fact->QueryObject()->GetName();
-      if (factname && *factname)
-      {
-        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-        factNode->SetValue("factory");
-        csRef<iDocumentNode> factnameNode = factNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-        factnameNode->SetValue(factname);
-      }    
-    }    
 
     //Writedown Material tag
     iMaterialWrapper* mat = partstate->GetMaterialWrapper();

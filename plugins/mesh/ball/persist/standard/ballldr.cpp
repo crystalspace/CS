@@ -188,6 +188,8 @@ bool csBallFactorySaver::Initialize (iObjectRegistry* object_reg)
 bool csBallFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   //Nothing gets parsed in the loader, so nothing gets saved here!
+  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  paramsNode->SetValue("params");
   return true;
 }
 
@@ -390,6 +392,21 @@ bool csBallSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     if (!ball) return false;
     if (!mesh) return false;
 
+    //Writedown Factory tag
+    csRef<iMeshFactoryWrapper> fact = 
+      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
+    if (fact)
+    {
+      const char* factname = fact->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        csRef<iDocumentNode> factnameNode = factNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        factnameNode->SetValue(factname);
+      }    
+    }    
+    
     //Writedown Reversed tag
     synldr->WriteBool(paramsNode, "reversed", ball->IsReversed(), false);
 
@@ -430,21 +447,6 @@ bool csBallSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     csRef<iDocumentNode> numrimValueNode = numrimNode->CreateNodeBefore(CS_NODE_TEXT, 0);
     numrimValueNode->SetValueAsInt(numrim);
 
-    //Writedown Factory tag
-    csRef<iMeshFactoryWrapper> fact = 
-      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
-    if (fact)
-    {
-      const char* factname = fact->QueryObject()->GetName();
-      if (factname && *factname)
-      {
-        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-        factNode->SetValue("factory");
-        csRef<iDocumentNode> factnameNode = factNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-        factnameNode->SetValue(factname);
-      }    
-    }    
-    
     //Writedown Material tag
     csRef<iMaterialWrapper> mat = 
       SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMaterialWrapper);
@@ -468,5 +470,4 @@ bool csBallSaver::WriteDown (iBase* obj, iDocumentNode* parent)
   }
   return true;
 }
-
 

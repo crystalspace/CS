@@ -344,8 +344,6 @@ bool csNullFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-#define MAXLINE 100 /* max number of chars per line... */
-
 bool csNullFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
@@ -494,19 +492,6 @@ bool csNullMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 
   if ( nullstate && mesh )
   {
-    //Writedown Box tag
-    csBox3 box;
-    nullstate->GetBoundingBox(box);
-    csRef<iDocumentNode> boxNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    boxNode->SetValue("box");
-    synldr->WriteBox(boxNode, &box);
-
-    //Writedown Radius tag
-    float radius = nullstate->GetRadius();
-    csRef<iDocumentNode> radiusNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    radiusNode->SetValue("radius");
-    radiusNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(radius);
-
     //Writedown Factory tag
     csRef<iMeshFactoryWrapper> fact = 
       SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
@@ -521,6 +506,30 @@ bool csNullMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent)
         factnameNode->SetValue(factname);
       }    
     }    
+
+    iMeshObjectFactory* meshfact = fact->GetMeshObjectFactory();
+    csRef<iNullFactoryState> nullfact = SCF_QUERY_INTERFACE(meshfact, iNullFactoryState);
+
+    //Writedown Box tag
+    csBox3 box, boxfact;
+    nullstate->GetBoundingBox(box);
+    nullfact->GetBoundingBox(boxfact);
+    if (boxfact != box)
+    {
+      csRef<iDocumentNode> boxNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      boxNode->SetValue("box");
+      synldr->WriteBox(boxNode, &box);
+    }
+
+    //Writedown Radius tag
+    float radius = nullstate->GetRadius();
+    float radiusfact = nullfact->GetRadius();
+    if (radius != radiusfact)
+    {
+      csRef<iDocumentNode> radiusNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      radiusNode->SetValue("radius");
+      radiusNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(radius);
+    }
   }
   return true;
 }

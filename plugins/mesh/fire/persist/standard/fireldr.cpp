@@ -157,11 +157,11 @@ bool csFireFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-#define MAXLINE 100 /* max number of chars per line... */
-
-bool csFireFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* /*parent*/)
+bool csFireFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent)
 {
   //Nothing gets parsed in the loader, so nothing gets saved here!
+  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  paramsNode->SetValue("params");
   return true;
 }
 
@@ -367,6 +367,21 @@ bool csFireSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 
   if ( partstate && firestate && mesh )
   {
+    //Writedown Factory tag
+    csRef<iMeshFactoryWrapper> fact = 
+      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
+    if (fact)
+    {
+      const char* factname = fact->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        csRef<iDocumentNode> factnameNode = factNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        factnameNode->SetValue(factname);
+      }    
+    }    
+
     //Writedown Color tag
     csColor col = partstate->GetColor();
     csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
@@ -410,21 +425,6 @@ bool csFireSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     csRef<iDocumentNode> totaltimeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     totaltimeNode->SetValue("totaltime");
     totaltimeNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(totaltime);
-
-    //Writedown Factory tag
-    csRef<iMeshFactoryWrapper> fact = 
-      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
-    if (fact)
-    {
-      const char* factname = fact->QueryObject()->GetName();
-      if (factname && *factname)
-      {
-        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-        factNode->SetValue("factory");
-        csRef<iDocumentNode> factnameNode = factNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-        factnameNode->SetValue(factname);
-      }    
-    }    
 
     //Writedown Material tag
     iMaterialWrapper* mat = partstate->GetMaterialWrapper();

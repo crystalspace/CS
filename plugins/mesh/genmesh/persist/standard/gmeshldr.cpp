@@ -533,23 +533,135 @@ bool csGeneralFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csGeneralFactorySaver::object_reg = object_reg;
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
 
-#define MAXLINE 100 /* max number of chars per line... */
-//TBD
 bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
   
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for general mesh");
-  paramsNode=0;
-  
+
+  if (obj)
+  {
+    csRef<iGeneralFactoryState> gfact = 
+      SCF_QUERY_INTERFACE (obj, iGeneralFactoryState);
+    csRef<iMeshObjectFactory> meshfact = SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
+    if (!gfact) return false;
+    if (!meshfact) return false;
+
+    //Write NumVt Tag
+    csRef<iDocumentNode> numvtNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    numvtNode->SetValue("numvt");
+    numvtNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(gfact->GetVertexCount());
+
+    //Write NumTri Tag
+    csRef<iDocumentNode> numtriNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    numtriNode->SetValue("numtri");
+    numtriNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(gfact->GetTriangleCount());
+
+    int i;
+    //Write Vertex Tags
+    for (i=0; i<gfact->GetVertexCount(); i++)
+    {
+      csRef<iDocumentNode> triaNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      triaNode->SetValue("v");
+      csVector3 vertex = gfact->GetVertices()[i];
+      csVector2 texel = gfact->GetTexels()[i];
+      synldr->WriteVector(triaNode, &vertex);
+      triaNode->SetAttributeAsInt("u", texel.x);
+      triaNode->SetAttributeAsInt("v", texel.y);
+    }
+
+    //Write Triangle Tags
+    for (i=0; i<gfact->GetTriangleCount(); i++)
+    {
+      csRef<iDocumentNode> triaNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      triaNode->SetValue("t");
+      csTriangle tria = gfact->GetTriangles()[i];
+      triaNode->SetAttributeAsInt("v1", tria.a);
+      triaNode->SetAttributeAsInt("v2", tria.b);
+      triaNode->SetAttributeAsInt("v3", tria.c);
+    }
+
+    if (false) //TBD: check for autonormals here
+    {
+      //Write Autonormals Tag
+      paramsNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue("autonormals");
+    }
+    else
+    {
+      //Write Normal Tags
+      for (i=0; i<gfact->GetVertexCount(); i++)
+      {
+        csRef<iDocumentNode> normalNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        normalNode->SetValue("n");
+        csVector3 normal = gfact->GetNormals()[i];
+        synldr->WriteVector(normalNode, &normal);
+      }
+    }
+
+    //Writedown DefaultColor tag
+    csColor col = gfact->GetColor();
+    csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    colorNode->SetValue("defaultcolor");
+    synldr->WriteColor(colorNode, &col);
+
+    //Write Color Tags
+    for (i=0; i<gfact->GetVertexCount(); i++)
+    {
+      csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      colorNode->SetValue("color");
+      csColor color = gfact->GetColors()[i];
+      synldr->WriteColor(colorNode, &color);
+    }
+
+    //Writedown Lighting tag
+    synldr->WriteBool(paramsNode, "lighting", gfact->IsLighting(), true);
+
+    //Writedown Back2Front tag
+    synldr->WriteBool(paramsNode, "back2front", gfact->IsBack2Front(), true);
+
+    //Writedown NoShadows tag
+    if (!gfact->IsShadowCasting())
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("noshadows");
+
+    //Writedown LocalShadows tag
+    if (!gfact->IsShadowReceiving())
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("localshadows");
+
+    //Writedown ManualColor tag
+    synldr->WriteBool(paramsNode, "manualcolors", gfact->IsManualColors(), true);
+
+    //Writedown Material tag
+    iMaterialWrapper* mat = gfact->GetMaterialWrapper();
+    if (mat)
+    {
+      const char* matname = mat->QueryObject()->GetName();
+      if (matname && *matname)
+      {
+        csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        matNode->SetValue("material");
+        csRef<iDocumentNode> matnameNode = matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        matnameNode->SetValue(matname);
+      }    
+    }    
+
+    //Writedown Mixmode tag
+    int mixmode = gfact->GetMixMode();
+    csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    mixmodeNode->SetValue("mixmode");
+    synldr->WriteMixmode(mixmodeNode, mixmode, true);
+
+    //TBD: Writedown box tag
+
+    //TBD: Writedown renderbuffer tag
+  }
   return true;
 }
+
 //---------------------------------------------------------------------------
 
 csGeneralMeshLoader::csGeneralMeshLoader (iBase* pParent)
@@ -706,17 +818,74 @@ bool csGeneralMeshSaver::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
-//TBD
+
 bool csGeneralMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
   
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for general mesh");
-  paramsNode=0;
-  
+
+  if (obj)
+  {
+    csRef<iGeneralMeshState> gmesh = SCF_QUERY_INTERFACE (obj, iGeneralMeshState);
+    csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+    if (!gmesh) return false;
+    if (!mesh) return false;
+
+    //Writedown Factory tag
+    csRef<iMeshFactoryWrapper> fact = 
+      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
+    if (fact)
+    {
+      const char* factname = fact->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        factNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(factname);
+      }    
+    }
+
+    //Writedown Lighting tag
+    synldr->WriteBool(paramsNode, "lighting", gmesh->IsLighting(), true);
+
+    //Writedown NoShadows tag
+    if (!gmesh->IsShadowCasting())
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("noshadows");
+
+    //Writedown LocalShadows tag
+    if (!gmesh->IsShadowReceiving())
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("localshadows");
+
+    //Writedown Color tag
+    csColor col = gmesh->GetColor();
+    csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    colorNode->SetValue("color");
+    synldr->WriteColor(colorNode, &col);
+
+    //Writedown ManualColor tag
+    synldr->WriteBool(paramsNode, "manualcolors", gmesh->IsManualColors(), true);
+
+    //Writedown Material tag
+    iMaterialWrapper* mat = gmesh->GetMaterialWrapper();
+    if (mat)
+    {
+      const char* matname = mat->QueryObject()->GetName();
+      if (matname && *matname)
+      {
+        csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        matNode->SetValue("material");
+        csRef<iDocumentNode> matnameNode = matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        matnameNode->SetValue(matname);
+      }    
+    }    
+
+    //Writedown Mixmode tag
+    int mixmode = gmesh->GetMixMode();
+    csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    mixmodeNode->SetValue("mixmode");
+    synldr->WriteMixmode(mixmodeNode, mixmode, true);
+  }
   return true;
 }
-

@@ -414,19 +414,23 @@ bool csSaver::SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent)
   for (int i=0; i<meshList->GetCount(); i++)
   {
     iMeshWrapper* meshwrapper = meshList->Get(i);
-    //Create the Tag for the MeshObj
-    csRef<iDocumentNode> meshNode = CreateNode(parent, "meshobj");
     //Check if it's a portal
     csRef<iPortalContainer> portal = SCF_QUERY_INTERFACE(meshwrapper->GetMeshObject(),
                                                          iPortalContainer);
     if (portal) 
     {
-      meshNode->SetValue ("portal");
+/*
+      //Create the Tag for the Portal
+      csRef<iDocumentNode> meshNode = CreateNode(parent, "portal");
+
       for (int i=0; i<portal->GetPortalCount(); i++)
         if (!SavePortals(portal->GetPortal(i), meshNode)) return false;
-
+*/
       continue;
     }
+
+    //Create the Tag for the MeshObj
+    csRef<iDocumentNode> meshNode = CreateNode(parent, "meshobj");
 
     //Add the mesh's name to the MeshObj tag
     const char* name = meshwrapper->QueryObject()->GetName();
@@ -486,15 +490,31 @@ bool csSaver::SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent)
 
 bool csSaver::SavePortals(iPortal *portal, iDocumentNode *parent)
 {
-  csRef<iDocumentNode> sectorNode = CreateNode(parent, "sector");
   portal->CompleteSector(0);
+
+  const char* portalname = portal->GetName();
+  if (portalname && *portalname) 
+    parent->SetAttribute("name", portalname);
+
+  //Write the vertex tags
+  for (int vertidx = 0; vertidx < portal->GetVertexIndicesCount(); vertidx++)
+  {
+    csRef<iDocumentNode> vertNode = CreateNode(parent, "v");
+    int vertexidx = portal->GetVertexIndices()[vertidx];
+    csVector3 vertex = portal->GetVertices()[vertexidx];
+    vertNode->SetAttributeAsFloat("x", vertex.x);
+    vertNode->SetAttributeAsFloat("y", vertex.y);
+    vertNode->SetAttributeAsFloat("z", vertex.z);
+  }  
+
+  //Write the Sector tag
   iSector* sector = portal->GetSector();
   if (sector)
   {
+    csRef<iDocumentNode> sectorNode = CreateNode(parent, "sector");
     const char* name = sector->QueryObject()->GetName();
     if (name && *name) sectorNode->SetAttribute("name", name);
   }
-  //saving the vertices (portal->GetVertices(), portal->GetVertexIndicesCount());
 
   return true;
 }

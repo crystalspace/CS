@@ -176,9 +176,11 @@ bool csEmitFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-bool csEmitFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* /*parent*/)
+bool csEmitFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent)
 {
   //Nothing gets parsed in the loader, so nothing gets saved here!
+  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  paramsNode->SetValue("params");
   return true;
 }
 

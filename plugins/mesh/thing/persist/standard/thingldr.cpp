@@ -1308,7 +1308,6 @@ bool csThingSaver::WriteFactory (iBase* obj, iDocumentNode* parent)
     csRef<iThingFactoryState> thingfact = SCF_QUERY_INTERFACE (obj, iThingFactoryState);
     if (!thingfact) return false;
 
-    //Write the factory stuff inside the params of the meshobject
     for (int vertidx = 0; vertidx < thingfact->GetVertexCount(); vertidx++)
     {
       csRef<iDocumentNode> vertNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);

@@ -176,11 +176,11 @@ bool csStarFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-#define MAXLINE 100 /* max number of chars per line... */
-
 bool csStarFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   //Nothing gets parsed in the loader, so nothing gets saved here!
+  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  paramsNode->SetValue("params");
   return true;
 }
 
@@ -326,6 +326,21 @@ bool csStarSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 
   if ( starsstate && mesh )
   {
+    //Writedown Factory tag
+    csRef<iMeshFactoryWrapper> fact = 
+      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
+    if (fact)
+    {
+      const char* factname = fact->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        csRef<iDocumentNode> factnameNode = factNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        factnameNode->SetValue(factname);
+      }    
+    }    
+
     //Writedown Color tag
     csColor col = starsstate->GetColor();
     csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
@@ -356,21 +371,6 @@ bool csStarSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     csRef<iDocumentNode> maxdistanceNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     maxdistanceNode->SetValue("maxdistance");
     maxdistanceNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(maxdistance);
-
-    //Writedown Factory tag
-    csRef<iMeshFactoryWrapper> fact = 
-      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
-    if (fact)
-    {
-      const char* factname = fact->QueryObject()->GetName();
-      if (factname && *factname)
-      {
-        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-        factNode->SetValue("factory");
-        csRef<iDocumentNode> factnameNode = factNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-        factnameNode->SetValue(factname);
-      }    
-    }    
   }
 
   paramsNode=0;
