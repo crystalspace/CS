@@ -2,7 +2,7 @@
 # settings. Also have a look at mk/user.mak.
 
 # Friendly names for building environment
-DESCRIPTION.cygnus = Cygnus
+DESCRIPTION.cygnus = Windows with Cygnus
 
 # Choose which drivers you want to build/use
 DRIVERS=cs2d/softx cs3d/software csnetdrv/null csnetdrv/sockets \
@@ -160,13 +160,13 @@ endif # ifeq ($(MAKESECTION),defines)
 ifeq ($(MAKESECTION),confighelp)
 
 SYSHELP += \
-  $(NEWLINE)echo $"  make linux        Prepare for building under and for $(DESCRIPTION.linux)$"
+  $(NEWLINE)echo $"  make cygnus       Prepare for building under and for $(DESCRIPTION.cygnus)$"
 
 endif # ifeq ($(MAKESECTION),confighelp)
 
 #---------------------------------------------------------------- configure ---#
 ifeq ($(ROOTCONFIG),config)
 
-SYSCONFIG=bin/unixconf.sh linux >>config.tmp
+SYSCONFIG=bin/unixconf.sh cygnus >>config.tmp
 
 endif # ifeq ($(ROOTCONFIG),config)
