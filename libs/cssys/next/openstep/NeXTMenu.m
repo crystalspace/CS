@@ -18,6 +18,7 @@
 #include "NeXTMenu.h"
 #include "NeXTConfigFile.h"
 #include "volatile.h"		// OS_NEXT_OPENSTEP
+#include <string.h>
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSEvent.h>
 #import <AppKit/NSMenu.h>

@@ -4,6 +4,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed several problems in lexan.mak.
 	- Eric Sunshine eliminated compilation warning from csobject.cpp about
 	  csObjectIterator having virtual functions but non-virtual destructor.
+	- Eric Sunshine eliminated compilation warning about implicit
+	  declaration of strncmp() in NeXTMenu.m on MacOS/X.
 23-May-2001
 	- Added 'virtual' before the csView destructor and also fixed a
 	  warning in the csView constructor.
