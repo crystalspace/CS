@@ -9,6 +9,17 @@ chronological order.
 3-Feb-2004
 	- Eric Sunshine fixed syntax error in aws.mak introduced yesterday
 	  which manifested when running 'msvcgen' targets.
+	- Eric Sunshine worked around more fallout from recent changes to the
+	  Jam build facility.  Jambase in Jam 2.4 incorrectly defines RANLIB as
+	  "" on MacOS/X, and this bogus setting overrides the `RANLIB ?=
+	  "ranlib"' emission from CS's configure script.  Worse, when configure
+	  detected MacOS/X Panther and tried to append "-s" to the value of
+	  RANLIB as required by Panther, it was really appending "-s" to
+	  Jamconfig's empty definition of RANLIB, thus resulting in an
+	  altogether broken value for RANLIB.
+	- Eric Sunshine added an `unconditional' option to
+	  CS_JAMCONFIG_PROPERTY() which, when used, causes it to emit the Jam
+	  property using `=' rather than `?='.
 2-Feb-2004
 	- Eric Sunshine changed STREAMMAX and TEXTUREMAX constants in
 	  csXMLShaderCompiler::shaderPass from 'static const int' to 'enum'

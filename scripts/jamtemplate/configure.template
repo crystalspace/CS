@@ -36,8 +36,16 @@ CS_PROG_LINK
 AC_CHECK_PROGS([INSTALL], [install])
 AS_IF([test -n "$INSTALL"], [CS_JAMCONFIG_PROPERTY([INSTALL], [$INSTALL])])
 
+# Jambase in Jam 2.4 has a bug where it incorrectly defines RANLIB as "" for
+# MacOS/X, and this bogus value will override a RANLIB set via ?= in Jamconfig,
+# thus we must use CS_JAMCONFIG_PROPERTY()'s "unconditional" option to force a
+# correct value for RANLIB.  This is especially important for MacOS/X Panther
+# which expects us to use the -s option with ranlib, which we can accomplish
+# via "RANLIB += -s"; but this will work correctly only if RANLIB has a
+# meaningful value in the first place.
 AC_PROG_RANLIB
-AS_IF([test -n "$RANLIB"], [CS_JAMCONFIG_PROPERTY([RANLIB], [$RANLIB])])
+AS_IF([test -n "$RANLIB"],
+    [CS_JAMCONFIG_PROPERTY([RANLIB], [$RANLIB], [], [Y])])
 
 #----------------------------------------------------------------------------
 # Determine system type
