@@ -23,6 +23,7 @@ chronological order.
 	      starting rooms varies over time.
 	    - Fixed crash in csInputDefinition for input strings like "-".
 	    - Un-deprecated some csString methods.
+	    - Removed the rather useless StdAfx.cpp file of the Opcode plugin.
 5-Apr-2005
 	- res replaced use of printf() and relatives with csPrintf() and 
 	  relatives and use of sprintf() with use of csStrings.
