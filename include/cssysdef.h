@@ -347,6 +347,7 @@ void Name (void (*p)())                                                \
 #  ifndef CS_IMPLEMENT_PLUGIN
 #  define CS_IMPLEMENT_PLUGIN        					\
           CS_IMPLEMENT_PLATFORM_PLUGIN 					\
+	  CS_DEFINE_STATICALLY_LINKED_FLAG				\
 	  CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION;		\
 	  CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);
 #  endif
@@ -355,6 +356,7 @@ void Name (void (*p)())                                                \
 
 #  ifndef CS_IMPLEMENT_PLUGIN
 #  define CS_IMPLEMENT_PLUGIN						\
+   CS_DEFINE_STATICALLY_LINKED_FLAG					\
    CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(csStaticVarCleanup_local)	\
    CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_local);	\
    CS_IMPLEMENT_PLATFORM_PLUGIN 
