@@ -589,6 +589,7 @@ public:
   int last_level, last_owner;
   csVector3 focus;
   csTicks time;
+  int time_count;
 
   csBCTerrObjectFactory (iObjectRegistry* object_reg);
   virtual ~csBCTerrObjectFactory ();
@@ -657,7 +658,13 @@ public:
     }
     virtual void AddTime (csTicks addtime)
     {
-      scfParent->time = addtime;
+      scfParent->time_count += 1;
+      if (scfParent->time_count == scfParent->num_objects)
+      { 
+        scfParent->time += addtime;
+        scfParent->time_count = 0;
+        scfParent->free_lods = true;
+      }
       //scfParent->CheckShared ();
     }
     virtual csVector2* GetSize ()
