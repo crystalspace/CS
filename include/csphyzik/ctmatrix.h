@@ -23,10 +23,10 @@
 
 #include <stdlib.h>
 
-#include "csphyzik/phyztype.h"
-#include "csphyzik/ctvector.h"
-#include "csphyzik/mtrxutil.h"
-#include "csphyzik/debug.h"
+#include "../csphyzik/phyztype.h"
+#include "../csphyzik/ctvector.h"
+#include "../csphyzik/mtrxutil.h"
+#include "../csphyzik/debug.h"
 
 class ctMatrix
 {
@@ -38,6 +38,222 @@ protected:
 
 
 };
+
+// NxN matrix
+class ctMatrixN
+{
+public:
+	ctMatrixN( long pdim, real scl = 1.0 ){
+		dimen = pdim;
+    rows = new real *[pdim];
+    for( int i = 0; i < pdim; i++ ){
+      rows[i] = new real[pdim];
+      for( int j = 0; j < pdim; j++ )
+        rows[i][j] = 0.0;
+      rows[i][i] = scl;
+    }
+	}
+	
+  virtual ~ctMatrixN()
+  {
+    for( int i = 0; i < dimen; i++ ){
+      delete [] rows[i];
+    }
+    delete [] rows;
+  }
+
+	real **access_elements(){ return rows; }
+
+	void identity(){ 
+    for( int i = 0; i < dimen; i++ ){
+      for( int j = 0; j < dimen; j++ )
+        rows[i][j] = 0.0;
+      rows[i][i] = 1.0;
+    }
+	}
+
+	real *operator[]( const int index ){ return rows[index]; }
+	real *operator[]( const int index ) const { return rows[index]; }
+
+	ctMatrixN get_transpose() const {
+		ctMatrixN Mret;
+		for( int idx = 0; idx < dimen; idx++ )
+			for( int idy = 0; idy < dimen; idy++ )
+				Mret[idx][idy] = rows[idy][idx];
+		return Mret;
+	}
+
+	void orthonormalize();
+
+	// better be same size vector....
+	void mult_v( real *pdest, const real *pv ){
+    for( int idx = 0; idx < dimen; idx++ ){
+		  pdest[idx] = 0;
+      for( int idy = 0; idy < dimen; idy++ ){
+			  pdest[idx] += rows[idx][idy]*pv[idy];
+      }
+    }
+  }
+
+/*	ctVector3 operator* ( const ctVector3 &pv ) {
+	  ctVector3 rv;
+    for( int idx = 0; idx < dimen; idx++ ){
+		  rv[idx] = 0;
+      for( int idy = 0; idy < dimen; idy++ ){
+        rv[idx] += rows[idx][idy]*pv[idy];
+      }
+    }
+		return rv;
+	}
+
+	ctVector3 operator* ( const ctVector3 &pv ) const {
+	  ctVector3 rv;
+    for( int idx = 0; idx < dimen; idx++ ){
+		  rv[idx] = 0;
+      for( int idy = 0; idy < dimen; idy++ ){
+        rv[idx] += rows[idx][idy]*pv[idy];
+      }
+    }
+		return rv;
+	}
+*/
+	ctMatrixN operator* ( const ctMatrixN &MM ) const {
+		ctMatrixN Mret;
+		for( int idr = 0; idr < dimen; idr++ )
+			for( int idc = 0; idc < dimen; idc++ ){
+				Mret[idr][idc] = 0.0;
+				for( int adder = 0; adder < dimen; adder++ )
+					Mret[idr][idc] += rows[idr][adder]*(MM[adder][idc]);
+			}
+
+		return Mret;
+	}
+
+	ctMatrixN operator* ( const real pk ) const {
+		ctMatrixN Mret;
+		for( int idr = 0; idr < dimen; idr++ )
+			for( int idc = 0; idc < dimen; idc++ ){
+				Mret[idr][idc] = rows[idr][idc]*pk;
+			}
+
+		return Mret;
+	}
+
+	void operator*=( const real pm ){
+	for( int idx = 0; idx < dimen; idx++ )
+		for( int idy = 0; idy < dimen; idy++ )
+			rows[idx][idy] *= pm;
+	}
+
+	// addition
+	void add( const ctMatrixN &pm ){
+		for( int idx = 0; idx < dimen; idx++ )
+			for( int idy = 0; idy < dimen; idy++ )
+				rows[idx][idy] += pm.rows[idx][idy];
+	}
+
+	void add2( const ctMatrixN &pm1, const ctMatrixN &pm2 ){
+		for( int idx = 0; idx < dimen; idx++ )
+			for( int idy = 0; idy < dimen; idy++ )
+				rows[idx][idy] = pm1.rows[idx][idy] + pm2.rows[idx][idy];
+	}
+
+	void add3( ctMatrixN &pmdest, const ctMatrixN &pm1, const ctMatrixN &pm2 ){
+		for( int idx = 0; idx < dimen; idx++ )
+			for( int idy = 0; idy < dimen; idy++ )
+				pmdest.rows[idx][idy] = pm1.rows[idx][idy] + pm2.rows[idx][idy];
+	}
+
+	void operator+=( const ctMatrixN &pm ){
+		for( int idx = 0; idx < dimen; idx++ )
+			for( int idy = 0; idy < dimen; idy++ )
+				rows[idx][idy] += pm.rows[idx][idy];
+	}
+
+	ctMatrixN operator+( const ctMatrixN &pm ){
+		ctMatrixN Mret;
+
+		for( int idx = 0; idx < dimen; idx++ )
+			for( int idy = 0; idy < dimen; idy++ )
+				Mret.rows[idx][idy] = rows[idx][idy] + pm.rows[idx][idy];
+
+		return Mret;
+	}
+
+	// subtraction
+	void subtract( const ctMatrixN &pm ){
+		for( int idx = 0; idx < dimen; idx++ )
+			for( int idy = 0; idy < dimen; idy++ )
+				rows[idx][idy] -= pm.rows[idx][idy];
+	}
+
+	void subtract2( const ctMatrixN &pm1, const ctMatrixN &pm2 ){
+		for( int idx = 0; idx < dimen; idx++ )
+			for( int idy = 0; idy < dimen; idy++ )
+				rows[idx][idy] = pm1.rows[idx][idy] - pm2.rows[idx][idy];
+	}
+
+	void subtract3( ctMatrixN &pmdest, const ctMatrixN &pm1, const ctMatrixN &pm2 ){
+		for( int idx = 0; idx < dimen; idx++ )
+			for( int idy = 0; idy < dimen; idy++ )
+				pmdest.rows[idx][idy] = pm1.rows[idx][idy] - pm2.rows[idx][idy];
+	}
+
+	void operator-=( const ctMatrixN &pm ){
+		for( int idx = 0; idx < dimen; idx++ )
+			for( int idy = 0; idy < dimen; idy++ )
+				rows[idx][idy] -= pm.rows[idx][idy];
+	}
+
+	ctMatrixN operator-( ctMatrixN &pm ){
+		ctMatrixN Mret;
+
+		for( int idx = 0; idx < dimen; idx++ )
+			for( int idy = 0; idy < dimen; idy++ )
+				Mret.rows[idx][idy] = rows[idx][idy] - pm.rows[idx][idy];
+
+		return Mret;
+	}
+
+	// solve the linear system Ax = b where x is an unknown vector
+	// b is a known vector and A is this matrix
+	// solved x will be returned in px
+	void solve( real *px, const real *pb ){
+		real *x;
+    real *b;
+    int idx;	
+		b = (real *)malloc( sizeof( real )*dimen );
+		x = px;
+
+		for( idx = 0; idx < dimen; idx++ ){
+			b[idx] = pb[idx];
+		}
+
+		// solve this sucker
+		linear_solve( rows, dimen, x, b );
+    free(b);
+	}
+
+	void debug_print(){
+		for( int i = 0; i < dimen; i++ ){
+			for( int j = 0; j < dimen; j++ ){
+#ifdef __CYSTALSPACE__
+				Debug::logf( CT_DEBUG_LEVEL, "%lf :: ", rows[i][j] ); 
+#endif
+			}
+#ifdef __CYSTALSPACE__
+				Debug::logf( CT_DEBUG_LEVEL, "\n" );
+#endif
+		}
+	}
+
+protected:
+	ctMatrixN(){ rows = NULL; dimen = 0; }
+
+	real **rows;
+  int dimen;
+};
+
 
 class ctMatrix3 : public ctMatrix
 {
@@ -218,9 +434,9 @@ public:
 	void debug_print(){
 		for( int i = 0; i < dimen; i++ ){
 			for( int j = 0; j < dimen; j++ ){
-				Debug::logf( CT_DEBUG_LEVEL, "%lf :: ", rows[i][j] ); 
+		//		Debug::logf( CT_DEBUG_LEVEL, "%lf :: ", rows[i][j] ); 
 			}
-				Debug::logf( CT_DEBUG_LEVEL, "\n" );
+		//		Debug::logf( CT_DEBUG_LEVEL, "\n" );
 		}
 	}
 
@@ -449,9 +665,9 @@ public:
 	void debug_print(){
 		for( int i = 0; i < dimen; i++ ){
 			for( int j = 0; j < dimen; j++ ){
-				Debug::logf( CT_DEBUG_LEVEL, "%lf :: ", rows[i][j] ); 
+//				Debug::logf( CT_DEBUG_LEVEL, "%lf :: ", rows[i][j] ); 
 			}
-				Debug::logf( CT_DEBUG_LEVEL, "\n" );
+//				Debug::logf( CT_DEBUG_LEVEL, "\n" );
 		}
 	}
 
