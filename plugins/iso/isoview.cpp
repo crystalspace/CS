@@ -276,7 +276,7 @@ void csIsoFakeCamera::SetIsoView(const csVector2& scroll,
 void csIsoFakeCamera::IsoReady(const csVector3& position, 
   iIsoRenderView *rview, const csVector2& scroll)
 {
-  printf("IsoReady %g,%g,%g\n", position.x, position.y, position.z);
+  //printf("IsoReady %g,%g,%g\n", position.x, position.y, position.z);
   camnum++;
   /// correct for position and renderview (minimum z bound)
   float minz = rview->GetMinZ();
