@@ -18,6 +18,7 @@ The history order is reversed so that new features are at the top.
 	  base class from which other mesh objects can be easily created.
 	  Martin Geisse added this.
 	- Small optimization to xmlread.
+	- Micah added a 'plaster' texture he drew, to stdtex.zip
 2-Apr-2003
         - Jonathan Tarbox fixed some bugs in csEvent::Flatten/Unflatten
 	- Matze removed the csSome, csConstSome and uint type from cstypes.h
