@@ -28,6 +28,47 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine updated many out-of-date documents in the 'docs'
 	  directory.  He also renamed a number of documents in order to
 	  achieve better naming consistency.
+	- Split polygon.cpp into polygon.cpp and pol2d.cpp.
+	- Fixed memory debugger again. It had unneeded depencies on the
+	  system stuff.
+	- Fixed an old bug in the lighting calculator. Apparantly allocating
+	  an array of zero size can give problems. We need to check if this
+	  happens elsewhere.
+	- Jorrit checked and there were some other places where this happened:
+	  allocation of sprite frames and reading of archive stuff.
+	- With the change to the csPolygon3D class and the fixes to the above
+	  mentioned bugs, BSP trees work almost perfectly for gouraud shaded
+	  polygons. There are still a few problems. Working on them... :-)
+	- Remove libs/csengine/bsppol.cpp again because it is not needed
+	  anymore.
+	- Bugfix: forgot to set a new transformation frame for lighting
+	  calculations and csWorld::DrawFunc().
+	- Everything seems to work well. Here is the list of currently known
+	  bugs (in the c-buffer/bsp system):
+	  	- A crash at exit when deallocating a csPolygon3D.
+		- Edge display does not work correctly when c-buffer is enabled.
+		- Space warping portals still have problems with c-buffer.
+		- There are still cases that drawing with the BSP tree gives
+		  incorrect results. Very rare though.
+		- The falling blocks in Blocks are not correctly lighted
+		  anymore.
+9-Aug-1999
+	- Changed merged things (static_thing) so that the original things
+	  are removed instead of kept in memory for no useful purpose.
+	- Renamed some functions which contained the term 'Lightmap' to the
+	  same name but with 'LightMap' instead.
+	- Very fundamental change in the csPolygon3D class. This is a change
+	  which has a large effect on the API of csPolygon3D. The
+	  lighting/texture information has been seperated from csPolygon3D and
+	  put in another class (csPolygonTextureType).
+	  There are two subclasses of csPolygonTextureType:
+	  csLightMapped or csGouraudShaded. The first
+	  case is default and represents the usual lightmapped polygon. The
+	  second case is a gouraud shaded polygon. This changes makes
+	  csPolygon3D a lot cleaner and smaller. In principle this change will
+	  also make it easier to add future types. The cleanup is currently
+	  mostly in data seperation and API. Most of the lightmap handling
+	  code is still in csPolygon3D. This needs to move in the future.
 8-Aug-1999
 	- Continued work on new csTransformationManager class. It is now fully
 	  functional and the old NewTransformation()/RestoreTransformation()
