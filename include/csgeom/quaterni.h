@@ -91,7 +91,16 @@ public:
   { r = theR; x = theX; y = theY; z = theZ; } 
 
   void Normalize() {
-    r = sqrt(1.0 - x*x + y*y + z*z);
+    if(x*x + y*y + z*z > .999) {
+      // Severe problems...
+      real len = x*x + y*y + z*z;
+      x /= len;
+      y /= len;
+      z /= len;
+      r = 0.0;
+    } else {
+      r = sqrt(1.0 - x*x - y*y - z*z);
+    }
   }
 
   double r,x,y,z;
