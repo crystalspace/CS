@@ -8,6 +8,152 @@ The history order has been reversed so that new features are at the top.
 	- Fixed a bug in WalkTest with ms->snd not being initialized to
 	  NULL on systems that don't have sound support. This could result
 	  in crashes when firing missiles.
+	- Eric Sunshine made the following changes to the project:
+	    - Repaired the MacOS/X Server, OpenStep, and NextStep ports of
+	      Crystal Space after they had sat idle for several months.  Many
+	      core-level changes to the project during the idle time broke
+	      these ports rather severely.  The ports are probably about 97%
+	      functional now compared to how functional they were once.  Some
+	      problems still exist which will be addressed in subsequent repair
+	      and upgrade sessions.  For instance, the NextStep port is not yet
+	      fully compatible with Andrew's new National Keyboard Support.
+	      Full compatiblity requires reverse engineering internal NextStep
+	      structures.  The MacOS/X Server and OpenStep ports, on the other
+	      hand, are now compatible with the National Keyboard Support.
+	      Further, certain portions of the software renderer (which Andrew
+	      updated since the last time I repaired all such problems) are
+	      broken for the Apple/NeXT ports running at 32-bit mode on
+	      big-endian hardware.  Future plans also include a port to the
+	      upcoming MacOS/X, as well as further decoupling of the 2D driver
+	      from the system driver.
+	    - The default NeXT 2D canvas is now responsible for the querying
+	      and interpreting its own `simulated depth' option.  This is no
+	      longer the responsibility of the system driver.
+	    - Eliminated iNeXTSystemDriver (NeXTSystemInterface.h) which
+	      published a method to report the simulated-depth value to the 2D
+	      canvas.  The canvas is now entirely responsible for this feature,
+	      so the system driver need not publish this any longer.
+	    - NeXTSystemDriver now manages an iEventOutlet which the 2D canvas
+	      can use for default handling of mouse and keyboard events.
+	    - NeXTSystemDriver now implements SystemExtension() to provide
+	      default mouse and keyboard event handling on behalf of canvases,
+	      as well as other functionality.
+	    - Promoted the ability to suspend the engine's virtual-time clock
+	      into csSystemDriver from NeXTSystemDriver where this feature was
+	      originally implemented.  This is useful for ports which allow the
+	      user to suspend the entire engine (for instance, to be friendly
+	      on multi-tasking systems).  Suspending the virtual-time clock
+	      prevents temporal anomalies from occurring within the engine even
+	      though the real-time clock continues to elapse.  An example of a
+	      temporal anomaly would be the firing of a missile just prior to
+	      suspension of the engine.  Upon engine resumption, if the
+	      virtual-time clock was not also suspended, the missile would
+	      suddenly jump forward as though much engine time had elapsed.
+	    - Updated Apple/NeXT plug-in loading (NeXTLoadLibrary.cpp) to work
+	      correctly with new plug-in search-path capabilites.  Also now
+	      implements a meaningful csPrintLibraryError()
+	    - Enhanced keyboard handling in the MacOS/X Server and OpenStep
+	      ports to be compatible with Andrew's National Language Support
+	      functionality.  (This feature is not yet fully implemented in the
+	      NextStep port.  Doing so requires reverse engineering internal
+	      NextStep data structures.)
+	    - Implemented F1 - F12 function key translation in MacOS/X Server
+	      and OpenStep ports.  (These keys are not yet implemented in the
+	      NextStep port.)
+	    - csEngineConfig is no longer an inner-class of csEngine.  This
+	      change was made in order to work around a bug in the NextStep
+	      compiler which was triggered after csObject (from which csEngine
+	      inherits) was changed so that it inherits from iObject.  Somehow,
+	      the compiler was getting confused by the QueryInterface(),
+	      IncRef(), and DecRef() methods declared in csEngineConfig as well
+	      as in iEngine and csObject (both of which csEngine inherits
+	      from).  Making csEngineConfig stand-alone works around the
+	      problem.
+	    - In order to work around a multiple-inheritance bug in NextStep
+	      compiler, changed the following classes so that they embed an SCF
+	      interface rather than inherit from it:
+		    iCameraPosition  -> csCameraPosition
+		    iMaterialWrapper -> csMaterialWrapper
+		    iRegion          -> csRegion
+		    iSpriteTemplate  -> csSpriteTemplate
+		    iTextureWrapper  -> csTextureWrapper
+	      The compiler's symptom was that it did not think that IncRef(),
+	      DecRef(), and QueryInterface() were implemented in classes which
+	      inherited from iBase multiple times (through different paths).
+	      *BEWARE* There were many places where the engine was dangerously
+	      and blindly casting pointers between the interface and the
+	      implementing class.  For instance, a pointer might be cast from a
+	      csMaterialWrapper to an iMaterialWrapper or vice-versa.  Although
+	      this worked when the implementing class inherited from the SCF
+	      interface, it does _not_ work when the interface is embedded.
+	      The danger here is that the compiler does not warn about this
+	      problem since it assumes that the programmer knew what he or she
+	      was doing when using the cast operation in the first place.  I
+	      tried to repair all such broken and dangerous blind casts in
+	      which the above classes were involved, but it is possible that I
+	      missed one here or there.
+	    - Added an assignment operator to ddgTriangle3 in order to appease
+	      the NextStep compiler.
+	    - Added a missing `inline' keyword to csCovMaskTriage::GetState().
+	      The lack of this keyword resulted in this function being
+	      implemented and exported from every single source file which
+	      included the header.
+	    - Unified the case of the `full-screen' extension as understood by
+	      iGraphics2D::PerformExtension().  Some canvases expected
+	      "fullscreen", whereas others expected "FullScreen".
+	    - Added a preprocessor flag to Blocks which allows all of the
+	      broken networking code to be disabled in one fell-swoop.
+	    - Eliminated compilation warning in pttex.cpp.
+	    - Minor modification to csphyzik/entity.h to appease broken
+	      OpenStep compiler which wasn't instantiating template methods
+	      early enough.  Worked around problem via simple textual
+	      reordering of header so that templatized variables are declared
+	      before they are actually referenced by inline methods.
+	    - Augmented TrueType to CS font converter makfile (csfgen.mak) so
+	      that its target only shows up on platforms which also build the
+	      TrueType font server plug-in.
+	    - Eliminated several compilation warnings in ddgchull.cpp regarding
+	      use of enumeral and non-enumeral types in conditional expression.
+	    - Added missing SYSDEF_ALLOC define to halogen2.cpp.
+	    - Worked around minor compiler bug on NextStep which affected
+	      csapp.cpp and txtmgr.cpp.
+	    - Eliminated several compilation warnings about "unused computed
+	      value" in CSWS and several applications which utilize CSWS, such
+	      as cswstest and levtool.
+	    - Worked around NextStep compiler limitation in null_pix.cpp and
+	      drawpmap.cpp.
+	    - 3dsout.cpp now includes cssysdefs.h in order to fake up a `bool'
+	      type for compilers which do not support `bool' natively.
+	    - Fixed error in me_app.cpp.  Was assinging an
+	      mzModificationOriginDepth constant to a csVector3 instance.
+	    - imotion.h no longer imports matrix3.h and quaterni.h.
+	      iskeleton.h no longer imports transfrm.h.  Not only was this
+	      unnecessary, but it also caused csSystemDriver to depend upon
+	      these classes on NextStep, which was a less-than-desirable
+	      consequence.  This resulted in linkage errors when linking the
+	      csSystem library into applications which do not otherwise link
+	      with the csGeometry library (such as scfreg).  (This problem is
+	      specific to the NextStep compiler which generates references to
+	      every mentioned class even if the class isn't actually used.)
+	    - All source files in apps/t3d2cs and apps/t3d2cs/libt3d now import
+	      cssysdef.h as the very first included file.  This ensures that
+	      the `bool' type is faked up, if necessary, before it is used by
+	      any other imported headers.
+	    - Eliminated an "unused variable" warning in tBrush.cpp.
+	    - Worked around a bizarre NextStep compiler bug which manifests as
+	      an apparent corruption of the virtual table for csSprite2D.
+	      Calls to QueryInterface() from a csSprite2D pointer would never
+	      actually invoke the real, inherited csSprite::QueryInterface(),
+	      and would instead always return NULL.  It is not even clear
+	      which, if any, method was being called in lieu of the real
+	      csSprite::QueryInterface().  Calls to QueryInterface() from a
+	      local instance of csSprite2D would succeed as expected (since the
+	      virtual table is not consulted in this case).  The work around
+	      for this problem (for magical reasons) is to declare
+	      QueryInterface() in csSprite2D which overrides the inherited
+	      csSprite::QueryInterface().  It is sufficient for this method to
+	      simply exist in csSprite2D.  Its actual implementation merely
+	      invokes its superclass' QueryInterface().
 17-Dec-2000
 	- Brandon Ehle fixed a quaternion bug, with r initializer in the
 	  wrong spot. The motion manager bug was fixed by this and

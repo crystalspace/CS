@@ -35,7 +35,7 @@ class csEngine;
  * and so on. In the map file you can use CAMERA (...) keyword to
  * define such points.
  */
-class csCameraPosition : public csPObject, public iCameraPosition
+class csCameraPosition : public csPObject
 {
 public:
   /// The sector this camera points to
@@ -64,6 +64,12 @@ public:
 
   CSOBJTYPE;
   DECLARE_IBASE;
+
+  //--------------------- iCameraPosition implementation ----------------------
+  struct CameraPosition : public iCameraPosition
+  {
+    DECLARE_EMBEDDED_IBASE(csCameraPosition);
+  } scfiCameraPosition;
 };
 
 #endif // __CS_CAMPOS_H__

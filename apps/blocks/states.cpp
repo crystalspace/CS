@@ -112,7 +112,6 @@ void States::EncodeStates ()
   int i = strlen((char*)encodedData);
   // i is at the start of the ints.
   
-  
   tints[0] = score;
   tints[1] = cube_x;
   tints[2] = cube_y;
@@ -126,7 +125,6 @@ void States::EncodeStates ()
   encodedData[i] = ',';
   i++;
   // i here is at the bitset.
-  
   
 //  csBitSet tempBitSet(ST_NUM_BITS);
   tempBitSet->Reset();
@@ -217,18 +215,13 @@ bool States::PrintData (const char* fileName) const
   return ok;  
 }
 
-
-
-
-
+#if defined(BLOCKS_NETWORKING)
 
 NetworkStates::NetworkStates ()
 {
   StateNumber = 0;
   PreviousStateNumber = -1;
-  
 }
-
 
 NetworkStates::~NetworkStates ()
 {
@@ -261,7 +254,6 @@ bool NetworkStates::EncodeForNetwork(unsigned char * EncodedData,
   tb[sizeOfNetwork-3] = 'T';
   tb[sizeOfNetwork-2] = 'E';
 
-  
   StateNumber ++;
   PreviousStateNumber++;
   
@@ -273,22 +265,15 @@ bool NetworkStates::EncodeForNetwork(unsigned char * EncodedData,
   tb[sizeOfNetwork-1] = '\0';
   
 //  memcpy(EncodedData, tb, sizeOfBuffer);
-  
 //  free(tb);
-  
-  
   return true;
 }
-
-
 
 bool NetworkStates::DecodeFromNetwork(unsigned char * NetworkData, 
 				      int sizeOfBuffer, 
 				      States * aState)
 {
-  
   // First we have to see if there is a full set of network data.
-  
   // Check if the STARTSTATE and ENDSTATE are there.
   if
   ( 
@@ -318,12 +303,9 @@ bool NetworkStates::DecodeFromNetwork(unsigned char * NetworkData,
     return false;
   }
   
-  
   // Try to decode the State data in the middle.
-  
   // Get the state number.
   int tempint[1];
-  
   memcpy(tempint, NetworkData+10, ST_SIZE_INT);
   
 //  char * tempStateData;
@@ -343,3 +325,5 @@ bool NetworkStates::DecodeFromNetwork(unsigned char * NetworkData,
     return false;
   }
 }
+
+#endif // BLOCKS_NETWORKING

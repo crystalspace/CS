@@ -83,9 +83,9 @@ public:
   /// Set normals calculated to value.
   void SetNormalsCalculated (bool n) { normals_calculated = n; }
 
-  ///
+  /// Set the name.
   void SetName (char const*);
-  ///
+  /// Get the name.
   char const* GetName () const { return name; }
 
   /**
@@ -127,7 +127,7 @@ public:
   { return (f < frames.Length ()) ? (csFrame *)frames [f] : (csFrame*)NULL; }
   /// Returns the looping frame after frame number f
   csFrame* GetNextFrame (int f)
-  { f++; return (f < frames.Length ()) ? (csFrame *)frames [f] : (csFrame *)frames [0]; }
+  { f++; return f<frames.Length() ? (csFrame*)frames[f]:(csFrame*)frames[0]; }
   /// Get delay for frame number f
   int GetFrameDelay (int f)
   { return (int)delays [f]; }
@@ -138,7 +138,6 @@ private:
   csVector delays;
 };
 
-
 /**
  * Macros for the csSprite3D lighting levels.
  */
@@ -146,8 +145,6 @@ private:
 #define CS_SPR_LIGHTING_LQ 1
 #define CS_SPR_LIGHTING_FAST 2
 #define CS_SPR_LIGHTING_RANDOM 3
-
-
 
 /**
  * Use the global value for determining which lighting level is used by the 
@@ -167,7 +164,6 @@ private:
  */
 #define CS_SPR_LIGHT_LOCAL 2
 
-
 /**
  * Use the global value for determining if LOD is used by the 
  * sprite, and what level it should be used at.
@@ -184,15 +180,13 @@ private:
  */
 #define CS_SPR_LOD_LOCAL 2
 
-
-
 /**
  * A 3D sprite based on a triangle mesh with a single texture.
  * Animation is done with frames.
  * This class represents a template from which a csSprite3D
  * class can be made.
  */
-class csSpriteTemplate : public csPObject, public iSpriteTemplate
+class csSpriteTemplate : public csPObject
 {
   friend class Dumper;
 
@@ -245,8 +239,6 @@ private:
    * This is used to set new sprites lod_level_config to this one.
    */
   int lod_level_config;
-  
-  
    
   /// The base mesh is also the texture alignment mesh.
   csTriangleMesh* texel_mesh;
@@ -300,7 +292,6 @@ public:
   /// Sets the lighting quality for this template.  See CS_SPR_LIGHTING_* defs.
   void SetLightingQuality(int quality) {lighting_quality = quality; }
 
-
   /**
    * Sets which lighting config variable that all new sprites created 
    * from this template will use.
@@ -320,18 +311,11 @@ public:
   int GetLightingQualityConfig ()
   { return lighting_quality_config; };
 
-   
-   
-   
-   
-   
-   
   /// Returns the lod_level for this template.
   float GetLodLevel() { return lod_level; }
 
   /// Sets the lod level for this template.  See CS_SPR_LOD_* defs.
   void SetLodLevel(float level) {lod_level = level; }
-
 
   /**
    * Sets which lod config variable that all new sprites created 
@@ -352,12 +336,6 @@ public:
   int GetLodLevelConfig ()
   { return lod_level_config; };
 
-   
-   
-   
-   
-   
-   
   /**
    * Generate the collapse order.
    * This function will also reorder all the vertices in the template.
@@ -444,9 +422,11 @@ public:
   { return (csSpriteAction *)actions [No]; }
 
   /// Get the material
-  csMaterialWrapper* GetMaterial () const { return cstxt; }
+  csMaterialWrapper* GetMaterial () const
+  { return cstxt; }
   /// Get the material handle.
-  iMaterialHandle* GetMaterialHandle () const { return cstxt->GetMaterialHandle (); }
+  iMaterialHandle* GetMaterialHandle () const
+  { return cstxt->GetMaterialHandle (); }
   /// Set the material used for this sprite
   void SetMaterial (csMaterialWrapper *material);
 
@@ -487,12 +467,19 @@ public:
 
   CSOBJTYPE;
   DECLARE_IBASE;
+
+  //--------------------- iSpriteTemplate implementation --------------------//
+  struct SpriteTemplate : public iSpriteTemplate
+  {
+    DECLARE_EMBEDDED_IBASE (csSpriteTemplate);
+  } scfiSpriteTemplate;
 };
 
 /// A callback function for csSprite3D::Draw().
 typedef void (csSpriteCallback) (csSprite3D* spr, csRenderView* rview);
 /// A callback function for csSprite3D::Draw().
-typedef void (csSpriteCallback2) (csSprite3D* spr, csRenderView* rview, csObject *callbackData);
+typedef void (csSpriteCallback2)
+  (csSprite3D* spr, csRenderView* rview, csObject *callbackData);
 
 /**
  * The base class for all types of sprites.
@@ -639,12 +626,14 @@ public:
    * This is useful to do some expensive computations which only need
    * to be done on a visible sprite.
    */
-  void SetDrawCallback (csSpriteCallback* callback) { draw_callback = callback; }
+  void SetDrawCallback (csSpriteCallback* callback)
+  { draw_callback = callback; }
 
   /**
    * Set a callback which is called only if the sprite is actually drawn.
    */
-  void SetDrawCallback2 (csSpriteCallback2* callback) { draw_callback2 = callback; }
+  void SetDrawCallback2 (csSpriteCallback2* callback)
+  { draw_callback2 = callback; }
 
   /**
    * Get the draw callback. If there are multiple draw callbacks you can
@@ -730,7 +719,7 @@ public:
   CSOBJTYPE;
   DECLARE_IBASE_EXT (csObject);
 
-  //------------------------- iParticle implementation -----------------------//
+  //------------------------ iParticle implementation -----------------------//
   struct Particle : public iParticle
   {
     DECLARE_EMBEDDED_IBASE (csSprite);
@@ -747,7 +736,7 @@ public:
     virtual void DeferUpdateLighting(int flags, int num_lights);
   } scfiParticle;
 
-  //------------------------- iSprite implementation -----------------------//
+  //-------------------------- iSprite implementation -----------------------//
   struct Sprite : public iSprite
   {
     DECLARE_EMBEDDED_IBASE (csSprite);
@@ -759,8 +748,6 @@ public:
     { return &scfParent->GetMovable ().scfiMovable; }
   } scfiSprite;
 };
-
-
 
 
 /**
@@ -805,9 +792,10 @@ private:
    float local_lod_level;
 
   /**
-   * Quality setting for sprite lighting. See the CS_SPR_LIGHTING_* macros defined
-   * in this header file for the different types of lighting.  This is the 
-   * local setting.  It overrides the template, and global lighting settings.
+   * Quality setting for sprite lighting.
+   * See the CS_SPR_LIGHTING_* macros defined in this header file for the
+   * different types of lighting.  This is the local setting.  It overrides the
+   * template, and global lighting settings.
    */  
   int local_lighting_quality;
    
@@ -825,10 +813,11 @@ private:
 public:
    
   /**
-   * Quality setting for sprite lighting. See the CS_SPR_LIGHTING_* macros defined
-   * in this header file for the different types of lighting.  This is the 
-   * global setting that is used for all csSprite3Ds(unless the template or 
-   * the individual sprite overrides it).
+   * Quality setting for sprite lighting.
+   * See the CS_SPR_LIGHTING_* macros defined in this header file for the
+   * different types of lighting.  This is the global setting that is used for
+   * all csSprite3Ds(unless the template or the individual sprite overrides
+   * it).
    */
   static int global_lighting_quality;
 
@@ -859,10 +848,11 @@ public:
   void SetLocalLightingQuality(int lighting_quality)
   { local_lighting_quality = lighting_quality; };
    
-   /**
-    * Sets the global lighting quality for all csSprite3Ds.  NOTE: you must use
-    * SetLightingQualityConfig(CS_SPR_LIGHT_GLOBAL) for the sprite to use this.
-    */
+  /**
+   * Sets the global lighting quality for all csSprite3Ds.
+   * NOTE: You must use SetLightingQualityConfig(CS_SPR_LIGHT_GLOBAL) for the
+   * sprite to use this.
+   */
   void SetGlobalLightingQuality (int lighting_quality)
   { global_lighting_quality = lighting_quality; };
    
@@ -884,12 +874,6 @@ public:
   int GetLightingQualityConfig()
   { return lighting_quality_config; };
 
-   
-   
-   
-
-   
-   
   /**
    * Returns the lod level used by this sprite.
    */ 
@@ -949,7 +933,7 @@ public:
     else 
       return true;
   };
-  
+
   /**
    * GetNumVertsToLight returns the number of vertices to light based on LOD.
    */
@@ -1033,7 +1017,6 @@ private:
    *  Intended for use for things like powerups.
    */
   void UpdateLightingRandom ();
-   
   
   /// random number generator used for random lighting.
   csRandomGen *rand_num;
@@ -1045,21 +1028,21 @@ protected:
   virtual void UpdateInPolygonTrees ();
 
 public:
-  ///
+  /// Constructor.
   csSprite3D (csObject* theParent);
-  ///
+  /// Destructor.
   virtual ~csSprite3D ();
 
-  ///
+  /// Set the template.
   void SetTemplate (csSpriteTemplate* tmpl);
 
-  ///
+  /// Get the template.
   csSpriteTemplate* GetTemplate () { return tpl; }
 
   /// Get the skeleton state for this sprite.
   csSkeletonState* GetSkeletonState () { return skeleton_state; }
 
-  /// force a new material skin other than default
+  /// Force a new material skin other than default
   void SetMaterial (csMaterialWrapper *material);
 
   /// Enable or disable tweening frames (default false).
@@ -1118,7 +1101,7 @@ public:
    */
   virtual void UpdateLighting (csLight** lights, int num_lights);
 
-  ///
+  /// Unset the texture.
   void UnsetTexture ()
   { force_otherskin = false; }
 
@@ -1166,13 +1149,13 @@ public:
 
   /**
    * Get the coordinates of the sprite in screen coordinates.
-   * Fills in the boundingBox with the X and Y locations
-   * of the sprite.  Returns the max Z location of the sprite,
-   * or -1 if the sprite is not on-screen.
-   * If the sprite is not on-screen, the X and Y values are
-   * not valid.
+   * Fills in the boundingBox with the X and Y locations of the sprite.
+   * Returns the max Z location of the sprite, or -1 if the sprite is not
+   * on-screen.  If the sprite is not on-screen, the X and Y values are not
+   * valid.
    */
-  float GetScreenBoundingBox (const csCamera& camtrans, csBox2& boundingBox, csBox3 &bbox3);
+  float GetScreenBoundingBox (const csCamera& camtrans,
+    csBox2& boundingBox, csBox3 &bbox3);
 
   /**
    * Draw this sprite given a camera transformation.
@@ -1184,7 +1167,8 @@ public:
   /**
    * Go to the next frame depending on the current time in milliseconds.
    */
-  bool NextFrame (cs_time current_time, bool onestep = false, bool stoptoend = false);
+  bool NextFrame (cs_time current_time, bool onestep = false,
+    bool stoptoend = false);
 
   /**
    * Go to a specified frame.
@@ -1252,7 +1236,7 @@ public:
 
   CSOBJTYPE;
 
-  //-------------------- iPolygonMesh interface implementation ------------------
+  //------------------ iPolygonMesh interface implementation ----------------//
   DECLARE_IBASE_EXT (csSprite);
 
   struct PolyMesh : public iPolygonMesh
@@ -1293,7 +1277,6 @@ public:
     csMeshedPolygon* polygons;
   } scfiPolygonMesh;
   friend struct PolyMesh;
-
 };
 
 #endif // __CS_CSSPRITE_H__

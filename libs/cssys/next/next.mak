@@ -81,7 +81,7 @@ NEXT.SOURCE_PATHS = $(addprefix libs/cssys/next/,$(NEXT.SEARCH_PATH))
 TO_INSTALL.CONFIG += data/config/next.cfg
 
 # Typical extension for dynamic libraries on this system.
-DLL = .dylib
+DLL = $(NEXT.PLUGIN_EXT)
 
 # Does this system require libsocket.a?
 NEED_SOCKET_LIB = no
@@ -105,9 +105,14 @@ JPG_LIBS = $(LFLAGS.l)jpeg
 SOUND_LIBS =
 
 # Indicate where special include files can be found.
+# @@@FIXME: Should not be using CS/libs/csys/next as include path.  This is
+# only currently needed because 2D driver includes NeXTDelegate.h.  In the
+# future, decouple 2D driver from dependence upon system driver.
 CFLAGS.INCLUDE = $(NEXT.INCLUDE_DIRS) \
   $(addprefix $(CFLAGS.I),$(NEXT.SOURCE_PATHS)) \
   $(CFLAGS.I)libs/zlib $(CFLAGS.I)libs/libpng $(CFLAGS.I)libs/libjpeg
+#CFLAGS.INCLUDE = $(NEXT.INCLUDE_DIRS) \
+#  $(CFLAGS.I)libs/zlib $(CFLAGS.I)libs/libpng $(CFLAGS.I)libs/libjpeg
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL = $(NEXT.CFLAGS.GENERAL) $(NEXT.ARCH_FLAGS) -fno-common -pipe
@@ -147,16 +152,10 @@ LFLAGS.DLL = $(NEXT.LFLAGS.DLL)
 NASMFLAGS.SYSTEM =
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = \
+SRC.SYS_CSSYS = $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS))) \
   libs/cssys/general/findlib.cpp \
   libs/cssys/general/getopt.cpp \
   libs/cssys/general/printf.cpp
-# @@@ Disabled for testing if rest of system compiles.
-# @@@The NeXT-specific code does not compile currently.  Will fix later.
-#SRC.SYS_CSSYS = $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS))) \
-#  libs/cssys/general/findlib.cpp \
-#  libs/cssys/general/getopt.cpp \
-#  libs/cssys/general/printf.cpp
 
 # Where to put dynamic libraries on this system?
 OUTDLL = $(NEXT.PLUGIN_DIR)

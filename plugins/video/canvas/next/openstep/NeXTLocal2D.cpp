@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -70,7 +70,7 @@ static NSWindowDepth window_server_depth()
 //	work for 12-bit RGB and 24-bit RGB.  Consequently this function only
 //	reports 4 or 8 bits per sample, representing 12-bit and 24-bit depths,
 //	respectively.  Other depths still work, but more slowly.  See
-//	README.NeXT for details.
+//	CS/docs/texinfo/internal/platform/next.txi for details.
 //
 //	Note that as of OpenStep 4.1, the Window Server may prefer a depth
 //	greater than that of the "deepest" screen as reported by the Window

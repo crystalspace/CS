@@ -28,13 +28,28 @@
 
 IMPLEMENT_CSOBJTYPE (csSprite2D, csSprite)
 
+// This empty SCF extension works around a bizarre NextStep compiler bug which
+// manifests as an apparent corruption of the virtual table for csSprite2D.
+// Calls to QueryInterface() from a csSprite2D pointer would never actually
+// invoke the real, inherited csSprite::QueryInterface(), and would instead
+// always return NULL.  It is not even clear which, if any, method was being
+// called in lieu of the real csSprite::QueryInterface().  Calls to
+// QueryInterface() from a local instance of csSprite2D would succeed as
+// expected (since the virtual table is not consulted in such cases).  The work
+// around for this problem (for magical reasons) is to declare QueryInterface()
+// in csSprite2D which overrides the inherited csSprite::QueryInterface().  It
+// is sufficient for this method to simply exist in csSprite2D.  Its actual
+// implementation merely invokes its superclass' QueryInterface().  The macros
+// below embody this work-around.
+IMPLEMENT_IBASE_EXT (csSprite2D)
+IMPLEMENT_IBASE_EXT_END
+
 csSprite2D::csSprite2D (csObject* theParent) : csSprite (theParent)
 {
   cstxt = NULL;
   lighting = true;
   ptree_obj = NULL;	//@@@
 }
-
 
 csSprite2D::~csSprite2D ()
 {
@@ -135,11 +150,12 @@ void csSprite2D::UpdateLighting (csLight** lights, int num_lights)
   int i;
   for (i = 0; i < num_lights; i++)
   {
-    csColor light_color = lights [i]->GetColor () * (256. / NORMAL_LIGHT_LEVEL);
+    csColor light_color = lights[i]->GetColor () * (256. / NORMAL_LIGHT_LEVEL);
     float sq_light_radius = lights [i]->GetSquaredRadius ();
     // Compute light position.
     csVector3 wor_light_pos = lights [i]->GetCenter ();
-    float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, GetPosition ());
+    float wor_sq_dist =
+      csSquaredDist::PointPoint (wor_light_pos, GetPosition ());
     if (wor_sq_dist >= sq_light_radius) continue;
     float wor_dist = sqrt (wor_sq_dist);
     float cosinus = 1.;
@@ -159,7 +175,8 @@ void csSprite2D::Draw (csRenderView& rview)
 {
   if (!cstxt)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Error! Trying to draw a 2D sprite with no texture!\n");
+    CsPrintf (MSG_FATAL_ERROR,
+      "Error! Trying to draw a 2D sprite with no texture!\n");
     fatal_exit (0, false);
   }
 

@@ -190,7 +190,7 @@ void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
     #Class, this, iInterfaceID, iVersion));				\
 
 /**
- * This macro is used to finish a IMPLEMENT_IBASE definition
+ * This macro is used to finish an IMPLEMENT_IBASE definition
  */
 #define IMPLEMENT_IBASE_END						\
   return scfParent ?							\
@@ -233,7 +233,7 @@ void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
  * is a class that extends the functionality of another SCF class. For example,
  * suppose a class TheWolf that implements the iWolf interface. Separately
  * it is a useful class per se, but if you want to implement an additional
- * class TheDog that is a subclass of TheWolf and which implements and
+ * class TheDog that is a subclass of TheWolf and which implements an
  * additional interface iDog in theory you should just override the
  * QueryInterface method and return the corresponding pointer when asked.
  * The following macro makes such overrides simpler to write.

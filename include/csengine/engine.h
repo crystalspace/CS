@@ -351,6 +351,25 @@ public:
 };
 
 /**
+ * Object which implements iConfig interface on behalf of csEngine.
+ * This class is used as an embedded SCF object within csEngine.  Typically,
+ * this class would be declared as an inner class of csEngine, but the NextStep
+ * compiler was unable to grok that usage after csObject (from which csEngine
+ * inherits) was changed so that it inherits from iObject.  Somehow, the
+ * compiler was getting confused by the QueryInterface(), IncRef(), and
+ * DecRef() methods declared here as well as in iEngine and csObject (both of
+ * which csEngine inherits from).  Making csEngineConfig stand-alone works
+ * around the problem.
+ */
+struct csEngineConfig : public iConfig
+{
+  DECLARE_EMBEDDED_IBASE (csEngine);
+  virtual bool GetOptionDescription (int idx, csOptionDescription *option);
+  virtual bool SetOption (int id, csVariant* value);
+  virtual bool GetOption (int id, csVariant* value);
+};
+
+/**
  * The 3D engine.
  * This class manages all components which comprise a 3D world including
  * sectors, polygons, curves, sprites, etc.
@@ -1174,13 +1193,7 @@ public:
 
   //--------------------- iConfig interface implementation --------------------
 
-  struct csEngineConfig : public iConfig
-  {
-    DECLARE_EMBEDDED_IBASE (csEngine);
-    virtual bool GetOptionDescription (int idx, csOptionDescription *option);
-    virtual bool SetOption (int id, csVariant* value);
-    virtual bool GetOption (int id, csVariant* value);
-  } scfiConfig;
+  csEngineConfig scfiConfig;
 
   //----------------Begin-Multi-Context-Support------------------------------
 

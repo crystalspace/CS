@@ -1163,7 +1163,7 @@ void OpenPortal (csView* view, char* lev)
     sprintf (buf, "/lev/%s", lev);
     Sys->VFS->ChDir (buf);
     csLoader::AppendMapFile (Sys->engine, "world");
-    Sys->engine->GetCsCurrentRegion ()->Prepare ();
+    Sys->engine->GetCurrentRegion ()->Prepare ();
   }
 
   thing->GetMovable ().SetPosition (pos + csVector3 (0, Sys->cfg_legs_offset, 0));
@@ -1172,13 +1172,13 @@ void OpenPortal (csView* view, char* lev)
 
   // First make a portal to the new level.
   csCameraPosition* cp = (csCameraPosition*)
-    	Sys->engine->GetCsCurrentRegion ()->FindCameraPosition ("Start");
+    	Sys->engine->GetCurrentRegion ()->FindCameraPosition ("Start");
   const char* room_name;
   csVector3 topos;
   if (cp) { room_name = cp->Sector; topos = cp->Position; }
   else { room_name = "room"; topos.Set (0, 0, 0); }
   topos.y -= Sys->cfg_eye_offset;
-  iSector* start_sector = Sys->engine->GetCsCurrentRegion ()->FindSector (room_name);
+  iSector* start_sector = Sys->engine->GetCurrentRegion ()->FindSector (room_name);
   if (start_sector)
   {
     portalPoly->SetCSPortal (start_sector->GetPrivateObject ());

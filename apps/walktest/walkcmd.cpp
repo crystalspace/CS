@@ -1604,7 +1604,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
   }
   else if (!strcasecmp (cmd, "fullscreen"))
-    Sys->G2D->PerformExtension("FullScreen");
+    Sys->G2D->PerformExtension("fullscreen");
   else
     return false;
 

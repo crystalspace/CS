@@ -1221,7 +1221,7 @@ public:
   virtual iPolygonTexture *GetTexture ()
   {
     csPolyTexLightMap *lm = GetLightMapInfo ();
-    return lm ? lm->GetPolyTex () : NULL;
+    return lm ? lm->GetPolyTex () : (iPolygonTexture*)NULL;
   }
 
   /// Get next polygon in texture share list
@@ -1258,7 +1258,7 @@ public:
     virtual iLightMap *GetLightMap ()
     {
       csPolyTexLightMap *lm = scfParent->GetLightMapInfo ();
-      return lm ? lm->GetLightMap () : NULL;
+      return lm ? lm->GetLightMap () : (iLightMap*)NULL;
     }
     /// Get the handle to the polygon texture object
     virtual iPolygonTexture *GetTexture ()
@@ -1269,7 +1269,8 @@ public:
     /// Set material.
     virtual void SetMaterial (iMaterialWrapper* mat)
     {
-      scfParent->SetMaterial ((csMaterialWrapper*)mat);
+      scfParent->SetMaterial (
+        ((csMaterialWrapper::MaterialWrapper*)(mat))->scfParent);
     }
 
     /// Query number of vertices in this polygon

@@ -28,6 +28,7 @@
 #include "csengine/collider.h"
 #include "csparser/csloader.h"
 #include "igraph3d.h"
+#include "igraph2d.h"
 #include "itxtmgr.h"
 #include "ifontsrv.h"
 
@@ -39,9 +40,6 @@
 // PHYZTEST DEMO
 // hit del key to create a swinging chain
 // hit tab key for a mass on a spring
-
-
-
 
 //------------------------------------------------- We need the 3D engine -----
 

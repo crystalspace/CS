@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CSSPRITE2D_H
-#define CSSPRITE2D_H
+#ifndef __CS_CSSPRITE2D_H__
+#define __CS_CSSPRITE2D_H__
 
 #include "csutil/cscolor.h"
 #include "csutil/garray.h"
@@ -109,10 +109,12 @@ public:
   /**
    * Relative move
    */
-  virtual void MovePosition (const csVector3& rel) { movable.MovePosition (rel); }
+  virtual void MovePosition (const csVector3& rel)
+  { movable.MovePosition (rel); }
 
   /// Get position of this sprite.
-  virtual const csVector3& GetPosition () const { return movable.GetPosition (); }
+  virtual const csVector3& GetPosition () const
+  { return movable.GetPosition (); }
 
   /**
    * Scale the vertices of the sprite by factor.
@@ -164,10 +166,13 @@ public:
    * Return the collision point in object space coordinates.
    * @@@ TO BE IMPLEMENTED!
    */
-  virtual bool HitBeamObject (const csVector3& /*start*/, const csVector3& /*end*/,
-  	csVector3& /*isect*/, float* /*pr*/) { return false; }
+  virtual bool HitBeamObject (const csVector3& /*start*/,
+    const csVector3& /*end*/, csVector3& /*isect*/, float* /*pr*/)
+    { return false; }
 
   CSOBJTYPE;
+  // Dummy SCF goop to work around compiler bug.  See csspr2d.cpp for details.
+  DECLARE_IBASE_EXT (csSprite);
 };
 
-#endif //CSSPRITE2D_H
+#endif // __CS_CSSPRITE2D_H__

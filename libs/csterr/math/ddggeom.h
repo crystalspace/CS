@@ -176,13 +176,15 @@ public:
     void set(ddgVector3 *p1, ddgVector3 *p2, ddgVector3 *p3 ) 
         {v[0].set(p1), v[1].set(p2), v[2].set(p3); }
     /// Default bConstructor
-    ddgTriangle3(void ) {}
+    ddgTriangle3(void) {}
     /// Intersect a triangle with line.  Returns if point is 
     bool intersectTriangleWithLine( const ddgVector3* l1, const ddgVector3* l2, ddgVector3 *pi);
     /** Intersect a point with triangle.  Returns if point is inside the triangle.
      *  point is assumed to lie in plane of triangle.
      */
     bool intersectPointTriangle( const ddgVector3* pt);
+    void operator=(const ddgTriangle3& t)
+	{v[0].set(&t.v[0]); v[0].set(&t.v[0]); v[0].set(&t.v[0]); }
 };
 
 class WEXP ddgPrism3 {

@@ -36,7 +36,9 @@
 #  warning Unable to identify compiler name using CS_COMPILER_NAME.
 #endif
 
-#define CS_VERSION CS_VERSION_MAJOR " r" CS_VERSION_MINOR \
+#define CS_VERSION_NUMBER CS_VERSION_MAJOR " r" CS_VERSION_MINOR
+
+#define CS_VERSION CS_VERSION_NUMBER \
   " [" CS_PLATFORM_NAME "-" CS_PROCESSOR_NAME "-" CS_COMPILER_NAME "]"
 
 #endif // __CS_VERSION_H__

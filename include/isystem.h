@@ -190,7 +190,7 @@ struct iSystem : public iBase
    */
   virtual void NextFrame () = 0;
 
-  //------------------------------ Miscelaneous ------------------------------//
+  //------------------------------ Miscellaneous -----------------------------//
 
   /// Returns the basic configuration parameters.
   virtual void GetSettings (int &oWidth, int &oHeight, int &oDepth, bool &oFullScreen) = 0;
@@ -205,15 +205,33 @@ struct iSystem : public iBase
    * driver, which is called, say, from canvas driver (such as EnablePrintf
    * in DJGPP port of CS). In such cases it doesn't have much sense to create
    * a new SCF interface and so on, better just override this function and
-   * use it ...
+   * use it.
    */
   virtual bool SystemExtension (const char *iCommand, ...) = 0;
 
   /**
+   * Suspend the engine's virtual-time clock.<p>
+   * Call this function when the client application will fail to invoking
+   * NextFrame() for an extended period of time.  Suspending the virtual-time
+   * clock prevents a temporal anomaly from occurring the next time
+   * GetElapsedTime() is called after the application resumes invoking
+   * NextFrame().
+   */
+  virtual void SuspendVirtualTimeClock() = 0;
+
+  /**
+   * Resume the engine's virtual-time clock.<p>
+   * Call this function when the client application begins invoking NextFrame()
+   * again after extended down-time.  This function is the complement of
+   * SuspendVirtualTimeClock().
+   */
+  virtual void ResumeVirtualTimeClock() = 0;
+
+  /**
    * Query the time elapsed between previous call to NextFrame and last
-   * call to NextFrame. Also returns the absolute time of the last call
-   * to NextFrame. The time is updated once at the beginning of every
-   * NextFrame, thus you may call this function as much as you wish.
+   * call to NextFrame(). Also returns the absolute time of the last call
+   * to NextFrame(). The time is updated once at the beginning of every
+   * NextFrame(), thus you may call this function as much as you wish.
    */
   virtual void GetElapsedTime (cs_time &oElapsedTime, cs_time &oCurrentTime) = 0;
 

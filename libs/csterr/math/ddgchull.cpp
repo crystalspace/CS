@@ -171,7 +171,7 @@ ddgInside ddgCHullSet::clip(ddgBBox3 *bbox, bool occluder)
 		// If ddgOUT we just try the next volume.
 		i++;
 	}
-	return ddgInsideState[occluder ? visState : 2 - visState];
+	return ddgInsideState[occluder ? visState : ddgInside(2 - visState)];
 }
 
 ddgInside ddgCHullSet::clip(ddgTriangle3 *tri, bool occluder)
@@ -195,7 +195,7 @@ ddgInside ddgCHullSet::clip(ddgTriangle3 *tri, bool occluder)
 		// If ddgOUT we just try the next volume.
 		i++;
 	}
-	return ddgInsideState[occluder ? visState : 2 - visState];
+	return ddgInsideState[occluder ? visState : ddgInside(2 - visState)];
 }
 
 
@@ -220,7 +220,7 @@ ddgInside ddgCHullSet::clip(ddgPrism3 *prism, bool occluder)
 		// If ddgOUT we just try the next volume.
 		i++;
 	}
-	return ddgInsideState[occluder ? visState : 2 - visState];
+	return ddgInsideState[occluder ? visState : ddgInside(2 - visState)];
 }
 
 ddgCHullSet::ddgCHullSet( int nv ) : _noVolumes(nv)

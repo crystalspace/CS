@@ -54,10 +54,7 @@ extern void csAddLibraryPath (const char *iPath);
 /**
  * Find a shared library in library search path and load it.
  * Same as csLoadLibrary except that you give just the name of the
- * module, without any prefix/suffix. You give the *possible* prefix
- * and suffix and it tries with and without them along every library
- * path entry. The first one that is found gets loaded and a handle
- * is returned.
+ * module, without any prefix/suffix.
  */
 extern csLibraryHandle csFindLoadLibrary (const char *iModule);
 
@@ -69,8 +66,8 @@ extern csLibraryHandle csFindLoadLibrary (const char *iModule);
  * Same about iSuffix - it can be something like ".dll" or ".so", but
  * not NULL (because all OSes use some suffix for shared libs).
  */
-extern csLibraryHandle csFindLoadLibrary (const char *iPrefix, const char *iName,
-  const char *iSuffix);
+extern csLibraryHandle csFindLoadLibrary (const char *iPrefix,
+  const char *iName, const char *iSuffix);
 
 /**
  * Print out the latest dynamic loader error.

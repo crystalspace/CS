@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -20,9 +20,11 @@
 //	is instructed to generate RGB data in the three high-order bytes of a
 //	four byte pixel.  During the cooking process, the fourth (alpha) byte
 //	is set to 0xff.  The resulting data can then be used directly by the
-//	NeXT Window Server.  See the file README.NeXT for an explanation of
-//	why the alpha byte of RGBA:8888 is set to 0xff before handing the
-//	data off to the Window Server.
+//	NeXT Window Server.
+//
+//	See the file CS/docs/texinfo/internal/platform/next.txi for an
+//	explanation of why the alpha byte of RGBA:8888 is set to 0xff before
+//	handing the data off to the Window Server.
 //
 //-----------------------------------------------------------------------------
 #include "NeXTFrameBuffer32.h"

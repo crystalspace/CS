@@ -22,7 +22,7 @@
 //-----------------------------------------------------------------------------
 #include "cssysdef.h"
 #include "NeXTDelegate.h"
-#include "NeXTSystemDriver.h"
+#include "cssys/next/NeXTSystemDriver.h"
 extern "Objective-C" {
 #import <appkit/Application.h>
 #import <appkit/View.h>
@@ -32,6 +32,40 @@ extern "C" {
 #include <string.h>
 }
 int const TRACK_TAG = 9797;
+
+//-----------------------------------------------------------------------------
+// For each keystroke, Crystal Space expects a raw key code and a cooked
+// character code.  For ASCII codes, Crystal Space expects the raw key code to
+// be in canonic lower-case form, and the cooked character code to be in
+// native cooked form.  Here are some examples:
+//
+//      Input    Raw  Cooked
+//      -------  ---  ------
+//      ctrl-C   c    ^C
+//      d        d    d
+//      shift-e  e    E
+//      F        f    F
+//      alt-m    m    "mu" *
+//
+// (*) For alt-m, the cooked character depends upon the user's current key
+// mapping.  It may actually be mapped to any character, but is often mapped to
+// Greek "mu", as it was in this example.
+//
+// The following table translates all raw ASCII key codes to their lower-case
+// equivalents in order to satisfy Crystal Space's canonic form requirement.
+//-----------------------------------------------------------------------------
+static char const CS_DOWN_CASE[] =
+{
+'2', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '[', '\\',']', '6', '-',
+' ', '1', '\'','3', '4', '5', '7', '\'','9', '0', '8', '=', ',', '-', '.', '/',
+'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ';', ';', ',', '=', '.', '/',
+'2', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '[', '\\',']', '6', '-',
+'`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '[', '\\',']', '`', 127
+};
+
 
 //-----------------------------------------------------------------------------
 // Keystrokes which must be translated to CrystalSpace-specific codes.
@@ -243,8 +277,10 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 //-----------------------------------------------------------------------------
 // adjustWindowPosition:
 //	For best video performance align left-edge of NeXTView (the window's
-//	contentView) at a position divisible by 8.  See also: README.NeXT and
-//	the NextStep 3.0 WindowServer release notes.
+//	contentView) at a position divisible by 8.
+//
+//	See also: CS/docs/texinfo/internal/platform/next.txi and the
+//	NextStep 3.0 WindowServer release notes.
 //-----------------------------------------------------------------------------
 - (void)adjustWindowPosition:(Window*)w
     {
@@ -364,95 +400,95 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 
 
 //-----------------------------------------------------------------------------
-// classifyOtherSet:
+// classifyOtherSet::
 //-----------------------------------------------------------------------------
-- (int)classifyOtherSet:(int)c
+- (void)classifyOtherSet:(int*)raw :(int*)cooked
     {
-    int k = 0;
-    switch (c)
+    switch (*raw)
 	{
-	case K_ED_PAGE_UP:   k = CSKEY_PGUP;     break;
-	case K_ED_PAGE_DOWN: k = CSKEY_PGDN;     break;
-	case K_ED_HOME:      k = CSKEY_HOME;     break;
-	case K_ED_END:       k = CSKEY_END;      break;
-	case K_ED_INSERT:    k = CSKEY_INS;      break;
-	case K_ED_DELETE:    k = CSKEY_DEL;      break;
+	case K_ED_PAGE_UP:   *raw = CSKEY_PGUP; *cooked = -1; break;
+	case K_ED_PAGE_DOWN: *raw = CSKEY_PGDN; *cooked = -1; break;
+	case K_ED_HOME:      *raw = CSKEY_HOME; *cooked = -1; break;
+	case K_ED_END:       *raw = CSKEY_END;  *cooked = -1; break;
+	case K_ED_INSERT:    *raw = CSKEY_INS;  *cooked = -1; break;
+	case K_ED_DELETE:    *raw = CSKEY_DEL;  *cooked = -1; break;
 	}
-    return k;
     }
 
 
 //-----------------------------------------------------------------------------
-// classifyAsciiSet:
-//	*NOTE* CrystalSpace wants control-keys translated to lower-case
-//	equivalents; that is: 'ctrl-c' --> 'c'.
+// classifyAsciiSet::
+//	*NOTE* The so-called "backspace" key on the keyboard actually sends
+//	DEL, however, Crystal Space would like to see it as CSKEY_BACKSPACE.
 //-----------------------------------------------------------------------------
-- (int)classifyAsciiSet:(int)c
+- (void)classifyAsciiSet:(int*)raw :(int*)cooked
     {
-    int k = 0;
-    switch (c)
+    switch (*raw)
 	{
-	case K_ESCAPE:    k = CSKEY_ESC;       break;
-	case K_RETURN:    k = CSKEY_ENTER;     break;
-	case K_TAB:       k = CSKEY_TAB;       break;
-	case K_BACKSPACE: k = CSKEY_BACKSPACE; break;
-	case K_DELETE:    k = CSKEY_BACKSPACE; break;
-	default: k = (c < ' ' ? c + '`' : c);  break;	// *NOTE*
+	case K_ESCAPE:    *raw = CSKEY_ESC;       break;
+	case K_RETURN:    *raw = CSKEY_ENTER;     break;
+	case K_TAB:       *raw = CSKEY_TAB;       break;
+	case K_BACKSPACE: *raw = CSKEY_BACKSPACE; break;
+	case K_DELETE:    *raw = CSKEY_BACKSPACE; break; // *NOTE*
+	default:
+	    if (*raw <= 0x7f) // Is it 7-bit ASCII?
+		*raw = CS_DOWN_CASE[ *raw ];
+	    break;
 	}
-    return k;
     }
 
 
 //-----------------------------------------------------------------------------
-// classifyKeypad:
+// classifyKeypad::
 //-----------------------------------------------------------------------------
-- (int)classifyKeypad:(int)c
+- (void)classifyKeypad:(int*)raw :(int*)cooked
     {
-    int k = 0;
-    switch (c)
+    switch (*raw)
 	{
-	case K_LEFT:         k = CSKEY_LEFT;     break;
-	case K_RIGHT:        k = CSKEY_RIGHT;    break;
-	case K_UP:           k = CSKEY_UP;       break;
-	case K_DOWN:         k = CSKEY_DOWN;     break;
-	case K_KP_CENTER:    k = CSKEY_CENTER;   break;
-	case K_KP_LEFT:      k = CSKEY_LEFT;     break;
-	case K_KP_UP:        k = CSKEY_UP;       break;
-	case K_KP_RIGHT:     k = CSKEY_RIGHT;    break;
-	case K_KP_DOWN:      k = CSKEY_DOWN;     break;
-	case K_KP_PAGE_UP:   k = CSKEY_PGUP;     break;
-	case K_KP_PAGE_DOWN: k = CSKEY_PGDN;     break;
-	case K_KP_HOME:      k = CSKEY_HOME;     break;
-	case K_KP_END:       k = CSKEY_END;      break;
-	case K_KP_INSERT:    k = CSKEY_INS;      break;
-	case K_KP_DELETE:    k = CSKEY_DEL;      break;
-	case K_KP_MULTIPLY:  k = CSKEY_PADMULT;  break;
-	case K_KP_DIVIDE:    k = CSKEY_PADDIV;   break;
-	case K_KP_PLUS:      k = CSKEY_PADPLUS;  break;
-	case K_KP_MINUS:     k = CSKEY_PADMINUS; break;
-	case K_KP_ENTER:     k = CSKEY_ENTER;    break;
+	case K_LEFT:         *raw = CSKEY_LEFT;  *cooked = -1;   break;
+	case K_RIGHT:        *raw = CSKEY_RIGHT; *cooked = -1;   break;
+	case K_UP:           *raw = CSKEY_UP;    *cooked = -1;   break;
+	case K_DOWN:         *raw = CSKEY_DOWN;  *cooked = -1;   break;
+	case K_KP_CENTER:    *raw = CSKEY_CENTER;                break;
+	case K_KP_LEFT:      *raw = CSKEY_LEFT;                  break;
+	case K_KP_UP:        *raw = CSKEY_UP;                    break;
+	case K_KP_RIGHT:     *raw = CSKEY_RIGHT;                 break;
+	case K_KP_DOWN:      *raw = CSKEY_DOWN;                  break;
+	case K_KP_PAGE_UP:   *raw = CSKEY_PGUP;                  break;
+	case K_KP_PAGE_DOWN: *raw = CSKEY_PGDN;                  break;
+	case K_KP_HOME:      *raw = CSKEY_HOME;                  break;
+	case K_KP_END:       *raw = CSKEY_END;                   break;
+	case K_KP_INSERT:    *raw = CSKEY_INS;                   break;
+	case K_KP_DELETE:    *raw = CSKEY_DEL;                   break;
+	case K_KP_MULTIPLY:  *raw = CSKEY_PADMULT;               break;
+	case K_KP_DIVIDE:    *raw = CSKEY_PADDIV;                break;
+	case K_KP_PLUS:      *raw = CSKEY_PADPLUS;               break;
+	case K_KP_MINUS:     *raw = CSKEY_PADMINUS;              break;
+	case K_KP_ENTER:     *raw = CSKEY_ENTER; *cooked = '\n'; break;
 	};
-    return k;
     }
 
 
 //-----------------------------------------------------------------------------
-// classifyKeyDown: -- Translate NeXT keystroke to CrystalSpace.
+// classifyKeyDown:raw:cooked: -- Translate NextStep keystroke to CrystalSpace.
 //-----------------------------------------------------------------------------
-- (int)classifyKeyDown:(NXEvent const*)p
+- (BOOL)classifyKeyDown:(NXEvent const*)p raw:(int*)raw cooked:(int*)cooked
     {
-    int k = 0;
+    BOOL ok = NO;
+    *raw = *cooked = 0;
     if ((p->flags & NX_COMMANDMASK) == 0)
 	{
-	int const c = p->data.key.charCode;
+	*raw = p->data.key.charCode;	// @@@FIXME: Derive `real' raw code.
+	*cooked = p->data.key.charCode;
 	if ((p->flags & NX_NUMERICPADMASK) != 0)
-	    k = [self classifyKeypad:c];
+	    [self classifyKeypad:raw:cooked];
 	else if (p->data.key.charSet != NX_ASCIISET)
-	    k = [self classifyOtherSet:c];
+	    [self classifyOtherSet:raw:cooked];
 	else
-	    k = [self classifyAsciiSet:c];
+	    [self classifyAsciiSet:raw:cooked];
+	ok = YES;
 	}
-    return k;
+    return ok;
     }
 
 
@@ -469,11 +505,16 @@ static void timer_handler( DPSTimedEntry, double, void* data )
     BOOL const old_state = ((modifiers & csmask) != 0);
     if (new_state != old_state)
 	{
-	driver->QueueKeyEvent( key, new_state );
 	if (new_state)
+	    {
 	    modifiers |= csmask;
+	    driver->SystemExtension( "keydown", key, -1 );
+	    }
 	else
+	    {
 	    modifiers &= ~csmask;
+	    driver->SystemExtension( "keyup", key, -1 );
+	    }
 	}
     }
 
@@ -484,7 +525,14 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 - (void)keyEvent:(NXEvent*)p down:(BOOL)flag
     {
     if (!paused)
-	driver->QueueKeyEvent( [self classifyKeyDown:p], flag );
+	{
+	int raw, cooked;
+	if ([self classifyKeyDown:p raw:&raw cooked:&cooked])
+	    {
+	    char const* request = flag ? "keydown" : "keyup";
+	    driver->SystemExtension( request, raw, cooked );
+	    }
+	}
     }
 
 - (void)keyDown:(NXEvent*)p inView:(View*)v
@@ -532,7 +580,7 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 	{
 	int x, y;
 	if ([self localize:p toView:v x:&x y:&y])
-	    driver->QueueMouseEvent( 0, false, x, y );
+	    driver->SystemExtension( "mousemoved", x, y );
 	}
     }
 
@@ -542,7 +590,7 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 	{
 	int x, y;
 	[self localize:p toView:v x:&x y:&y];
-	driver->QueueMouseEvent( button, false, x, y );
+	driver->SystemExtension( "mouseup", button, x, y );
 	}
     }
 
@@ -552,7 +600,7 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 	{
 	int x, y;
 	[self localize:p toView:v x:&x y:&y];
-	driver->QueueMouseEvent( button, true, x, y );
+	driver->SystemExtension( "mousedown", button, x, y );
 	}
     }
 
@@ -594,7 +642,7 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 	[self saveWindowTitle];
 	[self appendToWindowTitle:"  [Paused]"];
 	driver->pause_clock();
-	driver->QueueFocusEvent( false );
+	driver->SystemExtension( "appdeactivated" );
 	}
     }
 
@@ -607,7 +655,7 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 	[self startTracking:animationWindow];
 	[self startTimer];
 	driver->resume_clock();
-	driver->QueueFocusEvent( true );
+	driver->SystemExtension( "appactivated" );
 	}
     }
 

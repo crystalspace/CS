@@ -44,10 +44,15 @@ void csGraphics3DNull::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh,
   int tx, int ty, int tw, int th, uint8 Alpha)
 {
-  void (*drawpixfunc) (iGraphics2D *, csTextureManagerNull *, iTextureHandle *,
-    int, int, int, int, int, int, int, int, uint8) =
-    (pfmt.PixelBytes == 1) ? DrawPixmap8 :
-    (pfmt.PixelBytes == 2) ? ((pfmt.GreenBits == 5) ? DrawPixmap16_555 : DrawPixmap16_565) :
-    DrawPixmap32;
-  drawpixfunc (G2D, texman, hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha);
+  if (pfmt.PixelBytes == 1)
+    DrawPixmap8 (G2D, texman, hTex, sx,sy, sw,sh, tx,ty, tw,th, Alpha);
+  else if (pfmt.PixelBytes == 2)
+  {
+    if (pfmt.GreenBits == 5)
+      DrawPixmap16_555 (G2D, texman, hTex, sx,sy, sw,sh, tx,ty, tw,th, Alpha);
+    else
+      DrawPixmap16_565 (G2D, texman, hTex, sx,sy, sw,sh, tx,ty, tw,th, Alpha);
+  }
+  else
+    DrawPixmap32 (G2D, texman, hTex, sx,sy, sw,sh, tx,ty, tw,th, Alpha);
 }

@@ -1,4 +1,11 @@
+/**
+ * Idea for this kind of halo has been partially borrowed from GIMP:
+ * SuperNova plug-in
+ * Copyright (C) 1997 Eiichi Takamori <taka@ma1.seikyou.ne.jp>,
+ *                     Spencer Kimball, Federico Mena Quintero
+ */
 
+#define SYSDEF_ALLOCA
 #include "cssysdef.h"
 #include "qint.h"
 #include "csutil/rng.h"
@@ -7,13 +14,8 @@
 #include <math.h>
 #include <malloc.h>
 
-/**
- * Idea for this kind of halo has been partially borrowed from GIMP:
- * SuperNova plug-in
- * Copyright (C) 1997 Eiichi Takamori <taka@ma1.seikyou.ne.jp>,
- *                     Spencer Kimball, Federico Mena Quintero
- */
-unsigned char *GenerateNova (int iSize, int iSeed, int iNumSpokes, float iRoundness)
+unsigned char*
+GenerateNova (int iSize, int iSeed, int iNumSpokes, float iRoundness)
 {
   csRandomGen rnd (iSeed);
   unsigned char *image = new unsigned char [iSize * iSize];

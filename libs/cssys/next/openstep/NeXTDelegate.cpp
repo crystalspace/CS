@@ -22,7 +22,7 @@
 //-----------------------------------------------------------------------------
 #include "cssysdef.h"
 #include "NeXTDelegate.h"
-#include "NeXTSystemDriver.h"
+#include "cssys/next/NeXTSystemDriver.h"
 extern "Objective-C" {
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSCursor.h>
@@ -30,6 +30,40 @@ extern "Objective-C" {
 #import <AppKit/NSView.h>
 #import <AppKit/NSWindow.h>
 }
+
+//-----------------------------------------------------------------------------
+// For each keystroke, Crystal Space expects a raw key code and a cooked
+// character code.  For ASCII codes, Crystal Space expects the raw key code to
+// be in canonic lower-case form, and the cooked character code to be in
+// native cooked form.  Here are some examples:
+//
+//      Input    Raw  Cooked
+//      -------  ---  ------
+//      ctrl-C   c    ^C
+//      d        d    d
+//      shift-e  e    E
+//      F        f    F
+//      alt-m    m    "mu" *
+//
+// (*) For alt-m, the cooked character depends upon the user's current key
+// mapping.  It may actually be mapped to any character, but is often mapped to
+// Greek "mu", as it was in this example.
+//
+// The following table translates all raw ASCII key codes to their lower-case
+// equivalents in order to satisfy Crystal Space's canonic form requirement.
+//-----------------------------------------------------------------------------
+static char const CS_DOWN_CASE[] =
+{
+'2', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '[', '\\',']', '6', '-',
+' ', '1', '\'','3', '4', '5', '7', '\'','9', '0', '8', '=', ',', '-', '.', '/',
+'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ';', ';', ',', '=', '.', '/',
+'2', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '[', '\\',']', '6', '-',
+'`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '[', '\\',']', '`', 127
+};
+
 
 //-----------------------------------------------------------------------------
 // Keystrokes which must be translated to CrystalSpace-specific codes.
@@ -67,6 +101,18 @@ enum
     K_ED_END		= NSEndFunctionKey,
     K_ED_INSERT		= NSInsertFunctionKey,
     K_ED_DELETE		= NSDeleteFunctionKey,
+    K_F1		= NSF1FunctionKey,
+    K_F2		= NSF2FunctionKey,
+    K_F3		= NSF3FunctionKey,
+    K_F4		= NSF4FunctionKey,
+    K_F5		= NSF5FunctionKey,
+    K_F6		= NSF6FunctionKey,
+    K_F7		= NSF7FunctionKey,
+    K_F8		= NSF8FunctionKey,
+    K_F9		= NSF9FunctionKey,
+    K_F10		= NSF10FunctionKey,
+    K_F11		= NSF11FunctionKey,
+    K_F12		= NSF12FunctionKey,
     };
 
 //=============================================================================
@@ -181,8 +227,10 @@ enum
 //-----------------------------------------------------------------------------
 // adjustWindowPosition:
 //	For best video performance align left-edge of NeXTView (the window's
-//	contentView) at a position divisible by 8.  See also: README.NeXT and
-//	the NextStep 3.0 WindowServer release notes.
+//	contentView) at a position divisible by 8.
+//
+//	See also: CS/docs/texinfo/internal/platform/next.txi and the
+//	NextStep 3.0 WindowServer release notes.
 //-----------------------------------------------------------------------------
 - (void)adjustWindowPosition:(NSWindow*)w
     {
@@ -291,108 +339,107 @@ enum
 
 
 //-----------------------------------------------------------------------------
-// classifyFunctionKey:
+// classifyFunctionKey::
 //-----------------------------------------------------------------------------
-- (int)classifyFunctionKey:(NSString*)s
+- (void)classifyFunctionKey:(int*)raw :(int*)cooked
     {
-    int k = 0;
-    switch ([s characterAtIndex:0])
+    *cooked = -1;
+    switch (*raw)
 	{
-	case K_LEFT:         k = CSKEY_LEFT;  break;
-	case K_RIGHT:        k = CSKEY_RIGHT; break;
-	case K_UP:           k = CSKEY_UP;    break;
-	case K_DOWN:         k = CSKEY_DOWN;  break;
-	case K_ED_PAGE_UP:   k = CSKEY_PGUP;  break;
-	case K_ED_PAGE_DOWN: k = CSKEY_PGDN;  break;
-	case K_ED_HOME:      k = CSKEY_HOME;  break;
-	case K_ED_END:       k = CSKEY_END;   break;
-	case K_ED_INSERT:    k = CSKEY_INS;   break;
-	case K_ED_DELETE:    k = CSKEY_DEL;   break;
+	case K_LEFT:         *raw = CSKEY_LEFT;  break;
+	case K_RIGHT:        *raw = CSKEY_RIGHT; break;
+	case K_UP:           *raw = CSKEY_UP;    break;
+	case K_DOWN:         *raw = CSKEY_DOWN;  break;
+	case K_ED_PAGE_UP:   *raw = CSKEY_PGUP;  break;
+	case K_ED_PAGE_DOWN: *raw = CSKEY_PGDN;  break;
+	case K_ED_HOME:      *raw = CSKEY_HOME;  break;
+	case K_ED_END:       *raw = CSKEY_END;   break;
+	case K_ED_INSERT:    *raw = CSKEY_INS;   break;
+	case K_ED_DELETE:    *raw = CSKEY_DEL;   break;
+	case K_F1:           *raw = CSKEY_F1;   break;
+	case K_F2:           *raw = CSKEY_F2;   break;
+	case K_F3:           *raw = CSKEY_F3;   break;
+	case K_F4:           *raw = CSKEY_F4;   break;
+	case K_F5:           *raw = CSKEY_F5;   break;
+	case K_F6:           *raw = CSKEY_F6;   break;
+	case K_F7:           *raw = CSKEY_F7;   break;
+	case K_F8:           *raw = CSKEY_F8;   break;
+	case K_F9:           *raw = CSKEY_F9;   break;
+	case K_F10:          *raw = CSKEY_F10;  break;
+	case K_F11:          *raw = CSKEY_F11;  break;
+	case K_F12:          *raw = CSKEY_F12;  break;
 	}
-    return k;
     }
 
 
 //-----------------------------------------------------------------------------
-// classifyControlKey:
-//	CrystalSpace wants control-keys translated to lower-case equivalents; 
-//	that is: 'ctrl-c' --> 'c'.  
+// classifyOtherKey::
 //-----------------------------------------------------------------------------
-- (int)classifyControlKey:(NSString*)s
+- (void)classifyOtherKey:(int*)raw :(int*)cooked
     {
-    return [[s lowercaseString] characterAtIndex:0];
-    }
-
-
-//-----------------------------------------------------------------------------
-// classifyOtherKey:
-//-----------------------------------------------------------------------------
-- (int)classifyOtherKey:(NSString*)s
-    {
-    int k = 0;
-    unichar const c = [s characterAtIndex:0];
-    switch (c)
+    switch (*raw)
 	{
-	case K_ESCAPE:    k = CSKEY_ESC;       break;
-	case K_RETURN:    k = CSKEY_ENTER;     break;
-	case K_TAB:       k = CSKEY_TAB;       break;
-	case K_BACKSPACE: k = CSKEY_BACKSPACE; break;
-	case K_DELETE:    k = CSKEY_BACKSPACE; break;
-	default:          k = c;               break;
+	case K_ESCAPE:    *raw = CSKEY_ESC;       break;
+	case K_RETURN:    *raw = CSKEY_ENTER;     break;
+	case K_TAB:       *raw = CSKEY_TAB;       break;
+	case K_BACKSPACE: *raw = CSKEY_BACKSPACE; break;
+	case K_DELETE:    *raw = CSKEY_DEL;       break;
+	default:
+	    if (*raw <= 0x7f) // Is it 7-bit ASCII?
+		*raw = CS_DOWN_CASE[ *raw ];
+	    break;
 	}
-    return k;
     }
 
 
 //-----------------------------------------------------------------------------
-// classifyNumericPadKey:
+// classifyNumericPadKey::
 //-----------------------------------------------------------------------------
-- (int)classifyNumericPadKey:(NSString*)s
+- (void)classifyNumericPadKey:(int*)raw :(int*)cooked
     {
-    int k = 0;
-    switch ([s characterAtIndex:0])
+    switch (*raw)
 	{
-	case K_KP_CENTER:    k = CSKEY_CENTER;   break;
-	case K_KP_LEFT:      k = CSKEY_LEFT;     break;
-	case K_KP_UP:        k = CSKEY_UP;       break;
-	case K_KP_RIGHT:     k = CSKEY_RIGHT;    break;
-	case K_KP_DOWN:      k = CSKEY_DOWN;     break;
-	case K_KP_PAGE_UP:   k = CSKEY_PGUP;     break;
-	case K_KP_PAGE_DOWN: k = CSKEY_PGDN;     break;
-	case K_KP_HOME:      k = CSKEY_HOME;     break;
-	case K_KP_END:       k = CSKEY_END;      break;
-	case K_KP_INSERT:    k = CSKEY_INS;      break;
-	case K_KP_DELETE:    k = CSKEY_DEL;      break;
-	case K_KP_MULTIPLY:  k = CSKEY_PADMULT;  break;
-	case K_KP_DIVIDE:    k = CSKEY_PADDIV;   break;
-	case K_KP_PLUS:      k = CSKEY_PADPLUS;  break;
-	case K_KP_MINUS:     k = CSKEY_PADMINUS; break;
-	case K_KP_ENTER:     k = CSKEY_ENTER;    break;
+	case K_KP_CENTER:    *raw = CSKEY_CENTER;                break;
+	case K_KP_LEFT:      *raw = CSKEY_LEFT;                  break;
+	case K_KP_UP:        *raw = CSKEY_UP;                    break;
+	case K_KP_RIGHT:     *raw = CSKEY_RIGHT;                 break;
+	case K_KP_DOWN:      *raw = CSKEY_DOWN;                  break;
+	case K_KP_PAGE_UP:   *raw = CSKEY_PGUP;                  break;
+	case K_KP_PAGE_DOWN: *raw = CSKEY_PGDN;                  break;
+	case K_KP_HOME:      *raw = CSKEY_HOME;                  break;
+	case K_KP_END:       *raw = CSKEY_END;                   break;
+	case K_KP_INSERT:    *raw = CSKEY_INS;                   break;
+	case K_KP_DELETE:    *raw = CSKEY_DEL;                   break;
+	case K_KP_MULTIPLY:  *raw = CSKEY_PADMULT;               break;
+	case K_KP_DIVIDE:    *raw = CSKEY_PADDIV;                break;
+	case K_KP_PLUS:      *raw = CSKEY_PADPLUS;               break;
+	case K_KP_MINUS:     *raw = CSKEY_PADMINUS;              break;
+	case K_KP_ENTER:     *raw = CSKEY_ENTER; *cooked = '\n'; break;
 	};
-    return k;
     }
 
 
 //-----------------------------------------------------------------------------
-// classifyKeyDown: -- Translate OpenStep keystroke to CrystalSpace.
+// classifyKeyDown:raw:cooked: -- Translate OpenStep keystroke to CrystalSpace.
 //-----------------------------------------------------------------------------
-- (int)classifyKeyDown:(NSEvent*)p 
+- (BOOL)classifyKeyDown:(NSEvent*)p raw:(int*)raw cooked:(int*)cooked
     {
-    int k = 0;
+    BOOL ok = NO;
+    *raw = *cooked = 0;
     unsigned int const flags = [p modifierFlags];
     if ((flags & NSCommandKeyMask) == 0)
 	{
-	NSString* const s = [p charactersIgnoringModifiers];
+	*raw = [[p charactersIgnoringModifiers] characterAtIndex:0];
+	*cooked = [[p characters] characterAtIndex:0];
 	if ((flags & NSFunctionKeyMask) != 0)
-	    k = [self classifyFunctionKey:s];
+	    [self classifyFunctionKey:raw:cooked];
 	else if ((flags & NSNumericPadKeyMask) != 0)
-	    k = [self classifyNumericPadKey:s];
-	else if ((flags & NSControlKeyMask) != 0)
-	    k = [self classifyControlKey:s];
+	    [self classifyNumericPadKey:raw:cooked];
 	else
-	    k = [self classifyOtherKey:s];
+	    [self classifyOtherKey:raw:cooked];
+	ok = YES;
 	}
-    return k;
+    return ok;
     }
 
 
@@ -409,11 +456,16 @@ enum
     BOOL const old_state = ((modifiers & csmask) != 0);
     if (new_state != old_state)
 	{
-	driver->QueueKeyEvent( key, new_state );
 	if (new_state)
+	    {
 	    modifiers |= csmask;
+	    driver->SystemExtension( "keydown", key, -1 );
+	    }
 	else
+	    {
 	    modifiers &= ~csmask;
+	    driver->SystemExtension( "keyup", key, -1 );
+	    }
 	}
     }
 
@@ -424,7 +476,14 @@ enum
 - (void)keyEvent:(NSEvent*)p down:(BOOL)flag
     {
     if (!paused)
-	driver->QueueKeyEvent( [self classifyKeyDown:p], flag );
+	{
+	int raw, cooked;
+	if ([self classifyKeyDown:p raw:&raw cooked:&cooked])
+	    {
+	    char const* const request = flag ? "keydown" : "keyup";
+	    driver->SystemExtension( request, raw, cooked );
+	    }
+	}
     }
 
 - (void)keyDown:(NSEvent*)p inView:(NSView*)v
@@ -472,7 +531,7 @@ enum
 	{
 	int x, y;
 	if ([self localize:p toView:v x:&x y:&y])
-	    driver->QueueMouseEvent( 0, false, x, y );
+	    driver->SystemExtension( "mousemoved", x, y );
 	}
     }
 
@@ -482,7 +541,7 @@ enum
 	{
 	int x, y;
 	[self localize:p toView:v x:&x y:&y];
-	driver->QueueMouseEvent( button, false, x, y );
+	driver->SystemExtension( "mouseup", button, x, y );
 	}
     }
 
@@ -492,7 +551,7 @@ enum
 	{
 	int x, y;
 	[self localize:p toView:v x:&x y:&y];
-	driver->QueueMouseEvent( button, true, x, y );
+	driver->SystemExtension( "mousedown", button, x, y );
 	}
     }
 
@@ -536,7 +595,7 @@ enum
 	[animationWindow setTitle:
 		[savedTitle stringByAppendingString:@"  [Paused]"]];
 	driver->pause_clock();
-	driver->QueueFocusEvent( false );
+	driver->SystemExtension( "appdeactivated" );
 	}
     }
 
@@ -549,7 +608,7 @@ enum
 	[self startTracking:animationWindow];
 	[self startTimer];
 	driver->resume_clock();
-	driver->QueueFocusEvent( true );
+	driver->SystemExtension( "appactivated" );
 	}
     }
 

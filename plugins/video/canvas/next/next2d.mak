@@ -1,8 +1,10 @@
-# This is a subinclude file used to define the rules needed
-# to build the MacOS/X Server, OpenStep, or NextStep 2d driver -- next2d
+#==============================================================================
+# This is the default 2D graphics driver makefile for MacOS/X Server,
+# OpenStep, and NextStep.
+# Copyright (C)1998,1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
+#==============================================================================
 
-# Driver description
-DESCRIPTION.next2d = Crystal Space NeXT 2D driver
+DESCRIPTION.next2d = Crystal Space Apple/NeXT 2D driver
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)

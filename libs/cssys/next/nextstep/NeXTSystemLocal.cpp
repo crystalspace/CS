@@ -19,9 +19,10 @@
 //
 //-----------------------------------------------------------------------------
 #include "cssysdef.h"
-#include "NeXTSystemDriver.h"
+#include "cssys/next/NeXTSystemDriver.h"
 #include "NeXTDelegate.h"
 #include "NeXTMenu.h"
+#include "icfgfile.h"
 extern "Objective-C" {
 #import <appkit/Application.h>
 #import <appkit/Menu.h>
@@ -63,13 +64,13 @@ void NeXTSystemDriver::init_system()
 // init_menu
 //	Generate application menu based upon platform configuration.
 //-----------------------------------------------------------------------------
-void NeXTSystemDriver::init_menu()
+void NeXTSystemDriver::init_menu( iConfigFile* next_config )
     {
     char const* style =
 	next_config->GetStr( "Platform." CS_PLATFORM_NAME, "menu", 0);
     if (style != 0)
 	{
-	Menu* const menu = NeXTMenuGenerate( style, *next_config );
+	Menu* const menu = NeXTMenuGenerate( style, next_config );
 	[menu setTitle:[NXApp appName]];
 	[NXApp setMainMenu:menu];
 	}

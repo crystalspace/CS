@@ -204,34 +204,34 @@ bool csWsTest::Initialize (const char *iConfigName)
   // Create a menu for all test dialogs we implement
   csMenu *menu = new csMenu (this, csmfs3D, 0);
   csMenu *submenu = new csMenu (NULL);
-  new csMenuItem (menu, "~Standard dialogs", submenu);
-    new csMenuItem (submenu, "~File open", 66600);
-    new csMenuItem (submenu, "~Color choice", 66601);
+  (void)new csMenuItem (menu, "~Standard dialogs", submenu);
+    (void)new csMenuItem (submenu, "~File open", 66600);
+    (void)new csMenuItem (submenu, "~Color choice", 66601);
 
   submenu = new csMenu (NULL);
-  new csMenuItem (menu, "~Windows", submenu);
-    new csMenuItem (submenu, "No top when selected", 66610);
-    new csMenuItem (submenu, "Complex dialog", 66611);
-    new csMenuItem (submenu, "Semi-transparent window", 66612);
+  (void)new csMenuItem (menu, "~Windows", submenu);
+    (void)new csMenuItem (submenu, "No top when selected", 66610);
+    (void)new csMenuItem (submenu, "Complex dialog", 66611);
+    (void)new csMenuItem (submenu, "Semi-transparent window", 66612);
 
   submenu = new csMenu (NULL);
-  new csMenuItem (menu, "~Tests", submenu);
-    new csMenuItem (submenu, "Notebook", 66620);
-    new csMenuItem (submenu, "Grid", 66621);
-    new csMenuItem (submenu, "Tree", 66622);
-    new csMenuItem (submenu, "Layouts", 66623);
+  (void)new csMenuItem (menu, "~Tests", submenu);
+    (void)new csMenuItem (submenu, "Notebook", 66620);
+    (void)new csMenuItem (submenu, "Grid", 66621);
+    (void)new csMenuItem (submenu, "Tree", 66622);
+    (void)new csMenuItem (submenu, "Layouts", 66623);
 
   submenu = new csMenu (NULL);
-  new csMenuItem (menu, "~Color scheme", submenu);
-    new csMenuItem (submenu, "Green", 66630);
-    new csMenuItem (submenu, "Red", 66631);
-    new csMenuItem (submenu, "White", 66632);
-    new csMenuItem (submenu, "Black", 66633);
-    new csMenuItem (submenu);
-    new csMenuItem (submenu, "Default", 66639);
+  (void)new csMenuItem (menu, "~Color scheme", submenu);
+    (void)new csMenuItem (submenu, "Green", 66630);
+    (void)new csMenuItem (submenu, "Red", 66631);
+    (void)new csMenuItem (submenu, "White", 66632);
+    (void)new csMenuItem (submenu, "Black", 66633);
+    (void)new csMenuItem (submenu);
+    (void)new csMenuItem (submenu, "Default", 66639);
 
-  new csMenuItem (menu);
-  new csMenuItem (menu, "~Window list", 66699);
+  (void)new csMenuItem (menu);
+  (void)new csMenuItem (menu, "~Window list", 66699);
   csMenuItem *mi = new csMenuItem (menu, "~Quit\tQ", cscmdQuit);
 
   // Show that a hint can be added to absolutely any component

@@ -392,16 +392,20 @@ public:
 
   /**************************** iSystem interface ****************************/
 
-  /// returns the configuration.
+  /// Returns the configuration.
   virtual void GetSettings (int &oWidth, int &oHeight, int &oDepth, bool &oFullScreen);
-  /// get the time in milliseconds.
+  /// Get the time in milliseconds.
   virtual cs_time GetTime ();
-  /// print a string to the specified device.
+  /// Print a string to the specified device.
   virtual void Printf (int mode, const char *format, ...);
-  /// execute a system-dependent extension command
+  /// Execute a system-dependent extension command.
   virtual bool SystemExtension (const char *iCommand, ...)
   { (void)iCommand; return false; }
-  /// Query the elapsed time between last frames and absolute time
+  /// Suspend the engine's virtual-time clock.
+  virtual void SuspendVirtualTimeClock() {}
+  /// Resume the engine's virtual-time clock.
+  virtual void ResumeVirtualTimeClock() { CurrentTime = cs_time(-1); }
+  /// Query the elapsed time between last frames and absolute time.
   virtual void GetElapsedTime (cs_time &oElapsedTime, cs_time &oCurrentTime)
   { oElapsedTime = ElapsedTime; oCurrentTime = CurrentTime; }
   /// Get the installation path.

@@ -19,6 +19,8 @@
 #ifndef __BLOC_DEFS_H__
 #define __BLOC_DEFS_H__
 
+#undef BLOCKS_NETWORKING
+
 //-----------------------------------------------------------------------------
 // All of the defines for blocks.  Some of these will need to be changed so
 // we can use them for network stuff.

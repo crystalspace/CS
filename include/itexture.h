@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998, 2000mak by Jorrit Tyberghein
+    Copyright (C) 1998, 2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,11 +16,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef __ITEXTURE_H__
+#define __ITEXTURE_H__
+
 #include "csutil/scf.h"
 #include "cstypes.h"
-
-#ifndef ITEXTURE_H
-#define ITEXTURE_H
 
 SCF_VERSION (iTextureHandle, 2, 0, 0);
 
@@ -78,9 +78,9 @@ struct iTextureHandle : public iBase
   virtual iGraphics3D *GetProcTextureInterface () = 0;
 
   /**
-   * If this is a procedural texture with mip-mapping on sync enabled, call this 
-   * function to update its mip maps when required. 
-   * (currently unimplemented)
+   * If this is a procedural texture with mip-mapping on sync enabled, call
+   * this function to update its mip maps when required.  (Currently
+   * unimplemented)
    */
   virtual void ProcTextureSync () = 0;
 
@@ -103,5 +103,4 @@ struct iTextureWrapper : public iBase
 {
 };
 
-
-#endif //ITEXTURE_H
+#endif // __ITEXTURE_H__

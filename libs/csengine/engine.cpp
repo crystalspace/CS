@@ -1793,7 +1793,7 @@ void csEngine::SelectRegion (const char *iName)
 
 iRegion* csEngine::GetCurrentRegion ()
 {
-  return (iRegion*)region;
+  return &region->scfiRegion;
 }
 
 void csEngine::AddToCurrentRegion (csObject* obj)
@@ -1912,15 +1912,16 @@ iTextureWrapper* csEngine::CreateTexture (const char *iName, const char *iFileNa
     tex->SetKeyColor (QInt (iTransp->red * 255.2),
       QInt (iTransp->green * 255.2), QInt (iTransp->blue * 255.2));
 
-  return (iTextureWrapper*)tex;
+  return &tex->scfiTextureWrapper;
 }
 
 iMaterialWrapper* csEngine::CreateMaterial (const char *iName, iTextureWrapper* texture)
 {
-  csMaterial* mat = new csMaterial ((csTextureWrapper*)texture);
+  csMaterial* mat =
+    new csMaterial (((csTextureWrapper::TextureWrapper*)texture)->scfParent);
   csMaterialWrapper* wrapper = materials->NewMaterial (mat);
   wrapper->SetName (iName);
-  return (iMaterialWrapper*)wrapper;
+  return &wrapper->scfiMaterialWrapper;
 }
 
 bool csEngine::CreateCamera (const char *iName, const char *iSector,
@@ -2057,7 +2058,7 @@ iSpriteTemplate *csEngine::FindSpriteTemplate (const char *iName, bool regionOnl
     sprite = (csSpriteTemplate*)FindObjectInRegion (region, sprite_templates, iName);
   else
     sprite = (csSpriteTemplate*)sprite_templates.FindByName (iName);
-  return (iSpriteTemplate*)sprite;
+  return &sprite->scfiSpriteTemplate;
 }
 
 iMaterialWrapper* csEngine::FindMaterial (const char* iName, bool regionOnly)
@@ -2067,7 +2068,7 @@ iMaterialWrapper* csEngine::FindMaterial (const char* iName, bool regionOnly)
     wr = (csMaterialWrapper*)FindObjectInRegion (region, *materials, iName);
   else
     wr = materials->FindByName (iName);
-  return (iMaterialWrapper*)wr;
+  return &wr->scfiMaterialWrapper;
 }
 
 iTextureWrapper* csEngine::FindTexture (const char* iName, bool regionOnly)
@@ -2077,7 +2078,7 @@ iTextureWrapper* csEngine::FindTexture (const char* iName, bool regionOnly)
     wr = (csTextureWrapper*)FindObjectInRegion (region, *textures, iName);
   else
     wr = textures->FindByName (iName);
-  return (iTextureWrapper*)wr;
+  return &wr->scfiTextureWrapper;
 }
 
 iCameraPosition* csEngine::FindCameraPosition (const char* iName, bool regionOnly)
@@ -2087,7 +2088,7 @@ iCameraPosition* csEngine::FindCameraPosition (const char* iName, bool regionOnl
     wr = (csCameraPosition*)FindObjectInRegion (region, camera_positions, iName);
   else
     wr = (csCameraPosition*)camera_positions.FindByName (iName);
-  return (iCameraPosition*)wr;
+  return &wr->scfiCameraPosition;
 }
 
 iView* csEngine::CreateView (iGraphics3D* g3d)

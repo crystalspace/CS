@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef COVMASK_H
-#define COVMASK_H
+#ifndef __CS_COVMASK_H__
+#define __CS_COVMASK_H__
 
 // Define one of the three below to set the coverage mask size.
 #define CS_CM_4x4
@@ -87,7 +87,7 @@ public:
    * 's' is 0 or 1.
    * 'bit' is the index in the mask (between 0 and CS_CM_BITS-1).
    */
-  inline void SetState (int bit, int s);
+  void SetState (int bit, int s);
 
   /**
    * Get the state of mask bits.
@@ -95,7 +95,7 @@ public:
    * Note that this is not an efficient function.
    * It is ment mostly for debugging.
    */
-  inline int GetState (int bit) const;
+  int GetState (int bit) const;
 
   /// Dump state of this mask.
   void Dump () const;
@@ -240,7 +240,7 @@ public:
    * 'so' and 'si' are 0 or 1.
    * 'bit' is the index in the mask (between 0 and CS_CM_BITS-1).
    */
-  inline void SetState (int bit, int so, int si);
+  void SetState (int bit, int so, int si);
 
   /**
    * Get the state of two coverage mask bits.
@@ -250,7 +250,7 @@ public:
    * Note that this is not an efficient function.
    * It is ment mostly for debugging.
    */
-  inline int GetState (int bit) const;
+  int GetState (int bit) const;
 
   /// Dump state of this mask.
   void Dump () const;
@@ -550,7 +550,7 @@ inline void csCovMaskTriage::SetState (int bit, int so, int si)
 #endif
 }
 
-int csCovMaskTriage::GetState (int bit) const
+inline int csCovMaskTriage::GetState (int bit) const
 {
 #if defined(CS_CM_4x4)
   return (((out & (1<<bit)) >> bit) << 1) |
@@ -570,5 +570,4 @@ int csCovMaskTriage::GetState (int bit) const
 #endif
 }
 
-#endif /*COVMASK_H*/
-
+#endif // __CS_COVMASK_H__

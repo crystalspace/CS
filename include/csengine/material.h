@@ -28,7 +28,6 @@
 class csTextureWrapper;
 struct iTextureManager;
 
-
 /**
  * A material class.
  */
@@ -87,21 +86,24 @@ public:
   /// Set reflection of the material
   inline void SetReflection (float val) { reflection = val; }
 
-  //--------------------- iMaterial implementation ---------------------
   DECLARE_IBASE;
-  ///
+
+  //--------------------- iMaterial implementation ---------------------
+
+  /// Get texture.
   virtual iTextureHandle* GetTexture ();
-  ///
+  /// Get flat color.
   virtual void GetFlatColor (csRGBpixel &oColor);
-  ///
-  virtual void GetReflection (float &oDiffuse, float &oAmbient, float &oReflection);
+  /// Get reflection values (diffuse, ambient, reflection).
+  virtual void GetReflection (float &oDiffuse, float &oAmbient,
+    float &oReflection);
 };
 
 /**
  * csMaterialWrapper represents a texture and its link
  * to the iMaterialHandle as returned by iTextureManager.
  */
-class csMaterialWrapper : public csPObject, public iMaterialWrapper
+class csMaterialWrapper : public csPObject
 {
 private:
   /// The corresponding iMaterial.
@@ -138,6 +140,12 @@ public:
 
   CSOBJTYPE;
   DECLARE_IBASE;
+
+  //------------------- iMaterialWrapper implementation -----------------------
+  struct MaterialWrapper : public iMaterialWrapper
+  {
+    DECLARE_EMBEDDED_IBASE (csMaterialWrapper);
+  } scfiMaterialWrapper;
 };
 
 /**

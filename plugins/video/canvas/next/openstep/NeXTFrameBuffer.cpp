@@ -39,7 +39,8 @@ unsigned int NeXTFrameBuffer::adjust_allocation_size( unsigned int size )
 // allocate_memory
 //	Allocation via NSAllocateMemoryPages() is guaranteed to be
 //	page-aligned (on Mach, at least) which is required for best video
-//	optimization.  See README.NeXT for details.
+//	optimization.  See CS/docs/texinfo/internal/platform/next.txi for
+//	details.
 //-----------------------------------------------------------------------------
 unsigned char* NeXTFrameBuffer::allocate_memory( unsigned int nbytes )
     {

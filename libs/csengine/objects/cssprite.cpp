@@ -45,7 +45,6 @@
 // Set the default lod used.
 #define DEFAULT_LOD -1
 
-
 //--------------------------------------------------------------------------
 
 csFrame::csFrame (int anm_idx, int tex_idx)
@@ -106,9 +105,12 @@ void csSpriteAction::AddFrame (csFrame * f, int d)
 //--------------------------------------------------------------------------
 
 IMPLEMENT_IBASE (csSpriteTemplate)
-  IMPLEMENTS_INTERFACE (iSpriteTemplate)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iSpriteTemplate)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_EMBEDDED_IBASE (csSpriteTemplate::SpriteTemplate)
+  IMPLEMENTS_INTERFACE (iSpriteTemplate)
+IMPLEMENT_EMBEDDED_IBASE_END
 
 IMPLEMENT_CSOBJTYPE (csSpriteTemplate, csPObject)
 
@@ -117,6 +119,7 @@ csSpriteTemplate::csSpriteTemplate ()
     texels (8, 8), vertices (8, 8), normals (8, 8)
 {
   CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiSpriteTemplate);
   cstxt = NULL;
   emerge_from = NULL;
   skeleton = NULL;

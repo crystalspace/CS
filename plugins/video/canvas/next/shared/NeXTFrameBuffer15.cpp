@@ -22,14 +22,14 @@
 //	table is the corresponding 16-bit RGBA NeXT-format pixel value, where
 //	each color is represented by 4 bits (thus losing a small amount of
 //	accuracy) and an alpha nybble which is set to 0x0f.  See the file
-//	README.NeXT for an explanation of why the alpha nybble is set to 0x0f.
-//	To convert the buffer, a simple loop iterates over the raw data, and
-//	for each entry, the corresponding cooked data is looked up in the
-//	translation table and stored in the cooked buffer.  An alternate way
-//	to convert the data would be to manually massage the raw data bits
-//	each time cook() is invoked.  However, using the lookup table for
-//	conversion is considerably faster, although at a slightly higher cost
-//	in terms of memory.
+//	CS/docs/texinfo/internal/platform/next.txi for an explanation of why
+//	the alpha nybble is set to 0x0f.  To convert the buffer, a simple loop
+//	iterates over the raw data, and for each entry, the corresponding
+//	cooked data is looked up in the translation table and stored in the
+//	cooked buffer.  An alternate way to convert the data would be to
+//	manually massage the raw data bits each time cook() is invoked.
+//	However, using the lookup table for conversion is considerably faster,
+//	although at a slightly higher cost in terms of memory.
 //
 //	Note that the 15-to-16 bit lookup table is actually twice the size it
 //	needs to be for safety's sake.  The second half of the table is merely

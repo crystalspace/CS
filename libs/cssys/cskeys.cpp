@@ -25,7 +25,7 @@
 extern char ShiftedKey [];
 
 // And this one performs backward conversion
-char UnshiftedKey [128-32] =
+char const UnshiftedKey [128-32] =
 {
 ' ', '1', '\'','3', '4', '5', '7', '\'','9', '0', '8', '=', ',', '-', '.', '/',
 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ';', ';', ',', '=', '.', '/',

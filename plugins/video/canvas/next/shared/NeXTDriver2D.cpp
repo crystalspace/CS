@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -22,8 +22,10 @@
 #include "NeXTDriver2D.h"
 #include "NeXTFrameBuffer15.h"
 #include "NeXTFrameBuffer32.h"
-#include "NeXTSystemInterface.h"
+#include "icfgfile.h"
+#include "ievent.h"
 #include "isystem.h"
+#include "version.h"
 
 IMPLEMENT_FACTORY(NeXTDriver2D)
 
@@ -63,26 +65,14 @@ NeXTDriver2D::~NeXTDriver2D()
 
 //-----------------------------------------------------------------------------
 // Initialize
-//	We only support depth of 15 or 32.  See README.NeXT for an explanation.
 //-----------------------------------------------------------------------------
 bool NeXTDriver2D::Initialize( iSystem* s )
     {
     bool ok = superclass::Initialize(s);
     if (ok)
 	{
-	iNeXTSystemDriver* nxsys = QUERY_INTERFACE (System, iNeXTSystemDriver);
-	if (nxsys != 0)
-	    {
-	    initialized = true;
-	    ok = init_driver( nxsys->GetSimulatedDepth() );
-	    nxsys->DecRef();
-	    }
-	else
-	    {
-	    ok = false;
-	    System->Printf( MSG_FATAL_ERROR, "FATAL: The system driver does "
-		"not support the iNeXTSystemDriver interface\n" );
-	    }
+	initialized = true;
+	ok = init_driver( get_desired_depth() );
 	}
     return ok;
     }
@@ -91,10 +81,10 @@ bool NeXTDriver2D::Initialize( iSystem* s )
 //-----------------------------------------------------------------------------
 // init_driver
 //-----------------------------------------------------------------------------
-bool NeXTDriver2D::init_driver( int simulate_depth )
+bool NeXTDriver2D::init_driver( int desired_depth )
     {
     bool ok = true;
-    switch (determine_bits_per_sample( simulate_depth ))
+    switch (determine_bits_per_sample( desired_depth ))
 	{
 	case 4: frame_buffer = new NeXTFrameBuffer15( Width, Height ); break;
 	case 8: frame_buffer = new NeXTFrameBuffer32( Width, Height ); break;
@@ -125,12 +115,36 @@ bool NeXTDriver2D::init_driver( int simulate_depth )
 
 
 //-----------------------------------------------------------------------------
-// determine_bits_per_sample
+// get_desired_depth()
+//	Check if default device depth setting is overriden with a command-line
+//	switch or via a configuration file setting.
 //-----------------------------------------------------------------------------
-int NeXTDriver2D::determine_bits_per_sample( int simulate_depth )
+int NeXTDriver2D::get_desired_depth() const
+    {
+    int depth = 0;
+    char const* s = System->GetOptionCL( "simdepth" );
+    if (s != 0)
+	depth = atoi(s);
+    else
+	{
+	iConfigFile* cfg = System->GetConfig();
+	if (cfg != 0)
+	    depth = cfg->GetInt( "VideoDriver", "SimulateDepth", 0 );
+	}
+    return depth;
+    }
+
+
+//-----------------------------------------------------------------------------
+// determine_bits_per_sample
+//	Only depths of 15- and 32-bit are supported.  16-bit is treated as an
+//	alias for 15-bit.  See CS/docs/texinfo/internal/platform/next.txi for
+//	complete details concerning this limitation.
+//-----------------------------------------------------------------------------
+int NeXTDriver2D::determine_bits_per_sample( int desired_depth )
     {
     int bps;
-    switch (simulate_depth)
+    switch (desired_depth)
 	{
 	case 15: bps = 4; break;
 	case 16: bps = 4; break; // An alias for 15-bit.
@@ -168,6 +182,9 @@ void NeXTDriver2D::setup_rgb_32()
 //-----------------------------------------------------------------------------
 bool NeXTDriver2D::Open( char const* title )
     {
+    System->Printf( MSG_INITIALIZATION, CS_PLATFORM_NAME
+	" 2D graphics driver for Crystal Space " CS_VERSION_NUMBER "\n"
+	"Written by Eric Sunshine <sunshine@sunshineco.com>\n\n" );
     bool okay = false;
     if (superclass::Open( title ))
 	okay = open_window( title );
@@ -182,4 +199,23 @@ void NeXTDriver2D::Print( csRect* )
     {
     frame_buffer->cook();
     flush();
+    }
+
+
+//-----------------------------------------------------------------------------
+// HandleEvent
+//-----------------------------------------------------------------------------
+bool NeXTDriver2D::HandleEvent( iEvent& e )
+    {
+    bool rc = false;
+    if (System != 0 &&
+	e.Type == csevBroadcast && e.Command.Code == cscmdCommandLineHelp)
+	{
+	System->Printf( MSG_STDOUT,
+	    "Options for " CS_PLATFORM_NAME " 2D graphics driver:\n"
+	    "  -simdepth=<depth>  "
+		"simulate depth (15, 16, or 32) (default=none)\n" );
+	rc = true;
+	}
+    return rc;
     }

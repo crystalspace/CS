@@ -28,7 +28,7 @@ class csEngine;
  * A region. A region is basically a collection of objects in the
  * 3D engine that can be treated as a unit.
  */
-class csRegion : public csObjectNoDel, public iRegion
+class csRegion : public csObjectNoDel
 {
   friend class Dumper;
 
@@ -65,70 +65,82 @@ public:
   csObject* FindObject (const char* iName, const csIdType& type,
       	bool derived = false);
 
-  CSOBJTYPE;
-
-  //--------------------- iRegion implementation ---------------------
-  DECLARE_IBASE;
-
-  /**
-   * Clear this region without removing the entities in it. The entities
-   * will simply get unconnected from this region.
-   */
-  virtual void Clear ();
-
-  /**
-   * Delete all entities in this region.
-   */
-  virtual void DeleteAll ();
-
-  /**
-   * Prepare all textures and materials in this region.
-   */
-  virtual bool PrepareTextures ();
-
-  /**
-   * Prepare all sectors in this region.
-   */
-  virtual bool PrepareSectors ();
-
-  /**
-   * Do lighting calculations (or read from cache).
-   */
-  virtual bool ShineLights ();
-
-  /**
-   * Prepare all objects in this region. This has to be called
-   * directly after loading new objects.
-   * This function is equivalent to calling PrepareTextures(),
-   * followed by PrepareSectors(), followed by ShineLights().
-   */
-  virtual bool Prepare ();
-
-  /// Find a sector in this region by name.
-  virtual iSector *FindSector (const char *iName);
-  /// Find a thing in this region by name
-  virtual iThing *FindThing (const char *iName);
-  /// Find a sky thing in this region by name
-  virtual iThing *FindSky (const char *iName);
-  /// Find a thing template in this region by name
-  virtual iThing *FindThingTemplate (const char *iName);
-  /// Find a sprite in this region by name
-  virtual iSprite *FindSprite (const char *iName);
-  /// Find a sprite template in this region by name
-  virtual iSpriteTemplate *FindSpriteTemplate (const char *iName);
-  /// Find a texture in this region by name
-  virtual iTextureWrapper *FindTexture (const char *iName);
-  /// Find a material in this region by name
-  virtual iMaterialWrapper *FindMaterial (const char *iName);
-  /// Find a camera position in this region by name
-  virtual iCameraPosition *FindCameraPosition (const char *iName);
-
   /**
    * Check if some object is in this region.
    * The speed of this function is independent of the number of
    * objects in this region (i.e. very fast).
    */
   virtual bool IsInRegion (iObject* obj);
+
+  CSOBJTYPE;
+  DECLARE_IBASE;
+
+  //--------------------- iRegion implementation ---------------------
+  struct Region : public iRegion
+  {
+    DECLARE_EMBEDDED_IBASE (csRegion);
+
+    /**
+     * Clear this region without removing the entities in it. The entities
+     * will simply get unconnected from this region.
+     */
+    virtual void Clear ();
+
+    /**
+     * Delete all entities in this region.
+     */
+    virtual void DeleteAll ();
+
+    /**
+     * Prepare all textures and materials in this region.
+     */
+    virtual bool PrepareTextures ();
+
+    /**
+     * Prepare all sectors in this region.
+     */
+    virtual bool PrepareSectors ();
+
+    /**
+     * Do lighting calculations (or read from cache).
+     */
+    virtual bool ShineLights ();
+
+    /**
+     * Prepare all objects in this region. This has to be called
+     * directly after loading new objects.
+     * This function is equivalent to calling PrepareTextures(),
+     * followed by PrepareSectors(), followed by ShineLights().
+     */
+    virtual bool Prepare ();
+
+    /// Find a sector in this region by name.
+    virtual iSector *FindSector (const char *iName);
+    /// Find a thing in this region by name
+    virtual iThing *FindThing (const char *iName);
+    /// Find a sky thing in this region by name
+    virtual iThing *FindSky (const char *iName);
+    /// Find a thing template in this region by name
+    virtual iThing *FindThingTemplate (const char *iName);
+    /// Find a sprite in this region by name
+    virtual iSprite *FindSprite (const char *iName);
+    /// Find a sprite template in this region by name
+    virtual iSpriteTemplate *FindSpriteTemplate (const char *iName);
+    /// Find a texture in this region by name
+    virtual iTextureWrapper *FindTexture (const char *iName);
+    /// Find a material in this region by name
+    virtual iMaterialWrapper *FindMaterial (const char *iName);
+    /// Find a camera position in this region by name
+    virtual iCameraPosition *FindCameraPosition (const char *iName);
+
+    /**
+     * Check if some object is in this region.
+     * The speed of this function is independent of the number of
+     * objects in this region (i.e. very fast).
+     */
+    virtual bool IsInRegion (iObject* obj);
+  } scfiRegion;
+  friend struct Region;
 };
 
 #endif // __CS_REGION_H__

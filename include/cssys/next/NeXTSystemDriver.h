@@ -18,10 +18,8 @@
 //
 //-----------------------------------------------------------------------------
 #include "cssys/system.h"
-#include "cssys/csinput.h"
-#include "NeXTSystemInterface.h"
+#include "ievent.h"
 @class NeXTDelegate;
-
 
 //-----------------------------------------------------------------------------
 // NeXT-specific subclass of csSystemDriver.
@@ -33,42 +31,39 @@ class NeXTSystemDriver : public csSystemDriver
 private:
     bool initialized;		// System initialized?
     NeXTDelegate* controller;	// Application & Window delegate.
-    long ticks;			// Time of previous call to step_frame().
-    int simulated_depth;	// Simulated depth, either 15, 16, or 32.
-    iConfigFile* next_config;	// Platform-specific configuration options.
+    iEventOutlet* event_outlet;	// Shared event outlet.
 
-    void init_ticks() { ticks = Time(); }
-    void init_menu();
+    void init_menu( iConfigFile* );
     void init_system();
     void shutdown_system();
-    void step_frame();
     void start_loop();
     void stop_run_loop();
     bool continue_looping() const { return (!ExitLoop && continue_running()); }
 
 public:
+    DECLARE_IBASE_EXT(csSystemDriver);
+
     NeXTSystemDriver();
     virtual ~NeXTSystemDriver();
-    virtual bool Initialize( int argc, char const* const argv[],
-	char const* cfgfile );
-    virtual void Help();
-    virtual void NextFrame ();
+    virtual bool Initialize( int argc, char const* const argv[], char const* );
+    virtual bool SystemExtension( char const*, ... );
+    virtual void Loop();
 
     bool continue_running() const { return !Shutdown; }
     void timer_fired();
     void terminate();
 
-    void pause_clock() {}
-    void resume_clock() { init_ticks(); }  // Prevent AI temporal anomalies.
+    // Prevent AI temporal anomalies.
+    void pause_clock() { SuspendVirtualTimeClock(); }
+    void resume_clock() { ResumeVirtualTimeClock(); }
 
-    // Implement iNeXTSystemDriver interface.
-    struct NeXTSystemInterface : public iNeXTSystemDriver
+    // Implement iEventPlug interface.
+    struct NeXTSystemEventPlug : public iEventPlug
 	{
 	DECLARE_EMBEDDED_IBASE(NeXTSystemDriver);
-	virtual int GetSimulatedDepth() const;
-	} scfiNeXTSystemDriver;
-    friend struct NeXTSystemInterface;
-    virtual void* QueryInterface( char const* interface, int ver );
+	virtual uint GetPotentiallyConflictingEvents();
+	virtual uint QueryEventPriority( uint type );
+	} scfiEventPlug;
     };
 
 class SysSystemDriver : public NeXTSystemDriver {};

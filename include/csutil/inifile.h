@@ -85,6 +85,7 @@ private:
     Iterator (const csIniFile *s, const PrvINIbranch* b, BranchType t) :
       Source (s), Branch (b), Type (t), Node (NULL), Current (-1),
       Limit (b ? b->Length () : 0) {}
+    virtual ~Iterator() {}
 
     // Remove the item we are currently pointing to
     void RemoveItem ();
@@ -93,12 +94,12 @@ private:
 
   public:
     /// Rewind the iterator (points to nowhere after this)
-    void Rewind ()
+    virtual void Rewind ()
     { Current = -1; Node = NULL; }
     /// Move to next item and return true if the position is valid
-    bool Next ();
+    virtual bool Next ();
     /// Move to previous item and return true if the position is valid
-    bool Prev ();
+    virtual bool Prev ();
   };
 
   /// Section iterator

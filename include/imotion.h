@@ -21,43 +21,30 @@
 
 #include "csutil/scf.h"
 #include "iplugin.h"
-#include "csgeom/quaterni.h"
-#include "csgeom/matrix3.h"
 #include "iskeleton.h"
+class csMatrix3;
+class csQuaternion;
 
 SCF_VERSION (iMotion, 0, 0, 1);
 
-/// temporary - subject to change
 struct iMotion : public iBase
 {
-  ///
   virtual const char* GetName () = 0;
-  ///
   virtual void SetName (const char* name) = 0;
-  ///
   virtual bool AddAnim (const csQuaternion &quat) = 0;
-  ///
   virtual bool AddAnim (const csMatrix3 &mat) = 0;
-  ///
   virtual int AddFrame (int framenumber) = 0;
-  ///
-  virtual void AddFrameLink (int frameindex, const char* affector, int link) = 0;
+  virtual void AddFrameLink (int frameindex, const char* affector, int link)=0;
 };
 
 SCF_VERSION (iMotionManager, 0, 0, 1);
 
-/// temporary - subject to change
 struct iMotionManager : public iPlugIn
 {
-  ///
   virtual bool Initialize (iSystem *iSys) = 0;
-  ///
   virtual iMotion* FindByName (const char* name) = 0;
-  ///
   virtual iMotion* AddMotion (const char* name) = 0;
-  ///
   virtual bool ApplyMotion (iSkeletonBone *skel, const char* motion) = 0;
-  ///
   virtual void UpdateAll () = 0;
 };
 

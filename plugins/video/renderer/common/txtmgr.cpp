@@ -170,10 +170,10 @@ IMPLEMENT_IBASE (csMaterialHandle)
   IMPLEMENTS_INTERFACE (iMaterialHandle)
 IMPLEMENT_IBASE_END
 
-csMaterialHandle::csMaterialHandle (iMaterial* material)
+csMaterialHandle::csMaterialHandle (iMaterial* m)
 {
   CONSTRUCT_IBASE (NULL);
-  if ((csMaterialHandle::material = material))
+  if ((material = m) != 0)
   {
     material->IncRef ();
     texture = material->GetTexture ();
@@ -183,12 +183,12 @@ csMaterialHandle::csMaterialHandle (iMaterial* material)
   }
 }
 
-csMaterialHandle::csMaterialHandle (iTextureHandle* texture)
+csMaterialHandle::csMaterialHandle (iTextureHandle* t)
 {
   CONSTRUCT_IBASE (NULL);
   material = NULL;
   diffuse = 0.7; ambient = 0; reflection = 0;
-  if ((csMaterialHandle::texture = texture))
+  if ((texture = t) != 0)
     texture->IncRef ();
 }
 

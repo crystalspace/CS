@@ -21,7 +21,7 @@
 
 #include "csutil/scf.h"
 #include "iplugin.h"
-#include "csgeom/transfrm.h"
+class csTransform;
 
 SCF_VERSION (iSkeletonBone, 0, 0, 1);
 

@@ -41,8 +41,8 @@ IMPLEMENT_FACTORY (csGraphics2DInfinite)
 EXPORT_CLASS_TABLE (inf3d)
   EXPORT_CLASS_DEP (csGraphics3DInfinite, "crystalspace.graphics3d.infinite",
     "Infinite 3D graphics driver for Crystal Space", "crystalspace.font.server.")
-  EXPORT_CLASS (csGraphics2DInfinite, "crystalspace.graphics2d.infinite",
-    "Infinite 2D graphics driver for Crystal Space")
+  EXPORT_CLASS_DEP (csGraphics2DInfinite, "crystalspace.graphics2d.infinite",
+    "Infinite 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics3DInfinite)

@@ -259,7 +259,7 @@ void csHintManager::HandleEvent (iEvent &Event)
           {
             // Okay, create the floating hint object
             HintStore *ts = (HintStore *)Get (idx);
-            new csHint (c, ts->text, font, fontsize);
+            (void)new csHint (c, ts->text, font, fontsize);
           }
         }
       }

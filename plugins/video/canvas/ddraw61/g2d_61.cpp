@@ -460,7 +460,7 @@ bool csGraphics2DDDraw6::PerformExtension (const char *iCommand, ...)
   va_start (args, iCommand);
 
   bool rc = true;
-  if (!strcmp (iCommand, "FullScreen"))
+  if (!strcmp (iCommand, "fullscreen"))
   {
     bool fs = va_arg (args, bool);
     if (fs != FullScreen
@@ -792,7 +792,7 @@ long FAR PASCAL csGraphics2DDDraw6::WindowProc (HWND hWnd, UINT message,
       // Catch Alt+Enter
       if ((TCHAR)wParam == VK_RETURN)
       {
-        This->PerformExtension ("FullScreen", !This->FullScreen);
+        This->PerformExtension ("fullscreen", !This->FullScreen);
         return TRUE;
       }
       break;

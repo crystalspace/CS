@@ -24,7 +24,7 @@ extern "Objective-C" {
 #import <AppKit/NSMenuItem.h>
 }
 
-static NSMenu* build_menu( char const* section, iConfigFile const * );
+static NSMenu* build_menu( char const* section, iConfigFile const* );
 
 #define STR_SWITCH(X) { char const* switched_str__=(X); if (0) {}
 #define STR_CASE(X) else if (strcmp(switched_str__,(#X)) == 0)
@@ -55,8 +55,8 @@ static void menu_add_separator( NSMenu* m )
 
 //-----------------------------------------------------------------------------
 // menu_add_item
-//	Looks up the named section in csIniFile.  Pays particular attention to
-//	keys "type", "title", "shortcut", "action", & "target".  Adds a menu
+//	Looks up the named section in the INI file.  Pays particular attention
+//	to keys "type", "title", "shortcut", "action", & "target".  Adds a menu
 //	item to the menu based upon the attributes of these keys.  "type", if
 //	present, may specify "separator" in which case the menu item is a
 //	"separator".  Otherwise, "title", "shortcut", & "action" are used to
@@ -66,7 +66,7 @@ static void menu_add_separator( NSMenu* m )
 //	is sent to the first-responder.
 //-----------------------------------------------------------------------------
 static void menu_add_item( NSMenu* menu, char const* key,
-    iConfigFile const *config )
+    iConfigFile const* config )
     {
     char const* section = [[NSString stringWithFormat:@"Item.%s",key] cString];
 
@@ -104,7 +104,7 @@ static void menu_add_item( NSMenu* menu, char const* key,
 
 //-----------------------------------------------------------------------------
 // menu_add_submenu
-//	Looks up the named section in csIniFile.  Recursively calls
+//	Looks up the named section in the INI file.  Recursively calls
 //	build_menu() to generate the submenu.  Pays particular attention to
 //	key "type" which, if present, may be one of "apple", "window", or
 //	"services".  A TYPE qualification means that the menu should be
@@ -112,7 +112,7 @@ static void menu_add_item( NSMenu* menu, char const* key,
 //	respectively.
 //-----------------------------------------------------------------------------
 static void menu_add_submenu( NSMenu* menu, char const* key,
-    iConfigFile const *config )
+    iConfigFile const* config )
     {
     NSMenu* const sub = build_menu( key, config );
     if (sub != 0)
@@ -146,7 +146,7 @@ static void menu_add_submenu( NSMenu* menu, char const* key,
 //	parent menu.  For each "item", adds a new menu item.
 //-----------------------------------------------------------------------------
 static void menu_add( NSMenu* menu, char const* key, char const* value,
-    iConfigFile const *config )
+    iConfigFile const* config )
     {
     STR_SWITCH (key)
 	STR_CASE (menu)
@@ -159,11 +159,11 @@ static void menu_add( NSMenu* menu, char const* key, char const* value,
 
 //-----------------------------------------------------------------------------
 // build_menu
-//	Looks up the named section in csIniFile.  Enumerates over each entry
+//	Looks up the named section in the INI file.  Enumerates over each entry
 //	in the section to build the menu.  Pays particular attention to key
 //	"title" which is used to set the menu's title.
 //-----------------------------------------------------------------------------
-static NSMenu* build_menu( char const* key, iConfigFile const *config )
+static NSMenu* build_menu( char const* key, iConfigFile const* config )
     {
     NSMenu* m = 0;
     char const* section = [[NSString stringWithFormat:@"Menu.%s",key] cString];
@@ -171,11 +171,11 @@ static NSMenu* build_menu( char const* key, iConfigFile const *config )
 	{
 	char const* title = config->GetStr( section, "title", "" );
 	m = [[NSMenu alloc] initWithTitle:[NSString stringWithCString:title]];
-	iConfigDataIterator *iterator = config->EnumData(section);
-	while (iterator.Next())
+	iConfigDataIterator* iterator = config->EnumData( section );
+	while (iterator->Next())
 	    menu_add( m, iterator->GetKey(),
 		(char const*)iterator->GetData(), config);
-	iterator->DecRef ();
+	iterator->DecRef();
 	}
     return m;
     }
@@ -185,7 +185,7 @@ static NSMenu* build_menu( char const* key, iConfigFile const *config )
 // NeXTMenuGenerate
 //	Generate a menu from the configuration information in NeXTMenu.cfg.
 //-----------------------------------------------------------------------------
-NSMenu* NeXTMenuGenerate( char const* menu_ident, csIniFile const *config )
+NSMenu* NeXTMenuGenerate( char const* menu_ident, iConfigFile const* config )
     {
     return build_menu( menu_ident, config );
     }

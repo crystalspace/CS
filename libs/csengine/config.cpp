@@ -22,7 +22,7 @@
 #include "csengine/polytext.h"
 #include "csengine/polygon.h"
 
-IMPLEMENT_EMBEDDED_IBASE (csEngine::csEngineConfig)
+IMPLEMENT_EMBEDDED_IBASE (csEngineConfig)
   IMPLEMENTS_INTERFACE (iConfig)
 IMPLEMENT_EMBEDDED_IBASE_END
 
@@ -64,7 +64,7 @@ static void config_recalc (bool flag)
   config_revis   (flag);
 }
 
-bool csEngine::csEngineConfig::SetOption (int id, csVariant* value)
+bool csEngineConfig::SetOption (int id, csVariant* value)
 {
   switch (id)
   {
@@ -83,7 +83,7 @@ bool csEngine::csEngineConfig::SetOption (int id, csVariant* value)
   return true;
 }
 
-bool csEngine::csEngineConfig::GetOption (int id, csVariant* value)
+bool csEngineConfig::GetOption (int id, csVariant* value)
 {
   value->type = config_options[id].type;
   switch (id)
@@ -102,7 +102,7 @@ bool csEngine::csEngineConfig::GetOption (int id, csVariant* value)
   return true;
 }
 
-bool csEngine::csEngineConfig::GetOptionDescription (
+bool csEngineConfig::GetOptionDescription (
   int idx, csOptionDescription* option)
 {
   if (idx < 0 || idx >= NUM_OPTIONS) return false;

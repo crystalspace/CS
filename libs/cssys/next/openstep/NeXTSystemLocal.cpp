@@ -19,9 +19,10 @@
 //
 //-----------------------------------------------------------------------------
 #include "cssysdef.h"
-#include "NeXTSystemDriver.h"
+#include "cssys/next/NeXTSystemDriver.h"
 #include "NeXTDelegate.h"
 #include "NeXTMenu.h"
+#include "icfgfile.h"
 extern "Objective-C" {
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSDPSContext.h>
@@ -70,14 +71,14 @@ void NeXTSystemDriver::init_system()
 // init_menu
 //	Generate application menu based upon platform configuration.
 //-----------------------------------------------------------------------------
-void NeXTSystemDriver::init_menu()
+void NeXTSystemDriver::init_menu( iConfigFile* next_config )
     {
     char const* style =
 	next_config->GetStr( "Platform." CS_PLATFORM_NAME, "menu", 0);
     if (style != 0)
 	{
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	NSMenu* const menu = NeXTMenuGenerate( style, *next_config );
+	NSMenu* const menu = NeXTMenuGenerate( style, next_config );
 	[menu setTitle:[[NSProcessInfo processInfo] processName]];
 	[NSApp setMainMenu:menu];
 	[pool release];

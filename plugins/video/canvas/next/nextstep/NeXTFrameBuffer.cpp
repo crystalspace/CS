@@ -41,7 +41,8 @@ unsigned int NeXTFrameBuffer::adjust_allocation_size( unsigned int size )
 //-----------------------------------------------------------------------------
 // allocate_memory
 //	Allocation via vm_allocate() is guaranteed to be page-aligned which
-//	is required for best video optimization.  See README.NeXT for details.
+//	is required for best video optimization.  See the file
+//	CS/docs/texinfo/internal/platform/next.txi for details.
 //-----------------------------------------------------------------------------
 unsigned char* NeXTFrameBuffer::allocate_memory( unsigned int nbytes )
     {

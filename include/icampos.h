@@ -21,8 +21,6 @@
 
 #include "csutil/scf.h"
 
-struct iMovable;
-
 SCF_VERSION (iCameraPosition, 0, 0, 1);
 
 /**

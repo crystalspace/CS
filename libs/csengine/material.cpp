@@ -16,7 +16,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-
 #include "cssysdef.h"
 #include "csengine/material.h"
 #include "csengine/texture.h"
@@ -74,25 +73,31 @@ void csMaterial::GetReflection (float &oDiffuse, float &oAmbient,
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_CSOBJTYPE (csMaterialWrapper, csPObject);
-
 IMPLEMENT_IBASE (csMaterialWrapper)
-  IMPLEMENTS_INTERFACE (iMaterialWrapper)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iMaterialWrapper)
 IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csMaterialWrapper::MaterialWrapper)
+  IMPLEMENTS_INTERFACE (iMaterialWrapper)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+IMPLEMENT_CSOBJTYPE (csMaterialWrapper, csPObject);
 
 csMaterialWrapper::csMaterialWrapper (iMaterial* material) :
   csPObject (), handle (NULL)
 {
   CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
   csMaterialWrapper::material = material;
   material->IncRef ();
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &th) :
-  csPObject (), iMaterialWrapper (), handle (NULL)
+  csPObject (), handle (NULL)
 {
   CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
   (material = th.material)->IncRef ();
   handle = th.GetMaterialHandle ();
   SetName (th.GetName ());
@@ -103,6 +108,7 @@ csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) :
   csPObject (), material (NULL)
 {
   CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
   ith->IncRef ();
   handle = ith;
   csEngine::current_engine->AddToCurrentRegion (this);

@@ -18,8 +18,8 @@
 //
 //-----------------------------------------------------------------------------
 @class NSMenu;
-class csIniFile;
+struct iConfigFile;
 
-NSMenu* NeXTMenuGenerate( char const* menu_ident, csIniFile const& );
+NSMenu* NeXTMenuGenerate( char const* menu_ident, iConfigFile const* );
 
 #endif // __NeXT_NeXTMenu_h

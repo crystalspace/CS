@@ -2,7 +2,7 @@
 #define __NeXT_NeXTDriver2D_h
 //=============================================================================
 //
-//	Copyright (C)1999 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -32,7 +32,8 @@ private:
     NeXTFrameBuffer* frame_buffer;
     NeXTView* view;
 
-    bool init_driver( int simulate_depth );
+    bool init_driver( int desired_depth );
+    int  get_desired_depth() const;
     void shutdown_driver();
     void setup_rgb_15();
     void setup_rgb_32();
@@ -40,7 +41,7 @@ private:
     void flush();
 
     static int best_bits_per_sample();
-    static int determine_bits_per_sample( int simulate_depth );
+    static int determine_bits_per_sample( int desired_depth );
 
 public:
     NeXTDriver2D::NeXTDriver2D( iBase* );
@@ -50,6 +51,7 @@ public:
     virtual void Close();
     virtual void Print( csRect* = 0 );
     virtual bool SetMouseCursor( csMouseCursorID shape );
+    virtual bool HandleEvent( iEvent& );
     DECLARE_IBASE;
     };
 

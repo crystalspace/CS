@@ -23,8 +23,12 @@
 #include "csutil/util.h"
 
 IMPLEMENT_IBASE (csCameraPosition)
-  IMPLEMENTS_INTERFACE (iCameraPosition)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iCameraPosition)
 IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csCameraPosition::CameraPosition)
+  IMPLEMENTS_INTERFACE (iCameraPosition)
+IMPLEMENT_EMBEDDED_IBASE_END
 
 IMPLEMENT_CSOBJTYPE (csCameraPosition,csPObject);
 
@@ -33,6 +37,7 @@ csCameraPosition::csCameraPosition (const char *iName, const char *iSector,
   const csVector3 &iUpward)
 {
   CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiCameraPosition);
   SetName (iName);
   Sector = strnew (iSector);
   Position = iPosition;

@@ -15,16 +15,16 @@
 //	OpenStep-specific dynamic library loading and symbol lookup.
 //
 //	MacOS/X Server and OpenStep handle symbolic references within
-//	dynamically loaded libraries differently than most other platforms.
-//	On most platforms, all symbols linked into the plug-in module are
-//	considered private unless explicitly exported.  On MacOS/X Server and
-//	OpenStep, on the other hand, all symbols linked into the plug-in
-//	module are public.  This can easily lead to symbolic clashes when two
-//	or more plug-in modules have been linked with the same libraries or
-//	define like-named symbols.  To work around this problem, this dynamic
-//	module loader takes advantage the NSLinkEditErrorHandlers facility to
-//	instruct DYLD to ignore duplicate symbolic reference at module load
-//	time.
+//	dynamically loaded libraries in a different manner than most other
+//	platforms.  On most platforms, all symbols linked into the plug-in
+//	module are considered private unless explicitly exported.  On MacOS/X
+//	Server and OpenStep, on the other hand, all symbols linked into the
+//	plug-in module are public by default.  This can easily lead to
+//	symbolic clashes when two or more plug-in modules have been linked
+//	with the same libraries or define like-named symbols.  To work around
+//	this problem, this dynamic module loader takes advantage the
+//	NSLinkEditErrorHandlers facility to instruct DYLD to ignore duplicate
+//	symbolic reference at module load time.
 //
 //	One alternative approach for dealing with this problem would be to
 //	ensure that the none of the plug-in modules export like-named symbols,
@@ -45,9 +45,11 @@
 //-----------------------------------------------------------------------------
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
+#include "csutil/csstring.h"
 
 extern "C" {
 #include <stdio.h>
+#include <unistd.h> // access()
 #define bool dyld_bool
 #define __private_extern__
 #include <mach-o/dyld.h>
@@ -55,8 +57,13 @@ extern "C" {
 #undef bool
 }
 
+static csString CS_ERROR_MESSAGE;
+static void clear_error_message() { CS_ERROR_MESSAGE.Free(); }
+
 //-----------------------------------------------------------------------------
 // handle_collision
+//	When a symbolic collision occurs, choose to publish one of the
+//	symbols; the choice of which is rather arbitrary.
 //-----------------------------------------------------------------------------
 static NSModule handle_collision(NSSymbol sym, NSModule m_old, NSModule m_new)
     {
@@ -79,41 +86,49 @@ static void initialize_loader()
         }
     }
 
-csLibraryHandle csFindLoadLibrary (const char *iName)
-    {
-    static bool init_done = false;
-    if (!init_done)
-	{
-	init_done = true;
-        extern bool findlib_search_nodir;
-        findlib_search_nodir = false;
-        csAddLibraryPath (OS_NEXT_PLUGIN_DIR);
-	}
 
-    return csFindLoadLibrary (NULL, iName, OS_NEXT_PLUGIN_EXT);
+//-----------------------------------------------------------------------------
+// csFindLoadLibrary
+//-----------------------------------------------------------------------------
+csLibraryHandle csFindLoadLibrary( char const* name )
+    {
+    static bool initialized = false;
+    if (!initialized)
+	{
+	initialized = true;
+        csAddLibraryPath( OS_NEXT_PLUGIN_DIR );
+	}
+    return csFindLoadLibrary( 0, name, OS_NEXT_PLUGIN_EXT );
     }
+
 
 //-----------------------------------------------------------------------------
 // csLoadLibrary
 //-----------------------------------------------------------------------------
-csLibraryHandle csLoadLibrary( char const* lib )
+csLibraryHandle csLoadLibrary( char const* path )
     {
-    initialize_loader();
     csLibraryHandle handle = 0;
-    NSObjectFileImage image = 0;
-    NSObjectFileImageReturnCode rc =
-	NSCreateObjectFileImageFromFile( lib, &image );
-    if (rc == NSObjectFileImageSuccess)
+    initialize_loader();
+    clear_error_message();
+    if (access( path, F_OK ) == 0)
 	{
-	NSModule const module = NSLinkModule( image, lib, TRUE );
-	if (module != 0)
-	    handle = (csLibraryHandle)module;
+	NSObjectFileImage image = 0;
+	NSObjectFileImageReturnCode rc =
+	    NSCreateObjectFileImageFromFile( path, &image );
+	if (rc == NSObjectFileImageSuccess)
+	    {
+	    NSModule const module = NSLinkModule( image, path, TRUE );
+	    if (module != 0)
+		handle = (csLibraryHandle)module;
+	    else
+		CS_ERROR_MESSAGE << "NSLinkModule(" << path << ") failed";
+	    }
 	else
-	    fprintf( stderr, "Unable to link library '%s'.\n", lib );
+	    CS_ERROR_MESSAGE << "NSCreateObjectFileImageFromFile(" << path
+		<< ") " << "failed (error " << rc << ')';
 	}
     else
-	fprintf( stderr, "Unable to load library '%s' (%d).\n", lib, rc );
-
+	CS_ERROR_MESSAGE << "File does not exist (" << path << ')';
     return handle;
     }
 
@@ -123,7 +138,7 @@ csLibraryHandle csLoadLibrary( char const* lib )
 //-----------------------------------------------------------------------------
 void* csGetLibrarySymbol( csLibraryHandle handle, char const* s )
     {
-    char* symbol = new char[ strlen(s) + 2 ];	// Prepend an underscore '_'.
+    char* symbol = new char[ strlen(s) + 2 ]; // Prepend an underscore '_'.
     *symbol = '_';
     strcpy( symbol + 1, s );
 
@@ -142,4 +157,18 @@ void* csGetLibrarySymbol( csLibraryHandle handle, char const* s )
 bool csUnloadLibrary( csLibraryHandle )
     {
     return true; // Unimplemented.
+    }
+
+
+//-----------------------------------------------------------------------------
+// csPrintLibraryError
+//-----------------------------------------------------------------------------
+void csPrintLibraryError( char const* name )
+    {
+    fprintf( stderr, "ERROR: Failed to load plug-in module `%s'.\n", name );
+    if (!CS_ERROR_MESSAGE.IsEmpty())
+	{
+	fprintf( stderr, "Reason: %s\n", CS_ERROR_MESSAGE.GetData() );
+	clear_error_message();
+	}
     }

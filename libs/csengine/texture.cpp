@@ -26,16 +26,21 @@
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_CSOBJTYPE (csTextureWrapper,csPObject);
-
 IMPLEMENT_IBASE (csTextureWrapper)
-  IMPLEMENTS_INTERFACE (iTextureWrapper)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iTextureWrapper)
 IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csTextureWrapper::TextureWrapper)
+  IMPLEMENTS_INTERFACE (iTextureWrapper)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+IMPLEMENT_CSOBJTYPE (csTextureWrapper,csPObject);
 
 csTextureWrapper::csTextureWrapper (iImage* Image) :
   csPObject (), handle (NULL), flags (CS_TEXTURE_3D)
 {
   CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   (image = Image)->IncRef ();
   key_col_r = -1;
   if(image->HasKeycolor ())
@@ -47,6 +52,7 @@ csTextureWrapper::csTextureWrapper (csTextureWrapper &th) :
   csPObject (), handle (NULL)
 {
   CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   flags = th.flags;
   (image = th.image)->IncRef ();
   key_col_r = th.key_col_r;
@@ -63,6 +69,7 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith) :
   csPObject (), image (NULL)
 {
   CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   ith->IncRef ();
   flags = ith->GetFlags ();
   if (ith->GetKeyColor ())
@@ -128,7 +135,7 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
     SetKeyColor (key_col_r, key_col_g, key_col_b);
 }
 
-//-------------------------------------------------------- csTextureList -----//
+//------------------------------------------------------- csTextureList -----//
 
 csTextureList::~csTextureList ()
 {

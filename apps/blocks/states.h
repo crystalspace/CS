@@ -38,8 +38,6 @@
 
 // moving game_cube, set_cube, get_cube into states.
 
-
-
 /**
  * Player state object.
  */
@@ -141,14 +139,11 @@ public:
   /// Print the encoded data to 'stdout'.
   bool PrintData(const char* fileName) const;
 
-
-  
   int lenOfGameCube;
 
   // position in encodedData that these sections finish.
   int endOfFloats;
   int endOfInts;
-  
   
  private:
   
@@ -156,10 +151,9 @@ public:
   int tints[ST_NUM_INTS];
   unsigned char* tbools;
   csBitSet* tempBitSet;
-  
-  
 };
 
+#if defined(BLOCKS_NETWORKING)
 
 // -----------------------------------------------------------------------
 //  This is a description of the protocol.
@@ -175,16 +169,11 @@ public:
 // "BYE" other blocks disconnects.
 //
 
-
 class NetworkStates
 {
-
  public:
-  
-  
   NetworkStates ();
   ~NetworkStates ();
-  
   
   // Returns false if it can't encode the data for what ever reason.
   //  Increments the StateNumber everytime it is called.
@@ -207,9 +196,8 @@ class NetworkStates
  private:
   int StateNumber;
   int PreviousStateNumber;
-
 };
 
-
+#endif // BLOCKS_NETWORKING
 
 #endif // __BLOCKS_STATES_H__

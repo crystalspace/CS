@@ -44,14 +44,13 @@ static char* str_append( char const* prefix, char const* suffix )
 
 //-----------------------------------------------------------------------------
 // menu_add_item
-//	Looks up the named section in iConfigFile.  Pays particular attention to
-//	keys "title", "shortcut", "action", & "target".  Adds a menu item to
-//	the menu based upon the attributes of these keys.  "title",
-//	"shortcut", & "action" are used to generate the new menu item.
-//	"target", if present, may be either "application" which stands for
-//	NXApp, or "delegate" which stands for [NXApp delegate].  If "target"
-//	is not specified then the item's action is sent to the
-//	first-responder.
+//	Looks up the named section in the INI file.  Pays particular attention
+//	to keys "title", "shortcut", "action", & "target".  Adds a menu item to
+//	the menu based upon the attributes of these keys.  "title", "shortcut",
+//	& "action" are used to generate the new menu item.  "target", if
+//	present, may be either "application" which stands for NXApp, or
+//	"delegate" which stands for [NXApp delegate].  If "target" is not
+//	specified then the item's action is sent to the first-responder.
 //-----------------------------------------------------------------------------
 static void menu_add_item( Menu* menu, char const* key,
     iConfigFile const* config )
@@ -86,7 +85,7 @@ static void menu_add_item( Menu* menu, char const* key,
 
 //-----------------------------------------------------------------------------
 // menu_add_submenu
-//	Looks up the named section in iConfigFile.  Recursively calls
+//	Looks up the named section in the INI file.  Recursively calls
 //	build_menu() to generate the submenu.  Pays particular attention to
 //	key "type" which, if present, may be either "window", or "services".
 //	A "type" qualification means that the menu should be configured as the
@@ -137,7 +136,7 @@ static void menu_add( Menu* menu, char const* key, char const* value,
 
 //-----------------------------------------------------------------------------
 // build_menu
-//	Looks up the named section in iConfigFile.  Enumerates over each entry
+//	Looks up the named section in the INI file.  Enumerates over each entry
 //	in the section to build the menu.  Pays particular attention to key
 //	"title" which is used to set the menu's title.
 //-----------------------------------------------------------------------------
@@ -149,11 +148,11 @@ static Menu* build_menu( char const* key, iConfigFile const* config )
 	{
 	char const* title = config->GetStr( section, "title", "" );
 	m = [[Menu alloc] initTitle:title];
-	iConfigDataIterator *iterator = config.EnumData(section);
-	while (iterator.NextItem())
+	iConfigDataIterator* iterator = config.EnumData(section);
+	while (iterator->Next())
 	    menu_add( m, iterator->GetKey(),
 		(const char*)iterator->GetData(), config);
-	iterator->DecRef ();
+	iterator->DecRef();
 	}
     free( section );
     return m;

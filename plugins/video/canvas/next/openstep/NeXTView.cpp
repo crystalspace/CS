@@ -17,7 +17,6 @@ extern "Objective-C" {
 #import <AppKit/NSBitmapImageRep.h>
 }
 extern "C" {
-#include <assert.h>
 #include <limits.h>	// CHAR_BIT
 }
 
@@ -70,7 +69,8 @@ extern "C" {
 //	bits per sample will always be either 4 or 8.  A bps of 4 requires 2
 //	bytes per pixel (RRRRGGGGBBBBAAAA where A=1).  A bps of 8 requires 4
 //	bytes (RRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA where A=1).  See also:
-//	README.NeXT for a discussion of the frame buffer layout.
+//	CS/docs/texinfo/internal/platform/next.txi for a discussion of the
+//	frame buffer layout.
 //-----------------------------------------------------------------------------
 - (void)setFrameBuffer:(unsigned char*)buff bitsPerSample:(int)bits_per_sample
     {
@@ -78,7 +78,7 @@ extern "C" {
     unsigned int const w = int(r.size.width);
     unsigned int const h = int(r.size.height);
 
-    assert( bits_per_sample == 4 || bits_per_sample == 8 );
+    CS_ASSERT( bits_per_sample == 4 || bits_per_sample == 8 );
     unsigned int const samples_per_pixel = 3;	// RGB (A is not included).
     unsigned int const bytes_per_pixel = bits_per_sample / 2;
     unsigned int const bytes_per_row = bytes_per_pixel * w;

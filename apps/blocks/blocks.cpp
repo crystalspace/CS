@@ -52,18 +52,23 @@
 #include "isndrdr.h"
 #include "csparser/snddatao.h"
 #include "isnddata.h"
-#include "inetdrv.h"
 #include "ifontsrv.h"
+
+#if defined(BLOCKS_NETWORKING)
+#include "inetdrv.h"
+#endif
 
 //-----------------------------------------------------------------------------
 // Networking stuff.
 
+#if defined(BLOCKS_NETWORKING)
 static bool do_network = false;
 // Maybe move these into Blocks class.
 static iNetworkListener* Listener = NULL;
 static iNetworkConnection* Connection = NULL;
 // static long LastAcceptTime = 0;
 static long LastConnectTime = 0;
+#endif
 
 // End networking stuff.
 //-----------------------------------------------------------------------------
@@ -317,16 +322,19 @@ Blocks::Blocks ()
   screen = SCREEN_STARTUP;
   dynlight = NULL;
 
+#if defined(BLOCKS_NETWORKING)
   // Network stuff.
   since_last_check = 0;
+#endif
 
   keyconf_menu = NULL;
 
   // State changes.
   player1 = new States();
   
+#if defined(BLOCKS_NETWORKING)
   player1_net = new NetworkStates();
-
+#endif
 
   //menu
   cur_menu = 0;
@@ -346,7 +354,9 @@ Blocks::~Blocks ()
   delete dynlight;
   if (engine) engine->Clear ();
   delete keyconf_menu;
+#if defined(BLOCKS_NETWORKING)
   TerminateConnection();
+#endif
 }
 
 void Blocks::InitGame ()
@@ -1344,6 +1354,7 @@ void Blocks::HandleDemoKey (int key, bool /*shf*/, bool /*alt*/, bool /*ctl*/)
 	  initscreen = true;
 	  break;
 	case MENU_QUIT:
+#if defined(BLOCKS_NETWORKING)
 	  // Start Networking stuff.
 	  // Send disconect stuff here.
 	  if (Connection != NULL)
@@ -1351,7 +1362,7 @@ void Blocks::HandleDemoKey (int key, bool /*shf*/, bool /*alt*/, bool /*ctl*/)
 
 	  TerminateConnection ();
 	  // Finish networking stuff.
-
+#endif
 	  System->Shutdown = true;
 	  break;
       }
@@ -2315,11 +2326,10 @@ void Blocks::NextFrame ()
   // -----------------------------------------------------------------
   // Start network stuff.
   
-  //printf("since_last_check:%d\n",since_last_check);
+#if defined(BLOCKS_NETWORKING)
 
   if (do_network && NUM_FRAMES_CHK_NET <= since_last_check)
   {
-//    printf("h");
     since_last_check = 0;
 
 ///    player1->EncodeStates ();
@@ -2397,6 +2407,8 @@ void Blocks::NextFrame ()
   {
     since_last_check++;
   }
+
+#endif
 
   // Finish network stuff.
   // -----------------------------------------------------------------
@@ -2680,8 +2692,10 @@ void Blocks::ReadConfig ()
 	  keys.GetStr ("HighScores", key, NULL));
       }
     }
+#if defined(BLOCKS_NETWORKING)
   // Network stuff.
   IsServer = Config->GetYesNo ("Network", "Server", false);
+#endif
 }
 
 void Blocks::WriteConfig ()
@@ -2729,6 +2743,8 @@ void Blocks::WriteConfig ()
 // -----------------------------------------------------------------
 // Network Code
 // TODO: add the server CheckConnection stuff in here.
+
+#if defined(BLOCKS_NETWORKING)
 
 void Blocks::CheckConnection()
 {
@@ -2894,6 +2910,8 @@ void Blocks::TerminateConnection()
   }
 }
 
+#endif // BLOCKS_NETWORKING
+
 void cleanup ()
 {
   Sys->console_out ("Cleaning up...\n");
@@ -2984,7 +3002,9 @@ int main (int argc, char* argv[])
   Sys->black = Sys->txtmgr->FindRGB (0, 0, 0);
   Sys->red = Sys->txtmgr->FindRGB (255, 0, 0);
 
+#if defined(BLOCKS_NETWORKING)
   do_network = Sys->InitNet();
+#endif
   Sys->Loop ();
   cleanup ();
   return 0;

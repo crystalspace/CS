@@ -85,7 +85,7 @@ bool csApp::csAppPlugIn::HandleEvent (iEvent &Event)
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//-- csApp -//--
 
-csApp::csApp (iSystem *System, csSkin &Skin)
+csApp::csApp (iSystem *sys, csSkin &Skin)
   : csComponent (NULL), Mouse (this), hints (this), scfiPlugIn (this)
 {
   app = this;			// so that all inserted windows will inherit it
@@ -99,7 +99,7 @@ csApp::csApp (iSystem *System, csSkin &Skin)
   VFS = NULL;
   DefaultFont = NULL;
   InFrame = false;
-  (csApp::System = System)->IncRef ();
+  (System = sys)->IncRef ();
 
   OldMouseCursorID = csmcNone;
   MouseCursorID = csmcArrow;

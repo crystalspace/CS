@@ -36,38 +36,43 @@
 //---------------------------------------------------------------------------
 
 IMPLEMENT_IBASE (csRegion)
-  IMPLEMENTS_INTERFACE (iRegion)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iRegion)
 IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csRegion::Region)
+  IMPLEMENTS_INTERFACE (iRegion)
+IMPLEMENT_EMBEDDED_IBASE_END
 
 IMPLEMENT_CSOBJTYPE (csRegion,csObjectNoDel);
 
-csRegion::csRegion (csEngine* engine) : csObjectNoDel ()
+csRegion::csRegion (csEngine* e) : csObjectNoDel ()
 {
   CONSTRUCT_IBASE (NULL);
-  csRegion::engine = engine;
+  CONSTRUCT_EMBEDDED_IBASE (scfiRegion);
+  engine = e;
 }
 
 csRegion::~csRegion ()
 {
-  Clear ();
+  scfiRegion.Clear ();
 }
 
-void csRegion::Clear ()
+void csRegion::Region::Clear ()
 {
-  csObject* obj = GetChild (csObject::Type, true);
+  csObject* obj = scfParent->GetChild (csObject::Type, true);
   while (obj)
   {
-    ObjRelease (obj);
-    obj = GetChild (csObject::Type, true);
+    scfParent->ObjRelease (obj);
+    obj = scfParent->GetChild (csObject::Type, true);
   }
 }
 
-void csRegion::DeleteAll ()
+void csRegion::Region::DeleteAll ()
 {
   // First we need to copy the objects to a csVector to avoid
   // messing up the iterator while we are deleting them.
   csVector copy;
-  for (csObjIterator iter = GetIterator (csObject::Type, true);
+  for (csObjIterator iter = scfParent->GetIterator (csObject::Type, true);
   	!iter.IsFinished () ; ++iter)
   {
     csObject* o = iter.GetObj ();
@@ -86,7 +91,7 @@ void csRegion::DeleteAll ()
     if (((csObject*)copy[i])->GetType () == csCollection::Type)
     {
       csCollection* o = (csCollection*)copy[i];
-      engine->RemoveCollection (o);
+      scfParent->engine->RemoveCollection (o);
       copy[i] = NULL;
     }
 
@@ -94,7 +99,7 @@ void csRegion::DeleteAll ()
     if (copy[i] && ((csObject*)copy[i])->GetType () >= csSprite::Type)
     {
       csSprite* o = (csSprite*)copy[i];
-      engine->RemoveSprite (o);
+      scfParent->engine->RemoveSprite (o);
       copy[i] = NULL;
     }
 
@@ -105,7 +110,8 @@ void csRegion::DeleteAll ()
     if (copy[i] && ((csObject*)copy[i])->GetType () == csSpriteTemplate::Type)
     {
       csSpriteTemplate* o = (csSpriteTemplate*)copy[i];
-      engine->sprite_templates.Delete (engine->sprite_templates.Find (o));
+      scfParent->engine->sprite_templates.Delete (
+        scfParent->engine->sprite_templates.Find (o));
       copy[i] = NULL;
     }
 
@@ -113,7 +119,8 @@ void csRegion::DeleteAll ()
     if (copy[i] && ((csObject*)copy[i])->GetType () == csCurveTemplate::Type)
     {
       csCurveTemplate* o = (csCurveTemplate*)copy[i];
-      engine->curve_templates.Delete (engine->curve_templates.Find (o));
+      scfParent->engine->curve_templates.Delete (
+        scfParent->engine->curve_templates.Find (o));
       copy[i] = NULL;
     }
 
@@ -122,13 +129,14 @@ void csRegion::DeleteAll ()
     if (copy[i] && ((csObject*)copy[i])->GetType () == csThing::Type)
     {
       csThing* o = (csThing*)copy[i];
-      int idx = engine->thing_templates.Find (o);
+      int idx = scfParent->engine->thing_templates.Find (o);
       if (idx == -1)
       {
         delete o;
 	copy[i] = NULL;
       }
     }
+
   // @@@ Should thing templates be deleted if there are still things
   // (in other regions) using them? Maybe a ref counter. Also make
   // sure to ObjRelease when you don't delete a thing template.
@@ -136,10 +144,10 @@ void csRegion::DeleteAll ()
     if (copy[i] && ((csObject*)copy[i])->GetType () == csThing::Type)
     {
       csThing* o = (csThing*)copy[i];
-      int idx = engine->thing_templates.Find (o);
+      int idx = scfParent->engine->thing_templates.Find (o);
       if (idx != -1)
       {
-        engine->thing_templates.Delete (idx);
+        scfParent->engine->thing_templates.Delete (idx);
 	copy[i] = NULL;
       }
     }
@@ -148,21 +156,21 @@ void csRegion::DeleteAll ()
     if (copy[i] && ((csObject*)copy[i])->GetType () == csSector::Type)
     {
       csSector* o = (csSector*)copy[i];
-      int idx = engine->sectors.Find (o);
+      int idx = scfParent->engine->sectors.Find (o);
       if (idx != -1)
-        engine->sectors.Delete (idx);
+        scfParent->engine->sectors.Delete (idx);
       else
         delete o;
       copy[i] = NULL;
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
-    if (copy[i] && ((csObject*)copy[i])->GetType () == csMaterialWrapper::Type)
+    if (copy[i] && ((csObject*)copy[i])->GetType() == csMaterialWrapper::Type)
     {
       csMaterialWrapper* o = (csMaterialWrapper*)copy[i];
-      int idx = engine->GetMaterials ()->Find (o);
+      int idx = scfParent->engine->GetMaterials ()->Find (o);
       if (idx != -1)
-        engine->GetMaterials ()->Delete (idx);
+        scfParent->engine->GetMaterials ()->Delete (idx);
       else
         delete o;
       copy[i] = NULL;
@@ -172,9 +180,9 @@ void csRegion::DeleteAll ()
     if (copy[i] && ((csObject*)copy[i])->GetType () == csTextureWrapper::Type)
     {
       csTextureWrapper* o = (csTextureWrapper*)copy[i];
-      int idx = engine->GetTextures ()->Find (o);
+      int idx = scfParent->engine->GetTextures ()->Find (o);
       if (idx != -1)
-        engine->GetTextures ()->Delete (idx);
+        scfParent->engine->GetTextures ()->Delete (idx);
       else
         delete o;
       copy[i] = NULL;
@@ -184,9 +192,9 @@ void csRegion::DeleteAll ()
     if (copy[i] && ((csObject*)copy[i])->GetType () == csCameraPosition::Type)
     {
       csCameraPosition* o = (csCameraPosition*)copy[i];
-      int idx = engine->camera_positions.Find (o);
+      int idx = scfParent->engine->camera_positions.Find (o);
       if (idx != -1)
-        engine->camera_positions.Delete (idx);
+        scfParent->engine->camera_positions.Delete (idx);
       else
         delete o;
       copy[i] = NULL;
@@ -199,11 +207,11 @@ void csRegion::DeleteAll ()
       // Do a release here because the plane may still be used by other
       // polygons not belonging to this sector and we want to be sure
       // to release it from this region.
-      ObjRelease (o);
-      int idx = engine->planes.Find (o);
+      scfParent->ObjRelease (o);
+      int idx = scfParent->engine->planes.Find (o);
       o->DecRef ();
       if (idx != -1)
-        engine->planes[idx] = 0;
+        scfParent->engine->planes[idx] = 0;
       copy[i] = NULL;
     }
 
@@ -223,14 +231,15 @@ Object name is '%s', object type is '%s'\n",
 #endif // CS_DEBUG
 }
 
-bool csRegion::PrepareTextures ()
+bool csRegion::Region::PrepareTextures ()
 {
-  iTextureManager* txtmgr = csEngine::current_engine->G3D->GetTextureManager ();
+  iTextureManager* txtmgr = csEngine::current_engine->G3D->GetTextureManager();
   txtmgr->ResetPalette ();
 
   // First register all textures to the texture manager.
   {
-    for (csObjIterator iter = GetIterator (csTextureWrapper::Type, false);
+    for (csObjIterator iter =
+	scfParent->GetIterator (csTextureWrapper::Type, false);
   	!iter.IsFinished () ; ++iter)
     {
       csTextureWrapper* csth = (csTextureWrapper*)iter.GetObj ();
@@ -244,7 +253,8 @@ bool csRegion::PrepareTextures ()
 
   // Then register all materials to the texture manager.
   {
-    for (csObjIterator iter = GetIterator (csMaterialWrapper::Type, false);
+    for (csObjIterator iter = 
+	scfParent->GetIterator (csMaterialWrapper::Type, false);
   	!iter.IsFinished () ; ++iter)
     {
       csMaterialWrapper* csmh = (csMaterialWrapper*)iter.GetObj ();
@@ -258,10 +268,10 @@ bool csRegion::PrepareTextures ()
   return true;
 }
 
-bool csRegion::PrepareSectors ()
+bool csRegion::Region::PrepareSectors ()
 {
-  for (csObjIterator iter = GetIterator (csSector::Type);
-  	!iter.IsFinished () ; ++iter)
+  for (csObjIterator iter = scfParent->GetIterator (csSector::Type);
+    !iter.IsFinished () ; ++iter)
   {
     csSector* s = (csSector*)iter.GetObj ();
     s->Prepare (s);
@@ -269,13 +279,13 @@ bool csRegion::PrepareSectors ()
   return true;
 }
 
-bool csRegion::ShineLights ()
+bool csRegion::Region::ShineLights ()
 {
-  engine->ShineLights (this);
+  scfParent->engine->ShineLights (scfParent);
   return true;
 }
 
-bool csRegion::Prepare ()
+bool csRegion::Region::Prepare ()
 {
   if (!PrepareTextures ()) return false;
   if (!PrepareSectors ()) return false;
@@ -306,17 +316,17 @@ csObject* csRegion::FindObject (const char* iName, const csIdType& type,
   return NULL;
 }
 
-iSector* csRegion::FindSector (const char *iName)
+iSector* csRegion::Region::FindSector (const char *iName)
 {
-  csSector* obj = (csSector*)FindObject (iName, csSector::Type, false);
+  csSector* obj = (csSector*)scfParent->FindObject(iName,csSector::Type,false);
   if (!obj) return NULL;
   return &obj->scfiSector;
 }
 
-iThing* csRegion::FindThing (const char *iName)
+iThing* csRegion::Region::FindThing (const char *iName)
 {
-  for (csObjIterator iter = GetIterator (csThing::Type, false);
-  	!iter.IsFinished () ; ++iter)
+  for (csObjIterator iter = scfParent->GetIterator (csThing::Type, false);
+    !iter.IsFinished () ; ++iter)
   {
     csThing* o = (csThing*)iter.GetObj ();
     if (!o->IsSky () && !o->IsTemplate ())
@@ -329,10 +339,10 @@ iThing* csRegion::FindThing (const char *iName)
   return NULL;
 }
 
-iThing* csRegion::FindSky (const char *iName)
+iThing* csRegion::Region::FindSky (const char *iName)
 {
-  for (csObjIterator iter = GetIterator (csThing::Type, false);
-  	!iter.IsFinished () ; ++iter)
+  for (csObjIterator iter = scfParent->GetIterator (csThing::Type, false);
+    !iter.IsFinished () ; ++iter)
   {
     csThing* o = (csThing*)iter.GetObj ();
     if (o->IsSky () && !o->IsTemplate ())
@@ -345,10 +355,10 @@ iThing* csRegion::FindSky (const char *iName)
   return NULL;
 }
 
-iThing* csRegion::FindThingTemplate (const char *iName)
+iThing* csRegion::Region::FindThingTemplate (const char *iName)
 {
-  for (csObjIterator iter = GetIterator (csThing::Type, false);
-  	!iter.IsFinished () ; ++iter)
+  for (csObjIterator iter = scfParent->GetIterator (csThing::Type, false);
+    !iter.IsFinished () ; ++iter)
   {
     csThing* o = (csThing*)iter.GetObj ();
     if (o->IsTemplate ())
@@ -361,45 +371,43 @@ iThing* csRegion::FindThingTemplate (const char *iName)
   return NULL;
 }
 
-iSprite* csRegion::FindSprite (const char *iName)
+iSprite* csRegion::Region::FindSprite (const char *iName)
 {
-  csSprite* obj = (csSprite*)FindObject (iName, csSprite::Type, true);
+  csSprite* obj = (csSprite*)scfParent->FindObject(iName,csSprite::Type,true);
   if (!obj) return NULL;
   return &obj->scfiSprite;
 }
 
-iSpriteTemplate* csRegion::FindSpriteTemplate (const char *iName)
+iSpriteTemplate* csRegion::Region::FindSpriteTemplate (const char *iName)
 {
-  csSpriteTemplate* obj = (csSpriteTemplate*)FindObject (iName, csSpriteTemplate::Type, false);
+  csSpriteTemplate* obj = (csSpriteTemplate*)
+    scfParent->FindObject (iName, csSpriteTemplate::Type, false);
   if (!obj) return NULL;
-  return (iSpriteTemplate*)obj;
+  return &obj->scfiSpriteTemplate;
 }
 
-iTextureWrapper* csRegion::FindTexture (const char *iName)
+iTextureWrapper* csRegion::Region::FindTexture (const char *iName)
 {
-  csObject* obj = FindObject (iName, csTextureWrapper::Type, false);
+  csObject* obj = scfParent->FindObject (iName, csTextureWrapper::Type, false);
   if (!obj) return NULL;
-  // Cast two times to avoid problems with multi-inherit.
   csTextureWrapper* wrapper = (csTextureWrapper*)obj;
-  return (iTextureWrapper*)wrapper;
+  return &wrapper->scfiTextureWrapper;
 }
 
-iMaterialWrapper* csRegion::FindMaterial (const char *iName)
+iMaterialWrapper* csRegion::Region::FindMaterial (const char *iName)
 {
-  csObject* obj = FindObject (iName, csMaterialWrapper::Type, false);
+  csObject* obj = scfParent->FindObject(iName,csMaterialWrapper::Type,false);
   if (!obj) return NULL;
-  // Cast two times to avoid problems with multi-inherit.
   csMaterialWrapper* wrapper = (csMaterialWrapper*)obj;
-  return (iMaterialWrapper*)wrapper;
+  return &wrapper->scfiMaterialWrapper;
 }
 
-iCameraPosition* csRegion::FindCameraPosition (const char *iName)
+iCameraPosition* csRegion::Region::FindCameraPosition (const char *iName)
 {
-  csObject* obj = FindObject (iName, csCameraPosition::Type, false);
+  csObject* obj = scfParent->FindObject (iName, csCameraPosition::Type, false);
   if (!obj) return NULL;
-  // Cast two times to avoid problems with multi-inherit.
   csCameraPosition* campos = (csCameraPosition*)obj;
-  return (iCameraPosition*)campos;
+  return &campos->scfiCameraPosition;
 }
 
 bool csRegion::IsInRegion (iObject* iobj)
@@ -409,3 +417,7 @@ bool csRegion::IsInRegion (iObject* iobj)
   return objpar == (csObject*)this;
 }
 
+bool csRegion::Region::IsInRegion (iObject* iobj)
+{
+  return scfParent->IsInRegion (iobj);
+}

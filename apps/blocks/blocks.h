@@ -128,10 +128,6 @@ public:
   void SelDown ()
   { selected++; if (selected >= num_entries) selected = num_entries - 1; }
   void SelUp () { selected--; if (selected < 0) selected = 0; }
-
-
-
-
 };
 
 class HighScore
@@ -315,8 +311,9 @@ public:
 
   // Initialization stuff and starting of game/demo.
 
-// Rene.
+#if defined(BLOCKS_NETWORKING)
   bool IsServer;
+#endif
 
   void InitTextures ();
   void InitEngine ();
@@ -431,27 +428,29 @@ public:
 
   //------------- Networking stuff.
   
+#if defined(BLOCKS_NETWORKING)
+
   //The generic connection checker which then calls a client or server checker.
   void CheckConnection();
   
   void ClientCheckConnection();
   void ServerCheckConnection();
   
-  
   bool InitNet();
   void Connect ();
   
   void TerminateConnection();
-  
   
   // The number of frames since the last network check.
   int since_last_check;
   
   //----------------
   // State Changes.
-  States* player1;
   NetworkStates* player1_net;
-  
+
+#endif
+
+  States* player1;
 };
 
 #endif // __BLOCKS_H__

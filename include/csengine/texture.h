@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __TEXTURE_H__
-#define __TEXTURE_H__
+#ifndef __CS_TEXTURE_H__
+#define __CS_TEXTURE_H__
 
 #include "cstypes.h"
 #include "csobject/csobject.h"
@@ -34,7 +34,7 @@ struct iImage;
  * csTextureWrapper represents a texture and its link
  * to the iTextureHandle as returned by iTextureManager.
  */
-class csTextureWrapper : public csPObject, public iTextureWrapper
+class csTextureWrapper : public csPObject
 {
 private:
   /// The corresponding iImage.
@@ -83,6 +83,12 @@ public:
 
   CSOBJTYPE;
   DECLARE_IBASE;
+
+  //-------------------- iTextureWrapper implementation -----------------------
+  struct TextureWrapper : public iTextureWrapper
+  {
+    DECLARE_EMBEDDED_IBASE (csTextureWrapper);
+  } scfiTextureWrapper;
 };
 
 /**
@@ -115,4 +121,4 @@ public:
   { return (csTextureWrapper *)csNamedObjVector::FindByName (iName); }
 };
 
-#endif // __TEXTURE_H__
+#endif // __CS_TEXTURE_H__

@@ -18,6 +18,7 @@
 //
 //-----------------------------------------------------------------------------
 @class Menu;
+struct iConfigFile;
 
 Menu* NeXTMenuGenerate( char const* menu_ident, iConfigFile const* );
 
