@@ -23,6 +23,7 @@
 
 #include "csgeom/math3d.h"
 #include "csgeom/trimesh.h"
+#include "csutil/list.h"
 
 class csTriangleVerticesCost;
 
@@ -45,30 +46,73 @@ public:
   ///
   csTriangleVertexCost () : deleted (false) { }
   ///
-  virtual ~csTriangleVertexCost () { }
+  ~csTriangleVertexCost () { }
   ///
   bool DelVertex (int idx);
   ///
   void ReplaceVertex (int old, int replace);
+};
+
+/**
+ * Algorithm class that calculates the cost of a vertex.
+ */
+class CS_CSGEOM_EXPORT csTriangleLODAlgo
+{
+public:
+  virtual ~csTriangleLODAlgo () { }
 
   /**
    * Calculate the minimal cost of collapsing this vertex to some other.
    * Also remember which other vertex was selected for collapsing to.
    */
   virtual void CalculateCost (csTriangleVerticesCost* vertices,
-  	void* userdata) = 0;
+  	csTriangleVertexCost* vertex) = 0;
 };
 
 /**
- * This subclass of csTriangleVertexCost uses a very simple
+ * This subclass of csTriangleLODAlgo uses a very simple
  * cost metric to calculate the vertex cost. It will basically
  * just consider the length of the edge.
  */
-class CS_CSGEOM_EXPORT csTriangleVertexCostEdge : public csTriangleVertexCost
+class CS_CSGEOM_EXPORT csTriangleLODAlgoEdge : public csTriangleLODAlgo
 {
 public:
+  virtual ~csTriangleLODAlgoEdge () { }
   virtual void CalculateCost (csTriangleVerticesCost* vertices,
-  	void* userdata);
+  	csTriangleVertexCost* vertex);
+};
+
+/**
+ * This class works closely with csTriangleVerticesCost
+ * and maintains a sorted (on cost) view of the vertices.
+ */
+class CS_CSGEOM_EXPORT csTriangleVerticesSorted
+{
+private:
+  int num_vertices;
+  csTriangleVerticesCost* vertices;
+  csTriangleVertexCost* verts;
+
+  csList<int> sorted_list;
+  csList<int>::Iterator* entry_per_vertex;
+
+public:
+  csTriangleVerticesSorted (csTriangleVerticesCost* vertices);
+  ~csTriangleVerticesSorted ();
+
+  /**
+   * Get the lowest cost vertex that is still in the sorted list.
+   * It will be 'removed' so that next time you call this function
+   * you will get the next lowest cost vertex. Returns -1 if there
+   * are no more vertices.
+   */
+  int GetLowestCostVertex ();
+
+  /**
+   * Change the cost of a vertex. This function assumes the
+   * vertex cost has already been updated in the vertices table.
+   */
+  void ChangeCostVertex (int vtidx);
 };
 
 /**
@@ -91,13 +135,9 @@ public:
    * \param verts is an array of vertices that will be used to
    * fill the cost vertex table.
    * \param num_verts is the size of that table.
-   * \param cost_vertices is a table (with same size as 'verts')
-   * that contains instances of csTriangleVertexCost. This
-   * class will take ownership of this array and delete it with
-   * delete[] later.
    */
   csTriangleVerticesCost (csTriangleMesh* mesh, csVector3* verts,
-  	int num_verts, csTriangleVertexCost* cost_vertices);
+  	int num_verts);
   ///
   ~csTriangleVerticesCost ();
   /**
@@ -107,15 +147,22 @@ public:
   void UpdateVertices (csVector3* verts);
 
   ///
-  int GetVertexCount () { return num_vertices; }
+  int GetVertexCount () const { return num_vertices; }
+  ///
+  csTriangleVertexCost* GetVertices () const { return vertices; }
   ///
   csTriangleVertexCost& GetVertex (int idx) { return vertices[idx]; }
 
   /// Calculate the cost of all vertices.
-  void CalculateCost (void* userdata);
+  void CalculateCost (csTriangleLODAlgo* lodalgo);
 
   /// Return the vertex id with minimal cost.
   int GetMinimalCostVertex (float& min_cost);
+
+  /**
+   * Sort all vertices so that the lowest cost vertex is first.
+   */
+  csTriangleVerticesSorted* SortVertices ();
 
   /// Dump connectivity information@@@ TEMPORARY
   void Dump ();
@@ -139,13 +186,13 @@ public:
    * 'emerge_from' contains (for a given index in the new order) from
    * which this vertex arises (or seen the other way around: to what this
    * vertex had collapsed).
-   * \param userdata is given to the CalculateCost() function.
+   * \param lodalgo is the lod algorithm.
    * <p>
    * Note. The given 'mesh' and 'verts' objects are no longer valid after
    * calling this function. Don't expect any useful information here.
    */
   static void CalculateLOD (csTriangleMesh* mesh, csTriangleVerticesCost* verts,
-  	int* translate, int* emerge_from, void* userdata = 0);
+  	int* translate, int* emerge_from, csTriangleLODAlgo* lodalgo);
 
   /**
    * Calculate a simplified set of triangles so that all vertices with
@@ -153,14 +200,28 @@ public:
    * triangle mesh is returned (and number of triangles is set to
    * num_triangles). You must delete[] the returned list of triangles
    * if you don't want to use it anymore.
-   * \param userdata is given to the CalculateCost() function.
+   * \param lodalgo is the lod algorithm.
    * <p>
    * Note. The given 'mesh' and 'verts' objects are no longer valid after
    * calling this function. Don't expect any useful information here.
    */
   static csTriangle* CalculateLOD (csTriangleMesh* mesh,
   	csTriangleVerticesCost* verts, float max_cost, int& num_triangles,
-	void* userdata = 0);
+	csTriangleLODAlgo* lodalgo);
+
+  /**
+   * This is a faster version of CalculateLOD() which doesn't recalculate
+   * the cost of a vertex after edge collapse. It is less accurate in
+   * cases where the cost of a vertex can change after edge collapse but
+   * it calculates a LOT faster.
+   * \param lodalgo is the lod algorithm.
+   * <p>
+   * Note. The given 'mesh' and 'verts' objects are no longer valid after
+   * calling this function. Don't expect any useful information here.
+   */
+  static csTriangle* CalculateLODFast (csTriangleMesh* mesh,
+  	csTriangleVerticesCost* verts, float max_cost, int& num_triangles,
+	csTriangleLODAlgo* lodalgo);
 };
 
 

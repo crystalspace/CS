@@ -146,6 +146,24 @@ public:
         ptr = ptr->prev;
       return *this;
     }
+
+    /**
+     * Return next element but don't modify iterator.
+     * Warning! Assumes there is a next element!
+     */
+    const T& FetchNext () const
+    {
+      return ptr->next->data;
+    }
+    /**
+     * Return previous element but don't modify iterator.
+     * Warning! Assumes there is a previous element!
+     */
+    const T& FetchPrev () const
+    {
+      return ptr->prev->data;
+    }
+
   protected:
     friend class csList<T>;
     Iterator (csListElement* element) : ptr(element)
@@ -156,35 +174,41 @@ public:
     bool reversed;
   };
 
-  /// Assignment, shallow copy
+  /// Assignment, shallow copy.
   csList &operator=(const csList& other);
 
-  /// Add an item first in list. Copy T into the listdata
+  /// Add an item first in list. Copy T into the listdata.
   Iterator PushFront (const T & item);
 
-  /// Add an item last in list. Copy T into the listdata
+  /// Add an item last in list. Copy T into the listdata.
   Iterator PushBack (const T & item);
 
-  /// Insert an item before the item the iterator is set to
+  /// Insert an item before the item the iterator is set to.
   void InsertBefore(Iterator &it, const T & item);
 
-  /// Insert an item after the item the iterator is set to
+  /// Insert an item after the item the iterator is set to.
   void InsertAfter(Iterator &it, const T & item);
 
-  /// Remove specific item by iterator
+  /// Move an item (as iterator) before the item the iterator is set to.
+  void MoveBefore(const Iterator &it, const Iterator &item);
+
+  /// Move an item (as iterator) after the item the iterator is set to.
+  void MoveAfter(const Iterator &it, const Iterator &item);
+
+  /// Remove specific item by iterator.
   void Delete (Iterator &it);
 
-  /// Empty an list
+  /// Empty an list.
   void DeleteAll();
 
-  /// Return first element of the list
+  /// Return first element of the list.
   const T& Front () const
   { return head->data; }
-  /// Return last element of the list
+  /// Return last element of the list.
   const T& Last () const
   { return tail->data; }
 
-  /// Deletes the first element of the list
+  /// Deletes the first element of the list.
   bool PopFront ()
   {
     if (!head)
@@ -305,6 +329,62 @@ inline void csList<T>::InsertBefore (Iterator &it, const T& item)
   else
     el->prev->next = newEl;
   el->prev = newEl;
+}
+
+template <class T>
+inline void csList<T>::MoveAfter (const Iterator &it, const Iterator &item)
+{
+  csListElement* el_item = item.ptr;
+
+  // Unlink the item.
+  if (el_item->prev)
+    el_item->prev->next = el_item->next;
+  else
+    head = el_item->next;
+  if (el_item->next)
+    el_item->next->prev = el_item->prev;
+  else
+    tail = el_item->prev;
+
+  csListElement* el = it.ptr;
+  csListElement* next = el->next;
+  csListElement* prev = el;
+
+  el_item->next = next;
+  el_item->prev = prev;
+  if (!next) // this is the last element
+    tail = el_item;
+  else
+    el->next->prev = el_item;
+  el->next = el_item;
+}
+
+template <class T>
+inline void csList<T>::MoveBefore (const Iterator &it, const Iterator &item)
+{
+  csListElement* el_item = item.ptr;
+
+  // Unlink the item.
+  if (el_item->prev)
+    el_item->prev->next = el_item->next;
+  else
+    head = el_item->next;
+  if (el_item->next)
+    el_item->next->prev = el_item->prev;
+  else
+    tail = el_item->prev;
+
+  csListElement* el = it.ptr;
+  csListElement* next = el;
+  csListElement* prev = el->prev;
+
+  el_item->next = next;
+  el_item->prev = prev;
+  if (!prev) // this is the first element
+    head = el_item;
+  else
+    el->prev->next = el_item;
+  el->prev = el_item;
 }
 
 template <class T>

@@ -414,17 +414,17 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
     for (i = 0; i < GetVertexCount(); i++)
       v[i] = GetVertex (lod_base_frame, i);
 
-    csTriangleVertexCostEdge* cost_vertices = new csTriangleVertexCostEdge[
-    	GetVertexCount ()];
     csTriangleVerticesCost* verts = new csTriangleVerticesCost (texel_mesh, v,
-  	  GetVertexCount(), cost_vertices);
+  	  GetVertexCount());
     delete [] v;
 
     delete [] emerge_from;
     emerge_from = new int [GetVertexCount()];
     csTriangleMesh* new_mesh = new csTriangleMesh (*texel_mesh);
 
-    csTriangleMeshLOD::CalculateLOD (new_mesh, verts, translate, emerge_from);
+    csTriangleLODAlgoEdge lodalgo;
+    csTriangleMeshLOD::CalculateLOD (new_mesh, verts, translate, emerge_from,
+    	&lodalgo);
     delete verts;
     delete new_mesh;
   }
@@ -599,10 +599,8 @@ void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)
 
   if (!tri_verts)
   {
-    csTriangleVertexCostEdge* cost_vertices = new csTriangleVertexCostEdge[
-    	GetVertexCount ()];
     tri_verts = new csTriangleVerticesCost (texel_mesh, object_verts,
-      GetVertexCount(), cost_vertices);
+      GetVertexCount());
   }
 
   csTriangle * tris = texel_mesh->GetTriangles();
@@ -743,10 +741,8 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
 
   if (!tri_verts)
   {
-    csTriangleVertexCostEdge* cost_vertices = new csTriangleVertexCostEdge[
-    	GetVertexCount ()];
     tri_verts = new csTriangleVerticesCost (texel_mesh, obj_verts,
-    	GetVertexCount(), cost_vertices);
+    	GetVertexCount());
   }
 
   csTriangle * tris = texel_mesh->GetTriangles();
@@ -788,10 +784,8 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   for (i = 0; i < num_triangles; i++)
     merge_mesh.AddTriangle (merge[tris[i].a], merge[tris[i].b],
     	merge[tris[i].c]);
-  csTriangleVertexCostEdge* cost_vertices = new csTriangleVertexCostEdge[
-    	GetVertexCount ()];
   csTriangleVerticesCost * tv = new csTriangleVerticesCost (&merge_mesh,
-  	obj_verts, GetVertexCount(), cost_vertices);
+  	obj_verts, GetVertexCount());
 
   // calculate vertex normals, by averaging connected triangle normals
   csVector3* fr_normals = GetNormals (frame);

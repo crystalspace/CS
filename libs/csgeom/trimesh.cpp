@@ -63,6 +63,7 @@ void csTriangleVertex::AddTriangle (size_t idx)
 
 void csTriangleVertex::AddVertex (int idx)
 {
+  CS_ASSERT (idx != csTriangleVertex::idx);
   con_vertices.PushSmart (idx);
 }
 
@@ -74,21 +75,31 @@ csTriangleVertices::csTriangleVertices (csTriangleMesh* mesh,
 
   // Build connectivity information for all vertices in this mesh.
   csTriangle* triangles = mesh->GetTriangles ();
-  int i;
   size_t j;
+
+  // First add the triangles that are used by every vertex.
+  size_t tricount = mesh->GetTriangleCount ();
+  for (j = 0 ; j < tricount ; j++)
+  {
+    vertices[triangles[j].a].AddTriangle (j);
+    vertices[triangles[j].b].AddTriangle (j);
+    vertices[triangles[j].c].AddTriangle (j);
+  }
+  // Now setup the vertices and add the connected vertices.
+  int i;
   for (i = 0 ; i < num_vertices ; i++)
   {
     vertices[i].pos = verts[i];
     vertices[i].idx = i;
-    for (j = 0 ; j < mesh->GetTriangleCount () ; j++)
-      if (triangles[j].a == i || triangles[j].b == i || triangles[j].c == i)
-      {
-        vertices[i].AddTriangle (j);
-	if (triangles[j].a != i) vertices[i].AddVertex (triangles[j].a);
-	if (triangles[j].b != i) vertices[i].AddVertex (triangles[j].b);
-	if (triangles[j].c != i) vertices[i].AddVertex (triangles[j].c);
-      }
+    for (j = 0 ; j < vertices[i].con_triangles.Length () ; j++)
+    {
+      size_t triidx = vertices[i].con_triangles[j];
+      if (triangles[triidx].a != i) vertices[i].AddVertex (triangles[triidx].a);
+      if (triangles[triidx].b != i) vertices[i].AddVertex (triangles[triidx].b);
+      if (triangles[triidx].c != i) vertices[i].AddVertex (triangles[triidx].c);
+    }
   }
+
 }
 
 csTriangleVertices::~csTriangleVertices ()

@@ -100,10 +100,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
     {
       if (do_verbose)
         SetFailReason ("vertex program failed to load");
-      else
-	parent->compiler->Report (CS_REPORTER_SEVERITY_NOTIFY, 
-	  "Vertex Program for shader '%s' failed to load",
-	  parent->GetName ());
       return false;
     }
   }
@@ -120,10 +116,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
     {
       if (do_verbose)
         SetFailReason ("fragment program failed to load");
-      else
-        parent->compiler->Report (CS_REPORTER_SEVERITY_NOTIFY, 
-	  "Fragment Program for shader '%s' failed to load",
-	  parent->GetName ());
       return false;
     }
   }

@@ -7,6 +7,14 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 14-Oct-2004
+	- Jorrit optimized the LOD calculation routines a lot by using
+	  csList linked list to maintain a cost-sorted array of
+	  vertices.
+	- Jorrit added csList<T>::MoveAfter() and MoveBefore() to have
+	  a more efficient way to move items around in a list.
+	- Jorrit added csList<T>::Iterator::FetchNext() and FetchPrev()
+	  to more efficiently get the next and previous item from
+	  a list iterator.
 	- Eric Sunshine added an AAlib (ASCII Art library) check to
 	  configure.ac. If the package is present, then the CS `asciiart'
 	  canvas is built.
@@ -21,6 +29,9 @@ chronological order.
 	  configure.ac `-fPIC' check rather than being hard-coded to assume
 	  that all compilers understand this option.
 13-Oct-2004
+	- Jorrit removed the triangle connectivity information in
+	  the csTriangleVerticesCost class since they were not used there.
+	  The basic csTriangleVertices still has that information.
 	- Eric Sunshine removed invocation of the non-portable
 	  CS_ALLOC_STACK_ARRAY() from isdir() in cssysdef.h since this is a
 	  public header, and we want it to be usable by projects with strict
@@ -42,6 +53,17 @@ chronological order.
 	  -verbose is specified); now only reports if a device malfunctioned
 	  for some reason.
 12-Oct-2004
+	- Jorrit changed the way that you can define different algorithms
+	  for doing LOD (csTriangleMeshLOD) by making a csTriangleLODAlgo
+	  classes from which you can inherit to make your own LOD
+	  algorithms. That seperates the algorithm from the vertex data.
+	- Jorrit changed xmlshader so that it no longer complains about
+	  fragment and vertex programs failing to load unless -verbose
+	  is given.
+	- Jorrit greatly optimized the routine to setup the vertex
+	  table for LOD calculation. This routine was previously doing
+	  a loop #vertex * #triangle times which is VERY bad. Now it
+	  has been reduced to #vertex + #triangle.
 	- res changed the Win32 GL canvas to only employ the WGL pixel format
 	  check if really needed (e.g. multisampling was requested), otherwise
 	  the GDI method is used.
