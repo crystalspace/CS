@@ -1233,7 +1233,8 @@ CS_CHECK_LIB_WITH([jpeg],
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([lcms],
     [AC_LANG_PROGRAM([[#include <lcms.h>]],
-	[LPLUT p = cmsAllocLUT(); cmsFreeLUT(p);])])
+	[LPLUT p = cmsAllocLUT(); cmsFreeLUT(p);])],
+	[/usr/include/lcms| /usr/local/include/lcms|])
 
 CS_CHECK_LIB_WITH([mng],
     [AC_LANG_PROGRAM([[#include <libmng.h>]], [mng_version_release()])],

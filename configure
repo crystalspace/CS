@@ -24678,7 +24678,7 @@ fi
 	if test $with_liblcms != yes; then
   cs_check_lib_paths=$with_liblcms
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib /usr/include/lcms| /usr/local/include/lcms|"
 fi
 
 	for cs_lib_item in $cs_check_lib_paths

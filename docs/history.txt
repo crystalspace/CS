@@ -46,6 +46,13 @@ chronological order.
 	  *.cpp and *.h.
 	- Vincent Knecht updated rpm.txi manual page: --with newrenderer
 	  switch has changed to --with oldrenderer.
+	- Eric Sunshine augmented the `lcms' test in configure.ac so that it
+	  also looks for the header as <lcms/lcms.h> in addition to <lcms.h>,
+	  since it is installed in an "lcms" subdirectory on some
+	  platforms. (Normally, this should be handled automatically by
+	  `pkg-config --cflags lcms' which is invoked by configure.ac, but
+	  the necessary pkg-config goop presumably is missing on these rogue
+	  installations.)
 28-Nov-2004
 	- Eric Sunshine made the new-renderer the default. Users wanting to use
 	  the old-renderer must select it manually.
