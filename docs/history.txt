@@ -20,6 +20,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine moved the content of CS/docs/incoming/csupdate.txt
 	  directly into the csupdate.py script.  This information is now
 	  accessed via the --detailed-help option.
+	- Eric Sunshine eliminated a float-to-int compilation warning from
+	  isotest.cpp.
 26-Jun-2001
 	- Philip updated the win32gcc.txi doc to add explanation about
 	  PYTHONPATH environment variable.

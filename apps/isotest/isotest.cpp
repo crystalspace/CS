@@ -467,7 +467,7 @@ void IsoTest::AddMazeGrid(iIsoWorld *world, float posx, float posy,
   int gridw = width*2+1;
   int gridh = height*2+1;
   iIsoGrid *mazegrid = world->CreateGrid(gridw, gridh);
-  mazegrid->SetSpace(posy, posx, -1.0, +10.0);
+  mazegrid->SetSpace((int)posy, (int)posx, -1.0, +10.0);
   int multx = 1;
   int multy = 1;
   mazegrid->SetGroundMult(multx, multy);
