@@ -53,7 +53,7 @@ void csShadowMap::Alloc (csLight*, int w, int h, int lms)
   for (i = 0 ; i < lm_size ; i++) map[i] = 0;
 }
 
-void csShadowMap::MipmapLightmap (int w, int h, int lms, csShadowMap* source, int w2, int h2, int lms2)
+void csShadowMap::MipmapLightMap (int w, int h, int lms, csShadowMap* source, int w2, int h2, int lms2)
 {
   int lw = w/lms+2;
   int lh = h/lms+2;
@@ -80,7 +80,7 @@ void csShadowMap::MipmapLightmap (int w, int h, int lms, csShadowMap* source, in
   light = source->light;
 }
 
-void csShadowMap::CopyLightmap (csShadowMap* source, int size)
+void csShadowMap::CopyLightMap (csShadowMap* source, int size)
 {
   if (map) CHKB (delete [] map);
   CHK (map = new unsigned char [size]);
@@ -185,7 +185,7 @@ void csLightMap::Alloc (int w, int h, int lms, int r, int g, int b)
   }
 }
 
-void csLightMap::MipmapLightmap (int w, int h, int lms, csLightMap* source, int w2, int h2, int lms2)
+void csLightMap::MipmapLightMap (int w, int h, int lms, csLightMap* source, int w2, int h2, int lms2)
 {
   Alloc (w, h, lms, 0, 0, 0);
 
@@ -223,12 +223,12 @@ void csLightMap::MipmapLightmap (int w, int h, int lms, csLightMap* source, int 
   while (smap)
   {
     smap2 = NewShadowMap (smap->light, w, h, lms);
-    smap2->MipmapLightmap (w, h, lms, smap, w2, h2, lms2);
+    smap2->MipmapLightMap (w, h, lms, smap, w2, h2, lms2);
     smap = smap->next;
   }
 }
 
-void csLightMap::CopyLightmap (csLightMap* source)
+void csLightMap::CopyLightMap (csLightMap* source)
 {
   lm_size = source->lm_size;
   size = source->size;
@@ -253,7 +253,7 @@ void csLightMap::CopyLightmap (csLightMap* source)
     CHK (smap2 = new csShadowMap ());
     smap2->next = first_smap;
     first_smap = smap2;
-    smap2->CopyLightmap (smap, lm_size);
+    smap2->CopyLightMap (smap, lm_size);
     smap = smap->next;
   }
 }

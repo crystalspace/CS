@@ -24,6 +24,7 @@
 #include "csengine/thing.h"
 #include "csengine/polygon.h"
 #include "csengine/cssprite.h"
+#include "csengine/world.h"
 
 //---------------------------------------------------------------------------
 
@@ -156,6 +157,7 @@ csStatLight::~csStatLight ()
 
 void csStatLight::CalculateLighting ()
 {
+  csWorld::current_world->tr_manager.NewFrame ();
   //CsPrintf (MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
   csLightView lview;
   lview.l = this;
@@ -174,6 +176,7 @@ void csStatLight::CalculateLighting ()
 
 void csStatLight::CalculateLighting (csThing* th)
 {
+  csWorld::current_world->tr_manager.NewFrame ();
   //CsPrintf (MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
   csLightView lview;
   lview.l = this;
@@ -192,6 +195,7 @@ void csStatLight::CalculateLighting (csThing* th)
 
 void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
 {
+  csWorld::current_world->tr_manager.NewFrame ();
   csLightView lview;
   lview.l = this;
   lview.mirror = false;
@@ -290,6 +294,7 @@ csDynLight::~csDynLight ()
 
 void csDynLight::Setup ()
 {
+  csWorld::current_world->tr_manager.NewFrame ();
   while (lightpatches) CHKB (delete lightpatches);
   csLightView lview;
   lview.l = this;

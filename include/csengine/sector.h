@@ -28,7 +28,6 @@ struct LightInfo;
 class csThing;
 class csStatLight;
 class csPolygon3D;
-class csPolygonBspContainer;
 class Polygon2D;
 class csCamera;
 class csDynLight;
@@ -80,12 +79,6 @@ private:
    * sector which includes all static (non-moving) csThings.
    */
   csBspTree* static_bsp;
-
-  /**
-   * If static_bsp is not NULL then this is a pointer to a BSP container
-   * which holds all polygons of the non-moving csTThings.
-   */
-  csPolygonBspContainer* static_container;
 
   /**
    * If static_bsp is not NULL then this is a pointer to the csThing
@@ -237,7 +230,7 @@ public:
    * also convert the lightmaps so that they are suitable for the
    * 3D rasterizer.
    */
-  void CreateLightmaps (IGraphics3D* g3d);
+  void CreateLightMaps (IGraphics3D* g3d);
 
   /**
    * Draw the sector in the given view and with the given transformation.
@@ -251,7 +244,7 @@ public:
    * If do_cache == false this function will not try to read from
    * the cache.
    */
-  void InitLightmaps (bool do_cache = true);
+  void InitLightMaps (bool do_cache = true);
 
   /**
    * Update all lighting for all things and polygons in this sector
@@ -271,7 +264,7 @@ public:
    * The lightmaps will be cached to the current level file
    * (if it is an archive) or else to 'precalc.zip'.
    */
-  void CacheLightmaps ();
+  void CacheLightMaps ();
 
   /**
    * Intersects world-space sphere with polygons of this set. Return

@@ -193,7 +193,7 @@ private:
   ///
   void ShineLights ();
   ///
-  void CreateLightmaps (IGraphics3D* g3d);
+  void CreateLightMaps (IGraphics3D* g3d);
 
 public:
   /**

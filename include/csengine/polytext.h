@@ -127,7 +127,7 @@ private:
   ///
   float fdv;
 
-  /// Lightmap.
+  /// LightMap.
   csLightMap* lm;
 
   /// The mipmap level (0..3) that this PolyTexture is used for.
@@ -188,7 +188,7 @@ public:
   void SetMipmapSize (int mm);
 
   ///
-  csLightMap* GetLightmap () { return lm; }
+  csLightMap* GetLightMap () { return lm; }
   /// Get width of lighted texture (power of 2).
   int GetWidth () { return w; }
   /// Get height of lighted texture.
@@ -231,18 +231,18 @@ public:
   /**
    * Initialize the lightmaps.
    */
-  void InitLightmaps ();
+  void InitLightMaps ();
 
   /**
    * Update the lightmap for the given light.
    */
-  void FillLightmap (csLightView& lview);
+  void FillLightMap (csLightView& lview);
 
   /**
    * Update the real lightmap for a given csLightPatch
    * (used for a dynamic light).
    */
-  void ShineDynLightmap (csLightPatch* lp);
+  void ShineDynLightMap (csLightPatch* lp);
 
   ///
   void MakeDirtyDynamicLights ();

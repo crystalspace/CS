@@ -114,12 +114,16 @@ void Dumper::dump (csPolygon3D* p)
     	p->Vwor (i).x, p->Vwor (i).y, p->Vwor (i).z,
     	p->Vcam (i).x, p->Vcam (i).y, p->Vcam (i).z);
   dump (p->plane);
-  if (p->tex) dump (p->tex, "PolyTexture 1");
-  if (p->tex1) dump (p->tex1, "PolyTexture 2");
-  if (p->tex2) dump (p->tex2, "PolyTexture 3");
-  if (p->tex3) dump (p->tex3, "PolyTexture 4");
+  if (p->GetTextureType () == POLYTXT_LIGHTMAP)
+  {
+    csLightMapped* lmi = p->GetLightMapInfo ();
+    if (lmi->GetPolyTex (0)) dump (lmi->GetPolyTex (0), "PolyTexture 1");
+    if (lmi->GetPolyTex (1)) dump (lmi->GetPolyTex (1), "PolyTexture 2");
+    if (lmi->GetPolyTex (2)) dump (lmi->GetPolyTex (2), "PolyTexture 3");
+    if (lmi->GetPolyTex (3)) dump (lmi->GetPolyTex (3), "PolyTexture 4");
+  }
 
-  csLightPatch* lp = p->lightpatches;
+  csLightPatch* lp = p->light_info.lightpatches;
   while (lp)
   {
     CsPrintf (MSG_DEBUG_0, "  LightPatch (num_vertices=%d, light=%08lx)\n", lp->num_vertices,

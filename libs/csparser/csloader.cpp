@@ -1103,7 +1103,8 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
   float u_shift = 0, v_shift = 0;
 
   bool do_mirror = false;
-  poly3d->theDynLight = default_lightx;
+  csLightMapped* pol_lm = poly3d->GetLightMapInfo ();
+  if (pol_lm) pol_lm->SetUniformDynLight (default_lightx);
 
   char str[255];
 
@@ -1215,7 +1216,8 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
         break;
       case kTokenPolLightX:
         ScanStr (params, "%s", str);
-        poly3d->theDynLight = CLights::FindByName (str);
+  	pol_lm = poly3d->GetLightMapInfo ();
+        if (pol_lm) pol_lm->SetUniformDynLight (CLights::FindByName (str));
         break;
       case kTokenPolTexture:
         while ((cmd = csGetObject (&params, tCommands, &name, &params2)) > 0)
@@ -1285,40 +1287,51 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
         }
         break;
       case kTokenPolGouraud:
-        poly3d->SetColor (0, 0, 0, 0);
+        poly3d->SetTextureType (POLYTXT_GOURAUD);
+	poly3d->GetGouraudInfo ()->Setup (poly3d->GetNumVertices ());
+	poly3d->GetGouraudInfo ()->EnableGouraud (true);
         break;
       case kTokenPolUV:
         {
+          poly3d->SetTextureType (POLYTXT_GOURAUD);
+	  csGouraudShaded* gs = poly3d->GetGouraudInfo ();
+	  gs->Setup (poly3d->GetNumVertices ());
           float list[6];
           int num;
           ScanStr (params, "%F", list, &num);
-          poly3d->SetUV (0, list[0], list[1]);
-          poly3d->SetUV (1, list[2], list[3]);
-          poly3d->SetUV (2, list[4], list[5]);
+          gs->SetUV (0, list[0], list[1]);
+          gs->SetUV (1, list[2], list[3]);
+          gs->SetUV (2, list[4], list[5]);
         }
         break;
       case kTokenPolColors:
         {
+          poly3d->SetTextureType (POLYTXT_GOURAUD);
+	  csGouraudShaded* gs = poly3d->GetGouraudInfo ();
+	  gs->Setup (poly3d->GetNumVertices ());
           float list[9];
           int num;
           ScanStr (params, "%F", list, &num);
-          poly3d->SetColor (0, list[0], list[1], list[2]);
-          poly3d->SetColor (1, list[3], list[4], list[5]);
-          poly3d->SetColor (2, list[6], list[7], list[8]);
+          gs->SetColor (0, list[0], list[1], list[2]);
+          gs->SetColor (1, list[3], list[4], list[5]);
+          gs->SetColor (2, list[6], list[7], list[8]);
         }
         break;
       case kTokenPolUVA:
         {
+          poly3d->SetTextureType (POLYTXT_GOURAUD);
+	  csGouraudShaded* gs = poly3d->GetGouraudInfo ();
+	  gs->Setup (poly3d->GetNumVertices ());
           float list[9];
           int num;
           ScanStr (params, "%F", list, &num);
-          float angle;
-          angle = list[0]*2*M_PI/360.;
-          poly3d->SetUV (0, cos (angle)*list[1]+list[2], sin (angle)*list[1]+list[2]);
-          angle = list[3]*2*M_PI/360.;
-          poly3d->SetUV (1, cos (angle)*list[4]+list[5], sin (angle)*list[4]+list[5]);
-          angle = list[6]*2*M_PI/360.;
-          poly3d->SetUV (2, cos (angle)*list[7]+list[8], sin (angle)*list[7]+list[8]);
+          float a;
+          a = list[0]*2*M_PI/360.;
+          gs->SetUV (0, cos (a)*list[1]+list[2], sin (a)*list[1]+list[2]);
+          a = list[3]*2*M_PI/360.;
+          gs->SetUV (1, cos (a)*list[4]+list[5], sin (a)*list[4]+list[5]);
+          a = list[6]*2*M_PI/360.;
+          gs->SetUV (2, cos (a)*list[7]+list[8], sin (a)*list[7]+list[8]);
         }
         break;
     }
@@ -3060,7 +3073,8 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
         p->SetTextureSpace ((csPolyPlane*)w->planes.FindByName (colors[idx].plane));
       p->SetFlags (CS_POLY_MIPMAP|CS_POLY_LIGHTING,
         (no_mipmap ? 0 : CS_POLY_MIPMAP) | (no_lighting ? 0 : CS_POLY_LIGHTING));
-      p->theDynLight = todo[done].light;
+      csLightMapped* pol_lm = p->GetLightMapInfo ();
+      if (pol_lm) pol_lm->SetUniformDynLight (todo[done].light);
     }
     done++;
   }
@@ -3201,6 +3215,7 @@ void CSLoader::skydome_process (csSector& sector, char* name, char* buf,
   float radius = 0.0f;
   int i, j;
   int num = 0;
+  csGouraudShaded* gs;
 
   // Previous vertices.
   int prev_vertices[60];        // @@@ HARDCODED!
@@ -3294,9 +3309,14 @@ void CSLoader::skydome_process (csSector& sector, char* name, char* buf,
       p->AddVertex (prev_vertices[j]);
       p->AddVertex (new_vertices[(j+1)%num]);
       p->AddVertex (new_vertices[j]);
-      p->SetUV (0, prev_u[j], prev_v[j]);
-      p->SetUV (1, new_u[(j+1)%num], new_v[(j+1)%num]);
-      p->SetUV (2, new_u[j], new_v[j]);
+      p->SetTextureType (POLYTXT_GOURAUD);
+      gs = p->GetGouraudInfo ();
+      gs->Setup (p->GetNumVertices ());
+      gs->EnableGouraud (true);
+      gs->SetUV (0, prev_u[j], prev_v[j]);
+      gs->SetUV (1, new_u[(j+1)%num], new_v[(j+1)%num]);
+      gs->SetUV (2, new_u[j], new_v[j]);
+
       p->SetTextureSpace (t_m, t_v);
       sector.AddPolygon (p);
       LoadStat::polygons_loaded++;
@@ -3310,9 +3330,13 @@ void CSLoader::skydome_process (csSector& sector, char* name, char* buf,
       p->AddVertex (prev_vertices[j]);
       p->AddVertex (prev_vertices[(j+1)%num]);
       p->AddVertex (new_vertices[(j+1)%num]);
-      p->SetUV (0, prev_u[j], prev_v[j]);
-      p->SetUV (1, prev_u[(j+1)%num], prev_v[(j+1)%num]);
-      p->SetUV (2, new_u[(j+1)%num], new_v[(j+1)%num]);
+      p->SetTextureType (POLYTXT_GOURAUD);
+      gs = p->GetGouraudInfo ();
+      gs->Setup (p->GetNumVertices ());
+      gs->EnableGouraud (true);
+      gs->SetUV (0, prev_u[j], prev_v[j]);
+      gs->SetUV (1, prev_u[(j+1)%num], prev_v[(j+1)%num]);
+      gs->SetUV (2, new_u[(j+1)%num], new_v[(j+1)%num]);
       p->SetTextureSpace (t_m, t_v);
       sector.AddPolygon (p);
       LoadStat::polygons_loaded++;
@@ -3349,9 +3373,13 @@ void CSLoader::skydome_process (csSector& sector, char* name, char* buf,
     p->AddVertex (top_vertex);
     p->AddVertex (prev_vertices[j]);
     p->AddVertex (prev_vertices[(j+1)%num]);
-    p->SetUV (0, top_u, top_v);
-    p->SetUV (1, prev_u[j], prev_v[j]);
-    p->SetUV (2, prev_u[(j+1)%num], prev_v[(j+1)%num]);
+    p->SetTextureType (POLYTXT_GOURAUD);
+    gs = p->GetGouraudInfo ();
+    gs->Setup (p->GetNumVertices ());
+    gs->EnableGouraud (true);
+    gs->SetUV (0, top_u, top_v);
+    gs->SetUV (1, prev_u[j], prev_v[j]);
+    gs->SetUV (2, prev_u[(j+1)%num], prev_v[(j+1)%num]);
     p->SetTextureSpace (t_m, t_v);
     sector.AddPolygon (p);
     LoadStat::polygons_loaded++;

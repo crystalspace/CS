@@ -256,7 +256,7 @@ bool csWorld::Prepare (IGraphics3D* g3d)
 
   g3d->ClearCache ();
   ShineLights ();
-  CreateLightmaps (g3d);
+  CreateLightMaps (g3d);
 
 #if defined(OS_NEXT)
 // FIXME: NextStep: Multiple Inheritence broken (IID_IHaloRasterizer)
@@ -294,6 +294,8 @@ void csWorld::CloseWorldFile ()
 
 void csWorld::ShineLights ()
 {
+  tr_manager.NewFrame ();
+
   if (!csPolygon3D::do_not_force_recalc)
   {
     // If recalculation is not forced then we check if the 'precalc_info'
@@ -403,7 +405,7 @@ AMBIENT_BLUE=%d\nREFLECT=%d\nRADIOSITY=%d\nACCURATE_THINGS=%d\nCOSINUS_FACTOR=%f
   for (sn = 0; sn < total; sn++)
   {
     csSector* s = (csSector*)sectors[sn];
-    s->InitLightmaps ();
+    s->InitLightMaps ();
     meter.Step();
   }
 
@@ -422,7 +424,7 @@ AMBIENT_BLUE=%d\nREFLECT=%d\nRADIOSITY=%d\nACCURATE_THINGS=%d\nCOSINUS_FACTOR=%f
   for (sn = 0; sn < total; sn++)
   {
     csSector* s = (csSector*)sectors[sn];
-    s->CacheLightmaps ();
+    s->CacheLightMaps ();
     meter.Step();
   }
   CsPrintf (MSG_INITIALIZATION,"\n");
@@ -435,14 +437,14 @@ AMBIENT_BLUE=%d\nREFLECT=%d\nRADIOSITY=%d\nACCURATE_THINGS=%d\nCOSINUS_FACTOR=%f
       CsPrintf (MSG_WARNING, "WARNING: error updating lighttable cache in archive %s!\n", ar->GetFilename ());
 }
 
-void csWorld::CreateLightmaps (IGraphics3D* g3d)
+void csWorld::CreateLightMaps (IGraphics3D* g3d)
 {
   int sn = sectors.Length ();
   while (sn > 0)
   {
     sn--;
     csSector* s = (csSector*)sectors[sn];
-    s->CreateLightmaps (g3d);
+    s->CreateLightMaps (g3d);
   }
 }
 
@@ -552,6 +554,8 @@ supports_halos = false;
 void csWorld::DrawFunc (IGraphics3D* g3d, csCamera* c, csClipper* view,
 	csDrawFunc* callback, void* callback_data)
 {
+  tr_manager.NewFrame ();
+
   IGraphics2D* g2d;
   g3d->Get2dDriver (&g2d);
   csRenderView rview (*c, view, g3d, g2d);

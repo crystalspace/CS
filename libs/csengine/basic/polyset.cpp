@@ -323,7 +323,8 @@ csPolygon3D* csPolygonSet::IntersectSegment (const csVector3& start,
     d.end = &end;
     d.isect = &isect;
     d.pr = pr;
-    return (csPolygon3D*) bsp->Front2Back (start, &test_bsp_intersection, (void*)&d);
+    return (csPolygon3D*) bsp->Front2Back (start, &test_bsp_intersection,
+    	(void*)&d);
   }
   else
     for (i = 0 ; i < num_polygon ; i++)
@@ -334,8 +335,8 @@ csPolygon3D* csPolygonSet::IntersectSegment (const csVector3& start,
   return NULL;
 }
 
-void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly, csRenderView* d,
-	bool use_z_buf)
+void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
+	csRenderView* d, bool use_z_buf)
 {
   if (d->callback)
   {
@@ -362,10 +363,10 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly, csRenderVi
     // is_this_fog is true if this sector is fogged.
     bool is_this_fog = sector->HasFog ();
 
-    // If there is filtering (alpha mapping or something like that) we need to keep the
-    // texture plane so that it can be drawn after the sector has been drawn.
-    // The texture plane needs to be kept because this polygon may be rendered again
-    // (through mirrors) possibly overwriting the plane.
+    // If there is filtering (alpha mapping or something like that) we need
+    // to keep the texture plane so that it can be drawn after the sector has
+    // been drawn. The texture plane needs to be kept because this polygon
+    // may be rendered again (through mirrors) possibly overwriting the plane.
     csPolyPlane* keep_plane = NULL;
 
     long do_transp;
@@ -386,8 +387,8 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly, csRenderVi
       if (!d->callback)
       {
 	if (filtered) poly->DrawFilled (d, p, keep_plane, use_z_buf);
-	if (is_this_fog) poly->AddFogPolygon (d->g3d, p, keep_plane, d->IsMirrored (),
-		sector->GetID (), CS_FOG_BACK);
+	if (is_this_fog) poly->AddFogPolygon (d->g3d, p, keep_plane,
+		d->IsMirrored (), sector->GetID (), CS_FOG_BACK);
       }
     }
     else if (!d->callback)
@@ -400,8 +401,8 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly, csRenderVi
     poly->DrawFilled (d, p, p->GetPlane (), use_z_buf);
 }
 
-void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num, csRenderView* d,
-	bool use_z_buf)
+void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
+	csRenderView* d, bool use_z_buf)
 {
   csPolygon3D* p;
   csVector3* verts;
@@ -416,9 +417,10 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num, csRenderVi
     p = (csPolygon3D*)polygon[i];
     p->CamUpdate ();
     if ( !p->dont_draw &&
-         p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane*)NULL, d->GetOrigin (),
-	 	verts, num_verts) && //@@@Use pool for verts?
-         p->DoPerspective (*d, verts, num_verts, clip, NULL, d->IsMirrored ())  &&
+         p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane*)NULL,
+	 	d->GetOrigin (), verts, num_verts) && //@@@Use pool for verts?
+         p->DoPerspective (*d, verts, num_verts, clip, NULL,
+	 	d->IsMirrored ())  &&
          clip->ClipAgainst (d->view) )
     {
       DrawOnePolygon (p, clip, d, use_z_buf);
@@ -446,19 +448,22 @@ void csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
     visible = false;
     p = (csPolygon3D*)polygon[i];
     if ( !p->dont_draw &&
-         p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane*)NULL, d->GetOrigin (),
-	 	verts, num_verts) &&
-         p->DoPerspective (*d, verts, num_verts, clip, NULL, d->IsMirrored ())  &&
+         p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane*)NULL,
+	 	d->GetOrigin (), verts, num_verts) &&
+         p->DoPerspective (*d, verts, num_verts, clip, NULL,
+	 	d->IsMirrored ())  &&
          clip->ClipAgainst (d->view) )
     {
       po = p->GetPortal ();
       if (csSector::do_portals && po)
       {
-        visible = c_buffer->TestPolygon (clip->GetVertices (), clip->GetNumVertices ());
+        visible = c_buffer->TestPolygon (clip->GetVertices (),
+		clip->GetNumVertices ());
       }
       else
       {
-        visible = c_buffer->InsertPolygon (clip->GetVertices (), clip->GetNumVertices ());
+        visible = c_buffer->InsertPolygon (clip->GetVertices (),
+		clip->GetNumVertices ());
       }
     }
     if (visible)

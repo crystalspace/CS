@@ -282,7 +282,7 @@ bool csPolyTexture::RecalcDynamicLights ()
   csLightPatch* lp = polygon->GetLightpatches ();
   while (lp)
   {
-    ShineDynLightmap (lp);
+    ShineDynLightMap (lp);
     lp = lp->GetNextPoly ();
   }
 
@@ -349,7 +349,7 @@ bool csPolyTexture::RecalcDynamicLights ()
   return true;
 }
 
-void csPolyTexture::InitLightmaps ()
+void csPolyTexture::InitLightMaps ()
 {
 }
 
@@ -583,7 +583,7 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
 }
 
 /* Modified by me to add nice lightmaps recalculations -- D.D. */
-void csPolyTexture::FillLightmap (csLightView& lview)
+void csPolyTexture::FillLightMap (csLightView& lview)
 {
   if (!lm) return;
   DBCHECK ("room4", "southU");
@@ -903,7 +903,7 @@ void csPolyTexture::FillLightmap (csLightView& lview)
 }
 
 /* Modified by me to correct some lightmap's border problems -- D.D. */
-void csPolyTexture::ShineDynLightmap (csLightPatch* lp)
+void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
 {
   int lw = (w>>mipmap_shift)+2;   // @@@ DON'T NEED TO GO TO 'W', 'W_ORIG' SHOULD BE SUFFICIENT!
   int lh = (h>>mipmap_shift)+2;

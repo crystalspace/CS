@@ -43,7 +43,6 @@ CSOBJTYPE_IMPL(csThing,csPolygonSet);
 
 csThing::csThing () : csPolygonSet (), obj()
 {
-  merged = NULL;
   flags = 0;
   center_idx = -1;
   ParentTemplate = NULL;
@@ -51,12 +50,6 @@ csThing::csThing () : csPolygonSet (), obj()
 
 csThing::~csThing ()
 {
-  if (merged)
-  {
-    int i;
-    for (i = 0 ; i < num_polygon ; i++)
-      polygons[i] = NULL;
-  }
 }
 
 void csThing::SetConvex (bool c)
@@ -117,13 +110,13 @@ void csThing::Transform (csMatrix3& matrix)
   obj.SetT2O (matrix * obj.GetT2O ());
 }
 
-void csThing::CreateLightmaps (IGraphics3D* g3d)
+void csThing::CreateLightMaps (IGraphics3D* g3d)
 {
   int i;
   for (i = 0 ; i < num_polygon ; i++)
   {
     csPolygon3D* p = (csPolygon3D*)polygons[i];
-    p->CreateLightmaps (g3d);
+    p->CreateLightMaps (g3d);
   }
 }
 
@@ -486,28 +479,27 @@ void csThing::CalculateLighting (csLightView& lview)
   draw_busy--;
 }
 
-void csThing::InitLightmaps (bool do_cache)
+void csThing::InitLightMaps (bool do_cache)
 {
   int i;
   for (i = 0 ; i < num_polygon ; i++)
-    ((csPolygon3D*)polygons[i])->InitLightmaps (this, do_cache, i);
+    ((csPolygon3D*)polygons[i])->InitLightMaps (this, do_cache, i);
   for (i = 0 ; i < num_curves ; i++)
-    ((csCurve*)curves[i])->InitLightmaps (this, do_cache, num_polygon+i);
+    ((csCurve*)curves[i])->InitLightMaps (this, do_cache, num_polygon+i);
 }
 
-void csThing::CacheLightmaps ()
+void csThing::CacheLightMaps ()
 {
   int i;
   for (i = 0 ; i < num_polygon ; i++)
-    ((csPolygon3D*)polygons[i])->CacheLightmaps (this, i);
+    ((csPolygon3D*)polygons[i])->CacheLightMaps (this, i);
   for (i = 0 ; i < num_curves ; i++)
-    ((csCurve*)curves[i])->CacheLightmaps (this, num_polygon+i);
+    ((csCurve*)curves[i])->CacheLightMaps (this, num_polygon+i);
 }
 
 void csThing::Merge (csThing* other)
 {
   int i, j;
-  other->merged = this;
   CHK (int *merge_vertices = new int [other->GetNumVertices ()+1]);
   for (i = 0 ; i < other->GetNumVertices () ; i++)
     merge_vertices[i] = AddVertexSmart (other->Vwor (i));
@@ -520,6 +512,7 @@ void csThing::Merge (csThing* other)
       idx[j] = merge_vertices[idx[j]];
     p->SetParent (this);
     AddPolygon (p);
+    other->polygons[i] = NULL;
   }
 
   CHK (delete [] merge_vertices);
@@ -556,7 +549,8 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
     p = NewPolygon (pt->GetTexture ());
     csNameObject::AddName(*p, pt->GetName());
     if (!pt->GetTexture ()) p->SetTexture (default_texture);
-    p->theDynLight = default_lightx;
+    csLightMapped* pol_lm = p->GetLightMapInfo ();
+    if (pol_lm) pol_lm->SetUniformDynLight (default_lightx);
     int* idx = pt->GetVerticesIdx ();
     for (j = 0 ; j < pt->GetNumVertices () ; j++)
       p->AddVertex (merge_vertices[idx[j]]);
@@ -565,11 +559,16 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
       (pt->IsMipmapped () ? CS_POLY_MIPMAP : 0) |
       (pt->UseFlatColor () ? CS_POLY_FLATSHADING : 0));
     if (pt->GetUVCoords ())
+    {
+      p->SetTextureType (POLYTXT_GOURAUD);
+      csGouraudShaded* gs = p->GetGouraudInfo ();
+      gs->Setup (p->GetNumVertices ());
       for (j = 0 ; j < pt->GetNumVertices () ; j++)
-        p->SetUV (j, pt->GetUVCoords ()[j].x, pt->GetUVCoords ()[j].y);
+        gs->SetUV (j, pt->GetUVCoords ()[j].x, pt->GetUVCoords ()[j].y);
+      if (pt->UseGouraud ())
+        gs->EnableGouraud (true);
+    }
     p->SetTextureSpace (pt->GetTextureMatrix (), pt->GetTextureVector ());
-    if (pt->UseGouraud ())
-      p->SetColor (0, 0, 0, 0);
   }
 
   for (i=0;i< tpl->GetNumCurveVertices();i++)

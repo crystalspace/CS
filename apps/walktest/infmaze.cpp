@@ -241,9 +241,9 @@ bool InfPortalCS::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon, c
     SetSector (s);
     infinite_maze->random_loose_portals (x2, y2, z2);
     s->Prepare ();
-    s->InitLightmaps (false);
+    s->InitLightMaps (false);
     s->ShineLights ();
-    s->CreateLightmaps (rview.g3d);
+    s->CreateLightMaps (rview.g3d);
     while (lviews)
     {
       int old_draw_busy = s->draw_busy;

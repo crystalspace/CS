@@ -61,9 +61,9 @@ private:
   ///
   void Alloc (csLight* light, int w, int h, int lms);
   ///
-  void MipmapLightmap (int w, int h, int lms, csShadowMap* source, int w2, int h2, int lms2);
+  void MipmapLightMap (int w, int h, int lms, csShadowMap* source, int w2, int h2, int lms2);
   ///
-  void CopyLightmap (csShadowMap* source, int size);
+  void CopyLightMap (csShadowMap* source, int size);
 };
 
 /**
@@ -156,7 +156,7 @@ private:
   /// Size of the lightmap.
   long lm_size;
 
-  /// Lightmap dims (possibly po2 depending on used 3D driver).
+  /// LightMap dims (possibly po2 depending on used 3D driver).
   int lwidth, lheight;
   /// Original lightmap dims (non-po2 possibly).
   int rwidth, rheight;
@@ -231,10 +231,10 @@ public:
   /**
    * Allocate this lightmap by mipmapping the given source lightmap.
    */
-  void MipmapLightmap (int w, int h, int lms, csLightMap* source, int w2, int h2, int lms2);
+  void MipmapLightMap (int w, int h, int lms, csLightMap* source, int w2, int h2, int lms2);
 
   /// Copy a lightmap.
-  void CopyLightmap (csLightMap* source);
+  void CopyLightMap (csLightMap* source);
 
   /**
    * Create a ShadowMap for this LightMap.

@@ -74,12 +74,6 @@ private:
   /// If convex, this holds the index to the center vertex.
   int center_idx;
 
-  /**
-   * If not NULL this Thing has been merged into the given Thing.
-   * In this case this Thing is not responsible for cleaning it's own polygons.
-   */
-  csThing* merged;
-
 public:
   /**
    * Create an empty thing.
@@ -113,29 +107,8 @@ public:
   int GetCenter () { return center_idx; }
 
   /**
-   * Return true if this Thing has been merged into another Thing.
-   * This happens when there is a static BSP associated with the
-   * parent sector which holds all non-moving things.
-   */
-  bool IsMerged () { return !!merged; }
-
-  /**
-   * Set merged to true. This happens if the polygons of the thing
-   * are added to a BSP tree. The polygons in this things are unmodified
-   * though.
-   */
-  void SetMerged () { merged = (csThing*)1; }
-
-  /**
-   * Merge the given Thing into this one. The other Thing is marked
-   * as being merged. Note that the polygons of the other Thing will
-   * not be copied but only a reference is copied. This Thing will
-   * become the new owner of the polygons and the other Thing may
-   * not remove them.<br>
-   * Warning! All polygons from the other Thing will be modified so that
-   * they refer to this new Thing. This means that the vertex array
-   * of the original Thing will not be used anymore (@@@ Maybe clean this
-   * up?).<br>
+   * Merge the given Thing into this one. The other polygons are removed
+   * from the other thing so that it is ready to be removed.
    * Warning! All Things are merged in world space coordinates and not
    * in object space as one could expect!
    */
@@ -191,7 +164,7 @@ public:
    * Create all mipmaps for all textures for all polygons of
    * this thing.
    */
-  void CreateLightmaps (IGraphics3D* g3d);
+  void CreateLightMaps (IGraphics3D* g3d);
 
   /**
    * Draw this thing given a view and transformation.
@@ -212,7 +185,7 @@ public:
   /**
    * Init the lightmaps for all polygons in this thing.
    */
-  void InitLightmaps (bool do_cache = true);
+  void InitLightMaps (bool do_cache = true);
 
   /**
    * Update all lighting on this thing for the given light.
@@ -222,7 +195,7 @@ public:
   /**
    * Cache the lightmaps for all polygons in this thing.
    */
-  void CacheLightmaps ();
+  void CacheLightMaps ();
 
   /**
    * Intersects world-space sphere with polygons of this set. Return

@@ -26,7 +26,6 @@
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
-#include "csengine/bsppol.h"
 #include "csengine/dynlight.h"
 #include "csengine/light.h"
 #include "csengine/camera.h"
@@ -54,9 +53,6 @@ bool csSector::do_radiosity = false;
 
 //---------------------------------------------------------------------------
 
-// @@@ Experimental: does not work yet. Do not enable this!
-#define USE_CONTAINER 0
-
 CSOBJTYPE_IMPL(csSector,csPolygonSet);
 
 csSector::csSector () : csPolygonSet ()
@@ -67,7 +63,6 @@ csSector::csSector () : csPolygonSet ()
   level_r = level_g = level_b = 0;
   static_bsp = NULL;
   static_thing = NULL;
-  static_container = NULL;
 }
 
 csSector::~csSector ()
@@ -79,8 +74,6 @@ csSector::~csSector ()
     first_thing = n;
   }
   CHK (delete static_bsp);
-  CHK (delete static_thing);
-  CHK (delete static_container);
 
   // The sprites are not deleted here because they can occur in more
   // than one sector at the same time. Therefor we first clear the list.
@@ -119,43 +112,31 @@ void csSector::UseStaticBSP ()
   CHK (delete bsp); bsp = NULL;
   CHK (delete static_bsp); static_bsp = NULL;
 
-#if USE_CONTAINER
-  CHK (delete static_container);
-  CHK (static_container = new csPolygonBspContainer ());
-
-  csThing* sp = first_thing;
-  while (sp)
-  {
-    if (!sp->CheckFlags (CS_ENTITY_MOVEABLE) && !sp->GetFog ().enabled)
-    {
-      int i;
-      for (i = 0 ; i < sp->GetNumPolygons () ; i++)
-      {
-	CHK (csPolygonBsp* pol = new csPolygonBsp ((csPolygon3D*)(sp->GetPolygon (i))));
-        static_container->AddPolygon (pol);
-      }
-      sp->SetMerged ();
-    }
-    sp = (csThing*)(sp->GetNext ());
-  }
-
-  CHK (static_bsp = new csBspTree (static_container));
-#else
-  CHK (delete static_thing);
+  if (static_thing) return;
   CHK (static_thing = new csThing ());
   csNameObject::AddName (*static_thing, "__static__");
 
   static_thing->SetSector (this);
   csThing* sp = first_thing;
+  csThing* sp_prev = NULL;
   while (sp)
   {
+    csThing* n = (csThing*)(sp->GetNext ());
     if (!sp->CheckFlags (CS_ENTITY_MOVEABLE) && !sp->GetFog ().enabled)
-    	static_thing->Merge (sp);
-    sp = (csThing*)(sp->GetNext ());
+    {
+      static_thing->Merge (sp);
+      CHK (delete sp);
+      if (sp_prev) sp_prev->SetNext (n);
+      else first_thing = n;
+    }
+    else sp_prev = sp;
+    sp = n;
   }
+  static_thing->SetNext (first_thing);
+  first_thing = static_thing;
+  static_thing->CreateBoundingBox ();
 
   CHK (static_bsp = new csBspTree (static_thing));
-#endif
 }
 
 csPolygon3D* csSector::HitBeam (csVector3& start, csVector3& end)
@@ -193,19 +174,19 @@ csPolygon3D* csSector::HitBeam (csVector3& start, csVector3& end)
   else return NULL;
 }
 
-void csSector::CreateLightmaps (IGraphics3D* g3d)
+void csSector::CreateLightMaps (IGraphics3D* g3d)
 {
   int i;
   for (i = 0 ; i < num_polygon ; i++)
   {
     csPolygon3D* p = (csPolygon3D*)polygons[i];
-    p->CreateLightmaps (g3d);
+    p->CreateLightMaps (g3d);
   }
 
   csThing* sp = first_thing;
   while (sp)
   {
-    sp->CreateLightmaps (g3d);
+    sp->CreateLightMaps (g3d);
     sp = (csThing*)(sp->GetNext ());
   }
 }
@@ -319,7 +300,8 @@ void* csSector::TestQueuePolygons (csPolygonParentInt* pi, csPolygonInt** polygo
   return NULL;
 }
 
-void csSector::DrawPolygonsFromQueue (csPolygon2DQueue* queue, csRenderView* rview)
+void csSector::DrawPolygonsFromQueue (csPolygon2DQueue* queue,
+	csRenderView* rview)
 {
   csPolygon3D* poly3d;
   csPolygon2D* poly2d;
@@ -385,14 +367,6 @@ void csSector::Draw (csRenderView& rview)
     // @@@ We should make a pool for queues. The number of queues allocated
     // at the same time is bounded by the recursion through portals. So a
     // pool would be ideal.
-#if USE_CONTAINER
-    if (static_container && do_things)
-    {
-      CHK (poly_queue = new csPolygon2DQueue (GetNumPolygons ()+
-      	static_container->GetNumPolygons ()));
-      static_bsp->Front2Back (rview.GetOrigin (), &TestQueuePolygons2, (void*)&rview);
-    }
-#else
     if (static_thing && do_things)
     {
       CHK (poly_queue = new csPolygon2DQueue (GetNumPolygons ()+
@@ -400,7 +374,6 @@ void csSector::Draw (csRenderView& rview)
       static_thing->UpdateTransformation (rview);
       static_bsp->Front2Back (rview.GetOrigin (), &TestQueuePolygons, (void*)&rview);
     }
-#endif
     else
     {
       CHK (poly_queue = new csPolygon2DQueue (GetNumPolygons ()));
@@ -415,18 +388,11 @@ void csSector::Draw (csRenderView& rview)
   else
   {
     DrawPolygons ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&rview);
-#if USE_CONTAINER
-    if (static_container && do_things)
-    {
-      static_bsp->Back2Front (rview.GetOrigin (), &DrawPolygons2, (void*)&rview);
-    }
-#else
     if (static_thing && do_things)
     {
       static_thing->UpdateTransformation (rview);
       static_bsp->Back2Front (rview.GetOrigin (), &DrawPolygons, (void*)&rview);
     }
-#endif
   }
 
   if (do_things)
@@ -451,33 +417,18 @@ void csSector::Draw (csRenderView& rview)
     int sort_idx = 0;
     int i;
     csThing* sp = first_thing;
-#if USE_CONTAINER
-    if (static_container)
-    {
-      // Here we have a static bsp. So we draw all csThings using the
-      // Z-buffer and put all foggy csThings in the sort_list.
-      while (sp)
-      {
-        if (!sp->IsMerged () && sp != static_thing)
-          if (sp->GetFog ().enabled) sort_list[sort_idx++] = sp;
-          else sp->Draw (rview);
-        sp = (csThing*)(sp->GetNext ());
-      }
-    }
-#else
     if (static_thing)
     {
       // Here we have a static bsp. So we draw all csThings using the
       // Z-buffer and put all foggy csThings in the sort_list.
       while (sp)
       {
-        if (!sp->IsMerged () && sp != static_thing)
+        if (sp != static_thing)
           if (sp->GetFog ().enabled) sort_list[sort_idx++] = sp;
           else sp->Draw (rview);
         sp = (csThing*)(sp->GetNext ());
       }
     }
-#endif
     else
     {
       // Here we don't have a static bsp. In this case we put all
@@ -505,27 +456,13 @@ void csSector::Draw (csRenderView& rview)
       {
         sp = sort_list[i];
         if (sp->GetFog ().enabled) sp->DrawFoggy (rview);
-        else if (!sp->IsMerged () && sp->CheckFlags (CS_ENTITY_CONVEX))
+        else if (sp->CheckFlags (CS_ENTITY_CONVEX))
           sp->Draw (rview, false);
       }
     }
 
     // If there is no static bsp then we still need to draw the remaining
     // non-convex csThings.
-#if USE_CONTAINER
-    if (!static_container)
-    {
-      sp = first_thing;
-      while (sp)
-      {
-        // @@@ Note from Jorrit: temporarily disabled the option of Z sorting
-	// convex objects. (see note above).
-        // @@@ if (!sp->CheckFlags (CS_ENTITY_CONVEX) && !sp->GetFog ().enabled) sp->Draw (rview);
-        if (!sp->GetFog ().enabled) sp->Draw (rview);
-        sp = (csThing*)(sp->GetNext ());
-      }
-    }
-#else
     if (!static_thing)
     {
       sp = first_thing;
@@ -538,7 +475,6 @@ void csSector::Draw (csRenderView& rview)
         sp = (csThing*)(sp->GetNext ());
       }
     }
-#endif
 
     // Draw sprites.
     // To correctly support sprites in multiple sectors we only draw a
@@ -684,6 +620,7 @@ void* csSector::CalculateLightingPolygons (csPolygonParentInt*, csPolygonInt** p
   for (i = 0 ; i < num ; i++)
   {
     p = (csPolygon3D*)polygon[i];
+    if (p->GetUnsplitPolygon ()) p = p->GetUnsplitPolygon ();
     p->CamUpdate ();
     p->CalculateLighting (lview);
   }
@@ -707,6 +644,7 @@ csThing** csSector::GetVisibleThings (csLightView& lview, int& num_things)
   num_things = 0;
   sp = first_thing;
   while (sp) { num_things++; sp = (csThing*)(sp->GetNext ()); }
+  if (!num_things) { return NULL; }
   CHK (csThing** visible_things = new csThing* [num_things]);
 
   num_things = 0;
@@ -839,17 +777,10 @@ void csSector::CalculateLighting (csLightView& lview)
     CalculateLightingPolygons ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&lview);
 
   // Calculate lighting for all things in the current sector.
-#if !USE_CONTAINER
-  if (static_thing) static_thing->CalculateLighting (lview);
-#endif
   for (i = 0 ; i < num_visible_things ; i++)
   {
     sp = visible_things[i];
-#if USE_CONTAINER
     sp->CalculateLighting (lview);
-#else
-    if (!sp->IsMerged ()) sp->CalculateLighting (lview);
-#endif
   }
   CHK (delete [] visible_things);
 
@@ -870,31 +801,30 @@ void csSector::CalculateLighting (csLightView& lview)
   draw_busy--;
 }
 
-void csSector::InitLightmaps (bool do_cache)
+void csSector::InitLightMaps (bool do_cache)
 {
   int i;
   for (i = 0 ; i < num_polygon ; i++)
-    ((csPolygon3D*)polygons[i])->InitLightmaps (this, do_cache, i);
+    ((csPolygon3D*)polygons[i])->InitLightMaps (this, do_cache, i);
 
   csThing* sp = first_thing;
   while (sp)
   {
-    sp->InitLightmaps (do_cache);
+    sp->InitLightMaps (do_cache);
     sp = (csThing*)(sp->GetNext ());
   }
 }
 
-void csSector::CacheLightmaps ()
+void csSector::CacheLightMaps ()
 {
   int i;
   for (i = 0 ; i < num_polygon ; i++)
-    ((csPolygon3D*)polygons[i])->CacheLightmaps (this, i);
+    ((csPolygon3D*)polygons[i])->CacheLightMaps (this, i);
 
   csThing* sp = first_thing;
   while (sp)
   {
-    if (strcmp (csNameObject::GetName(*sp), "__static__") != 0) 
-      sp->CacheLightmaps ();
+    sp->CacheLightMaps ();
     sp = (csThing*)(sp->GetNext ());
   }
 }

@@ -359,6 +359,18 @@ void Blocks::add_cube_template ()
   world->thing_templates.Push (cube_tmpl);
 }
 
+void set_uv (csPolygon3D* p, float u1, float v1, float u2, float v2,
+	float u3, float v3)
+{
+  p->SetTextureType (POLYTXT_GOURAUD);
+  csGouraudShaded* gs = p->GetGouraudInfo ();
+  gs->Setup (p->GetNumVertices ());
+  gs->EnableGouraud (true);
+  gs->SetUV (0, u1, v1);
+  gs->SetUV (1, u2, v2);
+  gs->SetUV (2, u3, v3);
+}
+
 void Blocks::add_cube (int dx, int dy, int dz, int x, int y, int z)
 {
   csThing* cube;
@@ -371,26 +383,26 @@ void Blocks::add_cube (int dx, int dy, int dz, int x, int y, int z)
 
   csPolygon3D* p;
 
-  p = cube->GetPolygon ("f1"); p->SetUV (0, 0, 0); p->SetUV (1, 1, 0); p->SetUV (2, 1, 1);
-  p = cube->GetPolygon ("f2"); p->SetUV (0, 0, 0); p->SetUV (1, 1, 1); p->SetUV (2, 0, 1);
-  p = cube->GetPolygon ("t1"); p->SetUV (0, 0, 0); p->SetUV (1, 1, 0); p->SetUV (2, 1, 1);
-  p = cube->GetPolygon ("t2"); p->SetUV (0, 0, 0); p->SetUV (1, 1, 1); p->SetUV (2, 0, 1);
-  p = cube->GetPolygon ("b1"); p->SetUV (0, 0, 0); p->SetUV (1, 1, 0); p->SetUV (2, 1, 1);
-  p = cube->GetPolygon ("b2"); p->SetUV (0, 0, 0); p->SetUV (1, 1, 1); p->SetUV (2, 0, 1);
-  p = cube->GetPolygon ("d1"); p->SetUV (0, 0, 0); p->SetUV (1, 1, 0); p->SetUV (2, 1, 1);
-  p = cube->GetPolygon ("d2"); p->SetUV (0, 0, 0); p->SetUV (1, 1, 1); p->SetUV (2, 0, 1);
-  p = cube->GetPolygon ("l1"); p->SetUV (0, 0, 0); p->SetUV (1, 1, 0); p->SetUV (2, 1, 1);
-  p = cube->GetPolygon ("l2"); p->SetUV (0, 0, 0); p->SetUV (1, 1, 1); p->SetUV (2, 0, 1);
-  p = cube->GetPolygon ("r1"); p->SetUV (0, 0, 0); p->SetUV (1, 1, 0); p->SetUV (2, 1, 1);
-  p = cube->GetPolygon ("r2"); p->SetUV (0, 0, 0); p->SetUV (1, 1, 1); p->SetUV (2, 0, 1);
+  p = cube->GetPolygon ("f1"); set_uv (p, 0, 0, 1, 0, 1, 1);
+  p = cube->GetPolygon ("f2"); set_uv (p, 0, 0, 1, 1, 0, 1);
+  p = cube->GetPolygon ("t1"); set_uv (p, 0, 0, 1, 0, 1, 1);
+  p = cube->GetPolygon ("t2"); set_uv (p, 0, 0, 1, 1, 0, 1);
+  p = cube->GetPolygon ("b1"); set_uv (p, 0, 0, 1, 0, 1, 1);
+  p = cube->GetPolygon ("b2"); set_uv (p, 0, 0, 1, 1, 0, 1);
+  p = cube->GetPolygon ("d1"); set_uv (p, 0, 0, 1, 0, 1, 1);
+  p = cube->GetPolygon ("d2"); set_uv (p, 0, 0, 1, 1, 0, 1);
+  p = cube->GetPolygon ("l1"); set_uv (p, 0, 0, 1, 0, 1, 1);
+  p = cube->GetPolygon ("l2"); set_uv (p, 0, 0, 1, 1, 0, 1);
+  p = cube->GetPolygon ("r1"); set_uv (p, 0, 0, 1, 0, 1, 1);
+  p = cube->GetPolygon ("r2"); set_uv (p, 0, 0, 1, 1, 0, 1);
 
   room->AddThing (cube);
   csVector3 v ((x-CUBE_DIM/2)*BLOCK_DIM, z*BLOCK_DIM+1, (y-CUBE_DIM/2)*BLOCK_DIM);
   cube->SetMove (room, v);
   cube->Transform ();
-  cube->InitLightmaps (false);
+  cube->InitLightMaps (false);
   room->ShineLights (cube);
-  cube->CreateLightmaps (Gfx3D);
+  cube->CreateLightMaps (Gfx3D);
   cube_info[num_cubes].thing = cube;
   cube_info[num_cubes].dx = dx;
   cube_info[num_cubes].dy = dy;
@@ -625,13 +637,13 @@ bool Blocks::check_new_shape_rotation (const csMatrix3& rot)
 void reset_vertex_colors (csThing* th)
 {
   //@@@PROBABLY NOT NEEDED ANYMORE. TEST THIS!
-  int i, j;
-  for (i = 0 ; i < th->GetNumPolygons () ; i++)
-  {
-    csPolygon3D* p = (csPolygon3D*)(th->GetPolygon (i));
-    for (j = 0 ; j < 3 ; j++)
-        p->SetColor (j, 0, 0, 0);
-  }
+  //int i, j;
+  //for (i = 0 ; i < th->GetNumPolygons () ; i++)
+  //{
+    //csPolygon3D* p = (csPolygon3D*)(th->GetPolygon (i));
+    //for (j = 0 ; j < 3 ; j++)
+      //p->GetGouraudInfo ()->SetColor (j, 0, 0, 0);
+  //}
 }
 
 void Blocks::move_cubes (long elapsed_time)

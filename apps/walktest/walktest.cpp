@@ -761,7 +761,7 @@ void WalkTest::CreateColliders (void)
   p->AddVertex (0); p->AddVertex (4);
   p->AddVertex (7); p->AddVertex (3);
 
-  this->body=new csCollider(pb);
+  CHK (this->body=new csCollider(pb));
 
   CHK (csPolygonSet *pl = new csPolygonSet());
 
@@ -862,25 +862,6 @@ int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
   csThing *tp = sp->GetFirstThing ();
   while (tp)
   {
-    if (!tp->IsMerged ())
-    {
-      // TODO, if and when Things can move, their transform must be passed in.
-      csCollider::numHits=0;
-      csCollider::CollidePair(c,csColliderPointerObject::GetCollider(*tp),cdt);
-      hit += csCollider::numHits;
-
-      for (int i=0 ; i<csCollider::numHits ; i++)
-        our_cd_contact[num_our_cd++] = CD_contact[i];
-
-      if (csCollider::firstHit && hit)
-        return 1;
-    }
-    tp = (csThing*)(tp->GetNext ());
-    // TODO, should test which one is the closest.
-  }
-  tp = sp->GetStaticThing ();
-  if (tp)
-  {
     // TODO, if and when Things can move, their transform must be passed in.
     csCollider::numHits=0;
     csCollider::CollidePair(c,csColliderPointerObject::GetCollider(*tp),cdt);
@@ -891,6 +872,8 @@ int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
 
     if (csCollider::firstHit && hit)
       return 1;
+    tp = (csThing*)(tp->GetNext ());
+    // TODO, should test which one is the closest.
   }
 
   return hit;
@@ -1266,18 +1249,9 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
     csThing* tp = sp->GetFirstThing ();
     while (tp)
     {
-      if (!tp->IsMerged ())
-      {
-        CHK(csCollider* pCollider = new csCollider(tp));
-        csColliderPointerObject::SetCollider(*tp, pCollider, true);
-      }
-      tp = (csThing*)(tp->GetNext ());
-    }
-    tp = sp->GetStaticThing ();
-    if (tp)
-    {
       CHK(csCollider* pCollider = new csCollider(tp));
       csColliderPointerObject::SetCollider(*tp, pCollider, true);
+      tp = (csThing*)(tp->GetNext ());
     }
   }
   // Initialize all sprites for collision detection.
@@ -1603,3 +1577,17 @@ int main (int argc, char* argv[])
 
   return 1;
 }
+
+#if 0
+void* operator new (size_t s)
+{
+  if (s <= 0)
+  {
+    printf ("ILLEGAL %d!\n", s);
+    int* a = 0, b = 0;
+    *a = b;
+  }
+  return (void*)malloc (s);
+}
+#endif
+

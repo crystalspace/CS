@@ -57,9 +57,10 @@ STDMETHODIMP IPolygon3D::GetParent(IPolygonSet** retval)
 STDMETHODIMP IPolygon3D::GetLightMap(ILightMap** retval)
 {
 	METHOD_PROLOGUE( csPolygon3D, Polygon3D );
-	if (pThis->lightmap)
+	csLightMapped* lmi = pThis->GetLightMapInfo ();
+	if (lmi && lmi->GetLightMap ())
 	{
-	  *retval = GetILightMapFromcsLightMap (pThis->lightmap);
+	  *retval = GetILightMapFromcsLightMap (lmi->GetLightMap ());
 	  (*retval)->AddRef();
 	}
 	else *retval = NULL;
@@ -83,8 +84,14 @@ STDMETHODIMP IPolygon3D::UsesMipMaps(void)
 STDMETHODIMP IPolygon3D::GetTexture(int mipmap, IPolygonTexture** retval)
 {
 	METHOD_PROLOGUE( csPolygon3D, Polygon3D );
-	*retval = GetIPolygonTextureFromcsPolyTexture(pThis->GetPolyTex (mipmap));
-	(*retval)->AddRef();
+	csLightMapped* lmi = pThis->GetLightMapInfo ();
+	if (lmi)
+	{
+	  *retval = GetIPolygonTextureFromcsPolyTexture
+	  	(lmi->GetPolyTex (mipmap));
+	  (*retval)->AddRef();
+	}
+	else *retval = NULL;
 
 	return S_OK;
 }

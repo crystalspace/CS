@@ -157,7 +157,7 @@ void csCurve::Normal (csVector3& /*vec*/, double /*u*/, double /*v*/)
 
 #define CURVE_LM_SIZE 32
 
-void csCurve::InitLightmaps (csPolygonSet* owner, bool do_cache, int index)
+void csCurve::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
 {
   if (!IsLightable ()) return;
   CHK (lightmap = new csLightMap ());
@@ -241,7 +241,7 @@ void csCurve::CalculateLighting (csLightView& lview)
   }
 }
 
-void csCurve::CacheLightmaps (csPolygonSet* owner, int index)
+void csCurve::CacheLightMaps (csPolygonSet* owner, int index)
 {
   if (!lightmap) return;
   if (!lightmap_up_to_date)

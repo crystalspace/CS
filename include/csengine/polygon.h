@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -34,6 +34,7 @@ class CLights;
 class csTextureHandle;
 class csPolyPlane;
 class csPolygon2D;
+class csPolygon3D;
 class csLightMap;
 class csLightPatch;
 class Dumper;
@@ -61,6 +62,249 @@ interface IGraphics3D;
  */
 #define CS_POLY_FLATSHADING 4
 
+// Types of texturing.
+#define POLYTXT_LIGHTMAP 1
+#define POLYTXT_GOURAUD 2
+
+/**
+ * Structure containing lighting information valid
+ * for all types of polygons.
+ */
+struct csPolygonLightInfo
+{
+  /**
+   * This field describes how the light hitting this polygon is affected
+   * by the angle by which the beam hits the polygon. If this value is
+   * equal to -1 (default) then the global csPolyTexture::cfg_cosinus_factor
+   * will be used.
+   */
+  float cosinus_factor;
+
+  /**
+   * Flat shading color.
+   */
+  csColor flat_color;
+
+  /**
+   * List of light patches for this polygon.
+   */
+  csLightPatch* lightpatches;
+
+  /**
+   * True if we have a dirty polygon due to dynamic lighting.
+   */
+  bool dyn_dirty;
+};
+
+/**
+ * Kind of texturing that is used for a 3D polygon.
+ * This is the base class with subclasses depending on the kind
+ * of texturing that is used for a polygon.
+ */
+class csPolygonTextureType
+{
+  friend class csPolygon3D;
+
+public:
+  /// Destructor
+  virtual ~csPolygonTextureType () { }
+
+  /// Return a type for the kind of texturing used.
+  virtual int GetTextureType () = 0;
+};
+
+/**
+ * Texture class for lightmapped polygons.
+ */
+class csLightMapped : public csPolygonTextureType
+{
+  friend class csPolygon3D;
+
+private:
+  /**
+   * The textures and lightmaps for the four mipmap levels.
+   * The transformed texture for this polygon.
+   */
+  csPolyTexture* tex;
+  /// A mipmapped texture: one step further.
+  csPolyTexture* tex1;
+  /// A mipmapped texture: two steps further.
+  csPolyTexture* tex2;
+  /// A mipmapped texture: three steps further.
+  csPolyTexture* tex3;
+  /// The light-map for this polygon.
+  csLightMap* lightmap;
+  /// The light-map for this polygon (mipmap level 1)
+  csLightMap* lightmap1;
+  /// The light-map for this polygon (mipmap level 2)
+  csLightMap* lightmap2;
+  /// The light-map for this polygon (mipmap level 3)
+  csLightMap* lightmap3;
+
+  /**
+   * This bool indicates if the lightmap is up-to-date (read from the
+   * cache). If set to false the polygon still needs to be recalculated.
+   */
+  bool lightmap_up_to_date;
+
+  /**
+   * A uniform dynamic light for this poly.
+   * This is used for flashing the polygon in a uniform way
+   * (unlike positional dynamic lights).
+   */
+  CLights* theDynLight;
+
+private:
+  /// Constructor.
+  csLightMapped ();
+
+  /// Destructor.
+  virtual ~csLightMapped ();
+
+public:
+  /// Setup for the given polygon and texture.
+  void Setup (csPolygon3D* poly3d, csTextureHandle* txtMM);
+
+  /// Return a type for the kind of texturing used.
+  virtual int GetTextureType () { return POLYTXT_LIGHTMAP; }
+
+  /**
+   * Get the polytexture (lighted texture) with a given mipmap level (0, 1, 2 or 3).
+   */
+  csPolyTexture* GetPolyTex (int mipmap);
+
+  /**
+   * Get the lightmap belonging with this polygon.
+   */
+  csLightMap* GetLightMap () { return lightmap; }
+
+  /**
+   * Set the uniform dynamic light.
+   */
+  void SetUniformDynLight (CLights* l) { theDynLight = l; }
+};
+
+/**
+ * Lighting class for gouraud shaded polygons.
+ */
+class csGouraudShaded : public csPolygonTextureType
+{
+  friend class csPolygon3D;
+
+private:
+  /**
+   * If the following arrays is non-NULL then this polygon is drawn
+   * using a different technique (all previous mipmap and lightmap stuff
+   * is ignored). The polygon will be drawn with perspective incorrect
+   * texture mapping and (in the future) Gouroud shading. The following
+   * array specifies the u,v coordinates for every vertex of the polygon.
+   */
+  csVector2* uv_coords;
+
+  /**
+   * If uv_coords is given then this can be an optional array of vertex
+   * colors. If this array is given then gouraud shading is used. Otherwise
+   * flatshading.
+   */
+  csColor* colors;
+
+  /**
+   * This array contains the static colors. It is used in combination with
+   * 'colors'.  'colors=static_colors+dynamic_lights'.
+   */
+  csColor* static_colors;
+
+  /// Number of vertices.
+  int num_vertices;
+
+private:
+  /// Constructor.
+  csGouraudShaded ();
+
+  /// Destructor.
+  virtual ~csGouraudShaded ();
+
+public:
+  /// Return a type for the kind of texturing used.
+  virtual int GetTextureType () { return POLYTXT_GOURAUD; }
+
+  /**
+   * Setup this lighting structure with the rignt number of
+   * vertices. If use_gouraud is true we will also use gouraud shading.
+   * This function is guaranteed not to do anything if the number of
+   * vertices is already correct.
+   */
+  void Setup (int num_vertices);
+
+  /**
+   * Enable/disable gouraud.
+   * This function is guaranteed not to do anything if gouraud shading
+   * was already enabled and it is enabled again.
+   */
+  void EnableGouraud (bool g);
+
+  /**
+   * Set an (u,v) texture coordinate for the specified vertex
+   * of this polygon. This function may only be called after all
+   * vertices have been added. As soon as this function is used
+   * this polygon will be rendered using a different technique
+   * (perspective incorrect texture mapping and Gouroud shading).
+   * This is useful for triangulated objects for which the triangles
+   * are very small and also for drawing very far away polygons
+   * for which perspective correctness is not needed (sky polygons for
+   * example).
+   */
+  void SetUV (int i, float u, float v);
+
+  /**
+   * Clear all (u,v) and color information.
+   */
+  void Clear ();
+
+  /// Get the pointer to the vertex uv coordinates.
+  csVector2* GetUVCoords () { return uv_coords; }
+
+  /// Get the pointer to the vertex color table.
+  csColor* GetColors () { return colors; }
+
+  /// Get the pointer to the static vertex color table.
+  csColor* GetStaticColors () { return static_colors; }
+
+  /**
+   * Add a color to a static array color entry.
+   */
+  void AddColor (int i, float r, float g, float b);
+
+  /**
+   * Add a color to a dynamic array color entry.
+   */
+  void AddDynamicColor (int i, float r, float g, float b);
+
+  /**
+   * Set a color in the dynamic array.
+   */
+  void SetDynamicColor (int i, float r, float g, float b);
+
+  /**
+   * Reset a dynamic color to the static values.
+   */
+  void ResetDynamicColor (int i);
+
+  /**
+   * Set a color in the dynamic array.
+   */
+  void SetDynamicColor (int i, csColor& c) { SetDynamicColor (i, c.red, c.green, c.blue); }
+
+  /**
+   * Set a color in the static array.
+   */
+  void SetColor (int i, float r, float g, float b);
+
+  /**
+   * Set a color in the static array.
+   */
+  void SetColor (int i, csColor& c) { SetColor (i, c.red, c.green, c.blue); }
+};
 
 /**
  * This is our main 3D polygon class. Polygons are used to construct the
@@ -74,7 +318,8 @@ interface IGraphics3D;
  * Polygons have a texture and lie on a plane. The plane does not
  * define the orientation of the polygon but is derived from it. The plane
  * does define how the texture is scaled and translated accross the surface
- * of the polygon.
+ * of the polygon (in case we are talking about lightmapped polygons, gouraud
+ * shaded polygons have u,v coordinates at every vertex).
  * Several planes can be shared for different polygons. As a result of this
  * their textures will be correctly aligned.<p>
  *
@@ -82,19 +327,11 @@ interface IGraphics3D;
  * A portal-polygon is a see-through polygon that defines a view to another
  * sector. Normally the texture for a portal-polygon is not drawn unless
  * the texture is filtered in which case it is drawn on top of the other
- * sector.<p>
+ * sector.
  */
 class csPolygon3D : public csObject, public csPolygonInt
 {
   friend class Dumper;
-
-public:
-  /**
-   * A uniform dynamic light for this poly.
-   * This is used for flashing the polygon in a uniform way
-   * (unlike positional dynamic lights).
-   */
-  CLights* theDynLight;
 
 private:
   /// A table of indices into the vertices of the parent csPolygonSet (container).
@@ -148,24 +385,15 @@ private:
   csTextureHandle* txtMM;
 
   /**
-   * The textures and lightmaps for the four mipmap levels.
-   * The transformed texture for this polygon.
+   * General lighting information for this polygon.
    */
-  csPolyTexture* tex;
-  /// A mipmapped texture: one step further.
-  csPolyTexture* tex1;
-  /// A mipmapped texture: two steps further.
-  csPolyTexture* tex2;
-  /// A mipmapped texture: three steps further.
-  csPolyTexture* tex3;
-  /// The light-map for this polygon.
-  csLightMap* lightmap;
-  /// The light-map for this polygon (mipmap level 1)
-  csLightMap* lightmap1;
-  /// The light-map for this polygon (mipmap level 2)
-  csLightMap* lightmap2;
-  /// The light-map for this polygon (mipmap level 3)
-  csLightMap* lightmap3;
+  csPolygonLightInfo light_info;
+
+  /**
+   * Texture type specific information for this polygon. Can be either
+   * csLightMapped or csGouraudShaded.
+   */
+  csPolygonTextureType* txt_info;
 
   /// Set of flags
   ULong flags;
@@ -177,58 +405,12 @@ private:
   bool delete_tex_info;
 
   /**
-   * This bool indicates if the lightmap is up-to-date (read from the
-   * cache). If set to false the polygon still needs to be recalculated.
-   */
-  bool lightmap_up_to_date;
-
-  /**
    * The original polygon. This is useful when a BSP tree
    * has split a polygon. In that case, orig_poly will indicate the
    * original polygon that this polygon was split from.
    * If not split then this will be NULL.
    */
   csPolygon3D* orig_poly;
-
-  /**
-   * This field describes how the light hitting this polygon is affected
-   * by the angle by which the beam hits the polygon. If this value is
-   * equal to -1 (default) then the global csPolyTexture::cfg_cosinus_factor
-   * will be used.
-   */
-  float cosinus_factor;
-
-  /**
-   * List of light patches for this polygon.
-   */
-  csLightPatch* lightpatches;
-
-  /**
-   * Flat shading color.
-   */
-  csColor flat_color;
-
-  /**
-   * If the following arrays is non-NULL then this polygon is drawn
-   * using a different technique (all previous mipmap and lightmap stuff
-   * is ignored). The polygon will be drawn with perspective incorrect
-   * texture mapping and (in the future) Gouroud shading. The following
-   * array specifies the u,v coordinates for every vertex of the polygon.
-   */
-  csVector2* uv_coords;
-
-  /**
-   * If uv_coords is given then this can be an optional array of vertex
-   * colors. If this array is given then gouraud shading is used. Otherwise
-   * flatshading.
-   */
-  csColor* colors;
-
-  /**
-   * This array contains the static colors. It is used in combination with
-   * 'colors'.  'colors=static_colors+dynamic_lights'.
-   */
-  csColor* static_colors;
 
   /**
    * Precompute the plane normal. Normally this is done automatically by
@@ -243,14 +425,6 @@ private:
    * plane normal of the polygon.
    */
   void PlaneNormal (float* yz, float* zx, float* xy);
-
-  /**
-   * Private version of SetUV which is used by SplitWithPlane().
-   * This version is less efficient in that it will not assume that
-   * all vertices have already been added. Instead it will reallocate
-   * the uv_coords buffer every time to extend it with one coordinate.
-   */
-  void SetUV2 (int i, float u, float v);
 
 public:
   /// Option variable: force lightmap recalculation?
@@ -289,6 +463,45 @@ public:
    */
   virtual ~csPolygon3D ();
 
+  /**
+   * Set type of texturing to use for this polygon (one of
+   * the POLYTXT_??? flags). POLYTXT_LIGHTMAP is default.
+   * This function is guaranteed not to do anything if the type is
+   * already correct.
+   */
+  void SetTextureType (int type);
+
+  /**
+   * Short-hand to get the texture type from the csPolygonTextureType
+   * structure.
+   */
+  int GetTextureType () { return txt_info->GetTextureType (); }
+
+  /**
+   * Get the general texture type information structure.
+   */
+  csPolygonTextureType* GetTextureTypeInfo () { return txt_info; }
+
+  /**
+   * This is a conveniance function to get the lightmap information
+   * structure. If this polygon is gouraud shaded it will return NULL.
+   */
+  csLightMapped* GetLightMapInfo ()
+  {
+    if (txt_info->GetTextureType () == POLYTXT_LIGHTMAP) return (csLightMapped*)txt_info;
+    else return NULL;
+  }
+
+  /**
+   * This is a conveniance function to get the gouraud information
+   * structure. If this polygon is lightmapped it will return NULL.
+   */
+  csGouraudShaded* GetGouraudInfo ()
+  {
+    if (txt_info->GetTextureType () == POLYTXT_GOURAUD) return (csGouraudShaded*)txt_info;
+    else return NULL;
+  }
+
   /// Set all flags with the given mask.
   void SetFlags (ULong mask, ULong value) { flags = (flags & ~mask) | value; }
 
@@ -300,7 +513,6 @@ public:
 
   /**
    * Clear the polygon (remove all vertices).
-   * Also remove the uv coordinates and vertex colors if any.
    */
   void Reset ();
 
@@ -335,100 +547,24 @@ public:
    */
   void Finish ();
 
-  /**
-   * Set an (u,v) texture coordinate for the specified vertex
-   * of this polygon. This function may only be called after all
-   * vertices have been added. As soon as this function is used
-   * this polygon will be rendered using a different technique
-   * (perspective incorrect texture mapping and Gouroud shading).
-   * This is useful for triangulated objects for which the triangles
-   * are very small and also for drawing very far away polygons
-   * for which perspective correctness is not needed (sky polygons for
-   * example).
-   */
-  void SetUV (int i, float u, float v);
-
-  /**
-   * Reset the (u,v) texture coordinates which may have been set by set_uv().
-   * After calling this function normal texture mapping (perspective correct) will
-   * be used. Also clear the color table if present.
-   */
-  void ResetUV ();
-
-  /// Get the pointer to the vertex uv coordinates.
-  csVector2* GetUVCoords () { return uv_coords; }
-
-  /// Get the pointer to the vertex color table.
-  csColor* GetColors () { return colors; }
-
-  /// Get the pointer to the static vertex color table.
-  csColor* GetStaticColors () { return static_colors; }
-
   /// Get the flat color for this polygon.
-  csColor& GetFlatColor () { return flat_color; }
+  csColor& GetFlatColor () { return light_info.flat_color; }
 
   /// Set the flat color for this polygon.
   void SetFlatColor (float r, float g, float b)
   {
-    flat_color.red = r;
-    flat_color.green = g;
-    flat_color.blue = b;
+    light_info.flat_color.red = r;
+    light_info.flat_color.green = g;
+    light_info.flat_color.blue = b;
     SetFlags (CS_POLY_FLATSHADING, CS_POLY_FLATSHADING);
   }
 
   /// Set the flat color for this polygon.
   void SetFlatColor (csColor& fc)
-  { flat_color = fc; SetFlags (CS_POLY_FLATSHADING, CS_POLY_FLATSHADING); }
+  { light_info.flat_color = fc; SetFlags (CS_POLY_FLATSHADING, CS_POLY_FLATSHADING); }
 
   /// Reset flat color (i.e. use texturing again).
   void ResetFlatColor () { SetFlags (CS_POLY_FLATSHADING, 0); }
-
-  /**
-   * Add a color to a static array color entry.
-   * If no color information is set then this function will initialize
-   * color information (set everything to black).
-   */
-  void AddColor (int i, float r, float g, float b);
-
-  /**
-   * Add a color to a dynamic array color entry.
-   * If no color information is set then this function will initialize
-   * color information (set everything to black).
-   */
-  void AddDynamicColor (int i, float r, float g, float b);
-
-  /**
-   * Set a color in the dynamic array. Only use after 'set_uv' has been called
-   * for this index. When this function is called for the first time the color
-   * array will be initialized to all black.
-   */
-  void SetDynamicColor (int i, float r, float g, float b);
-
-  /**
-   * Reset a dynamic color to the static values.
-   */
-  void ResetDynamicColor (int i);
-
-  /**
-   * Set a color in the dynamic array. Only use after 'set_uv' has been called for
-   * this index. When this function is called for the first time the color array
-   * will be initialized to all black.
-   */
-  void SetDynamicColor (int i, csColor& c) { SetDynamicColor (i, c.red, c.green, c.blue); }
-
-  /**
-   * Set a color in the static array. Only use after 'set_uv' has been called
-   * for this index. When this function is called for the first time the color
-   * array will be initialized to all black.
-   */
-  void SetColor (int i, float r, float g, float b);
-
-  /**
-   * Set a color in the static array. Only use after 'set_uv' has been called for
-   * this index. When this function is called for the first time the color array
-   * will be initialized to all black.
-   */
-  void SetColor (int i, csColor& c) { SetColor (i, c.red, c.green, c.blue); }
 
   /**
    * If the polygon is a portal this will set the sector
@@ -557,11 +693,6 @@ public:
   ITextureHandle* GetTextureHandle ();
 
   /**
-   * Get the polytexture (lighted texture) with a given mipmap level (0, 1, 2 or 3).
-   */
-  csPolyTexture* GetPolyTex (int mipmap);
-
-  /**
    * Return true if this polygon or the texture it uses is transparent.
    */
   bool IsTransparent ();
@@ -570,13 +701,13 @@ public:
    * Get the cosinus factor. This factor is used
    * for lighting.
    */
-  float GetCosinusFactor () { return cosinus_factor; }
+  float GetCosinusFactor () { return light_info.cosinus_factor; }
 
   /**
    * Set the cosinus factor. This factor is used
    * for lighting.
    */
-  void SetCosinusFactor (float f) { cosinus_factor = f; }
+  void SetCosinusFactor (float f) { light_info.cosinus_factor = f; }
 
   /**
    * Set the alpha transparency value for this polygon (only if
@@ -711,12 +842,10 @@ public:
    * create the first lightmap. This is done by the precalculated
    * lighting process (using CalculateLighting()).
    */
-  void CreateLightmaps (IGraphics3D* g3d);
+  void CreateLightMaps (IGraphics3D* g3d);
 
-  /**
-   * Get the lightmap belonging with this polygon.
-   */
-  csLightMap* GetLightmap () { return orig_poly ? orig_poly->lightmap : lightmap; }
+  /// Return the pointer to the original polygon (before any BSP splits).
+  csPolygon3D* GetUnsplitPolygon () { return orig_poly; }
 
   /**
    * A dynamic light has changed (this can be either an
@@ -724,6 +853,12 @@ public:
    * a real dynamic light change).
    */
   void MakeDirtyDynamicLights ();
+
+  /// Return true if polygon is dirty for dynamic lights.
+  bool IsDirty () { return light_info.dyn_dirty; }
+
+  /// Make clean again.
+  void MakeCleanDynamicLights () { light_info.dyn_dirty = false; }
 
   /**
    * Unlink a light patch from the light patch list.
@@ -740,7 +875,7 @@ public:
   /**
    * Get the list of light patches for this polygon.
    */
-  csLightPatch* GetLightpatches () { return lightpatches; }
+  csLightPatch* GetLightpatches () { return light_info.lightpatches; }
 
   /**
    * Clip a polygon against a frustrum in camera space.
@@ -778,7 +913,7 @@ public:
   /**
    * Initialize the lightmaps for this polygon.
    * Should be called before calling CalculateLighting() and before
-   * calling CacheLightmaps().<p>
+   * calling CacheLightMaps().<p>
    *
    * This function will try to read the lightmap from the
    * cache in the level archive.
@@ -787,7 +922,7 @@ public:
    * Index is the index of this polygon into the containing object. This
    * is used to identify the lightmap data on disk.
    */
-  void InitLightmaps (csPolygonSet* owner, bool do_cache, int index);
+  void InitLightMaps (csPolygonSet* owner, bool do_cache, int index);
 
   /**
    * Fill the lightmap of this polygon according to the given light and
@@ -798,7 +933,7 @@ public:
    * If the lightmaps were cached in the level archive this function will
    * do nothing.
    */
-  void FillLightmap (csLightView& lview);
+  void FillLightMap (csLightView& lview);
 
   /**
    * Update vertex lighting for this polygon. Only works if the
@@ -830,17 +965,17 @@ public:
 
   /**
    * Check visibility of this polygon with the given csLightView
-   * and fill the lightmap if needed (this function calls FillLightmap ()).
+   * and fill the lightmap if needed (this function calls FillLightMap ()).
    * This function will also traverse through a portal if so needed.
    */
   void CalculateLighting (csLightView* lview);
 
   /**
-   * Call after calling InitLightmaps and CalculateLighting to cache
+   * Call after calling InitLightMaps and CalculateLighting to cache
    * the calculated lightmap to the level archive. This function does
    * nothing if the cached lightmap was already up-to-date.
    */
-  void CacheLightmaps (csPolygonSet* owner, int index);
+  void CacheLightMaps (csPolygonSet* owner, int index);
 
   /**
    * Transform the plane of this polygon from object space to world space.
@@ -912,7 +1047,7 @@ public:
    * Intersect world-space segment with this polygon. Return
    * true if it intersects and the intersection point in world coordinates.
    */
-  bool IntersectSegment (const csVector3& start, const csVector3& end, 
+  bool IntersectSegment (const csVector3& start, const csVector3& end,
                           csVector3& isect, float* pr = NULL);
 
   /**

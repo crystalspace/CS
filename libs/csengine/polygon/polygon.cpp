@@ -44,6 +44,266 @@ bool csPolygon3D::do_not_force_recalc = false;
 // Option variable: shadow mipmap size
 int csPolygon3D::def_mipmap_size = 16;
 
+#define SAFETY 1
+
+//---------------------------------------------------------------------------
+
+csLightMapped::csLightMapped ()
+{
+  lightmap = lightmap1 = lightmap2 = lightmap3 = NULL;
+  theDynLight = NULL;
+  CHK (tex = new csPolyTexture ());
+  CHK (tex1 = new csPolyTexture ());
+  CHK (tex2 = new csPolyTexture ());
+  CHK (tex3 = new csPolyTexture ());
+  lightmap_up_to_date = false;
+}
+
+csLightMapped::~csLightMapped ()
+{
+  CHK (delete tex);
+  CHK (delete tex1);
+  CHK (delete tex2);
+  CHK (delete tex3);
+  CHK (delete lightmap);
+  CHK (delete lightmap1);
+  CHK (delete lightmap2);
+  CHK (delete lightmap3);
+  CHK (delete theDynLight);
+}
+
+void csLightMapped::Setup (csPolygon3D* poly3d, csTextureHandle* txtMM)
+{
+  tex->SetPolygon (poly3d);
+  tex1->SetPolygon (poly3d);
+  tex2->SetPolygon (poly3d);
+  tex3->SetPolygon (poly3d);
+
+  tex->SetMipmapLevel (0);
+  tex1->SetMipmapLevel (1);
+  tex2->SetMipmapLevel (2);
+  tex3->SetMipmapLevel (3);
+
+  tex->SetTextureHandle (txtMM->GetTextureHandle ());
+  tex1->SetTextureHandle (txtMM->GetTextureHandle ());
+  tex2->SetTextureHandle (txtMM->GetTextureHandle ());
+  tex3->SetTextureHandle (txtMM->GetTextureHandle ());
+
+  tex->CreateBoundingTextureBox ();
+  tex1->CreateBoundingTextureBox ();
+  tex2->CreateBoundingTextureBox ();
+  tex3->CreateBoundingTextureBox ();
+
+  lightmap = lightmap1 = lightmap2 = lightmap3 = NULL;
+}
+
+csPolyTexture* csLightMapped::GetPolyTex (int mipmap)
+{
+  switch (mipmap)
+  {
+    case 0: return tex;
+    case 1: return tex1;
+    case 2: return tex2;
+    case 3: return tex3;
+  }
+  return tex;
+}
+
+//---------------------------------------------------------------------------
+
+csGouraudShaded::csGouraudShaded ()
+{
+  uv_coords = NULL;
+  colors = NULL;
+  static_colors = NULL;
+  num_vertices = -1;
+}
+
+csGouraudShaded::~csGouraudShaded ()
+{
+  Clear ();
+}
+
+void csGouraudShaded::Clear ()
+{
+  CHK (delete [] uv_coords); uv_coords = NULL;
+  CHK (delete [] colors); colors = NULL;
+  CHK (delete [] static_colors); static_colors = NULL;
+}
+
+void csGouraudShaded::Setup (int num_vertices)
+{
+  if (num_vertices == csGouraudShaded::num_vertices) return;
+  bool use_gouraud = (colors || static_colors);
+  Clear ();
+  csGouraudShaded::num_vertices = num_vertices;
+  CHK (uv_coords = new csVector2 [num_vertices]);
+  if (use_gouraud)
+  {
+    CHK (colors = new csColor [num_vertices]);
+    CHK (static_colors = new csColor [num_vertices]);
+    int j;
+    for (j = 0 ; j < num_vertices ; j++)
+    {
+      colors[j].Set (0, 0, 0);
+      static_colors[j].Set (0, 0, 0);
+    }
+  }
+}
+
+void csGouraudShaded::EnableGouraud (bool g)
+{
+  if (!g)
+  {
+    CHK (delete [] colors); colors = NULL;
+    CHK (delete [] static_colors); static_colors = NULL;
+  }
+  else
+  {
+    if (colors && static_colors) return;
+    if (num_vertices == -1)
+    {
+      CsPrintf (MSG_INTERNAL_ERROR,
+      	"Setup was not called yet for csGouraudShaded!\n");
+      fatal_exit (0, false);
+    }
+    CHK (delete [] colors); colors = NULL;
+    CHK (delete [] static_colors); static_colors = NULL;
+    CHK (colors = new csColor [num_vertices]);
+    CHK (static_colors = new csColor [num_vertices]);
+    int j;
+    for (j = 0 ; j < num_vertices ; j++)
+    {
+      colors[j].Set (0, 0, 0);
+      static_colors[j].Set (0, 0, 0);
+    }
+  }
+}
+
+void csGouraudShaded::SetUV (int i, float u, float v)
+{
+#if SAFETY
+  if (!uv_coords)
+  {
+    CsPrintf (MSG_INTERNAL_ERROR, "SetUV: Uv_coords is NULL!\n");
+    fatal_exit (0, false);
+  }
+  if (i >= num_vertices)
+  {
+    CsPrintf (MSG_INTERNAL_ERROR, "SetUV: Index %d is out of bounds (>= %d)!\n",
+    	i, num_vertices);
+    fatal_exit (0, false);
+  }
+#endif
+  uv_coords[i].x = u;
+  uv_coords[i].y = v;
+}
+
+void csGouraudShaded::AddColor (int i, float r, float g, float b)
+{
+#if SAFETY
+  if (!static_colors)
+  {
+    CsPrintf (MSG_INTERNAL_ERROR, "AddColor: static_colors is NULL!\n");
+    fatal_exit (0, false);
+  }
+  if (i >= num_vertices)
+  {
+    CsPrintf (MSG_INTERNAL_ERROR, "AddColor: Index %d is out of bounds (>= %d)!\n",
+    	i, num_vertices);
+    fatal_exit (0, false);
+  }
+#endif
+  r += static_colors[i].red; if (r > 2) r = 2;
+  g += static_colors[i].green; if (g > 2) g = 2;
+  b += static_colors[i].blue; if (b > 2) b = 2;
+  static_colors[i].Set (r, g, b);
+}
+
+void csGouraudShaded::AddDynamicColor (int i, float r, float g, float b)
+{
+#if SAFETY
+  if (!colors)
+  {
+    CsPrintf (MSG_INTERNAL_ERROR, "AddDynamicColor: colors is NULL!\n");
+    fatal_exit (0, false);
+  }
+  if (i >= num_vertices)
+  {
+    CsPrintf (MSG_INTERNAL_ERROR, "AddDynamicColor: Index %d is out of bounds (>= %d)!\n",
+    	i, num_vertices);
+    fatal_exit (0, false);
+  }
+#endif
+  r += colors[i].red; if (r > 2) r = 2;
+  g += colors[i].green; if (g > 2) g = 2;
+  b += colors[i].blue; if (b > 2) b = 2;
+  colors[i].Set (r, g, b);
+}
+
+
+void csGouraudShaded::SetColor (int i, float r, float g, float b)
+{
+#if SAFETY
+  if (!static_colors)
+  {
+    CsPrintf (MSG_INTERNAL_ERROR, "SetColor: static_colors is NULL!\n");
+    fatal_exit (0, false);
+  }
+  if (i >= num_vertices)
+  {
+    CsPrintf (MSG_INTERNAL_ERROR, "SetColor: Index %d is out of bounds (>= %d)!\n",
+    	i, num_vertices);
+    fatal_exit (0, false);
+  }
+#endif
+  static_colors[i].Set (r, g, b);
+}
+
+void csGouraudShaded::ResetDynamicColor (int i)
+{
+#if SAFETY
+  if (!static_colors)
+  {
+    CsPrintf (MSG_INTERNAL_ERROR, "ResetDynamicColor: static_colors is NULL!\n");
+    fatal_exit (0, false);
+  }
+  if (!colors)
+  {
+    CsPrintf (MSG_INTERNAL_ERROR, "ResetDynamicColor: colors is NULL!\n");
+    fatal_exit (0, false);
+  }
+  if (i >= num_vertices)
+  {
+    CsPrintf (MSG_INTERNAL_ERROR, "ResetDynamicColor: Index %d is out of bounds (>= %d)!\n",
+    	i, num_vertices);
+    int *a = 0, b = 0;
+    *a = b;
+    fatal_exit (0, false);
+  }
+#endif
+  colors[i] = static_colors[i];
+}
+
+void csGouraudShaded::SetDynamicColor (int i, float r, float g, float b)
+{
+#if SAFETY
+  if (!colors)
+  {
+    CsPrintf (MSG_INTERNAL_ERROR, "SetDynamicColor: colors is NULL!\n");
+    fatal_exit (0, false);
+  }
+  if (i >= num_vertices)
+  {
+    CsPrintf (MSG_INTERNAL_ERROR, "SetDynamicColor: Index %d is out of bounds (>= %d)!\n",
+    	i, num_vertices);
+    fatal_exit (0, false);
+  }
+#endif
+  colors[i].Set (r, g, b);
+}
+
+
 //---------------------------------------------------------------------------
 
 IMPLEMENT_UNKNOWN_NODELETE (csPolygon3D)
@@ -73,24 +333,15 @@ const INTERFACE_ENTRY *csPolygon3D::GetInterfaceTable ()
 CSOBJTYPE_IMPL(csPolygon3D,csObject);
 
 csPolygon3D::csPolygon3D (csTextureHandle* texture)
-	: csObject (), csPolygonInt (), theDynLight (0)
+	: csObject (), csPolygonInt ()
 {
   vertices_idx = NULL;
   max_vertices = num_vertices = 0;
 
-  CHK (tex = new csPolyTexture ());
-  tex->SetPolygon (this);
-  CHK (tex1 = new csPolyTexture ());
-  tex1->SetPolygon (this);
-  CHK (tex2 = new csPolyTexture ());
-  tex2->SetPolygon (this);
-  CHK (tex3 = new csPolyTexture ());
-  tex3->SetPolygon (this);
-
   txtMM = texture;
   if (texture) SetTexture (texture);
-  lightmap = lightmap1 = lightmap2 = lightmap3 = NULL;
 
+  txt_info = NULL;
   delete_tex_info = true;
 
   plane = NULL;
@@ -105,13 +356,11 @@ csPolygon3D::csPolygon3D (csTextureHandle* texture)
 
   flags = CS_POLY_MIPMAP | CS_POLY_LIGHTING;
 
-  cosinus_factor = -1;
-  lightmap_up_to_date = false;
+  light_info.cosinus_factor = -1;
+  light_info.lightpatches = NULL;
+  light_info.dyn_dirty = true;
 
-  lightpatches = NULL;
-  uv_coords = NULL;
-  colors = NULL;
-  static_colors = NULL;
+  SetTextureType (POLYTXT_LIGHTMAP);
 }
 
 csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt ()
@@ -119,7 +368,6 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt ()
   const char* tname = csNameObject::GetName(poly);
   if (tname) csNameObject::AddName(*this, tname);
 
-  theDynLight = poly.theDynLight;
   vertices_idx = NULL;
   max_vertices = num_vertices = 0;
 
@@ -134,50 +382,45 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt ()
 
   txtMM = poly.txtMM;
 
-  tex = poly.tex;
-  tex1 = poly.tex1;
-  tex2 = poly.tex2;
-  tex3 = poly.tex3;
-
-  lightmap = lightmap1 = lightmap2 = lightmap3 = NULL;
-
+  // Share txt_info with original polygon.
+  txt_info = poly.txt_info;
   delete_tex_info = false;
+
   poly.dont_draw = true;
   dont_draw = false;
   orig_poly = poly.orig_poly ? poly.orig_poly : &poly;
 
   flags = poly.flags;
-  cosinus_factor = poly.cosinus_factor;
-  lightmap_up_to_date = false;
 
-  lightpatches = NULL;
-  uv_coords = NULL;
-  colors = NULL;
-  static_colors = NULL;
-
-  flat_color = poly.flat_color;
+  light_info.cosinus_factor = poly.light_info.cosinus_factor;
+  light_info.lightpatches = NULL;
+  light_info.flat_color = poly.light_info.flat_color;
+  light_info.dyn_dirty = false;
 }
 
 csPolygon3D::~csPolygon3D ()
 {
-  CHK (delete [] uv_coords);
-  CHK (delete [] colors);
-  CHK (delete [] static_colors);
   CHK (delete [] vertices_idx);
   if (delete_tex_info)
-  {
-    CHK (delete tex);
-    CHK (delete tex1);
-    CHK (delete tex2);
-    CHK (delete tex3);
-    CHK (delete lightmap);
-    CHK (delete lightmap1);
-    CHK (delete lightmap2);
-    CHK (delete lightmap3);
-  }
+    CHKB (delete txt_info);
   if (plane && delete_plane) CHKB (delete plane);
   if (portal && delete_portal) CHKB (delete portal);
-  while (lightpatches) CHKB (delete lightpatches);
+  while (light_info.lightpatches) CHKB (delete light_info.lightpatches);
+}
+
+void csPolygon3D::SetTextureType (int type)
+{
+  if (txt_info && txt_info->GetTextureType () == type) return;	// Already that type
+  CHK (delete txt_info);
+  switch (type)
+  {
+    case POLYTXT_LIGHTMAP:
+      CHK (txt_info = (csPolygonTextureType*)new csLightMapped ());
+      break;
+    case POLYTXT_GOURAUD:
+      CHK (txt_info = (csPolygonTextureType*)new csGouraudShaded ());
+      break;
+  }
 }
 
 void csPolygon3D::Reset ()
@@ -185,128 +428,6 @@ void csPolygon3D::Reset ()
   num_vertices = max_vertices = 0;
   CHK (delete [] vertices_idx);
   vertices_idx = NULL;
-  ResetUV ();
-}
-
-void csPolygon3D::SetUV2 (int i, float u, float v)
-{
-  if (!uv_coords)
-  {
-    CHK (uv_coords = new csVector2 [num_vertices]);
-  }
-  else
-  {
-    CHK (csVector2* new_uv_coords = new csVector2 [num_vertices]);
-    memcpy (new_uv_coords, uv_coords, sizeof (csVector2)*(num_vertices-1));
-    CHK (delete [] uv_coords);
-    uv_coords = new_uv_coords;
-  }
-  uv_coords[i].x = u;
-  uv_coords[i].y = v;
-}
-
-void csPolygon3D::SetUV (int i, float u, float v)
-{
-  if (!uv_coords) CHKB (uv_coords = new csVector2 [num_vertices]);
-  uv_coords[i].x = u;
-  uv_coords[i].y = v;
-}
-
-void csPolygon3D::ResetUV ()
-{
-  CHK (delete [] uv_coords);
-  uv_coords = NULL;
-  CHK (delete [] colors);
-  colors = NULL;
-  CHK (delete [] static_colors);
-  static_colors = NULL;
-}
-
-void csPolygon3D::AddColor (int i, float r, float g, float b)
-{
-  if (!colors)
-  {
-    CHK (colors = new csColor [num_vertices]);
-    CHK (static_colors = new csColor [num_vertices]);
-    int j;
-    for (j = 0 ; j < num_vertices ; j++)
-    {
-      colors[j].Set (0, 0, 0);
-      static_colors[j].Set (0, 0, 0);
-    }
-  }
-  r += static_colors[i].red; if (r > 2) r = 2;
-  g += static_colors[i].green; if (g > 2) g = 2;
-  b += static_colors[i].blue; if (b > 2) b = 2;
-  static_colors[i].Set (r, g, b);
-}
-
-void csPolygon3D::AddDynamicColor (int i, float r, float g, float b)
-{
-  if (!colors)
-  {
-    CHK (colors = new csColor [num_vertices]);
-    CHK (static_colors = new csColor [num_vertices]);
-    int j;
-    for (j = 0 ; j < num_vertices ; j++)
-    {
-      colors[j].Set (0, 0, 0);
-      static_colors[j].Set (0, 0, 0);
-    }
-  }
-  r += colors[i].red; if (r > 2) r = 2;
-  g += colors[i].green; if (g > 2) g = 2;
-  b += colors[i].blue; if (b > 2) b = 2;
-  colors[i].Set (r, g, b);
-}
-
-
-void csPolygon3D::SetColor (int i, float r, float g, float b)
-{
-  if (!colors)
-  {
-    CHK (colors = new csColor [num_vertices]);
-    CHK (static_colors = new csColor [num_vertices]);
-    int j;
-    for (j = 0 ; j < num_vertices ; j++)
-    {
-      colors[j].Set (0, 0, 0);
-      static_colors[j].Set (0, 0, 0);
-    }
-  }
-  static_colors[i].Set (r, g, b);
-}
-
-void csPolygon3D::ResetDynamicColor (int i)
-{
-  if (!colors)
-  {
-    CHK (colors = new csColor [num_vertices]);
-    CHK (static_colors = new csColor [num_vertices]);
-    int j;
-    for (j = 0 ; j < num_vertices ; j++)
-    {
-      colors[j].Set (0, 0, 0);
-      static_colors[j].Set (0, 0, 0);
-    }
-  }
-  colors[i] = static_colors[i];
-}
-
-void csPolygon3D::SetDynamicColor (int i, float r, float g, float b)
-{
-  if (!colors)
-  {
-    CHK (colors = new csColor [num_vertices]);
-    CHK (static_colors = new csColor [num_vertices]);
-    int j;
-    for (j = 0 ; j < num_vertices ; j++)
-    {
-      colors[j].Set (0, 0, 0);
-      static_colors[j].Set (0, 0, 0);
-    }
-  }
-  colors[i].Set (r, g, b);
 }
 
 void csPolygon3D::SetCSPortal (csSector* sector)
@@ -396,10 +517,6 @@ void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 void csPolygon3D::SetTexture (csTextureHandle* texture)
 {
   txtMM = texture;
-  tex->SetMipmapLevel (0);
-  tex1->SetMipmapLevel (1);
-  tex2->SetMipmapLevel (2);
-  tex3->SetMipmapLevel (3);
 }
 
 ITextureHandle* csPolygon3D::GetTextureHandle ()
@@ -407,18 +524,6 @@ ITextureHandle* csPolygon3D::GetTextureHandle ()
   return txtMM ? txtMM->GetTextureHandle () : (ITextureHandle*)NULL;
 }
 
-
-csPolyTexture* csPolygon3D::GetPolyTex (int mipmap)
-{
-  switch (mipmap)
-  {
-    case 0: return tex;
-    case 1: return tex1;
-    case 2: return tex2;
-    case 3: return tex3;
-  }
-  return tex;
-}
 
 bool csPolygon3D::IsTransparent ()
 {
@@ -479,39 +584,41 @@ void csPolygon3D::ObjectToWorld (const csReversibleTransform& t)
 void csPolygon3D::Finish ()
 {
   if (orig_poly) return;
-  if (uv_coords || CheckFlags (CS_POLY_FLATSHADING)) return;
-
-  tex->SetTextureHandle (txtMM->GetTextureHandle ());
-  tex1->SetTextureHandle (txtMM->GetTextureHandle ());
-  tex2->SetTextureHandle (txtMM->GetTextureHandle ());
-  tex3->SetTextureHandle (txtMM->GetTextureHandle ());
+  if (GetTextureType () == POLYTXT_GOURAUD || CheckFlags (CS_POLY_FLATSHADING))
+  	return;
+  csLightMapped* lmi = GetLightMapInfo ();
+  if (!lmi)
+  {
+    CsPrintf (MSG_INTERNAL_ERROR, "No txt_info in polygon!\n");
+    fatal_exit (0, false);
+  }
+  lmi->Setup (this, txtMM);
+  lmi->tex->lm = NULL;
+  lmi->tex1->lm = NULL;
+  lmi->tex2->lm = NULL;
+  lmi->tex3->lm = NULL;
   if (portal) portal->SetTexture (txtMM->GetTextureHandle ());
 
-  tex->CreateBoundingTextureBox (); tex->lm = NULL;
-  tex1->CreateBoundingTextureBox (); tex1->lm = NULL;
-  tex2->CreateBoundingTextureBox (); tex2->lm = NULL;
-  tex3->CreateBoundingTextureBox (); tex3->lm = NULL;
-
-  lightmap = lightmap1 = lightmap2 = lightmap3 = NULL;
-  if (CheckFlags (CS_POLY_LIGHTING) && TEXW(tex)*TEXH(tex) < 1000000)
+  if (CheckFlags (CS_POLY_LIGHTING) && TEXW(lmi->tex)*TEXH(lmi->tex) < 1000000)
   {
-    CHK (lightmap = new csLightMap ());
+    CHK (lmi->lightmap = new csLightMap ());
     int r, g, b;
     GetSector ()->GetAmbientColor (r, g, b);
-    lightmap->Alloc (TEXW(tex), TEXH(tex), def_mipmap_size, r, g, b);
-    tex->SetMipmapSize (def_mipmap_size); tex->lm = lightmap;
+    lmi->lightmap->Alloc (TEXW(lmi->tex), TEXH(lmi->tex), def_mipmap_size,
+    	r, g, b);
+    lmi->tex->SetMipmapSize (def_mipmap_size); lmi->tex->lm = lmi->lightmap;
   }
 }
 
-void csPolygon3D::CreateLightmaps (IGraphics3D* g3d)
+void csPolygon3D::CreateLightMaps (IGraphics3D* g3d)
 {
-  if (!lightmap) return;
-
-  CHK (delete lightmap1); lightmap1 = NULL;
-  CHK (delete lightmap2); lightmap2 = NULL;
-  CHK (delete lightmap3); lightmap3 = NULL;
-
   if (orig_poly) return;
+  csLightMapped* lmi = GetLightMapInfo ();
+  if (!lmi || lmi->lightmap == NULL) return;
+
+  CHK (delete lmi->lightmap1); lmi->lightmap1 = NULL;
+  CHK (delete lmi->lightmap2); lmi->lightmap2 = NULL;
+  CHK (delete lmi->lightmap3); lmi->lightmap3 = NULL;
 
   ITextureManager* txtmgr;
   g3d->GetTextureManager (&txtmgr);
@@ -519,49 +626,49 @@ void csPolygon3D::CreateLightmaps (IGraphics3D* g3d)
   txtmgr->GetVeryNice (vn);
 
   if (vn)
-    tex1->SetMipmapSize (def_mipmap_size);
+    lmi->tex1->SetMipmapSize (def_mipmap_size);
   else
-    tex1->SetMipmapSize (def_mipmap_size>>1);
-  CHK (lightmap1 = new csLightMap ());
-  tex1->lm = lightmap1;
-  lightmap1->CopyLightmap (lightmap);
+    lmi->tex1->SetMipmapSize (def_mipmap_size>>1);
+  CHK (lmi->lightmap1 = new csLightMap ());
+  lmi->tex1->lm = lmi->lightmap1;
+  lmi->lightmap1->CopyLightMap (lmi->lightmap);
 
-  tex2->SetMipmapSize (tex1->mipmap_size>>1);
+  lmi->tex2->SetMipmapSize (lmi->tex1->mipmap_size>>1);
 
   // @@@ Normally the two mipmap levels can share the same lightmap.
   // But with the new sub-texture optimization in combination with the dynamic
   // lighting extension this gives some problems. For the moment we just copy
   // the lightmaps even though they are actually the same.
-  CHK (lightmap2 = new csLightMap ());
-  tex2->lm = lightmap2;
-  lightmap2->CopyLightmap (lightmap);
+  CHK (lmi->lightmap2 = new csLightMap ());
+  lmi->tex2->lm = lmi->lightmap2;
+  lmi->lightmap2->CopyLightMap (lmi->lightmap);
 
-  if (tex2->mipmap_size < 1)
+  if (lmi->tex2->mipmap_size < 1)
   {
-    tex2->SetMipmapSize (1);
-    CHK (lightmap2 = new csLightMap ());
-    lightmap2->MipmapLightmap (TEXW(tex2), TEXH(tex2), 1, lightmap, TEXW(tex1), TEXH(tex1), tex1->mipmap_size);
-    tex2->lm = lightmap2;
+    lmi->tex2->SetMipmapSize (1);
+    CHK (lmi->lightmap2 = new csLightMap ());
+    lmi->lightmap2->MipmapLightMap (TEXW(lmi->tex2), TEXH(lmi->tex2), 1, lmi->lightmap, TEXW(lmi->tex1), TEXH(lmi->tex1), lmi->tex1->mipmap_size);
+    lmi->tex2->lm = lmi->lightmap2;
 
-    tex3->SetMipmapSize (1);
-    CHK (lightmap3 = new csLightMap ());
-    lightmap3->MipmapLightmap (TEXW(tex3), TEXH(tex3), 1, lightmap2, TEXW(tex2), TEXH(tex2), tex2->mipmap_size);
-    tex3->lm = lightmap3;
+    lmi->tex3->SetMipmapSize (1);
+    CHK (lmi->lightmap3 = new csLightMap ());
+    lmi->lightmap3->MipmapLightMap (TEXW(lmi->tex3), TEXH(lmi->tex3), 1, lmi->lightmap2, TEXW(lmi->tex2), TEXH(lmi->tex2), lmi->tex2->mipmap_size);
+    lmi->tex3->lm = lmi->lightmap3;
   }
   else
   {
-    tex3->SetMipmapSize (tex2->mipmap_size>>1);
-    CHK (lightmap3 = new csLightMap ());
-    tex3->lm = lightmap3;
-    lightmap3->CopyLightmap (lightmap);
+    lmi->tex3->SetMipmapSize (lmi->tex2->mipmap_size>>1);
+    CHK (lmi->lightmap3 = new csLightMap ());
+    lmi->tex3->lm = lmi->lightmap3;
+    lmi->lightmap3->CopyLightMap (lmi->lightmap);
 
-    if (tex3->mipmap_size < 1)
+    if (lmi->tex3->mipmap_size < 1)
     {
-      tex3->SetMipmapSize (1);
-      CHK (delete lightmap3);
-      CHK (lightmap3 = new csLightMap ());
-      lightmap3->MipmapLightmap (TEXW(tex3), TEXH(tex3), 1, lightmap, TEXW(tex2), TEXH(tex2), tex2->mipmap_size);
-      tex3->lm = lightmap3;
+      lmi->tex3->SetMipmapSize (1);
+      CHK (delete lmi->lightmap3);
+      CHK (lmi->lightmap3 = new csLightMap ());
+      lmi->lightmap3->MipmapLightMap (TEXW(lmi->tex3), TEXH(lmi->tex3), 1, lmi->lightmap, TEXW(lmi->tex2), TEXH(lmi->tex2), lmi->tex2->mipmap_size);
+      lmi->tex3->lm = lmi->lightmap3;
     }
   }
 
@@ -570,10 +677,10 @@ void csPolygon3D::CreateLightmaps (IGraphics3D* g3d)
 
   g3d->GetMaximumAspectRatio(aspect);
 
-  if (lightmap) lightmap->ConvertFor3dDriver (po2, aspect);
-  if (lightmap1) lightmap1->ConvertFor3dDriver (po2, aspect);
-  if (lightmap2) lightmap2->ConvertFor3dDriver (po2, aspect);
-  if (lightmap3) lightmap3->ConvertFor3dDriver (po2, aspect);
+  if (lmi->lightmap) lmi->lightmap->ConvertFor3dDriver (po2, aspect);
+  if (lmi->lightmap1) lmi->lightmap1->ConvertFor3dDriver (po2, aspect);
+  if (lmi->lightmap2) lmi->lightmap2->ConvertFor3dDriver (po2, aspect);
+  if (lmi->lightmap3) lmi->lightmap3->ConvertFor3dDriver (po2, aspect);
 }
 
 void csPolygon3D::SetTextureSpace (csPolyPlane* pl)
@@ -646,17 +753,21 @@ void csPolygon3D::SetTextureSpace (
 
 void csPolygon3D::MakeDirtyDynamicLights ()
 {
-  if (tex) tex->MakeDirtyDynamicLights ();
-  if (tex1) tex1->MakeDirtyDynamicLights ();
-  if (tex2) tex2->MakeDirtyDynamicLights ();
-  if (tex3) tex3->MakeDirtyDynamicLights ();
+  if (orig_poly) return;
+  light_info.dyn_dirty = true;
+  csLightMapped* lmi = GetLightMapInfo ();
+  if (!lmi) return;
+  if (lmi->tex) lmi->tex->MakeDirtyDynamicLights ();
+  if (lmi->tex1) lmi->tex1->MakeDirtyDynamicLights ();
+  if (lmi->tex2) lmi->tex2->MakeDirtyDynamicLights ();
+  if (lmi->tex3) lmi->tex3->MakeDirtyDynamicLights ();
 }
 
 void csPolygon3D::UnlinkLightpatch (csLightPatch* lp)
 {
   if (lp->next_poly) lp->next_poly->prev_poly = lp->prev_poly;
   if (lp->prev_poly) lp->prev_poly->next_poly = lp->next_poly;
-  else lightpatches = lp->next_poly;
+  else light_info.lightpatches = lp->next_poly;
   lp->prev_poly = lp->next_poly = NULL;
   lp->polygon = NULL;
   MakeDirtyDynamicLights ();
@@ -664,10 +775,10 @@ void csPolygon3D::UnlinkLightpatch (csLightPatch* lp)
 
 void csPolygon3D::AddLightpatch (csLightPatch* lp)
 {
-  lp->next_poly = lightpatches;
+  lp->next_poly = light_info.lightpatches;
   lp->prev_poly = NULL;
-  if (lightpatches) lightpatches->prev_poly = lp;
-  lightpatches = lp;
+  if (light_info.lightpatches) light_info.lightpatches->prev_poly = lp;
+  light_info.lightpatches = lp;
   lp->polygon = this;
   MakeDirtyDynamicLights ();
 }
@@ -1001,7 +1112,7 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
     // we stop here because the triangle is only visible if all
     // vertices are visible (this is not exactly true but it is
     // easier this way! @@@ CHANGE IN FUTURE).
-    if (uv_coords || CheckFlags (CS_POLY_FLATSHADING)) return false;
+    if (GetTextureType () == POLYTXT_GOURAUD || CheckFlags (CS_POLY_FLATSHADING)) return false;
 
     csVector3 *exit = NULL, *exitn = NULL, *reenter = NULL, *reentern = NULL;
     csVector2 *evert = NULL;
@@ -1246,22 +1357,24 @@ bool csPolygon3D::IntersectSegment (const csVector3& start, const csVector3& end
   return plane->IntersectSegment (start, end, isect, pr);
 }
 
-void csPolygon3D::InitLightmaps (csPolygonSet* owner, bool do_cache, int index)
+void csPolygon3D::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
 {
   if (orig_poly) return;
-  if (!tex->lm) return;
-  if (!do_cache) { lightmap_up_to_date = false; return; }
+  csLightMapped* lmi = GetLightMapInfo ();
+  if (!lmi || lmi->lightmap == NULL) return;
+  if (!do_cache) { lmi->lightmap_up_to_date = false; return; }
   if (do_force_recalc || !csWorld::current_world->IsLightingCacheEnabled ())
   {
-    tex->InitLightmaps ();
-    lightmap_up_to_date = false;
+    lmi->tex->InitLightMaps ();
+    lmi->lightmap_up_to_date = false;
   }
-  else if (!tex->lm->ReadFromCache (TEXW(tex), TEXH(tex), def_mipmap_size, owner, this, index, csWorld::current_world))
+  else if (!lmi->tex->lm->ReadFromCache (TEXW(lmi->tex), TEXH(lmi->tex),
+  	def_mipmap_size, owner, this, index, csWorld::current_world))
   {
-    tex->InitLightmaps ();
-    lightmap_up_to_date = true;
+    lmi->tex->InitLightMaps ();
+    lmi->lightmap_up_to_date = true;
   }
-  else lightmap_up_to_date = true;
+  else lmi->lightmap_up_to_date = true;
 }
 
 void csPolygon3D::UpdateVertexLighting (csLight* light, const csColor& lcol,
@@ -1277,17 +1390,18 @@ void csPolygon3D::UpdateVertexLighting (csLight* light, const csColor& lcol,
 
   csColor col;
   int i;
-  float cosfact = cosinus_factor;
+  float cosfact = light_info.cosinus_factor;
   if (cosfact == -1) cosfact = csPolyTexture::cfg_cosinus_factor;
+  csGouraudShaded* gs = GetGouraudInfo ();
 
   for (i = 0 ; i < num_vertices ; i++)
   {
     if (reset)
     {
       if (dynamic)
-        ResetDynamicColor (i);
+        gs->ResetDynamicColor (i);
       else
-        SetColor (i, 0, 0, 0);
+        gs->SetColor (i, 0, 0, 0);
     }
     if (light)
     {
@@ -1303,16 +1417,15 @@ void csPolygon3D::UpdateVertexLighting (csLight* light, const csColor& lcol,
       col.green = cosinus * gd*(light->GetRadius () - d);
       col.blue = cosinus * bd*(light->GetRadius () - d);
       if (!dynamic)
-        AddColor (i, col.red, col.green, col.blue);
-      AddDynamicColor (i, col.red, col.green, col.blue);
+        gs->AddColor (i, col.red, col.green, col.blue);
+      gs->AddDynamicColor (i, col.red, col.green, col.blue);
     }
   }
 }
 
-void csPolygon3D::FillLightmap (csLightView& lview)
+void csPolygon3D::FillLightMap (csLightView& lview)
 {
   if (orig_poly) return;
-
   if (lview.callback)
   {
     lview.callback (&lview, CALLBACK_POLYGON, (void*)this);
@@ -1355,18 +1468,21 @@ void csPolygon3D::FillLightmap (csLightView& lview)
   }
   else
   {
-    if (uv_coords || CheckFlags (CS_POLY_FLATSHADING))
+    if (GetTextureType () == POLYTXT_GOURAUD ||
+    	CheckFlags (CS_POLY_FLATSHADING))
     {
       // We are working for a vertex lighted polygon.
       csColor col (lview.r, lview.g, lview.b);
-      UpdateVertexLighting ((csLight*)lview.l, col, false, lview.gouraud_color_reset);
+      UpdateVertexLighting ((csLight*)lview.l, col, false,
+      	lview.gouraud_color_reset);
       return;
     }
 
     if (lview.gouraud_only) return;
 
-    if (lightmap_up_to_date) return;
-    tex->FillLightmap (lview);
+    csLightMapped* lmi = GetLightMapInfo ();
+    if (lmi->lightmap_up_to_date) return;
+    lmi->tex->FillLightMap (lview);
 #if 0
 //@@@
     // If there is already a lightmap1 this means that we are
@@ -1379,7 +1495,8 @@ void csPolygon3D::FillLightmap (csLightView& lview)
   }
 }
 
-bool csPolygon3D::MarkRelevantShadowFrustrums (csLightView& lview, csPlane& plane)
+bool csPolygon3D::MarkRelevantShadowFrustrums (csLightView& lview,
+	csPlane& plane)
 {
   // @@@ Currently this function only checks if a shadow frustrum is inside
   // the light frustrum. There is no checking done if shadow frustrums obscure
@@ -1402,24 +1519,25 @@ bool csPolygon3D::MarkRelevantShadowFrustrums (csLightView& lview, csPlane& plan
       // Assume that the shadow frustrum is relevant.
       sf->relevant = true;
 
-      // Check if any of the vertices of the shadow polygon is inside the light frustrum.
-      // If that is the case then the shadow frustrum is indeed relevant.
+      // Check if any of the vertices of the shadow polygon is inside the
+      // light frustrum. If that is the case then the shadow frustrum is
+      // indeed relevant.
       contains = false;
       for (i = 0 ; i < sf->GetNumVertices () ; i++)
         if (lview.light_frustrum->Contains (sf->GetVertex (i))) { contains = true; break; }
       if (!contains)
       {
-        // All vertices of the shadow polygon are outside the light frustrum. In this
-        // case it is still possible that the light frustrum is completely inside the
-        // shadow frustrum.
+        // All vertices of the shadow polygon are outside the light frustrum.
+	// In this case it is still possible that the light frustrum is
+	// completely inside the shadow frustrum.
         count = 0;
         for (i = 0 ; i < lview.light_frustrum->GetNumVertices () ; i++)
           if (sf->Contains (lview.light_frustrum->GetVertex (i))) count++;
         if (count == 0)
         {
           // All vertices of the light frustrum (polygon we are trying to light)
-	  // are outside of the shadow frustrum. In this case the shadow frustrum is
-	  // not relevant.
+	  // are outside of the shadow frustrum. In this case the shadow
+	  // frustrum is not relevant.
 
 	  // @@@ WARNING!!! THIS IS NOT TRUE. There are cases where
 	  // it is still possible to have an overlap. We need to
@@ -1428,9 +1546,10 @@ bool csPolygon3D::MarkRelevantShadowFrustrums (csLightView& lview, csPlane& plan
         }
         else if (count == lview.light_frustrum->GetNumVertices ())
         {
-          // All vertices of the light frustrum are inside the shadow frustrum. This
-	  // is a special case. Now we know that the light frustrum is totally invisible
-	  // and we stop the routine and return false here.
+          // All vertices of the light frustrum are inside the shadow
+	  // frustrum. This is a special case. Now we know that the light
+	  // frustrum is totally invisible and we stop the routine and
+	  // return false here.
 	  return false;
         }
       }
@@ -1453,6 +1572,8 @@ public:
 
 void csPolygon3D::CalculateLighting (csLightView* lview)
 {
+  if (orig_poly) return;
+
   csPortal* po;
   csFrustrum* light_frustrum = lview->light_frustrum;
   csFrustrum* new_light_frustrum;
@@ -1532,7 +1653,7 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
       // We also give the polygon plane to MarkRelevantShadowFrustrums so that
       // all shadow frustrums which start at the same plane are discarded as
       // well.
-      // FillLightmap() will use this information and
+      // FillLightMap() will use this information and
       // csPortal::CalculateLighting() will also use it!!
       csPlane poly_plane = *GetPolyPlane ();
       // First translate plane to center of frustrum.
@@ -1541,7 +1662,7 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
       if (MarkRelevantShadowFrustrums (new_lview, poly_plane))
       {
         // Update the lightmap given light and shadow frustrums in new_lview.
-        FillLightmap (new_lview);
+        FillLightMap (new_lview);
 
         po = GetPortal ();
         if (po) po->CalculateLighting (new_lview);
@@ -1568,719 +1689,18 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
 }
 
 
-void csPolygon3D::CacheLightmaps (csPolygonSet* owner, int index)
+void csPolygon3D::CacheLightMaps (csPolygonSet* owner, int index)
 {
   if (orig_poly) return;
-  if (!tex->lm) return;
-  if (!lightmap_up_to_date)
+  csLightMapped* lmi = GetLightMapInfo ();
+  if (!lmi || lmi->lightmap == NULL) return;
+  if (!lmi->lightmap_up_to_date)
   {
-    lightmap_up_to_date = true;
+    lmi->lightmap_up_to_date = true;
     if (csWorld::current_world->IsLightingCacheEnabled ())
-      tex->lm->Cache (owner, this, index, csWorld::current_world);
+      lmi->tex->lm->Cache (owner, this, index, csWorld::current_world);
   }
-  tex->lm->ConvertToMixingMode ();
-}
-
-//---------------------------------------------------------------------------
-
-csPolygon2D::csPolygon2D ()
-{
-  max_vertices = 10;
-  CHK (vertices = new csVector2 [10]);
-  MakeEmpty ();
-}
-
-csPolygon2D::csPolygon2D (csPolygon2D& copy)
-{
-  max_vertices = copy.max_vertices;
-  CHK (vertices = new csVector2 [max_vertices]);
-  num_vertices = copy.num_vertices;
-  memcpy (vertices, copy.vertices, sizeof (csVector2)*num_vertices);
-  bbox = copy.bbox;
-}
-
-csPolygon2D::~csPolygon2D ()
-{
-  // Only delete the vertex array if max_vertices != 0.
-  // If max_vertices == 0 then this is a virtual 2D polygon
-  // allocated by csPolygon2DQueue.
-  if (max_vertices)
-    CHKB (delete [] vertices);
-}
-
-void csPolygon2D::MakeEmpty ()
-{
-  num_vertices = 0;
-  bbox.StartBoundingBox ();
-}
-
-void csPolygon2D::MakeRoom (int new_max)
-{
-  if (new_max <= max_vertices) return;
-  CHK (csVector2* new_vertices = new csVector2 [new_max]);
-  memcpy (new_vertices, vertices, num_vertices*sizeof (csVector2));
-  CHK (delete [] vertices);
-  vertices = new_vertices;
-  max_vertices = new_max;
-}
-
-void csPolygon2D::AddVertex (float x, float y)
-{
-  if (num_vertices >= max_vertices)
-    MakeRoom (max_vertices+5);
-  vertices[num_vertices].x = x;
-  vertices[num_vertices].y = y;
-  num_vertices++;
-  bbox.AddBoundingVertex (x, y);
-}
-
-void csPolygon2D::AddPerspective (float x, float y, float z)
-{
-  if (num_vertices >= max_vertices)
-    MakeRoom (max_vertices+5);
-
-  float iz = csCamera::aspect/z;
-  float px, py;
-
-  px = x * iz + csWorld::shift_x;
-  py = y * iz + csWorld::shift_y;
-  vertices[num_vertices].x = px;
-  vertices[num_vertices].y = py;
-
-  num_vertices++;
-  bbox.AddBoundingVertex (px, py);
-}
-
-bool csPolygon2D::ClipAgainst (csClipper* view)
-{
-  MakeRoom (num_vertices+view->GetNumVertices ()+1);
-  return view->Clip (vertices, num_vertices, max_vertices, &bbox);
-}
-
-void csPolygon2D::Draw (IGraphics2D* g2d, int col)
-{
-  int i;
-  int x1, y1, x2, y2;
-
-  if (!num_vertices) return;
-
-  x1 = QRound (vertices[num_vertices-1].x);
-  y1 = QRound (vertices[num_vertices-1].y);
-  for (i = 0 ; i < num_vertices ; i++)
-  {
-    x2 = QRound (vertices[i].x);
-    y2 = QRound (vertices[i].y);
-    g2d->DrawLine (x1, csWorld::frame_height - 1 - y1, x2, csWorld::frame_height - 1 - y2, col);
-
-    x1 = x2;
-    y1 = y2;
-  }
-}
-
-//---------------------------------------------------------------------------
-
-void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts, int num_vertices,
-	csVector2* orig_triangle, bool gouraud)
-{
-  // 'was_clipped' will be true if the triangle was clipped.
-  // This is the case if rescount != 3 (because we then don't have
-  // a triangle) or else if any of the clipped vertices is different.
-  bool was_clipped = num_vertices != 3;
-  int j;
-  for (j = 0; j < num_vertices; j++)
-  {
-    g3dpoly->vertices [j].sx = clipped_verts [j].x;
-    g3dpoly->vertices [j].sy = clipped_verts [j].y;
-    if (!was_clipped && clipped_verts[j] != orig_triangle[j]) was_clipped = true;
-  }
-
-  // If it was not clipped we don't have to do anything.
-  if (!was_clipped) return;
-								        
-  // first we copy the first three texture coordinates to a local buffer
-  // to avoid that they are overwritten when interpolating.
-  G3DTexturedVertex tritexcoords[3];
-  for (int i = 0; i < 3; i++)
-    tritexcoords [i] = g3dpoly->vertices [i];
-
-  // Now we have to find the u,v coordinates for every
-  // point in the clipped polygon. We know we started
-  // from orig_triangle and that texture mapping is not perspective correct.
-
-  // Compute U & V in vertices of the polygon
-  // First find the topmost triangle vertex
-  int top;
-  if (orig_triangle [0].y < orig_triangle [1].y)
-    if (orig_triangle [0].y < orig_triangle [2].y)
-      top = 0;
-    else
-      top = 2;
-  else
-    if (orig_triangle [1].y < orig_triangle [2].y)
-      top = 1;
-    else
-      top = 2;
-
-  int _vbl, _vbr;
-  if (top <= 0) _vbl = 2; else _vbl = top - 1;
-  if (top >= 2) _vbr = 0; else _vbr = top + 1;
-  for (j = 0 ; j < g3dpoly->num ; j++)
-  {
-    float x = g3dpoly->vertices [j].sx;
-    float y = g3dpoly->vertices [j].sy;
-
-    // Find the original triangle top/left/bottom/right vertices
-    // between which the currently examined point is located.
-    // There are two possible major cases:
-    // A*       A*       When DrawPolygonFX works, it will switch
-    //  |\       |\      start/final values and deltas ONCE (not more)
-    //  | \      | \     per triangle.On the left pictures this happens
-    //  |*X\     |  \    at the point B. This means we should "emulate"
-    //  |   *B   |   *B  this switch bytaking different start/final values
-    //  |  /     |*X/    for interpolation if examined point X is below
-    //  | /      | /     the point B.
-    //  |/       |/
-    // C*       C*  Fig.1 :-)
-    int vtl = top, vtr = top, vbl = _vbl, vbr = _vbr;
-    int ry = QRound (y);
-    if (ry > QRound (orig_triangle [vbl].y))
-    {
-      vtl = vbl;
-      if (--vbl < 0) vbl = 2;
-    }
-    else if (ry > QRound (orig_triangle [vbr].y))
-    {
-      vtr = vbr;
-      if (++vbr > 2) vbr = 0;
-    }
-
-    // Now interpolate Z,U,V,R,G,B by Y
-    float tL, tR, xL, xR, tX;
-    if (QRound (orig_triangle [vbl].y) != QRound (orig_triangle [vtl].y))
-      tL = (y - orig_triangle [vtl].y) / (orig_triangle [vbl].y - orig_triangle [vtl].y);
-    else
-      tL = (x - orig_triangle [vtl].x) / (orig_triangle [vbl].x - orig_triangle [vtl].x);
-    if (QRound (orig_triangle [vbr].y) != QRound (orig_triangle [vtr].y))
-      tR = (y - orig_triangle [vtr].y) / (orig_triangle [vbr].y - orig_triangle [vtr].y);
-    else
-      tR = (x - orig_triangle [vtr].x) / (orig_triangle [vbr].x - orig_triangle [vtr].x);
-    xL = orig_triangle [vtl].x + tL * (orig_triangle [vbl].x - orig_triangle [vtl].x);
-    xR = orig_triangle [vtr].x + tR * (orig_triangle [vbr].x - orig_triangle [vtr].x);
-    tX = xR - xL;
-    if (tX) tX = (x - xL) / tX;
-
-#   define INTERPOLATE(val,tl,bl,tr,br)	\
-    {					\
-      float vl,vr;				\
-      if (tl != bl)				\
-        vl = tl + (bl - tl) * tL;		\
-      else					\
-        vl = tl;				\
-      if (tr != br)				\
-        vr = tr + (br - tr) * tR;		\
-      else					\
-        vr = tr;				\
-      val = vl + (vr - vl) * tX;		\
-    }
-
-    // Calculate Z
-    INTERPOLATE(g3dpoly->vertices [j].z,
-                tritexcoords [vtl].z, tritexcoords [vbl].z,
-                tritexcoords [vtr].z, tritexcoords [vbr].z);
-    if (g3dpoly->txt_handle)
-    {
-      // Calculate U
-      INTERPOLATE(g3dpoly->vertices [j].u,
-                  tritexcoords [vtl].u, tritexcoords [vbl].u,
-                  tritexcoords [vtr].u, tritexcoords [vbr].u);
-      // Calculate V
-      INTERPOLATE(g3dpoly->vertices [j].v,
-                  tritexcoords [vtl].v, tritexcoords [vbl].v,
-                  tritexcoords [vtr].v, tritexcoords [vbr].v);
-    }
-    if (gouraud)
-    {
-      // Calculate R
-      INTERPOLATE(g3dpoly->vertices [j].r,
-                  tritexcoords [vtl].r, tritexcoords [vbl].r,
-                  tritexcoords [vtr].r, tritexcoords [vbr].r);
-      // Calculate G
-      INTERPOLATE (g3dpoly->vertices [j].g,
-                  tritexcoords [vtl].g, tritexcoords [vbl].g,
-                  tritexcoords [vtr].g, tritexcoords [vbr].g);
-      // Calculate B
-      INTERPOLATE (g3dpoly->vertices [j].b,
-                  tritexcoords [vtl].b, tritexcoords [vbl].b,
-                  tritexcoords [vtr].b, tritexcoords [vbr].b);
-    }
-    else
-    {
-      g3dpoly->vertices[j].r = 0;
-      g3dpoly->vertices[j].g = 0;
-      g3dpoly->vertices[j].b = 0;
-    }
-  }
-}
-
-// Remove this for old fog
-#define USE_EXP_FOG
-
-// After such number of values fog density coefficient can be considered 0.
-#define FOG_EXP_TABLE_SIZE 1600
-static float *fog_exp_table = NULL;
-
-static void InitializeFogTable ()
-{
-  fog_exp_table = new float [FOG_EXP_TABLE_SIZE];
-  for (int i = 0; i < FOG_EXP_TABLE_SIZE; i++)
-    fog_exp_table [i] = 1 - exp (-float (i) / 256.);
-}
-
-#define SMALL_D 0.01
-void CalculateFogPolygon (csRenderView* rview, G3DPolygonDP& poly)
-{
-  if (!rview->fog_info || poly.num < 3) { poly.use_fog = false; return; }
-  poly.use_fog = true;
-
-#ifdef USE_EXP_FOG
-  if (!fog_exp_table)
-    InitializeFogTable ();
-#endif
-
-  // Get the plane normal of the polygon. Using this we can calculate
-  // '1/z' at every screen space point.
-  float inv_aspect = poly.inv_aspect;
-  float Ac, Bc, Cc, Dc, inv_Dc;
-  Ac = poly.normal.A;
-  Bc = poly.normal.B;
-  Cc = poly.normal.C;
-  Dc = poly.normal.D;
-
-  float M, N, O;
-  if (ABS (Dc) < SMALL_D) Dc = -SMALL_D;
-  if (ABS (Dc) < SMALL_D)
-  {
-    // The Dc component of the plane normal is too small. This means that
-    // the plane of the polygon is almost perpendicular to the eye of the
-    // viewer. In this case, nothing much can be seen of the plane anyway
-    // so we just take one value for the entire polygon.
-    M = 0;
-    N = 0;
-    // For O choose the transformed z value of one vertex.
-    // That way Z buffering should at least work.
-    O = 1/poly.z_value;
-  }
-  else
-  {
-    inv_Dc = 1/Dc;
-    M = -Ac*inv_Dc*inv_aspect;
-    N = -Bc*inv_Dc*inv_aspect;
-    O = -Cc*inv_Dc;
-  }
-
-  int i;
-  for (i = 0 ; i < poly.num ; i++)
-  {
-    // Calculate the original 3D coordinate again (camera space).
-    csVector3 v;
-    v.z = 1. / (M * (poly.vertices[i].sx - csWorld::shift_x) + N * (poly.vertices[i].sy - csWorld::shift_y) + O);
-    v.x = (poly.vertices[i].sx - csWorld::shift_x) * v.z * inv_aspect;
-    v.y = (poly.vertices[i].sy - csWorld::shift_y) * v.z * inv_aspect;
-
-    // Initialize fog vertex.
-    poly.fog_info[i].r = 0;
-    poly.fog_info[i].g = 0;
-    poly.fog_info[i].b = 0;
-    poly.fog_info[i].intensity = 0;
-
-    // Consider a ray between (0,0,0) and v and calculate the thickness of every
-    // fogged sector in between.
-    csFogInfo* fog_info = rview->fog_info;
-    while (fog_info)
-    {
-      float dist1, dist2;
-      if (fog_info->has_incoming_plane)
-      {
-	const csPlane& pl = fog_info->incoming_plane;
-	float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
-	//dist1 = v.Norm () * (-pl.DD / denom);
-	dist1 = v.z * (-pl.DD / denom);
-      }
-      else
-        dist1 = 0;
-      const csPlane& pl = fog_info->outgoing_plane;
-      float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
-      //dist2 = v.Norm () * (-pl.DD / denom);
-      dist2 = v.z * (-pl.DD / denom);
-
-#ifdef USE_EXP_FOG
-      // Implement semi-exponential fog (linearily approximated)
-      UInt table_index = QRound ((100 * ABS (dist2 - dist1)) * fog_info->fog->density);
-      float I2;
-      if (table_index < FOG_EXP_TABLE_SIZE)
-        I2 = fog_exp_table [table_index];
-      else
-        I2 = 0.;
-#else
-      float I2 = ABS (dist2 - dist1) * fog_info->fog->density;
-#endif
-
-      if (poly.fog_info[i].intensity)
-      {
-        // We already have a previous fog level. In this case we do some
-	// mathematical tricks to combine both fog levels. Substitute one
-	// fog expresion in the other. The basic fog expression is:
-	//	C = I*F + (1-I)*P
-	//	with I = intensity
-	//	     F = fog color
-	//	     P = polygon color
-	//	     C = result
-	float I1 = poly.fog_info[i].intensity;
-	poly.fog_info[i].intensity = I1 + I2 - I1 * I2;
-	float fact = 1. / (I1 + I2 - I1*I2);
-	poly.fog_info[i].r = (I2*fog_info->fog->red + I1*poly.fog_info[i].r + I1*I2*poly.fog_info[i].r) * fact;
-	poly.fog_info[i].g = (I2*fog_info->fog->green + I1*poly.fog_info[i].g + I1*I2*poly.fog_info[i].g) * fact;
-	poly.fog_info[i].b = (I2*fog_info->fog->blue + I1*poly.fog_info[i].b + I1*I2*poly.fog_info[i].b) * fact;
-      }
-      else
-      {
-        // The first fog level.
-        poly.fog_info[i].intensity = I2;
-        poly.fog_info[i].r = fog_info->fog->red;
-        poly.fog_info[i].g = fog_info->fog->green;
-        poly.fog_info[i].b = fog_info->fog->blue;
-      }
-      fog_info = fog_info->next;
-    }
-  }
-}
-
-// @@@ We should be able to avoid having the need for two functions
-// which are almost exactly the same.
-void CalculateFogPolygon (csRenderView* rview, G3DPolygonDPFX& poly)
-{
-  if (!rview->fog_info || poly.num < 3) { poly.use_fog = false; return; }
-  poly.use_fog = true;
-
-#ifdef USE_EXP_FOG
-  if (!fog_exp_table)
-    InitializeFogTable ();
-#endif
-
-  float inv_aspect = poly.inv_aspect;
-
-  int i;
-  for (i = 0 ; i < poly.num ; i++)
-  {
-    // Calculate the original 3D coordinate again (camera space).
-    csVector3 v;
-    v.z = 1. / poly.vertices[i].z;
-    v.x = (poly.vertices[i].sx - csWorld::shift_x) * v.z * inv_aspect;
-    v.y = (poly.vertices[i].sy - csWorld::shift_y) * v.z * inv_aspect;
-
-    // Initialize fog vertex.
-    poly.fog_info[i].r = 0;
-    poly.fog_info[i].g = 0;
-    poly.fog_info[i].b = 0;
-    poly.fog_info[i].intensity = 0;
-
-    // Consider a ray between (0,0,0) and v and calculate the thickness of every
-    // fogged sector in between.
-    csFogInfo* fog_info = rview->fog_info;
-    while (fog_info)
-    {
-      float dist1, dist2;
-      if (fog_info->has_incoming_plane)
-      {
-	const csPlane& pl = fog_info->incoming_plane;
-	float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
-	//dist1 = v.Norm () * (-pl.DD / denom);
-        dist1 = v.z * (-pl.DD / denom);
-      }
-      else
-        dist1 = 0;
-      const csPlane& pl = fog_info->outgoing_plane;
-      float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
-      //dist2 = v.Norm () * (-pl.DD / denom);
-      dist2 = v.z * (-pl.DD / denom);
-
-#ifdef USE_EXP_FOG
-      // Implement semi-exponential fog (linearily approximated)
-      UInt table_index = QRound ((100 * ABS (dist2 - dist1)) * fog_info->fog->density);
-      float I2;
-      if (table_index < FOG_EXP_TABLE_SIZE)
-        I2 = fog_exp_table [table_index];
-      else
-        I2 = 0.;
-#else
-      float I2 = ABS (dist2 - dist1) * fog_info->fog->density;
-#endif
-
-      if (poly.fog_info[i].intensity)
-      {
-        // We already have a previous fog level. In this case we do some
-	// mathematical tricks to combine both fog levels. Substitute one
-	// fog expresion in the other. The basic fog expression is:
-	//	C = I*F + (1-I)*P
-	//	with I = intensity
-	//	     F = fog color
-	//	     P = polygon color
-	//	     C = result
-	float I1 = poly.fog_info[i].intensity;
-	poly.fog_info[i].intensity = I1 + I2 - I1*I2;
-	float fact = 1. / (I1 + I2 - I1*I2);
-	poly.fog_info[i].r = (I2*fog_info->fog->red + I1*poly.fog_info[i].r + I1*I2*poly.fog_info[i].r) * fact;
-	poly.fog_info[i].g = (I2*fog_info->fog->green + I1*poly.fog_info[i].g + I1*I2*poly.fog_info[i].g) * fact;
-	poly.fog_info[i].b = (I2*fog_info->fog->blue + I1*poly.fog_info[i].b + I1*I2*poly.fog_info[i].b) * fact;
-      }
-      else
-      {
-        // The first fog level.
-        poly.fog_info[i].intensity = I2;
-        poly.fog_info[i].r = fog_info->fog->red;
-        poly.fog_info[i].g = fog_info->fog->green;
-        poly.fog_info[i].b = fog_info->fog->blue;
-      }
-      fog_info = fog_info->next;
-    }
-  }
-}
-
-
-//---------------------------------------------------------------------------
-
-void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly, csPolyPlane* plane,
-	bool use_z_buf)
-{
-  int i;
-  bool debug = false;
-  bool mirror = rview->IsMirrored ();
-
-  if (use_z_buf)
-  {
-    rview->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, true);
-    rview->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
-  }
-  else
-  {
-    rview->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, false);
-    rview->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
-  }
-
-  if (poly->GetUVCoords () || poly->CheckFlags (CS_POLY_FLATSHADING))
-  {
-    // We have a gouraud shaded polygon.
-    // Add all dynamic lights if polygon is dirty.
-    csPolyTexture* tex = poly->GetPolyTex (0);
-    if (tex->dyn_dirty)
-    {
-      csLightPatch* lp = poly->GetLightpatches ();
-      if (lp)
-      {
-        // If there is at least one light patch we do the lighting reset
-	// in the first call to UpdateVertexLighting().
-        bool reset = true;
-        while (lp)
-        {
-          poly->UpdateVertexLighting (lp->GetLight (), lp->GetLight ()->GetColor (),
-      	    true, reset);
-	  reset = false;
-          lp = lp->GetNextPoly ();
-        }
-      }
-      else
-      {
-        // There are no more lightpatches. In this case we need to restore
-	// lighting to the static lighting. This can be done by calling
-	// UpdateVertexLighting() with no light and reset set to true.
-	poly->UpdateVertexLighting (NULL, csColor (0, 0, 0), true, true);
-      }
-      tex->dyn_dirty = false;
-    }
-
-    static G3DPolygonDPFX g3dpoly;
-    csVector2 orig_triangle[3];
-
-    //memset (&g3dpoly, 0, sizeof (g3dpoly));
-    g3dpoly.num = num_vertices;
-    g3dpoly.txt_handle = poly->GetTextureHandle ();
-    g3dpoly.inv_aspect = csCamera::inv_aspect;
-
-    csColor* po_colors = poly->GetColors ();
-    g3dpoly.flat_color_r = poly->GetFlatColor ().red;
-    g3dpoly.flat_color_g = poly->GetFlatColor ().green;
-    g3dpoly.flat_color_b = poly->GetFlatColor ().blue;
-    if (poly->CheckFlags (CS_POLY_FLATSHADING)) g3dpoly.txt_handle = NULL;
-
-    // We are going to use DrawPolygonFX.
-    // Here we have to do a little messy thing because PreparePolygonFX()
-    // still requires the original triangle that was valid before clipping.
-    float iz;
-    iz = 1. / poly->Vcam (0).z;
-    g3dpoly.vertices[0].z = iz;
-    iz *= csCamera::aspect;
-    orig_triangle[0].x = poly->Vcam (0).x * iz + csWorld::shift_x;
-    orig_triangle[0].y = poly->Vcam (0).y * iz + csWorld::shift_y;
-
-    iz = 1. / poly->Vcam (1).z;
-    g3dpoly.vertices[1].z = iz;
-    iz *= csCamera::aspect;
-    orig_triangle[1].x = poly->Vcam (1).x * iz + csWorld::shift_x;
-    orig_triangle[1].y = poly->Vcam (1).y * iz + csWorld::shift_y;
-
-    iz = 1. / poly->Vcam (2).z;
-    g3dpoly.vertices[2].z = iz;
-    iz *= csCamera::aspect;
-    orig_triangle[2].x = poly->Vcam (2).x * iz + csWorld::shift_x;
-    orig_triangle[2].y = poly->Vcam (2).y * iz + csWorld::shift_y;
-
-    if (g3dpoly.txt_handle)
-    {
-      g3dpoly.vertices[0].u = poly->GetUVCoords ()[0].x;
-      g3dpoly.vertices[0].v = poly->GetUVCoords ()[0].y;
-      g3dpoly.vertices[1].u = poly->GetUVCoords ()[1].x;
-      g3dpoly.vertices[1].v = poly->GetUVCoords ()[1].y;
-      g3dpoly.vertices[2].u = poly->GetUVCoords ()[2].x;
-      g3dpoly.vertices[2].v = poly->GetUVCoords ()[2].y;
-    }
-    if (po_colors)
-    {
-      g3dpoly.vertices[0].r = po_colors[0].red;
-      g3dpoly.vertices[0].g = po_colors[0].green;
-      g3dpoly.vertices[0].b = po_colors[0].blue;
-      g3dpoly.vertices[1].r = po_colors[1].red;
-      g3dpoly.vertices[1].g = po_colors[1].green;
-      g3dpoly.vertices[1].b = po_colors[1].blue;
-      g3dpoly.vertices[2].r = po_colors[2].red;
-      g3dpoly.vertices[2].g = po_colors[2].green;
-      g3dpoly.vertices[2].b = po_colors[2].blue;
-    }
-    PreparePolygonFX (&g3dpoly, vertices, num_vertices, orig_triangle, po_colors != NULL);
-    rview->g3d->StartPolygonFX (g3dpoly.txt_handle, CS_FX_COPY | (po_colors ? CS_FX_GOURAUD : 0));
-    CalculateFogPolygon (rview, g3dpoly);
-    rview->g3d->DrawPolygonFX (g3dpoly);
-    rview->g3d->FinishPolygonFX ();
-  }
-  else
-  {
-    static G3DPolygonDP g3dpoly;
-
-    //memset (&g3dpoly, 0, sizeof (g3dpoly));
-    g3dpoly.num = num_vertices;
-    g3dpoly.txt_handle = poly->GetTextureHandle ();
-    g3dpoly.inv_aspect = csCamera::inv_aspect;
-
-    // We are going to use DrawPolygon.
-    if (mirror)
-      for (i = 0 ; i < num_vertices ; i++)
-      {
-        g3dpoly.vertices[num_vertices-i-1].sx = vertices[i].x;
-        g3dpoly.vertices[num_vertices-i-1].sy = vertices[i].y;
-      }
-    else
-      for (i = 0 ; i < num_vertices ; i++)
-      {
-        g3dpoly.vertices[i].sx = vertices[i].x;
-        g3dpoly.vertices[i].sy = vertices[i].y;
-      }
-
-    g3dpoly.alpha           = poly->GetAlpha();
-    g3dpoly.uses_mipmaps    = poly->CheckFlags (CS_POLY_MIPMAP);
-    g3dpoly.z_value         = poly->Vcam(0).z;
-
-    for (int mipmaplevel = 0; mipmaplevel<4; mipmaplevel++)
-    {
-      g3dpoly.poly_texture[mipmaplevel] =
-        GetIPolygonTextureFromcsPolyTexture(poly->GetPolyTex(mipmaplevel));
-    }
-
-    g3dpoly.plane.m_cam2tex = &plane->m_cam2tex;
-    g3dpoly.plane.v_cam2tex = &plane->v_cam2tex;
-
-    float Ac, Bc, Cc, Dc;
-    plane->GetCameraNormal (&Ac, &Bc, &Cc, &Dc);
-    g3dpoly.normal.A = Ac;
-    g3dpoly.normal.B = Bc;
-    g3dpoly.normal.C = Cc;
-    g3dpoly.normal.D = Dc;
-
-    if (debug)
-      rview->g3d->DrawPolygonDebug (g3dpoly);
-    else
-    {
-      CalculateFogPolygon (rview, g3dpoly);
-      if (FAILED (rview->g3d->DrawPolygon (g3dpoly)))
-      {
-        CsPrintf (MSG_STDOUT, "Drawing polygon '%s/%s' failed!\n",
-                  csNameObject::GetName(*((csSector*)poly->GetParent ())),
-                  csNameObject::GetName(*poly));
-      }
-    }
-  }
-}
-
-void csPolygon2D::AddFogPolygon (IGraphics3D* g3d, csPolygon3D* /*poly*/, csPolyPlane* plane, bool mirror, CS_ID id, int fogtype)
-{
-  int i;
-
-  static G3DPolygonAFP g3dpoly;
-  memset(&g3dpoly, 0, sizeof(g3dpoly));
-  g3dpoly.num = num_vertices;
-  g3dpoly.inv_aspect = csCamera::inv_aspect;
-  if (mirror)
-    for (i = 0 ; i < num_vertices ; i++)
-    {
-      g3dpoly.vertices[num_vertices-i-1].sx = vertices[i].x;
-      g3dpoly.vertices[num_vertices-i-1].sy = vertices[i].y;
-    }
-  else
-    for (i = 0 ; i < num_vertices ; i++)
-    {
-      g3dpoly.vertices[i].sx = vertices[i].x;
-      g3dpoly.vertices[i].sy = vertices[i].y;
-    }
-  //g3dpoly.polygon = GetIPolygon3DFromcsPolygon3D(poly); //DPQFIX
-
-  float Ac, Bc, Cc, Dc;
-  plane->GetCameraNormal (&Ac, &Bc, &Cc, &Dc);
-  g3dpoly.normal.A = Ac;
-  g3dpoly.normal.B = Bc;
-  g3dpoly.normal.C = Cc;
-  g3dpoly.normal.D = Dc;
-
-  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, true);
-  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
-  g3d->AddFogPolygon (id, g3dpoly, fogtype);
-}
-
-//---------------------------------------------------------------------------
-
-csPolygon2DQueue::csPolygon2DQueue (int max_size)
-{
-  CHK (queue = new csQueueElement [max_size]);
-  max_queue = max_size;
-  num_queue = 0;
-}
-
-csPolygon2DQueue::~csPolygon2DQueue ()
-{
-  CHK (delete [] queue);
-}
-
-void csPolygon2DQueue::Push (csPolygon3D* poly3d, csPolygon2D* poly2d)
-{
-  queue[num_queue].poly3d = poly3d;
-  queue[num_queue].poly2d = poly2d;
-  num_queue++;
-}
-
-bool csPolygon2DQueue::Pop (csPolygon3D** poly3d, csPolygon2D** poly2d)
-{
-  if (num_queue <= 0) return false;
-  num_queue--;
-  *poly3d = queue[num_queue].poly3d;
-  *poly2d = queue[num_queue].poly2d;
-  return true;
+  lmi->tex->lm->ConvertToMixingMode ();
 }
 
 //---------------------------------------------------------------------------
