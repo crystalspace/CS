@@ -38,7 +38,6 @@ class csTextureHandle;
 class CLights;
 class csPolygon2D;
 class csPolygon2DQueue;
-class csCollider;
 class csBspTree;
 class Dumper;
 class csRenderView;

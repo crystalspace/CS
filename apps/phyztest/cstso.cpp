@@ -1,7 +1,8 @@
 #include "sysdef.h"
-#include "csengine/cdobj.h"
 #include "csphyzik/phyziks.h"
 #include "cstso.h"
+#include "csengine/cssprite.h"
+#include "csengine/sector.h"
 
 static ctCollidingContact contact_heap[1024];  // no more than that
 static int contact_heap_index = 0;
@@ -25,8 +26,7 @@ csRigidSpaceTimeObj::csRigidSpaceTimeObj( csSprite3D *psprt, ctRigidBody *prb )
  // col = pcollide;
   sprt = psprt;
   rb = prb;
-  CHK (col = new csCollider (sprt));
-  csColliderPointerObject::SetCollider (*sprt, col, true);
+  CHK (col = new csRAPIDCollider (*sprt, sprt));
   what_type = ST_RIGID;
 
 }
@@ -107,8 +107,8 @@ collision_pair *CD_contact = NULL;
     first_sector = (csSector*)(space_time_continuum[i]->sprt->sectors[0]);
     
     // Start collision detection.
-    csCollider::CollideReset ();
-    csCollider::firstHit = false;
+    csRAPIDCollider::CollideReset ();
+    csRAPIDCollider::SetFirstHit (false);
     coli = space_time_continuum[i]->col;
    // for ( ; num_sectors-- ; )
     M = space_time_continuum[i]->rb->get_world_to_this();
@@ -123,13 +123,13 @@ collision_pair *CD_contact = NULL;
     tfm.SetO2TTranslation( x );
 
     // Check collision with this sector.
-    csCollider::numHits = 0;
+    csRAPIDCollider::numHits = 0;
     if( first_sector ){
-      csCollider::CollidePair (coli, csColliderPointerObject::GetCollider(*first_sector), &tfm);
-      CD_contact = csCollider::GetCollisions ();
+      coli->Collide(*first_sector, &tfm);
+      CD_contact = csRAPIDCollider::GetCollisions ();
     }
 
-    space_time_continuum[i]->num_collisions = csCollider::numHits;
+    space_time_continuum[i]->num_collisions = csRAPIDCollider::numHits;
     space_time_continuum[i]->contact = NULL;
     contact_heap_index = 0;
     // determine type of collision and penetration depth
@@ -141,7 +141,7 @@ collision_pair *CD_contact = NULL;
       this_contact = &(contact_heap[contact_heap_index]);
       this_contact->next = NULL;
       
-      for( int acol = 0; acol < csCollider::numHits; acol++ ){
+      for( int acol = 0; acol < csRAPIDCollider::numHits; acol++ ){
         space_time_continuum[i]->cd_contact[acol] = CD_contact[acol];
 
         // here is where the body hit should be recorded as well

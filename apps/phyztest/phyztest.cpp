@@ -26,7 +26,6 @@
 #include "csengine/camera.h"
 #include "csengine/light.h"
 #include "csengine/polygon.h"
-#include "csengine/cdobj.h"
 #include "csengine/collider.h"
 #include "csparser/csloader.h"
 #include "igraph3d.h"
@@ -230,8 +229,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   light = new csStatLight (0, 7, -3, 10, 0, 1, 0, false);
   room->AddLight (light);
 
-  CHK(csCollider* pCollider = new csCollider(room));
-  csColliderPointerObject::SetCollider(*room, pCollider, true);
+  CHK(new csRAPIDCollider(*room, room));
 
   world->Prepare ();
 
@@ -466,7 +464,7 @@ int main (int argc, char* argv[])
 
   // add gravity to the world.  enviro forces affect all bodies in the world
   //ctGravityF *gf = new ctGravityF( 9.81 / M_PER_WORLDUNIT );
-  ctGravityF *gf = new ctGravityF( 1.0 / M_PER_WORLDUNIT );
+  ctGravityF *gf = new ctGravityF( 2.0 / M_PER_WORLDUNIT );
   phyz_world.add_enviro_force( gf );
   // add air resistance
   ctAirResistanceF *af = new ctAirResistanceF();

@@ -24,8 +24,10 @@
 #include "csgeom/math3d.h"
 #include "cssys/sysdriv.h"
 #include "csengine/collider.h"
+#include "csengine/light.h"
 #include "csutil/inifile.h"
 #include "csutil/vfs.h"
+#include "iworld.h"
 
 class Polygon3D;
 class WalkTest;
@@ -74,8 +76,8 @@ public:
   csVector3 angle_velocity;
 
   /// Colliders for "legs" and "body". Intersections are handled differently.
-  csCollider *legs;
-  csCollider *body;
+  csRAPIDCollider *legs;
+  csRAPIDCollider *body;
 
   // Various configuration values for collision detection.
   /// Initial speed of jumping.

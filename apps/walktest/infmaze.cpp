@@ -27,7 +27,6 @@
 #include "csengine/texture.h"
 #include "csengine/light.h"
 #include "csengine/lghtmap.h"
-#include "csengine/cdobj.h"
 #include "csengine/collider.h"
 #include "csobject/dataobj.h"
 #include "csutil/sparse3d.h"
@@ -253,8 +252,7 @@ void InfPortalCS::ConnectNewSector ()
     CHK (delete lviews);
     lviews = n;
   }
-  CHK (csCollider* pCollider = new csCollider (s));
-  csColliderPointerObject::SetCollider (*s, pCollider, true);
+  CHK (new csRAPIDCollider (*s, s));
 }
 
 bool InfPortalCS::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon, csRenderView& rview)

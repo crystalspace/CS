@@ -16,6 +16,7 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #ifndef BEING_H
 #define BEING_H
 
@@ -44,7 +45,7 @@
  * csBeing::CollisionDetect () code which you may need to overrule with
  * you own method.
  */
-class csBeing : public csCollider
+class csBeing
 {
   // Record the location we are standing at
   csCollider *_ground;
@@ -57,7 +58,7 @@ class csBeing : public csCollider
 
   static csWorld    *_world;  // This should not be needed in long term.
 
- public:
+public:
 
   static csBeing   *player;       // The being followed by the camera.
   static bool     init;         // Was the world initialized.
@@ -71,10 +72,13 @@ class csBeing : public csCollider
   bool falling;
   bool climbing;
   bool blocked;
+  csRAPIDCollider *m_pCollider;
 
   csBeing(csPolygonSet *p, csSector* s = 0, csTransform *cdt = 0);
   csBeing(csSprite3D *sp, csSector* s = 0, csTransform *cdt = 0);
 
+  virtual ~csBeing();
+  
   /// Create a player bounding box.
   static csBeing* PlayerSpawn (char* name);
 
@@ -87,7 +91,7 @@ class csBeing : public csCollider
   /// Collide cd with all objects in the sector.
   virtual int CollisionDetect ();
 
- private:
+private:
   int _CollisionDetect (csSector* s, csTransform *cdt);
 
   /// Find all sector which are near enough to intersect with this being.

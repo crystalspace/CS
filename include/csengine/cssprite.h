@@ -135,7 +135,6 @@ class csSpriteTemplate : public csObject
 
 private:
   friend class csSprite3D;
-  friend class csCollider;
 
   /// Texture handle as returned by iTextureManager.
   csTextureHandle* cstxt;
@@ -493,7 +492,6 @@ public:
 class csSprite3D : public csSprite
 {
   friend class Dumper;
-  friend class csCollider;
 
 private:
   /// Set the size of internally used tables

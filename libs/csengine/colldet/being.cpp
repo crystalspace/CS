@@ -19,7 +19,6 @@
 
 #include "sysdef.h"
 #include "csengine/being.h"
-#include "csengine/cdobj.h"
 #include "csengine/terrain.h"
 
 ///
@@ -27,22 +26,29 @@ bool csBeing::init = false;
 csBeing* csBeing::player = 0;
 csWorld* csBeing::_world = 0;
 
-csBeing::csBeing (  csPolygonSet *p, csSector* s, csTransform *cdt) : csCollider(p)
+csBeing::csBeing (  csPolygonSet *p, csSector* s, csTransform *cdt)
 {
   sector = s;
   transform = cdt;
   _ground = 0;
   _sold = 0;
   _vold.Set (0, 0, 0);
+  CHK(m_pCollider = new csRAPIDCollider(p));
+
 }
 
-csBeing::csBeing ( csSprite3D *sp, csSector* s, csTransform *cdt) : csCollider(sp)
+csBeing::csBeing ( csSprite3D *sp, csSector* s, csTransform *cdt)
 {
   sector = s;
   transform = cdt;
   _ground = 0;
   _sold = 0;
   _vold.Set (0, 0, 0);
+  CHK(m_pCollider = new csRAPIDCollider(sp));
+}
+
+csBeing::~csBeing() {
+  delete m_pCollider;
 }
 
 csBeing* csBeing::PlayerSpawn (char *name)
@@ -120,14 +126,12 @@ int csBeing::InitWorld (csWorld* world, csCamera* /*camera*/)
     sn--;
     csSector* sp = (csSector*)world->sectors[sn];
     // Initialize the sector itself.
-    CHK(csCollider* pCollider = new csCollider(sp));
-    csColliderPointerObject::SetCollider(*sp, pCollider, true);
+    CHK(new csRAPIDCollider(*sp, sp));
     // Initialize the things in this sector.
     csThing* tp = sp->GetFirstThing ();
     while (tp)
     {
-      CHK(csCollider* pCollider = new csCollider(tp));
-      csColliderPointerObject::SetCollider(*tp, pCollider, true);
+      CHK(new csRAPIDCollider(*tp, tp));
       tp = (csThing*)(tp->GetNext ());
     }
   }
@@ -142,8 +146,7 @@ int csBeing::InitWorld (csWorld* world, csCamera* /*camera*/)
 
     spp = (csSprite3D*)sp;
     // TODO: Should create beings for these.
-    CHK(csCollider* pCollider = new csCollider(spp));
-    csColliderPointerObject::SetCollider(*spp, pCollider, true);
+    CHK(new csRAPIDCollider(*spp, spp));
   }
 
   // Create a player object that follows the camera around.
@@ -164,14 +167,14 @@ int csBeing::_CollisionDetect (csSector* sp, csTransform *cdt)
   int hit = 0;
 
   // Check collision with this sector.
-  hit += CollidePair (this,csColliderPointerObject::GetCollider(*sp),cdt);
+  if (m_pCollider->Collide (*sp,cdt)) hit++;
 
   // Check collision of with the things in this sector.
   csThing* tp = sp->GetFirstThing ();
   while (tp)
   {
     // TODO, if and when Things can move, their transform must be passed in.
-    hit += CollidePair(this,csColliderPointerObject::GetCollider(*tp),cdt);
+    if (m_pCollider->Collide(*tp,cdt)) hit++;
     tp = (csThing*)(tp->GetNext ());
     // TODO, should test which one is the closest.
   }
@@ -188,8 +191,7 @@ int csBeing::_CollisionDetect (csSector* sp, csTransform *cdt)
     sp3d = (csSprite3D*)sp;
     cds.SetO2T (sp3d->GetW2T ());
     cds.SetOrigin (sp3d->GetW2TTranslation ());
-    csCollider* pCollider = csColliderPointerObject::GetCollider(*sp3d);
-    if (pCollider) hit+= CollidePair (this,pCollider,cdt,&cds);
+    if (m_pCollider->Collide (*sp3d,cdt,&cds)) hit++;
   }
 
   return hit;
@@ -228,7 +230,7 @@ int csBeing::FindSectors ( csVector3 v, csVector3 d, csSector *s, csSector **sa 
 int csBeing::CollisionDetect( void )
 {
   int hit = 0, cs;
-  CollideReset();
+  m_pCollider->CollideReset();
         
   if (_sold == 0)
   {
@@ -246,7 +248,7 @@ int csBeing::CollisionDetect( void )
   csSector *all [MAXSECTORSOCCUPIED];
   int scount = 0;
 
-  scount = FindSectors (transform->GetO2TTranslation (), GetBbox()->GetRadius(), sector, all);
+  scount = FindSectors (transform->GetO2TTranslation (), m_pCollider->GetRadius(), sector, all);
 
   // If we were to fall from our new position, which sector would our feet end up in?
   csTransform cdtnew (transform->GetO2T (), transform->GetO2TTranslation ());
@@ -271,7 +273,7 @@ int csBeing::CollisionDetect( void )
   cdtnew.SetOrigin (transform->GetO2TTranslation () + (0.2 * VEC_DOWN));
 
   // Test with the known ground object.
-  hit = _ground && CollidePair (this, _ground, &cdtnew);
+  hit = _ground && m_pCollider->Collide (*_ground, &cdtnew);
   cs = 0;
   while (!hit && (cs < scount))    // Test all nearby sectors.
   {
@@ -287,13 +289,13 @@ int csBeing::CollisionDetect( void )
                 
     // We are on something solid, remember what the ground was.
     csCdTriangle *tr1 = 0, *tr2 = 0;
-    _ground = FindCollision(&tr1,&tr2);
+    _ground = m_pCollider->FindCollision(&tr1,&tr2);
     // TODO: Check tr2 and what its normal is w.r.t. gravity,
     // If the angle more than 45* we should slip/bounce.
                 
     // printf("Ground %s\n",ground->get_name());
     // Perform forward collision of player with this sector.
-    CollideReset();
+    m_pCollider->CollideReset();
 
     cs = 0;
     hit = 0;
@@ -307,7 +309,7 @@ int csBeing::CollisionDetect( void )
     {
       // Get the object we hit.
 
-      csCollider *cdhit = FindCollision();
+      csCollider *cdhit = m_pCollider->FindCollision();
                         
       // Try to see if we can climb up.
       csTransform cdtnew(transform->GetO2T (),transform->GetO2TTranslation ()+(0.2*VEC_UP));
@@ -321,9 +323,9 @@ int csBeing::CollisionDetect( void )
         hit = _CollisionDetect(all[cs], &cdtnew);
         cs++;
       }
-      if (!CollidePair(this,cdhit, &cdtnew) && !hit)
+      if (!m_pCollider->Collide(*cdhit, &cdtnew) && !hit)
       {
-        CollideReset();
+        m_pCollider->CollideReset();
         climbing = true;
         transform->SetOrigin (cdtnew.GetO2TTranslation ());
       }

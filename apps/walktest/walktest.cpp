@@ -38,14 +38,18 @@
 #include "csengine/thing.h"
 #include "csengine/wirefrm.h"
 #include "csengine/polytext.h"
+#include "csengine/polyset.h"
+#include "csengine/polygon.h"
 #include "csengine/pol2d.h"
+#include "csengine/sector.h"
+#include "csengine/world.h"
 #include "csengine/covtree.h"
 #include "csscript/csscript.h"
 #include "csscript/intscri.h"
-#include "csengine/cdobj.h"
 #include "csengine/collider.h"
 #include "csengine/cspixmap.h"
 #include "csengine/terrain.h"
+#include "csengine/cssprite.h"
 #include "csparser/impexp.h"
 #include "csutil/inifile.h"
 #include "csutil/csrect.h"
@@ -57,6 +61,7 @@
 #include "itxtmgr.h"
 #include "isndrdr.h"
 #include "iimage.h"
+#include "csengine/colldet/rapid.h"
 
 #if defined(OS_DOS) || defined(OS_WIN32) || defined (OS_OS2)
 #  include <io.h>
@@ -677,8 +682,8 @@ void WalkTest::CreateColliders (void)
   p->AddVertex (0); p->AddVertex (4);
   p->AddVertex (7); p->AddVertex (3);
 
-  CHK (body = new csCollider (pb));
-  CHK (delete pb);
+  CHK (body = new csRAPIDCollider (pb));
+//  CHK (delete pb);
 
   CHK (csPolygonSet *pl = new csPolygonSet ());
 
@@ -722,8 +727,8 @@ void WalkTest::CreateColliders (void)
   p->AddVertex (0); p->AddVertex (4);
   p->AddVertex (7); p->AddVertex (3);
 
-  CHK (legs = new csCollider(pl));
-  CHK (delete pl);
+  CHK (legs = new csRAPIDCollider(pl));
+//  CHK (delete pl);
 
   if (!body || !legs)
     do_cd = false;
@@ -762,20 +767,19 @@ int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa)
   return c;
 }
 
-int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
+int CollisionDetect (csRAPIDCollider *c, csSector* sp, csTransform *cdt)
 {
   int hit = 0;
 
   // Check collision with this sector.
-  csCollider::numHits = 0;
-  csCollider::CollidePair (c, csColliderPointerObject::GetCollider(*sp), cdt);
-  collision_pair *CD_contact = csCollider::GetCollisions ();
+  csRAPIDCollider::CollideReset();
+  if (c->Collide(*sp, cdt)) hit++;
+  collision_pair *CD_contact = csRAPIDCollider::GetCollisions ();
 
-  hit += csCollider::numHits;
-  for (int i=0 ; i<csCollider::numHits ; i++)
+  for (int i=0 ; i<csRAPIDCollider::numHits ; i++)
     our_cd_contact[num_our_cd++] = CD_contact[i];
 
-  if (csCollider::firstHit && hit)
+  if (csRAPIDCollider::GetFirstHit() && hit)
     return 1;
 
   // Check collision with the things in this sector.
@@ -783,15 +787,14 @@ int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
   while (tp)
   {
     // TODO, if and when Things can move, their transform must be passed in.
-    csCollider::numHits = 0;
-    csCollider::CollidePair (c, csColliderPointerObject::GetCollider (*tp), cdt);
-    hit += csCollider::numHits;
+    csRAPIDCollider::numHits = 0;
+    if (c->Collide(*tp, cdt)) hit++;
 
-    CD_contact = csCollider::GetCollisions ();
-    for (int i=0 ; i<csCollider::numHits ; i++)
+    CD_contact = csRAPIDCollider::GetCollisions ();
+    for (int i=0 ; i<csRAPIDCollider::numHits ; i++)
       our_cd_contact[num_our_cd++] = CD_contact[i];
 
-    if (csCollider::firstHit && hit)
+    if (csRAPIDCollider::GetFirstHit() && hit)
       return 1;
     tp = (csThing*)(tp->GetNext ());
     // TODO, should test which one is the closest.
@@ -809,11 +812,11 @@ void DoGravity (csVector3& pos, csVector3& vel)
   csOrthoTransform test (m, new_pos);
 
   csSector *n[MAXSECTORSOCCUPIED];
-  int num_sectors = FindSectors (new_pos, 4*Sys->body->GetBbox()->GetRadius(),
+  int num_sectors = FindSectors (new_pos, 4*Sys->body->GetRadius(),
     Sys->view->GetCamera()->GetSector(), n);
 
   num_our_cd = 0;
-  csCollider::firstHit = false;
+  csRAPIDCollider::SetFirstHit (false);
   int hits = 0;
 
   // Check to see if there are any terrains, if so test against those.
@@ -838,37 +841,37 @@ void DoGravity (csVector3& pos, csVector3& vel)
   }
   if (hits == 0)
   {
-	  csCollider::CollideReset ();
+	  csRAPIDCollider::CollideReset ();
 
 	  for ( ; num_sectors-- ; )
 		hits += CollisionDetect (Sys->body, n[num_sectors], &test);
 
 	  for (int j=0 ; j<hits ; j++)
 	  {
-		csCdTriangle *wall = our_cd_contact[j].tr2;
-		csVector3 n = ((wall->p3-wall->p2)%(wall->p2-wall->p1)).Unit();
-		if (n*vel<0)
-		  continue;
-		vel = -(vel%n)%n;
+      csCdTriangle *wall = our_cd_contact[j].tr2;
+      csVector3 n = ((wall->p3-wall->p2)%(wall->p2-wall->p1)).Unit();
+      if (n*vel<0)
+        continue;
+      vel = -(vel%n)%n;
 	  }
 
 	  // We now know our (possible) velocity. Let's try to move up or down, if possible
 	  new_pos = pos+vel;
 	  test = csOrthoTransform (csMatrix3(), new_pos);
 
-	  num_sectors = FindSectors (new_pos, 4*Sys->legs->GetBbox()->GetRadius(), 
+	  num_sectors = FindSectors (new_pos, 4*Sys->legs->GetRadius(), 
 								 Sys->view->GetCamera()->GetSector(), n);
 
 	  num_our_cd = 0;
-	  csCollider::firstHit = false;
-	  csCollider::numHits = 0;
+	  csRAPIDCollider::SetFirstHit (false);
+	  csRAPIDCollider::numHits = 0;
 	  int hit = 0;
 
-	  csCollider::CollideReset ();
+	  csRAPIDCollider::CollideReset ();
 
 	  for ( ; num_sectors-- ; )
-		hit += CollisionDetect (Sys->legs, n[num_sectors], &test);
-
+      hit += CollisionDetect (Sys->legs, n[num_sectors], &test);
+    
 	  if (!hit)
 	  {
 		Sys->on_ground = false;
@@ -877,8 +880,8 @@ void DoGravity (csVector3& pos, csVector3& vel)
 	  }
 	  else
 	  {
-		float max_y=-1e10;
-
+      float max_y=-1e10;
+      
 		for (int j=0 ; j<hit ; j++)
 		{
 		  csCdTriangle first  = *our_cd_contact[j].tr1;
@@ -1150,14 +1153,12 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
     sn--;
     csSector* sp = (csSector*)world->sectors[sn];
     // Initialize the sector itself.
-    CHK(csCollider* pCollider = new csCollider(sp));
-    csColliderPointerObject::SetCollider(*sp, pCollider, true);
+    CHK(new csRAPIDCollider(*sp, sp));
     // Initialize the things in this sector.
     csThing* tp = sp->GetFirstThing ();
     while (tp)
     {
-      CHK(csCollider* pCollider = new csCollider(tp));
-      csColliderPointerObject::SetCollider(*tp, pCollider, true);
+      CHK(new csRAPIDCollider(*tp, tp));
       tp = (csThing*)(tp->GetNext ());
     }
   }
@@ -1172,8 +1173,7 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
     spp = (csSprite3D*)sp;
 
     // TODO: Should create beings for these.
-    CHK(csCollider* pCollider = new csCollider(spp));
-    csColliderPointerObject::SetCollider(*spp, pCollider, true);
+    CHK(new csRAPIDCollider(*spp, spp));
   }
 
   // Create a player object that follows the camera around.

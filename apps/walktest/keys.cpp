@@ -38,7 +38,6 @@
 #include "csengine/light.h"
 #include "csengine/sector.h"
 #include "csengine/cspixmap.h"
-#include "csengine/cdobj.h"
 #include "csengine/collider.h"
 #include "csutil/scanstr.h"
 #include "csparser/impexp.h"
@@ -54,6 +53,7 @@
 #include "isndbuf.h"
 #include "isndrdr.h"
 #include "igraph3d.h"
+#include "csengine/colldet/rapid.h"
 
 csKeyMap* mapping = NULL;
 
@@ -570,8 +570,7 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth, in
   }
   csSprite3D* spr = add_sprite (skelname, "__skelghost__", where, pos, 1);
   spr->SetMixmode (CS_FX_SETALPHA (0.75));
-  CHK (csCollider* col = new csCollider (spr));
-  csColliderPointerObject::SetCollider (*spr, col, true);
+  CHK (new csRAPIDCollider (*spr, spr));
   CHK (GhostSpriteInfo* gh_info = new GhostSpriteInfo ());
   spr->ObjAdd (gh_info);
   gh_info->dir = 1;
@@ -581,13 +580,13 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth, in
 #define MAXSECTORSOCCUPIED  20
 
 extern int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa);
-extern int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt);
+extern int CollisionDetect (csRAPIDCollider *c, csSector* sp, csTransform *cdt);
 extern collision_pair our_cd_contact[1000];//=0;
 extern int num_our_cd;
 
 void move_ghost (csSprite3D* spr)
 {
-  csCollider* col = csColliderPointerObject::GetCollider (*spr);
+  csRAPIDCollider* col = csRAPIDCollider::GetRAPIDCollider (*spr);
   csSector* first_sector = (csSector*)(spr->sectors[0]);
 
   // Create a transformation 'test' which indicates where the ghost is moving too.
@@ -600,12 +599,12 @@ void move_ghost (csSprite3D* spr)
 
   // Find all sectors that the ghost will occupy on the new position.
   csSector *n[MAXSECTORSOCCUPIED];
-  int num_sectors = FindSectors (new_pos, 4*col->GetBbox()->GetRadius(), first_sector, n);
+  int num_sectors = FindSectors (new_pos, 4*col->GetRadius(), first_sector, n);
 
   // Start collision detection.
-  csCollider::CollideReset ();
+  csRAPIDCollider::CollideReset ();
   num_our_cd = 0;
-  csCollider::firstHit = false;
+  csRAPIDCollider::SetFirstHit(false);
   int hits = 0;
   for ( ; num_sectors-- ; )
     hits += CollisionDetect (col, n[num_sectors], &test);

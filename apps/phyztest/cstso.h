@@ -3,9 +3,9 @@
 
 // hideously inefficient collision detection/response algorithm
 // just wanted to see some stuff bouncing around for now. 
-
 #include "csphyzik/ctcat.h"
 #include "csengine/collider.h"
+#include "csengine/colldet/rapid.h"
 
 class csWorld;
 class csSprite3D;
@@ -72,6 +72,5 @@ public:
   // catasrophe will not exist.
   virtual void handle_catastrophe();
 };
-
 
 #endif
