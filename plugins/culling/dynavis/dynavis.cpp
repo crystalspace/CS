@@ -2122,7 +2122,18 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
     }
 
     char buf[200];
-    sprintf (buf, "#visobj=%d #visnode=%d", cnt_visible, cnt_node_visible);
+    sprintf (buf, "FR%c COV%c HIS%c WQ%c VPT%c IS%c CO%c OS%c #visobj=%d #visnode=%d",
+        do_cull_frustum ? '+' : '-',
+	do_cull_coverage == COVERAGE_OUTLINE ? 'o' :
+	do_cull_coverage == COVERAGE_POLYGON ? 'p' :
+	'-',
+	do_cull_history ? '+' : '-',
+	do_cull_writequeue ? '+' : '-',
+	do_cull_vpt ? '+' : '-',
+	do_cull_ignoresmall ? '+' : '-',
+	do_cull_clampoccluder ? '+' : '-',
+	do_cull_outline_splatting ? '+' : '-',
+    	cnt_visible, cnt_node_visible);
     g2d->Write (fnt, 10, 5, col_fgtext, col_bgtext, buf);
 
     if (cfg_view_mode == VIEWMODE_STATSOVERLAY

@@ -22,6 +22,8 @@ chronological order.
 	  At some spots this optimization can really help a lot.
 	- Jorrit added a 'toggle_splatting' command to Dynavis. Assigned the
 	  ctrl-d 8 key to that command.
+	- Jorrit enhanced the Dynavis debug mode so that it now shows which
+	  of the optimizations are enabled and which are disabled.
 6-Nov-2003
 	- res bumped the version of the iGraphics2D interface and updated
 	  some doxygen comments in include/graph2d.h. (Basically the 
