@@ -169,6 +169,7 @@ csGraphics2DDDraw6::csGraphics2DDDraw6(iBase *iParent) :
   m_bPaletteChanged(false),
   m_bPalettized(false),
   m_lpDD(NULL),
+  m_lpDD4(NULL),
   m_lpddClipper(NULL),
   m_lpddPal(NULL),
   m_lpddsBack(NULL),
@@ -363,7 +364,7 @@ csGraphics2DDDraw6::~csGraphics2DDDraw6(void)
   m_nGraphicsReady=0;
 }
 
-bool csGraphics2DDDraw6::Open(char *Title)
+bool csGraphics2DDDraw6::Open(const char *Title)
 {
   SecondaryInit();
 

@@ -176,6 +176,8 @@ csGraphics3DDirect3DDx6::csGraphics3DDirect3DDx6(iBase *iParent) :
   m_pLightmapCache(NULL),
   m_lpD3D(NULL),
   m_lpd3dBackMat(NULL),
+  m_pDirectDevice(NULL),
+  m_lpd3dDevice(NULL),
   m_lpd3dDevice2(NULL),
   m_lpd3dViewport(NULL),
   m_lpDD4(NULL),
@@ -184,7 +186,14 @@ csGraphics3DDirect3DDx6::csGraphics3DDirect3DDx6(iBase *iParent) :
   m_lpddZBuffer(NULL),
   m_pTextureCache(NULL),
   m_piSystem(NULL),
-  m_bVerbose(true)
+  m_bVerbose(true),
+  m_nHeight(0),
+  m_nHalfHeight(0),
+  m_nWidth(0),
+  m_nHalfWidth(0),
+  m_mixmode(0),
+  m_ZBufMode(CS_ZBUF_NONE),
+  m_nDrawMode(0)
 {
   CONSTRUCT_IBASE (iParent);
 
@@ -282,8 +291,9 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   // Get the direct detection device.
   iGraphics2DDDraw6* pSysGInfo = QUERY_INTERFACE(m_piG2D, iGraphics2DDDraw6);
   ASSERT(pSysGInfo);
+
   pSysGInfo->SetFor3D(true);
-  
+
   // Open the 2D driver.
   if (!m_piG2D->Open(Title))
     return false;
@@ -791,7 +801,7 @@ bool csGraphics3DDirect3DDx6::BeginDraw (int nDrawFlags)
   
   m_nDrawMode = nDrawFlags;
   
-  return S_OK;
+  return true;
 }
 
 void csGraphics3DDirect3DDx6::FinishDraw ()
