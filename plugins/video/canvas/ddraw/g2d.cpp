@@ -38,6 +38,7 @@
 #endif
 
 #define WINDOW_STYLE (WS_CAPTION | WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU)
+#define FULLSCREEN_STYLE (WS_POPUP | WS_SYSMENU)
 
 static DirectDetection DDetection;
 static DirectDetectionDevice *DirectDevice;
@@ -153,15 +154,6 @@ bool csGraphics2DDDraw3::Open ()
   SetWindowLong (m_hWnd, GWL_WNDPROC, (LONG)WindowProc);
   SetWindowLong (m_hWnd, GWL_USERDATA, (LONG)this);
 
-  // Decide whenever we allow windowed mode at all
-  hdc = GetDC (m_hWnd);
-  m_bAllowWindowed = (GetDeviceCaps (hdc, RASTERCAPS) == Depth);
-  ReleaseDC (m_hWnd, hdc);
-  if (FullScreen && !m_bAllowWindowed)
-    FullScreen = true;
-  else
-    FullScreen = false;
-
   // Get ahold of the main DirectDraw object...
   DDetection.checkDevices2D ();
   DirectDevice = DDetection.findBestDevice2D ();
@@ -192,8 +184,21 @@ bool csGraphics2DDDraw3::Open ()
   // Default to no double buffering since usually this is SLOW
   m_bDoubleBuffer = false;
 
+  HDC DC = GetDC (0);
+  int desktopDepth = GetDeviceCaps (DC, BITSPIXEL);
+  ReleaseDC (0, DC);
   if (InitSurfaces () != DD_OK)
     return false;
+
+  // Determine if switching from FS to windowed is allowed
+  m_bAllowWindowed = !FullScreen || (desktopDepth == Depth);
+  if (FullScreen)
+  {
+    if (m_bAllowWindowed)
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Windowed mode allowed");
+    else
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Windowed mode not allowed");
+  }
 
   return true;
 }
@@ -509,7 +514,17 @@ bool csGraphics2DDDraw3::PerformExtensionV (char const* command, va_list args)
       if (!FullScreen)
         GetWindowRect (m_hWnd, &m_rcWindow);
       FullScreen = fs;
-      ChangeCoopLevel ();
+      if (FAILED(ChangeCoopLevel ()))
+	Report (CS_REPORTER_SEVERITY_WARNING,
+	  "ChangeCoopLevel() failed!");
+    } 
+    else
+    {
+      if (!(m_bAllowWindowed || fs))
+      {
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Windowed mode not available!");
+      }
     }
   }
   else
@@ -551,17 +566,6 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
   DDSCAPS ddscaps;
   DDPIXELFORMAT ddpf;
 
-  hRet = m_lpDD->SetCooperativeLevel (m_hWnd, FullScreen ?
-    (DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN) : DDSCL_NORMAL);
-  if (hRet != DD_OK)
-    return InitFail (hRet, "SetCooperativeLevel FAILED (Code: %08lx)\n");
-
-  // Set window style bits
-  SetWindowLong (m_hWnd, GWL_STYLE, FullScreen ? 0 : WINDOW_STYLE);
-  // Call SetWindowPos so that the change takes effect
-  SetWindowPos (m_hWnd, HWND_TOP, 0, 0, 0, 0,
-    SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-
   if (FullScreen)
   {
     // Set FS video mode
@@ -584,8 +588,23 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
       hRet = m_lpDD->SetDisplayMode (Width, Height, Depth);
     }
     if (hRet != DD_OK)
-      return InitFail (hRet, "SetDisplayMode FAILED (Code: %08lx)\n");
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING,
+        "SetDisplayMode FAILED (Code: %08lx); will try windowed mode", hRet);
+      FullScreen = false;
+    }
   }
+
+  hRet = m_lpDD->SetCooperativeLevel (m_hWnd, FullScreen ?
+    (DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN) : DDSCL_NORMAL);
+  if (hRet != DD_OK)
+    return InitFail (hRet, "SetCooperativeLevel FAILED (Code: %08lx)\n");
+
+  // Set window style bits
+  SetWindowLong (m_hWnd, GWL_STYLE, FullScreen ? FULLSCREEN_STYLE : WINDOW_STYLE);
+  // Call SetWindowPos so that the change takes effect
+  SetWindowPos (m_hWnd, HWND_TOP, 0, 0, 0, 0,
+    SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 
   if (!FullScreen || !m_bDoubleBuffer)
   {
@@ -729,17 +748,20 @@ HRESULT csGraphics2DDDraw3::ChangeCoopLevel ()
   hRet = InitSurfaces ();
 
   // Now restore the contents of backbuffer
-  int times;
-  for (times = (m_bDoubleBuffer && FullScreen) ? 2 : 1; times; times--)
-    if (BeginDraw ())
-    {
-      size_t BytesPerLine = Width * ((Depth + 7) / 8);
-      for (i = 0; i < Height; i++)
-        memcpy (Memory + LineAddress [i], oldBuffer + i * BytesPerLine, BytesPerLine);
-      FinishDraw ();
-      Print (NULL);
-    }
-  delete [] oldBuffer;
+  if (oldBuffer)
+  {
+    int times;
+    for (times = (m_bDoubleBuffer && FullScreen) ? 2 : 1; times; times--)
+      if (BeginDraw ())
+      {
+	size_t BytesPerLine = Width * ((Depth + 7) / 8);
+	for (i = 0; i < Height; i++)
+	  memcpy (Memory + LineAddress [i], oldBuffer + i * BytesPerLine, BytesPerLine);
+	FinishDraw ();
+	Print (NULL);
+      }
+    delete [] oldBuffer;
+  }
 
   return hRet;
 }
@@ -848,15 +870,11 @@ LRESULT CALLBACK csGraphics2DDDraw3::WindowProc (HWND hWnd, UINT message,
     case WM_PAINT:
       if (!This->FullScreen || !This->m_bDoubleBuffer)
       {
-        RECT rect;
-        if (GetUpdateRect (hWnd, &rect, FALSE))
-        {
-          PAINTSTRUCT ps;
-          BeginPaint (hWnd, &ps);
-          This->Refresh (rect);
-          EndPaint (hWnd, &ps);
-          return TRUE;
-        }
+        PAINTSTRUCT ps;
+        BeginPaint (hWnd, &ps);
+	This->Refresh (ps.rcPaint);
+        EndPaint (hWnd, &ps);
+        return TRUE;
       }
       break;
     case WM_SYSKEYDOWN:
@@ -888,4 +906,9 @@ void csGraphics2DDDraw3::AlertV (int type, const char* title,
     const char* okMsg, const char* msg, va_list args)
 {
   m_piWin32Assistant->AlertV (m_hWnd, type, title, okMsg, msg, args);
+  if (FullScreen)
+  {
+    ChangeCoopLevel();
+    // @@@ window acts strange after this
+  }
 }
