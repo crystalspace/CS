@@ -6320,6 +6320,7 @@ package cspace::iSpriteCal3DFactoryState;
 *AddMorphAnimation = *cspacec::iSpriteCal3DFactoryState_AddMorphAnimation;
 *AddMorphTarget = *cspacec::iSpriteCal3DFactoryState_AddMorphTarget;
 *AddCoreMaterial = *cspacec::iSpriteCal3DFactoryState_AddCoreMaterial;
+*CalculateAllBoneBoundingBoxes = *cspacec::iSpriteCal3DFactoryState_CalculateAllBoneBoundingBoxes;
 *BindMaterials = *cspacec::iSpriteCal3DFactoryState_BindMaterials;
 *GetMeshCount = *cspacec::iSpriteCal3DFactoryState_GetMeshCount;
 *GetMorphAnimationCount = *cspacec::iSpriteCal3DFactoryState_GetMorphAnimationCount;
