@@ -79,6 +79,26 @@ public:
       root = 0;
   }
 
+  /** Copy constructor just copies all data */
+  csArray (const csArray& other)
+  {
+    count = 0;
+    capacity = 0;
+    threshold = other.threshold;
+    root = 0;
+    for (int i=0;i<other.Length();i++)
+      Push (other[i]);
+  }
+
+  void operator = (const csArray& other)
+  {
+    // simple but not optimal solution here
+    DeleteAll ();
+
+    for (int i=0;i<other.Length();i++)
+      Push(other[i]);
+  }
+
   /// Clear entire vector, releasing all memory.
   void DeleteAll ()
   {

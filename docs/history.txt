@@ -27,6 +27,7 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine reverted Frank Richter's changes to the software
 	  renderer since they were causing bizarre texture mapping problems
 	  for some people and caused frequent crashes.
+	- Matze Braun added copy constructors and = operator to csArray
 27-Feb-2003
 	- res fixed the "shifted alpha map" bug in the software renderer.
 	- Marten Svanfeldt once again fiddled with the light/shadow culling. 
