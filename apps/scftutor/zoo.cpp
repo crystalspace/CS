@@ -74,9 +74,8 @@ void Clone (iBase *iObject)
 //int main(int,char **)
 int main(int argc, char *argv[])
 {
-  //hack to hide warning.
-  argc;
-  argv;
+  (void)argc;
+  (void)argv;
 #if 0
   // This method requires you register dlls with scfreg (or manually) in scf.cfg
   csIniFile config ("scf.cfg");
