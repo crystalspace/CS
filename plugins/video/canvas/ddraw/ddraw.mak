@@ -51,8 +51,6 @@ SRC.DDRAW = $(wildcard plugins/video/canvas/ddraw/*.cpp $(SRC.COMMON.DRV2D)) \
 OBJ.DDRAW = $(addprefix $(OUT),$(notdir $(SRC.DDRAW:.cpp=$O)))
 DEP.DDRAW = CSUTIL CSSYS CSUTIL
 
-TO_INSTALL.CONFIG += data/config/direct3ddx5.cfg data/config/direct3ddx6.cfg
-
 MSVC.DSP += DDRAW
 DSP.DDRAW.NAME = csddraw
 DSP.DDRAW.TYPE = plugin
