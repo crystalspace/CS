@@ -3072,6 +3072,7 @@ void csGraphics3DOGLCommon::ClearCache ()
   // We will clear lightmap cache since when unloading a world lightmaps
   // become invalid. We won't clear texture cache since texture items are
   // cleaned up individually when an iTextureHandle's RefCount reaches zero.
+  if (!lightmap_cache) return;	// System is being destructed.
   FlushDrawPolygon ();
   lightmap_cache->Flush ();
   FlushDrawFog ();
