@@ -45,7 +45,7 @@ public:
   int rim_vertices;
 
   ConstructSphereTask(iObjectRegistry *objreg, vRef<csMetaMaterial> mat,
-                      csMetaSphere* s, std::string n, iSector *s, int rv);
+                      csMetaSphere* s, std::string n, iSector *sec, int rv);
   virtual ~ConstructSphereTask();
   virtual void doTask();
 };

@@ -45,7 +45,7 @@ public:
   int hub_vertices;
 
   ConstructCylinderTask(iObjectRegistry *objreg, vRef<csMetaMaterial> mat,
-                      csMetaCylinder* s, std::string n, iSector *s, int hv);
+                      csMetaCylinder* c, std::string n, iSector *s, int hv);
   virtual ~ConstructCylinderTask();
   virtual void doTask();
 };

@@ -36,6 +36,14 @@
 #include "iutil/eventq.h"
 #include "ivaria/dynamics.h"
 
+#ifndef M_PI
+# ifdef PI
+#  define M_PI PI
+# else
+#  define M_PI 3.141592
+# endif
+#endif
+
 class csVosA3DL : public iComponent, public iEventHandler,
     public iVosA3DL, public iVosApi
 {
