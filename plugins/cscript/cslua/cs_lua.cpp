@@ -1416,12 +1416,12 @@ static void *SwigiMaterialHandleToiBase(void *ptr) {
 static int
 wrap_iMaterialHandle_GetTexture(lua_State *L)
 {
-    iTextureHandle * _result;
+    csPtr<iTextureHandle> * _result;
     iMaterialHandle * _arg0;
 
 {_arg0 = (iMaterialHandle *)LS_luaL_check_userdata(L, 1);}
 	lua_settop(L, 0);
-    _result = (iTextureHandle *)iMaterialHandle_GetTexture(_arg0);
+    _result = new csPtr<iTextureHandle> (iMaterialHandle_GetTexture(_arg0));
 {LS_luaL_pushuserpointer(L, _result, iTextureHandle_tag);}
 	return 1;
 }
@@ -1638,14 +1638,14 @@ static void *SwigiFontServerToiBase(void *ptr) {
 static int
 wrap_iFontServer_LoadFont(lua_State *L)
 {
-    iFont * _result;
+    csPtr<iFont> * _result;
     iFontServer * _arg0;
     char * _arg1;
 
 {_arg0 = (iFontServer *)LS_luaL_check_userdata(L, 1);}
 {_arg1 = (char*)luaL_opt_string(L, 2, NULL);}
 	lua_settop(L, 0);
-    _result = (iFont *)iFontServer_LoadFont(_arg0,_arg1);
+    _result = new csPtr<iFont> (iFontServer_LoadFont(_arg0,_arg1));
 {LS_luaL_pushuserpointer(L, _result, iFont_tag);}
 	return 1;
 }
@@ -2308,49 +2308,13 @@ wrap_iGraphics2D_SetMouseCursor(lua_State *L)
 static int
 wrap_iGraphics2D_ScreenShot(lua_State *L)
 {
-    iImage * _result;
+    csPtr<iImage> * _result;
     iGraphics2D * _arg0;
 
 {_arg0 = (iGraphics2D *)LS_luaL_check_userdata(L, 1);}
 	lua_settop(L, 0);
-    _result = (iImage *)iGraphics2D_ScreenShot(_arg0);
+    _result = new csPtr<iImage> (iGraphics2D_ScreenShot(_arg0));
 {LS_luaL_pushuserpointer(L, _result, iImage_tag);}
-	return 1;
-}
-
-#define iGraphics2D_CreateOffScreenCanvas(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4,_swigarg5,_swigarg6)  (_swigobj->CreateOffScreenCanvas(_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4,_swigarg5,_swigarg6))
-static int
-wrap_iGraphics2D_CreateOffScreenCanvas(lua_State *L)
-{
-    iGraphics2D * _result;
-    iGraphics2D * _arg0;
-    int  _arg1;
-    int  _arg2;
-    void * _arg3;
-    bool  _arg4;
-    csPixelFormat * _arg5;
-    csRGBpixel * _arg6 = NULL;
-    int  _arg7 = 0;
-
-{_arg0 = (iGraphics2D *)LS_luaL_check_userdata(L, 1);}
-{_arg1 = ( int )luaL_check_long(L, 2);}
-{_arg2 = ( int )luaL_check_long(L, 3);}
-{_arg3 = (void *)LS_luaL_check_userdata(L, 4);}
-{
-    if( (lua_isnull(L, 5)) || (lua_isnil(L, 5)) ) {
-	_arg4 = 0;
-    } else if (lua_isnumber(L, 5)) {
-	_arg4 = (bool)lua_tonumber(L, 5);
-    } else {
-	_arg4 = 1;
-    }
-}
-{_arg5 = (csPixelFormat *)LS_luaL_check_userdata(L, 6);}
-{_arg6 = ( csRGBpixel *)LS_luaL_opt_userdata(L, 7, NULL);}
-{_arg7 = ( int )luaL_opt_long(L, 8, (long)0);}
-	lua_settop(L, 0);
-    _result = (iGraphics2D *)iGraphics2D_CreateOffScreenCanvas(_arg0,_arg1,_arg2,_arg3,_arg4,_arg5,_arg6,_arg7);
-{LS_luaL_pushuserpointer(L, _result, iGraphics2D_tag);}
 	return 1;
 }
 
@@ -2374,6 +2338,26 @@ wrap_iGraphics2D_AllowResize(lua_State *L)
 	lua_settop(L, 0);
     iGraphics2D_AllowResize(_arg0,_arg1);
 	return 0;
+}
+
+#define iGraphics2D_FindRGB(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->FindRGB(_swigarg0,_swigarg1,_swigarg2))
+static int
+wrap_iGraphics2D_FindRGB(lua_State *L)
+{
+    int _result;
+    iGraphics2D * _arg0;
+    int  _arg1;
+    int  _arg2;
+    int  _arg3;
+
+{_arg0 = (iGraphics2D *)LS_luaL_check_userdata(L, 1);}
+{_arg1 = ( int )luaL_check_long(L, 2);}
+{_arg2 = ( int )luaL_check_long(L, 3);}
+{_arg3 = ( int )luaL_check_long(L, 4);}
+	lua_settop(L, 0);
+    _result = (int )iGraphics2D_FindRGB(_arg0,_arg1,_arg2,_arg3);
+{lua_pushnumber(L, (double)_result);}
+	return 1;
 }
 
 static void *SwigiHaloToiBase(void *ptr) {
@@ -3022,18 +3006,18 @@ static void *SwigiMeshObjectToiBase(void *ptr) {
     return (void *) dest;
 }
 
-static iThingState * iMeshObject_Query_iThingState(iMeshObject *self) {
+static csPtr<iThingState> iMeshObject_Query_iThingState(iMeshObject *self) {
       return SCF_QUERY_INTERFACE(self, iThingState);
     }
 static int
 wrap_iMeshObject_Query_iThingState(lua_State *L)
 {
-    iThingState * _result;
+    csPtr<iThingState> * _result;
     iMeshObject * _arg0;
 
 {_arg0 = (iMeshObject *)LS_luaL_check_userdata(L, 1);}
 	lua_settop(L, 0);
-    _result = (iThingState *)iMeshObject_Query_iThingState(_arg0);
+    _result = new csPtr<iThingState> (iMeshObject_Query_iThingState(_arg0));
 {LS_luaL_pushuserpointer(L, _result, iThingState_tag);}
 	return 1;
 }
@@ -3513,7 +3497,7 @@ wrap_iImage_Rescale(lua_State *L)
 static int
 wrap_iImage_MipMap(lua_State *L)
 {
-    iImage * _result;
+    csPtr<iImage> * _result;
     iImage * _arg0;
     int  _arg1;
     csRGBpixel * _arg2;
@@ -3522,7 +3506,7 @@ wrap_iImage_MipMap(lua_State *L)
 {_arg1 = ( int )luaL_check_long(L, 2);}
 {_arg2 = (csRGBpixel *)LS_luaL_check_userdata(L, 3);}
 	lua_settop(L, 0);
-    _result = (iImage *)iImage_MipMap(_arg0,_arg1,_arg2);
+    _result = new csPtr<iImage> (iImage_MipMap(_arg0,_arg1,_arg2));
 {LS_luaL_pushuserpointer(L, _result, iImage_tag);}
 	return 1;
 }
@@ -3615,12 +3599,12 @@ wrap_iImage_SetFormat(lua_State *L)
 static int
 wrap_iImage_Clone(lua_State *L)
 {
-    iImage * _result;
+    csPtr<iImage> * _result;
     iImage * _arg0;
 
 {_arg0 = (iImage *)LS_luaL_check_userdata(L, 1);}
 	lua_settop(L, 0);
-    _result = (iImage *)iImage_Clone(_arg0);
+    _result = new csPtr<iImage> (iImage_Clone(_arg0));
 {LS_luaL_pushuserpointer(L, _result, iImage_tag);}
 	return 1;
 }
@@ -3629,7 +3613,7 @@ wrap_iImage_Clone(lua_State *L)
 static int
 wrap_iImage_Crop(lua_State *L)
 {
-    iImage * _result;
+    csPtr<iImage> * _result;
     iImage * _arg0;
     int  _arg1;
     int  _arg2;
@@ -3642,7 +3626,7 @@ wrap_iImage_Crop(lua_State *L)
 {_arg3 = ( int )luaL_check_long(L, 4);}
 {_arg4 = ( int )luaL_check_long(L, 5);}
 	lua_settop(L, 0);
-    _result = (iImage *)iImage_Crop(_arg0,_arg1,_arg2,_arg3,_arg4);
+    _result = new csPtr<iImage> (iImage_Crop(_arg0,_arg1,_arg2,_arg3,_arg4));
 {LS_luaL_pushuserpointer(L, _result, iImage_tag);}
 	return 1;
 }
@@ -3659,7 +3643,7 @@ static void *SwigiTextureManagerToiBase(void *ptr) {
 static int
 wrap_iTextureManager_RegisterTexture(lua_State *L)
 {
-    iTextureHandle * _result;
+    csPtr<iTextureHandle> * _result;
     iTextureManager * _arg0;
     iImage * _arg1;
     int  _arg2;
@@ -3668,7 +3652,7 @@ wrap_iTextureManager_RegisterTexture(lua_State *L)
 {_arg1 = (iImage *)LS_luaL_check_userdata(L, 2);}
 {_arg2 = ( int )luaL_check_long(L, 3);}
 	lua_settop(L, 0);
-    _result = (iTextureHandle *)iTextureManager_RegisterTexture(_arg0,_arg1,_arg2);
+    _result = new csPtr<iTextureHandle> (iTextureManager_RegisterTexture(_arg0,_arg1,_arg2));
 {LS_luaL_pushuserpointer(L, _result, iTextureHandle_tag);}
 	return 1;
 }
@@ -3694,68 +3678,6 @@ wrap_iTextureManager_FreeImages(lua_State *L)
 {_arg0 = (iTextureManager *)LS_luaL_check_userdata(L, 1);}
 	lua_settop(L, 0);
     iTextureManager_FreeImages(_arg0);
-	return 0;
-}
-
-#define iTextureManager_ResetPalette(_swigobj)  (_swigobj->ResetPalette())
-static int
-wrap_iTextureManager_ResetPalette(lua_State *L)
-{
-    iTextureManager * _arg0;
-
-{_arg0 = (iTextureManager *)LS_luaL_check_userdata(L, 1);}
-	lua_settop(L, 0);
-    iTextureManager_ResetPalette(_arg0);
-	return 0;
-}
-
-#define iTextureManager_ReserveColor(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->ReserveColor(_swigarg0,_swigarg1,_swigarg2))
-static int
-wrap_iTextureManager_ReserveColor(lua_State *L)
-{
-    iTextureManager * _arg0;
-    int  _arg1;
-    int  _arg2;
-    int  _arg3;
-
-{_arg0 = (iTextureManager *)LS_luaL_check_userdata(L, 1);}
-{_arg1 = ( int )luaL_check_long(L, 2);}
-{_arg2 = ( int )luaL_check_long(L, 3);}
-{_arg3 = ( int )luaL_check_long(L, 4);}
-	lua_settop(L, 0);
-    iTextureManager_ReserveColor(_arg0,_arg1,_arg2,_arg3);
-	return 0;
-}
-
-#define iTextureManager_FindRGB(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->FindRGB(_swigarg0,_swigarg1,_swigarg2))
-static int
-wrap_iTextureManager_FindRGB(lua_State *L)
-{
-    int  _result;
-    iTextureManager * _arg0;
-    int  _arg1;
-    int  _arg2;
-    int  _arg3;
-
-{_arg0 = (iTextureManager *)LS_luaL_check_userdata(L, 1);}
-{_arg1 = ( int )luaL_check_long(L, 2);}
-{_arg2 = ( int )luaL_check_long(L, 3);}
-{_arg3 = ( int )luaL_check_long(L, 4);}
-	lua_settop(L, 0);
-    _result = (int )iTextureManager_FindRGB(_arg0,_arg1,_arg2,_arg3);
-{lua_pushnumber(L, (double)_result);}
-	return 1;
-}
-
-#define iTextureManager_SetPalette(_swigobj)  (_swigobj->SetPalette())
-static int
-wrap_iTextureManager_SetPalette(lua_State *L)
-{
-    iTextureManager * _arg0;
-
-{_arg0 = (iTextureManager *)LS_luaL_check_userdata(L, 1);}
-	lua_settop(L, 0);
-    iTextureManager_SetPalette(_arg0);
 	return 0;
 }
 
@@ -4303,7 +4225,7 @@ wrap_iEngine_CreateSector(lua_State *L)
 static int
 wrap_iEngine_CreateSectorWallsMesh(lua_State *L)
 {
-    iMeshWrapper * _result;
+    csPtr<iMeshWrapper> * _result;
     iEngine * _arg0;
     iSector * _arg1;
     char * _arg2;
@@ -4312,7 +4234,7 @@ wrap_iEngine_CreateSectorWallsMesh(lua_State *L)
 {_arg1 = (iSector *)LS_luaL_check_userdata(L, 2);}
 {_arg2 = (char*)luaL_opt_string(L, 3, NULL);}
 	lua_settop(L, 0);
-    _result = (iMeshWrapper *)iEngine_CreateSectorWallsMesh(_arg0,_arg1,_arg2);
+    _result = new csPtr<iMeshWrapper> (iEngine_CreateSectorWallsMesh(_arg0,_arg1,_arg2));
 {LS_luaL_pushuserpointer(L, _result, iMeshWrapper_tag);}
 	return 1;
 }
@@ -4367,34 +4289,34 @@ static void *SwigiObjectRegistryToiBase(void *ptr) {
     return (void *) dest;
 }
 
-static iEngine * iObjectRegistry_Query_iEngine(iObjectRegistry *self) {
+static csPtr<iEngine> iObjectRegistry_Query_iEngine(iObjectRegistry *self) {
       return CS_QUERY_REGISTRY(self, iEngine);
     }
 static int
 wrap_iObjectRegistry_Query_iEngine(lua_State *L)
 {
-    iEngine * _result;
+    csPtr<iEngine> * _result;
     iObjectRegistry * _arg0;
 
 {_arg0 = (iObjectRegistry *)LS_luaL_check_userdata(L, 1);}
 	lua_settop(L, 0);
-    _result = (iEngine *)iObjectRegistry_Query_iEngine(_arg0);
+    _result = new csPtr<iEngine> (iObjectRegistry_Query_iEngine(_arg0));
 {LS_luaL_pushuserpointer(L, _result, iEngine_tag);}
 	return 1;
 }
 
-static iGraphics3D * iObjectRegistry_Query_iGraphics3D(iObjectRegistry *self) {
+static csPtr<iGraphics3D>  iObjectRegistry_Query_iGraphics3D(iObjectRegistry *self) {
       return CS_QUERY_REGISTRY(self, iGraphics3D);
     }
 static int
 wrap_iObjectRegistry_Query_iGraphics3D(lua_State *L)
 {
-    iGraphics3D * _result;
+    csPtr<iGraphics3D> * _result;
     iObjectRegistry * _arg0;
 
 {_arg0 = (iObjectRegistry *)LS_luaL_check_userdata(L, 1);}
 	lua_settop(L, 0);
-    _result = (iGraphics3D *)iObjectRegistry_Query_iGraphics3D(_arg0);
+    _result = new csPtr<iGraphics3D> (iObjectRegistry_Query_iGraphics3D(_arg0));
 {LS_luaL_pushuserpointer(L, _result, iGraphics3D_tag);}
 	return 1;
 }
@@ -4615,7 +4537,7 @@ cspace_initialize(lua_State *L)
 	lua_register(L, "iGraphics2D_SetMousePosition", wrap_iGraphics2D_SetMousePosition);
 	lua_register(L, "iGraphics2D_SetMouseCursor", wrap_iGraphics2D_SetMouseCursor);
 	lua_register(L, "iGraphics2D_ScreenShot", wrap_iGraphics2D_ScreenShot);
-	lua_register(L, "iGraphics2D_CreateOffScreenCanvas", wrap_iGraphics2D_CreateOffScreenCanvas);
+	lua_register(L, "iGraphics2D_FindRGB", wrap_iGraphics2D_FindRGB);
 	lua_register(L, "iGraphics2D_AllowResize", wrap_iGraphics2D_AllowResize);
 	lua_register(L, "iGraphics2D_DecRef", wrap_iBase_DecRef);
 	iGraphics2D_tag = lua_newtag(L);
@@ -4751,10 +4673,6 @@ cspace_initialize(lua_State *L)
 	lua_register(L, "iTextureManager_RegisterTexture", wrap_iTextureManager_RegisterTexture);
 	lua_register(L, "iTextureManager_PrepareTextures", wrap_iTextureManager_PrepareTextures);
 	lua_register(L, "iTextureManager_FreeImages", wrap_iTextureManager_FreeImages);
-	lua_register(L, "iTextureManager_ResetPalette", wrap_iTextureManager_ResetPalette);
-	lua_register(L, "iTextureManager_ReserveColor", wrap_iTextureManager_ReserveColor);
-	lua_register(L, "iTextureManager_FindRGB", wrap_iTextureManager_FindRGB);
-	lua_register(L, "iTextureManager_SetPalette", wrap_iTextureManager_SetPalette);
 	lua_register(L, "iTextureManager_SetVerbose", wrap_iTextureManager_SetVerbose);
 	lua_register(L, "iTextureManager_GetTextureFormat", wrap_iTextureManager_GetTextureFormat);
 	lua_register(L, "iTextureManager_DecRef", wrap_iBase_DecRef);

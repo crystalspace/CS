@@ -48,6 +48,8 @@ The history order is reversed so that new features are at the top.
 	  correction patch to the Texinfo documentation from Andreas Busch
 	  <nobita@t-online.de>.  Also applied a few minor corrections from Eric
 	  Sunshine.
+	- Eric Sunshine applied a patch from Andreas Busch <nobita@t-online.de>
+	  to convert the cslua plugin over to csRef/csPtr.
 9-Dec-2002
 	- Fixed a bug in Dynavis where it would consider polygons as possible
 	  occluders even if Z very close to 0. This could cause bad overflow.
