@@ -41,6 +41,10 @@ The history order has been reversed so that new features are at the top.
 	  csSystemDriver to "NetProtocol" in order to better reflect its true
 	  meaning.  This also works around a name clash with the Objective-C
 	  class "Protocol".
+	- Eric Sunshine removed a significant number of out-of-date references
+	  to obsolete 'null' drivers from platform makefiles.  Also updated to
+	  reflect fact that network drivers have moved to CS/plugins
+	  directory.
 27-Apr-2000
 	- Frank O'Connor updated VC project files for NetComm and
 	  the scfTutor apps (zoo, dog, worm).
