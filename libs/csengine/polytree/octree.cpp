@@ -1203,7 +1203,8 @@ bool csOctree::ReadFromCache (
   iDataBuffer *data = cache_mgr->ReadCache ("octree", NULL, 0);
   if (!data) return false;	// File doesn't exist
 
-  csMemFile* cf = new csMemFile (*(char**)data, data->GetSize ());
+  csMemFile* cf = new csMemFile (*(char**)data, data->GetSize (),
+  	csMemFile::DISPOSITION_IGNORE);
   char buf[10];
   ReadString (cf, buf, 4);
   if (strncmp (buf, "OCTR", 4))
