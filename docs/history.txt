@@ -85,6 +85,14 @@ chronological order.
 	  new renderer enabled) but it fixes it for all the rest :-)
 	- Anders Stenberg now added the csplugin, jam and makefiles for new 
 	  software renderer, which were forgotten last time.
+	- Jorrit worked around a strange thing with new renderer and the
+	  XOR pattern image that is used in case a texture is not found. It
+	  turns out that GetMipMapDimensions() was not working properly then
+	  because the mipmap levels of the texture were not initialized. I
+	  fixed this by testing in the thing plugin for the return value
+	  of GetMipMapDimensions() and if it returns false I postpone init
+	  to later (like what happens with materials that are not yet
+	  prepared).
 	- Eric Sunshine fixed the following build-time problems with the recent
 	  changes to support BFD embedding of metainfo in plugins:
 	    - Fixed totally broken makefile syntax in unix.mak.
@@ -100,7 +108,6 @@ chronological order.
 	    config. 
 	  - pgserver uses all the accelerated CS operations
 	    again. Non-functional. 
-	
 28-Aug-2003
 	- Jorrit fixed the x2d plugin so it actually reports an error if the
 	  'xwin' plugin cannot be found.
