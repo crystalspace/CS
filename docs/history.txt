@@ -18,6 +18,10 @@ chronological order.
 	    - Enabled the fog stuff again in iSector. Support for this has
 	      to be disabled elsewhere.
 	    - Walktest now compiles and 'almost' runs using the new renderer.
+	    - Fixed the ball mesh plugin so that it compiles again with new
+	      renderer. Not sure that the fix is right. I had to add a
+	      missing parameter to CreateRenderBuffer() and I guessed that
+	      the correct value should be 'false' for index.
 26-Aug-2003
         - Philip Wyett eliminated warning suggesting adding parentheses
           around truth value in csGLShaderFFP::LoadLayer (...);.
