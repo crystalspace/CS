@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?> 
-<renderloop>
+<params>
   <name>std_rloop_diffuse</name>
   <steps>
     <!-- ambient lighting -->
@@ -19,4 +19,4 @@
       </steps>
     </step>
   </steps>
-</renderloop>
+</params>
