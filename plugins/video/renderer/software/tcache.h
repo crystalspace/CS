@@ -139,6 +139,9 @@ public:
    */
   SoftwareCachedTexture *cache_texture (int MipMap, iPolygonTexture* pt);
 
+  /// Remove a texture from the cache.
+  void uncache_texture (int MipMap, iPolygonTexture* pt);
+
   /**
    * Check if the given texture is in the cache and possibly
    * add it if not. The parts of lighted texture that were changed

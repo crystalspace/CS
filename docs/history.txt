@@ -48,6 +48,14 @@ Short-term cleanups that need to be done:
 		MIPMAP(no) DITHER(yes))
 	      Dithering is now by default off in soft3d.cfg.
 	- Fixed line renderer because Andrew broke it a little.
+	- Fixed bug in engine/software combination. If a polygon is deleted
+	  it will now call a new G3D->RemoveFromCache() function so that
+	  the renderer gets a chance to remove all references in the
+	  cache for that polygon. Only the software renderer currently
+	  implements this (I provided an empty implementation in the
+	  other renderers). I don't know if the other renderers need
+	  some work there.
+	- Again enhanced robustnes of the solid bsp culler.
 15-Mar-2000
 	- Fixed bug in terrain interface to terrain engine. Now passes
 	  1/z instead of z. This fixes the OpenGL clipping bug and also

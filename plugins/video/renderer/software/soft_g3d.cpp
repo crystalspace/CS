@@ -2625,6 +2625,17 @@ void csGraphics3DSoftware::ClearCache()
   if (tcache) tcache->Clear ();
 }
 
+void csGraphics3DSoftware::RemoveFromCache (iPolygonTexture* poly_texture)
+{
+  if (tcache)
+  {
+    tcache->uncache_texture (0, poly_texture);
+    tcache->uncache_texture (1, poly_texture);
+    tcache->uncache_texture (2, poly_texture);
+    tcache->uncache_texture (3, poly_texture);
+  }
+}
+
 void csGraphics3DSoftware::DumpCache()
 {
   if (tcache) tcache->dump (this);

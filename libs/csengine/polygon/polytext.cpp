@@ -55,6 +55,7 @@ csPolyTexture::csPolyTexture ()
 
 csPolyTexture::~csPolyTexture ()
 {
+  csWorld::current_world->G3D->RemoveFromCache (this);
   if (lm) lm->DecRef ();
 }
 

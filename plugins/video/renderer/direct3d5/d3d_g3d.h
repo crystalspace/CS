@@ -230,6 +230,9 @@ public:
   /// Clear the texture cache.
   virtual void ClearCache ();
 
+  /// Remove some polygon from the cache.
+  virtual void RemoveFromCache (iPolygonTexture* /*poly_texture*/) { }
+
   /// Print the screen.
   virtual void Print (csRect* rect)
   { m_piG2D->Print (rect); }

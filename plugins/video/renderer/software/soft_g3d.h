@@ -344,6 +344,9 @@ public:
   /// Clear the texture cache.
   virtual void ClearCache ();
 
+  /// Remove texture from cache.
+  virtual void RemoveFromCache (iPolygonTexture* poly_texture);
+
   /// Get drawing buffer width
   virtual int GetWidth ()
   { return width; }

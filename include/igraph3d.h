@@ -558,6 +558,13 @@ struct iGraphics3D : public iPlugIn
   /// Clear the texture cache.
   virtual void ClearCache () = 0;
 
+  /**
+   * Remove some polygon from the cache.
+   * You have to call this function before deleting a polygon
+   * (csPolygon3D destructor will do that).
+   */
+  virtual void RemoveFromCache (iPolygonTexture* poly_texture) = 0;
+
   /// Get drawing buffer width
   virtual int GetWidth () = 0;
   /// Get drawing buffer height
