@@ -1,5 +1,21 @@
 The history order has been reversed so that new features are at the top.
 
+23-Jan-2001
+	- Martin Geisse moved the following to the new config system:
+	    - SCF.
+	    - Map2CS.
+	    - Freetype plugin.
+	    - Funcon plugin.
+	- Norman Kramer created new stream interface iStream, iAudioStream,
+	  iVideoStream, iCodec, iStreamIterator and iStreamFormat. These
+	  are mainly for the new video plugins.
+	- Norman Kramer did a beginning of AVI implementation (where the
+	  opendivx will live as an CODEC). Dont try to compile :)
+	- Norman also reorganized the new video plugin system a bit (for
+	  playing video's on a texture).
+	- Wouter Wijngaards improved texture alignment for the procedural
+	  sky. Now colors are computed for the center of a texel - not a
+	  corner point.
 22-Jan-2001
 	- Norman Kramer added a plugin for opendivx (MP4 decoder), note
 	  that you need the decoder lib from www.projectmayo.com (its
