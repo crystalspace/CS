@@ -13,7 +13,7 @@ The history order is reversed so that new features are at the top.
 	  disabled so that I can debug this later.
 	- Fixed a bug in XML version of spr3dldr. It would not correctly
 	  load the names of the limbs. This prevent the motion manager
-	  from working.
+	  from working. Thanks to Steven Geens for finding this bug.
 	- Found the bug in the tinyxml node pool optimization. The optimization
 	  is now enabled.
 3-Sep-2002
