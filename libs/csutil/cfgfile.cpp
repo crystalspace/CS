@@ -194,8 +194,6 @@ public:
 
   /// Rewind the iterator (points to nowhere after this)
   virtual void Rewind ();
-  /// Move to previous item and return true if the position is valid
-  virtual bool Prev ();
   /// Move to the next valid key. Returns false if no more keys exist.
   virtual bool Next();
 
@@ -234,6 +232,8 @@ private:
   bool DoPrev();
   // Move to the next node, ignoring subsection
   bool DoNext();
+  // Move to previous item and return true if the position is valid
+  bool Prev ();
 };
 
 IMPLEMENT_IBASE(csConfigIterator);
@@ -800,6 +800,7 @@ void csConfigFile::SetEOFComment(const char *text)
 {
   if (EOFComment) delete[] EOFComment;
   EOFComment = (text ? strnew(text) : NULL);
+  Dirty = true;
 }
 
 const char *csConfigFile::GetEOFComment() const
