@@ -139,6 +139,12 @@ bool csGraphics2DGLCommon::Open ()
       "crystalspace.canvas.openglcommon",
       "Pixel format: %s", pfStr.GetData());
   }
+  if (currentFormat[glpfvColorBits] < 24)
+  {
+    reporter->Report (CS_REPORTER_SEVERITY_WARNING,
+      "crystalspace.canvas.openglcommon",
+      "WARNING! Crystal Space performs better in 24 or 32 bit display mode!");
+  }
 
   if (version)
   {

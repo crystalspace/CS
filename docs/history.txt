@@ -10,6 +10,9 @@ chronological order.
 	- Jorrit fixed a bug in all particle systems that depend on
 	  csNewParticleSystem (rain and fountain). 'camera_origin' was
 	  not set which could lead to bad back-to-front sorting for them.
+	- Jorrit changed the OpenGL canvases so that you get a warning
+	  when you try to run CS with less then 24 bit displays. Running
+	  CS under such conditions is sub-optimal.
 6-Sep-2004
 	- Eric Sunshine upgraded the ODE "sufficiently recent" check in
 	  configure.ac so that it demands version 0.5. Also added a check to
