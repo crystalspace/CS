@@ -72,6 +72,15 @@ csTextureHandleOpenGL::~csTextureHandleOpenGL ()
   G3D->DecRef ();
 }
 
+void csTextureHandleOpenGL::Clear ()
+{
+  if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC && tex[0])
+  {
+    SCF_DEC_REF (((csTextureProcOpenGL*)tex[0])->texG3D);
+    ((csTextureProcOpenGL*)tex[0])->texG3D = NULL;
+  }
+}
+
 csTexture *csTextureHandleOpenGL::NewTexture (iImage *Image)
 {
   if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
@@ -250,4 +259,12 @@ void csTextureManagerOpenGL::UnregisterTexture (csTextureHandleOpenGL *handle)
 {
   int idx = textures.Find (handle);
   if (idx >= 0) textures.Delete (idx);
+}
+
+void csTextureManagerOpenGL::Clear ()
+{
+  for (int i=0; i < textures.Length (); i++)
+    ((csTextureHandleOpenGL *)textures.Get (i))->Clear ();
+
+  csTextureManager::Clear ();
 }

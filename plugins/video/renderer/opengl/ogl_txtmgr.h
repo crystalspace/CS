@@ -105,6 +105,9 @@ public:
    */
   virtual bool GetAlphaMap ()
   { return has_alpha; }
+
+  /// maybe we are an proc texture and have additionally things to free
+  virtual void Clear ();
 };
 
 /**
@@ -148,6 +151,9 @@ public:
   /// Called by applications
   virtual void UnregisterTexture(iTextureHandle* handle)
   { UnregisterTexture((csTextureHandleOpenGL *)handle); }
+
+  /// remove all textures and materials
+  virtual void Clear ();
 
   /// Read configuration values from config file.
   virtual void read_config (iConfigFile *config);
