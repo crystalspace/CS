@@ -26,6 +26,10 @@ chronological order.
 	  'enum' emulation mechanism for Java which is incompatible with its
 	  pre-1.3.22 emulation. This caused compilation errors in existing
 	  code, such as SimpleRoom.java.
+	- Eric Sunshine fixed problem in SimpleRoom.java where it was
+	  requesting the null renderer rather than the OpenGL renderer. This
+	  explains why it failed to open a window. SimpleRoom.java now works
+	  correctly on Unix.
 20-Oct-2004
 	- Jorrit fixed a critical bug in VFS. In case you tried to
 	  call VFS->Sync() while there were still references to open files

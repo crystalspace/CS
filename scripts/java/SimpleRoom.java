@@ -157,7 +157,7 @@ class SimpleRoom extends CS
 		plugins.addElement(new csPluginRequest(
                   "crystalspace.kernel.vfs", "iVFS"));
 		plugins.addElement(new csPluginRequest(
-                  "crystalspace.graphics3d.null", "iGraphics3D"));
+                  "crystalspace.graphics3d.opengl", "iGraphics3D"));
 		plugins.addElement(new csPluginRequest(
                   "crystalspace.graphic.image.io.multiplex", "iImageIO"));
 		plugins.addElement(new csPluginRequest(
