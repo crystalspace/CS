@@ -1,6 +1,10 @@
 The history order has been reversed so that new features are at the top.
 
 3-Apr-2001
+	- Norman Kramer fixed a warning about explicit initialization
+	  of iBase in copy constructor of csCamera.
+	- Norman Kramer fixed a batch of warnings about conversions and
+	  comparisons in the software sound renderer.
 	- Created new iThingState interface and let csThing implement it.
 	  iThingState is almost the same as iThing but with extras.
 	  iThing will probably be removed in the future.
