@@ -277,72 +277,51 @@ bool Demo::Initialize (int argc, const char* const argv[],
   // Check the demo file and mount it if required.
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
-  char map_dir[255];
   const char *val;
-  if (!(val = cmdline->GetName ()))
+  if ((val = cmdline->GetName ()) != NULL)
   {
-    // @@@ DEFAULT?
-    val = "BLA";
-  }
-  strcpy (map_dir, val);
-  cmdline->DecRef ();
+    do_demo = true;
+    myVFS->Mount ("/data/demo", val);
 
-  char tmp[255];
-  sprintf (tmp, "%s/", map_dir);
-  if (!myVFS->Exists (map_dir))
-  {
-    char *name = strrchr (map_dir, '/');
-    if (name)
+    if (!myVFS->ChDir ("/data/demo"))
     {
-      name++;
-      char* extension = strrchr (name, '.');
-      if (extension && !strcmp (extension+1, "zip"))
-      {
-	// The file already ends with the correct extension.
-	sprintf (tmp, "$.$/data$/%s, $.$/%s, $(..)$/data$/%s, %s",
-             name, name, name, name);
-      }
-      else
-      {
-	// Add the extension.
-	sprintf (tmp, "$.$/data$/%s.%s, $.$/%s.%s, $(..)$/data$/%s.%s",
-             name, "zip", name, "zip", name, "zip");
-      }
-      myVFS->Mount (map_dir, tmp);
+      Report (CS_REPORTER_SEVERITY_ERROR,
+	  "The directory on VFS for demo file does not exist!");
+     return false;
     }
-  }
 
-  if (!myVFS->ChDir (map_dir))
+    if (!loader->LoadLibraryFile ("library"))
+    {
+      //Report (CS_REPORTER_SEVERITY_ERROR,
+        //"There was an error loading library!");
+      //exit (0);
+    }
+    if (!loader->LoadMapFile ("world", false, true))
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR, "There was an error loading world!");
+      exit (0);
+    }
+
+    room = engine->GetSectors ()->FindByName ("room");
+    seqmgr = new DemoSequenceManager (this);
+    seqmgr->Setup ("sequences");
+
+    engine->Prepare ();
+
+    view = new csView (engine, myG3D);
+    view->GetCamera ()->SetSector (room);
+    view->GetCamera ()->GetTransform ().SetOrigin (
+  	  csVector3 (0.0f, 0.0f, -900.0f));
+    view->GetCamera ()->GetTransform ().RotateThis (
+  	  csVector3 (0.0f, 1.0f, 0.0f), 0.8f);
+    view->SetRectangle (0, 0, myG2D->GetWidth (), myG2D->GetHeight ());
+  }
+  else
   {
-    Report (CS_REPORTER_SEVERITY_ERROR,
-	"The directory on VFS for demo file does not exist!");
-   return false;
+    do_demo = false;
   }
 
-  if (!loader->LoadLibraryFile ("library"))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "There was an error loading library!");
-    exit (0);
-  }
-  if (!loader->LoadMapFile ("world", false, true))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "There was an error loading world!");
-    exit (0);
-  }
-
-  room = engine->GetSectors ()->FindByName ("room");
-  seqmgr = new DemoSequenceManager (this);
-  seqmgr->Setup ("sequences");
-
-  engine->Prepare ();
-
-  view = new csView (engine, myG3D);
-  view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (
-  	csVector3 (0.0f, 0.0f, -900.0f));
-  view->GetCamera ()->GetTransform ().RotateThis (
-  	csVector3 (0.0f, 1.0f, 0.0f), 0.8f);
-  view->SetRectangle (0, 0, myG2D->GetWidth (), myG2D->GetHeight ());
+  cmdline->DecRef ();
 
   txtmgr->SetPalette ();
   col_red = txtmgr->FindRGB (255, 0, 0);
@@ -413,6 +392,46 @@ void Demo::ShowError (const char* msg, ...)
 
 void Demo::SetupFrame ()
 {
+  if (!do_demo)
+  {
+    // Don't do the demo but print out information about
+    // where to get all stuff.
+    if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+    iTextureManager* txtmgr = myG3D->GetTextureManager ();
+    int col_bg = txtmgr->FindRGB (200, 180, 180);
+    myG2D->Clear (col_bg);
+    int tx = 10;
+    int ty = 10;
+    GfxWrite (tx, ty, col_black, col_bg,
+    	"This is the Crystal Space Demo application"); ty += 10;
+    GfxWrite (tx, ty, col_black, col_bg,
+    	"To use this demo you need to give a data file."); ty += 10;
+    GfxWrite (tx, ty, col_black, col_bg,
+    	"Download 'demodata.zip' from"); ty += 10;
+    GfxWrite (tx, ty, col_red, col_bg,
+    	"    ftp://sunsite.dk/projects/crystal/cs094/levels/demodata.zip"); ty += 10;
+
+    ty += 10;
+    ty += 10;
+
+    GfxWrite (tx, ty, col_black, col_bg,
+    	"After you downloaded demodata you can rerun this demo as follows:"); ty += 10;
+    GfxWrite (tx, ty, col_red, col_bg,
+    	"    csdemo demodata.zip"); ty += 10;
+    ty += 10;
+    GfxWrite (tx, ty, col_black, col_bg,
+    	"or you can run it with OpenGL and a higher resolution:"); ty += 10;
+    GfxWrite (tx, ty, col_red, col_bg,
+    	"    csdemo demodata.zip -video=opengl -mode=800x600"); ty += 10;
+
+    ty += 10;
+    ty += 10;
+
+    GfxWrite (tx, ty, col_black, col_bg,
+    	"Good luck!      (exit this program by pressing ESC)"); ty += 10;
+    return;
+  }
+
   csTicks elapsed_time, current_time;
   elapsed_time = vc->GetElapsedTicks ();
   current_time = vc->GetCurrentTicks ();
@@ -616,7 +635,20 @@ bool Demo::DemoHandleEvent (iEvent &Event)
     bool alt = (Event.Key.Modifiers & CSMASK_ALT) != 0;
     bool ctrl = (Event.Key.Modifiers & CSMASK_CTRL) != 0;
 
-    if (map_enabled == MAP_EDIT_FORWARD)
+    if (!do_demo)
+    {
+      if (Event.Key.Code == CSKEY_ESC)
+      {
+	iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+	if (q)
+	{
+	  q->GetEventOutlet()->Broadcast (cscmdQuit);
+	  q->DecRef ();
+	}
+        return true;
+      }
+    }
+    else if (map_enabled == MAP_EDIT_FORWARD)
     {
       //==============================
       // Handle keys in path_edit_forward mode.
@@ -1190,7 +1222,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       }
     }
   }
-  else if (Event.Type == csevMouseDown)
+  else if (do_demo && Event.Type == csevMouseDown)
   {
     if (Event.Mouse.Button == 1)
     {

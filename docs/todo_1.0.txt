@@ -149,7 +149,11 @@ Bugs to fix:
 	     [Bug 478072]
 	[S]  Using software renderer proctexes with OpenGL causes a crash
 	     (At some place the OpenGL texture's images get NULL).
-	
+	[F]  When mounting a real directory on a VFS path you need to do:
+	        Mount ("this/is/a/dir$/", "/lib/whatever");
+	     i.e. the last '/' has to be preceeded with '$'. This needs
+	     to be fixed.
+
 API and Small Feature Additions:
 	[F]  Translate point on polygon to texture space/object space
 	     coordinates (for selection). This is useful for Quark++.

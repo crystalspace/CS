@@ -65,6 +65,7 @@ public:
   char message[255];
   csTicks message_timer;
   bool message_error;
+  bool do_demo;
 
 private:
   iMeshWrapper* LoadObject (const char* objname, const char* filename,

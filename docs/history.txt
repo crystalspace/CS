@@ -10,6 +10,14 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bad bug in pseudo-dynamic lights. Due to a wrong test
 	  in the lighting code polygons that were fully lit by a
 	  pseudo-dynamic light would not get lit at all.
+	- CS demo now gives information about where to get demodata.zip
+	  if you run it without demodata given on the commandline.
+	- Removed the ad-hoc mount to demodata.zip from vfs.cfg.
+	- csdemo now only accepts real filesystem path for the demo zip
+	  or directory. So run csdemo with 'csdemo data/demodata.zip'
+	  for example.
+	- csdemo will no longer fail if there is no library in the demo
+	  archive.
 11-Mar-2002
 	- Fixed a bug in csScanStr when presented with an empty string
 	  as input. This prevented the proper scanning of the format
