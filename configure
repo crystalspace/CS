@@ -6282,36 +6282,36 @@ else
 	if test -n "$PYTHON"; then
   # Python 2.x?
 	    if test $cs_cv_python_distutils = yes; then
-  cs_cv_pybase=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
-		    'import distutils.sysconfig ; import os.path ; \\
-		    print os.path.basename( \\
-			distutils.sysconfig.get_python_lib(0,1))'") >&5
-  ($PYTHON -c \
-		    'import distutils.sysconfig ; import os.path ; \
-		    print os.path.basename( \
-			distutils.sysconfig.get_python_lib(0,1))') 2>&5
+  cs_pyver=`{ (echo "$as_me:$LINENO: \$PYTHON -c 'import sys, string; \\
+		    print string.join(map(str,sys.version_info[:2]),\".\")'") >&5
+  ($PYTHON -c 'import sys, string; \
+		    print string.join(map(str,sys.version_info[:2]),".")') 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }`
+		cs_cv_pybase="python${cs_pyver}"
 		cs_cv_pybase_cflags=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
-		    'import distutils.sysconfig ; \\
+		    'import distutils.sysconfig; \\
 		    print \"-I\"+distutils.sysconfig.get_python_inc()'") >&5
   ($PYTHON -c \
-		    'import distutils.sysconfig ; \
+		    'import distutils.sysconfig; \
 		    print "-I"+distutils.sysconfig.get_python_inc()') 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }`
+		# Depending upon platform and installation, link library might
+		# reside in "${prefix}/lib", "get_python_lib()/config", or
+		# "${prefix}/libs" on Windows.
 		cs_cv_pybase_lflags=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
-		    'import distutils.sysconfig ; import os.path ; \\
+		    'import sys,distutils.sysconfig; \\
 		    print \"-L\"+distutils.sysconfig.get_python_lib(0,1)+\" \"+ \\
-			\"-L\"+distutils.sysconfig.get_python_lib(0,1)+ \\
-			\"/config\"'") >&5
+			\"-L\"+distutils.sysconfig.get_python_lib(0,1)+\"/config\"\\
+			+\" -L\"+sys.prefix+\"/lib\"+\" -L\"+sys.prefix+\"/libs\"'") >&5
   ($PYTHON -c \
-		    'import distutils.sysconfig ; import os.path ; \
+		    'import sys,distutils.sysconfig; \
 		    print "-L"+distutils.sysconfig.get_python_lib(0,1)+" "+ \
-			"-L"+distutils.sysconfig.get_python_lib(0,1)+ \
-			"/config"') 2>&5
+			"-L"+distutils.sysconfig.get_python_lib(0,1)+"/config"\
+			+" -L"+sys.prefix+"/lib"+" -L"+sys.prefix+"/libs"') 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }`

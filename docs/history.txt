@@ -53,6 +53,9 @@ chronological order.
 	- Jorrit fixed a bug in csNewParticleSystem. If lighting was enabled
 	  it would pass an invalid color array to the renderer. This could
 	  cause very funky but invalid lighting effects.
+	- Eric Sunshine augmented the Python SDK check in configure.ac so that
+	  it now works correctly with the Python package for Windows which is
+	  distributed by www.python.org.
 11-Feb-2004
 	- Jorrit optimized the csNewParticleSystem slightly (used by the
 	  rain mesh plugin) and also cleaned it up a bit.

@@ -526,18 +526,20 @@ AS_IF([test "$with_python" != no],
 	AS_IF([test -n "$PYTHON"],
 	    [# Python 2.x?
 	    AS_IF([test $cs_cv_python_distutils = yes],
-		[cs_cv_pybase=`AC_RUN_LOG([$PYTHON -c \
-		    'import distutils.sysconfig ; import os.path ; \
-		    print os.path.basename( \
-			distutils.sysconfig.get_python_lib(0,1))'])`
+		[cs_pyver=`AC_RUN_LOG([$PYTHON -c 'import sys, string; \
+		    print string.join(map(str,sys.version_info[[:2]]),".")'])`
+		cs_cv_pybase="python${cs_pyver}"
 		cs_cv_pybase_cflags=`AC_RUN_LOG([$PYTHON -c \
-		    'import distutils.sysconfig ; \
+		    'import distutils.sysconfig; \
 		    print "-I"+distutils.sysconfig.get_python_inc()'])`
+		# Depending upon platform and installation, link library might
+		# reside in "${prefix}/lib", "get_python_lib()/config", or
+		# "${prefix}/libs" on Windows.
 		cs_cv_pybase_lflags=`AC_RUN_LOG([$PYTHON -c \
-		    'import distutils.sysconfig ; import os.path ; \
+		    'import sys,distutils.sysconfig; \
 		    print "-L"+distutils.sysconfig.get_python_lib(0,1)+" "+ \
-			"-L"+distutils.sysconfig.get_python_lib(0,1)+ \
-			"/config"'])`
+			"-L"+distutils.sysconfig.get_python_lib(0,1)+"/config"\
+			+" -L"+sys.prefix+"/lib"+" -L"+sys.prefix+"/libs"'])`
 		cs_cv_pybase_libs=`AC_RUN_LOG([$PYTHON -c \
 		    'import distutils.sysconfig ; \
 		    print (distutils.sysconfig.get_config_var("LIBS") or "")+ \
