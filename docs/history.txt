@@ -40,6 +40,8 @@ chronological order.
 	      indicated item; and InsertAfter() was inserting the new item
 	      _before_ the indicated item.
 	    - Fixed some crash-worthy code in csList<>::Iterator.
+	- Eric Sunshine updated simpmap.txi to reflect Frank's changes to
+	  keyboard event handling from several months ago.
 6-May-2004
 	- res fixed the NR GL renderer to handle resize events.
 	- res fixed texture downsampling in the NR GL renderer. It could 

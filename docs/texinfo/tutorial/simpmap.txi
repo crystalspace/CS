@@ -71,39 +71,40 @@ Similarly for @file{simple.cpp}:
 
 @example
 #include "cssysdef.h"
-#include "csutil/sysfunc.h"
-#include "iutil/vfs.h"
-#include "csutil/cscolor.h"
+#include "simpmap.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
-#include "simpmap.h"
-#include "iutil/eventq.h"
-#include "iutil/event.h"
-#include "iutil/objreg.h"
-#include "iutil/csinput.h"
-#include "iutil/virtclk.h"
-#include "iengine/sector.h"
-#include "iengine/engine.h"
+#include "csutil/cmdhelp.h"
+#include "csutil/cscolor.h"
+#include "csutil/event.h"
+#include "csutil/sysfunc.h"
 #include "iengine/camera.h"
+#include "iengine/campos.h"
+#include "iengine/engine.h"
 #include "iengine/light.h"
-#include "iengine/statlght.h"
-#include "iengine/texture.h"
+#include "iengine/material.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
-#include "iengine/material.h"
-#include "imesh/thing.h"
-#include "imesh/object.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/txtmgr.h"
-#include "ivideo/texture.h"
-#include "ivideo/material.h"
-#include "ivideo/fontserv.h"
+#include "iengine/sector.h"
+#include "iengine/texture.h"
 #include "igraphic/imageio.h"
 #include "imap/parser.h"
+#include "imesh/object.h"
+#include "imesh/thing.h"
+#include "iutil/csinput.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
+#include "iutil/objreg.h"
+#include "iutil/vfs.h"
+#include "iutil/virtclk.h"
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
-#include "csutil/cmdhelp.h"
+#include "ivideo/fontserv.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/material.h"
+#include "ivideo/texture.h"
+#include "ivideo/txtmgr.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -169,14 +170,16 @@ bool Simple::HandleEvent (iEvent& ev)
     simple->FinishFrame ();
     return true;
   @}
-  else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
+  else if (ev.Type == csevKeyboard && 
+    csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown)
   @{
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-    if (q)
+    if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC)
     @{
-      q->GetEventOutlet()->Broadcast (cscmdQuit);
+      csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+      if (q)
+	q->GetEventOutlet()->Broadcast (cscmdQuit);
+      return true;
     @}
-    return true;
   @}
 
   return false;
@@ -457,4 +460,3 @@ starting position defined in the map.
 
 This is all. After adding this code this application will now load
 the 'flarge' map and display it so you can run around in this level.
-
