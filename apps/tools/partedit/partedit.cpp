@@ -643,7 +643,7 @@ bool PartEdit::RecreateParticleSystem(const char *texturefile)
 
 
   csRef<iEmitGen3D> attractor;
-  if (state_attractor.force>0.0f)
+  if (state_attractor.force>0.00001f || state_attractor.force<-0.00001f)
   {
 
     // Determine Attractor "Emitter"

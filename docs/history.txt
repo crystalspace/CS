@@ -116,6 +116,9 @@ chronological order.
 	  properly updated in UI.
 	- Rhad fixed a bug in partedit where conical emitters where initialized
 	  incorrectly.
+	- Rhad fixed a bug in partedit that caused regular particles to be
+	  unavailsble after some changes last night, and another bug that 
+	  caused negative forces on attractors (repulsors) to fail to function.
 20-Oct-2003
         - Philip Wyett added 'joytest' to CS/ root .cvsignore file.
 	- Jorrit added thing.cfg.

@@ -1132,11 +1132,28 @@ IMPLEMENT_COMPONENT_CHECKBOX_TO_BOOL(AwsSetLighting,
 IMPLEMENT_COMPONENT_CHECKBOX_TO_BOOL(AwsSetAlphaBlend,
 									 EmitterStateData.state.alpha_blend,EmitterStateData.settings_changed,
 									 UpdateEmitterStateDisplay)
-// Although this is a radio button, it only has 2 options, so we can treat it like a checkbox
-IMPLEMENT_COMPONENT_CHECKBOX_TO_BOOL(AwsSetParticleType,
-									 EmitterStateData.state.rectangular_particles,
-									 EmitterStateData.settings_changed,
-									 UpdateEmitterStateDisplay)
+/*
+ * We need a special handler here since we want to set the value based off of a specific
+ *  component regardless of which component generated the trigger.
+ *
+ * Although this is a radio button, it only has 2 options, so we can treat it like a checkbox if we 
+ * only examine the state of one of the buttons.
+ */
+void awsSink::AwsSetParticleType(void *sk, iAwsSource *source)
+{
+  bool *p_bvalue;
+  if (asink->EmitterStateData.iawscomponent_RectParticlesRadio->GetProperty("State",(void **)&p_bvalue))
+  {
+    if (*p_bvalue)
+      asink->EmitterStateData.state.rectangular_particles=true;
+    else
+      asink->EmitterStateData.state.rectangular_particles=false;
+    asink->EmitterStateData.settings_changed=true;
+  }
+  else
+    asink->UpdateEmitterStateDisplay();
+}
+
 IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetRectangularWidth,
 									 EmitterStateData.state.rect_w,EmitterStateData.settings_changed,
 									 UpdateEmitterStateDisplay)
