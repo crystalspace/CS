@@ -22978,15 +22978,33 @@
 	    <enable trigger="anim_sky" />
 	</sequence>
 
+    <sequence name="light_listener_on">
+        <!--
+         *** This light is turned on when the ambient light in 
+         *** street gets too dark.
+          -->
+        <setambient sector="corridor" red=".5" green=".5" blue=".75" />
+        <enable trigger="light_listener_off" />
+    </sequence>
+
+    <sequence name="light_listener_off">
+        <!--
+         *** This light is turned off when the ambient light in 
+         *** street gets bright again.
+          -->
+        <setambient sector="corridor" red="0" green="0" blue="0" />
+        <enable trigger="light_listener_on" />
+    </sequence>
+    
 	<sequence name="seq_lightning">
 	    <!-- Sequence fired by application and not by trigger.-->
-	    <setambient sector="large" red="1.5" green="1.5" blue="1.5" />
-	    <delay>75</delay>
-	    <setambient sector="large" red="0" green="0" blue="0" />
-	    <delay>75</delay>
-	    <setambient sector="large" red="1.5" green="1.5" blue="1.5" />
-	    <delay>150</delay>
-	    <setambient sector="large" red="0" green="0" blue="0" />
+	    <fadeambient sector="large" red="1.0" green="1.0" blue="1.5" duration="80" />
+	    <delay>120</delay>
+	    <fadeambient sector="large" red="0" green="0" blue="0" duration="120" />
+	    <delay>200</delay>
+	    <fadeambient sector="large" red="1.0" green="1.0" blue="1.5" duration="80" />
+	    <delay>120</delay>
+	    <fadeambient sector="large" red="0" green="0" blue="0" duration="120" />
 	    <delay>3000</delay>
 	</sequence>
 
@@ -23297,18 +23315,28 @@
 	    <fire delay="100" sequence="fog" />
 	</trigger>
 
-        <trigger name="animlight">
+      <trigger name="animlight">
 	    <sectorvis sector="large" />
 	    <fire sequence="animlight">
 	        <light name="light" light="l1" />
 	    </fire>
-	</trigger>
+	  </trigger>
 
-        <trigger name="anim_sky">
+      <trigger name="anim_sky">
 	    <sectorvis sector="street1" />
 	    <fire sequence="anim_sky" />
-	</trigger>
+	  </trigger>
 	
+	  <trigger name="light_listener_on">
+	    <lightvalue light="l1" operator="less" red=".1" blue=".1" green=".1" />
+	    <fire sequence="light_listener_on" />
+	  </trigger>
+	  <trigger name="light_listener_off">
+	    <lightvalue light="l1" operator="greater" red=".1" blue=".1" green=".1" />
+	    <fire sequence="light_listener_off" />
+	    <disable />
+	  </trigger>
+
 	<trigger name="rot_shapes">
 	    <sectorvis sector="shapes" />
 	    <fire sequence="rot_shapes" />
