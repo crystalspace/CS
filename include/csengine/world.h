@@ -285,9 +285,6 @@ private:
   /// Flag set when window resized.
   bool resize;
 
-  ///
-  void ShineLights ();
-
 public:
   /**
    * The starting sector for the camera as specified in the world file.
@@ -349,6 +346,12 @@ public:
    * function directly, because it will be called by Prepare() for you.
    */
   void PrepareSectors();
+
+  /**
+   * Calculate all lighting information. Normally you shouldn't call
+   * this function directly, because it will be called by Prepare().
+   */
+  void ShineLights ();
 
   /**
    * Prepare the world. This function must be called after
