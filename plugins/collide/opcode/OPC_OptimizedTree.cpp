@@ -350,30 +350,7 @@ bool AABBNoLeafTree::Build(AABBTree* tree)
  mExtentsCoeff.x = EQuantCoeff.x!=0.0f ? 1.0f / EQuantCoeff.x : 0.0f; \
  mExtentsCoeff.y = EQuantCoeff.y!=0.0f ? 1.0f / EQuantCoeff.y : 0.0f; \
  mExtentsCoeff.z = EQuantCoeff.z!=0.0f ? 1.0f / EQuantCoeff.z : 0.0f; \
-
-//  Old version of the macro
-//#define INIT_QUANTIZATION							\
-	udword nbc=15;	/* Keep one bit for sign */		\
-	udword nbe=15;	/* Keep one bit for fix */		\
-	if(!gFixQuantized) nbe++;						\
-													\
-	/* Compute quantization coeffs */				\
-	Point CQuantCoeff, EQuantCoeff;					\
-	CQuantCoeff.x = float((1<<nbc)-1)/CMax.x;		\
-	CQuantCoeff.y = float((1<<nbc)-1)/CMax.y;		\
-	CQuantCoeff.z = float((1<<nbc)-1)/CMax.z;		\
-	EQuantCoeff.x = float((1<<nbe)-1)/EMax.x;		\
-	EQuantCoeff.y = float((1<<nbe)-1)/EMax.y;		\
-	EQuantCoeff.z = float((1<<nbe)-1)/EMax.z;		\
-	/* Compute and save dequantization coeffs */	\
-	mCenterCoeff.x = 1.0f / CQuantCoeff.x;			\
-	mCenterCoeff.y = 1.0f / CQuantCoeff.y;			\
-	mCenterCoeff.z = 1.0f / CQuantCoeff.z;			\
-	mExtentsCoeff.x = 1.0f / EQuantCoeff.x;			\
-	mExtentsCoeff.y = 1.0f / EQuantCoeff.y;			\
-	mExtentsCoeff.z = 1.0f / EQuantCoeff.z;
     
-	
 #define PERFORM_QUANTIZATION														\
 	/* Quantize */																	\
 	mNodes[i].mAABB.mCenter[0] = sword(Nodes[i].mAABB.mCenter.x * CQuantCoeff.x);	\
