@@ -221,7 +221,7 @@ void csSimpleConsole::PutMessage (bool advance, const char *iText)
     LineMessageNumber++;
 }
 
-void csSimpleConsole::PutText (int iMode, const char *iText)
+void csSimpleConsole::PutText (int /*iMode*/, const char *iText)
 {
   int len;
   char *dst;

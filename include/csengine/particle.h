@@ -257,7 +257,7 @@ class csSpiralParticleSystem : public csNewtonianParticleSystem
 {
 protected:
   int max;
-  cs_time time_before_new_particle;
+  int time_before_new_particle; // needs to be signed.
   csVector3 source;
   int last_reuse;
   csMaterialHandle* mat;

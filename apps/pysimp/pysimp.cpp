@@ -183,7 +183,7 @@ bool PySimple::HandleEvent (csEvent &Event)
 
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
-    StartShutdown ();
+    System->Shutdown = true;
     return true;
   }
 
