@@ -22,6 +22,8 @@ chronological order.
 	- Eric Sunshine removed the following unused modules:
 	    csCrystalBall
 	    csIndPrint
+	- Eric Sunshine fixed some MSVC6 build problems which arose with recent
+	  changes.
 4-Apr-2005
 	- res made the following changes:
 	    - Changed some internals of shader program variable mappings; now

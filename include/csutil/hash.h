@@ -599,24 +599,27 @@ public:
 template <class T, class KeyHandler = csIntegralHashKeyHandler<T> > 
 class csSet
 {
+public:
+  typedef csHash<bool, T, KeyHandler> HashType;
+
 private:
-  csHash<bool, T, KeyHandler> map;
+  typedef typename_qualifier HashType::GlobalIterator SuperIter;
+  HashType map;
 
 public:
   /// An iterator class for the set.
-  class GlobalIterator : public csHash<bool, T, KeyHandler>::GlobalIterator
+  class GlobalIterator : public SuperIter
   {
   protected:
     GlobalIterator () {}
-    GlobalIterator (const csSet<T, KeyHandler>* s) :
-      csHash<bool, T, KeyHandler>::GlobalIterator(&s->map) {}
+    GlobalIterator (const csSet<T, KeyHandler>* s) : SuperIter(&s->map) {}
 
   public:
     friend class csSet<T, KeyHandler>;
     T Next()
     {
       T key;
-      csHash<bool, T, KeyHandler>::GlobalIterator::Next(key);
+      SuperIter::Next(key);
       return key;
     }
   };
@@ -706,7 +709,7 @@ public:
   }
 
   /// Return the hash map for this hash set.
-  csHash<bool, T, KeyHandler>* GetHash () { return &map; }
+  HashType* GetHash () { return &map; }
 
   /**
    * Return an iterator for the hash set, to iterate over all elements.
