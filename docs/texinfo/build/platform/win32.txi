@@ -192,6 +192,16 @@ grpall.lib - 0 error(s), 0 warning(s)}
 @node Win32 Rundemo, Win32 Workspace, Win32 Compile, Win32
 @subsubsection Running the Demonstration Applications
 
+Before you attempt to run of the Crystal Space applications, you must download
+and install @emph{winlibs}. Winlibs is a set of Dynamic Link Libraries (@emph{DLL})
+i.e. @samp{zlib.dll}, @samp{libjpeg.dll}, @samp{png.dll} and @samp{xmlparse.dll}.
+The latest version of the winlibs package @samp{winlibs16.zip} can be downloaded
+from:
+
+@uref{http://www.3ddownloads.com/?directory=/linuxgames/crystal/support/win32/}
+
+Once you have downloaded the winlbs package, extract it too your @samp{CS\} root directory.
+
 The first app you should try is @emph{Walktest}. This program shows many of
 the features of the 3d engine. You can run it by starting it from the windows
 explorer. It should be at @file{.../cs/walktest.exe}. Don't start it from
