@@ -25,7 +25,7 @@
 struct iNetworkSocket2;
 class csDataStream;
 
-SCF_VERSION (iNetworkPacket, 0, 0, 1);
+SCF_VERSION (iNetworkPacket, 0, 0, 2);
 
 /**
  * The application writes an implementation of the network packet
@@ -45,7 +45,7 @@ struct iNetworkPacket : public iBase
   /// If not all the data was read, the remaining data can be
   /// assumed to be part of the next packet.
   /// Write-only packets may ignore this.
-  virtual bool Read (csDataStream &data) = 0;
+  virtual bool Read (csDataStream &data, iNetworkSocket2 *socket) = 0;
 
   /// Returns the packet as flat data which can be sent over the network.
   /// Sets length to the length of the buffer.

@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+23-Mar-2003
+	- Oktal updated the network manager API and fixed a few problems in
+	  the plugin, including a redundant call to Poll() and a segfault.
 20-Mar-2003
 	- Split iThingState with iThingState and iThingFactoryState.
 	- Renamed GetPolygonStatic() to GetPolygon().
@@ -13,7 +16,6 @@ The history order is reversed so that new features are at the top.
 	  alot lately, so it doesn't make sense to keep the half-finished
 	  libxml2 plugin. (We can still revive it from attic when someone
 	  wants to use it)
-	  
 19-Mar-2003
 	- Removed a few unused flags from csPolygon3D.
 	- In order to be able to make real thing factories (that don't use
