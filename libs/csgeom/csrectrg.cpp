@@ -48,6 +48,12 @@ void csRectRegion::deleteRect(int i)
     memmove(region + i, region + i + 1, region_count - i);
 }
 
+void 
+csRectRegion::makeEmpty()
+{
+  region_count=0;
+}
+
 
 //  This operation takes a rect r1 which completely contains rect r2
 // and turns it into as many rects as it takes to exclude r2 from the
@@ -447,10 +453,6 @@ csRectRegion::Exclude(csRect &rect)
     // Fragment it
     fragmentRect(r1, r2, true, false);
   } // end for
-
-
-  
-
 
 }
 
