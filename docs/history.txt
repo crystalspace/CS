@@ -14,6 +14,8 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 24-Aug-1999
+	- Fixed deletion of curve information in thing templates. It
+	  used the wrong type of 'delete []'.
 	- Eric Sunshine fixed CSWS and MazeD so that the desktop is correctly
 	  repainted in all cases after information has been printed to the
 	  console.  This fixes problems where some sub-systems printed
@@ -87,8 +89,14 @@ Short-term cleanups that need to be done:
 	  "clean" target was trying to delete the X-windows OpenGL driver
 	  even on non-X platforms.
 	- Eric Sunshine removed some obnoxious debugging output from MazeD.
+	- Few changes from Thomas Hieber to csgame library.
+	- Tiny update to XSystem::GetSubSystemPtr() from Michael Dale Long.
 22-Aug-1999
 	- Fixed potentially very harmful bug in csPoly3D::MakeRoom().
+21-Aug-1999
+	- Change from Robert Bate to Mac port: make sure the console is
+	  full cleared when starting up and make sure the clipping rect
+	  is setup so the console will draw draw the text.
 20-Aug-1999
 	- Fixed problem in cscom.cpp with 'int i' declaration inside
 	  for loop.
@@ -97,6 +105,9 @@ Short-term cleanups that need to be done:
 	  and the Eigen functions have been moved into the CD lib.
 	- Eric Sunshine fixed a new compilation warning about an uninitialized
 	  variable in WalkTest.
+	- Few fixes from Robert Bate. Also updates to project files.
+	- Michael Dale Long updated VC project files for new files.
+	  Thomas Hieber fixed CR/LF problem in the updated project files.
 19-Aug-1999
 	- Added 'statistics' to engine for c-buffer rejection/acception.
 	  WalkTest also shows this with the 'stats' command.
