@@ -17,6 +17,14 @@ The history order is reversed so that new features are at the top.
 	  implement the depth buffer. The Dynavis unit tester will also
 	  call UnitTest on the depth buffer. The depth buffer is not
 	  yet functional though.
+	- Added csCoverageBuffer class to the Dynavis plugin. This is a
+	  full copy of the current csXORBuffer which is in the engine.
+	  In addition the csCoverageBuffer will also maintain a maximum
+	  depth value for every 8x8 pixels.
+	  This will replace the csDepthBuffer that hasn't even been
+	  finished yet :-)
+	- Removed csDepthBuffer class again. csCoverageBuffer is not finished
+	  yet.
 6-May-2002
 	- Added csBox2::SetMin/SetMax and csBox3::SetMin/SetMax functions.
 	- Renamed csKDTree::tree_bbox to obj_bbox and added a node_bbox

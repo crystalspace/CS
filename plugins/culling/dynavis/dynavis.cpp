@@ -24,7 +24,7 @@
 #include "csutil/scfstr.h"
 #include "dynavis.h"
 #include "kdtree.h"
-#include "depthbuf.h"
+#include "covbuf.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -83,19 +83,19 @@ iString* csDynaVis::Debug_UnitTest ()
   }
   delete kdtree;
 
-  csDepthBuffer* depthbuf = new csDepthBuffer ();
-  dbghelp = SCF_QUERY_INTERFACE (depthbuf, iDebugHelper);
+  csCoverageBuffer* covbuf = new csCoverageBuffer (640, 480);
+  dbghelp = SCF_QUERY_INTERFACE (covbuf, iDebugHelper);
   if (dbghelp)
   {
     iString* rc = dbghelp->UnitTest ();
     dbghelp->DecRef ();
     if (rc)
     {
-      delete depthbuf;
+      delete covbuf;
       return rc;
     }
   }
-  delete depthbuf;
+  delete covbuf;
 
   return NULL;
 }
