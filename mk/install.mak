@@ -13,9 +13,9 @@
 #
 # Always copied:
 # TO_INSTALL.INCLUDE: does not exist, the entire include/ hierarchy is copied
-#    to include/.  (max 4 levels deep now)
+#    to include/.  (max 6 levels deep)
 # TO_INSTALL.DOCS: also does not exist, the docs/html dir is copied (all html)
-#    to docs/html, as well as all subdirs (2 deep) with gif, jpg, png; also
+#    to docs/html, as well as all subdirs (6 deep) with gif, jpg, png; also
 #    docs/README.html is copied, and docs/pubapi is copied (all html, gif, css).
 # TO_INSTALL.SCRIPTS: does not exist. scripts/python is copied.
 #==============================================================================
@@ -68,10 +68,12 @@ ifeq ($(DO_INSTALL),yes)
 
 INSTALL_LOG = $(INSTALL_DIR)/install.log
 
+INSTALL_DEPTH=* */* */*/* */*/*/* */*/*/*/* */*/*/*/*/*
+
 # For the 'include/' hierarchy, only the header files detected here
 # will be copied
 INSTALL_INCLUDE.FILES = \
-  $(wildcard $(addprefix include/,*.h */*.h */*/*.h */*/*/*.h))
+  $(wildcard $(addprefix include/,$(addsuffix .h,$(INSTALL_DEPTH))))
 
 # Given all .h files in 'include/', take their directory parts, sort those,
 # and remove trailing '/', then add the INSTALL_DIR prefix
@@ -84,33 +86,46 @@ INSTALL_INCLUDE.DESTFILES = $(addprefix $(INSTALL_DIR)/, \
 # INSTALL_DIR/docs/pubapi and copy docs/README.html & docs/history.{txt|old}.
 INSTALL_DOCS.FILES = docs/README.html docs/history.txt docs/history.old \
   $(wildcard docs/html/*.html \
-  docs/html/*/*.jpg docs/html/*/*.gif docs/html/*/*.png  \
-  docs/html/*/*/*.jpg docs/html/*/*/*.gif docs/html/*/*/*.png \
-  docs/pubapi/*.html docs/pubapi/*.gif docs/pubapi/*.css )
-INSTALL_DOCS.DIR1 = $(addprefix $(INSTALL_DIR)/, \
+    $(addprefix docs/html,\
+      $(addsuffix .jpg,$(INSTALL_DEPTH)) \
+      $(addsuffix .gif,$(INSTALL_DEPTH)) \
+      $(addsuffix .png,$(INSTALL_DEPTH))) \
+    $(addprefix docs/pubapi/,*.html *.gif *.css))
+INSTALL_DOCS.DIR = $(addprefix $(INSTALL_DIR)/, \
   $(patsubst %/,%,$(sort $(dir $(INSTALL_DOCS.FILES)))))
-
-# Also include parent dirs in dirlist, for tutorial/mapcs 
-INSTALL_DOCS.DIR = $(filter-out $(INSTALL_DIR), \
-  $(sort $(INSTALL_DOCS.DIR1) $(patsubst %/,%,$(dir $(INSTALL_DOCS.DIR1)))))
 INSTALL_DOCS.DESTFILES = \
   $(addprefix $(INSTALL_DIR)/,$(sort $(INSTALL_DOCS.FILES)))
 
-# Files to install for scripts, includes parent dirs (for scripts/).
+# Files to install for scripts.
 INSTALL_SCRIPTS.FILES = $(wildcard scripts/python/*.py)
-INSTALL_SCRIPTS.DIR1 = $(addprefix $(INSTALL_DIR)/, \
+INSTALL_SCRIPTS.DIR = $(addprefix $(INSTALL_DIR)/, \
   $(patsubst %/,%,$(sort $(dir $(INSTALL_SCRIPTS.FILES)))))
-INSTALL_SCRIPTS.DIR = $(filter-out $(INSTALL_DIR), $(sort \
-  $(INSTALL_SCRIPTS.DIR1) $(patsubst %/,%,$(dir $(INSTALL_SCRIPTS.DIR1)))))
 INSTALL_SCRIPTS.DESTFILES = \
   $(addprefix $(INSTALL_DIR)/,$(sort $(INSTALL_SCRIPTS.FILES)))
 
+# Static library and plugin directories.
 INSTALL_LIB.DIR = $(INSTALL_DIR)/lib
 ifneq (.,$(OUTDLL))
   INSTALL_DLL.DIR = $(INSTALL_DIR)/$(OUTDLL)
 else
   INSTALL_DLL.DIR = $(INSTALL_LIB.DIR)
 endif
+
+# Data directories.
+INSTALL_DATA.DIR = $(addprefix $(INSTALL_DIR)/, \
+  $(patsubst %/,%,$(sort $(dir $(TO_INSTALL.DATA)))))
+
+# Command to copy a potentially deeply nested file to the installation
+# directory even while preserving the nesting.  The file to be copied must be
+# stored in a variable named F.  Assumes that the target directory tree
+# already exists.  The empty line in this macro is important since it results
+# in inclusion of a newline.  This is desirable because we expect this macro
+# to be invoked from $(foreach) for a set of files, and we want the expansion
+# to be a series of copy commands, one per line.
+define INSTALL.DEEP_COPY
+  $(CP) $(F) $(INSTALL_DIR)/$(patsubst ./%,%,$(F))
+
+endef
 
 endif # ifeq ($(DO_INSTALL),yes)
 
@@ -131,12 +146,12 @@ ifeq ($(DO_INSTALL),yes)
 
 # Rules for creating installation directories.
 $(INSTALL_DIR) $(INSTALL_DIR)/bin $(INSTALL_LIB.DIR) $(INSTALL_INCLUDE.DIR) \
-$(INSTALL_DIR)/data $(INSTALL_DIR)/data/config:
-	$(MKDIR)
+$(INSTALL_DATA.DIR) $(INSTALL_DIR)/data/config:
+	$(MKDIRS)
 
 ifneq (.,$(OUTDLL))
 $(INSTALL_DLL.DIR):
-	$(MKDIR)
+	$(MKDIRS)
 endif
 
 # Install log, itself, should also be deleted.
@@ -145,20 +160,20 @@ install_logfile:
 
 # Install configuration files.
 install_config: $(TO_INSTALL.CONFIG) $(INSTALL_DIR)/data/config
-	$(CP) $(TO_INSTALL.CONFIG) $(INSTALL_DIR)/data/config
+	$(foreach F,$(TO_INSTALL.CONFIG),$(INSTALL.DEEP_COPY))
 	@echo $(addprefix $(INSTALL_DIR)/data/config/, \
 	  $(notdir $(TO_INSTALL.CONFIG))) >> $(INSTALL_LOG)
 
 # Install data files.
-install_data: $(INSTALL_DIR)/data
-	$(CP) $(TO_INSTALL.DATA) $(INSTALL_DIR)/data
+install_data: $(INSTALL_DATA.DIR)
+	$(foreach F,$(TO_INSTALL.DATA),$(INSTALL.DEEP_COPY))
 	@echo $(addprefix $(INSTALL_DIR)/data/, \
 	  $(notdir $(TO_INSTALL.DATA))) >> $(INSTALL_LOG)
 
 # Install dynamic libraries (plug-in modules).
 ifeq ($(USE_PLUGINS),yes)
 install_dynamiclibs: $(INSTALL_DLL.DIR)
-	$(CP) $(TO_INSTALL.DYNAMIC_LIBS) $(INSTALL_DLL.DIR)
+	$(CP) -r $(TO_INSTALL.DYNAMIC_LIBS) $(INSTALL_DLL.DIR)
 	@echo $(addprefix $(INSTALL_DLL.DIR)/, \
 	  $(notdir $(TO_INSTALL.DYNAMIC_LIBS))) >> $(INSTALL_LOG)
 endif
@@ -191,7 +206,7 @@ install_include: $(INSTALL_DIR)/include $(INSTALL_INCLUDE.DIR) \
 
 # Install documentation.
 $(INSTALL_DOCS.DIR): 
-	$(MKDIR)
+	$(MKDIRS)
 	@echo $@/deleteme.dir >> $(INSTALL_LOG)
 
 $(INSTALL_DOCS.DESTFILES): $(INSTALL_DIR)/docs/% : docs/%
@@ -202,8 +217,8 @@ install_docs: $(INSTALL_DIR)/docs $(INSTALL_DOCS.DIR) \
   $(INSTALL_DOCS.DESTFILES)
 
 # Install Scripts
-$(INSTALL_SCRIPTS.DIR): 
-	$(MKDIR)
+$(INSTALL_DIR)/scripts $(INSTALL_SCRIPTS.DIR): 
+	$(MKDIRS)
 	@echo $@/deleteme.dir >> $(INSTALL_LOG)
 
 $(INSTALL_SCRIPTS.DESTFILES): $(INSTALL_DIR)/scripts/% : scripts/%

@@ -14,6 +14,32 @@ The history order is reversed so that new features are at the top.
 	    - Created mkdirs.bat for Windows/DOS users who are not using a Unix
 	      emulation shell.  This batch file emulates "mkdir -p" using only
 	      DOS commands.
+	- Eric Sunshine made the following changes to the "install" makefile
+	  target:
+	    - Fixed bugs in install.mak which prevented it from copying all of
+	      the images from the CS/docs/html directory and subdirectories.
+	    - Simplified some of the operations in install.mak to ease future
+	      maintenance (though, this file could use a lot more work).
+	    - Augmented install.mak so that it is now capable of copying files
+	      into the installation directory at an arbitrary directory depth.
+	    - Using the above enhancement, flarge, partsys, and isomap are now
+	      copied into appropriate subdirectories of ${INSTALL_DIR}/data.
+	      Although these demonstration files are not required for
+	      development (that is, they do not belong in the SDK), it is now
+	      deemed important that they should be present in order to reduce
+	      problem reports from novice users.  As an example, if a novice
+	      user installed the project and then double-clicked on WalkTest to
+	      launch it, WalkTest would terminate immediately on account of its
+	      inability to find its "default" map file (which is typically
+	      "flarge").  This was not only confusing for novice users, but it
+	      also made Crystal Space appear fragile (since the user might
+	      think that it had merely crashed).  On the other hand, with the
+	      map files installed, even a novice user can double-click on
+	      WalkTest and successfully interact with it.
+	    - Fixed a number of makefiles throughout the project which failed
+	      to specify their configuration and data files for installation.
+	      Also fixed a few makefiles which placed their configuration and
+	      script files in the wrong locations.
 7-Oct-2002
 	- Removed some obsolete texmem.{cpp|h} files in the 3D renderer
 	  directories.

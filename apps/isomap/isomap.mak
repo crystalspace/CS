@@ -37,6 +37,7 @@ LIB.ISOMAP = $(foreach d,$(DEP.ISOMAP),$($d.LIB))
 
 TO_INSTALL.EXE    += $(ISOMAP.EXE)
 #TO_INSTALL.CONFIG += $(CFG.ISOMAP)
+TO_INSTALL.DATA   += data/isomap/world
 
 MSVC.DSP += ISOMAP
 DSP.ISOMAP.NAME = isomap

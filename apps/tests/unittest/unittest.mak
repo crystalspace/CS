@@ -1,5 +1,5 @@
 # Application description
-DESCRIPTION.unittest = Crystal Space unittest Tester
+DESCRIPTION.unittest = Crystal Space unittest tester
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -37,8 +37,7 @@ OBJ.UNITTEST = $(addprefix $(OUT)/,$(notdir $(SRC.UNITTEST:.cpp=$O)))
 DEP.UNITTEST = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
 LIB.UNITTEST = $(foreach d,$(DEP.UNITTEST),$($d.LIB))
 
-TO_INSTALL.EXE    += $(UNITTEST.EXE)
-TO_INSTALL.DATA   += data/stdtex.zip
+#TO_INSTALL.EXE += $(UNITTEST.EXE)
 
 MSVC.DSP += UNITTEST
 DSP.UNITTEST.NAME = unittest

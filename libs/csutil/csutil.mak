@@ -36,7 +36,7 @@ OBJ.CSUTIL = \
   $(addprefix $(OUT)/,$(notdir $(patsubst %.c,%$O,$(SRC.CSUTIL:.cpp=$O))))
 CFG.CSUTIL = scf.cfg data/config/mouse.cfg
 
-TO_INSTALL.ROOT += $(CFG.CSUTIL)
+TO_INSTALL.CONFIG += $(CFG.CSUTIL)
 TO_INSTALL.STATIC_LIBS += $(CSUTIL.LIB)
 
 MSVC.DSP += CSUTIL

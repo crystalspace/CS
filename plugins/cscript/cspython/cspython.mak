@@ -47,7 +47,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSPYTHON)
 endif
 
-TO_INSTALL.ROOT += python.cex
+TO_INSTALL.EXE += python.cex
 
 SWIG.INTERFACE = include/ivaria/cs.i
 SWIG.CSPYTHON = plugins/cscript/cspython/cs_pyth.cpp
