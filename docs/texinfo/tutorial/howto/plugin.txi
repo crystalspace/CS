@@ -79,7 +79,7 @@ Finally we define the API by making a structure that inherits from
 @samp{iBase}. We use @samp{struct} instead of @samp{class} simply because for
 structures the default visibility is @samp{public} instead of @samp{private} for
 classes. This is just conveniant. There is no other difference between
-a @samp{struct} or a @sam{class} in C++.
+a @samp{struct} or a @samp{class} in C++.
 
 The name @samp{iMyApi} is not random. Crystal Space uses this naming
 convention (starting a class name with @samp{i}) for @sc{SCF} interfaces so that
