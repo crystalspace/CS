@@ -49,6 +49,7 @@ Options:
 	[--prefix]
 	[--exec-prefix]
 	[--version]
+	[--longversion]
 	[--libs]
 	[--cflags]
 	[--cxxflags]
@@ -190,6 +191,10 @@ while test $# -gt 0; do
         echo $version
         exit 0
         ;;
+    --longversion)
+	echo $longversion
+	exit 0
+	;;
     --cflags)
         show_cflags=true
         ;;

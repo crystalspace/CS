@@ -21,7 +21,8 @@ echo "#	WARNING: This script is generated automatically! " >> cs-config
 echo				>> cs-config
 echo "prefix=\${CRYSTAL-$1}"	>> cs-config
 echo "exec_prefix=\${prefix}"	>> cs-config
-echo "version='${vmajor}.${vminor} (${rdate})'"		>> cs-config
+echo "version='${vmajor}'"		>> cs-config
+echo "longversion='${vmajor}.${vminor} (${rdate})'"	>> cs-config
 echo "includedir=\${prefix}/include"	>> cs-config
 echo "if test -r \${prefix}/lib; then"	>> cs-config
 echo "  libdir=\${prefix}/lib"	>> cs-config

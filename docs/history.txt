@@ -1,5 +1,8 @@
 he history order is reversed so that new features are at the top.
 
+13-Jan-2002
+	- Matze changed cs-config --version to only output major number, the
+	  --longversion outputs all
 11-Jan-2002
 	- Matze removed DEBUG_BREAK_MSG again :) csString is using CS_ASSERT
 	  now
