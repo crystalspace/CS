@@ -784,11 +784,9 @@ csSprite3D::~csSprite3D ()
   CHK (delete skeleton_state);
 }
 
-void csSprite3D::SetMove (float x, float y, float z)
+void csSprite3D::SetPosition (const csVector3& p)
 {
-  v_obj2world.x = -x;
-  v_obj2world.y = -y;
-  v_obj2world.z = -z;
+  v_obj2world = p;
   UpdatePolyTreeBBox ();
 }
 
@@ -799,17 +797,15 @@ void csSprite3D::SetTransform (const csMatrix3& matrix)
   UpdatePolyTreeBBox ();
 }
 
-void csSprite3D::Move (float dx, float dy, float dz)
+void csSprite3D::MovePosition (const csVector3& rel)
 {
-  v_obj2world.x += dx;
-  v_obj2world.y += dy;
-  v_obj2world.z += dz;
+  v_obj2world += rel;
   UpdatePolyTreeBBox ();
 }
 
-bool csSprite3D::MoveTo (const csVector3 &move_to)
+bool csSprite3D::SetPositionSector (const csVector3 &move_to)
 {
-  csVector3 old_place(v_obj2world.x,v_obj2world.y,v_obj2world.z);
+  csVector3 old_place(-v_obj2world);
   csOrthoTransform OldPos (csMatrix3(1,0,0,0,1,0,0,0,1), old_place);
 
   csVector3 new_pos     = move_to;
@@ -825,10 +821,8 @@ bool csSprite3D::MoveTo (const csVector3 &move_to)
   {
     MoveToSector(pNewSector);
     //Move(new_pos);
-/*  v_obj2world.x=move_to.x;//new_pos.x;
-    v_obj2world.y=move_to.y;//new_pos.y;
-    v_obj2world.z=move_to.z;//new_pos.z;*/
-    v_obj2world=-new_pos;
+/*  v_obj2world=-move_to;//-new_pos;*/
+    v_obj2world=new_pos;
     UpdatePolyTreeBBox ();
     return true;
   }
@@ -985,7 +979,7 @@ void csSprite3D::UpdatePolyTreeBBox ()
 
   // This transform should be part of the sprite class and not just calculated
   // every time we need it. @@@!!!
-  csTransform trans = csTransform (m_obj2world, m_world2obj * v_obj2world);
+  csTransform trans = csTransform (m_obj2world, m_world2obj * -v_obj2world);
   csBspPolygon* poly;
 
   // Add the eight corner points of the bounding box to the container.
@@ -1098,7 +1092,7 @@ void csSprite3D::GetCameraBoundingBox (const csCamera& camtrans, csBox3& cbox)
   camera_cookie = cur_cookie;
 
   csTransform trans = camtrans * csTransform (m_obj2world,
-  	m_world2obj * v_obj2world);
+  	m_world2obj * -v_obj2world);
   if (skeleton_state)
   {
     skeleton_state->ComputeBoundingBox (trans, camera_bbox);
@@ -1233,7 +1227,7 @@ void csSprite3D::Draw (csRenderView& rview)
   // ->
   //   C = Mwc * (Mow * O - Vow - Vwc)
   //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  csReversibleTransform tr_o2c = rview * csTransform (m_obj2world, m_world2obj * v_obj2world);
+  csReversibleTransform tr_o2c = rview * csTransform (m_obj2world, m_world2obj * -v_obj2world);
   rview.g3d->SetObjectToCamera (&tr_o2c);
   rview.g3d->SetClipper (rview.view->GetClipPoly (), rview.view->GetNumVertices ());
   // @@@ This should only be done when aspect changes...
@@ -1518,7 +1512,7 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* 
   csBox3 obox;
   GetObjectBoundingBox (obox);
   csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
-  csVector3 wor_center = m_obj2world * obj_center - v_obj2world;
+  csVector3 wor_center = m_obj2world * obj_center + v_obj2world;
   csColor color;
 
   for (i = 0 ; i < num_lights ; i++)
@@ -1531,7 +1525,7 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* 
     float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_center);
     if (wor_sq_dist >= sq_light_radius) continue;
 
-    csVector3 obj_light_pos = m_world2obj * (wor_light_pos + v_obj2world);
+    csVector3 obj_light_pos = m_world2obj * (wor_light_pos - v_obj2world);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_center);
     float obj_dist = FastSqrt (obj_sq_dist);
     float wor_dist = FastSqrt (wor_sq_dist);
@@ -1576,12 +1570,12 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* 
 
     // Compute light position in object coordinates
     csVector3 wor_light_pos = lights [i]->GetCenter ();
-    csVector3 obj_light_pos = m_world2obj * (wor_light_pos + v_obj2world);
+    csVector3 obj_light_pos = m_world2obj * (wor_light_pos - v_obj2world);
 
     for (j = 0 ; j < tpl->GetNumTexels () ; j++)
     {
       csVector3& obj_vertex = object_vertices[j];
-      csVector3 wor_vertex = m_obj2world * obj_vertex - v_obj2world;
+      csVector3 wor_vertex = m_obj2world * obj_vertex + v_obj2world;
 
       // @@@ We have the distance in object space. Can't we use
       // that to calculate the distance in world space as well?

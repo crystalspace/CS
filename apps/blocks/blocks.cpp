@@ -566,7 +566,7 @@ void Blocks::add_pillar (int x, int y)
   room->AddThing (pillar);
   csVector3 v ( (x-(player1->zone_dim)/2)*CUBE_DIM, 0, 
 	       (y-(player1->zone_dim)/2)*CUBE_DIM);
-  pillar->SetMove (room, v);
+  pillar->SetPosition (room, v);
   pillar->Transform ();
 }
 
@@ -583,7 +583,7 @@ void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
   csMatrix3 rot = create_rotate_y (rot_z);
   vrast->Transform (rot);
-  vrast->SetMove (room, v);
+  vrast->SetPosition (room, v);
   vrast->Transform ();
 }
 
@@ -600,7 +600,7 @@ void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
   csMatrix3 rot = create_rotate_y (rot_z);
   hrast->Transform (rot);
-  hrast->SetMove (room, v);
+  hrast->SetPosition (room, v);
   hrast->Transform ();
 }
 
@@ -732,7 +732,7 @@ csThing* Blocks::add_cube_thing (csSector* sect, float dx, float dy, float dz,
   csThing* cube = create_cube_thing (dx, dy, dz, tmpl);
   sect->AddThing (cube);
   csVector3 v (x, y, z);
-  cube->SetMove (sect, v);
+  cube->SetPosition (sect, v);
   cube->Transform ();
   cube->InitLightMaps (false);
   room->ShineLights (cube);
@@ -1693,7 +1693,7 @@ void Blocks::HandleGameMovement (time_t elapsed_time)
     csThing* t = cube_info[i].thing;
     if (do_rot)
       t->Transform (rot);
-    t->Move (dx, -elapsed_fall, dy);
+    t->MovePosition (csVector3 (dx, -elapsed_fall, dy));
     t->Transform ();
     reset_vertex_colors (t);
     room->ShineLights (t);
@@ -1806,7 +1806,7 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu, int
     float y = 3. + sin (angle)*3.;
     float z = 5. - cos (angle)*3.;
     csVector3 v (x, y, z);
-    menus[i]->SetMove (demo_room, v);
+    menus[i]->SetPosition (demo_room, v);
     menus[i]->Transform ();
   }
   // Move the old menu item away.
@@ -1818,7 +1818,7 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu, int
     float y = 3. + sin (angle)*3.;
     float z = 5. - cos (angle)*3.;
     csVector3 v (x, y, z);
-    menu_hor_old_menu->SetMove (demo_room, v);
+    menu_hor_old_menu->SetPosition (demo_room, v);
     menu_hor_old_menu->Transform ();
   }
   else if (menu_hor_old_menu)
@@ -1836,8 +1836,8 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu, int
     csVector3 v (x, y, z);
     demo_room->AddThing (arrow_left);
     demo_room->AddThing (arrow_right);
-    arrow_left->SetMove (demo_room, v);
-    arrow_right->SetMove (demo_room, v);
+    arrow_left->SetPosition (demo_room, v);
+    arrow_right->SetPosition (demo_room, v);
     arrow_left->Transform ();
     arrow_right->Transform ();
   }
@@ -2394,7 +2394,7 @@ void Blocks::HandleLoweringPlanes (time_t elapsed_time)
 	t = room->GetThing (temp);
 	if (t)
 	{
-          t->Move (0, -elapsed_fall, 0);
+          t->MovePosition (csVector3 (0, -elapsed_fall, 0));
           t->Transform ();
           reset_vertex_colors (t);
           room->ShineLights (t);

@@ -68,7 +68,7 @@ csRigidSpaceTimeObj *sto;
     sto = space_time_continuum[i];
     new_p = sto->rb->get_pos();
 
-    sto->sprt->SetMove ( new_p );
+    sto->sprt->SetPosition ( new_p );
 
     M = sto->rb->get_R();   // get orientation for this link
     // ctMatrix3 and csMatrix3 not directly compatable yet

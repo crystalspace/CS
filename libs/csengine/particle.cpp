@@ -224,7 +224,7 @@ void csNewtonianParticleSystem :: Update(time_t elapsed_time)
     // resulting newpos = a*dt^2 + v*dt + oldposition (i.e. paraboloid).
     part_speed[i] += part_accel[i] * delta_t; // (1)
     move = part_speed[i] * delta_t; // (2)
-    part_2d[i]->Move(move); 
+    part_2d[i]->MovePosition (move); 
   }
 }
 
@@ -263,7 +263,7 @@ csParSysExplosion :: csParSysExplosion(int number_p,
     //AppendRectSprite(0.25, 0.25, txt);
     AppendRegularSprite(nr_sides, part_radius, txt);
     pos = center + GetRandomDirection() * spread_pos;
-    part_2d[i]->SetMove( pos );
+    part_2d[i]->SetPosition (pos);
     part_speed[i] = push + spread_speed * GetRandomDirection();
     part_accel[i] = (pos - center) * spread_accel * GetRandomDirection();
   }

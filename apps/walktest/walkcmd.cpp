@@ -118,7 +118,7 @@ bool LoadCamera (const char *fName)
 
 void move_sprite (csSprite3D* sprite, csSector* where, csVector3 const& pos)
 {
-  sprite->SetMove (pos);
+  sprite->SetPosition (pos);
   sprite->MoveToSector (where);
 }
 
@@ -167,7 +167,7 @@ csSprite3D* add_sprite (char* tname, char* sname, csSector* where,
   spr->SetName (sname);
   Sys->view->GetWorld ()->sprites.Push (spr);
   spr->MoveToSector (where);
-  spr->SetMove (pos);
+  spr->SetPosition (pos);
   csMatrix3 m; m.Identity (); m = m * size;
   spr->SetTransform (m);
 

@@ -504,6 +504,22 @@ public:
    */
   virtual void Draw (csRenderView& rview) = 0;
 
+  /**
+   * Move this sprite to some location.
+   */
+  virtual void SetPosition (const csVector3& location) = 0;
+
+  /**
+   * Get the location of the sprite.
+   */
+  virtual const csVector3& GetPosition () const = 0;
+
+  /**
+   * Relative move of this sprite.
+   * Note that this does not check if the sector is left.
+   */
+  virtual void MovePosition (const csVector3& delta) = 0;
+
   CSOBJTYPE;
 };
 
@@ -657,14 +673,19 @@ public:
   { force_otherskin = false; }
 
   /**
-   * Set the transformation vector to move sprite to some position.
+   * Move the sprite to an absolute position.
    */
-  void SetMove (const csVector3& v) { SetMove (v.x, v.y, v.z); }
+  virtual void SetPosition (const csVector3& p);
 
   /**
-   * Set the transformation vector to move sprite to some position.
+   * Get the position of the sprite.
    */
-  void SetMove (float x, float y, float z);
+  virtual const csVector3& GetPosition () const { return v_obj2world; }
+
+  /**
+   * Relative move.
+   */
+  virtual void MovePosition (const csVector3& rel);
 
   /**
    * Set the transformation matrix to rotate the sprite in some
@@ -673,24 +694,11 @@ public:
   void SetTransform (const csMatrix3& matrix);
 
   /**
-   * Relative move
+   * Absolute move.
+   * This version of SetPosition tries to find the correct sector
+   * to move too.
    */
-  void Move (float dx, float dy, float dz);
-
-  /**
-   * Relative move
-   */
-  void Move (csVector3& v) { Move (v.x, v.y, v.z); }
-
-  /**
-   * Absolute move
-   */
-  bool MoveTo (const csVector3& v);
-
-  /**
-   * The same as above
-   */
-  bool MoveTo (float x, float y, float z) { return MoveTo (csVector3 (x, y, z)); }
+  bool SetPositionSector (const csVector3& v);
 
   /**
    * Relative transform.
@@ -785,10 +793,8 @@ public:
   /// Get world to local transformation matrix
   inline csMatrix3 GetW2T () const { return m_world2obj; }
   /// Get world to local translation
-  inline csVector3 GetW2TTranslation () const { return -v_obj2world; }
+  inline csVector3 GetW2TTranslation () const { return v_obj2world; }
 
-  /// Get sprite origin
-  inline const csVector3 &GetOrigin () const { return v_obj2world; }
   /// Get sprite transform
   inline const csMatrix3 &GetT2W () const { return m_obj2world; }
 

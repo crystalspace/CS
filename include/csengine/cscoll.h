@@ -50,13 +50,7 @@ public:
   /**
    * Set the location of all objects in the collection.
    */
-  void SetMove (csSector* home, const csVector3& v) 
-  { SetMove (home, v.x, v.y, v.z); }
-
-  /**
-   * Set the location of all objects in the collection.
-   */
-  void SetMove (csSector* home, float x, float y, float z);
+  void SetPosition (csSector* home, const csVector3& v);
 
   /**
    * Set the transformation matrix for all objects in the collection.
@@ -66,13 +60,7 @@ public:
   /**
    * Relative move.
    */
-  void Move (float dx, float dy, float dz);
-
-  /**
-   * Relative move.
-   */
-  void Move (const csVector3& v) 
-  { Move (v.x, v.y, v.z); }
+  void MovePosition (const csVector3& v);
 
   /**
    * Relative transform.

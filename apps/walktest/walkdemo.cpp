@@ -543,7 +543,7 @@ void move_ghost (csSprite3D* spr)
     bool mirror = true;
     first_sector = first_sector->FollowSegment (test, new_pos, mirror);
     spr->MoveToSector (first_sector);
-    spr->SetMove (new_pos);
+    spr->SetPosition (new_pos);
   }
 
   // Turn around at random intervals.
@@ -817,7 +817,7 @@ void fire_missile ()
     Sys->view->GetWorld ()->sprites.Push (sp);
     sp->MoveToSector (Sys->view->GetCamera ()->GetSector ());
     ms->sprite = sp;
-    sp->SetMove (pos);
+    sp->SetPosition (pos);
     csMatrix3 m = ms->dir.GetT2O ();
     sp->SetTransform (m);
     move_sprite (sp, Sys->view->GetCamera ()->GetSector (), pos);

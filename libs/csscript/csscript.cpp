@@ -130,7 +130,7 @@ void LanguageLayer::transform (csObject* obj, csMatrix3& m, csVector3& v)
   {
     csThing* th = (csThing*)obj;
     th->Transform (m);
-    th->Move (v);
+    th->MovePosition (v);
     th->Transform (); // @@@ This should be delayed until it is sure that the
     		      // thing is visible.
   }
@@ -138,7 +138,7 @@ void LanguageLayer::transform (csObject* obj, csMatrix3& m, csVector3& v)
   {
     csCollection* col = (csCollection*)obj;
     col->Transform (m);
-    col->Move (v);
+    col->MovePosition (v);
     col->Transform (); // @@@ This should be delayed until it is sure that the
     		       // collection is visible.
   }
@@ -172,14 +172,14 @@ void LanguageLayer::transform (csObject* obj, float dx, float dy, float dz)
   if (obj->GetType () == csThing::Type)
   {
     csThing* th = (csThing*)obj;
-    th->Move (dx, dy, dz);
+    th->MovePosition (csVector3 (dx, dy, dz));
     th->Transform (); // @@@ This should be delayed until it is sure that the
     		      // thing is visible.
   }
   else if (obj->GetType () == csCollection::Type)
   {
     csCollection* col = (csCollection*)obj;
-    col->Move (dx, dy, dz);
+    col->MovePosition (csVector3 (dx, dy, dz));
     col->Transform (); // @@@ This should be delayed until it is sure that the
     		       // collection is visible.
   }

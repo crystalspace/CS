@@ -105,7 +105,7 @@ csSprite3D *add_test_sprite( csSpriteTemplate *tmpl, csSector *aroom, csView *vi
   tsprt->MoveToSector (aroom);
   csMatrix3 m; m.Identity ();
   tsprt->SetTransform (m);
-  tsprt->SetMove (csVector3( 0, 10, 0 ));    // only matters for root in chain demo
+  tsprt->SetPosition (csVector3( 0, 10, 0 ));    // only matters for root in chain demo
   tsprt->SetAction ("default");
   tsprt->InitSprite ();
 
@@ -344,7 +344,7 @@ void Phyztest::NextFrame (time_t elapsed_time, time_t current_time)
     bot->MoveToSector (room);
     m.Identity (); //m = m * 2.0;
     bot->SetTransform (m);
-    bot->SetMove (csVector3( 0, 10, 0 ));
+    bot->SetPosition (csVector3( 0, 10, 0 ));
     bot->SetAction ("default");
     bot->InitSprite ();
 
@@ -403,7 +403,7 @@ void Phyztest::NextFrame (time_t elapsed_time, time_t current_time)
         new_p = chain[i]->rb->get_pos();
   //      CsPrintf (MSG_DEBUG_0, "chain pos %d = %f, %f, %f\n",
     //      i, new_p.x, new_p.y, new_p.z);
-        chain[i]->sprt->SetMove ( new_p );
+        chain[i]->sprt->SetPosition ( new_p );
         
         M = chain[i]->rb->get_R();   // get orientation for this link
         // ctMatrix3 and csMatrix3 not directly compatable yet

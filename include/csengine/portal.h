@@ -227,7 +227,7 @@ public:
    * warping portals and also checks for infinite recursion (does
    * not allow traversing the same sector more than five times).
    */
-  virtual csPolygon3D* HitBeam (csVector3& start, csVector3& end);
+  virtual csPolygon3D* HitBeam (const csVector3& start, const csVector3& end);
 
   /**
    * Intersects world-space sphere through this sector. Return closest

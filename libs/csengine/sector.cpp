@@ -195,7 +195,7 @@ void csSector::UseStaticTree (int mode, bool octree)
   CsPrintf (MSG_INITIALIZATION, "DONE!\n");
 }
 
-csPolygon3D* csSector::HitBeam (csVector3& start, csVector3& end)
+csPolygon3D* csSector::HitBeam (const csVector3& start, const csVector3& end)
 {
   csVector3 isect;
   csPolygon3D* p = IntersectSegment (start, end, isect);

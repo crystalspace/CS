@@ -4826,7 +4826,7 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
         {
 	  float x, y, z;
 	  ScanStr (params, "%f,%f,%f", &x, &y, &z);
-          spr->SetMove (x, y, z);
+          spr->SetPosition (csVector3 (x, y, z));
 	}
         break;
 
@@ -4891,7 +4891,7 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
         {
           char* params2;
           spr->SetTransform (csMatrix3 ());     // Identity matrix.
-          spr->SetMove (0, 0, 0);
+          spr->SetPosition (csVector3 (0, 0, 0));
           while ((cmd = csGetObject (&params, tok_matvec, &name, &params2)) > 0)
           {
             if (!params2)
@@ -4912,7 +4912,7 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
               {
                 csVector3 v;
                 load_vector (params2, v);
-                spr->SetMove (v);
+                spr->SetPosition (v);
                 break;
               }
             }

@@ -124,7 +124,7 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
   return true;
 }
 
-csPolygon3D* csPortal::HitBeam (csVector3& start, csVector3& end)
+csPolygon3D* csPortal::HitBeam (const csVector3& start, const csVector3& end)
 {
   if (sector->draw_busy >= 5)
     return NULL;

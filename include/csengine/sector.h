@@ -252,7 +252,7 @@ public:
    * is hit. This function correctly traverse portals and space warping
    * portals.
    */
-  csPolygon3D* HitBeam (csVector3& start, csVector3& end);
+  csPolygon3D* HitBeam (const csVector3& start, const csVector3& end);
 
   /**
    * Prepare the lightmaps so that they are suitable for the

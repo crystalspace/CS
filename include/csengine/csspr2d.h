@@ -103,37 +103,17 @@ public:
   bool HasLighting () { return lighting; }
 
   /**
-   * Set the transformation vector to move sprite to some position.
+   * Move the sprite.
    */
-  void SetMove (const csVector3& v) { position = v; }
-
-  /**
-   * Set the transformation vector to move sprite to some position.
-   */
-  void SetMove (float x, float y, float z)
-  {
-    position.x = x;
-    position.y = y;
-    position.z = z;
-  }
+  virtual void SetPosition (const csVector3& v) { position = v; }
 
   /**
    * Relative move
    */
-  void Move (float dx, float dy, float dz)
-  {
-    position.x += dx;
-    position.y += dy;
-    position.z += dz;
-  }
-
-  /**
-   * Relative move
-   */
-  void Move (const csVector3& v) { position += v; }
+  virtual void MovePosition (const csVector3& rel) { position += rel; }
 
   /// Get position of this sprite.
-  inline csVector3 GetOrigin () const { return position; }
+  virtual const csVector3& GetPosition () const { return position; }
 
   /**
    * Scale the vertices of the sprite by factor.

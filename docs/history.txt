@@ -1,5 +1,17 @@
 The history order has been reversed so that new features are at the top.
 
+12-Apr-2000
+	- Fixed a second (related) bug in WalkTest CD.
+	- Fundamental API change for sprites. Move() has been replaced with
+	  MovePosition() (relative move). SetMove() has been replaced
+	  with SetPosition() and GetOrigin() has been replaced with
+	  SetPosition(). This is both for 2D sprites and 3D sprites.
+	  Additinally GetPosition (previously GetOrigin) and
+	  MovePosition (previously Move) have changed direction!!!
+	  They are now correct.
+	- Also use SetPosition and MovePosition for csCollection and
+	  csThing now (to be consistant).
+	- Changed HitBeam to use 'const' input parms.
 11-Apr-2000
 	- Wouter Wijngaards fixed SHM problem on some versions of
 	  Solaris. If SHM fails it will automatically retry without

@@ -41,11 +41,11 @@ void csCollection::Transform ()
       ((csThing*)(objects[i]))->Transform ();
 }
 
-void csCollection::SetMove (csSector* home, float x, float y, float z)
+void csCollection::SetPosition (csSector* home, const csVector3& pos)
 {
   for (int i = 0 ; i < objects.Length() ; i++)
     if ( ((csObject*)(objects[i]))->GetType () == csThing::Type)
-      ((csThing*)(objects[i]))->SetMove (home, x, y, z);
+      ((csThing*)(objects[i]))->SetPosition (home, pos);
 }
 
 void csCollection::SetTransform (const csMatrix3& matrix)
@@ -55,11 +55,11 @@ void csCollection::SetTransform (const csMatrix3& matrix)
       ((csThing*)(objects[i]))->SetTransform (matrix);
 }
 
-void csCollection::Move (float dx, float dy, float dz)
+void csCollection::MovePosition (const csVector3& rel)
 {
   for (int i = 0 ; i < objects.Length() ; i++)
     if ( ((csObject*)(objects[i]))->GetType () == csThing::Type)
-      ((csThing*)(objects[i]))->Move (dx, dy, dz);
+      ((csThing*)(objects[i]))->MovePosition (rel);
 }
 
 void csCollection::Transform (csMatrix3& matrix)

@@ -124,13 +124,7 @@ public:
    * Set the transformation vector and sector to move thing to
    * some position.
    */
-  void SetMove (csSector* home, csVector3& v) { SetMove (home, v.x, v.y, v.z); }
-
-  /**
-   * Set the transformation vector and sector to move thing to
-   * some position.
-   */
-  void SetMove (csSector* home, float x, float y, float z);
+  void SetPosition (csSector* home, const csVector3& v);
 
   /**
    * Set the transformation matrix to rotate the thing in some
@@ -151,12 +145,7 @@ public:
   /**
    * Relative move.
    */
-  void Move (float dx, float dy, float dz);
-
-  /**
-   * Relative move.
-   */
-  void Move (csVector3& v) { Move (v.x, v.y, v.z); }
+  void MovePosition (const csVector3& v);
 
   /**
    * Relative transform.

@@ -86,9 +86,9 @@ void csThing::Transform ()
   }
 }
 
-void csThing::SetMove (csSector* home, float x, float y, float z)
+void csThing::SetPosition (csSector* home, const csVector3& pos)
 {
-  obj.SetOrigin (csVector3(x,y,z));
+  obj.SetOrigin (pos);
   sector = home;
 }
 
@@ -97,9 +97,9 @@ void csThing::SetTransform (const csMatrix3& matrix)
   obj.SetT2O (matrix);
 }
 
-void csThing::Move (float dx, float dy, float dz)
+void csThing::MovePosition (const csVector3& rel)
 {
-  obj.Translate(csVector3(dx,dy,dz));
+  obj.Translate (rel);
 }
 
 void csThing::Transform (csMatrix3& matrix)
