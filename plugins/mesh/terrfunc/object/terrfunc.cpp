@@ -1911,6 +1911,7 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 
 void csTerrFuncObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 {
+  SetupObject ();
   bbox = global_bbox;
 }
 

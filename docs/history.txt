@@ -9,6 +9,8 @@ The history order is reversed so that new features are at the top.
 	    - csSector
 	    - csAnimationTemplate
 	- Removed csObjVector (replaced with csRefArray in most places).
+	- Fixed terrfunc so that it correctly calculates the bounding box.
+	  This fixes an assert in dynavis/frustvis.
 14-Jan-2002
 	- Keith Fulton fixed a bug in csPArray and csRefArray where DeleteAll()
 	  would not set the limit to 0.
