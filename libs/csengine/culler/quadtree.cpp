@@ -27,6 +27,11 @@
 
 bool BoxEntirelyInPolygon (csVector2* verts, int num_verts, const csBox2& bbox)
 {
+  printf("  BoxInPoly %d %d %d %d \n",
+          csPoly2D::In (verts, num_verts, bbox.GetCorner (0)) ,
+          csPoly2D::In (verts, num_verts, bbox.GetCorner (1)) ,
+          csPoly2D::In (verts, num_verts, bbox.GetCorner (2)) ,
+          csPoly2D::In (verts, num_verts, bbox.GetCorner (3)));
   return (csPoly2D::In (verts, num_verts, bbox.GetCorner (0)) &&
           csPoly2D::In (verts, num_verts, bbox.GetCorner (1)) &&
           csPoly2D::In (verts, num_verts, bbox.GetCorner (2)) &&
@@ -181,7 +186,7 @@ void csQuadTree :: CallChildren(quad_traverse_func* func, csQuadTree* pObj,
 
   /// counted in nr of nodes, how manyeth node is the topleft node
   /// of the children from it's plane_start
-  int nodenr = child_pos.plane_size * child_pos.node_y + child_pos.node_x;
+  int nodenr = child_pos.plane_size * child_y + child_x;
   int childnr = 0;
 
   for(int y = 0; y < 2; y++)
@@ -304,9 +309,11 @@ int csQuadTree :: insert_polygon_func (csQuadTree* pObj,
 
   /// is the whole node covered?
   /// first check bounding boxes then precisely.
-  if(info.pol_bbox->Contains(node_bbox) &&
+  if(
+    info.pol_bbox->Contains(node_bbox) &&
     BoxEntirelyInPolygon(info.verts, info.num_verts, node_bbox))
   {
+    printf("  =FULL\n");
     if(!info.test_only)
       pObj->SetNodeState(node_pos, CS_QUAD_FULL);
     /// mark children (if any) as unknown, since they should not be reached.
@@ -324,6 +331,7 @@ int csQuadTree :: insert_polygon_func (csQuadTree* pObj,
     || node_bbox.Intersect(info.verts, info.num_verts))
   { 
     int old_node_state = node_state;
+    printf("  =PARTIAL\n");
     // so it overlaps a bit.
     if(node_state == CS_QUAD_EMPTY && node_pos->depth < pObj->max_depth)
     {
@@ -353,6 +361,7 @@ int csQuadTree :: insert_polygon_func (csQuadTree* pObj,
   }
   /// polygon bound overlaps, but polygon itself does not intersect us
   /// i.e. the polygon is not in this node. No change, nothing added here.
+  printf("  =No_overlap\n");
   return CS_QUAD_NOCHANGE;
 }
 
@@ -471,7 +480,9 @@ void csQuadTree :: Print(void)
     {
       for(int x=0;x<plane_size;x++,nodenr++)
       {
-        int offset = plane_start + (nodenr >> 2);
+        int offset;
+        if(dep==1) offset = -1;
+        else offset = plane_start + (nodenr >> 2);
 	int bytepos = nodenr & 0x3;
 	int state = GetNodeState(offset, bytepos);
 	printf("%c", display[state]);
