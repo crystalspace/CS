@@ -521,11 +521,11 @@ int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show) \
   return ret; \
 }
 
+#endif
+
 // the main() is actually in win32.cpp
 
 #define main _cs_main
-
-#endif
 
 #if !defined(CS_STATIC_LINKED)
 

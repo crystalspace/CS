@@ -1056,7 +1056,7 @@ int main (int argc, char* argv[])
   is_console_app = true;
 
   CS_DEBUG_MSVC_INIT_GOOP; 
-  int ret = _cs_main(CS_WIN32_ARGC, CS_WIN32_ARGV); 
+  int ret = _cs_main(argc, argv); 
   CS_DEBUG_MSVC_EXIT_GOOP; 
   return ret; 
 }
