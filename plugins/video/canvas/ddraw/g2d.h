@@ -68,6 +68,8 @@ protected:
   HINSTANCE m_hInstance;
   HPALETTE m_hWndPalette;
 
+  HDC hdc;
+
   // Old window procedure (the one in win32.cpp)
   WNDPROC m_OldWndProc;
 

@@ -137,13 +137,13 @@ bool csGraphics2DDDraw3::Open ()
   SetWindowLong (m_hWnd, GWL_USERDATA, (LONG)this);
 
   // Decide whenever we allow windowed mode at all
-  HDC hdc = GetDC (m_hWnd);
-  m_bAllowWindowed = (GetDeviceCaps (hdc, BITSPIXEL) == Depth);
+  hdc = GetDC (m_hWnd);
+  m_bAllowWindowed = (GetDeviceCaps (hdc, RASTERCAPS) == Depth);
   ReleaseDC (m_hWnd, hdc);
   if (FullScreen && !m_bAllowWindowed)
     FullScreen = true;
   else
-	FullScreen = false;
+    FullScreen = false;
 
   // Get ahold of the main DirectDraw object...
   DDetection.checkDevices2D ();
@@ -270,7 +270,7 @@ void csGraphics2DDDraw3::Print (csRect *area)
         ClientToScreen (m_hWnd, (POINT *)&rcScreen.right);
       }
 
-      HDC hdc = 0;
+      hdc = 0;
       HPALETTE oldPal = 0;
       if (m_bPalettized)
       {
