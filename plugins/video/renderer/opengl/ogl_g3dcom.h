@@ -53,7 +53,6 @@
 
 struct iGraphics2D;
 class OpenGLTextureCache;
-class OpenGLLightmapCache;
 class csTextureHandleOpenGL;
 class csTextureManagerOpenGL;
 class csTriangleArrayVertexBufferManager;
@@ -558,9 +557,6 @@ public:
   /// The vertex buffer manager.
   csTriangleArrayVertexBufferManager* vbufmgr;
   //csPolArrayVertexBufferManager* vbufmgr;
-
-  /// The lightmap cache.
-  OpenGLLightmapCache* lightmap_cache;
 
   /**
    * If true, be verbose.

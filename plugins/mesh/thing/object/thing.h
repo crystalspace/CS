@@ -35,6 +35,7 @@
 #include "csutil/refarr.h"
 #include "csutil/garray.h"
 #include "csutil/blockallocator.h"
+#include "csutil/parray.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
 #include "iengine/shadcast.h"
@@ -547,8 +548,8 @@ private:
 #endif
 
 #ifdef COMBINE_LIGHTMAPS
-  csArray<csLitPolyGroup> litPolys;
-  csArray<csPolyGroup> unlitPolys;
+  csPDelArray<csLitPolyGroup> litPolys;
+  csPDelArray<csPolyGroup> unlitPolys;
   bool lightmapsPrepared;
   bool lightmapsDirty;
 
@@ -1169,14 +1170,14 @@ public:
   csBlockAllocator<csLightMap> blk_lightmap;
 
 #ifdef COMBINE_LIGHTMAPS
-  csArray<csSuperLMArray> superLMs;
+  csPDelArray<csSuperLMArray> superLMs;
   int minLightmapSize;
   int maxLightmapSize;
 
   void AllocLightmaps (const csPolyGroup& inputPolys,
-    csArray<csLitPolyGroup>& outputPolys, 
-    csPolyGroup& rejectedPolys);
-  void FreeLightmaps (csArray<csLitPolyGroup>& polys);
+    csPDelArray<csLitPolyGroup>& outputPolys, 
+    csPolyGroup* rejectedPolys);
+  void FreeLightmaps (csPDelArray<csLitPolyGroup>& polys);
 #endif
 public:
   SCF_DECLARE_IBASE;

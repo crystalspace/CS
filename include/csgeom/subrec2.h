@@ -45,6 +45,8 @@ protected:
   csSubRect2* root;
 
   csBlockAllocator<csSubRect2> alloc;
+
+  csSubRect2* AllocSubrect ();
 public:
   /// Allocate a new empty region with the given size.
   csSubRectangles2 (const csRect& region);

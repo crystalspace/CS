@@ -62,6 +62,17 @@ chronological order.
 	  leftover debug stuff.
 	- res added <cs-config> tags around the UPCASE make macro(or how is 
 	  it called?)
+	- res made the following changes:
+	    - Removed some leftover super LM code from the old GL renderer.
+	    - In the Thing SLM stuff some arrays of structs were replaced
+	      with arrays of pointers to resp. structs to avoid some 
+	      unnecessary copying of data.
+	    - Fixed some problems in csSubRectangles2 rectangle allocation
+	      that caused problems when reclaiming allocated rectangle
+	      space.
+	    - Added a small debug aid to csBlockAllocator: a #define at 
+	      compile time causes freed objects to be overwritten with a 
+	      certain byte value.
 4-Aug-2003
 	- Oktal added the following to csutil:
 	    - A template class, csHash<T>, intended to replace csHashMap soon.

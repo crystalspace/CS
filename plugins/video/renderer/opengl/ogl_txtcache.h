@@ -107,53 +107,5 @@ protected:
   void Unload (csTxtCacheData *d);
 };
 
-#define DEFAULT_SUPER_LM_SIZE 256
-#define DEFAULT_SUPER_LM_NUM 10
-
-/**
- * Cache for OpenGL lightmaps. This cache keeps a number of
- * super lightmaps. Every super lightmaps holds a number of lightmaps.
- */
-class OpenGLLightmapCache
-{
-public:
-  /// Number of static lightmaps (one size per queue).
-  static int super_lm_num[4];
-  /// Size of static lightmaps (queue 0).
-  static int super_lm_size;
-  /// Global timestamp for super lightmaps.
-  uint32 global_timestamp;
-
-  /// For statistics (with -verbose option).
-  int stats_hit[4];
-  int stats_fail[4];
-
-private:
-  csGraphics3DOGLCommon* g3d;
-
-  /// Four queues with super lightmaps.
-//  csSuperLightMap* suplm[4];
-  /// If true then setup is ok.
-  bool initialized;
-
-  void Setup ();
-
-public:
-  ///
-  OpenGLLightmapCache (csGraphics3DOGLCommon* g3d);
-  ///
-  ~OpenGLLightmapCache ();
-
-  /// Finds an empty superlightmap in a queue (returns -1 if none is found)
-  int FindFreeSuperLightmap (int queue_num);
-
-  /// Clear the entire lightmap cache.
-  void Clear ();
-
-  /// Check if lightmap blows size limit
-  bool IsLightmapOK (int lmw, int lmh, 
-    int lightCellSize);
-};
-
 #endif // __CS_OGL_TEXTURECACHE_H__
 

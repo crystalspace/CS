@@ -208,7 +208,6 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
 
   ogl_g3d = this;
   texture_cache = 0;
-  lightmap_cache = 0;
   txtmgr = 0;
   vbufmgr = 0;
   m_fogtexturehandle = 0;
@@ -888,16 +887,6 @@ bool csGraphics3DOGLCommon::NewOpen ()
     config->GetBool ("Video.OpenGL.Caps.NeedScreenClipping", false);
   GLCaps.nr_hardware_planes = config->GetInt ("Video.OpenGL.Caps.HWPlanes", 6);
   fps_limit = config->GetInt ("Video.OpenGL.FpsLimit", 0);
-  OpenGLLightmapCache::super_lm_num[0] = config->GetInt (
-    "Video.OpenGL.SuperLightMapNum0", 1);
-  OpenGLLightmapCache::super_lm_num[1] = config->GetInt (
-    "Video.OpenGL.SuperLightMapNum1", 12);
-  OpenGLLightmapCache::super_lm_num[2] = config->GetInt (
-    "Video.OpenGL.SuperLightMapNum2", 64);
-  OpenGLLightmapCache::super_lm_num[3] = config->GetInt (
-    "Video.OpenGL.SuperLightMapNum3", 128);
-  OpenGLLightmapCache::super_lm_size = config->GetInt (
-    "Video.OpenGL.SuperLightMapSize", 256);
 
   unsigned int i, j;
   const char* clip_opt = config->GetStr ("Video.OpenGL.ClipOptional", "auto");
@@ -1070,21 +1059,10 @@ bool csGraphics3DOGLCommon::NewOpen ()
   }
   Report (CS_REPORTER_SEVERITY_NOTIFY,
       "  Maximum texture size is %dx%d", Caps.maxTexWidth, Caps.maxTexHeight);
-  if (OpenGLLightmapCache::super_lm_size > Caps.maxTexWidth)
-    OpenGLLightmapCache::super_lm_size = Caps.maxTexWidth;
-  Report (CS_REPORTER_SEVERITY_NOTIFY,
-    "  Super lightmaps: max_size=%dx%d num=%d %d %d %d",
-    OpenGLLightmapCache::super_lm_size,
-    OpenGLLightmapCache::super_lm_size,
-    OpenGLLightmapCache::super_lm_num[0],
-    OpenGLLightmapCache::super_lm_num[1],
-    OpenGLLightmapCache::super_lm_num[2],
-    OpenGLLightmapCache::super_lm_num[3]);
 
   int max_cache_size = // 128mb combined cache per default
     config->GetInt("Video.OpenGL.MaxTextureCache", 128) * 1024*1024; 
   texture_cache = new OpenGLTextureCache (max_cache_size, this);
-  lightmap_cache = new OpenGLLightmapCache (this);
   texture_cache->SetBilinearMapping (config->GetBool
         ("Video.OpenGL.EnableBilinearMap", true));
 
@@ -1177,28 +1155,10 @@ void csGraphics3DOGLCommon::SharedOpen (csGraphics3DOGLCommon *d)
     d->m_config_options.m_lightmap_dst_blend;
   m_fogtexturehandle = d->m_fogtexturehandle;
   texture_cache = d->texture_cache;
-  lightmap_cache = d->lightmap_cache;
 }
 
 void csGraphics3DOGLCommon::Close ()
 {
-  if (verbose)
-  {
-    if (lightmap_cache)
-    {
-      printf ("Super lightmap cache usage:\n");
-      int i;
-      for (i = 0 ; i < 4 ; i++)
-      {
-        printf ("  queue %d: hits=%d fails=%d\n",
-	  i,
-      	  lightmap_cache->stats_hit[i],
-      	  lightmap_cache->stats_fail[i]);
-      }
-      fflush (stdout);
-    }
-  }
-
   if ((width == height) && height == -1)
     return;
 
@@ -1221,7 +1181,6 @@ void csGraphics3DOGLCommon::Close ()
   }
 
   delete texture_cache; texture_cache = 0;
-  delete lightmap_cache; lightmap_cache = 0;
   if (clipper)
   {
     clipper->DecRef ();
@@ -1375,8 +1334,6 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
   if (DrawMode & CSDRAW_3DGRAPHICS)
   {
     // For super lightmap caching.
-    lightmap_cache->global_timestamp++;
-
     FlushDrawPolygon ();
     clipportal_stack.DeleteAll ();
     clipportal_dirty = true;
@@ -5780,9 +5737,7 @@ void csGraphics3DOGLCommon::ClearCache ()
   // We will clear lightmap cache since when unloading a world lightmaps
   // become invalid. We won't clear texture cache since texture items are
   // cleaned up individually when an iTextureHandle's RefCount reaches zero.
-  if (!lightmap_cache) return;  // System is being destructed.
   FlushDrawPolygon ();
-  lightmap_cache->Clear ();
 }
 
 void csGraphics3DOGLCommon::DumpCache ()
@@ -6143,7 +6098,7 @@ iTextureManager *csGraphics3DOGLCommon::GetTextureManager ()
 bool csGraphics3DOGLCommon::IsLightmapOK (int lmw, int lmh, 
     int lightCellSize)
 {
-  return lightmap_cache->IsLightmapOK (lmw, lmh, lightCellSize);
+  return ((lmw <= Caps.maxTexWidth) && (lmh <= Caps.maxTexHeight));
 }
 
 void csGraphics3DOGLCommon::SetRenderTarget (iTextureHandle* handle,

@@ -19,7 +19,11 @@
 #include "cssysdef.h"
 #include "csgeom/subrec2.h"
 
-#ifdef CS_DEBUG
+#if 0//defined(CS_DEBUG)
+#define DUMP_TO_IMAGES
+#endif
+
+#ifdef DUMP_TO_IMAGES
 // csSubRectangles2::Dump () writes an image, stuff needed for that
 #include "qint.h"
 #include "csutil/csstring.h"
@@ -348,7 +352,7 @@ csSubRect2* csSubRect2::Alloc (int w, int h, const AllocInfo& ai, csRect& r)
     {
       splitPos = splitX - rect.xmin;
 
-      children[0] = superrect->alloc.Alloc ();
+      children[0] = superrect->AllocSubrect ();
       children[0]->parent = this;
       children[0]->superrect = superrect;
       children[0]->rect.Set (rect.xmin, rect.ymin, 
@@ -359,13 +363,13 @@ csSubRect2* csSubRect2::Alloc (int w, int h, const AllocInfo& ai, csRect& r)
       }
       else
       {
-	csSubRect2* subChild0 = superrect->alloc.Alloc ();
+	csSubRect2* subChild0 = superrect->AllocSubrect ();
 	subChild0->parent = children[0];
 	subChild0->superrect = superrect;
 	subChild0->rect.Set (rect.xmin, rect.ymin, splitX, allocedRect.ymax);
 	subChild0->allocedRect = allocedRect;
 
-	csSubRect2* subChild1 = superrect->alloc.Alloc ();
+	csSubRect2* subChild1 = superrect->AllocSubrect ();
 	subChild1->parent = children[0];
 	subChild1->superrect = superrect;
 	subChild1->rect.Set (rect.xmin, allocedRect.ymax, splitX, rect.ymax);
@@ -374,15 +378,12 @@ csSubRect2* csSubRect2::Alloc (int w, int h, const AllocInfo& ai, csRect& r)
 
 	children[0]->splitType = SPLIT_H;
 	children[0]->splitPos = allocedRect.Height ();
+	children[0]->allocedRect = children[0]->rect;
 	children[0]->children[0] = subChild0;
 	children[0]->children[1] = subChild1;
-	
-	//children[0]->allocedRect.Set 
-	//  (allocedRect.xmin, allocedRect.ymin, allocedRect.xmax, r.ymax);
-	//ret = children[0];
       }
 
-      children[1] = superrect->alloc.Alloc ();
+      children[1] = superrect->AllocSubrect ();
       children[1]->parent = this;
       children[1]->superrect = superrect;
       children[1]->rect.Set (splitX, rect.ymin, 
@@ -397,7 +398,7 @@ csSubRect2* csSubRect2::Alloc (int w, int h, const AllocInfo& ai, csRect& r)
     {
       splitPos = splitY - rect.ymin;
 
-      children[0] = superrect->alloc.Alloc ();
+      children[0] = superrect->AllocSubrect ();
       children[0]->parent = this;
       children[0]->superrect = superrect;
       children[0]->rect.Set (rect.xmin, rect.ymin, 
@@ -408,13 +409,13 @@ csSubRect2* csSubRect2::Alloc (int w, int h, const AllocInfo& ai, csRect& r)
       }
       else
       {
-	csSubRect2* subChild0 = superrect->alloc.Alloc ();
+	csSubRect2* subChild0 = superrect->AllocSubrect ();
 	subChild0->parent = children[0];
 	subChild0->superrect = superrect;
 	subChild0->rect.Set (rect.xmin, rect.ymin, allocedRect.xmax, splitY);
 	subChild0->allocedRect = allocedRect;
 
-	csSubRect2* subChild1 = superrect->alloc.Alloc ();
+	csSubRect2* subChild1 = superrect->AllocSubrect ();
 	subChild1->parent = children[0];
 	subChild1->superrect = superrect;
 	subChild1->rect.Set (allocedRect.xmax, rect.ymin, rect.xmax, splitY);
@@ -423,15 +424,12 @@ csSubRect2* csSubRect2::Alloc (int w, int h, const AllocInfo& ai, csRect& r)
 
 	children[0]->splitType = SPLIT_V;
 	children[0]->splitPos = allocedRect.Width ();
+	children[0]->allocedRect = children[0]->rect;
 	children[0]->children[0] = subChild0;
 	children[0]->children[1] = subChild1;
-
-//	children[0]->allocedRect.Set 
-//	  (allocedRect.xmin, allocedRect.ymin, r.xmax, allocedRect.ymax);
-	//ret = children[0];
       }
 
-      children[1] = superrect->alloc.Alloc ();
+      children[1] = superrect->AllocSubrect ();
       children[1]->parent = this;
       children[1]->superrect = superrect;
       children[1]->rect.Set (rect.xmin, splitY, 
@@ -458,19 +456,24 @@ void csSubRect2::Reclaim ()
   }
   else
   {
+    CS_ASSERT (children[0]);
     children[0]->Reclaim ();
+    TestCollapse ();
   }
 }
 
 void csSubRect2::TestCollapse ()
 {
-  if (children[0]->allocedRect.IsEmpty() && 
-    children[1]->allocedRect.IsEmpty())
+  // If both children are "empty space" we can revert the status
+  // of this sub-rectangle to "unsplit" and free the children.
+  if (((children[0] != 0) && (children[0]->allocedRect.IsEmpty ())) && 
+    ((children[1] != 0) && (children[1]->allocedRect.IsEmpty ())))
   {
     splitType = SPLIT_UNSPLIT;
     allocedRect.MakeEmpty ();
     superrect->alloc.Free (children[0]); children[0] = 0;
     superrect->alloc.Free (children[1]); children[1] = 0;
+    if (parent != 0) parent->TestCollapse ();
   }
 }
 
@@ -487,6 +490,11 @@ csSubRectangles2::csSubRectangles2 (const csRect &region) :
 csSubRectangles2::~csSubRectangles2 ()
 {
   alloc.Free (root);
+}
+
+csSubRect2* csSubRectangles2::AllocSubrect ()
+{
+  return alloc.Alloc ();
 }
 
 void csSubRectangles2::Clear ()
@@ -514,12 +522,8 @@ csSubRect2* csSubRectangles2::Alloc (int w, int h, csRect &rect)
 
 void csSubRectangles2::Reclaim (csSubRect2* subrect)
 {
-  subrect->Reclaim ();
+  if (subrect) subrect->Reclaim ();
 }
-
-#if 0//defined(CS_DEBUG)
-#define DUMP_TO_IMAGES
-#endif
 
 #if defined(DUMP_TO_IMAGES)
 static void FillImgRect (uint8* data, uint8 color, int imgW, int imgH, 
@@ -678,3 +682,4 @@ void csSubRectangles2::Dump ()
   }
 #endif
 }
+

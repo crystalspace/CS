@@ -37,6 +37,11 @@
  * Note that the objects are properly constructed and destructed.
  * <p>
  * WARNING: This class does VERY little error checking!
+ * <p>
+ * Defining the macro CS_BLOCKALLOC_DEBUG will cause freed objects to be
+ * overwritten with '0xfb' bytes. This can be useful to track use of
+ * already freed objects, as they can be more easily recognized (as some
+ * members will be likely bogus.)
  */
 template <class T>
 class csBlockAllocator
@@ -192,6 +197,10 @@ public:
     CS_ASSERT (idx != -1);
 
     el->T::~T();
+
+#ifdef CS_BLOCKALLOC_DEBUG
+    memset (el, 0xfb, elsize);
+#endif
 
     // If the index is lower than the index of the first free block
     // then we update the firstfreeblock index.

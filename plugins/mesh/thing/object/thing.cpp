@@ -1739,15 +1739,15 @@ void csThing::PreparePolygonBuffer ()
   {
     int mi = polybuf->GetMaterialCount ();
     polybuf_materials[polybuf_material_count] = 
-      litPolys[i].material;
+      litPolys[i]->material;
     polybuf_material_count++;
-    polybuf->AddMaterial (litPolys[i].material->GetMaterialHandle ());
+    polybuf->AddMaterial (litPolys[i]->material->GetMaterialHandle ());
     int j;
-    for (j = 0; j < litPolys[i].polys.Length (); j++)
+    for (j = 0; j < litPolys[i]->polys.Length (); j++)
     {
       verts.DeleteAll ();
 
-      csPolygon3D *poly = litPolys[i].polys[j];
+      csPolygon3D *poly = litPolys[i]->polys[j];
       csPolygon3DStatic *spoly = poly->GetStaticData ();
       csPolyLightMapMapping *mapping = spoly->GetLightMapMapping ();
       csPolyTextureMapping *tmapping = spoly->GetTextureMapping ();
@@ -1762,7 +1762,7 @@ void csThing::PreparePolygonBuffer ()
       polybuf->AddPolygon (spoly->GetVertexCount (), verts.GetArray (), 
 	tmapping, mapping, 
 	spoly->GetObjectPlane (), 
-	mi, litPolys[i].lightmaps[j]);
+	mi, litPolys[i]->lightmaps[j]);
     }
   }
 
@@ -1770,15 +1770,15 @@ void csThing::PreparePolygonBuffer ()
   {
     int mi = polybuf->GetMaterialCount ();
     polybuf_materials[polybuf_material_count] = 
-      unlitPolys[i].material;
+      unlitPolys[i]->material;
     polybuf_material_count++;
-    polybuf->AddMaterial (unlitPolys[i].material->GetMaterialHandle ());
+    polybuf->AddMaterial (unlitPolys[i]->material->GetMaterialHandle ());
     int j;
-    for (j = 0; j < unlitPolys[i].polys.Length (); j++)
+    for (j = 0; j < unlitPolys[i]->polys.Length (); j++)
     {
       verts.DeleteAll ();
 
-      csPolygon3D *poly = unlitPolys[i].polys[j];
+      csPolygon3D *poly = unlitPolys[i]->polys[j];
       csPolygon3DStatic *spoly = poly->GetStaticData ();
       csPolyTextureMapping *tmapping = spoly->GetTextureMapping ();
 
@@ -2456,7 +2456,7 @@ void csThing::PrepareLMs ()
     {
       csPolyGroup* lp = (csPolyGroup*)polyIt.Next ();
 
-      csPolyGroup rejectedPolys;
+      csPolyGroup* rejectedPolys = new csPolyGroup;
 
       static_data->thing_type->AllocLightmaps (*lp, litPolys,
 	rejectedPolys);
@@ -2488,13 +2488,13 @@ void csThing::UpdateDirtyLMs ()
   for (i = 0; i < litPolys.Length (); i++)
   {
     int j;
-    for (j = 0; j < litPolys[i].polys.Length (); j++)
+    for (j = 0; j < litPolys[i]->polys.Length (); j++)
     {
-      csPolygon3D *poly = litPolys[i].polys[j];
+      csPolygon3D *poly = litPolys[i]->polys[j];
       csPolyTexture* lmi = poly->GetPolyTexture ();
       if (lmi->DynamicLightsDirty () && lmi->RecalculateDynamicLights ())	
       {
-	litPolys[i].lightmaps[j]->SetData (
+	litPolys[i]->lightmaps[j]->SetData (
 	  lmi->GetLightMap ()->GetMapData ());
       }
     }
@@ -2601,7 +2601,7 @@ csThingObjectType::~csThingObjectType ()
 #ifdef COMBINE_LIGHTMAPS
   for (int i = 0; i < superLMs.Length(); i++)
   {
-    superLMs[i].Clear ();
+    superLMs[i]->Clear ();
   }
 #endif
 printf ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n"); fflush (stdout);
@@ -2646,7 +2646,7 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
   int lms = minLightmapSize;
   while (lms <= maxLightmapSize)
   {
-    superLMs.Push (csSuperLMArray (lms));
+    superLMs.Push (new csSuperLMArray (lms));
     lms <<= 1;
   }
 #endif
@@ -2693,8 +2693,8 @@ static int ComparePolys (csPolygon3D* const& poly1, csPolygon3D* const& poly2)
 }
 
 void csThingObjectType::AllocLightmaps (const csPolyGroup& inputPolys,
-					csArray<csLitPolyGroup>& outputPolys, 
-					csPolyGroup& rejectedPolys)
+					csPDelArray<csLitPolyGroup>& outputPolys, 
+					csPolyGroup* rejectedPolys)
 {
   struct internalPolyGroup : public csPolyGroup
   {
@@ -2707,7 +2707,7 @@ void csThingObjectType::AllocLightmaps (const csPolyGroup& inputPolys,
 
   int i;
 
-  rejectedPolys.material = inputPolys.material;
+  rejectedPolys->material = inputPolys.material;
   inputQueues[0].material = inputPolys.material;
   inputQueues[0].totalLumels = 0;
   inputQueues[0].maxlmw = 0;
@@ -2721,7 +2721,7 @@ void csThingObjectType::AllocLightmaps (const csPolyGroup& inputPolys,
     csLightMap* lm = polytxt->GetCSLightMap ();
     if (lm == 0)
     {
-      rejectedPolys.polys.Push (poly);
+      rejectedPolys->polys.Push (poly);
       continue;
     }
 
@@ -2730,7 +2730,7 @@ void csThingObjectType::AllocLightmaps (const csPolyGroup& inputPolys,
 
     if ((lmw > maxLightmapSize) || (lmh > maxLightmapSize)) 
     {
-      rejectedPolys.polys.Push (poly);
+      rejectedPolys->polys.Push (poly);
     }
     else
     {
@@ -2741,6 +2741,7 @@ void csThingObjectType::AllocLightmaps (const csPolyGroup& inputPolys,
     }
   }
 
+  csLitPolyGroup* curOutputPolys = new csLitPolyGroup;
   while (inputQueues[curQueue].polys.Length () > 0)
   {
     // Find place for as much polys as possible
@@ -2749,17 +2750,17 @@ void csThingObjectType::AllocLightmaps (const csPolyGroup& inputPolys,
     int maxAvailLumels = 0;
     for (i = 0; i < superLMs.Length(); i++)
     {
-      if ((superLMs[i].width >= inputQueues[curQueue].maxlmw) &&
-	  (superLMs[i].height >= inputQueues[curQueue].maxlmh))
+      if ((superLMs[i]->width >= inputQueues[curQueue].maxlmw) &&
+	  (superLMs[i]->height >= inputQueues[curQueue].maxlmh))
       {
-	if (superLMs[i].maxLumels >= maxAvailLumels)
+	if (superLMs[i]->maxLumels >= maxAvailLumels)
 	{
-	  maxAvailLumels = superLMs[i].maxLumels;
-	  masla = &superLMs[i];
+	  maxAvailLumels = superLMs[i]->maxLumels;
+	  masla = superLMs[i];
 	}
-	if (superLMs[i].maxLumels >= inputQueues[curQueue].totalLumels)
+	if (superLMs[i]->maxLumels >= inputQueues[curQueue].totalLumels)
 	{
-	  sla = &superLMs[i];
+	  sla = superLMs[i];
 	  break;
 	}
       }
@@ -2774,10 +2775,9 @@ void csThingObjectType::AllocLightmaps (const csPolyGroup& inputPolys,
     int s = 0;
     while (s < sla->SLMs.Length ())
     {
-      csLitPolyGroup curOutputPolys;
       SuperLM* slm = sla->SLMs[s];
-      curOutputPolys.thingTypeSLM = slm;
-      curOutputPolys.material = inputQueues[curQueue].material;
+      curOutputPolys->thingTypeSLM = slm;
+      curOutputPolys->material = inputQueues[curQueue].material;
         
       inputQueues[curQueue ^ 1].totalLumels = 0;
       inputQueues[curQueue ^ 1].maxlmw = 0;
@@ -2802,14 +2802,12 @@ void csThingObjectType::AllocLightmaps (const csPolyGroup& inputPolys,
 	  {
             if ( slm->rendererSLM )
             {
-	        rlm =  slm->rendererSLM->RegisterLightmap (r.xmin, r.ymin,  
-                                                           lmw - LM_BORDER, 
-                                                           lmh - LM_BORDER);
-	        //polytxt->RecalculateDynamicLights ();
-	        //rlm->SetData (lm->GetMapData ());
-        
-	        rlm->SetLightCellSize (polytxt->GetLightCellSize ());
-	        polytxt->SetRendererLightmap (rlm);
+	      rlm = slm->rendererSLM->RegisterLightmap (r.xmin, r.ymin,  
+                                                        lmw - LM_BORDER, 
+                                                        lmh - LM_BORDER);
+    
+	      rlm->SetLightCellSize (polytxt->GetLightCellSize ());
+	      polytxt->SetRendererLightmap (rlm);
             }
 
 	    stuffed = true;
@@ -2819,9 +2817,9 @@ void csThingObjectType::AllocLightmaps (const csPolyGroup& inputPolys,
 
 	if (stuffed)
 	{
-	  curOutputPolys.polys.Push (poly);
-	  curOutputPolys.lightmaps.Push (rlm);
-	  curOutputPolys.slmSubrects.Push (slmSR);
+	  curOutputPolys->polys.Push (poly);
+	  curOutputPolys->lightmaps.Push (rlm);
+	  curOutputPolys->slmSubrects.Push (slmSR);
 	}
 	else
 	{
@@ -2840,9 +2838,10 @@ void csThingObjectType::AllocLightmaps (const csPolyGroup& inputPolys,
 	s++;
       }
 
-      if (curOutputPolys.polys.Length () > 0)
+      if (curOutputPolys->polys.Length () > 0)
       {
 	outputPolys.Push (curOutputPolys);
+	curOutputPolys = new csLitPolyGroup;
       }
     
       curQueue ^= 1;
@@ -2856,25 +2855,26 @@ void csThingObjectType::AllocLightmaps (const csPolyGroup& inputPolys,
       sla->SLMs.InsertSorted (newslm, CompareSuperLM);
     }
   }
+  delete curOutputPolys;
 
 }
 
-void csThingObjectType::FreeLightmaps (csArray<csLitPolyGroup>& polys)
+void csThingObjectType::FreeLightmaps (csPDelArray<csLitPolyGroup>& polys)
 {
   int i, j;
   for (i = 0; i < polys.Length(); i++)
   {
-    csLitPolyGroup& curPolys = polys[i];
+    csLitPolyGroup* curPolys = polys[i];
 
-    for (j = 0; j < curPolys.polys.Length(); j++)
+    for (j = 0; j < curPolys->polys.Length(); j++)
     {
-      if (!curPolys.lightmaps[j])
+      curPolys->thingTypeSLM->GetRects ()->Reclaim (curPolys->slmSubrects[j]);
+      if (!curPolys->lightmaps[j])
 	continue;
       int l, t, w, h;
-      curPolys.lightmaps[j]->GetSLMCoords (l, t, w, h);
-      curPolys.thingTypeSLM->freeLumels += ((w + LM_BORDER) * (h + LM_BORDER));
-      curPolys.thingTypeSLM->GetRects ()->Reclaim (curPolys.slmSubrects[j]);
-      curPolys.lightmaps[j] = 0;	  
+      curPolys->lightmaps[j]->GetSLMCoords (l, t, w, h);
+      curPolys->thingTypeSLM->freeLumels += ((w + LM_BORDER) * (h + LM_BORDER));
+      curPolys->lightmaps[j] = 0;	  
     }
   }
   
@@ -2884,12 +2884,12 @@ void csThingObjectType::FreeLightmaps (csArray<csLitPolyGroup>& polys)
   for (i = 0; i < superLMs.Length (); i++)
   {
     j = 0;
-    while (j < superLMs[i].SLMs.Length ())
+    while (j < superLMs[i]->SLMs.Length ())
     {
-      SuperLM* slm = superLMs[i].SLMs[j];
+      SuperLM* slm = superLMs[i]->SLMs[j];
       if (slm->freeLumels == (slm->width * slm->height))
       {
-	superLMs[i].SLMs.DeleteIndex (j);
+	superLMs[i]->SLMs.DeleteIndex (j);
 	delete slm;
       }
       else
@@ -2934,9 +2934,9 @@ bool csThingObjectType::DebugCommand (const char* cmd)
 
     for (int i = 0; i < superLMs.Length(); i++)
     {
-      for (int j = 0; j < superLMs[i].SLMs.Length (); j++)
+      for (int j = 0; j < superLMs[i]->SLMs.Length (); j++)
       {
-	csRef<iImage> img = superLMs[i].SLMs[j]->rendererSLM->Dump ();
+	csRef<iImage> img = superLMs[i]->SLMs[j]->rendererSLM->Dump ();
 	if (img)
 	{
 	  csRef<iDataBuffer> buf = imgsaver->Save 
@@ -2957,8 +2957,8 @@ bool csThingObjectType::DebugCommand (const char* cmd)
 	    else
 	    {
 	      Notify ("Dumped %dx%d SLM to %s", 
-		superLMs[i].SLMs[j]->width,
-		superLMs[i].SLMs[j]->height,
+		superLMs[i]->SLMs[j]->width,
+		superLMs[i]->SLMs[j]->height,
 		outfn.GetData ());
 	    }
 	  }
