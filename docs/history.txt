@@ -33,6 +33,8 @@ Short-term cleanups that need to be done:
 	  crash otherwise.
 	- Edge drawing works now too when c-buffer is enabled.
 	- Fixed Blocks so that dynamic gouraud shading works again.
+	- Eric Sunshine fixed a compilation error in blocks.cpp caused by
+	  incorrect resolution of conflicts between the previous two revisions.
 11-Aug-1999
 	- Only transform a polygon to camera space AFTER clipping instead
 	  of before. This improves performance slightly and also fixes
