@@ -25,6 +25,8 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 

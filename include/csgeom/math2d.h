@@ -34,6 +34,8 @@
 #define CS_POLY_OUT -1
 #endif
 
+#include "csextern.h"
+
 #include "csgeom/vector2.h"
 #include "csgeom/plane2.h"
 #include "csgeom/segment.h"
@@ -45,7 +47,7 @@ class csPoly2D;
  * Various functions in 2D, such as 2D vector functions.
  * This is a static class and contains only static member functions.
  */
-class csMath2
+class CS_CSGEOM_EXPORT csMath2
 {
 public:
   /**
@@ -158,7 +160,7 @@ public:
  * line segments.  This is a static class and contains only static member
  * functions.
  */
-class csIntersect2
+class CS_CSGEOM_EXPORT csIntersect2
 {
 public:
   /**

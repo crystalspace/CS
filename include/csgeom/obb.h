@@ -26,6 +26,8 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 #include "csgeom/box.h"
 #include "csgeom/matrix3.h"
 
@@ -36,7 +38,7 @@ class csReversibleTransform;
  * Oriented bounding box (OBB). This is basically
  * a csBox3 with a matrix to rotate it.
  */
-class csOBB : public csBox3
+class CS_CSGEOM_EXPORT csOBB : public csBox3
 {
 private:
   csMatrix3 mMat;
@@ -99,7 +101,7 @@ public:
 /**
  * Version of the csOBB with frozen corners (for optimization purposes).
  */
-class csOBBFrozen
+class CS_CSGEOM_EXPORT csOBBFrozen
 {
 private:
   csVector3 corners[8];

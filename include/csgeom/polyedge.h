@@ -25,6 +25,8 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 #include "csgeom/math2d.h"
 #include "csgeom/segment.h"
 
@@ -32,7 +34,7 @@
  * The following class represents a general 2D polygon represented
  * with edges instead of vertices.
  */
-class csPoly2DEdges
+class CS_CSGEOM_EXPORT csPoly2DEdges
 {
 protected:
   /// The edges.

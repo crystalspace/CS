@@ -26,10 +26,12 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 /// declare table of square roots
-extern void BuildSqrtTable ();
+extern CS_CSGEOM_EXPORT void BuildSqrtTable ();
 /// fast square root, looks up table build by BuildSqrtTable().
-extern float FastSqrt (float n);
+extern CS_CSGEOM_EXPORT float FastSqrt (float n);
 
 /** @} */
 

@@ -25,6 +25,8 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 #include "csgeom/math3d.h"
 
 // Values returned by classify.
@@ -38,7 +40,7 @@ class csPoly2D;
 /**
  * The following class represents a general 3D polygon.
  */
-class csPoly3D
+class CS_CSGEOM_EXPORT csPoly3D
 {
 protected:
   /// The 3D vertices.
@@ -294,7 +296,7 @@ struct csCompressVertex
  * adds some functionality specific to that use. In particular
  * this class is more used to hold an unordered collection of 3D vectors.
  */
-class csVector3Array : public csPoly3D
+class CS_CSGEOM_EXPORT csVector3Array : public csPoly3D
 {
 public:
   csVector3Array (int start_size = 10) : csPoly3D (start_size) { }

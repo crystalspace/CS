@@ -25,6 +25,8 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 #include "csgeom/poly2d.h"
 
 /**

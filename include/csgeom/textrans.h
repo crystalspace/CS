@@ -25,6 +25,8 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 #include "csgeom/matrix3.h"
 
 /**
@@ -33,7 +35,7 @@
  * This class makes it easiers to define textures for polygons given
  * various things.
  */
-class csTextureTrans
+class CS_CSGEOM_EXPORT csTextureTrans
 {
 public:
   /**

@@ -25,6 +25,8 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 /**
  * The following class represents a general polygon.
  * Vertices are indexed relative to some vertex array instead of directly
@@ -32,7 +34,7 @@
  * knowledge of the actual values of the vertices. It only keeps
  * the indices. So it can actually be used both for 3D and 2D polygons.
  */
-class csPolyIndexed
+class CS_CSGEOM_EXPORT csPolyIndexed
 {
 protected:
   /// The vertex indices.

@@ -25,11 +25,13 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 /**
  * A spline superclass.
  * This spline can control several dimensions at once.
  */
-class csSpline
+class CS_CSGEOM_EXPORT csSpline
 {
 protected:
   int dimensions;

@@ -30,6 +30,8 @@
 #error "cssysdef.h must be included in EVERY source file!"
 #endif
 
+#include "csextern.h"
+
 #include "csgeom/vector3.h"
 
 /**
@@ -37,7 +39,7 @@
  * The plane is given by the equation AAx + BBy + CCz + DD = 0,
  * Where (AA,BB,CC) is given by the vector 'norm'.
  */
-class csPlane3
+class CS_CSGEOM_EXPORT csPlane3
 {
 public:
   /// The normal vector (or the (A,B,C) components).

@@ -25,6 +25,8 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 #include "csgeom/math2d.h"
 #include "csgeom/box.h"
 
@@ -34,7 +36,7 @@ struct iClipper2D;
  * The following class represents a general 2D polygon with
  * a bounding box.
  */
-class csPoly2D
+class CS_CSGEOM_EXPORT csPoly2D
 {
 protected:
   /// The 2D vertices.

@@ -25,6 +25,8 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
 #include "qsqrt.h"
@@ -32,7 +34,7 @@
 /**
  * Class for a quaternion.
  */
-class csQuaternion
+class CS_CSGEOM_EXPORT csQuaternion
 {
 public:
   /// Initialize a quaternion with specific values.

@@ -27,6 +27,8 @@
  * \addtogroup geom_utils
  * @{ */
  
+#include "csextern.h"
+
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
 #include "csutil/refarr.h"

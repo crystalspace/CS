@@ -27,6 +27,8 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 #include "cstypes.h"	// for bool
 #include "vector2.h"
 #include "vector3.h"
@@ -86,7 +88,7 @@ class csPoly2D;
  * (-#CS_BOUNDINGBOX_MAXVALUE, #CS_BOUNDINGBOX_MAXVALUE).  It is not
  * recommended to use points outside of this range.
  */
-class csBox2
+class CS_CSGEOM_EXPORT csBox2
 {
 private:
   struct bEdge
@@ -550,7 +552,7 @@ public:
  * (-#CS_BOUNDINGBOX_MAXVALUE, #CS_BOUNDINGBOX_MAXVALUE).  It is not
  * recommended to use points outside of this range.
  */
-class csBox3
+class CS_CSGEOM_EXPORT csBox3
 {
 protected:
   /// The top-left of this bounding box.
@@ -1024,22 +1026,30 @@ public:
   bool TestIntersect (const csBox3& box) const;
 
   /// Compute the union of two bounding boxes.
-  friend csBox3 operator+ (const csBox3& box1, const csBox3& box2);
+  friend CS_CSGEOM_EXPORT csBox3 operator+ (const csBox3& box1, 
+    const csBox3& box2);
   /// Compute the union of a bounding box and a point.
-  friend csBox3 operator+ (const csBox3& box, const csVector3& point);
+  friend CS_CSGEOM_EXPORT csBox3 operator+ (const csBox3& box, 
+    const csVector3& point);
   /// Compute the intersection of two bounding boxes.
-  friend csBox3 operator* (const csBox3& box1, const csBox3& box2);
+  friend CS_CSGEOM_EXPORT csBox3 operator* (const csBox3& box1, 
+    const csBox3& box2);
 
   /// Tests if two bounding boxes are equal.
-  friend bool operator== (const csBox3& box1, const csBox3& box2);
+  friend CS_CSGEOM_EXPORT bool operator== (const csBox3& box1, 
+    const csBox3& box2);
   /// Tests if two bounding boxes are unequal.
-  friend bool operator!= (const csBox3& box1, const csBox3& box2);
+  friend CS_CSGEOM_EXPORT bool operator!= (const csBox3& box1, 
+    const csBox3& box2);
   /// Tests if box1 is a subset of box2.
-  friend bool operator< (const csBox3& box1, const csBox3& box2);
+  friend CS_CSGEOM_EXPORT bool operator< (const csBox3& box1, 
+    const csBox3& box2);
   /// Tests if box1 is a superset of box2.
-  friend bool operator> (const csBox3& box1, const csBox3& box2);
+  friend CS_CSGEOM_EXPORT bool operator> (const csBox3& box1, 
+    const csBox3& box2);
   /// Tests if a point is contained in a box.
-  friend bool operator< (const csVector3& point, const csBox3& box);
+  friend CS_CSGEOM_EXPORT bool operator< (const csVector3& point, 
+    const csBox3& box);
 };
 
 /** @} */

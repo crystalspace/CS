@@ -19,6 +19,8 @@
 #ifndef __CS_POLYTREE_H__
 #define __CS_POLYTREE_H__
 
+#include "csextern.h"
+
 #include "csgeom/box.h"
 #include "csgeom/vector3.h"
 #include "csutil/array.h"
@@ -34,7 +36,7 @@ struct csMeshedPolygon;
 /**
  * A polygon tree. This is basically a simpler version of the kdtree.
  */
-class csPolygonTree
+class CS_CSGEOM_EXPORT csPolygonTree
 {
 private:
   csBox3 bbox;			// Bounding box of all polygons in this node.

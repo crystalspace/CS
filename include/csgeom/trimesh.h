@@ -19,6 +19,8 @@
 #ifndef __CS_TRIMESH_H__
 #define __CS_TRIMESH_H__
 
+#include "csextern.h"
+
 #include "csgeom/tri.h"
 #include "csgeom/math3d.h"
 #include "csutil/garray.h"
@@ -29,7 +31,7 @@
  * if used in combination with a vertex or edge table. Every triangle is then
  * a set of three indices in that table.
  */
-class csTriangleMesh
+class CS_CSGEOM_EXPORT csTriangleMesh
 {
 protected:
   /// The triangles.
@@ -67,7 +69,7 @@ public:
  * This is basically used as a temporary structure to be able to
  * calculate the cost of collapsing this vertex more quickly.
  */
-class csTriangleVertex
+class CS_CSGEOM_EXPORT csTriangleVertex
 {
 public:
   /// Position of this vertex in 3D space.
@@ -95,7 +97,7 @@ public:
  * A class which holds vertices and connectivity information for a triangle
  * mesh.
  */
-class csTriangleVertices
+class CS_CSGEOM_EXPORT csTriangleVertices
 {
 protected:
   csTriangleVertex* vertices;

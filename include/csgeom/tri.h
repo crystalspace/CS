@@ -25,6 +25,8 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 /**
  * A triangle. Note that this structure is only valid if used
  * in combination with a vertex or edge table. 'a', 'b', and 'c' are then

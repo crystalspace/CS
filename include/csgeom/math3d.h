@@ -30,6 +30,8 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 #include "csgeom/vector3.h"
 #include "csgeom/plane3.h"
 #include "csgeom/plane2.h"
@@ -49,7 +51,7 @@ inline float fSqr (float f)
  * Various assorted 3D mathematical functions.
  * This is a static class and contains only static member functions.
  */
-class csMath3
+class CS_CSGEOM_EXPORT csMath3
 {
 public:
   /**
@@ -227,7 +229,7 @@ public:
  * Some functions to perform squared distance calculations.
  * This is a static class and contains only static member functions.
  */
-class csSquaredDist
+class CS_CSGEOM_EXPORT csSquaredDist
 {
 public:
   /// Returns the squared distance between two points.
@@ -257,7 +259,7 @@ public:
  * line segments.  This is a static class and contains only static member
  * functions.
  */
-class csIntersect3
+class CS_CSGEOM_EXPORT csIntersect3
 {
 public:
   /**
@@ -479,7 +481,7 @@ public:
  * This is a class that does unit testing (and other debug stuff) for most
  * of csgeom classes.
  */
-class csGeomDebugHelper : public iDebugHelper
+class CS_CSGEOM_EXPORT csGeomDebugHelper : public iDebugHelper
 {
 public:
   csGeomDebugHelper ();

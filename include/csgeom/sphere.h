@@ -25,6 +25,8 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 #include "cstypes.h"
 #include "vector3.h"
 
@@ -33,7 +35,7 @@ class csTransform;
 /**
  * This class represents a sphere.
  */
-class csSphere
+class CS_CSGEOM_EXPORT csSphere
 {
 private:
   csVector3 center;

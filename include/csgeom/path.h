@@ -26,6 +26,8 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 #include "csutil/scf.h"
 #include "csgeom/spline.h"
 #include "csgeom/vector3.h"
@@ -37,7 +39,7 @@
  * This is particularly useful in combination with
  * csReversibleTransform::LookAt().
  */
-class csPath : public csCatmullRomSpline, public iPath
+class CS_CSGEOM_EXPORT csPath : public csCatmullRomSpline, public iPath
 {
 private:
   void SetVectorAsDimensionValues (int dim, csVector3* v)

@@ -26,6 +26,8 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 /**
  * A 2D point object
  */

@@ -32,6 +32,8 @@
 #error "cssysdef.h must be included in EVERY source file!"
 #endif
 
+#include "csextern.h"
+
 #include "csgeom/vector3.h"
 
 class csVector4;
@@ -40,7 +42,7 @@ class csVector4;
 /**
  * A 3D vector.
  */
-class csDVector4
+class CS_CSGEOM_EXPORT csDVector4
 {
 public:
   /// The X component of the vector
@@ -221,7 +223,7 @@ public:
 /**
  * A 4D vector.
  */
-class csVector4
+class CS_CSGEOM_EXPORT csVector4
 {
 public:
   /// The X component of the vector

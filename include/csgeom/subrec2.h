@@ -25,6 +25,8 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 #include "csgeom/csrect.h"
 
 class csSubRect2;
@@ -34,7 +36,7 @@ class csSubRect2;
  * a rectangular region from which a client can allocate smaller rectangles
  * until the region is full.
  */
-class csSubRectangles2
+class CS_CSGEOM_EXPORT csSubRectangles2
 {
   friend class csSubRect2;
 protected:

@@ -25,6 +25,8 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 #include "csgeom/csrect.h"
 
 /**
@@ -48,7 +50,7 @@ public:
  * a rectangular region from which a client can allocate smaller rectangles
  * until the region is full.
  */
-class csSubRectangles
+class CS_CSGEOM_EXPORT csSubRectangles
 {
 protected:
   /// Dimensions of this region.

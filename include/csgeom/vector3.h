@@ -30,12 +30,14 @@
 #error "cssysdef.h must be included in EVERY source file!"
 #endif
 
+#include "csextern.h"
+
 #include "csgeom/math3d_d.h"
 
 /**
  * A 3D vector.
  */
-class csVector3
+class CS_CSGEOM_EXPORT csVector3
 {
 public:
   /// The X component of the vector

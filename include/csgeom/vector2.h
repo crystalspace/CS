@@ -26,10 +26,12 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 /**
  * A 2D vector.
  */
-class csVector2
+class CS_CSGEOM_EXPORT csVector2
 {
 public:
   ///
@@ -85,21 +87,26 @@ public:
   inline csVector2 operator- () const { return csVector2(-x,-y); }
 
   /// Add two vectors.
-  friend csVector2 operator+ (const csVector2& v1, const csVector2& v2);
+  friend CS_CSGEOM_EXPORT csVector2 operator+ (const csVector2& v1, 
+    const csVector2& v2);
   /// Subtract two vectors.
-  friend csVector2 operator- (const csVector2& v1, const csVector2& v2);
+  friend CS_CSGEOM_EXPORT csVector2 operator- (const csVector2& v1, 
+    const csVector2& v2);
   /// Take the dot product of two vectors.
-  friend float operator* (const csVector2& v1, const csVector2& v2);
+  friend CS_CSGEOM_EXPORT float operator* (const csVector2& v1, 
+    const csVector2& v2);
   /// Multiply a vector and a scalar.
-  friend csVector2 operator* (const csVector2& v, float f);
+  friend CS_CSGEOM_EXPORT csVector2 operator* (const csVector2& v, float f);
   /// Multiply a vector and a scalar.
-  friend csVector2 operator* (float f, const csVector2& v);
+  friend CS_CSGEOM_EXPORT csVector2 operator* (float f, const csVector2& v);
   /// Divide a vector by a scalar.
-  friend csVector2 operator/ (const csVector2& v, float f);
+  friend CS_CSGEOM_EXPORT csVector2 operator/ (const csVector2& v, float f);
   /// Check if two vectors are equal.
-  friend bool operator== (const csVector2& v1, const csVector2& v2);
+  friend CS_CSGEOM_EXPORT bool operator== (const csVector2& v1, 
+    const csVector2& v2);
   /// Check if two vectors are not equal.
-  friend bool operator!= (const csVector2& v1, const csVector2& v2);
+  friend CS_CSGEOM_EXPORT bool operator!= (const csVector2& v1, 
+    const csVector2& v2);
 
   /// Test if each component of a vector is less than a small epsilon value.
   inline friend bool operator< (const csVector2& v, float f)

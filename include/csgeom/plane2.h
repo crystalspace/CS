@@ -34,6 +34,8 @@
 #define CS_POLY_OUT -1
 #endif
 
+#include "csextern.h"
+
 #include "csgeom/vector2.h"
 #include "csgeom/segment.h"
 

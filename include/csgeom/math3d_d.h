@@ -21,6 +21,8 @@
 #ifndef __CS_MATH3D_D_H__
 #define __CS_MATH3D_D_H__
 
+#include "csextern.h"
+
 #include "cstypes.h"
 
 /**\file 
@@ -45,7 +47,7 @@ inline double dSqr (double d)
 /**
  * A 3D vector.
  */
-class csDVector3
+class CS_CSGEOM_EXPORT csDVector3
 {
 public:
   /// The X component of the vector
@@ -217,7 +219,7 @@ public:
 /**
  * A 3x3 matrix.
  */
-class csDMatrix3
+class CS_CSGEOM_EXPORT csDMatrix3
 {
 public:
   double m11, m12, m13;
@@ -352,7 +354,7 @@ public:
  * The plane is given by the equation AAx + BBy + CCz + DD = 0,
  * Where (AA,BB,CC) is given by the vector 'norm'.
  */
-class csDPlane
+class CS_CSGEOM_EXPORT csDPlane
 {
 public:
   /// The normal vector (or the (A,B,C) components).
@@ -430,7 +432,7 @@ public:
  * Various assorted 3D mathematical functions.
  * This is a static class and contains only static member functions.
  */
-class csDMath3
+class CS_CSGEOM_EXPORT csDMath3
 {
 public:
   /**
@@ -564,7 +566,7 @@ public:
  * Some functions to perform squared distance calculations.
  * This is a static class and contains only static member functions.
  */
-class csDSquaredDist
+class CS_CSGEOM_EXPORT csDSquaredDist
 {
 public:
   /// Returns the squared distance between two points.
@@ -594,7 +596,7 @@ public:
  * line segments.  This is a static class and contains only static member
  * functions.
  */
-class csDIntersect3
+class CS_CSGEOM_EXPORT csDIntersect3
 {
 public:
   /**

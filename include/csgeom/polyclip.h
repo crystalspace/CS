@@ -28,6 +28,8 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 #include "csgeom/math2d.h"
 #include "csgeom/polypool.h"
 #include "igeom/clip2d.h"
@@ -35,7 +37,7 @@
 /**
  * The csClipper class is an abstract parent to all 2D clipping objects.
  */
-class csClipper : public iClipper2D
+class CS_CSGEOM_EXPORT csClipper : public iClipper2D
 {
 protected:
   /// This variable holds a pool for 2D polygons as used by the clipper.
@@ -67,7 +69,7 @@ public:
  * The csBoxClipper class is able to clip convex polygons to a rectangle
  * (such as the screen).
  */
-class csBoxClipper : public csClipper
+class CS_CSGEOM_EXPORT csBoxClipper : public csClipper
 {
   /// The clipping region
   csBox2 region;
@@ -129,7 +131,7 @@ public:
  * The clipping polygon *should* be convex since the routine does not
  * expect any line to intersect the edge of clipping polygon more than twice.
  */
-class csPolygonClipper : public csClipper
+class CS_CSGEOM_EXPORT csPolygonClipper : public csClipper
 {
   /// Equation for all edges of clipping polygon
   csVector2 *ClipData;

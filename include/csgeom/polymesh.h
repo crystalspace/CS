@@ -20,6 +20,8 @@
 #ifndef __CS_CSGEOM_POLYMESH_H__
 #define __CS_CSGEOM_POLYMESH_H__
 
+#include "csextern.h"
+
 #include "igeom/polymesh.h"
 #include "csgeom/vector3.h"
 #include "csgeom/box.h"
@@ -34,7 +36,7 @@
  * with vertices and polygons from another source. It will automatically
  * calculate the triangles if requested.
  */
-class csPolygonMesh : public iPolygonMesh
+class CS_CSGEOM_EXPORT csPolygonMesh : public iPolygonMesh
 {
 private:
   uint32 change_nr;
@@ -202,7 +204,7 @@ public:
 /**
  * A convenience polygon mesh implementation that represents a cube.
  */
-class csPolygonMeshBox : public iPolygonMesh
+class CS_CSGEOM_EXPORT csPolygonMeshBox : public iPolygonMesh
 {
 private:
   csVector3 vertices[8];

@@ -20,6 +20,7 @@
 #include <math.h>
 
 #include "cssysdef.h"
+#include "csgeom/fastsqrt.h"
 
 union FastSqrtUnion
 {

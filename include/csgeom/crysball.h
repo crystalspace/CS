@@ -19,6 +19,8 @@
 #ifndef __CS_CRYSBALL_H__
 #define __CS_CRYSBALL_H__
 
+#include "csextern.h"
+
 #include "csutil/tree.h"
 #include "csutil/array.h"
 #include "csgeom/vector3.h"
@@ -49,7 +51,7 @@
  * belonging to it are either all visible or invisible.
  * If the signs differ then recursively test the subtriangles.
  */
-class csCrystalBall
+class CS_CSGEOM_EXPORT csCrystalBall
 {
   class csCrystalBallVec : public csVector3
   {

@@ -19,6 +19,8 @@
 #ifndef __CS_KDTREE_H__
 #define __CS_KDTREE_H__
 
+#include "csextern.h"
+
 #include "csgeom/box.h"
 #include "csgeom/vector2.h"
 #include "csgeom/math2d.h"
@@ -58,7 +60,7 @@ typedef bool (csKDTreeVisitFunc)(csKDTree* treenode, void* userdata,
 /**
  * A child in the KD-tree (usually some object).
  */
-class csKDTreeChild
+class CS_CSGEOM_EXPORT csKDTreeChild
 {
 private:
   friend class csKDTree;
@@ -127,7 +129,7 @@ public:
  * calculation only once. This is more efficient and it also generates
  * a better tree as more information is available then.
  */
-class csKDTree : public iBase
+class CS_CSGEOM_EXPORT csKDTree : public iBase
 {
 private:
   static csBlockAllocator<csKDTree> tree_nodes;

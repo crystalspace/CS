@@ -29,6 +29,8 @@ class csVector3;
 class csPlane3;
 struct iPolygonMesh;
 
+#include "csextern.h"
+
 #include "csutil/array.h"
 #include "csgeom/polymesh.h"
 
@@ -54,7 +56,7 @@ struct csPolygonMeshEdge
 /**
  * A set of tools to work with iPolygonMesh instances.
  */
-class csPolygonMeshTools
+class CS_CSGEOM_EXPORT csPolygonMeshTools
 {
 public:
   /**

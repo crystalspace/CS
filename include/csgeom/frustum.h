@@ -25,6 +25,8 @@
  * \addtogroup geom_utils
  * @{ */
 
+#include "csextern.h"
+
 #include "cstypes.h"
 #include "csgeom/math3d.h"
 
@@ -51,7 +53,7 @@ class csTransform;
  * about how to interpolate additional information that goes
  * with the vertex.
  */
-struct csClipInfo
+struct CS_CSGEOM_EXPORT csClipInfo
 {
 # define CS_CLIPINFO_ORIGINAL 0
 # define CS_CLIPINFO_ONEDGE 1
@@ -138,7 +140,7 @@ struct csClipInfo
  * case the polygon will be 0 (not specified). The back
  * plane can also be 0.
  */
-class csFrustum
+class CS_CSGEOM_EXPORT csFrustum
 {
 private:
   /// The origin of this frustum

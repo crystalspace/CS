@@ -19,6 +19,8 @@
 #ifndef __CS_TRIMESHLOD_H__
 #define __CS_TRIMESHLOD_H__
 
+#include "csextern.h"
+
 #include "csgeom/math3d.h"
 #include "csgeom/trimesh.h"
 
@@ -29,7 +31,7 @@ class csTriangleVerticesCost;
  * This is basically used as a temporary structure to be able to
  * calculate the cost of collapsing this vertex more quickly.
  */
-class csTriangleVertexCost : public csTriangleVertex
+class CS_CSGEOM_EXPORT csTriangleVertexCost : public csTriangleVertex
 {
 public:
   /// True if already deleted.
@@ -62,7 +64,7 @@ public:
  * for LOD generation since every vertex contains information which
  * helps selecting the best vertices for collapsing.
  */
-class csTriangleVerticesCost
+class CS_CSGEOM_EXPORT csTriangleVerticesCost
 {
 private:
   csTriangleVertexCost* vertices;
@@ -99,7 +101,7 @@ public:
  * A static class which performs the calculation
  * of the best order to do the collapsing.
  */
-class csTriangleMeshLOD
+class CS_CSGEOM_EXPORT csTriangleMeshLOD
 {
 public:
   /**
