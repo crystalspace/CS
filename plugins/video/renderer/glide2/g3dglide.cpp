@@ -47,6 +47,8 @@
 #include "csutil/scanstr.h"
 #include "qint.h"
 
+#include "cs2d/glide2common/iglide2d.h"
+
 #if defined (OS_WIN32)
 #include "cs2d/winglide2/g2d.h"
 #include "cs2d/winglide2/ig2d.h"
@@ -76,10 +78,11 @@ EXPORT_CLASS_TABLE_END
 IMPLEMENT_IBASE (csGraphics3DGlide2x)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics3D)
+  IMPLEMENTS_INTERFACE (iHaloRasterizer)
 IMPLEMENT_IBASE_END
 
 // Error Message handling
-void sys_fatalerror(char *str, HRESULT hRes = S_OK)
+void sys_fatalerror( char* thestr, int hRes=0 )
 {
 #if defined(OS_WIN32)
   if (hRes!=S_OK)
@@ -122,7 +125,7 @@ void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 	StopAlert( kGeneralErrorDialog, NULL );
 	GlideLib_grSstControlMode( GR_CONTROL_ACTIVATE );
 #else
-  fprintf(stderr, "FATAL ERROR: %s", str);
+  fprintf(stderr, "FATAL ERROR: %s", thestr);
 #endif
 
   exit(1);
@@ -378,7 +381,7 @@ csGraphics3DGlide2x::csGraphics3DGlide2x(iBase* iParent) :
   CONSTRUCT_IBASE (iParent);
 
   m_piSystem = NULL;
-  config = new csIniFile ("Glide2x.cfg");
+  config = new csIniFile ("glide2x.cfg");
 
   // default
   m_Caps.ColorModel = G3DCOLORMODEL_RGB;
@@ -395,7 +398,8 @@ csGraphics3DGlide2x::csGraphics3DGlide2x(iBase* iParent) :
   m_Caps.PrimaryCaps.ShadeCaps = G3DRASTERCAPS_LIGHTMAP;
   m_Caps.PrimaryCaps.PerspectiveCorrects = true;
   m_Caps.PrimaryCaps.FilterCaps = G3D_FILTERCAPS((int)G3DFILTERCAPS_NEAREST | (int)G3DFILTERCAPS_MIPNEAREST);
-
+  m_Caps.fog = G3DFOGMETHOD_VERTEX;
+  
   rstate_dither = false;
   rstate_specular = false;
   rstate_bilinearmap = true;
@@ -441,6 +445,17 @@ bool csGraphics3DGlide2x::Initialize (iSystem *iSys)
   txtmgr->Initialize ();
 
   m_bVRetrace = config->GetYesNo("Glide2x","VRETRACE",FALSE);
+  // tell the 2D driver whether to wait for VRETRACE
+  iGraphics2DGlide *piGlide  = QUERY_INTERFACE ( m_piG2D, iGraphics2DGlide );
+  if (!piGlide){
+      SysPrintf ( MSG_INITIALIZATION, "\nCould not set VRETRACE\n");
+  }
+  else{
+      SysPrintf ( MSG_INITIALIZATION, "\nVRETRACE is %s\n", m_bVRetrace ? "on" : "off" );
+      piGlide->SetVRetrace( m_bVRetrace );
+      piGlide->DecRef();
+  }
+  
   GrHwConfiguration grconfig;
   GlideLib_grSstQueryBoards(&grconfig);
 
@@ -462,6 +477,12 @@ bool csGraphics3DGlide2x::Initialize (iSystem *iSys)
 
   GlideLib_grSstSelect(board);
 
+  m_bHaloEffect=config->GetYesNo("Glide2x","DISABLE_HALO", false);
+  if (m_bHaloEffect)
+    SysPrintf (MSG_INITIALIZATION, " Disable Halo Effect support.\n");
+
+  // generate fogtable
+  guFogGenerateExp( fogtable, 0.02f );
   CHK (m_pTextureCache = new GlideTextureCache(&m_TMUs[0], 16, new FixedTextureMemoryManager(m_TMUs[0].memory_size)));
   CHK (m_pLightmapCache = new GlideLightmapCache(&m_TMUs[1],new FixedTextureMemoryManager(m_TMUs[1].memory_size)));
 
@@ -500,7 +521,7 @@ static struct
 static int getResolutionIndex(int width, int height)
 {
   int i;
-  for(i=1;i<SIZEOFRESSTRUCT;i++)
+  for(i=1;(unsigned)i<SIZEOFRESSTRUCT;i++)
     {
       if((width==StatGlideRes[i].width)&&(height==StatGlideRes[i].height))
         return i;
@@ -515,7 +536,7 @@ bool csGraphics3DGlide2x::Open(const char* Title)
 
   // Open the 2D driver.
   if (!m_piG2D->Open (Title))
-    goto false;
+    return false;
 
 #if defined(OS_WIN32)
   pSysGInfo->GethWnd(&w);
@@ -526,10 +547,10 @@ bool csGraphics3DGlide2x::Open(const char* Title)
   if(use16BitTexture)
     SysPrintf(MSG_INITIALIZATION, "  Use 16 bit textures\n");
 
-  m_nWidth = pGraphicsInfo->GetWidth();
+  m_nWidth = m_piG2D->GetWidth();
   m_nHalfWidth = m_nWidth/2;
   
-  m_nHeight = pGraphicsInfo->GetHeight();
+  m_nHeight = m_piG2D->GetHeight();
   m_nHalfHeight = m_nHeight/2;
   
   if(/*config->GetYesNo("VideoDriver","FULL_SCREEN", true)*/true)
@@ -631,12 +652,14 @@ void csGraphics3DGlide2x::Close()
   GlideLib_grSstWinClose();
 }
 
-void csGraphics3DGlide2x::GetColormapFormat( G3D_COLORMAPFORMAT& g3dFormat ) 
+G3D_COLORMAPFORMAT csGraphics3DGlide2x::GetColormapFormat() 
 {
+  G3D_COLORMAPFORMAT g3dFormat;
   if (use16BitTexture)
     g3dFormat = G3DCOLORFORMAT_PRIVATE;
   else
     g3dFormat = G3DCOLORFORMAT_GLOBAL;
+  return g3dFormat;
 }
 
 void csGraphics3DGlide2x::SetDimensions (int width, int height)
@@ -696,11 +719,12 @@ void csGraphics3DGlide2x::Print(csRect* rect)
 {
    // we need to tell the glide2d driver to update the screen...
   m_piG2D->Print (rect);
-
+/*
   if(m_bVRetrace)
     GlideLib_grBufferSwap(1);
   else
     GlideLib_grBufferSwap(0);
+*/
 }
 
 /// Set the mode for the Z buffer (functionality also exists in SetRenderState).
@@ -893,7 +917,8 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
 
   if (poly.num < 3) 
   {
-    return E_INVALIDARG;
+    return;
+    // return E_INVALIDARG;
   }
 
   bool lm_exists=true;
@@ -915,8 +940,8 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
   //csTexture* txt_unl = txt_mm->get_texture (mipmap);
   
 
-  if (!pTex)
-     return E_INVALIDARG;
+  if (!pTex) return;
+//     return E_INVALIDARG;
 
   CacheTexture (pTex);
 
@@ -930,7 +955,7 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
   
   // retrieve the cached texture handle.
   tcache = txt_mm->GetHighColorCacheData ();
-  ASSERT( tcache );
+//  ASSERT( tcache );
         
   // retrieve the lightmap from the cache.
   iLightMap* piLM = pTex->GetLightMap ();
@@ -986,6 +1011,7 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
       verts[i].g = q;
       verts[i].b = q;
       //verts[i].a = poly_alpha; // Not used
+      //verts[i].a = poly_alpha; // Not used
       //verts[i].x -= SNAP;  // You can forget it
       //verts[i].y -= SNAP;  // This one also
     }
@@ -1031,6 +1057,14 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
   if(is_colorkeyed)
     GlideLib_grChromakeyMode(GR_CHROMAKEY_ENABLE);
   
+  if(poly.use_fog){
+//      GlideLib_grFogMode( GR_FOG_WITH_ITERATED_ALPHA );
+        GlideLib_grFogMode( GR_FOG_WITH_TABLE );
+	GlideLib_grFogTable( fogtable );
+//      GlideLib_grFogColorValue( 0 );
+      GlideLib_grFogColorValue( 0xFFC0C0C0 );
+  }
+      
   RenderPolygon(verts,poly.num,lm_exists,thTex,thLm,is_transparent);
   
   if(is_colorkeyed)
@@ -1039,6 +1073,9 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
   if(is_transparent)
     GlideLib_grConstantColorValue(0xFFFFFFFF);
   
+//  if(poly.use_fog){
+      GlideLib_grFogMode( GR_FOG_DISABLE );
+//  }
   delete[] verts;
 }
 
@@ -1069,7 +1106,7 @@ void csGraphics3DGlide2x::DrawPolygonFX(G3DPolygonDPFX& poly)
   m_pTextureCache->Add(poly.txt_handle);
   tcache = txt_mm->GetHighColorCacheData();
 
-  ASSERT( tcache );
+//  ASSERT( tcache );
         
   TextureHandler *thTex = (TextureHandler *)tcache->pData;
 
@@ -1103,10 +1140,16 @@ void csGraphics3DGlide2x::DrawPolygonFX(G3DPolygonDPFX& poly)
       verts[i].y -= SNAP;
       verts[i].tmuvtx[1].sow = verts[i].tmuvtx[0].sow = poly.vertices[i].u*thTex->width*verts[i].oow;
       verts[i].tmuvtx[1].tow = verts[i].tmuvtx[0].tow = poly.vertices[i].v*thTex->height*verts[i].oow;
+      verts[i].a = poly.vertices[i].z;
     }
     
     GlideLib_grTexSource(thTex->tmu->tmu_id, thTex->loadAddress,
       GR_MIPMAPLEVELMASK_BOTH, &thTex->info);
+  if(poly.use_fog){
+      printf( "\n *** Using fog in fx ***" );
+      GlideLib_grFogMode( GR_FOG_WITH_ITERATED_ALPHA );
+      GlideLib_grFogColorValue( 0 );
+  }
     
     if(!m_iMultiPass)
     {
@@ -1126,6 +1169,9 @@ void csGraphics3DGlide2x::DrawPolygonFX(G3DPolygonDPFX& poly)
         FXFALSE,FXFALSE);
     }
     
+  if(poly.use_fog){
+      GlideLib_grFogMode( GR_FOG_DISABLE );
+  }
     delete[] verts;
   }
 }
@@ -1160,15 +1206,15 @@ void csGraphics3DGlide2x::ClearCache(void)
 
 void csGraphics3DGlide2x::GetCaps(G3D_CAPS *caps)
 {
-  if (!caps)
-    return E_INVALIDARG;
+  if (!caps) return;
+//    return E_INVALIDARG;
 
   memcpy(caps, &m_Caps, sizeof(G3D_CAPS));
 }
 
 void csGraphics3DGlide2x::DrawLine (csVector3& v1, csVector3& v2, float fov, int color)
 {
-  if (v1.z < SMALL_Z && v2.z < SMALL_Z) return S_FALSE;
+  if (v1.z < SMALL_Z && v2.z < SMALL_Z) return ; //S_FALSE;
 
   float x1 = v1.x, y1 = v1.y, z1 = v1.z;
   float x2 = v2.x, y2 = v2.y, z2 = v2.z;
@@ -1327,4 +1373,455 @@ void csGraphics3DGlide2x::SysPrintf(int mode, char* szMsg, ...)
   va_end (arg);
 
   m_piSystem->Print(mode, buf);
+}
+
+csHaloHandle csGraphics3DGlide2x::CreateHalo(float r, float g, float b)
+{
+  if(m_bHaloEffect)
+  {
+    csHaloDrawer halo(m_piG2D, r, g, b);
+    
+    csG3DHardwareHaloInfo* retval = new csG3DHardwareHaloInfo();
+    
+    unsigned long *lpbuf = halo.GetBuffer();
+
+    CHK(unsigned short *mem = new unsigned short [128*128]);
+
+    // Warning : convertion maybe a bit bugged
+    for (int j=0; j<128; j++)
+    {
+      unsigned short *lpL = &mem[j<<7]; // j * 128
+      unsigned long *p = &lpbuf[j<<7]; // j * 128
+      for(int i=0; i<128; i++)
+      {
+        int a, r, g, b;
+        a=(*p>>24)>>4;
+        r=((*p&0x00FF0000)>>16)>>4;
+        g=((*p&0x0000FF00)>>8)>>4;
+        b=(*p&0x000000FF)>>4;
+        *lpL = (a << 12) | (r << 8) | (g << 4) | b;
+        lpL++;
+        p++;
+      }
+    }
+
+    retval->halo = m_pTextureCache->LoadHalo((char *)mem);
+
+    delete [] mem;
+    delete [] lpbuf;
+
+    return (csHaloHandle)retval;
+  }
+  return NULL;
+}
+
+void csGraphics3DGlide2x::DestroyHalo(csHaloHandle haloInfo)
+{
+  if(haloInfo != NULL)
+  {
+    m_pTextureCache->UnloadHalo(((csG3DHardwareHaloInfo*)haloInfo)->halo);
+    delete (csG3DHardwareHaloInfo*)haloInfo;
+  }
+}
+
+void csGraphics3DGlide2x::DrawHalo(csVector3* pCenter, float fIntensity, csHaloHandle haloInfo)
+{
+  if(m_bHaloEffect)
+  {
+    if (haloInfo == NULL) return;
+//      return E_INVALIDARG;
+    
+    if (pCenter->x > m_nWidth || pCenter->x < 0 || pCenter->y > m_nHeight || pCenter->y < 0  ) return;
+//      return S_FALSE;
+/*
+    int izz = QInt24 (1.0f / pCenter->z);
+    HRESULT hRes = S_OK;
+
+    unsigned long zb = z_buffer[(int)pCenter->x + (width * (int)pCenter->y)];
+
+          // first, do a z-test to make sure the halo is visible
+    if (izz < (int)zb)
+      hRes = S_FALSE;
+*/
+
+    GrVertex vx[4];
+    
+                int ci = (int)(255.0f * (float)fIntensity);
+    float len = ((float)m_nWidth/6.0);
+
+    vx[0].a = ci; vx[0].r = ci; vx[0].g = ci; vx[0].b = ci;
+    vx[0].x = pCenter->x - len;
+    vx[0].y = pCenter->y - len;
+    vx[0].z = pCenter->z;
+    vx[0].oow = pCenter->z;
+    vx[0].tmuvtx[0].sow = 0;
+    vx[0].tmuvtx[0].tow = 0;
+
+    vx[1].a = ci; vx[1].r = ci; vx[1].g = ci; vx[1].b = ci;
+    vx[1].x = pCenter->x + len;
+    vx[1].y = pCenter->y - len;
+    vx[1].z = pCenter->z;
+    vx[1].oow = pCenter->z;
+    vx[1].tmuvtx[0].sow = 128;
+    vx[1].tmuvtx[0].tow = 0;
+
+    vx[2].a = ci; vx[2].r = ci; vx[2].g = ci; vx[2].b = ci;
+    vx[2].x = pCenter->x + len;
+    vx[2].y = pCenter->y + len;
+    vx[2].z = pCenter->z;
+    vx[2].oow = pCenter->z;
+    vx[2].tmuvtx[0].sow = 128;
+    vx[2].tmuvtx[0].tow = 128;
+
+    vx[3].a = ci; vx[3].r = ci; vx[3].g = ci; vx[3].b = ci;
+    vx[3].x = pCenter->x - len;
+    vx[3].y = pCenter->y + len;
+    vx[3].z = pCenter->z;
+    vx[3].oow = pCenter->z;
+    vx[3].tmuvtx[0].sow = 0;
+    vx[3].tmuvtx[0].tow = 128;
+    
+    if(m_iMultiPass)
+    {
+      GlideLib_grAlphaBlendFunction( GR_BLEND_ONE_MINUS_SRC_COLOR, GR_BLEND_ZERO,
+                                    GR_BLEND_DST_ALPHA, GR_BLEND_ZERO);
+    }
+    else // disable single pass blending
+    {
+      GlideLib_grTexCombine(m_TMUs[0].tmu_id,
+                            GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE,
+                            GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
+                            FXFALSE,FXFALSE);
+    }
+
+    GlideLib_grDepthBufferFunction(GR_CMP_ALWAYS);
+    GlideLib_grDepthMask(FXFALSE);
+
+    HighColorCacheAndManage_Data *halo=((csG3DHardwareHaloInfo*)haloInfo)->halo;
+    TextureHandler *thTex = (TextureHandler *)halo->pData;
+    GlideLib_grTexSource(thTex->tmu->tmu_id, thTex->loadAddress,
+                         GR_MIPMAPLEVELMASK_BOTH,
+                         &thTex->info);
+    
+    GlideLib_grDrawPlanarPolygonVertexList(4, vx);
+    
+    GlideLib_grDepthBufferFunction(GR_CMP_LEQUAL);
+    GlideLib_grDepthMask(FXTRUE);
+
+    if(m_iMultiPass)
+    {
+      GlideLib_grAlphaBlendFunction(GR_BLEND_ONE, GR_BLEND_ZERO,
+                                    GR_BLEND_ONE, GR_BLEND_ZERO);
+    }
+    else // enable single pass blending
+    {
+      GlideLib_grTexCombine(m_TMUs[0].tmu_id,
+                            GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_LOCAL,
+                            GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
+                            FXFALSE,FXFALSE);
+    }
+  }
+};
+
+bool csGraphics3DGlide2x::TestHalo(csVector3* pCenter)
+{
+  if(m_bHaloEffect)
+  {
+    if (pCenter->x > m_nWidth || pCenter->x < 0 || pCenter->y > m_nHeight || pCenter->y < 0  ) 
+      return false;
+/*
+    int izz = QInt24 (1.0f / pCenter->z);
+    HRESULT hRes = S_OK;
+      
+    unsigned long zb = z_buffer[(int)pCenter->x + (width * (int)pCenter->y)];
+        
+    // first, do a z-test to make sure the halo is visible
+    if (izz < (int)zb)
+      hRes = S_FALSE;
+*/
+    return true;
+  }
+  return false;
+};
+
+/////////////
+
+// csHaloDrawer implementation //
+
+csGraphics3DGlide2x::csHaloDrawer::csHaloDrawer(iGraphics2D* iG2D, float r, float g, float b)
+{
+  mpBuffer = NULL;
+  (m_piG2D = iG2D)->IncRef();
+
+  mWidth = m_piG2D->GetWidth ();
+  mHeight = m_piG2D->GetHeight ();
+
+  int dim = 128;
+
+  // point variables
+  int x=0;
+  int y=dim/2;
+  // decision variable
+  int d = 1 - y;
+
+  mpBuffer = new unsigned long[dim*dim];
+  memset(mpBuffer, 0, dim*dim*sizeof(unsigned long));
+
+  mBufferWidth = dim;
+  mDim = dim;
+  
+  mRed = r; mGreen = b; mBlue = b;
+  mx = my = dim / 2;
+
+  ////// Draw the outer rim //////
+
+  drawline_outerrim(-y, y, x);
+  
+  while (true)
+  {
+    if (d < 0)
+      d += 2 * x + 3;
+    else
+    {
+      d += 2 * (x - y) + 5;
+      y--;
+      if (y <= x)
+        break;
+
+      drawline_outerrim(-x, x, y);
+      drawline_outerrim(-x, x, -y);
+    }
+    x++;
+
+    drawline_outerrim(-y, y, x);
+    drawline_outerrim(-y, y, -x);
+  }
+
+  ////// Draw the inner core /////
+
+  x=0;
+  y=dim/3;
+  d = 1 - y;
+
+  mDim = (int)((double)dim/1.5);
+
+  mRatioRed = (r - (r/3.f)) / y;
+  mRatioGreen = (g - (g/3.f)) / y;
+  mRatioBlue = (b - (b/3.f)) / y;
+
+  drawline_innerrim(-y, y, x);
+  
+  while (true)
+  {
+    if (d < 0)
+      d += 2 * x + 3;
+    else
+    {
+      d += 2 * (x - y) + 5;
+      y--;
+      if (y <= x)
+        break;
+
+      drawline_innerrim(-x, x, y);
+      drawline_innerrim(-x, x, -y);
+    }
+    x++;
+    drawline_innerrim(-y, y, x);
+    drawline_innerrim(-y, y, -x);
+  }
+
+  ///// Draw the vertical lines /////
+  
+  // DAN: this doesn't look right yet.
+#if 0
+  int y1, y2;
+
+  // the vertical line has a constant height, 
+  // until the halo itself is of a constant height,
+  // at which point the vertical line decreases.
+  
+  y1 = my - mWidth/10;
+  y2 = my + mWidth/10;
+  
+  if (dim < mWidth / 6)
+  {
+    int q = mWidth/6 - dim;
+    y1 += q;
+    y2 -= q;
+  }
+
+  drawline_vertical(mx, y1, y2);
+#endif
+}
+
+csGraphics3DGlide2x::csHaloDrawer::~csHaloDrawer()
+{
+  m_piG2D->DecRef ();
+}
+
+void csGraphics3DGlide2x::csHaloDrawer::drawline_vertical(int /*x*/, int y1, int y2)
+{
+  int i;
+  unsigned long* buf;
+
+  int r = (int)(mRed/2.5f * 256.0f);
+  int g = (int)(mGreen/2.5f * 256.0f);
+  int b = (int)(mBlue/2.5f * 256.0f);
+
+  int c = (r << 16) | (g << 8) | b;
+
+  while (y1 < y2)
+  {
+    buf = &mpBuffer[(mx-1) + (mBufferWidth * y1++)];
+    
+    for(i=0; i<3; i++)
+    {
+      buf[i] = c;    
+    }
+  }
+}
+
+void csGraphics3DGlide2x::csHaloDrawer::drawline_outerrim(int x1, int x2, int y)
+{
+  if (x1 == x2) return;
+
+  int r = (int)(mRed / 3.5f * 256.0f);
+  int g = (int)(mGreen / 3.5f * 256.0f);
+  int b = (int)(mBlue / 3.5f * 256.0f);
+ 
+  int a = QInt((r + g + b) / 3);
+
+  // stopx makes sure we don't overrdraw when drawing the inner core. 
+  // maybe there's something faster than a sqrt... - DAN
+  // @@@ JORRIT: had to make some changes to prevent overflows!
+  float sq = (mDim/3.0)*(mDim/3.0) - ((double)y*(double)y);
+  int stopx = 0;
+  if (sq > 0) stopx = (int)sqrt (sq);
+
+  unsigned long* bufy;
+
+  x1 += mx;
+  x2 += mx;
+  y += my;
+
+  bufy = &mpBuffer[y * mBufferWidth];
+
+//  unsigned short p;
+
+  if (stopx)
+  {    
+    while (x1 <= (mx - stopx) + 2)
+    { 
+      bufy[x1++] = (a << 24) | (r << 16) | (g << 8) | b;
+    }
+
+    x1 = mx + stopx - 2;
+    
+    while (x1 <= x2)
+    { 
+      bufy[x1++] = (a << 24) | (r << 16) | (g << 8) | b;
+    }
+  }
+  else
+  {
+    while (x1 <= x2)
+    {
+      bufy[x1++] = (a << 24) | (r << 16) | (g << 8) | b;
+    }  
+  }
+}
+
+void csGraphics3DGlide2x::csHaloDrawer::drawline_innerrim(int x1, int x2, int y)
+{
+  float w2 = x2 - x1;
+  unsigned long* bufy;
+
+  x1 += mx;
+  x2 += mx;
+  y += my;
+
+  if (y >= mHeight || y <= 0) return;
+  bufy = &mpBuffer[y * mBufferWidth];
+
+  if (w2 == 0.0f) return;
+  w2 /= 2.0f;
+
+  int halfx = x1 + (int)w2;
+
+  float ir, ig, ib, ia;
+
+  float rlow = mRed / 4.5f;
+  float glow = mGreen / 4.5f;
+  float blow = mBlue / 4.5f;
+  
+  if (y <= my)
+  {
+    int iy = y - (my - (mDim / 2));
+
+    ir = (iy * mRatioRed + rlow) * 256;
+    ig = (iy * mRatioGreen + glow) * 256;
+    ib = (iy * mRatioBlue + blow) * 256;    
+    ia = (ir + ig + ib) / 3.0f;     
+  }
+  else
+  {
+    int iy = (my + (mDim/2)) - y;
+
+    ir = (iy * mRatioRed + rlow) * 256;
+    ig = (iy * mRatioGreen + glow) * 256;
+    ib = (iy * mRatioBlue + blow) * 256;
+    ia = (ir + ig + ib) / 3.0f;
+  }
+
+  float r = rlow * 256;
+  float g = glow * 256;
+  float b = blow * 256;
+  float a = (r + g + b) / 3.0f;
+
+  if (a < 0) a = 0;
+ 
+  if (ir > 245) ir = 245;
+  if (ig > 245) ig = 245;
+  if (ib > 245) ib = 245;
+  if (ia > 250) ia = 250;
+
+  float rdelta = (ir - r) / w2;
+  float gdelta = (ig - g) / w2;
+  float bdelta = (ib - b) / w2;
+  float adelta = (ia - a) / w2;
+ 
+  int br, bg, bb;
+
+  unsigned short p;
+  int inta;
+
+  while (x1 <= halfx)
+  {
+    p = bufy[x1];
+    
+    inta = QInt(a);
+
+    br = QInt(r);
+    bg = QInt(g);
+    bb = QInt(b);
+
+    bufy[x1++] = (inta << 24) | (br << 16) | (bg << 8) | bb;
+
+    r += rdelta; g+=gdelta; b+=bdelta; a+=adelta;
+  }
+
+  while(x1 <= x2)
+  {
+    p = bufy[x1];
+    
+    inta = QInt(a);
+
+    br = QInt(r);
+    bg = QInt(g);
+    bb = QInt(b);
+
+    bufy[x1++] = (inta << 24) | (br << 16) | (bg << 8) | bb;
+
+    r -= rdelta; g -= gdelta; b -= bdelta; a -= adelta;
+  }
 }

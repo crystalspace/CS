@@ -104,6 +104,9 @@ GlideLib::GlideLib(void)
 	LOADFUNCTIONPROC(grChromakeyMode,(void (__stdcall *)(GrChromakeyMode_t mode)), 4);
 	LOADFUNCTIONPROC(grChromakeyValue,(void (__stdcall *)(GrColor_t color)), 4);
 	LOADFUNCTIONPROC(grHints,(void (__stdcall *)(GrHint_t,FxU32)),8);
+	LOADFUNCTIONPROC(grFogColorValue,(void (__stdcall *)(GrColor_t)),4);
+	LOADFUNCTIONPROC(grFogMode,(void (__stdcall *)(GrFogMode_t)),4);
+	LOADFUNCTIONPROC(grFogTable,(void (__stdcall *)(GrFog_t)),4);
   LOADFUNCTIONPROC(grClipWindow,(void (__stdcall *)(FxU32 minx, FxU32 miny, FxU32 maxx, FxU32 maxy )),16);
 }
 

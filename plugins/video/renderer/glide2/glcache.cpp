@@ -51,7 +51,7 @@ void GlideTextureCache::Load(HighColorCacheAndManage_Data *d)
 {
 
   iTextureHandle* txt_handle = (iTextureHandle*)d->pSource;
-  csTextureMM* txt_mm = (csTextureMM*)txt_handle->->GetPrivateObject ();
+  csTextureMM* txt_mm = (csTextureMM*)txt_handle->GetPrivateObject ();
   csTexture* txt_unl = txt_mm->get_texture (0);
   
   /*
@@ -301,7 +301,7 @@ void GlideTextureCache::Load(HighColorCacheAndManage_Data *d)
         lpSrc = piTM->GetBitmap();*/
         csTexture* txt_mip = txt_mm->get_texture (i);
         src = txt_mip->get_bitmap();
-        ASSERT( src != NULL );
+//        ASSERT( src != NULL );
 
         GlideLib_grTexDownloadMipMapLevel(texhnd->tmu->tmu_id,
                                           texhnd->loadAddress,
@@ -365,7 +365,7 @@ HighColorCacheAndManage_Data * GlideTextureCache::LoadHalo(char *data)
 
 void GlideTextureCache::UnloadHalo(HighColorCacheAndManage_Data *d)
 {
-  manager->freeSpaceMem(d->mempos);
+      manager->freeSpaceMem(d->mempos);
 }
 
 GlideLightmapCache::GlideLightmapCache(TMUInfo *t,TextureMemoryManager*man)
@@ -390,7 +390,7 @@ void GlideLightmapCache::Dump()
 void GlideLightmapCache::Load(HighColorCacheAndManage_Data *d)
 {
   CHK (TextureHandler *texhnd = new TextureHandler);
-  iLightMap *piLM = QUERY_INTERFACE (d->pSource->QueryInterface, iLightMap);
+  iLightMap *piLM = QUERY_INTERFACE (d->pSource, iLightMap);
 
   int width = piLM->GetWidth();
   int height = piLM->GetHeight();
@@ -398,8 +398,8 @@ void GlideLightmapCache::Load(HighColorCacheAndManage_Data *d)
   int rheight = piLM->GetRealHeight();
   int rwidth = piLM->GetRealWidth();
 
-  ASSERT(!(height%2));
-  ASSERT(!(width%2));
+//  ASSERT(!(height%2));
+//  ASSERT(!(width%2));
 
   bool bdef=true;
   GrLOD_t lod=GR_LOD_1;
@@ -486,9 +486,9 @@ void GlideLightmapCache::Load(HighColorCacheAndManage_Data *d)
     unsigned char *lpGreen;
     unsigned char *lpBlue;
     
-    piLM->GetMap(0, &lpRed);
-    piLM->GetMap(1, &lpGreen);
-    piLM->GetMap(2, &lpBlue);
+    lpRed = piLM->GetMap(0);
+    lpGreen = piLM->GetMap(1);
+    lpBlue = piLM->GetMap(2);
     
     unsigned short *mem = new unsigned short[width*height];
     

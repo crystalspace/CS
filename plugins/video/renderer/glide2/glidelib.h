@@ -160,6 +160,9 @@ extern GlideLib * glLib;
 #define GlideLib_grChromakeyValue glLib->grChromakeyValue
 #define GlideLib_grHints glLib->grHints
 #define GlideLib_grClipWindow glLib->grClipWindow
+#define GlideLib_grFogTable glLib->grFogTable
+#define GlideLib_grFogColorValue glLib->grFogColorValue
+#define GlideLib_grFogMode glLib->grFogMode
 
 #else // !OS_WIN32
 
@@ -218,6 +221,9 @@ extern GlideLib * glLib;
 #define GlideLib_grChromakeyValue grChromakeyValue
 #define GlideLib_grHints grHints
 #define GlideLib_grClipWindow grClipWindow
+#define GlideLib_grFogTable grFogTable
+#define GlideLib_grFogColorValue grFogColorValue
+#define GlideLib_grFogMode grFogMode
 
 #endif // OS_WIN32
 

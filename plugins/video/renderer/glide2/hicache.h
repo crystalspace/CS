@@ -25,6 +25,9 @@
 
 
 #include "csutil/scf.h"
+#include "ipolygon.h"
+#include "itexture.h"
+#include "ilghtmap.h"
 
 ///
 struct csHighColorCacheData
