@@ -1433,7 +1433,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
           ReportError (
 	    "crystalspace.maploader.parse.meshobject",
             "This mesh object doesn't support HARDMOVE!");
-	  return false;
+	  return NULL;
 	}
 	else
         {
