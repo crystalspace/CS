@@ -318,7 +318,7 @@ public:
   /// Creates and enables a transition for a window
   virtual void CreateTransitionEx (iAwsComponent *win, unsigned transition_type,
     csTicks duration, csRect &user);
-public:
+
   /// Set the contexts however you want
   virtual bool SetupCanvas (iAwsCanvas *newCanvas, iGraphics2D *g2d = 0,
     iGraphics3D *g3d = 0);

@@ -25,6 +25,8 @@ struct iView;
 
 class awsEngineView : public awsComponent  
 {
+private:
+  iView* view;
 public:
   awsEngineView ();
   virtual ~awsEngineView ();
@@ -39,8 +41,6 @@ public:
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual const char *Type ();
-private:
-  iView* view;
 };
 
 class awsEngineViewFactory : public awsComponentFactory
