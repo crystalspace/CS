@@ -10,6 +10,7 @@ chronological order.
 	- Eric Sunshine removed a slew of csengine library references from the
 	  project since the csengine library no longer exists.
 	- Eric Sunshine documented removal of csengine in apimod98.txi.
+	- Eric Sunshine eliminated TeX 'hbox' warning from render.txi.
 27-Jan-2004
 	- Dentoid added a missing CS_IMPLEMENT_PLUGIN to the engine plugin.
 	- John Harger moved everything from iParticlesObjectState::Update into
@@ -1395,7 +1396,7 @@ chronological order.
 	- Eric Sunshine augmented installdir.m4 so that it now keeps its
 	  Jam-specific modifications to "prefix" and "exec_prefix" local to
 	  itself, rather than polluting the global $prefix and $exec_prefix
-	  variables, which might needed unmolested elsewhere.
+	  variables, which might be needed unmolested elsewhere.
 	- Eric Sunshine augmented crystal.m4 so that it also exports
 	  CRYSTAL_INCLUDE_DIR (make) and CRYSTAL.INCLUDE_DIR (jam).  This is
 	  the value returned by cs-config's --includedir option.
@@ -1416,8 +1417,8 @@ chronological order.
 	- jamest commented out the setScale() function in sprcal3d
 	  so plugin would build until setScale() makes it into cal3d
 	  cvs
-	- res did a bunch of changes and fixes to shadersys. He attempted to get
-	  the r3dtest map functional, but hadn't too much success.
+	- res did a bunch of changes and fixes to shadersys. He attempted to
+	  get the r3dtest map functional, but hadn't too much success.
 2-Dec-2003
 	- res enabled VC the warning "class has virtual functions, but
 	  destructor is not virtual". It was enabled in the past, but somehow
@@ -1987,7 +1988,8 @@ chronological order.
 	  the assumption that the huge file size is what is triggering the
 	  server to drop the connection.  Enabling compression seems to
 	  side-step the problem.
-        - Andreas Busch changed pgtest and pgserver to use new keyeventhandling.
+        - Andreas Busch changed pgtest and pgserver to use new keyboard event
+	  handling.
 	- Eric Sunshine removed an unportable #include <memory.h> from
 	  bitarray.h.  This header is not present on all platforms.
 	- Eric Sunshine augmented the Swig rules in the makefiles and in Jam
@@ -2050,7 +2052,8 @@ chronological order.
 	    - A write to the coverage buffer disrupts the depth buffer because
 	      the depth buffer in Dynavis is always updated to highest values
 	      (in contrast with a usual Z buffer). So by delaying writes to
-	      the coverage/depth buffer we can often improve culling efficiency.
+	      the coverage/depth buffer we can often improve culling
+	      efficiency.
 	  The current optimizations reflects the fact that an object that
 	  was calculated to be visible the previous frame (after testing the
 	  write queue) will most likely not benefit from the write queue the
@@ -2083,7 +2086,7 @@ chronological order.
 	    - Added top-level swigpythclean and cspythonmaintainerclean
 	      targets, the latter of which is hooked into the top-level
 	      maintainerclean target.
-	    - Set up some additional variables instead of repeated;u using
+	    - Set up some additional variables instead of repeatedly using
 	      constants for pathnames in rules section.
 	    - Fixed bug: Secondary-level swigpythclean target was not marked
 	      `phony'.

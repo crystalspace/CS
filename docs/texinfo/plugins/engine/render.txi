@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Rendering Loop, 3D Sprites, Visibility Culling, iEngine
+@node Rendering Loop, 3D Sprites, Visibility Culling, csEngine
 @subsection Rendering Loop
 @cindex Rendering Loop
 
@@ -31,16 +31,16 @@ we call @code{iView::Draw()} which then calls @code{iEngine::Draw()}.
 
 @subsubheading World Rendering (@code{iEngine::Draw()})
 
-The method @code{iEngine::Draw()} is located in the file
+The method @code{iEngine::Draw()} is located in
 @file{CS/plugins/engine/3d/engine.cpp}.
 
 @code{iEngine::Draw()} first sets up the initial @samp{iRenderView}
-structure.  This structure is defined in @file{CS/include/iengine/rview.h}
-and is the main structure which is used throughout the entire rendering
-process.  It collects all data that is required for rendering the recursive
-portal structure.
+structure.  This structure is defined in
+@file{CS/include/iengine/rview.h} and is the main structure which is
+used throughout the entire rendering process.  It collects all data that
+is required for rendering the recursive portal structure.
 
-Basically it contains the following information:
+Basically, it contains the following information:
 
 @table @code
 @item view
