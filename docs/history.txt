@@ -7,7 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 16-May-2004
-        - Philip Wyett elimenated gcc compiler warnings in simpleformer.cpp.
+        - Philip Wyett eliminated gcc compiler warnings in simpleformer.cpp.
         - Andrew Craig enhanced viewmesh by letting the user select a mesh 
           file to load when using a socket on a model.
 	- Jorrit extended iKeyValuePair so that you can now attach multiple
@@ -19,7 +19,7 @@ chronological order.
 	- Steven Geens made the HitBeam methods of sprcal3d faster.
 	  They require the newest cal3d cvs.
         - Andrew Craig updated viewmesh again.  You can now specify 
-          hardtransform rotations ( via dialog box ) to use when attaching 
+          hardtransform rotations (via dialog box) to use when attaching 
           a mesh to a socket.
 15-May-2004
 	- Eric Sunshine added implementation of FReverse rule to 2.4 section of
@@ -56,7 +56,8 @@ chronological order.
 	- res added a declaration of iBase to weakref.h.
 	- res added a sanity check for the sector in the NR part in 
 	  csEngine::Draw().
-	- res changed a few header files that incorrectly had a GPL boilerplate.
+	- res changed a few header files that incorrectly had a GPL
+	  boilerplate rather than LGPL.
 	- res added a "struct" hash element handler.
 	- res fixed a typo in Jamrules.template.
 14-May-2004
