@@ -47,7 +47,6 @@ struct MemTrackerInfo
 extern MemTrackerInfo* mtiRegisterAlloc (size_t s, void* info);
 extern void mtiRegisterFree (MemTrackerInfo* mti, size_t s);
 extern void mtiUpdateAmount (MemTrackerInfo* mti, int dcount, int dsize);
-#define CS_MTI_TOSTRING(pre,s) (#pre""#s)
 
 #endif // CS_MEMORY_TRACKER
 
