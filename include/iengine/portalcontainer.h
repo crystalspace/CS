@@ -50,7 +50,7 @@ struct iPortalContainer : public iBase
   virtual void RemovePortal (iPortal* portal) = 0;
 
   /// Render the portal container
-  virtual void Draw (iRenderView* rview, iMovable* movable) = 0;
+  virtual void Draw (iRenderView* rview) = 0;
 };
 
 /** @} */

@@ -195,14 +195,9 @@ public:
   virtual void RemovePortal (iPortal* portal);
   virtual int GetPortalCount () const { return portals.Length () ; }
   virtual iPortal* GetPortal (int idx) const { return (iPortal*)portals[idx]; }
-  virtual void Draw (iRenderView* rview, iMovable* movable)
+  virtual void Draw (iRenderView* rview)
   {
-    //get the movable from parent
-    iBase *parent = GetLogicalParent();
-    csRef<iMeshWrapper> wrap = SCF_QUERY_INTERFACE(parent, iMeshWrapper);
-    if (wrap)
-      Draw (rview, wrap->GetMovable (), CS_ZBUF_NONE);
-    //Draw (rview, movable, CS_ZBUF_NONE);
+    Draw (rview, 0, CS_ZBUF_NONE);
   }
 
   //--------------------- For iMeshObject ------------------------------//

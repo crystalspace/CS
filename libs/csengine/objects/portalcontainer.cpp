@@ -857,7 +857,7 @@ bool csPortalContainer::DrawTest (iRenderView* rview, iMovable* movable)
   }
 
 #ifdef CS_USE_NEW_RENDERER
-  rmesh.object2camera = camtrans / movtrans;
+  rmesh.object2camera = camtrans / movtrans;  
 #endif
   return true;
 }
@@ -887,7 +887,11 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* movable,
   float shift_x = camera->GetShiftX ();
   float shift_y = camera->GetShiftY ();
 
+#ifdef CS_USE_NEW_RENDERER
+  const csReversibleTransform movtrans = rmesh.object2camera * camtrans;
+#else
   const csReversibleTransform& movtrans = movable->GetFullTransform ();
+#endif
 
   int i;
   //@@@@@@@@@@@@@@@@@ OPTIMIZE for the case when clipping is not needed.

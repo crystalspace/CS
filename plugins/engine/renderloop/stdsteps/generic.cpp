@@ -219,7 +219,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
     
     if (mesh->portal) 
     {
-      mesh->portal->Draw (rview,0);
+      mesh->portal->Draw (rview);
     }
     else 
     {

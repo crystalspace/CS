@@ -19,6 +19,8 @@ chronological order.
 	  it appears the movable is not passed along. Nevertheless the
 	  SCF_QUERY_INTERFACE should be avoided there so we need to
 	  rethink this.
+	- Marten provided the correct fix for the issue above. It is to use the
+	  movable passed to DrawTest (through the transform stored in rmesh)
 30-Dec-2003
 	- Eric Sunshine applied patch from Bjorn Hansen
 	  <holomorph@users.sourceforge.net> which adds csParseMouseDef() to
