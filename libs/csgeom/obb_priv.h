@@ -80,7 +80,7 @@ private:
 
 public:
   csOBBTreePair (csOBBTreePairHeap &heap, csOBBTreeNode *a, csOBBTreeNode *b);
-  ~csOBBTreePair () {}
+  ~csOBBTreePair ();
   csOBBTreeNode *A() { return mA; }
   csOBBTreeNode *B() { return mB; }
   float Diameter () { return mDiameter; }

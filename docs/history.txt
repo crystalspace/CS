@@ -9,6 +9,10 @@ The history order is reversed so that new features are at the top.
 	  version of Dynavis that will be used as the default culler in
 	  the future for all sectors.
 	- Added 'frustvis' target to walkall.
+	- Added new simple csIndPrint class in csutil which can be used
+	  for indented printing.
+	- Added temporary debugging code to csOBB to help find a problem
+	  there.
 23-Jun-2002
 	- Added csIntersect3::BoxSphere() function which tests intersection
 	  between a box and a sphere.

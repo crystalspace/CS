@@ -22,6 +22,7 @@
 #include "csgeom/obb_priv.h"
 #include "csgeom/transfrm.h"
 #include "qsqrt.h"
+#include "csutil/indprint.h"
 
 //=============================================================================
 
@@ -78,6 +79,8 @@ bool csOBBFrozen::ProjectOBB (
 
 //=============================================================================
 
+static csIndPrint ip;
+
 csOBB::csOBB (const csVector3 &dir1, const csVector3 &dir2,
   const csVector3 &dir3)
 {
@@ -106,6 +109,8 @@ float csOBB::Volume ()
 
 csOBBLine3::csOBBLine3 (const csVector3 &a, const csVector3 &b)
 {
+ip.Print ("csOBBLine3::csOBBLine3 %p  %g,%g,%g   %g,%g,%g\n", this,
+	a.x, a.y, a.z, b.x, b.y, b.z);
   mA = a; mB = b;
   mDir = mA - mB;
   mLength = mDir.SquaredNorm();
@@ -114,6 +119,9 @@ csOBBLine3::csOBBLine3 (const csVector3 &a, const csVector3 &b)
 
 csOBBTreeNode::csOBBTreeNode (csVector3 **left, csVector3 **right)
 {
+ip.Print ("csOBBTreeNode::csOBBTreeNode %p\n", this);
+ip.Down ();
+csIndPrintDown pd (ip);
   CS_ASSERT (left && right);
   mBox.StartBoundingBox ();
   csVector3 **c;
@@ -128,12 +136,17 @@ csOBBTreeNode::csOBBTreeNode (csVector3 **left, csVector3 **right)
 
 csOBBTreeNode::~csOBBTreeNode ()
 {
+ip.Up ();
+ip.Print ("csOBBTreeNode::~csOBBTreeNode %p\n", this);
+csIndPrintDown pd (ip);
   delete mLeft;
   delete mRight;
 }
 
 bool csOBBTreeNode::Split ()
 {
+ip.Print ("csOBBTreeNode::Split %p\n", this);
+csIndPrintDown pd (ip);
   if (mLeftPoint == mRightPoint) { return false; }
   if (mLeft != NULL || mRight != NULL) { return true; }
   int dim = 0;
@@ -178,6 +191,9 @@ csOBBTreePair::csOBBTreePair (csOBBTreePairHeap &heap,
 	csOBBTreeNode *a, csOBBTreeNode *b)
 	: mHeap(heap), mPointPair (a->GetLeftPoint(), b->GetRightPoint())
 {
+ip.Print ("csOBBTreePair::csOBBTreePair %p\n", this);
+ip.Down ();
+csIndPrintDown pd (ip);
   CS_ASSERT (a && b);
   mA = a; mB = b;
   csBox3 box = a->GetBox() + b->GetBox();
@@ -219,9 +235,17 @@ csOBBTreePair::csOBBTreePair (csOBBTreePairHeap &heap,
   mPointPair = csOBBLine3 (vmin, vmax);
 }
 
+csOBBTreePair::~csOBBTreePair ()
+{
+ip.Up ();
+ip.Print ("csOBBTreePair::~csOBBTreePair %p\n", this);
+}
+
 void csOBBTreePair::MakePair (csOBBTreeNode *l, csOBBTreeNode *r,
 	float dist_bound)
 {
+ip.Print ("csOBBTreePair::MakePair %p l=%p r=%p\n", this, l, r);
+csIndPrintDown pd (ip);
   CS_ASSERT (l && r);
   csOBBTreePair *n;
   n = new csOBBTreePair (mHeap, l, r);
@@ -237,6 +261,8 @@ void csOBBTreePair::MakePair (csOBBTreeNode *l, csOBBTreeNode *r,
 
 void csOBBTreePair::Split (float dist_bound)
 {
+ip.Print ("csOBBTreePair::Split %p\n", this);
+csIndPrintDown pd (ip);
   bool leftsplit = mA->Split ();
   bool rightsplit = mB->Split ();
   if (leftsplit && rightsplit)
@@ -271,6 +297,8 @@ csOBBTreePairHeap::~csOBBTreePairHeap ()
 
 void csOBBTreePairHeap::Push (csOBBTreePair *pair)
 {
+ip.Print ("csOBBTreePairHeap::Push pair=%p\n", pair);
+csIndPrintDown pd (ip);
   CS_ASSERT (pair);
   if (mCount == mSize) { Resize (); }
   CS_ASSERT (mCount < mSize);
@@ -293,6 +321,8 @@ void csOBBTreePairHeap::Push (csOBBTreePair *pair)
 
 csOBBTreePair *csOBBTreePairHeap::Pop ()
 {
+ip.Print ("csOBBTreePairHeap::Pop\n");
+csIndPrintDown pd (ip);
   CS_ASSERT (mCount > 0);
   mCount --;
   CS_ASSERT (mCount < mSize);
@@ -320,6 +350,7 @@ csOBBTreePair *csOBBTreePairHeap::Pop ()
 
 void csOBBTreePairHeap::Resize ()
 {
+ip.Print ("csOBBTreePairHeap::Resize\n");
   if (mSize == 0)
   {
     mSize ++;
@@ -337,6 +368,9 @@ void csOBBTreePairHeap::Resize ()
 
 csOBBTree::csOBBTree (const csVector3 *array, int num)
 {
+ip.Print ("csOBBTree::csOBBTree(%d) %p\n", num, this);
+ip.Down ();
+csIndPrintDown pd (ip);
   CS_ASSERT (array != NULL && num > 0);
   mArray = new csVector3 *[num];
   for (int i = 0; i < num; i ++)
@@ -348,6 +382,9 @@ csOBBTree::csOBBTree (const csVector3 *array, int num)
 
 csOBBTree::~csOBBTree ()
 {
+ip.Up ();
+ip.Print ("csOBBTree::~csOBBTree %p\n", this);
+csIndPrintDown pd (ip);
   CS_ASSERT (mRoot);
   delete mRoot;
   CS_ASSERT (mArray);
@@ -357,6 +394,8 @@ csOBBTree::~csOBBTree ()
 void csOBBTree::Compute (csOBBLine3& res,
 	csOBBTreePair *p, float eps)
 {
+ip.Print ("csOBBTree::Compute %p\n", this);
+csIndPrintDown pd (ip);
   CS_ASSERT (p);
   res = p->GetPointPair();
   p->Split ((1.0 + eps) * res.Length());
@@ -383,6 +422,8 @@ void csOBBTree::Diameter (csOBBLine3& line, float eps)
 
 void csOBB::FindOBB (const csVector3 *vertex_table, int num, float eps)
 {
+ip.Print ("csOBB::FindOBB\n");
+csIndPrintDown pd (ip);
   CS_ASSERT (vertex_table);
   int i;
 
