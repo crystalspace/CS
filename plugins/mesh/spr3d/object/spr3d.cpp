@@ -369,7 +369,7 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
   int* translate = new int [GetVertexCount()];
   csTriangleMesh* new_mesh = new csTriangleMesh (*texel_mesh);
 
-  csSpriteLOD::CalculateLOD (new_mesh, verts, translate, emerge_from);
+  csTriangleMeshLOD::CalculateLOD (new_mesh, verts, translate, emerge_from);
 
   for (i = 0 ; i < texels.Length () ; i++)
   {

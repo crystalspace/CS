@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998,2001 by Jorrit Tyberghein
+    Copyright (C) 1998,2001,2003 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "sprtri.h"
+#include "csgeom/trimeshlod.h"
 
 //---------------------------------------------------------------------------
 
@@ -51,7 +51,8 @@ void csTriangleVertexCost::CalculateCost (csTriangleVerticesCost* vertices)
   }
   for (i = 0 ; i < con_vertices.Length () ; i++)
   {
-    float sq_dist = csSquaredDist::PointPoint (vertices->GetVertex (idx).pos, vertices->GetVertex (con_vertices[i]).pos);
+    float sq_dist = csSquaredDist::PointPoint (vertices->GetVertex (idx).pos,
+    	vertices->GetVertex (con_vertices[i]).pos);
     if (sq_dist < min_sq_dist)
     {
       min_sq_dist = sq_dist;
@@ -124,8 +125,9 @@ void csTriangleVerticesCost::Dump ()
   int i, j;
   for (i = 0 ; i < num_vertices ; i++)
   {
-    printf ("  %d idx=%d del=%d cost=%f to=%d tri=[ ", i, vertices[i].idx, (int)vertices[i].deleted,
-      vertices[i].cost, vertices[i].to_vertex);
+    printf ("  %d idx=%d del=%d cost=%f to=%d tri=[ ", i,
+    	vertices[i].idx, (int)vertices[i].deleted,
+	vertices[i].cost, vertices[i].to_vertex);
     for (j = 0 ; j < vertices[i].con_triangles.Length () ; j++)
       printf ("%d ", vertices[i].con_triangles[j]);
     printf ("] vt=[ ");
@@ -135,13 +137,14 @@ void csTriangleVerticesCost::Dump ()
     if (!vertices[i].deleted)
       for (j = 0 ; j < vertices[i].con_vertices.Length () ; j++)
         if (vertices[vertices[i].con_vertices[j]].deleted)
-          printf ("ERROR refering deleted vertex %d!\n", vertices[i].con_vertices[j]);
+          printf ("ERROR refering deleted vertex %d!\n",
+	  	vertices[i].con_vertices[j]);
   }
 }
 
 //---------------------------------------------------------------------------
 
-void csSpriteLOD::CalculateLOD (csTriangleMesh* mesh,
+void csTriangleMeshLOD::CalculateLOD (csTriangleMesh* mesh,
 	csTriangleVerticesCost* verts, int* translate, int* emerge_from)
 {
   int i;

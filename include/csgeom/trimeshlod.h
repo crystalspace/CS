@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_SPRTRI_H__
-#define __CS_SPRTRI_H__
+#ifndef __CS_TRIMESHLOD_H__
+#define __CS_TRIMESHLOD_H__
 
 #include "csgeom/math3d.h"
 #include "csgeom/trimesh.h"
@@ -26,7 +26,7 @@ class csTriangleVerticesCost;
 
 /**
  * The representation of a vertex in a triangle mesh.
- * This is basicly used as a temporary structure to be able to
+ * This is basically used as a temporary structure to be able to
  * calculate the cost of collapsing this vertex more quickly.
  */
 class csTriangleVertexCost : public csTriangleVertex
@@ -70,10 +70,14 @@ private:
 
 public:
   /// Build vertex table for a triangle mesh.
-  csTriangleVerticesCost (csTriangleMesh* mesh, csVector3* verts, int num_verts);
+  csTriangleVerticesCost (csTriangleMesh* mesh, csVector3* verts,
+  	int num_verts);
   ///
   ~csTriangleVerticesCost ();
-  /// Update vertex table for a given set of vertices (with the same number as at init).
+  /**
+   * Update vertex table for a given set of vertices (with the same number as
+   * at init).
+   */
   void UpdateVertices (csVector3* verts);
 
   ///
@@ -95,7 +99,7 @@ public:
  * A static class which performs the calculation
  * of the best order to do the collapsing.
  */
-class csSpriteLOD
+class csTriangleMeshLOD
 {
 public:
   /**
@@ -111,11 +115,12 @@ public:
    * vertex had collapsed).<p>
    *
    * Note. The given 'mesh' and 'verts' objects are no longer valid after
-   * calling this function. Don't expect anything useful information here.
+   * calling this function. Don't expect any useful information here.
    */
   static void CalculateLOD (csTriangleMesh* mesh, csTriangleVerticesCost* verts,
   	int* translate, int* emerge_from);
 };
 
 
-#endif // __CS_SPRTRI_H__
+#endif // __CS_TRIMESHLOD_H__
+

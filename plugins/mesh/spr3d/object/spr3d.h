@@ -31,7 +31,7 @@
 #include "csgeom/poly3d.h"
 #include "csgeom/box.h"
 #include "csgeom/objmodel.h"
-#include "plugins/mesh/spr3d/object/sprtri.h"
+#include "csgeom/trimeshlod.h"
 #include "plugins/mesh/spr3d/object/skel3d.h"
 #include "imesh/sprite3d.h"
 #include "imesh/object.h"

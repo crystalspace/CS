@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Sep-2003
+	- Jorrit moved the progressive LOD calculation classes from sprite3d
+	  to csgeom.
 11-Sep-2003
 	- Jorrit cleaned up some sources in the stencil renderloop.
 	- Jorrit did the following optimizations with regards to
