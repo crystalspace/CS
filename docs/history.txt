@@ -1,5 +1,9 @@
-The history order is reversed so that new features are at the top.
+﻿The history order is reversed so that new features are at the top.
 
+01-March-2003
+	- Philip Wyett updated MSVC project files and also notes next
+	  time we change csver.h for a release, update the MSVC project files
+	  so the version number is also updated in the rc's. :)
 28-Feb-2003
 	- Release of 0.96r003.
 	- Fixed a bug with hierarchical objects not culling correctly.
