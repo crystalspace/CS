@@ -46,7 +46,8 @@ else
 endif
 
 INC.DDRAW8 = $(wildcard plugins/video/canvas/ddraw8/*.h \
-  $(wildcard plugins/video/canvas/directxcommon/*.h $(INC.COMMON.DRV2D)))
+  $(wildcard plugins/video/canvas/directxcommon/*.h $(INC.COMMON.DRV2D))) \
+  $(wildcard directx/*.h)
 SRC.DDRAW8 = $(wildcard plugins/video/canvas/ddraw8/*.cpp \
   $(wildcard plugins/video/canvas/directxcommon/*.cpp $(SRC.COMMON.DRV2D)))
 OBJ.DDRAW8 = $(addprefix $(OUT)/,$(notdir $(SRC.DDRAW8:.cpp=$O)))
