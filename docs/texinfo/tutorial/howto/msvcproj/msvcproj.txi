@@ -142,9 +142,8 @@ Generation}.
 @end ifnotinfo
 
 In @emph{Use run-time library} change @emph{Debug Single-threaded} to
-@emph{Debug Multithreaded}. Also make sure too change the directive
-@emph{/MT or /MTD} too @emph{/MD or /MDd} for release and debug builds
-respectively.
+@emph{Debug Multithreaded}. Also make sure too change the directive(s)
+@emph{/MD or /MDd} for release and debug builds respectively.
 
 Note: In a release build this is slightly different.  See the attached sample
 application for settings in that case.

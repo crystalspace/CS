@@ -3,6 +3,10 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+30-Apr-2003
+	- Philip Wyett removed MSVC external references to /MT and /MTd
+          as these params are not valid and will cause problems if used
+          when creating an application with current CS.
 29-Apr-2003
 	- Matze fixed bad filepermission for jam install
 	- Matze moved crystal.m4 around to mk/autoconf and merged to make and
