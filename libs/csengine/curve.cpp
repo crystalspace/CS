@@ -24,6 +24,8 @@
 #include "csengine/light/light.h"
 #include "csengine/polygon/polytext.h"
 #include "csengine/polygon/polygon.h"
+#include "csengine/objects/thing.h"
+#include "csengine/sector.h"
 #include "csengine/world.h"
 
 static csBezierCache theBezierCache;
@@ -156,7 +158,14 @@ void csCurve::InitLightmaps (csPolygonSet* owner, bool do_cache, int index)
 {
   if (!IsLightable ()) return;
   CHK (lightmap = new csLightMap ());
-  lightmap->Alloc (256, 256, 16, NULL);
+
+  // Allocate space for the lightmap and initialize it current sector ambient color.
+  int r, g, b;
+  csSector* sector = owner->GetSector ();
+  if (!sector) sector = (csSector*)owner;
+  sector->GetAmbientColor (r, g, b);
+  lightmap->Alloc (256, 256, 16, r, g, b);
+
   if (!do_cache) { lightmap_up_to_date = false; return; }
   if (csPolygon3D::do_force_recalc) lightmap_up_to_date = false;
   else if (!lightmap->ReadFromCache (256, 256, 16, owner, NULL, index, csWorld::current_world))
@@ -168,9 +177,9 @@ void csCurve::ShineLightmaps (csLightView& lview)
 {
   if (!lightmap) return;
   if (lightmap_up_to_date) return;
-  int lmw, lmh;
-  lmw = lightmap->GetWidth ()-2;
-  lmh = lightmap->GetHeight ()-2;
+  int lm_width, lm_height;
+  lm_width = lightmap->GetWidth ()-2;
+  lm_height = lightmap->GetHeight ()-2;
   csRGBLightMap& map = lightmap->GetStaticMap ();
   UByte* mapR = map.mapR;
   UByte* mapG = map.mapG;
@@ -190,13 +199,13 @@ void csCurve::ShineLightmaps (csLightView& lview)
   float u, v;
   int ui, vi;
   int uv;
-  for (ui = 0 ; ui <= lmw ; ui++)
+  for (ui = 0 ; ui <= lm_width ; ui++)
   {
-    u = ((float)ui)/(float)lmw;
-    for (vi = 0 ; vi <= lmh ; vi++)
+    u = ((float)ui)/(float)lm_width;
+    for (vi = 0 ; vi <= lm_height ; vi++)
     {
-      v = ((float)vi)/(float)lmh;
-      uv = vi*(lmw+2)+ui;
+      v = ((float)vi)/(float)lm_height;
+      uv = vi*(lm_width+2)+ui;
       PosInSpace (pos, u, v);
       d = csSquaredDist::PointPoint (light->GetCenter (), pos);
       if (d >= light->GetSquaredRadius ()) continue;
