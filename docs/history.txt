@@ -1,10 +1,20 @@
 The history order is reversed so that new features are at the top.
 
 27-Aug-2001
+	- Fixed a linking error in povie.mak.
+26-Aug-2001
+	- Removed G3DVertex class since this is equivalent to using
+	  csVector instead.
+	- DefaultDrawTriangleMesh now also understands lazy clipping but
+	  this is not yet used by the software renderer.
+	- Added clip_portal, clip_plane, and clip_z_plane to G3DPolygonMesh
+	  to support the same kind of clipping capabilities as with
+	  G3DTriangleMesh.
+	- Implemented clipping in DefaultDrawPolygonMesh.
+	- Renamed POLYMESH keyword and flag to FASTMESH instead.
 	- Michael Voase did the following:
             - Fixed walktest crasher in line 3d caused
 	      by proctex (ignoring PrepareAnim() failure)
-26-Aug-2001
 	- Norman Kramer fixed compilation error in csrectrg.cpp.
 	- Eric Sunshine made the following changes to the project:
 	    - Removed all event related code and functionality from
@@ -140,6 +150,34 @@ The history order is reversed so that new features are at the top.
 	  Fixed a couple of error message typos (said ball instead of surface).
 	- Eric Sunshine eliminated a warning in datastrm.cpp regarding
 	  undeclared function isspace().
+25-Aug-2001
+	- Extended iPolygonBuffer to have more specific support for
+	  lightmapped polygons. This means that iPolygonBuffer will be more
+	  closely tied to DrawPolygonMesh() which will be changed to
+	  work with iPolygonBuffer.
+	- The DefaultDrawPolygonMesh() now works with the new polygon buffers.
+	  Note that there are still some bugs with it though. The main problem
+	  is that clipping doesn't work yet.
+	- When the new CS_THING_POLYMESH flag is set for a thing the new
+	  DrawPolygonMesh will be used. This flag can also be set in the
+	  map file for things (POLYMESH keyword).
+	- Removed a few obsolete keywords in thing loader.
+	- Removed obsolete support for CS_ENTITY_INVISIBLE and
+	  CS_ENTITY_CAMERA in csThing. This support is already present
+	  in csMeshWrapper and is not needed in csThing.
+	- Removed a piece of totally unneeded code in thing drawing. It
+	  was actually calculating the tesselation resolution for curves
+	  and then never using the result (nor needing it at all).
+	- Fixed a bad bug in csThing::GetRadius(). It would only return
+	  a valid center the first time it was called. Otherwise it would
+	  return bogus values.
+	- Implemented csThing::DrawTest() so that a thing will not be
+	  even considered for rendering if behind the Z=0 plane. This can
+	  significantly speed up rendering for levels containing lots of
+	  things. Even for flarge this actually speeds up FPS a little
+	  (one example: 31.6 FPS -> 32.6 FPS).
+	- Extended the test in csThing::DrawTest() to also include frustum
+	  clipping. This also gives a small additional speed increase.
 24-Aug-2001
 	- Philip Wyett tried to fix the metaballs plugin from crashing.
 	- Fixed metaballs plugin so that it really works again now.  This

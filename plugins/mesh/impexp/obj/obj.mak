@@ -38,7 +38,7 @@ endif
 INC.OBJIE = $(wildcard plugins/mesh/impexp/obj/*.h)
 SRC.OBJIE = $(wildcard plugins/mesh/impexp/obj/*.cpp)
 OBJ.OBJIE = $(addprefix $(OUT),$(notdir $(SRC.OBJIE:.cpp=$O)))
-DEP.OBJIE = CSGEOM CSUTIL CSSYS CSUTIL CSTOOL
+DEP.OBJIE = CSGEOM CSUTIL CSSYS CSUTIL CSTOOL CSUTIL CSGEOM
 
 MSVC.DSP += OBJIE
 DSP.OBJIE.NAME = objie
