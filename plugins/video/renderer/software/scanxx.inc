@@ -66,6 +66,26 @@ void SCAN_NAME (SCAN_BPP, scan_flat_zfil) (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
+#ifndef NO_scan_flat_znone
+
+void SCAN_NAME (SCAN_BPP, scan_flat_znone) (int xx, unsigned char* d,
+  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
+{
+  (void)u_div_z; (void)v_div_z; (void)inv_z; (void)z_buf;
+  int color = Scan.FlatColor;
+  PIXTYPE *_dest = (PIXTYPE *)d;
+  PIXTYPE *_destend = _dest + xx - 1;
+  do
+  {
+    *_dest++ = color;
+  }
+  while (_dest <= _destend);
+}
+
+#endif // NO_scan_flat_znone
+
+//------------------------------------------------------------------
+
 #ifndef NO_scan_flat_zuse
 
 void SCAN_NAME (SCAN_BPP, scan_flat_zuse) (int xx, unsigned char* d,
@@ -92,6 +112,50 @@ void SCAN_NAME (SCAN_BPP, scan_flat_zuse) (int xx, unsigned char* d,
 }
 
 #endif // NO_scan_flat_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_flat_ztest
+
+void SCAN_NAME (SCAN_BPP, scan_flat_ztest) (int xx, unsigned char* d,
+  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
+{
+  (void)u_div_z; (void)v_div_z;
+  int color = Scan.FlatColor;
+  unsigned long izz = QInt24 (inv_z);
+  unsigned long dzz = QInt24 (Scan.M);
+  PIXTYPE *_dest = (PIXTYPE *)d;
+  PIXTYPE *_destend = _dest + xx - 1;
+  do
+  {
+    if (izz >= *z_buf)
+      *_dest = color;
+    _dest++;
+    z_buf++;
+    izz += dzz;
+  }
+  while (_dest <= _destend);
+}
+
+#endif // NO_scan_flat_ztest
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_tex_znone
+
+#define SCANFUNC SCAN_NAME (SCAN_BPP, scan_tex_znone)
+#define SCANLOOP \
+  do									\
+  {									\
+    *_dest++ = COLORMAP [srcTex [((uu >> 16) & ander_w) +		\
+      ((vv >> shifter_h) & ander_h)]];					\
+    uu += duu;								\
+    vv += dvv;								\
+  }									\
+  while (_dest <= _destend)
+#include "scanln.inc"
+
+#endif // NO_scan_tex_znone
 
 //------------------------------------------------------------------
 
@@ -145,6 +209,48 @@ void SCAN_NAME (SCAN_BPP, scan_flat_zuse) (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
+#ifndef NO_scan_tex_ztest
+
+#define SCANFUNC SCAN_NAME (SCAN_BPP, scan_tex_ztest)
+#define SCANLOOP \
+  do									\
+  {									\
+    if (izz >= *z_buffer)						\
+    {									\
+      *_dest = COLORMAP [srcTex [((uu >> 16) & ander_w) +		\
+        ((vv >> shifter_h) & ander_h)]];				\
+    }									\
+    _dest++;								\
+    z_buffer++;								\
+    uu += duu;								\
+    vv += dvv;								\
+    izz += dzz;								\
+  }									\
+  while (_dest <= _destend)
+#include "scanln.inc"
+
+#endif // NO_scan_tex_ztest
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_map_znone
+
+#define SCANFUNC SCAN_NAME (SCAN_BPP, scan_map_znone)
+#define SCANMAP
+#define SCANLOOP \
+  do									\
+  {									\
+    *_dest++ = srcTex [((vv >> 16) << shifter) + (uu >> 16)];		\
+    uu += duu;								\
+    vv += dvv;								\
+  }									\
+  while (_dest <= _destend)
+#include "scanln.inc"
+
+#endif // NO_scan_map_znone
+
+//------------------------------------------------------------------
+
 #ifndef NO_scan_map_zfil
 
 #define SCANFUNC SCAN_NAME (SCAN_BPP, scan_map_zfil)
@@ -194,6 +300,54 @@ void SCAN_NAME (SCAN_BPP, scan_flat_zuse) (int xx, unsigned char* d,
 #endif // NO_scan_map_zuse
 
 //------------------------------------------------------------------
+
+#ifndef NO_scan_map_ztest
+
+#define SCANFUNC SCAN_NAME (SCAN_BPP, scan_map_ztest)
+#define SCANMAP
+#define SCANLOOP \
+  do									\
+  {									\
+    if (izz >= *z_buffer)						\
+    {									\
+      *_dest = srcTex [((vv >> 16) << shifter) + (uu >> 16)];		\
+    }									\
+    _dest++;								\
+    z_buffer++;								\
+    uu += duu;								\
+    vv += dvv;								\
+    izz += dzz;								\
+  }									\
+  while (_dest <= _destend)
+#include "scanln.inc"
+
+#endif // NO_scan_map_ztest
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_tex_key_znone
+
+#define SCANFUNC SCAN_NAME (SCAN_BPP, scan_tex_key_znone)
+#define SCANLOOP \
+  do									\
+  {									\
+    UByte c = srcTex [((uu >> 16) & ander_w) +				\
+      ((vv >> shifter_h) & ander_h)];					\
+    if (c)								\
+    {									\
+      *_dest = COLORMAP [c];						\
+    }									\
+    _dest++;								\
+    uu += duu;								\
+    vv += dvv;								\
+  }									\
+  while (_dest <= _destend)
+#include "scanln.inc"
+
+#endif // scan_tex_key_znone
+
+//------------------------------------------------------------------
+
 
 #ifndef NO_scan_tex_key_zfil
 
@@ -249,6 +403,54 @@ transp_pixel:								\
 
 //------------------------------------------------------------------
 
+#ifndef NO_scan_tex_key_ztest
+
+#define SCANFUNC SCAN_NAME (SCAN_BPP, scan_tex_key_ztest)
+#define SCANLOOP \
+  do									\
+  {									\
+    if (izz >= *z_buffer)						\
+    {									\
+      UByte c = srcTex [((uu >> 16) & ander_w) +			\
+        ((vv >> shifter_h) & ander_h)];					\
+      if (!c) goto transp_pixel;					\
+      *_dest = COLORMAP [c];						\
+    }									\
+transp_pixel:								\
+    z_buffer++;								\
+    _dest++;								\
+    uu += duu;								\
+    vv += dvv;								\
+    izz += dzz;								\
+  }									\
+  while (_dest <= _destend)
+#include "scanln.inc"
+
+#endif // NO_scan_tex_key_ztest
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_map_key_znone
+
+#define SCANFUNC SCAN_NAME (SCAN_BPP, scan_map_key_znone)
+#define SCANMAP
+#define SCANLOOP \
+  do									\
+  {									\
+    PIXTYPE c = srcTex [((vv >> 16) << shifter) + (uu >> 16)];		\
+    if (c)								\
+      *_dest = c;							\
+    _dest++;								\
+    uu += duu;								\
+    vv += dvv;								\
+  }									\
+  while (_dest <= _destend)
+#include "scanln.inc"
+
+#endif // NO_scan_map_key_znone
+
+//------------------------------------------------------------------
+
 #ifndef NO_scan_map_key_zfil
 
 #define SCANFUNC SCAN_NAME (SCAN_BPP, scan_map_key_zfil)
@@ -300,3 +502,31 @@ transp_pixel:								\
 #include "scanln.inc"
 
 #endif // NO_scan_map_key_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_map_key_ztest
+
+#define SCANFUNC SCAN_NAME (SCAN_BPP, scan_map_key_ztest)
+#define SCANMAP
+#define SCANLOOP \
+  do									\
+  {									\
+    if (izz >= *z_buffer)						\
+    {									\
+      UByte c = srcTex [((vv >> 16) << shifter) + (uu >> 16)];		\
+      if (!c) goto transp_pixel;					\
+      *_dest = c;							\
+    }									\
+transp_pixel:								\
+    _dest++;								\
+    z_buffer++;								\
+    uu += duu;								\
+    vv += dvv;								\
+    izz += dzz;								\
+  }									\
+  while (_dest <= _destend)
+#include "scanln.inc"
+
+#endif // NO_scan_map_key_ztest
+

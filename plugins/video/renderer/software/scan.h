@@ -269,8 +269,10 @@ csDrawPIScanline csScan_scan_pi_zfil;
  * perspective-correct scanline routine.
  */
 #define SCAN_ROUTINE(pfmt,features)					\
+csDrawScanline csScan_##pfmt##_scan_##features##_znone;			\
 csDrawScanline csScan_##pfmt##_scan_##features##_zfil;			\
-csDrawScanline csScan_##pfmt##_scan_##features##_zuse;
+csDrawScanline csScan_##pfmt##_scan_##features##_zuse;			\
+csDrawScanline csScan_##pfmt##_scan_##features##_ztest;
 
 /*
  * The following macro is used to define all variations of a
@@ -279,7 +281,8 @@ csDrawScanline csScan_##pfmt##_scan_##features##_zuse;
 #define PI_SCAN_ROUTINE(pfmt,features)					\
 csDrawPIScanline csScan_##pfmt##_scan_pi_##features##_znone;		\
 csDrawPIScanline csScan_##pfmt##_scan_pi_##features##_zfil;		\
-csDrawPIScanline csScan_##pfmt##_scan_pi_##features##_zuse;
+csDrawPIScanline csScan_##pfmt##_scan_pi_##features##_zuse;		\
+csDrawPIScanline csScan_##pfmt##_scan_pi_##features##_ztest;
 
 /*
  * This macros is used to declare several variations of a Gouraud-shaded
@@ -288,7 +291,8 @@ csDrawPIScanline csScan_##pfmt##_scan_pi_##features##_zuse;
 #define PIG_SCAN_ROUTINE(pfmt,features)					\
 csDrawPIScanlineGouraud csScan_##pfmt##_scan_pi_##features##_znone;	\
 csDrawPIScanlineGouraud csScan_##pfmt##_scan_pi_##features##_zfil;	\
-csDrawPIScanlineGouraud csScan_##pfmt##_scan_pi_##features##_zuse;
+csDrawPIScanlineGouraud csScan_##pfmt##_scan_pi_##features##_zuse;	\
+csDrawPIScanlineGouraud csScan_##pfmt##_scan_pi_##features##_ztest;
 
 //---//---//---//---//---//---//---//---//---//-- 8-bit drawing routines //---//
 
@@ -380,13 +384,23 @@ SCAN_ROUTINE (16_555, map_alpha)
 SCAN_ROUTINE (16_565, map_alpha)
 
 /// Draw one horizontal scanline (lighting and filtering).
+csDrawScanline csScan_16_scan_map_filt_ztest;
+/// Draw one horizontal scanline (lighting and filtering).
+csDrawScanline csScan_16_scan_map_filt_znone;
+/// Draw one horizontal scanline (lighting and filtering).
 csDrawScanline csScan_16_scan_map_filt_zfil;
+/// Draw one horizontal scanline (lighting and more filtering).
+csDrawScanline csScan_16_555_scan_map_filt2_znone;
+csDrawScanline csScan_16_565_scan_map_filt2_znone;
 /// Draw one horizontal scanline (lighting and more filtering).
 csDrawScanline csScan_16_555_scan_map_filt2_zfil;
 csDrawScanline csScan_16_565_scan_map_filt2_zfil;
 /// Draw one horizontal scanline (lighting and more filtering, Z-check).
 csDrawScanline csScan_16_555_scan_map_filt2_zuse;
 csDrawScanline csScan_16_565_scan_map_filt2_zuse;
+/// Draw one horizontal scanline (lighting and more filtering, Z-check).
+csDrawScanline csScan_16_555_scan_map_filt2_ztest;
+csDrawScanline csScan_16_565_scan_map_filt2_ztest;
 
 /// Draw one horizontal scanline for fog.
 csDrawScanline csScan_16_555_scan_fog;
@@ -466,9 +480,13 @@ SCAN_ROUTINE (32, tex_alpha)
 SCAN_ROUTINE (32, map_alpha)
 
 /// Same as above but do bilinear filtering (Z-fill)
+csDrawScanline csScan_32_scan_map_filt2_znone;
+/// Same as above but do bilinear filtering (Z-fill)
 csDrawScanline csScan_32_scan_map_filt2_zfil;
 /// Same as above but do bilinear filtering (Z-check)
 csDrawScanline csScan_32_scan_map_filt2_zuse;
+/// Same as above but do bilinear filtering (Z-check)
+csDrawScanline csScan_32_scan_map_filt2_ztest;
 
 /// Draw one horizontal scanline for fog
 csDrawScanline csScan_32_scan_fog;

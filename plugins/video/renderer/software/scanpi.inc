@@ -161,6 +161,7 @@ void PI_SCANFUNC (void *dest, int len, unsigned long *zbuff,
 #undef PI_SCANFUNC
 #undef PI_ZUSE
 #undef PI_ZFILL
+#undef PI_ZTEST
 #undef PI_GOURAUD
 #undef PI_INDEX8
 #undef PI_R5G5B5

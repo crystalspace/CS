@@ -27,7 +27,7 @@
 
   while (_dest < _destend)
   {
-#ifdef PI_ZUSE
+#if defined (PI_ZUSE) || defined (PI_ZTEST)
     if (z > *zbuff)
 #endif
     {
@@ -157,7 +157,7 @@
     }
     _dest++;
     u += du; v += dv;
-#if defined (PI_ZUSE) || defined (PI_ZFILL)
+#if defined (PI_ZUSE) || defined (PI_ZFILL) || defined (PI_ZTEST)
     zbuff++;
     z += dz;
 #endif;

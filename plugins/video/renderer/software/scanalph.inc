@@ -108,7 +108,7 @@
 
 #ifndef A_PI
 
-#if defined (A_ZUSE)
+#if defined (A_ZUSE) || defined (A_ZTEST)
 #  define IF_ZBUF_OK if (izz > *z_buf)
 #else
 #  define IF_ZBUF_OK
@@ -117,6 +117,9 @@
 #if defined (A_ZNONE)
 #  define Z_FILL
 #  define Z_INC
+#elif defined (A_ZTEST)
+#  define Z_FILL
+#  define Z_INC		izz += dzz; z_buf++
 #else
 #  define Z_FILL	*z_buf = izz
 #  define Z_INC		izz += dzz; z_buf++
@@ -220,3 +223,6 @@ void A_SCANFUNC (void *dest, int len, unsigned long *zbuff,
 #undef A_ZUSE
 #undef A_ZFILL
 #undef A_ZNONE
+#undef A_ZTEST
+#undef Z_FILL
+#undef Z_INC

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -43,6 +43,276 @@
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--/ scan_XXXX --//--//--//
 
 #include "scanxx.inc"
+
+//----------------------------------------------------------------------------//
+
+#ifndef NO_scan_map_filt_znone
+
+#define SCANFUNC csScan_16_scan_map_filt_znone
+#define SCANMAP
+#define SCANLOOP \
+    int filter_du, filter_dv;						\
+    while(_dest<=_destend&&((vv<BAILOUT_CONSTANT||uu<BAILOUT_CONSTANT)||(vv>=Scan.th2fp-BAILOUT_CONSTANT||uu>=Scan.tw2fp-BAILOUT_CONSTANT)))\
+    {                                                                   \
+      *_dest++ = srcTex[((vv>>16)<<shifter) + (uu>>16)];                \
+      uu += duu;							\
+      vv += dvv;							\
+    }                                                                   \
+    while ((_dest <= _destend)&&!((vv<BAILOUT_CONSTANT||uu<BAILOUT_CONSTANT)||(vv>=Scan.th2fp-BAILOUT_CONSTANT||uu>=Scan.tw2fp-BAILOUT_CONSTANT)))\
+    {									\
+      if ((((long)_dest) & csGraphics3DSoftwareCommon::filter_bf) != 0)				\
+      {									\
+        if ((uu&0xffff) < 64*256) filter_du = -1;			\
+        else if ((uu&0xffff) > 192*256) filter_du = 1;			\
+        else filter_du = 0;						\
+        if ((vv&0xffff) < 64*256) filter_dv = -1;			\
+        else if ((vv&0xffff) > 192*256) filter_dv = 1;			\
+        else filter_dv = 0;						\
+      }									\
+      else filter_du = filter_dv = 0;					\
+      *_dest++ = srcTex[(((vv>>16)+filter_dv)<<shifter) + ((uu>>16)+filter_du)];\
+      uu += duu;							\
+      vv += dvv;							\
+    }									\
+    while(_dest<=_destend)                                              \
+    {                                                                   \
+      *_dest++ = srcTex[((vv>>16)<<shifter) + (uu>>16)];                \
+      uu += duu;							\
+      vv += dvv;							\
+    }									\
+  uu = uu1;								\
+  vv = vv1;
+#include "scanln.inc"
+
+#endif // NO_scan_map_filt_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_map_filt2_znone
+
+/*
+  We process two pixels at a time (in a single CPU register):
+     +--------+---------+    +--------+---------+
+  T: |top-left|top-right| B: |bot-left|bot-right|
+     +--------+---------+    +--------+---------+
+  We isolate the r/g/b components in both pixels at once and multiply
+  the double word with the V fractional value. Then we combine the left
+  and right halves. We use 16 gradations for interpolation, which is
+  quite enough for 16-bit modes.
+  Using one reg has a drawback: the subtraction operation do not perform
+  independent subtractions from both components; the least significant
+  bit of left pixel component could be garbled by right pixel's influence.
+*/
+
+#define SCANFUNC csScan_16_565_scan_map_filt2_znone
+#define SCANMAP
+#define SCANLOOP							\
+    if ((duu > 0xffff) || (dvv > 0xffff))				\
+      do								\
+      {									\
+        *_dest++ = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+        uu += duu;							\
+        vv += dvv;							\
+      }									\
+      while (_dest <= _destend);					\
+    else								\
+      do								\
+      {									\
+        unsigned addr = (((vv >> 16)) << shifter) + (uu >> 16);		\
+        unsigned top = *(unsigned *)&srcTex [addr];			\
+        unsigned bot = *(unsigned *)&srcTex [addr + Scan.tw2];		\
+        unsigned c, v = (vv >> 12) & 0x0f;				\
+        c = (top & 0x001f001f);						\
+        unsigned b = (c << 4) + v * ((bot & 0x001f001f) - c);		\
+        /* b == <7:0> <5.4:bl> <7:0> <5.4:br> */			\
+        c = (top & 0x07e007e0);						\
+        unsigned g = c + (int (v * ((bot & 0x07e007e0) - c)) >> 4);	\
+        /* g == <6:0> <6.4:gl> <6:0> <6.4:gr> */			\
+        c = (top & 0xf800f800) >> 8;					\
+        unsigned r = (c << 4) + v * (((bot & 0xf800f800) >> 8) - c);	\
+        /* r == <4:0> <5.7:rl> <4:0> <5.7:rr> */			\
+        unsigned u = (uu >> 12) & 0x0f;					\
+        c = LEFT (b);							\
+        b = ((c << 4) + u * (RIGHT (b) - c) + 0x0080) >> 8;		\
+        c = LEFT (g);							\
+        g = (c + ((u * (RIGHT (g) - c) + 0x0100) >> 4)) & 0x07e0;	\
+        c = LEFT (r);							\
+        r = (((c << 4) + (u * (RIGHT (r) - c)) + 0x0400) & 0xf800);	\
+        *_dest++ = r | g | b;						\
+        uu += duu;							\
+        vv += dvv;							\
+      }									\
+      while (_dest <= _destend);
+#include "scanln.inc"
+
+#endif // NO_565_scan_map_filt2_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_map_filt2_znone
+
+#define SCANFUNC csScan_16_555_scan_map_filt2_znone
+#define SCANMAP
+#define SCANLOOP							\
+    if ((duu > 0xffff) || (dvv > 0xffff))				\
+      do								\
+      {									\
+        *_dest++ = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+        uu += duu;							\
+        vv += dvv;							\
+      }									\
+      while (_dest <= _destend);					\
+    else								\
+      do								\
+      {									\
+        unsigned addr = (((vv >> 16)) << shifter) + (uu >> 16);		\
+        unsigned top = *(unsigned *)&srcTex [addr];			\
+        unsigned bot = *(unsigned *)&srcTex [addr + Scan.tw2];		\
+        unsigned c, v = (vv >> 12) & 0x0f;				\
+        c = (top & 0x001f001f);						\
+        unsigned b = (c << 4) + v * ((bot & 0x001f001f) - c);		\
+        /* b == <7:0> <5.4:bl> <7:0> <5.4:br> */			\
+        c = (top & 0x03e003e0);						\
+        unsigned g = c + (int (v * ((bot & 0x03e003e0) - c)) >> 4);	\
+        /* g == <7:0> <5.4:gl> <7:0> <5.4:gr> */			\
+        c = (top & 0x7c007c00) >> 8;					\
+        unsigned r = (c << 4) + v * (((bot & 0x7c007c00) >> 8) - c);	\
+        /* r == <4:0> <5.7:rl> <4:0> <5.7:rr> */			\
+        unsigned u = (uu >> 12) & 0x0f;					\
+        c = LEFT (b);							\
+        b = ((c << 4) + u * (RIGHT (b) - c) + 0x0080) >> 8;		\
+        c = LEFT (g);							\
+        g = (c + ((u * (RIGHT (g) - c) + 0x0100) >> 4)) & 0x03e0;	\
+        c = LEFT (r);							\
+        r = (((c << 4) + (u * (RIGHT (r) - c)) + 0x0200) & 0x7c00);	\
+        *_dest++ = r | g | b;						\
+        uu += duu;							\
+        vv += dvv;							\
+      }									\
+      while (_dest <= _destend);
+#include "scanln.inc"
+
+#endif // NO_555_scan_map_filt2_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_map_filt2_ztest
+
+#define SCANFUNC csScan_16_565_scan_map_filt2_ztest
+#define SCANMAP
+#define SCANLOOP							\
+    if ((duu > 0xffff) || (dvv > 0xffff))				\
+      do								\
+      {									\
+        if (izz >= *z_buffer)						\
+        {								\
+          *z_buffer = izz;						\
+          *_dest = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+        }								\
+        _dest++;							\
+        z_buffer++;							\
+        uu += duu;							\
+        vv += dvv;							\
+        izz += dzz;							\
+      }									\
+      while (_dest <= _destend);					\
+    else								\
+      do								\
+      {									\
+        if (izz >= *z_buffer)						\
+        {								\
+        unsigned addr = (((vv >> 16)) << shifter) + (uu >> 16);		\
+        unsigned top = *(unsigned *)&srcTex [addr];			\
+        unsigned bot = *(unsigned *)&srcTex [addr + Scan.tw2];		\
+        unsigned c, v = (vv >> 12) & 0x0f;				\
+        c = (top & 0x001f001f);						\
+        unsigned b = (c << 4) + v * ((bot & 0x001f001f) - c);		\
+        /* b == <7:0> <5.4:bl> <7:0> <5.4:br> */			\
+        c = (top & 0x07e007e0);						\
+        unsigned g = c + (int (v * ((bot & 0x07e007e0) - c)) >> 4);	\
+        /* g == <6:0> <6.4:gl> <6:0> <6.4:gr> */			\
+        c = (top & 0xf800f800) >> 8;					\
+        unsigned r = (c << 4) + v * (((bot & 0xf800f800) >> 8) - c);	\
+        /* r == <4:0> <5.7:rl> <4:0> <5.7:rr> */			\
+        unsigned u = (uu >> 12) & 0x0f;					\
+        c = LEFT (b);							\
+        b = ((c << 4) + u * (RIGHT (b) - c) + 0x0080) >> 8;		\
+        c = LEFT (g);							\
+        g = (c + ((u * (RIGHT (g) - c) + 0x0100) >> 4)) & 0x07e0;	\
+        c = LEFT (r);							\
+        r = (((c << 4) + (u * (RIGHT (r) - c)) + 0x0400) & 0xf800);	\
+        *_dest = r | g | b;						\
+        }								\
+        _dest++;							\
+        z_buffer++;							\
+        uu += duu;							\
+        vv += dvv;							\
+        izz += dzz;							\
+      }									\
+      while (_dest <= _destend);
+#include "scanln.inc"
+
+#endif // NO_565_scan_map_filt2_ztest
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_map_filt2_ztest
+
+#define SCANFUNC csScan_16_555_scan_map_filt2_ztest
+#define SCANMAP
+#define SCANLOOP							\
+    if ((duu > 0xffff) || (dvv > 0xffff))				\
+      do								\
+      {									\
+        if (izz >= *z_buffer)						\
+        {								\
+          *z_buffer = izz;						\
+          *_dest = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+        }								\
+        _dest++;							\
+        z_buffer++;							\
+        uu += duu;							\
+        vv += dvv;							\
+        izz += dzz;							\
+      }									\
+      while (_dest <= _destend);					\
+    else								\
+      do								\
+      {									\
+        if (izz >= *z_buffer)						\
+        {								\
+        unsigned addr = (((vv >> 16)) << shifter) + (uu >> 16);		\
+        unsigned top = *(unsigned *)&srcTex [addr];			\
+        unsigned bot = *(unsigned *)&srcTex [addr + Scan.tw2];		\
+        unsigned c, v = (vv >> 12) & 0x0f;				\
+        c = (top & 0x001f001f);						\
+        unsigned b = (c << 4) + v * ((bot & 0x001f001f) - c);		\
+        /* b == <7:0> <5.4:bl> <7:0> <5.4:br> */			\
+        c = (top & 0x03e003e0);						\
+        unsigned g = c + (int (v * ((bot & 0x03e003e0) - c)) >> 4);	\
+        /* g == <7:0> <5.4:gl> <7:0> <5.4:gr> */			\
+        c = (top & 0x7c007c00) >> 8;					\
+        unsigned r = (c << 4) + v * (((bot & 0x7c007c00) >> 8) - c);	\
+        /* r == <4:0> <5.7:rl> <4:0> <5.7:rr> */			\
+        unsigned u = (uu >> 12) & 0x0f;					\
+        c = LEFT (b);							\
+        b = ((c << 4) + u * (RIGHT (b) - c) + 0x0080) >> 8;		\
+        c = LEFT (g);							\
+        g = (c + ((u * (RIGHT (g) - c) + 0x0100) >> 4)) & 0x03e0;	\
+        c = LEFT (r);							\
+        r = (((c << 4) + (u * (RIGHT (r) - c)) + 0x0200) & 0x7c00);	\
+        *_dest = r | g | b;						\
+        }								\
+        _dest++;							\
+        z_buffer++;							\
+        uu += duu;							\
+        vv += dvv;							\
+        izz += dzz;							\
+      }									\
+      while (_dest <= _destend);
+#include "scanln.inc"
+
+#endif // NO_555_scan_map_filt2_ztest
 
 //----------------------------------------------------------------------------//
 
@@ -599,6 +869,18 @@ void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
+#ifndef NO_555_scan_map_alpha_znone
+
+#define A_SCANFUNC csScan_16_555_scan_map_alpha_znone
+#define A_ZNONE
+#define A_MAP
+#define A_R5G5B5
+#include "scanalph.inc"
+
+#endif // NO_555_scan_map_alpha_znone
+
+//------------------------------------------------------------------
+
 #ifndef NO_555_scan_map_alpha_zfil
 
 #define A_SCANFUNC csScan_16_555_scan_map_alpha_zfil
@@ -620,6 +902,30 @@ void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
 #include "scanalph.inc"
 
 #endif // NO_555_scan_map_alpha_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_map_alpha_ztest
+
+#define A_SCANFUNC csScan_16_555_scan_map_alpha_ztest
+#define A_ZTEST
+#define A_MAP
+#define A_R5G5B5
+#include "scanalph.inc"
+
+#endif // NO_555_scan_map_alpha_ztest
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_map_alpha_znone
+
+#define A_SCANFUNC csScan_16_565_scan_map_alpha_znone
+#define A_ZNONE
+#define A_MAP
+#define A_R5G6B5
+#include "scanalph.inc"
+
+#endif // NO_565_scan_map_alpha_znone
 
 //------------------------------------------------------------------
 
@@ -647,6 +953,29 @@ void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
+#ifndef NO_565_scan_map_alpha_ztest
+
+#define A_SCANFUNC csScan_16_565_scan_map_alpha_ztest
+#define A_ZTEST
+#define A_MAP
+#define A_R5G6B5
+#include "scanalph.inc"
+
+#endif // NO_565_scan_map_alpha_ztest
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_tex_alpha_znone
+
+#define A_SCANFUNC csScan_16_555_scan_tex_alpha_znone
+#define A_ZNONE
+#define A_R5G5B5
+#include "scanalph.inc"
+
+#endif // NO_555_scan_tex_alpha_znone
+
+//------------------------------------------------------------------
+
 #ifndef NO_555_scan_tex_alpha_zfil
 
 #define A_SCANFUNC csScan_16_555_scan_tex_alpha_zfil
@@ -669,6 +998,28 @@ void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
+#ifndef NO_555_scan_tex_alpha_ztest
+
+#define A_SCANFUNC csScan_16_555_scan_tex_alpha_ztest
+#define A_ZTEST
+#define A_R5G5B5
+#include "scanalph.inc"
+
+#endif // NO_555_scan_tex_alpha_ztest
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_tex_alpha_znone
+
+#define A_SCANFUNC csScan_16_565_scan_tex_alpha_znone
+#define A_ZNONE
+#define A_R5G6B5
+#include "scanalph.inc"
+
+#endif // NO_565_scan_tex_alpha_znone
+
+//------------------------------------------------------------------
+
 #ifndef NO_565_scan_tex_alpha_zfil
 
 #define A_SCANFUNC csScan_16_565_scan_tex_alpha_zfil
@@ -688,6 +1039,17 @@ void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
 #include "scanalph.inc"
 
 #endif // NO_565_scan_tex_alpha_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_tex_alpha_ztest
+
+#define A_SCANFUNC csScan_16_565_scan_tex_alpha_ztest
+#define A_ZTEST
+#define A_R5G6B5
+#include "scanalph.inc"
+
+#endif // NO_565_scan_tex_alpha_ztest
 
 //------------------------------------------------------------------
 
@@ -726,6 +1088,18 @@ void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
+#ifndef NO_555_scan_pi_tex_alpha_ztest
+
+#define A_SCANFUNC csScan_16_555_scan_pi_tex_alpha_ztest
+#define A_PI
+#define A_R5G5B5
+#define A_ZTEST
+#include "scanalph.inc"
+
+#endif // NO_555_scan_pi_tex_alpha_ztest
+
+//------------------------------------------------------------------
+
 #ifndef NO_565_scan_pi_tex_alpha_znone
 
 #define A_SCANFUNC csScan_16_565_scan_pi_tex_alpha_znone
@@ -758,6 +1132,18 @@ void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
 #include "scanalph.inc"
 
 #endif // NO_565_scan_pi_tex_alpha_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_tex_alpha_ztest
+
+#define A_SCANFUNC csScan_16_565_scan_pi_tex_alpha_ztest
+#define A_PI
+#define A_R5G6B5
+#define A_ZTEST
+#include "scanalph.inc"
+
+#endif // NO_565_scan_pi_tex_alpha_ztest
 
 //------------------------------------------------------------------
 
@@ -796,6 +1182,18 @@ void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
+#ifndef NO_scan_pi_flat_ztest
+
+#define PI_SCANFUNC csScan_16_scan_pi_flat_ztest
+#define PI_ZTEST
+#define PI_FLAT
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_flat_ztest
+
+//------------------------------------------------------------------
+
 #ifndef NO_scan_pi_tex_znone
 
 #define PI_SCANFUNC csScan_16_scan_pi_tex_znone
@@ -825,6 +1223,17 @@ void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
 #include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_ztest
+
+#define PI_SCANFUNC csScan_16_scan_pi_tex_ztest
+#define PI_ZTEST
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_ztest
 
 //------------------------------------------------------------------
 
@@ -860,6 +1269,18 @@ void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
 #include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_key_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_key_ztest
+
+#define PI_SCANFUNC csScan_16_scan_pi_tex_key_ztest
+#define PI_ZTEST
+#define PI_COLORKEY
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_key_ztest
 
 //------------------------------------------------------------------
 
@@ -939,6 +1360,32 @@ void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
+#ifndef NO_555_scan_pi_flat_fx_ztest
+
+#define PI_SCANFUNC csScan_16_555_scan_pi_flat_fx_ztest
+#define PI_ZTEST
+#define PI_FLAT
+#define PI_BLEND
+#define PI_R5G5B5
+#include "scanpi.inc"
+
+#endif // NO_555_scan_pi_flat_fx_ztest
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_flat_fx_ztest
+
+#define PI_SCANFUNC csScan_16_565_scan_pi_flat_fx_ztest
+#define PI_ZTEST
+#define PI_FLAT
+#define PI_BLEND
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_565_scan_pi_flat_fx_ztest
+
+//------------------------------------------------------------------
+
 #ifndef NO_555_scan_pi_tex_fx_znone
 
 #define PI_SCANFUNC csScan_16_555_scan_pi_tex_fx_znone
@@ -1006,6 +1453,30 @@ void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
 #include "scanpi.inc"
 
 #endif // NO_565_scan_pi_tex_fx_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_pi_tex_fx_ztest
+
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_fx_ztest
+#define PI_ZTEST
+#define PI_BLEND
+#define PI_R5G5B5
+#include "scanpi.inc"
+
+#endif // NO_555_scan_pi_tex_fx_ztest
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_tex_fx_ztest
+
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_fx_ztest
+#define PI_ZTEST
+#define PI_BLEND
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_565_scan_pi_tex_fx_ztest
 
 //------------------------------------------------------------------
 
@@ -1085,6 +1556,32 @@ void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
+#ifndef NO_555_scan_pi_tex_fxkey_ztest
+
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_fxkey_ztest
+#define PI_ZTEST
+#define PI_COLORKEY
+#define PI_BLEND
+#define PI_R5G5B5
+#include "scanpi.inc"
+
+#endif // NO_555_scan_pi_tex_fxkey_ztest
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_tex_fxkey_ztest
+
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_fxkey_ztest
+#define PI_ZTEST
+#define PI_COLORKEY
+#define PI_BLEND
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_565_scan_pi_tex_fxkey_ztest
+
+//------------------------------------------------------------------
+
 #ifndef NO_555_scan_pi_flat_gou_znone
 
 #define PI_SCANFUNC csScan_16_555_scan_pi_flat_gou_znone
@@ -1161,6 +1658,32 @@ void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
+#ifndef NO_555_scan_pi_flat_gou_ztest
+
+#define PI_SCANFUNC csScan_16_555_scan_pi_flat_gou_ztest
+#define PI_ZTEST
+#define PI_FLAT
+#define PI_GOURAUD
+#define PI_R5G5B5
+#include "scanpi.inc"
+
+#endif // NO_555_scan_pi_flat_gou_ztest
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_flat_gou_ztest
+
+#define PI_SCANFUNC csScan_16_565_scan_pi_flat_gou_ztest
+#define PI_ZTEST
+#define PI_FLAT
+#define PI_GOURAUD
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_565_scan_pi_flat_gou_ztest
+
+//------------------------------------------------------------------
+
 #ifndef NO_555_scan_pi_tex_gou_znone
 
 #define PI_SCANFUNC csScan_16_555_scan_pi_tex_gou_znone
@@ -1228,6 +1751,30 @@ void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
 #include "scanpi.inc"
 
 #endif // NO_565_scan_pi_tex_gou_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_pi_tex_gou_ztest
+
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_gou_ztest
+#define PI_ZTEST
+#define PI_GOURAUD
+#define PI_R5G5B5
+#include "scanpi.inc"
+
+#endif // NO_555_scan_pi_tex_gou_ztest
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_tex_gou_ztest
+
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_gou_ztest
+#define PI_ZTEST
+#define PI_GOURAUD
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_565_scan_pi_tex_gou_ztest
 
 //------------------------------------------------------------------
 
@@ -1304,6 +1851,32 @@ void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
 #include "scanpi.inc"
 
 #endif // NO_565_scan_pi_tex_goukey_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_pi_tex_goukey_ztest
+
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_goukey_ztest
+#define PI_ZTEST
+#define PI_GOURAUD
+#define PI_COLORKEY
+#define PI_R5G5B5
+#include "scanpi.inc"
+
+#endif // NO_555_scan_pi_tex_goukey_ztest
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_tex_goukey_ztest
+
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_goukey_ztest
+#define PI_ZTEST
+#define PI_GOURAUD
+#define PI_COLORKEY
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_565_scan_pi_tex_goukey_ztest
 
 //------------------------------------------------------------------
 
@@ -1389,6 +1962,34 @@ void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
+#ifndef NO_555_scan_pi_flat_goufx_ztest
+
+#define PI_SCANFUNC csScan_16_555_scan_pi_flat_goufx_ztest
+#define PI_ZTEST
+#define PI_FLAT
+#define PI_GOURAUD
+#define PI_BLEND
+#define PI_R5G5B5
+#include "scanpi.inc"
+
+#endif // NO_555_scan_pi_flat_goufx_ztest
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_flat_goufx_ztest
+
+#define PI_SCANFUNC csScan_16_565_scan_pi_flat_goufx_ztest
+#define PI_ZTEST
+#define PI_FLAT
+#define PI_GOURAUD
+#define PI_BLEND
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_565_scan_pi_flat_goufx_ztest
+
+//------------------------------------------------------------------
+
 #ifndef NO_555_scan_pi_tex_goufx_znone
 
 #define PI_SCANFUNC csScan_16_555_scan_pi_tex_goufx_znone
@@ -1462,6 +2063,32 @@ void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
 #include "scanpi.inc"
 
 #endif // NO_565_scan_pi_tex_goufx_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_pi_tex_goufx_ztest
+
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_goufx_ztest
+#define PI_ZTEST
+#define PI_GOURAUD
+#define PI_BLEND
+#define PI_R5G5B5
+#include "scanpi.inc"
+
+#endif // NO_555_scan_pi_tex_goufx_ztest
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_tex_goufx_ztest
+
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_goufx_ztest
+#define PI_ZTEST
+#define PI_GOURAUD
+#define PI_BLEND
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_565_scan_pi_tex_goufx_ztest
 
 //------------------------------------------------------------------
 
@@ -1544,5 +2171,33 @@ void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
 #include "scanpi.inc"
 
 #endif // NO_565_scan_pi_tex_goufxkey_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_pi_tex_goufxkey_ztest
+
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_goufxkey_ztest
+#define PI_ZTEST
+#define PI_GOURAUD
+#define PI_COLORKEY
+#define PI_BLEND
+#define PI_R5G5B5
+#include "scanpi.inc"
+
+#endif // NO_555_scan_pi_tex_goufxkey_ztest
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_tex_goufxkey_ztest
+
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_goufxkey_ztest
+#define PI_ZTEST
+#define PI_GOURAUD
+#define PI_COLORKEY
+#define PI_BLEND
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_565_scan_pi_tex_goufxkey_ztest
 
 //------------------------------------------------------------------
