@@ -20,7 +20,12 @@
 #ifndef __CS_GL2D_FONT_H__
 #define __CS_GL2D_FONT_H__
 
+#if defined(CS_OPENGL_PATH)
+#include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+#else
 #include <GL/gl.h>
+#endif
+
 #include "csutil/csvector.h"
 #include "ivideo/fontserv.h"
 

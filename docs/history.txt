@@ -25,6 +25,21 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine changed the SCF name for the 3D engine from
 	  crystalspace.engine.core to crystalspace.engine.3d in order to
 	  complement the existing crystalspace.engine.iso SCF class name.
+	- Eric Sunshine added the CS_HEADER_GLOBAL() and CS_HEADER_LOCAL()
+	  preprocessor macros to cssysdef.h.  These macros are used to compose
+	  header file include paths.  This is useful in cases where the
+	  location of a header file varies from platform to platform and one
+	  does not have the opportunity to augment the preprocessor's header
+	  file search path.  For instance, on most platforms, OpenGL headers
+	  are located in a `GL' subdirectory, however on other platforms they
+	  are located in an `OpenGL' subdirectory.  For instance, assuming that
+	  a platform has defined the preprocessor macro GLPATH with the value
+	  `OpenGL', then it can include the gl.h header by invoking:
+	    #include CS_HEADER_GLOBAL(GLPATH,gl.h)
+	- Eric Sunshine adjusted plugins/video/renderer/opengl and
+	  plugins/video/canvas/openglcommon to respect the OpenGL path
+	  specified via CS_OPENGL_PATH by utilizing the new CS_HEADER_GLOBAL()
+	  macro when including OpenGL headers.
 26-Jun-2001
 	- Philip updated the win32gcc.txi doc to add explanation about
 	  PYTHONPATH environment variable.

@@ -38,5 +38,5 @@ NEXT.FRIEND=yes
 include libs/cssys/next/next.mak
 NEXT.FRIEND=no
 
-CFLAGS.GL3D=-D'CS_OPENGL_PATH(X)=<OpenGL/\#\#X\#\#>' -FOpenGL
+CFLAGS.GL3D=-D'CS_OPENGL_PATH=OpenGL' -FOpenGL
 LIBS.OPENGL.SYSTEM=-framework OpenGL

@@ -25,7 +25,7 @@
 #include "isys/event.h"
 
 #if defined(CS_OPENGL_PATH)
-#include CS_OPENGL_PATH(gl.h)
+#include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
 #else
 #include <GL/gl.h>
 #endif
@@ -88,8 +88,8 @@ void csOpenGLProcBackBuffer::Prepare (csGraphics3DOGLCommon *g3d,
   // We are going to use an inverted orthographic projection matrix
   inverted = true;
 
-  // Set up a temporary buffer for glReadPixel conversions when the texture is not
-  // in the cache.
+  // Set up a temporary buffer for glReadPixel conversions when the texture is
+  // not in the cache.
 
   if (pfmt.PixelBytes == 2)
   {
@@ -120,8 +120,8 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
     // We set this transform to be the size of the procedural texture and to be
-    // inverted so that all the action takes place on the lower left hand corner
-    // of the screen and upside down.
+    // inverted so that all the action takes place on the lower left hand
+    // corner of the screen and upside down.
     glOrtho (0., (GLdouble) width, (GLdouble) height, 0., -1.0, 10.0);
 
     glMatrixMode (GL_MODELVIEW);
@@ -137,7 +137,8 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
       texture_cache->Cache (tex_mm);
 
       // Get texture handle
-      GLuint texturehandle = ((csTxtCacheData *)tex_mm->GetCacheData ())->Handle;
+      GLuint texturehandle =
+        ((csTxtCacheData *)tex_mm->GetCacheData ())->Handle;
       glShadeModel (GL_FLAT);
       glEnable (GL_TEXTURE_2D);
       glColor4f (1.,1.,1.,1.);
@@ -351,8 +352,8 @@ csImageArea *csOpenGLProcBackBuffer2D::SaveArea (int x, int y, int w, int h)
   return g2d->SaveArea (x, frame_height - height + y, w, h); 
 }
 
-void csOpenGLProcBackBuffer2D::Write (iFont *font, int x, int y, int fg, int bg,
-  const char *str)
+void csOpenGLProcBackBuffer2D::Write (iFont *font, int x, int y,
+  int fg, int bg, const char *str)
 { 
   g2d->Write (font, x, frame_height - height + y, fg, bg, str); 
 }
@@ -368,7 +369,7 @@ int csOpenGLProcBackBuffer2D::GetHeight ()
 }
 
 void csOpenGLProcBackBuffer2D::GetPixel (int x, int y, 
-					    UByte &oR, UByte &oG, UByte &oB)
+  UByte &oR, UByte &oG, UByte &oB)
 { 
   g2d->GetPixel (x, frame_height - height + y, oR, oG, oB); 
 }

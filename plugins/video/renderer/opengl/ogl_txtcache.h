@@ -25,7 +25,7 @@
 #include "ivideo/graph3d.h"
 
 #if defined(CS_OPENGL_PATH)
-#include CS_OPENGL_PATH(gl.h)
+#include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
 #else
 #include <GL/gl.h>
 #endif

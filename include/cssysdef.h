@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
     Written by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -330,6 +330,40 @@
 #ifdef SYSDEF_SELECT
 #  include <sys/select.h>
 #endif
+
+/**
+ * The CS_HEADER_GLOBAL() macro composes a pathname from two components and
+ * wraps the path in `<' and `>'.  This macro is useful in cases where one does
+ * not have the option of augmenting the preprocessor's header search path,
+ * even though the include path for some header file may vary from platform to
+ * platform.  For instance, on many platforms OpenGL headers are in a `GL'
+ * directory, whereas on other platforms they are in an `OpenGL' directory.  As
+ * an example, in the first case, the platform might define the preprocessor
+ * macro GLPATH with the value `GL', and in the second case GLPATH would be
+ * given the value `OpenGL'.  To actually include an OpenGL header, such as
+ * gl.h, the following code would be used:
+ * <pre>
+ * #include CS_HEADER_GLOBAL(GLPATH,gl.h)
+ * </pre>
+ */
+#define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+#define CS_HEADER_GLOBAL_COMPOSE(X,Y) < ## X ## / ## Y ## >
+
+/**
+ * The CS_HEADER_LOCAL() macro composes a pathname from two components and
+ * wraps the path in double-quotes.  This macro is useful in cases where one
+ * does not have the option of augmenting the preprocessor's header search
+ * path, even though the include path for some header file may vary from
+ * platform to platform.  For example, assuming that the preprocessor macro
+ * UTILPATH is defined with some platform-specific value, to actually include a
+ * header, such as util.h, the following code would be used:
+ * <pre>
+ * #include CS_HEADER_LOCAL(UTILPATH,util.h)
+ * </pre>
+ */
+#define CS_HEADER_LOCAL(X,Y) CS_HEADER_LOCAL_COMPOSE1(X,Y)
+#define CS_HEADER_LOCAL_COMPOSE1(X,Y) CS_HEADER_LOCAL_COMPOSE2(X ## / ## Y)
+#define CS_HEADER_LOCAL_COMPOSE2(X) #X
 
 /**
  * The CS_IMPLEMENT_PLUGIN macro should be placed at the global scope in
