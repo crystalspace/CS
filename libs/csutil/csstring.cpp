@@ -19,6 +19,7 @@
 
 #include "csutil/csstring.h"
 
+NO_MODULE_LOCK(a)
 IMPLEMENT_UNKNOWN(csString)
 
 BEGIN_INTERFACE_TABLE(csString)

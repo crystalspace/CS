@@ -22,6 +22,7 @@
 #define __INIFILE_H__
 
 #include "csutil/csvector.h"
+#include "csutil/strlist.h"
 
 class csVFS;
 
@@ -91,6 +92,10 @@ public:
   /// Enumerate sections in INI file: call iterator for each section
   bool EnumSections (const char *SectionPath, bool (*iterator)
     (csSome Parm, char *Name), csSome Parm) const;
+
+	/// Enumerate sections, but doesn't use crappy iterator
+	bool EnumSections(csSTRList* List); 
+
   /// Enumerate data entries: call iterator for each data entry
   bool EnumData (const char *SectionPath, bool (*iterator)
     (csSome Parm, char *Name, size_t DataSize, csSome Data), csSome Parm) const;

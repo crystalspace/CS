@@ -518,6 +518,25 @@ bool csIniFile::EnumSections (const char *SectionPath, bool (*iterator)
   return (true);
 }
 
+bool csIniFile::EnumSections(csSTRList* List) {
+  int i, j;
+  PrvINIbranch *Sec = FindNode (NULL);
+
+  if (!Sec)
+    return (false);
+
+  j = Sec->Length ();
+
+  for (i = 0; i < j; i++)
+  {
+    PrvINInode *cn = (PrvINInode *)(*Sec)[i];
+
+    if (cn->Type == TYPE_SECTION)
+			List->Add(cn->Section.Name);	      
+  }
+  return (true);
+}
+
 bool csIniFile::EnumData (const char *SectionPath, bool (*iterator)
   (csSome Parm, char *Name, size_t DataSize, csSome Data), csSome Parm) const
 {

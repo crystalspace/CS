@@ -147,6 +147,15 @@ inline void csVector::QuickSort (int Mode)
     QuickSort (0, count - 1, Mode);
 }
 
+class csUnknownVector:public csVector {
+public:
+	csUnknownVector(int ilimit = 8, int ithreshold = 16) 
+		:csVector(ilimit, ithreshold) {}
+
+	bool FreeItem(csSome Item) { ((IUnknown*)Item)->Release(); return 1; }
+};
+
+
 /* These macros will create a type-safe wrapper for csVector which manages
  * pointers to some type.
  *
@@ -169,34 +178,34 @@ inline void csVector::QuickSort (int Mode)
 class NAME : protected BASE					\
 {								\
 public:								\
-  NAME (int ilimit = 8, int ithreshold = 16) :			\
-    BASE (ilimit, ithreshold) {}				\
-  inline TYPE*& operator [] (int n)				\
-  { return (TYPE*&)BASE::operator [] (n); }			\
-  inline TYPE*& Get (int n) const				\
-  { return (TYPE*&)BASE::Get (n); }				\
-  inline TYPE*& operator [] (int n) const			\
-  { return Get (n); }						\
-  void SetLength (int n)					\
-  { BASE::SetLength (n); }					\
-  inline int Length () const					\
-  { return BASE::Length (); }					\
-  int Find (TYPE* which) const					\
-  { return BASE::Find (which); }				\
-  int FindKey (const TYPE* value) const				\
-  { return BASE::FindKey (value); }				\
-  inline void Push (TYPE* what)					\
-  { BASE::Push (what); }					\
-  inline TYPE* Pop ()						\
-  { return (TYPE*)BASE::Pop (); }				\
-  bool Delete (int n)						\
-  { return BASE::Delete (n); }					\
-  void DeleteAll ()						\
-  { BASE::DeleteAll (); }					\
-  bool Insert (int n, TYPE* Item)				\
-  { return BASE::Insert (n, Item); }				\
-  virtual bool FreeItem (TYPE* Item)				\
-  { return BASE::FreeItem (Item); }				\
+    NAME (int ilimit = 8, int ithreshold = 16) :			\
+      BASE (ilimit, ithreshold) {}				\
+    inline TYPE*& operator [] (int n)				\
+    { return (TYPE*&)BASE::operator [] (n); }			\
+    inline TYPE*& Get (int n) const				\
+    { return (TYPE*&)BASE::Get (n); }				\
+    inline TYPE*& operator [] (int n) const			\
+    { return Get (n); }						\
+    void SetLength (int n)					\
+    { BASE::SetLength (n); }					\
+    inline int Length () const					\
+    { return BASE::Length (); }					\
+    int Find (TYPE* which) const					\
+    { return BASE::Find (which); }				\
+    int FindKey (const TYPE* value) const				\
+    { return BASE::FindKey (value); }				\
+    inline void Push (TYPE* what)					\
+    { BASE::Push (what); }					\
+    inline TYPE* Pop ()						\
+    { return (TYPE*)BASE::Pop (); }				\
+    bool Delete (int n)						\
+    { return BASE::Delete (n); }					\
+    void DeleteAll ()						\
+    { BASE::DeleteAll (); }					\
+    bool Insert (int n, TYPE* Item)				\
+    { return BASE::Insert (n, Item); }				\
+    virtual bool FreeItem (TYPE* Item)				\
+    { return BASE::FreeItem (Item); }				\
 };
 
 #define DECLARE_TYPED_VECTOR(NAME,TYPE)				\

@@ -21,14 +21,26 @@
 #ifndef __CSBASE_H__
 #define __CSBASE_H__
 
+#include "cscom/com.h"
+#include "css/cssdefs.h"
+
 /**
  * Base class, all other CrystalSpace classes should be derived from this.
  */
-class csBase
+extern const GUID IID_IBase;
+
+/// Interface for csBase
+interface IBase:public IUnknown {
+};
+
+/// Class csBase
+class csBase:public IBase
 {
 public:
   ///
   virtual ~csBase () {}
+
+	DEFAULT_COM(Base);
 };
 
 #endif // __CSBASE_H__

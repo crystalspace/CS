@@ -23,6 +23,9 @@
 #include "sysdef.h"
 #include "csutil/csvector.h"
 
+NO_MODULE_LOCK(a)
+IMPLEMENT_DEFAULT_COM(Base)
+
 csVector::csVector (int ilimit, int ithreshold)
 {
   root = (csSome *)malloc ((limit = ilimit) * sizeof (csSome));
