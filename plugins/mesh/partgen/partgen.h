@@ -78,7 +78,7 @@ protected:
   iMeshObjectDrawCallback* vis_cb;
 
   /// Pointer to a mesh object factory for 2D sprites.
-  iMeshObjectFactory* spr_factory;
+  csRef<iMeshObjectFactory> spr_factory;
   /// Previous time.
   csTicks prev_time;
   long shapenr;

@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+11-Sep-2002
+	- Further csPtr/csRef cleanups by removing the cast operator.
 10-Sep-2002
 	- iLoaderPlugin and iBinaryLoaderPlugin->Parse() now return a
 	  csPtr.

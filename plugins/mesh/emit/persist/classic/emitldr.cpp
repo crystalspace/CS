@@ -156,50 +156,51 @@ csEmitFactoryLoader::csEmitFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csEmitFactoryLoader::~csEmitFactoryLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csEmitFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csEmitFactoryLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
 csPtr<iBase> csEmitFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext*, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.emit", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+		iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.emit", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.emit",
     	iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.emit\n");
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  if (fact) fact->IncRef ();	// To prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
 csPtr<iBase> csEmitFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.emit", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+		iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.emit", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.emit",
     	iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.emit\n");
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  if (fact) fact->IncRef ();	// To prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -209,18 +210,15 @@ csEmitFactorySaver::csEmitFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csEmitFactorySaver::~csEmitFactorySaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csEmitFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csEmitFactorySaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
@@ -237,22 +235,15 @@ csEmitLoader::csEmitLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
-  reporter = NULL;
-  synldr = NULL;
 }
 
 csEmitLoader::~csEmitLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
-  SCF_DEC_REF (reporter);
 }
 
 bool csEmitLoader::Initialize (iObjectRegistry* object_reg)
 {
   csEmitLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
 
@@ -599,10 +590,10 @@ csPtr<iBase> csEmitLoader::Parse (const char* string,
   char str[255];
 
   iEmitGen3D *emit;
-  iMeshObject* mesh = NULL;
-  iParticleState* partstate = NULL;
-  iEmitFactoryState* emitfactorystate = NULL;
-  iEmitState* emitstate = NULL;
+  csRef<iMeshObject> mesh;
+  csRef<iParticleState> partstate;
+  csRef<iEmitFactoryState> emitfactorystate;
+  csRef<iEmitState> emitstate;
 
   csParser* parser = ldr_context->GetParser ();
 
@@ -612,10 +603,6 @@ csPtr<iBase> csEmitLoader::Parse (const char* string,
     if (!params)
     {
       // @@@ Error handling!
-      SCF_DEC_REF (mesh);
-      SCF_DEC_REF (partstate);
-      SCF_DEC_REF (emitstate);
-      SCF_DEC_REF (emitfactorystate);
       return NULL;
     }
     switch (cmd)
@@ -627,10 +614,6 @@ csPtr<iBase> csEmitLoader::Parse (const char* string,
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
-            SCF_DEC_REF (mesh);
-            SCF_DEC_REF (partstate);
-            SCF_DEC_REF (emitstate);
-            SCF_DEC_REF (emitfactorystate);
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -648,10 +631,6 @@ csPtr<iBase> csEmitLoader::Parse (const char* string,
 	  {
 	    printf ("Could not find material '%s'!\n", str);
             // @@@ Error handling!
-            SCF_DEC_REF (mesh);
-            SCF_DEC_REF (partstate);
-            SCF_DEC_REF (emitstate);
-            SCF_DEC_REF (emitfactorystate);
             return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
@@ -746,9 +725,7 @@ csPtr<iBase> csEmitLoader::Parse (const char* string,
     }
   }
 
-  SCF_DEC_REF (partstate);
-  SCF_DEC_REF (emitstate);
-  SCF_DEC_REF (emitfactorystate);
+  if (mesh) mesh->IncRef ();	// To avoid smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -939,19 +916,15 @@ csEmitSaver::csEmitSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csEmitSaver::~csEmitSaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
 }
 
 bool csEmitSaver::Initialize (iObjectRegistry* object_reg)
 {
   csEmitSaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
@@ -962,49 +935,45 @@ static void WriteEmit(csString& str, iEmitGen3D *emit)
   char buf[MAXLINE];
   csVector3 a,b;
   float p, q, r, s, t;
-  iEmitFixed *efixed = SCF_QUERY_INTERFACE(emit, iEmitFixed);
+  csRef<iEmitFixed> efixed (SCF_QUERY_INTERFACE(emit, iEmitFixed));
   if(efixed)
   {
     /// b is ignored
     efixed->GetValue(a, b);
     sprintf(buf, "  EMITFIXED(%g, %g, %g)\n", a.x, a.y, a.z);
     str.Append(buf);
-    efixed->DecRef();
     return;
   }
-  iEmitSphere *esphere = SCF_QUERY_INTERFACE(emit, iEmitSphere);
+  csRef<iEmitSphere> esphere (SCF_QUERY_INTERFACE(emit, iEmitSphere));
   if(esphere)
   {
     esphere->GetContent(a, p, q);
     sprintf(buf, "  EMITSPHERE(%g,%g,%g, %g, %g)\n", a.x, a.y, a.z, p, q);
     str.Append(buf);
-    esphere->DecRef();
     return;
   }
-  iEmitBox *ebox = SCF_QUERY_INTERFACE(emit, iEmitBox);
+  csRef<iEmitBox> ebox (SCF_QUERY_INTERFACE(emit, iEmitBox));
   if(ebox)
   {
     ebox->GetContent(a, b);
     sprintf(buf, "  EMITBOX(%g,%g,%g, %g,%g,%g)\n", a.x,a.y,a.z, b.x,b.y,b.z);
     str.Append(buf);
-    ebox->DecRef();
     return;
   }
-  iEmitCone *econe = SCF_QUERY_INTERFACE(emit, iEmitCone);
+  csRef<iEmitCone> econe (SCF_QUERY_INTERFACE(emit, iEmitCone));
   if(econe)
   {
     econe->GetContent(a, p, q, r, s, t);
     sprintf(buf, "  EMITCONE(%g,%g,%g, %g, %g, %g, %g, %g)\n", a.x,a.y,a.z,
       p, q, r, s, t);
     str.Append(buf);
-    econe->DecRef();
     return;
   }
-  iEmitMix *emix = SCF_QUERY_INTERFACE(emit, iEmitMix);
+  csRef<iEmitMix> emix (SCF_QUERY_INTERFACE(emit, iEmitMix));
   if(emix)
   {
-	int i;
-	float w;
+    int i;
+    float w;
     for(i=0; i<emix->GetEmitterCount(); i++)
     {
       iEmitGen3D *gen;
@@ -1014,47 +983,42 @@ static void WriteEmit(csString& str, iEmitGen3D *emit)
       WriteEmit(str, gen);
       str.Append("  )\n");
     }
-    emix->DecRef();
     return;
   }
-  iEmitLine *eline = SCF_QUERY_INTERFACE(emit, iEmitLine);
+  csRef<iEmitLine> eline (SCF_QUERY_INTERFACE(emit, iEmitLine));
   if(eline)
   {
     eline->GetContent(a, b);
     sprintf(buf, "  EMITLINE(%g,%g,%g, %g,%g,%g)\n", a.x,a.y,a.z, b.x,b.y,b.z);
     str.Append(buf);
-    eline->DecRef();
     return;
   }
-  iEmitCylinder *ecyl = SCF_QUERY_INTERFACE(emit, iEmitCylinder);
+  csRef<iEmitCylinder> ecyl (SCF_QUERY_INTERFACE(emit, iEmitCylinder));
   if(ecyl)
   {
     ecyl->GetContent(a, b, p, q);
     sprintf(buf, "  EMITCYLINDER(%g,%g,%g, %g,%g,%g, %g, %g)\n", a.x,a.y,a.z,
       b.x,b.y,b.z, p, q);
     str.Append(buf);
-    ecyl->DecRef();
     return;
   }
-  iEmitCylinderTangent *ecyltan =
-    SCF_QUERY_INTERFACE(emit, iEmitCylinderTangent);
+  csRef<iEmitCylinderTangent> ecyltan (
+    SCF_QUERY_INTERFACE(emit, iEmitCylinderTangent));
   if(ecyltan)
   {
     ecyltan->GetContent(a, b, p, q);
     sprintf(buf, "  EMITCYLINDERTANGENT(%g,%g,%g, %g,%g,%g, %g, %g)\n",
       a.x,a.y,a.z, b.x,b.y,b.z, p, q);
     str.Append(buf);
-    ecyltan->DecRef();
     return;
   }
-  iEmitSphereTangent *espheretan =
-    SCF_QUERY_INTERFACE(emit, iEmitSphereTangent);
+  csRef<iEmitSphereTangent> espheretan (
+    SCF_QUERY_INTERFACE(emit, iEmitSphereTangent));
   if(espheretan)
   {
     espheretan->GetContent(a, p, q);
     sprintf(buf, "  EMITSPHERETANGENT(%g,%g,%g, %g, %g)\n", a.x,a.y,a.z, p, q);
     str.Append(buf);
-    espheretan->DecRef();
     return;
   }
   printf ("Unknown emitter type, cannot writedown!\n");
@@ -1063,9 +1027,9 @@ static void WriteEmit(csString& str, iEmitGen3D *emit)
 void csEmitSaver::WriteDown (iBase* obj, iFile *file)
 {
   csString str;
-  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
-  iParticleState *partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
-  iEmitState *state = SCF_QUERY_INTERFACE (obj, iEmitState);
+  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
+  csRef<iParticleState> partstate (SCF_QUERY_INTERFACE (obj, iParticleState));
+  csRef<iEmitState> state (SCF_QUERY_INTERFACE (obj, iEmitState));
   char buf[MAXLINE];
   char name[MAXLINE];
 
@@ -1131,8 +1095,4 @@ void csEmitSaver::WriteDown (iBase* obj, iFile *file)
   }
 
   file->Write ((const char*)str, str.Length ());
-
-  fact->DecRef();
-  partstate->DecRef();
-  state->DecRef();
 }

@@ -41,7 +41,6 @@ struct iEmitFactoryState;
 class csEmitFactoryLoader : public iLoaderPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
 
 public:
@@ -78,7 +77,6 @@ public:
 class csEmitFactorySaver : public iSaverPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
 
 public:
@@ -110,10 +108,9 @@ public:
 class csEmitLoader : public iLoaderPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
-  iReporter* reporter;
+  csRef<iSyntaxService> synldr;
+  csRef<iReporter> reporter;
   csStringHash xmltokens;
 
   iEmitGen3D* ParseEmit (iDocumentNode* node,
@@ -153,9 +150,8 @@ public:
 class csEmitSaver : public iSaverPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
+  csRef<iSyntaxService> synldr;
 
 public:
   SCF_DECLARE_IBASE;

@@ -106,8 +106,8 @@ bool csCrossBuilder::BuildThing (iModelDataObject *Object, iThingState *tgt,
   {
     // test if this is a valid polygon
     // @@@ MEMORY LEAK???
-    iModelDataPolygon *Polygon =
-      SCF_QUERY_INTERFACE (it->GetObject (), iModelDataPolygon);
+    csRef<iModelDataPolygon> Polygon (
+      SCF_QUERY_INTERFACE (it->GetObject (), iModelDataPolygon));
     if (!Polygon || Polygon->GetVertexCount () < 3)
     {
       it->Next ();
@@ -151,21 +151,21 @@ bool csCrossBuilder::BuildSpriteFactory (iModelDataObject *Object,
 iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
 	iModelData *Scene, iEngine *Engine, iMaterialWrapper *DefaultMaterial) const
 {
-  iMeshFactoryWrapper *MainWrapper = NULL;
+  csRef<iMeshFactoryWrapper> MainWrapper;
 
   csModelDataObjectIterator it (Scene->QueryObject ());
   while (!it.IsFinished ())
   {
-    iMeshFactoryWrapper *SubWrapper = Engine->CreateMeshFactory (
-      "crystalspace.mesh.object.sprite.3d", NULL);
+    csRef<iMeshFactoryWrapper> SubWrapper (Engine->CreateMeshFactory (
+      "crystalspace.mesh.object.sprite.3d", NULL));
     if (!SubWrapper)
     {
       // seems like building 3d sprites is impossible
       return NULL;
     }
 
-    iSprite3DFactoryState *sfState = SCF_QUERY_INTERFACE (
-      SubWrapper->GetMeshObjectFactory (), iSprite3DFactoryState);
+    csRef<iSprite3DFactoryState> sfState (SCF_QUERY_INTERFACE (
+      SubWrapper->GetMeshObjectFactory (), iSprite3DFactoryState));
     if (!sfState)
     {
       // impossible to query the correct interface, maybe because
@@ -176,7 +176,6 @@ iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
 
     sfState->SetMaterialWrapper (DefaultMaterial);
     BuildSpriteFactory (it.Get (), sfState);
-    sfState->DecRef ();
 
     if (MainWrapper)
     {
@@ -189,5 +188,6 @@ iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
     it.Next ();
   }
 
+  MainWrapper->IncRef ();	// IncRef() to avoid smart pointer release.
   return MainWrapper;
 }

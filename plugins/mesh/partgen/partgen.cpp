@@ -69,21 +69,19 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
   change_alpha = false;
   change_rotation = false;
   // bbox is empty.
-  spr_factory = NULL;
   prev_time = 0;
   MixMode = 0;
   vis_cb = NULL;
   mat = NULL;
   radius.Set (0, 0, 0);
   color.Set (0, 0, 0);
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.sprite.2d", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (
+	  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.sprite.2d", iMeshObjectType));
   if (!type) type = CS_LOAD_PLUGIN (plugin_mgr,
   	"crystalspace.mesh.object.sprite.2d", iMeshObjectType);
-  plugin_mgr->DecRef ();
   spr_factory = type->NewFactory ();
-  type->DecRef ();
   shapenr = 0;
   current_lod = 1;
   current_features = 0;
@@ -93,7 +91,6 @@ csParticleSystem::~csParticleSystem()
 {
   if (vis_cb) vis_cb->DecRef ();
   RemoveParticles ();
-  if (spr_factory) spr_factory->DecRef ();
 }
 
 void csParticleSystem::RemoveParticles ()
