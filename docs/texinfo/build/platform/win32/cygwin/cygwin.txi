@@ -1,3 +1,7 @@
 @c -*-texinfo-*-
 @node Cygwin, NeXT, MinGW, Platform Instructions
 @subsection Windows using Cygwin
+
+@uref{http://sources.redhat.com/cygwin/}
+
+@uref{http://sources.redhat.com/cygwin/setup.exe}
