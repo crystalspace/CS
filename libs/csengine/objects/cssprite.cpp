@@ -661,7 +661,8 @@ csSprite::csSprite () : csObject (), bbox (NULL)
 csSprite::~csSprite ()
 {
   while (dynamiclights) CHKB (delete dynamiclights);
-  RemoveFromSectors ();
+  csWorld::current_world->UnlinkSprite (this);
+  //RemoveFromSectors ();
 }
 
 void csSprite::MoveToSector (csSector* s)

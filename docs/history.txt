@@ -16,6 +16,9 @@ Short-term cleanups that need to be done:
 	- Decreased glOrtho setting in OpenGL renderer from 150 to 10 to
 	  make Z buffering precision better. This breaks the terrain engine
 	  on OpenGL right now but we need a better solution for that.
+	- Fixed deletion of sprites so that they clean up their entry
+	  in the world list at deletion. So it is now safe to do
+	  'delete spr'.
 7-Mar-2000
 	- Added LIGHTING(yes/no) option to skydomes to be able to disable
 	  lighting for the generated triangles.

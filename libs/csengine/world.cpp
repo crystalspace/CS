@@ -323,7 +323,8 @@ void csWorld::Clear ()
 {
   halos.DeleteAll ();
   collections.DeleteAll ();
-  sprites.DeleteAll ();
+  while (sprites.Length () > 0)
+    delete (csSprite*)sprites[0];
   sprite_templates.DeleteAll ();
   thing_templates.DeleteAll ();
   sectors.DeleteAll ();
