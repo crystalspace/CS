@@ -25,6 +25,7 @@
 #include "csengine/rview.h"
 #include "csengine/cscolor.h"
 #include "csengine/texture.h"
+#include "igraph3d.h"
 
 class Dumper;
 class csTextureList;
@@ -262,6 +263,10 @@ public:
    */
   static float cfg_lod_detail;
 
+protected:
+  DPFXMixMode MixMode;
+  float       Alpha;
+
 private:
   /// Object to world transformation.
   csVector3 v_obj2world;
@@ -366,6 +371,9 @@ public:
   ///
   void UnsetTexture ()
   { force_otherskin = false; }
+
+  //Sets the mode that is used, when drawing that sprite.
+  void SetMixmode(DPFXMixMode m, float a) {MixMode = m; Alpha = a;}
 
   /**
    * Set the transformation vector to move sprite to some position.
