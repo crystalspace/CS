@@ -1460,6 +1460,7 @@ WalkTest::WalkTest () : SysSystemDriver (), pos (0, 0, 0), velocity (0, 0, 0)
   wMissile_boom = NULL;
   wMissile_whoosh = NULL;
   cslogo = NULL;
+  world = NULL;
 
   wf = NULL;
   map_mode = MAP_OFF;
