@@ -18,18 +18,22 @@
 */
 #ifndef _ddgUtil_Class_
 #define _ddgUtil_Class_
-
+#ifdef DDG
+#include "ddg.h"
+#else
 #include "csterr/ddg.h"
 #include "types.h"
-
-#ifndef M_PI
-#define M_PI      3.14159265358979323846 
 #endif
-
+#ifndef M_PI
+#define M_PI      3.1415926535897932384626433832795028841971693993751
+#endif
 #ifdef WIN32
 #define MAXFLOAT  99999999
 #else
-//#include <strstream.h> 
+// Linux defines
+#ifdef DDG
+#include <strstream.h> 
+#endif
 #include <stdlib.h>
 #define sqrtf	sqrt
 #define cosf	cos
@@ -60,26 +64,33 @@ unsigned int const ddgAngle_res = 16;
 /// General utility object to perform conversions for angles.
 class WEXP ddgAngle
 {
-    ///
-    static float _cosTable[180*ddgAngle_res];
+    /// Cosine lookup table from 0 to 180 degrees.
+    static float _cosTable[180*ddgAngle_res+1];
+	/// ArcCosine lookup table from 0 to 1.
+    static float _acosTable[180*ddgAngle_res+1];
 public:
-    ///
-    ddgAngle();	/// Initializer.
+    /// Initializes lookup tables.
+    ddgAngle();
+	/// General purpose value of PI.
     static float pi;
-    ///
+    /// Input is angle in degrees.
     inline static float degtorad(float d) { return (d * (float)M_PI / 180.0f); }
-    ///
-    inline static float radtodef(float r) { return (r * 180.0f / (float)M_PI); }
-    ///
+    /// Input is angle in radians.
+    inline static float radtodeg(float r) { return (r * 180.0f / (float)M_PI); }
+    /// Input is angle in 0 to 1.
     inline static float ttorad(float t) { return (t * 2.0f * (float)M_PI); }
-    ///
+    /// Input is angle in degrees.
     inline static float mod(float a) { return a >= 360.0f ? a - 360.0f : ( a < 0.0f ? a + 360.0f : a ); }
-    ///
+    /// Input is angle in degrees.
     inline static float cotf(float a) { return cosf(a)/sinf(a); }
-    ///
+    /// Input is angle in degrees.
     static float cos( float angle);
-    ///
+    /// Input is angle in degrees.
     inline static float sin( float angle) { return cos(angle-90.0f);} 
+    /// Input is value from 0 to 1, Output is angle in degrees.
+    static float acos( float value);
+    /// Input is value from 0 to 1, Output is angle in degrees.
+    static float asin( float value) { return acos(1.0-value);}
 };
 
 #undef min
@@ -93,7 +104,7 @@ class WEXP ddgUtil
 public:
     /// return the clamped value of v so that v lies between a and b.
     inline static float clamp(float v, float a,float b)
-	{ return v < a ? a : (v > b ? b : v); }
+	{ return (v) < a ? a : ((v) > b ? b : (v)); }
     /// Linearly interpolate a value between a and b for x where v = 0->1
     inline static float linterp(float a, float b, float x)
 	{ return a + (b-a)*x;}
@@ -133,6 +144,58 @@ public:
 	/// The min of two float values.
 	inline static float abs( float v1)
 	{ return v1 > 0 ? v1:-v1; }
+	/// Detect if we have SIMD instructions.
+	static bool DetectSIMD(void);
+
+};
+
+
+
+/// A generic node class which can be maintained by a List.
+class WEXP ddgListNode
+{
+    /// Next node in the list.
+    ddgListNode* _next;
+public:
+    /// Construct a node.
+    inline ddgListNode() { _next = 0; }
+    /// return the next node.
+    inline ddgListNode* next( ddgListNode* t = 0 )
+	{
+		return (t? _next = t : _next); 
+	}
+};
+
+/// A generic list class which maintains a list of ListNodes.
+class WEXP ddgList
+{
+    /// Number of nodes in the list.
+    unsigned int _no;
+    /// The head of the list.
+    ddgListNode*  _head;
+public:
+    /// Constructor for an empty list.
+    ddgList() { _no = 0; _head = 0; }
+    /// Add a listnode to the list.
+    inline void add( ddgListNode* t) { t->next(_head); _head = t; _no++; }
+    /// Remove a specified list node from the list.
+    inline void remove( ddgListNode* t) {
+		ddgListNode *c = _head, *p = 0;
+		while(c)
+		{
+			if (t == c) 
+			{
+				_no--;
+				if (p) p->next(t->next());
+				if (p==_head) _head = t->next(); c=0;
+			}
+			else { p = c; c = c->next(); }
+        }
+    }
+    /// Return the size of the list.
+    inline unsigned int size() { return _no; }
+    /// Return the head of the list.
+    inline ddgListNode* head( ddgListNode *h = 0) { return (h? _head = h: _head); }
 };
 
 #endif

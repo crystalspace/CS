@@ -20,7 +20,13 @@
 #define _ddg_Class_
 
 #include <math.h>
-//#include <iostream.h> 
+#ifdef DDG
+#include <iostream.h>
+#else
+#include "sysdef.h"
+#include "csgeom/math3d.h"
+#define ddgVector3	csVector3
+#endif
 
 #ifdef WIN32
 // Windows defines
@@ -28,30 +34,32 @@
 #pragma warning (disable:4305)  // VC++ 5.0 version of above warning. 
 #include "strstrea.h"
 #include "stdlib.h"			// For exit()
-
-//I undefined the following defines, because they cause every application, 
-//that gets linked against the cspace lib to export all the ddg symbols.
-//you probably only need these, if you intend to make the ddg stuff
-//into its own dll.
-
-//#define WEXP	__declspec(dllexport) //Only needed for a standalone version...
-//#define WFEXP	__cdecl               //Only needed for a standalone version...  
-#define WEXP	
-#define WFEXP	
-
+#ifdef DDG
+#define WEXP	__declspec(dllexport)
+#define WFEXP	__cdecl
+#endif
 #else
 // Linux defines
-//#include <strstream.h> 
+#ifdef DDG
+#include <strstream.h> 
+#endif
 #include <stdlib.h>
-
+#endif
+// Define these if they are not yet defined
+#ifndef WEXP
 #define WEXP
 #define WFEXP
 #endif
 // Various assert macros.
 //
+#ifndef DDG
 #define ddgAssert(a)
 #define ddgAsserts(a,b)
 #define ddgMemorySet(a,b)
+#define ddgErrorSet(a,b)
+#define ddgSuccess false
+#define ddgFailure true
+#endif
 #ifndef WIN32
 #ifndef OPTIM
 #define _DEBUG

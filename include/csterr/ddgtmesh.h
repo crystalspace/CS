@@ -18,12 +18,22 @@
 */
 #ifndef _ddgMesh_Class_
 #define _ddgMesh_Class_
-
+#ifdef DDG
+#include "ddghemap.h"
+#include "ddgvec.h"
+#include "ddgcache.h"
+#ifdef HASH
+#include "ddghash.h"
+#else
+#include "ddgsplay.h"
+#endif
+#else
 #include "csterr/ddghemap.h"
 #include "csterr/ddgbbox.h"
 #include "csterr/ddgsplay.h"
 #include "csterr/ddgvec.h"
-
+#include "csterr/ddgcache.h"
+#endif
 class ddgTBinTree;
 class ddgTBinMesh;
 
@@ -70,7 +80,6 @@ public:
 	}
 };
 
-
 /**
  *  Vertex cache.
  * all vertices which are transformed to camera space
@@ -84,7 +93,7 @@ class WEXP ddgVCache {
 	/// Current size.
 	unsigned short _used;
 	/// Pointer to array of Vector3s.
-	csVector3		*_cache;
+	ddgVector3		*_cache;
 public:
 	/// Create cache.
 	ddgVCache();
@@ -93,12 +102,12 @@ public:
 	/// Initialize the cache.
 	void init (unsigned int size );
 	/// Get entry.
-	inline csVector3		*get(unsigned short index)
+	inline ddgVector3		*get(unsigned short index)
 	{
 		return &(_cache[index]);
 	}
 	/// New entry.
-	inline unsigned short	alloc(void)
+	inline unsigned short	allocate(void)
 	{
 		ddgAssert(_used + 1 < _size);
 		_used++;
@@ -111,6 +120,41 @@ public:
 	}
 };
 
+/**
+ * Triangle cache.
+ * the triangles which will be rendered a kept in this cache.
+ * this cache must be able to hold the max number of vis triangles
+ * this may be more than the final number of triangles on screen.
+ * Max number of entries this cache can hold is 0x7FFF.
+ * The way this cache works is as follows
+ */
+class WEXP ddgTNode {
+public:
+	// Pointer to a bin tree.
+	ddgTreeIndex	bt;
+	// Index to Triangle in the bin tree.
+	ddgTriIndex		tindex;
+};
+class WEXP ddgTCache : public ddgCache {
+public:
+	/// Initialize the cache.
+	void init (unsigned int size ) { ddgCache::init(size,sizeof(ddgTNode)); }
+	/// Get entry.
+	inline ddgTNode* get(unsigned short index)
+	{
+		return (ddgTNode*) ddgCache::get(index);
+	}
+	/// Get entry.
+	inline ddgCacheIndex set( ddgTreeIndex bt, ddgTriIndex tindex)
+	{
+		ddgCacheIndex ci = allocNode();
+		ddgTNode * tn = (ddgTNode*) ddgCache::get(ci);
+		tn->tindex = tindex;
+		tn->bt = bt;
+		return ci;
+	}
+
+};
 /**
  * ROAM Triangle Bintree mesh shared data.<br>
  *
@@ -205,6 +249,8 @@ class WEXP ddgTBinMesh
 	unsigned int _maxLevel;
 	/// The number of triangles in the TBinTree.
 	unsigned int _triNo;
+	/// Index beyond which there are leaf triangles in the TBinTree.
+	unsigned int _leafTriNo;
 	/// Dirty state.
 	bool		_dirty;
 	/// Max number of bintrees to manage.
@@ -213,8 +259,18 @@ class WEXP ddgTBinMesh
 	ddgTBinTree ** _bintree;
 	/// A transformed vertex cache.
 	ddgVCache		_vcache;
-	/// Number of visible triangles in the mesh.
-	unsigned int _visTri;
+	/// A visible triangle cache.
+	ddgTCache		_tcache;
+#ifdef HASH
+	/// Split queue.
+	ddgHashTable	*_qs;
+	/// Merge queue.
+	ddgHashTable	*_qm;
+	/// Split queue iterator
+	ddgHashIterator		*_qsi;
+	/// Merge queue
+	ddgHashIterator		*_qmi;
+#else
 	/// Split queue.
 	ddgSplayTree	*_qs;
 	/// Merge queue.
@@ -223,28 +279,27 @@ class WEXP ddgTBinMesh
 	ddgSplayIterator		*_qsi;
 	/// Merge queue
 	ddgSplayIterator		*_qmi;
+#endif
 	/// Number of rows of bintrees.
 	unsigned int	_nr;
 	/// Number of columns of bintrees.
 	unsigned int	_nc;
-    /// World to camera space transformation matrix must be initialized before calling calculate.
-    double          *_wtoc;
-    /// The bounding box in screen space.
-    ddgBBox         *_camBBox;
-    /// The field of view.
-    float           _tanHalfFOV;
 	/// The min number of triangles that should be displayed.
-	unsigned int	_mindetail;
-	/// The max number of triangles that should be displayed.
-	unsigned int	_maxdetail;
+	unsigned int	_minDetail;
+	/// The max number of triangles that should be currently displayed.
+	unsigned int	_maxDetail;
+	/// The max number of triangles that this implementation should handle.
+	unsigned int	_absMaxDetail;
 	/// Distant clip range triangles beyond this point are not needed.
-	float		_farclip;
+	float		_farClip;
 	/// Near clip range triangles beyond this point are not needed.
-	float		_nearclip;
+	float		_nearClip;
 	/// Triangles beyond this point have their priority recalculated once every n frames.
 	float		_progDist;
 	/// Merge queue active.
 	bool		_merge;
+	/// The normal lookup table.
+	ddgVector3	*_normalLUT;
 	/// Total number of triangles rendered.  For statistics.
 	unsigned int _triCount;
 	/// Total number of priorities calculated.
@@ -255,6 +310,10 @@ class WEXP ddgTBinMesh
 	unsigned int _remCount;
 	/// Total number of queue updates.
 	unsigned int _movCount;
+	/// Number of visibility calculations.
+	unsigned int _visCount;
+	/// Number of reset operations.
+	unsigned int _resetCount;
 	/// Number of balanceOperations this frame.
 	unsigned int _balanceCount;
 public:
@@ -271,7 +330,7 @@ public:
 	 */
 	ddgMSTri* stri;
 	/// Initialize the mesh.
-	bool init( double *worldToCameraMatrix, ddgBBox *camClipBox, float fov );
+	bool init( void );
 	/**
 	 * Initialize the neighbour field of all triangles.
 	 */
@@ -295,54 +354,42 @@ public:
     }
 
 	/// Return the required LOD.
-	unsigned int mindetail( void ) { return _mindetail; }
+	unsigned int minDetail( void ) { return _minDetail; }
 	/// Set the required LOD.
-	void mindetail( unsigned int d ) { _mindetail = d; }
+	void minDetail( unsigned int d ) { _minDetail = d; }
 	/// Return the required LOD.
-	unsigned int maxdetail( void ) { return _maxdetail; }
+	unsigned int maxDetail( void ) { return _maxDetail; }
 	/// Set the required LOD.
-	void maxdetail( unsigned int d ) { _maxdetail = d; }
-
-	/// Function to add a bintree.
-	void addBinTree( ddgTBinTree *bt );
-	/// Function to remove a bintree.
-	void removeBinTree( ddgTBinTree *bt );
-	/// Return the bintree for a given index.
-	ddgTBinTree *getBinTree( ddgTreeIndex i)
-	{ ddgAssert(i < _bintreeMax && i >= 0); return _bintree[i]; }
-
-	/// Return the split queue 
+	void maxDetail( unsigned int d ) { _maxDetail = d; }
+	/// Return the absolute maximum number of triangles to support.
+	unsigned int absMaxDetail( void ) { return _absMaxDetail; }
+	/// Set the absolute maximum number of triangles to support.
+	void absMaxDetail( unsigned int d ) { _absMaxDetail = d; }
+#ifdef HASH
+	/// Return the split queue (For debugging only)
+	ddgHashTable *qs(void) { return _qs; }
+	/// Return the merge queue (For debugging only)
+	ddgHashTable *qm(void) { return _qm; }
+	/// Return an iterator for the visible set of triangles.
+	ddgHashIterator* qsi(void) { return _qsi; }
+	/// Return an iterator for the mergable set of triangles. DEBUG
+	ddgHashIterator* qmi(void) { return _qmi; }
+#else
+	/// Return the split queue (For debugging only)
 	ddgSplayTree *qs(void) { return _qs; }
-	/// Return the merge queue 
+	/// Return the merge queue (For debugging only)
 	ddgSplayTree *qm(void) { return _qm; }
 	/// Return an iterator for the visible set of triangles.
 	ddgSplayIterator* qsi(void) { return _qsi; }
-	/// Return a priority from the merge queue.
-	unsigned int prioritySQ( ddgSplayIterator *i );
-	/// Return the tree of an item from the split queue.
-	ddgTBinTree* treeSQ( ddgSplayIterator *i )
-	{
-		return getBinTree(_qs->retrieve(i->current())->tree());
-	}
-	/// Return an item from the split queue.
-	unsigned int indexSQ(ddgSplayIterator *i)
-	{
-		return  _qs->retrieve(i->current())->index();
-	}
-	/// Return a priority from the merge queue.
-	unsigned int priorityMQ( ddgSplayIterator *i );
-	/// Return the tree of an item from the merge queue.
-	ddgTBinTree* treeMQ( ddgSplayIterator *i )
-	{
-		return getBinTree(_qm->retrieve(i->current())->tree());
-	}
-	/// Return an item from the split queue.
-	unsigned int indexMQ(ddgSplayIterator *i)
-	{
-		return _qm->retrieve(i->current())->index();
-	}
+	/// Return an iterator for the mergable set of triangles. DEBUG
+	ddgSplayIterator* qmi(void) { return _qmi; }
+#endif
+	/// Return the triangle cache.
+	ddgTCache *tcache(void) { return &_tcache; }
 	/// Return the number of triangles.
 	unsigned int triNo(void) { return _triNo; }
+	/// Return the number of triangles.
+	unsigned int leafTriNo(void) { return _leafTriNo; }
 	/**
 	 *  Split the best split candidate.
 	 */
@@ -360,12 +407,72 @@ public:
 	void clearSQ(void);
 	/// Empty the merge queue.
 	void clearMQ(void);
+#ifdef HASH
+	/// Return a priority from the split queue.
+	unsigned int prioritySQ( ddgHashIterator *i )
+	{
+		return i->current()->key();
+	}
+	/// Return a priority from the merge queue.
+	unsigned int priorityMQ(  ddgHashIterator *i )
+	{
+		return i->current()->key();
+	}
+	/// Return the tree of an item from the split queue.
+	ddgTBinTree* treeSQ(  ddgHashIterator *i )
+	{
+		return getBinTree(i->current()->tree());
+	}
+	/// Return an item from the split queue.
+	unsigned int indexSQ( ddgHashIterator *i)
+	{
+		return i->current()->index();
+	}
+	/// Return the tree of an item from the merge queue.
+	ddgTBinTree* treeMQ(  ddgHashIterator *i )
+	{
+		return getBinTree(i->current()->tree());
+	}
+	/// Return an item from the split queue.
+	unsigned int indexMQ( ddgHashIterator *i)
+	{
+		return i->current()->index();
+	}
+#else
+	/// Return a priority from the split queue.
+	unsigned int prioritySQ( ddgSplayIterator *i)
+	{
+		return _qs->retrieve(i->current())->key();
+	}
+	/// Return a priority from the merge queue.
+	unsigned int priorityMQ( ddgSplayIterator *i )
+	{
+		return _qm->retrieve(i->current())->key();
+	}
+	/// Return the tree of an item from the split queue.
+	ddgTBinTree* treeSQ( ddgSplayIterator *i)
+	{
+		return getBinTree(_qs->retrieve(i->current())->tree());
+	}
+	/// Return an item from the split queue.
+	unsigned int indexSQ(ddgSplayIterator *i)
+	{
+		return _qs->retrieve(i->current())->index();
+	}
+	/// Return the tree of an item from the merge queue.
+	ddgTBinTree* treeMQ( ddgSplayIterator *i)
+	{
+		return getBinTree(_qm->retrieve(i->current())->tree());
+	}
+	/// Return an item from the split queue.
+	unsigned int indexMQ(ddgSplayIterator *i)
+	{
+		return _qm->retrieve(i->current())->index();
+	}
+#endif
 
 	/// Return the number of visible triangles in the mesh.
-	unsigned int visTri(void) { return _visTri; }
-
-	/// Recalculate the number of visibile triangles.
-	unsigned int updateVisibleTri(void);
+	unsigned int visTri(void) { return _tcache.size(); }
 
 	/// Return the number of split levels.
 	unsigned int maxLevel( void ) { return _maxLevel; }
@@ -381,18 +488,25 @@ public:
 	 */
 	bool calculate(void);
 
+	/// Function to add a bintree.
+	void addBinTree( ddgTBinTree *bt );
+	/// Function to remove a bintree.
+	void removeBinTree( ddgTBinTree *bt );
+	/// Return the bintree for a given index.
+	ddgTBinTree *getBinTree( ddgTreeIndex i)
+	{ ddgAssert(i < _bintreeMax && i >= 0); return _bintree[i]; }
 	/// Distant clip range triangles beyond this point are not needed.
-	float		farclip(void) { return _farclip; }
+	float		farClip(void) { return _farClip; }
 	/// Near clip range triangles beyond this point are not needed.
-	float		nearclip(void) { return _nearclip; }
+	float		nearClip(void) { return _nearClip; }
 	/// Distant clip range triangles beyond this point are not needed.
-	inline void farclip(float f) { _farclip = f; }
+	inline void farClip(float f) { _farClip = f; }
 	/// Near clip range triangles beyond this point are not needed.
-	inline void nearclip(float n) { _nearclip = n; }
+	inline void nearClip(float n) { _nearClip = n; }
 	/// Return the row/col index and tree at a given location.
-	void progdist(float p ) { _progDist = p; }
+	void progDist(float p ) { _progDist = p; }
 	/// Return the row/col index and tree at a given location.
-	float progdist(void) { return _progDist; }
+	float progDist(void) { return _progDist; }
 	/// Return the vertex cache.
 	ddgVCache	*vcache(void) { return &_vcache; }
 	/**
@@ -413,6 +527,18 @@ public:
 	void merge( bool m ) { _merge = m; }
 	/// Indicate if the merge queue is on/off.
 	bool merge( void ) { return _merge; }
+	/** 
+	 *  Generate a normal map from this image.
+	 *  height map should be a single component image.
+	 *  The normal is calculated for each height sample, then appropriate
+	 *  normal LUT index is stored.
+	 *  aspect is the ratio of vertical units vs horizontal units.
+	 *  Default every horizontal unit = 10m.
+	 *                vertical   unit = 0.1m.
+	 */
+	bool generateNormals(void);
+	/// The normal lookup table.
+	ddgVector3	*normalLUT(unsigned int idx) { return &(_normalLUT[idx]); }
 	/// Total number of triangles rendered.
     void triCountIncr(void) { _triCount++; }
 	/// Total number of priorities calculated.
@@ -423,6 +549,10 @@ public:
 	void remCountIncr(void) { _remCount++; }
 	/// Total number of queue updates.
 	void movCountIncr(void) { _movCount++; }
+	/// Total number visibility calculations.
+	void visCountIncr(void) { _visCount++; }
+	/// Total number reset operations.
+	void resetCountIncr(void) { _resetCount++; }
 	/// Total number of triangles rendered.
     unsigned int triCount(void) { return _triCount; }
 	/// Total number of priorities calculated.
@@ -433,15 +563,20 @@ public:
 	unsigned int remCount(void) { return _remCount; }
 	/// Total number of queue updates.
 	unsigned int movCount(void) { return _movCount; }
+	/// Total number of queue updates.
+	unsigned int balanceCount(void) { return _balanceCount; }
+	/// Total number visibility calculations.
+	unsigned int visCount(void) { return _visCount; }
+	/// Total number reset operations.
+	unsigned int resetCount(void) { return _resetCount; }
 
 #ifdef _DEBUG
 	/// Debug method to check that tree is still sane.
 	void verify(void);
 #endif
-   /// Return the camera bounding box.
-    ddgBBox *camBBox(void) { return _camBBox; }
-    /// Return the half field of view.
-    float tanHalfFOV(void) { return _tanHalfFOV; }
+	/// x and z location on the height map.
+	float tx, tz;
 };
+
 
 #endif

@@ -19,13 +19,21 @@
 #ifndef _ddgBinTree_Class_
 #define _ddgBinTree_Class_
 
+#ifdef DDG
+#include "ddgtmesh.h"
+#include "ddgbbox.h"
+#include "ddggeom.h"
+#else
 #include "csterr/ddgtmesh.h"
+extern csVector3 transformer (csVector3 vin);
+#endif
 
 /**
  * A triangle object maintained by a TBinTree mesh.
  * The data in this class is unique for each TBinTree.
  * 2+2+2+1+1=8 bytes.
  * Should be able to do this in 8 bytes.
+ * Convert to Structure Of Arrays.
  */
 #define ddgMAXPRI 0xFFFF
 #define ddgMINPRI 0
@@ -33,24 +41,26 @@ class WEXP ddgMTri {
 	friend class ddgTBinTree;
 	friend class ddgTBinMesh;  // May be able to remove dependency.
 	/**
-	 * Thickness of this triangle's wedgie.		(2 bytes)
+	 * Thickness of this triangle's wedgie.					(2 bytes)
 	 * Equals the sum of thickness of all sub triangles.
 	 */
 	unsigned short _thick;
-	/** Triangle priority. (2 bytes)
+	/** Triangle priority.									(2 bytes)
      *	0 - ddgMAXPRI   - Normal priorities.
 	 *  ddgMAXPRI + 1   undefined.
 	 */
 	unsigned short _priority;
     /**
-	 * This value if used for 2 purposes:						(2 bytes)
+	 * This value is used for 2 purposes:						(2 bytes)
 	 * Initially it is an index into the transformed vertex cache.
 	 * at rendertime it is reused as an index into the vertex buffers.
 	 */
 	unsigned short _cbufindex;
-	unsigned short _vbufindex;
-   /// The flags which incidate which frustrum sides we intersected. (1 byte)
-	ddgClipFlags _vis;
+    /**
+	 * The state which indicates whether we are visible w.r.t. the viewing frustrum. (1 byte)
+	 * Only 2 bits are currently used.
+	 */
+	ddgVisState _vis;
 	/// Flags indicating the triangle's state.
 	enum {	// if all priority bits are clear, priority must be recalced.
 	  SF_PRIORITY0 = 1 << 0, /// 0 delay bit 0 LSB.
@@ -60,15 +70,22 @@ class WEXP ddgMTri {
 	  SF_COORD     = 1 << 4, /// 4 Flag is true if coord cpqr is correct for frame.
 	  SF_VBUFFER   = 1 << 5, /// 5 Flag is true if the coord is in the vertex buffer for frame.
 	  SF_SQ        = 1 << 6, /// 6 Flag is true if triangle is in the split queue.
-          SF_MQ        = 1 << 7  /// 7 Flag is true if triangle is in the merge queue.
+      SF_MQ        = 1 << 7  /// 7 Flag is true if triangle is in the merge queue.
 	};
 	#define SF_PRIORITY (SF_PRIORITY0 | SF_PRIORITY1 | SF_PRIORITY2 | SF_PRIORITY3)
 	typedef unsigned char ddgStateFlags;
+
     /// State of triangle.												(1 byte)
     ddgStateFlags  _state;
 public:
-	/// Return the objects visibility flags.
-	inline ddgClipFlags vis(void) { return _vis; }
+    /**
+	 * This value if used for triangle cache id:				(2 bytes)
+	 */
+	unsigned short tcacheId;
+	/// Return the objects visibility state.
+	inline ddgVisState vis(void) { return _vis; }
+	/// Set the objects visibility state.
+	inline void vis(ddgVisState v) { _vis = v; }
 	/// Return the objects visibility flags.
 	inline ddgStateFlags state(void) { return _state; }
     /// Set the priority of this triangle.
@@ -76,30 +93,35 @@ public:
     /// Return the priority of this triangle.
     inline unsigned short  priority(void) { return _priority; }
     /// Set the buffer index of this triangle.
-    inline unsigned int  vbufindex(unsigned int i) { return _vbufindex = i; }
+    inline unsigned int  vbufindex(unsigned int i) { return _cbufindex = i; }
     /// Return the buffer index of this triangle.
-    inline unsigned int  vbufindex(void) { return _vbufindex; }
+    inline unsigned int  vbufindex(void) { return _cbufindex; }
     /// Set the buffer flag for this triangle.
     inline unsigned int  setvbufflag(void) { DDG_BSET(_state, SF_VBUFFER); return true; }
 	///	get wedge thickness.
 	inline float	thick(void )	{return(_thick/4.0);}
 	///	set wedge thickness.
-	inline void	thick(float t )	{_thick = (unsigned short)(4 * t);}
-	/// Reset priority delay to zero.
-	inline void resetPriorityDelay()
+	inline void	thick(float t )	{_thick = (unsigned short)(4.0 * t);}
+    /// Reset all but queue status.
+    inline void reset()
 	{
-		DDG_BCLEAR(_state, SF_PRIORITY);
+		DDG_BCLEAR(_state, SF_COORD);
+		DDG_BCLEAR(_state, SF_VBUFFER);
+		decrPriorityDelay();
+		vis( ddgUNDEF);
+		_cbufindex = 0;
 	}
+
 	/// Set priority delay.  v should be a value from 0 to 15. 0 - invalid.
 	inline void setPriorityDelay(unsigned char v)
 	{
 		resetPriorityDelay();
 		_state += v;
 	}
-	/// Return priority delay.
-	inline unsigned char getPriorityDelay()
+	/// Reset priority delay to zero.
+	inline void resetPriorityDelay()
 	{
-		return DDG_BGET(_state, SF_PRIORITY);
+		DDG_BCLEAR(_state, SF_PRIORITY);
 	}
 	/// Decrement the delay by one.
 	inline void decrPriorityDelay()
@@ -109,19 +131,15 @@ public:
 			setPriorityDelay(v-1);
 		ddgAssert(getPriorityDelay()>=0 && getPriorityDelay() < 16);
 	}
-    /// Reset all but queue status.
-    inline void reset()
+	/// Return priority delay.
+	inline unsigned char getPriorityDelay()
 	{
-		DDG_BCLEAR(_state, SF_COORD);
-		DDG_BCLEAR(_state, SF_VBUFFER);
-		decrPriorityDelay();
-		_vis = 0;
-		_cbufindex = 0;
+		return DDG_BGET(_state, SF_PRIORITY);
 	}
 };
 
 
-/// Index array offsets for each level of the tree.
+/// Index array offsets for each level of the immplicit binary tree.
 const unsigned int ddgBintreeOffset[32] =
 	{ 0x1,       0x2,       0x4,       0x8,
 	  0x10,      0x20,      0x40,      0x80,
@@ -147,16 +165,14 @@ const unsigned int ddgBintreeOffset[32] =
 class WEXP ddgTBinTree {
 	/// The SharedBinTree data. (Could be static)
     ddgTBinMesh	*_mesh;
-    /// Record initialization state.
-    bool    _init:1;
     /// Col offset in maps.
     int     _dc;
     /// Row offset in maps.
     int     _dr;
     /// Is coordinate system inverted.
     bool    _mirror:1;
-	/// Number of visible triangles in the bintree.
-	unsigned int _visTri;
+	/// Number of triangles in queue for the bintree.
+	unsigned int _queueTri;
 	/// Index of this tree in the mesh.
 	unsigned int _index;
 	/**
@@ -165,6 +181,8 @@ class WEXP ddgTBinTree {
 	ddgMTri* _tri;
 	/// Height data map.
 	ddgHeightMap *heightMap;
+	/// Normals data map.
+	unsigned short *normalIdx;
 	/**
 	 * Pointer to neighbouring TBinTrees.
 	 *<pre>
@@ -185,13 +203,12 @@ class WEXP ddgTBinTree {
 	/// For mirrored mesh this is the right side.
 	ddgTBinTree   *_pNeighbourLeft;
 	/// Unit vector updated once per frame.
-	static csVector3	_unit;
-
+	static ddgVector3	_unit;
 public:
 	/**
 	 *  Construct a Bintree mesh.
 	 */
-	ddgTBinTree(ddgTBinMesh *m, ddgTreeIndex i, ddgHeightMap* h, int dr = 0, int dc = 0, bool mirror = false);
+	ddgTBinTree(ddgTBinMesh *m, ddgTreeIndex i, ddgHeightMap* h, unsigned short *idx, int dr = 0, int dc = 0, bool mirror = false);
 	/// Destroy the Bintree mesh.
 	~ddgTBinTree(void);
 
@@ -211,40 +228,21 @@ public:
 	inline void pNeighbourLeft(ddgTBinTree* t) { _pNeighbourLeft = t; }
 
 	/// Returns the column offset in the height map.
-	int dc(void) { return _dc; }
+	inline int dc(void) { return _dc; }
 	/// Returns the row offset in the height map.
-	int dr(void) { return _dr; }
+	inline int dr(void) { return _dr; }
 	/// Returns true if this is a mirrored mesh.
-	bool mirror(void) { return _mirror; }
-
-	/// Initialize the bin tree.
-	bool init(void);
-	/// Get maxLevel.
-	unsigned int maxLevel(void) { return _mesh->maxLevel(); }
-	/// Get number of triangles in a single BinTree.
-	unsigned int triNo(void) { return _mesh->triNo(); }
-	/// Get triangle row.
-	unsigned int row(unsigned int i)
-	{ return _mesh->stri[i].row; }
-	/// Get triangle col.
-	unsigned int col(unsigned int i)
-	{ return _mesh->stri[i].col; }
-	/// Get triangle vertex 0.
-	ddgTriIndex v0(ddgTriIndex i)
-	{ return _mesh->stri[i].v0; }
-	/// Get triangle vertex 1.
-	ddgTriIndex v1(ddgTriIndex i)
-	{ return _mesh->stri[i].v1; }
+	inline bool mirror(void) { return _mirror; }
 
 	/// Return the height of a location on the mesh.
-    float height(ddgTriIndex tindex)
+    inline float height(ddgTriIndex tindex)
     {
         return _mirror 
             ? heightMap->getf(_dr-row(tindex),_dc-col(tindex))
             : heightMap->getf(_dr+row(tindex),_dc+col(tindex));
     }
 	/// Return the height of a location on the mesh.
-    float height(unsigned int r, unsigned int c)
+    inline float height(unsigned int r, unsigned int c)
     {
         return _mirror 
             ? heightMap->getf(_dr-r,_dc-c)
@@ -254,16 +252,27 @@ public:
      * Coords should be unscaled in x,z direction.
      */
     float treeHeight(unsigned int r, unsigned int c, float dx, float dz);
-    /// Get vertex location.
-    unsigned int vertex(ddgTriIndex tindex, csVector3 *vout)
+    /// Get vertex location in world space from the cache, return the cache index if we have it.
+    inline unsigned int vertex(ddgTriIndex tindex, ddgVector3 *vout)
     {
         if (_mirror)
-            vout->Set(_dr-row(tindex),height(tindex),_dc-col(tindex));
+            *vout = ddgVector3(_dr-row(tindex),height(tindex),_dc-col(tindex));
         else
-            vout->Set(_dr+row(tindex),height(tindex),_dc+col(tindex));
+            *vout = ddgVector3(_dr+row(tindex),height(tindex),_dc+col(tindex));
+
         if (DDG_BGET(tri(tindex)->state(), ddgMTri::SF_VBUFFER))
             return tri(tindex)->vbufindex();
         return 0;
+    }
+
+    inline void normal(ddgTriIndex tindex, ddgVector3* n)
+    {
+		unsigned int idx;
+        if (_mirror)
+        	idx = normalIdx[(_dr-row(tindex))*heightMap->cols()+(_dc-col(tindex))];
+        else
+        	idx = normalIdx[(_dr+row(tindex))*heightMap->cols()+(_dc+col(tindex))];
+		n= _mesh->normalLUT(idx);
     }
 
     /// Get texture coord data.
@@ -273,53 +282,94 @@ public:
         	vout->set(_dr-row(tindex),_dc-col(tindex));
         else
         	vout->set(_dr+row(tindex),_dc+col(tindex));
-    }
+	}
 
+	/// Initialize the bin tree.
+	bool init(void);
+	/// Get maxLevel.
+	inline unsigned int maxLevel(void) { return _mesh->maxLevel(); }
+	/// Get number of triangles in a single BinTree.
+	inline unsigned int triNo(void) { return _mesh->triNo(); }
+	/// Get triangle row.
+	inline unsigned int row(unsigned int i)
+	{ return _mesh->stri[i].row; }
+	/// Get triangle col.
+	inline unsigned int col(unsigned int i)
+	{ return _mesh->stri[i].col; }
+	/// Get triangle vertex 0.
+	inline ddgTriIndex v0(ddgTriIndex i)
+	{ ddgAssert(i < _mesh->triNo()); return _mesh->stri[i].v0; }
+	/// Get triangle vertex 1.
+	inline ddgTriIndex v1(ddgTriIndex i)
+	{ ddgAssert(i < _mesh->triNo()); return _mesh->stri[i].v1; }
 	/** Return the starting offset in the array where a
 	 * given level is stored.
 	 */
-	static unsigned int offset(unsigned int l)
+	inline static unsigned int offset(unsigned int l)
 	{
 		return ddgBintreeOffset[l];
 	}
 
 	/// Return the level of this triangle based on its index.
-	static unsigned int level(ddgTriIndex i)
+	inline static unsigned int level(ddgTriIndex i)
 	{
 		unsigned int l = 0;
-		while ((i=i/2) > 1) l++;
+		if (i > 0)
+#ifdef WIN32
+			while ((i=i>>1) > 1)
+#else
+			while ((i=i/2) > 1)
+#endif
+				l++;
 		return l;
 	}
 	/// If this is odd (right) or even(left) child in the tree.
-	static bool	isRight(ddgTriIndex i)
+	inline static bool	isRight(ddgTriIndex i)
 	{
+#ifdef WIN32
+		return ((i&1) == 1);
+#else
 		return ((i%2) == 1);
+#endif
 	}
 	/// If this is odd (right) or even(left) child in the tree.
-	static bool	isLeft(ddgTriIndex i)
+	inline static bool	isLeft(ddgTriIndex i)
 	{
+#ifdef WIN32
+		return ((i&1) == 0);
+#else
 		return ((i%2) == 0);
+#endif
 	}
 	/// Return the parent of this element.
-	static ddgTriIndex parent(ddgTriIndex i)
+	inline static ddgTriIndex parent(ddgTriIndex i)
 	{
+//		asserts (i < _triNo,"Invalid element number.");
 		if (i == 0)
 			return 0; // Was _triNo
 		if (i == 1) return 0;
+#ifdef WIN32
+		return i>>1;
+#else
 		return i/2;
+#endif
 	}
 	/// Return the index of the left child.
-	static ddgTriIndex right(ddgTriIndex i)
-	{
-		return i*2;
-	}
-	/// Return the index of the left child.
-	static ddgTriIndex left(ddgTriIndex i)
+	inline static ddgTriIndex left(ddgTriIndex i)
 	{
 		return right(i)+1;
 	}
+	/// Return the index of the left child.
+	inline static ddgTriIndex right(ddgTriIndex i)
+	{
+#ifdef WIN32
+		return i<<1;
+#else
+		return i*2;
+#endif
+	}
 	/// Return the quad neighbour. If 0 there is no neighbour.
-	ddgTriIndex neighbour( ddgTriIndex i)
+	inline ddgTriIndex neighbour( ddgTriIndex i)
 	{
 		switch(_mesh->edge(i))
 		{
@@ -337,7 +387,7 @@ public:
 		}
 	}
 	/// Return the bintree of the neighbour.
-	ddgTBinTree *neighbourTree( ddgTriIndex i)
+	inline ddgTBinTree *neighbourTree( ddgTriIndex i)
 	{
 		switch(_mesh->edge(i))
 		{
@@ -355,7 +405,7 @@ public:
 		}
 	}
 	/// Return the edge information.
-	unsigned int edge( ddgTriIndex i)
+	inline unsigned int edge( ddgTriIndex i)
 	{ return _mesh->edge(i); }
 	/// Is i part of a mergeble diamond?
 	bool isDiamond(ddgTriIndex i);
@@ -365,18 +415,19 @@ public:
      */
     bool isDiamondVisible(ddgTriIndex i);
 
-	/// Is triangle visible?
-	bool visible(ddgTriIndex i)
+	/// Is triangle visible (even partially)?
+	inline bool visible(ddgTriIndex i)
 	{
-		const ddgClipFlags v = tri(i)->vis();
-		return (v != 0 && !DDG_BGET(v, DDGCF_ALLOUT));
+		return (tri(i)->vis() != ddgOUT) ? true : false;
+	}
+	/// Is triangle fully visible?
+	inline bool fullyvisible(ddgTriIndex i)
+	{
+		return (tri(i)->vis() == ddgIN) ? true : false;
 	}
 
 	/// Calculate visibility of tree below a triangle.
 	void visibility(ddgTriIndex tvc);
-
-	/// Reset flags in the tree below this triangle.
-	void reset(ddgTriIndex tvc);
 
 	/// Update priorities of all triangles below this triangle.
 	void priorityUpdate(ddgTriIndex tvc);
@@ -411,27 +462,56 @@ public:
 	unsigned short priority(ddgTriIndex tindex);
 
 	/// Return the number of visible triangles in the mesh.
-	unsigned int visTri(void) { return _visTri; }
-	/// Reset the visible number of triangles to zero.
-	void resetVisTri(void) { _visTri = 0; }
+	inline unsigned int queueTri(void) { return _queueTri; }
 
 	/// The mesh that manages this bintree.
-	ddgTBinMesh *mesh(void) { return _mesh; }
+	inline ddgTBinMesh *mesh(void) { return _mesh; }
 	/// Return the index in the mesh.
-	unsigned int index(void) { return _index; }
+	inline unsigned int index(void) { return _index; }
 	/// Init wtoc.
-	static void initWtoC( ddgTBinMesh *mesh);
+#ifdef DDG
+	static void initWtoC( ddgMatrix4 *wtoc, ddgBBox *camClipBox, float fov, ddgPlane frustrum[6]);
+#else
+	static void initWtoC( ddgBBox *camClipBox );
+#endif
+	/// Transform coordinate from world to camera space.
+    static void transform( ddgVector3 *vin, ddgVector3 *vout );
 	/// Return the camera space vector.
-	csVector3* pos(ddgTriIndex ti);
-	/// Return the camera space vector.
-	inline float pos(ddgTriIndex ti, unsigned int i)
+	inline ddgVector3* pos(ddgTriIndex tindex)
 	{
-		return (*pos( ti ))[i];
+		if (!DDG_BGET(tri(tindex)->_state, ddgMTri::SF_COORD))
+		{
+			ddgVector3 v;
+			vertex(tindex,&v);
+			ddgAssert(tri(tindex)->_cbufindex == 0);
+			tri(tindex)->_cbufindex = _mesh->vcache()->allocate();
+#ifdef DDG
+			transform( v, _mesh->vcache()->get( tri(tindex)->_cbufindex ) );
+#else
+			*(_mesh->vcache()->get( tri(tindex)->_cbufindex )) = transformer( v );
+#endif
+			DDG_BSET(tri(tindex)->_state, ddgMTri::SF_COORD);
+		}
+		return _mesh->vcache()->get( tri(tindex)->_cbufindex );
 	}
+	/// Return the one dimension of the camera space vector.
+#ifdef DDG
+	inline float pos(ddgTriIndex tindex, unsigned int i) { return ((float*)(*pos(tindex)))[i]; }
+#else
+	inline float pos(ddgTriIndex tindex, unsigned int i) { return ((*pos(tindex)))[i]; }
+#endif
 #ifdef _DEBUG
 	/// Test if queue status is correct for this triangle, return true on error.
 	bool verify( ddgTriIndex tindex );
 #endif
 };
 
+#ifdef DDG
+WEXP ostream& WFEXP operator << ( ostream&s, ddgTBinTree v );
+///
+WEXP ostream& WFEXP operator << ( ostream&s, ddgTBinTree* v );
+#endif
+
+WEXP void WFEXP incrframe(void);
+WEXP void WFEXP logactivate(void);
 #endif

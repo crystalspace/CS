@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -45,6 +45,7 @@
 #include "csengine/cdobj.h"
 #include "csengine/collider.h"
 #include "csengine/csspr2d.h"
+#include "csengine/terrain.h"
 #include "csparser/impexp.h"
 #include "csutil/inifile.h"
 #include "csutil/csrect.h"
@@ -815,84 +816,106 @@ void DoGravity (csVector3& pos, csVector3& vel)
   csCollider::firstHit = false;
   int hits = 0;
 
-  csCollider::CollideReset ();
-
-  for ( ; num_sectors-- ; )
-    hits += CollisionDetect (Sys->body, n[num_sectors], &test);
-
-  for (int j=0 ; j<hits ; j++)
+  // Check to see if there are any terrains, if so test against those.
+  // This routine will automatically adjust the transform to the highest
+  // terrain at this point.
+  int k;
+  for ( k = 0; k < num_sectors ; k++)
   {
-    csCdTriangle *wall = our_cd_contact[j].tr2;
-    csVector3 n = ((wall->p3-wall->p2)%(wall->p2-wall->p1)).Unit();
-    if (n*vel<0)
-      continue;
-    vel = -(vel%n)%n;
+	if (n[k]->terrains.Length () > 0)
+	{
+	  int i;
+	  for (i = 0 ; i < n[k]->terrains.Length () ; i++)
+		{
+		  csTerrain* terrain = (csTerrain*)n[k]->terrains[i];
+		  hits += terrain->CollisionDetect (&test);
+		}
+	}
+    if (hits)
+	{
+	  new_pos = test.GetOrigin ();
+	}
   }
-
-  // We now know our (possible) velocity. Let's try to move up or down, if possible
-  new_pos = pos+vel;
-  test = csOrthoTransform (csMatrix3(), new_pos);
-
-  num_sectors = FindSectors (new_pos, 4*Sys->legs->GetBbox()->GetRadius(), 
-                             Sys->view->GetCamera()->GetSector(), n);
-
-  num_our_cd = 0;
-  csCollider::firstHit = false;
-  csCollider::numHits = 0;
-  int hit = 0;
-
-  csCollider::CollideReset ();
-
-  for ( ; num_sectors-- ; )
-    hit += CollisionDetect (Sys->legs, n[num_sectors], &test);
-
-  if (!hit)
+  if (hits == 0)
   {
-    Sys->on_ground = false;
-    if (Sys->do_gravity && !Sys->move_3d)
-      vel.y -= 0.004;
+	  csCollider::CollideReset ();
+
+	  for ( ; num_sectors-- ; )
+		hits += CollisionDetect (Sys->body, n[num_sectors], &test);
+
+	  for (int j=0 ; j<hits ; j++)
+	  {
+		csCdTriangle *wall = our_cd_contact[j].tr2;
+		csVector3 n = ((wall->p3-wall->p2)%(wall->p2-wall->p1)).Unit();
+		if (n*vel<0)
+		  continue;
+		vel = -(vel%n)%n;
+	  }
+
+	  // We now know our (possible) velocity. Let's try to move up or down, if possible
+	  new_pos = pos+vel;
+	  test = csOrthoTransform (csMatrix3(), new_pos);
+
+	  num_sectors = FindSectors (new_pos, 4*Sys->legs->GetBbox()->GetRadius(), 
+								 Sys->view->GetCamera()->GetSector(), n);
+
+	  num_our_cd = 0;
+	  csCollider::firstHit = false;
+	  csCollider::numHits = 0;
+	  int hit = 0;
+
+	  csCollider::CollideReset ();
+
+	  for ( ; num_sectors-- ; )
+		hit += CollisionDetect (Sys->legs, n[num_sectors], &test);
+
+	  if (!hit)
+	  {
+		Sys->on_ground = false;
+		if (Sys->do_gravity && !Sys->move_3d)
+		  vel.y -= 0.004;
+	  }
+	  else
+	  {
+		float max_y=-1e10;
+
+		for (int j=0 ; j<hit ; j++)
+		{
+		  csCdTriangle first  = *our_cd_contact[j].tr1;
+		  csCdTriangle second = *our_cd_contact[j].tr2;
+
+		  csVector3 n=((second.p3-second.p2)%(second.p2-second.p1)).Unit ();
+
+		  if (n*csVector3(0,-1,0)<0.7)
+			continue;
+
+		  csVector3 line[2];
+
+		  first.p1 += new_pos;
+		  first.p2 += new_pos;
+		  first.p3 += new_pos;
+
+		  if (FindIntersection (&first,&second,line))
+		  {
+			if (line[0].y>max_y)
+			  max_y=line[0].y;
+			if (line[1].y>max_y)
+			  max_y=line[1].y;
+		  }
+		}
+
+		float p = new_pos.y-max_y+OYL+0.01;
+		if (fabs(p)<DYL-0.01)
+		{
+		  if (max_y != -1e10)
+			new_pos.y = max_y-OYL-0.01;
+
+		  if (vel.y<0)
+			vel.y = 0;
+		}
+		Sys->on_ground = true;
+	  }
   }
-  else
-  {
-    float max_y=-1e10;
-
-    for (int j=0 ; j<hit ; j++)
-    {
-      csCdTriangle first  = *our_cd_contact[j].tr1;
-      csCdTriangle second = *our_cd_contact[j].tr2;
-
-      csVector3 n=((second.p3-second.p2)%(second.p2-second.p1)).Unit ();
-
-      if (n*csVector3(0,-1,0)<0.7)
-        continue;
-
-      csVector3 line[2];
-
-      first.p1 += new_pos;
-      first.p2 += new_pos;
-      first.p3 += new_pos;
-
-      if (FindIntersection (&first,&second,line))
-      {
-        if (line[0].y>max_y)
-          max_y=line[0].y;
-        if (line[1].y>max_y)
-          max_y=line[1].y;
-      }
-    }
-
-    float p = new_pos.y-max_y+OYL+0.01;
-    if (fabs(p)<DYL-0.01)
-    {
-      if (max_y != -1e10)
-        new_pos.y = max_y-OYL-0.01;
-
-      if (vel.y<0)
-        vel.y = 0;
-    }
-    Sys->on_ground = true;
-  }
-
   new_pos -= Sys->view->GetCamera ()->GetOrigin ();
   if (Sys->world->sectors.Length()==1)
   {

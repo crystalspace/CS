@@ -18,18 +18,28 @@
 */
 #ifndef _ddgVBuffer_Class_
 #define _ddgVBuffer_Class_
-
+#ifdef DDG
+#include "ddgnode.h"
+#include "ddgvec.h"
+#include "ddgcolor.h"
+#else
 #include "sysdef.h"
 #include "csengine/terrain.h"
 #include "csterr/ddgvec.h"
-
-//#include "ddgcolor.hpp"
+#endif
 
 typedef unsigned int ddgVBIndex;
 /**
  * A class supporting vertex array buffers for rendering.
  */
-class WEXP ddgVBuffer  {
+class WEXP ddgVBuffer
+#ifdef DDG
+ : public ddgDLNode
+#endif
+ {
+#ifdef DDG
+    typedef ddgDLNode super;
+#endif
     /**
      * Number of vertices/texture/normal and color elements in buffer.
      */
@@ -44,28 +54,39 @@ class WEXP ddgVBuffer  {
     bool    _fColor:1;
 public:
 	/// Vertex buffer.
-	csVector3	*vbuf;
+	ddgVector3	*vbuf;
 	/// Index buffer.
 	ddgVBIndex *ibuf;
 	/// Texture coord buffer.
 	ddgVector2 *tbuf;
 	/// Normal coord buffer.
-	csVector3 *nbuf;
+	ddgVector3 *nbuf;
 	/// Color buffer.
 	float *cbuf;
 	/// Create a object but don't allocate any memory.
 	ddgVBuffer( void );
 	/// Destructor free all memory.
 	~ddgVBuffer( void );
+#ifdef DDG
 	/// Render the buffer object.
-//	bool draw( ddgContext *ctx );
+	bool draw( ddgContext *ctx );
+#endif
 	/// Initialize the vector Buffer object and allocate buffers if size is set.
-	bool init( /*ddgContext *ctx*/ );
+	bool init(
+#ifdef DDG
+		ddgContext *ctx 
+#endif
+		);
     /// Reset the buffers, Must be called before each frame.
     void reset(void) { _num = 0; _inum = 0; }
     /// Initial buffer size to allocate.  Must be called before init.
     void size(unsigned int s)
-	{ _num = s; }
+	{
+#ifdef DDG
+		if (!mode.flags.init)
+#endif
+		_num = s;
+	}
 	/// Return the number of triangles in the buffer.
 	unsigned int size(void) { return _inum/3; }
 	/// Set the rendering mode.
@@ -78,13 +99,11 @@ public:
 	/// Is normal active
 	bool normalOn(void) { return _fNormal; }
     /// Push a triangle into the buffer.
-    ddgVBIndex pushVTNC(csVector3 *p, ddgVector2 *t, csVector3 *n, ddgColor3 *c);
+    ddgVBIndex pushVTNC(ddgVector3 *p, ddgVector2 *t, ddgVector3 *n, ddgColor3 *c);
     /// Push a triangle into the buffer.
-    ddgVBIndex pushVTC(csVector3 *p, ddgVector2 *t, ddgColor3 *c);
+    ddgVBIndex pushVTN(ddgVector3 *p, ddgVector2 *t, ddgVector3 *n); 
     /// Push a triangle into the buffer.
-    ddgVBIndex pushVTN(csVector3 *p, ddgVector2 *t, csVector3 *n); 
-    /// Push a triangle into the buffer.
-    ddgVBIndex pushVT(csVector3 *p, ddgVector2 *t);
+    ddgVBIndex pushVT(ddgVector3 *p, ddgVector2 *t);
     /// Push an index into the buffer.
     unsigned int pushIndex( ddgVBIndex i1, ddgVBIndex i2, ddgVBIndex i3 );
 	/// Depth Sort the triangles in the buffer.

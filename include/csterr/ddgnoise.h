@@ -18,8 +18,11 @@
 */
 #ifndef _ddgNoise_Class_
 #define _ddgNoise_Class_
-
+#ifdef DDG
+#include "ddg.h"
+#else
 #include "csterr/ddg.h"
+#endif
 /**
  * A noise generation class based on Perlin noise.
  */

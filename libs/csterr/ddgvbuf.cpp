@@ -17,13 +17,18 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifdef DDG
+#include <GL/glut.h>
+#include "ddgvbuf.h"
+#include "ddgerror.h"
+#else
 #include "csterr/ddg.h"
 #include "csterr/ddgvbuf.h"
+#endif
 // ----------------------------------------------------------------------
 // VBuffer
 //   Initialize the VBuffer arrays.
 // ----------------------------------------------------------------------
-
 ddgVBuffer::ddgVBuffer(void)
 {
     vbuf = NULL;
@@ -39,32 +44,36 @@ ddgVBuffer::ddgVBuffer(void)
 
 ddgVBuffer::~ddgVBuffer(void)
 {
-	delete vbuf;
-	delete tbuf;
-	delete ibuf;
-	delete cbuf;
-	delete nbuf;
+	delete []vbuf;
+	delete []tbuf;
+	delete []ibuf;
+	delete []cbuf;
+	delete []nbuf;
 }
 
-bool ddgVBuffer::init( /*ddgContext *c */)
+bool ddgVBuffer::init(
+#ifdef DDG
+		ddgContext *c
+#endif
+	)
 {
 #ifdef DDG
     if (super::init(c))
-        return true;
+        return ddgFailure;
 #endif
     if (_num)
     {
 	    ibuf = new unsigned int[_num*2];
 		ddgAsserts(ibuf,"Failed to Allocate memory");
 		ddgMemorySet(unsigned int,_num*2);
-        vbuf = new csVector3[_num];
+        vbuf = new ddgVector3[_num];
 		ddgAsserts(vbuf,"Failed to Allocate memory");
-		ddgMemorySet(csVector3,_num);
+		ddgMemorySet(ddgVector3,_num);
         if (_fNormal)
 		{
-            nbuf = new csVector3[_num];
+            nbuf = new ddgVector3[_num];
 			ddgAsserts(nbuf,"Failed to Allocate memory");
-			ddgMemorySet(csVector3,_num);
+			ddgMemorySet(ddgVector3,_num);
 		}
         if (_fColor)
 		{
@@ -79,42 +88,44 @@ bool ddgVBuffer::init( /*ddgContext *c */)
 			ddgMemorySet(ddgVector2,_num);
 		}
     }
-
-	return false;
+ 
+	return ddgSuccess;
 }
-/*
-bool ddgVBuffer::draw(ddgContext *ctx)
+#ifdef DDG
+bool ddgVBuffer::draw(
+	ddgContext *ctx
+	)
 {
-	bool retval = false;
+	bool retval = ddgSuccess;
 
 	if (_fTexture)
 	{
 		// Texture coordinates.
 		glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer (2, GL_FLOAT, 0, _tbuf);
+		glTexCoordPointer (2, GL_FLOAT, 0, tbuf);
 	}
 
 	if (_fColor)
 	{
 		// 4 color components. [Unsigned char DOESNT WORK!]
 		glEnableClientState (GL_COLOR_ARRAY);
-		glColorPointer( 4, GL_FLOAT, 0, _cbuf );
+		glColorPointer( 4, GL_FLOAT, 0, cbuf );
 	}
 
 	if (_fNormal)
 	{
 		// Normal array for rendering.
 		glEnableClientState (GL_NORMAL_ARRAY);
-		glNormalPointer(GL_FLOAT, 12, _nbuf); // 3 floats = 16 bytes.
+		glNormalPointer(GL_FLOAT, 12, nbuf); // 3 floats = 16 bytes.
 	}
 
 	// Vertex array for rendering.
 	glEnableClientState (GL_VERTEX_ARRAY);
-	glVertexPointer (3, GL_FLOAT, 12, _vbuf); // 3 floats = 16 bytes.
+	glVertexPointer (3, GL_FLOAT, 12, vbuf); // 3 floats = 16 bytes.
 #if DDG_SUPPORT_COMPILED_VERTEX_ARRAYS
 	glLockArraysEXT(0, _step*_step);
 #endif
-	glDrawElements(GL_TRIANGLES,_inum, GL_UNSIGNED_INT, _ibuf);
+	glDrawElements(GL_TRIANGLES,_inum, GL_UNSIGNED_INT, ibuf);
 #if DDG_SUPPORT_COMPILED_VERTEX_ARRAYS
 	glUnlockArraysEXT();
 #endif
@@ -126,57 +137,38 @@ bool ddgVBuffer::draw(ddgContext *ctx)
 
     return retval;
 }
-*/
+#endif
 /// Push a given vertex into the buffer.
-ddgVBIndex ddgVBuffer::pushVT(csVector3 *p1, ddgVector2 *t1)
+ddgVBIndex ddgVBuffer::pushVT(ddgVector3 *p1, ddgVector2 *t1)
 {
 	// Push the vertex.
-    vbuf[_num]=*p1;
-    tbuf[_num]=t1;
+    vbuf[_num] =(*p1);
+    tbuf[_num] =(*t1);
     _num++;
 
     return _num;
 }
 /// Push a given vertex into the buffer.
-ddgVBIndex ddgVBuffer::pushVTN(csVector3 *p1, ddgVector2 *t1, csVector3 *n1 )
+ddgVBIndex ddgVBuffer::pushVTN(ddgVector3 *p1, ddgVector2 *t1, ddgVector3 *n1 )
 {
 	// Push the vertex.
-    vbuf[_num]=*p1;
-    nbuf[_num]=*n1;
-    tbuf[_num]=t1;
+    vbuf[_num] =(*p1);
+    nbuf[_num] =(*n1);
+    tbuf[_num] =(*t1);
     _num++;
 
     return _num;
 }
 /// Push a vertex into the buffer.
-ddgVBIndex ddgVBuffer::pushVTNC(csVector3 *p1, ddgVector2 *t1, csVector3 *n1, ddgColor3 *c1)
+ddgVBIndex ddgVBuffer::pushVTNC(ddgVector3 *p1, ddgVector2 *t1, ddgVector3 *n1, ddgColor3 *c1)
 {
 	// Push the vertex.
     const float df2 = 1.0/256.0;
-    vbuf[_num]=*p1;
+    vbuf[_num] = (*p1);
     if (_fNormal)
-        nbuf[_num]=*n1;
+        nbuf[_num] = (*n1);
     if (_fTexture)
-        tbuf[_num].set(t1);
-    if (_fColor)
-    {
-        cbuf[_num*4+0]=c1->v[0]*df2;
-        cbuf[_num*4+1]=c1->v[1]*df2;
-        cbuf[_num*4+2]=c1->v[2]*df2;
-        cbuf[_num*4+3]=1.0;
-    }
-    _num++;
-
-    return _num;
-}
-/// Push a vertex into the buffer.
-ddgVBIndex ddgVBuffer::pushVTC(csVector3 *p1, ddgVector2 *t1, ddgColor3 *c1)
-{
-	// Push the vertex.
-    const float df2 = 1.0/256.0;
-    vbuf[_num]=*p1;
-    if (_fTexture)
-        tbuf[_num].set(t1);
+        tbuf[_num] = (*t1);
     if (_fColor)
     {
         cbuf[_num*4+0]=c1->v[0]*df2;
@@ -209,25 +201,24 @@ int compareTriangles( const void* p1, const void* p2)
 	unsigned int *t2 = (unsigned int*)p2;
 	float z1 = ddgZcache[t1[0]/3],
 		  z2 = ddgZcache[t2[0]/3];
-
 	if (z1 == 0.0)
 	{
 		// Find nearest point and use that.
-		z1 = ddgCurrentVBuf->vbuf[t1[0]].z;
-		if (ddgCurrentVBuf->vbuf[t1[1]].z < z1)
-			z1 = ddgCurrentVBuf->vbuf[t1[1]].z;
-		if (ddgCurrentVBuf->vbuf[t1[2]].z < z1)
-			z1 = ddgCurrentVBuf->vbuf[t1[2]].z;
+		z1 = (ddgCurrentVBuf->vbuf[t1[0]])[2];
+		if ((ddgCurrentVBuf->vbuf[t1[1]])[2] < z1)
+			z1 = (ddgCurrentVBuf->vbuf[t1[1]])[2];
+		if ((ddgCurrentVBuf->vbuf[t1[2]])[2] < z1)
+			z1 = (ddgCurrentVBuf->vbuf[t1[2]])[2];
 		ddgZcache[t1[0]/3] = z1;
 	}
 	if (z2 == 0.0)
 	{
 		// Find nearest point and use that.
-		z2 = ddgCurrentVBuf->vbuf[t2[0]].z;
-		if (ddgCurrentVBuf->vbuf[t2[1]].z < z2)
-			z2 = ddgCurrentVBuf->vbuf[t2[1]].z;
-		if (ddgCurrentVBuf->vbuf[t2[2]].z < z2)
-			z2 = ddgCurrentVBuf->vbuf[t2[2]].z;
+		z2 = (ddgCurrentVBuf->vbuf[t2[0]])[2];
+		if ((ddgCurrentVBuf->vbuf[t2[1]])[2] < z2)
+			z2 = (ddgCurrentVBuf->vbuf[t2[1]])[2];
+		if ((ddgCurrentVBuf->vbuf[t2[2]])[2] < z2)
+			z2 = (ddgCurrentVBuf->vbuf[t2[2]])[2];
 		ddgZcache[t2[0]/3] = z2;
 	}
 	// Compare the two points.

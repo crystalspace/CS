@@ -16,19 +16,22 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
-#include "sysdef.h"
+#ifdef DDG
+#include "ddgsplay.h"
+#else
 #include "csterr/ddgsplay.h"
-
+#endif
 ddgSplayKey ddgSplayTree::_maxNode;
 ddgSplayKey ddgSplayTree::_minNode;
 ddgSplayIndex ddgSplayTree::_nList = 0;
 ddgSplayIndex ddgSplayTree::_fList = 0;
 unsigned int ddgSplayTree::_refCount = 0;
 unsigned int ddgSplayTree::_maxSize = 12000;
+unsigned int ddgSplayTree::_totalSize = 0;
 
 ddgSplayTree::~ddgSplayTree(void)
 {
+	_root = clear(_root);
     _refCount--;
     if (_refCount == 0)
     {
@@ -38,7 +41,7 @@ ddgSplayTree::~ddgSplayTree(void)
     }
 }
 
-ddgSplayTree::ddgSplayTree(  )
+ddgSplayTree::ddgSplayTree(void)
 {
     _refCount++;
 	_nullNode = 0;
@@ -48,12 +51,21 @@ ddgSplayTree::ddgSplayTree(  )
     {
         // Pre allocate a block of nodes.
         _nList = new ddgSplayNode[_maxSize];
+		ddgAsserts(_nList,"Failed to Allocate memory");
+		ddgMemorySet(ddgSplayNode,_maxSize);
 	    _fList = _nList; // 0
 	    _minNode.set(ddgSplayKey(0,0,0xFFFF));
 	    _maxNode.set(ddgSplayKey(0,0,0));
     }
 
-	if (_nList)
+	if (!_nList)
+	{
+		ddgErrorSet(Memory,"Failed to allocate ddgSplayTree buffer");
+#ifdef DDG
+		ddgError::report();
+#endif
+	}
+	else
 	{
 		// Initialize the free list.
 		unsigned int i = _maxSize-1;
@@ -70,6 +82,7 @@ ddgSplayTree::ddgSplayTree(  )
         right(_nullNode, _nullNode);
         // Don't count these items.
         _size = 0;
+		_totalSize = 0;
 	}
     _root = _nullNode;
 }
@@ -77,18 +90,24 @@ ddgSplayTree::ddgSplayTree(  )
 // Allocator for ddgSplayNodes.
 ddgSplayIndex ddgSplayTree::allocNode(void)
 {
+    ddgAssert(_nList);
+    ddgAssert(_totalSize < _maxSize-2);
 	ddgSplayIndex n = _fList;
+	ddgAsserts(n,"Ran out of free nodes");
 	_fList = left(n);
 	_size++;
+	_totalSize++;
 	return n;
 }
 
 // Deallocator for ddgSplayNodes.
 void ddgSplayTree::freeNode(ddgSplayIndex n)
 {
+    ddgAssert(_size && _totalSize);
 	left(n, _fList);
 	_fList = n;
 	_size--;
+	_totalSize--;
 }
 
 ddgSplayIndex ddgSplayTree::clear( ddgSplayIndex n )
@@ -235,7 +254,7 @@ ddgSplayIndex ddgSplayTree::remove( ddgSplayKey sk, ddgSplayIndex n )
     if( n != _nullNode )
     {
         n = ddgSplay( sk, n );
-        if( sk.compare( key(n)) == 0 )
+        ddgAsserts( sk.compare( key(n)) == 0, "could not find node to remove from SplayTree." );
         {
             // Found it!
             if( left(n) == _nullNode )
@@ -253,6 +272,32 @@ ddgSplayIndex ddgSplayTree::remove( ddgSplayKey sk, ddgSplayIndex n )
 
     return n;
 }
+
+#if (defined(_DEBUG) && DDG)
+ostream& operator << ( ostream&s, ddgSplayKey t )
+{
+	unsigned int tree, i, k;
+	i = t.index();
+    tree = t.tree();
+    k = t.key();
+	return s << "(" << k << "," << tree << "," << i << ")";
+}
+
+int ddgSplayTree::printTree( ddgSplayIndex n )
+{
+	static int d = 0, dm = 0;
+    if( n != _nullNode )
+    {
+		d++;
+		if (d > dm) dm = d;
+        printTree( left(n) );
+        cerr << key(n) << " ";
+        printTree( right(n) );
+		d--;
+    }
+	return dm;
+}
+#endif
 
 
 unsigned int ddgSplayTree::size(void)

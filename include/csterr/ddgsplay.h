@@ -18,8 +18,11 @@
 */
 #ifndef _ddgSplay_Class_
 #define _ddgSplay_Class_
-
-#include "csterr/ddg.h"
+#ifdef DDG
+#include "ddgerror.h"
+#else
+#include "ddg.h"
+#endif
 /**
  * This class defines the data element stored by the ddgSplay tree.
  * this class can be subclassed with other members which map to
@@ -57,10 +60,8 @@ public:
 	{
 		if (_key < sk._key) return -1;
 		if (_key > sk._key) return 1;
-		if (_ti._tree < sk._ti._tree) return -1;
-		if (_ti._tree > sk._ti._tree) return 1;
-		if (_ti._index < sk._ti._index) return -1;
-		if (_ti._index > sk._ti._index) return 1;
+		if (_value < sk._value) return -1;
+		if (_value > sk._value) return 1;
 		// They are equal.
 		return 0; 
 	}
@@ -96,8 +97,8 @@ class ddgSplayNode;
 typedef ddgSplayNode *ddgSplayIndex;
 class WEXP ddgSplayNode
 {
-	friend class ddgSplayTree;
-	friend class ddgSplayIterator;
+	friend ddgSplayTree;
+	friend ddgSplayIterator;
 	/// The Implementation specific Data stored by a ddgSplay tree entry.
 	ddgSplayKey		_key;
 	/// The left child (also used by the free list to point to next free node).
@@ -131,7 +132,7 @@ class WEXP ddgSplayTree
 	static ddgSplayIndex _fList;
     /// Number of active ddgSplayTrees.
     static unsigned int _refCount;
-	/// The number of entries that can be managed by this ddgSplay tree.
+	/// The number of entries that can be managed by all ddgSplay trees.
 	static unsigned int _maxSize;
     /// The minimum item in the tree
     static ddgSplayKey _minNode;
@@ -143,6 +144,8 @@ class WEXP ddgSplayTree
     ddgSplayIndex _header;
 	/// The number of elements currently in the tree.
 	unsigned int _size;
+	/// The number of elements currently in all trees.
+	static unsigned int _totalSize;
 
 	/// ddgSplay the tree for this item.
 	ddgSplayIndex ddgSplay( ddgSplayKey Item, ddgSplayIndex n );
@@ -164,9 +167,9 @@ public:
 	inline ddgSplayIndex find( ddgSplayKey k, ddgSplayIndex n )
     { return ddgSplay( k, n ); }
     /// Find the minimum value in the tree.
-	ddgSplayIndex findMin( ddgSplayIndex n );
+    inline ddgSplayIndex findMin( ddgSplayIndex n );
 	/// Find the maximum value in the tree.
-	ddgSplayIndex findMax( ddgSplayIndex n );
+    inline ddgSplayIndex findMax( ddgSplayIndex n );
 	/// Insert a node.
 	ddgSplayIndex insert( ddgSplayKey k, ddgSplayIndex n );
 	/// Remove a node.
@@ -236,6 +239,10 @@ public:
 	inline ddgSplayIndex null(void) { return _nullNode; }
 	/// Return if the given node is null.
 	inline bool isnull(ddgSplayIndex n) { return _nullNode == n; }
+#ifdef _DEBUG
+	/// Print the current content of the tree.
+	int printTree( ddgSplayIndex n );
+#endif
 };
 
 /**
@@ -245,7 +252,7 @@ public:
 class WEXP ddgSplayIterator
 {
 	/// The maximum number of levels in the tree.
-#define stackMax 1000
+#define stackMax 10000
 	/// The ddgSplay tree over which to iterate.
 	ddgSplayTree	*_ddgSplaytree;
 	/// The stack. At most stackMax levels deep
@@ -269,6 +276,7 @@ public:
 		_current = _ddgSplaytree->root();
 		// find smallest (leftmost) or largest (rightmost) entry.
 		while (_current != _ddgSplaytree->null()) {
+			ddgAsserts(_depth < stackMax, "ddgSplay Iterator ran out of stack space");
 #ifdef _DEBUG
 			if (_depth > _maxDepth) _maxDepth = _depth;
 #endif
@@ -301,6 +309,7 @@ public:
 				// If there is a left child, go to it.
 				if (_current != _ddgSplaytree->null())
 				{ 
+					ddgAsserts(_depth < stackMax, "ddgSplay Iterator ran out of stack space");
 #ifdef _DEBUG
 			        if (_depth > _maxDepth) _maxDepth = _depth;
 #endif
@@ -337,6 +346,7 @@ public:
 				// If there is a right child, go to it.
 				if (_current != _ddgSplaytree->null())
 				{ 
+					ddgAsserts(_depth < stackMax, "ddgSplay Iterator ran out of stack space");
 #ifdef _DEBUG
 			        if (_depth > _maxDepth) _maxDepth = _depth;
 #endif

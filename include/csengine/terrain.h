@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,31 +16,32 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef TERRAIN_H
-#define TERRAIN_H
+#ifndef __CS_TERRAIN_H__
+#define __CS_TERRAIN_H__
 
 #include "csgeom/transfrm.h"
 #include "csengine/rview.h"
 #include "csobject/csobject.h"
-class csTextureHandle;
 
 class ddgTBinMesh;
+class ddgTBinTree;
 class ddgHeightMap;
 class ddgBBox;
 class ddgVBuffer;
+class csTextureHandle;
 class csVector3;
 
 class ddgColor3
 {
 public:
-	/// Data
-	unsigned char v[3];
-	/// Set values
-	void set( ddgColor3 *c ) { v[0] = c->v[0]; v[1] = c->v[1]; v[2] = c->v[2]; }
-	/// Set values
-	void set( ddgColor3 c ) { v[0] = c.v[0]; v[1] = c.v[1]; v[2] = c.v[2]; }
-	/// Set values
-	void set( unsigned char r, unsigned char g, unsigned char b ) { v[0] = r; v[1] = g; v[2] = b; }
+  /// Data
+  unsigned char v[3];
+  /// Set values
+  void set( ddgColor3 *c ) { v[0] = c->v[0]; v[1] = c->v[1]; v[2] = c->v[2]; }
+  /// Set values
+  void set( ddgColor3 c ) { v[0] = c.v[0]; v[1] = c.v[1]; v[2] = c.v[2]; }
+  /// Set values
+  void set( unsigned char r, unsigned char g, unsigned char b ) { v[0] = r; v[1] = g; v[2] = b; }
 };
 
 /**
@@ -66,7 +67,12 @@ private:
   ddgColor3 _cliff, _beach, _grass, _trees, _rock, _snow;
   /// Angle/Altitude at which color takes effect.
   float	_cliffangle, _beachalt, _grassalt, _treealt, _rockalt, _snowalt;
-
+  /// Texture scale factor.
+  float _texturescale;
+  /// Terrains location offset in world space.
+  csVector3	_pos;
+  /// Terrains size in world space.
+  csVector3 _size;
 public:
   /**
    * Create an empty terrain.
@@ -95,9 +101,16 @@ public:
   void SetTexture (csTextureHandle *texture) { _textureMap = texture; }
   /// Choose a color for a vertex.
   void classify( csVector3 *p, ddgColor3 *c);
+  /// Put a triangle into the vertex buffer.
+  bool PushTriangle(ddgTBinTree *bt, unsigned int tvc, ddgVBuffer *vbuf);
+  /**
+   * If current transformation puts us below the terrain at the given x,z location
+   * then we have hit the terrain.  We adjust position to be at level of terrain
+   * and return 1.  If we are above the terrain we return 0.
+   */
+  int CollisionDetect( csTransform *p );
 
   CSOBJTYPE;
 };
 
-#endif /*TERRAIN_H*/
-
+#endif // __CS_TERRAIN_H__

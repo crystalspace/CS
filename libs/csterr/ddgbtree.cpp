@@ -16,78 +16,77 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
-//
+#ifdef DDG
+#include "ddgsplay.h"
+#include "ddgtmesh.h"
+#include "ddgbtree.h"
+#include "ddggeom.h"
+#include "ddgmatrx.h"
+#else
 #include "sysdef.h"
 #include "csterr/ddgsplay.h"
 #include "csterr/ddgtmesh.h"
 #include "csterr/ddgbtree.h"
-
-extern csVector3 transformer (csVector3 vin);
-
-// Constant used for identifying brothers.
-const	unsigned int ddgNINIT = 0xFFFFFFFF;
-
-// ----------------------------------------------------------------------
-
-csVector3 ddgTBinTree::_unit;
-
-#if 0
-ostream& operator << ( ostream&s, ddgTBinTree *b )
-     {
-	  return s << 
-	 (void*)b << ":" << 
-	 (b->mirror() ? "m":"-") << " T" <<
-	 (void*)b->pNeighbourTop() << " L" << 
-	 (void*)b->pNeighbourLeft() << " D" << 
-	 (void*)b->pNeighbourDiag() << " (" <<
-	 b->dr() << "," << 
-	 b->dc() << ")";
-}
-
-ostream& operator << ( ostream&s, ddgTBinTree b )
-     { return s << 
-	 (void*)&b << "	" << 
-	 (b.mirror() ? "m":"-") << " T" <<
-	 (void*)b.pNeighbourTop() << " L" << 
-	 (void*)b.pNeighbourLeft() << " D" << 
-	 (void*)b.pNeighbourDiag() << " (" <<
-	 b.dr() << "," << 
-	 b.dc() << ")";
-}
 #endif
 
+/*
+There *are* some more complications having to do with the frustum 
+OUT labels.  When triangles transition from OUT to not OUT or 
+back this requires some checking for merge/split queue updates 
+for the tris that transition and their parents/kids/neighbors. 
+This is because I don't waste effort splitting/merging tris 
+outside the frustum unless continuity dictates.  Mergable diamonds 
+with one or more OUT labels in the two tris are still on the merge 
+queue, but with the lowest possible priority (so they get merged first). 
+
+Any leaf tri with an OUT label is taken off the split queue. 
+Another minor boundary condition is that finest-resolution leaves 
+are not put on the split queue.  These cases are dealt with by (1) 
+avoiding putting any OUT or finest-res leaf on the split queue (just 
+check right before inserting); (2) any split-queue member that 
+goes OUT gets removed from the split queue; (3) any non-finest 
+leaf that transitions to not OUT gets put on the split queue. 
+*/
+
+// Constant used for identifying neighbours.
+const	unsigned int ddgNINIT = 0xFFFFFFFF;
+
+ddgVector3 ddgTBinTree::_unit;
+
+static ddgTriIndex	*recurStack = NULL;	// mesh->_maxLevel
+static unsigned int recurStackSize = 0;
+#define recurStackPush(a)	{ ddgAsserts( recurStackSize <= _mesh->maxLevel(),"Recursion stack overflow!");recurStack[recurStackSize] = a; recurStackSize++; }
+#define recurStackPop(a)	{ ddgAsserts( recurStackSize > 0,"Recursion stack underflow!");recurStackSize--; a = recurStack[recurStackSize]; }
+
 /// s = size along one edge of mesh, mesh is 'square'.
-ddgTBinTree::ddgTBinTree( ddgTBinMesh *m, ddgTreeIndex i, ddgHeightMap* h, int dr, int dc, bool mirror )
+ddgTBinTree::ddgTBinTree( ddgTBinMesh *m, ddgTreeIndex i, ddgHeightMap* h, unsigned short *idx, int dr, int dc, bool mirror )
 {
-    _init = false;
 	_index = i;
+    ddgAssert(m);
 	_mesh = m;
     _dr = dr;
     _dc = dc;
 	heightMap = h;
+	normalIdx = idx;
     _mirror = mirror;
 	_pNeighbourTop = NULL;
 	_pNeighbourLeft = NULL;
 	_pNeighbourDiag = NULL;
 	_tri = new ddgMTri[triNo()+2];
-	// Initialize split queue with top triangle.
-	init();
-	// Top level triangles.
-	tri(0)->_state = 0;
-	tri(1)->_state = 0;
-	tri(0)->reset();
-	tri(1)->reset();
-	tri(triNo())->_state = 0;
-	tri(triNo()+1)->_state = 0;
-	tri(triNo())->reset();
-	tri(triNo()+1)->reset();
-	insertSQ(1);
+	ddgAsserts(_tri,"Failed to Allocate memory");
+	ddgMemorySet(ddgMTri,triNo()+2);
+
+	if (!recurStack)
+	{
+		recurStack = new ddgTriIndex[2*_mesh->maxLevel()];
+		ddgMemorySet(ddgTriIndex,2*_mesh->maxLevel());
+	}
+
 }
 
 ddgTBinTree::~ddgTBinTree(void)
 {
-	delete _tri;
+	delete [] _tri;
 }
 
 static float maxTh = 0;
@@ -97,11 +96,8 @@ static float maxTh = 0;
  */
 bool ddgTBinTree::init( void )
 {
-	// Avoid being called twice.
-	if (_init)
-		return false;
-	else
-		_init = true;
+	//          va     1 size,0
+	// Dummy entries.
 
 	float th = split(1,0,triNo(),triNo()+1,1);
 	ddgAssert( maxTh < 0xFFFF);
@@ -111,22 +107,61 @@ bool ddgTBinTree::init( void )
 	tri(triNo())->thick(th);
 	tri(triNo()+1)->thick(th); 
 
-	return false;
+	return ddgSuccess;
 }
 
-void ddgTBinTree::initWtoC( ddgTBinMesh * /*mesh*/)
+/// The bounding box in screen space.
+ddgBBox         *_camBBox = NULL;
+/// The field of view.
+float           _tanHalfFOV   = 1.0;
+
+#ifdef DDG
+/// World to camera space transformation matrix must be initialized before calling calculate.
+ddgMatrix4 _wtoc;
+ddgPlane		*_frustrum;
+void ddgTBinTree::transform( ddgVector3 *vino, ddgVector3 *vouto )
+{
+	float *m = _wtoc, *vin = (float*)vino, *vout = (float*)vouto;
+    // Convert the world coordinates to camera coordinates.
+    // Perform matrix multiplication.
+    vout[0] = m[0]*vin[0]+m[4]*vin[1]+m[8]*vin[2]+m[12];
+    vout[1] = m[1]*vin[0]+m[5]*vin[1]+m[9]*vin[2]+m[13];
+    vout[2] = m[2]*vin[0]+m[6]*vin[1]+m[10]*vin[2]+m[14];
+}
+
+void ddgTBinTree::initWtoC( ddgMatrix4 *wtoc, ddgBBox *camClipBox, float fov, ddgPlane frustrum[6])
+{
+	ddgAssert(camClipBox);
+	int i;
+    // Set world to camera transformation matrix.
+	for(i = 0; i < 16; i++)
+	_wtoc.v[i] = wtoc->v[i];
+
+    // Set the camera bounding box.
+    _camBBox = camClipBox;
+    // Set the field of view.
+    _tanHalfFOV = tan(ddgAngle::degtorad(fov/2.0));
+	_frustrum = frustrum;
+	ddgVector3 ev0,ev1;
+	ddgTBinTree::transform( ddgVector3(0,0,0), ev0 );
+	ddgTBinTree::transform( ddgVector3(0,1,0), ev1 );
+	_unit =  ev1 - ev0;
+}
+#else
+
+
+void ddgTBinTree::initWtoC( ddgBBox *camClipBox )
 {
 	csVector3 ev0,ev1,tmp;
-//	float * meshWtoC = mesh->wtoc();
-//	int i;
-//	for(i = 0; i < 16; i++)
-//	_wtoc.m[i] = meshWtoC[i];
+    // Set the camera bounding box.
+    _camBBox = camClipBox;
 
 	ev0 = transformer (csVector3 (0,0,0));
 	ev1 = transformer (csVector3 (0,1,0));
 	tmp = ev1 - ev0;
 	_unit = tmp;
 }
+#endif
 
 /**
  *  Split this triangle into 2, and return the thickness.
@@ -166,9 +201,6 @@ float ddgTBinTree::split( unsigned int level,
 	return tri(vc)->thick();
 }
 
-
-
-
 /// Remove triangle i.
 void ddgTBinTree::removeSQ(ddgTriIndex tindex )
 {
@@ -177,18 +209,18 @@ void ddgTBinTree::removeSQ(ddgTriIndex tindex )
     ddgAsserts(!_mesh->merge() || !DDG_BGET(tri(tindex)->_state, ddgMTri::SF_MQ),"Triangle also in merge queue!");
 
 	DDG_BCLEAR(tri(tindex)->_state, ddgMTri::SF_SQ);
-	// If we were visible and not a leaf node actually remove us.
-	_mesh->remCountIncr();
-	unsigned int p = tri(tindex)->priority();
-//	ddgAsserts(tindex == 1 || p < 2 || p < tri(parent(tindex))->priority(),"Child has greater priority than parent!");
 
-	_mesh->qs()->remove(_index,tindex,p);
-	// If we were visible, reduce the count.
-	if (!DDG_BGET(tri(tindex)->_vis, DDGCF_ALLOUT))
+	unsigned int p = tri(tindex)->priority();
+	_mesh->tcache()->freeNode(tri(tindex)->tcacheId);
+	// If we are not a leaf node...
+	if (tindex < _mesh->leafTriNo())
 	{
-		ddgAssert(_visTri > 0);
-		_visTri--;
+	// If we were visible and not a leaf node actually remove us.
+		_mesh->remCountIncr();
+//	ddgAsserts(tindex == 1 || p < 2 || p < tri(parent(tindex))->priority(),"Child has greater priority than parent!");
+		_mesh->qs()->remove(_index,tindex,p);
 	}
+	_queueTri--;
 
 	//  then remove it from the merge queue if it is there.
 	if (_mesh->merge())
@@ -206,14 +238,21 @@ void ddgTBinTree::insertSQ(ddgTriIndex tindex)
 		removeMQ(tindex);
 	}
 	DDG_BSET(tri(tindex)->_state, ddgMTri::SF_SQ);
-	reset(tindex);
-	_mesh->insCountIncr();
+	tri(tindex)->reset();
 	tri(tindex)->resetPriorityDelay();
-	// Find insertion point.
-	unsigned int p = priority(tindex);
-	ddgAsserts(tindex == 1 || p < 2 || p < priority(parent(tindex)),"Child has greater priority than parent!");
 
-	_mesh->qs()->insert(_index,tindex,p);
+	unsigned int p = priority(tindex);
+	tri(tindex)->tcacheId = _mesh->tcache()->set(_index,tindex);
+	// If we are not a leaf node...
+	if (tindex < _mesh->leafTriNo())
+	{
+		_mesh->insCountIncr();
+		// Find insertion point.
+		ddgAsserts(tindex == 1 || p < 2 || p < priority(parent(tindex)),"Child has greater priority than parent!");
+		_mesh->qs()->insert(_index,tindex,p);
+	}
+	_queueTri++;
+
 	if (_mesh->merge())
 	{
 		if (tindex  > 1 && isDiamond(parent(tindex)))
@@ -377,174 +416,191 @@ bool ddgTBinTree::isDiamondVisible(ddgTriIndex tindex)
     ddgTriIndex f = parent(tindex),		// Father.
 				 u = neighbour(f);		// Uncle.
 	ddgAssert(u<ddgNINIT);
-	if (DDG_BGET(tri(tindex)->_vis, DDGCF_ALLOUT) && !u)
+	if (!visible(tindex) && !u)
 		return false;
 	if (!u)
 		return true;
-	if (DDG_BGET(neighbourTree(u)->tri(u)->_vis, DDGCF_ALLOUT))
+	if (!neighbourTree(u)->visible(u))
 		return false;
 
 	return true;
 }
 
-// Reset upto the point that the triangle are inserted but not below.
-void ddgTBinTree::reset(ddgTriIndex tindex)
+
+void ddgTBinTree::visibility(ddgTriIndex tindex)
 {
-	ddgAsserts(tindex <= triNo(), "No leaf node was found in the queue!");
+    ddgAssert(_camBBox);
+	ddgAsserts(tindex <= triNo(), " No leaf node was found in the queue!");
 
-	tri(tindex)->reset();  // Reset all but queue status.
-
-	// This will only go as far as the leaves which are currently in the split queue.
-	if (!DDG_BGET(tri(tindex)->_state, ddgMTri::SF_SQ))
+	recurStackPush(tindex);
+	do
 	{
-		reset(left(tindex));
-		reset(right(tindex));
-	}
-}
+		recurStackPop(tindex);
+		ddgTriIndex tva = parent(tindex),
+			tv0 = v0(tindex),
+			tv1 = v1(tindex);
 
-/// Return the camera space vector.
-csVector3* ddgTBinTree::pos(ddgTriIndex tindex)
-{
-	csVector3 *ptri;
-	if (tri(tindex)->_cbufindex == 0)
-	{
-		// Get new entry if we need it.
-		tri(tindex)->_cbufindex = _mesh->vcache()->alloc();
-	}
-	ptri = _mesh->vcache()->get( tri(tindex)->_cbufindex );
-	// Transform the vertex if we need to.
-	if (!DDG_BGET(tri(tindex)->_state, ddgMTri::SF_COORD))
-	{
-		static csVector3 wpqr;
-		vertex(tindex,&wpqr);
-		*ptri = transformer (wpqr);
-		DDG_BSET(tri(tindex)->_state, ddgMTri::SF_COORD);
-	}
-	// Return the cache index to the transformed vertex.
-	return ptri;
-}
+		ddgVisState oldVis = tri(tindex)->vis();
+		tri(tindex)->reset();  // Reset all but queue status.
 
-void ddgTBinTree::visibility(ddgTriIndex tvc)
-{
-	ddgTriIndex tva = parent(tvc),
-		tv0 = v0(tvc),
-		tv1 = v1(tvc);
- 
-    ddgAssert(_mesh->camBBox());
-	ddgAsserts(tvc <= triNo(), " No leaf node was found in the queue!");
-
-	bool oldVis = (DDG_BGET(tri(tvc)->_vis, DDGCF_ALLOUT) != 0);
-	// If visibility information is not valid.
-	if (tri(tvc)->_vis == 0)
-	{
-		if (DDG_BGET(tri(tva)->_vis, DDGCF_ALLIN)
-		  ||DDG_BGET(tri(tva)->_vis, DDGCF_ALLOUT))
+		if (fullyvisible(tva)||(!visible(tva))) 
 		// If parent is completely inside or completely outside, inherit.
 		{
-			tri(tvc)->_vis = tri(tva)->_vis;
+			tri(tindex)->vis( tri(tva)->vis());
 		}
 		// We dont know so analyze ourselves.
 		else
 		{
+			_mesh->visCountIncr();
 			// Calculate bounding box of wedgie.
-			csVector3 pmin;
-			csVector3 pmax;
-			csVector3 *ptri;
-			csVector3 vu, vl;
-			csVector3 th;
-			csVector3 *un = &_unit;
+			ddgBBox		bbox;
+			ddgVector3 *pmin = bbox.min();
+			ddgVector3 *pmax = bbox.max();
+
+			ddgVector3 vu, vl;
+#if 1
+			ddgVector3 th;
+			ddgVector3 *ptri;
+			th = _unit;
+			th *= tri(tindex)->thick();
+
 			// Calculate the parent.
 			ptri = pos(tva);
-			th = (*un)*(tri(tvc)->thick());
 			vu = *ptri+th;
-			vl = *ptri-th;
-			pmin = vu;
-			pmax = vu;
-			csMath3::SetMinMax(vl,pmin,pmax);
+			vl = *ptri - th;
 
+			*pmin = vu;
+			*pmax = vu;
+#ifdef DDG
+			pmin->minimum(vl);
+			pmax->maximum(vl);
+#else
+			csMath3::SetMinMax(vl,*pmin,*pmax);
+#endif
 			// Calculate the left and right vertex.
 			ptri = pos(tv0);
-			th= (*un) *(tri(tv0)->thick());
 			vu = *ptri+th;
-			vl = *ptri-th;
-			csMath3::SetMinMax(vu,pmin,pmax);
-			csMath3::SetMinMax(vl,pmin,pmax);
+			vl = *ptri - th;
+#ifdef DDG
+			pmin->minimum(vu);
+			pmax->maximum(vu);
+			pmin->minimum(vl);
+			pmax->maximum(vl);
+#else
+			csMath3::SetMinMax(vu,*pmin,*pmax);
+			csMath3::SetMinMax(vl,*pmin,*pmax);
+#endif
 
 			ptri = pos(tv1);
-			th = (*un)*(tri(tv1)->thick());
 			vu = *ptri+th;
 			vl = *ptri-th;
-			csMath3::SetMinMax(vu,pmin,pmax);
-			csMath3::SetMinMax(vl,pmin,pmax);
-
+#ifdef DDG
+			pmin->minimum(vu);
+			pmax->maximum(vu);
+			pmin->minimum(vl);
+			pmax->maximum(vl);
+#else
+			csMath3::SetMinMax(vu,*pmin,*pmax);
+			csMath3::SetMinMax(vl,*pmin,*pmax);
+#endif
 
 			// Pmin and Pmax now define a bounding box that contains the wedgie.
 			// Determine if this bounding box is visible in screen space.
-		   	if (pmin.z> _mesh->farclip() || pmax.z < _mesh->nearclip())
+#ifdef DDG
+			if ((*pmax)[2]< _mesh->farClip() || (*pmin)[2] > _mesh->nearClip())
+#else
+			if ((*pmin)[2]> _mesh->farClip() || (*pmax)[2] < _mesh->nearClip())
+#endif
 			{
-				tri(tvc)->_vis = 0;
-				DDG_BSET(tri(tvc)->_vis, DDGCF_ALLOUT);
+				tri(tindex)->vis(ddgOUT);
 			}
 			else
 			{
-				float thfov = _mesh->tanHalfFOV();
-				tri(tvc)->_vis = _mesh->camBBox()->visibleSpace(ddgBBox(pmin,pmax), thfov);
+				ddgClipFlags cf = _camBBox->visibleSpace(bbox,_tanHalfFOV );
+				if (DDG_BGET(cf, DDGCF_ALLOUT))
+					tri(tindex)->vis(ddgOUT);
+				else if (DDG_BGET(cf,DDGCF_ALLIN))
+					tri(tindex)->vis(ddgIN);
+				else
+					tri(tindex)->vis(ddgPART);
 			}
+#endif
+			/* World space clipping.*/
+#if 0
+			// Bounding box is defined by points v0 and v1.
+			vertex(tv0,pmin);
+			vertex(tv0,pmax);
+			vertex(tv1,&vl);
+			pmin->minimum(vl);
+			pmax->maximum(vl);
+			vertex(tva,&vu);
+			pmin->minimum(vu);
+			pmax->maximum(vu);
+			// Adjust box by wedgie thickness.
+			pmin->v[1] = pmin->v[1] - tri(tindex)->thick();
+			pmax->v[1] = pmax->v[1] + tri(tindex)->thick();
+			tri(tindex)->vis( bbox.isVisible(_frustrum));
+#endif
 		}
-		if (DDG_BGET(tri(tvc)->_state, ddgMTri::SF_SQ) && !DDG_BGET(tri(tvc)->_vis, DDGCF_ALLOUT))
-			// This triangle is in the mesh and is visible.
+		// Check if we need to reset the priority delay
+		if ((oldVis == ddgOUT) && visible(tindex))
 		{
-			_visTri++;
+			tri(tindex)->resetPriorityDelay();
+		}
+		// This will only go as far as the leaves which are currently in the split queue.
+	if (!DDG_BGET(tri(tindex)->_state, ddgMTri::SF_SQ))
+		{
+			recurStackPush(left(tindex));
+			recurStackPush(right(tindex));
 		}
 	}
-	// Check if we need to reset the priority delay
-	if (oldVis != DDG_BGET(tri(tvc)->_vis, DDGCF_ALLOUT))
-	{
-		tri(tvc)->resetPriorityDelay();
-	}
-	// This will only go as far as the leaves which are currently in the split queue.
-	if (!DDG_BGET(tri(tvc)->_state, ddgMTri::SF_SQ))
-	{
-		visibility(left(tvc));
-		visibility(right(tvc));
-	}
-
+	while (recurStackSize);
 }
 
 // Recusively update priorities.
 void ddgTBinTree::priorityUpdate(ddgTriIndex tindex)
 { 
 	ddgAsserts(tindex <= triNo(), " No leaf node was found in the queue!");
-	// If priority information is not valid.
-	if (!tri(tindex)->getPriorityDelay()
-		&& (DDG_BGET(tri(tindex)->_state, ddgMTri::SF_SQ) || DDG_BGET(tri(tindex)->_state, ddgMTri::SF_MQ)))
+	ddgAsserts(recurStackSize == 0, "Recursion stack was not empty!");
+
+	recurStackPush(tindex);
+	do
 	{
-		unsigned int op = tri(tindex)->priority();
-		unsigned int p = priority(tindex);
-		ddgAsserts(tindex == 1 || p < 2 || p < priority(parent(tindex)),"Child has greater priority than parent!");
-
-		if (op != p)
+		recurStackPop(tindex);
+		// If priority information is not valid.
+		if (!tri(tindex)->getPriorityDelay()
+			&& (DDG_BGET(tri(tindex)->_state, ddgMTri::SF_SQ) || DDG_BGET(tri(tindex)->_state, ddgMTri::SF_MQ)))
 		{
-			_mesh->movCountIncr();
-			if (DDG_BGET(tri(tindex)->_state, ddgMTri::SF_SQ))
-			{
-				_mesh->qs()->remove(_index,tindex,op);
-				_mesh->qs()->insert(_index,tindex,p);
-			}
+			unsigned int op = tri(tindex)->priority();
+			unsigned int p = priority(tindex);
+			ddgAsserts(tindex == 1 || p < 2 || p < priority(parent(tindex)),"Child has greater priority than parent!");
 
-			if (DDG_BGET(tri(tindex)->_state, ddgMTri::SF_MQ))
+			if (op != p)
 			{
-				_mesh->qm()->remove(_index,tindex,op);
-				_mesh->qm()->insert(_index,tindex,p);
+				// If we are not a leaf node...
+				if (tindex < _mesh->leafTriNo() && DDG_BGET(tri(tindex)->_state, ddgMTri::SF_SQ))
+				{
+					_mesh->movCountIncr();
+					_mesh->qs()->remove(_index,tindex,op);
+					_mesh->qs()->insert(_index,tindex,p);
+				}
+				else if (DDG_BGET(tri(tindex)->_state, ddgMTri::SF_MQ) )
+				{
+					_mesh->movCountIncr();
+					_mesh->qm()->remove(_index,tindex,op);
+					_mesh->qm()->insert(_index,tindex,p);
+				}
 			}
 		}
+		// This will only go as far as the leaves which are currently in the split queue.
+		if (!DDG_BGET(tri(tindex)->_state, ddgMTri::SF_SQ) )
+		{
+			recurStackPush(left(tindex));
+			recurStackPush(right(tindex));
+		}
 	}
-	// This will only go as far as the leaves which are currently in the split queue.
-	if (!DDG_BGET(tri(tindex)->_state, ddgMTri::SF_SQ))
-	{
-		priorityUpdate(left(tindex));
-		priorityUpdate(right(tindex));
-	}
+	while(recurStackSize);
+	ddgAsserts(recurStackSize == 0, "Recursion stack was not empty!");
 }
 
 // Priority of Triangle tindex.
@@ -559,13 +615,13 @@ unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 	}
 
 	// Ensure triangle's visibility is uptodate.
-	if (tri(tvc)->_vis == 0)
+	if (tri(tvc)->vis() == ddgUNDEF)
 	{
 		visibility(tvc);
 	}
 
 	// Wedgie is not visible.
-	if (DDG_BGET(tri(tvc)->_vis, DDGCF_ALLOUT))
+	if (!visible(tvc))
 	{
 		tri(tvc)->setPriorityDelay( 1 );
 		return tri(tvc)->priority( 0 );
@@ -576,38 +632,28 @@ unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 		tv0 = v0(tvc),
 		tv1 = v1(tvc);
 
-	csVector3 wpqr;
-
     // Get screen space error metric of wedgie thickness.
 	// Note were are switching y & z since ROAM paper is z
 	// oriented for thickness and we are y oriented.
 
-	if (!DDG_BGET(tri(tva)->_state, ddgMTri::SF_COORD))
-	{
-        vertex(tva,&wpqr);
-		*pos(tva) = transformer (wpqr);
-		DDG_BSET(tri(tva)->_state, ddgMTri::SF_COORD);
-	}
-
-	// Left and right vertex should be calculated.
-	if (!DDG_BGET(tri(tv0)->_state, ddgMTri::SF_COORD))
-	{
-        vertex(tv0,&wpqr);
-		*pos(tv0) = transformer (wpqr);
-		DDG_BSET(tri(tv0)->_state, ddgMTri::SF_COORD);
-	}
-	if (!DDG_BGET(tri(tv1)->_state, ddgMTri::SF_COORD))
-	{
-        vertex(tv1,&wpqr);
-		*pos(tv1) = transformer (wpqr);
-		DDG_BSET(tri(tv1)->_state, ddgMTri::SF_COORD);
-	}
-
 	// Calculate the maximum screen space thickness.
-	csVector3 th = _unit*(tri(tvc)->thick());
+	ddgVector3 th = _unit;
+	th *= tri(tvc)->thick();
+
+	// a,b,c = thickness vector in camera space.
+	// p = screen right
+	// q = screen down
+	// r = into screen
+	//
+	// m = 2/(r^2-c^2) three times (once per vertex), and take the max
+	// of the three.  You also compute m = ((ar-cp)^2+(br-cq)^2) 
+	// three times and take the max.  You then take the first max times
+	// the square root of the second.
+	// max as your distortion bound and priority.
 
 	float result = ddgMAXPRI;
 #define ddgEPSILON 0.00001
+
 	float a = th[0],
 		  b = th[1],
 		  c = th[2], cc,
@@ -620,36 +666,36 @@ unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 	cc = c*c;
 
 	// Check for invalid values.
-    r[0] = pos(tv0)->z;
+    r[0] = (*pos(tv0))[2];
 	rr[0] = r[0]*r[0];
 	if (rr[0] <= cc + ddgEPSILON)
 		goto skip;
-    r[1] = pos(tv1)->z;
+    r[1] = (*pos(tv1))[2];
 	rr[1] = r[1]*r[1];
 	if (rr[1] <= cc + ddgEPSILON)
 		goto skip;
-	r[2] = pos(tva)->z;
+	r[2] = (*pos(tva))[2];
 	rr[2] = r[2]*r[2];
 	if (rr[2] <= cc + ddgEPSILON)
 		goto skip;
 
 	// Perform expensive screen space error calculations.
-    p[0] = pos(tv0)->x;
-    q[0] = -1*pos(tv0)->y;
+    p[0] = (*pos(tv0))[0];
+    q[0] = -1*(*pos(tv0))[1];
 	tp[0] = a*r[0]-c*p[0];
 	tq[0] = b*r[0]-c*q[0];
 	d[0] = (sq(tp[0])+sq(tq[0]));
 	m[0] = 2.0 / (rr[0] - cc);
 
-    p[1] = pos(tv1)->x;
-    q[1] = -1*pos(tv1)->y;
+    p[1] = (*pos(tv1))[0];
+    q[1] = -1*(*pos(tv1))[1];
 	tp[1] = a*r[1]-c*p[1];
 	tq[1] = b*r[1]-c*q[1];
 	d[1] = (sq(tp[1])+sq(tq[1]));
 	m[1] = 2.0 / (rr[1] - cc);
 
-	p[2] = pos(tva)->x;
-	q[2] = -1*pos(tva)->y;
+	p[2] = (*pos(tva))[0];
+	q[2] = -1*(*pos(tva))[1];
 	tp[2] = a*r[2]-c*p[2];
 	tq[2] = b*r[2]-c*q[2];
 	d[2] = (sq(tp[2])+sq(tq[2]));
@@ -665,6 +711,7 @@ unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 	result = ddgUtil::clamp(result*1000,1,ddgMAXPRI);
 skip:
 	_mesh->priCountIncr();
+
 	// This puts in invalid values unless parents priority is always updated.
 	unsigned short tpriority = (unsigned short)result;
 
@@ -688,9 +735,9 @@ skip:
 
 	// Z is negative decreasing with distance.
 	int v = 1;
-	if (_mesh->progdist() != 0)
+	if (_mesh->progDist() != 0)
 	{
-		v = int(zMin / _mesh->progdist());
+		v = int(zMin / _mesh->progDist());
 		v = int(ddgUtil::clamp(v,1,15));
 	}
 	tri(tvc)->setPriorityDelay(v);
@@ -701,25 +748,20 @@ skip:
 // Get height of bintree at a real location.
 float ddgTBinTree::treeHeight(unsigned int r, unsigned int c, float dx, float dz)
 {
-    // Is this triangle mirrored.
-    csVector3 v(dx,0,dz);
-#if 1
-    (void)r;
-    (void)c;
-#else
-    unsigned int m = (dx+dz > 1.0) ? 1 : 0;
-    float h1 = height(r+ m,  c + m);
+	// Is this triangle mirrored.
+    float m = (dx+dz > 1.0) ? 1.0 : 0.0;
+    float h1 = height(ddgTriIndex(r+ m), ddgTriIndex(c + m));
     float h2 = height(r,  c+1);
     float h3 = height(r+1,c);
-    csVector3 p0(m,h1,m),
-    csVector3 p1(0,h2,1),
-    csVector3 p2(1,h3,0),
-    ddgPlane p(p0,p1,p2);
-    p.projectAlongY(&v);
-#endif
-    return v.y;
-}
+	ddgVector3 p0(m,h1,m),
+			   p1(0,h2,1),
+			   p2(1,h3,0),
+			   v(dx,0,dz);
+	ddgPlane p(p0,p1,p2);
+	p.projectAlongY(&v);
 
+    return v[1];
+}
 #ifdef _DEBUG
 bool ddgTBinTree::verify( ddgTriIndex tindex )
 {
@@ -727,8 +769,8 @@ bool ddgTBinTree::verify( ddgTriIndex tindex )
 	{
 		ddgTriIndex n = neighbour(tindex);
 		ddgTBinTree *nt = n ? neighbourTree(tindex) : 0;
-		if (!DDG_BGET(tri(tindex)->_state, ddgMTri::SF_MQ) &&
-			(n && !DDG_BGET(nt->tri(n)->_state, ddgMTri::SF_MQ)))
+		if (!DDG_BGET(tri(tindex)->_state,ddgMTri::SF_MQ) &&
+			(n&& !DDG_BGET(nt->tri(n)->_state,ddgMTri::SF_MQ)))
 			return true;
 	}
 	return false;

@@ -25,16 +25,21 @@
 #include <io.h>
 #include <fcntl.h>
 #endif
-
+// DDG includes
+#ifdef DDG
+#include "ddghemap.h"
+#include "ddgvec.h"
+#include "ddgnoise.h"
+#include "ddgimage.h"
+#include "ddgerror.h"
+#else
 #include "sysdef.h"
 // DDG includes
 #include "csterr/ddgutil.h"
 #include "csterr/ddghemap.h"
 #include "csterr/ddgnoise.h"
-#include "csterr/worditer.h"
+#endif
 
-#define PGM_MAGIC "P2"
-#define NO_DEM 1
 // ----------------------------------------------------------------------
 unsigned long ddgEndianTest = 0x12345678L;
 
@@ -43,7 +48,7 @@ ddgHeightMap::~ddgHeightMap(void)
 	delete _pixbuffer;
 }
 
-void ddgHeightMap::allocate( unsigned short r, unsigned short  c )
+bool ddgHeightMap::allocate( unsigned short r, unsigned short  c )
 {
 	_cols = c;
 	_rows = r;
@@ -51,6 +56,8 @@ void ddgHeightMap::allocate( unsigned short r, unsigned short  c )
 	ddgAssert(sizeof(short) == 2);
 	_pixbuffer = new short[_cols*_rows];
 	ddgAsserts(_pixbuffer,"Failed to Allocate memory");
+	ddgMemorySet(short,_cols*_rows);
+	return (_pixbuffer ? ddgSuccess : ddgFailure);
 }
 
 // ----------------------------------------------------------------------
@@ -60,7 +67,7 @@ bool ddgHeightMap::readMemory( unsigned short *buf )
 	int i;
 	for (i=0; i < _cols*_rows; i++)
 		_pixbuffer[i] = buf[i];
-	return false;
+	return ddgSuccess;
 }
 
 // ----------------------------------------------------------------------
@@ -69,21 +76,23 @@ bool ddgHeightMap::readMemory( unsigned short *buf )
 bool ddgHeightMap::writeTGN(const char *filename)
 {
 	FILE *fptr = filename && filename[0] ? fopen(filename,"wb") : 0;
-
 	if (!fptr) {
+		ddgErrorSet(FileWrite,(filename ? filename : "(null)"));
 		goto error;
 	}
 
 	// Header
 	if (fwrite("TERRAGENTERRAIN SIZE",1,20,fptr) < 20)
 	{
+		ddgErrorSet(FileWrite,"Couldn't write header.");
 		goto error;
 	}
 
 	// SIZE.
 	unsigned char ch1, ch2;
-	ch1 = (_cols - 1) % 256;
-	ch2 = ((_cols - 1) - ch1) / 256;
+
+	ch1 = (_cols-1) % 256;
+	ch2 = ((_cols-1) - ch1) / 256;
 	fputc(ch1,fptr);
 	fputc(ch2,fptr);
 	// Padding 2 bytes.
@@ -93,6 +102,7 @@ bool ddgHeightMap::writeTGN(const char *filename)
 	// XPTS.
 	if (fwrite("XPTS",1,4,fptr) < 4)
 	{
+		ddgErrorSet(FileWrite,"Couldn't write XPTS.");
 		goto error;
 	}
 
@@ -107,6 +117,7 @@ bool ddgHeightMap::writeTGN(const char *filename)
 	// YPTS.
 	if (fwrite("YPTS",1,4,fptr) < 4)
 	{
+		ddgErrorSet(FileWrite,"Couldn't write YPTS.");
 		goto error;
 	}
 
@@ -121,6 +132,7 @@ bool ddgHeightMap::writeTGN(const char *filename)
 	// ALTW.
 	if (fwrite("ALTW",1,4,fptr) < 4)
 	{
+		ddgErrorSet(FileWrite,"Couldn't write ALTW.");
 		goto error;
 	}
 
@@ -138,10 +150,11 @@ bool ddgHeightMap::writeTGN(const char *filename)
 	fputc(ch2,fptr);
 
 	// Write data
-	if (*((unsigned char*)&ddgEndianTest) == 0x12)
+	if  (*((unsigned char*)&ddgEndianTest) == 0x12)
 	{
 		char s;
 		int i;
+
 		for (i = 0; i < 2 * _rows * _cols; i=i+2)
 		{
 			s = _pixbuffer[i];
@@ -152,25 +165,25 @@ bool ddgHeightMap::writeTGN(const char *filename)
 	int r;
 	int cnt;
 	r = 0;
-
 	while (r < _rows)
 	{
-		if ((cnt = fwrite(&(_pixbuffer[r*_cols]),2,_cols,fptr)) < (int)_cols)
+		if ((cnt = fwrite(&(_pixbuffer[r*_cols]),2,_cols,fptr)) <(int)_cols)
 		{
+			ddgErrorSet(FileWrite,(char *) (filename ? filename : "(null)"));
 			if (feof(fptr))
 			{
-				ddgAsserts(false,"Error writing to file!");
+				ddgErrorSet(FileAccess,"Error writing to file!");
 			}
-			fclose(fptr);
-			return true;
+			goto error;
 		}
 		r++;
 	}
 	// Swap byte order for machines with different endian.
-	if (*((unsigned char*)&ddgEndianTest) == 0x12)
+	if  (*((unsigned char*)&ddgEndianTest) == 0x12)
 	{
 		char s;
 		int i;
+
 		for (i = 0; i < 2 * _rows * _cols; i=i+2)
 		{
 			s = _pixbuffer[i];
@@ -185,14 +198,16 @@ bool ddgHeightMap::writeTGN(const char *filename)
 	fputc(0,fptr);
 
 	fclose(fptr);
-	return true;
+	return ddgSuccess;
 
 error:
 	if (fptr)
 		fclose(fptr);
-	return false;
+#ifdef DDG
+	ddgError::report();
+#endif
+	return ddgFailure;
 }
-
 
 bool ddgHeightMap::readTGN(const void *buf, unsigned long size)
 {
@@ -311,55 +326,167 @@ bool ddgHeightMap::readTGN(const void *buf, unsigned long size)
 
 bool ddgHeightMap::readTGN(const char *file)
 {
-	bool err = true;
-	if (file && *file)
+	FILE *fptr = file && file[0] ? fopen(file,"rb") : 0;
+	if (!fptr)
 	{
-		FILE *fptr = fopen(file, "rb");
-		if (fptr)
+		ddgErrorSet(FileRead,(char *) (file ? file : "(null)"));
+		goto error;
+	}
+	unsigned char ch1, ch2;
+
+	char name[9],type[9], segment[5], pad[2];
+
+	// Name 8 bytes.
+	fread(name,8,1,fptr);
+	name[8] = '\0';
+	fread(type,8,1,fptr);
+	type[8] = '\0';
+	if (strcmp(name,"TERRAGEN") || strcmp(type,"TERRAIN "))
+	{
+		ddgErrorSet(FileRead,(char *) "File is not a TERRAGEN TERRAIN file");
+		goto error;
+	}
+
+	// Segment 4 bytes.
+	segment[4] = '\0';
+
+	fread(segment,4,1,fptr);
+
+	if (!strcmp(segment,"SIZE"))
+	{
+		// SIZE 2 bytes.
+		ch1 = fgetc(fptr);
+		ch2 = fgetc(fptr);
+		_rows = _cols = ch2*256+ch1 +1;
+		// Padding 2 bytes.
+		fread(pad,2,1,fptr);
+		fread(segment,4,1,fptr);
+	}
+
+	if (!strcmp(segment,"XPTS"))
+	{
+		// XPTS.
+		ch1 = fgetc(fptr);
+		ch2 = fgetc(fptr);
+		_cols = ch2*256+ch1;
+		// Padding 2 bytes.
+		fread(pad,2,1,fptr);
+
+		fread(segment,4,1,fptr);
+		// YPTS.
+		if (!strcmp(segment,"YPTS"))
 		{
-			fseek(fptr, 0, SEEK_END);
-			const long len = ftell(fptr);
-			if (len > 0)
-			{
-				void* buf = malloc(len);
-				fseek(fptr, 0, SEEK_SET);
-				if (fread(buf, len, 1, fptr) == 1)
-					err = readTGN(buf, (unsigned long)len);
-				free(buf);
-			}
-			fclose(fptr);
+			ch1 = fgetc(fptr);
+			ch2 = fgetc(fptr);
+			_rows = ch2*256+ch1;
+			// Padding 2 bytes.
+			fread(pad,2,1,fptr);
+			fread(segment,4,1,fptr);
+		}
+		else
+		{
+			ddgErrorSet(FileRead,(char *) "Expected YPTS segment, but it was not found.");
+			goto error;
 		}
 	}
-	return err;
+
+	// ALTW.
+	// Absolute elevation for a given point is
+	// BaseHeight + elevation* Scale / 65536.
+	if (!strcmp(segment,"ALTW"))
+	{
+		ch1 = fgetc(fptr);
+		ch2 = fgetc(fptr);
+		_scale = (ch2*256+ch1)/ 65536.0;
+
+		ch1 = fgetc(fptr);
+		ch2 = fgetc(fptr);
+		_base = ch2*256+ch1;
+	}
+	else
+	{
+		ddgErrorSet(FileRead,(char *) "Expected ALTW segment, but it was not found.");
+		goto error;
+	}
+
+	// Read height data
+	// The absolute altitude of a particular point (in the same scale as x and y)
+	// is equal to BaseHeight + Elevation * HeightScale / 65536
+	if (allocate(_cols,_rows) != ddgSuccess)
+		goto error;
+
+	int r;
+	int cnt;
+	r = 0;
+	while (r < _rows)
+	{
+		if ((cnt = fread(&(_pixbuffer[r*_cols]),2,_cols,fptr)) <
+		(int)_cols)
+		{
+			ddgErrorSet(FileRead,(char *) (file ? file : "(null)"));
+			if (feof(fptr))
+			{
+				ddgErrorSet(FileAccess,"Reached end of file!");
+			}
+			goto error;
+		}
+		r++;
+	}
+	// Swap byte order for machines with different endian.
+	if  (*((unsigned char*)&ddgEndianTest) == 0x12)
+	{
+		char s;
+		int i;
+
+		for (i = 0; i < 2 * _rows * _cols; i=i+2)
+		{
+			s = _pixbuffer[i];
+			_pixbuffer[i] = _pixbuffer[i+1];
+			_pixbuffer[i+1] = s;
+		}
+	}
+
+	return ddgSuccess;
+
+error:
+	if (fptr)
+		fclose(fptr);
+#ifdef DDG
+	ddgError::report();
+#endif
+	return ddgFailure;
 }
+
+
 
 bool ddgHeightMap::generateHeights(unsigned int r, unsigned int c, float oct )
 {
-    allocate(r,c);
-	unsigned int ci, ri;
 	float lacun = 2.0;
 	float fractalDim = 0.25;
 	float offset = 0.7;
 	double size = 3.0*r/256.0;  // sample range = 0 to 3 
+	// Read data
+    allocate(r,c);
+	unsigned int ci, ri;
 	short cc;
 	double n;
 	double v[3];
 	v[0] = 0; v[1] = 0; v[2] = 0;
+	setMinMax(0,4);
 	for (ri = 0; ri < r; ri++)
 	{
 		v[1] = 0.0f;
 		for (ci = 0; ci < c; ci++)
 		{
-			n = ddgNoise::hybridmultifractal(v,fractalDim,lacun,oct,offset);	// Returns 0 to 1.
-			cc = (short) ddgUtil::clamp(n*0x3FFF-0x7FFF,-0x7FFF,0x7FFF);	// Scale to fill range.
+			n = ddgNoise::hybridmultifractal(v,fractalDim,lacun,oct,offset);	// Returns 0 to 4.
+			cc = iconvert(n);
 			set(ri,ci, cc);
 			v[1]+= size/c;
 		}
 	v[0]+= size/r;
 	}
-
-  
-	return true;
+ 
+	return ddgSuccess;
 }
 
 void ddgHeightMap::canyonize(float f )
@@ -369,7 +496,7 @@ void ddgHeightMap::canyonize(float f )
 		for (unsigned c = 0; c < _cols; c++ )
 		{
 			unsigned int d = get(r,c);
-            unsigned int d2 = (unsigned int)ddgUtil::clamp(pow(d,(unsigned int)f),0,0xFFFF);
+            unsigned int d2 = (unsigned int)ddgUtil::clamp(pow(d,f),-0x7FFF,0x7FFF);
 			set(r,c,d2);
 		}
 }
@@ -384,7 +511,7 @@ void ddgHeightMap::glaciate(float f )
                         dn = (get(r-1,c)+ get(r+1,c)+ get(r,c-1)+ get(r,c+1))/4;
             if (fabs(d-dn) < f)
             {
-//                unsigned int d2 = Util::clamp(pow(d,f),0,0xFFFF);
+//                unsigned int d2 = Util::clamp(pow(d,f),-0x7FFF,0x7FFF);
 	    		set(r,c,dn);
             }
 		}
@@ -395,7 +522,7 @@ void ddgHeightMap::scale(float s )
 	for (unsigned r = 0; r < _rows; r++)
 		for (unsigned c = 0; c < _cols; c++ )
 		{
-            unsigned int d = (unsigned int)ddgUtil::clamp(s * get(r,c),0,0xFFFF);
+            unsigned int d = (unsigned int)ddgUtil::clamp(s * get(r,c),-0x7FFF,0x7FFF);
 			set(r,c,d);
 		}
 }
@@ -405,7 +532,7 @@ void ddgHeightMap::translate(float t )
 	for (unsigned r = 0; r < _rows; r++)
 		for (unsigned c = 0; c < _cols; c++ )
 		{
-            unsigned int d = (unsigned int)ddgUtil::clamp(t + get(r,c),0,0xFFFF);
+            unsigned int d = (unsigned int)ddgUtil::clamp(t + get(r,c),-0x7FFF,0x7FFF);
 			set(r,c,d);
 		}
 }
@@ -454,16 +581,16 @@ void ddgHeightMap::setmax( int m)
 
 void ddgHeightMap::closeEdge(float l)
 {
-	short _l = (short)iconvert(l);
+	l = iconvert(l);
 	for (unsigned r = 0; r < _rows; r++)
 	{
-		set(r,0,_l);
-		set(r,_cols-1,_l);
+		set(r,0,short(l));
+		set(r,_cols-1,short(l));
 	}
 	for (unsigned c = 0; c < _cols; c++ )
 	{
-		set(0,c,_l);
-		set(_rows-1,c,_l);
+		set(0,c,short(l));
+		set(_rows-1,c,short(l));
 	}
 }
 
@@ -472,13 +599,13 @@ void ddgHeightMap::sin(void)
 	for (unsigned r = 0; r < _rows; r++)
 		for (unsigned c = 0; c < _cols; c++ )
 		{
-			set(r,c,(short)(10000*(ddgAngle::sin(180.0*(float)r/(float)_rows)
-				         +ddgAngle::sin(180.0*(float)c/(float)_cols))));
+			set(r,c,short(10000*(ddgAngle::sin(180.0*(float)r/(float)_rows)
+				         + ddgAngle::sin(180.0*(float)c/(float)_cols))));
 		}
 }
 
 // Save image of height field.
-bool ddgHeightMap::saveAsTGA(const char * /*s*/)
+bool ddgHeightMap::saveAsTGA(const char *s)
 {
 #ifdef DDG
 	ddgImage * img = new ddgImage(rows(),cols(),1);
@@ -492,84 +619,190 @@ bool ddgHeightMap::saveAsTGA(const char * /*s*/)
 	}
 	return img->writeTGA(s);
 #else
-	return true;
+	return ddgSuccess;
 #endif
 }
 
+#ifdef DDGDEM
+// Terrain loaders based on Ben Discoe's code.
+#include "ElevationGrid.h"
+#endif
+
 bool ddgHeightMap::loadTerrain(const char *filename)
 {
-	bool retval = false;
-	retval = readTGN(filename);
-
-#ifndef NO_DEM
-	if (retval)
+	if ( (readTGN(filename) == ddgFailure)
+	/*	&& (readPGM(filename,0x7FFF) == ddgFailure )*/ )
+#ifdef DDGDEM
 	{
 		// Try one of the other formats.
 		ElevationGrid *eg = new ElevationGrid;
 
 		// Try to get one of the formats to load the file.
-		if (!eg->LoadFromBT(filename)
-		 ||	!eg->LoadFromDEM( filename)
-		 || !eg->LoadFromDTED(filename)
-		 || !eg->LoadFromGTOPO30(filename)
+		if (eg->LoadFromBT(filename)
+		 &&	eg->LoadFromDEM( filename)
+		 && eg->LoadFromDTED(filename)
+		 && eg->LoadFromGTOPO30(filename)
 		)
+			goto error;
+
+		int		gr,gc, i,j;
+		float	v;
+		unsigned short r,c;
+		eg->GetDimensions(gc, gr);
+		if (gc == 0 || gr == 0)
+			goto error;
+
+		// TODO calc based on grid corners/heightdelta.
+
+		cerr << "Loaded DEM " << eg->GetName( ) << endl;
+
+		setMinMax(eg->m_fMinHeight, eg->m_fMaxHeight);
+
+		r = gr;
+		c = gc;
+		if (allocate(r,c)== ddgFailure)
+			goto error;
+
+		for (i = 0; i < r; i++)
 		{
-			int		gr,gc, i,j,v ;
-			int min = eg->m_fMinHeight;
-			int max = eg->m_fMaxHeight;
-			float scale = 0x7FFF/max;
-			unsigned short r,c;
-			// TODO calc based on grid corners/heightdelta.
-			float s = 0.003,
-				  b = 0;
-
-			cerr << "Loaded DEM " << eg->GetName( ) << endl;
-
-			setScaleAndBase(s ,b);
-
-			eg->GetDimensions(gc, gr);
-			r = gr;
-			c = gc;
-			allocate(r,c);
-			for (i = 0; i < r; i++)
+			for (j = 0; j < c; j++)
 			{
-				for (j = 0; j < c; j++)
-				{
-					// Scale and rebase to 0.
-					v = eg->GetFValue(i,j);
-					if (v == INVALID_ELEVATION) v = 0;
-					v = (v * scale); // WORLD_SCALE
-					v = ddgUtil::clamp(v,-0x7FFF,0x7FFF);
-					set(i,j,v);
-				}
+				// Scale and rebase to 0.
+				v = eg->GetFValue(i,j);
+				if (v == INVALID_ELEVATION) v = 0;
+				set(i,j,iconvert(v));
 			}
-			cerr << "Terrain loaded " << rows() << "x" << cols() << endl;
-			retval = false;
 		}
-		else
-		{
-			retval = true;
-		}
+		cerr << "Terrain loaded " << rows() << "x" << cols() << endl;
 		delete eg;
 	}
+	return ddgSuccess;
+#else
+		goto error;
+	else
+		return ddgSuccess;
 #endif
-	return (retval);
+error:
+	return ddgFailure;
+}
+
+//
+// The following code uses code from Klaus Hartman's heighfield generator demo.
+//
+#ifdef DDGSPECTRAL
+#include "Generators/HeightField.h"
+#endif
+bool ddgHeightMap::createSpectralMap(int level, float smoothness)
+{
+#ifdef DDGSPECTRAL
+	CHeightField	m_heightField;
+	int		i,j;
+	float	v ;
+
+	unsigned short r,c;
+
+	m_heightField.CreateSpectral(level, smoothness);
+	r = m_heightField.GetFieldWidth();
+	c = r;
+	allocate(r,c);
+	setMinMax(m_heightField.GetMinHeight(), m_heightField.GetMaxHeight());
+
+	for (i = 0; i < r; i++)
+	{
+		for (j = 0; j < c; j++)
+		{
+			// Scale and rebase to 0.
+			v = m_heightField.GetField()[i * c + j];
+			set(i,j,iconvert(v));
+		}
+	}
+    // Success
+    return ddgSuccess;
+#else
+    return ddgFailure;
+#endif
 }
 
 /*
-	Dumb little utility function to make sure that 
-	atoi doesn't get a null argument...
+    Copyright (C) 1999 Ryan Willhoit
 */
-int stringToInt(char *str)
+#ifdef DDGPGM
+#define PGM_MAGIC "P2"
+
+class WordIterator
 {
-	if (str)
-	{
-		return atoi(str);
-	};
-	
-	return 0;
+	protected:
+		const char* string_pos;
+		char* token;
+		int token_length;
+		const char* delimiters;
+		
+	public:
+		/*
+			Creates a new iterator using string as the source
+			and delim as the list of characters that seperate
+			words
+		*/
+		WordIterator(const char* string, const char* delim);
+		~WordIterator();
+		
+		/*
+			Returns the next word, or 0 if there are none.
+		*/
+		char* nextWord();
+};
+WordIterator::WordIterator(const char* string, const char* delim)
+{
+	string_pos = string;
+	delimiters = delim;
+	token_length = 64;
+	token = new char[token_length];
 };
 
+WordIterator::~WordIterator()
+{
+	if (token)
+	{
+		delete token;
+	};
+};
+
+char* WordIterator::nextWord()
+{
+	if (string_pos)
+	{
+		int len = 0;
+
+		//Strip delims
+		len = strspn(string_pos, delimiters);
+		string_pos += len;
+
+		//Read in non-delims
+		len = strcspn(string_pos, delimiters);
+		if (token_length <= len)
+		{
+			delete token;
+			token = new char[len + 1];
+		};
+
+		if (len == 0)
+		{
+			return 0;
+		};
+		
+		strncpy(token, string_pos, len);
+		token[len] = '\0';
+
+		string_pos += len;
+
+		return token;
+	}
+	else
+	{
+		return 0;
+	};
+};
+#endif
 /*
 	Some notes about this function:
 	1. It sets scale to height/width and base to 0
@@ -589,34 +822,35 @@ int stringToInt(char *str)
 */
 bool ddgHeightMap::readPGM(const char* data, int desired_max)
 {
+#ifdef DDGPGM
 	int	max_grey;
 	int width;
 	int height;
 	
 	char* token;
 	
-	WordIterator st((char*)data, " \n\t");
-	
+	WordIterator st(data, " \n\t");
+
 	token = st.nextWord();
 	if (!strncmp(token, PGM_MAGIC, strlen(PGM_MAGIC)))
 	{
 		token = st.nextWord();
-		width = stringToInt(token);
+		width = token ? atoi(token) : 0;
 		
 		token = st.nextWord();
-		height = stringToInt(token);
+		height = token ? atoi(token) : 0;
 		
 		token = st.nextWord();
-		max_grey = stringToInt(token);
+		max_grey = token ? atoi(token) : 0;
 
 		if ((max_grey < 1) || (width < 1) || (height < 1))
 		{
 			//ERROR: Obviously not well formed...
-			return false;
+			return ddgFailure;
 		};
 		
 		allocate(height, width);
-		setScaleAndBase((float)((float)height / (float)width), 0);
+		setMinMax( 0, max_grey);
 	
 		for (int x = 0; x < width; x++)
 		{
@@ -626,7 +860,7 @@ bool ddgHeightMap::readPGM(const char* data, int desired_max)
 				short val;
 				
 				token = st.nextWord();
-				temp = stringToInt(token);
+				temp = token ? atoi(token) : 0;
 
 				/* @@@ This could overflow... how do we want to solve this?*/
 				val = (short)((temp * desired_max) / max_grey);
@@ -639,9 +873,12 @@ bool ddgHeightMap::readPGM(const char* data, int desired_max)
 	else
 	{
 		//ERROR: Invalid magic, not an ASCII PGM
-		return false;
+		return ddgFailure;
 	};
 
-	return true;	
+	return ddgSuccess;
+#else
+	return ddgFailure;
+#endif
 };
 

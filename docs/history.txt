@@ -28,6 +28,14 @@ Short-term cleanups that need to be done:
 	- Martin Geisse submitted more updates to the Texinfo documents.
 	- Alex Pfaffe changed the far-clipping plane in the OpenGL renderer
 	  from 10 to 150.
+	- Alex Pfaffe submitted a major update to the terrain library.  This
+	  version is now 1-to-1 compatible with his own terrain engine and
+	  should allow him to integrate new versions much more easily in the
+	  future.  This update also includes some performance optimizations.
+	- Eric Sunshine eliminated a fairly significant number of compilation
+	  problems in the new terrin library and also rewrote ddgMatrix4 to
+	  eliminate an unfortunate 'union' which was accepted by no compiler
+	  but MSVC.
 25-Feb-2000
 	- Fixed software texture cache so that it again allocates the
 	  texture cache based on number of pixels instead of bytes.

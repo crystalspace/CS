@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
     Written by Alex Pfaffe
 
     This library is free software; you can redistribute it and/or
@@ -20,6 +20,7 @@
 #include "sysdef.h"
 #include "csengine/being.h"
 #include "csengine/cdobj.h"
+#include "csengine/terrain.h"
 
 ///
 bool csBeing::init = false;
@@ -245,6 +246,19 @@ int csBeing::CollisionDetect( void )
   csTransform cdtnew (transform->GetO2T (), transform->GetO2TTranslation ());
 
   blocked = false;
+  // Check to see if there are any terrains, if so test against those.
+  // This routine will automatically adjust the transform to the highest
+  // terrain at this point.
+  if (sector->terrains.Length () > 0)
+  {
+   int i;
+   for (i = 0 ; i < sector->terrains.Length () ; i++)
+    {
+      csTerrain* terrain = (csTerrain*)sector->terrains[i];
+      hit = terrain->CollisionDetect (&cdtnew);
+    }
+  }
+
   // See if we are on solid ground.
   // First test against the current ground if there is one.
   // If there isn't one, test the sector.
@@ -342,4 +356,3 @@ int csBeing::CollisionDetect( void )
   _vold = transform->GetO2TTranslation ();
   return hit;
 }
-

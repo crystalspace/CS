@@ -74,17 +74,17 @@ bool csTerrain::Initialize (const void* heightmap, unsigned long size)
   grview = NULL;
   CHK (height = new ddgHeightMap ());
   if (height->readTGN (heightmap, size))
-	  height->generateHeights (257,257,5);
+    height->generateHeights (257,257,5);
   CHK (mesh = new ddgTBinMesh (height));
-  CHK (clipbox = new ddgBBox (csVector3(0,0,3),csVector3(640, 480, 15000)));
+  CHK (clipbox = new ddgBBox (ddgVector3(0,0,3),ddgVector3(640, 480, 15000)));
 
   CHK (vbuf = new ddgVBuffer ());
 
   vbuf->size (25000);
   vbuf->renderMode (true, false, true);
   vbuf->init ();
-  float fov = 90.0;
-  mesh->init (NULL, clipbox, fov);
+  vbuf->reset ();
+  mesh->init ();
 
   _cliff.set (175,175,175);
   _beach.set (200,200,50);
@@ -100,6 +100,70 @@ bool csTerrain::Initialize (const void* heightmap, unsigned long size)
   _rockalt = 7;
   _snowalt = 999;
 
+  // We are going to get texture coords from the terrain engine
+  // ranging from 0 to rows and 0 to cols.
+  // CS wants them to range from 0 to 1.
+  _texturescale  = 10.0 / height->rows();
+  _pos = csVector3(0,0,0);
+  _size = csVector3(height->cols(),height->maxf(),height->rows());
+  return true;
+}
+
+bool csTerrain::PushTriangle(ddgTBinTree *bt, ddgVBIndex tvc, ddgVBuffer *vbuf)
+{
+  ddgTriIndex tva, tv0, tv1;
+  static csVector3 p1, p2, p3;
+  static csVector3 *cp1, *cp2, *cp3;
+  static csVector3 n1, n2, n3;
+  static ddgVector2 t1, t2, t3;
+  // static ddgColor3  c1, c2, c3;
+  unsigned int i1 = 0, i2 = 0, i3 = 0;
+  // If triangle is visible.
+  if (DDG_BGET(bt->tri (tvc)->vis(), DDGCF_ALLOUT))
+    return false;
+
+  tva = ddgTBinTree::parent (tvc);
+  tv0 = bt->v0 (tvc);
+  tv1 = bt->v1 (tvc);
+
+  // Get the camera space coords.
+  cp1 = bt->pos (tva);
+  cp2 = bt->pos (tv0);
+  cp3 = bt->pos (tv1);
+
+  i1 = bt->vertex (tva,&p1);
+  i2 = bt->vertex (tv0,&p2);
+  i3 = bt->vertex (tv1,&p3);
+
+  // if (vbuf->normalOn())
+  // {
+  //    if (!i1) bt->normal(tva,&n1);
+  //    if (!i2) bt->normal(tv0,&n2);
+  //    if (!i3) bt->normal(tv1,&n3);
+  // }
+
+  if (vbuf->textureOn ())
+  {
+    if (!i1) { bt->textureC(tva,t1); t1.multiply( _texturescale); t1.v[0] -= ((int)t1[0]);  t1.v[1] -= ((int)t1[1]); }
+    if (!i2) { bt->textureC(tv0,t2); t2.multiply( _texturescale); t2.v[0] -= ((int)t2[0]);  t2.v[1] -= ((int)t2[1]); }
+    if (!i3) { bt->textureC(tv1,t3); t3.multiply( _texturescale); t3.v[0] -= ((int)t3[0]);  t3.v[1] -= ((int)t3[1]); }
+  }
+  // if (vbuf->colorOn())
+  // {
+  //   if (!i1) classify(&p1,&c1);
+  //   if (!i2) classify(&p2,&c2);
+  //   if (!i3) classify(&p3,&c3);
+  // }
+  // Push them into the buffer.
+  if (!i1) i1 = vbuf->pushVT (cp1,&t1);
+  if (!i2) i2 = vbuf->pushVT (cp2,&t2);
+  if (!i3) i3 = vbuf->pushVT (cp3,&t3);
+
+  // Record that these vertices are in the buffer.
+  bt->tri (tva)->vbufindex (i1); bt->tri (tva)->setvbufflag ();
+  bt->tri (tv0)->vbufindex (i2); bt->tri (tv0)->setvbufflag ();
+  bt->tri (tv1)->vbufindex (i3); bt->tri (tv1)->setvbufflag ();
+  vbuf->pushIndex (i1,i2,i3);
   return true;
 }
 
@@ -116,10 +180,6 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   poly.flat_color_g = 255;
   poly.flat_color_b = 255;
   poly.txt_handle = _textureMap->GetTextureHandle ();
-  // We are going to get texture coords from the terrain engine
-  // ranging from 0 to rows and 0 to cols.
-  // CS wants them to range from 0 to 1.
-  float texscale  = 10.0 / height->rows();
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, false /*use_z_buf*/);
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
   rview.g3d->StartPolygonFX (poly.txt_handle, CS_FX_GOURAUD);
@@ -142,87 +202,58 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
     mesh->dirty (moved);
   }
 
+  ddgTBinTree::initWtoC(clipbox);
   modified = mesh->calculate ();
   // For each frame.
   if (modified)
   {
     // Something changed, update the vertex buffer.
     vbuf->reset();
-
     // Get all the visible triangles.
     mesh->qsi()->reset();
     while (!mesh->qsi()->end())
     {
-      ddgTriIndex tvc = mesh->indexSQ(mesh->qsi()), tva, tv0, tv1;
-
+      ddgTriIndex tvc = mesh->indexSQ(mesh->qsi());
       ddgTBinTree *bt = mesh->treeSQ(mesh->qsi());
-      static csVector3 p1, p2, p3;
-      static csVector3 *cp1, *cp2, *cp3;
-      static csVector3 n1, n2, n3;
-      static ddgVector2 t1, t2, t3;
-      // static ddgColor3  c1, c2, c3;
-      unsigned int i1 = 0, i2 = 0, i3 = 0;
-      // If triangle is visible.
-      if (!DDG_BGET(bt->tri (tvc)->vis(), DDGCF_ALLOUT))
-      {
-	tva = ddgTBinTree::parent (tvc);
-	tv0 = bt->v0 (tvc);
-	tv1 = bt->v1 (tvc);
-
-	// Get the camera space coords.
-	cp1 =	bt->pos (tva);
-	cp2 =	bt->pos (tv0);
-   	cp3 =	bt->pos (tv1);
-
-	i1 = bt->vertex (tva,&p1);
-	i2 = bt->vertex (tv0,&p2);
-	i3 = bt->vertex (tv1,&p3);
-
-	// if (vbuf->normalOn())
-	// {
-	//    if (!i1) bt->normal(tva,&n1);
-	//    if (!i2) bt->normal(tv0,&n2);
-	//    if (!i3) bt->normal(tv1,&n3);
-	// }
-
-	if (vbuf->textureOn ())
-	{
-	  if (!i1) { bt->textureC(tva,t1); t1.multiply( texscale); t1.v[0] -= ((int)t1[0]);  t1.v[1] -= ((int)t1[1]); }
-	  if (!i2) { bt->textureC(tv0,t2); t2.multiply( texscale); t2.v[0] -= ((int)t2[0]);  t2.v[1] -= ((int)t2[1]); }
-	  if (!i3) { bt->textureC(tv1,t3); t3.multiply( texscale); t3.v[0] -= ((int)t3[0]);  t3.v[1] -= ((int)t3[1]); }
-	}
-	// if (vbuf->colorOn())
-	// {
-	//   if (!i1) classify(&p1,&c1);
-	//   if (!i2) classify(&p2,&c2);
-	//   if (!i3) classify(&p3,&c3);
-	// }
-	// Push them into the buffer.
-	if (!i1) i1 = vbuf->pushVT (cp1,&t1);
-	if (!i2) i2 = vbuf->pushVT (cp2,&t2);
-	if (!i3) i3 = vbuf->pushVT (cp3,&t3);
- 
-	// Record that these vertices are in the buffer.
-	bt->tri (tva)->vbufindex (i1); bt->tri (tva)->setvbufflag ();
-	bt->tri (tv0)->vbufindex (i2); bt->tri (tv0)->setvbufflag ();
-	bt->tri (tv1)->vbufindex (i3); bt->tri (tv1)->setvbufflag ();
-	vbuf->pushIndex (i1,i2,i3);
-      }
+      PushTriangle(bt, tvc, vbuf);
       mesh->qsi ()->next ();
     }
+    // Render all the leaf nodes.
+    mesh->qmi()->reset();
+    unsigned int nearLeaf = mesh->leafTriNo()/2;
+    while (!mesh->qmi()->end() )
+    {
+      ddgTriIndex tvc = mesh->indexSQ(mesh->qmi());
+      if (tvc >= nearLeaf)
+      {
+        ddgTBinTree *bt = mesh->treeSQ(mesh->qmi());
+        PushTriangle(bt, ddgTBinTree::left(tvc), vbuf);
+        PushTriangle(bt, ddgTBinTree::right(tvc), vbuf);
+        ddgTriIndex n = bt->neighbour(tvc);
+        if (n)
+        {
+          PushTriangle(bt->neighbourTree(n), ddgTBinTree::left(n), vbuf);
+          PushTriangle(bt->neighbourTree(n), ddgTBinTree::right(n), vbuf);
+        }
+      }
+      mesh->qmi()->next();
+    }
+
     // Perform Qsort on VBuffer->_ibuf.
     vbuf->sort ();
   }
+
   // Render
-  unsigned int i;
   csVector3 *p1, *p2, *p3;
   ddgVector2 t1, t2, t3;
   // float  *c1, *c2, *c3;
   ddgVBIndex i1, i2, i3;
   csVector2 clipped_triangle [10];	//@@@BAD HARCODED!
-  for (i = 0; i < vbuf->size(); i++)
+  unsigned int i = vbuf->size();
+  while (i)
   {
     int rescount;
+    i--;
 
     i3 = vbuf->ibuf[i*3];
     i2 = vbuf->ibuf[i*3+1];
@@ -258,7 +289,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
     triangle[2].y = p3->y * iz + rview.shift_y;
 
     if (!rview.view->Clip (triangle, clipped_triangle, 3, rescount))
-		  continue;
+      continue;
     poly.num = rescount;
 
     poly.vertices[0].z = p1->z;
@@ -289,3 +320,23 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   rview.g3d->FinishPolygonFX ();
 }
 
+// If we hit this terrain adjust our position to be on top of it.
+int csTerrain::CollisionDetect( csTransform *transform )
+{
+  float h;
+  // Translate us into terrain coordinate space.
+  csVector3 p = transform->GetOrigin () - _pos;
+  // If our location is above or outside the terrain then we cannot hit is.
+  if ((p[0] < 0)||(p[2] < 0)||(p[0] > _size[0])||(p[2] > _size[2])||(p[1]>_size[1]))
+    return 0;
+
+  // Return height of terrain at this location in Y coord.
+  h = mesh->height (p[0],p[2]);
+  if (h < p[1])
+    return 0;
+  p[1] = h;
+  // Translate us back.
+  p = p + _pos;
+  transform->SetOrigin (p);
+  return 1;
+}
