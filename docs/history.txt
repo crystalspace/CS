@@ -13,6 +13,18 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+16-Sep-1999
+	- Fix to console printing in system stuff from Stephan Goetter.
+	- Siu-Hang Or implemented MergeTexture for the software renderer.
+	- Fixed bug in sprites. UpdateLighting() could crash in some
+	  cases (depending on the current frame/action).
+	- Fixed bug with lighting of sprites. The lighting calculations
+	  were completely wrong when sprites were scaled from object
+	  to world space. Unfortunatelly the fix makes the lighting
+	  calculations somewhat less optimal. I have the feeling they
+	  can be optimized but I have to do some thinking about that :-)
+	- Fixed a bug with loading of sprite position from world file.
+	  This bug was recently introduced with VFS changes.
 15-Sep-1999
         - Ivan Avramovic fixed a few spots where "sysdef.h" was not included,
           but should have been.
