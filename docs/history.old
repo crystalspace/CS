@@ -37950,7 +37950,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- *** Release of 0.13_011 ***
 	- Added support for flat-shading triangles (for curves and sprites)
 	  with or without gouraud shading. Also started changing spelling
-	  of gouraud to gouraud. Note that gouraud shaded polygon objects
+	  of gouroud to gouraud. Note that gouraud shaded polygon objects
 	  still have a bug. I'm investigating this.
 	- Andrew Zabolotny added 'apps' target to makefile and also did some
 	  other makefile changes.
