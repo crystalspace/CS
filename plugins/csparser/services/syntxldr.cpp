@@ -219,10 +219,11 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
 
 void csTextSyntaxService::OptimizePolygon (iPolygon3D *p)
 {
+#ifndef CS_USE_NEW_RENDERER
   if (!p->GetPortal () || p->GetAlpha ()
   	|| p->GetPolyTexType ()->GetMixMode () != 0)
     return;
-
+#endif // CS_USE_NEW_RENDERER
   iMaterialWrapper *mat = p->GetMaterial ();
   if (mat)
   {
@@ -362,6 +363,7 @@ const char* csTextSyntaxService::MixmodeToText (
 
   text = ind;
   text.Append ("MIXMODE (\n");
+#ifndef CS_USE_NEW_RENDERER
   if (mixmode & CS_FX_COPY)
   {
     text.Append (ind);
@@ -405,6 +407,7 @@ const char* csTextSyntaxService::MixmodeToText (
     text.Append (buf);
   }
   text.Append (ind);
+#endif // CS_USE_NEW_RENDERER
   if (newline)
     text.Append (")\n");
   else
@@ -550,7 +553,7 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode)
     }							\
   }							\
   else
-
+#ifndef CS_USE_NEW_RENDERER
   bool warned = false;
   mixmode = 0;
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -585,6 +588,7 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode)
         return false;
     }
   }
+#endif // CS_USE_NEW_RENDERER
   return true;
 
 #undef MIXMODE_EXCLUSIVE
@@ -1013,9 +1017,11 @@ bool csTextSyntaxService::ParsePoly3d (
 	  if (ParseMixmode (child, mixmode))
 	  {
 	    iPolyTexType* ptt = poly3d->GetPolyTexType ();
-	    ptt->SetMixMode (mixmode);
+#ifndef CS_USE_NEW_RENDERER
+            ptt->SetMixMode (mixmode);
 	    if (mixmode & CS_FX_MASK_ALPHA)
 	      poly3d->SetAlpha (mixmode & CS_FX_MASK_ALPHA);
+#endif // CS_USE_NEW_RENDERER
 	  }
 	}
         break;
@@ -1388,6 +1394,7 @@ csPtr<iString> csTextSyntaxService::Debug_UnitTest ()
   SYN_ASSERT (m.m32 == 0, "m");
   SYN_ASSERT (m.m33 == 3, "m");
 
+#ifndef CS_USE_NEW_RENDERER
   csRef<iDocumentNode> mixmode_node = root->GetNode ("mixmode");
   SYN_ASSERT (mixmode_node != NULL, "mixmode_node");
   uint mixmode;
@@ -1396,6 +1403,7 @@ csPtr<iString> csTextSyntaxService::Debug_UnitTest ()
   desired_mixmode &= ~CS_FX_MASK_ALPHA;
   desired_mixmode |= CS_FX_SETALPHA (.5);
   SYN_ASSERT (mixmode == desired_mixmode, "mixmode");
+#endif // CS_USE_NEW_RENDERER
 
   return NULL;
 }
