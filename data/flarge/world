@@ -128,6 +128,7 @@
                 <scale u="20" v="20" />
                 <mixmode>
                     <add />
+                    <multiply />
                     <tiling />
                 </mixmode>
             </layer>
@@ -4872,7 +4873,6 @@
                 </matrix>
                 <v x="-2.5" y="-1" z="20" />
             </move>
-            <!--imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle" /-->
         </meshobj>
         <light>
             <center x="-1.5" y="3" z="17" />
@@ -5769,7 +5769,6 @@
             <params>
                 <factory>genMeshFact</factory>
                 <material>mosaic</material>
-		<!-- <localshadows /> -->
             </params>
             <move>
                 <v x="-1.5" y="-.7" z="14" />
@@ -6962,7 +6961,6 @@
             <params>
                 <factory>band</factory>
                 <moveable />
-		<smooth />
             </params>
             <move>
                 <matrix>
@@ -22935,6 +22933,7 @@
 	    <fadefog sector="kamer2l" red="0" green="0" blue="1" density="0.02"
 	    	duration="1000" />
 	    <delay time="1000" />
+	    <!-- @@@ Circular reference!!! Causes leak -->
 	    <run sequence="fogloop" />
 	</sequence>
 
@@ -22967,14 +22966,12 @@
 	</sequence>
 
 	<sequence name="anim_sky">
-	    /* Time of day simulation */
 	    <fadeambient sector="street1" red="1" green="1" blue="1"
 	    	duration="1000" />
 	    <delay time="1000" />
 	    <fadeambient sector="street1" red="0" green="0" blue="0"
 	    	duration="1000" />
 	    <delay time="2000" />
-	    /* Time of day simulation */
 	    <setambient sector="street1" red="1.5" green="1.5" blue="1.5" />
 	    <delay time="75" />
 	    <setambient sector="street1" red="0" green="0" blue="0" />
@@ -22987,25 +22984,16 @@
 	</sequence>
 
     <sequence name="light_listener_on">
-        <!--
-         *** This light is turned on when the ambient light in 
-         *** street gets too dark.
-          -->
         <setambient sector="corridor" red=".5" green=".5" blue=".75" />
         <enable trigger="light_listener_off" />
     </sequence>
 
     <sequence name="light_listener_off">
-        <!--
-         *** This light is turned off when the ambient light in 
-         *** street gets bright again.
-          -->
         <setambient sector="corridor" red="0" green="0" blue="0" />
         <enable trigger="light_listener_on" />
     </sequence>
     
 	<sequence name="seq_lightning">
-	    <!-- Sequence fired by application and not by trigger.-->
 	    <setambient sector="large" red="1.0" green="1.0" blue="1.5" duration="80" />
 	    <delay time="75" />
 	    <fadeambient sector="large" red="0" green="0" blue="0" duration="120" />
@@ -23017,7 +23005,6 @@
 	</sequence>
 
     <sequence name="flicker1">
-        <!-- demo of randomly flickering light -->
         <delay min="50" max="100" />
         <setlight light="ganglight1" red=".982" green=".815" blue=".616" />
         <delay min="100" max="1500" />
@@ -23025,7 +23012,6 @@
         <enable trigger="flicker1" />
     </sequence>
     <sequence name="flicker2">
-        <!-- demo of randomly flickering light -->
         <delay min="50" max="100" />
         <setlight light="ganglight2" red=".982" green=".815" blue=".616" />
         <delay min="100" max="1500" />
@@ -23033,7 +23019,6 @@
         <enable trigger="flicker2" />
     </sequence>
     <sequence name="flicker3">
-        <!-- demo of randomly flickering light -->
         <delay min="50" max="100" />
         <setlight light="ganglight3" red=".982" green=".815" blue=".616" />
         <delay min="100" max="1500" />
@@ -23191,7 +23176,7 @@
 	    <run sequence="movebox" />
 	-->
 	</sequence>
-
+	
 	<sequence name="openbox">
 	    <rotate mesh="floorplate" duration="12000">
 	        <roty>1.5707963</roty>
@@ -23263,6 +23248,7 @@
 		<v x="0" y="4" z="0" />
 	    </rotate>
 	    <delay time="6000" />
+	    <!-- @@@ Circular reference!!! Causes leak -->
 	    <run sequence="openbox" />
 	</sequence>
 
@@ -23283,16 +23269,7 @@
 	    <enable trigger="handle1" />
 	</sequence>
 
-	<!--
-	 *** This sequence is fired when the camera is near the door.
-	 *** It will start the operation of moving the door. First
-	 *** both opendoor triggers are disabled to prevent the other
-	 *** trigger from firing too (causing the door to open twice which
-	 *** isn't really nice). After opening the door the two triggers
-	 *** are constantly checked in the 'testdoor' sequence.
-	 -->
 	<sequence name="opendoor">
-	    <!-- Disable both triggers because the door is now open -->
 	    <disable trigger="opendoor1" />
 	    <disable trigger="opendoor2" />
 	    <rotate mesh="rot_door1" duration="2000">
@@ -23305,11 +23282,6 @@
 	    <run sequence="testdoor" />
         </sequence>
 	
-	<!--
-	 *** This sequence will first wait one second. Then it will
-	 *** see if both triggers are false. When that's the case the
-	 *** camera has moved away from the door and we can close it.
-	 -->
 	<sequence name="testdoor">
 	    <delay time="1000" />
 	    <test trigger="opendoor1"
@@ -23322,14 +23294,7 @@
 		falsesequence="reallyclosedoor" />
         </sequence>
 
-	<!--
-	 *** Now we can really close the door.
-	 *** First we disable the checks on the triggers.
-	 *** After the door is closed we enable both triggers again
-	 *** so the door can open later.
-	 -->
 	<sequence name="reallyclosedoor">
-	    <!-- Close door again -->
 	    <check trigger="opendoor1" delay="0" />
 	    <check trigger="opendoor2" delay="0" />
 	    <rotate mesh="rot_door1" duration="2000">
@@ -23360,7 +23325,6 @@
 	    <fire sequence="anim_sky" />
 	</trigger>
 
-        <!-- These 3 triggers control the flickering lights in the fog hallway-->
         <trigger name="flicker1">
 	    <sectorvis sector="gang3" />
 	    <fire sequence="flicker1" />
@@ -23429,14 +23393,6 @@
 	    <disable />
 	</trigger>
 
-	<!--
-	 *** opendoor1 and opendoor2 are both responsible for opening
-	 *** the same door. opendoor1 detects coming near the door
-	 *** from within sector 'large' while opendoor2 does the same
-	 *** from within sector 'room3'. Both triggers are disabled
-	 *** from within the opendoor sequence so that the door cannot
-	 *** accidently turn 180 degrees by activating both triggers.
-	 -->
 	<trigger name="opendoor1">
 	    <sectorvis sector="large">
 		<sphere x="-3.75" y="0.5" z="20" radius="5" />
