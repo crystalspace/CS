@@ -40,7 +40,8 @@ bool csCursorConverter::ConvertTo1bpp (iImage* image, uint8*& bitmap,
 				       uint8*& mask,
 				       const csRGBcolor forecolor, 
 				       const csRGBcolor backcolor, 
-				       const csRGBcolor* keycolor)
+				       const csRGBcolor* keycolor,
+				       bool XbitOrder)
 {
   csRef<iImage> myImage = image->Clone ();
   myImage->SetFormat (CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
@@ -67,7 +68,7 @@ bool csCursorConverter::ConvertTo1bpp (iImage* image, uint8*& bitmap,
   quantizer.Count (pal, 2, &transp);
 
   bool res = InternalConvertTo1bpp (myImage, quantizer, bitmap, mask, 
-    forecolor, backcolor, transp);
+    forecolor, backcolor, transp, XbitOrder);
 
   quantizer.End ();
 
@@ -91,7 +92,8 @@ bool csCursorConverter::InternalConvertTo1bpp (iImage* image,
 					       uint8*& bitmap, uint8*& mask,
 					       const csRGBcolor forecolor, 
 					       const csRGBcolor backcolor, 
-					       csRGBpixel keycolor)
+					       csRGBpixel keycolor,
+					       bool XbitOrder)
 {
   csRGBpixel* pal = 0;
   int maxcolors = 3; // fg, bg, keycolor
@@ -149,7 +151,7 @@ bool csCursorConverter::InternalConvertTo1bpp (iImage* image,
       {
 	int bitValue = (*pix == fgIndex) ? 1 : 0;
 	size_t bitIndex = (y * bytesPerBitmapLine * 8) + x;
-	int shift = (7 - (bitIndex % 8));
+	int shift = XbitOrder ? (bitIndex % 8) : (7 - (bitIndex % 8));
 	bitmap[bitIndex / 8] |= bitValue << shift;
 	mask[bitIndex / 8] |= 1 << shift;
       }

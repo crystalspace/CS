@@ -804,7 +804,7 @@ bool csXWindow::SetMouseCursor (iImage *image, const csRGBcolor* keycolor,
   uint8* source;
   uint8* mask;
   if (!csCursorConverter::ConvertTo1bpp (image, source, mask, fg, bg, 
-    keycolor)) 
+    keycolor, true)) 
     return false;
 
   // Create Xwindow compatible Pixmaps

@@ -92,6 +92,14 @@ public:
   virtual bool SetMouseCursor (csMouseCursorID iShape)
   { return xwin->SetMouseCursor (iShape);}
 
+  virtual bool SetMouseCursor (iImage *image, const csRGBcolor* keycolor, 
+                               int hotspot_x, int hotspot_y,
+			       csRGBcolor fg, csRGBcolor bg)
+  { 
+  return xwin->SetMouseCursor (image, keycolor, hotspot_x, hotspot_y,
+    fg, bg);
+  }
+
   struct eiOpenGLInterface : public iOpenGLInterface
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGraphics2DGLX);

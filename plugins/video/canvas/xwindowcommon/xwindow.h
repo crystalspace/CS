@@ -64,7 +64,7 @@ struct iXWindow : public iBase
   // Should be in the window manager...
   virtual bool SetMousePosition (int x, int y) = 0;
   virtual bool SetMouseCursor (csMouseCursorID iShape) = 0;
-  virtual bool SetMouseCursor (iImage *image, csRGBcolor keycolor, 
+  virtual bool SetMouseCursor (iImage *image, const csRGBcolor* keycolor, 
                                int hotspot_x, int hotspot_y,
                                csRGBcolor fg, csRGBcolor bg) = 0;
 };

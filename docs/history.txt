@@ -11,6 +11,7 @@ chronological order.
 	- res added a helper class to quickly write images to disk for
 	  debugging purposes.
 	- res added custom cursor support to the Win32 canvases.
+	- res fixed custom cursors for the X canvases.
 7-Oct-2004
 	- Jorrit added a new 'proto' mesh. This is a basic mesh that can
 	  be used to start creating a new mesh. It supports the following

@@ -30,7 +30,7 @@ class csCursorConverter
   static bool InternalConvertTo1bpp (iImage* image, 
     csColorQuantizer& quantizer, uint8*& bitmap, uint8*& mask,
     const csRGBcolor forecolor, const csRGBcolor backcolor, 
-    csRGBpixel keycolor);
+    csRGBpixel keycolor, bool XbitOrder);
   static void StripAlpha (iImage* image, csRGBpixel replaceColor);
 public:
   //static bool ConvertTo1bpp (iImage* image, uint8*& bitmap, uint8*& mask,
@@ -42,7 +42,7 @@ public:
    */
   static bool ConvertTo1bpp (iImage* image, uint8*& bitmap, uint8*& mask,
     const csRGBcolor forecolor, const csRGBcolor backcolor, 
-    const csRGBcolor* keycolor = 0);
+    const csRGBcolor* keycolor = 0, bool XbitOrder = false);
 };
 
 #endif // __CS_CANVAS_COMMON_CURSORCONVERT_H__
