@@ -872,20 +872,15 @@ bool ddgImage::readPNG(const char *filename)
 error:
     if (fptr) fclose(fptr);
 #endif
+	(void)filename;
 	return ddgFailure;
 }
 
 bool ddgImage::writePNG(const char *filename)
 {
 #ifdef DDGPNG
-
     return ddgSuccess;
 #endif
-	return ddgFailure;
-
+    (void)filename;
+    return ddgFailure;
 }
-
-
-
-
-

@@ -511,7 +511,9 @@ error:
 
 bool ddgHeightMap::generateHeights(unsigned int r, unsigned int c, float oct )
 {
-#ifdef DDG
+#ifndef DDG
+	(void)r; (void)c; (void)oct;
+#else
 	float lacun = 2.0;
 	float fractalDim = 0.25;
 	float offset = 0.7;
@@ -770,6 +772,7 @@ bool ddgHeightMap::createSpectralMap(int level, float smoothness)
     // Success
     return ddgSuccess;
 #else
+    (void)level; (void)smoothness;
     return ddgFailure;
 #endif
 }
@@ -929,6 +932,7 @@ bool ddgHeightMap::readPGM(const char* data, int desired_max)
 
 	return ddgSuccess;
 #else
+	(void)data; (void)desired_max;
 	return ddgFailure;
 #endif
 };

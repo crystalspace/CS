@@ -181,6 +181,8 @@ void ddgConsole::progress( char *s, int p, int total)
 		_last = 100*p/total;
 		cerr << '\r' << s << ": " << _last << "%";
 	}
+#else
+	(void)s; (void)p; (void)total;
 #endif
 }
 void ddgConsole::end(void)
@@ -194,6 +196,8 @@ void ddgConsole::s( char *s )
 {
 #ifdef DDG
 	cerr << s;
+#else
+	(void)s;
 #endif
 }
 /// Send an integer to the console.
@@ -201,6 +205,8 @@ void ddgConsole::i( int i )
 {
 #ifdef DDG
 	cerr << i;
+#else
+	(void)i;
 #endif
 }
 /// Send an float to the console.
@@ -208,5 +214,7 @@ void ddgConsole::f( float f )
 {
 #ifdef DDG
 	cerr << f;
+#else
+	(void)f;
 #endif
 }
