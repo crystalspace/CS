@@ -2129,8 +2129,9 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
   float alpha = ((poly.mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)?
     (poly.mixmode & CS_FX_MASK_ALPHA)/255.0f:1.0f;
 
-  bool flatlighting = (txt && txt->GetAlphaMap() && 
-    !(txt->GetKeyColor() && (alpha >= OPENGL_KEYCOLOR_MIN_ALPHA) ) );
+  bool flatlighting = ((txt && txt->GetAlphaMap() && 
+    !(txt->GetKeyColor() && (alpha >= OPENGL_KEYCOLOR_MIN_ALPHA) ))
+    || (alpha != 1.0f ) );
 
   //========
   // First check if this polygon is different from the current polygons
@@ -5898,6 +5899,15 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
     DrawPolygonSingleTexture (poly);
     return;
   }
+    
+  FlushDrawPolygon ();
+  if ((poly.mixmode & CS_FX_MASK_MIXMODE) != CS_FX_COPY)
+    lightmap_cache->Flush ();
+  else
+    lightmap_cache->FlushIfNeeded ();
+  if (!CompatibleZBufModes (fog_queue.z_buf_mode, z_buf_mode))
+    FlushDrawFog ();
+
   //  printf ("use multi\n");
   // OK, we're gonna draw a polygon with a dual texture
   // Get the plane normal of the polygon. Using this we can calculate
@@ -5986,6 +5996,7 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
 
   // configure base texture for texure unit 0
   glActiveTextureARB (GL_TEXTURE0_ARB);
+  glEnable (GL_TEXTURE_2D);
   glBindTexture (GL_TEXTURE_2D, texturehandle);
   float alpha = BYTE_TO_FLOAT (poly.mixmode & CS_FX_MASK_ALPHA);
   alpha = SetupBlend (poly.mixmode, alpha, tex_transp);
@@ -5993,6 +6004,7 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   {
     glEnable (GL_ALPHA_TEST);
     glAlphaFunc (GL_GEQUAL, OPENGL_KEYCOLOR_MIN_ALPHA);
+    SetupBlend (poly.mixmode, 1.0f, false);
   }
   if (ARB_texture_env_combine)
   {
