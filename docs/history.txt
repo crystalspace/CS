@@ -37,8 +37,10 @@ chronological order.
 	  targets failed to ensure that the appropriate `out' directories
 	  existed before instructing Swig to emit files into those directories.
 	- Eric Sunshine updated ivideo/graph2d.h to hopefully reflect res's
-	  changes (above), since res forgot to commit everything, causing
-	  compilation to fail.
+	  changes (above), since res forgot to commit all the files he had
+	  changed, causing compilation to fail.
+	- Eric Sunshine augmented jobber.pl to now automatically update
+	  out-dated Swig-generated Python and Perl5 files.
 4-Nov-2003
 	- Jorrit fixed a bug in Dynavis history culling. In some cases objects
 	  could remain visible for longer then expected because the history

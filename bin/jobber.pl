@@ -30,7 +30,8 @@
 #        - Converts Texinfo documentation to HTML format.
 #        - Builds the public API reference manual.
 #        - Builds the developer's API reference manual.
-#        - Re-builds Visual-C++ DSW and DSP project files.
+#        - Re-builds Visual-C++ DSW/DSP and SLN/VCPROJ project files.
+#        - Re-builds the Swig-generated Python and Perl5 files.
 #        - Commits all changes to the CVS repository.
 #        - Makes all generated HTML available online for browsing.
 #        - Makes archives of the generated HTML available for download.
@@ -86,7 +87,7 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber.pl';
-my $PROG_VERSION = '22';
+my $PROG_VERSION = '23';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000-2003 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -179,7 +180,11 @@ my $COPYRIGHT = "Copyright (C) 2000-2003 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 $ENV{'CVS_RSH'} = 'ssh';
 
 # Ensure that Doxygen and Swig can be found.
-$ENV{'PATH'} = '/home/groups/c/cr/crystal/bin:'.$ENV{'PATH'}.':/usr/local/bin';
+$ENV{'PATH'} = 
+    '/home/groups/c/cr/crystal/bin:' .
+    '/home/groups/c/cr/crystal/swig/bin:' .
+    $ENV{'PATH'} .
+    ':/usr/local/bin';
 
 # The Visual-C++ DSW and DSP generation process is a bit too noisy.
 $ENV{'MSVC_QUIET'} = 'yes';
@@ -214,6 +219,16 @@ my @TARGETS =
        'make'    => 'repairdoc',
        'olddirs' => ['docs/texinfo'],
        'log'     => 'Automated Texinfo @node and @menu repair.' },
+     { 'name'    => 'Swig Python files',
+       'action'  => 'Repairing',
+       'make'    => 'swigpythinst',
+       'olddirs' => ['plugins/cscript/cspython', 'scripts/python'],
+       'log'     => 'Automated Swig Python file repair.' },
+     { 'name'    => 'Swig Perl5 files',
+       'action'  => 'Repairing',
+       'make'    => 'swigperl5inst',
+       'olddirs' => ['scripts/perl5'],
+       'log'     => 'Automated Swig Perl5 file repair.' },
      { 'name'    => 'User\'s Manual',
        'action'  => 'Generating',
        'make'    => 'htmldoc',
@@ -284,7 +299,12 @@ my $CONFIGURE = "cat << EOF > config.mak\n" .
     "OS = UNIX\n" .
     "COMP = GCC\n" .
     "MODE = optimize\n" .
+    "SWIGBIN = swig\n" .
     "PERL = perl\n" .
+    "PERL5.AVAILABLE = yes\n" .
+    "PYTHON.AVAILABLE = yes\n" .
+    "PLUGINS.DYNAMIC += cscript/cspython\n" .
+    "PLUGINS.DYNAMIC += cscript/csperl5\n" .
     "EOF\n" .
     "sed 's/\@SET_MAKE\@//;s/\@top_srcdir\@/./' < Makefile.in > Makefile\n";
 
@@ -827,7 +847,8 @@ modified files to the CVS repository, and publish the generated files for
 browsing and download.  It should be run on a periodic basis, typically by
 an automated mechanism.  The tasks which it performs are:
 
-    o Repairs out-of-date Visual-C++ DSW and DSP project files.
+    o Repairs out-of-date Visual-C++ DSW/DSP and SLN/VCPROJ project files.
+    o Repairs out-of-date Swig-generated Python and Perl5 files.
     o Repairs out-of-date and broken \@node directives and \@menu blocks
       in Texinfo files.
     o Converts the User's Manual Texinfo source files to HTML format.
