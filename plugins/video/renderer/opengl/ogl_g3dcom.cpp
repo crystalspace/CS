@@ -3903,6 +3903,14 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   }
   vbman->UnlockBuffer (vb);
 
+  if (!something_was_drawn)
+  {
+    RestoreDTMTransforms ();
+    RestoreDTMClipping ();
+    return;
+  }
+
+  csZBufMode old_z_buf_mode = z_buf_mode;
   switch (z_buf_mode)
   {
     case CS_ZBUF_FILL:
@@ -3914,16 +3922,12 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
       break;
   }
 
-  if (!something_was_drawn)
+  if (m_renderstate.lighting || mesh.do_fog)
   {
-    RestoreDTMTransforms ();
-    RestoreDTMClipping ();
-    return;
+    trimesh.use_vertex_color = false;
+    trimesh.mat_handle = 0;
+    SetupDTMEffect (trimesh);
   }
-
-  trimesh.use_vertex_color = false;
-  trimesh.mat_handle = 0;
-  SetupDTMEffect (trimesh);
 
   if (m_renderstate.lighting)
   {
@@ -3975,6 +3979,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
 
   // If we don't do this then objects can disappear later.
   statecache->Disable_GL_ALPHA_TEST ();
+  z_buf_mode = old_z_buf_mode;
 }
 
 csStringID csGraphics3DOGLCommon::GLBlendToString (GLenum blend)
