@@ -863,3 +863,8 @@ got_value:
   return true;
 }
 
+void csSystemDriver::console_out (const char *str)
+{
+  //if (console_ok)
+    fputs (str, stdout);
+}  
