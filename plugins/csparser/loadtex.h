@@ -28,6 +28,7 @@
 #define PLUGIN_TEXTURELOADER_ANIMIMG  "crystalspace.texture.loader.animimg"
 #define PLUGIN_TEXTURELOADER_CHECKERS "crystalspace.texture.loader.checkerboard"
 #define PLUGIN_TEXTURELOADER_CUBEMAP  "crystalspace.texture.loader.cubemap"
+#define PLUGIN_TEXTURELOADER_TEX3D    "crystalspace.texture.loader.tex3d"
 
 /// Default texture loader context
 class TextureLoaderContext : public iTextureLoaderContext
@@ -107,8 +108,23 @@ class csCubemapTextureLoader : public csBaseTextureLoader
   csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE "plugins/csparser/cubemaploader.tok"
 #include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE 
 public:
   csCubemapTextureLoader (iBase *p);
+
+  virtual csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
+    iBase* context);
+};
+
+/// 3D texture loader pseudo-plugin
+class csTexture3DLoader : public csBaseTextureLoader
+{
+  csStringHash xmltokens;
+#define CS_TOKEN_ITEM_FILE "plugins/csparser/tex3dloader.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE 
+public:
+  csTexture3DLoader (iBase *p);
 
   virtual csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
     iBase* context);

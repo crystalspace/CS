@@ -5104,7 +5104,7 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
     if (docsys == 0)
       docsys.AttachNew (new csTinyDocumentSystem ());
     csRef<iDocument> shaderDoc = docsys->CreateDocument ();
-    const char* err = shaderDoc->Parse (shaderFile, true);
+    const char* err = shaderDoc->Parse (shaderFile, false);
     if (err != 0)
     {
       ReportWarning ("crystalspace.maploader",

@@ -37,10 +37,16 @@
  */
 class CS_CSGFX_EXPORT csImageManipulate
 {
+  static csRef<iImage> Mipmap2D (iImage* source, int step, 
+    csRGBpixel* transp = 0);
+  static csRef<iImage> Mipmap3D (iImage* source, int step, 
+    csRGBpixel* transp = 0);
+  static csRef<iImage> Rescale2D (iImage* source, int NewWidth, 
+    int NewHeight);
 public:
   /// Rescale an image to the given size.
   static csRef<iImage> Rescale (iImage* source, int NewWidth, 
-    int NewHeight);
+    int NewHeight, int NewDepth = 1);
   /**
    * Create a new iImage which is a mipmapped version of this one.
    * 'step' indicates how much the mipmap should be scaled down. Step 0 
@@ -71,6 +77,15 @@ public:
    */
   static csRef<iImage> Sharpen (iImage* source, int strength, 
     csRGBpixel* transp = 0);
+  /**
+   * Set alpha of all pixels to 0 that match \a transpColor.
+   * Pixels that have non-transparent neighbours will be set to the mean
+   * color of all non-transparent neighbours, otherwise to \a fillColor.
+   * \remarks Intermediately uses a truecolor images, i.e. paletted images
+   *  are not handled with maximum efficiency.
+   */
+  static csRef<iImage> RenderKeycolorToAlpha (iImage* source, 
+    const csRGBpixel& transpColor, const csRGBpixel& fillColor);
 };
 
 #endif // __CS_CSGFX_IMAGEMANIPULATE_H__

@@ -193,33 +193,22 @@ void csTextureHandle::AdjustSizePo2 ()
 {
   int newwidth, newheight;
 
-  CalculateNextBestPo2Size (image->GetWidth(), image->GetHeight(),
-    newwidth, newheight);
+  CalculateNextBestPo2Size (image->GetWidth(), newwidth);
+  CalculateNextBestPo2Size (image->GetHeight(), newheight);
 
   if (newwidth != image->GetWidth () || newheight != image->GetHeight ())
     image = csImageManipulate::Rescale (image, newwidth, newheight);
 }
 
-void csTextureHandle::CalculateNextBestPo2Size (const int width, 
-						const int height, 
-						int& newWidth, 
-						int& newHeigth)
+void csTextureHandle::CalculateNextBestPo2Size (const int orgDim, int& newDim)
 {
-  newWidth = csFindNearestPowerOf2 (width);
-  if (newWidth != width)
+  newDim = csFindNearestPowerOf2 (orgDim);
+  if (newDim != orgDim)
   {
-    int dU = newWidth - width;
-    int dD = width - (newWidth >> 1);
+    int dU = newDim - orgDim;
+    int dD = orgDim - (newDim >> 1);
     if (dD < dU)
-      newWidth >>= 1;
-  }
-  newHeigth = csFindNearestPowerOf2 (height);
-  if (newHeigth != height)
-  {
-    int dU = newHeigth - height;
-    int dD = height - (newHeigth >> 1);
-    if (dD < dU)
-      newHeigth >>= 1;
+      newDim >>= 1;
   }
 }
 

@@ -140,12 +140,10 @@ private:
   void Load ();
   void Unload ();
 public:
-  //int formatidx;
   int orig_width, orig_height, orig_d;
   int actual_width, actual_height, actual_d;
   csArray<csGLUploadData>* uploadData;
   csWeakRef<csGLGraphics3D> G3D;
-  //long size;
   int target;
   bool IsWasRenderTarget() const { return texFlags.Check (flagWasRenderTarget); }
   void SetWasRenderTarget (bool b) { texFlags.SetBool (flagWasRenderTarget, b); }
@@ -160,12 +158,11 @@ public:
 
   void AdjustSizePo2 ();
   void CreateMipMaps();
-  //bool FindFormatType();
-  void PrepareKeycolor (iImage* image, const csRGBpixel& transp_color,
+  void PrepareKeycolor (csRef<iImage>& image, const csRGBpixel& transp_color,
     csAlphaMode::AlphaType& alphaType);
-  void ComputeMeanColor (int w, int h, csRGBpixel *src, 
+  void ComputeMeanColor (int w, int h, int d, csRGBpixel *src, 
     const csRGBpixel* transp_color, csRGBpixel& mean_color);
-  void CheckAlpha (int w, int h, csRGBpixel *src, 
+  void CheckAlpha (int w, int h, int d, csRGBpixel *src, 
     const csRGBpixel* transp_color, csAlphaMode::AlphaType& alphaType);
   csRef<iImage>& GetImage () { return image; }
   void Unprepare () { SetPrepared (false); }

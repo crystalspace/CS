@@ -39,6 +39,7 @@
 #include "ivideo/texture.h"
 #include "imap/reader.h"
 #include "csgfx/imagecubemapmaker.h"
+#include "csgfx/imagevolumemaker.h"
 #include "csgfx/xorpat.h"
 
 #include "loadtex.h"
@@ -307,6 +308,7 @@ csPtr<iBase> csImageTextureLoader::Parse (iDocumentNode* node,
 
   csRef<iTextureHandle> TexHandle (tm->RegisterTexture (ctx->GetImage(), 
     ctx->HasFlags() ? ctx->GetFlags() : CS_TEXTURE_3D));
+  if (!TexHandle) return 0;
 
   csRef<iTextureWrapper> TexWrapper =
 	Engine->GetTextureList ()->NewTexture(TexHandle);
@@ -379,6 +381,7 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
 
   csRef<iTextureHandle> TexHandle (tm->RegisterTexture (Image, 
     (ctx && ctx->HasFlags()) ? ctx->GetFlags() : CS_TEXTURE_3D));
+  if (!TexHandle) return 0;
 
   csRef<iTextureWrapper> TexWrapper =
 	Engine->GetTextureList ()->NewTexture(TexHandle);
@@ -512,10 +515,91 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 
   csRef<iTextureHandle> TexHandle (tm->RegisterTexture (cube, 
     ctx->HasFlags() ? ctx->GetFlags() : CS_TEXTURE_3D));
+  if (!TexHandle) return 0;
 
   csRef<iTextureWrapper> TexWrapper =
 	Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->SetImageFile (cube);
+
+  return csPtr<iBase> (TexWrapper);
+}
+
+//----------------------------------------------------------------------------
+
+SCF_IMPLEMENT_FACTORY(csTexture3DLoader);
+
+csTexture3DLoader::csTexture3DLoader (iBase *p) : csBaseTextureLoader(p)
+{
+  init_token_table (xmltokens);
+}
+
+csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node, 
+				       iLoaderContext* ldr_context,
+				       iBase* context)
+{
+  if (!context) return 0;
+  csRef<iTextureLoaderContext> ctx = csPtr<iTextureLoaderContext>
+    (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
+  if (!ctx) return 0;
+  
+  csRef<iEngine> Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iTextureManager> tm = G3D->GetTextureManager();
+  csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  csRef<iSyntaxService> SyntaxService = 
+    CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+
+  int Format = tm->GetTextureFormat ();
+  csRef<csImageVolumeMaker> vol;
+  int w = -1, h = -1;
+  if (ctx->HasSize())
+  {
+    ctx->GetSize (w, h);
+    vol.AttachNew (new csImageVolumeMaker (Format, w, h));
+  }
+  else if (ctx->HasImage())
+  {
+    vol.AttachNew (new csImageVolumeMaker (ctx->GetImage()));
+  }
+  else
+    vol.AttachNew (new csImageVolumeMaker (Format));
+
+  if (!Engine->GetSaveableFlag()) vol->SetName (0);
+
+  const char* fname;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_LAYER:
+        fname = child->GetContentsValue ();
+	if (!fname)
+	{
+	  SyntaxService->ReportError (
+	    PLUGIN_TEXTURELOADER_TEX3D,
+	       child, "Expected VFS filename for 'file'!");
+	  return 0;
+	}
+      
+	vol->AddImage (csRef<iImage>(loader->LoadImage (fname, Format)));
+        break;
+    }
+  }
+
+
+  csRef<iTextureHandle> TexHandle (tm->RegisterTexture (vol, 
+    ctx->HasFlags() ? ctx->GetFlags() : CS_TEXTURE_3D));
+  if (!TexHandle) return 0;
+
+  csRef<iTextureWrapper> TexWrapper =
+	Engine->GetTextureList ()->NewTexture(TexHandle);
+  TexWrapper->SetImageFile (vol);
 
   return csPtr<iBase> (TexWrapper);
 }

@@ -42,35 +42,50 @@ struct csShaderVariableWrapper;
 class csShaderVariable;
 
 SCF_VERSION (iShaderVariableAccessor, 0, 0, 1);
+
 /**
-* Interface to an accessorcallback for shadervariables.
-* This is used when we know the object providing the value of a single
-* variable, but the exact value cannot be predetermined.
-*/
+ * Interface to an accessorcallback for shadervariables.
+ * This is used when we know the object providing the value of a single
+ * variable, but the exact value cannot be predetermined.
+ */
 struct iShaderVariableAccessor : public iBase
 {
   /// Called before the value of the attached SV is returned
   virtual void PreGetValue (csShaderVariable *variable) = 0;
 };
 
-
 /**
- * Storage class for inheritable variables in the shader system.
+ * Storage class for "shader vars", inheritable variables in the shader 
+ * system. Shader vars are a primary system to transport information from
+ * the engine/meshes/etc. to the renderer.
  */
 class CS_CSGFX_EXPORT csShaderVariable : public csRefCount
 {
 public:
-  /// Data types able to be stored
+  /**
+   * Data types that can be stored.
+   * Data storage and retrieval is not strict - data stored as INT, FLOAT, 
+   * COLOR or any VECTORx data can also be retrieved as any other of those.
+   */
   enum VariableType
   {
+    /// Integer
     INT = 1,
+    /// Float
     FLOAT,
+    /// Color
     COLOR,
+    /// Texture
     TEXTURE,
+    /// Renderbuffer
     RENDERBUFFER,
+    /// Vector with 2 components
     VECTOR2,
+    /// Vector with 3 components
     VECTOR3,
+    /// Vector with 4 components
     VECTOR4,
+    /// Matrix
     MATRIX
   };
 
@@ -88,8 +103,8 @@ private:
 
   csRef<iShaderVariableAccessor> accessor;
 
-public:
   csStringID Name;
+public:
 
   /// Constructor
   csShaderVariable (csStringID name);
@@ -111,7 +126,7 @@ public:
   /// Get the name of the variable
   csStringID GetName () const { return Name; }
 
-  /// Retireve an int
+  /// Retrieve an int
   bool GetValue (int& value)
   { 
     if (accessor) accessor->PreGetValue (this);
@@ -164,7 +179,7 @@ public:
     return true;
   }
 
-  /// Retireve a csVector2
+  /// Retrieve a csVector2
   bool GetValue (csVector2& value)
   {
     if (accessor) accessor->PreGetValue (this);

@@ -19,6 +19,10 @@
 #ifndef __CS_GFX_SHADEREXP_H__
 #define __CS_GFX_SHADEREXP_H__
 
+/**\file
+ * An evaluable expression attached to a shader variable.
+ */
+
 #include "csextern.h"
 
 #include "csutil/strhash.h"
@@ -74,11 +78,14 @@ private:
   iObjectRegistry * obj_reg;
   /// Indicates whether the token- and type-tables have been loaded.
   static bool loaded;
-  /// Various internal hash tables
+  /**
+   * Various internal hash tables
+   * @{ */
   static csStringHash xmltokens;
   static csStringHash sexptokens;
   static csStringHash xmltypes;
   static csStringHash mnemonics;
+  /** @} */
   /// Attached iShaderVariableContext
   iShaderVariableContext * varContext;
   /// String set for producing String IDs

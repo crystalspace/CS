@@ -43,6 +43,7 @@ enum
   DDPF_ALPHAPIXEL  = 0x00000001,
   DDPF_FOURCC	   = 0x00000004,
   DDPF_RGB	   = 0x00000040,
+  DDPF_LUMINANCE   = 0x00020000,
   
   // Flags for complex caps
   DDSCAPS_COMPLEX  = 0x00000008,
@@ -148,6 +149,8 @@ public:
   static void DecompressRGB (csRGBpixel* buffer, const uint8* source, 
     int w, int h, int depth, size_t size, const PixelFormat& pf);
   static void DecompressRGBA (csRGBpixel* buffer, const uint8* source, 
+    int w, int h, int depth, size_t size, const PixelFormat& pf);
+  static void DecompressLum (csRGBpixel* buffer, const uint8* source, 
     int w, int h, int depth, size_t size, const PixelFormat& pf);
 private:
   static void CorrectPremult (csRGBpixel* buffer, size_t pixnum);

@@ -40,22 +40,25 @@ void csImageMemory::ConstructCommon()
   Image = 0;
   Palette = 0;
   Alpha = 0;
+  imageType = csimg2D;
   destroy_image = true;
   has_keycolour = false;
   keycolour.Set (0, 0, 0, 255);
 }
 
-void csImageMemory::ConstructWHF (int width, int height, int format)
+void csImageMemory::ConstructWHDF (int width, int height, int depth, int format)
 {
   ConstructCommon();
   Width = width;
   Height = height;
+  Depth = depth;
   Format = format;
 }
 
 void csImageMemory::ConstructSource (iImage* source)
 {
-  ConstructWHF (source->GetWidth(), source->GetHeight(), source->GetFormat());
+  ConstructWHDF (source->GetWidth(), source->GetHeight(), source->GetDepth(),
+    source->GetFormat());
 
   AllocImage();
   memcpy (Image, source->GetImageData(), csImageTools::ComputeDataSize (this));
@@ -71,6 +74,7 @@ void csImageMemory::ConstructBuffers (int width, int height, void* buffer,
   ConstructCommon();
   Width = width;
   Height = height;
+  Depth = 1;
   Format = format;
   Image = buffer;
   Palette = palette;
@@ -79,7 +83,13 @@ void csImageMemory::ConstructBuffers (int width, int height, void* buffer,
 
 csImageMemory::csImageMemory (int width, int height, int format) : csImageBase()
 {
-  ConstructWHF (width, height, format);
+  ConstructWHDF (width, height, 1, format);
+}
+
+csImageMemory::csImageMemory (int width, int height, int depth, int format) : csImageBase()
+{
+  ConstructWHDF (width, height, depth, format);
+  if (depth > 1) imageType = csimg3D;
 }
 
 csImageMemory::csImageMemory (int width, int height, void* buffer,
@@ -93,7 +103,7 @@ csImageMemory::csImageMemory (int width, int height, const void* buffer,
                               int format, const csRGBpixel *palette)
  : csImageBase()
 {
-  ConstructWHF (width, height, format);
+  ConstructWHDF (width, height, 1, format);
   AllocImage();
   memcpy (Image, buffer, csImageTools::ComputeDataSize (this));
   if (Palette)
@@ -113,7 +123,7 @@ csImageMemory::csImageMemory (iImage* source, int newFormat) : csImageBase()
 
 csImageMemory::csImageMemory (int iFormat) : csImageBase()
 {
-  ConstructWHF (0, 0, iFormat);
+  ConstructWHDF (0, 0, 0, iFormat);
 }
 
 void csImageMemory::AllocImage()
@@ -121,15 +131,15 @@ void csImageMemory::AllocImage()
   switch (Format & CS_IMGFMT_MASK)
   {
     case CS_IMGFMT_PALETTED8:
-      Image = (void*) new uint8[Width*Height];
+      Image = (void*) new uint8[Width*Height*Depth];
       if (Format & CS_IMGFMT_ALPHA)
       {
-        Alpha =  new uint8[Width*Height];
+        Alpha =  new uint8[Width*Height*Depth];
       }
       Palette = new csRGBpixel[256];
       break;
     case CS_IMGFMT_TRUECOLOR:
-      Image = (void*) new csRGBpixel[Width*Height];
+      Image = (void*) new csRGBpixel[Width*Height*Depth];
       break;
   }
   destroy_image = true;
@@ -167,8 +177,13 @@ void csImageMemory::FreeImage ()
 
 void csImageMemory::SetDimensions (int newWidth, int newHeight)
 {
+  SetDimensions (newWidth, newHeight, 1);
+}
+
+void csImageMemory::SetDimensions (int newWidth, int newHeight, int newDepth)
+{
   FreeImage();
-  Width = newWidth; Height = newHeight;
+  Width = newWidth; Height = newHeight; Depth = newDepth;
 }
 
 csImageMemory::~csImageMemory ()
@@ -212,7 +227,7 @@ void csImageMemory::Clear (const csRGBpixel &colour)
   uint32 *dst = (uint32*)Image;
 
   int i;
-  for (i = 0; i < Width*Height; i++, dst++)
+  for (i = 0; i < Width*Height*Depth; i++, dst++)
     *dst = *src;
 }
 
@@ -221,7 +236,7 @@ void csImageMemory::CheckAlpha ()
   if (!(Format & CS_IMGFMT_ALPHA))
     return;
 
-  int i, pixels = Width * Height;
+  int i, pixels = Width * Height * Depth;
   bool noalpha = true;
   switch (Format & CS_IMGFMT_MASK)
   {
@@ -256,7 +271,7 @@ void csImageMemory::CheckAlpha ()
 
 void csImageMemory::ConvertFromRGBA (csRGBpixel *iImage)
 {
-  int pixels = Width * Height;
+  int pixels = Width * Height * Depth;
 
   if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_ANY)
     Format = (Format & ~CS_IMGFMT_MASK) | CS_IMGFMT_TRUECOLOR;
@@ -300,7 +315,7 @@ void csImageMemory::ConvertFromRGBA (csRGBpixel *iImage)
 void csImageMemory::ConvertFromPal8 (uint8 *iImage, uint8* alpha, 
 				     csRGBpixel *iPalette, int nPalColors)
 {
-  int pixels = Width * Height;
+  int pixels = Width * Height * Depth;
 
   // ensure the palette has at least 256 entries.
   if (nPalColors < 256)
@@ -375,7 +390,7 @@ void csImageMemory::ConvertFromPal8 (uint8 *iImage, uint8* alpha,
 
 void csImageMemory::SetFormat (int iFormat)
 {
-  int pixels = Width * Height;
+  int pixels = Width * Height * Depth;
   int oldformat = Format;
   void *oldimage = Image;
   uint8* oldalpha = Alpha;
@@ -417,22 +432,6 @@ void csImageMemory::SetFormat (int iFormat)
   }
 }
 
-// short cut
-/*void csImageMemory::Rescale (int NewWidth, int NewHeight)
-{
-#if 0
-  if (short_cut)
-  {
-    Width = NewWidth;
-    Height = NewHeight;
-    delete [] (csRGBpixel *) Image;
-    Image = (void*) new csRGBpixel[Width*Height];
-  }
-  else
-#endif
-    csImageFile::Rescale (NewWidth, NewHeight);
-}*/
-
 void csImageMemory::SetKeyColor (int r, int g, int b)
 {
   has_keycolour = true;
@@ -453,7 +452,7 @@ void csImageMemory::ApplyKeyColor ()
 
     uint8* imageData = (uint8*)Image;
     uint8* imagePtr;
-    const int pixcount = Width * Height;
+    const int pixcount = Width * Height * Depth;
     int i;
 
     // Find out what colors in the palette are actually used

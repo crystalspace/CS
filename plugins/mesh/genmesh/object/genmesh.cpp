@@ -1489,7 +1489,7 @@ void csGenmeshMeshObjectFactory::SetupFactory ()
 void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (
   csShaderVariable* var)
 {
-  iRenderBuffer *a = anon_buffers.GetRenderBuffer (var->Name);
+  iRenderBuffer *a = anon_buffers.GetRenderBuffer (var->GetName());
   if (a!=0)
   {
     var->SetValue(a);

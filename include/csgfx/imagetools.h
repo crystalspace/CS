@@ -40,7 +40,7 @@ public:
   /// Compute the size of an image data, in bytes.
   static inline size_t ComputeDataSize (iImage* img) 
   {
-    return img->GetWidth() * img->GetHeight() * 
+    return img->GetWidth() * img->GetHeight() * img->GetDepth() * 
       (((img->GetFormat() & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8) ? 1 : 
       sizeof (csRGBpixel));
   }

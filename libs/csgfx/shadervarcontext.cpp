@@ -57,7 +57,7 @@ static int SvCompare (csShaderVariable* const& r, csShaderVariable* const& k)
 void csShaderVariableContext::AddVariable 
   (csShaderVariable *variable) 
 {
-  csShaderVariable* var = GetVariable (variable->Name);
+  csShaderVariable* var = GetVariable (variable->GetName());
   if (var == 0)
     variables.InsertSorted (variable, SvCompare);
   else

@@ -28,6 +28,7 @@
 #include "csgfx/imagecubemapmaker.h"
 #include "csgfx/imagemanipulate.h"
 #include "csgfx/memimage.h"
+#include "csgfx/packrgb.h"
 #include "csgfx/xorpat.h"
 #include "cstool/debugimagewriter.h"
 #include "iutil/cfgfile.h"
@@ -246,11 +247,14 @@ bool csGLTextureHandle::GetAlphaMap ()
 }
 
 static void ComputeNewPo2ImageSize (int orig_width, int orig_height,
-				    int& newwidth, int& newheight, 
+				    int orig_depth,
+				    int& newwidth, int& newheight,
+				    int& newdepth,
 				    int max_tex_size)
 {
-  csTextureHandle::CalculateNextBestPo2Size (
-    orig_width, orig_height, newwidth, newheight);
+  csTextureHandle::CalculateNextBestPo2Size (orig_width, newwidth);
+  csTextureHandle::CalculateNextBestPo2Size (orig_height, newheight);
+  csTextureHandle::CalculateNextBestPo2Size (orig_depth, newdepth);
 
   // If necessary rescale if bigger than maximum texture size,
   // but only if a dimension has changed. For textures that are
@@ -259,6 +263,8 @@ static void ComputeNewPo2ImageSize (int orig_width, int orig_height,
     newwidth = max_tex_size;
   if ((newheight != orig_width) && (newheight > max_tex_size)) 
     newheight = max_tex_size;
+  if ((newdepth != orig_depth) && (newdepth > max_tex_size)) 
+    newdepth = max_tex_size;
 }
 
 void csGLTextureHandle::PrepareInt ()
@@ -282,10 +288,10 @@ void csGLTextureHandle::PrepareInt ()
     int faceCount = MIN (image->HasSubImages() + 1, 6);
     for (int i = 0; i < faceCount; i++)
     {
-      int newFaceW, newFaceH;
+      int newFaceW, newFaceH, newFaceD;
       csRef<iImage> imgFace = image->GetSubImage (i);
-      ComputeNewPo2ImageSize (imgFace->GetWidth(), imgFace->GetHeight(),
-	newFaceW, newFaceH, txtmgr->max_tex_size);
+      ComputeNewPo2ImageSize (imgFace->GetWidth(), imgFace->GetHeight(), 1,
+	newFaceW, newFaceH, newFaceD, txtmgr->max_tex_size);
       csRef<iImage> newFace;
       if (newFaceW != newFaceH) newFaceH = newFaceW;
       if ((newFaceW != imgFace->GetWidth()) 
@@ -330,9 +336,11 @@ void csGLTextureHandle::PrepareInt ()
   else
   {
     csRef<iImage> newImage;
-    if (actual_width != orig_width || actual_height != orig_height)
+    if (actual_width != orig_width || actual_height != orig_height 
+      || actual_d != orig_d)
     {
-      newImage = csImageManipulate::Rescale (image, actual_width, actual_height);
+      newImage = csImageManipulate::Rescale (image, actual_width, 
+	actual_height, actual_d);
     }
     if (IsTransp())
     {
@@ -366,14 +374,16 @@ void csGLTextureHandle::AdjustSizePo2 ()
   //actual_d = orig_d = images->Length();
   orig_width  = image->GetWidth();
   orig_height = image->GetHeight();
+  orig_d = image->GetDepth();
 
-  int newwidth, newheight;
+  int newwidth, newheight, newd;
 
-  ComputeNewPo2ImageSize (orig_width, orig_height, newwidth, newheight,
-    txtmgr->max_tex_size);
+  ComputeNewPo2ImageSize (orig_width, orig_height, orig_d, newwidth, newheight,
+    newd, txtmgr->max_tex_size);
 
   actual_width = newwidth;
   actual_height = newheight;
+  actual_d = newd;
 }
 
 //#define MIPMAP_DEBUG
@@ -401,7 +411,8 @@ void csGLTextureHandle::CreateMipMaps()
     && textureSettings->allowDownsample;
   int mipskip = doReduce ? txtmgr->texture_downsample : 0;
   while (((actual_width >> mipskip) > txtmgr->max_tex_size)
-    || ((actual_height >> mipskip) > txtmgr->max_tex_size))
+    || ((actual_height >> mipskip) > txtmgr->max_tex_size)
+    || ((actual_d >> mipskip) > txtmgr->max_tex_size))
     mipskip++;
 
   // Delete existing mipmaps, if any
@@ -415,7 +426,7 @@ void csGLTextureHandle::CreateMipMaps()
 #ifdef MIPMAP_DEBUG
   for (i=0; i < subImageCount; i++)
   {
-    csDebugImageWriter::DebugImageWrite (images->GetSubImage (i),
+    csDebugImageWriter::DebugImageWrite (image->GetSubImage (i),
       "/tmp/mipdebug/%.8x_%d_0.png", this, i);
   }
 #endif
@@ -474,6 +485,7 @@ void csGLTextureHandle::CreateMipMaps()
 	if (txtmgr->sharpen_mipmaps 
 	  && (mipskip == 0) // don't sharpen when doing skip...
 	  && textureSettings->allowMipSharpen
+	  && (cimg->GetDepth() == 1) // @@@ sharpen not "depth-safe"
 	  && (!precompMip || textureSettings->sharpenPrecomputedMipmaps))
 	{
 	  cimg = csImageManipulate::Sharpen (cimg, txtmgr->sharpen_mipmaps, 
@@ -541,23 +553,39 @@ bool csGLTextureHandle::transform (bool allowCompressed, GLenum targetFormat,
       uploadData.sourceFormat = GL_RGB;
       uploadData.sourceType = GL_UNSIGNED_BYTE;
     }
-    else if (strcmp (rawFormat, "r5g6b5") == 0)
+    else if (G3D->ext->CS_GL_version_1_2
+      && (strcmp (rawFormat, "b8g8r8") == 0))
+    {
+      uploadData.image_data = imageRaw->GetUint8();
+      uploadData.sourceFormat = GL_BGR;
+      uploadData.sourceType = GL_UNSIGNED_BYTE;
+    }
+    else if (G3D->ext->CS_GL_version_1_2
+      && (strcmp (rawFormat, "r5g6b5") == 0))
     {
       uploadData.image_data = imageRaw->GetUint8();
       uploadData.sourceFormat = GL_RGB;
       uploadData.sourceType = GL_UNSIGNED_SHORT_5_6_5;
     }
-    else if (strcmp (rawFormat, "a8r8g8b8") == 0)
+    else if (G3D->ext->CS_GL_version_1_2
+      && (strcmp (rawFormat, "a8r8g8b8") == 0))
     {
       uploadData.image_data = imageRaw->GetUint8();
       uploadData.sourceFormat = GL_BGRA;
       uploadData.sourceType = GL_UNSIGNED_INT_8_8_8_8_REV;
     }
+    else if (strcmp (rawFormat, "l8") == 0)
+    {
+      uploadData.image_data = imageRaw->GetUint8();
+      uploadData.sourceFormat = GL_LUMINANCE;
+      uploadData.sourceType = GL_UNSIGNED_BYTE;
+      targetFormat = GL_LUMINANCE;
+    }
     else 
     {
       bool isCompressedTarget;
       /* Only use glCompressedTexImage if the target format matches
-	* exactly the one of mip 0. */
+       * exactly the one of mip 0. */
       if ((DetermineTargetFormat (targetFormat, allowCompressed,
 	rawFormat, isCompressedTarget) == targetFormat) 
 	&& isCompressedTarget)
@@ -571,8 +599,22 @@ bool csGLTextureHandle::transform (bool allowCompressed, GLenum targetFormat,
 
   if (!uploadData.image_data)
   {
-    uploadData.image_data = (uint8*)Image->GetImageData (); // @@@ use pixel packing!
-    uploadData.dataRef = Image;
+    if (csPackRGBA::IsRGBpixelSane())
+    {
+      uploadData.image_data = (uint8*)Image->GetImageData ();
+      uploadData.dataRef = Image;
+    }
+    else
+    {
+      const size_t numPix = 
+	Image->GetWidth() * Image->GetHeight() * Image->GetDepth();
+      csRef<csDataBuffer> newDataBuf;
+      newDataBuf.AttachNew (new csDataBuffer (numPix));
+      csPackRGBA::PackRGBpixelToRGBA (newDataBuf->GetUint8(),
+	(csRGBpixel*)Image->GetImageData(), numPix);
+      uploadData.image_data = newDataBuf->GetUint8();
+      uploadData.dataRef = newDataBuf;
+    }
     //uploadData->size = n * 4;
     uploadData.sourceFormat = GL_RGBA;
     uploadData.sourceType = GL_UNSIGNED_BYTE;
@@ -682,8 +724,8 @@ void csGLTextureHandle::Load ()
 
     // @@@ Not sure if the following makes sense with 3D textures.
     glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, magFilter);
-
-    glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, minFilter);
+    glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER,
+      (texFlags.Check (CS_TEXTURE_NOMIPMAPS)) ? magFilter : minFilter);
 
     if (G3D->ext->CS_GL_EXT_texture_filter_anisotropic)
     {
@@ -695,10 +737,19 @@ void csGLTextureHandle::Load ()
     for (i = 0; i < uploadData->Length(); i++)
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
-      G3D->ext->glTexImage3DEXT (GL_TEXTURE_3D, uploadData.mip, 
-	uploadData.targetFormat, uploadData.w, uploadData.h, uploadData.d,
-	0, uploadData.sourceFormat, uploadData.sourceType, 
-	uploadData.image_data);
+      if (uploadData.compressed)
+      {
+	G3D->ext->glCompressedTexImage3DARB (GL_TEXTURE_3D, uploadData.mip, 
+	  uploadData.targetFormat, uploadData.w, uploadData.h, 
+	  uploadData.d, 0, uploadData.compressedSize, uploadData.image_data);
+      }
+      else
+      {
+	G3D->ext->glTexImage3DEXT (GL_TEXTURE_3D, uploadData.mip, 
+	  uploadData.targetFormat, uploadData.w, uploadData.h, uploadData.d,
+	  0, uploadData.sourceFormat, uploadData.sourceType, 
+	  uploadData.image_data);
+      }
     }
   }
   else if (target == CS_TEX_IMG_CUBEMAP)
@@ -792,11 +843,11 @@ GLuint csGLTextureHandle::GetHandle ()
   return Handle;
 }
 
-void csGLTextureHandle::ComputeMeanColor (int w, int h, csRGBpixel *src,
+void csGLTextureHandle::ComputeMeanColor (int w, int h, int d, csRGBpixel *src,
 					  const csRGBpixel* transp_color,
 					  csRGBpixel& mean_color)
 {
-  int pixels = w * h;
+  int pixels = w * h * d;
   unsigned r = 0, g = 0, b = 0;
   CS_ASSERT (pixels > 0);
   int count = pixels;
@@ -804,7 +855,7 @@ void csGLTextureHandle::ComputeMeanColor (int w, int h, csRGBpixel *src,
   while (count--)
   {
     const csRGBpixel &pix = *src++;
-    if (!transp_color || !transp_color->eq (pix) || pix.alpha)
+    if ((!transp_color || !transp_color->eq (pix)) && pix.alpha)
     {
       r += pix.red;
       g += pix.green;
@@ -822,22 +873,19 @@ void csGLTextureHandle::ComputeMeanColor (int w, int h, csRGBpixel *src,
     mean_color.red = mean_color.green = mean_color.blue = 0;
 }
 
-void csGLTextureHandle::CheckAlpha (int w, int h, csRGBpixel *src, 
+void csGLTextureHandle::CheckAlpha (int w, int h, int d, csRGBpixel *src, 
 				    const csRGBpixel* transp_color, 
 				    csAlphaMode::AlphaType& alphaType)
 {
-  int pixels = w * h;
-  CS_ASSERT (pixels > 0);
-  int count = pixels;
-  pixels = 0;
+  int count = w * h * d;
+  CS_ASSERT (count > 0);
   while (count--)
   {
     const csRGBpixel &pix = *src++;
-    if (!transp_color || !transp_color->eq (pix) || pix.alpha)
+    if ((!transp_color || !transp_color->eq (pix)) && pix.alpha)
     {
       if ((pix.alpha < 255) && (alphaType != csAlphaMode::alphaSmooth))
 	alphaType = csAlphaMode::alphaSmooth;
-      pixels++;
     }
     else
     {
@@ -849,111 +897,20 @@ void csGLTextureHandle::CheckAlpha (int w, int h, csRGBpixel *src,
 }
 
 
-void csGLTextureHandle::PrepareKeycolor (iImage* image,
+void csGLTextureHandle::PrepareKeycolor (csRef<iImage>& image,
 					 const csRGBpixel& transp_color,
 					 csAlphaMode::AlphaType& alphaType)
 {
-  int pixels = image->GetWidth () * image->GetHeight ();
+  int w = image->GetWidth();
+  int h = image->GetHeight ();
+  int d = image->GetDepth ();
   csRGBpixel *_src = (csRGBpixel *)image->GetImageData ();
-
-  while (pixels--)
-  {
-    /*
-      Drop the alpha of the transparent pixels to 0, but leave the alpha
-      of non-keycolored ones as is. Keycolor only makes transparent, but
-      doesn't mean the rest of the image isn't.
-     */
-     if (transp_color.eq (*_src)) _src->alpha = 0;
-    _src++;
-  }
-
-  // Now we draw borders inside all keycolored areas.
-  // This removes the halos of keycolor when using bilinear filtering
-  int h, rows, w, cols;
-  h = rows = image->GetHeight ();
-  w = image->GetWidth();
-  
-  _src = (csRGBpixel *)image->GetImageData ();
   csRGBpixel mean_color;
-  CheckAlpha (w, h, _src, &transp_color, alphaType);
-  ComputeMeanColor (w, h, _src, &transp_color, mean_color);
+  CheckAlpha (w, h, d, _src, &transp_color, alphaType);
   if (alphaType == csAlphaMode::alphaNone) return; // Nothing to fix up
-
-  while (rows--)
-  {
-    cols = w;
-    while (cols--)
-    {
-      if (!_src[(rows*w)+cols].alpha)
-      {
-	int n=0, r=0, g=0, b=0, xl, xr, yt, yb;
-	if (!cols)
-	{
-	  xl = w-1;
-	  xr = 1;
-	}
-	else if (cols==w-1)
-	{
-	  xl = cols-1;
-	  xr = 0;
-	}
-	else
-	{
-	  xl = cols-1;
-	  xr = cols+1;
-	}
-
-	if (!rows)
-	{
-	  yt = h-1;
-	  yb = 1;
-	}
-	else if (rows==h-1)
-	{
-	  yt = rows-1;
-	  yb = 0;
-	}
-	else
-	{
-	  yt = rows-1;
-	  yb = rows+1;
-	}
-
-#define CHECK_PIXEL(d) \
-	{ \
-	  if (_src[(d)].alpha) \
-	  { \
-	    n++; \
-	    r += _src[(d)].red; \
-	    g += _src[(d)].green; \
-	    b += _src[(d)].blue; \
-	  } \
-	}
-
-	CHECK_PIXEL((yt*w)+xl);
-	CHECK_PIXEL((yt*w)+cols);
-	CHECK_PIXEL((yt*w)+xr);
-	CHECK_PIXEL((rows*w)+xl);
-	CHECK_PIXEL((rows*w)+xr);
-	CHECK_PIXEL((yb*w)+xl);
-	CHECK_PIXEL((yb*w)+cols);
-	CHECK_PIXEL((yb*w)+xr);
-#undef CHECK_PIXEL
-	if (n)
-	{
-	  _src[(rows*w)+cols].red = r / n;
-	  _src[(rows*w)+cols].green = g / n;
-	  _src[(rows*w)+cols].blue = b / n;
-	}
-	else
-	{
-	  _src[(rows*w)+cols].red = mean_color.red;
-	  _src[(rows*w)+cols].green = mean_color.green;
-	  _src[(rows*w)+cols].blue = mean_color.blue;
-	}
-      }
-    }
-  }
+  ComputeMeanColor (w, h, d, _src, &transp_color, mean_color);
+  image = csImageManipulate::RenderKeycolorToAlpha (image, transp_color, 
+    mean_color);
 }
 
 SCF_IMPLEMENT_IBASE (csGLMaterialHandle)
@@ -1311,6 +1268,13 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image,
       "BAAAAAAAD!!! csGLTextureManager::RegisterTexture with 0 image!");
     return 0;
   }
+
+  if ((image->GetImageType() == csimgCube)
+    && !G3D->ext->CS_GL_ARB_texture_cube_map)
+    return 0;
+  if ((image->GetImageType() == csimg3D)
+    && !G3D->ext->CS_GL_EXT_texture3D)
+    return 0;
 
   csGLTextureHandle *txt = new csGLTextureHandle (image, flags, G3D);
   textures.Push(txt);

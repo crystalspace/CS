@@ -35,7 +35,7 @@ private:
   /// Common code shared by constructors.
   void ConstructCommon();
   /// Used by ctors setting a width/height/format.
-  void ConstructWHF (int width, int height, int format);
+  void ConstructWHDF (int width, int height, int depth, int format);
   /// Used by the "copy from iImage" ctor.
   void ConstructSource (iImage* source);
   /// Used by the "init from buffers" ctors.
@@ -46,6 +46,8 @@ protected:
   int Width;
   /// Height of image.
   int Height;
+  /// Depth of image.
+  int Depth;
   /**
    * The image data.
    * A value of 0 means the Image contents are "undefined". However,
@@ -65,6 +67,7 @@ protected:
   csRGBpixel keycolour;
   /// If true when these interfaces are destroyed the image is also.
   bool destroy_image;
+  csImageType imageType;
 
   /**
    * csImageMemory constructor, only set a format, no dimensions.
@@ -103,6 +106,15 @@ public:
    * \param format Image format. Default: #CS_IMGFMT_TRUECOLOR
    */
   csImageMemory (int width, int height, int format = CS_IMGFMT_TRUECOLOR);
+  /**
+   * Create a blank image of these dimensions and the specified
+   * format.
+   * \param width Width of the image
+   * \param height Height of the image
+   * \param depth Height of the image
+   * \param format Image format. 
+   */
+  csImageMemory (int width, int height, int depth, int format);
   /**
    * Create an instance for this pixel buffer with these dimensions. 
    * If destroy is set to true then the supplied buffer
@@ -152,6 +164,7 @@ public:
   virtual const void *GetImageData () { return GetImagePtr(); }
   virtual int GetWidth () const { return Width; }
   virtual int GetHeight () const { return Height; }
+  virtual int GetDepth () const { return Depth; }
 
   virtual int GetFormat () const { return Format; }
   virtual const csRGBpixel* GetPalette () { return GetPalettePtr(); }
@@ -191,6 +204,10 @@ public:
    */
   virtual void ApplyKeyColor ();
   virtual void ApplyKeycolor () { ApplyKeyColor(); }
+
+  virtual csImageType GetImageType() const { return imageType; }
+  void SetImageType (csImageType type) { imageType = type; }
+
 
   /// Copy an image as subpart into this image.
   bool Copy (iImage* srcImage, int x, int y, int width, int height);

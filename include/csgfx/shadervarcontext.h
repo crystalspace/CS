@@ -29,6 +29,9 @@
  * Simple implementation for iShaderVariableContext.
  */
 
+/**
+ * Simple implementation for iShaderVariableContext.
+ */
 class CS_CSGFX_EXPORT csShaderVariableContext : public iShaderVariableContext
 {
 private:

@@ -38,6 +38,17 @@ chronological order.
 	  csPoly3D::ComputePlane() that takes an indexed array of vertices.
 	- Jorrit added csPolygonMeshTools::IsMeshConvex() to test if a
 	  mesh is convex.
+	- res made the following changes:
+	    - Added proper support for 3D textures to renderer, loader, and
+	      some image csImageManipulate functions.
+	    - Moved "keycolor preparation" (set alpha of KCed pixels to 0) to
+	      csImageManipulate.
+	    - Fixed R8G8B8 support for DDS files.
+	    - Added support for L8 format for DDS files.
+	    - Fixed A8R8G8B8 decoding for DDS files.
+	    - Fixed PNG loader not properly clearing image format alpha flag 
+	      on some images.
+	    - A few documentation tweaks to SV-related stuff.
 14-Feb-2005
 	- Chris made the minimum polygon UV determinant into a #define
 	  so that it would be more amenable to experimentation. 

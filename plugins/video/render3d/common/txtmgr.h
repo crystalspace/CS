@@ -180,8 +180,7 @@ public:
    * rows/columns would be added/removed when sizing up/down, and takes the 
    * one with the smaller number. In case of a tie, it'll size up. 
    */
-  static void CalculateNextBestPo2Size (const int width, const int height,
-    int& newWidth, int& newHeigth);
+  static void CalculateNextBestPo2Size (const int orgDim, int& newDim);
 
   virtual csAlphaMode::AlphaType GetAlphaType () const
   { return csAlphaMode::alphaNone; }

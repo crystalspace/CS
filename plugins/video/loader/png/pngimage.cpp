@@ -507,8 +507,10 @@ nomem2:
 	    ImageType = imgRGB;
 	  }
 	  else
-	    NewFormat &= ~CS_IMGFMT_ALPHA;
+	    NewFormat &= ~CS_IMGFMT_ALPHA; // We're basically keycolored
 	}
+	else
+	  NewFormat &= ~CS_IMGFMT_ALPHA; // Nope, not transparent
       }
       break;
     case PNG_COLOR_TYPE_RGB:

@@ -431,7 +431,9 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     }
     csRef<iBase> b = BuiltinCheckerTexLoader->Parse (ParamsNode,
       ldr_context, CS_STATIC_CAST(iBase*, &context));
+    CS_ASSERT(b);
     tex = SCF_QUERY_INTERFACE (b, iTextureWrapper);
+    CS_ASSERT(tex);
   }
 
   delete[] type;
@@ -708,77 +710,35 @@ iTextureWrapper* csLoader::ParseCubemap (iLoaderContext* ldr_context,
 iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
     iDocumentNode* node)
 {
-  return 0;
-  /*
-   csRef<iImageVector> cubetextures = csPtr<iImageVector>(new csImageVector());
-
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
-  int Format = tm ? tm->GetTextureFormat () : CS_IMGFMT_TRUECOLOR;
-  
-  csRef<iImageVector> imagevec = csPtr<iImageVector>(new csImageVector());
-  csRef<iImage> image;
-
-  const char* texname = node->GetAttributeValue ("name");
-  csString className;
-
-  csRefArray<iDocumentNode> key_nodes;
-
-  int imagecount = 0;
-  while (it->HasNext ())
+  static bool volmapDeprecationWarning = false;
+  if (!volmapDeprecationWarning)
   {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_KEY:
-        key_nodes.Push (child);
-        break;
-      case XMLTOKEN_LAYER:
-      {
-        const char* fname = child->GetContentsValue ();
-	if (!fname)
-	{
-	  SyntaxService->ReportError (
-	       "crystalspace.maploader.parse.texture",
-	       child, "Expected VFS filename for 'file'!");
-	  return 0;
-	}
-        image = LoadImage(fname, Format);
-        imagevec->AddImage(image);
-        imagecount++;
-        break;
-      }
-      case XMLTOKEN_CLASS:
-      {
-	className.Replace (child->GetContentsValue ());
-      }
-      break;
-    }
-  }
-  
-  csRef<iTextureHandle> itex (tm->RegisterTexture(imagevec,0,
-  	iTextureHandle::CS_TEX_IMG_3D));
-
-  csRef<iTextureWrapper> itexwrap = Engine->GetTextureList()->NewTexture(itex);
-  itexwrap->QueryObject()->SetName(texname);
-  if (!className.IsEmpty())
-    itexwrap->SetTextureClass (className);
-
-  // Set keys
-  for (size_t i=0; i<key_nodes.Length (); i++)
-  {
-    iKeyValuePair* kvp = 0;
-    SyntaxService->ParseKey (key_nodes[i], kvp);
-    if (kvp)
-    {
-      itexwrap->QueryObject()->ObjAdd (kvp->QueryObject ());
-      kvp->DecRef ();
-    }
+    volmapDeprecationWarning = true;
+    SyntaxService->Report ("crystalspace.maploader.parse.texture",
+      CS_REPORTER_SEVERITY_WARNING, node,
+      "'<texture3d>...' is deprecated, use '<texture><type>"
+      PLUGIN_TEXTURELOADER_TEX3D "</type><params>...' instead");
   }
 
-  return itexwrap;
-  */
+  csRef<csTexture3DLoader> plugin;
+  plugin.AttachNew (new csTexture3DLoader (0));
+  plugin->Initialize (object_reg);
+
+  csRef<TextureLoaderContext> context;
+  const char* txtname = node->GetAttributeValue ("name");
+  context.AttachNew (new TextureLoaderContext (txtname));
+
+  csRef<iBase> b = plugin->Parse (node, ldr_context, context);
+  csRef<iTextureWrapper> tex;
+  if (b) tex = SCF_QUERY_INTERFACE (b, iTextureWrapper);
+
+  if (tex)
+  {
+    tex->QueryObject ()->SetName (txtname);
+    AddToRegion (ldr_context, tex->QueryObject ());
+    iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
+    if (tm) tex->Register (tm);
+  }
+
+  return tex;
 }

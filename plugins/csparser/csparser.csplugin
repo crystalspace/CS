@@ -44,6 +44,14 @@
           <class>crystalspace.level.loader</class>
         </requires>
       </class>
+      <class>
+        <name>crystalspace.texture.loader.tex3d</name>
+        <implementation>csTexture3DLoader</implementation>
+        <description>3D texture loader</description>
+        <requires>
+          <class>crystalspace.level.loader</class>
+        </requires>
+      </class>
     </classes>
   </scf>
 </plugin>
