@@ -27,6 +27,9 @@ Short-term cleanups that need to be done:
 	  shadowing others with the same name.  The code incorrectly assumed
 	  that it was setting the values of the original variables, when in
 	  fact it was not.
+	- Eric Sunshine modified pol2d.cpp so that Gouraud shaded polygons
+	  now respect the CS_POLY_LIGHTING flag.  Jorrit provided the
+	  information necessary to make this change.
 29-Sep-1999
 	- Added initial code base from Brandon Ehle for the CS scripting
 	  layer.
