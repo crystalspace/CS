@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Mar-2005
+	- Fixed flarge so that the name of the 'fire' texture plugin
+	  no longer conflicts with the name of the 'fire' mesh loader plugin
+	  in partsys. That way flarge and partsys can be loaded together.
 9-Mar-2005
 	- Peter Amstutz changed the csvosa3ld plugin to automatically
 	  recalculate normals on loaded models (md2 and the like)

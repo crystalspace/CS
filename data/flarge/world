@@ -17,8 +17,8 @@
         <plugin name="mesh">crystalspace.mesh.loader.genmesh</plugin>
         <plugin name="emitFact">crystalspace.mesh.loader.factory.emit</plugin>
         <plugin name="emit">crystalspace.mesh.loader.emit</plugin>
-        <plugin name="dots">crystalspace.texture.loader.dots</plugin>
-        <plugin name="fire">crystalspace.texture.loader.fire</plugin>
+        <plugin name="dotsTxt">crystalspace.texture.loader.dots</plugin>
+        <plugin name="fireTxt">crystalspace.texture.loader.fire</plugin>
         <plugin name="protoFact">crystalspace.mesh.loader.factory.protomesh</plugin>
         <plugin name="proto">crystalspace.mesh.loader.protomesh</plugin>
     </plugins>
@@ -103,13 +103,13 @@
             <file>/lib/stdtex/blobby.jpg</file>
         </texture>
         <texture name="fire">
-            <type>fire</type>
+            <type>fireTxt</type>
         </texture>
         <texture name="water">
             <type>crystalspace.texture.loader.water</type>
         </texture>
         <texture name="dots">
-            <type>dots</type>
+            <type>dotsTxt</type>
         </texture>
         <texture name="plasma">
             <type>crystalspace.texture.loader.plasma</type>
