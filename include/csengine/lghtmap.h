@@ -249,6 +249,9 @@ public:
   void Cache (csPolygonSet* owner, csPolygon3D* poly, int index,
     csWorld* world);
 
+  /// Set the last frustum id, used by lighting
+  void SetLastFrustumId(int val) { last_frustum_id = val; }
+
   /**
    * Convert the lightmaps to the correct mixing mode.
    * This function does nothing unless the mixing mode is
