@@ -1186,10 +1186,6 @@ public:
     virtual iPolygon3D* IntersectSegment (const csVector3& start,
       const csVector3& end, csVector3& isect, float* pr = NULL,
       iMeshWrapper** p_mesh = NULL);
-    virtual bool SupportsShadowCasting ()
-    {
-      return true;
-    }
     virtual void CastShadows (iFrustumView* fview)
     {
       scfParent->CastShadows (fview);

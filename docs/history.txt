@@ -1,5 +1,41 @@
 The history order is reversed so that new features are at the top.
 
+8-Jul-2002
+	- Implemented CastShadows() in Dynavis. Not fully optimal yet
+	  (i.e. no culling is actually done except for frustum culling).
+	- Removed SupportsShadowCasting() from iVisibilityCuller. Shadow
+	  casting is no longer an optional feature. It must be supported
+	  by the culler.
+	- Fixed a refcount leak on plugin manager in
+	  csSector::UseCullerPlugin().
+	- The crystalspace.culling.frustvis visibility culler is now the
+	  default visibility culler in all cases. This means that a sector
+	  will ALWAYS have a visibility culler now.
+	- Fixed a bug in the frustum visibility culler. It would not mark
+	  an object as visible if you were in the bounding box of that
+	  object.
+	- There is now better error checking when loading a culling
+	  plugin for a sector.
+	- Fixed a bug in the sector drawing code when used in combination
+	  with a visibility culler and a space-warping portal. In such a
+	  case the traversal of the portal could cause the previously
+	  calculated vis culling results to be wrong. This is now solved
+	  by storing an array of visible objects BEFORE drawing them.
+	- The bugfix above also also fixes a bug in the sector drawing code
+	  related to the alpha render priority (which will sort objects
+	  back to front internally) and the use of space-warping (or mirror)
+	  portals. In that case the traversal through the portal would resort
+	  the objects on that priority which would mess up the order in the
+	  previous recursion level.
+	- The bugfix mentioned above involves changing the way the render
+	  priority queue works. Now all is sorted at once and then put
+	  in one big list.
+	- Fixed a bug in FrustVis and DynaVis with regards to frustum
+	  culling in case the sector is mirrored (i.e. looking through
+	  a mirroring portal). The frustum planes need to be reversed in
+	  that case. Seems that DynaVis still has some problems though.
+	- Removed csSector::GetVisibleObjects() since that is no longer
+	  needed (there is always a culler to do this work now).
 7-Jul-2002
 	- csSector::GetVisibleObjects() now uses the efficient
 	  csIntersect3::BoxFrustum() routine. This also fixes a bug

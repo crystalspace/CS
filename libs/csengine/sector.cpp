@@ -195,20 +195,23 @@ void csSector::RelinkMesh (iMeshWrapper *mesh)
 }
 
 //----------------------------------------------------------------------
-void csSector::UseCuller (const char *meshname)
+bool csSector::UseCuller (const char *meshname)
 {
-  // If there is already a culler in use, do nothing.
-  if (culler) return;
+  if (culler)
+  {
+    culler->DecRef ();
+    culler = NULL;
+  }
 
   // Find the culler with the given name.
   culler_mesh = meshes.FindByName (meshname);
-  if (!culler_mesh) return;
+  if (!culler_mesh) return false;
 
   // Query the culler interface from it.
   culler = SCF_QUERY_INTERFACE (
       culler_mesh->GetMeshObject (),
       iVisibilityCuller);
-  if (!culler) { culler_mesh = NULL; return; }
+  if (!culler) { culler_mesh = NULL; return false; }
 
   // load cache data
   char cachename[256];
@@ -227,20 +230,45 @@ void csSector::UseCuller (const char *meshname)
     culler->RegisterVisObject (vo);
     vo->DecRef ();
   }
+  return true;
 }
 
-void csSector::UseCullerPlugin (const char *plugname)
+bool csSector::UseCullerPlugin (const char *plugname)
 {
-  // If there is already a culler in use, do nothing.
-  if (culler) return;
+  if (culler)
+  {
+    culler->DecRef ();
+    culler = NULL;
+  }
 
   culler_mesh = NULL;
 
   // Load the culler plugin.
-  iPluginManager* plugmgr = CS_QUERY_REGISTRY (
-  	csEngine::object_reg, iPluginManager);
-  culler = CS_LOAD_PLUGIN (plugmgr, plugname, iVisibilityCuller);
-  if (!culler) return;
+  iPluginManager* plugmgr = CS_QUERY_REGISTRY (csEngine::object_reg,
+  	iPluginManager);
+  culler = CS_QUERY_PLUGIN_CLASS (plugmgr, plugname, iVisibilityCuller);
+  if (culler)
+  {
+    // Culler is already loaded. Create new instance.
+    culler->DecRef ();
+    //@@@ This is not good! We should use SCF_CREATE_INSTANCE here but for
+    // some reason that doesn't work!!!
+    //culler = SCF_CREATE_INSTANCE (plugname, iVisibilityCuller);
+    culler = CS_LOAD_PLUGIN (plugmgr, plugname, iVisibilityCuller);
+    printf ("Create culler '%s' -> %p\n", plugname, culler); fflush (stdout);
+  }
+  else
+  {
+    // Plugin is not yet loaded.
+    culler = CS_LOAD_PLUGIN (plugmgr, plugname, iVisibilityCuller);
+    printf ("Load culler '%s' -> %p\n", plugname, culler); fflush (stdout);
+  }
+  plugmgr->DecRef ();
+
+  if (!culler)
+  {
+    return false;
+  }
 
   // load cache data
   char cachename[256];
@@ -258,6 +286,14 @@ void csSector::UseCullerPlugin (const char *plugname)
     culler->RegisterVisObject (vo);
     vo->DecRef ();
   }
+  return true;
+}
+
+iVisibilityCuller* csSector::GetVisibilityCuller ()
+{
+  if (!culler) UseCullerPlugin ("crystalspace.culling.frustvis");
+  CS_ASSERT (culler != NULL);
+  return culler;
 }
 
 csPolygon3D *csSector::HitBeam (
@@ -362,7 +398,7 @@ csPolygon3D *csSector::IntersectSegment (
   csPolygon3D *best_p = NULL;
   csVector3 obj_start, obj_end, obj_isect;
 
-  if (culler && !only_portals)
+  if (!only_portals)
   {
     // culler_mesh has option CS_THING_MOVE_NEVER so
     // object space == world space.
@@ -387,9 +423,6 @@ csPolygon3D *csSector::IntersectSegment (
   {
     iMeshWrapper *mesh = meshes.Get (i);
     if (mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE)) continue;
-    //@@@ Should use 'culler' and not 'culler_mesh'!
-    if (culler_mesh && !only_portals && mesh == culler_mesh)
-      continue;  // Already handled above.
 
     // @@@ UGLY!!!
     iThingState *ith = SCF_QUERY_INTERFACE (
@@ -671,7 +704,10 @@ void csSector::Draw (iRenderView *rview)
 
   draw_busy++;
 
-  int i, j;
+  // Make sure the visibility culler is loaded.
+  GetVisibilityCuller ();
+
+  int i;
   iCamera *icam = rview->GetCamera ();
   rview->SetThisSector (&scfiSector);
 
@@ -686,7 +722,8 @@ void csSector::Draw (iRenderView *rview)
     if (HasFog ())
     {
       if (
-        (fogmethod = csEngine::current_engine->fogmethod) == G3DFOGMETHOD_VERTEX)
+        (fogmethod = csEngine::current_engine->fogmethod)
+		== G3DFOGMETHOD_VERTEX)
       {
         csFogInfo *fog_info = new csFogInfo ();
         fog_info->next = rview->GetFirstFogInfo ();
@@ -730,8 +767,8 @@ void csSector::Draw (iRenderView *rview)
    */
   if (meshes.Length () > 0)
   {
-    // if we use a culler, visible objects are marked now
-    bool use_culler = (culler && culler->VisTest (rview));
+    // Mark visible objects.
+    culler->VisTest (rview);
 
     // get a pointer to the previous sector
     iSector *prev_sector = rview->GetPreviousSector ();
@@ -747,36 +784,32 @@ void csSector::Draw (iRenderView *rview)
             CS_PORTAL_WARP);
     }
 
+    // First sort everything based on render priority and return
+    // a big list of visible objects. This will use the visibility
+    // information calculated by VisTest() above.
+    int num_objects;
+    iMeshWrapper** objects = RenderQueues.SortAll (rview, num_objects);
+
     // Draw the meshes.
-    for (i = 0; i < RenderQueues.GetQueueCount (); i++)
+    for (i = 0 ; i < num_objects ; i++)
     {
-      RenderQueues.Sort (rview, i);
-
-      csMeshVectorNodelete *v = RenderQueues.GetQueue (i);
-      if (!v) continue;
-
-      for (j = 0; j < v->Length (); j++)
-      {
-        iMeshWrapper *sp = v->Get (j);
-        if (!use_culler || sp->GetPrivateObject ()->IsVisible ())
-        {
-          if (
+      iMeshWrapper* sp = objects[i];
+      if (
             !prev_sector ||
             sp->GetMovable ()->GetSectors ()->Find (prev_sector) == -1)
-          {
-            // Mesh is not in the previous sector or there is no previous
-
-            // sector.
-            sp->Draw (rview);
-          }
-          else if (draw_prev_sector)
-          {
-            // @@@ Here we should draw clipped to the portal.
-            sp->Draw (rview);
-          }
-        }
+      {
+        // Mesh is not in the previous sector or there is no previous
+        // sector.
+        sp->Draw (rview);
+      }
+      else if (draw_prev_sector)
+      {
+        // @@@ Here we should draw clipped to the portal.
+        sp->Draw (rview);
       }
     }
+
+    delete[] objects;
   }
 
   // queue all halos in this sector to be drawn.
@@ -847,78 +880,6 @@ void csSector::Draw (iRenderView *rview)
 # endif
 }
 
-csObject **csSector::GetVisibleObjects (iFrustumView *lview, int &num_objects)
-{
-  num_objects = meshes.Length ();
-  if (!num_objects)
-  {
-    return NULL;
-  }
-
-  csFrustum *lf = lview->GetFrustumContext ()->GetLightFrustum ();
-  const csVector3& c = lf->GetOrigin ();
-  bool infinite = lf->IsInfinite ();
-
-  csPlane3 planes[32];
-  uint32 planes_mask;
-  if (!infinite)
-  {
-    CS_ASSERT (lf->GetVertexCount () <= 31);	// @@@ What if the frustum is bigger???
-    if (lf->GetVertexCount () > 31)
-    {
-      printf ("INTERNAL ERROR! Vertex count in GetVisibleObjects() exceeded!\n");
-      fflush (stdout);
-      return NULL;
-    }
-    planes_mask = 0;
-    int i;
-    int i1 = lf->GetVertexCount () - 1;
-    for (i = 0 ; i < lf->GetVertexCount () ; i1 = i, i++)
-    {
-      planes_mask = (planes_mask<<1)|1;
-      const csVector3 &v1 = lf->GetVertex (i);
-      const csVector3 &v2 = lf->GetVertex (i1);
-      planes[i].Set (c, v1+c, v2+c);
-    }
-    if (lf->GetBackPlane ())
-    {
-      // @@@ UNTESTED CODE! There are no backplanes yet in frustums.
-      // It is possible this plane has to be inverted.
-      planes_mask = (planes_mask<<1)|1;
-      planes[i] = *(lf->GetBackPlane ());
-    }
-  }
-
-  bool vis;
-  int j;
-
-  csObject **visible_objects = new csObject *[num_objects];
-
-  num_objects = 0;
-
-  // @@@ Unify both loops below once csThing becomes a mesh object.
-  for (j = 0; j < meshes.Length (); j++)
-  {
-    iMeshWrapper *sp = meshes.Get (j);
-
-    // If the light frustum is infinite then every thing
-    // in this sector is of course visible.
-    if (infinite)
-      vis = true;
-    else
-    {
-      csBox3 bbox;
-      sp->GetWorldBoundingBox (bbox);
-      uint32 out_mask;
-      vis = csIntersect3::BoxFrustum (bbox, planes, planes_mask, out_mask);
-    }
-
-    if (vis) visible_objects[num_objects++] = sp->GetPrivateObject ();
-  }
-
-  return visible_objects;
-}
-
 void csSector::CheckFrustum (iFrustumView *lview)
 {
   csCBufferCube *cb = engine->GetCBufCube ();
@@ -931,93 +892,9 @@ void csSector::RealCheckFrustum (iFrustumView *lview)
   if (draw_busy > cfg_reflections) return ;
   draw_busy++;
 
-  int i;
-
-  // Translate this sector so that it is oriented around
-  // the position of the light (position of the light becomes
-  // the new origin).
-  csVector3 &center = lview->GetFrustumContext ()->GetLightFrustum ()
-    ->GetOrigin ();
-
-  iShadowBlockList *shadows = lview->GetFrustumContext ()->GetShadows ();
-
-  // Mark a new region so that we can restore the shadows later.
-  uint32 prev_region = shadows->MarkNewRegion ();
-
-  if (culler && culler->SupportsShadowCasting ())
-  {
-    culler->CastShadows (lview);
-  }
-  else
-  {
-    /*
-     * Here we have no octree so we know the sector polygons are
-     * convex. First find all objects that are visible in the frustum.
-     */
-    int num_visible_objects;
-    csObject **visible_objects = GetVisibleObjects (
-        lview,
-        num_visible_objects);
-
-    /*
-     * Append the shadows for these objects to the shadow list.
-     * This list is appended to the one given in 'lview'. After
-     * returning, the list in 'lview' will be restored.
-     */
-    if (lview->ThingShadowsEnabled ())
-    {
-      for (i = 0; i < num_visible_objects; i++)
-      {
-        csObject *o = visible_objects[i];
-        csMeshWrapper *mesh = (csMeshWrapper *)o;
-        // Only if the thing has right flags do we consider it for shadows.
-        if (lview->CheckShadowMask (mesh->flags.Get ()))
-	{
-          iShadowCaster *shadcast = SCF_QUERY_INTERFACE (
-            mesh->GetMeshObject (), iShadowCaster);
-          if (shadcast)
-          {
-            shadcast->AppendShadows (&(mesh->GetMovable ().scfiMovable), shadows, center);
-            shadcast->DecRef ();
-	  }
-        }
-      }
-    }
-
-    // Calculate lighting for all objects in the current sector.
-    for (i = 0; i < num_visible_objects; i++)
-    {
-      csObject *o = visible_objects[i];
-      csMeshWrapper *mesh = (csMeshWrapper *)o;
-      // Only if the thing has right flags do we consider it for shadows.
-      if (lview->CheckProcessMask (mesh->flags.Get ()))
-      {
-        iShadowReceiver *shadrcv = SCF_QUERY_INTERFACE (
-          mesh->GetMeshObject (),
-          iShadowReceiver);
-        if (shadrcv)
-        {
-          shadrcv->CastShadows (&(mesh->GetMovable ().scfiMovable), lview);
-          shadrcv->DecRef ();
-	}
-      }
-    }
-
-    delete[] visible_objects;
-  }
-
-  // Restore the shadow list in 'lview' and then delete
-  // all the shadow frustums that were added in this recursion
-  // level.
-  while (shadows->GetLastShadowBlock ())
-  {
-    iShadowBlock *sh = shadows->GetLastShadowBlock ();
-    if (!shadows->FromCurrentRegion (sh))
-      break;
-    shadows->RemoveLastShadowBlock ();
-    sh->DecRef ();
-  }
-  shadows->RestoreRegion (prev_region);
+  // Make sure we have a culler.
+  GetVisibilityCuller ();
+  culler->CastShadows (lview);
 
   draw_busy--;
 }

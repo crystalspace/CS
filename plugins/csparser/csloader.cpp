@@ -3105,10 +3105,19 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
   if (!(flags & CS_LOADER_NOBSP))
     if (do_culler)
     {
+      bool rc;
       if (*bspname)
-        sector->SetVisibilityCuller (bspname);
+        rc = sector->SetVisibilityCuller (bspname);
       else
-        sector->SetVisibilityCullerPlugin (culplugname);
+        rc = sector->SetVisibilityCullerPlugin (culplugname);
+      if (!rc)
+      {
+	ReportError (
+	      	"crystalspace.maploader.load.sector",
+		"Could not load visibility culler for sector '%s'!",
+		secname ? secname : "<noname>");
+	return NULL;
+      }
     }
   return sector;
 }

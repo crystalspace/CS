@@ -97,6 +97,40 @@ static int comp_mesh (const void *el1, const void *el2)
     return 0;
 }
 
+iMeshWrapper** csRenderQueueSet::SortAll (iRenderView* rview,
+	int& tot_num)
+{
+  tot_num = 0;
+
+  int tot_objects = 0;
+  int priority;
+  for (priority = 0 ; priority < Queues.Length () ; priority++)
+  {
+    Sort (rview, priority);
+    csMeshVectorNodelete* v = Queues[priority];
+    if (v)
+      tot_objects += v->Length ();
+  }
+  if (!tot_objects) return NULL;
+
+  iMeshWrapper** meshes = new iMeshWrapper* [tot_objects];
+  for (priority = 0 ; priority < Queues.Length () ; priority++)
+  {
+    csMeshVectorNodelete* v = Queues[priority];
+    if (v)
+      for (int i = 0 ; i < v->Length () ; i++)
+      {
+        iMeshWrapper *sp = v->Get (i);
+        if (sp->GetPrivateObject ()->IsVisible ())
+        {
+          meshes[tot_num++] = sp;
+        }
+      }
+  }
+
+  return meshes;
+}
+
 void csRenderQueueSet::Sort (iRenderView *rview, int priority)
 {
   static engine3d_comp_mesh_z &comp_mesh_z = *GetStaticComp_Mesh_Comp ();
@@ -118,9 +152,12 @@ void csRenderQueueSet::Sort (iRenderView *rview, int priority)
     csVector3 rad, cent;
     mesh->GetRadius (rad, cent);
 
-    csReversibleTransform tr_o2c = camtrans / mesh->GetMovable ()->GetFullTransform ();
+    csReversibleTransform tr_o2c = camtrans / mesh->GetMovable ()->
+    	GetFullTransform ();
     csVector3 tr_cent = tr_o2c.Other2This (cent);
-    comp_mesh_z[i].z = rendsort == CS_RENDPRI_FRONT2BACK ? tr_cent.z : -tr_cent.z;
+    comp_mesh_z[i].z = rendsort == CS_RENDPRI_FRONT2BACK
+    	? tr_cent.z
+	: -tr_cent.z;
     comp_mesh_z[i].mesh = mesh;
   }
 
@@ -137,3 +174,4 @@ void csRenderQueueSet::Sort (iRenderView *rview, int priority)
 
   return ;
 }
+

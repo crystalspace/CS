@@ -46,11 +46,22 @@ public:
   long update_number;	// Last used update_number from movable.
   long shape_number;	// Last used shape_number from model.
 
+  // Optional data for shadows. Both fields can be NULL.
+  iMeshWrapper* mesh;
+  iShadowCaster* caster;
+  iShadowReceiver* receiver;
+
   csFrustVisObjectWrapper ()
   {
+    mesh = NULL;
+    caster = NULL;
+    receiver = NULL;
   }
   ~csFrustVisObjectWrapper ()
   {
+    if (mesh) mesh->DecRef ();
+    if (caster) caster->DecRef ();
+    if (receiver) receiver->DecRef ();
   }
 
   void MarkVisible ()
@@ -103,8 +114,7 @@ public:
   virtual iPolygon3D* IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr = NULL,
     iMeshWrapper** p_mesh = NULL);
-  virtual bool SupportsShadowCasting () { return false; }
-  virtual void CastShadows (iFrustumView* /*fview*/) { }
+  virtual void CastShadows (iFrustumView* fview);
 
   struct eiComponent : public iComponent
   {

@@ -58,7 +58,7 @@ private:
 
   csBox3 bbox;
   void* object;			// Pointer back to the original object.
-  csSimpleKDTree** leafs;		// Leafs that contain this object.
+  csSimpleKDTree** leafs;	// Leafs that contain this object.
   int num_leafs;
   int max_leafs;
 
@@ -123,9 +123,9 @@ public:
 class csSimpleKDTree
 {
 private:
-  csSimpleKDTree* child1;		// If child1 isn't NULL then child2 will
-  csSimpleKDTree* child2;		// also be not NULL.
-  csSimpleKDTree* parent;		// NULL if this is the root.
+  csSimpleKDTree* child1;	// If child1 isn't NULL then child2 will
+  csSimpleKDTree* child2;	// also be not NULL.
+  csSimpleKDTree* parent;	// NULL if this is the root.
 
   bool obj_bbox_valid;		// If false obj_bbox is not valid.
   csBox3 obj_bbox;		// Bbox of all objects in this node.

@@ -38,6 +38,9 @@ struct iPolygonMesh;
 struct iMovable;
 struct iMeshWrapper;
 struct iBugPlug;
+struct iMeshWrapper;
+struct iShadowCaster;
+struct iShadowReceiver;
 
 #define VIEWMODE_STATS 0
 #define VIEWMODE_STATSOVERLAY 1
@@ -65,14 +68,24 @@ public:
   long shape_number;	// Last used shape_number from model.
   csObjectModel* model;
   csVisibilityObjectHistory* history;
+  // Optional data for shadows. Both fields can be NULL.
+  iMeshWrapper* mesh;
+  iShadowCaster* caster;
+  iShadowReceiver* receiver;
 
   csVisibilityObjectWrapper ()
   {
     history = new csVisibilityObjectHistory ();
+    mesh = NULL;
+    caster = NULL;
+    receiver = NULL;
   }
   ~csVisibilityObjectWrapper ()
   {
     history->DecRef ();
+    if (mesh) mesh->DecRef ();
+    if (caster) caster->DecRef ();
+    if (receiver) receiver->DecRef ();
   }
 
   void MarkVisible (csVisReason reason, int cnt)
@@ -185,7 +198,6 @@ public:
   virtual iPolygon3D* IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr = NULL,
     iMeshWrapper** p_mesh = NULL);
-  virtual bool SupportsShadowCasting () { return false; }
   virtual void CastShadows (iFrustumView* fview);
 
   // Debugging functions.

@@ -40,7 +40,7 @@ struct iGraphics3D;
 struct iPolygon3D;
 struct iRenderView;
 
-SCF_VERSION (iSector, 0, 4, 2);
+SCF_VERSION (iSector, 0, 4, 4);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -89,17 +89,19 @@ struct iSector : public iBase
    * Use the specified mesh object as the visibility culler for
    * this sector.
    */
-  virtual void SetVisibilityCuller (const char *Name) = 0;
+  virtual bool SetVisibilityCuller (const char *Name) = 0;
   /**
    * Use the specified plugin as the visibility culler for
-   * this sector.
+   * this sector. Returns false if the culler could not be
+   * loaded for some reason.
    */
-  virtual void SetVisibilityCullerPlugin (const char *Name) = 0;
+  virtual bool SetVisibilityCullerPlugin (const char *Name) = 0;
   /**
    * Get the visibility culler that is used for this sector.
-   * NULL if none.
+   * If there is no culler yet a culler of type 'crystalspace.culling.frustvis'
+   * will be created and used for this sector.
    */
-  virtual iVisibilityCuller* GetVisibilityCuller () const = 0;
+  virtual iVisibilityCuller* GetVisibilityCuller () = 0;
 
   /**
    * Get the current draw recursion level.

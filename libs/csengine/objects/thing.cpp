@@ -3702,7 +3702,11 @@ static bool CullOctreeNodeLighting (
 
 void csThing::CastShadows (iFrustumView *fview)
 {
-  if (!static_tree) return ;
+  CS_ASSERT (static_tree != NULL);
+
+  iShadowBlockList *shadows = fview->GetFrustumContext ()->GetShadows ();
+  // Mark a new region so that we can restore the shadows later.
+  uint32 prev_region = shadows->MarkNewRegion ();
 
   // If there is a static tree (BSP and/or octree) then we
   // go front to back and add shadows to the list while we are doing
@@ -3766,6 +3770,19 @@ void csThing::CastShadows (iFrustumView *fview)
       }
     }
   }
+
+  // Restore the shadow list in 'lview' and then delete
+  // all the shadow frustums that were added in this recursion
+  // level.
+  while (shadows->GetLastShadowBlock ())
+  {
+    iShadowBlock *sh = shadows->GetLastShadowBlock ();
+    if (!shadows->FromCurrentRegion (sh))
+      break;
+    shadows->RemoveLastShadowBlock ();
+    sh->DecRef ();
+  }
+  shadows->RestoreRegion (prev_region);
 }
 
 void csThing::CheckFrustum (iFrustumView *lview, iMovable *movable)

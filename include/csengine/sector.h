@@ -235,19 +235,20 @@ public:
    * Look for the mesh object and see if it implements iVisibilityCuller.
    * If so then use it for visibility culling in this sector.
    */
-  void UseCuller (const char* meshname);
+  bool UseCuller (const char* meshname);
 
   /**
    * Use the given plugin as a visibility culler (should implement
-   * iVisibilityCuller).
+   * iVisibilityCuller). Returns false if the culler could not be
+   * loaded for some reason.
    */
-  void UseCullerPlugin (const char* plugname);
+  bool UseCullerPlugin (const char* plugname);
 
   /**
    * Get the visibility culler that is used for this sector.
    * NULL if none.
    */
-  iVisibilityCuller* GetVisibilityCuller () const { return culler; }
+  iVisibilityCuller* GetVisibilityCuller ();
 
   //----------------------------------------------------------------------
   // Drawing
@@ -294,14 +295,6 @@ public:
    * this sector and possibly traverse through portals to other sectors.
    */
   void CheckFrustum (iFrustumView* lview);
-
-  /**
-   * Get a list of all objects which are visible in the given frustum.
-   * Return an array to pointers to visible objects.
-   * You must delete this array after you are ready using it.
-   * @@@ When csThing becomes a mesh object then change rc to csMeshWrapper**
-   */
-  csObject** GetVisibleObjects (iFrustumView* lview, int& num_objects);
 
   /**
    * Intersects world-space sphere with polygons of this set. Return
@@ -431,11 +424,11 @@ public:
       { return scfParent; }
     virtual int GetRecLevel () const
       { return scfParent->draw_busy; }
-    virtual void SetVisibilityCuller (const char *Name)
-      { scfParent->UseCuller (Name); }
-    virtual void SetVisibilityCullerPlugin (const char *Name)
-      { scfParent->UseCullerPlugin (Name); }
-    virtual iVisibilityCuller* GetVisibilityCuller () const
+    virtual bool SetVisibilityCuller (const char *Name)
+      { return scfParent->UseCuller (Name); }
+    virtual bool SetVisibilityCullerPlugin (const char *Name)
+      { return scfParent->UseCullerPlugin (Name); }
+    virtual iVisibilityCuller* GetVisibilityCuller ()
       { return scfParent->GetVisibilityCuller (); }
     virtual iMeshList* GetMeshes ()
       { return scfParent->GetMeshes (); }

@@ -23,6 +23,7 @@
 #include "csutil/scf.h"
 #include "csutil/util.h"
 #include "csutil/scfstr.h"
+#include "csgeom/frustum.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/math3d.h"
 #include "csgeom/obb.h"
@@ -40,6 +41,9 @@
 #include "iengine/rview.h"
 #include "iengine/camera.h"
 #include "iengine/mesh.h"
+#include "iengine/shadcast.h"
+#include "iengine/shadows.h"
+#include "iengine/fview.h"
 #include "imesh/object.h"
 #include "imesh/thing/thing.h"
 #include "iutil/object.h"
@@ -144,6 +148,16 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
   CalculateVisObjBBox (visobj, bbox);
   visobj_wrap->child = kdtree->AddObject (bbox, (void*)visobj_wrap);
 
+  iMeshWrapper* mesh = SCF_QUERY_INTERFACE (visobj, iMeshWrapper);
+  visobj_wrap->mesh = mesh;
+  if (mesh)
+  {
+    visobj_wrap->caster = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+    	iShadowCaster);
+    visobj_wrap->receiver = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+    	iShadowReceiver);
+  }
+
   visobj_vector.Push (visobj_wrap);
 }
 
@@ -238,6 +252,7 @@ bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
     const csBox3& obj_bbox = obj->child->GetBBox ();
     if (obj_bbox.Contains (data->pos))
     {
+      obj->MarkVisible ();
       return true;
     }
   
@@ -330,6 +345,13 @@ bool csFrustumVis::VisTest (iRenderView* rview)
   data.frustum[3].Set (origin, p3, p0);
   //data.frustum[4].Set (origin, p0, p1);	// @@@ DO z=0 plane too!
   data.frustum_mask = 0xf;
+  if (rview->GetCamera ()->IsMirrored ())
+  {
+    data.frustum[0].Invert ();
+    data.frustum[1].Invert ();
+    data.frustum[2].Invert ();
+    data.frustum[3].Invert ();
+  }
 
   // The big routine: traverse from front to back and mark all objects
   // visible that are visible.
@@ -576,5 +598,174 @@ iPolygon3D* csFrustumVis::IntersectSegment (const csVector3& start,
   isect = data.isect;
 
   return data.polygon;
+}
+
+//======== CastShadows =====================================================
+
+struct CastShadows_Front2BackData
+{
+  iFrustumView* fview;
+  csPlane3 planes[32];
+  uint32 planes_mask;
+};
+
+static bool CastShadows_Front2Back (csSimpleKDTree* treenode, void* userdata,
+	uint32 cur_timestamp)
+{
+  CastShadows_Front2BackData* data = (CastShadows_Front2BackData*)userdata;
+
+  // First we do frustum checking if relevant. See if the current node
+  // intersects with the frustum.
+  if (data->planes_mask)
+  {
+    const csBox3& node_bbox = treenode->GetNodeBBox ();
+    uint32 out_mask;
+    if (!csIntersect3::BoxFrustum (node_bbox, data->planes, data->planes_mask,
+    	out_mask))
+      return false;
+  }
+
+  treenode->Distribute ();
+
+  int num_objects;
+  csSimpleKDTreeChild** objects;
+  num_objects = treenode->GetObjectCount ();
+  objects = treenode->GetObjects ();
+
+  iFrustumView* fview = data->fview;
+  const csVector3& center = fview->GetFrustumContext ()->GetLightFrustum ()
+    ->GetOrigin ();
+  iShadowBlockList *shadows = fview->GetFrustumContext ()->GetShadows ();
+
+  int i;
+  // The first time through the loop we just append shadows.
+  // We also don't mark the timestamp yet so that we can easily
+  // go a second time through the loop.
+  for (i = 0 ; i < num_objects ; i++)
+  {
+    if (objects[i]->timestamp != cur_timestamp)
+    {
+      csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
+      	objects[i]->GetObject ();
+
+      // Test the bounding box of the object with the frustum.
+      bool vis = false;
+      if (data->planes_mask)
+      {
+        const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+	uint32 out_mask;
+	if (csIntersect3::BoxFrustum (obj_bbox, data->planes, data->planes_mask,
+		out_mask))
+	{
+	  vis = true;
+	}
+      }
+      else
+      {
+        vis = true;
+      }
+      // If visible we mark as visible and add shadows if possible.
+      if (vis)
+      {
+	visobj_wrap->visobj->MarkVisible ();
+        if (visobj_wrap->caster && fview->ThingShadowsEnabled () &&
+            fview->CheckShadowMask (visobj_wrap->mesh->GetFlags ().Get ()))
+        {
+          visobj_wrap->caster->AppendShadows (
+	  	visobj_wrap->visobj->GetMovable (), shadows, center);
+	}
+      }
+      else
+      {
+	visobj_wrap->visobj->MarkInvisible ();
+      }
+    }
+  }
+  // Here we go a second time through the loop. Here we will
+  // actually send shadows to the receivers.
+  for (i = 0 ; i < num_objects ; i++)
+  {
+    if (objects[i]->timestamp != cur_timestamp)
+    {
+      objects[i]->timestamp = cur_timestamp;
+      csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
+      	objects[i]->GetObject ();
+
+      // If visible we mark as visible and add shadows if possible.
+      if (visobj_wrap->visobj->IsVisible ())
+      {
+        if (visobj_wrap->receiver
+		&& fview->CheckProcessMask (
+			visobj_wrap->mesh->GetFlags ().Get ()))
+        {
+          visobj_wrap->receiver->CastShadows (
+	  	visobj_wrap->visobj->GetMovable (), fview);
+	}
+      }
+    }
+  }
+
+  return true;
+}
+
+void csFrustumVis::CastShadows (iFrustumView* fview)
+{
+  UpdateObjects ();
+  CastShadows_Front2BackData data;
+  data.fview = fview;
+
+  const csVector3& center = fview->GetFrustumContext ()->GetLightFrustum ()
+    ->GetOrigin ();
+
+  // First check if we need to do frustum clipping.
+  csFrustum* lf = fview->GetFrustumContext ()->GetLightFrustum ();
+  data.planes_mask = 0;
+  bool infinite = lf->IsInfinite ();
+  if (!infinite)
+  {
+    // @@@ What if the frustum is bigger???
+    CS_ASSERT (lf->GetVertexCount () <= 31);
+    if (lf->GetVertexCount () > 31)
+    {
+      printf ("INTERNAL ERROR! #vertices in GetVisibleObjects() exceeded!\n");
+      fflush (stdout);
+      return;
+    }
+    int i;
+    int i1 = lf->GetVertexCount () - 1;
+    for (i = 0 ; i < lf->GetVertexCount () ; i1 = i, i++)
+    {
+      data.planes_mask = (data.planes_mask<<1)|1;
+      const csVector3 &v1 = lf->GetVertex (i);
+      const csVector3 &v2 = lf->GetVertex (i1);
+      data.planes[i].Set (center, v1+center, v2+center);
+    }
+    if (lf->GetBackPlane ())
+    {
+      // @@@ UNTESTED CODE! There are no backplanes yet in frustums.
+      // It is possible this plane has to be inverted.
+      data.planes_mask = (data.planes_mask<<1)|1;
+      data.planes[i] = *(lf->GetBackPlane ());
+    }
+  }
+
+  // Mark a new region so that we can restore the shadows later.
+  iShadowBlockList *shadows = fview->GetFrustumContext ()->GetShadows ();
+  uint32 prev_region = shadows->MarkNewRegion ();
+
+  kdtree->Front2Back (center, CastShadows_Front2Back, (void*)&data);
+
+  // Restore the shadow list in 'fview' and then delete
+  // all the shadow frustums that were added in this recursion
+  // level.
+  while (shadows->GetLastShadowBlock ())
+  {
+    iShadowBlock *sh = shadows->GetLastShadowBlock ();
+    if (!shadows->FromCurrentRegion (sh))
+      break;
+    shadows->RemoveLastShadowBlock ();
+    sh->DecRef ();
+  }
+  shadows->RestoreRegion (prev_region);
 }
 

@@ -61,6 +61,16 @@ public:
     return Queues[priority];
   }
 
+  /**
+   * Sort all priority queues and return a sorted list of all mesh
+   * objects for all priorities. This list should be deleted with delete[]
+   * later. Returns NULL if there are no visible objects.
+   * The number of objects returned in 'tot_num' is the size of the
+   * returned array. Note that this function will only add
+   * visible objects to the array (i.e. IsVisible() function)!
+   */
+  iMeshWrapper** SortAll (iRenderView* rview, int& tot_num);
+
   /// Sort this queue based on the flags for that queue.
   void Sort (iRenderView* rview, int priority);
 };
