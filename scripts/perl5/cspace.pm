@@ -650,6 +650,7 @@ sub new {
 *Norm = *cspacec::csVector2_Norm;
 *SquaredNorm = *cspacec::csVector2_SquaredNorm;
 *Rotate = *cspacec::csVector2_Rotate;
+*IsLeft = *cspacec::csVector2_IsLeft;
 *__add_ass__ = *cspacec::csVector2___add_ass__;
 *__subtr_ass__ = *cspacec::csVector2___subtr_ass__;
 *__mult_ass__ = *cspacec::csVector2___mult_ass__;
