@@ -587,7 +587,11 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   ModuleHandle = GetModuleHandle(0);
   STARTUPINFO startupInfo;
   GetStartupInfo (&startupInfo);
-  ApplicationShow = startupInfo.wShowWindow;
+  if (startupInfo.dwFlags & STARTF_USESHOWWINDOW)
+    ApplicationShow = startupInfo.wShowWindow;
+  else
+    ApplicationShow = SW_SHOWNORMAL;
+
 
 // Cygwin has problems with freopen()
 #if defined(CS_DEBUG) || defined(__CYGWIN__)
