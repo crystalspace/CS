@@ -1625,7 +1625,7 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
     glDisable (GL_TEXTURE_2D);
     if (mat_handle)
     {
-      UByte r, g, b;
+      uint8 r, g, b;
       mat_handle->GetTexture ()->GetMeanColor (r, g, b);
       flat_r = BYTE_TO_FLOAT (r);
       flat_g = BYTE_TO_FLOAT (g);
@@ -3106,7 +3106,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     if (!m_textured)
     {
       // Fill flat color if renderer decide to paint it flat-shaded
-      UByte r,g,b;
+      uint8 r,g,b;
       if (mesh.mat_handle)
         mesh.mat_handle->GetTexture ()->GetMeanColor (r, g, b);
       else

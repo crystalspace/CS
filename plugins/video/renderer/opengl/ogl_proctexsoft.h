@@ -299,7 +299,7 @@ class csOpenGLProcSoftware2D : public iGraphics2D
   virtual csRGBpixel *GetPalette ()
   { return g2d->GetPalette (); }
 
-  virtual void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB)
+  virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB)
   { g2d->GetPixel (x, y, oR, oG, oB); }
 
   virtual iImage *ScreenShot () 

@@ -149,7 +149,7 @@ iTextureHandle *TxtHandleVector::RegisterAndPrepare (iTextureHandle *ogl_txt)
   // deal with key colours..
   if (ogl_txt->GetKeyColor ())
   {
-    UByte r, g, b;
+    uint8 r, g, b;
     ogl_txt->GetKeyColor (r, g, b);
     hstxt->SetKeyColor (true);
     hstxt->SetKeyColor (r, g, b);
@@ -267,7 +267,6 @@ bool csOpenGLProcSoftware::Prepare(
 
   object_reg = parent_g3d->object_reg;
   CS_ASSERT (object_reg != NULL);
-  iPluginManager* plugin_mgr = parent_g3d->plugin_mgr;
   this->buffer = (char*) buffer;
   this->tex = tex;
   this->parent_g3d = parent_g3d;
@@ -289,6 +288,7 @@ bool csOpenGLProcSoftware::Prepare(
   alone_mode = alone_hint;
 
   // Get an instance of the software procedural texture renderer
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY(object_reg, iPluginManager);
   iGraphics3D *soft_proc_g3d = CS_LOAD_PLUGIN (plugin_mgr, 
     "crystalspace.graphics3d.software.offscreen", iGraphics3D);
   if (!soft_proc_g3d)
@@ -298,6 +298,7 @@ bool csOpenGLProcSoftware::Prepare(
 	"Error creating offscreen software renderer");
     return false;
   }
+  plugin_mgr->DecRef();
 
   isoft_proc = SCF_QUERY_INTERFACE(soft_proc_g3d, iSoftProcTexture);
 

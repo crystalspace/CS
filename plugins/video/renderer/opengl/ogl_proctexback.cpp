@@ -380,7 +380,7 @@ int csOpenGLProcBackBuffer2D::GetHeight ()
 }
 
 void csOpenGLProcBackBuffer2D::GetPixel (int x, int y, 
-  UByte &oR, UByte &oG, UByte &oB)
+  uint8 &oR, uint8 &oG, uint8 &oB)
 { 
   g2d->GetPixel (x, frame_height - height + y, oR, oG, oB); 
 }
