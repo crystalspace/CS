@@ -75,7 +75,7 @@ void csTerrainQuad::InitHorizon(float *horizon, int horsize)
 int csTerrainQuad::GetHorIndex(const csVector3& campos, float x, float z, 
   int horsize)
 {
-#if 1
+#if 0
   x -= campos.x;
   z -= campos.z;
   float len = qsqrt (x*x + z*z);
@@ -84,6 +84,21 @@ int csTerrainQuad::GetHorIndex(const csVector3& campos, float x, float z,
   if (idx == 0) return idx;
   if (z < 0) idx = horsize-idx;
 #else
+  x -= campos.x;
+  z -= campos.z;
+  float len = qsqrt (x*x + z*z);
+  // circle is split into horsize parts, each of size k (of 2*PI total)
+  // the x-axis is right in the middle of parts 0 and horsize/2
+  // thus precision around z==0 is not so important
+  float k = 2.0*PI / float(horsize);
+  float cosinus = x / len;
+  float invcos = acos(cosinus);
+  if(invcos < k*0.5) return 0;
+  if(invcos > PI - k*0.5) return horsize/2;
+  int idx = QInt( invcos + k*0.5 );
+  if(z < 0) idx = horsize - idx;
+#endif
+#if 0
   /// @@@ could make a table to lookup the angle from x/z
   /// instead of atan
   float diffx = x - campos.x;
