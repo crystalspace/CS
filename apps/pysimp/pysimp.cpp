@@ -79,7 +79,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   engine = Engine->GetCsEngine ();
   Engine->DecRef ();
 
-  myG3D = QUERY_PLUGIN(this, iGraphics3D);
+  myG3D = QUERY_PLUGIN_ID(this, CS_FUNCID_VIDEO, iGraphics3D);
   if (!myG3D) {
     Printf (MSG_FATAL_ERROR, "No iGraphics3D loader plugin!\n");
     return false;

@@ -154,7 +154,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
     return false;
 
   // Find the pointer to engine plugin
-  myG3D = QUERY_PLUGIN (this, iGraphics3D);
+  myG3D = QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
   if (!myG3D)
   {
     CsPrintf (MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
