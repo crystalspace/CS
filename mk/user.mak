@@ -29,7 +29,7 @@ endif
 ifndef PLUGINS
   PLUGINS=video/canvas video/renderer cscon csclear dungeon \
     net/driver/socket net/netman \
-    netspace/nstp netspace/nsmgr $(DETECTED_PLUGINS)
+    netspace/nstp netspace/nsmgr csauth/simple $(DETECTED_PLUGINS)
 endif
 
 # Should we use NASM for assembly?

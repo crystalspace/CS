@@ -30,6 +30,7 @@
 #include "isystem.h"
 #include "ivfs.h"
 #include "iproto.h"
+#include "iauth.h"
 
 class csEventQueue;
 class csKeyboardDriver;
@@ -169,6 +170,8 @@ public:
   iCMDMGR *CmdManager;
   /// System console
   iConsole *Console;
+  /// Authentication method
+  iAuth *Auth;  
 
   /// the width of this frame
   int FrameWidth;

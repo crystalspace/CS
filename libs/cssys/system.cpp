@@ -470,6 +470,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
   NetProtocol = QUERY_PLUGIN_ID (this, CS_FUNCID_PROTOCOL, iPROTO);
   CmdManager = QUERY_PLUGIN_ID (this, CS_FUNCID_CMDMGR, iCMDMGR);
   Console = QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsole);
+  Auth = QUERY_PLUGIN_ID (this, CS_FUNCID_AUTH, iAuth);
 
   // Check if the minimal required drivers are loaded
   if (!CheckDrivers ())
@@ -498,6 +499,10 @@ bool csSystemDriver::Open (const char *Title)
     if (!NetMan->Open ())
       return false;
 
+  if (Auth)
+    if (!Auth->Open())
+      return false;
+
   // Now pass the open event to all plugins
   csEvent e (GetTime (), csevBroadcast, cscmdSystemOpen);
   HandleEvent (e);
@@ -523,6 +528,8 @@ void csSystemDriver::Close ()
     NetProtocol->Close ();
   if (CmdManager)
     CmdManager->Close ();
+  if (Auth)
+      Auth->Close();
   if (G3D)
     G3D->Close ();
 }
@@ -966,6 +973,7 @@ bool csSystemDriver::UnloadPlugIn (iPlugIn *iObject)
   CHECK (Sound, iSoundRender)
   CHECK (NetDrv, iNetworkDriver)
   CHECK (NetMan, iNetworkManager)
+  CHECK (Auth, iAuth)    
   CHECK (Console, iConsole)
 
 #undef CHECK

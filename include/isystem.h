@@ -91,6 +91,8 @@
 #define CS_FUNCID_NETMAN	"NetManager"
 /// Network Protocol layer
 #define CS_FUNCID_PROTOCOL      "Protocol"
+/// Authentation Plugin
+#define CS_FUNCID_AUTH          "Auth"
 /// Network Cmd Manager layer 
 #define CS_FUNCID_CMDMGR        "CmdManager"
 /// Console

@@ -5,6 +5,7 @@
 #include "isystem.h"
 #include "iplugin.h"
 #include "icmdmgr.h"
+#include "inetcmd.h"
 
 #define PROTOCOL_SETUP_OK     (1)
 #define PROTOCOL_CONNECT_FAIL (2)
@@ -42,7 +43,7 @@ struct iPROTO: public iPlugIn
   ///
   /// Command processor - for things coming from above
   ///
-  virtual int OnCmd(int NetPort, csNode *cmd) = 0;
+  virtual int OnCmd(int NetPort, iNetCmd *cmd) = 0;
 
   ///
   /// Create an outbound protocol "pipe" connection
@@ -64,10 +65,14 @@ struct iPROTO: public iPlugIn
   /// Utility stuff
   virtual int GetLastError() = 0;
 
+  // Get an integer associated with protocol.
+  virtual int GetProtocolVersion() =0;
+
 };
 
 
 #endif 
+
 
 
 
