@@ -1567,12 +1567,15 @@ bool csLoader::LoadMap (char* buf)
     iSector *Sector = Engine->GetSector (i);
     for (j=0; j<Sector->GetMeshCount(); j++)
     {
-      iMeshWrapper *Mesh = Sector->GetMesh(j);
-      iThing *Thing = QUERY_INTERFACE (Mesh->GetMeshObject(), iThing);
-      if (Thing)
+      iMeshWrapper *Mesh    = Sector->GetMesh(j);
+      if (Mesh)
       {
-        ResolvePortalSectors (Thing);
-	Thing->DecRef ();
+        iThing *Thing = QUERY_INTERFACE_SAFE (Mesh->GetMeshObject(), iThing);
+        if (Thing)
+        {
+          ResolvePortalSectors (Thing);
+	  Thing->DecRef ();
+        }
       }
     }
   }
@@ -2317,10 +2320,17 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	else
 	{
 	  iBase* mo = plug->Parse (params, Engine, mesh);
-	  iMeshObject* mo2 = QUERY_INTERFACE (mo, iMeshObject);
-	  mesh->SetMeshObject (mo2);
-	  mo2->DecRef ();
-	  mo->DecRef ();
+          if (mo)
+          {
+	    iMeshObject* mo2 = QUERY_INTERFACE (mo, iMeshObject);
+	    mesh->SetMeshObject (mo2);
+	    mo2->DecRef ();
+            mo->DecRef ();
+          }
+          else
+          {
+            System->Printf (MSG_WARNING, "Error parsing PARAM() in plugin '%s'!\n", str);
+          }
 	}
         break;
 

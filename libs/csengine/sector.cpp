@@ -1128,7 +1128,7 @@ void csSector::InitLightMaps (bool do_cache)
   {
     csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
     // @@@ Engine should now know about things.
-    iThingState* thing_state = QUERY_INTERFACE (mesh->GetMeshObject (),
+    iThingState* thing_state = QUERY_INTERFACE_SAFE (mesh->GetMeshObject (),
     	iThingState);
     if (thing_state)
     {
@@ -1145,7 +1145,7 @@ void csSector::CacheLightMaps ()
   {
     csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
     // @@@ Engine should now know about things.
-    iThingState* thing_state = QUERY_INTERFACE (mesh->GetMeshObject (),
+    iThingState* thing_state = QUERY_INTERFACE_SAFE (mesh->GetMeshObject (),
     	iThingState);
     if (thing_state)
     {
