@@ -23,19 +23,13 @@
 
 csQuadtreeNode::csQuadtreeNode ()
 {
-  children[0] = NULL;
-  children[1] = NULL;
-  children[2] = NULL;
-  children[3] = NULL;
+  children = NULL;
   state = CS_QUAD_EMPTY;
 }
 
 csQuadtreeNode::~csQuadtreeNode ()
 {
-  CHK (delete children[0]);
-  CHK (delete children[1]);
-  CHK (delete children[2]);
-  CHK (delete children[3]);
+  CHK (delete [] children);
 }
 
 //--------------------------------------------------------------------------
@@ -48,21 +42,21 @@ void csQuadtree::Build (csQuadtreeNode* node, const csBox& box, int depth)
 
   csBox childbox;
 
-  CHK (node->children[0] = new csQuadtreeNode ());
+  CHK (node->children = new csQuadtreeNode [4]);
+
+  csQuadtreeNode* children = node->children;
+
   childbox.Set (box.Min (), center);
-  Build (node->children[0], childbox, depth-1);
+  Build (&children[0], childbox, depth-1);
 
-  CHK (node->children[1] = new csQuadtreeNode ());
   childbox.Set (center.x, box.MinY (), box.MaxX (), center.y);
-  Build (node->children[1], childbox, depth-1);
+  Build (&children[1], childbox, depth-1);
 
-  CHK (node->children[2] = new csQuadtreeNode ());
   childbox.Set (center, box.Max ());
-  Build (node->children[2], childbox, depth-1);
+  Build (&children[2], childbox, depth-1);
 
-  CHK (node->children[3] = new csQuadtreeNode ());
   childbox.Set (box.MinX (), center.y, center.x, box.MaxY ());
-  Build (node->children[3], childbox, depth-1);
+  Build (&children[3], childbox, depth-1);
 }
 
 csQuadtree::csQuadtree (const csBox& box, int depth)
@@ -77,36 +71,6 @@ csQuadtree::~csQuadtree ()
   CHK (delete root);
 }
 
-bool IsVisibleFull (
-	csVector2* frustrum, int num_frust,
-  	csVector2* poly, int num_poly)
-{
-  int i1, j1, i, j;
-
-  // Here is the difficult case. We need to see if there is an
-  // edge from the polygon which intersects a frustrum plane.
-  // If so then polygon is visible. Otherwise not.
-  csVector2 isect;
-  float dist;
-  j1 = num_frust-1;
-  for (j = 0 ; j < num_frust ; j++)
-  {
-    i1 = num_poly-1;
-    for (i = 0 ; i < num_poly ; i++)
-    {
-      if (csIntersect2::Segments (poly[i], poly[i1],
-      	frustrum[j], frustrum[j1], isect, dist))
-      {
-        return true;
-      }
-      i1 = i;
-    }
-    j1 = j;
-  }
-  return false;
-}
-
-// Test if a bounding box is completely inside a convex polygon.
 bool BoxEntirelyInPolygon (csVector2* verts, int num_verts, const csBox& bbox)
 {
   return (csPoly2D::In (verts, num_verts, bbox.GetCorner (0)) &&
@@ -122,9 +86,9 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
   // If node is completely full already then nothing can happen.
   if (node->GetState () == CS_QUAD_FULL) return false;
 
-  csQuadtreeNode** children = node->children;
+  csQuadtreeNode* children = node->children;
   // If there are no children then this node is set to state partial.
-  if (!children[0])
+  if (!children)
   {
     node->SetState (CS_QUAD_PARTIAL);
     return true;
@@ -135,10 +99,10 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
   // state is going to change so the children need to be valid.
   if (node->GetState () == CS_QUAD_EMPTY)
   {
-    children[0]->SetState (CS_QUAD_EMPTY);
-    children[1]->SetState (CS_QUAD_EMPTY);
-    children[2]->SetState (CS_QUAD_EMPTY);
-    children[3]->SetState (CS_QUAD_EMPTY);
+    children[0].SetState (CS_QUAD_EMPTY);
+    children[1].SetState (CS_QUAD_EMPTY);
+    children[2].SetState (CS_QUAD_EMPTY);
+    children[3].SetState (CS_QUAD_EMPTY);
   }
 
   csBox childbox;
@@ -170,7 +134,7 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
   // the check to see if the polygon also overlaps the child area.
 
   // Child 0 (top/left).
-  if (children[0]->GetState () != CS_QUAD_FULL &&
+  if (children[0].GetState () != CS_QUAD_FULL &&
   	pol_bbox.MinX () <= center.x && pol_bbox.MinY () <= center.y)
   {
     vis = false;
@@ -193,19 +157,19 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
       // the node is full and we can stop recursion.
       if (center_vis && left_vis && top_vis && csPoly2D::In (verts, num_verts, cur_bbox.Min ()))
       {
-        children[0]->SetState (CS_QUAD_FULL);
+        children[0].SetState (CS_QUAD_FULL);
 	rc1 = true;
       }
       else
       {
         childbox.Set (cur_bbox.Min (), center);
-        rc1 = InsertPolygon (children[0], verts, num_verts, childbox, pol_bbox);
+        rc1 = InsertPolygon (&children[0], verts, num_verts, childbox, pol_bbox);
       }
     }
   }
 
   // Child 1 (top/right).
-  if (children[1]->GetState () != CS_QUAD_FULL &&
+  if (children[1].GetState () != CS_QUAD_FULL &&
   	pol_bbox.MaxX () > center.x && pol_bbox.MinY () <= center.y)
   {
     vis = false;
@@ -221,19 +185,19 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
       v.y = cur_bbox.MinY ();
       if (center_vis && right_vis && top_vis && csPoly2D::In (verts, num_verts, v))
       {
-        children[1]->SetState (CS_QUAD_FULL);
+        children[1].SetState (CS_QUAD_FULL);
 	rc2 = true;
       }
       else
       {
         childbox.Set (center.x, cur_bbox.MinY (), cur_bbox.MaxX (), center.y);
-        rc2 = InsertPolygon (children[1], verts, num_verts, childbox, pol_bbox);
+        rc2 = InsertPolygon (&children[1], verts, num_verts, childbox, pol_bbox);
       }
     }
   }
 
   // Child 2 (bottom/right).
-  if (children[2]->GetState () != CS_QUAD_FULL &&
+  if (children[2].GetState () != CS_QUAD_FULL &&
   	pol_bbox.MaxX () > center.x && pol_bbox.MaxY () > center.y)
   {
     vis = false;
@@ -247,19 +211,19 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
     {
       if (center_vis && right_vis && bottom_vis && csPoly2D::In (verts, num_verts, cur_bbox.Max ()))
       {
-        children[2]->SetState (CS_QUAD_FULL);
+        children[2].SetState (CS_QUAD_FULL);
 	rc3 = true;
       }
       else
       {
         childbox.Set (center, cur_bbox.Max ());
-        rc3 = InsertPolygon (children[2], verts, num_verts, childbox, pol_bbox);
+        rc3 = InsertPolygon (&children[2], verts, num_verts, childbox, pol_bbox);
       }
     }
   }
 
   // Child 3 (bottom/left).
-  if (children[3]->GetState () != CS_QUAD_FULL &&
+  if (children[3].GetState () != CS_QUAD_FULL &&
   	pol_bbox.MinX () <= center.x && pol_bbox.MaxY () > center.y)
   {
     vis = false;
@@ -275,21 +239,21 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
       v.y = cur_bbox.MaxY ();
       if (center_vis && left_vis && bottom_vis && csPoly2D::In (verts, num_verts, v))
       {
-        children[3]->SetState (CS_QUAD_FULL);
+        children[3].SetState (CS_QUAD_FULL);
 	rc4 = true;
       }
       else
       {
   	childbox.Set (cur_bbox.MinX (), center.y, center.x, cur_bbox.MaxY ());
-        rc4 = InsertPolygon (children[3], verts, num_verts, childbox, pol_bbox);
+        rc4 = InsertPolygon (&children[3], verts, num_verts, childbox, pol_bbox);
       }
     }
   }
 
-  if (children[0]->GetState () == CS_QUAD_FULL &&
-      children[1]->GetState () == CS_QUAD_FULL &&
-      children[2]->GetState () == CS_QUAD_FULL &&
-      children[3]->GetState () == CS_QUAD_FULL)
+  if (children[0].GetState () == CS_QUAD_FULL &&
+      children[1].GetState () == CS_QUAD_FULL &&
+      children[2].GetState () == CS_QUAD_FULL &&
+      children[3].GetState () == CS_QUAD_FULL)
   {
     node->SetState (CS_QUAD_FULL);
     return true;
@@ -305,12 +269,6 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
 
 bool csQuadtree::InsertPolygon (csVector2* verts, int num_verts, const csBox& pol_bbox)
 {
-//printf ("InsertPolygon(%08lx): ", (long)this);
-//int i;
-//for (i = 0 ; i < num_verts ; i++)
-//printf ("(%.3f,%.3f) ", verts[i].x, verts[i].y);
-//printf ("\n");
-
   // If root is already full then there is nothing that can happen further.
   if (root->GetState () == CS_QUAD_FULL) return false;
 
@@ -344,10 +302,10 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
   // If node is completely empty then polygon is always visible.
   if (node->GetState () == CS_QUAD_EMPTY) return true;
 
-  csQuadtreeNode** children = node->children;
+  csQuadtreeNode* children = node->children;
   // If there are no children then we assume polygon is not visible.
   // This is an optimization which is not entirely correct@@@
-  if (!children[0]) return false;
+  if (!children) return false;
 
   csBox childbox;
   const csVector2& center = node->GetCenter ();
@@ -377,7 +335,7 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
   // the check to see if the polygon also overlaps the child area.
 
   // Child 0 (top/left).
-  if (children[0]->GetState () != CS_QUAD_FULL &&
+  if (children[0].GetState () != CS_QUAD_FULL &&
   	pol_bbox.MinX () <= center.x && pol_bbox.MinY () <= center.y)
   {
     vis = false;
@@ -406,13 +364,13 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
       else
       {
         childbox.Set (cur_bbox.Min (), center);
-        if (TestPolygon (children[0], verts, num_verts, childbox, pol_bbox)) return true;
+        if (TestPolygon (&children[0], verts, num_verts, childbox, pol_bbox)) return true;
       }
     }
   }
 
   // Child 1 (top/right).
-  if (children[1]->GetState () != CS_QUAD_FULL &&
+  if (children[1].GetState () != CS_QUAD_FULL &&
   	pol_bbox.MaxX () > center.x && pol_bbox.MinY () <= center.y)
   {
     vis = false;
@@ -433,13 +391,13 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
       else
       {
         childbox.Set (center.x, cur_bbox.MinY (), cur_bbox.MaxX (), center.y);
-        if (TestPolygon (children[1], verts, num_verts, childbox, pol_bbox)) return true;
+        if (TestPolygon (&children[1], verts, num_verts, childbox, pol_bbox)) return true;
       }
     }
   }
 
   // Child 2 (bottom/right).
-  if (children[2]->GetState () != CS_QUAD_FULL &&
+  if (children[2].GetState () != CS_QUAD_FULL &&
   	pol_bbox.MaxX () > center.x && pol_bbox.MaxY () > center.y)
   {
     vis = false;
@@ -458,13 +416,13 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
       else
       {
         childbox.Set (center, cur_bbox.Max ());
-        if (TestPolygon (children[2], verts, num_verts, childbox, pol_bbox)) return true;
+        if (TestPolygon (&children[2], verts, num_verts, childbox, pol_bbox)) return true;
       }
     }
   }
 
   // Child 3 (bottom/left).
-  if (children[3]->GetState () != CS_QUAD_FULL &&
+  if (children[3].GetState () != CS_QUAD_FULL &&
   	pol_bbox.MinX () <= center.x && pol_bbox.MaxY () > center.y)
   {
     vis = false;
@@ -485,7 +443,7 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
       else
       {
   	childbox.Set (cur_bbox.MinX (), center.y, center.x, cur_bbox.MaxY ());
-        if (TestPolygon (children[3], verts, num_verts, childbox, pol_bbox)) return true;
+        if (TestPolygon (&children[3], verts, num_verts, childbox, pol_bbox)) return true;
       }
     }
   }
@@ -495,13 +453,6 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
 
 bool csQuadtree::TestPolygon (csVector2* verts, int num_verts, const csBox& pol_bbox)
 {
-//printf ("TestPolygon(%08lx): ", (long)this);
-//int i;
-//for (i = 0 ; i < num_verts ; i++)
-//printf ("(%.3f,%.3f) ", verts[i].x, verts[i].y);
-//printf ("\n");
-
-
   // If root is already full then there is nothing that can happen further.
   if (root->GetState () == CS_QUAD_FULL) return false;
 
@@ -525,4 +476,46 @@ bool csQuadtree::TestPolygon (csVector2* verts, int num_verts, const csBox& pol_
   return TestPolygon (root, verts, num_verts, bbox, pol_bbox);
 }
 
+int csQuadtree::TestPoint (csQuadtreeNode* node, const csVector2& point)
+{
+  csQuadtreeNode* children = node->children;
+  if (!children) return node->GetState ();
+
+  const csVector2& center = node->GetCenter ();
+  if (point.x <= center.x)
+  {
+    if (point.y <= center.y)
+    {
+      if (children[0].GetState () != CS_QUAD_PARTIAL) return children[0].GetState ();
+      return TestPoint (&children[0], point);
+    }
+    else
+    {
+      if (children[3].GetState () != CS_QUAD_PARTIAL) return children[3].GetState ();
+      return TestPoint (&children[3], point);
+    }
+  }
+  else
+  {
+    if (point.y <= center.y)
+    {
+      if (children[1].GetState () != CS_QUAD_PARTIAL) return children[1].GetState ();
+      return TestPoint (&children[1], point);
+    }
+    else
+    {
+      if (children[2].GetState () != CS_QUAD_PARTIAL) return children[2].GetState ();
+      return TestPoint (&children[2], point);
+    }
+  }
+  return CS_QUAD_EMPTY;
+}
+
+
+int csQuadtree::TestPoint (const csVector2& point)
+{
+  if (!bbox.In (point)) return CS_QUAD_UNKNOWN;
+  if (root->GetState () != CS_QUAD_PARTIAL) return root->GetState ();
+  return TestPoint (root, point);
+}
 

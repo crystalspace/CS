@@ -51,6 +51,11 @@ public:
    * The optional 'clipper' will be used to clip the resulting polygon.
    */
   bool TestPolygon (csVector3* verts, int num_verts, csClipper* clipper = NULL);
+
+  /**
+   * Test for point visibility with the quad-tree.
+   */
+  int TestPoint (const csVector3& point);
 };
 
 /**
@@ -101,6 +106,11 @@ public:
    * to start at (0,0,0).
    */
   bool TestPolygon (csVector3* verts, int num_verts);
+
+  /**
+   * Test for point visibility with the quad-cube.
+   */
+  int TestPoint (const csVector3& point);
 };
 
 #endif /*QUADCUBE_H*/

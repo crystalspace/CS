@@ -388,14 +388,14 @@ void Dumper::dump (csLightPatchPool* pool, char* name)
 void Dumper::dump (csQuadtreeNode* node, char* buf, int bufdim, int depth,
   	int x1, int y1, int x2, int y2)
 {
-  if (node->GetState () == CS_QUAD_PARTIAL && node->children[0])
+  if (node->GetState () == CS_QUAD_PARTIAL && node->children)
   {
     int cx = x1+(x2-x1+1)/2;
     int cy = y1+(y2-y1+1)/2;
-    dump (node->children[0], buf, bufdim, depth-1, x1, y1, cx-1, cy-1);
-    dump (node->children[1], buf, bufdim, depth-1, cx, y1, x2, cy-1);
-    dump (node->children[2], buf, bufdim, depth-1, cx, cy, x2, y2);
-    dump (node->children[3], buf, bufdim, depth-1, x1, cy, cx-1, y2);
+    dump (&node->children[0], buf, bufdim, depth-1, x1, y1, cx-1, cy-1);
+    dump (&node->children[1], buf, bufdim, depth-1, cx, y1, x2, cy-1);
+    dump (&node->children[2], buf, bufdim, depth-1, cx, cy, x2, y2);
+    dump (&node->children[3], buf, bufdim, depth-1, x1, cy, cx-1, y2);
   }
   else
   {
@@ -430,7 +430,7 @@ void Dumper::dump (csQuadtree* tree)
   while (n)
   {
     depth++;
-    n = n->children[0];
+    n = n->children;
   }
 
   // Calculate 2^depth.

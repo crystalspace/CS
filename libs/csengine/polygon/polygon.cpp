@@ -38,13 +38,11 @@
 #include "itexture.h"
 #include "itxtmgr.h"
 
-// Option variable: force lightmap recalculation?
 bool csPolygon3D::do_force_recalc = false;
 bool csPolygon3D::do_not_force_recalc = false;
-// Option variable: shadow mipmap size
 int csPolygon3D::def_mipmap_size = 16;
-// Option variable: high quality lightmap rendering.
 bool csPolygon3D::do_lightmap_highqual = true;
+bool csPolygon3D::do_cache_lightmaps = true;
 
 //---------------------------------------------------------------------------
 
@@ -1457,7 +1455,6 @@ bool csPolygon3D::MarkRelevantShadowFrustrums (csLightView& lview,
       // Assume that the shadow frustrum is relevant.
       sf->relevant = true;
 
-#if 1
       // First we test a special case. If all vertices of the light
       // frustrum are contained in the shadow frustrum then we don't
       // need to process the light frustrum at all. In that case we
@@ -1471,46 +1468,10 @@ bool csPolygon3D::MarkRelevantShadowFrustrums (csLightView& lview,
 	}
       if (fully_shadowed) return false;
 
+      // @@@ Replace with a less accurate but faster test.
       if (!csFrustrum::IsVisible (lview.light_frustrum->GetVertices (),
       	  lview.light_frustrum->GetNumVertices (), sf->GetVertices (), sf->GetNumVertices ()))
 	sf->relevant = false;
-#else
-      // Check if any of the vertices of the shadow polygon is inside the
-      // light frustrum. If that is the case then the shadow frustrum is
-      // indeed relevant.
-      contains = false;
-      for (i = 0 ; i < sf->GetNumVertices () ; i++)
-        if (lview.light_frustrum->Contains (sf->GetVertex (i))) { contains = true; break; }
-      if (!contains)
-      {
-        // All vertices of the shadow polygon are outside the light frustrum.
-	// In this case it is still possible that the light frustrum is
-	// completely inside the shadow frustrum.
-        count = 0;
-        for (i = 0 ; i < lview.light_frustrum->GetNumVertices () ; i++)
-          if (sf->Contains (lview.light_frustrum->GetVertex (i))) count++;
-        if (count == 0)
-        {
-          // All vertices of the light frustrum (polygon we are trying to light)
-	  // are outside of the shadow frustrum. In this case the shadow
-	  // frustrum is not relevant.
-
-	  // @@@ WARNING!!! THIS IS NOT TRUE. There are cases where
-	  // it is still possible to have an overlap. We need to
-	  // continue the testing here!!!
-	  sf->relevant = false;
-	  //sf->relevant = true;	//@@@ Temporarily disabled.
-        }
-        else if (count == lview.light_frustrum->GetNumVertices ())
-        {
-          // All vertices of the light frustrum are inside the shadow
-	  // frustrum. This is a special case. Now we know that the light
-	  // frustrum is totally invisible and we stop the routine and
-	  // return false here.
-	  return false;
-        }
-      }
-#endif
     }
     sf = sf->next;
   }
@@ -1657,7 +1618,7 @@ void csPolygon3D::CacheLightMaps (csPolygonSet* owner, int index)
   if (!lmi->lightmap_up_to_date)
   {
     lmi->lightmap_up_to_date = true;
-    if (csWorld::current_world->IsLightingCacheEnabled ())
+    if (csWorld::current_world->IsLightingCacheEnabled () && do_cache_lightmaps)
       lmi->tex->lm->Cache (owner, this, index, csWorld::current_world);
   }
   lmi->tex->lm->ConvertToMixingMode ();

@@ -939,13 +939,25 @@ void* CalculateLightingPolygonsFB (csPolygonParentInt*,
     for (j = 0 ; j < p->GetNumVertices () ; j++)
       poly[j] = p->Vwor (j)-center;
     bool vis = false;
+
+#define QUADTREE_SHADOW 0
+#if QUADTREE_SHADOW
+    vis = qc->TestPolygon (poly, p->GetNumVertices ());
+#else
     if (p->GetPortal ())
       vis = qc->TestPolygon (poly, p->GetNumVertices ());
     else
       vis = qc->InsertPolygon (poly, p->GetNumVertices ());
+#endif
     if (vis)
     {
       p->CalculateLighting (lview);
+
+#if QUADTREE_SHADOW
+      if (!p->GetPortal ())
+        qc->InsertPolygon (poly, p->GetNumVertices ());
+#endif
+
       //if (p->GetPlane ()->VisibleFromPoint (center) != cw) continue;
       float clas = p->GetPlane ()->GetWorldPlane ().Classify (center);
       if (ABS (clas) < EPSILON) continue;

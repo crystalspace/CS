@@ -40,9 +40,10 @@ csOptionDescription csEngineConfig::config_options[] =
   { 4, "reflect", "Max number of reflections for radiosity", CSVAR_LONG },
   { 5, "recalc", "Force recalculation of lightmaps", CSVAR_CMD },
   { 6, "inhrecalc", "Inhibit automatic recalculation of lightmaps", CSVAR_CMD },
+  { 7, "cache", "Enabling caching of generated lightmaps", CSVAR_BOOL },
 };
 
-#define NUM_OPTIONS 7
+#define NUM_OPTIONS 8
 
 bool csEngineConfig::SetOption (int id, csVariant* value)
 {
@@ -55,6 +56,7 @@ bool csEngineConfig::SetOption (int id, csVariant* value)
     case 4: csSector::cfg_reflections = value->v.lVal; break;
     case 5: csPolygon3D::do_force_recalc = value->v.bVal; break;
     case 6: csPolygon3D::do_not_force_recalc = value->v.bVal; break;
+    case 7: csPolygon3D::do_cache_lightmaps = value->v.bVal; break;
     default: return false;
   }
   return true;
@@ -72,6 +74,7 @@ bool csEngineConfig::GetOption (int id, csVariant* value)
     case 4: value->v.lVal = csSector::cfg_reflections; break;
     case 5: value->v.bVal = csPolygon3D::do_force_recalc; break;
     case 6: value->v.bVal = csPolygon3D::do_not_force_recalc; break;
+    case 7: value->v.bVal = csPolygon3D::do_cache_lightmaps; break;
     default: return false;
   }
   return true;

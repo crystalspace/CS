@@ -204,8 +204,8 @@ csWorld::csWorld () : csObject (), start_vec (0, 0, 0)
   CHK (render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory()));
   CHK (lightpatch_pool = new csLightPatchPool ());
   CHK (cfg_engine = new csEngineConfig ());
-	CHK (cs = new csClassSpawner());
-	CHK (plugins=new csLoaderExtensions(this));
+  CHK (cs = new csClassSpawner ());
+  CHK (plugins = new csLoaderExtensions (this));
 
   BuildSqrtTable ();
 }
@@ -652,6 +652,8 @@ void csWorld::ShineLights (IGraphics3D* g3d)
     meter.Step();
   }
 
+  time_t start, stop;
+  isys->GetTime (start);
   meter.SetTotal (light_count);
   CsPrintf (MSG_INITIALIZATION, "\nShining lights (%d lights):\n  ", light_count);
   lit->Restart ();
@@ -660,6 +662,8 @@ void csWorld::ShineLights (IGraphics3D* g3d)
     ((csStatLight*)l)->CalculateLighting ();
     meter.Step();
   }
+  isys->GetTime (stop);
+  CsPrintf (MSG_INITIALIZATION, "\n(%f seconds)", (float)(stop-start)/1000.);
 
   // Restore lumel size from 'High Quality Mode'
   // and remap all lightmaps.

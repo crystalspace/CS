@@ -432,6 +432,8 @@ public:
   static int def_mipmap_size;
   /// Option variable: high quality lightmap rendering.
   static bool do_lightmap_highqual;
+  /// Option variable: cache lightmaps.
+  static bool do_cache_lightmaps;
 
   /**
    * If this flag is true then this polygon will never be drawn.

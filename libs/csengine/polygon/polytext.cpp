@@ -27,6 +27,7 @@
 #include "csengine/light.h"
 #include "csengine/sector.h"
 #include "csengine/world.h"
+#include "csengine/quadcube.h"
 #include "csengine/lghtmap.h"
 #include "igraph3d.h"
 #include "itexture.h"
@@ -81,20 +82,8 @@ void csPolyTexture::SetMipmapSize (int mm)
   }
 }
 
-#if 0
-bool verbose = false;
-#  define DB(x) if (verbose) CsPrintf##x
-#  define DBCHECK(sector,poly) verbose = !strcmp (polygon->get_name (), poly) && !strcmp (((PolygonSet*)(polygon->get_parent ()))->get_name (), sector)
-#else
-#  define DB(x)
-#  define DBCHECK(sector,poly)
-#endif
-
 void csPolyTexture::CreateBoundingTextureBox ()
 {
-  DBCHECK ("moor", "southU");
-  DB ((MSG_DEBUG_0, "---------------------------------------------\n"));
-
   // First we compute the bounding box in 2D texture space (uv-space).
   float min_u = 1000000000.;
   float min_v = 1000000000.;
@@ -105,11 +94,9 @@ void csPolyTexture::CreateBoundingTextureBox ()
 
   int i;
   csVector3 v1, v2;
-  DB ((MSG_DEBUG_0, "  Vertices in world-space:\n"));
   for (i = 0 ; i < polygon->GetVertices ().GetNumVertices () ; i++)
   {
     v1 = polygon->Vwor (i);   // Coordinates of vertex in world space.
-    DB ((MSG_DEBUG_0, "      %d:(%f,%f,%f)\n", i, v1.x, v1.y, v1.z));
     v1 -= pl->v_world2tex;
     v2 = (pl->m_world2tex) * v1;  // Coordinates of vertex in texture space.
     if (v2.x < min_u) min_u = v2.x;
@@ -118,8 +105,6 @@ void csPolyTexture::CreateBoundingTextureBox ()
     if (v2.y > max_v) max_v = v2.y;
   }
 
-  DB ((MSG_DEBUG_0, "  min_u=%f max_u=%f min_v=%f max_v=%f\n", min_u, max_u, min_v, max_v));
-
   int ww, hh;
   txt_handle->GetMipMapDimensions (mipmap_level, ww, hh);
   Imin_u = QRound (min_u*ww);
@@ -127,9 +112,6 @@ void csPolyTexture::CreateBoundingTextureBox ()
   Imax_u = QRound (max_u*ww);
   Imax_v = QRound (max_v*hh);
   
-  DB ((MSG_DEBUG_0, "  ww=%d hh=%d\n", ww, hh));
-  DB ((MSG_DEBUG_0, "  Imin_u=%d Imax_u=%d Imin_v=%d Imax_v=%d\n", Imin_u, Imax_u, Imin_v, Imax_v));
-
   // DAN: used in hardware accel drivers
   Fmin_u = min_u;
   Fmax_u = max_u;
@@ -154,15 +136,9 @@ void csPolyTexture::CreateBoundingTextureBox ()
   du = QInt16 (fdu);
   dv = QInt16 (fdv);
 
-  DB ((MSG_DEBUG_0, "  w_orig=%d w=%d h=%d\n", w_orig, w, h));
-  DB ((MSG_DEBUG_0, "  fdu=%f fdv=%f du=%d dv=%d\n", fdu, fdv, du, dv));
-  DB ((MSG_DEBUG_0, "  and_u=%d shf_u=%d\n", and_u, shf_u));
-
   // The size of the whole texture is extended by an upper and lower
   // margin to prevent overflow in the texture mapper.
   size = w*(H_MARGIN+H_MARGIN+h);
-
-  DB ((MSG_DEBUG_0, "  size=%d\n", size));
 }
 
 void csPolyTexture::MakeDirtyDynamicLights ()
@@ -604,9 +580,9 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
 void csPolyTexture::FillLightMap (csLightView& lview)
 {
   if (!lm) return;
-  DBCHECK ("room4", "southU");
   csStatLight* light = (csStatLight*)lview.l;
-  DB ((MSG_DEBUG_0, "#### shine_lightmaps #### light:(%f,%f,%f)\n", light->GetCenter ().x, light->GetCenter ().y, light->GetCenter ().z));
+
+  csQuadcube* qc = csWorld::current_world->GetQuadcube ();
 
   int lw = lm->GetWidth (); // @@@ DON'T NEED TO GO TO PO2 SIZES
   int lh = lm->GetHeight ();
@@ -618,8 +594,6 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 
   int ww, hh;
   txt_handle->GetMipMapDimensions (mipmap_level, ww, hh);
-
-  DB ((MSG_DEBUG_0, "lw=%d lh=%d ww=%d hh=%d mipmap_shift=%d mipmap_size=%d\n", lw, lh, ww, hh, mipmap_shift, mipmap_size));
 
   csPolyPlane* pl = polygon->GetPlane ();
   float cosfact = polygon->GetCosinusFactor ();
@@ -645,8 +619,6 @@ void csPolyTexture::FillLightMap (csLightView& lview)
   float txt_B = A*m_t2w.m12 + B*m_t2w.m22 + C*m_t2w.m32;
   float txt_C = A*m_t2w.m13 + B*m_t2w.m23 + C*m_t2w.m33;
   float txt_D = A*pl->v_world2tex.x + B*pl->v_world2tex.y + C*pl->v_world2tex.z + D;
-
-  DB ((MSG_DEBUG_0, "(A,B,C,D)=(%f,%f,%f,%f) txt_(A,B,C,D)=(%f,%f,%f,%f)\n", A, B, C, D, txt_A, txt_B, txt_C, txt_D));
 
   csVector3 v1, v2(0);
 
@@ -726,9 +698,6 @@ void csPolyTexture::FillLightMap (csLightView& lview)
     f_uv[i].y = (v1.y*hh-Imin_v) / (mipmap_size) + 0.5;
     if (f_uv[i].y < miny) miny = f_uv[MinIndex = i].y;
     if (f_uv[i].y > maxy) maxy = f_uv[MaxIndex = i].y;
-
-    DB ((MSG_DEBUG_0, "    %d: frust:(%f,%f,%f) f_uv:(%f,%f) ", i, frustrum[mi].x, frustrum[mi].y, frustrum[mi].z, f_uv[i].x, f_uv[i].y));
-    DB ((MSG_DEBUG_0, "frust+lcenter:(%f,%f,%f)\n", frustrum[mi].x+light_frustrum->GetOrigin ().x, frustrum[mi].y+light_frustrum->GetOrigin ().y, frustrum[mi].z+light_frustrum->GetOrigin ().z));
   }
 
   csColor color = csColor (lview.r, lview.g, lview.b) * NORMAL_LIGHT_LEVEL;
@@ -818,12 +787,30 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 	  csShadowFrustrum* shadow_frust;
 	  shadow_frust = lview.shadows.GetFirst ();
 	  bool shadow = false;
-	  while (shadow_frust)
+#define QUADTREE_SHADOW 0
+#if QUADTREE_SHADOW
+	  int state = qc->TestPoint (v2-light_frustrum->GetOrigin ());
+	  if (state == CS_QUAD_FULL)
 	  {
-	    if (shadow_frust->relevant && shadow_frust->polygon != polygon)
-	      if (shadow_frust->Contains (v2-shadow_frust->GetOrigin ()))
-		{ shadow = true; break; }
-	    shadow_frust = shadow_frust->next;
+	    // The quadtree indicates that we have shadow. However, it is possible
+	    // that we have an adjacent polygon which gives false shadows. Therefor
+	    // we test if the lumel coordinate falls outside the polygon and if so
+	    // we do the full frustrum test below.
+	    if (!light_frustrum->Contains (v2)) state = CS_QUAD_PARTIAL;
+	  }
+
+	  if (state == CS_QUAD_EMPTY) shadow = false;
+	  else if (state == CS_QUAD_FULL) shadow = true;
+	  else
+#endif
+	  {
+	    while (shadow_frust)
+	    {
+	      if (shadow_frust->relevant && shadow_frust->polygon != polygon)
+	        if (shadow_frust->Contains (v2-shadow_frust->GetOrigin ()))
+		  { shadow = true; break; }
+	      shadow_frust = shadow_frust->next;
+	    }
 	  }
 	  if (!shadow) { rc = false; break; }
 
@@ -833,22 +820,13 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 
         if (!rc)
         {
-    	  //@@@ I think this is wrong and the next line is right!
-          //d = csSquaredDist::PointPoint (light->GetCenter (), v2);
           d = csSquaredDist::PointPoint (lview.light_frustrum->GetOrigin (), v2);
-          DB ((MSG_DEBUG_0, "    -> In viewing frustrum (distance %f compared with radius %f)\n", sqrt (d), light->GetRadius ()));
-
           if (d >= light->GetSquaredRadius ()) continue;
 
 	  d = sqrt (d);
-          DB ((MSG_DEBUG_0, "    -> *** HIT ***\n"));
-
 	  hit = true;
-
 	  l1 = mapR[uv];
 
-	  //@@@ I think this is wrong and the next line is right!
-	  //float cosinus = (v2-light->GetCenter ())*polygon->GetPolyPlane ()->Normal ();
 	  float cosinus = (v2-lview.light_frustrum->GetOrigin ())*polygon->GetPolyPlane ()->Normal ();
 	  cosinus /= d;
 	  cosinus += cosfact;
@@ -857,7 +835,6 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 
 	  if (dyn)
 	  {
-          //@@@ (Note from Seth): What the heck is all this?
 	    dl = NORMAL_LIGHT_LEVEL/light->GetRadius ();
 	    l1 = l1 + QInt (lightness*QRound (cosinus * (NORMAL_LIGHT_LEVEL - d*dl)));
 	    if (l1 > 255) l1 = 255;
@@ -865,7 +842,7 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 	  }
 	  else
 	  {
-          float brightness = cosinus * light->GetBrightnessAtDistance (d);
+            float brightness = cosinus * light->GetBrightnessAtDistance (d);
 
 	    if (lview.r > 0)
 	    {
@@ -1015,7 +992,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
 
   sxL = sxR = dxL = dxR = 0;            // avoid GCC warnings about "uninitialized variables"
   scanL2 = scanR2 = MaxIndex;
-//  sy = fyL = fyR = (QRound (f_uv[scanL2].y)>lh-1)?lh-1:QRound (f_uv[scanL2].y);
+  // sy = fyL = fyR = (QRound (f_uv[scanL2].y)>lh-1)?lh-1:QRound (f_uv[scanL2].y);
   sy = fyL = fyR = (QRound (ceil(f_uv[scanL2].y))>lh-1)?lh-1:QRound (ceil(f_uv[scanL2].y));
 
   for ( ; ; )
@@ -1045,14 +1022,14 @@ a:      if (scanR2 == MinIndex) goto finish;
 */
         fyR = QRound(floor(f_uv[scanR2].y));
         float dyR = (f_uv[scanR1].y - f_uv[scanR2].y);
-  sxR = f_uv[scanR1].x;
+	sxR = f_uv[scanR1].x;
         if (dyR != 0)
         {
           dxR = (f_uv[scanR2].x - sxR) / dyR;
-    // horizontal pixel correction
+	  // horizontal pixel correction
           sxR += dxR * (f_uv[scanR1].y - ((float)sy));
         }
-  else dxR = 0;
+	else dxR = 0;
         leave = false;
       }
       if (sy <= fyL)
@@ -1067,19 +1044,18 @@ b:      if (scanL2 == MinIndex) goto finish;
           goto b;
         }
 
-/*      scanL1 = scanL2;
-        scanL2 = (scanL2 - 1 + lp->num_vertices) % lp->num_vertices;
-*/
+	//scanL1 = scanL2;
+	//scanL2 = (scanL2 - 1 + lp->num_vertices) % lp->num_vertices;
         fyL = QRound(floor(f_uv[scanL2].y));
         float dyL = (f_uv[scanL1].y - f_uv[scanL2].y);
-  sxL = f_uv[scanL1].x;
+	sxL = f_uv[scanL1].x;
         if (dyL != 0)
         {
           dxL = (f_uv[scanL2].x - sxL) / dyL;
           // horizontal pixel correction
           sxL += dxL * (f_uv[scanL1].y - ((float)sy));
         }
-  else dxL = 0;
+	else dxL = 0;
         leave = false;
       }
     }
@@ -1100,10 +1076,9 @@ b:      if (scanL2 == MinIndex) goto finish;
       xL = QRound (ceil(_l))+1;
       xR = QRound (floor(_r));
 
-/*    xL = QRound (sxL)+1;
-      xR = QRound (sxR);
-      if (xR > xL) { int xswap = xR; xR = xL; xL = xswap; }
-*/
+      //xL = QRound (sxL)+1;
+      //xR = QRound (sxR);
+      //if (xR > xL) { int xswap = xR; xR = xL; xL = xswap; }
       if (xR < 0) xR = 0;
       if (xL > lw) xL = lw;
 
@@ -1111,9 +1086,9 @@ b:      if (scanL2 == MinIndex) goto finish;
       {
         uv = sy*new_lw+u;
 
-  //@@@ (Note from Jorrit): The following test should not be needed
-  // but it appears to be anyway. 'uv' can get both negative and too large.
-  if (uv < 0 || uv >= lm_size) continue;
+	//@@@ (Note from Jorrit): The following test should not be needed
+	// but it appears to be anyway. 'uv' can get both negative and too large.
+	if (uv < 0 || uv >= lm_size) continue;
 
         ru = u  << mipmap_shift;
         rv = sy << mipmap_shift;
@@ -1126,67 +1101,66 @@ b:      if (scanL2 == MinIndex) goto finish;
           v1.z = - (txt_D + txt_A*v1.x + txt_B*v1.y) / txt_C;
         v2 = vv + m_t2w * v1;
 
-  // Check if the point on the polygon is shadowed. To do this
-  // we traverse all shadow frustrums and see if it is contained in any of them.
-  csShadowFrustrum* shadow_frust;
-  shadow_frust = lp->shadows.GetFirst ();
-  bool shadow = false;
-  while (shadow_frust)
-  {
-    if (shadow_frust->relevant && shadow_frust->polygon != polygon)
-      if (shadow_frust->Contains (v2-shadow_frust->GetOrigin ()))
-        { shadow = true; break; }
-    shadow_frust = shadow_frust->next;
-  }
+	// Check if the point on the polygon is shadowed. To do this
+	// we traverse all shadow frustrums and see if it is contained in any of them.
+	csShadowFrustrum* shadow_frust;
+	shadow_frust = lp->shadows.GetFirst ();
+	bool shadow = false;
+	while (shadow_frust)
+	{
+	  if (shadow_frust->relevant && shadow_frust->polygon != polygon)
+	    if (shadow_frust->Contains (v2-shadow_frust->GetOrigin ()))
+	    { shadow = true; break; }
+	  shadow_frust = shadow_frust->next;
+	}
 
-  if (!shadow)
-        {
-    //@@@ This is only right if we don't allow reflections for dynamic lights
-          d = csSquaredDist::PointPoint (light->GetCenter (), v2);
+	if (!shadow)
+	{
+	  //@@@ This is only right if we don't allow reflections for dynamic lights
+	  d = csSquaredDist::PointPoint (light->GetCenter (), v2);
 
-    if (d >= light->GetSquaredRadius ()) continue;
+	  if (d >= light->GetSquaredRadius ()) continue;
+	  d = sqrt (d);
 
-    d = sqrt (d);
+	  //@@@ This is only right if we don't allow reflections for dynamic lights
+	  float cosinus = (v2-light->GetCenter ())*polygon->GetPolyPlane ()->Normal ();
+	  cosinus /= d;
+	  cosinus += cosfact;
+	  if (cosinus < 0) cosinus = 0;
+	  else if (cosinus > 1) cosinus = 1;
 
-    //@@@ This is only right if we don't allow reflections for dynamic lights
-    float cosinus = (v2-light->GetCenter ())*polygon->GetPolyPlane ()->Normal ();
-    cosinus /= d;
-    cosinus += cosfact;
-    if (cosinus < 0) cosinus = 0;
-    else if (cosinus > 1) cosinus = 1;
+	  float brightness = cosinus * light->GetBrightnessAtDistance (d);
 
-    float brightness = cosinus * light->GetBrightnessAtDistance (d);
-
-    if (color.red > 0)
-    {
-      l1 = QRound (color.red * brightness);
-      if (l1)
-      {
-        l1 += mapR[uv];
-        if (l1 > 255) l1 = 255;
-        mapR[uv] = l1;
-      }
-    }
-    if (color.green > 0 && mapG)
-    {
-      l2 = QRound (color.green * brightness);
-      if (l2)
-      {
-        l2 += mapG[uv];
-        if (l2 > 255) l2 = 255;
-        mapG[uv] = l2;
-      }
-    }
-    if (color.blue > 0 && mapB)
-    {
-      l3 = QRound (color.blue * brightness);
-      if (l3)
-      {
-        l3 += mapB[uv];
-        if (l3 > 255) l3 = 255;
-        mapB[uv] = l3;
-      }
-    }
+	  if (color.red > 0)
+	  {
+	    l1 = QRound (color.red * brightness);
+	    if (l1)
+	    {
+	      l1 += mapR[uv];
+	      if (l1 > 255) l1 = 255;
+	      mapR[uv] = l1;
+	    }
+	  }
+	  if (color.green > 0 && mapG)
+	  {
+	    l2 = QRound (color.green * brightness);
+	    if (l2)
+	    {
+	      l2 += mapG[uv];
+	      if (l2 > 255) l2 = 255;
+	      mapG[uv] = l2;
+	    }
+	  }
+	  if (color.blue > 0 && mapB)
+	  {
+	    l3 = QRound (color.blue * brightness);
+	    if (l3)
+	    {
+	      l3 += mapB[uv];
+	      if (l3 > 255) l3 = 255;
+	      mapB[uv] = l3;
+	    }
+	  }
         }
       }
 

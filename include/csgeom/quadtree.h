@@ -28,6 +28,7 @@
 #define CS_QUAD_EMPTY 0
 #define CS_QUAD_FULL 1
 #define CS_QUAD_PARTIAL 2
+#define CS_QUAD_UNKNOWN 3
 
 class csQuadtree;
 class Dumper;
@@ -45,7 +46,7 @@ private:
    * Children.
    * 0 = topleft, 1=topright, 2=bottomright, 3=bottomleft.
    */
-  csQuadtreeNode* children[4];
+  csQuadtreeNode* children;
 
   /// Center point for this node.
   csVector2 center;
@@ -102,6 +103,9 @@ private:
 	csVector2* verts, int num_verts,
 	const csBox& cur_bbox, const csBox& pol_bbox);
 
+  /// Test a point in the node.
+  int TestPoint (csQuadtreeNode* node, const csVector2& point);
+
 public:
   /**
    * Create an empty tree with the given box.
@@ -137,6 +141,15 @@ public:
    */
   bool TestPolygon (csVector2* verts, int num_verts,
   	const csBox& pol_bbox);
+
+  /**
+   * Test if a given point is visible in the quad-tree.
+   * Returns CS_QUAD_FULL if not visible, CS_QUAD_EMPTY
+   * if visible and CS_QUAD_PARTIAL if undecided.
+   * This function returns CS_QUAD_UNKNOWN if the point is not
+   * in the quadtree.
+   */
+  int TestPoint (const csVector2& point);
 };
 
 #endif /*QUADTREE_H*/

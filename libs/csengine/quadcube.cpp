@@ -109,6 +109,16 @@ bool csQuadtreePersp::TestPolygon (csVector3* verts, int num_verts,
   	persp.GetNumVertices (), persp.GetBoundingBox ());
 }
 
+int csQuadtreePersp::TestPoint (const csVector3& point)
+{
+  if (point.z < EPSILON) return CS_QUAD_UNKNOWN;
+  float iz = 1. / point.z;
+  csVector2 persp (point.x * iz, point.y * iz);
+  return csQuadtree::TestPoint (persp);
+}
+
+//-----------------------------------------------------------------
+
 csQuadcube::csQuadcube (int depth)
 {
   csBox box (-1, -1, 1, 1);
@@ -263,4 +273,46 @@ bool csQuadcube::TestPolygon (csVector3* verts, int num_verts)
   return false;
 }
 
+int csQuadcube::TestPoint (const csVector3& point)
+{
+  int state;
+  csVector3 cam;
+  // -> Z
+  state = trees[0]->TestPoint (point);
+  if (state != CS_QUAD_UNKNOWN) return state;
+
+  // -> -Z
+  cam.x = -point.x;
+  cam.y = point.y;
+  cam.z = -point.z;
+  state = trees[1]->TestPoint (cam);
+  if (state != CS_QUAD_UNKNOWN) return state;
+
+  // -> X
+  cam.x = point.z;
+  cam.y = point.y;
+  cam.z = -point.x;
+  state = trees[2]->TestPoint (cam);
+  if (state != CS_QUAD_UNKNOWN) return state;
+
+  // -> -X
+  cam.x = -point.z;
+  cam.y = point.y;
+  cam.z = point.x;
+  state = trees[3]->TestPoint (cam);
+  if (state != CS_QUAD_UNKNOWN) return state;
+
+  // -> Y
+  cam.x = point.x;
+  cam.y = point.z;
+  cam.z = -point.y;
+  state = trees[4]->TestPoint (cam);
+  if (state != CS_QUAD_UNKNOWN) return state;
+
+  // -> -Y
+  cam.x = point.x;
+  cam.y = -point.z;
+  cam.z = point.y;
+  return trees[5]->TestPoint (cam);
+}
 
