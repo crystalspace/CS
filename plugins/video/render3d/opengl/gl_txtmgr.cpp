@@ -1313,7 +1313,7 @@ csPtr<iMaterialHandle> csGLTextureManager::RegisterMaterial (
 
   // @@@ Dunno if this should be _here_ really.
   csRef<iShaderManager> shadman = 
-    SCF_QUERY_INTERFACE (object_reg, iShaderManager);
+    CS_QUERY_REGISTRY (object_reg, iShaderManager);
   //shadman->AddChild (mat->GetMaterial ());
 
   return csPtr<iMaterialHandle> (mat);
