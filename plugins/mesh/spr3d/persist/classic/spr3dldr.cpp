@@ -294,7 +294,7 @@ static UInt ParseMixmode (iReporter* reporter, char* buf)
       ReportError (reporter,
 		"crystalspace.sprite3dloader.parse.mixmode.badformat",
 		"Bad format while parsing mixmode!");
-      return 0;
+      return ~0;
     }
     switch (cmd)
     {
@@ -318,7 +318,7 @@ static UInt ParseMixmode (iReporter* reporter, char* buf)
 		"crystalspace.sprite3dloader.parse.mixmode.badtoken",
 		"Token '%s' not found while parsing mixmodes!",
 		csGetLastOffender ());
-    return 0;
+    return ~0;
   }
   return Mixmode;
 }
@@ -959,7 +959,14 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 	}
 	break;
       case CS_TOKEN_MIXMODE:
-        spr3dLook->SetMixMode (ParseMixmode (reporter, params));
+	UInt mm = ParseMixmode (reporter, params);
+	if (mm == (UInt)~0)
+	{
+	  if (spr3dLook) spr3dLook->DecRef ();
+	  mesh->DecRef ();
+	  return NULL;
+	}
+        spr3dLook->SetMixMode (mm);
 	break;
       case CS_TOKEN_APPLY_MOTION:
 	{

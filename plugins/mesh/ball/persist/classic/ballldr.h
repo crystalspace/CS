@@ -25,6 +25,7 @@
 
 struct iEngine;
 struct iSystem;
+struct iReporter;
 
 /**
  * Ball factory loader.
@@ -33,6 +34,7 @@ class csBallFactoryLoader : public iLoaderPlugIn
 {
 private:
   iSystem* sys;
+  iReporter* reporter;
 
 public:
   /// Constructor.
@@ -59,6 +61,7 @@ class csBallFactorySaver : public iSaverPlugIn
 {
 private:
   iSystem* sys;
+  iReporter* reporter;
 
 public:
   /// Constructor.
@@ -85,6 +88,7 @@ class csBallLoader : public iLoaderPlugIn
 {
 private:
   iSystem* sys;
+  iReporter* reporter;
 
 public:
   /// Constructor.
@@ -111,6 +115,7 @@ class csBallSaver : public iSaverPlugIn
 {
 private:
   iSystem* sys;
+  iReporter* reporter;
 
 public:
   /// Constructor.

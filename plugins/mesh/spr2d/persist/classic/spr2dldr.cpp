@@ -160,7 +160,7 @@ static UInt ParseMixmode (iReporter* reporter, char* buf)
       ReportError (reporter,
 		"crystalspace.sprite2dloader.parse.mixmode.badformat",
 		"Bad format while parsing mixmode!");
-      return 0;
+      return ~0;
     }
     switch (cmd)
     {
@@ -184,7 +184,7 @@ static UInt ParseMixmode (iReporter* reporter, char* buf)
 		"crystalspace.sprite2dloader.parse.mixmode.badtoken",
 		"Token '%s' not found while parsing mixmodes!",
 		csGetLastOffender ());
-    return 0;
+    return ~0;
   }
   return Mixmode;
 }
@@ -308,7 +308,16 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine,
         }
 	break;
       case CS_TOKEN_MIXMODE:
-        spr2dLook->SetMixMode (ParseMixmode (reporter, params));
+        {
+	  UInt mm = ParseMixmode (reporter, params);
+	  if (mm == (UInt)~0)
+	  {
+	    spr2dLook->DecRef ();
+	    fact->DecRef ();
+	    return NULL;
+	  }
+          spr2dLook->SetMixMode (mm);
+	}
 	break;
       case CS_TOKEN_UVANIMATION:
 	{
@@ -474,7 +483,16 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
 	}
 	break;
       case CS_TOKEN_MIXMODE:
-        spr2dLook->SetMixMode (ParseMixmode (reporter, params));
+        {
+	  UInt mm = ParseMixmode (reporter, params);
+	  if (mm == (UInt)~0)
+	  {
+	    if (spr2dLook) spr2dLook->DecRef ();
+	    mesh->DecRef ();
+	    return NULL;
+	  }
+          spr2dLook->SetMixMode (mm);
+	}
 	break;
       case CS_TOKEN_VERTICES:
         {
@@ -541,6 +559,9 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
 	    ReportError (reporter,
 		"crystalspace.sprite2dloader.parse.uvanim",
 		"UVAnimation '%s' not found!", str);
+	    if (spr2dLook) spr2dLook->DecRef ();
+	    mesh->DecRef ();
+	    return NULL;
 	  }
         }
         break;

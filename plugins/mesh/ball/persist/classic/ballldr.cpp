@@ -34,6 +34,7 @@
 #include "csutil/util.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -95,18 +96,42 @@ SCF_EXPORT_CLASS_TABLE (ballldr)
     "Crystal Space Ball Mesh Saver")
 SCF_EXPORT_CLASS_TABLE_END
 
+static void ReportError (iReporter* reporter, const char* id,
+	const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  if (reporter)
+  {
+    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
+  }
+  else
+  {
+    char buf[1024];
+    vsprintf (buf, description, arg);
+    printf ("Error ID: %s\n", id);
+    printf ("Description: %s\n", buf);
+    fflush (stdout);
+  }
+  va_end (arg);
+}
+
 csBallFactoryLoader::csBallFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  reporter = NULL;
 }
 
 csBallFactoryLoader::~csBallFactoryLoader ()
 {
+  if (reporter) reporter->DecRef ();
 }
 
 bool csBallFactoryLoader::Initialize (iSystem* system)
 {
   sys = system;
+  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 
@@ -119,7 +144,13 @@ iBase* csBallFactoryLoader::Parse (const char* /*string*/,
   {
     type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.ball",
     	"MeshObj", iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.ball\n");
+  }
+  if (!type)
+  {
+    ReportError (reporter,
+		"crystalspace.ballfactoryloader.setup.objecttype",
+		"Could not load the ball mesh object plugin!");
+    return NULL;
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
@@ -131,15 +162,18 @@ iBase* csBallFactoryLoader::Parse (const char* /*string*/,
 csBallFactorySaver::csBallFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  reporter = NULL;
 }
 
 csBallFactorySaver::~csBallFactorySaver ()
 {
+  if (reporter) reporter->DecRef ();
 }
 
 bool csBallFactorySaver::Initialize (iSystem* system)
 {
   sys = system;
+  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 
@@ -156,19 +190,22 @@ void csBallFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 csBallLoader::csBallLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  reporter = NULL;
 }
 
 csBallLoader::~csBallLoader ()
 {
+  if (reporter) reporter->DecRef ();
 }
 
 bool csBallLoader::Initialize (iSystem* system)
 {
   sys = system;
+  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 
-static UInt ParseMixmode (char* buf)
+static UInt ParseMixmode (iReporter* reporter, char* buf)
 {
   CS_TOKEN_TABLE_START (modes)
     CS_TOKEN_TABLE (COPY)
@@ -190,8 +227,10 @@ static UInt ParseMixmode (char* buf)
   {
     if (!params)
     {
-      printf ("Expected parameters instead of '%s'!\n", buf);
-      return 0;
+      ReportError (reporter,
+		"crystalspace.ballloader.parse.mixmode.badformat",
+		"Bad format while parsing mixmode!");
+      return ~0;
     }
     switch (cmd)
     {
@@ -211,8 +250,11 @@ static UInt ParseMixmode (char* buf)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    printf ("Token '%s' not found while parsing the modes!\n", csGetLastOffender ());
-    return 0;
+    ReportError (reporter,
+		"crystalspace.ballloader.parse.mixmode.badtoken",
+		"Token '%s' not found while parsing mixmodes!",
+		csGetLastOffender ());
+    return ~0;
   }
   return Mixmode;
 }
@@ -249,7 +291,9 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine,
   {
     if (!params)
     {
-      // @@@ Error handling!
+      ReportError (reporter,
+		"crystalspace.ballloader.parse.badformat",
+		"Bad format while parsing ball object!");
       if (ballstate) ballstate->DecRef ();
       return NULL;
     }
@@ -317,7 +361,10 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine,
 	  iMeshFactoryWrapper* fact = engine->FindMeshFactory (str);
 	  if (!fact)
 	  {
-	    // @@@ Error handling!
+      	    ReportError (reporter,
+		"crystalspace.ballloader.parse.unknownfactory",
+		"Couldn't find factory '%s'!", str);
+	    if (ballstate) ballstate->DecRef ();
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -331,7 +378,9 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine,
           iMaterialWrapper* mat = engine->FindMaterial (str);
 	  if (!mat)
 	  {
-            // @@@ Error handling!
+      	    ReportError (reporter,
+		"crystalspace.ballloader.parse.unknownmaterial",
+		"Couldn't find material '%s'!", str);
             mesh->DecRef ();
             return NULL;
 	  }
@@ -339,7 +388,14 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine,
 	}
 	break;
       case CS_TOKEN_MIXMODE:
-        ballstate->SetMixMode (ParseMixmode (params));
+	UInt mm = ParseMixmode (reporter, params);
+	if (mm == (UInt)~0)
+	{
+	  if (ballstate) ballstate->DecRef ();
+	  mesh->DecRef ();
+	  return NULL;
+	}
+        ballstate->SetMixMode (mm);
 	break;
     }
   }
@@ -354,15 +410,18 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine,
 csBallSaver::csBallSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  reporter = NULL;
 }
 
 csBallSaver::~csBallSaver ()
 {
+  if (reporter) reporter->DecRef ();
 }
 
 bool csBallSaver::Initialize (iSystem* system)
 {
   sys = system;
+  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 
