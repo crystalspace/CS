@@ -54,5 +54,6 @@ void SysSystemDriver::Loop(void)
 
 void SysSystemDriver::Sleep (int SleepTime)
 {
+  int usleep(unsigned int useconds);
   usleep (SleepTime * 1000);
 }
