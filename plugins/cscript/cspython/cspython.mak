@@ -79,7 +79,7 @@ cspython: $(OUTDIRS) $(CSPYTHON) python.cex
 clean: cspythonclean
 
 $(SWIG.CSPYTHON.OBJ): $(SWIG.CSPYTHON)
-	$(filter-out -W -Wunused -Wall,$(DO.COMPILE.CPP) $(PYTHON.CFLAGS))
+	$(filter-out -W -Wunused -Wall -Wmost,$(DO.COMPILE.CPP) $(PYTHON.CFLAGS))
 
 $(OUT)/%$O: plugins/cscript/cspython/%.cpp
 	$(DO.COMPILE.CPP) $(PYTHON.CFLAGS)
