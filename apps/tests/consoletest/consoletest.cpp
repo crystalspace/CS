@@ -125,8 +125,13 @@ int main (int argc, char* argv[])
     csPrintf ("\n");
   }
 
-  csPrintf ("%p", "testing");
+  csPrintf ("%p\n", "testing");
 
+  csPrintf ("%f ", 123.456); 
+  csPrintf ("%0*f ", 12, 123.456);
+  csPrintf ("%0.*f ", 4, 123.456);
+  csPrintf ("%0*.*f ", 12, 4, 123.456);
+  csPrintf ("\n");
   return 0;
 }
 

@@ -237,13 +237,13 @@ void csFancyConsole::Draw3D (csRect *oArea)
 
   float u_stretch = 1.0, v_stretch = 1.0;
 
-  /*if (!with_color && !deco.bgnd.do_stretch)
+  if (!deco.bgnd.do_stretch)
   {
     int w, h;
-    deco.bgnd.mat->GetTexture ()->GetMipMapDimensions (0, w, h);
+    deco.bgnd.mat->GetTexture ()->GetRendererDimensions (w, h);
     u_stretch = ((float)(size.xmax - size.xmin)) / ((float)w);
     v_stretch = ((float)(size.ymax - size.ymin)) / ((float)h);
-  }*/
+  }
 
   texels [0].x = 0;
   texels [0].y = 0;
@@ -270,10 +270,15 @@ void csFancyConsole::Draw3D (csRect *oArea)
 
   for (i = 0; i < 4; i++)
   {
-    colors [i].x = ((float)deco.bgnd.kr) * (1 / 255.0);
-    colors [i].y = ((float)deco.bgnd.kg) * (1 / 255.0);
-    colors [i].z = ((float)deco.bgnd.kb) * (1 / 255.0);
-    colors [i].w = 1; //rescale to correct
+    if (with_color)
+    {
+      colors [i].x = ((float)deco.bgnd.kr) * (1 / 255.0);
+      colors [i].y = ((float)deco.bgnd.kg) * (1 / 255.0);
+      colors [i].z = ((float)deco.bgnd.kb) * (1 / 255.0);
+    }
+    else
+      colors [i].x = colors [i].y = colors [i].z = 1.0f;
+    colors [i].w = alpha;
   }
   
   mesh.vertices = vertices;
@@ -284,8 +289,7 @@ void csFancyConsole::Draw3D (csRect *oArea)
 
   if (!with_color)
     mesh.texture = deco.bgnd.mat->GetTexture();
-  else 
-    mesh.colors = colors;
+  mesh.colors = colors;
 
   mesh.meshtype = CS_MESHTYPE_QUADS;
   

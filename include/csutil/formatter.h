@@ -414,6 +414,7 @@ class csPrintfFormatter
       formatParamFlagsWidthPrecTypeConversion,
       formatFlagsWidthPrecTypeConversion,
       formatParamWidth,
+      formatDotPrecTypeConversion,
       formatPrecTypeConversion,
       formatTypeConversion
     } parseState = scanFormat;
@@ -425,6 +426,7 @@ class csPrintfFormatter
     {
       switch (parseState)
       {
+	// Note: all falling through in this switch() is intentional.
 	case scanFormat:
 	  {
 	    // Check for a % sign
@@ -444,6 +446,13 @@ class csPrintfFormatter
 	  {
 	    state.currentFormat.width = state.ch - '0';
 	    parseState = formatParamWidth;
+	    break;
+	  }
+	  // Check for '*' (fetch width from args)
+	  else if (state.ch == '*')
+	  {
+	    state.currentFormat.width = -2;
+	    parseState = formatDotPrecTypeConversion;
 	    break;
 	  }
 	  // Param delimiter
@@ -481,14 +490,22 @@ class csPrintfFormatter
 	    parseState = formatParamWidth;
 	    break;
 	  }
+	  // Check for '*' (fetch width from args)
+	  else if (state.ch == '*')
+	  {
+	    state.currentFormat.width = -2;
+	    parseState = formatDotPrecTypeConversion;
+	    break;
+	  }
 	  // Check for flags (0, -, ...)
 	  else if (ParseFlag (state))
 	  {
 	    parseState = formatFlagsWidthPrecTypeConversion;
 	    break;
 	  }
+	case formatDotPrecTypeConversion:
 	  // Check for precision delimiter
-	  else if (state.ch == '.')
+	  if (state.ch == '.')
 	  {
 	    parseState = formatPrecTypeConversion;
 	    state.currentFormat.precision = 0;
@@ -500,6 +517,13 @@ class csPrintfFormatter
 	  {
 	    state.currentFormat.precision *= 10;
 	    state.currentFormat.precision += state.ch - '0';
+	    break;
+	  }
+	  // Check for '*' (fetch precision from args)
+	  else if (state.ch == '*')
+	  {
+	    state.currentFormat.precision = -2;
+	    parseState = formatTypeConversion;
 	    break;
 	  }
 	  // Check for param type modifier (l, h, ...)
@@ -535,8 +559,22 @@ class csPrintfFormatter
     // Determine order of params
     for (size_t i = 0; i < formatSpecs.Length(); i++)
     {
-      const FormatSpec& currentFormat = formatSpecs[i];
+      FormatSpec& currentFormat = formatSpecs[i];
       FmtParam& param = params.GetExtend (currentFormat.paramIdx);
+      if (currentFormat.width == -2)
+      {
+	currentFormat.width = va_arg (args, int);
+	if (currentFormat.width < 0)
+	{
+	  currentFormat.width = -currentFormat.width;
+	  currentFormat.leftJustify = true;
+	}
+      }
+      if (currentFormat.precision == -2)
+      {
+	int v = va_arg (args, int);
+	if (v >= 0) currentFormat.precision = v;
+      }
       switch (currentFormat.conversion)
       {
 	case convInt:

@@ -157,7 +157,7 @@ extern CS_CSUTIL_EXPORT void csSplitPath (const char *iPathName, char *oPath,
  * matches exactly one character. Examples: "*a*.txt", "*a?b*", "*"
  * Character-classes \p [a-z] are not understood by this function.
  * \remark If you want case-insensitive comparison, convert \p fName and
- *   \fMask to upper- or lower-case first.
+ *   \p fMask to upper- or lower-case first.
  */
 extern CS_CSUTIL_EXPORT bool csGlobMatches (const char *fName, const char *fMask);
 
