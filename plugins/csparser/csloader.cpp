@@ -384,11 +384,7 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
   ResolveOnlyRegion = iOnlyRegion;
   ldr_context = NULL;
 
-  csTicks startticks = csGetTicks();
-//  ReportWarning ("crystalspace.maploader.perf","Started load here.",startticks);
   csRef<iDataBuffer> buf (VFS->ReadFile (file));
-  csTicks loadticks = csGetTicks();
-//  ReportWarning ("crystalspace.maploader.perf","Loading the file took %d ticks",loadticks-startticks);
 
   if (!buf || !buf->GetSize ())
   {
@@ -403,15 +399,10 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
   csRef<iDocument> doc;
   bool er = TestXml (file, buf, doc);
 
-  csTicks xmlticks = csGetTicks();
-//  ReportWarning ("crystalspace.maploader.perf","Parsing the xml took %d ticks",xmlticks-loadticks);
-
   if (!er) return false;
   if (doc)
   {
     if (!LoadMap (doc->GetRoot ())) return false;
-    csTicks lastticks = csGetTicks();
-//    ReportWarning ("crystalspace.maploader.perf","Loading the map into the engine took %d ticks",lastticks-xmlticks);
   }
   else
   {
@@ -429,7 +420,7 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
       Stats->things_loaded, Stats->meshes_loaded);
     ReportNotify ("  %d curves, %d lights, %d sounds.", Stats->curves_loaded,
       Stats->lights_loaded, Stats->sounds_loaded);
-  } /* endif */
+  }
 
   return true;
 }
@@ -1608,7 +1599,8 @@ bool csLoader::HandleMeshParameter (iMeshWrapper* mesh, iDocumentNode* child,
 	  	child, "First specify the parent factory with 'factory'!");
 	return false;
       }
-      ParseImposterSettings (mesh, child);
+      if (!ParseImposterSettings (mesh, child))
+        return false;
       break;
     case XMLTOKEN_ZFILL:
       if (!mesh)
@@ -2066,7 +2058,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
   return true;
 }
 
-void csLoader::ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node)
+bool csLoader::ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node)
 {
   csRef<iImposter> imposter (SCF_QUERY_INTERFACE (
                                 mesh,
@@ -2076,13 +2068,13 @@ void csLoader::ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node)
     SyntaxService->ReportError (
 	    "crystalspace.maploader.parse.meshobject",
 	    node, "This mesh doesn't implement impostering!");
-    return;
+    return false;
   }
   const char *s = node->GetAttributeValue ("active");
   if (s && !strcmp (s,"no"))
-      imposter->SetImposterActive (false,NULL);
+    imposter->SetImposterActive (false,NULL);
   else
-      imposter->SetImposterActive (true,object_reg);
+    imposter->SetImposterActive (true,object_reg);
 
   s = node->GetAttributeValue ("range");
   iSharedVariable *var = Engine->GetVariableList()->FindByName (s);
@@ -2091,7 +2083,7 @@ void csLoader::ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node)
     SyntaxService->ReportError (
 	    "crystalspace.maploader.parse.meshobject",
 	    node, "Specified imposter range variable (%s) doesn't exist!",s);
-    return;
+    return false;
   }
   imposter->SetMinDistance (var);
 
@@ -2102,7 +2094,7 @@ void csLoader::ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node)
     SyntaxService->ReportError (
 	    "crystalspace.maploader.parse.meshobject",
 	    node, "Specified imposter rotation tolerance variable doesn't exist!");
-    return;
+    return false;
   }
   imposter->SetRotationTolerance (var2);
   char const* const name = mesh->QueryObject()->GetName();
@@ -2110,6 +2102,7 @@ void csLoader::ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node)
     "Set mesh %s to imposter active=%s, range=%f, tolerance=%f", 
     name ? name : "<noname>", imposter->GetImposterActive() ? "yes" : "no", 
     var->Get(),var2->Get() );
+  return true;
 }
 
 bool csLoader::LoadAddOn (iDocumentNode* node, iBase* context)
@@ -3118,7 +3111,8 @@ bool csLoader::ParseVariableList (iDocumentNode* node)
     switch (id)
     {
       case XMLTOKEN_VARIABLE:
-	ParseSharedVariable (child);
+	if (!ParseSharedVariable (child))
+	  return false;
         break;
       default:
         SyntaxService->ReportBadToken (child);
@@ -3129,43 +3123,43 @@ bool csLoader::ParseVariableList (iDocumentNode* node)
   return true;
 }
 
-void csLoader::ParseSharedVariable (iDocumentNode* node)
+bool csLoader::ParseSharedVariable (iDocumentNode* node)
 {
-  iSharedVariable *v = Engine->GetVariableList()->New();
+  csRef<iSharedVariable> v = Engine->GetVariableList()->New ();
 
-  v->SetName(node->GetAttributeValue ("name"));
+  v->SetName (node->GetAttributeValue ("name"));
 
-  if (v->GetName())
+  if (v->GetName ())
   {
-    const char *type = node->GetAttributeValue ("type");
-    if (type)
+    csRef<iDocumentNode> colornode = node->GetNode ("color");
+    csRef<iDocumentNode> vectornode = node->GetNode ("v");
+    if (colornode)
     {
-      if (!strcmp (type,"float"))
-      {
-        v->Set(node->GetAttributeValueAsFloat ("value"));
-      }
-      else if (!strcmp (type,"color"))
-      {
-        v->SetColor (csColor(node->GetAttributeValueAsFloat ("red"),
-			     node->GetAttributeValueAsFloat ("green"),
-			     node->GetAttributeValueAsFloat ("blue") ) );
-      }
-      else if (!strcmp (type,"vector3"))
-      {
-        v->SetVector (node->GetAttributeValueAsFloat ("x"),
-		      node->GetAttributeValueAsFloat ("y"),
-		      node->GetAttributeValueAsFloat ("z") );
-      }
-      else
-	  ; // Empty vars are technically allowed but not very useful
+      csColor c;
+      if (!SyntaxService->ParseColor (colornode, c))
+	return false;
+      v->SetColor (c);
+    }
+    else if (vectornode)
+    {
+      csVector3 vec;
+      if (!SyntaxService->ParseVector (vectornode, vec))
+	return false;
+      v->SetVector (vec);
+    }
+    else
+    {
+      v->Set (node->GetAttributeValueAsFloat ("value"));
     }
     Engine->GetVariableList ()->Add (v);
   }
   else
   {
-    v->DecRef();
-    ReportWarning("csLoader::ParseSharedVariable",node,"Variable tag does not have 'name' attribute.");
+    SyntaxService->ReportError ("csLoader::ParseSharedVariable",
+    	node, "Variable tag does not have 'name' attribute.");
+    return false;
   }
+  return true;
 }
 
 //========================================================================

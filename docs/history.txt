@@ -13,6 +13,18 @@ The history order is reversed so that new features are at the top.
 	  Walktest now sets the ambient in the large room to the color of
 	  light on the stairs at the moment you hit Ctrl-L to start the
 	  lightning.
+	- Fixed a memory leak in the shared variable implementation.
+	  Changed prototype of New() (for creating a new shared variable)
+	  to return a csPtr instead of a normal pointer.
+	- Fixed error handling in parsing of shared variables and
+	  imposter settings.
+	- Changed syntax for variables. Now it is like:
+	    <variable name="color"><color red="..." /></variable>
+	  or:
+	    <variable name="float" value="1.3" />
+	- Changed prototype of iSharedVariable->SetVector() so that it
+	  expects a vector instead of three floats.
+	- Added 'const' to a few methods in iSharedVariable.
 15-Jan-2003
 	- Started removing a few csVector usages and replacing them
 	  with typed versions. In particular changed:

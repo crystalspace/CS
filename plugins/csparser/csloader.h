@@ -354,9 +354,9 @@ private:
   /// Parse a list of shared variables and add them each to the engine
   bool ParseVariableList (iDocumentNode* node);
   /// Process the attributes of one shared variable
-  void ParseSharedVariable (iDocumentNode* node);
+  bool ParseSharedVariable (iDocumentNode* node);
   /// Process the attributes of an <imposter> tag in a mesh specification.
-  void ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node);
+  bool ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node);
 
   /// Parse a texture definition and add the texture to the engine
   iTextureWrapper* ParseTexture (iDocumentNode* node);

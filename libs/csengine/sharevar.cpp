@@ -85,13 +85,15 @@ int csSharedVariableList::SharedVariableList::Find (iSharedVariable *obj) const
   return scfParent->Find (obj);
 }
 
-iSharedVariable *csSharedVariableList::SharedVariableList::FindByName (const char *Name) const
+iSharedVariable *csSharedVariableList::SharedVariableList::FindByName (
+	const char *Name) const
 {
   return scfParent->FindByName (Name);
 }
 
-iSharedVariable *csSharedVariableList::New() const
+csPtr<iSharedVariable> csSharedVariableList::New() const
 {
   csSharedVariable *New = new csSharedVariable;
-  return &New->scfiSharedVariable;
+  return csPtr<iSharedVariable> (&New->scfiSharedVariable);
 }
+

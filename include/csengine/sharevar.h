@@ -45,7 +45,8 @@ public:
   SCF_DECLARE_IBASE_EXT (csObject);
 
   /**
-   * Construct a SharedVariable. This SharedVariable will be initialized to zero and unnamed.
+   * Construct a SharedVariable. This SharedVariable will be initialized to
+   * zero and unnamed.
    */
   csSharedVariable () : csObject()
   { 
@@ -63,20 +64,20 @@ public:
   void SetColor (const csColor& col)
   {  color.Set(col.red,col.green,col.blue); type = iSharedVariable::SV_COLOR; }
 
-  const csColor& GetColor()
-  {  return (type == iSharedVariable::SV_COLOR) ? color : color.Set(0,0,0),color; }
+  const csColor& GetColor() const
+  {  return (type == iSharedVariable::SV_COLOR) ? color : csColor (0,0,0),color; }
 
-  void SetVector (float x, float y, float z)
-  {  vec.Set(x,y,z); type = iSharedVariable::SV_VECTOR; }
+  void SetVector (const csVector3& v)
+  {  vec = v; type = iSharedVariable::SV_VECTOR; }
 
-  const csVector3& GetVector()
-  {  return (type == iSharedVariable::SV_VECTOR) ? vec : vec.Set(0,0,0),vec; }
+  const csVector3& GetVector() const
+  {  return (type == iSharedVariable::SV_VECTOR) ? vec : csVector3 (0,0,0),vec; }
 
   int GetType () const
   {  return type; }
 
 
-  //------------------------- iSharedVariable interface -------------------------------
+  //---------------------- iSharedVariable interface --------------------------
   struct eiSharedVariable : public iSharedVariable
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSharedVariable);
@@ -92,11 +93,11 @@ public:
     {   return scfParent->GetName(); }
     virtual void SetColor (const csColor& color)
     {   scfParent->SetColor (color); }
-    virtual const csColor& GetColor() 
+    virtual const csColor& GetColor() const
     {   return scfParent->GetColor(); }
-    virtual void SetVector (float x, float y, float z)
-    {   scfParent->SetVector (x,y,z); }
-    virtual const csVector3& GetVector () 
+    virtual void SetVector (const csVector3& v)
+    {   scfParent->SetVector (v); }
+    virtual const csVector3& GetVector () const
     {   return scfParent->GetVector (); }
     int GetType () const
     {   return scfParent->GetType (); }
@@ -117,7 +118,7 @@ public:
   virtual ~csSharedVariableList ();
 
   /// iSharedVariable Factory method. This does not add the new var to the list.
-  iSharedVariable *New() const;
+  csPtr<iSharedVariable> New() const;
 
   class SharedVariableList : public iSharedVariableList
   {
@@ -132,7 +133,7 @@ public:
     virtual void RemoveAll ();
     virtual int Find (iSharedVariable *obj) const;
     virtual iSharedVariable *FindByName (const char *Name) const;
-    virtual iSharedVariable *New() const
+    virtual csPtr<iSharedVariable> New() const
     { return scfParent->New(); }
   } scfiSharedVariableList;
 };

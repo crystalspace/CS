@@ -42,7 +42,7 @@ struct iSharedVariable : public iBase
   virtual iObject* QueryObject () = 0;
 
   /// iSharedVariables are referenced by name. Here is where you set it.
-  virtual void SetName (const char *iName) = 0;
+  virtual void SetName (const char *name) = 0;
 
   /// Get the name of this variable.
   virtual const char *GetName () const = 0;
@@ -51,19 +51,19 @@ struct iSharedVariable : public iBase
   virtual void Set(float val) = 0;
 
   /// Get the floating point version of the var value.
-  virtual float Get() const = 0;
+  virtual float Get () const = 0;
 
   /// Set the variable to store a csColor.
   virtual void SetColor (const csColor& col) = 0;
 
   /// Get the csColor from the variable.
-  virtual const csColor& GetColor() = 0;
+  virtual const csColor& GetColor () const = 0;
 
   /// Set the variable to store a csVector3.
-  virtual void SetVector (float x, float y, float z) = 0;
+  virtual void SetVector (const csVector3& v) = 0;
 
   /// Get the vector from the variable.
-  virtual const csVector3& GetVector() = 0;
+  virtual const csVector3& GetVector () const = 0;
 
   /// Possible types stored by this class.
   enum SharedVariableType
@@ -111,8 +111,8 @@ struct iSharedVariableList : public iBase
   /// Find a SharedVariable by name.
   virtual iSharedVariable *FindByName (const char *Name) const = 0;
 
-  /// iSharedVariable Factory method.  This does not add the new var to the list.
-  virtual iSharedVariable *New() const = 0;
+  /// iSharedVariable Factory method. This does not add the new var to the list.
+  virtual csPtr<iSharedVariable> New() const = 0;
 };
 
 #endif // __CS_IENGINE_SHAREVAR_H__
