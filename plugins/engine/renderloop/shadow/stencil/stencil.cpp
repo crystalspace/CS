@@ -219,11 +219,13 @@ void csStencilShadowCacheEntry::HandleEdge (EdgeInfo *e, csHash<EdgeInfo*>& edge
   hash = (uint32)(mplier * e->a.x + mplier * e->a.y + mplier * e->a.z);
   hash += (uint32)(mplier * e->b.x + mplier * e->b.y + mplier * e->b.z);
 
-  csHash<EdgeInfo*>::Iterator it = edge_stack.GetIterator(hash);
+  csHash<EdgeInfo*>::Iterator it = edge_stack.GetIterator (hash);
   bool found = false;
-  while (it.HasNext()) {
-    EdgeInfo *t = it.Next();
-    if (e->a == t->b && e->b == t->a) {
+  while (it.HasNext ()) 
+  {
+    EdgeInfo *t = it.Next ();
+    if (e->a == t->b && e->b == t->a) 
+    {
       found = true;
       edge_indices[edge_count*3 + 0] = e->ind_a;
       edge_indices[edge_count*3 + 1] = t->ind_b;
@@ -243,9 +245,45 @@ void csStencilShadowCacheEntry::HandleEdge (EdgeInfo *e, csHash<EdgeInfo*>& edge
       break;
     }
   }
-  if (!found) { 
+  if (!found) 
+  { 
     edge_stack.Put (hash, e); 
   }
+}
+
+void csStencilShadowCacheEntry::HandlePoly (const csVector3* vertices, 
+                                            const int* polyVertices, 
+                                            const int numVerts,
+                                            csArray<EdgeInfo>& edge_array, 
+                                            csHash<EdgeInfo*>& edge_stack,
+                                            int& NextEdge, int& TriIndex)
+{
+  EdgeInfo *e = &edge_array[NextEdge ++];
+  e->a = vertices[polyVertices[0]];
+  e->b = vertices[polyVertices[1]];
+  e->ind_a = TriIndex + 0;
+  e->ind_b = TriIndex + 1;
+  HandleEdge (e, edge_stack);
+
+  /* if the polygon is just a triangle this happens once
+      and the net result is that each edge is handled explicitly */
+  for (int j = 2; j < numVerts; j ++) 
+  {
+    EdgeInfo *e = &edge_array[NextEdge ++];
+    e->a = vertices[polyVertices[j - 1]];
+    e->b = vertices[polyVertices[j]];
+    e->ind_a = TriIndex + 1;
+    e->ind_b = TriIndex + 2;
+    HandleEdge (e, edge_stack);
+    TriIndex += 3;
+  }
+
+  e = &edge_array[NextEdge ++];
+  e->a = vertices[polyVertices[numVerts - 1]];
+  e->b = vertices[polyVertices[0]];
+  e->ind_a = TriIndex - 1; /* TriIndex + 2 from previous triangle */
+  e->ind_b = TriIndex - 3; /* TriIndex + 0 from previous taiangle */
+  HandleEdge (e, edge_stack);
 }
 
 void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
@@ -289,15 +327,20 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
 
   csVector3 *verts = mesh->GetVertices ();
 
-  int new_triangle_count = mesh->GetTriangleCount ();
-  csTriangle* triangles = mesh->GetTriangles ();
+  int new_triangle_count = 0;
   int i;
+  for (i = 0; i < mesh->GetPolygonCount(); i ++) 
+  {
+    /* count triangles assume fan style */
+    new_triangle_count += mesh->GetPolygons()[i].num_vertices - 2;
+  }
+
   /* significant change, need to realloc vertex arrays */
   if (mesh->GetVertexCount () != vertex_count || 
       new_triangle_count != triangle_count)
   {
     vertex_count = mesh->GetVertexCount ();
-    triangle_count = new_triangle_count;
+	triangle_count = new_triangle_count;
 
     shadow_vertex_buffer = parent->g3d->CreateRenderBuffer (
        sizeof (csVector3)*new_triangle_count*3, CS_BUF_STATIC,
@@ -318,34 +361,29 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
     edge_normals.SetLength(new_triangle_count*3);
     edge_midpoints.SetLength(new_triangle_count*3);
 
-    for (int i = 0; i < new_triangle_count; i ++)
+    if (mesh->GetFlags ().Check (CS_POLYMESH_TRIANGLEMESH))
     {
-      const csTriangle& poly = triangles[i];
-      EdgeInfo *e = &edge_array[NextEdge ++];
-      e->a = verts[poly.a];
-      e->b = verts[poly.b];
-      e->ind_a = TriIndex + 0;
-      e->ind_b = TriIndex + 1;
-      // e->norm = normal;
-      HandleEdge (e, edge_stack);
+      const csVector3* triVerts = mesh->GetVertices ();
+      const csTriangle* tris = mesh->GetTriangles();
+      for (int i = 0; i < mesh->GetTriangleCount(); i ++)
+      {
+        const csTriangle* tri = &tris[i];
 
-      e = &edge_array[NextEdge ++];
-      e->a = verts[poly.b];
-      e->b = verts[poly.c];
-      e->ind_a = TriIndex + 1;
-      e->ind_b = TriIndex + 2;
-      // e->norm = normal;
-      HandleEdge (e, edge_stack);
+        HandlePoly (triVerts, (int*)tri, 3, 
+          edge_array, edge_stack, NextEdge, TriIndex);
+      }
+    }
+    else
+    {
+      const csVector3* meshVerts = mesh->GetVertices ();
+      const csMeshedPolygon* polys = mesh->GetPolygons();
+      for (int i = 0; i < mesh->GetPolygonCount(); i ++)
+      {
+        const csMeshedPolygon *poly = &polys[i];
 
-      e = &edge_array[NextEdge ++];
-      e->a = verts[poly.c];
-      e->b = verts[poly.a];
-      e->ind_a = TriIndex + 2;
-      e->ind_b = TriIndex + 0;
-      // e->norm = normal;
-      HandleEdge (e, edge_stack);
-
-      TriIndex += 3;
+        HandlePoly (meshVerts, poly->vertices, poly->num_vertices,
+          edge_array, edge_stack, NextEdge, TriIndex);
+      }
     }
   }
 
@@ -354,23 +392,28 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
   csVector3 *n = (csVector3*)shadow_normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
   int ind = 0;
-  for (i = 0; i < new_triangle_count; i ++) 
+  for (i = 0; i < mesh->GetPolygonCount(); i ++) 
   {
-    csTriangle& poly = triangles[i];
-    csVector3 ab = verts[poly.b] - verts[poly.a];
-    csVector3 bc = verts[poly.c] - verts[poly.b];
+    csMeshedPolygon *poly = &mesh->GetPolygons()[i];
+    csVector3 ab = verts[poly->vertices[1]] -
+                   verts[poly->vertices[0]];
+    csVector3 bc = verts[poly->vertices[2]] -
+                   verts[poly->vertices[1]];
     csVector3 normal = ab % bc;
-    v[ind] = verts[poly.a];
-    face_normals[ind++] = normal;
-    v[ind] = verts[poly.b];
-    face_normals[ind++] = normal;
-    v[ind] = verts[poly.c];
-    face_normals[ind++] = normal;
+
+    for (int j = 2; j < poly->num_vertices; j ++)
+    {
+      v[ind] = verts[poly->vertices[0]];
+      face_normals[ind++] = normal;
+      v[ind] = verts[poly->vertices[j-1]];
+      face_normals[ind++] = normal;
+      v[ind] = verts[poly->vertices[j]];
+      face_normals[ind++] = normal;
+    }
   }
   memcpy (n, &face_normals[0], sizeof (csVector3) * new_triangle_count * 3);
 
-  for (i = 0; i < triangle_count * 3; i ++)
-  {
+  for (i = 0; i < triangle_count * 3; i ++) {
     edge_normals[i] = face_normals[edge_indices[i * 3]];
   }
 
@@ -481,7 +524,8 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
   	edge_start);
 
   csRenderMesh rmesh;
-  rmesh.transform = &tr_o2c;
+  //rmesh.object2camera = tr_o2c;
+  rmesh.transfom = &tr_o2c;
   rmesh.z_buf_mode = CS_ZBUF_TEST;
   rmesh.mixmode = pass->GetMixmodeOverride (); //CS_FX_COPY;
   rmesh.material = 0;

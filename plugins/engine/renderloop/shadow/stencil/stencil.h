@@ -81,6 +81,9 @@ private:
 
   bool meshShadows;
 
+  inline void HandlePoly (const csVector3* vertices, const int* polyVertices, 
+    const int numVerts, csArray<EdgeInfo>& edge_array, 
+    csHash<EdgeInfo*>& edge_stack, int& NextEdge, int& TriIndex);
   void HandleEdge (EdgeInfo* e, csHash<EdgeInfo*>& edge_stack);
 public:
   SCF_DECLARE_IBASE;

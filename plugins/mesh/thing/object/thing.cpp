@@ -1278,7 +1278,7 @@ void csThingStatic::FillRenderMeshes (
       csMatrix3 t_m;
       csVector3 t_v;
       static_data->MappingGetTextureSpace (t_m, t_v);
-      csReversibleTransform transform (t_m, t_v);
+      csTransform object2texture (t_m, t_v);
 
       /*
         Calculate the 'tangent' vector of this poly, needed for dot3.
@@ -1291,16 +1291,14 @@ void csThingStatic::FillRenderMeshes (
          @@@ Ignores the fact things can be smooth.
          But it's simpler for now :)
        */
-      csVector3 tex_t0 = transform.This2Other (csVector3 (0, 0, 0));
-      csVector3 tex_t1 = transform.This2Other (csVector3 (1, 0, 0));
-      csVector3 tangent (tex_t1 - tex_t0);
+      csTransform tangentTF (t_m.GetInverse (), csVector3 (0));
+      csVector3 tangent = tangentTF.Other2This (csVector3 (1, 0, 0));
       tangent.Normalize ();
 
       /*
       Calculate the 'binormal' vector of this poly, needed for dot3.
       */
-      tex_t1 = transform.This2Other (csVector3 (0, 1, 0));
-      csVector3 binormal (tex_t1 - tex_t0);
+      csVector3 binormal = tangentTF.Other2This (csVector3 (0, -1, 0));
       binormal.Normalize ();
 
       // First, fill the normal/texel/vertex buffers.
@@ -1316,7 +1314,7 @@ void csThingStatic::FillRenderMeshes (
 	}
 	else
 	  *normals++ = polynormal;
-	csVector3 t = transform.Other2This (obj_verts[vidx]);
+	csVector3 t = object2texture.Other2This (obj_verts[vidx]);
 	*texels++ = csVector2 (t.x, t.y);
         *tangents++ = tangent;
         *binormals++ = binormal;
@@ -2482,6 +2480,7 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
   {
     csRenderMesh* rm = renderMeshes[i];
     rm->transform = &tr_o2c;
+    //rm->object2camera = tr_o2c;
     rm->clip_portal = clip_portal;
     rm->clip_plane = clip_plane;
     rm->clip_z_plane = clip_z_plane;

@@ -65,6 +65,11 @@ chronological order.
 	  shader system should also use this, but don't right now.
 	- Anders Stenberg added a bumpmapping shader, and fixed tangent
 	  and binormal calculations in thing.
+        - res made the following changes:
+            - Simplified tangent/binormal calculation in thing a bit. Also
+              'flipped' the binormal, seems to look more correct.
+            - Changed stencil plugin to use either an iPolygonMesh's poly or
+              triangle mesh, depending what's 'native' to the object.
 8-Sep-2003
 	- Jorrit added csgfx to the stdsteps renderloop plugin (for Jam).
 	- Jorrit did the following changes to bring new and old renderer
