@@ -1,5 +1,14 @@
 #include <stdlib.h>
+
 #include "csrenode.h"
+#include "csrdparse.h"
+
+/*****
+ Changelog:
+ 
+ Fri Jun 01 03:00:01 PM MDT 2001 paradox <paradox@bbhc.org>  Created new file, implemented basic parsing
+
+ ****/
 
 /// Does a foreward lookup to support wildcards
 bool
@@ -92,7 +101,7 @@ csRESyntaxTree::Build(char **regexp)
      case '[':
      { // Begin table creation.  
        
-       
+         
      	
      	
      } // End table creation
@@ -128,7 +137,8 @@ csRESyntaxTree::Build(char **regexp)
 }
 
 
-csReSyntaxTree::Compile(char *regexp)
+bool
+csRESyntaxTree::Compile(char *regexp)
 {
  char *pRE = regexp;
  
@@ -141,5 +151,6 @@ csReSyntaxTree::Compile(char *regexp)
    csRENode *node = new csRECatNode(top_node, Build(&pRE));	
    top_node = node;	
  }
- 	
+ 
+ return true;	
 }
