@@ -61,7 +61,7 @@
   #define VERIFY_RESULT(expression, result) expression
 #endif
 
-//COM Helpers. (DirectX is still COM...)
+//COM Helpers. (DirectX still requires COM...03/31/2000 -- PEG)
 #define FINAL_RELEASE( d ) if (d!=NULL) { d->Release(); d = NULL; }
 
 // The 2D graphics driver used by software renderer on this platform
@@ -72,8 +72,12 @@
 
 #if defined (SYSDEF_DIR) || defined (SYSDEF_GETCWD) || defined (SYSDEF_MKDIR)
 #  include <direct.h>
-#  ifdef COMP_BC
-#    include <dirent.h>
+#  if defined(COMP_BC) || defined(COMP_GCC)
+#	ifdef __CYGWIN32__
+#		include <sys/dirent.h>
+#	else
+#    	include <dirent.h>
+#	endif
 #  endif
 #endif
 
@@ -98,8 +102,12 @@
 #  endif
 #endif
 
+// COMP_GCC has generic opendir(), readdir(), closedir()
+
 #if defined(SYSDEF_DIR) || defined(SYSDEF_PATH)
   /// Directory read functions
+#if !defined(COMP_GCC)	  
+  
   #if !(defined(COMP_BC) || defined(COMP_WCC))
     #define __NEED_OPENDIR_PROTOTYPE
     #include <io.h>
@@ -129,20 +137,22 @@
     extern "C" dirent *readdir (DIR *dirp);
     extern "C" int closedir (DIR *dirp);
 
-  #endif
+  #endif // end if !(defined(COMP_BC)...(COMP_WCC))
+# endif
 #endif
 
 #ifdef SYSDEF_PATH
-#  ifdef COMP_BC
+#  if defined(COMP_BC) || defined(COMP_GCC)
 #    define __NEED_GENERIC_ISDIR
 #  else
-  #define __NO_GENERIC_ISDIR
+#    define __NO_GENERIC_ISDIR
   static inline bool isdir (char *path, dirent *de)
   {
     (void)path;
     return !!(de->d_attr & _A_SUBDIR);
   }
 #  endif
+
 #endif
 
 #ifdef SYSDEF_SOCKETS
