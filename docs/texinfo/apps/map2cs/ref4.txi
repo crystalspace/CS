@@ -12,21 +12,21 @@ extended, thus allowing you to embed the required data directly in the map
 file.
 
 You can add key / value pairs to the map file itself; both to @dfn{things}
-and @dfn{sectors}.  To do this, just add @samp{KEY("@var{keyname}",
-"@var{keyvalue}")} to the appropriate sections.  You can use any number of
-keys.  Because not all game-specific information can be bound to actual
-geometry, (like @samp{info_deathmatchstart}, for example) there is also an
-element called @samp{NODE}.
+and @dfn{sectors}.  To do this, just add @samp{<key name="@var{keyname}"
+value="@var{keyvalue}" />} to the appropriate sections.  You can use any
+number of keys.  Because not all game-specific information can be bound to
+actual geometry, (like @samp{info_deathmatchstart}, for example) there is
+also an element called @samp{node}.
 
 A node looks like this:
 
 @example
-NODE 'nodename' (
-    POSITION(x,y,z)
-    KEY("keyname1", "keyvalue1")
-    KEY("keyname2", "keyvalue2")
-    KEY("keyname3", "keyvalue3")
-)
+<node name="nodeName">
+	<position x="" y="" z="" />
+	<key name="keyName1" value="keyValue1" />
+	<key name="keyName2" value="keyValue2" />
+	<key name="keyName3" value="keyValue3" />
+</node>
 @end example
 
 @subsubheading How Does @file{map2cs} Support Game-Specific Data?

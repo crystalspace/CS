@@ -26,6 +26,8 @@ The history order is reversed so that new features are at the top.
 	  keep no refs to the listeners).
 	- Fixed the documentation on typed vectors and added documentation
 	  for all new templated arrays.
+	- Andreas Busch modified the documentation for map2cs and texmap
+	  from old syntax to XML.
 13-Jan-2002
 	- Further work on XML doc.
 	- Added support for <key> in mesh factories and collections.
@@ -61,7 +63,7 @@ The history order is reversed so that new features are at the top.
 	  csGrowingArray. Consequently removed the GROWING ARRAY macros.
 	- Andreas Busch modified the documentation for all meshobjects
 	  from old syntax to XML. The thing documentation needs a big
-	  review, and Texinfo box-warnings need to be checked.
+	  review.
 	- Eric Sunshine augmented the configure script to emit
 	  CS_UNIX_PLUGIN_REQUIRES_MAIN to volatile.h for Unix platforms.  Note
 	  that it emits this based upon the broad assumption that Unix

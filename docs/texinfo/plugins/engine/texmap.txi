@@ -825,7 +825,7 @@ equations.
 @subsubsection Instructions for Texture Mapper
 
 In the Crystal Space map file,
-the @samp{ORIG}, @samp{FIRST}, and @samp{SECOND} vertex keywords describe the
+the @samp{orig}, @samp{first}, and @samp{second} vertex keywords describe the
 texture plane.  What Crystal Space does internally is to create a
 transformation matrix/vector which translates object space (3D coordinates) to
 texture space (@math{u,v} coordinates).  Here is how this works.
@@ -835,15 +835,15 @@ First a few definitions:
 
 @itemize @bullet
 @item
-@code{ORIG} vector is @Nn{V,o}
+@code{orig} vector is @Nn{V,o}
 @item
-@code{FIRST} vector is @Nn{V,1}
+@code{first} vector is @Nn{V,1}
 @item
-@code{SECOND} vector is @Nn{V,2}
+@code{second} vector is @Nn{V,2}
 @item
-@code{FIRST_LEN} is @Nn{L,1}
+@code{firstlen} is @Nn{L,1}
 @item
-@code{SECOND_LEN} is @Nn{L,2}
+@code{secondlen} is @Nn{L,2}
 @item
 Length of
 @ifnottex
