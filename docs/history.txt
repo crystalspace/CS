@@ -27,6 +27,9 @@ chronological order.
 	- Luca modified his last commit, upon advice of res, using the right
 	  order for the libraries' dependency, id est: cstool csgfx csgeom 
 	  csutil.
+    - acraig Fixed two problems in sprcal3d. First was a check to make sure
+      it does not attach the same mesh more then once.  Second is a fix to 
+      SetMaterial() to use the right mesh id.  
 17-Jan-2004
         - Steven Geens added HitBeamOutline and HitBeamObject for sprcal3d.
 	  He's not completely sure it works, but it doesn't seem to break

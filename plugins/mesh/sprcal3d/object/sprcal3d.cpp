@@ -1798,7 +1798,10 @@ bool csSpriteCal3DMeshObject::AttachCoreMesh(const char *meshname)
 }
 
 bool csSpriteCal3DMeshObject::AttachCoreMesh(int mesh_id,int iMatWrapID)
-{
+{  
+  if ( attached_ids.Find( mesh_id ) != -1 )
+    return true;
+    
   if (!calModel.attachMesh(mesh_id))
     return false;
 
@@ -1848,9 +1851,9 @@ bool csSpriteCal3DMeshObject::DetachCoreMesh (int mesh_id)
       int j;
       for (j=i+1; j<attached_ids.Length(); j++)
       {
-	meshes[j-1] = meshes[j];
-	is_initialized[j-1] = is_initialized[j];
-	meshes_colors[j-1]  = meshes_colors[j];
+        meshes[j-1] = meshes[j];
+        is_initialized[j-1] = is_initialized[j];
+        meshes_colors[j-1]  = meshes_colors[j];
       }
       meshes[j-1].DeleteAll();
       is_initialized[j-1].DeleteAll();
@@ -1914,13 +1917,13 @@ bool csSpriteCal3DMeshObject::SetMaterial(const char *mesh_name,iMaterialWrapper
   int idx = factory->FindMeshName(mesh_name);
   if (idx == -1)
     return false;
-
+          
   int i,j;
   for (i=0; i<attached_ids.Length(); i++)
   {
     if (attached_ids[i] == idx)
     {
-      CalMesh *mesh = calModel.getMesh(i);
+      CalMesh *mesh = calModel.getMesh(attached_ids[i]);
       for (j=0; j<mesh->getSubmeshCount(); j++)
       {
         mesh->getSubmesh(j)->setCoreMaterialId((int)mat);
