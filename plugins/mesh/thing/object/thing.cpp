@@ -1764,9 +1764,10 @@ bool csThing::HitBeamOutline (const csVector3& start,
 }
 
 bool csThing::HitBeamObject (const csVector3& start,
-  const csVector3& end, csVector3& isect, float *pr)
+  const csVector3& end, csVector3& isect, float *pr, int* polygon_idx)
 {
   int idx = static_data->IntersectSegmentIndex (start, end, isect, pr, false);
+  if (polygon_idx) *polygon_idx = idx;
   if (idx == -1) return false;
   return true;
 }

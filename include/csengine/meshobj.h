@@ -534,7 +534,7 @@ public:
    * Return the collision point in object space coordinates.
    */
   bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr);
+  	csVector3& isect, float* pr, int* polygon_idx = 0);
   /**
    * Check if this object is hit by this world space vector.
    * Return the collision point in world space coordinates.
@@ -650,9 +650,9 @@ public:
       return scfParent->HitBeamOutline (start, end, isect, pr);
     }
     virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr)
+  	csVector3& isect, float* pr, int* polygon_idx = 0)
     {
-      return scfParent->HitBeamObject (start, end, isect, pr);
+      return scfParent->HitBeamObject (start, end, isect, pr, polygon_idx);
     }
     virtual bool HitBeam (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr)

@@ -812,8 +812,10 @@ printf ("ChunkLOD: HitBeamOutline called, but not implemented\n");
 }
 
 bool csChunkLodTerrainObject::HitBeamObject (const csVector3& start,
-	const csVector3& end, csVector3& isect, float* pr)
+	const csVector3& end, csVector3& isect, float* pr,
+	int* polygon_idx)
 {
+  if (polygon_idx) *polygon_idx = -1;
 printf ("ChunkLOD: HitBeamObject called, but not implemented\n");
   return false;
 }

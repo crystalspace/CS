@@ -53,7 +53,8 @@ public:
   bool HitBeamOutline (csSegment3 seg,
     csVector3& isect, float* pr);
   bool HitBeamObject (csSegment3 seg,
-    csVector3& isect, float* pr, float &distance);
+    csVector3& isect, float* pr, float &distance,
+    int* polygon_idx = 0);
 };
 
 class csBCCollisionQuad
@@ -76,7 +77,8 @@ public:
   bool HitBeamOutline (const csVector3& start, const csVector3& end,
     csVector3& isect, float* pr);
   bool HitBeamObject (const csVector3& start, const csVector3& end,
-    csVector3& isect, float* pr);
+    csVector3& isect, float* pr,
+    int* polygon_idx = 0);
 };
 
 

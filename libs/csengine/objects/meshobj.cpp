@@ -492,9 +492,9 @@ bool csMeshWrapper::HitBeamObject (
   const csVector3 &start,
   const csVector3 &end,
   csVector3 &isect,
-  float *pr)
+  float *pr, int* polygon_idx)
 {
-  return meshobj->HitBeamObject (start, end, isect, pr);
+  return meshobj->HitBeamObject (start, end, isect, pr, polygon_idx);
 }
 
 bool csMeshWrapper::HitBeam (

@@ -1796,11 +1796,13 @@ bool csBCTerrObject::HitBeamOutline (const csVector3& start, const csVector3& en
     return false;
 }
 
-bool csBCTerrObject::HitBeamObject (const csVector3& start, const csVector3& end,
-    csVector3& isect, float* pr)
+bool csBCTerrObject::HitBeamObject (const csVector3& start,
+	const csVector3& end, csVector3& isect, float* pr,
+	int* polygon_idx)
 {
+  if (polygon_idx) *polygon_idx = -1;
   if (collision)
-    return collision->HitBeamObject (start, end, isect, pr);
+    return collision->HitBeamObject (start, end, isect, pr, polygon_idx);
   else
     return false;
 }

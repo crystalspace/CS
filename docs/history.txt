@@ -9,6 +9,10 @@ chronological order.
 26-Sep-2003
 	- Jorrit fixed the static lod documentation which forgot to mention
 	  that you had to add the children to the parent too.
+	- Jorrit added an optional polygon_idx parameter to
+	  iMeshObject->HitBeamObject(). Currently only thing supports this.
+	  The intention is that you can get the index of the polygon that is
+	  hit.
 25-Sep-2003
 	- Jorrit removed iCamera->GetHit(). This function is only a very
 	  thin wrapper on top of iSector->HitBeamPortals() so it is not

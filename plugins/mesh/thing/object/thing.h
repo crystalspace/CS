@@ -892,7 +892,7 @@ public:
    * Test a beam with this thing.
    */
   bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr);
+  	csVector3& isect, float* pr, int* polygon_idx = 0);
 
   //----------------------------------------------------------------------
   // Transformation
@@ -1122,9 +1122,9 @@ public:
       return scfParent->HitBeamOutline (start, end, isect, pr);
     }
     virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr)
+  	csVector3& isect, float* pr, int* polygon_idx = 0)
     {
-      return scfParent->HitBeamObject (start, end, isect, pr);
+      return scfParent->HitBeamObject (start, end, isect, pr, polygon_idx);
     }
     virtual void SetLogicalParent (iBase* lp) { scfParent->logparent = lp; }
     virtual iBase* GetLogicalParent () const { return scfParent->logparent; }

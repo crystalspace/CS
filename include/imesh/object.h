@@ -48,7 +48,7 @@ struct iMeshObjectDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshObject, 0, 2, 0);
+SCF_VERSION (iMeshObject, 0, 2, 1);
 
 /**
  * This is a general mesh object that the engine can interact with. The mesh
@@ -157,10 +157,11 @@ struct iMeshObject : public iBase
    * Return the collision point in object space coordinates.
    * This is the most detailed version (and also the slowest). The
    * returned hit will be guaranteed to be the point closest to the
-   * 'start' of the beam.
+   * 'start' of the beam. If the object supports this then an index
+   * of the hit polygon will be returned (or -1 if not supported or no hit).
    */
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr) = 0;
+  	csVector3& isect, float* pr, int* polygon_idx = 0) = 0;
 
   /**
    * Set a reference to some logical parent in the context that holds

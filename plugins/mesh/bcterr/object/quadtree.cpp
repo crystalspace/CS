@@ -110,8 +110,9 @@ bool csColQuad::HitBeamOutline (csSegment3 seg,
 }
 
 bool csColQuad::HitBeamObject (csSegment3 seg,
-    csVector3& isect, float* pr, float &distance)
+    csVector3& isect, float* pr, float &distance, int* polygon_idx)
 {
+  if (polygon_idx) *polygon_idx = -1;
   if (csIntersect3::BoxSegment (bbox, seg, isect, pr) )
   //if (BBoxLineIntersect (bbox, seg, isect, pr) )
   {
@@ -660,10 +661,11 @@ bool csBCCollisionQuad::HitBeamOutline (const csVector3& start, const csVector3&
   csSegment3 seg (start, end);
   return root_quad->HitBeamOutline ( seg, isect, pr);
 }
-bool csBCCollisionQuad::HitBeamObject (const csVector3& start, const csVector3& end,
-    csVector3& isect, float* pr)
+bool csBCCollisionQuad::HitBeamObject (const csVector3& start,
+	const csVector3& end, csVector3& isect, float* pr,
+	int* polygon_idx)
 {
   csSegment3 seg (start, end);
   float dist = 0;
-  return root_quad->HitBeamObject (seg, isect, pr, dist);
+  return root_quad->HitBeamObject (seg, isect, pr, dist, polygon_idx);
 }

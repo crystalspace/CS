@@ -194,7 +194,7 @@ public:
   virtual bool HitBeamOutline (const csVector3& start,
   	const csVector3& end, csVector3& isect, float* pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr);
+  	csVector3& isect, float* pr, int* polygon_idx = 0);
   virtual int GetPortalCount () const { return portals.Length () ; }
   virtual iPortal* GetPortal (int idx) const { return (iPortal*)portals[idx]; }
 

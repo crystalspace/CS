@@ -244,7 +244,7 @@ struct iMeshWrapper : public iBase
    * is more accurate than HitBeamOutline.
    */
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr) = 0;
+  	csVector3& isect, float* pr, int* polygon_idx = 0) = 0;
   /**
    * Check if this object is hit by this world space vector.
    * Return the collision point in world space coordinates.

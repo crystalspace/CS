@@ -451,8 +451,12 @@ int csSector::IntersectSegment (
     }
     else
     {
-      // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ TODO @@@@@@@@@@@@@@@@@@@@@@
-      // iPortalContainer
+      // @@@ Use iMeshWrapper->GetPortalContainer() when that exists!!!
+      //csRef<iPortalContainer> pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+      	//iPortalContainer);
+      //CS_ASSERT (pc != 0);
+      //int i;
+      //for (i = 0 ; i < 
     }
   }
 

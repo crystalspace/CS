@@ -88,13 +88,13 @@ public:
   virtual iMeshObjectFactory* GetFactory () const = 0;
 
   /**
-   * See imesh/object.h for sepcification. The default implementation
+   * See imesh/object.h for specification. The default implementation
    * does nothing and always returns true.
    */
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
 
   /**
-   * See imesh/object.h for sepcification. The default implementation
+   * See imesh/object.h for specification. The default implementation
    * does nothing and always returns 0.
    * @@@ Note: in future it would be better that the default implementation
    * does nothing as this function has to be implemented by mesh objects.
@@ -106,72 +106,72 @@ public:
   }
 
   /**
-   * See imesh/object.h for sepcification. The default implementation
+   * See imesh/object.h for specification. The default implementation
    * does nothing.
    */
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
 
   /**
-   * See imesh/object.h for sepcification. There is no default
+   * See imesh/object.h for specification. There is no default
    * implementation for this method.
    */
   virtual bool Draw (iRenderView* rview, iMovable* movable,
   	csZBufMode zbufMode) = 0;
 
   /**
-   * See imesh/object.h for sepcification. This function is handled
+   * See imesh/object.h for specification. This function is handled
    * completely in csMeshObject. The actual implementation just has
    * to use the VisCallback variable to perform the callback.
    */
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb);
 
   /**
-   * See imesh/object.h for sepcification. This function is handled
+   * See imesh/object.h for specification. This function is handled
    * completely in csMeshObject.
    */
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const;
 
   /**
-   * See imesh/object.h for sepcification. The default implementation
+   * See imesh/object.h for specification. The default implementation
    * does nothing.
    */
   virtual void NextFrame (csTicks current_time,const csVector3& pos);
 
   /**
-   * See imesh/object.h for sepcification. The default implementation
+   * See imesh/object.h for specification. The default implementation
    * does nothing.
    */
   virtual void HardTransform (const csReversibleTransform& t);
 
   /**
-   * See imesh/object.h for sepcification. The default implementation
+   * See imesh/object.h for specification. The default implementation
    * returns false.
    */
   virtual bool SupportsHardTransform () const;
 
   /**
-   * See imesh/object.h for sepcification. The default implementation
+   * See imesh/object.h for specification. The default implementation
    * will always return a miss.
    */
   virtual bool HitBeamOutline (const csVector3& start,
   	const csVector3& end, csVector3& isect, float* pr);
 
   /**
-   * See imesh/object.h for sepcification. The default implementation
+   * See imesh/object.h for specification. The default implementation
    * will always return a miss.
    */
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr);
+  	csVector3& isect, float* pr, int* polygon_idx = 0);
 
   /**
-   * See imesh/object.h for sepcification. This function is handled
+   * See imesh/object.h for specification. This function is handled
    * completely in csMeshObject.
    */
   virtual void SetLogicalParent (iBase* logparent);
 
   /**
-   * See imesh/object.h for sepcification. This function is handled
+   * See imesh/object.h for specification. This function is handled
    * completely in csMeshObject.
    */
   virtual iBase* GetLogicalParent () const;
@@ -182,25 +182,25 @@ public:
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
   /**
-   * See imesh/object.h for sepcification. The default implementation
+   * See imesh/object.h for specification. The default implementation
    * does not support a base color.
    */
   virtual bool SetColor (const csColor& color);
 
   /**
-   * See imesh/object.h for sepcification. The default implementation
+   * See imesh/object.h for specification. The default implementation
    * does not support a base color.
    */
   virtual bool GetColor (csColor& color) const;
 
   /**
-   * See imesh/object.h for sepcification. The default implementation
+   * See imesh/object.h for specification. The default implementation
    * does not support a material.
    */
   virtual bool SetMaterialWrapper (iMaterialWrapper* material);
 
   /**
-   * See imesh/object.h for sepcification. The default implementation
+   * See imesh/object.h for specification. The default implementation
    * does not support a material.
    */
   virtual iMaterialWrapper* GetMaterialWrapper () const;
@@ -218,7 +218,7 @@ public:
   virtual int GetPortalCount () const { return 0; }
 
   /**
-   * See imesh/object.h for sepcification. The default implementation
+   * See imesh/object.h for specification. The default implementation
    * does not support portals.
    */
   virtual iPortal* GetPortal (int) const { return 0; }
@@ -277,31 +277,31 @@ public:
   virtual ~csMeshFactory ();
 
   /**
-   * See imesh/object.h for sepcification. There is no default
+   * See imesh/object.h for specification. There is no default
    * implementation for this method.
    */
   virtual csPtr<iMeshObject> NewInstance () = 0;
 
   /**
-   * See imesh/object.h for sepcification. The default implementation
+   * See imesh/object.h for specification. The default implementation
    * does nothing.
    */
   virtual void HardTransform (const csReversibleTransform& t);
 
   /**
-   * See imesh/object.h for sepcification. The default implementation
+   * See imesh/object.h for specification. The default implementation
    * returns false.
    */
   virtual bool SupportsHardTransform () const;
 
   /**
-   * See imesh/object.h for sepcification. This function is handled
+   * See imesh/object.h for specification. This function is handled
    * completely in csMeshObject.
    */
   virtual void SetLogicalParent (iBase* logparent);
 
   /**
-   * See imesh/object.h for sepcification. This function is handled
+   * See imesh/object.h for specification. This function is handled
    * completely in csMeshObject.
    */
   virtual iBase* GetLogicalParent () const;
@@ -340,7 +340,7 @@ public:
   bool Initialize (iObjectRegistry* reg);
 
   /**
-   * See imesh/object.h for sepcification. There is no default
+   * See imesh/object.h for specification. There is no default
    * implementation for this method.
    */
   virtual csPtr<iMeshObjectFactory> NewFactory () = 0;

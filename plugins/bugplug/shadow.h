@@ -129,7 +129,7 @@ public:
         csVector3&, float*)
   { return false; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
-  	csVector3&, float*) { return false; }
+  	csVector3&, float*, int* = 0) { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
 

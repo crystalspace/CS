@@ -305,8 +305,9 @@ bool csStuffObject::HitBeamOutline (const csVector3& start,
 }
 	
 bool csStuffObject::HitBeamObject (const csVector3& start,
-  const csVector3& end, csVector3& isect, float* pr)
+  const csVector3& end, csVector3& isect, float* pr, int* polygon_idx)
 {
+  if (polygon_idx) *polygon_idx = -1;
   // This is now closer to an outline hitting method. It will
   // return as soon as it touches any triangle in the mesh, and
   // will be a bit faster than its more accurate cousin (below).

@@ -838,7 +838,7 @@ bool csBigTerrainObject::HitBeamOutline (const csVector3&, const csVector3&, csV
 	return false;
 }
 
-bool csBigTerrainObject::HitBeamObject (const csVector3&, const csVector3&, csVector3&, float*)
+bool csBigTerrainObject::HitBeamObject (const csVector3&, const csVector3&, csVector3&, float*, int*)
 // csBigTerrainObject::HitBeamObject (const csVector3& start, const csVector3& end, csVector3& isect, float* pr)
 {
 	return false;

@@ -90,8 +90,8 @@ bool csMeshObject::HitBeamOutline (const csVector3& start,
   return false;
 }
 
-bool csMeshObject::HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr)
+bool csMeshObject::HitBeamObject (const csVector3&, const csVector3&,
+  	csVector3&, float*, int*)
 {
   return false;
 }

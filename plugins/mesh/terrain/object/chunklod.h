@@ -280,7 +280,7 @@ public:
 	csVector3& isect, float* pr);
   /// Find exact position of a beam hit
   bool HitBeamObject (const csVector3& start, const csVector3& end, 
-	csVector3& isect, float* pr);
+	csVector3& isect, float* pr, int* polygon_idx = 0);
 
   /// Set/Get logical parent
   void SetLogicalParent (iBase* lp) { logparent = lp; }

@@ -421,7 +421,7 @@ public:
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end, csVector3& isect, float* pr);
 
   /// Check exactly where the hit is.
-  virtual bool HitBeamObject (const csVector3& start, const csVector3& end, csVector3& isect, float* pr);
+  virtual bool HitBeamObject (const csVector3& start, const csVector3& end, csVector3& isect, float* pr, int* = 0);
 
   ///////////////////////////////////////////////////////////////////
 

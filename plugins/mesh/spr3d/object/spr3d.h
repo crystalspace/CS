@@ -1711,7 +1711,7 @@ public:
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
     csVector3& intersect, float* pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-    csVector3& intersect, float* pr);
+    csVector3& intersect, float* pr, int* polygon_idx = 0);
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
 

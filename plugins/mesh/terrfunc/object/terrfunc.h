@@ -527,7 +527,7 @@ public:
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
         csVector3& isect, float* pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr);
+  	csVector3& isect, float* pr, int* polygon_idx = 0);
 
   //------------------------- iObjectModel implementation ----------------
   class ObjectModel : public csObjectModel

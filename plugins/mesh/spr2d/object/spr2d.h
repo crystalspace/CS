@@ -142,8 +142,11 @@ public:
         csVector3&, float*);
   /// 2D sprites have no depth, so this is equivalent to HitBeamOutline.
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr)
-  { return HitBeamOutline(start, end, isect, pr); }
+  	csVector3& isect, float* pr, int* polygon_idx = 0)
+  {
+    if (polygon_idx) *polygon_idx = -1;
+    return HitBeamOutline(start, end, isect, pr);
+  }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
 

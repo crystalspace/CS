@@ -146,7 +146,7 @@ class           csStuffObject:public iMeshObject
     virtual bool    HitBeamOutline(const csVector3 &, const csVector3 &,
 				   csVector3 &, float *);
     virtual bool    HitBeamObject(const csVector3 &, const csVector3 &,
-				  csVector3 &, float *);
+				  csVector3 &, float *, int* = 0);
     virtual void    SetLogicalParent(iBase *);
     virtual iBase  *GetLogicalParent() const;
     void            GetObjectBoundingBox(csBox3 & bbox, int type =

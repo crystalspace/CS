@@ -619,8 +619,9 @@ bool csMetaBall::HitBeamOutline (const csVector3& start, const csVector3& end,
 }
 
 bool csMetaBall::HitBeamObject( const csVector3& start, const csVector3& end,
-  csVector3& isect, float *pr)
+  csVector3& isect, float *pr, int* polygon_idx)
 {
+  if (polygon_idx) *polygon_idx = -1;
   int i, max = int(vertices_tesselated/3);
   csSegment3 seg (start, end);
   csVector3 tmp;

@@ -922,13 +922,15 @@ bool csPortalContainer::HitBeamOutline (const csVector3& start,
 }
 
 bool csPortalContainer::HitBeamObject (const csVector3& start,
-	const csVector3& end, csVector3& isect, float* pr)
+	const csVector3& end, csVector3& isect, float* pr,
+	int* polygon_idx)
 {
   Prepare ();
   (void)start;
   (void)end;
   (void)isect;
   (void)pr;
+  (void)polygon_idx;
   return false;
 }
 
