@@ -106,7 +106,7 @@ WORLD (
 	  POLYGON 'left3' (VERTICES (17,5,1,9))
 	)
     )
-    LIGHT (CENTER (0, 0, 0) RADIUS (80) COLOR (1,1,1))
+    LIGHT (CENTER (0, 0, 0) RADIUS (40) COLOR (1,1,1))
     MESHOBJ 'flame' (
       PLUGIN ('fire')
       ZTEST ()
@@ -218,7 +218,7 @@ WORLD (
 	)
       HARDMOVE (V (0,0,40))
     )
-    LIGHT (CENTER (0, 0, 40) RADIUS (80) COLOR (0,0,1))
+    LIGHT (CENTER (0, 0, 40) RADIUS (40) COLOR (0,0,1))
     MESHOBJ 'emit1' (
       PLUGIN ('emit')
       ZTEST ()
@@ -359,7 +359,7 @@ WORLD (
 	)
       HARDMOVE (V (0,0,80))
     )
-    LIGHT (CENTER (0, 0, 80) RADIUS (80) COLOR (1,0,1))
+    LIGHT (CENTER (0, 0, 80) RADIUS (40) COLOR (1,0,1))
     MESHOBJ 'fire' (
       PLUGIN ('fire')
       ZTEST ()
@@ -482,7 +482,7 @@ WORLD (
 	)
       HARDMOVE (V (-40,0,80))
     )
-    LIGHT (CENTER (-40, 0, 80) RADIUS (80) COLOR (1,1,0))
+    LIGHT (CENTER (-40, 0, 80) RADIUS (40) COLOR (1,1,0))
     MESHOBJ 'emit7' (
       PLUGIN ('emit')
       ZTEST ()
@@ -630,7 +630,7 @@ WORLD (
 	)
       HARDMOVE (V (40,0,0))
     )
-    LIGHT (CENTER (40, 0, 0) RADIUS (80) COLOR (1,0,0))
+    LIGHT (CENTER (40, 0, 0) RADIUS (40) COLOR (1,0,0))
   )
   SECTOR 'room2,0' (
     MESHOBJ 'walls' (
@@ -672,6 +672,6 @@ WORLD (
 	)
       HARDMOVE (V (80,0,0))
     )
-    LIGHT (CENTER (80, 0, 0) RADIUS (80) COLOR (0,1,0))
+    LIGHT (CENTER (80, 0, 0) RADIUS (40) COLOR (0,1,0))
   )
 )
