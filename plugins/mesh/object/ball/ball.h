@@ -153,7 +153,7 @@ public:
     }
     virtual void GetRadius (float& radx, float& rady, float& radz) const
     { 
-      return scfParent->GetRadius (radx, rady, radz);
+      scfParent->GetRadius (radx, rady, radz);
     }
     virtual void SetShift (float shiftx, float shifty, float shiftz)
     {
