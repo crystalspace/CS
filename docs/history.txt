@@ -13,6 +13,12 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+3-Oct-1999
+	- Eric Sunshine modified the configuration of makedep slightly so
+	  that certain platform-specific porting information is maintained by
+	  the makefile system.  Hopefully this will help to eliminate the need
+	  to actually change makedep's source code as it is ported to new
+	  platforms.
 1-Oct-1999
 	- Eric Sunshine fixed makedep so that it compiles on BeOS.
 	- Eric Sunshine fixed a compiler warning in impexp.cpp where the order
