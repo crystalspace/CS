@@ -129,8 +129,6 @@ public:
 	iEngine* engine, int vt_offset, bool isParent,
 	iMeshWrapper* mesh);
 
-  void OptimizePolygon (iPolygon3DStatic *p);
-
 public:
   SCF_DECLARE_IBASE;
 

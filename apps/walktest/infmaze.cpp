@@ -177,7 +177,8 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
   return ird;
 }
 
-void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2, int z2, bool create_portal1)
+void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2,
+	int z2, bool create_portal1)
 {
   InfRoomData* s1 = (InfRoomData*)(infinite_world->Get (x1, y1, z1));
   InfRoomData* s2 = (InfRoomData*)(infinite_world->Get (x2, y2, z2));
@@ -194,8 +195,9 @@ void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2, int
     else { p1 = "w"; p2 = "e"; }
   iPolygon3DStatic* po1 = s1->walls_fact_state->GetPolygon (p1);
   iPolygon3DStatic* po2 = s2->walls_fact_state->GetPolygon (p2);
-  if (create_portal1) po1->CreatePortal (s2->sector);
-  po2->CreatePortal (s1->sector);
+  //@@@@@@@@@
+  //if (create_portal1) po1->CreatePortal (s2->sector);
+  //po2->CreatePortal (s1->sector);
 }
 
 SCF_IMPLEMENT_IBASE (InfPortalCS)
@@ -308,12 +310,13 @@ void InfiniteMaze::create_loose_portal (int x1, int y1, int z1,
     else p1 = "w";
   InfRoomData* s = (InfRoomData*)(infinite_world->Get (x1, y1, z1));
   iPolygon3DStatic* po = s->walls_fact_state->GetPolygon (p1);
-  iPortal* portal = po->CreateNullPortal ();
+  //@@@@@@@@@@@@
+  //iPortal* portal = po->CreateNullPortal ();
   InfPortalCS* prt = new InfPortalCS ();
   prt->x1 = x1; prt->y1 = y1; prt->z1 = z1;
   prt->x2 = x2; prt->y2 = y2; prt->z2 = z2;
   infinite_world->Set (x2, y2, z2, (void*)1);
-  portal->SetMissingSectorCallback (prt);
+  //portal->SetMissingSectorCallback (prt);
 }
 
 void InfiniteMaze::random_loose_portals (int x1, int y1, int z1)

@@ -26,15 +26,14 @@
 #include "iengine/portal.h"
 #include "csutil/debug.h"
 #include "iengine/rview.h"
-#include "imesh/thing/polygon.h"
 #include "ivideo/graph3d.h"
 
 csImposterMesh::csImposterMesh(csMeshWrapper *parent,iObjectRegistry *objreg)
 {
-    parent_mesh = parent;
-    tex		= new csImposterProcTex(this,objreg);
-    ready	= false;
-    incidence_dist = 0;
+  parent_mesh = parent;
+  tex		= new csImposterProcTex(this,objreg);
+  ready	= false;
+  incidence_dist = 0;
 }
 
 float csImposterMesh::CalcIncidenceAngleDist(iRenderView *rview)

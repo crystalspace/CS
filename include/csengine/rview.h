@@ -321,12 +321,10 @@ public:
 
   /// Get the last portal.
   virtual iPortal* GetLastPortal () { return ctxt->last_portal; }
-  virtual iPolygon3D* GetLastPortalP () { return ctxt->portal_polygon; }
   /// Set the last portal.
-  virtual void SetLastPortal (iPortal* por, iPolygon3D* p)
+  virtual void SetLastPortal (iPortal* por)
   {
     ctxt->last_portal = por;
-    ctxt->portal_polygon = p;
   }
 
   /**

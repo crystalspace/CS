@@ -45,6 +45,7 @@ struct iLight;
 struct iLightingInfo;
 struct iShadowReceiver;
 struct iObject;
+struct iPortalContainer;
 class csFlags;
 class csRenderMesh;
 
@@ -112,7 +113,7 @@ struct iMeshDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshWrapper, 0, 7, 0);
+SCF_VERSION (iMeshWrapper, 0, 8, 0);
 
 /**
  * A mesh wrapper is an engine-level object that wraps around an actual
@@ -139,6 +140,11 @@ struct iMeshWrapper : public iBase
   virtual iMeshObject* GetMeshObject () const = 0;
   /// Set the iMeshObject.
   virtual void SetMeshObject (iMeshObject*) = 0;
+  /**
+   * If this mesh is a portal container you can use GetPortalContainer() to
+   * get the portal container interface.
+   */
+  virtual iPortalContainer* GetPortalContainer () const = 0;
 
   /**
    * Get the optional lighting information that is implemented

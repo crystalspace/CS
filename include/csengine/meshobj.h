@@ -223,6 +223,12 @@ private:
   /// For optimization purposes we keep the iShadowReceiver interface here.
   csRef<iShadowReceiver> shadow_receiver;
 
+  /**
+   * For optimization purposes we keep the portal container interface here
+   * (only if this object is a portal container of course).
+   */
+  csRef<iPortalContainer> portal_container;
+
   /// Children of this object (other instances of iMeshWrapper).
   csMeshMeshList children;
 
@@ -320,6 +326,8 @@ public:
   void SetMeshObject (iMeshObject* meshobj);
   /// Get the mesh object.
   iMeshObject* GetMeshObject () const { return meshobj; }
+
+  iPortalContainer* GetPortalContainer () const { return portal_container; }
 
   /// For iVisibilityObject: Get the object model.
   virtual iObjectModel* GetObjectModel ()
@@ -617,6 +625,10 @@ public:
     virtual void SetMeshObject (iMeshObject* m)
     {
       scfParent->SetMeshObject (m);
+    }
+    virtual iPortalContainer* GetPortalContainer () const
+    {
+      return scfParent->GetPortalContainer ();
     }
     virtual iLightingInfo* GetLightingInfo () const
     {

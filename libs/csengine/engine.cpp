@@ -70,7 +70,6 @@
 #include "ivaria/engseq.h"
 #include "iutil/plugin.h"
 #include "iutil/virtclk.h"
-#include "imesh/thing/polygon.h"
 #include "ivideo/graph3d.h"
 #include "igeom/clip2d.h"
 
@@ -2520,112 +2519,53 @@ void csEngine::GetNearbyObjectList (iSector* sector,
     if (imw)
     {
       list.Push (imw->QueryObject ()); 
-      if (crossPortals && imw->GetMeshObject ()->GetPortalCount () > 0)
+      if (crossPortals && imw->GetPortalContainer ())
       {
-        csRef<iThingState> st = SCF_QUERY_INTERFACE (
-		imw->GetMeshObject (), iThingState);
-        if (st)
+	iPortalContainer* portals = imw->GetPortalContainer ();
+        int pc = portals->GetPortalCount ();
+        int j;
+        for (j = 0 ; j < pc ; j++)
         {
-	//@@@@ TEMPORARY UNTIL PORTALS ARE REMOVED FROM THING!
-          // Check if there are portals and if they are near the position.
-          int pc = st->GetFactory ()->GetPortalCount ();
-          int j;
-          for (j = 0 ; j < pc ; j++)
+          iPortal* portal = portals->GetPortal (j);
+          const csPlane3& wor_plane = portal->GetWorldPlane ();
+	  const csVector3* world_vertices = portal->GetVertices (); // @@@ NEED WORLD!
+          // Can we see the portal?
+          if (wor_plane.Classify (pos) < -0.001)
           {
-            iPolygon3D* pp = st->GetPortalPolygon (j);
-	    iPolygon3DStatic* pps = pp->GetStaticData ();
-            const csPlane3& wor_plane = pp->GetWorldPlane ();
-            // Can we see the portal?
-            if (wor_plane.Classify (pos) < -0.001)
+            csVector3 poly[100];	//@@@ HARDCODE
+            int k;
+	    int* idx = portal->GetVertexIndices ();
+            for (k = 0 ; k < portal->GetVertexIndicesCount () ; k++)
             {
-              csVector3 poly[100];	//@@@ HARDCODE
-              int k;
-              for (k = 0 ; k < pps->GetVertexCount () ; k++)
+              poly[k] = world_vertices[idx[k]];
+            }
+            float sqdist_portal = csSquaredDist::PointPoly (
+                  pos, poly, portal->GetVertexIndicesCount (),
+                  wor_plane);
+            if (sqdist_portal <= radius * radius)
+            {
+              // Also handle objects in the destination sector unless
+              // it is a warping sector.
+              portal->CompleteSector (0);
+              CS_ASSERT (portal != 0);
+              if (sector != portal->GetSector () && portal->GetSector ()
+                              && !portal->GetFlags ().Check (CS_PORTAL_WARP))
               {
-                poly[k] = pp->GetVertexW (k);
-              }
-              float sqdist_portal = csSquaredDist::PointPoly (
-                    pos, poly, pps->GetVertexCount (),
-                    wor_plane);
-              if (sqdist_portal <= radius * radius)
-              {
-                // Also handle objects in the destination sector unless
-                // it is a warping sector.
-                iPortal* portal = pps->GetPortal ();
-                portal->CompleteSector (0);
-                CS_ASSERT (portal != 0);
-                if (sector != portal->GetSector () && portal->GetSector ()
-                                && !portal->GetFlags ().Check (CS_PORTAL_WARP))
+                int l;
+                bool already_visited = false;
+                for (l = 0 ; l < visited_sectors.Length () ; l++)
                 {
-                  int l;
-                  bool already_visited = false;
-                  for (l = 0 ; l < visited_sectors.Length () ; l++)
+                  if (visited_sectors[l] == portal->GetSector ())
                   {
-                    if (visited_sectors[l] == portal->GetSector ())
-                    {
-                      already_visited = true;
-                      break;
-                    }
-                  }
-                  if (!already_visited)
-                  {
-                    visited_sectors.Push (portal->GetSector ());
-                    GetNearbyObjectList (portal->GetSector (), pos, radius, list,
-                                         visited_sectors);
+                    already_visited = true;
+                    break;
                   }
                 }
-              }
-            }
-          }
-        }
-	else
-	{
-	  iMeshObject* meshobj = imw->GetMeshObject ();
-          int pc = meshobj->GetPortalCount ();
-          int j;
-          for (j = 0 ; j < pc ; j++)
-          {
-            iPortal* portal = meshobj->GetPortal (j);
-            const csPlane3& wor_plane = portal->GetWorldPlane ();
-	    const csVector3* world_vertices = portal->GetVertices (); // @@@ NEED WORLD!
-            // Can we see the portal?
-            if (wor_plane.Classify (pos) < -0.001)
-            {
-              csVector3 poly[100];	//@@@ HARDCODE
-              int k;
-	      int* idx = portal->GetVertexIndices ();
-              for (k = 0 ; k < portal->GetVertexIndicesCount () ; k++)
-              {
-                poly[k] = world_vertices[idx[k]];
-              }
-              float sqdist_portal = csSquaredDist::PointPoly (
-                    pos, poly, portal->GetVertexIndicesCount (),
-                    wor_plane);
-              if (sqdist_portal <= radius * radius)
-              {
-                // Also handle objects in the destination sector unless
-                // it is a warping sector.
-                portal->CompleteSector (0);
-                CS_ASSERT (portal != 0);
-                if (sector != portal->GetSector () && portal->GetSector ()
-                                && !portal->GetFlags ().Check (CS_PORTAL_WARP))
+                if (!already_visited)
                 {
-                  int l;
-                  bool already_visited = false;
-                  for (l = 0 ; l < visited_sectors.Length () ; l++)
-                  {
-                    if (visited_sectors[l] == portal->GetSector ())
-                    {
-                      already_visited = true;
-                      break;
-                    }
-                  }
-                  if (!already_visited)
-                  {
-                    visited_sectors.Push (portal->GetSector ());
-                    GetNearbyObjectList (portal->GetSector (), pos, radius, list,
-                                         visited_sectors);
-                  }
+                  visited_sectors.Push (portal->GetSector ());
+                  GetNearbyObjectList (portal->GetSector (), pos, radius, list,
+                                       visited_sectors);
                 }
               }
             }
@@ -2682,112 +2622,53 @@ void csEngine::GetNearbyMeshList (iSector* sector,
     if (imw)
     {
       list.Push (imw); 
-      if (crossPortals && imw->GetMeshObject ()->GetPortalCount () > 0)
+      if (crossPortals && imw->GetPortalContainer ())
       {
-        csRef<iThingState> st = SCF_QUERY_INTERFACE (
-		imw->GetMeshObject (), iThingState);
-        if (st)
+        iPortalContainer* portals = imw->GetPortalContainer ();
+        int pc = portals->GetPortalCount ();
+        int j;
+        for (j = 0 ; j < pc ; j++)
         {
-	//@@@@ TEMPORARY UNTIL PORTALS ARE REMOVED FROM THING!
-          // Check if there are portals and if they are near the position.
-          int pc = st->GetFactory ()->GetPortalCount ();
-          int j;
-          for (j = 0 ; j < pc ; j++)
+          iPortal* portal = portals->GetPortal (j);
+          const csPlane3& wor_plane = portal->GetWorldPlane ();
+	  const csVector3* world_vertices = portal->GetVertices (); // @@@ NEED WORLD!
+          // Can we see the portal?
+          if (wor_plane.Classify (pos) < -0.001)
           {
-            iPolygon3D* pp = st->GetPortalPolygon (j);
-	    iPolygon3DStatic* pps = pp->GetStaticData ();
-            const csPlane3& wor_plane = pp->GetWorldPlane ();
-            // Can we see the portal?
-            if (wor_plane.Classify (pos) < -0.001)
+            csVector3 poly[100];	//@@@ HARDCODE
+          int k;
+	    int* idx = portal->GetVertexIndices ();
+            for (k = 0 ; k < portal->GetVertexIndicesCount () ; k++)
             {
-              csVector3 poly[100];	//@@@ HARDCODE
-              int k;
-              for (k = 0 ; k < pps->GetVertexCount () ; k++)
+              poly[k] = world_vertices[idx[k]];
+            }
+            float sqdist_portal = csSquaredDist::PointPoly (
+                  pos, poly, portal->GetVertexIndicesCount (),
+                  wor_plane);
+            if (sqdist_portal <= radius * radius)
+            {
+              // Also handle objects in the destination sector unless
+              // it is a warping sector.
+              portal->CompleteSector (0);
+              CS_ASSERT (portal != 0);
+              if (sector != portal->GetSector () && portal->GetSector ()
+                              && !portal->GetFlags ().Check (CS_PORTAL_WARP))
               {
-                poly[k] = pp->GetVertexW (k);
-              }
-              float sqdist_portal = csSquaredDist::PointPoly (
-                    pos, poly, pps->GetVertexCount (),
-                    wor_plane);
-              if (sqdist_portal <= radius * radius)
-              {
-                // Also handle objects in the destination sector unless
-                // it is a warping sector.
-                iPortal* portal = pps->GetPortal ();
-                portal->CompleteSector (0);
-                CS_ASSERT (portal != 0);
-                if (sector != portal->GetSector () && portal->GetSector ()
-                                && !portal->GetFlags ().Check (CS_PORTAL_WARP))
+                int l;
+                bool already_visited = false;
+                for (l = 0 ; l < visited_sectors.Length () ; l++)
                 {
-                  int l;
-                  bool already_visited = false;
-                  for (l = 0 ; l < visited_sectors.Length () ; l++)
+                  if (visited_sectors[l] == portal->GetSector ())
                   {
-                    if (visited_sectors[l] == portal->GetSector ())
-                    {
-                      already_visited = true;
-                      break;
-                    }
-                  }
-                  if (!already_visited)
-                  {
-                    visited_sectors.Push (portal->GetSector ());
-                    GetNearbyMeshList (portal->GetSector (), pos, radius, list,
-                                         visited_sectors);
+                    already_visited = true;
+                    break;
                   }
                 }
-              }
-            }
-          }
-        }
-	else
-	{
-	  iMeshObject* meshobj = imw->GetMeshObject ();
-          int pc = meshobj->GetPortalCount ();
-          int j;
-          for (j = 0 ; j < pc ; j++)
-          {
-            iPortal* portal = meshobj->GetPortal (j);
-            const csPlane3& wor_plane = portal->GetWorldPlane ();
-	    const csVector3* world_vertices = portal->GetVertices (); // @@@ NEED WORLD!
-            // Can we see the portal?
-            if (wor_plane.Classify (pos) < -0.001)
-            {
-              csVector3 poly[100];	//@@@ HARDCODE
-              int k;
-	      int* idx = portal->GetVertexIndices ();
-              for (k = 0 ; k < portal->GetVertexIndicesCount () ; k++)
-              {
-                poly[k] = world_vertices[idx[k]];
-              }
-              float sqdist_portal = csSquaredDist::PointPoly (
-                    pos, poly, portal->GetVertexIndicesCount (),
-                    wor_plane);
-              if (sqdist_portal <= radius * radius)
-              {
-                // Also handle objects in the destination sector unless
-                // it is a warping sector.
-                portal->CompleteSector (0);
-                CS_ASSERT (portal != 0);
-                if (sector != portal->GetSector () && portal->GetSector ()
-                                && !portal->GetFlags ().Check (CS_PORTAL_WARP))
+                if (!already_visited)
                 {
-                  int l;
-                  bool already_visited = false;
-                  for (l = 0 ; l < visited_sectors.Length () ; l++)
-                  {
-                    if (visited_sectors[l] == portal->GetSector ())
-                    {
-                      already_visited = true;
-                      break;
-                    }
-                  }
-                  if (!already_visited)
-                  {
-                    visited_sectors.Push (portal->GetSector ());
-                    GetNearbyMeshList (portal->GetSector (), pos, radius, list,
-                                         visited_sectors);
-                  }
+                  visited_sectors.Push (portal->GetSector ());
+                  GetNearbyMeshList (portal->GetSector (), pos, radius, list,
+                                       visited_sectors);
                 }
               }
             }

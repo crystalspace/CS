@@ -31,7 +31,6 @@
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
 #include "ivaria/engseq.h"
-#include "imesh/thing/thing.h"
 
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csRegion)

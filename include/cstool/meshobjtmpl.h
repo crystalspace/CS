@@ -212,18 +212,6 @@ public:
   virtual void InvalidateMaterialHandles () { }
 
   /**
-   * See imesh/object.h for specification. The default implementation
-   * does not support portals.
-   */
-  virtual int GetPortalCount () const { return 0; }
-
-  /**
-   * See imesh/object.h for specification. The default implementation
-   * does not support portals.
-   */
-  virtual iPortal* GetPortal (int) const { return 0; }
-
-  /**
    * See igeom/objmodel.h for specification. The default implementation
    * returns an infinite bounding box.
    */

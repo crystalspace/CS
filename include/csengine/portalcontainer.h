@@ -189,6 +189,8 @@ public:
   //-------------------For iPortalContainer ----------------------------//
   virtual iPortal* CreatePortal (csVector3* vertices, int num);
   virtual void RemovePortal (iPortal* portal);
+  virtual int GetPortalCount () const { return portals.Length () ; }
+  virtual iPortal* GetPortal (int idx) const { return (iPortal*)portals[idx]; }
 
   //--------------------- For iMeshObject ------------------------------//
   virtual iMeshObjectFactory* GetFactory () const { return 0; }
@@ -201,8 +203,6 @@ public:
   	const csVector3& end, csVector3& isect, float* pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr, int* polygon_idx = 0);
-  virtual int GetPortalCount () const { return portals.Length () ; }
-  virtual iPortal* GetPortal (int idx) const { return (iPortal*)portals[idx]; }
 
   //--------------------- For csMeshObject ------------------------------//
   virtual void GetObjectBoundingBox (csBox3& bbox, int)

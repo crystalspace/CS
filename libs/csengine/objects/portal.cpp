@@ -436,7 +436,7 @@ bool csPortal::Draw (
   rview->SetRenderRecursionLevel (rview->GetRenderRecursionLevel () + 1);
   rview->SetClipper (&new_view);
   rview->ResetFogInfo ();
-  rview->SetLastPortal ((iPortal*)this, 0);
+  rview->SetLastPortal ((iPortal*)this);
   rview->SetPreviousSector (rview->GetThisSector ());
   rview->SetClipPlane (camera_plane);
   rview->GetClipPlane ().Invert ();

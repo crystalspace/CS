@@ -26,7 +26,6 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/polyidx.h"
-#include "portal.h"
 #include "thing.h"
 #include "polytext.h"
 #include "iengine/sector.h"
@@ -89,23 +88,8 @@ private:
 
   /**
    * The physical parent of this polygon.
-   * Important note for CS developers. If the parent of a polygon
-   * is changed in any way and this polygon has a portal then the
-   * portal needs to be removed from the old thing and added to the
-   * new thing (things keep a list of all polygons having a portal
-   * on them).
    */
   csThingStatic* thing_static;
-
-  /**
-   * If not-null, this polygon is a portal.
-   * Important note for CS developers. If the portal is changed
-   * in any way (deleted or set) then the parent thing has to
-   * be notified (csThing::AddPortalPolygon() and
-   * csThing::RemovePortalPolygon()) so that it can update its list
-   * of portal polygons.
-   */
-  csPortalObsolete* portal;
 
   /// The object space plane equation (this is fixed).
   csPlane3 plane_obj;
@@ -281,20 +265,6 @@ public:
   bool Finish ();
 
   /**
-   * If the polygon is a portal this will set the sector
-   * that this portal points to. If this polygon has no portal
-   * one will be created.
-   * If 'null' is true and sector == '0' then a 0 portal
-   * is created.
-   */
-  void SetPortal (iSector* sector, bool null = false);
-
-  /**
-   * Get the portal structure (if there is one).
-   */
-  csPortalObsolete* GetPortal () { return portal; }
-
-  /**
    * Set the thing that this polygon belongs to.
    */
   void SetParent (csThingStatic* thing_static);
@@ -338,22 +308,6 @@ public:
    * Get vertex index table.
    */
   int* GetVertexIndices () { return vertices.GetVertexIndices (); }
-
-  /**
-   * Set the warping transformation for the portal.
-   * If there is no portal this function does nothing.
-   */
-  void SetWarp (const csTransform& t) { if (portal) portal->SetWarp (t); }
-
-  /**
-   * Set the warping transformation for the portal.
-   * If there is no portal this function does nothing.
-   */
-  void SetWarp (const csMatrix3& m_w, const csVector3& v_w_before,
-  	const csVector3& v_w_after)
-  {
-    if (portal) portal->SetWarp (m_w, v_w_before, v_w_after);
-  }
 
   /**
    * 'idx' is a local index into the vertices table of the polygon.
@@ -473,7 +427,7 @@ public:
 
   /**
    * Hard transform the plane of this polygon and also the
-   * portal and lightmap info. This is similar to ObjectToWorld
+   * lightmap info. This is similar to ObjectToWorld
    * but it does a hard transform of the object space planes
    * instead of keeping a transformation.
    */
@@ -558,8 +512,7 @@ public:
   }
 
   /**
-   * Set the alpha transparency value for this polygon (only if
-   * it is a portal).
+   * Set the alpha transparency value for this polygon.
    * Not all renderers support all possible values. 0, 25, 50,
    * 75, and 100 will always work but other values may give
    * only the closest possible to one of the above.
@@ -631,25 +584,6 @@ public:
 
     virtual csFlags& GetFlags ()
     { return scfParent->flags; }
-
-    virtual iPortal* CreateNullPortal ()
-    {
-      scfParent->SetPortal (0, true);
-      return &(scfParent->GetPortal ()->scfiPortal);
-    }
-    virtual iPortal* CreatePortal (iSector *target)
-    {
-      scfParent->SetPortal (target);
-      return &(scfParent->GetPortal ()->scfiPortal);
-    }
-    virtual iPortal* GetPortal ()
-    {
-      csPortalObsolete* prt = scfParent->GetPortal ();
-      if (prt)
-        return &(prt->scfiPortal);
-      else
-        return 0;
-    }
 
     virtual void SetTextureSpace (
   	const csVector3& p1, const csVector2& uv1,
@@ -1025,7 +959,6 @@ public:
   /**
    * Check visibility of this polygon with the given csFrustumView
    * and update the light patches if needed.
-   * This function will also traverse through a portal if so needed.
    * This version is for dynamic lighting.
    */
   void CalculateLightingDynamic (iFrustumView* lview, iMovable* movable);
@@ -1033,7 +966,6 @@ public:
   /**
    * Check visibility of this polygon with the given csFrustumView
    * and fill the lightmap if needed (this function calls FillLightMap ()).
-   * This function will also traverse through a portal if so needed.
    * If 'vis' == false this means that the lighting system already discovered
    * that the polygon is totally shadowed.
    * This version is for static lighting.

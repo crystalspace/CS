@@ -212,8 +212,7 @@ void csThingStatic::Prepare ()
     if (thing_type->engine)
     {
       if (static_polygons.Length () >= thing_type->engine->
-    	  GetFastMeshThresshold () &&
-	  portal_polygons.Length () == 0)
+    	  GetFastMeshThresshold ())
       {
 	flags.Set (CS_THING_FASTMESH);
       }
@@ -230,7 +229,6 @@ void csThingStatic::Prepare ()
 
     int i;
     csPolygon3DStatic* sp;
-    portal_polygons.DeleteAll ();
     for (i = 0; i < static_polygons.Length (); i++)
     {
       sp = static_polygons.Get (i);
@@ -239,8 +237,6 @@ void csThingStatic::Prepare ()
       // again so that we force a new prepare later.
       if (!sp->Finish ())
 	prepared = false;
-      if (sp->GetPortal ())
-	portal_polygons.Push (i);
     }
   }
   
@@ -576,19 +572,6 @@ void csThingStatic::UnprepareLMLayout ()
   lmprepared = false;
 }
 
-void csThingStatic::UpdatePortalList ()
-{
-  int i;
-  csPolygon3DStatic* sp;
-  portal_polygons.DeleteAll ();
-  for (i = 0; i < static_polygons.Length (); i++)
-  {
-    sp = static_polygons.Get (i);
-    if (sp->GetPortal ())
-      portal_polygons.Push (i);
-  }
-}
-
 int csThingStatic::AddVertex (float x, float y, float z)
 {
   if (!obj_verts)
@@ -843,54 +826,15 @@ void csThingStatic::RemovePolygon (int idx)
 void csThingStatic::RemovePolygons ()
 {
   static_polygons.FreeAll ();
-  portal_polygons.DeleteAll ();
   scfiObjectModel.ShapeChanged ();
   UnprepareLMLayout ();
-}
-
-iPortal *csThingStatic::GetPortal (int idx) const
-{
-  csPolygon3DStatic *p = static_polygons.Get (portal_polygons[idx]);
-  return &(p->GetPortal ()->scfiPortal);
-}
-
-iPolygon3DStatic *csThingStatic::GetPortalPolygon (int idx) const
-{
-  csPolygon3DStatic *p = (static_polygons.Get (portal_polygons[idx]));
-  return &(p->scfiPolygon3DStatic);
 }
 
 int csThingStatic::IntersectSegmentIndex (
   const csVector3 &start, const csVector3 &end,
   csVector3 &isect,
-  float *pr,
-  bool only_portals)
+  float *pr)
 {
-  if (only_portals)
-  {
-    int i;
-    float r, best_r = 2000000000.;
-    csVector3 cur_isect;
-    int best_p = -1;
-    for (i = 0 ; i < portal_polygons.Length () ; i++)
-    {
-      int polygon_index = portal_polygons[i];
-      csPolygon3DStatic *p = static_polygons.Get (polygon_index);
-      if (p->IntersectSegment (start, end, cur_isect, &r))
-      {
-        if (r < best_r)
-        {
-          best_r = r;
-          best_p = polygon_index;
-          isect = cur_isect;
-        }
-      }
-    }
-
-    if (pr) *pr = best_r;
-    return best_p;
-  }
-
   int i;
   float r, best_r = 2000000000.;
   csVector3 cur_isect;
@@ -914,15 +858,6 @@ int csThingStatic::IntersectSegmentIndex (
 
   if (pr) *pr = best_r;
   return best_p;
-}
-
-int csThingStatic::IntersectSegment (
-	const csVector3& start,
-	const csVector3& end, csVector3& isect,
-	float* pr, bool only_portals)
-{
-  return IntersectSegmentIndex (start, end, isect, pr,
-  	only_portals);
 }
 
 csPtr<csThingStatic> csThingStatic::Clone ()
@@ -966,8 +901,6 @@ csPtr<csThingStatic> csThingStatic::Clone ()
     p->SetParent (clone);
     clone->static_polygons.Push (p);
   }
-
-  clone->portal_polygons = portal_polygons;
 
   return csPtr<csThingStatic> (clone);
 }
@@ -1324,7 +1257,7 @@ csThing::~csThing ()
 
   delete[] cam_verts;
 
-  polygons.FreeAll ();          // delete prior to portal_poly array !
+  polygons.FreeAll ();
 
 #ifdef CS_USE_NEW_RENDERER
   ClearRenderMeshes ();
@@ -1538,47 +1471,12 @@ void csThing::Unprepare ()
   prepared = false;
 }
 
-void csThing::RegisterPortalMeshes ()
-{
-  csRef<iMeshWrapper> mw = SCF_QUERY_INTERFACE (logparent, iMeshWrapper);
-  if (mw)
-  {
-    iMovable* mov = mw->GetMovable ();
-    iSectorList* sl = mov->GetSectors ();
-    int j;
-    for (j = 0 ; j < sl->GetCount () ; j++)
-    {
-      iSector* s = sl->Get (j);
-      s->RegisterPortalMesh (mw);
-    }
-  }
-}
-
-void csThing::UnregisterPortalMeshes ()
-{
-  csRef<iMeshWrapper> mw = SCF_QUERY_INTERFACE (logparent, iMeshWrapper);
-  if (mw)
-  {
-    iMovable* mov = mw->GetMovable ();
-    iSectorList* sl = mov->GetSectors ();
-    int j;
-    for (j = 0 ; j < sl->GetCount () ; j++)
-    {
-      iSector* s = sl->Get (j);
-      s->UnregisterPortalMesh (mw);
-    }
-  }
-}
-
 void csThing::PreparePolygons ()
 {
   csPolygon3DStatic *ps;
   csPolygon3D *p;
   polygons.FreeAll ();
 
-  UnregisterPortalMeshes ();
-
-  bool has_portals = false;
   int i;
   for (i = 0; i < static_data->static_polygons.Length (); i++)
   {
@@ -1589,12 +1487,7 @@ void csThing::PreparePolygons ()
     polygons.Push (p);
     p->SetMaterial (FindRealMaterial (ps->GetMaterialWrapper ()));
     p->Finish ();
-    csPortalObsolete* portal = ps->GetPortal ();
-    if (portal) has_portals = true;
   }
-
-  if (has_portals)
-    RegisterPortalMeshes ();
 }
 
 void csThing::Prepare ()
@@ -1757,7 +1650,7 @@ bool csThing::HitBeamOutline (const csVector3& start,
 bool csThing::HitBeamObject (const csVector3& start,
   const csVector3& end, csVector3& isect, float *pr, int* polygon_idx)
 {
-  int idx = static_data->IntersectSegmentIndex (start, end, isect, pr, false);
+  int idx = static_data->IntersectSegmentIndex (start, end, isect, pr);
   if (polygon_idx) *polygon_idx = idx;
   if (idx == -1) return false;
   return true;
@@ -1771,8 +1664,6 @@ void csThing::DrawOnePolygon (
   csZBufMode zMode,
   const csPlane3& camera_plane)
 {
-  iCamera *icam = d->GetCamera ();
-
   if (d->AddedFogInfo ())
   {
     // If fog info was added then we are dealing with vertex fog and
@@ -1781,88 +1672,7 @@ void csThing::DrawOnePolygon (
     d->GetFirstFogInfo ()->outgoing_plane = camera_plane;
   }
 
-  csPolygon3DStatic* sp = p->GetStaticData ();
-  csPortalObsolete *po = sp->GetPortal ();
-  //@@@if (csSector::do_portals && po)
-  if (po)
-  {
-    bool filtered = false;
-
-    // is_this_fog is true if this sector is fogged.
-    bool is_this_fog = d->GetThisSector ()->HasFog ();
-
-    // If there is filtering (alpha mapping or something like that) we need
-    // to keep the texture plane so that it can be drawn after the sector has
-    // been drawn. The texture plane needs to be kept because this polygon
-    // may be rendered again (through mirrors) possibly overwriting the plane.
-    csPlane3 keep_plane;
-    if (d->GetGraphics3D ()->GetRenderState (
-          G3DRENDERSTATE_TRANSPARENCYENABLE))
-      filtered = sp->IsTransparent ();
-    if (filtered || is_this_fog || (po && po->flags.Check (CS_PORTAL_ZFILL)))
-    {
-      keep_plane = camera_plane;
-    }
-
-    // First call OpenPortal() if needed.
-    bool use_float_portal = po->flags.Check (CS_PORTAL_FLOAT);
-    if (use_float_portal)
-    {
-      static G3DPolygonDFP g3dpoly;
-      g3dpoly.num = poly->GetVertexCount ();
-      memcpy (g3dpoly.vertices, poly->GetVertices (),
-      	g3dpoly.num * sizeof (csVector2));
-      g3dpoly.normal = camera_plane;
-      d->GetGraphics3D ()->OpenPortal (&g3dpoly);
-    }
-
-    // Draw through the portal. If this fails we draw the original polygon
-    // instead. Drawing through a portal can fail because we have reached
-    // the maximum number that a sector is drawn (for mirrors).
-    if (po->Draw (poly, &(p->scfiPolygon3D), t, d, keep_plane))
-    {
-      if (filtered)
-      {
-        //csZBufMode new_mode = zMode;
-        //switch (zMode)
-	//{
-	  //case CS_ZBUF_NONE: new_mode = CS_ZBUF_NONE; break;
-	  //case CS_ZBUF_TEST: new_mode = CS_ZBUF_TEST; break;
-	  //case CS_ZBUF_FILL: new_mode = CS_ZBUF_FILL; break;
-	  //case CS_ZBUF_USE: new_mode = CS_ZBUF_FILL; break;
-	//}
-        poly->DrawFilled (d, p, keep_plane, zMode);
-      }
-      if (is_this_fog)
-      {
-        poly->AddFogPolygon (
-            d->GetGraphics3D (),
-            p,
-            keep_plane,
-            icam->IsMirrored (),
-            d->GetThisSector ()->QueryObject ()->GetID (),
-            CS_FOG_BACK);
-      }
-
-      // Here we z-fill the portal contents to make sure that sprites
-      // that are drawn outside of this portal cannot accidently cross
-      // into the others sector space (we cannot trust the Z-buffer here).
-      if (po->flags.Check (CS_PORTAL_ZFILL))
-        poly->FillZBuf (d, p, keep_plane);
-    }
-    else
-    {
-      poly->DrawFilled (d, p, camera_plane, zMode);
-    }
-
-    // Make sure to close the portal again.
-    if (use_float_portal)
-      d->GetGraphics3D ()->ClosePortal ();
-  }
-  else
-  {
-    poly->DrawFilled (d, p, camera_plane, zMode);
-  }
+  poly->DrawFilled (d, p, camera_plane, zMode);
 }
 
 void csThing::DrawPolygonArray (
@@ -2129,7 +1939,6 @@ void csThing::AppendShadows (
   for (i = 0; i < static_data->static_polygons.Length (); i++)
   {
     sp = static_data->static_polygons.Get (i);
-    if (sp->GetPortal ()) continue;  // No portals
     p = polygons.Get (i);
 
     //if (p->GetPlane ()->VisibleFromPoint (origin) != cw) continue;
@@ -2769,23 +2578,6 @@ iPolygon3D *csThing::ThingState::GetPolygon (const char *name)
   csPolygon3D *p = scfParent->GetPolygon3D (name);
   if (!p) return 0;
   return &(p->scfiPolygon3D);
-}
-
-iPolygon3D *csThing::ThingState::GetPortalPolygon (int idx) const
-{
-  scfParent->Prepare ();
-  csPolygon3D *p = (scfParent->polygons.Get (
-		  scfParent->static_data->portal_polygons[idx]));
-  return &(p->scfiPolygon3D);
-}
-
-int csThing::ThingState::IntersectSegment (
-	const csVector3& start,
-	const csVector3& end, csVector3& isect,
-	float* pr, bool only_portals)
-{
-  return scfParent->static_data->IntersectSegmentIndex (start, end, isect, pr,
-  	only_portals);
 }
 
 //---------------------------------------------------------------------------

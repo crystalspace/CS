@@ -259,13 +259,6 @@ public:
   csPDelArray<csStaticPolyGroup> unlitPolys;
   csArray<StaticSuperLM*> superLMs;
 
-  /**
-   * Polygon indices to polygons that contain portals (optimization).
-   * csPolygon3DStatic will make sure to call AddPortalPolygon() and
-   * RemovePortalPolygon() when appropriate.
-   */
-  csArray<int> portal_polygons;
-
   /// If true then this thing has been prepared (Prepare() function).
   bool prepared;
   bool lmprepared;
@@ -304,13 +297,6 @@ public:
 public:
   csThingStatic (iBase* parent, csThingObjectType* thing_type);
   virtual ~csThingStatic ();
-
-  /**
-   * When a portal is added/removed the portal list must be updated.
-   * Prepare() does this automatically But this function is useful in
-   * cases where you don't want the overhead of a full prepare.
-   */
-  void UpdatePortalList ();
 
   /**
    * Prepare the thing for use. This function MUST be called
@@ -423,15 +409,12 @@ public:
    *
    * If 'pr' != 0 it will also return a value between 0 and 1
    * indicating where on the 'start'-'end' vector the intersection
-   * happened.<p>
-   *
-   * If only_portals == true then only portals are checked.
+   * happened.
    */
   int IntersectSegmentIndex (
     const csVector3 &start, const csVector3 &end,
     csVector3 &isect,
-    float *pr,
-    bool only_portals);
+    float *pr);
 
   SCF_DECLARE_IBASE;
 
@@ -444,15 +427,7 @@ public:
   virtual void RemovePolygon (int idx);
   virtual void RemovePolygons ();
 
-  virtual int GetPortalCount () const { return portal_polygons.Length (); }
-  virtual iPortal* GetPortal (int idx) const;
-  virtual iPolygon3DStatic* GetPortalPolygon (int idx) const;
-
   virtual csFlags& GetFlags () { return flags; }
-
-  virtual int IntersectSegment (const csVector3& start,
-	const csVector3& end, csVector3& isect,
-	float* pr = 0, bool only_portals = false);
 
   virtual void SetSmoothingFlag (bool smoothing) { smoothed = smoothing; }
   virtual bool GetSmoothingFlag () { return smoothed; }
@@ -645,8 +620,6 @@ private:
   bool lightmapsPrepared;
   bool lightmapsDirty;
 
-  void RegisterPortalMeshes ();
-  void UnregisterPortalMeshes ();
   void PreparePolygons ();
   void PrepareLMs ();
   void ClearLMs ();
@@ -974,8 +947,6 @@ public:
     virtual int FindPolygonIndex (iPolygon3D* polygon) const
     { return scfParent->FindPolygonIndex (polygon); }
 
-    virtual iPolygon3D* GetPortalPolygon (int idx) const;
-
     virtual const csVector3 &GetVertexW (int i) const
     { return scfParent->wor_verts[i]; }
     virtual const csVector3* GetVerticesW () const
@@ -989,10 +960,6 @@ public:
     { return scfParent->GetMovingOption (); }
     virtual void SetMovingOption (int opt)
     { scfParent->SetMovingOption (opt); }
-
-    virtual int IntersectSegment (const csVector3& start,
-	const csVector3& end, csVector3& isect,
-	float* pr = 0, bool only_portals = false);
 
     /// Prepare.
     virtual void Prepare ()
@@ -1140,14 +1107,6 @@ public:
     virtual void InvalidateMaterialHandles ()
     {
       scfParent->InvalidateMaterialHandles ();
-    }
-    virtual int GetPortalCount () const
-    {
-      return scfParent->static_data->GetPortalCount ();
-    }
-    virtual iPortal* GetPortal (int idx) const
-    {
-      return scfParent->static_data->GetPortal (idx);
     }
   } scfiMeshObject;
   friend struct MeshObject;

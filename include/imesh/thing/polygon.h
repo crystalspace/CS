@@ -32,7 +32,6 @@ struct iPolygonTexture;
 struct iPolyTexLightMap;
 struct iLight;
 struct iLightMap;
-struct iPortal;
 struct iSector;
 struct iThingState;
 struct iThingFactoryState;
@@ -127,19 +126,6 @@ struct iPolygon3DStatic : public iBase
 
   /// Set polygon flags (see CS_POLY_... values above)
   virtual csFlags& GetFlags () = 0;
-
-  /**
-   * Create a null pointer pointing to no sector.
-   * It is preferably to set a missing sector callback on the
-   * returned portal.
-   */
-  virtual iPortal* CreateNullPortal () = 0;
-  /// Create a portal object pointing to given sector
-  virtual iPortal *CreatePortal (iSector *iTarget) = 0;
-  /**
-   * Return the pointer to the portal if there is one.
-   */
-  virtual iPortal* GetPortal () = 0;
 
   /**
    * Set the texture space transformation given three vertices and

@@ -177,23 +177,6 @@ bool csThingLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csThingLoader::OptimizePolygon (iPolygon3DStatic *p)
-{
-  if (!p->GetPortal () || p->GetAlpha () || !p->IsTextureMappingEnabled () ||
-  	p->GetMixMode () != 0)
-    return;
-  iMaterialWrapper *mat = p->GetMaterial ();
-  if (mat)
-  {
-    iMaterial *m = mat->GetMaterial ();
-    iTextureHandle *th = m ? m->GetTexture () : 0;
-    if (th && th->GetKeyColor ())
-      return;
-  }
-
-  p->EnableTextureMapping (false);
-}
-
 bool csThingLoader::ParseTextureMapping (
 	iDocumentNode* node, const csVector3* vref, uint &texspec,
 	csVector3 &tx_orig, csVector3 &tx1, csVector3 &tx2, csVector3 &len,
@@ -754,8 +737,6 @@ bool csThingLoader::ParsePoly3d (
 	      m_w, v_w_before, v_w_after, &destSectorName))
     {
       iSector* destSector = ldr_context->FindSector (destSectorName.GetData ());
-#if 1
-// @@@ Works more or less but not fully!
       csVector3* portal_verts = new csVector3[poly3d->GetVertexCount ()];
       int i;
       for (i = 0 ; i < poly3d->GetVertexCount () ; i++)
@@ -797,22 +778,6 @@ bool csThingLoader::ParsePoly3d (
       {
         poly_delete = if_portal_delete_polygon;
       }
-#else
-      iPortal* portal;
-      if (destSector)
-      {
-	portal = poly3d->CreatePortal (destSector);
-      }
-      else
-      {
-	poly3d->CreateNullPortal ();
-	portal = poly3d->GetPortal ();
-	MissingSectorCallback* mscb = new MissingSectorCallback (
-	    	ldr_context, destSectorName.GetData ());
-	portal->SetMissingSectorCallback (mscb);
-	mscb->DecRef ();
-      }
-#endif
 
       portal->GetFlags ().Set (flags);
 
@@ -847,8 +812,6 @@ bool csThingLoader::ParsePoly3d (
     poly3d->GetFlags ().Set (CS_POLY_COLLDET);
   else if (set_colldet == -1)
     poly3d->GetFlags ().Reset (CS_POLY_COLLDET);
-
-  OptimizePolygon (poly3d);
 
   return true;
 }

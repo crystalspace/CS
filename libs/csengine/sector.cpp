@@ -38,8 +38,6 @@
 #include "iengine/rview.h"
 #include "iengine/portal.h"
 #include "imesh/lighting.h"
-#include "imesh/thing/thing.h"
-#include "imesh/thing/polygon.h"
 #include "csengine/material.h"
 
 #include "ivaria/bugplug.h"
@@ -336,24 +334,11 @@ iMeshWrapper* csSector::HitBeamPortals (
 		  &mesh);
   if (p != -1)
   {
-    iMeshObject* meshobj = mesh->GetMeshObject ();
-    if (meshobj->GetPortalCount () > 0)
+    iPortalContainer* portals = mesh->GetPortalContainer ();
+    if (portals)
     {
       // There are portals.
-      // @@@@@ TEMPORARY check for thing! Until portals are moved away.
-      csRef<iThingState> st = SCF_QUERY_INTERFACE (meshobj, iThingState);
-      iPortal* po;
-      if (st)
-      {
-        iPolygon3D* pol = st->GetPolygon (p);
-        iPolygon3DStatic* ps = pol->GetStaticData ();
-	po = ps->GetPortal ();
-      }
-      else
-      {
-        // We have a portal object.
-	po = meshobj->GetPortal (p);
-      }
+      iPortal* po = portals->GetPortal (p);
       if (po)
       {
 	draw_busy++;
@@ -430,8 +415,8 @@ int csSector::IntersectSegment (
     iMeshWrapper* mesh = vo->GetMeshWrapper ();
     if (!mesh || mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE)) continue;
 
-    // If we have no portals then we don't consider this thing.
-    if (mesh->GetMeshObject ()->GetPortalCount () == 0) continue;
+    // Only operate on portal objects.
+    if (!mesh->GetPortalContainer ()) continue;
 
     bool has_not_moved = mesh->GetMovable ()->IsFullTransformIdentity ();
     if (has_not_moved)
@@ -447,25 +432,12 @@ int csSector::IntersectSegment (
     }
     r = best_r;
 
-    csRef<iThingState> ith = SCF_QUERY_INTERFACE (
-        mesh->GetMeshObject (),
-        iThingState);
+    // We know it is a portal container. No other object can have a
+    // portal.
     int p;
-    if (ith)
-    {
-      p = ith->IntersectSegment (
-          obj_start, obj_end, obj_isect,
-          &r,
-          only_portals);	// Always true here.
-    }
-    else
-    {
-      // We know it is a portal container. No other object can have a
-      // portal.
-      bool rc = mesh->GetMeshObject ()->HitBeamObject (
+    bool rc = mesh->GetMeshObject ()->HitBeamObject (
       	obj_start, obj_end, obj_isect, &r, &p);
-      if (!rc) p = -1;
-    }
+    if (!rc) p = -1;
     if (p != -1 && r < best_r)
     {
       if (has_not_moved)
@@ -502,22 +474,10 @@ iSector *csSector::FollowSegment (
 
   if (p != -1)
   {
-    iMeshObject* meshobj = mesh->GetMeshObject ();
-    if (meshobj->GetPortalCount () > 0)
+    iPortalContainer* portals = mesh->GetPortalContainer ();
+    if (portals)
     {
-      csRef<iThingState> ts = SCF_QUERY_INTERFACE (meshobj, iThingState);
-      if (ts)
-      {
-        // @@@@@@@ TEMPORARY
-	iPolygon3D* pol = ts->GetPolygon (p);
-        iPolygon3DStatic* ps = pol->GetStaticData ();
-        po = ps->GetPortal ();
-      }
-      else
-      {
-        po = meshobj->GetPortal (p);
-      }
-
+      po = portals->GetPortal (p);
       if (po)
       {
         po->CompleteSector (0);
@@ -560,35 +520,6 @@ iPolygon3D *csSector::IntersectSphere (
   float min_d = radius;
   iPolygon3D *min_p = 0;
   (void)center;
-#if 0
-  float d = .0f;
-  iPolygon3D *p = 0, *min_p = 0;
-  csVector3 obj_center;
-  csReversibleTransform movtrans;
-
-  //@@@ Support for meshes!!!
-  int i;
-  for (i = 0; i < things.Length (); i++)
-  {
-    //@@@ NOT VALID!!!
-    iThingState *sp = (iThingState *)things[i];
-    bool has_not_moved = sp->GetMovable ()->IsFullTransformIdentity ();
-    if (has_not_moved)
-      obj_center = center;
-    else
-    {
-      movtrans = sp->GetMovable ().GetFullTransform ();
-      obj_center = movtrans.Other2This (center);
-    }
-
-    p = sp->IntersectSphere (obj_center, radius, &d);
-    if (p && d < min_d)
-    {
-      min_d = d;
-      min_p = p;
-    }
-  }
-#endif
   if (pr) *pr = min_d;
   return min_p;
 }
@@ -806,17 +737,8 @@ void csSector::Draw (iRenderView *rview)
       iPortal* last_portal = rview->GetLastPortal ();
       if (last_portal)
       {
-        iPolygon3D *ipoly3d = rview->GetLastPortalP ();
-	if (ipoly3d)
-	{
-          ipoly3d->ComputeCameraPlane (icam->GetTransform (),
+        last_portal->ComputeCameraPlane (icam->GetTransform (),
 		  fog_info->incoming_plane);
-	}
-	else
-	{
-          last_portal->ComputeCameraPlane (icam->GetTransform (),
-		  fog_info->incoming_plane);
-	}
         fog_info->incoming_plane.Invert ();
         fog_info->has_incoming_plane = true;
       }

@@ -312,8 +312,7 @@ public:
   virtual iSector* GetPreviousSector () {return 0;}
   virtual void SetPreviousSector (iSector* ) {}
   virtual iPortal* GetLastPortal () {return 0;}
-  virtual iPolygon3D* GetLastPortalP () {return 0;}
-  virtual void SetLastPortal (iPortal*, iPolygon3D* ) {}
+  virtual void SetLastPortal (iPortal*) {}
   virtual int GetRenderRecursionLevel () {return 0;}
   virtual void SetRenderRecursionLevel (int ) {}
   virtual void AttachRenderContextData (void* key, iBase* data)

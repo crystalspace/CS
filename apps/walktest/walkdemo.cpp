@@ -1244,31 +1244,30 @@ void light_statics ()
 
 static csPtr<iMeshWrapper> CreateMeshWrapper (const char* name)
 {
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (Sys->object_reg,
-  	iPluginManager));
-  csRef<iMeshObjectType> ThingType (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.thing", iMeshObjectType));
+  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (Sys->object_reg,
+  	iPluginManager);
+  csRef<iMeshObjectType> ThingType = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.thing", iMeshObjectType);
   if (!ThingType)
     ThingType = CS_LOAD_PLUGIN (plugin_mgr,
     	"crystalspace.mesh.object.thing", iMeshObjectType);
 
-  csRef<iMeshObjectFactory> thing_fact (ThingType->NewFactory ());
-  csRef<iMeshObject> mesh_obj (SCF_QUERY_INTERFACE (thing_fact, iMeshObject));
+  csRef<iMeshObjectFactory> thing_fact = ThingType->NewFactory ();
+  csRef<iMeshObject> mesh_obj = thing_fact->NewInstance ();
 
-  csRef<iMeshWrapper> mesh_wrap (
-  	Sys->Engine->CreateMeshWrapper (mesh_obj, name));
+  csRef<iMeshWrapper> mesh_wrap =
+  	Sys->Engine->CreateMeshWrapper (mesh_obj, name);
   return csPtr<iMeshWrapper> (mesh_wrap);
 }
 
 static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
     	iMaterialWrapper* tm, iPolygon3DStatic*& portalPoly)
 {
-  csRef<iMeshWrapper> thing (CreateMeshWrapper (name));
-  csRef<iThingState> thing_state (
+  csRef<iMeshWrapper> thing = CreateMeshWrapper (name);
+  csRef<iThingState> thing_state =
   	SCF_QUERY_INTERFACE (thing->GetMeshObject (),
-  	iThingState));
+  	iThingState);
   csRef<iThingFactoryState> thing_fact_state = thing_state->GetFactory ();
-  thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
   thing->GetMovable ()->SetSector (room);
   float dx = 1, dy = 3, dz = .3;
   float border = 0.3; // width of border around the portal
@@ -1474,8 +1473,9 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
   	FindByName ("portal");
 
   iPolygon3DStatic* portalPoly;
-  csRef<iMeshWrapper> thing (
-  	CreatePortalThing ("portalTo", room, tm, portalPoly));
+  csRef<iMeshWrapper> thing = CreatePortalThing ("portalTo", room, tm,
+  	portalPoly);
+printf ("b\n"); fflush (stdout);
 
   bool regionExists = (Sys->Engine->GetRegions ()->FindByName (lev) != 0);
   iRegion* cur_region = Sys->Engine->CreateRegion (lev);
@@ -1490,9 +1490,10 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
     cur_region->Prepare ();
   }
 
-  thing->GetMovable ()->SetPosition (pos + csVector3 (0, Sys->cfg_legs_offset, 0));
-  thing->GetMovable ()->Transform (view->GetCamera ()->GetTransform ().GetT2O ());
-  thing->GetMovable ()->UpdateMove ();
+  iMovable* tmov = thing->GetMovable ();
+  tmov->SetPosition (pos + csVector3 (0, Sys->cfg_legs_offset, 0));
+  tmov->Transform (view->GetCamera ()->GetTransform ().GetT2O ());
+  tmov->UpdateMove ();
 
   // First make a portal to the new level.
   iCameraPosition* cp = cur_region->FindCameraPosition ("Start");
@@ -1504,7 +1505,17 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
   iSector* start_sector = cur_region->FindSector (room_name);
   if (start_sector)
   {
-    iPortal* portal = portalPoly->CreatePortal (start_sector);
+    csPoly3D poly;
+    poly.AddVertex (portalPoly->GetVertex (0));
+    poly.AddVertex (portalPoly->GetVertex (1));
+    poly.AddVertex (portalPoly->GetVertex (2));
+    poly.AddVertex (portalPoly->GetVertex (3));
+    iPortal* portal;
+    csRef<iMeshWrapper> portalMesh = Sys->Engine->CreatePortal (
+    	"new_portal", tmov->GetSectors ()->Get (0), csVector3 (0),
+	start_sector, poly.GetVertices (), poly.GetVertexCount (),
+	portal);
+    //iPortal* portal = portalPoly->CreatePortal (start_sector);
     portal->GetFlags ().Set (CS_PORTAL_ZFILL);
     portal->GetFlags ().Set (CS_PORTAL_CLIPDEST);
     portal->SetWarp (view->GetCamera ()->GetTransform ().GetT2O (), topos, pos);
@@ -1515,15 +1526,28 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
       // back. So even if multiple portals go to the region we only have
       // one portal back.
       iPolygon3DStatic* portalPolyBack;
-      csRef<iMeshWrapper> thingBack (CreatePortalThing ("portalFrom",
-	  	start_sector, tm, portalPolyBack));
-      thingBack->GetMovable ()->SetPosition (topos + csVector3 (0, Sys->cfg_legs_offset, -.1));
-      thingBack->GetMovable ()->Transform (csYRotMatrix3 (PI));//view->GetCamera ()->GetW2C ());
-      thingBack->GetMovable ()->UpdateMove ();
-      iPortal* portalBack = portalPolyBack->CreatePortal (room);
+      csRef<iMeshWrapper> thingBack = CreatePortalThing ("portalFrom",
+	  	start_sector, tm, portalPolyBack);
+      iMovable* tbmov = thingBack->GetMovable ();
+      tbmov->SetPosition (topos + csVector3 (0, Sys->cfg_legs_offset, -.1));
+      tbmov->Transform (csYRotMatrix3 (PI));//view->GetCamera ()->GetW2C ());
+      tbmov->UpdateMove ();
+      iPortal* portalBack;
+      csPoly3D polyBack;
+      polyBack.AddVertex (portalPoly->GetVertex (0));
+      polyBack.AddVertex (portalPoly->GetVertex (1));
+      polyBack.AddVertex (portalPoly->GetVertex (2));
+      polyBack.AddVertex (portalPoly->GetVertex (3));
+      csRef<iMeshWrapper> portalMeshBack = Sys->Engine->CreatePortal (
+    	  "new_portal_back", tbmov->GetSectors ()->Get (0), csVector3 (0),
+	  tmov->GetSectors ()->Get (0), polyBack.GetVertices (),
+	  polyBack.GetVertexCount (),
+	  portalBack);
+      //iPortal* portalBack = portalPolyBack->CreatePortal (room);
       portalBack->GetFlags ().Set (CS_PORTAL_ZFILL);
       portalBack->GetFlags ().Set (CS_PORTAL_CLIPDEST);
-      portalBack->SetWarp (view->GetCamera ()->GetTransform ().GetO2T (), -pos, -topos);
+      portalBack->SetWarp (view->GetCamera ()->GetTransform ().GetO2T (),
+      	-pos, -topos);
     }
   }
 

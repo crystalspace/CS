@@ -27,8 +27,6 @@
 #include "iengine/portal.h"
 #include "csutil/debug.h"
 #include "iengine/rview.h"
-#include "imesh/thing/thing.h"
-#include "imesh/thing/polygon.h"
 #include "ivideo/graph3d.h"
 
 
@@ -84,6 +82,7 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject *meshobj) :
   {
     light_info = SCF_QUERY_INTERFACE (meshobj, iLightingInfo);
     shadow_receiver = SCF_QUERY_INTERFACE (meshobj, iShadowReceiver);
+    portal_container = SCF_QUERY_INTERFACE (meshobj, iPortalContainer);
   }
   factory = 0;
   zbufMode = CS_ZBUF_USE;
@@ -143,7 +142,7 @@ void csMeshWrapper::SetParentContainer (iMeshWrapper* newParent)
 
 void csMeshWrapper::ClearFromSectorPortalLists ()
 {
-  if (meshobj && meshobj->GetPortalCount () > 0)
+  if (portal_container)
   {
     int i;
     const iSectorList *sectors = movable.GetSectors ();
@@ -164,7 +163,8 @@ void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
   {
     light_info = SCF_QUERY_INTERFACE (meshobj, iLightingInfo);
     shadow_receiver = SCF_QUERY_INTERFACE (meshobj, iShadowReceiver);
-    if (meshobj->GetPortalCount () > 0)
+    portal_container = SCF_QUERY_INTERFACE (meshobj, iPortalContainer);
+    if (portal_container)
     {
       int i;
       const iSectorList *sectors = movable.GetSectors ();
@@ -179,6 +179,7 @@ void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
   {
     light_info = 0;
     shadow_receiver = 0;
+    portal_container = 0;
   }
 }
 
@@ -204,7 +205,7 @@ void csMeshWrapper::MoveToSector (iSector *s)
   // Otherwise we have a hierarchical object and in that case
   // the parent object controls this.
   if (!Parent) s->GetMeshes ()->Add (&scfiMeshWrapper);
-  if (meshobj && meshobj->GetPortalCount () > 0)
+  if (portal_container)
     s->RegisterPortalMesh (&scfiMeshWrapper);
 }
 
@@ -704,12 +705,13 @@ void csMeshWrapper::PlaceMesh ()
   while (it->HasNext ())
   {
     iMeshWrapper* mesh = it->Next ();
-    int pc_count = mesh->GetMeshObject ()->GetPortalCount ();
-    if (pc_count == 0) continue;		// No portals to consider.
+    iPortalContainer* portals = mesh->GetPortalContainer ();
+    if (!portals) continue;	// No portals.
+    int pc_count = portals->GetPortalCount ();
 
     for (j = 0 ; j < pc_count ; j++)
     {
-      iPortal *portal = mesh->GetMeshObject ()->GetPortal (j);
+      iPortal *portal = portals->GetPortal (j);
       iSector *dest_sector = portal->GetSector ();
       if (movable_sectors->Find (dest_sector) == -1)
       {

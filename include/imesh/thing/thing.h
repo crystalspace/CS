@@ -28,7 +28,6 @@ class csMatrix3;
 struct iSector;
 struct iPolygon3D;
 struct iPolygon3DStatic;
-struct iPortal;
 struct iGraphics3D;
 struct iFrustumView;
 struct iMaterialWrapper;
@@ -95,13 +94,6 @@ struct iThingFactoryState : public iBase
   /// Delete all polygons.
   virtual void RemovePolygons () = 0;
 
-  /// Query number of portals in this thing.
-  virtual int GetPortalCount () const = 0;
-  /// Get a portal.
-  virtual iPortal* GetPortal (int idx) const = 0;
-  /// Get the polygon for the given portal (with index).
-  virtual iPolygon3DStatic* GetPortalPolygon (int idx) const = 0;
-
   /// Query number of vertices in set
   virtual int GetVertexCount () const = 0;
   /// Get the given vertex coordinates in object space
@@ -129,15 +121,6 @@ struct iThingFactoryState : public iBase
 
   /// Set thing flags (see CS_THING_... values above)
   virtual csFlags& GetFlags () = 0;
-
-  /**
-   * Intersect a segment with this thing and return the first
-   * polygon that is hit. If only_portals == true then only portals
-   * will be checked. -1 is returned if no hit.
-   */
-  virtual int IntersectSegment (const csVector3& start,
-	const csVector3& end, csVector3& isect,
-	float* pr = 0, bool only_portals = false) = 0;
 
   /**
    * Sets the smoothing flag.
@@ -186,8 +169,6 @@ struct iThingState : public iBase
   virtual iPolygon3D *GetPolygon (const char* name) = 0;
   /// Find the index for a polygon. Returns -1 if polygon cannot be found.
   virtual int FindPolygonIndex (iPolygon3D* polygon) const = 0;
-  /// Get the polygon for the given portal (with index).
-  virtual iPolygon3D* GetPortalPolygon (int idx) const = 0;
 
   /// Get the given vertex coordinates in world space
   virtual const csVector3 &GetVertexW (int idx) const = 0;
@@ -231,15 +212,6 @@ struct iThingState : public iBase
    * to the slightly less efficient CS_THING_MOVE_OCCASIONAL if needed.
    */
   virtual void SetMovingOption (int opt) = 0;
-
-  /**
-   * Intersect a segment with this thing and return the first
-   * polygon that is hit. If only_portals == true then only portals
-   * will be checked. -1 is returned if no hit.
-   */
-  virtual int IntersectSegment (const csVector3& start,
-	const csVector3& end, csVector3& isect,
-	float* pr = 0, bool only_portals = false) = 0;
 
   /**
    * Prepare the thing to be ready for use. Normally this doesn't have

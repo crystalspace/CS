@@ -40,7 +40,6 @@ struct iGraphics2D;
 struct iGraphics3D;
 struct iCamera;
 struct iSector;
-struct iPolygon3D;	// @@@ TEMPORARY
 struct iPortal;
 class csRenderView;
 class csReversibleTransform;
@@ -133,8 +132,6 @@ public:
 
   /// The last portal we traversed through (or 0 if first sector).
   iPortal* last_portal;
-  /// The portal polygon (or 0 if the first sector). @@@ TEMPORARY
-  iPolygon3D* portal_polygon;
   /// The previous sector (or 0 if the first sector).
   iSector* previous_sector;
   /// This sector.
@@ -374,17 +371,9 @@ struct iRenderView : public iBase
   virtual iPortal* GetLastPortal () = 0;
 
   /**
-   * Get the polygon we last traversed through.
-   * @@@ TEMPORARY!!!
-   */
-  virtual iPolygon3D* GetLastPortalP () = 0;
-
-  /**
    * Set the last portal.
-   * @@@ The 'p' is temporary!!! Should be removed as soon as thing
-   * no longer supports portals.
    */
-  virtual void SetLastPortal (iPortal* portal, iPolygon3D* p) = 0;
+  virtual void SetLastPortal (iPortal* portal) = 0;
 
   /**
    * Get render recursion level.

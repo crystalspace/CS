@@ -21,7 +21,6 @@
 #include "pol2d.h"
 #include "polytext.h"
 #include "lghtmap.h"
-#include "portal.h"
 #include "lppool.h"
 #include "thing.h"
 #include "csgeom/frustum.h"
@@ -86,7 +85,6 @@ csPolygon3DStatic::csPolygon3DStatic () : vertices(4)
 
   mapping = 0;
   tmapping = 0;
-  portal = 0;
 
   flags.SetAll (CS_POLY_LIGHTING | CS_POLY_COLLDET | CS_POLY_VISCULL);
 
@@ -103,13 +101,6 @@ csPolygon3DStatic::~csPolygon3DStatic ()
   thing_static->thing_type->blk_lightmapmapping.Free (mapping);
   thing_static->thing_type->blk_texturemapping.Free (tmapping);
 
-  if (portal)
-  {
-    portal->SetSector (0);
-    delete portal;
-    portal = 0;
-  }
-
   VectorArray->DecRef ();
 }
 
@@ -120,13 +111,6 @@ csPolygon3DStatic* csPolygon3DStatic::Clone ()
   clone->SetMaterial (material);
   clone->SetName (name);
   clone->vertices = vertices;
-  if (portal)
-  {
-    clone->portal = portal->Clone ();
-    clone->portal->SetParentPolygon (this);
-  }
-  else
-    clone->portal = 0;
   clone->plane_obj = plane_obj;
   if (mapping)
   {
@@ -319,25 +303,6 @@ void csPolygon3DStatic::Reset ()
   vertices.MakeEmpty ();
 }
 
-void csPolygon3DStatic::SetPortal (iSector *sector, bool null)
-{
-  if (portal && portal->GetSector () == sector)
-    return ;
-  if (portal)
-  {
-    delete portal;
-    portal = 0;
-    if (thing_static) thing_static->UpdatePortalList ();
-  }
-
-  if (!null && !sector) return ;
-  portal = new csPortalObsolete (this);
-  portal->flags.Reset (CS_PORTAL_WARP);
-  portal->SetSector (sector);
-  flags.Reset (CS_POLY_COLLDET);         // Disable CD by default for portals.
-  if (thing_static) thing_static->UpdatePortalList ();
-}
-
 bool csPolygon3DStatic::Overlaps (csPolygon3DStatic *overlapped)
 {
   csPolygon3DStatic *totest = overlapped;
@@ -502,7 +467,6 @@ void csPolygon3DStatic::ComputeNormal ()
 
 void csPolygon3DStatic::HardTransform (const csReversibleTransform &t)
 {
-  if (portal) portal->HardTransform (t);
   csPlane3 new_plane;
   t.This2Other (GetObjectPlane (), Vobj (0), new_plane);
   GetObjectPlane () = new_plane;
@@ -601,14 +565,6 @@ bool csPolygon3DStatic::Finish ()
   else
   {
     return true;
-  }
-
-  if (portal)
-  {
-    if (material->GetMaterialHandle ())
-      portal->SetFilter (material->GetMaterialHandle ()->GetTexture ());
-    else
-      rc = false;
   }
 
   if (flags.Check (CS_POLY_LIGHTING))
@@ -1988,7 +1944,6 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
   if (dist_to_plane < SMALL_EPSILON || dist_to_plane >= lview->GetRadius ())
     return ;
 
-  csPortalObsolete *po;
   csRef<csFrustum> new_light_frustum;
 
   csVector3 *poly;
@@ -2050,19 +2005,10 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
   // all shadow frustums which start at the same plane are discarded as
   // well.
   // FillLightMap() will use this information and
-  // csPortalObsolete::CalculateLighting() will also use it!!
-  po = static_data->GetPortal ();
   if (!MarkRelevantShadowFrustums (lview)) goto stop;
 
   // Update the lightmap given light and shadow frustums in new_lview.
   if (fill_lightmap) FillLightMapDynamic (lview);
-
-  if (po)
-  {
-    if (!po->flags.Check (CS_PORTAL_MIRROR))
-      po->CheckFrustum (lview, movable->GetTransform (),
-          static_data->GetAlpha ());
-  }
 
 stop:
   lview->RestoreFrustumContext (old_ctxt);
@@ -2123,43 +2069,6 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
 
   if (maybeItsVisible)
     return;
-
-  csPortalObsolete *po = static_data->GetPortal ();
-
-  // @@@@@@@@ We temporarily don't do lighting through space-warping portals.
-  // Needs to be fixed soon!!!
-  if (po && !po->flags.Check (CS_PORTAL_WARP))
-  {
-    csFrustumContext *old_ctxt = lview->GetFrustumContext ();
-    lview->CreateFrustumContext ();
-
-    csFrustumContext *new_ctxt = lview->GetFrustumContext ();
-
-    int num_vertices = static_data->GetVertices ().GetVertexCount ();
-    if (num_vertices > VectorArray->Length ())
-      VectorArray->SetLength (num_vertices);
-
-    csVector3 *poly = VectorArray->GetArray ();
-
-    int j;
-    if (old_ctxt->IsMirrored ())
-      for (j = 0; j < num_vertices; j++)
-        poly[j] = Vwor (num_vertices - j - 1) - center;
-    else
-      for (j = 0; j < num_vertices; j++) poly[j] = Vwor (j) - center;
-
-    // @@@ Check if this isn't a memory leak.
-    new_ctxt->SetNewLightFrustum (light_frustum->Intersect (
-        poly,
-        num_vertices));
-    if (new_ctxt->GetLightFrustum ())
-    {
-      po->CheckFrustum ((iFrustumView *)lview,
-          movable->GetTransform (), static_data->GetAlpha ());
-    }
-
-    lview->RestoreFrustumContext (old_ctxt);
-  }
 }
 
 void csPolygon3D::FillLightMapStatic (iFrustumView *lview,

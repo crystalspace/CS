@@ -175,8 +175,6 @@ public:
   }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
   virtual void InvalidateMaterialHandles () { }
-  virtual int GetPortalCount () const { return 0; }
-  virtual iPortal* GetPortal (int) const { return 0; }
 
   //------------------------- iSprite2DState implementation ----------------
   class Sprite2DState : public iSprite2DState

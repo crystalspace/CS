@@ -293,8 +293,6 @@ public:
   }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return mat; }
   virtual void InvalidateMaterialHandles () { }
-  virtual int GetPortalCount () const { return 0; }
-  virtual iPortal* GetPortal (int) const { return 0; }
 
   //------------------------- iParticleState implementation ----------------
   class ParticleState : public iParticleState

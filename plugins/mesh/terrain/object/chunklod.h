@@ -303,9 +303,6 @@ public:
   iMaterialWrapper* GetMaterialWrapper () const { return matwrap; }
   void InvalidateMaterialHandles () { }
 
-  int GetPortalCount () const { return 0; }
-  iPortal* GetPortal (int) const { return 0; }
-
   bool SetMaterialPalette (const csArray<iMaterialWrapper*>& pal);
   csArray<iMaterialWrapper*> GetMaterialPalette ();
   bool SetMaterialMap (csArray<char> data, int x, int y);

@@ -22,7 +22,6 @@
 #include "polytext.h"
 #include "lppool.h"
 #include "lghtmap.h"
-#include "portal.h"
 #include "iengine/camera.h"
 #include "iengine/texture.h"
 #include "iengine/material.h"

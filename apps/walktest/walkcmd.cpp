@@ -898,8 +898,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
 	if (ml->GetCount () > 0)
 	{
 	  iMeshWrapper* pcmesh = ml->Get (0);
-	  csRef<iPortalContainer> pc = SCF_QUERY_INTERFACE (
-	  	pcmesh->GetMeshObject (), iPortalContainer);
+	  iPortalContainer* pc = pcmesh->GetPortalContainer ();
 	  if (pc)
 	  {
 	    char polyname[255];

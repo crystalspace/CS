@@ -219,13 +219,6 @@ struct iMeshObject : public iBase
    * again.
    */
   virtual void InvalidateMaterialHandles () = 0;
-
-  /**
-   * Get the number of portals in this mesh object.
-   */
-  virtual int GetPortalCount () const = 0;
-  /// Get a portal.
-  virtual iPortal* GetPortal (int idx) const = 0;
 };
 
 SCF_VERSION (iMeshObjectFactory, 0, 0, 6);
