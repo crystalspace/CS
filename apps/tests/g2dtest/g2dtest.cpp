@@ -20,12 +20,11 @@
 
 #include <stdarg.h>
 
-#define CS_SYSDEF_PROVIDE_ALLOCA
-#define CS_SYSDEF_PROVIDE_SOFTWARE2D
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "csutil/csvector.h"
 #include "csutil/rng.h"
+#include "csutil/csstring.h"
 #include "cstool/initapp.h"
 #include "ivaria/reporter.h"
 #include "qint.h"
@@ -1128,15 +1127,12 @@ int main (int argc, char *argv[])
   // Now load the canvas plugin
   if (!System.myG2D)
   {
-    const char *canvas = cmdline->GetOption ("canvas");
+    csString canvas = cmdline->GetOption ("canvas");
     if (!canvas || !*canvas)
       canvas = CS_SOFTWARE_2D_DRIVER;
     else if (strncmp ("crystalspace.", canvas, 13))
     {
-      char *tmp = (char *)alloca (strlen (canvas) + 25);
-      strcpy (tmp, "crystalspace.graphics2d.");
-      strcat (tmp, canvas);
-      canvas = tmp;
+      canvas = "crystalspace.graphics2d." + canvas;
     }
     System.myG2D = CS_LOAD_PLUGIN (plugin_mgr, canvas, iGraphics2D);
     if (!object_reg->Register (System.myG2D, "iGraphics2D"))
