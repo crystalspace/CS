@@ -15,6 +15,26 @@ The history order is reversed so that new features are at the top.
 	  a csPtr and it was assumed that a DecRef() would happen in that
 	  case (which no longer occurs since there is a constructor
 	  from csRef to csPtr).
+	- Eric Sunshine made the following changes to TiXmlString:
+	    - Major optimization to methods which append and access strings and
+	      characters, and which access length.  Problem was that the class
+	      did not have an instance variable recording the string's length.
+	      This resulted in two types of major slow down.  First, anytime it
+	      needed to know its own length (which it did quite frequently --
+	      even when accessing a single character with operator[], and when
+	      appending), it had to scan the entire string with strlen().
+	      Second, in order to append anything (even a single character), it
+	      used strcat() or strncat() which resulted in yet another complete
+	      string scan.  Considering that the XML parser appends characters
+	      one at a time, this meant that every single character appended
+	      was accompanied by at minimum two complete string scans.  For
+	      large strings built up character by character, this overhead was
+	      a killer.
+	    - Fixed each of the comparison operators (==, <, >).  Each returned
+	      incorrect results for the boundary cases.
+	    - Folded out a small amount of redundant code (but in reality, the
+	      bulk of the code implementing this class is redundant and should
+	      be folded out).
 9-Oct-2002
 	- For some reason include/cssys/win32/csosdefs.h was full of
 	  ^M (carriage return) characters. This failed the compilation.

@@ -54,6 +54,7 @@ class TiXmlString
     {
         allocated = 0;
         cstring = NULL;
+	clength = 0;
     }
 
     // TiXmlString copy constructor
@@ -74,7 +75,7 @@ class TiXmlString
     }
 
     // Return the length of a TiXmlString
-    unsigned length () const;
+    unsigned length () const { return clength; }
 
     // TiXmlString = operator
     void operator = (const char * content);
@@ -97,7 +98,7 @@ class TiXmlString
     }
 
     // += operator. Maps to append
-    TiXmlString& operator += (TiXmlString & suffix)
+    TiXmlString& operator += (const TiXmlString & suffix)
     {
         append (suffix);
 		return *this;
@@ -164,7 +165,9 @@ class TiXmlString
 
     // The base string
     char * cstring;
-    // Number of chars allocated
+    // Length of string (not including implicit null pointer).
+    unsigned clength;
+    // Number of chars allocated (including implicit null pointer).
     unsigned allocated;
 
     // New size computation. It is simplistic right now : it returns twice the amount
@@ -180,10 +183,14 @@ class TiXmlString
         if (cstring)
             delete [] cstring;
         cstring = NULL;
+	clength = 0;
         allocated = 0;
     }
 
-    void append (const char *suffix );
+    void append (const char *suffix )
+    {
+    	append (suffix, strlen (suffix));
+    }
 
     // append function for another TiXmlString
     void append (const TiXmlString & suffix)
