@@ -1,6 +1,7 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
-    CSScript module created by Brandon Ehle
+    Based on CSScript module created by Brandon Ehle
+    Copyright (C) 2002 by W.C.A. Wijngaards
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -23,11 +24,14 @@
 #ifndef __CSS_H__
 #define __CSS_H__
 
-#ifndef BRANDON_NOTHING
+#ifndef CS_INCLUDE_NOTHING
 
 // SysDef
 #ifndef NO_CSSYSDEF
+// make it safe so no double cssysdef.h includes
+#ifndef __CS_CSSYSDEFS_H__
 #include "cssysdef.h"
+#endif
 #endif 
 
 // CS Version
@@ -411,6 +415,6 @@
 #include "csws/csws.h"
 #endif
 
-#endif // BRANDON_NOTHING
+#endif // CS_INCLUDE_NOTHING
 
 #endif // __CSS_H__
