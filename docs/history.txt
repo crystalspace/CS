@@ -8,8 +8,7 @@ The history order is reversed so that new features are at the top.
 	  infinite loops in cases where there is a portal from A->B and then
 	  another portal back from B->A which is also visible from the
 	  viewpoint of the center.
-        - Philip Wyett removed ddraw8 canvas from win32gcc build
-	  process.
+  - Philip Wyett removed ddraw8 canvas from win32gcc build process.
 	- Eric Sunshine augmented the configure script so that it uses libm.a
 	  (if available) when testing for GLU, since apparently some GLU tests
 	  (such as RedHat 8.0) fail without it.
