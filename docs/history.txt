@@ -27,6 +27,14 @@ chronological order.
 	  crystalspace3d.com.)
 	- res fixed a crash in OpenGL DrawSimpleMesh() where mesh.dynDomain
 	  wasn't checked for 0.
+	- res comitted an update to CrystalExport.mel from Mark Sanders:
+	    - Fixed bug: When save as box is open and you press Cancel it 
+	      continues saving with the previous file name.
+	    - Added a "roundoff" feature to round the vertice coordinates in 
+	      the exported file.
+	    - Changed the progress bar to display a bit more regular on 
+	      different sizes of meshes. Also rounded off the percentage 
+	      display.
 27-Nov-2004
 	- Jorrit did a few minor changes to foliage. Nothing significant.
 	- Jorrit submitted a patch from Marc Prussmeier which adds the
