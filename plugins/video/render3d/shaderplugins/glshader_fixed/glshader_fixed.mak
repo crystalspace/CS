@@ -45,9 +45,11 @@ endif
 
 INF.GLSHADER_FIXED = $(SRCDIR)/plugins/video/render3d/shaderplugins/glshader_fixed/glshader_fixed.csplugin
 INC.GLSHADER_FIXED = \
-  $(wildcard plugins/video/render3d/shaderplugins/glshader_fixed/*.h) 
+  $(wildcard $(addprefix $(SRCDIR)/,\
+  plugins/video/render3d/shaderplugins/glshader_fixed/*.h))
 SRC.GLSHADER_FIXED = \
-  $(wildcard plugins/video/render3d/shaderplugins/glshader_fixed/*.cpp)
+  $(wildcard $(addprefix $(SRCDIR)/,\
+  plugins/video/render3d/shaderplugins/glshader_fixed/*.cpp))
 OBJ.GLSHADER_FIXED = $(addprefix $(OUT)/,$(notdir $(SRC.GLSHADER_FIXED:.cpp=$O)))
 DEP.GLSHADER_FIXED = CSGEOM CSUTIL CSSYS CSUTIL CSGFX
 CFG.GLSHADER_FIXED =
