@@ -96,7 +96,7 @@ chronological order.
 	  various container classes.
 	- Eric Sunshine added the following methods to various classes and
 	  interfaces in order to promote API consistency between the various
-	  container classes. In some cases, the new methods deprecated existing
+	  container classes. In some cases, the new methods deprecate existing
 	  ones; in other cases, they add functionality which was missing.
 	    csArray<>::Contains()
 	    csArray<>::GetSize()
