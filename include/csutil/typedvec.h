@@ -174,11 +174,11 @@
 class csRestrictedAccessVector : public csVector
 {
 public:
-  virtual bool PrepareItem (csSome item)
+  virtual bool PrepareItem (csSome )
   { return true; }
-  virtual bool FreeItem (csSome item)
+  virtual bool FreeItem (csSome )
   { return true; }
-  virtual bool PopItem (csSome item)
+  virtual bool PopItem (csSome )
   { return true; }
 
   inline csRestrictedAccessVector (int lim, int thr) : csVector (lim, thr) {}
