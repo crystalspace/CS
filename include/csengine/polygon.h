@@ -1035,6 +1035,19 @@ public:
   void FillLightMap (csFrustumView& lview);
 
   /**
+   * Fill the lightmap of this polygon according to the given light and
+   * the frustum. The light is given in world space coordinates. The
+   * view frustum is given in camera space (with (0,0,0) the origin
+   * of the frustum). The camera space used is just world space translated
+   * so that the center of the light is at (0,0,0).
+   * If the lightmaps were cached in the level archive this function will
+   * do nothing.
+   * The "frustum" parameter defines the original light frustum (not the
+   * one bounded by this polygon as given by "lview").
+   */
+  void FillLightMapNew (csFrustumView* lview);
+
+  /**
    * Update vertex lighting for this polygon. Only works if the
    * polygon uses gouraud shading or is flat-shaded.
    * 'dynamic' is true for a dynamic light.
@@ -1073,6 +1086,13 @@ public:
    * This function will also traverse through a portal if so needed.
    */
   void CalculateLighting (csFrustumView* lview);
+
+  /**
+   * Check visibility of this polygon with the given csFrustumView
+   * and fill the lightmap if needed (this function calls FillLightMap ()).
+   * This function will also traverse through a portal if so needed.
+   */
+  void CalculateLightingNew (csFrustumView* lview);
 
   /**
    * Transform the plane of this polygon from object space to world space.

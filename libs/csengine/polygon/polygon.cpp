@@ -2062,3 +2062,103 @@ void csPolygon3D::CalculateDelayedLighting (csFrustumView *lview,
   lview->RestoreFrustumContext (old_ctxt);
 }
 
+void csPolygon3D::CalculateLightingNew (csFrustumView* lview)
+{
+  csFrustum* light_frustum = lview->GetFrustumContext ()->GetLightFrustum ();
+  const csVector3& center = light_frustum->GetOrigin ();
+
+  // If plane is not visible then return (backface culling).
+  if (!csMath3::Visible (center, plane->GetWorldPlane ())) return;
+
+  // Compute the distance from the center of the light
+  // to the plane of the polygon.
+  float dist_to_plane = GetPolyPlane ()->Distance (center);
+
+  // If distance is too small or greater than the radius of the light
+  // then we have a trivial case (no hit).
+  if (dist_to_plane < SMALL_EPSILON || dist_to_plane >= lview->GetRadius ())
+    return;
+
+  // In the following algorithm we ignore the light frustum and only
+  // apply shadows on the lightmap.
+
+  // @@@ TODO: Optimization. Use the light frustum to test if the
+  // polygon falls inside the light frustum (to avoid unneeded work).
+  // Beware of mirroring here.
+
+  // @@@ TODO: Optimization. Calculate minimum squared distance between
+  // the light center and the polygon to see if we should bother lighting
+  // at all.
+
+  // @@@ TODO: Optimization. Mark all shadow frustums which are relevant. i.e.
+  // which are inside the light frustum and are not obscured (shadowed)
+  // by other shadow frustums. Maybe only do this for portals.
+  // We should also give the polygon plane to MarkRelevantShadowFrustums so
+  // that all shadow frustums which start at the same plane are discarded as
+  // well.
+
+  // @@@ TODO: Optimization. Precalculated edge-table to detect polygons
+  // that are adjacent.
+
+  csPolyTexLightMap *lmi = GetLightMapInfo ();
+  bool calc_lmap = lmi && lmi->tex && lmi->tex->lm && !lmi->lightmap_up_to_date;
+
+  // Update the lightmap given light and shadow frustums in lview.
+  if (calc_lmap) FillLightMapNew (lview);
+
+  csPortal* po = GetPortal ();
+  // @@@@@@@@ We temporarily don't do lighting through space-warping portals.
+  // Needs to be fixed soon!!!
+  if (po && !po->flags.Check (CS_PORTAL_WARP))
+  {
+    csFrustumContext* old_ctxt = lview->GetFrustumContext ();
+    lview->CreateFrustumContext ();
+    csFrustumContext* new_ctxt = lview->GetFrustumContext ();
+
+    int num_vertices = GetVertices ().GetVertexCount ();
+    if (num_vertices > VectorArray.Limit ())
+      VectorArray.SetLimit (num_vertices);
+    csVector3* poly = VectorArray.GetArray ();
+
+    int j;
+    if (old_ctxt->IsMirrored ())
+      for (j = 0 ; j < num_vertices ; j++)
+        poly[j] = Vwor (num_vertices - j - 1) - center;
+    else
+      for (j = 0 ; j < num_vertices ; j++)
+        poly[j] = Vwor (j) - center;
+
+    csFrustum* new_light_frustum = light_frustum->Intersect (
+    	poly, num_vertices);
+    // @@@ Check if this isn't a memory leak.
+    new_ctxt->SetLightFrustum (new_light_frustum);
+
+    po->CheckFrustum ((iFrustumView*)lview, GetAlpha ());
+
+    lview->RestoreFrustumContext (old_ctxt);
+  }
+}
+
+void csPolygon3D::FillLightMapNew (csFrustumView* lview)
+{
+  csFrustumContext* ctxt = lview->GetFrustumContext ();
+  csLightingInfo& linfo = ctxt->GetLightingInfo ();
+
+  if (GetTextureType () != POLYTXT_LIGHTMAP)
+  {
+    // We are working for a vertex lighted polygon.
+    csColor& col = linfo.GetColor ();
+    csLight* l = (csLight*)lview->GetUserData ();
+    iLight* il = SCF_QUERY_INTERFACE_FAST (l, iLight);
+    UpdateVertexLighting (il, col, false, ctxt->IsFirstTime ());
+    il->DecRef ();
+    return;
+  }
+
+  if (linfo.GetGouraudOnly ()) return;
+
+  csPolyTexLightMap* lmi = GetLightMapInfo ();
+  if (lmi->lightmap_up_to_date) return;
+  lmi->tex->FillLightMapNew (lview);
+}
+

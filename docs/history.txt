@@ -8,6 +8,24 @@ The history order is reversed so that new features are at the top.
 	  this data is to rewrite the callback system using SCF interfaces
 	  as I have already done at other places. This is on my todo.
 	  So please leave the memory leak there for the moment.
+	- Made a lot of functions in csPolyTexture inline.
+	- Started a fundamental rewrite of the lighting system. I'm far
+	  from satisfied with the quality of the current lightmap generator.
+	  In big levels using octree there are LOTS of small and not-so-small
+	  lighting errors. Also the current code is WAY to complex to
+	  actually maintain. So I'm not going to start to try fixing that.
+	  This is only the fourth time the lighting system has been rewritten
+	  though :-)
+	- Added new csShadowBitmap class. This class will hold shadow
+	  information for a single lightmap. Shadows will be rendered on
+	  this bitmap during the lighting process. Later on the shadow bitmaps
+	  will be used to update the lightmaps.
+	- Added iFrustumViewUserdata SCF interface which will be used to
+	  attach user data to iFrustumView (used by CastShadows() and
+	  CheckFrustum()). Added SetUserdata() and GetUserdata() to
+	  iFrustumView interface.
+	- Added csLightingPolyTexQueue class which will hold the data for the
+	  lighting process. It implements iFrustumViewUserdata.
 10-Jul-2001
 	- Michael Voasse did the following:
 	    - Next installment on terrfunc, this patch adds some bound

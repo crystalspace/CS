@@ -35,6 +35,7 @@ csFrustumView::csFrustumView () :
 	node_func (NULL),
 	poly_func (NULL),
 	curve_func (NULL),
+	userdata (NULL),
 	things_shadow (false),
 	dynamic (false),
 	callback (NULL),
@@ -53,6 +54,7 @@ csFrustumView::~csFrustumView ()
   if (ctxt->GetLightFrustum ()) ctxt->GetLightFrustum ()->DecRef ();
   if (!ctxt->IsShared ()) ctxt->GetShadows ()->DecRef ();
   delete ctxt;
+  if (userdata) userdata->DecRef ();
 }
 
 void csFrustumView::StartNewShadowBlock ()

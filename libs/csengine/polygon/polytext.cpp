@@ -264,9 +264,6 @@ csPolygon3D *csDelayedLightingInfo::GetNextUnlitPolygon ()
 // Option variable: cosinus factor.
 float csPolyTexture::cfg_cosinus_factor = 0;
 
-#define lightcell_size	csLightMap::lightcell_size
-#define lightcell_shift	csLightMap::lightcell_shift
-
 SCF_IMPLEMENT_IBASE (csPolyTexture)
   SCF_IMPLEMENTS_INTERFACE (iPolygonTexture)
 SCF_IMPLEMENT_IBASE_END
@@ -278,6 +275,7 @@ csPolyTexture::csPolyTexture ()
   cache_data [0] = cache_data [1] = cache_data [2] = cache_data [3] = NULL;
   polygon = NULL;
   ipolygon = NULL;
+  shadow_bitmap = NULL;
 }
 
 csPolyTexture::~csPolyTexture ()
@@ -288,6 +286,7 @@ csPolyTexture::~csPolyTexture ()
   CS_ASSERT (cache_data[1] == NULL);
   CS_ASSERT (cache_data[2] == NULL);
   CS_ASSERT (cache_data[3] == NULL);
+  delete shadow_bitmap;
   if (lm) lm->DecRef ();
 }
 
@@ -439,8 +438,8 @@ bool csPolyTexture::GetLightmapBounds (const csVector3& lightpos, bool mirror,
     v.y = (i < 2) ? -0.5 : lmh - 0.5;
     v.z = 0.0;
 
-    v.x = ((v.x * lightcell_size) + Imin_u) * inv_ww;
-    v.y = ((v.y * lightcell_size) + Imin_v) * inv_hh;
+    v.x = ((v.x * csLightMap::lightcell_size) + Imin_u) * inv_ww;
+    v.y = ((v.y * csLightMap::lightcell_size) + Imin_v) * inv_hh;
 
     v = (m_t2w * v + v_t2w) - lightpos;
 
@@ -615,7 +614,7 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
   csVector3 *lf3d = light_frustum->GetVertices ();
   ALLOC_STACK_ARRAY (lf2d, csVector2, nvlf);
   // Project the light polygon from world space to responsability grid space
-  float inv_lightcell_size = 1.0 / lightcell_size;
+  float inv_lightcell_size = 1.0 / csLightMap::lightcell_size;
   int i, j;
   for (i = 0; i < nvlf; i++)
   {
@@ -752,7 +751,7 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
 void csPolyTexture::FillLightMap (csFrustumView& lview)
 {
   if (!lm) return;
-  
+
   csLightingInfo& linfo = lview.GetFrustumContext ()->GetLightingInfo ();
 
   // We will compute the lighting of the entire lightmap, disregarding
@@ -779,8 +778,6 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
   float inv_ww = 1.0 / ww;
   float inv_hh = 1.0 / hh;
 
-  bool hit = false;         // Set to true if there is a hit
-  bool first_time = false;  // Set to true if this is the first pass for the dynamic light
   csStatLight *light = (csStatLight *)lview.GetUserData ();
   bool dyn = light->IsDynamic ();
   csVector3& lightpos = lview.GetFrustumContext ()->GetLightFrustum ()->
@@ -790,12 +787,7 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
   {
     smap = lm->FindShadowMap (light);
     if (!smap)
-    {
       smap = lm->NewShadowMap (light, w, h);
-      first_time = true;
-    }
-    else
-      first_time = false;
     ShadowMap = smap->GetArray ();
   }
   else
@@ -830,8 +822,8 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
       if (lightness < EPSILON)
         continue;
 
-      int ru = j << lightcell_shift;
-      int rv = i << lightcell_shift;
+      int ru = j << csLightMap::lightcell_shift;
+      int rv = i << csLightMap::lightcell_shift;
 
       csVector3 v (float (ru + Imin_u) * inv_ww, float (rv + Imin_v) * inv_hh,
       	0);
@@ -841,7 +833,6 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
       if (d >= light->GetSquaredRadius ()) continue;
 
       d = qsqrt (d);
-      hit = true;
 
       float cosinus = (v - lightpos) * polygon->GetPolyPlane ()->Normal ();
       cosinus /= d;
@@ -867,16 +858,23 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
         LightMap [uv].green = l < 255 ? l : 255;
         l = LightMap [uv].blue + QRound (light_b * lightness * brightness);
         LightMap [uv].blue = l < 255 ? l : 255;
-      } /* endif */
-    } /* endfor */
-  } /* endfor */
+      }
+    }
+  }
+}
+
+void csPolyTexture::FillLightMapNew (csFrustumView* lview)
+{
+  if (!lm) return;
+
+  csLightingInfo& linfo = lview->GetFrustumContext ()->GetLightingInfo ();
 }
 
 /* Modified by me to correct some lightmap's border problems -- D.D. */
 void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
 {
-  int lw = 1 + ((w_orig + lightcell_size - 1) >> lightcell_shift);
-  int lh = 1 + ((h + lightcell_size - 1) >> lightcell_shift);
+  int lw = 1 + ((w_orig + csLightMap::lightcell_size - 1) >> csLightMap::lightcell_shift);
+  int lh = 1 + ((h + csLightMap::lightcell_size - 1) >> csLightMap::lightcell_shift);
 
   int u, uv;
 
@@ -911,7 +909,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
   int i;
   float miny = 1000000, maxy = -1000000;
   int MaxIndex = -1, MinIndex = -1;
-  float inv_lightcell_size = 1.0 / lightcell_size;
+  float inv_lightcell_size = 1.0 / csLightMap::lightcell_size;
 
   csVector3 lightpos;
   if (lp->GetLightFrustum ())
@@ -1051,8 +1049,8 @@ b:      if (scanL2 == MinIndex) goto finish;
       {
         uv = sy * new_lw + u;
 
-        ru = u << lightcell_shift;
-        rv = sy << lightcell_shift;
+        ru = u << csLightMap::lightcell_shift;
+        rv = sy << csLightMap::lightcell_shift;
 
         v1.x = (float)(ru + Imin_u) * invww;
         v1.y = (float)(rv + Imin_v) * invhh;
@@ -1160,17 +1158,329 @@ void csPolyTexture::MakeDirtyDynamicLights ()
     lm->dyn_dirty = true; 
 }
 
-iLightMap *csPolyTexture::GetLightMap () { return lm; }
-iMaterialHandle *csPolyTexture::GetMaterialHandle () { return mat_handle; }
-int csPolyTexture::GetWidth () { return w; }
-int csPolyTexture::GetHeight () { return h; }
-float csPolyTexture::GetFDU () { return fdu; }
-float csPolyTexture::GetFDV () { return fdv; }
-int csPolyTexture::GetShiftU () { return shf_u; }
-int csPolyTexture::GetOriginalWidth () { return w_orig; }
-int csPolyTexture::GetIMinU () { return Imin_u; }
-int csPolyTexture::GetIMinV () { return Imin_v; }
-void *csPolyTexture::GetCacheData (int idx) { return cache_data [idx]; }
-void csPolyTexture::SetCacheData (int idx, void *d) { cache_data [idx] = d; }
-int csPolyTexture::GetLightCellSize () { return lightcell_size; }
-int csPolyTexture::GetLightCellShift () { return lightcell_shift; }
+iLightMap* csPolyTexture::GetLightMap ()
+{
+  return lm;
+}
+
+int csPolyTexture::GetLightCellSize () { return csLightMap::lightcell_size; }
+int csPolyTexture::GetLightCellShift () { return csLightMap::lightcell_shift; }
+
+//------------------------------------------------------------------------------
+
+csShadowBitmap::csShadowBitmap (int lm_w, int lm_h, int quality)
+{
+  bitmap = NULL;
+  full_shadow = false;
+  csShadowBitmap::lm_w = lm_w;
+  csShadowBitmap::lm_h = lm_h;
+  if (quality >= 0)
+  {
+    sb_w = lm_w << quality;
+    sb_h = lm_h << quality;
+  }
+  else
+  {
+    sb_w = (lm_w+1) >> (-quality);
+    sb_h = (lm_h+1) >> (-quality);
+    if (sb_w < 1) sb_w = 1;
+    if (sb_h < 1) sb_h = 1;
+  }
+}
+
+void csShadowBitmap::RenderShadow (csVector2* shadow_poly, int num_vertices)
+{
+  int i;
+  //-------------------
+  // First we convert the polygon from lightmap coordinates to shadow
+  // bitmap coordinates.
+  //-------------------
+  if (quality > 0)
+  {
+    float mul = float (1 << quality);
+    for (i = 0 ; i < num_vertices ; i++)
+      shadow_poly[i] = shadow_poly[i] * mul;
+  }
+  else if (quality < 0)
+  {
+    float div = 1. / float (1 << -quality);
+    for (i = 0 ; i < num_vertices ; i++)
+      shadow_poly[i] = shadow_poly[i] * div;
+  }
+
+  //-------------------
+  // If we don't already have a bitmap then we allocate it here.
+  // @@@ NOTE: We currently allocate one byte for every shadow-point.
+  // That's not optimal. We should use 1/8 byte for every shadow-point.
+  //-------------------
+  if (!bitmap) bitmap = new char [sb_w * sb_h];
+
+  //-------------------
+  // First calculate the minimum and maximum indices (for 'y').
+  //-------------------
+  csVector2* sp = shadow_poly;		// For conveniance.
+  int MaxIndex = -1, MinIndex = -1;
+  float miny = 100000000, maxy = -100000000;
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    if (sp[i].y < miny) miny = sp[MinIndex = i].y;
+    if (sp[i].y > maxy) maxy = sp[MaxIndex = i].y;
+  }
+
+  //-------------------
+  // Now we will render the shadow on the shadow-bitmap.
+  //-------------------
+  int scanL1, scanL2, scanR1, scanR2;   // Scan vertex left/right start/final.
+  float sxL, sxR, dxL, dxR;             // Scanline X left/right and deltas.
+  int sy, fyL, fyR;                     // Scanline Y, final Y left and right.
+  int xL, xR;
+
+  sxL = sxR = dxL = dxR = 0;
+  scanL2 = scanR2 = MaxIndex;
+  sy = fyL = fyR = (QRound (ceil (sp[scanL2].y)) > sb_h-1)
+  	? sb_h-1 : QRound (ceil (sp[scanL2].y));
+
+  for ( ; ; )
+  {
+    //-----
+    // We have reached the next segment. Recalculate the slopes.
+    //-----
+    bool leave;
+    do
+    {
+      leave = true;
+      if (sy <= fyR)
+      {
+        // Check first if polygon has been finished
+a:      if (scanR2 == MinIndex) return;
+        scanR1 = scanR2;
+        scanR2 = (scanR2 + 1) % num_vertices;
+
+        if (ABS (sp[scanR2].y - sp[MaxIndex].y) < EPSILON)
+        {
+          // oops! we have a flat bottom!
+          goto a;
+        }
+        fyR = QRound (floor (sp[scanR2].y));
+        float dyR = (sp[scanR1].y - sp[scanR2].y);
+	sxR = sp[scanR1].x;
+        if (dyR != 0)
+        {
+          dxR = (sp[scanR2].x - sxR) / dyR;
+	  // horizontal pixel correction
+          sxR += dxR * (sp[scanR1].y - ((float)sy));
+        }
+	else dxR = 0;
+        leave = false;
+      }
+      if (sy <= fyL)
+      {
+b:      if (scanL2 == MinIndex) return;
+        scanL1 = scanL2;
+        scanL2 = (scanL2 - 1 + num_vertices) % num_vertices;
+
+        if (ABS (sp[scanL2].y - sp[MaxIndex].y) < EPSILON)
+        {
+          // oops! we have a flat bottom!
+          goto b;
+        }
+
+        fyL = QRound (floor (sp[scanL2].y));
+        float dyL = (sp[scanL1].y - sp[scanL2].y);
+	sxL = sp[scanL1].x;
+        if (dyL != 0)
+        {
+          dxL = (sp[scanL2].x - sxL) / dyL;
+          // horizontal pixel correction
+          sxL += dxL * (sp[scanL1].y - ((float)sy));
+        }
+	else dxL = 0;
+        leave = false;
+      }
+    }
+    while (!leave);
+
+    // Find the trapezoid top (or bottom in inverted Y coordinates)
+    int fin_y;
+    if (fyL > fyR) fin_y = fyL;
+    else fin_y = fyR;
+
+    while (sy >= fin_y)
+    {
+      // @@@ The check below should not be needed but it is.
+      if (sy < 0) return;
+    
+      // Compute the rounded screen coordinates of horizontal strip
+      float _l = sxL, _r = sxR;
+
+      if (_r > _l) { float _=_r; _r=_l; _l=_; }
+
+      xL = 1 + QRound (ceil (_l));
+      xR = QRound (floor (_r));
+
+      if (xR < 0) xR = 0;
+      if (xL > sb_w) xL = sb_w;
+
+      char* uv = &bitmap[sy * sb_w + xR];
+      char* uv_end = uv + (xR-xL);
+      while (uv < uv_end) *uv++ = 1;
+
+      if (!sy) return;
+      sxL += dxL;
+      sxR += dxR;
+      sy--;
+    }
+  }
+}
+
+float csShadowBitmap::GetLighting (int lm_u, int lm_v)
+{
+  if (!bitmap) return 1;
+  CS_ASSERT (lm_u >= 0 && lm_u < lm_w);
+  CS_ASSERT (lm_v >= 0 && lm_v < lm_h);
+  if (quality == 0)
+  {
+    // Shadow-bitmap has equal quality.
+    return float (bitmap[lm_v * sb_w + lm_u]);
+  }
+  else if (quality > 0)
+  {
+    // Shadow-bitmap has better quality.
+    // Here we will take an average of all shadow-bitmap values.
+    // @@@ TODO!!!
+    return 1;
+  }
+  else
+  {
+    // Shadow-bitmap has lower quality.
+    // Here we will interpolate shadow-bitmap values.
+    // @@@ TODO!!!
+    return 1;
+  }
+}
+
+void csShadowBitmap::UpdateLightMap (csRGBpixel* lightmap,
+	int lightcell_shift,
+	float shf_u, float shf_v,
+	float mul_u, float mul_v,
+	const csMatrix3& m_t2w, const csVector3& v_t2w,
+	csLight* light, const csVector3& lightpos,
+	const csVector3& poly_normal,
+	float cosfact)
+{
+  const csColor& color = light->GetColor ();
+  float light_r = color.red * NORMAL_LIGHT_LEVEL;
+  float light_g = color.green * NORMAL_LIGHT_LEVEL;
+  float light_b = color.blue * NORMAL_LIGHT_LEVEL;
+  for (int i = 0 ; i < lm_h ; i++)
+  {
+    int uv = i * lm_w;
+    for (int j = 0 ; j < lm_w ; j++, uv++)
+    {
+      float lightness = GetLighting (i, j);
+      if (lightness < EPSILON)
+        continue;
+
+      // @@@ Optimization: It should be possible to combine these
+      // calculations into a more efficient formula.
+      int ru = j << lightcell_shift;
+      int rv = i << lightcell_shift;
+      csVector3 v (float (ru + shf_u) * mul_u, float (rv + shf_v) * mul_v, 0);
+      v = v_t2w + m_t2w * v;
+
+      float d = csSquaredDist::PointPoint (lightpos, v);
+      if (d >= light->GetSquaredRadius ()) continue;
+
+      d = qsqrt (d);
+
+      float cosinus = (v - lightpos) * poly_normal;
+      cosinus /= d;
+      cosinus += cosfact;
+      if (cosinus < 0)
+        cosinus = 0;
+      else if (cosinus > 1)
+        cosinus = 1;
+
+      float brightness = cosinus * light->GetBrightnessAtDistance (d);
+
+      int l;
+      l = lightmap[uv].red + QRound (light_r * lightness * brightness);
+      lightmap[uv].red = l < 255 ? l : 255;
+      l = lightmap[uv].green + QRound (light_g * lightness * brightness);
+      lightmap[uv].green = l < 255 ? l : 255;
+      l = lightmap[uv].blue + QRound (light_b * lightness * brightness);
+      lightmap[uv].blue = l < 255 ? l : 255;
+    }
+  }
+}
+
+void csShadowBitmap::UpdateShadowMap (unsigned char* shadowmap,
+	int lightcell_shift,
+	float shf_u, float shf_v,
+	float mul_u, float mul_v,
+	const csMatrix3& m_t2w, const csVector3& v_t2w,
+	csLight* light, const csVector3& lightpos,
+	const csVector3& poly_normal,
+	float cosfact)
+{
+  for (int i = 0 ; i < lm_h ; i++)
+  {
+    int uv = i * lm_w;
+    for (int j = 0 ; j < lm_w ; j++, uv++)
+    {
+      float lightness = GetLighting (i, j);
+      if (lightness < EPSILON)
+        continue;
+
+      // @@@ Optimization: It should be possible to combine these
+      // calculations into a more efficient formula.
+      int ru = j << lightcell_shift;
+      int rv = i << lightcell_shift;
+      csVector3 v (float (ru + shf_u) * mul_u, float (rv + shf_v) * mul_v, 0);
+      v = v_t2w + m_t2w * v;
+
+      float d = csSquaredDist::PointPoint (lightpos, v);
+      if (d >= light->GetSquaredRadius ()) continue;
+
+      d = qsqrt (d);
+
+      float cosinus = (v - lightpos) * poly_normal;
+      cosinus /= d;
+      cosinus += cosfact;
+      if (cosinus < 0)
+        cosinus = 0;
+      else if (cosinus > 1)
+        cosinus = 1;
+
+      float brightness = cosinus * light->GetBrightnessAtDistance (d);
+
+      int l = shadowmap[uv] +
+      	QRound (NORMAL_LIGHT_LEVEL * lightness * brightness);
+      shadowmap[uv] = l < 255 ? l : 255;
+    }
+  }
+}
+
+//------------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (csLightingPolyTexQueue)
+  SCF_IMPLEMENTS_INTERFACE (iFrustumViewUserdata)
+SCF_IMPLEMENT_IBASE_END
+
+csLightingPolyTexQueue::csLightingPolyTexQueue ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+}
+
+csLightingPolyTexQueue::~csLightingPolyTexQueue ()
+{
+}
+
+void csLightingPolyTexQueue::UpdateMaps (csLight* light,
+	const csVector3& lightpos)
+{
+  (void) light; (void) lightpos;
+}
+
+//------------------------------------------------------------------------------
+

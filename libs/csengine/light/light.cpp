@@ -150,7 +150,10 @@ csStatLight::~csStatLight ()
 void poly_light_func (csObject* obj, csFrustumView* lview)
 {
   csPolygon3D* poly = (csPolygon3D*)obj;
-  poly->CalculateLighting (lview);
+  //if (lview->IsDynamic ())
+    poly->CalculateLighting (lview);
+  //else
+    //poly->CalculateLightingNew (lview);
 }
 
 void curve_light_func (csObject* obj, csFrustumView* lview)
@@ -174,10 +177,16 @@ void csStatLight::CalculateLighting ()
   lview.SetDynamic (false);
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
+  csLightingPolyTexQueue* lptq = new csLightingPolyTexQueue ();
+  //@@@ TWO KINDS OF USERDATA!!!
+  lview.SetUserdata (lptq);
 
   ctxt->SetLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
   sector->CheckFrustum ((iFrustumView*)&lview);
+
+  lptq->UpdateMaps (this, GetCenter ());
+  lptq->DecRef ();
 }
 
 void csStatLight::CalculateLighting (iMeshWrapper* th)
@@ -196,6 +205,10 @@ void csStatLight::CalculateLighting (iMeshWrapper* th)
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
 
+  csLightingPolyTexQueue* lptq = new csLightingPolyTexQueue ();
+  //@@@ TWO KINDS OF USERDATA!!!
+  lview.SetUserdata (lptq);
+
   ctxt->SetLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
   // @@@ Engine should not know about iThingState!!!
@@ -209,6 +222,9 @@ void csStatLight::CalculateLighting (iMeshWrapper* th)
       thing_state->DecRef ();
     }
   }
+
+  lptq->UpdateMaps (this, GetCenter ());
+  lptq->DecRef ();
 }
 
 void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
@@ -359,9 +375,19 @@ void csDynLight::Setup ()
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
 
+#if 0
+  csLightingPolyTexQueue* lptq = new csLightingPolyTexQueue ();
+  //@@@ TWO KINDS OF USERDATA!!!
+  lview.SetUserdata (lptq);
+#endif
+
   ctxt->SetLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
   sector->CheckFrustum ((iFrustumView*)&lview);
+
+#if 0
+  lptq->DecRef ();
+#endif
 }
 
 void csDynLight::SetColor (const csColor& col)

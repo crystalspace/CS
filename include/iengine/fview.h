@@ -32,6 +32,17 @@ class csFrustumContext;
 class csObject; //@@@@@@
 class csOctreeNode; //@@@@@
 
+
+SCF_VERSION (iFrustumViewUserdata, 0, 0, 1);
+
+/**
+ * User data which can be attached to iFrustumView.
+ */
+struct iFrustumViewUserdata : public iBase
+{
+};
+
+
 /**
  * The structure for registering cleanup actions.  You can register with any
  * frustumlist object any number of cleanup routines.  For this you create
@@ -234,7 +245,7 @@ public:
   bool IsFirstTime () { return first_time; }
 };
 
-SCF_VERSION (iFrustumView, 0, 1, 3);
+SCF_VERSION (iFrustumView, 0, 1, 4);
 
 /**
  * This structure represents all information needed for the frustum
@@ -292,6 +303,11 @@ struct iFrustumView : public iBase
 
   /// Start new shadow list for this frustum.
   virtual void StartNewShadowBlock () = 0;
+
+  /// Set or clear userdata.
+  virtual void SetUserdata (iFrustumViewUserdata* data) = 0;
+  /// Get userdata.
+  virtual iFrustumViewUserdata* GetUserdata () = 0;
 };
 
 #endif

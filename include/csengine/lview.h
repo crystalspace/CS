@@ -425,6 +425,8 @@ private:
   csFrustumViewFunc* poly_func;
   /// A function that is called for every curve that is hit.
   csFrustumViewFunc* curve_func;
+  /// User data for the entire process.
+  iFrustumViewUserdata* userdata;
 
   /// Radius we want to check.
   float radius;
@@ -549,7 +551,18 @@ public:
     return ((mask & process_thing_mask) == process_thing_value);
   }
 
+  /// Set or clear userdata.
+  virtual void SetUserdata (iFrustumViewUserdata* data)
+  {
+    SCF_SET_REF (userdata, data);
+  }
+  /// Get userdata.
+  virtual iFrustumViewUserdata* GetUserdata ()
+  {
+    return userdata;
+  }
   SCF_DECLARE_IBASE;
 };
 
 #endif // __CS_LVIEW_H__
+

@@ -21,7 +21,14 @@
 
 #include "csgeom/math3d.h"
 #include "imesh/thing/polygon.h"
+#include "iengine/fview.h"
 
+struct iFrustumView;
+struct csFrustumViewCleanup;
+struct iMaterialHandle;
+struct iPolygon3D;
+struct LightInfo;
+struct csRGBpixel;
 class csPolygon3D;
 class Textures;
 class csPolyPlane;
@@ -29,12 +36,144 @@ class csLightMap;
 class csLightPatch;
 class csFrustumContext;
 class csFrustumView;
-struct iFrustumView;
-struct csFrustumViewCleanup;
 class csBitSet;
-struct iMaterialHandle;
-struct iPolygon3D;
-struct LightInfo;
+class csLight;
+class csMatrix3;
+class csVector3;
+class csVector2;
+class csHashMap;
+
+/**
+ * This is user-data for iFrustumView for the lighting process.
+ * It represents a queue holding references to csPolygonTexture
+ * for all polygons that were hit by a light during the lighting
+ * process.
+ */
+struct csLightingPolyTexQueue : public iFrustumViewUserdata
+{
+private:
+  // Hashmap containing csPolygonTexture pointers.
+  // Key is the pointer itself.
+  csHashMap* map;
+
+public:
+  csLightingPolyTexQueue ();
+  virtual ~csLightingPolyTexQueue ();
+
+  /**
+   * Update all lightmaps or shadowmaps mentioned in the queue.
+   */
+  void UpdateMaps (csLight* light, const csVector3& lightpos);
+
+  SCF_DECLARE_IBASE;
+};
+
+/**
+ * This class represents a shadow-bitmap. It is used while calculating
+ * lighting for one light on a polygon. First shadows are collected on
+ * this bitmap. Later the bitmap will be used to update the lightmap.
+ */
+class csShadowBitmap
+{
+private:
+  char* bitmap;		// Shadow bitmap.
+  int lm_w, lm_h;	// Original lightmap size.
+  int sb_w, sb_h;	// Shadow bitmap size.
+  int quality;		// Quality factor.
+  bool full_shadow;	// Optimization: we are fully shadowed.
+
+private:
+  /**
+   * Get the lighting level of a point in the lightmap (using lightmap
+   * coordinates). This will be a number between 1 and 0 with 1 meaning
+   * fully lit and 0 meaning fully shadowed.
+   */
+  float GetLighting (int lm_u, int lm_v);
+
+public:
+  /**
+   * Make a new shadow bitmap of the given lightmap size and quality.
+   * Quality will be a number indicating how much we want to enhance
+   * or reduce size of this bitmap compared to the lightmap size.
+   * A quality of 0 means no change (i.e. the bitmap will hold as many
+   * shadow-points as lumels). A quality of -1 means that for every 2x2
+   * lumels there will be one shadow-point. A quality of 1 means that
+   * one lumel corresponds with 2x2 shadow-points.
+   */
+  csShadowBitmap (int lm_w, int lm_h, int quality);
+
+  /**
+   * Destroy the shadow bitmap.
+   */
+  ~csShadowBitmap () { delete[] bitmap; }
+
+  /**
+   * Render a shadow polygon on this bitmap. The coordinates of this
+   * polygon are given in lightmap coordinates. WARNING the given polygon
+   * will be modified by this function!
+   */
+  void RenderShadow (csVector2* shadow_poly, int num_vertices);
+
+  /**
+   * Take a light and update the lightmap using the information in
+   * this shadow-bitmap.
+   * <ul>
+   * <li>lightcell_shift is the shift to scale lightmap space to
+   *     texture space (with texture space meaning 0 to real texture size).
+   * <li>The shf_u, shf_v, mul_u, and mul_v fields define how to translate
+   *     the previous texture space to uv space (where uv goes between
+   *     0 and 1 for a single texture).
+   * <li>m_t2w and v_t2w transform uv space to world space coordinates.
+   * <li>light is the light and lightpos is the position of that light (which
+   *     can be different from the position of the light given by 'light'
+   *     itself because we can have space warping).
+   * </ul>
+   */
+  void UpdateLightMap (csRGBpixel* lightmap,
+	int lightcell_shift,
+	float shf_u, float shf_v,
+	float mul_u, float mul_v,
+	const csMatrix3& m_t2w, const csVector3& v_t2w,
+	csLight* light, const csVector3& lightpos,
+	const csVector3& poly_normal,
+	float cosfact);
+
+  /**
+   * Take a light and update the shadowmap using the information in
+   * this shadow-bitmap.
+   * <ul>
+   * <li>lightcell_shift is the shift to scale lightmap space to
+   *     texture space (with texture space meaning 0 to real texture size).
+   * <li>The shf_u, shf_v, mul_u, and mul_v fields define how to translate
+   *     the previous texture space to uv space (where uv goes between
+   *     0 and 1 for a single texture).
+   * <li>m_t2w and v_t2w transform uv space to world space coordinates.
+   * <li>light is the light and lightpos is the position of that light (which
+   *     can be different from the position of the light given by 'light'
+   *     itself because we can have space warping).
+   * </ul>
+   */
+  void UpdateShadowMap (unsigned char* shadowmap,
+	int lightcell_shift,
+	float shf_u, float shf_v,
+	float mul_u, float mul_v,
+	const csMatrix3& m_t2w, const csVector3& v_t2w,
+	csLight* light, const csVector3& lightpos,
+	const csVector3& poly_normal,
+	float cosfact);
+
+  /**
+   * Return true if this bitmap is fully shadowed.
+   * @@@ Will always return false at the moment (not implemented yet).
+   */
+  bool IsFullyShadowed () const { return full_shadow; }
+
+  /**
+   * Return true if this bitmap is fully lit.
+   * @@@ Will always return false at the moment (not implemented yet).
+   */
+  bool IsFullyLit () const { return false; }
+};
 
 
 // a structure used to build the light coverage data
@@ -113,6 +252,10 @@ private:
 
   /// LightMap.
   csLightMap* lm;
+  /**
+   * Shadow-bitmap used while doing lighting.
+   */
+  csShadowBitmap* shadow_bitmap;
 
   /// Internally used by (software) texture cache
   void *cache_data [4];
@@ -171,6 +314,11 @@ public:
    */
   void FillLightMap (csFrustumView& lview);
 
+  /**
+   * Update the lightmap for the given light.
+   */
+  void FillLightMapNew (csFrustumView* lview);
+
   /// set the dirty flag for our lightmap
   void MakeDirtyDynamicLights ();
 
@@ -198,25 +346,26 @@ public:
   //--------------------- iPolygonTexture implementation ---------------------
   SCF_DECLARE_IBASE;
   ///
-  virtual iMaterialHandle *GetMaterialHandle ();
+  virtual iMaterialHandle *GetMaterialHandle () { return mat_handle; }
   ///
-  virtual float GetFDU ();
+  virtual float GetFDU () { return fdu; }
   ///
-  virtual float GetFDV ();
+  virtual float GetFDV () { return fdv; }
   /// Get width of lighted texture (power of 2)
-  virtual int GetWidth ();
+  virtual int GetWidth () { return w; }
   /// Get height of lighted texture.
-  virtual int GetHeight ();
+  virtual int GetHeight () { return h; }
   ///
-  virtual int GetShiftU ();
+  virtual int GetShiftU () { return shf_u; }
   ///
-  virtual int GetIMinU ();
+  virtual int GetIMinU () { return Imin_u; }
   ///
-  virtual int GetIMinV ();
+  virtual int GetIMinV () { return Imin_v; }
   ///
-  virtual void GetTextureBox (float& fMinU, float& fMinV, float& fMaxU, float& fMaxV);
+  virtual void GetTextureBox (float& fMinU, float& fMinV,
+  	float& fMaxU, float& fMaxV);
   ///
-  virtual int GetOriginalWidth ();
+  virtual int GetOriginalWidth () { return w_orig; }
 
   ///
   virtual iPolygon3D *GetPolygon ()
@@ -241,9 +390,9 @@ public:
   virtual int GetLightCellShift ();
 
   /// Get data used internally by texture cache
-  virtual void *GetCacheData (int idx);
+  virtual void *GetCacheData (int idx) { return cache_data[idx]; }
   /// Set data used internally by texture cache
-  virtual void SetCacheData (int idx, void *d);
+  virtual void SetCacheData (int idx, void *d) { cache_data[idx] = d; }
 };
 
 #endif // __CS_POLYTEXT_H__
