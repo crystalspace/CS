@@ -26,7 +26,7 @@
 #include "csutil/objreg.h"
 #include "csutil/csstring.h"
 #include "csutil/util.h"
-#include "csgfx/symtable.h"
+#include "csutil/symtable.h"
 
 #include "iutil/event.h"
 #include "iutil/eventh.h"

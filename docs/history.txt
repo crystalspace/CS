@@ -24,6 +24,7 @@ The history order is reversed so that new features are at the top.
 	  iShaderWrapper::SelectMaterial() on the child before adding it.
 	- Oktal fixed crash in csSymbolTable::SetParent() by adding bounds
 	  checking to the symbols hashmap iterator.
+	- Oktal moved csSymbolTable from csgfx to csutil.
 19-Jul-2003
 	- Jorrit added howto about adding game data to Crystal Space objects
 	  in map files.

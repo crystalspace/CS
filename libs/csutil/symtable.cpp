@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "csgfx/symtable.h"
+#include "csutil/symtable.h"
 
 inline void csSymbolTable::SetParent (csSymbolTable *p)
 {

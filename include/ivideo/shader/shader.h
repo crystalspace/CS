@@ -29,7 +29,7 @@
 #include "csutil/csvector.h"
 #include "ivideo/render3d.h"
 #include "ivideo/rendermesh.h"
-#include "csgfx/symtable.h"
+#include "csutil/symtable.h"
 
 struct iString;
 struct iDataBuffer;

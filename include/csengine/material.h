@@ -28,7 +28,7 @@
 #include "ivideo/effects/efdef.h"
 
 #ifdef CS_USE_NEW_RENDERER
-  #include "csgfx/symtable.h"
+  #include "csutil/symtable.h"
 #endif
 
 struct iTextureWrapper;
