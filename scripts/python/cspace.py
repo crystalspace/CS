@@ -1152,77 +1152,45 @@ csIntersect2_PlaneNoTest = _cspace.csIntersect2_PlaneNoTest
 
 csIntersect2_Planes = _cspace.csIntersect2_Planes
 
-class csPoly2DUnbounded(_object):
+class csPoly2D(_object):
     __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csPoly2DUnbounded, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csPoly2DUnbounded, name)
-    def __repr__(self):
-        return "<C csPoly2DUnbounded instance at %s>" % (self.this,)
-    def __init__(self, *args):
-        _swig_setattr(self, csPoly2DUnbounded, 'this', _cspace.new_csPoly2DUnbounded(*args))
-        _swig_setattr(self, csPoly2DUnbounded, 'thisown', 1)
-    def __del__(self, destroy=_cspace.delete_csPoly2DUnbounded):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-    def assign(*args): return _cspace.csPoly2DUnbounded_assign(*args)
-    def MakeEmpty(*args): return _cspace.csPoly2DUnbounded_MakeEmpty(*args)
-    def GetVertexCount(*args): return _cspace.csPoly2DUnbounded_GetVertexCount(*args)
-    def GetVertices(*args): return _cspace.csPoly2DUnbounded_GetVertices(*args)
-    def GetVertex(*args): return _cspace.csPoly2DUnbounded_GetVertex(*args)
-    def GetFirst(*args): return _cspace.csPoly2DUnbounded_GetFirst(*args)
-    def GetLast(*args): return _cspace.csPoly2DUnbounded_GetLast(*args)
-    __swig_getmethods__["In"] = lambda x: _cspace.csPoly2DUnbounded_In
-    if _newclass:In = staticmethod(_cspace.csPoly2DUnbounded_In)
-    def MakeRoom(*args): return _cspace.csPoly2DUnbounded_MakeRoom(*args)
-    def SetVertexCount(*args): return _cspace.csPoly2DUnbounded_SetVertexCount(*args)
-    def AddVertex(*args): return _cspace.csPoly2DUnbounded_AddVertex(*args)
-    def SetVertices(*args): return _cspace.csPoly2DUnbounded_SetVertices(*args)
-    def ClipAgainst(*args): return _cspace.csPoly2DUnbounded_ClipAgainst(*args)
-    def Intersect(*args): return _cspace.csPoly2DUnbounded_Intersect(*args)
-    def ClipPlane(*args): return _cspace.csPoly2DUnbounded_ClipPlane(*args)
-    def ExtendConvex(*args): return _cspace.csPoly2DUnbounded_ExtendConvex(*args)
-    def GetSignedArea(*args): return _cspace.csPoly2DUnbounded_GetSignedArea(*args)
-    def Random(*args): return _cspace.csPoly2DUnbounded_Random(*args)
-
-class csPoly2DUnboundedPtr(csPoly2DUnbounded):
-    def __init__(self, this):
-        _swig_setattr(self, csPoly2DUnbounded, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, csPoly2DUnbounded, 'thisown', 0)
-        _swig_setattr(self, csPoly2DUnbounded,self.__class__,csPoly2DUnbounded)
-_cspace.csPoly2DUnbounded_swigregister(csPoly2DUnboundedPtr)
-
-csPoly2DUnbounded_In = _cspace.csPoly2DUnbounded_In
-
-class csPoly2D(csPoly2DUnbounded):
-    __swig_setmethods__ = {}
-    for _s in [csPoly2DUnbounded]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPoly2D, name, value)
     __swig_getmethods__ = {}
-    for _s in [csPoly2DUnbounded]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csPoly2D, name)
     def __repr__(self):
         return "<C csPoly2D instance at %s>" % (self.this,)
     def __init__(self, *args):
         _swig_setattr(self, csPoly2D, 'this', _cspace.new_csPoly2D(*args))
         _swig_setattr(self, csPoly2D, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csPoly2D):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
     def assign(*args): return _cspace.csPoly2D_assign(*args)
     def MakeEmpty(*args): return _cspace.csPoly2D_MakeEmpty(*args)
+    def GetVertexCount(*args): return _cspace.csPoly2D_GetVertexCount(*args)
+    def GetVertices(*args): return _cspace.csPoly2D_GetVertices(*args)
+    def GetVertex(*args): return _cspace.csPoly2D_GetVertex(*args)
+    def GetFirst(*args): return _cspace.csPoly2D_GetFirst(*args)
+    def GetLast(*args): return _cspace.csPoly2D_GetLast(*args)
+    __swig_getmethods__["In"] = lambda x: _cspace.csPoly2D_In
+    if _newclass:In = staticmethod(_cspace.csPoly2D_In)
+    def MakeRoom(*args): return _cspace.csPoly2D_MakeRoom(*args)
+    def SetVertexCount(*args): return _cspace.csPoly2D_SetVertexCount(*args)
     def AddVertex(*args): return _cspace.csPoly2D_AddVertex(*args)
-    def UpdateBoundingBox(*args): return _cspace.csPoly2D_UpdateBoundingBox(*args)
-    def GetBoundingBox(*args): return _cspace.csPoly2D_GetBoundingBox(*args)
+    def SetVertices(*args): return _cspace.csPoly2D_SetVertices(*args)
     def ClipAgainst(*args): return _cspace.csPoly2D_ClipAgainst(*args)
+    def Intersect(*args): return _cspace.csPoly2D_Intersect(*args)
+    def ClipPlane(*args): return _cspace.csPoly2D_ClipPlane(*args)
+    def ExtendConvex(*args): return _cspace.csPoly2D_ExtendConvex(*args)
+    def GetSignedArea(*args): return _cspace.csPoly2D_GetSignedArea(*args)
+    def Random(*args): return _cspace.csPoly2D_Random(*args)
     def __getitem__(*args): return _cspace.csPoly2D___getitem__(*args)
     def __setitem__ (self, i, v):
       own_v = self.__getitem__(i)
       for i in range(2):
         own_v[i] = v[i]
 
-    def __del__(self, destroy=_cspace.delete_csPoly2D):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
 
 class csPoly2DPtr(csPoly2D):
     def __init__(self, this):
@@ -1230,6 +1198,8 @@ class csPoly2DPtr(csPoly2D):
         if not hasattr(self,"thisown"): _swig_setattr(self, csPoly2D, 'thisown', 0)
         _swig_setattr(self, csPoly2D,self.__class__,csPoly2D)
 _cspace.csPoly2D_swigregister(csPoly2DPtr)
+
+csPoly2D_In = _cspace.csPoly2D_In
 
 class csPoly2DFactory(_object):
     __swig_setmethods__ = {}
