@@ -253,7 +253,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   if (!csInitializer::OpenApplication (object_reg))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
-	Cleanup ();
+    Cleanup ();
     exit (1);
   }
 
@@ -615,7 +615,7 @@ int main (int argc, char* argv[])
   if (!System->Initialize (argc, argv, NULL))
   {
     System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
-	Cleanup ();
+    Cleanup ();
     exit (1);
   }
 
