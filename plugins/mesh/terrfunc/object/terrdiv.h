@@ -58,6 +58,15 @@ class csTerrainQuadDiv
   /// visibility check quad to use (if any);
   csTerrainQuad *visquad;
 
+  /// cached heights for corners and middle
+  float corner_height[4], middle_height;
+
+  /// cached texture coordinates for corners and middle
+  csVector2 corner_texuv[4], middle_texuv;
+
+  /// cached lighting colors for corners and middle
+  csColor corner_color[4], middle_color;
+
 public:
   /// create tree of certain depth (0 = create leaf node).
   csTerrainQuadDiv(int depth);
@@ -84,8 +93,10 @@ public:
 
   /** Compute dmaxes from scratch.
    * Pass height func, and borders of this quad in flat space
+   * Also pass a function that compute texture coords. and its userdata.
    */
   void ComputeDmax(iTerrainHeightFunction* height_func,
+    void (*texuv_func)(void*, csVector2&, float, float), void *texdata,
     float minx, float miny, float maxx, float maxy);
   /// get Dmax
   float GetDmax() const {return dmax;}
@@ -98,21 +109,25 @@ public:
   /** Compute LOD levels - which nodes are subdivided and which are not.
    *  Pass frame number (number unique to frame so that all nodes
    *  are cleared at start), and camera position.
+   *  Also pass a function to (re)compute lighting colors, and its data.
    */
   void ComputeLOD(int framenum, const csVector3& campos,
+    void (*light_func)(void*, csColor&, float, float), void *lightdata,
     float minx, float miny, float maxx, float maxy);
 
   /// estimate nr of triangles needed (rough estimate, will be higher)
   int EstimateTris(int framenum);
 
   /** Triangulate this piece of terrain.
-   *  Calls back with triangles, cb(userdata, t1, t2, t3).
+   *  Calls back with triangles, cb(userdata, t1, t2, t3, uv1, uv2, uv3,
+   *    col1, col2, col3).
    *  Pass frame number (number unique to frame so that all nodes
    *  are cleared at start)
    */
   void Triangulate(void (*cb)(void *, const csVector3&, const csVector3&,
-    const csVector3&), void *userdata, int framenum,
-    float minx, float miny, float maxx, float maxy);
+    const csVector3&, const csVector2&, const csVector2&, const csVector2&,
+    const csColor&, const csColor&, const csColor&), void *userdata, 
+    int framenum, float minx, float miny, float maxx, float maxy);
 
   /**
    * returns true if this node has a neighbor whose LOD > this LOD.
@@ -128,8 +143,12 @@ public:
    *  Note: call this on your neighbor
    */
   void TriEdge(int dir, void (*cb)(void *, const csVector3&, const csVector3&,
-    const csVector3&), void *userdata, int framenum, 
-    const csVector3& center, csVector3& oldv, const csVector3& nextv,
+    const csVector3&, const csVector2&, const csVector2&, const csVector2&,
+    const csColor&, const csColor&, const csColor&), void *userdata, 
+    int framenum, const csVector3& center, csVector3& oldv, 
+    const csVector3& nextv, const csVector2& center_uv, 
+    csVector2& old_uv, const csVector2& next_uv, 
+    const csColor& center_col, csColor& old_col, const csColor& next_col,
     float minx, float miny, float maxx, float maxy);
 
 };

@@ -98,18 +98,74 @@ csTerrBlock::~csTerrBlock ()
   delete quaddiv; quaddiv = NULL;
 }
 
-void csTerrBlock::PrepareQuadDiv(iTerrainHeightFunction *height_func)
+/// static texture computing helpder
+struct qd_texuv_data {
+  /// who is calling
+  csTerrBlock *block;
+  csTerrFuncObject *terr;
+  /// texture correction
+  float correct_du, correct_su, correct_dv, correct_sv;
+};
+static void qd_texuv_func(void *data, csVector2& uv, float x, float y)
 {
-  quaddiv->ComputeDmax(height_func, 
+  struct qd_texuv_data *dat = (struct qd_texuv_data *)data;
+  float minx = dat->block->bbox.MinX();
+  float miny = dat->block->bbox.MinZ();
+  float boxxsize = dat->block->bbox.MaxX() - minx;
+  float boxysize = dat->block->bbox.MaxZ() - miny;
+
+  // obtain texture coords
+  uv.Set(x - minx, y - miny);
+  uv.x /= boxxsize; uv.y /= boxysize;
+  uv.x = uv.x * dat->correct_du + dat->correct_su;
+  uv.y = uv.y * dat->correct_dv + dat->correct_sv;
+}
+
+void csTerrBlock::PrepareQuadDiv(iTerrainHeightFunction *height_func,
+  csTerrFuncObject *terr)
+{
+  struct qd_texuv_data dat;
+  dat.correct_du = terr->correct_du;
+  dat.correct_su = terr->correct_su;
+  dat.correct_dv = terr->correct_dv;
+  dat.correct_sv = terr->correct_sv;
+
+  dat.terr = terr;
+  dat.block = this;
+
+  quaddiv->ComputeDmax(height_func, qd_texuv_func, (void*)&dat,
     bbox.MinX(), bbox.MinZ(), bbox.MaxX(), bbox.MaxZ());
 }
 
-void csTerrBlock::PrepareFrame(const csVector3& campos, int framenum)
+/// static light computing helper
+struct qd_light_data {
+  /// who is calling
+  csTerrBlock *block;
+  csTerrFuncObject *terr;
+};
+static void qd_light_func(void* data, csColor& col, float x, float y)
+{
+  struct qd_light_data *dat = (struct qd_light_data *)data;
+  /// need to precompute a light-map texture
+  col = dat->terr->base_color;
+  if(dat->terr->do_dirlight && dat->terr->quad_normal)
+  {
+    float l;
+    l = dat->terr->dirlight * dat->terr->quad_normal->GetNormal(x,y);
+    if(l>0) col += dat->terr->dirlight_color * l;
+  }
+}
+
+void csTerrBlock::PrepareFrame(const csVector3& campos, int framenum,
+  csTerrFuncObject *terr)
 {
   CS_ASSERT(quaddiv);
   /// compute LOD
-  quaddiv->ComputeLOD(framenum, campos, bbox.MinX(), bbox.MinZ(), bbox.MaxX(),
-    bbox.MaxZ());
+  static qd_light_data dat;
+  dat.block = this;
+  dat.terr = terr;
+  quaddiv->ComputeLOD(framenum, campos, qd_light_func, (void*)&dat,
+    bbox.MinX(), bbox.MinZ(), bbox.MaxX(), bbox.MaxZ());
   //printf("campos %g,%g,%g\n", campos.x, campos.y, campos.z);
   //printf("estimated triangles: %d\n", quaddiv->EstimateTris(framenum));
 }
@@ -132,18 +188,24 @@ struct terrdata {
 };
 
 /// get triangles
-static void TerrTri(void *userdata, const csVector3& zt1, 
-  const csVector3& zt2, const csVector3& zt3)
+static void TerrTri(void *userdata, const csVector3& t1, 
+  const csVector3& t2, const csVector3& t3, 
+  const csVector2& uv1, const csVector2& uv2, const csVector2& uv3,
+  const csColor& col1, const csColor& col2, const csColor& col3
+  )
 {
   struct terrdata *dat = (struct terrdata*)userdata;
   /// get indices for triangle
   int trinum = dat->vertices.Length();
-  csVector3 t1 = zt1;
-  csVector3 t2 = zt2;
-  csVector3 t3 = zt3;
-  t1.y = dat->terr->quad_height->GetHeight(t1.x, t1.z);
-  t2.y = dat->terr->quad_height->GetHeight(t2.x, t2.z);
-  t3.y = dat->terr->quad_height->GetHeight(t3.x, t3.z);
+  //csVector3 t1 = zt1;
+  //csVector3 t2 = zt2;
+  //csVector3 t3 = zt3;
+  //t1.y = dat->terr->quad_height->GetHeight(t1.x, t1.z);
+  //t2.y = dat->terr->quad_height->GetHeight(t2.x, t2.z);
+  //t3.y = dat->terr->quad_height->GetHeight(t3.x, t3.z);
+  //printf("triheights %g %g %g\n", dat->terr->quad_height->GetHeight(t1.x, t1.z),
+    //dat->terr->quad_height->GetHeight(t2.x, t2.z),
+    //dat->terr->quad_height->GetHeight(t3.x, t3.z));
   dat->vertices.Push(t1);
   dat->vertices.Push(t2);
   dat->vertices.Push(t3);
@@ -153,11 +215,10 @@ static void TerrTri(void *userdata, const csVector3& zt1,
   tri.c = trinum+2;
   dat->triangles.Push( tri );
 
-  float minx = dat->block->bbox.MinX();
-  float miny = dat->block->bbox.MinZ();
-  float boxxsize = dat->block->bbox.MaxX() - minx;
-  float boxysize = dat->block->bbox.MaxZ() - miny;
-
+  dat->colors.Push(col1);
+  dat->colors.Push(col2);
+  dat->colors.Push(col3);
+  /*********
   /// hack for light!
   /// need to precompute a light-map texture
   csColor res1 = dat->terr->base_color;
@@ -176,6 +237,16 @@ static void TerrTri(void *userdata, const csVector3& zt1,
   dat->colors.Push(res1);
   dat->colors.Push(res2);
   dat->colors.Push(res3);
+  *****/
+
+  dat->texels.Push( uv1 );
+  dat->texels.Push( uv2 );
+  dat->texels.Push( uv3 );
+  /****
+  float minx = dat->block->bbox.MinX();
+  float miny = dat->block->bbox.MinZ();
+  float boxxsize = dat->block->bbox.MaxX() - minx;
+  float boxysize = dat->block->bbox.MaxZ() - miny;
 
   // obtain texture coords
   csVector2 uv(t1.x - minx, t1.z - miny);
@@ -193,6 +264,7 @@ static void TerrTri(void *userdata, const csVector3& zt1,
   uv.x = uv.x * dat->correct_du + dat->correct_su;
   uv.y = uv.y * dat->correct_dv + dat->correct_sv;
   dat->texels.Push( uv );
+  ***/
 }
 
 void csTerrBlock::Draw(iRenderView *rview, bool clip_portal, bool clip_plane,
@@ -268,7 +340,8 @@ struct QuadDivHeightFunc : public iTerrainHeightFunction
   float sch, offh;
 
   SCF_DECLARE_IBASE;
-  QuadDivHeightFunc () { SCF_CONSTRUCT_IBASE (NULL); hf=NULL;}
+  QuadDivHeightFunc () { SCF_CONSTRUCT_IBASE (NULL); hf=NULL;
+    scx=scy=sch=1.0; offx=offy=offh=0.0f;}
   virtual ~QuadDivHeightFunc () {}
   /// get height using world space in world space answers
   virtual float GetHeight (float x, float y)
@@ -1480,9 +1553,9 @@ void csTerrFuncObject::SetupObject ()
       printf ("Deleted %d triangles from %d.\n", del_tri, tot_tri);
       fflush (stdout);
     }
-    if(quaddiv_enabled) InitQuadDiv();
     ComputeNormals ();
     ComputeBBoxes ();
+    if(quaddiv_enabled) InitQuadDiv();
     SetupVisibilityTree ();
   }
 }
@@ -1662,7 +1735,7 @@ void csTerrFuncObject::InitQuadDiv()
     {
       blidx = by*blockxy + bx;
       blocks[blidx].quaddiv = new csTerrainQuadDiv(initdepth);
-      blocks[blidx].PrepareQuadDiv(quad_height);
+      blocks[blidx].PrepareQuadDiv(quad_height, this);
       blocks[blidx].quaddiv->SetVisQuad(blocks[blidx].node);
       //printf("block bx=%d by=%d block %x qd %x center %g,%g,%g\n", bx, by,
        //(int)&blocks[blidx],(int)blocks[blidx].quaddiv,blocks[blidx].center.x,
@@ -1733,7 +1806,7 @@ void csTerrFuncObject::QuadDivDraw (iRenderView* rview, csZBufMode zbufMode)
         block.qd_portal = clip_portal;
         block.qd_plane = clip_plane;
         block.qd_z_plane = clip_z_plane;
-        block.PrepareFrame( origin, qd_framenum );
+        block.PrepareFrame( origin, qd_framenum, this );
       }
     }
   }

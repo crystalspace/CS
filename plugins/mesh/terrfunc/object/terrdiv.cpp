@@ -32,7 +32,13 @@ csTerrainQuadDiv::csTerrainQuadDiv(int depth)
   {
     children[i] = NULL;
     neighbors[i] = NULL;
+    corner_height[i] = 0.0;
+    corner_texuv[i].Set(0,0);
+    corner_color[i].Set(1,1,1);
   }
+  middle_height = 0.0;
+  middle_texuv.Set(0,0);
+  middle_color.Set(1,1,1);
   subdivided = 0;
   dmax = 0;
   min_height = 0;
@@ -196,43 +202,60 @@ csTerrainQuad *csTerrainQuadDiv::GetVisQuad()
 }
 
 void csTerrainQuadDiv::ComputeDmax(iTerrainHeightFunction* height_func,
+    void (*texuv_func)(void*, csVector2&, float, float), void *texdata,
     float minx, float miny, float maxx, float maxy)
 {
   int i;
   float midx = (minx+maxx)*0.5f;
   float midy = (miny+maxy)*0.5f;
   float h;
-  float cornerh[4];
-  cornerh[0] = height_func->GetHeight(minx, miny);
-  cornerh[1] = height_func->GetHeight(minx, maxy);
-  cornerh[2] = height_func->GetHeight(maxx, maxy);
-  cornerh[3] = height_func->GetHeight(maxx, miny);
+  //float cornerh[4];
+  //cornerh[0] = height_func->GetHeight(minx, miny);
+  //cornerh[1] = height_func->GetHeight(minx, maxy);
+  //cornerh[2] = height_func->GetHeight(maxx, maxy);
+  //cornerh[3] = height_func->GetHeight(maxx, miny);
+
+  corner_height[CS_QUAD_TOPLEFT] = height_func->GetHeight(minx, miny);
+  corner_height[CS_QUAD_BOTLEFT] = height_func->GetHeight(minx, maxy);
+  corner_height[CS_QUAD_BOTRIGHT] = height_func->GetHeight(maxx, maxy);
+  corner_height[CS_QUAD_TOPRIGHT] = height_func->GetHeight(maxx, miny);
+  middle_height = height_func->GetHeight(midx, midy);
+  //printf("corners %g %g %g %g\n", corner_height[0], corner_height[1], corner_height[2], corner_height[3]);
+
+  texuv_func(texdata, corner_texuv[CS_QUAD_TOPLEFT], minx, miny);
+  texuv_func(texdata, corner_texuv[CS_QUAD_BOTLEFT], minx, maxy);
+  texuv_func(texdata, corner_texuv[CS_QUAD_BOTRIGHT], maxx, maxy);
+  texuv_func(texdata, corner_texuv[CS_QUAD_TOPRIGHT], maxx, miny);
+  texuv_func(texdata, middle_texuv, midx, midy);
+
   /// first establish min/max height
   if(IsLeaf())
   {
-    min_height = height_func->GetHeight (midx, midy);
+    min_height = middle_height;
     max_height = min_height;
     for(i=0; i<4; i++)
     {
-      h = cornerh[i];
+      h = corner_height[i];
       if(h>max_height) max_height=h; 
       if(h<min_height) min_height=h;
     }
 
     /// compute dmax 
-    float h_pol = (cornerh[1] + cornerh[3])*0.5; // interpolated
-    h = height_func->GetHeight (midx, midy);
+    float h_pol = (corner_height[CS_QUAD_BOTLEFT] + 
+      corner_height[CS_QUAD_TOPRIGHT])*0.5; // interpolated
+    h = middle_height;
     dmax = ABS(h_pol - h);
+    //printf("isleaf, dmax %g h %g \n", dmax, h);
   }
   else
   {
-    children[CS_QUAD_TOPLEFT]->ComputeDmax (height_func, 
+    children[CS_QUAD_TOPLEFT]->ComputeDmax (height_func, texuv_func, texdata,
       minx, miny, midx, midy);
-    children[CS_QUAD_TOPRIGHT]->ComputeDmax(height_func, 
+    children[CS_QUAD_TOPRIGHT]->ComputeDmax(height_func, texuv_func, texdata,
       midx, miny, maxx, midy);
-    children[CS_QUAD_BOTLEFT]->ComputeDmax(height_func, 
+    children[CS_QUAD_BOTLEFT]->ComputeDmax(height_func, texuv_func, texdata,
       minx, midy, midx, maxy);
-    children[CS_QUAD_BOTRIGHT]->ComputeDmax(height_func, 
+    children[CS_QUAD_BOTRIGHT]->ComputeDmax(height_func, texuv_func, texdata,
       midx, midy, maxx, maxy);
     min_height = children[0]->GetMinHeight();
     max_height = children[0]->GetMaxHeight();
@@ -245,41 +268,54 @@ void csTerrainQuadDiv::ComputeDmax(iTerrainHeightFunction* height_func,
     }
     /// compute dmax
     /// test middle vertice
-    h = height_func->GetHeight(midx, midy);
-    float interpol_h = (cornerh[1]+cornerh[3])*0.5;
+    h = middle_height;
+    float interpol_h = (corner_height[CS_QUAD_BOTLEFT] + 
+      corner_height[CS_QUAD_TOPRIGHT])*0.5; // interpolated
     dmax = ABS(interpol_h - h);
+    //printf("nonleaf, dmax %g h %g \n", dmax, h);
     /// make sure dmax >= MAX(children dmax);
     for(i=0; i<4; i++)
     {
       if(children[i]->GetDmax() > dmax)
         dmax = children[i]->GetDmax();
     }
+    //printf("nonleaf, dmax %g after children \n", dmax);
   }
   CS_ASSERT(max_height >= min_height);
 
   /// compute dmax more precise - based on edge lines
   h = height_func->GetHeight(midx, miny);
-  h -= (cornerh[3] + cornerh[0])*0.5;
+  h -= (corner_height[CS_QUAD_TOPLEFT] + corner_height[CS_QUAD_TOPRIGHT])*0.5;
   h = ABS(h); if(h > dmax) dmax = h;
   h = height_func->GetHeight(midx, maxy);
-  h -= (cornerh[1] + cornerh[2])*0.5;
+  h -= (corner_height[CS_QUAD_BOTLEFT] + corner_height[CS_QUAD_BOTRIGHT])*0.5;
   h = ABS(h); if(h > dmax) dmax = h;
   h = height_func->GetHeight(minx, midy);
-  h -= (cornerh[0] + cornerh[1])*0.5;
+  h -= (corner_height[CS_QUAD_TOPLEFT] + corner_height[CS_QUAD_BOTLEFT])*0.5;
   h = ABS(h); if(h > dmax) dmax = h;
   h = height_func->GetHeight(maxx, midy);
-  h -= (cornerh[2] + cornerh[3])*0.5;
+  h -= (corner_height[CS_QUAD_TOPRIGHT] + corner_height[CS_QUAD_BOTRIGHT])*0.5;
   h = ABS(h); if(h > dmax) dmax = h;
 
+  //printf("  dmax %g after rest \n", dmax);
   //printf("size %g dmax is %g.\n", maxx-minx, dmax);
 }
 
 void csTerrainQuadDiv::ComputeLOD(int framenum, const csVector3& campos,
+  void (*light_func)(void*, csColor&, float, float), void *lightdata,
   float minx, float miny, float maxx, float maxy)
 {
   if(GetVisQuad()) if(!GetVisQuad()->IsVisible()) return;
   float midx = (minx+maxx)*0.5f;
   float midy = (miny+maxy)*0.5f;
+
+  /// if we arrive at this point then the quad will be visible, so
+  /// (re)compute lighting for it
+  light_func(lightdata, corner_color[CS_QUAD_TOPLEFT], minx, miny);
+  light_func(lightdata, corner_color[CS_QUAD_BOTLEFT], minx, maxy);
+  light_func(lightdata, corner_color[CS_QUAD_BOTRIGHT], maxx, maxy);
+  light_func(lightdata, corner_color[CS_QUAD_TOPRIGHT], maxx, miny);
+  light_func(lightdata, middle_color, midx, midy);
 
   /// compute visible error  (lower = more quality)
   float maxerror = 0.001f;
@@ -331,13 +367,13 @@ void csTerrainQuadDiv::ComputeLOD(int framenum, const csVector3& campos,
     /// subdivide this quad
     subdivided = framenum;
     children[CS_QUAD_TOPLEFT]->ComputeLOD (framenum, campos,
-      minx, miny, midx, midy);
+      light_func, lightdata, minx, miny, midx, midy);
     children[CS_QUAD_TOPRIGHT]->ComputeLOD (framenum, campos,
-      midx, miny, maxx, midy);
+      light_func, lightdata, midx, miny, maxx, midy);
     children[CS_QUAD_BOTLEFT]->ComputeLOD (framenum, campos,
-      minx, midy, midx, maxy);
+      light_func, lightdata, minx, midy, midx, maxy);
     children[CS_QUAD_BOTRIGHT]->ComputeLOD (framenum, campos,
-      midx, midy, maxx, maxy);
+      light_func, lightdata, midx, midy, maxx, maxy);
     return;
   }
   // do nothing (yet)
@@ -358,7 +394,9 @@ int csTerrainQuadDiv::EstimateTris(int framenum)
 }
 
 void csTerrainQuadDiv::Triangulate(void (*cb)(void *, const csVector3&, 
-  const csVector3&, const csVector3&), void *userdata, int framenum,
+  const csVector3&, const csVector3&, const csVector2&, const csVector2&, 
+  const csVector2&, const csColor&, const csColor&, const csColor&), 
+  void *userdata, int framenum, 
   float minx, float miny, float maxx, float maxy)
 {
   float midx = (minx+maxx)*0.5f;
@@ -381,48 +419,82 @@ void csTerrainQuadDiv::Triangulate(void (*cb)(void *, const csVector3&,
   /// can it suffice to just create two polys?
   /// this is possible if this node is the same or more detailed
   /// than its neighbors. (the neighbors will accomodate for this node)
-  float h=0.0;
   if(!HaveMoreDetailedNeighbor(framenum))
   {
     /// debug, create a polygon at medio height
     /// float h = (min_height + max_height)*0.5;
     cb(userdata, 
-      csVector3(minx,h,miny), csVector3(minx,h,maxy), csVector3(maxx,h,miny));
+      csVector3(minx,corner_height[CS_QUAD_TOPLEFT],miny), 
+      csVector3(minx,corner_height[CS_QUAD_BOTLEFT],maxy), 
+      csVector3(maxx,corner_height[CS_QUAD_TOPRIGHT],miny),
+      corner_texuv[CS_QUAD_TOPLEFT], corner_texuv[CS_QUAD_BOTLEFT],
+      corner_texuv[CS_QUAD_TOPRIGHT], corner_color[CS_QUAD_TOPLEFT],
+      corner_color[CS_QUAD_BOTLEFT], corner_color[CS_QUAD_TOPRIGHT]);
     cb(userdata, 
-     csVector3(maxx,h,miny), csVector3(minx,h,maxy), csVector3(maxx,h,maxy));
+     csVector3(maxx,corner_height[CS_QUAD_TOPRIGHT],miny), 
+     csVector3(minx,corner_height[CS_QUAD_BOTLEFT],maxy), 
+     csVector3(maxx,corner_height[CS_QUAD_BOTRIGHT],maxy),
+     corner_texuv[CS_QUAD_TOPRIGHT], corner_texuv[CS_QUAD_BOTLEFT],
+     corner_texuv[CS_QUAD_BOTRIGHT], corner_color[CS_QUAD_TOPRIGHT],
+     corner_color[CS_QUAD_BOTLEFT], corner_color[CS_QUAD_BOTRIGHT]);
     return;
   }
 
   /// accomodate the more detailed neighbors
   /// by drawing starshaped triangles fitting all vertices at edges
-  csVector3 center(midx,h,midy);
+  csVector3 center(midx,middle_height,midy);
+  csVector2& center_uv = middle_texuv;
+  csColor& center_col = middle_color;
+
   csVector3 nextv;
   csVector3 oldv;
 
-  oldv.Set(minx, h, miny);
+  csVector2 old_uv = corner_texuv[CS_QUAD_TOPLEFT];
+  csColor old_col = corner_color[CS_QUAD_TOPLEFT];
+  oldv.Set(minx, corner_height[CS_QUAD_TOPLEFT], miny);
   csTerrainQuadDiv *neigh = GetNeighbor(CS_QUAD_TOP);
-  nextv.Set(maxx,h,miny);
+  nextv.Set(maxx,corner_height[CS_QUAD_TOPRIGHT],miny);
+  csVector2 next_uv = corner_texuv[CS_QUAD_TOPRIGHT];
+  csColor next_col = corner_color[CS_QUAD_TOPRIGHT];
   if(neigh) neigh->TriEdge(CS_QUAD_TOP, cb, userdata, framenum, center, oldv, 
-    nextv, minx, miny, maxx, maxy);
-  else { cb(userdata, center, nextv, oldv); oldv = nextv; }
+    nextv, center_uv, old_uv, next_uv, center_col, old_col, next_col, 
+    minx, miny, maxx, maxy);
+  else { cb(userdata, center, nextv, oldv, center_uv, next_uv, old_uv,
+    center_col, next_col, old_col); 
+    oldv = nextv; old_uv=next_uv; old_col=next_col;}
 
-  nextv.Set(maxx,h,maxy);
+  nextv.Set(maxx,corner_height[CS_QUAD_BOTRIGHT],maxy);
+  next_uv = corner_texuv[CS_QUAD_BOTRIGHT];
+  next_col = corner_color[CS_QUAD_BOTRIGHT];
   neigh = GetNeighbor(CS_QUAD_RIGHT);
   if(neigh) neigh->TriEdge(CS_QUAD_RIGHT, cb, userdata, framenum, center, oldv,
-    nextv, minx, miny, maxx, maxy);
-  else { cb(userdata, center, nextv, oldv); oldv = nextv; }
+    nextv, center_uv, old_uv, next_uv, center_col, old_col, next_col, 
+    minx, miny, maxx, maxy);
+  else { cb(userdata, center, nextv, oldv, center_uv, next_uv, old_uv,
+    center_col, next_col, old_col); 
+    oldv = nextv; old_uv=next_uv; old_col=next_col;}
 
-  nextv.Set(minx,h,maxy);
+  nextv.Set(minx,corner_height[CS_QUAD_BOTLEFT],maxy);
+  next_uv = corner_texuv[CS_QUAD_BOTLEFT];
+  next_col = corner_color[CS_QUAD_BOTLEFT];
   neigh = GetNeighbor(CS_QUAD_BOT);
   if(neigh) neigh->TriEdge(CS_QUAD_BOT, cb, userdata, framenum, center, oldv,
-    nextv, minx, miny, maxx, maxy);
-  else { cb(userdata, center, nextv, oldv); oldv = nextv; }
+    nextv, center_uv, old_uv, next_uv, center_col, old_col, next_col, 
+    minx, miny, maxx, maxy);
+  else { cb(userdata, center, nextv, oldv, center_uv, next_uv, old_uv,
+    center_col, next_col, old_col); 
+    oldv = nextv; old_uv=next_uv; old_col=next_col;}
 
-  nextv.Set(minx,h,miny);
+  nextv.Set(minx,corner_height[CS_QUAD_TOPLEFT],miny);
+  next_uv = corner_texuv[CS_QUAD_TOPLEFT];
+  next_col = corner_color[CS_QUAD_TOPLEFT];
   neigh = GetNeighbor(CS_QUAD_LEFT);
   if(neigh) neigh->TriEdge(CS_QUAD_LEFT, cb, userdata, framenum, center, oldv,
-    nextv, minx, miny, maxx, maxy);
-  else { cb(userdata, center, nextv, oldv); oldv = nextv; }
+    nextv, center_uv, old_uv, next_uv, center_col, old_col, next_col, 
+    minx, miny, maxx, maxy);
+  else { cb(userdata, center, nextv, oldv, center_uv, next_uv, old_uv,
+    center_col, next_col, old_col); 
+    oldv = nextv; old_uv=next_uv; old_col=next_col;}
 
 }
 
@@ -451,17 +523,23 @@ bool csTerrainQuadDiv::HaveMoreDetailedNeighbor(int framenum)
 
 
 void csTerrainQuadDiv::TriEdge(int dir, void (*cb)(void *, 
-  const csVector3&, const csVector3&, const csVector3&), 
-  void *userdata, int framenum,
+  const csVector3&, const csVector3&, const csVector3&, const csVector2&, 
+  const csVector2&, const csVector2&, const csColor&, const csColor&, 
+  const csColor&), void *userdata, int framenum,
   const csVector3& center, csVector3& oldv, const csVector3& nextv,
+  const csVector2& center_uv, csVector2& old_uv, const csVector2& next_uv, 
+  const csColor& center_col, csColor& old_col, const csColor& next_col,
   float minx, float miny, float maxx, float maxy)
 {
   /// NOTE dir is from the caller (points from 'center' towards me)
   if(subdivided != framenum) 
   {
     /// draw singly
-    cb(userdata, center, nextv, oldv);
+    cb(userdata, center, nextv, oldv, center_uv, next_uv, old_uv,
+      center_col, next_col, old_col);
     oldv = nextv;
+    old_uv = next_uv;
+    old_col = next_col;
     return;
   }
 
@@ -469,15 +547,38 @@ void csTerrainQuadDiv::TriEdge(int dir, void (*cb)(void *,
   CS_ASSERT(!IsLeaf());
   csVector3 midpt = (oldv + nextv)*0.5f; // midpt along edge
   int ch = -1;
-  if(dir == CS_QUAD_TOP) ch=CS_QUAD_BOTLEFT;
-  if(dir == CS_QUAD_RIGHT) ch=CS_QUAD_TOPLEFT;
-  if(dir == CS_QUAD_BOT) ch=CS_QUAD_TOPRIGHT;
-  if(dir == CS_QUAD_LEFT) ch=CS_QUAD_BOTRIGHT;
+  int corner = -1;
+  if(dir == CS_QUAD_TOP) {ch=CS_QUAD_BOTLEFT; corner=CS_QUAD_BOTRIGHT;}
+  if(dir == CS_QUAD_RIGHT) {ch=CS_QUAD_TOPLEFT; corner=CS_QUAD_BOTLEFT;}
+  if(dir == CS_QUAD_BOT) {ch=CS_QUAD_TOPRIGHT; corner=CS_QUAD_TOPLEFT;}
+  if(dir == CS_QUAD_LEFT) {ch=CS_QUAD_BOTRIGHT; corner=CS_QUAD_TOPRIGHT;}
   CS_ASSERT(ch!=-1);
+  CS_ASSERT(corner!=-1);
+  /// get middle point height from children
+  midpt.y = children[ch]->corner_height[corner];
+  /// middle point texture, color from children of caller...
+  int origdir = -1, origchild = -1, origcorner = -1;
+  if(dir == CS_QUAD_TOP) {origdir=CS_QUAD_BOT, origchild=CS_QUAD_TOPLEFT;
+    origcorner=CS_QUAD_TOPRIGHT;}
+  if(dir == CS_QUAD_RIGHT) {origdir=CS_QUAD_LEFT; origchild=CS_QUAD_TOPRIGHT;
+    origcorner=CS_QUAD_BOTRIGHT;}
+  if(dir == CS_QUAD_BOT) {origdir=CS_QUAD_TOP; origchild=CS_QUAD_BOTRIGHT;
+    origcorner=CS_QUAD_BOTLEFT;}
+  if(dir == CS_QUAD_LEFT) {origdir=CS_QUAD_RIGHT; origchild=CS_QUAD_BOTLEFT;
+    origcorner=CS_QUAD_TOPLEFT;}
+  csTerrainQuadDiv *n= GetNeighbor(origdir);
+  CS_ASSERT(n);
+  csVector2 mid_uv = n->children[origchild]->corner_texuv[origcorner];
+  // csColor mid_col = n->children[origchild]->corner_color[origcorner];
+
+  csColor mid_col = children[ch]->corner_color[corner];
+
   children[ch]->TriEdge(dir, cb, userdata, framenum, center, oldv,
-    midpt, minx, miny, maxx, maxy);
+    midpt, center_uv, old_uv, mid_uv, center_col, old_col, mid_col,
+    minx, miny, maxx, maxy);
 
   CS_ASSERT( oldv == midpt );
+  CS_ASSERT( old_uv == mid_uv );
 
   ch=-1;
   if(dir == CS_QUAD_TOP) ch=CS_QUAD_BOTRIGHT;
@@ -486,5 +587,6 @@ void csTerrainQuadDiv::TriEdge(int dir, void (*cb)(void *,
   if(dir == CS_QUAD_LEFT) ch=CS_QUAD_TOPRIGHT;
   CS_ASSERT(ch!=-1);
   children[ch]->TriEdge(dir, cb, userdata, framenum, center, oldv,
-    nextv, minx, miny, maxx, maxy);
+    nextv, center_uv, old_uv, next_uv, center_col, old_col, next_col,
+    minx, miny, maxx, maxy);
 }

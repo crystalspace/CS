@@ -75,9 +75,11 @@ public:
   ~csTerrBlock ();
 
   /// prepare quad divisor, precalculations
-  void PrepareQuadDiv(iTerrainHeightFunction *height_func);
+  void PrepareQuadDiv(iTerrainHeightFunction *height_func,
+    csTerrFuncObject *terr);
   /// compute LOD for block, prepare to render (for quaddiv use)
-  void PrepareFrame(const csVector3& campos, int framenum);
+  void PrepareFrame(const csVector3& campos, int framenum,
+    csTerrFuncObject *terr);
   /// Draw (for quaddiv use)
   void Draw(iRenderView *rview, bool clip_portal, bool clip_plane,
     bool clip_z_plane, float correct_du, float correct_su, float correct_dv, 
