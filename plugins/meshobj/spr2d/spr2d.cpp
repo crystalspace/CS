@@ -289,7 +289,7 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/)
   return true;
 }
 
-void csSprite2DMeshObject::GetObjectBoundingBox (csBox3& bbox, bool /*accurate*/)
+void csSprite2DMeshObject::GetObjectBoundingBox (csBox3& /*bbox*/, bool /*accurate*/)
 {
   SetupObject ();
   //@@@ TODO
