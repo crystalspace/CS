@@ -289,7 +289,7 @@ bool G2DTestSystemDriver::HandleEvent (iEvent &Event)
       switch (Event.Command.Code)
       {
         case cscmdSystemOpen:
-          if (G2D)
+          if (myG2D)
           {
             // Create a uniform palette: r(3)g(3)b(2)
             int r,g,b;
@@ -310,7 +310,7 @@ bool G2DTestSystemDriver::HandleEvent (iEvent &Event)
             break;
           }
         case cscmdContextResize:
-          if (G2D)
+          if (myG2D)
           {
             ResizeContext ();
             break;
@@ -792,7 +792,7 @@ int main (int argc, char *argv[])
       canvas = tmp;
     }
     System.myG2D = LOAD_PLUGIN (&System, canvas, CS_FUNCID_CANVAS, iGraphics2D);
-    System.G2D = System.myG2D; // @@ temporary as long as the rest of CS relies on G2D variable in System
+    //    System.G2D = System.myG2D; // @@ temporary as long as the rest of CS relies on G2D variable in System
     System.myG2D->IncRef ();
   }
 
