@@ -73,8 +73,8 @@ obtained from:
 
 @uref{http://www.msdn.microsoft.com/directx}
 
-If you are unable to accomplish the 100+Mb (For the full @sc{sdk}) or 43Mb (For
-the VisualC only parts of the @sc{sdk}) download of the DirectX 8.1b @sc{sdk}
+If you are unable to accomplish the 200+Mb (For the full @sc{sdk}) or 43Mb (For
+the VisualC only parts of the @sc{sdk}) download of the DirectX 9 @sc{sdk}
 from the link above.  You can obtain cut down older versions (6 & 7 with no
 documents or example code) of the DirectX @sc{sdk}'s from the following
 website:

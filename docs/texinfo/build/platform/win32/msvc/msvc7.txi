@@ -54,7 +54,7 @@ Kit (@sc{sdk}) on your system.
 
 Visual C++ 7 comes with the minimum DirectX @sc{sdk} 8.1 pre-release files
 in-order to build Crystal Space. However, my advice is you download the final
-8.1b version to guarantee complete compliance.
+9 version to guarantee complete compliance.
 
 To enable you to build Crystal Space to it optimum @sc{d3d} support, you must
 download the latest DirectX Software Development Kit (@sc{sdk}), which can be
