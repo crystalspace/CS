@@ -732,6 +732,9 @@ public:
   /// Option variable: quality for lightmap calculation.
   static int lightmap_quality;
 
+  /// Option variable: enable/disable lightmapping.
+  static bool lightmap_enabled;
+
   /**
    * Create an empty thing.
    */

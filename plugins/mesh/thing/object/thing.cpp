@@ -84,6 +84,7 @@ CS_LEAKGUARD_IMPLEMENT (csThingStatic);
 CS_LEAKGUARD_IMPLEMENT (csThing);
 
 int csThing::lightmap_quality = 3;
+bool csThing::lightmap_enabled = true;
 bool csThingObjectType::do_verbose = false;
 
 //---------------------------------------------------------------------------
@@ -327,7 +328,8 @@ void csThingStatic::PrepareLMLayout ()
     }
 
     csPolyTextureMapping* lmi = sp->GetTextureMapping ();
-    if ((lmi != 0) && (sp->flags.Check (CS_POLY_LIGHTING)))
+    if ((lmi != 0) &&
+    	(csThing::lightmap_enabled && sp->flags.Check (CS_POLY_LIGHTING)))
     {
       lp->numLitPolys++;
 
@@ -472,7 +474,8 @@ void csThingStatic::DistributePolyLMs (
     csPolygon3DStatic* sp = static_polygons[polyIdx];
 
     csPolyTextureMapping* lm = sp->GetTextureMapping ();
-    if ((lm == 0) || (!sp->flags.Check (CS_POLY_LIGHTING)))
+    if ((lm == 0) || (!csThing::lightmap_enabled) ||
+    	!sp->flags.Check (CS_POLY_LIGHTING))
     {
       sp->polygon_data.useLightmap = false;
       rejectedPolys->polys.Push (polyIdx);
@@ -605,10 +608,11 @@ void csThingStatic::DistributePolyLMs (
 	int neww = (slm->width > slm->height) ? slm->width : slm->width*2;
 	int newh = (slm->width > slm->height) ? slm->height*2 : slm->height;
 
-	if ((((neww * newh) - usedLumels) >= inputQueues[curQueue].totalLumels) &&
+	if ((((neww*newh) - usedLumels) >= inputQueues[curQueue].totalLumels) &&
 	  (((float)(usedLumels + inputQueues[curQueue].totalLumels) / 
 	  (float)(neww * newh)) > (1.0f - thing_type->maxSLMSpaceWaste)) &&
-	  (neww <= thing_type->maxLightmapW) && (newh <= thing_type->maxLightmapH))
+	  (neww <= thing_type->maxLightmapW) &&
+	  (newh <= thing_type->maxLightmapH))
 	{
 	  superLMs.DeleteIndex (s);
 	  slm->Grow (neww, newh);
@@ -3262,8 +3266,13 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
     cfg->GetFloat ("Mesh.Thing.MaxSuperlightmapWaste", 0.6f);
   csThing::lightmap_quality = cfg->GetInt (
       "Mesh.Thing.LightmapQuality", 3);
+  csThing::lightmap_enabled = cfg->GetBool (
+      "Mesh.Thing.EnableLightmaps", true);
   if (csThingObjectType::do_verbose)
-    Notify ("Lightmap quality=%d\n", csThing::lightmap_quality);
+  {
+    Notify ("Lightmap quality=%d", csThing::lightmap_quality);
+    Notify ("Lightmapping enabled=%d", csThing::lightmap_enabled);
+  }
 
   return true;
 }
@@ -3350,7 +3359,8 @@ static const csOptionDescription
   config_options[] =
 {
   { 0, "cosfact", "Cosinus factor for lighting", CSVAR_FLOAT },
-  { 1, "lightqual", "Lighting quality", CSVAR_LONG }
+  { 1, "lightqual", "Lighting quality", CSVAR_LONG },
+  { 2, "lightmapping", "Enable/disable lightmapping", CSVAR_BOOL }
 };
 const int NUM_OPTIONS =
   (
@@ -3368,7 +3378,13 @@ bool csThingObjectType::eiConfig::SetOption (int id, csVariant *value)
     case 1:
       csThing::lightmap_quality = value->GetLong ();
       if (csThingObjectType::do_verbose)
-	scfParent->Notify ("Lightmap quality=%d\n", csThing::lightmap_quality);
+	scfParent->Notify ("Lightmap quality=%d", csThing::lightmap_quality);
+      break;
+    case 2:
+      csThing::lightmap_enabled = value->GetBool ();
+      if (csThingObjectType::do_verbose)
+	scfParent->Notify ("Lightmapping enabled=%d",
+		csThing::lightmap_enabled);
       break;
     default:
       return false;
@@ -3383,6 +3399,7 @@ bool csThingObjectType::eiConfig::GetOption (int id, csVariant *value)
   {
     case 0:   value->SetFloat (csPolyTexture::cfg_cosinus_factor); break;
     case 1:   value->SetLong (csThing::lightmap_quality); break;
+    case 2:   value->SetBool (csThing::lightmap_enabled); break;
     default:  return false;
   }
 

@@ -602,7 +602,7 @@ bool csPolygon3DStatic::Finish (iBase* thing_logparent)
     return true;
   }
 
-  if (flags.Check (CS_POLY_LIGHTING))
+  if (csThing::lightmap_enabled && flags.Check (CS_POLY_LIGHTING))
   {
     int lmw = csLightMap::CalcLightMapWidth (
     	polygon_data.tmapping->GetLitOriginalWidth ());
@@ -1118,7 +1118,7 @@ void csPolygon3D::Finish (csPolygon3DStatic* spoly)
   if (spoly->IsTextureMappingEnabled ())
   {
     txt_info.SetLightMap (0);
-    if (spoly->flags.Check (CS_POLY_LIGHTING))
+    if (csThing::lightmap_enabled && spoly->flags.Check (CS_POLY_LIGHTING))
     {
       csLightMap *lm = spoly->thing_static->thing_type
         ->blk_lightmap.Alloc ();

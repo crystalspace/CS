@@ -18,6 +18,11 @@ chronological order.
 	  MSVC6. If, in the future, we need to support both products, we will
 	  have to arrive at some other solution (such as conditional
 	  compilation).
+	- Jorrit added an option to thing to disable lightmapping. This
+	  will save some memory (but not as much as I expected) and enhances
+	  render speed. You can enable this option in thing.cfg (uncomment
+	  the EnableLightmaps=false line) or you can use the
+	  '-nolightmapping' commandline option.
 29-Nov-2004
 	- res changed the static variable cleanup code to employ a variable
 	  with a pointer to the cleanup function instead of using it directly.
