@@ -45,7 +45,7 @@ struct csLoaderPluginRec
 
   ~csLoaderPluginRec ()
   {
-    if (ShortName) delete [] ShortName;
+    delete [] ShortName;
     delete [] ClassID;
   }
 };
