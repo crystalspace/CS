@@ -470,27 +470,31 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview,
   iCamera* cam = rview->GetCamera ();
 
   tr_o2c = cam->GetTransform ();
-  if(!transform_mode)
+  if (!transform_mode)
   {
     emitter = movable->GetFullPosition();
     csReversibleTransform trans;
+    // @@@ The code below is not very efficient!
     trans.Identity();
     trans.SetOrigin (emitter);
     tr_o2c /= trans;
   }
   else
   {
-    tr_o2c /= movable->GetFullTransform ();
+    if (!movable->IsFullTransformIdentity ())
+      tr_o2c /= movable->GetFullTransform ();
   }
+  // @@@ GetTransform??? Shouldn't this be GetFullTransform?
   rotation_matrix = movable->GetTransform ().GetT2O ();
 
   int vertnum = 0;
   float new_radius = 0.0f;
 
-  for(int i=0;i<point_data->Length ();i++)
+  int i;
+  for (i=0 ; i<point_data->Length () ; i++)
   {
     const csParticlesData &point = point_data->Get(i);
-    if(point.time_to_live < 0.0f) break;
+    if (point.time_to_live < 0.0f) break;
 
     vertnum ++;
 
@@ -503,9 +507,9 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview,
   }
   //dead_particles = point_data->Length () - vertnum;
 
-  if(vertnum>0) 
+  if (vertnum>0) 
   {
-    radius = qsqrt(new_radius);
+    radius = qsqrt (new_radius);
     running = true;
   }
   else
@@ -515,14 +519,9 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview,
   }
 
   int clip_portal, clip_plane, clip_z_plane;
-  csSphere s (csVector3 (0), radius);
-  csVector3 camera_origin;
-  if (!rview->ClipBSphere (tr_o2c, s, clip_portal, clip_plane, clip_z_plane,
-  	camera_origin))
-  {
-    n = 0;
-    return 0;
-  }
+  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
+  	clip_z_plane);
+  csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
 
   if (!point_sprites)
   {

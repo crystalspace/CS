@@ -41,6 +41,8 @@ chronological order.
 	  simply didn't work with NR.
 	- Neil Mosafi added forward declare for iGraphics3D to 
 	  ivideo/custcursor.h
+	- Jorrit changed the 'particles' mesh object so that it now also
+	  uses CalculateClipSettings.
 	- Eric Sunshine augmented scripts/python/Jamfile so that it also cleans
 	  up the evil .pyc and .pyo files which are excreted by Python.
 25-Apr-2004
