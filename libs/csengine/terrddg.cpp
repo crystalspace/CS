@@ -375,7 +375,7 @@ void csDDGTerrain::Draw (csRenderView& rview, bool use_z_buf)
 
       rview.CalculateFogMesh (rview, g3dmesh);
 
-      if (rview.GetCallback)
+      if (rview.GetCallback ())
         rview.CallCallback (CALLBACK_MESH, (void*)&g3dmesh);
       else
         rview.GetG3D ()->DrawTriangleMesh (g3dmesh);
