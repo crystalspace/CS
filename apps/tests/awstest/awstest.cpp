@@ -72,7 +72,8 @@ const int AWSTEST_MULTIPROC  = 0;
 const int AWSTEST_SINGLEPROC = 1;
 const int AWSTEST_SCREEN     = 2;
 
-const int AWSTEST_CANVAS=AWSTEST_SINGLEPROC;
+const int AWSTEST_CANVAS=AWSTEST_SCREEN;
+// @@@@@ engine view as window background doesn't work with the proctex canvases
 
 //-----------------------------------------------------------------------------
 
