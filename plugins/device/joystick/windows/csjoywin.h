@@ -29,6 +29,9 @@
 #define DIRECTINPUT_VERSION 0x0500
 // @@@ Should be able build on older SDKs as well
 #include <dinput.h>
+#ifdef COMP_BC
+#include <dinputdefs.h>
+#endif
 
 /**
  * This plugin puts joystick events in the CS eventqueue.
