@@ -62,6 +62,11 @@ csGraphics2DSVGALib::csGraphics2DSVGALib(ISystem* piSystem) : csGraphics2D (piSy
                                "the IUnixSystemDriver interface\n");
     exit (-1);
   }
+}
+
+void csGraphics2DSVGALib::Initialize ()
+{
+  csGraphics2D::Initialize ();
 
   Font = 0;
   Memory = NULL;

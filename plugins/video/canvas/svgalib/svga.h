@@ -68,8 +68,11 @@ public:
 
   virtual bool Open (char *Title);
   virtual void Close ();
+  virtual void Initialize ();
 
   virtual bool BeginDraw () { return (Memory != NULL); }
+  virtual bool DoubleBuffer (bool Enable) { return true; }
+  virtual bool DoubleBuffer () { return true; }
 
   virtual void Print (csRect *area = NULL);
   virtual void SetRGB (int i, int r, int g, int b);
