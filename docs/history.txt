@@ -19,6 +19,31 @@ The history order is reversed so that new features are at the top.
 	  set client states outside the OpenGL renderer because the
 	  renderer has a state cache for this. We need to find a better
 	  way to solve this.
+	- Removed an unneeded 'if' before a delete. C++ guarantees checking
+	  for NULL pointers with 'delete'. No need to test.
+	- Philipp Aumayr optimized font drawing code to use vertex arrays
+	  again. This time correctly queries the client states.
+	- Daniel Duhprey fixed shadermgr: one too many passes. This is why
+	  I lost half my FPS.
+	- Matthias Braun removed const from some functions in
+	  iDocumentAttribute, this makes it considerably easier to implement
+	  them when you have to construct the elements first from some cache
+	  thing. Also fixed spr3dldr.
+	- Matthias Braun added libxml2 loader, unfortunately has several
+	  problems:
+	    - Only loading part implemented so far.
+	    - Strings which are returned are only valid till the next call to
+	      the loader. This breaks several CS plugins which store the
+	      string pointer longer than allowed.
+	    - No configure test yet.
+	    - The worst I'll probably not have time to hack on CS till next
+	      weekend, so perhaps someone wants to finish this?
+	- Daniel Duhprey fixed gcc based compiler warnings/problems with
+	  render3d.
+	- Daniel also fixed genmesh to handle anonymous buffers as well as
+	  make the vertex buffers slightly more efficient.
+	- Daniel changed which stream to use for shadows.
+	- Christian Bayle did some other debian related changes.
 15-Feb-2003
 	- res checked if the image IO plugins work properly and fixed them
 	  if necessary:
@@ -33,6 +58,14 @@ The history order is reversed so that new features are at the top.
 	  relevant for the given OS (similar to 'softcanvas').
 	- Make 'walkall' will now compile the OpenGL renderer instead of
 	  the software renderer.
+	- Matthias Braun fixed another config issue.
+	- Wouter Wijngaards fixed containerbox in emit, works now also for
+	  non-alpha particles. Added rotation to the star-sphere in partsys,
+	  removed the rotation-key (which did not work for me anyway) using
+	  the new fieldspeed feature.
+	- Matthias Braun fixed blocks.cfg not getting installed.
+	- Daniel Duhprey added arbitrary stream component for genmesh.
+	- Christian Bayle did several fixes to the Debian packages.
 14-Feb-2003
 	- Extended iVertexBuffer and iPolygonBuffer with a bounding box.
 	  The renderers can use this to optimize clipping.
@@ -64,10 +97,42 @@ The history order is reversed so that new features are at the top.
 	  could remove itself by returning true with WantToDie(). However
 	  this system is slow since the engine has to check this flag
 	  every frame. I replaced this with a new function in the engine
-	  (which is also called WantToDie()). With that functions objects
+	  (which is also called WantToDie()). With that function objects
 	  (like particle systems) can schedule themselves so that they are
 	  deleted the next frame. The engine will only have to check if
 	  there are any sheduled deletions every frame. Much faster...
+	- Anders Stenberg fixed a missing ';' in genmesh.cpp.
+	- Philip Wyett turned CS_USE_NEW_RENDERER after #endif into a c++
+	  comment as it should be and eliminated compiler warning.
+	- Marten Svanfeldt added default attenuation vector and fixed
+	  loading of attenuation vector.
+	- Marten once again fixed texturemanager (hopefully). It needs some
+	  more testing with 1d, 3d and cubemaps though.
+	- Matthias Braun fixed problems in cspython.cpp after config changes.
+	- Matthias did a fix for aws.mak to not double object files - older
+	  compilers don't like that.
+	- Matthias added a touch to get timestamp up. Some older bisons don't
+	  work otherwise.
+	- Wouter Wijngaards did the following:
+	  Added features to emitter particle system:
+	    - Field speed EmitGen3D can be specified: based on the position
+	      of the particle, each frame, the speed can be calculated for
+	      the particle.
+	    - Field accel EmitGen3D can be given, as above, but for the
+	      acceleration.
+	    - ContainerBox can be specified: particles outside this box are not 
+	      rendered. They are also not respawned, because I'm afraid it would
+	      create too many short-aged particles, and destroy the look of it.
+	    - The loader has XML format for these features.
+	    - The saver writes something sensible, but since the loader
+	      does not read this format at all, and any old converter would not
+	      support these new features, these values are more for human
+	      consumption, I'm afraid.
+	    - Note there is currently no testcase in partsys yet for these
+	      features.
+	- Marten Svanfeldt optimized shader variable system.
+	- Marten also added fixes to the way the new texture manager handles
+	  cubemaps.
 13-Feb-2003
 	- Added another trivial case to csRect::ClipLine() making it a little
 	  bit safer again.
@@ -125,6 +190,11 @@ The history order is reversed so that new features are at the top.
 	  Using this system also ensures that the genmesh lighting will be
 	  automatically updated when a light changes (pseudo-dynamic or
 	  dynamic) even without having to call DeferUpdateLighting().
+	- Christian Bayle did some more Debian stuff.
+	- Philipp Aumayr added support for attenuation 3 for new renderer. Also
+	  added parsing for this.
+	- Matthias Braun renamed aws flex and bison files to more standard
+	  extensions.
 12-Feb-2003
 	- Performed several optimizations on the tinyxml parser. Hopefully
 	  it is now a little faster.
@@ -140,6 +210,24 @@ The history order is reversed so that new features are at the top.
 	       large coordinates. This function will automatically switch
 	       to ClipLine() if the given coordinates are small enough.
 	  Thanks to Steven Geens for making the base algorithm.
+	- Matthias Braun did the following:
+	  Changed the way CS looks for the install path a bit:
+	    - Remove csGetInstallPath function and added csGetConfigPath
+	      and csGetPluginPaths.
+	    - Changed win32, unix and mac implementations accordingly. All 3
+	      compile and the win32 and unix one run fine for me. However I'm
+	      not able to test the macos one, as the shell server can't run
+	      any graphical app (and also not vsh for some reason).
+	    - Changed some #includes: When the include file is on the same
+	      directory don't do #include "walktest/walktest.h" but only
+	      #include "walktest.h"
+	    - There is no need to link the physics loader with ODE.
+	- res updated Doxygen documentation for iEvent.
+	- Daniel Duhprey did the following:
+	    - Added a function to terrbig to convert arbitrary float data (vs
+	      image data which has a granularity of 1/255).
+	    - Also a fix from John Harger for msvc.
+	- Anders Stenberg did some additional fixes for cubemaps.
 11-Feb-2003
 	- Fixed lightning command in walktest to also work if there is no light
 	  called 'l1'.
@@ -169,11 +257,27 @@ The history order is reversed so that new features are at the top.
 	  which classes are preferred, and which should be avoided.
 	- Eric Sunshine eliminated `hbox' warnings from the Texinfo files
 	  reported by TeX.
+	- Marten Svanfeldt changed render3d so that Philipp Aumayr's new texture
+	  manager is default.
+	- Marten also fixed a loading bug in shadermgr.cpp.
+	- Marten fixed multi-texturing in new shader plugin.
+	- Marten did a small fix for constants in texture.h and fixed a missing
+	  pre-definition.
+	- res reports: openal test in configure now also tests if linking with
+	  -lalut is needed.
+	- Norman Kramer make the first page visible on first appearance for
+	  the AWS notebook.
+	- Anders Stenberg fixed some errors concerning leaving wrong texture
+	  util activated.
+	- Anders also fixed some errors with cube mapping.
+	- Christian Bayle added the pre-version of the 0.96 package for Debian.
 10-Feb-2003
-	- Marten Svanfeldt fixed various bugs in TextureManager
+	- Marten Svanfeldt fixed various bugs in TextureManager and hopefully
+	  fixed the VAR-buffer manager.
 	- Philipp Aumayr added new TextureManager for Render3D with support
 	  for 1D, 3D and CubeMap Textures. iTextureManager and iTexture
 	  interface was extended to do so (#ifdef CS_USE_NEW_RENDERER).
+	- Anders Stenberg did a hack to prevent CG from ruining cached states.
 	- Philip Wyett removed duplicate CS_REPORTER_SEVERITY_DEBUG, which
 	  caused perftest to output results twice.
 	- Philip Wyett moved the flicker-note texture into 'stdtex.zip',
@@ -206,6 +310,15 @@ The history order is reversed so that new features are at the top.
 	  DrawPolygonMesh (fastmesh objects).
 	- res updated the DirectSound renderer to use smart pointers and fixed
 	  a DecRef() on a smart pointer there.
+	- res did the following:
+	    - Changed map2cs so mirrors get their own renderpriority after
+	      sky, but before wall which is drawn f2b. in map2cs tut6 this
+	      reduces the z-fighting problems, but doesn't solve them.
+	    - Cleaned .scf file loading (no need for version key any more).
+	    - Fixed possible crash in csparser (char* could've been NULL 
+	      but was unconditionally delete[]d).
+	- Matthias Braun changed scfreg to allow creation of .scf files
+	  (default now).
 9-Feb-2003
 	- res augmented flarge to contain a notice that the flickering in
 	  the street is intentional.
@@ -227,6 +340,10 @@ The history order is reversed so that new features are at the top.
 	- res further worked on XMLifying map2cs.
 	- res changed the image, sound and model converter multiplexer to
 	  lazily load plugins.
+	- res additionally did the following:
+	    - csMultiplexImageIO::SetDithering() improved.
+	    - Fixed model converters/sound loaders after interface change.
+	- Matthias Braun fixed csArray with older gcc2.9x compilers.
 8-Feb-2003
 	- Reverted the changes of res for packed rgb struct since they
 	  don't appear to work on linux (png image loader crashes).
@@ -237,6 +354,17 @@ The history order is reversed so that new features are at the top.
 	- The parsing of LEN now actually works with cs2xml.
 	- Anders Stenberg added actual support for different meshtypes 
 	  in new renderer. (Triangle strips, quads, points, lines, etc.)
+	- Anders also did a small fix to rndbuf.h.
+	- res did some minor changes in csendian.h to be better accessible via
+	  the api docs.
+	- res did some minor API documentation changes.
+	- res did a recommit of jpg/png loader w/ packed pixel routine
+	  utilization; png loader crash bug w/ grayscale images fixed.
+	- Marten Svanfeldt added very early version of shader-loader including
+	  a simple sample.
+	- res XMLified map2cs. Still needs some work. And cleanup. map2cs
+	  seems to have quite a few features not mentioned anywhere and
+	  probably unknown to everyone. 
 7-Feb-2003
 	- Fixed levtool so that by default it now gives usage information
 	  instead of the -list option. That way people will not forget
@@ -292,6 +420,13 @@ The history order is reversed so that new features are at the top.
 	  headers instead of the Win32 OpenGL headers.  This was problematic
 	  because the Cygwin headers lack __stdcall, which results in link
 	  errors when linking against opengl32.lib (libopengl32.a).
+	- res did the following:
+	    - Added routines for packed RGB/RGBA vs. csRGBcolor/csRGBpixel
+	      conversions; should work correctly on platforms where 
+	      sizeof(csRGBcolor) != 3 or sizeof(csRGBpixel) != 4.
+	    - Minor documentation changes.
+	- Matthias Braun did a little code cleanup in cs-config and made it
+	  compatible with jam build.
 6-Feb-2003
 	- Removed Video.OpenGL.Caps.MaxTexWidth, MaxTexHeight, MinTexWidth,
 	  and MinTexHeight options in opengl.cfg. Instead there is now the
@@ -323,6 +458,33 @@ The history order is reversed so that new features are at the top.
 	  Prior to this patch, the PNG loader made the dangerous and fragile
 	  assumption that csRGBPixel was always four bytes.  The patch works
 	  uniformly by converting all input formats to 24-bit.
+	- Matthias Braun enabled qsqrt again as it seems to compile for me
+	  without problem and according to Jorrit it's important for
+	  performance. configure switch still is in of course.
+	- Matthias also removed an unneeded #define from the pthread test.
+5-Feb-2003
+	- Philip Wyett bumped version to 0.97rdev.
+	- Anders Stenberg added better matrix support in CG plugin.
+	- Anders updated thing and bugplug to comply to changed meshobject
+	  interface for new renderer.
+	- Anders fixed some bad indentation in genmesh and also made
+	  shadow generation work without <autonormals />.
+	- Matthias Braun added a Clear() function to the list iterator.
+	- Matthias Braun also changed recursive mutex test to define
+	  _GNU_SOURCE first this seems to be needed on older linux
+	  distributions to get the recursive extension. Also rewrote the posix
+	  mutex code a bit.
+	- Matthias did a fix for pthread stuff.
+	- Marten Svanfeldt fixed a memoryleak due to the sorted render
+	  queues not being destructed when using render3d.
+	- Marten also updated the OpenGL extensionheader creator in the
+	  python plugin.
+	- Matthias Braun disabled qsqrt by default as it seems to trigger
+	  compiler bugs in latest gcc although our test succeeds.
+	- Marten Svanfeldt added a renderbuffer manager for
+	  ATI_vertex_array_object. Fixed the NV_vertex_array_range buffer
+	  manager so that it hopefully works. Fixed the discardingsystem.
+	- Marten also began implementing shader loading.
 4-Feb-2003
 	- Eric Sunshine augmented the ODE check in configure.ac so that it
 	  works in two phases.  First it checks for libode.  Second, it checks
@@ -334,6 +496,23 @@ The history order is reversed so that new features are at the top.
 	  PTHREAD_MUTEX_RECURSIVE_NP, rather than only recognizing the _NP
 	  variation.  The detected macro, if any, is now properly employed by
 	  cspthrd.cpp.
+	- Matthias Braun reports: apparently on some bitched strange installs
+	  (redhat 7.3 :-/) recursive mutexes compile with gcc but don't
+	  compile with g++ :-/
+	- Marten Svanfeldt did the following:
+	    - Changed the way we pass lightinformation to vertex-programs
+	      from using glLight tracking into using variables.
+	    - Added a 4-component vector. This is almost a copy of
+	      csVector3/csDVector3 with small changes due to the 4th-component.
+	    - Added support for csVector4 to shader variables.
+	    - Added so that default-color is white when using new renderer
+	      (this is needed due to how the new renderer handles lighting).
+	- Anders Stenberg moved the implementation of csShaderVariable.
+	- Daniel Duhprey optimized shadow volumes from 9x per light to 2x per
+	  light. Also changed the shadow calculation to depth pass for now
+	  (almost twice as fast).
+	- Daniel also added light parameter to DrawShadow() for optimization
+	  purposes.
 3-Feb-2003
 	- Eric Sunshine replaced fabsf() with fabs() in terrbig plugin for
 	  improved portability since not all platforms have fabsf().  (An
@@ -390,6 +569,11 @@ The history order is reversed so that new features are at the top.
 	      for dsound.lib on Windows.
 	    - Ported OpenAL renderer (plugins/sound/renderer/openal) to
 	      MacOS/X.  Works correctly with OpenAL.framework.
+	- Philip Wyett worked around #define MNG_DLL for Cygwin port, who's
+	  default build of MNG is static.
+	- Matthias Braun did a fix to cs-config so that --help works without
+	  CRYSTAL being set. Also updated ODE test to look for some new
+	  0.035 functions and improved check for recursive mutexes.
 2-Feb-2002
 	- Optimization with polygon buffers (DrawPolygonMesh) in OpenGL
 	  renderer. They use less memory now and they are also more efficient.
@@ -439,9 +623,30 @@ The history order is reversed so that new features are at the top.
 	    * Effective code (totally unoptimized now)
 	- Anders Stenberg fixed stencil clipping for new renderer again.  It
 	  should now work even with shadows.
+	- Anders also fixed shader plugins to be up to date with minor
+	  changes in the shader interface.
 	- Eric Sunshine updated the extremely outdated "External Utilities /
 	  Libraries" page on the web site and fixed broken links.
-	- res fixed a crash in JNG saving
+	- res fixed a crash in JNG saving.
+	- Matthias Braun rewrote the list template:
+	    - Function names are more uniform to rest of CS templates now
+	      (Yes, we should use STL but the function names used before are
+	      neither STL nor CS standard...)
+	    - Internal implementation of csListElement is now correctly hidden
+	      and only exposed through the Iterators.
+	    - Improved implementation of PushFront and PushBack a bit.
+	    - Replaced some const T with const T& to make the copy
+	      constructors more efficient.
+	    - Fixed gl_varbufmgr for the list changes.
+	- Matthias Braun finally found the memory error: an unitialized
+	  variable in the ogg reader...
+	- Matthias added helper class for scoped mutex lock. Also renamed
+	  ScopedMutex to ScopedMutexLock.
+	- Matthias changed CS mutex code to support recursive mutexes. Also
+	  added check for pthread implementation allowing recursive
+	  mutexes.
+	- res commented out a csMutex::Create() to make it compile again
+	  and Matthias then fixed it for real.
 1-Feb-2003
 	- Marten Svanfeldt completly rewrote the renderbuffer manager using
 	  the VAR extension on Nvidia-cards
@@ -465,6 +670,10 @@ The history order is reversed so that new features are at the top.
 	  calculations would go wrong because the shift value (4) wasn't
 	  updated. This bug was introduced when I moved thing to a seperate
 	  plugin.
+	- Matthias Braun applied patch from damage-list@freenet.de.
+	  This patch fixed some crashers in csgrid and tries to close a memory
+	  leak in palettes. (I modified the patch a bit as it contained a
+	  mismatched malloc/delete).
 31-Jan-2003
 	- Another small optimization in the super lightmap cache. This time
 	  avoid virtual function calls.
@@ -484,11 +693,13 @@ The history order is reversed so that new features are at the top.
 	  bug was introduced yesterday and caused lightmaps to be wrong
 	  if exact clipping was needed.
 	- res fixed MSVC assertion in csString::Collapse() if the string
-	  contains characters >= 0x80
+	  contains characters >= 0x80.
 	- Eric Sunshine worked around an internal compiler error on MacOS/X by
 	  slightly reorganizing csGraphics3DOGLCommon::ClipTriangleMesh() in
 	  ogl_g3dcom.cpp.  Also eliminated a significant number of compilation
 	  warnings.
+	- Matthias Braun fixed plugin linking with custom lflags for various
+	  plugins. Also fixed dependency generation.
 30-Jan-2003
 	- Greatly modified the DrawPolygonMesh and polygon buffer
 	  code in the OpenGL renderer. This is still very experimental
@@ -512,6 +723,8 @@ The history order is reversed so that new features are at the top.
 	- The software implementation of DrawPolygonMesh was not at all
 	  behaving well in case polygons go beyond the Z-plane. Fixed this
 	  now.
+	- Philip Wyett updated the msvc_libs links in the documentation.
+	- Marten Svanfeldt fixed an error made when rewriting the statecache.
 28-Jan-2003
 	- Removed iGLStateCache. Instead csGLStateCache is used. This is
 	  possible because csGLStateCache doesn't do any memory allocation
