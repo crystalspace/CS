@@ -14,9 +14,12 @@ struct iAwsSigSrc;
 class  awsWindow;
 class  awsComponentNode;
 class  awsComponentFactory;
+
 struct  iGraphics2D;
 struct  iGraphics3D;
-            
+struct  iEngine;
+struct  iTextureManager;
+       
 
 SCF_VERSION (iAws, 0, 0, 1);
 
@@ -37,6 +40,12 @@ public:
 
   /// Set the top window
   virtual void       SetTopWindow(awsWindow *win)=0;
+  
+  /// Causes the current view of the window system to be drawn to the given graphics device.
+  virtual void       Print(iGraphics3D *g3d)=0;
+  
+  /// Redraw whatever portions of the screen need it.
+  virtual void       Redraw()=0;
 
   /// Mark a region dirty
   virtual void       Mark(csRect &rect)=0;
@@ -45,7 +54,7 @@ public:
   virtual void SetContext(iGraphics2D *g2d, iGraphics3D *g3d)=0;
 
   /// Set the context to the procedural texture
-  virtual void SetDefaultContext()=0;
+  virtual void SetDefaultContext(iEngine* engine, iTextureManager* txtmgr)=0;
 
   /// Get the iGraphics2D interface so that components can use it.
   virtual iGraphics2D *G2D()=0;
@@ -100,6 +109,19 @@ public:
   
   /// Find window definition and return the component node holding it, Null otherwise
   virtual awsComponentNode *FindWindowDef(char *name)=0;
+  
+  /// Sets the value of a color in the global AWS palette.
+  virtual void SetColor(int index, int color)=0; 
+    
+  /// Gets the value of a color from the global AWS palette.
+  virtual int  GetColor(int index)=0;
+    
+  /** Sets up the AWS palette so that the colors are valid reflections of
+       user preferences.  Although SetColor can be used, it's recommended 
+       that you do not.  Colors should always be a user preference, and 
+       should be read from the window and skin definition files (as
+       happens automatically normally. */
+  virtual void SetupPalette(iGraphics3D *g3d)=0;
 
 };
 
