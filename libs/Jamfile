@@ -5,13 +5,13 @@ CSLIB.TESTS = ;
 CSLIB.ROOT = $(SUBDIR_TOKENS) ;
 CSLIB.DECLARED = no ;
 
-## CsLibAddTestDir dirs, reparent
+## CsLibAddTestDirs dirs, reparent
 ##   Convenience rule for use by subdirectories of this directory and their
 ##   children.  Adds a list of test directories within the child directory to
 ##   the list of directories containing unit tests for the master
 ##   crystalspace.lib target.  `reparent' is a list of tokens representing the
 ##   relative path from this directory down to the child directory.
-rule CsLibAddTestDir
+rule CsLibAddTestDirs
 {
   local dirs = $(1) ;
   local reparent = [ ConcatDirs $(2) ] ;
@@ -71,7 +71,7 @@ rule CsLibAddModule
   local incpat = *.h *.hpp *.hxx *.H ;
 
   CsLibAddWild $(srcpat) $(incpat) : $(modname) : $(rejects) ;
-  CsLibAddTestDir t : $(modname) ;
+  CsLibAddTestDirs t : $(modname) ;
 
   local oldsubdir = $(SUBDIR_TOKENS) ;
   SubDir TOP include $(modname) ;
