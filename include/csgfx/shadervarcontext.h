@@ -20,6 +20,8 @@
 #ifndef __CS_CSGFX_SHADERVARCONTEXT_H__
 #define __CS_CSGFX_SHADERVARCONTEXT_H__
 
+#include "csextern.h"
+
 #include "ivideo/shader/shader.h"
 #include "shadervar.h"
 
@@ -27,7 +29,7 @@
  * Simple implementation for iShaderVariableContext.
  */
 
-class csShaderVariableContext : public iShaderVariableContext
+class CS_CSGFX_EXPORT csShaderVariableContext : public iShaderVariableContext
 {
   csRefArray<csShaderVariable> variables;
 public:

@@ -22,6 +22,8 @@
 /**\file
  */
 
+#include "csextern.h"
+
 #include "cstypes.h"
 
 struct iImage;
@@ -44,7 +46,7 @@ struct iImage;
  * A class representing a bumpmap. It can be constructed from regular
  * images.
  */
-class csBumpMap
+class CS_CSGFX_EXPORT csBumpMap
 {
 protected:
   /// Width of bumpmap.

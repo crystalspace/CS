@@ -20,6 +20,8 @@
 #ifndef __CS_GFX_SHADERVAR_H__
 #define __CS_GFX_SHADERVAR_H__
 
+#include "csextern.h"
+
 #include "csutil/refcount.h"
 #include "csutil/strhash.h"
 #include "iutil/string.h"
@@ -54,7 +56,7 @@ struct iShaderVariableAccessor : public iBase
 /**
  * Storage class for inheritable variables in the shader system.
  */
-class csShaderVariable : public csRefCount
+class CS_CSGFX_EXPORT csShaderVariable : public csRefCount
 {
 public:
   /// Data types able to be stored

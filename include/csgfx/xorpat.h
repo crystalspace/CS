@@ -27,6 +27,8 @@
 #ifndef __CS_XORPAT_H__
 #define __CS_XORPAT_H__
 
+#include "csextern.h"
+
 /**
  * Create an iImage with a nice XOR pattern with 2^\p recdepth
  * shades of from white to black.
@@ -37,11 +39,9 @@
  * \param green Maximum value of green component
  * \param blue Maximum value of blue component
  */
-extern csPtr<iImage> csCreateXORPatternImage(int width, int height,
-					     int recdepth,
-					     float red = 1.0f,
-					     float green = 1.0f,
-					     float blue = 1.0f);
+extern CS_CSGFX_EXPORT csPtr<iImage> csCreateXORPatternImage(int width, 
+  int height, int recdepth, float red = 1.0f, float green = 1.0f,
+  float blue = 1.0f);
 
 /** @} */
 

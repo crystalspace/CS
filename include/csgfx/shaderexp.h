@@ -19,6 +19,8 @@
 #ifndef __CS_GFX_SHADEREXP_H__
 #define __CS_GFX_SHADEREXP_H__
 
+#include "csextern.h"
+
 #include "csutil/strhash.h"
 #include "csgeom/vector4.h"
 #include "csutil/array.h"
@@ -33,9 +35,11 @@ struct cons;
 /** 
  * An evaluable expression attached to a shader variable.
  */
-class csShaderExpression {
+class CS_CSGFX_EXPORT csShaderExpression 
+{
 public:
-  struct oper_arg { 
+  struct oper_arg 
+  { 
     uint8 type;
     
     union {
@@ -53,7 +57,8 @@ public:
     csVector4 vec4;
   };
 
-  struct oper {
+  struct oper 
+  {
     uint8 opcode, acc;
     oper_arg arg1, arg2;
   };
@@ -66,7 +71,10 @@ private:
   /// Indicates whether the token- and type-tables have been loaded.
   static bool loaded;
   /// Various internal hash tables
-  static csStringHash xmltokens, sexptokens, xmltypes, mnemonics;
+  static csStringHash xmltokens;
+  static csStringHash sexptokens;
+  static csStringHash xmltypes;
+  static csStringHash mnemonics;
   /// Attached iShaderVariableContext
   iShaderVariableContext * varContext;
   /// String set for producing String IDs
@@ -172,7 +180,8 @@ public:
   bool Evaluate(csShaderVariable *);
 };
 
-inline const char * csShaderExpression::get_type_name(csStringID id) const {
+inline const char * csShaderExpression::get_type_name(csStringID id) const 
+{
   return xmltypes.Request(id);
 }
 

@@ -19,6 +19,8 @@
 #ifndef __CS_CSGRAPHIC_IMGLIST_H__
 #define __CS_CSGRAPHIC_IMGLIST_H__
 
+#include "csextern.h"
+
 #include "csutil/scf.h"
 #include "csutil/refarr.h"
 #include "igraphic/image.h"
@@ -26,7 +28,7 @@
 
 SCF_VERSION (csImageVector, 0, 0, 1);
 
-struct csImageVector : public iImageVector
+struct CS_CSGFX_EXPORT csImageVector : public iImageVector
 {
 private:
   csRefArray<iImage> image;

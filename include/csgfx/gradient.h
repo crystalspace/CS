@@ -24,6 +24,8 @@
  * Simple color gradient
  */
 
+#include "csextern.h"
+
 #include "csutil/cscolor.h"
 #include "csutil/array.h"
 #include "csgfx/rgbpixel.h"
@@ -33,7 +35,7 @@ class csGradient;
 /**
  * An entry in a csGradient gradient.
  */
-struct csGradientShade 
+struct CS_CSGFX_EXPORT csGradientShade 
 {
   /// Color of the left side
   csColor left;
@@ -91,7 +93,7 @@ struct csGradientShade
  * \endcode
  * \todo More shade management (e.g. getting, deleting of single shades.)
  */
-class csGradient
+class CS_CSGFX_EXPORT csGradient
 {
 protected:
   /// The entries in this gradient.

@@ -20,13 +20,15 @@
 #ifndef __CS_MEMIMAGE_H__
 #define __CS_MEMIMAGE_H__
 
+#include "csextern.h"
+
 #include "csimage.h"
 
 /**
  * Memory image.
  * \remark Does not support cropping or cloning.
  */
-class csImageMemory : public csImageFile
+class CS_CSGFX_EXPORT csImageMemory : public csImageFile
 {
 private:
   /// If we are a blank image, we can take a short cut with rescaling

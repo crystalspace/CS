@@ -20,6 +20,8 @@
 #ifndef __CS_IMAGE_H__
 #define __CS_IMAGE_H__
 
+#include "csextern.h"
+
 #include <stdio.h>
 #include "csgfx/rgbpixel.h"
 #include "cstypes.h"
@@ -31,7 +33,7 @@
  * type. The image file class contains a number of member functions
  * for accessing and manipulating the image contents.
  */
-class csImageFile : public iImage
+class CS_CSGFX_EXPORT csImageFile : public iImage
 {
 protected:
   /// Width of image.

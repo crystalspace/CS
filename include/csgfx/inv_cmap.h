@@ -37,6 +37,8 @@
  * Compute an inverse colormap
  */
 
+#include "csextern.h"
+
 #include "rgbpixel.h"
 
 /**
@@ -85,8 +87,8 @@
  * if red is bigger). Thus it is adviced to use same resolution for R and G.
  * If someone can find out why it happens, he is free to do it -- A.Z.
  */
-extern void csInverseColormap (int colors, csRGBpixel *colormap,
-  int rbits, int gbits, int bbits, uint8 *&rgbmap,
+extern CS_CSGFX_EXPORT void csInverseColormap (int colors, 
+  csRGBpixel *colormap, int rbits, int gbits, int bbits, uint8 *&rgbmap,
   uint32 *dist_buf = 0);
 
 #endif // __CS_INV_CMAP_H__

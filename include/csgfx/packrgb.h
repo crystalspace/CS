@@ -25,6 +25,8 @@
 #ifndef __CSGFX_PACKRGB_H__
 #define __CSGFX_PACKRGB_H__
 
+#include "csextern.h"
+
 #include "cstypes.h"
 #include "rgbpixel.h"
 

@@ -21,6 +21,8 @@
 #ifndef __CS_RGB_VECTOR_H__
 #define __CS_RGB_VECTOR_H__
 
+#include "csextern.h"
+
 #include "csutil/array.h"
 #include "csgfx/rgbpixel.h"
 
@@ -29,7 +31,7 @@
  * csRGBcolor structs onto it.  It has overrides for
  * Compare and CompareKey.  
  */
-class csRGBVector : public csArray<csRGBcolor*>
+class CS_CSGFX_EXPORT csRGBVector : public csArray<csRGBcolor*>
 {
 public:
   /// Compare two csRGBcolor structs.

@@ -54,6 +54,8 @@
 #ifndef __CS_RGBPIXEL_H__
 #define __CS_RGBPIXEL_H__
 
+#include "csextern.h"
+
 #include <stdio.h>
 #include "cstypes.h"
 

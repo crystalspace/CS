@@ -28,9 +28,8 @@
  * @{
  */
 
-  /**
-   */
-   
+#include "csextern.h"
+
 #include "csgfx/rgbpixel.h"
 
 struct csColorBox;
@@ -127,7 +126,7 @@ struct csColorBox;
  * Palette() will allocate color index 0 for that color, and
  * Remap will map all such pixel values to index 0.
  */
-class csColorQuantizer
+class CS_CSGFX_EXPORT csColorQuantizer
 {
 private:
   friend struct csColorBox;
