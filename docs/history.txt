@@ -1,6 +1,13 @@
 The history order has been reversed so that new features are at the top.
 
 9-Apr-2001
+	- Michael Voase did a slight visual change to MazeD.
+	- Michael also removed bogus comment about non existant bug
+	  in the loader.
+	- Norman Kramer fixed the case insensitivity problem in scf
+	  classname construction (for avi) (hopefully there aren't codecs
+	  that distinguish by case only).
+	- Norman also fixed a color problem in the avi plugin.
 	- Removed the 'movable' from csThing. The 'movable' is part of the
 	  mesh wrapper and the one in csThing should not be used.
 	- csThing no longer implements iVisibilityObject as the mesh wrapper
