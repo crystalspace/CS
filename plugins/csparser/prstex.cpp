@@ -49,7 +49,8 @@
 
 #define PLUGIN_LEGACY_TEXTYPE_PREFIX  "crystalspace.texture.loader."
 
-bool csLoader::ParseMaterialList (iDocumentNode* node, const char* prefix)
+bool csLoader::ParseMaterialList (iLoaderContext* ldr_context,
+	iDocumentNode* node, const char* prefix)
 {
   if (!Engine) return false;
 
@@ -63,9 +64,7 @@ bool csLoader::ParseMaterialList (iDocumentNode* node, const char* prefix)
     switch (id)
     {
       case XMLTOKEN_MATERIAL:
-        //if (!ParseMaterial (child, prefix))
-	//  return false;
-	if (!ParseMaterial (child, prefix))
+	if (!ParseMaterial (ldr_context, child, prefix))
 	  return false;
         break;
       default:
@@ -77,7 +76,8 @@ bool csLoader::ParseMaterialList (iDocumentNode* node, const char* prefix)
   return true;
 }
 
-bool csLoader::ParseTextureList (iDocumentNode* node)
+bool csLoader::ParseTextureList (iLoaderContext* ldr_context,
+	iDocumentNode* node)
 {
   if (!Engine || !ImageLoader) return false;
   static bool proctex_deprecated_warned = false;
@@ -106,7 +106,7 @@ bool csLoader::ParseTextureList (iDocumentNode* node)
 	  proctex_deprecated_warned = true;
 	}
       case XMLTOKEN_TEXTURE:
-        if (!ParseTexture (child))
+        if (!ParseTexture (ldr_context, child))
 	  return false;
         break;
       case XMLTOKEN_HEIGHTGEN:
@@ -122,7 +122,8 @@ bool csLoader::ParseTextureList (iDocumentNode* node)
   return true;
 }
 
-iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
+iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
+	iDocumentNode* node)
 {
   const char* txtname = node->GetAttributeValue ("name");
   if (checkDupes)
@@ -342,7 +343,7 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
   if (plugin)
   {
     csRef<iBase> b = plugin->Parse (ParamsNode,
-      GetLoaderContext (), STATIC_CAST(iBase*, &context));
+      ldr_context, STATIC_CAST(iBase*, &context));
     if (b) tex = SCF_QUERY_INTERFACE (b, iTextureWrapper);
   }
 
@@ -360,7 +361,7 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
       BuiltinCheckerTexLoader.AttachNew (ctl);
     }
     csRef<iBase> b = BuiltinCheckerTexLoader->Parse (ParamsNode,
-      GetLoaderContext (), STATIC_CAST(iBase*, &context));
+      ldr_context, STATIC_CAST(iBase*, &context));
     tex = SCF_QUERY_INTERFACE (b, iTextureWrapper);
   }
 
@@ -382,8 +383,8 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
   return tex;
 }
 
-iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node,
-	const char *prefix)
+iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
+	iDocumentNode* node, const char *prefix)
 {
   if (!Engine) return NULL;
 
@@ -421,7 +422,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node,
       case XMLTOKEN_TEXTURE:
         {
 	  const char* txtname = child->GetContentsValue ();
-	  texh = GetLoaderContext()->FindTexture (txtname);
+	  texh = ldr_context->FindTexture (txtname);
           if (!texh)
           {
  	    ReportError (

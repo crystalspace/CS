@@ -28,6 +28,8 @@
 #include "csutil/csvector.h"
 #include "csutil/util.h"
 #include "csutil/strhash.h"
+#include "csutil/parray.h"
+#include "csutil/scopedmutexlock.h"
 #include "csgeom/quaterni.h"
 #include "iutil/plugin.h"
 #include "imap/services.h"
@@ -259,6 +261,7 @@ enum
 };
 
 class StdLoaderContext;
+struct csLoaderPluginRec;
 
 /**
  * The loader for Crystal Space maps.
@@ -267,8 +270,7 @@ class csLoader : public iLoader
 {
   friend class StdLoaderContext;
 private:
-  csRef<iLoaderContext> ldr_context;
-  iLoaderContext* GetLoaderContext ();
+  csPtr<iLoaderContext> CreateLoaderContext ();
   csStringHash xmltokens;
 
   /// Parser for common stuff like MixModes, vectors, matrices, ...
@@ -281,9 +283,14 @@ private:
   /// Pointer to built-in checkerboard texture loader.
   csRef<iLoaderPlugin> BuiltinCheckerTexLoader;
 
-  class csLoadedPluginVector : public csVector
+  class csLoadedPluginVector
   {
   private:
+    /// Mutex to make the plugin vector thread-safe.
+    csRef<csMutex> mutex;
+
+    csPArray<csLoaderPluginRec> vector;
+
     // Find a loader plugin record
     struct csLoaderPluginRec* FindPluginRec (const char* name);
     // Return the loader plugin from a record, possibly loading the plugin now
@@ -293,11 +300,9 @@ private:
     iPluginManager* plugin_mgr;
 
     // constructor
-    csLoadedPluginVector (int iLimit = 8, int iThresh = 16);
+    csLoadedPluginVector ();
     // destructor
     ~csLoadedPluginVector ();
-    // delete a plugin record
-    virtual bool FreeItem (void* Item);
     /**
      * Find a plugin by its name or load it if it doesn't exist.
      * Supports both binary and normal plugins. Returns 'false' if the
@@ -307,6 +312,10 @@ private:
     	iBinaryLoaderPlugin*& binplug);
     // add a new plugin record
     void NewPlugin (const char* ShortName, const char* ClassID);
+    /**
+     * Delete all loaded plugins.
+     */
+    void DeleteAll ();
   };
 
   /// List of loaded plugins
@@ -335,31 +344,36 @@ private:
   bool ParseColor (iDocumentNode* node, csColor &c);
 
   /// Load a trigger.
-  iSequenceTrigger* LoadTrigger (iDocumentNode* node);
+  iSequenceTrigger* LoadTrigger (iLoaderContext* ldr_context,
+  	iDocumentNode* node);
   /// Load a list of triggers.
-  bool LoadTriggers (iDocumentNode* node);
+  bool LoadTriggers (iLoaderContext* ldr_context, iDocumentNode* node);
   /// Create a sequence and make parameter bindings.
   iSequenceWrapper* CreateSequence (iDocumentNode* node);
   /// Load a sequence.
-  iSequenceWrapper* LoadSequence (iDocumentNode* node);
+  iSequenceWrapper* LoadSequence (iLoaderContext* ldr_context,
+  	iDocumentNode* node);
   /// Load a list of sequences.
-  bool LoadSequences (iDocumentNode* node);
+  bool LoadSequences (iLoaderContext* ldr_context, iDocumentNode* node);
   /// Parse a parameter block for firing a sequence.
   csPtr<iEngineSequenceParameters> CreateSequenceParameters (
+  	iLoaderContext* ldr_context,
 	iSequenceWrapper* sequence, iDocumentNode* node,
 	const char* parenttype, const char* parentname, bool& error);
   /// Resolve a parameter for a sequence operation.
-  csPtr<iParameterESM> ResolveOperationParameter (iDocumentNode* opnode,
+  csPtr<iParameterESM> ResolveOperationParameter (
+  	iLoaderContext* ldr_context, iDocumentNode* opnode,
 	int partypeidx, const char* partype, const char* seqname,
 	iEngineSequenceParameters* base_params);
 
   /// Parse a list of textures and add them to the engine.
-  bool ParseTextureList (iDocumentNode* node);
+  bool ParseTextureList (iLoaderContext* ldr_context, iDocumentNode* node);
   /**
    * Parse a list of materials and add them to the engine. If a prefix is
    * given, all material names will be prefixed with the corresponding string.
    */
-  bool ParseMaterialList (iDocumentNode* node, const char* prefix = NULL);
+  bool ParseMaterialList (iLoaderContext* ldr_context,
+  	iDocumentNode* node, const char* prefix = NULL);
   /// Parse a list of shared variables and add them each to the engine
   bool ParseVariableList (iDocumentNode* node);
   /// Process the attributes of one shared variable
@@ -368,23 +382,26 @@ private:
   bool ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node);
 
   /// Parse a texture definition and add the texture to the engine
-  iTextureWrapper* ParseTexture (iDocumentNode* node);
+  iTextureWrapper* ParseTexture (iLoaderContext* ldr_context,
+  	iDocumentNode* node);
   /// Parse a proc texture definition and add the texture to the engine
   //iTextureWrapper* ParseProcTex (iDocumentNode* node);
   /// Parse a material definition and add the material to the engine
-  iMaterialWrapper* ParseMaterial (iDocumentNode* node, const char* prefix = NULL);
+  iMaterialWrapper* ParseMaterial (iLoaderContext* ldr_context,
+  	iDocumentNode* node, const char* prefix = NULL);
   /// Parse a collection definition and add the collection to the engine
-  iCollection* ParseCollection (iDocumentNode* node);
+  iCollection* ParseCollection (iLoaderContext* ldr_context,
+  	iDocumentNode* node);
   /// Parse a camera position.
   bool ParseStart (iDocumentNode* node, iCameraPosition* campos);
   /// Parse a static light definition and add the light to the engine
-  iStatLight* ParseStatlight (iDocumentNode* node);
+  iStatLight* ParseStatlight (iLoaderContext* ldr_context, iDocumentNode* node);
   /// Parse a key definition and add the key to the given object
   iKeyValuePair* ParseKey (iDocumentNode* node, iObject* pParent);
   /// Parse a map node definition and add the node to the given sector
   iMapNode* ParseNode (iDocumentNode* node, iSector* sec);
   /// Parse a sector definition and add the sector to the engine
-  iSector* ParseSector (iDocumentNode* node);
+  iSector* ParseSector (iLoaderContext* ldr_context, iDocumentNode* node);
   /// Find the named shared variable and verify its type if specified
   iSharedVariable *FindSharedVariable(const char *colvar,
 				      int verify_type );
@@ -430,30 +447,35 @@ private:
    * mesh object factory and the transformation will be filled in with
    * the relative transform (from MOVE keyword).
    */
-  bool LoadMeshObjectFactory (iMeshFactoryWrapper* meshFact,
+  bool LoadMeshObjectFactory (
+  	iLoaderContext* ldr_context, iMeshFactoryWrapper* meshFact,
   	iDocumentNode* node, csReversibleTransform* transf = NULL);
 
   /**
    * Handle various common mesh object parameters.
    */
-  bool HandleMeshParameter (iMeshWrapper* mesh, iDocumentNode* child,
+  bool HandleMeshParameter (iLoaderContext* ldr_context,
+  	iMeshWrapper* mesh, iDocumentNode* child,
 	csStringID id, bool& handled, const char*& priority);
   /**
    * Load the mesh object from the map file.
    */
-  bool LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node);
+  bool LoadMeshObject (iLoaderContext* ldr_context,
+  	iMeshWrapper* mesh, iDocumentNode* node);
 
   /**
    * Load the mesh object from the map file.
    * This version will parse FACTORY statement to directly create
    * a mesh from a factory.
    */
-  iMeshWrapper* LoadMeshObjectFromFactory (iDocumentNode* node);
+  iMeshWrapper* LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
+  	iDocumentNode* node);
 
   /**
    * Load a plugin in general.
    */
-  bool LoadAddOn (iDocumentNode* node, iBase* context);
+  bool LoadAddOn (iLoaderContext* ldr_context,
+  	iDocumentNode* node, iBase* context);
 
   /**
    * Load the render priority section.
@@ -483,10 +505,10 @@ private:
    * A library is just a map file that contains just mesh factories,
    * thing templates, sounds and textures.
    */
-  bool LoadLibrary (iDocumentNode* node);
+  bool LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node);
 
   /// Load map from a memory buffer
-  bool LoadMap (iDocumentNode* node);
+  bool LoadMap (iLoaderContext* ldr_context, iDocumentNode* node);
 
   /// Get the engine sequence manager (load it if not already present).
   iEngineSequenceManager* GetEngineSequenceManager ();
@@ -506,7 +528,8 @@ private:
    * XML and will call the XML Parse function in that case. Otherwise it
    * will call the old style Parse function.
    */
-  csPtr<iBase> TestXmlPlugParse (iLoaderPlugin* plug, iFile* buf,
+  csPtr<iBase> TestXmlPlugParse (iLoaderContext* ldr_context,
+  	iLoaderPlugin* plug, iFile* buf,
   	iBase* context, const char* fname);
 
   /// Report any error.

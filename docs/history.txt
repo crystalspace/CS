@@ -32,6 +32,11 @@ The history order is reversed so that new features are at the top.
 	  should not be used in threads.
 	- Jorrit removed the statistics from the loader. It wasn't complete
 	  anymore and it is a pretty useless feature anyway.
+	- Jorrit changed the csparser plugin so it no longer has a
+	  ldr_context variable. Instead the ldr_context variable is passed
+	  as a parameter to all loading functions. That makes it easier to
+	  make the loader (partially) thread-safe.
+	- Jorrit made the plugin vector in the loader thread-safe.
 14-May-2003
 	- Jorrit fixed a bug in the syntax services. When a polygon is a
 	  portal it is now marked as excluded from the visculling mesh.

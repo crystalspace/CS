@@ -50,10 +50,10 @@ struct csLoaderPluginRec
   }
 };
 
-csLoader::csLoadedPluginVector::csLoadedPluginVector (
-	int iLimit, int iThresh) : csVector (iLimit, iThresh)
+csLoader::csLoadedPluginVector::csLoadedPluginVector ()
 {
   plugin_mgr = NULL;
+  mutex = csMutex::Create (true);
 }
 
 csLoader::csLoadedPluginVector::~csLoadedPluginVector ()
@@ -61,24 +61,30 @@ csLoader::csLoadedPluginVector::~csLoadedPluginVector ()
   DeleteAll ();
 }
 
-bool csLoader::csLoadedPluginVector::FreeItem (void* Item)
+void csLoader::csLoadedPluginVector::DeleteAll ()
 {
-  csLoaderPluginRec *rec = (csLoaderPluginRec*)Item;
-  if (rec->Component && plugin_mgr)
+  csScopedMutexLock lock (mutex);
+  int i;
+  for (i = 0 ; i < vector.Length () ; i++)
   {
-    plugin_mgr->UnloadPlugin (rec->Component);
+    csLoaderPluginRec* rec = vector[i];
+    if (rec->Component && plugin_mgr)
+    {
+      plugin_mgr->UnloadPlugin (rec->Component);
+    }
+    delete rec;
   }
-  delete rec;
-  return true;
+  vector.DeleteAll ();
 }
 
 csLoaderPluginRec* csLoader::csLoadedPluginVector::FindPluginRec (
 	const char* name)
 {
+  csScopedMutexLock lock (mutex);
   int i;
-  for (i=0 ; i<Length () ; i++)
+  for (i=0 ; i<vector.Length () ; i++)
   {
-    csLoaderPluginRec* pl = (csLoaderPluginRec*)Get (i);
+    csLoaderPluginRec* pl = vector.Get (i);
     if (pl->ShortName && !strcmp (name, pl->ShortName))
       return pl;
     if (!strcmp (name, pl->ClassID))
@@ -111,6 +117,7 @@ bool csLoader::csLoadedPluginVector::FindPlugin (
 	const char* Name, iLoaderPlugin*& plug,
 	iBinaryLoaderPlugin*& binplug)
 {
+  csScopedMutexLock lock (mutex);
   // look if there is already a loading record for this plugin
   csLoaderPluginRec* pl = FindPluginRec (Name);
   if (pl)
@@ -120,13 +127,14 @@ bool csLoader::csLoadedPluginVector::FindPlugin (
 
   // create a new loading record
   NewPlugin (NULL, Name);
-  return GetPluginFromRec ((csLoaderPluginRec*)Get(Length()-1),
+  return GetPluginFromRec (vector.Get(vector.Length()-1),
   	plug, binplug);
 }
 
 void csLoader::csLoadedPluginVector::NewPlugin
 	(const char *ShortName, const char *ClassID)
 {
-  Push (new csLoaderPluginRec (ShortName, ClassID, NULL, NULL, NULL));
+  csScopedMutexLock lock (mutex);
+  vector.Push (new csLoaderPluginRec (ShortName, ClassID, NULL, NULL, NULL));
 }
 

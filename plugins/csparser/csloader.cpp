@@ -353,7 +353,8 @@ bool csLoader::TestXml (const char* file, iFile* buf,
   return true;
 }
 
-csPtr<iBase> csLoader::TestXmlPlugParse (iLoaderPlugin* plug, iFile* buf,
+csPtr<iBase> csLoader::TestXmlPlugParse (iLoaderContext* ldr_context,
+	iLoaderPlugin* plug, iFile* buf,
   	iBase* context, const char* fname)
 {
   csRef<iDocument> doc;
@@ -370,7 +371,7 @@ csPtr<iBase> csLoader::TestXmlPlugParse (iLoaderPlugin* plug, iFile* buf,
               doc->GetRoot (), "Could not find <params> in '%s'!", fname);
       return NULL;
     }
-    return plug->Parse (paramsnode, GetLoaderContext (), context);
+    return plug->Parse (paramsnode, ldr_context, context);
   }
   else
   {
@@ -389,7 +390,7 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
   if (iClearEngine) Engine->DeleteAll ();
   ResolveOnlyRegion = iOnlyRegion;
   csLoader::checkDupes = checkdupes;
-  ldr_context = NULL;
+  csRef<iLoaderContext> ldr_context = CreateLoaderContext ();
 
   csRef<iFile> buf (VFS->Open (file, VFS_FILE_READ));
 
@@ -409,7 +410,7 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
   if (!er) return false;
   if (doc)
   {
-    if (!LoadMap (doc->GetRoot ())) return false;
+    if (!LoadMap (ldr_context, doc->GetRoot ())) return false;
   }
   else
   {
@@ -437,14 +438,14 @@ bool csLoader::LoadLibraryFile (const char* fname)
 
   ResolveOnlyRegion = false;
   checkDupes = false;
-  ldr_context = NULL;
+  csRef<iLoaderContext> ldr_context = CreateLoaderContext ();
 
   csRef<iDocument> doc;
   bool er = TestXml (fname, buf, doc);
   if (!er) return false;
   if (doc)
   {
-    return LoadLibrary (doc->GetRoot ());
+    return LoadLibrary (ldr_context, doc->GetRoot ());
   }
   else
   {
@@ -462,7 +463,7 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
 
   ResolveOnlyRegion = false;
   checkDupes = false;
-  ldr_context = NULL;
+  csRef<iLoaderContext> ldr_context = CreateLoaderContext ();
 
   csRef<iFile> databuff (VFS->Open (fname, VFS_FILE_READ));
 
@@ -489,7 +490,7 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
     }
     csRef<iMeshFactoryWrapper> t (Engine->CreateMeshFactory (
       	meshfactnode->GetAttributeValue ("name")));
-    if (LoadMeshObjectFactory (t, meshfactnode))
+    if (LoadMeshObjectFactory (ldr_context, t, meshfactnode))
     {
       return csPtr<iMeshFactoryWrapper> (t);
     }
@@ -520,6 +521,7 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
 
   csRef<iFile> databuff (VFS->Open (fname, VFS_FILE_READ));
   csRef<iMeshWrapper> mesh;
+  csRef<iLoaderContext> ldr_context = CreateLoaderContext ();
 
   if (!databuff || !databuff->GetSize ())
   {
@@ -544,7 +546,7 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
     }
     mesh = Engine->CreateMeshWrapper (
     	meshobjnode->GetAttributeValue ("name"));
-    if (!LoadMeshObject (mesh, meshobjnode))
+    if (!LoadMeshObject (ldr_context, mesh, meshobjnode))
     {
       // Error is already reported.
       mesh = NULL;
@@ -614,14 +616,10 @@ csLoader::~csLoader()
   loaded_plugins.DeleteAll ();
 }
 
-iLoaderContext* csLoader::GetLoaderContext ()
+csPtr<iLoaderContext> csLoader::CreateLoaderContext ()
 {
-  if (!ldr_context)
-  {
-    ldr_context = csPtr<iLoaderContext> (
+  return csPtr<iLoaderContext> (
     	new StdLoaderContext (Engine, ResolveOnlyRegion, this));
-  }
-  return ldr_context;
 }
 
 #define GET_PLUGIN(var, intf, msgname)				\
@@ -861,7 +859,7 @@ void csLoader::SetMode (int iFlags)
 
 //--- Parsing of Engine Objects ---------------------------------------------
 
-bool csLoader::LoadMap (iDocumentNode* node)
+bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
 {
   if (!Engine) return false;
 
@@ -890,7 +888,7 @@ bool csLoader::LoadMap (iDocumentNode* node)
 	    return false;
 	  break;
         case XMLTOKEN_ADDON:
-	  if (!LoadAddOn (child, (iEngine*)Engine))
+	  if (!LoadAddOn (ldr_context, child, (iEngine*)Engine))
 	    return false;
       	  break;
         case XMLTOKEN_MESHFACT:
@@ -902,7 +900,7 @@ bool csLoader::LoadMap (iDocumentNode* node)
 	      if (t) break;
 	    }
             csRef<iMeshFactoryWrapper> t (Engine->CreateMeshFactory (name));
-	    if (!t || !LoadMeshObjectFactory (t, child))
+	    if (!t || !LoadMeshObjectFactory (ldr_context, t, child))
 	    {
 	      // Error is already reported.
 	      return false;
@@ -919,11 +917,11 @@ bool csLoader::LoadMap (iDocumentNode* node)
 	  }
 	  break;
         case XMLTOKEN_SECTOR:
-          if (!ParseSector (child))
+          if (!ParseSector (ldr_context, child))
 	    return false;
           break;
         case XMLTOKEN_COLLECTION:
-          if (!ParseCollection (child))
+          if (!ParseCollection (ldr_context, child))
 	    return false;
           break;
 	case XMLTOKEN_SEQUENCES:
@@ -939,11 +937,11 @@ bool csLoader::LoadMap (iDocumentNode* node)
 	    return false;
 	  break;
         case XMLTOKEN_TEXTURES:
-          if (!ParseTextureList (child))
+          if (!ParseTextureList (ldr_context, child))
             return false;
           break;
         case XMLTOKEN_MATERIALS:
-          if (!ParseMaterialList (child))
+          if (!ParseMaterialList (ldr_context, child))
             return false;
           break;
 	case  XMLTOKEN_VARIABLELIST:
@@ -1001,16 +999,16 @@ bool csLoader::LoadMap (iDocumentNode* node)
   // Sequences and triggers are parsed at the end because
   // all sectors and other objects need to be present.
   if (sequences)
-    if (!LoadSequences (sequences))
+    if (!LoadSequences (ldr_context, sequences))
       return false;
   if (triggers)
-    if (!LoadTriggers (triggers))
+    if (!LoadTriggers (ldr_context, triggers))
       return false;
 
   return true;
 }
 
-bool csLoader::LoadLibrary (iDocumentNode* node)
+bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node)
 {
   if (!Engine)
   {
@@ -1036,7 +1034,7 @@ bool csLoader::LoadLibrary (iDocumentNode* node)
       switch (id)
       {
         case XMLTOKEN_ADDON:
-	  if (!LoadAddOn (child, (iEngine*)Engine))
+	  if (!LoadAddOn (ldr_context, child, (iEngine*)Engine))
 	    return false;
       	  break;
 	case XMLTOKEN_SEQUENCES:
@@ -1049,11 +1047,11 @@ bool csLoader::LoadLibrary (iDocumentNode* node)
 	  break;
         case XMLTOKEN_TEXTURES:
           // Append textures to engine.
-          if (!ParseTextureList (child))
+          if (!ParseTextureList (ldr_context, child))
             return false;
           break;
         case XMLTOKEN_MATERIALS:
-          if (!ParseMaterialList (child))
+          if (!ParseMaterialList (ldr_context, child))
             return false;
           break;
 #ifdef CS_USE_NEW_RENDERER
@@ -1071,7 +1069,7 @@ bool csLoader::LoadLibrary (iDocumentNode* node)
           break;
         case XMLTOKEN_MESHREF:
           {
-            iMeshWrapper* mesh = LoadMeshObjectFromFactory (child);
+            iMeshWrapper* mesh = LoadMeshObjectFromFactory (ldr_context, child);
             if (!mesh)
 	    {
 	      // Error is already reported.
@@ -1086,7 +1084,7 @@ bool csLoader::LoadLibrary (iDocumentNode* node)
           {
 	    csRef<iMeshWrapper> mesh (Engine->CreateMeshWrapper (
 			    child->GetAttributeValue ("name")));
-            if (!LoadMeshObject (mesh, child))
+            if (!LoadMeshObject (ldr_context, mesh, child))
 	    {
 	      // Error is already reported.
 	      return false;
@@ -1099,7 +1097,7 @@ bool csLoader::LoadLibrary (iDocumentNode* node)
 			    child->GetAttributeValue ("name")));
 	    if (t)
 	    {
-	      if (!LoadMeshObjectFactory (t, child))
+	      if (!LoadMeshObjectFactory (ldr_context, t, child))
 	      {
 	        // Error is already reported.
 		return false;
@@ -1128,10 +1126,10 @@ bool csLoader::LoadLibrary (iDocumentNode* node)
   // Sequences and triggers are parsed at the end because
   // all sectors and other objects need to be present.
   if (sequences)
-    if (!LoadSequences (sequences))
+    if (!LoadSequences (ldr_context, sequences))
       return false;
   if (triggers)
-    if (!LoadTriggers (triggers))
+    if (!LoadTriggers (ldr_context, triggers))
       return false;
 
   return true;
@@ -1471,7 +1469,8 @@ bool csLoader::ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel)
   return true;
 }
 
-bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
+bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
+	iMeshFactoryWrapper* stemp,
 	iDocumentNode* node, csReversibleTransform* transf)
 {
   iLoaderPlugin* plug = NULL;
@@ -1520,7 +1519,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
         }
         break;
       case XMLTOKEN_ADDON:
-	if (!LoadAddOn (child, stemp))
+	if (!LoadAddOn (ldr_context, child, stemp))
 	  return false;
       	break;
       case XMLTOKEN_PARAMS:
@@ -1536,7 +1535,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	  // We give here the iMeshObjectFactory as the context. If this
 	  // is a new factory this will be NULL. Otherwise it is possible
 	  // to append information to the already loaded factory.
-	  csRef<iBase> mof (plug->Parse (child, GetLoaderContext (),
+	  csRef<iBase> mof (plug->Parse (child, ldr_context,
 	  	stemp->GetMeshObjectFactory ()));
 	  if (!mof)
 	  {
@@ -1585,14 +1584,15 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	  // to append information to the already loaded factory.
 	  csRef<iBase> mof;
 	  if (plug)
-	    mof = TestXmlPlugParse (plug, buf, stemp->GetMeshObjectFactory (),
+	    mof = TestXmlPlugParse (ldr_context,
+	    	plug, buf, stemp->GetMeshObjectFactory (),
 	    	child->GetContentsValue ());
 	  else
 	  {
 	    csRef<iDataBuffer> dbuf = VFS->ReadFile (
 	    	child->GetContentsValue ());
 	    mof = binplug->Parse ((void*)(dbuf->GetUint8 ()),
-	  	GetLoaderContext (), stemp->GetMeshObjectFactory ());
+	  	ldr_context, stemp->GetMeshObjectFactory ());
 	  }
 	  if (!mof)
 	  {
@@ -1653,7 +1653,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	    return false;
 	  }
 	  const char* matname = child->GetContentsValue ();
-          mat = GetLoaderContext ()->FindMaterial (matname);
+          mat = ldr_context->FindMaterial (matname);
           if (mat)
 	  {
 	    csRef<iSprite3DFactoryState> state (SCF_QUERY_INTERFACE (
@@ -1734,7 +1734,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
           csRef<iMeshFactoryWrapper> t (Engine->CreateMeshFactory (
 	  	child->GetAttributeValue ("name")));
 	  csReversibleTransform child_transf;
-          if (!LoadMeshObjectFactory (t, child, &child_transf))
+          if (!LoadMeshObjectFactory (ldr_context, t, child, &child_transf))
 	  {
 	    // Error is already reported above.
 	    return false;
@@ -1817,7 +1817,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
   return true;
 }
 
-bool csLoader::HandleMeshParameter (iMeshWrapper* mesh, iDocumentNode* child,
+bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
+	iMeshWrapper* mesh, iDocumentNode* child,
 	csStringID id, bool& handled, const char*& priority)
 {
   handled = true;
@@ -1864,7 +1865,7 @@ bool csLoader::HandleMeshParameter (iMeshWrapper* mesh, iDocumentNode* child,
 	  	child, "First specify the parent factory with 'factory'!");
 	return false;
       }
-      if (!LoadAddOn (child, mesh))
+      if (!LoadAddOn (ldr_context, child, mesh))
 	return false;
       break;
     case XMLTOKEN_NOLIGHTING:
@@ -2139,7 +2140,8 @@ bool csLoader::HandleMeshParameter (iMeshWrapper* mesh, iDocumentNode* child,
   return true;
 }
 
-iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
+iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
+	iDocumentNode* node)
 {
   if (!Engine) return NULL;
 
@@ -2155,7 +2157,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     bool handled;
-    if (!HandleMeshParameter (mesh, child, id, handled, priority))
+    if (!HandleMeshParameter (ldr_context, mesh, child, id, handled, priority))
       return NULL;
     if (!handled) switch (id)
     {
@@ -2200,7 +2202,8 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
   return mesh;
 }
 
-bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
+bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
+	iMeshWrapper* mesh, iDocumentNode* node)
 {
   if (!Engine) return false;
 
@@ -2217,13 +2220,13 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     bool handled;
-    if (!HandleMeshParameter (mesh, child, id, handled, priority))
+    if (!HandleMeshParameter (ldr_context, mesh, child, id, handled, priority))
       return false;
     if (!handled) switch (id)
     {
       case XMLTOKEN_MESHREF:
         {
-          iMeshWrapper* sp = LoadMeshObjectFromFactory (child);
+          iMeshWrapper* sp = LoadMeshObjectFromFactory (ldr_context, child);
           if (!sp)
 	  {
 	    // Error is already reported.
@@ -2239,7 +2242,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
         {
 	  csRef<iMeshWrapper> sp (Engine->CreateMeshWrapper (
 			  child->GetAttributeValue ("name")));
-          if (!LoadMeshObject (sp, child))
+          if (!LoadMeshObject (ldr_context, sp, child))
 	  {
 	    // Error is already reported.
 	    return false;
@@ -2259,7 +2262,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	}
 	else
 	{
-	  csRef<iBase> mo (plug->Parse (child, GetLoaderContext (), NULL));
+	  csRef<iBase> mo (plug->Parse (child, ldr_context, NULL));
           if (mo)
           {
 	    csRef<iMeshObject> mo2 (SCF_QUERY_INTERFACE (mo, iMeshObject));
@@ -2317,12 +2320,12 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	  }
 	  csRef<iBase> mo;
 	  if (plug)
-	    mo = TestXmlPlugParse (plug, buf, NULL, fname);
+	    mo = TestXmlPlugParse (ldr_context, plug, buf, NULL, fname);
 	  else
 	  {
 	    csRef<iDataBuffer> dbuf = VFS->ReadFile (fname);
 	    mo = binplug->Parse ((void*)(dbuf->GetUint8 ()),
-	  	GetLoaderContext (), NULL);
+	  	ldr_context, NULL);
 	  }
           if (mo)
           {
@@ -2457,7 +2460,8 @@ bool csLoader::ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node)
   return true;
 }
 
-bool csLoader::LoadAddOn (iDocumentNode* node, iBase* context)
+bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
+	iDocumentNode* node, iBase* context)
 {
   iLoaderPlugin* plug = NULL;
   iBinaryLoaderPlugin* binplug = NULL;
@@ -2481,7 +2485,7 @@ bool csLoader::LoadAddOn (iDocumentNode* node, iBase* context)
 	}
 	else
 	{
-	  csRef<iBase> rc (plug->Parse (child, GetLoaderContext (), context));
+	  csRef<iBase> rc (plug->Parse (child, ldr_context, context));
 	  if (!rc) return false;
 	}
         break;
@@ -2515,14 +2519,15 @@ bool csLoader::LoadAddOn (iDocumentNode* node, iBase* context)
 	  bool rc;
 	  if (plug)
 	  {
-	    csRef<iBase> ret (TestXmlPlugParse (plug, buf, NULL, fname));
+	    csRef<iBase> ret (TestXmlPlugParse (ldr_context,
+	    	plug, buf, NULL, fname));
 	    rc = (ret != NULL);
 	  }
 	  else
 	  {
 	    csRef<iDataBuffer> dbuf = VFS->ReadFile (fname);
 	    csRef<iBase> ret (binplug->Parse ((void*)(dbuf->GetUint8 ()),
-	  	GetLoaderContext (), NULL));
+	  	ldr_context, NULL));
 	    rc = (ret != NULL);
 	  }
 	  if (!rc)
@@ -2715,7 +2720,8 @@ bool csLoader::LoadRenderPriorities (iDocumentNode* node)
   return true;
 }
 
-iCollection* csLoader::ParseCollection (iDocumentNode* node)
+iCollection* csLoader::ParseCollection (iLoaderContext* ldr_context,
+	iDocumentNode* node)
 {
   iCollection* collection = Engine->GetCollections ()->NewCollection (
 		  node->GetAttributeValue ("name"));
@@ -2782,7 +2788,7 @@ iCollection* csLoader::ParseCollection (iDocumentNode* node)
       case XMLTOKEN_SECTOR:
         {
 	  const char* sectname = child->GetContentsValue ();
-	  iSector* s = GetLoaderContext ()->FindSector (sectname);
+	  iSector* s = ldr_context->FindSector (sectname);
           if (!s)
 	  {
 	    SyntaxService->ReportError (
@@ -2879,7 +2885,8 @@ bool csLoader::ParseStart (iDocumentNode* node, iCameraPosition* campos)
   return true;
 }
 
-iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
+iStatLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
+	iDocumentNode* node)
 {
   const char* lightname = node->GetAttributeValue ("name");
 
@@ -2999,9 +3006,15 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
             halo.cross.Intensity = 2.0;
 	    halo.cross.Cross = 0.45;
 	    csRef<iDocumentNode> intnode = child->GetNode ("intensity");
-	    if (intnode) { halo.cross.Intensity = intnode->GetContentsValueAsFloat (); }
+	    if (intnode)
+	    {
+	      halo.cross.Intensity = intnode->GetContentsValueAsFloat ();
+	    }
 	    csRef<iDocumentNode> crossnode = child->GetNode ("cross");
-	    if (crossnode) { halo.cross.Cross = crossnode->GetContentsValueAsFloat (); }
+	    if (crossnode)
+	    {
+	      halo.cross.Cross = crossnode->GetContentsValueAsFloat ();
+	    }
 	  }
 	  else if (!strcasecmp (type, "nova"))
 	  {
@@ -3010,16 +3023,25 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 	    halo.nova.NumSpokes = 100;
 	    halo.nova.Roundness = 0.5;
 	    csRef<iDocumentNode> seednode = child->GetNode ("seed");
-	    if (seednode) { halo.nova.Seed = seednode->GetContentsValueAsInt (); }
+	    if (seednode)
+	    {
+	      halo.nova.Seed = seednode->GetContentsValueAsInt ();
+	    }
 	    csRef<iDocumentNode> spokesnode = child->GetNode ("numspokes");
-	    if (spokesnode) { halo.nova.NumSpokes = spokesnode->GetContentsValueAsInt (); }
+	    if (spokesnode)
+	    {
+	      halo.nova.NumSpokes = spokesnode->GetContentsValueAsInt ();
+	    }
 	    csRef<iDocumentNode> roundnode = child->GetNode ("roundness");
-	    if (roundnode) { halo.nova.Roundness = roundnode->GetContentsValueAsFloat (); }
+	    if (roundnode)
+	    {
+	      halo.nova.Roundness = roundnode->GetContentsValueAsFloat ();
+	    }
 	  }
 	  else if (!strcasecmp (type, "flare"))
 	  {
             halo.type = 3;
-	    iLoaderContext* lc = GetLoaderContext ();
+	    iLoaderContext* lc = ldr_context;
 	    csRef<iDocumentNode> matnode;
 	    
 	    matnode = child->GetNode ("centermaterial");
@@ -3287,14 +3309,15 @@ iMapNode* csLoader::ParseNode (iDocumentNode* node, iSector* sec)
   return pNode;
 }
 
-iSector* csLoader::ParseSector (iDocumentNode* node)
+iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
+	iDocumentNode* node)
 {
   const char* secname = node->GetAttributeValue ("name");
 
   bool do_culler = false;
   const char* culplugname = NULL;
 
-  iSector* sector = GetLoaderContext ()->FindSector (secname);
+  iSector* sector = ldr_context->FindSector (secname);
   if (sector == NULL)
   {
     sector = Engine->CreateSector (secname);
@@ -3310,7 +3333,7 @@ iSector* csLoader::ParseSector (iDocumentNode* node)
     switch (id)
     {
       case XMLTOKEN_ADDON:
-	if (!LoadAddOn (child, sector))
+	if (!LoadAddOn (ldr_context, child, sector))
 	{
 	  return NULL;
 	}
@@ -3347,7 +3370,7 @@ iSector* csLoader::ParseSector (iDocumentNode* node)
 		secname ? secname : "<noname>");
 	    return NULL; // @@@ Leak
 	  }
-          iMeshWrapper* mesh = LoadMeshObjectFromFactory (child);
+          iMeshWrapper* mesh = LoadMeshObjectFromFactory (ldr_context, child);
           if (!mesh)
 	  {
 	    // Error is already reported.
@@ -3373,7 +3396,7 @@ iSector* csLoader::ParseSector (iDocumentNode* node)
 	    return NULL; // @@@ Leak
 	  }
 	  csRef<iMeshWrapper> mesh (Engine->CreateMeshWrapper (meshname));
-          if (!LoadMeshObject (mesh, child))
+          if (!LoadMeshObject (ldr_context, mesh, child))
 	  {
 	    // Error is already reported.
 	    return NULL; // @@@ Leak
@@ -3411,7 +3434,7 @@ iSector* csLoader::ParseSector (iDocumentNode* node)
 		meshname, secname ? secname : "<noname>");
 	    return NULL;
 	  }
-          if (!LoadMeshObject (mesh, child))
+          if (!LoadMeshObject (ldr_context, mesh, child))
 	  {
 	    // Error is already reported.
 	    return NULL;
@@ -3423,7 +3446,7 @@ iSector* csLoader::ParseSector (iDocumentNode* node)
         break;
       case XMLTOKEN_LIGHT:
         {
-	  iStatLight* sl = ParseStatlight (child);
+	  iStatLight* sl = ParseStatlight (ldr_context, child);
 	  if (!sl)
 	  {
 	    return NULL; // @@@ Leak

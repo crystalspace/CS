@@ -74,6 +74,7 @@ static iSequenceTrigger* FindCreateTrigger (iEngineSequenceManager* eseqmgr,
 #define PARTYPE_POLYGON 6
 
 csPtr<iParameterESM> csLoader::ResolveOperationParameter (
+	iLoaderContext* ldr_context,
 	iDocumentNode* opnode,
 	int partypeidx, const char* partype, const char* seqname,
 	iEngineSequenceParameters* base_params)
@@ -200,6 +201,7 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
 }
 
 csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
+	iLoaderContext* ldr_context,
 	iSequenceWrapper* sequence, iDocumentNode* node,
 	const char* parenttype, const char* parentname, bool& error)
 {
@@ -428,7 +430,8 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
   return csPtr<iEngineSequenceParameters> (params);
 }
 
-iSequenceTrigger* csLoader::LoadTrigger (iDocumentNode* node)
+iSequenceTrigger* csLoader::LoadTrigger (iLoaderContext* ldr_context,
+	iDocumentNode* node)
 {
   const char* trigname = node->GetAttributeValue ("name");
   // LoadTriggers() already checked for the presence of the engine
@@ -588,7 +591,7 @@ iSequenceTrigger* csLoader::LoadTrigger (iDocumentNode* node)
 
 	  bool error;
 	  csRef<iEngineSequenceParameters> params = CreateSequenceParameters (
-	  	sequence, child, "trigger", trigname, error);
+	  	ldr_context, sequence, child, "trigger", trigname, error);
 	  if (error)
 	  {
 	    // There was an error already reported by CreateSequenceParameters.
@@ -613,7 +616,7 @@ iSequenceTrigger* csLoader::LoadTrigger (iDocumentNode* node)
   return trigger;
 }
 
-bool csLoader::LoadTriggers (iDocumentNode* node)
+bool csLoader::LoadTriggers (iLoaderContext* ldr_context, iDocumentNode* node)
 {
   iEngineSequenceManager* sm = GetEngineSequenceManager ();
   if (!sm) return false;
@@ -628,7 +631,7 @@ bool csLoader::LoadTriggers (iDocumentNode* node)
     switch (id)
     {
       case XMLTOKEN_TRIGGER:
-        if (!LoadTrigger (child))
+        if (!LoadTrigger (ldr_context, child))
 	  return false;
         break;
       default:
@@ -685,7 +688,8 @@ iSequenceWrapper* csLoader::CreateSequence (iDocumentNode* node)
   return sequence;
 }
 
-iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
+iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
+	iDocumentNode* node)
 {
   const char* seqname = node->GetAttributeValue ("name");
   // LoadSequences() already checked for the presence of the engine
@@ -734,7 +738,7 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
 	  }
 	  bool error;
 	  csRef<iEngineSequenceParameters> params2 = CreateSequenceParameters (
-	  	sequence2, child, "sequence", seqname, error);
+	  	ldr_context, sequence2, child, "sequence", seqname, error);
 	  if (error)
 	  {
 	    // There was an error already reported by CreateSequenceParameters.
@@ -771,6 +775,7 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_MOVE:
         {
 	  csRef<iParameterESM> mesh = ResolveOperationParameter (
+	  	ldr_context,
 	  	child, PARTYPE_MESH, "mesh", seqname, base_params);
 	  if (!mesh) return NULL;
 
@@ -787,6 +792,7 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_ROTATE:
         {
 	  csRef<iParameterESM> mesh = ResolveOperationParameter (
+	  	ldr_context,
 	  	child, PARTYPE_MESH, "mesh", seqname, base_params);
 	  if (!mesh) return NULL;
 
@@ -852,14 +858,17 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_MATERIAL:
         {
 	  csRef<iParameterESM> mesh = ResolveOperationParameter (
+	  	ldr_context,
 	  	child, PARTYPE_MESH, "mesh", seqname, base_params);
 	  if (!mesh) return NULL;
 	  csRef<iParameterESM> mat = ResolveOperationParameter (
+	  	ldr_context,
 	  	child, PARTYPE_MATERIAL, "material", seqname, base_params);
 	  if (!mat) return NULL;
 
 	  // optional polygon parameter.
 	  csRef<iParameterESM> polygon = ResolveOperationParameter (
+	  	ldr_context,
 	  	child, PARTYPE_POLYGON, "polygon", seqname, base_params);
 
 	  if (polygon)
@@ -871,6 +880,7 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_FADECOLOR:
         {
 	  csRef<iParameterESM> mesh = ResolveOperationParameter (
+	  	ldr_context,
 	  	child, PARTYPE_MESH, "mesh", seqname, base_params);
 	  if (!mesh) return NULL;
 	  csColor col;
@@ -885,6 +895,7 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_SETCOLOR:
         {
 	  csRef<iParameterESM> mesh = ResolveOperationParameter (
+	  	ldr_context,
 	  	child, PARTYPE_MESH, "mesh", seqname, base_params);
 	  if (!mesh) return NULL;
 	  csColor col;
@@ -897,6 +908,7 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_FADELIGHT:
         {
 	  csRef<iParameterESM> light = ResolveOperationParameter (
+	  	ldr_context,
 	  	child, PARTYPE_LIGHT, "light", seqname, base_params);
 	  if (!light) return NULL;
 
@@ -913,6 +925,7 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_SETLIGHT:
         {
 	  csRef<iParameterESM> light = ResolveOperationParameter (
+	  	ldr_context,
 	  	child, PARTYPE_LIGHT, "light", seqname, base_params);
 	  if (!light) return NULL;
 
@@ -926,6 +939,7 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_FADEAMBIENT:
         {
 	  csRef<iParameterESM> sector = ResolveOperationParameter (
+	  	ldr_context,
 	  	child, PARTYPE_SECTOR, "sector", seqname, base_params);
 	  if (!sector) return NULL;
 
@@ -942,6 +956,7 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_SETAMBIENT:
         {
 	  csRef<iParameterESM> sector = ResolveOperationParameter (
+	  	ldr_context,
 	  	child, PARTYPE_SECTOR, "sector", seqname, base_params);
 	  if (!sector) return NULL;
 	  iSharedVariable *var=NULL;
@@ -971,6 +986,7 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_FADEFOG:
         {
 	  csRef<iParameterESM> sector = ResolveOperationParameter (
+	  	ldr_context,
 	  	child, PARTYPE_SECTOR, "sector", seqname, base_params);
 	  if (!sector) return NULL;
 
@@ -988,6 +1004,7 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_SETFOG:
         {
 	  csRef<iParameterESM> sector = ResolveOperationParameter (
+	  	ldr_context,
 	  	child, PARTYPE_SECTOR, "sector", seqname, base_params);
 	  if (!sector) return NULL;
 
@@ -1003,6 +1020,7 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_ENABLE:
         {
 	  csRef<iParameterESM> trigger = ResolveOperationParameter (
+	  	ldr_context,
 	  	child, PARTYPE_TRIGGER, "trigger", seqname, base_params);
 	  if (!trigger) return NULL;
 
@@ -1013,6 +1031,7 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_DISABLE:
         {
 	  csRef<iParameterESM> trigger = ResolveOperationParameter (
+	  	ldr_context,
 	  	child, PARTYPE_TRIGGER, "trigger", seqname, base_params);
 	  if (!trigger) return NULL;
 
@@ -1023,6 +1042,7 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_CHECK:
         {
 	  csRef<iParameterESM> trigger = ResolveOperationParameter (
+	  	ldr_context,
 	  	child, PARTYPE_TRIGGER, "trigger", seqname, base_params);
 	  if (!trigger) return NULL;
 
@@ -1034,6 +1054,7 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_TEST:
         {
 	  csRef<iParameterESM> trigger = ResolveOperationParameter (
+	  	ldr_context,
 	  	child, PARTYPE_TRIGGER, "trigger", seqname, base_params);
 	  if (!trigger) return NULL;
 
@@ -1082,7 +1103,7 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
   return sequence;
 }
 
-bool csLoader::LoadSequences (iDocumentNode* node)
+bool csLoader::LoadSequences (iLoaderContext* ldr_context, iDocumentNode* node)
 {
   iEngineSequenceManager* sm = GetEngineSequenceManager ();
   if (!sm) return false;
@@ -1120,7 +1141,7 @@ bool csLoader::LoadSequences (iDocumentNode* node)
     switch (id)
     {
       case XMLTOKEN_SEQUENCE:
-        if (!LoadSequence (child))
+        if (!LoadSequence (ldr_context, child))
 	  return false;
         break;
       default:
