@@ -234,7 +234,7 @@ void funConsole::DrawBorder (int x, int y, int width, int height,
     float u_stretch = 1.0, v_stretch = 1.0;
     int w, h;
     
-    border.txt->GetTexture ()->GetMipMapDimensions (0, w, h);
+    border.mat->GetTexture ()->GetMipMapDimensions (0, w, h);
     switch (align)
     {
       case 1:
