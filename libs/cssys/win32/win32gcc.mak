@@ -219,6 +219,6 @@ endif # ifeq ($(MAKESECTION),confighelp)
 #--------------------------------------------------------------- configure ---#
 ifeq ($(ROOTCONFIG),config)
 
-SYSCONFIG=libs\cssys\win32\win32conf.bat mingw32
+SYSCONFIG=libs\cssys\win32\winconf.bat mingw32
 
 endif # ifeq ($(ROOTCONFIG),config)

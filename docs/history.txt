@@ -40,6 +40,7 @@ The history order is reversed so that new features are at the top.
 	    win32conf.bat --> libs/cssys/win32/winconf.bat
 	    win32conf.mak --> libs/cssys/win32/winconf.mak
 	    win32conf.var --> libs/cssys/win32/winconf.var
+	- Fixed a problem in mingw config.
 5-Nov-2001
 	- Fixed a bug in bin/chkheadr.sh which caused that test to always
 	  fail with the result that CS_USE_FAKE_SOCKLEN_TYPE would always
