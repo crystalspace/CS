@@ -25,7 +25,7 @@
 
 IMPLEMENT_COMPOSITE_UNKNOWN(csGraphics2DDDraw6, XDDraw6GraphicsInfo)
 
-STDMETHODIMP IXDDraw6GraphicsInfo::Open(const char* szTitle)
+STDMETHODIMP IXDDraw6GraphicsInfo::Open(char* szTitle)
 {
     METHOD_PROLOGUE( csGraphics2DDDraw6, XDDraw6GraphicsInfo);
     

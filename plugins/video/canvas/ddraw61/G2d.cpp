@@ -172,30 +172,42 @@ csGraphics2DDDraw6::csGraphics2DDDraw6(ISystem* piSystem, bool bUses3D) :
                    m_nActivePage(0),
                    m_nDepth(-1),
                    m_nGraphicsReady(true),
-                   m_bLocked(false)
+                   m_bLocked(false),
+                   m_bUses3D(bUses3D)
+{
+  HRESULT ddrval;
+  IWin32SystemDriver* piWin32System;
+ 
+  // Get the creation parameters //
+  ddrval = piSystem->QueryInterface(IID_IWin32SystemDriver, (void**)&piWin32System);
+  if (SUCCEEDED(ddrval))
+  {
+      piWin32System->GetInstance(&m_hInstance);
+      piWin32System->GetCmdShow(&m_nCmdShow);
+      FINAL_RELEASE(piWin32System);
+  }
+  else
+  {
+  	  sys_fatalerror("csGraphics2DDDraw6::Open(QI) -- ISystem passed does not support IWin32SystemDriver.", ddrval);
+  }
+}
+
+void csGraphics2DDDraw6::Initialize()
 {
   DDSURFACEDESC2 ddsd;
   HRESULT ddrval;
   DDPIXELFORMAT ddpf;
   //DDCAPS ddcaps;
   LPGUID pGuid = NULL;
-  IWin32SystemDriver* piW32Sys = NULL;
- 
-  // QI for IWin32SystemDriver //
-  ddrval = piSystem->QueryInterface(IID_IWin32SystemDriver, (void**)&piW32Sys);
-  if (FAILED(ddrval))
-  	  sys_fatalerror("csGraphics2DDDraw6::Open(QI) -- ISystem passed does not support IWin32SystemDriver.", ddrval);
+  //IWin32SystemDriver* piWin32System;
 
-  // Get the creation parameters //
-  piW32Sys->GetInstance(&m_hInstance);
-  piW32Sys->GetCmdShow(&m_nCmdShow);
-  FINAL_RELEASE(piW32Sys);
+  // Call original Initialize() function
+  csGraphics2D::Initialize();
 
-  piSystem->GetDepthSetting(m_nDepth);
+  system->GetDepthSetting(m_nDepth);
   
   // Create the DirectDraw device //
-
-  if (!bUses3D)
+  if (!m_bUses3D)
   {
       DDetection.checkDevices2D();
       DirectDevice = DDetection.findBestDevice2D();
@@ -253,6 +265,10 @@ csGraphics2DDDraw6::csGraphics2DDDraw6(ISystem* piSystem, bool bUses3D) :
     sys_fatalerror("Cannot get pixel format descriptor.", ddrval);
   
 
+  int RedMask   = 0x00FF0000;
+  int GreenMask = 0x0000FF00;
+  int BlueMask  = 0x000000FF;
+
   // automatically determine bit-depth for windowed mode //
   
   if (!FullScreen)
@@ -271,10 +287,6 @@ csGraphics2DDDraw6::csGraphics2DDDraw6(ISystem* piSystem, bool bUses3D) :
   }
   
   // I'm not sure whether the following stuff is nessecary to work
-  int RedMask   = 0x00FF0000;
-  int GreenMask = 0x0000FF00;
-  int BlueMask  = 0x000000FF;
-
   // set 16bpp mode up //
   
   if (m_nDepth==16)
@@ -289,16 +301,12 @@ csGraphics2DDDraw6::csGraphics2DDDraw6(ISystem* piSystem, bool bUses3D) :
     DrawPixel = DrawPixel16;   WriteChar = WriteChar16;
     GetPixelAt = GetPixelAt16; DrawSprite = DrawSprite16;
     
-	RedMask  = 0x1f << 11;
-	BlueMask = 0x3f << 5;
-	GreenMask= 0x1f;
-
     // calculate CS's pixel format structure.
     pfmt.PixelBytes = 2;
     pfmt.PalEntries = 0;
-    pfmt.RedMask = ddpf.dwRBitMask;
-    pfmt.GreenMask = ddpf.dwGBitMask;
-    pfmt.BlueMask = ddpf.dwBBitMask;
+    pfmt.RedMask    = ddpf.dwRBitMask;
+    pfmt.GreenMask  = ddpf.dwGBitMask;
+    pfmt.BlueMask   = ddpf.dwBBitMask;
     
     complete_pixel_format();
   }
@@ -307,27 +315,28 @@ csGraphics2DDDraw6::csGraphics2DDDraw6(ISystem* piSystem, bool bUses3D) :
 
   if (m_nDepth==32)
   {
-    // desktop depth has to be set to 16bpp for DEPTH 16 to work.
+  /*  // desktop depth has to be set to 16bpp for DEPTH 16 to work.
     if(ddpf.dwRGBBitCount != 32)
     {
       MessageBox(NULL, "Desktop display depth has to be set to 32bpp for DEPTH 32 to work.", "Fatal Error", MB_OK | MB_ICONEXCLAMATION|MB_TOPMOST);
       exit(1);
     }
-    
+    */
     DrawPixel = DrawPixel32;   WriteChar = WriteChar32;
-    GetPixelAt = GetPixelAt32; DrawSprite = DrawSprite32;
-    
+    GetPixelAt = GetPixelAt32; DrawSprite = DrawSprite32;    
       
-	RedMask  = 0xff << 16;
-	BlueMask = 0xff << 8;
-	GreenMask= 0xff;
-	
+	RedMask = 0xff << 16;
+	GreenMask = 0xff << 8;
+	BlueMask = 0xff;
 	// calculate CS's pixel format structure.
     pfmt.PixelBytes = 4;
     pfmt.PalEntries = 0;
-    pfmt.RedMask = ddpf.dwRBitMask;
-    pfmt.GreenMask = ddpf.dwGBitMask;
-    pfmt.BlueMask = ddpf.dwBBitMask;
+   // pfmt.RedMask    = ddpf.dwRBitMask;
+   // pfmt.GreenMask  = ddpf.dwGBitMask;
+   // pfmt.BlueMask   = ddpf.dwBBitMask;
+	pfmt.RedMask   = RedMask;
+	pfmt.GreenMask = GreenMask;
+	pfmt.BlueMask  = BlueMask;
     
     complete_pixel_format();
   }
@@ -347,7 +356,7 @@ csGraphics2DDDraw6::~csGraphics2DDDraw6(void)
   m_nGraphicsReady=0;
 }
 
-bool csGraphics2DDDraw6::Open(const char *Title)
+bool csGraphics2DDDraw6::Open(char *Title)
 {
   if (!csGraphics2D::Open (Title))
     return false;
@@ -571,8 +580,8 @@ void csGraphics2DDDraw6::Print (csRect* /*area*/)
       r.right += pt.x;
       r.bottom += pt.y;
       
-      HDC      hdc    = NULL;
-      HPALETTE oldPal = NULL;
+      HDC hdc = 0;
+      HPALETTE oldPal = 0;
       
       if(m_bPalettized)
       {

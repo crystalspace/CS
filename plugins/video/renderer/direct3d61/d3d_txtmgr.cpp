@@ -246,6 +246,7 @@ void csTextureManagerDirect3D::remap_textures ()
   int i;
 
   // Remap all textures according to the new colormap.
+  
   for (i = 0 ; i < textures.Length () ; i++)
     ((csTextureMMDirect3D*)textures[i])->remap_texture (this);
 

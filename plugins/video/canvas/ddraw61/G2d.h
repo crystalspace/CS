@@ -60,7 +60,9 @@ public:
   csGraphics2DDDraw6(ISystem* piSystem, bool bUses3D);
   virtual ~csGraphics2DDDraw6(void);
   
-  virtual bool Open (const char *Title);
+  virtual void Initialize ();
+
+  virtual bool Open (char *Title);
   virtual void Close ();
   
   virtual void Print (csRect *area = NULL);
@@ -92,7 +94,7 @@ protected:
   HWND m_hWnd;
   HINSTANCE  m_hInstance;
   int m_nCmdShow;
-  
+  bool m_bUses3D;
   bool m_bPalettized;
   bool m_bPaletteChanged;
   int m_nActivePage;

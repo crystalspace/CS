@@ -46,7 +46,7 @@ const double TextureGamma      = 1.0; //can be from 0.01   to 1.0 (1.0= no effec
 // D3DTextureCache Implementation//
 ///////////////////////////////////
 D3DTextureCache::D3DTextureCache(int nMaxSize, bool bHardware, LPDIRECTDRAW4 pDDraw, 
-                                 LPDIRECT3DDEVICE2 pDevice, int nBpp, bool bMipmapping,
+                                 LPDIRECT3DDEVICE3 pDevice, int nBpp, bool bMipmapping,
 				 G3D_CAPS* pRendercaps, int MaxAspectRatio)
 : HighColorCache(nMaxSize, HIGHCOLOR_TEXCACHE, nBpp)
 {
@@ -105,11 +105,15 @@ void D3DTextureCache::Load(HighColorCache_Data *d)
   csTexture* txt_unl = txt_mm->get_texture (0);
   
   // create a texture surface in system memory and move it there.
-  memcpy(&ddsd, &csGraphics3DDirect3DDx6::m_ddsdTextureSurfDesc, sizeof(DDSURFACEDESC));
+  memset(&ddsd, 0, sizeof(ddsd));
   ddsd.dwSize = sizeof(ddsd);
   ddsd.dwFlags = DDSD_CAPS | DDSD_WIDTH | DDSD_HEIGHT | DDSD_PIXELFORMAT;
   ddsd.ddsCaps.dwCaps = DDSCAPS_TEXTURE | DDSCAPS_SYSTEMMEMORY;
-  
+
+  memcpy(&ddsd.ddpfPixelFormat, 
+         &csGraphics3DDirect3DDx6::m_ddsdTextureSurfDesc.ddpfPixelFormat, 
+         sizeof(ddsd.ddpfPixelFormat));
+
   int OriginalWidth  = txt_unl->get_width ();
   int OriginalHeight = txt_unl->get_height ();
 
@@ -144,8 +148,8 @@ void D3DTextureCache::Load(HighColorCache_Data *d)
     ddsd.ddsCaps.dwCaps |= DDSCAPS_MIPMAP | DDSCAPS_COMPLEX;
   }
   
-  VERIFY_SUCCESS( m_lpDD->CreateSurface(&ddsd, &cached_texture->lpsurf, NULL) );
-  
+  VERIFY_SUCCESS(m_lpDD->CreateSurface(&ddsd, &cached_texture->lpsurf, NULL) );
+
   cached_texture->lpddpal=NULL;
   unsigned long m;
   int s;
@@ -188,7 +192,7 @@ void D3DTextureCache::Load(HighColorCache_Data *d)
     int CurrentHeight = NewHeight / (1<<z);
 
     // lock the texture surface for writing
-    memset(&ddsd, 0, sizeof(DDSURFACEDESC));
+    memset(&ddsd, 0, sizeof(DDSURFACEDESC2));
     ddsd.dwSize = sizeof(ddsd);
     lpDDLevel->Lock(NULL, &ddsd, 0, NULL);
     
@@ -332,11 +336,7 @@ void D3DTextureCache::Load(HighColorCache_Data *d)
   // get the texture interfaces and handles
   cached_texture->lpsurf->QueryInterface(IID_IDirect3DTexture2, (LPVOID *)&cached_texture->lptex);
   
-  if(!m_bHardware)
-  {
-    cached_texture->lptex->GetHandle(m_lpD3dDevice, &cached_texture->htex);
-  }
-  else
+  if(m_bHardware)
   {
     LoadIntoVRAM(cached_texture);    
   }
@@ -347,7 +347,6 @@ void D3DTextureCache::LoadIntoVRAM(D3DTextureCache_Data *tex)
   DDSURFACEDESC2 ddsd;
   IDirectDrawSurface4* lpddts;
   IDirect3DTexture2*  ddtex;
-  D3DTEXTUREHANDLE    htex;   
   
   memset(&ddsd, 0, sizeof(ddsd));
   ddsd.dwSize = sizeof(ddsd);
@@ -364,16 +363,14 @@ void D3DTextureCache::LoadIntoVRAM(D3DTextureCache_Data *tex)
 
   VERIFY_SUCCESS( m_lpDD->CreateSurface(&ddsd, &lpddts, NULL) );
   
-  VERIFY_SUCCESS( lpddts->QueryInterface(IID_IDirect3DTexture2, (LPVOID *)&ddtex) );     
+  VERIFY_SUCCESS( lpddts->QueryInterface(IID_IDirect3DTexture2, (LPVOID *)&ddtex) );
   VERIFY_SUCCESS( ddtex->Load(tex->lptex) );
-  VERIFY_SUCCESS( ddtex->GetHandle(m_lpD3dDevice, &htex) );
-  
+
   tex->lptex->Release();
   tex->lpsurf->Release();
   
   tex->lptex = ddtex;
   tex->lpsurf = lpddts;
-  tex->htex = htex;
 }
 
 void D3DTextureCache::Unload(HighColorCache_Data *d)
@@ -391,7 +388,6 @@ void D3DTextureCache::Unload(HighColorCache_Data *d)
     t->lptex->Release();
     t->lptex = NULL;
   }
-  t->htex = NULL;
   if (t->lpddpal)
   {
     t->lpddpal->Release();
@@ -404,7 +400,7 @@ void D3DTextureCache::Unload(HighColorCache_Data *d)
 ///////////////////////////////////
 // D3DLightMapCache Implementation//
 ///////////////////////////////////
-D3DLightMapCache::D3DLightMapCache(int nMaxSize, bool bHardware, LPDIRECTDRAW4 pDDraw, LPDIRECT3DDEVICE2 pDevice, int nBpp)
+D3DLightMapCache::D3DLightMapCache(int nMaxSize, bool bHardware, LPDIRECTDRAW4 pDDraw, LPDIRECT3DDEVICE3 pDevice, int nBpp)
 : HighColorCache(nMaxSize, HIGHCOLOR_LITCACHE, nBpp)
 {
   m_bHardware=bHardware;
@@ -447,12 +443,13 @@ void D3DLightMapCache::Load(HighColorCache_Data *d)
   
   // create the lightmap surface. this is a hi/true color surface.
   DDSURFACEDESC2 ddsd;
-  memcpy(&ddsd, &csGraphics3DDirect3DDx6::m_ddsdLightmapSurfDesc, sizeof(DDSURFACEDESC));
+  memset(&ddsd, 0, sizeof(ddsd));
   ddsd.dwSize = sizeof(ddsd);
   ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
   ddsd.ddsCaps.dwCaps = DDSCAPS_TEXTURE | DDSCAPS_SYSTEMMEMORY;
   ddsd.dwHeight = lheight;
   ddsd.dwWidth = lwidth;
+  memcpy(&ddsd.ddpfPixelFormat, &csGraphics3DDirect3DDx6::m_ddsdLightmapSurfDesc.ddpfPixelFormat, sizeof(DDPIXELFORMAT));
   
   ASSERT(!(lheight%2));
   ASSERT(!(lwidth%2));
@@ -481,7 +478,7 @@ void D3DLightMapCache::Load(HighColorCache_Data *d)
   blue_scale = 255 / (csGraphics3DDirect3DDx6::m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwBBitMask >> s);
   
   // lock the lightmap surface
-  memset(&ddsd, 0, sizeof(DDSURFACEDESC));
+  memset(&ddsd, 0, sizeof(DDSURFACEDESC2));
   ddsd.dwSize = sizeof(ddsd);
   VERIFY_SUCCESS( cached_texture->lpsurf->Lock(NULL, &ddsd, 0, NULL) );
   
@@ -581,11 +578,7 @@ void D3DLightMapCache::Load(HighColorCache_Data *d)
   // get the texture interfaces and handles
   VERIFY_SUCCESS( cached_texture->lpsurf->QueryInterface(IID_IDirect3DTexture2, (LPVOID *)&cached_texture->lptex) );
   
-  if (!m_bHardware)
-  {
-    VERIFY_SUCCESS( cached_texture->lptex->GetHandle(m_lpD3dDevice, &cached_texture->htex) );
-  }
-  else
+  if (m_bHardware)
   {
     LoadIntoVRAM(cached_texture);
   }
@@ -598,7 +591,6 @@ void D3DLightMapCache::LoadIntoVRAM(D3DLightCache_Data *tex)
   DDSURFACEDESC2 ddsd;
   IDirectDrawSurface4* lpddts;
   IDirect3DTexture2*  ddtex;
-  D3DTEXTUREHANDLE    htex;   
   
   memset(&ddsd, 0, sizeof(ddsd));
   ddsd.dwSize = sizeof(ddsd);
@@ -611,14 +603,12 @@ void D3DLightMapCache::LoadIntoVRAM(D3DLightCache_Data *tex)
   lpddts->QueryInterface(IID_IDirect3DTexture2, (LPVOID *)&ddtex);     
   
   VERIFY_SUCCESS( ddtex->Load(tex->lptex) );
-  VERIFY_SUCCESS( ddtex->GetHandle(m_lpD3dDevice, &htex) );
   
   tex->lptex->Release();
   tex->lpsurf->Release();
   
   tex->lptex = ddtex;
   tex->lpsurf = lpddts;
-  tex->htex = htex;
 }
 
 void D3DLightMapCache::Unload(HighColorCache_Data *d)
@@ -639,7 +629,6 @@ void D3DLightMapCache::Unload(HighColorCache_Data *d)
     t->lptex->Release();
     t->lptex = NULL;
   }
-  t->htex = NULL;
 }
 
 

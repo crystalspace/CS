@@ -34,7 +34,6 @@ struct D3DTextureCache_Data
 {
   LPDIRECTDRAWSURFACE4 lpsurf;		// texture data surface
   LPDIRECT3DTEXTURE2 lptex;		// texture interface
-  D3DTEXTUREHANDLE htex;			// texture handle
   
   LPDIRECTDRAWPALETTE lpddpal;	// texture palette
 };
@@ -44,7 +43,6 @@ struct D3DLightCache_Data
 {
   LPDIRECTDRAWSURFACE4 lpsurf;		// texture data surface
   LPDIRECT3DTEXTURE2 lptex;		// texture interface
-  D3DTEXTUREHANDLE htex;			// texture handle
   float ratio_width;
   float ratio_height;
 };
@@ -59,7 +57,7 @@ private:
   ///
   LPDIRECTDRAW4 m_lpDD;
   ///
-  LPDIRECT3DDEVICE2 m_lpD3dDevice;
+  LPDIRECT3DDEVICE3 m_lpD3dDevice;
 
   G3D_CAPS* m_pRendercaps;
   int       m_MaxAspectRatio;
@@ -67,7 +65,7 @@ private:
 public:
   ///
   D3DTextureCache(int nMaxSize, bool bHardware, LPDIRECTDRAW4 pDDraw, 
-                  LPDIRECT3DDEVICE2 pDevice, int nBpp, bool bMipmapping,
+                  LPDIRECT3DDEVICE3 pDevice, int nBpp, bool bMipmapping,
 		  G3D_CAPS* pRendercaps, int MaxAspectRatio);
   ///
   virtual void Dump();
@@ -95,10 +93,10 @@ private:
   ///
   //@@@ some operations use Direct3DDevice3 some do use Direct3DDevice2,
   //due a missing implementation of DirectTexture3
-  LPDIRECT3DDEVICE2 m_lpD3dDevice;
+  LPDIRECT3DDEVICE3 m_lpD3dDevice;
 public:
   ///
-  D3DLightMapCache(int nMaxSize, bool bHardware, LPDIRECTDRAW4 pDDraw, LPDIRECT3DDEVICE2 pDevice, int nBpp);
+  D3DLightMapCache(int nMaxSize, bool bHardware, LPDIRECTDRAW4 pDDraw, LPDIRECT3DDEVICE3 pDevice, int nBpp);
   ///
   virtual void Dump();
   

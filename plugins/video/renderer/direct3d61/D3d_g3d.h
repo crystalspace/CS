@@ -241,9 +241,9 @@ public:
   STDMETHODIMP GetWidth(int& nWidth) { nWidth = m_nWidth; return S_OK; }
   ///
   STDMETHODIMP GetHeight(int& nHeight) { nHeight = m_nHeight; return S_OK; }
-  /// Set center of projection.
-  STDMETHODIMP SetPerspectiveCenter (int x, int y);
 
+  STDMETHODIMP SetPerspectiveCenter(int /*x*/, int /*y*/) {return S_OK;}
+ 
   ///
   STDMETHODIMP NeedsPO2Maps(void) { return S_OK; }
   ///
@@ -282,7 +282,6 @@ public:
   {
     LPDIRECTDRAWSURFACE4 lpsurf;		// texture data surface
     LPDIRECT3DTEXTURE2 lptex;		// texture interface
-    D3DTEXTUREHANDLE htex;			// texture handle
   };
 
   /// Actually draws a halo the the screen.
@@ -323,9 +322,10 @@ private:
   
   // print to the system's device
   void SysPrintf(int mode, char* str, ...);
-  
-  // texture format enumeration callback function :: static member function.
-  static HRESULT CALLBACK EnumTextFormatsCallback(LPDDSURFACEDESC2 lpddsd, LPVOID lpUserArg);
+
+  // Z-Buffer enumeration callback  
+  static HRESULT CALLBACK EnumZBufferFormatsCallback(LPDDPIXELFORMAT lpddpf, LPVOID lpUserArg);
+
   // Microsoft changed their API for DX6, now it is not DDSURFACEDESC2 but DDPIXELFORMAT ... stupid
   static HRESULT CALLBACK EnumPixelFormatsCallback(LPDDPIXELFORMAT lpddpf, LPVOID lpUserArg);
   /// used to get the appropriate device.
