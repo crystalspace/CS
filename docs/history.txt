@@ -12,6 +12,10 @@ The history order is reversed so that new features are at the top.
 	  clamping the clip rect in g2d to the size of the screen so it is
 	  now impossible to make the clip rect go outside screen boundaries.
 	- The engine no longer crashes if the camera has a NULL sector.
+	- Removed the totally unused csWireFrame class from the engine.
+	  It was not even possible to use it since there was no SCF
+	  API to access it. And it doesn't belong in the engine anyway.
+	- Removed the obsolete and broken map commands in walktest.
 19-Feb-2003
 	- Mårten Svanfeldt fixed a bug introduced when adding the new
 	  light-parameters for the new renderer due to a missing

@@ -343,13 +343,6 @@ public:
   /// If true then show both debug boxes.
   bool do_show_debug_boxes;
 
-  /// A WireFrame object for the map.
-  csWireFrameCam* wf;
-  /// Map mode.
-  int map_mode;
-  /// The map projection mode (WF_PROJ_xxx)
-  int map_projection;
-
   /// Timing.
   float timeFPS;
 
@@ -428,11 +421,6 @@ public:
 
   /// Move bots, particle systems, players, etc. for each frame.
   virtual void MoveSystems (csTicks elapsed_time, csTicks current_time);
-
-  /**
-   * Draw a frame in map mode.
-   */
-  void DrawFrameMap ();
 
   /**
    * Draw all things related to debugging (mostly edge drawing).

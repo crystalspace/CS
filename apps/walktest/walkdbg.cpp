@@ -29,8 +29,6 @@
 #include "iengine/statlght.h"
 #include "iengine/light.h"
 
-#include "csengine/wirefrm.h"
-
 #define Gfx3D Sys->myG3D
 #define Gfx2D Sys->myG2D
 

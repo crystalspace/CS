@@ -39,8 +39,6 @@
 #include "iutil/event.h"
 #include "iutil/csinput.h"
 
-#include "csengine/wirefrm.h"
-
 extern WalkTest* Sys;
 
 csKeyMap* mapping = NULL;
@@ -236,7 +234,7 @@ extern WalkTest* Sys;
 
 void WalkTest::strafe (float speed,int keep_old)
 {
-  if (move_3d || map_mode) return;
+  if (move_3d) return;
   static bool pressed = false;
   static float strafe_speed = 0;
   static long start_time = csGetTicks ();
@@ -277,7 +275,7 @@ void WalkTest::strafe (float speed,int keep_old)
 
 void WalkTest::step (float speed,int keep_old)
 {
-  if (move_3d || map_mode) return;
+  if (move_3d) return;
 
   static bool pressed = false;
   static float step_speed = 0;
@@ -323,7 +321,7 @@ void WalkTest::step (float speed,int keep_old)
 
 void WalkTest::rotate (float speed,int keep_old)
 {
-  if (move_3d || map_mode) return;
+  if (move_3d) return;
 
   static bool pressed = false;
   static float angle_accel = 0;
@@ -370,7 +368,7 @@ void WalkTest::rotate (float speed,int keep_old)
 void WalkTest::look (float speed,int keep_old)
 {
   (void) speed; (void) keep_old;
-  if (move_3d || map_mode) return;
+  if (move_3d) return;
   static float step_speed = 0;
   if (!keep_old)
     step_speed = speed*cfg_look_accelerate;
@@ -396,7 +394,6 @@ void WalkTest::RotateCam(float x, float y)
 
 void WalkTest::imm_forward (float speed, bool slow, bool fast)
 {
-  if (map_mode) { wf->KeyUp (speed, slow, fast); return; }
   if (slow)
     view->GetCamera ()->Move (speed * 0.01 * CS_VEC_FORWARD, do_cd);
   else if (fast)
@@ -407,7 +404,6 @@ void WalkTest::imm_forward (float speed, bool slow, bool fast)
 
 void WalkTest::imm_backward (float speed, bool slow, bool fast)
 {
-  if (map_mode) { wf->KeyDown (speed, slow, fast); return; }
   if (slow)
     view->GetCamera ()->Move (speed*.01*CS_VEC_BACKWARD, do_cd);
   else if (fast)
@@ -418,7 +414,6 @@ void WalkTest::imm_backward (float speed, bool slow, bool fast)
 
 void WalkTest::imm_left (float speed, bool slow, bool fast)
 {
-  if (map_mode) return;
   if (slow)
     view->GetCamera ()->Move (speed * 0.01 * CS_VEC_LEFT, do_cd);
   else if (fast)
@@ -429,7 +424,6 @@ void WalkTest::imm_left (float speed, bool slow, bool fast)
 
 void WalkTest::imm_right (float speed, bool slow, bool fast)
 {
-  if (map_mode) return;
   if (slow)
     view->GetCamera ()->Move (speed * 0.01 * CS_VEC_RIGHT, do_cd);
   else if (fast)
@@ -440,7 +434,6 @@ void WalkTest::imm_right (float speed, bool slow, bool fast)
 
 void WalkTest::imm_up (float speed, bool slow, bool fast)
 {
-  if (map_mode) return;
   if (slow)
     view->GetCamera ()->Move (speed * 0.01 * CS_VEC_UP, do_cd);
   else if (fast)
@@ -451,7 +444,6 @@ void WalkTest::imm_up (float speed, bool slow, bool fast)
 
 void WalkTest::imm_down (float speed, bool slow, bool fast)
 {
-  if (map_mode) return;
   if (slow)
     view->GetCamera ()->Move (speed * 0.01 * CS_VEC_DOWN, do_cd);
   else if (fast)
@@ -462,8 +454,6 @@ void WalkTest::imm_down (float speed, bool slow, bool fast)
 
 void WalkTest::imm_rot_left_camera (float speed, bool slow, bool fast)
 {
-  if (map_mode == MAP_TXT) { wf->KeyLeftStrafe (speed, slow, fast); return; }
-  if (map_mode) { wf->KeyLeft (speed, slow, fast); return; }
   if (slow)
     view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed * .01);
   else if (fast)
@@ -474,7 +464,6 @@ void WalkTest::imm_rot_left_camera (float speed, bool slow, bool fast)
 
 void WalkTest::imm_rot_left_world (float speed, bool slow, bool fast)
 {
-  if (map_mode) return;
   if (slow)
     view->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_LEFT, speed * .01);
   else if (fast)
@@ -485,8 +474,6 @@ void WalkTest::imm_rot_left_world (float speed, bool slow, bool fast)
 
 void WalkTest::imm_rot_right_camera (float speed, bool slow, bool fast)
 {
-  if (map_mode == MAP_TXT) { wf->KeyRightStrafe (speed, slow, fast); return; }
-  if (map_mode) { wf->KeyRight (speed, slow, fast); return; }
   if (slow)
     view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed * .01);
   else if (fast)
@@ -497,7 +484,6 @@ void WalkTest::imm_rot_right_camera (float speed, bool slow, bool fast)
 
 void WalkTest::imm_rot_right_world (float speed, bool slow, bool fast)
 {
-  if (map_mode) return;
   if (slow)
     view->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_RIGHT, speed * .01);
   else if (fast)
@@ -508,7 +494,6 @@ void WalkTest::imm_rot_right_world (float speed, bool slow, bool fast)
 
 void WalkTest::imm_rot_left_xaxis (float speed, bool slow, bool fast)
 {
-  if (map_mode) { wf->KeyPgDn (speed, slow, fast); return; }
   if (slow)
     view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed * .01);
   else if (fast)
@@ -519,7 +504,6 @@ void WalkTest::imm_rot_left_xaxis (float speed, bool slow, bool fast)
 
 void WalkTest::imm_rot_right_xaxis (float speed, bool slow, bool fast)
 {
-  if (map_mode) { wf->KeyPgUp (speed, slow, fast); return; }
   if (slow)
     view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed * .01);
   else if (fast)
@@ -530,7 +514,6 @@ void WalkTest::imm_rot_right_xaxis (float speed, bool slow, bool fast)
 
 void WalkTest::imm_rot_left_zaxis (float speed, bool slow, bool fast)
 {
-  if (map_mode) return;
   if (slow)
     view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_LEFT, speed * .01);
   else if (fast)
@@ -541,7 +524,6 @@ void WalkTest::imm_rot_left_zaxis (float speed, bool slow, bool fast)
 
 void WalkTest::imm_rot_right_zaxis (float speed, bool slow, bool fast)
 {
-  if (map_mode) return;
   if (slow)
     view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_RIGHT, speed * .01);
   else if (fast)
@@ -703,15 +685,14 @@ bool WalkTest::WalkHandleEvent (iEvent &Event)
             int newVHeight = FRAME_HEIGHT - oldCHeight + oldVHeight;
             if ((oldVWidth != newVWidth) || (oldVHeight != newVHeight))
             {
-                views[0]->GetCamera()->SetPerspectiveCenter(bbox1.MinX() + (newVWidth / 4),
-                                                            bbox1.MinY() + (newVHeight / 2));
-                views[1]->GetCamera()->SetPerspectiveCenter(bbox1.MinX() + (3 * newVWidth / 4),
-                                                            bbox1.MinY() + (newVHeight / 2));
+              views[0]->GetCamera()->SetPerspectiveCenter (
+	      	bbox1.MinX() + (newVWidth / 4),
+		bbox1.MinY() + (newVHeight / 2));
+              views[1]->GetCamera()->SetPerspectiveCenter (
+	      	bbox1.MinX() + (3 * newVWidth / 4),
+		bbox1.MinY() + (newVHeight / 2));
             }
         }
-        
-	if (wf)
-	  wf->GetCamera ()->SetPerspectiveCenter (FRAME_WIDTH/2, FRAME_HEIGHT/2);
 	break;
       }
       else if (Event.Command.Code == cscmdCanvasHidden)

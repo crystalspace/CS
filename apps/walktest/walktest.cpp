@@ -77,7 +77,6 @@
 #include "iengine/campos.h"
 #include "iutil/plugin.h"
 
-#include "csengine/wirefrm.h"
 #include "csengine/stats.h"
 #include "csengine/light.h"
 
@@ -121,9 +120,6 @@ WalkTest::WalkTest () :
   anim_sky = NULL;
   anim_dirlight = NULL;
 
-  wf = NULL;
-  map_mode = MAP_OFF;
-  map_projection = WF_ORTHO_PERSP;
   do_stats = false;
   do_edges = false;
   do_show_coord = false;
@@ -186,7 +182,6 @@ WalkTest::WalkTest () :
 
 WalkTest::~WalkTest ()
 {
-  delete wf;
   delete [] auto_script;
   delete infinite_maze;
   delete cslogo;
@@ -716,16 +711,16 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
   // Here comes the main call to the engine. view->Draw() actually
   // takes the current camera and starts rendering.
   //------------
-  if (map_mode != MAP_ON && map_mode != MAP_TXT && !do_covtree_dump)
+  if (!do_covtree_dump)
   {
     if (split == -1)
-        view->Draw ();
+      view->Draw ();
     else 
     {	
-        views[0]->Draw();
-        views[1]->Draw();
+      views[0]->Draw();
+      views[1]->Draw();
     }
-  };
+  }
 
   // no need to clear screen anymore
   drawflags = 0;
@@ -748,116 +743,6 @@ void WalkTest::DrawFrame2D (void)
   // White-board for debugging purposes.
   if (do_covtree_dump)
     DrawFrameExtraDebug ();
-}
-
-void WalkTest::DrawFrameMap ()
-{
-#if 0
-//@@@
-  if (map_mode == MAP_TXT)
-  {
-    // Texture mapped map.
-    csPolyIt* pi = view->GetEngine ()->NewPolyIterator ();
-    csPolygon3D* p;
-    csCamera* cam = wf->GetCamera ();
-    const csVector3& c = cam->GetOrigin ();
-    float scale = 10.;
-    csBox2 box (2, 2, FRAME_WIDTH-2, FRAME_HEIGHT-2);
-    csClipper* clipper = new csBoxClipper (box);
-    csVector2 maxdist (FRAME_WIDTH/(2*scale), FRAME_HEIGHT/(2*scale));
-    csPoly2DPool* render_pool = view->GetEngine ()->render_pol2d_pool;
-    Gfx3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
-    int i;
-    bool in;
-    while ((p = pi->Fetch ()) != NULL)
-    {
-      if (p->GetPortal ()) continue;
-      in = false;
-      for (i = 0 ; i < p->GetVertexCount () ; i++)
-      {
-	const csVector3& v = p->Vwor (i);
-	if (ABS (v.x - c.x) < maxdist.x &&
-	    ABS (v.z - c.z) < maxdist.y &&
-	    v.y <= c.y && v.y >= (c.y-5))
-	{
-	  in = true;
-	  break;
-	}
-      }
-      if (in)
-      {
-        csPolygon2D* clip = (csPolygon2D*)(render_pool->Alloc ());
-	clip->MakeEmpty ();
-	for (i = 0 ; i < p->GetVertexCount () ; i++)
-	{
-	  const csVector3& v = p->Vwor (i);
-	  csVector2 v2;
-	  v2.x = (v-c).x;
-	  v2.y = (v-c).z;
-	  v2 *= scale;
-	  v2.x += FRAME_WIDTH/2;
-	  v2.y += FRAME_HEIGHT/2;
-	  clip->AddVertex (v2);
-	}
-	if (clip->ClipAgainst (clipper))
-	{
-  	  if (p->GetTextureType () != POLYTXT_LIGHTMAP)
-  	  {
-	    // @@@ Unsupported for now.
-	  }
-	  else
-	  {
-    	    static G3DPolygonDP g3dpoly;
-	    g3dpoly.num = clip->GetVertexCount ();
-    	    g3dpoly.mat_handle = p->GetMaterialHandle ();
-    	    g3dpoly.inv_aspect = view->GetCamera ()->GetInvFOV ();
-	    for (i = 0 ; i <g3dpoly.num ; i++)
-	    {
-	      g3dpoly.vertices[i].x = clip->GetVertex (i)->x;
-	      g3dpoly.vertices[i].y = clip->GetVertex (i)->y;
-	    }
-	    g3dpoly.alpha = 0;
-	    g3dpoly.z_value = p->Vwor (0).y;
-	    g3dpoly.poly_texture = p->GetLightMapInfo ()->GetPolyTex ();
-
-	    csPolyTxtPlane* txt_plane = p->GetLightMapInfo ()->GetTxtPlane ();
-    	    csMatrix3 m_cam2tex;
-    	    csVector3 v_cam2tex;
-	    txt_plane->GetTextureSpace (m_cam2tex, v_cam2tex);
-	    float s;
-	    s = m_cam2tex.m12; m_cam2tex.m12 = m_cam2tex.m13; m_cam2tex.m13 = s;
-	    s = m_cam2tex.m22; m_cam2tex.m22 = m_cam2tex.m23; m_cam2tex.m23 = s;
-	    s = m_cam2tex.m32; m_cam2tex.m32 = m_cam2tex.m33; m_cam2tex.m33 = s;
-	    s = v_cam2tex.y; v_cam2tex.y = v_cam2tex.z; v_cam2tex.z = s;
-    	    g3dpoly.plane.m_cam2tex = &m_cam2tex;
-    	    g3dpoly.plane.v_cam2tex = &v_cam2tex;
-
-	    csPlane3* plane = p->GetPolyPlane ();
-    	    g3dpoly.normal.A () = plane->A ();
-    	    g3dpoly.normal.B () = plane->C ();
-    	    g3dpoly.normal.C () = plane->B ();
-    	    g3dpoly.normal.D () = plane->D ();
-
-	    Gfx3D->DrawPolygon (g3dpoly);
-	  }
-	}
-        render_pool->Free (clip);
-      }
-    }
-
-    delete pi;
-    delete clipper;
-  }
-  else
-  {
-    // Wireframe map.
-    wf->GetWireframe ()->Clear ();
-    extern void draw_map (csRenderView*, int, void*);
-    view->GetEngine ()->DrawFunc (view->GetCamera (),
-    	view->GetClipper (), draw_map);
-    wf->GetWireframe ()->Draw (Gfx3D, wf->GetCamera (), map_projection);
-  }
-#endif
 }
 
 void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
@@ -910,17 +795,8 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
 
   (void)elapsed_time; (void)current_time;
 
-  //not used since we need WHITE background not black
-  int drawflags = (map_mode == MAP_TXT) ? CSDRAW_CLEARZBUFFER : 0;
-  if (map_mode == MAP_ON || map_mode == MAP_TXT)
-  {
-    if (!Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS))
-      return;
-    int col = 0;
-    if (map_mode == MAP_ON) col = bgcolor_map;
-    else if (map_mode == MAP_TXT) col = bgcolor_txtmap;
-    Gfx2D->Clear (col);
-  }
+  // Not used since we need WHITE background not black.
+  int drawflags = 0;
 
   if (!myConsole
    || !myConsole->GetVisible ()
@@ -944,11 +820,7 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
     DrawFullScreenFX2D (elapsed_time, current_time);
   }
 
-  if (map_mode != MAP_OFF)
-    DrawFrameMap ();
-  else
-    DrawFrameDebug ();
-
+  DrawFrameDebug ();
   DrawFrameConsole ();
 
   // If console is not active we draw a few additional things.
@@ -1540,9 +1412,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // Initialize collision detection system (even if disabled so
   // that we can enable it later).
   InitCollDet (Engine, NULL);
-
-  // Create a wireframe object which will be used for debugging.
-  wf = new csWireFrameCam (myG2D);
 
   // Load a few sounds.
   if (mySound)

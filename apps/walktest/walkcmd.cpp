@@ -1068,7 +1068,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  loadmesh addmesh delmesh listmeshes");
     CONPRI("  listactions setaction setmotion");
     CONPRI("Various:");
-    CONPRI("  coordsave coordload bind map mapproj p_alpha s_fog");
+    CONPRI("  coordsave coordload bind p_alpha s_fog");
     CONPRI("  snd_play snd_volume record play clrrec saverec");
     CONPRI("  loadrec action plugins conflist confset");
 
@@ -1615,49 +1615,49 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "strafe_left"))
   {
     float f = safe_atof (arg);
-    if (Sys->move_3d || Sys->map_mode) { if (f) Sys->imm_left (.1, false, false); }
+    if (Sys->move_3d) { if (f) Sys->imm_left (.1, false, false); }
     else Sys->strafe (-1*f,0);
   }
   else if (!strcasecmp (cmd, "strafe_right"))
   {
     float f = safe_atof (arg);
-    if (Sys->move_3d || Sys->map_mode) { if (f) Sys->imm_right (.1, false, false); }
+    if (Sys->move_3d) { if (f) Sys->imm_right (.1, false, false); }
     else Sys->strafe (1*f,0);
   }
   else if (!strcasecmp (cmd, "step_forward"))
   {
     float f = safe_atof (arg);
-    if (Sys->move_3d || Sys->map_mode) { if (f) Sys->imm_forward (.1, false, false); }
+    if (Sys->move_3d) { if (f) Sys->imm_forward (.1, false, false); }
     else Sys->step (1*f,0);
   }
   else if (!strcasecmp (cmd, "step_backward"))
   {
     float f = safe_atof (arg);
-    if (Sys->move_3d || Sys->map_mode) { if (f) Sys->imm_backward (.1, false, false); }
+    if (Sys->move_3d) { if (f) Sys->imm_backward (.1, false, false); }
     else Sys->step (-1*f,0);
   }
   else if (!strcasecmp (cmd, "rotate_left"))
   {
     float f = safe_atof (arg);
-    if (Sys->move_3d || Sys->map_mode) { if (f) Sys->imm_rot_left_camera (.1, false, false); }
+    if (Sys->move_3d) { if (f) Sys->imm_rot_left_camera (.1, false, false); }
     else Sys->rotate (-1*f,0);
   }
   else if (!strcasecmp (cmd, "rotate_right"))
   {
     float f = safe_atof (arg);
-    if (Sys->move_3d || Sys->map_mode) { if (f) Sys->imm_rot_right_camera (.1, false, false); }
+    if (Sys->move_3d) { if (f) Sys->imm_rot_right_camera (.1, false, false); }
     else Sys->rotate (1*f,0);
   }
   else if (!strcasecmp (cmd, "look_up"))
   {
     float f = safe_atof (arg);
-    if (Sys->move_3d || Sys->map_mode) { if (f) Sys->imm_rot_right_xaxis (.1, false, false); }
+    if (Sys->move_3d) { if (f) Sys->imm_rot_right_xaxis (.1, false, false); }
     else Sys->look (-1*f,0);
   }
   else if (!strcasecmp (cmd, "look_down"))
   {
     float f = safe_atof (arg);
-    if (Sys->move_3d || Sys->map_mode) { if (f) Sys->imm_rot_left_xaxis (.1, false, false); }
+    if (Sys->move_3d) { if (f) Sys->imm_rot_left_xaxis (.1, false, false); }
     else Sys->look (1*f,0);
   }
   else if (!strcasecmp (cmd, "jump"))
@@ -2163,18 +2163,6 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->view->GetEngine ()->RemoveDynLight (dyn);
     }
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "All dynamic lights deleted.");
-  }
-  else if (!strcasecmp (cmd, "map"))
-  {
-    const char* const choices[5] = { "off", "overlay", "on", "txt", NULL };
-    csCommandProcessor::change_choice (arg, &Sys->map_mode, "map", choices, 4);
-  }
-  else if (!strcasecmp (cmd, "mapproj"))
-  {
-    const char* const choices[5] = { "persp", "x", "y", "z", NULL };
-    Sys->map_projection++;
-    csCommandProcessor::change_choice (arg, &Sys->map_projection, "map projection", choices, 4);
-    Sys->map_projection--;
   }
   else if (!strcasecmp (cmd, "snd_play"))
   {
