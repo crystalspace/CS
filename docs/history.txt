@@ -43,6 +43,7 @@ The history order is reversed so that new features are at the top.
 	  work standalone.
 	- Added '-dupes' commandline option to walktest which enables this
 	  option.
+	- Fixed an uninitialized variable in the OpenGL benchmark routine.
 2-Mar-2003
         - Rudolf Potucek updated makefiles in the apps/ directory to 
 	  remove vpath and generate object files in individual 
