@@ -246,6 +246,9 @@ public:
   /// Finds the smallest visible component which contains the point (x,y)
   virtual iAwsComponent* ComponentAt(int x, int y)=0;
 
+  /// Returns true if the mouse is inside any of the top-level components.
+  virtual bool MouseInComponent(int x, int y)=0;
+
   /// Causes the current view of the window system to be drawn to the given graphics device.
   virtual void Print(iGraphics3D *g3d, uint8 Alpha=0)=0;
 
@@ -502,7 +505,10 @@ struct iAwsSinkManager : public iBase
   /// Create a new embeddable sink, with parm as the void * passed into the triggers.
   virtual iAwsSink *CreateSink(void *parm)=0;
 
+
+
   /// Create a new embeddable slot
+
   virtual iAwsSlot *CreateSlot ()=0;
 };
 

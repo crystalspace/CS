@@ -186,6 +186,9 @@ public:
 
   /// Returns true if window is in transition
   virtual bool ComponentIsInTransition(iAwsComponent *win, bool perform_transition=false);
+
+  /// Returns true if the mouse is inside any of the top-level components.
+  virtual bool MouseInComponent(int x, int y);
  
   /// Causes the current view of the window system to be drawn to the given graphics device.
   virtual void Print (iGraphics3D *g3d, uint8 Alpha = 0);

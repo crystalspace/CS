@@ -473,6 +473,20 @@ iAwsComponent* awsManager::ComponentAt(int x, int y)
   return NULL;
 }
 
+bool awsManager::MouseInComponent(int x, int y)
+{
+  for(iAwsComponent* cur = GetTopComponent(); cur; cur = cur->ComponentBelow())
+  {
+    if (cur->isHidden())
+      continue;
+        
+    if(cur->Frame().Contains(x,y))
+      return true;
+  }
+  
+  return false;
+}
+
 void awsManager::Mark (const csRect &rect)
 {
   dirty.Include (rect);
