@@ -17,6 +17,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+/**\file
+ */
+
 #ifndef __XORPAT_H__
 #define __XORPAT_H__
 

@@ -17,6 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+/**\file
+ */
 //-----------------------------------------------------------------------------
 // Implementation Note: Eric Sunshine <sunshine@sunshineco.com>      1999/02/09
 //
@@ -142,24 +144,27 @@ struct csRGBpixel
 // We don't need RGB_MASK anymore
 #undef RGB_MASK
 
-/**
+/** \name Eye sensivity to different color components
  * Eye sensivity to different color components, from NTSC grayscale equation.
  * The coefficients are multiplied by 100 and rounded towards nearest integer,
  * to facilitate integer math. The squared coefficients are also multiplied
  * by 100 and rounded to nearest integer (thus 173 == 1.73, 242 == 2.42 etc).
- */
+ * @{ */
 /// Red component sensivity
 #define R_COEF		173
 /// Green component sensivity
 #define G_COEF		242
 /// Blue component sensivity
 #define B_COEF		107
-/// Eye sensivity to different color components, squared
+/** @} */
+/**\name Eye sensivity to different color components, squared
+ * @{ */
 /// Red component sensivity, squared
 #define R_COEF_SQ	299
 /// Green component sensivity, squared
 #define G_COEF_SQ	587
 /// Blue component sensivity, squared
 #define B_COEF_SQ	114
+/** @} */
 
 #endif // __CS_RGBPIXEL_H__

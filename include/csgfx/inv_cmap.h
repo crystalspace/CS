@@ -33,12 +33,16 @@
 #ifndef __INV_CMAP_H__
 #define __INV_CMAP_H__
 
+/**\file 
+ * Compute an inverse colormap
+ */
+
 #include "rgbpixel.h"
 
 /**
- * <pre>
  * Compute an inverse colormap efficiently.
- * Inputs:
+ * 
+ * <pre>Inputs:
  * 	colors:		Number of colors in the forward colormap.
  * 	colormap:	The forward colormap.
  *      rbits, gbits, bbits:
@@ -76,8 +80,6 @@
  * 	Thus, the complexity of the algorithm is O(log(K) N^3),
  * 	where K = colors, and N = 2^bits.
  * </pre>
- */
-/**
  * BUGBUG: For some unknown reason the routine generates colormaps shifted
  * towards red if green is bigger than red (and vice versa, shifted to green
  * if red is bigger). Thus it is adviced to use same resolution for R and G.
