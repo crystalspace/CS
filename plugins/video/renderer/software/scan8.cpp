@@ -132,8 +132,8 @@
 #define SCANLOOP \
     do                                                                  \
     {                                                                   \
-      *_dest = Scan.AlphaMap [*_dest + unsigned (			\
-        srcTex [((vv >> 16) << shifter) + (uu >> 16)]) << 8];		\
+      *_dest = Scan.AlphaMap [(*_dest + unsigned (			\
+        srcTex [((vv >> 16) << shifter) + (uu >> 16)])) << 8];		\
       _dest++;                                                          \
       uu += duu;                                                        \
       vv += dvv;                                                        \
