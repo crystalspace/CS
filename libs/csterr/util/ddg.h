@@ -24,7 +24,11 @@
 
 #ifdef DDGSTREAM
 #include <iostream.h>
+#ifdef WIN32
+#include <strstrea.h>
+#else
 #include <strstream.h>
+#endif
 #endif
 
 #ifdef WIN32
@@ -35,7 +39,6 @@
 #pragma warning (disable:4097)	// typedef-name 'super' used as synonym for class-name 'ddgSubclass::ddgSuperClass'. 
 #pragma warning (disable:4100)	// unreferenced formal parameter. 
 #pragma warning (disable:4706)	// assignment within conditional expression 
-#include "strstrea.h"
 #endif
 //
 #ifdef DDG
