@@ -216,6 +216,7 @@ TOKEN_DEF_START
   TOKEN_DEF (SECONDARY_INACTIVE)
   TOKEN_DEF (SECOND_LEN)
   TOKEN_DEF (SECTOR)
+  TOKEN_DEF (SHADING)
   TOKEN_DEF (SIXFACE)
   TOKEN_DEF (SKELETON)
   TOKEN_DEF (SKY)
@@ -242,7 +243,6 @@ TOKEN_DEF_START
   TOKEN_DEF (TEXTURE_LIGHTING)
   TOKEN_DEF (TEXTURE_MIPMAP)
   TOKEN_DEF (TEXTURE_SCALE)
-  TOKEN_DEF (TEXTURING)
   TOKEN_DEF (TEX_SET)
   TOKEN_DEF (TEX_SET_SELECT)
   TOKEN_DEF (THING)
@@ -1784,7 +1784,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
     TOKEN_TABLE (WARP)
     TOKEN_TABLE (LIGHTX)
     TOKEN_TABLE (TEXTURE)
-    TOKEN_TABLE (TEXTURING)
+    TOKEN_TABLE (SHADING)
     TOKEN_TABLE (VERTICES)
     TOKEN_TABLE (UVA)
     TOKEN_TABLE (UV)
@@ -2061,7 +2061,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
 	  }
         }
         break;
-      case TOKEN_TEXTURING:
+      case TOKEN_SHADING:
         while ((cmd = csGetObject (&params, texturing_commands, &name, &params2)) > 0)
           switch (cmd)
           {
@@ -2628,7 +2628,7 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
     TOKEN_TABLE (FLATCOL)
     TOKEN_TABLE (GOURAUD)
     TOKEN_TABLE (COLLDET)
-    TOKEN_TABLE (TEXTURING)
+    TOKEN_TABLE (SHADING)
     TOKEN_TABLE (COLORS)
   TOKEN_TABLE_END
 
@@ -2697,7 +2697,7 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
         }
         ptemplate->SetMaterial (mat);
         break;
-      case TOKEN_TEXTURING:
+      case TOKEN_SHADING:
         while ((cmd = csGetObject (&params, texturing_commands, &name, &params2)) > 0)
           switch (cmd)
           {
