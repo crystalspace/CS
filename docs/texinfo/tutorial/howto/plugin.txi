@@ -158,12 +158,14 @@ public:
 #endif // __GAME_MYPLUG_H__
 @end example
 
-This requires a little explanation.  The @sc{Crystal Space} framework requires
-that every @sc{scf} class implement the @samp{iComponent} interface.  This
-interface has a single method, @code{Initialize()}, with which the class will
-be initialized after it is instantiated.  This gives the instance a chance to
-perform various initialization operations and it also provides the instance
-with a pointer to the global object registry.
+This requires a little explanation.  The Crystal Space plugin framework
+requires that every @dfn{named} @sc{scf} class which will be requested by name
+from a plugin module via the Crystal Space @dfn{plugin manager/loader} must
+implement the @samp{iComponent} interface.  This interface has a single method,
+@code{Initialize()}, with which the class will be initialized after it is
+instantiated.  This gives the instance a chance to perform various
+initialization operations and it also provides the instance with a pointer to
+the global object registry.
 
 But, our plugin also needs to implement its own native @samp{iMyApi} interface.
 So here is a situation where the same class needs to implement two interfaces
