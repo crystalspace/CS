@@ -1,4 +1,4 @@
-crystalspace (0.94-1) unstable; urgency=low
+crystalspace (0.94-20010412-1) unstable; urgency=low
 
   * Added suggested changes proposed by Gerhard Tonn <GerhardTonn@swol.de>
   to support s390 (Closes: bug#142404)
@@ -8,7 +8,7 @@ crystalspace (0.94-1) unstable; urgency=low
 
  -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
 
-crystalspace (0.93-8) unstable; urgency=low
+crystalspace (0.93-20020318-8) unstable; urgency=low
 
   * Changed svgalibg1-dev dependancy to try to get autobuilders happy
   * I won't upload package daily when everything will compile on 
@@ -16,21 +16,21 @@ crystalspace (0.93-8) unstable; urgency=low
 
  -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
 
-crystalspace (0.93-7) unstable; urgency=low
+crystalspace (0.93-20020318-7) unstable; urgency=low
 
   * Changed version dependency on lib3ds-dev
   * Repeating Automan correction/improvment (Closes: bug#140793)
 
  -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
 
-crystalspace (0.93-6) unstable; urgency=low
+crystalspace (0.93-20020318-6) unstable; urgency=low
 
   * Section changes in control file
   * Added dependancy on zlib1g (Closes: bug#140649)
 
  -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
 
-crystalspace (0.93-5) unstable; urgency=low
+crystalspace (0.93-20020318-5) unstable; urgency=low
 
   * Repeating First upload (CLoses: bug#120691)
   * Removed csdemo from demos menus (Closes: bug#140508)
@@ -38,26 +38,26 @@ crystalspace (0.93-5) unstable; urgency=low
 
  -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
 
-crystalspace (0.93-4) unstable; urgency=low
+crystalspace (0.93-20020318-4) unstable; urgency=low
 
   * Automan correction/improvment
 
  -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
 
-crystalspace (0.93-3) unstable; urgency=low
+crystalspace (0.93-20020318-3) unstable; urgency=low
 
   * Added dependency on zip, libpng, libjpeg62
   svgalibg1, python2.1, libfreetype6, lib3ds
 
  -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
 
-crystalspace (0.93-2) unstable; urgency=low
+crystalspace (0.93-20020315-2) unstable; urgency=low
 
   * Added dependency on xlibmesa
 
  -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
 
-crystalspace (0.93-1) unstable; urgency=low
+crystalspace (0.93-20020315-1) unstable; urgency=low
 
   * First upload (CLoses: bug#120691)
   * Fix cs-config from Loic Dachary
