@@ -358,7 +358,12 @@ void csSector::Draw (csRenderView& rview)
       // hulls (convex csThings) and foggy csThings in the sort_list.
       while (sp)
       {
-        if (sp->CheckFlags (CS_ENTITY_CONVEX) || sp->GetFog ().enabled)
+        // @@@ Note from Jorrit: temporarily disabled the option of
+	// Z sorting convex objects. The reason is that Z sort is not
+	// perfect and we really need something better here. So we
+	// only Z sort fog objects.
+        // @@@ if (sp->CheckFlags (CS_ENTITY_CONVEX) || sp->GetFog ().enabled)
+        if (sp->GetFog ().enabled)
           sort_list[sort_idx++] = sp;
         sp = (csThing*)(sp->GetNext ());
       }
@@ -386,7 +391,10 @@ void csSector::Draw (csRenderView& rview)
       sp = first_thing;
       while (sp)
       {
-        if (!sp->CheckFlags (CS_ENTITY_CONVEX) && !sp->GetFog ().enabled) sp->Draw (rview);
+        // @@@ Note from Jorrit: temporarily disabled the option of Z sorting
+	// convex objects. (see note above).
+        // @@@ if (!sp->CheckFlags (CS_ENTITY_CONVEX) && !sp->GetFog ().enabled) sp->Draw (rview);
+        if (!sp->GetFog ().enabled) sp->Draw (rview);
         sp = (csThing*)(sp->GetNext ());
       }
     }
