@@ -220,9 +220,9 @@ csMaterialHandle::~csMaterialHandle ()
 
 void csMaterialHandle::FreeMaterial ()
 {
+  SCF_DEC_REF (texture);
   if (material)
   {
-    SCF_DEC_REF (texture);
     material->DecRef ();
     material = NULL;
   }
