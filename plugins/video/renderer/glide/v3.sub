@@ -38,12 +38,15 @@ ifeq ($(USE_SHARED_PLUGINS),yes)
   GLIDE3D3=glide3d3$(DLL)
   LIBS.GLIDE3D3=$(LIBS._GLIDE3D3)
   DEP.GLIDE3D3=$(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  TO_INSTALL.DYNAMIC_LIBS += $(GLIDE3D3)
 else
   GLIDE3D3=$(OUT)$(LIB_PREFIX)glide3d3$(LIB)
   DEP.EXE+=$(GLIDE3D3)
   LIBS.EXE+=$(LIBS._GLIDE3D3)
+  TO_INSTALL.STATIC_LIBS += $(GLIDE3D3)
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLIDE3D3
 endif
+TO_INSTALL.CONFIG += data/config/glide.cfg
 DESCRIPTION.$(GLIDE3D3) = $(DESCRIPTION.glide3d3)
 SRC0.GLIDE3D3 = $(wildcard plugins/video/renderer/glide/*.cpp )
 SRC1.GLIDE3D3 = $(wildcard plugins/video/renderer/common/*.cpp)

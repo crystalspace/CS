@@ -36,10 +36,12 @@ vpath %.cpp plugins/sound/driver/oss
 ifeq ($(USE_SHARED_PLUGINS),yes)
   SNDOSS=$(OUTDLL)ossdrv$(DLL)
   DEP.OSS+=$(CSUTIL.LIB) $(CSSYS.LIB)
+  TO_INSTALL.DYNAMIC_LIBS+=$(SNDOSS)
 else
   SNDOSS=$(OUT)$(LIB_PREFIX)ossdrv.a
   DEP.EXE+=$(SNDOSS)
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_SNDOSS
+  TO_INSTALL.STATIC_LIBS+=$(SNDOSS)
 endif
 DESCRIPTION.$(SNDOSS) = $(DESCRIPTION.oss)
 SRC.SNDOSS = $(wildcard plugins/sound/driver/oss/*.cpp)

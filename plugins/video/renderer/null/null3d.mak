@@ -34,11 +34,14 @@ vpath %.cpp plugins/video/renderer/null
 ifeq ($(USE_SHARED_PLUGINS),yes)
   NULL3D=$(OUTDLL)null3d$(DLL)
   DEP.NULL3D=$(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  TO_INSTALL.DYNAMIC_LIBS+=$(NULL3D)
 else
   NULL3D=$(OUT)$(LIB_PREFIX)null3d$(LIB)
   DEP.EXE+=$(NULL3D)
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_NULL3D
+  TO_INSTALL.STATIC_LIBS+=$(NULL3D)
 endif
+TO_INSTALL.CONFIG += data/config/null3d.cfg
 DESCRIPTION.$(NULL3D) = $(DESCRIPTION.null3d)
 SRC.NULL3D = $(wildcard plugins/video/renderer/null/*.cpp) \
   plugins/video/renderer/common/txtmgr.cpp

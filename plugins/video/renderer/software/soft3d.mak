@@ -34,12 +34,15 @@ vpath %.cpp plugins/video/renderer/software plugins/video/renderer/common
 ifeq ($(USE_SHARED_PLUGINS),yes)
   SOFT3D=$(OUTDLL)soft3d$(DLL)
   DEP.SOFT3D=$(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  TO_INSTALL.DYNAMIC_LIBS+=$(SOFT3D)
 else
   SOFT3D=$(OUT)$(LIB_PREFIX)sft3d$(LIB)
   DEP.EXE+=$(SOFT3D)
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_SOFT3D
+  TO_INSTALL.STATIC_LIBS+=$(SOFT3D)
 endif
 
+TO_INSTALL.CONFIG += data/config/soft3d.cfg
 DESCRIPTION.$(SOFT3D) = $(DESCRIPTION.soft)
 SRC.SOFT3D += $(wildcard plugins/video/renderer/software/*.cpp) \
 	plugins/video/renderer/common/txtmgr.cpp \

@@ -35,11 +35,14 @@ vpath %.cpp plugins/metaball
 ifeq ($(USE_SHARED_PLUGINS),yes)
   METABALL=$(OUTDLL)metaball$(DLL)
   DEP.METABALL=$(CSGEOM.LIB) $(CSSYS.LIB) $(CSUTIL.LIB)
+  TO_INSTALL.DYNAMIC_LIBS+=$(METABALL)
 else
   METABALL=$(OUT)$(LIB_PREFIX)meta$(LIB)
   DEP.EXE+=$(METABALL)
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_METABALL
+  TO_INSTALL.STATIC_LIBS+=$(METABALL)
 endif
+TO_INSTALL.CONFIG += data/config/metaball.cfg
 DESCRIPTION.$(METABALL) = $(DESCRIPTION.metaball)
 SRC.METABALL = $(wildcard plugins/metaball/*.cpp)
 OBJ.METABALL = $(addprefix $(OUT),$(notdir $(SRC.METABALL:.cpp=$O)))

@@ -44,6 +44,7 @@ ifeq ($(USE_SHARED_PLUGINS),yes)
   DDRAW=csddraw$(DLL)
   DEP.DDRAW=$(CSUTIL.LIB) $(CSSYS.LIB)
   LIBS.LOCAL.DDRAW=$(LIBS.DDRAW)
+  TO_INSTALL.DYNAMIC_LIBS+=$(DDRAW)
 else
 # Generate Static Libs
   DDRAW=$(OUT)$(LIB_PREFIX)csdrw$(LIB)
@@ -54,8 +55,10 @@ else
     LIBS.EXE+=$(LIBS.DDRAW)
   endif
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_CSDDRAW
+  TO_INSTALL.STATIC_LIBS+=$(DDRAW)
 endif
 
+TO_INSTALL.CONFIG += data/config/direct3ddx5.cfg data/config/direct3ddx6.cfg
 DESCRIPTION.$(DDRAW)=$(DESCRIPTION.ddraw)
 
 SRC.DDRAW = $(wildcard plugins/video/canvas/ddraw/*.cpp $(SRC.COMMON.DRV2D)) \

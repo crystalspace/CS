@@ -34,10 +34,12 @@ vpath %.cpp plugins/video/renderer/line
 ifeq ($(USE_SHARED_PLUGINS),yes)
   LINE3D=$(OUTDLL)line3d$(DLL)
   DEP.LINE3D=$(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  TO_INSTALL.DYNAMIC_LIBS+=$(LINE3D)
 else
   LINE3D=$(OUT)$(LIB_PREFIX)line$(LIB)
   DEP.EXE+=$(LINE3D)
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_LINE3D
+  TO_INSTALL.STATIC_LIBS+=$(LINE3D)
 endif
 DESCRIPTION.$(LINE3D) = $(DESCRIPTION.line)
 SRC.LINE3D = $(wildcard plugins/video/renderer/line/*.cpp) \

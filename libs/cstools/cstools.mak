@@ -30,6 +30,7 @@ vpath %.cpp libs/cstools
 CSTOOLS.LIB = $(OUT)$(LIB_PREFIX)cstools$(LIB_SUFFIX)
 SRC.CSTOOLS = $(wildcard libs/cstools/*.cpp)
 OBJ.CSTOOLS = $(addprefix $(OUT),$(notdir $(SRC.CSTOOLS:.cpp=$O)))
+TO_INSTALL.STATIC_LIBS += $(CSTOOLS.LIB)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

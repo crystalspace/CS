@@ -30,6 +30,7 @@ vpath %.cpp libs/csobject
 CSOBJECT.LIB = $(OUT)$(LIB_PREFIX)csobject$(LIB_SUFFIX)
 SRC.CSOBJECT = $(wildcard libs/csobject/*.cpp)
 OBJ.CSOBJECT = $(addprefix $(OUT),$(notdir $(SRC.CSOBJECT:.cpp=$O)))
+TO_INSTALL.STATIC_LIBS += $(CSOBJECT.LIB)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

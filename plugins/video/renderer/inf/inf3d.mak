@@ -34,10 +34,12 @@ vpath %.cpp plugins/video/renderer/inf
 ifeq ($(USE_SHARED_PLUGINS),yes)
   INF3D=$(OUTDLL)inf3d$(DLL)
   DEP.INF3D=$(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  TO_INSTALL.DYNAMIC_LIBS+=$(INF3D)
 else
   INF3D=$(OUT)$(LIB_PREFIX)inf$(LIB)
   DEP.EXE+=$(INF3D)
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_INF3D
+  TO_INSTALL.STATIC_LIBS+=$(INF3D)
 endif
 DESCRIPTION.$(INF3D) = $(DESCRIPTION.infinite)
 SRC.INF3D = $(wildcard plugins/video/renderer/inf/*.cpp) \

@@ -57,12 +57,15 @@ ifeq ($(USE_SHARED_PLUGINS),yes)
   GL3D=$(OUTDLL)gl3d$(DLL)
   LIBS.GL3D=$(LIBS.LOCAL.GL3D)
   DEP.GL3D=$(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  TO_INSTALL.DYNAMIC_LIBS+=$(GL3D)
 else
   GL3D=$(OUT)$(LIB_PREFIX)gl3d$(LIB)
   DEP.EXE+=$(GL3D)
   LIBS.EXE+=$(LIBS.LOCAL.GL3D)
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_OPENGL3D
+  TO_INSTALL.STATIC_LIBS+=$(GL3D)
 endif
+TO_INSTALL.CONFIG += data/config/opengl.cfg
 DESCRIPTION.$(GL3D) = $(DESCRIPTION.gl3d)
 SRC.GL3D = $(wildcard plugins/video/renderer/opengl/*.cpp) \
   plugins/video/renderer/common/txtmgr.cpp \

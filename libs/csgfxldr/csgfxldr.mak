@@ -68,6 +68,7 @@ endif
 
 CSGFXLDR.LIB = $(OUT)$(LIB_PREFIX)csgfxldr$(LIB_SUFFIX)
 OBJ.CSGFXLDR = $(addprefix $(OUT),$(notdir $(SRC.CSGFXLDR:.cpp=$O)))
+TO_INSTALL.STATIC_LIBS += $(CSGFXLDR.LIB)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -42,10 +42,12 @@ ifeq ($(MAKESECTION),postdefines)
 # The NeXT 2D driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
   NEXT2D=$(OUTDLL)next2d$(DLL)
+  TO_INSTALL.DYNAMIC_LIBS+=$(NEXT2D)
 else
   NEXT2D=$(OUT)$(LIB_PREFIX)next2d$(LIB)
   DEP.EXE+=$(NEXT2D)
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_NEXT2D
+  TO_INSTALL.STATIC_LIBS+=$(NEXT2D)
 endif
 DESCRIPTION.$(NEXT2D) = $(DESCRIPTION.next2d)
 SRC.NEXT2D = $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_2D_PATHS)) \

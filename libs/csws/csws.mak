@@ -30,6 +30,7 @@ vpath %.cpp libs/csws
 CSWS.LIB = $(OUT)$(LIB_PREFIX)csws$(LIB_SUFFIX)
 SRC.CSWS = $(wildcard libs/csws/*.cpp)
 OBJ.CSWS = $(addprefix $(OUT),$(notdir $(SRC.CSWS:.cpp=$O)))
+TO_INSTALL.STATIC_LIBS += $(CSWS.LIB)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -6,7 +6,7 @@
 
 .PHONY: help banner showplatforms showconfig platforms all depend configure \
   configbanner clean cleanlib cleandep distclean libs plugins drivers \
-  drivers2d drivers3d snddrivers netdrivers
+  drivers2d drivers3d snddrivers netdrivers install
 
 # The following two symbols are intended to be used in "echo" commands.
 # config.mak can override them depending on configured platform's requirements.
@@ -57,6 +57,8 @@ define SYSMODIFIERSHELP
   echo $"      Build drivers/plugins as dynamic/static modules$"
   echo $"  MODE=optimize$|debug$|profile$"
   echo $"      Select one of three available compilation modes$"
+  echo $"  INSTALL_DIR=<directory name, not ending in />$"
+  echo $"      Override the default installation destination$"
 endef
 # This macro is used to rebuild "volatile.h"
 # You're free to add any commands you want to it in submakefiles
@@ -89,6 +91,12 @@ dep:
 depend: cleandep dep
 
 clean cleanlib cleandep distclean:
+	@$(MAKE) --no-print-directory -f mk/cs.mak $@
+
+install:
+	@echo $(SEPARATOR)
+	@echo "  Installing to "$(INSTALL_DIR)
+	@echo $(SEPARATOR)
 	@$(MAKE) --no-print-directory -f mk/cs.mak $@
 
 unknown:
@@ -126,6 +134,11 @@ dochelp:
 
 pseudohelp:
 	@$(PSEUDOHELP)
+  ifdef INSTALL_DIR
+	@echo $"  make install      Make installation to $(INSTALL_DIR)$"
+  else
+	@echo $"  make install      Make installation INSTALL_DIR=<directory>$"
+  endif
 	@echo $(SEPARATOR)
 
 endif

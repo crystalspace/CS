@@ -31,11 +31,15 @@ DESCRIPTION.$(CSCON.EXE) = $(DESCRIPTION.cscon)
 ifeq ($(USE_SHARED_PLUGINS),yes)
   CSCON=$(OUTDLL)cscon$(DLL)
   DEP.CSCON=$(LIB.CSCON)
+  TO_INSTALL.DYNAMIC_LIBS+=$(CSCON)
 else
   CSCON=$(OUT)$(LIB_PREFIX)cscon$(LIB)
   DEP.EXE+=$(CSCON)
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_CSCON
+  TO_INSTALL.STATIC_LIBS+=$(CSCON)
 endif
+TO_INSTALL.CONFIG += data/config/funcon.cfg
+TO_INSTALL.DATA += data/funcon.zip
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#

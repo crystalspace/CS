@@ -30,6 +30,7 @@ vpath %.cpp libs/csphyzik libs/csphyzik/math
 CSPHYZIK.LIB = $(OUT)$(LIB_PREFIX)csphyzik$(LIB)
 SRC.CSPHYZIK = $(wildcard libs/csphyzik/*.cpp libs/csphyzik/*/*.cpp)
 OBJ.CSPHYZIK = $(addprefix $(OUT),$(notdir $(SRC.CSPHYZIK:.cpp=$O)))
+TO_INSTALL.STATIC_LIBS += $(CSPHYZIK.LIB)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

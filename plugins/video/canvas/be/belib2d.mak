@@ -36,10 +36,12 @@ vpath %.cpp plugins/video/canvas/be
 ifeq ($(USE_SHARED_PLUGINS),yes)
   BE2D=$(OUTDLL)be2d$(DLL)
   DEP.BE2D = $(CSUTIL.LIB) $(CSSYS.LIB)
+  TO_INSTALL.DYNAMIC_LIBS += $(BE2D)
 else
   BE2D=be2d.a
   DEP.EXE+=$(BE2D)
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_BE2D
+  TO_INSTALL.STATIC_LIBS += $(BE2D)
 endif
 DESCRIPTION.$(BE2D) = $(DESCRIPTION.be2d)
 SRC.BE2D = $(wildcard plugins/video/canvas/be/*.cpp $(SRC.COMMON.DRV2D))

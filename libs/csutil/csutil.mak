@@ -30,6 +30,7 @@ vpath %.cpp libs/csutil
 CSUTIL.LIB = $(OUT)$(LIB_PREFIX)csutil$(LIB_SUFFIX)
 SRC.CSUTIL = $(wildcard libs/csutil/*.cpp)
 OBJ.CSUTIL = $(addprefix $(OUT),$(notdir $(SRC.CSUTIL:.cpp=$O)))
+TO_INSTALL.STATIC_LIBS += $(CSUTIL.lIB)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

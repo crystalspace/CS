@@ -45,6 +45,7 @@ endif
 
 CSSFXLDR.LIB = $(OUT)$(LIB_PREFIX)cssfxldr$(LIB_SUFFIX)
 OBJ.CSSFXLDR = $(addprefix $(OUT),$(notdir $(SRC.CSSFXLDR:.cpp=$O)))
+TO_INSTALL.STATIC_LIBS += $(CSSFXLDR.LIB)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

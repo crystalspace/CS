@@ -4,12 +4,14 @@
 # needed for building Crystal Space on various Unix flavours.
 #
 # Arguments: $1 is operating system subtype (linux, solaris, freebsd etc)
+#            $2 is user-preferred install dir, argument can be left out
 #
 # The configuration (a makefile fragment) is piped to stdout
 # and errors are piped to stderr.
 #
 
 SYSTYPE=$1
+INSTALL_DIR=$2
 
 # Find the directory where script is located
 SCRIPT_NAME=`basename $0`
@@ -123,11 +125,28 @@ if [ -n "${MAKEDEP}" ]; then
 fi
 
 # Find the X11 directory
-([ -d /usr/X11 ] && echo "X11_PATH = /usr/X11") || \
-([ -d /usr/X11R6 ] && echo "X11_PATH = /usr/X11R6") || \
-([ -d /usr/openwin ] && echo "X11_PATH = /usr/openwin") || \
-([ -d /usr/lib/X11 ] && echo "X11_PATH = /usr/lib/X11") || \
-(echo "$0: Cannot find X11 directory!" >&2 && exit 1)
+if [ -d /usr/X11 ]; then
+  X11_PATH="/usr/X11"
+elif [ -d /usr/X11R6 ]; then
+  X11_PATH="/usr/X11R6"
+elif [ -d /usr/openwin ]; then
+  X11_PATH="/usr/openwin"
+elif [ -d /usr/lib/X11 ]; then
+  X11_PATH="/usr/lib/X11"
+else
+  echo "$0: Cannot find X11 directory!" >&2
+  exit 1
+fi
+echo "X11_PATH = "${X11_PATH}
+
+# find out if Xfree86 is installed, enable VideoMode extension if so.
+# detected by existence of the XFree86 server binary.
+[ -e ${X11_PATH}/bin/XFree86 ] && echo "USE_XFREE86VM = yes"
+
+# find a writable install dir, unless user has done an override
+([ ${INSTALL_DIR} ] && echo "INSTALL_DIR = ${INSTALL_DIR}") ||
+([ -w /usr/local ] && echo "INSTALL_DIR = /usr/local/crystal") ||
+echo "INSTALL_DIR = "${HOME}"/crystal"
 
 sh ${SCRIPT_DIR}/haspythn.sh ${CXX}
 sh ${SCRIPT_DIR}/booltest.sh ${CXX}

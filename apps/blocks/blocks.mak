@@ -32,6 +32,9 @@ SRC.BLOCKS = $(wildcard apps/blocks/*.cpp) \
   apps/support/static.cpp
 OBJ.BLOCKS = $(addprefix $(OUT),$(notdir $(SRC.BLOCKS:.cpp=$O)))
 DESCRIPTION.$(BLOCKS.EXE) = $(DESCRIPTION.blks)
+TO_INSTALL.EXE += $(BLOCKS.EXE)
+TO_INSTALL.CONFIG += data/config/blocks.cfg
+TO_INSTALL.DATA += data/blocks.zip
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

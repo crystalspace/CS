@@ -32,6 +32,7 @@ CSTERR.LIB = $(OUT)$(LIB_PREFIX)csterr$(LIB_SUFFIX)
 SRC.CSTERR = $(wildcard libs/csterr/*/*.cpp)
 OBJ.CSTERR = $(addprefix $(OUT),$(notdir $(SRC.CSTERR:.cpp=$O)))
 CFLAGS.CSTERR = $(CFLAGS.D)__CRYSTAL_SPACE__ $(CFLAGS.I)libs/csterr
+TO_INSTALL.STATIC_LIBS += $(CSTERR.LIB)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

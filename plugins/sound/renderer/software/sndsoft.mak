@@ -60,10 +60,12 @@ ifeq ($(USE_SHARED_PLUGINS),yes)
 
   DEP.SNDSOFT=$(CSUTIL.LIB) $(CSSYS.LIB) $(CSSNDLDR.LIB) $(CSSFXLDR.LIB)
 	LIBS.LOCAL.SNDSOFT=$(LIBS.SNDSOFT)
+  TO_INSTALL.DYNAMIC_LIBS+=$(SNDSOFT)
 
 else
 # Generate static libs
   SNDSOFT=$(OUT)$(LIB_PREFIX)sndsoft$(LIB)
+  TO_INSTALL.STATIC_LIBS+=$(SNDSOFT)
 	DEP.EXE+=$(SNDSOFT)
 
  	ifeq ($(OS),WIN32)
@@ -79,6 +81,7 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_SNDSOFT
 endif
 
+TO_INSTALL.CONFIG += data/config/sndsoft.cfg
 DESCRIPTION.$(SNDSOFT) = $(DESCRIPTION.sndsoft)
 
 SRC.SNDSOFT = $(wildcard plugins/sound/renderer/software/*.cpp)

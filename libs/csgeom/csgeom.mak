@@ -31,6 +31,8 @@ CSGEOM.LIB = $(OUT)$(LIB_PREFIX)csgeom$(LIB_SUFFIX)
 SRC.CSGEOM = $(wildcard libs/csgeom/*.cpp)
 OBJ.CSGEOM = $(addprefix $(OUT),$(notdir $(SRC.CSGEOM:.cpp=$O)))
 
+TO_INSTALL.STATIC_LIBS += $(CSGEOM.LIB)
+
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #------------------------------------------------------------------ targets ---#

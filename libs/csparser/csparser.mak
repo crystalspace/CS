@@ -31,6 +31,7 @@ CSPARSER.LIB = $(OUT)$(LIB_PREFIX)csparser$(LIB_SUFFIX)
 SRC.CSPARSER = $(wildcard libs/csparser/*.cpp libs/csparser/impexp/*.cpp)
 OBJ.CSPARSER = $(addprefix $(OUT),$(notdir $(SRC.CSPARSER:.cpp=$O)))
 CFLAGS.CSPARSER = -Ilibs/csterr
+TO_INSTALL.STATIC_LIBS += $(CSPARSER.LIB)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
