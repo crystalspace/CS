@@ -80,8 +80,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-NODEFIX = bin/nodefix.pl
-TEXI2HTML = bin/texi2html
+NODEFIX = docs/support/nodefix.pl
+TEXI2HTML = docs/support/texi2html
 TEXI2DVI = texi2dvi
 DVIPS = dvips
 PS2PDF = ps2pdf
