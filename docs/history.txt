@@ -23,6 +23,10 @@ The history order is reversed so that new features are at the top.
 	  in iEngine so that they set the logical parent of the created
 	  mesh object and factory correctly.
 	- Fixed another bug in attenuation parsing.
+	- Keith Fulton added the ability for rain drops to do collision
+	  detection (this is an optional feature that is off by default
+	  since it slows down).
+	- I added new <colldet> flag in rain loader to enable this.
 	- Eric Sunshine fixed haspythn.sh so that it does a better job of
 	  locating Python even when Python is installed in a non-standard
 	  location.

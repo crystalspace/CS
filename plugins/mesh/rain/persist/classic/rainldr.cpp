@@ -66,6 +66,7 @@ enum
   XMLTOKEN_MATERIAL,
   XMLTOKEN_MIXMODE,
   XMLTOKEN_NUMBER,
+  XMLTOKEN_COLLDET,
   XMLTOKEN_BOX
 };
 
@@ -222,6 +223,7 @@ bool csRainLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
   xmltokens.Register ("number", XMLTOKEN_NUMBER);
   xmltokens.Register ("box", XMLTOKEN_BOX);
+  xmltokens.Register ("colldet", XMLTOKEN_COLLDET);
   return true;
 }
 
@@ -429,6 +431,14 @@ csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
           partstate->SetMixMode (mode);
 	}
 	break;
+      case XMLTOKEN_COLLDET:
+        {
+          bool do_cd;
+	  if (!synldr->ParseBool (child, do_cd, true))
+	    return NULL;
+          rainstate->SetCollisionDetection (do_cd);
+        }
+        break;
       case XMLTOKEN_LIGHTING:
         {
           bool do_lighting;

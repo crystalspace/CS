@@ -51,6 +51,10 @@ struct iRainState : public iBase
   virtual void SetFallSpeed (const csVector3& fspeed) = 0;
   /// Get fall speed.
   virtual const csVector3& GetFallSpeed () const = 0;
+  /// Enable/Disable Collision Detection for drops.
+  virtual void SetCollisionDetection (bool cd) = 0;
+  /// Get CD flag.
+  virtual bool GetCollisionDetection () const = 0;
 };
 
 #endif

@@ -19,10 +19,14 @@
 
 #include "cssysdef.h"
 #include "csgeom/matrix3.h"
+#include "iengine/sector.h"
 #include "csgeom/transfrm.h"
 #include "rain.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
+#include "iengine/mesh.h"
+#include "iengine/movable.h"
+#include "imesh/thing/polygon.h"
 #include "qsqrt.h"
 #include <math.h>
 #include <stdlib.h>
@@ -44,8 +48,11 @@ void csRainMeshObject::SetupObject ()
     RemoveParticles ();
     initialized = true;
     delete[] part_pos;
+    delete[] drop_stop;
 
     part_pos = new csVector3[number];
+    drop_stop = new float[number];
+
     bbox = rainbox;
     /// spread particles evenly through box
     csVector3 size = rainbox.Max () - rainbox.Min ();
@@ -58,7 +65,7 @@ void csRainMeshObject::SetupObject ()
     radius = qsqrt (a*a + a*a);
 
     csVector3 pos;
-	int i;
+    int i;
     for (i=0 ; i < number ; i++)
     {
       AppendRectSprite (drop_width, drop_height, mat, lighted_particles);
@@ -66,6 +73,8 @@ void csRainMeshObject::SetupObject ()
       pos = GetRandomDirection (size, rainbox.Min ()) ;
       GetParticle (i)->SetPosition (pos);
       part_pos[i] = pos;
+      if (useCD)
+        drop_stop[i] = FindStopHeight(i);
     }
     SetupColor ();
     SetupMixMode ();
@@ -76,7 +85,10 @@ csRainMeshObject::csRainMeshObject (iObjectRegistry* object_reg,
   iMeshObjectFactory* factory) : csParticleSystem (object_reg, factory)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRainState);
-  part_pos = NULL;
+  part_pos  = NULL;
+  drop_stop = NULL;
+  sector    = NULL;
+  useCD     = false;
   rainbox.Set (csVector3 (0, 0, 0), csVector3 (1, 1, 1));
   rain_dir.Set (0, -1, 0);
   drop_width = drop_height = .1;
@@ -87,6 +99,7 @@ csRainMeshObject::csRainMeshObject (iObjectRegistry* object_reg,
 csRainMeshObject::~csRainMeshObject()
 {
   delete[] part_pos;
+  delete[] drop_stop;
 }
 
 
@@ -107,7 +120,8 @@ void csRainMeshObject::Update (csTicks elapsed_time)
   // check if particles are out of the box.
   for (i=0 ; i < particles.Length () ; i++)
   {
-    if (!rainbox.In(part_pos[i]))
+    if (!rainbox.In(part_pos[i]) ||
+        (useCD && part_pos[i].y < drop_stop[i]) )
     {
       // this particle has left the box.
       // it will disappear.
@@ -128,8 +142,42 @@ void csRainMeshObject::Update (csTicks elapsed_time)
         pos.y = rainbox.MaxY() - height * ((float)rand() / (1.0 + RAND_MAX));
       GetParticle (i)->SetPosition (pos);
       part_pos[i] = pos;
+      if (useCD)
+        drop_stop[i] = FindStopHeight(i);
     }
   }
+}
+
+void csRainMeshObject::SetCollisionDetection(bool cd)
+{
+  useCD = cd;
+  if (cd && logparent)
+  {
+    csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE (logparent, iMeshWrapper);
+    if (mesh)
+    {
+      // First sector is only one considered.
+      sector = mesh->GetMovable()->GetSectors()->Get(0);
+    }
+    else sector = NULL;
+  }
+};
+
+float csRainMeshObject::FindStopHeight(int i)
+{
+  if (!sector)  // this is only set when SetCD true is successful
+    return rainbox.MinY();
+
+  csVector3 isect, end = part_pos[i] + rain_dir
+  	* (rainbox.MaxY() - rainbox.MinY() );
+
+  iPolygon3D* poly = NULL;
+  sector->HitBeam (part_pos[i], end, isect, &poly);
+  
+  if (poly)  // found hit
+    return isect.y;         // where it hit
+  else
+    return rainbox.MinY();  // bottom of bounding box
 }
 
 void csRainMeshObject::HardTransform (const csReversibleTransform& /*t*/)

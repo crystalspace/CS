@@ -36,15 +36,18 @@ struct iMaterialWrapper;
 class csRainMeshObject : public csParticleSystem
 {
 protected:
-  csBox3 rainbox;
-  csVector3 rain_dir;
-  csVector3 *part_pos;
-  float drop_width, drop_height;
-  int number;
+  csBox3 rainbox;       /// bounding box for rain
+  csVector3 rain_dir;   /// vector to simulate wind and handle downward motion
+  csVector3 *part_pos;  /// list of xyz positions of each drop
+  float     *drop_stop; /// list of y positions to stop each drop if CD is used
+  float drop_width, drop_height;  /// sizes of 2dsprite to use
+  int number;           /// count of particles
+  bool useCD;           /// flag whether to use exact stopping locations or not
+  iSector *sector;      /// sector of rain mesh, used for CD
+  bool lighted_particles; /// flag whether to use lighting on particles or not
 
-  bool lighted_particles;
-
-  void SetupObject ();
+  void  SetupObject ();
+  float FindStopHeight (int i);  // Use HitBeam to determine where raindrop will land
 
 public:
   /**
@@ -106,6 +109,12 @@ public:
   const csVector3& GetFallSpeed () const
   { return rain_dir; }
 
+  /// Enable/Disable Collision Detection for drops
+  void SetCollisionDetection(bool cd);
+  /// Get CD flag
+  bool GetCollisionDetection() const
+  { return useCD; };
+
   /// Update the particle system.
   virtual void Update (csTicks elapsed_time);
 
@@ -149,6 +158,10 @@ public:
     { return scfParent->GetLighting(); }
     virtual const csVector3& GetFallSpeed () const
     { return scfParent->GetFallSpeed(); }
+    virtual void SetCollisionDetection(bool cd)
+    { scfParent->SetCollisionDetection(cd); };
+    virtual bool GetCollisionDetection() const
+    { return scfParent->GetCollisionDetection(); };
   } scfiRainState;
   friend class RainState;
 };

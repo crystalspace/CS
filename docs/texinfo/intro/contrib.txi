@@ -23,6 +23,12 @@ specific implementation issues.  Jorrit's home address is Schoonstraat 11,
 3020 Veltem Beisem, @sc{belgium}.
 
 @item
+Keith Fulton (@email{keith@@paqrat.com})
+
+Keith added the ability for rain drops to do collision detection with
+the surrounding.
+
+@item
 Mendrak (@email{mendrak@@worldnet.att.net})
 
 Mendrak added @code{MountRoot()} to VFS and also extended standard font
