@@ -425,6 +425,7 @@ $ignore['^index\..+$'     ] = 1;
 $ignore["^$prog_name\$"   ] = 1;
 $ignore["^$globalconfig\$"] = 1;
 $ignore["^$localconfig\$" ] = 1;
+$ignore['^CVS$'           ] = 1;
 
 $indexfile['^index.s?html?$'  ] = 1; // index.htm, index.html, index.shtml
 $indexfile['^index.php[1-9]?$'] = 1; // index.php, index.php3, index.php4
