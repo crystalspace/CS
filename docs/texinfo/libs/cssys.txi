@@ -1,4 +1,4 @@
-@node csSys, csUtil, Lib Overview, Libraries
+@node csSys, csUtil, Libraries, Libraries
 @section System Library (@code{csSys})
 @cindex @code{csSys}
 @cindex Libraries, @code{csSys}

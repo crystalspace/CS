@@ -8,11 +8,13 @@ The history order is reversed so that new features are at the top.
 	  between the enclosing '--'.
 	- acraig added in missing include for va_start in stringarray.h.
 	- Keith Fulton added a FormatPush member to stringarray.h.
-	- Eric Sunshine continued updating the user manual to reflect recent
-	  SCF changes.
-	- Eric Sunshine started updating the user manual to reflect the recent
-	  changes to how user-specific settings are managed (i.e. retirement of
-	  user.cfg).
+	- Eric Sunshine made the following user manual-related changes:
+	    - Continued updating the user manual to reflect recent SCF changes.
+	    - Started updating the user manual to reflect the recent changes as
+	      to how user-specific settings are managed (i.e. retirement of
+	      user.cfg).
+	    - Updated a lot of extremely out-of-date information in
+	      texinfo/internal, and removed a bunch of obsolete information.
 24-Jul-2003
 	- Reed Hedges made some minor updates to the AWS "Quick Start" section
 	  and API Changes appendix for the recent changes to AWS (15-Jul-2003).

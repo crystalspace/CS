@@ -5,8 +5,8 @@
 @cindex Hierarchy, Directory
 
 @noindent
-@emph{Written by Thomas Hieber, @email{thieber@@gmx.net}.  Updated by Chris
-Forno, @email{jcore@@arbornet.org}.}
+@emph{Written by Thomas Hieber, @email{thieber@@gmx.net}.@*
+Updated by Chris Forno, @email{jcore@@arbornet.org}.}
 
 This section is intended to explain the general CS directory structure. It
 lists all the directories, however some may be missing from your copy of

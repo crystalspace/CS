@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Threads in CS, , Memory Debugger, Internals
+@node Threads in CS, , Makefile How-To, Internals
 @section Threads in Crystal Space
 @cindex Threads
 
@@ -12,41 +12,49 @@ several parts of Crystal Space are thread-safe to some degree. This is
 documented in this section. However, by default you must assume that some
 Crystal Space plugin or module is not thread-safe unless it is mentioned here.
 
-@subsubheading Threadsafe parts of CS
+@subsubheading Threadsafe parts of Crystal Space
 
 @itemize @bullet
 @item
-@sc{scf} class loading/unloading is safe. This means that
-@code{SCF_CREATE_INSTANCE} and all the routines in @code{iSCF} that have
+@sc{scf} (@pxref{SCF}) class loading/unloading is safe. This means that
+@code{SCF_CREATE_INSTANCE()} and all the routines in @samp{iSCF} that have
 to do with loaded classes are safe.
 
 @item
-The plugin manager is safe. So macros like @code{CS_LOAD_PLUGIN},
-@code{CS_LOAD_PLUGIN_ALWAYS}, and @code{CS_QUERY_PLUGIN_CLASS} are safe.
+The plugin manager is safe, thus macros such as @code{CS_LOAD_PLUGIN()},
+@code{CS_LOAD_PLUGIN_ALWAYS()}, and @code{CS_QUERY_PLUGIN_CLASS()} are safe.
 
 @item
-The object registry is safe. So macros like @code{CS_QUERY_REGISTRY}
+The object registry is safe, thus macros like @code{CS_QUERY_REGISTRY()}
 are safe. The @code{iObjectRegistryIterator} takes a copy of the data
 over which it iterates so it will not even lock.
 
 @item
-@sc{vfs} is thread-safe for most operations. But do not work on the same
-@code{iFile} from different threads! That is not thread-safe. Also the concept
-of the current directory is not really valid with threads.
+@sc{vfs} (@pxref{VFS}) is thread-safe for most operations.  But do not work on
+the same @samp{iFile} from different threads!  That is not thread-safe.  Also
+the concept of the current directory is not really valid with threads.
 
 @item
-The TinyXML, XMLRead, and Binary XML parsers are thread safe in the sense
-that it is ok to create and work on seperate documents in seperate threads.
-However it is NOT ok to work on the same document in different threads.
+The TinyXML, XMLRead, and BinaryXML parsers are thread safe in the sense
+that it is okay to create and work on seperate documents in seperate threads.
+However it is @emph{not} okay to work on the same document in different
+threads.
 
 @item
 The syntax services plugin is safe for the basic parsing tools (vectors,
-matrices, reporting errors, ...). For polygons and thing related objects
-this hasn't been checked yet.
+matrices, reporting errors, etc.). For polygons and thing related objects
+this has not yet been checked for safety.
 
 @item
-The @sc{simpcon} and @sc{csconout} output consoles are thread-safe provided
-auto-updating is disabled (call @code{iConsoleOutput->AutoUpdate(false)}).
+The @samp{simpcon} and @samp{csconout} output consoles are thread-safe provided
+auto-updating is disabled which you can set like this:
+
+@example
+csRef<iConsoleOutput> con = ...;
+con->AutoUpdate(false);
+@end example
+
+@noindent
 Note that by default auto-updating is enabled!
 
 @item
@@ -59,13 +67,14 @@ Also note that thread-safety of the standard reporter listener depends
 on thread-safety of the output console that is being used.
 
 @item
-The following mesh object and factory loaders are thread-safe provided
-that the implementation of @code{iLoaderContext} is thread-safe. Please
-note that the default @code{iLoaderContext} is NOT thread-safe which makes
-all loader plugins unsafe by default.
+The following mesh object and factory loaders are thread-safe provided that the
+implementation of @samp{iLoaderContext} is thread-safe.  Please note that the
+default @code{iLoaderContext} is @emph{not} thread-safe which makes all loader
+plugins unsafe by default.
+
 @itemize @bullet
 @item
-@emph{Genmesh loader}: aside from a small design mistake with streams in
+@emph{Genmesh loader}: Aside from a small design mistake with streams in
 case the new renderer is used, the genmesh loader plugin is perfectly
 thread-safe.
 @end itemize
@@ -74,24 +83,21 @@ thread-safe.
 
 @subsubheading Threaded Loading
 
-One important threaded section of CS is the threaded loader. In order
-to ensure that the threaded loader works correctly you must make sure that
-you use thread-safe versions of the following modules in CS:
+One important threaded section of Crystal Space is the threaded loader.  In
+order to ensure that the threaded loader works correctly you must make sure
+that you use thread-safe versions of the following modules in Crystal Space:
 
 @itemize
 @item
-@code{iReporter} (the standard reporter is ok).
+@code{iReporter} (the standard reporter is okay).
 @item
-@code{iReporterListener} (the standard reporter listener is ok).
+@code{iReporterListener} (the standard reporter listener is okay).
 @item
-@code{iConsoleOutput} (simpcon and csconout are ok provided auto-updating is
-disabled).
+@code{iConsoleOutput} (@file{simpcon} and @file{csconout} are okay provided
+auto-updating is disabled).
 @item
 @code{iLoaderContext} (the threaded loader provides a thread-safe version
 of this one).
 @item
-@code{iDocumentSystem} (TinyXML, XMLRead, and BinaryXML are all ok).
+@code{iDocumentSystem} (TinyXML, XMLRead, and BinaryXML are all okay).
 @end itemize
-
-
-

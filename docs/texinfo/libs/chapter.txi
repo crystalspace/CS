@@ -4,13 +4,9 @@
 @cindex Libraries
 
 This chapter describes the features of the libraries of which Crystal Space
-consists. There are certain dependencies between libraries which enforce a
-sort of hierarchy.  If you are developer actually working on Crystal Space,
-you should be careful not to introduce circular dependencies into the library
-graph.  @xref{Dependencies}.
+consists.
 
 @menu
-* Lib Overview:: Quick Overview
 * csSys:: System Library (@code{csSys})
 * csUtil:: Utility Library (@code{csUtil})
 * SCF:: Shared Class Facility (@sc{scf})
@@ -18,7 +14,56 @@ graph.  @xref{Dependencies}.
 * CSWS:: Crystal Space Windowing System (@sc{csws})
 @end menu
 
-@imports{libs,overview.txi}
+This section presents a quick overview of the libraries provided by Crystal
+Space. More detailed descriptions of these facilities may be found in later
+sections.
+
+@table @code
+@item csEngine
+The 3d engine is currently moved to a separate plug-in. For documentation on
+the engine, have a look at @ref{csEngine}. In the future the preferred way
+to access the engine will be to use the engine plugin. At this moment
+this is still not fully possible because the @sc{scf} interfaces for the
+engine plugin are not complete yet.
+
+@item csTool
+This library contains various things that are useful for Crystal Space
+but are too specialized in order to be placed in @sc{csEngine}. Currently
+it contains the @code{csPixmap} class for simple 2D graphics and
+a number of predefined procedural textures. It also contains basic support
+structures for the model importers, the csColliderWrapper class and the
+notion of key-value pairs (to be attached to csObject's).
+
+@item csSys
+All system dependent functionality (non-graphics and non-sound related) is in
+this library, for example keyboard, joystick and mouse driver, system-dependent
+file handling, loading dynamic libraries etc.  This library is the main module
+to make Crystal Space applications system-independent.
+
+@item csUtil
+This library contains various utilities. There is an Archive class which can
+read/write @sc{zip} archives. There is a vector class, a sparse matrix class
+and some other useful goodies. This library requires the use of the external
+ZLib library which is used to read/write @sc{zip} archives. One module from
+this library is explained in a separate section: @sc{scf}.
+
+@item SCF @r{(Shared Class Facility)}
+The @sc{scf} is actually part of the @code{csUtil} library. It is explained
+in a separate section as it is both complex (compared to the rest of
+@code{csUtil}) and fundamental to the understanding of plug-ins. @xref{SCF}.
+
+@item csGeom
+A library for 3d geometry operations. It provides 2d and 3d vectors, polygons
+and bounding boxes, 3d matrices and some other useful things. @xref{csGeom}.
+
+@item csGfx
+Basic image support.
+
+@item csWS
+A window system nicely integrated with Crystal Space. It is also platform
+independent, as it is based on the CS graphics drivers. @xref{CSWS}.
+@end table
+
 @imports{libs,cssys.txi}
 @imports{libs,csutil.txi}
 @imports{libs,scf.txi}
