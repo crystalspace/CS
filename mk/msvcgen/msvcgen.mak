@@ -287,6 +287,12 @@ MSVC.MAKEVERRC.plugin  = $(MSVC.MAKEVERRC.COMMAND)
 MSVC.MAKEVERRC.library =
 MSVC.MAKEVERRC.group   =
 
+MSVC.MERGERC.appgui  = $(MSVC.MERGERC.COMMAND)
+MSVC.MERGERC.appcon  = $(MSVC.MERGERC.COMMAND)
+MSVC.MERGERC.plugin  = $(MSVC.MERGERC.COMMAND)
+MSVC.MERGERC.library =
+MSVC.MERGERC.group   =
+
 # Name of project.rc file for types which require version information.
 MSVC.VERSIONRC.CVS.appgui  = $(MSVC.VERSIONRC.CVS.NAME)
 MSVC.VERSIONRC.OUT.appgui  = $(MSVC.VERSIONRC.OUT.NAME)
@@ -320,6 +326,7 @@ MSVC.VERSIONRC.OUT.NAME = $(MSVC.OUT.DIR)/$(MSVC.PROJECT).$(MSVC.EXT.RESOURCES)
 # Macros to compose project.rc filename for a given project.
 MSVC.VERSIONRC.CVS = $(MSVC.VERSIONRC.CVS.$(DSP.$*.TYPE))
 MSVC.VERSIONRC.OUT = $(MSVC.VERSIONRC.OUT.$(DSP.$*.TYPE))
+MSVC.VERSIONRC.TEMP = $(MSVC.OUT.FRAGMENT)/version.tmp
 
 # Module name/description for project.rc.
 #MSVC.VERSIONDESC = \
@@ -329,17 +336,21 @@ MSVC.VERSIONDESC = \
   $(DESCRIPTION.$(DSP.$*.NAME))
 
 # Command to generate the project.rc file.
-MSVC.MAKEVERRC.COMMAND = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh \
-  '$(MSVC.VERSIONRC.OUT)' '$(MSVC.VERSIONDESC)'
+MSVC.MAKEVERRC.COMMAND = \
+  $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh '$(MSVC.VERSIONRC.TEMP)' '$(MSVC.VERSIONDESC)'
+MSVC.MERGERC.COMMAND = \
+  $(RUN_SCRIPT) libs/cssys/win32/mergeres.sh '$(MSVC.VERSIONRC.OUT)' '$(MSVC.CVS.DIR)/' \
+  '$(MSVC.VERSIONRC.TEMP)' '$($($*.EXE).WINRSRC)'
 
 # Command to generate the project.rc file for a given project.
 MSVC.MAKEVERRC = $(MSVC.MAKEVERRC.$(DSP.$*.TYPE))
+MSVC.MERGERC = $(MSVC.MERGERC.$(DSP.$*.TYPE))
 
 # Macro to compose entire list of resources which comprise a project.
+#MSVC.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) \
+#  $(MSVC.VERSIONRC.CVS)
 MSVC.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) \
   $(MSVC.VERSIONRC.CVS)
-#MSVC.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) \
-#  $($($*.EXE).WINRSRC) $(MSVC.VERSIONRC.CVS)
 
 # Macro to compose the entire dependency list for a particular project.
 # Dependencies are gleaned from three variables: DSP.PROJECT.DEPEND,
@@ -426,6 +437,7 @@ $(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT): $(MSVC.OUT.BASE)
 # Build a project project file and an associated DSW fragment file.
 %.MAKEPROJECT:
 	$(MSVC.SILENT)$(MSVC.MAKEVERRC)
+	$(MSVC.SILENT)$(MSVC.MERGERC)
 	$(MSVC.SILENT)$(MSVCGEN) --quiet --project \
 	$(MSVCGEN.EXTRA) \
 	--projext=$(MSVC.EXT.PROJECT) --wsext=$(MSVC.EXT.WORKSPACE) \

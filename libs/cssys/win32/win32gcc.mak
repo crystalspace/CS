@@ -224,23 +224,25 @@ PLUGIN.POSTFLAGS=-mwindows -mconsole
 # uncomment the following to enable workaround for dllwrap bug
 DLLWRAPWRAP = $(RUN_SCRIPT) libs/cssys/win32/dllwrapwrap.sh
 
-COMPILE_RES = $(RUN_SCRIPT) libs/cssys/win32/compres.sh
+ifeq ($(MODE),debug)
+	RCFLAGS=-DCS_DEBUG
+else
+	RCFLAGS=
+endif
+
+COMPILE_RES = windres --include-dir include $(RCFLAGS) 
 MAKEVERSIONINFO = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh
+MERGERES = $(RUN_SCRIPT) libs/cssys/win32/mergeres.sh
 
 DO.SHARED.PLUGIN.CORE = \
   $(MAKEVERSIONINFO) $(OUT)$(@:$(DLL)=-version.rc) \
     "$(DESCRIPTION.$*)" $(COMMAND_DELIM) \
-  $(COMPILE_RES) $(MODE) $(OUT)$(@:$(DLL)=-rsrc.o) \
-    $(OUT)$(@:$(DLL)=-version.rc) $(COMMAND_DELIM) \
+  $(MERGERES) $(OUT)$(@:$(DLL)=-rsrc.rc) "./" \
+    $(OUT)$(@:$(DLL)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
+  $(COMPILE_RES) -i $(OUT)$(@:$(DLL)=-rsrc.rc) \
+    -o $(OUT)$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM) \
   $(DLLWRAPWRAP) $* $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
     $(OUT)$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS) -mwindows
-#DO.SHARED.PLUGIN.CORE = \
-#  $(MAKEVERSIONINFO) $(OUT)$(@:$(DLL)=-version.rc) \
-#    "$(DESCRIPTION.$*)" $(COMMAND_DELIM) \
-#  $(COMPILE_RES) $(MODE) $(OUT)$(@:$(DLL)=-rsrc.o) $($@.WINRSRC) \
-#    $(OUT)$(@:$(DLL)=-version.rc) $(COMMAND_DELIM) \
-#  $(DLLWRAPWRAP) $* $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
-#    $(OUT)$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS) -mwindows
 
 # Commenting out the following line will make the -noconsole option work
 # but the only way to redirect output will be WITH -noconsole (wacky :-)
@@ -249,18 +251,13 @@ DO.SHARED.PLUGIN.CORE += -mconsole
 
 DO.LINK.EXE = \
 	$(MAKEVERSIONINFO) $(OUT)$(@:$(EXE)=-version.rc) \
-	"$(DESCRIPTION.$*)" $(COMMAND_DELIM) \
-	$(COMPILE_RES) $(MODE) $(OUT)$(@:$(EXE)=-rsrc.o)  \
-	$(OUT)$(@:$(EXE)=-version.rc) $(COMMAND_DELIM) \
+	  "$(DESCRIPTION.$*)" $(COMMAND_DELIM) \
+	$(MERGERES) $(OUT)$(@:$(EXE)=-rsrc.rc) "./" \
+	  $(OUT)$(@:$(EXE)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
+	$(COMPILE_RES) -i $(OUT)$(@:$(EXE)=-rsrc.rc) \
+	  -o $(OUT)$(@:$(EXE)=-rsrc.o) $(COMMAND_DELIM) \
 	$(LINK) $(LFLAGS) $(LFLAGS.EXE) $(LFLAGS.@) $(^^) \
-	$(OUT)$(@:$(EXE)=-rsrc.o) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
-#DO.LINK.EXE = \
-#	$(MAKEVERSIONINFO) $(OUT)$(@:$(EXE)=-version.rc) \
-#	"$(DESCRIPTION.$*)" $(COMMAND_DELIM) \
-#	$(COMPILE_RES) $(MODE) $(OUT)$(@:$(EXE)=-rsrc.o) $($@.WINRSRC) \
-#	$(OUT)$(@:$(EXE)=-version.rc) $(COMMAND_DELIM) \
-#	$(LINK) $(LFLAGS) $(LFLAGS.EXE) $(LFLAGS.@) $(^^) \
-#	$(OUT)$(@:$(EXE)=-rsrc.o) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
+	  $(OUT)$(@:$(EXE)=-rsrc.o) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
 DO.LINK.CONSOLE.EXE = $(DO.LINK.EXE)
 
 endif # ifeq ($(MAKESECTION),postdefines)
