@@ -25,6 +25,8 @@
 #include "csgfxldr/quantize.h"
 #include "csutil/scanstr.h"
 #include "csutil/inifile.h"
+#include "cssys/csevent.h"
+#include "ievent.h"
 #include "isystem.h"
 #include "iimage.h"
 #include "qint.h"
@@ -153,7 +155,6 @@ csTextureMMSoftware::~csTextureMMSoftware ()
 csTexture *csTextureMMSoftware::NewTexture (iImage *Image)
 {
   if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
-
     return new csTextureSoftwareProc (this, Image);
   else
     return new csTextureSoftware (this, Image);
@@ -468,7 +469,7 @@ void csTextureManagerSoftware::SetPixelFormat (csPixelFormat &PixelFormat)
   else
     lightmap_tables [2] = GenLightmapTable (pfmt.BlueBits);
 
-  if (pfmt.PixelBytes == 1)
+  if ((pfmt.PixelBytes == 1) && !Scan.GlobalCMap)
     Scan.GlobalCMap = new uint16 [256];
 }
 
@@ -486,6 +487,7 @@ csTextureManagerSoftware::~csTextureManagerSoftware ()
   if (first_8bit_proc_tex) 
     first_8bit_proc_tex->DecRef ();
 
+  delete [] Scan.GlobalCMap;
   delete [] inv_cmap;
   delete [] lightmap_tables [0];
   if (lightmap_tables [1] != lightmap_tables [0])
@@ -522,7 +524,7 @@ int csTextureManagerSoftware::FindRGB (int r, int g, int b)
   if (truecolor)
     return encode_rgb (r, g, b);
   else
-    return inv_cmap [encode_rgb (r, g, b)];
+    return inv_cmap ? inv_cmap [encode_rgb (r, g, b)] : 0;
 }
 
 void csTextureManagerSoftware::create_inv_cmap ()
@@ -588,7 +590,8 @@ void csTextureManagerSoftware::compute_palette ()
 {
   if (truecolor) return;
 
-  if (verbose) SysPrintf (MSG_INITIALIZATION, "  Computing palette...\n");
+  if (verbose)
+    SysPrintf (MSG_INITIALIZATION, "  Computing palette...\n");
 
   // Allocate first 6*6*4=144 colors in a uniformly-distributed fashion
   // since we'll get lighted/dimmed/colored textures more often
@@ -661,7 +664,8 @@ void csTextureManagerSoftware::PrepareTextures ()
   // The locked colors will stay the same.
   memcpy (cmap.alloc, locked, sizeof(locked));
 
-  if (verbose) SysPrintf (MSG_INITIALIZATION, "  Creating texture mipmaps...\n");
+  if (verbose)
+    SysPrintf (MSG_INITIALIZATION, "  Creating texture mipmaps...\n");
 
   int i;
 
@@ -766,6 +770,8 @@ void csTextureManagerSoftware::SetPalette ()
     int b = GammaTable [cmap [i].blue];
     G2D->SetRGB (i, r, g, b);
   }
+
+  System->GetSystemEventOutlet ()->ImmediateBroadcast (cscmdPaletteChanged, this);
 }
 
 void csTextureManagerSoftware::ReprepareAloneProcs ()

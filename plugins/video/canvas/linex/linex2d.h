@@ -21,6 +21,7 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
+#include "ievent.h"
 
 #define XK_MISCELLANY 1
 #include <X11/Xlib.h>
@@ -34,7 +35,7 @@
 #endif
 
 /// XLIB version.
-class csGraphics2DLineXLib : public csGraphics2D
+class csGraphics2DLineXLib : public csGraphics2D, public iEventPlug
 {
   // The display context
   Display* dpy;
@@ -83,6 +84,9 @@ class csGraphics2DLineXLib : public csGraphics2D
   int orig_y;
 #endif
 
+  // The event outlet
+  iEventOutlet *EventOutlet;
+
 public:
   DECLARE_IBASE;
 
@@ -102,7 +106,7 @@ public:
   virtual void Clear (int color);
   virtual void Write (int x, int y, int fg, int bg, const char *text);
 
-  virtual bool PerformExtension (const char* args);
+  virtual bool PerformExtension (const char* iCommand, ...);
 
   /// Set mouse position.
   virtual bool SetMousePosition (int x, int y);
@@ -117,6 +121,7 @@ public:
   bool AllocateMemory ();
   /// helper function which deallocates buffers
   void DeAllocateMemory ();
+  bool ReallocateMemory ();
 
   void EnterFullScreen ();
   void LeaveFullScreen ();
@@ -124,6 +129,13 @@ public:
 #ifdef XFREE86VM
   void InitVidModes ();
 #endif
+
+  //------------------------- iEventPlug interface ---------------------------//
+
+  virtual unsigned GetPotentiallyConflictingEvents ()
+  { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
+  virtual unsigned QueryEventPriority (unsigned /*iType*/)
+  { return 150; }
 };
 
 #endif // __LINEX2D_H__

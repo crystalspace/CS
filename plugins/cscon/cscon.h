@@ -22,73 +22,159 @@
 #include "iconsole.h"
 #include "csutil/scf.h"
 #include "csutil/csrect.h"
+#include "csgfxldr/rgbpixel.h"
 
 struct iGraphics2D;
+struct iGraphics3D;
 struct iTextureManager;
-struct iCursor;
 class csConsoleBuffer;
 
 class csConsole : public iConsole
 {
 public:
   DECLARE_IBASE;
-  csConsole(iBase *base);
-  virtual ~csConsole();
-  virtual bool Initialize(iSystem *);
-  /***DEPRECATED***/
-  virtual void Show();
-  /***DEPRECATED***/
-  virtual void Hide();
-  /***DEPRECATED***/
-  virtual bool IsActive() const;
-  virtual void Clear(bool wipe = false);
-  virtual void PutText(const char *text);
-  virtual const csString *GetText(int line = -1) const;
-  virtual void DeleteText(int start = 0, int end = -1);
-  virtual void Draw(csRect *rect);
-  virtual void Draw3D(csRect*) {}
-  virtual void SetBufferSize(int lines);
-  virtual void CacheColors(iTextureManager *txtmgr);
-  virtual void GetForeground(int &red, int &green, int &blue) const;
-  virtual void SetForeground(int red, int green, int blue);
-  virtual void GetBackground(int &red, int &green, int &blue) const;
-  virtual void SetBackground(int red, int green, int blue);
-  virtual void GetPosition(int &x, int &y, int &width, int &height) const;
-  virtual void SetPosition(int x, int y, int width = -1, int height = -1);
-  virtual void Invalidate(csRect &area);
-  virtual bool GetTransparency() const;
-  virtual void SetTransparency(bool trans);
-  virtual int GetFontID() const;
-  virtual void SetFontID(int FontID);
-  virtual int GetTopLine() const;
-  virtual void ScrollTo(int topline, bool snap = true);
-  virtual void GetCursorPos(int &x, int &y) const;
-  virtual void SetCursorPos(int x, int y);
-  virtual int GetCursorStyle(bool &flashing, iCursor **custom = NULL) const;
-  virtual void SetCursorStyle(int style, bool flashing = true, iCursor *custom = NULL);
+
+  csConsole (iBase *base);
+  virtual ~csConsole ();
+
+  /// Initialize the console
+  virtual bool Initialize (iSystem *);
+  /// Handle broadcast events
+  virtual bool HandleEvent (csEvent &Event);
+
+  /**
+   * Put some text to the console. Console acts like a simple
+   * TTY and should interpret basical symbols like '\n' and '\b'.
+   * The '\r' character has a special meaning: it sets a flag that
+   * tells console to clear the current line before next character
+   * is output. That is, you can emmit non-persistent messages
+   * this way: PutText ("some text\r"); This message will disappear
+   * as soon as any other message will be sent to console.
+   */
+  virtual void PutText (int iMode, const char *iText);
+
+  /// Return a line from the buffer (-1 = current line)
+  virtual const char *GetLine (int iLine = -1) const;
+
+  /**
+   * Display the console and return the dirty rectangle.
+   * The graphics driver should be in 2D draw mode.
+   */
+  virtual void Draw2D (csRect *oRect = NULL);
+
+  /**
+   * Update the 3D part of the console on the window.
+   * The graphics driver should be in 3D draw mode.
+   */
+  virtual void Draw3D (csRect *oRect = NULL)
+  { }
+
+  /**
+   * Clear console. If wipe = false, it just moves the top line to the
+   * current line; if wipe is true, it clears the buffer completely.
+   */
+  virtual void Clear (bool iWipe = false);
+
+  /// Set the buffer size in lines
+  virtual void SetBufferSize (int iMaxLines);
+
+  /// Retrieve the transparency setting
+  virtual bool GetTransparency () const
+  { return transparent; }
+  /// Set transparency
+  virtual void SetTransparency (bool iTransp)
+  { transparent = iTransp; }
+
+  /// Gets the ID of current font.
+  virtual int GetFontID () const;
+  /// Sets the type of the font.
+  virtual void SetFontID (int FontID);
+
+  /// Get the current top line being displayed
+  virtual int GetTopLine () const;
+  /**
+   * Set the current top line, or use of the constants above for scrolling.
+   * If snap is true, the console returns to the very bottom of the display
+   * when a new line is printed.
+   */
+  virtual void ScrollTo (int iTopLine, bool iSnap = true);
+
+  /// Retrieve the cursor style
+  virtual int GetCursorStyle () const
+  { return cursor; }
+  /// Assign the cursor style
+  virtual void SetCursorStyle (int iStyle)
+  { cursor = iStyle; }
+
+  /**
+   * Show/hide the console. In 'hidden' state console should not display
+   * anything at all (when Draw() is called) or draw some minimal information
+   */
+  virtual void SetVisible (bool iShow);
+  /**
+   * Query whether the console is visible or hidden.
+   */
+  virtual bool GetVisible ()
+  { return visible; }
+
+  /**
+   * Enable or disable automatic console updates.
+   * When the console is in console auto-update mode, it automatically
+   * calls BeginDraw/Console->Draw methods on every PutText call.
+   * Otherwise it is your responsability to call Draw() at appropiate
+   * times. Initially this mode is enabled.
+   */
+  virtual void AutoUpdate (bool iAutoUpdate)
+  { auto_update = iAutoUpdate; }
+
+  /// Set cursor horizontal position (-1 == follow output)
+  virtual void SetCursorPos (int iCharNo);
+
+  /// Query maximal line width in characters
+  virtual int GetMaxLineWidth ()
+  { return 200; }
+
+  /**
+   * Tell console that this object should be notified when console 
+   * visibility status changes.
+   */
+  virtual void RegisterPlugin (iPlugIn *iClient)
+  { Client = iClient; }
+
+  /**
+   * Implement simple extension commands.
+   */
+  virtual bool ConsoleExtension (const char *iCommand, ...);
 
 protected:
+  virtual void GetPosition (int &x, int &y, int &width, int &height) const;
+  virtual void SetPosition (int x, int y, int width = -1, int height = -1);
+  void Invalidate (csRect &area);
+  void DeleteText (int start, int end);
+  void CacheColors ();
+  void GetCursorPos(int &x, int &y) const;
+  void SetCursorPos(int x, int y);
+
   csConsoleBuffer *buffer;
-  bool transparent, do_snap, flash_cursor, do_flash;
-  iGraphics2D *piG2D;
-  iSystem *piSystem;
+  bool transparent, do_snap;
+  iGraphics2D *G2D;
+  iGraphics3D *G3D;
+  iSystem *System;
   csRect size, invalid;
   int font, cursor, cx, cy;
-  iCursor *custom_cursor;
-  int flash_time;
-
-  typedef struct {
-    int red;
-    int green;
-    int blue;
-  } Color;
+  time_t flash_time, flash_interval;
+  bool cursor_visible;
+  bool clear_input;
+  bool auto_update;
+  bool system_ready;
+  bool visible;
+  iPlugIn *Client;
 
   //  Foreground and background colors
-  Color fg_rgb;
-  Color bg_rgb;
+  RGBcolor fg_rgb;
+  RGBcolor bg_rgb;
   // The texture manager codes for the colors
   int fg, bg;
-
 };
 
 #endif // ! __CS_CSCON_H__

@@ -109,8 +109,10 @@
 
 #if defined (PI_INDEX8)
 #  define INV_COLORMAP(x) Scan.inv_cmap [x]
+#  define SCR_COLORMAP(x) Scan.GlobalCMap [x]
 #else
 #  define INV_COLORMAP(x) x
+#  define SCR_COLORMAP(x) x
 #endif
 
 /*

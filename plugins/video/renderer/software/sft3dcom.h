@@ -156,11 +156,11 @@ protected:
   int Gamma;
 
   /// scan_xxx routines
-  csDrawScanline* ScanProc [15];
+  csDrawScanline* ScanProc [17];
   /// scan_pi_xxx routines
-  csDrawPIScanline* ScanProcPI [13];
+  csDrawPIScanline* ScanProcPI [21];
   /// scan_pi_xxx routines
-  csDrawPIScanlineGouraud* ScanProcPIG [13];
+  csDrawPIScanlineGouraud* ScanProcPIG [18];
 
   /// The routine for getting the address of needed scanline_xxx_alpha
   csDrawScanline* (*ScanProc_Alpha) (csGraphics3DSoftwareCommon*, int alpha);

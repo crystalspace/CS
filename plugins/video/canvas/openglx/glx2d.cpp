@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "video/canvas/openglx/glx2d.h"
 #include "video/canvas/common/x11comm.h"
+#include "video/canvas/common/scancode.h"
 #include "csutil/scf.h"
 #include "cssys/csevent.h"
 #include "cssys/csinput.h"
@@ -40,7 +41,6 @@ EXPORT_CLASS_TABLE_END
 csGraphics2DGLX::csGraphics2DGLX (iBase *iParent) :
   csGraphics2DGLCommon (iParent), cmap (0), currently_full_screen(false)
 {
-
 }
 
 bool csGraphics2DGLX::Initialize (iSystem *pSystem)
@@ -115,6 +115,8 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
 
   // Tell system driver to call us on every frame
   System->CallOnEvents (this, CSMASK_Nothing);
+  // Create the event outlet
+  EventOutlet = System->CreateEventOutlet (this);
 
 #ifdef XFREE86VM
   InitVidModes();
@@ -336,19 +338,22 @@ bool csGraphics2DGLX::Open(const char *Title)
      0 /*border*/, active_GLVisual->depth, InputOutput, active_GLVisual->visual,
     CWBorderPixel | CWColormap, &winattr);
 
+  XStoreName (dpy, wm_window, Title);
   XSelectInput (dpy, wm_window, FocusChangeMask | KeyPressMask |
   	KeyReleaseMask | StructureNotifyMask);
+
+  window = XCreateWindow (dpy, wm_window, 0, 0, Width,Height, 0 /*border*/,
+    active_GLVisual->depth, InputOutput, active_GLVisual->visual,
+    CWBorderPixel | CWColormap | CWEventMask | CWBitGravity, &winattr);
+
+  XSelectInput (dpy, window, ExposureMask | KeyPressMask | KeyReleaseMask |
+    FocusChangeMask | PointerMotionMask | ButtonPressMask |
+    ButtonReleaseMask | StructureNotifyMask | KeymapStateMask);
 
   // Intern WM_DELETE_WINDOW and set window manager protocol
   // (Needed to catch user using window manager "delete window" button)
   wm_delete_window = XInternAtom (dpy, "WM_DELETE_WINDOW", False);
   XSetWMProtocols (dpy, wm_window, &wm_delete_window, 1);
-
-  window = XCreateWindow(dpy, wm_window, 0, 0, Width,Height, 0 /*border*/,
-    active_GLVisual->depth, InputOutput, active_GLVisual->visual,
-    CWBorderPixel | CWColormap | CWEventMask | CWBitGravity, &winattr);
-
-  XStoreName (dpy, wm_window, Title);
 
   // Now communicate fully to the window manager our wishes using the non-mapped
   // leader_window to form a window_group
@@ -473,20 +478,14 @@ void csGraphics2DGLX::Close(void)
   }
 }
 
-bool csGraphics2DGLX::PerformExtension (const char* args)
+bool csGraphics2DGLX::PerformExtension (const char* iCommand, ...)
 {
-  csString ext(args);
-
-  if (ext.CompareNoCase ("fullscreen"))
+  if (!strcasecmp (iCommand, "fullscreen"))
   {
     if (currently_full_screen)
-    {
       LeaveFullScreen ();
-    }
     else
-    {
       EnterFullScreen ();
-    }
   }
 
   return true;
@@ -539,15 +538,20 @@ static Bool CheckKeyPress (Display * /*dpy*/, XEvent *event, XPointer arg)
 }
 
 // XCheckMaskEvent() doesn't get ClientMessage Events so use XCheckIfEvent()
-//    with this Predicate function as a work-around ( ClientMessage events
-//    are needed in order to catch "WM_DELETE_WINDOW")
-static Bool AlwaysTruePredicate (Display*, XEvent*, char*) { return True; }
+// with this Predicate function as a work-around (ClientMessage events
+// are needed in order to catch "WM_DELETE_WINDOW")
+static Bool AlwaysTruePredicate (Display*, XEvent*, char*)
+{
+  return True;
+}
 
 bool csGraphics2DGLX::HandleEvent (csEvent &/*Event*/)
 {
   static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
   XEvent event;
-  int state, key;
+  KeySym key;
+  int charcount;
+  char charcode [8];
   bool down;
 
   while (XCheckIfEvent (dpy, &event, AlwaysTruePredicate, 0))
@@ -556,22 +560,23 @@ bool csGraphics2DGLX::HandleEvent (csEvent &/*Event*/)
       case ClientMessage:
 	if (static_cast<Atom>(event.xclient.data.l[0]) == wm_delete_window)
 	{
-	  System->QueueContextCloseEvent ((void*)this);
-	  System->StartShutdown();
+	  EventOutlet->Broadcast (cscmdContextClose, (iGraphics2D *)this);
+	  EventOutlet->Broadcast (cscmdQuit);
 	}
 	break;
+      case MappingNotify:
+        XRefreshKeyboardMapping (&event.xmapping);
+	break;
       case ButtonPress:
-        state = ((XButtonEvent*)&event)->state;
-        System->QueueMouseEvent (button_mapping [event.xbutton.button],
+        EventOutlet->Mouse (button_mapping [event.xbutton.button],
           true, event.xbutton.x, event.xbutton.y);
-          break;
+        break;
       case ButtonRelease:
-        System->QueueMouseEvent (button_mapping [event.xbutton.button],
+        EventOutlet->Mouse (button_mapping [event.xbutton.button],
           false, event.xbutton.x, event.xbutton.y);
         break;
       case MotionNotify:
-        System->QueueMouseEvent (0, false,
-	  event.xbutton.x, event.xbutton.y);
+        EventOutlet->Mouse (0, false, event.xbutton.x, event.xbutton.y);
         break;
       case KeyPress:
       case KeyRelease:
@@ -580,8 +585,8 @@ bool csGraphics2DGLX::HandleEvent (csEvent &/*Event*/)
 	// in favour of KeyDown since this is most (sure?) an autorepeat
         XCheckIfEvent (event.xkey.display, &event, CheckKeyPress, (XPointer)&event);
         down = (event.type == KeyPress);
-        key = XLookupKeysym (&event.xkey, 0);
-        state = event.xkey.state;
+        charcount = XLookupString ((XKeyEvent *)&event, charcode,
+          sizeof (charcode), &key, NULL);
         switch (key)
         {
           case XK_Meta_L:
@@ -639,22 +644,26 @@ bool csGraphics2DGLX::HandleEvent (csEvent &/*Event*/)
           case XK_F10:        key = CSKEY_F10; break;
           case XK_F11:        key = CSKEY_F11; break;
           case XK_F12:        key = CSKEY_F12; break;
-          default:            break;
+          default:            key = (key <= 127) ? ScanCodeToChar [key] : 0;
         }
-	System->QueueKeyEvent (key, down);
+	EventOutlet->Key (key, charcount == 1 ? uint8 (charcode [0]) : 0, down);
         break;
       case FocusIn:
       case FocusOut:
-        System->QueueFocusEvent (event.type == FocusIn);
+        EventOutlet->Broadcast (cscmdFocusChanged, (void *)(event.type == FocusIn));
         break;
       case Expose:
       {
         csRect rect (event.xexpose.x, event.xexpose.y,
-	  event.xexpose.x + event.xexpose.width, event.xexpose.y + event.xexpose.height);
-	Print (&rect);
-        break;
+                     event.xexpose.x + event.xexpose.width,
+                     event.xexpose.y + event.xexpose.height);
+        Print (&rect);
+	break;
       }
+      default:
+        break;
     }
+
   return false;
 }
 

@@ -73,7 +73,7 @@ $(OUT)glide3common2d$O: plugins/video/canvas/glide2common/glide2common2d.cpp \
 $(OUT)%$O: plugins/video/canvas/common/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDX2D3)
  
-$(GLIDX2D3): $(OBJ.GLIDX2D3) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+$(GLIDX2D3): $(OBJ.GLIDX2D3) $(CSUTIL.LIB) $(CSSYS.LIB)
 	$(DO.PLUGIN) $(LIBS.GLIDX2D3)
 
 glidx2d3clean:

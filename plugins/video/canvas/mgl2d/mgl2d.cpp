@@ -21,10 +21,8 @@
 #include "isystem.h"
 #include "csutil/csrect.h"
 #include "cssys/csevent.h"
+#include "plugins/video/canvas/common/scancode.h"
 #include "mgl2d.h"
-#define x x /* @@@ Why this, Andrew? */
-
-extern int ScancodeToChar[];
 
 IMPLEMENT_FACTORY (csGraphics2DMGL)
 
@@ -36,6 +34,7 @@ EXPORT_CLASS_TABLE_END
 IMPLEMENT_IBASE (csGraphics2DMGL)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics2D)
+  IMPLEMENTS_INTERFACE (iEventPlug)
 IMPLEMENT_IBASE_END
 
 // csGraphics2DMGL functions
@@ -44,6 +43,23 @@ csGraphics2DMGL::csGraphics2DMGL (iBase *iParent) : csGraphics2D ()
   CONSTRUCT_IBASE (iParent);
   dc = backdc = NULL;
   joybutt = 0;
+  EventOutlet = NULL;
+
+  ScanCodeToChar [KB_padEnter] = CSKEY_ENTER;
+  ScanCodeToChar [KB_padDivide] = '/';
+  ScanCodeToChar [KB_padLeft] = CSKEY_LEFT;
+  ScanCodeToChar [KB_padRight] = CSKEY_RIGHT;
+  ScanCodeToChar [KB_padUp] = CSKEY_UP;
+  ScanCodeToChar [KB_padDown] = CSKEY_DOWN;
+  ScanCodeToChar [KB_padInsert] = CSKEY_INS;
+  ScanCodeToChar [KB_padDelete] = CSKEY_DEL;
+  ScanCodeToChar [KB_padHome] = CSKEY_HOME;
+  ScanCodeToChar [KB_padEnd] = CSKEY_END;
+  ScanCodeToChar [KB_padPageUp] = CSKEY_PGUP;
+  ScanCodeToChar [KB_padPageDown] = CSKEY_PGDN;
+  ScanCodeToChar [KB_padCenter] = CSKEY_CENTER;
+  ScanCodeToChar [KB_rightCtrl] = CSKEY_CTRL;
+  ScanCodeToChar [KB_rightAlt] = CSKEY_ALT;
 }
 
 bool csGraphics2DMGL::Initialize (iSystem *pSystem)
@@ -75,26 +91,30 @@ bool csGraphics2DMGL::Initialize (iSystem *pSystem)
 
   // Tell system driver to call us on every frame
   System->CallOnEvents (this, CSMASK_Nothing);
+  // Create the event outlet
+  EventOutlet = System->CreateEventOutlet (this);
 
   return true;
 }
 
 csGraphics2DMGL::~csGraphics2DMGL ()
 {
+  if (EventOutlet)
+    EventOutlet->DecRef ();
 }
 
 // Ugly
-static iSystem *SysDriver;
+static iEventOutlet *EventOutlet;
 
 static int MGLAPI MGL_suspend_callback (MGLDC *dc, int flags)
 {
   if (flags == MGL_DEACTIVATE)
   {
-    SysDriver->SuspendResume (true);
+    EventOutlet->ImmediateBroadcast (cscmdFocusChanged, (void *)false);
     return MGL_SUSPEND_APP;
   }
   else if (flags == MGL_REACTIVATE)
-    SysDriver->SuspendResume (false);
+    EventOutlet->Broadcast (cscmdFocusChanged, (void *)true);
   return MGL_NO_SUSPEND_APP;
 }
 
@@ -104,7 +124,7 @@ bool csGraphics2DMGL::Open (const char *Title)
   if (!csGraphics2D::Open (Title))
     return false;
 
-  SysDriver = System;
+  ::EventOutlet = EventOutlet;
   MGL_setSuspendAppCallback (MGL_suspend_callback);
 
   numPages = MGL_availablePages (video_mode);
@@ -118,7 +138,7 @@ bool csGraphics2DMGL::Open (const char *Title)
   }
   MGL_makeCurrentDC (dc);
 
-  System->EnablePrintf (false);
+  System->SystemExtension ("EnablePrintf", false);
 
   pixel_format_t pf;
   MGL_getPixelFormat (dc, &pf);
@@ -173,7 +193,7 @@ void csGraphics2DMGL::Close ()
   }
   csGraphics2D::Close ();
 
-  System->EnablePrintf (true);
+  System->SystemExtension ("EnablePrintf", true);
 }
 
 void csGraphics2DMGL::AllocateBackBuffer ()
@@ -340,7 +360,7 @@ int csGraphics2DMGL::TranslateKey (int mglKey)
       case KB_rightCtrl:  key = CSKEY_CTRL; break;
       case KB_leftAlt:
       case KB_rightAlt:   key = CSKEY_ALT; break;
-      default:            key = ScancodeToChar [mglKey]; break;
+      default:            key = ScanCodeToChar [mglKey]; break;
     }
     return key;
   }
@@ -354,9 +374,7 @@ int csGraphics2DMGL::TranslateKey (int mglKey)
       return CSKEY_TAB;
     if (EVT_scanCode (mglKey) == KB_backspace)
       return CSKEY_BACKSPACE;
-    if (EVT_asciiCode (mglKey) < ' ')
-      return EVT_asciiCode (mglKey + 96);
-    return EVT_asciiCode (mglKey);
+    return ScanCodeToChar [EVT_scanCode (mglKey)];
   }
 }
 
@@ -375,24 +393,23 @@ bool csGraphics2DMGL::HandleEvent (csEvent &/*Event*/)
       case EVT_KEYDOWN:
       case EVT_KEYREPEAT:
       case EVT_KEYUP:
-        evt.message = TranslateKey (evt.message);
-        if (evt.message)
-          System->QueueKeyEvent (evt.message, evt.what != EVT_KEYUP);
+        EventOutlet->Key (TranslateKey (evt.message),
+          EVT_asciiCode (evt.message), evt.what != EVT_KEYUP);
         break;
       case EVT_MOUSEDOWN:
       case EVT_MOUSEUP:
         if (evt.message & EVT_LEFTBMASK)
-          System->QueueMouseEvent (1, !!(evt.modifiers & EVT_LEFTBUT),
+          EventOutlet->Mouse (1, !!(evt.modifiers & EVT_LEFTBUT),
             evt.where_x, evt.where_y);
         if (evt.message & EVT_RIGHTBMASK)
-          System->QueueMouseEvent (2, !!(evt.modifiers & EVT_RIGHTBUT),
+          EventOutlet->Mouse (2, !!(evt.modifiers & EVT_RIGHTBUT),
             evt.where_x, evt.where_y);
         if (evt.message & EVT_MIDDLEBMASK)
-          System->QueueMouseEvent (3, !!(evt.modifiers & EVT_MIDDLEBUT),
+          EventOutlet->Mouse (3, !!(evt.modifiers & EVT_MIDDLEBUT),
             evt.where_x, evt.where_y);
         break;
       case EVT_MOUSEMOVE:
-        System->QueueMouseEvent (0, false, evt.where_x, evt.where_y);
+        EventOutlet->Mouse (0, false, evt.where_x, evt.where_y);
         break;
       case EVT_JOYCLICK:
         if (joybutt != evt.message)
@@ -400,28 +417,28 @@ bool csGraphics2DMGL::HandleEvent (csEvent &/*Event*/)
           int diff = joybutt ^ evt.message;
           joybutt = evt.message;
           if (diff & EVT_JOY1_BUTTONA)
-            System->QueueJoystickEvent (1, 1, !!(joybutt & EVT_JOY1_BUTTONA),
+            EventOutlet->Joystick (1, 1, !!(joybutt & EVT_JOY1_BUTTONA),
               evt.where_x, evt.where_y);
           if (diff & EVT_JOY1_BUTTONB)
-            System->QueueJoystickEvent (1, 2, !!(joybutt & EVT_JOY1_BUTTONB),
+            EventOutlet->Joystick (1, 2, !!(joybutt & EVT_JOY1_BUTTONB),
               evt.where_x, evt.where_y);
           if (diff & EVT_JOY2_BUTTONA)
-            System->QueueJoystickEvent (2, 1, !!(joybutt & EVT_JOY2_BUTTONA),
+            EventOutlet->Joystick (2, 1, !!(joybutt & EVT_JOY2_BUTTONA),
               evt.relative_x, evt.relative_y);
           if (diff & EVT_JOY2_BUTTONB)
-            System->QueueJoystickEvent (2, 2, !!(joybutt & EVT_JOY2_BUTTONB),
+            EventOutlet->Joystick (2, 2, !!(joybutt & EVT_JOY2_BUTTONB),
               evt.relative_x, evt.relative_y);
         }
         break;
       case EVT_JOYMOVE:
         if (joyposx [0] != evt.where_x || joyposy [0] != evt.where_y)
         {
-          System->QueueJoystickEvent (1, 0, false, evt.where_x, evt.where_y);
+          EventOutlet->Joystick (1, 0, false, evt.where_x, evt.where_y);
           joyposx [0] = evt.where_x; joyposy [0] = evt.where_y;
         }
         if (joyposx [1] != evt.relative_x || joyposy [1] != evt.relative_y)
         {
-          System->QueueJoystickEvent (2, 0, false, evt.relative_x, evt.relative_y);
+          EventOutlet->Joystick (2, 0, false, evt.relative_x, evt.relative_y);
           joyposx [1] = evt.relative_x; joyposy [1] = evt.relative_y;
         }
         break;

@@ -287,9 +287,12 @@ bool gdDiveInitialize ()
 
 bool gdDiveDeinitialize ()
 {
+  if (!PMtid)
+    return true;
   WinPostQueueMsg (dA->MQ, WM_QUIT, (MPARAM) 0, (MPARAM) 0);
   DosWaitThread ((PTID) &PMtid, DCWW_WAIT);
   DosCloseEventSem (semSleep);
   DosCloseMutexSem (semBusy);
+  PMtid = 0;
   return true;
 }

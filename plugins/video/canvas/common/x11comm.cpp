@@ -23,8 +23,8 @@
 void GetX11Settings (iSystem *iSys, int &oSimDepth, bool &oUseSHM,
   bool &oHardwareCursor)
 {
-  oSimDepth = iSys->ConfigGetInt ("VideoDriver", "SIMULATE_DEPTH", 0);
-  oUseSHM = iSys->ConfigGetYesNo ("VideoDriver", "XSHM", true);
+  oSimDepth = iSys->ConfigGetInt ("VideoDriver", "SimulateDepth", 0);
+  oUseSHM = iSys->ConfigGetYesNo ("VideoDriver", "Xshm", true);
   oHardwareCursor = iSys->ConfigGetYesNo ("VideoDriver", "SystemMouseCursor", true);
 
   const char *val;
@@ -43,4 +43,9 @@ void GetX11Settings (iSystem *iSys, int &oSimDepth, bool &oUseSHM,
       oSimDepth = 0;
     }
   }
+
+  if (iSys->GetOptionCL ("sysmouse"))
+    oHardwareCursor = true;
+  if (iSys->GetOptionCL ("nosysmouse"))
+    oHardwareCursor = false;
 }

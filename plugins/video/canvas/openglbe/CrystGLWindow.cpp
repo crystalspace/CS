@@ -108,7 +108,9 @@ void CrystGLWindow::DirectConnected(direct_buffer_info* info)
 
 bool CrystGLWindow::QuitRequested()
 {
-  cs_system->StartShutdown();
+//  EventOutlet->Broadcast (cscmdContextClose, (iGraphics2D *)this);
+//  EventOutlet->Broadcast (cscmdQuit);
+  cs_system->StartShutdown ();
   // @@@FIXME: Don't destroy window before "LoopThread" has finished.
   return true;
 }

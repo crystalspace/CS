@@ -21,12 +21,15 @@
 #ifndef __ALLEGRO_H__
 #define __ALLEGRO_H__
 
+#include <allegro.h>
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include <allegro.h>
+#include "ievent.h"
 
-/// DOS Allegro 2D graphics driver
-class csGraphics2DAlleg : public csGraphics2D
+/**
+ * Allegro 2D graphics driver.
+ */
+class csGraphics2DAlleg : public csGraphics2D, public iEventPlug
 {
   /// Palette has been changed?
   bool PaletteChanged;
@@ -37,6 +40,12 @@ class csGraphics2DAlleg : public csGraphics2D
   int opened;
   BITMAP *bitmap;
   bool scale; /* Bitmap is not screen size, scale it */
+  // The event outlet
+  iEventOutlet *EventOutlet;
+  // Hook keyboard and mouse?
+  bool hook_kbd, hook_mouse;
+  // Are the keyboard/mouse hooks active?
+  bool kbd_hook_active, mouse_hook_active;
 
 public:
   DECLARE_IBASE;
@@ -57,12 +66,20 @@ public:
   virtual bool DoubleBuffer (bool /*Enable*/) { return true; }
   virtual bool GetDoubleBufferState () { return true; }
   
-  virtual bool PerformExtension (const char *args);
+  virtual bool PerformExtension (const char *iCommand, ...);
   /**
    * Blit between a bitmap and one twice it's size.
    * sw,sh are in source dimensions.
    */
   virtual void DoubleBlit (BITMAP *src, BITMAP *dst, int sw, int sh);
+
+  //------------------------- iEventPlug interface ---------------------------//
+
+  virtual unsigned GetPotentiallyConflictingEvents ()
+  { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
+  virtual unsigned QueryEventPriority (unsigned /*iType*/)
+  { return 50; }
+  virtual void EnableEvents (unsigned iType, bool iEnable);
 
 private:
   void FillEvents ();

@@ -23,6 +23,7 @@
 #include "video/canvas/common/graph2d.h"
 #include "video/canvas/glide2common/iglide2d.h"
 #include "video/canvas/glide2common/glide2common2d.h"
+#include "ievent.h"
 
 #include <glide.h>
 
@@ -40,7 +41,7 @@
 #endif /* DO_SHM */
 
 /// XLIB version.
-class csGraphics2DGlideX : public csGraphics2DGlideCommon
+class csGraphics2DGlideX : public csGraphics2DGlideCommon, public iEventPlug
 {
 private:
   // The display context
@@ -71,9 +72,12 @@ private:
   Cursor EmptyMouseCursor;
   /// A empty pixmap
   Pixmap EmptyPixmap;
+  // The event outlet
+  iEventOutlet *EventOutlet;
 
 public:
-//  DECLARE_IBASE;
+  DECLARE_IBASE_EXT (csGraphics2DGlideCommon)
+
   csGraphics2DGlideX (iBase *iParent);
   virtual ~csGraphics2DGlideX ();
 
@@ -92,6 +96,13 @@ public:
 
   /// Called on every frame by system driver
   virtual bool HandleEvent (csEvent &Event);
+
+  //------------------------- iEventPlug interface ---------------------------//
+
+  virtual unsigned GetPotentiallyConflictingEvents ()
+  { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
+  virtual unsigned QueryEventPriority (unsigned /*iType*/)
+  { return 150; }
 
 protected:
   /// This method is used for GlideInWindow...

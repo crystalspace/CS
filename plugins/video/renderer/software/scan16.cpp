@@ -104,7 +104,7 @@
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_map_filt2_zfil_565
+#ifndef NO_565_scan_map_filt2_zfil
 
 /*
   We process two pixels at a time (in a single CPU register):
@@ -120,7 +120,7 @@
   bit of left pixel component could be garbled by right pixel's influence.
 */
 
-#define SCANFUNC csScan_16_scan_map_filt2_zfil_565
+#define SCANFUNC csScan_16_565_scan_map_filt2_zfil
 #define SCANMAP
 #define SCANLOOP							\
     if ((duu > 0xffff) || (dvv > 0xffff))				\
@@ -169,13 +169,13 @@
     while (z_buffer <= lastZbuf)
 #include "scanln.inc"
 
-#endif // NO_scan_map_filt2_zfil_565
+#endif // NO_565_scan_map_filt2_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_map_filt2_zfil_555
+#ifndef NO_555_scan_map_filt2_zfil
 
-#define SCANFUNC csScan_16_scan_map_filt2_zfil_555
+#define SCANFUNC csScan_16_555_scan_map_filt2_zfil
 #define SCANMAP
 #define SCANLOOP							\
     if ((duu > 0xffff) || (dvv > 0xffff))				\
@@ -224,13 +224,13 @@
     while (z_buffer <= lastZbuf)
 #include "scanln.inc"
 
-#endif // NO_scan_map_filt2_zfil_555
+#endif // NO_555_scan_map_filt2_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_map_filt2_zuse_565
+#ifndef NO_565_scan_map_filt2_zuse
 
-#define SCANFUNC csScan_16_scan_map_filt2_zuse_565
+#define SCANFUNC csScan_16_565_scan_map_filt2_zuse
 #define SCANMAP
 #define SCANLOOP							\
     if ((duu > 0xffff) || (dvv > 0xffff))				\
@@ -285,13 +285,13 @@
       while (_dest <= _destend);
 #include "scanln.inc"
 
-#endif // NO_scan_map_filt2_zuse_565
+#endif // NO_565_scan_map_filt2_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_map_filt2_zuse_555
+#ifndef NO_555_scan_map_filt2_zuse
 
-#define SCANFUNC csScan_16_scan_map_filt2_zuse_555
+#define SCANFUNC csScan_16_555_scan_map_filt2_zuse
 #define SCANMAP
 #define SCANLOOP							\
     if ((duu > 0xffff) || (dvv > 0xffff))				\
@@ -346,7 +346,7 @@
       while (_dest <= _destend);
 #include "scanln.inc"
 
-#endif // NO_scan_map_filt2_zuse_555
+#endif // NO_555_scan_map_filt2_zuse
 
 //------------------------------------------------------------------
 
@@ -369,9 +369,9 @@
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_map_fixalpha_555
+#ifndef NO_555_scan_map_fixalpha
 
-#define SCANFUNC csScan_16_scan_map_fixalpha_555
+#define SCANFUNC csScan_16_555_scan_map_fixalpha
 #define SCANMAP
 #define SCANLOOP \
     do									\
@@ -390,13 +390,13 @@
     while (_dest <= _destend)
 #include "scanln.inc"
 
-#endif // NO_scan_map_fixalpha_555
+#endif // NO_555_scan_map_fixalpha
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_map_fixalpha_565
+#ifndef NO_565_scan_map_fixalpha
 
-#define SCANFUNC csScan_16_scan_map_fixalpha_565
+#define SCANFUNC csScan_16_565_scan_map_fixalpha
 #define SCANMAP
 #define SCANLOOP \
     do									\
@@ -415,13 +415,13 @@
     while (_dest <= _destend)
 #include "scanln.inc"
 
-#endif // NO_scan_map_fixalpha_565
+#endif // NO_565_scan_map_fixalpha
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_fog_555
+#ifndef NO_555_scan_fog
 
-void csScan_16_scan_fog_555 (int xx, unsigned char* d,
+void csScan_16_555_scan_fog (int xx, unsigned char* d,
   unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z PIXEL_ADJUST)
 {
   if (xx <= 0) return;
@@ -470,13 +470,13 @@ fd_done:
   while (_dest < _destend);
 }
 
-#endif // NO_scan_fog_555
+#endif // NO_555_scan_fog
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_fog_565
+#ifndef NO_565_scan_fog
 
-void csScan_16_scan_fog_565 (int xx, unsigned char* d,
+void csScan_16_565_scan_fog (int xx, unsigned char* d,
   unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z PIXEL_ADJUST)
 {
   if (xx <= 0) return;
@@ -525,13 +525,13 @@ fd_done:
   while (_dest < _destend);
 }
 
-#endif // NO_scan_fog_565
+#endif // NO_565_scan_fog
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_fog_view_555
+#ifndef NO_555_scan_fog_view
 
-void csScan_16_scan_fog_view_555 (int xx, unsigned char* d,
+void csScan_16_555_scan_fog_view (int xx, unsigned char* d,
   unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z PIXEL_ADJUST)
 {
   if (xx <= 0) return;
@@ -564,13 +564,13 @@ void csScan_16_scan_fog_view_555 (int xx, unsigned char* d,
   while (_dest < _destend);
 }
 
-#endif // NO_scan_fog_view_555
+#endif // NO_555_scan_fog_view
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_fog_view_565
+#ifndef NO_565_scan_fog_view
 
-void csScan_16_scan_fog_view_565 (int xx, unsigned char* d,
+void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
   unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z PIXEL_ADJUST)
 {
   if (xx <= 0) return;
@@ -603,71 +603,180 @@ void csScan_16_scan_fog_view_565 (int xx, unsigned char* d,
   while (_dest < _destend);
 }
 
-#endif // NO_scan_fog_view_565
+#endif // NO_565_scan_fog_view
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_map_alpha_555
+#ifndef NO_555_scan_map_alpha_zfil
 
-#define A_SCANFUNC csScan_16_scan_map_alpha_555
+#define A_SCANFUNC csScan_16_555_scan_map_alpha_zfil
+#define A_ZFIL
 #define A_MAP
 #define A_R5G5B5
 #include "scanalph.inc"
 
-#endif // NO_scan_map_alpha_555
+#endif // NO_555_scan_map_alpha_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_map_alpha_565
+#ifndef NO_555_scan_map_alpha_zuse
 
-#define A_SCANFUNC csScan_16_scan_map_alpha_565
+#define A_SCANFUNC csScan_16_555_scan_map_alpha_zuse
+#define A_ZUSE
+#define A_MAP
+#define A_R5G5B5
+#include "scanalph.inc"
+
+#endif // NO_555_scan_map_alpha_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_map_alpha_zfil
+
+#define A_SCANFUNC csScan_16_565_scan_map_alpha_zfil
+#define A_ZFIL
 #define A_MAP
 #define A_R5G6B5
 #include "scanalph.inc"
 
-#endif // NO_scan_map_alpha_565
+#endif // NO_565_scan_map_alpha_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_tex_alpha_555
+#ifndef NO_565_scan_map_alpha_zuse
 
-#define A_SCANFUNC csScan_16_scan_tex_alpha_555
-#define A_R5G5B5
-#include "scanalph.inc"
-
-#endif // NO_scan_tex_alpha_555
-
-//------------------------------------------------------------------
-
-#ifndef NO_scan_tex_alpha_565
-
-#define A_SCANFUNC csScan_16_scan_tex_alpha_565
+#define A_SCANFUNC csScan_16_565_scan_map_alpha_zuse
+#define A_ZUSE
+#define A_MAP
 #define A_R5G6B5
 #include "scanalph.inc"
 
-#endif // NO_scan_tex_alpha_565
+#endif // NO_565_scan_map_alpha_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_alpha_555
+#ifndef NO_555_scan_tex_alpha_zfil
 
-#define A_SCANFUNC csScan_16_scan_pi_tex_alpha_555
+#define A_SCANFUNC csScan_16_555_scan_tex_alpha_zfil
+#define A_ZFIL
+#define A_R5G5B5
+#include "scanalph.inc"
+
+#endif // NO_555_scan_tex_alpha_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_tex_alpha_zuse
+
+#define A_SCANFUNC csScan_16_555_scan_tex_alpha_zuse
+#define A_ZUSE
+#define A_R5G5B5
+#include "scanalph.inc"
+
+#endif // NO_555_scan_tex_alpha_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_tex_alpha_zfil
+
+#define A_SCANFUNC csScan_16_565_scan_tex_alpha_zfil
+#define A_ZFIL
+#define A_R5G6B5
+#include "scanalph.inc"
+
+#endif // NO_565_scan_tex_alpha_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_tex_alpha_zuse
+
+#define A_SCANFUNC csScan_16_565_scan_tex_alpha_zuse
+#define A_ZUSE
+#define A_R5G6B5
+#include "scanalph.inc"
+
+#endif // NO_565_scan_tex_alpha_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_pi_tex_alpha_znone
+
+#define A_SCANFUNC csScan_16_555_scan_pi_tex_alpha_znone
 #define A_PI
 #define A_R5G5B5
 #include "scanalph.inc"
 
-#endif // NO_scan_pi_tex_alpha_555
+#endif // NO_555_scan_pi_tex_alpha_znone
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_alpha_565
+#ifndef NO_555_scan_pi_tex_alpha_zfil
 
-#define A_SCANFUNC csScan_16_scan_pi_tex_alpha_565
+#define A_SCANFUNC csScan_16_555_scan_pi_tex_alpha_zfil
+#define A_PI
+#define A_R5G5B5
+#define A_ZFIL
+#include "scanalph.inc"
+
+#endif // NO_555_scan_pi_tex_alpha_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_pi_tex_alpha_zuse
+
+#define A_SCANFUNC csScan_16_555_scan_pi_tex_alpha_zuse
+#define A_PI
+#define A_R5G5B5
+#define A_ZUSE
+#include "scanalph.inc"
+
+#endif // NO_555_scan_pi_tex_alpha_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_tex_alpha_znone
+
+#define A_SCANFUNC csScan_16_565_scan_pi_tex_alpha_znone
 #define A_PI
 #define A_R5G6B5
 #include "scanalph.inc"
 
-#endif // NO_scan_pi_tex_alpha_565
+#endif // NO_565_scan_pi_tex_alpha_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_tex_alpha_zfil
+
+#define A_SCANFUNC csScan_16_565_scan_pi_tex_alpha_zfil
+#define A_PI
+#define A_R5G6B5
+#define A_ZFIL
+#include "scanalph.inc"
+
+#endif // NO_565_scan_pi_tex_alpha_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_tex_alpha_zuse
+
+#define A_SCANFUNC csScan_16_565_scan_pi_tex_alpha_zuse
+#define A_PI
+#define A_R5G6B5
+#define A_ZUSE
+#include "scanalph.inc"
+
+#endif // NO_565_scan_pi_tex_alpha_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_flat_znone
+
+#define PI_SCANFUNC csScan_16_scan_pi_flat_znone
+#define PI_FLAT
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_flat_znone
 
 //------------------------------------------------------------------
 
@@ -695,6 +804,16 @@ void csScan_16_scan_fog_view_565 (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
+#ifndef NO_scan_pi_tex_znone
+
+#define PI_SCANFUNC csScan_16_scan_pi_tex_znone
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_znone
+
+//------------------------------------------------------------------
+
 #ifndef NO_scan_pi_tex_zfil
 
 #define PI_SCANFUNC csScan_16_scan_pi_tex_zfil
@@ -714,6 +833,17 @@ void csScan_16_scan_fog_view_565 (int xx, unsigned char* d,
 #include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_key_znone
+
+#define PI_SCANFUNC csScan_16_scan_pi_tex_key_znone
+#define PI_COLORKEY
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_key_znone
 
 //------------------------------------------------------------------
 
@@ -741,313 +871,479 @@ void csScan_16_scan_fog_view_565 (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_flat_fx_zfil_555
+#ifndef NO_555_scan_pi_flat_fx_znone
 
-#define PI_SCANFUNC csScan_16_scan_pi_flat_fx_zfil_555
+#define PI_SCANFUNC csScan_16_555_scan_pi_flat_fx_znone
+#define PI_FLAT
+#define PI_BLEND
+#define PI_R5G5B5
+#include "scanpi.inc"
+
+#endif // NO_555_scan_pi_flat_fx_none
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_flat_fx_znone
+
+#define PI_SCANFUNC csScan_16_565_scan_pi_flat_fx_znone
+#define PI_FLAT
+#define PI_BLEND
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_565_scan_pi_flat_fx_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_pi_flat_fx_zfil
+
+#define PI_SCANFUNC csScan_16_555_scan_pi_flat_fx_zfil
 #define PI_ZFILL
 #define PI_FLAT
 #define PI_BLEND
 #define PI_R5G5B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_flat_fx_zfil_555
+#endif // NO_555_scan_pi_flat_fx_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_flat_fx_zfil_565
+#ifndef NO_565_scan_pi_flat_fx_zfil
 
-#define PI_SCANFUNC csScan_16_scan_pi_flat_fx_zfil_565
+#define PI_SCANFUNC csScan_16_565_scan_pi_flat_fx_zfil
 #define PI_ZFILL
 #define PI_FLAT
 #define PI_BLEND
 #define PI_R5G6B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_flat_fx_zfil_565
+#endif // NO_565_scan_pi_flat_fx_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_flat_fx_zuse_555
+#ifndef NO_555_scan_pi_flat_fx_zuse
 
-#define PI_SCANFUNC csScan_16_scan_pi_flat_fx_zuse_555
+#define PI_SCANFUNC csScan_16_555_scan_pi_flat_fx_zuse
 #define PI_ZUSE
 #define PI_FLAT
 #define PI_BLEND
 #define PI_R5G5B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_flat_fx_zuse_555
+#endif // NO_555_scan_pi_flat_fx_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_flat_fx_zuse_565
+#ifndef NO_565_scan_pi_flat_fx_zuse
 
-#define PI_SCANFUNC csScan_16_scan_pi_flat_fx_zuse_565
+#define PI_SCANFUNC csScan_16_565_scan_pi_flat_fx_zuse
 #define PI_ZUSE
 #define PI_FLAT
 #define PI_BLEND
 #define PI_R5G6B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_flat_fx_zuse_565
+#endif // NO_565_scan_pi_flat_fx_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_fx_zfil_555
+#ifndef NO_555_scan_pi_tex_fx_znone
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_fx_zfil_555
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_fx_znone
+#define PI_BLEND
+#define PI_R5G5B5
+#include "scanpi.inc"
+
+#endif // NO_555_scan_pi_tex_fx_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_tex_fx_znone
+
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_fx_znone
+#define PI_BLEND
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_565_scan_pi_tex_fx_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_pi_tex_fx_zfil
+
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_fx_zfil
 #define PI_ZFILL
 #define PI_BLEND
 #define PI_R5G5B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_tex_fx_zfil_555
+#endif // NO_555_scan_pi_tex_fx_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_fx_zfil_565
+#ifndef NO_565_scan_pi_tex_fx_zfil
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_fx_zfil_565
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_fx_zfil
 #define PI_ZFILL
 #define PI_BLEND
 #define PI_R5G6B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_tex_fx_zfil_565
+#endif // NO_565_scan_pi_tex_fx_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_fx_zuse_555
+#ifndef NO_555_scan_pi_tex_fx_zuse
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_fx_zuse_555
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_fx_zuse
 #define PI_ZUSE
 #define PI_BLEND
 #define PI_R5G5B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_tex_fx_zuse_555
+#endif // NO_555_scan_pi_tex_fx_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_fx_zuse_565
+#ifndef NO_565_scan_pi_tex_fx_zuse
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_fx_zuse_565
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_fx_zuse
 #define PI_ZUSE
 #define PI_BLEND
 #define PI_R5G6B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_tex_fx_zuse_565
+#endif // NO_565_scan_pi_tex_fx_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_fxkey_zfil_555
+#ifndef NO_555_scan_pi_tex_fxkey_znone
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_fxkey_zfil_555
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_fxkey_znone
+#define PI_COLORKEY
+#define PI_BLEND
+#define PI_R5G5B5
+#include "scanpi.inc"
+
+#endif // NO_555_scan_pi_tex_fxkey_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_tex_fxkey_znone
+
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_fxkey_znone
+#define PI_COLORKEY
+#define PI_BLEND
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_565_scan_pi_tex_fxkey_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_pi_tex_fxkey_zfil
+
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_fxkey_zfil
 #define PI_ZFILL
 #define PI_COLORKEY
 #define PI_BLEND
 #define PI_R5G5B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_tex_fxkey_zfil_555
+#endif // NO_555_scan_pi_tex_fxkey_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_fxkey_zfil_565
+#ifndef NO_565_scan_pi_tex_fxkey_zfil
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_fxkey_zfil_565
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_fxkey_zfil
 #define PI_ZFILL
 #define PI_COLORKEY
 #define PI_BLEND
 #define PI_R5G6B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_tex_fxkey_zfil_565
+#endif // NO_565_scan_pi_tex_fxkey_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_fxkey_zuse_555
+#ifndef NO_555_scan_pi_tex_fxkey_zuse
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_fxkey_zuse_555
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_fxkey_zuse
 #define PI_ZUSE
 #define PI_COLORKEY
 #define PI_BLEND
 #define PI_R5G5B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_tex_fxkey_zuse_555
+#endif // NO_555_scan_pi_tex_fxkey_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_fxkey_zuse_565
+#ifndef NO_565_scan_pi_tex_fxkey_zuse
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_fxkey_zuse_565
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_fxkey_zuse
 #define PI_ZUSE
 #define PI_COLORKEY
 #define PI_BLEND
 #define PI_R5G6B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_tex_fxkey_zuse_565
+#endif // NO_565_scan_pi_tex_fxkey_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_flat_gou_zfil_555
+#ifndef NO_555_scan_pi_flat_gou_znone
 
-#define PI_SCANFUNC csScan_16_scan_pi_flat_gou_zfil_555
+#define PI_SCANFUNC csScan_16_555_scan_pi_flat_gou_znone
+#define PI_FLAT
+#define PI_GOURAUD
+#define PI_R5G5B5
+#include "scanpi.inc"
+
+#endif // NO_555_scan_pi_flat_gou_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_flat_gou_znone
+
+#define PI_SCANFUNC csScan_16_565_scan_pi_flat_gou_znone
+#define PI_FLAT
+#define PI_GOURAUD
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_565_scan_pi_flat_gou_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_pi_flat_gou_zfil
+
+#define PI_SCANFUNC csScan_16_555_scan_pi_flat_gou_zfil
 #define PI_ZFILL
 #define PI_FLAT
 #define PI_GOURAUD
 #define PI_R5G5B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_flat_gou_zfil_555
+#endif // NO_555_scan_pi_flat_gou_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_flat_gou_zfil_565
+#ifndef NO_565_scan_pi_flat_gou_zfil
 
-#define PI_SCANFUNC csScan_16_scan_pi_flat_gou_zfil_565
+#define PI_SCANFUNC csScan_16_565_scan_pi_flat_gou_zfil
 #define PI_ZFILL
 #define PI_FLAT
 #define PI_GOURAUD
 #define PI_R5G6B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_flat_gou_zfil_565
+#endif // NO_565_scan_pi_flat_gou_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_flat_gou_zuse_555
+#ifndef NO_555_scan_pi_flat_gou_zuse
 
-#define PI_SCANFUNC csScan_16_scan_pi_flat_gou_zuse_555
+#define PI_SCANFUNC csScan_16_555_scan_pi_flat_gou_zuse
 #define PI_ZUSE
 #define PI_FLAT
 #define PI_GOURAUD
 #define PI_R5G5B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_flat_gou_zuse_555
+#endif // NO_555_scan_pi_flat_gou_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_flat_gou_zuse_565
+#ifndef NO_565_scan_pi_flat_gou_zuse
 
-#define PI_SCANFUNC csScan_16_scan_pi_flat_gou_zuse_565
+#define PI_SCANFUNC csScan_16_565_scan_pi_flat_gou_zuse
 #define PI_ZUSE
 #define PI_FLAT
 #define PI_GOURAUD
 #define PI_R5G6B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_flat_gou_zuse_565
+#endif // NO_565_scan_pi_flat_gou_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_gou_zfil_555
+#ifndef NO_555_scan_pi_tex_gou_znone
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_gou_zfil_555
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_gou_znone
+#define PI_GOURAUD
+#define PI_R5G5B5
+#include "scanpi.inc"
+
+#endif // NO_555_scan_pi_tex_gou_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_tex_gou_znone
+
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_gou_znone
+#define PI_GOURAUD
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_565_scan_pi_tex_gou_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_pi_tex_gou_zfil
+
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_gou_zfil
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_R5G5B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_tex_gou_zfil_555
+#endif // NO_555_scan_pi_tex_gou_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_gou_zfil_565
+#ifndef NO_565_scan_pi_tex_gou_zfil
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_gou_zfil_565
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_gou_zfil
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_R5G6B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_tex_gou_zfil_565
+#endif // NO_565_scan_pi_tex_gou_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_gou_zuse_555
+#ifndef NO_555_scan_pi_tex_gou_zuse
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_gou_zuse_555
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_gou_zuse
 #define PI_ZUSE
 #define PI_GOURAUD
 #define PI_R5G5B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_tex_gou_zuse_555
+#endif // NO_555_scan_pi_tex_gou_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_gou_zuse_565
+#ifndef NO_565_scan_pi_tex_gou_zuse
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_gou_zuse_565
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_gou_zuse
 #define PI_ZUSE
 #define PI_GOURAUD
 #define PI_R5G6B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_tex_gou_zuse_565
+#endif // NO_565_scan_pi_tex_gou_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_goukey_zfil_555
+#ifndef NO_555_scan_pi_tex_goukey_znone
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_goukey_zfil_555
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_goukey_znone
+#define PI_GOURAUD
+#define PI_COLORKEY
+#define PI_R5G5B5
+#include "scanpi.inc"
+
+#endif // NO_555_scan_pi_tex_goukey_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_tex_goukey_znone
+
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_goukey_znone
+#define PI_GOURAUD
+#define PI_COLORKEY
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_565_scan_pi_tex_goukey_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_pi_tex_goukey_zfil
+
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_goukey_zfil
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_COLORKEY
 #define PI_R5G5B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_tex_goukey_zfil_555
+#endif // NO_555_scan_pi_tex_goukey_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_goukey_zfil_565
+#ifndef NO_565_scan_pi_tex_goukey_zfil
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_goukey_zfil_565
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_goukey_zfil
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_COLORKEY
 #define PI_R5G6B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_tex_goukey_zfil_565
+#endif // NO_565_scan_pi_tex_goukey_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_goukey_zuse_555
+#ifndef NO_555_scan_pi_tex_goukey_zuse
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_goukey_zuse_555
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_goukey_zuse
 #define PI_ZUSE
 #define PI_GOURAUD
 #define PI_COLORKEY
 #define PI_R5G5B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_tex_goukey_zuse_555
+#endif // NO_555_scan_pi_tex_goukey_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_goukey_zuse_565
+#ifndef NO_565_scan_pi_tex_goukey_zuse
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_goukey_zuse_565
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_goukey_zuse
 #define PI_ZUSE
 #define PI_GOURAUD
 #define PI_COLORKEY
 #define PI_R5G6B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_tex_goukey_zuse_565
+#endif // NO_565_scan_pi_tex_goukey_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_flat_goufx_zfil_555
+#ifndef NO_555_scan_pi_flat_goufx_znone
 
-#define PI_SCANFUNC csScan_16_scan_pi_flat_goufx_zfil_555
+#define PI_SCANFUNC csScan_16_555_scan_pi_flat_goufx_znone
+#define PI_FLAT
+#define PI_GOURAUD
+#define PI_BLEND
+#define PI_R5G5B5
+#include "scanpi.inc"
+
+#endif // NO_555_scan_pi_flat_goufx_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_flat_goufx_znone
+
+#define PI_SCANFUNC csScan_16_565_scan_pi_flat_goufx_znone
+#define PI_FLAT
+#define PI_GOURAUD
+#define PI_BLEND
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_565_scan_pi_flat_goufx_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_pi_flat_goufx_zfil
+
+#define PI_SCANFUNC csScan_16_555_scan_pi_flat_goufx_zfil
 #define PI_ZFILL
 #define PI_FLAT
 #define PI_GOURAUD
@@ -1055,13 +1351,13 @@ void csScan_16_scan_fog_view_565 (int xx, unsigned char* d,
 #define PI_R5G5B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_flat_goufx_zfil_555
+#endif // NO_555_scan_pi_flat_goufx_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_flat_goufx_zfil_565
+#ifndef NO_565_scan_pi_flat_goufx_zfil
 
-#define PI_SCANFUNC csScan_16_scan_pi_flat_goufx_zfil_565
+#define PI_SCANFUNC csScan_16_565_scan_pi_flat_goufx_zfil
 #define PI_ZFILL
 #define PI_FLAT
 #define PI_GOURAUD
@@ -1069,13 +1365,13 @@ void csScan_16_scan_fog_view_565 (int xx, unsigned char* d,
 #define PI_R5G6B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_flat_goufx_zfil_565
+#endif // NO_565_scan_pi_flat_goufx_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_flat_goufx_zuse_555
+#ifndef NO_555_scan_pi_flat_goufx_zuse
 
-#define PI_SCANFUNC csScan_16_scan_pi_flat_goufx_zuse_555
+#define PI_SCANFUNC csScan_16_555_scan_pi_flat_goufx_zuse
 #define PI_ZUSE
 #define PI_FLAT
 #define PI_GOURAUD
@@ -1083,13 +1379,13 @@ void csScan_16_scan_fog_view_565 (int xx, unsigned char* d,
 #define PI_R5G5B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_flat_goufx_zuse_555
+#endif // NO_555_scan_pi_flat_goufx_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_flat_goufx_zuse_565
+#ifndef NO_565_scan_pi_flat_goufx_zuse
 
-#define PI_SCANFUNC csScan_16_scan_pi_flat_goufx_zuse_565
+#define PI_SCANFUNC csScan_16_565_scan_pi_flat_goufx_zuse
 #define PI_ZUSE
 #define PI_FLAT
 #define PI_GOURAUD
@@ -1097,65 +1393,115 @@ void csScan_16_scan_fog_view_565 (int xx, unsigned char* d,
 #define PI_R5G6B5
 #include "scanpi.inc"
 
-#endif // NO_scan_pi_flat_goufx_zuse_565
+#endif // NO_565_scan_pi_flat_goufx_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_goufx_zfil_555
+#ifndef NO_555_scan_pi_tex_goufx_znone
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_goufx_zfil_555
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_goufx_znone
+#define PI_GOURAUD
+#define PI_BLEND
+#define PI_R5G5B5
+#include "scanpi.inc"
+
+#endif // NO_555_scan_pi_tex_goufx_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_tex_goufx_znone
+
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_goufx_znone
+#define PI_GOURAUD
+#define PI_BLEND
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_565_scan_pi_tex_goufx_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_pi_tex_goufx_zfil
+
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_goufx_zfil
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_BLEND
 #define PI_R5G5B5
 #include "scanpi.inc"
 
-#endif
+#endif // NO_555_scan_pi_tex_goufx_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_goufx_zfil_565
+#ifndef NO_565_scan_pi_tex_goufx_zfil
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_goufx_zfil_565
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_goufx_zfil
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_BLEND
 #define PI_R5G6B5
 #include "scanpi.inc"
 
-#endif
+#endif // NO_565_scan_pi_tex_goufx_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_goufx_zuse_555
+#ifndef NO_555_scan_pi_tex_goufx_zuse
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_goufx_zuse_555
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_goufx_zuse
 #define PI_ZUSE
 #define PI_GOURAUD
 #define PI_BLEND
 #define PI_R5G5B5
 #include "scanpi.inc"
 
-#endif
+#endif // NO_555_scan_pi_tex_goufx_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_goufx_zuse_565
+#ifndef NO_565_scan_pi_tex_goufx_zuse
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_goufx_zuse_565
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_goufx_zuse
 #define PI_ZUSE
 #define PI_GOURAUD
 #define PI_BLEND
 #define PI_R5G6B5
 #include "scanpi.inc"
 
-#endif
+#endif // NO_565_scan_pi_tex_goufx_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_goufxkey_zfil_555
+#ifndef NO_555_scan_pi_tex_goufxkey_znone
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_goufxkey_zfil_555
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_goufxkey_znone
+#define PI_GOURAUD
+#define PI_COLORKEY
+#define PI_BLEND
+#define PI_R5G5B5
+#include "scanpi.inc"
+
+#endif // NO_555_scan_pi_tex_goufxkey_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_pi_tex_goufxkey_znone
+
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_goufxkey_znone
+#define PI_GOURAUD
+#define PI_COLORKEY
+#define PI_BLEND
+#define PI_R5G6B5
+#include "scanpi.inc"
+
+#endif // NO_565_scan_pi_tex_goufxkey_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_pi_tex_goufxkey_zfil
+
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_goufxkey_zfil
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_COLORKEY
@@ -1163,13 +1509,13 @@ void csScan_16_scan_fog_view_565 (int xx, unsigned char* d,
 #define PI_R5G5B5
 #include "scanpi.inc"
 
-#endif
+#endif // NO_555_scan_pi_tex_goufxkey_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_goufxkey_zfil_565
+#ifndef NO_565_scan_pi_tex_goufxkey_zfil
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_goufxkey_zfil_565
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_goufxkey_zfil
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_COLORKEY
@@ -1177,13 +1523,13 @@ void csScan_16_scan_fog_view_565 (int xx, unsigned char* d,
 #define PI_R5G6B5
 #include "scanpi.inc"
 
-#endif
+#endif // NO_565_scan_pi_tex_goufxkey_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_goufxkey_zuse_555
+#ifndef NO_555_scan_pi_tex_goufxkey_zuse
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_goufxkey_zuse_555
+#define PI_SCANFUNC csScan_16_555_scan_pi_tex_goufxkey_zuse
 #define PI_ZUSE
 #define PI_GOURAUD
 #define PI_COLORKEY
@@ -1191,13 +1537,13 @@ void csScan_16_scan_fog_view_565 (int xx, unsigned char* d,
 #define PI_R5G5B5
 #include "scanpi.inc"
 
-#endif
+#endif // NO_555_scan_pi_tex_goufxkey_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_goufxkey_zuse_565
+#ifndef NO_565_scan_pi_tex_goufxkey_zuse
 
-#define PI_SCANFUNC csScan_16_scan_pi_tex_goufxkey_zuse_565
+#define PI_SCANFUNC csScan_16_565_scan_pi_tex_goufxkey_zuse
 #define PI_ZUSE
 #define PI_GOURAUD
 #define PI_COLORKEY
@@ -1205,6 +1551,6 @@ void csScan_16_scan_fog_view_565 (int xx, unsigned char* d,
 #define PI_R5G6B5
 #include "scanpi.inc"
 
-#endif
+#endif // NO_565_scan_pi_tex_goufxkey_zuse
 
 //------------------------------------------------------------------

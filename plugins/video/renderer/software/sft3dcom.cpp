@@ -85,51 +85,67 @@ int csGraphics3DSoftwareCommon::filter_bf = 1;
 #define SCANPROC_TEX_ZUSE               0x07
 #define SCANPROC_TEX_KEY_ZFIL           0x08
 #define SCANPROC_TEX_KEY_ZUSE           0x09
+#define SCANPROC_TEX_ALPHA_ZFIL         0x0a
+#define SCANPROC_TEX_ALPHA_ZUSE         0x0b
+#define SCANPROC_MAP_ALPHA_ZFIL         0x0c
+#define SCANPROC_MAP_ALPHA_ZUSE         0x0d
 // these do not have "zuse" counterparts
-#define SCANPROC_ZFIL                   0x0a
-#define SCANPROC_FOG                    0x0b
-#define SCANPROC_FOG_VIEW               0x0c
-#define SCANPROC_TEX_ALPHA              0x0d
-#define SCANPROC_MAP_ALPHA              0x0e
+#define SCANPROC_ZFIL                   0x0e
+#define SCANPROC_FOG                    0x0f
+#define SCANPROC_FOG_VIEW               0x10
 
 // The following routines have a different prototype
 
 // Flat-shaded perspective-incorrect routines
-#define SCANPROC_PI_FLAT_ZFIL           0x00
-#define SCANPROC_PI_FLAT_ZUSE           0x01
+#define SCANPROC_PI_FLAT_ZNONE          0x00
+#define SCANPROC_PI_FLAT_ZFIL           0x01
+#define SCANPROC_PI_FLAT_ZUSE           0x02
 // Textured flat-shaded polygons
-#define SCANPROC_PI_TEX_ZFIL            0x02
-#define SCANPROC_PI_TEX_ZUSE            0x03
-#define SCANPROC_PI_TEX_KEY_ZFIL        0x04
-#define SCANPROC_PI_TEX_KEY_ZUSE        0x05
+#define SCANPROC_PI_TEX_ZNONE           0x03
+#define SCANPROC_PI_TEX_ZFIL            0x04
+#define SCANPROC_PI_TEX_ZUSE            0x05
+#define SCANPROC_PI_TEX_KEY_ZNONE       0x06
+#define SCANPROC_PI_TEX_KEY_ZFIL        0x07
+#define SCANPROC_PI_TEX_KEY_ZUSE        0x08
 // Scanline drawing routines with flat shading + effects.
-#define SCANPROC_PI_FLAT_FX_ZFIL        0x06
-#define SCANPROC_PI_FLAT_FX_ZUSE        0x07
-#define SCANPROC_PI_TEX_FX_ZFIL         0x08
-#define SCANPROC_PI_TEX_FX_ZUSE         0x09
-#define SCANPROC_PI_TEX_FXKEY_ZFIL      0x0a
-#define SCANPROC_PI_TEX_FXKEY_ZUSE      0x0b
+#define SCANPROC_PI_FLAT_FX_ZNONE       0x09
+#define SCANPROC_PI_FLAT_FX_ZFIL        0x0a
+#define SCANPROC_PI_FLAT_FX_ZUSE        0x0b
+#define SCANPROC_PI_TEX_FX_ZNONE        0x0c
+#define SCANPROC_PI_TEX_FX_ZFIL         0x0d
+#define SCANPROC_PI_TEX_FX_ZUSE         0x0e
+#define SCANPROC_PI_TEX_FXKEY_ZNONE     0x0f
+#define SCANPROC_PI_TEX_FXKEY_ZFIL      0x10
+#define SCANPROC_PI_TEX_FXKEY_ZUSE      0x11
 // Perspective-incorrect flat-shaded alpha-mapped texture
-#define SCANPROC_PI_TEX_ALPHA           0x0c
+#define SCANPROC_PI_TEX_ALPHA_ZNONE     0x12
+#define SCANPROC_PI_TEX_ALPHA_ZFIL      0x13
+#define SCANPROC_PI_TEX_ALPHA_ZUSE      0x14
 
 // Gouraud-shaded PI routines should have same indices
 // as their non-Gouraud counterparts. Every routine except
 // flat-shaded ones have two versions: without table-driven
 // effects (FX) and one with them.
-#define SCANPROC_PI_FLAT_GOU_ZFIL       0x00
-#define SCANPROC_PI_FLAT_GOU_ZUSE       0x01
+#define SCANPROC_PI_FLAT_GOU_ZNONE      0x00
+#define SCANPROC_PI_FLAT_GOU_ZFIL       0x01
+#define SCANPROC_PI_FLAT_GOU_ZUSE       0x02
 // Textured Gouraud-shaded polygons
-#define SCANPROC_PI_TEX_GOU_ZFIL        0x02
-#define SCANPROC_PI_TEX_GOU_ZUSE        0x03
-#define SCANPROC_PI_TEX_GOUKEY_ZFIL     0x04
-#define SCANPROC_PI_TEX_GOUKEY_ZUSE     0x05
+#define SCANPROC_PI_TEX_GOU_ZNONE       0x03
+#define SCANPROC_PI_TEX_GOU_ZFIL        0x04
+#define SCANPROC_PI_TEX_GOU_ZUSE        0x05
+#define SCANPROC_PI_TEX_GOUKEY_ZNONE    0x06
+#define SCANPROC_PI_TEX_GOUKEY_ZFIL     0x07
+#define SCANPROC_PI_TEX_GOUKEY_ZUSE     0x08
 // Scanline drawing routines with Gouraud shading + effects.
-#define SCANPROC_PI_FLAT_GOUFX_ZFIL     0x06
-#define SCANPROC_PI_FLAT_GOUFX_ZUSE     0x07
-#define SCANPROC_PI_TEX_GOUFX_ZFIL      0x08
-#define SCANPROC_PI_TEX_GOUFX_ZUSE      0x09
-#define SCANPROC_PI_TEX_GOUFXKEY_ZFIL   0x0a
-#define SCANPROC_PI_TEX_GOUFXKEY_ZUSE   0x0b
+#define SCANPROC_PI_FLAT_GOUFX_ZNONE    0x09
+#define SCANPROC_PI_FLAT_GOUFX_ZFIL     0x0a
+#define SCANPROC_PI_FLAT_GOUFX_ZUSE     0x0b
+#define SCANPROC_PI_TEX_GOUFX_ZNONE     0x0c
+#define SCANPROC_PI_TEX_GOUFX_ZFIL      0x0d
+#define SCANPROC_PI_TEX_GOUFX_ZUSE      0x0e
+#define SCANPROC_PI_TEX_GOUFXKEY_ZNONE  0x0f
+#define SCANPROC_PI_TEX_GOUFXKEY_ZFIL   0x10
+#define SCANPROC_PI_TEX_GOUFXKEY_ZUSE   0x11
 
 ///---------------------------------------------------------------------------
 csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon () :
@@ -390,36 +406,52 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProc [SCANPROC_MAP_KEY_ZFIL] = csScan_8_scan_map_key_zfil;
       ScanProc [SCANPROC_MAP_KEY_ZUSE] = csScan_8_scan_map_key_zuse;
 
-      ScanProc [SCANPROC_TEX_ALPHA] = csScan_8_scan_tex_alpha;
-      ScanProc [SCANPROC_MAP_ALPHA] = csScan_8_scan_map_alpha;
+      ScanProc [SCANPROC_TEX_ALPHA_ZFIL] = csScan_8_scan_tex_alpha_zfil;
+      ScanProc [SCANPROC_TEX_ALPHA_ZUSE] = csScan_8_scan_tex_alpha_zuse;
+      ScanProc [SCANPROC_MAP_ALPHA_ZFIL] = csScan_8_scan_map_alpha_zfil;
+      ScanProc [SCANPROC_MAP_ALPHA_ZUSE] = csScan_8_scan_map_alpha_zuse;
 
       ScanProc [SCANPROC_FOG] = csScan_8_scan_fog;
       ScanProc [SCANPROC_FOG_VIEW] = csScan_8_scan_fog_view;
 
+      ScanProcPI [SCANPROC_PI_FLAT_ZNONE] = csScan_8_scan_pi_flat_znone;
       ScanProcPI [SCANPROC_PI_FLAT_ZFIL] = csScan_8_scan_pi_flat_zfil;
       ScanProcPI [SCANPROC_PI_FLAT_ZUSE] = csScan_8_scan_pi_flat_zuse;
+      ScanProcPI [SCANPROC_PI_TEX_ZNONE] = csScan_8_scan_pi_tex_znone;
       ScanProcPI [SCANPROC_PI_TEX_ZFIL] = csScan_8_scan_pi_tex_zfil;
       ScanProcPI [SCANPROC_PI_TEX_ZUSE] = csScan_8_scan_pi_tex_zuse;
+      ScanProcPI [SCANPROC_PI_TEX_KEY_ZNONE] = csScan_8_scan_pi_tex_key_znone;
       ScanProcPI [SCANPROC_PI_TEX_KEY_ZFIL] = csScan_8_scan_pi_tex_key_zfil;
       ScanProcPI [SCANPROC_PI_TEX_KEY_ZUSE] = csScan_8_scan_pi_tex_key_zuse;
+      ScanProcPI [SCANPROC_PI_FLAT_FX_ZNONE] = csScan_8_scan_pi_flat_fx_znone;
       ScanProcPI [SCANPROC_PI_FLAT_FX_ZFIL] = csScan_8_scan_pi_flat_fx_zfil;
       ScanProcPI [SCANPROC_PI_FLAT_FX_ZUSE] = csScan_8_scan_pi_flat_fx_zuse;
+      ScanProcPI [SCANPROC_PI_TEX_FX_ZNONE] = csScan_8_scan_pi_tex_fx_znone;
       ScanProcPI [SCANPROC_PI_TEX_FX_ZFIL] = csScan_8_scan_pi_tex_fx_zfil;
       ScanProcPI [SCANPROC_PI_TEX_FX_ZUSE] = csScan_8_scan_pi_tex_fx_zuse;
+      ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZNONE] = csScan_8_scan_pi_tex_fxkey_znone;
       ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZFIL] = csScan_8_scan_pi_tex_fxkey_zfil;
       ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZUSE] = csScan_8_scan_pi_tex_fxkey_zuse;
-      ScanProcPI [SCANPROC_PI_TEX_ALPHA] = csScan_8_scan_pi_tex_alpha;
+      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZNONE] = csScan_8_scan_pi_tex_alpha_znone;
+      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZFIL] = csScan_8_scan_pi_tex_alpha_zfil;
+      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZUSE] = csScan_8_scan_pi_tex_alpha_zuse;
 
+      ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZNONE] = csScan_8_scan_pi_flat_gou_znone;
       ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZFIL] = csScan_8_scan_pi_flat_gou_zfil;
       ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZUSE] = csScan_8_scan_pi_flat_gou_zuse;
+      ScanProcPIG [SCANPROC_PI_TEX_GOU_ZNONE] = csScan_8_scan_pi_tex_gou_znone;
       ScanProcPIG [SCANPROC_PI_TEX_GOU_ZFIL] = csScan_8_scan_pi_tex_gou_zfil;
       ScanProcPIG [SCANPROC_PI_TEX_GOU_ZUSE] = csScan_8_scan_pi_tex_gou_zuse;
+      ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZNONE] = csScan_8_scan_pi_tex_goukey_znone;
       ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZFIL] = csScan_8_scan_pi_tex_goukey_zfil;
       ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZUSE] = csScan_8_scan_pi_tex_goukey_zuse;
+      ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZNONE] = csScan_8_scan_pi_flat_goufx_znone;
       ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZFIL] = csScan_8_scan_pi_flat_goufx_zfil;
       ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZUSE] = csScan_8_scan_pi_flat_goufx_zuse;
+      ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZNONE] = csScan_8_scan_pi_tex_goufx_znone;
       ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZFIL] = csScan_8_scan_pi_tex_goufx_zfil;
       ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZUSE] = csScan_8_scan_pi_tex_goufx_zuse;
+      ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZNONE] = csScan_8_scan_pi_tex_goufxkey_znone;
       ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZFIL] = csScan_8_scan_pi_tex_goufxkey_zfil;
       ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZUSE] = csScan_8_scan_pi_tex_goufxkey_zuse;
       break;
@@ -440,8 +472,8 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProc [SCANPROC_MAP_ZFIL] =
         bilinear_filter == 2 ?
         (pfmt.GreenBits == 5 ?
-          csScan_16_scan_map_filt2_zfil_555 :
-          csScan_16_scan_map_filt2_zfil_565) :
+          csScan_16_555_scan_map_filt2_zfil :
+          csScan_16_565_scan_map_filt2_zfil) :
         bilinear_filter == 1 ? csScan_16_scan_map_filt_zfil :
 #ifdef DO_MMX
         UseMMX ? csScan_16_mmx_scan_map_zfil :
@@ -450,8 +482,8 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProc [SCANPROC_MAP_ZUSE] =
         bilinear_filter == 2 ?
         (pfmt.GreenBits == 5 ?
-          csScan_16_scan_map_filt2_zuse_555 :
-          csScan_16_scan_map_filt2_zuse_565) :
+          csScan_16_555_scan_map_filt2_zuse :
+          csScan_16_565_scan_map_filt2_zuse) :
         csScan_16_scan_map_zuse;
 
       ScanProc [SCANPROC_TEX_KEY_ZFIL] = csScan_16_scan_tex_key_zfil;
@@ -459,89 +491,131 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProc [SCANPROC_MAP_KEY_ZFIL] = csScan_16_scan_map_key_zfil;
       ScanProc [SCANPROC_MAP_KEY_ZUSE] = csScan_16_scan_map_key_zuse;
 
-      ScanProc [SCANPROC_TEX_ALPHA] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_tex_alpha_555 :
-        csScan_16_scan_tex_alpha_565;
-      ScanProc [SCANPROC_MAP_ALPHA] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_map_alpha_555 :
-        csScan_16_scan_map_alpha_565;
+      ScanProc [SCANPROC_TEX_ALPHA_ZFIL] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_tex_alpha_zfil :
+        csScan_16_565_scan_tex_alpha_zfil;
+      ScanProc [SCANPROC_TEX_ALPHA_ZUSE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_tex_alpha_zuse :
+        csScan_16_565_scan_tex_alpha_zuse;
+      ScanProc [SCANPROC_MAP_ALPHA_ZFIL] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_map_alpha_zfil :
+        csScan_16_565_scan_map_alpha_zfil;
+      ScanProc [SCANPROC_MAP_ALPHA_ZUSE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_map_alpha_zuse :
+        csScan_16_565_scan_map_alpha_zuse;
 
       ScanProc [SCANPROC_FOG] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_fog_555 :
-        csScan_16_scan_fog_565;
+        csScan_16_555_scan_fog :
+        csScan_16_565_scan_fog;
       ScanProc [SCANPROC_FOG_VIEW] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_fog_view_555 :
-        csScan_16_scan_fog_view_565;
+        csScan_16_555_scan_fog_view :
+        csScan_16_565_scan_fog_view;
 
+      ScanProcPI [SCANPROC_PI_FLAT_ZNONE] = csScan_16_scan_pi_flat_znone;
       ScanProcPI [SCANPROC_PI_FLAT_ZFIL] = csScan_16_scan_pi_flat_zfil;
       ScanProcPI [SCANPROC_PI_FLAT_ZUSE] = csScan_16_scan_pi_flat_zuse;
+      ScanProcPI [SCANPROC_PI_TEX_ZNONE] = csScan_16_scan_pi_tex_znone;
       ScanProcPI [SCANPROC_PI_TEX_ZFIL] = csScan_16_scan_pi_tex_zfil;
       ScanProcPI [SCANPROC_PI_TEX_ZUSE] =
 #ifdef DO_MMX
         UseMMX ? csScan_16_mmx_scan_pi_tex_zuse :
 #endif
         csScan_16_scan_pi_tex_zuse;
+      ScanProcPI [SCANPROC_PI_TEX_KEY_ZNONE] = csScan_16_scan_pi_tex_key_znone;
       ScanProcPI [SCANPROC_PI_TEX_KEY_ZFIL] = csScan_16_scan_pi_tex_key_zfil;
       ScanProcPI [SCANPROC_PI_TEX_KEY_ZUSE] = csScan_16_scan_pi_tex_key_zuse;
 
+      ScanProcPI [SCANPROC_PI_FLAT_FX_ZNONE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_flat_fx_znone :
+        csScan_16_565_scan_pi_flat_fx_znone;
       ScanProcPI [SCANPROC_PI_FLAT_FX_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_pi_flat_fx_zfil_555 :
-        csScan_16_scan_pi_flat_fx_zfil_565;
+        csScan_16_555_scan_pi_flat_fx_zfil :
+        csScan_16_565_scan_pi_flat_fx_zfil;
       ScanProcPI [SCANPROC_PI_FLAT_FX_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_pi_flat_fx_zuse_555 :
-        csScan_16_scan_pi_flat_fx_zuse_565;
+        csScan_16_555_scan_pi_flat_fx_zuse :
+        csScan_16_565_scan_pi_flat_fx_zuse;
+      ScanProcPI [SCANPROC_PI_TEX_FX_ZNONE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tex_fx_znone :
+        csScan_16_565_scan_pi_tex_fx_znone;
       ScanProcPI [SCANPROC_PI_TEX_FX_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_pi_tex_fx_zfil_555 :
-        csScan_16_scan_pi_tex_fx_zfil_565;
+        csScan_16_555_scan_pi_tex_fx_zfil :
+        csScan_16_565_scan_pi_tex_fx_zfil;
       ScanProcPI [SCANPROC_PI_TEX_FX_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_pi_tex_fx_zuse_555 :
-        csScan_16_scan_pi_tex_fx_zuse_565;
+        csScan_16_555_scan_pi_tex_fx_zuse :
+        csScan_16_565_scan_pi_tex_fx_zuse;
+      ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZNONE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tex_fxkey_znone :
+        csScan_16_565_scan_pi_tex_fxkey_znone;
       ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_pi_tex_fxkey_zfil_555 :
-        csScan_16_scan_pi_tex_fxkey_zfil_565;
+        csScan_16_555_scan_pi_tex_fxkey_zfil :
+        csScan_16_565_scan_pi_tex_fxkey_zfil;
       ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_pi_tex_fxkey_zuse_555 :
-        csScan_16_scan_pi_tex_fxkey_zuse_565;
-      ScanProcPI [SCANPROC_PI_TEX_ALPHA] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_pi_tex_alpha_555 :
-        csScan_16_scan_pi_tex_alpha_565;
+        csScan_16_555_scan_pi_tex_fxkey_zuse :
+        csScan_16_565_scan_pi_tex_fxkey_zuse;
+      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZNONE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tex_alpha_znone :
+        csScan_16_565_scan_pi_tex_alpha_znone;
+      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZFIL] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tex_alpha_zfil :
+        csScan_16_565_scan_pi_tex_alpha_zfil;
+      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZUSE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tex_alpha_zuse :
+        csScan_16_565_scan_pi_tex_alpha_zuse;
 
+      ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZNONE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_flat_gou_znone :
+        csScan_16_565_scan_pi_flat_gou_znone;
       ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_pi_flat_gou_zfil_555 :
-        csScan_16_scan_pi_flat_gou_zfil_565;
+        csScan_16_555_scan_pi_flat_gou_zfil :
+        csScan_16_565_scan_pi_flat_gou_zfil;
       ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_pi_flat_gou_zuse_555 :
-        csScan_16_scan_pi_flat_gou_zuse_565;
+        csScan_16_555_scan_pi_flat_gou_zuse :
+        csScan_16_565_scan_pi_flat_gou_zuse;
+      ScanProcPIG [SCANPROC_PI_TEX_GOU_ZNONE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tex_gou_znone :
+        csScan_16_565_scan_pi_tex_gou_znone;
       ScanProcPIG [SCANPROC_PI_TEX_GOU_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_pi_tex_gou_zfil_555 :
-        csScan_16_scan_pi_tex_gou_zfil_565;
+        csScan_16_555_scan_pi_tex_gou_zfil :
+        csScan_16_565_scan_pi_tex_gou_zfil;
       ScanProcPIG [SCANPROC_PI_TEX_GOU_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_pi_tex_gou_zuse_555 :
-        csScan_16_scan_pi_tex_gou_zuse_565;
+        csScan_16_555_scan_pi_tex_gou_zuse :
+        csScan_16_565_scan_pi_tex_gou_zuse;
+      ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZNONE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tex_goukey_znone :
+        csScan_16_565_scan_pi_tex_goukey_znone;
       ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_pi_tex_goukey_zfil_555 :
-        csScan_16_scan_pi_tex_goukey_zfil_565;
+        csScan_16_555_scan_pi_tex_goukey_zfil :
+        csScan_16_565_scan_pi_tex_goukey_zfil;
       ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_pi_tex_goukey_zuse_555 :
-        csScan_16_scan_pi_tex_goukey_zuse_565;
+        csScan_16_555_scan_pi_tex_goukey_zuse :
+        csScan_16_565_scan_pi_tex_goukey_zuse;
+      ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZNONE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_flat_goufx_znone :
+        csScan_16_565_scan_pi_flat_goufx_znone;
       ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_pi_flat_goufx_zfil_555 :
-        csScan_16_scan_pi_flat_goufx_zfil_565;
+        csScan_16_555_scan_pi_flat_goufx_zfil :
+        csScan_16_565_scan_pi_flat_goufx_zfil;
       ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_pi_flat_goufx_zuse_555 :
-        csScan_16_scan_pi_flat_goufx_zuse_565;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_pi_tex_goufx_zuse_555 :
-        csScan_16_scan_pi_tex_goufx_zuse_565;
+        csScan_16_555_scan_pi_flat_goufx_zuse :
+        csScan_16_565_scan_pi_flat_goufx_zuse;
+      ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZNONE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tex_goufx_znone :
+        csScan_16_565_scan_pi_tex_goufx_znone;
       ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_pi_tex_goufx_zfil_555 :
-        csScan_16_scan_pi_tex_goufx_zfil_565;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_pi_tex_goufxkey_zuse_555 :
-        csScan_16_scan_pi_tex_goufxkey_zuse_565;
+        csScan_16_555_scan_pi_tex_goufx_zfil :
+        csScan_16_565_scan_pi_tex_goufx_zfil;
+      ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZUSE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tex_goufx_zuse :
+        csScan_16_565_scan_pi_tex_goufx_zuse;
+      ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZNONE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tex_goufxkey_znone :
+        csScan_16_565_scan_pi_tex_goufxkey_znone;
       ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_scan_pi_tex_goufxkey_zfil_555 :
-        csScan_16_scan_pi_tex_goufxkey_zfil_565;
+        csScan_16_555_scan_pi_tex_goufxkey_zfil :
+        csScan_16_565_scan_pi_tex_goufxkey_zfil;
+      ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZUSE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tex_goufxkey_zuse :
+        csScan_16_565_scan_pi_tex_goufxkey_zuse;
       break;
 
     case 4:
@@ -572,38 +646,54 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProc [SCANPROC_MAP_KEY_ZFIL] = csScan_32_scan_map_key_zfil;
       ScanProc [SCANPROC_MAP_KEY_ZUSE] = csScan_32_scan_map_key_zuse;
 
-      ScanProc [SCANPROC_TEX_ALPHA] = csScan_32_scan_tex_alpha;
-      ScanProc [SCANPROC_MAP_ALPHA] = csScan_32_scan_map_alpha;
+      ScanProc [SCANPROC_TEX_ALPHA_ZFIL] = csScan_32_scan_tex_alpha_zfil;
+      ScanProc [SCANPROC_TEX_ALPHA_ZUSE] = csScan_32_scan_tex_alpha_zuse;
+      ScanProc [SCANPROC_MAP_ALPHA_ZFIL] = csScan_32_scan_map_alpha_zfil;
+      ScanProc [SCANPROC_MAP_ALPHA_ZUSE] = csScan_32_scan_map_alpha_zuse;
 
       ScanProc [SCANPROC_FOG] = csScan_32_scan_fog;
       ScanProc [SCANPROC_FOG_VIEW] = csScan_32_scan_fog_view;
 
+      ScanProcPI [SCANPROC_PI_FLAT_ZNONE] = csScan_32_scan_pi_flat_znone;
       ScanProcPI [SCANPROC_PI_FLAT_ZFIL] = csScan_32_scan_pi_flat_zfil;
       ScanProcPI [SCANPROC_PI_FLAT_ZUSE] = csScan_32_scan_pi_flat_zuse;
+      ScanProcPI [SCANPROC_PI_TEX_ZNONE] = csScan_32_scan_pi_tex_znone;
       ScanProcPI [SCANPROC_PI_TEX_ZFIL] = csScan_32_scan_pi_tex_zfil;
       ScanProcPI [SCANPROC_PI_TEX_ZUSE] = csScan_32_scan_pi_tex_zuse;
+      ScanProcPI [SCANPROC_PI_TEX_KEY_ZNONE] = csScan_32_scan_pi_tex_key_znone;
       ScanProcPI [SCANPROC_PI_TEX_KEY_ZFIL] = csScan_32_scan_pi_tex_key_zfil;
       ScanProcPI [SCANPROC_PI_TEX_KEY_ZUSE] = csScan_32_scan_pi_tex_key_zuse;
+      ScanProcPI [SCANPROC_PI_FLAT_FX_ZNONE] = csScan_32_scan_pi_flat_fx_znone;
       ScanProcPI [SCANPROC_PI_FLAT_FX_ZFIL] = csScan_32_scan_pi_flat_fx_zfil;
       ScanProcPI [SCANPROC_PI_FLAT_FX_ZUSE] = csScan_32_scan_pi_flat_fx_zuse;
+      ScanProcPI [SCANPROC_PI_TEX_FX_ZNONE] = csScan_32_scan_pi_tex_fx_znone;
       ScanProcPI [SCANPROC_PI_TEX_FX_ZFIL] = csScan_32_scan_pi_tex_fx_zfil;
       ScanProcPI [SCANPROC_PI_TEX_FX_ZUSE] = csScan_32_scan_pi_tex_fx_zuse;
+      ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZNONE] = csScan_32_scan_pi_tex_fxkey_znone;
       ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZFIL] = csScan_32_scan_pi_tex_fxkey_zfil;
       ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZUSE] = csScan_32_scan_pi_tex_fxkey_zuse;
-      ScanProcPI [SCANPROC_PI_TEX_ALPHA] = csScan_32_scan_pi_tex_alpha;
+      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZNONE] = csScan_32_scan_pi_tex_alpha_znone;
+      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZFIL] = csScan_32_scan_pi_tex_alpha_zfil;
+      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZUSE] = csScan_32_scan_pi_tex_alpha_zuse;
 
+      ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZNONE] = csScan_32_scan_pi_flat_gou_znone;
       ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZFIL] = csScan_32_scan_pi_flat_gou_zfil;
       ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZUSE] = csScan_32_scan_pi_flat_gou_zuse;
+      ScanProcPIG [SCANPROC_PI_TEX_GOU_ZNONE] = csScan_32_scan_pi_tex_gou_znone;
       ScanProcPIG [SCANPROC_PI_TEX_GOU_ZFIL] = csScan_32_scan_pi_tex_gou_zfil;
       ScanProcPIG [SCANPROC_PI_TEX_GOU_ZUSE] = csScan_32_scan_pi_tex_gou_zuse;
+      ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZNONE] = csScan_32_scan_pi_tex_goukey_znone;
       ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZFIL] = csScan_32_scan_pi_tex_goukey_zfil;
       ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZUSE] = csScan_32_scan_pi_tex_goukey_zuse;
+      ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZNONE] = csScan_32_scan_pi_flat_goufx_znone;
       ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZFIL] = csScan_32_scan_pi_flat_goufx_zfil;
       ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZUSE] = csScan_32_scan_pi_flat_goufx_zuse;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZUSE] = csScan_32_scan_pi_tex_goufx_zuse;
+      ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZNONE] = csScan_32_scan_pi_tex_goufx_znone;
       ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZFIL] = csScan_32_scan_pi_tex_goufx_zfil;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZUSE] = csScan_32_scan_pi_tex_goufxkey_zuse;
+      ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZUSE] = csScan_32_scan_pi_tex_goufx_zuse;
+      ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZNONE] = csScan_32_scan_pi_tex_goufxkey_znone;
       ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZFIL] = csScan_32_scan_pi_tex_goufxkey_zfil;
+      ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZUSE] = csScan_32_scan_pi_tex_goufxkey_zuse;
       break;
   } /* endswitch */
 
@@ -658,9 +748,9 @@ csDrawScanline* csGraphics3DSoftwareCommon::ScanProc_16_Alpha
     return csScan_16_scan_map_zfil;
   // general case
   if (This->pfmt.GreenBits == 5)
-    return csScan_16_scan_map_fixalpha_555;
+    return csScan_16_555_scan_map_fixalpha;
   else
-    return csScan_16_scan_map_fixalpha_565;
+    return csScan_16_565_scan_map_fixalpha;
 }
 
 csDrawScanline* csGraphics3DSoftwareCommon::ScanProc_32_Alpha
@@ -989,7 +1079,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   {
     // Sometimes double precision in the clipper is not enough. Do an epsilon fuzz
     // so not to reject cases when bounds exceeded by less than epsilon. smgh
-    if (((poly.vertices[i].sx + EPSILON) < 0) || 
+    if (((poly.vertices[i].sx + EPSILON) < 0) ||
 	((poly.vertices[i].sx - EPSILON) > width))
       return;
 
@@ -1010,7 +1100,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
       num_vertices++;
   }
 
-  if (((min_y + EPSILON) < 0) || 
+  if (((min_y + EPSILON) < 0) ||
       ((max_y - EPSILON) > height))
     return;
 
@@ -1259,7 +1349,7 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
 
   // Sometimes double precision in the clipper is not enough. Do an epsilon fuzz
   // so not to reject cases when bounds exceeded by less than epsilon. smgh
-  if (((poly.vertices[0].sx + EPSILON) < 0) || 
+  if (((poly.vertices[0].sx + EPSILON) < 0) ||
       ((poly.vertices[0].sx - EPSILON) > width))
     return;
 
@@ -1271,7 +1361,7 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
   int num_vertices = 1;
   for (i = 1 ; i < poly.num ; i++)
   {
-    if (((poly.vertices[i].sx + EPSILON) < 0) || 
+    if (((poly.vertices[i].sx + EPSILON) < 0) ||
 	((poly.vertices[i].sx - EPSILON) > width))
       return;
 
@@ -1299,7 +1389,7 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
       num_vertices++;
   }
 
-  if (((min_y + EPSILON) < 0) || 
+  if (((min_y + EPSILON) < 0) ||
       ((max_y - EPSILON) > height))
     return;
 
@@ -1594,14 +1684,18 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
 #define CHECK(sx)					\
       {							\
         float cx = sx - float (width2);			\
-        float z = 1 / (M * cx + N * cy + O);		\
-        float u = (J1 * cx + J2 * cy + J3) * z;		\
-        float v = (K1 * cx + K2 * cy + K3) * z;		\
+        float z = M * cx + N * cy + O;			\
+        if (ABS (z) > SMALL_EPSILON)			\
+        {						\
+          z = 1 / z;					\
+          float u = (J1 * cx + J2 * cy + J3) * z;	\
+          float v = (K1 * cx + K2 * cy + K3) * z;	\
 							\
-        if (u < u_min) u_min = u;			\
-        if (u > u_max) u_max = u;			\
-        if (v < v_min) v_min = v;			\
-        if (v > v_max) v_max = v;			\
+          if (u < u_min) u_min = u;			\
+          if (u > u_max) u_max = u;			\
+          if (v < v_min) v_min = v;			\
+          if (v > v_max) v_max = v;			\
+        }						\
       }
 
       float cy = (float (sy) - 0.5 - float (height2));
@@ -1641,7 +1735,10 @@ texr_done:
       if (tex_keycolor)
         scan_index += 2;
       else if ((Scan.AlphaMap = txt_unl->get_alphamap ()))
-        scan_index = Scan.bitmap2 ? SCANPROC_MAP_ALPHA : SCANPROC_TEX_ALPHA;
+      {
+        scan_index = Scan.bitmap2 ? SCANPROC_MAP_ALPHA_ZFIL : SCANPROC_TEX_ALPHA_ZFIL;
+        if (z_buf_mode == CS_ZBUF_USE) scan_index++;
+      }
     dscan = ScanProc [scan_index];
   }
   else
@@ -1664,7 +1761,7 @@ texr_done:
       {
         // Check first if polygon has been finished
         if (scanR2 == min_i)
-          return; //goto finish;
+          goto finish;
         scanR1 = scanR2;
 	if (++scanR2 >= poly.num)
 	  scanR2 = 0;
@@ -1764,9 +1861,10 @@ texr_done:
     } /* endwhile */
   } /* endfor */
 
-//  finish:
-//    if ((tex_mm->GetFlags () & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
-//      tcache->uncache_texture (0, tex);
+finish:
+  ;
+//if ((tex_mm->GetFlags () & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
+//  tcache->uncache_texture (0, tex);
 }
 
 void csGraphics3DSoftwareCommon::DrawPolygonDebug (G3DPolygonDP& poly)
@@ -2122,8 +2220,6 @@ void csGraphics3DSoftwareCommon::StartPolygonFX (iMaterialHandle* handle,
     Scan.TexturePalette = tex_mm->GetColorMap ();
     Scan.AlphaMap = txt_unl->get_alphamap ();
     Scan.PrivateCMap = tex_mm->GetPaletteToGlobal8 ();
-    if (Scan.AlphaMap)
-      mode &= ~CS_FX_GOURAUD;
   }
   else
     pqinfo.textured = false;
@@ -2137,7 +2233,10 @@ void csGraphics3DSoftwareCommon::StartPolygonFX (iMaterialHandle* handle,
   pqinfo.drawline_gouraud = NULL;
 
   if (pqinfo.textured && Scan.AlphaMap)
-    pqinfo.drawline = ScanProcPI [SCANPROC_PI_TEX_ALPHA];
+    pqinfo.drawline = ScanProcPI [
+      (z_buf_mode == CS_ZBUF_USE) ? SCANPROC_PI_TEX_ALPHA_ZUSE :
+      (z_buf_mode == CS_ZBUF_FILL) ? SCANPROC_PI_TEX_ALPHA_ZFIL :
+      SCANPROC_PI_TEX_ALPHA_ZNONE];
   else
     switch (mode & CS_FX_MASK_MIXMODE)
     {
@@ -2173,13 +2272,15 @@ zfill_only:
     }
 
   // Select draw scanline routines
-  int scan_index = pqinfo.textured ? SCANPROC_PI_TEX_ZFIL : SCANPROC_PI_FLAT_ZFIL;
-  if (z_buf_mode == CS_ZBUF_USE)
+  int scan_index = pqinfo.textured ? SCANPROC_PI_TEX_ZNONE : SCANPROC_PI_FLAT_ZNONE;
+  if (z_buf_mode == CS_ZBUF_FILL)
     scan_index++;
-  if (pqinfo.textured && pqinfo.keycolor)
+  else if (z_buf_mode == CS_ZBUF_USE)
     scan_index += 2;
+  if (pqinfo.textured && pqinfo.keycolor)
+    scan_index += 3;
   if ((mode & CS_FX_MASK_MIXMODE) != CS_FX_COPY)
-    scan_index += 6;
+    scan_index += 9;
   if (!pqinfo.drawline)
     pqinfo.drawline = ScanProcPI [scan_index];
   if (mode & CS_FX_GOURAUD)
@@ -2280,7 +2381,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
   }
 
   // If the polygon exceeds the screen, it is an engine failure
-  if (((bot_y + EPSILON) < 0) || 
+  if (((bot_y + EPSILON) < 0) ||
       ((top_y - EPSILON) > height))
     return;
 

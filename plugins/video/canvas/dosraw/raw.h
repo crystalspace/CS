@@ -24,15 +24,12 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "cssys/djgpp/idjgpp.h"
 
 /// Raw DOS SVGA 2D graphics driver
 class csGraphics2DDOSRAW : public csGraphics2D
 {
   /// Palette has been changed?
   bool PaletteChanged;
-  /// Pointer to DOS-specific interface
-  iDosSystemDriver* DosSystem;
 
 public:
   DECLARE_IBASE;

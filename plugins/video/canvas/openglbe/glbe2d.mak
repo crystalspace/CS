@@ -36,7 +36,7 @@ CFLAGS.GLBE2D+=-I/boot/home/develop/headers/be/opengl
 # The 2D GLBe driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
   GLBE2D=$(OUTDLL)glbe2d$(DLL)
-  DEP.BE2D = $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.BE2D = $(CSUTIL.LIB) $(CSSYS.LIB)
   LIBS.GLBE2D=-lGL
 else
   GLBE2D=$(OUT)$(LIB_PREFIX)glbe2d$(LIB)

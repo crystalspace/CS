@@ -22,7 +22,6 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "video/canvas/dosraw/raw.h"
-#include "cssys/djgpp/idjgpp.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
 
@@ -54,21 +53,12 @@ csGraphics2DDOSRAW::csGraphics2DDOSRAW (iBase *iParent) :
 csGraphics2DDOSRAW::~csGraphics2DDOSRAW ()
 {
   Close();
-  DosSystem->DecRef ();
 }
 
 bool csGraphics2DDOSRAW::Initialize (iSystem *pSystem)
 {
   if (!csGraphics2D::Initialize (pSystem))
     return false;
-
-  DosSystem = QUERY_INTERFACE (System, iDosSystemDriver);
-  if (!DosSystem)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "The system driver does not support "
-                             "the iDosSystemDriver interface\n");
-    return false;
-  }
 
   // Tell videosystem not to wait vertical retrace during page flip
   VS.WaitVRetrace (false);
@@ -160,7 +150,7 @@ bool csGraphics2DDOSRAW::Open (const char* Title)
 #endif // USE_ALLEGRO
 
   // Tell printf() to shut up
-  System->EnablePrintf (false);
+  System->SystemExtension ("EnablePrintf", false);
 
   // Update drawing routine addresses
   switch (pfmt.PixelBytes)
@@ -197,7 +187,7 @@ void csGraphics2DDOSRAW::Close ()
 #endif // USE_ALLEGRO
   csGraphics2D::Close ();
   // Tell printf() it can work now
-  System->EnablePrintf (true);
+  System->SystemExtension ("EnablePrintf", true);
 }
 
 void csGraphics2DDOSRAW::Print (csRect *area)
@@ -238,7 +228,7 @@ void csGraphics2DDOSRAW::Print (csRect *area)
 
 bool csGraphics2DDOSRAW::SetMousePosition (int x, int y)
 {
-  return DosSystem->SetMousePosition (x, y);
+  return System->SystemExtension ("SetMousePosition", x, y);
 }
 
 bool csGraphics2DDOSRAW::SetMouseCursor (csMouseCursorID iShape)

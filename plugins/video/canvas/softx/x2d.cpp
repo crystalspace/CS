@@ -21,8 +21,10 @@
 #include "csutil/scf.h"
 #include "cssys/csevent.h"
 #include "video/canvas/common/x11comm.h"
+#include "video/canvas/common/scancode.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
+#include "ievent.h"
 #include "x2d.h"
 
 IMPLEMENT_FACTORY (csGraphics2DXLib)
@@ -35,6 +37,7 @@ EXPORT_CLASS_TABLE_END
 IMPLEMENT_IBASE (csGraphics2DXLib)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics2D)
+  IMPLEMENTS_INTERFACE (iEventPlug)
 IMPLEMENT_IBASE_END
 
 csGraphics2DXLib::csGraphics2DXLib (iBase *iParent) :
@@ -46,6 +49,7 @@ csGraphics2DXLib::csGraphics2DXLib (iBase *iParent) :
   EmptyMouseCursor = 0;
   memset (&MouseCursor, 0, sizeof (MouseCursor));
   leader_window = window = 0;
+  EventOutlet = NULL;
 }
 
 bool csGraphics2DXLib::Initialize (iSystem *pSystem)
@@ -243,6 +247,8 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
 
   // Tell system driver to call us on every frame
   System->CallOnEvents (this, CSMASK_Nothing);
+  // Create the event outlet
+  EventOutlet = System->CreateEventOutlet (this);
 
 #ifdef XFREE86VM
   InitVidModes();
@@ -256,6 +262,8 @@ csGraphics2DXLib::~csGraphics2DXLib(void)
   Close();
   delete [] sim_lt8;
   delete [] sim_lt16;
+  if (EventOutlet)
+    EventOutlet->DecRef ();
 }
 
 bool csGraphics2DXLib::Open(const char *Title)
@@ -294,6 +302,7 @@ bool csGraphics2DXLib::Open(const char *Title)
   wm_window = XCreateWindow (dpy, root_window, 64, 16, wm_width, wm_height, 4,
     vinfo.depth, InputOutput, visual, CWBorderPixel | (cmap ? CWColormap : 0), &swa);
 
+  XStoreName (dpy, wm_window, Title);
   XSelectInput (dpy, wm_window, FocusChangeMask | KeyPressMask |
     KeyReleaseMask | StructureNotifyMask);
 
@@ -306,8 +315,6 @@ bool csGraphics2DXLib::Open(const char *Title)
     Width, Height, 0, vinfo.depth, InputOutput, visual,
     CWBackPixel | CWBorderPixel | CWBitGravity | (cmap ? CWColormap : 0), &swa);
 
-  XStoreName (dpy, wm_window, Title);
-
   XGCValues values;
   gc = XCreateGC (dpy, window, 0, &values);
   XSetForeground (dpy, gc, BlackPixel (dpy, screen_num));
@@ -316,7 +323,7 @@ bool csGraphics2DXLib::Open(const char *Title)
 
   XSelectInput (dpy, window, ExposureMask | KeyPressMask | KeyReleaseMask |
     FocusChangeMask | PointerMotionMask | ButtonPressMask |
-    ButtonReleaseMask | StructureNotifyMask);
+    ButtonReleaseMask | StructureNotifyMask | KeymapStateMask);
 
   if (cmap)
     XSetWindowColormap (dpy, window, cmap);
@@ -388,7 +395,7 @@ bool csGraphics2DXLib::Open(const char *Title)
   if (!AllocateMemory ())
   {
 #ifdef DO_SHM
-    if(do_shm)
+    if (do_shm)
     {
       CsPrintf (MSG_INITIALIZATION, "SHM available but could not allocate. "
         "Trying without SHM.\n");
@@ -814,24 +821,24 @@ void csGraphics2DXLib::recompute_grey_palette ()
   CsPrintf (MSG_DEBUG_0, "Done!\n");
 }
 
-bool csGraphics2DXLib::PerformExtension (const char* args)
+bool csGraphics2DXLib::PerformExtension (const char* iCommand, ...)
 {
-  if (!strcasecmp (args, "sim_pal"))
+  if (!strcasecmp (iCommand, "sim_pal"))
   {
     recompute_simulated_palette ();
     return true;
   }
-  else if (!strcasecmp (args, "sim_grey"))
+  else if (!strcasecmp (iCommand, "sim_grey"))
   {
     recompute_grey_palette ();
     return true;
   }
-  else if (!strcasecmp (args, "sim_332"))
+  else if (!strcasecmp (iCommand, "sim_332"))
   {
     restore_332_palette ();
     return true;
   }
-  else if (!strcasecmp (args, "fullscreen"))
+  else if (!strcasecmp (iCommand, "fullscreen"))
   {
     if (currently_full_screen)
       LeaveFullScreen ();
@@ -1087,26 +1094,38 @@ static Bool CheckKeyPress (Display* /*dpy*/, XEvent *event, XPointer arg)
 }
 
 // XCheckMaskEvent() doesn't get ClientMessage Events so use XCheckIfEvent()
-//    with this Predicate function as a work-around ( ClientMessage events
-//    are needed in order to catch "WM_DELETE_WINDOW")
-static Bool AlwaysTruePredicate (Display*, XEvent*, char*) { return True; }
+// with this Predicate function as a work-around (ClientMessage events
+// are needed in order to catch "WM_DELETE_WINDOW")
+static Bool AlwaysTruePredicate (Display*, XEvent*, char*)
+{
+  return True;
+}
 
-//#define DO_STUFF_EXTENDED_KEYCODE
-bool csGraphics2DXLib::HandleEvent (csEvent &/*Event*/)
+bool csGraphics2DXLib::HandleEvent (csEvent &Event)
 {
   static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
   XEvent event;
-  int state, key;
-  bool cskey=true;
+  KeySym key;
+  int charcount;
+  char charcode [8];
   bool down;
   bool resize = false;
   bool parent_resize = false;
   int newWidth = 0;
   int newHeight = 0;
 
-#ifdef DO_STUFF_EXTENDED_KEYCODE
-  unsigned char keytranslated;
-#endif
+  if ((Event.Type == csevBroadcast)
+   && (Event.Command.Code == cscmdCommandLineHelp)
+   && System)
+  {
+    System->Printf (MSG_STDOUT, "Options for X-Windows 2D graphics driver:\n");
+    System->Printf (MSG_STDOUT, "  -sdepth=<depth>    set simulated depth (8, 15, 16, or 32) (default=none)\n");
+    System->Printf (MSG_STDOUT, "  -shm/noshm         SHM extension (default '%sshm')\n",
+      do_shm ? "" : "no");
+    System->Printf (MSG_STDOUT, "  -[no]sysmouse      use/don't use system mouse cursor (default=%s)\n",
+      do_hwmouse ? "use" : "don't");
+    return true;
+  }
 
   while (XCheckIfEvent (dpy, &event, AlwaysTruePredicate, 0))
     switch (event.type)
@@ -1154,25 +1173,26 @@ bool csGraphics2DXLib::HandleEvent (csEvent &/*Event*/)
 	  resize = true;
 	}
 	break;
+      case MappingNotify:
+        XRefreshKeyboardMapping (&event.xmapping);
+	break;
       case ClientMessage:
 	if (static_cast<Atom>(event.xclient.data.l[0]) == wm_delete_window)
 	{
-	  System->QueueContextCloseEvent ((void*)this);
-	  System->StartShutdown();
+	  EventOutlet->Broadcast (cscmdContextClose, (iGraphics2D *)this);
+	  EventOutlet->Broadcast (cscmdQuit);
 	}
 	break;
       case ButtonPress:
-        state = ((XButtonEvent*)&event)->state;
-        System->QueueMouseEvent (button_mapping [event.xbutton.button],
+        EventOutlet->Mouse (button_mapping [event.xbutton.button],
           true, event.xbutton.x, event.xbutton.y);
-          break;
+        break;
       case ButtonRelease:
-        System->QueueMouseEvent (button_mapping [event.xbutton.button],
+        EventOutlet->Mouse (button_mapping [event.xbutton.button],
           false, event.xbutton.x, event.xbutton.y);
         break;
       case MotionNotify:
-        System->QueueMouseEvent (0, false,
-	  event.xbutton.x, event.xbutton.y);
+        EventOutlet->Mouse (0, false, event.xbutton.x, event.xbutton.y);
         break;
       case KeyPress:
       case KeyRelease:
@@ -1181,12 +1201,8 @@ bool csGraphics2DXLib::HandleEvent (csEvent &/*Event*/)
 	// in favour of KeyDown since this is most (sure?) an autorepeat
         XCheckIfEvent (event.xkey.display, &event, CheckKeyPress, (XPointer)&event);
         down = (event.type == KeyPress);
-#ifdef DO_STUFF_EXTENDED_KEYCODE
-        XLookupString ((XKeyEvent*)&event, (char*)&keytranslated, 1, (KeySym*)&key, NULL);
-#else
-        key = XLookupKeysym (&event.xkey, 0);
-        state = event.xkey.state;
-#endif
+        charcount = XLookupString ((XKeyEvent *)&event, charcode,
+          sizeof (charcode), &key, NULL);
         switch (key)
         {
           case XK_Meta_L:
@@ -1244,20 +1260,13 @@ bool csGraphics2DXLib::HandleEvent (csEvent &/*Event*/)
           case XK_F10:        key = CSKEY_F10; break;
           case XK_F11:        key = CSKEY_F11; break;
           case XK_F12:        key = CSKEY_F12; break;
-          default:            cskey=false; break;
+          default:            key = (key <= 127) ? ScanCodeToChar [key] : 0;
         }
-#ifdef DO_STUFF_EXTENDED_KEYCODE
-        if ( cskey )
-	  System->QueueKeyEvent (key, down);
-	else
-  	  System->QueueExtendedKeyEvent (key, (int)keytranslated, down);
-#else
-	System->QueueKeyEvent (key, down);
-#endif
+	EventOutlet->Key (key, charcount == 1 ? uint8 (charcode [0]) : 0, down);
         break;
       case FocusIn:
       case FocusOut:
-        System->QueueFocusEvent (event.type == FocusIn);
+        EventOutlet->Broadcast (cscmdFocusChanged, (void *)(event.type == FocusIn));
         break;
       case Expose:
 	if (!resize && !parent_resize)
@@ -1278,14 +1287,8 @@ bool csGraphics2DXLib::HandleEvent (csEvent &/*Event*/)
   }
 
   if (resize)
-  {
     if (!ReallocateMemory ())
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Unable to allocate memory on resize!\n");
-      abort ();
-    }
-    System->QueueContextResizeEvent ((void*)this);
-  }
+      EventOutlet->Broadcast (cscmdQuit);
   return false;
 }
 
@@ -1321,7 +1324,8 @@ bool csGraphics2DXLib::ReallocateMemory ()
     LineAddress[i] = addr;
 
   SetClipRect (0, 0, Width, Height);
-  XSync (dpy, False);
+
+  EventOutlet->Broadcast (cscmdContextResize, (iGraphics2D *)this);
   return true;
 }
 
@@ -1335,19 +1339,15 @@ Bool GetModeInfo(Display *dpy, int scr, XF86VidModeModeInfo *info)
   return XF86VidModeGetModeLine (dpy, scr, (int *) &info->dotclock, l);
 }
 
-static int cmp_modes(const void *va, const void *vb)
+static int cmp_modes (const void *va, const void *vb)
 {
   XF86VidModeModeInfo *a = *(XF86VidModeModeInfo **) va;
   XF86VidModeModeInfo *b = *(XF86VidModeModeInfo **) vb;
 
   if (a->hdisplay > b->hdisplay)
-  {
     return -1;
-  }
   else
-  {
     return b->vdisplay - a->vdisplay;
-  }
 }
 
 static Bool wait_for_notify(Display */*display*/, XEvent *xEvent, XPointer arg)
@@ -1355,7 +1355,7 @@ static Bool wait_for_notify(Display */*display*/, XEvent *xEvent, XPointer arg)
   return (xEvent->type == MapNotify) && (xEvent->xmap.window == (Window) arg);
 }
 
-void csGraphics2DXLib::InitVidModes()
+void csGraphics2DXLib::InitVidModes ()
 {
   XF86VidModeModeLine mode;
   XF86VidModeModeInfo **modes;

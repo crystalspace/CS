@@ -49,7 +49,8 @@ else
   CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_MGL2D
 endif
 DESCRIPTION.$(MGL2D) = $(DESCRIPTION.mgl2d)
-SRC.MGL2D = $(wildcard plugins/video/canvas/mgl2d/*.cpp $(SRC.COMMON.DRV2D))
+SRC.MGL2D = $(wildcard plugins/video/canvas/mgl2d/*.cpp \
+  plugins/video/canvas/common/pc-keys.cpp $(SRC.COMMON.DRV2D))
 OBJ.MGL2D = $(addprefix $(OUT),$(notdir $(SRC.MGL2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)

@@ -55,17 +55,23 @@ EXPORT_CLASS_TABLE_END
 IMPLEMENT_IBASE (csGraphics2DAlleg)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics2D)
+  IMPLEMENTS_INTERFACE (iEventPlug)
 IMPLEMENT_IBASE_END
 
 csGraphics2DAlleg::csGraphics2DAlleg (iBase *iParent) :
   csGraphics2D ()
 {
   CONSTRUCT_IBASE (iParent);
+  EventOutlet = NULL;
+  hook_kbd = hook_mouse = true;
+  kbd_hook_active = mouse_hook_active = false;
 }
 
 csGraphics2DAlleg::~csGraphics2DAlleg ()
 {
   Close ();
+  if (EventOutlet)
+    EventOutlet->DecRef ();
 }
 
 bool csGraphics2DAlleg::Initialize (iSystem *pSystem)
@@ -106,6 +112,7 @@ bool csGraphics2DAlleg::Initialize (iSystem *pSystem)
   Font = 0;
   Memory = NULL;
   System->CallOnEvents (this, CSMASK_Nothing);
+  EventOutlet = System->CreateEventOutlet (this);
   return true;
 }
 
@@ -118,8 +125,6 @@ bool csGraphics2DAlleg::Open (const char* Title)
   PaletteChanged = false;
 
   allegro_init ();
-  install_keyboard ();
-  install_mouse ();
   set_color_depth (Depth);
 
   if (set_gfx_mode (GFX_AUTODETECT, Width, Height, 0, 0)
@@ -143,7 +148,7 @@ bool csGraphics2DAlleg::Open (const char* Title)
   Memory = (unsigned char *) bitmap->dat;
 
   // Tell printf() to shut up
-  System->EnablePrintf (false);
+  System->SystemExtension ("EnablePrintf", false);
 
   // Update drawing routine addresses
   switch (pfmt.PixelBytes)
@@ -165,6 +170,19 @@ bool csGraphics2DAlleg::Open (const char* Title)
       break;
   } /* endif */
 
+  // Hook keyboard, if needed
+  if (hook_kbd)
+  {
+    install_keyboard ();
+    kbd_hook_active = true;
+  }
+  // Hook mouse, if needed
+  if (hook_mouse)
+  {
+    install_mouse ();
+    mouse_hook_active = true;
+  }
+
   // Clear all videopages
   ClearAll (0);
   opened = true;
@@ -175,13 +193,25 @@ bool csGraphics2DAlleg::Open (const char* Title)
 void csGraphics2DAlleg::Close (void)
 {
   if (!opened)
-    exit (1);
+    return;
+
+  if (kbd_hook_active)
+  {
+    remove_keyboard ();
+    kbd_hook_active = false;
+  }
+  if (mouse_hook_active)
+  {
+    remove_mouse ();
+    mouse_hook_active = false;
+  }
+
   if (bitmap)
     destroy_bitmap (bitmap);
   bitmap = NULL;
   Memory = NULL;
   csGraphics2D::Close ();
-  System->EnablePrintf (true);
+  System->SystemExtension ("EnablePrintf", true);
   set_gfx_mode (GFX_TEXT, 0, 0, 0, 0);
   opened = false;
 }
@@ -291,7 +321,7 @@ void csGraphics2DAlleg::SetRGB (int i, int r, int g, int b)
 
 bool csGraphics2DAlleg::HandleEvent (csEvent &/*Event*/)
 {
-  int scancode, c;
+  int scancode, keycode, c;
   
   if (!opened)
     return false;
@@ -302,49 +332,47 @@ bool csGraphics2DAlleg::HandleEvent (csEvent &/*Event*/)
 
   while (keypressed ())
   {
-    int scancode = (readkey () >> 8) & 127;
-    int real = ScanCodeToChar [scancode];
-
-    if (real)
-    {
-      keydown [scancode] = 1;
-      System->QueueKeyEvent (real, 1);
-    }
+    scancode = readkey () >> 8;
+    keydown [scancode] = 1;
+    keycode = ScanCodeToChar [scancode];
+    if (keycode)
+      EventOutlet->Key (keycode, -1, true);
   }
 
   for (scancode = 127; scancode >= 0; scancode --)
   {
-    int real = ScanCodeToChar [scancode];
-    bool down = real ? (key [scancode] ? 1 : 0) : 0;
-    if (down != keydown [scancode])
+    keycode = ScanCodeToChar [scancode];
+    if (keycode)
     {
-      keydown [scancode] = down;
-      System->QueueKeyEvent (real, down);
+      bool down = !!key [scancode];
+      if (down != keydown [scancode])
+      {
+        keydown [scancode] = down;
+        EventOutlet->Key (keycode, -1, down);
+      }
     }
   }
 
   if (mouse_x != x_mouse || mouse_y != y_mouse)
   {
     x_mouse = mouse_x; y_mouse = mouse_y;
-    System->QueueMouseEvent (0, false, x_mouse, y_mouse);
+    EventOutlet->Mouse (0, false, x_mouse, y_mouse);
   }
 
   for (c = 0; c < 3; c ++)
   {
     bool down = (mouse_b & (1 << c)) != 0;
     if ((mouse_b & (1 << c)) != (button & (1 << c)))
-      System->QueueMouseEvent (c + 1, down, x_mouse, y_mouse);
+      EventOutlet->Mouse (c + 1, down, x_mouse, y_mouse);
   }
   button = mouse_b;
   
   return false;
 }
 
-bool csGraphics2DAlleg::PerformExtension (const char *args)
+bool csGraphics2DAlleg::PerformExtension (const char *iCommand, ...)
 {
-  csString ext (args);
-
-  if (ext.CompareNoCase ("fullscreen"))
+  if (!strcasecmp (iCommand, "fullscreen"))
   {
     System->Printf (MSG_INITIALIZATION, "Fullscreen toggle.");
     scale = !scale;
@@ -353,6 +381,50 @@ bool csGraphics2DAlleg::PerformExtension (const char *args)
   }
 
   return true;
+}
+
+void csGraphics2DAlleg::EnableEvents (unsigned iType, bool iEnable)
+{
+  // If the system drivers decides to ignore our keyboard and/or mouse events
+  // in favour of other driver (e.g. system built-in such as on DOS) we should
+  // drop the Allegro handler (since Allegro has a poor keyboard/mouse handler).
+
+  if (iType == CSEVTYPE_Keyboard)
+  {
+    if (hook_kbd != iEnable)
+    {
+      hook_kbd = iEnable;
+      if (opened && (hook_kbd != kbd_hook_active))
+        if (hook_kbd)
+        {
+          install_keyboard ();
+          kbd_hook_active = true;
+        }
+        else
+        {
+          remove_keyboard ();
+          kbd_hook_active = false;
+        }
+    }
+  }
+  else if (iType == CSEVTYPE_Mouse)
+  {
+    if (hook_mouse != iEnable)
+    {
+      hook_mouse = iEnable;
+      if (opened && (hook_mouse != mouse_hook_active))
+        if (hook_mouse)
+        {
+          install_mouse ();
+          mouse_hook_active = true;
+        }
+        else
+        {
+          remove_mouse ();
+          mouse_hook_active = false;
+        }
+    }
+  }
 }
 
 #ifdef main

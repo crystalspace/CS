@@ -66,7 +66,7 @@ glidebe2d: $(OUTDIRS) $(GLIDEBE2D)
 $(OUT)%$O: plugins/video/canvas/beglide2/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDEBE2D)
  
-$(GLIDEBE2D): $(OBJ.GLIDEBE2D) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+$(GLIDEBE2D): $(OBJ.GLIDEBE2D) $(CSUTIL.LIB) $(CSSYS.LIB)
 	$(DO.PLUGIN) $(LIBS.GLIDEBE2D)
 
 glidebeclean:

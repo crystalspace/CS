@@ -23,7 +23,8 @@
 #include "igraph3d.h"
 #include "ivfs.h"
 
-typedef struct{
+struct ConDecoBorder
+{
   iMaterialHandle *mat;
   bool do_keycolor;
   UByte kr, kg, kb;
@@ -31,31 +32,35 @@ typedef struct{
   int offx, offy;
   bool do_alpha;
   float alpha;
-} ConDecoBorder;
+};
 
-typedef struct{
+struct ConsoleDecoration
+{
   ConDecoBorder border[8];
   ConDecoBorder bgnd;
   int lx, rx, ty, by;
   int p2lx, p2rx, p2ty, p2by;
-} ConsoleDecoration;
+};
 
 class funConsole : public csConsole
 {
 public:
   DECLARE_IBASE;
-  funConsole(iBase *base);
-  virtual ~funConsole();
-  virtual bool Initialize(iSystem *);
-  virtual void Draw3D(csRect *rect);
-  virtual void SetTransparency(bool){ csConsole::SetTransparency ( true ); }
-  virtual void GetPosition(int &x, int &y, int &width, int &height) const;
-  virtual void SetPosition(int x, int y, int width = -1, int height = -1);
+  funConsole (iBase *base);
+  virtual ~funConsole ();
+  virtual bool Initialize (iSystem *);
   virtual bool HandleEvent (csEvent &Event);
+  virtual void PutText (int iMode, const char *iText);
+  virtual void Draw3D (csRect *rect);
+  virtual void SetTransparency (bool)
+  { csConsole::SetTransparency (true); }
 
 protected:
-  iGraphics3D *piG3D;
-  iVFS *piVFS;
+  virtual void GetPosition (int &x, int &y, int &width, int &height) const;
+  virtual void SetPosition (int x, int y, int width = -1, int height = -1);
+
+  iGraphics3D *G3D;
+  iVFS *VFS;
   ConsoleDecoration deco;
   csRect outersize, bordersize, p2size;
   bool border_computed;

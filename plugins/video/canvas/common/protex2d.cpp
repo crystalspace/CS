@@ -20,10 +20,11 @@
 #include "cssysdef.h"
 #include "protex2d.h"
 #include "csutil/scf.h"
+#include "cssys/csevent.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
+#include "ievent.h"
 
-DECLARE_FACTORY (csProcTextureSoft2D)
 IMPLEMENT_IBASE (csProcTextureSoft2D)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics2D)
@@ -151,7 +152,7 @@ void csProcTextureSoft2D::Close ()
   // These arrays are shared with the texture, the texture will destroy them.
   Palette = NULL;
   csGraphics2D::Close ();
-  System->QueueContextCloseEvent ((void*)this);
+  System->GetSystemEventOutlet ()->Broadcast (cscmdContextClose, this);
 }
 
 void csProcTextureSoft2D::Print (csRect *area)
@@ -231,4 +232,3 @@ void csProcTextureSoft2D::Print (csRect *area)
     }
   } // end if (image_buffer)
 }
-

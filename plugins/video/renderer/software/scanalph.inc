@@ -2,17 +2,17 @@
 /*
     Crystal Space 3D engine
     Copyright (C) 2000 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -107,49 +107,76 @@
 
 #ifndef A_PI
 
+#if defined (A_ZUSE)
+#  define IF_ZBUF_OK if (izz > *z_buf)
+#else
+#  define IF_ZBUF_OK
+#endif
+
 #define SCANLOOP \
   do									\
   {									\
-    unsigned srcaddr = A_SRCADDR;					\
-    uint8 alpha = Scan.AlphaMap [srcaddr];				\
-    A_IPIXTYPE src = A_COLORMAP (srcTex [srcaddr]);			\
-    A_IPIXTYPE dst = A_DSTTEX;						\
-    unsigned src_rb = src & A_MASK_RB;					\
-    unsigned dst_rb = dst & A_MASK_RB;					\
-    dst_rb = dst_rb + (alpha * (src_rb - dst_rb) >> A_NORMSHIFT);	\
-    unsigned src_g = src & A_MASK_G;					\
-    unsigned dst_g = dst & A_MASK_G;					\
-    dst_g = dst_g + (alpha * (src_g - dst_g) >> A_NORMSHIFT);		\
-    *_dest++ = INV_COLORMAP ((dst_rb & A_MASK_RB) | (dst_g & A_MASK_G));\
+    IF_ZBUF_OK								\
+    {									\
+      *z_buf = izz;							\
+      unsigned srcaddr = A_SRCADDR;					\
+      uint8 alpha = Scan.AlphaMap [srcaddr];				\
+      A_IPIXTYPE src = A_COLORMAP (srcTex [srcaddr]);			\
+      A_IPIXTYPE dst = A_DSTTEX;					\
+      unsigned src_rb = src & A_MASK_RB;				\
+      unsigned dst_rb = dst & A_MASK_RB;				\
+      dst_rb = dst_rb + (alpha * (src_rb - dst_rb) >> A_NORMSHIFT);	\
+      unsigned src_g = src & A_MASK_G;					\
+      unsigned dst_g = dst & A_MASK_G;					\
+      dst_g = dst_g + (alpha * (src_g - dst_g) >> A_NORMSHIFT);		\
+      *_dest = INV_COLORMAP ((dst_rb & A_MASK_RB) | (dst_g & A_MASK_G));\
+    }									\
+    _dest++;								\
     uu += duu;								\
     vv += dvv;								\
+    izz += dzz;								\
+    z_buf++;								\
   }									\
   while (_dest <= _destend)
 #define SCANFUNC A_SCANFUNC
 #include "scanln.inc"
+#undef IF_ZBUF_OK
 
 #else // A_PI
 
-void A_SCANFUNC (void *dest, int len, unsigned long* /*zbuff*/,
-  long u, long du, long v, long dv, unsigned long /*z*/, long /*dz*/,
+void A_SCANFUNC (void *dest, int len, unsigned long *zbuff,
+  long u, long du, long v, long dv, unsigned long z, long dz,
   unsigned char *bitmap, int bitmap_log2w)
 {
   A_PIXTYPE *_dest = (A_PIXTYPE *)dest;
   A_PIXTYPE *_destend = _dest + len;
   while (_dest < _destend)
   {
-    unsigned srcaddr = ((v >> 16) << bitmap_log2w) + (u >> 16);
-    uint8 alpha = Scan.AlphaMap [srcaddr];
-    A_IPIXTYPE src = A_COLORMAP (bitmap [srcaddr]);
-    A_IPIXTYPE dst = A_DSTTEX;
-    unsigned src_rb = src & A_MASK_RB;
-    unsigned dst_rb = dst & A_MASK_RB;
-    dst_rb = dst_rb + (alpha * (src_rb - dst_rb) >> A_NORMSHIFT);
-    unsigned src_g = src & A_MASK_G;
-    unsigned dst_g = dst & A_MASK_G;
-    dst_g = dst_g + (alpha * (src_g - dst_g) >> A_NORMSHIFT);
-    *_dest++ = INV_COLORMAP ((dst_rb & A_MASK_RB) | (dst_g & A_MASK_G));
-    u += du; v += dv;
+#if defined (A_ZUSE)
+    if (z > *zbuff)
+#endif
+    {
+#if defined (A_ZUSE) || defined (A_ZFIL)
+      *zbuff = z;
+#endif
+      unsigned srcaddr = ((v >> 16) << bitmap_log2w) + (u >> 16);
+      uint8 alpha = Scan.AlphaMap [srcaddr];
+      A_IPIXTYPE src = A_COLORMAP (bitmap [srcaddr]);
+      A_IPIXTYPE dst = A_DSTTEX;
+      unsigned src_rb = src & A_MASK_RB;
+      unsigned dst_rb = dst & A_MASK_RB;
+      dst_rb = dst_rb + (alpha * (src_rb - dst_rb) >> A_NORMSHIFT);
+      unsigned src_g = src & A_MASK_G;
+      unsigned dst_g = dst & A_MASK_G;
+      dst_g = dst_g + (alpha * (src_g - dst_g) >> A_NORMSHIFT);
+      *_dest = INV_COLORMAP ((dst_rb & A_MASK_RB) | (dst_g & A_MASK_G));
+      u += du; v += dv;
+    }
+#if defined (A_ZUSE) || defined (A_ZFIL)
+    zbuff++;
+    z += dz;
+#endif
+    _dest++;
   }
 }
 

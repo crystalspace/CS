@@ -95,7 +95,7 @@ public:
   virtual void Print (csRect *area = NULL);
   virtual bool BeginDraw ();
 
-  virtual bool PerformExtension (const char* args);
+  virtual bool PerformExtension (const char* iCommand, ...);
 
   /// Set mouse position.
   virtual bool SetMousePosition (int x, int y);

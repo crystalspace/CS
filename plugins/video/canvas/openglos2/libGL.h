@@ -84,8 +84,10 @@ enum tOpenGLError
 
 extern long DesktopW, DesktopH;         // Desktop width and height
 
-typedef void (*tKeyboardHandler) (void *param, unsigned char ScanCode, int Down, unsigned char RepeatCount, int ShiftFlags);
-typedef void (*tMouseHandler) (void *param, int Button, int Down, int x, int y, int ShiftFlags);
+typedef void (*tKeyboardHandler) (void *param, unsigned char ScanCode,
+  unsigned char CharCode, int Down, unsigned char RepeatCount, int ShiftFlags);
+typedef void (*tMouseHandler) (void *param, int Button, bool Down, int x, int y,
+  int ShiftFlags);
 typedef void (*tTerminateHandler) (void *param);
 typedef void (*tFocusHandler) (void *param, bool Enable);
 
@@ -109,9 +111,9 @@ typedef void (*tFocusHandler) (void *param, bool Enable);
 #define GLCF_STENC_SHFT	24
 
 // Mask for shift keys (used in mouse handler)
-#define GLKF_SHIFT	0x00000001
-#define GLKF_ALT	0x00000002
-#define GLKF_CTRL	0x00000004
+#define KF_SHIFT	0x00000001
+#define KF_ALT		0x00000002
+#define KF_CTRL		0x00000004
 
 /**
  * OpenGL window class
@@ -157,6 +159,8 @@ private:
   HGC hgc;				// GL PM context
   int ScreenW, ScreenH;			// Screen size
   SWP swpFullScreen;			// Saved window position
+
+  char lastKeyCode [128];		// Last scan->character encountered
 
 public:
   HAB glAB;				// Application anchor block

@@ -37,12 +37,14 @@ EXPORT_CLASS_TABLE_END
 IMPLEMENT_IBASE (csGraphics2DGGI)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics2D)
+  IMPLEMENTS_INTERFACE (iEventPlug)
 IMPLEMENT_IBASE_END
 
 // csGraphics2DGGI functions
 csGraphics2DGGI::csGraphics2DGGI(iBase *iParent) : csGraphics2D ()
 {
   CONSTRUCT_IBASE (iParent);
+  EventOutlet = NULL;
 }
 
 bool csGraphics2DGGI::Initialize (iSystem *pSystem)
@@ -150,6 +152,8 @@ bool csGraphics2DGGI::Initialize (iSystem *pSystem)
 
   // Tell system driver to call us on every frame
   System->CallOnEvents (this, CSMASK_Nothing);
+  // Create the event outlet
+  EventOutlet = System->CreateEventOutlet (this);
 
   return true;
 }
@@ -159,15 +163,20 @@ csGraphics2DGGI::~csGraphics2DGGI(void)
   // Destroy your graphic interface
   Close();
 
-  if (Memory) {
+  if (Memory)
+  {
     delete [] Memory;
     Memory = NULL;
   }
 
-  if (vis) {
+  if (vis)
+  {
     ggiClose(vis);
     vis = NULL;
   }
+
+  if (EventOutlet)
+    EventOutlet->DecRef ();
 
   ggiExit();
 }
@@ -197,7 +206,8 @@ void csGraphics2DGGI::Close(void)
 int csGraphics2DGGI::translate_key (ggi_event *ev)
 {
   // Normal Latin-1 key ?
-  if (GII_KTYP(ev->key.sym) == GII_KT_LATIN1) {
+  if (GII_KTYP(ev->key.sym) == GII_KT_LATIN1)
+  {
     switch (ev->key.sym)
     {
       case GIIUC_Tab:        return CSKEY_TAB;
@@ -275,7 +285,7 @@ bool csGraphics2DGGI::HandleEvent (csEvent &/*Event*/)
         int down = (ev.any.type != evKeyRelease);
 
         if (key >= 0)
-          System->QueueKeyEvent (key, down);
+          EventOutlet->Key (key, -1, down);
         break;
       }
 
@@ -305,11 +315,4 @@ void csGraphics2DGGI::SetRGB(int i, int r, int g, int b)
   ggiFlush(vis);
 
   csGraphics2D::SetRGB (i, r, g, b);
-}
-
-bool csGraphics2DGGI::PerformExtension(const char* args)
-{
-  (void) args;
-
-  return true;
 }

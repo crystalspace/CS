@@ -58,7 +58,7 @@ CFLAGS.GLX2D+=-I$(X11_PATH)/include
 ifeq ($(USE_SHARED_PLUGINS),yes)
   GLX2D=$(OUTDLL)glx2d$(DLL)
   LIBS.GLX2D=$(LIBS._GLX2D)
-  DEP.GLX2D=$(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.GLX2D=$(CSUTIL.LIB) $(CSSYS.LIB)
 else
   GLX2D=$(OUT)$(LIB_PREFIX)glx2d$(LIB)
   DEP.EXE+=$(GLX2D)
@@ -68,6 +68,7 @@ endif
 DESCRIPTION.$(GLX2D) = $(DESCRIPTION.glx2d)
 SRC.GLX2D = $(wildcard plugins/video/canvas/openglx/*.cpp \
   plugins/video/canvas/common/x11comm.cpp \
+  plugins/video/canvas/common/x11-keys.cpp \
   $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
 OBJ.GLX2D = $(addprefix $(OUT),$(notdir $(SRC.GLX2D:.cpp=$O)))
 

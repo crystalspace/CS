@@ -35,6 +35,7 @@ csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
 {
   CONSTRUCT_IBASE (iParent);
   is_double_buffered = true;
+  EventOutlet = NULL;
 }
 
 bool csGraphics2DGLCommon::Initialize (iSystem *pSystem)
@@ -66,6 +67,8 @@ bool csGraphics2DGLCommon::Initialize (iSystem *pSystem)
 csGraphics2DGLCommon::~csGraphics2DGLCommon ()
 {
   Close ();
+  if (EventOutlet)
+    EventOutlet->DecRef ();
 }
 
 bool csGraphics2DGLCommon::Open (const char *Title)

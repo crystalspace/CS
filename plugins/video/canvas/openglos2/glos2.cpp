@@ -24,6 +24,8 @@
 #include "csutil/scf.h"
 #include "csutil/csrect.h"
 #include "cssys/csevent.h"
+#include "video/canvas/common/scancode.h"
+#include "video/canvas/common/os2-keys.h"
 #include "isystem.h"
 
 // shit ...
@@ -53,6 +55,22 @@ csGraphics2DOS2GL::csGraphics2DOS2GL (iBase *iParent) :
   extern unsigned long dll_handle;
   gdMH = dll_handle;
 #endif
+
+  // Initialize scancode->char conversion table with additional codes
+  ScanCodeToChar [SCANCODE_RALT]        = CSKEY_ALT;
+  ScanCodeToChar [SCANCODE_RCTRL]       = CSKEY_CTRL;
+  ScanCodeToChar [SCANCODE_GRAYUP]      = CSKEY_UP;
+  ScanCodeToChar [SCANCODE_GRAYDOWN]    = CSKEY_DOWN;
+  ScanCodeToChar [SCANCODE_GRAYLEFT]    = CSKEY_LEFT;
+  ScanCodeToChar [SCANCODE_GRAYRIGHT]   = CSKEY_RIGHT;
+  ScanCodeToChar [SCANCODE_GRAYPGUP]    = CSKEY_PGUP;
+  ScanCodeToChar [SCANCODE_GRAYPGDN]    = CSKEY_PGDN;
+  ScanCodeToChar [SCANCODE_GRAYINS]     = CSKEY_INS;
+  ScanCodeToChar [SCANCODE_GRAYDEL]     = CSKEY_DEL;
+  ScanCodeToChar [SCANCODE_GRAYHOME]    = CSKEY_HOME;
+  ScanCodeToChar [SCANCODE_GRAYEND]     = CSKEY_END;
+  ScanCodeToChar [SCANCODE_GRAYENTER]   = CSKEY_ENTER;
+  ScanCodeToChar [SCANCODE_GRAYSLASH]   = CSKEY_PADDIV;
 }
 
 csGraphics2DOS2GL::~csGraphics2DOS2GL (void)
@@ -60,7 +78,6 @@ csGraphics2DOS2GL::~csGraphics2DOS2GL (void)
   Close ();
   // Deallocate OpenGL resources
   gdGLDeinitialize ();
-  OS2System->DecRef ();
 }
 
 bool csGraphics2DOS2GL::Initialize (iSystem *pSystem)
@@ -68,23 +85,12 @@ bool csGraphics2DOS2GL::Initialize (iSystem *pSystem)
   if (!csGraphics2DGLCommon::Initialize (pSystem))
     return false;
 
-  OS2System = QUERY_INTERFACE (System, iOS2SystemDriver);
-  if (!OS2System)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "The system driver does not support the iOS2SystemDriver interface\n");
-    return false;
-  }
-
   // Initialize OpenGL
   if (!gdGLInitialize ())
   {
     CsPrintf (MSG_FATAL_ERROR, "Unable to initialize OpenGL library\n");
     return false;
   }
-
-  // Query settings from system driver
-  int WindowWidth, WindowHeight;
-  OS2System->GetExtSettings (WindowX, WindowY, WindowWidth, WindowHeight, HardwareCursor);
 
   PixelFormat = GLCF_DBLBUFF | (1 << GLCF_DEPTH_SHFT);
   if (Depth > 8)
@@ -95,7 +101,46 @@ bool csGraphics2DOS2GL::Initialize (iSystem *pSystem)
     pfmt.PalEntries = 256;
   }
 
+  WindowX = System->ConfigGetInt ("VideoDriver", "WindowX", INT_MIN);
+  WindowY = System->ConfigGetInt ("VideoDriver", "WindowY", INT_MIN);
+  HardwareCursor = System->ConfigGetYesNo ("VideoDriver", "SystemMouseCursor", true);
+
+  const char *val;
+  if ((val = System->GetOptionCL ("winpos")))
+  {
+    int xpos, ypos;
+    if (sscanf (val, "%d,%d", &xpos, &ypos) == 2)
+    {
+      WindowX = xpos;
+      WindowY = ypos;
+    }
+    else
+      System->Printf (MSG_WARNING, "Bad value `%s' for -winpos command-line parameter (X,Y expected)\n", val);
+  }
+
+  if (System->GetOptionCL ("sysmouse"))
+    HardwareCursor = true;
+  if (System->GetOptionCL ("nosysmouse"))
+    HardwareCursor = false;
+
+  EventOutlet = System->CreateEventOutlet (this);
+
   return true;
+}
+
+bool csGraphics2DOS2GL::HandleEvent (csEvent &Event)
+{
+  if ((Event.Type == csevBroadcast)
+   && (Event.Command.Code == cscmdCommandLineHelp)
+   && System)
+  {
+    System->Printf (MSG_STDOUT, "Options for OS/2 OpenGL canvas driver:\n");
+    System->Printf (MSG_STDOUT, "  -winpos=<x>,<y>    set window position in percent of screen (default=center)\n");
+    System->Printf (MSG_STDOUT, "  -[no]sysmouse      use/don't use system mouse cursor (default=%s)\n",
+      HardwareCursor ? "use" : "don't");
+    return true;
+  }
+  return false;
 }
 
 bool csGraphics2DOS2GL::Open (const char *Title)
@@ -325,26 +370,34 @@ void csGraphics2DOS2GL::MouseHandlerStub (void *Self, int Button, bool Down,
   if (!This)
     return;
 
-  This->System->QueueMouseEvent (Button, Down, x, This->Height - 1 - y);
+  This->EventOutlet->Mouse (Button, Down, x, This->Height - 1 - y);
 }
 
 void csGraphics2DOS2GL::KeyboardHandlerStub (void *Self, unsigned char ScanCode,
-  int Down, unsigned char RepeatCount, int ShiftFlags)
+  unsigned char CharCode, int Down, unsigned char RepeatCount, int ShiftFlags)
 {
   csGraphics2DOS2GL *This = (csGraphics2DOS2GL *)Self;
-  if (!This)
-    return;
-  This->OS2System->KeyboardEvent (ScanCode, Down);
+  int KeyCode = ScanCode < 128 ? ScanCodeToChar [ScanCode] : 0;
+  // OS/2 ENTER has char code 13 while Crystal Space uses '\n' ...
+  if (KeyCode == CSKEY_ENTER) CharCode = CSKEY_ENTER;
+
+  // WM_CHAR does not support Ctrl+# ...
+  if (This->System->GetKeyState (CSKEY_CTRL) && !CharCode
+   && (KeyCode > 96) && (KeyCode < 127))
+    CharCode = KeyCode - 96;
+
+  This->EventOutlet->Key (KeyCode, CharCode, Down);
 }
 
 void csGraphics2DOS2GL::FocusHandlerStub (void *Self, bool Enable)
 {
   csGraphics2DOS2GL *This = (csGraphics2DOS2GL *)Self;
-  This->System->QueueFocusEvent (Enable);
+  This->EventOutlet->Broadcast (cscmdFocusChanged, (void *)Enable);
 }
 
 void csGraphics2DOS2GL::TerminateHandlerStub (void *Self)
 {
   csGraphics2DOS2GL *This = (csGraphics2DOS2GL *)Self;
-  This->System->StartShutdown ();
+  This->EventOutlet->Broadcast (cscmdContextClose, (iGraphics2D *)This);
+  This->EventOutlet->Broadcast (cscmdQuit);
 }

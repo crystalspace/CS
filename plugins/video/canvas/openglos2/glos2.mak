@@ -51,7 +51,8 @@ else
 endif
 DESCRIPTION.$(GLOS2)=$(DESCRIPTION.glos2)
 SRC.GLOS2 = $(wildcard plugins/video/canvas/openglos2/*.cpp \
-  $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
+  plugins/video/canvas/common/pc-keys.cpp $(SRC.COMMON.DRV2D.OPENGL) \
+  $(SRC.COMMON.DRV2D))
 OBJ.GLOS2 = $(addprefix $(OUT),$(notdir $(SRC.GLOS2:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)

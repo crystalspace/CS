@@ -30,20 +30,20 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-# We need also the X libs
-CFLAGS.LINEX2D+=-I$(X11_PATH)/include
-LIBS.LINEX2D+=-L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
-
 ifeq ($(USE_XFREE86VM),yes)
   CFLAGS.LINEX2D+=-DXFREE86VM
   LIBS.LINEX2D+=-lXxf86vm
 endif
  
+# We need also the X libs
+CFLAGS.LINEX2D+=-I$(X11_PATH)/include
+LIBS.LINEX2D+=-L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
+
 # The 2D Xlib driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
   LINEXLIB2D=$(OUTDLL)linex2d$(DLL)
   LIBS.LOCAL.LINEX2D=$(LIBS.LINEX2D)
-  DEP.LINEX2D=$(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.LINEX2D=$(CSUTIL.LIB) $(CSSYS.LIB)
 else
   LINEXLIB2D=$(OUT)$(LIB_PREFIX)linex2d$(LIB)
   DEP.EXE+=$(LINEXLIB2D)
@@ -52,7 +52,9 @@ else
 endif
 DESCRIPTION.$(LINEXLIB2D) = $(DESCRIPTION.linex2d)
 SRC.LINEXLIB2D = \
-  $(wildcard plugins/video/canvas/linex/*.cpp $(SRC.COMMON.DRV2D))
+  $(wildcard plugins/video/canvas/linex/*.cpp \
+  plugins/video/canvas/common/x11-keys.cpp \
+  $(SRC.COMMON.DRV2D))
 OBJ.LINEXLIB2D = $(addprefix $(OUT),$(notdir $(SRC.LINEXLIB2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)

@@ -21,19 +21,20 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
+#include "ievent.h"
 
 #include <ggi/ggi.h>
 
 /// GGI version.
-class csGraphics2DGGI : public csGraphics2D
+class csGraphics2DGGI : public csGraphics2D, public iEventPlug
 {
-  ///
-  virtual bool PerformExtension (const char* args);
-
 private:
   ggi_visual_t vis;
   ggi_mode vis_mode;
   int display_width, display_height;
+
+  // The event outlet
+  iEventOutlet *EventOutlet;
 
   virtual int translate_key(ggi_event *ev);
 
@@ -54,6 +55,13 @@ public:
 
   /// Called on every frame by system driver
   virtual bool HandleEvent (csEvent &Event);
+
+  //------------------------- iEventPlug interface ---------------------------//
+
+  virtual unsigned GetPotentiallyConflictingEvents ()
+  { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
+  virtual unsigned QueryEventPriority (unsigned /*iType*/)
+  { return 150; }
 };
 
 #endif // __CS_GGI2D_H__

@@ -60,8 +60,9 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
+#include "ievent.h"
 
-class csGraphics2DMGL : public csGraphics2D
+class csGraphics2DMGL : public csGraphics2D, public iEventPlug
 {
   /// MGL context
   MGLDC *dc;
@@ -83,6 +84,8 @@ class csGraphics2DMGL : public csGraphics2D
   int joyposx [2], joyposy [2];
   /// true if palette was changed
   bool paletteChanged;
+  // The event outlet
+  iEventOutlet *EventOutlet;
 
 public:
   DECLARE_IBASE;
@@ -150,6 +153,13 @@ public:
 
   /// Called on every frame by system driver
   virtual bool HandleEvent (csEvent &Event);
+
+  //------------------------- iEventPlug interface ---------------------------//
+
+  virtual unsigned GetPotentiallyConflictingEvents ()
+  { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
+  virtual unsigned QueryEventPriority (unsigned /*iType*/)
+  { return 150; }
 
 private:
   /// Allocate the back buffer: either in hardware or software

@@ -29,21 +29,22 @@ endif # ifeq ($(MAKESECTION),roottargets)
 
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
+ 
+ifeq ($(USE_XFREE86VM),yes)
+  CFLAGS.X2D+=-DXFREE86VM
+  # Place the xf86vm library before -lX11, this is required on some platforms
+  LIBS.X2D+=-lXxf86vm
+endif
 
 # We need also the X libs
 CFLAGS.X2D+=-I$(X11_PATH)/include
 LIBS.X2D+=-L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
- 
-ifeq ($(USE_XFREE86VM),yes)
-  CFLAGS.X2D+=-DXFREE86VM
-  LIBS.X2D+=-lXxf86vm
-endif
 
 # The 2D Xlib driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
   XLIB2D=$(OUTDLL)x2d$(DLL)
   LIBS.LOCAL.X2D=$(LIBS.X2D)
-  DEP.X2D=$(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.X2D=$(CSUTIL.LIB) $(CSSYS.LIB)
 else
   XLIB2D=$(OUT)$(LIB_PREFIX)x2d$(LIB)
   DEP.EXE+=$(XLIB2D)
@@ -52,7 +53,9 @@ else
 endif
 DESCRIPTION.$(XLIB2D) = $(DESCRIPTION.x2d)
 SRC.XLIB2D = $(wildcard plugins/video/canvas/softx/*.cpp \
-  plugins/video/canvas/common/x11comm.cpp $(SRC.COMMON.DRV2D))
+  plugins/video/canvas/common/x11comm.cpp \
+  plugins/video/canvas/common/x11-keys.cpp \
+  $(SRC.COMMON.DRV2D))
 OBJ.XLIB2D = $(addprefix $(OUT),$(notdir $(SRC.XLIB2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)

@@ -22,7 +22,8 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "csutil/csrect.h"
-#include "cssys/csevent.h"
+#include "video/canvas/common/scancode.h"
+#include "video/canvas/common/os2-keys.h"
 #include "isystem.h"
 #include "csdive.h"
 #include "libDIVE.h"
@@ -52,6 +53,7 @@ EXPORT_CLASS_TABLE_END
 IMPLEMENT_IBASE (csGraphics2DOS2DIVE)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics2D)
+  IMPLEMENTS_INTERFACE (iEventPlug)
 IMPLEMENT_IBASE_END
 
 csGraphics2DOS2DIVE::csGraphics2DOS2DIVE (iBase *iParent) :
@@ -69,9 +71,25 @@ csGraphics2DOS2DIVE::csGraphics2DOS2DIVE (iBase *iParent) :
   gdMH = dll_handle;
 #endif
 
-  OS2System = NULL;
   ActivePage = 0;
   dW = NULL;
+  EventOutlet = NULL;
+
+  // Initialize scancode->char conversion table with additional codes
+  ScanCodeToChar [SCANCODE_RALT]        = CSKEY_ALT;
+  ScanCodeToChar [SCANCODE_RCTRL]       = CSKEY_CTRL;
+  ScanCodeToChar [SCANCODE_GRAYUP]      = CSKEY_UP;
+  ScanCodeToChar [SCANCODE_GRAYDOWN]    = CSKEY_DOWN;
+  ScanCodeToChar [SCANCODE_GRAYLEFT]    = CSKEY_LEFT;
+  ScanCodeToChar [SCANCODE_GRAYRIGHT]   = CSKEY_RIGHT;
+  ScanCodeToChar [SCANCODE_GRAYPGUP]    = CSKEY_PGUP;
+  ScanCodeToChar [SCANCODE_GRAYPGDN]    = CSKEY_PGDN;
+  ScanCodeToChar [SCANCODE_GRAYINS]     = CSKEY_INS;
+  ScanCodeToChar [SCANCODE_GRAYDEL]     = CSKEY_DEL;
+  ScanCodeToChar [SCANCODE_GRAYHOME]    = CSKEY_HOME;
+  ScanCodeToChar [SCANCODE_GRAYEND]     = CSKEY_END;
+  ScanCodeToChar [SCANCODE_GRAYENTER]   = CSKEY_ENTER;
+  ScanCodeToChar [SCANCODE_GRAYSLASH]   = CSKEY_PADDIV;
 }
 
 csGraphics2DOS2DIVE::~csGraphics2DOS2DIVE ()
@@ -79,8 +97,8 @@ csGraphics2DOS2DIVE::~csGraphics2DOS2DIVE ()
   Close ();
   // Deallocate DIVE resources
   gdDiveDeinitialize ();
-  if (OS2System)
-    OS2System->DecRef ();
+  if (EventOutlet)
+    EventOutlet->DecRef ();
 }
 
 bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
@@ -91,27 +109,71 @@ bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
   // Initialize DIVE
   if (!gdDiveInitialize ())
   {
-    CsPrintf (MSG_FATAL_ERROR, "Unable to initialize DIVE\n");
+    CsPrintf (MSG_FATAL_ERROR, "Unable to initialize OS/2 DIVE\n");
     return false;
   }
 
-  OS2System = QUERY_INTERFACE (pSystem, iOS2SystemDriver);
-  if (!OS2System)
+  WindowX = System->ConfigGetInt ("VideoDriver", "WindowX", INT_MIN);
+  WindowY = System->ConfigGetInt ("VideoDriver", "WindowY", INT_MIN);
+  WindowWidth = System->ConfigGetInt ("VideoDriver", "WindowW", -1);
+  WindowHeight = System->ConfigGetInt ("VideoDriver", "WindowH", -1);
+  HardwareCursor = System->ConfigGetYesNo ("VideoDriver", "SystemMouseCursor", true);
+
+  const char *val;
+  if ((val = System->GetOptionCL ("winsize")))
   {
-    CsPrintf (MSG_FATAL_ERROR, "The system driver does not support the iOS2SystemDriver interface\n");
-    return false;
+    int wres, hres;
+    if (sscanf (val, "%d,%d", &wres, &hres) == 2)
+    {
+      WindowWidth = wres;
+      WindowHeight = hres;
+    }
+    else
+      System->Printf (MSG_WARNING, "Bad value `%s' for -winsize command-line parameter (W,H expected)\n", val);
   }
+
+  if ((val = System->GetOptionCL ("winpos")))
+  {
+    int xpos, ypos;
+    if (sscanf (val, "%d,%d", &xpos, &ypos) == 2)
+    {
+      WindowX = xpos;
+      WindowY = ypos;
+    }
+    else
+      System->Printf (MSG_WARNING, "Bad value `%s' for -winpos command-line parameter (X,Y expected)\n", val);
+  }
+
+  if (System->GetOptionCL ("sysmouse"))
+    HardwareCursor = true;
+  if (System->GetOptionCL ("nosysmouse"))
+    HardwareCursor = false;
+
+  EventOutlet = System->CreateEventOutlet (this);
 
   return true;
+}
+
+bool csGraphics2DOS2DIVE::HandleEvent (csEvent &Event)
+{
+  if ((Event.Type == csevBroadcast)
+   && (Event.Command.Code == cscmdCommandLineHelp)
+   && System)
+  {
+    System->Printf (MSG_STDOUT, "Options for OS/2 DIVE driver:\n");
+    System->Printf (MSG_STDOUT, "  -winpos=<x>,<y>    set window position in percent of screen (default=center)\n");
+    System->Printf (MSG_STDOUT, "  -winsize=<w>,<h>   set window size (default=max fit mode multiple)\n");
+    System->Printf (MSG_STDOUT, "  -[no]sysmouse      use/don't use system mouse cursor (default=%s)\n",
+      HardwareCursor ? "use" : "don't");
+    return true;
+  }
+  return false;
 }
 
 bool csGraphics2DOS2DIVE::Open (const char *Title)
 {
   if (!csGraphics2D::Open (Title))
     return false;
-
-  // Query settings from system driver
-  OS2System->GetExtSettings (WindowX, WindowY, WindowWidth, WindowHeight, HardwareCursor);
 
   // Set up FGVideoMode
   // Check first all available 16-bit modes for 'native' flag
@@ -135,26 +197,6 @@ bool csGraphics2DOS2DIVE::Open (const char *Title)
         } /* endif */
       if (PixelFormat != FOURCC_LUT8)
         break;
-#if 0
-    // When Crystal Space (hopefully) oneday will support
-    // 24 bpp modes, enable this branch
-    case 24:
-      for (int i = 0; i < (int)vmCount; i++)
-        if (vmList[i].PixelFormat == FOURCC_RGB3
-         || vmList[i].PixelFormat == FOURCC_BGR3)
-        {
-          if (vmList[i].Flags & vmfNative)
-          {
-            PixelFormat = vmList[i].PixelFormat;
-            break;
-          }
-
-          if (PixelFormat == FOURCC_LUT8)
-            PixelFormat = vmList[i].PixelFormat;
-        } /* endif */
-      if (PixelFormat != FOURCC_LUT8)
-        break;
-#endif
     case 16:
       for (int i = 0; i < (int)vmCount; i++)
       {
@@ -420,7 +462,7 @@ void csGraphics2DOS2DIVE::Print (csRect *area)
 
 int csGraphics2DOS2DIVE::GetPage ()
 {
-  return dW->ActiveBuff ();
+  return ActivePage;
 }
 
 bool csGraphics2DOS2DIVE::DoubleBuffer (bool Enable)
@@ -471,8 +513,6 @@ bool csGraphics2DOS2DIVE::BeginDraw ()
   // if paused, return false
   if (Memory == NULL)
   {
-    if (System->GetShutdown ())
-      dW->Pause (FALSE);
     csGraphics2D::FinishDraw ();
     return false;
   } /* endif */
@@ -586,26 +626,34 @@ void csGraphics2DOS2DIVE::MouseHandlerStub (void *Self, int Button, bool Down,
   x = (x * This->Width) / ww;
   y = ((wh - 1 - y) * This->Height) / wh;
 
-  This->System->QueueMouseEvent (Button, Down, x, y);
+  This->EventOutlet->Mouse (Button, Down, x, y);
 }
 
 void csGraphics2DOS2DIVE::KeyboardHandlerStub (void *Self, unsigned char ScanCode,
-  bool Down, unsigned char RepeatCount, int ShiftFlags)
+  unsigned char CharCode, bool Down, unsigned char RepeatCount, int ShiftFlags)
 {
   csGraphics2DOS2DIVE *This = (csGraphics2DOS2DIVE *)Self;
-  if (!This)
-    return;
-  This->OS2System->KeyboardEvent (ScanCode, Down);
+  int KeyCode = ScanCode < 128 ? ScanCodeToChar [ScanCode] : 0;
+  // OS/2 ENTER has char code 13 while Crystal Space uses '\n' ...
+  if (KeyCode == CSKEY_ENTER) CharCode = CSKEY_ENTER;
+
+  // WM_CHAR does not support Ctrl+# ...
+  if (This->System->GetKeyState (CSKEY_CTRL) && !CharCode
+   && (KeyCode > 96) && (KeyCode < 127))
+    CharCode = KeyCode - 96;
+
+  This->EventOutlet->Key (KeyCode, CharCode, Down);
 }
 
 void csGraphics2DOS2DIVE::FocusHandlerStub (void *Self, bool Enable)
 {
   csGraphics2DOS2DIVE *This = (csGraphics2DOS2DIVE *)Self;
-  This->System->QueueFocusEvent (Enable);
+  This->EventOutlet->Broadcast (cscmdFocusChanged, (void *)Enable);
 }
 
 void csGraphics2DOS2DIVE::TerminateHandlerStub (void *Self)
 {
   csGraphics2DOS2DIVE *This = (csGraphics2DOS2DIVE *)Self;
-  This->System->StartShutdown ();
+  This->EventOutlet->Broadcast (cscmdContextClose, (iGraphics2D *)This);
+  This->EventOutlet->Broadcast (cscmdQuit);
 }

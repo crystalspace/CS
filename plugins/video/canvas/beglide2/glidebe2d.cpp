@@ -173,7 +173,7 @@ bool csGraphics2DBeGlide::HandleEvent (csEvent &/*Event*/)
           (state & ShiftMask ? CSMASK_SHIFT : 0) |
 	  (state & Mod1Mask ? CSMASK_ALT : 0) |
 	  (state & ControlMask ? CSMASK_CTRL : 0));
-          break;
+        break;
       case ButtonRelease:
         System->MouseEvent (button_mapping [event.xbutton.button],
           false, event.xbutton.x, event.xbutton.y, 0);

@@ -435,22 +435,35 @@ MRESULT glWindow::ClientMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm2
           return OldClientWindowProc (hwndCL, Message, MsgParm1, MsgParm2);
       }
     case WM_CHAR:
+    {
       // err.... for some strange reasons '/' on numeric keypad
       // emits very strange codes for me ...
-      if (SHORT1FROMMP (MsgParm1) == KC_CHAR
-       && SHORT1FROMMP (MsgParm2) == 0x7f)
+      unsigned short flags = SHORT1FROMMP (MsgParm1);
+      if ((flags & (KC_CHAR | KC_SCANCODE)) == KC_CHAR && flags == 0x7f)
         MsgParm1 = MPARAM (int (MsgParm1) | 0x6f000000 | KC_SCANCODE);
-      if (hKeyboard && (SHORT1FROMMP (MsgParm1) & KC_SCANCODE))
+      if (hKeyboard && (flags & (KC_SCANCODE | KC_CHAR)))
       {
-        unsigned int ScanCode = SHORT2FROMMP (MsgParm1);
-        unsigned short flags = SHORT1FROMMP (MsgParm1);
+        unsigned short ScanCode = (flags & KC_SCANCODE) ? SHORT2FROMMP (MsgParm1) : 0;
+        unsigned short CharCode = (flags & KC_CHAR) ? SHORT1FROMMP (MsgParm2) : 0;
+        int RepeatCount = (ScanCode & 0xFF);
+        ScanCode >>= 8;
 
-        hKeyboard (paramKeyboard, ScanCode >> 8, !(flags & KC_KEYUP),
-          ScanCode && 0xFF, (flags & KC_SHIFT ? GLKF_SHIFT : 0) |
-          (flags & KC_ALT ? GLKF_ALT : 0) | (flags & KC_CTRL ? GLKF_CTRL : 0));
+        if (ScanCode < 128)
+          if (flags & KC_KEYUP)
+          {
+            if (!CharCode)
+              CharCode = lastKeyCode [ScanCode];
+          }
+          else
+            lastKeyCode [ScanCode] = CharCode;
+
+        hKeyboard (paramKeyboard, ScanCode, CharCode, !(flags & KC_KEYUP),
+          RepeatCount, (flags & KC_SHIFT ? KF_SHIFT : 0) |
+          (flags & KC_ALT ? KF_ALT : 0) | (flags & KC_CTRL ? KF_CTRL : 0));
         return (MRESULT) TRUE;
       }
       return (MRESULT) FALSE;
+    }
     case WM_MOUSEMOVE:
       if (fActive)
         WinSetPointer (HWND_DESKTOP, fMouseVisible ? WinQuerySysPointer (HWND_DESKTOP,
@@ -499,8 +512,8 @@ ProcessMouse:
       {
         unsigned short flags = SHORT2FROMMP (MsgParm2);
         hMouse (paramMouse, m_button, m_down, (short)SHORT1FROMMP (MsgParm1),
-          (short)SHORT2FROMMP (MsgParm1), (flags & KC_SHIFT ? GLKF_SHIFT : 0) |
-          (flags & KC_ALT ? GLKF_ALT : 0) | (flags & KC_CTRL ? GLKF_CTRL : 0));
+          (short)SHORT2FROMMP (MsgParm1), (flags & KC_SHIFT ? KF_SHIFT : 0) |
+          (flags & KC_ALT ? KF_ALT : 0) | (flags & KC_CTRL ? KF_CTRL : 0));
       }
       if (m_down)
         WinSetActiveWindow (HWND_DESKTOP, hwndCL);

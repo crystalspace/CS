@@ -21,8 +21,8 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "iconsole.h"
-#include "icursor.h"
 #include "igraph2d.h"
+#include "igraph3d.h"
 #include "isystem.h"
 #include "itxtmgr.h"
 #include "cssys/csevent.h"
@@ -32,316 +32,329 @@
 #include "cscon.h"
 #include "conbuffr.h"
 
-csConsole::csConsole(iBase *base)
+IMPLEMENT_IBASE(csConsole)
+  IMPLEMENTS_INTERFACE(iConsole)
+  IMPLEMENTS_INTERFACE(iPlugIn)
+IMPLEMENT_IBASE_END
+
+IMPLEMENT_FACTORY (csConsole)
+DECLARE_FACTORY (funConsole)
+
+EXPORT_CLASS_TABLE (cscon)
+  EXPORT_CLASS (csConsole, "crystalspace.console.output.standard",
+		"Standard Console Plugin")
+  EXPORT_CLASS (funConsole, "crystalspace.console.output.funky",
+		"Funky Console Plugin")
+EXPORT_CLASS_TABLE_END
+
+csConsole::csConsole (iBase *base)
 {
-  CONSTRUCT_IBASE(base);
-  fg_rgb.red = fg_rgb.green = fg_rgb.blue = 255;    // Foreground defaults to white
-  bg_rgb.red = bg_rgb.green = bg_rgb.blue = 0;    // Background defaults to black
-  transparent = false;  // Default to no transparency
-  do_snap = true;      // Default to snapping
+  CONSTRUCT_IBASE (base);
+  fg_rgb.Set (255, 255, 255);	// Foreground defaults to white
+  bg_rgb.Set (0, 0, 0);		// Background defaults to black
+  transparent = false;		// Default to no transparency
+  do_snap = true;		// Default to snapping
   // Initialize the cursor state variables
-  flash_cursor = false;
-  do_flash = false;
   cursor = csConNoCursor;
   cx = cy = 0;
-  custom_cursor = NULL;
+  flash_interval = 500;
+  cursor_visible = true;
+  clear_input = false;
+  auto_update = true;
+  system_ready = false;
+  visible = true;
+  Client = NULL;
 }
 
-csConsole::~csConsole()
+csConsole::~csConsole ()
 {
-  if (piSystem)
-    piSystem->DecRef ();
-  if (piG2D)
-    piG2D->DecRef ();
+  if (System)
+    System->DecRef ();
+  if (G2D)
+    G2D->DecRef ();
   delete buffer;
 }
 
 bool csConsole::Initialize(iSystem *system)
 {
-  (piSystem = system)->IncRef ();
-  piG2D = QUERY_PLUGIN(piSystem, iGraphics2D);
-  if(!piG2D)
-    return false;
+  (System = system)->IncRef ();
+  G3D = QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
+  if (!G3D) return false;
+  G2D = G3D->GetDriver2D ();
+
   // Initialize the display rectangle to the entire display
-  size.Set(0, 0, piG2D->GetWidth() - 1, piG2D->GetHeight() - 1);
-  invalid.Set(size); // Invalidate the entire console
-  font = piG2D->GetFontID();
+  size.Set (0, 0, G2D->GetWidth () - 1, G2D->GetHeight () - 1);
+  invalid.Set (size); // Invalidate the entire console
+  font = G2D->GetFontID ();
   // Create the backbuffer (4096 lines max)
-  buffer = new csConsoleBuffer(4096, (size.Height() / (piG2D->GetTextHeight(font) + 2)));
+  buffer = new csConsoleBuffer (4096, (size.Height() / (G2D->GetTextHeight (font) + 2)));
   // Initialize flash_time for flashing cursors
-  flash_time = piSystem->GetTime();
-  // Initialize ourselves with the system and return true if all is well
+  flash_time = System->GetTime ();
+
+  // We want to see broadcast events
+  System->CallOnEvents (this, CSMASK_Broadcast);
+
   return true;
 }
 
-void csConsole::Show()
+void csConsole::Clear (bool wipe)
 {
-  /***DEPRECATED***/
-}
-
-void csConsole::Hide()
-{
-  /***DEPRECATED***/
-}
-
-bool csConsole::IsActive() const
-{
-  /***DEPRECATED***/
-  return true;
-}
-
-void csConsole::Clear(bool wipe)
-{
-  if(wipe)
+  if (wipe)
     // Clear the buffer 
-    buffer->Clear();
+    buffer->Clear ();
   else
     // Put the top of the buffer on the current line
-    buffer->SetTopLine(buffer->GetCurLine());
+    buffer->SetTopLine (buffer->GetCurLine ());
 
   // Redraw the (now blank) console
-  invalid.Set(size);
+  invalid.Set (size);
   // Reset the cursor position
   cx = cy = 0;
+  clear_input = false;
 }
 
-void csConsole::SetBufferSize(int lines)
+void csConsole::SetBufferSize (int lines)
 {
-  buffer->SetLength(lines);
+  buffer->SetLength (lines);
 }
 
-void csConsole::PutText(const char *text)
+void csConsole::PutText (int iMode, const char *text)
 {
   int i;
   csString *curline = NULL;
 
   // Scan the string for escape characters
-  for(i = 0; text[i]!=0; i++) {
-    switch(text[i]) {
-    case '\n':
-      buffer->NewLine(do_snap);
-      // Update the cursor Y position
+  for (i = 0; text && text [i] != 0; i++)
+  {
+    if (clear_input)
+    {
+      curline = buffer->WriteLine ();
+      curline->Clear ();
+      clear_input = false;
       cx = 0;
-      if(do_snap)
-	cy = buffer->GetCurLine() - buffer->GetTopLine();
-      else
-	++cy < buffer->GetPageSize() ? cy : cy--;
-      // Make sure we don't change the X position below
-      curline = NULL;
-      break;
-    case '\b':
-      if(cx>0) {
-	if(cx==1) {
-	  cx = 0;
-	  buffer->DeleteLine(cy);
-	  curline = NULL;
-	} else {
-	  // Delete the character before the cursor, and move the cursor back
-	  curline = buffer->WriteLine();
-	  curline->DeleteAt(--cx);
-	}
-      } else if(cy>0) {
-	// Backup a line
-	cy--;
-	buffer->SetCurLine(cy);
-	curline = buffer->WriteLine();
-      }
-      break;
-    case '\t':
-      // Print 4-space tabs
-      curline = buffer->WriteLine();
-      curline->Append("    ");
-      cx += 4;
-      break;      
-    default:
-      curline = buffer->WriteLine();
-      if(cx==(int)curline->Length())
-	curline->Append(text[i]);
-      else
-	curline->Insert(cx, text[i]);
-      cx++;
-      break;
     }
+
+    switch (text [i])
+    {
+      case '\r':
+        clear_input = true;
+        break;
+      case '\n':
+        buffer->NewLine (do_snap);
+        // Update the cursor Y position
+        cx = 0;
+        if (do_snap)
+          cy = buffer->GetCurLine () - buffer->GetTopLine ();
+        else
+          ++cy < buffer->GetPageSize () ? cy : cy--;
+        // Make sure we don't change the X position below
+        curline = NULL;
+        break;
+      case '\b':
+        if (cx > 0)
+        {
+          if (cx == 1)
+          {
+            cx = 0;
+            buffer->DeleteLine (cy);
+            curline = NULL;
+          }
+          else
+          {
+            // Delete the character before the cursor, and move the cursor back
+            curline = buffer->WriteLine ();
+            curline->DeleteAt (--cx);
+          }
+        }
+        else if (cy > 0)
+        {
+          // Backup a line
+          cy--;
+          buffer->SetCurLine (cy);
+          curline = buffer->WriteLine ();
+        }
+        break;
+      case '\t':
+        // Print 4-space tabs
+        curline = buffer->WriteLine ();
+        curline->Append ("    ");
+        cx += 4;
+        break;
+      default:
+        curline = buffer->WriteLine ();
+        if (cx == (int)curline->Length ())
+          curline->Append (text [i]);
+        else
+          curline->Insert (cx, text [i]);
+        cx++;
+        break;
+      }
   }
-  // Update cursor X position
-  //if(curline!=NULL)
-  //cx = curline->Length();
+
+  if (auto_update && system_ready && G2D->BeginDraw ())
+  {
+    csRect rect;
+    G2D->Clear (bg);
+    Draw2D (&rect);
+    G2D->FinishDraw ();
+    G2D->Print (&rect);
+  }
 }
 
-const csString *csConsole::GetText(int line) const
+const char *csConsole::GetLine (int line) const
 {
-  return buffer->GetLine((line==-1) ? (buffer->GetCurLine() - buffer->GetTopLine()) : line);
+  return buffer->GetLine ((line == -1) ?
+    (buffer->GetCurLine () - buffer->GetTopLine ()) : line)->GetData ();
 }
 
-void csConsole::DeleteText(int start, int end)
+void csConsole::DeleteText (int start, int end)
 {
-  csString *text = buffer->WriteLine();
-  int length = text->Length();
+  csString *text = buffer->WriteLine ();
+  int length = text->Length ();
 
   // Avoid invalid start points
-  if(start>length)
+  if (start > length)
     return;
 
   // Make sure we don't go past the end of the string
-  if((end==-1)||(end>=length)) {
-    text->DeleteAt(start, length - start);
-    cx = text->Length();
-  } else {
-    text->DeleteAt(start, end - start);
+  if ((end == -1) || (end >= length))
+  {
+    text->DeleteAt (start, length - start);
+    cx = text->Length ();
+  }
+  else
+  {
+    text->DeleteAt (start, end - start);
     cx -= end - start;
   }
-
 }
 
-void csConsole::Draw(csRect *area)
+void csConsole::Draw2D (csRect *area)
 {
+  if (!visible) return;
+
   int i, height, oldfont;
   csRect line, oldrgn;
   const csString *text;
   bool dirty;
 
+  invalid.Union (size);
+
   // Save old clipping region
-  piG2D->GetClipRect(oldrgn.xmin, oldrgn.ymin, oldrgn.xmax, oldrgn.ymax);
-  piG2D->SetClipRect(size.xmin, size.ymin, size.xmax, size.ymax);
+  G2D->GetClipRect (oldrgn.xmin, oldrgn.ymin, oldrgn.xmax, oldrgn.ymax);
+  G2D->SetClipRect (invalid.xmin, invalid.ymin, invalid.xmax, invalid.ymax);
 
   // Save the old font and set it to the requested font
-  oldfont = piG2D->GetFontID();
-  piG2D->SetFontID(font);
+  oldfont = G2D->GetFontID ();
+  G2D->SetFontID (font);
 
   // Calculate the height of the text
-  height = (piG2D->GetTextHeight(font) + 2);
+  height = G2D->GetTextHeight (font) + 2;
 
   // Draw the background
-  if(!transparent)
-    piG2D->DrawBox(size.xmin, size.ymin, size.xmax, size.ymax, bg);
+  if (!transparent)
+    G2D->DrawBox (size.xmin, size.ymin, size.xmax, size.ymax, bg);
 
   // Make sure we redraw everything we need to
-  if(area)
-    area->Union(invalid);
+  if (area)
+    area->Union (invalid);
 
   // Print all lines on the current page
-  for (i=0; i<buffer->GetPageSize(); i++) {
-
+  for (i = 0; i < buffer->GetPageSize (); i++)
+  {
     // Retrieve the line from the buffer and it's dirty flag
-    text = buffer->GetLine(i, &dirty);
+    text = buffer->GetLine (i, &dirty);
 
     // A NULL line indicates it's the last printed line on the page
-    if(text==NULL)
+    if (text == NULL)
       break;
 
     // Calculate the rectangle of this line
-    line.Set(size.xmin, (i * height) + size.ymin, size.xmax, (i * height) + size.ymin + height);
+    line.Set (size.xmin, (i * height) + size.ymin,
+      size.xmax, (i * height) + size.ymin + height);
 
     // See if the line changed or if the line intersects with the invalid area
-    if(area&&(dirty||line.Intersects(invalid)))
-      area->Union(line);
+    if (area && (dirty || line.Intersects (invalid)))
+      area->Union (line);
 
     // Write the line
-    piG2D->Write(1 + size.xmin, (i * height) + size.ymin, fg, -1, text->GetData());
-
+    G2D->Write (1 + size.xmin, (i * height) + size.ymin, fg, -1, text->GetData ());
   }
 
   // Test for a change in the flash state
-  if(flash_cursor) {
-    int cur_time = piSystem->GetTime();
-    if(cur_time > flash_time + 500) {
-      do_flash = !do_flash;
+  if (flash_interval > 0)
+  {
+    time_t cur_time = System->GetTime ();
+    if (cur_time > flash_time + flash_interval || cur_time < flash_time)
+    {
+      cursor_visible = !cursor_visible;
       flash_time = cur_time;
     }
-  } else
-    do_flash = true;
+  }
+  else
+    cursor_visible = true;
 
   // See if we draw a cursor
-  if((cursor!=csConNoCursor)&&do_flash&&(cy!=-1)) {
-
+  if ((cursor != csConNoCursor) && cursor_visible && (cy != -1))
+  {
     int cx_pix, cy_pix;
 
     // Get the line of text that the cursor is on
-    text = buffer->GetLine(cy);
+    text = buffer->GetLine (cy);
 
-    if(text==NULL) {
-
+    if (text == NULL)
+    {
 #ifdef CS_DEBUG
-      if(cx!=0)
-	piSystem->Printf(MSG_WARNING, "csConsole:  Current line is empty but cursor x != 0!\n");
+      if (cx != 0)
+	System->Printf (MSG_WARNING, "csConsole:  Current line is empty but cursor x != 0!\n");
 #endif // CS_DEBUG
-
       cx_pix = 1;
-
-    } else {
-
+    }
+    else
+    {
       // Make a copy of the text
-      csString curText(*text);
-      curText.SetCapacity(cx);
-      curText.SetAt(cx, '\0');
-      cx_pix = piG2D->GetTextWidth(font, curText.GetData());
+      csString curText (*text);
+      curText.SetCapacity (cx);
+      curText.SetAt (cx, '\0');
+      cx_pix = G2D->GetTextWidth (font, curText.GetData ());
     }
     cy_pix = (cy * height) + size.ymin;
     cx_pix += size.xmin;
 
-    line.Set(cx_pix, cy_pix, cx_pix + piG2D->GetTextWidth(font, "_"), cy_pix + height);
-    piG2D->SetClipRect(line.xmin, line.ymin, line.xmax, line.ymax);
+    line.Set (cx_pix, cy_pix, cx_pix + G2D->GetTextWidth(font, "_"), cy_pix + height);
 
     // Draw the appropriate cursor
-    switch(cursor) {
-    case csConLineCursor:
-      piG2D->DrawLine(cx_pix + 1, cy_pix + (height-3), line.xmax, cy_pix + (height-3), fg);
-      break;
-    case csConBlockCursor:
-      piG2D->DrawBox(cx_pix + 1, cy_pix + 1, line.xmax - 1, cy_pix + (height-1), fg);
-      break;
-    case csConCustomCursor:
+    switch (cursor)
+    {
+      case csConInsertCursor:
+        G2D->DrawLine (cx_pix + 1, cy_pix + (height-3), line.xmax, cy_pix + (height-3), fg);
+        break;
+      case csConNormalCursor:
+        G2D->DrawBox (cx_pix + 1, cy_pix + 1, line.xmax - 1, cy_pix + (height - 1), fg);
+        break;
 #ifdef CS_DEBUG
-      if(custom_cursor==NULL)
-	piSystem->Printf(MSG_FATAL_ERROR, "csConsole:  Tried to display NULL custom cursor!!!\n");
-#endif // CS_DEBUG
-      line.ymin++; line.xmax--; line.ymax--;
-      custom_cursor->Draw(line);
-      break;
-#ifdef CS_DEBUG
-    default:
-      piSystem->Printf(MSG_WARNING, "csConsole:  Invalid cursor setting!\n");
+      default:
+        System->Printf(MSG_WARNING, "csConsole:  Invalid cursor setting!\n");
 #endif // CS_DEBUG
     }
-
   }
 
   // Restore the original clipping region
-  piG2D->SetClipRect(oldrgn.xmin, oldrgn.ymin, oldrgn.xmax, oldrgn.ymax);
+  G2D->SetClipRect (oldrgn.xmin, oldrgn.ymin, oldrgn.xmax, oldrgn.ymax);
 
   // No more invalid area
-  invalid.MakeEmpty();
+  invalid.MakeEmpty ();
 
   // Restore the original font
-  piG2D->SetFontID(oldfont);
-
+  G2D->SetFontID (oldfont);
 }
 
-void csConsole::CacheColors(iTextureManager* txtmgr)
+void csConsole::CacheColors ()
 {
   // Update the colors from the texture manager
-  fg = txtmgr->FindRGB(fg_rgb.red, fg_rgb.green, fg_rgb.blue);
-  bg = txtmgr->FindRGB(bg_rgb.red, bg_rgb.green, bg_rgb.blue);
-}
-
-void csConsole::GetForeground(int &red, int &green, int &blue) const
-{
-  red = fg_rgb.red; green = fg_rgb.green; blue = fg_rgb.blue;
-}
-
-void csConsole::SetForeground(int red, int green, int blue)
-{
-  fg_rgb.red = red; fg_rgb.green = green; fg_rgb.blue = blue;
-}
-
-void csConsole::GetBackground(int &red, int &green, int &blue) const
-{
-  red = bg_rgb.red; green = bg_rgb.green; blue = bg_rgb.blue;
-}
-
-void csConsole::SetBackground(int red, int green, int blue)
-{
-  bg_rgb.red = red; bg_rgb.green = green; bg_rgb.blue = blue;
+  iTextureManager *txtmgr = G3D->GetTextureManager ();
+  fg = txtmgr->FindRGB (fg_rgb.red, fg_rgb.green, fg_rgb.blue);
+  bg = txtmgr->FindRGB (bg_rgb.red, bg_rgb.green, bg_rgb.blue);
 }
 
 void csConsole::GetPosition(int &x, int &y, int &width, int &height) const
@@ -354,106 +367,97 @@ void csConsole::GetPosition(int &x, int &y, int &width, int &height) const
 
 void csConsole::SetPosition(int x, int y, int width, int height)
 {
-  if(x>=0)
+  if (x >= 0)
     size.xmin = x;
-  if(y>=0)
+  if (y >= 0)
     size.ymin = y;
-  if(width>=0)
+  if (width >= 0)
     size.xmax = size.xmin + width;
-  if(height>=0)
+  if (height >= 0)
     size.ymax = size.ymin + height;
 
   // Make sure we don't go off the current screen
-  if(size.xmax>=piG2D->GetWidth())
-    size.xmax = piG2D->GetWidth() - 1;
-  if(size.ymax>=piG2D->GetHeight())
-    size.ymax = piG2D->GetHeight() - 1;
+  if (size.xmax >= G2D->GetWidth ())
+    size.xmax = G2D->GetWidth () - 1;
+  if (size.ymax >= G2D->GetHeight ())
+    size.ymax = G2D->GetHeight () - 1;
   
   // Calculate the number of lines on the console
-  buffer->SetPageSize(size.Height() / (piG2D->GetTextHeight(font) + 2));
+  buffer->SetPageSize (size.Height () / (G2D->GetTextHeight (font) + 2));
 
   // Invalidate the entire new area of the console
-  invalid.Set(size); 
+  invalid.Set (size); 
 
   // Update cursor coordinates
-  cy = MIN( cy, buffer->GetPageSize () );
+  cy = MIN (cy, buffer->GetPageSize ());
   // now check how many chars do fit in the current width
-  const csString *text = buffer->GetLine(cy);
-  if(text==NULL) {
+  const csString *text = buffer->GetLine (cy);
+  if (!text)
     cx = 0;
-  } else {
-    csString curText(*text);
-    curText.SetCapacity(cx);
-    curText.SetAt(cx, '\0');
-    while ( cx && piG2D->GetTextWidth(font, curText.GetData()) > size.Width() )
+  else
+  {
+    csString curText (*text);
+    curText.SetCapacity (cx);
+    curText.SetAt (cx, '\0');
+    while (cx && G2D->GetTextWidth (font, curText.GetData ()) > size.Width ())
     {
-      curText.SetCapacity(--cx);
-      curText.SetAt(cx, '\0');
+      curText.SetCapacity (--cx);
+      curText.SetAt (cx, '\0');
     }
   }
 }
 
-void csConsole::Invalidate(csRect &area)
+void csConsole::Invalidate (csRect &area)
 {
   // Make sure we only update within our rectangle, otherwise 2D driver may crash!
-  csRect console(size);
-  console.Intersect(area);
-  if(!console.IsEmpty())
-    invalid.Union(console);
+  csRect console (size);
+  console.Intersect (area);
+  if (!console.IsEmpty ())
+    invalid.Union (console);
 }
 
-bool csConsole::GetTransparency() const
-{
-  return transparent;
-}
-
-void csConsole::SetTransparency(bool trans)
-{
-  transparent = trans;
-}
-
-int csConsole::GetFontID() const
+int csConsole::GetFontID () const
 {
   return font;
 }
 
-void csConsole::SetFontID(int FontID)
+void csConsole::SetFontID (int FontID)
 {
   font = FontID;
 
   // Calculate the number of lines on the console with the new font
-  buffer->SetPageSize(size.Height() / (piG2D->GetTextHeight(font) + 2));
-
+  buffer->SetPageSize (size.Height () / (G2D->GetTextHeight (font) + 2));
 }
 
-int csConsole::GetTopLine() const
+int csConsole::GetTopLine () const
 {
-  return buffer->GetTopLine();
+  return buffer->GetTopLine ();
 }
 
 void csConsole::ScrollTo(int top, bool snap)
 {
-  switch(top) {
-  case csConPageUp:
-    buffer->SetTopLine(buffer->GetTopLine() - buffer->GetPageSize());
-    break;
-  case csConPageDown:
-    buffer->SetTopLine(buffer->GetTopLine() + buffer->GetPageSize());
-    break;
-  case csConVeryTop:
-    buffer->SetTopLine(0);
-    break;
-  case csConVeryBottom:
-    buffer->SetTopLine(buffer->GetCurLine() - buffer->GetPageSize());
-    break;
-  default:
-    buffer->SetTopLine(top);
-    break;
+  switch (top)
+  {
+    case csConPageUp:
+      buffer->SetTopLine (buffer->GetTopLine () - buffer->GetPageSize ());
+      break;
+    case csConPageDown:
+      buffer->SetTopLine (buffer->GetTopLine () + buffer->GetPageSize ());
+      break;
+    case csConVeryTop:
+      buffer->SetTopLine (0);
+      break;
+    case csConVeryBottom:
+      buffer->SetTopLine (buffer->GetCurLine () - buffer->GetPageSize () + 1);
+      break;
+    default:
+      buffer->SetTopLine (top);
+      break;
   }
-  if( (buffer->GetCurLine() >= buffer->GetTopLine())
-      && (buffer->GetCurLine() <= buffer->GetTopLine() + buffer->GetPageSize())) {
-    cy = buffer->GetCurLine() - buffer->GetTopLine();
-  } else
+  if ((buffer->GetCurLine () >= buffer->GetTopLine ())
+   && (buffer->GetCurLine () <= buffer->GetTopLine () + buffer->GetPageSize ()))
+    cy = buffer->GetCurLine () - buffer->GetTopLine ();
+  else
     cy = -1;
   do_snap = snap;
 }
@@ -466,69 +470,97 @@ void csConsole::GetCursorPos(int &x, int &y) const
 
 void csConsole::SetCursorPos(int x, int y)
 {
-  int max_x, max_y = buffer->GetPageSize();
-  const csString *curline = buffer->GetLine(cy);
+  int max_x, max_y = buffer->GetPageSize ();
+  const csString *curline = buffer->GetLine (cy);
 
-  if(curline)
-    max_x = curline->Length();
+  if (curline)
+    max_x = curline->Length ();
   else
     max_x = 0;
 
   // Keep the cursor from going past the end of the line
-  if(x>max_x)
+  if (x > max_x)
     cx = max_x - 1;
   else
     cx = x;
   
   // Keep it from going off the bottom of the display
-  if(y>max_y)
+  if (y > max_y)
     cy = max_y - 1;
   else
     cy = y;
-  
 }
 
-int csConsole::GetCursorStyle(bool &flashing, iCursor **custom) const
+void csConsole::SetCursorPos (int iCharNo)
 {
-  flashing = flash_cursor;
-  if(custom!=NULL)
-    *custom = custom_cursor;
-  return cursor;
+  int max_x;
+  const csString *curline = buffer->GetLine (cy);
+
+  max_x = curline ? curline->Length () : 0;
+  cx = (iCharNo > max_x) ? max_x : (iCharNo <= 0) ? 0 : iCharNo;
 }
 
-void csConsole::SetCursorStyle(int style, bool flashing, iCursor *custom)
+void csConsole::SetVisible (bool iShow)
 {
-  // Setup the custom cursor
-  if(style==csConCustomCursor) {
-#ifdef CS_DEBUG
-    if(custom==NULL)
-      piSystem->Printf(MSG_FATAL_ERROR, "csConsole:  Tried to assign NULL pointer for cursor texture!");
-#endif
-    custom_cursor = custom;
-  } else
-    // If the cursor isn't set to custom, we ignore the texture completely
-    custom_cursor = NULL;
-
-  cursor = style;
-  flash_cursor = flashing;
-  do_flash = flash_cursor;
-
+  visible = iShow;
+  if (Client)
+  {
+    csEvent e (System->GetTime (), csevBroadcast, cscmdConsoleStatusChange, this);
+    Client->HandleEvent (e);
+  }
+  invalid.Set (size);
 }
 
-IMPLEMENT_IBASE(csConsole)
-  IMPLEMENTS_INTERFACE(iConsole)
-  IMPLEMENTS_INTERFACE(iPlugIn)
-IMPLEMENT_IBASE_END
+bool csConsole::ConsoleExtension (const char *iCommand, ...)
+{
+  va_list args;
+  va_start (args, iCommand);
 
-IMPLEMENT_FACTORY(csConsole)
-DECLARE_FACTORY(csConsoleInput)
-DECLARE_FACTORY(funConsole)
+  bool rc = true;
+  if (!strcmp (iCommand, "FlashTime"))
+    flash_interval = va_arg (args, time_t);
+  else if (!strcmp (iCommand, "GetPos"))
+  {
+    int *x = va_arg (args, int *);
+    int *y = va_arg (args, int *);
+    int *w = va_arg (args, int *);
+    int *h = va_arg (args, int *);
+    GetPosition (*x, *y, *w, *h);
+  }
+  else if (!strcmp (iCommand, "SetPos"))
+  {
+    int x = va_arg (args, int);
+    int y = va_arg (args, int);
+    int w = va_arg (args, int);
+    int h = va_arg (args, int);
+    SetPosition (x, y, w, h);
+  }
+  else
+    rc = false;
 
-EXPORT_CLASS_TABLE (cscon)
-  EXPORT_CLASS (csConsole, "crystalspace.console.stdout",
-		"Standard Console Plugin")
-  EXPORT_CLASS (csConsoleInput, "crystalspace.console.stdin",
-		"Standard Console Input Plugin")
-  EXPORT_CLASS (funConsole, "crystalspace.console.xstdout",
-		"Funky Console Plugin")
-EXPORT_CLASS_TABLE_END
+  va_end (args);
+  return rc;
+}
+
+bool csConsole::HandleEvent (csEvent &Event)
+{
+  switch (Event.Type)
+  {
+    case csevBroadcast:
+      switch (Event.Command.Code)
+      {
+        case cscmdSystemOpen:
+          system_ready = true;
+          CacheColors ();
+          return true;
+        case cscmdSystemClose:
+          system_ready = false;
+          return true;
+        case cscmdPaletteChanged:
+          CacheColors ();
+          break;
+      }
+      break;
+  }
+  return false;
+}

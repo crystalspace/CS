@@ -309,43 +309,103 @@ void csScan_32_scan_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_map_alpha
+#ifndef NO_scan_map_alpha_zfil
 
-#define A_SCANFUNC csScan_32_scan_map_alpha
+#define A_SCANFUNC csScan_32_scan_map_alpha_zfil
+#define A_ZFIL
 #define A_MAP
 #define A_R8G8B8
 #include "scanalph.inc"
 
-#endif // NO_scan_map_alpha
+#endif // NO_scan_map_alpha_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_tex_alpha
+#ifndef NO_scan_map_alpha_zuse
 
-#define A_SCANFUNC csScan_32_scan_tex_alpha
+#define A_SCANFUNC csScan_32_scan_map_alpha_zuse
+#define A_ZUSE
+#define A_MAP
 #define A_R8G8B8
 #include "scanalph.inc"
 
-#endif // NO_scan_tex_alpha
+#endif // NO_scan_map_alpha_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_scan_pi_tex_alpha
+#ifndef NO_scan_tex_alpha_zfil
 
-#define A_SCANFUNC csScan_32_scan_pi_tex_alpha
+#define A_SCANFUNC csScan_32_scan_tex_alpha_zfil
+#define A_ZFIL
+#define A_R8G8B8
+#include "scanalph.inc"
+
+#endif // NO_scan_tex_alpha_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_tex_alpha_zuse
+
+#define A_SCANFUNC csScan_32_scan_tex_alpha_zuse
+#define A_ZUSE
+#define A_R8G8B8
+#include "scanalph.inc"
+
+#endif // NO_scan_tex_alpha_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_alpha_znone
+
+#define A_SCANFUNC csScan_32_scan_pi_tex_alpha_znone
 #define A_PI
 #define A_R8G8B8
 #include "scanalph.inc"
 
-#endif // NO_scan_pi_tex_alpha
+#endif // NO_scan_pi_tex_alpha_znone
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_alpha_zfil
+
+#define A_SCANFUNC csScan_32_scan_pi_tex_alpha_zfil
+#define A_PI
+#define A_R8G8B8
+#define A_ZFIL
+#include "scanalph.inc"
+
+#endif // NO_scan_pi_tex_alpha_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_alpha_zuse
+
+#define A_SCANFUNC csScan_32_scan_pi_tex_alpha_zuse
+#define A_PI
+#define A_R8G8B8
+#define A_ZUSE
+#include "scanalph.inc"
+
+#endif // NO_scan_pi_tex_alpha_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_flat_znone
+
+#define PI_SCANFUNC csScan_32_scan_pi_flat_znone
+#define PI_FLAT
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_flat_znone
 
 //------------------------------------------------------------------
 
 #ifndef NO_scan_pi_flat_zfil
 
 #define PI_SCANFUNC csScan_32_scan_pi_flat_zfil
-#define PI_FLAT
 #define PI_ZFILL
+#define PI_FLAT
 #define PI_R8G8B8
 #include "scanpi.inc"
 
@@ -356,12 +416,22 @@ void csScan_32_scan_fog_view (int xx, unsigned char* d,
 #ifndef NO_scan_pi_flat_zuse
 
 #define PI_SCANFUNC csScan_32_scan_pi_flat_zuse
-#define PI_FLAT
 #define PI_ZUSE
+#define PI_FLAT
 #define PI_R8G8B8
 #include "scanpi.inc"
 
 #endif // NO_scan_pi_flat_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_znone
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_znone
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_znone
 
 //------------------------------------------------------------------
 
@@ -384,6 +454,17 @@ void csScan_32_scan_fog_view (int xx, unsigned char* d,
 #include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_key_znone
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_key_znone
+#define PI_COLORKEY
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_key_znone
 
 //------------------------------------------------------------------
 
@@ -411,11 +492,23 @@ void csScan_32_scan_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
+#ifndef NO_scan_pi_flat_fx_znone
+
+#define PI_SCANFUNC csScan_32_scan_pi_flat_fx_znone
+#define PI_FLAT
+#define PI_BLEND
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_flat_fx_znone
+
+//------------------------------------------------------------------
+
 #ifndef NO_scan_pi_flat_fx_zfil
 
 #define PI_SCANFUNC csScan_32_scan_pi_flat_fx_zfil
-#define PI_FLAT
 #define PI_ZFILL
+#define PI_FLAT
 #define PI_BLEND
 #define PI_R8G8B8
 #include "scanpi.inc"
@@ -427,13 +520,24 @@ void csScan_32_scan_fog_view (int xx, unsigned char* d,
 #ifndef NO_scan_pi_flat_fx_zuse
 
 #define PI_SCANFUNC csScan_32_scan_pi_flat_fx_zuse
-#define PI_FLAT
 #define PI_ZUSE
+#define PI_FLAT
 #define PI_BLEND
 #define PI_R8G8B8
 #include "scanpi.inc"
 
 #endif // NO_scan_pi_flat_fx_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_fx_znone
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_fx_znone
+#define PI_BLEND
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_fx_znone
 
 //------------------------------------------------------------------
 
@@ -458,6 +562,18 @@ void csScan_32_scan_fog_view (int xx, unsigned char* d,
 #include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_fx_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_fxkey_znone
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_fxkey_znone
+#define PI_COLORKEY
+#define PI_BLEND
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_fxkey_znone
 
 //------------------------------------------------------------------
 
@@ -487,11 +603,23 @@ void csScan_32_scan_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
+#ifndef NO_scan_pi_flat_gou_znone
+
+#define PI_SCANFUNC csScan_32_scan_pi_flat_gou_znone
+#define PI_FLAT
+#define PI_GOURAUD
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_flat_gou_znone
+
+//------------------------------------------------------------------
+
 #ifndef NO_scan_pi_flat_gou_zfil
 
 #define PI_SCANFUNC csScan_32_scan_pi_flat_gou_zfil
-#define PI_FLAT
 #define PI_ZFILL
+#define PI_FLAT
 #define PI_GOURAUD
 #define PI_R8G8B8
 #include "scanpi.inc"
@@ -503,13 +631,24 @@ void csScan_32_scan_fog_view (int xx, unsigned char* d,
 #ifndef NO_scan_pi_flat_gou_zuse
 
 #define PI_SCANFUNC csScan_32_scan_pi_flat_gou_zuse
-#define PI_FLAT
 #define PI_ZUSE
+#define PI_FLAT
 #define PI_GOURAUD
 #define PI_R8G8B8
 #include "scanpi.inc"
 
 #endif // NO_scan_pi_flat_gou_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_gou_znone
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_gou_znone
+#define PI_GOURAUD
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_gou_znone
 
 //------------------------------------------------------------------
 
@@ -537,6 +676,18 @@ void csScan_32_scan_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
+#ifndef NO_scan_pi_tex_goukey_znone
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_goukey_znone
+#define PI_GOURAUD
+#define PI_COLORKEY
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_goukey_znone
+
+//------------------------------------------------------------------
+
 #ifndef NO_scan_pi_tex_goukey_zfil
 
 #define PI_SCANFUNC csScan_32_scan_pi_tex_goukey_zfil
@@ -560,6 +711,19 @@ void csScan_32_scan_fog_view (int xx, unsigned char* d,
 #include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_goukey_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_flat_goufx_znone
+
+#define PI_SCANFUNC csScan_32_scan_pi_flat_goufx_znone
+#define PI_FLAT
+#define PI_GOURAUD
+#define PI_BLEND
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_flat_goufx_znone
 
 //------------------------------------------------------------------
 
@@ -591,6 +755,18 @@ void csScan_32_scan_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
+#ifndef NO_scan_pi_tex_goufx_znone
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_goufx_znone
+#define PI_GOURAUD
+#define PI_BLEND
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_goufx_znone
+
+//------------------------------------------------------------------
+
 #ifndef NO_scan_pi_tex_goufx_zfil
 
 #define PI_SCANFUNC csScan_32_scan_pi_tex_goufx_zfil
@@ -600,7 +776,7 @@ void csScan_32_scan_fog_view (int xx, unsigned char* d,
 #define PI_R8G8B8
 #include "scanpi.inc"
 
-#endif
+#endif // NO_scan_pi_tex_goufx_zfil
 
 //------------------------------------------------------------------
 
@@ -613,7 +789,20 @@ void csScan_32_scan_fog_view (int xx, unsigned char* d,
 #define PI_R8G8B8
 #include "scanpi.inc"
 
-#endif
+#endif // NO_scan_pi_tex_goufx_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_pi_tex_goufxkey_znone
+
+#define PI_SCANFUNC csScan_32_scan_pi_tex_goufxkey_znone
+#define PI_GOURAUD
+#define PI_COLORKEY
+#define PI_BLEND
+#define PI_R8G8B8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tex_goufxkey_znone
 
 //------------------------------------------------------------------
 
@@ -627,7 +816,7 @@ void csScan_32_scan_fog_view (int xx, unsigned char* d,
 #define PI_R8G8B8
 #include "scanpi.inc"
 
-#endif
+#endif // NO_scan_pi_tex_goufxkey_zfil
 
 //------------------------------------------------------------------
 
@@ -641,9 +830,6 @@ void csScan_32_scan_fog_view (int xx, unsigned char* d,
 #define PI_R8G8B8
 #include "scanpi.inc"
 
-#endif
+#endif // NO_scan_pi_tex_goufxkey_zuse
 
 //------------------------------------------------------------------
-
-#undef PIXEL_PREPROC
-#undef PIXEL_POSTPROC

@@ -430,11 +430,12 @@ unsigned char *csGraphics2DDDraw3::LockBackBuf()
     ret=m_lpddsBack->Lock(NULL, &ddsd, DDLOCK_SURFACEMEMORYPTR, NULL);
   }
   while (ret==DDERR_WASSTILLDRAWING);
-  
-  if (ret!=DD_OK)
+
+  if (ret != DD_OK)
   {
-    InitFail(m_hWnd, ret, "There was an error locking the DirectDraw surface.");
-    System->StartShutdown();
+    InitFail (m_hWnd, ret, "There was an error locking the DirectDraw surface.");
+    System->GetSystemEventOutlet ()->Broadcast (cscmdContextClose, (iGraphics2D *)this);
+    System->GetSystemEventOutlet ()->Broadcast (cscmdQuit);
   }
 
   m_bLocked = true;
@@ -593,11 +594,9 @@ void csGraphics2DDDraw3::SetFor3D(bool For3D)
   m_bUses3D = For3D;
 }
 
-bool csGraphics2DDDraw3::PerformExtension (const char *args)
+bool csGraphics2DDDraw3::PerformExtension (const char *iCommand, ...)
 {
-  csString ext(args);
-
-  if (ext.CompareNoCase("fullscreen"))
+  if (!strcasecmp (iCommand, "fullscreen"))
   {
     if (m_bReady)
     {

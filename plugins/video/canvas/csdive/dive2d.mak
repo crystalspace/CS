@@ -46,7 +46,8 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_DIVE2D
 endif
 DESCRIPTION.$(CSDIVE)=$(DESCRIPTION.csdive)
-SRC.CSDIVE = $(wildcard plugins/video/canvas/csdive/*.cpp $(SRC.COMMON.DRV2D))
+SRC.CSDIVE = $(wildcard plugins/video/canvas/csdive/*.cpp \
+  plugins/video/canvas/common/pc-keys.cpp $(SRC.COMMON.DRV2D))
 OBJ.CSDIVE = $(addprefix $(OUT),$(notdir $(SRC.CSDIVE:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)

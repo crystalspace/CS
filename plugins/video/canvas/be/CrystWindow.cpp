@@ -90,6 +90,8 @@ CrystWindow::~CrystWindow()
 
 bool CrystWindow::QuitRequested()
 {
+//EventOutlet->Broadcast (cscmdContextClose, (iGraphics2D *)this);
+//EventOutlet->Broadcast (cscmdQuit);
   cs_system->StartShutdown();
   // @@@FIXME: Don't destroy window before "LoopThread" has finished.
   return true;

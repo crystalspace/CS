@@ -20,7 +20,6 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "csalleg.h"
-#include "cssys/djgpp/idjgpp.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
 #include "allegro.h"
@@ -50,22 +49,12 @@ csGraphics2DDOSAlleg::csGraphics2DDOSAlleg (iBase *iParent) :
 csGraphics2DDOSAlleg::~csGraphics2DDOSAlleg ()
 {
   Close ();
-  if (DosSystem)
-    DosSystem->DecRef ();
 }
 
 bool csGraphics2DDOSAlleg::Initialize (iSystem *pSystem)
 {
   if (!csGraphics2D::Initialize (pSystem))
     return false;
-
-  DosSystem = QUERY_INTERFACE (System, iDosSystemDriver);
-  if (!DosSystem)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "The system driver does not support "
-                             "the IDosSystemDriver interface\n");
-    return false;
-  }
 
   switch (Depth)
   {
@@ -126,7 +115,7 @@ bool csGraphics2DDOSAlleg::Open (char* Title)
   }
 
   // Tell printf() to shut up
-  System->EnablePrintf (false);
+  System->SystemExtension ("EnablePrintf", false);
 
   // Update drawing routine addresses
   switch (pfmt.PixelBytes)
@@ -159,7 +148,7 @@ void csGraphics2DDOSAlleg::Close ()
   destroy_bitmap ((BITMAP *)_cs_alleg2d);
   csGraphics2D::Close ();
   // Tell printf() it can work now
-  System->EnablePrintf (true);
+  System->SystemExtension ("EnablePrintf", true);
 }
 
 void csGraphics2DDOSAlleg::Print (csRect *area)
@@ -183,7 +172,7 @@ void csGraphics2DDOSAlleg::Print (csRect *area)
 
 bool csGraphics2DDOSAlleg::SetMousePosition (int x, int y)
 {
-  return DosSystem->SetMousePosition (x, y);
+  return System->SystemExtension ("SetMousePosition", x, y);
 }
 
 bool csGraphics2DDOSAlleg::SetMouseCursor (csMouseCursorID iShape)

@@ -114,16 +114,16 @@ extern u_int vmCount;                   // Number of videomodes in vmList
 extern long DesktopW, DesktopH;         // Desktop width and height
 
 typedef void (*tKeyboardHandler) (void *param, unsigned char ScanCode,
-  bool Down, unsigned char RepeatCount, int ShiftFlags);
+  unsigned char CharCode, bool Down, unsigned char RepeatCount, int ShiftFlags);
 typedef void (*tMouseHandler) (void *param, int Button, bool Down,
   int x, int y, int ShiftFlags);
 typedef void (*tTerminateHandler) (void *param);
 typedef void (*tFocusHandler) (void *param, bool Enable);
 
 // Mask for shift keys (used in mouse handler)
-#define dkf_SHIFT 0x000000001
-#define dkf_ALT   0x000000002
-#define dkf_CTRL  0x000000004
+#define KF_SHIFT 0x000000001
+#define KF_ALT   0x000000002
+#define KF_CTRL  0x000000004
 
 /**
  * DIVE window class
@@ -178,6 +178,8 @@ private:
   void *paramFocus;                     // Parameter passed to focus handler
   tMouseHandler hMouse;                 // Called on mouse events if not NULL
   void *paramMouse;                     // Parameter passed to mouse handler
+
+  char lastKeyCode [128];		// Last scan->character encountered
 
 public:
   HWND diveFR, diveCL, diveMN;          // Window frame, client and menu handles

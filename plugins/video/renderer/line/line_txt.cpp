@@ -25,6 +25,8 @@
 #include "csgfxldr/quantize.h"
 #include "csutil/scanstr.h"
 #include "csutil/inifile.h"
+#include "cssys/csevent.h"
+#include "ievent.h"
 #include "isystem.h"
 #include "iimage.h"
 
@@ -513,4 +515,6 @@ void csTextureManagerLine::SetPalette ()
 
   for (int i = 0; i < 256; i++)
     G2D->SetRGB (i, cmap [i].red, cmap [i].green, cmap [i].blue);
+
+  System->GetSystemEventOutlet ()->ImmediateBroadcast (cscmdPaletteChanged, this);
 }

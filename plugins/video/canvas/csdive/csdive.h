@@ -21,7 +21,8 @@
 #define __CSDIVE_H__
 
 #include "video/canvas/common/graph2d.h"
-#include "cssys/os2/icsos2.h"
+#include "cssys/csevent.h"
+#include "ievent.h"
 
 // avoid including os2.h
 class diveWindow;
@@ -41,7 +42,7 @@ typedef ULong ULONG;
  * on my Matrox Mystique (in 1152x864x64K), but is very slow on sluggish
  * cards (such as Cirrus Logic 543X, 546X (last one becuz of lame drivers)).
  */
-class csGraphics2DOS2DIVE : public csGraphics2D
+class csGraphics2DOS2DIVE : public csGraphics2D, public iEventPlug
 {
   /// Pixel format (one of FOURCC_XXX)
   UInt PixelFormat;
@@ -66,8 +67,8 @@ class csGraphics2DOS2DIVE : public csGraphics2D
   int WindowX, WindowY;
   /// Window width and height
   int WindowWidth, WindowHeight;
-  /// Pointer to the OS/2 system driver
-  iOS2SystemDriver* OS2System;
+  // The event outlet
+  iEventOutlet *EventOutlet;
 
 public:
   DECLARE_IBASE;
@@ -94,9 +95,18 @@ public:
   virtual bool SetMousePosition (int x, int y);
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 
+  virtual bool HandleEvent (csEvent &Event);
+
+  //------------------------- iEventPlug interface ---------------------------//
+
+  virtual unsigned GetPotentiallyConflictingEvents ()
+  { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
+  virtual unsigned QueryEventPriority (unsigned /*iType*/)
+  { return 150; }
+
 private:
   static void KeyboardHandlerStub (void *Self, unsigned char ScanCode,
-    bool Down, unsigned char RepeatCount, int ShiftFlags);
+    unsigned char CharCode, bool Down, unsigned char RepeatCount, int ShiftFlags);
   static void MouseHandlerStub (void *Self, int Button, bool Down,
     int x, int y, int ShiftFlags);
   static void FocusHandlerStub (void *Self, bool Enable);

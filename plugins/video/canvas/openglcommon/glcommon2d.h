@@ -22,6 +22,7 @@
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
 #include "gl2d_font.h"
+#include "ievent.h"
 
 class OpenGLTextureCache;
 #define CsPrintf System->Printf
@@ -36,12 +37,15 @@ class OpenGLTextureCache;
  * so that a fix or improvement will be inherited by all platforms
  * instead of percolating via people copying code over. -GJH
  */
-class csGraphics2DGLCommon : public csGraphics2D
+class csGraphics2DGLCommon : public csGraphics2D, public iEventPlug
 {
   /// hold the CS fonts in an OpenGL-friendly format
   csGraphics2DOpenGLFontServer *LocalFontServer;
 
 public:
+  /// The event plug object
+  iEventOutlet *EventOutlet;
+
   DECLARE_IBASE;
 
   bool is_double_buffered;
@@ -118,6 +122,13 @@ public:
   /// Enable or disable double buffering; returns success status
   virtual bool DoubleBuffer (bool Enable) 
   { is_double_buffered = Enable; return true; }
+
+  //------------------------- iEventPlug interface ---------------------------//
+
+  virtual unsigned GetPotentiallyConflictingEvents ()
+  { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
+  virtual unsigned QueryEventPriority (unsigned /*iType*/)
+  { return 150; }
 };
 
 #endif

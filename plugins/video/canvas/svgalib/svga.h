@@ -26,9 +26,10 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
+#include "ievent.h"
 
 /// SVGALIB version.
-class csGraphics2DSVGALib : public csGraphics2D
+class csGraphics2DSVGALib : public csGraphics2D, public iEventPlug
 {
   /// Physical graphics context
   GraphicsContext physicalscreen;
@@ -39,6 +40,9 @@ class csGraphics2DSVGALib : public csGraphics2D
   bool mouse_button [3];
   /// Keep track of mouse position
   int mouse_x, mouse_y;
+
+  // The event outlet
+  iEventOutlet *EventOutlet;
   
 public:
   DECLARE_IBASE;
@@ -59,6 +63,13 @@ public:
 
   /// Called on every frame by system driver
   virtual bool HandleEvent (csEvent &Event);
+
+  //------------------------- iEventPlug interface ---------------------------//
+
+  virtual unsigned GetPotentiallyConflictingEvents ()
+  { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
+  virtual unsigned QueryEventPriority (unsigned /*iType*/)
+  { return 150; }
 };
 
 #endif // __SVGA_H__

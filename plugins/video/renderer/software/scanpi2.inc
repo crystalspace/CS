@@ -83,7 +83,7 @@
         // subvalues to get just the lower X bits from them (where X is the
         // number of bits per color component except in 32bpp modes where we
         // use 6 bit values).
-        unsigned pixel = *_dest;
+        unsigned pixel = SCR_COLORMAP (*_dest);
         unsigned rd = (pixel & PI_RM) >> PI_RS_DST_BLEND;
         unsigned gd = (pixel & PI_GM) >> PI_GS_DST_BLEND;
         unsigned bd = (pixel & PI_BM) >> PI_BS_DST_BLEND;

@@ -26,6 +26,7 @@
 #include "csutil/csrect.h"
 #include "isystem.h"
 #include "video/canvas/common/x11comm.h"
+#include "video/canvas/common/scancode.h"
 #include "video/renderer/glide/gllib.h"
 
 #ifdef GLIDE3
@@ -48,13 +49,17 @@ EXPORT_CLASS_TABLE_END
 
 #endif
 
+IMPLEMENT_IBASE_EXT (csGraphics2DGlideX)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iEventPlug)
+IMPLEMENT_IBASE_EXT_END
+
 csGraphics2DGlideX* thisPtr=NULL;
 
 // csGraphics2DGLX functions
 csGraphics2DGlideX::csGraphics2DGlideX(iBase *iParent) :
   csGraphics2DGlideCommon( iParent ), xim (NULL), cmap (0)
 {
-  CONSTRUCT_IBASE (iParent);
+  EventOutlet = NULL;
 }
 
 bool csGraphics2DGlideX::Initialize (iSystem *pSystem)
@@ -117,6 +122,8 @@ bool csGraphics2DGlideX::Initialize (iSystem *pSystem)
  
   // Tell system driver to call us on every frame
   System->CallOnEvents (this, CSMASK_Nothing);
+  // Create the event outlet
+  EventOutlet = System->CreateEventOutlet (this);
 
   GraphicsReady = 1;  
 
@@ -128,11 +135,12 @@ csGraphics2DGlideX::~csGraphics2DGlideX ()
   // Destroy your graphic interface
   GraphicsReady=0;
   Close ();
+  if (EventOutlet)
+    EventOutlet->DecRef ();
 }
 
 bool csGraphics2DGlideX::Open(const char *Title)
 { 
-
   // Open your graphic interface
   if (!csGraphics2DGlideCommon::Open (Title))
     return false;
@@ -269,7 +277,6 @@ void csGraphics2DGlideX::FXgetImage()
 
    // now put image in window...
    XPutImage (dpy, window, gc, xim, 0, 0, 0, 0, Width, Height);
-
 }
 
 bool csGraphics2DGlideX::SetMouseCursor (csMouseCursorID iShape)
@@ -300,41 +307,46 @@ static Bool CheckKeyPress (Display *dpy, XEvent *event, XPointer arg)
   return false;
 }
 
-#define DO_STUFF_EXTENDED_KEYCODE
+// XCheckMaskEvent() doesn't get ClientMessage Events so use XCheckIfEvent()
+// with this Predicate function as a work-around (ClientMessage events
+// are needed in order to catch "WM_DELETE_WINDOW")
+static Bool AlwaysTruePredicate (Display*, XEvent*, char*)
+{
+  return True;
+}
 
 bool csGraphics2DGlideX::HandleEvent (csEvent &/*Event*/)
 {
   static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
   XEvent event;
-  bool cskey=true;
-  int state, key;
+  KeySym key;
+  int charcount;
+  char charcode [8];
   bool down;
-#ifdef DO_STUFF_EXTENDED_KEYCODE
-  unsigned char keytranslated;
-#endif
 
-  while (XCheckMaskEvent (dpy, ~0, &event))
+  while (XCheckIfEvent (dpy, &event, AlwaysTruePredicate, 0))
     switch (event.type)
     {
       case ButtonPress:
-        state = ((XButtonEvent*)&event)->state;
-        System->QueueMouseEvent (button_mapping [event.xbutton.button],
+        EventOutlet->Mouse (button_mapping [event.xbutton.button],
           true, event.xbutton.x, event.xbutton.y);
-          break;
+        break;
+      case MappingNotify:
+        XRefreshKeyboardMapping (&event.xmapping);
+	break;
       case ClientMessage:
 	if (static_cast<Atom>(event.xclient.data.l[0]) == wm_delete_window)
 	{
-	  System->QueueContextCloseEvent ((void*)this);
-	  System->StartShutdown();
+	  EventOutlet->Broadcast (cscmdContextClose, (iGraphics2D *)this);
+	  EventOutlet->Broadcast (cscmdQuit);
 	}
 	break;
       case ButtonRelease:
-        System->QueueMouseEvent (button_mapping [event.xbutton.button],
+        EventOutlet->Mouse (button_mapping [event.xbutton.button],
           false, event.xbutton.x, event.xbutton.y);
         break;
       case MotionNotify:
-        System->QueueMouseEvent (0, false,
-	  event.xbutton.x, event.xbutton.y);
+        EventOutlet->Mouse (0, false, event.xbutton.x, event.xbutton.y);
 	mx = event.xbutton.x; my = event.xbutton.y;
         break;
       case KeyPress:
@@ -344,12 +356,8 @@ bool csGraphics2DGlideX::HandleEvent (csEvent &/*Event*/)
 	// in favour of KeyDown since this is most (sure?) an autorepeat
         XCheckIfEvent (event.xkey.display, &event, CheckKeyPress, (XPointer)&event);
         down = (event.type == KeyPress);
-#ifdef DO_STUFF_EXTENDED_KEYCODE
-        XLookupString ((XKeyEvent*)&event, (char*)&keytranslated, 1, (KeySym*)&key, NULL);
-#else
-        key = XLookupKeysym (&event.xkey, 0);
-        state = event.xkey.state;
-#endif
+        charcount = XLookupString ((XKeyEvent *)&event, charcode,
+          sizeof (charcode), &key, NULL);
         switch (key)
         {
           case XK_Meta_L:
@@ -407,20 +415,13 @@ bool csGraphics2DGlideX::HandleEvent (csEvent &/*Event*/)
           case XK_F10:        key = CSKEY_F10; break;
           case XK_F11:        key = CSKEY_F11; break;
           case XK_F12:        key = CSKEY_F12; break;
-          default:            cskey=false; break;
+          default:            key = (key <= 127) ? ScanCodeToChar [key] : 0;
         }
-#ifdef DO_STUFF_EXTENDED_KEYCODE
-        if ( cskey )
-	  System->QueueKeyEvent (key, down);
-	else
-  	  System->QueueExtendedKeyEvent (key, (int)keytranslated, down);
-#else
-	System->QueueKeyEvent (key, down);
-#endif
+	EventOutlet->Key (key, charcount == 1 ? uint8 (charcode [0]) : 0, down);
         break;
       case FocusIn:
       case FocusOut:
-        System->QueueFocusEvent (event.type == FocusIn);
+        EventOutlet->Broadcast (cscmdFocusChanged, (void *)(event.type == FocusIn));
         break;
       case Expose:
       {

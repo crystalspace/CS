@@ -39,6 +39,7 @@ csGraphics2D::csGraphics2D ()
   Memory = NULL;
   FontServer = NULL;
   LineAddress = NULL;
+  Palette = NULL;
 }
 
 bool csGraphics2D::Initialize (iSystem* pSystem)
@@ -79,8 +80,7 @@ csGraphics2D::~csGraphics2D ()
   if (FontServer)
     FontServer->DecRef ();
   Close ();
-  if (Palette)
-    delete [] Palette;
+  delete [] Palette;
 }
 
 bool csGraphics2D::Open (const char *Title)
@@ -490,9 +490,9 @@ bool csGraphics2D::SetMouseCursor (csMouseCursorID iShape)
   return (iShape == csmcArrow);
 }
 
-bool csGraphics2D::PerformExtension (const char* args)
+bool csGraphics2D::PerformExtension (const char* iCommand, ...)
 {
-  (void)args;
+  (void)iCommand;
   return false;
 }
 

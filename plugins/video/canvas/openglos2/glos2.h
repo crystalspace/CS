@@ -22,7 +22,6 @@
 #define __GLOS2_H__
 
 #include "csutil/scf.h"
-#include "cssys/os2/icsos2.h"
 #include "video/canvas/openglcommon/glcommon2d.h"
 
 // avoid including os2.h
@@ -59,8 +58,6 @@ class csGraphics2DOS2GL : public csGraphics2DGLCommon
 
   /// Window position in percents
   int WindowX, WindowY;
-  /// Pointer to the OS/2 system driver
-  iOS2SystemDriver* OS2System;
 
 public:
   csGraphics2DOS2GL (iBase *iParent);
@@ -73,7 +70,7 @@ public:
   virtual void Print (csRect *area = NULL);
   virtual int GetPage ();
   virtual bool DoubleBuffer (bool Enable);
-  virtual bool DoubleBuffer ();
+  virtual bool GetDoubleBufferState ();
 
   virtual void SetRGB (int i, int r, int g, int b);
 
@@ -83,10 +80,12 @@ public:
   virtual bool SetMousePosition (int x, int y);
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 
+  virtual bool HandleEvent (csEvent &Event);
+
 private:
-  static void KeyboardHandlerStub (void *Self, unsigned char ScanCode, int Down,
-    unsigned char RepeatCount, int ShiftFlags);
-  static void MouseHandlerStub (void *Self, int Button, int Down, int x, int y,
+  static void KeyboardHandlerStub (void *Self, unsigned char ScanCode,
+    unsigned char CharCode, int Down, unsigned char RepeatCount, int ShiftFlags);
+  static void MouseHandlerStub (void *Self, int Button, bool Down, int x, int y,
     int ShiftFlags);
   static void FocusHandlerStub (void *Self, bool Enable);
   static void TerminateHandlerStub (void *Self);

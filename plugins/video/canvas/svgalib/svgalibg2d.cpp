@@ -54,12 +54,14 @@ EXPORT_CLASS_TABLE_END
 IMPLEMENT_IBASE (csGraphics2DSVGALib)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics2D)
+  IMPLEMENTS_INTERFACE (iEventPlug)
 IMPLEMENT_IBASE_END
 
 // csGraphics2DSVGALib functions
 csGraphics2DSVGALib::csGraphics2DSVGALib(iBase *iParent) : csGraphics2D ()
 {
   CONSTRUCT_IBASE (iParent);
+  EventOutlet = NULL;
 }
 
 bool csGraphics2DSVGALib::Initialize (iSystem *pSystem)
@@ -131,6 +133,8 @@ bool csGraphics2DSVGALib::Initialize (iSystem *pSystem)
 
   // Tell system driver to call us on every frame
   System->CallOnEvents (this, CSMASK_Nothing);
+  // Create the event outlet
+  EventOutlet = System->CreateEventOutlet (this);
 
   return true;
 }
@@ -139,6 +143,8 @@ csGraphics2DSVGALib::~csGraphics2DSVGALib(void)
 {
   // Destroy your graphic interface
   Close();
+  if (EventOutlet)
+    EventOutlet->DecRef ();
 }
 
 bool csGraphics2DSVGALib::Open(const char *Title)
@@ -229,7 +235,7 @@ bool csGraphics2DSVGALib::HandleEvent (csEvent &/*Event*/)
     if (down != keydown [scancode])
     {
       keydown [scancode] = down;
-      System->QueueKeyEvent (key, down);
+      EventOutlet->Key (key, -1, down);
     }
   }
 
@@ -240,7 +246,7 @@ bool csGraphics2DSVGALib::HandleEvent (csEvent &/*Event*/)
     if ((x != mouse_x) || (y != mouse_y))
     {
       mouse_x = x; mouse_y = y;
-      System->QueueMouseEvent (0, false, x, y);
+      EventOutlet->Mouse (0, false, x, y);
     }
     
     int buttons = mouse_getbutton ();
@@ -250,7 +256,7 @@ bool csGraphics2DSVGALib::HandleEvent (csEvent &/*Event*/)
       if (down != mouse_button [button])
       {
         mouse_button [button] = down;
-        System->QueueMouseEvent (button + 1, down, x, y);
+        EventOutlet->Mouse (button + 1, down, x, y);
       }
     }
   }

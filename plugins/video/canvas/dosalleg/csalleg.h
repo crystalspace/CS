@@ -22,15 +22,12 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "cssys/djgpp/idjgpp.h"
 
 /// DOS Allegro 2D graphics driver
 class csGraphics2DDOSAlleg : public csGraphics2D
 {
   /// Palette has been changed?
   bool PaletteChanged;
-  /// Pointer to DOS-specific interface
-  iDosSystemDriver* DosSystem;
 
 public:
   DECLARE_IBASE;

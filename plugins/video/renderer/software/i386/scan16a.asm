@@ -931,7 +931,7 @@ endproc
 ;   int xx, unsigned char *d, unsigned long *z_buf,
 ;   float inv_z, float u_div_z, float v_div_z
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
-proc		csScan_16_scan_fog_555,36,ebx,esi,edi,ebp
+proc		csScan_16_555_scan_fog,36,ebx,esi,edi,ebp
 		targ	%$width		; int
 		targ	%$dest		; unsigned char *
 		targ	%$zbuff		; unsigned long *
@@ -1096,7 +1096,7 @@ endproc
 ;   int xx, unsigned char *d, unsigned long *z_buf,
 ;   float inv_z, float u_div_z, float v_div_z
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
-proc		csScan_16_scan_fog_565,36,ebx,esi,edi,ebp
+proc		csScan_16_565_scan_fog,36,ebx,esi,edi,ebp
 		targ	%$width		; int
 		targ	%$dest		; unsigned char *
 		targ	%$zbuff		; unsigned long *
@@ -1261,7 +1261,7 @@ endproc
 ;   int xx, unsigned char *d, unsigned long *z_buf,
 ;   float inv_z, float u_div_z, float v_div_z
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
-proc		csScan_16_scan_fog_view_555,28,ebx,esi,edi,ebp
+proc		csScan_16_555_scan_fog_view,28,ebx,esi,edi,ebp
 		targ	%$width		; int
 		targ	%$dest		; unsigned char *
 		targ	%$zbuff		; unsigned long *
@@ -1371,7 +1371,7 @@ endproc
 ;   int xx, unsigned char *d, unsigned long *z_buf,
 ;   float inv_z, float u_div_z, float v_div_z
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
-proc		csScan_16_scan_fog_view_565,28,ebx,esi,edi,ebp
+proc		csScan_16_565_scan_fog_view,28,ebx,esi,edi,ebp
 		targ	%$width		; int
 		targ	%$dest		; unsigned char *
 		targ	%$zbuff		; unsigned long *
