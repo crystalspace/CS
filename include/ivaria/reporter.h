@@ -228,7 +228,7 @@ inline void csReport (iObjectRegistry* object_reg, int severity,
     reporter->ReportV (severity, msgId, description, arg);
   else
   {
-    csVPrintf (description, arg);
+    csPrintfV (description, arg);
     csPrintf ("\n");
   }
   va_end (arg);

@@ -62,7 +62,7 @@ void csGraphics2DGLX::Report (int severity, const char* msg, ...)
     rep->ReportV (severity, "crystalspace.canvas.glx2d", msg, arg);
   else
   {
-    csVPrintf (msg, arg);
+    csPrintfV (msg, arg);
     csPrintf ("\n");
   }
   va_end (arg);

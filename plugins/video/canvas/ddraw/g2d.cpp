@@ -81,7 +81,7 @@ void csGraphics2DDDraw3::Report (int severity, const char* msg, ...)
     rep->ReportV (severity, "crystalspace.canvas.ddraw", msg, arg);
   else
   {
-    csVPrintf (msg, arg);
+    csPrintfV (msg, arg);
     csPrintf ("\n");
   }
   va_end (arg);

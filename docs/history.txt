@@ -5,6 +5,9 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine eliminated the now unnecessary inclusion of
 	  cssys/system.h from NeXTTime.cpp.  Also changed file's comment so
 	  that it no longer mentions csSystemDriver.
+	- Eric Sunshine renamed csVPrintf() to csPrintfV() for consistency with
+	  other `vararg' functions in the project, such as PerformExtensionV(),
+	  ReportV(), etc.
 27-Jul-2001
 	- Removed csSystemDriver::Warn() and Alert().
 	- Removed the console pointer in csSystemDriver.

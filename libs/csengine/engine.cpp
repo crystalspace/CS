@@ -76,7 +76,7 @@ void csEngine::Report (const char* description, ...)
   }
   else
   {
-    csVPrintf (description, arg);
+    csPrintfV (description, arg);
     csPrintf ("\n");
   }
   va_end (arg);
@@ -94,7 +94,7 @@ void csEngine::Warn (const char* description, ...)
   }
   else
   {
-    csVPrintf (description, arg);
+    csPrintfV (description, arg);
     csPrintf ("\n");
   }
   va_end (arg);
@@ -112,7 +112,7 @@ void csEngine::ReportBug (const char* description, ...)
   }
   else
   {
-    csVPrintf (description, arg);
+    csPrintfV (description, arg);
     csPrintf ("\n");
   }
   va_end (arg);

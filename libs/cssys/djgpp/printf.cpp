@@ -46,7 +46,7 @@ int csPrintf (const char *str, ...)
 }
 
 // to be called instead of vprintf
-int csVPrintf (const char *str, va_list arg)
+int csPrintfV (const char *str, va_list arg)
 {
   int rc = 0;
   if (EnablePrintf)

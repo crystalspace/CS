@@ -474,7 +474,7 @@ extern void (*fatal_exit) (int errorcode, bool canreturn);
 // CS version of printf
 extern int csPrintf (const char* str, ...);
 // CS version of vprintf
-extern int csVPrintf (const char* str, va_list arg);
+extern int csPrintfV (const char* str, va_list arg);
 
 // Get the time.
 extern csTime csGetTicks ();

@@ -167,7 +167,7 @@ void csLoader::ReportNotify (const char* description, ...)
   }
   else
   {
-    csVPrintf (description, arg);
+    csPrintfV (description, arg);
     csPrintf ("\n");
   }
   va_end (arg);

@@ -67,7 +67,7 @@ void csFreeTypeServer::Report (int severity, const char* msg, ...)
     rep->ReportV (severity, "crystalspace.font.freefont", msg, arg);
   else
   {
-    csVPrintf (msg, arg);
+    csPrintfV (msg, arg);
     csPrintf ("\n");
   }
   va_end (arg);

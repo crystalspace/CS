@@ -101,7 +101,7 @@ void BumpTest::Report (int severity, const char* msg, ...)
     rep->ReportV (severity, "crystalspace.application.bumptest", msg, arg);
   else
   {
-    csVPrintf (msg, arg);
+    csPrintfV (msg, arg);
     csPrintf ("\n");
   }
   va_end (arg);
