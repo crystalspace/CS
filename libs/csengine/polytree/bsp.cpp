@@ -117,7 +117,7 @@ void csBspTree::Build (csPolygonInt** polygons, int num)
   delete [] new_polygons;
 }
 
-#define BSPDB 1
+#define BSPDB 0
 
 #if BSPDB
 #  define DB(msg) CsPrintf##msg;
