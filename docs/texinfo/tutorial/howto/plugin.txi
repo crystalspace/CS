@@ -1,0 +1,443 @@
+@c -*-texinfo-*-
+@node HOWTO Create Your Own Plugin, , HOWTO Setting the CRYSTAL enviroment variable, , HOWTO
+@subsection Create Your Own Plugin
+
+Making a plugin in Crystal Space is not very hard but nevertheless
+there are still a few issues that are often forgotten. Here in this
+article we show you how you can write a simple plugin and use
+it in your application.
+
+@subsubheading Defining your Plugin API
+
+The first thing that you need to do when making a plugin is to
+define the API for it. The API is what your application is going
+to use to talk to the plugin. It is the interface to the plugin
+so it is very important to get this right. In the Crystal Space
+framework SCF (Shared Class Facility) is used to define the API.
+Basically with this facility you create an abstract class
+containing only the methods from the API. An abstract class in C++
+means that all methods are pure virtual. This means that no
+implementation is given; only method declarations. The implementation
+will come later in the code of the plugin.
+
+This concept is similar to the Java interface mechanism. The
+advantage of using this paradigm is that you have a clear seperation 
+between
+the API and the implementation. This allows one to easily replace an
+implementation of some API or even provide multiple implementations
+(for example, the Software and OpenGL renderers are two implementations
+of the same 3D rendering API).
+
+Here is the API definition for our plugin:
+
+@example
+#ifndef __GAME_MYAPI_H__
+#define __GAME_MYAPI_H__
+
+#include "csutil/scf.h"
+
+class csVector3;
+
+SCF_VERSION (iMyApi, 0, 0, 1);
+
+/**
+* This is the API for our plugin. I recommend
+* to use better comments then this one here in a
+* real situation.
+*/
+struct iMyApi : public iBase
+{
+/// Do something.
+virtual void DoSomething (int param, const csVector3& v) = 0;
+/// Get something.
+virtual int GetSomething () const = 0;
+};
+
+#endif // __GAME_MYAPI_H__
+@end example
+
+The above text should be put in an header file. Let's put it in
+@file{myapi.h}. I'll explain what happens in this header here.
+
+First we include @file{csutil/scf.h}. This is a Crystal Space header
+for @sc{SCF} which we need to get the definition of @samp{iBase} and the
+definition of the @samp{SCF_VERSION} macro.
+
+Then we declare @samp{csVector3} as a class. We do this so that we
+can later use @samp{csVector3} as a parameter in one of the API methods.
+We don't need the complete definition of @samp{csVector3} since we
+are going to define the method so that it passes the vector by
+reference.
+
+After this we use the @samp{SCF_VERSION} macro to define the version
+of this interface. This versioning can be used to query for
+specific versions of an interface. This can be useful later when you
+want to extent the API without breaking existing apps. The version
+has three parts: major, minor, and micro.
+
+Finally we define the API by making a structure that inherits from
+@samp{iBase}. We use @samp{struct} instead of @samp{class} simply because for
+structures the default visibility is @samp{public} instead of @samp{private} for
+classes. This is just conveniant. There is no other difference between
+a @samp{struct} or a @sam{class} in C++.
+
+The name @samp{iMyApi} is not random. Crystal Space uses this naming
+convention (starting a class name with @samp{i}) for @sc{SCF} interfaces so that
+it is easy to see that we're talking about an @sc{SCF} interface just by
+looking at the name.
+
+We inherit from @samp{iBase} because that's how @sc{SCF} works. All @sc{SCF} 
+interfaces
+need to inherit from @samp{iBase}. This will make sure that we have
+reference counting (more on that later) and also takes care of the
+other internal @sc{SCF} issues.
+
+In that structure we define two methods: @samp{DoSomething()} and
+@samp{GetSomething()}. Note that every method is defined as follows:
+
+@example
+virtual ... = 0;
+@end example
+
+The @samp{= 0} means that we will not give an implementation here. The
+implementation will be provided by the plugin (see later).
+
+Note that it is good practice to use @samp{const} a lot. In the declaration
+of @samp{GetSomething()} we added @samp{const} at the end to indicate that this
+method will not change the object. This is useful for two reasons: 
+@enumerate
+@item 
+a good compiler may do some optimizations if it knows that the method
+will not modify the object
+@item 
+it also serves as documentation to the API user.
+@end enumerate
+
+@subsubheading Creating the Plugin Implementation (header)
+
+After you defined the API for your plugin it is now time to actually
+make the plugin implementation. First you define a header called
+@samp{myplug.h} with the following contents:
+
+@example
+#ifndef __GAME_MYPLUG_H__
+#define __GAME_MYPLUG_H__
+
+#include "iutil/comp.h"
+#include "csgeom/vector3.h"
+#include "myapi.h"
+
+struct iObjectRegistry;
+
+/**
+* This is the implementation for our API and
+* also the implementation of the plugin.
+*/
+class MyPlugin : public iMyApi
+{
+private:
+iObjectRegistry* object_reg;
+csVector3 store_v;
+
+public:
+MyPlugin (iBase* parent);
+virtual ~MyPlugin ();
+bool Initialize (iObjectRegistry* iobject_reg);
+
+SCF_DECLARE_IBASE;
+virtual void DoSomething (int param, const csVector3& v);
+virtual int GetSomething () const;
+
+struct Component : public iComponent
+{
+SCF_DECLARE_EMBEDDED_IBASE (MyPlugin);
+virtual bool Initialize (iObjectRegistry* object_reg)
+{
+return scfParent->Initialize (object_reg);
+}
+} scfiComponent;
+};
+
+#endif // __GAME_MYPLUG_H__
+@end example
+
+This requires a little explanation. The @sc{Crystal Space} framework
+requires that every plugin implements the @samp{iComponent} interface.
+This interface has a single method @samp{Initialize()} with which the
+plugin will be initialized after it is loaded. This gives the plugin
+a chance to do various initialization operations and it also provides
+the plugin with a pointer to the global object registry.
+
+But our plugin also needs to implement its own native @samp{iMyApi}
+interface. So here is a situation where the same class needs to
+implement two interfaces at the same time. There are basically two ways
+to do this: multiple inheritence or by using an embedded @sc{SCF} class.
+We use the second case here since that is more portable. Multiple
+inheritence is known to cause problems on some platforms (i.e. 
+NextStep).
+
+In the example above the class @samp{MyPlugin} directly inherits from
+@samp{iMyApi}. The methods from @samp{iMyApi} are implemented directly in
+@samp{MyPlugin}. To do that the method declarations from @samp{iMyApi} are
+copied to @samp{MyPlugin} except that the @code{= 0} is removed. To indicate
+that this class represents an implementation of an @sc{SCF} interface
+we additionally need the @code{SCF_DECLARE_IBASE} macro. This macro
+will take care of declaring the @samp{DecRef()} and @samp{IncRef()} functions
+to take care of reference counting. In addition the macro also
+declares @samp{QueryInterface()} so that it is possible to request
+other interfaces (like @samp{iComponent)} from this class. You don't need
+to worry much about this.
+
+Note that @samp{MyPlugin} needs a constructor that accepts an @samp{iBase*}
+parameter. Otherwise CS will not be able to load this plugin.
+
+To implement @samp{iComponent} we add an inner class called @samp{Component}.
+This class will inherit directly from @samp{iComponent} so that @samp{MyPlugin}
+also implements @samp{iComponent} indirectly. Because this is an
+embedded interface we now need the @samp{SCF_DECLARE_EMBEDDED_IBASE} macro.
+This macro takes care of the fact that this interface actually belongs
+to the parent class (which is given as a parameter). One thing it does
+is declare a variable of type @samp{MyPlugin} which is called @samp{scfParent}.
+Through that variable the method implementations of the embedded
+interface can access the main class. After declaring the class
+@samp{Component} we immediatelly create an instance of this called
+@samp{scfiComponent}. You can call it whatever you like. This name is just
+a convention in Crystal Space.
+
+Sometimes embedded classes are also made friend of the main
+class so that they can access the private information. In this case
+this is not needed. The only thing that @samp{Component} has is an
+@samp{Initialize()} method which immediatelly transfers control to
+the parent @samp{Initialize()} method.
+
+@subsubheading Creating the Plugin Implementation (source)
+
+Now we create the main source file containing the implementation
+of our plugin. Let's call this @samp{myplug.cpp}:
+
+@example
+#include "cssysdef.h"
+#include "myplug.h"
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
+
+CS_IMPLEMENT_PLUGIN
+
+SCF_IMPLEMENT_IBASE (MyPlugin)
+SCF_IMPLEMENTS_INTERFACE (iMyApi)
+SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (MyPlugin::Component)
+SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_FACTORY (MyPlugin)
+
+SCF_EXPORT_CLASS_TABLE (myplugin)
+SCF_EXPORT_CLASS (MyPlugin,
+"crystalspace.mygame.myplugin",
+"My First Plugin!")
+SCF_EXPORT_CLASS_TABLE_END
+
+MyPlugin::MyPlugin (iBase* parent)
+{
+SCF_CONSTRUCT_IBASE (parent);
+SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
+object_reg = NULL;
+}
+
+MyPlugin::~MyPlugin ()
+{
+}
+
+bool MyPlugin::Initialize (iObjectRegistry* iobject_reg)
+{
+object_reg = iobject_reg;
+return true;
+}
+
+void MyPlugin::DoSomething (int param, const csVector3& v)
+{
+// Just some stupid behaviour.
+if (param == 1)
+store_v = v;
+else
+store_v = -v;
+}
+
+int MyPlugin::GetSomething () const
+{
+return (int)store_v.x+(int)store_v.y+(int)store_v.z;
+}
+
+@end example
+
+The first macro is @samp{CS_IMPLEMENT_PLUGIN}. This indicates to the
+@sc{Crystal Space} framework that this module will end up as a plugin
+(as opposed to being an application). On some platforms this
+actually makes a difference.
+
+The first @samp{SCF_IMPLEMENT_IBASE} section describes what interfaces
+the class @samp{MyPlugin} implements. This section says that
+@samp{MyPlugin} implements @samp{iMyApi} directly and @samp{iComponent} through
+embedding.
+
+The second @samp{SCF_IMPLEMENT_EMBEDDED_IBASE} section describes what
+interfaces the class @samp{MyPlugin::Component} implements (i.e. the
+embedded class). @samp{MyPlugin::Component} only implements @samp{iComponent}.
+
+It is important to correctly use the above macros. These macros
+will make sure that the implementation for @samp{IncRef()}, @samp{DecRef()},
+and @samp{QueryInterface()} is provided. The @samp{SCF_IMPLEMENT_...} are general
+SCF macros. As such they have nothing to do with plugins. However,
+the following macros actually declare that @samp{MyPlugin} is a plugin.
+
+The @samp{SCF_IMPLEMENT_FACTORY} says that @samp{MyPlugin} represents an
+@sc{SCF} factory which is required to make it a plugin. It will basically
+define a function that creates an instance of the @samp{MyPlugin} class.
+Note that one dynamic module can in fact define several distinct
+plugins. In that case you need multiple @samp{SCF_IMPLEMENT_FACTORY}
+lines for every one of them.
+
+The @samp{SCF_EXPORT_CLASS} macro declares a list of all classes that
+are exported by this plugin. In this case we only export the
+@samp{MyPlugin} class. In addition to exporting the class you also need
+to give the name and description of the plugin. In this case our
+plugin is named @samp{crystalspace.mygame.myplugin}. This name is important
+as this is the name by which we will later load the plugin in our
+application.
+
+The name given after @samp{SCF_EXPORT_CLASS} (in this case @samp{myplugin)}
+should be equal to the name of the dynamic module (i.e. @samp{myplugin.dll}
+or @samp{myplugin.so)}. If this is not the case then the plugin will not
+work.
+
+In the constructor of @samp{MyPlugin} you must call @samp{SCF_CONSTRUCT_IBASE} 
+for
+the main interface and @samp{SCF_CONSTRUCT_EMBEDDED_IBASE} for all embedded
+interfaces. These macros will make sure that the object is initialized
+correctly (i.e. reference count set to 1 and so on).
+
+The rest of the plugin is very straightforward. It is important
+to realize that you should do most initialization of the plugin
+in the @samp{Initialize()} function and not in the constructor. The reason
+for this is that at construction time you cannot depend on the entire
+Crystal Space framework to be ready. Also when @samp{Initialize()} is
+called you get a pointer to the object registry which is essential
+to find other modules and plugins loaded in the Crystal Space
+framework.
+
+This should conclude the implementation of the plugin.
+
+@subsubheading Compiling the Plugin
+
+Depending on the compiler that you use I refer you to the
+HOWTO's on the subject of compiling an external application. There
+is a template makefile provided which also works for plugins. That's
+by far the easiest way to get this compiled.
+
+@subsubheading Registering the Plugin
+
+Before you can use your plugin you first have to register it.
+For this you can use the @samp{scfreg} application which is included
+with @sc{Crystal Space}. Just call:
+
+@example
+scfreg myplugin.dll
+@end example
+
+or
+@example
+scfreg myplugin.so
+@end example
+
+If all is well this should create an entry for your plugin
+in @file{scf.cfg}. Call this from within your game directory and not
+the Crystal Space directory. That way you will get a local
+@file{scf.cfg} that is used in addition to the global one from
+Crystal Space itself.
+
+@subsubheading Loading the Plugin in your Application
+
+First include the header defining the API of the plugin:
+
+@example
+#include "myapi.h"
+@end example
+
+Do NOT include the @samp{myplug.h} header file! This is implementation
+specific and you should not use the implementation of the plugin
+directly! Doing this invalidates the entire reason to use plugins
+in the first place.
+
+To load the plugin there are a few possibilities. First you
+can load the plugin manually using @samp{CS_LOAD_PLUGIN} like this:
+
+@example
+iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+iMyApi* myapi = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mygame.myplugin",
+                                iMyApi);        
+plugin_mgr->DecRef ();
+@end example
+
+This will first query the plugin manager from the object registry.
+This is the module that is responsible for loading and unloading
+plugins.
+
+Then it will use the plugin manager to load your plugin. Note that
+this can fail. You should always check the returned value to see if
+it is different from NULL.
+
+Finally it will release the reference to the plugin manager that
+we obtained with @samp{CS_QUERY_REGISTRY}. This is important! Always
+keep track of your references. Otherwise you will get memory leaks.
+After loading our plugin we will also have a reference to the plugin.
+In the cleanup of your game you should make sure to release that
+reference.
+
+Another way to load the plugin is through @samp{RequestPlugins()} which
+is called at initialization time:
+
+@example
+if (!csInitializer::RequestPlugins (object_reg,
+                                    CS_REQUEST_VFS,
+                                    CS_REQUEST_SOFTWARE3D,
+                                    CS_REQUEST_ENGINE,
+                                    ...
+                                    CS_REQUEST_PLUGIN("crystalspace.mygame.myplugin", iMyApi),
+                                    CS_REQUEST_END))
+{
+...
+}
+...
+
+iMyApi* myapi = CS_QUERY_REGISTRY (object_reg, iMyApi);
+@end example
+
+This way has several advantages. First it makes sure that the
+user can override your plugin at the commandline or in the 
+configuration
+file (if you have one for your game). In cases where there are
+multiple possible implementations for the same API this can be
+important. It is by doing this that it is possible to switch
+between Software and OpenGL with the commandline or the config file.
+
+Secondly it registers the plugin with the object registry so that
+it is easier to find your module later. This way other plugins
+can find your plugin by doing a query on the object registry.
+
+Note that also in this case you need to clean up the reference
+to @samp{myapi} at cleanup time.
+
+@subsubheading Using the Plugin in your Application
+
+After loading the plugin you can use the plugin by just
+calling the methods defined in the API:
+
+@example
+myapi->DoSomething (1, csVector3 (2, 3, 4);
+printf ("%d\n", myapi->GetSomething ());
+@end example
+
+This should print out 9.
