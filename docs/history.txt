@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+7-Jun-2001
+	- Justin Miller fixed a minor syntax error in csview.h.
 6-Jun-2001
 	- Removed support for the quadtree, coverage mask tree, coverage mask
 	  cube, and solid tree from CS. I parked the code locally and it will
@@ -28,6 +30,37 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine implemented iGraphics2D::SetMouseCursor() in the OpenGL
 	  and Glide BeOS drivers.  (This method was already implemented in the
 	  software driver.)
+	- Michael Voasse did the following:
+	    - Moved metaball to a mesh object.
+	    - Added meta ball loader.
+	    - Modified metasys to suit new meta ball.
+	- Norman Kramer fixed ptlab to the new meta ball plugin.
+	- Martin Geisse did the following:
+	    - Removed DECLARE_TYPED_SCF_VECTOR(). This macro created a
+  	      subclass of csVector that was intended to store SCF objects.
+	      It was useless because it never did an IncRef() on the
+	      contained objects, only a DecRef().
+	    - Made iSoundWrapper a subclass of iBase.
+	    - Completely rewrote csObject. It now stores a list of iObject
+	      pointers and does not cast to csObject anymore. The reference
+	      count of contained objects is correctly increased and
+	      decreased. In addition, a csObject keeps a 'parent' pointer
+	      that is set when an object is added or removed, but has no
+	      further meaning and it is not IncRef'ed / DecRef'ed either. The
+	      user can decide how to make use of this pointer.
+	    - The remake of csObject required some changes in the whole of
+	      CS. Mainly, where an object was added with ObjAdd (), a DecRef
+	      to the added object had to be done. Calls to ObjRelease()
+	      should be replaced by an IncRef() to the object-to-release and
+	      then a RemoveObject, although there was no such case in the
+	      current CS code.
+	    - Removed csObjectNoDel and csPObject.
+	- Wouter Wijngaards added visibility routine for terrfunc. The
+	  computation in the quadtree.
+	- Wouter also fixed a number of potential bugs in that code.
+	  Fixed a warning, CS_ASSERT(a%b == 0) will give warnings,
+	  CS_ASSERT(a%d) will put the %d in a printf even...
+	- Martin Geisse fixed a compilation problem in the terrfunc plugin.
 5-Jun-2001
 	- Reduced the optimization level in linux.mak from -O6 to -O2.  This
 	  will probably not do much anyway and -O6 seems to give problems with
