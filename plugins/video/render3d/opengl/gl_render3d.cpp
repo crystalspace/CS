@@ -58,6 +58,7 @@
 #include "gl_renderbuffer.h"
 #include "gl_txtmgr.h"
 #include "gl_polyrender.h"
+#include "gl_r2t_framebuf.h"
 
 #include "csplugincommon/opengl/glextmanager.h"
 
@@ -150,6 +151,8 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) : isOpen (false)
   clipportal_dirty = true;
   clipportal_floating = 0;
   cliptype = CS_CLIPPER_NONE;
+
+  r2tbackend = 0;
 }
 
 csGLGraphics3D::~csGLGraphics3D()
@@ -688,23 +691,14 @@ void csGLGraphics3D::SetupProjection ()
 
   statecache->SetMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  SetGlOrtho (render_target);
   if (render_target)
-  {
-    int txt_w, txt_h;
-    render_target->GetRendererDimensions (txt_w, txt_h);
-
-    /*
-      Need a different translation for PTs, they are in the upper left.
-      @@@ Not very nice to have that here,
-      @@@ furthermore, the perspective center X & Y coordinate is effectively
-          hardcoded
-     */
-
-    glTranslatef ((txt_w / 2), (txt_h / 2), 0);
-  }
+    r2tbackend->SetupProjection();
   else
-    glTranslatef (asp_center_x, asp_center_y, 0);
+  {
+    SetGlOrtho (false);
+    //glTranslatef (asp_center_x, asp_center_y, 0);
+  }
+  glTranslatef (asp_center_x, asp_center_y, 0);
 
   GLfloat matrixholder[16];
   for (int i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
@@ -1027,6 +1021,8 @@ bool csGLGraphics3D::Open ()
   cache_clip_plane = -1;
   cache_clip_z_plane = -1;
 
+  r2tbackend = new csGLRender2TextureFramebuf (this);
+  
   return true;
 }
 
@@ -1043,6 +1039,7 @@ void csGLGraphics3D::Close ()
   }
   txtmgr = 0;
   shadermgr = 0;
+  delete r2tbackend; r2tbackend = 0;
   for (size_t h = 0; h < halos.Length(); h++)
   {
     if (halos[h]) halos[h]->DeleteTexture();
@@ -1077,40 +1074,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   current_drawflags = drawflags;
 
   if (render_target)
-  {
-    int txt_w, txt_h;
-    render_target->GetRendererDimensions (txt_w, txt_h);
-    if (!rt_cliprectset)
-    {
-      G2D->GetClipRect (rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy);
-      G2D->SetClipRect (-1, -1, txt_w+1, txt_h+1);
-      rt_cliprectset = true;
-    }
-
-    if (!rt_onscreen)
-    {
-      statecache->SetMatrixMode (GL_PROJECTION);
-      glLoadIdentity ();
-      SetGlOrtho (false);
-      glViewport (0, 0, viewwidth, viewheight);
-      statecache->SetMatrixMode (GL_MODELVIEW);
-      glLoadIdentity ();
-
-      statecache->SetShadeModel (GL_FLAT);
-      glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
-      ActivateTexture (render_target);
-      statecache->Disable_GL_BLEND ();
-      SetZMode (CS_ZBUF_NONE);
-
-      glBegin (GL_QUADS);
-      glTexCoord2f (0, 0); glVertex2i (0, viewheight-txt_h);
-      glTexCoord2f (0, 1); glVertex2i (0, viewheight);
-      glTexCoord2f (1, 1); glVertex2i (txt_w, viewheight);
-      glTexCoord2f (1, 0); glVertex2i (txt_w, viewheight-txt_h);
-      glEnd ();
-      rt_onscreen = true;
-    }
-  }
+    r2tbackend->BeginDrawCommon (); 
 
   const bool doStencilClear = 
     (drawflags & CSDRAW_3DGRAPHICS) && stencil_clipping_available;
@@ -1137,7 +1101,9 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     glViewport (0, 0, viewwidth, viewheight);
     needProjectionUpdate = true;
 
-    statecache->SetCullFace (render_target ? GL_BACK : GL_FRONT);
+    if (render_target)
+      r2tbackend->BeginDraw3D (); 
+    //statecache->SetCullFace (render_target ? GL_BACK : GL_FRONT);
 
     statecache->SetMatrixMode (GL_MODELVIEW);
     glLoadIdentity ();
@@ -1169,16 +1135,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       statecache->SetMatrixMode (GL_PROJECTION);
       glLoadIdentity ();
       if (render_target)
-      {
-	int txt_w, txt_h;
-	render_target->GetRendererDimensions (txt_w, txt_h);
-	/*
-	  Render target: draw everything in top-left corner, but flipped.
-	*/
-	glOrtho (0., (GLdouble) viewwidth, (GLdouble) (2 * viewheight - txt_h), 
-	  (GLdouble) (viewheight - txt_h), -1.0, 10.0);
-	statecache->SetCullFace (GL_BACK);
-      }
+	r2tbackend->BeginDraw2D (); 
       else
 	SetGlOrtho (false);
       //glViewport (0, 0, viewwidth, viewheight);
@@ -1244,75 +1201,10 @@ void csGLGraphics3D::FinishDraw ()
 
   if (render_target)
   {
-    if (rt_cliprectset)
-    {
-      rt_cliprectset = false;
-      G2D->SetClipRect (rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy);
-      statecache->SetMatrixMode (GL_PROJECTION);
-      glLoadIdentity ();
-      glOrtho (0., viewwidth, 0., viewheight, -1.0, 10.0);
-      glViewport (0, 0, viewwidth, viewheight);
-    }
-
-    if ((current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS)) == 
-      CSDRAW_2DGRAPHICS)
-    {
-      statecache->SetCullFace (GL_FRONT);
-    }
-
-    if (rt_onscreen)
-    {
-      rt_onscreen = false;
-      //statecache->Enable_GL_TEXTURE_2D ();
-      SetZMode (CS_ZBUF_NONE);
-      statecache->Disable_GL_BLEND ();
-      statecache->Disable_GL_ALPHA_TEST ();
-      int txt_w, txt_h;
-      render_target->GetRendererDimensions (txt_w, txt_h);
-      csGLTextureHandle* tex_mm = (csGLTextureHandle *)
-        render_target->GetPrivateObject ();
-      tex_mm->Precache ();
-      //statecache->SetTexture (GL_TEXTURE_2D, tex_data->Handle);
-      // Texture is in tha cache, update texture directly.
-      ActivateTexture (tex_mm);
-      /*
-        Texture has a keycolor - so we need to deal specially with it
-	to make sure the keycolor gets transparent.
-       */
-      if (tex_mm->GetKeyColor ())
-      {
-	tex_mm->SetWasRenderTarget (true);
-	csRef<iImage>& image = tex_mm->GetImage();
-	if (image == 0) // @@@ How to deal with cubemaps?
-	{
-	  image.AttachNew (new csImageMemory (
-	    txt_w, txt_h, CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
-	}
-
-	// @@@ BAD BAD BAD BAD CAST
-	void* imgdata = CS_CONST_CAST(void*, image->GetImageData ());
-	glReadPixels (1, viewheight - txt_h, txt_w, txt_h, GL_RGBA, GL_UNSIGNED_BYTE, 
-	  imgdata);
-
-	/*
-	  @@@ Optimize a bit. E.g. the texture shouldn't be uncached and cached again
-	  every time.
-	 */
-	tex_mm->UpdateTexture ();
-	//tex_mm->InitTexture (txtmgr, G2D->GetPixelFormat ());
-	tex_mm->Unprepare ();
-	tex_mm->PrepareInt();
-	tex_mm->Precache ();
-      }
-      else
-      {
-	PrepareAsRenderTarget (tex_mm);
-        glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 0, viewheight-txt_h,
-          txt_w, txt_h, 0);
-      }
-    }
+    r2tbackend->FinishDraw();
+    SetRenderTarget (0);
   }
-  render_target = 0;
+  //render_target = 0;
   current_drawflags = 0;
 }
 
@@ -1791,7 +1683,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
     const csArray< csArray<csShaderVariable*> > &stacks)
 {
-  if (cliptype == CS_CLIPPER_EMPTY) return;
+  if (cliptype == CS_CLIPPER_EMPTY) 
+    return;
 
   SetupProjection ();
 
@@ -1801,7 +1694,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
                 mymesh->clip_plane, 
                 mymesh->clip_z_plane,
 		num_tri);
-  if (debug_inhibit_draw) return;
+  if (debug_inhibit_draw) 
+    return;
 
   csReversibleTransform o2w;
 
@@ -1952,11 +1846,11 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       }
   }
 
-  if (current_shadow_state == CS_SHADOW_VOLUME_PASS2 ||
+  /*if (current_shadow_state == CS_SHADOW_VOLUME_PASS2 ||
       current_shadow_state == CS_SHADOW_VOLUME_FAIL1)
     SetMirrorMode (!mymesh->do_mirror);
   else
-    SetMirrorMode (mymesh->do_mirror);
+    SetMirrorMode (mymesh->do_mirror);*/
 
 
   const uint mixmode = modes.mixmode;
@@ -2015,7 +1909,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   glPopMatrix ();
   //indexbuf->RenderRelease ();
   RenderRelease (iIndexbuf);
-  SetMirrorMode (false);
+  //SetMirrorMode (false);
 }
 
 void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
@@ -2403,8 +2297,13 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
     csBox2 scissorbox;
     scissorbox.AddBoundingVertex (clippoly[0]);
     for (i=1; i<clipper->GetVertexCount (); i++)
-      scissorbox.AddBoundingVertexSmart (clippoly[i]);
-    scissorbox *= csBox2 (old2dClip);
+      scissorbox.AddBoundingVertexSmart (csVector2 (clippoly[i].x,
+	/*(float)viewheight - */clippoly[i].y));
+    csBox2 scissorClip;
+    // Correct for differences in 2D and 3D coord systems.
+    scissorClip.Set (old2dClip.xmin, /*viewheight - */old2dClip.ymin,
+      old2dClip.xmax, /*viewheight - */old2dClip.ymax);
+    scissorbox *= csBox2 (scissorClip);
     if (scissorbox.Empty())
     {
       csGLGraphics3D::cliptype = CS_CLIPPER_EMPTY;
@@ -2412,8 +2311,11 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
     }
 
     const csRect scissorRect ((int)floorf (scissorbox.MinX ()), 
-      (int)floorf (scissorbox.MinY ()), (int)ceilf (scissorbox.MaxX ()), 
-      (int)ceilf (scissorbox.MaxY ()));
+      // @@@ UGLY UGLY UGLY
+      render_target ? viewheight - (int)ceilf (scissorbox.MaxY ()) : (int)floorf (scissorbox.MinY ()), 
+      (int)ceilf (scissorbox.MaxX ()), 
+      // @@@ UGLY UGLY UGLY
+      render_target ? viewheight - (int)floorf (scissorbox.MinY ()) : (int)ceilf (scissorbox.MaxY ()));
     glScissor (scissorRect.xmin, scissorRect.ymin, scissorRect.Width(),
       scissorRect.Height());
   }

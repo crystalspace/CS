@@ -55,6 +55,7 @@
 
 #include "csplugincommon/opengl/glstates.h"
 #include "gl_renderbuffer.h"
+#include "gl_r2t_backend.h"
 
 class csGLTextureHandle;
 class csGLTextureManager;
@@ -128,7 +129,6 @@ private:
 
   csWeakRef<iBugPlug> bugplug;
 
-  csRef<csGLTextureManager> txtmgr;
   csWeakRefArray<csOpenGLHalo> halos;
 
   int current_drawflags;
@@ -229,12 +229,7 @@ private:
 
   /// Current render target.
   csRef<iTextureHandle> render_target;
-  /// If true then the current render target has been put on screen.
-  bool rt_onscreen;
-  /// If true then we have set the old clip rect.
-  bool rt_cliprectset;
-  /// Old clip rect to restore after rendering on a proc texture.
-  int rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy;
+  csGLRender2TextureBackend* r2tbackend;
 
   /// Should we use special buffertype (VBO) or just systemmeory
   bool use_hw_render_buffers;
@@ -334,6 +329,7 @@ private:
 public:
   static csGLStateCache* statecache;
   static csGLExtensionManager* ext;
+  csRef<csGLTextureManager> txtmgr;
 
   SCF_DECLARE_IBASE;
 
@@ -444,11 +440,12 @@ public:
 	  bool persistent = false)
   {
     render_target = handle;
-    rt_onscreen = !persistent;
-    rt_cliprectset = false;
+    r2tbackend->SetRenderTarget (handle, persistent);
 
     int hasRenderTarget = (handle != 0) ? 1 : 0;
     G2D->PerformExtension ("userendertarget", hasRenderTarget);
+    viewwidth = G2D->GetWidth();
+    viewheight = G2D->GetHeight();
   }
 
   /// Get the current render target (0 for screen).

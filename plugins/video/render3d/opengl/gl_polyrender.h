@@ -18,6 +18,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef __CS_GL_POLYRENDER_H__
+#define __CS_GL_POLYRENDER_H__
+
 #include "csutil/array.h"
 #include "csutil/leakguard.h"
 #include "ivideo/polyrender.h"
@@ -100,3 +103,4 @@ public:
 
 };
 
+#endif // __CS_GL_POLYRENDER_H__

@@ -42,6 +42,16 @@ chronological order.
 	- Eric Sunshine removed the long-deprecated csHashMap,
 	  csHashMapReversible, and csHashSet classes. Use instead the templated
 	  classes csHash<>, csHashReversible<>, and csSet<>.
+	- res changed the way how render-to-texture is handle a bit. Setting a
+	  render target now is like switching to another screen, e.g. the 
+	  width and height of the canvas change to the render target size etc.
+	  Coordinates also change accordingly and are in "render target space"
+	  as long as a render target is set (note that a FinishDraw() call will
+	  unset render targets). On the implementation side, the GL r2t support
+	  was moved out into separate classes to facilitate the change of 
+	  render-to-texture modes. Small warning: needs more work, not checked
+	  against software rendering. On the bright side, nothing appears more
+	  broken than before.
 29-Mar-2005
 	- Jorrit disabled the new `clearWithBox' rule in gldrivers.xml
 	  because it breaks screen clearing on his nVidia card. If this is
@@ -54,7 +64,7 @@ chronological order.
 	- Marten made some general cleanup.
 	- Marten fixed DrawSimpleMesh() after yesterday's changes.
 	- Marten fixed the approximate mesh z-sorting.
-	- Eric Sunshine fixed bugs in TiXmlElement::ReavValue() and
+	- Eric Sunshine fixed bugs in TiXmlElement::ReadValue() and
 	  TrXmlElement::ReadValue() where they unconditionally stripped leading
 	  whitepsace from text and cdata nodes even if the client asked for
 	  whitespace to be preserved.

@@ -244,6 +244,9 @@ bool csGraphics2DGLCommon::Open ()
 
   glViewport (0, 0, Width, Height);
   Clear (0);
+  vpWidth = Width;
+  vpHeight = Height;
+  vpSet = false;
 
   return true;
 }
@@ -261,7 +264,7 @@ void csGraphics2DGLCommon::SetClipRect (int xmin, int ymin, int xmax, int ymax)
   ((csGLFontCache*)fontCache)->FlushText ();
 
   csGraphics2D::SetClipRect (xmin, ymin, xmax, ymax);
-  glScissor (ClipX1, Height - ClipY2, ClipX2 - ClipX1, ClipY2 - ClipY1);
+  glScissor (ClipX1, vpHeight - ClipY2, ClipX2 - ClipX1, ClipY2 - ClipY1);
 }
 
 bool csGraphics2DGLCommon::BeginDraw ()
@@ -273,8 +276,8 @@ bool csGraphics2DGLCommon::BeginDraw ()
 
   statecache->SetMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  glOrtho (0, Width, 0, Height, -1.0, 10.0);
-  glViewport (0, 0, Width, Height);
+  glOrtho (0, vpWidth, 0, vpHeight, -1.0, 10.0);
+  glViewport (0, 0, vpWidth, vpHeight);
 
   // not needed really, should persist between draws
   //statecache->Enable_GL_SCISSOR_TEST ();
@@ -426,7 +429,7 @@ void csGraphics2DGLCommon::Clear (int color)
   ((csGLFontCache*)fontCache)->FlushText ();
 
   if (clearWithBox)
-    DrawBox (0, 0, Width, Height, color);
+    DrawBox (0, 0, vpWidth, vpHeight, color);
   else
   {
     float r, g, b, a;
@@ -495,8 +498,8 @@ void csGraphics2DGLCommon::DrawLine (
   //    the same goes for all the other DrawX functions.
   
   glBegin (GL_LINES);
-  glVertex2f (x1, Height - y1);
-  glVertex2f (x2, Height - y2);
+  glVertex2f (x1, vpHeight - y1);
+  glVertex2f (x2, vpHeight - y2);
   glEnd ();
 
   if (gl_alphaTest) statecache->Enable_GL_ALPHA_TEST ();
@@ -507,7 +510,7 @@ void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
   ((csGLFontCache*)fontCache)->FlushText ();
 
   statecache->Disable_GL_TEXTURE_2D ();
-  y = Height - y;
+  y = vpHeight - y;
   // prepare for 2D drawing--so we need no fancy GL effects!
   setGLColorfromint (color);
 
@@ -533,7 +536,7 @@ void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
   if (fabs(float(int(y1))-y1) < 0.1f) { y1 += 0.05f; }
   setGLColorfromint (color);
   glBegin (GL_POINTS);
-  glVertex2f (x, Height - y1);
+  glVertex2f (x, vpHeight - y1);
   glEnd ();
 }
 
@@ -554,7 +557,7 @@ void csGraphics2DGLCommon::DrawPixels (
     int x = pixels->x;
     int y = pixels->y;
     pixels++;
-    glVertex2i (x, Height - y);
+    glVertex2i (x, vpHeight - y);
   }
   glEnd ();
 }
@@ -584,7 +587,7 @@ void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
     takes those as the lower left dest coord (in window.) So it has to drawn 
     h pixels farther down. 
    */
-  glRasterPos2i (x, Height-y);
+  glRasterPos2i (x, vpHeight-y);
   if (!hasRenderTarget)
   {
     glPixelZoom (1.0f, -1.0f);
@@ -603,7 +606,7 @@ unsigned char* csGraphics2DGLCommon::GetPixelAt (int x, int y)
   /// left as Height-y-1 to keep within offscreen bitmap.
   /// but for opengl itself you'd need Height-y.
   return screen_shot ?
-    (screen_shot + pfmt.PixelBytes * ((Height - y - 1) * Width + x)) : 0;
+    (screen_shot + pfmt.PixelBytes * ((vpHeight - y - 1) * vpWidth + x)) : 0;
 }
 
 csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
@@ -616,16 +619,16 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
     return 0;
 #endif
   // Convert to Opengl co-ordinate system
-  y = Height - (y + h);
+  y = vpHeight - (y + h);
 
   if (x < 0)
   { w += x; x = 0; }
-  if (x + w > Width)
-    w = Width - x;
+  if (x + w > vpWidth)
+    w = vpWidth - x;
   if (y < 0)
   { h += y; y = 0; }
-  if (y + h > Height)
-    h = Height - y;
+  if (y + h > vpHeight)
+    h = vpHeight - y;
   if ((w <= 0) || (h <= 0))
     return 0;
 
@@ -721,11 +724,11 @@ csPtr<iImage> csGraphics2DGLCommon::ScreenShot ()
 #endif*/
 
   // Need to resolve pixel alignment issues
-  int screen_width = Width * (4);
-  if (!screen_shot) screen_shot = new uint8 [screen_width * Height];
+  int screen_width = vpWidth * (4);
+  if (!screen_shot) screen_shot = new uint8 [screen_width * vpHeight];
   //if (!screen_shot) return 0;
 
-  glReadPixels (0, 0, Width, Height, GL_RGBA,
+  glReadPixels (0, 0, vpWidth, vpHeight, GL_RGBA,
     GL_UNSIGNED_BYTE, screen_shot);
 
   csGLScreenShot* ss = GetScreenShot ();
@@ -763,6 +766,20 @@ bool csGraphics2DGLCommon::PerformExtensionV (char const* command, va_list args)
   {
     int hasRenderTarget = va_arg (args, int);
     csGraphics2DGLCommon::hasRenderTarget = (hasRenderTarget != 0);
+    return true;
+  }
+  else if (!strcasecmp (command, "vp_set"))
+  {
+    vpWidth = va_arg (args, int);
+    vpHeight = va_arg (args, int);
+    vpSet = true;
+    return true;
+  }
+  else if (!strcasecmp (command, "vp_reset"))
+  {
+    vpWidth = Width;
+    vpHeight = Height;
+    vpSet = false;
     return true;
   }
   return false;
@@ -854,8 +871,13 @@ bool csGraphics2DGLCommon::Resize (int width, int height)
 
   Width = width;
   Height = height;
-  SetClipRect (0, 0, Width, Height);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  if (!vpSet)
+  {
+    vpWidth = width;
+    vpHeight = height;
+    SetClipRect (0, 0, Width, Height);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  }
   EventOutlet->Broadcast (cscmdContextResize, (intptr_t)this);
   return true;
 }

@@ -136,6 +136,9 @@ protected:
    */
   bool clearWithBox;
 
+  int vpWidth, vpHeight;
+  bool vpSet;
+
   void GetPixelFormatString (const GLPixelFormat& format, csString& str);
 public:
   virtual const char* GetRendererString (const char* str);

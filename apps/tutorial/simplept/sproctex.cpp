@@ -49,31 +49,38 @@ bool csEngineProcTex::PrepareAnim ()
   if (anim_prepared) return true;
   if (!csProcTexture::PrepareAnim ()) return false;
 
-  // set up a view for the engine
-  iSector *room = Engine->GetSectors ()->FindByName ("room");
-  View = csPtr<iView> (new csView (Engine, g3d));
-  View->GetCamera ()->GetTransform ().SetOrigin (csVector3 (-0.5,0,0));
-  View->GetCamera ()->SetSector (room);
-  View->SetRectangle (0, g2d->GetHeight ()-256, 256, g2d->GetHeight ());
-  View->GetCamera ()->SetPerspectiveCenter (128, g2d->GetHeight ()-128);
   return true;
 }
 
 void csEngineProcTex::Animate (csTicks CurrentTime)
 {
+  g3d->SetRenderTarget (tex->GetTextureHandle ());
+
+  if (!View.IsValid())
+  {
+    // @@@ Here to get the render target size, not screen size
+    iSector *room = Engine->GetSectors ()->FindByName ("room");
+    View = csPtr<iView> (new csView (Engine, g3d));
+    View->GetCamera ()->GetTransform ().SetOrigin (csVector3 (-0.5,0,0));
+    View->GetCamera ()->SetSector (room);
+    View->SetRectangle (0, 0, 256, 256);
+    View->GetCamera ()->SetPerspectiveCenter (128, 128);
+    View->GetCamera ()->SetFOVAngle (View->GetCamera ()->GetFOVAngle(), 256);
+  }
+
   // move the camera
   csVector3 Position (-0.5, 0, 3 + sin (CurrentTime / (10*1000.0))*3);
   View->GetCamera ()->Move (Position - View->GetCamera ()
   	->GetTransform ().GetOrigin ());
-
-  g3d->SetRenderTarget (tex->GetTextureHandle ());
 
   // Switch to the context of the procedural texture.
   iTextureHandle *oldContext = Engine->GetContext ();
   Engine->SetContext (tex->GetTextureHandle ());
 
   // Draw the engine view.
-  g3d->BeginDraw (CSDRAW_3DGRAPHICS | Engine->GetBeginDrawFlags ());
+  g3d->BeginDraw (CSDRAW_3DGRAPHICS | Engine->GetBeginDrawFlags () 
+    | CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER);
+  //g3d->GetDriver2D()->Clear (g3d->GetDriver2D()->FindRGB (0, 255, 0));
   View->Draw ();
   g3d->FinishDraw ();
 
