@@ -189,6 +189,7 @@ bool csXWindow::Open ()
 				ButtonReleaseMask |
 				PointerMotionMask |
 				ExposureMask |
+				VisibilityChangeMask |
 				KeymapStateMask );
 
   unsigned long swa_wm_mask = (StructureNotifyMask |
@@ -207,6 +208,7 @@ bool csXWindow::Open ()
 				ButtonReleaseMask |
 				PointerMotionMask |
 				ExposureMask |
+				VisibilityChangeMask |
 				KeymapStateMask );
 
   unsigned long si_wm_mask  = (StructureNotifyMask |
@@ -686,6 +688,26 @@ bool csXWindow::HandleEvent (iEvent &Event)
 		       event.xexpose.y + event.xexpose.height);
 	  Canvas->Print (&rect);
 	}
+	break;
+      case VisibilityNotify:
+	switch(event.xvisibility.state)
+	{
+	  case VisibilityUnobscured:
+	    EventOutlet->Broadcast (cscmdCanvasExposed, NULL);
+	    break;
+	  case VisibilityPartiallyObscured:
+	    EventOutlet->Broadcast (cscmdCanvasExposed, NULL);
+	    break;
+	  case VisibilityFullyObscured:
+	    EventOutlet->Broadcast (cscmdCanvasHidden, NULL);
+	    break;
+	}
+	break;
+      case UnmapNotify:
+	EventOutlet->Broadcast (cscmdCanvasHidden, NULL);
+	break;
+      case MapNotify:
+	EventOutlet->Broadcast (cscmdCanvasExposed, NULL);
 	break;
       default:
         break;

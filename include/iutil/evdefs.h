@@ -342,7 +342,7 @@ enum
   cscmdCommandLineHelp,
 
   /**
-   * This event is broadcasted by the texture manaher when the SetPalette
+   * This event is broadcasted by the texture manager when the SetPalette
    * method is called.
    *<pre>
    * IN: (iTextureManager *) the texture manager object
@@ -371,7 +371,19 @@ enum
    * Broadcasted after cscmdPostProcess -- on every frame --
    * as Event.Command.Code of a broadcast event.
    */
-  cscmdFinalProcess
+  cscmdFinalProcess,
+
+  /**
+   * Broadcast indicating that the display canvas is not currently
+   * visible to the user (such as being iconified).
+   */
+  cscmdCanvasHidden,
+
+  /**
+   * Broadcast indicating that the display canvas has just become
+   * visible (such as being uniconified).
+   */
+  cscmdCanvasExposed
 };
 
 #endif // __IUTIL_EVDEFS_H__
