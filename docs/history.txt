@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Sep-2003
+        - acraig fixed a problem in sprcal3d where it was using the old
+          renderer iLight::GetSquaredRadius() function that no longer exists.
 6-Sep-2003
 	- Jorrit fixed a compile bug in perfstat.
 	- Anders Stenberg did the following changes to the new renderer:
