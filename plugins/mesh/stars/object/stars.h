@@ -59,6 +59,18 @@ private:
    */
   void SetupObject ();
 
+  /// get a random number between 0.0 and max
+  float GetRandom(float max);
+  
+  /// draw a box of stars
+  void DrawStarBox (iRenderView* rview,
+    const csReversibleTransform &tr_o2c, csZBufMode zbufmode,
+      csBox3& starbox, const csVector3& origin);
+
+  //; Draw a star on the screen, given screencoordinates/depth and color
+  void DrawPoint(iRenderView *rview, const csVector3& pos, const csColor& col,
+    csZBufMode zbufmode);
+
 public:
   /// Constructor.
   csStarsMeshObject (iMeshObjectFactory* factory);

@@ -23,6 +23,7 @@
 #include "iengine/rview.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
+#include "ivideo/txtmgr.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "iengine/camera.h"
@@ -30,6 +31,7 @@
 #include "iengine/engine.h"
 #include "iengine/light.h"
 #include "qsqrt.h"
+#include "qint.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -55,6 +57,7 @@ csStarsMeshObject::csStarsMeshObject (iMeshObjectFactory* factory)
   color.green = 1;
   color.blue = 1;
   use_max_color = false;
+  max_color.Set(0,0,0);
   max_dist = 20;
   density = .1;
   seed = 3939394;
@@ -88,37 +91,170 @@ void csStarsMeshObject::UpdateLighting (iLight**, int,
   return;
 }
 
-/*
- * Commented this out because it was not used -- mgeisse
- *
-static void Perspective (const csVector3& v, csVector2& p, float fov,
+static void Perspective (const csVector3& v, csVector3& p, float fov,
     	float sx, float sy)
 {
-  float iz = fov / v.z;
-  p.x = v.x * iz + sx;
-  p.y = v.y * iz + sy;
+  p.z = 1. / v.z;
+  float iza = fov * p.z;
+  p.x = v.x * iza + sx;
+  p.y = v.y * iza + sy;
 }
-*/
 
-bool csStarsMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
-	csZBufMode)
+float csStarsMeshObject::GetRandom(float max)
+{
+  return max * (rand()/(RAND_MAX+1.0));
+}
+
+void csStarsMeshObject::DrawPoint(iRenderView *rview, 
+  const csVector3& pos, const csColor& col, csZBufMode zbufmode)
+{
+  iGraphics2D *g2d = rview->GetGraphics2D();
+  iGraphics3D *g3d = rview->GetGraphics3D();
+  int x = QInt(pos.x);
+  int y = QInt(pos.y);
+  // clip to screen and to clipper
+  if(x < 0.0 || y < 0.0 || x >= g2d->GetWidth() || y >= g2d->GetHeight()) 
+    return;
+  if(!rview->GetClipper()->IsInside(csVector2(pos.x, pos.y)))
+    return;
+
+  // test zbuffer?
+  if(zbufmode & CS_ZBUF_TEST) // tests if zbuf is ZBUF_TEST or ZBUF_USE
+  {
+    float atpoint = g3d->GetZBuffValue(x, y);
+    if(pos.z < atpoint) return;
+  }
+
+  // draw
+  int colidx = g3d->GetTextureManager()->FindRGB(QInt(col.red * 255), 
+    QInt(col.green*255), QInt(col.blue*255));
+  g2d->DrawPixel(x, y, colidx);
+  
+}
+
+void csStarsMeshObject::DrawStarBox (iRenderView* rview, 
+  const csReversibleTransform &tr_o2c, csZBufMode zbufmode,
+  csBox3& starbox, const csVector3& origin)
+{
+  iCamera* camera = rview->GetCamera ();
+  float fov = camera->GetFOV ();
+  float shiftx = camera->GetShiftX ();
+  float shifty = camera->GetShiftY ();
+
+  float sqmaxdist = max_dist * max_dist;
+
+  /// primitive box clipping
+  if(!starbox.In(origin) 
+    && (starbox.GetCorner(0)-origin).SquaredNorm() > sqmaxdist
+    && (starbox.GetCorner(1)-origin).SquaredNorm() > sqmaxdist
+    && (starbox.GetCorner(2)-origin).SquaredNorm() > sqmaxdist
+    && (starbox.GetCorner(3)-origin).SquaredNorm() > sqmaxdist
+    && (starbox.GetCorner(4)-origin).SquaredNorm() > sqmaxdist
+    && (starbox.GetCorner(5)-origin).SquaredNorm() > sqmaxdist
+    && (starbox.GetCorner(6)-origin).SquaredNorm() > sqmaxdist
+    && (starbox.GetCorner(7)-origin).SquaredNorm() > sqmaxdist
+    ) 
+    return;
+
+  unsigned int starseed = seed ^ QInt(starbox.Min().x) ^ QInt(starbox.Min().y) 
+    ^ QInt(starbox.Min().z);
+  srand(starseed);
+
+  csVector3 boxsize = starbox.Max() - starbox.Min();
+  int number = 100; // number of stars is volume * density
+  //printf("boxsize.x %g %g %g\n", boxsize.x, boxsize.y, boxsize.z);
+  number = QInt(
+    boxsize.x * boxsize.y * boxsize.z * density 
+    * ( GetRandom(0.4) + 0.8 ) /// * 0.8 ... * 1.2, so +- 20%
+    );
+  //printf("number is %d\n", number);
+
+  csVector3 pos; // star position in 3d
+  csVector3 screenpos;  // star position on screen
+  csColor starcolor = color; // color of the star
+  bool color_per_box = false; // debug coloring
+
+  if(color_per_box)
+  {
+  starcolor.red = 0.2 + GetRandom(0.8);
+  starcolor.green = 0.2 + GetRandom(0.8);
+  starcolor.blue = 0.2 + GetRandom(0.8);
+  }
+  int i;
+  int drawn = 0;
+  for (i = 0 ; i < number ; i++)
+  {
+    pos = starbox.Min();
+    pos += csVector3( GetRandom(boxsize.x), GetRandom(boxsize.y), 
+      GetRandom(boxsize.z));
+    Perspective(tr_o2c*pos, screenpos, fov, shiftx, shifty);
+    float sqdist = (pos-origin).SquaredNorm();
+    if(!color_per_box)
+    {
+      starcolor = color;
+      starcolor.red += -0.3 + GetRandom(0.6);
+      starcolor.green += -0.3 + GetRandom(0.6);
+      starcolor.blue += -0.3 + GetRandom(0.6);
+      starcolor.Clamp(1.,1.,1.);
+      starcolor.ClampDown();
+    }
+    if(sqdist > sqmaxdist) continue;
+    if(screenpos.z <= SMALL_Z) continue;
+    if(use_max_color) {
+      /// fade to max dist
+      float fadeamt = sqdist / sqmaxdist;
+      starcolor = starcolor * (1.0-fadeamt) + fadeamt * max_color;
+    }
+    DrawPoint(rview, screenpos, starcolor, zbufmode);
+    drawn++;
+  }
+  printf("drawn is %d\n", drawn);
+
+}
+
+bool csStarsMeshObject::Draw (iRenderView* rview, iMovable* movable,
+	csZBufMode zbufmode)
 {
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
-#if 0
-  iGraphics2D* g2d; g2d = rview->GetGraphics2D ();
   iCamera* camera = rview->GetCamera ();
-  const csReversibleTransform& camtrans = camera->GetTransform ();
-  //float fov = camera->GetFOV ();
-  //float shiftx = camera->GetShiftX ();
-  //float shifty = camera->GetShiftY ();
+  csReversibleTransform tr_o2c = camera->GetTransform ()
+    * movable->GetFullTransform ().GetInverse ();
+  const csVector3& origin = movable->GetFullTransform ().GetInverse () *
+    camera->GetTransform().GetOrigin();
 
+  if(max_dist <= 0.0) return false; // protect against divide by zero
   srand (seed);
-  int i;
-  for (i = 0 ; i < 100 ; i++)
-  {
-  }
-#endif
+
+  /// walk in boxes around origin
+  /// snap boxes to a grid
+  const float gridsize = 20;
+  csVector3 boxsize = box.Max() - box.Min();
+  int nr_x = QInt(gridsize * max_dist / boxsize.x)+1;
+  int nr_y = QInt(gridsize * max_dist / boxsize.y)+1;
+  int nr_z = QInt(gridsize * max_dist / boxsize.z)+1;
+  csVector3 starboxsize( boxsize.x / gridsize, boxsize.y / gridsize, 
+    boxsize.z / gridsize );
+  csVector3 starmin = box.Min();
+  starmin.x += QInt((origin.x-box.Min().x)/starboxsize.x)*starboxsize.x;
+  starmin.y += QInt((origin.y-box.Min().y)/starboxsize.y)*starboxsize.y;
+  starmin.z += QInt((origin.z-box.Min().z)/starboxsize.z)*starboxsize.z;
+  csBox3 starbox(starmin, starmin+starboxsize);
+  csBox3 passbox;
+
+  for(int x = -nr_x; x<=nr_x; x++)
+   for(int y = -nr_y; y<=nr_y; y++)
+    for(int z = -nr_z; z<=nr_z; z++)
+    {
+      csVector3 offset(x*starboxsize.x,y*starboxsize.y,z*starboxsize.z);
+      passbox.Set(starbox.Min()+offset, starbox.Max()+offset);
+      DrawStarBox (rview, tr_o2c, zbufmode, passbox, origin);
+    }
+  
+  /// before exiting, set the seed to be pretty random again
+  static unsigned int funkyrand = 0;
+  if(funkyrand==0) funkyrand = (unsigned int) time(0);
+  srand(funkyrand++);
 
   return true;
 }
