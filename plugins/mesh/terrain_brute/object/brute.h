@@ -59,6 +59,8 @@ public:
   csVector3 *morphnormal_data;
   csRef<iRenderBuffer> mesh_texcoords;
   csVector2 *texcoord_data;
+  csRef<iRenderBuffer> mesh_colors;
+  csVector3 *color_data;
 
   int num_mesh_vertices;
   csArray<csRenderMesh> meshes;
@@ -255,7 +257,7 @@ private:
   csStringID vertices_name, morphvertices_name,
     normals_name, morphnormals_name,
     texcoords_name, indices_name,
-    morphval_name;
+    morphval_name, colors_name;
 
   bool initialized;
 

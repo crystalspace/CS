@@ -70,6 +70,7 @@ csTerrBlock::csTerrBlock (csTerrainObject *terr)
   normal_data = 0;
   morphnormal_data = 0;
   texcoord_data = 0;
+  color_data = 0;
 
   built = false;
 
@@ -148,6 +149,8 @@ void csTerrBlock::SetupMesh ()
   texcoord_data = new csVector2[res * res];
   delete[] normal_data;
   normal_data = new csVector3[res * res];
+  delete[] color_data;
+  color_data = new csVector3[res * res];
 
   if (!terrasampler)
   {
@@ -164,6 +167,7 @@ void csTerrBlock::SetupMesh ()
     res * res * sizeof (csVector2));
   terrasampler->Cleanup ();
 
+
   bbox.Empty ();
   int i, j;
   for (j = 0; j < res; ++j)
@@ -172,6 +176,7 @@ void csTerrBlock::SetupMesh ()
     {
       const int pos = i + j * res;
       bbox.AddBoundingVertexSmart (vertex_data[pos]);
+      color_data[pos] = csVector3(0.5, 0.5, 0.5);
     }
   }
   built = true;
@@ -450,6 +455,15 @@ void csTerrBlock::DrawTest (iRenderView *rview, uint32 frustum_mask,
     delete[] texcoord_data;
     texcoord_data = 0;
 
+    mesh_colors = 
+      g3d->CreateRenderBuffer (sizeof(csVector2)*num_mesh_vertices,
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
+      3, false);
+    mesh_colors->CopyToBuffer (color_data,
+      sizeof(csVector3)*num_mesh_vertices);
+    delete[] color_data;
+    color_data = 0;
+
     csRef<csShaderVariable> sv;
     sv = svcontext->GetVariableAdd (terr->vertices_name);
     sv->SetValue (mesh_vertices);
@@ -461,6 +475,8 @@ void csTerrBlock::DrawTest (iRenderView *rview, uint32 frustum_mask,
     sv->SetValue (mesh_morphnormals);*/
     sv = svcontext->GetVariableAdd (terr->texcoords_name);
     sv->SetValue (mesh_texcoords);
+    sv = svcontext->GetVariableAdd (terr->colors_name);
+    sv->SetValue (mesh_colors);
   }
 
   csVector3 cam = rview->GetCamera ()->GetTransform ().GetOrigin ();
@@ -546,6 +562,7 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   morphnormals_name = strings->Request ("morph source normals");
   texcoords_name = strings->Request ("texture coordinates");
   morphval_name = strings->Request ("morph amount");
+  colors_name = strings->Request ("colors");
 
   //terr_func = &((csTerrainFactory*)pFactory)->terr_func;
   terraformer = ((csTerrainFactory*)pFactory)->terraformer;
