@@ -54,12 +54,24 @@ To set up render priorities from within a map file you can use the
 following construct:
 
 @example
-RENDERPRIORITIES (
-  PRIORITY 'sky' (1,NONE)
-  PRIORITY 'wall' (2,NONE)
-  PRIORITY 'object' (3,NONE)
-  PRIORITY 'alpha' (4,BACK2FRONT)
-)
+<renderpriorities>
+  <priority name="sky"
+    <level>1</level>
+    <sort>NONE</sort>
+  </priority>
+  <priority name="wall"
+    <level>2</level>
+    <sort>NONE</sort>
+  </priority>
+  <priority name="object"
+    <level>3</level>
+    <sort>NONE</sort>
+  </priority>
+  <priority name="alpha"
+    <level>4</level>
+    <sort>BACK2FRONT</sort>
+  </priority>
+</renderpriorities>
 @end example
 
 This example sets up the render priorities like they are by default.
@@ -101,11 +113,13 @@ To set the render priority for an object you can use the following
 in a map file:
 
 @example
-  MESHOBJ 'myObject' (
-    PLUGIN ('...')
-    PARAMS (...)
-    PRIORITY ('object')
-  )
+  <meshobj name="myObject">
+    <plugin>@dots{}</plugin>
+    <params>
+      @dots{}
+    </params>
+    <priority>object</priority>
+  </meshobj>
 @end example
 
 To set the render priority from within the code you can do:
@@ -139,12 +153,14 @@ but don't update the Z-buffer.
 To set the Z-buffer mode from a map file you can do the following:
 
 @example
-  MESHOBJ 'myObject' (
-    PLUGIN ('...')
-    PARAMS (...)
-    PRIORITY ('object')
-    ZUSE ()
-  )
+  <meshobj name="myObject">
+    <plugin>@dots{}</plugin>
+    <params>
+      @dots{}
+    </params>
+    <priority>object</priority>
+    <zuse />
+  </meshobj>
 @end example
 
 To set the Z-buffer mode from the code you can use the following example:

@@ -70,10 +70,6 @@ not to the screen.
 Uses OpenGL for 3D output, and by this takes advantage of hardware
 acceleration. Requires installed OpenGL run-time libraries.
 
-@item crystalspace.graphics3d.direct3d.dx61
-Similar to the above. Requires installed DirectX 6.1 or higher run-time
-libraries.
-
 @item crystalspace.graphics3d.line
 This is a variant of the software renderer.
 @end table

@@ -373,11 +373,10 @@ To load the plugin there are a few possibilities. First you
 can load the plugin manually using @samp{CS_LOAD_PLUGIN} like this:
 
 @example
-iPluginManager* plugin_mgr = 
+csRef<iPluginManager> plugin_mgr = 
   CS_QUERY_REGISTRY (object_reg, iPluginManager);
-iMyApi* myapi = CS_LOAD_PLUGIN (plugin_mgr,
+csRef<iMyApi> myapi = CS_LOAD_PLUGIN (plugin_mgr,
   "crystalspace.mygame.myplugin", iMyApi);        
-plugin_mgr->DecRef ();
 @end example
 
 This will first query the plugin manager from the object registry.
@@ -411,7 +410,7 @@ if (!csInitializer::RequestPlugins (object_reg,
 @}
 @dots{}
 
-iMyApi* myapi = CS_QUERY_REGISTRY (object_reg, iMyApi);
+csRef<iMyApi> myapi = CS_QUERY_REGISTRY (object_reg, iMyApi);
 @end example
 
 This way has several advantages. First it makes sure that the

@@ -54,7 +54,7 @@ accurately reflects your changes.
 
 @item
 If you worked on the engine internals or on the renderers, run @code{walktest}
-using @file{large.zip} and visit various locations which exercise the engine's
+using @file{flarge} and visit various locations which exercise the engine's
 features, such as the doughnut in the street and the foggy corridor.
 
 @item

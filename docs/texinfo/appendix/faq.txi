@@ -90,7 +90,7 @@ cause?
 components, as explained by the previous section? If not, then download the
 missing components.
 
-@strong{A2}: In general, Crystal Space requires an 8, 15, 16, or 32-bit
+@strong{A2}: In general, Crystal Space requires a 15, 16, or 32-bit
 display and will not work with other displays modes.  Note, however, that the
 MacOS/X Server, OpenStep, and NextStep ports of Crystal Space are not subject
 to this limitation.
@@ -168,7 +168,8 @@ with the @samp{-mode=} option.  @xref{Common Command Line Options}.
 
 @strong{A2}: Use a hardware accelerated graphics card and driver.  Such cards
 are quite popular these days and can perform extremely well, especially when
-compared to Crystal Space's software renderer.
+compared to Crystal Space's software renderer. Framerates of 100 fps and more
+are not uncommon if you have a properly configured OpenGL renderer.
 
 @item
 @strong{Q}: I want to create textures for Crystal Space.  What palette should I
@@ -297,14 +298,6 @@ correctly lit.  What did I do wrong?
 
 @strong{A}: Crystal Space does not automatically recalculate lighting.
 To do that you have to use the @samp{-relight} commandline option.
-
-@item
-@strong{Q}: Every time I start my Crystal Space based application the lights
-are recalculated.  How can I avoid that?
-
-@strong{A}: Use the @samp{-relight} commandline option. This will make
-sure the lighting gets recalculated AND cached in the zip file of your
-level.
 
 @item
 @strong{Q}: I'm confused by the Crystal Space coordinate system.  The 3D
@@ -453,5 +446,17 @@ load the plugin using @code{CS_LOAD_PLUGIN}. @code{RequestPlugins()} is
 best because it actually registers the plugin with the object
 registry and it also correctly manages config file, commandline and
 request plugins (so you can override a plugin on commandline/config file).
+
+@item
+@strong{Q}: How can I show FPS (frame rate) in my Crystal Space application?
+
+@strong{A}: Add the following line to @file{data/config/user.cfg}:
+@example
+Global.System.Plugins.iBugPlug = crystalspace.utilities.bugplug
+@end example
+This will make sure that the BugPlug plugin runs in any Crystal Space
+application. BugPlug shows FPS (among other things) and is otherwise
+not harmful. You can also use BugPlug to make screenshots (press ctrl-d
+followed by f12).
 
 @end itemize

@@ -44,9 +44,6 @@ quaternions
 2D and 3D polygons
 
 @item
-splines
-
-@item
 2D and 3D matrices (and transforms)
 
 @item
@@ -132,19 +129,19 @@ lighting (static, pseudo-dynamic, dynamic, halos, shadows, radiosity)
 bezier curves
 
 @item
-visibility culling
+visibility culling based on kd-tree with coverage buffers
 
 @item
 multiple cameras
 
 @item
-textures and materials
+textures, materials, and shaders
 
 @item
-isometric engine
+optional isometric engine
 
 @item
-a virtual file system
+a virtual file system (allows reading into zip files)
 
 @item
 sound drivers (CoreAudio, @sc{oss}, and WaveOut)
@@ -196,7 +193,7 @@ bitmapped and vector fonts
 map file loader and converters
 
 @item
-scripting engine
+scripting engine (python, perl, ...)
 
 @item
 performance statistics

@@ -25,13 +25,13 @@ another system.
 To load a collision detection system you can use the following code:
 
 @example
-iPluginManager* plugmgr =
+csRef<iPluginManager> plugmgr =
   CS_QUERY_REGISTRY (object_reg, iPluginManager);
-iConfigManager* config =
+csRef<iConfigManager> config =
   CS_QUERY_REGISTRY (object_reg, iConfigManager);
 const char* p = config->GetStr ("MyGame.Settings.CollDetPlugin",
   	"crystalspace.collisiondetection.rapid");
-iCollideSystem* cd_sys =
+csRef<iCollideSystem> cd_sys =
   CS_LOAD_PLUGIN (plugmgr, p, iCollideSystem);
 if (!cd_sys)
 @{
@@ -60,14 +60,13 @@ geometry on your own you can make your own classes to implement
 for a mesh:
 
 @example
-iCollider* MyGame::InitCollider (iMeshWrapper* mesh)
+csRef<iCollider> MyGame::InitCollider (iMeshWrapper* mesh)
 @{
-  iPolygonMesh* polmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+  csRef<iPolygonMesh> polmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
   	iPolygonMesh);
   if (polmesh)
   @{
-    iCollider* cd = cd_sys->CreateCollider (polmesh);
-    polmesh->DecRef ();
+    csRef<iCollider> cd = cd_sys->CreateCollider (polmesh);
     return cd;
   @}
   else
@@ -95,12 +94,11 @@ above:
 @example
 bool MyGame::InitCollider (iMeshWrapper* mesh)
 @{
-  iPolygonMesh* polmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+  csRef<iPolygonMesh> polmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
   	iPolygonMesh);
   if (polmesh)
   @{
     new csColliderWrapper (mesh->QueryObject (), cd_sys, polmesh);
-    polmesh->DecRef ();
     return true;
   @}
   else

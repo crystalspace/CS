@@ -11,7 +11,7 @@ following configurations:
 
 @itemize @bullet
 @item
-In 8, 15, 16, and 32-bit software renderer on all platforms.
+In 15, 16, and 32-bit software renderer on all platforms.
 
 @item
 In OpenGL on platforms which support OpenGL.  Currently there is a hardware
@@ -26,6 +26,8 @@ DirectX support has yet to be added.
 
 Here is the basic, minimum code required to render text onto a procedural
 texture.
+
+@emph{WARNING: OUTDATED!}.
 
 @example
 // Initialize a procedural texture of dimension 128x128.

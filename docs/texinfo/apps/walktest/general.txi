@@ -14,9 +14,6 @@ Terminate the application.
 @item help
 Give a short list of all commands.
 
-@item capture
-Generate a screenshot in PNG format.
-
 @item activate
 Activate the object that is right in front of you (@emph{obsolete}).
 

@@ -18,11 +18,6 @@ Select the map file to be loaded at startup.
 The extension to use for archive files. This is required because Walktest
 tries to automatically mount unmounted world archives. Defaults to @samp{zip}.
 
-@item Walktest.Settings.FPS = <yes/no>
-Enable/disable the FPS counter (default is @samp{yes}). You can disable the
-FPS counter (frames per second) with this option. The FPS counter can also
-be enabled/disabled with the @code{-fps}/@code{-nofps} commandline options.
-
 @item Walktest.Settings.Stats = <yes/no>
 Enable/disable the statistics counter (default is @samp{no}). The
 statistics counter can also be enabled/disabled with the

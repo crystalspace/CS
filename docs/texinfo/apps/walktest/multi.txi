@@ -18,22 +18,13 @@ the command to change it. Use @samp{next} to switch to the next value and
 @samp{lightmap next}: use the next value for lightmap setting
 @end itemize
 
-The following multi-choice commands are available :
+The following multi-choice command is available:
 
 @table @code
 @item map
 Control the display of the map. @samp{off} (default) is off. @samp{overlay}
 shows the map on top of the current display. @samp{on} shows the map on its
 own. While the map is active, moving with the arrow keys will move the map
-instead of the display.
-
-@item emode
-Select the current engine mode. Possible values are @samp{auto} (default),
-@samp{back2front}, @samp{front2back}, or @samp{zbuffer}. With @samp{auto}
-the engine will detect the best mode the first time a frame is rendered.
-@samp{back2front} is the best way for portal worlds. @samp{front2back}
-is best for big STATBSP worlds. It will use a culler (see the @samp{culler}
-command) to cull invisible geometry. @samp{zbuffer} is more experimental
-and is meant for fast hardware.
+instead of the display. Currently broken!
 
 @end table

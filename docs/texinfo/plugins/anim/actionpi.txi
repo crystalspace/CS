@@ -53,9 +53,9 @@ each interface and what they do. An example of obtaining the state interfaces
 is described below:
 
 @example
-iSprite3dFactoryState *fstat =
+csRef<iSprite3dFactoryState> fstat =
   SCF_QUERY_INTERFACE(fact, iSprite3dFactoryState);
-iSprite3DState *stat =
+csRef<iSprite3DState> stat =
   SCF_QUERY_INTERFACE(mesh, iSprite3DState);
 @end example
 

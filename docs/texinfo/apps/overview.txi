@@ -21,6 +21,12 @@ A @sc{3ds} to Crystal Space map converter (work in progress!).
 @item blocks
 A falling blocks game.  (Think 3D Tetris.).
 
+@cindex @file{csdemo}
+@cindex Applications, @file{csdemo}
+@item csdemo
+A self-running space demo. It requires the @file{demodata.zip} file
+that you can get from @url{ftp://sunsite.dk/projects/crystal/cs096/levels/demodata.zip}.
+
 @cindex @file{csfedit}
 @cindex Applications, @file{csfedit}
 @item csfedit
@@ -41,8 +47,7 @@ A test application for the Open DivX video plugin.
 @item cswstest
 This application tests the Crystal Space Windowing System (@sc{csws}), which
 is designed to provide a clean, effective and cross-platform base for creating
-CrystalSpace-related utilities.  Currently there is only one such utility under
-development, the CrystalSpace maze editor (MazeD).  @xref{CSWS}.
+CrystalSpace-related utilities. @xref{CSWS}.
 
 @cindex @file{demosky}
 @cindex Applications, @file{demosky}
@@ -77,12 +82,6 @@ native Crystal Space map format. It is known to work with WorldCraft
 This application is a Quake @file{.mdl} and @file{.md2} model converter.  It
 converts model files into native Crystal Space sprites. @xref{mdl2spr}.
 
-@cindex @file{metademo}
-@cindex Applications, @file{metademo}
-@item metademo
-A demonstration application which draws texture-mapped meta-balls in a
-free-form, dynamic blob.
-
 @cindex @file{perftest}
 @cindex Applications, @file{perftest}
 @item perftest
@@ -104,11 +103,6 @@ hardware renderers, with Crystal Space's @sc{scf} mechanism.
 @item scftutor
 An tutorial demonstrating the ins and outs of Crystal Space's @sc{scf} system.
 @xref{SCF}.
-
-@cindex @file{uninst}
-@cindex Applications, @file{uninst}
-@item uninst
-An uninstall program.
 
 @cindex @file{vsh}
 @cindex Applications, @file{vsh}

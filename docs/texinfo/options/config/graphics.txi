@@ -21,7 +21,7 @@ the @code{-mode} commandline option.
 @item Video.ScreenDepth = <depth>
 This option is for all ports of Crystal Space where it is possible to control
 the depth of the display from within Crystal Space itself (currently
-@sc{svgalib}, Windows (fullscreen).  Use 8, 15, or 16 here (default is 8).
+@sc{svgalib}, Windows (fullscreen).  Use 15, or 16 here.
 Note that 15 is not supported by the Windows version.  Note that the Windows
 version ignores the given depth if it is running in windowed mode.  Note also
 that there is also an equivalent commandline option -depth.
@@ -30,8 +30,7 @@ Special note for the X11 version: normally the X11 version will also
 ignore the @code{-depth} commandline option as it will open a window to
 match the given depth of the display. However if you give a negative depth
 it will simulate the given depth as well as possible. This is useful for
-debugging purposes (to see on an 8-bit display if a feature works in 16-bit
-mode as well without having to restart your server).
+debugging purposes.
 
 @item Video.XSHM = <yes/no>
 This option is only for Crystal Space on the X window system. This option

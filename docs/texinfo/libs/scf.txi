@@ -31,6 +31,7 @@ configurations supported: using shared libraries and using static linkage
 * SCF Client:: Client Side
 * SCF Example:: Example
 * SCF Advanced:: Advanced Techniques
+* SCF Smart Pointers:: Smart Pointers
 @end menu
 
 @node SCF Explained, SCF Using, SCF, SCF
@@ -691,7 +692,7 @@ Alternatively, you can register classes at run time:
 iSCF::SCF->RegisterClass("csDog", "dog");
 @end example
 
-@node SCF Advanced, , SCF Example, SCF
+@node SCF Advanced, SCF Smart Pointers, SCF Example, SCF
 @subsection Advanced Techniques
 
 The @sc{scf} library implements some things that you will need to know about
@@ -751,3 +752,13 @@ instead of @code{SCF_IMPLEMENT_IBASE()}, as if your object was an embedded
 interface.  Embedded interfaces don't have the habit of deleting themselves
 when their reference count reaches zero.  In this case you should take care
 and delete your object manually.
+
+@node SCF Smart Pointers, , SCF Advanced, SCF
+@subsection Smart Pointers
+
+A more recent new feature are smart pointers. These smart pointers allow
+you to automate the process of reference counting. If you use a smart pointer
+then you no longer need to worry about calling @code{IncRef} or @code{DecRef}.
+In last versions of Crystal Space the use of smart pointers is required.
+@xref{HOWTO Smart Pointers}.
+

@@ -130,12 +130,11 @@ movable you need to do the following in code:
 
 @example
   iMeshWrapper* mesh = @dots{};
-  iThingState* state = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+  csRef<iThingState> state = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
   	iThingState);
   if (state)
   @{
     state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
-    state->DecRef ();
   @}
 @end example
 
@@ -145,18 +144,20 @@ is not implemented at this moment.
 To do this from within a map file you can do the following:
 
 @example
-  MESHOBJ 'myObject' (
-    PLUGIN ('thing')
-    PARAMS (
-      MOVEABLE ()
+  <meshobj name="myObject">
+    <plugin>thing</plugin>
+    <params>
+      <moveable />
       @dots{}
-    )
-    MOVE (@dots{})
-  )
+    </params>
+    <move>
+      @dots{}
+    </move>
+  </meshobj>
 @end example
 
 If you don't make a thing movable you can only move it with
-@code{HardTransform()} or @samp{HARDMOVE}.
+@code{HardTransform()} or @samp{hardmove}.
 
 @subsubheading Include Files
 

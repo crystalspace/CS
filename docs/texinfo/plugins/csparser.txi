@@ -7,6 +7,8 @@
 This section will describe the map file parser (@code{csParser}). Currently
 there is only a section describing the format of the map files.
 
+@emph{WARNING:} Outdated! Requires new explanation of the XML format.
+
 @menu
 * Map File Format:: Format of Map File
 @end menu

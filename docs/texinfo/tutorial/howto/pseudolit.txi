@@ -26,16 +26,16 @@ To specify a pseudo-dynamic light in a map file you use the following
 syntax:
 
 @example
-  LIGHT 'DynLight' (
-    CENTER (23,1,5)
-    RADIUS (10)
-    COLOR (1,0,0)
-    DYNAMIC ()
-  )
+  <light name="DynLight">
+    <center x="23" y="1" z="5"/>
+    <radius>10</radius>
+    <color red="1" green="0" blue="0"/>
+    <dynamic />
+  <light>
 @end example
 
 In other words, the syntax is the same as for a normal light except for
-the @samp{DYNAMIC} keyword. Note that lights usually don't have a name
+the @samp{dynamic} keyword. Note that lights usually don't have a name
 but for a pseudo-dynamic light it is convenient to have one since you can
 use that name to find the light later (which is essential if you want to
 change the color/intensity).
@@ -44,7 +44,7 @@ To create a pseudo-dynamic light from within an application you can
 use the following code:
 
 @example
-  iStatLight* light = engine->CreateLight ("DynLight",
+  csRef<iStatLight> light = engine->CreateLight ("DynLight",
   	csVector3 (23, 1, 5), 10, csColor (1, 0, 0), true);
   sector->GetLights ()->AddLight (light->QueryLight ());
 @end example

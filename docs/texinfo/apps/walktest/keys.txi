@@ -45,21 +45,6 @@ Activate a trigger.
 @item @key{SPACE}
 Fire a missile (a moving sprite and a dynamic light).
 
-@item l
-Toggle lighting (default on).
-
-@item e
-Toggle edges on/off (default off). This is useful for debugging map
-files. When edges are on you will also see where all the lights are.
-Clicking on a light will select it (useful for the next key).
-
-@item @key{SHIFT}-e
-Toggle frustum viewing on/off (default off). This is useful for debugging
-the engine. With this option you see the view frustum around the selected
-light (see the @key{e} key above). The white outlines are the shapes where
-the light may hit the polygon (ignoring radius of the light). The red lines
-connect the vertices of every outline with the center of the light.
-
 @item c
 Load coordinates from the @file{coord} file and jump camera to that
 location.
@@ -77,97 +62,20 @@ Toggle display of coordinates while we are running.
 @item q
 Quit program.
 
-@item t
-Toggle texture mapping or flat drawing.
-
-@item @key{SHIFT}-t
-Enable mipmapping. Three possible states:
-@table @samp
-@item on
-Mipmapping is used according to the distance (default).
-
-@item off
-Mipmapping is never used.
-
-@item always
-Mipmapping is always used.
-@end table
-
-@item @key{ALT}-t
-Toggle texel filtering (default off). This is an experimental feature
-which will slow down the engine considerably and also introduces some
-artifacts on the borders of polygons.
-
-@item @key{CTRL}-t
-Turn on/off the display of things (same as @samp{things} command).
-Default is on.
-
-@item i
-Dump information about the texture cache.
-
-@item r
-Clear the texture cache.
-
 @item p
 Do a performance test on the current location.
-
-@item @key{SHIFT}-p
-Toggle perfect texture mapping on/off (default off).
-
-@item @key{ALT}-p
-Switch between @samp{smart}, @samp{step16}, and @samp{step32} scanline
-interpolation modes.  For more info on the @samp{inter} command,
-@ref{Console}.
-
-@item m
-Toggle @samp{map} mode.
-
-@item g
-Increase gamma level of display.
-
-@item @key{SHIFT}-g
-Decrease gamma level of display.
-
-@item f
-Increase FOV value.
-
-@item @key{SHIFT}-f
-Decrease FOV value.
-
-@item @key{ALT}-f
-Toggle FPS display.
 
 @item @key{TAB}
 Toggle input console.  For a list of commands, @xref{Console}.
 
 @item 1
-Experimental: create a new pulsating dynamic light at your location.
+Create a new pulsating dynamic light at your location.
 
 @item @key{SHIFT}-1
 Delete the last created dynamic light.
 
 @item @key{ALT}-1
 Delete all dynamic lights.
-
-@item 2
-@emph{Broken}.
-
-@item @key{SHIFT}-2
-@emph{Broken}.
-
-@item @key{F1}
-(X version only) Used when simulating a 15/16-bit display on an 8-bit
-display (@code{-depth} option). This will compute an optimal palette for
-the current frame.
-
-@item @key{F2}
-(X version only) Used when simulating a 15/16-bit display on an 8-bit
-display (@code{-depth} option). This will compute a greyscale palette and
-use that instead of the standard 3:3:2 truecolor palette.
-
-@item @key{F3}
-(X version only) Restore the standard 3:3:2 palette used for simulating
-15/16-bit on an 8-bit display.
 
 @item d
 Assigned to @samp{debug0 toggle}.

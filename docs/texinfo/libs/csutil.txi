@@ -8,11 +8,22 @@ The utility library consists of many smaller modules that are too small to
 live as a separate library. The biggest part of it is the @sc{scf} library.
 @xref{SCF}.
 
+@emph{WARNING:} This section needs updating after we fixed all code
+to use @code{csPArray} and @code{csRefArray}.
+
 The second most important class is probably the @code{csVector}. This class
 is a generic resizable array. It is generic because its elements are
 @code{(void*)} pointers. You can also use handy macros to create type-safe
 subclasses of this class. Also, the @file{.cfg} file reader and the random
 number generator will probably help you.
+
+Two newer alternatives to @code{csVector} are @code{csPArray} and
+@code{csRefArray}. The first one is very similar to @code{csVector} but it
+is automatically type-safe because it uses templates. It is recommended
+to use that one instead of @code{csVector} in new code. @code{csRefArray}
+is like @code{csPArray} but it also keeps references on the objects in the
+array (i.e. the reference count of an object will be increased when it is
+added to the array and decreased when it is removed again).
 
 The other classes might or might not be useful, so if you need some very
 common functionality in your application, you should look in the @sc{api}

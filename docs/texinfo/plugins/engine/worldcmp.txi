@@ -27,13 +27,18 @@ logically bounded by sector walls or a sky object.
 about them (@pxref{MeshObject}). Mesh objects represent geometry in some
 sector. Everything you can see (walls, actors, particle systems, ...) is
 represented by some kind of mesh object. This is a very important concept
-in the Crystal Space engine.
+in the Crystal Space engine. Mesh objects can also be hierarchical.
+A mesh object can have several children which in turn can also have children
+and so on. The children of a mesh object are positioned relative to the
+parent. So when you move the parent the children will automatically move
+with the parent.
 
 @item
 @dfn{Mesh Object Factories}. Mesh object factories are objects that
 can be used to create mesh objects that inherit characteristics
 from their mesh factory. Basically a mesh object factory is like
-a blue-print for creating a mesh object.
+a blue-print for creating a mesh object. Mesh factories can also
+be hierarchical like mesh objects.
 
 @item
 @dfn{Portals}. Again see the portal discussion (@pxref{Portal Engine}) but
@@ -47,7 +52,16 @@ sector to a single polygon.
 to increase performance.  @xref{Lighting}.
 
 @item
-@dfn{Collection Objects}.  These are simply groups of other objects.
+@dfn{Collection Objects}.  These are simply groups of other objects. Do not
+confuse them with hierarchical objects.
+
+@item
+@dfn{Regions}. A region is also a collection of objects but the purpose
+is different (as opposed to collections). A region can contain textures,
+materials, mesh objects, mesh factories, lights, collections, sectors,
+@dots{}. Regions are useful when you want to load/unload big parts of a world
+dynamically. This can be used in cases where the world is too big to fit
+in memory and you want to use dynamic loading.
 
 @item
 @dfn{Key/value Pairs}. A key/value pair is a

@@ -13,12 +13,12 @@ defined in the sprite and an interface (@samp{iSkeletonBone}).
 For the purpose of this document I will describe frame based animation as an
 @dfn{action}.  This name is coined from the class the implements frame
 animations in the 3D sprite object @samp{csSpriteAction2} and has been
-traditionally referred to as an @samp{ACTION} in the sprite loader plug in.
+traditionally referred to as an @samp{action} in the sprite loader plug in.
 
 Further, I will also refer to skeletal based animation as a @dfn{motion}.
 This term is coined from the Motion Manager which provides the facilities
 for automating a skeletal animation sequence. Skeletal animation sequences
-have been traditionally referred to as a @samp{MOTION} in the motion loader
+have been traditionally referred to as a @samp{motion} in the motion loader
 plug in.
 
 This document presumes that you have an operational copy of Crystal Space.

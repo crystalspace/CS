@@ -266,9 +266,7 @@ the 3D vertex.  We will call this 2D vector @Nn{V,s}.
 
 @math{F} is some factor needed to get a correct @dfn{Field of Vision}
 (@sc{fov}).  Crystal Space currently uses the height of the display (in
-pixels) for this.  You can experiment with other values in the @file{walktest}
-application (@pxref{Walktest}) using the @samp{-fov} command-line option or
-the @kbd{f} or @kbd{@key{Shift}-f} keys while the program is running.
+pixels) for this.
 
 @node Texture Mapping Together, Texture Mapping Instructions, Texture Mapping Perspective Correction, Texture Mapping
 @subsubsection Bringing it All Together

@@ -7,7 +7,7 @@ work in progress.  Expect these problems to go away in the future.
 
 @itemize @bullet
 @item
-With the exception of MacOS/X, all ports of Crystal Space require an 8-bit,
+With the exception of MacOS/X, all ports of Crystal Space require a
 15-bit, 16-bit, or 32-bit display to run.  It will @emph{not} work on 24-bit
 displays.
 

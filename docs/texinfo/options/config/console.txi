@@ -8,11 +8,7 @@ The default values are stored in @file{CS/data/config/simpcon.cfg}.
 @table @code
 @item SimpleConsole.ConFG = <red>,<green>,<blue>
 Set the color that is used for console output and the frame rate counter.
-Default is 255,255,255 (white). Note that this color is independent of the
-gamma setting. The console always tries to find the closest possible color
-given the current palette. If you change the palette by changing the gamma
-value (by pressing @key{g} or @key{G} in Walktest for example) the console
-will search again for the most fitting color.
+Default is 255,255,255 (white).
 
 @item SimpleConsole.ConBG = <red>,<green>,<blue>
 Set the color that is used for console background. Default is

@@ -7,7 +7,8 @@ type the command without arguments it will show you the current state of the
 command (@code{on} or @code{off}). To turn the state on just use: @code{on},
 @code{yes}, @code{true}, or @code{1} as the first argument of the command. To
 turn it off use: @code{off}, @code{no}, @code{false}, or @code{0}. To toggle
-a state use @code{toggle}. Example:
+a state use @code{toggle}. Example (the @code{fps} command doesn't really exist
+anymore, so this is only an example):
 
 @itemize @bullet
 @item
@@ -37,11 +38,6 @@ Enable/disable statistics display. Corresponds to
 @samp{Walktest.Settings.Stats} configuration option. Note that enabling the
 statistics counter automatically disables the display of the coordinates.
 
-@item fps
-Enable/disable @sc{fps} display (frames per second).  Corresponds to
-@code{-fps}/@code{-nofps} commandline options and @samp{Walktest.Settings.FPS}
-configuration option.
-
 @item portals
 Enable/disable drawing through portals. If this is off, a portal will just
 draw as the default texture on the polygon.
@@ -52,9 +48,6 @@ Open/close console (is done automatically by @key{TAB} key).
 @item coordshow
 Enable/disable display of coordinate at runtime. Note that enabling the
 coordinates display automatically disables the statistics display.
-
-@item things
-Toggle the display of things on/off (default on).
 
 @item zbuf
 For debugging. When enabled this will show an alternate view where far away
@@ -81,21 +74,6 @@ Enable/disable gravity (enabled by default).
 If freelook is enabled the mouse moves around like in Quake. By default
 freelook is disabled.
 
-@item pvs
-Toggle pvs visibility culling on/off. Use this in combination with the
-c-buffer (see cbuffer command) to enable the PVS. In the current release
-of CS this feature is still experimental.
-
-@item pvsonly
-With this command you can indicate that ONLY the PVS should be used
-for visibility culling and not any other technique. Default is off.
-
-@item freezepvs
-Use this command to freeze the PVS to a given position. This is very
-useful for debugging a PVS as you can then walk around and see where
-the PVS is culling nodes. Use this command with 'pvsonly' for better
-debugging.
-
 @item sprlight
 Change quality setting of sprite lighting.  If yes every vertex will be lit
 according to the correct distance with the light.  If no then the distances
@@ -103,12 +81,7 @@ for all vertices are calculated to the center of the sprite.  Default is
 @samp{no}.  This option can also be set with the
 @samp{Engine.Lighting.SpriteQuality} option in the configuration file.
 
-@item palette
-Toggle on/off displaying the palette on top of everything (just below the
-Crystal Space logo). Works in 8-bit modes only.
-
 @item fullscreen
-Toggle fullscreen mode on/off. This will only work with X windows right now
-and only if the X drivers were compiled with this option.
+Toggle fullscreen mode on/off.
 
 @end table

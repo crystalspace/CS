@@ -34,7 +34,7 @@ To finally be able to use the image loader in your application you
 need to do:
 
 @example
-iImageIO* imgldr = CS_QUERY_REGISTRY (object_reg, iImageIO);
+csRef<iImageIO> imgldr = CS_QUERY_REGISTRY (object_reg, iImageIO);
 @end example
 
 When you don't need it anymore you must call @code{imgldr->DecRef ()}.
@@ -46,13 +46,11 @@ In this section I show you how you can use @sc{vfs} and the image
 loader to load an image:
 
 @example
-iDataBuffer* buf = VFS->ReadFile ("/lib/mydata/test.jpg");
-iImage* ifile = imgldr->Load (buf->GetUint8 (),
+csRef<iDataBuffer> buf = VFS->ReadFile ("/lib/mydata/test.jpg");
+csRef<iImage> ifile = imgldr->Load (buf->GetUint8 (),
   buf->GetSize (), txtmgr->GetTextureFormat ());
-buf->DecRef ();
 iTextureHandle* txt = txtmgr->RegisterTexture (ifile, CS_TEXTURE_2D);
 txt->Prepare ();
-ifile->DecRef ();
 @end example
 
 This code will first use @sc{vfs} to load the image from the given @sc{vfs}

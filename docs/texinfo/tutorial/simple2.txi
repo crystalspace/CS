@@ -199,6 +199,13 @@ After doing movement (either updating the sectors or the position) you
 @emph{must} call @code{movable->UpdateMove()} to change internal data
 structures (i.e. the engine may use this to recalculate visibility information).
 
+@emph{WARNING:} The code above actually scaled the object by giving it
+a transformation matrix which is multiplied with 5. Don't do this in your
+own code. Many subsystems in Crystal Space (like the collision detection
+system, the visibility culling system and the lighting system) don't work
+properly with scaled objects. Instead scale your object using
+@code{HardTransform}.
+
 If you read the mesh object documentation (see @pxref{MeshObject})
 carefully you will see that in order to control visual attributes
 of mesh objects you will have to get the @emph{state} interface for

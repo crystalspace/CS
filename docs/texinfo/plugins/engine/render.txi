@@ -25,20 +25,20 @@ basics for using Crystal Space.  This document is based upon the
 @file{simple} application (@file{CS/apps/simple/}) because this discussion
 looks a lot like a tutorial.
 
-First we start in @file{apps/simple/simple.cpp}.  In the @code{main()}
-function we initialize our engine.  This is an instance of the class
-@samp{csEngine} which actually represents the engine.  I will not explain how
-all the initialization works.  This is explained in the tutorial.  But I will
-go straight to @code{csEngine::Draw()} which is called indirectly from within
-@code{Simple::NextFrame()}.  It is called indirectly because first we call
-@code{csView::Draw()} which then calls @code{csEngine::Draw()}.
+First we start in @file{apps/tutorial/simple1/simple1.cpp}.  In the
+@code{main()} function we initialize our engine.  This is an instance of the
+plugin @samp{iEngine} which actually represents the engine.  I will not
+explain how all the initialization works.  This is explained in the tutorial.
+But I will go straight to @code{csEngine::Draw()} which is called indirectly
+from within @code{Simple::NextFrame()}.  It is called indirectly because first
+we call @code{iView::Draw()} which then calls @code{iEngine::Draw()}.
 
 @subsubheading World Rendering (@code{csEngine::Draw()})
 
-The method @code{csEngine::Draw()} is located in the file
+The method @code{iEngine::Draw()} is located in the file
 @file{CS/libs/csengine/engine.cpp}.
 
-@code{csEngine::Draw()} first sets up the initial @samp{csRenderView}
+@code{iEngine::Draw()} first sets up the initial @samp{csRenderView}
 structure.  This structure is defined in @file{CS/include/csengine/rview.h}
 and is the main structure which is used throughout the entire rendering
 process.  It collects all data that is required for rendering the recursive

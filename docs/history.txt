@@ -8,6 +8,8 @@ The history order is reversed so that new features are at the top.
 	  methods (deformation).
 	- Fixed the unit tester in csgeom for the new methods.
 	- Fixed the rapid plugin for the new methods.
+	- Fixed various outdated information throughout the documentation.
+	  Still a lot of work to do however.
 10-Jan-2002
 	- Made the calling of the movable callbacks safe so that they now
 	  can delete themselves from the movable. This basically amounts

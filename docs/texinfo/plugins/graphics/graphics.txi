@@ -3,7 +3,7 @@
 @section Graphics Drivers
 @cindex Graphics Drivers
 
-The graphics system consists of two drivers:
+The graphics system consists of two or three drivers:
 
 @itemize @bullet
 @item
@@ -26,6 +26,14 @@ This driver is used to draw 3d graphics and also 2D bitmaps on screen.  It
 automatically loads a 2D driver on startup.  There are currently several
 implementations of this component: Software, OpenGL, and Direct3D, as
 well as debugging drivers such as Line and Infinite.
+
+@item
+Effect or Shader System
+
+Some of the renderers (currently the OpenGL renderer) also require an
+additional effect or shader system. When this is present it is possible
+to make more advanced texture effects using shaders. This is still work
+in progress.
 @end itemize
 
 @menu

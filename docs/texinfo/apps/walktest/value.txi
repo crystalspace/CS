@@ -5,7 +5,8 @@
 A value command has some value associated with it. Typing the command without
 arguments will show the current value. Just type the value after the command
 to change it. Using a @samp{++} or @samp{--} operator before the value will
-increase or decrease the value with the given amount. Example:
+increase or decrease the value with the given amount. Example (@code{gamma}
+command doesn't exist, this is only an example):
 
 @itemize @bullet
 @item
@@ -38,27 +39,6 @@ routines every frame. Normally this is set to a very high number so that
 this maximum is never reached (2000000000 polygons every frame should suit
 everyone's need for the near future :-)  You can reduce this number for
 debugging purposes.
-
-@item gamma
-Control the gamma value of the display. A gamma of 1.00 is neutral. 2.00
-(for example) is lighter and 0.5 is darker. Press @key{g} or @key{SHF-g} to
-experiment with this value at render time. This command corresponds with
-the @code{-gamma} commandline option and with the GAMMA configuration
-option.
-
-@item fov
-Control the FOV (Field Of Vision) of the display. By default this is equal
-to the height (in pixels) of the current display. Press @key{f} or
-@key{SHF-f} to experiment with this value at render time. This command
-corresponds with the @code{-fov} commandline option and with the FOV
-configuration option.
-
-@item fovangle
-Control the FOV (Field Of Vision) of the display in angles (degrees).
-
-@item cosfact
-Control the cosinus factor (default 0) used for lighting. For details,
-@xref{Config Engine}.
 
 @item p_alpha
 Change the alpha transparency for a selected portal. You can select a

@@ -188,15 +188,15 @@ unsubscribing.
 The Crystal Space developers are often available online for live chat via the
 Internet Relay Chat (@sc{irc}) system.  If you are unfamiliar with @sc{irc}, a
 good place to learn about it is @uref{http://irchelp.org/}.  The Crystal
-Space developers inhabit a channel named @code{#CrystalSpace} on the Open
-Projects Network (@sc{opn}). You can find more information about @sc{opn} at
-@uref{http://openprojects.net/}, including a list of servers. There are a few
+Space developers inhabit a channel named @code{#CrystalSpace} on the FreeNode
+Network (@sc{FreeNode}). You can find more information about @sc{FreeNode} at
+@uref{http://freenode.net/}, including a list of servers. There are a few
 redirection servers that you should be able to connect to right away. Try
 connecting to one located close (geographically) to you for the least lag.
 
 @example
-irc.au.openprojects.net
-irc.cn.openprojects.net
-irc.eu.openprojects.net
-irc.us.openprojects.net
+irc.au.freenode.net
+irc.cn.freenode.net
+irc.eu.freenode.net
+irc.us.freenode.net
 @end example
