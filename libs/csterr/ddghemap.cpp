@@ -63,15 +63,14 @@ bool ddgHeightMap::readMemory( unsigned short *buf )
 
 bool ddgHeightMap::writeTGN(char *filename, unsigned int base, unsigned int scale)
 {
-	FILE *fptr = filename && filename[0] ? fopen(filename,"w") : 0;
+	FILE *fptr = filename && filename[0] ? fopen(filename,"wb") : 0;
+	unsigned long test_value = 0x12345678L;
+	bool endian = (*((unsigned char*)&test_value) == 0x12);
+
 	if (!fptr) {
 		ddgErrorSet(FileWrite,(char *) (filename ? filename : "(null)"));
 		goto error;
 	}
-
-#ifdef WIN32
-	_setmode(_fileno(fptr),_O_BINARY);
-#endif
 
 	// Header
 	if (fwrite("TERRAGENTERRAIN SIZE",1,20,fptr) < 20)
@@ -140,14 +139,23 @@ bool ddgHeightMap::writeTGN(char *filename, unsigned int base, unsigned int scal
 	// Write data
 	int r, c;
 	r = 0;
+
 	while (r < _rows)
 	{
 		for (c = 0; c < _cols; c++)
 		{
 			ch1 = _pixbuffer[c + r * _cols] % 256;
 			ch2 = _pixbuffer[c + r * _cols] - ch1 * 256;
-			fputc(ch1,fptr);
-			fputc(ch2,fptr);
+			if  (endian)
+			{
+				fputc(ch2,fptr);
+				fputc(ch1,fptr);
+			}
+			else
+			{
+				fputc(ch1,fptr);
+				fputc(ch2,fptr);
+			}
 		}
 		r++;
 	}
@@ -169,6 +177,9 @@ error:
 bool ddgHeightMap::readTGN(char *file)
 {
 	FILE *fptr = file && file[0] ? fopen(file,"rb") : 0;
+	unsigned long test_value = 0x12345678L;
+	bool endian = (*((unsigned char*)&test_value) == 0x12);
+
 	if (!fptr)
 	{
 		ddgErrorSet(FileRead,(char *) (file ? file : "(null)"));
@@ -279,8 +290,7 @@ bool ddgHeightMap::readTGN(char *file)
 		r++;
 	}
 	// Swap byte order for machines with different endian.
-	unsigned long test_value = 0x12345678L;
-	if  (*((unsigned char*)&test_value) == 0x12)
+	if  (endian)
 	{
 		char s;
 		int i;
