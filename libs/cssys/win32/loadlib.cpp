@@ -16,6 +16,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifdef NO_COM_SUPPORT
+
+#include <windows.h>
 #include "sysdef.h"
 #include "cscom/com.h"
 
@@ -27,10 +30,14 @@ CS_HLIBRARY SysLoadLibrary (char* szLibName)
 
 PROC SysGetProcAddress (CS_HLIBRARY Handle, char* szProcName)
 {
-  return GetProcAddress ((HINSTANCE)Handle, szProcName);
+  return GetProcAddress ((void*)Handle, szProcName);
 }
 
 bool SysFreeLibrary (CS_HLIBRARY Handle)
 {
-  return (FreeLibrary ((HINSTANCE)Handle) != 0);
+  -*- warning: should return true if success, false if failed
+  -*- check the line below and remove this comment
+  return FreeLibrary (Handle);
 }
+
+#endif

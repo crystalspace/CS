@@ -19,14 +19,14 @@
 #include "sysdef.h"
 #include "cscom/com.h"
 
-HINSTANCE ModuleHandle;
+HINSTANCE DllHandle;
 
 // our main entry point...should be called when we're loaded.
 BOOL WINAPI DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
   if (fdwReason == DLL_PROCESS_ATTACH)
   {
-    ModuleHandle = hinstDLL;
+    DllHandle = hinstDLL;
     DllInitialize ();
   }
 
