@@ -42,6 +42,7 @@ static int const SIZEOF_MD2FRAMENAME = 16;
 static int const SIZEOF_MD2HEADER = 15*SIZEOF_MD2LONG;
 
 static const float SCALE_FACTOR = 0.025;
+static const float FRAME_DELAY = 0.1;
 
 CS_DECLARE_TYPED_VECTOR (csStringVector, csString);
 CS_DECLARE_OBJECT_VECTOR (csVertexFrameVector, iModelDataVertices);
@@ -297,8 +298,9 @@ iModelData *csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
   char currAction [256];
   memset (currAction, 0, 256);
   iModelDataAction * action = 0;
+  float time = 0;
 
-  for (i = 0; i < Header.FrameCount; i++)
+  for (i = 0; i < Header.FrameCount; i++, time += FRAME_DELAY)
   {
     csVector3 scale, translate;
     // read in scale and translate info
@@ -325,13 +327,14 @@ iModelData *csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
       action = new csModelDataAction ();
       action->QueryObject ()->SetName (currAction);
       Object->QueryObject ()->ObjAdd (action->QueryObject ());
+      time = FRAME_DELAY;
     }
 
     // read in vertex coordinate data for the frame
     in.Read (readbuffer, 4*Header.VertexCount);
 
     iModelDataVertices *VertexFrame = new csModelDataVertices ();
-    action->AddFrame (i / 10., VertexFrame->QueryObject ());
+    action->AddFrame (time, VertexFrame->QueryObject ());
     VertexFrame->QueryObject ()->SetName (FrameName);
     if (!DefaultFrame)
        DefaultFrame = VertexFrame;
