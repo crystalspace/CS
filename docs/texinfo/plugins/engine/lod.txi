@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Level of Detail, , Dynamic Worlds, csEngine
+@node Level of Detail, Sequence Manager, Dynamic Worlds, csEngine
 @subsection Level of Detail
 @cindex Level of Detail
 @cindex static lod
