@@ -63,6 +63,9 @@ The history order is reversed so that new features are at the top.
         - Philip Wyett eliminated link errors in many of the applications
           under GNU Linux.
 14-Jun-2003
+        - Charlls put a temporal fopen() hack in
+          libs/cssys/general/scanplugins.cpp to fix some linking problems
+          under linux.
 	- Jorrit got a fix from Arthur K. (nemerle@lsk.pl) for two memory
 	  leaks in AWS.
 	- res changed the way how SCF plugin scanning works:
