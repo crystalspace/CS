@@ -33,6 +33,7 @@
 #include "csengine/stats.h"
 #include "csgeom/bsp.h"
 #include "csobject/nameobj.h"
+#include "cssys/common/csppulse.h"
 #include "ihalo.h"
 #include "igraph3d.h"
 #include "igraph2d.h"
@@ -825,20 +826,20 @@ csThing* csSector::GetThing (const char* name)
 
 void csSector::ShineLights ()
 {
-  int i;
-  for (i = 0 ; i < lights.Length () ; i++)
+  csProgressPulse pulse(true);
+  for (int i = 0 ; i < lights.Length () ; i++)
   {
-    CsPrintf(MSG_TICKER, "");
+    pulse.Step();
     ((csStatLight*)lights[i])->CalculateLighting ();
   }
 }
 
 void csSector::ShineLights (csThing* th)
 {
-  int i;
-  for (i = 0 ; i < lights.Length () ; i++)
+  csProgressPulse pulse(true);
+  for (int i = 0 ; i < lights.Length () ; i++)
   {
-    CsPrintf(MSG_TICKER, "");
+    pulse.Step();
     ((csStatLight*)lights[i])->CalculateLighting (th);
   }
 }
