@@ -39,6 +39,10 @@ The history order is reversed so that new features are at the top.
 	  thing environment.
 	- Cleaned up a lot more links between csEngine and csThing.
 	- Added iEngine->FindLight() to find a light given an index.
+	- Eric Sunshine eliminated compilation warnings.
+	- Eric Sunshine worked around a linker warning from the latest MacOS/X
+	  developer tools which stated "AppKit/Foundation not made a weak
+	  library".
 17-Dec-2002
 	- Fixed the fix on reparenting of a mesh object for the culler.
 	- Added 'do_popup' parameter to iStandardReporterListener->
