@@ -166,7 +166,7 @@ static char *ap_cvt(double arg, int ndigits, int *decpt, int *sign, int eflag, c
 	p1 = &buf[NDIG];
 	while (p1 > &buf[0] && fi != 0) {
 	    fj = modf(fi / 10, &fi);
-	    *--p1 = (int) ((fj + .03) * 10) + '0';
+	    *--p1 = (char)((int) ((fj + .03) * 10) + '0');
 	    r2++;
 	}
 	while (p1 < &buf[NDIG])
@@ -189,7 +189,7 @@ static char *ap_cvt(double arg, int ndigits, int *decpt, int *sign, int eflag, c
     while (p <= p1 && p < &buf[NDIG]) {
 	arg *= 10;
 	arg = modf(arg, &fj);
-	*p++ = (int) fj + '0';
+	*p++ = (char)((int) fj + '0');
     }
     if (p1 >= &buf[NDIG]) {
 	buf[NDIG - 1] = '\0';
@@ -258,10 +258,10 @@ static char *ap_gcvt(double number, int ndigit, char *buf, boolean_e altform)
 	else
 	    *p2++ = '+';
 	if (decpt / 100 > 0)
-	    *p2++ = decpt / 100 + '0';
+	    *p2++ = (char)(decpt / 100 + '0');
 	if (decpt / 10 > 0)
-	    *p2++ = (decpt % 100) / 10 + '0';
-	*p2++ = decpt % 10 + '0';
+	    *p2++ = (char)((decpt % 100) / 10 + '0');
+	*p2++ = (char)(decpt % 10 + '0');
     }
     else {
 	if (decpt <= 0) {
@@ -584,7 +584,7 @@ static char *conv_fp(register char format, register double num,
 	if (decimal_point != 0) {
 	    p = conv_10((wide_int) decimal_point, FALSE, &exponent_is_negative,
 			&temp[EXPONENT_LENGTH], &t_len);
-	    *s++ = exponent_is_negative ? '-' : '+';
+	    *s++ = (char)(exponent_is_negative ? '-' : '+');
 
 	    /*
 	     * Make sure the exponent has at least 2 digits
@@ -1024,7 +1024,7 @@ int ap_vformatter(int (*flush_func)(ap_vformatter_buff *),
 		else if (var_type == IS_LONG)
 		    *(va_arg(ap, long *)) = cc;
 		else if (var_type == IS_SHORT)
-		    *(va_arg(ap, short *)) = cc;
+		    *(va_arg(ap, short *)) = (short)cc;
 		else
 		    *(va_arg(ap, int *)) = cc;
 		break;
@@ -1175,6 +1175,7 @@ int ap_vformatter(int (*flush_func)(ap_vformatter_buff *),
 
 static int snprintf_flush(ap_vformatter_buff *vbuff)
 {
+	(void)vbuff;
     /* if the buffer fills we have to abort immediately, there is no way
      * to "flush" an ap_snprintf... there's nowhere to flush it to.
      */
