@@ -218,11 +218,9 @@ bool Video::Initialize (int argc, const char* const argv[],
   txtmgr->SetPalette ();
 
   // load the videoformat plugin
-  iSCF *pSCF = QUERY_INTERFACE (this, iSCF);
   Printf (MSG_INITIALIZATION, "Loading an iVideoFormat.\n");
-  pVideoFormat = (iStreamFormat*)pSCF->CreateInstance ("crystalspace.video.format.avi", 
-							  "iStreamFormat", 0);
-  pSCF->DecRef ();
+  pVideoFormat = CREATE_INSTANCE ("crystalspace.video.format.avi", iStreamFormat);
+
   Printf (MSG_INITIALIZATION, "initializing iVideoFormat.\n");
   if (pVideoFormat && pVideoFormat->Initialize (this))
   {

@@ -128,32 +128,26 @@ bool csAVIStreamAudio::LoadCodec (UByte *pInitData, ULong nInitDataLen,
 				  UByte *pFormatEx, ULong nFormatEx)
 {
   // based on the codec id we try to load the apropriate codec
-  iSCF *pSCF = QUERY_INTERFACE (pSystem, iSCF);
-  if (pSCF)
+
+  // create a classname from the coec id
+  char cn[128];
+  sprintf (cn, "crystalspace.audio.codec.avi.%s", strdesc.codec);
+  // try open this class
+  pCodec = CREATE_INSTANCE (cn, iAVICodec);
+  if (pCodec)
   {
-    // create a classname from the coec id
-    char cn[128];
-    sprintf (cn, "crystalspace.audio.codec.avi.%s", strdesc.codec);
-    // try open this class
-    pCodec = (iAVICodec*)pSCF->CreateInstance (cn, "iAVICodec", 0);
-    pSCF->DecRef ();
-    if (pCodec)
-    {
-      // codec exists, now try to initialize it
-      if (pCodec->Initialize (&strdesc, pInitData, nInitDataLen, pFormatEx, nFormatEx))
-		return true;
-      else
-      {
-		pSystem->Printf (MSG_WARNING, "CODEC class \"%s\" could not be initialized !", cn);
-		pCodec->DecRef ();
-		pCodec = NULL;
-      }
-    }
+    // codec exists, now try to initialize it
+    if (pCodec->Initialize (&strdesc, pInitData, nInitDataLen, pFormatEx, nFormatEx))
+      return true;
     else
-      pSystem->Printf (MSG_WARNING, "CODEC class \"%s\" could not be loaded !", cn);
+    {
+      pSystem->Printf (MSG_WARNING, "CODEC class \"%s\" could not be initialized !", cn);
+      pCodec->DecRef ();
+      pCodec = NULL;
+    }
   }
   else
-    pSystem->Printf (MSG_DEBUG_0, "Could not get an SCF interface from the systemdriver !");
+    pSystem->Printf (MSG_WARNING, "CODEC class \"%s\" could not be loaded !", cn);
 
   return false;
 }

@@ -281,7 +281,6 @@ bool csPluginList::RecurseSort (csSystemDriver *iSys, int row, char *order,
 
 IMPLEMENT_IBASE (csSystemDriver)
   IMPLEMENTS_INTERFACE (iSystem)
-  IMPLEMENTS_INTERFACE_COMMON (iSCF, iSCF::SCF)
 IMPLEMENT_IBASE_END
 
 csSystemDriver::csSystemDriver () : PlugIns (8, 8), EventQueue (),
