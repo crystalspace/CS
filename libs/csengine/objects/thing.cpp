@@ -227,6 +227,8 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
       CHK (poly.pi_texcoords = new G3DPolygon::poly_texture_def [64]);
       rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, use_z_buf);
       rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
+      rview.g3d->StartPolygonQuick (poly.txt_handle, false);
+
       for (j = 0 ; j < tess->GetNumTriangles () ; j++)
 	{
 	  csCurveTriangle& ct = tess->GetTriangle (j);
@@ -358,6 +360,8 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 	      rview.g3d->DrawPolygonQuick (poly, false);
 	    }
 	}
+      rview.g3d->FinishPolygonQuick ();
+
       CHK (delete [] poly.pi_texcoords);
     }
 }
