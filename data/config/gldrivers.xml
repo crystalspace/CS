@@ -179,7 +179,7 @@
 	<usecfg>preferstencil</usecfg>
       </applicable>
     </rule>
-    <rule description="GeForce MX/Go class HW: Prefer Stencil">
+    <!--<rule description="GeForce MX/Go class HW: Prefer Stencil">
       <conditions fulfill="one">
 	<regexp	string="renderer" pattern="^GeForce.*MX" />
 	<regexp	string="renderer" pattern="^GeForce.*Go" />
@@ -188,6 +188,7 @@
 	<usecfg>preferstencil</usecfg>
       </applicable>
     </rule>
+    -->
     <!--
     <rule description="Software GL tweaks">
       <conditions fulfill="one">

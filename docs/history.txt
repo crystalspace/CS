@@ -19,6 +19,9 @@ chronological order.
 	  Details of the problem are avalable in cscript/csperl5/Jamfile.)
 	- Jorrit added an entry to the GL driver database so that stencil
 	  clipping is prefered for ATI Radeon style cards.
+	- Jorrit removed the entry from the GL driver database that forced
+	  stencil clipping for GeForce4 Go cards. Don't know why in the
+	  past that seemed to cause massive slowdown. It no longer does that.
 15-Apr-2004
 	- Eric Sunshine added a blurb to the Unix and MacOS/X build
 	  instructions cautioning about potential problems caused by
