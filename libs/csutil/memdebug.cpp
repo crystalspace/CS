@@ -17,29 +17,39 @@
 */
 
 #include <stdarg.h>
+#ifdef CS_EXTENSIVE_MEMDEBUG
+  // in cssysdef.h is a "#define new" which affects the operator
+  // implementations as well
+  #define CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
+  #undef CS_EXTENSIVE_MEMDEBUG
+#endif
 #include "cssysdef.h"
 
-#if defined(COMP_VCC)
+#if defined(COMP_VC)
 
+// The VC runtime has it's own memory debugging facility, always
+// enabled when using the debug runtime.
+// So not much to do here.
+
+#ifdef CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
+// use the CRT's built-in memory debugging aids
 #include <crtdbg.h>
 
-#ifdef CS_EXTENSIVE_MEMDEBUG
-// use the CRT's built-in memory debugging aids
 void* operator new (size_t s, void* filename, int line)
 {
-  return (void*)_malloc_dbg (s, _NORMAL_BLOCK, filename, line);
+  return (void*)_malloc_dbg (s, _NORMAL_BLOCK, (char*)filename, line);
 }
 void* operator new[] (size_t s, void* filename, int line)
 {
-  return (void*)_malloc_dbg (s, _NORMAL_BLOCK, filename, line);
+  return (void*)_malloc_dbg (s, _NORMAL_BLOCK, (char*)filename, line);
 }
 void operator delete (void* p)
 {
-  if (p) _free_dbg(p, _NORMAL_BLOCK);
+  if (p) _free_dbg (p, _NORMAL_BLOCK);
 }
 void operator delete[] (void* p)
 {
-  if (p) _free_dbg(p, _NORMAL_BLOCK);
+  if (p) _free_dbg (p, _NORMAL_BLOCK);
 }
 #endif
 
@@ -232,7 +242,7 @@ static void ShowBlockInfo (MemEntry& me)
 {
   printf ("BLOCK: start=%08lx size=%d freed=%d\n", (long)me.start,
   	me.size, me.freed);
-# ifdef CS_EXTENSIVE_MEMDEBUG
+# ifdef CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
   printf ("       alloced at '%s' %d\n", me.alloc_file, me.alloc_line);
 # endif
 }
@@ -344,7 +354,7 @@ static void DumpError (const char* msg, int info, char* rc)
   }
 }
 
-#ifdef CS_EXTENSIVE_MEMDEBUG
+#ifdef CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 #undef new
 void* operator new (size_t s, void* filename, int line)
 #else
@@ -368,7 +378,7 @@ void* operator new (size_t s)
   me.start = rc+4+DETECT_WALL;
   me.size = s;
   me.freed = false;
-# ifdef CS_EXTENSIVE_MEMDEBUG
+# ifdef CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
   me.alloc_file = (char*)filename;
   me.alloc_line = line;
 # endif
@@ -376,7 +386,7 @@ void* operator new (size_t s)
   return (void*)(rc+4+DETECT_WALL);
 }
 
-#ifdef CS_EXTENSIVE_MEMDEBUG
+#ifdef CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 void* operator new[] (size_t s, void* filename, int line)
 #else
 void* operator new[] (size_t s)
@@ -399,7 +409,7 @@ void* operator new[] (size_t s)
   me.start = rc+4+DETECT_WALL;
   me.size = s;
   me.freed = false;
-# ifdef CS_EXTENSIVE_MEMDEBUG
+# ifdef CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
   me.alloc_file = (char*)filename;
   me.alloc_line = line;
 # endif
@@ -501,7 +511,7 @@ void operator delete[] (void* p)
 // If CS_EXTENSIVE_MEMDEBUG is defined we still have to provide
 // the correct overloaded operators even if we don't do debugging.
 
-#ifdef CS_EXTENSIVE_MEMDEBUG
+#ifdef CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 #undef new
 void* operator new (size_t s, void*, int)
 {

@@ -76,6 +76,13 @@
 
   #undef  DEBUG_BREAK
   #define DEBUG_BREAK ::DebugBreak()
+  
+  #if defined(COMP_VC) && defined(CS_EXTENSIVE_MEMDEBUG)
+    #include <crtdbg.h>
+    #define malloc(size) 	_malloc_dbg ((size), _NORMAL_BLOCK, __FILE__, __LINE__)
+    #define free(ptr) 		_free_dbg ((ptr), _NORMAL_BLOCK)
+    #define realloc(ptr, size) 	_realloc_dbg ((ptr), (size), _NORMAL_BLOCK, __FILE__, __LINE__)
+  #endif
 
 #else
   #define ASSERT(expression)
