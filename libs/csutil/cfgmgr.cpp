@@ -470,8 +470,8 @@ csConfigDomain *csConfigManager::FindConfig(const char *Name, iVFS *vfs) const
 {
   for (csConfigDomain *d=FirstDomain; d!=NULL; d=d->Next) {
     if (d->Cfg &&
-        strcmp(d->Cfg->GetFileName(), Name)==0 &&
-        d->Cfg->GetVFS() == vfs)
+        (d->Cfg->GetVFS() == vfs) &&
+        (strcmp(d->Cfg->GetFileName(), Name)==0))
       return d;
   }
   return NULL;
