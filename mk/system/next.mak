@@ -222,7 +222,7 @@ ifeq ($(ROOTCONFIG),config)
 # Currently this port does not support dynamic libraries
 override USE_DLL = no
 
-SYSCONFIG += $(NEWLINE)echo DO_ASM = $(DO_ASM)>>config.tmp
+SYSCONFIG += $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 ifneq ($(strip $(TARGET_ARCHS)),)
   SYSCONFIG += $(NEWLINE)echo TARGET_ARCHS = $(NEXT.TARGET_ARCHS)>>config.tmp
 endif
