@@ -259,36 +259,35 @@ struct iAttributeArray : public iBase
 
 //---------------------------------------------------------------------------
 
-SCF_VERSION (iEntity, 0, 1, 0);
+SCF_VERSION (iEntityComponent, 0, 1, 0);
 
 /**
- * A game entity.
+ * A component of a game entity.
  */
-struct iEntity : public iBase
+struct iEntityComponent : public iBase
 {
-  /// Get the name of the Entity.
-  virtual const char* GetName () = 0;
-
-  /// Set the name of the Entity.
-  virtual const char* SetName () = 0;
-
-  /// Get the classname of this entity
-  virtual const char* GetClassname() = 0;
-
   /**
-   * Check if this entity supports a specific classname, either
-   * by inheritance or by manually implementing its interface.
-   * useful for example to query an entity of class "Sabertooth"
-   * if it supports the "cs_weapon" interface
+   * Let the entity component handle a given event. If there are no return
+   * return parameters, OutPar can be NULL. If there are no Input parameters,
+   * InPar can also be NULL.
+   * The method needs to return true, if the event has been handled, 
+   * otherwise it must return false. In that case the entity will keep on
+   * searching for another entity that can handle this event.
    */
-  virtual bool SupportsInterface(const char* classname) = 0;
+  virtual bool HandleEvent(const char*     EventName, 
+                           iAttributeList* InPar,
+                           iAttributeList* OutPar) = 0;
+};
 
-  /**
-   * Get the position of the entity, or NULL if the entity has
-   * no position in the 3D world.
-   */
-  virtual iPosition* GetPosition () = 0;
+//---------------------------------------------------------------------------
 
+SCF_VERSION (iEntityCollider, 0, 1, 0);
+
+/**
+ * A collider component of a game entity.
+ */
+struct iEntityCollider : public iBase
+{
   /**
    * Get the size of the bounding box for this entity. There will
    * be no collision detection happening outside of this bounding
@@ -317,6 +316,91 @@ struct iEntity : public iBase
                            iCollider*&  pCollider,
                            csTransform& pTransform,
                            bool&        Solid);
+};
+
+//---------------------------------------------------------------------------
+
+SCF_VERSION (iEntityAttributes, 0, 1, 0);
+
+/**
+ * An entity component to manage attributes
+ */
+struct iEntityAttributes : public iBase
+{
+  /// Get the given Attribute.
+  virtual iAttribute* GetAttribute (const char* Name) = 0;
+
+  /// Get the given Tag.
+  virtual iAttribute* GetTag (const char* TagKey, const char* Name) = 0;
+
+  /**
+   * Get an iterator, that will allow the caller to iterate across all
+   * attributes in this entity and all baseclasses. (Used mainly for
+   * persistance.)
+   */
+  virtual iAttributeIterator* GetAllAttributes() = 0;
+
+  /**
+   * returns true, if this entity is to be stored to disk, when
+   * the game state will be saved (persistance is only useful for 
+   * objects that can be modifed in a way while the game is running,
+   * an whose state the player will remember all other entites
+   * can happily remain unsaved.
+   */
+  virtual bool IsPersistant() = 0;
+};
+
+//---------------------------------------------------------------------------
+
+SCF_VERSION (iEntityClassInformation, 0, 1, 0);
+
+/**
+ * An entity component to manage attributes
+ */
+struct iEntityClassInformation : public iBase
+{
+  /// Get the classname of this entity
+  virtual const char* GetClassname() = 0;
+
+  /**
+   * Check if this entity supports a specific classname, either
+   * by inheritance or by manually implementing its interface.
+   * useful for example to query an entity of class "Sabertooth"
+   * if it supports the "cs_weapon" interface
+   */
+  virtual bool SupportsInterface(const char* EntityClassname) = 0;
+};
+
+
+
+//---------------------------------------------------------------------------
+
+SCF_VERSION (iEntity, 0, 1, 0);
+
+/**
+ * A game entity.
+ */
+struct iEntity : public iBase
+{
+  /// Get the name of the Entity.
+  virtual const char* GetName () = 0;
+
+  /// Set the name of the Entity.
+  virtual void SetName (const char* Name) = 0;
+
+  /**
+   * Get a pointer to the embedded interface with the given
+   * interface name, or NULL, if there is no embedded interface
+   * of that type. It is safe to directly cast up the returned pointer
+   * to (ScfClassname*).
+   *
+   * Typical Classes that are to be used inside an entity are:
+   * - iEntityCollider
+   * - iEntityAttributes
+   * - iPositition
+   * - iEntityClassInformation
+   */
+  virtual void* GetComponent(const char* ScfClassname);
 
   /**
    * Let the entity handle a given event. If you don't need any
@@ -329,27 +413,6 @@ struct iEntity : public iBase
                            iAttributeList* InPar,
                            iAttributeList* OutPar) = 0;
 
-  /// Get the given Attribute.
-  virtual iAttribute* GetAttribute (const char* Name) = 0;
-
-  /// Get the given Tag.
-  virtual iAttribute* GetTag (const char* TagKey, const char* Name) = 0;
-
-  /**
-   * returns true, if this entity is to be stored to disk, when
-   * the game state will be saved (persistance is only useful for 
-   * objects that can be modifed in a way while the game is running,
-   * an whose state the player will remember all other entites
-   * can happily remain unsaved.
-   */
-  virtual bool IsPersistant() = 0;
-
-  /**
-   * Get an iterator, that will allow the caller to iterate across all
-   * attributes in this entity and all baseclasses. (Used mainly for
-   * persistance.)
-   */
-  virtual iAttributeIterator* GetAllAttributes() = 0;
 };
 
 //---------------------------------------------------------------------------
@@ -366,6 +429,19 @@ struct iEntityClass : public iBase
 
   /// Create an Entity of this class.
   virtual iEntity* CreateEntity () = 0;
+
+  /// Add a Baseclass to this class
+  virtual void AddBaseclass(const char* EntityClassname) = 0;
+
+  /**
+   * Add a component to this class. That component _must_ support the
+   * iEntityComponent interface as well as all required additional 
+   * interfaces like iEntityCollider or others.
+   * Note, that this call, like AddBaseclass, only adds the information
+   * about components, and doesn't try to create an instance of that
+   * class. Instantiation will happen only in CreateEntity.
+   */
+  virtual void AddComponent(const char* ScfClassname) = 0;
 };
 
 //---------------------------------------------------------------------------
