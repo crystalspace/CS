@@ -19,7 +19,7 @@
 #ifndef __CS_WIN32_H__
 #define __CS_WIN32_H__
 
-#ifndef __CSOSDEFS_H__
+#ifndef __CS_CSOSDEFS_H__
 #  error csosdefs.h should be included before "cssys/win32.h"
 #endif
 
