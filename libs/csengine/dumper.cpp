@@ -244,7 +244,7 @@ void Dumper::dump (csPolyTexture* p, char* name)
     {
       CsPrintf (MSG_DEBUG_0, "        ");
       for (j = 0 ; j < p->dirty_w ; j++)
-        CsPrintf (MSG_DEBUG_0, "%d ", p->dirty_matrix [p->dirty_w*i + j]);
+        CsPrintf (MSG_DEBUG_0, "%d ", p->dirty_matrix->Get(p->dirty_w*i + j));
       CsPrintf (MSG_DEBUG_0, "\n");
     }
     CsPrintf (MSG_DEBUG_0, "    ]\n");
