@@ -3113,6 +3113,7 @@ defaulthalo:
   l->QueryObject ()->ObjAddChildren (&Keys);
   Keys.ObjRemoveAll ();
 
+  l->IncRef ();	// Avoid smart pointer release.
   return l;
 }
 

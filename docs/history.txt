@@ -9,6 +9,7 @@ The history order is reversed so that new features are at the top.
 	- Reverted Norman's revert on my reversion again :-)
 	- Fixed cspython.mak for swig again.
 	- Fixed python plugin for csPtr usage.
+	- Fixed bug in old style parser for lights.
 	- Eric Sunshine fixed the Opcode plugin so that it builds on platforms
 	  where sizeof(bool) != 1.
 	- Eric Sunshine fixed formatting of help message in several new
