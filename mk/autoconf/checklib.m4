@@ -30,9 +30,31 @@ AC_PREREQ([2.56])
 #	itself is searched.  Thus, "/proj" is shorthand for
 #	"/proj/include|/proj/lib /proj|/proj".
 #
-#	By default this list is empty, but may be overridden in configure.ac.
+# Present Cases:
+#	/usr/local -- Not all compilers search here by default, so we specify
+#		it manually.
+#	/sw -- Fink, the MacOS/X manager of Unix packages, installs here by
+#		default.
 #------------------------------------------------------------------------------
-m4_define([cs_lib_paths_default], [])
+m4_define([cs_lib_paths_default],
+    [/usr/local/include|/usr/local/lib /sw/include|/sw/lib])
+
+
+
+#------------------------------------------------------------------------------
+# cs_pkg_paths_default
+#	Comma delimited list of additional directories in which the
+#	`pkg-config' command should search for its `.pc' files.
+#
+# Present Cases:
+#	/usr/local/lib/pkgconfig -- Although a common location for .pc files
+#		installed by "make install", many `pkg-config' commands neglect
+#		to search here automatically.
+#	/sw/lib/pkgconfig -- Fink, the MacOS/X manager of Unix packages,
+#		installs .pc files here by default.
+#------------------------------------------------------------------------------
+m4_define([cs_pkg_paths_default],
+    [/usr/local/lib/pkgconfig, /sw/lib/pkgconfig])
 
 
 
@@ -137,6 +159,7 @@ m4_define([CS_PKG_CONFIG_MIN], [0.9.0])
 AC_DEFUN([CS_CHECK_PKG_CONFIG],
     [AS_IF([test "$cs_prog_pkg_config_checked" != yes],
 	[AC_CHECK_TOOLS([PKG_CONFIG], [pkg-config])
+	_CS_CHECK_PKG_CONFIG_PREPARE_PATH
 	cs_prog_pkg_config_checked=yes])
     AS_IF([test -z "$cs_cv_prog_pkg_config_ok"],
 	[AS_IF([test -n "$PKG_CONFIG"],
@@ -144,6 +167,11 @@ AC_DEFUN([CS_CHECK_PKG_CONFIG],
 		[cs_cv_prog_pkg_config_ok=yes],
 		[cs_cv_prog_pkg_config_ok=no])],
 	    [cs_cv_prog_pkg_config_ok=no])])])
+
+AC_DEFUN([_CS_CHECK_PKG_CONFIG_PREPARE_PATH],
+    [PKG_CONFIG_PATH="m4_foreach([cs_pkg_path], [cs_pkg_paths_default],
+	[cs_pkg_path$PATH_SEPARATOR])$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH])
 
 
 
@@ -156,7 +184,7 @@ AC_DEFUN([CS_CHECK_PKG_CONFIG],
 #------------------------------------------------------------------------------
 AC_DEFUN([_CS_CHECK_LIB_PKG_CONFIG_FLAGS],
     [CS_CHECK_PKG_CONFIG
-    AS_IF([test -n "$PKG_CONFIG"],
+    AS_IF([test $cs_cv_prog_pkg_config_ok = yes],
 	[AC_CACHE_CHECK([if $PKG_CONFIG recognizes $2], [_CS_CLPCF_CVAR([$2])],
 	    [AS_IF([$PKG_CONFIG --exists $2],
 		[_CS_CLPCF_CVAR([$2])=yes], [_CS_CLPCF_CVAR([$2])=no])])

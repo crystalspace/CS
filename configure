@@ -17209,6 +17209,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -17226,7 +17228,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes Xxf86vm" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes Xxf86vm... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_Xxf86vm+set}" = set; then
@@ -21134,6 +21136,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -21151,7 +21155,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes z" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes z... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_z+set}" = set; then
@@ -21391,6 +21395,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -21408,7 +21414,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes zlib" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes zlib... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_zlib+set}" = set; then
@@ -22251,6 +22257,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -22268,7 +22276,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes png" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes png... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_png+set}" = set; then
@@ -22508,6 +22516,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -22525,7 +22535,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes libpng" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes libpng... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_libpng+set}" = set; then
@@ -23365,6 +23375,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -23382,7 +23394,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes jpeg" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes jpeg... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_jpeg+set}" = set; then
@@ -23622,6 +23634,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -23639,7 +23653,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes libjpeg" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes libjpeg... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_libjpeg+set}" = set; then
@@ -24483,6 +24497,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -24500,7 +24516,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes lcms" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes lcms... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_lcms+set}" = set; then
@@ -25202,6 +25218,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -25219,7 +25237,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes mng" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes mng... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_mng+set}" = set; then
@@ -25459,6 +25477,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -25476,7 +25496,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes libmng" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes libmng... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_libmng+set}" = set; then
@@ -26314,6 +26334,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -26331,7 +26353,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes mikmod" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes mikmod... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_mikmod+set}" = set; then
@@ -27065,6 +27087,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -27082,7 +27106,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes ogg" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes ogg... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_ogg+set}" = set; then
@@ -27811,6 +27835,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -27828,7 +27854,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes vorbis" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes vorbis... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_vorbis+set}" = set; then
@@ -28559,6 +28585,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -28576,7 +28604,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes vorbisfile" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes vorbisfile... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_vorbisfile+set}" = set; then
@@ -29318,6 +29346,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -29335,7 +29365,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes 3ds" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes 3ds... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_3ds+set}" = set; then
@@ -29575,6 +29605,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -29592,7 +29624,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes lib3ds-120" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes lib3ds-120... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_lib3ds_120+set}" = set; then
@@ -30750,6 +30782,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -30767,7 +30801,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes ode" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes ode... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_ode+set}" = set; then
@@ -32742,8 +32776,13 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Check for FreeType2.
+# Check for FreeType2. Note that on MacOS/X, Fink strangely installs
+# `freetype-config' in /sw/lib/freetype2/bin, thus we augment PATH so that
+# CS_CHECK_LIB_WITH() will take this unusual location into account.
 #------------------------------------------------------------------------------
+PATH=$PATH$PATH_SEPARATOR/sw/lib/freetype2/bin
+export PATH
+
 
 # Check whether --with-libfreetype2 or --without-libfreetype2 was given.
 if test "${with_libfreetype2+set}" = set; then
@@ -32854,6 +32893,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -32871,7 +32912,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes freetype2" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes freetype2... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_freetype2+set}" = set; then
@@ -33111,6 +33152,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -33128,7 +33171,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes freetype" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes freetype... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_freetype+set}" = set; then
@@ -34477,6 +34520,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -34494,7 +34539,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes cal3d" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes cal3d... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_cal3d+set}" = set; then
@@ -35543,6 +35588,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -35560,7 +35607,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes sdl" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes sdl... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_sdl+set}" = set; then
@@ -36524,7 +36571,8 @@ fi
     export PKG_CONFIG_PATH
 fi
 
-if test -n "$ac_tool_prefix"; then
+if test "$cs_prog_pkg_config_checked" != yes; then
+  if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -36608,6 +36656,25 @@ fi
 done
 
   PKG_CONFIG=$ac_ct_PKG_CONFIG
+fi
+
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+	cs_prog_pkg_config_checked=yes
+fi
+
+    if test -z "$cs_cv_prog_pkg_config_ok"; then
+  if test -n "$PKG_CONFIG"; then
+  if $PKG_CONFIG --atleast-pkgconfig-version=0.9.0; then
+  cs_cv_prog_pkg_config_ok=yes
+else
+  cs_cv_prog_pkg_config_ok=no
+fi
+
+else
+  cs_cv_prog_pkg_config_ok=no
+fi
+
 fi
 
 
@@ -38032,6 +38099,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -38049,7 +38118,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes Cg" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes Cg... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_Cg+set}" = set; then
@@ -38289,6 +38358,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -38306,7 +38377,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes cg" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes cg... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_cg+set}" = set; then
@@ -38546,6 +38617,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -38563,7 +38636,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes CG" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes CG... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_CG+set}" = set; then
@@ -39795,6 +39868,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -39812,7 +39887,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes CgGL" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes CgGL... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_CgGL+set}" = set; then
@@ -40052,6 +40127,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -40069,7 +40146,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes cggl" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes cggl... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_cggl+set}" = set; then
@@ -40309,6 +40386,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -40326,7 +40405,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes cgGL" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes cgGL... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_cgGL+set}" = set; then
@@ -40566,6 +40645,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -40583,7 +40664,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes CGGL" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes CGGL... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_CGGL+set}" = set; then
@@ -40823,6 +40904,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -40840,7 +40923,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes Cg" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes Cg... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_Cg+set}" = set; then
@@ -41080,6 +41163,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -41097,7 +41182,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes cg" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes cg... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_cg+set}" = set; then
@@ -41337,6 +41422,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -41354,7 +41441,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes CG" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes CG... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_CG+set}" = set; then
@@ -43168,6 +43255,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -43185,7 +43274,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes asound" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes asound... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_asound+set}" = set; then
@@ -44922,6 +45011,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -44939,7 +45030,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes aa" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes aa... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_aa+set}" = set; then
@@ -45179,6 +45270,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -45196,7 +45289,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes aalib" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes aalib... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_aalib+set}" = set; then
@@ -51094,6 +51187,8 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
 
@@ -51111,7 +51206,7 @@ fi
 
 fi
 
-    if test -n "$PKG_CONFIG"; then
+    if test $cs_cv_prog_pkg_config_ok = yes; then
   echo "$as_me:$LINENO: checking if $PKG_CONFIG recognizes bfd" >&5
 echo $ECHO_N "checking if $PKG_CONFIG recognizes bfd... $ECHO_C" >&6
 if test "${cs_cv_prog_pkg_config_bfd+set}" = set; then

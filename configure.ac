@@ -16,28 +16,6 @@ m4_define([cs_version_number], [0.99])
 
 
 
-#------------------------------------------------------------------------------
-# cs_lib_paths_default
-#	Whitespace delimited list of directory tuples in which to search, by
-#	default, for external libraries.  Each list item can specify an
-#	include|library directory tuple (for example, "/usr/include|/usr/lib"),
-#	or a single directory (for example, "/usr").  If the second form is
-#	used, then the directory itself is searched first.  If the external
-#	resource is not found, then "include" and "lib" subdirectories of the
-#	directory are searched.  Thus, specifying "/proj" is shorthand for
-#	"/proj|/proj /proj/include|/proj/lib".
-#
-# Present Cases:
-#	/usr/local -- Not all compilers search here by default, so we specify
-#		it manually.
-#	/sw -- Fink, the MacOS/X manager of Unix packages, installs here by
-#		default.
-#------------------------------------------------------------------------------
-m4_define([cs_lib_paths_default],
-    [/usr/local/include|/usr/local/lib /sw/include|/sw/lib])
-
-
-
 #==============================================================================
 # INITIALIZATION
 #==============================================================================
@@ -1428,8 +1406,13 @@ CS_CHECK_LIBOPENAL
 
 
 #------------------------------------------------------------------------------
-# Check for FreeType2.
+# Check for FreeType2. Note that on MacOS/X, Fink strangely installs
+# `freetype-config' in /sw/lib/freetype2/bin, thus we augment PATH so that
+# CS_CHECK_LIB_WITH() will take this unusual location into account.
 #------------------------------------------------------------------------------
+PATH=$PATH$PATH_SEPARATOR/sw/lib/freetype2/bin
+export PATH
+
 CS_CHECK_LIB_WITH([freetype2],
     [AC_LANG_PROGRAM(
 	[[#include <ft2build.h>
@@ -1535,7 +1518,7 @@ AS_IF([test "$with_vos" != no && test "$with_vos" != yes],
  	[PKG_CONFIG_PATH="$PKG_CONFIG_PATH$PATH_SEPARATOR$with_vos"],
 	[PKG_CONFIG_PATH="$with_vos"])
     export PKG_CONFIG_PATH])
-AC_CHECK_TOOLS([PKG_CONFIG], [pkg-config])
+CS_CHECK_PKG_CONFIG
 
 m4_define([cs_vos_pkgs], [libmetaobject_a3dl libmetaobject_misc])
 AS_IF([test "$with_vos" != no],

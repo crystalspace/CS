@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Nov-2004
+	- Eric Sunshine changed CS_CHECK_PKG_CONFIG in checklib.h so that it
+	  also augments pkg-config's search path to reference directories which
+	  commonly contain .pc files, but which pkg-config does not search by
+	  default. In particular, it now instructs pkg-config to also search
+	  /usr/local/lib/pkgconfig and /sw/lib/pkgconfig (the Fink-installed
+	  .pc location on MacOS/X).
+	- Eric Sunshine upgraded the FreeType2 check so that it is capable of
+	  locating the Fink-installed `freetype-config' in the unusual location
+	  /sw/lib/freetype2/bin on MacOS/X.
 17-Nov-2004
 	- Eric Sunshine fixed a bogus string comparison in
 	  csSpriteCal3DMeshObject::FindAnimCycleNamePos() which generally
