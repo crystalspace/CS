@@ -9,16 +9,11 @@ DESCRIPTION.mingw = Win32 with Mingw GCC
 # video/renderer/direct3d5 video/renderer/direct3d6
 # video/renderer/opengl
 #
-PLUGINS += video/canvas/ddraw video/renderer/software font/server/csfont
-# font/server/csfont font/server/freefont
-# sound/renderer/software video/canvas/ddraw video/renderer/direct3d5 \
-# video/renderer/direct3d6 video/renderer/opengl
-#
-
-#  Console window is always generated for OS_WIN32...see LFLAGS.GENERAL
-# Uncomment the following to get an startup console window
-#CONSOLE_FLAGS = -DWIN32_USECONSOLE
-
+PLUGINS += video/renderer/software video/canvas/ddraw
+# sound/renderer/software
+# video/renderer/direct3d5
+# video/renderer/direct3d6
+#video/renderer/opengl
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
@@ -34,12 +29,6 @@ OS=WIN32
 # Compiler
 COMP=GCC
 
-# Use Xavier Trocchus DO_DINPUT_KEYBOARD?  set to no if you do not wish to
-# use DirectInput.
-# If you select "yes", then you must change include\cssys\win32\volatile.h
-# to reflect this by uncommenting #define DO_DINPUT_KEYBOARD
-DO_DINPUT=no
-
 # Command to update a target
 #UPD=bin\dosupd.bat $@ DEST
 
@@ -48,8 +37,6 @@ endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 #------------------------------------------------------------------ defines ---#
 ifeq ($(MAKESECTION),defines)
 
-include mk/dos.mak
-
 # OpenGL settings for use with OpenGL Drivers...untested
 #SGI OPENGL SDK v1.1 for Win32
 #OPENGL.LIBS.DEFINED = -lopengl -lglut
@@ -57,11 +44,10 @@ include mk/dos.mak
 #OPENGL.LIBS.DEFINED = -lopengl32 -lglut32
 
 # Extra libraries needed on this system (beside drivers)
-# -mwindows or -lgdi32 are required for Mingw build
-LIBS.EXE= -mwindows
+LIBS.EXE=
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-Llibs/zlib -lz
+Z_LIBS=-Llibs/zlib -lz -mwindows
 
 # Where can the PNG library be found on this system?
 PNG_LIBS=-Llibs/libpng -lpng
@@ -75,26 +61,20 @@ SOUND_LIBS=
 # Does this system require libsocket.a?
 NEED_SOCKET_LIB=
 
-#Accomodate differences between static and dynamic libraries
-ifeq ($(USE_SHARED_PLUGINS),no)
-	CFLAGS.GENERAL=-DCS_STATIC_LINKED
-endif
-
 # Indicate where special include files can be found.
 CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
 
-# General flags for the compiler which are used in any case.
-# Default is Ix386:
+# General flags for the compiler which are used for Ix386.
 #CFLAGS.GENERAL+= -fomit-frame-pointer -fvtable-thunks \
-		-DWIN32_VOLATILE -Wall $(CFLAGS.SYSTEM)
+#		-Wall $(CFLAGS.SYSTEM)
 
-# If using Pentium II
+# General flags which are used when using Pentium II
 #CFLAGS.GENERAL+=-Dpentium -fomit-frame-pointer -fvtable-thunks \
-#		-DWIN32_VOLATILE -Wall $(CFLAGS.SYSTEM)
+#		-Wall $(CFLAGS.SYSTEM)
 
 # If using Pentium Pro or better (Recommended for MMX builds)
 CFLAGS.GENERAL+=-Dpentiumpro -fomit-frame-pointer -fvtable-thunks \
-		-DWIN32_VOLATILE -Wall $(CFLAGS.SYSTEM)
+		-Wall $(CFLAGS.SYSTEM)
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize=-s -O3
@@ -123,10 +103,11 @@ LFLAGS.profile=-pg
 ifeq ($(USE_SHARED_PLUGINS),yes)
 # Flags for the linker which are used when building a shared library.
 LFLAGS.DLL=--dll
-endif
-
+LIB=.dll
+else
 # Typical extension for static libraries
 LIB=.a
+endif
 
 # Typical extension for object files
 O=.o
@@ -152,7 +133,7 @@ NASMFLAGS.SYSTEM=-f win32 -DEXTERNC_UNDERSCORE
 SRC.SYS_CSSYS = libs/cssys/win32/printf.cpp \
   libs/cssys/win32/timing.cpp libs/cssys/win32/dir.cpp \
   libs/cssys/win32/win32.cpp libs/cssys/win32/loadlib.cpp \
-  support/gnu/getopt.c support/gnu/getopt1.c
+  support/gnu/getopt.c support/gnu/getopt1.cpp
 SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp
 SRC.SYS_CSSYS_DLL=libs/cssys/win32/dllentry.cpp
 
@@ -160,6 +141,8 @@ SRC.SYS_CSSYS_DLL=libs/cssys/win32/dllentry.cpp
 CC=gcc -c
 
 # The C++ compiler for Mingw
+# For internal compiler error handling
+#CXX=c++ -c --save-temp
 CXX=c++ -c
 
 # The linker for Mingw/G++
@@ -168,20 +151,19 @@ LINK=c++
 # Command sequence for creating a directory.
 # Note that directories will have forward slashes. Please
 # make sure that this command accepts that (or use 'subst' first).
+MKDIR = mkdir $(subst /,\,$(@:/=))
 
 # For using sockets we should link with sockets library
 NETSOCK_LIBS=
 
 # Extra parameters for 'sed' which are used for doing 'make depend'.
-SYS_SED_DEPEND=-e "s/\.ob*j*\:/\$$O:/g"
+SYS_SED_DEPEND=
+
+#Use CC to build Dependencies
+DEPEND_TOOL=cc
 
 # Flags for linking a GUI and a console executable
 LFLAGS.EXE=
-LFLAGS.CONSOLE.EXE=
-
-# Use makedep to build dependencies
-#DEPEND_TOOL=mkdep
-DEPEND_TOOL=cc
 
 endif # ifeq ($(MAKESECTION),defines)
 
@@ -204,3 +186,49 @@ ifeq ($(ROOTCONFIG),config)
 SYSCONFIG=
 
 endif # ifeq ($(ROOTCONFIG),config)
+
+#---------------------------------------------------------------- volatile ---#
+ifeq ($(ROOTCONFIG),volatile)
+
+define MAKE_VOLATILE_H
+  echo $ /* This file is automatically generated, do not change manually! */$>>volatile.tmp
+  echo $ #ifndef __VOLATILE_H__$ >>volatile.tmp
+  echo $ #define __VOLATILE_H__$ >>volatile.tmp
+  echo $ #define OS_$(OS)$ >>volatile.tmp
+  echo $ #define PROC_$(PROC)$ >>volatile.tmp
+  echo $ #define COMP_$(COMP)$ >>volatile.tmp
+endef
+
+DO.MAKE.VOLATILE = $(MAKE_VOLATILE_H)
+
+ifeq ($(USE_SHARED_PLUGINS),no)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $\\\#define CS_STATIC_LINKED$ >>volatile.tmp
+endif
+ifeq ($(DO_SOUND),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $\\\#define DO_SOUND$ >>volatile.tmp
+endif
+ifeq ($(USE_NASM),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $\\\#define DO_NASM$ >>volatile.tmp
+endif
+ifeq ($(DO_MMX),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $\\\#define DO_MMX$ >>volatile.tmp
+endif
+ifeq ($(DO_FAKE_BOOL),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $\\\#define DO_FAKE_BOOL$ >>volatile.tmp
+endif
+ifeq ($(DO_FAKE_SOCKLEN_T),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $\\\#define DO_FAKE_SOCKLEN_T$ >>volatile.tmp
+endif
+ifeq ($(DO_COREDUMP),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $\\\#define DO_COREDUMP$ >>volatile.tmp
+endif
+ifdef CS_LITTLE_ENDIAN
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $\\\#define CS_LITTLE_ENDIAN$ >>volatile.tmp
+endif
+ifdef CS_BIG_ENDIAN
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $\\\#define CS_BIG_ENDIAN$ >>volatile.tmp
+endif
+
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $\\\#endif // __VOLATILE_H__$ >>volatile.tmp
+
+endif # ifeq ($(ROOTCONFIG,volatile)
