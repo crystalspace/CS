@@ -42,7 +42,6 @@
 class csEngine;
 class csProgressPulse;
 class csSector;
-class csStatLight;
 class csMeshWrapper;
 class csKDTree;
 struct iVisibilityCuller;
@@ -416,9 +415,9 @@ public:
   /**
    * The whole setup starts with csEngine::shine_lights calling
    * csSector::shine_lights for every sector in the engine.
-   * This function will call csStatLight::shine_lightmaps for every
+   * This function will call csLight::shine_lightmaps for every
    * light in the sector.
-   * csStatLight::shine_light will generate a view frustum from the
+   * csLight::shine_light will generate a view frustum from the
    * center of the light and use that to light all polygons that
    * are hit by the frustum.
    */

@@ -28,9 +28,9 @@
 #include "csutil/memfile.h"
 #include "cssys/csendian.h"
 
-int csLight:: ambient_red = CS_DEFAULT_LIGHT_LEVEL;
-int csLight:: ambient_green = CS_DEFAULT_LIGHT_LEVEL;
-int csLight:: ambient_blue = CS_DEFAULT_LIGHT_LEVEL;
+int csLight::ambient_red = CS_DEFAULT_LIGHT_LEVEL;
+int csLight::ambient_green = CS_DEFAULT_LIGHT_LEVEL;
+int csLight::ambient_blue = CS_DEFAULT_LIGHT_LEVEL;
 
 float csLight::influenceIntensityFraction = 256;
 #define HUGE_RADIUS 100000000
@@ -46,7 +46,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csLight::csLight (
   float x, float y, float z,
   float d,
-  float red, float green, float blue) :
+  float red, float green, float blue,
+  int dyntype) :
     csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLight);
@@ -54,6 +55,10 @@ csLight::csLight (
   center.x = x;
   center.y = y;
   center.z = z;
+
+  dynamic_type = dyntype;
+  if (dynamic_type != CS_LIGHT_DYNAMICTYPE_DYNAMIC)
+    flags.SetAll (CS_LIGHT_THINGSHADOWS);
 
   SetName ("__light__");
 
@@ -436,22 +441,6 @@ iFlareHalo *csLight::Light::CreateFlareHalo ()
 }
 
 //---------------------------------------------------------------------------
-csStatLight::csStatLight (
-  float x, float y, float z,
-  float dist,
-  float red, float green, float blue,
-  bool dynamic) :
-    csLight(x, y, z, dist, red, green, blue)
-{
-  dynamic_type = dynamic
-  	? CS_LIGHT_DYNAMICTYPE_PSEUDO
-	: CS_LIGHT_DYNAMICTYPE_STATIC;
-  flags.SetAll (CS_LIGHT_THINGSHADOWS);
-}
-
-csStatLight::~csStatLight ()
-{
-}
 
 static void object_light_func (iMeshWrapper *mesh, iFrustumView *lview,
   bool vis)
@@ -462,10 +451,20 @@ static void object_light_func (iMeshWrapper *mesh, iFrustumView *lview,
     receiver->CastShadows (mesh->GetMovable (), lview);
 }
 
-void csStatLight::CalculateLighting ()
+void csLight::CalculateLighting ()
 {
   csFrustumView lview;
   csFrustumContext *ctxt = lview.GetFrustumContext ();
+
+  csGlobalHashIterator it (lightinginfos.GetHashMap ());
+  while (it.HasNext ())
+  {
+    iLightingInfo* linfo = (iLightingInfo*)it.Next ();
+    linfo->LightDisconnect (&scfiLight);
+    linfo->DecRef ();
+  }
+  lightinginfos.DeleteAll ();
+
   lview.SetObjectFunction (object_light_func);
   lview.SetRadius (GetInfluenceRadius ());
   lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
@@ -474,7 +473,7 @@ void csStatLight::CalculateLighting ()
 
   csRef<csLightingProcessInfo> lpi;
   lpi.AttachNew (new csLightingProcessInfo (
-      this, false));
+        this, dynamic_type == CS_LIGHT_DYNAMICTYPE_DYNAMIC));
   lview.SetUserdata (lpi);
 
   ctxt->SetNewLightFrustum (new csFrustum (center));
@@ -484,7 +483,7 @@ void csStatLight::CalculateLighting ()
   lpi->FinalizeLighting ();
 }
 
-void csStatLight::CalculateLighting (iMeshWrapper *th)
+void csLight::CalculateLighting (iMeshWrapper *th)
 {
   csFrustumView lview;
   csFrustumContext *ctxt = lview.GetFrustumContext ();
@@ -496,7 +495,7 @@ void csStatLight::CalculateLighting (iMeshWrapper *th)
 
   csRef<csLightingProcessInfo> lpi;
   lpi.AttachNew (new csLightingProcessInfo (
-      this, false));
+      this, dynamic_type == CS_LIGHT_DYNAMICTYPE_DYNAMIC));
   lview.SetUserdata (lpi);
 
   ctxt->SetNewLightFrustum (new csFrustum (center));
@@ -508,50 +507,6 @@ void csStatLight::CalculateLighting (iMeshWrapper *th)
 }
 
 //---------------------------------------------------------------------------
-
-csDynLight::csDynLight (
-  float x, float y, float z,
-  float dist,
-  float red, float green, float blue) :
-    csLight(x, y, z, dist, red, green, blue)
-{
-  dynamic_type = CS_LIGHT_DYNAMICTYPE_DYNAMIC;
-}
-
-csDynLight::~csDynLight ()
-{
-}
-
-void csDynLight::Setup ()
-{
-  csGlobalHashIterator it (lightinginfos.GetHashMap ());
-  while (it.HasNext ())
-  {
-    iLightingInfo* linfo = (iLightingInfo*)it.Next ();
-    linfo->LightDisconnect (&scfiLight);
-    linfo->DecRef ();
-  }
-  lightinginfos.DeleteAll ();
-
-  csFrustumView lview;
-  csFrustumContext *ctxt = lview.GetFrustumContext ();
-  lview.SetObjectFunction (object_light_func);
-  lview.SetRadius (GetInfluenceRadius ());
-  lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
-  lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
-  lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
-
-  csRef<csLightingProcessInfo> lpi;
-  lpi.AttachNew (new csLightingProcessInfo (
-      this, true));
-  lview.SetUserdata (lpi);
-
-  ctxt->SetNewLightFrustum (new csFrustum (center));
-  ctxt->GetLightFrustum ()->MakeInfinite ();
-  sector->CheckFrustum ((iFrustumView *) &lview);
-
-  lpi->FinalizeLighting ();
-}
 
 // --- csLightList -----------------------------------------------------------
 SCF_IMPLEMENT_IBASE(csLightList)

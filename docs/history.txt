@@ -29,6 +29,9 @@ chronological order.
 	  LightChanged() remain.
 	- Jorrit removed iLight->IsDynamic(). This is now obsolete since
 	  you can use iLight->GetDynamicType() for this.
+	- Jorrit removed csStatLight and csDynLight internally in the engine.
+	  All lights are now csLight instances. Turned out that nearly all
+	  code was identical anyway.
 15-Jan-2004
 	- Peter Amstutz changed the keyboard movement in the "simple" tutorials
 	  (along with the associated texinfo documentation) to follow more

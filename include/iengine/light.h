@@ -173,8 +173,6 @@ SCF_VERSION (iLight, 0, 0, 9);
  *     Shadows for dynamic lights will be less accurate because things
  *     will not cast accurate shadows (due to computation speed limitations).
  * </ul>
- * Note that static and pseudo-dynamic lights are represented by the
- * same csStatLight class.
  */
 struct iLight : public iBase
 {

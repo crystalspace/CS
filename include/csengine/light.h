@@ -30,7 +30,6 @@
 #include "iengine/light.h"
 
 class csLightMap;
-class csDynLight;
 class csHalo;
 class csPolygon3D;
 class csCurve;
@@ -52,6 +51,15 @@ private:
 
   /// Childnode representing this light in the sector light list kdtree.
   csKDTreeChild* childnode;
+
+  // @@@ TEMPORARY!
+  csLight* next;
+  csLight* prev;
+public:
+  csLight* GetCsNext () { return next; }
+  csLight* GetCsPrev () { return prev; }
+  void SetNext (csLight* n) { next = n; }
+  void SetPrev (csLight* p) { prev = p; }
 
 protected:
   /// Home sector of the light.
@@ -131,7 +139,7 @@ public:
    * type. The light will not have a halo by default.
    */
   csLight (float x, float y, float z, float dist,
-     float red, float green, float blue);
+     float red, float green, float blue, int dyntype);
 
   /**
    * Destroy the light. Note that destroying a light
@@ -143,8 +151,28 @@ public:
 
   int GetDynamicType () const { return dynamic_type; }
 
-  virtual void Setup () { }
-  virtual iLight* GetNext () { return 0; }//@@@ TEMPORARY
+  /**
+   * Shine this light on all polygons visible from the light.
+   * This routine will update the lightmaps of all polygons or
+   * update the vertex colors if gouraud shading is used.
+   * It correctly takes pseudo-dynamic lights into account and will then
+   * update the corresponding shadow map.
+   * For dynamic lights this will work differently.
+   */
+  void CalculateLighting ();
+
+  /**
+   * Shine this light on all polygons of the mesh.
+   * Only backface culling is used. The light is assumed
+   * to be in the same sector as the mesh.
+   * Currently only works on thing meshes.
+   */
+  void CalculateLighting (iMeshWrapper* mesh);
+
+  iLight* GetNext () // @@@ Temporary
+  {
+    return next ? &(next->scfiLight) : 0;
+  }
 
   /**
    * Set the kdtree child node used by this light (in the kdtree
@@ -390,119 +418,12 @@ public:
     { scfParent->RemoveAffectedLightingInfo (li); }
 
     virtual void Setup ()
-    { scfParent->Setup (); }
+    { scfParent->CalculateLighting (); }
     virtual iLight* GetNext ()
     { return scfParent->GetNext (); }
   } scfiLight;
   friend struct Light;
 };
-
-/**
- * Class for a static light. These lights cast shadows (against
- * sector boundaries and with things), they support three different
- * colors (R,G,B). They cannot move and they can only vary in
- * intensity with some memory trade-offs (in which case we call
- * it a pseudo-dynamic light).
- */
-class csStatLight : public csLight
-{
-private:
-  /**
-   * The following three variables are used if the light intensity
-   * can vary. 'dynamic' is set to true in that case.
-   * The 'lightmaps' vector indicates all lightmaps that are
-   * possibly lit by this light.
-   */
-  bool dynamic;
-
-public:
-  /**
-   * Construct a static light at a given position. With
-   * a given radius and a given color. If 'dynamic' is
-   * true we have a pseudo-dynamic light which can change
-   * intensity and color (but not move).
-   * The light will not have a halo by default.
-   */
-  csStatLight (float x, float y, float z, float dist,
-     float red, float green, float blue,
-     bool dynamic);
-
-  /**
-   * Destroy the light. Note that destroying a light
-   * may not have the expected effect. Static lights result
-   * in changes in the lightmaps. Removing them will not automatically
-   * update those lightmaps as that is a time-consuming process.
-   */
-  virtual ~csStatLight ();
-
-  /**
-   * Shine this light on all polygons visible from the light.
-   * This routine will update the lightmaps of all polygons or
-   * update the vertex colors if gouraud shading is used.
-   * It correctly takes pseudo-dynamic lights into account and will then
-   * update the corresponding shadow map.
-   */
-  void CalculateLighting ();
-
-  /**
-   * Shine this light on all polygons of the mesh.
-   * Only backface culling is used. The light is assumed
-   * to be in the same sector as the mesh.
-   * Currently only works on thing meshes.
-   */
-  void CalculateLighting (iMeshWrapper* mesh);
-};
-
-/**
- * Class for a dynamic light. These lights only cast shadows
- * for sectors/portals and not for things. However, they can
- * freely move and change color intensity.
- */
-class csDynLight : public csLight
-{
-private:
-  csDynLight* next;
-  csDynLight* prev;
-
-public:
-  /**
-   * Create a new dynamic light at the given position and with the
-   * given radius and color. Initially the light will
-   * not be visible. You need to set the current
-   * sector and call 'Setup()' first.
-   */
-  csDynLight (float x, float y, float z, float dist,
-     float red, float green, float blue);
-
-  /**
-   * Remove the dynamic light from all polygons (i.e.
-   * remove all light patches) and then destroy the light itself.
-   */
-  virtual ~csDynLight ();
-
-  /**
-   * Initial placement of the light. This routine generates a view
-   * frustum as seen from the light. The clipped polygons that
-   * result from this are light patches and are put in the
-   * lightpatches list. This routine needs to be called whenever
-   * the light moves.
-   */
-  virtual void Setup ();
-  virtual iLight* GetNext () //@@@ TEMPORARY
-  {
-    return next ? &(next->scfiLight) : 0;
-  }
-
-  ///
-  void SetNext (csDynLight* n) { next = n; }
-  ///
-  void SetPrev (csDynLight* p) { prev = p; }
-  ///
-  csDynLight* GetCsNext () { return next; }
-  ///
-  csDynLight* GetCsPrev () { return prev; }
-};
-
 
 /**
  * List of lights for a sector. This class implements iLightList.

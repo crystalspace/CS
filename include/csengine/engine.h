@@ -64,8 +64,6 @@ class csTextureList;
 class csMaterialList;
 class csPolygon3D;
 class csCamera;
-class csStatLight;
-class csDynLight;
 class csEngine;
 class csLight;
 class csLightPatchPool;
@@ -380,7 +378,7 @@ private:
   /// Material objects.
   csMaterialList* materials;
   /// Linked list of dynamic lights.
-  csDynLight* first_dyn_lights;
+  csLight* first_dyn_lights;
   /// The list of all shared variables in the engine.
   csSharedVariableList* shared_variables;
   /// List of halos (csHaloInformation).
@@ -789,12 +787,12 @@ public:
   /**
    * Add a dynamic light to the engine.
    */
-  void AddDynLight (csDynLight* dyn);
+  void AddDynLight (csLight* dyn);
 
   /**
    * Remove a dynamic light from the engine.
    */
-  void RemoveDynLight (csDynLight* dyn);
+  void RemoveDynLight (csLight* dyn);
 
   /**
    * Return the first dynamic light in this engine.

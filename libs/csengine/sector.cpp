@@ -942,7 +942,7 @@ void csSector::ShineLights (csProgressPulse *pulse)
     if (pulse != 0) pulse->Step ();
 
     csLight *cl = lights.Get (i)->GetPrivateObject ();
-    ((csStatLight *)cl)->CalculateLighting ();
+    cl->CalculateLighting ();
   }
 }
 
@@ -954,7 +954,7 @@ void csSector::ShineLights (iMeshWrapper *mesh, csProgressPulse *pulse)
     if (pulse != 0) pulse->Step ();
 
     csLight *cl = lights.Get (i)->GetPrivateObject ();
-    ((csStatLight *)cl)->CalculateLighting (mesh);
+    cl->CalculateLighting (mesh);
   }
 }
 
