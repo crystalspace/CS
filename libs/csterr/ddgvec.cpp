@@ -20,7 +20,6 @@
 //#include <iostream.h>
 #include "sysdef.h"
 #include "csterr/ddgvec.h"
-#include "csterr/ddgmat.h"
 // ----------------------------------------------------------------------
 
 // Assumes that incoming vectors are normalized.
