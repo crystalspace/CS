@@ -1062,6 +1062,9 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   color_buffer = NULL;
   index_buffer = NULL;
 
+  anon_buffers.SetLength (0);
+  anon_names.SetLength (0);
+
   r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
 
   vertex_name = r3d->GetStringContainer ()->Request ("vertices");
@@ -1849,6 +1852,84 @@ void csGenmeshMeshObjectFactory::GenerateBox (const csBox3& box)
   triangles[10].a = 0; triangles[10].b = 1; triangles[10].c = 4;
   triangles[11].a = 1; triangles[11].b = 5; triangles[11].c = 4;
 }
+
+#ifdef CS_USE_NEW_RENDERER
+bool csGenmeshMeshObjectFactory::AddStream (const char *name, int component_size)
+{
+  csRef<iRender3D> r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+  anon_names.Push(r3d->GetStringContainer ()->Request (name));
+  csRef<iRenderBuffer> b = r3d->GetBufferManager ()->CreateBuffer (
+        sizeof (float)*component_size*(num_mesh_vertices), CS_BUF_STATIC);
+  anon_buffers.Push(b);
+  anon_size.Push(component_size);
+  return true;
+}
+
+bool csGenmeshMeshObjectFactory::SetStreamComponent (const char *name, int index, int component, float value)
+{
+  csRef<iRender3D> r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+  csStringID nameid = r3d->GetStringContainer ()->Request (name);
+  int i;
+  for (i = 0; i < anon_names.Length(); i ++) {
+    if (nameid == anon_names[i]) break;
+  }
+  if (i == anon_names.Length()) return false;
+
+  float *buf = (float *)anon_buffers[i]->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+  buf[index * anon_size[i] + component] = value;
+  anon_buffers[i]->Release ();
+  return true;
+}
+
+bool csGenmeshMeshObjectFactory::SetStreamComponent (const char *name, int index, int component, int value)
+{
+  csRef<iRender3D> r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+  csStringID nameid = r3d->GetStringContainer ()->Request (name);
+  int i;
+  for (i = 0; i < anon_names.Length(); i ++) {
+    if (nameid == anon_names[i]) break;
+  }
+  if (i == anon_names.Length()) return false;
+
+  int *buf = (int *)anon_buffers[i]->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+  buf[index * anon_size[i] + component] = value;
+  anon_buffers[i]->Release ();
+  return true;
+}
+
+bool csGenmeshMeshObjectFactory::SetStream (const char *name, float *value)
+{
+  csRef<iRender3D> r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+  csStringID nameid = r3d->GetStringContainer ()->Request (name);
+  int i;
+  for (i = 0; i < anon_names.Length(); i ++) {
+    if (nameid == anon_names[i]) break;
+  }
+  if (i == anon_names.Length()) return false;
+
+  float *buf = (float *)anon_buffers[i]->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+  memcpy (buf, value, sizeof (float) * anon_size[i] * num_mesh_vertices);
+  anon_buffers[i]->Release ();
+  return true;
+}
+
+bool csGenmeshMeshObjectFactory::SetStream (const char *name, int *value)
+{
+  csRef<iRender3D> r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+  csStringID nameid = r3d->GetStringContainer ()->Request (name);
+  int i;
+  for (i = 0; i < anon_names.Length(); i ++) {
+    if (nameid == anon_names[i]) break;
+  }
+  if (i == anon_names.Length()) return false;
+
+  int *buf = (int *)anon_buffers[i]->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+  memcpy (buf, value, sizeof (int) * anon_size[i] * num_mesh_vertices);
+  anon_buffers[i]->Release ();
+  return true;
+}
+
+#endif
 
 void csGenmeshMeshObjectFactory::Invalidate ()
 {

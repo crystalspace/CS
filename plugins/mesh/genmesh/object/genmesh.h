@@ -24,6 +24,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
 #include "csutil/hashmap.h"
+#include "csutil/garray.h"
 #include "imesh/object.h"
 #include "imesh/genmesh.h"
 #include "imesh/lighting.h"
@@ -465,6 +466,10 @@ private:
   csRef<iRenderBuffer> index_buffer;
 
   csStringID vertex_name, texel_name, normal_name, trinormal_name, color_name, index_name;
+
+  csRefArray<iRenderBuffer> anon_buffers;
+  csGrowingArray<csStringID> anon_names;
+  csGrowingArray<int> anon_size;
 #endif
 
   csVector3 radius;
@@ -557,6 +562,13 @@ public:
   void Invalidate ();
   void CalculateNormals ();
   void GenerateBox (const csBox3& box);
+#ifdef CS_USE_NEW_RENDERER
+  bool AddStream (const char *name, int component_size);
+  bool SetStreamComponent (const char *name, int index, int component, float value);
+  bool SetStreamComponent (const char *name, int index, int component, int value);
+  bool SetStream (const char *name, float *value);
+  bool SetStream (const char *name, int *value);
+#endif
   const csBox3& GetObjectBoundingBox ();
   const csVector3& GetRadius ();
 
@@ -664,6 +676,28 @@ public:
     {
       scfParent->GenerateBox (box);
     }
+#ifdef CS_USE_NEW_RENDERER
+    virtual bool AddStream (const char *name, int component_size)
+	{
+	  return scfParent->AddStream (name, component_size);
+	}
+	virtual bool SetStreamComponent (const char *name, int index, int component, float value)
+	{
+	  return scfParent->SetStreamComponent (name, index, component, value);
+	}
+	virtual bool SetStreamComponent (const char *name, int index, int component, int value)
+	{
+	  return scfParent->SetStreamComponent (name, index, component, value);
+    }
+	virtual bool SetStream (const char *name, float *value) 
+	{
+	  return scfParent->SetStream (name, value);
+	}
+	virtual bool SetStream (const char *name, int *value) 
+	{
+	  return scfParent->SetStream (name, value);
+	}
+#endif
   } scfiGeneralFactoryState;
   friend class GeneralFactoryState;
 };
