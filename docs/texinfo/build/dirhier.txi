@@ -291,8 +291,6 @@ Support for 3D sound (@sc{ds3d} or @sc{software} only at the moment).
 @end table
 
 @table @code
-@item CS/plugins/csclear
-The Crystal Clear plug-in, a game abstraction library.
 @item CS/plugins/cscon
 A console plug-in for displaying a textual console within the graphic
 environment.

@@ -76,12 +76,6 @@ The Metaballs plug-in module can be used to build blob-shaped polygon
 structures based on points in 3d space with size and strength values.
 
 @item
-@emph{Crystal Clear}
-
-The Crystal Clear Plug-In provides high-level functions to make it easier to
-write games. @xref{CrystalClear}.
-
-@item
 @emph{Dungeon}
 
 The Dungeon Plug-In can be used to create random levels based on simple
@@ -106,7 +100,7 @@ Skeletal motion manager.
 @item
 @emph{Game Core}
 
-This plug-in also tries to make writing games easier, like Crystal Clear.
+This plug-in tries to make writing games easier.
 
 @item
 @emph{Performance Statistics}

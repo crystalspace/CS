@@ -32,7 +32,6 @@ information you need in the introduction to the simple tutorial
 * Network Drivers::
 * csEngine:: The 3D Engine (@code{csEngine})
 * MeshObject:: Mesh Object Plug-In System
-* CrystalClear::
 * Dungeon::
 * csPython::
 @end menu
@@ -44,6 +43,5 @@ information you need in the introduction to the simple tutorial
 @imports{plugins,network.txi}
 @importss{plugins,engine,engine.txi}
 @importss{plugins,meshobj,meshobj.txi}
-@imports{plugins,csclear.txi}
 @imports{plugins,dungeon.txi}
 @imports{plugins,python.txi}

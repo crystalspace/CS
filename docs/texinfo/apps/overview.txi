@@ -21,12 +21,6 @@ A @sc{3ds} to Crystal Space map converter (work in progress!).
 @item blocks
 A falling blocks game.  (Think 3D Tetris.).
 
-@cindex @file{cctest}
-@cindex Applications, @file{cctest}
-@item cctest
-A test application for the Crystal Clear library and plug-in module.
-@xref{CCtest}.
-
 @cindex @file{csfedit}
 @cindex Applications, @file{csfedit}
 @item csfedit

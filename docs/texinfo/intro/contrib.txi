@@ -395,9 +395,11 @@ OpenGL ports.
 Michael Dale Long (@email{mlong@@custom.net})
 
 Michael helped fix the Glide port and contributed some other small fixes.  He
-is also the author of the Crystal Clear project which is now included in
-Crystal Space.  Crystal Clear serves as a game layer on top of Crystal Space.
-Michael also wrote the default version of DrawPolygonMesh().
+is also the author of the Crystal Clear project which was included in
+Crystal Space.  Crystal Clear served as a game layer on top of Crystal Space.
+Crystal Clear is now removed from Crystal Space though due to lack of
+maintenance and interest. Michael also wrote the default version of
+DrawPolygonMesh().
 
 @item
 Gary Haussmann (@email{g.haussmann@@worldnet.att.net})

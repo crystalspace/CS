@@ -120,6 +120,8 @@ Michael Dale Long (@email{mlong@@custom.net})
 
 Michael wrote detailed documentation about the Crystal Clear project, of which
 he is the principal developer, and which is layered atop Crystal Space.
+Crystal Clear has now been removed from the Crystal Space project however
+due to lack of maintenance and interest.
 
 @item
 Wyatt Miler (@email{wmiler@@milertronics.com}

@@ -65,10 +65,6 @@ to a plug-in.
 A window system nicely integrated with Crystal Space. It is also platform
 independent, as it is based on the CS graphics drivers. @xref{CSWS}.
 
-@item csClear
-This is the statically-linked part of the Crystal Clear plug-in module.
-@xref{CrystalClear}.
-
 @item csGame
 This libary is an attempt to build a gaming system that is specialized on
 3d shooters.
