@@ -9,6 +9,12 @@ ifeq ($(MAKESECTION), rootdefines)
 
 PLUGINHELP += \
   $(NEWLINE)echo $"  make csperl5      Make the $(DESCRIPTION.csperl5)$"
+ifneq (,$(SWIGBIN))
+PSEUDOHELP += \
+  $(NEWLINE)echo $"  make swigperl5gen Make the $(DESCRIPTION.swigperl5gen)$" \
+  $(NEWLINE)echo $"  make swigperl5inst$" \
+  $(NEWLINE)echo $"                    Install $(DESCRIPTION.swigperl5inst)$"
+endif
 
 endif
 
