@@ -1,4 +1,4 @@
-﻿The history order is reversed so that new features are at the top.
+The history order is reversed so that new features are at the top.
 
 7-Mar-2003
 	- Philip Wyett fixed some old legacy instructions reported
@@ -10,6 +10,14 @@
 	    - Updated one and removed another '.cvsignore' related to
 	      new msvc_libs.
 	    - Removed '.cvsignore' and thus 'lib3ds' dir as it's not needed.
+	- Eric Sunshine applied a patch suggested by Ben Thomas
+	  <ben.thomas@wickedstudios.com> to work around a problem where
+	  cssysdef.h including <windef.h> (but not <windows.h>) coupled with
+	  use of ZLIB_DLL in CS/include/win32/volatile.h was causing
+	  compilation errors when zlib/zconf.h was included since the FAR macro
+	  was not defined.  The work-around was to remove ZLIB_DLL from
+	  volatile.h.  This macro is only needed when building the zlib.dll
+	  itself, thus it was superfluous for volatile.h to define it.
 4-Mar-2003
 	- Eric Sunshine fixed a problem in win32gcc.mak which caused plugin
 	  makefiles to fail when USE_PLUGINS=no.  Problem was that win32gcc.mak
