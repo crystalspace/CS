@@ -117,8 +117,8 @@ You can now try running the @file{walktest} demonstration. @xref{Quick Start}.
 
 The OpenGL renderer is used by default when you run Crystal Space programs.  To
 select a different renderer, such as the software renderer, you can edit your
-local configuration file @file{$HOME/.crystal/Global.cfg}.  Add the following
-line to select the software renderer for all applications:
+local configuration file @file{$HOME/.crystalspace/Global.cfg}.  Add the
+following line to select the software renderer for all applications:
 
 @example
 System.Plugins.iGraphics3D = crystalspace.graphics3d.software
