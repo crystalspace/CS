@@ -478,11 +478,10 @@ void csGraphics3DSoftware::ScanSetup ()
   int MaxColorcomponent = 64; // (pfmt.PixelBytes == 4) ? 256 : 32;
   
   // For DrawPolygonFX we will need to do some blending of textures with current
-  // screen content. 
-  for (int i = 0; i < 8; i++)
-  {
+  // screen content.
+  int i;
+  for (i = 0; i < 8; i++)
     m_BlendingTable [i] = new UByte [MaxColorcomponent * MaxColorcomponent];
-  }
 
   for (int src = 0; src<MaxColorcomponent; src++)
   {
@@ -501,11 +500,9 @@ void csGraphics3DSoftware::ScanSetup ()
       m_BlendingTable [BLENDTABLE_ALPHA75  ][index] = (dest*3)/4 + src/4;
       m_BlendingTable [BLENDTABLE_ALPHA100 ][index] =  dest;
 
-      for (i = 0; i<8; i++)
-      {
+      for (i = 0; i < 8; i++)
         if (m_BlendingTable[i][index] >= MaxColorcomponent) 
           m_BlendingTable[i][index] = MaxColorcomponent-1;
-      }
     }
   }
 }
