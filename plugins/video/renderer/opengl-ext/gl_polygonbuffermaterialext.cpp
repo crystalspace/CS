@@ -3,7 +3,7 @@
 
 
 csPolygonBufferMaterialEXT::
-csPolygonBufferMaterialEXT(iGraphics3D *g3d, csRealVertexBuffer &vbuf):
+csPolygonBufferMaterialEXT(iGraphics3D*, csRealVertexBuffer &vbuf):
   m_realvbuf(vbuf)
 {
 }
@@ -19,6 +19,13 @@ void csPolygonBufferMaterialEXT::AddPolygon(csVector3 *origverts,
       const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
       iPolygonTexture* poly_texture)
 {
+  (void)origverts;
+  (void)verts;
+  (void)num_verts;
+  (void)poly_normal;
+  (void)m_obj2tex;
+  (void)v_obj2tex;
+  (void)poly_texture;
 }
 
 void csPolygonBufferMaterialEXT::Clear()

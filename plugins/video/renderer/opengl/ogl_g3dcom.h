@@ -679,7 +679,7 @@ public:
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh);
   void OldDrawTriangleMesh (G3DTriangleMesh& mesh);
   void EffectDrawTriangleMesh (G3DTriangleMesh& mesh,
-    GLuint lightmap = NULL, csVector2* lightmapcoords = NULL );
+    GLuint lightmap = 0, csVector2* lightmapcoords = 0);
 
   /**
    * Debug version that draws outlines only. Is automatically

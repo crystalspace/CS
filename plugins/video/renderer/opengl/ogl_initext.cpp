@@ -100,7 +100,7 @@ void csGraphics3DOGLCommon::Init_ARB_texture_compression(iOpenGLInterface *G2DGL
 #define INITMORE_ARB_texture_env_combine
 #endif
 
-void csGraphics3DOGLCommon::Init_ARB_texture_env_combine(iOpenGLInterface *G2DGL) 
+void csGraphics3DOGLCommon::Init_ARB_texture_env_combine(iOpenGLInterface*) 
 { 
   #if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_ARB_texture_env_combine) 
   bool &allFound = ARB_texture_env_combine;	  	  
@@ -127,7 +127,7 @@ void csGraphics3DOGLCommon::Init_ARB_texture_env_combine(iOpenGLInterface *G2DGL
 #define INITMORE_ARB_texture_env_dot3
 #endif
 
-void csGraphics3DOGLCommon::Init_ARB_texture_env_dot3(iOpenGLInterface *G2DGL) 
+void csGraphics3DOGLCommon::Init_ARB_texture_env_dot3(iOpenGLInterface*) 
 { 
   #if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_ARB_texture_env_dot3) 
   bool &allFound = ARB_texture_env_dot3;	  	  
@@ -154,7 +154,7 @@ void csGraphics3DOGLCommon::Init_ARB_texture_env_dot3(iOpenGLInterface *G2DGL)
 #define INITMORE_EXT_texture_env_combine
 #endif
 
-void csGraphics3DOGLCommon::Init_EXT_texture_env_combine(iOpenGLInterface *G2DGL) 
+void csGraphics3DOGLCommon::Init_EXT_texture_env_combine(iOpenGLInterface*) 
 { 
   #if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_EXT_texture_env_combine) 
   bool &allFound = EXT_texture_env_combine;	  	  
@@ -181,7 +181,7 @@ void csGraphics3DOGLCommon::Init_EXT_texture_env_combine(iOpenGLInterface *G2DGL
 #define INITMORE_EXT_texture_env_dot3
 #endif
 
-void csGraphics3DOGLCommon::Init_EXT_texture_env_dot3(iOpenGLInterface *G2DGL) 
+void csGraphics3DOGLCommon::Init_EXT_texture_env_dot3(iOpenGLInterface*) 
 { 
   #if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_EXT_texture_env_dot3) 
   bool &allFound = EXT_texture_env_dot3;	  	  
@@ -262,7 +262,7 @@ void csGraphics3DOGLCommon::Init_NV_vertex_program(iOpenGLInterface *G2DGL)
 #define INITMORE_SGIS_generate_mipmap
 #endif
 
-void csGraphics3DOGLCommon::Init_SGIS_generate_mipmap(iOpenGLInterface *G2DGL) 
+void csGraphics3DOGLCommon::Init_SGIS_generate_mipmap(iOpenGLInterface*)
 { 
   #if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_SGIS_generate_mipmap) 
   bool &allFound = SGIS_generate_mipmap;	  	  

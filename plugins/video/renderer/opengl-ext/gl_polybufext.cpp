@@ -70,6 +70,13 @@ void csPolygonBufferEXT::AddPolygon (int* verts, int num_verts,
 	const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
 	iPolygonTexture* poly_texture)
 {
+  (void)verts;
+  (void)num_verts;
+  (void)poly_normal;
+  (void)mat_index;
+  (void)m_obj2tex;
+  (void)v_obj2tex;
+  (void)poly_texture;
 }
 
 void csPolygonBufferEXT::SetVertexArray (csVector3* verts, int num_verts)
@@ -80,7 +87,7 @@ void csPolygonBufferEXT::SetVertexArray (csVector3* verts, int num_verts)
   m_tempverts_count = num_verts;
 }
 
-void csPolygonBufferEXT::AddMaterial (iMaterialHandle* mat_handle)
+void csPolygonBufferEXT::AddMaterial (iMaterialHandle*)
 {
   csPolygonBufferMaterialEXT newmat(m_g3d, m_combverts);
   m_materials.Push(newmat);

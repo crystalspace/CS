@@ -288,7 +288,7 @@ const csReversibleTransform& csGraphics3DGLext::GetObjectToCamera( )
   return object2camera;
 }
 
-void csGraphics3DGLext::SetClipper( iClipper2D* clipper, int cliptype )
+void csGraphics3DGLext::SetClipper( iClipper2D* clipper, int /*cliptype*/ )
 {
   m_clipper->SetClipper(clipper);
 }
@@ -306,7 +306,7 @@ int csGraphics3DGLext::GetClipType( )
     return CS_CLIPPER_NONE;
 }
 
-void csGraphics3DGLext::SetNearPlane (const csPlane3& pl)
+void csGraphics3DGLext::SetNearPlane (const csPlane3&)
 {
 }
 
@@ -327,7 +327,7 @@ bool csGraphics3DGLext::HasNearPlane( )
 }
 
 // Debug methods from iGraphics3D
-uint32 *csGraphics3DGLext::GetZBuffAt( int x, int y )
+uint32 *csGraphics3DGLext::GetZBuffAt( int /*x*/, int /*y*/ )
 {
   return 0;
 }
@@ -445,32 +445,32 @@ bool csGraphics3DGLext::SetRenderState(G3D_RENDERSTATEOPTION op, long val)
   return true;
 }
 
-long csGraphics3DGLext::GetRenderState(G3D_RENDERSTATEOPTION op )
+long csGraphics3DGLext::GetRenderState(G3D_RENDERSTATEOPTION)
 {
   return 0;
 }
 
-void csGraphics3DGLext::DrawPolygon(G3DPolygonDP& poly )
+void csGraphics3DGLext::DrawPolygon(G3DPolygonDP&)
 {
 }
 
-void csGraphics3DGLext::DrawPolygonDebug(G3DPolygonDP& poly )
+void csGraphics3DGLext::DrawPolygonDebug(G3DPolygonDP&)
 {
 }
 
-void csGraphics3DGLext::DrawPolygonFX(G3DPolygonDPFX& poly )
+void csGraphics3DGLext::DrawPolygonFX(G3DPolygonDPFX&)
 {
 }
 
-void csGraphics3DGLext::DrawTriangleMesh(G3DTriangleMesh& mesh )
+void csGraphics3DGLext::DrawTriangleMesh(G3DTriangleMesh&)
 {
 }
 
-void csGraphics3DGLext::DrawPolygonMesh(G3DPolygonMesh&  mesh )
+void csGraphics3DGLext::DrawPolygonMesh(G3DPolygonMesh&)
 {
 }
 
-void csGraphics3DGLext::OpenFogObject(CS_ID id, csFog* fog )
+void csGraphics3DGLext::OpenFogObject(CS_ID, csFog*)
 {
   // Fogging is handled by GL
   return;
@@ -479,10 +479,13 @@ void csGraphics3DGLext::OpenFogObject(CS_ID id, csFog* fog )
 void csGraphics3DGLext::DrawFogPolygon(CS_ID id, G3DPolygonDFP& poly, int fogtype )
 {
   // Fogging is handled by GL
+  (void)id;
+  (void)poly;
+  (void)fogtype;
   return;
 }
 
-void csGraphics3DGLext::CloseFogObject(CS_ID id )
+void csGraphics3DGLext::CloseFogObject(CS_ID)
 {
   // Fogging is handled by GL
   return;
@@ -490,10 +493,20 @@ void csGraphics3DGLext::CloseFogObject(CS_ID id )
 
 void csGraphics3DGLext::DrawLine( const csVector3& v1, const csVector3& v2, float fov, int color )
 {
+  (void)v1;
+  (void)v2;
+  (void)fov;
+  (void)color;
 }
 
 iHalo *csGraphics3DGLext::CreateHalo (float iR, float iG, float IB, unsigned char *iAlpha, int iWidth, int iHeight )
 {
+  (void)iR;
+  (void)iG;
+  (void)IB;
+  (void)iAlpha;
+  (void)iWidth;
+  (void)iHeight;
   return NULL;
 }
 
@@ -501,6 +514,16 @@ void csGraphics3DGLext::DrawPixmap(iTextureHandle *hTex,
                         int sx, int sy, int sw, int sh,
                         int tx, int ty, int tw, int th, uint8 Alpha )
 {
+  (void)hTex;
+  (void)sx;
+  (void)sy;
+  (void)sw;
+  (void)sh;
+  (void)tx;
+  (void)ty;
+  (void)tw;
+  (void)th;
+  (void)Alpha;
 }
 
 // Texture Cache Management
@@ -517,7 +540,7 @@ void csGraphics3DGLext::ClearCache( )
 {
 }
 
-void csGraphics3DGLext::RemoveFromCache(iPolygonTexture *poly_texture)
+void csGraphics3DGLext::RemoveFromCache(iPolygonTexture*)
 {
 }
 
@@ -526,7 +549,7 @@ iVertexBufferManager *csGraphics3DGLext::GetVertexBufferManager ( )
   return vbufmgr;
 }
 
-bool csGraphics3DGLext::IsLightmapOK(iPolygonTexture* poly_texture )
+bool csGraphics3DGLext::IsLightmapOK(iPolygonTexture*)
 {
   return true;
 }

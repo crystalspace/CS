@@ -244,8 +244,7 @@ class           StuffFactory:public iMeshObjectFactory
     virtual bool    SupportsHardTransform() const;
     virtual void    SetLogicalParent(iBase *);
     virtual iBase  *GetLogicalParent() const;
-    // --------------------< iClothFactoryState implementation
-    // >----------------------\\ 
+    // iClothFactoryState implementation
     // WARNING:::::::::::::::::WARNING:::::::::::::WARNING::::::::::::::
     // INITIAL REFINEMENT SHOULD BE DONE ON THE FACTORY MESHES!!!!!!!
     iMaterialWrapper *material;

@@ -3052,27 +3052,6 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
 ////////////////////////////////////////////////////////////////////
 
 
-static void GenerateFogInfo(G3DFogInfo* fog_info, int* indices, int num_verts)
-{
-
-  if (fog_info == NULL) return;
-  int i;
-  if(clipped_lightmap_fog->Limit() < num_verts)
-    clipped_lightmap_fog->SetLimit(num_verts);
-  if(clipped_lightmap_fog_texels->Limit() < num_verts)
-    clipped_lightmap_fog_texels->SetLimit(num_verts);
-
-  for( i = 0; i < num_verts; i++)
-  {
-    (*clipped_lightmap_fog)[i].red = fog_info[indices[i]].r;
-    (*clipped_lightmap_fog)[i].green = fog_info[indices[i]].g;
-    (*clipped_lightmap_fog)[i].blue = fog_info[indices[i]].b;
-
-    (*clipped_lightmap_fog_texels)[i].x = fog_info[indices[i]].intensity;
-    (*clipped_lightmap_fog_texels)[i].y = 0.0;
-  }
-}
-
 void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
 {
   csRef<iVertexBufferManager> vbman = GetVertexBufferManager();

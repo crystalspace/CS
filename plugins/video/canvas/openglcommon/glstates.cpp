@@ -119,7 +119,7 @@ void csGLStateCache::SetTexture( GLenum target, GLuint texture, int layer )
     }
   }
 }
-GLuint csGLStateCache::GetTexture( GLenum target, GLuint texture, int layer)
+GLuint csGLStateCache::GetTexture(GLenum target, GLuint /*texture*/, int layer)
 {
   if( target == GL_TEXTURE_1D )
     return texture1d[layer];
