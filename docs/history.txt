@@ -21,6 +21,9 @@ The history order is reversed so that new features are at the top.
 	- Matze made the configure script respect the CFLAGS, CXXFLAGS,
 	  CPPFLAGS and LDFLAGS passed to configure. Also augmented the
 	  jamtemplate to take care of this by adding a new compiler.m4 macros.
+	- Wouter updated csfgen so it defaults an alphamap of the font by
+	  default. The opengl video uses this for antialiased font rendering.
+	  Unantialiased fonts can also be created (with -a). 
 1-May-2003
 	- res made the following changes to VFS:
 	    - Added iFile::SetPos() to complement iFile::GetPos().

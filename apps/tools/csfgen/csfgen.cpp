@@ -46,6 +46,7 @@ static struct option long_options[] =
   {"help", no_argument, 0, 'h'},
   {"version", no_argument, 0, 'V'},
   {"verbose", no_argument, 0, 'v'},
+  {"alpha", no_argument, 0, 'a'},
   {0, no_argument, 0, 0}
 };
 
@@ -58,6 +59,7 @@ static struct
   int first;
   int glyphs;
   char *output;
+  bool do_alpha;
 } opt =
 {
   false,
@@ -66,7 +68,8 @@ static struct
   -1,
   0,
   256,
-  NULL
+  NULL,
+  true
 };
 
 static int lastglyph;
@@ -88,6 +91,7 @@ static int display_help ()
   printf ("  -h   --help        Display this help text\n");
   printf ("  -v   --verbose     Comment on what's happening\n");
   printf ("  -V   --version     Display program version\n");
+  printf ("  -a   --alpha       Disable alphamap output, make unantialiased font\n");
   return 1;
 }
 
@@ -186,9 +190,13 @@ static bool Convert (const char *fontfile)
       fontname, opt.fontsize, fontname, opt.fontsize);
     fprintf (out, "\n");
   }
-  else
-    fprintf (out, "CSF [Font=%s.%d Width=%d Height=%d First=%d Glyphs=%d]\n",
+  else 
+  {
+    fprintf (out, "CSF [Font=%s.%d Width=%d Height=%d First=%d Glyphs=%d",
       fontname, opt.fontsize, maxwidth, maxheight, opt.first, opt.glyphs);
+    fprintf (out, " Alpha=%d", opt.do_alpha);
+    fprintf (out, "]\n");
+  }
 
   int arrsize = 0;
   uint8 width [256];
@@ -248,7 +256,26 @@ static bool Convert (const char *fontfile)
         fwrite (bitmap, bpc, 1, out);
   }
 
-  fprintf (out, "};\n\n");
+  if(opt.sourcecode) fprintf (out, "};\n\n");
+
+  if (!opt.sourcecode && opt.do_alpha)
+  {
+    for (c = opt.first; c < lastglyph; c++)
+    {
+      int cw=0, ch=0;
+      uint8* alphamap = font->GetGlyphAlphaBitmap(c, cw, ch);
+      if(!alphamap)
+      {
+	printf("Error: alphamap not available for character %d (%c)\n",
+			c, c);
+	alphamap = new uint8[cw*ch]; // robust output
+	memset(alphamap, 0, cw*ch);
+	fwrite(alphamap, cw*ch, 1, out);
+	delete[] alphamap;
+      }
+      else fwrite(alphamap, cw*ch, 1, out);
+    }
+  }
   fclose (out);
   return true;
 }
@@ -270,7 +297,7 @@ int main (int argc, char* argv[])
   programname = argv [0];
 
   int c;
-  while ((c = getopt_long (argc, argv, "f:g:s:o:tdhvV", long_options, NULL)) != EOF)
+  while ((c = getopt_long (argc, argv, "f:g:s:o:tdhvVa", long_options, NULL)) != EOF)
     switch (c)
     {
       case '?':
@@ -324,6 +351,9 @@ int main (int argc, char* argv[])
         printf ("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n");
         printf ("GNU Library General Public License for more details.\n");
         return 0;
+      case 'a':
+	opt.do_alpha = false;
+	break;
     } /* endswitch */
 
   if (optind >= argc)
