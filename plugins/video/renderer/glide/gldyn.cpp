@@ -221,11 +221,11 @@ void csGlideDynamic::DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, i
   g3d->DrawPixmap (hTex, sx, sy, sw, sh, tx, ty, tw, th); 
 }
 
-iGraphics3D *csGlideDynamic::CreateOffScreenRenderer (iGraphics2D *parent_g2d, 
+iGraphics3D *csGlideDynamic::CreateOffScreenRenderer (iGraphics3D *parent_g3d, 
   int width, int height, csPixelFormat *pfmt, void *buffer, RGBPixel *palette, 
   int pal_size)
 { 
-  return g3d->CreateOffScreenRenderer (parent_g2d, width, height, pfmt, buffer,
+  return g3d->CreateOffScreenRenderer (parent_g3d, width, height, pfmt, buffer,
 				       palette, pal_size); 
 }
 

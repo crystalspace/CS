@@ -854,6 +854,7 @@ void csGraphics3DGlide::DrawPolygon (G3DPolygonDP& poly)
 
   for(i=0;i < poly.num;i++)
   {
+    //    printf("%g,%g ->", poly.vertices[i].sx, poly.vertices[i].sy );
 #ifdef DO_HW_UVZ
     if ( poly.uvz )
     {
@@ -883,6 +884,7 @@ void csGraphics3DGlide::DrawPolygon (G3DPolygonDP& poly)
     m_dpverts[i].tmuvtx[0].tow= v; 
     m_dpverts[i].oow /*= verts[i].tmuvtx[0].oow = verts[i].tmuvtx[1].oow */= ooz;
   }
+  //  printf("\n");
 
   if (lm_exists)
   {
