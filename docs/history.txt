@@ -92,6 +92,19 @@ chronological order.
 	- res slightly changed the way lightiter creates the attenuation 
 	  texture.
 	- res made some VC6 compile fixes.
+	- Eric Sunshine performed a major overhaul of intro/contrib.txi:
+	    - Eliminated and rewrote much outdated information so as to avoid
+	      misleading readers.
+	    - Added a good deal of missing information to entries for various
+	      contributors.
+	    - Re-wrote almost all entries to improve grammar and follow
+	      standard English idiom more closely.
+	    - Folded together several duplicate entries, including those for
+	      Frank Richter.
+	    - Alphebatized the list of contributors. (Previously, the document
+	      claimed to be ordered by date of initial contribution, however,
+	      in reality, there was much randomness of entries, and the
+	      date-based claim was more misleading than not.)
 7-Apr-2004
 	- res added a small helper class to create minidumps on Win32.
 	- res augmented the Win32 assistant to allow user-defined exception
