@@ -55,7 +55,7 @@ void ddgVector3::normal( ddgVector3* v[9])
 	//     0 1 2
 	//      \|/
 	//     7-8-3
-	//      /|\
+	//      /|\ 
 	//     6 5 4
 
 	// Now calculate the normals for every point on the grid
