@@ -40,6 +40,9 @@ The history order has been reversed so that new features are at the top.
 	  with csRenderView. As an unexpected bonus this fix also fixes
 	  the problem that sprites and particle systems were not visible
 	  in mirrors.
+	- Removed csSphere... classes related to polygon tree visibility.
+	  They were not used and would have to be redone anyway in order
+	  to be useful.
 	- Eric Sunshine resolved a circular reference problem between the
 	  system driver and the VFS plugin.  The actual problem was that the
 	  VFS plugin was utilizing the new configuration manager module even
