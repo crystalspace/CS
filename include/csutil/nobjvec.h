@@ -67,34 +67,4 @@ public:
 };
 
 
-class csObject;
-struct iObject;
-
-/**
- * csNamedObjVector is a version of csObjVector that assumes all
- * its components are csObject's which can be examined by name etc.
- * All csVector methods should work with this class: Find, FindKey,
- * QuickSort, FindSortedKey and so on.
- */
-class csNamedObjVector : public csObjVector
-{
-public:
-  /// Constructor just passes control to csVector's
-  csNamedObjVector (int ilimit = 8, int ithreshold = 16) :
-    csObjVector (ilimit, ithreshold) {}
-
-  /// Find an item in this vector by name and returns it (or NULL if not found)
-  csObject *FindByName (const char* iName) const;
-
-  /// Compare two objects by their names
-  virtual int Compare (csSome Item1, csSome Item2, int Mode) const;
-
-  /// Compare object's name with a string
-  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
-
-  /// Override Get() to avoid casting to csObject
-  csObject *Get (int idx) const
-  { return (csObject *)csVector::Get (idx); }
-};
-
 #endif // __CS_NOBJVEC_H__
