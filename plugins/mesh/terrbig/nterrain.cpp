@@ -32,7 +32,7 @@ SCF_IMPLEMENT_IBASE_END
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-csBigTerrainObject::csBigTerrainObject(iObjectRegistry* _obj_reg, iMeshObjectFactory *_pFactory):pFactory(_pFactory), object_reg(_obj_reg), terrain(NULL), nTextures(1)
+csBigTerrainObject::csBigTerrainObject(iObjectRegistry* _obj_reg, iMeshObjectFactory *_pFactory):pFactory(_pFactory), object_reg(_obj_reg), terrain(NULL), nTextures(1), materials(NULL)
 {
   SCF_CONSTRUCT_IBASE (NULL)
 
@@ -183,9 +183,14 @@ csBigTerrainObject::HitBeamObject (const csVector3& start, const csVector3& end,
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 void 
-csBigTerrainObject::SetMaterialsList(iMaterialHandle **matlist)
+csBigTerrainObject::SetMaterialsList(iMaterialHandle **matlist, unsigned int nMaterials)
 {
-  materials=matlist;
+  int i;
+  if (materials) delete [] materials;
+
+  materials = new iMaterialHandle *[nMaterials];
+  for(i=0; i<nMaterials; ++i)
+    materials[i]=matlist[i];
 }
 
 

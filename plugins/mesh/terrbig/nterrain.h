@@ -514,7 +514,7 @@ public:
   ///////////////////////////////////////////////////////////////////
 
   /// Set the materials list
-  void SetMaterialsList(iMaterialHandle **matlist);
+  void SetMaterialsList(iMaterialHandle **matlist, unsigned int nMaterials);
 };
 
 
