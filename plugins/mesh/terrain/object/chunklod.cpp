@@ -846,7 +846,6 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
   csSphere s(node->Center (), node->Radius ());
   if (!rv->ClipBSphere (tr_o2c, s, clip_portal, clip_plane, clip_z_plane))
     return false;
-  csBox2 sbox;
   csBox3 cbox;
   cbox.StartBoundingBox (tr_o2c * node->BBox().GetCorner(0));
   cbox.AddBoundingVertexSmart (tr_o2c * node->BBox().GetCorner(1));
@@ -857,30 +856,6 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
   cbox.AddBoundingVertexSmart (tr_o2c * node->BBox().GetCorner(6));
   cbox.AddBoundingVertexSmart (tr_o2c * node->BBox().GetCorner(7));
   if ((cbox.MinZ() < 0) && (cbox.MaxZ () < 0))
-    return false;
-  // Transform from camera to screen space.
-  if (cbox.MinZ () <= 0)
-  {
-    // Mesh is very close to camera.
-    // Just return a maximum bounding box.
-    sbox.Set (-10000, -10000, 10000, 10000);
-  }
-  else
-  {
-    csVector2 oneCorner;
-    rv->GetCamera()->Perspective (cbox.Max (), oneCorner);
-    sbox.StartBoundingBox (oneCorner);
-
-    csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
-    rv->GetCamera()->Perspective (v, oneCorner);
-    sbox.AddBoundingVertexSmart (oneCorner);
-    rv->GetCamera()->Perspective (cbox.Min (), oneCorner);
-    sbox.AddBoundingVertexSmart (oneCorner);
-    v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
-    rv->GetCamera()->Perspective (v, oneCorner);
-    sbox.AddBoundingVertexSmart (oneCorner);
-  }
-  if (!rv->ClipBBox (sbox, cbox, clip_portal, clip_plane, clip_z_plane))
     return false;
 
   float sq_dist = (tr_o2c * node->Center()).SquaredNorm ();

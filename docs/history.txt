@@ -59,6 +59,8 @@ chronological order.
 	  crash when the underlying representation was a null-string.  Also,
 	  completely overhauled the remaining csString and iString
 	  documentation.
+	- Jorrit optimized the NR terrain engine by removing an unneeded
+	  call to ClipBBox(). If ClipBSphere() is used then that's sufficient.
 13-Apr-2004
 	- Jorrit changed the PreferClipPlane default to enabled for the new
 	  renderer. Now clipping planes are enabled by default and only
