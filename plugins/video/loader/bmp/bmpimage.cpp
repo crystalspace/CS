@@ -242,6 +242,7 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
 
   csDataBuffer *db = new csDataBuffer (len);
   unsigned char *p = (unsigned char *)db->GetData ();
+  memset (p, 0, len);
   memcpy (p, &hdr.bfTypeLo, sizeof (bmpHeader)-2);
 
   p += sizeof (bmpHeader)-2;

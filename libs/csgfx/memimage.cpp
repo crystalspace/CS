@@ -371,6 +371,14 @@ void csImageMemory::ConvertFromPal8 (uint8 *iImage,
   ConvertFromPal8 (iImage, newpal);
 }
 
+void csImageMemory::ConvertFromPal8 (uint8 *iImage, uint8* alpha, 
+                                     const csRGBcolor *iPalette,
+                                     int nPalColors)
+{
+  delete[] Alpha; Alpha = alpha;
+  ConvertFromPal8 (iImage, iPalette, nPalColors);
+}
+
 void csImageMemory::SetFormat (int iFormat)
 {
   int pixels = Width * Height;

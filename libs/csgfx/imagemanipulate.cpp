@@ -360,8 +360,7 @@ csRef<iImage> csImageManipulate::Sharpen (iImage* source, int strength,
 
   csRef<csImageMemory> resimg;
   resimg.AttachNew (new csImageMemory (source->GetWidth(), source->GetHeight(),
-    result));
-  //delete[] result;
+    result, true));
 
   return resimg;
 }

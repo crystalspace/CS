@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-Jan-2005
+	- res fixed a leak in spr2d.
+	- res fixed a leak in the VBO buffer manager.
+	- res fixed an uninit member in csGLRenderBuffer, which could cause
+	  a delete[] on an invalid memory address.
+	- res made the BMP writer zero the buffer before modifying it (to avoid
+	  writing stuff that was previously in that place).
+	- res fixed a leak in the image sharpener.
+	- res added a method to csImageMemory to specify index data with alpha.
 29-Jan-2005
 	- Jorrit moved the tiled coverage buffer from Dynavis to csgeom.
 	  This class is going to be useful for the PVS calculator.

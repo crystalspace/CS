@@ -125,7 +125,9 @@ void csSprite2DMeshObject::SetupObject ()
     radius.Set (max_dist, max_dist, max_dist);
 
     bufferHolder.AttachNew (new csRenderBufferHolder);
-    bufferHolder->SetAccessor (new eiRenderBufferAccessor (this), CS_BUFFER_ALL_MASK);
+    csRef<iRenderBufferAccessor> newAccessor;
+    newAccessor.AttachNew (new eiRenderBufferAccessor (this));
+    bufferHolder->SetAccessor (newAccessor, CS_BUFFER_ALL_MASK);
   }
 }
 

@@ -70,14 +70,16 @@ csGLRenderBuffer::csGLRenderBuffer (csGLVBOBufferManager * vbomgr, size_t size,
     buffer = new unsigned char[size];
     doDelete = true;
   }
+  else
+    doDelete = false;
 }
 
 csGLRenderBuffer::~csGLRenderBuffer ()
 {
-  SCF_DESTRUCT_IBASE ();
   if (vbomgr.IsValid ()) vbomgr->DeactivateBuffer (this);
   if (doDelete) delete[] buffer;
   buffer = 0;
+  SCF_DESTRUCT_IBASE ();
 }
 
 void* csGLRenderBuffer::Lock(csRenderBufferLockType lockType,
@@ -275,7 +277,7 @@ csGLVBOBufferManager::~csGLVBOBufferManager ()
       delete t;
     }
 
-    t = indexBuffer.slots[i].head;
+    c = indexBuffer.slots[i].head;
     while (c)
     {
       t = c;
@@ -495,7 +497,8 @@ void csGLVBOBufferManager::csGLVBOBuffer::Setup (GLenum usage,
    524288         2    1048576
    Total: 8mb
    */
-  uint countTable[] = {1024,512,512,512,128,64,32,16,16,8,4,2};
+  uint countTable[VBO_NUMBER_OF_SLOTS] = 
+    {1024, 512, 512, 512, 128, 64, 32, 16, 16, 8, 4, 2};
   size_t currentOffset = 0;
   unsigned int i;
   for (i = 0; i < VBO_NUMBER_OF_SLOTS; i++)

@@ -215,8 +215,8 @@ public:
    * function which will handle the RGB -> target format conversion.
    * NOTE: the pointer should be allocated with new csRGBpixel [] and you should
    * not free it after calling this function: the function will free
-   * the buffer itself if it is appropiate (or wont if the buffer
-   * size/contents are appropiate for target format).
+   * the buffer itself if it is appropriate (or wont if the buffer
+   * size/contents are appropriate for target format).
    */
   void ConvertFromRGBA (csRGBpixel* iImage);
   /**
@@ -224,17 +224,30 @@ public:
    * Pass a pointer to color indices and a pointer to palette, and you're done.
    * NOTE: the pointer should be allocated with new uint8 [] and you should
    * not free it after calling this function: the function will free
-   * the buffer itself if it is appropiate (or wont if the buffer
-   * size/contents are appropiate for target format). Same about palette.
+   * the buffer itself if it is appropriate (or wont if the buffer
+   * size/contents are appropriate for target format). Same about palette.
    */
   void ConvertFromPal8 (uint8* iImage, csRGBpixel* iPalette, int nPalColors = 256);
   /**
-   * Same as above but accepts an array of csRGBcolor's as palette.
-   * The csRGBcolor array is never freed, so its your responsability
-   * if you did it.
+   * Used to convert an 8-bit indexed image into requested format.
+   * Pass a pointer to color indices, a pointer to the alpha mask and a 
+   * pointer to the palette, and you're done.
+   * NOTE: the pointer should be allocated with new uint8 [] and you should
+   * not free it after calling this function: the function will free
+   * the buffer itself if it is appropriate (or wont if the buffer
+   * size/contents are appropriate for target format). Same about palette
+   * and alpha.
    */
   void ConvertFromPal8 (uint8* iImage, const csRGBcolor* iPalette,
     int nPalColors = 256);
+  /**
+   * Same as above but accepts an array of csRGBcolor's as palette
+   * and an alpha mask.
+   * The csRGBcolor array is never freed, so its your responsability
+   * if you did it. The image will take ownership over the alpha mask.
+   */
+  void ConvertFromPal8 (uint8* iImage, uint8* alpha, 
+    const csRGBcolor* iPalette, int nPalColors = 256);
 };
 
 #endif // __CS_CSGFX_MEMIMAGE_H__
