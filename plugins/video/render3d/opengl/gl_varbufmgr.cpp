@@ -498,6 +498,9 @@ void csVARRenderBuffer::Release()
     bm->render3d->ext.glSetFenceNV(memblock->fence_id, GL_ALL_COMPLETED_NV);
   }
 
+  if(lastlock != CS_BUF_LOCK_RENDER)
+    discarded = false;
+
   discardable = true;
   lastlock = CS_BUF_LOCK_NOLOCK;
   locked = false;
