@@ -76,6 +76,7 @@ csGraphics2D::csGraphics2D (iBase* parent)
   Width = 640;
   Height = 480;
   Depth = 16;
+  DisplayNumber = 0;
   FullScreen = false;
   is_open = false;
   win_title = csStrNew ("Crystal Space Application");
@@ -94,6 +95,7 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
   Height = config->GetInt ("Video.ScreenHeight", Height);
   Depth = config->GetInt ("Video.ScreenDepth", Depth);
   FullScreen = config->GetBool ("Video.FullScreen", FullScreen);
+  DisplayNumber = config->GetInt ("Video.DisplayNumber", DisplayNumber);
 
   // Get the font server: A missing font server is NOT an error
   if (!FontServer)

@@ -20,6 +20,7 @@
 #define INITGUID
 
 #include "cssysdef.h"
+#icnlude "csutil/csstring.h"
 #include <stdlib.h>
 #include <windows.h>
 
@@ -94,17 +95,32 @@ DirectDetection::~DirectDetection ()
 }
 
 /// find the best 2d device
-DirectDetectionDevice * DirectDetection::findBestDevice2D ()
+DirectDetectionDevice * DirectDetection::findBestDevice2D(int displayNumber)
 {
-  DirectDetectionDevice * cur = Devices;
+  DirectDetectionDevice * cur;
 
-  while (cur != NULL)
+  // If displayNumber is 0, then we use the primary display; otherwise, if
+  // it is greater than 0, then we try using the indicated display.  If the
+  // indicated display does not exist, then we use the primary display.
+  if (displayNumber != 0)
   {
-    // in fact we just need primary device
-    if (cur->Only2D && cur->IsPrimary2D) return cur;
-    cur = cur->next;
+    csString devName2d("\\\\.\\Display");
+    devName2d.Append(displayNumber);
+    for(cur = Devices; cur != NULL; cur = cur->next)
+    {
+      char const* const s = cur->DeviceName2D;
+      if (s != 0 && devName2d.CompareNoCase(s))
+        return cur;
+    }
+    // Requested display not found; fall through and search for primary.
   }
-
+  
+  for (cur = Devices; cur != NULL; cur = cur->next)
+  {
+    if (cur->Only2D && cur->IsPrimary2D) 
+      return cur;
+  }
+  
   return NULL;
 }
 
@@ -259,7 +275,8 @@ static HRESULT WINAPI DirectDetectionD3DEnumCallback (LPGUID lpGuid,
 
 /// Enumeration of directdraw devices
 static BOOL WINAPI DirectDetectionDDrawEnumCallback (GUID FAR * lpGUID,
-  LPSTR lpDriverDescription, LPSTR lpDriverName, LPVOID lpContext)
+  LPSTR lpDriverDescription, LPSTR lpDriverName, LPVOID lpContext,
+  HMONITOR p_notUsed)
 {
   LPDIRECTDRAW pDD = NULL;
   DDCAPS DriverCaps;
@@ -370,9 +387,11 @@ bool DirectDetection::checkDevices2D ()
 {
   // enumerate DDraw device
   HRESULT hRes;
-  if (FAILED (hRes = DirectDrawEnumerate (DirectDetectionDDrawEnumCallback, this)))
+  if (FAILED (hRes = DirectDrawEnumerateEx(
+    DirectDetectionDDrawEnumCallback, this,
+    DDENUM_DETACHEDSECONDARYDEVICES | DDENUM_ATTACHEDSECONDARYDEVICES |
+    DDENUM_NONDISPLAYDEVICES)))
     SystemFatalError ("Error when enumerating DirectDraw devices.", hRes);
-
   return true;
 }
 

@@ -150,7 +150,7 @@ bool csGraphics2DDDraw3::Open ()
 
   // Get ahold of the main DirectDraw object...
   DDetection.checkDevices2D ();
-  DirectDevice = DDetection.findBestDevice2D ();
+  DirectDevice = DDetection.findBestDevice2D (DisplayNumber);
 
   if (DirectDevice == NULL)
   {

@@ -136,11 +136,11 @@ bool csGraphics2DDDraw8::Open ()
   if (m_bAllowWindowed)
     FullScreen = false;
 
-  // Create the DirectDraw device //
+  // Create the DirectDraw device
   if (!m_bUses3D)
   {
     DDetection.checkDevices2D ();
-    DirectDevice = DDetection.findBestDevice2D ();
+    DirectDevice = DDetection.findBestDevice2D (DisplayNumber);
   }
   else
   {

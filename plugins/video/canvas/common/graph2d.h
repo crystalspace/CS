@@ -81,6 +81,12 @@ public:
 
   /// The width, height and depth of visual.
   int Width, Height, Depth;
+  /**
+   * Display number.  If 0, use primary display; else if greater than 0, use
+   * that display number.  If that display number is not present, use primary
+   * display.
+   */
+  int DisplayNumber;
   /// True if visual is full-screen.
   bool FullScreen;
   /// Whether to allow resizing.

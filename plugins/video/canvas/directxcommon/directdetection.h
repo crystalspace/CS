@@ -106,19 +106,12 @@ public:
   bool Only2D; // Is only a 2d device ?
   DirectDetectionDevice * next;
 
-  ///
   STDMETHODIMP_(LPD3DDEVICEDESC) GetDesc3D()  { return &Desc3D; }
-  ///
   STDMETHODIMP_(LPGUID) GetGuid3D() { return &Guid3D; }
-  ///
   STDMETHODIMP_(bool) GetMipmap() { return Mipmap; }
-  ///
   STDMETHODIMP_(bool) GetAlphaBlend() { return AlphaBlend; }
-  ///
   STDMETHODIMP_(int) GetAlphaBlendType() { return AlphaBlendType; }
-  ///
   STDMETHODIMP_(bool) GetAlphaBlendHalo() { return AlphaBlendHalo; }
-  ///
   STDMETHODIMP_(bool) GetHardware() { return Hardware; }
 };
 
@@ -131,7 +124,7 @@ public:
   DirectDetection();
   virtual ~DirectDetection();
   DirectDetectionDevice * findBestDevice3D(bool fscreen);
-  DirectDetectionDevice * findBestDevice2D();
+  DirectDetectionDevice * findBestDevice2D(int displayNumber = 0);
   int addDevice(DirectDetection2D * dd2d);
   int addDevice(DirectDetection3D * dd3d);
   bool checkDevices();
