@@ -95,6 +95,8 @@ void csIsoView::Draw()
     rect.xmax, rect.ymax);
 
   rview->SetClipper(clipper);
+  rview->GetG3D()->SetClipper( rview->GetClipper(), CS_CLIPPER_TOPLEVEL);
+  rview->GetG3D()->ResetNearPlane ();
   if(rview->GetNumBuckets() < engine->GetNumMaterials())
     rview->CreateBuckets(engine->GetNumMaterials());
   PreCalc();
@@ -111,6 +113,8 @@ void csIsoView::Draw()
       fakecam->SetIsoView(scroll, x_axis, y_axis, z_axis);
     }
   }
+
+  rview->GetG3D()->SetClipper(NULL, CS_CLIPPER_NONE);
   delete clipper;
 }
 
@@ -277,7 +281,8 @@ void csIsoFakeCamera::IsoReady(const csVector3& position,
   //// fov is an int!
   //fov = QInt(position.z - position.x - minz);
   /// adjust fov by scale, to make the iz=fov/z scaled larger.
-  fov = QInt( (position.z - position.x - minz)*scale );
+  float ffov = (position.z - position.x - minz)*scale;
+  fov = QInt( ffov );
   invfov = 1. / (position.z - position.x - minz);
   //trans.SetO2TTranslation( csVector3(0, 0, -minz) );
   //trans.SetO2TTranslation( trans.This2Other(csVector3(0, 0, -minz)) );
@@ -287,8 +292,8 @@ void csIsoFakeCamera::IsoReady(const csVector3& position,
   shiftx = scroll.x + scale * minz * trans.GetO2T().m13;
   shifty = scroll.y + scale * minz * trans.GetO2T().m23;
 
-  rview->GetG3D()->SetPerspectiveCenter((int)shiftx, (int)shifty);
-  //rview->GetG3D()->SetClipper( rview->GetClipper(), CS_CLIPPER_TOPLEVEL);
+  rview->GetG3D()->SetPerspectiveCenter(QInt(shiftx), QInt(shifty));
+  rview->GetG3D()->SetPerspectiveAspect( ffov );
 
   /*
   csMatrix3 bb = trans.GetO2T();
