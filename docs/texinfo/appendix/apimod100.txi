@@ -253,8 +253,6 @@ global namespace.
 @item
 @code{convert_endian()} @result{} @code{csConvertEndian()}
 @item
-@code{CS_PROCSIZE} @result{} @code{CS_PROCESSOR_SIZE}
-@item
 @code{DO_MMX} @result{} @code{CS_HAVE_MMX}
 @item
 @code{DO_NASM} @result{} @code{CS_HAVE_NASM}
@@ -309,10 +307,10 @@ global namespace.
 @item
 @code{PATH_SEPARATOR} @result{} @code{CS_PATH_SEPARATOR}
 @item
-@code{PROC_FOO} @result{} @code{CS_PROCESSOR_FOO} (where @samp{FOO} is
+@code{PROC_arch} @result{} @code{CS_PROCESSOR_arch} (where @samp{arch} is
 @samp{X86}, @samp{M68K}, etc.)
 @item
-@code{ProcEventHandler()} @result{} @code{csProcEventHandler}
+@code{ProcEventHandler()} @result{} @code{csProcTexEventHandler}
 @item
 @code{QInt()} @result{} @code{csQint()}
 @item
@@ -870,6 +868,14 @@ name change.
 @code{CS_USE_FAKE_WCHAR_TYPE} @result{} @code{CS_HAVE_WCHAR_T}
 @item
 @code{CS_USE_FAKE_WCSLEN} @result{} @code{CS_HAVE_WCSLEN}
+@end itemize
+
+For consistency with like-named macros (such as @samp{CS_PROCESSOR_NAME} and
+@samp{CS_PROCESSOR_arch}), the following control macros have been renamed:
+
+@itemize @bullet
+@item
+@code{CS_PROCSIZE} @result{} @code{CS_PROCESSOR_SIZE}
 @end itemize
 
 @subheading Default @code{csHash<>} (and @code{csHashReversible<>}) Table Size
