@@ -253,7 +253,7 @@ static inline void *better_memcpy (void *dst, const void *src, size_t len)
 #endif
 
 #define CS_IMPLEMENT_APPLICATION \
-extern int main (int argc, char* argv[]); \
+int main (int argc, char* argv[]); \
 HINSTANCE ModuleHandle = NULL; \
 int ApplicationShow = SW_SHOWNORMAL; \
 int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show) \
