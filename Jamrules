@@ -37,6 +37,7 @@ include $(TOP)/mk/jam/build.jam ;
 
 # Additional msvcgen configuration.
 MsvcGenConfig [ ConcatDirs $(TOP) mk msvcgen msvcgen.jam ] ;
+include [ ConcatDirs $(TOP) mk msvcgen workspaces.jam ] ;
 
 # Project-specific settings.
 if $(TARGET.OS) = MACOS_X

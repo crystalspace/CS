@@ -1,10 +1,5 @@
 SubDir TOP apps tools cs2xml ;
 
-Application cs2xml
-	: [ Wildcard *.cpp *.h ]
-	: console
-;
-LinkWith cs2xml : csgeom csgfx cstool csutil ;
-
 Help cs2xml : "Crystal Space World To XML Convertor" ;
-
+Application cs2xml : [ Wildcard *.cpp *.h ] : console ;
+LinkWith cs2xml : csgeom csgfx cstool csutil ;

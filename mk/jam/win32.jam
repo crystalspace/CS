@@ -83,11 +83,11 @@ FILEFLAGS 0x0
   {
     BLOCK "040904E4"
     {
-      VALUE "ProductName", "$(PACKAGE_NAME)"
+      VALUE "ProductName", "$(PRODUCT_NAME)"
       VALUE "ProductVersion", "$(PACKAGE_VERSION)"
       VALUE "FileVersion", "$(PACKAGE_VERSION)"
       VALUE "LegalCopyright", "$(PACKAGE_COPYRIGHT)"
-      VALUE "FileDescription", "$(DESCRIPTION)"
+      VALUE "FileDescription", "$(PRODUCT_DESCRIPTION)"
 #ifdef CS_DEBUG
       VALUE "Comments", "Debug build"
 #else
@@ -166,7 +166,7 @@ actions GenerateExportDefs
 # linking part
 
 ##  ConstructApplicationTarget target : options
-##    Constructs the application atrget name (ie. foo.exe for foo)
+##    Constructs the application target name (ie. foo.exe for foo)
 rule ConstructApplicationTarget
 {
   return $(<).exe ;
@@ -180,6 +180,7 @@ rule ConstructPluginTarget
   return $(<).dll ;
 }
 
+# Also invoked by msvcgen.jam.
 rule MakeVersionRc
 {
   # normalize version list
@@ -194,12 +195,16 @@ rule MakeVersionRc
   if ! $(v4) { v4 = 0 ; }
   PACKAGE_VERSION_LIST on $(<) = $(v1) $(v2) $(v3) $(v4) ;
       
-  local desc = "$(>)" ;
-  if $($(>)_help)
-  {
-    desc = $($(>)_help) ;
-  }
-  DESCRIPTION on $(<) = $(desc) ;
+  local desc ;
+  if $($(>)_help) { desc = $($(>)_help) ; }
+  else { desc = "$(>)" ; }
+  PRODUCT_DESCRIPTION on $(<) = $(desc) ;
+
+  local name ;
+  if $(PACKAGE_LONGNAME) { name = $(PACKAGE_LONGNAME) ; }
+  else if $(PACKAGE_NAME) { name = $(PACKAGE_NAME) ; }
+  else { name = $(>) ; }
+  PRODUCT_NAME on $(<) = $(name) ;
       
   GenerateWin32VersionRc $(<) ;
 }
@@ -231,7 +236,6 @@ rule PluginResourceWin32
   SEARCH on $(versionrc) = $(LOCATE_TARGET) ;
   MakeVersionRc $(versionrc) : $(<) ;
   
-  # This is order sensitive; metarc is appended to the output of versionrc.
   if $(EMBED_META) = "yes"
   {
     metarc = [ DoObjectGrist $(<)_metarc.rc ] ;

@@ -21,6 +21,29 @@ chronological order.
 	- Jorrit removed the motion manager plugin. It was not very nicely
 	  designed and I question the usability of the plugin.
 	  Also removed associated iSkeletonBone.
+	- Eric Sunshine made the following changes to the Jam build system:
+	    - Augmented msvcgen.jam so that it is capable of generating
+	      multiple workspaces, rather than being hardcoded to produce only
+	      a single workspace named "wksall" containing all
+	      projects. Workspaces are controlled by client invocation of the
+	      new MsvcGenWorkspace rule. This rule allows clients to specify,
+	      not only which workspaces to create, but also the contents of
+	      each workspace.
+	    - Added CS/mk/msvcgen/workspaces.jam, which specifies the
+	      workspaces to create for CS. CS/Jamrules includes this file.
+	      (Unfortunately, there are now so many projects being included in
+	      workspaces, that the command to actually build a workspace
+	      overflows Jam's maximum command-line length, causing it to
+	      abort. Working around this Jam limitation is the next task.)
+	    - Removed code from the MsvcProject rule which was copied directly
+	      from win32.jam. Instead, now calls MakeVersionRc in win32.jam to
+	      achieve the same result. Also cleaned up other portions of
+	      MsvcProject.
+	    - Added an invocation of Help for the 'msvcclean' target.
+	    - The MakeVersionRc rule in win32.jam now prefers
+	      $(PACKAGE_LONGNAME) if available rather than $(PACKAGE_NAME).  If
+	      neither is available, it just uses the bare target name as the
+	      package name.
 18-Apr-2004
 	- Eric Sunshine fixed CS/bin/autogen.sh so that it returns the exit
 	  status of 'autoconf' as its own exit status. This allows invokers of

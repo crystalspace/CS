@@ -7,17 +7,8 @@ L - Low Priority (only minor function loss)
 W - Wishlist (the build also works without this feature)
 * - Completed
 
-[H] msvcgen.jam: Add support to create multiple, customizable workspaces rather
-    than always creating only wksall.  Obvious examples of workspaces are the
-    ones presently created by the GNU make system: wksall, wkstypical,
-    wkswalkall, wksnewrenderer.  This is particularly problematic since
-    creation of the wksnewrenderer target is entirely crippled by the fact that
-    USE_NEW_RENDERER must be "no" in order to create the other workspaces, but
-    "yes" to create this one. A different set of Jamfiles is loaded depending
-    upon this setting, thus making it extremely difficult to get the proper set
-    of module definitions.
-[H] msvcgen.jam: Add support to create specified pseudo-groups in generated
-    workspaces, such as grpall-typical, grplibs-typical, etc.
+[H] msvcgen.jam: The command line for creating a workspace file overflows Jam's
+    command-line length limit, causing it to fail.
 [H] msvcgen.jam: Either respect ExternaLibs() or fix all the Jamfiles which
     require special Windows libraries to invoke MsvcExternalLibrary().  This is
     necessary for modules such as cssocket and ensocket which require
@@ -102,6 +93,15 @@ W - Wishlist (the build also works without this feature)
     with a message telling that you should rerun configure, or at least emit a
     big warning?
 
+[*] msvcgen.jam: Add support to create multiple, customizable workspaces rather
+    than always creating only wksall.  Obvious examples of workspaces are the
+    ones presently created by the GNU make system: wksall, wkstypical,
+    wkswalkall, wksnewrenderer.  This task is particularly problematic since
+    creation of the wksnewrenderer target is entirely crippled by the fact that
+    USE_NEW_RENDERER must be "no" in order to create the other workspaces, but
+    "yes" to create this one. A different set of Jamfiles is loaded depending
+    upon this setting, thus making it extremely difficult to get the proper set
+    of module definitions.
 [*] msvcgen.jam: There should be some way to indicate that project files should
     not be generated for certain applications, plugins, and libraries.  This
     could be done either via a monolithic list or on a module-by-module basis

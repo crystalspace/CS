@@ -1,0 +1,53 @@
+#==============================================================================
+#
+#    Automatic MSVC-compliant workspace and project generation component
+#    Copyright (C) 2004 by Eric Sunshine <sunshine@sunshineco.com>
+#
+#    This library is free software; you can redistribute it and/or
+#    modify it under the terms of the GNU Library General Public
+#    License as published by the Free Software Foundation; either
+#    version 2 of the License, or (at your option) any later version.
+#
+#    This library is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    Library General Public License for more details.
+#
+#    You should have received a copy of the GNU Library General Public
+#    License along with this library; if not, write to the Free
+#    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#==============================================================================
+
+# Everything.
+MsvcGenWorkspace all : : "grp.+_(?!all\.)" ;
+
+# What the typical user will need. Presently, everything but the new renderer.
+MsvcGenWorkspace typical : :
+  chunklod
+  glrender3d
+  glshader_arb
+  glshader_cg
+  glshader_fixed
+  glshader_ps1
+  grpnrall
+  "grp.+_(?!typical\.)"
+  nullrender3d
+  shadermgr
+  softrender3d
+  softshader
+  terrainldr
+  waterdemo
+  xmlshader
+  ;
+
+# Similar to "typical" but using the new renderer instead of the old.
+MsvcGenWorkspace newrenderer : :
+  csjava
+  csperl5
+  cspython
+  gl3d
+  "grp.+_(?!newrenderer\.)"
+  null3d
+  soft3d
+  ;

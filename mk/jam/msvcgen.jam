@@ -42,9 +42,14 @@
 #
 #==============================================================================
 
+MSVCGEN_BUILD_ROOT = [ ConcatDirs $(BUILDTOP) out ] ;
+MSVCGEN_BUILD_MK = [ ConcatDirs $(MSVCGEN_BUILD_ROOT) mk ] ;
+
 if ! $(DO_MSVCGEN)
 {
+MSVCGEN_SILENT ?= no ;
 JAM ?= jam ;
+if $(MSVCGEN_SILENT) = yes { JAM += -d0 ; }
 
 ## MsvcGenConfig configfile
 ##   Specify an additional configuration file to augment the msvcgen
@@ -57,6 +62,26 @@ JAM ?= jam ;
 rule MsvcGenConfig
 {
   MSVCGEN_CONFIG = $(<) ;
+}
+
+## MsvcGenWorkspace name [ : accepts [ : rejects ]]
+##   Specify the name of a workspace which the 'msvcgen' target should create.
+##   The generated workspace file name will be prefixed by "wks".  By default,
+##   a workspace contains all projects resulting from invocations of the
+##   Application, Plugin, Library, and CompileGroups. It is possible to
+##   restrict the projects placed into the workspace by providing the optional
+##   'accepts' and/or 'rejects'. These are lists of Perl regular expressions
+##   matched against the project names. (Project names are composed of "app",
+##   "plg", "lib", and "grp" prepended to the target name given to the
+##   Application, Plugin, Library, and CompileGroups rules, respectively.)
+##   Reject patterns take precedence over accept patterns.  This rule must be
+##   invoked before any invocations of Application, Plugin, Library, or
+##   CompileGroups.  You may invoke this rule multiple times to produce
+##   multiple workspaces, but you must invoke it at least once in order for the
+##   'msvcgen' target to produce any output.
+rule MsvcGenWorkspace
+{
+  # Implemented below.
 }
 
 ## MsvcGenTarget version
@@ -84,6 +109,10 @@ NotFile msvcgen ;
 Depends msvcgen : msvcgen6 msvcgen7 ;
 Help msvcgen : "Create MSVC6 and MSVC7 project files" : verbatim ;
 
+CleanDir msvcclean : $(MSVCGEN_BUILD_MK) ;
+Help msvcclean : "Remove built MSVC project files" : verbatim ;
+Depends clean : msvcclean ;
+
 }
 else
 {
@@ -98,11 +127,10 @@ MSVCGEN = $(PERL) [ ConcatDirs $(TOP) mk msvcgen msvcgen.pl ] ;
 MERGERES = $(SHELL) [ ConcatDirs $(TOP) libs csutil win32 mergeres.sh ] ;
 
 MSVC_VERSION ?= 7 ;
-MSVCGEN_BUILD_ROOT = [ ConcatDirs $(BUILDTOP) out ] ;
 MSVCGEN_LOCATE_TARGET ?=
-  [ ConcatDirs $(MSVCGEN_BUILD_ROOT) mk visualc$(MSVC_VERSION) ] ;
+  [ ConcatDirs $(MSVCGEN_BUILD_MK) visualc$(MSVC_VERSION) ] ;
 MSVCGEN_LOCATE_FRAGMENT ?=
-  [ ConcatDirs $(MSVCGEN_BUILD_ROOT) mk fragment$(MSVC_VERSION) ] ;
+  [ ConcatDirs $(MSVCGEN_BUILD_MK) fragment$(MSVC_VERSION) ] ;
 MSVCGEN_TEMPLATEDIR ?=
   [ ConcatDirs $(TOP) mk msvcgen template$(MSVC_VERSION) ] ;
 
@@ -154,140 +182,180 @@ SetProperty build : projgen_version : $(MSVC_VERSION) ;
 #----------------------------------------------------------------------------
 # Override some rules
 
+## MsvcGenConfig configfile
+##   (See documentation above.)
 rule MsvcGenConfig
 {
 }
 
-## MsvcProject target : sources : type : target-with-ext
+## MsvcGenWorkspace name [ : accepts [ : rejects ]]
+##   (See documentation above.)
+rule MsvcGenWorkspace
+{
+  local name = $(1) ;
+  MSVC.WORKSPACES += $(name) ;
+  MSVC.ACCEPTS.$(name) = $(2) ;
+  MSVC.REJECTS.$(name) = $(3) ;
+}
+
+## MsvcProject target : type : target-with-ext : sources
+## MsvcProject target : type : target-with-ext : accepts : rejects
+##   Create a project file for 'target', which is the project's raw name.
+##   If 'type' is not "group", then 'sources' is a list of files comprising
+##   the target. If 'type' is "group", then 'accepts' and 'rejects' are the
+##   Perl regular-expression lists indicating which dependencies of the group
+##   should be accepted and rejected, respectively.
 rule MsvcProject
 {
-  local rcpath resource msvcname target fragments fragroot files i ;
+  local rawname = $(1) ;
+  local type = $(2) ;
+  local decorated = $(3) ;
+  local sources = $(4) ;
+  local accepts = $(4) ;
+  local rejects = $(5) ;
 
-  switch $(3)
+  local msvcname ;
+  switch $(type)
   {
     case appgui :
-      msvcname = app$(<) ;
+      msvcname = app$(rawname) ;
     case appcon :
-      msvcname = app$(<) ;
+      msvcname = app$(rawname) ;
     case plugin :
-      msvcname = plg$(<) ;
+      msvcname = plg$(rawname) ;
     case library :
-      msvcname = lib$(<) ;
+      msvcname = lib$(rawname) ;
     case group :
-      msvcname = grp$(<) ;
+      msvcname = grp$(rawname) ;
     case * :
-      exit "Unknown msvc projecttype: $(3) specified!" ;
+      exit "Unknown msvc projecttype: $(type) specified!" ;
   }
-  $(<)_MSVCNAME = $(msvcname) ;
+  $(rawname)_MSVCNAME = $(msvcname) ;
       
-  fragroot = [ ConcatDirs $(MSVCGEN_LOCATE_FRAGMENT) $(msvcname).frag ] ;
+  local fragroot = [ ConcatDirs $(MSVCGEN_LOCATE_FRAGMENT) $(msvcname).frag ] ;
   NotFile $(fragroot) ;
 
-  fragments = [ FAppendSuffix $(msvcname) : .frag.cff ]
-	      [ FAppendSuffix $(msvcname) : .frag.dpf ]
-	      [ FAppendSuffix $(msvcname) : .frag.pjf ] ;
+  local fragments = [ FAppendSuffix $(msvcname) : .frag.cff ]
+		    [ FAppendSuffix $(msvcname) : .frag.dpf ]
+		    [ FAppendSuffix $(msvcname) : .frag.pjf ] ;
   MakeLocate $(fragments) : $(MSVCGEN_LOCATE_FRAGMENT) ;
-  target = [ FAppendSuffix $(msvcname) : $(SUFPRJ) ] ;
+
+  local target = [ FAppendSuffix $(msvcname) : $(SUFPRJ) ] ;
   MakeLocate $(target) : $(MSVCGEN_LOCATE_TARGET) ;
   target += $(fragments) ;
-  $(<)_TARGET = $(target) ;
+  $(rawname)_TARGET = $(target) ;
 
   # Only include source and headers files for now.  In the future, we also
   # want to include .cfg files and any other textual resources which which the
   # user might care to read/view in the MSVC IDE.
-  for i in $(>)
+  local i, files ;
+  for i in $(sources)
   {
-    i = $(i:G=$(LOCATE_SOURCE)) ;
-    switch $(i:S)
+    if [ IsElem $(i:S) : .h .hpp .H .c .cc .cpp .C .m .mm .M ]
     {
-      case .h   : files += $(i) ;
-      case .hpp : files += $(i) ;
-      case .H   : files += $(i) ;
-      case .c   : files += $(i) ;
-      case .cc  : files += $(i) ;
-      case .cpp : files += $(i) ;
-      case .m   : files += $(i) ;
-      case .mm  : files += $(i) ;
-      case .M   : files += $(i) ;
+      files += $(i:G=$(LOCATE_SOURCE)) ;
     }
   }
   # Search at the correct place for the files
   SEARCH on $(files) = $(SEARCH_SOURCE) ;
 
   # Add resource file.
-  if $(3) = "plugin" || $(3) = "appgui" || $(3) = "appcon"
+  if [ IsElem $(type) : plugin appgui appcon ]
   {
-    resource = $(msvcname:S=.rc) ;
+    local resource = $(msvcname:S=.rc) ;
     files += $(resource) ;
     Depends $(target) : $(resource) ;
-    LOCATE on $(resource) = $(MSVCGEN_LOCATE_TARGET) ;
+    MakeLocate $(resource) : $(MSVCGEN_LOCATE_TARGET) ;
     SEARCH on $(resource) = $(MSVCGEN_LOCATE_FRAGMENT) ;
-    NAME on $(resource) = $(<) ;
-    $(<)_RCNAME = $(resource) ;
+    NAME on $(resource) = $(rawname) ;
+    $(rawname)_RCNAME = $(resource) ;
   
     local versionrc = $(resource:S=.vrctmp) ;
-  
-    # Normalize version list.
-    local v1, v2, v3, v4 ;
-    v1 = $(PACKAGE_VERSION_LIST[1]) ;
-    if ! $(v1) { v1 = 0 ; }
-    v2 = $(PACKAGE_VERSION_LIST[2]) ;
-    if ! $(v2) { v2 = 0 ; }
-    v3 = $(PACKAGE_VERSION_LIST[3]) ;
-    if ! $(v3) { v3 = 0 ; }
-    v4 = $(PACKAGE_VERSION_LIST[4]) ;
-    if ! $(v4) { v4 = 0 ; }
-    PACKAGE_VERSION_LIST on $(versionrc) = $(v1) $(v2) $(v3) $(v4) ;
-    DESCRIPTION on $(versionrc) = $($(<)_help) ;
-    LOCATE on $(versionrc) = $(MSVCGEN_LOCATE_FRAGMENT) ;
-    
-    GenerateWin32VersionRc $(versionrc) ;
+    MakeLocate $(versionrc) : $(MSVCGEN_LOCATE_FRAGMENT) ;
+    MakeVersionRc $(versionrc) : $(rawname) ;
     Always $(versionrc) ;
-    Win32Resource $(<) : $(versionrc) ;
+    Win32Resource $(rawname) : $(versionrc) ;
     RmTemps $(target) : $(versionrc) ;
     
-    if $(3) = "plugin" 
+    if $(type) = "plugin" 
     {
       local metarc = $(resource:S=.mrctmp) ;
     
-      LOCATE on $(metarc) = $(MSVCGEN_LOCATE_FRAGMENT) ;
+      MakeLocate $(metarc) : $(MSVCGEN_LOCATE_FRAGMENT) ;
       SEARCH on $(metarc) = $(SEARCH_SOURCE) ;
     
-      Depends $(metarc) : $($(<)_METAFILE) ;
-      GenerateWin32MetadataRc $(metarc) : $($(<)_METAFILE) ;
+      Depends $(metarc) : $($(rawname)_METAFILE) ;
+      GenerateWin32MetadataRc $(metarc) : $($(rawname)_METAFILE) ;
       Always $(metarc) ;
-      Win32Resource $(<) : $(metarc) ;
+      Win32Resource $(rawname) : $(metarc) ;
       RmTemps $(target) : $(metarc) ;
     }
   
     Always $(resource) ;
   }
   
-  RAWNAME on $(target) = $(<) ;
+  RAWNAME on $(target) = $(rawname) ;
   PROJECTNAME on $(target) = $(msvcname) ;
-  TARGET on $(target) = $(4) ;
-  TYPE on $(target) = $(3) ;
+  TARGET on $(target) = $(decorated) ;
+  TYPE on $(target) = $(type) ;
   FRAGMENT_ROOT on $(target) = $(fragroot) ;
-  DEPEND on $(target) += $(MSVC.DEPEND) $(MSVC.DEPEND.$(3)) ;
-  LIBRARIES on $(target) += $(MSVC.LIBRARY) $(MSVC.LIBRARY.$(3)) ;
-  LFLAGS on $(target) += $(MSVC.LFLAGS) $(MSVC.LFLAGS.$(3)) ;
-  CFLAGS on $(target) += $(MSVC.CFLAGS) $(MSVC.CFLAGS.$(3)) ;
+  DEPEND on $(target) += $(MSVC.DEPEND) $(MSVC.DEPEND.$(type)) ;
+  LIBRARIES on $(target) += $(MSVC.LIBRARY) $(MSVC.LIBRARY.$(type)) ;
+  LFLAGS on $(target) += $(MSVC.LFLAGS) $(MSVC.LFLAGS.$(type)) ;
+  CFLAGS on $(target) += $(MSVC.CFLAGS) $(MSVC.CFLAGS.$(type)) ;
+
+  if $(type) = "group"
+  {
+    ACCEPTS on $(target) = $(accepts) ;
+    REJECTS on $(target) = $(rejects) ;
+  }
+  else
+  {
+    ACCEPTS on $(target) = ;
+    REJECTS on $(target) = ;
+  }
 
   Depends msvcgen : $(target) ;
   Depends $(target) : $(files) $(MSVCGEN_LOCATE_FRAGMENT:G=dir) ;
   MsvcProjectGen $(target) : $(files) ;
   Always $(target) ;
 
-  MSVCWorkspace wksall : $(fragments) : $(fragroot) ;
+  if ! $(MSVC.WORKSPACES)
+  {
+    exit "You must specify at least one workspace via MsvcGenWorkspace" ;
+  }
+
+  local w ;
+  for w in $(MSVC.WORKSPACES)
+  {
+    MSVCWorkspace $(w) : $(fragments) : $(fragroot) ;
+  }
 
   Clean msvcclean : $(target) ;
 }
 
 #----------------------------------------------------------------------------
 
+# Ensure that the pseudo-groups exist with which the overridden Application,
+# Plugin, and Library rules will register their targets. We have to do this
+# here rather than at the top-level (outside of any rule invocation) because we
+# need to give the client time to invoke MsvcGenWorkspace first to set up the
+# workspaces into which these groups will be inserted. If we tried registering
+# theses pseudo-groups at the top-level, registration would occur before the
+# client has had a chance to invoke MsvcGenWorkspace, thus these pseudo-groups
+# would not inhabit any workspaces.
+rule RegisterWellKnownCompileGroups
+{
+  if $(MSVCGEN.WELL_KNOWN_GROUPS_REGISTERED) != yes
+  {
+    MSVCGEN.WELL_KNOWN_GROUPS_REGISTERED = yes ;
+    RegisterCompileGroups all apps plugins libs ;
+  }
+}
+
 rule Application
 {
-  # _Options $(<) : $(3) ;
+  RegisterWellKnownCompileGroups ;
 
   local projtype ;
   if [ IsElem console : $(3) ]
@@ -298,24 +366,26 @@ rule Application
   {
     projtype = appgui ;
   }
-
-  MsvcProject $(<) : $(>) : $(projtype) : $(<:S=.exe) ;
+  MsvcProject $(<) : $(projtype) : $(<:S=.exe) : $(>) ;
   CompileGroups $(<) : all apps ;
 }
 
 rule Plugin
 {
+  RegisterWellKnownCompileGroups ;
+
   local metafile ;
   metafile = [ FAppendSuffix $(<) : $(SUFMETA) ] ;
   SEARCH on $(metafile) = $(SEARCH_SOURCE) ;
   $(<)_METAFILE = $(metafile) ;
-  MsvcProject $(<) : $(>) : plugin : $(<:S=.dll) ;
+  MsvcProject $(<) : plugin : $(<:S=.dll) : $(>) ;
   CompileGroups $(<) : all plugins ;
 }
 
 rule Library
 {
-  MsvcProject $(<) : $(>) : library : $(<:S=.lib) ;
+  RegisterWellKnownCompileGroups ;
+  MsvcProject $(<) : library : $(<:S=.lib) : $(>) ;
   CompileGroups $(<) : all libs ;
 }
 
@@ -324,19 +394,19 @@ rule RegisterCompileGroups
   local i ;
   for i in $(<)
   {
-    RegisterCompileGroup $(i) ;
+    local w ;
+    for w in $(MSVC.WORKSPACES)
+    {
+      MsvcProject
+        $(i)_$(w) : group : : $(MSVC.ACCEPTS.$(w)) : $(MSVC.REJECTS.$(w)) ;
+    }
   }
-}
-
-rule RegisterCompileGroup
-{
-  MsvcProject $(<) : $(>) : group ; 
 }
 
 rule CompileGroups
 {
   local i ;
-  for i in $(>)
+  for i in $(>)_$(MSVC.WORKSPACES)
   {
     DEPEND on $($(i)_TARGET) += $($(<)_MSVCNAME) ;
   }
@@ -376,18 +446,22 @@ rule ExternalLibs
   }
 }
 
+# MSVCWorkspace name : fragments : fragmentroot
 rule MSVCWorkspace
 {
-  local target ;
+  local name = $(1) ;
+  local fragments = $(2) ;
+  local fragroot = $(3) ;
+  local target = wks$(name) ;
 
-  target = [ FAppendSuffix $(<) : $(SUFWSP) ] ;
-  MakeLocate $(target) : $(MSVCGEN_LOCATE_TARGET) ;
+  target = $(target:G=msvcworkspace:S=$(SUFWSP)) ;
+  RAWNAME on $(target) = $(name) ;
 
   Depends msvcgen : $(target) ;
-  Depends $(target) : $(>[1]) ;
-  MsvcWorkspaceGen $(target) : $(3) ;
-
-  RmTemps $(target) : $(>) ;
+  Depends $(target) : $(fragments[1]) ;
+  MakeLocate $(target) : $(MSVCGEN_LOCATE_TARGET) ;
+  MsvcWorkspaceGen $(target) : $(fragroot) ;
+  RmTemps msvcgen : $(fragments) ;
 }
 
 rule Win32Resource
@@ -424,6 +498,8 @@ actions MsvcProjectGen
   --cflags='$(CFLAGS)' \
   --strip-root='$(MSVCGEN_BUILD_ROOT)/' \
   --strip-root='$(TOP)/' \
+  --accept='$(ACCEPTS)' \
+  --reject='$(REJECTS)' \
   $(>)
 }
 
@@ -436,6 +512,8 @@ actions together MsvcWorkspaceGen
   --workspace-extension=$(SSUFWSP) \
   --output=$(<) \
   --template-dir=$(MSVCGEN_TEMPLATEDIR) \
+  --accept='$(MSVC.ACCEPTS.$(RAWNAME))' \
+  --reject='$(MSVC.REJECTS.$(RAWNAME))' \
   $(>)
 }
 
@@ -446,12 +524,6 @@ actions together MergeRcs
 
 #----------------------------------------------------------------------------
 
-RegisterCompileGroups all apps plugins libs ;
 NotFile msvcgen ;
 Always msvcgen ;
-Clean clean : $(MSVCGEN_LOCATE_TARGET:G=dir) ;
-Clean clean : $(MSVCGEN_LOCATE_FRAGMENT:G=dir) ;
-Clean clean : $(MSVCGEN_BUILD_ROOT) ;
-Clean msvcclean : $(MSVCGEN_LOCATE_TARGET:G=dir) ;
-Clean msvcclean : $(MSVCGEN_LOCATE_FRAGMENT:G=dir) ;
 }
