@@ -19,8 +19,8 @@ Download the following packages:
 
 @itemize @bullet
 @item
-Crystal Space MinGW package @file{cs_mingw_0.92.exe} from the Mingw32 support
-directory at Linux Games.  This package contains all the recent MinGW package
+Crystal Space MinGW package @file{cs_mingw_0.92.exe} from the @emph{mingw32} support
+directory at Sunsite.  This package contains all the recent MinGW package
 releases (i.e. all the files necessary to compile Crystal Space successfully).
 
 @noindent
