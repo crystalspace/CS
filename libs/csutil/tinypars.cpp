@@ -163,7 +163,7 @@ bool TiXmlBase::StringEqual( const char* p,
 		return false;
 	}
 
-    if ( tolower( *p ) == tolower( *tag ) )
+    if ( tolower( *(p) ) == tolower( *tag ) )
 	{
 		const char* q = p;
 
