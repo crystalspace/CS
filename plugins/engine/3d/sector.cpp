@@ -301,7 +301,7 @@ public:
     if (num > 0)
     {
       csBox3 box;
-      cmesh->GetWorldBoundingBox (box);
+      //cmesh->GetWorldBoundingBox (box);
       privMeshlist->AddRenderMeshes (meshes, num, cmesh->GetRenderPriority (),
 	  cmesh->GetZBufMode (), box);
     }

@@ -9,6 +9,10 @@ chronological order.
 30-Mar-2004
 	- Eric Sunshine added missing "#define CS_SYSDEF_PROVIDE_SOFTWARE2D"
 	  to null_render3d.cpp.  Reported by Steven Geens.
+	- Jorrit disabled the sphere culling for the generic render loop
+	  that was recently added. This adds a very big overhead to the
+	  main rendering loop in csSector which is not acceptable. We need
+	  another solution for this.
 29-Mar-2004
 	- Jorrit changed the NR null3d renderer so it uses the soft canvas
 	  instead of the OpenGL canvas by default.

@@ -271,6 +271,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   iGraphics3D* g3d = rview->GetGraphics3D();
 
   csRenderMeshList* meshlist = sector->GetVisibleMeshes (rview);
+#if 0
   if (light != 0)
   {
     csSphere sphere;
@@ -278,6 +279,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     sphere.SetRadius (light->GetInfluenceRadiusSq ());
     meshlist->CullToSphere (sphere);
   }
+#endif
   int num = meshlist->SortMeshLists ();
   CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, num);
   csArray<csRenderMesh> saveMeshes;
