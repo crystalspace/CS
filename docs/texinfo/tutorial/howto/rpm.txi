@@ -1,26 +1,27 @@
 @c -*-texinfo-*-
-@node RPM, , Unix, Unix
-@subsubsection Unix using RPM packages
-@cindex Rpm
-@cindex package
+@node HOWTO Create RPM, HOWTO Setting the CRYSTAL environment variable, HOWTO Creating External Application using KDevelop, HOWTO
+@subsection Creating Crystal Space @sc{rpm}'s
+@cindex @sc{rpm}
+@cindex Package, @sc{rpm} 
 @cindex @file{cs.spec}
 
-@subheading Getting @sc{rpm}s Packages
+@subsubheading Creating Crystal Space @sc{rpm} Packages
 
-Building your own @sc{rpm}'s is probably the best option. This way you won't
-have to find distribution specific package, and you'll be able to set building
-options. For this purpose, @file{CS/scripts/rpm/cs.spec} file is provided with
+It is possible to build Crystal Space @sc{rpm}'s. This is useful if you want to
+distribute pre-built Crystal Space packages, or if you want to install Crystal
+Space on your machine using the normal package management facilities of your
+host.  For this purpose, @file{CS/scripts/rpm/cs.spec} file is provided with
 Crystal Space.
 
-@subheading Configure to Build @sc{rpm} Packages
+@subsubheading Configure to Build @sc{rpm} Packages
 
-Building @sc{rpm} packages involves a few settings, which are covered in
+Building @sc{rpm} packages involves a few settings, which are covered at
 the following page:
 
 @noindent
 @uref{http://qa.mandrakesoft.com/twiki/bin/view/Main/RpmHowTo#Preliminary_tasks}
 
-@subheading Building Your Own @sc{rpm}'s From Source Archive 
+@subsubheading Building Your Own @sc{rpm}'s From Source Archive 
 
 Once you've set your system to build @sc{rpm} packages as a regular user,
 perform the following steps:
@@ -81,7 +82,7 @@ rpm -ba cs.spec --with perl
 The binary @sc{rpm}'s should be under @file{rpm/RPMS/}, and the source @sc{rpm}
 in @file{rpm/SRPMS/}.
 
-The process builds three Crystal Space binary @sc{rpm} packages:
+The process creates three Crystal Space binary @sc{rpm} packages:
 
 @itemize @bullet
 @item

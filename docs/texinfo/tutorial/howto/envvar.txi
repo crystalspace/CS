@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Setting the CRYSTAL environment variable, HOWTO Create Your Own Plugin, HOWTO Creating External Application using KDevelop, HOWTO
+@node HOWTO Setting the CRYSTAL environment variable, HOWTO Create Your Own Plugin, HOWTO Create RPM, HOWTO
 @subsection Setting the CRYSTAL environment variable
 
 This section describes how to set the @samp{CRYSTAL} environment variable under

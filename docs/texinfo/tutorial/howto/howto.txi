@@ -27,6 +27,7 @@ code.
 * HOWTO Creating External MSVC 6 Application:: Creating an External @sc{msvc} 6 Application
 * HOWTO Creating External MSVC 7 Application:: Creating an External @sc{msvc} 7 Application
 * HOWTO Creating External Application using KDevelop:: Creating an External Application using KDevelop
+* HOWTO Create RPM:: Creating Crystal Space @sc{rpm}'s
 * HOWTO Setting the CRYSTAL environment variable:: Setting the CRYSTAL environment variable
 * HOWTO Create Your Own Plugin:: Create Your Own Plugin
 * HOWTO Simple Map Example:: Simple Map Example
@@ -53,6 +54,7 @@ code.
 @importsss{tutorial,howto,msvc6proj,msvc6proj.txi}
 @importsss{tutorial,howto,msvc7proj,msvc7proj.txi}
 @importsss{tutorial,howto,kdevproj,kdevproj.txi}
+@importss{tutorial,howto,rpm.txi}
 @importss{tutorial,howto,envvar.txi}
 @importss{tutorial,howto,plugin.txi}
 @importss{tutorial,howto,simpmap.txi}

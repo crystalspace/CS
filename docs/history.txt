@@ -38,6 +38,10 @@ chronological order.
 	  grammatical errors in apimod100.txi.
 	- Marten fixed an error in the msvcgen where it set the libdir for
 	  release but not debug builds.
+	- Eric Sunshine relocated the Crystal Space RPM-creation instructions
+	  from texinfo/build/platform/unix to texinfo/tutorial/howto, and also
+	  performed a small amount of re-writing to make it more sensible in
+	  the context of a HOWTO.
 12-Dec-2004
 	- Eric Sunshine worked around problem in csjava caused by new operator
 	  overrides in csColor and csColor4. Although modern C++ can deal with
