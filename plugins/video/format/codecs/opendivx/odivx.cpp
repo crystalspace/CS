@@ -64,6 +64,7 @@ bool csOpenDivX::Initialize (csStreamDescription *desc)
   bool succ;
   dec_param.x_dim = w;
   dec_param.y_dim = h;
+  dec_param.color_depth = 32;
   succ = (decore ((unsigned long)this, DEC_OPT_INIT, &dec_param, NULL) == DEC_OK);
 
   if (succ)

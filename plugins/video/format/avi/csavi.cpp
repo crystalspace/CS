@@ -34,6 +34,7 @@ EXPORT_CLASS_TABLE (csavi)
 EXPORT_CLASS_TABLE_END
 
 #define AVI_HEADER_SKIP 8 // 8 bytes : 4 for id and 4 for length
+#define AVI_EVEN(x) ((x)&1?(x)+1:(x))
 csAVIFormat::csAVIFormat (iBase *pParent)
 {
   CONSTRUCT_IBASE (pParent);
@@ -119,7 +120,7 @@ bool csAVIFormat::InitVideoData ()
     hdrl.Endian ();
     if (!strncmp (hdrl.type, "hdrl", 4))
     {
-      pmovi = p + AVI_HEADER_SKIP + hdrl.listsize; // audio/video data begins here
+      pmovi = p + AVI_HEADER_SKIP + AVI_EVEN(hdrl.listsize); // audio/video data begins here
       p += sizeof (RIFFlist);
       // read the AVI header chunk
       memcpy (&avichunk, p, sizeof (RIFFchunk));
@@ -130,13 +131,13 @@ bool csAVIFormat::InitVideoData ()
 	p += sizeof (RIFFchunk);
 	memcpy (&aviheader, p, sizeof (AVIHeader));
 	aviheader.Endian ();
-	p += avichunk.chunksize;
+	p += AVI_EVEN(avichunk.chunksize);
 	// now read all streamlists
 	for (ULong nStream=0; nStream < aviheader.streamcount; nStream++)
 	{
 	  memcpy (&strl, p, sizeof (RIFFlist));
 	  strl.Endian ();
-	  char *pListEnd = p+AVI_HEADER_SKIP+strl.listsize;
+	  char *pListEnd = p+AVI_HEADER_SKIP+AVI_EVEN(strl.listsize);
 	  p += sizeof (RIFFlist);
 	  if (!strncmp (strl.type, "strl", 4))
 	  {
@@ -151,7 +152,7 @@ bool csAVIFormat::InitVideoData ()
 		p += sizeof (RIFFchunk);
 		memcpy (&streamheader, p, sizeof (StreamHeader));
 		streamheader.Endian ();
-		p += strh.chunksize;
+		p += AVI_EVEN(strh.chunksize);
 		ULong nread = CreateStream (&streamheader);
 		if (nread == 0)
 		{
@@ -161,7 +162,7 @@ bool csAVIFormat::InitVideoData ()
 	      }
 	      else
 	      {
-		p += strh.chunksize + sizeof (RIFFchunk);
+		p += AVI_EVEN(strh.chunksize) + sizeof (RIFFchunk);
 	      }
 	    }
 	  }
@@ -179,7 +180,7 @@ bool csAVIFormat::InitVideoData ()
 	  memcpy (&movi, p, sizeof (RIFFlist));
 	  movi.Endian ();
 	  if (strncmp (movi.type, "movi", 4))
-	    p += AVI_HEADER_SKIP + movi.listsize;
+	    p += AVI_HEADER_SKIP + AVI_EVEN(movi.listsize);
 	  else
 	    break;
 	}
@@ -187,7 +188,7 @@ bool csAVIFormat::InitVideoData ()
 	if (!strncmp (movi.type, "movi", 4))
 	{
 	  startframepos = p + sizeof (RIFFlist);
-	  moviendpos = p + AVI_HEADER_SKIP + movi.listsize;
+	  moviendpos = p + AVI_HEADER_SKIP + AVI_EVEN(movi.listsize);
 	  maxframe = 0; // max. frame visited to date
 	  maxframepos = startframepos;
 	  // some AVI with only one stream do not enclose the chunks in a <rec> LIST but
@@ -266,8 +267,8 @@ ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
       p += sizeof (RIFFchunk);
       memcpy (&audsf, p, sizeof (AudioStreamFormat));
       audsf.Endian ();
-      p += strh.chunksize;
-      n = strh.chunksize + sizeof (RIFFchunk);
+      p += AVI_EVEN(strh.chunksize);
+      n = AVI_EVEN(strh.chunksize) + sizeof (RIFFchunk);
       if (pAudioStream->Initialize (&aviheader, streamheader, &audsf, nAudio, pSystem))
 	vStream.Push (pAudioStream);
       else
@@ -288,8 +289,8 @@ ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
       p += sizeof (RIFFchunk);
       memcpy (&vidsf, p, sizeof (VideoStreamFormat));
       vidsf.Endian ();
-      p += strh.chunksize;
-      n = strh.chunksize + sizeof (RIFFchunk);
+      p += AVI_EVEN(strh.chunksize);
+      n = AVI_EVEN(strh.chunksize) + sizeof (RIFFchunk);
       if (pVideoStream->Initialize (&aviheader, streamheader, &vidsf, nVideo, pSystem))
 	vStream.Push (pVideoStream);
       else
@@ -306,8 +307,8 @@ ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
     {
       pSystem->Printf (MSG_WARNING, "Unsupported streamtype \"%4c\" found ... ignoring it !", 
 		       strh.id);
-      n = strh.chunksize + sizeof (RIFFchunk);
-      p += strh.chunksize + sizeof (RIFFchunk);
+      n = AVI_EVEN(strh.chunksize) + sizeof (RIFFchunk);
+      p += AVI_EVEN(strh.chunksize) + sizeof (RIFFchunk);
     }
     else
     {
@@ -341,7 +342,7 @@ bool csAVIFormat::HasChunk (ULong frameindex)
 	    memcpy (&ch, pp, sizeof (RIFFlist));
 	    ch.Endian ();
 	    maxframepos = pp;
-	    pp += ch.listsize + AVI_HEADER_SKIP;
+	    pp += AVI_EVEN(ch.listsize) + AVI_HEADER_SKIP;
 	    maxframe++;
 	  }
 	}
@@ -353,7 +354,7 @@ bool csAVIFormat::HasChunk (ULong frameindex)
 	    memcpy (&ch, pp, sizeof (RIFFchunk));
 	    ch.Endian ();
 	    maxframepos = pp;
-	    pp += ch.chunksize + sizeof (RIFFchunk);
+	    pp += AVI_EVEN(ch.chunksize) + sizeof (RIFFchunk);
 	    maxframe++;
 	  }
 	}
@@ -381,22 +382,22 @@ bool csAVIFormat::GetChunk (ULong frameindex, AVIDataChunk *pChunk)
 	memcpy (&ch, pp, sizeof (RIFFlist));
 	ch.Endian ();
 	pp += sizeof (RIFFlist);
-	maxsize = ch.listsize - (sizeof (RIFFlist)-AVI_HEADER_SKIP);
+	maxsize = AVI_EVEN(ch.listsize) - (sizeof (RIFFlist)-AVI_HEADER_SKIP);
       }
       else
       {
 	RIFFchunk ch;
 	memcpy (&ch, pp, sizeof (RIFFchunk));
 	ch.Endian ();
-	maxsize = ch.chunksize + sizeof (RIFFchunk);
+	maxsize = AVI_EVEN(ch.chunksize) + sizeof (RIFFchunk);
       }
     }
     else
     {  
       ULong startfrom = (frameindex < pChunk->currentframe ? 0 
-			 : frameindex < maxframe ? pChunk->currentframe : maxframe);
+			 : frameindex <= maxframe ? pChunk->currentframe : maxframe);
       pp = (frameindex < pChunk->currentframe ? startframepos
-	    : frameindex < maxframe ? pChunk->currentframepos : maxframepos);
+	    : frameindex <= maxframe ? pChunk->currentframepos : maxframepos);
     
       if (!no_recl)
       {
@@ -406,12 +407,13 @@ bool csAVIFormat::GetChunk (ULong frameindex, AVIDataChunk *pChunk)
 	  memcpy (&ch, pp, sizeof (RIFFlist));
 	  ch.Endian ();
 	  maxframepos = pp;
-	  pp += ch.listsize + AVI_HEADER_SKIP;
+	  pp += AVI_EVEN(ch.listsize) + AVI_HEADER_SKIP;
 	  startfrom++;
 	}
 
-	pp -= ch.listsize;
-	maxsize = ch.listsize;
+	pChunk->currentframepos = pp;
+	pp -= AVI_EVEN(ch.listsize);
+	maxsize = AVI_EVEN(ch.listsize);
       }
       else 
       { // no_recl == true
@@ -421,11 +423,12 @@ bool csAVIFormat::GetChunk (ULong frameindex, AVIDataChunk *pChunk)
 	  memcpy (&ch, pp, sizeof (RIFFchunk));
 	  ch.Endian ();
 	  maxframepos = pp;
-	  pp += ch.chunksize + sizeof (RIFFchunk);
+	  pp += AVI_EVEN(ch.chunksize) + sizeof (RIFFchunk);
 	  startfrom++;
 	}
-	pp -= (ch.chunksize + sizeof (RIFFchunk));
-	maxsize = ch.chunksize + sizeof (RIFFchunk);
+	pChunk->currentframepos = pp;
+	pp -= (AVI_EVEN(ch.chunksize) + sizeof (RIFFchunk));
+	maxsize = AVI_EVEN(ch.chunksize) + sizeof (RIFFchunk);
       }
     }
 
@@ -443,8 +446,8 @@ bool csAVIFormat::GetChunk (ULong frameindex, AVIDataChunk *pChunk)
       }
       else
       {
-	pp += chunk.chunksize + sizeof (RIFFchunk);
-	n  += chunk.chunksize + sizeof (RIFFchunk);
+	pp += AVI_EVEN(chunk.chunksize) + sizeof (RIFFchunk);
+	n  += AVI_EVEN(chunk.chunksize) + sizeof (RIFFchunk);
       }
     }
   }

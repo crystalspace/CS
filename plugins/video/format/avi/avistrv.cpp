@@ -133,15 +133,17 @@ void csAVIStreamVideo::GetStreamDescription (csVideoStreamDescription &desc)
 
 bool csAVIStreamVideo::SetRect (int x, int y, int w, int h)
 {
+  int height = pG3D->GetHeight ()-1;
   rc.Set (x, y, x+w, y+h);
+  
   polyfx.vertices[0].sx = x;
-  polyfx.vertices[0].sy = y;
+  polyfx.vertices[0].sy = height - y;
   polyfx.vertices[1].sx = x+w;
-  polyfx.vertices[1].sy = y;
+  polyfx.vertices[1].sy = height - y;
   polyfx.vertices[2].sx = x+w;
-  polyfx.vertices[2].sy = y+h;
+  polyfx.vertices[2].sy = height - (y+h);
   polyfx.vertices[3].sx = x;
-  polyfx.vertices[3].sy = y+h;
+  polyfx.vertices[3].sy = height - (y+h);
   memimage.Rescale (w, h);
   return true;
 }
@@ -151,15 +153,20 @@ bool csAVIStreamVideo::SetFXMode (UInt mode)
   fxmode = mode;
   return true;
 }
-
+#include "csgfxldr/pngsave.h"
+#include <unistd.h>
+#include <sys/types.h>
+#include <fcntl.h>
 iMaterialHandle* csAVIStreamVideo::NextFrameGetMaterial ()
 {
   void *outdata;
 
-  if (pAVI->GetChunk (pChunk->currentframe++, pChunk))
+  if (pAVI->GetChunk (pChunk->currentframe, pChunk))
   {
+    pChunk->currentframe++;
     pCodec->Decode ((char*)pChunk->data, pChunk->length, outdata);
     if (cdesc.decodeoutput == CS_CODECFORMAT_YUV_CHANNEL)
+      //      rgb_channel_2_rgba_interleave ((char **)outdata);
       yuv_channel_2_rgba_interleave ((char **)outdata);
     else
     if (cdesc.decodeoutput == CS_CODECFORMAT_RGB_CHANNEL)
@@ -170,6 +177,20 @@ iMaterialHandle* csAVIStreamVideo::NextFrameGetMaterial ()
     else
     if (cdesc.decodeoutput != CS_CODECFORMAT_RGBA_INTERLEAVED)
       return NULL;
+    /*
+    char name[20];
+    int i=0;
+  do
+  {
+    sprintf (name, "avi%06d.png", i++);
+  } while (i < 100000 && (access (name, 0) == 0));
+
+  if (i >= 1000)
+    pSystem->Printf (MSG_CONSOLE, "Too many screenshot files in current directory\n");
+  else
+    if (!csSavePNG (name, &memimage))
+      pSystem->Printf (MSG_CONSOLE, "There was an error while writing screen shot\n");
+    */
     makeMaterial ();
     return pMaterial;
   }
@@ -204,16 +225,36 @@ void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
   char *ydata = data[0];
   char *udata = data[1];
   char *vdata = data[2];
+  int idx=0;
   csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
-  for (int idx=0, y=0; y < rc.Height (); y++)
+  for (int y=0; y < rc.Height (); y++)
     for (int x=0; x < rc.Width (); x++)
     {
-      pixel[idx].red = (unsigned char)(ydata[idx] + (1.4075 * ((int)vdata[idx] - 128)));
-      pixel[idx].green = (unsigned char)(ydata[idx] - (0.3455 * ((int)udata[idx] - 128) 
-				       - 0.7169 * ((int)vdata[idx] - 128)));
-      pixel[idx].blue = (unsigned char)(ydata[idx] + (1.7790 * ((int)udata[idx] - 128)));
+      int y=MAX(0,(ydata[idx]) - 16);
+      int u=MAX(0,(udata[idx]) - 128);
+      int v=MAX(0,(vdata[idx]) - 128);
+      pixel[idx].blue = (1.164*y + 2.018 * v);
+      pixel[idx].green= (1.164*y - 0.813 * u - 0.391 * v);
+      pixel[idx].red  = (1.164*y + 1.596 * u);
       idx++;
     }
+  /*
+  static int n=0;
+  char tt[20];
+  sprintf (tt,"pic%03d.Y", n);
+  int f = creat ( tt, 0);
+  write (f,ydata,idx);
+  close (f);
+  sprintf (tt,"pic%03d.U", n);
+  f = creat ( tt, 0);
+  write (f,udata,idx);
+  close (f);
+  sprintf (tt,"pic%03d.V", n);
+  f = creat ( tt, 0);
+  write (f,vdata,idx);
+  close (f);
+  n++;
+  */
 }
 
 void csAVIStreamVideo::rgb_channel_2_rgba_interleave (char *data[3])
