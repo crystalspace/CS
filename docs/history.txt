@@ -16,6 +16,10 @@ Short-term cleanups that need to be done:
 12-Sep-1999
 	- Eric Sunshine rewrote MazeEditor::LoadWorld() so that it integrates
 	  correctly with VFS and can once again load worlds.
+	- Eric Sunshine worked around an OpenStep 4.2 compiler bug which was
+	  triggered by vfs.cpp.  The compiler generates unlinkable code when
+	  an inline method in a class calls another inline method which the
+	  compiler has not yet seen a declaration for.
 11-Sep-1999
 	- Andrew Zabolotny integrated his Virtual File System (VFS) into
 	  Crystal Space.  This was a major update to CS, and involved many
@@ -103,10 +107,6 @@ Short-term cleanups that need to be done:
 	  which prevented many level files from loading.
 	- Eric Sunshine fixed compilation warnings in sector.cpp and
 	  polyset.cpp.
-	- Eric Sunshine worked around an OpenStep 4.2 compiler bug which was
-	  triggered by vfs.cpp.  The compiler generates unlinkable code when
-	  an inline method in a class calls another inline method which the
-	  compiler has not yet seen a declaration for.
 10-Sep-1999
 	- AddVertexSmart() is now deprecated. It is still there and can be
 	  used. However, it is better (read faster) to use AddVertex()
