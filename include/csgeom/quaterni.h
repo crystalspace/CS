@@ -19,6 +19,7 @@
 #ifndef _QUATERNION_H_
 #define _QUATERNION_H_
 
+#include <math.h>
 #include "csgeom/math3d.h"
 
 /**
@@ -28,7 +29,7 @@ class csQuaternion
 {
 public:
   /// Construct a 0,0,0,0 quaternion.
-  csQuaternion () { Init (0, 0, 0, 0 ); }
+  csQuaternion () { Init(0, 0, 0, 0 ); }
   /// Construct a quaternion with the given parameters.
   csQuaternion (double theR, double theX=0.0, double theY=0.0, double theZ=0.0)
   { Init (theR, theX, theY, theZ ); }
@@ -36,7 +37,7 @@ public:
   csQuaternion (const csQuaternion& q) { Init (q.r, q.x, q.y, q.z); }
   /// Construct quaternion from a vector.
   csQuaternion (const csVector3& q) { Init (0, q.x, q.y, q.z); }
-  
+
   ///
   inline friend csQuaternion operator+ (const csQuaternion& q1, const csQuaternion& q2)
   { return csQuaternion (q1.r + q2.r, q1.x + q2.x, q1.y + q2.y, q1.z + q2.z ); }
@@ -59,7 +60,6 @@ public:
 	  x*q2.y -  y*q2.x + r*q2.z + z*q2.r); 
     return *this;
   }
-  
 
   ///
   void Conjugate () { Init (r, -x, -y, -z); }
@@ -89,6 +89,10 @@ public:
   ///
   inline void Init (double theR, double theX, double theY, double theZ)
   { r = theR; x = theX; y = theY; z = theZ; } 
+
+  void Normalize() {
+    r = sqrt(1.0 - x*x + y*y + z*z);
+  }
 
   double r,x,y,z;
 };
