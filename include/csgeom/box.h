@@ -77,21 +77,21 @@ protected:
   csVector2 maxbox;
 
 public:
-  ///
+  /// Get the minimum X value of the box
   float MinX () const { return minbox.x; }
-  ///
+  /// Get the minimum Y value of the box
   float MinY () const { return minbox.y; }
-  ///
+  /// Get the maximum X value of the box
   float MaxX () const { return maxbox.x; }
-  ///
+  /// Get the maximum Y value of the box
   float MaxY () const { return maxbox.y; }
   /// Get Min component for 0 (x) or 1 (y).
   float Min (int idx) const { return idx ? minbox.y : minbox.x; }
   /// Get Max component for 0 (x) or 1 (y).
   float Max (int idx) const { return idx ? maxbox.y : maxbox.x; }
-  ///
+  /// Get the 2d vector of minimum (x, y) values
   const csVector2& Min () const { return minbox; }
-  ///
+  /// Get the 2d vector of maximum (x, y) values
   const csVector2& Max () const { return maxbox; }
 
   /**
@@ -432,17 +432,17 @@ protected:
   // Index by BOX_SIDE_? number.
   static bFace faces[6];
 public:
-  ///
+  /// Get the minimum X value of the box
   float MinX () const { return minbox.x; }
-  ///
+  /// Get the minimum Y value of the box
   float MinY () const { return minbox.y; }
-  ///
+  /// Get the minimum Z value of the box
   float MinZ () const { return minbox.z; }
-  ///
+  /// Get the maximum X value of the box
   float MaxX () const { return maxbox.x; }
-  ///
+  /// Get the maximum Y value of the box
   float MaxY () const { return maxbox.y; }
-  ///
+  /// Get the maximum Z value of the box
   float MaxZ () const { return maxbox.z; }
   /// Get Min component for 0 (x), 1 (y), or 2 (z).
   float Min (int idx) const
@@ -450,9 +450,9 @@ public:
   /// Get Max component for 0 (x), 1 (y), or 2 (z).
   float Max (int idx) const
   { return idx == 1 ? maxbox.y : idx == 0 ? maxbox.x : maxbox.z; }
-  ///
+  /// Get the 3d vector of minimum (x, y, z) values
   const csVector3& Min () const { return minbox; }
-  ///
+  /// Get the 3d vector of maximum (x, y, z) values
   const csVector3& Max () const { return maxbox; }
 
   /**

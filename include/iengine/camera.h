@@ -44,28 +44,67 @@ struct iPolygon3D;
 
 SCF_VERSION (iCamera, 0, 0, 12);
 
-/// Camera class.
+/**
+ * Camera class. This class represents camera objects which can be used to
+ * render a world in the engine. A camera has the following properties: <ul>
+ * <li> Home sector: The sector in which rendering starts.
+ * <li> Transformation: This is an orthonormal transformation which is applied
+ *      to all rendered objects to move them from world space to camera space.
+ *      It is the mathematical representation of position and direction of the
+ *      camera. The position should be inside the home sector.
+ * <li> Field of View: Controls the size on screen of the rendered objects and
+ *      can be used for zooming effects. The FOV can be given either in pixels
+ *      or as an angle in radians. The view is not zoomed if the FOV (in pixels)
+ *      is equal to the display height (@@@correct?), or (in radians) equal to
+ *      (@@@ to what?).
+ * <li> Shift amount: The projection center in screen coordinates.
+ * <li> Mirrored Flag: Should be set to true if the transformation is mirrored.
+ * <li> Far Plane: A distant plane that is orthogonal to the view direction. It
+ *      is used to clip away all objects that are farther away than a certain
+ *      distance, usually to improve rendering speed.
+ * <li> Camera number: An identifier for a camera transformation, used
+ *      internally in the engine to detect outdated vertex buffers.
+ * <li> Only Portals Flag: If this is true then no collisions are detected for
+ *      camera movement except for portals.
+ * </ul>
+ */
 struct iCamera : public iBase
 {
   /// Create a clone of this camera
   virtual iCamera *Clone () const = 0;
 
-  ///
+  /// Return the FOV (field of view) in pixels
   virtual int GetFOV () const = 0;
-  ///
+  /// Return the inverse flield of view (1/FOV) in pixels
   virtual float GetInvFOV () const = 0;
-  ///
+  /// Return the FOV (field of view) in radians
   virtual float GetFOVAngle () const = 0;
-  ///
-  virtual void SetFOV (int a, int width) = 0;
-  ///
-  virtual void SetFOVAngle (float a, int width) = 0;
 
-  ///
+  /**
+   * Set the FOV in pixels. 'fov' is the desired FOV in pixels. 'width' is
+   * the display width, also in pixels.
+   */
+  virtual void SetFOV (int fov, int width) = 0;
+  /**
+   * Set the FOV in radians. 'fov' is the desired FOV in radians. 'width' is
+   * the display width in pixels.
+   */
+  virtual void SetFOVAngle (float fov, int width) = 0;
+
+  /**
+   * Set the X shift amount. The parameter specified the desired X coordinate
+   * on screen of the projection center of the camera.
+   */
   virtual float GetShiftX () const = 0;
-  ///
+  /**
+   * Set the Y shift amount. The parameter specified the desired Y coordinate
+   * on screen of the projection center of the camera.
+   */
   virtual float GetShiftY () const = 0;
-  ///
+  /**
+   * Set the shift amount. The parameter specified the desired projection
+   * center of the camera on screen.
+   */
   virtual void SetPerspectiveCenter (float x, float y) = 0;
 
   /**

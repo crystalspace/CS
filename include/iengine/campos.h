@@ -26,10 +26,18 @@ struct iObject;
 struct iEngine;
 struct iCamera;
 
-SCF_VERSION (iCameraPosition, 0, 0, 2);
+SCF_VERSION (iCameraPosition, 0, 0, 3);
 
 /**
- * A camera position.
+ * A camera position. This object can be used to initialize a camera object to
+ * a certain state. It has the following properties: <ul>
+ * <li> Home sector name: This name is used to find the home sector of the
+ *      camera in the engine when the camera position is applied.
+ * <li> Position: Position of the camera
+ * <li> Upward and forward vectors: These vectors define the orientation of the
+ *      camera. More exactly, they are used to compute the transformation of
+ *      the camera.
+ * </ul>
  */
 struct iCameraPosition : public iBase
 {
@@ -41,26 +49,36 @@ struct iCameraPosition : public iBase
   
   /// Return the home sector
   virtual const char *GetSector() = 0;
+  /// Set the home sector
+  virtual void SetSector(const char *Name) = 0;
   
   /// Return the position
-  virtual csVector3 GetPosition() = 0;
+  virtual const csVector3 &GetPosition() = 0;
+  /// Set the position
+  virtual void SetPosition(const csVector3 &p) = 0;
   
   /// Return the 'up' vector
-  virtual csVector3 GetUpwardVector() = 0;
+  virtual const csVector3 &GetUpwardVector() = 0;
+  /// Set the 'up' vector
+  virtual void SetUpwardVector(const csVector3 &v) = 0;
   
   /// Return the 'front' vector
-  virtual csVector3 GetForwardVector() = 0;
-
-  /// Load the camera position into a camera object
-  virtual bool Load (iCamera*, iEngine*) = 0;
+  virtual const csVector3 &GetForwardVector() = 0;
+  /// Set the 'front' vector
+  virtual void SetForwardVector(const csVector3 &v) = 0;
 
   /// Set all attributes of the camera position
   virtual void Set (const char *sector, const csVector3 &pos,
       const csVector3 &forward, const csVector3 &upward) = 0;
+
+  /// Load the camera position into a camera object
+  virtual bool Load (iCamera*, iEngine*) = 0;
 };
+
 
 SCF_VERSION (iCameraPositionList, 0, 0, 1);
 
+/// A list of camera position objects.
 struct iCameraPositionList : public iBase
 {
   /// Create a new empty camera position.

@@ -71,3 +71,30 @@ bool csCameraPosition::Load (iCamera* oCamera, iEngine *e)
                Right.z, Upward.z, Forward.z));
   return true;
 }
+
+
+iObject *csCameraPosition::CameraPosition::QueryObject()
+  { return scfParent; }
+iCameraPosition *csCameraPosition::CameraPosition::Clone () const
+  { return &(new csCameraPosition (*scfParent))->scfiCameraPosition; }
+const char *csCameraPosition::CameraPosition::GetSector()
+  { return scfParent->Sector; }
+void csCameraPosition::CameraPosition::SetSector(const char *Name)
+  { scfParent->Sector = csStrNew (Name); }
+const csVector3 &csCameraPosition::CameraPosition::GetPosition()
+  { return scfParent->Position; }
+void csCameraPosition::CameraPosition::SetPosition (const csVector3 &v)
+  { scfParent->Position = v; }
+const csVector3 &csCameraPosition::CameraPosition::GetUpwardVector()
+  { return scfParent->Upward; }
+void csCameraPosition::CameraPosition::SetUpwardVector (const csVector3 &v)
+  { scfParent->Upward = v; }
+const csVector3 &csCameraPosition::CameraPosition::GetForwardVector()
+  { return scfParent->Forward; }
+void csCameraPosition::CameraPosition::SetForwardVector (const csVector3 &v)
+  { scfParent->Forward = v; }
+void csCameraPosition::CameraPosition::Set (const char *sector, const csVector3 &pos,
+      const csVector3 &forward, const csVector3 &upward)
+  { scfParent->Set (sector, pos, forward, upward); }
+bool csCameraPosition::CameraPosition::Load (iCamera *c, iEngine *e)
+  { return scfParent->Load (c, e); }

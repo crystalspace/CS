@@ -29,11 +29,15 @@ struct iEngine;
 struct iCamera;
 
 /**
- * Camera position structure. This structure is used internally by the
- * engine to store named camera positions than can be retrieved by
- * client programs to store starting map points, teleporter positions
- * and so on. In the map file you can use CAMERA (...) keyword to
- * define such points.
+ * A camera position. This object can be used to initialize a camera object to
+ * a certain state. It has the following properties: <ul>
+ * <li> Home sector name: This name is used to find the home sector of the
+ *      camera in the engine when the camera position is applied.
+ * <li> Position: Position of the camera
+ * <li> Upward and forward vectors: These vectors define the orientation of the
+ *      camera. More exactly, they are used to compute the transformation of
+ *      the camera.
+ * </ul>
  */
 class csCameraPosition : public csObject
 {
@@ -70,25 +74,19 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE(csCameraPosition);
 
-    virtual iObject *QueryObject()
-    { return scfParent; }
-    virtual iCameraPosition *Clone () const
-    { return &(new csCameraPosition (*scfParent))->scfiCameraPosition; }
-    virtual const char *GetSector()
-    { return scfParent->Sector; }
-    virtual csVector3 GetPosition()
-    { return scfParent->Position; }
-    virtual csVector3 GetUpwardVector()
-    { return scfParent->Upward; }
-    virtual csVector3 GetForwardVector()
-    { return scfParent->Forward; }
-    virtual bool Load (iCamera *c, iEngine *e)
-    { return scfParent->Load (c, e); }
+    virtual iObject *QueryObject();
+    virtual iCameraPosition *Clone () const;
+    virtual const char *GetSector();
+    virtual void SetSector(const char *Name);
+    virtual const csVector3 &GetPosition();
+    virtual void SetPosition (const csVector3 &v);
+    virtual const csVector3 &GetUpwardVector();
+    virtual void SetUpwardVector (const csVector3 &v);
+    virtual const csVector3 &GetForwardVector();
+    virtual void SetForwardVector (const csVector3 &v);
     virtual void Set (const char *sector, const csVector3 &pos,
-      const csVector3 &forward, const csVector3 &upward)
-    {
-      scfParent->Set (sector, pos, forward, upward);
-    }
+      const csVector3 &forward, const csVector3 &upward);
+    virtual bool Load (iCamera *c, iEngine *e);
   } scfiCameraPosition;
   friend struct CameraPosition;
 };
