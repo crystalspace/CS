@@ -70,6 +70,8 @@ chronological order.
 	      shadow mesh is used; if not present, no shadow is casted.
 	      However, the shadow mesh is tested for closedness.
 	- Duhprey commited the ode.h he forgot to commit yesterday
+	- Troy fixed strcmp calls in stringarray.h (Find & and 
+	  FindCaseInsensitive).
 3-Sep-2003
 	- Peter Amstutz changed nullmesh to properly initialize it's
 	  bounding box to a legal (albeit extremely small) value.
