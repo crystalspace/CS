@@ -41,7 +41,7 @@ endif
 INC.CSPARSER = $(wildcard plugins/csparser/*.h)
 SRC.CSPARSER = $(wildcard plugins/csparser/*.cpp)
 OBJ.CSPARSER = $(addprefix $(OUT),$(notdir $(SRC.CSPARSER:.cpp=$O)))
-DEP.CSPARSER = CSUTIL CSSYS CSUTIL CSGEOM CSTOOL CSGFX
+DEP.CSPARSER = CSUTIL CSTOOL CSSYS CSUTIL CSGEOM CSTOOL CSGFX
 
 MSVC.DSP += CSPARSER
 DSP.CSPARSER.NAME = csparser
