@@ -54,7 +54,8 @@ char *csStrNew (const char *s)
 static bool RecursivecsCombinations (int *vector, int top, int mask, int m, int n,
   bool (*callback) (int *vector, int count, void *arg), void *arg)
 {
-  for (int i = 0; i < m; i++)
+  int i;
+  for (i = 0; i < m; i++)
   {
     if (mask & (1 << i))
       continue;
