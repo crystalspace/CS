@@ -68,6 +68,7 @@ public:
       free (root);
       root = NULL;
       count = 0;
+      limit = 0;
     }
   }
 

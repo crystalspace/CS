@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+14-Jan-2002
+	- Keith Fulton fixed a bug in csPArray and csRefArray where DeleteAll()
+	  would not set the limit to 0.
+	- Keith also fixed FindByName() and GetIndexByName() in
+	  csRefArrayObject when the name of the object was NULL.
+	- Fixed a bug in csGrowingArray where DeleteAll() would not set
+	  the limit to 0.
 13-Jan-2002
 	- Further work on XML doc.
 	- Added support for <key> in mesh factories and collections.

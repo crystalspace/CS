@@ -50,7 +50,8 @@ public:
     for (i = 0 ; i < Length () ; i++)
     {
       T* o = (*this)[i];
-      if (o->QueryObject ()->GetName () && !strcmp (o->QueryObject ()->GetName (), name))
+      const char* n = o->QueryObject ()->GetName ();
+      if (n && !strcmp (n, name))
         return i;
     }
     return -1;
