@@ -20,8 +20,8 @@ chronological order.
 	- Eric Sunshine fixed problem in cspython/Jamfile where invocations of
 	  CFlags, LFlags, and ExternalLibs were dysfunctional for 'pythmod'
 	  target.
-        - Philip Wyett changed order of variable initialisation variables,
-          culling a compiler warning in particles.cpp.
+        - Philip Wyett changed order of variable initialisation, culling a
+          compiler warning in particles.cpp.
 22-Jul-2004
 	- Jorrit started work on adding a new test to csbench to test lots
 	  of smaller objects.
