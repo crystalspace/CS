@@ -21,6 +21,8 @@ for each given day, however, are in normal (ascending) chronological order.
 	  (csScanPluginsDir and related, iSCF (QueryClassList)).
 	- Jorrit finally removed csStrVector, iStrVector, and scfStrVector.
 	- Jorrit also fixed the python plugin for all latest changes.
+	- Jorrit renamed FindSortedKey to FindSorted in csStringArray
+	  and iStringArray.
 28-Jul-2003
 	- Jorrit removed several csVector's throughout CS:
 	    - Replaced 'render_priorities' in the engine with csStringArray.

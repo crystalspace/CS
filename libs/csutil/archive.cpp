@@ -692,7 +692,7 @@ void csArchive::UpdateDirectory ()
 
 bool csArchive::IsDeleted (const char *name) const
 {
-  return (del.FindSortedKey ((void*)name) >= 0);
+  return (del.FindSorted (name) >= 0);
 }
 
 void csArchive::UnpackTime (ush zdate, ush ztime, csFileTime & rtime) const

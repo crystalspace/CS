@@ -70,9 +70,9 @@ public:
   }
 
   /// Find index of a string in a pre-sorted string array.
-  virtual int FindSortedKey (void *key) const
+  virtual int FindSorted (const char *value) const
   {
-    return v.FindSortedKey (key);
+    return v.FindSorted (value);
   }
 
   /// Sort the string array.

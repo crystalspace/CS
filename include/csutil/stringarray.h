@@ -24,7 +24,6 @@
 #include "csutil/util.h"
 
 typedef int csStringArrayCompareFunction (char const* item1, char const* item2);
-typedef int csStringArrayCompareKeyFunction (char const* item, void* key);
 typedef int csStringArraySortFunction (void const* item1, void const* item2);
 
 /**
@@ -346,14 +345,14 @@ public:
   /**
    * Find an element based on some key.
    */
-  int FindSortedKey (void* key,
-  	csStringArrayCompareKeyFunction* comparekey) const
+  int FindSorted (const char* key,
+  	csStringArrayCompareFunction* compare) const
   {
     int l = 0, r = Length () - 1;
     while (l <= r)
     {
       int m = (l + r) / 2;
-      int cmp = comparekey (root [m], key);
+      int cmp = compare (root [m], key);
 
       if (cmp == 0)
         return m;
@@ -393,16 +392,6 @@ public:
     return m;
   }
 
-  static int CaseSensitiveCompare (char const* item, void* key)
-  {
-    return strcmp (item, (char*)key);
-  }
-
-  static int CaseInsensitiveCompare (char const* item, void* key)
-  {
-    return strcasecmp (item, (char*)key);
-  }
-
   static int CaseSensitiveCompare (char const* item1, char const* item2)
   {
     return strcmp (item1, item2);
@@ -426,9 +415,9 @@ public:
   /**
    * Find an element in a case sensitive way.
    */
-  int FindSortedKey (void* key) const
+  int FindSorted (const char* key) const
   {
-    return FindSortedKey (key, CaseSensitiveCompare);
+    return FindSorted (key, CaseSensitiveCompare);
   }
 
   /**
