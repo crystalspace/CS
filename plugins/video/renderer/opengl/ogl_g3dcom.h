@@ -36,7 +36,7 @@
 #include "csutil/cfgacc.h"
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
-#include "video/renderer/common/polybuf.h"
+#include "ogl_polybuf.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/poly3d.h"
 #include "ivideo/graph3d.h"
@@ -324,6 +324,47 @@ private:
     csPlane3* planes, int num_planes,
     csPlane3* diag_planes, int num_diag_planes);
 
+
+  void ClipTrianglePolygonMesh (
+    int num_triangles,
+    int num_vertices,
+    csTriangle* triangles,
+    csVector3* vertices,
+    csVector2* texels,
+    csColor* vertex_colors,
+    G3DFogInfo* vertex_fog,
+    iPolyTex_p* lightmaps,
+    int& num_clipped_triangles,
+    int& num_clipped_vertices,
+    bool transform,
+    bool mirror,
+    bool exact_clipping,
+    bool plane_clipping,
+    bool z_plane_clipping,
+    bool frustum_clipping);
+
+
+  void ClipTrianglePolygonMesh (
+    int num_triangles,
+    int num_vertices,
+    csTriangle* triangles,
+    csVector3* vertices,
+    csVector2* texels,    
+    csColor* vertex_colors,
+    G3DFogInfo* vertex_fog,
+    iPolyTex_p* lightmaps,
+    int& num_clipped_triangles,
+    int& num_clipped_vertices,
+    bool exact_clipping,
+    const csVector3& frust_origin,
+    csPlane3* planes, int num_planes,
+    csPlane3* diag_planes, int num_diag_planes);
+
+
+
+
+
+
   /**
    * Draw the outlines of all triangles. This function accepts
    * the same arguments as glDrawElements() (but GL_TRIANGLES
@@ -510,7 +551,7 @@ public:
   /// The texture manager
   csTextureManagerOpenGL* txtmgr;
   /// The vertex buffer manager.
-  csPolArrayVertexBufferManager* vbufmgr;
+  csTriangleArrayVertexBufferManager* vbufmgr;
 
   /// The lightmap cache.
   OpenGLLightmapCache* lightmap_cache;

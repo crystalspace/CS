@@ -1,5 +1,14 @@
 The history order is reversed so that new features are at the top.
 
+19-Feb-2002
+	- Toni Asco' Gonzalez implemented a faster version of DrawPolygonMesh()
+	  for OpenGL. This code is still experimental but it seems to work.
+	  Fog is not yet correct though. To enable this use the FASTMESH()
+	  option inside the PARAMS() block of a thing mesh object.
+	  The speed increase will be mostly visible on small objects with
+	  a high polygon count. Don't use it on an entire level because
+	  then the mesh will have to be clipped and this degrades performance
+	  again.
 18-Feb-2002
 	- Added experimental code to allow video mode selection using
 	  AWS. This does not work yet and the API is subject to change
