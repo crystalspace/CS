@@ -31,6 +31,7 @@
 
 struct iObjectRegistry;
 class csEngineSequenceManager;
+class OpStandard;
 
 /**
  * Implementation of iEngineSequenceParameters.
@@ -137,6 +138,7 @@ public:
 		  const csColor& color);
   void AddOperationFadeAmbient (csTicks time, iParameterESM* light,
 		  const csColor& color, csTicks duration);
+  void AddOperationRandomDelay(csTicks time,int min, int max);
   void AddOperationSetMeshColor (csTicks time, iParameterESM* mesh,
 		  const csColor& color);
   void AddOperationFadeMeshColor (csTicks time, iParameterESM* mesh,
@@ -170,6 +172,8 @@ public:
   		  iParameterESM* trigger,
 		  iSequence* trueSequence,
 		  iSequence* falseSequence);
+
+  void OverrideTimings(OpStandard *afterop,int ticks);
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
@@ -226,6 +230,10 @@ public:
 		  const csColor& color, csTicks duration)
     {
       scfParent->AddOperationFadeAmbient (time, light, color, duration);
+    }
+    virtual void AddOperationRandomDelay (csTicks time,int min, int max)
+    {
+      scfParent->AddOperationRandomDelay (time,min,max);
     }
     virtual void AddOperationSetMeshColor (csTicks time, iParameterESM* mesh,
 		  const csColor& color)

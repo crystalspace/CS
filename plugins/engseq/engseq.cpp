@@ -25,6 +25,7 @@
 #include "csgeom/math3d.h"
 #include "csutil/scf.h"
 #include "csutil/cscolor.h"
+#include "csutil/rng.h"
 #include "iutil/objreg.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -764,6 +765,36 @@ public:
   }
 };
 
+/**
+ * Random Delay operation.
+ */
+class OpRandomDelay : public OpStandard
+{
+private:
+  iEngineSequenceManager* eseqmgr;
+  int min,max;
+  csRandomGen *rg;
+  csSequenceWrapper *sequence;
+public:
+  OpRandomDelay (int min_int, int max_int,csSequenceWrapper *seq,iEngineSequenceManager* seqmgr)
+  {
+    min = min_int;
+    max = max_int;
+    sequence = seq;
+    eseqmgr  = seqmgr;
+    rg = new csRandomGen(csGetTicks()+(int)this);  // seed rng
+  }
+  virtual ~OpRandomDelay ()
+  {
+    delete rg;
+  }
+  virtual void Do (csTicks dt, iBase* params)
+  {
+    int delay = rg->Get(max-min) + min;
+    sequence->OverrideTimings(this, delay);
+  }
+};
+
 //---------------------------------------------------------------------------
 
 /**
@@ -1036,6 +1067,13 @@ void csSequenceWrapper::AddOperationFadeAmbient (csTicks time,
   op->DecRef ();
 }
 
+void csSequenceWrapper::AddOperationRandomDelay(csTicks time,int min, int max)
+{
+  OpRandomDelay* op = new OpRandomDelay (min,max,this,eseqmgr);
+  sequence->AddOperation (time,op);
+  op->DecRef();
+}
+
 void csSequenceWrapper::AddOperationSetMeshColor (csTicks time,
 	iParameterESM* mesh, const csColor& color)
 {
@@ -1117,6 +1155,29 @@ void csSequenceWrapper::AddOperationTestTrigger (csTicks time,
   CondTestTrigger* cond = new CondTestTrigger (trigger);
   sequence->AddCondition (time, cond, trueSequence, falseSequence);
   cond->DecRef ();
+}
+
+void csSequenceWrapper::OverrideTimings(OpStandard *afterop,int ticks)
+{
+  csSequenceOp *curr;
+  int time_diff=0;
+  csTicks last_time;
+
+  for (curr = sequence->GetFirstSequence(); curr; curr = curr->next)
+  {
+    if (curr->operation == afterop)
+    {
+      // calculate delta relative to time which is already set there
+      csSequenceOp *nextop = curr->next;
+      if (nextop)
+        time_diff = curr->time + ticks - nextop->time;
+    }
+    else if (time_diff)
+    {
+      // adjust time for op by diff amount
+      curr->time += time_diff;
+    }
+  }
 }
 
 //---------------------------------------------------------------------------

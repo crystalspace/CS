@@ -27,16 +27,6 @@
 
 struct iObjectRegistry;
 
-struct csSequenceOp
-{
-  csSequenceOp* next, * prev;
-  csTicks time;
-  csRef<iBase> params;
-  csRef<iSequenceOperation> operation;
-
-  csSequenceOp () { }
-  ~csSequenceOp () { }
-};
 
 class csSequence : public iSequence
 {

@@ -744,8 +744,25 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
 	break;
       case XMLTOKEN_DELAY:
         {
-	  int delay = child->GetContentsValueAsInt ();
-	  cur_time += delay;
+	  int min,max,time;
+	  min  = child->GetAttributeValueAsInt ("min");
+	  max  = child->GetAttributeValueAsInt ("max");
+	  time = child->GetAttributeValueAsInt ("time");
+	  if (!time && !(min || max))
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.sequence",
+		child, "Delay tag in sequence '%s' must specify time, or min and max!",
+		seqname);
+	    return NULL;
+	  }
+	  if (!time)
+	  {
+	    sequence->AddOperationRandomDelay (cur_time, min, max);
+	    cur_time += min;
+	  }
+	  else
+	    cur_time += time;  // standard delay can be hardcoded into next op
 	}
 	break;
       case XMLTOKEN_MOVE:
