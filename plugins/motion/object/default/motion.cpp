@@ -98,8 +98,9 @@ void csMotionManager::CompileMotion ( csAppliedMotion *mot )
   
   mot->numframes = mot->curmotion->numframes;
   int numlink;
+  int i, j;
 
-  for (int i = 0; i < mot->numframes ; i++ )
+  for ( i = 0; i < mot->numframes ; i++ )
   {
 	csAppliedFrame *fr = new csAppliedFrame();
 	fr->numqlinks = 0 ;
@@ -117,7 +118,7 @@ void csMotionManager::CompileMotion ( csAppliedMotion *mot )
 
 	if ((numlink =  mot->curmotion->frames[i].numqlinks))
 	{
-	  for ( int j = 0; j < numlink; j++ )
+	  for ( j = 0; j < numlink; j++ )
 	  {
 		iSkeletonBone *bone = FindBone( mot->skel, mot->curmotion->frames[i].qaffector[j] );
 		if (bone)
@@ -142,7 +143,7 @@ void csMotionManager::CompileMotion ( csAppliedMotion *mot )
 	
 	if ((numlink =  mot->curmotion->frames[i].nummlinks))
 	{
-	  for ( int j = 0; j < numlink; j++ )
+	  for ( j = 0; j < numlink; j++ )
 	  {
 		iSkeletonBone *bone = FindBone( mot->skel, mot->curmotion->frames[i].maffector[j] );
 		if (bone)
@@ -167,7 +168,7 @@ void csMotionManager::CompileMotion ( csAppliedMotion *mot )
 	
 	if ((numlink =  mot->curmotion->frames[i].numvlinks))
 	{
-	  for ( int j = 0; j < numlink; j++ )
+	  for ( j = 0; j < numlink; j++ )
 	  {
 		iSkeletonBone *bone = FindBone( mot->skel, mot->curmotion->frames[i].vaffector[j] );
 		if (bone)
@@ -266,11 +267,11 @@ void csMotionManager::UpdateTransform( iSkeletonBone *bone, csVector3 *vec )
 void csMotionManager::UpdateAppliedFrame(csAppliedFrame *fr)
 {
   int i;
-  for (i = 0; i < fr->numqlinks; i++ )
+  for ( i = 0; i < fr->numqlinks; i++ )
 	UpdateTransform( fr->qaffector[i], fr->qlinks[i] );
-  for (i = 0; i < fr->nummlinks; i++ )
+  for ( i = 0; i < fr->nummlinks; i++ )
 	UpdateTransform( fr->maffector[i], fr->mlinks[i] );
-  for (i = 0; i < fr->numvlinks;  i++ )
+  for ( i = 0; i < fr->numvlinks;  i++ )
 	UpdateTransform( fr->vaffector[i], fr->vlinks[i] );
 }
 
@@ -289,7 +290,8 @@ bool csMotionManager::UpdateAppliedMotion(csAppliedMotion *am, cs_time elapsedti
     am->curtime -= am->frames[size-1]->keyframe;
   }
 
-  for(int i=0; i<size; i++)
+  int i;
+  for(i=0; i<size; i++)
   {
     if(am->frames[i]->keyframe==am->curtime)
     {
@@ -325,7 +327,8 @@ void csMotionManager::UpdateAll( int time )
   cs_time elapsed_time = time - oldtime;
   oldtime = time;
   int size = skels.Length();
-  for (int i = 0; i < size; i++)
+  int i;
+  for (i = 0; i < size; i++)
   {
 	UpdateAppliedMotion( skels[i], elapsed_time);
   }
@@ -358,7 +361,8 @@ csMotion::~csMotion()
   if (translate) free (translate);
   if (frames)
   {
-    for (int i = 0; i < numframes; i++)
+	int i;
+    for (i = 0; i < numframes; i++)
     {
       if (frames[i].numqlinks)
       {
