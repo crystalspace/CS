@@ -87,7 +87,6 @@ private:
   static inline void csProcessorCapability::CheckX86Processor ()
   {
     int32 capFlags;
-    int32 extFlags;
     int CPUnum;
     int maxEax;
 
