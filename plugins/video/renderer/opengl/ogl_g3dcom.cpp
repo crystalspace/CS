@@ -248,6 +248,8 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   toplevel_init = false;
   stencil_init = false;
   planes_init = false;
+  planes_add_near_clip = false;
+  planes_add_z_clip = false;
   frustum_valid = false;
   clipportal_dirty = false;
 
@@ -1219,8 +1221,14 @@ void csGraphics3DOGLCommon::SetDimensions (int width, int height)
 void csGraphics3DOGLCommon::SetupClipPlanes (bool add_near_clip,
   bool add_z_clip)
 {
-  if (planes_init) return;
+  if (planes_init
+  	&& planes_add_near_clip == add_near_clip
+  	&& planes_add_z_clip == add_z_clip)
+    return;
   planes_init = true;
+  planes_add_near_clip = add_near_clip;
+  planes_add_z_clip = add_z_clip;
+
   // This routine assumes the hardware planes can handle the
   // required number of planes from the clipper.
   if (clipper && GLCaps.nr_hardware_planes >= 0)
@@ -1291,6 +1299,8 @@ void csGraphics3DOGLCommon::SetClipper (iClipper2D* clip, int cliptype)
   frustum_valid = false;
   stencil_init = false;
   planes_init = false;
+  planes_add_near_clip = false;
+  planes_add_z_clip = false;
 
 #if 0
 // @@@ TODO: init z-buffer

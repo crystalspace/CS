@@ -33,6 +33,14 @@ chronological order.
 	- Jorrit made 'ieplex' optional in walktest and then removed the
 	  target from 'jam walkall'.
 	- Jorrit removed 'crossbld' from the 'meshes' target.
+	- Jorrit fixed a bad and old clipping bug in the old OpenGL renderer.
+	  This bug manifested itself if plane clipping (P) was selected as
+	  the default clipping method AND if a clipped portal had five
+	  vertices AND the previous portal had four vertices AND an object
+	  was rendered that required plane clipping. In that specific case
+	  the fifth plane was not calculated. This bug sounds rather
+	  esoteric but it manifested very easily with the recent removal
+	  of single polygon drawing.
 	- Eric Sunshine removed 8-bit character from csjoywin.h, csjoylin.h,
 	  and csjoylin.cpp.
 15-Oct-2003

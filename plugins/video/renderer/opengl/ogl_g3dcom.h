@@ -458,8 +458,12 @@ protected:
   bool stencil_init;
   /**
    * If true then the OpenGL clipping planes are initialized for this clipper.
+   * Also compare the 'add_near_clip' and 'add_z_clip' values to see if the
+   * planes are really valid.
    */
   bool planes_init;
+  bool planes_add_near_clip;
+  bool planes_add_z_clip;
 
   /// The current near plane.
   csPlane3 near_plane;
