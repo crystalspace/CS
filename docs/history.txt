@@ -3,28 +3,27 @@ The history order has been reversed so that new features are at the top.
 17-Apr-2001
 	- Martin Geisse eliminated some warnings in the function terrain
 	  loader.
-	- Philip Wyett eliminated three uninitialized variable warnings to
-	  ch under VC6 (avi plugin).
+	- Philip Wyett eliminated three uninitialized variable warnings to ch
+	  under VC6 (avi plugin).
 	- Implemented TEST and NONE z-buffer modes for all perspective correct
-	  texture mapping routines in the software renderer. Also implemented
+	  texture mapping routines in the software renderer.  Also implemented
 	  TEST z-buffer mode routines for all perspetive incorrect texture
-	  mapping routines. This completes support for all Z-buf modes
-	  in the software renderer.
-	- Fixed a bug in the OpenGL renderer with regards to clearing of
-	  the Z-buffer. When the last operation in the previous frame disables
-	  the Z-buffer writing (glDepthMask()) then the clear of the
-	  Z-buffer will not happen. This is because glClear() actually listens
-	  to the buffer write masks and doesn't update the buffer when the
-	  mask is disabled. This affected iso mostly as CS normally doesn't
-	  require a clear of the Z-buffer.
+	  mapping routines.  This completes support for all Z-buf modes in the
+	  software renderer.
+	- Fixed a bug in the OpenGL renderer with regards to clearing of the
+	  Z-buffer.  When the last operation in the previous frame disables the
+	  Z-buffer writing (glDepthMask()) then the clear of the Z-buffer will
+	  not happen.  This is because glClear() actually listens to the buffer
+	  write masks and doesn't update the buffer when the mask is disabled.
+	  This affected iso mostly as CS normally doesn't require a clear of
+	  the Z-buffer.
 	- Started preparation work for stencil buffer support in OpenGL
 	  renderer.
-	- Added csCubicSpline to csgeom. This is going to be used for an
-	  algo to calculate a smooth path between points.
-	- Wouter Wijngaards did the following update:
-	  The isometric sprites now use zbuffer TEST mode when the sprite is
-	  transparent. This removes some glitches in drawing overlapping
-	  transparent sprites.
+	- Added csCubicSpline to csgeom.  This is going to be used for an algo
+	  to calculate a smooth path between points.
+	- Wouter Wijngaards did the following update: The isometric sprites now
+	  use zbuffer TEST mode when the sprite is transparent.  This removes
+	  some glitches in drawing overlapping transparent sprites.
 	- Eric Sunshine reverted Philip Wyett's changes to blocks.cpp.
 	  Philip's intention was to fix a problem with Blocks locking up at
 	  termination time on Windows 2000.  Unfortunately, his changes were
@@ -71,48 +70,50 @@ The history order has been reversed so that new features are at the top.
 	  build process, despite the fact that the application is in need of a
 	  major overhaul.  Also added CSGFX to the dependency list in
 	  levtool.mak.
+	- Eric Sunshine fixed SetGridChangeCallback() and
+	  GetGridChangeCallback() in iso.h and isospr.h so that they compile
+	  error-free with the broken NextStep compiler.  Function pointer
+	  references were confusing the electronic fellow.  In the process,
+	  increased the likelihood that humans will be able to parse these
+	  function protyptes as well.
 16-Apr-2001
 	- Added iEngine::CreateSectorWallsMesh().
-	- Fixed simplep (plugin version of simple) so that it works
-	  again.
-	- Philip Wyett fixed a little nasty bug under Windows 2000 for
-	  Blocks. Removed void cleanup() and all it's calls
-	  and moved all it's contents to the blocks
-	  destructor.
-	  This fixes where Windows 2000 could not successfully close
-	  the app and locked up (non responding).
-	- Philip also removed lots of compiler warnings in VC6 port.
-	  85% of CS warnings many VC specific and some which should have
-	  been apparrent in other compilers.
+	- Fixed simplep (plugin version of simple) so that it works again.
+	- Philip Wyett fixed a little nasty bug under Windows 2000 for Blocks.
+	  Removed void cleanup() and all it's calls and moved all it's contents
+	  to the blocks destructor.  This fixes where Windows 2000 could not
+	  successfully close the app and locked up (non responding).
+	- Philip also removed lots of compiler warnings in VC6 port.  85% of CS
+	  warnings many VC specific and some which should have been apparrent
+	  in other compilers.
 	- Wouter Wijngaards did some more work on the isometric engine:
-	    - Changed size of front facing sprites to be more correct.
-	      (less fat).
-	    - Added a 'halo' sprite for the blue light in isotest - you
-	      can see the alpha problems using both transparent sprites
-	      now. However, when I try to enable ZBUF_TEST, the effect
-	      is ZBUF_NONE.
-	- Wouter also changed the demo particle systems in walktest to
-	  use ZBUF_TEST mode. This makes them look a lot better. For
-	  the 'flame' commans (a fire particle system), this helps a lot.
+	    - Changed size of front facing sprites to be more correct.  (less
+	      fat).
+	    - Added a 'halo' sprite for the blue light in isotest - you can see
+	      the alpha problems using both transparent sprites now.  However,
+	      when I try to enable ZBUF_TEST, the effect is ZBUF_NONE.
+	- Wouter also changed the demo particle systems in walktest to use
+	  ZBUF_TEST mode.  This makes them look a lot better.  For the 'flame'
+	  commans (a fire particle system), this helps a lot.
 	- Martin Geisse extended the iEngine interface and added iTextureList.
 	- Martin also added lots of methods to iTextureWrapper.
 15-Apr-2001
-	- Martin Geisse removed csstdldr, the test application for it,
-	  the iLoader interface and renamed iLoaderNew to iLoader.
-	- Martin also made the csparser stats counter a non-static member
-	  of csloader
-	- Martin added a parameter to the Delete(), Replace() and
-	  DeleteAll() functions of csVector that lets you choose whether
-	  to free the deleted element.
+	- Martin Geisse removed csstdldr, the test application for it, the
+	  iLoader interface and renamed iLoaderNew to iLoader.
+	- Martin also made the csparser stats counter a non-static member of
+	  csloader
+	- Martin added a parameter to the Delete(), Replace() and DeleteAll()
+	  functions of csVector that lets you choose whether to free the
+	  deleted element.
 	- Philip Wyett did the following:
-	  Brought VC6 port into the new millennium by updating png lib
-	  used from 1.0.0.2 to 1.0.1.0. This update offers many little
-	  texture artifact fixes/improvements which I will not bother
-	  to list, check the apps for yourselves. ;-)
+	  Brought VC6 port into the new millennium by updating png lib used
+	  from 1.0.0.2 to 1.0.1.0.  This update offers many little texture
+	  artifact fixes/improvements which I will not bother to list, check
+	  the apps for yourselves.  ;-)
 	  Updated MSVC project file auto-generation process to elimate
-	  '/NODEFAULTLIB: "LIBC"' warnings generated by the change.
-	  Updated docs to point to location of new winlibs package
-	  (version 16) where it will be stored on the 3D Downloads site.
+	  '/NODEFAULTLIB: "LIBC"' warnings generated by the change.  Updated
+	  docs to point to location of new winlibs package (version 16) where
+	  it will be stored on the 3D Downloads site.
 	  NOTE:
 	  The new lib requires use of a new "png.dll", which can be
 	  obtained temporarily from the Red Eye Entertainment server.
@@ -136,29 +137,28 @@ The history order has been reversed so that new features are at the top.
 	- Philip Wyett did a minor update to win32.txi.
 	- Richard D. Shank did a minor update to win32.txi.
 14-Apr-2001
-	- Philip Wyett added 'include imap/parser.h" and fixed many
-	  of a slew of compiler errors in the app. App is
-	  still broken though at present.
-	- Martin Geisse fixed a few more applications with regards to
-	  the csparser stuff.
+	- Philip Wyett added 'include imap/parser.h" and fixed many of a slew
+	  of compiler errors in the app.  App is still broken though at
+	  present.
+	- Martin Geisse fixed a few more applications with regards to the
+	  csparser stuff.
 	- Martin also did further work on csloader:
-	    - Added a new image format flag that indicates an invalid
-	      format. This flag may not be used in csImage or the
-	      image loader, but higher-level modules such as csloader
-	      may use this flag to say 'use the default format'. It's much
-	      like the NULL pointer.
-	    - Extended csLoader::LoadImage() so you can choose an
-	      alternate format for the image.
-	    - Extended csLoader::LoadTexture() so you can choose an
-	      alternate texture manager for the texture.
+	    - Added a new image format flag that indicates an invalid format.
+	      This flag may not be used in csImage or the image loader, but
+	      higher-level modules such as csloader may use this flag to say
+	      'use the default format'.  It's much like the NULL pointer.
+	    - Extended csLoader::LoadImage() so you can choose an alternate
+	      format for the image.
+	    - Extended csLoader::LoadTexture() so you can choose an alternate
+	      texture manager for the texture.
 	    - Ptlab uses the extended LoadImage() instead of its own function.
 	    - Cleaned up the way csloader handles plugins.
 13-Apr-2001
 	- Martin Geisse did the following changes:
-	    - Added texture loading methods to iLoaderNew. The loader now
-	      uses these functions for texture loading.
-	    - Added a temporary function to iTextureWrapper to get the
-	      private csTextureWrapper object.
+	    - Added texture loading methods to iLoaderNew.  The loader now uses
+	      these functions for texture loading.
+	    - Added a temporary function to iTextureWrapper to get the private
+	      csTextureWrapper object.
 	    - Fixed a bug in csTextureWrapper.
 	    - Fixed VC compilation problems in csPortal.
 	    - Made all static functions non-static.
@@ -173,15 +173,15 @@ The history order has been reversed so that new features are at the top.
 	  colored, dynamic lighting. Shadows are calculated in realtime.
 	  In addition he did the following things:
 	    - Smaller player.
-	    - Added a stone pillar to the isotest app to show the
-	      lighting and shadows.
+	    - Added a stone pillar to the isotest app to show the lighting and
+	      shadows.
 	    - Added a nice doorway to show off lighting.
-	    - The blue light now uses another attenuation type, nicely
-	      casts through the door opening now.
+	    - The blue light now uses another attenuation type, nicely casts
+	      through the door opening now.
 	    - The vertical scale has been corrected for the skew.
 	    - Performed some speed optimisations.
-	    - Added mouse support to isotest.  You can click where you
-	      want to move to.
+	    - Added mouse support to isotest.  You can click where you want to
+	      move to.
 	    - Made keyboard cursorskeys in isotest more intuitive.
 	    - Added support for transparency in the isometric engine.
   	    - Changed the player sprite in isotest to be partially transparent.

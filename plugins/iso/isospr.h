@@ -74,12 +74,11 @@ public:
   virtual const csVector3& GetVertexPosition(int i) { return poly[i];}
   virtual void AddToVertexColor(int i, const csColor& color);
   virtual iIsoGrid *GetGrid() const {return grid;}
-  virtual void SetGridChangeCallback(void (*func)(iIsoSprite *, void *),
-    void *data) {gridcall = func; gridcalldata = data;}
-  virtual void GetGridChangeCallback(void (*&func)(iIsoSprite *, void *),
-    void *&data) const {func = gridcall; data = gridcalldata;}
+  virtual void SetGridChangeCallback(GridChangeCallbackType func, void *data)
+  {gridcall = func; gridcalldata = data;}
+  virtual void GetGridChangeCallback(GridChangeCallbackType &func, void *&data)
+    const {func = gridcall; data = gridcalldata;}
   virtual void ForcePosition(const csVector3& pos) {position = pos;}
-
 };
 
 #endif

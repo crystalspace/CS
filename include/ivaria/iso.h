@@ -82,7 +82,6 @@ struct iIsoEngine : public iPlugIn
     float h) = 0;
 };
 
-
 SCF_VERSION (iIsoWorld, 0, 0, 1);
 
 /**
@@ -273,7 +272,6 @@ struct iIsoView : public iBase
    * Call this when in 3d mode (with the engine->getBeginDrawFlags passed)
    */
   virtual void Draw() = 0;
-
 };
 
 SCF_VERSION (iIsoRenderView, 0, 0, 1);
@@ -314,6 +312,9 @@ SCF_VERSION (iIsoSprite, 0, 0, 1);
 */
 struct iIsoSprite : public iBase
 {
+  /// Type of grid-change callback hook.
+  typedef void (*GridChangeCallbackType)(iIsoSprite *, void *);
+
   /// get the number of vertices
   virtual int GetNumVertices() const = 0;
   /// add a new vertex to the polygon
@@ -355,10 +356,9 @@ struct iIsoSprite : public iBase
   /// get the grid this sprite is part of
   virtual iIsoGrid *GetGrid() const = 0;
   /// set a callback for when the sprite moves to another grid
-  virtual void SetGridChangeCallback(void (*func)(iIsoSprite *, void *),
-    void *data) = 0;
+  virtual void SetGridChangeCallback(GridChangeCallbackType, void *data) = 0;
   /// get the callback for when the sprite moves to another grid
-  virtual void GetGridChangeCallback(void (*&func)(iIsoSprite *, void *),
+  virtual void GetGridChangeCallback(GridChangeCallbackType&,
     void *&data) const = 0;
 };
 
@@ -410,7 +410,6 @@ struct iIsoLight : public iBase
   virtual void ShineGrid() = 0;
   /// shine the light on a sprite, adding to all the vertex colors
   virtual void ShineSprite(iIsoSprite *sprite) = 0;
-
 };
 
 #endif
