@@ -811,7 +811,7 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
   iRender3D* r3d = rview->GetGraphics3D ();
 
   mater->Visit ();
-  if(!factory->GetEdgeMidpoint()) return //bad hack.. EdgeMidpoint might not be initialized on first rendering
+  if(!factory->GetEdgeMidpoint()) return false; //bad hack.. EdgeMidpoint might not be initialized on first rendering
 
   // Prepare for rendering.
   mesh.z_buf_mode = CS_ZBUF_TEST;
