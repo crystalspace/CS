@@ -62,6 +62,7 @@ csFreeType2Server::csFreeType2Server (iBase *pParent)
 
 csFreeType2Server::~csFreeType2Server ()
 {
+  fonts.DeleteAll();
   if (freetype_inited) 
   {
     FT_Done_FreeType (library);
@@ -196,6 +197,7 @@ csFreeType2Font::~csFreeType2Font ()
     FT_Done_Face (face);
   }
   delete [] fontdata;
+  delete [] name;
 }
 
 void csFreeType2Font::SetSize (int iSize)

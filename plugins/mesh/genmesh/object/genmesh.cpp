@@ -943,6 +943,8 @@ csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
   delete[] top_mesh.vertex_fog;
 #endif
   delete[] polygons;
+  if (mesh_tri_normals)
+    delete [] mesh_tri_normals;
 }
 
 void csGenmeshMeshObjectFactory::CalculateBBoxRadius ()
