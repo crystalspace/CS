@@ -26,8 +26,8 @@
 #include "cscom/com.h"
 #include "csengine/world.h"
 #include "csutil/vfs.h"
-#include "csutil/newclass.h"
-#include "csutil/intrface.h"
+#include "csengine/newclass.h"
+#include "csengine/intrface.h"
 #include "csutil/inifile.h"
 
 class csWorld;

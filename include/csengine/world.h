@@ -26,9 +26,9 @@
 #include "csengine/tranman.h"
 #include "csobject/csobj.h"
 #include "csutil/cleanup.h"
-#include "csutil/ibase.h"
-#include "csutil/newclass.h"
-#include "csutil/iextensn.h"
+#include "csengine/ibase.h"
+#include "csengine/newclass.h"
+#include "csengine/iextensn.h"
 
 class csSector;
 class csTextureList;

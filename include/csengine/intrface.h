@@ -20,8 +20,8 @@
 #ifndef __INTRFACE_H__
 #define __INTRFACE_H__
 
-#include "csutil/ibase.h"
-#include "csutil/newclass.h"
+#include "csengine/ibase.h"
+#include "csengine/newclass.h"
 #include "isystem.h"
 
 extern const IID IID_IExtension;
