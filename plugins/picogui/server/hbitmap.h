@@ -21,7 +21,6 @@
 #define __CS_PICOGUI_SERVER_HBITMAP_H__
 
 #include "ivideo/graph2d.h"
-#include "ivideo/texture.h"
 #include "igraphic/image.h"
 
 extern "C"

@@ -55,10 +55,10 @@ g_error csPGVideoDriver::RegFunc (vidlib *v)
   setvbl_linear32 (v);
   v->init			= Init;
   v->setmode			= SetMode;
-  v->close			= Close;
-  v->coord_logicalize		= CoordLogicalize;
+  /*v->close			= Close;
+  v->coord_logicalize		= CoordLogicalize;*/
   v->update			= Update;
-  v->is_rootless		= IsRootless;
+  /*v->is_rootless		= IsRootless;
   v->color_pgtohwr		= ColorPG2CS;
   v->color_hwrtopg		= ColorCS2PG;
   v->pixel			= Pixel;
@@ -67,17 +67,17 @@ g_error csPGVideoDriver::RegFunc (vidlib *v)
   v->bar			= Bar;
   v->line			= Line;
   v->rect			= Rect;
-  v->blit			= Blit;
+  v->blit			= Blit;*/
   v->bitmap_load		= Load;
-  v->bitmap_new			= New;
+  /*v->bitmap_new			= New;
   v->bitmap_free		= Free;
   v->bitmap_getsize		= GetSize;
   v->bitmap_get_groprender	= GetGropRender;
-  v->bitmap_getshm		= GetShareMem;
+  v->bitmap_getshm		= GetShareMem;*/
   v->lxres = v->xres		= Gfx2D->GetWidth ();
   v->lyres = v->yres		= Gfx2D->GetHeight ();
   v->bpp                        = Gfx2D->GetPixelBytes () * 8;
-  v->grop_render_presetup_hook  = BeginDraw;
+  //v->grop_render_presetup_hook  = BeginDraw;
 
   return 0;
 }
@@ -86,11 +86,12 @@ g_error csPGVideoDriver::Init ()
 {
   // Create an intermediate canvas, since we will want to read from it.
   // @@@ What's responsible for deleting data? /Anders Stenberg
-  void *data = new char[(vid->bpp>>3)*vid->xres*vid->yres];
+  /*void *data = new char[(vid->bpp>>3)*vid->xres*vid->yres];
   memset (data, 0, (vid->bpp>>3)*vid->xres*vid->yres);
   csRef<iGraphics2D> canvas = 
     Gfx2D->CreateOffscreenCanvas (data, vid->xres, vid->yres, vid->bpp, 0);
-  vid->display = (hwrbitmap)new csHwrBitmap (canvas);
+  vid->display = (hwrbitmap)new csHwrBitmap (canvas);*/
+  vid->display->bits = 0;
   return 0;
 }
 
@@ -110,7 +111,11 @@ int csPGVideoDriver::BeginDraw (struct divnode **div, struct gropnode ***listp,
 g_error csPGVideoDriver::SetMode (int16 x, int16 y, int16 bpp, 
                                   unsigned long flags)
 {
-  Gfx2D->Resize (x, y);
+  delete vid->display->bits;
+  vid->display->bits = new u8[vid->xres*vid->yres*(vid->bpp>>3)];
+  vid->display->pitch = vid->xres*(vid->bpp>>3);
+
+  //Gfx2D->Resize (x, y);
   return 0;
 }
 
@@ -127,8 +132,12 @@ void csPGVideoDriver::Update (hwrbitmap b, int16 x, int16 y, int16 w, int16 h)
   if (b != vid->display) return;
 
   Gfx2D->BeginDraw ();
-  Blit ((hwrbitmap)&csHwrBitmap (Gfx2D), x, y, w, h, 
-        vid->display, x, y, PG_LGOP_NONE);
+  /*Blit ((hwrbitmap)&csHwrBitmap (Gfx2D), x, y, w, h, 
+        vid->display, x, y, PG_LGOP_NONE);*/
+  for (int l=0; l<h; l++)
+    Gfx2D->Blit (x, y+l, w, 1, vid->display->bits+
+      x*(vid->bpp>>3)+
+      (y+l)*vid->display->pitch);
   Gfx2D->Print (& csRect (x, y, x + w, y + h));
   Gfx2D->FinishDraw ();
 }
@@ -153,7 +162,66 @@ hwrcolor csPGVideoDriver::ColorCS2PG (hwrcolor c)
 void csPGVideoDriver::Pixel (hwrbitmap b, int16 x, int16 y,
   hwrcolor color, int16 lgop)
 {
-  GETBMP (b)->G2D ()->DrawPixel (x, y, color);
+  hwrcolor newcol = color;
+  hwrcolor oldcol;
+  // These logical operations will be slow. Just to make it work for now.
+  switch (lgop)
+  {
+  case PG_LGOP_OR:
+    oldcol = GetPixel (b, x, y);
+    newcol = oldcol | color;
+    break;
+  case PG_LGOP_AND:
+    oldcol = GetPixel (b, x, y);
+    newcol = oldcol & color;
+    break;
+  case PG_LGOP_XOR:
+    oldcol = GetPixel (b, x, y);
+    newcol = oldcol ^ color;
+    break;
+  case PG_LGOP_INVERT:
+    newcol = ~color;
+    break;
+  case PG_LGOP_INVERT_OR:
+    oldcol = GetPixel (b, x, y);
+    newcol = oldcol | ~color;
+    break;
+  case PG_LGOP_INVERT_AND:
+    oldcol = GetPixel (b, x, y);
+    newcol = oldcol & ~color;
+    break;
+  case PG_LGOP_INVERT_XOR:
+    oldcol = GetPixel (b, x, y);
+    newcol = oldcol ^ ~color;
+    break;
+  case PG_LGOP_ADD:
+    oldcol = GetPixel (b, x, y);
+    newcol = (min (getred(oldcol)+getred(color),255)<<16)+
+             (min (getgreen(oldcol)+getgreen(color),255)<<8)+
+             (min (getblue(oldcol)+getblue(color),255));
+    break;
+  case PG_LGOP_SUBTRACT:
+    oldcol = GetPixel (b, x, y);
+    newcol = (max (getred(oldcol)-getred(color),0)<<16)+
+             (max (getgreen(oldcol)-getgreen(color),0)<<8)+
+             (max (getblue(oldcol)-getblue(color),0));
+    break;
+  case PG_LGOP_MULTIPLY:
+    oldcol = GetPixel (b, x, y);
+    newcol = ((min (getred(oldcol)*getred(color),65535)<<8)&0xFF0000)+
+             ((min (getgreen(oldcol)*getgreen(color),65535))&0xFF00)+
+             (min (getblue(oldcol)*getblue(color),65535)>>8);
+    break;
+  case PG_LGOP_ALPHA:
+    newcol = ((min (getred(oldcol)*(255-getalpha(color))+
+                    getred(color)*getalpha(color),65535)<<8)&0xFF0000)+
+             ((min (getgreen(oldcol)*(255-getalpha(color))+
+                    getgreen(color)*getalpha(color),65535))&0xFF00)+
+             (min (getblue(oldcol)*(255-getalpha(color))+
+                   getblue(color)*getalpha(color),65535)>>8);
+    break;
+  }
+  GETBMP (b)->G2D ()->DrawPixel (x, y, newcol);
 }
 
 hwrcolor csPGVideoDriver::GetPixel (hwrbitmap b, int16 x, int16 y)
@@ -166,24 +234,32 @@ hwrcolor csPGVideoDriver::GetPixel (hwrbitmap b, int16 x, int16 y)
 void csPGVideoDriver::Slab (hwrbitmap b, int16 x, int16 y, int16 w,
   hwrcolor color, int16 lgop)
 {
+  if (lgop != PG_LGOP_NONE)
+    def_slab (b, x, y, w, color, lgop);
   GETBMP (b)->G2D ()->DrawBox (x, y, w, 1, color);
 }
 
 void csPGVideoDriver::Bar (hwrbitmap b, int16 x, int16 y, int16 h,
   hwrcolor color, int16 lgop)
 {
+  if (lgop != PG_LGOP_NONE)
+    def_bar (b, x, y, h, color, lgop);
   GETBMP (b)->G2D ()->DrawBox (x, y, 1, h, color);
 }
 
 void csPGVideoDriver::Line (hwrbitmap b, int16 x1, int16 y1, int16 x2, int16 y2,
   hwrcolor color, int16 lgop)
 {
+  if (lgop != PG_LGOP_NONE)
+    def_line (b, x1, y1, x2, y2, color, lgop);
   GETBMP (b)->G2D ()->DrawLine (x1, y1, x2, y2, color);
 }
 
 void csPGVideoDriver::Rect (hwrbitmap b, int16 x1, int16 y1, int16 x2, int16 y2,
   hwrcolor color, int16 lgop)
 {
+  if (lgop != PG_LGOP_NONE)
+    def_rect (b, x1, y1, x2, y2, color, lgop);
   GETBMP (b)->G2D ()->DrawBox (x1, y1, x2 - x1, y2 - y1, color);
 }
 
@@ -239,7 +315,7 @@ void csPGVideoDriver::Blit (hwrbitmap b, int16 x, int16 y, int16 w, int16 h,
         *(s++) ^= *(d++);
       break;
     default:
-      printf ("Unsupported logical operation.\n");
+      def_blit (b, x, y, w, h, p, px, py, lgop);
       GETBMP (b)->G2D ()->FreeArea (dstarea);
       GETBMP (p)->G2D ()->FreeArea (srcarea);
       return;
@@ -261,6 +337,7 @@ g_error csPGVideoDriver::New (hwrbitmap *b, int16 w, int16 h, uint16 bpp)
 
 g_error csPGVideoDriver::Load (hwrbitmap *b, const uint8 *data, unsigned long len)
 {
+
   int format;
   switch (vid->bpp)
   {
@@ -276,6 +353,12 @@ g_error csPGVideoDriver::Load (hwrbitmap *b, const uint8 *data, unsigned long le
   memcpy (tmp, data, len);
   csRef<iImage> img = ImageIO->Load (tmp, len, format);
   delete tmp;
+#if 1
+  img->SetFormat (format);
+  def_bitmap_new (b, img->GetWidth (), img->GetHeight (), vid->bpp);
+  memcpy ((*b)->bits, img->GetImageData (), 
+    img->GetWidth ()*img->GetHeight ()*((*b)->bpp>>3));
+#else
 
 /*  SETBMP (b, new csHwrBitmap (new csImageMemory (len, 1, (void *) data, false,
     CS_IMGFMT_ANY)));*/
@@ -283,9 +366,13 @@ g_error csPGVideoDriver::Load (hwrbitmap *b, const uint8 *data, unsigned long le
   /*csRef<csImageFile> img = new csImageMemory (
     bmp->w, bmp->h, );*/
 
+  tmp = new uint8[(vid->bpp>>3)*img->GetWidth ()*img->GetHeight ()];
   csRef<iGraphics2D> newg2d = Gfx2D->CreateOffscreenCanvas (
-    img->GetImageData (), img->GetWidth (), img->GetHeight (), vid->bpp, 0);
+    tmp, img->GetWidth (), img->GetHeight (), vid->bpp, 0);
+  newg2d->Blit (0, 0, img->GetWidth (), img->GetHeight (), 
+    (unsigned char*)img->GetImageData ());
   SETBMP (b, new csHwrBitmap (newg2d));
+#endif
 
   return 0;
 }
