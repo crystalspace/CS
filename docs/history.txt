@@ -30,6 +30,8 @@ chronological order.
 	  maps this can save a lot of memory.
 	- Jorrit fixed a few more ref-leak problems in the NR texture
 	  manager.
+	- Jorrit fixed a problem with memdebug which fails the build if
+	  you build in optimize mode.
 	- Fritz Elfert changed sprcal3d loader so that it defers scaling
 	  until loading of all model data is completed. Before, scaling
 	  randomly either crashed in cal3d or had no effect at all, depending

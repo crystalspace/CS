@@ -632,6 +632,8 @@ void operator delete[] (void* p)
 
 #elif defined(MEMDEBUG_MEMORY_TRACKER)
 
+#ifdef CS_MEMORY_TRACKER_IMPLEMENT
+
 #include "csutil/scf.h"
 #include "csutil/ref.h"
 #include "iutil/objreg.h"
@@ -908,6 +910,8 @@ void operator delete[] (void* p)
     mtiRegisterFree (mti, s);
   }
 }
+
+#endif // CS_MEMORY_TRACKER_IMPLEMENT
 
 #else	// COMP_VC
 //========================================================================
