@@ -371,7 +371,9 @@ bool csInitializer::SetupEventHandler (
   iObjectRegistry* r, csEventHandlerFunc evhdlr_func, unsigned int eventmask)
 {
   csAppEventHandler* evhdlr = new csAppEventHandler (evhdlr_func);
-  return SetupEventHandler (r, evhdlr, eventmask);
+  bool rc = SetupEventHandler (r, evhdlr, eventmask);
+  evhdlr->DecRef ();
+  return rc;
 }
 
 bool csInitializer::OpenApplication (iObjectRegistry* r)
