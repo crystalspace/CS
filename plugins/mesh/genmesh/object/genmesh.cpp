@@ -985,8 +985,7 @@ csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
   delete[] top_mesh.vertex_fog;
 #endif
   delete[] polygons;
-  if (mesh_tri_normals)
-    delete [] mesh_tri_normals;
+  delete[] mesh_tri_normals;
 
 #ifdef CS_USE_NEW_RENDERER
   delete [] mesh_triangles;
@@ -1113,7 +1112,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
   }
   if (name == normal_name)
   {
-    if (mesh_normals_dirty_flag )
+    if (mesh_normals_dirty_flag)
     {
       normal_buffer = r3d->CreateRenderBuffer (
         sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
@@ -1189,6 +1188,7 @@ void csGenmeshMeshObjectFactory::SetVertexCount (int n)
   delete[] top_mesh.vertex_fog;
 #endif
   mesh_normals = new csVector3 [num_mesh_vertices];
+  memset (mesh_normals, 0, sizeof (csVector3)*num_mesh_vertices);
   mesh_vertices = new csVector3 [num_mesh_vertices];
   mesh_colors = new csColor [num_mesh_vertices];
   mesh_texels = new csVector2 [num_mesh_vertices];
@@ -1376,8 +1376,7 @@ void csGenmeshMeshObjectFactory::CalculateNormals ()
   csTriangleVertices* tri_verts = new csTriangleVertices (tri_mesh,
   	new_verts, new_num_verts);
 
-  if (mesh_tri_normals)
-    delete [] mesh_tri_normals;
+  delete[] mesh_tri_normals;
   mesh_tri_normals = new csVector3[num_triangles];
 #ifdef CS_USE_NEW_RENDERER
   autonormals = true;

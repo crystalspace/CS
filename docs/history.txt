@@ -4,6 +4,12 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 27-Jun-2003
+	- Jorrit fixed a bug in genmesh where it would not initialize
+	  normals to 0 if <autonormals/> was not used. The result would
+	  be unpredictable lighting behaviour. Now genmesh will initialize
+	  the normals to 0. This means that at least the behaviour is
+	  consistent: if you don't use <autonormals/> and you don't specify
+	  normals manually you'll get NO lighting at all.
 	- res augmented r3dtest to accept a map to load as a command line
 	  parameter.
 	- res renamed stencil.csplugin to the correct rlsstencil.csplugin.
