@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+9-Apr-2003
+	- Matze fixed (blindly) lots of errors when using the jambuild on
+	  macosx.
 8-Apr-2003
         - Boyan fixed error in lightning plugin.
 	- Anders Stenberg fixed two cases where WaitForSingleObject used a 
