@@ -1148,11 +1148,10 @@ bool do_message_script (IntRunScript* sc, char* data)
 
 void cleanup ()
 {
-  pprintf ("Cleaning up...\n");
+  Sys->console_out ("Cleaning up...\n");
   free_keymap ();
   Sys->EndWorld ();
   CHK (delete Sys); Sys = NULL;
-  pprintf_close();
 }
 
 /*---------------------------------------------------------------------*
