@@ -33,6 +33,7 @@
 #include "imap/parser.h"
 #include "isys/plugin.h"
 #include "iutil/eventq.h"
+#include "iutil/evdefs.h"
 
 static SysSystemDriver* global_sys = NULL;
 static char* global_config_name = NULL;
