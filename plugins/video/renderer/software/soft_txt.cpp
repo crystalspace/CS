@@ -308,7 +308,7 @@ iGraphics3D *csTextureMMSoftware::GetProcTextureInterface ()
 
   if (!((csTextureSoftwareProc*)tex[0])->texG3D)
   {
-    bool success;
+    bool success = false;
     bool alone_hint = (flags & CS_TEXTURE_PROC_ALONE_HINT) == 
 						CS_TEXTURE_PROC_ALONE_HINT;
 
@@ -318,7 +318,7 @@ iGraphics3D *csTextureMMSoftware::GetProcTextureInterface ()
     if ((texman->pfmt.PixelBytes == 1) && !alone_hint)
     {
       success = stex->Prepare (this, texman->G3D, 
-			       alone_hint ? texman->alone_proc_tex : NULL, 
+			       alone_hint ? texman->alone_proc_tex : 0, 
 			       alone_hint,
                                (void*) ((csTextureSoftware*) tex[0])->bitmap, 
 			       &texman->pfmt, palette, 256);
