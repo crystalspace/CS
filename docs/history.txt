@@ -24,6 +24,14 @@ chronological order.
 	  are used is not a particularly elegant solution, but I can not, at
 	  present, arrive at anything more generalized.  An obvious example of
 	  a path containing whitespace occurs on Windows with "Program Files".
+	- Eric Sunshine worked around a bug in the `exec' command in the MSYS
+	  shell where it incorrectly interpreted a DOS-style absolute path as
+	  relative.  This problem manifested when running Ant for building
+	  csjava if the user had the environment variables JAVACMD and/or
+	  JAVA_HOME set with DOS-style paths.  Since MSYS's `exec' incorrectly
+	  interpreted these paths as relative, it looked for the 'java'
+	  executable at a location relative to the current working directory;
+	  with the result that the Ant invocation failed.
 24-Oct-2004
 	- Eric Sunshine simplified the 22-Oct-2004 change to DDS loader so that
 	  it no longer Clone()'s the image when returning a mipmap.  It is

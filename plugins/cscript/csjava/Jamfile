@@ -1,33 +1,48 @@
 SubDir TOP plugins cscript csjava ;
 
-if ! $(CSJAVA.MODULE.PREFIX) && ! $(CSJAVA.MODULE.SUFFIX)
-{
-  switch $(TARGET.OS)
-  {
-  case WIN32 :
-    CSJAVA.MODULE.PREFIX = ;
-    CSJAVA.MODULE.SUFFIX = .dll ;
-  case MACOS_X :
-    CSJAVA.MODULE.PREFIX = lib ;
-    CSJAVA.MODULE.SUFFIX = .jnilib ;
-  case UNIX :
-    CSJAVA.MODULE.PREFIX = lib ;
-    CSJAVA.MODULE.SUFFIX = .so ;
-  case * :
-    CSJAVA.MODULE.PREFIX = lib ;
-    CSJAVA.MODULE.SUFFIX = .so ;
-  }
-}
-
-# Be wary of Jam's variable interpolation: "$(X)foo" expands to nothing if X
-# does not have a value.  (This differs from other interpolators which would
-# expand it to "foo".)
-if ! $(CSJAVA.MODULE.PREFIX) { CSJAVA.MODULE.PREFIX = "" ; }
-if ! $(CSJAVA.MODULE.SUFFIX) { CSJAVA.MODULE.SUFFIX = "" ; }
-
-if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(CMD.SWIG) &&
+if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(JAVA) && $(JAVAC) && $(CMD.SWIG) &&
   ! [ Property build : projgen ]
 {
+  # The `ant' shell script is dysfunctional on MSYS when environment variables
+  # JAVACMD or JAVA_HOME are set with DOS-style paths.  The problem is that the
+  # `exec' command under the MSYS shell which is invoked by the `ant' script as
+  # its very last operation misinterprets the DOS-style path as a _relative_,
+  # rather than _absolute_, path.  This causes it to look for $JAVACMD relative
+  # to the current working directory, which fails fatally.  We work around the
+  # problem by assigning JAVACMD the value of $(JAVA) which was discovered by
+  # the CS configure script.  This solution works because the $(JAVA) path
+  # recorded in Jamconfig is an MSYS-style, rather than DOS-style path (i.e.
+  # "/c/j2sdk/bin/java", instead of "c:/j2sdk/bin/java").  Our replacement
+  # JAVACMD is correctly recognized by MSYS's `exec' as an absolute path.
+  CSJAVA.ANT_PREPARE = "
+    JAVACMD=\"$(JAVA)\"
+    export JAVACMD" ;
+  
+  if ! $(CSJAVA.MODULE.PREFIX) && ! $(CSJAVA.MODULE.SUFFIX)
+  {
+    switch $(TARGET.OS)
+    {
+    case WIN32 :
+      CSJAVA.MODULE.PREFIX = ;
+      CSJAVA.MODULE.SUFFIX = .dll ;
+    case MACOS_X :
+      CSJAVA.MODULE.PREFIX = lib ;
+      CSJAVA.MODULE.SUFFIX = .jnilib ;
+    case UNIX :
+      CSJAVA.MODULE.PREFIX = lib ;
+      CSJAVA.MODULE.SUFFIX = .so ;
+    case * :
+      CSJAVA.MODULE.PREFIX = lib ;
+      CSJAVA.MODULE.SUFFIX = .so ;
+    }
+  }
+  
+  # Be wary of Jam's variable interpolation: "$(X)foo" expands to nothing if X
+  # does not have a value.  (This differs from other interpolators which would
+  # expand it to "foo".)
+  if ! $(CSJAVA.MODULE.PREFIX) { CSJAVA.MODULE.PREFIX = "" ; }
+  if ! $(CSJAVA.MODULE.SUFFIX) { CSJAVA.MODULE.SUFFIX = "" ; }
+
   local common = [ DoSourceGrist csjava.cpp ] ;
 
   local javabase = [ ConcatDirs $(LOCATE_TARGET) src ] ;
@@ -96,6 +111,7 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(CMD.SWIG) &&
 
   actions Ant
   {
+    $(CSJAVA.ANT_PREPARE)
     "$(ANT)" -quiet -emacs -Dbuild.compiler.emacs=true -buildfile $(>)
   }
   Ant $(jar) : $(buildxml:G=build) ;
