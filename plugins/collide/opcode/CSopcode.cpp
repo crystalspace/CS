@@ -66,7 +66,7 @@ bool Opcode_Err (const char* msg, ...)
   va_list args;
   va_start (args, msg);
   // Although it's called "..._Err", Opcode also reports less-than-fatal 
-  // messages thorugh it
+  // messages through it
   csReportV (0, CS_REPORTER_SEVERITY_WARNING, // @@@ use a real object_reg
     "crystalspace.collisiondetection.opcode", msg, args);
   va_end (args);
@@ -82,15 +82,10 @@ csOPCODECollideSystem::csOPCODECollideSystem (iBase *pParent)
   TreeCollider.SetFullPrimBoxTest (false);
   // TreeCollider.SetFullPrimPrimTest (true);
   TreeCollider.SetTemporalCoherence (true);
-  N_pairs = 0;
-  pairs = 0;
-  col1 = 0;
-  col2 = 0;
 }
 
 csOPCODECollideSystem::~csOPCODECollideSystem ()
 {
-  delete[] pairs;
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_DESTRUCT_IBASE ();
 }
@@ -113,8 +108,8 @@ bool csOPCODECollideSystem::Collide (
   iCollider* collider2, const csReversibleTransform* trans2)
 {
   // printf( " we are in Collide \n");
-  col1 = (csOPCODECollider*) collider1;
-  col2 = (csOPCODECollider*) collider2;
+  csOPCODECollider* col1 = (csOPCODECollider*) collider1;
+  csOPCODECollider* col2 = (csOPCODECollider*) collider2;
  
   ColCache.Model0 = col1->m_pCollisionModel;
   ColCache.Model1 = col2->m_pCollisionModel;
@@ -172,10 +167,15 @@ bool csOPCODECollideSystem::Collide (
   // col2->transform.m[3][1] = u.y;
   // col2->transform.m[3][2] = u.z;
 
-  bool isOk = TreeCollider.Collide (ColCache ,&col1->transform , 0);
+  bool isOk = TreeCollider.Collide (ColCache, &col1->transform,  0);
   if (isOk)
   {
-    return  TreeCollider.GetContactStatus ();
+    bool status = TreeCollider.GetContactStatus ();
+    if (status)
+    {
+      CopyCollisionPairs (col1, col2);
+    }
+    return status;
   }
   else
   {
@@ -201,26 +201,27 @@ int csOPCODECollideSystem::CollidePath (
   // return thiscol->CollidePath (trans, newpos,	num_colliders, colliders, transforms);
 }
 
-csCollisionPair* csOPCODECollideSystem::GetCollisionPairs ()
+void csOPCODECollideSystem::CopyCollisionPairs (csOPCODECollider* col1,
+	csOPCODECollider* col2)
 {     
   int size = (int) (udword(TreeCollider.GetNbPairs ()));
-  N_pairs = size;
-  if (N_pairs == 0) return 0;
+  if (size == 0) return;
+  int N_pairs = size;
   const Pair* colPairs=TreeCollider.GetPairs ();
   Point* vertholder0 = col1->vertholder;
-  if (!vertholder0) return 0;
+  if (!vertholder0) return;
   Point* vertholder1 = col2->vertholder;
-  if (!vertholder1) return 0;
+  if (!vertholder1) return;
   udword* indexholder0 = col1->indexholder;
-  if (!indexholder0) return 0;
+  if (!indexholder0) return;
   udword* indexholder1 = col2->indexholder;
-  if (!indexholder1) return 0;
+  if (!indexholder1) return;
   Point* current;
   int i, j;
-  
-  delete[] pairs;
-  pairs = new csCollisionPair[N_pairs];
-   
+
+  int oldlen = pairs.Length ();
+  pairs.SetLength (oldlen + N_pairs);
+ 
   // it really sucks having to copy all this each Collide query, but
   // since opcode library uses his own vector types, 
   // but there are some things to consider:
@@ -238,53 +239,41 @@ csCollisionPair* csOPCODECollideSystem::GetCollisionPairs ()
   //    so, the question is, what we should prefer? memory or speed?
   //	   printf( " 1) \n");
 
-  for(i = 0; i < N_pairs; i++)
+  for (i = 0 ; i < N_pairs ; i++)
   {
     j = 3 * colPairs[i].id0;
     current = &vertholder0[indexholder0[j]];		 
-    pairs[i].a1 = csVector3 (current->x, current->y, current->z);
+    pairs[oldlen].a1 = csVector3 (current->x, current->y, current->z);
     current = &vertholder0[indexholder0[j + 1]];		 
-    pairs[i].b1 = csVector3 (current->x, current->y, current->z);
+    pairs[oldlen].b1 = csVector3 (current->x, current->y, current->z);
     current = &vertholder0[indexholder0[j + 2]];		 
-    pairs[i].c1 = csVector3 (current->x, current->y, current->z);
+    pairs[oldlen].c1 = csVector3 (current->x, current->y, current->z);
 
     j = 3 * colPairs[i].id1; 
-    current = &vertholder1[indexholder1[j ]];		 
-    pairs[i].a2 = csVector3 (current->x, current->y, current->z);
+    current = &vertholder1[indexholder1[j]];		 
+    pairs[oldlen].a2 = csVector3 (current->x, current->y, current->z);
     current = &vertholder1[indexholder1[j + 1 ]];		 
-    pairs[i].b2 = csVector3 (current->x, current->y, current->z);
+    pairs[oldlen].b2 = csVector3 (current->x, current->y, current->z);
     current = &vertholder1[indexholder1[j + 2 ]];		 
-    pairs[i].c2 = csVector3 (current->x, current->y, current->z);
+    pairs[oldlen].c2 = csVector3 (current->x, current->y, current->z);
+
+    oldlen++;
   }
-  return pairs;
+}
+
+csCollisionPair* csOPCODECollideSystem::GetCollisionPairs ()
+{
+  return pairs.GetArray ();
 }
 
 int csOPCODECollideSystem::GetCollisionPairCount ()
 {
-  if (!col1) return 0;
-  Point* vertholder0 = col1->vertholder;
-  if (!vertholder0) return 0;
-  if (!col2) return 0;
-  Point* vertholder1 = col2->vertholder;
-  if (!vertholder1) return 0;
-  udword* indexholder0 = col1->indexholder;
-  if (!indexholder0) return 0;
-  udword* indexholder1 = col2->indexholder;
-  if (!indexholder1) return 0;
-
-  int size = (int) (udword(TreeCollider.GetNbPairs ()));
-  N_pairs = size;
-  return N_pairs;
+  return pairs.Length ();
 }
 
 void csOPCODECollideSystem::ResetCollisionPairs ()
 {
-  if (pairs)
-  {
-    delete[] pairs;
-    pairs = 0;
-    N_pairs = 0;
-  }
+  pairs.Empty ();
 }
 
 void csOPCODECollideSystem::SetOneHitOnly (bool on) 

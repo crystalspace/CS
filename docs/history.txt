@@ -10,6 +10,11 @@ chronological order.
 	- Jorrit fixed a bug in the particles loader. The test to see if a
 	  factory is ok was wrong.
 	- Jorrit removed unneeded copy of transformation from OPCODE plugin.
+	- Jorrit fixed collision pair handling in OPCODE plugin. It was
+	  assuming that the code using the CD system would call
+	  GetCollisionPairs() right after calling Collide() but that
+	  assumption is not true. This bugfix fixes a problem with OPCODE
+	  and flarge were it would let the camera jump a bit in the main hall.
 31-May-2004
 	- Jorrit added "IncludeDir plugins" back to Jamfile.in (it was removed
 	  yesterday).  Otherwise, many video plugins failed to compile.

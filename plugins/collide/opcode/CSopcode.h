@@ -32,6 +32,7 @@
 
 #include "iutil/comp.h"
 #include "csgeom/vector3.h"
+#include "csutil/garray.h"
 #include "ivaria/collider.h"
 #include "csgeom/transfrm.h"
 #include "CSopcodecollider.h"
@@ -47,11 +48,8 @@ class csOPCODECollideSystem : public iCollideSystem
 public:
   Opcode::AABBTreeCollider TreeCollider;
   Opcode::BVTCache ColCache;
-  csOPCODECollider* col1;
-  csOPCODECollider* col2;
 
-  csCollisionPair *pairs;
-  int N_pairs;
+  csDirtyAccessArray<csCollisionPair> pairs;
   iObjectRegistry *object_reg;
  
   SCF_DECLARE_IBASE;
@@ -59,6 +57,10 @@ public:
   csOPCODECollideSystem (iBase* parent);
   virtual ~csOPCODECollideSystem ();
   bool Initialize (iObjectRegistry* iobject_reg);
+
+  // Copy the collision detection pairs for the current Collide
+  // to 'pairs'.
+  void CopyCollisionPairs (csOPCODECollider* col1, csOPCODECollider* col2);
 
   virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh);
 
