@@ -83,6 +83,7 @@
 
 #ifdef CS_USE_NEW_RENDERER
 #include "ivideo/shader/shader.h"
+#include "iengine/renderloop.h"
 #endif //CS_USE_NEW_RENDERER
 
 //---------------------------------------------------------------------------
@@ -950,6 +951,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("casthwshadow", XMLTOKEN_CAST_HW_SHADOW);
   xmltokens.Register ("shaders", XMLTOKEN_SHADERS);
   xmltokens.Register ("shader", XMLTOKEN_SHADER);
+  xmltokens.Register ("renderloop", XMLTOKEN_RENDERLOOP);
 #endif
 
   return true;
@@ -2868,6 +2870,40 @@ bool csLoader::LoadSettings (iDocumentNode* node)
 	  Engine->SetAmbientLight (c);
         }
 	break;
+#ifdef CS_USE_NEW_RENDERER
+      case XMLTOKEN_RENDERLOOP:
+	{
+	  const char* loopName = child->GetContentsValue ();
+	  if (loopName)
+	  {
+	    iRenderLoop* loop = 
+	      Engine->GetRenderLoopManager()->Retrieve (loopName);
+	    if (loop)
+	    {
+	      Engine->SetCurrentDefaultRenderloop (loop);
+	    }
+	    else
+	    {
+	      SyntaxService->Report (
+		"crystalspace.maploader.parse.settings",
+		CS_REPORTER_SEVERITY_WARNING,
+		child,
+		"Render loop '%s' not found",
+		loopName);
+	    }
+	  }
+	  else
+	  {
+	    SyntaxService->Report (
+	      "crystalspace.maploader.parse.settings",
+	      CS_REPORTER_SEVERITY_WARNING,
+	      child,
+	      "Expected render loop name",
+	      loopName);
+	  }
+	}
+	break;
+#endif
       default:
 	SyntaxService->ReportBadToken (child);
         return false;

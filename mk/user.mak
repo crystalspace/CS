@@ -106,6 +106,14 @@ PLUGINS += sequence
 PLUGINS += engseq
 PLUGINS += documentsystem/xmlread
 
+#PLUGINS.DYNAMIC += video/render3d/opengl
+#PLUGINS.DYNAMIC += video/render3d/shadermgr
+#PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_arb
+#PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_cg
+#PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_mtex
+#PLUGINS.DYNAMIC += video/render3d/renderloop/loader
+#PLUGINS.DYNAMIC += video/render3d/renderloop/stdsteps
+
 PLUGINS.DYNAMIC += engine/iso
 PLUGINS.DYNAMIC += isoldr
 PLUGINS.DYNAMIC += video/renderer/line
@@ -163,12 +171,6 @@ endif
 PLUGINS.DYNAMIC += documentsystem/binary
 PLUGINS.DYNAMIC += documentsystem/xmltiny
 PLUGINS.DYNAMIC += documentsystem/dsplex
-
-#PLUGINS.DYNAMIC += video/render3d/opengl
-#PLUGINS.DYNAMIC += video/render3d/shadermgr
-#PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_arb
-#PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_cg
-#PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_mtex
 
 ifeq ($(PYTHON.AVAILABLE),yes)
 PLUGINS.DYNAMIC += cscript/cspython

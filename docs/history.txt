@@ -13,6 +13,14 @@ The history order is reversed so that new features are at the top.
 	- Oktal added the shader variable system to the new renderer, and
 	  fixed const-correctness throughout the renderer.
 	  Note I can't test this since I don't have GL.
+	- res modified the engine to change to the default render loop when
+	  the world-specific settings reset.
+	- res augmented the map loader to allow setting of a <renderloop> in
+	  a map's <settings>.
+	- res added support for render loop loading through the <addon> 
+	  mechanism.
+	- res started working on a generic render step plugin. For now just 
+	  compiles, but doesn't do anything yet.
 4-June-2003
 	- Jorrit fixed a bug in the AWS engine view where it would not set the
 	  FOV of the camera based on the height of the frame. This caused the
@@ -69,8 +77,6 @@ The history order is reversed so that new features are at the top.
 	- res fixed some "csFooIterator::Next: recursive on all control paths, 
 	  function will cause runtime stack overflow" warnings on MSVC.
 	- res removed iSectorRenderMeshList::GetVisible().
-	- res fixed csGenmeshMeshObject::GetRenderMeshes() from being 
-	  completely commented out.
 3-June-2003
 	- Philipp Aumayr fixed the fancycon bug, where the borders
 	  were visibile in SW but not in GL mode. (wrong mixmode at line

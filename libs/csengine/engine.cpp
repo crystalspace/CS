@@ -1054,6 +1054,11 @@ void csEngine::ResetWorldSpecificSettings()
 	default_ambient_green / 255.0f, 
         default_ambient_blue / 255.0f));
   fastmesh_thresshold = default_fastmesh_thresshold;
+#ifdef CS_USE_NEW_RENDERER
+  iRenderLoop* defaultRL = renderLoopManager->Retrieve 
+    (CS_DEFAULT_RENDERLOOP_NAME);
+  SetCurrentDefaultRenderloop (defaultRL);
+#endif
 }
 
 void csEngine::PrepareTextures ()

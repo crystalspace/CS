@@ -317,6 +317,16 @@ void csRenderLoop::Draw (iCamera *c, iClipper2D *view)
   //csSleep (1000);
 }
 
+int csRenderLoop::AddStep (iRenderStep* step)
+{
+  return steps.Push (step);
+}
+
+int csRenderLoop::GetStepCount ()
+{
+  return steps.Length ();
+}
+
 //---------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE(csRenderLoopManager)

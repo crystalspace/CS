@@ -87,6 +87,9 @@ public:
 
   void StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview);
   virtual void Draw (iCamera* c, iClipper2D* clipper);
+
+  virtual int AddStep (iRenderStep* step);
+  virtual int GetStepCount ();
 };
 
 class csRenderLoopManager : public iRenderLoopManager

@@ -48,14 +48,21 @@ struct iRenderStep : public iBase
   virtual void Perform (csRenderView* rview, iSector* sector) = 0;
 };
  
-SCF_VERSION (iRenderLoop, 0, 0, 2);
+SCF_VERSION (iRenderLoop, 0, 0, 3);
 
+/**
+ * Render loop.
+ * \todo Add more step management methods.
+ */
 struct iRenderLoop : public iBase
 {
   virtual void Draw (iCamera* c, iClipper2D* clipper) = 0;
+
+  virtual int AddStep (iRenderStep* step) = 0;
+  virtual int GetStepCount () = 0;
 };
 
-SCF_VERSION (iRenderLoopManager, 0, 0, 1);
+SCF_VERSION (iRenderLoopManager, 0, 0, 2);
 
 /**
  * Render loop manager.
