@@ -94,21 +94,26 @@ void csNodeIterator::Reset (iSector *pSector, const char *classname)
 {
   Iterator = pSector->QueryObject ()->GetIterator ();
   Classname = classname;
-  CurrentNode = SCF_QUERY_INTERFACE (Iterator->Next (), iMapNode);
+  iObject* n = Iterator->Next ();
+  if (n)
+    CurrentNode = SCF_QUERY_INTERFACE (n, iMapNode);
+  else
+    CurrentNode = 0;
 
   SkipWrongClassname ();
 }
 
 iMapNode* csNodeIterator::Next ()
 {
+  iMapNode* c = CurrentNode;
   NextNode ();
   SkipWrongClassname ();
-  return CurrentNode;
+  return c;
 }
 
 bool csNodeIterator::HasNext () const
 {
-  return Iterator->HasNext ();
+  return CurrentNode != 0;
 }
 
 void csNodeIterator::SkipWrongClassname ()

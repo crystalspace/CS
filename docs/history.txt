@@ -19,6 +19,8 @@ The history order is reversed so that new features are at the top.
 	  key '8' to that. This new command toggles the mmx capability on/off.
 	- Jorrit replaced _X86_ with PROC_X86 in the tiled coverage buffer.
 	- Jorrit replaced _X86_ with PROC_X86 in csProcessorCapabilities.
+	- Jorrit fixed a bug in csNodeIterator. It was not working correctly
+	  at all.
 15-Jun-2003
         - Boyan added property "Image" that can be set in AWS component "Image
 	  View".
