@@ -1182,7 +1182,7 @@ void fire_missile ()
   }
 }
 
-void AttachRandomLight (csDynLight* light)
+void AttachRandomLight (iDynLight* light)
 {
   RandomLight* rl = new RandomLight;
   rl->type = DYN_TYPE_RANDOM;
@@ -1190,7 +1190,7 @@ void AttachRandomLight (csDynLight* light)
   rl->dyn_move = 0;
   rl->dyn_r1 = rl->dyn_g1 = rl->dyn_b1 = 1;
   csDataObject* rldata = new csDataObject (rl);
-  light->ObjAdd (rldata);
+  light->QueryObject ()->ObjAdd (rldata);
   rldata->DecRef ();
 }
 

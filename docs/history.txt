@@ -1,5 +1,20 @@
 The history order is reversed so that new features are at the top.
 
+2-Jul-2002
+	- Removed an obsolete feature to show the c-buffer in walktest.
+	- Removed db_cbuffer console command in walktest.
+	- Added iLight->GetFlags().
+	- Moved a lot of the Doxygen documentation and also a few
+	  constants from the private csLight to iLight.
+	- Added iEngine->GetLightIterator() to iterate over all static
+	  and pseudo-dynamic lights of the engine (for a given region
+	  optionally). Added iLightIterator.
+	- Added iEngine->GetFirstDynLight().
+	- Removed the old cludgy iEngine->GetCsEngine(). Modified walktest
+	  so it no longer needs it (by using the newly added functions
+	  above).
+	- Fixed a bug in iDynLight->GetNext(). It would actually try to
+	  get the iDynLight from a NULL csDynLight pointer.
 1-Jul-2002
 	- Extended both iShadowCaster and iShadowReceiver with iMovable
 	  parameter.

@@ -76,7 +76,7 @@ struct iString;
  * in the engine while it is being used.
  * If changes to the engine happen the results are unpredictable.
  */
-class csLightIt
+class csLightIt : public iLightIterator
 {
 private:
   // The engine for this iterator.
@@ -95,14 +95,18 @@ public:
   /// Construct an iterator and initialize to start.
   csLightIt (csEngine*, iRegion* region = NULL);
 
+  virtual ~csLightIt () { }
+
+  SCF_DECLARE_IBASE;
+
   /// Restart iterator.
-  void Restart ();
+  virtual void Restart ();
 
   /// Get light from iterator. Return NULL at end.
-  csLight* Fetch ();
+  virtual iLight* Fetch ();
 
   /// Get the sector for the last fetched light.
-  csSector* GetLastSector ();
+  virtual iSector* GetLastSector ();
 };
 
 CS_DECLARE_OBJECT_VECTOR (csCollectionListHelper, iCollection);
@@ -833,7 +837,7 @@ public:
   /**
    * Return the first dynamic light in this engine.
    */
-  csDynLight* GetFirstDynLight () const { return first_dyn_lights; }
+  virtual iDynLight* GetFirstDynLight () const;
 
   /**
    * This routine returns all lights which might affect an object
@@ -908,7 +912,7 @@ public:
   /**
    * Create an iterator to iterate over all static lights of the engine.
    */
-  csLightIt* NewLightIterator (iRegion* region = NULL)
+  virtual iLightIterator* GetLightIterator (iRegion* region = NULL)
   {
     csLightIt* it;
     it = new csLightIt (this, region);
@@ -985,8 +989,6 @@ public:
   } * scfiEventHandler;
 
   //--------------------- iEngine interface implementation --------------------
-
-  virtual csEngine *GetCsEngine () { return this; };
 
   /**
    * Query the format to load textures

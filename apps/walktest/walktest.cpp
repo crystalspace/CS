@@ -133,7 +133,6 @@ WalkTest::WalkTest () :
   do_stats = false;
   do_edges = false;
   do_show_coord = false;
-  do_show_cbuffer = false;
   busy_perf_test = false;
   do_show_z = false;
   do_show_palette = false;
@@ -570,14 +569,6 @@ void WalkTest::DrawFrameDebug ()
   {
     // @@@
   }
-  if (do_show_cbuffer)
-  {
-    csCBuffer* cbuf = view->GetEngine ()->GetCsEngine ()->GetCBuffer ();
-    if (cbuf)
-    {
-      cbuf->GfxDump (Gfx2D, Gfx3D);
-    }
-  }
   if (do_show_debug_boxes)
   {
     extern void DrawDebugBoxes (iCamera* cam, bool do3d);
@@ -736,14 +727,13 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
     return;
 
   // Apply lighting BEFORE the very first frame
-  csEngine* engine = (csEngine*)Engine;
-  csDynLight* dyn = engine->GetFirstDynLight ();
+  iDynLight* dyn = Engine->GetFirstDynLight ();
   while (dyn)
   {
     extern void HandleDynLight (iDynLight*);
-    csDynLight* dn = dyn->GetNext ();
-    if (CS_GET_CHILD_OBJECT (dyn, iDataObject))
-      HandleDynLight (&(dyn->scfiDynLight));
+    iDynLight* dn = dyn->GetNext ();
+    if (CS_GET_CHILD_OBJECT (dyn->QueryObject (), iDataObject))
+      HandleDynLight (dyn);
     dyn = dn;
   }
   // Apply lighting to all meshes

@@ -392,10 +392,16 @@ public:
 };
 
 //---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE(csLightIt)
+  SCF_IMPLEMENTS_INTERFACE (iLightIterator)
+SCF_IMPLEMENT_IBASE_END
+
 csLightIt::csLightIt (csEngine *e, iRegion *r) :
   engine(e),
   region(r)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   Restart ();
 }
 
@@ -403,11 +409,9 @@ bool csLightIt::NextSector ()
 {
   sector_idx++;
   if (region)
-    while
-    (
-      sector_idx < engine->sectors.Length () &&
-      !region->IsInRegion (GetLastSector ())
-    ) sector_idx++;
+    while ( sector_idx < engine->sectors.Length () &&
+      	!region->IsInRegion (GetLastSector ()->GetPrivateObject ()))
+      sector_idx++;
   if (sector_idx >= engine->sectors.Length ()) return false;
   return true;
 }
@@ -418,7 +422,7 @@ void csLightIt::Restart ()
   light_idx = 0;
 }
 
-csLight *csLightIt::Fetch ()
+iLight *csLightIt::Fetch ()
 {
   csSector *sector;
   if (sector_idx == -1)
@@ -443,12 +447,12 @@ csLight *csLightIt::Fetch ()
     return Fetch ();
   }
 
-  return sector->scfiSector.GetLights ()->Get (light_idx)->GetPrivateObject ();
+  return sector->scfiSector.GetLights ()->Get (light_idx);
 }
 
-csSector *csLightIt::GetLastSector ()
+iSector *csLightIt::GetLastSector ()
 {
-  return engine->sectors[sector_idx]->GetPrivateObject ();
+  return engine->sectors[sector_idx];
 }
 
 //---------------------------------------------------------------------------
@@ -1328,10 +1332,10 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
     csSector::cfg_reflections = 1;
   }
 
-  csLightIt *lit = NewLightIterator (iregion);
+  iLightIterator *lit = GetLightIterator (iregion);
 
   // Count number of lights to process.
-  csLight *l;
+  iLight *l;
   int light_count = 0;
   lit->Restart();
   while (lit->Fetch()) light_count++;
@@ -1397,7 +1401,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
     lit->Restart ();
     while ((l = lit->Fetch ()) != NULL)
     {
-      ((csStatLight *)l)->CalculateLighting ();
+      ((csStatLight *)(l->GetPrivateObject ()))->CalculateLighting ();
       if (meter) meter->Step ();
     }
 
@@ -1465,7 +1469,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
   if (!VFS->Sync()) Warn ("Error updating lighttable cache!");
   if (do_relight) Report ("DONE!");
 
-  delete lit;
+  lit->DecRef ();
 }
 void csEngine::InvalidateLightmaps ()
 {
@@ -1712,6 +1716,11 @@ void csEngine::RemoveDynLight (csDynLight *dyn)
     first_dyn_lights = dyn->GetNext ();
   dyn->SetNext (NULL);
   dyn->SetPrev (NULL);
+}
+
+iDynLight* csEngine::GetFirstDynLight () const
+{
+  return first_dyn_lights ? &(first_dyn_lights->scfiDynLight) : NULL;
 }
 
 void csEngine::ControlMeshes ()

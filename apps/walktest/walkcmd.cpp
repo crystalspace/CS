@@ -1154,7 +1154,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  db_octree, db_osolid, db_dumpstubs, db_cbuffer, db_frustum");
     CONPRI("  db_curleaf, farplane");
     CONPRI("Lights:");
-    CONPRI("  addlight dellight dellights picklight droplight");
+    CONPRI("  addlight dellight dellights");
     CONPRI("  clrlights setlight");
     CONPRI("Views:");
     CONPRI("  split_view unsplit_view toggle_view");
@@ -1540,8 +1540,6 @@ bool CommandHandler (const char *cmd, const char *arg)
       	"No octree in this sector!");
 #endif
   }
-  else if (!strcasecmp (cmd, "db_cbuffer"))
-    csCommandProcessor::change_boolean (arg, &Sys->do_show_cbuffer, "debug cbuffer");
   else if (!strcasecmp (cmd, "db_frustum"))
     csCommandProcessor::change_int (arg, &Sys->cfg_debug_check_frustum, "debug check frustum", 0, 2000000000);
   else if (!strcasecmp (cmd, "db_octree"))
@@ -2380,13 +2378,13 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "clrlights"))
   {
     RECORD_CMD (cmd);
-    csLightIt* lit = Sys->view->GetEngine ()->GetCsEngine ()
-    	->NewLightIterator ();
-    csLight* l;
+    iLightIterator* lit = Sys->view->GetEngine ()->GetLightIterator ();
+    iLight* l;
     while ((l = lit->Fetch ()) != NULL)
     {
       l->SetColor (csColor (0, 0, 0));
     }
+    lit->DecRef ();
   }
   else if (!strcasecmp (cmd, "setlight"))
   {
@@ -2406,67 +2404,52 @@ bool CommandHandler (const char *cmd, const char *arg)
     RECORD_ARGS (cmd, arg);
     csVector3 dir (0,0,0);
     csVector3 pos = Sys->view->GetCamera ()->GetTransform ().This2Other (dir);
-    csDynLight* dyn;
+    iDynLight* dyn;
 
     bool rnd;
     float r, g, b, radius, thing_shadows;
     if (arg && csScanStr (arg, "%f,%f,%f,%f,%d", &r, &g, &b, &radius,
     	&thing_shadows) == 5)
     {
-      dyn = new csDynLight (pos.x, pos.y, pos.z, radius, r, g, b);
-      if (thing_shadows) dyn->flags.Set (CS_LIGHT_THINGSHADOWS,
-      	CS_LIGHT_THINGSHADOWS);
+      dyn = Sys->view->GetEngine ()->CreateDynLight (pos,
+      	radius, csColor (r, g, b));
+      if (thing_shadows) dyn->QueryLight ()->
+      	GetFlags ().Set (CS_LIGHT_THINGSHADOWS, CS_LIGHT_THINGSHADOWS);
       rnd = false;
     }
     else
     {
-      dyn = new csDynLight (pos.x, pos.y, pos.z, 6, 1, 1, 1);
+      dyn = Sys->view->GetEngine ()->CreateDynLight (pos,
+      	6, csColor (1, 1, 1));
       rnd = true;
     }
-    Sys->view->GetEngine ()->GetCsEngine ()->AddDynLight (dyn);
-    dyn->SetSector (Sys->view->GetCamera ()->GetSector ()->GetPrivateObject ());
+    dyn->QueryLight ()->SetSector (Sys->view->GetCamera ()->GetSector ());
     dyn->Setup ();
-    extern void AttachRandomLight (csDynLight* light);
+    extern void AttachRandomLight (iDynLight* light);
     if (rnd)
       AttachRandomLight (dyn);
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Dynamic light added.");
   }
   else if (!strcasecmp (cmd, "dellight"))
   {
-    csDynLight* dyn;
-    if ((dyn = Sys->view->GetEngine ()->GetCsEngine ()->GetFirstDynLight ()) != NULL)
+    iDynLight* dyn;
+    if ((dyn = Sys->view->GetEngine ()->GetFirstDynLight ()) != NULL)
     {
-      Sys->view->GetEngine ()->GetCsEngine ()->RemoveDynLight (dyn);
-      delete dyn;
+      Sys->view->GetEngine ()->RemoveDynLight (dyn);
+      dyn->DecRef ();
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Dynamic light deleted.");
     }
   }
   else if (!strcasecmp (cmd, "dellights"))
   {
     RECORD_CMD (cmd);
-    csDynLight* dyn;
-    while ((dyn = Sys->view->GetEngine ()->GetCsEngine ()->GetFirstDynLight ()) != NULL)
+    iDynLight* dyn;
+    while ((dyn = Sys->view->GetEngine ()->GetFirstDynLight ()) != NULL)
     {
-      Sys->view->GetEngine ()->GetCsEngine ()->RemoveDynLight (dyn);
-      delete dyn;
+      Sys->view->GetEngine ()->RemoveDynLight (dyn);
+      dyn->DecRef ();
     }
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "All dynamic lights deleted.");
-  }
-  else if (!strcasecmp (cmd, "picklight"))
-  {
-#   if 0
-    pickup_light = Sys->view->GetEngine ()->GetFirstFltLight ();
-    if (pickup_light) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Floating light taken.");
-    else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No floating light to take.");
-#   endif
-  }
-  else if (!strcasecmp (cmd, "droplight"))
-  {
-#   if 0
-    if (pickup_light) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Floating light dropped.");
-    else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No floating light to drop.");
-    pickup_light = NULL;
-#   endif
   }
   else if (!strcasecmp (cmd, "map"))
   {

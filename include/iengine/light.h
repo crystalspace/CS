@@ -28,11 +28,26 @@
 
 class csLight;
 class csColor;
+class csFlags;
 struct iSector;
 struct iObject;
 struct iCrossHalo;
 struct iNovaHalo;
 struct iFlareHalo;
+
+/**
+ * If CS_LIGHT_THINGSHADOWS is set for a light then things will also
+ * cast shadows. This flag is set by default for static lights and unset
+ * for dynamic lights.
+ */
+#define CS_LIGHT_THINGSHADOWS	0x00000001
+
+/**
+ * If this flag is set, the halo for this light is active and is in the
+ * engine's queue of active halos. When halo become inactive, this flag
+ * is reset.
+ */
+#define CS_LIGHT_ACTIVEHALO	0x80000000
 
 /// Light level that is used when there is no light on the texture.
 #define CS_DEFAULT_LIGHT_LEVEL 20
@@ -54,10 +69,31 @@ struct iFlareHalo;
 #define CS_ATTN_INVERSE   2
 #define CS_ATTN_REALISTIC 3
 
-SCF_VERSION (iLight, 0, 0, 6);
+SCF_VERSION (iLight, 0, 0, 7);
 
 /**
  * The iLight interface is the SCF interface for the csLight class.
+ * <p>
+ * First some terminology about all the several types of lights
+ * that Crystal Space supports:
+ * <ul>
+ * <li>Static light. This is a normal static light that cannot move
+ *     and cannot change intensity/color. All lighting information from
+ *     all static lights is collected in one static lightmap.
+ * <li>Pseudo-dynamic light. This is a static light that still cannot
+ *     move but the intensity/color can change. The shadow information
+ *     from every pseudo-dynamic light is kept in a seperate shadow-map.
+ *     Shadowing is very accurate with pseudo-dynamic lights since they
+ *     use the same algorithm as static lights.
+ * <li>Dynamic light. This is a light that can move and change
+ *     intensity/color. These lights are the most flexible. All lighting
+ *     information from all dynamic lights is collected in one dynamic
+ *     lightmap (seperate from the pseudo-dynamic shadow-maps).
+ *     Shadows for dynamic lights will be less accurate because things
+ *     will not cast accurate shadows (due to computation speed limitations).
+ * </ul>
+ * Note that static and pseudo-dynamic lights are represented by the
+ * same csStatLight class.
  */
 struct iLight : public iBase
 {
@@ -118,6 +154,16 @@ struct iLight : public iBase
 
   /// Get the brightness of a light at a given distance.
   virtual float GetBrightnessAtDistance (float d) = 0;
+
+  /**
+   * Get flags for this light.
+   * Supported flags:
+   * <ul>
+   * <li>CS_LIGHT_ACTIVEHALO
+   * <li>CS_LIGHT_THINGSHADOWS
+   * </ul>
+   */
+  virtual csFlags& GetFlags () = 0;
 };
 
 SCF_VERSION (iLightList, 0, 0, 1);
@@ -179,6 +225,26 @@ struct iLightingProcessInfo : public iFrustumViewUserdata
 
   /// Get the current color.
   virtual const csColor& GetColor () const = 0;
+};
+
+SCF_VERSION (iLightIterator, 0, 0, 1);
+
+/**
+ * Iterator to iterate over all static lights in the engine.
+ * This iterator assumes there are no fundamental changes
+ * in the engine while it is being used.
+ * If changes to the engine happen the results are unpredictable.
+ */
+struct iLightIterator : public iBase
+{
+  /// Restart iterator.
+  virtual void Restart () = 0;
+
+  /// Get light from iterator. Return NULL at end.
+  virtual iLight* Fetch () = 0;
+
+  /// Get the sector for the last fetched light.
+  virtual iSector* GetLastSector () = 0;
 };
 
 #endif // __IENGINE_LIGHT_H__

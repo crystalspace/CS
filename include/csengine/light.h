@@ -40,44 +40,9 @@ class csSector;
 struct iMeshWrapper;
 
 /**
- * If CS_LIGHT_THINGSHADOWS is set for a light then things will also
- * cast shadows. This flag is set by default for static lights and unset
- * for dynamic lights.
- */
-#define CS_LIGHT_THINGSHADOWS	0x00000001
-
-/**
- * If this flag is set, the halo for this light is active and is in the
- * engine's queue of active halos. When halo become inactive, this flag
- * is reset.
- */
-#define CS_LIGHT_ACTIVEHALO	0x80000000
-
-/**
  * Superclass of all positional lights.
  * A light subclassing from this has a color, a position
- * and a radius.<P>
- *
- * First some terminology about all the several types of lights
- * that Crystal Space supports:
- * <ul>
- * <li>Static light. This is a normal static light that cannot move
- *     and cannot change intensity/color. All lighting information from
- *     all static lights is collected in one static lightmap.
- * <li>Pseudo-dynamic light. This is a static light that still cannot
- *     move but the intensity/color can change. The shadow information
- *     from every pseudo-dynamic light is kept in a seperate shadow-map.
- *     Shadowing is very accurate with pseudo-dynamic lights since they
- *     use the same algorithm as static lights.
- * <li>Dynamic light. This is a light that can move and change
- *     intensity/color. These lights are the most flexible. All lighting
- *     information from all dynamic lights is collected in one dynamic
- *     lightmap (seperate from the pseudo-dynamic shadow-maps).
- *     Shadows for dynamic lights will be less accurate because things
- *     will not cast accurate shadows (due to computation speed limitations).
- * </ul>
- * Note that static and pseudo-dynamic lights are represented by the
- * same csStatLight class.
+ * and a radius.
  */
 class csLight : public csObject
 {
@@ -251,6 +216,7 @@ public:
     virtual iNovaHalo* CreateNovaHalo (int seed, int num_spokes,
   	float roundness);
     virtual iFlareHalo* CreateFlareHalo ();
+    virtual csFlags& GetFlags () { return scfParent->flags; }
   } scfiLight;
 };
 
@@ -593,7 +559,10 @@ public:
     virtual iLight *QueryLight ()
     { return &(scfParent->scfiLight); }
     virtual iDynLight* GetNext ()
-    { return &(scfParent->GetNext())->scfiDynLight; }
+    {
+      csDynLight* n = scfParent->GetNext ();
+      return n ? &(n->scfiDynLight) : NULL;
+    }
   } scfiDynLight;
   friend struct eiDynLight;
 };

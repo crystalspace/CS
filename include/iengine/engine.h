@@ -36,6 +36,7 @@ struct iSector;
 struct iSectorIterator;
 struct iObjectIterator;
 struct iLight;
+struct iLightIterator;
 struct iStatLight;
 struct iDynLight;
 struct iSprite;
@@ -176,21 +177,15 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 7, 9);
+SCF_VERSION (iEngine, 0, 7, 10);
 
 /**
  * This interface is the main interface to the 3D engine.
  * The engine is responsible for creating new engine-specific objects
- * such as sectors, things, sprites and so on.
+ * such as sectors, mesh objects, mesh object factories, lights, and so on.
  */
 struct iEngine : public iBase
 {
-  /**
-   * @@@KLUDGE: This will no longer be needed once the iEngine interface is
-   * complete.
-   */
-  virtual csEngine *GetCsEngine () = 0;
-
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
 
@@ -509,11 +504,17 @@ struct iEngine : public iBase
   /// Find a static/pseudo-dynamic light by name.
   virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false)
     const = 0;
+  /**
+   * Create an iterator to iterate over all static lights of the engine.
+   */
+  virtual iLightIterator* GetLightIterator (iRegion* region = NULL) = 0;
   /// Create a dynamic light.
   virtual iDynLight* CreateDynLight (const csVector3& pos, float radius,
   	const csColor& color) = 0;
   /// Remove a dynamic light.
   virtual void RemoveDynLight (iDynLight*) = 0;
+  /// Return the first dynamic light in this engine.
+  virtual iDynLight* GetFirstDynLight () const = 0;
 
   /**
    * Get the required flags for 3D->BeginDraw() which should be called
