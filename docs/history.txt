@@ -54,6 +54,9 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine moved the MacOS/X Server MAKE_VOLATILE_H bug fix out
 	  of Makefile and into macosxs.mak, thus localizing the bug fix and
 	  simplifying the configuration phase for other platforms.
+	- Eric Sunshine updated INSTALL.NeXT and INSTALL.NeXT-Binary to
+	  reflect the fact that Crystal Space no longer automatically performs
+	  a "-recalc" when AMBIENT_WHITE changes.
 9-Aug-1999
 	- Changed merged things (static_thing) so that the original things
 	  are removed instead of kept in memory for no useful purpose.
