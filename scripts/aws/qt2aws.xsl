@@ -293,8 +293,12 @@
 
   <xsl:template name="get_classname">
     <xsl:choose>
-      <xsl:when test="property[name='toolTip' and string-length(comment)>0]">
-        <xsl:text>"</xsl:text><xsl:value-of select="property[name='toolTip']/comment"/><xsl:text>"</xsl:text></xsl:when>
+      <xsl:when test="contains(concat('|',property[name='whatsThis']/string),'|t:')">
+        <xsl:call-template name="awsinfo">
+          <xsl:with-param name="info" select="concat(property[name='whatsThis']/string,'|')"/>
+          <xsl:with-param name="process" select="'t'"/>
+        </xsl:call-template>
+      </xsl:when>
       <xsl:when test="class='QTabWidget'">"Notebook"</xsl:when>
       <xsl:when test="class='QWidget' and ../class='QTabWidget'">"Notebook Page"</xsl:when>
       <xsl:when test="class='QPushButton'">"Command Button"</xsl:when>
@@ -346,26 +350,34 @@
 
   <xsl:template name="awsinfo">
     <xsl:param name="info"/>
+    <xsl:param name="process"><xsl:text>cl</xsl:text></xsl:param>
     <xsl:param name="sepa"><xsl:text>|</xsl:text></xsl:param>
     <xsl:param name="idsepa"><xsl:text>:</xsl:text></xsl:param>
     <xsl:variable name="token" select="substring-before($info,$sepa)"/>
     <xsl:if test="string-length($token)>0">
       <xsl:variable name="tokenid" select="substring-before($token,$idsepa)"/>
-      <xsl:choose>
-        <xsl:when test="$tokenid='c'">
-          <xsl:call-template name="do_connect">
-            <xsl:with-param name="inp" select="substring-after($token,$idsepa)"/>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:when test="$tokenid='l'">
-          <xsl:call-template name="do_literal">
-            <xsl:with-param name="inp" select="substring-after($token,$idsepa)"/>
-          </xsl:call-template>
-        </xsl:when>
-      </xsl:choose>
-
+      <xsl:if test="contains($process,$tokenid)">
+        <xsl:choose>
+          <xsl:when test="$tokenid='c'">
+            <xsl:call-template name="do_connect">
+              <xsl:with-param name="inp" select="substring-after($token,$idsepa)"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="$tokenid='l'">
+            <xsl:call-template name="do_literal">
+              <xsl:with-param name="inp" select="substring-after($token,$idsepa)"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="$tokenid='t'">
+            <xsl:call-template name="do_classtype">
+              <xsl:with-param name="inp" select="substring-after($token,$idsepa)"/>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:if>
       <xsl:call-template name="awsinfo">
         <xsl:with-param name="info" select="substring-after($info,$sepa)"/>
+        <xsl:with-param name="process" select="$process"/>
         <xsl:with-param name="sepa" select="$sepa"/>
         <xsl:with-param name="idsepa" select="$idsepa"/>
       </xsl:call-template>
@@ -375,6 +387,11 @@
   <xsl:template name="do_literal">
     <xsl:param name="inp"/>
     <xsl:call-template name="spacer"/><xsl:value-of select="$inp"/>
+  </xsl:template>
+
+  <xsl:template name="do_classtype">
+    <xsl:param name="inp"/>
+    <xsl:text>"</xsl:text><xsl:value-of select="$inp"/><xsl:text>"</xsl:text>
   </xsl:template>
 
   <xsl:template name="do_connect">
