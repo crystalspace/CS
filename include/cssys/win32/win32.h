@@ -29,11 +29,6 @@
 #include "cssys/win32/win32itf.h"
 #include <objbase.h>
 
-#if defined(COMP_VC)
-#include "cssys/csinput.h"
-#include "ivideo/graph2d.h"
-#endif
-
 #include "cssys/system.h"
 #include "cssys/csinput.h"
 
