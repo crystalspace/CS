@@ -18,6 +18,9 @@ chronological order.
 	- Jorrit fixed the software renderer so that it now scales the image
 	  to power of two dimension at Prepare time and not at register time.
 	  That way it works more like the OpenGL renderer.
+	- Jorrit fixed an initialization bug in the kdtree code where the
+	  'parent' of the root node was not set to 0. This could cause crashes
+	  in viewmesh (and in other apps too if there were moving objects).
 25-Nov-2003
 	- Eric Sunshine removed the ugly, semi-private, legacy name_VERSION and
 	  name_scfGetID() API which SCF_VERSION() created for each declared
