@@ -60,7 +60,8 @@ rule SystemLinkApplication
 
 rule SystemInstallApplication
 {
-  Depends install_bin : [ DoInstall $(<) : $(bindir) $(2) : $(INSTALL_PROGRAM) ] ;
+  Depends install_bin :
+    [ DoInstall $(<) : $(bindir) $(2) : $(INSTALL_PROGRAM) ] ;
 }
 
 rule SystemInstallPlugin
@@ -112,7 +113,7 @@ if $(PLUGIN.LFLAGS.USE_SONAME) = "yes"
   actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS
   {
     $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS) \
-      -Wl,-soname,$(<)
+      -Wl,-soname,$(<:BS)
   }
 }
 else
