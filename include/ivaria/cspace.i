@@ -958,7 +958,6 @@ TYPEMAP_OUT_csWrapPtr
 %include "ivideo/texture.h"
 
 %include "ivideo/txtmgr.h"
-%include "ivideo/vbufmgr.h"
 %include "ivideo/material.h"
 
 %immutable csStreamDescription::name;
