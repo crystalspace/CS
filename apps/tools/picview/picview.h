@@ -19,90 +19,51 @@
 #ifndef __PICVIEW_H__
 #define __PICVIEW_H__
 
-#include <stdarg.h>
-#include "csws/csws.h"
-#include "csutil/ref.h"
-#include "csgeom/math2d.h"
-#include "csgeom/math3d.h"
-#include "ivideo/graph3d.h"
-#include "imap/parser.h"
+#include <crystalspace.h>
 
-class ceImageView;
-class csButton;
-struct iVFS;
-struct iImageIO;
-struct iObjectRegistry;
-struct iGraphics3D;
-struct iStringArray;
-
-enum
+class PicView : public csApplicationFramework, public csBaseEventHandler
 {
-  cmdQuit = 9000,
-  cmdPrev,
-  cmdNext,
-  cmdFirst,
-  cmdNothing
-};
+private:
 
-/**
- * This subclass of csApp is our main entry point
- * for the CSWS application. It controls everything including
- * the image view.
- */
-class PicViewApp : public csApp
-{
-public:
-  csRef<iGraphics3D> pG3D;
-  csRef<iVFS> VFS;
-  csRef<iImageIO> image_loader;
-  ceImageView* image_view;
-  csWindow* image_window;
+  csRef<iEngine> engine;
+  csRef<iGraphics3D> g3d;
+  csRef<iKeyboardDriver> kbd;
+  csRef<iVFS> vfs;
+  csRef<iImageIO> imgloader;
+  csRef<iAws> aws;
+
   csRef<iStringArray> files;
+  csRef<iTextureHandle> txt;
+  csSimplePixmap* pic;
+  iAwsWindow *gui;
   int cur_idx;
-  csButton* label1;
-  csButton* label2;
+  bool scale;
+  float x,y;
 
+  bool OnKeyboard (iEvent&);
+  bool HandleEvent (iEvent &);
+
+  void ProcessFrame ();
+  void FinishFrame ();
+
+  void CreateGui ();
   void LoadNextImage (int idx, int step);
 
-public:
-  PicViewApp (iObjectRegistry *object_reg, csSkin &skin);
-  ~PicViewApp ();
-
-  virtual bool HandleEvent (iEvent &Event);
-  virtual bool Initialize ();
-};
-
-/**
- * This is a view of an image. It is a subclass of csComponent
- * so that it behaves nicely in the CSWS framework.
- */
-class ceImageView : public csComponent
-{
-public:
-  csPixmap* image;
+  static void ButtonFirst(void* app, iAwsSource *source);
+  static void ButtonPrev (void* app, iAwsSource *source);
+  static void ButtonNext (void* app, iAwsSource *source);
+  static void ButtonQuit (void* app, iAwsSource *source);
+  static void ButtonScale(void* app, iAwsSource *source);
 
 public:
-  ceImageView (csComponent *iParent, iGraphics3D *G3D);
-  virtual ~ceImageView ();
 
-  // Redraw the view.
-  virtual void Draw ();
-  // Do motion etc.
-  virtual bool HandleEvent (iEvent &Event);
-};
+  PicView ();
+  ~PicView ();
 
-/**
- * This is a small window with three buttons.
- */
-class ceControlWindow : public csWindow
-{
-public:
-  ceControlWindow (csComponent *iParent, char *iTitle,
-  	int iWindowStyle = CSWS_DEFAULTVALUE,
-	csWindowFrameStyle iFrameStyle = cswfs3D) :
-	csWindow (iParent, iTitle, iWindowStyle, iFrameStyle) { }
-  virtual bool HandleEvent (iEvent& Event);
+  void OnExit ();
+  bool OnInitialize (int argc, char* argv[]);
+
+  bool Application ();
 };
 
 #endif // __PICVIEW_H__
-

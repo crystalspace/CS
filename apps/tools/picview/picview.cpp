@@ -16,347 +16,242 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "cssysdef.h"
-#include "cstool/csview.h"
-#include "cstool/initapp.h"
-#include "csutil/cscolor.h"
-#include "csutil/cmdline.h"
-#include "csutil/cmdhelp.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/natwin.h"
-#include "ivideo/txtmgr.h"
-#include "ivaria/conout.h"
-#include "iutil/event.h"
 #include "picview.h"
-#include "imesh/object.h"
-#include "imesh/thing.h"
-#include "iutil/objreg.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "ivaria/reporter.h"
-#include "iutil/plugin.h"
-#include "iutil/vfs.h"
-#include "igraphic/imageio.h"
-#include "csutil/event.h"
 
 CS_IMPLEMENT_APPLICATION
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
-ceImageView::ceImageView (csComponent *iParent, iGraphics3D * /*G3D*/)
-  	: csComponent (iParent)
+PicView::PicView ()
 {
-  image = 0;
-
-  SetState (CSS_SELECTABLE, true);
-  // set background color to use and make palette
-  int palsize = 1;
-  int *palette = new int[palsize];
-  SetPalette(palette, palsize);
-  SetColor(0, cs_Color_Gray_L);
-  if (parent)
-    parent->SendCommand (cscmdWindowSetClient, (void *)this);
+  SetApplicationName ("PicView");
+  pic = 0;
+  gui = 0;
+  scale = false;
 }
 
-ceImageView::~ceImageView ()
+PicView::~PicView ()
 {
-  delete image;
 }
 
-bool ceImageView::HandleEvent (iEvent &Event)
+void PicView::ProcessFrame ()
 {
-  switch (Event.Type)
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+
+  if (g2d->GetHeight() != y || g2d->GetWidth() != x)
   {
-    case csevBroadcast:
-      break;
-    case csevKeyboard:
-      break;
+    x = g2d->GetWidth();
+    y = g2d->GetHeight();
+    aws->SetupCanvas(0, g3d->GetDriver2D (), g3d);
+    if (gui)
+      gui->MoveTo(g2d->GetWidth ()/2-100, 0);
   }
-  return csComponent::HandleEvent (Event);
+
+  if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+
+  g2d->Clear(0);
+  if (pic)
+  {
+    if (scale)
+      pic->DrawScaled(g3d, 0, 0, g2d->GetWidth (), g2d->GetHeight ());
+    else
+      pic->Draw(g3d, 0, 0);
+  }
+
+  aws->Redraw ();
+  aws->Print (g3d, 64);
 }
 
-void ceImageView::Draw ()
+void PicView::FinishFrame ()
 {
-  Box (0, 0, bound.Width(), bound.Height(), 0);
-  if (image) Pixmap (image, 0, 0, bound.Width (), bound.Height ());
+  g3d->FinishDraw ();
+  g3d->Print (0);
 }
 
-//-----------------------------------------------------------------------------
-
-bool ceControlWindow::HandleEvent (iEvent& Event)
+bool PicView::OnKeyboard(iEvent& ev)
 {
-  PicViewApp* ceapp = (PicViewApp*)app;
-  if (Event.Type == csevCommand)
-    switch (Event.Command.Code)
+  csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
+  if (eventtype == csKeyEventTypeDown)
+  {
+    utf32_char code = csKeyEventHelper::GetCookedCode(&ev);
+    if (code == CSKEY_ESC || code == 'q')
     {
-      case cmdQuit:
-        app->SendCommand (cscmdQuit);
-        break;
-      case cmdFirst:
-	ceapp->LoadNextImage (1, -1);
-	return true;
-      case cmdPrev:
-	ceapp->LoadNextImage (0, -1);
-	return true;
-      case cmdNext:
-	ceapp->LoadNextImage (0, 1);
-	return true;
+      ButtonQuit(this, 0);
     }
-  return csWindow::HandleEvent (Event);
-}
-
-/*---------------------------------------------------------------------*
- * PicViewApp
- *---------------------------------------------------------------------*/
-
-PicViewApp::PicViewApp (iObjectRegistry *object_reg, csSkin &skin)
-	: csApp (object_reg, skin)
-{
-}
-
-PicViewApp::~PicViewApp ()
-{
-}
-
-bool PicViewApp::Initialize ()
-{
-  if (!csApp::Initialize ())
-    return false;
-
-  image_loader = CS_QUERY_REGISTRY (object_reg, iImageIO);
-  if (!image_loader)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.picview", "No image loader plugin!");
-    return false;
+    else if (code == 'f')
+    {
+      ButtonFirst(this, 0);
+    }
+    else if (code == 'p')
+    {
+      ButtonPrev(this, 0);
+    }
+    else if (code == 'n')
+    {
+      ButtonNext(this, 0);
+    }
+    else if (code == 's')
+    {
+      ButtonScale(this, 0);
+    }
   }
+  return false;
+}
 
-  pG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  // Disable double buffering since it kills performance
-  pG3D->GetDriver2D ()->DoubleBuffer (false);
+bool PicView::HandleEvent (iEvent &ev)
+{
+  csBaseEventHandler::HandleEvent(ev);
+  if (aws) return aws->HandleEvent (ev);
+  return false;
+}
 
-  // Change to other directory before doing Prepare()
-  // because otherwise precalc_info file will be written into MazeD.zip
-  // The /tmp dir is fine for this.
-  VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
-  VFS->ChDir ("/tmp");
-  files = VFS->FindFiles ("/this/*");
-  cur_idx = 0;
+bool PicView::OnInitialize(int argc, char* argv[])
+{
+  if (!csInitializer::RequestPlugins(GetObjectRegistry(),
+    CS_REQUEST_VFS,
+    CS_REQUEST_OPENGL3D,
+    CS_REQUEST_ENGINE,
+    CS_REQUEST_FONTSERVER,
+    CS_REQUEST_IMAGELOADER,
+    CS_REQUEST_REPORTER,
+    CS_REQUEST_REPORTERLISTENER,
+    CS_REQUEST_PLUGIN("crystalspace.window.alternatemanager", iAws),
+    CS_REQUEST_END))
+    return ReportError("Failed to initialize plugins!");
 
-  //------------------------------- ok, now initialize the CSWS application ---
-
-  // Initialize the image window ...
-  csWindow *w = new csWindow (this, "Image View", CSWS_TITLEBAR, cswfsThin );
-  image_view = new ceImageView (w, pG3D);
-  image_window = w;
-  w->SetRect (140, 0, bound.Width (), bound.Height ());
-  w->SetDragStyle(0);
-  w->SetResizeMode(CS_LOCK_ALL);
-  int bw = 0, bh = 0;
-  w->GetBorderSize(bw, bh);
-  image_view->SetRect(bw, bh + w->GetTitlebarHeight(), bw + 5,
-    bh+w->GetTitlebarHeight() + 5);
-
-  w = new ceControlWindow (this, "", CSWS_DEFAULTVALUE & ~CSWS_MENUBAR);
-  w->SetRect (1, 50, 1+140, 50+320);
-  csComponent* d = new csDialog (w);
-  csButton* but;
-  but = new csButton (d, cmdFirst);
-  but->SetText ("First");
-  int y = 10;
-  but->SetPos (1, y); but->SetSize (130, 14); y += 15;
-
-  but = new csButton (d, cmdPrev);
-  but->SetText ("Prev");
-  but->SetPos (1, y); but->SetSize (130, 14); y += 15;
-
-  but = new csButton (d, cmdNext);
-  but->SetText ("Next");
-  but->SetPos (1, y); but->SetSize (130, 14); y += 15;
-
-  but = new csButton (d, cmdQuit);
-  but->SetText ("~Quit");
-  but->SetPos (1, y); but->SetSize (130, 14); y += 15;
-
-  y += 30;
-
-  label1 = new csButton (d, cmdNothing, CSBS_NODEFAULTBORDER|
-		  CSBS_TEXTBELOW, csbfsNone);
-  label1->SetText ("?");
-  label1->SetPos (0, y); label1->SetSize (130, 14); y += 15;
-  label2 = new csButton (d, cmdNothing, CSBS_NODEFAULTBORDER|
-		  CSBS_TEXTBELOW, csbfsNone);
-  label2->SetText ("?");
-  label2->SetPos (0, y); label2->SetSize (130, 14); y += 15;
+  if (!RegisterQueue(GetObjectRegistry()))
+    return ReportError("Failed to set up event handler!");
 
   return true;
 }
 
-bool PicViewApp::HandleEvent (iEvent &Event)
+void PicView::OnExit()
 {
-  switch (Event.Type)
-  {
-    case csevKeyboard:
-      if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
-      {
-	switch (csKeyEventHelper::GetCookedCode (&Event))
-	{
-	  case 'q':
-	  {
-	    ShutDown ();
-	    return true;
-	  }
-	}
-      }
-      break;
-    case csevCommand:
-      if (Event.Command.Code == cscmdStopModal)
-      {
-	csComponent* d = GetTopModalComponent ();
-	int rc = (int)Event.Command.Info;
-	if (rc == cscmdCancel) { delete d; return true; }
-
-        if (GetTopModalUserdata ())
-	{
-          csRef<iMessageBoxData> mbd (
-	  	SCF_QUERY_INTERFACE (GetTopModalUserdata (),
-		iMessageBoxData));
-	  if (mbd)
-	  {
-	    delete d;
-	    return true;
-	  }
-	}
-	return true;
-      }
-      break;
-  }
-  return csApp::HandleEvent (Event);
 }
 
-void PicViewApp::LoadNextImage (int idx, int step)
+bool PicView::Application()
 {
-  iTextureManager* txtmgr = pG3D->GetTextureManager ();
-  int i;
+  if (!OpenApplication(GetObjectRegistry()))
+    return ReportError("Error opening system!");
+
+  g3d = CS_QUERY_REGISTRY(GetObjectRegistry(), iGraphics3D);
+  if (!g3d) return ReportError("Failed to locate 3D renderer!");
+
+  engine = CS_QUERY_REGISTRY(GetObjectRegistry(), iEngine);
+  if (!engine) return ReportError("Failed to locate 3D engine!");
+
+  kbd = CS_QUERY_REGISTRY(GetObjectRegistry(), iKeyboardDriver);
+  if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
+
+  vfs = CS_QUERY_REGISTRY(GetObjectRegistry(), iVFS);
+  if (!vfs) return ReportError("Failed to locate Image Loader!");
+
+  imgloader = CS_QUERY_REGISTRY(GetObjectRegistry(), iImageIO);
+  if (!imgloader) return ReportError("Failed to locate Image Loader!");
+
+  aws = CS_QUERY_REGISTRY(GetObjectRegistry(), iAws);
+  if (!aws) return ReportError("Failed to locate Alternative WindowingSystem!");
+
+  vfs->ChDir ("/tmp");
+  files = vfs->FindFiles ("/this/*");
+  cur_idx = 0;
+
+  CreateGui();
+
+  x = g3d->GetDriver2D ()->GetWidth ();
+  y = g3d->GetDriver2D ()->GetHeight ();
+
+  Run();
+
+  return true;
+}
+
+void PicView::CreateGui ()
+{
+  aws->SetupCanvas(0, g3d->GetDriver2D (), g3d);
+
+  iAwsSink* sink = aws->GetSinkMgr ()->CreateSink ((void*)this);
+  sink->RegisterTrigger ("First", &ButtonFirst);
+  sink->RegisterTrigger ("Prev" , &ButtonPrev );
+  sink->RegisterTrigger ("Next" , &ButtonNext );
+  sink->RegisterTrigger ("Quit" , &ButtonQuit );
+  sink->RegisterTrigger ("Scale", &ButtonScale);
+  aws->GetSinkMgr ()->RegisterSink ("PicView", sink);
+
+  if (!aws->GetPrefMgr()->Load ("/aws/windows_skin.def"))
+    ReportError("couldn't load skin definition file!");
+  if (!aws->GetPrefMgr()->Load ("/varia/picview.def"))
+    ReportError("couldn't load definition file!");
+
+  aws->GetPrefMgr ()->SelectDefaultSkin ("Windows");
+
+  gui = aws->CreateWindowFrom ("PicView");
+  if (gui)
+  {
+    gui->MoveTo(g3d->GetDriver2D ()->GetWidth ()/2-100, 0);
+    gui->Show ();
+  }
+}
+
+void PicView::LoadNextImage (int idx, int step)
+{
+  iTextureManager* txtmgr = g3d->GetTextureManager();
+
   if (idx) cur_idx = idx;
-  else cur_idx += step;
+  cur_idx += step;
+
   if (cur_idx < 0) cur_idx = files->Length ()-1;
   if ((size_t)cur_idx >= files->Length ()) cur_idx = 0;
-  i = cur_idx;
-  printf ("loading file '%s' (%d/%lu)\n", files->Get (i), i+1,
-	  (unsigned long)files->Length ());
-  char sbuf[255];
-  sprintf (sbuf, "%d/%lu", i+1, (unsigned long)files->Length ());
-  label1->SetText (sbuf);
-  sprintf (sbuf, "%s", files->Get (i));
-  label2->SetText (sbuf+6);
-  csRef<iDataBuffer> buf (VFS->ReadFile (files->Get (i)));
+
+  csRef<iDataBuffer> buf (vfs->ReadFile (files->Get (cur_idx)));
   if (!buf) return;
-  csRef<iImage> ifile (image_loader->Load (buf->GetUint8 (),
-		  buf->GetSize (), txtmgr->GetTextureFormat ()));
-  if (image_view->image)
-  {
-    image_view->image->GetTextureHandle ()->DecRef ();
-    delete image_view->image;
-    image_view->image = 0;
-    image_view->SetSize(5, 5);
-  }
-  if (ifile)
-  {
-    int w = ifile->GetWidth ();
-    int h = ifile->GetHeight ();
-    csRef<iTextureHandle> txt (txtmgr->RegisterTexture (ifile, CS_TEXTURE_2D
-    	| CS_TEXTURE_DITHER));
-    txt->IncRef ();	// Avoid DecRef from smart pointer.
-    csSimplePixmap* pm = new csSimplePixmap (txt);
-    image_view->image = pm;
-    //int w = pm->Width ();
-    //int h = pm->Height ();
-    int mw = image_window->bound.xmax - image_window->bound.xmin;
-    int mh = image_window->bound.ymax - image_window->bound.ymin;
-    while (w > mw || h > mh)
-    {
-      w = w*90/100;
-      h = h*90/100;
-    }
-    printf ("size is %d %d\n", w, h);
-    image_view->SetSize(w,h);
-  }
-  image_view->Invalidate ();
+
+  csRef<iImage> ifile (imgloader->Load (buf->GetUint8 (), 
+    buf->GetSize (), txtmgr->GetTextureFormat ()));
+  if (!ifile) return;
+
+  delete pic;
+  txt = txtmgr->RegisterTexture (ifile, CS_TEXTURE_2D | CS_TEXTURE_DITHER);
+  pic = new csSimplePixmap (txt);
 }
 
-/*---------------------------------------------------------------------*
- * Main function
- *---------------------------------------------------------------------*/
-CSWS_SKIN_DECLARE_DEFAULT (DefaultSkin);
+//---------------------------------------------------------------------------
 
+void PicView::ButtonFirst(void* app, iAwsSource *source)
+{
+  PicView* picview = (PicView*)app;
+  picview->LoadNextImage (1, -1);
+}
+
+void PicView::ButtonPrev (void* app, iAwsSource *source)
+{
+  PicView* picview = (PicView*)app;
+  picview->LoadNextImage (0, -1);
+}
+
+void PicView::ButtonNext (void* app, iAwsSource *source)
+{
+  PicView* picview = (PicView*)app;
+  picview->LoadNextImage (0, 1);
+}
+
+void PicView::ButtonQuit (void* app, iAwsSource *source)
+{
+  PicView* picview = (PicView*)app;
+  csRef<iEventQueue> q = CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
+  if (q.IsValid()) q->GetEventOutlet()->Broadcast(cscmdQuit);
+}
+
+void PicView::ButtonScale (void* app, iAwsSource *source)
+{
+  PicView* picview = (PicView*)app;
+  picview->scale ^= true;
+}
+
+/*-------------------------------------------------------------------------*
+ * Main function
+ *-------------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
-  if (!object_reg) return false;
-
-  if (!csInitializer::SetupConfigManager (object_reg, 0))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.picview",
-	"Can't initialize system!");
-    return -1;
-  }
-
-  if (!csInitializer::RequestPlugins (object_reg,
-  	CS_REQUEST_VFS,
-	CS_REQUEST_OPENGL3D,
-	CS_REQUEST_FONTSERVER,
-	CS_REQUEST_IMAGELOADER,
-	CS_REQUEST_END))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.picview",
-	"Can't initialize system!");
-    return -1;
-  }
-
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser));
-  cmdline->AddOption ("mode", "1024x768");
-
-  // Check for commandline help.
-  if (csCommandLineHelper::CheckHelp (object_reg))
-  {
-    csCommandLineHelper::Help (object_reg);
-    exit (0);
-  }
-
-  srand (time (0));
-
-  csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
-  iNativeWindow* nw = g3d->GetDriver2D ()->GetNativeWindow ();
-  if (nw) nw->SetTitle ("Crystal Space Picture Viewer");
-
-  if (!csInitializer::OpenApplication (object_reg))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.picview",
-	"Can't initialize system!");
-    return -1;
-  }
-  // Create our main class.
-
-  PicViewApp *theApp = new PicViewApp (object_reg, DefaultSkin);
-
-  // Initialize the main system. This will load all needed plug-ins
-  // (3D, 2D, network, sound, ...) and initialize them.
-  if (theApp->Initialize ())
-    csDefaultRunLoop(object_reg);
-  else
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.picview", "Error initializing system!");
-
-  delete theApp;
-  g3d = 0;	// Release before DestroyApplication().
-  cmdline = 0;
-
-  csInitializer::DestroyApplication (object_reg);
-  return 0;
+  return PicView().Main(argc, argv);
 }

@@ -35,6 +35,7 @@ chronological order.
 	  where it neglected to install config.sub, config.guess, and
 	  install-sh into ${datadir}/build/autoconf. These are needed by
 	  jamtemplate.
+	- PK changed PicView to use csApplicationFramework and AWS.
 19-Nov-2004
 	- PK fixed the mesh attaching to sockets in viewmesh by adding
 	  sprite->GetMovable()->UpdateMove() to ViewMesh::AttachMeshToSocket.
