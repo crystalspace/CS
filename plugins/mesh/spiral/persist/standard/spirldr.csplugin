@@ -6,18 +6,22 @@
     <classes>
       <class>
         <name>crystalspace.mesh.loader.factory.spiral</name>
+        <implementation>csSpiralFactoryLoader</implementation>
         <description>Crystal Space Spiral Factory Loader</description>
       </class>
       <class>
         <name>crystalspace.mesh.loader.spiral</name>
+        <implementation>csSpiralLoader</implementation>
         <description>Crystal Space Spiral Mesh Loader</description>
       </class>
       <class>
         <name>crystalspace.mesh.saver.factory.spiral</name>
+        <implementation>csSpiralFactorySaver</implementation>
         <description>Crystal Space Spiral Factory Saver</description>
       </class>
       <class>
         <name>crystalspace.mesh.saver.spiral</name>
+        <implementation>csSpiralSaver</implementation>
         <description>Crystal Space Spiral Mesh Saver</description>
       </class>
     </classes>

@@ -109,21 +109,4 @@ SCF_IMPLEMENT_IBASE (awsLayoutManager)
   SCF_IMPLEMENTS_INTERFACE (iAwsLayoutManager)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_EXPORT_CLASS_TABLE(aws)
-SCF_EXPORT_CLASS
-  (
-    awsManager, "crystalspace.window.alternatemanager",
-      "Crystal Space alternate window manager"
-  )
-SCF_EXPORT_CLASS
-  (
-    awsPrefManager, "crystalspace.window.preferencemanager",
-      "Crystal Space window preference manager"
-  )
-SCF_EXPORT_CLASS
-  (
-    awsSinkManager, "crystalspace.window.sinkmanager",
-      "Crystal Space window sink manager"
-  )
-SCF_EXPORT_CLASS_TABLE_END
 

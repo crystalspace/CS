@@ -87,13 +87,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 SCF_IMPLEMENT_FACTORY (csBCTerrFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csBCTerrLoader)
 
-SCF_EXPORT_CLASS_TABLE (bcterrldr)
-  SCF_EXPORT_CLASS (csBCTerrFactoryLoader,
-    "crystalspace.mesh.loader.factory.bcterr",
-    "Crystal Space Bezier Curve Terrain Factory Loader")
-  SCF_EXPORT_CLASS (csBCTerrLoader, "crystalspace.mesh.loader.bcterr",
-    "Crystal Space Bezier Curve Terrain Loader")
-SCF_EXPORT_CLASS_TABLE_END
 
 //-----------------------------------------------------------------------
 //-----------------------------------------------------------------------

@@ -354,7 +354,4 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csModLoader);
 
-SCF_EXPORT_CLASS_TABLE (sndmod)
-  SCF_EXPORT_CLASS (csModLoader, "crystalspace.sound.loader.mod", "MikMod Sound Loader")
-SCF_EXPORT_CLASS_TABLE_END
 

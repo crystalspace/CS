@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.font.server.multiplexer</name>
+        <implementation>csFontServerMultiplexor</implementation>
         <description>Crystal Space font server multiplexor</description>
         <requires>
           <class>crystalspace.font.server.</class>

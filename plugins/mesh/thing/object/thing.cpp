@@ -2041,11 +2041,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csThingObjectType)
 
-SCF_EXPORT_CLASS_TABLE (thing)
-  SCF_EXPORT_CLASS (csThingObjectType,
-  	"crystalspace.mesh.object.thing",
-	"Crystal Space Thing Mesh Type")
-SCF_EXPORT_CLASS_TABLE_END
 
 csThingObjectType::csThingObjectType (iBase *pParent) :
 	blk_polygon3d (2000),

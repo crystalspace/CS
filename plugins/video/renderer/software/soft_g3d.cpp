@@ -34,12 +34,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics3DSoftware)
 
-SCF_EXPORT_CLASS_TABLE (soft3d)
-  SCF_EXPORT_CLASS_DEP (csGraphics3DSoftware,
-    "crystalspace.graphics3d.software",
-    "Software 3D graphics driver for Crystal Space",
-    "crystalspace.font.server.")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE_EXT (csGraphics3DSoftware)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)

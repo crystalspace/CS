@@ -55,10 +55,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csFrustumVis)
 
-SCF_EXPORT_CLASS_TABLE (frustvis)
-  SCF_EXPORT_CLASS (csFrustumVis, "crystalspace.culling.frustvis",
-    "Simple Frustum Visibility System")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csFrustumVis)
   SCF_IMPLEMENTS_INTERFACE (iVisibilityCuller)

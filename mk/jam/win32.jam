@@ -143,10 +143,8 @@ rule SystemLinkPlugin
 
   # create export definitions
   local exportdefs = [ DoObjectGrist $(<).def ] ;
-  LOCATE on $(exportdefs) = $(LOCATE.OBJECTS) ;
-  SEARCH on $(exportdefs) = $(LOCATE.OBJECTS) ;
   NAME on $(exportdefs) = $(<) ;
-  GenerateExportDefs $(exportdefs) ;
+  GenerateExportDefs $(exportdefs) : $($(<)_METAFILE) ;
   Depends $(target) : $(exportdefs) ;
 
   Depends $(target) : $(>) ;
@@ -165,14 +163,20 @@ actions LinkApplication bind NEEDLIBS bind EXTRAOBJECTS
   $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }
 
+rule GenerateExportDefs
+{
+  SEARCH on $(<) = $(LOCATE.OBJECTS) ;
+  MakeLocate $(<) : $(LOCATE.OBJECTS) ;
+  Depends $(<) : $(>) ;
+}
+
 actions GenerateExportDefs
 {
-  cat > $(<) << __EOF__
-EXPORTS
-    $(NAME)_scfInitialize
-    $(NAME)_scfFinalize
-    plugin_compiler
-__EOF__
+  echo "EXPORTS" > $(<)
+  echo "  plugin_compiler" >> $(<)
+  sed '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  \1_scfInitialize\
+  \1_scfFinalize\
+  \1_Create:' < $(>) >> $(<)
 }
 
 actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS bind EXPORTDEFS

@@ -1176,11 +1176,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csBezierMeshObjectType)
 
-SCF_EXPORT_CLASS_TABLE (bezier)
-  SCF_EXPORT_CLASS (csBezierMeshObjectType,
-  	"crystalspace.mesh.object.bezier",
-	"Crystal Space Bezier Mesh Type")
-SCF_EXPORT_CLASS_TABLE_END
 
 csBezierMeshObjectType::csBezierMeshObjectType (
   iBase *pParent)

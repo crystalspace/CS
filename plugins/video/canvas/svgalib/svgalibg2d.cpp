@@ -82,12 +82,6 @@ static unsigned short ScanCodeToChar[128] =
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DSVGALib)
 
-SCF_EXPORT_CLASS_TABLE (svga2d)
-  SCF_EXPORT_CLASS_DEP (csGraphics2DSVGALib,
-    "crystalspace.graphics2d.svgalib",
-    "SVGALib 2D graphics driver for Crystal Space",
-    "crystalspace.font.server.")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE_EXT (csGraphics2DSVGALib)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)

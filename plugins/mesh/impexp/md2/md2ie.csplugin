@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.modelconverter.md2</name>
+        <implementation>csModelConverterMD2</implementation>
         <description>MD2 Model Converter</description>
       </class>
     </classes>

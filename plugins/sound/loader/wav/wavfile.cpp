@@ -127,10 +127,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csSoundLoader_WAV);
 
-SCF_EXPORT_CLASS_TABLE (sndwav)
-SCF_EXPORT_CLASS (csSoundLoader_WAV,
-  "crystalspace.sound.loader.wav", "WAV Sound Loader")
-SCF_EXPORT_CLASS_TABLE_END;
 
 // header of the RIFF-chunk
 struct _RIFFchk

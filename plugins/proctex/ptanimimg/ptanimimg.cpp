@@ -45,12 +45,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY(csAnimateProctexLoader);
 
-SCF_EXPORT_CLASS_TABLE (ptanimimg)
-  SCF_EXPORT_CLASS_DEP (csAnimateProctexLoader, 
-    "crystalspace.texture.loader.animimg",
-    "Animated image procedural texture loader", 
-    "crystalspace.graphics3d., crystalspace.level.loader, ")
-SCF_EXPORT_CLASS_TABLE_END
 
 //----------------------------------------------------------------------------
 

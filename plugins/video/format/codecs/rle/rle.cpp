@@ -47,10 +47,6 @@ SCF_IMPLEMENT_IBASE (csRLECodec)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csRLECodec)
-SCF_EXPORT_CLASS_TABLE (rlecodec)
-  SCF_EXPORT_CLASS (csRLECodec, "crystalspace.video.codec.avi.rle", "CrystalSpace RLE codec")
-  SCF_EXPORT_CLASS (csRLECodec, "crystalspace.video.codec.avi.RLE", "CrystalSpace RLE codec")
-SCF_EXPORT_CLASS_TABLE_END
 
 csRLECodec::csRLECodec (iBase *pParent)
 {

@@ -98,17 +98,6 @@ SCF_IMPLEMENT_FACTORY (csHazeFactorySaver)
 SCF_IMPLEMENT_FACTORY (csHazeLoader)
 SCF_IMPLEMENT_FACTORY (csHazeSaver)
 
-SCF_EXPORT_CLASS_TABLE (hazeldr)
-  SCF_EXPORT_CLASS (csHazeFactoryLoader,
-    "crystalspace.mesh.loader.factory.haze",
-    "Crystal Space Haze Factory Loader")
-  SCF_EXPORT_CLASS (csHazeFactorySaver, "crystalspace.mesh.saver.factory.haze",
-    "Crystal Space Haze Factory Saver")
-  SCF_EXPORT_CLASS (csHazeLoader, "crystalspace.mesh.loader.haze",
-    "Crystal Space Haze Mesh Loader")
-  SCF_EXPORT_CLASS (csHazeSaver, "crystalspace.mesh.saver.haze",
-    "Crystal Space Haze Mesh Saver")
-SCF_EXPORT_CLASS_TABLE_END
 
 csHazeFactoryLoader::csHazeFactoryLoader (iBase* pParent)
 {

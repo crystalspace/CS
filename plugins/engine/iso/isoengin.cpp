@@ -60,11 +60,6 @@ SCF_IMPLEMENT_IBASE (csIsoEngine::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_EXPORT_CLASS_TABLE (iso)
-  SCF_EXPORT_CLASS_DEP (csIsoEngine, "crystalspace.engine.iso",
-    "Crystal Space Isometric Engine",
-    "crystalspace.kernel., crystalspace.graphics3d., crystalspace.graphics2d.")
-SCF_EXPORT_CLASS_TABLE_END
 
 void csIsoEngine::Report (int severity, const char* msg, ...)
 {

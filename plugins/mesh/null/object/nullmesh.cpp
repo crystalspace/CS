@@ -170,10 +170,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csNullmeshMeshObjectType)
 
-SCF_EXPORT_CLASS_TABLE (nullmesh)
-  SCF_EXPORT_CLASS (csNullmeshMeshObjectType, "crystalspace.mesh.object.nullmesh",
-    "Crystal Space Null Mesh Type")
-SCF_EXPORT_CLASS_TABLE_END
 
 csNullmeshMeshObjectType::csNullmeshMeshObjectType (iBase* pParent)
 {

@@ -1654,10 +1654,6 @@ void csSequenceTrigger::TestConditions (csTicks delay)
 
 SCF_IMPLEMENT_FACTORY (csEngineSequenceManager)
 
-SCF_EXPORT_CLASS_TABLE (engseq)
-  SCF_EXPORT_CLASS (csEngineSequenceManager,
-  	"crystalspace.utilities.sequence.engine", "Engine Sequence Manager")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csEngineSequenceManager)
   SCF_IMPLEMENTS_INTERFACE (iEngineSequenceManager)

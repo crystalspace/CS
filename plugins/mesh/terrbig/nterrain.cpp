@@ -938,10 +938,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csBigTerrainObjectType)
 
-SCF_EXPORT_CLASS_TABLE (terrbig)
-  SCF_EXPORT_CLASS (csBigTerrainObjectType, "crystalspace.mesh.object.terrbig",
-    "Crystal Space Big Terrain Type")
-SCF_EXPORT_CLASS_TABLE_END
 
 csBigTerrainObjectType::csBigTerrainObjectType (iBase *pParent)
 {

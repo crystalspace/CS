@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.sound.loader.multiplexer</name>
+        <implementation>csSoundLoaderMultiplexer</implementation>
         <description>Sound Loader Multiplexer</description>
         <requires>
           <class>crystalspace.sound.loader.</class>

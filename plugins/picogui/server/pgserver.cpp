@@ -53,11 +53,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csPicoGUIServer)
 
-SCF_EXPORT_CLASS_TABLE (pgserver)
-  SCF_EXPORT_CLASS (csPicoGUIServer,
-    "crystalspace.gui.pico.server",
-    "Crystal Space PicoGUI Server")
-SCF_EXPORT_CLASS_TABLE_END
 
 csPicoGUIServer::csPicoGUIServer (iBase *parent)
 {

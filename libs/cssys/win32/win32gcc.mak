@@ -79,6 +79,7 @@ DFLAGS.debug =
 # Flags for the linker which are used when building a shared library.
 # <cs-config>
 TARGET.RAW = $(basename $(notdir $@))
+TARGET.RAW.UPCASE = $(basename $(notdir $(UPCASE)))
 LFLAGS.DLL = $(DFLAGS.$(MODE)) -q --def=$(OUT)/$(TARGET.RAW).def \
   --no-export-all-symbols --dllname $(TARGET.RAW)
 # </cs-config>
@@ -136,6 +137,7 @@ endif
 COMPILE_RES = windres --use-temp-file --include-dir include $(RCFLAGS) 
 MAKEVERSIONINFO = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkverres.sh
 MERGERES = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mergeres.sh
+MAKEDEFFILE = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkdef.sh
 
 DO.SHARED.PLUGIN.PREAMBLE += \
   $(MAKEVERSIONINFO) $(OUT)/$(@:$(DLL)=-version.rc) \
@@ -143,16 +145,8 @@ DO.SHARED.PLUGIN.PREAMBLE += \
   $(MERGERES) $(OUT)/$(@:$(DLL)=-rsrc.rc) $(SRCDIR) $(SRCDIR) \
     $(OUT)/$(@:$(DLL)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
   $(COMPILE_RES) -i $(OUT)/$(@:$(DLL)=-rsrc.rc) \
-    -o $(OUT)/$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM)
-# <cs-config>
-DO.SHARED.PLUGIN.PREAMBLE += \
-  echo $"EXPORTS$">$(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM) \
-  echo $"	$(TARGET.RAW)_scfInitialize$">>$(OUT)/$(TARGET.RAW).def \
-  $(COMMAND_DELIM) \
-  echo $"	$(TARGET.RAW)_scfFinalize$">>$(OUT)/$(TARGET.RAW).def \
-  $(COMMAND_DELIM) \
-  echo $"	plugin_compiler$">>$(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM)
-# </cs-config>
+    -o $(OUT)/$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM) \
+  $(MAKEDEFFILE) $(INF.$(TARGET.RAW.UPCASE)) $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM)
 DO.SHARED.PLUGIN.CORE = \
   $(LINK.PLUGIN) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
     $(OUT)/$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS)

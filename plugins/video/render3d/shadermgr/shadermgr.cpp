@@ -80,9 +80,6 @@ SCF_IMPLEMENT_IBASE( csShaderPass )
   SCF_IMPLEMENTS_INTERFACE( iShaderPass )
 SCF_IMPLEMENT_IBASE_END
 
-SCF_EXPORT_CLASS_TABLE( shadermgr )
-  SCF_EXPORT_CLASS( csShaderManager, "crystalspace.render3d.shadermanager", "Shader manager" )
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE( csShaderVariable )
   SCF_IMPLEMENTS_INTERFACE( iShaderVariable )

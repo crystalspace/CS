@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.mesh.loader.factory.genmesh.tree</name>
+        <implementation>csGeneralTreeFactoryLoader</implementation>
         <description>Crystal Space General/Tree Mesh Factory Loader</description>
       </class>
     </classes>

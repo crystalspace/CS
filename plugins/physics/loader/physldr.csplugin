@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.dynamics.loader</name>
+        <implementation>csPhysicsLoader</implementation>
         <description>Crystal Space dynamics loader</description>
       </class>
     </classes>

@@ -174,10 +174,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSpiralMeshObjectType)
 
-SCF_EXPORT_CLASS_TABLE (spiral)
-  SCF_EXPORT_CLASS (csSpiralMeshObjectType, "crystalspace.mesh.object.spiral",
-    "Crystal Space Spiral Mesh Type")
-SCF_EXPORT_CLASS_TABLE_END
 
 csSpiralMeshObjectType::csSpiralMeshObjectType (iBase* pParent)
 {

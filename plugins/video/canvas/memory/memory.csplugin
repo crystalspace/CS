@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.graphics2d.memory</name>
+        <implementation>csGraphicsMemory</implementation>
         <description>Crystal Space Image Exporter</description>
         <requires>
           <class>crystalspace.font.server.</class>

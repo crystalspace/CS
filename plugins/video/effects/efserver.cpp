@@ -143,7 +143,4 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY( csEffectServer )
 
-SCF_EXPORT_CLASS_TABLE( effects )
-  SCF_EXPORT_CLASS( csEffectServer, "crystalspace.video.effects.stdserver", "Effects system" )
-SCF_EXPORT_CLASS_TABLE_END
 

@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.texture.loader.animimg</name>
+        <implementation>csAnimateProctexLoader</implementation>
         <description>Animated image procedural texture loader</description>
         <requires>
           <class>crystalspace.graphics3d.</class>

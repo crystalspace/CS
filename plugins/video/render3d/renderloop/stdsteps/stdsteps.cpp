@@ -27,14 +27,6 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_EXPORT_CLASS_TABLE (rlsstd)
-  SCF_EXPORT_CLASS_DEP (csGenericRSLoader, 
-    "crystalspace.renderloop.step.generic",
-    "", "")
-  SCF_EXPORT_CLASS_DEP (csGenericRSType, 
-    "crystalspace.renderloop.step.generic.type",
-    "", "")
-SCF_EXPORT_CLASS_TABLE_END
 
 
 

@@ -44,11 +44,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csRapidCollideSystem)
 
-SCF_EXPORT_CLASS_TABLE (rapid)
-  SCF_EXPORT_CLASS (csRapidCollideSystem,
-    "crystalspace.collisiondetection.rapid",
-    "Crystal Space RAPID CD System")
-SCF_EXPORT_CLASS_TABLE_END
 
 csRapidCollideSystem::csRapidCollideSystem (iBase *pParent)
 {

@@ -39,11 +39,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY(csRenderLoopLoader);
 
-SCF_EXPORT_CLASS_TABLE (rlloader)
-  SCF_EXPORT_CLASS_DEP (csRenderLoopLoader, 
-    "crystalspace.renderloop.loop.loader",
-    "", "")
-SCF_EXPORT_CLASS_TABLE_END
 
 //---------------------------------------------------------------------------
 

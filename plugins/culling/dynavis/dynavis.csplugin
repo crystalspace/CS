@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.culling.dynavis</name>
+        <implementation>csDynaVis</implementation>
         <description>Dynamic Visibility System</description>
       </class>
     </classes>

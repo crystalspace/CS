@@ -69,11 +69,6 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csModelConverterOBJ)
 
-SCF_EXPORT_CLASS_TABLE (objie)
-  SCF_EXPORT_CLASS (csModelConverterOBJ,
-    "crystalspace.modelconverter.obj",
-    "OBJ Model Converter")
-SCF_EXPORT_CLASS_TABLE_END
 
 CS_IMPLEMENT_PLUGIN
 

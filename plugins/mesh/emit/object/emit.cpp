@@ -979,10 +979,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csEmitMeshObjectType)
 
-SCF_EXPORT_CLASS_TABLE (emit)
-  SCF_EXPORT_CLASS (csEmitMeshObjectType, "crystalspace.mesh.object.emit",
-    "Crystal Space Emit Mesh Type")
-SCF_EXPORT_CLASS_TABLE_END
 
 csEmitMeshObjectType::csEmitMeshObjectType (iBase* pParent)
 {

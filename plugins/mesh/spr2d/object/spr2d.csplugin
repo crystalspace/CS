@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.mesh.object.sprite.2d</name>
+        <implementation>csSprite2DMeshObjectType</implementation>
         <description>Crystal Space Sprite2D Mesh Type</description>
       </class>
     </classes>

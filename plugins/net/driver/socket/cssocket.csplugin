@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.network.driver.sockets</name>
+        <implementation>csSocketDriver</implementation>
         <description>Crystal Space BSD Sockets Network Driver</description>
       </class>
     </classes>

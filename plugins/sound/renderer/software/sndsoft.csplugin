@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.sound.render.software</name>
+        <implementation>csSoundRenderSoftware</implementation>
         <description>Software Sound Renderer for Crystal Space</description>
       </class>
     </classes>

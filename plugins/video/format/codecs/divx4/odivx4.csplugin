@@ -6,10 +6,12 @@
     <classes>
       <class>
         <name>crystalspace.video.codec.avi.divx</name>
+        <implementation>csDivX4</implementation>
         <description>CrystalSpace OpenDivX codec</description>
       </class>
       <class>
         <name>crystalspace.video.codec.avi.dvx1</name>
+        <implementation>csDivX4</implementation>
         <description>CrystalSpace OpenDivX codec</description>
       </class>
     </classes>

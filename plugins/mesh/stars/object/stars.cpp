@@ -316,10 +316,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csStarsMeshObjectType)
 
-SCF_EXPORT_CLASS_TABLE (stars)
-  SCF_EXPORT_CLASS (csStarsMeshObjectType, "crystalspace.mesh.object.stars",
-    "Crystal Space Stars Mesh Type")
-SCF_EXPORT_CLASS_TABLE_END
 
 csStarsMeshObjectType::csStarsMeshObjectType (iBase* pParent)
 {

@@ -2378,10 +2378,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csGenmeshMeshObjectType)
 
-SCF_EXPORT_CLASS_TABLE (genmesh)
-  SCF_EXPORT_CLASS (csGenmeshMeshObjectType, "crystalspace.mesh.object.genmesh",
-    "Crystal Space General Mesh Type")
-SCF_EXPORT_CLASS_TABLE_END
 
 csGenmeshMeshObjectType::csGenmeshMeshObjectType (iBase* pParent)
 {

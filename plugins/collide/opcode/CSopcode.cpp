@@ -49,11 +49,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csOPCODECollideSystem)
 
-SCF_EXPORT_CLASS_TABLE (opcode)
-  SCF_EXPORT_CLASS (csOPCODECollideSystem,
-    "crystalspace.collisiondetection.opcode",
-    "Crystal Space OPCODE CD System")
-SCF_EXPORT_CLASS_TABLE_END
 
 using namespace Opcode;
 

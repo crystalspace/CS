@@ -57,6 +57,53 @@ The history order is reversed so that new features are at the top.
 	  complain about too many colors when it meant too many vertices.
 	- Eric Sunshine eliminated a compilation warning in ensocket driver
 	  regarding signed versus unsigned comparision.
+	- Eric Sunshine performed Phase Three of the elimination of the
+	  monolithic scf.cfg:
+	    - Eliminated the SCF information which was hardcoded in the .cpp
+	      files of plugin modules, and which duplicated information in the
+	      external .csplugin files.
+	    - Plugin modules no longer maintain and export a monolithic class
+	      list.  Now, each factory implemented by the code is exported
+	      automatically.
+	    - Added a new <implementation> child node to the <class> node in
+	      .csplugin files.  The value of this node is the name of the C++
+	      class which implements the SCF class.  For instance, C++ class
+	      csVFS implements crystalspace.kernel.vfs.
+	    - Eliminated the following SCF macros which were related to
+	      exporting SCF information from .cpp code and/or registering
+	      classes manually:
+	    	SCF_EXPORT_CLASS_TABLE
+		SCF_EXPORT_CLASS
+		SCF_EXPORT_CLASS_DEP
+	    	SCF_EXPORT_CLASS_TABLE_END
+		SCF_REGISTER_STATIC_CLASS_DEP
+	    - Eliminated the following methods from iSCF:
+		RegisterStaticClass
+		RegisterClassList
+	    - Plugin modules are now initialized/shutdown lazily as classes are
+	      requested from them.  The first time a class is requested, the
+	      plugin is initialized.  The plugin is shutdown after the last
+	      class instance has been destroyed.
+	    - Fixed bug in scf.h where SCF_PRINT_CALL_ADDRESS was not being
+	      enabled for gcc 3.x.
+	    - Fixed bug in win32.jam where GenerateExportDefs rule failed to
+	      ensure that directory containing output file existed before
+	      creating file.  Also fixed bug where it failed to set up a
+	      dependency between the input and output files.
+	    - Still To-Do:
+		- Remove references to scf.cfg and scfreg from documentation.
+		  Also document new .csplugin resources.
+		- Add platform-specific function to scan and locate plugins
+		  automatically rather than using the ad-hoc approach inherited
+		  from scanning for .scf files.
+		- Add platform-specific function to query a plugin's
+		  meta-information.  This should be used by SCF to do the raw
+		  extraction.  Provide and finalize API for higher-level
+		  clients to access meta-information.
+		- Augment static linking to work with the new facility.
+		  (Removal of the hardcoded SCF information, has now broken
+		  static linking.  It worked until this time, even with all of
+		  the preceding changes.)
 4-June-2003
 	- Jorrit fixed a bug in the AWS engine view where it would not set the
 	  FOV of the camera based on the height of the frame. This caused the

@@ -6,18 +6,22 @@
     <classes>
       <class>
         <name>crystalspace.mesh.loader.factory.fountain</name>
+        <implementation>csFountainFactoryLoader</implementation>
         <description>Crystal Space Fountain Factory Loader</description>
       </class>
       <class>
         <name>crystalspace.mesh.loader.fountain</name>
+        <implementation>csFountainLoader</implementation>
         <description>Crystal Space Fountain Mesh Loader</description>
       </class>
       <class>
         <name>crystalspace.mesh.saver.factory.fountain</name>
+        <implementation>csFountainFactorySaver</implementation>
         <description>Crystal Space Fountain Factory Saver</description>
       </class>
       <class>
         <name>crystalspace.mesh.saver.fountain</name>
+        <implementation>csFountainSaver</implementation>
         <description>Crystal Space Fountain Mesh Saver</description>
       </class>
     </classes>

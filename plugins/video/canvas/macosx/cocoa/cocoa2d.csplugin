@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.graphics2d.cocoa</name>
+        <implementation>CocoaDriver2D</implementation>
         <description>Crystal Space 2D driver for MacOS/X (Cocoa)</description>
         <requires>
           <class>crystalspace.font.server.</class>

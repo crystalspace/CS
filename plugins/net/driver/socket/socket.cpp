@@ -36,10 +36,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY(csSocketDriver)
 
-SCF_EXPORT_CLASS_TABLE(cssocket)
-  SCF_EXPORT_CLASS(csSocketDriver, "crystalspace.network.driver.sockets",
-    "Crystal Space BSD Sockets Network Driver")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE(csSocketConnection)
   SCF_IMPLEMENTS_INTERFACE(iNetworkConnection)

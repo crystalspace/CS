@@ -74,10 +74,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csBugPlug)
 
-SCF_EXPORT_CLASS_TABLE (bugplug)
-  SCF_EXPORT_CLASS (csBugPlug, "crystalspace.utilities.bugplug",
-    "Debugging utility")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csBugPlug)
   SCF_IMPLEMENTS_INTERFACE (iComponent)

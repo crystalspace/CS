@@ -63,10 +63,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csSoundLoader_IFF);
 
-SCF_EXPORT_CLASS_TABLE (sndiff)
-SCF_EXPORT_CLASS (csSoundLoader_IFF,
-  "crystalspace.sound.loader.iff", "IFF Sound Loader")
-SCF_EXPORT_CLASS_TABLE_END;
 
 #define setStream(x) {if(x>size) {goto exit_read;} else {index=x;}}
 #define canAddStream(x) {if((index+x)>size) goto exit_read;}

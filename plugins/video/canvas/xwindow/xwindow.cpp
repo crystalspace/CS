@@ -38,10 +38,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csXWindow)
 
-SCF_EXPORT_CLASS_TABLE (xwin)
-  SCF_EXPORT_CLASS (csXWindow, "crystalspace.window.x",
-    "X-Window plugin for Crystal Space")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE(csXWindow)
   SCF_IMPLEMENTS_INTERFACE(iXWindow)

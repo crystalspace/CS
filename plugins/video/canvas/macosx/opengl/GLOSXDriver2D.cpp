@@ -37,10 +37,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 SCF_IMPLEMENT_FACTORY(GLOSXDriver2D)
 
 
-SCF_EXPORT_CLASS_TABLE(glosx2d)
-    SCF_EXPORT_CLASS_DEP(GLOSXDriver2D, "crystalspace.graphics2d.glosx",
-    "Crystal Space 2D driver for MacOS/X (OpenGL)", "crystalspace.font.server.")
-SCF_EXPORT_CLASS_TABLE_END
 
 // Constructor
 GLOSXDriver2D::GLOSXDriver2D(iBase *p)

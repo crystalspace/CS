@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.sound.driver.coreaudio</name>
+        <implementation>csSoundDriverCoreAudio</implementation>
         <description>Crystal Space CoreAudio sound driver for MacOS/X</description>
       </class>
     </classes>

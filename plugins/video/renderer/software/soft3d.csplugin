@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.graphics3d.software</name>
+        <implementation>csGraphics3DSoftware</implementation>
         <description>Software 3D graphics driver for Crystal Space</description>
         <requires>
           <class>crystalspace.font.server.</class>

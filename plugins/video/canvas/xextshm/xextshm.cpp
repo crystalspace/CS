@@ -29,10 +29,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csXExtSHM)
 
-SCF_EXPORT_CLASS_TABLE (xextshm)
-  SCF_EXPORT_CLASS (csXExtSHM, "crystalspace.window.x.extshm",
-    "X-Window Shared Memory Extension plugin for Crystal Space")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE(csXExtSHM)
   SCF_IMPLEMENTS_INTERFACE(iXExtSHM)

@@ -39,11 +39,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csReporterListener)
 
-SCF_EXPORT_CLASS_TABLE (stdrep)
-  SCF_EXPORT_CLASS_DEP (csReporterListener, "crystalspace.utilities.stdrep",
-    "Standard Reporter Listener",
-    "crystalspace.utilities.reporter, crystalspace.console.output.")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csReporterListener::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)

@@ -24,17 +24,10 @@
 #include "csutil/strhash.h"
 #include "csutil/csstring.h"
 
-SCF_DECLARE_FACTORY(csPtFireType);
-SCF_DECLARE_FACTORY(csPtFireLoader);
-
-#define CLASSID_FIRETYPE	    "crystalspace.texture.type.fire"
-#define CLASSID_FIRELOADER	    "crystalspace.texture.loader.fire"
-
 class csPtFireType : public csBaseProctexType
 {
 public:
   csPtFireType (iBase *p);
-
   virtual csPtr<iTextureFactory> NewFactory();
 };
 
@@ -42,7 +35,6 @@ class csPtFireFactory : public csBaseTextureFactory
 {
 public:
   csPtFireFactory (iBase* p, iObjectRegistry* object_reg);
-
   virtual csPtr<iTextureWrapper> Generate ();
 };
 

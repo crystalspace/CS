@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.modelconverter.ase</name>
+        <implementation>csModelConverterASE</implementation>
         <description>ASE Model Converter</description>
       </class>
     </classes>

@@ -36,10 +36,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csSoundDriverWaveOut)
 
-SCF_EXPORT_CLASS_TABLE (sndwaveout)
-  SCF_EXPORT_CLASS (csSoundDriverWaveOut, "crystalspace.sound.driver.waveout",
-    "Software Sound Driver for Crystal Space")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE(csSoundDriverWaveOut)
   SCF_IMPLEMENTS_INTERFACE(iSoundDriver)

@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.renderloop.step.generic</name>
+        <implementation>csGenericRSLoader</implementation>
         <description>Generic render loop step</description>
         <requires>
           <class>crystalspace.render3d.</class>
@@ -13,6 +14,7 @@
       </class>
       <class>
         <name>crystalspace.renderloop.step.generic.type</name>
+        <implementation>csGenericRSType</implementation>
         <description>Generic render loop step type</description>
         <requires>
           <class>crystalspace.render3d.</class>

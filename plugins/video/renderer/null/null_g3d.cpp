@@ -40,10 +40,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics3DNull)
 
-SCF_EXPORT_CLASS_TABLE (null3d)
-  SCF_EXPORT_CLASS_DEP (csGraphics3DNull, "crystalspace.graphics3d.null",
-    "0 3D graphics driver for Crystal Space", "crystalspace.font.server.")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csGraphics3DNull)
   SCF_IMPLEMENTS_INTERFACE (iGraphics3D)

@@ -6,10 +6,12 @@
     <classes>
       <class>
         <name>crystalspace.motion.loader.default</name>
+        <implementation>csMotionLoader</implementation>
         <description>Skeletal MotionLoader for Crystal Space</description>
       </class>
       <class>
         <name>crystalspace.motion.saver.default</name>
+        <implementation>csMotionSaver</implementation>
         <description>Skeletal Motion Manager Saver for Crystal Space</description>
       </class>
     </classes>

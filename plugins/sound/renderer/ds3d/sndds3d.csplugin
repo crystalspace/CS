@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.sound.render.ds3d</name>
+        <implementation>csSoundRenderDS3D</implementation>
         <description>Crystal Space DirectSound3D Sound Render</description>
       </class>
     </classes>

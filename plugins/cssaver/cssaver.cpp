@@ -31,10 +31,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csSaver);
 
-SCF_EXPORT_CLASS_TABLE (cssaver)
-  SCF_EXPORT_CLASS_DEP (csSaver, "crystalspace.level.saver",
-    "Level and library file saver", "crystalspace.kernel., ")
-SCF_EXPORT_CLASS_TABLE_END
 
 CS_IMPLEMENT_PLUGIN
 

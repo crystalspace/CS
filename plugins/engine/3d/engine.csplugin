@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.engine.3d</name>
+        <implementation>csEngine</implementation>
         <description>Crystal Space 3D Engine</description>
         <requires>
           <class>crystalspace.kernel.</class>

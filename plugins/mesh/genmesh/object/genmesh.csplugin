@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.mesh.object.genmesh</name>
+        <implementation>csGenmeshMeshObjectType</implementation>
         <description>Crystal Space General Mesh Type</description>
       </class>
     </classes>

@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.utilities.reporter</name>
+        <implementation>csReporter</implementation>
         <description>Reporting utility</description>
       </class>
     </classes>

@@ -103,18 +103,6 @@ SCF_IMPLEMENT_FACTORY (csExplosionFactorySaver)
 SCF_IMPLEMENT_FACTORY (csExplosionLoader)
 SCF_IMPLEMENT_FACTORY (csExplosionSaver)
 
-SCF_EXPORT_CLASS_TABLE (exploldr)
-  SCF_EXPORT_CLASS (csExplosionFactoryLoader,
-    "crystalspace.mesh.loader.factory.explosion",
-    "Crystal Space Explosion Factory Loader")
-  SCF_EXPORT_CLASS (csExplosionFactorySaver,
-    "crystalspace.mesh.saver.factory.explosion",
-    "Crystal Space Explosion Factory Saver")
-  SCF_EXPORT_CLASS (csExplosionLoader, "crystalspace.mesh.loader.explosion",
-    "Crystal Space Explosion Mesh Loader")
-  SCF_EXPORT_CLASS (csExplosionSaver, "crystalspace.mesh.saver.explosion",
-    "Crystal Space Explosion Mesh Saver")
-SCF_EXPORT_CLASS_TABLE_END
 
 csExplosionFactoryLoader::csExplosionFactoryLoader (iBase* pParent)
 {

@@ -640,13 +640,6 @@ SCF_IMPLEMENT_IBASE (csEngine::EventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csEngine)
-  SCF_EXPORT_CLASS_TABLE(engine)
-  SCF_EXPORT_CLASS_DEP
-  (
-    csEngine, "crystalspace.engine.3d", "Crystal Space 3D Engine",
-      "crystalspace.kernel., crystalspace.graphics3d., crystalspace.graphic.image.io."
-  )
-SCF_EXPORT_CLASS_TABLE_END
 
 csEngine::csEngine (iBase *iParent) :
   sectors(true)

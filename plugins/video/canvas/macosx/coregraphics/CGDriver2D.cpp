@@ -31,11 +31,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY(CGDriver2D)
 
-SCF_EXPORT_CLASS_TABLE(cgdriver2d)
-    SCF_EXPORT_CLASS_DEP(CGDriver2D, "crystalspace.graphics2d.coregraphics",
-    "Crystal Space 2D driver for MacOS/X (CoreGraphics)",
-    "crystalspace.font.server.")
-SCF_EXPORT_CLASS_TABLE_END
 
 
 

@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.modelconverter.spr</name>
+        <implementation>csModelConverterSPR</implementation>
         <description>SPR Model Converter</description>
       </class>
     </classes>

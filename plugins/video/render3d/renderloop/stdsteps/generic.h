@@ -27,9 +27,6 @@
 #include "../common/basesteptype.h"
 #include "../common/basesteploader.h"
 
-SCF_DECLARE_FACTORY(csGenericRSType);
-SCF_DECLARE_FACTORY(csGenericRSLoader);
-
 class csGenericRenderStep : public iRenderStep, iGenericRenderStep
 {
 public:

@@ -67,11 +67,6 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csModelConverterPOV)
 
-SCF_EXPORT_CLASS_TABLE (povie)
-  SCF_EXPORT_CLASS (csModelConverterPOV,
-    "crystalspace.modelconverter.pov",
-    "POV Model Converter")
-SCF_EXPORT_CLASS_TABLE_END
 
 CS_IMPLEMENT_PLUGIN
 

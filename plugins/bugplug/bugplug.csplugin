@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.utilities.bugplug</name>
+        <implementation>csBugPlug</implementation>
         <description>Debugging utility</description>
       </class>
     </classes>

@@ -38,10 +38,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csFreeType2Server)
 
-SCF_EXPORT_CLASS_TABLE (freefnt2)
-  SCF_EXPORT_CLASS (csFreeType2Server, "crystalspace.font.server.freetype2",
-    "Crystal Space FreeType2 font server" )
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csFreeType2Server)
   SCF_IMPLEMENTS_INTERFACE (iFontServer)

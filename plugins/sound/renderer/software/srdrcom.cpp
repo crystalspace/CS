@@ -44,11 +44,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csSoundRenderSoftware)
 
-SCF_EXPORT_CLASS_TABLE (sndsoft)
-  SCF_EXPORT_CLASS (csSoundRenderSoftware,
-    "crystalspace.sound.render.software",
-    "Software Sound Renderer for Crystal Space")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE(csSoundRenderSoftware)
 	SCF_IMPLEMENTS_INTERFACE(iSoundRender)

@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.renderloop.loop.loader</name>
+        <implementation>csRenderLoopLoader</implementation>
         <description>Render loop loader</description>
         <requires>
           <class>crystalspace.engine.3d</class>

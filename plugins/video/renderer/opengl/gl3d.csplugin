@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.graphics3d.opengl</name>
+        <implementation>csGraphics3DOpenGL</implementation>
         <description>OpenGL 3D graphics driver for Crystal Space</description>
         <requires>
           <class>crystalspace.font.server.</class>

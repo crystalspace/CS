@@ -95,18 +95,6 @@ SCF_IMPLEMENT_FACTORY (csSpiralFactorySaver)
 SCF_IMPLEMENT_FACTORY (csSpiralLoader)
 SCF_IMPLEMENT_FACTORY (csSpiralSaver)
 
-SCF_EXPORT_CLASS_TABLE (spirldr)
-  SCF_EXPORT_CLASS (csSpiralFactoryLoader,
-  	"crystalspace.mesh.loader.factory.spiral",
-	"Crystal Space Spiral Factory Loader")
-  SCF_EXPORT_CLASS (csSpiralFactorySaver,
-    "crystalspace.mesh.saver.factory.spiral",
-    "Crystal Space Spiral Factory Saver")
-  SCF_EXPORT_CLASS (csSpiralLoader, "crystalspace.mesh.loader.spiral",
-    "Crystal Space Spiral Mesh Loader")
-  SCF_EXPORT_CLASS (csSpiralSaver, "crystalspace.mesh.saver.spiral",
-    "Crystal Space Spiral Mesh Saver")
-SCF_EXPORT_CLASS_TABLE_END
 
 csSpiralFactoryLoader::csSpiralFactoryLoader (iBase* pParent)
 {

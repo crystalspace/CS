@@ -413,10 +413,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (StuffMeshObjectType)
 
-SCF_EXPORT_CLASS_TABLE (cloth)
-SCF_EXPORT_CLASS ( StuffMeshObjectType , "crystalspace.mesh.object.cloth" ,
-               "CrystalSpace Cloth mesh object type" )
-SCF_EXPORT_CLASS_TABLE_END
 
 StuffMeshObjectType::StuffMeshObjectType (iBase* pParent)
 {

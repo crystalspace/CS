@@ -6,10 +6,12 @@
     <classes>
       <class>
         <name>crystalspace.video.codec.avi.rle</name>
+        <implementation>csRLECodec</implementation>
         <description>CrystalSpace RLE codec</description>
       </class>
       <class>
         <name>crystalspace.video.codec.avi.RLE</name>
+        <implementation>csRLECodec</implementation>
         <description>CrystalSpace RLE codec</description>
       </class>
     </classes>

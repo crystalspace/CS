@@ -67,10 +67,6 @@ public:
 
 SCF_IMPLEMENT_FACTORY(csSoundLoaderMultiplexer);
 
-SCF_EXPORT_CLASS_TABLE (sndplex)
-SCF_EXPORT_CLASS_DEP (csSoundLoaderMultiplexer,
-  SNDPLEX_CLASSNAME, "Sound Loader Multiplexer", "crystalspace.sound.loader.")
-SCF_EXPORT_CLASS_TABLE_END;
 
 SCF_IMPLEMENT_IBASE(csSoundLoaderMultiplexer)
   SCF_IMPLEMENTS_INTERFACE(iSoundLoader)

@@ -40,10 +40,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY(csSoundRenderDS3D);
 
-SCF_EXPORT_CLASS_TABLE (sndds3d)
-SCF_EXPORT_CLASS (csSoundRenderDS3D, "crystalspace.sound.render.ds3d",
-        "DirectSound 3D Sound Driver for Crystal Space")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE(csSoundRenderDS3D)
   SCF_IMPLEMENTS_INTERFACE(iSoundRender)

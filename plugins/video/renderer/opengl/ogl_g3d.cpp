@@ -40,11 +40,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics3DOpenGL)
 
-SCF_EXPORT_CLASS_TABLE (gl3d)
-  SCF_EXPORT_CLASS_DEP (csGraphics3DOpenGL, "crystalspace.graphics3d.opengl",
-    "OpenGL 3D graphics driver for Crystal Space",
-    "crystalspace.font.server.")
-SCF_EXPORT_CLASS_TABLE_END
 
 /*=========================================================================
  Method implementations

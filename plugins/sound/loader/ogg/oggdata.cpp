@@ -242,7 +242,4 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csOggLoader);
 
-SCF_EXPORT_CLASS_TABLE (sndogg)
-  SCF_EXPORT_CLASS (csOggLoader, "crystalspace.sound.loader.ogg", "Ogg Vorbis Sound Loader")
-SCF_EXPORT_CLASS_TABLE_END
 

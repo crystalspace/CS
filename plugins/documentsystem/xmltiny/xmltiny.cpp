@@ -178,8 +178,4 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csTinyXMLPlugin)
 
-SCF_EXPORT_CLASS_TABLE(xmltiny)
-  SCF_EXPORT_CLASS(csTinyXMLPlugin, "crystalspace.documentsystem.tinyxml",
-      "Crystal Space TinyXML document system")
-SCF_EXPORT_CLASS_TABLE_END
 

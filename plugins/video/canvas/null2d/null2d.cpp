@@ -32,10 +32,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DNull)
 
-SCF_EXPORT_CLASS_TABLE (null2d)
-  SCF_EXPORT_CLASS_DEP (csGraphics2DNull, "crystalspace.graphics2d.null2d",
-    "Null 2D graphics driver for Crystal Space", "crystalspace.font.server.")
-SCF_EXPORT_CLASS_TABLE_END
 
 csGraphics2DNull::csGraphics2DNull(iBase* iParent)
     : csGraphics2D(iParent)

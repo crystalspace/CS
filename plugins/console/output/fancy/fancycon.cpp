@@ -57,11 +57,6 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csFancyConsole)
 
-SCF_EXPORT_CLASS_TABLE (fancycon)
-  SCF_EXPORT_CLASS_DEP (csFancyConsole, "crystalspace.console.output.fancy",
-    "Crystal Space fancy output console",
-    "crystalspace.kernel., crystalspace.graphics3d., crystalspace.graphics2d.")
-SCF_EXPORT_CLASS_TABLE_END
 
 
 void csFancyConsole::Report (int severity, const char* msg, ...)

@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.mesh.object.snow</name>
+        <implementation>csSnowMeshObjectType</implementation>
         <description>Crystal Space Snow Mesh Type</description>
       </class>
     </classes>

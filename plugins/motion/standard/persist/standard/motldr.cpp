@@ -76,12 +76,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 SCF_IMPLEMENT_FACTORY (csMotionLoader)
 SCF_IMPLEMENT_FACTORY (csMotionSaver)
 
-SCF_EXPORT_CLASS_TABLE (motldr)
-  SCF_EXPORT_CLASS (csMotionLoader, "crystalspace.motion.loader.default",
-    "Skeletal Motion Manager Loader for Crystal Space")
-  SCF_EXPORT_CLASS (csMotionSaver, "crystalspace.motion.saver.default",
-    "Skeletal Motion Manager Saver for Crystal Space")
-SCF_EXPORT_CLASS_TABLE_END
 
 csMotionLoader::csMotionLoader(iBase *iParent)
 {

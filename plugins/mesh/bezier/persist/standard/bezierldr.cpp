@@ -96,16 +96,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 SCF_IMPLEMENT_FACTORY (csBezierLoader)
 SCF_IMPLEMENT_FACTORY (csBezierSaver)
 
-SCF_EXPORT_CLASS_TABLE (bezierldr)
-  SCF_EXPORT_CLASS (csBezierLoader, "crystalspace.mesh.loader.factory.bezier",
-    "Crystal Space Bezier Mesh Factory Loader")
-  SCF_EXPORT_CLASS (csBezierSaver, "crystalspace.mesh.saver.factory.bezier",
-    "Crystal Space Bezier Mesh Factory Saver")
-  SCF_EXPORT_CLASS (csBezierLoader, "crystalspace.mesh.loader.bezier",
-    "Crystal Space Bezier Mesh Loader")
-  SCF_EXPORT_CLASS (csBezierSaver, "crystalspace.mesh.saver.bezier",
-    "Crystal Space Bezier Mesh Saver")
-SCF_EXPORT_CLASS_TABLE_END
 
 #define MAXLINE 200 /* max number of chars per line... */
 

@@ -42,10 +42,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csArtsRenderer);
 
-SCF_EXPORT_CLASS_TABLE (csarts)
-  SCF_EXPORT_CLASS (csArtsRenderer, "crystalspace.sound.render.arts",
-		"aRts renderer plugin for Crystal Space")
-SCF_EXPORT_CLASS_TABLE_END
 
 csArtsRenderer::csArtsRenderer (iBase *pParent)
 {

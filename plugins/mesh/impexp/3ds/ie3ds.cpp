@@ -58,11 +58,6 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY( csModelConverter3ds )
 
-SCF_EXPORT_CLASS_TABLE( ie3ds )
-  SCF_EXPORT_CLASS( csModelConverter3ds,
-                "crystalspace.modelconverter.3ds",
-                "3ds Model Converter" )
-SCF_EXPORT_CLASS_TABLE_END
 
 // these are wrappers for csDataStream to interface with Lib3dsIO
 static Lib3dsBool DataErrorFunc( void * )

@@ -45,10 +45,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DGLX)
 
-SCF_EXPORT_CLASS_TABLE (glx2d)
-  SCF_EXPORT_CLASS_DEP (csGraphics2DGLX, "crystalspace.graphics2d.glx",
-    "GL/X OpenGL 2D graphics driver for Crystal Space", "crystalspace.font.server.")
-SCF_EXPORT_CLASS_TABLE_END
 
 #define DEF_OGLDISP "crystalspace.graphics2d.glx.disp.empty"
 #define XWIN_SCF_ID "crystalspace.window.x"

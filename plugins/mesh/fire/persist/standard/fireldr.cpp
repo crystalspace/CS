@@ -102,17 +102,6 @@ SCF_IMPLEMENT_FACTORY (csFireFactorySaver)
 SCF_IMPLEMENT_FACTORY (csFireLoader)
 SCF_IMPLEMENT_FACTORY (csFireSaver)
 
-SCF_EXPORT_CLASS_TABLE (fireldr)
-  SCF_EXPORT_CLASS (csFireFactoryLoader,
-    "crystalspace.mesh.loader.factory.fire",
-    "Crystal Space Fire Factory Loader")
-  SCF_EXPORT_CLASS (csFireFactorySaver, "crystalspace.mesh.saver.factory.fire",
-    "Crystal Space Fire Factory Saver")
-  SCF_EXPORT_CLASS (csFireLoader, "crystalspace.mesh.loader.fire",
-    "Crystal Space Fire Mesh Loader")
-  SCF_EXPORT_CLASS (csFireSaver, "crystalspace.mesh.saver.fire",
-    "Crystal Space Fire Mesh Saver")
-SCF_EXPORT_CLASS_TABLE_END
 
 csFireFactoryLoader::csFireFactoryLoader (iBase* pParent)
 {

@@ -52,11 +52,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csJPGImageIO);
 
-SCF_EXPORT_CLASS_TABLE (csjpgimg)
-  SCF_EXPORT_CLASS (csJPGImageIO,
-    "crystalspace.graphic.image.io.jpg",
-    "CrystalSpace JPG image format I/O plugin")
-SCF_EXPORT_CLASS_TABLE_END
 
 #define JPG_MIME "image/jpg"
 

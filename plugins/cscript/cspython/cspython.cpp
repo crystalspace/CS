@@ -38,10 +38,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csPython)
 
-SCF_EXPORT_CLASS_TABLE(cspython)
-  SCF_EXPORT_CLASS(csPython, "crystalspace.script.python",
-    "Crystal Space Script Python")
-SCF_EXPORT_CLASS_TABLE_END
 
 csPython* csPython::shared_instance = 0;
 

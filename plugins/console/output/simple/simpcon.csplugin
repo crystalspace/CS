@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.console.output.simple</name>
+        <implementation>csSimpleConsole</implementation>
         <description>Crystal Space simple output console</description>
         <requires>
           <class>crystalspace.kernel.</class>

@@ -45,10 +45,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csMotionManager)
 
-SCF_EXPORT_CLASS_TABLE (motion)
-  SCF_EXPORT_CLASS_DEP (csMotionManager, "crystalspace.motion.manager.default",
-    "Skeletal Motion Manager for Crystal Space", 0)
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csMotionTemplate)
   SCF_IMPLEMENTS_INTERFACE (iMotionTemplate)

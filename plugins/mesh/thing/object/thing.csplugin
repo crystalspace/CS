@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.mesh.object.thing</name>
+        <implementation>csThingObjectType</implementation>
         <description>Crystal Space Thing Mesh Type</description>
       </class>
     </classes>

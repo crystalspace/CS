@@ -46,11 +46,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGLShader_ARB)
 
-SCF_EXPORT_CLASS_TABLE (glshader_arb)
-SCF_EXPORT_CLASS_DEP (csGLShader_ARB, "crystalspace.render3d.shader.glarb",
-                      "OpenGL specific shaderprogram provider for Render3D",
-                      "")
-SCF_EXPORT_CLASS_TABLE_END
 
 
 SCF_IMPLEMENT_IBASE(csGLShader_ARB)

@@ -40,12 +40,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csFontServerMultiplexor)
 
-SCF_EXPORT_CLASS_TABLE (fontplex)
-  SCF_EXPORT_CLASS_DEP (csFontServerMultiplexor,
-    "crystalspace.font.server.multiplexer",
-    "Crystal Space font server multiplexer",
-    "crystalspace.font.server.")
-SCF_EXPORT_CLASS_TABLE_END
 
 csFontServerMultiplexor::csFontServerMultiplexor (iBase *pParent)
 {

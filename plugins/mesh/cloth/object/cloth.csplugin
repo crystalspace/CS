@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.mesh.object.cloth</name>
+        <implementation>StuffMeshObjectType</implementation>
         <description>CrystalSpace Cloth mesh object type</description>
       </class>
     </classes>

@@ -64,10 +64,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csSoundLoader_AU);
 
-SCF_EXPORT_CLASS_TABLE (sndau)
-SCF_EXPORT_CLASS (csSoundLoader_AU,
-  "crystalspace.sound.loader.au", "AU Sound Loader")
-SCF_EXPORT_CLASS_TABLE_END;
 
 #define BIT16 0x03
 #define BIT8 0x02

@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.syntax.loader.service.text</name>
+        <implementation>csTextSyntaxService</implementation>
         <description>Crystal Space loader services for textual CS syntax</description>
       </class>
     </classes>

@@ -66,10 +66,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csSoundLoader_AIFF)
 
-SCF_EXPORT_CLASS_TABLE (sndaiff)
-SCF_EXPORT_CLASS (csSoundLoader_AIFF,
-  "crystalspace.sound.loader.aiff", "AIFF Sound Loader")
-SCF_EXPORT_CLASS_TABLE_END
 
 #define BIT8 0x0008
 #define BIT16 0x0010

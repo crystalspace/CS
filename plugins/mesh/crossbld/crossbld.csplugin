@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.mesh.crossbuilder</name>
+        <implementation>csCrossBuilder</implementation>
         <description>Modeldata-to-Meshobject cross builder</description>
       </class>
     </classes>

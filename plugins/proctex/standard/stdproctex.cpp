@@ -56,29 +56,6 @@ SCF_IMPLEMENT_FACTORY(csPtDotsLoader);
 SCF_IMPLEMENT_FACTORY(csPtPlasmaLoader);
 SCF_IMPLEMENT_FACTORY(csPtWaterLoader);
 
-SCF_EXPORT_CLASS_TABLE (stdpt)
-  SCF_EXPORT_CLASS_DEP (csPtFireType, 
-    CLASSID_FIRETYPE,
-    "'Fire' procedural texture factory", 
-    "crystalspace.graphics3d., ")
-
-  SCF_EXPORT_CLASS_DEP (csPtDotsLoader, 
-    "crystalspace.texture.loader.dots",
-    "'Dots' procedural texture loader", 
-    "crystalspace.graphics3d., ")
-  SCF_EXPORT_CLASS_DEP (csPtFireLoader, 
-    CLASSID_FIRELOADER,
-    "'Fire' procedural texture loader", 
-    "crystalspace.graphics3d., ")
-  SCF_EXPORT_CLASS_DEP (csPtWaterLoader, 
-    "crystalspace.texture.loader.water",
-    "'Water' procedural texture loader", 
-    "crystalspace.graphics3d., ")
-  SCF_EXPORT_CLASS_DEP (csPtPlasmaLoader, 
-    "crystalspace.texture.loader.plasma",
-    "'Plasma' procedural texture loader", 
-    "crystalspace.graphics3d., ")
-SCF_EXPORT_CLASS_TABLE_END
 
 //---------------------------------------------------------------------------
 // Base for all PT types

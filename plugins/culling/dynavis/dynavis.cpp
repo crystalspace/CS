@@ -61,10 +61,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csDynaVis)
 
-SCF_EXPORT_CLASS_TABLE (dynavis)
-  SCF_EXPORT_CLASS (csDynaVis, "crystalspace.culling.dynavis",
-    "Dynamic Visibility System")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csDynaVis)
   SCF_IMPLEMENTS_INTERFACE (iVisibilityCuller)

@@ -165,10 +165,6 @@ void csSequence::RunLoop::Do (csTicks dt, iBase* params)
 
 SCF_IMPLEMENT_FACTORY (csSequenceManager)
 
-SCF_EXPORT_CLASS_TABLE (sequence)
-  SCF_EXPORT_CLASS (csSequenceManager, "crystalspace.utilities.sequence",
-    "Sequence Manager")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csSequenceManager)
   SCF_IMPLEMENTS_INTERFACE (iSequenceManager)

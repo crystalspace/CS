@@ -197,8 +197,4 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csXmlReadXMLPlugin)
 
-SCF_EXPORT_CLASS_TABLE(xmlread)
-  SCF_EXPORT_CLASS(csXmlReadXMLPlugin, "crystalspace.documentsystem.xmlread",
-      "Crystal Space XmlRead document system")
-SCF_EXPORT_CLASS_TABLE_END
 

@@ -41,10 +41,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csMultiplexImageIO);
 
-SCF_EXPORT_CLASS_TABLE (imgplex)
-  SCF_EXPORT_CLASS (csMultiplexImageIO,
-    IMGPLEX_CLASSNAME, "Image file format multiplex plug-in.")
-SCF_EXPORT_CLASS_TABLE_END
 
 csMultiplexImageIO::csMultiplexImageIO (iBase *pParent)
 {

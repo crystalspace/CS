@@ -221,11 +221,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csFountainMeshObjectType)
 
-SCF_EXPORT_CLASS_TABLE (fountain)
-  SCF_EXPORT_CLASS (csFountainMeshObjectType,
-    "crystalspace.mesh.object.fountain",
-    "Crystal Space Fountain Mesh Type")
-SCF_EXPORT_CLASS_TABLE_END
 
 csFountainMeshObjectType::csFountainMeshObjectType (iBase* pParent)
 {

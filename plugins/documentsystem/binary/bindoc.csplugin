@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.documentsystem.binary</name>
+        <implementation>csBinaryDocumentSystem</implementation>
         <description>Binary document system</description>
       </class>
     </classes>

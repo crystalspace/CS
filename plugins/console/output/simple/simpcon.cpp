@@ -59,11 +59,6 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSimpleConsole)
 
-SCF_EXPORT_CLASS_TABLE (simpcon)
-  SCF_EXPORT_CLASS_DEP (csSimpleConsole, "crystalspace.console.output.simple",
-    "Crystal Space simple output console",
-    "crystalspace.kernel., crystalspace.graphics3d., crystalspace.graphics2d.")
-SCF_EXPORT_CLASS_TABLE_END
 
 csSimpleConsole::csSimpleConsole (iBase *iParent)
 {

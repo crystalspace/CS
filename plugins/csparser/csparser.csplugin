@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.level.loader</name>
+        <implementation>csLoader</implementation>
         <description>Level and library file loader</description>
         <requires>
           <class>crystalspace.kernel.</class>
@@ -22,6 +23,7 @@
       </class>
       <class>
         <name>crystalspace.texture.loader.checkerboard</name>
+        <implementation>csCheckerTextureLoader</implementation>
         <description>Checkerboard texture loader</description>
         <requires>
           <class>crystalspace.level.loader</class>
@@ -29,6 +31,7 @@
       </class>
       <class>
         <name>crystalspace.texture.loader.image</name>
+        <implementation>csImageTextureLoader</implementation>
         <description>Image texture loader</description>
         <requires>
           <class>crystalspace.level.loader</class>

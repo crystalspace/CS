@@ -98,14 +98,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 SCF_IMPLEMENT_FACTORY (csSprite3DBinFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csSprite3DBinFactorySaver)
 
-SCF_EXPORT_CLASS_TABLE (spr3dbin)
-  SCF_EXPORT_CLASS (csSprite3DBinFactoryLoader,
-  	"crystalspace.mesh.loader.factory.sprite.3d.binary",
-	"Crystal Space Sprite3DBin Mesh Factory Loader")
-  SCF_EXPORT_CLASS (csSprite3DBinFactorySaver,
-  	"crystalspace.mesh.saver.factory.sprite.3d.binary",
-	"Crystal Space Sprite3DBin Mesh Factory Saver")
-SCF_EXPORT_CLASS_TABLE_END
 
 /**
  * Creates a new csSprite3DBinFactoryLoader

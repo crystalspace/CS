@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.sound.render.openal</name>
+        <implementation>csSoundRenderOpenAL</implementation>
         <description>OpenAL 3D Sound Driver for Crystal Space</description>
       </class>
     </classes>

@@ -1454,10 +1454,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csVFS)
 
-SCF_EXPORT_CLASS_TABLE (vfs)
-  SCF_EXPORT_CLASS (csVFS, "crystalspace.kernel.vfs",
-    "Crystal Space Virtual File System")
-SCF_EXPORT_CLASS_TABLE_END
 
 csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
 {

@@ -726,10 +726,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csMetaGenType)
 
-SCF_EXPORT_CLASS_TABLE (metagen)
-  SCF_EXPORT_CLASS (csMetaGenType, "crystalspace.mesh.factory.metagen",
-    "The Crystal Space Meta Surface Generator")
-SCF_EXPORT_CLASS_TABLE_END
 
 csMetaGenType::csMetaGenType( iBase *par )
 {

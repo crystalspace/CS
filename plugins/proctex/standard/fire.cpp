@@ -33,6 +33,8 @@
 SCF_IMPLEMENT_FACTORY(csPtFireType);
 SCF_IMPLEMENT_FACTORY(csPtFireLoader);
 
+#define CLASSID_FIRETYPE "crystalspace.texture.type.fire"
+
 csPtFireType::csPtFireType (iBase* p) : csBaseProctexType(p)
 {
 }

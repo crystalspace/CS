@@ -168,11 +168,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csExploMeshObjectType)
 
-SCF_EXPORT_CLASS_TABLE (explo)
-  SCF_EXPORT_CLASS (csExploMeshObjectType,
-    "crystalspace.mesh.object.explosion",
-    "Crystal Space Explosion Mesh Type")
-SCF_EXPORT_CLASS_TABLE_END
 
 csExploMeshObjectType::csExploMeshObjectType (iBase* pParent)
 {

@@ -116,17 +116,6 @@ SCF_IMPLEMENT_FACTORY (csEmitFactorySaver)
 SCF_IMPLEMENT_FACTORY (csEmitLoader)
 SCF_IMPLEMENT_FACTORY (csEmitSaver)
 
-SCF_EXPORT_CLASS_TABLE (emitldr)
-  SCF_EXPORT_CLASS (csEmitFactoryLoader,
-    "crystalspace.mesh.loader.factory.emit",
-    "Crystal Space Emit Factory Loader")
-  SCF_EXPORT_CLASS (csEmitFactorySaver, "crystalspace.mesh.saver.factory.emit",
-    "Crystal Space Emit Factory Saver")
-  SCF_EXPORT_CLASS (csEmitLoader, "crystalspace.mesh.loader.emit",
-    "Crystal Space Emit Mesh Loader")
-  SCF_EXPORT_CLASS (csEmitSaver, "crystalspace.mesh.saver.emit",
-    "Crystal Space Emit Mesh Saver")
-SCF_EXPORT_CLASS_TABLE_END
 
 csEmitFactoryLoader::csEmitFactoryLoader (iBase* pParent)
 {

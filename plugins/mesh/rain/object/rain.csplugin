@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.mesh.object.rain</name>
+        <implementation>csRainPlugin</implementation>
         <description>Crystal Space Rain Mesh Type</description>
       </class>
     </classes>

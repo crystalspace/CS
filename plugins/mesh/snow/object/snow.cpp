@@ -187,10 +187,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSnowMeshObjectType)
 
-SCF_EXPORT_CLASS_TABLE (snow)
-  SCF_EXPORT_CLASS (csSnowMeshObjectType, "crystalspace.mesh.object.snow",
-    "Crystal Space Snow Mesh Type")
-SCF_EXPORT_CLASS_TABLE_END
 
 csSnowMeshObjectType::csSnowMeshObjectType (iBase* pParent)
 {

@@ -55,11 +55,6 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csConsoleOutput)
 
-SCF_EXPORT_CLASS_TABLE (csconout)
-  SCF_EXPORT_CLASS_DEP (csConsoleOutput, "crystalspace.console.output.standard",
-    "Crystal Space standard output console",
-    "crystalspace.kernel., crystalspace.graphics3d., crystalspace.graphics2d.")
-SCF_EXPORT_CLASS_TABLE_END
 
 csConsoleOutput::csConsoleOutput (iBase *base)
 {

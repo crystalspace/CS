@@ -77,10 +77,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csPhysicsLoader)
 
-SCF_EXPORT_CLASS_TABLE (physldr)
-  SCF_EXPORT_CLASS (csPhysicsLoader, "crystalspace.dynamics.loader",
-    "Crystal Space Dynamics Loader")
-SCF_EXPORT_CLASS_TABLE_END
 
 csPhysicsLoader::csPhysicsLoader (iBase* pParent)
 {

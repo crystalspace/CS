@@ -36,12 +36,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DAA)
 
-SCF_EXPORT_CLASS_TABLE (asciiart)
-  SCF_EXPORT_CLASS_DEP (csGraphics2DAA,
-    "crystalspace.graphics2d.asciiart",
-    "Ascii Art 2D graphics driver for Crystal Space",
-    "crystalspace.font.server.")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE_EXT (csGraphics2DAA)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)

@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.video.format.avi</name>
+        <implementation>csAVIFormat</implementation>
         <description>CrystalSpace AVI format interface</description>
       </class>
     </classes>

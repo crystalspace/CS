@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.graphics2d.asciiart</name>
+        <implementation>csGraphics2DAA</implementation>
         <description>Ascii Art 2D graphics driver for Crystal Space</description>
         <requires>
           <class>crystalspace.font.server.</class>

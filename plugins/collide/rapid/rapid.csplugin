@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.collisiondetection.rapid</name>
+        <implementation>csRapidCollideSystem</implementation>
         <description>CrystalSpace RAPID CD System</description>
       </class>
     </classes>

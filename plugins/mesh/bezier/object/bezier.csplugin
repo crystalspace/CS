@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.mesh.object.bezier</name>
+        <implementation>csBezierMeshObjectType</implementation>
         <description>Crystal Space Bezier Mesh Type</description>
       </class>
     </classes>

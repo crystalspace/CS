@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.mesh.object.spiral</name>
+        <implementation>csSpiralMeshObjectType</implementation>
         <description>Crystal Space Spiral Mesh Type</description>
       </class>
     </classes>

@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.utilities.sequence.engine</name>
+        <implementation>csEngineSequenceManager</implementation>
         <description>Engine Sequence Manager</description>
       </class>
     </classes>

@@ -36,9 +36,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csGIFImageIO);
 
-SCF_EXPORT_CLASS_TABLE (csgifimg)
-  SCF_EXPORT_CLASS (csGIFImageIO, "crystalspace.graphic.image.io.gif", "CrystalSpace GIF image format I/O plugin")
-SCF_EXPORT_CLASS_TABLE_END
 
 static iImageIO::FileFormatDescription formatlist[2] =
 {

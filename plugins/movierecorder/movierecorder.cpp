@@ -53,11 +53,6 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csMovieRecorder)
 
-SCF_EXPORT_CLASS_TABLE (movierecorder)
-  SCF_EXPORT_CLASS (csMovieRecorder,
-    "crystalspace.utilities.movierecorder",
-    "Realtime Movie Recorder")
-SCF_EXPORT_CLASS_TABLE_END
 
 
 void csMovieRecorder::Report (int severity, const char* msg, ...)

@@ -92,17 +92,6 @@ SCF_IMPLEMENT_FACTORY (csStarFactorySaver)
 SCF_IMPLEMENT_FACTORY (csStarLoader)
 SCF_IMPLEMENT_FACTORY (csStarSaver)
 
-SCF_EXPORT_CLASS_TABLE (starldr)
-  SCF_EXPORT_CLASS (csStarFactoryLoader,
-    "crystalspace.mesh.loader.factory.stars",
-    "Crystal Space Star Factory Loader")
-  SCF_EXPORT_CLASS (csStarFactorySaver, "crystalspace.mesh.saver.factory.stars",
-    "Crystal Space Star Factory Saver")
-  SCF_EXPORT_CLASS (csStarLoader, "crystalspace.mesh.loader.stars",
-		    "Crystal Space Star Mesh Loader")
-  SCF_EXPORT_CLASS (csStarSaver, "crystalspace.mesh.saver.stars",
-    "Crystal Space Star Mesh Saver")
-SCF_EXPORT_CLASS_TABLE_END
 
 static void ReportError (iReporter* reporter, const char* id,
 	const char* description, ...)

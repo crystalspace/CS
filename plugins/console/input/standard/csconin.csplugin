@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.console.input.standard</name>
+        <implementation>csConsoleInput</implementation>
         <description>Crystal Space standard input console</description>
       </class>
     </classes>

@@ -82,13 +82,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csIsoLoader);
 
-SCF_EXPORT_CLASS_TABLE (isoload)
-  SCF_EXPORT_CLASS_DEP (csIsoLoader, "crystalspace.iso.loader",
-    "iso engine level and library loader", "crystalspace.kernel., "
-    "crystalspace.mesh.loader., "
-    "crystalspace.engine.3d, crystalspace.graphics3d., "
-	"crystalspace.engine.iso, crystalspace.syntax.loader.service.text ")
-SCF_EXPORT_CLASS_TABLE_END
 
 enum
 {

@@ -90,17 +90,6 @@ SCF_IMPLEMENT_FACTORY (csThingLoader)
 SCF_IMPLEMENT_FACTORY (csThingFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csThingSaver)
 
-SCF_EXPORT_CLASS_TABLE (thingldr)
-  SCF_EXPORT_CLASS (csThingFactoryLoader,
-    "crystalspace.mesh.loader.factory.thing",
-    "Crystal Space Thing Mesh Factory Loader")
-  SCF_EXPORT_CLASS (csThingSaver, "crystalspace.mesh.saver.factory.thing",
-    "Crystal Space Thing Mesh Factory Saver")
-  SCF_EXPORT_CLASS (csThingLoader, "crystalspace.mesh.loader.thing",
-    "Crystal Space Thing Mesh Loader")
-  SCF_EXPORT_CLASS (csThingSaver, "crystalspace.mesh.saver.thing",
-    "Crystal Space Thing Mesh Saver")
-SCF_EXPORT_CLASS_TABLE_END
 
 #define MAXLINE 200 /* max number of chars per line... */
 

@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.engine.iso</name>
+        <implementation>csIsoEngine</implementation>
         <description>Crystal Space Isometric Engine</description>
         <requires>
           <class>crystalspace.kernel.</class>

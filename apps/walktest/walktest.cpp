@@ -98,9 +98,11 @@ WalkTest *Sys;
 
 CS_IMPLEMENT_APPLICATION
 
-// need to register the engine explicit here when not building static
+// Need to register the engine explicit here when not building static.
 #if !defined(CS_STATIC_LINKED)
-SCF_REGISTER_STATIC_LIBRARY (engine)
+SCF_REGISTER_STATIC_CLASS(csEngine,
+"crystalspace.engine.3d", "Crystal Space 3D Engine",
+"crystalspace.kernel.:crystalspace.graphics3d.:crystalspace.graphic.image.io.")
 #endif
 
 //-----------------------------------------------------------------------------

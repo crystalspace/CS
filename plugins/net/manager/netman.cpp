@@ -53,11 +53,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csNetworkManager)
 
-SCF_EXPORT_CLASS_TABLE (netman)
-  SCF_EXPORT_CLASS (csNetworkManager,
-  "crystalspace.network.manager.standard",
-  "Crystal Space Standard Network Manager")
-SCF_EXPORT_CLASS_TABLE_END
 
 csNetworkManager::csNetworkManager (iBase *parent)
 {

@@ -57,11 +57,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csGeneralTreeFactoryLoader)
 
-SCF_EXPORT_CLASS_TABLE (gtreeldr)
-  SCF_EXPORT_CLASS (csGeneralTreeFactoryLoader,
-    "crystalspace.mesh.loader.factory.genmesh.tree",
-    "Crystal Space General/Tree Mesh Factory Loader")
-SCF_EXPORT_CLASS_TABLE_END
 
 static void ReportError (iReporter* reporter, const char* id,
 	const char* description, ...)

@@ -228,7 +228,3 @@ void csLinuxJoystick::Report (int severity, const char* msg, ...)
 
 SCF_IMPLEMENT_FACTORY (csLinuxJoystick);
 
-SCF_EXPORT_CLASS_TABLE (joylin)
-  SCF_EXPORT_CLASS (csLinuxJoystick, "crystalspace.device.joystick.linux", 
-                    "Crystal Space Joystick plugin for Linux")
-SCF_EXPORT_CLASS_TABLE_END

@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.mesh.object.emit</name>
+        <implementation>csEmitMeshObjectType</implementation>
         <description>Crystal Space Emit Mesh Type</description>
       </class>
     </classes>

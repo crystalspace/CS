@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.graphics2d.x2d</name>
+        <implementation>csGraphics2DXLib</implementation>
         <description>Crystal Space 2D driver for X-Windows</description>
         <requires>
           <class>crystalspace.font.server.</class>

@@ -41,10 +41,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY(CocoaDriver2D)
 
-SCF_EXPORT_CLASS_TABLE(cocoa2d)
-  SCF_EXPORT_CLASS_DEP(CocoaDriver2D, "crystalspace.graphics2d.cocoa",
-    "Crystal Space 2D driver for MacOS/X (Cocoa)", "crystalspace.font.server.")
-SCF_EXPORT_CLASS_TABLE_END
 
 
 //-----------------------------------------------------------------------------

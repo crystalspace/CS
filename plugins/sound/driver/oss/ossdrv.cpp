@@ -50,11 +50,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY(csSoundDriverOSS)
 
-SCF_EXPORT_CLASS_TABLE(ossdrv)
-  SCF_EXPORT_CLASS(csSoundDriverOSS,
-    "crystalspace.sound.driver.oss",
-    "OSS Sounddriver for Crystal Space")
-SCF_EXPORT_CLASS_TABLE_END;
 
 SCF_IMPLEMENT_IBASE(csSoundDriverOSS)
   SCF_IMPLEMENTS_INTERFACE(iSoundDriver)

@@ -37,10 +37,6 @@ extern "C" {
 CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csGraphicsMemory)
 
-SCF_EXPORT_CLASS_TABLE (memory)
-  SCF_EXPORT_CLASS_DEP (csGraphicsMemory, "crystalspace.graphics2d.memory",
-    "Crystal Space Image Exporter", "crystalspace.font.server.")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE_EXT (csGraphicsMemory)
   SCF_IMPLEMENTS_INTERFACE (iGraphics2D)

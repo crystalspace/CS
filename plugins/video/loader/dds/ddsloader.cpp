@@ -157,7 +157,3 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csDDSImageIO);
 
-SCF_EXPORT_CLASS_TABLE (csddsimg)
-  SCF_EXPORT_CLASS (csDDSImageIO, "crystalspace.graphic.image.io.dds",
-      "DDS image format I/O plugin")
-SCF_EXPORT_CLASS_TABLE_END

@@ -79,13 +79,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 SCF_IMPLEMENT_FACTORY (csTerrFuncFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csTerrFuncLoader)
 
-SCF_EXPORT_CLASS_TABLE (terrfldr)
-  SCF_EXPORT_CLASS (csTerrFuncFactoryLoader,
-    "crystalspace.mesh.loader.factory.terrfunc",
-    "Crystal Space Function Terrain Factory Loader")
-  SCF_EXPORT_CLASS (csTerrFuncLoader, "crystalspace.mesh.loader.terrfunc",
-    "Crystal Space Function Terrain Loader")
-SCF_EXPORT_CLASS_TABLE_END
 
 static void ReportError (iReporter* reporter, const char* id,
 	const char* description, ...)

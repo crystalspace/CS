@@ -76,11 +76,6 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csModelConverterMultiplexer);
 
-SCF_EXPORT_CLASS_TABLE (ieplex)
-  SCF_EXPORT_CLASS (csModelConverterMultiplexer,
-    MDLPLEX_CLASSNAME,
-    "Multiplexer for Model Converters")
-SCF_EXPORT_CLASS_TABLE_END
 
 CS_IMPLEMENT_PLUGIN
 

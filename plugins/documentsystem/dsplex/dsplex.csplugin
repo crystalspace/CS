@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.documentsystem.multiplex</name>
+        <implementation>csMplexDocumentSystem</implementation>
         <description>Document system multiplexer</description>
       </class>
     </classes>

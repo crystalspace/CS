@@ -50,9 +50,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csTGAImageIO);
 
-SCF_EXPORT_CLASS_TABLE (cstgaimg)
-  SCF_EXPORT_CLASS (csTGAImageIO, "crystalspace.graphic.image.io.tga", "CrystalSpace TGA image format I/O plugin")
-SCF_EXPORT_CLASS_TABLE_END
 
 /* Header definition. */
 struct TGAheader

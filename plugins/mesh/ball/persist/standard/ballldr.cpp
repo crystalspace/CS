@@ -101,17 +101,6 @@ SCF_IMPLEMENT_FACTORY (csBallFactorySaver)
 SCF_IMPLEMENT_FACTORY (csBallLoader)
 SCF_IMPLEMENT_FACTORY (csBallSaver)
 
-SCF_EXPORT_CLASS_TABLE (ballldr)
-  SCF_EXPORT_CLASS (csBallFactoryLoader,
-    "crystalspace.mesh.loader.factory.ball",
-    "Crystal Space Ball Factory Loader")
-  SCF_EXPORT_CLASS (csBallFactorySaver, "crystalspace.mesh.saver.factory.ball",
-    "Crystal Space Ball Factory Saver")
-  SCF_EXPORT_CLASS (csBallLoader, "crystalspace.mesh.loader.ball",
-		    "Crystal Space Ball Mesh Loader")
-  SCF_EXPORT_CLASS (csBallSaver, "crystalspace.mesh.saver.ball",
-    "Crystal Space Ball Mesh Saver")
-SCF_EXPORT_CLASS_TABLE_END
 
 static void ReportError (iReporter* reporter, const char* id,
 	const char* description, ...)

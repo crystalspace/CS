@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.console.output.fancy</name>
+        <implementation>csFancyConsole</implementation>
         <description>Crystal Space fancy output console</description>
         <requires>
           <class>crystalspace.kernel.</class>

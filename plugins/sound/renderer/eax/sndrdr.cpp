@@ -40,10 +40,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY(csSoundRenderEAX);
 
-SCF_EXPORT_CLASS_TABLE (sndeax)
-SCF_EXPORT_CLASS (csSoundRenderEAX, "crystalspace.sound.render.eax",
-        "EAX on Direct Sound Driver for Crystal Space")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE(csSoundRenderEAX)
   SCF_IMPLEMENTS_INTERFACE(iSoundRender)

@@ -99,17 +99,6 @@ SCF_IMPLEMENT_FACTORY (csRainFactorySaver)
 SCF_IMPLEMENT_FACTORY (csRainLoader)
 SCF_IMPLEMENT_FACTORY (csRainSaver)
 
-SCF_EXPORT_CLASS_TABLE (rainldr)
-  SCF_EXPORT_CLASS (csRainFactoryLoader,
-    "crystalspace.mesh.loader.factory.rain",
-    "Crystal Space Rain Factory Loader")
-  SCF_EXPORT_CLASS (csRainFactorySaver, "crystalspace.mesh.saver.factory.rain",
-    "Crystal Space Rain Factory Saver")
-  SCF_EXPORT_CLASS (csRainLoader, "crystalspace.mesh.loader.rain",
-    "Crystal Space Rain Mesh Loader")
-  SCF_EXPORT_CLASS (csRainSaver, "crystalspace.mesh.saver.rain",
-    "Crystal Space Rain Mesh Saver")
-SCF_EXPORT_CLASS_TABLE_END
 
 csRainFactoryLoader::csRainFactoryLoader (iBase* pParent)
 {

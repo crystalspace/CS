@@ -58,10 +58,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DSDL)
 
-SCF_EXPORT_CLASS_TABLE (sdl2d)
-  SCF_EXPORT_CLASS_DEP (csGraphics2DSDL, "crystalspace.graphics2d.sdl2d",
-    "SDL 2D graphics driver for Crystal Space", "crystalspace.font.server.")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE_EXT (csGraphics2DSDL)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)

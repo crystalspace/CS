@@ -376,8 +376,4 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csMplexDocumentSystem)
 
-SCF_EXPORT_CLASS_TABLE(dsplex)
-  SCF_EXPORT_CLASS(csMplexDocumentSystem, DOCPLEX_CLASSNAME,
-      "Document system multiplexer")
-SCF_EXPORT_CLASS_TABLE_END
 

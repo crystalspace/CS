@@ -155,7 +155,3 @@ CS_DECLARE_SIMPLE_MESH_PLUGIN (csRainPlugin, csRainFactory);
 
 SCF_IMPLEMENT_FACTORY (csRainPlugin)
 
-SCF_EXPORT_CLASS_TABLE (rain)
-  SCF_EXPORT_CLASS (csRainPlugin, "crystalspace.mesh.object.rain",
-    "Crystal Space Rain Mesh Type")
-SCF_EXPORT_CLASS_TABLE_END

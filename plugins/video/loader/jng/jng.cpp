@@ -65,10 +65,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csJNGImageIO);
 
-SCF_EXPORT_CLASS_TABLE (csjngimg)
-  SCF_EXPORT_CLASS (csJNGImageIO, "crystalspace.graphic.image.io.jng",
-		"CrystalSpace JNG/MNG image format I/O plugin")
-SCF_EXPORT_CLASS_TABLE_END
 
 #define JNG_MIME "image/x-jng" 
 #define MNG_MIME "image/x-mng"

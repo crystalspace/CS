@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.modelconverter.mdl</name>
+        <implementation>csModelConverterMDL</implementation>
         <description>MDL Model Converter</description>
       </class>
     </classes>

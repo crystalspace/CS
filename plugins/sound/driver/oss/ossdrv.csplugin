@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.sound.driver.oss</name>
+        <implementation>csSoundDriverOSS</implementation>
         <description>Crystal Space OSS Sound Driver</description>
       </class>
     </classes>

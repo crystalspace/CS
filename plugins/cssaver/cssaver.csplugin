@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.level.saver</name>
+        <implementation>csSaver</implementation>
         <description>Level and library file saver</description>
         <requires>
           <class>crystalspace.kernel.</class>

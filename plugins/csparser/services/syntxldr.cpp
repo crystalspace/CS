@@ -70,11 +70,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csTextSyntaxService);
 
-SCF_EXPORT_CLASS_TABLE (cssynldr)
-  SCF_EXPORT_CLASS (csTextSyntaxService,
-  	"crystalspace.syntax.loader.service.text",
-	"Crystal Space loader services for textual CS syntax")
-SCF_EXPORT_CLASS_TABLE_END
 
 enum
 {

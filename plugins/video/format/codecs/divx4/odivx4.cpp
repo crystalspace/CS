@@ -28,10 +28,6 @@ SCF_IMPLEMENT_IBASE (csDivX4)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csDivX4)
-SCF_EXPORT_CLASS_TABLE (odivx4)
-  SCF_EXPORT_CLASS (csDivX4, "crystalspace.video.codec.avi.divx", "CrystalSpace DivX4 codec")
-  SCF_EXPORT_CLASS (csDivX4, "crystalspace.video.codec.avi.dvx1", "CrystalSpace DivX4 codec")
-SCF_EXPORT_CLASS_TABLE_END
 
 csDivX4::csDivX4 (iBase *pParent)
 {

@@ -2136,10 +2136,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csTerrFuncObjectType)
 
-SCF_EXPORT_CLASS_TABLE (terrfunc)
-  SCF_EXPORT_CLASS (csTerrFuncObjectType, "crystalspace.mesh.object.terrfunc",
-    "Crystal Space Function Terrain Mesh Type")
-SCF_EXPORT_CLASS_TABLE_END
 
 csTerrFuncObjectType::csTerrFuncObjectType (iBase* pParent)
 {

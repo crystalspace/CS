@@ -38,10 +38,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DDDraw8)
 
-SCF_EXPORT_CLASS_TABLE (ddraw8)
-  SCF_EXPORT_CLASS_DEP (csGraphics2DDDraw8, "crystalspace.graphics2d.direct3d.dx8",
-    "DirectDraw DX8 2D graphics driver for Crystal Space", "crystalspace.font.server.")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE_EXT (csGraphics2DDDraw8)
   SCF_IMPLEMENTS_INTERFACE (iGraphics2DDDraw8)

@@ -44,10 +44,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csNetworkDriver2)
 
-SCF_EXPORT_CLASS_TABLE (ensocket)
-  SCF_EXPORT_CLASS (csNetworkDriver2, "crystalspace.network.driver.sockets2",
-    "Crystal Space TCP/IP-specific network driver")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csNetworkDriver2)
   SCF_IMPLEMENTS_INTERFACE (iNetworkDriver2)

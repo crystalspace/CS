@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.font.server.freetype2</name>
+        <implementation>csFreeType2Server</implementation>
         <description>Crystal Space FreeType2 font server</description>
       </class>
     </classes>

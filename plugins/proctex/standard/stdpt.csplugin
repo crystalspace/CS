@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.texture.loader.dots</name>
+        <implementation>csPtDotsLoader</implementation>
         <description>'Dots' procedural texture loader</description>
         <requires>
           <class>crystalspace.graphics3d.</class>
@@ -13,6 +14,7 @@
       </class>
       <class>
         <name>crystalspace.texture.loader.fire</name>
+        <implementation>csPtFireLoader</implementation>
         <description>'Fire' procedural texture loader</description>
         <requires>
           <class>crystalspace.graphics3d.</class>
@@ -20,6 +22,7 @@
       </class>
       <class>
         <name>crystalspace.texture.loader.plasma</name>
+        <implementation>csPtPlasmaLoader</implementation>
         <description>'Plasma' procedural texture loader</description>
         <requires>
           <class>crystalspace.graphics3d.</class>
@@ -27,6 +30,7 @@
       </class>
       <class>
         <name>crystalspace.texture.loader.water</name>
+        <implementation>csPtWaterLoader</implementation>
         <description>'Water' procedural texture loader</description>
         <requires>
           <class>crystalspace.graphics3d.</class>
@@ -34,6 +38,7 @@
       </class>
       <class>
         <name>crystalspace.texture.type.fire</name>
+        <implementation>csPtFireType</implementation>
         <description>'Fire' procedural texture factory</description>
         <requires>
           <class>crystalspace.graphics3d.</class>

@@ -100,16 +100,6 @@ SCF_IMPLEMENT_FACTORY (csMetaBallFactorySaver)
 SCF_IMPLEMENT_FACTORY (csMetaBallLoader)
 SCF_IMPLEMENT_FACTORY (csMetaBallSaver)
 
-SCF_EXPORT_CLASS_TABLE (mballldr)
-  SCF_EXPORT_CLASS (csMetaBallFactoryLoader, "crystalspace.mesh.loader.factory.metaball",
-    "Crystal Space MetaBall Factory Loader")
-  SCF_EXPORT_CLASS (csMetaBallFactorySaver, "crystalspace.mesh.saver.factory.metaball",
-    "Crystal Space MetaBall Factory Saver")
-  SCF_EXPORT_CLASS (csMetaBallLoader, "crystalspace.mesh.loader.metaball",
-    "Crystal Space MetaBall Mesh Loader")
-  SCF_EXPORT_CLASS (csMetaBallSaver, "crystalspace.mesh.saver.metaball",
-    "Crystal Space MetaBall Mesh Saver")
-SCF_EXPORT_CLASS_TABLE_END
 
 csMetaBallFactoryLoader::csMetaBallFactoryLoader (iBase* pParent)
 {

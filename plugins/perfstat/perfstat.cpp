@@ -38,10 +38,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csPerfStats)
 
-SCF_EXPORT_CLASS_TABLE (perfstat)
-  SCF_EXPORT_CLASS (csPerfStats, "crystalspace.utilities.perfstat",
-    "Performance statistics utility")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csPerfStats)
   SCF_IMPLEMENTS_INTERFACE (iPerfStats)

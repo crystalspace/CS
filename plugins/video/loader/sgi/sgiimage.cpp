@@ -37,9 +37,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSGIImageIO);
 
-SCF_EXPORT_CLASS_TABLE (cssgiimg)
-  SCF_EXPORT_CLASS (csSGIImageIO, "crystalspace.graphic.image.io.sgi", "CrystalSpace SGI image format I/O plugin")
-SCF_EXPORT_CLASS_TABLE_END
 
 static iImageIO::FileFormatDescription formatlist[2] =
 {

@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.iso.loader</name>
+        <implementation>csIsoLoader</implementation>
         <description>iso engine level and library loader</description>
         <requires>
           <class>crystalspace.kernel.</class>

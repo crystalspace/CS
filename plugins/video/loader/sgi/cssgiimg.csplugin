@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.graphic.image.io.sgi</name>
+        <implementation>csSGIImageIO</implementation>
         <description>CrystalSpace SGI image format I/O plugin</description>
       </class>
     </classes>

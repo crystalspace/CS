@@ -58,15 +58,16 @@ public:
   virtual ~csSCF ();
 
   virtual void RegisterClasses (iDocument*);
+  virtual bool RegisterClass (const char *iClassID,
+    const char *iLibraryName, const char *iFactoryClass,
+    const char *Description, const char *Dependencies = 0);
+  virtual bool RegisterClass (scfFactoryFunc, const char *iClassID,
+    const char *Description, const char *Dependencies = 0);
   virtual bool ClassRegistered (const char *iClassID);
   virtual void *CreateInstance (const char *iClassID,
     const char *iInterfaceID, int iVersion);
   virtual const char *GetClassDescription (const char *iClassID);
   virtual const char *GetClassDependencies (const char *iClassID);
-  virtual bool RegisterClass (const char *iClassID,
-    const char *iLibraryName, const char *Dependencies = 0);
-  virtual bool RegisterStaticClass (scfClassInfo *iClassInfo);
-  virtual bool RegisterClassList (scfClassInfo *iClassInfo);
   virtual bool UnregisterClass (const char *iClassID);
   virtual void UnloadUnusedModules ();
   virtual scfInterfaceID GetInterfaceID (const char *iInterface);
@@ -90,14 +91,17 @@ static scfLibraryVector *LibraryRegistry = 0;
 class scfSharedLibrary
 {
   friend class scfLibraryVector;
+  friend class scfFactory;
   // Shared library name
   char *LibraryName;
   // Handle of shared module (if RefCount > 0)
   csLibraryHandle LibraryHandle;
   // Number of references to this shared library
   int RefCount;
-  // The table of classes exported from this library
-  scfClassInfo *ClassTable;
+  // Number of classes which have been initialized in this module.  The first
+  // class initialization function called should also initialize the module.
+  // The last finalization function called should also finalize the module.
+  unsigned int ActiveClasses;
 
 public:
   /// Create a shared library and load it
@@ -107,8 +111,8 @@ public:
   virtual ~scfSharedLibrary ();
 
   /// Check if library object is okay
-  bool ok ()
-  { return (LibraryHandle != 0) && (ClassTable != 0); }
+  bool ok () const
+  { return (LibraryHandle != 0); }
 
   /// Increment reference count for the library
   void IncRef ()
@@ -116,12 +120,10 @@ public:
 
   /// Decrement reference count for the library
   void DecRef ()
-  { 
-    RefCount--;
-  }
+  { RefCount--; }
 
   /// Get the reference count.
-  int GetRefCount ()
+  int GetRefCount () const
   { return RefCount; }
 
   /// Try to free the library, if refcount is zero
@@ -134,9 +136,6 @@ public:
     }
     return false;
   }
-
-  /// Find a scfClassInfo for given class ID
-  scfClassInfo *Find (const char *iClassID);
 };
 
 scfSharedLibrary::scfSharedLibrary (const char *iLibraryName)
@@ -144,60 +143,17 @@ scfSharedLibrary::scfSharedLibrary (const char *iLibraryName)
   LibraryRegistry->Push (this);
 
   RefCount = 0;
-  ClassTable = 0;
+  ActiveClasses = 0;
   LibraryName = csStrNew (iLibraryName);
   LibraryHandle = csFindLoadLibrary (LibraryName);
-  if (!LibraryHandle)
-    return;
-
-  // This is the prototype for the function that
-  // a shared library should export - it will be called upon loading
-  typedef scfClassInfo *(*scfInitializeFunc) (iSCF*);
-
-  // To get the library name, split the input name into path and file name.
-  // Then append "_scfInitialize" to the file name to get the name of
-  // the exported function.
-  char name [200];
-  csSplitPath (iLibraryName, 0, 0, name, 200);
-  strcat (name, "_scfInitialize");
-
-  scfInitializeFunc func =
-    (scfInitializeFunc)csGetLibrarySymbol (LibraryHandle, name);
-  if (func)
-    ClassTable = func (PrivateSCF);
-  else
-    csPrintLibraryError (name);
 }
 
 scfSharedLibrary::~scfSharedLibrary ()
 {
+  CS_ASSERT(ActiveClasses == 0);
   if (LibraryHandle)
-  {
-    // This is the prototype for the function that
-    // a shared library should export - it will be called upon unloading
-    typedef void (*scfFinalizeFunc) ();
-
-    char name [200];
-    csSplitPath (LibraryName, 0, 0, name, 200);
-    strcat (name, "_scfFinalize");
-
-    scfFinalizeFunc func = (scfFinalizeFunc)csGetLibrarySymbol (
-    	LibraryHandle, name);
-    if (func)
-      func ();
-    else
-      csPrintLibraryError (name);
     csUnloadLibrary (LibraryHandle);
-  }
   delete [] LibraryName;
-}
-
-scfClassInfo *scfSharedLibrary::Find (const char *iClassID)
-{
-  for (scfClassInfo* cur = ClassTable; cur->ClassID; cur++)
-    if (strcmp (iClassID, cur->ClassID) == 0)
-      return cur;
-  return 0;
 }
 
 bool scfLibraryVector::FreeItem (void* Item)
@@ -221,22 +177,25 @@ public:
 
   // Class identifier
   char *ClassID;
+  // Class description
+  char *Description;
   // The dependency list
   char *Dependencies;
-  // Information about this class
-  const scfClassInfo *ClassInfo;
+  // Function which actually creates an instance
+  scfFactoryFunc CreateFunc;
 #ifndef CS_STATIC_LINKED
   // Shared module that implements this class or 0 for local classes
   char *LibraryName;
   // A pointer to shared library object (0 for local classes)
   scfSharedLibrary *Library;
+  // Name of factory implementation class in shared library.
+  char *FactoryClass;
 #endif
 
   // Create the factory for a class located in a shared library
   scfFactory (const char *iClassID, const char *iLibraryName,
+    const char *iFactoryClass, scfFactoryFunc iCreateFunc, const char *iDesc,
     const char *iDepend);
-  // Create the factory for a class located in client module
-  scfFactory (const scfClassInfo *iClassInfo);
   // Free the factory object (but not objects created by this factory)
   virtual ~scfFactory ();
   // Create a insance of class this factory represents
@@ -269,33 +228,24 @@ public:
 //----------------------------------------- Class factory implementation ----//
 
 scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
+  const char *iFactoryClass, scfFactoryFunc iCreate, const char *iDescription,
   const char *iDepend)
 {
   // Don't use SCF_CONSTRUCT_IBASE (0) since it will call IncRef()
   scfRefCount = 0; scfParent = 0;
   ClassID = csStrNew (iClassID);
-  ClassInfo = 0;
+  Description = csStrNew (iDescription);
   Dependencies = csStrNew (iDepend);
+  CreateFunc = iCreate;
 #ifndef CS_STATIC_LINKED
   LibraryName = csStrNew (iLibraryName);
   Library = 0;
+  FactoryClass = csStrNew (iFactoryClass);
 #else
   (void)iLibraryName;
+  (void)iFactoryClass;
   // this branch should never be called
   abort ();
-#endif
-}
-
-scfFactory::scfFactory (const scfClassInfo *iClassInfo)
-{
-  // Don't use SCF_CONSTRUCT_IBASE (0) since it will call IncRef()
-  scfRefCount = 0; scfParent = 0;
-  ClassID = csStrNew (iClassInfo->ClassID);
-  ClassInfo = iClassInfo;
-  Dependencies = csStrNew (iClassInfo->Dependencies);
-#ifndef CS_STATIC_LINKED
-  LibraryName = 0;
-  Library = 0;
 #endif
 }
 
@@ -311,9 +261,11 @@ scfFactory::~scfFactory ()
 #ifndef CS_STATIC_LINKED
   if (Library)
     Library->DecRef ();
+  delete [] FactoryClass;
   delete [] LibraryName;
 #endif
   delete [] Dependencies;
+  delete [] Description;
   delete [] ClassID;
 }
 
@@ -327,10 +279,33 @@ void scfFactory::IncRef ()
       Library = (scfSharedLibrary *)LibraryRegistry->Get (libidx);
     else
       Library = new scfSharedLibrary (LibraryName);
-    if (Library->ok ())
-      ClassInfo = Library->Find (ClassID);
 
-    if (!Library->ok () || !ClassInfo)
+    if (Library->ok ())
+    {
+      if (CreateFunc == 0)
+      {
+        csString sym;
+	sym << FactoryClass << "_Create";
+	CreateFunc =
+	  (scfFactoryFunc)csGetLibrarySymbol(Library->LibraryHandle, sym);
+	if (CreateFunc != 0)
+	{
+	  typedef void (*scfInitFunc)(bool, iSCF*);
+	  sym.Clear();
+	  sym << FactoryClass << "_scfInitialize";
+	  scfInitFunc initfunc =
+	    (scfInitFunc)csGetLibrarySymbol(Library->LibraryHandle, sym);
+	  if (initfunc)
+	    initfunc(Library->ActiveClasses++ == 0, PrivateSCF);
+	  else
+	    csPrintLibraryError(sym);
+	}
+	else
+	  csPrintLibraryError(sym);
+      }
+    }
+
+    if (!Library->ok () || CreateFunc == 0)
     {
       Library = 0;
       return; // Signify that IncRef() failed by _not_ incrementing count.
@@ -359,6 +334,18 @@ void scfFactory::DecRef ()
     // now we no longer need the library either
     if (Library)
     {
+      if (CreateFunc != 0)
+      {
+        typedef void (*scfFinisFunc)(bool);
+        csString sym;
+        sym << FactoryClass << "_scfFinalize";
+        scfFinisFunc func =
+          (scfFinisFunc)csGetLibrarySymbol(Library->LibraryHandle, sym);
+        if (func)
+          func(--Library->ActiveClasses == 0);
+        else
+          csPrintLibraryError(sym);
+      }
       Library->DecRef ();
       Library = 0;
     }
@@ -384,7 +371,7 @@ void *scfFactory::CreateInstance ()
   if (!scfRefCount)
     return 0;
 
-  void *instance = ClassInfo->Factory (this);
+  void *instance = CreateFunc(this);
 
   // No matter whenever we succeeded or not, decrement the refcount
   DecRef ();
@@ -399,7 +386,7 @@ void scfFactory::TryUnload ()
 const char *scfFactory::QueryDescription ()
 {
   if (scfRefCount)
-    return ClassInfo->Description;
+    return Description;
   else
     return 0;
 }
@@ -492,6 +479,12 @@ void csSCF::RegisterClasses (iDocument* doc)
 #endif
 }
 
+static char const* get_node_value(csRef<iDocumentNode> parent, char const* key)
+{
+  csRef<iDocumentNode> node = parent->GetNode(key);
+  return node.IsValid() ? node->GetContentsValue() : "";
+}
+
 void csSCF::RegisterClasses (char const* pluginname, iDocumentNode* scfnode)
 {
   csRef<iDocumentNode> classesnode = scfnode->GetNode("classes");
@@ -501,10 +494,9 @@ void csSCF::RegisterClasses (char const* pluginname, iDocumentNode* scfnode)
     csRef<iDocumentNode> classnode;
     while ((classnode = classiter->Next()))
     {
-      csString classname;
-      csRef<iDocumentNode> namenode = classnode->GetNode("name");
-      if (namenode.IsValid())
-	classname = namenode->GetContentsValue();
+      csString classname = get_node_value(classnode, "name");
+      csString imp = get_node_value(classnode, "implementation");
+      csString desc = get_node_value(classnode, "description");
 
       // For backward compatibility, we build a comma-delimited dependency
       // string from the individual dependency nodes.  In the future,
@@ -524,7 +516,7 @@ void csSCF::RegisterClasses (char const* pluginname, iDocumentNode* scfnode)
       }
 
       char const* pdepend = (depend.IsEmpty() ? 0 : depend.GetData());
-      RegisterClass(classname, pluginname, pdepend);
+      RegisterClass(classname, pluginname, imp, desc, pdepend);
     }
   }
 }
@@ -559,7 +551,10 @@ void *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
       object->DecRef ();
 
       if (!instance)
-        fprintf (stderr, "SCF_WARNING: factory returned a null instance for %s\n\tif error messages are not self explanatory, recompile CS with CS_DEBUG\n", iClassID);
+        fprintf (stderr,
+	  "SCF_WARNING: factory returned a null instance for %s\n"
+	  "\tif error messages are not self explanatory, recompile CS with "
+	  "CS_DEBUG\n", iClassID);
     }
   } /* endif */
 
@@ -582,7 +577,7 @@ void csSCF::UnloadUnusedModules ()
 }
 
 bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
-  const char *Dependencies)
+  const char *iFactoryClass, const char *iDesc, const char *Dependencies)
 {
 #ifndef CS_STATIC_LINKED
   csScopedMutexLock lock (mutex);
@@ -590,34 +585,33 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
   if (ClassRegistry->FindKey (iClassID) >= 0)
     return false;
   // Create a factory and add it to class registry
-  ClassRegistry->Push (new scfFactory (iClassID, iLibraryName, Dependencies));
+  scfFactory* factory = new scfFactory (iClassID, iLibraryName, iFactoryClass,
+    0, iDesc, Dependencies);
+  ClassRegistry->Push (factory);
   SortClassRegistry = true;
   return true;
 #else
-  (void)iLibraryName;
   (void)iClassID;
+  (void)iLibraryName;
+  (void)iFactoryClass;
+  (void)iDesc;
   (void)Dependencies;
   return false;
 #endif
 }
 
-bool csSCF::RegisterStaticClass (scfClassInfo *iClassInfo)
+bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
+  const char *Desc, const char *Dependencies )
 {
   csScopedMutexLock lock (mutex);
 
-  if (ClassRegistry->FindKey (iClassInfo->ClassID) >= 0)
+  if (ClassRegistry->FindKey (iClassID) >= 0)
     return false;
   // Create a factory and add it to class registry
-  ClassRegistry->Push (new scfFactory (iClassInfo));
+  scfFactory* factory =
+    new scfFactory (iClassID, 0, 0, Func, Desc, Dependencies);
+  ClassRegistry->Push (factory);
   SortClassRegistry = true;
-  return true;
-}
-
-bool csSCF::RegisterClassList (scfClassInfo *iClassInfo)
-{
-  while (iClassInfo->ClassID)
-    if (!RegisterStaticClass (iClassInfo++))
-      return false;
   return true;
 }
 

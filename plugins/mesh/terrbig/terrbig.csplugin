@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.mesh.object.terrbig</name>
+        <implementation>csBigTerrainObjectType</implementation>
         <description>Crystal Space Big Terrain Mesh Type</description>
       </class>
     </classes>

@@ -69,10 +69,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csDefaultFontServer)
 
-SCF_EXPORT_CLASS_TABLE (csfont)
-  SCF_EXPORT_CLASS (csDefaultFontServer, "crystalspace.font.server.default",
-    "Crystal Space default font server")
-SCF_EXPORT_CLASS_TABLE_END
 
 csDefaultFontServer::csDefaultFontServer (iBase *pParent) : object_reg(0)
 {

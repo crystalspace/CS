@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.documentsystem.tinyxml</name>
+        <implementation>csTinyXMLPlugin</implementation>
         <description>Crystal Space TinyXML document system</description>
       </class>
     </classes>

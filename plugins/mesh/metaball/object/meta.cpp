@@ -848,10 +848,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csMetaBallType)
 
-SCF_EXPORT_CLASS_TABLE (metaball)
-  SCF_EXPORT_CLASS (csMetaBallType, "crystalspace.mesh.object.metaball",
-    "Crystal Space MetaBall mesh object")
-SCF_EXPORT_CLASS_TABLE_END
 
 csMetaBallType::csMetaBallType( iBase *par )
 {

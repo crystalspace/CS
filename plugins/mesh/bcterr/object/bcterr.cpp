@@ -2537,10 +2537,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csBCTerrObjectType)
 
-SCF_EXPORT_CLASS_TABLE (bcterr)
-  SCF_EXPORT_CLASS (csBCTerrObjectType, "crystalspace.mesh.object.bcterr",
-    "Crystal Space Bezier Curve Terrain Mesh Type")
-SCF_EXPORT_CLASS_TABLE_END
 
 csBCTerrObjectType::csBCTerrObjectType (iBase* pParent)
 {

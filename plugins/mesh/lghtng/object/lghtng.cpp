@@ -270,10 +270,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csLightningMeshObjectType)
 
-SCF_EXPORT_CLASS_TABLE (lghtng)
-  SCF_EXPORT_CLASS (csLightningMeshObjectType, "crystalspace.mesh.object.lightning",
-    "Crystal Space Lightning Mesh Type")
-SCF_EXPORT_CLASS_TABLE_END
 
 csLightningMeshObjectType::csLightningMeshObjectType (iBase* pParent)
 {

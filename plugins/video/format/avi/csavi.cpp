@@ -36,10 +36,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csAVIFormat::eiComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csAVIFormat)
-SCF_EXPORT_CLASS_TABLE (csavi)
-  SCF_EXPORT_CLASS (csAVIFormat, "crystalspace.video.format.avi",
-		"CrystalSpace AVI format interface")
-SCF_EXPORT_CLASS_TABLE_END
 
 #define AVI_EVEN(x) ((x)&1?(x)+1:(x))
 

@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.graphics2d.glx</name>
+        <implementation>csGraphics2DGLX</implementation>
         <description>Crystal Space 2D driver for OpenGL using GL/X</description>
         <requires>
           <class>crystalspace.font.server.</class>

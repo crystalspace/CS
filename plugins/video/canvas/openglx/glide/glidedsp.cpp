@@ -26,9 +26,6 @@
 
 SCF_IMPLEMENT_FACTORY(csOpenGLGlideDisp)
 
-SCF_EXPORT_CLASS_TABLE(oglglide)
-    SCF_EXPORT_CLASS( csOpenGLGlideDisp, "crystalspace.graphics2d.glx.disp.glide", "Glide Displaydriver for Crystal Space GL/X")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE(csOpenGLGlideDisp)
   SCF_IMPLEMENTS_INTERFACE(iComponent)

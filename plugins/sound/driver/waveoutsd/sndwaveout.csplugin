@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.sound.driver.waveout</name>
+        <implementation>csSoundDriverWaveOut</implementation>
         <description>Crystal Space waveOut Sound Driver</description>
       </class>
     </classes>

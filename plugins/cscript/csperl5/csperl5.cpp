@@ -43,11 +43,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csPerl5)
 
-SCF_EXPORT_CLASS_TABLE (csperl5)
-  SCF_EXPORT_CLASS (csPerl5,
-  "crystalspace.script.perl5",
-  "Crystal Space Perl v5 Scripting Plugin")
-SCF_EXPORT_CLASS_TABLE_END
 
 csPerl5::csPerl5 (iBase *parent)
 {

@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.mesh.object.ball</name>
+        <implementation>csBallMeshObjectType</implementation>
         <description>Crystal Space Ball Mesh Type</description>
       </class>
     </classes>

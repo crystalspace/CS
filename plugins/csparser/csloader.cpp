@@ -692,23 +692,6 @@ SCF_IMPLEMENT_FACTORY(csLoader);
 SCF_IMPLEMENT_FACTORY(csImageTextureLoader);
 SCF_IMPLEMENT_FACTORY(csCheckerTextureLoader);
 
-SCF_EXPORT_CLASS_TABLE (csparser)
-  SCF_EXPORT_CLASS_DEP (csLoader, "crystalspace.level.loader",
-    "Level and library file loader", "crystalspace.kernel., "
-    "crystalspace.sound.loader., crystalspace.image.loader, "
-    "crystalspace.mesh.loader., "
-    "crystalspace.engine.3d, crystalspace.graphics3d., "
-    "crystalspace.sound.render., crystalspace.motion.manager., "
-    "crystalspace.mesh.crossbuilder, crystalspace.modelconverter. ")
-  SCF_EXPORT_CLASS_DEP (csImageTextureLoader,
-    PLUGIN_TEXTURELOADER_IMAGE,
-    "Image texture loader",
-    "crystalspace.level.loader, ")
-  SCF_EXPORT_CLASS_DEP (csCheckerTextureLoader,
-    PLUGIN_TEXTURELOADER_CHECKERS,
-    "Checkerboard texture loader",
-    "crystalspace.level.loader, ")
-SCF_EXPORT_CLASS_TABLE_END
 
 CS_IMPLEMENT_PLUGIN
 

@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.utilities.stdrep</name>
+        <implementation>csReporterListener</implementation>
         <description>Standard Reporter Listener</description>
         <requires>
           <class>crystalspace.utilities.reporter</class>

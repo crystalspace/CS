@@ -1054,10 +1054,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csBallMeshObjectType)
 
-SCF_EXPORT_CLASS_TABLE (ball)
-  SCF_EXPORT_CLASS (csBallMeshObjectType, "crystalspace.mesh.object.ball",
-    "Crystal Space Ball Mesh Type")
-SCF_EXPORT_CLASS_TABLE_END
 
 csBallMeshObjectType::csBallMeshObjectType (iBase* pParent)
 {

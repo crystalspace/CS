@@ -28,9 +28,6 @@ SCF_IMPLEMENT_IBASE (csOpenDivX)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csOpenDivX)
-SCF_EXPORT_CLASS_TABLE (odivx)
-  SCF_EXPORT_CLASS (csOpenDivX, "crystalspace.video.codec.avi.dvx1", "CrystalSpace OpenDivX codec")
-SCF_EXPORT_CLASS_TABLE_END
 
 csOpenDivX::csOpenDivX (iBase *pParent)
 {

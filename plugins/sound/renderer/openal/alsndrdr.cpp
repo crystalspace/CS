@@ -43,10 +43,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY(csSoundRenderOpenAL);
 
-SCF_EXPORT_CLASS_TABLE (sndoal)
-SCF_EXPORT_CLASS (csSoundRenderOpenAL, "crystalspace.sound.render.openal",
-        "OpenAL 3D Sound Driver for Crystal Space")
-SCF_EXPORT_CLASS_TABLE_END;
 
 SCF_IMPLEMENT_IBASE(csSoundRenderOpenAL)
   SCF_IMPLEMENTS_INTERFACE(iSoundRender)

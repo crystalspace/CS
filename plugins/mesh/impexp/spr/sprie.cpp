@@ -66,11 +66,6 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csModelConverterSPR)
 
-SCF_EXPORT_CLASS_TABLE (sprie)
-  SCF_EXPORT_CLASS (csModelConverterSPR,
-    "crystalspace.modelconverter.spr",
-    "SPR Model Converter")
-SCF_EXPORT_CLASS_TABLE_END
 
 CS_IMPLEMENT_PLUGIN
 

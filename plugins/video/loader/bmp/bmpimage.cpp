@@ -40,9 +40,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csBMPImageIO);
 
-SCF_EXPORT_CLASS_TABLE (csbmpimg)
-  SCF_EXPORT_CLASS (csBMPImageIO, "crystalspace.graphic.image.io.bmp", "CrystalSpace BMP image format I/O plugin")
-SCF_EXPORT_CLASS_TABLE_END
 
 #define BMP_MIME "image/bmp"
 #define BMP_EXT	 "bmp"

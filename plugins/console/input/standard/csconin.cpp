@@ -42,10 +42,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csConsoleInput)
 
-SCF_EXPORT_CLASS_TABLE (csconin)
-  SCF_EXPORT_CLASS (csConsoleInput, "crystalspace.console.input.standard",
-    "Crystal Space standard input console")
-SCF_EXPORT_CLASS_TABLE_END
 
 csConsoleInput::csConsoleInput (iBase *iParent) : History (16, 16)
 {

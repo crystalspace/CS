@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.utilities.movierecorder</name>
+        <implementation>csMovieRecorder</implementation>
         <description>Realtime movie recorder</description>
       </class>
     </classes>

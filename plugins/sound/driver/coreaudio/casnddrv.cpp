@@ -22,11 +22,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY(csSoundDriverCoreAudio)
 
-SCF_EXPORT_CLASS_TABLE(casnddrv)
-    SCF_EXPORT_CLASS (csSoundDriverCoreAudio,
-	"crystalspace.sound.driver.coreaudio",
-	"Crystal Space CoreAudio sound driver for MacOS/X")
-SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE(csSoundDriverCoreAudio)
     SCF_IMPLEMENTS_INTERFACE(iSoundDriver)

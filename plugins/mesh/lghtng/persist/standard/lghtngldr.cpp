@@ -99,17 +99,6 @@ SCF_IMPLEMENT_FACTORY (csLightningFactorySaver)
 SCF_IMPLEMENT_FACTORY (csLightningLoader)
 SCF_IMPLEMENT_FACTORY (csLightningSaver)
 
-SCF_EXPORT_CLASS_TABLE (lghtngldr)
-  SCF_EXPORT_CLASS (csLightningFactoryLoader,
-    "crystalspace.mesh.loader.factory.lightning",
-    "Crystal Space Lightning Factory Loader")
-  SCF_EXPORT_CLASS (csLightningFactorySaver, "crystalspace.mesh.saver.factory.lightning",
-    "Crystal Space Lightning Factory Saver")
-  SCF_EXPORT_CLASS (csLightningLoader, "crystalspace.mesh.loader.lightning",
-    "Crystal Space Lightning Mesh Loader")
-  SCF_EXPORT_CLASS (csLightningSaver, "crystalspace.mesh.saver.lightning",
-    "Crystal Space Lightning Mesh Saver")
-SCF_EXPORT_CLASS_TABLE_END
 
 csLightningFactoryLoader::csLightningFactoryLoader (iBase* pParent)
 {

@@ -149,10 +149,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DOpenGL)
 
-SCF_EXPORT_CLASS_TABLE (glwin32)
-  SCF_EXPORT_CLASS_DEP (csGraphics2DOpenGL, "crystalspace.graphics2d.glwin32",
-    "Win32 OpenGL 2D graphics driver for Crystal Space", "crystalspace.font.server.")
-SCF_EXPORT_CLASS_TABLE_END
 
 ///// Windowed-mode palette stuff //////
 

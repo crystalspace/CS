@@ -55,8 +55,4 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csBinaryDocumentSystem)
 
-SCF_EXPORT_CLASS_TABLE(bindoc)
-  SCF_EXPORT_CLASS(csBinaryDocumentSystem, "crystalspace.documentsystem.binary",
-      "Binary document system")
-SCF_EXPORT_CLASS_TABLE_END
 

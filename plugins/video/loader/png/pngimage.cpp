@@ -47,10 +47,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csPNGImageIO);
 
-SCF_EXPORT_CLASS_TABLE (cspngimg)
-  SCF_EXPORT_CLASS (csPNGImageIO, "crystalspace.graphic.image.io.png",
-		"CrystalSpace PNG image format I/O plugin")
-SCF_EXPORT_CLASS_TABLE_END
 
 #define PNG_MIME "image/png"
 

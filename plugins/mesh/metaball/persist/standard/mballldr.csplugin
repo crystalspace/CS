@@ -6,18 +6,22 @@
     <classes>
       <class>
         <name>crystalspace.mesh.loader.factory.metaball</name>
+        <implementation>csMetaBallFactoryLoader</implementation>
         <description>Crystal Space MetaBall Factory Loader</description>
       </class>
       <class>
         <name>crystalspace.mesh.loader.metaball</name>
+        <implementation>csMetaBallLoader</implementation>
         <description>Crystal Space MetaBall Mesh Loader</description>
       </class>
       <class>
         <name>crystalspace.mesh.saver.factory.metaball</name>
+        <implementation>csMetaBallFactorySaver</implementation>
         <description>Crystal Space MetaBall Factory Saver</description>
       </class>
       <class>
         <name>crystalspace.mesh.saver.metaball</name>
+        <implementation>csMetaBallSaver</implementation>
         <description>Crystal Space MetaBall Mesh Saver</description>
       </class>
     </classes>

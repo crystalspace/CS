@@ -110,17 +110,6 @@ SCF_IMPLEMENT_FACTORY (csGeneralFactorySaver)
 SCF_IMPLEMENT_FACTORY (csGeneralMeshLoader)
 SCF_IMPLEMENT_FACTORY (csGeneralMeshSaver)
 
-SCF_EXPORT_CLASS_TABLE (gmeshldr)
-  SCF_EXPORT_CLASS (csGeneralFactoryLoader,
-    "crystalspace.mesh.loader.factory.genmesh",
-    "Crystal Space General Mesh Factory Loader")
-  SCF_EXPORT_CLASS (csGeneralFactorySaver, "crystalspace.mesh.saver.factory.genmesh",
-    "Crystal Space General Mesh Factory Saver")
-  SCF_EXPORT_CLASS (csGeneralMeshLoader, "crystalspace.mesh.loader.genmesh",
-		    "Crystal Space General Mesh Mesh Loader")
-  SCF_EXPORT_CLASS (csGeneralMeshSaver, "crystalspace.mesh.saver.genmesh",
-    "Crystal Space General Mesh Mesh Saver")
-SCF_EXPORT_CLASS_TABLE_END
 
 csGeneralFactoryLoader::csGeneralFactoryLoader (iBase* pParent)
 {

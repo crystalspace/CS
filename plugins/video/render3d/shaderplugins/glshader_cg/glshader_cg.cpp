@@ -46,11 +46,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGLShader_CG)
 
-SCF_EXPORT_CLASS_TABLE (glshader_cg)
-SCF_EXPORT_CLASS_DEP (csGLShader_CG, "crystalspace.render3d.shader.glcg",
-                      "OpenGL specific shaderprogram provider for Render3D",
-                      "")
-SCF_EXPORT_CLASS_TABLE_END
 
 
 SCF_IMPLEMENT_IBASE(csGLShader_CG)

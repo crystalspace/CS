@@ -2486,11 +2486,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSprite3DMeshObjectType)
 
-SCF_EXPORT_CLASS_TABLE (spr3d)
-  SCF_EXPORT_CLASS (csSprite3DMeshObjectType,
-  	"crystalspace.mesh.object.sprite.3d",
-	"Crystal Space Sprite3D Mesh Type")
-SCF_EXPORT_CLASS_TABLE_END
 
 csSprite3DMeshObjectType::csSprite3DMeshObjectType (iBase* pParent)
 {

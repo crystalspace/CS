@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.modelconverter.obj</name>
+        <implementation>csModelConverterOBJ</implementation>
         <description>OBJ Model Converter</description>
       </class>
     </classes>

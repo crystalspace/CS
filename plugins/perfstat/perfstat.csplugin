@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.utilities.perfstat</name>
+        <implementation>csPerfStats</implementation>
         <description>Performance statistics utility</description>
       </class>
     </classes>

@@ -103,18 +103,6 @@ SCF_IMPLEMENT_FACTORY (csFountainFactorySaver)
 SCF_IMPLEMENT_FACTORY (csFountainLoader)
 SCF_IMPLEMENT_FACTORY (csFountainSaver)
 
-SCF_EXPORT_CLASS_TABLE (fountldr)
-  SCF_EXPORT_CLASS (csFountainFactoryLoader,
-  	"crystalspace.mesh.loader.factory.fountain",
-	"Crystal Space Fountain Factory Loader")
-  SCF_EXPORT_CLASS (csFountainFactorySaver,
-  	"crystalspace.mesh.saver.factory.fountain",
-	"Crystal Space Fountain Factory Saver")
-  SCF_EXPORT_CLASS (csFountainLoader, "crystalspace.mesh.loader.fountain",
-    "Crystal Space Fountain Mesh Loader")
-  SCF_EXPORT_CLASS (csFountainSaver, "crystalspace.mesh.saver.fountain",
-    "Crystal Space Fountain Mesh Saver")
-SCF_EXPORT_CLASS_TABLE_END
 
 csFountainFactoryLoader::csFountainFactoryLoader (iBase* pParent)
 {

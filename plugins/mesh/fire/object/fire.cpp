@@ -296,10 +296,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csFireMeshObjectType)
 
-SCF_EXPORT_CLASS_TABLE (fire)
-  SCF_EXPORT_CLASS (csFireMeshObjectType, "crystalspace.mesh.object.fire",
-    "Crystal Space Fire Mesh Type")
-SCF_EXPORT_CLASS_TABLE_END
 
 csFireMeshObjectType::csFireMeshObjectType (iBase* pParent)
 {

@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.graphics2d.coregraphics</name>
+        <implementation>CGDriver2D</implementation>
         <description>Crystal Space 2D driver for MacOS/X (CoreGraphics)</description>
         <requires>
           <class>crystalspace.font.server.</class>

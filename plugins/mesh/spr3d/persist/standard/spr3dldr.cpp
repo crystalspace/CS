@@ -112,18 +112,6 @@ SCF_IMPLEMENT_FACTORY (csSprite3DFactorySaver)
 SCF_IMPLEMENT_FACTORY (csSprite3DLoader)
 SCF_IMPLEMENT_FACTORY (csSprite3DSaver)
 
-SCF_EXPORT_CLASS_TABLE (spr3dldr)
-  SCF_EXPORT_CLASS (csSprite3DFactoryLoader,
-  	"crystalspace.mesh.loader.factory.sprite.3d",
-	"Crystal Space Sprite3D Mesh Factory Loader")
-  SCF_EXPORT_CLASS (csSprite3DFactorySaver,
-  	"crystalspace.mesh.saver.factory.sprite.3d",
-	"Crystal Space Sprite3D Mesh Factory Saver")
-  SCF_EXPORT_CLASS (csSprite3DLoader, "crystalspace.mesh.loader.sprite.3d",
-    "Crystal Space Sprite3D Mesh Loader")
-  SCF_EXPORT_CLASS (csSprite3DSaver, "crystalspace.mesh.saver.sprite.3d",
-    "Crystal Space Sprite3D Mesh Saver")
-SCF_EXPORT_CLASS_TABLE_END
 
 csSprite3DFactoryLoader::csSprite3DFactoryLoader (iBase* pParent)
 {

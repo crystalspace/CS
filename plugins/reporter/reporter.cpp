@@ -28,10 +28,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csReporter)
 
-SCF_EXPORT_CLASS_TABLE (reporter)
-  SCF_EXPORT_CLASS (csReporter, "crystalspace.utilities.reporter",
-    "Reporting utility")
-SCF_EXPORT_CLASS_TABLE_END
 
 //-----------------------------------------------------------------------
 

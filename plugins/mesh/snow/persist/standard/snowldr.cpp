@@ -99,17 +99,6 @@ SCF_IMPLEMENT_FACTORY (csSnowFactorySaver)
 SCF_IMPLEMENT_FACTORY (csSnowLoader)
 SCF_IMPLEMENT_FACTORY (csSnowSaver)
 
-SCF_EXPORT_CLASS_TABLE (snowldr)
-  SCF_EXPORT_CLASS (csSnowFactoryLoader,
-    "crystalspace.mesh.loader.factory.snow",
-    "Crystal Space Snow Factory Loader")
-  SCF_EXPORT_CLASS (csSnowFactorySaver, "crystalspace.mesh.saver.factory.snow",
-    "Crystal Space Snow Factory Saver")
-  SCF_EXPORT_CLASS (csSnowLoader, "crystalspace.mesh.loader.snow",
-    "Crystal Space Snow Mesh Loader")
-  SCF_EXPORT_CLASS (csSnowSaver, "crystalspace.mesh.saver.snow",
-    "Crystal Space Snow Mesh Saver")
-SCF_EXPORT_CLASS_TABLE_END
 
 csSnowFactoryLoader::csSnowFactoryLoader (iBase* pParent)
 {

@@ -6,6 +6,7 @@
     <classes>
       <class>
         <name>crystalspace.modelconverter.pov</name>
+        <implementation>csModelConverterPOV</implementation>
         <description>POV Model Converter</description>
       </class>
     </classes>

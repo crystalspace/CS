@@ -78,10 +78,6 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csCrossBuilder)
 
-SCF_EXPORT_CLASS_TABLE (crossbld)
-  SCF_EXPORT_CLASS (csCrossBuilder, "crystalspace.mesh.crossbuilder",
-    "Modeldata-to-Meshobject cross builder")
-SCF_EXPORT_CLASS_TABLE_END
 
 csCrossBuilder::csCrossBuilder (iBase *parent)
 {
