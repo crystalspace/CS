@@ -178,6 +178,8 @@ void R3DTest::SetupFrame ()
   }
 
 
+  char text[1024];
+
   iFontServer* fntsvr = r3d->GetDriver2D ()->GetFontServer ();
   CS_ASSERT (fntsvr != NULL);
   csRef<iFont> fnt (fntsvr->GetFont (0));
@@ -194,6 +196,18 @@ void R3DTest::SetupFrame ()
     view->GetCamera ()->Move (CS_VEC_FORWARD);
   if (kbd->GetKeyState (CSKEY_DOWN))
     view->GetCamera ()->Move (CS_VEC_BACKWARD);
+
+  r3d->SetRenderTarget (matwrap->GetMaterial ()->GetTexture (), true);
+
+  // Tell 3D driver we're going to display 3D things.
+  if (!r3d->BeginDraw (CSDRAW_2DGRAPHICS))
+    return;
+
+  sprintf (text, "Le SetRenderTargette iz workeeng!");
+  r3d->GetDriver2D ()->Write (fnt, 10, 10, 0x00FF00FF, -1, text);
+
+  r3d->FinishDraw ();
+  r3d->SetRenderTarget (NULL);
 
   r3d->SetPerspectiveAspect (r3d->GetDriver2D ()->GetHeight ());
   r3d->SetPerspectiveCenter (r3d->GetDriver2D ()->GetWidth ()/2,
@@ -241,12 +255,9 @@ void R3DTest::SetupFrame ()
   if (!r3d->BeginDraw (CSDRAW_2DGRAPHICS))
     return;
 
-  char asdf[1024];
-
-  sprintf (asdf, "Ah, it iz le test!      Le FPS c'est cyrrentlee %d, frame %d", FPS, framecount);
-  r3d->GetDriver2D ()->Write (fnt, 10, 50, 0x00FF00FF, -1, asdf);
+  sprintf (text, "Ah, it iz le test!      Le FPS c'est cyrrentlee %d, frame %d", FPS, framecount);
+  r3d->GetDriver2D ()->Write (fnt, 10, 50, 0x00FF00FF, -1, text);
   r3d->FinishDraw ();
-
 }
 
 void R3DTest::FinishFrame ()
