@@ -208,13 +208,15 @@ private:
   bool auto_update;
   bool system_ready;
   bool visible;
+  bool has_shadow;
   iConsoleWatcher *Client;
 
   //  Foreground and background colors
   csRGBcolor fg_rgb;
   csRGBcolor bg_rgb;
+  csRGBcolor shadow_rgb;
   // The texture manager codes for the colors
-  int fg, bg;
+  int fg, bg, shadow;
 };
 
 #endif // __CS_CSCONOUT_H__

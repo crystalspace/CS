@@ -63,6 +63,7 @@ csConsoleOutput::csConsoleOutput (iBase *base)
   scfiEventHandler = 0;
   fg_rgb.Set (255, 255, 255);	// Foreground defaults to white
   bg_rgb.Set (0, 0, 0);		// Background defaults to black
+  bg_rgb.Set (32, 32, 32);	// Shadow defaults to darkgray
   transparent = false;		// Default to no transparency
   do_snap = true;		// Default to snapping
   // Initialize the cursor state variables
@@ -74,10 +75,14 @@ csConsoleOutput::csConsoleOutput (iBase *base)
   auto_update = true;
   system_ready = false;
   visible = true;
+  has_shadow = false;
   Client = 0;
   // clear font for closedown
   object_reg = 0;
   mutex = csMutex::Create (true);
+  fg=0;
+  bg=0;
+  shadow=0;
 }
 
 csConsoleOutput::~csConsoleOutput ()
@@ -324,6 +329,11 @@ void csConsoleOutput::Draw2D (csRect *area)
     if (area && (dirty || line.Intersects (invalid)))
       area->Union (line);
 
+    // draw the shadow if needed, behind the text
+    if (has_shadow)
+      G2D->Write (font, 1 + size.xmin + 1, (i * height) + size.ymin + 1, 
+	  shadow, -1, text->GetData ());
+
     // Write the line
     G2D->Write (font, 1 + size.xmin, (i * height) + size.ymin, fg, -1,
       text->GetData ());
@@ -402,6 +412,7 @@ void csConsoleOutput::CacheColors ()
 {
   fg = G2D->FindRGB (fg_rgb.red, fg_rgb.green, fg_rgb.blue);
   bg = G2D->FindRGB (bg_rgb.red, bg_rgb.green, bg_rgb.blue);
+  shadow = G2D->FindRGB (shadow_rgb.red, shadow_rgb.green, shadow_rgb.blue);
 }
 
 void
@@ -613,6 +624,11 @@ bool csConsoleOutput::PerformExtensionV (const char *iCommand, va_list args)
     int *fgcolor = va_arg (args, int *);
     *fgcolor = fg;
   }
+  else if (!strcmp (iCommand, "GetShadowColor"))
+  {
+    int *shcolor = va_arg (args, int *);
+    *shcolor = shadow;
+  }
   else if (!strcmp (iCommand, "SetBackgroundColor"))
   {
     bg = va_arg (args, int);
@@ -620,6 +636,18 @@ bool csConsoleOutput::PerformExtensionV (const char *iCommand, va_list args)
   else if (!strcmp (iCommand, "SetForegroundColor"))
   {
     fg = va_arg (args, int);
+  }
+  else if (!strcmp (iCommand, "SetShadowColor"))
+  {
+    shadow = va_arg (args, int);
+  }
+  else if (!strcmp (iCommand, "EnableShadow"))
+  {
+    has_shadow = true;
+  }
+  else if (!strcmp (iCommand, "DisableShadow"))
+  {
+    has_shadow = false;
   }
   else
     rc = false;

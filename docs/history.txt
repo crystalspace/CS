@@ -82,6 +82,11 @@ chronological order.
 	  to some of the classes. C++ only accepts one destructor.
 	- Eric Sunshine added missing SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS()
 	  invocations to csReporterListener and csXmlReadNode.
+	- Wouter added new extensions to the csconout (standard output
+	  console) plugin. This enables shadowing of the letters. Default
+	  is off, the same behaviour as before. Extensions are:
+	  EnableShadow, DisableShadow, SetShadowColor, GetShadowColor.
+
 6-Nov-2003
 	- res bumped the version of the iGraphics2D interface and updated some
 	  Doxygen comments in include/graph2d.h (basically, the differences
