@@ -20,8 +20,12 @@ char *strdup (const char *str);
 #define SCF_EXPORT_FUNCTION extern "C" __declspec(export)
 
 #ifdef SYSDEF_ACCESS
+# if __MWERKS__>=0x2400
+# include <unistd.h>
+# elif
 int access (const char *path, int mode);
-#endif
+# endif
+#endif // SYSDEF_ACCESS
 
 #ifdef __cplusplus
 }
@@ -38,6 +42,13 @@ int access (const char *path, int mode);
 
 #if defined (SYSDEF_DIR)
 #  define __NEED_GENERIC_ISDIR
+#endif
+
+// WHM CW6 fix
+#if defined (SYSDEF_GETCWD) || defined (SYSDEF_UNLINK)
+#if __MWERKS__>=0x2400
+#include <unistd.h>
+#endif
 #endif
 
 #if defined (SYSDEF_SELECT)
