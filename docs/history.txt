@@ -5,14 +5,75 @@ The history order is reversed so that new features are at the top.
 	  the needed include files on mingw.
 30-Oct-2001
 	- Matze changed code structure of viewmesh a bit. I'll add csws
-	  interfaces tomorrow
+	  interfaces tomorrow.
 	- Jorge Acereda fixed wrong NASMFLAGS.SYSTEM for NetBSD.
+	- Jorge also fixed newlines (unix format) in viewmesh.*.
+	- Jorge did some minor symbol name fixes, commited just to test if
+	  my problems with CVS have vanished.
+	- Wouter Wijngaards added some debug code to iso engine.
+	- Christopher Nelson did the following:
+	    - Missed awscmdbt.h when I was moving stuff back to the private
+	      directory.
+	    - Fixed some fragmentation rule errors.
+	    - Fixed the exclude code so that it works correctly.
+	    - Fixed a bug in DeleteRect that would cause it not to move
+	      stuff properly.
+	    - Updated awsWindow to use a more optimal redraw method. Since
+	      windows are always containers, they now maintain a csRectRegion
+	      of areas where it should draw. The entire frame is included,
+	      and then all child components are excluded. It doesn't attempt
+	      to recurse children because all children are contained inside
+	      their parents. This should reduce overdraw by quite a lot and
+	      make full screen windows much more optimal.
+	    - Add Flags(), SetFlag(), and ClearFlag() to the component
+	      definition. This lets me extend behavior without always having
+	      to modify the interface. The hidden flag is now embedded into
+	      the flags dword.  
+	    - Components which expect the parent window to erase them before
+	      each redraw can now call set the "AWSF_CMP_ALWAYSERASE" flag.
+	    - Fixed a few small bugs here and there in csrectrg.cpp.
+	    - New header iawsdefs.h.
+	- Martin Geisse removed UnregisterTexture() and UnregisterMaterial()
+	  from iGraphics3D. To unregister a texture or material, all
+	  references to the handle should be released. This behaviour was
+	  already assumed by all renderers and other code, but not yet
+	  reflected in the interface functions and comments.
+	- Martin Geisse added csRegionList and iRegionList. It is now possible
+	  to access the regions in the engine as such a list.
+	- Martin added an 'applicationID' parameter to SetupConfigManager().
+	  This parameter is used for the application ID, unless overridden by
+	  the application's config file.
+	- 'res' added mouse cursors: cross, pen. Windows mouse cursors
+	  can now be turned off via Video.SystemMouseCursor.
+	- Philip Wyett did some quick compile fixes on the changes from 'res'.
 29-Oct-2001
 	- Eric Sunshine augmented the makefile configuration procedure for the
 	  Apple/NeXT ports so that they work even if executable permission has
 	  been lost on the scripts in CS/bin.  (Unfortunately, this fix is too
 	  late for the 0.90 package in which none of the scripts in CS/bin had
 	  executable permission.)
+	- Christopher Nelson did the following:
+	    - Added "Check Box", trivial modification from RadioButton.
+	    - Added component into the common components automatic register.
+	    - Added new container "Group Frame".
+	    - Container can have several border types and a caption:
+                % "gfsBump", sort of a bump border, goes up and down.
+                % "gfsRaised", "gfsSunken", just like a button being up and
+		  down.
+                % "gfsSimple", A simple black border.
+	    - Updated test definition to show new group frame and how it
+	      acts with radio buttons.
+	- 'res' fixed a bug in CSWS: if button dismisses parent, command
+	   isn't send (to parent, causing crash).
+28-Oct-2001
+	- 'res' fixed map2cs so that a proper message is given when a token
+	  is too long (instead of crash). Texture names with special chars
+	  (like ~, + in half-life) are now corrected so CS parser will
+	  recognize string.
+	- 'res' fixed some of the OpenGL 2D routines so that they properly
+	  restore disabled states.
+	- 'res' also fixed wrong screen resolution on voodoo2 (openglwin).
+	- 'res' fixed a crash in 8 bit mode with ddraw canvas.
 27-Oct-2001
 	- Markus Korth <mkorth@military.de> fixed a bug with
 	  unixconf.sh which would use -mcpu=486 instead of -mcpu=i486.
@@ -21,9 +82,90 @@ The history order is reversed so that new features are at the top.
 	    sunsite.dk/projects/crystal/support/map2cs/cstex_1.zip.
 26-Oct-2001
 	- Jorge Acereda fixed warning introduced in his latest fix.
+	- Philip Wyett added private function to openglwin canvas for restoring
+	  display mode. Also swapped round so context is deleted before it
+	  is made current which is the correct way of performing the
+	  destruction.
+	- Christopher Nelson did the following:
+	    - Fixed include error in awsecomp.h pointed out by Eric.
+	    - Added toggling capability to Command Button via attribute
+	      "Toggle". This lets a command button act just like a toolbar
+	      button: staying pushed down when clicked, and then staying
+	      unpushed when clicked again.    
+	    - Added "State" property to command button to find out whether
+	      a button is pushed or not. This is mostly only useful for
+	      toggle buttons.
+	    - Moving files back around so that 'private' header files can't
+	      be included into external projects.
+	    - Fixed all the files to not include out of 'aws/' now.
+	    - Created new component "Radio Button".
+	    - Added this component to the window manager.
+	    - Notes: As with normal radio buttons, these buttons are one
+	      on/rest off items. This was accomplished by creating a new event
+	      called GroupOff and overriding handle event so that it would
+	      turn off this component when receiving that event.  
+	    - New definition of evdefs.h.
+	    - Added awsdef.zip.
+	    - Added another attribute to "Radio Button": this component can
+	      now be aligned to the right or to the left of it's bounding
+	      box. Also properly truncates it's caption if the text is too
+	      long.
+	    - Fixed small bug with command button.
+	    - Added GroupClear functionality to the command button so that it
+	      can properly be used for toolbars now. Push buttons in the
+	      toggle mode have one extra ability over radio buttons: all
+	      buttons can be deselected. This is NOT the case with Radio
+	      Buttons. I intend to have an additional attribute called
+	      AllowAllUp that will disable this ability.
+	- Norman Kramer fixes compile problems with versions of mesa that
+	  declare GLenum as an enum (later versions simply typedef it as an
+	  int).
+	- Norman Kramer changed inclusion of freetype to be loaded as
+	  freetype/freetype.h.
+	- Philip Wyett removed the no longer existant winhelper.h from the
+	  MSVC project file.
+	- Philip Wyett updated documentation to new version of msvc_libs for
+	  cvs code. This adjusts dirs to bring into line with Norman Kramer's
+	  Freetype change.
+	  The new version of msvc_libs can be obtaine via:
+	  	ftp://ftp.sunsite.dk/projects/crystal/support/win32/
+	  	msvc_libs_0.91a.zip
+	  Note: This version is NOT to be used with CS 0.90 release.
 25-Oct-2001
 	- Jorge Acereda fixed coredumps when passing options to the 
 	  software renderer.
+	- Christopher Nelson did the following:
+	    - Fixed textbox so that it has a cursor now (Non flashing).
+	    - Updated the event handling system so that it properly delivers
+	      messages only to the component that has the keyboard focus.
+	    - Keyboard focus now properly sends out gain/lost focus events.
+	    - Added csevGainFocus and csevLostFocus to the evdefs.h file.
+	    - Added a check so that, if the mous is clicked on a component,
+	      that component receives the keyboard focus. I may eventually
+	      extend this to add the normal tabbing behavior, but that will
+	      require a slight retrofit of existing component architecture.
+	    - Implemented "disallow" and masking.
+	    - Fixed small bug regarding click focus.
+	    - Updated awstest to show a text box with masking on. Updated
+	      previous textbox to disallow numbers and spaces.
+	    - Updated definition of a pseudo-login session in awstest.
+	    - Fixed a minor bug in focus-change order.
+	    - Added HideWindow action.
+	    - Fixed bug where hidden windows still received events.
+	    - Made the test a little more interesting and useful by first
+	      displaying a login window, then demonstrating how you can make
+	      a signal do something, hide the source window, and then show
+	      another window. This uses static member functions, but you
+	      could do something similiar with normal functions and a struct
+	      or something.
+	    - Added new attribute "Align" to labels. Now they can be aligned
+	      left, right, or centered. Also, the text will be clipped if
+	      it's too long to display.
+	    - Fixed small bug in window that was forgetting to get the title.
+	    - Added Title line to awstest to make window be titled.
+	    - Fixed possible bug in component that could make it crash if the
+	      user called HideWindow action on a window.
+	    - Fixed awsWindow so that titles are clipped to the frame.
 24-Oct-2001
 	- Bumped up development version of CS to 0.91.
 	- Added iSectorIterator interface to iterate over sectors.
@@ -35,6 +177,23 @@ The history order is reversed so that new features are at the top.
 	  to iEngine.
 	- Also added GetNearbyLights() to iEngine and changed prototype
 	  to work with SCF interfaces.
+	- Christopher Nelson did the following:
+	    - Fixed bug where hidden windows were still displayed.
+	    - Added a close button to awstest that hooks into the standard
+	      sink and makes the main window go away.
+	    - Modified test definitions to include label.
+	    - Added awsTestBox to manager.
+	    - Added new component awsTextBox, named "Text Box". This component
+	      currently acts like most other text boxes you've ever seen,
+	      with the additional benefit that it can be textured and you can
+	      completely replace it's background with a bitmap if you like.
+	      It also has support for character disallowing. I also plan to
+	      add character masking so that it replaces the view on screen
+	      with a random number of asterisks or user defined character.
+	      This component is currently missing a cursor.
+	    - Added a text box to awstest so you can play with it.
+	    - Added trivially simply static label component named "Label".
+	    - Added this to the common components registry.
 23-Oct-2001
 	- Michael Voase improved lighting on water procedural texture in
 	  flarge.
@@ -107,6 +266,11 @@ The history order is reversed so that new features are at the top.
 	- Creation of R0_90 branch.
 	- Matze added csphyzik to cs-config
 	- Release of CS 0.90r001.
+	- Christopher Nelson did the following:
+	    - Committed the embedded component header. Please note that this
+	      hasn't really been tested, so some bugs certainly exist in it.
+	    - Fixed some bugs. Added Execute. Added some other stuff to make
+	      the some useful things in StandardSink work.
 22-Oct-2001
 	- Fixed a bug in the 'addghost' console command. It would fail
 	  if you used it more than once.
