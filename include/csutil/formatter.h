@@ -36,6 +36,16 @@
 #define CS_FORMATTER_NO_LONG_DOUBLE_FORMAT
 #endif
 
+// MSVC 7.1 requires us to use a `typename' qualifier on the declaration of
+// `mantissa' in csPrintfFormatter. Although this is accepted by most other
+// compilers, it breaks on gcc 3.4.x, which complains (apparently incorrectly?)
+// that IEEEFloatMantissa is not a templated type.
+#if defined(CS_COMPILER_MSVC) && (_MSC_VER >= 1300)
+#define CS_FORMATTER_TYPENAME_QUALIFIER typename_qualifier
+#else
+#define CS_FORMATTER_TYPENAME_QUALIFIER
+#endif
+
 /**\addtogroup csutil
  * @{ */
 
@@ -918,7 +928,7 @@ class csPrintfFormatter
     bool sign;
     Tbase exp;
 
-    typename_qualifier
+    CS_FORMATTER_TYPENAME_QUALIFIER
     csPrintfFormatter<Twriter,Treader>::IEEEFloatMantissa<T, Tbase> mantissa;
 
     IEEEFloatSplitter (const T& val, const int mantissaBits,
