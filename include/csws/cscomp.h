@@ -106,6 +106,7 @@ class csSkinSlice;
  *       <li>0x00000C00 ... 0x00000CFF: csNotebook class messages
  *       <li>0x00000D00 ... 0x00000DFF: csSlider class messages
  *       <li>0x00000E00 ... 0x00000EFF: csTree class messages
+ *       <li>0x00000F00 ... 0x00000FFF: csGrid class messages
  *     </ul>
  *   <li>0x10000000 ... 0xFFFFFFFF: Reserved for user class-specific messages
  * </ul>

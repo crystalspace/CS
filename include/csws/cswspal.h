@@ -436,6 +436,8 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_GRIDCELL_SEL_BORDER_BG	5
 #define CSPAL_GRIDCELL_DATA_FG	        6
 #define CSPAL_GRIDCELL_DATA_BG	        7
+#define CSPAL_GRIDCELL_SEL_DATA_FG	8
+#define CSPAL_GRIDCELL_SEL_DATA_BG	9
 
 /**
  * csGridView class color palete indices.<p>
@@ -445,6 +447,10 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_GRIDVIEW_DARK3D		1
 /// 3D border light
 #define CSPAL_GRIDVIEW_LIGHT3D		2
+/// 3D border dark selected
+#define CSPAL_GRIDVIEW_SEL_DARK3D	3
+/// 3D border light selected
+#define CSPAL_GRIDVIEW_SEL_LIGHT3D	4
 
 /**
  * csSplitter class color palete indices.<p>

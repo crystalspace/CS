@@ -192,6 +192,9 @@ enum csGridCellBorderStyle
   gcbsLine
 };
 
+/// Additional state flag used to mark selected cell
+#define CSS_GRIDCELL_SELECTED        0x00010000
+
 /**
  * The following class collects properties for drawing the cell
  * and acts as a container for the csComponent (i.e. the
@@ -272,6 +275,9 @@ protected:
   /// The horizontal and vertical scrollbar objects
   csScrollBar *hscroll, *vscroll;
 
+  /// get the row and column at the pixel (theX, theY)
+  void CooAt (int theX, int theY, int &theRow, int &theCol);
+
 public:
   /**
    * if view was split and this is the newly created view,
@@ -292,6 +298,8 @@ public:
   virtual bool HandleEvent (iEvent& Event);
   /// Set grid view position and size
   virtual bool SetRect (int xmin, int ymin, int xmax, int ymax);
+  /// return this views area
+  const csRect& GetArea (){return area;}
   /// Snap size to nearest grid cell
   virtual void FixSize (int &newW, int &newH);
   /// Suggest the optimal size for this grid view
@@ -342,6 +350,21 @@ protected:
 /// Default grid style
 #define CSGS_DEFAULTVALUE	(CSGS_HSPLIT | CSGS_VSPLIT)
 
+/// what kind of cursor
+#define CSGCS_NONE   1
+#define CSGCS_CELL   2
+#define CSGCS_ROW    3
+#define CSGCS_COLUMN 4
+
+enum
+{
+  /**
+   * This message is sent to the grids parent to notify whenever the cursor
+   * changes (moves)
+   */
+  cscmdGridCursorChanged = 0x00000F00
+};
+
 /**
  * This is the grid object itself.
  * The grid object can contain a number of vertically and
@@ -359,10 +382,16 @@ protected:
   csSparseGrid *grid;
   /// The array of grid views
   csVector vViews;
+  /// The actiove grid view
+  csGridView *activeView;
   /// A vector containing the pattern csGridCell for every region;
   csVector vRegionStyles;
   /// The horizontal and vertical dividers
   csSplitter *splitterX, *splitterY;
+  /// cursor style
+  int cursorStyle;
+  /// cursor position
+  int xcur, ycur;
 
   /// Calculate minimal size needed for given region
   void CalcMinimalSize (csRegionTree2D *node, int &w, int &h);
@@ -383,6 +412,15 @@ public:
   /// Destroy the grid object
   virtual ~csGrid ();
 
+  /// Set a cursor style
+  virtual void SetCursorStyle (int iCursorStyle = CSGCS_NONE);
+  /// Get cursor style
+  virtual int GetCursorStyle ();
+  /// Get cursor position
+  virtual void GetCursorPos (int &row, int &col);
+  /// Set cursor position
+  virtual void SetCursorPos (int row, int col);
+
   /// Draw the grid
   virtual void Draw ();
   /// Set grid size and position
@@ -399,6 +437,10 @@ public:
   /// Get the first grid view object
   csGridView* GetRootView ()
   { return (csGridView*)vViews.Get (0); }
+  /// Get the active grid view
+  csGridView *GetActiveView () {return activeView;}
+  /// Set the active grid view
+  void SetActiveView (csGridView *view);
 
   /**
    * Set string to display in specified cell
