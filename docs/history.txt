@@ -2,80 +2,85 @@ The history order has been reversed so that new features are at the top.
 
 13-Jun-2000
        - Samuel verbosely has been busy with the now called procedural textures:
-         - Changed names from dynamic textures to the more correct term 
-           procedural textures.
-         - The iGraphics3D method CreateOffScreenRenderer is now gone. All 
-           drivers are updated.
-         - The software drivers procedural textures are now more memory 
-           efficient.
-         - By default the software procedural textures use the main renderers 
-           texture manager, which makes it more consistent with the glide and 
-           back buffer opengl implementations. Within this mode the engine can 
-           render to the texture.
-         - The CS_TEXTURE_DYNAMIC_SHARE_HINT is now gone. In its place is a 
-           new hint CS_TEXTURE_PROC_ALONE. When this flag is selected the 
-           software procedural textures run internally at 8bit, they share and 
-           utilise their own 8bit texture manager. (Before each procedural 
-           texture had its own texture manager and cache..this is no longer the
-           case :). The engine cannot render to the texture in this mode.
-         - The iTextureHandle->TextureDynamicSyncPalette is now gone. This is 
-           no longer needed, and makes the interface more consistent across 
-           implementations. In its place is ProcTextureSync (), which currently
-           is an empty method, but is in preparation for fine grained control 
-           of mip-mapping. The software texture manager now keeps a single 
-           linked list of all 8bit canvases it services.
-         - Rewritten the opengl software procedural texture implementation. 
-           So that it can be rendered to by the engine.
-         - Added a force32bitsoftware additional flag to opengl.cfg, which 
-           performs better with mesa and 16bit displays with a voodoo2. 
-           However, the problem with the transposition of red and blue returns,
-           this is probably a bug in Mesa3.3beta.
-         - This is how it now works: csOpenGLProcSoftware now wraps an instance
-           of csSoftProcTexture3D. This instance is created via a new interface
-           iSoftProcTexture. csSoftProcTexture3D creates its own texture 
-           manager and canvas. Subsequent software procedural textures share 
-           this texture manager. Each procedural texture registers itself with
-           the software texture manager, and passes its handle back to the 
-           csOpenglProcSoftware class which stores it in a vector along with 
-           its opengl texture handle. The app writer registers and prepares all
-           textures with the opengl texture manager, and then starts rendering.
-           Each texture handle not already present within the vector is 
-           registered and prepared with the software texture manager and its 
-           handle stored with its opengl counterpart in a vector. Each 
-           iGraphics3D call which utilises a texture is intercepted and the 
-           opengl texture handle swapped for its software counterpart. On 
-           Print (csRect) the opengl texture is updated with the new procedural
-           texture state, and also its software counterpart.
-         - This change has required modifying the software drivers so that the 
-           texture handle is not referred to within the iPolygonTexture 
-           structure.
-         - The CS_TEXTURE_PROC_ALONE_HINT has the effect of disabling the 
-           updating of the software texture managers versions of the procedural
-           textures, which improves performance but disallows the engine from 
-           rendering to any procedural textures. For this mode to operate all 
-           textures need to possess this flag otherwise it'll revert to the 
-           slower mode.
-         - Fixed the colours on the opengl back buffer implementation. Voodoo2 
-           owners now need Mesa beta3.3 from cvs for this to work. Unfortunately
-           glCopySubTexImage2D is now broken in cvs so I cant implement this 
-           optimisation. The texture probably still renders inverted, it does on
-           the voodoo2. I dont think there is an opengl trick to reinvert the 
-           texture, but I could be wrong. Possible solutions are to intercept 
-           every draw call and invert these or to copy over from the framebuffer
-           to the texture line by line. The latter way is going to be *slow*, 
-           the former would involve modifying transformation matrices (i.e.
-           rotating by 180 degrees the world to camera matrix about the lookat 
-           vector) within the driver and inverting all vertices which are in 
-           screen co-ordinates.
-           I wait for a better suggestion :).
-          - Lastly Ive destroyed the performance of the opengl procedural 
-           textures, oops, need to investigate this :( Used to get about 70fps 
-           with the astext texture alone, this is now down to 10ish with 
-           software textures. This might be Mesa3.3beta.
-          - dtsimple is updated to demonstrate how to do things with the 
-            cleaner, more consistent interface.
-          - Added new constructor for csImageMemory
-          - Fixed typo in memdbg.sh
+           - Changed names from dynamic textures to the more correct term 
+             procedural textures.
+           - The iGraphics3D method CreateOffScreenRenderer is now gone. All 
+             drivers are updated.
+           - The software drivers procedural textures are now more memory 
+             efficient.
+           - By default the software procedural textures use the main
+	     renderers texture manager, which makes it more consistent
+	     with the glide and back buffer opengl implementations. Within
+	     this mode the engine can render to the texture.
+           - The CS_TEXTURE_DYNAMIC_SHARE_HINT is now gone. In its place is a 
+             new hint CS_TEXTURE_PROC_ALONE. When this flag is selected the
+             software procedural textures run internally at 8bit, they share
+	     and utilise their own 8bit texture manager. (Before each
+	     procedural texture had its own texture manager and cache..
+	     this is no longer the case :). The engine cannot render to the
+	     texture in this mode.
+           - The iTextureHandle->TextureDynamicSyncPalette is now gone. This
+	     is no longer needed, and makes the interface more consistent
+	     across implementations. In its place is ProcTextureSync (),
+	     which currently is an empty method, but is in preparation for
+	     fine grained control of mip-mapping. The software texture
+	     manager now keeps a single linked list of all 8bit canvases
+	     it services.
+           - Rewritten the opengl software procedural texture implementation. 
+             So that it can be rendered to by the engine.
+           - Added a force32bitsoftware additional flag to opengl.cfg, which 
+             performs better with mesa and 16bit displays with a voodoo2. 
+             However, the problem with the transposition of red and
+	     blue returns, this is probably a bug in Mesa3.3beta.
+           - This is how it now works: csOpenGLProcSoftware now wraps an
+	     instance of csSoftProcTexture3D. This instance is created via
+	     a new interface iSoftProcTexture. csSoftProcTexture3D creates
+	     its own texture manager and canvas. Subsequent software
+	     procedural textures share this texture manager. Each
+	     procedural texture registers itself with the software texture
+	     manager, and passes its handle back to the
+	     csOpenglProcSoftware class which stores it in a vector along
+	     with its opengl texture handle. The app writer registers and
+	     prepares all textures with the opengl texture manager, and then
+	     starts rendering. Each texture handle not already present
+	     within the vector is registered and prepared with the software
+	     texture manager and its handle stored with its opengl
+	     counterpart in a vector. Each iGraphics3D call which utilises
+	     a texture is intercepted and the opengl texture handle
+	     swapped for its software counterpart. On Print (csRect) the
+	     opengl texture is updated with the new procedural texture
+	     state, and also its software counterpart.
+           - This change has required modifying the software drivers so
+	     that the texture handle is not referred to within the
+	     iPolygonTexture structure.
+           - The CS_TEXTURE_PROC_ALONE_HINT has the effect of disabling the 
+             updating of the software texture managers versions of the
+	     procedural textures, which improves performance but disallows
+	     the engine from rendering to any procedural textures. For
+	     this mode to operate all textures need to possess this flag
+	     otherwise it'll revert to the slower mode.
+           - Fixed the colours on the opengl back buffer implementation.
+	     Voodoo2 owners now need Mesa beta3.3 from cvs for this to work.
+	     Unfortunately glCopySubTexImage2D is now broken in cvs so I
+	     cant implement this optimisation. The texture probably still
+	     renders inverted, it does on the voodoo2. I dont think there
+	     is an opengl trick to reinvert the texture, but I could be
+	     wrong. Possible solutions are to intercept every draw call
+	     and invert these or to copy over from the framebuffer
+             to the texture line by line. The latter way is going to be
+	     *slow*, the former would involve modifying transformation
+	     matrices (i.e.  rotating by 180 degrees the world to camera
+	     matrix about the lookat vector) within the driver and
+	     inverting all vertices which are in screen co-ordinates.
+             I wait for a better suggestion :).
+            - Lastly Ive destroyed the performance of the opengl procedural 
+             textures, oops, need to investigate this :( Used to get about
+	     70fps with the astext texture alone, this is now down to 10ish
+	     with software textures. This might be Mesa3.3beta.
+            - dtsimple is updated to demonstrate how to do things with the 
+              cleaner, more consistent interface.
+            - Added new constructor for csImageMemory
+            - Fixed typo in memdbg.sh
 	- Added csPoly2D::Random() to generate a random convex polygon
 	  (triangles only right now). This is going to be used for
 	  debugging the c-buffer.
@@ -94,6 +99,19 @@ The history order has been reversed so that new features are at the top.
 	  K. Robert Bate's mac port fix. But that fix provably breaks theu
 	  VC port.... Anyway, perhaps I should look up the correct syntax
 	  somewhere?
+	- Andrew Zabolotny did the following changes:
+	    - Fixed my fix regarding Eric's fix regarding halos yet again :)
+	      2*SRC lighting did not work for halos.
+	    - Fixed csFrustum::Classify(). Now it seems to work okay.
+	    - Removed delaying of draw operations in CSWS. From now
+	      on graphics pipeline always draws at the time the draw
+	      routine is called. This both reduces memory usage by CSWS
+	      programs (by ~500K) and removes the limit on the
+	      number of graphics primitives that can be painted in one frame
+	      (this was seen as uncomplete redraws when loading complex 3D
+	      models in MazeD). Also it should be a little faster now.
+	    - Fixed an old-standing bug that caused wrong window resizes
+	      when switching MazeD screen resolution.
 12-Jun-2000
 	- Thomas Hieber added basic support for WC3 (WorldCraft) file
 	  format to Map2CS.
