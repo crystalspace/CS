@@ -150,9 +150,10 @@ SYSHELP += \
 endif # ifeq ($(MAKESECTION),confighelp)
 
 #--------------------------------------------------------------- configure ---#
-ifeq ($(ROOTCONFIG),config)
+ifeq ($(MAKESECTION),rootdefines) # Makefile includes us twice with valid
+ifeq ($(ROOTCONFIG),config)	  # ROOTCONFIG, but we only need to run once.
 
-SYSCONFIG=sh bin/unixconf.sh linux $(INSTALL_DIR)>>config.tmp
+SYSCONFIG += $(NEWLINE)sh bin/unixconf.sh linux $(INSTALL_DIR)>>config.tmp
 
 endif # ifeq ($(ROOTCONFIG),config)
 
@@ -162,3 +163,4 @@ MAKE_VOLATILE_H += \
   $(NEWLINE)echo $"\#define CS_UNIX_PLUGIN_REQUIRES_MAIN$">>volatile.tmp
 
 endif # ifeq ($(ROOTCONFIG),volatile)
+endif # ifeq ($(MAKESECTION),rootdefines)

@@ -11,6 +11,10 @@ The history order is reversed so that new features are at the top.
 	      apimod19.txi.
 	    - Performed clean-up and unification of the new material added to
 	      apimod19.txi.
+	- Eric Sunshine fixed a problem in linux.mak, hurd.mak, and freebsd.mak
+	  where the values of SYSCONFIG and MAKE_VOLATILE_H were being set
+	  twice (so, for instance, CS_UNIX_PLUGIN_REQUIRES_MAIN appeared twice
+	  in the generated volatile.h).
 18-Jun-2001
 	- Fixed a bug in the region checking code from the loader.
 	- Renamed csCollider to csColliderWrapper and moved it from csengine
