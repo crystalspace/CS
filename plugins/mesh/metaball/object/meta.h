@@ -26,11 +26,14 @@
 #include "csgeom/math3d.h"
 #include "csgeom/tesselat.h"
 #include "csutil/refarr.h"
-#include "imesh/object.h"
-#include "imesh/metaball.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "igeom/objmodel.h"
+#include "imesh/object.h"
+#include "imesh/metaball.h"
+
+#ifndef CS_USE_NEW_RENDERER
+
 #include "ivideo/vbufmgr.h"
 
 class csMaterialHandle;
@@ -40,6 +43,17 @@ struct iGraphics3D;
 struct iGraphics2D;
 struct iMaterialWrapper;
 struct iMeshObject;
+
+#else
+
+#include "ivideo/rndbuf.h"
+
+struct iMaterialHandle;
+class csRenderMesh;
+struct iRender3D;
+
+#endif
+
 
 struct MetaBall
 {
@@ -60,13 +74,35 @@ class csMetaBall : public iMeshObject
   iObjectRegistry *object_reg;
   iMaterialWrapper *th;
 
+#ifndef CS_USE_NEW_RENDERER
   csRef<iVertexBuffer> vbuf;
   iVertexBufferManager* vbufmgr;
+#else
+
+  csStringID vertex_name, texel_name, color_name, index_name;
+
+  csRef<iRenderBufferManager> rndbufmgr;
+  csRef<iRenderBuffer> rndbuf_verts;
+  csRef<iRenderBuffer> rndbuf_texels;
+  csRef<iRenderBuffer> rndbuf_colors;
+  csRef<iRenderBuffer> rndbuf_index;
+
+  csRef<iRender3D> r3d;
+
+#endif
+
   csVector3* mesh_vertices;
   csVector2* mesh_texels;
   csColor* mesh_colors;
+  csTriangle * mesh_indices;
+  int num_mesh_triangles;
   int num_mesh_vertices;
+
+#ifndef CS_USE_NEW_RENDERER
   G3DTriangleMesh mesh;
+#else
+  csRenderMesh mesh;
+#endif
 
   MetaBall *meta_balls;
   char frame;
@@ -87,8 +123,10 @@ class csMetaBall : public iMeshObject
   float current_lod;
   uint32 current_features;
 
+#ifndef CS_USE_NEW_RENDERER
   /// retrieve a vertexbuffer from the manager if not done already
   void SetupVertexBuffer ();
+
 
   /// interface to receive state of vertexbuffermanager
   struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
@@ -97,6 +135,7 @@ class csMetaBall : public iMeshObject
     virtual void ManagerClosing ();
   }scfiVertexBufferManagerClient;
   friend struct eiVertexBufferManagerClient;
+#endif
 
 public:
   SCF_DECLARE_IBASE;
@@ -123,8 +162,13 @@ public:
   virtual MetaParameters *GetParameters ()
   { return &mp; }
 
+#ifndef CS_USE_NEW_RENDERER
   virtual int ReportTriangleCount ()
   { return mesh.num_triangles; }
+#else
+  virtual int ReportTriangleCount ()
+  { return num_mesh_triangles; }
+#endif
 
   // Where the real work gets done....
   void CalculateMetaBalls (void);
@@ -141,6 +185,27 @@ public:
   void FireListeners ();
   void AddListener (iObjectModelListener* listener);
   void RemoveListener (iObjectModelListener* listener);
+
+#ifdef CS_USE_NEW_RENDERER
+  virtual bool DrawZ (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
+  virtual bool DrawShadow (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
+  virtual bool DrawLight (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
+
+  iRenderBuffer *GetBuffer (csStringID name);
+  int GetComponentCount (csStringID name);
+  //------------------------- iStreamSource implementation ----------------
+  class StreamSource : public iStreamSource 
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csMetaBall);
+    iRenderBuffer *GetBuffer (csStringID name)
+	{ return scfParent->GetBuffer (name); }
+    int GetComponentCount (csStringID name)
+	{ return scfParent->GetComponentCount (name); }
+  } scfiStreamSource;
+  friend class StreamSource;
+
+#endif // CS_USE_NEW_RENDERER
+
 
   ///-------------------- iMeshObject implementation --------------
 
