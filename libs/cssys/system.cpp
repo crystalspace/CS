@@ -1009,7 +1009,7 @@ bool csSystemDriver::ConfigSetFloat (const char *Section, const char *Key, float
 
 bool csSystemDriver::ConfigSave ()
 {
-  return ConfigName ? Config->Save (ConfigName) : false;
+  return ConfigName ? Config->SaveIfDirty (ConfigName) : false;
 }
 
 void csSystemDriver::QueueKeyEvent (int iKeyCode, bool iDown)

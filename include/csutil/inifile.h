@@ -121,14 +121,34 @@ public:
   bool Load (iVFS*, const char* fName);
   /// Load INI from iFile
   bool Load (iFile*);
+  /// Load INI from a string buffer
+  bool Load (const csString& buffer);
   /// Load INI from memory buffer
   bool Load (const char *Data, size_t DataSize);
-  /// Override to type your own error messages
-  virtual bool Error (int LineNo, const char *Line, int Pos);
 
-  /// Save INI file
-  bool Save (const char *fName);
-  bool Save (iFile*);
+  /// Save INI to physical file
+  bool Save (const char *fName) const;
+  /// Save INI to VFS volume
+  bool Save (iVFS*, const char* fName) const;
+  /// Save INI to iFile
+  bool Save (iFile*) const;
+  /// Save INI to string buffer
+  csString Save () const;
+
+  /// Save INI to physical file if dirty (and clear dirty flag)
+  bool SaveIfDirty (const char *fName);
+  /// Save INI to VFS volume if dirty (and clear dirty flag)
+  bool SaveIfDirty (iVFS*, const char* fName);
+  /// Save INI to iFile if dirty (and clear dirty flag)
+  bool SaveIfDirty (iFile*);
+  /// Save INI to string buffer if dirty (and clear dirty flag)
+  csString SaveIfDirty ();
+
+  bool IsDirty () const { return Dirty; }
+  void ClearDirty() { Dirty = false; }
+
+  /// Override to type your own parsing error messages
+  virtual bool Error (int LineNo, const char *Line, int Pos);
 
   /// A section iterator
   class SectionIterator : public Iterator
@@ -278,8 +298,6 @@ private:
     const PrvINIbranch* comments, csString&) const;
   /// Save all the data in a section
   void SaveSection (const PrvINInode*, csString&) const;
-  /// Text representation of entire database (suitable for saving to a file)
-  csString TextRepresentation () const;
 };
 
 #endif // __CS_INIFILE_H__

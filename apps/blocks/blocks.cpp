@@ -2809,7 +2809,7 @@ void Blocks::WriteConfig ()
 	  keys.SetStr ("HighScores", key, highscores[level][size-3].GetName (i));
         }
     }
-  keys.Save ("blocks.cfg");
+  keys.SaveIfDirty ("blocks.cfg");
 }
 
 

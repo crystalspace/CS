@@ -6,6 +6,23 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine changed the CVS snapshot script (bin/snapshot.py) so
 	  that it now uses /tmp as its working directory rather than polluting
 	  the snapshot directory with temporary files.
+	- Eric Sunshine made the following additional changes to csIniFile:
+	    - Completed the list of Save() methods so that they now complement
+	      the Load() methods.  In particular, Save(iVFS,path) was
+	      conspicuously absent.
+	    - Added Load(csString) for convenience.
+	    - Renamed TextualRepresentation() to Save(), thus making it just
+	      another one of the Save() methods (which returns a textual
+	      representation of the INI as a csString, in this case).
+	      This complements Load(csString).
+	    - There is now a distinction between Save() methods which check
+	      and affect the 'dirty' flag, and those which do not.  Previously,
+	      Save() methods would only actually save the INI if it was dirty.
+	      This made it impossible to save the INI to a new file if you
+	      hadn't made any changes to it.  (In other words, the following
+	      sequence would fail to emit a new INI file ("b.cfg"):
+	          cfg.Load("a.cfg"); cfg.Save("b.cfg");
+	    - Added IsDirty() and ClearDirty() for finer control by client.
 2-May-2000
 	- Added csPoly3D::ProjectAxisPlane() which is similar to
 	  ProjectXPlane() but for a general axis aligned plane.

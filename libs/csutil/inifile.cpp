@@ -145,13 +145,13 @@ void csIniFile::CommentIterator::Clone(const CommentIterator& i)
 //------------------------------------------------------------ Constructors ---
 
 csIniFile::csIniFile (const char* path, char Comment) :
-  CommentChar(Comment), Dirty(true) { Load (path); }
+  CommentChar(Comment), Dirty(false) { Load (path); }
 
 csIniFile::csIniFile (iVFS *vfs, const char* path, char Comment) :
-  CommentChar(Comment), Dirty(true) { Load (vfs, path); }
+  CommentChar(Comment), Dirty(false) { Load (vfs, path); }
 
 csIniFile::csIniFile (iFile* f, char Comment) :
-  CommentChar(Comment), Dirty(true) { Load (f); }
+  CommentChar(Comment), Dirty(false) { Load (f); }
 
 csIniFile::~csIniFile () {}
 
@@ -196,6 +196,11 @@ bool csIniFile::Load (const char* path)
     fclose (f);
   }
   return rc;
+}
+
+bool csIniFile::Load (const csString& s)
+{
+  return Load (s.GetData(), s.Length());
 }
 
 bool csIniFile::Load (iVFS* vfs, const char* path)
@@ -537,7 +542,43 @@ void csIniFile::SaveSection (const PrvINInode* node, csString& s) const
       iterator.GetComments(), s);
 }
 
-csString csIniFile::TextRepresentation () const
+bool csIniFile::Save (const char* path) const
+{
+  bool ok = false;
+  FILE* file = fopen (path, "w");
+  if (file)
+  {
+    csString s(Save());
+    const size_t n = s.Length();
+    ok = (n == 0 || fwrite (s.GetData(), 1, n, file) > 0);
+    fclose (file);
+  }
+  return ok;
+}
+
+bool csIniFile::Save (iVFS* vfs, const char* path) const
+{
+  bool ok = false;
+  if (vfs && path)
+  {
+    csString s(Save());
+    ok = vfs->WriteFile (path, s.GetData(), s.Length());
+  }
+  return ok;
+}
+
+bool csIniFile::Save (iFile* file) const
+{
+  bool ok = false;
+  if (file)
+  {
+    csString s(Save());
+    ok = (file->Write (s.GetData(), s.Length()) == s.Length());
+  }
+  return ok;
+}
+
+csString csIniFile::Save () const
 {
   csString s;
   SectionIterator iterator (EnumSections());
@@ -546,31 +587,17 @@ csString csIniFile::TextRepresentation () const
   return s;
 }
 
-bool csIniFile::Save (const char* path)
-{
-  if (Dirty)
-  {
-    FILE* file = fopen (path, "w");
-    if (file)
-    {
-      csString s(TextRepresentation());
-      if (fwrite (s.GetData(), s.Length(), 1, file) == 1)
-        Dirty = false;
-      fclose (file);
-    }
-  }
-  return !Dirty; // If still dirty then 'save' failed.
-}
+#define SAVE_IF_DIRTY(P,A) \
+bool csIniFile::SaveIfDirty P { if (Dirty) Dirty = !Save A; return !Dirty; }
+SAVE_IF_DIRTY((const char* path), (path))
+SAVE_IF_DIRTY((iVFS* vfs, const char* path), (vfs, path))
+SAVE_IF_DIRTY((iFile* file), (file))
+#undef SAVE_IF_DIRTY
 
-bool csIniFile::Save (iFile* file)
+csString csIniFile::SaveIfDirty ()
 {
-  if (Dirty && file)
-  {
-    csString s(TextRepresentation());
-    if (file->Write (s.GetData(), s.Length()) == s.Length())
-      Dirty = false;
-  }
-  return !Dirty; // If still dirty then 'save' failed.
+  ClearDirty();
+  return Save();
 }
 
 bool csIniFile::Error (int LineNo, const char *Line, int Pos)
