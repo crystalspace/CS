@@ -21,6 +21,8 @@ The history order is reversed so that new features are at the top.
 	  for this bug was the iterators for VisTest() were all sharing the
 	  same vector but with different data. This fix does not completely
 	  fix the issue though. Still have to investigate what's wrong.
+	- Fixed the bug in IntersectSegment(). It was not calculating the
+	  bounding box the right way.
 3-Nov-2002
 	- Changed DynaVis to use the new movable and object model
 	  listeners. This significantly speeds up rendering and walking
