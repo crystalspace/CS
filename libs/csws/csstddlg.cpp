@@ -560,8 +560,8 @@ void cspFileDialog::Reread ()
 	else
 	  files.Push(csStrNew(fname));
       }
+      filelist->DecRef();
     }
-    filelist->DecRef();
   }
 
   dirs.QuickSort (csStrVector::CASE_INSENSITIVE);
