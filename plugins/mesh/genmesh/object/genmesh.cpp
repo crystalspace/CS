@@ -530,7 +530,7 @@ void csGenmeshMeshObjectFactory::CalculateNormals ()
 
   csTriangleMesh* tri_mesh = new csTriangleMesh ();
   tri_mesh->SetTriangles (tris, num_triangles);
-  csTriangleVertices* tri_verts = new csTriangleVertices (tri_mesh,
+  csGenTriangleVertices* tri_verts = new csGenTriangleVertices (tri_mesh,
   	mesh_vertices, num_mesh_vertices);
 
   csVector3 * tri_normals = new csVector3[num_triangles];

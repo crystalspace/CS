@@ -127,7 +127,7 @@ void csTriangleVertex::AddVertex (int idx)
   num_con_vertices++;
 }
 
-csTriangleVertices::csTriangleVertices (csTriangleMesh* mesh,
+csGenTriangleVertices::csGenTriangleVertices (csTriangleMesh* mesh,
 	csVector3* verts, int num_verts)
 {
   vertices = new csTriangleVertex [num_verts];
@@ -151,12 +151,12 @@ csTriangleVertices::csTriangleVertices (csTriangleMesh* mesh,
   }
 }
 
-csTriangleVertices::~csTriangleVertices ()
+csGenTriangleVertices::~csGenTriangleVertices ()
 {
   delete [] vertices;
 }
 
-void csTriangleVertices::UpdateVertices (csVector3* verts)
+void csGenTriangleVertices::UpdateVertices (csVector3* verts)
 {
   int i;
   for (i = 0 ; i < num_vertices ; i++)

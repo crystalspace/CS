@@ -105,7 +105,7 @@ public:
  * A class which holds vertices and connectivity information for a triangle
  * mesh.
  */
-class csTriangleVertices
+class csGenTriangleVertices
 {
 private:
   csTriangleVertex* vertices;
@@ -113,9 +113,9 @@ private:
 
 public:
   /// Build vertex table for a triangle mesh.
-  csTriangleVertices (csTriangleMesh* mesh, csVector3* verts, int num_verts);
+  csGenTriangleVertices (csTriangleMesh* mesh, csVector3* verts, int num_verts);
   ///
-  ~csTriangleVertices ();
+  ~csGenTriangleVertices ();
   /**
    * Update vertex table for a given set of vertices (with the same number
    * as at init).
