@@ -21,15 +21,67 @@ The history order is reversed so that new features are at the top.
 	  of the mesh wrapper and containing sector to guarantee more
 	  uniqueness. Previously the name of the csThing itself was used
 	  but this is almost always NULL.
+31-Mar-2002
+	- Christian Bayle added $MACHINE error message for not found arch.
+30-Mar-2002
+	- Matze Braun fixed a bug that prevented going to edit mode in
+	  csdemo...
+	- Norman Kramer did the following:
+	    - Fixed a crasher - in DrawPolygonSingleTexture was a case
+	      where lm_queue was not checked to own the data (reproducable
+	      crasher by running few times through the fountain in flarge).
+	    - Removed a printf ("dang\n") in gl extensions detection routine.
+	    - Fixed destruction of csSuperLightMap.
+29-Mar-2002
+	- Norman Kramer reports: csEmitFixed now exposes the implemented
+	  iEmitFixed interface, hinted by Florian Vielhauer <FloViel@web.de>.
+	- Norman extended the static variable declaration macros with an
+	  _ARRAY version that differs in the destruction process only (that
+	  caused the opengl renderer to crash at exit - at least this was one
+	  reason).
+	- Norman extended OpenGL renderer so it uses the new _ARRAY static
+	  var declaration macro.
+	- Norman fixed several warnings in the OpenGL renderer.
+	- Wouter Wijngaards reports: Optimized terrfunc quaddiv tree drawing;
+	  for me it is now more than twice as fast as it was. It is still
+	  slower than the terrfunc original, as it does not cache the normals
+	  generated.
+	- Wouter also reports: This commit has quaddiv_enabled=true; so that
+	  the new quadtree based terrain LOD is enabled by default. The FPS
+	  is now the same as the fps with it disabled, for me.
+	- Philip Wyett reports:
+	  Fixed Windows Procedure callbacks which were causing initial
+	  crasher of simpvs under Windows. The Window(s) will now
+	  successfully create however there are still many issues to be
+	  resolved i.e.
+	    - Two windows - No destruction of parent.
+	    - GL not rendering textures corectly under simpvs under Windows.
+	    - Linux lockup issues.
+	  Work is progressing... ;)
 28-Mar-2002
 	- Reverted part of 'res' changes to the lightmap checker because
 	  they cause big problems.
+	- Toni Asco Gonzalez commited a big patch to a new version of
+	  DrawPolygonMesh for OpenGL:
+	  To use DrawPolygonMesh just type FASTMESH() inside PARAMS section
+	  of a thing. This will use a faster way to render a thing. This
+	  optimization is especially good for high polygon models that
+	  are not too big (in 3D dimensions). At this moment it is not
+	  possible to combine FASTMESH() with VISTREE(). i.e. the thing
+	  that is responsible for visibility culling cannot use FASTMESH().
+	  Keep in mind also that clipping these objects is expensive. That's
+	  why they should be as small as possible (but with high number
+	  of polygons).
+	  Another limitation is that FASTMESH() currently only works on
+	  lit objects (i.e. with lightmaps).
 	- Fixed the software version of DrawPolygonMesh() so it correctly
 	  sets do_fullbright to false before calling DrawPolygon. This
 	  bug would cause the stairs in flarge sometimes to be full
 	  bright.
 	- Applied a patch from Loic Dachary for improved diagnostics
 	  when loading plugins (findlib.cpp).
+	- Norman Kramer updated Dos port again. Also updated build
+	  instructions.
 27-Mar-2002
 	- Preparation for release 0.94. Updated version numbers.
 	- Norman Kramer reports: awsSource and awsSlot were never
