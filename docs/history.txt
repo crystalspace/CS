@@ -23,6 +23,10 @@ chronological order.
 	  DestroyApplication() afterwards).
 	- res removed csApplicationFramework::Free(). DestroyApplication() is
 	  now called in the destructor.
+	- Eric Sunshine fixed a couple resource leaks in
+	  libs/generic/scanplugins.cpp where it was incorrectly copying strings
+	  with csStrNew() before pushing them onto iStringArrays.  iStringArray
+	  makes its own copy, so the manual copy was not needed.
 9-May-2004
 	- Vincent Knecht made the following changes to cs.spec:
 	    - Added current dir to PATH when invoking jam, so building
