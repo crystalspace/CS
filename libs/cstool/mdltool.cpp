@@ -543,7 +543,7 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
 	if (total<0)
 	{
           // this should not happen
-	  CS_ASSERT (("Action conflict detection missed a conflict!!!", false));
+	  CS_ASSERT ("Action conflict detection missed a conflict!!!" && false);
 	  NewAction = NULL;
 	}
 
