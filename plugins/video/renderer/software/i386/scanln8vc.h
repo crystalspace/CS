@@ -1,6 +1,4 @@
 /*
-    OUTDATED: to be removed after NASM routines are debugged - A.Z.
-
     Crystal Space 8-bit software driver assembler-optimized routines
     Copyright (C) 1998 by Jorrit Tyberghein
     Contributors:

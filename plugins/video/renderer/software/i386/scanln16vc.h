@@ -1,6 +1,4 @@
 /*
-    OUTDATED: to be removed after NASM routines are debugged - A.Z.
-
     Crystal Space 16-bit software driver assembler-optimized routines
     Copyright (C) 1998 by Jorrit Tyberghein
     Contributors:
@@ -172,7 +170,7 @@ __asm   mov     _dest,edi                   \
     }                               \
     while (z_buffer <= lastZbuf)
 
-#include "cs3d/software/scanln16.inc"
+#include "cs3d/software/scanln.inc"
 
 #undef SCANFUNC
 #undef SCANEND
@@ -231,7 +229,7 @@ __asm   mov     _dest,edi      }        \
     vv = vv1;                           \
     z_buffer = sz_buffer;
 
-#include "cs3d/software/scanln16.inc"
+#include "cs3d/software/scanln.inc"
 
 #define I386_SCANLINE_MAP_ALPHA50_16                        \
     static UShort alpha = Textures::AlphaMask;             \
@@ -416,7 +414,7 @@ __asm   mov     _dest, edi         }                \
 #define SCANFUNC draw_scanline_map_alpha50
 #define SCANMAP 1
 #define SCANLOOP I386_SCANLINE_MAP_ALPHA50_16
-#include "cs3d/software/scanln16.inc"
+#include "cs3d/software/scanln.inc"
 
 #if defined (DO_MMX)
 
@@ -429,7 +427,7 @@ __asm   mov     _dest, edi         }                \
 #define SCANMAP 1
 #define SCANLOOP I386_SCANLINE_MAP16
 #define SCANEND MMX_FILLZBUFFER
-#include "cs3d/software/scanln16.inc"
+#include "cs3d/software/scanln.inc"
 
 #undef SCANFUNC
 #undef SCANEND
@@ -446,7 +444,7 @@ __asm   mov     _dest, edi         }                \
     }                                   \
     while (_dest <= _destend)
 #define SCANEND MMX_FILLZBUFFER
-#include "cs3d/software/scanln16.inc"
+#include "cs3d/software/scanln.inc"
 
 #endif
 
