@@ -301,35 +301,35 @@ void DrawDebugBoxSide (iCamera* cam, bool do3d,
 void DrawDebugBox (iCamera* cam, bool do3d, const csBox3& box, float r, float b)
 {
   DrawDebugBoxSide (cam, do3d,
-      	box.GetCorner (BOX_CORNER_xYz), csColor (r, .5, b),
-      	box.GetCorner (BOX_CORNER_XYz), csColor (r, 0, b),
-      	box.GetCorner (BOX_CORNER_Xyz), csColor (r, .5, b),
-      	box.GetCorner (BOX_CORNER_xyz), csColor (r, 0, b));
+      	box.GetCorner (CS_BOX_CORNER_xYz), csColor (r, .5, b),
+      	box.GetCorner (CS_BOX_CORNER_XYz), csColor (r, 0, b),
+      	box.GetCorner (CS_BOX_CORNER_Xyz), csColor (r, .5, b),
+      	box.GetCorner (CS_BOX_CORNER_xyz), csColor (r, 0, b));
   DrawDebugBoxSide (cam, do3d,
-      	box.GetCorner (BOX_CORNER_XYz), csColor (r, 0, b),
-      	box.GetCorner (BOX_CORNER_XYZ), csColor (r, .5, b),
-      	box.GetCorner (BOX_CORNER_XyZ), csColor (r, 0, b),
-      	box.GetCorner (BOX_CORNER_Xyz), csColor (r, .5, b));
+      	box.GetCorner (CS_BOX_CORNER_XYz), csColor (r, 0, b),
+      	box.GetCorner (CS_BOX_CORNER_XYZ), csColor (r, .5, b),
+      	box.GetCorner (CS_BOX_CORNER_XyZ), csColor (r, 0, b),
+      	box.GetCorner (CS_BOX_CORNER_Xyz), csColor (r, .5, b));
   DrawDebugBoxSide (cam, do3d,
-      	box.GetCorner (BOX_CORNER_XYZ), csColor (r, .5, b),
-      	box.GetCorner (BOX_CORNER_xYZ), csColor (r, 0, b),
-      	box.GetCorner (BOX_CORNER_xyZ), csColor (r, .5, b),
-      	box.GetCorner (BOX_CORNER_XyZ), csColor (r, 0, b));
+      	box.GetCorner (CS_BOX_CORNER_XYZ), csColor (r, .5, b),
+      	box.GetCorner (CS_BOX_CORNER_xYZ), csColor (r, 0, b),
+      	box.GetCorner (CS_BOX_CORNER_xyZ), csColor (r, .5, b),
+      	box.GetCorner (CS_BOX_CORNER_XyZ), csColor (r, 0, b));
   DrawDebugBoxSide (cam, do3d,
-      	box.GetCorner (BOX_CORNER_xYZ), csColor (r, 0, b),
-      	box.GetCorner (BOX_CORNER_xYz), csColor (r, .5, b),
-      	box.GetCorner (BOX_CORNER_xyz), csColor (r, 0, b),
-      	box.GetCorner (BOX_CORNER_xyZ), csColor (r, .5, b));
+      	box.GetCorner (CS_BOX_CORNER_xYZ), csColor (r, 0, b),
+      	box.GetCorner (CS_BOX_CORNER_xYz), csColor (r, .5, b),
+      	box.GetCorner (CS_BOX_CORNER_xyz), csColor (r, 0, b),
+      	box.GetCorner (CS_BOX_CORNER_xyZ), csColor (r, .5, b));
   DrawDebugBoxSide (cam, do3d,
-      	box.GetCorner (BOX_CORNER_xYZ), csColor (r, 0, b),
-      	box.GetCorner (BOX_CORNER_XYZ), csColor (r, .5, b),
-      	box.GetCorner (BOX_CORNER_XYz), csColor (r, 0, b),
-      	box.GetCorner (BOX_CORNER_xYz), csColor (r, .5, b));
+      	box.GetCorner (CS_BOX_CORNER_xYZ), csColor (r, 0, b),
+      	box.GetCorner (CS_BOX_CORNER_XYZ), csColor (r, .5, b),
+      	box.GetCorner (CS_BOX_CORNER_XYz), csColor (r, 0, b),
+      	box.GetCorner (CS_BOX_CORNER_xYz), csColor (r, .5, b));
   DrawDebugBoxSide (cam, do3d,
-      	box.GetCorner (BOX_CORNER_xyz), csColor (r, 0, b),
-      	box.GetCorner (BOX_CORNER_Xyz), csColor (r, .5, b),
-      	box.GetCorner (BOX_CORNER_XyZ), csColor (r, 0, b),
-      	box.GetCorner (BOX_CORNER_xyZ), csColor (r, .5, b));
+      	box.GetCorner (CS_BOX_CORNER_xyz), csColor (r, 0, b),
+      	box.GetCorner (CS_BOX_CORNER_Xyz), csColor (r, .5, b),
+      	box.GetCorner (CS_BOX_CORNER_XyZ), csColor (r, 0, b),
+      	box.GetCorner (CS_BOX_CORNER_xyZ), csColor (r, .5, b));
 }
 
 void DrawDebugBoxes (iCamera* cam, bool do3d)
@@ -480,8 +480,8 @@ void CreateSolidThings (csEngine* engine, csSector* room,
     if (mask)
     {
       csBox2 box = bbox.GetSide (side);
-      csVector2 cor_xy = box.GetCorner (BOX_CORNER_xy);
-      csVector2 cor_XY = box.GetCorner (BOX_CORNER_XY);
+      csVector2 cor_xy = box.GetCorner (CS_BOX_CORNER_xy);
+      csVector2 cor_XY = box.GetCorner (CS_BOX_CORNER_XY);
       int plane_nr = side/2;
       float plane_pos = (side&1) ? bbox.Max (plane_nr) : bbox.Min (plane_nr);
 

@@ -70,10 +70,10 @@ public:
 
   /**
    * Classify this polygon with regards to a plane (in world space).  If this
-   * poly is on same plane it returns POL_SAME_PLANE.  If this poly is
-   * completely in front of the given plane it returnes POL_FRONT.  If this
-   * poly is completely back of the given plane it returnes POL_BACK.
-   * Otherwise it returns POL_SPLIT_NEEDED.
+   * poly is on same plane it returns CS_POL_SAME_PLANE.  If this poly is
+   * completely in front of the given plane it returnes CS_POL_FRONT.  If this
+   * poly is completely back of the given plane it returnes CS_POL_BACK.
+   * Otherwise it returns CS_POL_SPLIT_NEEDED.
    */
   virtual int Classify (const csPlane3& pl) = 0;
 

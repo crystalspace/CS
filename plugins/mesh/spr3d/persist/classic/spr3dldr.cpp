@@ -466,7 +466,8 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iReporter* reporter,
       case CS_TOKEN_VERTICES:
         {
           int vert, next, tot=0;
-	  while(csScanStr (&params[tot], "%d%n", &vert, &next)>0) {
+	  while(csScanStr (&params[tot], "%d%n", &vert, &next)>0)
+	  {
             limb->AddVertex (vert);
 	    tot+=next;
 	    next=0;

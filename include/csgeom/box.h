@@ -34,23 +34,23 @@ class csPlane3;
 #define CS_BOUNDINGBOX_MAXVALUE 1000000000.
 
 /// For csBox2::GetCorner().
-#define BOX_CORNER_xy 0
-#define BOX_CORNER_xY 1
-#define BOX_CORNER_Xy 2
-#define BOX_CORNER_XY 3
+#define CS_BOX_CORNER_xy 0
+#define CS_BOX_CORNER_xY 1
+#define CS_BOX_CORNER_Xy 2
+#define CS_BOX_CORNER_XY 3
 
 /**
  * Indices of edges for cxBox2.
  * Index e+1 is opposite edge of e (with e even).
  */
-#define BOX_EDGE_xy_Xy 0
-#define BOX_EDGE_Xy_xy 1
-#define BOX_EDGE_Xy_XY 2
-#define BOX_EDGE_XY_Xy 3
-#define BOX_EDGE_XY_xY 4
-#define BOX_EDGE_xY_XY 5
-#define BOX_EDGE_xY_xy 6
-#define BOX_EDGE_xy_xY 7
+#define CS_BOX_EDGE_xy_Xy 0
+#define CS_BOX_EDGE_Xy_xy 1
+#define CS_BOX_EDGE_Xy_XY 2
+#define CS_BOX_EDGE_XY_Xy 3
+#define CS_BOX_EDGE_XY_xY 4
+#define CS_BOX_EDGE_xY_XY 5
+#define CS_BOX_EDGE_xY_xy 6
+#define CS_BOX_EDGE_xy_xY 7
 
 /**
  * A bounding box in 2D space.
@@ -64,10 +64,10 @@ class csBox2
 private:
   struct bEdge
   {
-    uint8 v1, v2;	// Indices of vertex in bounding box (BOX_CORNER_...)
+    uint8 v1, v2;	// Indices of vertex in bounding box (CS_BOX_CORNER_...)
   };
   // Index by edge number. Edge e and e+1 with e even are opposite edges.
-  // (BOX_EDGE_...)
+  // (CS_BOX_EDGE_...)
   static bEdge edges[8];
 
 protected:
@@ -99,7 +99,7 @@ public:
    * to 3. This contrasts with Min() and Max() because
    * those are only the min and max corners.
    * Corner 0 = xy, 1 = xY, 2 = Xy, 3 = XY.
-   * Use BOX_CORNER_??? defines.
+   * Use CS_BOX_CORNER_??? defines.
    */
   csVector2 GetCorner (int corner) const;
 
@@ -120,8 +120,8 @@ public:
   void SetSize (const csVector2& s);
 
   /**
-   * Given an edge index (BOX_EDGE_???) return the two vertices
-   * (index BOX_CORNER_???).
+   * Given an edge index (CS_BOX_EDGE_???) return the two vertices
+   * (index CS_BOX_CORNER_???).
    */
   void GetEdgeInfo (int edge, int& v1, int& v2) const
   {
@@ -131,7 +131,7 @@ public:
 
   /**
    * Return every edge (segment) of this bounding box
-   * from 0 to 7 (BOX_EDGE_???).
+   * from 0 to 7 (CS_BOX_EDGE_???).
    */
   csSegment2 GetEdge (int edge) const
   {
@@ -140,7 +140,7 @@ public:
 
   /**
    * Return every edge (segment) of this bounding box
-   * from 0 to 7 (BOX_EDGE_???).
+   * from 0 to 7 (CS_BOX_EDGE_???).
    */
   void GetEdge (int edge, csSegment2& e) const
   {
@@ -355,55 +355,55 @@ public:
  * Indices of corner vertices for csBox3.
  * Used by csBox3::GetCorner().
  */
-#define BOX_CORNER_xyz 0
-#define BOX_CORNER_xyZ 1
-#define BOX_CORNER_xYz 2
-#define BOX_CORNER_xYZ 3
-#define BOX_CORNER_Xyz 4
-#define BOX_CORNER_XyZ 5
-#define BOX_CORNER_XYz 6
-#define BOX_CORNER_XYZ 7
+#define CS_BOX_CORNER_xyz 0
+#define CS_BOX_CORNER_xyZ 1
+#define CS_BOX_CORNER_xYz 2
+#define CS_BOX_CORNER_xYZ 3
+#define CS_BOX_CORNER_Xyz 4
+#define CS_BOX_CORNER_XyZ 5
+#define CS_BOX_CORNER_XYz 6
+#define CS_BOX_CORNER_XYZ 7
 
 /**
  * Indices of faces for csBox3.
  * Used by csBox3::GetSide().
  */
-#define BOX_SIDE_x 0
-#define BOX_SIDE_X 1
-#define BOX_SIDE_y 2
-#define BOX_SIDE_Y 3
-#define BOX_SIDE_z 4
-#define BOX_SIDE_Z 5
-#define BOX_INSIDE 6
+#define CS_BOX_SIDE_x 0
+#define CS_BOX_SIDE_X 1
+#define CS_BOX_SIDE_y 2
+#define CS_BOX_SIDE_Y 3
+#define CS_BOX_SIDE_z 4
+#define CS_BOX_SIDE_Z 5
+#define CS_BOX_INSIDE 6
 
 /**
  * Indices of edges for cxBox3.
  * Index e+1 is opposite edge of e (with e even).
  */
-#define BOX_EDGE_Xyz_xyz 0
-#define BOX_EDGE_xyz_Xyz 1
-#define BOX_EDGE_xyz_xYz 2
-#define BOX_EDGE_xYz_xyz 3
-#define BOX_EDGE_xYz_XYz 4
-#define BOX_EDGE_XYz_xYz 5
-#define BOX_EDGE_XYz_Xyz 6
-#define BOX_EDGE_Xyz_XYz 7
-#define BOX_EDGE_Xyz_XyZ 8
-#define BOX_EDGE_XyZ_Xyz 9
-#define BOX_EDGE_XyZ_XYZ 10
-#define BOX_EDGE_XYZ_XyZ 11
-#define BOX_EDGE_XYZ_XYz 12
-#define BOX_EDGE_XYz_XYZ 13
-#define BOX_EDGE_XYZ_xYZ 14
-#define BOX_EDGE_xYZ_XYZ 15
-#define BOX_EDGE_xYZ_xYz 16
-#define BOX_EDGE_xYz_xYZ 17
-#define BOX_EDGE_xYZ_xyZ 18
-#define BOX_EDGE_xyZ_xYZ 19
-#define BOX_EDGE_xyZ_xyz 20
-#define BOX_EDGE_xyz_xyZ 21
-#define BOX_EDGE_xyZ_XyZ 22
-#define BOX_EDGE_XyZ_xyZ 23
+#define CS_BOX_EDGE_Xyz_xyz 0
+#define CS_BOX_EDGE_xyz_Xyz 1
+#define CS_BOX_EDGE_xyz_xYz 2
+#define CS_BOX_EDGE_xYz_xyz 3
+#define CS_BOX_EDGE_xYz_XYz 4
+#define CS_BOX_EDGE_XYz_xYz 5
+#define CS_BOX_EDGE_XYz_Xyz 6
+#define CS_BOX_EDGE_Xyz_XYz 7
+#define CS_BOX_EDGE_Xyz_XyZ 8
+#define CS_BOX_EDGE_XyZ_Xyz 9
+#define CS_BOX_EDGE_XyZ_XYZ 10
+#define CS_BOX_EDGE_XYZ_XyZ 11
+#define CS_BOX_EDGE_XYZ_XYz 12
+#define CS_BOX_EDGE_XYz_XYZ 13
+#define CS_BOX_EDGE_XYZ_xYZ 14
+#define CS_BOX_EDGE_xYZ_XYZ 15
+#define CS_BOX_EDGE_xYZ_xYz 16
+#define CS_BOX_EDGE_xYz_xYZ 17
+#define CS_BOX_EDGE_xYZ_xyZ 18
+#define CS_BOX_EDGE_xyZ_xYZ 19
+#define CS_BOX_EDGE_xyZ_xyz 20
+#define CS_BOX_EDGE_xyz_xyZ 21
+#define CS_BOX_EDGE_xyZ_XyZ 22
+#define CS_BOX_EDGE_XyZ_xyZ 23
 
 /**
  * A bounding box in 3D space.
@@ -422,14 +422,14 @@ protected:
 
   struct bEdge
   {
-    uint8 v1, v2; // Indices of vertex in bounding box (BOX_CORNER_...)
-    uint8 fl, fr; // Indices of left/right faces sharing edge (BOX_SIDE_...)
+    uint8 v1, v2; // Indices of vertex in bounding box (CS_BOX_CORNER_...)
+    uint8 fl, fr; // Indices of left/right faces sharing edge (CS_BOX_SIDE_...)
   };
   typedef uint8 bFace[4];	// Indices of four clock-wise edges (0..23)
   // Index by edge number. Edge e and e+1 with e even are opposite edges.
-  // (BOX_EDGE_...)
+  // (CS_BOX_EDGE_...)
   static bEdge edges[24];
-  // Index by BOX_SIDE_? number.
+  // Index by CS_BOX_SIDE_? number.
   static bFace faces[6];
 public:
   /// Get the minimum X value of the box
@@ -461,13 +461,13 @@ public:
    * those are only the min and max corners.
    * Corner 0 = xyz, 1 = xyZ, 2 = xYz, 3 = xYZ,
    *        4 = Xyz, 5 = XyZ, 6 = XYz, 7 = XYZ.
-   * Use BOX_CORNER_??? defines.
+   * Use CS_BOX_CORNER_??? defines.
    */
   csVector3 GetCorner (int corner) const;
 
   /**
-   * Given an edge index (BOX_EDGE_???) return the two vertices
-   * (index BOX_CORNER_???) and left/right faces (BOX_SIDE_???).
+   * Given an edge index (CS_BOX_EDGE_???) return the two vertices
+   * (index CS_BOX_CORNER_???) and left/right faces (CS_BOX_SIDE_???).
    */
   void GetEdgeInfo (int edge, int& v1, int& v2, int& fleft, int& fright) const
   {
@@ -478,8 +478,8 @@ public:
   }
 
   /**
-   * Given a face index (BOX_SIDE_???) return the four edges oriented
-   * clockwise around this face (BOX_EDGE_???).
+   * Given a face index (CS_BOX_SIDE_???) return the four edges oriented
+   * clockwise around this face (CS_BOX_EDGE_???).
    */
   uint8* GetFaceEdges (int face) const
   {
@@ -504,21 +504,21 @@ public:
 
   /**
    * Get a side of this box as a 2D box.
-   * Use BOX_SIDE_??? defines.
+   * Use CS_BOX_SIDE_??? defines.
    */
   csBox2 GetSide (int side) const;
 
   /**
    * Fill the array (which should be three long at least)
-   * with all visible sides (BOX_SIDE_??? defines) as seen
+   * with all visible sides (CS_BOX_SIDE_??? defines) as seen
    * from the given point.
    * Returns the number of visible sides.
    */
   int GetVisibleSides (const csVector3& pos, int* visible_sides) const;
 
   /**
-   * Static function to get the 'other' side (i.e. BOX_SIDE_X
-   * to BOX_SIDE_x, ...).
+   * Static function to get the 'other' side (i.e. CS_BOX_SIDE_X
+   * to CS_BOX_SIDE_x, ...).
    */
   static int OtherSide (int side)
   {
@@ -527,7 +527,7 @@ public:
 
   /**
    * Return every edge (segment) of this bounding box
-   * from 0 to 23 (use one of the BOX_EDGE_??? indices).
+   * from 0 to 23 (use one of the CS_BOX_EDGE_??? indices).
    * The returned edge is undefined for any other index.
    */
   csSegment3 GetEdge (int edge) const
@@ -537,7 +537,7 @@ public:
 
   /**
    * Return every edge (segment) of this bounding box
-   * from 0 to 23 (use one of the BOX_EDGE_??? indices).
+   * from 0 to 23 (use one of the CS_BOX_EDGE_??? indices).
    * The returned edge is undefined for any other index.
    */
   void GetEdge (int edge, csSegment3& e) const
@@ -711,7 +711,7 @@ public:
 
   /**
    * Test if this box is adjacent to the other one.
-   * Return -1 if not adjacent or else any of the BOX_SIDE_???
+   * Return -1 if not adjacent or else any of the CS_BOX_SIDE_???
    * flags to indicate the side of this box that the other
    * box is adjacent with.
    */

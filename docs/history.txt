@@ -4,6 +4,23 @@ The history order is reversed so that new features are at the top.
         - Jorge Acereda fixed LoadCamera() (crashed if the sector
 	  wasn't found). Rewrote it to be more robust and coherent
 	  (either loads all parameters or none).
+	- Renamed all BOX_ constants in box.h to CS_BOX_. This includes
+	  BOX_CORNER_..., BOX_EDGE_..., and BOX_SIDE_...
+	- Renamed POL_FRONT, POL_BACK, POL_SAME_PLANE, and POL_SPLIT_NEEDED
+	  so that they also start with CS_.
+	- Renamed DECLARE_TYPED_QUEUE to CS_DECLARE_TYPED_QUEUE.
+	- Created a new general mesh object. This is simply a static mesh
+	  rendered with DrawTriangleMesh(). It doesn't support animation
+	  except that you can directly alter the vertices in the mesh
+	  if you want. For static objects that don't require any special
+	  features like animation or such this is a good alternative to
+	  3D sprites. The factory of this object contains the geometry
+	  so it is very efficient to make multiple instances of this object
+	  (just like 3D sprites).
+	- Added a loader for the new general mesh objects. Added an example
+	  to flarge so you can see how it works.
+	- Added the ability to automatically generate normals for
+	  the general mesh object.
 22-Jan-2002
 	- Created a crystal-docs mailing list. The doc annotation script
 	  will now send mail to that mailing list.

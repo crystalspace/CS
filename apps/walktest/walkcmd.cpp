@@ -1509,12 +1509,12 @@ bool CommandHandler (const char *cmd, const char *arg)
       const csBox3& b = l->GetBox ();
       printf ("Leaf (%d): %f,%f,%f %f,%f,%f\n", l->IsLeaf (),
       	b.MinX (), b.MinY (), b.MinZ (), b.MaxX (), b.MaxY (), b.MaxZ ());
-      printf ("Solid Mask x: %04x\n", l->GetSolidMask (BOX_SIDE_x));
-      printf ("Solid Mask X: %04x\n", l->GetSolidMask (BOX_SIDE_X));
-      printf ("Solid Mask y: %04x\n", l->GetSolidMask (BOX_SIDE_y));
-      printf ("Solid Mask Y: %04x\n", l->GetSolidMask (BOX_SIDE_Y));
-      printf ("Solid Mask z: %04x\n", l->GetSolidMask (BOX_SIDE_z));
-      printf ("Solid Mask Z: %04x\n", l->GetSolidMask (BOX_SIDE_Z));
+      printf ("Solid Mask x: %04x\n", l->GetSolidMask (CS_BOX_SIDE_x));
+      printf ("Solid Mask X: %04x\n", l->GetSolidMask (CS_BOX_SIDE_X));
+      printf ("Solid Mask y: %04x\n", l->GetSolidMask (CS_BOX_SIDE_y));
+      printf ("Solid Mask Y: %04x\n", l->GetSolidMask (CS_BOX_SIDE_Y));
+      printf ("Solid Mask z: %04x\n", l->GetSolidMask (CS_BOX_SIDE_z));
+      printf ("Solid Mask Z: %04x\n", l->GetSolidMask (CS_BOX_SIDE_Z));
     }
     else
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,

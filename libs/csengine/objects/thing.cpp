@@ -1251,7 +1251,7 @@ void csThing::DrawPolygonArray (csPolygonInt** polygon, int num,
       // in front of the far plane it is not visible. Otherwise we will render
       // it.
       if (!plclip ||
-      	csPoly3D::Classify (*plclip, verts, num_verts) != POL_FRONT)
+      	csPoly3D::Classify (*plclip, verts, num_verts) != CS_POL_FRONT)
       {
         clip = (csPolygon2D*)(render_pool->Alloc ());
 	if (p->DoPerspective (camtrans, verts, num_verts, clip, NULL,
@@ -1546,7 +1546,7 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
           // in front of the far plane it is not visible. Otherwise we will
 	  // render it.
           if (!plclip ||
-      	    csPoly3D::Classify (*plclip, verts, num_verts) != POL_FRONT)
+      	    csPoly3D::Classify (*plclip, verts, num_verts) != CS_POL_FRONT)
 	  {
             if (bsppol->DoPerspective (camtrans, verts,
 	       		num_verts, clip, icam->IsMirrored ())
@@ -1598,7 +1598,7 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         if (
          p->ClipToPlane (pclip_plane, camtrans.GetOrigin (), verts, num_verts)
          && (!plclip ||
-      	    csPoly3D::Classify (*plclip, verts, num_verts) != POL_FRONT)
+      	    csPoly3D::Classify (*plclip, verts, num_verts) != CS_POL_FRONT)
          && p->DoPerspective (camtrans, verts, num_verts, clip, NULL,
                               icam->IsMirrored ())
          && clip->ClipAgainst (d->GetClipper ()))
@@ -1626,7 +1626,7 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         if (!(
            p->ClipToPlane (pclip_plane, camtrans.GetOrigin (), verts, num_verts)
            && (!plclip ||
-      	      csPoly3D::Classify (*plclip, verts, num_verts) != POL_FRONT)
+      	      csPoly3D::Classify (*plclip, verts, num_verts) != CS_POL_FRONT)
            && p->DoPerspective (camtrans, verts, num_verts, clip, NULL,
                                 icam->IsMirrored ())
            && clip->ClipAgainst (d->GetClipper ())))

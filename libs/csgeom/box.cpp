@@ -25,24 +25,24 @@
 
 csBox2::bEdge csBox2::edges[8] =
   {
-    { BOX_CORNER_xy, BOX_CORNER_Xy },
-    { BOX_CORNER_Xy, BOX_CORNER_xy },
-    { BOX_CORNER_Xy, BOX_CORNER_XY },
-    { BOX_CORNER_XY, BOX_CORNER_Xy },
-    { BOX_CORNER_XY, BOX_CORNER_xY },
-    { BOX_CORNER_xY, BOX_CORNER_XY },
-    { BOX_CORNER_xY, BOX_CORNER_xy },
-    { BOX_CORNER_xy, BOX_CORNER_xY }
+    { CS_BOX_CORNER_xy, CS_BOX_CORNER_Xy },
+    { CS_BOX_CORNER_Xy, CS_BOX_CORNER_xy },
+    { CS_BOX_CORNER_Xy, CS_BOX_CORNER_XY },
+    { CS_BOX_CORNER_XY, CS_BOX_CORNER_Xy },
+    { CS_BOX_CORNER_XY, CS_BOX_CORNER_xY },
+    { CS_BOX_CORNER_xY, CS_BOX_CORNER_XY },
+    { CS_BOX_CORNER_xY, CS_BOX_CORNER_xy },
+    { CS_BOX_CORNER_xy, CS_BOX_CORNER_xY }
   };
 
 csVector2 csBox2::GetCorner (int corner) const
 {
   switch (corner)
   {
-    case BOX_CORNER_xy: return Min ();
-    case BOX_CORNER_xY: return csVector2 (MinX (), MaxY ());
-    case BOX_CORNER_Xy: return csVector2 (MaxX (), MinY ());
-    case BOX_CORNER_XY: return Max ();
+    case CS_BOX_CORNER_xy: return Min ();
+    case CS_BOX_CORNER_xY: return csVector2 (MinX (), MaxY ());
+    case CS_BOX_CORNER_Xy: return csVector2 (MaxX (), MinY ());
+    case CS_BOX_CORNER_XY: return Max ();
   }
   return csVector2 (0, 0);
 }
@@ -111,26 +111,26 @@ csBox2 operator* (const csBox2& box1, const csBox2& box2)
 
 bool operator== (const csBox2& box1, const csBox2& box2)
 {
-  return ( (box1.minbox.x == box2.minbox.x) && (box1.minbox.y == box2.minbox.y) &&
-           (box1.maxbox.x == box2.maxbox.x) && (box1.maxbox.y == box2.maxbox.y) );
+  return ((box1.minbox.x==box2.minbox.x) && (box1.minbox.y==box2.minbox.y) &&
+          (box1.maxbox.x==box2.maxbox.x) && (box1.maxbox.y==box2.maxbox.y) );
 }
 
 bool operator!= (const csBox2& box1, const csBox2& box2)
 {
-  return ( (box1.minbox.x != box2.minbox.x) || (box1.minbox.y != box2.minbox.y) ||
-           (box1.maxbox.x != box2.maxbox.x) || (box1.maxbox.y != box2.maxbox.y) );
+  return ((box1.minbox.x!=box2.minbox.x) || (box1.minbox.y!=box2.minbox.y) ||
+          (box1.maxbox.x!=box2.maxbox.x) || (box1.maxbox.y!=box2.maxbox.y) );
 }
 
 bool operator< (const csBox2& box1, const csBox2& box2)
 {
-  return ( (box1.minbox.x >= box2.minbox.x) && (box1.minbox.y >= box2.minbox.y) &&
-           (box1.maxbox.x <= box2.maxbox.x) && (box1.maxbox.y <= box2.maxbox.y) );
+  return ((box1.minbox.x>=box2.minbox.x) && (box1.minbox.y>=box2.minbox.y) &&
+          (box1.maxbox.x<=box2.maxbox.x) && (box1.maxbox.y<=box2.maxbox.y) );
 }
 
 bool operator> (const csBox2& box1, const csBox2& box2)
 {
-  return ( (box2.minbox.x >= box1.minbox.x) && (box2.minbox.y >= box1.minbox.y) &&
-           (box2.maxbox.x <= box1.maxbox.x) && (box2.maxbox.y <= box1.maxbox.y) );
+  return ((box2.minbox.x>=box1.minbox.x) && (box2.minbox.y>=box1.minbox.y) &&
+          (box2.maxbox.x<=box1.maxbox.x) && (box2.maxbox.y<=box1.maxbox.y) );
 }
 
 bool operator< (const csVector2& point, const csBox2& box)
@@ -244,87 +244,87 @@ struct Outline
 /// Outline lookup table.
 static Outline outlines[27] =
 {
-  { 7, {3,2,6,4,5,1,0},        3, {BOX_SIDE_x,BOX_SIDE_y,BOX_SIDE_z} },	// 0,0,0
-  { 6, {3,2,0,4,5,1,-1},       2, {BOX_SIDE_x,BOX_SIDE_y,-1} },		// 0,0,1
-  { 7, {7,3,2,0,4,5,1},        3, {BOX_SIDE_x,BOX_SIDE_y,BOX_SIDE_Z} },	// 0,0,2
-  { 6, {3,2,6,4,0,1,-1},       2, {BOX_SIDE_x,BOX_SIDE_z,-1} },		// 0,1,0
-  { 4, {3,2,0,1,-1,-1,-1},     1, {BOX_SIDE_x,-1,-1} },			// 0,1,1
-  { 6, {7,3,2,0,1,5,-1},       2, {BOX_SIDE_x,BOX_SIDE_Z,-1} },		// 0,1,2
-  { 7, {3,7,6,4,0,1,2},        3, {BOX_SIDE_x,BOX_SIDE_Y,BOX_SIDE_z} },	// 0,2,0
-  { 6, {3,7,6,2,0,1,-1},       2, {BOX_SIDE_x,BOX_SIDE_Y,-1} },		// 0,2,1
-  { 7, {7,6,2,0,1,5,3},        3, {BOX_SIDE_x,BOX_SIDE_Y,BOX_SIDE_Z} },	// 0,2,2
-  { 6, {2,6,4,5,1,0,-1},       2, {BOX_SIDE_y,BOX_SIDE_z,-1} },		// 1,0,0
-  { 4, {0,4,5,1,-1,-1,-1},     1, {BOX_SIDE_y,-1,-1} },			// 1,0,1
-  { 6, {3,1,0,4,5,7,-1},       2, {BOX_SIDE_y,BOX_SIDE_Z,-1} },		// 1,0,2
-  { 4, {2,6,4,0,-1,-1,-1},     1, {BOX_SIDE_z,-1,-1} },			// 1,1,0
-  { 0, {-1,-1,-1,-1,-1,-1,-1}, 0, {-1,-1,-1} },				// 1,1,1
-  { 4, {7,3,1,5,-1,-1,-1},     1, {BOX_SIDE_Z,-1,-1} },			// 1,1,2
-  { 6, {3,7,6,4,0,2,-1},       2, {BOX_SIDE_Y,BOX_SIDE_z,-1} },		// 1,2,0
-  { 4, {3,7,6,2,-1,-1,-1},     1, {BOX_SIDE_Y,-1,-1} },			// 1,2,1
-  { 6, {2,3,1,5,7,6,-1},       2, {BOX_SIDE_Y,BOX_SIDE_Z,-1} },		// 1,2,2
-  { 7, {2,6,7,5,1,0,4},        3, {BOX_SIDE_X,BOX_SIDE_y,BOX_SIDE_z} },	// 2,0,0
-  { 6, {6,7,5,1,0,4,-1},       2, {BOX_SIDE_X,BOX_SIDE_y,-1} },		// 2,0,1
-  { 7, {6,7,3,1,0,4,5},        3, {BOX_SIDE_X,BOX_SIDE_y,BOX_SIDE_Z} },	// 2,0,2
-  { 6, {2,6,7,5,4,0,-1},       2, {BOX_SIDE_X,BOX_SIDE_z,-1} },		// 2,1,0
-  { 4, {6,7,5,4,-1,-1,-1},     1, {BOX_SIDE_X,-1,-1} },			// 2,1,1
-  { 6, {6,7,3,1,5,4,-1},       2, {BOX_SIDE_X,BOX_SIDE_Z,-1} },		// 2,1,2
-  { 7, {2,3,7,5,4,0,6},        3, {BOX_SIDE_X,BOX_SIDE_Y,BOX_SIDE_z} },	// 2,2,0
-  { 6, {2,3,7,5,4,6,-1},       2, {BOX_SIDE_X,BOX_SIDE_Y,-1} },		// 2,2,1
-  { 7, {6,2,3,1,5,4,7},        3, {BOX_SIDE_X,BOX_SIDE_Y,BOX_SIDE_Z} }	// 2,2,2
+{7,{3,2,6,4,5,1,0},        3,{CS_BOX_SIDE_x,CS_BOX_SIDE_y,CS_BOX_SIDE_z}}, //000
+{6,{3,2,0,4,5,1,-1},       2,{CS_BOX_SIDE_x,CS_BOX_SIDE_y,-1}},		   //001
+{7,{7,3,2,0,4,5,1},        3,{CS_BOX_SIDE_x,CS_BOX_SIDE_y,CS_BOX_SIDE_Z}}, //002
+{6,{3,2,6,4,0,1,-1},       2,{CS_BOX_SIDE_x,CS_BOX_SIDE_z,-1}},		   //010
+{4,{3,2,0,1,-1,-1,-1},     1,{CS_BOX_SIDE_x,-1,-1}},			   //011
+{6,{7,3,2,0,1,5,-1},       2,{CS_BOX_SIDE_x,CS_BOX_SIDE_Z,-1}},		   //012
+{7,{3,7,6,4,0,1,2},        3,{CS_BOX_SIDE_x,CS_BOX_SIDE_Y,CS_BOX_SIDE_z}}, //020
+{6,{3,7,6,2,0,1,-1},       2,{CS_BOX_SIDE_x,CS_BOX_SIDE_Y,-1}},		   //021
+{7,{7,6,2,0,1,5,3},        3,{CS_BOX_SIDE_x,CS_BOX_SIDE_Y,CS_BOX_SIDE_Z}}, //022
+{6,{2,6,4,5,1,0,-1},       2,{CS_BOX_SIDE_y,CS_BOX_SIDE_z,-1}},		   //100
+{4,{0,4,5,1,-1,-1,-1},     1,{CS_BOX_SIDE_y,-1,-1}},			   //101
+{6,{3,1,0,4,5,7,-1},       2,{CS_BOX_SIDE_y,CS_BOX_SIDE_Z,-1}},		   //102
+{4,{2,6,4,0,-1,-1,-1},     1,{CS_BOX_SIDE_z,-1,-1}},			   //110
+{0,{-1,-1,-1,-1,-1,-1,-1}, 0,{-1,-1,-1}},				   //111
+{4,{7,3,1,5,-1,-1,-1},     1,{CS_BOX_SIDE_Z,-1,-1}},			   //112
+{6,{3,7,6,4,0,2,-1},       2,{CS_BOX_SIDE_Y,CS_BOX_SIDE_z,-1}},		   //120
+{4,{3,7,6,2,-1,-1,-1},     1,{CS_BOX_SIDE_Y,-1,-1}},			   //121
+{6,{2,3,1,5,7,6,-1},       2,{CS_BOX_SIDE_Y,CS_BOX_SIDE_Z,-1}},		   //122
+{7,{2,6,7,5,1,0,4},        3,{CS_BOX_SIDE_X,CS_BOX_SIDE_y,CS_BOX_SIDE_z}}, //200
+{6,{6,7,5,1,0,4,-1},       2,{CS_BOX_SIDE_X,CS_BOX_SIDE_y,-1}},		   //201
+{7,{6,7,3,1,0,4,5},        3,{CS_BOX_SIDE_X,CS_BOX_SIDE_y,CS_BOX_SIDE_Z}}, //202
+{6,{2,6,7,5,4,0,-1},       2,{CS_BOX_SIDE_X,CS_BOX_SIDE_z,-1}},		   //210
+{4,{6,7,5,4,-1,-1,-1},     1,{CS_BOX_SIDE_X,-1,-1}},			   //211
+{6,{6,7,3,1,5,4,-1},       2,{CS_BOX_SIDE_X,CS_BOX_SIDE_Z,-1}},		   //212
+{7,{2,3,7,5,4,0,6},        3,{CS_BOX_SIDE_X,CS_BOX_SIDE_Y,CS_BOX_SIDE_z}}, //220
+{6,{2,3,7,5,4,6,-1},       2,{CS_BOX_SIDE_X,CS_BOX_SIDE_Y,-1}},		   //221
+{7,{6,2,3,1,5,4,7},        3,{CS_BOX_SIDE_X,CS_BOX_SIDE_Y,CS_BOX_SIDE_Z}}  //222
 };
 
 csBox3::bEdge csBox3::edges[24] =
   {
-    { BOX_CORNER_Xyz, BOX_CORNER_xyz, BOX_SIDE_y, BOX_SIDE_z },
-    { BOX_CORNER_xyz, BOX_CORNER_Xyz, BOX_SIDE_z, BOX_SIDE_y },
-    { BOX_CORNER_xyz, BOX_CORNER_xYz, BOX_SIDE_x, BOX_SIDE_z },
-    { BOX_CORNER_xYz, BOX_CORNER_xyz, BOX_SIDE_z, BOX_SIDE_x },
-    { BOX_CORNER_xYz, BOX_CORNER_XYz, BOX_SIDE_Y, BOX_SIDE_z },
-    { BOX_CORNER_XYz, BOX_CORNER_xYz, BOX_SIDE_z, BOX_SIDE_Y },
-    { BOX_CORNER_XYz, BOX_CORNER_Xyz, BOX_SIDE_X, BOX_SIDE_z },
-    { BOX_CORNER_Xyz, BOX_CORNER_XYz, BOX_SIDE_z, BOX_SIDE_X },
+    { CS_BOX_CORNER_Xyz, CS_BOX_CORNER_xyz, CS_BOX_SIDE_y, CS_BOX_SIDE_z },
+    { CS_BOX_CORNER_xyz, CS_BOX_CORNER_Xyz, CS_BOX_SIDE_z, CS_BOX_SIDE_y },
+    { CS_BOX_CORNER_xyz, CS_BOX_CORNER_xYz, CS_BOX_SIDE_x, CS_BOX_SIDE_z },
+    { CS_BOX_CORNER_xYz, CS_BOX_CORNER_xyz, CS_BOX_SIDE_z, CS_BOX_SIDE_x },
+    { CS_BOX_CORNER_xYz, CS_BOX_CORNER_XYz, CS_BOX_SIDE_Y, CS_BOX_SIDE_z },
+    { CS_BOX_CORNER_XYz, CS_BOX_CORNER_xYz, CS_BOX_SIDE_z, CS_BOX_SIDE_Y },
+    { CS_BOX_CORNER_XYz, CS_BOX_CORNER_Xyz, CS_BOX_SIDE_X, CS_BOX_SIDE_z },
+    { CS_BOX_CORNER_Xyz, CS_BOX_CORNER_XYz, CS_BOX_SIDE_z, CS_BOX_SIDE_X },
 
-    { BOX_CORNER_Xyz, BOX_CORNER_XyZ, BOX_SIDE_X, BOX_SIDE_y },
-    { BOX_CORNER_XyZ, BOX_CORNER_Xyz, BOX_SIDE_y, BOX_SIDE_X },
-    { BOX_CORNER_XyZ, BOX_CORNER_XYZ, BOX_SIDE_X, BOX_SIDE_Z },
-    { BOX_CORNER_XYZ, BOX_CORNER_XyZ, BOX_SIDE_Z, BOX_SIDE_X },
-    { BOX_CORNER_XYZ, BOX_CORNER_XYz, BOX_SIDE_X, BOX_SIDE_Y },
-    { BOX_CORNER_XYz, BOX_CORNER_XYZ, BOX_SIDE_Y, BOX_SIDE_X },
-    { BOX_CORNER_XYZ, BOX_CORNER_xYZ, BOX_SIDE_Y, BOX_SIDE_Z },
-    { BOX_CORNER_xYZ, BOX_CORNER_XYZ, BOX_SIDE_Z, BOX_SIDE_Y },
+    { CS_BOX_CORNER_Xyz, CS_BOX_CORNER_XyZ, CS_BOX_SIDE_X, CS_BOX_SIDE_y },
+    { CS_BOX_CORNER_XyZ, CS_BOX_CORNER_Xyz, CS_BOX_SIDE_y, CS_BOX_SIDE_X },
+    { CS_BOX_CORNER_XyZ, CS_BOX_CORNER_XYZ, CS_BOX_SIDE_X, CS_BOX_SIDE_Z },
+    { CS_BOX_CORNER_XYZ, CS_BOX_CORNER_XyZ, CS_BOX_SIDE_Z, CS_BOX_SIDE_X },
+    { CS_BOX_CORNER_XYZ, CS_BOX_CORNER_XYz, CS_BOX_SIDE_X, CS_BOX_SIDE_Y },
+    { CS_BOX_CORNER_XYz, CS_BOX_CORNER_XYZ, CS_BOX_SIDE_Y, CS_BOX_SIDE_X },
+    { CS_BOX_CORNER_XYZ, CS_BOX_CORNER_xYZ, CS_BOX_SIDE_Y, CS_BOX_SIDE_Z },
+    { CS_BOX_CORNER_xYZ, CS_BOX_CORNER_XYZ, CS_BOX_SIDE_Z, CS_BOX_SIDE_Y },
 
-    { BOX_CORNER_xYZ, BOX_CORNER_xYz, BOX_SIDE_Y, BOX_SIDE_x },
-    { BOX_CORNER_xYz, BOX_CORNER_xYZ, BOX_SIDE_x, BOX_SIDE_Y },
-    { BOX_CORNER_xYZ, BOX_CORNER_xyZ, BOX_SIDE_x, BOX_SIDE_Z },
-    { BOX_CORNER_xyZ, BOX_CORNER_xYZ, BOX_SIDE_Z, BOX_SIDE_x },
-    { BOX_CORNER_xyZ, BOX_CORNER_xyz, BOX_SIDE_x, BOX_SIDE_y },
-    { BOX_CORNER_xyz, BOX_CORNER_xyZ, BOX_SIDE_y, BOX_SIDE_x },
-    { BOX_CORNER_xyZ, BOX_CORNER_XyZ, BOX_SIDE_y, BOX_SIDE_Z },
-    { BOX_CORNER_XyZ, BOX_CORNER_xyZ, BOX_SIDE_Z, BOX_SIDE_y }
+    { CS_BOX_CORNER_xYZ, CS_BOX_CORNER_xYz, CS_BOX_SIDE_Y, CS_BOX_SIDE_x },
+    { CS_BOX_CORNER_xYz, CS_BOX_CORNER_xYZ, CS_BOX_SIDE_x, CS_BOX_SIDE_Y },
+    { CS_BOX_CORNER_xYZ, CS_BOX_CORNER_xyZ, CS_BOX_SIDE_x, CS_BOX_SIDE_Z },
+    { CS_BOX_CORNER_xyZ, CS_BOX_CORNER_xYZ, CS_BOX_SIDE_Z, CS_BOX_SIDE_x },
+    { CS_BOX_CORNER_xyZ, CS_BOX_CORNER_xyz, CS_BOX_SIDE_x, CS_BOX_SIDE_y },
+    { CS_BOX_CORNER_xyz, CS_BOX_CORNER_xyZ, CS_BOX_SIDE_y, CS_BOX_SIDE_x },
+    { CS_BOX_CORNER_xyZ, CS_BOX_CORNER_XyZ, CS_BOX_SIDE_y, CS_BOX_SIDE_Z },
+    { CS_BOX_CORNER_XyZ, CS_BOX_CORNER_xyZ, CS_BOX_SIDE_Z, CS_BOX_SIDE_y }
   };
-// Index by BOX_SIDE_? number.
+// Index by CS_BOX_SIDE_? number.
 csBox3::bFace csBox3::faces[6] =
-  {
-    { BOX_EDGE_xyz_xyZ, BOX_EDGE_xyZ_xYZ, BOX_EDGE_xYZ_xYz, BOX_EDGE_xYz_xyz },
-    { BOX_EDGE_XYz_XYZ, BOX_EDGE_XYZ_XyZ, BOX_EDGE_XyZ_Xyz, BOX_EDGE_Xyz_XYz },
-    { BOX_EDGE_xyz_Xyz, BOX_EDGE_Xyz_XyZ, BOX_EDGE_XyZ_xyZ, BOX_EDGE_xyZ_xyz },
-    { BOX_EDGE_xYZ_XYZ, BOX_EDGE_XYZ_XYz, BOX_EDGE_XYz_xYz, BOX_EDGE_xYz_xYZ },
-    { BOX_EDGE_xYz_XYz, BOX_EDGE_XYz_Xyz, BOX_EDGE_Xyz_xyz, BOX_EDGE_xyz_xYz },
-    { BOX_EDGE_XYZ_xYZ, BOX_EDGE_xYZ_xyZ, BOX_EDGE_xyZ_XyZ, BOX_EDGE_XyZ_XYZ }
-  };
+{
+  { CS_BOX_EDGE_xyz_xyZ,CS_BOX_EDGE_xyZ_xYZ,CS_BOX_EDGE_xYZ_xYz,CS_BOX_EDGE_xYz_xyz },
+  { CS_BOX_EDGE_XYz_XYZ,CS_BOX_EDGE_XYZ_XyZ,CS_BOX_EDGE_XyZ_Xyz,CS_BOX_EDGE_Xyz_XYz },
+  { CS_BOX_EDGE_xyz_Xyz,CS_BOX_EDGE_Xyz_XyZ,CS_BOX_EDGE_XyZ_xyZ,CS_BOX_EDGE_xyZ_xyz },
+  { CS_BOX_EDGE_xYZ_XYZ,CS_BOX_EDGE_XYZ_XYz,CS_BOX_EDGE_XYz_xYz,CS_BOX_EDGE_xYz_xYZ },
+  { CS_BOX_EDGE_xYz_XYz,CS_BOX_EDGE_XYz_Xyz,CS_BOX_EDGE_Xyz_xyz,CS_BOX_EDGE_xyz_xYz },
+  { CS_BOX_EDGE_XYZ_xYZ,CS_BOX_EDGE_xYZ_xyZ,CS_BOX_EDGE_xyZ_XyZ,CS_BOX_EDGE_XyZ_XYZ }
+};
 
 csVector3 csBox3::GetCorner (int corner) const
 {
   switch (corner)
   {
-    case BOX_CORNER_xyz: return Min ();
-    case BOX_CORNER_xyZ: return csVector3 (MinX (), MinY (), MaxZ ());
-    case BOX_CORNER_xYz: return csVector3 (MinX (), MaxY (), MinZ ());
-    case BOX_CORNER_xYZ: return csVector3 (MinX (), MaxY (), MaxZ ());
-    case BOX_CORNER_Xyz: return csVector3 (MaxX (), MinY (), MinZ ());
-    case BOX_CORNER_XyZ: return csVector3 (MaxX (), MinY (), MaxZ ());
-    case BOX_CORNER_XYz: return csVector3 (MaxX (), MaxY (), MinZ ());
-    case BOX_CORNER_XYZ: return Max ();
+    case CS_BOX_CORNER_xyz: return Min ();
+    case CS_BOX_CORNER_xyZ: return csVector3 (MinX (), MinY (), MaxZ ());
+    case CS_BOX_CORNER_xYz: return csVector3 (MinX (), MaxY (), MinZ ());
+    case CS_BOX_CORNER_xYZ: return csVector3 (MinX (), MaxY (), MaxZ ());
+    case CS_BOX_CORNER_Xyz: return csVector3 (MaxX (), MinY (), MinZ ());
+    case CS_BOX_CORNER_XyZ: return csVector3 (MaxX (), MinY (), MaxZ ());
+    case CS_BOX_CORNER_XYz: return csVector3 (MaxX (), MaxY (), MinZ ());
+    case CS_BOX_CORNER_XYZ: return Max ();
   }
   return csVector3 (0, 0, 0);
 }
@@ -347,14 +347,14 @@ csBox2 csBox3::GetSide (int side) const
 {
   switch (side)
   {
-    case BOX_SIDE_x:
-    case BOX_SIDE_X:
+    case CS_BOX_SIDE_x:
+    case CS_BOX_SIDE_X:
       return csBox2 (MinY (), MinZ (), MaxY (), MaxZ ());
-    case BOX_SIDE_y:
-    case BOX_SIDE_Y:
+    case CS_BOX_SIDE_y:
+    case CS_BOX_SIDE_Y:
       return csBox2 (MinX (), MinZ (), MaxX (), MaxZ ());
-    case BOX_SIDE_z:
-    case BOX_SIDE_Z:
+    case CS_BOX_SIDE_z:
+    case CS_BOX_SIDE_Z:
       return csBox2 (MinX (), MinY (), MaxX (), MaxY ());
   }
   return csBox2 ();
@@ -400,18 +400,18 @@ int csBox3::Adjacent (const csBox3& other) const
 {
   if (AdjacentX (other))
   {
-    if (other.MaxX () > MaxX ()) return BOX_SIDE_X;
-    else return BOX_SIDE_x;
+    if (other.MaxX () > MaxX ()) return CS_BOX_SIDE_X;
+    else return CS_BOX_SIDE_x;
   }
   if (AdjacentY (other))
   {
-    if (other.MaxY () > MaxY ()) return BOX_SIDE_Y;
-    else return BOX_SIDE_y;
+    if (other.MaxY () > MaxY ()) return CS_BOX_SIDE_Y;
+    else return CS_BOX_SIDE_y;
   }
   if (AdjacentZ (other))
   {
-    if (other.MaxZ () > MaxZ ()) return BOX_SIDE_Z;
-    else return BOX_SIDE_z;
+    if (other.MaxZ () > MaxZ ()) return CS_BOX_SIDE_Z;
+    else return CS_BOX_SIDE_z;
   }
   return -1;
 }

@@ -410,7 +410,8 @@ void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)
 
   if (!tri_verts)
   {
-    tri_verts = new csTriangleVertices2 (texel_mesh, object_verts, GetVertexCount());
+    tri_verts = new csTriangleVertices2 (texel_mesh, object_verts,
+      GetVertexCount());
   }
 
   csTriangle * tris = texel_mesh->GetTriangles();

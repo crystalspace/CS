@@ -1519,11 +1519,12 @@ bool csTerrFuncObject::HitBeamOutline (const csVector3& start,
     tbox.AddBoundingVertex(v.x, max_y, v.z);
     tbox.AddBoundingVertex(v.x, min_y, v.z);
 
-    switch (csIntersect3::BoxSegment (tbox, rev, isect, NULL)) {
-      case BOX_SIDE_x: x--; break;
-      case BOX_SIDE_X: x++; break;
-      case BOX_SIDE_z: y--; break;
-      case BOX_SIDE_Z: y++; break;
+    switch (csIntersect3::BoxSegment (tbox, rev, isect, NULL))
+    {
+      case CS_BOX_SIDE_x: x--; break;
+      case CS_BOX_SIDE_X: x++; break;
+      case CS_BOX_SIDE_z: y--; break;
+      case CS_BOX_SIDE_Z: y++; break;
       default: return false;
     }
   }
@@ -1588,11 +1589,12 @@ bool csTerrFuncObject::HitBeamObject (const csVector3& start,
     tbox.AddBoundingVertex(v.x, max_y, v.z);
     tbox.AddBoundingVertex(v.x, min_y, v.z);
 
-    switch (csIntersect3::BoxSegment (tbox, rev, st, NULL)) {
-      case BOX_SIDE_x: x--; break;
-      case BOX_SIDE_X: x++; break;
-      case BOX_SIDE_z: y--; break;
-      case BOX_SIDE_Z: y++; break;
+    switch (csIntersect3::BoxSegment (tbox, rev, st, NULL))
+    {
+      case CS_BOX_SIDE_x: x--; break;
+      case CS_BOX_SIDE_X: x++; break;
+      case CS_BOX_SIDE_z: y--; break;
+      case CS_BOX_SIDE_Z: y++; break;
       default: brk = true;
     }
     if (brk) break;

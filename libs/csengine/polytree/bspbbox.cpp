@@ -63,8 +63,8 @@ void csBspPolygon::Dump ()
 
 int csBspPolygon::Classify (const csPlane3& pl)
 {
-  if (GetPolyPlane () == &pl) return POL_SAME_PLANE;
-  if (csMath3::PlanesEqual (pl, *GetPolyPlane ())) return POL_SAME_PLANE;
+  if (GetPolyPlane () == &pl) return CS_POL_SAME_PLANE;
+  if (csMath3::PlanesEqual (pl, *GetPolyPlane ())) return CS_POL_SAME_PLANE;
 
   int i;
   int front = 0, back = 0;
@@ -77,9 +77,9 @@ int csBspPolygon::Classify (const csPlane3& pl)
     if (dot > 0) back++;
     else if (dot < 0) front++;
   }
-  if (back == 0) return POL_FRONT;
-  if (front == 0) return POL_BACK;
-  return POL_SPLIT_NEEDED;
+  if (back == 0) return CS_POL_FRONT;
+  if (front == 0) return CS_POL_BACK;
+  return CS_POL_SPLIT_NEEDED;
 }
 
 int csBspPolygon::ClassifyX (float x)
@@ -94,9 +94,9 @@ int csBspPolygon::ClassifyX (float x)
     if (xx < -EPSILON) front++;
     else if (xx > EPSILON) back++;
   }
-  if (back == 0) return POL_FRONT;
-  if (front == 0) return POL_BACK;
-  return POL_SPLIT_NEEDED;
+  if (back == 0) return CS_POL_FRONT;
+  if (front == 0) return CS_POL_BACK;
+  return CS_POL_SPLIT_NEEDED;
 }
 
 int csBspPolygon::ClassifyY (float y)
@@ -111,9 +111,9 @@ int csBspPolygon::ClassifyY (float y)
     if (yy < -EPSILON) front++;
     else if (yy > EPSILON) back++;
   }
-  if (back == 0) return POL_FRONT;
-  if (front == 0) return POL_BACK;
-  return POL_SPLIT_NEEDED;
+  if (back == 0) return CS_POL_FRONT;
+  if (front == 0) return CS_POL_BACK;
+  return CS_POL_SPLIT_NEEDED;
 }
 
 int csBspPolygon::ClassifyZ (float z)
@@ -128,9 +128,9 @@ int csBspPolygon::ClassifyZ (float z)
     if (zz < -EPSILON) front++;
     else if (zz > EPSILON) back++;
   }
-  if (back == 0) return POL_FRONT;
-  if (front == 0) return POL_BACK;
-  return POL_SPLIT_NEEDED;
+  if (back == 0) return CS_POL_FRONT;
+  if (front == 0) return CS_POL_BACK;
+  return CS_POL_SPLIT_NEEDED;
 }
 
 
@@ -919,28 +919,28 @@ void csPolyTreeBBox::Update (const csBox3& object_bbox, const csTransform& o2w,
   // Transform from object to world space here.
   world_bbox.StartBoundingBox ();
   csVector3 v;
-  v = o2w.Other2This (b.GetCorner (BOX_CORNER_xyz));
+  v = o2w.Other2This (b.GetCorner (CS_BOX_CORNER_xyz));
   int pt_xyz = va.AddVertex (v);
   world_bbox.AddBoundingVertex (v);
-  v = o2w.Other2This (b.GetCorner (BOX_CORNER_Xyz));
+  v = o2w.Other2This (b.GetCorner (CS_BOX_CORNER_Xyz));
   int pt_Xyz = va.AddVertex (v);
   world_bbox.AddBoundingVertex (v);
-  v = o2w.Other2This (b.GetCorner (BOX_CORNER_xYz));
+  v = o2w.Other2This (b.GetCorner (CS_BOX_CORNER_xYz));
   int pt_xYz = va.AddVertex (v);
   world_bbox.AddBoundingVertex (v);
-  v = o2w.Other2This (b.GetCorner (BOX_CORNER_XYz));
+  v = o2w.Other2This (b.GetCorner (CS_BOX_CORNER_XYz));
   int pt_XYz = va.AddVertex (v);
   world_bbox.AddBoundingVertex (v);
-  v = o2w.Other2This (b.GetCorner (BOX_CORNER_xyZ));
+  v = o2w.Other2This (b.GetCorner (CS_BOX_CORNER_xyZ));
   int pt_xyZ = va.AddVertex (v);
   world_bbox.AddBoundingVertex (v);
-  v = o2w.Other2This (b.GetCorner (BOX_CORNER_XyZ));
+  v = o2w.Other2This (b.GetCorner (CS_BOX_CORNER_XyZ));
   int pt_XyZ = va.AddVertex (v);
   world_bbox.AddBoundingVertex (v);
-  v = o2w.Other2This (b.GetCorner (BOX_CORNER_xYZ));
+  v = o2w.Other2This (b.GetCorner (CS_BOX_CORNER_xYZ));
   int pt_xYZ = va.AddVertex (v);
   world_bbox.AddBoundingVertex (v);
-  v = o2w.Other2This (b.GetCorner (BOX_CORNER_XYZ));
+  v = o2w.Other2This (b.GetCorner (CS_BOX_CORNER_XYZ));
   int pt_XYZ = va.AddVertex (v);
   world_bbox.AddBoundingVertex (v);
 
@@ -1024,14 +1024,14 @@ void csPolyTreeBBox::Update (const csBox3& world_bbox, csVisObjInfo* originator)
   const csBox3& b = world_bbox;
 
   // Add the eight corner points of the bounding box to the container.
-  int pt_xyz = va.AddVertex (b.GetCorner (BOX_CORNER_xyz));
-  int pt_Xyz = va.AddVertex (b.GetCorner (BOX_CORNER_Xyz));
-  int pt_xYz = va.AddVertex (b.GetCorner (BOX_CORNER_xYz));
-  int pt_XYz = va.AddVertex (b.GetCorner (BOX_CORNER_XYz));
-  int pt_xyZ = va.AddVertex (b.GetCorner (BOX_CORNER_xyZ));
-  int pt_XyZ = va.AddVertex (b.GetCorner (BOX_CORNER_XyZ));
-  int pt_xYZ = va.AddVertex (b.GetCorner (BOX_CORNER_xYZ));
-  int pt_XYZ = va.AddVertex (b.GetCorner (BOX_CORNER_XYZ));
+  int pt_xyz = va.AddVertex (b.GetCorner (CS_BOX_CORNER_xyz));
+  int pt_Xyz = va.AddVertex (b.GetCorner (CS_BOX_CORNER_Xyz));
+  int pt_xYz = va.AddVertex (b.GetCorner (CS_BOX_CORNER_xYz));
+  int pt_XYz = va.AddVertex (b.GetCorner (CS_BOX_CORNER_XYz));
+  int pt_xyZ = va.AddVertex (b.GetCorner (CS_BOX_CORNER_xyZ));
+  int pt_XyZ = va.AddVertex (b.GetCorner (CS_BOX_CORNER_XyZ));
+  int pt_xYZ = va.AddVertex (b.GetCorner (CS_BOX_CORNER_xYZ));
+  int pt_XYZ = va.AddVertex (b.GetCorner (CS_BOX_CORNER_XYZ));
 
   csBspPolygon* poly;
 
@@ -1121,19 +1121,19 @@ void csPolyTreeBBox::SplitWithPlane (csPolygonStub* stub,
     int c = polygons[i]->Classify (plane);
     switch (c)
     {
-      case POL_SAME_PLANE:
+      case CS_POL_SAME_PLANE:
         stub_on->GetPolygonArray ().AddPolygon (polygons[i]);
 	polygons[i]->IncRefCount ();
 	break;
-      case POL_FRONT:
+      case CS_POL_FRONT:
         stub_front->GetPolygonArray ().AddPolygon (polygons[i]);
 	polygons[i]->IncRefCount ();
 	break;
-      case POL_BACK:
+      case CS_POL_BACK:
         stub_back->GetPolygonArray ().AddPolygon (polygons[i]);
 	polygons[i]->IncRefCount ();
 	break;
-      case POL_SPLIT_NEEDED:
+      case CS_POL_SPLIT_NEEDED:
 	{
 	  csPolygonInt* np1, * np2;
 	  polygons[i]->SplitWithPlane (&np1, &np2, plane);
@@ -1189,16 +1189,16 @@ void csPolyTreeBBox::SplitWithPlaneX (csPolygonStub* stub,
     int c = polygons[i]->ClassifyX (x);
     switch (c)
     {
-      case POL_SAME_PLANE:
-      case POL_FRONT:
+      case CS_POL_SAME_PLANE:
+      case CS_POL_FRONT:
         stub_front->GetPolygonArray ().AddPolygon (polygons[i]);
 	polygons[i]->IncRefCount ();
 	break;
-      case POL_BACK:
+      case CS_POL_BACK:
         stub_back->GetPolygonArray ().AddPolygon (polygons[i]);
 	polygons[i]->IncRefCount ();
 	break;
-      case POL_SPLIT_NEEDED:
+      case CS_POL_SPLIT_NEEDED:
 	{
 	  csPolygonInt* np1, * np2;
 	  polygons[i]->SplitWithPlaneX (&np1, &np2, x);
@@ -1248,16 +1248,16 @@ void csPolyTreeBBox::SplitWithPlaneY (csPolygonStub* stub,
     int c = polygons[i]->ClassifyY (y);
     switch (c)
     {
-      case POL_SAME_PLANE:
-      case POL_FRONT:
+      case CS_POL_SAME_PLANE:
+      case CS_POL_FRONT:
         stub_front->GetPolygonArray ().AddPolygon (polygons[i]);
 	polygons[i]->IncRefCount ();
 	break;
-      case POL_BACK:
+      case CS_POL_BACK:
         stub_back->GetPolygonArray ().AddPolygon (polygons[i]);
 	polygons[i]->IncRefCount ();
 	break;
-      case POL_SPLIT_NEEDED:
+      case CS_POL_SPLIT_NEEDED:
 	{
 	  csPolygonInt* np1, * np2;
 	  polygons[i]->SplitWithPlaneY (&np1, &np2, y);
@@ -1307,16 +1307,16 @@ void csPolyTreeBBox::SplitWithPlaneZ (csPolygonStub* stub,
     int c = polygons[i]->ClassifyZ (z);
     switch (c)
     {
-      case POL_SAME_PLANE:
-      case POL_FRONT:
+      case CS_POL_SAME_PLANE:
+      case CS_POL_FRONT:
         stub_front->GetPolygonArray ().AddPolygon (polygons[i]);
 	polygons[i]->IncRefCount ();
 	break;
-      case POL_BACK:
+      case CS_POL_BACK:
         stub_back->GetPolygonArray ().AddPolygon (polygons[i]);
 	polygons[i]->IncRefCount ();
 	break;
-      case POL_SPLIT_NEEDED:
+      case CS_POL_SPLIT_NEEDED:
 	{
 	  csPolygonInt* np1, * np2;
 	  polygons[i]->SplitWithPlaneZ (&np1, &np2, z);

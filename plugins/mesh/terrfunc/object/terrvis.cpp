@@ -130,53 +130,53 @@ void csTerrainQuad::ComputeExtent(const csVector3& campos, const csBox3& bbox,
   // those two vertices.
 
   // In the code below we compute the left index which is compatible
-  // with BOX_CORNER_xyz (for csBox3::GetCorner()).
+  // with CS_BOX_CORNER_xyz (for csBox3::GetCorner()).
   int left_idx;
   if (campos.x < bbox.MinX ())
   {
     if (campos.z > bbox.MaxZ ())
-      left_idx = BOX_CORNER_XyZ;
+      left_idx = CS_BOX_CORNER_XyZ;
     else
-      left_idx = BOX_CORNER_xyZ;
+      left_idx = CS_BOX_CORNER_xyZ;
   }
   else if (campos.x > bbox.MaxX ())
   {
     if (campos.z < bbox.MinZ ())
-      left_idx = BOX_CORNER_xyz;
+      left_idx = CS_BOX_CORNER_xyz;
     else
-      left_idx = BOX_CORNER_Xyz;
+      left_idx = CS_BOX_CORNER_Xyz;
   }
   else
   {
     if (campos.z < bbox.MinZ ())
-      left_idx = BOX_CORNER_xyz;
+      left_idx = CS_BOX_CORNER_xyz;
     else
-      left_idx = BOX_CORNER_XyZ;
+      left_idx = CS_BOX_CORNER_XyZ;
   }
 
   // In the code below we compute the right index which is compatible
-  // with BOX_CORNER_xyz (for csBox3::GetCorner()).
+  // with CS_BOX_CORNER_xyz (for csBox3::GetCorner()).
   int right_idx;
   if (campos.z < bbox.MinZ ())
   {
     if (campos.x < bbox.MaxX ())
-      right_idx = BOX_CORNER_Xyz;
+      right_idx = CS_BOX_CORNER_Xyz;
     else
-      right_idx = BOX_CORNER_XyZ;
+      right_idx = CS_BOX_CORNER_XyZ;
   }
   else if (campos.z > bbox.MaxZ ())
   {
     if (campos.x < bbox.MinX ())
-      right_idx = BOX_CORNER_xyz;
+      right_idx = CS_BOX_CORNER_xyz;
     else
-      right_idx = BOX_CORNER_xyZ;
+      right_idx = CS_BOX_CORNER_xyZ;
   }
   else
   {
     if (campos.x < bbox.MinX ())
-      right_idx = BOX_CORNER_xyz;
+      right_idx = CS_BOX_CORNER_xyz;
     else
-      right_idx = BOX_CORNER_XyZ;
+      right_idx = CS_BOX_CORNER_XyZ;
   }
 
   // left_idx and right_idx are now the left-most and right-most

@@ -23,13 +23,13 @@
 
 /*
  *	A general purpose thread safe queue. You may use this queue directly
- *	by using the DECLARE_TYPED_QUEUE( QueueType, Content type ). This is
+ *	by using the CS_DECLARE_TYPED_QUEUE( QueueType, Content type ). This is
  *	loosely based on csEventQueue, but does not specifically use iEvent.
  *	Place the declare typed queue somewhere in a header file then place
  *	declare typed queue base in a code page to complete the macro.
  */
 
-#define DECLARE_TYPED_QUEUE( NAME, TYPE, DEF_QUEUE_LENGTH ) \
+#define CS_DECLARE_TYPED_QUEUE( NAME, TYPE, DEF_QUEUE_LENGTH ) \
 class NAME \
 { \
   volatile TYPE **Content; \
@@ -53,7 +53,7 @@ private: \
 
 
 
-#define DECLARE_TYPED_QUEUE_BASE( NAME, TYPE, DEF_QUEUE_LENGTH ) \
+#define CS_DECLARE_TYPED_QUEUE_BASE( NAME, TYPE, DEF_QUEUE_LENGTH ) \
 NAME::NAME ( int len ) : Content(NULL), Length(0), Spinlock(0) \
 { \
   qHead = qTail = 0; \

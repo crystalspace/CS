@@ -670,8 +670,8 @@ bool csPolygon3D::IsTransparent ()
 
 int csPolygon3D::Classify (const csPlane3& pl)
 {
-  if (GetPolyPlane () == &pl) return POL_SAME_PLANE;
-  if (csMath3::PlanesEqual (pl, *GetPolyPlane ())) return POL_SAME_PLANE;
+  if (GetPolyPlane () == &pl) return CS_POL_SAME_PLANE;
+  if (csMath3::PlanesEqual (pl, *GetPolyPlane ())) return CS_POL_SAME_PLANE;
 
   int i;
   int front = 0, back = 0;
@@ -683,9 +683,9 @@ int csPolygon3D::Classify (const csPlane3& pl)
     if (dot > 0) back++;
     else if (dot < 0) front++;
   }
-  if (back == 0) return POL_FRONT;
-  if (front == 0) return POL_BACK;
-  return POL_SPLIT_NEEDED;
+  if (back == 0) return CS_POL_FRONT;
+  if (front == 0) return CS_POL_BACK;
+  return CS_POL_SPLIT_NEEDED;
 }
 
 int csPolygon3D::ClassifyX (float x)
@@ -699,10 +699,10 @@ int csPolygon3D::ClassifyX (float x)
     if (xx < -EPSILON) front++;
     else if (xx > EPSILON) back++;
   }
-  if (back == 0 && front == 0) return POL_SAME_PLANE;
-  if (back == 0) return POL_FRONT;
-  if (front == 0) return POL_BACK;
-  return POL_SPLIT_NEEDED;
+  if (back == 0 && front == 0) return CS_POL_SAME_PLANE;
+  if (back == 0) return CS_POL_FRONT;
+  if (front == 0) return CS_POL_BACK;
+  return CS_POL_SPLIT_NEEDED;
 }
 
 int csPolygon3D::ClassifyY (float y)
@@ -716,10 +716,10 @@ int csPolygon3D::ClassifyY (float y)
     if (yy < -EPSILON) front++;
     else if (yy > EPSILON) back++;
   }
-  if (back == 0 && front == 0) return POL_SAME_PLANE;
-  if (back == 0) return POL_FRONT;
-  if (front == 0) return POL_BACK;
-  return POL_SPLIT_NEEDED;
+  if (back == 0 && front == 0) return CS_POL_SAME_PLANE;
+  if (back == 0) return CS_POL_FRONT;
+  if (front == 0) return CS_POL_BACK;
+  return CS_POL_SPLIT_NEEDED;
 }
 
 int csPolygon3D::ClassifyZ (float z)
@@ -733,10 +733,10 @@ int csPolygon3D::ClassifyZ (float z)
     if (zz < -EPSILON) front++;
     else if (zz > EPSILON) back++;
   }
-  if (back == 0 && front == 0) return POL_SAME_PLANE;
-  if (back == 0) return POL_FRONT;
-  if (front == 0) return POL_BACK;
-  return POL_SPLIT_NEEDED;
+  if (back == 0 && front == 0) return CS_POL_SAME_PLANE;
+  if (back == 0) return CS_POL_FRONT;
+  if (front == 0) return CS_POL_BACK;
+  return CS_POL_SPLIT_NEEDED;
 }
 
 void csPolygon3D::ComputeNormal ()

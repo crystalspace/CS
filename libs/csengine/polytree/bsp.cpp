@@ -202,9 +202,9 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, int num)
 	else
 	  jj = j;
         int c = polygons[jj]->Classify (poly_plane);
-	if (c == POL_FRONT) front++;
-	else if (c == POL_BACK) back++;
-	else if (c == POL_SPLIT_NEEDED) splits++;
+	if (c == CS_POL_FRONT) front++;
+	else if (c == CS_POL_BACK) back++;
+	else if (c == CS_POL_SPLIT_NEEDED) splits++;
       }
       // balance_penalty is 0 for a very good balanced tree and
       // 1 for a very bad one.
@@ -241,7 +241,7 @@ void csBspTree::Build (csBspNode* node, csPolygonInt** polygons,
     node->polygons_on_splitter = true;
     node->splitter = *(polygons[0]->GetPolyPlane ());
     for (i = 1 ; i < num ; i++)
-      if (polygons[i]->Classify (node->splitter) != POL_SAME_PLANE)
+      if (polygons[i]->Classify (node->splitter) != CS_POL_SAME_PLANE)
       {
         node->polygons_on_splitter = false;
 	break;
@@ -265,16 +265,16 @@ void csBspTree::Build (csBspNode* node, csPolygonInt** polygons,
     int c = polygons[i]->Classify (node->splitter);
     switch (c)
     {
-      case POL_SAME_PLANE:
+      case CS_POL_SAME_PLANE:
       	node->AddPolygon (polygons[i]);
 	break;
-      case POL_FRONT:
+      case CS_POL_FRONT:
         front_poly[front_idx++] = polygons[i];
 	break;
-      case POL_BACK:
+      case CS_POL_BACK:
         back_poly[back_idx++] = polygons[i];
 	break;
-      case POL_SPLIT_NEEDED:
+      case CS_POL_SPLIT_NEEDED:
 	{
 	  csPolygonInt* np1, * np2;
 	  polygons[i]->SplitWithPlane (&np1, &np2, node->splitter);
@@ -581,16 +581,16 @@ bool csBspTree::ReadFromCache (iFile* cf, csBspNode* node,
     int c = polygons[i]->Classify (node->splitter);
     switch (c)
     {
-      case POL_SAME_PLANE:
+      case CS_POL_SAME_PLANE:
       	node->AddPolygon (polygons[i]);
 	break;
-      case POL_FRONT:
+      case CS_POL_FRONT:
         front_poly[front_idx++] = polygons[i];
 	break;
-      case POL_BACK:
+      case CS_POL_BACK:
         back_poly[back_idx++] = polygons[i];
 	break;
-      case POL_SPLIT_NEEDED:
+      case CS_POL_SPLIT_NEEDED:
 	{
 	  csPolygonInt* np1, * np2;
 	  polygons[i]->SplitWithPlane (&np1, &np2, node->splitter);

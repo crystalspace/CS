@@ -254,17 +254,23 @@ int csMath3::FindObserverSides (const csBox3& box1, const csBox3& box2,
   int num_sides = 0;
   csPlane3 pl;
   pl.Set (1, 0, 0, -box1.MinX ());
-  if (pl.Classify (box2.GetCorner (BOX_CORNER_xyz)) < 0) sides[num_sides++] = 0;
+  if (pl.Classify (box2.GetCorner (CS_BOX_CORNER_xyz)) < 0)
+    sides[num_sides++] = 0;
   pl.Set (-1, 0, 0, box1.MaxX ());
-  if (pl.Classify (box2.GetCorner (BOX_CORNER_Xyz)) < 0) sides[num_sides++] = 1;
+  if (pl.Classify (box2.GetCorner (CS_BOX_CORNER_Xyz)) < 0)
+    sides[num_sides++] = 1;
   pl.Set (0, 1, 0, -box1.MinY ());
-  if (pl.Classify (box2.GetCorner (BOX_CORNER_xyz)) < 0) sides[num_sides++] = 2;
+  if (pl.Classify (box2.GetCorner (CS_BOX_CORNER_xyz)) < 0)
+    sides[num_sides++] = 2;
   pl.Set (0, -1, 0, box1.MaxY ());
-  if (pl.Classify (box2.GetCorner (BOX_CORNER_xYz)) < 0) sides[num_sides++] = 3;
+  if (pl.Classify (box2.GetCorner (CS_BOX_CORNER_xYz)) < 0)
+    sides[num_sides++] = 3;
   pl.Set (0, 0, 1, -box1.MinZ ());
-  if (pl.Classify (box2.GetCorner (BOX_CORNER_xyz)) < 0) sides[num_sides++] = 4;
+  if (pl.Classify (box2.GetCorner (CS_BOX_CORNER_xyz)) < 0)
+    sides[num_sides++] = 4;
   pl.Set (0, 0, -1, box1.MaxZ ());
-  if (pl.Classify (box2.GetCorner (BOX_CORNER_xyZ)) < 0) sides[num_sides++] = 5;
+  if (pl.Classify (box2.GetCorner (CS_BOX_CORNER_xyZ)) < 0)
+    sides[num_sides++] = 5;
   return num_sides;
 }
 
@@ -580,16 +586,16 @@ int csIntersect3::BoxSegment (const csBox3& box, const csSegment3& seg,
   int num_sides = box.GetVisibleSides (u, sides);
   int i;
   // If there are no sides then we're in the box so we can return true.
-  if (num_sides == 0) { isect = u; if (pr) *pr = 0; return BOX_INSIDE; }
+  if (num_sides == 0) { isect = u; if (pr) *pr = 0; return CS_BOX_INSIDE; }
   for (i = 0 ; i < num_sides ; i++)
   {
     switch (sides[i])
     {
-      case BOX_SIDE_x:
+      case CS_BOX_SIDE_x:
         plane_pos = box.MinX ();
 	// Fall THRU...
-      case BOX_SIDE_X:
-        if (sides[i] == BOX_SIDE_X) plane_pos = box.MaxX ();
+      case CS_BOX_SIDE_X:
+        if (sides[i] == CS_BOX_SIDE_X) plane_pos = box.MaxX ();
         if (ABS (v.x - u.x) > SMALL_EPSILON)
 	{
           r = (plane_pos-u.x) / (v.x-u.x);
@@ -605,11 +611,11 @@ int csIntersect3::BoxSegment (const csBox3& box, const csSegment3& seg,
 	  }
 	}
 	break;
-      case BOX_SIDE_y:
+      case CS_BOX_SIDE_y:
         plane_pos = box.MinY ();
 	// Fall THRU...
-      case BOX_SIDE_Y:
-        if (sides[i] == BOX_SIDE_Y) plane_pos = box.MaxY ();
+      case CS_BOX_SIDE_Y:
+        if (sides[i] == CS_BOX_SIDE_Y) plane_pos = box.MaxY ();
         if (ABS (v.y - u.y) > SMALL_EPSILON)
         {
           r = (plane_pos-u.y) / (v.y-u.y);
@@ -625,11 +631,11 @@ int csIntersect3::BoxSegment (const csBox3& box, const csSegment3& seg,
 	  }
 	}
 	break;
-      case BOX_SIDE_z:
+      case CS_BOX_SIDE_z:
         plane_pos = box.MinZ ();
 	// Fall THRU...
-      case BOX_SIDE_Z:
-        if (sides[i] == BOX_SIDE_Z) plane_pos = box.MaxZ ();
+      case CS_BOX_SIDE_Z:
+        if (sides[i] == CS_BOX_SIDE_Z) plane_pos = box.MaxZ ();
         if (ABS (v.z - u.z) > SMALL_EPSILON)
         {
           r = (plane_pos-u.z) / (v.z-u.z);

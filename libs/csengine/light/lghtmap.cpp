@@ -308,7 +308,7 @@ bool csLightMap::ReadFromCache (int id, int w, int h,
   else
     CacheName (buf, "C", id, curve->GetCurveID (), "_d");
   data = engine->VFS->ReadFile (buf);
-  if (!data) return true;	// No dynamic data. @@@ Recalculate dynamic data?
+  if (!data) return true;	// No dynamic data. @@@ Recalc dynamic data?
 
   d = **data;
   memcpy (lh.header, d, 4); d += 4;

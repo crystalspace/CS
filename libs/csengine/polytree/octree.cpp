@@ -226,14 +226,14 @@ static void SplitOptPlane (csPolygonInt* np, csPolygonInt** npF, csPolygonInt** 
     case 1: rc = np->ClassifyY (xyz_val); break;
     case 2: rc = np->ClassifyZ (xyz_val); break;
   }
-  if (rc == POL_SPLIT_NEEDED)
+  if (rc == CS_POL_SPLIT_NEEDED)
     switch (xyz)
     {
       case 0: np->SplitWithPlaneX (npF, npB, xyz_val); break;
       case 1: np->SplitWithPlaneY (npF, npB, xyz_val); break;
       case 2: np->SplitWithPlaneZ (npF, npB, xyz_val); break;
     }
-  else if (rc == POL_BACK)
+  else if (rc == CS_POL_BACK)
   {
     *npF = NULL;
     *npB = np;
@@ -360,8 +360,8 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
     for (j = 0 ; j < num ; j++)
     {
       rc = polygons[j]->ClassifyX (x);
-      if (rc == POL_SPLIT_NEEDED) splits++;
-      //else if (rc == POL_SAME_PLANE) splits -= 2;	// Very good!
+      if (rc == CS_POL_SPLIT_NEEDED) splits++;
+      //else if (rc == CS_POL_SAME_PLANE) splits -= 2;	// Very good!
     }
     if (splits < best_splits)
     {
@@ -377,8 +377,8 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
     for (j = 0 ; j < num ; j++)
     {
       rc = polygons[j]->ClassifyY (y);
-      if (rc == POL_SPLIT_NEEDED) splits++;
-      //else if (rc == POL_SAME_PLANE) splits -= 2;	// Very good!
+      if (rc == CS_POL_SPLIT_NEEDED) splits++;
+      //else if (rc == CS_POL_SAME_PLANE) splits -= 2;	// Very good!
     }
     if (splits < best_splits)
     {
@@ -394,8 +394,8 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
     for (j = 0 ; j < num ; j++)
     {
       rc = polygons[j]->ClassifyZ (z);
-      if (rc == POL_SPLIT_NEEDED) splits++;
-      //else if (rc == POL_SAME_PLANE) splits -= 2;	// Very good!
+      if (rc == CS_POL_SPLIT_NEEDED) splits++;
+      //else if (rc == CS_POL_SAME_PLANE) splits -= 2;	// Very good!
     }
     if (splits < best_splits)
     {

@@ -60,7 +60,7 @@ private:
 
   /**
    * Six masks representing solid space on the boundaries
-   * of this node. Use the BOX_SIDE_xxx flags to fetch them.
+   * of this node. Use the CS_BOX_SIDE_xxx flags to fetch them.
    */
   uint16 solid_masks[6];
 
@@ -140,7 +140,7 @@ public:
 
   /**
    * Get one of the masks representing solid space on the boundaries
-   * of this node. Use the BOX_SIDE_xxx flags to fetch them.
+   * of this node. Use the CS_BOX_SIDE_xxx flags to fetch them.
    */
   uint16 GetSolidMask (int idx) { return solid_masks[idx]; }
 
@@ -178,7 +178,7 @@ public:
   /**
    * Create an iterator to iterate over all solid polygons that
    * are on the specified side of this octree node ('side' is one
-   * of BOX_SIDE_xxx flags).
+   * of CS_BOX_SIDE_xxx flags).
    */
   void* InitSolidPolygonIterator (int side);
 

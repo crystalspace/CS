@@ -165,10 +165,10 @@ int csPoly3D::Classify (const csPlane3& pl, csVector3* vertices,
     if (dot > 0) back++;
     else if (dot < 0) front++;
   }
-  if (back == 0 && front == 0) return POL_SAME_PLANE;
-  if (back == 0) return POL_FRONT;
-  if (front == 0) return POL_BACK;
-  return POL_SPLIT_NEEDED;
+  if (back == 0 && front == 0) return CS_POL_SAME_PLANE;
+  if (back == 0) return CS_POL_FRONT;
+  if (front == 0) return CS_POL_BACK;
+  return CS_POL_SPLIT_NEEDED;
 }
 
 int csPoly3D::ClassifyX (float x) const
@@ -182,9 +182,9 @@ int csPoly3D::ClassifyX (float x) const
     if (xx < -EPSILON) front++;
     else if (xx > EPSILON) back++;
   }
-  if (back == 0) return POL_FRONT;
-  if (front == 0) return POL_BACK;
-  return POL_SPLIT_NEEDED;
+  if (back == 0) return CS_POL_FRONT;
+  if (front == 0) return CS_POL_BACK;
+  return CS_POL_SPLIT_NEEDED;
 }
 
 int csPoly3D::ClassifyY (float y) const
@@ -198,9 +198,9 @@ int csPoly3D::ClassifyY (float y) const
     if (yy < -EPSILON) front++;
     else if (yy > EPSILON) back++;
   }
-  if (back == 0) return POL_FRONT;
-  if (front == 0) return POL_BACK;
-  return POL_SPLIT_NEEDED;
+  if (back == 0) return CS_POL_FRONT;
+  if (front == 0) return CS_POL_BACK;
+  return CS_POL_SPLIT_NEEDED;
 }
 
 int csPoly3D::ClassifyZ (float z) const
@@ -214,9 +214,9 @@ int csPoly3D::ClassifyZ (float z) const
     if (zz < -EPSILON) front++;
     else if (zz > EPSILON) back++;
   }
-  if (back == 0) return POL_FRONT;
-  if (front == 0) return POL_BACK;
-  return POL_SPLIT_NEEDED;
+  if (back == 0) return CS_POL_FRONT;
+  if (front == 0) return CS_POL_BACK;
+  return CS_POL_SPLIT_NEEDED;
 }
 
 void csPoly3D::SplitWithPlane (csPoly3D& poly1, csPoly3D& poly2,

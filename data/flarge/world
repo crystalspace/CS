@@ -85,6 +85,8 @@ WORLD (
     PLUGIN 'spr2d' ('crystalspace.mesh.loader.sprite.2d')
     PLUGIN 'cubeFact' ('crystalspace.mesh.loader.factory.cube')
     PLUGIN 'cube' ('crystalspace.mesh.loader.cube')
+    PLUGIN 'meshFact' ('crystalspace.mesh.loader.factory.genmesh')
+    PLUGIN 'mesh' ('crystalspace.mesh.loader.genmesh')
     PLUGIN 'metafact' ('crystalspace.mesh.loader.factory.metaball')
     PLUGIN 'metablob' ('crystalspace.mesh.loader.metaball')
     PLUGIN 'emitFact' ('crystalspace.mesh.loader.factory.emit')
@@ -160,6 +162,39 @@ WORLD (
       FIRST_LEN (5)
       SECOND (-20,8,29)
       SECOND_LEN (5)
+    )
+  )
+
+  MESHFACT 'genMeshFact' (
+    PLUGIN ('meshFact')
+    PARAMS (
+      ; 8 vertices and 12 triangles.
+      NUM (8,12)
+      VERTICES (
+        V (-.1,.1,.1:0,0)
+        V (-.1,.1,-.1:1,0)
+        V (.1,.1,-.1:0,1)
+        V (.1,.1,.1:1,1)
+        V (-.1,-.1,.1:1,0)
+        V (-.1,-.1,-.1:0,1)
+        V (.1,-.1,-.1:1,1)
+        V (.1,-.1,.1:0,0)
+      )
+      TRIANGLES (
+        T (0,3,1)
+        T (3,2,1)
+        T (4,5,7)
+        T (5,6,7)
+        T (0,4,3)
+        T (4,7,3)
+        T (1,6,5)
+        T (1,2,6)
+        T (0,1,5)
+        T (0,5,4)
+        T (2,3,7)
+        T (2,7,6)
+      )
+      AUTONORMALS()
     )
   )
 
@@ -2366,6 +2401,14 @@ WORLD (
       MOVE (V (-10,-1,14))
     )
     LIGHT (3.5,2,12.5:5,.7,.7,.8, 0)
+    MESHOBJ 'genMesh' (
+      PLUGIN ('mesh')
+      PARAMS (
+        FACTORY ('genMeshFact')
+	MATERIAL ('mosaic')
+      )
+      MOVE (V (-1.5,.3,14))
+    )
     MESHOBJ 'sprSkel' (
       PLUGIN ('spr3d')
       PARAMS (

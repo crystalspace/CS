@@ -22,10 +22,10 @@
 #include "csgeom/math3d.h"
 
 // Values returned by classify.
-#define POL_SAME_PLANE 0
-#define POL_FRONT 1
-#define POL_BACK 2
-#define POL_SPLIT_NEEDED 3
+#define CS_POL_SAME_PLANE 0
+#define CS_POL_FRONT 1
+#define CS_POL_BACK 2
+#define CS_POL_SPLIT_NEEDED 3
 
 class csPoly2D;
 
@@ -196,20 +196,20 @@ public:
 
   /**
    * Static function to classify a polygon with regards to a plane.
-   * If this poly is on same plane it returns POL_SAME_PLANE.
+   * If this poly is on same plane it returns CS_POL_SAME_PLANE.
    * If this poly is completely in front of the given plane it returnes
-   * POL_FRONT. If this poly is completely back of the given plane it
-   * returnes POL_BACK. Otherwise it returns POL_SPLIT_NEEDED.
+   * CS_POL_FRONT. If this poly is completely back of the given plane it
+   * returnes CS_POL_BACK. Otherwise it returns CS_POL_SPLIT_NEEDED.
    */
   static int Classify (const csPlane3& pl,
   	csVector3* vertices, int num_vertices);
 
   /**
    * Classify this polygon with regards to a plane.
-   * If this poly is on same plane it returns POL_SAME_PLANE. If this poly is
-   * completely in front of the given plane it returnes POL_FRONT. If this
-   * poly is completely back of the given plane it returnes POL_BACK.
-   * Otherwise it returns POL_SPLIT_NEEDED.
+   * If this poly is on same plane it returns CS_POL_SAME_PLANE. If this poly is
+   * completely in front of the given plane it returnes CS_POL_FRONT. If this
+   * poly is completely back of the given plane it returnes CS_POL_BACK.
+   * Otherwise it returns CS_POL_SPLIT_NEEDED.
    */
   int Classify (const csPlane3& pl) const
   {
