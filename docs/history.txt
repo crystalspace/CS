@@ -43,6 +43,8 @@ chronological order.
 	  MacOS/X (via the --with-x switch).  In this case, the checks were
 	  still incorrectly trying to locate OpenGL.framework, GLU.framework,
 	  and GLUT.framework, rather than the XFree86 resources.
+	- Steven Geens fixed sprite sockets. They wouldn't work correctly 
+	  if morph targets were used.
 10-Jan-2004
 	- res added a facility to draw meshes with less render buffer juggling
 	  etc. required from the client.

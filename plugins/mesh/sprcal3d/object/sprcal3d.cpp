@@ -1153,43 +1153,65 @@ void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,csTicks current_
   {
     iMovable* movable = socket->GetMeshWrapper()->GetMovable();
     Advance(current_time);
+    // Get the submesh
+    CalSubmesh* submesh = calModel.getMesh(socket->GetMeshIndex())->getSubmesh(socket->GetSubmeshIndex());
+    // Get the core submesh
     CalCoreSubmesh* coresubmesh = calModel.getCoreModel()->
       getCoreMesh(socket->GetMeshIndex())->getCoreSubmesh(socket->GetSubmeshIndex());
+    // get the sub morph target vector from the core sub mesh
+    std::vector<CalCoreSubMorphTarget*>& vectorSubMorphTarget =
+      coresubmesh->getVectorCoreSubMorphTarget();
+    // calculate the base weight
+    float baseWeight = submesh->getBaseWeight();
+    // get the number of morph targets
+    int morphTargetCount = submesh->getMorphTargetWeightCount();
+    // get the triangle
     CalCoreSubmesh::Face face = coresubmesh->getVectorFace()[socket->GetTriangleIndex()];
-    CalCoreSubmesh::Vertex vertex1 = coresubmesh->getVectorVertex()[face.vertexId[0]];
-    CalCoreSubmesh::Vertex vertex2 = coresubmesh->getVectorVertex()[face.vertexId[1]];
-    CalCoreSubmesh::Vertex vertex3 = coresubmesh->getVectorVertex()[face.vertexId[2]];
-    CalVector vector1(0,0,0);
-    CalVector vector2(0,0,0);
-    CalVector vector3(0,0,0);
+    // get the vertices
+    CalCoreSubmesh::Vertex vertex[3];
+    vertex[0] = coresubmesh->getVectorVertex()[face.vertexId[0]];
+    vertex[1] = coresubmesh->getVectorVertex()[face.vertexId[1]];
+    vertex[2] = coresubmesh->getVectorVertex()[face.vertexId[2]];
+    CalVector vector[3];
     unsigned int i;
-    for(i=0;i<vertex1.vectorInfluence.size();i++)
+    unsigned int j;
+    for(i=0;i<3;i++)
     {
-      CalBone* bone = calModel.getSkeleton()->getBone(vertex1.vectorInfluence[i].boneId);
-      CalVector v(vertex1.position);
-      v *= bone->getTransformMatrix();
-      v += bone->getTranslationBoneSpace();
-      vector1 += vertex1.vectorInfluence[i].weight*v;
+      CalVector position(0,0,0);
+      if(baseWeight == 1.0f)
+      {
+	position.x = vertex[i].position.x;
+	position.y = vertex[i].position.y;
+	position.z = vertex[i].position.z;
+      }
+      else
+      {
+	position.x = baseWeight*vertex[i].position.x;
+	position.y = baseWeight*vertex[i].position.y;
+	position.z = baseWeight*vertex[i].position.z;
+	int morphTargetId;
+	for(morphTargetId=0; morphTargetId < morphTargetCount;++morphTargetId)
+	{
+	  CalCoreSubMorphTarget::BlendVertex& blendVertex =
+	    vectorSubMorphTarget[morphTargetId]->getVectorBlendVertex()[face.vertexId[i]];
+	  float currentWeight = submesh->getMorphTargetWeight(morphTargetId);
+	  position.x += currentWeight*blendVertex.position.x;
+	  position.y += currentWeight*blendVertex.position.y;
+	  position.z += currentWeight*blendVertex.position.z;
+	}
+      }
+      for(j=0;j<vertex[i].vectorInfluence.size();j++)
+      {
+	CalBone* bone = calModel.getSkeleton()->getBone(vertex[i].vectorInfluence[j].boneId);
+	CalVector v(position);
+	v *= bone->getTransformMatrix();
+	v += bone->getTranslationBoneSpace();
+	vector[i] += vertex[i].vectorInfluence[j].weight*v;
+      }
     }
-    for(i=0;i<vertex2.vectorInfluence.size();i++)
-    {
-      CalBone* bone = calModel.getSkeleton()->getBone(vertex2.vectorInfluence[i].boneId);
-      CalVector v(vertex2.position);
-      v *= bone->getTransformMatrix();
-      v += bone->getTranslationBoneSpace();
-      vector2 += vertex2.vectorInfluence[i].weight*v;
-    }
-    for(i=0;i<vertex3.vectorInfluence.size();i++)
-    {
-      CalBone* bone = calModel.getSkeleton()->getBone(vertex3.vectorInfluence[i].boneId);
-      CalVector v(vertex3.position);
-      v *= bone->getTransformMatrix();
-      v += bone->getTranslationBoneSpace();
-      vector3 += vertex3.vectorInfluence[i].weight*v;
-    }
-    csVector3 vert1(vector1.x,vector1.y,vector1.z);
-    csVector3 vert2(vector2.x,vector2.y,vector2.z);
-    csVector3 vert3(vector3.x,vector3.y,vector3.z);
+    csVector3 vert1(vector[0].x,vector[0].y,vector[0].z);
+    csVector3 vert2(vector[1].x,vector[1].y,vector[1].z);
+    csVector3 vert3(vector[2].x,vector[2].y,vector[2].z);
 
     csVector3 center= (vert1+vert2+vert3)/3;
 
