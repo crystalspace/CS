@@ -933,7 +933,7 @@ void csODEDynamics::EnableEventProcessing (bool enable)
       scfiEventHandler = csPtr<EventHandler> (new EventHandler (this));
     csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q)
-      q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
+      q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
   } else if (!enable && process_events) {
     process_events = false;
 
@@ -1282,6 +1282,7 @@ csODERigidBody::~csODERigidBody ()
 
   if (move_cb) move_cb->DecRef ();
   if (coll_cb) coll_cb->DecRef ();
+  dSpaceDestroy (groupID);
   dBodyDestroy (bodyID);
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiRigidBody);
