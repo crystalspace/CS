@@ -346,17 +346,27 @@ enum
   cscmdPaletteChanged,
 
   /**
-   * Broadcasted before iSystem::NextFrame begins to process current
-   * messages -- on every frame -- as Event.Command.Code of a broadcast event.
+   * Broadcasted before cscmdProcess -- on every frame --
+   * as Event.Command.Code of a broadcast event.
    */
   cscmdPreProcess,
 
   /**
-   * Broadcasted after csApp::Process () finished to process all messages
-   * in the system message queue -- on every frame -- as Event.Command.Code
-   * of a broadcast event.
+   * Broadcasted every frame as Event.Command.Code of a broadcast event.
    */
-  cscmdPostProcess
+  cscmdProcess,
+
+  /**
+   * Broadcasted after cscmdProcess -- on every frame --
+   * as Event.Command.Code of a broadcast event.
+   */
+  cscmdPostProcess,
+
+  /**
+   * Broadcasted after cscmdPostProcess -- on every frame --
+   * as Event.Command.Code of a broadcast event.
+   */
+  cscmdFinalProcess
 };
 
 #endif // __IUTIL_EVDEFS_H__

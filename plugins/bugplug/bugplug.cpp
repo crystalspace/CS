@@ -740,8 +740,6 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
     int cursor_w, cursor_h;
     fnt->GetDimensions (cursor, cursor_w, cursor_h);
     G2D->Write (fnt, x+5+cursor_w, y+5+fh+7, fgcolor, -1, "_");
-    G3D->FinishDraw ();
-    G2D->Print (NULL);
   }
   if (spider_hunting)
   {

@@ -1313,8 +1313,9 @@ void csEngine::Draw (iCamera* c, iClipper2D* view)
 
   // draw all halos on the screen
   csTicks Elapsed, Current;
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->GetElapsedTime (Elapsed, Current);
+  iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  Elapsed = vc->GetElapsedTicks ();
+  Current = vc->GetCurrentTicks ();
   int halo;
   for (halo = halos.Length () - 1; halo >= 0; halo--)
     if (!halos.Get (halo)->Process (Elapsed, *this))
@@ -1475,8 +1476,9 @@ void csEngine::RemoveDynLight (csDynLight* dyn)
 void csEngine::ControlMeshes ()
 {
   csTicks elapsed_time, current_time;
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->GetElapsedTime (elapsed_time, current_time);
+  iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  elapsed_time = vc->GetElapsedTicks ();
+  current_time = vc->GetCurrentTicks ();
 
   nextframe_pending = current_time;
 

@@ -35,6 +35,7 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/virtclk.h"
 
 #include "cstool/proctex.h"
 
@@ -74,8 +75,9 @@ void ProcCallback::UseTexture (iTextureWrapper*)
 {
   if (!pt->PrepareAnim ()) return;
   csTicks elapsed_time, current_time;
-  iSystem* sys = CS_GET_SYSTEM (pt->object_reg);	//@@@
-  sys->GetElapsedTime (elapsed_time, current_time);
+  iVirtualClock* vc = CS_QUERY_REGISTRY (pt->object_reg, iVirtualClock);
+  elapsed_time = vc->GetElapsedTicks ();
+  current_time = vc->GetCurrentTicks ();
   if (pt->last_cur_time == current_time) return;
   pt->Animate (current_time);
   pt->last_cur_time = current_time;

@@ -29,6 +29,7 @@
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
+#include "iutil/virtclk.h"
 #include "ivaria/reporter.h"
 
 #include "sndrdr.h"
@@ -143,8 +144,9 @@ bool csSoundRenderEAX::Open()
     	"  Volume: %g\n", GetVolume());
 
   csTicks et, ct;
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->GetElapsedTime(et, ct);
+  iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  et = vc->GetElapsedTicks ();
+  ct = vc->GetCurrentTicks ();
   LastTime = ct;
   
   return true;
@@ -216,8 +218,9 @@ void csSoundRenderEAX::Update()
 {
   int i;
   csTicks et, ct;
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->GetElapsedTime(et, ct);
+  iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  et = vc->GetElapsedTicks ();
+  ct = vc->GetCurrentTicks ();
   csTicks ETime = ct - LastTime;
   LastTime = ct;
 

@@ -32,6 +32,7 @@
 #include "isound/data.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/virtclk.h"
 #include "ivaria/reporter.h"
 
 #include "srdrcom.h"
@@ -153,8 +154,9 @@ bool csSoundRenderSoftware::Open()
   Report (CS_REPORTER_SEVERITY_NOTIFY, "  Volume: %g", Volume);
 
   csTicks et, ct;
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->GetElapsedTime(et, ct);
+  iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  et = vc->GetElapsedTicks ();
+  ct = vc->GetCurrentTicks ();
   LastTime = ct;
 
   return true;

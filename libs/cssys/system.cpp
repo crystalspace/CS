@@ -290,12 +290,17 @@ bool csPluginList::RecurseSort (csSystemDriver *iSys, int row, char *order,
 SCF_IMPLEMENT_IBASE (csSystemDriver)
   SCF_IMPLEMENTS_INTERFACE (iSystem)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPluginManager)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVirtualClock)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::PluginManager)
   SCF_IMPLEMENTS_INTERFACE (iPluginManager)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::VirtualClock)
+  SCF_IMPLEMENTS_INTERFACE (iVirtualClock)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::eiComponent)
@@ -311,6 +316,7 @@ csSystemDriver::csSystemDriver () :
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPluginManager);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVirtualClock);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
 
@@ -320,10 +326,11 @@ csSystemDriver::csSystemDriver () :
 
   // Register the shared event queue.
   iEventQueue* q = new csEventQueue (&object_reg);
-  object_reg.Register (q, "crystalspace.event.queue");
+  object_reg.Register (q, NULL);
   q->DecRef();
 
-  object_reg.Register (&scfiPluginManager, "PluginManager");
+  object_reg.Register (&scfiPluginManager, NULL);
+  object_reg.Register (&scfiVirtualClock, NULL);
   iCommandLineParser* cmdline = new csCommandLineParser ();
   object_reg.Register (cmdline, "CommandLine");
   //@@@ cmdline->DecRef (); Uncomment when object registry moves out
@@ -415,7 +422,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
 
   iConfigFile *cfg = new csConfigFile();
   iConfigManager* Config = new csConfigManager(cfg, true);
-  object_reg.Register (Config, "ConfigManager");
+  object_reg.Register (Config, NULL);
   Config->DecRef ();
   cfg->DecRef ();
   Config->SetDomainPriority(cfg, iConfigManager::ConfigPriorityApplication);
@@ -451,9 +458,9 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   iKeyboardDriver* k = new csKeyboardDriver (&object_reg);
   iMouseDriver*    m = new csMouseDriver    (&object_reg);
   iJoystickDriver* j = new csJoystickDriver (&object_reg);
-  object_reg.Register (k, "crystalspace.driver.input.generic.keyboard");
-  object_reg.Register (m, "crystalspace.driver.input.generic.mouse"   );
-  object_reg.Register (j, "crystalspace.driver.input.generic.joystick");
+  object_reg.Register (k, NULL);
+  object_reg.Register (m, NULL);
+  object_reg.Register (j, NULL);
   j->DecRef();
   m->DecRef();
   k->DecRef();
@@ -583,12 +590,20 @@ void csSystemDriver::Close ()
   EventQueue->RemoveListener(&scfiEventHandler);
 }
 
+void csSystemDriver::AdvanceVirtualTimeClock ()
+{
+  csTicks last = CurrentTime;
+  CurrentTime = csGetTicks ();
+  if (last == csTicks(-1))
+    ElapsedTime = 0;
+  else
+    ElapsedTime = CurrentTime - last;
+}
+
 void csSystemDriver::NextFrame ()
 {
   // Update elapsed time first
-  csTicks cur_time = csGetTicks ();
-  ElapsedTime = (CurrentTime == csTicks (-1)) ? 0 : cur_time - CurrentTime;
-  CurrentTime = cur_time;
+  AdvanceVirtualTimeClock ();
 
   // Process the event queue.
   EventQueue->Process();

@@ -1,5 +1,68 @@
 The history order is reversed so that new features are at the top.
 
+2-Oct-2001
+	- Changed the csInitialize... functions in cstool to static member
+	  functions of the class csInitializer. There are now the following
+	  functions in csInitializer:
+	  	- CreateObjectRegistry()
+		- RequestPlugins()
+		- Initialize()
+		- LoadReporter()
+		- SetupObjectRegistry()
+		- OpenApplication()
+		- CloseApplication()
+		- SetupEventHandler()
+		- MainLoop()
+		- DestroyApplication()
+	  SetupObjectRegistry() will now try to find the following plugins
+	  and if present it will add them to the object registry as default
+	  plugins (with NULL tag):
+		- iVFS
+		- iGraphics3D
+		- iGraphics2D
+		- iFontServer
+		- iEngine
+		- iConsoleOutput
+		- iLoader
+		- iImageIO
+		- iReporter
+		- iStandardReporterListener
+	- Added cscmdProcess and cscmdFinalProcess. There are now the following
+	  broadcast events relevant to frame processing:
+	  	- cscmdPreProcess: this is called first and allows apps and
+		  plugins to basically do some preprocessing before rendering.
+		- cscmdProcess: in this pass the application should render
+		  to the screen. But NOT the actual printing of the display.
+		  That should happen in cscmdFinalProcess.
+		- cscmdPostProcess: in this pass plugins or apps can add
+		  additional information on top of the previously rendered
+		  display. Some uses are HUD overlays or debugging information.
+		- cscmdFinalProcess: this is the final pass. The application
+		  should use this pass to actually print the resulting
+		  display to the 3D driver.
+	  So most apps will be interested in catching cscmdProcess and
+	  cscmdFinalProcess.
+	- Modified the simple1 tutorial app to all the changes above.
+	  Instead of NextFrame() there is SetupFrame() and FinishFrame().
+	- Fixed BugPlug so that it no longer does FinishDraw() and
+	  Print() in its cscmdPostProcess handler. This will now have to be
+	  done by the application in cscmdFinalProcess. This has the very
+	  nice effect that BugPlug can now properly overlay messages on
+	  top of the 3D view without the flicker effect. Note that BugPlug
+	  will now only work correctly (for these overlays) for apps that
+	  actually use the new cscmdFinalProcess system. Add this moment
+	  only simple1 does that.
+	- Added iVirtualClock which is a new interface that implements some
+	  stuff that used to be in iSystem. The following functions are there:
+	    Advance(), Suspend(), Resume(), GetElapsedTicks(), and
+	    GetCurrentTicks().
+	- Removed iSystem::SuspendVirtualTimeClock(), ResumeVirtualTimeClock(),
+	  and GetElapsedTime(). Use iVirtualClock now.
+	  The system driver now implements iVirtualClock and puts it in the
+	  registry with NULL tag.
+	- The system driver will now register a lot of the common objects
+	  using the NULL tag instead of a name. The NULL tag is meant to be
+	  for default objects so this is better.
 28-Sep-2001
 	- Drastically increased quality of OpenGL texture mapping
 	  in 16-bit mode. An alpha channel was selected for all textures

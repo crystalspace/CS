@@ -30,6 +30,8 @@
 #include "ivaria/stdrep.h"
 #include "ivaria/conout.h"
 #include "isys/vfs.h"
+#include "igraphic/imageio.h"
+#include "ivideo/fontserv.h"
 #include "imap/parser.h"
 #include "isys/plugin.h"
 #include "iutil/eventq.h"
@@ -40,13 +42,13 @@ static char* global_config_name = NULL;
 static int global_argc = 0;
 static const char* const * global_argv = 0;
 
-iObjectRegistry* csInitializeApplication ()
+iObjectRegistry* csInitializer::CreateObjectRegistry ()
 {
   global_sys = new SysSystemDriver ();
   return global_sys->GetObjectRegistry ();
 }
 
-bool csInitializeQueryPlugins (iObjectRegistry* /*object_reg*/,
+bool csInitializer::RequestPlugins (iObjectRegistry* /*object_reg*/,
 	const char* config_name,
 	int argc, const char* const argv[],
 	bool want_3d, bool want_engine, bool want_imgldr,
@@ -71,13 +73,13 @@ bool csInitializeQueryPlugins (iObjectRegistry* /*object_reg*/,
   return true;
 }
 
-bool csInitializeStartApp (iObjectRegistry* object_reg)
+bool csInitializer::Initialize (iObjectRegistry* object_reg)
 {
   return global_sys->Initialize (global_argc, global_argv,
     global_config_name);
 }
 
-bool csInitializeEventHandler (iObjectRegistry* object_reg,
+bool csInitializer::SetupEventHandler (iObjectRegistry* object_reg,
 	iEventHandler* evhdlr, unsigned int eventmask)
 {
   iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
@@ -112,18 +114,18 @@ SCF_IMPLEMENT_IBASE (csAppEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 
-bool csInitializeEventHandler (iObjectRegistry* object_reg,
+bool csInitializer::SetupEventHandler (iObjectRegistry* object_reg,
 	csEventHandlerFunc* evhdlr_func)
 {
   csAppEventHandler* evhdlr = new csAppEventHandler (evhdlr_func);
-  return csInitializeEventHandler (object_reg, evhdlr, CSMASK_Broadcast |
+  return SetupEventHandler (object_reg, evhdlr, CSMASK_Broadcast |
   	CSMASK_MouseUp | CSMASK_MouseDown | CSMASK_MouseMove |
 	CSMASK_KeyDown | CSMASK_KeyUp | CSMASK_MouseClick |
 	CSMASK_MouseDoubleClick | CSMASK_JoystickMove |
 	CSMASK_JoystickDown | CSMASK_JoystickUp | CSMASK_Nothing);
 }
 
-bool csInitializeReporter (iObjectRegistry* object_reg,
+bool csInitializer::LoadReporter (iObjectRegistry* object_reg,
 	bool use_reporter_listener)
 {
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
@@ -151,7 +153,7 @@ bool csInitializeReporter (iObjectRegistry* object_reg,
   return true;
 }
 
-bool csInitializeRegistry (iObjectRegistry* object_reg)
+bool csInitializer::SetupObjectRegistry (iObjectRegistry* object_reg)
 {
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
@@ -163,6 +165,12 @@ bool csInitializeRegistry (iObjectRegistry* object_reg)
     if (g3d->GetDriver2D ())
       object_reg->Register (g3d->GetDriver2D ());
     g3d->DecRef ();
+  }
+  else
+  {
+    iGraphics2D* g2d = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_CANVAS,
+  	iGraphics2D);
+    if (g2d) { object_reg->Register (g2d); g2d->DecRef (); }
   }
 
   iEngine* engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
@@ -195,6 +203,22 @@ bool csInitializeRegistry (iObjectRegistry* object_reg)
     loader->DecRef ();
   }
 
+  iImageIO* imloader = CS_QUERY_PLUGIN_ID (plugin_mgr,
+  	CS_FUNCID_IMGLOADER, iImageIO);
+  if (imloader)
+  {
+    object_reg->Register (imloader);
+    imloader->DecRef ();
+  }
+
+  iFontServer* fntsvr = CS_QUERY_PLUGIN_ID (plugin_mgr,
+  	CS_FUNCID_FONTSERVER, iFontServer);
+  if (fntsvr)
+  {
+    object_reg->Register (fntsvr);
+    fntsvr->DecRef ();
+  }
+
   iReporter* reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER,
   	iReporter);
   if (reporter)
@@ -215,12 +239,17 @@ bool csInitializeRegistry (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csInitializeOpenApp (iObjectRegistry* object_reg)
+bool csInitializer::OpenApplication (iObjectRegistry* object_reg)
 {
   return global_sys->Open ();
 }
 
-void csDestroyApp ()
+void csInitializer::CloseApplication (iObjectRegistry* object_reg)
+{
+  global_sys->Close ();
+}
+
+void csInitializer::DestroyApplication ()
 {
   delete global_sys;
 }
@@ -306,7 +335,7 @@ bool csInitializeApplication (iObjectRegistry* object_reg, bool use_reporter,
   return true;
 }
 
-bool csStartMainLoop (iObjectRegistry* /*object_reg*/)
+bool csInitializer::MainLoop (iObjectRegistry* /*object_reg*/)
 {
   global_sys->Loop ();
   return true;

@@ -17,7 +17,6 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/system.h"
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
@@ -26,6 +25,7 @@
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
+#include "iutil/virtclk.h"
 #include "iengine/sector.h"
 #include "iengine/engine.h"
 #include "iengine/camera.h"
@@ -75,14 +75,19 @@ void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
   delete simple;
-  csDestroyApp ();
+  csInitializer::DestroyApplication ();
 }
 
 bool SimpleEventHandler (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdPostProcess)
+  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   {
-    simple->NextFrame ();
+    simple->SetupFrame ();
+    return true;
+  }
+  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  {
+    simple->FinishFrame ();
     return true;
   }
   else
@@ -94,13 +99,10 @@ bool SimpleEventHandler (iEvent& ev)
 bool Simple::Initialize (int argc, const char* const argv[],
   const char *iConfigName)
 {
-  object_reg = csInitializeApplication ();
-  if (!object_reg)
-  {
-    return false;
-  }
+  object_reg = csInitializer::CreateObjectRegistry ();
+  if (!object_reg) return false;
 
-  if (!csInitializeQueryPlugins (object_reg, iConfigName, argc, argv))
+  if (!csInitializer::RequestPlugins (object_reg, iConfigName, argc, argv))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple1",
@@ -108,7 +110,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  if (!csInitializeStartApp (object_reg))
+  if (!csInitializer::Initialize (object_reg))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple1",
@@ -116,7 +118,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  if (!csInitializeReporter (object_reg, true))
+  if (!csInitializer::LoadReporter (object_reg, true))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple1",
@@ -124,7 +126,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  if (!csInitializeRegistry (object_reg))
+  if (!csInitializer::SetupObjectRegistry (object_reg))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple1",
@@ -132,7 +134,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  if (!csInitializeEventHandler (object_reg, SimpleEventHandler))
+  if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple1",
@@ -140,6 +142,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
     return false;
   }
 
+  // The virtual clock.
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
 
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
@@ -183,7 +187,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   kbd->IncRef();
 
   // Open the main system. This will open all the previously loaded plug-ins.
-  if (!csInitializeOpenApp (object_reg))
+  if (!csInitializer::OpenApplication (object_reg))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple1",
@@ -323,12 +327,10 @@ bool Simple::HandleEvent (iEvent& Event)
   return false;
 }
 
-void Simple::NextFrame ()
+void Simple::SetupFrame ()
 {
   // First get elapsed time from the system driver.
-  csTicks elapsed_time, current_time;
-  iSystem* sys = CS_GET_SYSTEM (object_reg);
-  sys->GetElapsedTime (elapsed_time, current_time);
+  csTicks elapsed_time = vc->GetElapsedTicks ();
   
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
@@ -354,7 +356,10 @@ void Simple::NextFrame ()
 
   // Tell the camera to render into the frame buffer.
   view->Draw ();
+}
 
+void Simple::FinishFrame ()
+{
   // Drawing code ends here.
   g3d->FinishDraw ();
   // Display the final output.
@@ -378,7 +383,7 @@ int main (int argc, char* argv[])
   }
 
   // Main loop.
-  csStartMainLoop (simple->object_reg);
+  csInitializer::MainLoop (simple->object_reg);
 
   // Cleanup.
   Cleanup ();

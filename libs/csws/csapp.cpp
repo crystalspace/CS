@@ -43,6 +43,7 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
+#include "iutil/virtclk.h"
 #include "igraphic/imageio.h"
 #include "ivaria/reporter.h"
 #include "isys/plugin.h"
@@ -532,8 +533,9 @@ void csApp::StartFrame ()
   InFrame = true;
 
   csTicks elapsed_time;
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->GetElapsedTime (elapsed_time, CurrentTime);
+  iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  elapsed_time = vc->GetElapsedTicks ();
+  CurrentTime = vc->GetCurrentTicks ();
 
   GfxPpl.StartFrame (Mouse);
 }

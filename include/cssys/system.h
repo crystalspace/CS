@@ -34,6 +34,7 @@
 #include "iutil/comp.h"
 #include "iutil/config.h"
 #include "iutil/objreg.h"
+#include "iutil/virtclk.h"
 
 struct iGraphics3D;
 struct iGraphics2D;
@@ -247,6 +248,17 @@ private:
   iBase* GetPlugin (int idx);
 
 protected:
+  /// Advance the engine's virtual-time clock.
+  void AdvanceVirtualTimeClock ();
+
+  /// Suspend the engine's virtual-time clock.
+  void SuspendVirtualTimeClock() {}
+  /// Resume the engine's virtual-time clock.
+  void ResumeVirtualTimeClock() { CurrentTime = csTicks(-1); }
+  /// Query the elapsed time between last frames and absolute time.
+  void GetElapsedTime (csTicks &oElapsedTime, csTicks &oCurrentTime) const
+  { oElapsedTime = ElapsedTime; oCurrentTime = CurrentTime; }
+
   /**
    * Print help for an iConfig interface.
    */
@@ -273,14 +285,6 @@ public:
 
   /// Get the object registry.
   virtual iObjectRegistry* GetObjectRegistry () { return &object_reg; }
-
-  /// Suspend the engine's virtual-time clock.
-  virtual void SuspendVirtualTimeClock() {}
-  /// Resume the engine's virtual-time clock.
-  virtual void ResumeVirtualTimeClock() { CurrentTime = csTicks(-1); }
-  /// Query the elapsed time between last frames and absolute time.
-  virtual void GetElapsedTime (csTicks &oElapsedTime, csTicks &oCurrentTime)
-  { oElapsedTime = ElapsedTime; oCurrentTime = CurrentTime; }
 
   //------------------------------------------------------------------
 
@@ -326,6 +330,29 @@ public:
     }
   } scfiPluginManager;
   friend class PluginManager;
+
+  //------------------------------------------------------------------
+
+  class VirtualClock : public iVirtualClock
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csSystemDriver);
+    virtual void Advance () { scfParent->AdvanceVirtualTimeClock (); }
+    virtual void Suspend () { scfParent->SuspendVirtualTimeClock (); }
+    virtual void Resume () { scfParent->ResumeVirtualTimeClock (); }
+    virtual csTicks GetElapsedTicks () const
+    {
+      csTicks oElapsedTime, oCurrentTime;
+      scfParent->GetElapsedTime (oElapsedTime, oCurrentTime);
+      return oElapsedTime;
+    }
+    virtual csTicks GetCurrentTicks () const
+    {
+      csTicks oElapsedTime, oCurrentTime;
+      scfParent->GetElapsedTime (oElapsedTime, oCurrentTime);
+      return oCurrentTime;
+    }
+  } scfiVirtualClock;
+  friend class VirtualClock;
 
   //------------------------------------------------------------------
 

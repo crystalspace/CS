@@ -41,6 +41,7 @@
 #include "isys/system.h"
 #include "isys/plugin.h"
 #include "iutil/eventh.h"
+#include "iutil/virtclk.h"
 #include "iutil/comp.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
@@ -1077,8 +1078,9 @@ void csGraphics3DOGLCommon::Print (csRect * area)
   if (fps_limit)
   {
     csTicks elapsed_time, current_time;
-    iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-    sys->GetElapsedTime (elapsed_time, current_time);
+    iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+    elapsed_time = vc->GetElapsedTicks ();
+    current_time = vc->GetCurrentTicks ();
     /// Smooth last n frames, to avoid jitter when objects appear/disappear.
     static int num = 10;
     static int times[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -1088,6 +1090,7 @@ void csGraphics3DOGLCommon::Print (csRect * area)
     times[cur] = elapsed_time;
     totaltime += times[cur];
     cur = (cur+1)%num;
+    iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
     if (totaltime/10 < fps_limit) sys->Sleep (fps_limit - totaltime/10);
   }
   G2D->Print (area);

@@ -27,6 +27,7 @@ struct iGraphics3D;
 struct iKeyboardDriver;
 struct iSector;
 struct iView;
+struct iVirtualClock;
 
 class Simple
 {
@@ -35,6 +36,7 @@ public:
   iLoader* loader;
   iGraphics3D* g3d;
   iKeyboardDriver* kbd;
+  iVirtualClock* vc;
   iSector* room;
   iView* view;
   iObjectRegistry* object_reg;
@@ -45,7 +47,9 @@ public:
 
   bool Initialize (int argc, const char* const argv[], const char* config);
   bool HandleEvent (iEvent&);
-  void NextFrame ();
+  void SetupFrame ();
+  void FinishFrame ();
 };
 
 #endif // __SIMPLE1_H__
+
