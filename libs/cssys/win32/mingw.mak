@@ -15,13 +15,6 @@ PLUGINS += video/renderer/software video/canvas/ddraw
 # video/renderer/direct3d6
 #video/renderer/opengl
 
-ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL)))
-"=
-|=³
-endif
-
-override DO.MAKE.VOLATILE=$(subst \#,\\\#,$(VOLATILE_H.ALL))
-
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -183,8 +176,19 @@ SYSHELP += \
 endif # ifeq ($(MAKESECTION),confighelp)
 
 #---------------------------------------------------------------- configure ---#
+ifeq ($(MAKESECTION),rootdefines)
+
+#ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL)))
+"=
+|=³
+#endif
+
 ifeq ($(ROOTCONFIG),config)
-
 SYSCONFIG=
-
 endif # ifeq ($(ROOTCONFIG),config)
+
+ifeq ($(ROOTCONFIG),volatile)
+override DO.MAKE.VOLATILE=$(subst \#,\\\#,$(VOLATILE_H.ALL))
+endif # ifeq ($(ROOTCONFIG),volatile)
+
+endif # ifeq ($(MAKESECTION),rootdefines)
