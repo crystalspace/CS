@@ -17,6 +17,12 @@ chronological order.
 	  could happen if you have sudden changes in camera position.
 	- Jorrit changed Dynavis to also use the block allocator inside
 	  Dynavis.
+	- Eric Sunshine fixed bug in CS_CHECK_BUILD_FLAGS() in checkbuild.m4
+	  where it could invoke the `test' program with too many arguments
+	  because it failed to quote the result of the build check, and the
+	  build result might consist of multiple tokens.  An example which
+	  triggered the error: `test -multiply_defined suppress != no'.  Now,
+	  it correctly quotes the build result ("-multiply_defined suppress").
 16-Nov-2003
 	- Eric Sunshine fixed bug in make and Jam `install' targets where they
 	  neglected to install the generated volatile.h if the build directory
