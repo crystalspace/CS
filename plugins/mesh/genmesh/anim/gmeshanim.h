@@ -23,6 +23,7 @@
 #include "csgeom/transfrm.h"
 #include "csutil/array.h"
 #include "csutil/parray.h"
+#include "csutil/stringarray.h"
 #include "csutil/csstring.h"
 #include "csutil/cscolor.h"
 #include "imesh/genmesh.h"
@@ -348,7 +349,7 @@ private:
   csGenmeshAnimationControlType* type;
   iObjectRegistry* object_reg;
 
-  char* autorun_script;
+  csStringArray autorun_scripts;
 
   csPDelArray<csAnimControlGroup> groups;
   csPDelArray<csAnimControlScript> scripts;

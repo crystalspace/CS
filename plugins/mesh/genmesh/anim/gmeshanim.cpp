@@ -599,13 +599,10 @@ csGenmeshAnimationControlFactory::csGenmeshAnimationControlFactory (
   animates_colors = false;
   animates_normals = false;
   has_hierarchical_groups = false;
-
-  autorun_script = 0;
 }
 
 csGenmeshAnimationControlFactory::~csGenmeshAnimationControlFactory ()
 {
-  delete[] autorun_script;
   SCF_DESTRUCT_IBASE ();
 }
 
@@ -613,8 +610,9 @@ csPtr<iGenMeshAnimationControl> csGenmeshAnimationControlFactory::
 	CreateAnimationControl ()
 {
   csGenmeshAnimationControl* ctrl = new csGenmeshAnimationControl (this);
-  if (autorun_script)
-    ctrl->Execute (autorun_script);
+  size_t i;
+  for (i = 0 ; i < autorun_scripts.Length () ; i++)
+    ctrl->Execute (autorun_scripts[i]);
   return csPtr<iGenMeshAnimationControl> (ctrl);
 }
 
@@ -924,7 +922,7 @@ const char* csGenmeshAnimationControlFactory::Load (iDocumentNode* node)
 	  const char* scriptname = child->GetAttributeValue ("script");
 	  if (!scriptname)
 	    return "Missing script name attribute for <run>!";
-	  autorun_script = csStrNew (scriptname);
+	  autorun_scripts.Push (scriptname);
 	}
 	break;
       default:

@@ -11,6 +11,8 @@ chronological order.
 	  in case checkDupes was true and the object that it was loading
 	  didn't have a name.
 	- Jorrit made the special gmeshanim effect in flarge look nicer.
+	- Jorrit enhanced the gmeshanim system so that you can auto-run
+	  multiple scripts at once.
 15-Sep-2004
 	- Eric Sunshine added an `UNCONDITIONAL' argument to
 	  CS_EMIT_BUILD_PROPERTY(). This is analogous to the like-named
