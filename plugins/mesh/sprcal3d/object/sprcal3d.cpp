@@ -1183,7 +1183,7 @@ void csSpriteCal3DMeshObject::SetupVertices()
 {
   if(!vertices_allocated)
   {
-    vertices.SetLength(calModel.getCoreModel()->getCoreMeshCount ());
+    vertices.SetLength( attached_ids.Length() );
     int m;
     for (m=0;m<vertices.Length();m++)
     {
@@ -2138,6 +2138,10 @@ bool csSpriteCal3DMeshObject::AttachCoreMesh(int mesh_id,int iMatWrapID)
   {
     mesh->getSubmesh(i)->setCoreMaterialId(iMatWrapID);
   }
+
+  // Make sure space is allocated for new vertices in SetupVertices()
+  vertices_allocated = false;
+
   //    mesh->setMaterialSet(0);
   return true;
 }
@@ -2180,6 +2184,7 @@ bool csSpriteCal3DMeshObject::DetachCoreMesh (int mesh_id)
       meshes_colors[j-1].DeleteAll();
 
       attached_ids.DeleteIndex(i);
+      vertices_allocated = false;
       break;
     }
   }
