@@ -87,11 +87,11 @@ static int value_choice (const char* arg, int old_value, const char* const* choi
 {
   if (!arg) return -1;
   int i = 0;
-  if (!strcasecmp (arg, "next")) return (old_value+1)%num;
-  if (!strcasecmp (arg, "prev")) return (old_value-1+num)%num;
+  if (!csStrCaseCmp (arg, "next")) return (old_value+1)%num;
+  if (!csStrCaseCmp (arg, "prev")) return (old_value-1+num)%num;
   while (choices[i])
   {
-    if (!strcasecmp (choices[i], arg)) return i;
+    if (!csStrCaseCmp (choices[i], arg)) return i;
     i++;
   }
   Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Expected one of the following:");
@@ -111,9 +111,9 @@ static bool yes_or_no (const char* arg, bool old_value)
   if (!arg) return false;
   if (*arg == '0' && *(arg+1) == 0) return false;
   if (*arg == '1' && *(arg+1) == 0) return true;
-  if (!strcasecmp (arg, "yes") || !strcasecmp (arg, "true") || !strcasecmp (arg, "on")) return true;
-  if (!strcasecmp (arg, "no") || !strcasecmp (arg, "false") || !strcasecmp (arg, "off")) return false;
-  if (!strcasecmp (arg, "toggle")) return !old_value;
+  if (!csStrCaseCmp (arg, "yes") || !csStrCaseCmp (arg, "true") || !csStrCaseCmp (arg, "on")) return true;
+  if (!csStrCaseCmp (arg, "no") || !csStrCaseCmp (arg, "false") || !csStrCaseCmp (arg, "off")) return false;
+  if (!csStrCaseCmp (arg, "toggle")) return !old_value;
   Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
   	"Expected: yes, true, on, 1, no, false, off, 0, or toggle!");
   return false;
@@ -312,13 +312,13 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     }
   }
 
-  if (!strcasecmp (cmd, "quit"))
+  if (!csStrCaseCmp (cmd, "quit"))
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
       q->GetEventOutlet()->Broadcast (cscmdQuit);
   }
-  else if (!strcasecmp (cmd, "help"))
+  else if (!csStrCaseCmp (cmd, "help"))
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "-*- General commands -*-");
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, " about, version, quit, help");
@@ -329,19 +329,19 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, " portals");
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, " extension, lod, sprlight, coordset");
   }
-  else if (!strcasecmp (cmd, "about"))
+  else if (!csStrCaseCmp (cmd, "about"))
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Crystal Space version %s (%s).", CS_VERSION, CS_RELEASE_DATE);
   }
-  else if (!strcasecmp (cmd, "version"))
+  else if (!csStrCaseCmp (cmd, "version"))
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "%s", CS_VERSION);
-  else if (!strcasecmp (cmd, "extension"))
+  else if (!csStrCaseCmp (cmd, "extension"))
   {
     iGraphics2D* g2d = g3d->GetDriver2D ();
     if (!g2d->PerformExtension (arg))
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Extension '%s' not supported!", arg);
   }
-  else if (!strcasecmp (cmd, "db_maxpol"))
+  else if (!csStrCaseCmp (cmd, "db_maxpol"))
   {
 #if 0 //OR_REMOVAL
     long val = g3d->GetRenderState (G3DRENDERSTATE_MAXPOLYGONSTODRAW);
@@ -350,17 +350,17 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     g3d->SetRenderState (G3DRENDERSTATE_MAXPOLYGONSTODRAW, (long)ival);
 #endif
   }
-  else if (!strcasecmp (cmd, "cmessage"))
+  else if (!csStrCaseCmp (cmd, "cmessage"))
   {
     if (arg) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "%s", arg);
     else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Argument expected!");
   }
-  else if (!strcasecmp (cmd, "dmessage"))
+  else if (!csStrCaseCmp (cmd, "dmessage"))
   {
     if (arg) Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "%s", arg);
     else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Argument expected!");
   }
-  else if (!strcasecmp (cmd, "lod"))
+  else if (!csStrCaseCmp (cmd, "lod"))
   {
     csRef<iPluginManager> plugin_mgr (
     	CS_QUERY_REGISTRY (object_reg, iPluginManager));
@@ -373,7 +373,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     lod_level.SetFloat (f);
     SetConfigOption (type, "sprlod", lod_level);
   }
-  else if (!strcasecmp (cmd, "sprlight"))
+  else if (!csStrCaseCmp (cmd, "sprlight"))
   {
     csRef<iPluginManager> plugin_mgr (
     	CS_QUERY_REGISTRY (object_reg, iPluginManager));
@@ -386,9 +386,9 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     lqual.SetLong (l);
     SetConfigOption (type, "sprlq", lqual);
   }
-  else if (!strcasecmp (cmd, "dnl"))
+  else if (!csStrCaseCmp (cmd, "dnl"))
     Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "");
-  else if (!strcasecmp (cmd, "exec"))
+  else if (!csStrCaseCmp (cmd, "exec"))
   {
     if (arg)
     {
@@ -398,12 +398,12 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"Please specify the name of the script!");
   }
-  else if (!strcasecmp (cmd, "cls"))
+  else if (!csStrCaseCmp (cmd, "cls"))
   {
     if (console)
       console->Clear ();
   }
-  else if (!strcasecmp (cmd, "console"))
+  else if (!csStrCaseCmp (cmd, "console"))
   {
     if (console)
     {
@@ -413,13 +413,13 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
         console->SetVisible (active);
     }
   }
-  else if (!strcasecmp (cmd, "turn"))
+  else if (!csStrCaseCmp (cmd, "turn"))
     camera->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, PI);
-  else if (!strcasecmp (cmd, "activate"))
+  else if (!csStrCaseCmp (cmd, "activate"))
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "OBSOLETE");
   }
-  else if (!strcasecmp (cmd, "coordset"))
+  else if (!csStrCaseCmp (cmd, "coordset"))
   {
     if (!arg)
     {
@@ -443,25 +443,25 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     camera->SetSector (s);
     camera->GetTransform ().SetOrigin (csVector3(x,y,z));
   }
-  else if (!strcasecmp (cmd, "facenorth"))
+  else if (!csStrCaseCmp (cmd, "facenorth"))
    camera->GetTransform ().SetO2T (csMatrix3() /* identity */ );
-  else if (!strcasecmp (cmd, "facesouth"))
+  else if (!csStrCaseCmp (cmd, "facesouth"))
    camera->GetTransform ().SetO2T ( csMatrix3 ( -1,  0,  0,
                                0,  1,  0,
                                0,  0, -1 ) );
-  else if (!strcasecmp (cmd, "facewest"))
+  else if (!csStrCaseCmp (cmd, "facewest"))
    camera->GetTransform ().SetO2T ( csMatrix3 (  0,  0,  1,
                                0,  1,  0,
                               -1,  0,  0 ) );
-  else if (!strcasecmp (cmd, "faceeast"))
+  else if (!csStrCaseCmp (cmd, "faceeast"))
    camera->GetTransform ().SetO2T ( csMatrix3 (  0,  0, -1,
                                0,  1,  0,
                               1,  0,  0 ) );
-  else if (!strcasecmp (cmd, "facedown"))
+  else if (!csStrCaseCmp (cmd, "facedown"))
    camera->GetTransform ().SetO2T ( csMatrix3 (  1,  0,  0,
                                0,  0,  1,
                                0, -1,  0 ) );
-  else if (!strcasecmp (cmd, "faceup"))
+  else if (!csStrCaseCmp (cmd, "faceup"))
    camera->GetTransform ().SetO2T ( csMatrix3 (  1,  0,  0,
                                0,  0, -1,
                                0,  1,  0 ) );

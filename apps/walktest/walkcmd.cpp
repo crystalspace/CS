@@ -1020,7 +1020,7 @@ if (Sys->cfg_recording >= 0)                        \
 
 bool CommandHandler (const char *cmd, const char *arg)
 {
-  if (!strcasecmp (cmd, "help"))
+  if (!csStrCaseCmp (cmd, "help"))
   {
     csCommandProcessor::perform (cmd, arg);
 #   undef CONPRI
@@ -1061,13 +1061,13 @@ bool CommandHandler (const char *cmd, const char *arg)
 
 #   undef CONPRI
   }
-  else if (!strcasecmp (cmd, "coordsave"))
+  else if (!csStrCaseCmp (cmd, "coordsave"))
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"Saving camera to /tmp/walktest.cam");
     SaveCamera (Sys->myVFS, "/tmp/walktest.cam");
   }
-  else if (!strcasecmp (cmd, "coordload"))
+  else if (!csStrCaseCmp (cmd, "coordload"))
   {
     char const* s = "/tmp/walktest.cam"; // User-writable location.
     if (!Sys->myVFS->Exists(s))
@@ -1075,7 +1075,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading camera from %s", s);
     LoadCamera (Sys->myVFS, s);
   }
-  else if (!strcasecmp (cmd, "plugins"))
+  else if (!csStrCaseCmp (cmd, "plugins"))
   {
     int i = 0;
     csRef<iPluginIterator> it = Sys->plugin_mgr->GetPlugins ();
@@ -1088,7 +1088,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       i++;
     }
   }
-  else if (!strcasecmp (cmd, "setvarc"))
+  else if (!csStrCaseCmp (cmd, "setvarc"))
   {
     if (!arg)
     {
@@ -1111,7 +1111,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     v->SetColor (c);
   }
-  else if (!strcasecmp (cmd, "setvarv"))
+  else if (!csStrCaseCmp (cmd, "setvarv"))
   {
     if (!arg)
     {
@@ -1134,7 +1134,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     v->SetVector (w);
   }
-  else if (!strcasecmp (cmd, "setvar"))
+  else if (!csStrCaseCmp (cmd, "setvar"))
   {
     if (!arg)
     {
@@ -1157,7 +1157,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     v->Set (value);
   }
-  else if (!strcasecmp (cmd, "var"))
+  else if (!csStrCaseCmp (cmd, "var"))
   {
     if (!arg)
     {
@@ -1199,7 +1199,7 @@ bool CommandHandler (const char *cmd, const char *arg)
         break;
     }
   }
-  else if (!strcasecmp (cmd, "varlist"))
+  else if (!csStrCaseCmp (cmd, "varlist"))
   {
     iSharedVariableList* vl = Sys->view->GetEngine ()->GetVariableList ();
     int i;
@@ -1230,7 +1230,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
     }
   }
-  else if (!strcasecmp (cmd, "conflist"))
+  else if (!csStrCaseCmp (cmd, "conflist"))
   {
     if (arg)
     {
@@ -1296,7 +1296,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	"Expected index to plugin (from 'plugins' command)!");
   }
-  else if (!strcasecmp (cmd, "confset"))
+  else if (!csStrCaseCmp (cmd, "confset"))
   {
     if (arg)
     {
@@ -1329,7 +1329,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	"Expected index to plugin (from 'plugins' command)!");
   }
-  else if (!strcasecmp (cmd, "action"))
+  else if (!csStrCaseCmp (cmd, "action"))
   {
     csVector3 where = Sys->view->GetCamera ()->GetTransform ().This2Other (
     	3.0f*CS_VEC_FORWARD);
@@ -1347,7 +1347,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       //Sys->ActivateObject ((csObject*)(ob->QueryObject ()));
     }
   }
-  else if (!strcasecmp (cmd, "saverec"))
+  else if (!csStrCaseCmp (cmd, "saverec"))
   {
     if (arg)
     {
@@ -1358,7 +1358,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
       SaveRecording (Sys->myVFS, "/tmp/record");
   }
-  else if (!strcasecmp (cmd, "loadrec"))
+  else if (!csStrCaseCmp (cmd, "loadrec"))
   {
     if (arg)
     {
@@ -1369,12 +1369,12 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
       LoadRecording (Sys->myVFS, "/tmp/record");
   }
-  else if (!strcasecmp (cmd, "clrrec"))
+  else if (!csStrCaseCmp (cmd, "clrrec"))
   {
     Sys->recording.DeleteAll ();
     Sys->recording.SetLength (0);
   }
-  else if (!strcasecmp (cmd, "record"))
+  else if (!csStrCaseCmp (cmd, "record"))
   {
     if (Sys->cfg_recording == -1)
     {
@@ -1390,7 +1390,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       	"Stop recording.");
     }
   }
-  else if (!strcasecmp (cmd, "play"))
+  else if (!csStrCaseCmp (cmd, "play"))
   {
     if (Sys->cfg_playrecording == -1)
     {
@@ -1408,7 +1408,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Stop playback.");
     }
   }
-  else if (!strcasecmp (cmd, "playonce"))
+  else if (!csStrCaseCmp (cmd, "playonce"))
   {
     if (Sys->cfg_playrecording == -1)
     {
@@ -1426,48 +1426,48 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Stop playback.");
     }
   }
-  else if (!strcasecmp (cmd, "bind"))
+  else if (!csStrCaseCmp (cmd, "bind"))
   {
     extern void bind_key (const char* arg);
     bind_key (arg);
   }
-  else if (!strcasecmp (cmd, "bugplug"))
+  else if (!csStrCaseCmp (cmd, "bugplug"))
   {
     csRef<iBase> plug = CS_LOAD_PLUGIN_ALWAYS (Sys->plugin_mgr,
     	"crystalspace.utilities.bugplug");
     plug->IncRef ();	// Avoid smart pointer release (@@@)
   }
-  else if (!strcasecmp (cmd, "do_logo"))
+  else if (!csStrCaseCmp (cmd, "do_logo"))
     csCommandProcessor::change_boolean (arg, &Sys->do_logo, "do_logo");
-  else if (!strcasecmp (cmd, "do_gravity"))
+  else if (!csStrCaseCmp (cmd, "do_gravity"))
     csCommandProcessor::change_boolean (arg, &Sys->do_gravity, "do_gravity");
-  else if (!strcasecmp (cmd, "inverse_mouse"))
+  else if (!csStrCaseCmp (cmd, "inverse_mouse"))
     csCommandProcessor::change_boolean (arg, &Sys->inverse_mouse, "inverse_mouse");
-  else if (!strcasecmp (cmd, "colldet"))
+  else if (!csStrCaseCmp (cmd, "colldet"))
     csCommandProcessor::change_boolean (arg, &Sys->do_cd, "colldet");
-  else if (!strcasecmp (cmd, "zbuf"))
+  else if (!csStrCaseCmp (cmd, "zbuf"))
     csCommandProcessor::change_boolean (arg, &Sys->do_show_z, "zbuf");
-  else if (!strcasecmp (cmd, "db_boxshow"))
+  else if (!csStrCaseCmp (cmd, "db_boxshow"))
     csCommandProcessor::change_boolean (arg, &Sys->do_show_debug_boxes, "show debug boxes");
-  else if (!strcasecmp (cmd, "db_boxcam1"))
+  else if (!csStrCaseCmp (cmd, "db_boxcam1"))
     Sys->debug_box1.SetCenter (Sys->view->GetCamera ()->GetTransform ().GetOrigin ());
-  else if (!strcasecmp (cmd, "db_boxcam2"))
+  else if (!csStrCaseCmp (cmd, "db_boxcam2"))
     Sys->debug_box2.SetCenter (Sys->view->GetCamera ()->GetTransform ().GetOrigin ());
-  else if (!strcasecmp (cmd, "db_boxsize1"))
+  else if (!csStrCaseCmp (cmd, "db_boxsize1"))
   {
     float size = Sys->debug_box1.MaxX ()-Sys->debug_box1.MinX ();
     csCommandProcessor::change_float (arg, &size, "box1 size", 0.01f, 1000);
     Sys->debug_box1.SetSize (csVector3 (size, size, size));
   }
-  else if (!strcasecmp (cmd, "db_boxsize2"))
+  else if (!csStrCaseCmp (cmd, "db_boxsize2"))
   {
     float size = Sys->debug_box2.MaxX ()-Sys->debug_box2.MinX ();
     csCommandProcessor::change_float (arg, &size, "box2 size", 0.01f, 1000);
     Sys->debug_box2.SetSize (csVector3 (size, size, size));
   }
-  else if (!strcasecmp (cmd, "db_frustum"))
+  else if (!csStrCaseCmp (cmd, "db_frustum"))
     csCommandProcessor::change_int (arg, &Sys->cfg_debug_check_frustum, "debug check frustum", 0, 2000000000);
-  else if (!strcasecmp (cmd, "db_radstep"))
+  else if (!csStrCaseCmp (cmd, "db_radstep"))
   {
 #if 0
     csRadiosity* rad;
@@ -1485,7 +1485,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
 #endif
   }
-  else if (!strcasecmp (cmd, "db_radtodo"))
+  else if (!csStrCaseCmp (cmd, "db_radtodo"))
   {
 #if 0
     csRadiosity* rad;
@@ -1497,7 +1497,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
 #endif
   }
-  else if (!strcasecmp (cmd, "db_radhi"))
+  else if (!csStrCaseCmp (cmd, "db_radhi"))
   {
 #if 0
     csRadiosity* rad;
@@ -1510,11 +1510,11 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
 #endif
   }
-  else if (!strcasecmp (cmd, "palette"))
+  else if (!csStrCaseCmp (cmd, "palette"))
     csCommandProcessor::change_boolean (arg, &Sys->do_show_palette, "palette");
-  else if (!strcasecmp (cmd, "move3d"))
+  else if (!csStrCaseCmp (cmd, "move3d"))
     csCommandProcessor::change_boolean (arg, &Sys->move_3d, "move3d");
-  else if (!strcasecmp (cmd, "speed"))
+  else if (!csStrCaseCmp (cmd, "speed"))
   {
     bool speed = Sys->cfg_walk_maxspeed_multreal > 1.1f;
     csCommandProcessor::change_boolean (arg, &speed, "speed");
@@ -1523,18 +1523,18 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
       Sys->cfg_walk_maxspeed_multreal = 1.0f;
   }
-  else if (!strcasecmp (cmd, "freelook"))
+  else if (!csStrCaseCmp (cmd, "freelook"))
   {
     csCommandProcessor::change_boolean (arg, &Sys->do_freelook, "freelook");
     if (Sys->do_freelook)
       Sys->myG2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
     Sys->myG2D->SetMouseCursor (Sys->do_freelook?csmcNone:csmcArrow);
   }
-  else if (!strcasecmp (cmd, "coordshow"))
+  else if (!csStrCaseCmp (cmd, "coordshow"))
   {
     csCommandProcessor::change_boolean (arg, &Sys->do_show_coord, "coordshow");
   }
-  else if (!strcasecmp (cmd, "hi"))
+  else if (!csStrCaseCmp (cmd, "hi"))
   {
 #if 0
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -1545,7 +1545,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     Sys->selected_polygon = hi;
 #endif
   }
-  else if (!strcasecmp (cmd, "p_alpha"))
+  else if (!csStrCaseCmp (cmd, "p_alpha"))
   {
 #if 0
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -1563,7 +1563,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No polygon selected!");
 #endif
   }
-  else if (!strcasecmp (cmd, "s_fog"))
+  else if (!csStrCaseCmp (cmd, "s_fog"))
   {
     csFog* f = Sys->view->GetCamera ()->GetSector ()->GetFog ();
     if (!arg)
@@ -1588,7 +1588,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       f->blue = b;
     }
   }
-  else if (!strcasecmp (cmd, "portal"))
+  else if (!csStrCaseCmp (cmd, "portal"))
   {
     if (arg)
     {
@@ -1601,7 +1601,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	"Expected parameter 'level'!");
   }
-  else if (!strcasecmp (cmd, "fs_inter"))
+  else if (!csStrCaseCmp (cmd, "fs_inter"))
   {
     Sys->do_fs_inter = !Sys->do_fs_inter;
     if (Sys->do_fs_inter)
@@ -1613,7 +1613,7 @@ bool CommandHandler (const char *cmd, const char *arg)
         csScanStr (arg, "%f,%f", &Sys->fs_inter_amount, &Sys->fs_inter_length);
     }
   }
-  else if (!strcasecmp (cmd, "fs_fadeout"))
+  else if (!csStrCaseCmp (cmd, "fs_fadeout"))
   {
     Sys->do_fs_fadeout = !Sys->do_fs_fadeout;
     if (Sys->do_fs_fadeout)
@@ -1622,7 +1622,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->fs_fadeout_dir = true;
     }
   }
-  else if (!strcasecmp (cmd, "fs_fadecol"))
+  else if (!csStrCaseCmp (cmd, "fs_fadecol"))
   {
     Sys->do_fs_fadecol = !Sys->do_fs_fadecol;
     if (Sys->do_fs_fadecol)
@@ -1634,7 +1634,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->fs_fadecol_color.Set (r, g, b);
     }
   }
-  else if (!strcasecmp (cmd, "fs_fadetxt"))
+  else if (!csStrCaseCmp (cmd, "fs_fadetxt"))
   {
     Sys->do_fs_fadetxt = !Sys->do_fs_fadetxt;
     if (Sys->do_fs_fadetxt)
@@ -1657,7 +1657,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
     }
   }
-  else if (!strcasecmp (cmd, "fs_red"))
+  else if (!csStrCaseCmp (cmd, "fs_red"))
   {
     Sys->do_fs_red = !Sys->do_fs_red;
     if (Sys->do_fs_red)
@@ -1666,7 +1666,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->fs_red_dir = true;
     }
   }
-  else if (!strcasecmp (cmd, "fs_green"))
+  else if (!csStrCaseCmp (cmd, "fs_green"))
   {
     Sys->do_fs_green = !Sys->do_fs_green;
     if (Sys->do_fs_green)
@@ -1675,7 +1675,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->fs_green_dir = true;
     }
   }
-  else if (!strcasecmp (cmd, "fs_blue"))
+  else if (!csStrCaseCmp (cmd, "fs_blue"))
   {
     Sys->do_fs_blue = !Sys->do_fs_blue;
     if (Sys->do_fs_blue)
@@ -1684,7 +1684,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->fs_blue_dir = true;
     }
   }
-  else if (!strcasecmp (cmd, "fs_whiteout"))
+  else if (!csStrCaseCmp (cmd, "fs_whiteout"))
   {
     Sys->do_fs_whiteout = !Sys->do_fs_whiteout;
     if (Sys->do_fs_whiteout)
@@ -1693,7 +1693,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->fs_whiteout_dir = true;
     }
   }
-  else if (!strcasecmp (cmd, "fs_shadevert"))
+  else if (!csStrCaseCmp (cmd, "fs_shadevert"))
   {
     Sys->do_fs_shadevert = !Sys->do_fs_shadevert;
     if (Sys->do_fs_shadevert)
@@ -1705,7 +1705,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->fs_shadevert_botcol.Set (br, bg, bb);
     }
   }
-  else if (!strcasecmp (cmd, "perftest"))
+  else if (!csStrCaseCmp (cmd, "perftest"))
   {
     int num = 200;
     if (arg)
@@ -1719,150 +1719,150 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     perf_test (num);
   }
-  else if (!strcasecmp (cmd, "debug0"))
+  else if (!csStrCaseCmp (cmd, "debug0"))
   {
   }
-  else if (!strcasecmp (cmd, "debug1"))
+  else if (!csStrCaseCmp (cmd, "debug1"))
   {
   }
-  else if (!strcasecmp (cmd, "debug2"))
+  else if (!csStrCaseCmp (cmd, "debug2"))
   {
   }
-  else if (!strcasecmp (cmd, "strafe_left"))
+  else if (!csStrCaseCmp (cmd, "strafe_left"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d) { if (f) Sys->imm_left (0.1f, false, false); }
     else Sys->strafe (-1*f,0);
   }
-  else if (!strcasecmp (cmd, "strafe_right"))
+  else if (!csStrCaseCmp (cmd, "strafe_right"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d) { if (f) Sys->imm_right (0.1f, false, false); }
     else Sys->strafe (1*f,0);
   }
-  else if (!strcasecmp (cmd, "step_forward"))
+  else if (!csStrCaseCmp (cmd, "step_forward"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d) { if (f) Sys->imm_forward (0.1f, false, false); }
     else Sys->step (1*f,0);
   }
-  else if (!strcasecmp (cmd, "step_backward"))
+  else if (!csStrCaseCmp (cmd, "step_backward"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d) { if (f) Sys->imm_backward (0.1f, false, false); }
     else Sys->step (-1*f,0);
   }
-  else if (!strcasecmp (cmd, "rotate_left"))
+  else if (!csStrCaseCmp (cmd, "rotate_left"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d) { if (f) Sys->imm_rot_left_camera (0.1f, false, false); }
     else Sys->rotate (-1*f,0);
   }
-  else if (!strcasecmp (cmd, "rotate_right"))
+  else if (!csStrCaseCmp (cmd, "rotate_right"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d) { if (f) Sys->imm_rot_right_camera (0.1f, false, false); }
     else Sys->rotate (1*f,0);
   }
-  else if (!strcasecmp (cmd, "look_up"))
+  else if (!csStrCaseCmp (cmd, "look_up"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d) { if (f) Sys->imm_rot_right_xaxis (0.1f, false, false); }
     else Sys->look (-1*f,0);
   }
-  else if (!strcasecmp (cmd, "look_down"))
+  else if (!csStrCaseCmp (cmd, "look_down"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d) { if (f) Sys->imm_rot_left_xaxis (0.1f, false, false); }
     else Sys->look (1*f,0);
   }
-  else if (!strcasecmp (cmd, "jump"))
+  else if (!csStrCaseCmp (cmd, "jump"))
   {
     if (Sys->do_gravity && Sys->on_ground)
       Sys->velocity.y = Sys->cfg_jumpspeed;
   }
-  else if (!strcasecmp (cmd, "i_forward"))
+  else if (!csStrCaseCmp (cmd, "i_forward"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_forward (0.1f, (bool)slow, (bool)fast);
   }
-  else if (!strcasecmp (cmd, "i_backward"))
+  else if (!csStrCaseCmp (cmd, "i_backward"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_backward (0.1f, (bool)slow, (bool)fast);
   }
-  else if (!strcasecmp (cmd, "i_left"))
+  else if (!csStrCaseCmp (cmd, "i_left"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_left (0.1f, (bool)slow, (bool)fast);
   }
-  else if (!strcasecmp (cmd, "i_right"))
+  else if (!csStrCaseCmp (cmd, "i_right"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_right (0.1f, (bool)slow, (bool)fast);
   }
-  else if (!strcasecmp (cmd, "i_up"))
+  else if (!csStrCaseCmp (cmd, "i_up"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_up (0.1f, (bool)slow, (bool)fast);
   }
-  else if (!strcasecmp (cmd, "i_down"))
+  else if (!csStrCaseCmp (cmd, "i_down"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_down (0.1f, (bool)slow, (bool)fast);
   }
-  else if (!strcasecmp (cmd, "i_rotleftc"))
+  else if (!csStrCaseCmp (cmd, "i_rotleftc"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_rot_left_camera (0.1f, (bool)slow, (bool)fast);
   }
-  else if (!strcasecmp (cmd, "i_rotleftw"))
+  else if (!csStrCaseCmp (cmd, "i_rotleftw"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_rot_left_world (0.1f, (bool)slow, (bool)fast);
   }
-  else if (!strcasecmp (cmd, "i_rotrightc"))
+  else if (!csStrCaseCmp (cmd, "i_rotrightc"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_rot_right_camera (0.1f, (bool)slow, (bool)fast);
   }
-  else if (!strcasecmp (cmd, "i_rotrightw"))
+  else if (!csStrCaseCmp (cmd, "i_rotrightw"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_rot_right_world (0.1f, (bool)slow, (bool)fast);
   }
-  else if (!strcasecmp (cmd, "i_rotleftx"))
+  else if (!csStrCaseCmp (cmd, "i_rotleftx"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_rot_left_xaxis (0.1f, (bool)slow, (bool)fast);
   }
-  else if (!strcasecmp (cmd, "i_rotleftz"))
+  else if (!csStrCaseCmp (cmd, "i_rotleftz"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_rot_left_zaxis (0.1f, (bool)slow, (bool)fast);
   }
-  else if (!strcasecmp (cmd, "i_rotrightx"))
+  else if (!csStrCaseCmp (cmd, "i_rotrightx"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_rot_right_xaxis (0.1f, (bool)slow, (bool)fast);
   }
-  else if (!strcasecmp (cmd, "i_rotrightz"))
+  else if (!csStrCaseCmp (cmd, "i_rotrightz"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_rot_right_zaxis (0.1f, (bool)slow, (bool)fast);
   }
-  else if (!strcasecmp (cmd, "fire"))
+  else if (!csStrCaseCmp (cmd, "fire"))
   {
     RECORD_CMD (cmd);
     extern void fire_missile ();
     fire_missile ();
   }
-  else if (!strcasecmp (cmd, "lightning"))
+  else if (!csStrCaseCmp (cmd, "lightning"))
   {
     extern void show_lightning ();
     show_lightning ();
   }
-  else if (!strcasecmp (cmd, "rain"))
+  else if (!csStrCaseCmp (cmd, "rain"))
   {
     char txtname[100];
     int cnt = 0;
@@ -1879,7 +1879,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     add_particles_rain (Sys->view->GetCamera ()->GetSector (),
     	txtname, num, speed, false);
   }
-  else if (!strcasecmp (cmd, "frain"))
+  else if (!csStrCaseCmp (cmd, "frain"))
   {
     char txtname[100];
     int cnt = 0;
@@ -1896,7 +1896,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     add_particles_rain (Sys->view->GetCamera ()->GetSector (),
     	txtname, num, speed, true);
   }
-  else if (!strcasecmp (cmd, "snow"))
+  else if (!csStrCaseCmp (cmd, "snow"))
   {
     char txtname[100];
     int cnt = 0;
@@ -1913,7 +1913,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     add_particles_snow (Sys->view->GetCamera ()->GetSector (),
     	txtname, num, speed);
   }
-  else if (!strcasecmp (cmd, "flame"))
+  else if (!csStrCaseCmp (cmd, "flame"))
   {
     RECORD_ARGS (cmd, arg);
     char txtname[100];
@@ -1928,7 +1928,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     	txtname, num, Sys->view->GetCamera ()->GetTransform ().GetOrigin ()-
 	csVector3 (0, Sys->cfg_body_height, 0));
   }
-  else if (!strcasecmp (cmd, "fountain"))
+  else if (!csStrCaseCmp (cmd, "fountain"))
   {
     RECORD_ARGS (cmd, arg);
     char txtname[100];
@@ -1943,7 +1943,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     	txtname, num, Sys->view->GetCamera ()->GetTransform ().GetOrigin ()-
 	csVector3 (0, Sys->cfg_body_height, 0));
   }
-  else if (!strcasecmp (cmd, "explosion"))
+  else if (!csStrCaseCmp (cmd, "explosion"))
   {
     char txtname[100];
     int cnt = 0;
@@ -1961,7 +1961,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     	Sys->Engine,
 	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), txtname);
   }
-  else if (!strcasecmp (cmd, "spiral"))
+  else if (!csStrCaseCmp (cmd, "spiral"))
   {
     char txtname[100];
     int cnt = 0;
@@ -1977,7 +1977,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       add_particles_spiral (Sys->view->GetCamera ()->GetSector (),
     	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), txtname);
   }
-  else if (!strcasecmp (cmd, "loadmesh"))
+  else if (!csStrCaseCmp (cmd, "loadmesh"))
   {
     char filename[100], tempname[100], txtname[100];
     int cnt = 0;
@@ -1989,7 +1989,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     else load_meshobj (filename, tempname, txtname);
   }
-  else if (!strcasecmp (cmd, "addmesh"))
+  else if (!csStrCaseCmp (cmd, "addmesh"))
   {
     char tname[100];
     char sname[100];
@@ -2007,7 +2007,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     	          Sys->view->GetCamera ()->GetTransform ().GetOrigin (), size);
     }
   }
-  else if (!strcasecmp (cmd, "delmesh"))
+  else if (!csStrCaseCmp (cmd, "delmesh"))
   {
     char name[100];
     if (arg)
@@ -2024,11 +2024,11 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Missing mesh name!");
   }
-  else if (!strcasecmp (cmd, "listmeshes"))
+  else if (!csStrCaseCmp (cmd, "listmeshes"))
   {
     list_meshes ();
   }
-  else if(!strcasecmp(cmd, "listactions"))
+  else if(!csStrCaseCmp(cmd, "listactions"))
   {
     char name[100];
     char action[100];
@@ -2069,7 +2069,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
     }
   }
-  else if (!strcasecmp (cmd, "setaction"))
+  else if (!csStrCaseCmp (cmd, "setaction"))
   {
     char name[100];
     char action[100];
@@ -2109,7 +2109,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
     }
   }
-  else if (!strcasecmp (cmd, "addbot"))
+  else if (!csStrCaseCmp (cmd, "addbot"))
   {
     RECORD_ARGS (cmd, arg);
     float radius = 0;
@@ -2117,11 +2117,11 @@ bool CommandHandler (const char *cmd, const char *arg)
     Sys->add_bot (2, Sys->view->GetCamera ()->GetSector (),
     	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), radius);
   }
-  else if (!strcasecmp (cmd, "delbot"))
+  else if (!csStrCaseCmp (cmd, "delbot"))
   {
     Sys->del_bot ();
   }
-  else if (!strcasecmp (cmd, "clrlights"))
+  else if (!csStrCaseCmp (cmd, "clrlights"))
   {
     RECORD_CMD (cmd);
     csRef<iLightIterator> lit (Sys->view->GetEngine ()->GetLightIterator ());
@@ -2132,7 +2132,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       l->SetColor (csColor (0, 0, 0));
     }
   }
-  else if (!strcasecmp (cmd, "setlight"))
+  else if (!csStrCaseCmp (cmd, "setlight"))
   {
     if (Sys->selected_light)
     {
@@ -2145,7 +2145,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No light selected!");
   }
-  else if (!strcasecmp (cmd, "addlight"))
+  else if (!csStrCaseCmp (cmd, "addlight"))
   {
     RECORD_ARGS (cmd, arg);
     csVector3 dir (0,0,0);
@@ -2180,7 +2180,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       AttachRandomLight (dyn);
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Dynamic light added.");
   }
-  else if (!strcasecmp (cmd, "delstlight"))
+  else if (!csStrCaseCmp (cmd, "delstlight"))
   {
     RECORD_ARGS (cmd, arg);
     char name[255];
@@ -2204,7 +2204,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Static light removed.");
     }
   }
-  else if (!strcasecmp (cmd, "addstlight"))
+  else if (!csStrCaseCmp (cmd, "addstlight"))
   {
     RECORD_ARGS (cmd, arg);
     csVector3 dir (0,0,0);
@@ -2229,7 +2229,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     Sys->view->GetEngine ()->ForceRelight (light);
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Static light added.");
   }
-  else if (!strcasecmp (cmd, "dellight"))
+  else if (!csStrCaseCmp (cmd, "dellight"))
   {
     RECORD_CMD (cmd);
     iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
@@ -2254,7 +2254,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
     }
   }
-  else if (!strcasecmp (cmd, "dellights"))
+  else if (!csStrCaseCmp (cmd, "dellights"))
   {
     RECORD_CMD (cmd);
     iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
@@ -2279,7 +2279,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "All dynamic lights deleted.");
   }
-  else if (!strcasecmp (cmd, "relight"))
+  else if (!csStrCaseCmp (cmd, "relight"))
   {
     csRef<iConsoleOutput> console = CS_QUERY_REGISTRY(Sys->object_reg, iConsoleOutput);
     if(console.IsValid())
@@ -2289,7 +2289,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       delete meter;
     }
   }
-  else if (!strcasecmp (cmd, "snd_play"))
+  else if (!csStrCaseCmp (cmd, "snd_play"))
   {
     if (Sys->mySound)
     {
@@ -2303,7 +2303,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 		"Sound '%s' not found!", arg);
     }
   }
-  else if (!strcasecmp (cmd, "snd_volume"))
+  else if (!csStrCaseCmp (cmd, "snd_volume"))
   {
     if (Sys->mySound)
     {
@@ -2312,9 +2312,9 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->mySound->SetVolume (vol);
     }
   }
-  else if (!strcasecmp (cmd, "fullscreen"))
+  else if (!csStrCaseCmp (cmd, "fullscreen"))
     Sys->myG2D->PerformExtension("fullscreen");
-  else if (!strcasecmp(cmd, "split_view"))
+  else if (!csStrCaseCmp(cmd, "split_view"))
   {
     if (Sys->split == -1)
     {	
@@ -2334,7 +2334,7 @@ bool CommandHandler (const char *cmd, const char *arg)
         Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "Splitting to 2 views");
     };
   }
-  else if (!strcasecmp(cmd, "unsplit_view"))
+  else if (!csStrCaseCmp(cmd, "unsplit_view"))
   {
     if (Sys->split != -1)
     {
@@ -2351,7 +2351,7 @@ bool CommandHandler (const char *cmd, const char *arg)
         Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "Unsplitting view");
     }
   }
-  else if (!strcasecmp(cmd, "toggle_view"))
+  else if (!csStrCaseCmp(cmd, "toggle_view"))
   {
     if (Sys->split != -1)
     {
@@ -2360,7 +2360,7 @@ bool CommandHandler (const char *cmd, const char *arg)
         Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "Switching to view %d", Sys->split);
     }
   }
-  else if (!strcasecmp(cmd, "farplane"))
+  else if (!csStrCaseCmp(cmd, "farplane"))
   {
     if (!arg)
     {
@@ -2384,7 +2384,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     // turn on zclear to be sure
     Sys->Engine->SetClearZBuf(true);
   }
-  else if (!strcasecmp (cmd, "saveworld"))
+  else if (!csStrCaseCmp (cmd, "saveworld"))
   {
     if (!arg)
     {
@@ -2414,7 +2414,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "saveworld: Error saving map file!");
   }
-  else if (!strcasecmp (cmd, "cubemapshots"))
+  else if (!csStrCaseCmp (cmd, "cubemapshots"))
   {
     csRef<iImageIO> iio = CS_QUERY_REGISTRY (Sys->object_reg, iImageIO);
     int dim = MIN (Sys->myG3D->GetWidth (), Sys->myG3D->GetHeight ());
