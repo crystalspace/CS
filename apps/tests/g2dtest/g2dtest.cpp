@@ -528,7 +528,7 @@ void G2DTestSystemDriver::DrawContextInfoScreen ()
   if (pfmt.PalEntries)
     sprintf (pixfmt, "not available");
   else
-    sprintf (pixfmt, "R[%08lX] G[%08lX] B[%08lX] ", pfmt.RedMask, pfmt.GreenMask, pfmt.BlueMask);
+    sprintf (pixfmt, "R[%08X] G[%08X] B[%08X] ", pfmt.RedMask, pfmt.GreenMask, pfmt.BlueMask);
   WriteCentered (0, 16*0, gray,  -1, "R/G/B masks: %s", pixfmt);
 
   WriteCentered (0, 16*1, gray,  -1, "More than one backbuffer available: %s",
