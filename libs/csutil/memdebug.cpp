@@ -870,6 +870,7 @@ void* operator new (size_t s, void* filename, int /*line*/)
 {
   CS_ASSERT (s > 0);
   uint32* rc = (uint32*)malloc (s+16);
+  memset (rc, 0xfe, s+16);
   *rc++ = s;
   *rc++ = 0xbeebbeeb;
   *rc++ = (uint32)mtiRegisterAlloc (s, filename);
@@ -880,6 +881,7 @@ void* operator new[] (size_t s, void* filename, int /*line*/)
 {
   CS_ASSERT (s > 0);
   uint32* rc = (uint32*)malloc (s+16);
+  memset (rc, 0xfe, s+16);
   *rc++ = s;
   *rc++ = 0xfeedbeef;
   *rc++ = (uint32)mtiRegisterAlloc (s, filename);

@@ -47,7 +47,6 @@ csPolyTexture::csPolyTexture ()
   //polygon = 0;
   shadow_bitmap = 0;
   light_version = 0;
-  tmapping = 0;
 }
 
 void csPolyTexture::ObjectToWorld (const csMatrix3& m_obj2tex,
@@ -68,11 +67,6 @@ void csPolyTexture::ObjectToWorld (const csMatrix3& m_obj2tex,
   m_world2tex = m_obj2tex;
   m_world2tex *= obj.GetO2T ();
   v_world2tex = obj.This2Other (v_obj2tex);
-}
-
-void csPolyTexture::SetTextureMapping (csPolyTextureMapping* mapping)
-{
-  csPolyTexture::tmapping = mapping;
 }
 
 void csPolyTexture::SetRendererLightmap (iRendererLightmap* rlm)
@@ -291,6 +285,8 @@ void csPolyTexture::FillLightMap (
     // @@@ Actually we only want to project the light and shadow frustums
     // on the polygon plane but I'm not sure yet how to do that efficiently.
     // poly will be the polygon to which we clip all frustums.
+    csPolyTextureMapping* tmapping = subpoly->GetStaticPoly ()->GetTextureMapping ();
+
     csVector3 poly[4];
     csPolygon3D *base_poly = subpoly;
     int num_vertices = 4;
@@ -455,6 +451,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
   const csVector3& v_world2tex,
   csPolygon3D* polygon)
 {
+  csPolyTextureMapping* tmapping = polygon->GetStaticPoly ()->GetTextureMapping ();
   int lw = 1 +
     ((tmapping->w_orig + csLightMap::lightcell_size - 1) >>
       csLightMap::lightcell_shift);
@@ -788,6 +785,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
   float cosfact = polygon->GetParent ()->GetStaticData ()->GetCosinusFactor ();
   if (cosfact == -1) cosfact = cfg_cosinus_factor;
 
+  csPolyTextureMapping* tmapping = polygon->GetStaticPoly ()->GetTextureMapping ();
   if (dyn)
   {
     if (!(shadow_bitmap->IsFullyShadowed () || shadow_bitmap->IsFullyUnlit ()))

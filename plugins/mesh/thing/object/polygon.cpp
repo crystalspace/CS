@@ -1032,7 +1032,6 @@ csPolygon3D::csPolygon3D ()
   thing = 0;
   static_poly = 0;
 
-  txt_info = 0;
   lightpatches = 0;
 }
 
@@ -1054,18 +1053,15 @@ csPolygon3D::~csPolygon3D ()
 
 void csPolygon3D::RemovePolyTexture ()
 {
-  if (!txt_info) return;
   if (GetParent ())
   {
     iGraphics3D* G3D = GetParent()->GetStaticData()->thing_type->G3D;
-    if (G3D && txt_info->rlm) G3D->RemoveFromCache (txt_info->rlm);
+    if (G3D && txt_info.rlm) G3D->RemoveFromCache (txt_info.rlm);
   }
-  if (txt_info->lm)
+  if (txt_info.lm)
   {
-    GetParent ()->GetStaticData ()->thing_type->blk_lightmap.Free (txt_info->lm);
+    GetParent ()->GetStaticData ()->thing_type->blk_lightmap.Free (txt_info.lm);
   }
-  thing->GetStaticData ()->thing_type->blk_polytex.Free (txt_info);
-  txt_info = 0;
 }
 
 void csPolygon3D::SetStaticPoly (csPolygon3DStatic* static_poly)
@@ -1081,11 +1077,6 @@ void csPolygon3D::SetParent (csThing *thing)
 void csPolygon3D::RefreshFromStaticData ()
 {
   RemovePolyTexture ();
-  if (static_poly->IsTextureMappingEnabled ())
-  {
-    txt_info = static_poly->thing_static->thing_type->blk_polytex.Alloc ();
-    txt_info->SetTextureMapping (static_poly->GetTextureMapping ());
-  }
   plane_wor = static_poly->GetObjectPlane ();
 }
 
@@ -1110,12 +1101,12 @@ void csPolygon3D::Finish ()
 
   if (static_poly->IsTextureMappingEnabled ())
   {
-    txt_info->SetLightMap (0);
+    txt_info.SetLightMap (0);
     if (static_poly->flags.Check (CS_POLY_LIGHTING))
     {
       csLightMap *lm = static_poly->thing_static->thing_type
         ->blk_lightmap.Alloc ();
-      txt_info->SetLightMap (lm);
+      txt_info.SetLightMap (lm);
 
       lm->Alloc (static_poly->polygon_data.tmapping->w_orig,
       	static_poly->polygon_data.tmapping->h);
@@ -1148,13 +1139,12 @@ void csPolygon3D::DynamicLightDisconnect (iLight* dynlight)
 
 void csPolygon3D::StaticLightDisconnect (iLight* statlight)
 {
-  if (!txt_info) return;
-  csLightMap* lm = txt_info->GetLightMap ();
+  csLightMap* lm = txt_info.GetLightMap ();
   if (!lm) return;
   csShadowMap* sm = lm->FindShadowMap (statlight);
   if (!sm) return;
   lm->DelShadowMap (sm);
-  txt_info->light_version--;
+  txt_info.light_version--;
 }
 
 void csPolygon3D::UnlinkLightpatch (csLightPatch *lp)
@@ -1170,57 +1160,40 @@ void csPolygon3D::AddLightpatch (csLightPatch *lp)
 
 void csPolygon3D::InitializeDefault (bool clear)
 {
-  if (txt_info)
+  if (txt_info.lm == 0) return ;
+  txt_info.InitLightMaps ();
+  if (clear)
   {
-    if (txt_info->lm == 0) return ;
-    txt_info->InitLightMaps ();
-    if (clear)
-    {
-      csColor ambient;
-      thing->GetStaticData ()->thing_type->engine->GetAmbientLight (ambient);
-      txt_info->lm->InitColor (
+    csColor ambient;
+    thing->GetStaticData ()->thing_type->engine->GetAmbientLight (ambient);
+    txt_info.lm->InitColor (
           int(ambient.red * 255.0f),
           int(ambient.green * 255.0f),
           int(ambient.blue * 255.0f));
-    }
-    return ;
   }
 }
 
 const char* csPolygon3D::ReadFromCache (iFile* file)
 {
-  if (txt_info)
-  {
-    CS_ASSERT (txt_info != 0);
-    if (txt_info->lm == 0) return 0;
-    const char* error = txt_info->lm->ReadFromCache (
+  if (txt_info.lm == 0) return 0;
+  const char* error = txt_info.lm->ReadFromCache (
           file,
           static_poly->polygon_data.tmapping->w_orig,
           static_poly->polygon_data.tmapping->h,
           this,
-    thing->GetStaticData ()->thing_type->engine);
-    if (error != 0)
-    {
-      txt_info->InitLightMaps ();
-    }
-    return error;
-  }
-
-  return 0;
+  thing->GetStaticData ()->thing_type->engine);
+  if (error != 0)
+    txt_info.InitLightMaps ();
+  return error;
 }
 
 bool csPolygon3D::WriteToCache (iFile* file)
 {
-  if (txt_info)
-  {
-    if (txt_info->lm == 0) return true;
-    if (thing->GetStaticData ()->thing_type->engine->GetLightingCacheMode ()
+  if (txt_info.lm == 0) return true;
+  if (thing->GetStaticData ()->thing_type->engine->GetLightingCacheMode ()
       & CS_ENGINE_CACHE_WRITE)
-      txt_info->lm->Cache (file, this,
-    thing->GetStaticData ()->thing_type->engine);
-    return true;
-  }
-
+      txt_info.lm->Cache (file, this,
+  thing->GetStaticData ()->thing_type->engine);
   return true;
 }
 
@@ -1527,14 +1500,9 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
   // well.
   // @@@ TODO: Optimization. Precalculated edge-table to detect polygons
   // that are adjacent.
-  bool calc_lmap;
-  if (txt_info)
-    calc_lmap = txt_info->lm != 0;
-  else
-    calc_lmap = true;
 
   // Update the lightmap given light and shadow frustums in lview.
-  if (calc_lmap)
+  if (txt_info.lm)
     FillLightMapStatic (lview, lptq, vis, m_world2tex, v_world2tex);
 
   if (maybeItsVisible)
@@ -1546,10 +1514,7 @@ void csPolygon3D::FillLightMapStatic (iFrustumView *lview,
   const csMatrix3& m_world2tex,
   const csVector3& v_world2tex)
 {
-  if (txt_info)
-  {
-    txt_info->FillLightMap (lview, lptq, vis, this,
+  txt_info.FillLightMap (lview, lptq, vis, this,
     	m_world2tex, v_world2tex);
-  }
 }
 

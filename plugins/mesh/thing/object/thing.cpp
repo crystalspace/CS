@@ -2894,7 +2894,6 @@ csThingObjectType::csThingObjectType (iBase *pParent) :
 	blk_polygon3d (2000),
 	blk_polygon3dstatic (2000),
 	blk_texturemapping (2000),
-	blk_polytex (2000),
 	blk_lightmap (2000),
 	blk_polidx3 (1000),
 	blk_polidx4 (2000)

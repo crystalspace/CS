@@ -88,6 +88,9 @@ private:
   // attached) in which case we use the polygon based culler.
   bool use_outline_filler;
 
+  // If true then object is empty and we can't do coverage culling.
+  bool empty_object;
+
   csPolygonMeshEdge* edges;
   int num_edges;
 
@@ -116,6 +119,9 @@ public:
 
   /// Return true if this model can use outline filler.
   bool CanUseOutlineFiller () const { return use_outline_filler; }
+
+  /// Return true if model is empty.
+  bool EmptyObject () const { return empty_object; }
   
   /// Get the OBB for this model.
   const csOBB& GetOBB ();

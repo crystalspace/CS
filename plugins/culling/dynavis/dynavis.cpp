@@ -357,6 +357,12 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
   	|| visobj_wrap->model->CanUseOutlineFiller ())
 	&& !visobj_wrap->hint_goodoccluder;
 
+  if (visobj_wrap->model->EmptyObject ())
+  {
+    visobj_wrap->hint_badoccluder = true;
+    visobj_wrap->hint_goodoccluder = false;
+  }
+
   visobj_vector.Push (visobj_wrap);
 }
 
@@ -418,6 +424,13 @@ void csDynaVis::UpdateObject (csVisibilityObjectWrapper* visobj_wrap)
   visobj_wrap->use_outline_filler = (visobj_wrap->hint_closed
   	|| visobj_wrap->model->CanUseOutlineFiller ())
 	&& !visobj_wrap->hint_goodoccluder;
+
+  if (visobj_wrap->model->EmptyObject ())
+  {
+    visobj_wrap->hint_badoccluder = true;
+    visobj_wrap->hint_goodoccluder = false;
+  }
+
   csBox3 bbox;
   visobj_wrap->full_transform_identity = movable->IsFullTransformIdentity ();
   CalculateVisObjBBox (visobj, bbox, visobj_wrap->full_transform_identity);

@@ -79,12 +79,12 @@ class csPolygon3DStatic
 
 private:
   /// Name of this polygon.
-  char* name;
+  char* name;			// @@@ Avoid this?
 
   /**
    * The physical parent of this polygon.
    */
-  csThingStatic* thing_static;
+  csThingStatic* thing_static;	// @@@ Can probably be removed easily!!!
 
   /**
    * Render data for the renderer. This contains information like
@@ -524,10 +524,8 @@ private:
 
   /**
    * Texture type specific information for this polygon.
-   * Warning! Objects of this type are allocated on
-   * csThingObjectType->blk_polytex.
    */
-  csPolyTexture *txt_info;
+  csPolyTexture txt_info;
 
 public:
   /**
@@ -550,7 +548,7 @@ public:
   /**
    * Get the lightmap information.
    */
-  csPolyTexture* GetPolyTexture () const { return txt_info; }
+  csPolyTexture* GetPolyTexture () { return &txt_info; }
 
   /**
    * Set the static data.

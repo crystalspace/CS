@@ -33,6 +33,11 @@ chronological order.
 	  which already invoked those macros.
 	- res fixed a leak where shadervars were created with new, but not
 	  properly DecRef()ed.
+	- Jorrit fixed a bug in Dynavis with empty occlusion objects. It would
+	  try to put those on the coverage buffer with bad initialized arrays.
+	  The current solution is very optimal in that objects with no occlusion
+	  objects will now be completely ignored for occlusion writing as the
+	  old code always attempted to process them (and failed later).
 18-Feb-2004
 	- Jorrit added the ability to specify defaults for mesh object types
 	  in the map loader. Here is an example to demonstrate how this works:
@@ -87,6 +92,10 @@ chronological order.
 	  to the polygon in csPolyTexture).
 	- Jorrit removed 4 bytes for every polygon (removed lightmap_up_to_date
 	  field which was actually not needed).
+	- Jorrit removed at least 4 bytes by putting csPolyTexture directly
+	  in csPolygon3D. This also avoids one of the block allocators.
+	- Jorrit removed another 4 bytes from every csPolyTexture by avoiding
+	  the redundant csPolyTextureMapping pointer.
 	- Eric Sunshine augmented the OpenAL check in configure.ac so that it
 	  utilizes -ldl (if available).  This seems to be needed by Suse 7.3
 	  Linux.

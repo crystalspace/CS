@@ -40,6 +40,8 @@ csDynavisObjectModel::csDynavisObjectModel ()
   dirty_obb = true;
   has_obb = false;
   imodel = 0;
+  use_outline_filler = false;
+  empty_object = true;
 }
 
 csDynavisObjectModel::~csDynavisObjectModel ()
@@ -52,7 +54,7 @@ csDynavisObjectModel::~csDynavisObjectModel ()
 
 void csDynavisObjectModel::UpdateOutline (const csVector3& pos)
 {
-  if (!imodel->GetPolygonMeshViscull ()) return;
+  if (num_edges <= 0 || !imodel->GetPolygonMeshViscull ()) return;
 
   int num_vertices = imodel->GetPolygonMeshViscull ()->GetVertexCount ();
 
@@ -174,6 +176,15 @@ bool csObjectModelManager::CheckObjectModel (csDynavisObjectModel* model,
     iPolygonMesh* mesh = model->imodel->GetPolygonMeshViscull ();
     if (mesh)
     {
+      if (mesh->GetPolygonCount () == 0)
+      {
+        model->empty_object = true;
+	model->use_outline_filler = false;
+	return false;
+      }
+
+      model->empty_object = false;
+
       if (model->num_planes != mesh->GetPolygonCount ())
       {
         delete[] model->planes;
@@ -187,6 +198,9 @@ bool csObjectModelManager::CheckObjectModel (csDynavisObjectModel* model,
       delete[] model->edges;
       model->edges = csPolygonMeshTools::CalculateEdges (
       	mesh, model->num_edges);
+
+      // If the mesh is empty then it is possible that num_edges will be -1.
+      // The code below will correctly handle that.
       csPolygonMeshTools::CheckActiveEdges (model->edges, model->num_edges,
       	model->planes);
 
@@ -215,6 +229,10 @@ bool csObjectModelManager::CheckObjectModel (csDynavisObjectModel* model,
 	  }
 	  break;
 	}
+    }
+    else
+    {
+      model->empty_object = true;
     }
     return true;
   }

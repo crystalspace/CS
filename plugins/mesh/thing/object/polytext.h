@@ -238,8 +238,7 @@ class csPolyTexture
   friend class csPolygon3D;
 
 private:
-  /// How to map the lightmap on the polygon.
-  csPolyTextureMapping* tmapping;
+  /// Lightmap for the renderer.
   csRef<iRendererLightmap> rlm;
 
   /// LightMap.
