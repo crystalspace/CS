@@ -79,7 +79,7 @@ void D3DTextureCache::Load(HighColorCache_Data *d)
   IDirectDrawSurface* lpDDNextLevel;
   
   DDCOLORKEY key = { 0, 0 };
-  RGBpaletteEntry* Palette;
+  RGBpaletteEntry* Palette = NULL;
   CHK (cached_texture = new D3DTextureCache_Data);
   
   ITextureHandle* txt_handle = (ITextureHandle*)d->pSource;
