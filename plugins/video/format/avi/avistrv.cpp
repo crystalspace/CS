@@ -101,7 +101,7 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
   polyfx.vertices[2].v = 1;
   polyfx.vertices[3].u = 0;
   polyfx.vertices[3].v = 1;
-  for (int i=0; i<4; i++)
+  for (i=0; i<4; i++)
   {
     polyfx.vertices[i].r = 1;
     polyfx.vertices[i].g = 1;
