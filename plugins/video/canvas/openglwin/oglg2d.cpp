@@ -271,6 +271,13 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
   Report (CS_REPORTER_SEVERITY_NOTIFY,
   	"Using %d bits per pixel (%d color mode).", Depth, 1 << Depth);
 
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+						   iCommandLineParser);
+  m_bHardwareCursor = config->GetBool ("Video.SystemMouseCursor", true);
+  if (cmdline->GetOption ("sysmouse")) m_bHardwareCursor = true;
+  if (cmdline->GetOption ("nosysmouse")) m_bHardwareCursor = false;
+  cmdline->DecRef ();
+
   return true;
 }
 
