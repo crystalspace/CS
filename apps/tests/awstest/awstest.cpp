@@ -64,6 +64,7 @@
 #include "csgeom/csrectrg.h"
 
 #include "awstest.h"
+#include "awssktst.h"
 #include <stdio.h>
 
 
@@ -379,6 +380,15 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   /// 
   //aws->SetContext(myG2D, myG3D);
   aws->SetDefaultContext(engine, myG3D->GetTextureManager());
+
+  // next, setup sinks before loading any preferences
+  awsTestSink *s    = new awsTestSink();
+  iAwsSink    *sink =aws->GetSinkMgr()->CreateSink(s);
+
+  s->SetSink(sink);
+  aws->GetSinkMgr()->RegisterSink("testButtonSink", sink);
+
+  // now load preferences
   aws->GetPrefMgr()->Load("./data/temp/awstest.def");
   aws->GetPrefMgr()->SelectDefaultSkin("Normal Windows");
   
