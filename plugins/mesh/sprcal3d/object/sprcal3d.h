@@ -64,25 +64,26 @@ struct iMaterialWrapper;
 
 struct csCal3DAnimation
 {
-    int      index;
-    csString name;
-    int	     type;
-    float    base_velocity;
-    float    min_velocity;
-    float    max_velocity;
-    int      min_interval;
-    int      max_interval;
-    int      idle_pct;
-    bool     lock;
+  int      index;
+  csString name;
+  int	   type;
+  float    base_velocity;
+  float    min_velocity;
+  float    max_velocity;
+  int      min_interval;
+  int      max_interval;
+  int      idle_pct;
+  bool     lock;
 };
 
 struct csCal3DMesh
 {
-    int		      index;
-    csString	      name;
-    bool	      attach_by_default;
-    csRef<iMaterialWrapper> default_material;
-    csArray<csString> morph_target_name;
+  CS_LEAKGUARD_DECLARE (csCal3DMesh);
+  int	      index;
+  csString    name;
+  bool	      attach_by_default;
+  csRef<iMaterialWrapper> default_material;
+  csArray<csString> morph_target_name;
 };
 
 /**
@@ -156,8 +157,8 @@ private:
 
   /// This is the factory equivalent class in cal3d.
   CalCoreModel calCoreModel;
-  csArray<csCal3DAnimation*> anims;
-  csArray<csCal3DMesh*>      submeshes;
+  csPDelArray<csCal3DAnimation> anims;
+  csPDelArray<csCal3DMesh>   submeshes;
   csArray<csString>          morph_animation_names;
 
   csString     basePath;
@@ -180,7 +181,7 @@ public:
    * Reference to the engine (optional because sprites can also be
    * used for the isometric engine).
    */
-  iEngine* engine;
+  csWeakRef<iEngine> engine;
   
   static csStringID vertex_name, texel_name, normal_name, color_name, 
     index_name;
@@ -1080,7 +1081,7 @@ class csSpriteCal3DMeshObjectType : public iMeshObjectType
 private:
   iObjectRegistry* object_reg;
   csRef<iVirtualClock> vc;
-  iEngine* engine;
+  csWeakRef<iEngine> engine;
 
 public:
   /// Constructor.

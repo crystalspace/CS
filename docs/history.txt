@@ -29,6 +29,10 @@ chronological order.
 	  cal3d model specifies NO path and the textures also have
 	  no path so everything is loaded relative to the current VFS
 	  directory.
+	- Jorrit fixed a big memory leak in sprcal3d. The csCal3DAnimation
+	  and csCal3DMesh structures where never freed and csCal3DMesh
+	  kept a reference to the material which caused a number of other
+	  leaks as a result.
 22-Aug-2004
 	- Jorrit fixed a leak in spr3d. Everytime an spr3d was created
 	  it couldn't be removed again.

@@ -46,6 +46,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 // STL include required by cal3d
 #include <string>
 
+CS_LEAKGUARD_IMPLEMENT (csCal3DMesh)
 CS_LEAKGUARD_IMPLEMENT (csSpriteCal3DMeshObject)
 CS_LEAKGUARD_IMPLEMENT (csSpriteCal3DMeshObjectFactory)
 
@@ -112,36 +113,36 @@ void csSpriteCal3DSocket::SetName (char const* n)
 //--------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csSpriteCal3DMeshObjectFactory)
-SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSpriteCal3DFactoryState)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
-{
-  static scfInterfaceID iPolygonMesh_scfID = (scfInterfaceID)-1;		
-  if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
-    iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
-  if (iInterfaceID == iPolygonMesh_scfID &&				
-    scfCompatibleVersion(iVersion, scfInterface<iPolygonMesh>::GetVersion()))
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSpriteCal3DFactoryState)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
   {
-    printf ("Deprecated feature use: iPolygonMesh queried from Sprite3d "
-      "factory; use iObjectModel->GetPolygonMeshColldet() instead.\n");
-    iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
-    (Object)->IncRef ();						
-    return CS_STATIC_CAST(iPolygonMesh*, Object);				
+    static scfInterfaceID iPolygonMesh_scfID = (scfInterfaceID)-1;		
+    if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
+      iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
+    if (iInterfaceID == iPolygonMesh_scfID &&				
+      scfCompatibleVersion(iVersion, scfInterface<iPolygonMesh>::GetVersion()))
+    {
+      printf ("Deprecated feature use: iPolygonMesh queried from Sprite3d "
+        "factory; use iObjectModel->GetPolygonMeshColldet() instead.\n");
+      iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
+      (Object)->IncRef ();						
+      return CS_STATIC_CAST(iPolygonMesh*, Object);				
+    }
   }
-}
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DMeshObjectFactory::SpriteCal3DFactoryState)
-SCF_IMPLEMENTS_INTERFACE (iSpriteCal3DFactoryState)
+  SCF_IMPLEMENTS_INTERFACE (iSpriteCal3DFactoryState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DMeshObjectFactory::LODControl)
-SCF_IMPLEMENTS_INTERFACE (iLODControl)
+  SCF_IMPLEMENTS_INTERFACE (iLODControl)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DMeshObjectFactory::ObjectModel)
-SCF_IMPLEMENTS_INTERFACE (iObjectModel)
+  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csStringID csSpriteCal3DMeshObjectFactory::vertex_name = csInvalidStringID;
@@ -353,7 +354,7 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget (
 	const char *filename,
 	const char *name)
 {
-  if(mesh_index < 0 || submeshes.Length() <= (size_t)mesh_index)
+  if (mesh_index < 0 || submeshes.Length() <= (size_t)mesh_index)
   {
     return -1;
   }
@@ -381,7 +382,8 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget (
 
 void csSpriteCal3DMeshObjectFactory::CalculateAllBoneBoundingBoxes()
 {
-  // This function is SLOOOW.  Should only be called once after model is fully loaded.
+  // This function is SLOOOW.  Should only be called once after model is
+  // fully loaded.
   calCoreModel.getCoreSkeleton()->calculateBoundingBoxes(&calCoreModel);
 }
 
@@ -399,7 +401,7 @@ bool csSpriteCal3DMeshObjectFactory::AddMorphTarget(
   int mesh_index = FindMeshName(mesh_name);
   if(mesh_index == -1)
   {
-     return false;
+    return false;
   }
   csArray<csString>& morph_target = submeshes[mesh_index]->morph_target_name;
   size_t i;
@@ -419,7 +421,7 @@ bool csSpriteCal3DMeshObjectFactory::AddMorphTarget(
 
 int csSpriteCal3DMeshObjectFactory::GetMorphTargetCount(int mesh_id)
 {
-  if(mesh_id < 0|| submeshes.Length() <= (size_t)mesh_id)
+  if (mesh_id < 0|| submeshes.Length() <= (size_t)mesh_id)
   {
     return -1;
   }
@@ -437,7 +439,7 @@ const char *csSpriteCal3DMeshObjectFactory::GetMeshName(int idx)
 bool csSpriteCal3DMeshObjectFactory::IsMeshDefault(int idx)
 {
   if ((size_t)idx >= submeshes.Length())
-    return 0;
+    return false;
 
   return submeshes[idx]->attach_by_default;
 }
@@ -627,7 +629,7 @@ void csSpriteCal3DMeshObjectFactory::HardTransform (
 //=============================================================================
 
 SCF_IMPLEMENT_IBASE (csSpriteCal3DMeshObjectFactory::PolyMesh)
-SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
+  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
 SCF_IMPLEMENT_IBASE_END
 
 //=============================================================================
@@ -638,7 +640,6 @@ SCF_IMPLEMENT_IBASE (csSpriteCal3DMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSpriteCal3DState)
   #ifndef CS_USE_NEW_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
-  #else
   #endif // CS_USE_NEW_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
@@ -658,7 +659,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 #ifndef CS_USE_NEW_RENDERER
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DMeshObject::eiVertexBufferManagerClient)
-SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
+  SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 #else
 #endif // CS_USE_NEW_RENDERER
@@ -734,9 +735,7 @@ csSpriteCal3DMeshObject::~csSpriteCal3DMeshObject ()
     {
       size_t s; 
       for (s=0;s<vertices[m].Length();s++)
-      {
 	delete[] vertices[m][s];
-      }
     }
   }
   calModel.destroy();
@@ -793,7 +792,8 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
 		      factory->submeshes[meshId]->default_material);
     }
   }
-  // To get an accurate bbox below, you must have the model standing in the default anim first
+  // To get an accurate bbox below, you must have the model standing in
+  // the default anim first
   calModel.getMixer()->blendCycle(0,1,0);
   calModel.update(0);
   last_update_time = csGetTicks();
@@ -969,10 +969,11 @@ void csSpriteCal3DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
 }
 
 
-void csSpriteCal3DMeshObject::UpdateLightingSubmesh (const csArray<iLight*>& lights, 
-						     iMovable* movable,
-						     CalRenderer *pCalRenderer,
-						     int mesh, int submesh,float *have_normals)
+void csSpriteCal3DMeshObject::UpdateLightingSubmesh (
+	const csArray<iLight*>& lights, 
+	iMovable* movable,
+	CalRenderer *pCalRenderer,
+	int mesh, int submesh,float *have_normals)
 {
   int vertCount;
   vertCount = pCalRenderer->getVertexCount();
@@ -1015,7 +1016,8 @@ void csSpriteCal3DMeshObject::UpdateLightingSubmesh (const csArray<iLight*>& lig
     csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, 0);
     if (obj_sq_dist >= li->GetInfluenceRadiusSq ()) return;
-    float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)?csQisqrt (obj_sq_dist):1.0f;
+    float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)?
+    	csQisqrt (obj_sq_dist):1.0f;
 
     csColor light_color = li->GetColor () * (256.0f / CS_NORMAL_LIGHT_LEVEL)
       * li->GetBrightnessAtDistance (csQsqrt (obj_sq_dist));
@@ -1023,7 +1025,9 @@ void csSpriteCal3DMeshObject::UpdateLightingSubmesh (const csArray<iLight*>& lig
     int normal_index=0;
     for (i = 0; i < vertCount; i++)
     {
-      csVector3 normal(meshNormals[normal_index],meshNormals[normal_index+1],meshNormals[normal_index+2]);
+      csVector3 normal(meshNormals[normal_index],
+      	meshNormals[normal_index+1],
+	meshNormals[normal_index+2]);
       normal_index+=3;
       float cosinus;
       if (obj_sq_dist < SMALL_EPSILON) cosinus = 1;
@@ -1214,7 +1218,8 @@ void csSpriteCal3DMeshObject::SetupVertices()
 	vertices[m][s] = 
 	  new csVector3[calModel.getMesh(m)->getSubmesh(s)->getVertexCount ()];
 	int v;
-	for(v = 0; v < calModel.getMesh(m)->getSubmesh(s)->getVertexCount (); v++)
+	for(v = 0; v < calModel.getMesh(m)->getSubmesh(s)->getVertexCount ();
+		v++)
 	{
 	  vertices[m][s][v].x = 0;
 	  vertices[m][s][v].y = 0;
@@ -1301,8 +1306,9 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
       size_t s;
       for (s = 0; s < vertices[m].Length(); s++)
       {
-	std::vector<CalCoreSubmesh::Face>& vectorFace = calModel.getMesh(m)->getSubmesh(s)
-	  ->getCoreSubmesh()->getVectorFace();
+	std::vector<CalCoreSubmesh::Face>& vectorFace
+		= calModel.getMesh(m)->getSubmesh(s)
+		->getCoreSubmesh()->getVectorFace();
 	std::vector<CalCoreSubmesh::Face>::iterator iteratorFace
 	  = vectorFace.begin();
 	while(iteratorFace != vectorFace.end())
@@ -1311,8 +1317,9 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
 	  int f;
 	  for(f=0;!bboxhit&&f<3;f++)
 	  {
-	    std::vector<CalCoreSubmesh::Influence> influ = calModel.getMesh(m)->getSubmesh(s)
-	      ->getCoreSubmesh()->getVectorVertex ()
+	    std::vector<CalCoreSubmesh::Influence> influ
+	    	= calModel.getMesh(m)->getSubmesh(s)
+		->getCoreSubmesh()->getVectorVertex ()
 	      [(*iteratorFace).vertexId[f]].vectorInfluence;
 	    std::vector<CalCoreSubmesh::Influence>::iterator iteratorInflu =
 	      influ.begin();
@@ -1421,8 +1428,9 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
       size_t s;
       for (s = 0; s < vertices[m].Length(); s++)
       {
-	std::vector<CalCoreSubmesh::Face>& vectorFace = calModel.getMesh(m)->getSubmesh(s)
-	  ->getCoreSubmesh()->getVectorFace();
+	std::vector<CalCoreSubmesh::Face>& vectorFace
+		= calModel.getMesh(m)->getSubmesh(s)
+		->getCoreSubmesh()->getVectorFace();
 	std::vector<CalCoreSubmesh::Face>::iterator iteratorFace
 	  = vectorFace.begin();
 	while(iteratorFace != vectorFace.end())
@@ -1431,8 +1439,9 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
 	  int f;
 	  for(f=0;!bboxhit&&f<3;f++)
 	  {
-	    std::vector<CalCoreSubmesh::Influence> influ = calModel.getMesh(m)->getSubmesh(s)
-	      ->getCoreSubmesh()->getVectorVertex ()
+	    std::vector<CalCoreSubmesh::Influence> influ
+	    	= calModel.getMesh(m)->getSubmesh(s)
+		->getCoreSubmesh()->getVectorVertex ()
 	      [(*iteratorFace).vertexId[f]].vectorInfluence;
 	    std::vector<CalCoreSubmesh::Influence>::iterator iteratorInflu =
 	      influ.begin();
@@ -2030,7 +2039,7 @@ bool csSpriteCal3DMeshObject::SetAnimAction(int idx, float delayIn,
 
   if (factory->anims[idx]->lock)
   {
-     last_locked_anim = idx;
+    last_locked_anim = idx;
   }
 
   return true;
@@ -2165,10 +2174,10 @@ bool csSpriteCal3DMeshObject::AttachCoreMesh(const char *meshname)
 }
 
 bool csSpriteCal3DMeshObject::AttachCoreMesh(int mesh_id,int iMatWrapID)
-{  
+{
   if ( attached_ids.Find( mesh_id ) != csArrayItemNotFound )
     return true;
-    
+ 
   if (!calModel.attachMesh(mesh_id))
     return false;
 
@@ -2436,22 +2445,22 @@ void csSpriteCal3DMeshObject::BaseAccessor::PreGetValue (
 //----------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csSpriteCal3DMeshObjectType)
-SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DMeshObjectType::eiComponent)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DMeshObjectType::csSpriteCal3DConfig)
-SCF_IMPLEMENTS_INTERFACE (iConfig)
+  SCF_IMPLEMENTS_INTERFACE (iConfig)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DMeshObjectType::LODControl)
-SCF_IMPLEMENTS_INTERFACE (iLODControl)
+  SCF_IMPLEMENTS_INTERFACE (iLODControl)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSpriteCal3DMeshObjectType)
@@ -2476,9 +2485,7 @@ bool csSpriteCal3DMeshObjectType::Initialize (iObjectRegistry* object_reg)
 {
   csSpriteCal3DMeshObjectType::object_reg = object_reg;
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
-  csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
-  // We don't want to keep a reference to the engine (circular ref otherwise).
-  engine = eng;
+  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   return true;
 }
 
