@@ -3985,6 +3985,30 @@ CS_ENGINE_CACHE_NOUPDATE = _cspace.CS_ENGINE_CACHE_NOUPDATE
 CS_RENDPRI_NONE = _cspace.CS_RENDPRI_NONE
 CS_RENDPRI_BACK2FRONT = _cspace.CS_RENDPRI_BACK2FRONT
 CS_RENDPRI_FRONT2BACK = _cspace.CS_RENDPRI_FRONT2BACK
+class iEngineSectorCallback(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iEngineSectorCallback, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iEngineSectorCallback, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iEngineSectorCallback instance at %s>" % (self.this,)
+    def NewSector(*args): return _cspace.iEngineSectorCallback_NewSector(*args)
+    def RemoveSector(*args): return _cspace.iEngineSectorCallback_RemoveSector(*args)
+    def __del__(self, destroy=_cspace.delete_iEngineSectorCallback):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class iEngineSectorCallbackPtr(iEngineSectorCallback):
+    def __init__(self, this):
+        _swig_setattr(self, iEngineSectorCallback, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iEngineSectorCallback, 'thisown', 0)
+        _swig_setattr(self, iEngineSectorCallback,self.__class__,iEngineSectorCallback)
+_cspace.iEngineSectorCallback_swigregister(iEngineSectorCallbackPtr)
+
 class iEngine(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -4020,6 +4044,8 @@ class iEngine(iBase):
     def CreateBlackTexture(*args): return _cspace.iEngine_CreateBlackTexture(*args)
     def CreateMaterial(*args): return _cspace.iEngine_CreateMaterial(*args)
     def CreateSector(*args): return _cspace.iEngine_CreateSector(*args)
+    def AddEngineSectorCallback(*args): return _cspace.iEngine_AddEngineSectorCallback(*args)
+    def RemoveEngineSectorCallback(*args): return _cspace.iEngine_RemoveEngineSectorCallback(*args)
     def CreateSectorWallsMesh(*args): return _cspace.iEngine_CreateSectorWallsMesh(*args)
     def CreateThingMesh(*args): return _cspace.iEngine_CreateThingMesh(*args)
     def GetSectors(*args): return _cspace.iEngine_GetSectors(*args)
