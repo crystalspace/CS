@@ -141,7 +141,7 @@ echo "X11_PATH = "${X11_PATH}
 
 # find out if Xfree86 is installed, enable VideoMode extension if so.
 # detected by existence of the XFree86 server binary.
-[ -e ${X11_PATH}/bin/XFree86 -o -e /etc/X11/XF86Config ] &&
+[ -f ${X11_PATH}/bin/XFree86 -o -f /etc/X11/XF86Config ] &&
 echo "USE_XFREE86VM = yes"
 
 # find a writable install dir, unless user has done an override
