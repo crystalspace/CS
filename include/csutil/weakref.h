@@ -21,6 +21,7 @@
 #define __CS_WEAKREF_H__
 
 #include "csextern.h"
+#include "csutil/ref.h"
 
 /**
  * A weak reference. This is a reference to a reference counted object
@@ -85,6 +86,17 @@ public:
   }
 
   /**
+   * Construct a weak reference from a csPtr. This will put the object
+   * in the weak reference and then it will release the reference.
+   */
+  csWeakRef (const csPtr<T>& newobj)
+  {
+    csRef<T> r = newobj;
+    obj = r;
+    Link ();
+  }
+
+  /**
    * Weak pointer destructor.
    */
   ~csWeakRef ()
@@ -101,6 +113,22 @@ public:
     {
       Unlink ();
       obj = newobj;
+      Link ();
+    }
+    return *this;
+  }
+
+  /**
+   * Assign a csPtr reference to this weak reference. This
+   * will cause a DecRef() on the pointer.
+   */
+  csWeakRef& operator = (csPtr<T> newobj)
+  {
+    csRef<T> r = newobj;
+    if (obj != r)
+    {
+      Unlink ();
+      obj = r;
       Link ();
     }
     return *this;
