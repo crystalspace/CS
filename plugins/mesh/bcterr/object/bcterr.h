@@ -545,7 +545,8 @@ public:
     {
       return;
     }
-    virtual void SetHeightMap (iImage*, float /*hscale*/, float /*hshift*/)
+    virtual void SetHeightMap (iImage*, float /*hscale*/, float /*hshift*/,
+      bool, bool)
     {
       return;
     }

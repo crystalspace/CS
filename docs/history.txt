@@ -13,6 +13,8 @@ chronological order.
 	  caused problems with the Quit and Pause menu items because those
 	  items were still targeting the delegate, thus they became
 	  dysfunctional.
+	- Luca fixed a compilation error in plugins/mesh/bcterr/object/bcterr.h
+	  due to recent changes to the iTerrFuncState interface.
 10-Nov-2003
 	- Jorrit removed the blend2cs script from CS. It is made obsolete
 	  by the blend2cs project http://projects.blender.org/projects/blend2cs/
