@@ -26,6 +26,7 @@ awsComponent::awsComponent () :
   is_zoomed(false),
   flags(0),
   signalsrc(),
+  redraw_tag(0),
   focusable(false)
 {
   signalsrc.SetOwner (this);

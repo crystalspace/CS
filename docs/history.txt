@@ -11,6 +11,18 @@ chronological order.
 	  neglected to install the generated volatile.h if the build directory
 	  differed from the source directory.  Problem pointed out by Allister
 	  MacLeod <amacleod@mv3d.com>.
+	- Wouter fixed two 'jumps on uninitialised values' errors in aws:
+	  in awsmenu the mouse_captured was uninited (inited to false),
+	  in awscomponent the redraw_tag was uninited (inited to 0).
+	  Another bad initialisation in the console buffer of std.output.
+	  Seems that SetPageSize() was called too early in the constructor.
+	  Also in conbuff some delete instead of delete[] usage fixed.
+	- Wouter also fixed a buffer over-read problem in writechr.inc.
+	  The alpha byte was pre-fetched at the end of the writeloop,
+	  but also prefetched for the last iteration (i.e. reading a value
+	  outside bounds which wasn't used).
+	  Additionally, the freefnt2 plugin sometimes did a new[0], which
+	  is bad as well, changed it to allocate at least 1 byte.
 14-Nov-2003
 	- Jorrit did the following Dynavis changes:
 	    - Removed the write queue optimization for kdtree nodes again as

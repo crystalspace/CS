@@ -249,7 +249,7 @@ void WS_NAME (iFont *font, int pen_x, int pen_y,
 		  WS_ALPHABLEND_BG(fg, VRAM, CharLine)
 		}
 		VRAM++;
-		CharLine = (*CharImageAlpha++);
+		if (j < rX-1) CharLine = (*CharImageAlpha++);
 	      } /* endfor */
 	    }
 	    else
@@ -265,7 +265,7 @@ void WS_NAME (iFont *font, int pen_x, int pen_y,
 		  WS_ALPHABLEND(fg, VRAM, CharLine)
 		}
 		VRAM++;
-		CharLine = (*CharImageAlpha++);
+		if (j < rX-1) CharLine = (*CharImageAlpha++);
 	      } /* endfor */
 	      if (advance < 0) advance++;
 	    }

@@ -24,7 +24,7 @@ csConsoleBuffer::csConsoleBuffer (int length, int size)
 {
   buffer = 0;
   SetLength (length);
-  SetPageSize (size);
+  page_size = size;
   empty = new csString ("");
   current_line = 0;
   display_top = 0;
@@ -37,8 +37,8 @@ csConsoleBuffer::~csConsoleBuffer ()
   {
     // Clear out the current buffer and delete it
     Clear ();
-    delete buffer;
-    delete dirty;
+    delete[] buffer;
+    delete[] dirty;
     delete empty;
   }
 }
@@ -113,8 +113,8 @@ void csConsoleBuffer::SetLength (int length)
   if (buffer)
   {
     Clear ();
-    delete buffer;
-    delete dirty;
+    delete[] buffer;
+    delete[] dirty;
   }
 
   len = length;

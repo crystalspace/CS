@@ -469,6 +469,7 @@ awsMenu::awsMenu()
     parent_menu(0),
     mouse_pos(0,0),
     sink(),
+    mouse_captured(false),
     let_mouse_exit(true)
 {
   sink.SetParm (this);
