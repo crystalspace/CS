@@ -1,5 +1,25 @@
 The history order is reversed so that new features are at the top.
 
+25-Nov-2002
+	- Added a new CS_POLY_VISCULL flag with which it is possible to
+	  enable/disable visibility culling for individual polygons (thing
+	  mesh only). By default this flag is enabled except in the following
+	  cases:
+	      - Polygon has an <alpha> keyword.
+	      - Image associated with the texture of this polygon has
+	        keycolor.
+	      - Image associated with the texture of this polygon has
+	        an alpha map.
+	  Note that it is the polygon loader in syntax services that
+	  actually provides these defaults. If you manually create polygons
+	  with the API the default is always true.
+	- Extended syntax services plugin with new <viscull> keyword that
+	  you can use in a polygon to enable/disable visibility culling for
+	  individual polygons. Similar to the <colldet> keyword.
+	- Renamed iObjectModel->GetSmallerPolygonMesh() to
+	  GetPolygonMeshViscull() as this more closely describes what the
+	  purpose is of this polygon mesh.
+	- Renamed iObjectModel->GetPolygonMesh() to GetPolygonMeshColldet().
 24-Nov-2002
 	- Thanks to groton I managed to fix the bug that newsky crashes
 	  with recent versions of CS. The reason was that the default

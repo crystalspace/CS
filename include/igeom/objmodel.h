@@ -71,7 +71,7 @@ struct iObjectModelListener : public iBase
   virtual void ObjectModelChanged (iObjectModel* model) = 0;
 };
 
-SCF_VERSION (iObjectModel, 0, 0, 2);
+SCF_VERSION (iObjectModel, 0, 1, 0);
 
 /**
  * This interface represents data related to some geometry in object
@@ -90,27 +90,29 @@ struct iObjectModel : public iBase
 
   /**
    * Get a polygon mesh representing the geometry of the object.
+   * This mesh is useful for collision detection.
    * Can return NULL if this object model doesn't support that.
    */
-  virtual iPolygonMesh* GetPolygonMesh () = 0;
+  virtual iPolygonMesh* GetPolygonMeshColldet () = 0;
 
   /**
-   * Get a polygon mesh representing a lower detail version of the
-   * object. This lower detail version is guaranteed to be smaller
-   * than the real object. In other words: if you would render the original
+   * Get a polygon mesh specifically for visibility culling (to be used
+   * as an occluder). This polygon mesh is guaranteed to be smaller or equal
+   * to the real object. In other words: if you would render the original
    * mesh in red and this one in blue you should not see any blue anywhere.
    * This kind of lower detail version can be used for occlusion writing
    * in a visibility culling system.
-   * Can return NULL if this object model doesn't support that.
+   * Can return NULL if this object model doesn't support that. In that
+   * case the object will not be used for visibility culling.
    */
-  virtual iPolygonMesh* GetSmallerPolygonMesh () = 0;
+  virtual iPolygonMesh* GetPolygonMeshViscull () = 0;
 
   /**
    * Create a polygon mesh representing a lower detail version of the
-   * object but without the restrictions of GetSmallerPolygonMesh().
+   * object but without the restrictions of GetPolygonMeshViscull().
    * The floating point input number is 0 for minimum detail and
    * 1 for highest detail. This function may return the same polygon
-   * mesh as GetPolygonMesh() (but with ref count incremented by one).
+   * mesh as GetPolygonMeshColldet() (but with ref count incremented by one).
    * Can return NULL if this object model doesn't support that.
    */
   virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float detail) = 0;

@@ -406,11 +406,11 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csBCTerrObject);
     virtual long GetShapeNumber () const { return 1; }
-    virtual iPolygonMesh* GetPolygonMesh ()
+    virtual iPolygonMesh* GetPolygonMeshColldet ()
     {
       return (iPolygonMesh*)&scfParent->culling_mesh;
     }
-    virtual iPolygonMesh* GetSmallerPolygonMesh ()
+    virtual iPolygonMesh* GetPolygonMeshViscull ()
     {
       return (iPolygonMesh*)&scfParent->culling_mesh;
     }

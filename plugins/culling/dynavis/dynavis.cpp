@@ -502,7 +502,7 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
 	iVisibilityObject* visobj, csObjectModel* model)
 {
   iMovable* movable = visobj->GetMovable ();
-  iPolygonMesh* polymesh = visobj->GetObjectModel ()->GetSmallerPolygonMesh ();
+  iPolygonMesh* polymesh = visobj->GetObjectModel ()->GetPolygonMeshViscull ();
 
   const csVector3* verts = polymesh->GetVertices ();
   int vertex_count = polymesh->GetVertexCount ();
@@ -601,7 +601,7 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
 	iVisibilityObject* visobj, csObjectModel* model)
 {
   iMovable* movable = visobj->GetMovable ();
-  iPolygonMesh* polymesh = visobj->GetObjectModel ()->GetSmallerPolygonMesh ();
+  iPolygonMesh* polymesh = visobj->GetObjectModel ()->GetPolygonMeshViscull ();
 
   const csVector3* verts = polymesh->GetVertices ();
   int vertex_count = polymesh->GetVertexCount ();
@@ -892,7 +892,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 
 end:
   if (do_write_object && cull_coverage != COVERAGE_NONE &&
-  	obj->visobj->GetObjectModel ()->GetSmallerPolygonMesh ())
+  	obj->visobj->GetObjectModel ()->GetPolygonMeshViscull ())
   {
     // Object is visible.
     if (do_cull_writequeue)
@@ -1851,7 +1851,7 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
 	  float sy = debug_camera->GetShiftY ();
 
 	  iPolygonMesh* polymesh = visobj->GetObjectModel ()->
-	  	GetSmallerPolygonMesh ();
+	  	GetPolygonMeshViscull ();
 	  const csVector3* verts = polymesh->GetVertices ();
 
 	  int j;
@@ -2192,7 +2192,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
       iVisibilityObject* visobj = visobj_wrap->visobj;
       iMovable* movable = visobj->GetMovable ();
       iPolygonMesh* polymesh = visobj->GetObjectModel ()
-      	->GetSmallerPolygonMesh ();
+      	->GetPolygonMeshViscull ();
       if (polymesh)
         excul->AddObject (visobj_wrap, polymesh, movable, debug_camera,
   	  visobj_wrap->model->GetPlanes ());
@@ -2203,7 +2203,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
       csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
         visobj_vector[i];
       iPolygonMesh* polymesh = visobj_wrap->visobj->GetObjectModel ()
-      	->GetSmallerPolygonMesh ();
+      	->GetPolygonMeshViscull ();
       visobj_wrap->history->history_frame_cnt = 0;	//@@@
       if (polymesh)
       {
@@ -2309,7 +2309,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
       iVisibilityObject* visobj = visobj_wrap->visobj;
       iMovable* movable = visobj->GetMovable ();
       iPolygonMesh* polymesh = visobj->GetObjectModel ()
-      	->GetSmallerPolygonMesh ();
+      	->GetPolygonMeshViscull ();
       if (polymesh)
         excul->AddObject (visobj_wrap, polymesh, movable, debug_camera,
   	  visobj_wrap->model->GetPlanes ());
@@ -2326,7 +2326,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
       csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
         visobj_vector[i];
       iPolygonMesh* polymesh = visobj_wrap->visobj->GetObjectModel ()
-      	->GetSmallerPolygonMesh ();
+      	->GetPolygonMeshViscull ();
       if (polymesh)
       {
         int vispix, totpix;

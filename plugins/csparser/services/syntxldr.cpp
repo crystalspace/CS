@@ -34,6 +34,7 @@
 #include "ivideo/texture.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
+#include "iengine/texture.h"
 #include "ivideo/material.h"
 #include "imesh/thing/thing.h"
 #include "imesh/thing/ptextype.h"
@@ -131,6 +132,7 @@ enum
   XMLTOKEN_MATRIX,
   XMLTOKEN_PLANE,
   XMLTOKEN_UVSHIFT,
+  XMLTOKEN_VISCULL,
   XMLTOKEN_W,
   XMLTOKEN_MIRROR,
   XMLTOKEN_STATIC,
@@ -208,6 +210,7 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("matrix", XMLTOKEN_MATRIX);
   xmltokens.Register ("plane", XMLTOKEN_PLANE);
   xmltokens.Register ("uvshift", XMLTOKEN_UVSHIFT);
+  xmltokens.Register ("viscull", XMLTOKEN_VISCULL);
   xmltokens.Register ("w", XMLTOKEN_W);
   xmltokens.Register ("mirror", XMLTOKEN_MIRROR);
   xmltokens.Register ("static", XMLTOKEN_STATIC);
@@ -878,6 +881,7 @@ bool csTextSyntaxService::ParsePoly3d (
 
   bool do_mirror = false;
   int set_colldet = 0; // If 1 then set, if -1 then reset, else default.
+  int set_viscull = 0; // If 1 then set, if -1 then reset, else default.
 
   bool init_gouraud_poly = false;
   csRef<iPolyTexFlat> fs;
@@ -918,6 +922,17 @@ bool csTextSyntaxService::ParsePoly3d (
         break;
       case XMLTOKEN_ALPHA:
         poly3d->SetAlpha (child->GetContentsValueAsInt () * 655 / 256);
+	// Disable vis culling for alpha objects.
+	if (!set_viscull) set_viscull = -1;
+        break;
+      case XMLTOKEN_VISCULL:
+        {
+          bool do_viscull;
+	  if (!ParseBool (child, do_viscull, true))
+	    return false;
+	  if (do_viscull) set_viscull = 1;
+	  else set_viscull = -1;
+        }
         break;
       case XMLTOKEN_COLLDET:
         {
@@ -1122,6 +1137,31 @@ bool csTextSyntaxService::ParsePoly3d (
     poly3d->GetFlags ().Set (CS_POLY_COLLDET);
   else if (set_colldet == -1)
     poly3d->GetFlags ().Reset (CS_POLY_COLLDET);
+
+  if (!set_viscull)
+  {
+    mat = poly3d->GetMaterial ();
+    csRef<iMaterialEngine> mateng = SCF_QUERY_INTERFACE (mat, iMaterialEngine);
+    if (mateng)
+    {
+      iTextureWrapper* tw = mateng->GetTextureWrapper ();
+      if (tw)
+      {
+        iImage* im = tw->GetImageFile ();
+        if (im)
+        {
+          if (im->HasKeycolor ()) set_viscull = -1;
+	  else if (im->GetFormat () & CS_IMGFMT_ALPHA)
+	    set_viscull = -1;
+        }
+      }
+    }
+  }
+
+  if (set_viscull == 1)
+    poly3d->GetFlags ().Set (CS_POLY_VISCULL);
+  else if (set_viscull == -1)
+    poly3d->GetFlags ().Reset (CS_POLY_VISCULL);
 
   if (texspec & CSTEX_UV)
   {

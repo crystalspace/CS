@@ -36,6 +36,7 @@
 #include "iengine/rview.h"
 #include "iengine/shadcast.h"
 #include "imesh/thing/thing.h"
+#include "imesh/thing/polygon.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
 #include "iutil/eventh.h"
@@ -100,8 +101,15 @@ struct csThingEdge
 class PolyMeshHelper : public iPolygonMesh
 {
 public:
-  PolyMeshHelper () : polygons (NULL), vertices (NULL), alloc_vertices (NULL) { }
+  /**
+   * Make a polygon mesh helper which will accept polygons which match
+   * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
+   */
+  PolyMeshHelper (uint32 flag) :
+  	polygons (NULL), vertices (NULL), alloc_vertices (NULL),
+	poly_flag (flag) { }
   virtual ~PolyMeshHelper () { Cleanup (); }
+
   void Setup ();
   void SetThing (csThing* thing) { PolyMeshHelper::thing = thing; }
 
@@ -140,6 +148,7 @@ private:
     				// Polygons after this index need to be
 				// deleted individually.
   int num_verts;		// Total number of vertices.
+  uint32 poly_flag;		// Polygons must match with this flag.
 };
 
 /**
@@ -1259,6 +1268,7 @@ public:
   struct PolyMesh : public PolyMeshHelper
   {
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
+    PolyMesh () : PolyMeshHelper (CS_POLY_COLLDET) { }
   } scfiPolygonMesh;
 
   //------------------- Lower detail iPolygonMesh implementation ---------------
@@ -1339,11 +1349,11 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
     virtual long GetShapeNumber () const { return scfParent->shapenr; }
-    virtual iPolygonMesh* GetPolygonMesh ()
+    virtual iPolygonMesh* GetPolygonMeshColldet ()
     {
       return &(scfParent->scfiPolygonMesh);
     }
-    virtual iPolygonMesh* GetSmallerPolygonMesh ()
+    virtual iPolygonMesh* GetPolygonMeshViscull ()
     {
       return &(scfParent->scfiPolygonMeshLOD);
     }

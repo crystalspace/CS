@@ -523,8 +523,8 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csTerrFuncObject);
     virtual long GetShapeNumber () const { return 1; }
-    virtual iPolygonMesh* GetPolygonMesh () { return NULL; }
-    virtual iPolygonMesh* GetSmallerPolygonMesh () { return NULL; }
+    virtual iPolygonMesh* GetPolygonMeshColldet () { return NULL; }
+    virtual iPolygonMesh* GetPolygonMeshViscull () { return NULL; }
     virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
     { return NULL; }
     virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)

@@ -2552,7 +2552,7 @@ SCF_IMPLEMENT_IBASE(csThing::PolyMeshLOD)
   SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
 SCF_IMPLEMENT_IBASE_END
 
-csThing::PolyMeshLOD::PolyMeshLOD ()
+csThing::PolyMeshLOD::PolyMeshLOD () : PolyMeshHelper (CS_POLY_VISCULL)
 {
   SCF_CONSTRUCT_IBASE (NULL);
 }
@@ -2580,7 +2580,7 @@ void PolyMeshHelper::Setup ()
   for (i = 0; i < thing->GetPolygonCount (); i++)
   {
     csPolygon3D *p = pol.Get (i);
-    if (!p->GetUnsplitPolygon () && p->flags.Check (CS_POLY_COLLDET))
+    if (!p->GetUnsplitPolygon () && p->flags.Check (poly_flag))
       num_poly++;
   }
 
@@ -2627,7 +2627,7 @@ void PolyMeshHelper::Setup ()
     for (i = 0; i < thing->GetPolygonCount (); i++)
     {
       csPolygon3D *p = pol.Get (i);
-      if (!p->GetUnsplitPolygon () && p->flags.Check (CS_POLY_COLLDET))
+      if (!p->GetUnsplitPolygon () && p->flags.Check (poly_flag))
       {
         polygons[num_poly].num_vertices = p->GetVertexCount ();
         polygons[num_poly].vertices = p->GetVertexIndices ();

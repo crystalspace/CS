@@ -53,6 +53,11 @@ class csColor;
  */
 #define CS_POLY_COLLDET	0x00000002
 
+/**
+ * If this flag is set then this polygon is used for visibility culling.
+ */
+#define CS_POLY_VISCULL	0x00000004
+
 
 SCF_VERSION (iPolygon3D, 0, 1, 14);
 

@@ -313,7 +313,7 @@ csPolygon3D::csPolygon3D (
   //sector = NULL;
   orig_poly = NULL;
 
-  flags.SetAll (CS_POLY_LIGHTING | CS_POLY_COLLDET);
+  flags.SetAll (CS_POLY_LIGHTING | CS_POLY_COLLDET | CS_POLY_VISCULL);
 
   light_info.cosinus_factor = -1;
   light_info.lightpatches = NULL;
@@ -523,7 +523,7 @@ void csPolygon3D::SetCSPortal (csSector *sector, bool null)
     portal->SetSector (&sector->scfiSector);
   else
     portal->SetSector (NULL);
-  flags.Reset (CS_POLY_COLLDET);                      // Disable CD by default for portals.
+  flags.Reset (CS_POLY_COLLDET);         // Disable CD by default for portals.
   if (thing) thing->AddPortalPolygon (this);
 
   //portal->SetTexture (texh->get_texture_handle ());
@@ -541,7 +541,7 @@ void csPolygon3D::SetPortal (csPortal *prt)
 
   portal = prt;
   flags.Set (CS_POLY_DELETE_PORTAL);
-  flags.Reset (CS_POLY_COLLDET);                      // Disable CD by default for portals.
+  flags.Reset (CS_POLY_COLLDET);         // Disable CD by default for portals.
   if (thing) thing->AddPortalPolygon (this);
 }
 

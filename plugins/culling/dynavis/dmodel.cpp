@@ -49,9 +49,9 @@ csObjectModel::~csObjectModel ()
 
 void csObjectModel::UpdateOutline (const csVector3& pos)
 {
-  if (!imodel->GetSmallerPolygonMesh ()) return;
+  if (!imodel->GetPolygonMeshViscull ()) return;
 
-  int num_vertices = imodel->GetSmallerPolygonMesh ()->GetVertexCount ();
+  int num_vertices = imodel->GetPolygonMeshViscull ()->GetVertexCount ();
 
   bool recalc_outline = false;
   if (!outline_info.outline_edges)
@@ -90,10 +90,10 @@ const csOBB& csObjectModel::GetOBB ()
   if (dirty_obb)
   {
     dirty_obb = false;
-    if (imodel->GetSmallerPolygonMesh ())
+    if (imodel->GetPolygonMeshViscull ())
     {
-      int num_vertices = imodel->GetSmallerPolygonMesh ()->GetVertexCount ();
-      csVector3* verts = imodel->GetSmallerPolygonMesh ()->GetVertices ();
+      int num_vertices = imodel->GetPolygonMeshViscull ()->GetVertexCount ();
+      csVector3* verts = imodel->GetPolygonMeshViscull ()->GetVertices ();
       obb.FindOBB (verts, num_vertices);
       has_obb = true;
     }
@@ -162,7 +162,7 @@ bool csObjectModelManager::CheckObjectModel (csObjectModel* model,
     model->shape_number = model->imodel->GetShapeNumber ();
     model->outline_info.Clear ();
     model->dirty_obb = true;
-    iPolygonMesh* mesh = model->imodel->GetSmallerPolygonMesh ();
+    iPolygonMesh* mesh = model->imodel->GetPolygonMeshViscull ();
     if (mesh)
     {
       if (model->num_planes != mesh->GetPolygonCount ())
