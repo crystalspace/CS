@@ -274,23 +274,21 @@ void csTerrainQuad::ComputeVisibility(const csVector3& campos,
   else camchild = CS_QUAD_BOTLEFT;
   if(campos.x > midx) camchild++; // get the right quad
 
-  // iterate back-to front
-  const int fronttoback[4][4] = {
-    {0,1,2,3},
-    {1,0,3,2},
-    {2,3,0,1},
-    {3,1,2,0}
-  };
+  // iterate front to back
   csBox3 cbox[4];
   cbox[CS_QUAD_TOPLEFT].Set (bbox.MinX(), 0, bbox.MinZ(), midx, 0, midz);
   cbox[CS_QUAD_TOPRIGHT].Set(midx, 0, bbox.MinZ(), bbox.MaxX(), 0, midz);
   cbox[CS_QUAD_BOTLEFT].Set (bbox.MinX(), 0, midz, midx, 0, bbox.MaxZ());
   cbox[CS_QUAD_BOTRIGHT].Set(midx, 0, midz, bbox.MaxX(), 0, bbox.MaxZ());
-  for(int i=0; i<4; i++)
-  {
-    int child = fronttoback[camchild][i];
-    GetChild(child)->ComputeVisibility(campos, cbox[child], horizon, horsize);
-  }
+
+  int child = camchild;
+  GetChild(child)->ComputeVisibility(campos, cbox[child], horizon, horsize);
+  child = (camchild+1)&3;
+  GetChild(child)->ComputeVisibility(campos, cbox[child], horizon, horsize);
+  child = (camchild+3)&3;
+  GetChild(child)->ComputeVisibility(campos, cbox[child], horizon, horsize);
+  child = (camchild+2)&3;
+  GetChild(child)->ComputeVisibility(campos, cbox[child], horizon, horsize);
 }
 
 //------------------------------------------------------------------------
