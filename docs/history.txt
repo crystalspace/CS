@@ -15,6 +15,9 @@ chronological order.
 	  conditions.
 	- res added csGetPlatformConfigPath(), a function to obtain a platform 
 	  specific path for per-user data.
+	- Eric Sunshine fixed oversight in 4-Nov-2004 change to jamtemplate
+	  where it neglected to copy config.sub, config.guess, and install-sh
+	  to the synthesized project.
 19-Nov-2004
 	- PK fixed the mesh attaching to sockets in viewmesh by adding
 	  sprite->GetMovable()->UpdateMove() to ViewMesh::AttachMeshToSocket.

@@ -195,6 +195,8 @@ mkdir "$PROJECTNAME/src" || exit 2
 
 # copy Autoconf, Jam, and msvcgen support files.
 cp -p  "$SUPPORTDIR/autoconf/"*.m4 "$PROJECTNAME/mk/autoconf"
+cp -p  "$SUPPORTDIR/autoconf/"config.* "$PROJECTNAME/mk/autoconf"
+cp -p  "$SUPPORTDIR/autoconf/"install-sh "$PROJECTNAME/mk/autoconf"
 cp -p  "$SUPPORTDIR/jam/"*.jam "$PROJECTNAME/mk/jam"
 cp -p  "$SUPPORTDIR/msvcgen/"*.tlib "$PROJECTNAME/mk/msvcgen"
 
