@@ -263,7 +263,8 @@ void add_particles_fountain (iSector* sector, char* matname, int num,
 //===========================================================================
 // Demo particle system (explosion).
 //===========================================================================
-void add_particles_explosion (iSector* sector, const csVector3& center, char* matname)
+void add_particles_explosion (iSector* sector, iEngine* engine,
+	const csVector3& center, char* matname)
 {
   // First check if the material exists.
   iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->
@@ -283,7 +284,7 @@ void add_particles_explosion (iSector* sector, const csVector3& center, char* ma
 	sector, center));
 
   exp->SetZBufMode(CS_ZBUF_TEST);
-  exp->SetRenderPriority(4); // @@@ alpha, most of the cases. should be queried from engine
+  exp->SetRenderPriority (engine->GetAlphaRenderPriority ());
 
   csRef<iParticleState> partstate (
   	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
@@ -442,7 +443,7 @@ struct RandomLight
   float dyn_r1, dyn_g1, dyn_b1;
 };
 
-bool HandleDynLight (iLight* dyn)
+bool HandleDynLight (iLight* dyn, iEngine* engine)
 {
   LightStruct* ls = (LightStruct*)(WalkDataObject::GetData(dyn->QueryObject ()));
   switch (ls->type)
@@ -500,7 +501,8 @@ bool HandleDynLight (iLight* dyn)
         WalkDataObject* esdata = new WalkDataObject (es);
         dyn->QueryObject ()->ObjAdd (esdata);
 	esdata->DecRef ();
-        add_particles_explosion (dyn->GetSector (), dyn->GetCenter (), "explo");
+        add_particles_explosion (dyn->GetSector (),
+		engine, dyn->GetCenter (), "explo");
         return false;
       }
       else ms->dir.SetOrigin (v);

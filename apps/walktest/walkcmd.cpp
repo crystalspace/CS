@@ -1942,7 +1942,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     char txtname[100];
     int cnt = 0;
     if (arg) cnt = csScanStr (arg, "%s", txtname);
-    extern void add_particles_explosion (iSector* sector, const csVector3& center,
+    extern void add_particles_explosion (iSector* sector,
+    	iEngine* engine, const csVector3& center,
     	char* txtname);
     if (cnt != 1)
     {
@@ -1951,7 +1952,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     else
       add_particles_explosion (Sys->view->GetCamera ()->GetSector (),
-    	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), txtname);
+    	Sys->Engine,
+	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), txtname);
   }
   else if (!strcasecmp (cmd, "spiral"))
   {

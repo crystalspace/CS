@@ -651,11 +651,11 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
   for (i = 0 ; i < dynamic_lights.Length () ; i++)
   {
     iLight* dyn = dynamic_lights[i];
-    extern bool HandleDynLight (iLight*);
+    extern bool HandleDynLight (iLight*, iEngine*);
     csRef<WalkDataObject> dao (
     	CS_GET_CHILD_OBJECT (dyn->QueryObject (), WalkDataObject));
     if (dao)
-      if (HandleDynLight (dyn))
+      if (HandleDynLight (dyn, Engine))
       {
         dynamic_lights.DeleteIndex (i);
 	i--;

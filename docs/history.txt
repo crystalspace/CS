@@ -10,6 +10,9 @@ chronological order.
 	- Jorrit fixed a bug in the engine where it would ignore (and not
 	  cache) lighting generated for hierarchical objects. This would
 	  make the door too dark because it is a child object.
+	- Jorrit fixed a bug with a hardcoded alpha render priority for
+	  explosions in walktest. This could cause particles to be
+	  rendered after other objects sometimes.
 8-Jun-2004
 	- Jorrit fixed a bug in the FindByNameWithChild() function in the
 	  engine. This function would crash if there were unnamed meshes
