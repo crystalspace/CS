@@ -21,6 +21,9 @@ The history order is reversed so that new features are at the top.
 	  some incorrect batch of keys.  Note that the API for this feature,
 	  once properly generalized to be platform-neutral, does not belong in
 	  iGraphics2D; but rather in some input- or keyboard-related interface.
+	- Eric Sunshine fixed bug reported by Daniel Fryer <dfryer@uvic.ca>
+	  where csEngine::CreateBlackTexture() was leaking a csImageMemory
+	  instance upon each invocation.
 22-Jul-2003
         - Philip Wyett fixed inconsistent swig -I flag in make build and
 	  aligning it with jam build.  cs_pyth.cpp will now be identical

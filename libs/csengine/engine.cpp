@@ -2776,7 +2776,7 @@ iTextureWrapper *csEngine::CreateBlackTexture (
 {
   if (!ImageLoader) return 0;
 
-  csImageMemory* ifile = new csImageMemory (w, h);
+  csRef<iImage> ifile = csPtr<iImage>(new csImageMemory (w, h));
   ifile->SetName (name);
 
   // Okay, now create the respective texture handle object
