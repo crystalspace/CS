@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Feb-2005
+	- Jorrit significantly improved PVS quality by fixing the polygon
+	  clipper so that the orientation of the polygon clipper is
+	  correct. This orientation matters. Now half of the projected
+	  polygons were rejected due to wrong orientation.
 15-Feb-2005
 	- Jorrit added csIntersect3::IntersectPolygon() to intersect
 	  a polygon with a segment.
