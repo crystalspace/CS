@@ -44,6 +44,10 @@ chronological order.
 	    - Replaced 'vStream' in csavi plugin with csRefArray<iStream>.
 	    - Replaced 'StreamIdx' in csavi plugin with csArray<indexentry*>.
 	    - Replaced 'StreamList' in csavi plugin with csPDelArray<StreamIdx>.
+	- Jorrit replaced various occurances of csVector:
+	    - Replaced 'scfLibraryVector' in scf with
+	      csPDelArray<scfSharedLibrary>.
+	    - Replaced 'scfClassRegistry' in scf with csPDelArray<scfFactory>.
 1-Aug-2003
 	- Jorrit changed csPDelArray::Sort() to use a new
 	  csArraySortCompareFunction typedef instead of csArrayCompareFunction.
