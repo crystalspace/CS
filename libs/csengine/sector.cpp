@@ -884,6 +884,7 @@ void csSector::DrawZ (iRenderView* rview)
 
 void csSector::DrawShadow (iRenderView* rview, iLight* light)
 {
+  int number = 0;
   //test if light is in front of or behind camera
   bool lightBehindCamera = false;
   const csVector3 camPlaneZ = rview->GetCamera ()->GetTransform ().GetO2T ().Row3 ();
@@ -905,13 +906,15 @@ void csSector::DrawShadow (iRenderView* rview, iLight* light)
   }
 
   //cull against the boundingsphere of the light
-  csSphere lightSphere (light->GetCenter (), light->GetInfluenceRadius ());
+  //csSphere lightSphere (csVector3(0,0,0), 10000);
+  csSphere lightSphere (lightPos, light->GetInfluenceRadius ());
   csRef<iVisibilityObjectIterator> objInLight = culler->VisTest (lightSphere);
   
   csVector3 rad, center;
   float maxRadius = 0;
-  while (objInLight->Next () )
+  while (!objInLight->IsFinished ())
   {
+    number++;
     iMeshWrapper *sp = objInLight->GetObject() ->GetMeshWrapper ();
     if (sp) 
     {
@@ -926,16 +929,21 @@ void csSector::DrawShadow (iRenderView* rview, iLight* light)
         //test if mesh is behind camera
         v = pos - camPos;
         if (!(camPlaneZ*v < -maxRadius))
+        {
           sp->DrawShadow (rview, light); //mesh is also infront of camera, draw the shadow
+        }
       }
       else {
         // light is behind camera
         // if mesh is behind the light we don't draw it
         v = pos - lightPos;
         if (!(camPlaneZ*v < -maxRadius))
+        {
           sp->DrawShadow (rview, light); //mesh is infront of the light, draw the shadow
+        }
       }
     }
+    objInLight->Next ();
   }
 
   //disable the reverses
@@ -946,7 +954,7 @@ void csSector::DrawShadow (iRenderView* rview, iLight* light)
     sp->GetMeshObject ()->DisableShadowCaps ();
     objCameraInShadow->Next();
   }
-
+  //printf ("%x - %d\n",(int)light, number);
 }
 
 void csSector::DrawLight (iRenderView* rview, iLight* light)
