@@ -32,6 +32,7 @@ struct iAwsParmList;
 struct iAwsComponent;
 struct iAwsPrefManager;
 struct iAwsSinkManager;
+struct iAwsCanvas;
 
 class  awsWindow;
 class  awsComponent;
@@ -51,7 +52,7 @@ struct  iEvent;
 const   bool aws_debug=false;  // set to true to turn on debugging printf's
        
 
-SCF_VERSION (iAws, 0, 0, 1);
+SCF_VERSION (iAws, 0, 1, 0);
 
 struct iAws : public iBase
 {
@@ -99,10 +100,17 @@ public:
   virtual bool HandleEvent(iEvent&)=0;
   
   /// Set the contexts however you want
-  virtual void SetContext(iGraphics2D *g2d, iGraphics3D *g3d)=0;
+  virtual void SetCanvas(iAwsCanvas *newCanvas)=0;
 
-  /// Set the context to the procedural texture
-  virtual void SetDefaultContext(iEngine* engine, iTextureManager* txtmgr)=0;
+  /// Get the current context
+  virtual iAwsCanvas* GetCanvas()=0;
+
+  /// Create a default canvas, covering the whole screen
+  virtual iAwsCanvas *CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr)=0;
+
+  /// Create a default canvas, just a single proctex
+  virtual iAwsCanvas *CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr, 
+    int width, int height, const char *name)=0;
 
   /// Get the iGraphics2D interface so that components can use it.
   virtual iGraphics2D *G2D()=0;
