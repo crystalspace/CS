@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Setting the CRYSTAL enviroment variable, , HOWTO Creating External MSVC Application, HOWTO
+@node HOWTO Setting the CRYSTAL enviroment variable, HOWTO Create Your Own Plugin, HOWTO Creating External MSVC Application, HOWTO
 @subsection Setting the CRYSTAL enviroment variable
 
 This section describes howto set the @emph{@sc{crystal}} enviroment variable

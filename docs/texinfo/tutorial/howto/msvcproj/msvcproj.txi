@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Creating External MSVC Application, , HOWTO CS Project, HOWTO
+@node HOWTO Creating External MSVC Application, HOWTO Setting the CRYSTAL enviroment variable, HOWTO CS Project, HOWTO
 @subsection Creating an External @sc{msvc} Application
 
 This @sc{howto} is a step by step guide for creating a Crystal Space

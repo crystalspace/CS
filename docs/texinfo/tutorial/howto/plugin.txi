@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Create Your Own Plugin, , HOWTO Setting the CRYSTAL enviroment variable, , HOWTO
+@node HOWTO Create Your Own Plugin, , HOWTO Setting the CRYSTAL enviroment variable, HOWTO
 @subsection Create Your Own Plugin
 
 Making a plugin in Crystal Space is not very hard but nevertheless
