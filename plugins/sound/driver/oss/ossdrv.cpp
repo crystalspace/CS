@@ -100,7 +100,7 @@ static const char *err[]=
 #define err_get_sem 1
 #define err_no_err 0
 
-bool AudioDevice::Blocked()
+bool csSoundDriverOSS::AudioDevice::Blocked()
 {
   // are there free fragments to fill in the soundbuffer ?
   audio_buf_info info;
@@ -113,13 +113,13 @@ bool AudioDevice::Blocked()
   return info.fragments == 0;
 }
 
-AudioDevice::AudioDevice()
+csSoundDriverOSS::AudioDevice::AudioDevice()
 {
   audio = -1;
   lasterr = 0;
 }
 
-bool AudioDevice::Open(int& frequency, bool& bit16, bool& stereo,
+bool csSoundDriverOSS::AudioDevice::Open(int& frequency, bool& bit16, bool& stereo,
   int& fragments, int& block_size)
 {
   int dsp_sample,dsp_stereo,dsp_speed;
@@ -196,7 +196,7 @@ bool AudioDevice::Open(int& frequency, bool& bit16, bool& stereo,
   return succ;
 }
 
-void AudioDevice::Close()
+void csSoundDriverOSS::AudioDevice::Close()
 {
   if (audio != -1)
   {
@@ -206,7 +206,7 @@ void AudioDevice::Close()
   }
 }
 
-void AudioDevice::Play(unsigned char *snddata, int len)
+void csSoundDriverOSS::AudioDevice::Play(unsigned char *snddata, int len)
 {
   write(audio, snddata, len);
 }
@@ -241,12 +241,16 @@ bool csSoundDriverOSS::Open(iSoundRender *, int frequency, bool bit16,
   m_nFrequency = frequency;
 
   bool Active = device.Open(frequency,bit16,stereo, fragments, block_size);
+  int lasterr;
+
   if (Active)
   {
     lasterr = err_alloc_soundbuffer;
     soundbuffer = new unsigned char[fragments * block_size];
     Active = soundbuffer != NULL;
   }
+  else
+    lasterr = device.lasterr;
 
   if (!Active)
   {

@@ -37,32 +37,30 @@
 
 #define SOUND_DEVICE "/dev/dsp"
 
-extern bool AudioDeviceBlocked();
-
-/// Audio device.
-class AudioDevice
-{
-public:
-  AudioDevice();
-
-  /// Open device with specified parameters.
-  bool Open(int& frequency, bool& bit16, bool& stereo, int& fragments,
-    int& block_size);
-
-  /// Close device.
-  void Close();
-  /// Play sound.
-  void Play(unsigned char *snddata, int len);
-
-  bool Blocked();
-
-private:
-  int audio;
-  int lasterr;
-};
-
 class csSoundDriverOSS : public iSoundDriver
 {
+
+  /// Audio device.
+  class AudioDevice
+  {
+  public:
+    AudioDevice();
+
+    /// Open device with specified parameters.
+    bool Open(int& frequency, bool& bit16, bool& stereo, int& fragments,
+	      int& block_size);
+
+    /// Close device.
+    void Close();
+    /// Play sound.
+    void Play(unsigned char *snddata, int len);
+
+    bool Blocked();
+
+    int audio;
+    int lasterr;
+  } device;
+
 
 protected:
   iObjectRegistry* object_reg;
@@ -74,7 +72,6 @@ protected:
   int fragments;
   int block_size;
   int writeblock;
-  int lasterr;
   unsigned char *soundbuffer;
 
 public:
@@ -104,8 +101,6 @@ public:
   } scfiComponent;
   friend struct eiComponent;
 
-public:
-  AudioDevice device;
 };
 
 #endif // __CS_OSSDRV_H__
