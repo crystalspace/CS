@@ -19,8 +19,8 @@
 
 #include <stdarg.h>
 #include <string.h>
-#include "qsqrt.h"
 #include "cssysdef.h"
+#include "qsqrt.h"
 #include "csutil/scf.h"
 #include "csutil/cscolor.h"
 #include "iengine/rview.h"
