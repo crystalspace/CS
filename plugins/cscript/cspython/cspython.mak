@@ -74,7 +74,7 @@ ifeq ($(MAKESECTION),targets)
 
 all: $(CSPYTHON.LIB)
 cspython: $(OUTDIRS) $(CSPYTHON)
-clean: cspythonclean cspythonswigclean
+clean: cspythonclean
 
 $(OUT)%$O: plugins/cscript/cspython/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.PYTHON)
