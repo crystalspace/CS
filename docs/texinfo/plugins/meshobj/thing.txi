@@ -203,7 +203,7 @@ follows:
 @item <material>materialName</material>
 The material to use for this polygon. If not given then the default material
 will be used.
-@item <texture> @dots{}
+@item <texmap> @dots{}
 This keyword can be used to define additional texture mapping parameters.
 @item <lighting>yes/no</lighting>
 Should this polygon use lighting or not. By default this is enabled. If
