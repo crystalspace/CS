@@ -145,7 +145,7 @@
 #include "edgeclip.inc"
 
   // The polygon is fully inside clipper polygon?
-  if (OutV == -1)
+  if (OutV == (size_t)-1)
   {
     OutV = InV;
     if (InP != OutPolygon)
