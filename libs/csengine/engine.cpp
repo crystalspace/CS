@@ -699,9 +699,6 @@ csEngine::csEngine (iBase *iParent) :
 # endif
 }
 
-// @@@ Hack
-iCamera* camera_hack = NULL;
-
 csEngine::~csEngine ()
 {
   if (scfiEventHandler)
@@ -809,14 +806,6 @@ bool csEngine::HandleEvent (iEvent &Event)
 
           if (csCamera::GetDefaultFOV () == 0)
             csCamera::SetDefaultFOV (frame_height, frame_width);
-
-          // @@@ Ugly hack to always have a camera in current_camera.
-          // This is needed for the lighting routines.
-          if (!current_camera)
-          {
-            current_camera = &(new csCamera ())->scfiCamera;
-            camera_hack = current_camera;
-          }
 
           // Allow context resizing since we handle cscmdContextResize
           if (G2D) G2D->AllowResize (true);
