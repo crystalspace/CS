@@ -193,6 +193,32 @@ public:
   virtual void SetAttributeAsFloat (const char* name, float value) {}
 };
 
+class csEmptyDocumentNodeIterator : public iDocumentNodeIterator
+{
+public:
+  SCF_DECLARE_IBASE;
+  CS_LEAKGUARD_DECLARE(csEmptyDocumentNodeIterator);
+
+  csEmptyDocumentNodeIterator ();
+  virtual ~csEmptyDocumentNodeIterator ();
+
+  virtual bool HasNext () { return false; }
+  virtual csRef<iDocumentNode> Next () { return 0; }
+};
+
+class csEmptyDocumentAttributeIterator : public iDocumentAttributeIterator
+{
+public:
+  SCF_DECLARE_IBASE;
+  CS_LEAKGUARD_DECLARE(csEmptyDocumentAttributeIterator);
+
+  csEmptyDocumentAttributeIterator ();
+  virtual ~csEmptyDocumentAttributeIterator ();
+
+  virtual bool HasNext () { return false; }
+  virtual csRef<iDocumentAttribute> Next () { return 0; }
+};
+
 class csTextNodeWrapper : public iDocumentNode
 {
   char* nodeText;
@@ -219,9 +245,9 @@ public:
   { return realMe->GetParent (); }
 
   virtual csRef<iDocumentNodeIterator> GetNodes ()
-  { return 0; }
+  { return csPtr<iDocumentNodeIterator> (new csEmptyDocumentNodeIterator); }
   virtual csRef<iDocumentNodeIterator> GetNodes (const char* value)
-  { return 0; }
+  { return csPtr<iDocumentNodeIterator> (new csEmptyDocumentNodeIterator); }
   virtual csRef<iDocumentNode> GetNode (const char* value)
   { return 0; }
 
@@ -240,7 +266,10 @@ public:
   { return 0.0f; }
 
   virtual csRef<iDocumentAttributeIterator> GetAttributes ()
-  { return 0; }
+  { 
+    return csPtr<iDocumentAttributeIterator> 
+      (new csEmptyDocumentAttributeIterator); 
+  }
 
   virtual csRef<iDocumentAttribute> GetAttribute (const char* name)
   { return 0; }

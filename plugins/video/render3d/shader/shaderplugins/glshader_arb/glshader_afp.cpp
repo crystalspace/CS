@@ -175,7 +175,7 @@ bool csShaderGLAFP::LoadProgramStringToGL ()
   return true;
 }
 
-bool csShaderGLAFP::Load(iDocumentNode* program)
+bool csShaderGLAFP::Load(iShaderTUResolver*, iDocumentNode* program)
 {
   if(!program)
     return false;

@@ -531,8 +531,8 @@ bool csPolygon3DStatic::CreateBoundingTextureBox ()
   }
   else
   {
-    ww = hh = 64;
-    rc = false;
+    ww = hh = 128;
+    rc = true;
   }
 
 #define csQroundSure(x) (int ((x) + ((x < 0) ? -0.5 : +0.5)))
@@ -592,8 +592,8 @@ bool csPolygon3DStatic::Finish (iBase* thing_logparent)
     if (!material || (material->GetMaterialHandle () &&
       !material->GetMaterialHandle ()->GetTexture ()))
     {
-      EnableTextureMapping (false);
-      return true;
+      //EnableTextureMapping (false);
+      //return true;
     }
     rc = CreateBoundingTextureBox ();
   }

@@ -304,6 +304,11 @@ void csWrappedDocumentNode::ProcessWrappedNode (NodeProcessingState* state,
 		    "Error parsing condition '%s': %s", condStr.GetData(),
 		    result);
 		}
+#ifdef DUMP_CONDITION_IDS
+	      csPrintf ("condition %s = %lu\n", 
+		csString().Append (valStart, valLen).GetDataSafe (),
+		newWrapper.child->condition);
+#endif
       	  
 		resolver->AddNode (
 		  elseWrapper.condNodes[elseWrapper.currentCondNode], 
@@ -618,6 +623,38 @@ iDocumentNode* csWrappedDocumentNode::WrapperWalker::Next ()
   iDocumentNode* ret = next;
   SeekNext();
   return ret;
+}
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE(csEmptyDocumentNodeIterator)
+  SCF_IMPLEMENTS_INTERFACE(iDocumentNodeIterator)
+SCF_IMPLEMENT_IBASE_END
+
+csEmptyDocumentNodeIterator::csEmptyDocumentNodeIterator ()
+{
+  SCF_CONSTRUCT_IBASE(0);
+}
+
+csEmptyDocumentNodeIterator::~csEmptyDocumentNodeIterator ()
+{
+  SCF_DESTRUCT_IBASE();
+}
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE(csEmptyDocumentAttributeIterator)
+  SCF_IMPLEMENTS_INTERFACE(iDocumentAttributeIterator)
+SCF_IMPLEMENT_IBASE_END
+
+csEmptyDocumentAttributeIterator::csEmptyDocumentAttributeIterator ()
+{
+  SCF_CONSTRUCT_IBASE(0);
+}
+
+csEmptyDocumentAttributeIterator::~csEmptyDocumentAttributeIterator ()
+{
+  SCF_DESTRUCT_IBASE();
 }
 
 //---------------------------------------------------------------------------

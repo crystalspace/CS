@@ -85,7 +85,7 @@ void csShaderGLCGFP::ResetState()
   csShaderGLCGCommon::ResetState();
 }
 
-bool csShaderGLCGFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
+bool csShaderGLCGFP::Compile (csArray<iShaderVariableContext*> &staticContexts)
 {
   csRef<iDataBuffer> programBuffer = GetProgramData();
   if (!programBuffer.IsValid())
@@ -133,7 +133,7 @@ bool csShaderGLCGFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
       }
     }
 
-    if (pswrap->Load (cgGetProgramString (program, CG_COMPILED_PROGRAM), 
+    if (pswrap->Load (0, cgGetProgramString (program, CG_COMPILED_PROGRAM), 
       mappings))
     {
       return pswrap->Compile (staticContexts);

@@ -60,7 +60,7 @@ void csSoftShader_FP::BuildTokenHash()
   xmltokens.Register("vector3", 100+csShaderVariable::VECTOR3);
 }
 
-bool csSoftShader_FP::Load(iDataBuffer* program)
+bool csSoftShader_FP::Load (iShaderTUResolver* resolve, iDataBuffer* program)
 {
   csRef<iDocumentSystem> xml (
     CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
@@ -73,10 +73,10 @@ bool csSoftShader_FP::Load(iDataBuffer* program)
       "crystalspace.graphics3d.shader.software", "XML error '%s'!", error);
     return false;
   }
-  return Load(doc->GetRoot());
+  return Load (resolve, doc->GetRoot());
 }
 
-bool csSoftShader_FP::Load(iDocumentNode* program)
+bool csSoftShader_FP::Load (iShaderTUResolver*, iDocumentNode* program)
 {
   if(!program)
     return false;

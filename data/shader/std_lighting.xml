@@ -11,97 +11,76 @@
   </pass>
 </technique>-->
 
-    <technique priority="100">
+    <technique priority="200">
       <pass>
-        <?if !vars."tex diffuse".texture ?>
-          <!-- flat material -->
-          <?if vars."tex lightmap".texture ?>
-            <buffer source="texture coordinate lightmap" destination="texture coordinate 0" />
-            <texture name="tex lightmap" destination="unit 0" />
-          <?else?>
-            <!-- need to bind at least some texture -->
-            <texture name="standardtex white" destination="unit 0" />
-          <?endif?>
-          <vp plugin="glfixed">
-            <fixedvp>
-              <constantcolor layer="0" type="shadervar">mat flatcolor</constantcolor>
-            </fixedvp>
-          </vp>
-          <fp plugin="glfixed">
-            <fixedfp>
-              <layer>
-                <?if vars."tex lightmap".texture ?>
-                  <colorsource num="0" source="texture" modifier="color"/>
-                <?else?>
-                  <colorsource num="0" source="primary color" modifier="color"/>
-                <?endif?>
-                <colorsource num="1" source="constant color" modifier="color"/>
-                <coloroperation operation="modulate" scale="2" />
-                <alphasource num="0" source="constant color" modifier="alpha"/>
-                <alphaoperation operation="replace"/>
-              </layer>
-            </fixedfp>
-          </fp>
-        <?else?>
-          <!-- textured material -->
-          <texture name="tex diffuse" destination="unit 0" />
-          <?if vars."tex lightmap".texture ?>
-            <buffer source="texture coordinate lightmap" destination="texture coordinate 1" />
-            <texture name="tex lightmap" destination="unit 1" />
-            <?if vars."fog density".float &gt; 0 ?>
-              <texture name="standardtex fog" destination="unit 2" />
-              <vp plugin="glfixed">
-                <fixedvp>
-                  <texgen type="fog" layer="2"/>
-                  <constantcolor layer="2" type="shadervar">fog color</constantcolor>
-                </fixedvp>
-              </vp>
-            <?endif?>
-          <?else?>
-            <?if vars."fog density".float &gt; 0 ?>
-              <texture name="standardtex fog" destination="unit 1" />
-              <vp plugin="glfixed">
-                <fixedvp>
-                  <texgen type="fog" layer="1"/>
-                  <constantcolor layer="1" type="shadervar">fog color</constantcolor>
-                </fixedvp>
-              </vp>
-            <?endif?>
-          <?endif?>
-          <fp plugin="glfixed">
-            <fixedfp>
-              <layer>
-                  <colorsource num="0" source="texture" modifier="color"/>
-                  <colorsource num="1" source="primary color" modifier="color"/>
-                  <coloroperation operation="modulate" />
-                  <alphasource num="0" source="texture" modifier="alpha"/>
-                  <alphasource num="1" source="primary color" modifier="alpha"/>
-                  <alphaoperation operation="modulate" />
-              </layer>
-              <?if vars."tex lightmap".texture ?>
-                <layer>
-                    <colorsource num="0" source="previous layer" modifier="color"/>
-                    <colorsource num="1" source="texture" modifier="color"/>
-                    <coloroperation operation="modulate" scale="2" />
-                    <alphasource num="0" source="previous layer" modifier="alpha"/>
-                    <alphaoperation operation="replace"/>
-                </layer>
-              <?endif?>
-              <?if vars."fog density".float &gt; 0 ?>
-                <layer>
-                  <colorsource num="0" source="constant color" modifier="color"/>
-                  <colorsource num="1" source="previous layer" modifier="color"/>
-                  <colorsource num="2" source="texture" modifier="alpha"/>
-                  <coloroperation operation="interpolate" />
-                  <alphasource num="0" source="previous layer" modifier="alpha"/>
-                  <alphaoperation operation="replace"/>
-                </layer>
-              <?endif?>
-            </fixedfp>
-          </fp>
-        <?endif?>
+	<?if vars."tex diffuse".texture ?>
+	  <texture name="tex diffuse" destination="diffuse" />
+	<?else?>
+	  <!-- need to bind at least some texture -->
+	  <texture name="standardtex white" destination="diffuse" />
+	<?endif?>
+	<?if vars."tex lightmap".texture ?>
+	  <buffer source="texture coordinate lightmap" destination="texture coordinate lightmap" />
+	  <texture name="tex lightmap" destination="lightmap" />
+	<?endif?>
+	<?if vars."fog density".float &gt; 0 ?>
+	  <texture name="standardtex fog" destination="pea soup" />
+	<?endif?>
+	<vp plugin="glfixed">
+	  <fixedvp>
+	    <?if !vars."tex diffuse".texture ?>
+	      <constantcolor layer="diffuse" type="shadervar">mat flatcolor</constantcolor>
+	    <?endif?>
+	    <?if vars."fog density".float &gt; 0 ?>
+	      <texgen type="fog" layer="pea soup"/>
+	      <constantcolor layer="pea soup" type="shadervar">fog color</constantcolor>
+	    <?endif?>
+	  </fixedvp>
+	</vp>
+	<fp plugin="glfixed">
+	  <fixedfp>
+	    <layer name="diffuse">
+	      <?if vars."tex diffuse".texture ?>
+		<colorsource num="0" source="texture" modifier="color"/>
+		<alphasource num="0" source="texture" modifier="alpha"/>
+	      <?else?>
+		<colorsource num="0" source="constant color" modifier="color"/>
+		<alphasource num="0" source="constant color" modifier="alpha"/>
+	      <?endif?>
+	      <?if !vars."tex lightmap".texture ?>
+		<colorsource num="1" source="primary color" modifier="color"/>
+		<coloroperation operation="modulate" />
+		<alphasource num="1" source="primary color" modifier="alpha"/>
+		<alphaoperation operation="modulate" />
+	      <?else?>
+		<coloroperation operation="replace" />
+		<alphaoperation operation="replace" />
+	      <?endif?>
+	    </layer>
+	    <?if vars."tex lightmap".texture ?>
+	      <layer name="lightmap">
+		<colorsource num="0" source="previous layer" modifier="color"/>
+		<colorsource num="1" source="texture" modifier="color"/>
+		<coloroperation operation="modulate" scale="2" />
+		<alphasource num="0" source="previous layer" modifier="alpha"/>
+		<alphaoperation operation="replace" />
+	      </layer>
+	    <?endif?>
+	    <?if vars."fog density".float &gt; 0 ?>
+	      <layer name="pea soup">
+		<colorsource num="0" source="constant color" modifier="color"/>
+		<colorsource num="1" source="previous layer" modifier="color"/>
+		<colorsource num="2" source="texture" modifier="alpha"/>
+		<coloroperation operation="interpolate" />
+		<alphasource num="0" source="previous layer" modifier="alpha"/>
+		<alphaoperation operation="replace"/>
+	      </layer>
+	    <?endif?>
+	  </fixedfp>
+	</fp>
       </pass>
     </technique>
+
     <technique priority="75">
       <pass>
 	<buffer source="normal" destination="normal" />

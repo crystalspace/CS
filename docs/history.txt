@@ -34,6 +34,14 @@ chronological order.
 		the data order row by row. For every data there is a
 		4 byte little endian long which will be translated to a
 		floating point height value between 0 and 1.
+	- res made the following changes:
+	    - Fixed a couple VC7 64bit warnings.
+	    - Fixed an issue in the syntax services where syntax error messages
+	      were practically empty.
+	    - Made Thing work with flat materials again.
+	    - Added ability to give layers in fixed FPs names and use them to 
+	      refer to a layer from VPs.
+	    - Made the shader condition handling a tad more efficient.
 23-Mar-2005
 	- res removed the Apache snprintf code.
 	- res fixed AWS after the recent 64bit compatibility changes. In 

@@ -19,11 +19,12 @@
 #ifndef __XMLSHADER_H__
 #define __XMLSHADER_H__
 
-#include "csutil/weakref.h"
-#include "csutil/csobject.h"
-#include "csutil/leakguard.h"
 #include "csutil/array.h"
+#include "csutil/bitarray.h"
+#include "csutil/csobject.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/leakguard.h"
+#include "csutil/weakref.h"
 #include "ivideo/material.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
@@ -138,7 +139,8 @@ private:
   // load a shaderdefinition block
   //bool LoadSVBlock (iDocumentNode *node, iShaderVariableContext *context);
   // load a shaderprogram
-  csPtr<iShaderProgram> LoadProgram (iDocumentNode *node, shaderPass *pass);
+  csPtr<iShaderProgram> LoadProgram (iShaderTUResolver* tuResolve, iDocumentNode *node, 
+    shaderPass *pass);
   // Set reason for failure.
   void SetFailReason (const char* reason, ...) CS_GNUC_PRINTF (2, 3);
 
@@ -164,18 +166,31 @@ public:
   { return fail_reason.GetData(); }
 };
 
+/**
+ * A node in the actual binary condition tree.
+ */
 struct csRealConditionNode : public csRefCount
 {
   csConditionID condition;
   size_t variant;
 
+  csRealConditionNode* parent;
   csRef<csRealConditionNode> trueNode;
   csRef<csRealConditionNode> falseNode;
 
-  csRealConditionNode ()
+  csRealConditionNode (csRealConditionNode* parent)
   {
+    this->parent = parent;
     condition = csCondAlwaysTrue;
     variant = csArrayItemNotFound;
+  }
+  void FillConditionArray (csBitArray& array)
+  {
+    if (!parent) return;
+    const csConditionID cond = parent->condition;
+    if ((cond != csCondAlwaysFalse) && (cond != csCondAlwaysTrue))
+      array.Set (parent->condition, this == parent->trueNode);
+    parent->FillConditionArray (array);
   }
 };
 
@@ -204,6 +219,7 @@ class csShaderConditionResolver : public iConditionResolver
   csPDelArray<csConditionNode> condNodes;
   csConditionNode* rootNode;
   size_t nextVariant;
+  csHash<size_t, csBitArray, csBitArrayHashKeyHandler> variantIDs;
 
   const csRenderMeshModes* modes;
   const csShaderVarStack* stacks;
@@ -216,6 +232,7 @@ class csShaderConditionResolver : public iConditionResolver
   void AddToRealNode (csRealConditionNode* node, csConditionID condition, 
     csConditionNode* trueNode, csConditionNode* falseNode);
   void DumpConditionNode (csRealConditionNode* node, int level);
+  size_t GetVariant (csRealConditionNode* node);
 public:
   csShaderConditionResolver (csXMLShaderCompiler* compiler);
   virtual ~csShaderConditionResolver ();
@@ -226,6 +243,7 @@ public:
   virtual void AddNode (csConditionNode* parent,
     csConditionID condition, csConditionNode*& trueNode, 
     csConditionNode*& falseNode);
+  void ResetEvaluationCache() { evaluator.ResetEvaluationCache(); }
 
   void SetEvalParams (const csRenderMeshModes* modes,
     const csShaderVarStack* stacks);

@@ -85,15 +85,38 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
   if (varNode)
     parent->compiler->LoadSVBlock (varNode, &pass->svcontext);
 
-  //load vp
   csRef<iDocumentNode> programNode;
   csRef<iShaderProgram> program;
+  // load fp
+  /* This is done before VP loading b/c the VP could query for TU bindings
+   * which are currently handled by the FP. */
+  programNode = node->GetNode (xmltokens.Request (
+    csXMLShaderCompiler::XMLTOKEN_FP));
+
+  if (programNode)
+  {
+    program = LoadProgram (0, programNode, pass);
+    if (program)
+      pass->fp = program;
+    else
+    {
+      if (do_verbose)
+        SetFailReason ("fragment program failed to load");
+      return false;
+    }
+  }
+
+  csRef<iShaderTUResolver> tuResolve;
+  if (pass->fp) 
+    tuResolve = SCF_QUERY_INTERFACE(pass->fp, iShaderTUResolver);
+
+  //load vp
   programNode = node->GetNode(xmltokens.Request (
     csXMLShaderCompiler::XMLTOKEN_VP));
 
   if (programNode)
   {
-    program = LoadProgram (programNode, pass);
+    program = LoadProgram (tuResolve, programNode, pass);
     if (program)
     {
       pass->vp = program;
@@ -102,22 +125,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
     {
       if (do_verbose)
         SetFailReason ("vertex program failed to load");
-      return false;
-    }
-  }
-
-  programNode = node->GetNode (xmltokens.Request (
-    csXMLShaderCompiler::XMLTOKEN_FP));
-
-  if (programNode)
-  {
-    program = LoadProgram (programNode, pass);
-    if (program)
-      pass->fp = program;
-    else
-    {
-      if (do_verbose)
-        SetFailReason ("fragment program failed to load");
       return false;
     }
   }
@@ -266,21 +273,17 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
 	{
 	  const char* target = dest + sizeof (mapName) - 1;
 
-	  for (int u = 0; u < 8; u++)
+	  int texUnit = 
+	    tuResolve ? tuResolve->ResolveTextureBinding (target) : -1;
+	  if (texUnit >= 0)
 	  {
-	    char buf[2];
-	    sprintf (buf, "%d", u);
-	    if (strcmp (target, buf) == 0)
-	    {
-	      attrib = (csVertexAttrib)((int)CS_VATTRIB_TEXCOORD0 + u);
-	      found = true;
-	      break;
-	    }
+	    attrib = (csVertexAttrib)((int)CS_VATTRIB_TEXCOORD0 + texUnit);
+	    found = true;
 	  }
-	  if (!found && pass->fp)
+	  else
 	  {
-	    int texUnit = pass->fp->ResolveTextureBinding (target);
-	    if (texUnit >= 0)
+	    char dummy;
+	    if (sscanf (target, "%d%c", &texUnit, &dummy) == 1)
 	    {
 	      attrib = (csVertexAttrib)((int)CS_VATTRIB_TEXCOORD0 + texUnit);
 	      found = true;
@@ -352,21 +355,17 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
     const char* dest = mapping->GetAttributeValue ("destination");
     if (mapping->GetAttribute("name") && dest)
     {
-      char unitName[8];
-      int i;
-      int texUnit = -1;
-      for (i = 0; i < shaderPass::TEXTUREMAX; i++)
+      int texUnit = tuResolve ? tuResolve->ResolveTextureBinding (dest) : -1;
+      if (texUnit < 0)
       {
-	sprintf (unitName, "unit %d", i);
-	if (strcasecmp (unitName, dest) == 0)
+	if (csStrNCaseCmp (dest, "unit ", 5) == 0)
 	{
-	  texUnit = i;
-	  break;
+	  dest += 5;
+	  char dummy;
+	  if (sscanf (dest, "%d%c", &texUnit, &dummy) != 1)
+	    texUnit = -1;
 	}
       }
-
-      if ((texUnit < 0) && pass->fp)
-	texUnit = pass->fp->ResolveTextureBinding (dest);
 
       if (texUnit < 0) continue;
       csStringID varID = strings->Request (mapping->GetAttributeValue("name"));
@@ -415,7 +414,8 @@ bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
   return true;
 }
 
-csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (iDocumentNode *node, 
+csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (iShaderTUResolver* tuResolve,
+						    iDocumentNode *node, 
 						    shaderPass *pass)
 {
   if (node->GetAttributeValue("plugin") == 0)
@@ -466,7 +466,7 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (iDocumentNode *node,
     programNode = parent->LoadProgramFile (node->GetAttributeValue ("file"));
   else
     programNode = node;
-  if (!program->Load (programNode))
+  if (!program->Load (tuResolve, programNode))
     return 0;
 
   csArray<iShaderVariableContext*> staticContexts;
@@ -855,21 +855,25 @@ void csShaderConditionResolver::AddToRealNode (csRealConditionNode* realNode,
   {
     /* There's a variant assigned, (!= csArrayItemNotFound)
        un-assign variant but assign condition */
+    csBitArray bits (evaluator.GetNumConditions ());
+    realNode->condition = condition;
+
     csRef<csRealConditionNode> realTrueNode;
-    realTrueNode.AttachNew (new csRealConditionNode);
+    realTrueNode.AttachNew (new csRealConditionNode (realNode));
     realNode->trueNode = realTrueNode;
     trueNode = NewNode ();
-    realTrueNode->variant = realNode->variant;
+    realTrueNode->variant = GetVariant (realTrueNode); //nextVariant++;
     trueNode->nodes.Push (realTrueNode);
 
     csRef<csRealConditionNode> realFalseNode;
-    realFalseNode.AttachNew (new csRealConditionNode);
+    realFalseNode.AttachNew (new csRealConditionNode (realNode));
     realNode->falseNode = realFalseNode;
+    realFalseNode->variant = realNode->variant;
     falseNode = NewNode ();
-    realFalseNode->variant = nextVariant++;
     falseNode->nodes.Push (realFalseNode);
+    realFalseNode->FillConditionArray (bits);
+    variantIDs.PutUnique (bits, realNode->variant);
 
-    realNode->condition = condition;
     realNode->variant = csArrayItemNotFound;
   }
   else
@@ -882,8 +886,24 @@ void csShaderConditionResolver::AddToRealNode (csRealConditionNode* realNode,
       falseNode->nodes.Push (realNode->falseNode);
       return;
     }
-    AddToRealNode (realNode->trueNode, condition, trueNode, falseNode);
-    AddToRealNode (realNode->falseNode, condition, trueNode, falseNode);
+    if (evaluator.ConditionIndependent (realNode->condition, true, condition))
+      AddToRealNode (realNode->trueNode, condition, trueNode, falseNode);
+    if (evaluator.ConditionIndependent (realNode->condition, false, condition))
+      AddToRealNode (realNode->falseNode, condition, trueNode, falseNode);
+  }
+}
+  
+size_t csShaderConditionResolver::GetVariant (csRealConditionNode* node)
+{
+  csBitArray bits (evaluator.GetNumConditions ());
+  node->FillConditionArray (bits);
+  size_t* var = variantIDs.GetElementPointer (bits);
+  if (var)
+    return *var;
+  else
+  {
+    variantIDs.Put (bits, nextVariant);
+    return nextVariant++;
   }
 }
 
@@ -899,21 +919,21 @@ void csShaderConditionResolver::AddNode (csConditionNode* parent,
     parent = GetRoot ();
 
     csRef<csRealConditionNode> realNode;
-    realNode.AttachNew (new csRealConditionNode);
+    realNode.AttachNew (new csRealConditionNode (0));
     realNode->condition = condition;
     parent->nodes.Push (realNode);
 
     csRef<csRealConditionNode> realTrueNode;
-    realTrueNode.AttachNew (new csRealConditionNode);
+    realTrueNode.AttachNew (new csRealConditionNode (realNode));
     realNode->trueNode = realTrueNode;
-    realTrueNode->variant = nextVariant++;
+    realTrueNode->variant = GetVariant (realTrueNode);
     trueNode = NewNode ();
     trueNode->nodes.Push (realTrueNode);
 
     csRef<csRealConditionNode> realFalseNode;
-    realFalseNode.AttachNew (new csRealConditionNode);
+    realFalseNode.AttachNew (new csRealConditionNode (realNode));
     realNode->falseNode = realFalseNode;
-    realFalseNode->variant = nextVariant++;
+    realFalseNode->variant = GetVariant (realFalseNode);
     falseNode = NewNode ();
     falseNode->nodes.Push (realFalseNode);
   }
@@ -1001,7 +1021,9 @@ void csShaderConditionResolver::DumpConditionNode (csRealConditionNode* node,
   {
     Indent (level);
     if (node->variant != csArrayItemNotFound)
+    {
       csPrintf ("variant: %lu\n", (unsigned long)node->variant);
+    }
     else
     {
       csPrintf ("condition: %lu\n", (unsigned long)node->condition);
@@ -1361,9 +1383,33 @@ void csXMLShader::ParseGlobalSVs ()
   resolver->SetEvalParams (0, 0);
 }
 
+//#define DUMP_SHADER_VARIANTS
+
+#ifdef DUMP_SHADER_VARIANTS
+static void CloneNode (iDocumentNode* from, iDocumentNode* to)
+{
+  to->SetValue (from->GetValue ());
+  csRef<iDocumentNodeIterator> it = from->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
+    	child->GetType (), 0);
+    CloneNode (child, child_clone);
+  }
+  csRef<iDocumentAttributeIterator> atit = from->GetAttributes ();
+  while (atit->HasNext ())
+  {
+    csRef<iDocumentAttribute> attr = atit->Next ();
+    to->SetAttribute (attr->GetName (), attr->GetValue ());
+  }
+}
+#endif
+
 size_t csXMLShader::GetTicket (const csRenderMeshModes& modes, 
 			       const csShaderVarStack& stacks)
 {
+  resolver->ResetEvaluationCache();
   resolver->SetEvalParams (&modes, &stacks);
   size_t vi = resolver->GetVariant (/*modes, stacks*/);
 
@@ -1373,6 +1419,17 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 
     if (!var.prepared)
     {
+#ifdef DUMP_SHADER_VARIANTS
+      {
+	csRef<iDocumentSystem> docsys;
+	docsys.AttachNew (new csTinyDocumentSystem);
+	csRef<iDocument> newdoc = docsys->CreateDocument();
+	CloneNode (shaderSource, newdoc->CreateRoot());
+	newdoc->Write (compiler->vfs, csString().Format ("/tmp/shader/%p_%lu.xml",
+	  this, (unsigned long)vi));
+      }
+#endif
+
       // So external files are found correctly
       compiler->vfs->PushDir ();
       compiler->vfs->ChDir (vfsStartDir);

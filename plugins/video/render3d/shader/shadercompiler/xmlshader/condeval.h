@@ -21,6 +21,7 @@
 #define __CONDEVAL_H__
 
 #include "csutil/array.h"
+#include "csutil/bitarray.h"
 #include "csutil/hashr.h"
 #include "iutil/strset.h"
 #include "ivideo/shader/shader.h"
@@ -118,6 +119,10 @@ class csConditionEvaluator
   csHashReversible<csConditionID, CondOperation, OperationHashKeyHandler>
     conditions;
 
+  // Evaluation cache
+  csBitArray condChecked;
+  csBitArray condResult;
+
   csString lastError;
   const char* SetLastError (const char* msg, ...) CS_GNUC_PRINTF (2, 3);
 
@@ -128,8 +133,10 @@ class csConditionEvaluator
   static bool OpTypesCompatible (OperandType t1, OperandType t2);
   /// Get a name for an operand type, for error reporting purposes.
   static const char* OperandTypeDescription (OperandType t);
-  /// Get the ID for an operation.
-  csConditionID FindCondition (const CondOperation& operation);
+  /**
+   * Get the ID for an operation, but also do some optimization of the 
+   * expression. */
+  csConditionID FindOptimizedCondition (const CondOperation& operation);
   const char* ResolveExpValue (const csExpressionToken& value,
     CondOperand& operand);
   const char* ResolveOperand (csExpression* expression, 
@@ -143,6 +150,11 @@ class csConditionEvaluator
     const csRenderMeshModes& modes, const csShaderVarStack& stacks);
   float EvaluateOperandF (const CondOperand& operand, 
     const csRenderMeshModes& modes, const csShaderVarStack& stacks);
+
+  bool EvaluateConst (const CondOperation& operation, bool& result);
+  bool EvaluateOperandBConst (const CondOperand& operand, bool& result);
+  bool EvaluateOperandIConst (const CondOperand& operand, int& result);
+  bool EvaluateOperandFConst (const CondOperand& operand, float& result);
 public:
   csConditionEvaluator (iStringSet* strings);
 
@@ -153,6 +165,21 @@ public:
   /// Evaluate a condition and return the result.
   bool Evaluate (csConditionID condition, const csRenderMeshModes& modes,
     const csShaderVarStack& stacks);
+  /**
+   * Reset the evaluation cache. Prevents same conditions from being evaled 
+   * twice.
+   */
+  void ResetEvaluationCache();
+
+  /// Get number of conditions allocated so far
+  size_t GetNumConditions() { return nextConditionID; }
+
+  /**
+   * Determines whether - under the condition that 'a' evaluates to aVal -
+   * 'b' can still evaluate to something other than aVal.
+   */
+  bool ConditionIndependent (csConditionID a, bool aVal,
+    csConditionID b);
 };
 
 #endif // __CONDEVAL_H__

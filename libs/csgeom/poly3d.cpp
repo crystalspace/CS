@@ -86,7 +86,7 @@ bool csPoly3D::ProjectXPlane (
   float plane_x,
   csPoly2D *poly2d) const
 {
-  poly2d->SetVertexCount (vertices.Length ());
+  poly2d->SetVertexCount ((int)vertices.Length ());
   csVector2* verts = poly2d->GetVertices ();
 
   csVector3 v;
@@ -108,7 +108,7 @@ bool csPoly3D::ProjectYPlane (
   float plane_y,
   csPoly2D *poly2d) const
 {
-  poly2d->SetVertexCount (vertices.Length ());
+  poly2d->SetVertexCount ((int)vertices.Length ());
   csVector2* verts = poly2d->GetVertices ();
 
   csVector3 v;
@@ -130,7 +130,7 @@ bool csPoly3D::ProjectZPlane (
   float plane_z,
   csPoly2D *poly2d) const
 {
-  poly2d->SetVertexCount (vertices.Length ());
+  poly2d->SetVertexCount ((int)vertices.Length ());
   csVector2* verts = poly2d->GetVertices ();
 
   csVector3 v;

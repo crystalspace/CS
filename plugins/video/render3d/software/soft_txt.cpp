@@ -603,8 +603,8 @@ csPtr<iTextureHandle> csSoftwareTextureManager::RegisterTexture (iImage* image,
 void csSoftwareTextureManager::UnregisterTexture (
 		csSoftwareTextureHandle* handle)
 {
-  int idx = textures.Find (handle);
-  if (idx >= 0) textures.DeleteIndexFast (idx);
+  size_t idx = textures.Find (handle);
+  if (idx != csArrayItemNotFound) textures.DeleteIndexFast (idx);
 }
 
 csPtr<iSuperLightmap> csSoftwareTextureManager::CreateSuperLightmap (

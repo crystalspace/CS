@@ -2731,9 +2731,9 @@ Initialise all the cache-aliged data blocks
 
 void RTjpeg_init_data(void)
 {
- unsigned long dptr;
+ uintptr_t dptr;
  
- dptr=(unsigned long)&(RTjpeg_alldata[0]);
+ dptr=(uintptr_t)&(RTjpeg_alldata[0]);
  dptr+=32;
  dptr=dptr>>5;
  dptr=dptr<<5; /* cache align data */
@@ -3147,12 +3147,12 @@ Initialise additional data structures for motion compensation
 
 void RTjpeg_init_mcompress(void)
 {
- unsigned long tmp;
+ uintptr_t tmp;
 
  if(!RTjpeg_old)
  {
   RTjpeg_old=(int16*)malloc((4*RTjpeg_width*RTjpeg_height)+32);
-  tmp=(unsigned long)RTjpeg_old;
+  tmp=(uintptr_t)RTjpeg_old;
   tmp+=32;
   tmp=tmp>>5;
   RTjpeg_old=(int16 *)(tmp<<5);

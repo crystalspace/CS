@@ -51,7 +51,7 @@ int csChainHull2D::CalculatePresorted (csVector2* points, int n,
 {
   // The output array hull[] will be used as the stack.
   int bot = 0, top = -1;  // Indices for bottom and top of the stack.
-  size_t i;
+  int i;
 
   // Get the indices of points with min x-coord and min|max y-coord.
   int minmin = 0, minmax;
@@ -70,7 +70,7 @@ int csChainHull2D::CalculatePresorted (csVector2* points, int n,
   }
 
   // Get the indices of points with max x-coord and min|max y-coord.
-  size_t maxmin, maxmax = n-1;
+  int maxmin, maxmax = n-1;
   float xmax = points[n-1].x;
   i = n-2;
   while (i-- > 0)

@@ -154,9 +154,109 @@ const char* csConditionEvaluator::OperandTypeDescription (OperandType t)
   }
 }
 
-csConditionID csConditionEvaluator::FindCondition (
+csConditionID csConditionEvaluator::FindOptimizedCondition (
   const CondOperation& operation)
 {
+  CondOperation newOp = operation;
+  if ((newOp.left.type == operandOperation)
+    && ((newOp.left.operation == csCondAlwaysFalse)
+    || (newOp.left.operation == csCondAlwaysTrue)))
+  {
+    newOp.left.type = operandBoolean;
+    newOp.left.boolVal = newOp.left.operation == csCondAlwaysTrue;
+  }
+  if ((newOp.right.type == operandOperation)
+    && ((newOp.right.operation == csCondAlwaysFalse)
+    || (newOp.right.operation == csCondAlwaysTrue)))
+  {
+    newOp.right.type = operandBoolean;
+    newOp.right.boolVal = newOp.left.operation == csCondAlwaysTrue;
+  }
+  if ((newOp.left.type >= operandFloat) 
+    && (newOp.left.type < operandSV)
+    && (newOp.right.type >= operandFloat)
+    && (newOp.right.type < operandSV))
+  {
+    bool res;
+    if (EvaluateConst (newOp, res))
+      return (res ? csCondAlwaysTrue : csCondAlwaysFalse);
+  }
+  if (newOp.operation == opAnd)
+  {
+    if ((newOp.left.type == operandBoolean) && (newOp.left.boolVal == false))
+      return csCondAlwaysFalse;
+    if ((newOp.right.type == operandBoolean) && (newOp.right.boolVal == false))
+      return csCondAlwaysFalse;
+    if ((newOp.left.type == operandBoolean) && (newOp.left.boolVal == true))
+    {
+      if (newOp.right.type == operandOperation)
+	return (newOp.right.operation);
+      else
+      {
+	CondOperation newNewOp;
+	newNewOp.left = newOp.right;
+	newNewOp.operation = opEqual;
+	newNewOp.right.type = operandBoolean;
+	newNewOp.right.boolVal = true;
+	return FindOptimizedCondition (newNewOp);
+      }
+    }
+    if ((newOp.right.type == operandBoolean) && (newOp.right.boolVal == true))
+    {
+      if (newOp.left.type == operandOperation)
+	return (newOp.left.operation);
+      else
+      {
+	CondOperation newNewOp;
+	newNewOp.left = newOp.left;
+	newNewOp.operation = opEqual;
+	newNewOp.right.type = operandBoolean;
+	newNewOp.right.boolVal = true;
+	return FindOptimizedCondition (newNewOp);
+      }
+    }
+  }
+  else if (newOp.operation == opOr)
+  {
+    if ((newOp.left.type == operandBoolean) && (newOp.left.boolVal == true))
+      return csCondAlwaysTrue;
+    if ((newOp.right.type == operandBoolean) && (newOp.right.boolVal == true))
+      return csCondAlwaysTrue;
+    if ((newOp.left.type == operandBoolean) && (newOp.left.boolVal == false))
+    {
+      if (newOp.right.type == operandOperation)
+	return (newOp.right.operation);
+      else
+      {
+	CondOperation newNewOp;
+	newNewOp.left = newOp.right;
+	newNewOp.operation = opEqual;
+	newNewOp.right.type = operandBoolean;
+	newNewOp.right.boolVal = true;
+	return FindOptimizedCondition (newNewOp);
+      }
+    }
+    if ((newOp.right.type == operandBoolean) && (newOp.right.boolVal == false))
+    {
+      if (newOp.left.type == operandOperation)
+	return (newOp.left.operation);
+      else
+      {
+	CondOperation newNewOp;
+	newNewOp.left = newOp.left;
+	newNewOp.operation = opEqual;
+	newNewOp.right.type = operandBoolean;
+	newNewOp.right.boolVal = true;
+	return FindOptimizedCondition (newNewOp);
+      }
+    }
+  }
+  else if (newOp.operation == opNot)
+  {
+    if (newOp.right.type == operandBoolean)
+      return newOp.right.boolVal ? csCondAlwaysFalse : csCondAlwaysTrue;
+  }
+
   csConditionID id = conditions.Get (operation, (csConditionID)~0);
   if (id == (csConditionID)~0)
   {
@@ -361,8 +461,6 @@ const char* csConditionEvaluator::ProcessExpression (
 	csExpressionToken::Extractor (expression->valueValue).Get (), OperandTypeDescription (newOp.left.type),
 	OperandTypeDescription (newOp.right.type));
     }
-    cond = FindCondition (newOp);
-    return 0;
   }
   else
   {
@@ -371,14 +469,9 @@ const char* csConditionEvaluator::ProcessExpression (
     {
       newOp.operation = opEqual;
       err = ResolveOperand (expression, newOp.left);
-      if (err)
-      {
-	return err;
-      }
+      if (err != 0) return err;
       newOp.right.type = operandBoolean;
       newOp.right.boolVal = true;
-      cond = FindCondition (newOp);
-      return 0;
     }
     else if (TokenEquals (t.tokenStart, t.tokenLen, "!"))
     {
@@ -394,8 +487,6 @@ const char* csConditionEvaluator::ProcessExpression (
 	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.right.type),
 	  OperandTypeDescription (operandBoolean));
       }
-      cond = FindCondition (newOp);
-      return 0;
     }
     else if (TokenEquals (t.tokenStart, t.tokenLen, "=="))
     {
@@ -412,8 +503,6 @@ const char* csConditionEvaluator::ProcessExpression (
 	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.left.type),
 	  OperandTypeDescription (newOp.right.type));
       }
-      cond = FindCondition (newOp);
-      return 0;
     }
     else if (TokenEquals (t.tokenStart, t.tokenLen, "!="))
     {
@@ -430,8 +519,6 @@ const char* csConditionEvaluator::ProcessExpression (
 	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.left.type),
 	  OperandTypeDescription (newOp.right.type));
       }
-      cond = FindCondition (newOp);
-      return 0;
     }
     else if (TokenEquals (t.tokenStart, t.tokenLen, "<"))
     {
@@ -448,8 +535,6 @@ const char* csConditionEvaluator::ProcessExpression (
 	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.left.type),
 	  OperandTypeDescription (newOp.right.type));
       }
-      cond = FindCondition (newOp);
-      return 0;
     }
     else if (TokenEquals (t.tokenStart, t.tokenLen, "<="))
     {
@@ -466,8 +551,6 @@ const char* csConditionEvaluator::ProcessExpression (
 	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.left.type),
 	  OperandTypeDescription (newOp.right.type));
       }
-      cond = FindCondition (newOp);
-      return 0;
     }
     else if (TokenEquals (t.tokenStart, t.tokenLen, ">="))
     {
@@ -484,8 +567,6 @@ const char* csConditionEvaluator::ProcessExpression (
 	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.left.type),
 	  OperandTypeDescription (newOp.right.type));
       }
-      cond = FindCondition (newOp);
-      return 0;
     }
     else if (TokenEquals (t.tokenStart, t.tokenLen, ">"))
     {
@@ -502,8 +583,6 @@ const char* csConditionEvaluator::ProcessExpression (
 	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.left.type),
 	  OperandTypeDescription (newOp.right.type));
       }
-      cond = FindCondition (newOp);
-      return 0;
     }
     else if (TokenEquals (t.tokenStart, t.tokenLen, "&&"))
     {
@@ -526,8 +605,6 @@ const char* csConditionEvaluator::ProcessExpression (
 	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.right.type),
 	  OperandTypeDescription (operandBoolean));
       }
-      cond = FindCondition (newOp);
-      return 0;
     }
     else if (TokenEquals (t.tokenStart, t.tokenLen, "||"))
     {
@@ -550,8 +627,6 @@ const char* csConditionEvaluator::ProcessExpression (
 	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.right.type),
 	  OperandTypeDescription (operandBoolean));
       }
-      cond = FindCondition (newOp);
-      return 0;
     }
     else
     {
@@ -560,7 +635,7 @@ const char* csConditionEvaluator::ProcessExpression (
     }
   }
 
-  CS_ASSERT (false);
+  cond = FindOptimizedCondition (newOp);
   return 0;
 }
 
@@ -573,19 +648,29 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
   else if (condition == csCondAlwaysFalse)
     return false;
 
+  if (condChecked.IsBitSet (condition))
+  {
+    return condResult.IsBitSet (condition);
+  }
+
+  bool result = false;
+
   const CondOperation* op = conditions.GetKeyPointer (condition);
   CS_ASSERT (op != 0);
 
   switch (op->operation)
   {
     case opNot:
-      return !EvaluateOperandB (op->right, modes, stacks);
+      result = !EvaluateOperandB (op->right, modes, stacks);
+      break;
     case opAnd:
-      return EvaluateOperandB (op->left, modes, stacks)
+      result = EvaluateOperandB (op->left, modes, stacks)
 	&& EvaluateOperandB (op->right, modes, stacks);
+      break;
     case opOr:
-      return EvaluateOperandB (op->left, modes, stacks)
+      result = EvaluateOperandB (op->left, modes, stacks)
 	|| EvaluateOperandB (op->right, modes, stacks);
+      break;
     case opEqual:
       {
 	if ((op->left.type == operandFloat) 
@@ -595,20 +680,21 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
 	{
 	  const float f1 = EvaluateOperandF (op->left, modes, stacks);
 	  const float f2 = EvaluateOperandF (op->right, modes, stacks);
-	  return (f1 - f2) < EPSILON;
+	  result = (f1 - f2) < EPSILON;
 	}
 	else if (OpTypesCompatible (op->left.type, operandBoolean) 
 	  && OpTypesCompatible (op->right.type, operandBoolean))
 	{
-	  return EvaluateOperandB (op->left, modes, stacks)
+	  result = EvaluateOperandB (op->left, modes, stacks)
 	    == EvaluateOperandB (op->right, modes, stacks);
 	}
 	else
 	{
 	  const int i1 = EvaluateOperandI (op->left, modes, stacks);
 	  const int i2 = EvaluateOperandI (op->right, modes, stacks);
-	  return i1 == i2;
+	  result = i1 == i2;
 	}
+	break;
       }
     case opNEqual:
       {
@@ -619,20 +705,21 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
 	{
 	  const float f1 = EvaluateOperandF (op->left, modes, stacks);
 	  const float f2 = EvaluateOperandF (op->right, modes, stacks);
-	  return (f1 - f2) >= EPSILON;
+	  result = (f1 - f2) >= EPSILON;
 	}
 	else if (OpTypesCompatible (op->left.type, operandBoolean) 
 	  && OpTypesCompatible (op->right.type, operandBoolean))
 	{
-	  return EvaluateOperandB (op->left, modes, stacks)
+	  result = EvaluateOperandB (op->left, modes, stacks)
 	    != EvaluateOperandB (op->right, modes, stacks);
 	}
 	else
 	{
 	  const int i1 = EvaluateOperandI (op->left, modes, stacks);
 	  const int i2 = EvaluateOperandI (op->right, modes, stacks);
-	  return i1 != i2;
+	  result = i1 != i2;
 	}
+	break;
       }
     case opLesser:
       {
@@ -643,14 +730,15 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
 	{
 	  const float f1 = EvaluateOperandF (op->left, modes, stacks);
 	  const float f2 = EvaluateOperandF (op->right, modes, stacks);
-	  return (f1 < f2);
+	  result = (f1 < f2);
 	}
 	else
 	{
 	  const int i1 = EvaluateOperandI (op->left, modes, stacks);
 	  const int i2 = EvaluateOperandI (op->right, modes, stacks);
-	  return i1 < i2;
+	  result = i1 < i2;
 	}
+	break;
       }
     case opLesserEq:
       {
@@ -661,22 +749,32 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
 	{
 	  const float f1 = EvaluateOperandF (op->left, modes, stacks);
 	  const float f2 = EvaluateOperandF (op->right, modes, stacks);
-	  return (f1 <= f2);
+	  result = (f1 <= f2);
 	}
 	else
 	{
 	  const int i1 = EvaluateOperandI (op->left, modes, stacks);
 	  const int i2 = EvaluateOperandI (op->right, modes, stacks);
-	  return i1 <= i2;
+	  result = i1 <= i2;
 	}
+	break;
       }
     default:
       CS_ASSERT (false);
   }
 
-  return false;
+  condChecked.Set (condition, true);
+  condResult.Set (condition, result);
+
+  return result;
 }
 
+void csConditionEvaluator::ResetEvaluationCache()
+{
+  condChecked.SetLength (GetNumConditions ());
+  condChecked.Clear();
+  condResult.SetLength (GetNumConditions ());
+}
 
 bool csConditionEvaluator::EvaluateOperandB (const CondOperand& operand, 
   const csRenderMeshModes& modes, const csShaderVarStack& stacks)
@@ -831,4 +929,193 @@ float csConditionEvaluator::EvaluateOperandF (const CondOperand& operand,
   }
 
   return 0.0f;
+}
+
+bool csConditionEvaluator::EvaluateConst (const CondOperation& op, bool& result)
+{
+  bool rB1, rB2;
+  int rI1, rI2;
+  float rF1, rF2;
+  switch (op.operation)
+  {
+    case opNot:
+      if (!EvaluateOperandBConst (op.right, rB1)) return false;
+      result = !rB1;
+      break;
+    case opAnd:
+      if (!EvaluateOperandBConst (op.left, rB1)) return false;
+      if (!EvaluateOperandBConst (op.right, rB2)) return false;
+      result = rB1 && rB2;
+      break;
+    case opOr:
+      if (!EvaluateOperandBConst (op.left, rB1)) return false;
+      if (!EvaluateOperandBConst (op.right, rB2)) return false;
+      result = rB1 || rB2;
+      break;
+    case opEqual:
+      {
+	if ((op.left.type == operandFloat) || (op.right.type == operandFloat))
+	{
+	  if (!EvaluateOperandFConst (op.left, rF1)) return false;
+	  if (!EvaluateOperandFConst (op.right, rF2)) return false;
+	  result = (rF1 - rF2) < EPSILON;
+	}
+	else if (OpTypesCompatible (op.left.type, operandBoolean) 
+	  && OpTypesCompatible (op.right.type, operandBoolean))
+	{
+	  if (!EvaluateOperandBConst (op.left, rB1)) return false;
+	  if (!EvaluateOperandBConst (op.right, rB2)) return false;
+	  result = rB1 == rB2;
+	}
+	else
+	{
+	  if (!EvaluateOperandIConst (op.left, rI1)) return false;
+	  if (!EvaluateOperandIConst (op.right, rI2)) return false;
+	  result = rI1 == rI2;
+	}
+	break;
+      }
+    case opNEqual:
+      {
+	CondOperation op2 = op;
+	op2.operation = opEqual;
+	if (!EvaluateConst (op2, result)) return false;
+	result = !result;
+	break;
+      }
+    case opLesser:
+      {
+	if ((op.left.type == operandFloat) || (op.right.type == operandFloat))
+	{
+	  if (!EvaluateOperandFConst (op.left, rF1)) return false;
+	  if (!EvaluateOperandFConst (op.right, rF2)) return false;
+	  result = rF1 < rF2;
+	}
+	else
+	{
+	  if (!EvaluateOperandIConst (op.left, rI1)) return false;
+	  if (!EvaluateOperandIConst (op.right, rI2)) return false;
+	  result = rI1 < rI2;
+	}
+	break;
+      }
+    case opLesserEq:
+      {
+	if ((op.left.type == operandFloat) || (op.right.type == operandFloat))
+	{
+	  if (!EvaluateOperandFConst (op.left, rF1)) return false;
+	  if (!EvaluateOperandFConst (op.right, rF2)) return false;
+	  result = rF1 <= rF2;
+	}
+	else
+	{
+	  if (!EvaluateOperandIConst (op.left, rI1)) return false;
+	  if (!EvaluateOperandIConst (op.right, rI2)) return false;
+	  result = rI1 <= rI2;
+	}
+	break;
+      }
+    default:
+      return false;
+  }
+  return true;
+}
+
+bool csConditionEvaluator::EvaluateOperandBConst (const CondOperand& operand, 
+  bool& result)
+{
+  switch (operand.type)
+  {
+    case operandOperation:
+      {
+	if (operand.operation == csCondAlwaysTrue)
+	  result = true;
+	else if (operand.operation == csCondAlwaysFalse)
+	  result = false;
+	else
+	{
+	  const CondOperation* op = 
+	    conditions.GetKeyPointer (operand.operation);
+	  CS_ASSERT (op != 0);
+	  if (!EvaluateConst (*op, result)) return false;
+	}
+      }
+      break;
+    case operandBoolean:
+      result = operand.boolVal;
+      break;
+    default:
+      return false;
+  }
+  return true;
+}
+
+bool csConditionEvaluator::EvaluateOperandIConst (const CondOperand& operand, 
+  int& result)
+{
+  switch (operand.type)
+  {
+    case operandInt:
+      result = operand.intVal;
+      break;
+    case operandFloat:
+      result = (int)operand.floatVal;
+      break;
+    default:
+      return false;
+  }
+
+  return true;
+}
+
+bool csConditionEvaluator::EvaluateOperandFConst (const CondOperand& operand, 
+  float& result)
+{
+  switch (operand.type)
+  {
+    case operandFloat:
+      result = operand.floatVal;
+      break;
+    case operandInt:
+      result = (float)operand.intVal;
+      break;
+    default:
+      return false;
+  }
+
+  return true;
+}
+
+bool csConditionEvaluator::ConditionIndependent (csConditionID a, bool aVal,
+						 csConditionID b)
+{
+  if (a == b) return false;
+
+  if (aVal && (b == csCondAlwaysTrue)) return false;
+  if (!aVal && (b == csCondAlwaysFalse)) return false;
+
+  if ((a == csCondAlwaysFalse) || (a == csCondAlwaysTrue) 
+    || (b == csCondAlwaysFalse) || (b == csCondAlwaysTrue))
+    return true;
+
+  const CondOperation* A = conditions.GetKeyPointer (a);
+  CS_ASSERT (A);
+  const CondOperation* B = conditions.GetKeyPointer (b);
+  CS_ASSERT (B);
+
+  if ((A->operation == opNot) && (A->right.type >= operandSV)
+    && (B->operation == opEqual) && (B->left.type >= operandSV)
+    && (B->right.type == operandBoolean) && (B->right.boolVal == true)
+    && (B->left.svName == A->right.svName)) return false;
+  if ((B->operation == opNot) && (B->right.type >= operandSV)
+    && (A->operation == opEqual) && (A->left.type >= operandSV)
+    && (A->right.type == operandBoolean) && (A->right.boolVal == true)
+    && (A->left.svName == B->right.svName)) return false;
+  
+  if ((A->operation == opNot) && (A->right.type == operandOperation)
+    && (A->right.operation == b)) return false;
+  if ((B->operation == opNot) && (B->right.type == operandOperation)
+    && (B->right.operation == a)) return false;
+
+  return true;
 }

@@ -32,6 +32,8 @@
 
 #include "csextern.h"
 
+class csBitArrayHashKeyHandler;
+
 /**
  * A one-dimensional array of bits, similar to STL bitset.
  */
@@ -40,6 +42,7 @@ class CS_CSUTIL_EXPORT csBitArray
 public:
   typedef unsigned long store_type;
 private:
+  friend class csBitArrayHashKeyHandler;
   enum
   {
     bits_per_byte = 8,
@@ -179,7 +182,7 @@ public:
   }
 
   /// Destructor.
-  virtual ~csBitArray()
+  ~csBitArray()
   {
     if (mLength > 1)
       delete mpStore;
@@ -409,6 +412,52 @@ public:
   void SetSingleWord (store_type sw)
   {
     mSingleWord = sw;
+  }
+};
+
+/**
+ * Hash key handler, allows bit arrays to be used as hash keys.
+ */
+class csBitArrayHashKeyHandler
+{
+public:
+  static unsigned int ComputeHash (const csBitArray& key)
+  {
+    const int uintCount = sizeof (csBitArray::store_type) / sizeof (uint);
+    union
+    {
+      csBitArray::store_type store;
+      uint ui[uintCount];
+    } bitStoreToUint;
+    uint hash = 0;
+    // @@@ Not very good. Find a better hash function; however, it should
+    // return the same hash for two bit arrays that are the same except for
+    // the amount of trailing zeros. (e.g. f(10010110) == f(100101100000...))
+    for (size_t i = 0; i < key.mLength; i++)
+    {
+      bitStoreToUint.store = key.mpStore[i];
+      for (size_t j = 0; j < uintCount; j++)
+	hash += bitStoreToUint.ui[j];
+    }
+    return hash;
+  }
+  static bool CompareKeys (const csBitArray& key1, const csBitArray& key2)
+  {
+    size_t compareNum = MIN (key1.mLength, key2.mLength);
+    size_t i = 0;
+    for (; i < compareNum; i++)
+      if (key1.mpStore[i] != key2.mpStore[i]) return false;
+    if (key1.mLength > key2.mLength)
+    {
+      for (; i < key1.mLength; i++)
+	if (key1.mpStore[i] != 0) return false;
+    }
+    else
+    {
+      for (; i < key2.mLength; i++)
+	if (key2.mpStore[i] != 0) return false;
+    }
+    return true;
   }
 };
 

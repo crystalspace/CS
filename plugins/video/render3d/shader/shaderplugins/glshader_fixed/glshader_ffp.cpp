@@ -104,7 +104,7 @@ void csGLShaderFFP::BuildTokenHash()
 //                          iShaderProgram
 ////////////////////////////////////////////////////////////////////
 
-bool csGLShaderFFP::Load(iDocumentNode* node)
+bool csGLShaderFFP::Load(iShaderTUResolver*, iDocumentNode* node)
 {
   if(!node)
     return false;
@@ -124,9 +124,12 @@ bool csGLShaderFFP::Load(iDocumentNode* node)
         case XMLTOKEN_LAYER:
           {
             mtexlayer ml;
+	    const char* name = child->GetAttributeValue ("name");
             if(!LoadLayer(&ml, child))
               return false;
-            texlayers.Push (ml);
+            size_t idx = texlayers.Push (ml);
+	    if (name != 0)
+	      layerNames.Put (name, (int)idx);
           }
           break;
 	case XMLTOKEN_FOG:

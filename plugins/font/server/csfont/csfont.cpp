@@ -604,7 +604,8 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
 
 csDefaultFont::~csDefaultFont ()
 {
-  for (int i = DeleteCallbacks.Length () - 1; i >= 0; i--)
+  size_t i = DeleteCallbacks.Length();
+  while (i-- > 0)
   {
     iFontDeleteNotify* delnot = DeleteCallbacks[i];
     delnot->BeforeDelete (this);

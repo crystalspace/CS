@@ -107,7 +107,6 @@ Class::Pool::~Pool ()					\
   while (pool != 0)					\
   {							\
     Class* n = pool->poolNext;				\
-    pool->PoolRecycle ();				\
     delete pool;					\
     pool = n;						\
   }							\

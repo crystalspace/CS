@@ -71,16 +71,14 @@ public:
   virtual bool IsValid() { return validProgram;} 
 
   /// Loads from a document-node
-  virtual bool Load(iDocumentNode* node);
+  virtual bool Load (iShaderTUResolver*, iDocumentNode* node);
 
   /// Loads from raw text
-  virtual bool Load (const char* program, csArray<csShaderVarMapping> &mappings);
+  virtual bool Load (iShaderTUResolver*, const char* program, 
+    csArray<csShaderVarMapping> &mappings);
 
   /// Compile a program
   virtual bool Compile(csArray<iShaderVariableContext*> &staticDomains);
-
-  virtual int ResolveTextureBinding (const char* binding)
-  { return -1; }
 };
 
 #endif //__GLSHADER_PS1_COMMON_H__

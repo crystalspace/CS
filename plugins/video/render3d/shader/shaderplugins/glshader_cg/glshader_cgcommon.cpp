@@ -317,7 +317,7 @@ void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description,
   }
 }
 
-bool csShaderGLCGCommon::Load(iDocumentNode* program)
+bool csShaderGLCGCommon::Load (iShaderTUResolver*, iDocumentNode* program)
 {
   if(!program)
     return false;

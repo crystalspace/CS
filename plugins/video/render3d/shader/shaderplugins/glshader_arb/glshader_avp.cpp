@@ -168,7 +168,8 @@ bool csShaderGLAVP::LoadProgramStringToGL ()
   }
   else
   {
-    if ((programErrorString != 0) && (*programErrorString != 0))
+    if (/*doVerbose && */ (programErrorString != 0) 
+      && (*programErrorString != 0))
     {
       Report (CS_REPORTER_SEVERITY_WARNING, 
 	"Warning for vertex program \"%s\": '%s'", description, 
@@ -179,7 +180,7 @@ bool csShaderGLAVP::LoadProgramStringToGL ()
   return true;
 }
 
-bool csShaderGLAVP::Load (iDocumentNode* program)
+bool csShaderGLAVP::Load (iShaderTUResolver*, iDocumentNode* program)
 {
   if(!program)
     return false;
@@ -203,7 +204,7 @@ bool csShaderGLAVP::Load (iDocumentNode* program)
   return true;
 }
 
-bool csShaderGLAVP::Load (const char* program, 
+bool csShaderGLAVP::Load (iShaderTUResolver*, const char* program, 
 			  csArray<csShaderVarMapping> &mappings)
 {
   programBuffer.AttachNew (new csDataBuffer (csStrNew (program),

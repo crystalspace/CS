@@ -74,7 +74,7 @@ bool csIntersect2::PlanePolygon (
 {
   csVector2 &v1 = seg.Start ();
   csVector2 &v2 = seg.End ();
-  size_t i, i1;
+  int i, i1;
   float c, c1;
   csVector2 isect;
   float dist;

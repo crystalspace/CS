@@ -128,7 +128,7 @@ static bool TokenEquals (const char* token, size_t tokenLen, const char* cmp)
 
 typedef csStringFast<8> csProgVarStr;
 
-bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
+bool csShaderGLCGVP::Compile (csArray<iShaderVariableContext*> &staticContexts)
 {
   csRef<iDataBuffer> programBuffer = GetProgramData();
   if (!programBuffer.IsValid())
@@ -422,7 +422,7 @@ bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
     if (!override)
       return false;
 
-    if (!override->Load (newProgram, mappings))
+    if (!override->Load (0, newProgram, mappings))
       return false;
 
     return override->Compile (staticContexts);

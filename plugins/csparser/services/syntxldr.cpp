@@ -1390,11 +1390,9 @@ void csTextSyntaxService::ReportV (const char* msgid, int severity,
     n = n->GetParent ();
   }
   if (nodepath != "")
-    errmsg.Format ("%s\n[node: %s]", 
-      (const char*)errmsg,
-      (const char*)nodepath);
-
-  csReport (object_reg, severity, msgid, "%s",	(const char*)errmsg);
+    csReport (object_reg, severity, msgid, "%s", (const char*)errmsg);
+  else
+    csReport (object_reg, severity, msgid, "%s\n[node: %s]", (const char*)nodepath);
 }
 
 void csTextSyntaxService::ReportBadToken (iDocumentNode* badtokennode)

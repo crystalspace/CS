@@ -40,7 +40,8 @@
 
 struct iDataBuffer;
 
-class CS_CSPLUGINCOMMON_EXPORT csShaderProgram : public iShaderProgram
+class CS_CSPLUGINCOMMON_EXPORT csShaderProgram : public iShaderProgram,
+						 public iShaderTUResolver
 {
 protected:
   csStringHash commonTokens;
@@ -128,6 +129,9 @@ public:
 
   csShaderProgram (iObjectRegistry* objectReg);
   virtual ~csShaderProgram ();
+
+  virtual int ResolveTextureBinding (const char* binding)
+  { return -1; }
 };
 
 #endif // __CS_SHADERPLUGINS_COMMON_SHADERPROGRAM_H__

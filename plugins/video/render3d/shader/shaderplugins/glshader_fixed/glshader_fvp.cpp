@@ -557,7 +557,17 @@ bool csGLShaderFVP::ParseTexMatrix (iDocumentNode* node,
   return true;
 }
 
-bool csGLShaderFVP::Load(iDocumentNode* program)
+static int ParseLayerParam (iDocumentNode* node, iShaderTUResolver* tuResolve)
+{
+  const char* layerName = node->GetAttributeValue ("layer");
+  if (layerName == 0) return -1;
+
+  int layer = tuResolve->ResolveTextureBinding (layerName);
+  if (layer < 0) layer = node->GetAttributeValueAsInt ("layer");
+  return layer;
+}
+
+bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
 {
   if (!program)
     return false;
@@ -640,7 +650,13 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
         case XMLTOKEN_CONSTANTCOLOR:
           {
 	    // @@@ Realize as var mapping?
-            int layer = child->GetAttributeValueAsInt ("layer");
+            int layer = ParseLayerParam (child, tuResolve);
+	    if (layer < 0)
+	    {
+	      synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
+		variablesnode, "'layer' attribute invalid");
+	      return false;
+	    }
             if (layers.Length ()<= (size_t)layer)
               layers.SetLength (layer+1);
 	    if (!ParseProgramParam (child, layers[layer].constcolor, ParamFloat | 
@@ -661,6 +677,15 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
           break;
         case XMLTOKEN_TEXGEN:
           {
+            int layer = ParseLayerParam (child, tuResolve);
+	    if (layer < 0)
+	    {
+	      synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
+		variablesnode, "'layer' attribute invalid");
+	      return false;
+	    }
+            if (layers.Length () <= (size_t)layer)
+              layers.SetLength (layer+1);
             const char* str;
             if ((str = child->GetAttributeValue ("type")))
             {
@@ -670,71 +695,61 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
                 {
                   if (!strcasecmp(str, "cube"))
                   {
-                    int layer = child->GetAttributeValueAsInt ("layer");
-                    if (layers.Length () <= (size_t)layer)
-                      layers.SetLength (layer+1);
                     layers[layer].texgen = TEXGEN_REFLECT_CUBE;
                   }
-				  else
-                  if (!strcasecmp(str, "sphere"))
+		  else if (!strcasecmp(str, "sphere"))
                   {
-                    int layer = child->GetAttributeValueAsInt ("layer");
-                    if (layers.Length () <= (size_t)layer)
-                      layers.SetLength (layer+1);
                     layers[layer].texgen = TEXGEN_REFLECT_SPHERE;
                   }
+		  else
+		  {
+		    synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
+		      variablesnode, "invalid mapping '%s'", str);
+		    return false;
+		  }
                 }
-              } else if (!strcasecmp(str, "fog"))
+		else
+		{
+		  synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
+		    variablesnode, "'mapping' attribute missing");
+		  return false;
+		}
+              } 
+	      else if (!strcasecmp(str, "fog"))
               {
-                int layer = child->GetAttributeValueAsInt ("layer");
-                if (layers.Length () <= (size_t)layer)
-                  layers.SetLength (layer+1);
                 layers[layer].texgen = TEXGEN_FOG;
 
                 if ((str = child->GetAttributeValue("plane")))
                   layers[layer].fogplane = strings->Request (str);
                 else
-                {
                   layers[layer].fogplane = strings->Request ("fogplane");
-                }
 
                 if ((str = child->GetAttributeValue("density")))
                   layers[layer].fogdensity = strings->Request (str);
                 else
-                {
                   layers[layer].fogdensity = strings->Request ("fog density");
-                }
               }
+	      else
+	      {
+		synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
+		  variablesnode, "invalid type '%s'", str);
+		return false;
+	      }
             }
           }
           break;
 	case XMLTOKEN_TEXMATRIX:
 	  {
-	    const char* dest = child->GetAttributeValue ("destination");
-	    if (!dest)
+            int layer = ParseLayerParam (child, tuResolve);
+	    if (layer < 0)
 	    {
-	      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
-		CS_REPORTER_SEVERITY_WARNING,
-		child,
-		"No 'destination' attribute");
+	      synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
+		variablesnode, "'layer' attribute invalid");
 	      return false;
 	    }
-	    int unit = 0;
-	    if (sscanf (dest, "unit %d", &unit) != 1)
-	    {
-	      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
-		CS_REPORTER_SEVERITY_WARNING,
-		child,
-		"Unknown destination '%s'", dest);
-	      return false;
-	    }
-	    /*
-	     @@@ Would be nice to somehow utilize the 'Resolve TU' function 
-	         of the FP.
-	     */
-            if (layers.Length () <= (size_t)unit)
-              layers.SetLength (unit + 1);
-	    if (!ParseTexMatrix (child, layers[unit].texMatrixOps))
+            if (layers.Length () <= (size_t)layer)
+              layers.SetLength (layer+1);
+	    if (!ParseTexMatrix (child, layers[layer].texMatrixOps))
 	      return false;
 	  }
 	  break;

@@ -80,17 +80,14 @@ public:
   virtual bool IsValid() { return validProgram;} 
 
   /// Loads from a document-node
-  virtual bool Load(iDocumentNode* node);
+  virtual bool Load (iShaderTUResolver*, iDocumentNode* node);
 
   /// Loads from raw text
-  virtual bool Load (const char* program, 
+  virtual bool Load (iShaderTUResolver*, const char* program, 
     csArray<csShaderVarMapping> &mappings);
 
   /// Compile a program
   virtual bool Compile(csArray<iShaderVariableContext*> &staticContexts);
-
-  virtual int ResolveTextureBinding (const char* binding)
-  { return -1; }
 };
 
 

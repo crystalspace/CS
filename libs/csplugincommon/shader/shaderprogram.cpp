@@ -31,6 +31,7 @@ CS_LEAKGUARD_IMPLEMENT (csShaderProgram);
 
 SCF_IMPLEMENT_IBASE(csShaderProgram)
   SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
+  SCF_IMPLEMENTS_INTERFACE(iShaderTUResolver)
 SCF_IMPLEMENT_IBASE_END
 
 csShaderProgram::csShaderProgram (iObjectRegistry* objectReg)
