@@ -801,7 +801,6 @@ AC_ARG_ENABLE([cpu-specific-optimizations],
     [case $enable_cpu_specific_optimizations in
 	yes|min) enable_cpu_specific_optimizations=minimum ;;
 	max) enable_cpu_specific_optimizations=maximum ;;
-	max) enable_cpu_specific_optimizations=maximum ;;
     esac],
     [enable_cpu_specific_optimizations=minimum])
 AC_MSG_RESULT([$enable_cpu_specific_optimizations])
