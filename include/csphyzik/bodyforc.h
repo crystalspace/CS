@@ -18,8 +18,8 @@
 
 */
 
-#ifndef __CT_BODYFORCE_H__
-#define __CT_BODYFORCE_H__
+#ifndef __CT_BODYFORC_H__
+#define __CT_BODYFORC_H__
 
 #include "csphyzik/force.h"
 #include "csphyzik/linklist.h"

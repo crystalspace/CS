@@ -22,7 +22,7 @@
 #define CT_THEFORCES_H
 
 #include "csphyzik/phyzent.h"
-#include "csphyzik/bodyforce.h"
+#include "csphyzik/bodyforc.h"
 
 class ctDynamicEntity;
 
