@@ -57,7 +57,9 @@ ifeq ($(MAKESECTION),targets)
 rlecodec: $(OUTDIRS) $(RLECODEC)
 
 $(RLECODEC): $(OBJ.RLECODEC) $(LIB.RLECODEC)
-	$(DO.PLUGIN) $(LIB.EXTERNAL.RLECODEC)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(LIB.EXTERNAL.RLECODEC) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 clean: rlecodecclean
 rlecodecclean:

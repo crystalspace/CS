@@ -63,7 +63,9 @@ $(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/openglx/glide/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.OGLGLIDE)
 
 $(OGLGLIDE): $(OBJ.OGLGLIDE) $(LIB.OGLGLIDE)
-	$(DO.PLUGIN) $(LIB.OGLGLIDE.SPECIAL)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(LIB.OGLGLIDE.SPECIAL) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 clean: oglglideclean
 oglglideclean:

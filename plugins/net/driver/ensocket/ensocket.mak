@@ -61,7 +61,9 @@ ifeq ($(MAKESECTION),targets)
 ensocket: $(OUTDIRS) $(ENSOCKET)
 
 $(ENSOCKET): $(OBJ.ENSOCKET) $(LIB.ENSOCKET)
-	$(DO.PLUGIN) $(SOCKET.LFLAGS)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(SOCKET.LFLAGS) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 clean: ensocketclean
 ensocketclean:

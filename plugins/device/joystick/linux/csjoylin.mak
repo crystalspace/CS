@@ -52,7 +52,9 @@ ifeq ($(MAKESECTION),targets)
 joylin: $(OUTDIRS) $(JOYLIN)
 
 $(JOYLIN): $(OBJ.JOYLIN) $(LIB.JOYLIN)
-	$(DO.PLUGIN) $(LIB.EXTERNAL.JOYLIN)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(LIB.EXTERNAL.JOYLIN) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 clean: joylinclean
 joylinclean:

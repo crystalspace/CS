@@ -59,7 +59,9 @@ ifeq ($(MAKESECTION),targets)
 odivx4: $(OUTDIRS) $(ODIVX4)
 
 $(ODIVX4): $(OBJ.ODIVX4) $(LIB.ODIVX4)
-	$(DO.PLUGIN) $(LIB.EXTERNAL.ODIVX4)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(LIB.EXTERNAL.ODIVX4) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 clean: odivx4clean
 odivx4clean:

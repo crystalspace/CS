@@ -68,7 +68,9 @@ ifeq ($(MAKESECTION),targets)
 sndwaveout: $(OUTDIRS) $(SNDWAVEOUT)
 
 $(SNDWAVEOUT): $(OBJ.SNDWAVEOUT) $(LIB.SNDWAVEOUT)
-	$(DO.PLUGIN) $(LDFLAGS.SNDWAVEOUT)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(LDFLAGS.SNDWAVEOUT) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 clean: sndwaveoutclean
 sndwaveoutclean:

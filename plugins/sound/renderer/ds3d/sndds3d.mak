@@ -88,7 +88,9 @@ $(OUT.SNDDS3D)/%$O: $(SRCDIR)/plugins/sound/renderer/common/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(SNDDS3D): $(OBJ.SNDDS3D) $(LIB.SNDDS3D)
-	$(DO.PLUGIN) $(LIB.SNDDS3D.SPECIAL)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(LIB.SNDDS3D.SPECIAL) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 clean: sndds3dclean
 sndds3dclean:
