@@ -14,6 +14,7 @@ PLUGINS+=net/driver/ensocket
 # Choose which 2D/3D driver combinations you want to build/use
 PLUGINS+=video/canvas/softx
 PLUGINS+=video/canvas/openglx video/renderer/opengl
+PLUGINS+=video/renderer/opengl-ext
 PLUGINS+=video/canvas/linex video/renderer/line
 
 # The X-Window plugin
