@@ -25,11 +25,11 @@
   <xsl:variable name="tabwidth" select="'  '"/>
 
   <!-- the top level widget types allowed -->
-  <xsl:template match="widget[class[text()='QDialog' or text()='QWidget'] and not(../class='QTabWidget')]">
+  <xsl:template match="widget[@class='QDialog' or @class='QWidget' and not(../@class='QTabWidget')]">
     <xsl:call-template name="spacer"/><xsl:text>window "</xsl:text>
     <xsl:choose>
       <xsl:when test="/UI/class"><xsl:value-of select="/UI/class"/></xsl:when>
-      <xsl:otherwise><xsl:value-of select="property[name[text()='name']]/cstring"/></xsl:otherwise>
+      <xsl:otherwise><xsl:value-of select="property[@name='name']/cstring"/></xsl:otherwise>
     </xsl:choose>
     <xsl:text>"</xsl:text>
     <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
@@ -41,7 +41,7 @@
   </xsl:template>
 
   <!-- list of widgets we convert -->
-  <xsl:template match="widget[class[text()='QPushButton' or text()='QRadioButton' or text()='QSlider' or text()='QButtonGroup' or text()='QGroupBox' or text()='QFrame' or text()='QCheckBox' or text()='QLineEdit' or text()='QLabel' or text()='QTextView' or text()='QTabWidget'] or (class='QWidget' and ../class='QTabWidget')]">
+  <xsl:template match="widget[@class='QPushButton' or @class='QRadioButton' or @class='QSlider' or @class='QButtonGroup' or @class='QGroupBox' or @class='QFrame' or @class='QCheckBox' or @class='QLineEdit' or @class='QLabel' or @class='QTextView' or @class='QTabWidget' or (@class='QWidget' and ../@class='QTabWidget')]">
     <xsl:call-template name="spacer"/><xsl:call-template name="component_header"/>
     <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
     <xsl:call-template name="layout"/>
@@ -50,32 +50,32 @@
   </xsl:template>
  
   <!-- special treatment of QListBox that maps to List Box with one column -->
-  <xsl:template match="widget[class[text()='QListBox']]">
+  <xsl:template match="widget[@class='QListBox']">
     <xsl:call-template name="spacer"/><xsl:call-template name="component_header"/>
     <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
     <!-- configure a awslistbox with a single column -->
     <xsl:call-template name="spacer">
-      <xsl:with-param name="here" select="class"/>
+      <xsl:with-param name="here" select="property[@name='name']"/>
     </xsl:call-template>
     <xsl:text>Type: lbtList</xsl:text>
     <xsl:call-template name="spacer">
-      <xsl:with-param name="here" select="class"/>
+      <xsl:with-param name="here" select="property[@name='name']"/>
     </xsl:call-template>
     <xsl:text>Highlight: "/aws/lbhi.png"</xsl:text>
     <xsl:call-template name="spacer">
-      <xsl:with-param name="here" select="class"/>
+      <xsl:with-param name="here" select="property[@name='name']"/>
     </xsl:call-template>
     <xsl:text>Columns: 1</xsl:text>
     <xsl:call-template name="spacer">
-      <xsl:with-param name="here" select="class"/>
+      <xsl:with-param name="here" select="property[@name='name']"/>
     </xsl:call-template>
     <xsl:text>DefaultSortCol: 0</xsl:text>
     <xsl:call-template name="spacer">
-      <xsl:with-param name="here" select="class"/>
+      <xsl:with-param name="here" select="property[@name='name']"/>
     </xsl:call-template>
     <xsl:text>Column0Width: </xsl:text><xsl:value-of select="property/rect/width"/>
     <xsl:call-template name="spacer">
-      <xsl:with-param name="here" select="class"/>
+      <xsl:with-param name="here" select="property[@name='name']"/>
     </xsl:call-template>
     <xsl:text>Column0Caption: "Column 0"</xsl:text>
     <!-- we ignore scrollbar stuff since aws always creates a vertical one (currently) -->
@@ -84,19 +84,16 @@
     <xsl:call-template name="spacer"/><xsl:text>}</xsl:text>
   </xsl:template>
 
-  <xsl:template match="widget[class[text()='QListView']]">
+  <xsl:template match="widget[@class='QListView']">
     <xsl:call-template name="spacer"/><xsl:call-template name="component_header"/>
     <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
     <xsl:call-template name="spacer">
-      <xsl:with-param name="here" select="class"/>
     </xsl:call-template>
     <xsl:text>Highlight: "/aws/lbhi.png"</xsl:text>
     <xsl:call-template name="spacer">
-      <xsl:with-param name="here" select="class"/>
     </xsl:call-template>
     <xsl:text>Columns: </xsl:text><xsl:value-of select="count(column)"/>
     <xsl:call-template name="spacer">
-      <xsl:with-param name="here" select="class"/>
     </xsl:call-template>
     <xsl:text>DefaultSortCol: 0</xsl:text>
     <!-- we ignore scrollbar stuff since aws always creates a vertical one (currently) -->
@@ -111,30 +108,30 @@
     <xsl:value-of select="round(number(../property/rect/width) div count(../column))"/>
     <xsl:call-template name="spacer"/>
     <xsl:value-of select="concat('Column',count(preceding-sibling::node()[self::column]),'Caption: ')"/>
-    <xsl:text>"</xsl:text><xsl:value-of select="property[name='text']/string"/><xsl:text>"</xsl:text>
+    <xsl:text>"</xsl:text><xsl:value-of select="property[@name='text']/string"/><xsl:text>"</xsl:text>
   </xsl:template>
   
-  <xsl:template match="property[name[text()='caption']]">
+  <xsl:template match="property[@name='caption']">
     <xsl:call-template name="spacer"/><xsl:text>Title: "</xsl:text><xsl:value-of select="string"/><xsl:text>"</xsl:text>
   </xsl:template>
 
-  <xsl:template match="property[name[text()='text' or text()='title'] and ../class[text() != 'QLineEdit']]">
+  <xsl:template match="property[@name='text' or @name='title' and ../@class != 'QLineEdit']">
     <xsl:if test="string-length(string) > 0">
       <xsl:call-template name="spacer"/><xsl:text>Caption: "</xsl:text><xsl:value-of select="string"/><xsl:text>"</xsl:text>
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="property[name[text()='text'] and ../class[text()='QLineEdit']]">
+  <xsl:template match="property[@name='text' and ../@class='QLineEdit']">
     <xsl:call-template name="spacer"/><xsl:text>Text: "</xsl:text><xsl:value-of select="string"/><xsl:text>"</xsl:text>
   </xsl:template>
 
-  <xsl:template match="property[name[text()='pixmap'] and ../class[text()='QLabel']]">
+  <xsl:template match="property[@name='pixmap' and ../@class='QLabel']">
     <!--
     <xsl:call-template name="spacer"/><xsl:text>Texture: "</xsl:text><xsl:value-of select="string"/><xsl:text>"</xsl:text>
     -->
   </xsl:template>
 
-  <xsl:template match="property[name[text()='geometry']]">
+  <xsl:template match="property[@name='geometry']">
     <xsl:call-template name="spacer"/><xsl:text>Frame: (</xsl:text>
     <xsl:value-of select="rect/x"/><xsl:text>,</xsl:text><xsl:value-of select="rect/y"/>
     <xsl:text>) - (</xsl:text>
@@ -142,23 +139,23 @@
     <xsl:value-of select="number(rect/y)+number(rect/height)"/><xsl:text>)</xsl:text>
   </xsl:template>
 
-  <xsl:template match="property[name[text()='minValue']]">
+  <xsl:template match="property[@name='minValue']">
     <xsl:call-template name="spacer"/><xsl:text>Min: </xsl:text><xsl:value-of select="number"/>
   </xsl:template>
 
-  <xsl:template match="property[name[text()='maxValue']]">
+  <xsl:template match="property[@name='maxValue']">
     <xsl:call-template name="spacer"/><xsl:text>Max: </xsl:text><xsl:value-of select="number"/>
   </xsl:template>
 
-  <xsl:template match="property[name[text()='pageStep']]">
+  <xsl:template match="property[@name='pageStep']">
     <xsl:call-template name="spacer"/><xsl:text>PageSize: </xsl:text><xsl:value-of select="number"/>
   </xsl:template>
 
-  <xsl:template match="property[name[text()='value']]">
+  <xsl:template match="property[@name='value']">
     <xsl:call-template name="spacer"/><xsl:text>Value: </xsl:text><xsl:value-of select="number"/>
   </xsl:template>
 
-  <xsl:template match="property[name[text()='orientation']]">
+  <xsl:template match="property[@name='orientation']">
     <xsl:call-template name="spacer"/><xsl:text>Orientation: </xsl:text>
     <xsl:choose>
       <xsl:when test="enum='Horizontal'">
@@ -170,7 +167,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="property[name[text()='echoMode']]">
+  <xsl:template match="property[@name='echoMode']">
     <xsl:choose>
       <xsl:when test="enum='NoEcho'">
         <xsl:call-template name="spacer"/><xsl:text>Masked: Yes</xsl:text>
@@ -182,7 +179,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="property[name[text()='frameShadow'] and not(../class='QLabel')]">
+  <xsl:template match="property[@name='frameShadow' and not(../@class='QLabel')]">
     <xsl:call-template name="spacer"/><xsl:text>Style: </xsl:text>
     <xsl:choose>
       <xsl:when test="enum='Raised'">
@@ -197,7 +194,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="property[name[text()='alignment']]">
+  <xsl:template match="property[@name='alignment']">
     <xsl:call-template name="spacer"/><xsl:text>Align: </xsl:text>
     <xsl:choose>
       <xsl:when test="contains(set,'AlignCenter')">
@@ -217,7 +214,7 @@
     <xsl:apply-templates/>
   </xsl:template>
 
-  <xsl:template match="property[name[text()='sizePolicy']]">
+  <xsl:template match="property[@name='sizePolicy']">
     <xsl:choose>
       <xsl:when test="sizepolicy/hsizetype=0 and sizepolicy/vsizetype=0">
         <xsl:call-template name="spacer"/><xsl:text>Fill: gbcNone</xsl:text>
@@ -234,13 +231,13 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="property[name='whatsThis']">
+  <xsl:template match="property[@name='whatsThis']">
     <xsl:call-template name="awsinfo">
       <xsl:with-param name="info" select="concat(string,'|')"/>
     </xsl:call-template>
   </xsl:template>
 
-  <xsl:template match="attribute[name='title']">
+  <xsl:template match="attribute[@name='title']">
     <xsl:if test="string-length(string) > 0">
       <xsl:call-template name="spacer"/>
       <xsl:text>Caption: "</xsl:text><xsl:value-of select="string"/><xsl:text>"</xsl:text>
@@ -271,17 +268,23 @@
   </xsl:template>
 
   <xsl:template name="style">
+    <!--
     <xsl:call-template name="spacer"><xsl:with-param name="here" select="./class"/></xsl:call-template>
+    -->
+    <xsl:call-template name="spacer"/>
     <xsl:text>Style: </xsl:text><xsl:call-template name="prefix"/><xsl:text>fsNormal</xsl:text>
   </xsl:template>
 
   <xsl:template name="options">
+    <!--
     <xsl:call-template name="spacer"><xsl:with-param name="here" select="./class"/></xsl:call-template>
+    -->
+    <xsl:call-template name="spacer"/>
     <xsl:choose>
-      <xsl:when test="class[text()='QDialog']">
+      <xsl:when test="@class='QDialog'">
         <xsl:text>Options: wfoGrip+wfoTitle+wfoClose+wfoMin+wfoZoom+wfoControl</xsl:text>
       </xsl:when>
-      <xsl:when test="class[text()='QWidget']">
+      <xsl:when test="@class='QWidget'">
         <xsl:text>Options: wfoTitle+wfoClose</xsl:text>
       </xsl:when>
     </xsl:choose>
@@ -289,51 +292,51 @@
 
   <xsl:template name="component_header">
     <xsl:text>component "</xsl:text>
-    <xsl:value-of select="property[name[text()='name']]/cstring"/>
+    <xsl:value-of select="property[@name='name']/cstring"/>
     <xsl:text>" is </xsl:text><xsl:call-template name="get_classname"/>
   </xsl:template>
 
   <xsl:template name="get_classname">
     <xsl:choose>
-      <xsl:when test="contains(concat('|',property[name='whatsThis']/string),'|t:')">
+      <xsl:when test="contains(concat('|',property[@name='whatsThis']/string),'|t:')">
         <xsl:call-template name="awsinfo">
-          <xsl:with-param name="info" select="concat(property[name='whatsThis']/string,'|')"/>
+          <xsl:with-param name="info" select="concat(property[@name='whatsThis']/string,'|')"/>
           <xsl:with-param name="process" select="'t'"/>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="class='QTabWidget'">"Notebook"</xsl:when>
-      <xsl:when test="class='QWidget' and ../class='QTabWidget'">"Notebook Page"</xsl:when>
-      <xsl:when test="class='QPushButton'">"Command Button"</xsl:when>
-      <xsl:when test="class='QRadioButton'">"Radio Button"</xsl:when>
-      <xsl:when test="class='QButtonGroup'">"Group Frame"</xsl:when>
-      <xsl:when test="class='QGroupBox'">"Group Frame"</xsl:when>
-      <xsl:when test="class='QFrame'">"Group Frame"</xsl:when>
-      <xsl:when test="class='QLineEdit'">"Text Box"</xsl:when>
-      <xsl:when test="class='QTextView'">"Multiline Edit"</xsl:when>
-      <xsl:when test="class='QCheckBox'">"Check Box"</xsl:when>
-      <xsl:when test="class='QListBox'">"List Box"</xsl:when>
-      <xsl:when test="class='QListView'">"List Box"</xsl:when>
-      <xsl:when test="class='QSlider'">"Scroll Bar"</xsl:when>
-      <xsl:when test="class='QLabel' and property/name='text'">"Label"</xsl:when>
-      <xsl:when test="class='QLabel' and property/name='pixmap'">"Image View"</xsl:when>
-      <xsl:otherwise><xsl:value-of select="class"/></xsl:otherwise>
+      <xsl:when test="@class='QTabWidget'">"Notebook"</xsl:when>
+      <xsl:when test="@class='QWidget' and ../@class='QTabWidget'">"Notebook Page"</xsl:when>
+      <xsl:when test="@class='QPushButton'">"Command Button"</xsl:when>
+      <xsl:when test="@class='QRadioButton'">"Radio Button"</xsl:when>
+      <xsl:when test="@class='QButtonGroup'">"Group Frame"</xsl:when>
+      <xsl:when test="@class='QGroupBox'">"Group Frame"</xsl:when>
+      <xsl:when test="@class='QFrame'">"Group Frame"</xsl:when>
+      <xsl:when test="@class='QLineEdit'">"Text Box"</xsl:when>
+      <xsl:when test="@class='QTextView'">"Multiline Edit"</xsl:when>
+      <xsl:when test="@class='QCheckBox'">"Check Box"</xsl:when>
+      <xsl:when test="@class='QListBox'">"List Box"</xsl:when>
+      <xsl:when test="@class='QListView'">"List Box"</xsl:when>
+      <xsl:when test="@class='QSlider'">"Scroll Bar"</xsl:when>
+      <xsl:when test="@class='QLabel' and property/@name='text'">"Label"</xsl:when>
+      <xsl:when test="@class='QLabel' and property/@name='pixmap'">"Image View"</xsl:when>
+      <xsl:otherwise><xsl:value-of select="@class"/></xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
   <xsl:template name="prefix">
     <xsl:choose>
-      <xsl:when test="../class='QWidget' and ../../class='QTabWidget'"><xsl:text>nb</xsl:text></xsl:when>
-      <xsl:when test="class='QWidget' or class='QDialog'"><xsl:text>w</xsl:text></xsl:when>
-      <xsl:when test="../class='QPushButton' or class='QPushButton'"><xsl:text>b</xsl:text></xsl:when>
-      <xsl:when test="../class='QButtonGroup'"><xsl:text>g</xsl:text></xsl:when>
-      <xsl:when test="../class='QGroupBox'"><xsl:text>g</xsl:text></xsl:when>
-      <xsl:when test="../class='QFrame'"><xsl:text>g</xsl:text></xsl:when>
-      <xsl:when test="../class='QListBox'"><xsl:text>lb</xsl:text></xsl:when>
-      <xsl:when test="../class='QListView'"><xsl:text>lb</xsl:text></xsl:when>
-      <xsl:when test="../class='QSlider'"><xsl:text>sb</xsl:text></xsl:when>
-      <xsl:when test="../class='QTextView'"><xsl:text>me</xsl:text></xsl:when>
-      <xsl:when test="../class='QLabel' and ../property/name='pixmap'"><xsl:text>iv</xsl:text></xsl:when>
-      <xsl:when test="../class='QLabel' and ../property/name='text'"><xsl:text>lbl</xsl:text></xsl:when>
+      <xsl:when test="../@class='QWidget' and ../../@class='QTabWidget'"><xsl:text>nb</xsl:text></xsl:when>
+      <xsl:when test="@class='QWidget' or @class='QDialog'"><xsl:text>w</xsl:text></xsl:when>
+      <xsl:when test="../@class='QPushButton' or @class='QPushButton'"><xsl:text>b</xsl:text></xsl:when>
+      <xsl:when test="../@class='QButtonGroup'"><xsl:text>g</xsl:text></xsl:when>
+      <xsl:when test="../@class='QGroupBox'"><xsl:text>g</xsl:text></xsl:when>
+      <xsl:when test="../@class='QFrame'"><xsl:text>g</xsl:text></xsl:when>
+      <xsl:when test="../@class='QListBox'"><xsl:text>lb</xsl:text></xsl:when>
+      <xsl:when test="../@class='QListView'"><xsl:text>lb</xsl:text></xsl:when>
+      <xsl:when test="../@class='QSlider'"><xsl:text>sb</xsl:text></xsl:when>
+      <xsl:when test="../@class='QTextView'"><xsl:text>me</xsl:text></xsl:when>
+      <xsl:when test="../@class='QLabel' and ../property/@name='pixmap'"><xsl:text>iv</xsl:text></xsl:when>
+      <xsl:when test="../@class='QLabel' and ../property/@name='text'"><xsl:text>lbl</xsl:text></xsl:when>
     </xsl:choose>
   </xsl:template>
 
