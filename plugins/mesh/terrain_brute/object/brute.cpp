@@ -39,17 +39,21 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csTerrainObject)
-SCF_IMPLEMENTS_INTERFACE (iMeshObject)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iTerrainObjectState)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iTerrainObjectState)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainObject::eiObjectModel)
-SCF_IMPLEMENTS_INTERFACE (iObjectModel)
+  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_IBASE (csTerrainObject::PolyMesh)
+  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
+SCF_IMPLEMENT_IBASE_END
+
 SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainObject::eiTerrainObjectState)
-SCF_IMPLEMENTS_INTERFACE (iTerrainObjectState)
+  SCF_IMPLEMENTS_INTERFACE (iTerrainObjectState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csTerrBlock::csTerrBlock (csTerrainObject *terr)
@@ -570,6 +574,43 @@ bool csTerrBlock::IsMaterialUsed (int index)
 
 // ---------------------------------------------------------------
 
+void csTerrainObject::PolyMesh::Cleanup ()
+{
+}
+
+int csTerrainObject::PolyMesh::GetVertexCount ()
+{
+  return 0;
+}
+
+csVector3* csTerrainObject::PolyMesh::GetVertices ()
+{
+  return 0;
+}
+
+int csTerrainObject::PolyMesh::GetPolygonCount ()
+{
+  return 0;
+}
+
+csMeshedPolygon* csTerrainObject::PolyMesh::GetPolygons ()
+{
+  return 0;
+}
+
+int csTerrainObject::PolyMesh::GetTriangleCount ()
+{
+  return 0;
+}
+
+csTriangle* csTerrainObject::PolyMesh::GetTriangles ()
+{
+  return 0;
+}
+
+//----------------------------------------------------------------------
+
+
 csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
                                     iMeshObjectFactory *pFactory)
                                     : returnMeshesHolder (false)
@@ -580,6 +621,14 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   csTerrainObject::object_reg = object_reg;
   csTerrainObject::pFactory = pFactory;
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+
+  scfiObjectModel.SetPolygonMeshBase (0);
+  scfiObjectModel.SetPolygonMeshColldet (0);
+  //scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
+  //scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
+  scfiObjectModel.SetPolygonMeshViscull (0);
+  scfiObjectModel.SetPolygonMeshShadows (0);
+
   logparent = 0;
   initialized = false;
 

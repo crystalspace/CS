@@ -390,6 +390,40 @@ public:
   void AddListener (iObjectModelListener* listener);
   void RemoveListener (iObjectModelListener* listener);
 
+  //------------------ iPolygonMesh interface implementation ----------------//
+  struct PolyMesh : public iPolygonMesh
+  {
+  private:
+    csTerrainObject* terrain;
+    csFlags flags;
+  public:
+    SCF_DECLARE_IBASE;
+
+    void SetTerrain (csTerrainObject* t)
+    {
+      terrain = t;
+      flags.SetAll (CS_POLYMESH_TRIANGLEMESH);
+    }
+    void Cleanup ();
+
+    virtual int GetVertexCount ();
+    virtual csVector3* GetVertices ();
+    virtual int GetPolygonCount ();
+    virtual csMeshedPolygon* GetPolygons ();
+    virtual int GetTriangleCount ();
+    virtual csTriangle* GetTriangles ();
+    virtual void Lock () { }
+    virtual void Unlock () { }
+
+    virtual csFlags& GetFlags () { return flags;  }
+    virtual uint32 GetChangeNumber() const { return 0; }
+
+    PolyMesh ()
+    { SCF_CONSTRUCT_IBASE (0); }
+    virtual ~PolyMesh ()
+    { SCF_DESTRUCT_IBASE (); }
+  } scfiPolygonMesh;
+
   //------------------------- iObjectModel implementation ----------------
   class eiObjectModel : public csObjectModel
   {
