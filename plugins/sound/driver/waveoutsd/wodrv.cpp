@@ -65,6 +65,8 @@ csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
   MemorySize = 0;
   Memory = NULL;
   WaveOut = NULL;
+  Playback = 0;
+  LastError = -1;
 }
 
 csSoundDriverWaveOut::~csSoundDriverWaveOut()
@@ -89,7 +91,7 @@ bool csSoundDriverWaveOut::Initialize (iObjectRegistry *r)
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
-    q->RegisterListener (scfiEventHandler, CSMASK_Command | CSMASK_Broadcast);
+    q->RegisterListener (scfiEventHandler, CSMASK_Nothing | CSMASK_Broadcast);
     q->DecRef ();
   }
   Config.AddConfig(object_reg, "/config/sound.cfg");
@@ -159,23 +161,16 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency,
   // support?
   MMRESULT res = waveOutOpen(&WaveOut, WAVE_MAPPER, &Format,
     (LONG)&waveOutProc, 0L, CALLBACK_FUNCTION);
-  if (res != MMSYSERR_NOERROR) Report (CS_REPORTER_SEVERITY_NOTIFY,
-    "  could not open Wave-Out system (%s).", GetMMError(res));
+  CheckError("waveOutOpen", res);
 
   // Store old volume and set full volume because the software sound renderer
   // will apply volume internally. If this device does not allow volume
   // changes, all the volume set/get calls will fail, but output will be
   // correct. So don't check for errors here!
-  waveOutGetVolume(WaveOut, &OldVolume);
-  waveOutSetVolume(WaveOut, 0xffffffff);
+//  waveOutGetVolume(WaveOut, &OldVolume);
+//  waveOutSetVolume(WaveOut, 0xffffffff);
 
-  // write empty sound blocks to start playback. Three sound blocks should
-  // be enough to prevent sound gaps; if not, make this an option in the
-  // config file.
   ActivateSoundProc = true;
-  SoundProc(NULL);
-  SoundProc(NULL);
-  SoundProc(NULL);
 
   return S_OK;
 }
@@ -185,7 +180,7 @@ void csSoundDriverWaveOut::Close()
   ActivateSoundProc = false;
   if (WaveOut)
   {
-    waveOutSetVolume(WaveOut, OldVolume);
+//    waveOutSetVolume(WaveOut, OldVolume);
     /* @@@ error checking */
     waveOutReset(WaveOut);
     waveOutClose(WaveOut);
@@ -226,6 +221,7 @@ typedef struct {
 
 bool csSoundDriverWaveOut::HandleEvent(iEvent &e)
 {
+  //Report (CS_REPORTER_SEVERITY_NOTIFY, "handleevent: %d", Playback);
   if (e.Type == csevCommand || e.Type == csevBroadcast)
     if (e.Command.Code == cscmdPreProcess)
   {
@@ -235,12 +231,19 @@ bool csSoundDriverWaveOut::HandleEvent(iEvent &e)
       SoundBlock *Block = (SoundBlock*)BlocksToDelete.Pop();
       MMRESULT res;
       res = waveOutUnprepareHeader(WaveOut, Block->WaveHeader,sizeof(WAVEHDR));
-      if (res != MMSYSERR_NOERROR) Report (CS_REPORTER_SEVERITY_WARNING,
-        "cannot unprepare wave-out header (%s).", GetMMError(res));
+      CheckError("waveOutUnprepareHeader", res);
 
       GlobalUnlock(Block->DataHandle);
       GlobalFree(Block->DataHandle);
       delete Block;
+    }
+  // write empty sound blocks to start playback. Three sound blocks should
+  // be enough to prevent sound gaps; if not, make this an option in the
+  // config file.
+    if (!Playback) {
+      SoundProc(NULL);
+      SoundProc(NULL);
+      SoundProc(NULL);
     }
   }
   return false;
@@ -265,6 +268,7 @@ void csSoundDriverWaveOut::SoundProc(LPWAVEHDR OldHeader) {
   if (OldHeader) {
     SoundBlock *Block = (SoundBlock *)(OldHeader->dwUser);
     BlocksToDelete.Push(Block);
+    if (Playback) Playback--;
   }
 
   // look if sound proc is activated
@@ -302,23 +306,27 @@ void csSoundDriverWaveOut::SoundProc(LPWAVEHDR OldHeader) {
     lpWaveHdr->dwFlags = 0L;
     lpWaveHdr->dwLoops = 0L;
     lpWaveHdr->dwUser = (DWORD)Block;
-    waveOutPrepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
-
-    // Now the data block can be sent to the output device. The 
-    // waveOutWrite function returns immediately and waveform 
-    // data is sent to the output device in the background.
-    MMRESULT result = waveOutWrite(WaveOut, lpWaveHdr, sizeof(WAVEHDR)); 
-    if (result != MMSYSERR_NOERROR) {
-      Report (CS_REPORTER_SEVERITY_WARNING,
-        "Cannot write sound block to wave-out (%s).", GetMMError(result));
-
-      result = waveOutUnprepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
-      if (result != MMSYSERR_NOERROR)
-        Report(CS_REPORTER_SEVERITY_WARNING,
-	  "Cannot unprepare sound block (%s).", GetMMError(result));
+    MMRESULT result = waveOutPrepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
+    if (!CheckError("waveOutPrepareHeader", result)) {
       GlobalUnlock(Block->DataHandle);
       GlobalFree(Block->DataHandle);
       delete Block;
+    }
+    else
+    {
+      // Now the data block can be sent to the output device. The 
+      // waveOutWrite function returns immediately and waveform 
+      // data is sent to the output device in the background.
+      result = waveOutWrite(WaveOut, lpWaveHdr, sizeof(WAVEHDR)); 
+      if (!CheckError("waveOutWrite", result)) {
+	result = waveOutUnprepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
+	CheckError("waveOutUnprepareHeader", result);
+	GlobalUnlock(Block->DataHandle);
+	GlobalFree(Block->DataHandle);
+	delete Block;
+      } else {
+	Playback++;
+      }
     }
   }
   
@@ -327,6 +335,8 @@ void csSoundDriverWaveOut::SoundProc(LPWAVEHDR OldHeader) {
 }
 
 const char *csSoundDriverWaveOut::GetMMError(MMRESULT r) {
+  static char err[MAXERRORLENGTH];
+
   switch (r) {
   case MMSYSERR_NOERROR:
     return "no MM error";
@@ -343,7 +353,7 @@ const char *csSoundDriverWaveOut::GetMMError(MMRESULT r) {
   case MMSYSERR_NOMEM:
     return "unable to allocate memory";
 
-  case WAVERR_BADFORMAT:
+/*  case WAVERR_BADFORMAT:
     return "unsupported audio format";
 
   case WAVERR_SYNC:
@@ -353,9 +363,29 @@ const char *csSoundDriverWaveOut::GetMMError(MMRESULT r) {
     return "invalid device handle";
 
   case WAVERR_STILLPLAYING:
-    return "still playing this sound block";
+    return "still playing this sound block";*/
 
   default:
-    return "unknown MM error";
+    //return "unknown MM error";
+    waveOutGetErrorText(r, err, sizeof(err));
+
+    return err;
+  }
+}
+
+bool csSoundDriverWaveOut::CheckError(const char *action, MMRESULT code)
+{
+  if (code != MMSYSERR_NOERROR) {
+    if (code != LastError)
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR,
+	"%s: %.8x %s .", action, code, GetMMError(code));
+      LastError = code;
+    }
+    return false;
+  }
+  else
+  {
+    return true;
   }
 }

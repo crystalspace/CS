@@ -50,8 +50,6 @@ public:
   virtual int GetFrequency();
   virtual bool IsHandleVoidSound();
 
-  const char *GetMMError(MMRESULT code);
-	
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundDriverWaveOut);
@@ -99,12 +97,19 @@ protected:
   volatile int NumSoundBlocksToWrite;
   // list of blocks to delete
   csVector BlocksToDelete;
+  // has playback already started?
+  volatile int Playback;
+  // when the same error occurs multiple times, we just show the first
+  volatile MMRESULT LastError;
 
   // this function is called when a sound block is returned by wave-out
   static void CALLBACK waveOutProc(HWAVEOUT hwo, UINT uMsg, DWORD dwInstance,
     DWORD dwParam1, DWORD dwParam2);
   // this function writes a new sound block to wave-out
   void SoundProc(LPWAVEHDR OldHeader);
+
+  bool CheckError(const char *action, MMRESULT code);
+  const char *GetMMError(MMRESULT code);
 
   // wave-out device
   HWAVEOUT WaveOut;
