@@ -72,10 +72,15 @@ AC_MSG_CHECKING([build mode])
 AS_VAR_SET_IF([cs_build_mode], [], [cs_build_mode=optimize])
 AC_MSG_RESULT([$cs_build_mode])
 CS_JAMCONFIG_PROPERTY([MODE], [$cs_build_mode])
+
+#-----------------------------------------------------------------------------
+# Output Installpaths
+#-----------------------------------------------------------------------------
+CS_OUTPUT_INSTALLDIRS
                                                                                 
 #----------------------------------------------------------------------------
-# Output generated files.  Also create a Jamfile when compiling outside source
-# directory.
+# Output generated files.  Also create a Jamfile when compiling outside
+# source directory.
 #----------------------------------------------------------------------------
 CS_JAMCONFIG_PROPERTY([JAMCONFIG_READ], [yes])
 CS_JAMCONFIG_OUTPUT([Jamconfig])
