@@ -154,7 +154,6 @@ csThing::csThing (iBase *parent, csThingObjectType* thing_type) :
   obj_bbox_valid = false;
 
   dynamic_ambient.Set (0,0,0);
-  ambient_version = 1;
   light_version = 1;
 
   center_idx = -1;

@@ -56,7 +56,6 @@ csPolyTexture::csPolyTexture ()
   cache_data = NULL;
   polygon = NULL;
   shadow_bitmap = NULL;
-  ambient_version = 0;
   light_version = 0;
 }
 
@@ -85,6 +84,11 @@ csPolyTexture::~csPolyTexture ()
   }
 
   DG_REM (this);
+}
+
+iMaterialHandle *csPolyTexture::GetMaterialHandle ()
+{
+  return polygon->GetMaterialHandle ();
 }
 
 void* csPolyTexture::GetCacheData (int idx)
@@ -160,26 +164,25 @@ void csPolyTexture::CreateBoundingTextureBox ()
   Fmax_v = max_v;
 
   int ww, hh;
+  iMaterialHandle* mat_handle = polygon->GetMaterialHandle ();
   if (mat_handle && mat_handle->GetTexture ())
     mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
   else
     ww = hh = 64;
   Imin_u = QRound (min_u * ww);
   Imin_v = QRound (min_v * hh);
-  Imax_u = QRound (max_u * ww);
-  Imax_v = QRound (max_v * hh);
+  int Imax_u = QRound (max_u * ww);
+  int Imax_v = QRound (max_v * hh);
 
   h = Imax_v - Imin_v;
   w_orig = Imax_u - Imin_u;
   w = 1;
   shf_u = 0;
-  and_u = 0;
   while (true)
   {
     if (w_orig <= w) break;
     w <<= 1;
     shf_u++;
-    and_u = (and_u << 1) + 1;
   }
 
   fdu = min_u * ww;
@@ -197,11 +200,9 @@ bool csPolyTexture::RecalculateDynamicLights ()
   if (!lm->UpdateRealLightMap (amb.red,
       amb.green,
       amb.blue,
-      thing->GetDynamicAmbientVersion() != ambient_version,
       thing->GetLightVersion () != light_version ))
     return false;
 
-  ambient_version = thing->GetDynamicAmbientVersion();
   light_version = thing->GetLightVersion ();
 
   //---
@@ -338,6 +339,7 @@ void csPolyTexture::FillLightMap (
   csVector3 &lightpos = light_frustum->GetOrigin ();
   float inv_lightcell_size = 1.0f / csLightMap::lightcell_size;
   int ww, hh;
+  iMaterialHandle* mat_handle = polygon->GetMaterialHandle ();
   if (mat_handle && mat_handle->GetTexture ())
     mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
   else
@@ -554,6 +556,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp)
   float d;
 
   int ww, hh;
+  iMaterialHandle* mat_handle = polygon->GetMaterialHandle ();
   mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
 
   csPolyTxtPlane *txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
@@ -847,6 +850,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
   CS_ASSERT (shadow_bitmap != NULL);
 
   int ww, hh;
+  iMaterialHandle* mat_handle = polygon->GetMaterialHandle ();
   if (mat_handle && mat_handle->GetTexture ())
     mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
   else

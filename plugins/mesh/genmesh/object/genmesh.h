@@ -317,10 +317,6 @@ public:
     {
       return scfParent->dynamic_ambient;
     }
-    virtual uint32 GetDynamicAmbientVersion () const
-    {
-      return scfParent->ambient_version;
-    }
     virtual void DynamicLightChanged (iDynLight* dynlight)
     {
       scfParent->DynamicLightChanged (dynlight);

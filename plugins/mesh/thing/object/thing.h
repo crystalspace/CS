@@ -304,12 +304,8 @@ private:
   /// Dynamic ambient light assigned to this thing.
   csColor dynamic_ambient;
   /**
-   * Version number of ambient light color determines whether recalc
-   * is necessary in poly.
-   */
-  uint32 ambient_version;
-  /**
-   * Version number for dynamic/pseudo-dynamic light changes.
+   * Version number for dynamic/pseudo-dynamic light changes
+   * and also for ambient.
    */
   uint32 light_version;
 
@@ -952,7 +948,7 @@ public:
   void SetDynamicAmbientLight(const csColor& color)
   {
       dynamic_ambient = color;
-      ambient_version++;
+      light_version++;
       MarkLightmapsDirty ();
   }
   /// Gets dynamic ambient light for this thing
@@ -960,10 +956,6 @@ public:
   {
       return dynamic_ambient;
   }
-
-  /// Get dynamic ambient light version to test if needs to be recalculated
-  uint32 GetDynamicAmbientVersion() const
-  { return ambient_version; }
 
   /// Get light version.
   uint32 GetLightVersion() const
@@ -1150,8 +1142,6 @@ public:
     { scfParent->SetDynamicAmbientLight (color); }
     virtual const csColor& GetDynamicAmbientLight ()
     { return scfParent->GetDynamicAmbientLight (); }
-    virtual uint32 GetDynamicAmbientVersion () const
-    { return scfParent->GetDynamicAmbientVersion (); }
     virtual void DynamicLightChanged (iDynLight* dynlight)
     { scfParent->DynamicLightChanged (dynlight); }
     virtual void DynamicLightDisconnect (iDynLight* dynlight)

@@ -165,7 +165,6 @@ public:
   bool UpdateRealLightMap (float dyn_ambient_r,
                            float dyn_ambient_g,
                            float dyn_ambient_b, 
-                           bool amb_dirty,
                            bool dyn_dirty);
 
   ///

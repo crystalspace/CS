@@ -92,7 +92,6 @@ csPolyTexLightMap::~csPolyTexLightMap ()
 void csPolyTexLightMap::Setup (csPolygon3D *poly3d, iMaterialWrapper *mat)
 {
   tex->SetPolygon (poly3d);
-  tex->SetMaterialHandle (mat->GetMaterialHandle ());
   tex->CreateBoundingTextureBox ();
 }
 

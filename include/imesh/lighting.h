@@ -25,7 +25,7 @@ struct iCacheManager;
 struct iDynLight;
 struct iStatLight;
 
-SCF_VERSION (iLightingInfo, 0, 1, 3);
+SCF_VERSION (iLightingInfo, 0, 1, 4);
 
 /**
  * This interface is implemented by mesh objects that have some kind
@@ -68,11 +68,6 @@ struct iLightingInfo : public iBase
    * Get dynamic ambient light.
    */
   virtual const csColor& GetDynamicAmbientLight () = 0;
-
-  /**
-   * Get dynamic ambient light version to test if needs to be recalculated.
-   */
-  virtual uint32 GetDynamicAmbientVersion () const = 0;
 
   /**
    * Indicate that some dynamic light has changed. This function will

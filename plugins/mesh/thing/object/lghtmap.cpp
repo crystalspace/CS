@@ -533,10 +533,9 @@ void csLightMap::Cache (
 bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
                                      float dyn_ambient_g,
                                      float dyn_ambient_b,
-                                     bool  amb_dirty,
                                      bool  dyn_dirty)
 {
-  if (!dyn_dirty && !amb_dirty) return false;
+  if (!dyn_dirty) return false;
 
   mean_recalc = true;
 
@@ -812,7 +811,7 @@ void csLightMap::GetMeanLighting (int &r, int &g, int &b)
 { 
   if (mean_recalc)
   {
-    UpdateRealLightMap (0, 0, 0, false, false);
+    UpdateRealLightMap (0, 0, 0, false);
     CalcMeanLighting ();
     mean_recalc = false;
   }

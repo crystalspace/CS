@@ -241,25 +241,18 @@ private:
   /// The corresponding polygon.
   csPolygon3D* polygon;
 
-  /// The corresponding unlighted material.
-  iMaterialHandle* mat_handle;
-
   /**
    * Bounding box of corresponding polygon in 2D texture space.
    * Note that the u-axis of this bounding box is made a power of 2 for
    * efficiency reasons.
    */
-  int Imin_u, Imin_v, Imax_u, Imax_v;
+  int Imin_u, Imin_v;
 
-  //@@@Fmin... Fmax... is the same for all four csPolyTexture.
-  //SHARE!
   /// fp bounding box (0..1 texture space)
   float Fmin_u, Fmin_v, Fmax_u, Fmax_v;
 
   ///
   uint16 shf_u;
-  ///
-  uint16 and_u;
 
   /*
    * New texture data with lighting added. This is an untiled texture
@@ -292,11 +285,6 @@ private:
   /// Internally used by (software) texture cache
   void **cache_data;
 
-  /**
-   * Compared against csThing ambient version to know whether lightmap needs
-   * updating.
-   */
-  uint32 ambient_version;
   /**
    * Compared against csThing version to know whether lightmap needs updating.
    */
@@ -338,9 +326,6 @@ public:
   /// Get the cslightmap, for engine internal use (users see GetLightMap below)
   csLightMap *GetCSLightMap() { return lm; }
 
-  /// Set the material to be used for this polytexture.
-  void SetMaterialHandle (iMaterialHandle* th) { mat_handle = th; }
-
   /**
    * Calculate the bounding box in (u,v) space for the lighted texture.
    */
@@ -376,7 +361,7 @@ public:
   //--------------------- iPolygonTexture implementation ---------------------
   SCF_DECLARE_IBASE;
   ///
-  virtual iMaterialHandle *GetMaterialHandle () { return mat_handle; }
+  virtual iMaterialHandle *GetMaterialHandle ();
   ///
   virtual float GetFDU () { return fdu; }
   ///

@@ -251,7 +251,7 @@ bool csCurve::RecalculateDynamicLights ()
 {
   // first combine the static and pseudo-dynamic lights
 	// @@@@@@@@@@@@@@@@
-  if (!LightMap || !LightMap->UpdateRealLightMap (0, 0, 0, false,
+  if (!LightMap || !LightMap->UpdateRealLightMap (0, 0, 0,
       ParentThing->GetLightVersion ()>light_version ))
     return false;
 
