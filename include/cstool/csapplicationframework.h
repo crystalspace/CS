@@ -95,10 +95,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 * 
 * int main (int argc, char* argv[]) 
 * {
-*   MyApp* myApp = new MyApp ();
-*   int result = myApp->Main (argc, argv);
-*   myApp->Free();
-*   return result;
+*   MyApp myApp;
+*   return myApp.Main (argc, argv);
 * }
 * \endcode
 * \par
@@ -152,11 +150,6 @@ protected:
   * its own constructor.
   */
   csApplicationFramework ();
-  /**
-   * Destructor
-   * \remarks Protected to force usage of Free().
-   */
-  virtual ~csApplicationFramework ();
 
   /**\internal
   * Initialize the csApplicationFramework class.
@@ -195,15 +188,10 @@ protected:
   static void End ();
 public:
   /**
-   * Free the instance of the application object.
-   * 'delete' shouldn't be used as certain tasks should be done *after* the
-   * destruction of the application class. Namely, DestroyApplication(). The
-   * application object could still keep references to interfaces, all of 
-   * which should be released before calling DestroyApplication(). So this
-   * method destroys the application object and then calls 
-   * DestroyApplication().
+   * Destructor.
+   * \remarks Also calls DestroyApplication().
    */
-  void Free ();
+  virtual ~csApplicationFramework ();
 
   /**
   * Quit running the appliation.

@@ -43,6 +43,8 @@ csApplicationFramework::csApplicationFramework ()
 
 csApplicationFramework::~csApplicationFramework ()
 {
+  DestroyApplication (object_reg);
+  object_reg = 0;
   m_Ptr = 0;
 }
 
@@ -57,15 +59,6 @@ void csApplicationFramework::End ()
 {
   CS_ASSERT (0 != m_Ptr);
   m_Ptr->OnExit ();
-}
-
-void csApplicationFramework::Free ()
-{
-  iObjectRegistry* object_reg = csApplicationFramework::object_reg;
-  delete this;
-  // Calling DestroyApplication is okay - it's static
-  DestroyApplication (object_reg);
-  object_reg = 0;
 }
 
 void csApplicationFramework::OnExit ()

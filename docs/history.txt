@@ -21,6 +21,8 @@ chronological order.
 	  object_reg), made object_reg protected, made dtor protected, added
 	  new Free() method (to delete the instance and call 
 	  DestroyApplication() afterwards).
+	- res removed csApplicationFramework::Free(). DestroyApplication() is
+	  now called in the destructor.
 9-May-2004
 	- Vincent Knecht made the following changes to cs.spec:
 	    - Added current dir to PATH when invoking jam, so building
