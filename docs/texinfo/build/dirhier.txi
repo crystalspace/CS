@@ -259,9 +259,17 @@ Network drivers.  The only existing driver is a @sc{bsd} socket-based
 @item CS/plugins/cscript/cspython
 @sc{Python} scripting module.
 
+@item CS/plugins/sequence
+This is the sequence manager which is useful for managing timed sequences
+of events (useful for demos for example).
+
 @item CS/plugins/bugplug
 @sc{BugPlug} is a small plugin that gives debugging facilities to any
 Crystal Space application. Just load the plugin and it works.
+
+@item CS/plugins/collide/rapid
+This is the @sc{RAPID} collision detection plugin. In the future we may
+have other collision detection plugins in the @file{collide} directory.
 
 @item CS/plugins/engine/3d
 If you want to use the engine as a plugin then this directory contains

@@ -6,6 +6,10 @@
 This section documents the major changes between versions 0.18 and 0.19 of of
 Crystal Space.
 
+@subheading csObject/RTTI/SCF
+
+@@@todo
+
 @subheading Platform Portability Encapsulation
 
 The new macro @samp{CS_IMPLEMENT_APPLICATION} must now be invoked by exactly
@@ -65,7 +69,7 @@ code:
 #include "igraphic/imageio.h"
 @dots{}
 iDataBuffer* buf = @dots{};
-iImageIO* imgldr = QUERY_PlUGIN (System, iImageIO);
+iImageIO* imgldr = QUERY_PLUGIN (System, iImageIO);
 imgldr->Load (buf->GetUint8 (), buf->GetSize (),
 txtmgr->GetTextureFormat ());
 @dots{}
@@ -112,12 +116,16 @@ iLoader* level_loader =
 
 When you don't need it anymore you must call @code{level_loader->DecRef ()}.
 Check the API reference to see what functions you can use on level_loader.
-There are functions to load a map, textures, mesh objects, etc.
+There are functions to load a map, textures, mesh objects, etc. Many of
+these functions have been renamed as well.
 
 @subheading Things are Mesh Objects
 @cindex @code{csThing}
 @cindex mesh objects
+@cindex iThing
+@cindex iThingState
 
+@code{iThing} has been removed. Instead there is @code{iThingState}.
 @@@@@@ TODO
 
 @subheading Map File Changes
@@ -147,11 +155,30 @@ There are functions to load a map, textures, mesh objects, etc.
 @@@@@@ TODO
 
 @subheading Using the Engine as a Plugin
+@cindex engine plugin
 
-@@@@@@ TODO
+It is now recommended to use the engine as a plugin. Linking directly
+to the csengine library is still possible but strongly discouraged.
+We will not be able to guarantee API compatibility on this level.
+
+Using the engine as a plugin means in the first placing loading it
+as a plugin instead of linking to csengine. You can do this with:
+
+@example
+  System->RequestPlugin ("crystalspace.engine.core:Engine");
+  System->Initialize (argc, argv, NULL);
+  @dots{}
+  iEngine* engine = QUERY_PLUGIN (System, iEngine);
+@end example
+
+Then you have to use the engine through @sc{scf} interfaces. So avoid
+including anything outside @file{include/csengine} but instead only
+include interfaces outside @file{include/iengine} and other related
+include directories.
 
 @subheading Sectors Have No Polygons
 @cindex csSector
+@cindex iSector
 
 Sectors can no longer contain polygons. All geometry is now represented
 with mesh objects (see the section above about how to create csThing
@@ -181,13 +208,72 @@ iMeshWrapper* mesh =
   engine->CreateSectorWallsMesh (sector, "walls");
 @end example
 
+@subheading Include Directory Changes
+@cindex scf
+
+All @sc{scf} interfaces (classes starting with @samp{i} like
+@samp{iPolygon3D}) have moved from @file{include} to directories inside
+@file{include}. Some examples:
+
+@itemize
+@item
+@file{ipolygon.h} to @file{imesh/thing/polygon.h}
+@item
+@file{light.h} to @file{iengine/light.h}
+@item
+@file{imeshobj.h} to @file{imesh/object.h} and @file{iengine/mesh.h}
+@end itemize
+
+In general there are now the following new directories:
+
+@itemize
+@item
+@file{include/iengine}: everything related to the engine itself
+(@file{view.h}, @file{camera.h}, @file{light.h}, @file{sector.h},
+@file{engine.h}, @file{texture.h}, ...).
+@item
+@file{include/igame}: for the csgame plugin (@file{csgame.h}).
+@item
+@file{include/igeom}: for the csgeom library (@file{clip2d.h}).
+@item
+@file{include/igraphic}: for the csgfx library and the image loader
+plugins (@file{image.h}, @file{imageio.h}, and @file{loader.h}).
+@item
+@file{include/imap}: for the map loader and mesh object loaders and
+savers (@file{parser.h}, @file{reader.h}, and @file{writer.h}).
+@item
+@file{include/imesh}: for everything related to mesh objects and the
+state interfaces of mesh objects (@file{object.h}, @file{spr3d.h},
+@file{ball.h}, @file{thing/thing.h}, @file{thing/polygon.h}, ...).
+@item
+@file{include/inetwork}: for networking plugins (@file{driver.h} and
+@file{socket.h}).
+@item
+@file{include/isound}: for sound (@file{listener.h}, @file{renderer.h}, ...).
+@item
+@file{include/isys}: everything system related (@file{event.h},
+@file{evdefs.h}, @file{plugin.h}, @file{vfs.h}, and @file{system.h}).
+@item
+@file{include/iutil}: for the csutil library (@file{string.h},
+@file{object.h}, @file{config.h}, ...).
+@item
+@file{include/ivideo}: everything for the 3D and 2D driver subsystems
+(@file{graph2d.h}, @file{graph3d.h}, @file{texture.h}, @file{fontserv.h},
+@file{txtmgr.h}, ...).
+@item
+@file{include/ivaria}: everything that doesn't fit anywhere else
+(@file{collider.h}, @file{conin.h}, @file{conout.h}, @file{iso.h},
+@file{keyval.h}, @file{script.h}, ...).
+@end itemize
+
 @subheading Global @sc{api} Changes
 
 Methods in many classes and @sc{scf} interfaces have been renamed in order to
 improve naming consistency throughout the project.
 
 The following method names changes follow the pattern where
-@code{GetNumSomething()} became @code{GetSomethingCount()}.
+@code{GetNumSomething()} or @code{GetNumberSomething()} became
+@code{GetSomethingCount()}.
 
 @itemize @bullet
 @item
@@ -341,17 +427,29 @@ names were also normalized.
 @end itemize
 
 @subheading @code{csfx} Library Renamed
+@cindex csfx library
+@cindex cstool library
 
 The @samp{csfx} library was renamed to @samp{cstool}.
 
-@subheading @code{csCollider}
+@subheading @code{csobject} library removed
+@cindex csutil library
+@cindex csobject library
 
-@samp{csCollider} moved from the @samp{csengine} library to the @samp{cstool}
-library and wasn renamed to @samp{csColliderWrapper.}
+The @samp{csobject} library has been removed. All files in that
+library have moved to @samp{csutil}.
+
+@subheading @code{csCollider}
+@cindex csCollider
+@cindex csColliderWrapper
+
+@code{csCollider} moved from @samp{csengine} to @samp{cstool} and is renamed
+to @code{csColliderWrapper}.
 
 @subheading Key/Node Mechanism
+@cindex csKeyValuePair
 
-The key/node mechanism moved from the @samp{csengine} to @samp{cstool} library.
+The @code{csKeyValuePair} class moved from @samp{csengine} to @samp{cstool}.
 
 @subheading System Driver Variables
 
@@ -386,3 +484,21 @@ pointer to the shared @sc{vfs} instance.  For example:
 iSystem* sys = @dots{};
 iVFS* vfs = QUERY_INTERFACE(sys, iVFS);
 @end example
+
+@subheading DDG Gone
+@cindex DDG landscape engine
+
+The DDG landscape engine which used to be in CS is gone and has been
+replaced with a simpler landscape engine, but one which is better
+integrated with CS.
+
+@subheading Various Small Changes
+@cindex iPortal
+@cindex csMeshWrapper
+
+Renamed @code{iPortal::GetPortal()} to @code{iPortal::GetSector()} and
+@code{iPortal::SetPortal()} to @code{iPortal::SetSector()}.
+
+Removed @code{csMeshWrapper::GetChildren()}. Instead use @code{AddChild()}
+and @code{RemoveChild()}.
+

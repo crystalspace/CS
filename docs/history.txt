@@ -4,6 +4,8 @@ The history order is reversed so that new features are at the top.
 	- Removed verbose output of lightmap calculation if recalculation
 	  of lighting is not enabled. Now the progress bars are only
 	  displayed when lighting is actually being calculated.
+	- Removed some totally useles init message in the parser with regards
+	  to lightmap cell size.
 18-Jun-2001
 	- Fixed a bug in the region checking code from the loader.
 	- Renamed csCollider to csColliderWrapper and moved it from csengine
@@ -18,6 +20,20 @@ The history order is reversed so that new features are at the top.
 	  polytmap.h, portal.h, ptextype.h, and curve.h).
 	- Moved include/iengine/collider.h and polymesh.h to
 	  include/ivaria.
+	- Wouter Wijngaards fixed a bug in iso engine clipping detection
+	  (ClipBBox).
+	- Wouter also fixed linux.mak. The 'make install' didn't work anymore
+	  because a += was used where an = should be used (for SYSCONFIG).
+	- Wouter fixed the ddraw.mak makefile so it no longer tries to install
+	  the removed directx5 and 6 config files.
+	- Worked on apimod19.txi. Also updated dirhier.txi to add the
+	  sequence plugin.
+	- Philip Wyett fixed the video app after Jorrit's changes.
+	- Michael Voasse shifted the tesselator from MetaBall to csgeom. It
+	  is a general purpose utility that better serves CS in the geometry
+	  library. Performance has been checked and a slight speedup has
+	  been noticed in metagen, however, no significant improvement has
+	  been observed in metaball.
 	- Eric Sunshine repaired a problem with plugins/chapter.txi where it
 	  was referencing plugins/anim/anim.txi even though that file does not
 	  (yet) exist.
@@ -71,6 +87,20 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine eliminated a compilation warning about instance
 	  members of csDataStream being initialized in an order different from
 	  the declaration order.
+	- Christopher Nelson made some changes to AWS:
+	    - Made some minor changes, fixed some silly errors.
+	    - Created the csComponentFactory class.
+	    - Made some mods to the interface and manager to support
+	      component registration.  
+	- Norman Kramer removed csBase in favor of iBase (or in many
+	  cases it is just removed). Did various changes throughout the
+	  project for this.
+	- Norman als changed csObjVector so that it DecRef()'s the items
+	  in FreeItem().
+	- Norman made csLightArray descendant of iBase.
+	- Norman changed scfSharedLibrary so it no longer derives from iBase.
+	- Norman changed csRect so it no longer derives from iBase.
+	- Norman moved pulse and meter from csengine to csutil.
 17-Jun-2001
 	- Fixed a bug in 'facedown'/'faceup' commands (walktest). Reported
 	  by Thiago Ramon.
