@@ -58,8 +58,9 @@ awsScrollBar::Setup(iAws *_wmgr, awsComponentNode *settings)
   pm->LookupIntKey("OverlayTextureAlpha", alpha_level); // global get
   pm->GetInt(settings, "Style", frame_style);
   pm->GetInt(settings, "Alpha", alpha_level);          // local overrides, if present.
+  
   tex=pm->GetTexture("Texture");
-
+  
   // Setup embedded buttons
   incVal = new awsCmdButton;
   decVal = new awsCmdButton;
@@ -189,7 +190,7 @@ awsScrollBar::OnDraw(csRect clip)
 {
   aws3DFrame frame3d;
 
-  frame3d.Draw(WindowManager(), Window(), Frame(), frame_style, tex, alpha_level);
+  frame3d.Draw(WindowManager(), Window(), Frame(), 3, tex, alpha_level);
 }
 
 bool 

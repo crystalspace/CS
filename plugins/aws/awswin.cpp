@@ -606,6 +606,12 @@ awsWindow::HandleEvent(iEvent& Event)
 
 }
 
+void 
+awsWindow::OnAdded()
+{
+  return;
+}
+
 bool 
 awsWindow::OnFrame()
 {

@@ -43,7 +43,7 @@ awsGroupFrame::Setup(iAws *_wmgr, awsComponentNode *settings)
  pm->GetString(settings, "Caption", caption);
 
  bkg=pm->GetTexture("Texture");
-  
+ 
  return true;
 }
 

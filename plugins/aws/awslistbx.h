@@ -331,6 +331,8 @@ public:
     /// Triggered when the keyboard focus is gained
     virtual bool OnGainFocus();
 
+    /// Updates the scrollbar so that it's in the right place and has the right stuff.
+    virtual void OnAdded();
 };
 
 class awsListBoxFactory : public awsComponentFactory

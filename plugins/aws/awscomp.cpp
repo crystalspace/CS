@@ -290,6 +290,9 @@ awsComponent::AddChild(iAwsComponent *child, bool owner)
    
    // Modify the child's rectangle to be inside and relative to the parent's rectangle.
    child->Frame().Move(Frame().xmin, Frame().ymin);
+
+   // Fire off the event so that the child can do something if it needs to.
+   child->OnAdded();
 }
 
 void 
@@ -440,6 +443,11 @@ bool awsComponent::OnGainFocus()
 bool awsComponent::OnFrame()
 { 
   return false;
+}
+
+void awsComponent::OnAdded()
+{
+  return;
 }
 
 /////////////////////////////////////  awsComponentFactory ////////////////////////////////////////////////////////

@@ -345,6 +345,9 @@ public:
 
     /// Triggered at the beginning of each frame
     virtual bool OnFrame();
+
+    /// Triggered when a child is added to the parent (triggered on the child)
+    virtual void OnAdded();
 };
 
 #endif

@@ -194,11 +194,12 @@ awsListBox::Setup(iAws *_wmgr, awsComponentNode *settings)
   sbinfo.Initialize(new scfString("vertscroll"), new scfString("Scroll Bar"));
 
   sbinfo.AddRectKey(new scfString("Frame"), 
-                        csRect(Frame().xmax-sb_w, Frame().ymin,
-                                Frame().xmax, Frame().ymax));
+                    csRect(Frame().Width()-sb_w, 0,Frame().Width(), Frame().Height()));
 
   sbinfo.AddIntKey(new scfString("Style"), awsScrollBar::fsVertical);
 
+  scrollbar->SetWindow(Window());
+  scrollbar->SetParent(this);
   scrollbar->Setup(_wmgr, sbinfo.GetThisNode());
   
   // Setup trigger
@@ -209,7 +210,7 @@ awsListBox::Setup(iAws *_wmgr, awsComponentNode *settings)
   slot = new awsSlot();
 
   slot->Connect(scrollbar, awsScrollBar::signalChanged, sink, sink->GetTriggerID("ScrollChanged"));
-  
+
   return true;
 }
 
@@ -230,7 +231,7 @@ awsListBox::SetProperty(char *name, void *parm)
 }
 
 void 
-awsListBox::ScrollChanged(void *sk, iAwsSource *source)
+awsListBox::ScrollChanged(void *sk, iAwsSource *source)     
 {
   awsListBox *lb = (awsListBox *)lb;
   
@@ -451,7 +452,7 @@ awsListBox::Execute(char *action, iAwsParmList &parmlist)
 {
   if (awsComponent::Execute(action, parmlist)) return true;
 
-  actions.Execute(action, this,parmlist);
+  actions.Execute(action, this, parmlist);
 
   return false;
 }
@@ -573,6 +574,10 @@ awsListBox::OnDraw(csRect clip)
   int lo2   = WindowManager()->GetPrefMgr()->GetColor(AC_SHADOW2);    
   int i,j;
   int border=3;
+  int sb_w, sb_h;
+
+  WindowManager()->GetPrefMgr()->LookupIntKey("ScrollBarHeight", sb_h);
+  WindowManager()->GetPrefMgr()->LookupIntKey("ScrollBarWidth", sb_w);
 
   ClearHotspots();
 
@@ -589,6 +594,7 @@ awsListBox::OnDraw(csRect clip)
     border=1;
     break;
   }
+  
 
   int starty=Frame().ymin+border;
   int startx=Frame().xmin+border;
@@ -604,7 +610,7 @@ awsListBox::OnDraw(csRect clip)
       int hcw;
 
       if (i==ncolumns-1)
-        hcw = Frame().xmax-x-border;
+        hcw = Frame().xmax-x-border-sb_w;
       else
         hcw = columns[i].width;
 
@@ -1061,6 +1067,13 @@ awsListBox::OnGainFocus()
 {
   return false;
 }
+
+void 
+awsListBox::OnAdded()
+{
+    AddChild(scrollbar);
+}
+
 
 /************************************* Command Button Factory ****************/
 SCF_IMPLEMENT_IBASE(awsListBoxFactory)
