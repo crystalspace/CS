@@ -313,7 +313,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL DLLWRAP ac_ct_DLLWRAP WINDRES ac_ct_WINDRES OBJCOPY ac_ct_OBJCOPY FLEX BISON DOXYGEN TEXI2DVI DVIPS DVIPDF MAKEINFO INSTALL SWIG LIBTOOL_TEST ac_ct_LIBTOOL_TEST LIBTOOL_PATH LIBTOOL ac_ct_LIBTOOL CS_LT_APPLE APPLE_LIBTOOL MKDIR MKDIRS JAM MAKE CSLIBS_CONFIG ac_ct_CSLIBS_CONFIG NASM ac_ct_NASM PERL PYTHON JAVA JAVAC ANT CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP FT2CONFIG ac_ct_FT2CONFIG SDLCONFIG ac_ct_SDLCONFIG PKGCONFIG ac_ct_PKGCONFIG CGC CXXCPP LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL DLLWRAP ac_ct_DLLWRAP WINDRES ac_ct_WINDRES OBJCOPY ac_ct_OBJCOPY FLEX BISON DOXYGEN TEXI2DVI DVIPS DVIPDF MAKEINFO INSTALL SWIG LIBTOOL_TEST ac_ct_LIBTOOL_TEST LIBTOOL_PATH LIBTOOL ac_ct_LIBTOOL CS_LT_APPLE APPLE_LIBTOOL MKDIR MKDIRS JAM MAKE CSLIBS_CONFIG ac_ct_CSLIBS_CONFIG NASM ac_ct_NASM PERL PYTHON JAVA JAVAC ANT CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP FT2CONFIG ac_ct_FT2CONFIG SDLCONFIG ac_ct_SDLCONFIG PKGCONFIG ac_ct_PKGCONFIG WXCONFIG ac_ct_WXCONFIG CGC CXXCPP LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -14128,6 +14128,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 echo "$as_me:$LINENO: checking for X" >&5
 echo $ECHO_N "checking for X... $ECHO_C" >&6
 
+ac_path_x_has_been_run=yes
 
 # Check whether --with-x or --without-x was given.
 if test "${with_x+set}" = set; then
@@ -14220,7 +14221,7 @@ ac_x_header_dirs='
 /usr/openwin/share/include'
 
 if test "$ac_x_includes" = no; then
-  # Guess where to find include files, by looking for Intrinsic.h.
+  # Guess where to find include files, by looking for a specified header file.
   # First, try using that file with no special directory specified.
   cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
@@ -14354,10 +14355,255 @@ else
   # Update the cache value to reflect the command line values.
   ac_cv_have_x="have_x=yes \
 		ac_x_includes=$x_includes ac_x_libraries=$x_libraries"
-  echo "$as_me:$LINENO: result: libraries $x_libraries, headers $x_includes" >&5
-echo "${ECHO_T}libraries $x_libraries, headers $x_includes" >&6
+  # It might be that x_includes is empty (headers are found in the
+  # standard search path. Then output the corresponding message
+  ac_out_x_includes=$x_includes
+  test "x$x_includes" = x && ac_out_x_includes="in standard search path"
+  echo "$as_me:$LINENO: result: libraries $x_libraries, headers $ac_out_x_includes" >&5
+echo "${ECHO_T}libraries $x_libraries, headers $ac_out_x_includes" >&6
 fi
 
+
+if test "x$ac_path_x_has_been_run" != xyes; then
+  echo "$as_me:$LINENO: checking for X" >&5
+echo $ECHO_N "checking for X... $ECHO_C" >&6
+
+ac_path_x_has_been_run=yes
+
+# Check whether --with-x or --without-x was given.
+if test "${with_x+set}" = set; then
+  withval="$with_x"
+
+fi;
+# $have_x is `yes', `no', `disabled', or empty when we do not yet know.
+if test "x$with_x" = xno; then
+  # The user explicitly disabled X.
+  have_x=disabled
+else
+  if test "x$x_includes" != xNONE && test "x$x_libraries" != xNONE; then
+    # Both variables are already set.
+    have_x=yes
+  else
+    if test "${ac_cv_have_x+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  # One or both of the vars are not set, and there is no cached value.
+ac_x_includes=no ac_x_libraries=no
+rm -fr conftest.dir
+if mkdir conftest.dir; then
+  cd conftest.dir
+  # Make sure to not put "make" in the Imakefile rules, since we grep it out.
+  cat >Imakefile <<'_ACEOF'
+acfindx:
+	@echo 'ac_im_incroot="${INCROOT}"; ac_im_usrlibdir="${USRLIBDIR}"; ac_im_libdir="${LIBDIR}"'
+_ACEOF
+  if (xmkmf) >/dev/null 2>/dev/null && test -f Makefile; then
+    # GNU make sometimes prints "make[1]: Entering...", which would confuse us.
+    eval `${MAKE-make} acfindx 2>/dev/null | grep -v make`
+    # Open Windows xmkmf reportedly sets LIBDIR instead of USRLIBDIR.
+    for ac_extension in a so sl; do
+      if test ! -f $ac_im_usrlibdir/libX11.$ac_extension &&
+	 test -f $ac_im_libdir/libX11.$ac_extension; then
+	ac_im_usrlibdir=$ac_im_libdir; break
+      fi
+    done
+    # Screen out bogus values from the imake configuration.  They are
+    # bogus both because they are the default anyway, and because
+    # using them would break gcc on systems where it needs fixed includes.
+    case $ac_im_incroot in
+	/usr/include) ;;
+	*) test -f "$ac_im_incroot/X11/Xos.h" && ac_x_includes=$ac_im_incroot;;
+    esac
+    case $ac_im_usrlibdir in
+	/usr/lib | /lib) ;;
+	*) test -d "$ac_im_usrlibdir" && ac_x_libraries=$ac_im_usrlibdir ;;
+    esac
+  fi
+  cd ..
+  rm -fr conftest.dir
+fi
+
+# Standard set of common directories for X headers.
+# Check X11 before X11Rn because it is often a symlink to the current release.
+ac_x_header_dirs='
+/usr/X11/include
+/usr/X11R6/include
+/usr/X11R5/include
+/usr/X11R4/include
+
+/usr/include/X11
+/usr/include/X11R6
+/usr/include/X11R5
+/usr/include/X11R4
+
+/usr/local/X11/include
+/usr/local/X11R6/include
+/usr/local/X11R5/include
+/usr/local/X11R4/include
+
+/usr/local/include/X11
+/usr/local/include/X11R6
+/usr/local/include/X11R5
+/usr/local/include/X11R4
+
+/usr/X386/include
+/usr/x386/include
+/usr/XFree86/include/X11
+
+/usr/include
+/usr/local/include
+/usr/unsupported/include
+/usr/athena/include
+/usr/local/x11r5/include
+/usr/lpp/Xamples/include
+
+/usr/openwin/include
+/usr/openwin/share/include'
+
+if test "$ac_x_includes" = no; then
+  # Guess where to find include files, by looking for a specified header file.
+  # First, try using that file with no special directory specified.
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <X11/Intrinsic.h>
+_ACEOF
+if { (eval echo "$as_me:$LINENO: \"$ac_cpp conftest.$ac_ext\"") >&5
+  (eval $ac_cpp conftest.$ac_ext) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null; then
+  if test -s conftest.err; then
+    ac_cpp_err=$ac_c_preproc_warn_flag
+    ac_cpp_err=$ac_cpp_err$ac_c_werror_flag
+  else
+    ac_cpp_err=
+  fi
+else
+  ac_cpp_err=yes
+fi
+if test -z "$ac_cpp_err"; then
+  # We can compile using X headers with no special include directory.
+ac_x_includes=
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  for ac_dir in $ac_x_header_dirs; do
+  if test -r "$ac_dir/X11/Intrinsic.h"; then
+    ac_x_includes=$ac_dir
+    break
+  fi
+done
+fi
+rm -f conftest.err conftest.$ac_ext
+fi # $ac_x_includes = no
+
+if test "$ac_x_libraries" = no; then
+  # Check for the libraries.
+  # See if we find them without any special options.
+  # Don't add to $LIBS permanently.
+  ac_save_LIBS=$LIBS
+  LIBS="-lXt $LIBS"
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <X11/Intrinsic.h>
+int
+main ()
+{
+XtMalloc (0)
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  LIBS=$ac_save_LIBS
+# We can link X programs with no special library path.
+ac_x_libraries=
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+LIBS=$ac_save_LIBS
+for ac_dir in `echo "$ac_x_includes $ac_x_header_dirs" | sed s/include/lib/g`
+do
+  # Don't even attempt the hair of trying to link an X program!
+  for ac_extension in a so sl; do
+    if test -r $ac_dir/libXt.$ac_extension; then
+      ac_x_libraries=$ac_dir
+      break 2
+    fi
+  done
+done
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+fi # $ac_x_libraries = no
+
+if test "$ac_x_includes" = no || test "$ac_x_libraries" = no; then
+  # Didn't find X anywhere.  Cache the known absence of X.
+  ac_cv_have_x="have_x=no"
+else
+  # Record where we found X for the cache.
+  ac_cv_have_x="have_x=yes \
+		ac_x_includes=$ac_x_includes ac_x_libraries=$ac_x_libraries"
+fi
+fi
+
+  fi
+  eval "$ac_cv_have_x"
+fi # $with_x != no
+
+if test "$have_x" != yes; then
+  echo "$as_me:$LINENO: result: $have_x" >&5
+echo "${ECHO_T}$have_x" >&6
+  no_x=yes
+else
+  # If each of the values was on the command line, it overrides each guess.
+  test "x$x_includes" = xNONE && x_includes=$ac_x_includes
+  test "x$x_libraries" = xNONE && x_libraries=$ac_x_libraries
+  # Update the cache value to reflect the command line values.
+  ac_cv_have_x="have_x=yes \
+		ac_x_includes=$x_includes ac_x_libraries=$x_libraries"
+  # It might be that x_includes is empty (headers are found in the
+  # standard search path. Then output the corresponding message
+  ac_out_x_includes=$x_includes
+  test "x$x_includes" = x && ac_out_x_includes="in standard search path"
+  echo "$as_me:$LINENO: result: libraries $x_libraries, headers $ac_out_x_includes" >&5
+echo "${ECHO_T}libraries $x_libraries, headers $ac_out_x_includes" >&6
+fi
+
+fi
 if test "$no_x" = yes; then
   # Not all programs may use this symbol, but it does not hurt to define it.
 
@@ -27356,6 +27602,151 @@ fi
 fi
 
 
+#------------------------------------------------------------------------------
+# Check whether to build the WxWidgets Canvas
+#------------------------------------------------------------------------------
+if test -n "$ac_tool_prefix"; then
+  for ac_prog in wx-config
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_WXCONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$WXCONFIG"; then
+  ac_cv_prog_WXCONFIG="$WXCONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_WXCONFIG="$ac_tool_prefix$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+WXCONFIG=$ac_cv_prog_WXCONFIG
+if test -n "$WXCONFIG"; then
+  echo "$as_me:$LINENO: result: $WXCONFIG" >&5
+echo "${ECHO_T}$WXCONFIG" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+    test -n "$WXCONFIG" && break
+  done
+fi
+if test -z "$WXCONFIG"; then
+  ac_ct_WXCONFIG=$WXCONFIG
+  for ac_prog in wx-config
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_ac_ct_WXCONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_WXCONFIG"; then
+  ac_cv_prog_ac_ct_WXCONFIG="$ac_ct_WXCONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_WXCONFIG="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+ac_ct_WXCONFIG=$ac_cv_prog_ac_ct_WXCONFIG
+if test -n "$ac_ct_WXCONFIG"; then
+  echo "$as_me:$LINENO: result: $ac_ct_WXCONFIG" >&5
+echo "${ECHO_T}$ac_ct_WXCONFIG" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$ac_ct_WXCONFIG" && break
+done
+
+  WXCONFIG=$ac_ct_WXCONFIG
+fi
+
+echo "$as_me:$LINENO: checking for WxWidgets" >&5
+echo $ECHO_N "checking for WxWidgets... $ECHO_C" >&6
+if test "${cs_cv_wxwidgets+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$WXCONFIG"; then
+  cs_cv_wxwidgets=yes
+    	cs_cv_wxwidgets_cflags="`{ (echo "$as_me:$LINENO: \$WXCONFIG --cxxflags") >&5
+  ($WXCONFIG --cxxflags) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }`"
+    	cs_cv_wxwidgets_lflags="`{ (echo "$as_me:$LINENO: \$WXCONFIG --ldflags") >&5
+  ($WXCONFIG --ldflags) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }`"
+    	cs_cv_wxwidgets_libs="`{ (echo "$as_me:$LINENO: \$WXCONFIG --libs --gl-libs") >&5
+  ($WXCONFIG --libs --gl-libs) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }`"
+else
+  cs_cv_wxwidgets=no
+fi
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_wxwidgets" >&5
+echo "${ECHO_T}$cs_cv_wxwidgets" >&6
+if test $cs_cv_wxwidgets = yes; then
+  if test "$cs_cv_wxwidgets" = yes; then
+  cs_build_prop_val="yes"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}WX.AVAILABLE ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+	cs_build_prop_val="$cs_cv_wxwidgets_cflags"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}WX.CFLAGS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+	cs_build_prop_val="$cs_cv_wxwidgets_lflags $cs_cv_wxwidgets_libs"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}WX.LFLAGS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+fi
+
+fi
+
 
 
 #------------------------------------------------------------------------------
@@ -37448,6 +37839,8 @@ s,@SDLCONFIG@,$SDLCONFIG,;t t
 s,@ac_ct_SDLCONFIG@,$ac_ct_SDLCONFIG,;t t
 s,@PKGCONFIG@,$PKGCONFIG,;t t
 s,@ac_ct_PKGCONFIG@,$ac_ct_PKGCONFIG,;t t
+s,@WXCONFIG@,$WXCONFIG,;t t
+s,@ac_ct_WXCONFIG@,$ac_ct_WXCONFIG,;t t
 s,@CGC@,$CGC,;t t
 s,@CXXCPP@,$CXXCPP,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
