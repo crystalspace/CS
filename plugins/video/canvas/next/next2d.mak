@@ -35,9 +35,16 @@ NEXT.SOURCE_2D_PATHS = \
   $(addprefix plugins/video/canvas/next/,$(NEXT.SEARCH_PATH))
 NEXT.HEADER_2D_PATHS = $(addprefix $(CFLAGS.I),$(NEXT.SOURCE_2D_PATHS))
 
-# Only add header search paths if actually building this plug-in.
+# Only add header search paths if actually building this plug-in or if
+# USE_PLUGINS=no, in which case this module might be built as the dependency
+# of some other module (rather than being built explicitly by the `next2d'
+# target).
+ifeq ($(USE_PLUGINS),no)
+  CFLAGS.INCLUDE += $(NEXT.HEADER_2D_PATHS)
+else
 ifeq ($(DO_NEXT2D),yes)
   CFLAGS.INCLUDE += $(NEXT.HEADER_2D_PATHS)
+endif
 endif
 
 endif # ifeq ($(MAKESECTION),defines)

@@ -50,6 +50,11 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine eliminated compilation warning about csAnimatedPixmap
 	  having virtual functions but non-virtual destructor following removal
 	  of csBase.
+	- Eric Sunshine fixed next2d.mak so that it correctly augments
+	  CSFLAGS.INCLUDE when building with USE_PLUGINS=no.  This ensures that
+	  the proper CFLAGS will be used even when the next2d driver is built
+	  as a result of being a dependency of some other module (even when
+	  not explicitly built via the next2d makefile target).
 17-Jun-2001
 	- Fixed a bug in 'facedown'/'faceup' commands (walktest). Reported
 	  by Thiago Ramon.
