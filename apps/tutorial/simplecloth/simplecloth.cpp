@@ -39,7 +39,7 @@
 #include "iengine/material.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
-#include "imesh/genmesh.h"
+#include "imesh/clothmesh.h"
 #include "imesh/object.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
@@ -326,7 +326,9 @@ bool Simple::Initialize ()
   }
 
   // Load a sprite template from disk.
+  printf("bla1 \n");
   csRef<iMeshFactoryWrapper> imeshfact ( engine->CreateMeshFactory("crystalspace.mesh.object.cloth","StuffFactory") );
+
   
   if (imeshfact == NULL)
   {
@@ -335,8 +337,8 @@ bool Simple::Initialize ()
     	"Error loading mesh object factory!");
     return false;
   }
-
-  csRef<iMaterialWrapper> mat ( engine->GetMaterialList()->FindByName("spark") );
+  
+  csRef<iMaterialWrapper> mat ( engine->GetMaterialList()->FindByName("stone") );
 
   if (mat == NULL)
   {
@@ -345,24 +347,33 @@ bool Simple::Initialize ()
     	"Error loading material!!!");
     return false;
   }
-
+  printf("bla2 \n");
+  csRef<iClothFactoryState> spstate (SCF_QUERY_INTERFACE (imeshfact->GetMeshObjectFactory(), iClothFactoryState));
+  
+  spstate->SetMaterialWrapper( mat );
+  printf("bla3 \n");
+  spstate->GenerateFabric(40,40);
+  printf("blu \n");
 
   // Create the sprite and add it to the engine.
   csRef<iMeshWrapper> sprite (engine->CreateMeshWrapper (
   	imeshfact, "MySprite", room,
-	csVector3 (-1, 4, 0)));
+	csVector3 (-2, 4, 0)));
   csMatrix3 m; m.Identity (); // m *= 5.;
   sprite->GetMovable ()->SetTransform (m);
   sprite->GetMovable ()->UpdateMove ();
-  csRef<iGeneralMeshState> spstate (SCF_QUERY_INTERFACE (sprite->GetMeshObject (), iGeneralMeshState));
-  spstate->SetMaterialWrapper( mat );
+  
+  //spstate->SetMixMode( CS_FX_SETALPHA(0.9));
+  
   //spstate->SetAction ("default");
 
   // The following two calls are not needed since CS_ZBUF_USE and
   // Object render priority are the default but they show how you
   // can do this.
-  //sprite->SetZBufMode (CS_ZBUF_USE);
-  //sprite->SetRenderPriority (engine->GetObjectRenderPriority ());
+  //sprite->SetZBufMode (CS_ZBUF_NONE);
+  //sprite->SetRenderPriority (engine->GetRenderPriority ("alpha"));
+  
+  
 
   //sprite->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   return true;
