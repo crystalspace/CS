@@ -98,7 +98,7 @@ rule CompileObject
   }
   else
   {
-    echo Warning: no rules for filetype $(>:S) defined (at file $(>)). ;
+    echo Warning: no rules for filetype $(>:S) defined (at file $(>) ). ;
   }
 
   if $(targets)

@@ -22,6 +22,11 @@ chronological order.
 	    - As a consequence of the above changes the dangerous
 	      csWeakRef::Link() and Unlink() functions could be made
 	      private so they cannot be misused.
+	- res made the following changes:
+	    - Fixed "Independent target ../../../mk/visualcX/foobar.rc" Jam
+	      warnings, for real now.
+	    - Fixed "..\..\out\mk\fragment7\..\..\..\mk\visualc7\foobar.rc"
+	      style paths VC projects.
 20-Jan-2004
 	- Jorrit added a new MemoryAllocator template parameter to csArray.
 	  With this parameter it is possible to use another memory allocator

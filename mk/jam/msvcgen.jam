@@ -93,7 +93,7 @@ rule MsvcProject
       msvcname = plg$(<) ;
     case library :
       msvcname = lib$(<) ;
-    case group :
+      case group :
       msvcname = grp$(<) ;
     case * :
       exit "Unknown msvc projecttype: $(3) specified!" ;
@@ -139,7 +139,7 @@ rule MsvcProject
   {
     resource = $(msvcname:S=.rc) ;
     # @@@ Uber-ugly
-    rcpath = ../../../mk/visualc7/$(msvcname:S=.rc) ;
+    rcpath = mk/visualc7/$(msvcname:S=.rc) ;
     #files += $(resource) ;
     Depends $(target) : $(resource) ;
     LOCATE on $(resource) = $(MSVCGEN_LOCATE_TARGET) ;
@@ -163,8 +163,6 @@ rule MsvcProject
     if ! $(v4) { v4 = 0 ; }
     PACKAGE.VERSION.LIST on $(versionrc) = $(v1) $(v2) $(v3) $(v4) ;
 	
-    # @@@ The "Help" rule is usually invoked after 'Plugin'/'Application',
-    # so "$(<)_help" is empty...
     DESCRIPTION on $(versionrc) = $($(<)_help) ;
 	
     LOCATE on $(versionrc) = $(MSVCGEN_LOCATE_FRAGMENT) ;
@@ -204,6 +202,7 @@ rule MsvcProject
   Depends msvcgen : $(target) ;
   Depends $(target) : $(files) $(MSVCGEN_LOCATE_FRAGMENT:G=dir) ;
   MsvcProjectGen $(target) : $(files) $(rcpath) ;
+  NotFile $(rcpath) ;
   Always $(target) ;
 
   MSVCWorkspace csall : $(fragments) : $(fragroot) ;

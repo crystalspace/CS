@@ -51,7 +51,7 @@ FILEFLAGS 0x0
       VALUE "ProductVersion", "$(PACKAGE.VERSION)"
       VALUE "FileVersion", "$(PACKAGE.VERSION)"
       VALUE "LegalCopyright", "$(PACKAGE.COPYRIGHT)"
-      /* VALUE "FileDescription", "$(DESCRIPTION)" */
+      VALUE "FileDescription", "$(DESCRIPTION)"
 #ifdef CS_DEBUG
       VALUE "Comments", "Debug build"
 #else
