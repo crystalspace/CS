@@ -145,6 +145,7 @@ public:
     defaulttexcoords = "texture coordinates";
     defaultnormals = "normals";
     defaultindices = "indices";
+    mixmode = CS_FX_COPY;
   }
 
   /// Special attributes. Please don't change, it's used as flags
