@@ -20,6 +20,7 @@
 #define __IVIDEO_FONTSERV_H__
 
 #include "csutil/scf.h"
+#include "csutil/ref.h"
 
 /**\file
  */
@@ -166,7 +167,7 @@ struct iFont : public iBase
   virtual bool RemoveDeleteCallback (iFontDeleteNotify* func) = 0;
 };
 
-SCF_VERSION (iFontServer, 2, 0, 0);
+SCF_VERSION (iFontServer, 2, 0, 1);
 
 /**
  * A font server interface.
@@ -182,7 +183,7 @@ struct iFontServer : public iBase
    * Load a font by name.
    * Returns a new iFont object or NULL on failure.
    */
-  virtual iFont *LoadFont (const char *filename) = 0;
+  virtual csPtr<iFont> LoadFont (const char *filename) = 0;
 
   /**
    * Get number of loaded fonts.

@@ -91,7 +91,7 @@ bool csFontServerMultiplexor::Initialize (iObjectRegistry *object_reg)
   return true;
 }
 
-iFont *csFontServerMultiplexor::LoadFont (const char *filename)
+csPtr<iFont> csFontServerMultiplexor::LoadFont (const char *filename)
 {
   int i;
   for (i = 0; i < fontservers.Length (); i++)

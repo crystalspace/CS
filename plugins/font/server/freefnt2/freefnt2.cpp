@@ -121,7 +121,7 @@ bool csFreeType2Server::Initialize (iObjectRegistry *object_reg)
   return true;
 }
 
-iFont *csFreeType2Server::LoadFont (const char *filename)
+csPtr<iFont> csFreeType2Server::LoadFont (const char *filename)
 {
   // First of all look for an alias in config file
   if (ftconfig && fontset)

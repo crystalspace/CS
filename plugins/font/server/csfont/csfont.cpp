@@ -84,7 +84,7 @@ csDefaultFontServer::~csDefaultFontServer()
 {
 }
 
-iFont *csDefaultFontServer::LoadFont (const char *filename)
+csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename)
 {
   int i;
 

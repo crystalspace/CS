@@ -153,7 +153,7 @@ public:
    * Load a font by name.
    * Returns a new iFont object or NULL on failure.
    */
-  virtual iFont *LoadFont (const char *filename);
+  virtual csPtr<iFont> LoadFont (const char *filename);
 
   /**
    * Get number of loaded fonts.
