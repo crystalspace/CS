@@ -108,7 +108,7 @@ csTextureDirect3D::csTextureDirect3D (csTextureMM*             Parent,
     }
     case 32:
     {
-      image = new UByte [2*NumPixels * sizeof (ULong)];
+      image = new UByte [NumPixels * sizeof (ULong)];
       ULong *dst = (ULong *)image;
       ULong NearBlack = 1 << bsl;
 
