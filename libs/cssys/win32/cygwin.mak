@@ -145,13 +145,13 @@ SRC.SYS_CSSYS = $(wildcard libs/cssys/win32/*.cpp) \
   $(CSTHREAD.SRC)
 
 # The C compiler
-CC=gcc -c
+#CC=gcc -c
 
 # The C++ compiler
-CXX=g++ -c
+#CXX=g++ -c
 
 # The linker.
-LINK=gcc
+#LINK=gcc
 
 # Command sequence for creating a directory.
 # Note that directories will have forward slashes. Please
