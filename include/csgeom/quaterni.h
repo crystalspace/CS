@@ -20,6 +20,7 @@
 #define __CS_QUATERNION_H__
 
 #include "csgeom/math3d.h"
+#include "csgeom/matrix3.h"
 #include "qsqrt.h"
 
 /**
@@ -42,6 +43,9 @@ public:
   /// Construct quaternion from a vector.
   csQuaternion (const csVector3& q) { Init (0, q.x, q.y, q.z); }
 
+  /// Construct quaternion from a matrix
+      csQuaternion (const csMatrix3& smat);
+
   ///
   inline friend csQuaternion operator+ (const csQuaternion& q1, const csQuaternion& q2)
   { return csQuaternion (q1.r + q2.r, q1.x + q2.x, q1.y + q2.y, q1.z + q2.z ); }
@@ -51,25 +55,40 @@ public:
   ///
   inline friend csQuaternion operator* (const csQuaternion& q1, const csQuaternion& q2)
   { return csQuaternion (q1.r*q2.r -  q1.x*q2.x - q1.y*q2.y - q1.z*q2.z,
-			 q1.y*q2.z -  q1.z*q2.y + q1.r*q2.x + q1.x*q2.r,
-			 q1.z*q2.x -  q1.x*q2.z + q1.r*q2.y + q1.y*q2.r,
-			 q1.x*q2.y -  q1.y*q2.x + q1.r*q2.z + q1.z*q2.r); }
+             q1.y*q2.z -  q1.z*q2.y + q1.r*q2.x + q1.x*q2.r,
+             q1.z*q2.x -  q1.x*q2.z + q1.r*q2.y + q1.y*q2.r,
+             q1.x*q2.y -  q1.y*q2.x + q1.r*q2.z + q1.z*q2.r); }
 
   ///
   csQuaternion& operator*= (const csQuaternion& q2)
   {
     Init (r*q2.r -  x*q2.x - y*q2.y - z*q2.z,
-	  y*q2.z -  z*q2.y + r*q2.x + x*q2.r,
-	  z*q2.x -  x*q2.z + r*q2.y + y*q2.r,
-	  x*q2.y -  y*q2.x + r*q2.z + z*q2.r);
+      y*q2.z -  z*q2.y + r*q2.x + x*q2.r,
+      z*q2.x -  x*q2.z + r*q2.y + y*q2.r,
+      x*q2.y -  y*q2.x + r*q2.z + z*q2.r);
     return *this;
   }
 
   ///
   void Conjugate () { Init (r, -x, -y, -z); }
 
-	/// Negate all parameters of the quaternion
-	void Negate () { Init(-r, -x, -y, -z); }
+    /// Negate all parameters of the quaternion
+    void Negate () { Init(-r, -x, -y, -z); }
+
+    /** Invert the orientation of this quaternion */
+    void Invert();
+
+    /** Get an axis-angle representation of this orientation.
+        @param axis this vector specifies the axis on which to make a rotation
+        @param phi the angle (in radians) about this axis
+     */
+    void GetAxisAngle(csVector3& axis, float& phi) const;
+
+    /** Set the quaternion using an axis-angle representation.
+        @param axis this vector specifies the axis on which to make a rotation
+        @param phi the angle (in radians) about this axis
+     */
+    void SetWithAxisAngle(csVector3 axis, float phi);
 
   /**
    * Prepare a rotation quaternion, we do a rotation around vec by
@@ -96,19 +115,33 @@ public:
   /// Normalize this quaternion.
   void Normalize ()
   {
-    if(x*x + y*y + z*z > .999)
+    float     dist, square;
+
+    square = x * x + y * y + z * z + r * r;
+
+    if (square > 0.0)
+        dist = (float)(1.0 / sqrt(square));
+    else dist = 1;
+
+    x *= dist;
+    y *= dist;
+    z *= dist;
+    r *= dist;
+
+    /*if(x*x + y*y + z*z > .999)
     {
       // Severe problems...
       float inverselen = 1.0f / (x*x + y*y + z*z);
       x *= inverselen;
       y *= inverselen;
       z *= inverselen;
-      r = 0.0f;
+      if(r > 0) r = -1 + r;
+      else r = 1 + r;
     }
     else
     {
       r = qsqrt(1.0f - x*x - y*y - z*z);
-    }
+      }*/
   }
 
   /**
