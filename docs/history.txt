@@ -63,7 +63,7 @@ chronological order.
 	    - Made sure DrawPolysMesh() visits the materials before usage.
 	    - Added a fallback-technique to the reflection shader.
 	- Eric Sunshine improved error reporting in SCF for when an SCF class
-	  is detected in more than on plugin module. It now reports the
+	  is detected in more than one plugin module. It now reports the
 	  physical DLL in which each declaration is made. This should make it
 	  much easier to debug problems, rather than trying to guess about the
 	  locations of the plugins.
