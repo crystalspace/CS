@@ -289,7 +289,7 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
 
   sxL = sxR = dxL = dxR = 0;
   scanL2 = scanR2 = min_i;
-  sy = fyL = fyR = QInt (iVertices [scanL2].y); // round down
+  sy = fyL = fyR = QRound (iVertices [scanL2].y); // round down
 
   // Shift amount to get pixel address
   int pixel_shift = csLog2 (pfmt.PixelBytes);
