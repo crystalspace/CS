@@ -46,6 +46,7 @@ protected:
   /**
    * Some basic data associated with a glyph.
    */
+public:
   struct GlyphCacheData
   {
     /// Font
@@ -56,6 +57,7 @@ protected:
     int w, h, adv, left, top;
   };
 
+protected:
   /**
    * An entry in the LRU list.
    */

@@ -43,7 +43,7 @@ class csGraphics2DGLCommon;
 
 class csGLFontCache : public csFontCache
 {
-  struct GLGlyphCacheData : public GlyphCacheData
+  struct GLGlyphCacheData : public csFontCache::GlyphCacheData
   {
     csSubRect2* subrect;
     float tx1, ty1, tx2, ty2;

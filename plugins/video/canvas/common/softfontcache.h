@@ -27,7 +27,7 @@ class csGraphics2D;
 class csSoftFontCache : public csFontCache
 {
 protected:
-  struct SoftGlyphCacheData : public GlyphCacheData
+  struct SoftGlyphCacheData : public csFontCache::GlyphCacheData
   {
     uint8* glyphData;
     uint8* glyphDataAlpha;

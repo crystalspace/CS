@@ -26,6 +26,7 @@ chronological order.
 	  apps/demosky/demosky.cpp.
 	- res added dummies for the new LOD functions to 
 	  csIsoMeshFactoryWrapper.
+	- res fixed compile errors on MSVC6 related to the new font caches.
 14-Aug-2003
 	- Jorrit added iSharedVariableListener. With this interface you can
 	  listen to a variable and get notified when its value changes.

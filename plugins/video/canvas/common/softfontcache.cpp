@@ -49,7 +49,6 @@ void csSoftFontCache::InternalUncacheGlyph (GlyphCacheData* cacheData)
   delete softCacheData;
 }
 
-
 //---------------------------------------------------------------------------
 
 csSoftFontCache8::csSoftFontCache8 (csGraphics2D* G2D) : csSoftFontCache (G2D)
