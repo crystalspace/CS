@@ -4346,6 +4346,7 @@ class iMeshWrapper(iBase):
     def GetPortalContainer(*args): return _cspace.iMeshWrapper_GetPortalContainer(*args)
     def GetLightingInfo(*args): return _cspace.iMeshWrapper_GetLightingInfo(*args)
     def GetShadowReceiver(*args): return _cspace.iMeshWrapper_GetShadowReceiver(*args)
+    def GetShadowCaster(*args): return _cspace.iMeshWrapper_GetShadowCaster(*args)
     def GetVisibilityNumber(*args): return _cspace.iMeshWrapper_GetVisibilityNumber(*args)
     def GetFactory(*args): return _cspace.iMeshWrapper_GetFactory(*args)
     def SetFactory(*args): return _cspace.iMeshWrapper_SetFactory(*args)
