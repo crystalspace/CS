@@ -2,8 +2,12 @@ The history order is reversed so that new features are at the top.
 
 27-Feb-2003
 	- res fixed the "shifted alpha map" bug in the software renderer.
-	- Marten Svanfeldt once again fiddled with the light/shadow culling.
-  	  Still it isn't failsaife though, but works in most cases.
+	- Marten Svanfeldt once again fiddled with the light/shadow culling. 
+	  Still it isn't failsaife though, but works in most cases.
+	- Added iVisibilityCuller::VisTest() version which takes a set of
+	  planes and returns all objects that are (partially) inside the
+	  volume formed by the intersection of the planes. Added (untested)
+	  implementation in dynavis and frustvis.
 	- Philip Wyett fixed redefintion of i in 'for' loops under MSVC6 in the
   	  DDS image plugin.
 	- Eric Sunshine fixed compilation error in ddsloader.cpp.  Was

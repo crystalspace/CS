@@ -62,7 +62,7 @@ struct iVisibilityObjectIterator : public iBase
   virtual bool IsFinished () const = 0;
 };
 
-SCF_VERSION (iVisibilityCuller, 0, 3, 0);
+SCF_VERSION (iVisibilityCuller, 0, 3, 1);
 
 /**
  * This interface represents a visibility culling system.
@@ -107,6 +107,14 @@ struct iVisibilityCuller : public iBase
    * sphere.
    */
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere) = 0;
+
+  /**
+   * Mark all objects as visible that are in the volume formed by the set
+   * of planes. Can be used for frustum intersection, box intersection, ....
+   * Warning! This function can only use up to 32 planes.
+   */
+  virtual csPtr<iVisibilityObjectIterator> VisTest (csPlane3* plane,
+  	int num_planes) = 0;
 
   /**
    * Intersect a segment with all objects in the visibility culler and

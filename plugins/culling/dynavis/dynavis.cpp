@@ -1324,6 +1324,106 @@ bool csDynaVis::VisTest (iRenderView* rview)
   return true;
 }
 
+//======== VisTest planes ==================================================
+
+struct VisTestPlanes_Front2BackData
+{
+  uint32 current_visnr;
+  csVector* vistest_objects;
+  // During VisTest() we use the current frustum as five planes.
+  // Associated with this frustum we also have a clip mask which
+  // is maintained recursively during VisTest() and indicates the
+  // planes that are still active for the current kd-tree node.
+  csPlane3* frustum;
+  uint32 frustum_mask;
+};
+
+static bool VisTestPlanes_Front2Back (csKDTree* treenode,
+	void* userdata, uint32 cur_timestamp)
+{
+  VisTestPlanes_Front2BackData* data
+  	= (VisTestPlanes_Front2BackData*)userdata;
+
+  // In the first part of this test we are going to test if the node
+  // itself is visible. If it is not then we don't need to continue.
+  const csBox3& node_bbox = treenode->GetNodeBBox ();
+  uint32 new_mask;
+  if (!csIntersect3::BoxFrustum (node_bbox, data->frustum, data->frustum_mask,
+  	new_mask))
+  {
+    return false;
+  }
+
+  // Remember current frustum mask.
+  uint32 old_frustum_mask = data->frustum_mask;
+  data->frustum_mask = new_mask;
+
+  treenode->Distribute ();
+
+  int num_objects;
+  csKDTreeChild** objects;
+  num_objects = treenode->GetObjectCount ();
+  objects = treenode->GetObjects ();
+  int i;
+  for (i = 0 ; i < num_objects ; i++)
+  {
+    if (objects[i]->timestamp != cur_timestamp)
+    {
+      objects[i]->timestamp = cur_timestamp;
+      csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
+      	objects[i]->GetObject ();
+      if (visobj_wrap->visobj->GetVisibilityNumber () != data->current_visnr)
+      {
+	const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+	uint32 new_mask2;
+	if (csIntersect3::BoxFrustum (obj_bbox, data->frustum,
+		data->frustum_mask, new_mask2))
+	{
+	  visobj_wrap->visobj->SetVisibilityNumber (data->current_visnr);
+	  data->vistest_objects->Push (visobj_wrap->visobj);
+	}
+      }
+    }
+  }
+
+  // Restore the frustum mask.
+  data->frustum_mask = old_frustum_mask;
+  return true;
+}
+
+csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (csPlane3* planes,
+	int num_planes)
+{
+  UpdateObjects ();
+  current_visnr++;
+
+  csVector* v;
+  if (vistest_objects_inuse)
+  {
+    // Vector is already in use by another iterator. Allocate a new vector
+    // here.
+    v = new csVector ();
+  }
+  else
+  {
+    v = &vistest_objects;
+    vistest_objects.DeleteAll ();
+  }
+  
+  VisTestPlanes_Front2BackData data;
+  data.current_visnr = current_visnr;
+  data.vistest_objects = v;
+  data.frustum = planes;
+  data.frustum_mask = (1 << num_planes)-1;
+
+  kdtree->Front2Back (csVector3 (0, 0, 0), VisTestPlanes_Front2Back,
+  	(void*)&data);
+
+  csDynVisObjIt* vobjit = new csDynVisObjIt (v,
+  	vistest_objects_inuse ? NULL : &vistest_objects_inuse);
+  return csPtr<iVisibilityObjectIterator> (vobjit);
+}
+
 //======== VisTest box =====================================================
 
 struct VisTestBox_Front2BackData
