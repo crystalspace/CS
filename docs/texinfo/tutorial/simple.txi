@@ -29,7 +29,7 @@ available online.  The @sc{api} documentation can be generated locally or
 viewed online.  @xref{Where to Get}.
 
 @menu
-* Simple MinApp:: Minimum Application
+* Simple Minimum Requirements:: Minimum Application Requirements
 * Simple System Driver:: Creating the Simple System Driver
 * Simple Event Handling:: Event Handling
 * Simple World:: Creating a ``World''
@@ -37,29 +37,31 @@ viewed online.  @xref{Where to Get}.
 * Simple Locomotion:: Locomotion (Moving Around)
 @end menu
 
-@node Simple MinApp, Simple System Driver, Tutorial Simple, Tutorial Simple
-@subsection Minimum Application
-@cindex Tutorial Minimum Application
-@cindex Minimum Application, Tutorial
+@node Simple Minimum Requirements, Simple System Driver, Tutorial Simple, Tutorial Simple
+@subsection Minimum Application Requirements
+@cindex Tutorial Minimum Application Requirements
+@cindex Minimum Application Requirements, Tutorial
 
-There are some requirements to fulfil until an application can be considered
-a ``Crystal Space Application''. These are:
+For an application to be considered a proper ``Crystal Space application'',
+there are a frew requirements.  These are:
+
 @itemize @bullet
 @item
-You have to include @file{cssysdef.h} as the very first include in
-@emph{every} source file.
+Each and every source file (@file{.cpp}) must import @file{cssysdef.h} as the
+very first included Crystal Space header files.  @file{cssysdef.h} should never
+be included by a header file.
 
 @item
-Your @code{main} function must be built using the following prototype:
+The @code{main()} function must be declared with the following prototype:
 @example
 int main(int argc, char *argv[]);
 @end example
 @end itemize
 
-If you don't obey these rules, your program will not compile, or not compile
-on all supported systems.
+Following these guidelines will help to ensure that your application builds
+and runs on all platforms supported by Crystal Space.
 
-@node Simple System Driver, Simple Event Handling, Simple MinApp, Tutorial Simple
+@node Simple System Driver, Simple Event Handling, Simple Minimum Requirements, Tutorial Simple
 @subsection Creating the Simple System Driver
 @cindex Tutorial Simple System Driver
 @cindex Simple System Driver, Tutorial

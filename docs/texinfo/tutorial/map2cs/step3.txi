@@ -4,19 +4,19 @@
 
 @file{map2cs} is configured by a special configuration file called
 @file{map2cs.cfg}, located within the 'D:\Crystal\CS\data\config\' directory.
-If you need support for multiple configurations, you can use several configuration
-files, but for now we will restrict ourselves to just one file.  Open
-up @file{map2cs.cfg} in you favourite editor and edit it, so it looks like the
-following template:
+If you need support for multiple configurations, you can use several
+configuration files, but for now we will restrict ourselves to just one file.
+Open up @file{map2cs.cfg} in you favourite editor and edit it, so it looks like
+the following template:
 
 @example
 Map2CS.TextureSettings.DefaultTexture = liquids/bubbles
-Map2CS.TextureSettings.wad1 = E:\SIERRA\Half-Life\valve\halflife.wad
-Map2CS.TextureSettings.wad2 = E:\SIERRA\Half-Life\valve\xeno.wad
-Map2CS.TextureSettings.wad3 = E:\SIERRA\Half-Life\valve\liquids.wad
-Map2CS.TextureSettings.wad4 = E:\SIERRA\Half-Life\valve\texpack.wad
-Map2CS.TextureSettings.pk1 = D:\GAMES\Quake III Arena\baseq3\pak0.pk3
-Map2CS.TextureSettings.pk2 = D:\GAMES\Quake III Arena\baseq3\mapmedia.pk3
+Map2CS.TextureSettings.wad1 = E:\Sierra\HalfLife\valve\halflife.wad
+Map2CS.TextureSettings.wad2 = E:\Sierra\HalfLife\valve\xeno.wad
+Map2CS.TextureSettings.wad3 = E:\Sierra\HalfLife\valve\liquids.wad
+Map2CS.TextureSettings.wad4 = E:\Sierra\HalfLife\valve\texpack.wad
+Map2CS.TextureSettings.pk1 = D:\Games\Quake3A\baseq3\pak0.pk3
+Map2CS.TextureSettings.pk2 = D:\Games\Quake3A\baseq3\mapmedia.pk3
 
 Map2CS.General.Scaling = 0.025
 Map2CS.General.UseBSP = 1
@@ -45,11 +45,11 @@ cd..
 @end example
 
 From the command-line (the @sc{ms-dos} prompt for Windows and @sc{dos} users)
-change to the directory @file{D:\Crystal}.  Type @samp{LevBuild.bat yourmapsname}.  Now, if
-everything is properly installed and you have a file @file{yourmapsname.map} in your
-@file{maps} directory (if you have downloaded the binary Crystal Space
-distribution for map making, you have), then you should see the following
-output:
+change to the directory @file{D:\Crystal}.  Type @samp{LevBuild.bat
+yourmapsname}.  Now, if everything is properly installed and you have a file
+@file{yourmapsname.map} in your @file{maps} directory (if you have downloaded
+the binary Crystal Space distribution for map making, you have), then you
+should see the following output:
 
 @example
 map2cs, Copyright (C) 1999 by Thomas Hieber

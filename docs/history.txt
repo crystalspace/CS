@@ -10,6 +10,10 @@ The history order has been reversed so that new features are at the top.
 	  to make it easier to make it SCF interfaces. For example,
 	  csShadowFrustum is now completely private to the shadow block
 	  classes.
+	- Eric Sunshine performed some rewriting of material recently added to
+	  simple.txi.
+	- Eric Sunshine eliminated an `overfull hbox' warning reported by TeX
+	  for tutorial/map2cs/step3.txi.
 11-Mar-2001
 	- Norman Kramer renamed avi codec classnames from codec.*
 	  to codec.avi.*.
