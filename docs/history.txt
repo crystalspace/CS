@@ -46,6 +46,7 @@ chronological order.
 16-Aug-2004
         - Vincent Knecht made corrections in csapplicationframework.h doxygen
           sample code.
+	- Jorrit fixed flarge so that the billboard has <ztest/> mode.
 14-Aug-2004
         - Philip Wyett eliminated the redefinition of _POSIX_C_SOURCE warning
           within the CS Python plugin.

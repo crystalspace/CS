@@ -6014,6 +6014,7 @@
                 <color red="1" green="1" blue="1" />
                 <material>billboard</material>
             </params>
+	    <ztest/>
             <move>
                 <v x="-4" y="0" z="8" />
             </move>
