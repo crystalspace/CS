@@ -30,7 +30,7 @@
 #include "ivaria/reporter.h"
 #include "csutil/csvector.h"
 
-#define MY_CLASSNAME "crystalspace.sound.loader.multiplexer"
+#define SNDPLEX_CLASSNAME "crystalspace.sound.loader.multiplexer"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -69,7 +69,7 @@ SCF_IMPLEMENT_FACTORY(csSoundLoaderMultiplexer);
 
 SCF_EXPORT_CLASS_TABLE (sndplex)
 SCF_EXPORT_CLASS_DEP (csSoundLoaderMultiplexer,
-  MY_CLASSNAME, "Sound Loader Multiplexer", "crystalspace.sound.loader.")
+  SNDPLEX_CLASSNAME, "Sound Loader Multiplexer", "crystalspace.sound.loader.")
 SCF_EXPORT_CLASS_TABLE_END;
 
 SCF_IMPLEMENT_IBASE(csSoundLoaderMultiplexer)
@@ -105,16 +105,16 @@ bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
   while (i < list->Length())
   {
     char const* classname = list->Get(i);
-    if (!strcasecmp (classname, MY_CLASSNAME))
+    if (!strcasecmp (classname, SNDPLEX_CLASSNAME))
     {
       list->Delete(i);
     }
     else if (strstr (classname, "mp3") && (i < (list->Length() - 1)))
     {
-      // ok the following is a bit hacky, but since the mp3 loader skips junk until
-      // it finds something useful chances are high it finds some "good" header the
-      // bigger the input gets, so we give all other loaders a chance to look at it
-      // first
+      // ok the following is a bit hacky, but since the mp3 loader skips junk
+      // until it finds something useful chances are high it finds some "good"
+      // header the bigger the input gets, so we give all other loaders a
+      // chance to look at it first
       list->Push (csStrNew (classname));
       list->Delete (i);
     }

@@ -19,6 +19,9 @@ The history order is reversed so that new features are at the top.
 	  class identifier in SCF_EXPORT_CLASS_DEP() rather than using the
 	  CS_SOFTWARE_2D_DRIVER macro which might change value, inadvertently
 	  causing the ddraw2d plugin to change identity.
+	- Eric Sunshine renamed MY_CLASSNAME macros in several plugins to use
+	  distinct names.  This simplifies the conversion script (slightly) for
+	  upcoming Phase Three of the elimination of the monolithic scf.cfg.
 3-June-2003
 	- Philipp Aumayr fixed the fancycon bug, where the borders
 	  were visibile in SW but not in GL mode. (wrong mixmode at line

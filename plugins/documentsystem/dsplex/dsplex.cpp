@@ -32,8 +32,8 @@
 
 #include "dsplex.h"
 
-#define DSCLASSPREFIX	"crystalspace.documentsystem."
-#define MY_CLASSNAME	DSCLASSPREFIX "multiplex"
+#define DSCLASSPREFIX "crystalspace.documentsystem."
+#define DOCPLEX_CLASSNAME DSCLASSPREFIX "multiplex"
 
 SCF_IMPLEMENT_IBASE (csPlexDocument)
   SCF_IMPLEMENTS_INTERFACE (iDocument)
@@ -344,7 +344,7 @@ csRef<iDocumentSystem> csMplexDocumentSystem::LoadNextPlugin (int num)
 	      return 0;
 	    }
 	    classname = classlist->Get(0);
-	  } while (!strcasecmp (classname, MY_CLASSNAME));
+	  } while (!strcasecmp (classname, DOCPLEX_CLASSNAME));
           
 	  res = CS_LOAD_PLUGIN (plugin_mgr, classname, iDocumentSystem);
 	  if (res)
@@ -377,7 +377,7 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csMplexDocumentSystem)
 
 SCF_EXPORT_CLASS_TABLE(dsplex)
-  SCF_EXPORT_CLASS(csMplexDocumentSystem, MY_CLASSNAME,
+  SCF_EXPORT_CLASS(csMplexDocumentSystem, DOCPLEX_CLASSNAME,
       "Document system multiplexer")
 SCF_EXPORT_CLASS_TABLE_END
 

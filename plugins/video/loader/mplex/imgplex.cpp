@@ -26,7 +26,7 @@
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 
-#define MY_CLASSNAME "crystalspace.graphic.image.io.multiplex"
+#define IMGPLEX_CLASSNAME "crystalspace.graphic.image.io.multiplex"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -43,7 +43,7 @@ SCF_IMPLEMENT_FACTORY(csMultiplexImageIO);
 
 SCF_EXPORT_CLASS_TABLE (imgplex)
   SCF_EXPORT_CLASS (csMultiplexImageIO,
-    MY_CLASSNAME, "Image file format multiplex plug-in.")
+    IMGPLEX_CLASSNAME, "Image file format multiplex plug-in.")
 SCF_EXPORT_CLASS_TABLE_END
 
 csMultiplexImageIO::csMultiplexImageIO (iBase *pParent)
@@ -75,7 +75,7 @@ bool csMultiplexImageIO::Initialize (iObjectRegistry *object_reg)
       for (i = 0; i < nmatches; i++)
       {
 	char const* classname = classlist->Get(i);
-        if (strcasecmp (classname, MY_CLASSNAME))
+        if (strcasecmp (classname, IMGPLEX_CLASSNAME))
         {
 	  csRef<iImageIO> plugin (
 	  	CS_LOAD_PLUGIN (plugin_mgr, classname, iImageIO));
@@ -110,7 +110,8 @@ const csVector& csMultiplexImageIO::GetDescription ()
   return formats;
 }
 
-csPtr<iImage> csMultiplexImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
+csPtr<iImage> csMultiplexImageIO::Load (uint8* iBuffer, uint32 iSize,
+  int iFormat)
 {
   int i;
   for (i=0; i<list.Length(); i++)

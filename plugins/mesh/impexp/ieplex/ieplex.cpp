@@ -30,7 +30,7 @@
 #include "imesh/mdlconv.h"
 #include "imesh/mdldata.h"
 
-#define MY_CLASSNAME	"crystalspace.modelconverter.multiplexer"
+#define MDLPLEX_CLASSNAME	"crystalspace.modelconverter.multiplexer"
 
 typedef csPArray<const csModelConverterFormat> csModelConverterFormatVector;
 
@@ -78,7 +78,7 @@ SCF_IMPLEMENT_FACTORY (csModelConverterMultiplexer);
 
 SCF_EXPORT_CLASS_TABLE (ieplex)
   SCF_EXPORT_CLASS (csModelConverterMultiplexer,
-    MY_CLASSNAME,
+    MDLPLEX_CLASSNAME,
     "Multiplexer for Model Converters")
 SCF_EXPORT_CLASS_TABLE_END
 
@@ -127,7 +127,7 @@ bool csModelConverterMultiplexer::LoadNextPlugin ()
 	return false;
       }
       classname = classlist->Get(0);
-    } while (!strcasecmp (classname, MY_CLASSNAME));
+    } while (!strcasecmp (classname, MDLPLEX_CLASSNAME));
     
     plugin = CS_LOAD_PLUGIN (plugin_mgr, classname, iModelConverter);
     if (plugin)
