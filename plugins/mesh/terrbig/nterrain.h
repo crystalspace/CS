@@ -354,7 +354,7 @@ public:
     virtual bool ConvertImageToMapFile (iFile *input, iImageIO *imageio, const char *hm)
     { return scfParent->ConvertImageToMapFile (input, imageio, hm); }
     virtual void SetMaterialsList(iMaterialHandle **matlist, unsigned int nMaterials)
-    { return scfParent->SetMaterialsList(matlist, nMaterials); }
+    { scfParent->SetMaterialsList(matlist, nMaterials); }
   } scfiTerrBigState;
   friend class eiTerrBigState;
 
@@ -372,11 +372,11 @@ public:
 		virtual	iPolygonMesh*	CreateLowerDetailPolygonMesh(	float	)	{	return NULL; }
 		virtual	void GetObjectBoundingBox( csBox3& bBBox,	int	iType	=	CS_BBOX_NORMAL )
 		{
-			return scfParent->GetObjectBoundingBox(	bBBox, iType );
+			scfParent->GetObjectBoundingBox(	bBBox, iType );
 		}
 		virtual	void GetRadius(	csVector3& rad,	csVector3& cent	)
 		{
-			return scfParent->GetRadius( rad, cent );
+			scfParent->GetRadius( rad, cent );
 		}
 	}	scfiObjectModel;
   friend class eiObjectModel;
@@ -390,7 +390,7 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE( csBigTerrainObject );
     void ManagerClosing()
 		{
-			return scfParent->ManagerClosing();
+			scfParent->ManagerClosing();
 		}
   } scfiVertexBufferManagerClient;
 
