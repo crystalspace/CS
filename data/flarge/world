@@ -246,6 +246,18 @@
         <material name="flare_spark5">
             <texture>flare_spark5</texture>
         </material>
+        <material name="dots">
+            <texture>dots</texture>
+        </material>
+        <material name="fire">
+            <texture>fire</texture>
+        </material>
+        <material name="water">
+            <texture>water</texture>
+        </material>
+        <material name="plasma">
+            <texture>plasma</texture>
+        </material>
     </materials>
     <renderpriorities>
         <priority name="sky">

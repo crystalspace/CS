@@ -239,6 +239,8 @@ iTextureWrapper* csLoader::ParseProcTex (iDocumentNode* node)
   iLoaderPlugin* plug = NULL;
   iBinaryLoaderPlugin* binplug = NULL;
 
+  csRef<iDocumentNode> ParamsNode;
+
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -292,6 +294,7 @@ iTextureWrapper* csLoader::ParseProcTex (iDocumentNode* node)
 	}
         break;
       case XMLTOKEN_PARAMS:
+	ParamsNode = child;
 	break;
       default:
         SyntaxService->ReportBadToken (child);
@@ -301,15 +304,10 @@ iTextureWrapper* csLoader::ParseProcTex (iDocumentNode* node)
 
   if (plug)
   {
-    /*
-      @@@ The <proctex> node is passed to the loader plugin.
-      Really, there should only used something like a <params> block
-      here. However, th PT loader needs the name, which is an attrib
-      of the <proctex> tag.
-     */
-    csRef<iBase> b = plug->Parse (node,
+    csRef<iBase> b = plug->Parse (ParamsNode,
       GetLoaderContext (), NULL);
     csRef<iTextureWrapper> tw = SCF_QUERY_INTERFACE (b, iTextureWrapper);
+    tw->QueryObject ()->SetName (node->GetAttributeValue ("name"));
     return tw;
   }
   else

@@ -36,6 +36,15 @@ The history order is reversed so that new features are at the top.
 	    - Renamed variables named 'or' in the module for the same reason.
 	    - Added a makefile target that forcibly regenerates the module
 	      code, for use by the jobber.pl daily server cron job.
+	- res made the following changes related to proctexes:
+	    - PT loader plugins are now expected to return a texture wrapper,
+	      not material wrapper.
+	    - adjusted stdpt plugin to this behaviour.
+	    - the callback for procedural textures now keeps a reference to
+	      the PT.
+	    - like normal textures, proctexes now don't create a material of the 
+	      same name at load time.
+	    - adjusted flarge to specify materials for the PTs.
 7-May-2003
 	- Eric Sunshine removed MSVC project-related variables from
 	  csjoylin.mak.  This module is Linux-specific, therefore there is no

@@ -89,21 +89,17 @@ bool csBaseProctexLoader::Initialize(iObjectRegistry *object_reg)
   return true;
 }
 
-csPtr<iBase> csBaseProctexLoader::PrepareProcTex (csProcTexture* pt,
-    const char* name)
+csPtr<iBase> csBaseProctexLoader::PrepareProcTex (csProcTexture* pt)
 {
-  csRef<iEngine> Engine = CS_QUERY_REGISTRY(object_reg, iEngine);
-  if (!Engine) return NULL;
-
-  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY(object_reg, iGraphics3D);
-
-  csRef<iMaterialWrapper> mw = pt->Initialize (object_reg, 
-    Engine,
-    G3D ? G3D->GetTextureManager () : NULL,
-    name);
-  mw->QueryObject ()->ObjAdd (pt);
-  csRef<iTextureWrapper> tw = pt->GetTextureWrapper ();
-  return csPtr<iBase> (tw);
+  if (pt->Initialize (object_reg))
+  {
+    csRef<iTextureWrapper> tw = pt->GetTextureWrapper ();
+    return csPtr<iBase> (tw);
+  }
+  else
+  {
+    return NULL;
+  }
 }
 
 // 'Dots' loader.
@@ -117,7 +113,7 @@ csPtr<iBase> csPtDotsLoader::Parse (iDocumentNode* node,
   				    iBase* context)
 {
   csRef<csProcTexture> pt = csPtr<csProcTexture> (new csProcDots ());
-  return PrepareProcTex (pt, node->GetAttributeValue ("name"));
+  return PrepareProcTex (pt);
 }
 
 // 'Fire' loader.
@@ -131,7 +127,7 @@ csPtr<iBase> csPtFireLoader::Parse (iDocumentNode* node,
   				    iBase* context)
 {
   csRef<csProcTexture> pt = csPtr<csProcTexture> (new csProcFire ());
-  return PrepareProcTex (pt, node->GetAttributeValue ("name"));
+  return PrepareProcTex (pt);
 }
 
 // 'Water' loader.
@@ -145,7 +141,7 @@ csPtr<iBase> csPtWaterLoader::Parse (iDocumentNode* node,
   				    iBase* context)
 {
   csRef<csProcTexture> pt = csPtr<csProcTexture> (new csProcWater ());
-  return PrepareProcTex (pt, node->GetAttributeValue ("name"));
+  return PrepareProcTex (pt);
 }
 
 // 'Plasma' loader.
@@ -159,6 +155,6 @@ csPtr<iBase> csPtPlasmaLoader::Parse (iDocumentNode* node,
   				      iBase* context)
 {
   csRef<csProcTexture> pt = csPtr<csProcTexture> (new csProcPlasma ());
-  return PrepareProcTex (pt, node->GetAttributeValue ("name"));
+  return PrepareProcTex (pt);
 }
 

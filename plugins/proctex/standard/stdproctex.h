@@ -32,8 +32,7 @@ class csBaseProctexLoader : public iLoaderPlugin
 protected:
   csRef<iObjectRegistry> object_reg;
 
-  csPtr<iBase> PrepareProcTex (csProcTexture* pt,
-    const char* name);
+  csPtr<iBase> PrepareProcTex (csProcTexture* pt);
 public:
   SCF_DECLARE_IBASE;
 

@@ -135,7 +135,7 @@ iEventHandler* csProcTexture::SetupProcEventHandler (
 
 struct ProcCallback : public iTextureCallback
 {
-  csProcTexture* pt;
+  csRef<csProcTexture> pt;
   SCF_DECLARE_IBASE;
   ProcCallback () { SCF_CONSTRUCT_IBASE (NULL); }
   virtual ~ProcCallback () { }
