@@ -16,9 +16,9 @@ chronological order.
 	  work with iLight instead of iStatLight or iDynLight.
 	- Jorrit added a now a iLight->GetDynamicType() function that
 	  returns one of the following:
-	    - CS_LIGHT_DYNAMICTYPE_STATIC
-	    - CS_LIGHT_DYNAMICTYPE_PSEUDO
-	    - CS_LIGHT_DYNAMICTYPE_DYNAMIC
+	    CS_LIGHT_DYNAMICTYPE_STATIC
+	    CS_LIGHT_DYNAMICTYPE_PSEUDO
+	    CS_LIGHT_DYNAMICTYPE_DYNAMIC
 	- Jorrit added mention of the above changes to the apimod98.txi
 	  document.
 	- Jorrit modified the tutorials in the documentation to reflect
@@ -40,6 +40,9 @@ chronological order.
 	- Jorrit removed iLight->SetSector(). It is not valid to manually set
 	  the sector of a light. This is done automatically when you add
 	  a light to a sector by calling sector->GetLights()->Add().
+	- Eric Sunshine performed some Texinfo markup corrections in simple.txi
+	  and apimod98.txi, and eliminated TeX underfull hbox complaint from
+	  apimod98.txi.
 15-Jan-2004
 	- Peter Amstutz changed the keyboard movement in the "simple" tutorials
 	  (along with the associated texinfo documentation) to follow more
@@ -75,8 +78,6 @@ chronological order.
 	  buffers are now only recreated when really needed and not every
 	  time the dirty bit was set. Also removed the copy of the triangle
 	  array to an int* buffer. That's not needed.
-	- Jorrit added a sequence to the terrain level so that the sun
-	  moves. This gives nice realtime lighting effects on the landscape.
 	- Eric Sunshine simplified a number of macros in checkbuild.m4,
 	  checklib.m4, and configure.ac by removing some unnecssary
 	  m4_default() invocations.
@@ -108,14 +109,16 @@ chronological order.
 	- Eric Sunshine revised outdated and incomplete Doxygen comments
 	  iNetworkEndPoint, iNetworkConnection, iNetworkListener,
 	  iNetworkDriver, and csNetworkDriverCapabilities.
-	- John Harger fixed a sorting problem (though the back2front sorting 
+	- John Harger fixed a sorting problem (though the back2front sorting
 	  is broken still in libcstool/rendermeshlist) and enabled selecting
 	  other physics plugins for the particles plugin.
 	- res updated the ball mesh plugin makefile to link against csgfx, too.
 	- res fixed AWS to compile with NR.
-	- res fixed Opcode after the recent operator-related changes. MSVC was 
-	  confused by the presence of both a float* and float[] operator. 
+	- res fixed Opcode after the recent operator-related changes. MSVC was
+	  confused by the presence of both a float* and float[] operator.
 	  Removed float* version.
+	- Jorrit added a sequence to the terrain level so that the sun
+	  moves. This gives nice realtime lighting effects on the landscape.
 	- Keith added timeFactor for slow motion and reversible anims for
 	  sprcal3d. Improved error reporting on bad loads of .cal3d files.
 	  Added stopLock flag to animation mixer so that animation stops on

@@ -153,11 +153,12 @@ then you can do it like this:
 @cindex @code{iStatLight}
 @cindex @code{iDynLight}
 
-The interfaces @code{iStatLight} and @code{iDynLight} have been removed
-and their functionality has been merged into @code{iLight} (this includes
+The interfaces @samp{iStatLight} and @samp{iDynLight} have been removed
+and their functionality has been merged into @samp{iLight} (this includes
 the function @code{iDynLight::Setup()}. There is now a new function
-@code{iLight::GetDynamicType()} which will return one of the following
+@code{iLight::GetDynamicType()} which returns one of the following
 constants depending on the type of the light:
+
 @itemize
 @item
 @code{CS_LIGHT_DYNAMICTYPE_STATIC}: for static lights.
@@ -166,33 +167,34 @@ constants depending on the type of the light:
 @item
 @code{CS_LIGHT_DYNAMICTYPE_DYNAMIC}: for fully dynamic lights.
 @end itemize
-The function @code{iLight::IsDynamic()} has been removed as you can
+
+The method @code{iLight::IsDynamic()} was removed;
 use @code{iLight::GetDynamicType()} to get the same information.
 
-The following functions have been modified to work with @code{iLight}
-instead of @code{iStatLight} and @code{iDynLight}:
+The following functions have been modified to work with @samp{iLight}
+instead of @samp{iStatLight} and @samp{iDynLight}:
 
 @itemize
 @item
 @code{iEngine::CreateLight()}.
 @item
-@code{iEngine::FindLightID()}.
-@item
 @code{iEngine::FindLight()}.
+@item
+@code{iEngine::FindLightID()}.
 @item
 @code{iEngine::ForceRelight()}.
 @end itemize
 
 The last parameter of @code{iEngine::CreateLight()} routine has
-changed to be the dynamic type of the light (one of
-@code{CS_LIGHT_DYNAMICTYPE} constants) instead of a boolean. The
-@code{iEngine::CreateDynLight()} has thus been superceded by this
+changed to be the dynamic type of the light (one of the above
+@samp{CS_LIGHT_DYNAMICTYPE} constants) instead of a boolean. Thus, the
+@code{iEngine::CreateDynLight()} method has been superceded by this
 function.
 
 All functions related to dynamic lights have been removed. Dynamic
-lights are now treated exactly like static lights. i.e. you have to
-call @code{iSector::GetLights()} and @code{Add()} the light to the
-sector. The @code{iLight::Setup()} function remains however and is
+lights are now treated exactly like static lights. For example, you have to
+call @code{iSector::GetLights()} and then @code{Add()} to add the light to the
+sector. The @code{iLight::Setup()} function remains, however, and is
 specific to dynamic lights.
 
 @subheading Polygon Texture Mapping Changes

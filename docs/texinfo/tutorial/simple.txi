@@ -92,7 +92,7 @@ public:
 #endif // __SIMPLE1_H__
 @end example
 
-In the @code{Simple} class we keep a number of references to important
+In the @samp{Simple} class we keep a number of references to important
 objects that we are going to need a lot. That way we don't have to get
 them every time when we need them. Other than that we have a constructor
 which will do the initialization of these variables, a destructor which
@@ -100,9 +100,9 @@ will clean up the application, an initialization function which will
 be responsible for the full set up of Crystal Space and our application,
 and finally a @code{Start()} function to start the event handler.
 
-Note that we use smart pointers (@code{csRef}) for several of those
+Note that we use smart pointers (@code{csRef<>}) for several of those
 references. That makes it easier to manage reference counting. We let
-the smart pointer take care of this for us. For @code{iObjectRegistry}
+the smart pointer take care of this for us. For @samp{iObjectRegistry}
 we don't do this because for technical reasons it doesn't make sense
 to keep references to that.
 
@@ -290,10 +290,10 @@ the things and features it already has:
 It will open a window.
 @item
 You can control the size of the window and the video driver used
-for that window with commandline options (@code{-video} and @code{-mode}
+for that window with commandline options (@samp{-video} and @samp{-mode}
 commandline options).
 @item
-It will give commandline help when you use the @code{-help} commandline
+It will give commandline help when you use the @samp{-help} commandline
 option.
 @item
 It has the following plugins initialized and ready to use: engine, 3D
@@ -320,7 +320,7 @@ is done in the @code{Initialize()} function.
 
 Note the usage of the @code{csReport()} function. This is a convenience
 function to send a message (usually an error or notification) to the
-reporter plugin. It works a lot like @code{printf} except that you
+reporter plugin. It works a lot like @code{printf()} except that you
 additionally need to give the severity level and an identifier which can give
 someone listening to the reporter an idea of the origin of the message.
 
@@ -330,17 +330,17 @@ plugins to find out which plugins to load. The commandline has highest
 priority, followed by the config file and lastly the requested plugins.
 
 The @code{csCommandLineHelper::CheckHelp()} function will check if the
-@code{-help} commandline option is given and if so show the help for
+@samp{-help} commandline option is given and if so show the help for
 all loaded plugins (every plugin that is loaded in memory is capable of
 extending the commandline options).
 
 After that we will query the object registry to find out all the common
 objects that we're going to need later and store a reference in our
-main class. Because we use @code{csRef} or smart pointers we don't have
+main class. Because we use @code{csRef<>} or smart pointers we don't have
 to worry about @code{DecRef()}.
 
 Finally, when all is done the window is opened with a call to the function
-@code{csInitializer::OpenApplication()}.  This sends the @code{cscmdSystemOpen}
+@code{csInitializer::OpenApplication()}.  This sends the @samp{cscmdSystemOpen}
 message to all components that are listening to the event queue.  One of the
 plugins that does this is the 3D renderer which will then open its window (or
 enable graphics on a non-windowing operating system).
@@ -369,7 +369,7 @@ methods to our class in @file{simple.h}:
 The static function @code{SimpleEventHandler()} will be registered to
 the event queue. It has to be a static function because the event queue
 expects to call a normal C-style function (alternatively you could also
-implement this by making a subclass of @code{iEventHandler} but this is
+implement this by making a subclass of @samp{iEventHandler} but this is
 more complicated and not really required).
 
 @code{HandleEvent()} is the real event handler. @code{SimpleEventHandler()}
@@ -434,7 +434,7 @@ for the @key{ESC} key to quit.  We assume this is the application you always
 wanted to have?  No?  Ok then, let's create some 3D stuff.
 
 We'll add a texture manager, a room (technically called a @dfn{sector}) and
-some lights.  First, add a pointer to our main sector to the @code{Simple}
+some lights.  First, add a pointer to our main sector to the @samp{Simple}
 class header file:
 
 @example
@@ -541,20 +541,20 @@ object. Because this is a very common case there is a convenience function
 in the engine (called @code{CreateSectorWallsMesh()}) which will create a
 thing mesh and add it to the given sector. The only thing that has to be
 done after this is add polygons to that mesh. To do this we first query
-the interface called @code{iThingState} from the thing mesh object.
+the interface called @samp{iThingState} from the thing mesh object.
 We use the macro @code{SCF_QUERY_INTERFACE()} which is part of @sc{scf}
 (@pxref{SCF}). This will see if the mesh object (which is wrapped by
-the mesh wrapper) actually implements @code{iThingState} (which should
+the mesh wrapper) actually implements @samp{iThingState} (which should
 be the case here) and if so it will return a pointer to the implementation
-of @code{iThingState}. All mesh objects implement some kind of state
+of @samp{iThingState}. All mesh objects implement some kind of state
 interface which is used to set up or query the state of that mesh object.
 Note that all interfaces which you query using @code{SCF_QUERY_INTERFACE()}
 should be released when you no longer need them (by calling @code{DecRef()}).
-However in this example we assign them to a @code{csRef} which takes care of
+However in this example we assign them to a @code{csRef<>} which takes care of
 @code{DecRef()} for us.
 
 From the returned thing state we now get the factory state
-(@code{iThingFactoryState}) which we can now use to create polygons.
+(@samp{iThingFactoryState}) which we can now use to create polygons.
 There are various functions to create individual polygons if you want that
 but in this case we use a conveniance function to create a box that can
 be seen from the inside. That will serve as the walls of our room.
@@ -565,7 +565,7 @@ clock-wise). The box coordinates given to @code{AddInsideBox()} are in object
 space (in contrast with world space and camera space).
 
 The @code{SetPolygonMaterial()} function will set the material of the
-polygons. The first parameter is a range. We use @code{CS_POLYRANGE_LAST}
+polygons. The first parameter is a range. We use @samp{CS_POLYRANGE_LAST}
 here to indicate that we are interested in setting the materials of the last
 created polygons (i.e. all polygons created with @code{AddInsideBox()}).
 
@@ -582,12 +582,12 @@ able to see the walls.  The interface @samp{iLight} represents a light.
 In this case we created some static lights which can not move and change
 intensity.  We create three such lights
 and add them to the room with @code{AddLight()}. Note that the list of lights
-in a sector is presented by an object implementing @code{iLightList}. To
+in a sector is presented by an object implementing @samp{iLightList}. To
 get this list you call @code{iSector::GetLights()}.
 
 When creating a light we use several parameters.
 First we have the name of the light. This is not used
-often and mostly you can set this to @code{0}. The second parameter is
+often and mostly you can set this to 0. The second parameter is
 the location of the light in the world. Then follows a radius. The light will
 not affect polygons which are outside the sphere described by the center of
 the light and the radius.  The next parameter is the color of the light in
@@ -618,10 +618,10 @@ Because we have not created a camera through which you can see.
 @cindex iView
 @cindex iCamera
 
-In Crystal Space there is an interface called @code{iView} which
-encapsulates both @samp{iCamera} and @code{iClipper2D} instances.
-In principle you can use those classes directly but using @code{iView} is
-easier.  Now edit @file{simple.h} to make use of @code{iView}:
+In Crystal Space there is an interface called @samp{iView} which
+encapsulates both @samp{iCamera} and @samp{iClipper2D} instances.
+In principle you can use those classes directly but using @samp{iView} is
+easier.  Now edit @file{simple.h} to make use of @samp{iView}:
 
 @example
 @dots{}
@@ -735,16 +735,16 @@ needs to be rendered the Crystal Space framework will send four messages:
 
 @itemize
 @item
-@code{cscmdPreProcess} is sent first. This allows plugins to preprocess
+@samp{cscmdPreProcess} is sent first. This allows plugins to preprocess
 things before drawing can happen.
 @item
-@code{cscmdProcess} follows. In this pass the application will render.
+@samp{cscmdProcess} follows. In this pass the application will render.
 @item
-@code{cscmdPostProcess} is after that. This is the pass that can be used
+@samp{cscmdPostProcess} is after that. This is the pass that can be used
 by external components to render on top of the view rendered by the
 application.
 @item
-@code{cscmdFinalProcess} is last. In this pass the application will display
+@samp{cscmdFinalProcess} is last. In this pass the application will display
 the frame on screen.
 @end itemize
 
