@@ -869,14 +869,19 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-cpu-specific-optimizations=level
                           enable CPU-specific optimizations; recognized levels
-                          are `no', `minimum' or `min', `maximum' or `max'
-                          (default MINIMUM); the `minimum' option selects
+                          are `no',
+ `minimum' or `min', `maximum' or `max'
+                          (default MINIMUM); the `minimum'
+ option selects
                           optimizations which are likely to be supported by
                           reasonably modern hardware, thus making the
-                          resulting executables fairly portable; use the
-                          `maximum' option with caution since code for one
+                          resulting executables
+ fairly portable; use the
+                          `maximum' option with caution since code for
+ one
                           processor will not work with earlier processors (for
-                          example, Intel 686-specific code will not work with
+                          example, Intel
+ 686-specific code will not work with
                           a 586)
   --disable-freetypetest  Do not try to compile and run
                           a test FreeType program
@@ -884,94 +889,125 @@ Optional Features:
                           (default YES)
   --enable-meta-info-embedding
                           store plugin meta-information directly inside plugin
-                          modules if supported by platform; if disabled,
-                          meta-information is stored in stand-alone .csplugin
-                          files; this is enabled by default for non-Unix
-                          platforms, and disabled by default for Unix
-                          platforms since the Unix implementation requires the
-                          GPL-licensed libbfd library; enable this option on
-                          Unix only if you are certain you want a GPL-licensed
-                          library infecting your project
-  --enable-optimize       build with optimizations enabled (default YES); same
-                          as --enable-mode=optimize
-  --enable-debug          build with debugging information (default NO); same
+                          modules
+ if supported by platform; if disabled,
+                          meta-information is
+ stored in stand-alone .csplugin
+                          files; this is enabled by
+ default for non-Unix
+                          platforms, and disabled by default for
+ Unix
+                          platforms since the Unix implementation requires
+                          the
+ GPL-licensed libbfd library; enable this option
+                          on Unix only if
+ you are certain you want a
+                          GPL-licensed library infecting your
+ project
+  --enable-optimize       build with optimizations enabled (default YES);
+                          same as --enable-mode=optimize
+  --enable-debug          build with debugging information (default NO);
+ same
                           as --enable-mode=debug
-  --enable-profile        build with profiling information (default NO); same
+  --enable-profile        build with profiling information (default NO);
+ same
                           as --enable-mode=profile
   --enable-mode=mode      set build mode; recognized modes are `optimize',
-                          `debug', `profile' (default OPTIMIZE)
+                          `debug', `profile'
+ (default OPTIMIZE)
   --enable-extensive-memory-debugger
                           enable the extensive memory debugger which catches
-                          common memory management mistakes (default NO)
+                          common memory
+ management mistakes (default NO)
   --enable-new-renderer   enable use of new renderer (_EXPERIMENTAL_!)
                           (default NO)
   --enable-makefile-cache enable caching of makefile information to speed up
-                          build process; (default YES)
+                          build process;
+ (default YES)
   --enable-makefile-cache-monitor
                           auto-refresh makefile cache when source makefiles
-                          change (default YES); auto-refresh entails very
-                          slight performance penalty but is more robust
+                          change
+ (default YES); auto-refresh entails very
+                          slight performance
+ penalty but is more robust
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-x                use the X Window System
   --with-libXxf86vm=dir   specify location of libXxf86vm if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-mesa             use Mesa OpenGL library if available (default YES)
   --with-libz=dir         specify location of libz if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libpng=dir       specify location of libpng if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libjpeg=dir      specify location of libjpeg if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libmng=dir       specify location of libmng if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libmikmod=dir    specify location of libmikmod if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libogg=dir       specify location of libogg if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libvorbis=dir    specify location of libvorbis if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libvorbisfile=dir
                           specify location of libvorbisfile if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libpgserver=dir  specify location of libpgserver if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-lib3ds=dir       specify location of lib3ds if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libode=dir       specify location of libode if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-ft-prefix=PREFIX
                           Prefix where FreeType is installed (optional)
   --with-ft-exec-prefix=PREFIX
                           Exec prefix where FreeType is installed (optional)
   --with-libvga=dir       specify location of libvga if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libcal3d=dir     specify location of libcal3d if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libCg=dir        specify location of libCg if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libCgGL=dir      specify location of libCgGL if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libbfd=dir       specify location of libbfd if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
 
 Some influential environment variables:
@@ -13553,8 +13589,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in `echo @@@-lddraw | sed 'y% %#%'` \
-    `echo @-I/usr/include/directx@@-lddraw -ldsound | sed 'y% %#%'`
+    for cs_build_item in `echo @@@-lddraw -ldsound -ldinput | sed 'y% %#%'` \
+    `echo @-I/usr/include/directx@@-lddraw -ldsound -ldinput | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -13626,10 +13662,13 @@ cat >>conftest.$ac_ext <<_ACEOF
 	#include <windows.h>
 	#include <ddraw.h>
 	#include <dsound.h>
+	#include <dinput.h>
 int
 main ()
 {
-DirectDrawCreate(0,0,0); DirectSoundCreate(0,0,0)
+DirectDrawCreate(0,0,0);
+	 DirectSoundCreate(0,0,0);
+	 DirectInputCreate(0,0,0,0)
   ;
   return 0;
 }
@@ -13695,8 +13734,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in `echo @@@-lddraw | sed 'y% %#%'` \
-    `echo @-I/usr/include/directx@@-lddraw -ldsound | sed 'y% %#%'`
+    for cs_build_item in `echo @@@-lddraw -ldsound -ldinput | sed 'y% %#%'` \
+    `echo @-I/usr/include/directx@@-lddraw -ldsound -ldinput | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -13768,10 +13807,13 @@ cat >>conftest.$ac_ext <<_ACEOF
 	#include <windows.h>
 	#include <ddraw.h>
 	#include <dsound.h>
+	#include <dinput.h>
 int
 main ()
 {
-DirectDrawCreate(0,0,0); DirectSoundCreate(0,0,0)
+DirectDrawCreate(0,0,0);
+	 DirectSoundCreate(0,0,0);
+	 DirectInputCreate(0,0,0,0)
   ;
   return 0;
 }
@@ -25355,6 +25397,12 @@ done
 
 
 
+
+
+
+
+
+
 for ac_header in unistd.h \
     sys/types.h \
     sys/socket.h \
@@ -27730,9 +27778,11 @@ if diff $cache_file confcache >/dev/null 2>&1; then :; else
   fi
 fi
 rm -f confcache
-    { { echo "$as_me:$LINENO: error: unrecognized mode --enable-mode=$enableval; use
+    { { echo "$as_me:$LINENO: error: unrecognized mode --enable-mode=$enableval;
+ use
     \`optimize', \`debug', or \`profile'" >&5
-echo "$as_me: error: unrecognized mode --enable-mode=$enableval; use
+echo "$as_me: error: unrecognized mode --enable-mode=$enableval;
+ use
     \`optimize', \`debug', or \`profile'" >&2;}
    { (exit 1); exit 1; }; } ;;
     esac

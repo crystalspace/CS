@@ -1,0 +1,9 @@
+SubDir TOP apps tests joytest ;
+
+Application joytest
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith joytest : csgeom csgfx cstool csutil ;
+
+Help joytest : "Joystick Test" ;
+

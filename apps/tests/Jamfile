@@ -4,6 +4,7 @@ SubInclude TOP apps tests awstest ;
 SubInclude TOP apps tests eventtest ;
 SubInclude TOP apps tests g2dtest ;
 SubInclude TOP apps tests gfxtst ;
+SubInclude TOP apps tests joytest ;
 SubInclude TOP apps tests lghtngtest ;
 SubInclude TOP apps tests mottest ;
 SubInclude TOP apps tests netmtst ;

@@ -1,0 +1,13 @@
+SubDir TOP plugins device joystick windows ;
+
+if $(DIRECTX.AVAILABLE) = "yes" 
+{
+Plugin joywin
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith joywin : csutil ;
+ExternalLibs joywin :  DIRECTX ;
+
+Help joywin : "Crystal Space Joystick plugin for Windows" ;
+}
+
