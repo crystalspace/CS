@@ -503,7 +503,7 @@ int csSprite2DMeshObject::Sprite2DState::GetUVAnimationCount ()
 iSprite2DUVAnimation *csSprite2DMeshObject::Sprite2DState::CreateUVAnimation ()
 { return scfParent->factory->CreateUVAnimation ();}
 void csSprite2DMeshObject::Sprite2DState::RemoveUVAnimation (iSprite2DUVAnimation *anim)
-{ return scfParent->factory->RemoveUVAnimation (anim); }
+{ scfParent->factory->RemoveUVAnimation (anim); }
 iSprite2DUVAnimation *csSprite2DMeshObject::Sprite2DState::GetUVAnimation (const char *name)
 { return scfParent->factory->GetUVAnimation (name); }
 iSprite2DUVAnimation *csSprite2DMeshObject::Sprite2DState::GetUVAnimation (int idx)
