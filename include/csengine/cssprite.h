@@ -32,10 +32,12 @@ class csTextureList;
 class csTextureHandle;
 class csTriangleMesh;
 class csLightHitsSprite;
+class csSkeleton;
+class csSkeletonState;
 interface ITextureHandle;
 
 /**
- * A frame for a 3D sprite animation.
+ * A frame for 3D sprite animation.
  */
 class csFrame : public csBase
 {
@@ -58,6 +60,12 @@ public:
     vertices[i].x = x;
     vertices[i].y = y;
     vertices[i].z = z;
+  }
+  void SetVertex (int i, const csVector3& v)
+  {
+    vertices[i].x = v.x;
+    vertices[i].y = v.y;
+    vertices[i].z = v.z;
   }
   ///
   void SetTexel (int i, float u, float v)
@@ -100,8 +108,11 @@ public:
   /**
    * Compute all normals in this frame given the
    * mesh which connects the vertices in the frame.
+   * The vertex array is also given. Note that the vertex
+   * array from the frame is not used because it is possible
+   * that the vertices are computed using a skeleton.
    */
-  void ComputeNormals (csTriangleMesh* mesh, int num_vertices);
+  void ComputeNormals (csTriangleMesh* mesh, csVector3* object_verts, int num_vertices);
 };
 
 /**
@@ -161,6 +172,9 @@ private:
   /// The triangles.
   csTriangleMesh* base_mesh;
 
+  /// An optional skeleton.
+  csSkeleton* skeleton;
+
   /**
    * The order in which to introduce levels in order to get to a higher LOD.
    * The index of this array is the vertex number which is introduced.
@@ -181,9 +195,6 @@ public:
   /// Destroy the template
   virtual ~csSpriteTemplate ();
 
-  /// Query the number of vertices
-  int GetNumVertices () { return num_vertices; }
-
   /**
    * Create a new sprite for this template.
    * The 'default' action will be made default. If there is
@@ -197,6 +208,12 @@ public:
    */
   csTriangleMesh* GetBaseMesh () { return base_mesh; }
 
+  /// Set the skeleton for this sprite template.
+  void SetSkeleton (csSkeleton* sk);
+
+  /// Get the skeleton for this sprite template.
+  csSkeleton* GetSkeleton () { return skeleton; }
+
   /// Get the 'emerge_from' array from which you can construct triangles.
   int* GetEmergeFrom () { return emerge_from; }
 
@@ -207,8 +224,11 @@ public:
    */
   void GenerateLOD ();
 
-  /// Set the number of vertices
+  /// Set the number of vertices.
   void SetNumVertices (int v) { num_vertices = v; }
+
+  /// Query the number of vertices.
+  int GetNumVertices () { return num_vertices; }
 
   /// Create and add a new frame to the sprite.
   csFrame* AddFrame ();
@@ -246,12 +266,28 @@ public:
 
 /**
  * A 3D sprite based on a triangle mesh with a single texture.
- * Animation is done with frames.
+ * Animation is done with frames (a frame may be controlled by
+ * a skeleton).
  */
 class csSprite3D : public csObject
 {
   friend Dumper;
   friend csCollider;
+
+private:
+  /// Static vertex array.
+  static csVector3* tr_verts;
+  /// Static z array.
+  static float* z_verts;
+  /// Static uv array.
+  static csVector2* uv_verts;
+  /// The perspective corrected vertices.
+  static csVector2* persp;
+  /// Array which indicates which vertices are visible and which are not.
+  static bool* visible;
+
+  /// Update the above tables with a new size.
+  static void UpdateWorkTables (int max_size);
 
 public:
   /// List of sectors where this sprite is.
@@ -300,15 +336,6 @@ private:
   /// The current action.
   csSpriteAction* cur_action;
 
-  /// The transformed frame (from object->camera space).
-  csFrame* tr_frame;
-
-  /// The perspective corrected vertices (screen space) for tr_frame.
-  csVector2* persp;
-
-  /// Array which indicates which vertices are visible and which are not.
-  bool* visible;
-
   /// The last frame time action
   int last_time;
 
@@ -319,6 +346,9 @@ private:
    * List of light-hits-sprites for this sprite.
    */
   csLightHitsSprite* dynamiclights;
+
+  /// Skeleton state (optional).
+  csSkeletonState* skeleton_state;
 
 public:
   ///
@@ -331,6 +361,9 @@ public:
 
   ///
   csSpriteTemplate* GetTemplate () { return tpl; }
+
+  /// Get the skeleton state for this sprite.
+  csSkeletonState* GetSkeletonState () { return skeleton_state; }
 
   /// force a new texture skin other than default
   void SetTexture (char * name, csTextureList* textures);
@@ -372,7 +405,7 @@ public:
   void UnsetTexture ()
   { force_otherskin = false; }
 
-  //Sets the mode that is used, when drawing that sprite.
+  /// Sets the mode that is used, when drawing that sprite.
   void SetMixmode(DPFXMixMode m, float a) {MixMode = m; Alpha = a;}
 
   /**
