@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+17-Jun-2002
+	- Worked further on the tiled coverage buffer in Dynavis.
+	- Fixed bug in handling of 'analyze_vis' command in Dynavis.
+	- Tiled coverage buffer is still not working properly. Work
+	  in progress.
 16-Jun-2002
 	- Fixed a bug in csTiledCoverageBuffer::Debug_Dump().
 	- Fixed a bug in the tiled coverage buffer. The operations

@@ -1391,6 +1391,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     fflush (stdout);
 
     delete excul;
+    return true;
   }
   return false;
 }

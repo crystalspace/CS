@@ -170,6 +170,11 @@ public:
   void PushFullVLine (int x);
 
   /**
+   * Flush all operations in a tile and render them on the coverage_cache.
+   */
+  void FlushOperations ();
+
+  /**
    * Flush all operations in a tile given the fvalue from the
    * previous tile and return the new fvalue (also in fvalue).
    * This is the 1-bit implementation of Flush. A 3-bit implementation
@@ -194,6 +199,16 @@ public:
    * are given relative to top-left coordinate of this tile.
    */
   bool TestPoint (int x, int y, float testdepth);
+
+  /**
+   * Give a textual dump of this tile.
+   */
+  iString* Debug_Dump ();
+
+  /**
+   * Give a textual dump of the coverage cache.
+   */
+  iString* Debug_Dump_Cache ();
 };
 
 /**

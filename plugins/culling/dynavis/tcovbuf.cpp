@@ -15,6 +15,7 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "csutil/scfstr.h"
@@ -89,6 +90,7 @@ void csCoverageTile::PushLine (int x1, int y1, int x2, int y2, int dx)
   op.x2 = x2;
   op.y2 = y2;
   op.dx = dx;
+//printf ("        LINE %d,%d - %d,%d (dx=%d)\n", x1>>16, y1, x2>>16, y2, dx);
 }
 
 void csCoverageTile::PushVLine (int x, int y1, int y2)
@@ -104,6 +106,7 @@ void csCoverageTile::PushVLine (int x, int y1, int y2)
   op.x1 = x;
   op.y1 = y1;
   op.y2 = y2;
+//printf ("        VLINE %d    %d - %d\n", x>>16, y1, y2);
 }
 
 void csCoverageTile::PushFullVLine (int x)
@@ -113,6 +116,72 @@ void csCoverageTile::PushFullVLine (int x)
   csLineOperation& op = AddOperation ();
   op.op = OP_FULLVLINE;
   op.x1 = x;
+//printf ("        FULLVLINE %d\n", x>>16);
+}
+
+void csCoverageTile::FlushOperations ()
+{
+  int i;
+
+  memset (coverage_cache, 0, sizeof (csBits64)*32);
+
+  // First draw all lines.
+  for (i = 0 ; i < num_operations ; i++)
+  {
+    csLineOperation& op = operations[i];
+    if (op.op == OP_FULLVLINE)
+    {
+      CS_ASSERT (op.x1 >= 0 && op.x1 <= (32<<16));
+      coverage_cache[op.x1 >> 16].Invert ();
+    }
+    else if (op.op == OP_VLINE)
+    {
+      CS_ASSERT (op.x1 >= 0 && op.x1 <= (32<<16));
+      CS_ASSERT (op.y1 >= 0);
+      CS_ASSERT (op.y1 <= 63);
+      CS_ASSERT (op.y2 >= 0);
+      CS_ASSERT (op.y2 <= 63);
+      int y1, y2;
+      if (op.y1 < op.y2) { y1 = op.y1; y2 = op.y2; }
+      else { y1 = op.y2; y2 = op.y1; }
+      const csBits64& start = precalc_start_lines[y2];
+      const csBits64& end = precalc_end_lines[y1];
+      // Xor the line with the coverage cache. This happens in three stages:
+      csBits64& cc = coverage_cache[op.x1 >> 16];
+      cc ^= start;
+      cc ^= end;
+      cc.Invert ();
+    }
+    else // OP_LINE
+    {
+      CS_ASSERT (op.x1 >= 0 && op.x1 <= (32<<16));
+      CS_ASSERT (op.x2 >= 0 && op.x2 <= (32<<16));
+      CS_ASSERT (op.y1 >= 0);
+      CS_ASSERT (op.y1 <= 63);
+      CS_ASSERT (op.y2 >= 0);
+      CS_ASSERT (op.y2 <= 63);
+      int x1, y1, x2, y2;
+      if (op.y1 < op.y2) { x1 = op.x1; y1 = op.y1; x2 = op.x2; y2 = op.y2; }
+      else { x1 = op.x2; y1 = op.y2; x2 = op.x1; y2 = op.y1; }
+      int dy = y2-y1;
+      int x = x1;
+      int y = y1;
+      int dx = op.dx;
+      while (dy >= 0)
+      {
+	CS_ASSERT ((x>>16) >= 0);
+	CS_ASSERT ((x>>16) < 32);
+	csBits64& cc = coverage_cache[x >> 16];
+	cc.XorBit (y);
+        x += dx;
+        y++;
+        dy--;
+      }
+    }
+  }
+
+  // Clear all operations.
+  num_operations = 0;
 }
 
 void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
@@ -154,65 +223,11 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
 	fvalue.Invert ();
       }
     }
+    num_operations = 0;
   }
   else
   {
-    memset (coverage_cache, 0, sizeof (csBits64)*32);
-
-    // First draw all lines.
-    for (i = 0 ; i < num_operations ; i++)
-    {
-      csLineOperation& op = operations[i];
-      if (op.op == OP_FULLVLINE)
-      {
-        CS_ASSERT (op.x1 >= 0 && op.x1 <= (32<<16));
-	coverage_cache[op.x1 >> 16].Invert ();
-      }
-      else if (op.op == OP_VLINE)
-      {
-        CS_ASSERT (op.x1 >= 0 && op.x1 <= (32<<16));
-	CS_ASSERT (op.y1 >= 0);
-	CS_ASSERT (op.y1 <= 63);
-	CS_ASSERT (op.y2 >= 0);
-	CS_ASSERT (op.y2 <= 63);
-	int y1, y2;
-	if (op.y1 < op.y2) { y1 = op.y1; y2 = op.y2; }
-	else { y1 = op.y2; y2 = op.y1; }
-	const csBits64& start = precalc_start_lines[y2];
-	const csBits64& end = precalc_end_lines[y1];
-	// Xor the line with the coverage cache. This happens in three stages:
-	csBits64& cc = coverage_cache[op.x1 >> 16];
-	cc ^= start;
-	cc ^= end;
-	cc.Invert ();
-      }
-      else // OP_LINE
-      {
-        CS_ASSERT (op.x1 >= 0 && op.x1 <= (32<<16));
-        CS_ASSERT (op.x2 >= 0 && op.x2 <= (32<<16));
-	CS_ASSERT (op.y1 >= 0);
-	CS_ASSERT (op.y1 <= 63);
-	CS_ASSERT (op.y2 >= 0);
-	CS_ASSERT (op.y2 <= 63);
-	int x1, y1, x2, y2;
-	if (op.y1 < op.y2) { x1 = op.x1; y1 = op.y1; x2 = op.x2; y2 = op.y2; }
-	else { x1 = op.x2; y1 = op.y2; x2 = op.x1; y2 = op.y1; }
-	int dy = y2-y1;
-        int x = x1;
-        int y = y1;
-        int dx = op.dx;
-        while (dy > 0)
-        {
-	  CS_ASSERT ((x>>16) >= 0);
-	  CS_ASSERT ((x>>16) < 32);
-	  csBits64& cc = coverage_cache[x >> 16];
-	  cc.XorBit (y);
-          x += dx;
-          y++;
-          dy--;
-        }
-      }
-    }
+    FlushOperations ();
 
     // Now perform the XOR sweep and OR with main coverage buffer.
     // fvalue will be the modified from left to right and will be
@@ -290,9 +305,6 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
       }
     }
   }
-
-  // Clear all operations.
-  num_operations = 0;
 }
 
 bool csCoverageTile::TestFullRect (float testdepth)
@@ -338,6 +350,95 @@ bool csCoverageTile::TestPoint (int x, int y, float testdepth)
 
   const csBits64& c = coverage[x];
   return !c.TestBit (y);
+}
+
+iString* csCoverageTile::Debug_Dump ()
+{
+  scfString* rc = new scfString ();
+  csString& str = rc->GetCsString ();
+
+  csString ss;
+  ss.Format ("full=%d queue_empty=%d blocks_full=%08lx blocks_part=%08lx\n",
+  	tile_full, queue_tile_empty, blocks_full, blocks_partial);
+  str.Append (ss);
+  ss.Format ("  d %g,%g,%g,%g\n", depth[0], depth[1], depth[2], depth[3]);
+  str.Append (ss);
+  ss.Format ("  d %g,%g,%g,%g\n", depth[4], depth[5], depth[6], depth[7]);
+  str.Append (ss);
+  ss.Format ("  d %g,%g,%g,%g\n", depth[8], depth[9], depth[10], depth[11]);
+  str.Append (ss);
+  ss.Format ("  d %g,%g,%g,%g\n", depth[12], depth[13], depth[14], depth[15]);
+  str.Append (ss);
+  ss.Format ("  d %g,%g,%g,%g\n", depth[16], depth[17], depth[18], depth[19]);
+  str.Append (ss);
+  ss.Format ("  d %g,%g,%g,%g\n", depth[20], depth[21], depth[22], depth[23]);
+  str.Append (ss);
+  ss.Format ("  d %g,%g,%g,%g\n", depth[24], depth[25], depth[26], depth[27]);
+  str.Append (ss);
+  ss.Format ("  d %g,%g,%g,%g\n", depth[28], depth[29], depth[30], depth[31]);
+  str.Append (ss);
+  int i;
+  for (i = 0 ; i < num_operations ; i++)
+  {
+    ss.Format ("  op %d ", i);
+    str.Append (ss);
+    csLineOperation& op = operations[i];
+    switch (op.op)
+    {
+      case OP_LINE: ss.Format ("LINE %d,%d - %d,%d   dx=%d\n",
+      	op.x1>>16, op.y1, op.x2>>16, op.y2, op.dx);
+	str.Append (ss);
+	break;
+      case OP_VLINE: ss.Format ("VLINE x=%d y1=%d y2=%d\n",
+      	op.x1>>16, op.y1, op.y2);
+	str.Append (ss);
+        break;
+      case OP_FULLVLINE: ss.Format ("FULLVLINE x=%d\n", op.x1>>16);
+        str.Append (ss);
+        break;
+      default: str.Append ("???\n");
+        break;
+    }
+  }
+  str.Append ("          1    1    2    2    3  \n");
+  str.Append ("0    5    0    5    0    5    0  \n");
+  for (i = 0 ; i < 64 ; i++)
+  {
+    int j;
+    for (j = 0 ; j < 32 ; j++)
+    {
+      const csBits64& c = coverage[j];
+      str.Append (c.TestBit (i) ? "#" : ".");
+    }
+    ss.Format (" %d\n", i);
+    str.Append (ss);
+  }
+
+  return rc;
+}
+
+iString* csCoverageTile::Debug_Dump_Cache ()
+{
+  scfString* rc = new scfString ();
+  csString& str = rc->GetCsString ();
+  csString ss;
+
+  int i;
+  str.Append ("          1    1    2    2    3  \n");
+  str.Append ("0    5    0    5    0    5    0  \n");
+  for (i = 0 ; i < 64 ; i++)
+  {
+    int j;
+    for (j = 0 ; j < 32 ; j++)
+    {
+      const csBits64& c = coverage_cache[j];
+      str.Append (c.TestBit (i) ? "#" : ".");
+    }
+    ss.Format (" %d\n", i);
+    str.Append (ss);
+  }
+
+  return rc;
 }
 
 //---------------------------------------------------------------------------
@@ -411,6 +512,7 @@ void csTiledCoverageBuffer::Initialize ()
 void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
 	int yfurther)
 {
+//printf ("draw line %d,%d - %d,%d (yfurther=%d)\n", x1, y1, x2, y2, yfurther);
   y2 += yfurther;
 
   if (y2 < 0 || y1 >= height)
@@ -423,6 +525,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
 
   if (x1 <= 0 && x2 <= 0)
   {
+//printf ("  CLAMP\n");
     //------
     // Totally on the left side. Just clamp.
     //------
@@ -434,19 +537,21 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
 
     // First calculate tile coordinates of x1,y1 and x2,y2.
     int tile_y1 = y1 >> 6;
-    int tile_y2 = y2 >> 6;
+    int tile_y2 = (y2-1) >> 6;
     csCoverageTile* tile = GetTile (0, tile_y1);
 
     if (tile_y1 == tile_y2)
     {
+//printf ("    ONE TILE\n");
       //------
       // All is contained in one tile.
       //------
-      tile->PushVLine (0, y1 & 63, y2 & 63);
+      tile->PushVLine (0, y1 & 63, (y2-1) & 63);
       if (!tile->IsFull ()) MarkTileDirty (0, tile_y1);
     }
     else
     {
+//printf ("    MULTIPLE TILES\n");
       //------
       // Multiple tiles. First do first tile, then intermediate tiles,
       // and finally the last tile.
@@ -461,13 +566,14 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
 	if (!tile->IsFull ()) MarkTileDirty (0, t);
       }
       tile += width_po2 >> 5;
-      tile->PushVLine (0, 0, y2 & 63);
+      tile->PushVLine (0, 0, (y2-1) & 63);
       if (!tile->IsFull ()) MarkTileDirty (0, tile_y2);
     }
     return;
   }
   else if (x1 >= width && x2 >= width)
   {
+//printf ("  DROP\n");
     //------
     // Lines on the far right can just be dropped since they
     // will have no effect on the coverage buffer.
@@ -476,6 +582,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   }
   else if (x1 == x2)
   {
+//printf ("  FULLY VERTICAL\n");
     //------
     // If line is fully vertical we also have a special case that
     // is easier to resolve.
@@ -488,21 +595,23 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     // First calculate tile coordinates of x1,y1 and x2,y2.
     int tile_x = x1 >> 5;	// tile_x1 == tile_x2
     int tile_y1 = y1 >> 6;
-    int tile_y2 = y2 >> 6;
+    int tile_y2 = (y2-1) >> 6;
     x1 &= 31;
     x1 <<= 16;
 
     csCoverageTile* tile = GetTile (tile_x, tile_y1);
     if (tile_y1 == tile_y2)
     {
+//printf ("    ONE TILE\n");
       //------
       // All is contained in one tile.
       //------
-      tile->PushVLine (x1, y1 & 63, y2 & 63);
+      tile->PushVLine (x1, y1 & 63, (y2-1) & 63);
       if (!tile->IsFull ()) MarkTileDirty (tile_x, tile_y1);
     }
     else
     {
+//printf ("    MULTIPLE TILES\n");
       //------
       // Multiple tiles. First do first tile, then intermediate tiles,
       // and finally the last tile.
@@ -517,7 +626,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
 	if (!tile->IsFull ()) MarkTileDirty (tile_x, t);
       }
       tile += width_po2 >> 5;
-      tile->PushVLine (x1, 0, y2 & 63);
+      tile->PushVLine (x1, 0, (y2-1) & 63);
       if (!tile->IsFull ()) MarkTileDirty (tile_x, tile_y2);
     }
     return;
@@ -538,6 +647,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     y2 = height-1;
     yfurther = 0;
   }
+//printf ("  GENERAL CASE after clip: %d,%d - %d,%d\n", x1, y1, x2, y2);
   if (y1 == y2) return;	// Return if clipping results in one pixel.
 
   //------
@@ -546,24 +656,27 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   int tile_x1 = x1 >> 5;
   int tile_y1 = y1 >> 6;
   int tile_x2 = x2 >> 5;
-  int tile_y2 = y2 >> 6;
+  int tile_y2 = (y2-1) >> 6;
 
 # define xmask ((32<<16)-1)
 
   if (tile_x1 == tile_x2 && tile_y1 == tile_y2)
   {
+//printf ("    ONE TILE\n");
     //------
     // Easy case. The line segment is fully inside one tile.
     //------
     int dy = y2-y1;
     int dx = ((x2-x1)<<16) / (dy-yfurther);
     csCoverageTile* tile = GetTile (tile_x1, tile_y1);
-    tile->PushLine ((x1 & 31) << 16, y1 & 63, (x2 & 31) << 16, y2 & 63, dx);
+    tile->PushLine ((x1 & 31) << 16, y1 & 63, ((x2 & 31) << 16)-dx,
+    	(y2-1) & 63, dx);
     if (!tile->IsFull ()) MarkTileDirty (tile_x1, tile_y1);
     return;
   }
   else if (tile_x1 == tile_x2)
   {
+//printf ("    NEARLY VERTICAL\n");
     //------
     // Line is nearly vertical. This means we will stay in the same
     // column of tiles.
@@ -587,7 +700,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       x = xt+dx;
     }
     tile += width_po2 >> 5;
-    tile->PushLine (x & xmask, 0, x2 & xmask, y2 & 63, dx);
+    tile->PushLine (x & xmask, 0, (x2 & xmask) - dx, (y2-1) & 63, dx);
     if (!tile->IsFull ()) MarkTileDirty (tile_x1, tile_y2);
     return;
   }
@@ -596,6 +709,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   // This is the most general case and it is extremely slow.
   // @@@ NEED A BETTER ALGO HERE!!!
   //------
+//printf ("    MOST GENERIC\n");
   int dy = y2-y1;
 
   int x = x1<<16;
@@ -607,6 +721,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   // screen (to the right). If that's the case we first do a small loop to
   // skip that initial part. @@@ Not efficient!
   //------
+//if (dy > 0 && x >= (width<<16))printf ("      SKIP CLIP-RIGHT\n");
   while (dy > 0 && x >= (width<<16))
   {
     x += dx;
@@ -630,21 +745,18 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   if (x <= 0)
   {
     need_to_finish = false;
+//if (dy > 0 && x <= 0)printf ("      SKIP CLAMP-LEFT\n");
     while (dy > 0 && x <= 0)
     {
+      need_to_finish = true;
       int tile_y = y >> 6;
       if (cur_tile_y != tile_y)
       {
         csCoverageTile* tile = GetTile (0, cur_tile_y);
         tile->PushVLine (0, last_y & 63, (y-1) & 63);
         if (!tile->IsFull ()) MarkTileDirty (0, cur_tile_y);
-	need_to_finish = false;
         cur_tile_y = tile_y;
         last_y = y;
-      }
-      else
-      {
-        need_to_finish = true;
       }
 
       x += dx;
@@ -676,29 +788,29 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   cur_tile_x = x >> (16+5);
   cur_tile_y = y >> 6;
 
+//printf ("      REMAINDER %d,%d\n", x>>16, y);
+
   //------
   // Here is the remainder of the line until we go out screen again.
   //------
   need_to_finish = false;
   while (dy > 0 && x > 0 && x < (width<<16))
   {
+    need_to_finish = true;
     int tile_x = x >> (16+5);
     int tile_y = y >> 6;
+//printf ("        dy=%d x>>16=%d y=%d tile_x=%d tile_y=%d\n", dy, x>>16, y, tile_x, tile_y);
     if (cur_tile_x != tile_x || cur_tile_y != tile_y)
     {
+//printf ("        cur_tile_x=%d cur_tile_y=%d\n", tile_x, tile_y);
       csCoverageTile* tile = GetTile (cur_tile_x, cur_tile_y);
       tile->PushLine (last_x & xmask, last_y & 63, (x-dx) & xmask,
       	(y-1) & 63, dx);
       if (!tile->IsFull ()) MarkTileDirty (cur_tile_x, cur_tile_y);
-      need_to_finish = false;
       cur_tile_x = tile_x;
       cur_tile_y = tile_y;
       last_x = x;
       last_y = y;
-    }
-    else
-    {
-      need_to_finish = true;
     }
 
     x += dx;
@@ -708,6 +820,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
 
   if (need_to_finish)
   {
+//printf ("        need_to_finish!\n");
     //int tile_x = (x-dx) >> (16+5);
     //int tile_y = (y-1) >> 6;
     csCoverageTile* tile = GetTile (cur_tile_x, cur_tile_y);
@@ -731,19 +844,15 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     need_to_finish = false;
     while (dy > 0 && x <= 0)
     {
+      need_to_finish = true;
       int tile_y = y >> 6;
       if (cur_tile_y != tile_y)
       {
         csCoverageTile* tile = GetTile (0, cur_tile_y);
         tile->PushVLine (0, last_y & 63, (y-1) & 63);
         if (!tile->IsFull ()) MarkTileDirty (0, cur_tile_y);
-	need_to_finish = false;
         cur_tile_y = tile_y;
         last_y = y;
-      }
-      else
-      {
-        need_to_finish = true;
       }
 
       x += dx;
@@ -1164,31 +1273,77 @@ iString* csTiledCoverageBuffer::Debug_UnitTest ()
   csString& str = rc->GetCsString ();
 
   csVector2 poly[4];
+  //csCoverageTile* t;
+  iString* s;
+
+  //Initialize ();
+  //COV_ASSERT (TestPoint (csVector2 (100, 100), 5) == true, "tp");
+  //poly[0].Set (50, 50);
+  //poly[1].Set (600, 50);
+  //poly[2].Set (600, 430);
+  //poly[3].Set (50, 430);
+  //InsertPolygon (poly, 4, 10.0);
+  //COV_ASSERT (TestPoint (csVector2 (100, 100), 5) == true, "tp");
+  //COV_ASSERT (TestPoint (csVector2 (100, 100), 15) == false, "tp");
+  //COV_ASSERT (TestPoint (csVector2 (599, 100), 5) == true, "tp");
+  //COV_ASSERT (TestPoint (csVector2 (599, 100), 15) == false, "tp");
+  //COV_ASSERT (TestPoint (csVector2 (601, 100), 5) == true, "tp");
+  //COV_ASSERT (TestPoint (csVector2 (601, 100), 15) == true, "tp");
 
   Initialize ();
-  COV_ASSERT (TestPoint (csVector2 (100, 100), 5) == true, "tp");
-  poly[0].Set (50, 50);
-  poly[1].Set (600, 50);
-  poly[2].Set (600, 430);
-  poly[3].Set (50, 430);
-  InsertPolygon (poly, 4, 10.0);
-  COV_ASSERT (TestPoint (csVector2 (100, 100), 5) == true, "tp");
-  COV_ASSERT (TestPoint (csVector2 (100, 100), 15) == false, "tp");
-  COV_ASSERT (TestPoint (csVector2 (599, 100), 5) == true, "tp");
-  COV_ASSERT (TestPoint (csVector2 (599, 100), 15) == false, "tp");
-  COV_ASSERT (TestPoint (csVector2 (601, 100), 5) == true, "tp");
-  COV_ASSERT (TestPoint (csVector2 (601, 100), 15) == true, "tp");
+  poly[0].Set (194, 315);
+  poly[1].Set (358, 203);
+  poly[2].Set (443, 376);
+  InsertPolygon (poly, 3, 10.0);
+s=Debug_Dump ();
+printf ("%s\n", s->GetData ());
+s->DecRef ();
+    COV_ASSERT (TestPoint (csVector2 (194-5, 315), 15) == true, "tp");
 
-  Initialize ();
-  poly[0].Set (50, 50);
-  poly[1].Set (600, 400);
-  poly[2].Set (600, 430);
-  poly[3].Set (50, 70);
-  InsertPolygon (poly, 4, 10.0);
 
-iString* sss = Debug_Dump ();
-printf ("%s\n", sss->GetData ());
-sss->DecRef ();
+
+  int i;
+  for (i = 0 ; i < 10000 ; i++)
+  {
+    Initialize ();
+    float x1 = rnd (640, 10, 330);
+    float y1 = rnd (480, 1, 1);
+    float x2 = rnd (640, 330, 10);
+    float y2 = rnd (480, 1, 230);
+    float x3 = rnd (640, 330, 10);
+    float y3 = rnd (480, 250, 1);
+    float cx = (x1+x2+x3)/3.0;
+    float cy = (y1+y2+y3)/3.0;
+    poly[0].Set (x1, y1);
+    poly[1].Set (x2, y2);
+    poly[2].Set (x3, y3);
+    InsertPolygon (poly, 3, 10.0);
+printf ("%g,%g  %g,%g  %g,%g  (%g,%g)\n", x1, y1, x2, y2, x3, y3, cx, cy); fflush (stdout);
+s=Debug_Dump ();
+printf ("%s\n", s->GetData ());
+s->DecRef ();
+    COV_ASSERT (TestPoint (csVector2 (x1-5, y1), 15) == true, "tp");
+    COV_ASSERT (TestPoint (csVector2 (x2+5, y2), 15) == true, "tp");
+    COV_ASSERT (TestPoint (csVector2 (x3+5, y3), 15) == true, "tp");
+    COV_ASSERT (TestPoint (csVector2 (cx, cy), 5) == true, "tp");
+    COV_ASSERT (TestPoint (csVector2 (cx, cy), 15) == false, "tp");
+  }
+
+  //Initialize ();
+  //poly[0].Set (50, 50);
+  //poly[1].Set (600, 400);
+  //poly[2].Set (600, 430);
+  //poly[3].Set (50, 70);
+  //InsertPolygon (poly, 4, 10.0);
+//
+//s = Debug_Dump ();
+//printf ("%s\n", s->GetData ());
+//s->DecRef ();
+
+  //Initialize ();
+  //DrawLine (-10, 10, -40, 40, 0);
+  //t = GetTile (0, 0); t->FlushOperations ();
+  //s = t->Debug_Dump_Cache (); printf ("%s\n", s->GetData ()); s->DecRef ();
 
   rc->DecRef ();
   return NULL;
