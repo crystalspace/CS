@@ -3,7 +3,7 @@
 
     This document was written by Eric Sunshine <sunshine@sunshineco.com>
     Copyright (C)1999 by Eric Sunshine
-    1999/10/11
+    1999/11/19
 
     Also see INSTALL.NeXT for installation details.
 ===============================================================================
@@ -574,6 +574,14 @@ This is a list of known problems with the current release of this project.
 
 10. History
 -----------
+1999/11/15 (15r000+CVS)
+    Performed the SCF conversion on the NextStep port.  This involved working
+        around severe mulitple-inheritance bugs in the compiler.
+
+1999/11/12 (15r000+CVS)
+    Performed the SCF conversion on the MacOS/X Server and OpenStep ports.
+        Additionally fixed a lot of other SCF-related bugs in the system.
+
 1999/10/11 (15r000+CVS)
     Provided additional work around for the register allocation bug in the
         OpenStep compiler which corrupts virtual table pointers when compiling
@@ -587,6 +595,9 @@ This is a list of known problems with the current release of this project.
         application to crash when querying COM for the halo rasterizer.  In
         order to fix the problem, I reworked csGraphics3DSoftware so that it
         implements IHaloRasterizer via composition rather than inheritence.
+	[1999/10/21 -- I discovered, after the fact, that the bug was actaully
+	the well-known "'const' table with undeclared size" compiler bug.  It
+	was apparently unrelated to multiple-inheritance.]
 
 1999/10/10 (15r000+CVS)
     Reworked dynamic linking so that it deals gracefully with the case when it
@@ -658,8 +669,7 @@ This is a list of known problems with the current release of this project.
     Added a 'distclean' target to the makefile.
     Removed redundant code and hard-coded constants from Makefile and cs.mak.
     Updated makefiles so that drivers2d, drivers3d, netdrivers, snddrivers,
-        and drivers targets work even for platforms which specify
-	USE_SHARED_PLUGINS=no.
+        and drivers targets work even for platforms which specify USE_DLL=no.
     Updated PrimEdit to work with beta 13.
     Now TARGET_ARCHS is a "sticky" option, specified at configuration time.
     Worked around compiler bug in OpenStep 4.2 where compiler corrupts virtual
