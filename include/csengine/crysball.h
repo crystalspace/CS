@@ -51,16 +51,16 @@
 
 class csCrystalBall
 {
-  class crysVec : public csVector3
+  class csCrystalBallVec : public csVector3
   {
   protected:
     int idx; // holds the index of the polygon
   public:
-    crysVec (int polyidx) { idx = polyidx; }
+    csCrystalBallVec (int polyidx) { idx = polyidx; }
     inline int GetIndex () { return idx; }
   };
 
-  class trinode : public csTreeNode
+  class csTriNode : public csTreeNode
   {
   public:
     enum 
@@ -71,11 +71,11 @@ class csCrystalBall
 
     int from, len; // contains <len> points in vPoints starting at <from>
     int divider; // index to point that divides this triangle
-    trinode (trinode *theParent=NULL, int from=-1, int len=0) : csTreeNode (theParent)
+    csTriNode (csTriNode *theParent=NULL, int from=-1, int len=0) : csTreeNode (theParent)
       {this->from = from; this->len = len;}
     
     // find a triangle for <normal> and return the index where its been inserted into vP
-    int Add (const crysVec *normal, int tri1, int tri2, int tri3, 
+    int Add (const csCrystalBallVec *normal, int tri1, int tri2, int tri3, 
 	      csVector *vP, csVector *vTP);
 
     // adjust (from,len) pairs after a new point was inserted
@@ -107,7 +107,7 @@ class csCrystalBall
  protected:
   csVector vPoints;
   csVector vTrianglePoints;
-  trinode tri[8];
+  csTriNode tri[8];
   
  public:
   csCrystalBall ();
