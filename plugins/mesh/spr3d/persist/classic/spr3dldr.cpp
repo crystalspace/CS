@@ -375,6 +375,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iReporter* reporter,
 
   CS_TOKEN_TABLE_START (tok_matvec)
     CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (Q)
     CS_TOKEN_TABLE (V)
   CS_TOKEN_TABLE_END
 
@@ -435,6 +436,16 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iReporter* reporter,
 		  return false;
 		}
 		break;
+   	      case CS_TOKEN_Q: {
+		csQuaternion q;
+	        if (!load_quaternion (params2, q))
+	        {
+		  con->DecRef ();
+		  return false;
+	        }
+		m.Set(q);
+	        break;
+	      }
               case CS_TOKEN_V:
                 load_vector (params2, v);
 		break;

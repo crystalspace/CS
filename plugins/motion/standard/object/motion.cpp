@@ -145,27 +145,26 @@ void csMotionBone::SelectFrameForTime(float time, float *weight, int *curframe, 
   assert(nextframe);
 
   int i=0;
-  for(; i<framecount; i++) {
-    if(frames[i].frametime>time)
+  for(; i<framecount-1; i++) {
+    if(frames[i+1].frametime>time)
       break;
   }
-  if(i==framecount)
-      i--;
 
   //No Lerp needed
   if(frames[i].frametime==time) {
-    *weight=1;
+    *weight=1.0f;
     *curframe=i;
     *nextframe=-1;
     return;
   }
 
   //Lerp needed
-  float start=(time-frames[i].frametime);
-  float total=start+(frames[i+1].frametime-time);
-  *weight=start/total;
+  int ni=(i+1<framecount)?i+1:0; //TODO need to support LOOPFLIP()
+  float cur=time-frames[i].frametime;
+  float end=frames[ni].frametime-frames[i].frametime;
+  *weight=cur/end;
   *curframe=i;
-  *nextframe=(i+1<framecount)?i+1:0;
+  *nextframe=ni;
 }
 
 void csMotionBone::Animate(float time, csVector3 &v, csQuaternion &q, bool interpolate)
@@ -175,12 +174,11 @@ void csMotionBone::Animate(float time, csVector3 &v, csQuaternion &q, bool inter
   SelectFrameForTime(time, &frameweight, &curframe, &nextframe);
   if(nextframe>=0 && interpolate) {
     q=frames[curframe].rot.Slerp(frames[nextframe].rot, frameweight);
-    v=frameweight*frames[curframe].pos + (1.0f-frameweight)*frames[nextframe].pos;
+    v=(1.0f-frameweight)*frames[curframe].pos + frameweight*frames[nextframe].pos;
   } else {
     q=frames[curframe].rot;
     v=frames[curframe].pos;
   }
-//  MOT_DPRINTF(("Animate %d %f,%f,%f\n",curframe,frames[curframe].pos.x,frames[curframe].pos.y,frames[curframe].pos.z));
 }
 
 //************************************************************ Motion Controller
@@ -323,7 +321,7 @@ void csMotionController::Animate()
 
     csMotionStackItem *si=stack[bone->stacks[0]];
     csMotionBone* motbone=si->motion->bones[bone->boneids[0]];
-    motbone->Animate(si->frametime, v, q, 0); //TODO pass interpolate flag
+    motbone->Animate(si->frametime, v, q, 1); //TODO pass interpolate flag
 
 //TODO Enable stack interpolation    
 /*    for(int j=1; j<bone->nummotions; j++) {
@@ -333,7 +331,8 @@ void csMotionController::Animate()
       q=
       v=
     }*/
-    bone->bone->SetTransformation(csTransform(csMatrix3(q), v));
+    csMatrix3 m(q);
+    bone->bone->SetTransformation(csTransform(m, -m.GetInverse()*v));
   }
 }
 
@@ -360,10 +359,10 @@ void csMotionStackItem::DoLoop() {
 
   if(loopflip) {
     rate=-rate;
-    if(rate>=0) {
-      frametime=motion->duration-frametime;
+    if(rate<=0) {
+      frametime=motion->duration-(frametime-motion->duration);
     } else {
-      frametime-=motion->duration;
+      frametime=-frametime;
     }
   } else {
     if(rate>=0) {
@@ -379,7 +378,7 @@ bool csMotionStackItem::Update(float timedelta)
   frametime+=timedelta*rate;
 
   //Reset the frametime if looping animation, else expire the motion
-  while(frametime<0 || frametime>motion->duration) {
+  while(frametime<0 || frametime>=motion->duration) {
     if(loopcount != 0) {
       DoLoop();
     } else {
