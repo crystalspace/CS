@@ -162,6 +162,10 @@ SYS_SED_DEPEND=-e "s/\.ob*j*\:/\$$O:/g"
 
 # Flags for linking a GUI and a console executable
 LFLAGS.EXE=-mwindows
+# commenting out the following line will make the -noconsole option work
+# but the only way to redirect output will be WITH -noconsole (wacky :-)
+# and the console will not start minimized if a shortcut says it should
+LFLAGS.EXE+=-mconsole
 LFLAGS.CONSOLE.EXE=
 
 # Use makedep to build dependencies
@@ -174,6 +178,11 @@ ifeq ($(MAKESECTION),postdefines)
 
 # How to make a shared AKA dynamic library
 DO.SHARED.PLUGIN = dllwrap $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows
+
+# Commenting out the following line will make the -noconsole option work
+# but the only way to redirect output will be WITH -noconsole (wacky :-)
+# and the console will not start minimized if a shortcut says it should
+DO.SHARED.PLUGIN += -mconsole
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
