@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Jun-2004
+	- Jorrit fixed a bug in the FindByNameWithChild() function in the
+	  engine. This function would crash if there were unnamed meshes
+	  in the map file.
 7-Jun-2004
 	- Jorrit added an assignement operator to csHashMapReversible.
 	  This actually fixes the crash at exit bug for some of the CSWS

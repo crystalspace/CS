@@ -1107,7 +1107,8 @@ iMeshWrapper* csMeshList::FindByNameWithChild (const char *Name) const
   for (i = 0 ; i < list.Length () ; i++)
   {
     iMeshWrapper* m = list.Get (i);
-    if (!strncmp (m->QueryObject ()->GetName (), Name, p-Name))
+    const char* mn = m->QueryObject ()->GetName ();
+    if (mn && !strncmp (mn, Name, p-Name))
     {
       return m->GetChildren ()->FindByName (p+1);
     }
