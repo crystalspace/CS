@@ -45,14 +45,17 @@ class ctDampedPointMass : public ctPointObj, public ctEntity {
   void init_state() { v = ctVector3(0,0,0); }
   int get_state_size() { return 3; }
   int set_state(real *sa) {
+    printf("Set_state!\n");
     sa[0] = x[0]; sa[1] = x[1]; sa[2] = x[2];
     return get_state_size();
   }
   int get_state(real *sa) {
+    printf("Get_state!\n");
     x[0] = sa[0]; x[1] = sa[1]; x[2] = sa[2];
     return get_state_size();
   }
   int set_delta_state(real *sa) {
+    printf("Set_delta_state!\n");
     sa[0] = v[0]; sa[1] = v[1]; sa[2] = v[2];
     return get_state_size();
   }
@@ -88,16 +91,16 @@ class ctPointMass : public ctPointObj, public ctEntity {
   void set_force(ctVector3 force) { F = force; }
 
   // ctEntity methods
-  void init_state() { F = ctVector3(0,0,0); }
+  void init_state() { F[0] = F[1] = F[2] = 0.0; }
   int  get_state_size() { return 6; }
   int  set_state(real *sa) {
     sa[0] = x[0]; sa[1] = x[1]; sa[2] = x[2];
-    sa[3] = x[3]; sa[4] = x[4]; sa[5] = x[5];
+    sa[3] = v[0]; sa[4] = v[1]; sa[5] = v[2];
     return get_state_size();
   }
   int  get_state(const real *sa) {
     x[0] = sa[0]; x[1] = sa[1]; x[2] = sa[2];
-    x[3] = sa[3]; x[4] = sa[4]; x[5] = sa[5];
+    v[0] = sa[3]; v[1] = sa[4]; v[2] = sa[5];
     return get_state_size();
   }
   int set_delta_state(real *sa) {
