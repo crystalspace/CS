@@ -15,6 +15,15 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine brought simple.txi (the Simple tutorial) up to date.
 	- Eric Sunshine fixed several problems in the CrystalClear tutorial
 	  document.
+	- Release of 0.16r001.
+	- Andrew Zabolotny removed the ugly inclusion of iworld.h and
+	  isector.h from icmdmgr.h which in turn means that cssys depended
+	  on csengine.
+	- Andrew also removed the unneeded inclusion of lightdef.h from
+	  3D renderers. lightdef.h should go into include/csengine in the
+	  end.
+	- Norman Kramer did a coding style change to csTreeNode.
+	- Norman fixed glide renderer after Jorrit broke it yesterday.
 25-Jun-2000
 	- New tree control in CSWS from Norman Kramer.
 	- Did an experiment for speeding up OpenGL by putting the setup
