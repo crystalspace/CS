@@ -1,0 +1,10 @@
+SubDir TOP apps import md22spr ;
+
+Description md22spr : "Quake model MDL/MD2 conversion tool" ;
+
+Application md22spr
+	: [ Wildcard *.cpp *.h ]
+	: console
+;
+LinkWith md22spr : csgeom csgfx csutil ;
+

@@ -4,4 +4,4 @@ SubInclude TOP apps import 3ds2lev ;
 SubInclude TOP apps import map2cs ;
 SubInclude TOP apps import maya2spr ;
 SubInclude TOP apps import md32spr ;
-SubInclude TOP apps import mdl2spr ;
+SubInclude TOP apps import md22spr ;
