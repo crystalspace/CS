@@ -6,6 +6,25 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Sep-2003
+	- Jorrit changed the engine to create the stringset object in the
+	  object registry when this is not already done by the new renderer.
+	  This is also done with old renderer.
+	- Jorrit made the csStringID's in csMaterial static so that not
+	  every csMaterial instance has them.
+	- Jorrit added csStringID names for the four texture layers so that
+	  we can use the same API for iMaterial/iMaterialWrapper as the
+	  new renderer uses.
+	- Jorrit Removed iMaterial->GetTextureWrapper() which takes an index as
+	  a parameter. Instead we now use GetTextureWrapper() which takes
+	  a name. Added four names ('tex layer1'... ) to refer to the four
+	  texture layers.
+	- Jorrit removed csMaterial::SetTexture() with a texture handle
+	  as a parameter. Materials should NEVER refer to handles directly
+	  but always go through iMaterialWrapper.
+	- Jorrit consequently also removed support for iMaterialHandle
+	  in the shader variables.
+	- Jorrit migrated csMaterial::GetTexture() to old renderer.
 2-Sep-2003
 	- Philip Wyett re-applied Eric Sunshine's Cygwin __argc/__argv fix in
           win32.cpp, which was overwritten by the old version by another

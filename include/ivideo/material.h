@@ -43,18 +43,25 @@
 /// Default material `reflection' parameter
 #define CS_DEFMAT_REFLECTION  0.0f
 
-#ifdef CS_USE_NEW_RENDERER
-  /// Name string for the material "diffuse" shader var
-  #define CS_MATERIAL_VARNAME_DIFFUSE		"mat diffuse"
-  /// Name string for the material "ambient" shader var
-  #define CS_MATERIAL_VARNAME_AMBIENT		"mat ambient"
-  /// Name string for the material "reflection" shader var
-  #define CS_MATERIAL_VARNAME_REFLECTION	"mat reflection"
-  /// Name string for the material "flat color" shader var
-  #define CS_MATERIAL_VARNAME_FLATCOLOR		"mat flatcolor"
-  /// Name string for the material "diffuse" texture
-  #define CS_MATERIAL_TEXTURE_DIFFUSE		"tex diffuse"
-#endif
+/// Name string for the material "diffuse" shader var
+#define CS_MATERIAL_VARNAME_DIFFUSE		"mat diffuse"
+/// Name string for the material "ambient" shader var
+#define CS_MATERIAL_VARNAME_AMBIENT		"mat ambient"
+/// Name string for the material "reflection" shader var
+#define CS_MATERIAL_VARNAME_REFLECTION		"mat reflection"
+/// Name string for the material "flat color" shader var
+#define CS_MATERIAL_VARNAME_FLATCOLOR		"mat flatcolor"
+/// Name string for the material "diffuse" texture
+#define CS_MATERIAL_TEXTURE_DIFFUSE		"tex diffuse"
+
+/// Name string for old renderer: layer 1
+#define CS_MATERIAL_TEXTURE_LAYER1		"tex layer1"
+/// Name string for old renderer: layer 2
+#define CS_MATERIAL_TEXTURE_LAYER2		"tex layer2"
+/// Name string for old renderer: layer 3
+#define CS_MATERIAL_TEXTURE_LAYER3		"tex layer3"
+/// Name string for old renderer: layer 4
+#define CS_MATERIAL_TEXTURE_LAYER4		"tex layer4"
 
 struct iEffectDefinition;
 struct iTextureHandle;
@@ -121,17 +128,10 @@ struct iMaterial : public iShaderBranch
    */
   virtual iTextureHandle *GetTexture () = 0;
 
-#ifdef CS_USE_NEW_RENDERER
   /**
    * Get a texture from the material.
    */
   virtual iTextureHandle* GetTexture (csStringID name) = 0;
-
-  /**
-   * Set a texture of the material.
-   */
-  virtual void SetTexture (csStringID name, iTextureHandle* texture) = 0;
-#endif
 
 #ifndef CS_USE_NEW_RENDERER
   /**

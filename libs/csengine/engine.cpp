@@ -19,6 +19,7 @@
 #include "cssys/sysfunc.h"
 #include "qint.h"
 #include "csutil/scf.h"
+#include "csutil/scfstrset.h"
 #include "ivaria/pmeter.h"
 #include "csengine/engine.h"
 #include "csengine/halo.h"
@@ -835,6 +836,16 @@ bool csEngine::HandleEvent (iEvent &Event)
         {
           if (G3D)
           {
+	    Strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+	      object_reg, "crystalspace.renderer.stringset", iStringSet);
+	    if (!Strings)
+	    {
+	      // We are using the old renderer or for some other reason
+	      // the string set isn't created yet. So we create it here.
+	      Strings = csPtr<iStringSet> (new csScfStringSet ());
+	      object_reg->Register (Strings, "crystalspace.renderer.stringset");
+	    }
+
 #ifndef CS_USE_NEW_RENDERER
             csGraphics3DCaps *caps = G3D->GetCaps ();
             fogmethod = caps->fog;
@@ -843,16 +854,15 @@ bool csEngine::HandleEvent (iEvent &Event)
 #else
             NeedPO2Maps = false;
             MaxAspectRatio = 4096;
-
-	    Strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-	      object_reg, "crystalspace.renderer.stringset", iStringSet);
 	    ShaderManager = CS_QUERY_REGISTRY(object_reg, iShaderManager);
 	    if (!ShaderManager)
 	    {
-	      csRef<iPluginManager> plugin_mgr (
-		CS_QUERY_REGISTRY (object_reg, iPluginManager));
-	      ShaderManager = csPtr<iShaderManager>
-		(CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.graphics3d.shadermanager", iShaderManager));
+	      csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
+	      	object_reg, iPluginManager);
+	      ShaderManager = csPtr<iShaderManager> (
+	      	CS_LOAD_PLUGIN(plugin_mgr,
+			"crystalspace.graphics3d.shadermanager",
+			iShaderManager));
 	      object_reg->Register (ShaderManager, "iShaderManager");
 	    }
 #endif // CS_USE_NEW_RENDERER

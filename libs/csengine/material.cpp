@@ -36,6 +36,17 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csMaterial::MaterialEngine)
   SCF_IMPLEMENTS_INTERFACE(iMaterialEngine)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+csStringID csMaterial::nameDiffuseParam;
+csStringID csMaterial::nameAmbientParam;
+csStringID csMaterial::nameReflectParam;
+csStringID csMaterial::nameFlatColorParam;
+csStringID csMaterial::nameDiffuseTexture;
+
+csStringID csMaterial::nameTextureLayer1;
+csStringID csMaterial::nameTextureLayer2;
+csStringID csMaterial::nameTextureLayer3;
+csStringID csMaterial::nameTextureLayer4;
+
 csMaterial::csMaterial (csEngine* engine)
 {
   SCF_CONSTRUCT_IBASE (0);
@@ -44,13 +55,18 @@ csMaterial::csMaterial (csEngine* engine)
 #ifdef CS_USE_NEW_RENDERER
   shaders = new csHashMap();
   csMaterial::engine = engine;
+#endif // CS_USE_NEW_RENDERER
 
   nameDiffuseParam = engine->Strings->Request (CS_MATERIAL_VARNAME_DIFFUSE);
   nameAmbientParam = engine->Strings->Request (CS_MATERIAL_VARNAME_AMBIENT);
   nameReflectParam = engine->Strings->Request (CS_MATERIAL_VARNAME_REFLECTION);
   nameFlatColorParam = engine->Strings->Request (CS_MATERIAL_VARNAME_FLATCOLOR);
   nameDiffuseTexture = engine->Strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
-#endif // CS_USE_NEW_RENDERER
+
+  nameTextureLayer1 = engine->Strings->Request (CS_MATERIAL_TEXTURE_LAYER1);
+  nameTextureLayer2 = engine->Strings->Request (CS_MATERIAL_TEXTURE_LAYER2);
+  nameTextureLayer3 = engine->Strings->Request (CS_MATERIAL_TEXTURE_LAYER3);
+  nameTextureLayer4 = engine->Strings->Request (CS_MATERIAL_TEXTURE_LAYER4);
 
   SetTextureWrapper (0);
   // @@@ This will force the shader vars to be created...
@@ -273,15 +289,25 @@ void csMaterial::SetTextureWrapper (iTextureWrapper *tex)
 #endif
 }
 
-#ifdef CS_USE_NEW_RENDERER
 
 iTextureWrapper* csMaterial::GetTextureWrapper (csStringID name)
 {
+#ifdef CS_USE_NEW_RENDERER
   iTextureWrapper* tex;
   GetVar (name)->GetValue (tex);
   return tex;
   //return texWrappers.Get (name);
+#else
+  if (name == nameDiffuseTexture) return texture;
+  if (name == nameTextureLayer1) return texture_layer_wrappers[0];
+  if (name == nameTextureLayer2) return texture_layer_wrappers[1];
+  if (name == nameTextureLayer3) return texture_layer_wrappers[2];
+  if (name == nameTextureLayer4) return texture_layer_wrappers[3];
+  return 0;
+#endif
 }
+
+#ifdef CS_USE_NEW_RENDERER
 
 void csMaterial::SetTextureWrapper (csStringID name, iTextureWrapper* tex)
 {
@@ -340,41 +366,37 @@ iShaderWrapper* csMaterial::GetShader(csStringID type)
 
 #endif
 
+iTextureHandle *csMaterial::GetTexture ()
+{
 #ifndef CS_USE_NEW_RENDERER
-iTextureHandle *csMaterial::GetTexture ()
-{
   return texture ? texture->GetTextureHandle () : 0;
-}
 #else
-iTextureHandle *csMaterial::GetTexture ()
-{
   iTextureWrapper* tex;
   GetVar (nameDiffuseTexture)->GetValue (tex);
   return tex->GetTextureHandle ();
 
   /*iTextureHandle* texture = texHandles.Get (nameDiffuseTexture);
   return texture;*/
-}
 #endif
+}
 
-#ifdef CS_USE_NEW_RENDERER
 iTextureHandle* csMaterial::GetTexture (csStringID name)
 {
-  iTextureHandle* tex;
+#ifdef CS_USE_NEW_RENDERER
+  iTextureWrapper* tex;
   GetVar (name)->GetValue (tex);
-  return tex;
+  return tex->GetTextureHandle ();
   //return texHandles.Get (name);
-}
-
-void csMaterial::SetTexture (csStringID name, iTextureHandle* texture)
-{
-  csShaderVariable* var = GetVar (name, true);
-  var->SetValue (texture);
-  /*texWrappers.Put (name, 0);
-  texHandles.Put (name, texture);*/
-}
-
+#else
+  if (name == nameDiffuseTexture)
+    return texture ? texture->GetTextureHandle () : 0;
+  if (name == nameTextureLayer1) return texture_layers[0].txt_handle;
+  if (name == nameTextureLayer2) return texture_layers[1].txt_handle;
+  if (name == nameTextureLayer3) return texture_layers[2].txt_handle;
+  if (name == nameTextureLayer4) return texture_layers[3].txt_handle;
+  return 0;
 #endif
+}
 
 #ifndef CS_USE_NEW_RENDERER
 int csMaterial::GetTextureLayerCount ()

@@ -113,14 +113,19 @@ private:
 
   csEngine* engine;
 
-  csStringID nameDiffuseParam;
-  csStringID nameAmbientParam;
-  csStringID nameReflectParam;
-  csStringID nameFlatColorParam;
-  csStringID nameDiffuseTexture;
-
   csShaderVariable* GetVar (csStringID name, bool create = false);
 #endif
+
+  static csStringID nameDiffuseParam;
+  static csStringID nameAmbientParam;
+  static csStringID nameReflectParam;
+  static csStringID nameFlatColorParam;
+  static csStringID nameDiffuseTexture;
+
+  static csStringID nameTextureLayer1;
+  static csStringID nameTextureLayer2;
+  static csStringID nameTextureLayer3;
+  static csStringID nameTextureLayer4;
 
 public:
   /**
@@ -174,11 +179,11 @@ public:
   void AddTextureLayer (iTextureWrapper* txtwrap, uint mode,
         float uscale, float vscale, float ushift, float vshift);
 #else
-  /// Get a texture (if none 0 is returned)
-  iTextureWrapper* GetTextureWrapper (csStringID name);
   /// Set a texture (pass 0 to set no texture)
   void SetTextureWrapper (csStringID name, iTextureWrapper* tex);
 #endif
+  /// Get a texture (if none 0 is returned)
+  iTextureWrapper* GetTextureWrapper (csStringID name);
 
   //--------------------- iMaterial implementation ---------------------
 
@@ -210,16 +215,10 @@ public:
 #endif
   /// Get texture.
   virtual iTextureHandle* GetTexture ();
-#ifdef CS_USE_NEW_RENDERER
   /**
    * Get a texture from the material.
    */
   virtual iTextureHandle *GetTexture (csStringID name);
-  /**
-   * Set a texture of the material.
-   */
-  virtual void SetTexture (csStringID name, iTextureHandle* texture);
-#endif
 #ifndef CS_USE_NEW_RENDERER
   /// Get num texture layers.
   virtual int GetTextureLayerCount ();
@@ -251,24 +250,12 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csMaterial);
     virtual iTextureWrapper *GetTextureWrapper ()
     {
-#ifdef CS_USE_NEW_RENDERER
-      return scfParent->GetTextureWrapper (
-	scfParent->nameDiffuseTexture);
-#else
       return scfParent->GetTextureWrapper ();
-#endif
     }
-#ifndef CS_USE_NEW_RENDERER
-    virtual iTextureWrapper* GetTextureWrapper (int idx)
-    {
-      return scfParent->texture_layer_wrappers[idx];
-    }
-#else
     virtual iTextureWrapper* GetTextureWrapper (csStringID name)
     {
       return scfParent->GetTextureWrapper (name);
     }
-#endif
     virtual void Visit ()
     {
       scfParent->Visit ();

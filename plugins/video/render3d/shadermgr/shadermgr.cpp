@@ -557,9 +557,10 @@ void csShaderPass::SetupState (csRenderMesh *mesh)
       csShaderVariable* var = GetVariable (texmapping[i]);
       if (var)
       {
-        iTextureHandle* tex;
+        iTextureWrapper* tex;
         var->GetValue (tex);
-        if (tex) textures[i] = tex;
+        if (tex && tex->GetTextureHandle ())
+	  textures[i] = tex->GetTextureHandle ();
       }
     }
   }
