@@ -1,0 +1,142 @@
+/*
+Copyright (C) 2002 by Mårten Svanfeldt
+                      Anders Stenberg
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the Free
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#include "cssysdef.h"
+
+#include "csutil/csvector.h"
+#include "csutil/hashmap.h"
+#include "csutil/objreg.h"
+#include "csutil/ref.h"
+#include "csutil/scf.h"
+#include "csutil/scfstr.h"
+#include "csutil/csmd5.h"
+#include "csgeom/vector3.h"
+#include "csutil/xmltiny.h"
+
+#include "iutil/document.h"
+#include "iutil/string.h"
+#include "iutil/vfs.h"
+#include "ivaria/reporter.h"
+#include "ivideo/render3d.h"
+#include "ivideo/rndbuf.h"
+#include "ivideo/shader/shader.h"
+//#include "ivideo/shader/shadervar.h"
+
+#include "softshader_fp.h"
+
+SCF_IMPLEMENT_IBASE(csSoftShader_FP)
+SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
+SCF_IMPLEMENT_IBASE_END
+
+void csSoftShader_FP::Activate(iShaderPass* current, csRenderMesh* mesh)
+{
+}
+
+void csSoftShader_FP::Deactivate(iShaderPass* current)
+{
+}
+
+void csSoftShader_FP::BuildTokenHash()
+{
+  xmltokens.Register("softfp",XMLTOKEN_SOFTFP);
+
+  xmltokens.Register("integer", 100+iShaderVariable::INT);
+  xmltokens.Register("float", 100+iShaderVariable::FLOAT);
+  xmltokens.Register("string", 100+iShaderVariable::STRING);
+  xmltokens.Register("vector3", 100+iShaderVariable::VECTOR3);
+}
+
+bool csSoftShader_FP::Load(iDataBuffer* program)
+{
+  csRef<iDocumentSystem> xml (
+    CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
+  if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
+  csRef<iDocument> doc = xml->CreateDocument ();
+  const char* error = doc->Parse (program);
+  if (error != 0)
+  { 
+    csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, 
+      "crystalspace.render3d.shader.software", "XML error '%s'!", error);
+    return false;
+  }
+  return Load(doc->GetRoot());
+}
+
+bool csSoftShader_FP::Load(iDocumentNode* program)
+{
+  if(!program)
+    return false;
+
+  BuildTokenHash();
+
+  csRef<iRender3D> r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+  csRef<iShaderManager> shadermgr = 
+    CS_QUERY_REGISTRY(object_reg, iShaderManager);
+
+  csRef<iDocumentNode> variablesnode = program->GetNode("softfp");
+  if(variablesnode)
+  {
+    csRef<iDocumentNodeIterator> it = variablesnode->GetNodes ();
+    while(it->HasNext())
+    {
+      csRef<iDocumentNode> child = it->Next();
+      if(child->GetType() != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch(id)
+      {
+      default:
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+  
+bool csSoftShader_FP::Prepare()
+{
+  return true;
+}
+
+csPtr<iString> csSoftShader_FP::GetProgramID()
+{
+  csMD5::Digest d = csMD5::Encode("blah");
+  scfString* str = new scfString();
+  str->Append((const char*)d.data[0], 16);
+  return csPtr<iString>(str);
+}
+
+csBasicVector csSoftShader_FP::GetAllVariableNames()
+{
+  csBasicVector res;
+
+  return res;
+}
+
+csSymbolTable* csSoftShader_FP::GetSymbolTable()
+{
+  return 0;
+}
+
+iShaderVariable* csSoftShader_FP::GetVariable(int namehash)
+{
+  return 0;
+}

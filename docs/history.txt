@@ -23,6 +23,10 @@ The history order is reversed so that new features are at the top.
 	  - Fixed bug with transform not beeing updated in some cases where 
 	    it should.
 	  - Added "rendertarget" and "fullscreenquad" render steps.
+	- Anders Stenberg added software implementation of new renderer. 
+	  (Pretty much just a hack to use a copy of the old renderer. No 
+	  makefiles included, so someone who knows what they're doing should 
+	  create some. )
 15-Jul-2003
 	- Christopher Nelson removed the procedural texture support from
 	AWS entirely.  This means that a user must do all the construction
