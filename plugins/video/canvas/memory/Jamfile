@@ -7,5 +7,5 @@ Plugin memory
 ;
 LinkWith memory : canvascommon csutil ;
 
-CompileGroups memory :  drivers2d ;
+CompileGroups memory :  canvases ;
 

@@ -32,6 +32,9 @@ chronological order.
 	  being reported.
 	- Eric Sunshine added Contains() to csStringSet. Previously, there was
 	  no way to determine if a given string was a member of the set.
+	- Eric Sunshine renamed the 'drivers2d' and 'drivers3d' compile groups
+	  to 'canvases' and 'renderers', respectively. (The old names, though
+	  deprecated, are still recognized for backward compatibility.)
 24-Nov-2004
 	- res fixed light flare halos for NR.
 	- res changed csRenderLoop::Draw() to save the clipper before drawing

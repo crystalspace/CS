@@ -6,5 +6,5 @@ Description sdl2d : "SDL 2D driver" ;
 Plugin sdl2d : [ Wildcard *.cpp *.h ] ;
 LinkWith sdl2d : canvascommon csgeom csutil ;
 ExternalLibs sdl2d : SDL ;
-CompileGroups sdl2d : drivers2d ;
+CompileGroups sdl2d : canvases ;
 }

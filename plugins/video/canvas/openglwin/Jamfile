@@ -8,5 +8,5 @@ LinkWith glwin32 : win32canvascommon openglcommon canvascommon csgeom csutil ;
 MsvcExternalLibrary glwin32 : "version.lib" ;
 LFlags glwin32 : "-lversion" ;
 ExternalLibs glwin32 : GL ;
-CompileGroups glwin32 : drivers2d  openglcanvas ;
+CompileGroups glwin32 : canvases  openglcanvas ;
 }

@@ -7,5 +7,5 @@ Plugin null2d
 ;
 LinkWith null2d : canvascommon csgeom csutil ;
 
-CompileGroups null2d :  drivers2d ;
+CompileGroups null2d :  canvases ;
 

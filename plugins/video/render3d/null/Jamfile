@@ -7,4 +7,4 @@ Plugin nullrender3d
 ;
 LinkWith nullrender3d : render3dcommon cstool csgfx csgeom csutil ;
 
-CompileGroups nullrender3d : drivers3d ;
+CompileGroups nullrender3d : renderers ;

@@ -3,4 +3,4 @@ SubDir TOP plugins video render3d shader shadermgr ;
 Description shadermgr : "Shadermanager plugin" ;
 Plugin shadermgr : [ Wildcard *.cpp *.h ] ;
 LinkWith shadermgr : csgfx csgeom cstool csutil ;
-CompileGroups shadermgr : drivers3d nrall ;
+CompileGroups shadermgr : renderers nrall ;

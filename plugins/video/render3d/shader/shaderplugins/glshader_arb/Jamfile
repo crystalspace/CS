@@ -6,5 +6,5 @@ Description glshader_arb : "Render3d Shaderplugin for ARB vp/fp" ;
 Plugin glshader_arb : [ Wildcard *.cpp *.h ] ;
 LinkWith glshader_arb : shaderplugincommon csgeom csgfx csutil ;
 ExternalLibs glshader_arb : GL ;
-CompileGroups glshader_arb : drivers3d nrall ;
+CompileGroups glshader_arb : renderers nrall ;
 }

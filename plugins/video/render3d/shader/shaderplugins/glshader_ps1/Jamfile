@@ -6,5 +6,5 @@ Description glshader_ps1 : "Render3d Shaderplugin for PS 1.x emulation" ;
 Plugin glshader_ps1 : [ Wildcard *.cpp *.h ] ;
 LinkWith glshader_ps1 : shaderplugincommon csgeom csgfx csutil ;
 ExternalLibs glshader_ps1 : GL ;
-CompileGroups glshader_ps1 : drivers3d nrall ;
+CompileGroups glshader_ps1 : renderers nrall ;
 }

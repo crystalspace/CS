@@ -6,5 +6,5 @@ Description wxgl : "wxWidgets OpenGL 2D driver" ;
 Plugin wxgl : [ Wildcard *.c *.cc *.cpp *.C *.m *.mm *.M *.h ] ;
 LinkWith wxgl : canvascommon openglcommon csgeom csutil ;
 ExternalLibs wxgl : WX GL ;
-CompileGroups wxgl : drivers2d openglcanvas ;
+CompileGroups wxgl : canvases openglcanvas ;
 }

@@ -6,5 +6,5 @@ Description glx2d : "GL/X 2D driver" ;
 Plugin glx2d : [ Wildcard *.cpp *.h ] ;
 LinkWith glx2d : openglcommon canvascommon csgeom csutil ;
 ExternalLibs glx2d : GLX ;
-CompileGroups glx2d : drivers2d openglcanvas ;
+CompileGroups glx2d : canvases openglcanvas ;
 }

@@ -44,8 +44,8 @@ Description sounddrivers : "sound drivers" ;
 Description soundloaders : "sound loaders" ;
 Description imageloaders : "image loaders" ;
 Description fontservers  : "font servers" ;
-Description drivers2d	 : "2D canvases" ;
-Description drivers3d	 : "3D renderers" ;
+Description canvases	 : "2D canvases" ;
+Description renderers	 : "3D renderers" ;
 Description meshes	 : "mesh plugins and mesh loader" ;
 Description walkall  	 : "Walktest application and all required plugins" ;
 Description openglcanvas : "canvases for the OpenGL renderer" ;
@@ -53,8 +53,14 @@ Description softcanvas   : "canvases for the software renderer" ;
 Description proctexes    : "procedural texture plugins" ;
 Description nrall        : "new-renderer-related modules" ;
 RegisterCompileGroups sounddrivers soundloaders imageloaders fontservers
-		      drivers2d drivers3d meshes walkall openglcanvas 
+		      canvases renderers meshes walkall openglcanvas 
 		      softcanvas proctexes nrall ;
+
+# Historic group aliases.
+NotFile drivers2d ;
+Depends drivers2d : canvases ;
+NotFile drivers3d ;
+Depends drivers3d : renderers ;
 
 # Process subdirectories.  NOTE: Unfortunately, Jam rules are presently
 # order-sensitive; Library targets must be seen by Jam before Application and

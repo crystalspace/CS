@@ -6,5 +6,5 @@ Description x2d : "XLib 2D driver" ;
 Plugin x2d : [ Wildcard *.cpp *.h ] ;
 LinkWith x2d : canvascommon csgeom csutil ;
 ExternalLibs x2d : X11 ;
-CompileGroups x2d : drivers2d ;
+CompileGroups x2d : canvases ;
 }

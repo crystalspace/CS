@@ -13,4 +13,4 @@ else
 
 Plugin soft3d : [ Wildcard *.cpp *.h ] $(SOFT3D_ASMFILES) ;
 LinkWith soft3d : renderercommon csgeom csgfx csutil ;
-CompileGroups soft3d : drivers3d ;
+CompileGroups soft3d : renderers ;

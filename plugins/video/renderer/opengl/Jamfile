@@ -6,5 +6,5 @@ Description gl3d : "OpenGL 3D renderer" ;
 Plugin gl3d : [ Wildcard *.cpp *.h ] [ Wildcard effects : *.cpp *.h ] ;
 LinkWith gl3d : renderercommon csgeom csgfx csutil ;
 ExternalLibs gl3d : GL ;
-CompileGroups gl3d : drivers3d ;
+CompileGroups gl3d : renderers ;
 }

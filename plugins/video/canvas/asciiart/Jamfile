@@ -6,5 +6,5 @@ Description asciiart : "Ascii Art driver" ;
 Plugin asciiart : [ Wildcard *.cpp *.h ] ;
 LinkWith asciiart : canvascommon csutil ;
 ExternalLibs asciiart : AALIB ;
-CompileGroups asciiart : drivers2d ;
+CompileGroups asciiart : canvases ;
 }
