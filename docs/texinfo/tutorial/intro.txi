@@ -435,7 +435,7 @@ able to include it again (due to header protection) and would then not be
 able to add the additional stuff that it may need.
 
 @item
-@code{CS_IMPLEMENT_APPLICATION()} needs to be put in the beginning of
+@code{CS_IMPLEMENT_APPLICATION} needs to be put in the beginning of
 the file (@emph{after} the includes).
 
 @item
