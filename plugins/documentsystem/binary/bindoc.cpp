@@ -245,9 +245,9 @@ int csBinaryDocAttribute::GetValueAsInt ()
   {
     case BD_VALUE_TYPE_STR:
       {
-	if (!attrPtr->GetValueStr(node->doc)) return 0;
+	if (!attrPtr->GetValueStr (node->doc)) return 0;
 	int val = 0;
-	sscanf (attrPtr->GetValueStr(node->doc), "%d", &val);
+	sscanf (attrPtr->GetValueStr (node->doc), "%d", &val);
 	return val;
       }
     case BD_VALUE_TYPE_INT:
@@ -269,9 +269,9 @@ float csBinaryDocAttribute::GetValueAsFloat ()
   {
     case BD_VALUE_TYPE_STR:
       {
-	if (!attrPtr->GetValueStr(node->doc)) return 0.0f;
+	if (!attrPtr->GetValueStr (node->doc)) return 0.0f;
 	float val = 0.0f;
-	sscanf (attrPtr->GetValueStr(node->doc), "%g", &val);
+	sscanf (attrPtr->GetValueStr (node->doc), "%g", &val);
 	return val;
       }
     case BD_VALUE_TYPE_INT:
@@ -293,16 +293,16 @@ bool csBinaryDocAttribute::GetValueAsBool ()
   {
     case BD_VALUE_TYPE_STR:
       {
-	if (!attrPtr->GetValueStr(node->doc)) return false;
-    const char *val = attrPtr->GetValueStr(node->doc);
-    if (strcasecmp(val,"true")==0 ||
-        strcasecmp(val,"yes")==0 ||
-        atoi(val)!=0)
-    {
-      return true;
-    }
-    else
-      return false;
+	if (!attrPtr->GetValueStr (node->doc)) return false;
+	const char *val = attrPtr->GetValueStr (node->doc);
+	if (strcasecmp (val, "true") == 0 ||
+	    strcasecmp (val, "yes") == 0 ||
+	    atoi(val)!=0)
+	{
+	  return true;
+	}
+	else
+	  return false;
       }
     case BD_VALUE_TYPE_INT:
       {
@@ -365,6 +365,8 @@ void csBinaryDocAttribute::SetValue (const char* val)
     delete[] vstr; vstr = 0;
     int v;
     float f;
+    if (val == 0) val = ""; 
+      // "<Jorrit> A null value is equivalent to empty."
     if (checkInt (val, v))
     {
       attrPtr->flags = (attrPtr->flags & ~BD_VALUE_TYPE_MASK) | 
@@ -1008,6 +1010,8 @@ void csBinaryDocNode::SetValue (const char* value)
     delete[] nodeData->vstr; nodeData->vstr = 0;
     int v;
     float f;
+    if (value == 0) value = ""; 
+      // "<Jorrit> A null value is equivalent to empty."
     if (checkInt (value, v))
     {
       nodeData->flags = (nodeData->flags & ~BD_VALUE_TYPE_MASK) | 

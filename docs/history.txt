@@ -49,6 +49,7 @@ chronological order.
 	- res changed WT to allow disabling crash dumps via the 
 	  Walktest.Win32.Minidumps config setting. Also, for non-VC compilers
 	  it's now disabled by default (not much useful there anyway).
+	- res fixed a crash in bindoc when 0 was set as a node value.
 27-Apr-2004
 	- Jorrit removed ClipBSphere() from iRenderView.
 	- Jorrit added a private implementation of ClipBSphere() to
