@@ -53,7 +53,7 @@
 csKeyMap* mapping = NULL;
 
 Bot* first_bot = NULL;
-bool do_bots = true;
+bool do_bots = false;
 
 #define DYN_TYPE_MISSILE 1
 #define DYN_TYPE_RANDOM 2
@@ -744,9 +744,9 @@ bool WalkTest::ParseArg (int argc, char* argv[], int& i)
   {
     do_infinite = true;
   }
-  else if (strcasecmp ("-nobots", argv[i]) == 0)
+  else if (strcasecmp ("-bots", argv[i]) == 0)
   {
-    do_bots = false;
+    do_bots = true;
   }
   else if (strcasecmp ("-colldet", argv[i]) == 0)
   {
@@ -782,7 +782,7 @@ void WalkTest::Help ()
   Sys->Printf (MSG_STDOUT, "  -fps/nofps         frame rate printing (default '%sfps')\n", do_fps ? "" : "no");
   Sys->Printf (MSG_STDOUT, "  -colldet/nocolldet collision detection system (default '%scolldet')\n", do_cd ? "" : "no");
   Sys->Printf (MSG_STDOUT, "  -infinite          special infinite level generation (ignores world file!)\n");
-  Sys->Printf (MSG_STDOUT, "  -nobots            inhibit random generation of bots\n");
+  Sys->Printf (MSG_STDOUT, "  -bots              allow random generation of bots\n");
   Sys->Printf (MSG_STDOUT, "  <filename>         load world file from <filename> (default '%s')\n", world_file);
 }
   
