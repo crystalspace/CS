@@ -164,9 +164,9 @@ struct iEntity : public iBase
   virtual iPosition*  GetPosition() = 0;
 
   /// Return a reference to the polygon mesh for this collider.
-  virtual iPolygonMesh* CallEvent(const char*     EventName, 
-                                  iAttributeList* InPar,
-                                  iAttributeList* OutPar) = 0;
+  virtual iPolygonMesh* HandleEvent(const char*     EventName, 
+                                    iAttributeList* InPar,
+                                    iAttributeList* OutPar) = 0;
 
   ///Get the given Attribute
   virtual iAttribute*  GetAttribute(const char* Name) = 0;
