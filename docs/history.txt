@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Feb-2005
+	- Jorrit added csVector2::IsLeft().
+	- Jorrit added a new csChainHull2D class which calculates the convex
+	  hull of a set of points. The main routine is there but the routine
+	  to sort the points is still missing.
 7-Feb-2005
 	- Eric Sunshine fixed some bogus mounts in vfs.cfg.template (the
 	  vfs.cfg which gets installed), which caused several of the maps to
