@@ -1,5 +1,22 @@
-# AC_PATH_CRYSTAL
+#    Matze Braun <MatzeBraun@gmx.de>
+#    Patrick McFarland (Diablo-D3) <unknown@panax.com>
 #
+#    This library is free software; you can redistribute it and/or modify it
+#    under the terms of the GNU Library General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or (at your
+#    option) any later version.
+#
+#    This library is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public
+#    License for more details.
+#
+#    You should have received a copy of the GNU Library General Public License
+#    along with this library; if not, write to the Free Software Foundation,
+#    Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+
+# CS_PATH_CRYSTAL_HELPER
 # Checks for Crystal Space paths and libs, This scripts tries first if it can
 # find a cs-config in the actual path.  If yes it just uses that.  If not it
 # checks if CRYSTAL environment variable is set, and after that if it tries to
@@ -9,9 +26,6 @@
 # CRYSTAL_LIBS, and CRYSTAL_INCLUDE_DIR.  Remember to do CFLAGS="$CFLAGS
 # $CRYSTAL_CFLAGS" and LDFLAGS=$"LDFLAGS $CRYSTAL_LIBS" so you can use the
 # information provided by this script.
-
-# Matze Braun <MatzeBraun@gmx.de>
-# Patrick McFarland (Diablo-D3) <unknown@panax.com>
 
 dnl helper function
 AC_DEFUN([CS_PATH_CRYSTAL_HELPER],
