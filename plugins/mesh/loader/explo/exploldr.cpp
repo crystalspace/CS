@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2001 by W.C.A. Wijngaards
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -30,6 +31,11 @@
 #include "imesh/explode.h"
 #include "ivideo/graph3d.h"
 #include "qint.h"
+#include "iutil/strvec.h"
+#include "csutil/util.h"
+#include "iobject/object.h"
+#include "iengine/material.h"
+#include "csengine/material.h"
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ADD)
@@ -61,19 +67,37 @@ IMPLEMENT_IBASE (csExplosionFactoryLoader)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_IBASE (csExplosionFactorySaver)
+  IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
+
 IMPLEMENT_IBASE (csExplosionLoader)
   IMPLEMENTS_INTERFACE (iLoaderPlugIn)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_IBASE (csExplosionSaver)
+  IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
+
 IMPLEMENT_FACTORY (csExplosionFactoryLoader)
+IMPLEMENT_FACTORY (csExplosionFactorySaver)
 IMPLEMENT_FACTORY (csExplosionLoader)
+IMPLEMENT_FACTORY (csExplosionSaver)
 
 EXPORT_CLASS_TABLE (exploldr)
-  EXPORT_CLASS (csExplosionFactoryLoader, "crystalspace.mesh.loader.factory.explosion",
+  EXPORT_CLASS (csExplosionFactoryLoader, 
+    "crystalspace.mesh.loader.factory.explosion",
     "Crystal Space Explosion Factory Loader")
+  EXPORT_CLASS (csExplosionFactorySaver, 
+    "crystalspace.mesh.saver.factory.explosion",
+    "Crystal Space Explosion Factory Saver")
   EXPORT_CLASS (csExplosionLoader, "crystalspace.mesh.loader.explosion",
     "Crystal Space Explosion Mesh Loader")
+  EXPORT_CLASS (csExplosionSaver, "crystalspace.mesh.saver.explosion",
+    "Crystal Space Explosion Mesh Saver")
 EXPORT_CLASS_TABLE_END
 
 csExplosionFactoryLoader::csExplosionFactoryLoader (iBase* pParent)
@@ -103,6 +127,49 @@ iBase* csExplosionFactoryLoader::Parse (const char* /*string*/, iEngine* /*engin
   type->DecRef ();
   return fact;
 }
+
+//---------------------------------------------------------------------------
+
+csExplosionFactorySaver::csExplosionFactorySaver (iBase* pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+}
+
+csExplosionFactorySaver::~csExplosionFactorySaver ()
+{
+}
+
+bool csExplosionFactorySaver::Initialize (iSystem* system)
+{
+  sys = system;
+  return true;
+}
+
+#define MAXLINE 100 /* max number of chars per line... */
+
+static void WriteMixmode(iStrVector *str, UInt mixmode)
+{
+  str->Push(strnew("  MIXMODE ("));
+  if(mixmode&CS_FX_COPY) str->Push(strnew(" COPY ()"));
+  if(mixmode&CS_FX_ADD) str->Push(strnew(" ADD ()"));
+  if(mixmode&CS_FX_MULTIPLY) str->Push(strnew(" MULTIPLY ()"));
+  if(mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
+  if(mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
+  if(mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
+  if(mixmode&CS_FX_ALPHA) {
+    char buf[MAXLINE];
+    sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
+    str->Push(strnew(buf));
+  }
+  str->Push(strnew(")"));
+}
+
+void csExplosionFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
+  iEngine* /*engine*/)
+{
+  // nothing to do
+}
+
 
 //---------------------------------------------------------------------------
 
@@ -333,4 +400,77 @@ iBase* csExplosionLoader::Parse (const char* string, iEngine* engine)
 
 //---------------------------------------------------------------------------
 
+
+csExplosionSaver::csExplosionSaver (iBase* pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+}
+
+csExplosionSaver::~csExplosionSaver ()
+{
+}
+
+bool csExplosionSaver::Initialize (iSystem* system)
+{
+  sys = system;
+  return true;
+}
+
+void csExplosionSaver::WriteDown (iBase* obj, iStrVector *str,
+  iEngine* /*engine*/)
+{
+  iFactory *fact = QUERY_INTERFACE (this, iFactory);
+  iParticleState *partstate = QUERY_INTERFACE (obj, iParticleState);
+  iExplosionState *explostate = QUERY_INTERFACE (obj, iExplosionState);
+  char buf[MAXLINE];
+  char name[MAXLINE];
+
+  csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
+  sprintf(buf, "FACTORY ('%s')\n", name);
+  str->Push(strnew(buf));
+
+  if(partstate->GetMixMode() != CS_FX_COPY)
+  {
+    WriteMixmode(str, partstate->GetMixMode());
+  }
+  sprintf(buf, "MATERIAL (%s)\n", partstate->GetMaterialWrapper()->
+    GetPrivateObject()->GetName());
+  str->Push(strnew(buf));
+  sprintf(buf, "COLOR (%g, %g, %g)\n", partstate->GetColor().red,
+    partstate->GetColor().green, partstate->GetColor().blue);
+  str->Push(strnew(buf));
+
+  sprintf(buf, "CENTER (%g, %g, %g)\n", explostate->GetCenter().x,
+    explostate->GetCenter().y, explostate->GetCenter().z);
+  str->Push(strnew(buf));
+  sprintf(buf, "PUSH (%g, %g, %g)\n", explostate->GetPush().x,
+    explostate->GetPush().y, explostate->GetPush().z);
+  str->Push(strnew(buf));
+  sprintf(buf, "SPREADPOS (%g)\n", explostate->GetSpreadPos());
+  str->Push(strnew(buf));
+  sprintf(buf, "SPREADSPEED (%g)\n", explostate->GetSpreadSpeed());
+  str->Push(strnew(buf));
+  sprintf(buf, "SPREADACCEL (%g)\n", explostate->GetSpreadAcceleration());
+  str->Push(strnew(buf));
+  sprintf(buf, "NUMBER (%d)\n", explostate->GetNumberParticles());
+  str->Push(strnew(buf));
+  sprintf(buf, "NRSIDES (%d)\n", explostate->GetNrSides());
+  str->Push(strnew(buf));
+  sprintf(buf, "PARTRADIUS (%g)\n", explostate->GetPartRadius());
+  str->Push(strnew(buf));
+  sprintf(buf, "LIGHTING (%s)\n", explostate->GetLighting()?"true":"false");
+  str->Push(strnew(buf));
+  cs_time fade_time = 0;
+  if(explostate->GetFadeSprites(fade_time))
+  {
+    sprintf(buf, "FADE (%d)\n", (int)fade_time);
+    str->Push(strnew(buf));
+  }
+
+  fact->DecRef();
+  partstate->DecRef();
+  explostate->DecRef();
+}
+
+//---------------------------------------------------------------------------
 
