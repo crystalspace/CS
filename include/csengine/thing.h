@@ -311,6 +311,11 @@ private:
   csVector visobjects;
 
   /**
+   * List of objects to iterate over (after VisTest()).
+   */
+  csVector vistest_objects;
+
+  /**
    * If this variable is not NULL then it is a BSP or octree for this
    * thing.
    */
@@ -826,9 +831,9 @@ public:
   /// General VisTest.
   bool VisTest (iRenderView* irview);
   /// Box VisTest.
-  bool VisTest (const csBox3& box);
+  csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box);
   /// Sphere VisTest.
-  bool VisTest (const csSphere& sphere);
+  csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere);
 
   //----------------------------------------------------------------------
   // Shadow System
@@ -1290,11 +1295,11 @@ public:
     {
       return scfParent->VisTest (irview);
     }
-    virtual bool VisTest (const csBox3& box)
+    virtual csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box)
     {
       return scfParent->VisTest (box);
     }
-    virtual bool VisTest (const csSphere& sphere)
+    virtual csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere)
     {
       return scfParent->VisTest (sphere);
     }

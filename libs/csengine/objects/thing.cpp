@@ -3649,10 +3649,68 @@ bool csThing::VisTest (iRenderView *irview)
   }
 }
 
-bool csThing::VisTest (const csBox3& box)
+//----------------------------------------------------------------------
+
+class csThingVisObjIt : public iVisibilityObjectIterator
 {
-  if (!static_tree) return false;
+private:
+  csVector* vector;
+  int position;
+
+public:
+  SCF_DECLARE_IBASE;
+
+  csThingVisObjIt (csVector* vector)
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    csThingVisObjIt::vector = vector;
+    Reset ();
+  }
+  virtual ~csThingVisObjIt ()
+  {
+  }
+
+  virtual bool Next()
+  {
+    if (position < 0) return false;
+    position++;
+    if (position == vector->Length ())
+    {
+      position = -1;
+      return false;
+    }
+    return true;
+  }
+
+  virtual void Reset()
+  {
+    if (vector == NULL || vector->Length () < 1)
+      position = -1;
+    else
+      position = 0;
+  }
+
+  virtual iVisibilityObject* GetObject () const
+  {
+    return (iVisibilityObject*)(vector->Get (position));
+  }
+  virtual bool IsFinished () const
+  {
+    return (position < 0);
+  }
+};
+
+//----------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (csThingVisObjIt)
+  SCF_IMPLEMENTS_INTERFACE (iVisibilityObjectIterator)
+SCF_IMPLEMENT_IBASE_END
+
+csPtr<iVisibilityObjectIterator> csThing::VisTest (const csBox3& box)
+{
+  if (!static_tree) return NULL;
   current_visnr++;
+  vistest_objects.DeleteAll ();
 
   // @@@ Very ugly implementation. Should at least try
   // to use the octree!!!
@@ -3665,15 +3723,22 @@ bool csThing::VisTest (const csBox3& box)
     csPolyTreeBBox *pt_bbox = vinf->bbox;
     const csBox3& bbox = pt_bbox->GetWorldBoundingBox ();
     if (bbox.TestIntersect (box))
+    {
       vo->SetVisibilityNumber (current_visnr);
+      vistest_objects.Push (vo);
+    }
   }
-  return true;
+
+  csRef<iVisibilityObjectIterator> visit = csPtr<iVisibilityObjectIterator> (
+  	new csThingVisObjIt (&vistest_objects));
+  return visit;
 }
 
-bool csThing::VisTest (const csSphere& sphere)
+csPtr<iVisibilityObjectIterator> csThing::VisTest (const csSphere& sphere)
 {
-  if (!static_tree) return false;
+  if (!static_tree) return NULL;
   current_visnr++;
+  vistest_objects.DeleteAll ();
 
   // @@@ Very ugly implementation. Should at least try
   // to use the octree!!!
@@ -3688,9 +3753,15 @@ bool csThing::VisTest (const csSphere& sphere)
     csPolyTreeBBox *pt_bbox = vinf->bbox;
     const csBox3& bbox = pt_bbox->GetWorldBoundingBox ();
     if (csIntersect3::BoxSphere (bbox, pos, sqradius))
+    {
       vo->SetVisibilityNumber (current_visnr);
+      vistest_objects.Push (vo);
+    }
   }
-  return true;
+
+  csRef<iVisibilityObjectIterator> visit = csPtr<iVisibilityObjectIterator> (
+  	new csThingVisObjIt (&vistest_objects));
+  return visit;
 }
 
 struct CheckFrustData

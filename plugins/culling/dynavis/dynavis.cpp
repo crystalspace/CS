@@ -81,6 +81,61 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 //----------------------------------------------------------------------
 
+class csDynVisObjIt : public iVisibilityObjectIterator
+{
+private:
+  csVector* vector;
+  int position;
+
+public:
+  SCF_DECLARE_IBASE;
+
+  csDynVisObjIt (csVector* vector)
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    csDynVisObjIt::vector = vector;
+    Reset ();
+  }
+  virtual ~csDynVisObjIt ()
+  {
+  }
+
+  virtual bool Next()
+  {
+    if (position < 0) return false;
+    position++;
+    if (position == vector->Length ())
+    {
+      position = -1;
+      return false;
+    }
+    return true;
+  }
+
+  virtual void Reset()
+  {
+    if (vector == NULL || vector->Length () < 1)
+      position = -1;
+    else
+      position = 0;
+  }
+
+  virtual iVisibilityObject* GetObject () const
+  {
+    return (iVisibilityObject*)(vector->Get (position));
+  }
+  virtual bool IsFinished () const
+  {
+    return (position < 0);
+  }
+};
+
+SCF_IMPLEMENT_IBASE (csDynVisObjIt)
+  SCF_IMPLEMENTS_INTERFACE (iVisibilityObjectIterator)
+SCF_IMPLEMENT_IBASE_END
+
+//----------------------------------------------------------------------
+
 SCF_IMPLEMENT_IBASE (csVisibilityObjectWrapper)
   SCF_IMPLEMENTS_INTERFACE (iObjectModelListener)
   SCF_IMPLEMENTS_INTERFACE (iMovableListener)
@@ -1037,6 +1092,7 @@ struct VisTestBox_Front2BackData
 {
   uint32 current_visnr;
   csBox3 box;
+  csVector* vistest_objects;
 };
 
 static bool VisTestBox_Front2Back (csKDTree* treenode, void* userdata,
@@ -1074,6 +1130,7 @@ static bool VisTestBox_Front2Back (csKDTree* treenode, void* userdata,
       if (obj_bbox.TestIntersect (data->box))
       {
 	visobj_wrap->visobj->SetVisibilityNumber (data->current_visnr);
+	data->vistest_objects->Push (visobj_wrap->visobj);
       }
     }
   }
@@ -1081,15 +1138,20 @@ static bool VisTestBox_Front2Back (csKDTree* treenode, void* userdata,
   return true;
 }
 
-bool csDynaVis::VisTest (const csBox3& box)
+csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csBox3& box)
 {
   current_visnr++;
+  vistest_objects.DeleteAll ();
 
   VisTestBox_Front2BackData data;
   data.box = box;
   data.current_visnr = current_visnr;
+  data.vistest_objects = &vistest_objects;
   kdtree->Front2Back (box.GetCenter (), VisTestBox_Front2Back, (void*)&data);
-  return true;
+
+  csRef<iVisibilityObjectIterator> visit = csPtr<iVisibilityObjectIterator> (
+  	new csDynVisObjIt (&vistest_objects));
+  return visit;
 }
 
 //======== VisTest sphere ==================================================
@@ -1099,6 +1161,7 @@ struct VisTestSphere_Front2BackData
   uint32 current_visnr;
   csVector3 pos;
   float sqradius;
+  csVector* vistest_objects;
 };
 
 static bool VisTestSphere_Front2Back (csKDTree* treenode, void* userdata,
@@ -1136,6 +1199,7 @@ static bool VisTestSphere_Front2Back (csKDTree* treenode, void* userdata,
       if (csIntersect3::BoxSphere (obj_bbox, data->pos, data->sqradius))
       {
 	visobj_wrap->visobj->SetVisibilityNumber (data->current_visnr);
+	data->vistest_objects->Push (visobj_wrap->visobj);
       }
     }
   }
@@ -1143,16 +1207,21 @@ static bool VisTestSphere_Front2Back (csKDTree* treenode, void* userdata,
   return true;
 }
 
-bool csDynaVis::VisTest (const csSphere& sphere)
+csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csSphere& sphere)
 {
   current_visnr++;
+  vistest_objects.DeleteAll ();
 
   VisTestSphere_Front2BackData data;
   data.current_visnr = current_visnr;
+  data.vistest_objects = &vistest_objects;
   data.pos = sphere.GetCenter ();
   data.sqradius = sphere.GetRadius () * sphere.GetRadius ();
   kdtree->Front2Back (data.pos, VisTestSphere_Front2Back, (void*)&data);
-  return true;
+
+  csRef<iVisibilityObjectIterator> visit = csPtr<iVisibilityObjectIterator> (
+  	new csDynVisObjIt (&vistest_objects));
+  return visit;
 }
 
 //======== IntersectSegment ================================================

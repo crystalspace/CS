@@ -2155,33 +2155,16 @@ void csEngine::GetNearbyObjectList (iSector* sector,
     int& max_objects)
 {
   iVisibilityCuller* culler = sector->GetVisibilityCuller ();
-  uint32 current_visnr = 1;
-  if (!(culler && culler->VisTest (csSphere (pos, radius))))
-  {
-    // There was no culler or culler failed. In that case
-    // mark objects manually.
-    current_visnr = 1;
-    int i;
-    iMeshList* ml = sector->GetMeshes ();
-    for (i = 0 ; i < ml->GetCount () ; i++)
-    {
-      iMeshWrapper *imw = ml->Get (i);
-      csMeshWrapper* mw = imw->GetPrivateObject ();
-      //@@@ SHOULD USE BBOX HERE!!!
-      //@@@ NOT OPTIMAL!
-      mw->SetVisibilityNumber (current_visnr);
-    }
-  }
-  else if (culler) current_visnr = culler->GetCurrentVisibilityNumber ();
+  csRef<iVisibilityObjectIterator> visit = culler->VisTest (
+  	csSphere (pos, radius));
 
-  int i;
   //@@@@@@@@ TODO ALSO SUPPORT LIGHTS!
-  iMeshList* ml = sector->GetMeshes ();
-  for (i = 0 ; i < ml->GetCount () ; i++)
+  while (!visit->IsFinished ())
   {
-    iMeshWrapper *imw = ml->Get (i);
-    csMeshWrapper* mw = imw->GetPrivateObject ();
-    if (mw->GetVisibilityNumber () == current_visnr)
+    iVisibilityObject* vo = visit->GetObject ();
+    visit->Next ();
+    csRef<iMeshWrapper> imw (SCF_QUERY_INTERFACE (vo, iMeshWrapper));
+    if (imw)
     {
       AddObject (list, num_objects, max_objects, imw->QueryObject ());
       csRef<iThingState> st (

@@ -71,6 +71,61 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 //----------------------------------------------------------------------
 
+class csFrustVisObjIt : public iVisibilityObjectIterator
+{
+private:
+  csVector* vector;
+  int position;
+
+public:
+  SCF_DECLARE_IBASE;
+
+  csFrustVisObjIt (csVector* vector)
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    csFrustVisObjIt::vector = vector;
+    Reset ();
+  }
+  virtual ~csFrustVisObjIt ()
+  {
+  }
+
+  virtual bool Next()
+  {
+    if (position < 0) return false;
+    position++;
+    if (position == vector->Length ())
+    {
+      position = -1;
+      return false;
+    }
+    return true;
+  }
+
+  virtual void Reset()
+  {
+    if (vector == NULL || vector->Length () < 1)
+      position = -1;
+    else
+      position = 0;
+  }
+
+  virtual iVisibilityObject* GetObject () const
+  {
+    return (iVisibilityObject*)(vector->Get (position));
+  }
+  virtual bool IsFinished () const
+  {
+    return (position < 0);
+  }
+};
+
+SCF_IMPLEMENT_IBASE (csFrustVisObjIt)
+  SCF_IMPLEMENTS_INTERFACE (iVisibilityObjectIterator)
+SCF_IMPLEMENT_IBASE_END
+
+//----------------------------------------------------------------------
+
 SCF_IMPLEMENT_IBASE (csFrustVisObjectWrapper)
   SCF_IMPLEMENTS_INTERFACE (iObjectModelListener)
   SCF_IMPLEMENTS_INTERFACE (iMovableListener)
@@ -396,6 +451,7 @@ struct FrustTestBox_Front2BackData
 {
   uint32 current_visnr;
   csBox3 box;
+  csVector* vistest_objects;
 };
 
 static bool FrustTestBox_Front2Back (csSimpleKDTree* treenode, void* userdata,
@@ -433,6 +489,7 @@ static bool FrustTestBox_Front2Back (csSimpleKDTree* treenode, void* userdata,
       if (obj_bbox.TestIntersect (data->box))
       {
 	visobj_wrap->visobj->SetVisibilityNumber (data->current_visnr);
+	data->vistest_objects->Push (visobj_wrap->visobj);
       }
     }
   }
@@ -440,14 +497,19 @@ static bool FrustTestBox_Front2Back (csSimpleKDTree* treenode, void* userdata,
   return true;
 }
 
-bool csFrustumVis::VisTest (const csBox3& box)
+csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csBox3& box)
 {
   current_visnr++;
+  vistest_objects.DeleteAll ();
   FrustTestBox_Front2BackData data;
   data.current_visnr = current_visnr;
   data.box = box;
+  data.vistest_objects = &vistest_objects;
   kdtree->Front2Back (box.GetCenter (), FrustTestBox_Front2Back, (void*)&data);
-  return true;
+
+  csRef<iVisibilityObjectIterator> visit = csPtr<iVisibilityObjectIterator> (
+  	new csFrustVisObjIt (&vistest_objects));
+  return visit;
 }
 
 //======== VisTest sphere ==================================================
@@ -457,6 +519,7 @@ struct FrustTestSphere_Front2BackData
   uint32 current_visnr;
   csVector3 pos;
   float sqradius;
+  csVector* vistest_objects;
 };
 
 static bool FrustTestSphere_Front2Back (csSimpleKDTree* treenode,
@@ -495,6 +558,7 @@ static bool FrustTestSphere_Front2Back (csSimpleKDTree* treenode,
       if (csIntersect3::BoxSphere (obj_bbox, data->pos, data->sqradius))
       {
 	visobj_wrap->visobj->SetVisibilityNumber (data->current_visnr);
+	data->vistest_objects->Push (visobj_wrap->visobj);
       }
     }
   }
@@ -502,15 +566,20 @@ static bool FrustTestSphere_Front2Back (csSimpleKDTree* treenode,
   return true;
 }
 
-bool csFrustumVis::VisTest (const csSphere& sphere)
+csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csSphere& sphere)
 {
   current_visnr++;
+  vistest_objects.DeleteAll ();
   FrustTestSphere_Front2BackData data;
   data.current_visnr = current_visnr;
   data.pos = sphere.GetCenter ();
   data.sqradius = sphere.GetRadius () * sphere.GetRadius ();
+  data.vistest_objects = &vistest_objects;
   kdtree->Front2Back (data.pos, FrustTestSphere_Front2Back, (void*)&data);
-  return true;
+
+  csRef<iVisibilityObjectIterator> visit = csPtr<iVisibilityObjectIterator> (
+  	new csFrustVisObjIt (&vistest_objects));
+  return visit;
 }
 
 //======== IntersectSegment ================================================

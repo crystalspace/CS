@@ -41,7 +41,27 @@ class csVector3;
 class csBox3;
 class csSphere;
 
-SCF_VERSION (iVisibilityCuller, 0, 1, 1);
+SCF_VERSION (iVisibilityObjectIterator, 0, 0, 1);
+
+/**
+ * Iterator to iterate over some visibility objects.
+ */
+struct iVisibilityObjectIterator : public iBase
+{
+  /// Move forward.
+  virtual bool Next () = 0;
+
+  /// Reset the iterator to the beginning.
+  virtual void Reset () = 0;
+
+  /// Get the object we are pointing at.
+  virtual iVisibilityObject* GetObject () const = 0;
+
+  /// Check if we have any more children.
+  virtual bool IsFinished () const = 0;
+};
+
+SCF_VERSION (iVisibilityCuller, 0, 2, 0);
 
 /**
  * This interface represents a visibility culling system.
@@ -79,13 +99,13 @@ struct iVisibilityCuller : public iBase
    * Mark all objects as visible that intersect with the given bounding
    * box.
    */
-  virtual bool VisTest (const csBox3& box) = 0;
+  virtual csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box) = 0;
 
   /**
    * Mark all objects as visible that intersect with the given bounding
    * sphere.
    */
-  virtual bool VisTest (const csSphere& sphere) = 0;
+  virtual csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere) = 0;
 
   /**
    * Intersect a beam using this culler and return the intersection

@@ -79,6 +79,10 @@ public:
  */
 class csFrustumVis : public iVisibilityCuller
 {
+public:
+  // List of objects to iterate over (after VisTest()).
+  csVector vistest_objects;
+
 private:
   iObjectRegistry *object_reg;
   csSimpleKDTree* kdtree;
@@ -114,8 +118,8 @@ public:
   virtual void RegisterVisObject (iVisibilityObject* visobj);
   virtual void UnregisterVisObject (iVisibilityObject* visobj);
   virtual bool VisTest (iRenderView* rview);
-  virtual bool VisTest (const csBox3& box);
-  virtual bool VisTest (const csSphere& sphere);
+  virtual csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box);
+  virtual csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere);
   virtual bool IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr = NULL,
     iMeshWrapper** p_mesh = NULL, iPolygon3D** poly = NULL);

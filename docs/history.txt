@@ -7,6 +7,11 @@ The history order is reversed so that new features are at the top.
 	  moved. It was doing this only to test if there was a terrain
 	  with which to do visibility testing. I optimized this by attaching
 	  an object to the sector which contains this information.
+	- Redesigned the way the VisTest() functions for spheres and boxes
+	  work in iVisibilityCuller. Now they return an iterator instead
+	  of just marking the objects. This is a LOT faster in levels
+	  with a huge number of objects. Fixed Dynavis, Frustvis, and
+	  old style octree based culler for this change.
 3-Nov-2002
 	- Changed DynaVis to use the new movable and object model
 	  listeners. This significantly speeds up rendering and walking
