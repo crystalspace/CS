@@ -67,6 +67,11 @@ extern csPaletteExport cswsPalette[];
 #define CSPAL_GRIDVIEW  		13
 /// Slider palette index
 #define CSPAL_SLIDER		        14
+/// Tree control item palette index
+#define CSPAL_TREEITEM		        15
+/// Tree control palette index
+#define CSPAL_TREECTRL		        16
+
 
 /**
  * csApp class color palette indices.<p>
@@ -147,6 +152,32 @@ extern csPaletteExport cswsPalette[];
 #define CSPAL_LISTBOX_SELBACKGROUND	CSPAL_INPUTLINE_SELBACKGROUND
 /// list box selected text
 #define CSPAL_LISTBOX_SELTEXT		CSPAL_INPUTLINE_SELTEXT
+
+/**
+ * csTreeCtrl class color palette indices.<p>
+ */
+/// tree control background
+#define CSPAL_TREECTRL_BACKGROUND	0
+/// background color for cstfsThickRect
+#define CSPAL_TREECTRL_BACKGROUND2	1
+/// 3D border dark
+#define CSPAL_TREECTRL_DARK3D		2
+/// 3D border light
+#define CSPAL_TREECTRL_LIGHT3D		3
+/// 2nd level 3D border dark
+#define CSPAL_TREECTRL_2DARK3D		4
+/// 2nd level 3D border light
+#define CSPAL_TREECTRL_2LIGHT3D		5
+/// tree control text
+#define CSPAL_TREECTRL_TEXT		6
+/// tree control selection background
+#define CSPAL_TREECTRL_SELBACKGROUND	7
+/// tree control selected text
+#define CSPAL_TREECTRL_SELTEXT		8
+/// tree control selected text
+#define CSPAL_TREECTRL_BRANCH		9
+/// tree control branchknob color
+#define CSPAL_TREECTRL_BRANCHKNOB	10
 
 /**
  * csMenuItem class color palette indices.<p>
@@ -253,6 +284,26 @@ extern csPaletteExport cswsPalette[];
 #define CSPAL_LISTBOXITEM_UETEXT	6
 /// Selected emphasized text
 #define CSPAL_LISTBOXITEM_SETEXT	7
+
+/**
+ * csTreeItem class color palette indices.<p>
+ */
+/// Unselected tree item background
+#define CSPAL_TREEITEM_BACKGROUND	0
+/// Selected tree item background
+#define CSPAL_TREEITEM_SELECTION	1
+/// Thin rectangle around selected item
+#define CSPAL_TREEITEM_SELRECT	2
+/// Disabled text
+#define CSPAL_TREEITEM_DTEXT		3
+/// Unselected normal text
+#define CSPAL_TREEITEM_UNTEXT	4
+/// Selected normal text
+#define CSPAL_TREEITEM_SNTEXT	5
+/// Unselected emphasized text
+#define CSPAL_TREEITEM_UETEXT	6
+/// Selected emphasized text
+#define CSPAL_TREEITEM_SETEXT	7
 
 /**
  * csScrollBar class color palette indices.<p>

@@ -133,6 +133,35 @@ static int palette_csListBoxItem [] =
   cs_Color_Cyan_L			// Selected emphasized text
 };
 
+// Tree item class default palette
+static int palette_csTreeItem [] =
+{
+  cs_Color_Gray_L,			// Unselected tree item background
+  cs_Color_Cyan_D,			// Selected tree item background
+  cs_Color_Cyan_L,			// Thin rectangle around selected item
+  cs_Color_Gray_D,			// Disabled text
+  cs_Color_Black,			// Unselected normal text
+  cs_Color_White,			// Selected normal text
+  cs_Color_Cyan_D,			// Unselected emphasized text
+  cs_Color_Cyan_L			// Selected emphasized text
+};
+
+// Treecontrol class default palette
+static int palette_csTreeCtrl [] =
+{
+  cs_Color_Gray_L,			// input line background
+  cs_Color_White,			// background for csifsThickRect
+  cs_Color_Gray_D,			// 3D border dark
+  cs_Color_White,			// 3D border light
+  cs_Color_Black,			// 2nd level 3D border dark
+  cs_Color_Gray_D,			// 2nd level 3D border light
+  cs_Color_Black,			// input line text
+  cs_Color_Cyan_D,			// input line selection background
+  cs_Color_White,			// input line selected text
+  cs_Color_Cyan_L,			// branch color
+  cs_Color_Cyan_D			// branchknob color
+};
+
 // Scroll bar class default palette
 static int palette_csScrollBar [] =
 {
@@ -208,5 +237,7 @@ csPaletteExport cswsPalette [] =
   { palette_csNotebook,    sizeof (palette_csNotebook)    / sizeof (int) },
   { palette_csGridCell,    sizeof (palette_csGridCell)    / sizeof (int) },
   { palette_csGridView,    sizeof (palette_csGridView)    / sizeof (int) },
-  { palette_csSlider,      sizeof (palette_csSlider)      / sizeof (int) }
+  { palette_csSlider,      sizeof (palette_csSlider)      / sizeof (int) },
+  { palette_csTreeItem,    sizeof (palette_csTreeItem)    / sizeof (int) },
+  { palette_csTreeCtrl,    sizeof (palette_csTreeCtrl)    / sizeof (int) }
 };

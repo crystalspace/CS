@@ -50,6 +50,7 @@
  *        +--[ csNotebook ]		// notebook control
  *        +--[ csGrid ]			// grid control
  *        +--[ csSlider ]		// slider control
+ *        +--[ csTreeCtrl ]		// tree control
  * </pre>
  */
 
@@ -107,6 +108,7 @@ class csApp;
 #include "csspinbx.h"			// Spin boxes
 #include "csmenu.h"			// Menu class
 #include "cslistbx.h"			// List box class
+#include "cstree.h"			// Tree control class
 #include "csnotebk.h"			// Notebook class
 #include "csgrid.h"			// Grid class
 #include "csslider.h"			// Slider class
