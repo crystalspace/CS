@@ -19,6 +19,9 @@ chronological order.
 	  sectors to a different color (max 14 different colors). This is
 	  useful for debugging complex portal based levels so you can easily
 	  see what object belongs to what sector.
+	- Jorrit fixed a bug with the ball mesh where colors generated
+	  by the special 'PaintSky()' and related routines were no longer
+	  being honored.
 24-Feb-2004
         - Fritz Elfert fixed conversion of bezier mesh factories in map2cs
           and re-enabled them (With wrong cvs log-message: "Before big

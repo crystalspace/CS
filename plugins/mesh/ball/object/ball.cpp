@@ -125,6 +125,7 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   toponly = false;
   cyl_mapping = false;
   do_lighting = true;
+  generated_colors = false;
   color.red = 0.0f;
   color.green = 0.0f;
   color.blue = 0.0f;
@@ -787,6 +788,8 @@ bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 void csBallMeshObject::UpdateLighting (const csArray<iLight*>& lights,
     iMovable* movable)
 {
+  if (generated_colors) return;
+
   int i, l;
   csColor* colors = ball_colors;
 
@@ -808,7 +811,7 @@ void csBallMeshObject::UpdateLighting (const csArray<iLight*>& lights,
     colors[i] = col;
 
   if (!do_lighting) return;
-    // @@@ it is not effiecient to do this all the time.
+    // @@@ it is not efficient to do this all the time.
 
   // Do the lighting.
   csReversibleTransform trans = movable->GetFullTransform ();
@@ -1045,6 +1048,7 @@ void csBallMeshObject::ApplyVertGradient(float horizon_height,
     GetGradientColor(gradient, val, color);
     ball_colors[i] = color;
   }
+  generated_colors = true;
 }
 
 void csBallMeshObject::ApplyLightSpot(const csVector3& position, float size,
@@ -1078,10 +1082,11 @@ void csBallMeshObject::ApplyLightSpot(const csVector3& position, float size,
     ball_colors[i].Clamp(2.0f, 2.0f, 2.0f);
     ball_colors[i].ClampDown();
   }
+  generated_colors = true;
 }
 
 
-void csBallMeshObject::PaintSky(float time, float **dayvert, float **nightvert,
+void csBallMeshObject::PaintSky (float time, float **dayvert, float **nightvert,
   float **topsun, float **sunset)
 {
   // apply defaults if needed
@@ -1205,6 +1210,7 @@ void csBallMeshObject::PaintSky(float time, float **dayvert, float **nightvert,
   for(i=0; i<num_ball_vertices; i++)
     if(ball_vertices[i].y < shift.y)
       ball_colors[i] = apparent;
+  generated_colors = true;
 
   /// delete gradients
   for(i=0; i<vertlen; i++)

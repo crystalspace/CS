@@ -61,6 +61,7 @@ private:
   bool toponly;
   bool cyl_mapping;
   bool do_lighting;
+  bool generated_colors;
   csColor color;
   float current_lod;
   uint32 current_features;
