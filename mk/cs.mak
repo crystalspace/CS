@@ -210,7 +210,7 @@ zips: cs-help-html.zip
 
 classpdf: $(PDF_FILES)
 
-pdf: cs-tut.pdf cs-inst.pdf classpdf
+pdf: cs-tut.pdf cs-inst.pdf cs-thry.pdf classpdf
 
 pdfbook: crystal.pdf classpdf
 
