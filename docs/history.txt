@@ -118,7 +118,7 @@ chronological order.
 	  the function is used only by other compilation units in the same
 	  DLL. Swig 1.3.24 issue reported by Michael D. Adams
 	  <mdmkolbe@gmail.com>.
-	- res augmented the MAXPATHLEN condifugure check to use the -ansi 
+	- res augmented the MAXPATHLEN configure check to use the -ansi and
 	  -pedantic flags, as apparently on some setups MAXPATHLEN is detected 
 	  by configure, but later not available when compiling sources with 
 	  -ansi -pedantic.
