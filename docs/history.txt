@@ -133,6 +133,8 @@ The history order is reversed so that new features are at the top.
 	  It have alot of serve compilation-errors which should be fixed before
 	  commiting.
 23-Jun-2003
+	- HangDude fixed metaballs for recent renderbuffer changes
+	   (changed CS_BUF_INDEX / STATIC to CS_BUF_DYNAMIC)
         - Boyan did the following in AWS:
           - Added iAwsComponent->GetFirstFocusableChild
           - Added awsWindow->SetFocusedChild and awsWindow->GetFocusedChild
@@ -155,6 +157,7 @@ The history order is reversed so that new features are at the top.
 	  directories to scan for plugin modules.
 	- Matze added a workaround for bison 1.875 to aws
 22-Jun-2003
+	- HangDude converted metaballs to new renderer
 	- Luca did the following:
 	  - Fixed a bug in the label component of AWS: in fact the method
 	    awsLabel::OnKeypress was returning always 'true', although the 
@@ -356,6 +359,11 @@ The history order is reversed so that new features are at the top.
 	  of the height-y-1.
 	  Closed three sf-bugs on this topic.
 19-Jun-2003
+	- HangDude did following
+	    - added anonymous render buffer manager class, which 
+	       can be used to implement the anonymous render buffers for new 
+	       renderer easily.
+	    - "stream" to "renderbuffer" namechange in genmeshldr
 	- Oktal made the following changes to the Perl plugin and module:
 	    - Got rid of all the warnings in the Perl plugin and module,
 	      some by fixing them and some by ignoring them with compiler
