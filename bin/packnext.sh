@@ -18,7 +18,7 @@
 #
 #	Run this script from the directory which contains the "CS" source
 #	directory.  It takes a single, optional argument which is the ambient
-#	light level for use with the cryst.cfg file.  Typically MacOS/X Server
+#	light level for use with the engine.cfg file.  Typically MacOS/X Server
 #	package should use 70 for this value, while OpenStep and NextStep
 #	packages should use 50.  The default, if not specified, is 50.
 #
@@ -26,6 +26,8 @@
 #	Update to support plug-in modules.  Need to include .csplugin files
 #	and strip applications and plug-ins with appropriate flags for both
 #	NextStep, OpenStep, and MacOS/X Server.
+#       Many of the configuration files have changed.  Augment the list here
+#       so that it includes all necessary files.
 #------------------------------------------------------------------------------
 
 SRC=./CS
@@ -34,8 +36,8 @@ PACK=${DST}/CS
 PROGS="walktest mazed blocks metademo"
 DATA="standard.zip flarge.zip maze.zip room.zip MazeD.zip blocks.zip"
 DOCS="blocks.txt config.txt console.txt keys.txt README.NeXT"
-SRCFILES="autoexec.cfg blocks.cfg cryst.cfg softrndr.cfg coord MazeD.cfg \
-	metademo.cfg scf.cfg vfs.cfg"
+SRCFILES="autoexec.cfg blocks.cfg walktest.cfg softrndr.cfg coord MazeD.cfg \
+	metademo.cfg scf.cfg vfs.cfg engine.cfg"
 READMEFILES="README INSTALL.NeXT-Binary"
 
 AMBIENT=50
@@ -103,10 +105,10 @@ for f in ${PROGS}; do
     done
 echo ""
 
-echo -n "Patching cryst.cfg:"
-PATTERN="AMBIENT_WHITE=20"
-REPLACE="AMBIENT_WHITE=${AMBIENT}"
-PATCH_FILE cryst.cfg "brightness"
+echo -n "Patching engine.cfg:"
+PATTERN="Lighting.Ambient.White=20"
+REPLACE="Lighting.Ambient.White=${AMBIENT}"
+PATCH_FILE engine.cfg "brightness"
 echo ""
 
 mv ${PACK}/INSTALL.NeXT-Binary ${PACK}/INSTALL.NeXT

@@ -171,8 +171,8 @@ walktest
 @end example
 
 This will run the WalkTest with the settings from the
-@file{CS/data/config/cryst.cfg} file (usually using software renderer, though
-you can change this).  Alternately you can choose the video driver by
+@file{CS/data/config/walktest.cfg} file (usually using software renderer,
+though you can change this).  Alternately you can choose the video driver by
 specifying the @samp{--video} option on the command-line:
 
 @example
@@ -193,8 +193,8 @@ walktest flarge
 
 If you wish this map to be used by default whenever you launch WalkTest without
 otherwise explicitly mentioning a map file, you may want to edit
-@file{CS/data/config/cryst.cfg} to set the @samp{Walktest.Settings.WorldFile}
-variable to the chosen map.
+@file{CS/data/config/walktest.cfg} to set the
+@samp{Walktest.Settings.WorldFile} variable to the chosen map.
 
 @example
 Walktest.Settings.WorldFile=flarge
@@ -204,7 +204,7 @@ The rest of the settings are mostly self evident and can often be overridden
 at the command line.
 
 You may have to adjust the @samp{Engine.Lighting.Ambient.White} level in
-@file{cryst.cfg} if the maps appear too dark.  After adjusting the ambient
+@file{engine.cfg} if the maps appear too dark.  After adjusting the ambient
 level, specify @samp{--relight} on the command-line to instruct Crystal Space
 to recalculate the lighting information.  For example:
 

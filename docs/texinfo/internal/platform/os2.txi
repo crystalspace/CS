@@ -62,18 +62,18 @@ ratio is not 1:1) @sc{dive} is almost @emph{twice} as slow if @sc{dive} window
 (at least such an effect I've got on my Matrox Mystique).  If you get low
 frame rates, try moving the window by one pixel left/right.
 
-To fix this if you use @samp{WINDOWX} and @samp{WINDOWY} keywords in
-@file{cryst.cfg} file or @samp{-pos <@var{x}>x<@var{y}>} command-line switch,
-the computed @sc{x} value will be rounded to nearest divisor of 2.  However,
-if you manually move the window it can fall on a odd bound and you'll get
-twice lower frame rates.
+To fix this if you use @samp{Video.WindowX} and @samp{Video.WindowY} keywords
+in the application's configuration file (such as @file{walktest.cfg}) or use
+@samp{-pos <@var{x}>x<@var{y}>} command-line switch, the computed @sc{x} value
+will be rounded to nearest divisor of 2.  However, if you manually move the
+window it can fall on a odd bound and you'll get twice lower frame rates.
 
-You can use @samp{WINDOWWIDTH} and @samp{WINDOWHEIGHT} keywords in
-@file{cryst.cfg} file to define start window width and height (client window
+You can use @samp{Video.WindowWidth} and @samp{Video.WindowHeight} keywords in
+the configuration file to define start window width and height (client window
 width and height, not counting borders and titlebar).  If you won't define it,
 the @sc{dive} window will be rescaled to the maximum possible integer factor
-such that window won't be larger than screen.  For example, a 320x200 window
-in 1152x864 resolution will be automatically rescaled at startup to 960x600.
+such that window won't be larger than screen.  For example, a 320x200 window in
+1152x864 resolution will be automatically rescaled at startup to 960x600.
 
 @node OS2 DIVE Features, OS2 Input, OS2 DIVE, OS2 Details
 @subsubsection @sc{dive} Features

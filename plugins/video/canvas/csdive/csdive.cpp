@@ -120,8 +120,8 @@ bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
   iConfigFileNew *Config = System->GetConfig ();
   WindowX = Config->GetInt ("Video.WindowX", INT_MIN);
   WindowY = Config->GetInt ("Video.WindowY", INT_MIN);
-  WindowWidth = Config->GetInt ("Video.WindowW", -1);
-  WindowHeight = Config->GetInt ("Video.WindowH", -1);
+  WindowWidth = Config->GetInt ("Video.WindowWidth", -1);
+  WindowHeight = Config->GetInt ("Video.WindowHeight", -1);
   HardwareCursor = Config->GetBool ("Video.SystemMouseCursor", true);
 
   const char *val;

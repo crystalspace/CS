@@ -31,9 +31,9 @@ placed in your @file{CS/data} directory.  For instance:
 walktest flarge
 @end example
 
-Your other option is to edit the configuration file @file{cryst.cfg} and set
-the @samp{WorldFile} variable to the name of the map you wish to use.  For
-instance:
+Your other option is to edit the application's configuration file
+@file{walktest.cfg} and set the @samp{WorldFile} variable to the name of the
+map you wish to use.  For instance:
 
 @example
 ; Start map file

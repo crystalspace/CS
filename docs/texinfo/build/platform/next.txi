@@ -411,13 +411,13 @@ administrative files.  This problem will be corrected in the future once a
 suitable work-around has been devised.  @emph{Therefore, at this time, all
 Crystal Space applications @strong{must} be launched from the command-line.}
 
-Before running the demonstration programs for the first time, you should
-locate the file @file{cryst.cfg} in the @file{CS/data/config} directory.  This
-file contains parameters which control Crystal Space's environment.
+Before running the demonstration programs for the first time, you should locate
+the file @file{engine.cfg} in the @file{CS/data/config} directory.  This file
+contains parameters which control Crystal Space's lighting.
 
-By default, the overall ambient light level specified in @file{cryst.cfg} is
+By default, the overall ambient light level specified in @file{engine.cfg} is
 often too dark for many MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and
-NextStep displays.  To correct this problem, edit @file{cryst.cfg} and change
+NextStep displays.  To correct this problem, edit @file{engine.cfg} and change
 the @samp{Engine.Lighting.Ambient.White} setting to a more appropriate value.
 Some potentially good choices for this setting are summarized below.  If these
 values do not work well for you, experiment with others until you find one

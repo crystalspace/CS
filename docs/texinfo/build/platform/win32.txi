@@ -374,11 +374,11 @@ A. When I start @file{walktest} I just get a black screen, maybe with some
 text output, but after a few seconds it drops back to the normal windows
 screen without an error.
 
-This shouldn't happen any more, because in most cases now, @file{walktest}
-will display proper error messages.  Anyway, you should make sure you have set
-an appropriate directory set (see above).  Make sure you have specified the
-level in @file{cryst.cfg} as @samp{WORLDFILE=} (also keep in mind, that your
-current directory is, where the executable sits.)
+This shouldn't happen any more, because in most cases now, @file{walktest} will
+display proper error messages.  Anyway, you should make sure you have set an
+appropriate directory set (see above).  Make sure you have specified the map
+file in @file{walktest.cfg} as @samp{Walktest.Settings.WorldFile=} (also keep
+in mind, that your current directory is, where the executable sits.)
 
 @item
 Q. @emph{I get the following (or similar) errors:}

@@ -1539,7 +1539,7 @@ int main (int argc, char* argv[])
 
   // Initialize the main system. This will load all needed plugins
   // (3D, 2D, network, sound, ..., engine) and initialize them.
-  if (!Sys->Initialize (argc, argv, "/config/cryst.cfg"))
+  if (!Sys->Initialize (argc, argv, "/config/walktest.cfg"))
   {
     Sys->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
     fatal_exit (-1, false);

@@ -4,11 +4,8 @@
 @cindex Walktest Configuration
 @cindex Configuration, Walktest
 
-The Walktest configuration file is named @file{cryst.cfg}.  It contains
+The Walktest configuration file is named @file{walktest.cfg}.  It contains
 configuration options specific to the Walktest application.
-
-@emph{Warning}: The configuration file @file{cryst.cfg} will be renamed to
-@file{walktest.cfg} in the near future.
 
 Options which are specific to Walktest and which may be specified in the
 configuration file are:

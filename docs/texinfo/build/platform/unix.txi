@@ -143,8 +143,10 @@ GGI driver. Otherwise if @samp{DISPLAY} is defined it will choose the X11
 driver. If that fails it will try the @samp{SVGALIB} driver. There is no need
 to recompile the program.
 
-To select another 3D rasterizer you need to edit @file{cryst.cfg} and change
-the @samp{VideoDriver} setting. Or else you can run Crystal Space as follows:
+To select another 3D rasterizer you need to edit the application's
+configuration file (such as @file{walktest.cfg}) and change the
+@samp{System.PlugIns.VideoDriver} setting.  Or else you can run Crystal Space
+as follows:
 
 @example
 walktest -video=opengl
