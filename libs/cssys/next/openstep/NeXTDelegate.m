@@ -642,37 +642,6 @@ ND_PROTO(void,stop_event_loop)(NeXTDelegateHandle handle)
 
 
 //-----------------------------------------------------------------------------
-// locateResourceDirectory
-//	If the CrystalSpaceRoot default value is set, then its value is used to
-//	set the current working directory.  This will allow Crystal Space to
-//	locate its resource files even when launched from the Workspace which
-//	does not otherwise provide a meaningful working directory.  However, if
-//	CrystalSpaceRootIgnore is set to "yes", then ignore the
-//	CrystalSpaceRoot setting.  This can be used to force a particular
-//	application to ignore a CrystalSpaceRoot setting inherited from the
-//	"global" domain.
-//-----------------------------------------------------------------------------
-+ (void)locateResourceDirectory
-{
-  NSUserDefaults* defs = [NSUserDefaults standardUserDefaults];
-  NSString* s = [defs stringForKey:@"CrystalSpaceRootIgnore"];
-  if (s == 0 || [s isEqualToString:@""] ||
-     (![s hasPrefix:@"Y"] && ![s hasPrefix:@"y"] &&	// Yes
-      ![s hasPrefix:@"T"] && ![s hasPrefix:@"t"] &&	// True
-      ![s hasPrefix:@"O"] && ![s hasPrefix:@"o"] &&	// On
-      ![s hasPrefix:@"1"]))				// 1
-  {
-    s = [defs stringForKey:@"CrystalSpaceRoot"];
-    if (s != 0 && ![s isEqualToString:@""] &&
-      ![[NSFileManager defaultManager] changeCurrentDirectoryPath:s])
-      fprintf(stderr,
-	"\nWARNING: Unable to set working directory from "
-	"`CrystalSpaceRoot'\nWARNING: Value: %s\n\n",[s lossyCString]);
-  }
-}
-
-
-//-----------------------------------------------------------------------------
 // startup
 //	Interaction with AppKit is initiated here with instantiation of an
 //	NSApplication object and a NeXTDelegate which oversees AppKit-related
@@ -687,7 +656,6 @@ ND_PROTO(void,stop_event_loop)(NeXTDelegateHandle handle)
   NSApp = [NeXTApplication sharedApplication];
   controller = [[NeXTDelegate alloc] initWithDriver:handle];
   [NSApp setDelegate:controller];
-  [self locateResourceDirectory];
   [pool release];
   return controller;
 }
