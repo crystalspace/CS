@@ -635,3 +635,11 @@ to 23 resp. 5 to have hashes use less memory. If a hash is expected to contain
 a large quantity of elements, those two parameters can be tweaked upon 
 construction of a @code{csHash<>} or @code{csHashReversible<>}.  Consult the 
 Public API Documentation of @code{csHash<>} for more information.
+
+@subheading @code{iTextureManager::FreeImages()} Removal
+
+The @code{iTextureManager::FreeImages()} was removed. It was used to release
+the iImage objects associated with textures with the purpose of freeing up
+memory. This happens automatically now; the images associated with a texture
+are released by the renderer as soon as the image data is converted into the
+internal texture format resp. uploaded to the graphics hardware.
