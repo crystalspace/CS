@@ -648,7 +648,8 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
 
 Win32Assistant::~Win32Assistant ()
 {
-  if (console_window)
+  registry->DecRef();
+  if (!is_console_app && (console_window || cmdline_help_wanted))
     FreeConsole();
 }
 
