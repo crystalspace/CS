@@ -184,6 +184,8 @@ void csBMPImageIO::SetDithering (bool)
 iDataBuffer *csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *,
   const char* extraoptions)
 {
+  extraoptions = NULL;
+
   if (!Image || !Image->GetImageData ())
     return NULL;
 
