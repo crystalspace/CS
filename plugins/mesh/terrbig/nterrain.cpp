@@ -50,6 +50,7 @@ csBigTerrainObject::~csBigTerrainObject()
     delete [] info->triq;
     delete info;
   }
+  if (materials) delete [] materials;
 }
 
 void 
@@ -191,6 +192,8 @@ csBigTerrainObject::SetMaterialsList(iMaterialHandle **matlist, unsigned int nMa
   materials = new iMaterialHandle *[nMaterials];
   for(i=0; i<nMaterials; ++i)
     materials[i]=matlist[i];
+
+  // @@@ Should I incref each material?  Then decref on closing?
 }
 
 

@@ -7,6 +7,9 @@
 #include "csutil/mmapio.h"
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"
+#include "csutil/scanstr.h"
+#include "csutil/csvector.h"
+#include "iutil/vfs.h"
 #include "ivideo/graph3d.h"
 #include "iengine/rview.h"
 #include <string.h>
@@ -51,7 +54,50 @@ struct nRect
 };
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+class RGBVector : public csVector
+{
+
+public:
+  virtual int Compare(csSome item1, csSome item2, int Mode)
+  {
+    csRGBcolor *i1 = STATIC_CAST(csRGBcolor *, item1);
+    csRGBcolor *i2 = STATIC_CAST(csRGBcolor *, item2);
+
+    if ((*i1)==(*i2))
+      return 0;
+    else if(i1->red < i2->red &&
+	    i1->green < i2->green &&
+	    i1->blue < i2->blue)
+    {
+      return -1;
+    }
+    else
+      return 1;
+  }
+
+  virtual int CompareKey(csSome item, csConstSome key, int Mode)
+  {
+    csRGBcolor *i1 = STATIC_CAST(csRGBcolor *, item);
+    const csRGBcolor *i2 = STATIC_CAST(const csRGBcolor *, key);
+
+    if ((*i1)==(*i2))
+      return 0;
+    else if(i1->red < i2->red &&
+	    i1->green < i2->green &&
+	    i1->blue < i2->blue)
+    {
+      return -1;
+    }
+    else
+      return 1;
+  }
+
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 
 /// The length of the nBlock structure
@@ -191,7 +237,9 @@ class nTerrain
   /// This is the camera position, in object space.
   csVector3 cam;
 
-
+  /// List of textures
+  iMaterialHandle **materials;
+  
 private:
   /// Calculates the binary logarithm of n
   int ilogb (unsigned n) 
@@ -396,6 +444,77 @@ public:
   /// Sets the camera origin
   void SetCameraOrigin(const csVector3 &camv)
   { cam=camv; }
+
+  /** Map materials to their colors in the image map.  The matmap is a handle to
+   * an iFile that holds the text mapping information of color to material.  The 
+   * terrtex is the image that contains the actual false-color map of texture 
+   * data.  When the terrain file is built, this information will be encoded into
+   * the file.  This function should only be called WHEN CREATING a terrain file.
+   * When loading the terrain for render, call LoadMaterialMap(). 
+   */
+  void CreateMaterialMap(iFile *matmap, iImage *terrtex)
+  {
+    char mode[128];
+    char matname[512];
+    RGBVector rgb_colors;
+    csVector  pal_colors;
+    
+    char *data = new char[matmap->GetSize()];
+    matmap->Read(data, matmap->GetSize());
+
+    int index=0;
+    int read;
+    int r,g,b;
+
+    const MAP_MODE_RGB = 0;
+    const MAP_MODE_8BIT = 1;
+
+    // Must be a power of two.
+    int map_scale;
+
+    // Map mode
+    int map_mode=0;
+    
+    while(index<matmap->GetSize())
+    {
+
+      // Get some settings
+      if ((read=csScanStr(&data[index], "scale: %d", &map_scale))!=-1)
+	index+=read;
+
+      else if ((read=csScanStr(&data[index], "mode: %s", mode))!=-1)
+      {
+	index+=read;
+	if (strcmp(mode, "RGB")==0)
+	  map_mode=MAP_MODE_RGB;
+	else
+  	  map_mode=MAP_MODE_8BIT;
+      }
+      else if (map_mode==MAP_MODE_RGB && (read=csScanStr(&data[index], "%d,%d,%d: %s", &r, &g, &b, matname))!=-1)
+      {
+	index+=read;
+	csRGBcolor *color = new csRGBcolor;
+
+	color->red=r;
+	color->green=g;
+	color->blue=b;
+
+	rgb_colors.Push(color);
+      }
+
+      else if (map_mode==MAP_MODE_8BIT && (read=csScanStr(&data[index], "%d: %s", &r, matname))!=-1)
+      {
+	index+=read;
+	
+	pal_colors.Push((void *)r);
+      }
+    }
+
+    // Now sort the list
+    if (map_mode==MAP_MODE_RGB) rgb_colors.QuickSort();
+    else pal_colors.QuickSort();
+  }
+
 };
 
 
@@ -513,7 +632,7 @@ public:
 
   ///////////////////////////////////////////////////////////////////
 
-  /// Set the materials list
+  /// Set the materials list, copies the passed in list.
   void SetMaterialsList(iMaterialHandle **matlist, unsigned int nMaterials);
 };
 
