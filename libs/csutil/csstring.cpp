@@ -64,11 +64,11 @@ void csString::ExpandIfNeeded(size_t NewSize)
       n = (NewSize + GrowBy - 1) & ~(GrowBy - 1);
     else
     {
-      n = MaxSize << 1;
+      n = (MaxSize+1) << 1;
       while (n < NewSize)
         n <<= 1;
     }
-  SetCapacity(n);
+    SetCapacity(n);
   }
 }
 
