@@ -61,7 +61,8 @@ DSP.WIN32SYS.RESOURCES = \
   $(wildcard libs/cssys/*.cpp libs/cssys/win32/*.cpp \
   include/cssys/win32/csosdefs.h include/cssys/win32/volatile.h \
   include/cssys/win32/win32.h include/cssys/win32/win32itf.h) \
-  libs/cssys/general/findlib.cpp libs/cssys/general/getopt.cpp
+  libs/cssys/general/findlib.cpp libs/cssys/general/getopt.cpp \
+  libs/cssys/general/printf.cpp
 
 
 # grpall -- represents all other projects indirectly through grpapps,
