@@ -1,13 +1,13 @@
 #------------------------------------------------------------------------------
 # Isometric loader plugin submakefile
 #------------------------------------------------------------------------------
-DESCRIPTION.isoload = Crystal Space isometric world loader plugin
+DESCRIPTION.isoload = Crystal Space isometric world loader plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make isoload          Make the $(DESCRIPTION.isoload)$"
+  $(NEWLINE)echo $"  make isoload      Make the $(DESCRIPTION.isoload)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#

@@ -9,7 +9,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 DRIVERHELP += \
-  $(NEWLINE)echo $"  make memory         Make the $(DESCRIPTION.memory)$"
+  $(NEWLINE)echo $"  make memory       Make the $(DESCRIPTION.memory)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -48,11 +48,9 @@ SRC.MEMORY = $(wildcard plugins/video/canvas/memory/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.MEMORY = $(addprefix $(OUT),$(notdir $(SRC.MEMORY:.cpp=$O)))
 DEP.MEMORY = CSUTIL CSSYS
 
-
-
-#MSVC.DSP += MEMORY
-#DSP.MEMORY.NAME = memory
-#DSP.MEMORY.TYPE = plugin
+MSVC.DSP += MEMORY
+DSP.MEMORY.NAME = memory
+DSP.MEMORY.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

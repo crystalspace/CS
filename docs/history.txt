@@ -4,6 +4,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed a problem which caused a host of HTML pages in
 	  the user manual to be blank.  The culprit was a missing closing brace
 	  '}' for an @emph directive in msdos.txi.
+	- Eric Sunshine fixed formatting of the help message for memory.mak and
+	  isoload.mak.
 28-Mar-2002
 	- Reverted part of 'res' changes to the lightmap checker because
 	  they cause big problems.
