@@ -159,13 +159,15 @@ SRC.SYS_CSSYS = \
 #RC=rc
 RCFLAGS=-r -I libs $(RCFLAGS.SYSTEM)
 
-# Command sequence for creating a directory.
+# Command sequence for creating a directory, and command for creating a
+# directory as well as any missing parents.
 # Note that directories will have forward slashes. Please
 # make sure that this command accepts that (or use 'subst' first).
-ifneq (,$(findstring cmd,$(SHELL))$(findstring CMD,$(SHELL)))
-  MKDIR = mkdir $(subst /,\,$(@:/=))
-else
-  MKDIR = mkdir $@
+# If we are using a Unix-like shell, then use Unix-like paths, otherwise
+# sipmly inherit these settings from CS/mk/dos.mak.
+ifeq (,$(findstring cmd,$(SHELL))$(findstring CMD,$(SHELL)))
+  MKDIR=$(CMD.MKDIR) $(patsubst %/,%,$@)
+  MKDIRS=$(CMD.MKDIRS) $(patsubst %/,%,$@)
 endif
 
 # For using sockets we should link with sockets library

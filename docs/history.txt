@@ -1,5 +1,19 @@
 The history order is reversed so that new features are at the top.
 
+8-Oct-2002
+	- Eric Sunshine made the following changes:
+	    - Added the new makefile variable MKDIRS which, given a path
+	      representing a directory, creates that directory as well as any
+	      missing parent directories.  This complements the existing MKDIR
+	      variable.
+	    - Augmented the project configuration phase so that, for Unix and
+	      Unix-like environments (including Cygwin and Mingw/Msys), it
+	      automatically discovers the appropriate command for creating a
+	      directory including missing parents.  Currently recognizes "mkdir
+	      -p" and the old "mkdirs" commands.
+	    - Created mkdirs.bat for Windows/DOS users who are not using a Unix
+	      emulation shell.  This batch file emulates "mkdir -p" using only
+	      DOS commands.
 7-Oct-2002
 	- Removed some obsolete texmem.{cpp|h} files in the 3D renderer
 	  directories.

@@ -41,7 +41,10 @@ endif
 # Command sequence for creating a directory.
 # Note that directories will have forward slashes. Please
 # make sure that this command accepts that (or use 'subst' first).
-MKDIR=mkdir $(@:/=)
+MKDIR=$(CMD.MKDIR) $(patsubst %/,%,$@)
+
+# Command for creating a directory including missing parents.
+MKDIRS=$(CMD.MKDIRS) $(patsubst %/,%,$@)
 
 # The command to remove all specified files.
 RM=rm -f

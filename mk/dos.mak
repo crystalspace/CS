@@ -32,10 +32,13 @@ OUTDLL=.
 # We don't need separate directories for dynamic libraries
 OUTSUFX.yes=
 
-# Command sequence for creating a directory.
+# Command for creating a directory.
 # Note that directories will have forward slashes. Please
 # make sure that this command accepts that (or use 'subst' first).
-MKDIR = mkdir $(subst /,\,$(@:/=))
+MKDIR=mkdir $(subst /,\,$(patsubst %/,%,$@))
+
+# Command for creating a directory including missing parents.
+MKDIRS=libs/cssys/win32/mkdirs.bat $(strip $(subst /, ,$@))
 
 # The command to remove all specified files.
 RM=rm -f

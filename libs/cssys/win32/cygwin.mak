@@ -164,7 +164,10 @@ LINK=gcc
 # Command sequence for creating a directory.
 # Note that directories will have forward slashes. Please
 # make sure that this command accepts that (or use 'subst' first).
-MKDIR = mkdir $@
+MKDIR=$(CMD.MKDIR) $(patsubst %/,%,$@)
+
+# Command for creating a directory including missing parents.
+MKDIRS=$(CMD.MKDIRS) $(patsubst %/,%,$@)
 
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND=-e "s/\.ob*j*\:/\$$O:/g"
