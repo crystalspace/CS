@@ -46,6 +46,7 @@ public:
 //  csDLinkList CacheList;
 	Opcode::BVTCache ColCache;
   csCollisionPair *pairs;
+  unsigned int N_pairs;
   iObjectRegistry *object_reg;
 
  SCF_DECLARE_IBASE;
