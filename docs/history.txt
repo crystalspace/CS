@@ -110,6 +110,9 @@ chronological order.
 	      any time. It was highly dangerous.
 	    - Augmented perl5test to also exercise iScriptObject::Set(), in
 	      addition to Get().
+	- Neil Mosafi fixed crash in plugins/cursor/cursor.cpp where it was
+	  passing a null char* into strcmp, due to it using the internal
+	  data in an uninitialised csString
 24-Apr-2004
 	- Jorrit fixed a compile bug in glshader_fixed. 'friend' needs
 	  'struct'.
