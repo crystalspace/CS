@@ -272,7 +272,7 @@ void csConsole::Draw(csRect *area)
 
       // Make a copy of the text
       csString curText(*text);
-      curText.SetSize(cx);
+      curText.SetCapacity(cx);
       curText.SetAt(cx, '\0');
       cx_pix = piG2D->GetTextWidth(font, curText.GetData());
     }
@@ -383,11 +383,11 @@ void csConsole::SetPosition(int x, int y, int width, int height)
     cx = 0;
   } else {
     csString curText(*text);
-    curText.SetSize(cx);
+    curText.SetCapacity(cx);
     curText.SetAt(cx, '\0');
     while ( cx && piG2D->GetTextWidth(font, curText.GetData()) > size.Width() )
     {
-      curText.SetSize(--cx);
+      curText.SetCapacity(--cx);
       curText.SetAt(cx, '\0');
     }
   }

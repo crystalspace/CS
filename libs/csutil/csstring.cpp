@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
-		CSScript module created by Brandon Ehle (Azverkan)
+    Crystal Space utility library: string class
+    Copyright (C) 1999,2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,8 +17,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+extern "C" {
 #include <ctype.h>
 #include <stdarg.h>
+}
 #include "sysdef.h"
 #include "csutil/csstring.h"
 
@@ -27,22 +29,36 @@ csString::~csString ()
   Free ();
 }
 
-void csString::SetSize (size_t NewSize)
+void csString::SetCapacity (size_t NewSize)
 {
   NewSize++;
   if (NewSize == MaxSize)
     return;
 
-  Data = (char *)realloc (Data, MaxSize = NewSize);
+  MaxSize = NewSize;
+  Data = (char *)realloc (Data, MaxSize);
 
   if (Size >= MaxSize)
-    Size = MaxSize, Data [Size] = 0;
+  {
+    Size = MaxSize - 1;
+    Data [Size] = 0;
+  }
+}
+
+csString &csString::Truncate (size_t iPos)
+{
+  if (iPos < Size)
+  {
+    Size = iPos;
+    Data [Size] = 0;
+  }
+  return *this;
 }
 
 csString &csString::DeleteAt (size_t iPos, size_t iCount)
 {
 #ifdef CS_DEBUG
-  if ( (iPos > Size) || (iPos + iCount > Size) )
+  if (iPos > Size || iPos + iCount > Size)
     STR_FATAL (("Tried to delete characters beyond the end of the string!\n"))
 #endif
   memmove(Data + iPos, Data + iPos + iCount, Size - (iPos + iCount));
@@ -68,7 +84,7 @@ csString &csString::Insert (size_t iPos, const csString &iStr)
   size_t sl = iStr.Length ();
   size_t NewSize = sl + Length ();
   if (NewSize >= MaxSize)
-    SetSize (NewSize);
+    SetCapacity (NewSize);
   memmove (Data + iPos + sl, Data + iPos, Size - iPos);
   memcpy (Data + iPos, iStr.GetData (), sl);
   Data [Size = NewSize] = 0;
@@ -92,7 +108,7 @@ csString &csString::Insert (size_t iPos, const char iChar)
 
   size_t NewSize = 1 + Length ();
   if (NewSize >= MaxSize)
-    SetSize (NewSize);
+    SetCapacity (NewSize);
   memmove (Data + iPos + 1, Data + iPos, Size - iPos);
   Data[iPos] = iChar;
   Data [Size = NewSize] = 0;
@@ -117,7 +133,7 @@ csString &csString::Overwrite (size_t iPos, const csString &iStr)
   size_t sl = iStr.Length ();
   size_t NewSize = iPos + sl;
   if (NewSize >= MaxSize)
-    SetSize (NewSize);
+    SetCapacity (NewSize);
   memcpy (Data + iPos, iStr.GetData (), sl);
   Data [Size = NewSize] = 0;
 
@@ -134,7 +150,7 @@ csString &csString::Append (const csString &iStr, size_t iCount)
 
   size_t NewSize = Size + iCount;
   if (NewSize >= MaxSize)
-    SetSize (NewSize);
+    SetCapacity (NewSize);
 
   memcpy (Data + Size, iStr.GetData (), iCount);
   Data [Size = NewSize] = 0;
@@ -152,7 +168,7 @@ csString &csString::Append (const char *iStr, size_t iCount)
 
   size_t NewSize = Size + iCount;
   if (NewSize >= MaxSize)
-    SetSize (NewSize);
+    SetCapacity (NewSize);
 
   memcpy (Data + Size, iStr, iCount);
   Data [Size = NewSize] = 0;
@@ -162,21 +178,22 @@ csString &csString::Append (const char *iStr, size_t iCount)
 
 csString &csString::LTrim()
 {
-  size_t i;
-  for(i = 0; i < Size; i++) {
-    if(!isspace(Data[i]))
-      return DeleteAt(0, i);
+  for (size_t i = 0; i < Size; i++)
+  {
+    if (!isspace (Data[i]))
+      return DeleteAt (0, i);
   }
   return *this;
 }
 
 csString &csString::RTrim()
 {
-  int i;
-  for(i = Size - 1; i >= 0; i--) {
-    if(!isspace(Data[i])) {
+  for(int i = Size - 1; i >= 0; i--)
+  {
+    if (!isspace (Data[i]))
+    {
       i++;
-      return DeleteAt(i, Size - i);
+      return DeleteAt (i, Size - i);
     }
   }
   return *this;
@@ -184,38 +201,34 @@ csString &csString::RTrim()
 
 csString &csString::Trim()
 {
-  LTrim();
-  return RTrim();
+  return LTrim().RTrim();
 }
 
 csString &csString::Collapse()
 {
-  size_t i, start = (size_t) -1;
-
+  size_t start = (size_t) -1;
   Trim();
-
-  for(i = 0; i < Size; i++) {
-
-    if(isspace(Data[i])) {
-
-      // We skip over the first whitespace, and make sure the first space IS a space
-      if(start==(size_t) -1) {
+  for (size_t i = 1; i < Size - 1; i++)
+  {
+    if (isspace (Data[i]))
+    {
+      if (start==(size_t) -1)
+      {
 	start = i + 1;
-	Data[i] = ' ';
+	Data[i] = ' '; // Force 'space' as opposed to anything isspace()able.
       }
-
-    } else {
-
+    }
+    else
+    {
       // Delete any extra whitespace
-      if((start!=(size_t) -1)&&(start!=i)) {
-	DeleteAt(start, i - start);
+      if (start != (size_t)-1 && start != i)
+      {
+	DeleteAt (start, i - start);
 	i -= i - start;
       }
-
       start = (size_t) -1;
     }
   }
-
   return *this;
 }
 
@@ -228,23 +241,23 @@ csString &csString::Format(const char *format, ...)
   va_start(args, format);
 
   // Keep trying until the buffer is big enough to hold the entire string
-  while(NewSize < 0) {
+  while(NewSize < 0)
+  {
     NewSize = vsnprintf(Data, MaxSize, format, args);
     // Increasing by the size of the format streams seems logical enough
     if(NewSize < 0)
-      SetSize(MaxSize + strlen(format));
+      SetCapacity(MaxSize + strlen(format));
     // In this case we know what size it wants
-    if((size_t) NewSize>=MaxSize) {
-      SetSize(NewSize + 1);
+    if((size_t) NewSize>=MaxSize)
+    {
+      SetCapacity(NewSize + 1);
       NewSize = -1; // Don't break the while loop just yet!
     } 
   }
 
   // Add in the terminating NULL
   Size = NewSize + 1;
-
   va_end(args);
-
   return *this;
 
 }

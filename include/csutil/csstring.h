@@ -39,7 +39,7 @@ class csString
 
 public:
   /// Set string capacity to NewSize characters (plus one for ending NULL)
-  void SetSize (size_t NewSize);
+  void SetCapacity (size_t NewSize);
 
   /// Free the memory allocated for the string
   void Free ()
@@ -52,16 +52,16 @@ public:
     }
   }
 
+  /// Truncate the string
+  csString &Truncate (size_t iPos);
+
   /// Set string maximal capacity to current string length
-  void Reclaim ()
-  { SetSize (Size); }
+  csString &Reclaim ()
+  { SetCapacity (Size); return *this; }
 
   /// Clear the string (so that it contains only ending NULL character)
   csString& Clear ()
-  {
-    SetSize (0);
-    return *this;
-  }
+  { return Truncate (0); }
 
   /// Get a pointer to ASCIIZ string
   char *GetData () const
@@ -129,6 +129,19 @@ public:
 
   /// Append a character to this string
   csString &Append (char c){ char s[2]; s[0] = c; s[1] = 0; return Append(s); }
+  csString &Append (unsigned char c){ return Append(char(c)); }
+
+#define STR_APPEND(TYPE,FMT,SZ) csString &Append(TYPE n) \
+  { char s[SZ]; sprintf(s, #FMT, n); return Append(s); }
+  STR_APPEND(short, %hd, 32)
+  STR_APPEND(unsigned short, %hu, 32)
+  STR_APPEND(int, %d, 32)
+  STR_APPEND(unsigned int, %u, 32)
+  STR_APPEND(long, %ld, 32)
+  STR_APPEND(unsigned long, %lu, 32)
+  STR_APPEND(float, %g, 64)
+  STR_APPEND(double, %g, 64)
+#undef STR_APPEND
 
   /// Replace contents of this string with the contents of another
   csString &Replace (const csString &iStr, size_t iCount = (size_t)-1)
@@ -167,7 +180,7 @@ public:
 
   /// Create an csString object and reserve space for iLength characters
   csString (int iLength) : Data (NULL), Size (0), MaxSize (0)
-  { SetSize (iLength); }
+  { SetCapacity (iLength); }
 
   /// Copy constructor from existing csString.
   csString (const csString &copy) : Data (NULL), Size (0), MaxSize (0)
@@ -197,25 +210,27 @@ public:
   /// Does both LTrim() and RTrim()
   csString &Trim();
 
-  /// Does Trim() and then consolidates internal consecutive whitespace to a single space
+  /// Calls Trim() and collapses internal whitespace to a single space.
   csString &Collapse();
-
-  /// Provides sprintf capabilities.  Overwrites whatever is currently in the string.
-  /// Disabled due to issues with vsnprintf on some OSes
-  //csString &Format(const char *format, ...);
-
 
   /// Assign a string to another
   csString &operator = (const csString &iStr)
   { return Replace (iStr); }
 
-  /// Append another string to this
-  csString &operator += (const csString &iStr)
-  { return Append (iStr); }
-
-  /// Append an ASCIIZ to this string
-  csString &operator += (const char* iStr)
-  { return Append (iStr); }
+#define STR_APPEND(TYPE) csString &operator += (TYPE s) { return Append (s); }
+  STR_APPEND(const csString&)
+  STR_APPEND(const char*)
+  STR_APPEND(char)
+  STR_APPEND(unsigned char)
+  STR_APPEND(short)
+  STR_APPEND(unsigned short)
+  STR_APPEND(int)
+  STR_APPEND(unsigned int)
+  STR_APPEND(long);
+  STR_APPEND(unsigned long)
+  STR_APPEND(float)
+  STR_APPEND(double)
+#undef STR_APPEND
 
   /// Concatenate two strings and return a third one
   csString operator + (const csString &iStr) const
@@ -241,5 +256,22 @@ inline csString operator + (const csString &iStr1, const char* iStr2)
 {
   return iStr1.Clone ().Append (iStr2);
 }
+
+/// Handy shift operators.
+#define STR_SHIFT(TYPE) \
+  inline csString &operator << (csString &s, TYPE v) { return s.Append (v); }
+STR_SHIFT(const csString&)
+STR_SHIFT(const char*)
+STR_SHIFT(char)
+STR_SHIFT(unsigned char)
+STR_SHIFT(short)
+STR_SHIFT(unsigned short)
+STR_SHIFT(int)
+STR_SHIFT(unsigned int)
+STR_SHIFT(long);
+STR_SHIFT(unsigned long)
+STR_SHIFT(float)
+STR_SHIFT(double)
+#undef STR_SHIFT
 
 #endif // __CS_CSSTRING_H__

@@ -24,56 +24,56 @@ IMPLEMENT_IBASE (scfString)
   IMPLEMENTS_INTERFACE (iString)
 IMPLEMENT_IBASE_END
 
-scfString::~scfString ()
-{ delete s; }
+void scfString::SetCapacity (size_t NewSize)
+{ s.SetCapacity (NewSize); }
 
-void scfString::SetSize (size_t NewSize)
-{ s->SetSize (NewSize); }
+void scfString::Truncate (size_t iPos)
+{ s.Truncate (iPos); }
 
 void scfString::Reclaim ()
-{ s->Reclaim (); }
+{ s.Reclaim (); }
 
 iString *scfString::Clone () const
 { return new scfString (*this); }
 
 char *scfString::GetData () const
-{ return s->GetData (); }
+{ return s.GetData (); }
 
 size_t scfString::Length () const
-{ return s->Length (); }
+{ return s.Length (); }
 
 inline char& scfString::operator [] (size_t iPos)
-{ return (*s) [iPos]; }
+{ return s[iPos]; }
 
 void scfString::SetAt (size_t iPos, char iChar)
-{ s->SetAt (iPos, iChar); }
+{ s.SetAt (iPos, iChar); }
 
 char scfString::GetAt (size_t iPos) const
-{ return s->GetAt (iPos); }
+{ return s.GetAt (iPos); }
 
 void scfString::Insert (size_t iPos, iString *iStr)
-{ s->Insert (iPos, iStr->GetData ()); }
+{ s.Insert (iPos, iStr->GetData ()); }
 
 void scfString::Overwrite (size_t iPos, iString *iStr)
-{ s->Overwrite (iPos, iStr->GetData ()); }
+{ s.Overwrite (iPos, iStr->GetData ()); }
 
-iString *scfString::Append (const char *iStr, size_t iCount)
+iString &scfString::Append (const char *iStr, size_t iCount)
 {
-  s->Append (iStr, iCount);
-  return this;
+  s.Append (iStr, iCount);
+  return *this;
 }
 
-iString *scfString::Append (const iString *iStr, size_t iCount)
+iString &scfString::Append (const iString *iStr, size_t iCount)
 {
-  s->Append (iStr->GetData (), iCount);
-  return this;
+  s.Append (iStr->GetData (), iCount);
+  return *this;
 }
 
 void scfString::Replace (const iString *iStr, size_t iCount)
-{ s->Replace (iStr->GetData (), iCount); }
+{ s.Replace (iStr->GetData (), iCount); }
 
 bool scfString::Compare (const iString *iStr) const
-{ return s->Compare (iStr->GetData ()); }
+{ return s.Compare (iStr->GetData ()); }
 
 bool scfString::CompareNoCase (const iString *iStr) const
-{ return s->CompareNoCase (iStr->GetData ()); }
+{ return s.CompareNoCase (iStr->GetData ()); }

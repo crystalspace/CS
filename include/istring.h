@@ -28,14 +28,17 @@ SCF_VERSION (iString, 0, 0, 1);
 struct iString : public iBase
 {
   /// Set string capacity to NewSize characters (plus one for ending NULL)
-  virtual void SetSize (size_t NewSize) = 0;
+  virtual void SetCapacity (size_t NewSize) = 0;
+
+  /// Truncate the string
+  virtual void Truncate (size_t iPos) = 0;
 
   /// Set string maximal capacity to current string length
   virtual void Reclaim () = 0;
 
   /// Clear the string (so that it contains only ending NULL character)
   inline void Clear ()
-  { SetSize (0); }
+  { Truncate (0); }
 
   /// Get a copy of this string
   virtual iString *Clone () const = 0;
@@ -65,11 +68,11 @@ struct iString : public iBase
   /// Overlay another string onto a part of this string
   virtual void Overwrite (size_t iPos, iString *iStr) = 0;
 
-  /// Append an ASCIIZ string to this one (possibly iCount characters from the string)
-  virtual iString *Append (const char *iStr, size_t iCount = (size_t)-1) = 0;
+  /// Append an ASCIIZ string to this one (up to iCount characters)
+  virtual iString &Append (const char *iStr, size_t iCount = (size_t)-1) = 0;
 
   /// Append a string to this one (possibly iCount characters from the string)
-  virtual iString *Append (const iString *iStr, size_t iCount = (size_t)-1) = 0;
+  virtual iString &Append (const iString *iStr, size_t iCount = (size_t)-1)=0;
 
   /// Replace contents of this string with the contents of another
   virtual void Replace (const iString *iStr, size_t iCount = (size_t)-1) = 0;
@@ -82,15 +85,15 @@ struct iString : public iBase
 
   /// Append another string to this
   iString &operator += (const iString &iStr)
-  { return *Append (&iStr); }
+  { return Append (&iStr); }
 
   /// Append an ASCIIZ to this string
   iString &operator += (const char *iStr)
-  { return *Append (iStr); }
+  { return Append (iStr); }
 
   /// Concatenate two strings and return a third one
   iString &operator + (const iString &iStr) const
-  { return *(Clone ()->Append (&iStr)); }
+  { return Clone ()->Append (&iStr); }
 
   /// Convert iString into ASCIIZ
   operator char * () const

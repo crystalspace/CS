@@ -26,32 +26,35 @@
 /// This is a thin SCF wrapper around csString
 class scfString : public iString
 {
-  csString *s;
+  csString s;
 
 public:
   DECLARE_IBASE;
 
   /// Create an empty scfString object
   scfString ()
-  { CONSTRUCT_IBASE (NULL); s = new csString (); }
+  { CONSTRUCT_IBASE (NULL); }
 
   /// Create an scfString object and reserve space for iLength characters
-  scfString (int iLength)
-  { CONSTRUCT_IBASE (NULL); s = new csString (iLength); }
+  scfString (int iLength) : s(iLength)
+  { CONSTRUCT_IBASE (NULL); }
 
   /// Copy constructor
-  scfString (const iString &copy)
-  { CONSTRUCT_IBASE (NULL); s = new csString (copy.GetData ()); }
+  scfString (const iString &copy) : s(copy.GetData())
+  { CONSTRUCT_IBASE (NULL); }
 
   /// Yet another copy constructor
-  scfString (const char *copy)
-  { CONSTRUCT_IBASE (NULL); s = new csString (copy); }
+  scfString (const char *copy) : s(copy)
+  { CONSTRUCT_IBASE (NULL); }
 
   /// Destroy a scfString object
-  virtual ~scfString ();
+  virtual ~scfString () {}
 
   /// Set string capacity to NewSize characters (plus one for ending NULL)
-  virtual void SetSize (size_t NewSize);
+  virtual void SetCapacity (size_t NewSize);
+
+  /// Truncate the string
+  virtual void Truncate (size_t iPos);
 
   /// Set string maximal capacity to current string length
   virtual void Reclaim ();
@@ -80,11 +83,11 @@ public:
   /// Overlay another string onto a part of this string
   virtual void Overwrite (size_t iPos, iString *iStr);
 
-  /// Append an ASCIIZ string to this one (possibly iCount characters from the string)
-  virtual iString *Append (const char *iStr, size_t iCount = (size_t)-1);
+  /// Append an ASCIIZ string to this one (up to iCount characters)
+  virtual iString &Append (const char *iStr, size_t iCount = (size_t)-1);
 
   /// Append a string to this one (possibly iCount characters from the string)
-  virtual iString *Append (const iString *iStr, size_t iCount = (size_t)-1);
+  virtual iString &Append (const iString *iStr, size_t iCount = (size_t)-1);
 
   /// Replace contents of this string with the contents of another
   virtual void Replace (const iString *iStr, size_t iCount = (size_t)-1);
