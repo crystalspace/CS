@@ -159,7 +159,7 @@ The history order is reversed so that new features are at the top.
 	      headache associated with trying to keep two nearly identical
 	      scripts synchronized, but it also fixes a lot of bugs with the
 	      Jam configuration.  A significant number of changes which had
-	      been applied to configure.ac were never propogated to
+	      been applied to configure.ac were never propagated to
 	      configure-jam.ac.
 	    - Replaced CS/Jamfile with CS/Jamfile.in.  CS/Jamfile is now
 	      created automatically from Jamfile.in as part of the
