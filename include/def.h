@@ -87,7 +87,7 @@
 #  error "Please specify the compiler in the makefile! (COMP=...)"
 #endif
 
-#if !defined(PROC_INTEL) && !defined(PROC_SPARC) && !defined(PROC_MIPS) && !defined(PROC_UNKNOWN) && !defined(PROC_POWERPC) && !defined(PROC_M68K) && !defined(PROC_HPPA)
+#if !defined(PROC_INTEL) && !defined(PROC_SPARC) && !defined(PROC_MIPS) && !defined(PROC_UNKNOWN) && !defined(PROC_POWERPC) && !defined(PROC_M68K) && !defined(PROC_HPPA) && !defined(PROC_ALPHA)
 #  error "Please specify the processor in the makefile! (PROC=...)"
 #endif
 

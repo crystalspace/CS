@@ -162,6 +162,8 @@ bool csGraphics2DSVGALib::Open(const char *Title)
   // Set loop callback
   UnixSystem->SetLoopCallback (ProcessEvents, this);
 
+  vga_init ();
+
   // Enable mouse support in SVGALIB
   vga_setmousesupport (1);
 

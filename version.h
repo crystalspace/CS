@@ -53,6 +53,8 @@
 #  define PR_VERSION "M68K"
 #elif defined(PROC_HPPA)
 #  define PR_VERSION "PA-RISC"
+#elif defined(PROC_ALPHA)
+#  define PR_VERSION "Alpha"
 #elif defined(PROC_UNKNOWN)
 #  define PR_VERSION "Unknown"
 #else

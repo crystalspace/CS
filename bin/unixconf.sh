@@ -46,6 +46,7 @@ case $MACHINE in
   *i[3-9]86*)	echo "PROC = INTEL" ;;
   *sparc*)	echo "PROC = SPARC" ;;
   *mips*)	echo "PROC = MIPS" ;;
+  *alpha*)	echo "PROC = ALPHA" ;;
   *)		echo "UNKNOWN MACHINE TYPE: Please fix $0!" >&2
 		exit 1
 esac
@@ -69,8 +70,9 @@ echo "int main () {}" >conftest.cpp
 # Check for machine-specific C compiler flags
 (echo "$CPU" | grep -q 686 && ${CXX} -c -mpentiumpro -march=i686 conftest.cpp && echo "CFLAGS.SYSTEM += -mpentiumpro -march=i686") || \
 (echo "$CPU" | grep -q [5-6]86 && ${CXX} -c -mpentium -march=i586 conftest.cpp && echo "CFLAGS.SYSTEM += -mpentium -march=i586") || \
-(echo "$CPU" | grep -q [3-9]86 && ${CXX} -c -m486 conftest.cpp && echo "CFLAGS.SYSTEM += -m486 ")
-
+(echo "$CPU" | grep -q [3-9]86 && ${CXX} -c -m486 conftest.cpp && echo "CFLAGS.SYSTEM += -m486") || \
+(echo "$MACHINE" | grep -q alpha && ${CXX} -c -mieee conftest.cpp && echo "CFLAGS.SYSTEM += -mieee")
+ 
 # Check for GCC-version-specific command-line options
 ${CXX} -c -fno-exceptions conftest.cpp 2>/dev/null && echo "CFLAGS.SYSTEM += -fno-exceptions"
 ${CXX} -c -fno-rtti conftest.cpp 2>/dev/null && echo "CFLAGS.SYSTEM += -fno-rtti"
