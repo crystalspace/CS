@@ -698,15 +698,18 @@
 ; Example:
 ;   scanproc 8,draw_scanline_tex_zfil,SCANPROC_MAP,scanloop_tex
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
-%define		scanloop_tex_args 8
+%define		scanloop_tex_args 12
 %macro		scanloop_tex_init 0
 		tloc	%$and_w		; texture width mask
 		tloc	%$and_h		; texture height mask
+		tloc	%$paltable	; index->palette conversion table
 
 		mov	eax,and_w
 		mov	ecx,and_h
+		mov	ebp,PaletteTable
 		mov	%$and_w,eax
 		mov	%$and_h,ecx
+		mov	%$paltable,ebp
 %endmacro
 %macro		scanloop_tex_body 0
 	%ifdef PIC
@@ -740,7 +743,9 @@
 		add	ebp,edx						; 8
 		xor	edx,edx						; 8
 		mov	dl,[esi+ebp]					; 10
+		mov	ebp,%$paltable					; 9
 		add	eax,%$duu					; 11/2
+		mov	dl,[ebp+edx]					; 10
 		mov	[edi],dl					; 13
 		inc	edi						; 13
 		cmp	edi,%$destend					; 14
