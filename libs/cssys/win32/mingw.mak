@@ -6,10 +6,10 @@ DESCRIPTION.mingw = Win32 with Mingw GCC
 
 # Choose which drivers you want to build/use
 # video/canvas/ddraw6 video/canvas/ddraw 
-# video/renderer/direct3d5 video/renderer/direct3d6
-# video/renderer/opengl
+# video/renderer/software video/renderer/direct3d5
+# video/renderer/direct3d6 video/renderer/opengl
 #
-PLUGINS += video/renderer/software video/canvas/ddraw
+PLUGINS += video/canvas/ddraw video/renderer/software
 
 ifeq ($(DO_SOUND),yes)
 PLUGINS += sound/renderer/software
@@ -33,7 +33,7 @@ OS=WIN32
 COMP=GCC
 
 # Command to update a target
-#UPD=bin\dosupd.bat $@ DEST
+#UPD=
 
 # Win32 console equivalent of Unix rmdir
 RMDIR=deltree /Y
@@ -44,8 +44,9 @@ endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 ifeq ($(MAKESECTION),defines)
 
 # OpenGL settings for use with OpenGL Drivers...untested
-#SGI OPENGL SDK v1.1 for Win32
+#SGI OPENGL SDK v1.1.1 for Win32
 #OPENGL.LIBS.DEFINED = -lopengl -lglut
+
 #MS OpenGL
 #OPENGL.LIBS.DEFINED = -lopengl32 -lglut32
 
@@ -71,19 +72,17 @@ NEED_SOCKET_LIB=
 CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
 
 # General flags for the compiler which are used for Ix386.
-#CFLAGS.GENERAL+= -fomit-frame-pointer -fvtable-thunks \
-#		-Wall $(CFLAGS.SYSTEM)
+#CFLAGS.GENERAL+= -fvtable-thunks -Wall $(CFLAGS.SYSTEM)
 
 # General flags which are used when using Pentium II
-#CFLAGS.GENERAL+=-Dpentium -fomit-frame-pointer -fvtable-thunks \
-#		-Wall $(CFLAGS.SYSTEM)
+#CFLAGS.GENERAL+=-Dpentium -mthreads -fvtable-thunks -Wall $(CFLAGS.SYSTEM)
 
 # If using Pentium Pro or better (Recommended for MMX builds)
-CFLAGS.GENERAL+=-Dpentiumpro -fomit-frame-pointer -fvtable-thunks \
-		-Wall $(CFLAGS.SYSTEM)
+CFLAGS.GENERAL+=-Dpentiumpro -mthreads -fvtable-thunks -Wall $(CFLAGS.SYSTEM)
 
 # Flags for the compiler which are used when optimizing.
-CFLAGS.optimize=-s -O3
+#CFLAGS.optimize=-s -O3
+CFLAGS.optimize= -O3
 
 # Flags for the compiler which are used when debugging.
 CFLAGS.debug=-g
@@ -95,24 +94,28 @@ CFLAGS.profile=-p -O -g
 CFLAGS.DLL=
 
 # General flags for the linker which are used in any case.
-LFLAGS.GENERAL =
+#LFLAGS.GENERAL = -mconsole -mwindows
+#LFLAGS.GENERAL = -mwindows
+LFLAGS.GENERAL = -mconsole -mwindows
 
 # Flags for the linker which are used when optimizing.
 LFLAGS.optimize=
 
 # Flags for the linker which are used when debugging.
-LFLAGS.debug=-g
+LFLAGS.debug=
 
 # Flags for the linker which are used when profiling.
 LFLAGS.profile=-p
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
 # Flags for the linker which are used when building a shared library.
-LFLAGS.DLL=--dll
-LIB=.dll
+  LFLAGS.DLL=--dll
+  LIB=.dll
 else
 # Typical extension for static libraries
-LIB=.a
+  LIB=.a
+#force static linking
+  LFLAGS.GENERAL+= -static
 endif
 
 # Typical extension for object files
@@ -168,11 +171,11 @@ SYS_SED_DEPEND=
 #Use CC to build Dependencies
 DEPEND_TOOL=cc
 
-# Flags for linking a GUI [Windows Executable -- WinMain()]
-LFLAGS.EXE= -mwindows
+# Flags for linking a GUI such as V
+LFLAGS.EXE=
 
-# Flags for linking a console executable [Mingw Console Executable -- Main()]
-LFLAGS.CONSOLE.EXE= -mconsole
+# Flags for linking a separate console executable
+LFLAGS.CONSOLE.EXE=
 
 endif # ifeq ($(MAKESECTION),defines)
 
