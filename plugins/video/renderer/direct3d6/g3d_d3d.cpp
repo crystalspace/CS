@@ -570,6 +570,13 @@ STDMETHODIMP csGraphics3DDirect3DDx6::SetDimensions(int nWidth, int nHeight)
   return S_OK;
 }
 
+STDMETHODIMP csGraphics3DDirect3DDx6::SetPerspectiveCenter (int x, int y)
+{
+  m_nHalfWidth = x;
+  m_nHalfHeight = y;
+  return S_OK;
+}
+
 STDMETHODIMP csGraphics3DDirect3DDx6::BeginDraw (int nDrawFlags)
 {
   if (nDrawFlags & CSDRAW_2DGRAPHICS)

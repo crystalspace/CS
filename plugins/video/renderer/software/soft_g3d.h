@@ -366,6 +366,8 @@ public:
   STDMETHODIMP GetWidth(int& retval) { retval = width; return S_OK; }
   /// Get drawing buffer height
   STDMETHODIMP GetHeight(int& retval) { retval = height; return S_OK; }
+  /// Set center of projection.
+  STDMETHODIMP SetPerspectiveCenter (int x, int y);
 
   /// Get the IGraphics2D driver.
   STDMETHODIMP Get2dDriver(IGraphics2D** pi) { *pi = m_piG2D; return S_OK; }

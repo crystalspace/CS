@@ -707,6 +707,13 @@ STDMETHODIMP csGraphics3DSoftware::SetDimensions (int nwidth, int nheight)
   return S_OK;
 }
 
+STDMETHODIMP csGraphics3DSoftware::SetPerspectiveCenter (int x, int y)
+{
+  width2 = x;
+  height2 = y;
+  return S_OK;
+}
+
 STDMETHODIMP csGraphics3DSoftware::BeginDraw (int DrawFlags)
 {
   //ASSERT( m_piG2D );

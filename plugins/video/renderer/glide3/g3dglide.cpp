@@ -543,6 +543,13 @@ STDMETHODIMP csGraphics3DGlide3x::SetDimensions (int width, int height)
   return S_OK;
 }
 
+STDMETHODIMP csGraphics3DGlide3x::SetPerspectiveCenter (int x, int y)
+{
+  m_nHalfWidth = x;
+  m_nHalfHeight = y;
+  return S_OK;
+}
+
 csGraphics3DGlide3x::~csGraphics3DGlide3x()
 {
   grGlideShutdown();

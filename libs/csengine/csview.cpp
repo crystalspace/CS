@@ -24,6 +24,7 @@
 #include "csengine/world.h"
 #include "csengine/pol2d.h"
 #include "csengine/camera.h"
+#include "igraph3d.h"
 
 csView::csView (csWorld *iWorld, IGraphics3D* ig3d)
 {
@@ -69,6 +70,7 @@ void csView::Draw ()
     else
       CHKB (clipper = new csBoxClipper (bview));
 
+  g3d->SetPerspectiveCenter ((int)camera->shift_x, (int)camera->shift_y);
   world->Draw (g3d, camera, clipper);
 }
 
@@ -77,4 +79,7 @@ void csView::SetSector (csSector *sector)
   camera->SetSector (sector);
 }
 
-void csView::SetPerspectiveCenter (float x, float y) {camera->SetPerspectiveCenter(x,y);}
+void csView::SetPerspectiveCenter (float x, float y)
+{
+  camera->SetPerspectiveCenter (x, y);
+}

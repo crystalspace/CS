@@ -712,6 +712,13 @@ STDMETHODIMP csGraphics3DGlide2x::SetDimensions (int width, int height)
   return S_OK;
 }
 
+STDMETHODIMP csGraphics3DGlide2x::SetPerspectiveCenter (int x, int y)
+{
+  m_nHalfWidth = x;
+  m_nHalfHeight = y;
+  return S_OK;
+}
+
 csGraphics3DGlide2x::~csGraphics3DGlide2x()
 {
   GlideLib_grGlideShutdown();

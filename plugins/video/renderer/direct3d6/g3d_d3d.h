@@ -235,6 +235,8 @@ public:
   STDMETHODIMP GetWidth(int& nWidth) { nWidth = m_nWidth; return S_OK; }
   ///
   STDMETHODIMP GetHeight(int& nHeight) { nHeight = m_nHeight; return S_OK; }
+  /// Set center of projection.
+  STDMETHODIMP SetPerspectiveCenter (int x, int y);
   ///
   STDMETHODIMP SetWorld(IWorld* piWorld) { return S_OK; }
   
