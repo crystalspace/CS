@@ -13,6 +13,8 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 27-Mar-2000
+	- W.C.A. Wijngaards <wouterw@cs.vu.nl> made a small fix to
+	  line renderer.
 	- Updated docs/incoming/worldfmt.tex to conform to the latest
 	  changes related to TEXTURES, 2D sprites, and UVEC/VVEC.
 	- Added support for MIXMODE statement to 2D and 3D sprites.

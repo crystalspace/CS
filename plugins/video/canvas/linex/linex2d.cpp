@@ -344,18 +344,18 @@ void csGraphics2DLineXLib::Print (csRect *area)
 
 void csGraphics2DLineXLib::DrawLine (float x1, float y1, float x2, float y2, int color)
 {
-  if (nr_segments >= 100)
-  {
-    XSetForeground (dpy, gc_back, seg_color);
-    XDrawSegments (dpy, back, gc_back, segments, nr_segments);
-    nr_segments = 0;
-  }
-  else if (seg_color != color)
+  if (seg_color != color)
   {
     XSetForeground (dpy, gc_back, seg_color);
     XDrawSegments (dpy, back, gc_back, segments, nr_segments);
     nr_segments = 0;
     seg_color = color;
+  }
+  else if (nr_segments >= 20)
+  {
+    XSetForeground (dpy, gc_back, seg_color);
+    XDrawSegments (dpy, back, gc_back, segments, nr_segments);
+    nr_segments = 0;
   }
   segments[nr_segments].x1 = (int)x1;
   segments[nr_segments].y1 = (int)y1;
