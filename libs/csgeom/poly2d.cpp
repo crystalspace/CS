@@ -130,7 +130,7 @@ void csPoly2D::UpdateBoundingBox ()
 bool csPoly2D::ClipAgainst (csClipper *view)
 {
   MakeRoom (num_vertices + view->GetNumVertices () + 1);
-  return view->Clip (vertices, num_vertices, bbox);
+  return view->ClipInPlace (vertices, num_vertices, bbox);
 }
 
 void csPoly2D::Intersect (const csPlane2& plane,

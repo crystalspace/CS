@@ -1,6 +1,48 @@
 The history order has been reversed so that new features are at the top.
 
+26-Dec-2000
+	- Samuel Humphreys did the following:
+	    - Little clean up of ptlab.
+	    - Fixed the proc textures after AndyZ's recent changes.
+	    - Removed Jorrits additional PrepareTextures in protex3d.cpp
+	    - Fixed Simple to display ProcTextures properly with the
+	      global palette properly communicated.
+	    - Cleaned up csphyzik library.
+	- csparser no longer deletes all textures and materials in
+	  the MATERIALS and TEXTURES statement. This caused bad
+	  crashes with the portal command. The portal command is now working
+	  properly again.
+	- Added iRenderView and let csRenderView implement this through
+	  embedding.
+	- Added iClipper2D and let csClipper implement this through
+	  inheritance.
+	- Removed csClipper::IsInside(x,y) so that only the csVector2 version
+	  remains.
+	- Renamed the inplace clipper called 'Clip' to 'ClipInPlace' to
+	  avoid C++ inheritance clashes.
+	- Added iMeshObject interface which will eventually be used
+	  to move sprites, and particle systems outside the engine as plugins.
+	- Additionally added iMeshObjectFactory plugin. This is a plugin
+	  that can be loaded in the engine will generate instances of
+	  one type of mesh object.
+	- Added csCubeMeshObject as a plugin (in plugins/meshobj/cube) which
+	  represents a simple cube that is going to be used as a test-base
+	  for the new iMeshObject system. Only when csCubeMeshObject is
+	  working properly am I going to port csSprite3D and csParticleSystem
+	  to iMeshObject.
+	- Added csMeshObject which is the engine holder for iMeshObject
+	  plugin objects. csMeshObject is eventually going to replace csSprite.
+	  It will controll all aspects of mesh objects which are global and
+	  pass them on to the various implementations of iMeshObject.
+	- Added code to simple to query this new cube plugin.
+25-Dec-2000
+	- Norman Kramer changes pixmap so that they incref and decref
+	  the texturehandle it has in use. (just came across this when
+	  someone added engine->startengine to LoadMapFile - all my pixmaps
+	  that held texturehandles created via LoadTexture before LoadMapFile
+	  were invalid).
 24-Dec-2000
+	- Norman Kramer added CSFX lib to several of the makefiles.
 	- Eric Sunshine made a slight modification to handling of the Backspace
 	  key in the OpenStep port so that it works in the expected fashion in
 	  Crystal Space.

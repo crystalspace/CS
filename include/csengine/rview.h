@@ -22,6 +22,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/frustum.h"
 #include "csengine/camera.h"
+#include "irview.h"
 
 class csClipper;
 class csMatrix3;
@@ -53,40 +54,6 @@ typedef void (csLightingFunc) (csFrustumView* lview, int type, void* entity);
 #define CALLBACK_THING 6
 #define CALLBACK_THINGEXIT 7
 #define CALLBACK_MESH 8
-
-/**
- * Information for vertex based fog. There is an instance of this
- * structure in the csRenderView struct for every fogged sector that
- * we encounter. It contains information which allows us to calculate
- * the thickness of the fog for any given ray through the incoming
- * and outgoing portals of the sector.
- */
-class csFogInfo
-{
-public:
-  /// Next in list (back in recursion time).
-  csFogInfo* next;
-
-  /// The incoming plane (plane of the portal).
-  csPlane3 incoming_plane;
-  /// The outgoing plane (also of a portal).
-  csPlane3 outgoing_plane;
-  /**
-   * If this is false then there is no incoming plane (the current sector has
-   * fog and is not being drawn through a portal).
-   */
-  bool has_incoming_plane;
-
-  /**
-   * If this is false there is no outgoing plane.  The 'outgoing plane
-   * distance' is then calculated by straight distance to a vertex instead of
-   * projecting throught the outgoing plane
-   */
-  bool has_outgoing_plane;
-
-  /// The structure describing the fog.
-  csFog* fog;
-};
 
 /**
  * This structure represents all information needed for drawing
@@ -194,6 +161,32 @@ public:
     topy = ty;
     boty = by;
   }
+
+  DECLARE_IBASE;
+
+  //------------------- iRenderView implementation -----------------------
+  struct RenderView : public iRenderView
+  {
+    DECLARE_EMBEDDED_IBASE (csRenderView);
+    virtual iClipper2D* GetClipper ();
+    virtual bool IsClipperRequired () { return scfParent->do_clip_frustum; }
+    virtual iGraphics2D* GetGraphics2D () { return scfParent->g2d; }
+    virtual iGraphics3D* GetGraphics3D ()  { return scfParent->g3d; }
+    virtual void GetViewFrustum (float& leftx, float& rightx, float& topy, float& boty)
+    {
+      leftx = scfParent->leftx;
+      rightx = scfParent->rightx;
+      topy = scfParent->topy;
+      boty = scfParent->boty;
+    }
+    virtual bool GetClipPlane (csPlane3& pl)
+    {
+      pl = scfParent->clip_plane;
+      return scfParent->do_clip_plane;
+    }
+    virtual csFogInfo* GetFirstFogInfo () { return scfParent->fog_info; }
+    virtual iCamera* GetCamera ();
+  } scfiRenderView;
 };
 
 /**

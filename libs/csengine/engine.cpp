@@ -1388,7 +1388,7 @@ void csEngine::AddHalo (csLight* Light)
   v.y = frame_height - 1 - (v.y * iz + current_camera->GetShiftY ());
 
   // If halo is not inside visible region, return
-  if (!top_clipper->IsInside (v.x, v.y))
+  if (!top_clipper->IsInside (csVector2 (v.x, v.y)))
     return;
 
   // Check if light is not obscured by anything

@@ -4130,14 +4130,14 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
           break;
         case CS_TOKEN_TEXTURES:
           {
-            Engine->GetTextures ()->DeleteAll ();
+            //Engine->GetTextures ()->DeleteAll ();
             if (!LoadTextures (params))
               return false;
           }
           break;
         case CS_TOKEN_MATERIALS:
           {
-            Engine->GetMaterials ()->DeleteAll ();
+            //Engine->GetMaterials ()->DeleteAll ();
             if (!LoadMaterials (params))
               return false;
           }

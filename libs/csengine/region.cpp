@@ -234,7 +234,7 @@ Object name is '%s', object type is '%s'\n",
 bool csRegion::Region::PrepareTextures ()
 {
   iTextureManager* txtmgr = csEngine::current_engine->G3D->GetTextureManager();
-  txtmgr->ResetPalette ();
+  //txtmgr->ResetPalette ();
 
   // First register all textures to the texture manager.
   {

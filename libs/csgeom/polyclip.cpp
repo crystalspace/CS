@@ -1,6 +1,6 @@
 /*
     Crystal Space polygon clipping routines
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
     Contributed by Ivan Avramovic <ivan@avramovic.com> and
                    Andrew Zabolotny <bit@eltech.ru>
 
@@ -28,7 +28,16 @@
 
 csPoly2DPool csClipper::polypool (csPoly2DFactory::SharedFactory ());
 
-UByte csClipper::Clip (csVector2 *InPolygon, int &InOutCount,
+IMPLEMENT_IBASE (csClipper)
+  IMPLEMENTS_INTERFACE (iClipper2D)
+IMPLEMENT_IBASE_END
+
+csClipper::csClipper ()
+{
+  CONSTRUCT_IBASE (NULL);
+}
+
+UByte csClipper::ClipInPlace (csVector2 *InPolygon, int &InOutCount,
   csBox2 &BoundingBox)
 {
   csVector2 TempPoly [MAX_OUTPUT_VERTICES];
@@ -89,6 +98,7 @@ UByte csBoxClipper::Clip (csVector2 *InPolygon, int InCount,
 //---------------------------------------------------------------------------
 
 csPolygonClipper::csPolygonClipper (csPoly2D *Clipper, bool mirror, bool copy)
+  	: csClipper ()
 {
   int Count = Clipper->GetNumVertices ();
   ClipPolyVertices = Count;
@@ -118,7 +128,7 @@ csPolygonClipper::csPolygonClipper (csPoly2D *Clipper, bool mirror, bool copy)
 }
 
 csPolygonClipper::csPolygonClipper (csVector2 *Clipper, int Count,
-  bool mirror, bool copy)
+  bool mirror, bool copy) : csClipper ()
 {
   ClipPolyVertices = Count;
 
@@ -172,22 +182,22 @@ void csPolygonClipper::Prepare ()
 int csPolygonClipper::ClassifyBox (csBox2 &box)
 {
   if (!ClipBox.Overlap (box)) return -1;
-  if (!csClipper::IsInside (box.GetCorner (0))) return 0;
-  if (!csClipper::IsInside (box.GetCorner (1))) return 0;
-  if (!csClipper::IsInside (box.GetCorner (2))) return 0;
-  if (!csClipper::IsInside (box.GetCorner (3))) return 0;
+  if (!IsInside (box.GetCorner (0))) return 0;
+  if (!IsInside (box.GetCorner (1))) return 0;
+  if (!IsInside (box.GetCorner (2))) return 0;
+  if (!IsInside (box.GetCorner (3))) return 0;
   return 1;
 }
 
-bool csPolygonClipper::IsInside (float x, float y)
+bool csPolygonClipper::IsInside (const csVector2& v)
 {
   // Quick test
-  if (!ClipBox.In (x, y))
+  if (!ClipBox.In (v.x, v.y))
     return false;
   // Detailed test
   for (int vert = 0; vert < ClipPolyVertices; vert++)
-    if ((x - ClipPoly [vert].x) * ClipData [vert].y -
-        (y - ClipPoly [vert].y) * ClipData [vert].x < 0)
+    if ((v.x - ClipPoly [vert].x) * ClipData [vert].y -
+        (v.y - ClipPoly [vert].y) * ClipData [vert].x < 0)
       return false;
   return true;
 }

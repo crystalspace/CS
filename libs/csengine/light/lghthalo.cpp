@@ -109,7 +109,7 @@ bool csLightHalo::Process (cs_time ElapsedTime, const csEngine &Engine)
     v.y = Engine.frame_height - 1 -
       (v.y * iz + Engine.current_camera->GetShiftY ());
 
-    if (Engine.top_clipper->IsInside (v.x, v.y))
+    if (Engine.top_clipper->IsInside (csVector2 (v.x, v.y)))
     {
       float zv = Engine.G3D->GetZBuffValue (QRound (v.x), QRound (v.y));
       halo_vis = (v.z <= zv);

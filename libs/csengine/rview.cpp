@@ -18,7 +18,10 @@
 
 #include "cssysdef.h"
 #include "csengine/rview.h"
+#include "csgeom/polyclip.h"
 #include "igraph3d.h"
+#include "iclip2.h"
+#include "icamera.h"
 
 csFrustumView::csFrustumView () : light_frustum (NULL), callback (NULL),
   callback_data (NULL)
@@ -64,6 +67,14 @@ bool csFrustumView::DeregisterCleanup (csFrustrumViewCleanup *action)
 
 //---------------------------------------------------------------------------
 
+IMPLEMENT_IBASE (csRenderView)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iRenderView)
+IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csRenderView::RenderView)
+  IMPLEMENTS_INTERFACE (iRenderView)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 csRenderView::csRenderView () :
     csCamera (), engine (NULL), view (NULL), g3d (NULL), g2d (NULL),
     portal_polygon (NULL), previous_sector (NULL), this_sector (NULL),
@@ -71,6 +82,8 @@ csRenderView::csRenderView () :
     callback (NULL), callback_data (NULL), fog_info (NULL),
     added_fog_info (false)
 {
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiRenderView);
 }
 
 csRenderView::csRenderView (const csCamera& c) :
@@ -80,6 +93,8 @@ csRenderView::csRenderView (const csCamera& c) :
     callback (NULL), callback_data (NULL), fog_info (NULL),
     added_fog_info (false)
 {
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiRenderView);
 }
 
 csRenderView::csRenderView (const csCamera& c, csClipper* v, iGraphics3D* ig3d,
@@ -90,4 +105,17 @@ csRenderView::csRenderView (const csCamera& c, csClipper* v, iGraphics3D* ig3d,
     callback (NULL), callback_data (NULL), fog_info (NULL),
     added_fog_info (false)
 {
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiRenderView);
 }
+
+iClipper2D* csRenderView::RenderView::GetClipper ()
+{
+  return QUERY_INTERFACE (scfParent->view, iClipper2D);
+}
+
+iCamera* csRenderView::RenderView::GetCamera ()
+{
+  return QUERY_INTERFACE (scfParent, iCamera);
+}
+

@@ -407,7 +407,7 @@ void csPVSAlgo::CalculatePolygonShadow (
     csClipper* clipper = new csPolygonClipper (&proj_poly, ar > 0);
     result_poly.MakeRoom (MAX_OUTPUT_VERTICES);
     int num_verts = result_poly.GetNumVertices ();
-    UByte rc = clipper->Clip (result_poly.GetVertices (), num_verts,
+    UByte rc = clipper->ClipInPlace (result_poly.GetVertices (), num_verts,
 	  result_poly.GetBoundingBox ());
     delete clipper;
     if (rc == CS_CLIP_OUTSIDE)
@@ -504,7 +504,7 @@ bool csPVSAlgo::TestShadowIntoCBuffer (const csPoly2D& result_poly,
   //@@@ SCALE IS MORE EFFICIENT?
   scaled_poly.MakeRoom (MAX_OUTPUT_VERTICES);
   int num_verts = scaled_poly.GetNumVertices ();
-  if (box_clipper->Clip (scaled_poly.GetVertices (), num_verts,
+  if (box_clipper->ClipInPlace (scaled_poly.GetVertices (), num_verts,
 	  scaled_poly.GetBoundingBox ()))
   {
     scaled_poly.SetNumVertices (num_verts);
@@ -537,7 +537,7 @@ bool csPVSAlgo::InsertShadowIntoCBuffer (const csPoly2D& result_poly,
   //@@@ SCALE IS MORE EFFICIENT?
   scaled_poly.MakeRoom (MAX_OUTPUT_VERTICES);
   int num_verts = scaled_poly.GetNumVertices ();
-  if (box_clipper->Clip (scaled_poly.GetVertices (), num_verts,
+  if (box_clipper->ClipInPlace (scaled_poly.GetVertices (), num_verts,
 	  scaled_poly.GetBoundingBox ()))
   {
     scaled_poly.SetNumVertices (num_verts);
