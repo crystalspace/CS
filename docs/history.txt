@@ -25,9 +25,14 @@ chronological order.
 	  configure.ac and to csjoylin.cpp.  Reported as necessary for Linux
 	  2.2 by Dariusz Dawidowski <chfsoft@interia.pl>.
 	- Luca fixed a bug in awsTextBox class: in fact it was not possible to
-	  delete with the 'Del' key the first character contained in the text box.
-	  Luca also added a 'friend' declaration to make the physics ode plugin
+	  delete with the 'Del' key the first character contained in the text
+	  box.
+	- Luca added a 'friend' declaration to make the physics ode plugin
 	  compile properly on VisualC++ 6.
+	- Eric Sunshine fixed bug in cspython.mak where PYTHON.LFLAGS was never
+	  being set.  This should resolve problem where linking of cspython
+	  plugin failed on Windows with unresolved _CreateSolidBrush@4 symbol
+	  (which exists in gdi.lib).
 13-Dec-2003
 	- Eric Sunshine applied patch from Randall Foreman
           <eidpers@comcast.net>.  csModelConverterASE was accidentally
