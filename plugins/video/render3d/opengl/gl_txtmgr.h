@@ -25,6 +25,7 @@
 
 #include "csgfx/rgbpixel.h"
 #include "ivideo/texture.h"
+#include "ivideo/material.h"
 #include "ivideo/txtmgr.h"
 #include "iengine/texture.h"
 #include "igraphic/imgvec.h"
@@ -513,6 +514,7 @@ public:
    */
   virtual int GetTextureFormat ();
 
+  //virtual csPtr<iSuperLightmap> CreateSuperLightmap(int, int);
 };
 
 #define CS_GL_FORMAT_TABLE(var) \

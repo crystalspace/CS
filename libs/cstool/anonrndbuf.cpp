@@ -20,7 +20,7 @@
 
 #ifdef CS_USE_NEW_RENDERER
 
-#include "csutil/anonrndbuf.h"
+#include "cstool/anonrndbuf.h"
 #include "ivideo/render3d.h"
 #include "ivideo/rndbuf.h"
 

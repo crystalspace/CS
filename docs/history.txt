@@ -3,6 +3,10 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+4-Jul-2003
+	- res committed fixes from Oktal for some circular #include 
+	  dependencies in the new renderer.
+	- res fixed a wrong #include in anonrndbuf.cpp.
 3-Jul-2003
 	- Jorrit removed obsolete bindings for radiosity commands for Walktest
 	  and added 'r' key to record movements on/off and 'shift-r' to play

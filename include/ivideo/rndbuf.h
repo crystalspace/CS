@@ -30,8 +30,6 @@
 
 #include "csutil/strset.h"
 
-#include "ivideo/material.h"
-
 class csVector3;
 class csVector2;
 class csColor;

@@ -1077,3 +1077,8 @@ void csGLTextureManager::SetPixelFormat (csPixelFormat &PixelFormat)
   max_tex_size = R3D->GetMaxTextureSize ();
   DetermineStorageSizes ();
 }
+/*
+csPtr<iSuperLightmap> csGLTextureManager::CreateSuperLightmap(int, int)
+{
+  return 0;
+}*/
