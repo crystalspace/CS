@@ -77,6 +77,8 @@ chronological order.
 	  correctly in conjunction with <crystalspace.h>. (Some headers expect
 	  that the .cpp file has #included other headers upon which they
 	  depend, but this is incorrect behavior.)
+	- Eric Sunshine removed the long-deprecated csutil/rng.h.  Use
+	  csutil/randomgen.h instead.
 13-Sep-2004
 	- Eric Sunshine renamed the following symbols in order to avoid
 	  global namespace pollution:
