@@ -24,6 +24,7 @@ code.
 * HOWTO User Objects:: Attaching User Objects to CS Objects
 * HOWTO CS Project:: Creating an External Crystal Space Application
 * HOWTO Creating External MSVC Application:: Creating an External @sc{msvc} Application
+* HOWTO Setting the CRYSTAL enviroment variable:: Setting the CRYSTAL enviroment variable
 @end menu
 
 @importss{tutorial,howto,colldet.txi}
@@ -37,3 +38,4 @@ code.
 @importss{tutorial,howto,userobj.txi}
 @importss{tutorial,howto,project.txi}
 @importsss{tutorial,howto,msvcproj,msvcproj.txi}
+@importss{tutorial,howto,envvar.txi}
