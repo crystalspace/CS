@@ -40,7 +40,7 @@ const int grip_size=16;
 const bool DEBUG_WINDOW_EVENTS = false;
 
 awsWindow::awsWindow():above(NULL), below(NULL),
-min_button(NULL), max_button(NULL), close_button(NULL), btxt(NULL),
+min_button(NULL), max_button(NULL), close_button(NULL), btxt(NULL), otxt(NULL),
 frame_style(fsNormal),
 frame_options(foControl | foZoom | foClose | foTitle | foGrip | foRoundBorder),
 title(NULL),
@@ -107,6 +107,18 @@ awsWindow::Setup(iAws *_wmgr, awsComponentNode *settings)
   pm->LookupRectKey("WindowZoomAt", maxp);
   pm->LookupRectKey("WindowCloseAt", closep);
   pm->LookupIntKey("OverlayTextureAlpha", alpha_level);
+
+  if (frame_style==fsBitmap)
+  {
+     iString   *tn1=NULL, *tn2=NULL;
+
+     pm->GetString(settings, "BitmapBackground", tn1);
+     pm->GetString(settings, "BitmapOverlay", tn2);
+     
+     if (tn1) btxt=pm->GetTexture(tn1->GetData(), tn1->GetData());
+     if (tn2) otxt=pm->GetTexture(tn2->GetData(), tn2->GetData());     
+  } 
+
 
   // Arrange control rects
   minp.xmin=Frame().xmax-minp.xmin;
@@ -693,7 +705,7 @@ awsWindow::OnDraw(csRect clip)
   int black = WindowManager()->GetPrefMgr()->GetColor(AC_BLACK);
 //int white = WindowManager()->GetPrefMgr()->GetColor(AC_WHITE);
 
-  int tw, th, toff, btw, bth;
+  int tw, th, toff, btw, bth, otw, oth;
   int i;
 
   clipper.SetClipRect(clip);
@@ -738,6 +750,7 @@ awsWindow::OnDraw(csRect clip)
 
   // Get the texture size, if there is one.
   if (btxt) btxt->GetOriginalDimensions(btw, bth);
+  if (otxt) otxt->GetOriginalDimensions(otw, oth);
 
   switch (frame_style)
   {
@@ -747,14 +760,9 @@ awsWindow::OnDraw(csRect clip)
     {
       if (view)
       {
-//        iGraphics3D *og3d = view->GetContext();
-
-//        view->SetContext(g3d);
         g3d->BeginDraw(view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS);
         view->Draw();
         g3d->BeginDraw(CSDRAW_2DGRAPHICS);
-//        view->SetContext(og3d);
-
       } //  end if view
       else
       {
@@ -795,14 +803,9 @@ awsWindow::OnDraw(csRect clip)
 
       if (view)
       {
-//        iGraphics3D *og3d = view->GetContext();
-
-//        view->SetContext(g3d);
         g3d->BeginDraw(view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS);
         view->Draw();
         g3d->BeginDraw(CSDRAW_2DGRAPHICS);
-//        view->SetContext(og3d);
-
       } //  end if view
       else
       {
@@ -972,6 +975,20 @@ awsWindow::OnDraw(csRect clip)
 
     }
     break;
+
+  case fsBitmap:
+	     if (btxt!=NULL)          
+            clipper.DrawPixmap(btxt,
+                               Frame().xmin, Frame().ymin, btw, bth,
+                               0, 0, btw, bth, 0);
+		 if (otxt!=NULL)          
+            clipper.DrawPixmap(otxt,
+                               Frame().xmin, Frame().ymin, otw, oth,
+                               0, 0, otw, oth, 0);
+
+
+		  
+	break;
 
   default:
     break;

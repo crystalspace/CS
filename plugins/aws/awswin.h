@@ -51,7 +51,7 @@ private:
     void LinkBelow(iAwsWindow *win);
 
     /// Texture handles for buttons
-    iTextureHandle *min_button, *max_button, *close_button, *btxt;
+    iTextureHandle *min_button, *max_button, *close_button, *btxt, *otxt;
 
 private:
     /** Contains the redraw tag.  This tag changes everytime we redraw the window system, but only once per frame.
