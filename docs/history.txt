@@ -15,8 +15,8 @@ chronological order.
 	  multiple scripts at once.
 15-Sep-2004
 	- Eric Sunshine added an `UNCONDITIONAL' argument to
-	  CS_EMIT_BUILD_PROPERTY(). This is analogous to the like-named
-	  argument accepted by CS_JAMCONFIG_PROPERTY().
+	  CS_EMIT_BUILD_PROPERTY() in emit.m4. This is analogous to the
+	  like-named argument accepted by CS_JAMCONFIG_PROPERTY().
 	- Eric Sunshine updated configure.ac so that it sets RANLIB
 	  unconditionally (via `=') in Jamconfig, rather than conditionally
 	  (via `?='). This is needed because the default RANLIB in Jambase is

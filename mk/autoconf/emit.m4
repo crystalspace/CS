@@ -20,7 +20,8 @@
 AC_PREREQ([2.56])
 
 #------------------------------------------------------------------------------
-# CS_EMIT_BUILD_PROPERTY(KEY, VALUE, [APPEND], [EMPTY-OKAY], [EMITTER])
+# CS_EMIT_BUILD_PROPERTY(KEY, VALUE, [APPEND], [EMPTY-OKAY], [EMITTER],
+#                        [UNCONDITIONAL])
 #	A utility function which invokes CS_JAMCONFIG_PROPERTY() if VALUE is
 #	not the empty string (after leading and trailing whitespace is
 #	stripped). If EMPTY-OKAY is not an empty string, then the property is
@@ -30,7 +31,12 @@ AC_PREREQ([2.56])
 #	"+=". EMITTER is a macro name, such as CS_JAMCONFIG_PROPERTY or
 #	CS_MAKEFILE_PROPERTY, which performs the actual task of emitting the
 #	KEY/VALUE tuple; it should also accept APPEND as an optional third
-#	argument. If EMITTER is omitted, CS_JAMCONFIG_PROPERTY is used.
+#	argument. If EMITTER is omitted, CS_JAMCONFIG_PROPERTY is used.  Some
+#	emitters accept an optional fourth argument, UNCONDITIONAL, which
+#	instructs it to set KEY's value unconditionally, even if KEY already
+#	had been assigned a value via some other mechanism (such as imported
+#	from the environment, or from Jambase, in the case of
+#	CS_JAMCONFIG_PROPERTY).
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_EMIT_BUILD_PROPERTY],
     [cs_build_prop_val="$2"
@@ -39,7 +45,7 @@ AC_DEFUN([CS_EMIT_BUILD_PROPERTY],
 	[CS_JAMCONFIG_PROPERTY([$1], [$cs_build_prop_val], [$3])],
 	AS_IF([test -n "$cs_build_prop_val"],
 	    [m4_default([$5],[CS_JAMCONFIG_PROPERTY])(
-		[$1], [$cs_build_prop_val], [$3])]))])
+		[$1], [$cs_build_prop_val], [$3], [$6])]))])
 
 
 
