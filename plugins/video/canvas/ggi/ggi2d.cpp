@@ -288,7 +288,7 @@ void csGraphics2DGGI::ProcessEvents (void* Param)
         int down = (ev.any.type != evKeyRelease);
 
         if (key >= 0)
-          Self->UnixSystem->KeyboardEvent (key, down);
+          Self->System->QueueKeyEvent (key, down);
         break;
       }
 
