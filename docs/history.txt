@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Sep-2004
+	- Rhad changed the Windows waveout sound driver to properly handle
+	  threading issues, buffer sounds better, manage memory better, and
+	  not blow up randomly.
+		- Fixes "waveOutUnprepareHeader: 0000000b An invalid 
+                         parameter was passed"
+		- Should reduce/fix sound studdering during moderate system 
+                  load.
+		- The software renderer needs certain changes to be made to
+		  thread safety to go along with this.
 27-Sep-2004
 	- dfryer changed "unsigned int" to size_t in
 	  csXMLShaderTech::ActivatePass().  Prototype used size_t; size_t is

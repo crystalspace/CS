@@ -52,6 +52,9 @@ SCF_IMPLEMENT_IBASE (csSoundDriverWaveOut::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
+#define WAVEOUT_BUFFER_COUNT 5
+
+
 csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
 {
   SCF_CONSTRUCT_IBASE(piBase);
@@ -62,9 +65,6 @@ csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
   SoundRender = 0;
   MemorySize = 0;
   Memory = 0;
-  WaveOut = 0;
-  Playback = 0;
-  LastError = ~0;
 }
 
 csSoundDriverWaveOut::~csSoundDriverWaveOut()
@@ -89,6 +89,11 @@ bool csSoundDriverWaveOut::Initialize (iObjectRegistry *r)
   if (q != 0)
     q->RegisterListener (scfiEventHandler, CSMASK_Nothing | CSMASK_Broadcast);
   Config.AddConfig(object_reg, "/config/sound.cfg");
+
+  // Create mutexes to lock access to the various block exchange lists
+  mutex_EmptyBlocks = csMutex::Create(true);
+
+
   return true;
 }
 
@@ -111,7 +116,6 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency,
   bool bit16, bool stereo)
 {
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Wave-Out Sound Driver selected.");
-  ActivateSoundProc = false;
 
   // store pointer to sound renderer
   if (!render) return false;
@@ -124,7 +128,6 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency,
   Stereo = stereo;
 
   // setup wave format
-  WAVEFORMATEX Format;
   Format.wFormatTag = WAVE_FORMAT_PCM;
   if (Stereo) Format.nChannels = 2;
   else Format.nChannels = 1;
@@ -136,23 +139,43 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency,
   Format.cbSize = 0;
 
   // read settings from the config file
-  unsigned int RefreshRate=Config->GetInt("Sound.WaveOut.Refresh", 5);
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "  updating %d times per second",
-    RefreshRate);
+  float BufferLength=Config->GetFloat("Sound.WaveOut.BufferLength", (float)0.05);
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "  pre-buffering %f seconds of sound",
+    BufferLength);
+
 
   // setup misc member variables
-  MemorySize = Format.nAvgBytesPerSec/RefreshRate;
-  MemorySize -=(MemorySize%Format.nBlockAlign);
-  Memory = 0;
-  SoundProcLocked = false;
-  NumSoundBlocksToWrite = 0;
 
-  // initialize sound output.
-  // @@@ must this be called from within another thread for multi-processor
-  // support?
-  MMRESULT res = waveOutOpen (&WaveOut, WAVE_MAPPER, &Format,
-    (LONG)&waveOutProc, 0L, CALLBACK_FUNCTION);
-  CheckError ("waveOutOpen", res);
+  // We'll keep 5 buffer-segments.  Every time one is empty we'll refill it and send it along again
+  float f_memsize=(BufferLength * Format.nAvgBytesPerSec) / WAVEOUT_BUFFER_COUNT;
+
+  MemorySize = f_memsize; // Translate to an int
+  MemorySize += Format.nBlockAlign; // Add the alignment size - this causes a round-up
+  MemorySize -= (MemorySize%Format.nBlockAlign); // Truncate to an even alignment size
+  Memory = 0;
+
+
+  // Allocate the buffers
+  int buffer_idx;
+  
+  AllocatedBlocks = new SoundBlock[WAVEOUT_BUFFER_COUNT];
+  for (buffer_idx=0;buffer_idx<WAVEOUT_BUFFER_COUNT;buffer_idx++)
+  {
+    AllocatedBlocks[buffer_idx].Driver = this;
+    AllocatedBlocks[buffer_idx].DataHandle = GlobalAlloc(GMEM_FIXED | GMEM_SHARE, sizeof(WAVEHDR) + MemorySize);
+    AllocatedBlocks[buffer_idx].Data = (unsigned char *)GlobalLock(AllocatedBlocks[buffer_idx].DataHandle);
+    AllocatedBlocks[buffer_idx].WaveHeader = (LPWAVEHDR)(AllocatedBlocks[buffer_idx].Data);
+
+    // Zero out the block
+    memset(AllocatedBlocks[buffer_idx].Data,0,sizeof(WAVEHDR) + MemorySize);
+
+    EmptyBlocks.Push(&(AllocatedBlocks[buffer_idx]));
+  }
+
+  // Start the background thread
+  bgThread=new BackgroundThread (this);
+  csbgThread=csThread::Create (bgThread);
+  csbgThread->Start();
 
   // Store old volume and set full volume because the software sound renderer
   // will apply volume internally. If this device does not allow volume
@@ -161,26 +184,39 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency,
 //  waveOutGetVolume(WaveOut, &OldVolume);
 //  waveOutSetVolume(WaveOut, 0xffffffff);
 
-  ActivateSoundProc = true;
 
   return S_OK;
 }
 
 void csSoundDriverWaveOut::Close()
 {
-  ActivateSoundProc = false;
-  if (WaveOut)
+  int wait_timer=0;
+  int got_lock=0;
+  // Signal background thread to halt
+  bgThread->RequestStop();
+
+  while (bgThread->IsRunning() && wait_timer++<120000)
+    csSleep(0);
+
+  // Clear out the EmptyBlocks queue
+  if (!mutex_EmptyBlocks->LockTry())
+    Report (CS_REPORTER_SEVERITY_WARNING, "  Could not obtain EmptyBlocks lock during driver shutdown.  Clearing list without a lock.");
+  else
+    got_lock=1;
+
+  while (EmptyBlocks.Length())
   {
-//    waveOutSetVolume(WaveOut, OldVolume);
-    /* @@@ error checking */
-    waveOutReset(WaveOut);
-    waveOutClose(WaveOut);
-    WaveOut=0;
+    SoundBlock *Block=EmptyBlocks.Pop();
+    GlobalUnlock(Block->DataHandle);
+    GlobalFree(Block->DataHandle);
   }
+  if (got_lock)
+    mutex_EmptyBlocks->Release();
 
-  // wait for SoundProc() to exit
-  while (SoundProcLocked);
+  delete AllocatedBlocks;
+  AllocatedBlocks=NULL;
 
+ 
   if (SoundRender)
   {
     SoundRender->DecRef();
@@ -205,120 +241,35 @@ int csSoundDriverWaveOut::GetFrequency() {return Frequency;}
 
 bool csSoundDriverWaveOut::HandleEvent(iEvent &e)
 {
-  //Report (CS_REPORTER_SEVERITY_NOTIFY, "handleevent: %d", Playback);
-  if (e.Type == csevCommand || e.Type == csevBroadcast)
-    if (e.Command.Code == cscmdPreProcess)
-  {
-    // Delete all queued blocks
-    while (BlocksToDelete.Length())
-    {
-      SoundBlock *Block = BlocksToDelete.Pop();
-      MMRESULT res;
-      res = waveOutUnprepareHeader(WaveOut, Block->WaveHeader,sizeof(WAVEHDR));
-      CheckError("waveOutUnprepareHeader", res);
-
-      GlobalUnlock(Block->DataHandle);
-      GlobalFree(Block->DataHandle);
-      delete Block;
-    }
-  // write empty sound blocks to start playback. Three sound blocks should
-  // be enough to prevent sound gaps; if not, make this an option in the
-  // config file.
-    if (!Playback) {
-      SoundProc(0);
-      SoundProc(0);
-      SoundProc(0);
-    }
-  }
   return false;
 }
 
+/*
+ * Applications should not call any system-defined functions from inside a callback function, 
+ * except for EnterCriticalSection, LeaveCriticalSection, midiOutLongMsg, midiOutShortMsg, 
+ * OutputDebugString, PostMessage, PostThreadMessage, SetEvent, timeGetSystemTime, timeGetTime, 
+ * timeKillEvent, and timeSetEvent. Calling other wave functions will cause deadlock.
+*/
 void CALLBACK csSoundDriverWaveOut::waveOutProc(HWAVEOUT /*WaveOut*/,
   UINT uMsg, DWORD /*dwInstance*/, DWORD dwParam1, DWORD /*dwParam2*/)
 {
   if (uMsg==MM_WOM_DONE) {
-    // @@@ special behaviour in case this was called by waveOutReset?
-
     LPWAVEHDR OldHeader = (LPWAVEHDR)dwParam1;
     if (OldHeader->dwUser == 0) return;
     SoundBlock *Block = (SoundBlock *)OldHeader->dwUser;
-    Block->Driver->SoundProc(OldHeader);
+    Block->Driver->RecycleBlock(Block);
   }
 }
 
-// @@@ error checking
-void csSoundDriverWaveOut::SoundProc(LPWAVEHDR OldHeader) {
-  // get rid of the previous header
-  if (OldHeader) {
-    SoundBlock *Block = (SoundBlock *)(OldHeader->dwUser);
-    BlocksToDelete.Push(Block);
-    if (Playback) Playback--;
-  }
-
-  // look if sound proc is activated
-  if (!ActivateSoundProc) return;
-
-  // if there is already an instance of this function, tell it to write our
-  // block as well and return
-  NumSoundBlocksToWrite++;
-  if (SoundProcLocked) return;
-
-  // lock this function
-  SoundProcLocked = true;
-
-  while (NumSoundBlocksToWrite > 0) {
-    NumSoundBlocksToWrite--;
-
-    // create a new block
-    SoundBlock *Block = new SoundBlock();
-    Block->Driver = this;
-    Block->DataHandle = GlobalAlloc(GMEM_MOVEABLE |
-        GMEM_SHARE, sizeof(WAVEHDR)+MemorySize);
-    Block->Data = (unsigned char *)GlobalLock(Block->DataHandle);
-
-    // Set up various pointers
-    LPWAVEHDR lpWaveHdr = (LPWAVEHDR)Block->Data;
-    Block->WaveHeader = lpWaveHdr;
-    Memory = Block->Data + sizeof(WAVEHDR);
-
-    // call the sound renderer mixing function
-    SoundRender->MixingFunction();
-
-    // Set up and prepare header.
-    lpWaveHdr->lpData = (char *)Memory;
-    lpWaveHdr->dwBufferLength = MemorySize;
-    lpWaveHdr->dwFlags = 0L;
-    lpWaveHdr->dwLoops = 0L;
-    lpWaveHdr->dwUser = (DWORD)Block;
-    MMRESULT result = waveOutPrepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
-    if (!CheckError("waveOutPrepareHeader", result)) {
-      GlobalUnlock(Block->DataHandle);
-      GlobalFree(Block->DataHandle);
-      delete Block;
-    }
-    else
-    {
-      // Now the data block can be sent to the output device. The
-      // waveOutWrite function returns immediately and waveform
-      // data is sent to the output device in the background.
-      result = waveOutWrite(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
-      if (!CheckError("waveOutWrite", result)) {
-	result = waveOutUnprepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
-	CheckError("waveOutUnprepareHeader", result);
-	GlobalUnlock(Block->DataHandle);
-	GlobalFree(Block->DataHandle);
-	delete Block;
-      } else {
-	Playback++;
-      }
-    }
-  }
-
-  // unlock this function
-  SoundProcLocked = false;
+void csSoundDriverWaveOut::RecycleBlock(SoundBlock *Block)
+{
+  mutex_EmptyBlocks->LockWait();
+  EmptyBlocks.Push(Block);
+  mutex_EmptyBlocks->Release();
 }
 
-const char *csSoundDriverWaveOut::GetMMError (MMRESULT r) 
+
+const char *csSoundDriverWaveOut::BackgroundThread::GetMMError (MMRESULT r) 
 {
   switch (r) 
   {
@@ -363,13 +314,13 @@ const char *csSoundDriverWaveOut::GetMMError (MMRESULT r)
   }
 }
 
-bool csSoundDriverWaveOut::CheckError(const char *action, MMRESULT code)
+bool csSoundDriverWaveOut::BackgroundThread::CheckError(const char *action, MMRESULT code)
 {
   if (code != MMSYSERR_NOERROR) 
   {
     if (code != LastError)
     {
-      Report (CS_REPORTER_SEVERITY_ERROR,
+      parent_driver->Report (CS_REPORTER_SEVERITY_ERROR,
 	"%s: %.8x %s .", action, code, GetMMError (code));
       LastError = code;
     }
@@ -379,4 +330,120 @@ bool csSoundDriverWaveOut::CheckError(const char *action, MMRESULT code)
   {
     return true;
   }
+}
+
+bool csSoundDriverWaveOut::BackgroundThread::FillBlock(SoundBlock *Block)
+{
+  LPWAVEHDR lpWaveHdr;
+  MMRESULT result;
+
+  // Unprepare the block, in case it was used previously.  Per MSDN an unprepare on a block that has
+  //  not been previously prepared is safe - it does nothing and returns zero.
+  lpWaveHdr = (LPWAVEHDR)Block->Data;
+  result = waveOutUnprepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
+  if (result != 0 && !CheckError("waveOutUnprepareHeader", result))
+    return false;
+
+  // Ensure the block pointers are correct
+  Block->WaveHeader = (LPWAVEHDR)Block->Data;
+
+  // Parent Memory pointer is used by the renderer to lock memory to write into
+  //  It's a very circular process
+  parent_driver->Memory = Block->Data + sizeof(WAVEHDR);
+
+  // call the sound renderer mixing function
+  parent_driver->SoundRender->MixingFunction();
+
+  // Set up and prepare header.
+  lpWaveHdr->lpData = (char *)parent_driver->Memory;
+  lpWaveHdr->dwBufferLength = parent_driver->MemorySize;
+  lpWaveHdr->dwFlags = 0L;
+  lpWaveHdr->dwLoops = 0L;
+  lpWaveHdr->dwUser = (DWORD)Block;
+
+  result = waveOutPrepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
+  if (!CheckError("waveOutPrepareHeader", result)) {
+      return false;
+  }
+  else
+  {
+      // Now the data block can be sent to the output device. The
+      // waveOutWrite function returns immediately and waveform
+      // data is sent to the output device in the background.
+      result = waveOutWrite(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
+      if (!CheckError("waveOutWrite", result)) {
+        result = waveOutUnprepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
+        CheckError("waveOutUnprepareHeader", result);
+        return false;
+      }
+  }
+  return true;
+}
+
+void csSoundDriverWaveOut::BackgroundThread::Run()
+{
+  MMRESULT result;
+  int shutdown_wait_counter=0;
+  running=true;
+
+  // Startup waveOut device
+  result = waveOutOpen (&WaveOut, WAVE_MAPPER, &(parent_driver->Format),
+    (LONG)&waveOutProc, 0L, CALLBACK_FUNCTION);
+  CheckError ("waveOutOpen", result);
+
+
+  while (!request_stop)
+  {
+    int block_count;
+
+    // Grab a lock on the available blocks list
+    parent_driver->mutex_EmptyBlocks->LockWait();
+
+    // Fill all available blocks
+    block_count=parent_driver->EmptyBlocks.Length();
+    while (block_count>0)
+    {
+      SoundBlock *CurrentBlock=parent_driver->EmptyBlocks.Pop();
+      if (!FillBlock(CurrentBlock))
+        parent_driver->EmptyBlocks.Insert(0,CurrentBlock);
+      block_count--;
+    }
+
+    // Release the lock
+    parent_driver->mutex_EmptyBlocks->Release();
+    // Give up timeslice
+    csSleep(0);
+  }
+
+  // Request all blocks to stop and be returned 
+  result = waveOutReset(WaveOut);
+  CheckError ("waveOutReset", result);
+
+  // Need to wait for queued blocks to all be finished
+  while (1)
+  {
+    // Dont stall forever
+    if (shutdown_wait_counter++>100000)
+      break; 
+
+    // Grab a lock on the available blocks list
+    parent_driver->mutex_EmptyBlocks->LockWait();
+
+    if (parent_driver->EmptyBlocks.Length() >= WAVEOUT_BUFFER_COUNT)
+    {
+      // Release the lock
+      parent_driver->mutex_EmptyBlocks->Release();
+      break;
+    }
+
+    // Release the lock
+    parent_driver->mutex_EmptyBlocks->Release();
+    // Give up timeslice
+    csSleep(0);
+  }
+
+  // Close the wave output device
+  waveOutClose(WaveOut);
+
+  running=false;
 }

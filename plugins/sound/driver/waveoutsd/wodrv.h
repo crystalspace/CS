@@ -24,12 +24,39 @@
 #include "csutil/scf.h"
 #include "csutil/array.h"
 #include "csutil/cfgacc.h"
+#include "csutil/thread.h"
 #include "isound/driver.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 
 #include <mmsystem.h>
 
+/* This driver uses the windows MMSystem wave output functions.  This system has been around forever and it sometimes behaves a bit fickle.
+ *
+ * This driver kicks off its own thread to attempt to ensure that data is fed to the underlying system in a timely manner.  Additionally, MMSystem
+ *  kicks off its own thread in the process space as well.  This means if you use this driver you get 2 extra threads.  Threads are cheap, don't
+ *  sweat it.
+ *
+ * The MMSystem thread performs all the callbacks to the application, but it's not safe to do any work inside this callback - you're extremely limited
+ *  in what functions you can safely call.  See the note above the definition of waveOutProc in wodrv.cpp for a list.  The callback receives blocks that
+ *  the driver is done with.  All we do here is put those into a queue to be refilled and handed back to the driver.
+ *
+ * Our own background thread sits in a loop with a sleep(0), waiting for free blocks to become available.  When they are it calls back into the renderer
+ *  to have it fill them.  This seems somewhat backwards, having the driver call the renderer, but since the linux driver seems to work fine, and this
+ *  driver has always done things this way, it's the easiest way to approach this without creating new problems elsewhere.
+ *
+ * Note that this means the Software Renderer call path invoked from here should be thread safe (real mutexes should lock all the data that may be accessed
+ *  by both the call path from this background thread and the main application thread).
+ *
+ * If you alter or create any code that touches EmptyBlocks, make sure you lock mutex_EmptyBlocks while accessing it, and release it (from all exit paths)
+ *  afterward.
+ *
+ *
+ *  This plugin respects the following configuration options:
+ *  Sound.WaveOut.BufferLength - A floating point value specifying the length of buffers (in seconds) created to
+ *                                     hold data from the renderer (streaming AND static audio). (default is 0.05 seconds)
+ *                               Increasing this value will cause delays in sound actions (button clicks are especially noticable)
+*/
 class csSoundDriverWaveOut : public iSoundDriver
 {
 public:
@@ -77,6 +104,7 @@ public:
     virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
   } * scfiEventHandler;
 
+
 protected:
   struct SoundBlock 
   {
@@ -85,6 +113,45 @@ protected:
     unsigned char *Data;
     LPWAVEHDR WaveHeader;
   };
+
+  // this function is called when a sound block is returned by wave-out
+  static void CALLBACK waveOutProc(HWAVEOUT hwo, UINT uMsg, DWORD dwInstance,
+    DWORD dwParam1, DWORD dwParam2);
+  // This function is called by the above callback to put the returned block into the recycle queue
+  void RecycleBlock(SoundBlock *Block);
+
+
+  class BackgroundThread : public csRunnable
+  {
+  public:
+    BackgroundThread (csSoundDriverWaveOut *driver): parent_driver(driver), count(1), running(false), request_stop(false) {}
+    virtual ~BackgroundThread () {}
+    virtual void IncRef () {count++;}
+    // If the thread is still running and we're going to delete this object, we are in for a crash
+    virtual void DecRef () {if (--count == 0) { CS_ASSERT(running); delete this; } }
+    virtual int GetRefCount () { return count; }
+    /// For the situations in which this will be used, the lack of a mutex is OK
+    virtual void RequestStop () { request_stop=true; }
+    /// For the situations in which this will be used, the lack of a mutex is OK
+    virtual bool IsRunning() { return running; }
+    virtual void Run ();
+    virtual bool FillBlock(SoundBlock *Block);
+  private:
+    // Helper function to check for error result codes from MM function calls
+    bool CheckError(const char *action, MMRESULT code);
+    // MM error translator
+    const char *GetMMError(MMRESULT code);
+  public:
+    int count;
+  private:
+    csSoundDriverWaveOut *parent_driver;
+    volatile bool running, request_stop;
+    // when the same error occurs multiple times, we just show the first
+    MMRESULT LastError;
+    // wave-out device
+    HWAVEOUT WaveOut;
+  };
+  friend class BackgroundThread;
 
   // system driver
   iObjectRegistry *object_reg;
@@ -99,37 +166,29 @@ protected:
   void *Memory;
   int MemorySize;
 
+  // Pointer to the array of allocated SoundBlock structures
+  SoundBlock *AllocatedBlocks;
+  // list of blocks that are available to fill with sound data
+  csArray<SoundBlock*> EmptyBlocks;
+
   // sound format
+  WAVEFORMATEX Format;
   int Frequency;
   bool Bit16;
   bool Stereo;
 
-  // switch to activate/deactivate the sound proc
-  volatile bool ActivateSoundProc;
-  // is the sound proc locked?
-  volatile bool SoundProcLocked;
-  // number of sound blocks to write
-  volatile int NumSoundBlocksToWrite;
-  // list of blocks to delete
-  csArray<SoundBlock*> BlocksToDelete;
-  // has playback already started?
-  volatile int Playback;
-  // when the same error occurs multiple times, we just show the first
-  volatile MMRESULT LastError;
-
-  // this function is called when a sound block is returned by wave-out
-  static void CALLBACK waveOutProc(HWAVEOUT hwo, UINT uMsg, DWORD dwInstance,
-    DWORD dwParam1, DWORD dwParam2);
-  // this function writes a new sound block to wave-out
-  void SoundProc(LPWAVEHDR OldHeader);
-
-  bool CheckError(const char *action, MMRESULT code);
-  const char *GetMMError(MMRESULT code);
-
-  // wave-out device
-  HWAVEOUT WaveOut;
   // old system volume
   DWORD OldVolume;
+
+  /// Mutex to protect the EmptyBlocks queue which may be accessed by both the callback function and the background thread.
+  csRef<csMutex> mutex_EmptyBlocks;
+  /// CS representation of running background thread
+  csRef<csThread> csbgThread;
+  /// Background thread object
+  csRef<BackgroundThread> bgThread;
 };
+
+
+
 
 #endif // __CS_WODRV_H__
