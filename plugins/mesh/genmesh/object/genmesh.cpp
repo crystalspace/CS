@@ -137,9 +137,9 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   static_mesh_colors = 0;
   do_lighting = true;
   do_manual_colors = false;
-  color.red = 0;
-  color.green = 0;
-  color.blue = 0;
+  base_color.red = 0;
+  base_color.green = 0;
+  base_color.blue = 0;
   current_lod = 1;
   current_features = 0;
   do_shadows = true;
@@ -641,7 +641,7 @@ void csGenmeshMeshObject::SetupObject ()
         lit_mesh_colors[i].Set (0.2f, 0.2f, 0.2f);  // @@@ ???
       static_mesh_colors = new csColor [num_lit_mesh_colors];
       for (i = 0 ; i <  num_lit_mesh_colors; i++)
-        static_mesh_colors[i] = color;	// Initialize to base color.
+        static_mesh_colors[i] = base_color;	// Initialize to base color.
     }
     iMaterialWrapper* mater = material;
     if (!mater) mater = factory->GetMaterialWrapper ();
@@ -915,14 +915,14 @@ void csGenmeshMeshObject::UpdateLighting2 (iMovable* movable)
     if (factory->engine)
     {
       factory->engine->GetAmbientLight (col);
-      col += color;
+      col += base_color;
       iSector* sect = movable->GetSectors ()->Get (0);
       if (sect)
 	col += sect->GetDynamicAmbientLight ();
     }
     else
     {
-      col = color;
+      col = base_color;
     }
     for (i = 0 ; i < factory->GetVertexCount () ; i++)
       colors[i] = col;
@@ -977,14 +977,14 @@ void csGenmeshMeshObject::UpdateLighting (const csArray<iLight*>& lights,
   if (factory->engine)
   {
     factory->engine->GetAmbientLight (col);
-    col += color;
+    col += base_color;
     iSector* sect = movable->GetSectors ()->Get (0);
     if (sect)
       col += sect->GetDynamicAmbientLight ();
   }
   else
   {
-    col = color;
+    col = base_color;
   }
   for (i = 0 ; i < factory->GetVertexCount () ; i++)
     colors[i] = col;

@@ -114,7 +114,7 @@ private:
   iMeshObjectDrawCallback* vis_cb;
   bool do_lighting;
   bool do_manual_colors;
-  csColor color;
+  csColor base_color;
   float current_lod;
   uint32 current_features;
   csFlags flags;
@@ -202,7 +202,7 @@ public:
   uint GetMixMode () const { return MixMode; }
   void SetLighting (bool l) { do_lighting = l; }
   bool IsLighting () const { return do_lighting; }
-  const csColor& GetColor () const { return color; }
+  const csColor& GetColor () const { return base_color; }
   void SetManualColors (bool m) { do_manual_colors = m; }
   bool IsManualColors () const { return do_manual_colors; }
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
@@ -294,11 +294,11 @@ public:
   virtual iObjectModel* GetObjectModel ();
   virtual bool SetColor (const csColor& col)
   {
-    color = col;
+    base_color = col;
     initialized = false;
     return true;
   }
-  virtual bool GetColor (csColor& col) const { col = color; return true; }
+  virtual bool GetColor (csColor& col) const { col = base_color; return true; }
   virtual bool SetMaterialWrapper (iMaterialWrapper* mat);
   virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
   virtual void InvalidateMaterialHandles () { }

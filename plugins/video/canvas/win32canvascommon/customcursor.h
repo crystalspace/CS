@@ -32,6 +32,11 @@ public:
 
   HCURSOR GetMouseCursor (iImage* image, const csRGBcolor* keycolor, 
     int hotspot_x, int hotspot_y, csRGBcolor fg, csRGBcolor bg);
+private:
+
+  HCURSOR CreateCursor(iImage* image, const csRGBcolor* keycolor, 
+					      int hotspot_x, int hotspot_y);
 };
 
 #endif // __CS_CANVAS_WIN32CANVASCOMMON_CUSTOMCURSOR_H__
+

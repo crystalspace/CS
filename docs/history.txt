@@ -20,6 +20,8 @@ chronological order.
 	- Eric Sunshine upgraded ivaria/javapre.i to be compatible with Swig
 	  1.3.22 which complained (correctly) about unamed operator overloads
 	  in several exported classes.
+	- Jorrit added a patch from Andrew Dai which adds support for
+	  color cursors in the Win32 canvas.
 20-Oct-2004
 	- Jorrit fixed a critical bug in VFS. In case you tried to
 	  call VFS->Sync() while there were still references to open files
