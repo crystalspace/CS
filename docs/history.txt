@@ -16,6 +16,8 @@ The history order is reversed so that new features are at the top.
 	  message when the user specifies an invalid Perl regular-expression,
 	  rather than printing some apparently unrelated error message about an
 	  unknown function much later in the script.
+	- Eric Sunshine fixed jpgio.mak and pngio.mak so that they work when
+	  USE_PLUGINS=no is specified.
 1-Jun-2001
 	- Michael Voasse fixed a couple of additional bugs in motion
 	  manager. Changed csAppliedFrameVector from TYPED_VECTOR to

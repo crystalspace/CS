@@ -28,18 +28,20 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/video/loader/jpg
 
+LIB.JPGIMG.LOCAL += $(JPG_LIBS)
+
 ifeq ($(USE_PLUGINS),yes)
   JPGIMG = $(OUTDLL)csjpgimg$(DLL)
   LIB.JPGIMG = $(foreach d,$(DEP.JPGIMG),$($d.LIB))
+  LIB.JPGIMG.SPECIAL += $(LIB.JPGIMG.LOCAL)
   TO_INSTALL.DYNAMIC_LIBS += $(JPGIMG)
 else
   JPGIMG = $(OUT)$(LIB_PREFIX)csjpgimg$(LIB)
   DEP.EXE += $(JPGIMG)
+  LIBS.EXE += $(LIB.JPGIMG.LOCAL)
   SCF.STATIC += csjpgimg
   TO_INSTALL.STATIC_LIBS += $(JPGIMG)
 endif
-
-LIB.JPGIMG.SPECIAL += $(JPG_LIBS)
 
 INC.JPGIMG = $(wildcard plugins/video/loader/jpg/*.h)
 SRC.JPGIMG = $(wildcard plugins/video/loader/jpg/*.cpp)
