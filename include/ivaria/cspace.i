@@ -805,6 +805,7 @@ TYPEMAP_OUT_csWrapPtr
 
 %ignore csGetPlatformConfig;
 %ignore csPrintfV;
+%ignore csPrintfErrV;
 %include "csutil/sysfunc.h"
 
 %ignore csInitializer::RequestPlugins(iObjectRegistry*, ...);

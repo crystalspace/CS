@@ -44,6 +44,14 @@ chronological order.
 	- res fixed an array access with an negative index in bruteblock.
 	- Eric Sunshine fixed several compilation warnings.
 	- res fixed a double-Open() of the renderer in g2dtest.
+	- Eric Sunshine changed cspace.i so that it no longer exports the new
+	  va_list function csPrintfErrV() (the same change had been made for
+	  csPrintfV() on 24-July-2004).  This change was necessary because Swig
+	  emits code which is invalid on platforms on which va_list is
+	  implemented as a simple array. ISO C++ forbids array assignment, yet
+	  Swig-generated code attempts to assign a va_list to a va_list.  Note
+	  that the corresponding var-arg (...) function, csPrintfErr() is still
+	  exported. (bug #1039809)
 5-Oct-2004
 	- Rhad fixed a long standing bug in the Ogg loader.
 	  - Per specs, SEEK_END must seek 1 byte past the end of data
