@@ -118,6 +118,8 @@ csProcSky::csProcSky()
     curposition[i] = 0;
     aperiod = aperiod*2/3;
   }
+  windpos.Set(0.0,0.0);
+  winddir.Set(10.,10.);
 
   Initialize();
 }
@@ -446,7 +448,7 @@ uint8 csProcSky::GetCloudVal(int x, int y)
   else res = res;
 #endif
   int cloudmin = 180;
-  int cloudlen = 420 - cloudmin;
+  int cloudlen = 400 - cloudmin;
   res = (res-cloudmin)*255/cloudlen;
   res = (res*res)>>7; //// square the cloudyness
 
@@ -474,8 +476,11 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex, cs_time current_time)
   /// animate the octaves
   int elapsed_time = int(current_time) - int(old_time);
   if(elapsed_time > 0)
+  {
     for(i=0; i<nr_octaves; i++)
       AnimOctave(i, elapsed_time);
+    windpos += winddir * (float(elapsed_time)*.001);
+  }
   old_time = current_time;
 
   if (!skytex->GetG3D()->BeginDraw (CSDRAW_2DGRAPHICS))
@@ -508,8 +513,8 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex, cs_time current_time)
       int cloud;
       if(!below)
       {
-        float cloudx = 1024.+(isect.x - center.x)/radius*255.*40.;
-        float cloudy = 1024.+(isect.z - center.z)/radius*255.*40.;
+        float cloudx = 1024.+(isect.x - center.x)/radius*255.*40.+windpos.x;
+        float cloudy = 1024.+(isect.z - center.z)/radius*255.*40.+windpos.y;
         if(cloudx<0.0)cloudx = -cloudx;
         if(cloudy<0.0)cloudy = -cloudy;
         cloud = GetCloudVal((int)cloudx, (int)cloudy ); /* 80 msec */

@@ -107,6 +107,8 @@ class csProcSky {
   csVector3 sunpos;
   /// sun's color
   csColor suncolor;
+  /// color at the maximum hazyness point
+  csRGBcolor maxhaze;
 
   /// nr of octaves of the clouds.
   int nr_octaves;
@@ -131,6 +133,10 @@ class csProcSky {
   uint8 *startoctaves, *endoctaves;
   /// the previous time of animated frame
   cs_time old_time;
+  /// current wind 'position', of the origin of the clouds
+  csVector2 windpos;
+  /// direction and speed of wind
+  csVector2 winddir;
 
   /// init the texture
   void Initialize();
