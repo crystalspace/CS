@@ -684,10 +684,15 @@ IMPLEMENT_CSOBJTYPE (csSprite3D, csSprite)
 
 IMPLEMENT_IBASE_EXT (csSprite3D)
   IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iSprite3DState)
 IMPLEMENT_IBASE_EXT_END
 
 IMPLEMENT_EMBEDDED_IBASE (csSprite3D::PolyMesh)
   IMPLEMENTS_INTERFACE (iPolygonMesh)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csSprite3D::Sprite3DState)
+  IMPLEMENTS_INTERFACE (iSprite3DState)
 IMPLEMENT_EMBEDDED_IBASE_END
 
 /// Static vertex array.
@@ -704,6 +709,7 @@ static DECLARE_GROWING_ARRAY_REF (tween_verts, csVector3);
 csSprite3D::csSprite3D (csObject* theParent) : csSprite (theParent), bbox (NULL)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
+  CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DState);
   bbox.SetOwner (this);
   ptree_obj = &bbox;
   cur_frame = 0;
@@ -1707,3 +1713,9 @@ csMeshedPolygon* csSprite3D::PolyMesh::GetPolygons ()
   }
   return polygons;
 }
+
+iSkeletonState* csSprite3D::Sprite3DState::GetSkeletonState ()
+{
+  return QUERY_INTERFACE_SAFE (scfParent->GetSkeletonState (), iSkeletonState);
+}
+

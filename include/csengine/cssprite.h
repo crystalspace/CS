@@ -1171,6 +1171,9 @@ public:
   /// Force a new material skin other than default
   void SetMaterial (csMaterialWrapper *material);
 
+  /// Get the material for this sprite.
+  csMaterialWrapper* GetMaterial () { return cstxt; }
+
   /// Enable or disable tweening frames (default false).
   void EnableTweening (bool en) { do_tweening = en; }
 
@@ -1400,6 +1403,101 @@ public:
     csMeshedPolygon* polygons;
   } scfiPolygonMesh;
   friend struct PolyMesh;
+
+  //--------------------- iSprite3DState implementation -------------//
+  struct Sprite3DState : public iSprite3DState
+  {
+    DECLARE_EMBEDDED_IBASE (csSprite3D);
+    virtual void SetMaterialWrapper (iMaterialWrapper* material)
+    {
+      scfParent->SetMaterial (material->GetPrivateObject ());
+    }
+    virtual iMaterialWrapper* GetMaterialWrapper ()
+    {
+      return QUERY_INTERFACE_SAFE (scfParent->GetMaterial (), iMaterialWrapper);
+    }
+    virtual void SetMixMode (UInt mode)
+    {
+      scfParent->SetMixmode (mode);
+    }
+    virtual UInt GetMixMode ()
+    {
+      return scfParent->GetMixmode ();
+    }
+    virtual iMeshObjectFactory* GetFactory ()
+    {
+      return NULL; // @@@ Cannot be implemented here yet.
+    }
+    virtual iSkeletonState* GetSkeletonState ();
+    virtual void SetFrame (int f)
+    {
+      scfParent->SetFrame (f);
+    }
+    virtual int GetCurFrame ()
+    {
+      return scfParent->GetCurFrame ();
+    }
+    virtual int GetNumFrames ()
+    {
+      return scfParent->GetNumFrames ();
+    }
+    virtual bool SetAction (const char * name)
+    {
+      return scfParent->SetAction (name);
+    }
+    virtual iSpriteAction* GetCurAction ()
+    {
+      return QUERY_INTERFACE_SAFE (scfParent->GetCurAction (), iSpriteAction);
+    }
+    virtual void EnableTweening (bool en)
+    {
+      scfParent->EnableTweening (en);
+    }
+    virtual bool IsTweeningEnabled ()
+    {
+      return scfParent->IsTweeningEnabled ();
+    }
+    virtual void UnsetTexture ()
+    {
+      scfParent->UnsetTexture ();
+    }
+    virtual int GetLightingQuality ()
+    {
+      return scfParent->GetLightingQuality ();
+    }
+    virtual void SetLocalLightingQuality (int lighting_quality)
+    {
+      scfParent->SetLocalLightingQuality (lighting_quality);
+    }
+    virtual void SetLightingQualityConfig (int config_flag)
+    {
+      scfParent->SetLightingQualityConfig (config_flag);
+    }
+    virtual int GetLightingQualityConfig ()
+    {
+      return scfParent->GetLightingQualityConfig ();
+    }
+    virtual float GetLodLevel ()
+    {
+      return scfParent->GetLodLevel ();
+    }
+    virtual void SetLocalLodLevel (float lod_level)
+    {
+      scfParent->SetLocalLodLevel (lod_level);
+    }
+    virtual void SetLodLevelConfig (int config_flag)
+    {
+      scfParent->SetLodLevelConfig (config_flag);
+    }
+    virtual int GetLodLevelConfig ()
+    {
+      return scfParent->GetLodLevelConfig ();
+    }
+    virtual bool IsLodEnabled ()
+    {
+      return scfParent->IsLodEnabled ();
+    }
+  } scfiSprite3DState;
 };
 
 #endif // __CS_CSSPRITE_H__

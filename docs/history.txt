@@ -1,9 +1,19 @@
 The history order has been reversed so that new features are at the top.
 
 2-Feb-2001
+	- Wouter Wijngaards continued work on csfedit. You can now load
+	  a font (or make a new font) and see its contents in a window.
+	  The window also has working scrollbars now.
+	- Norman Kramer added initialization of pG2D to NULL (for avi plugin).
 	- Fixed a compile error in csfedit (only in debug mode) and
 	  fixed the makefile so that the description of the make target
 	  aligns correctly with the other descriptions.
+	- Extended iSkeletonConnectionState with GetTransformation() and
+	  SetTransformation().
+	- csSprite3D now implements iSprite3DState (similar to the work that
+	  has been done yesterday on csSpriteTemplate).
+	- Walktest now uses this new iSprite3DState for the skeleton and
+	  the ghost.
 1-Feb-2001
 	- Martin Geisse changed the sockets driver to use system events
 	  instead of Open() and Close() methods.

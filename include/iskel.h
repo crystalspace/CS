@@ -95,7 +95,7 @@ struct iSkeletonLimbState : public iBase
   virtual void* GetUserData () = 0;
 };
 
-SCF_VERSION (iSkeletonConnectionState, 0, 0, 1);
+SCF_VERSION (iSkeletonConnectionState, 0, 0, 2);
 
 /**
  * This interface describes the API for a connection state in the skeleton
@@ -105,6 +105,10 @@ SCF_VERSION (iSkeletonConnectionState, 0, 0, 1);
  */
 struct iSkeletonConnectionState : public iBase
 {
+  /// Set the transformation for this connection.
+  virtual void SetTransformation (const csTransform& tr) = 0;
+  /// Get the current transformation.
+  virtual csTransform& GetTransformation () = 0;
 };
 
 SCF_VERSION (iSkeletonState, 0, 0, 1);

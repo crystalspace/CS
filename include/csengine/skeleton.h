@@ -322,6 +322,14 @@ public:
   struct SkeletonConnectionState : iSkeletonConnectionState
   {
     DECLARE_EMBEDDED_IBASE (csSkeletonConnectionState);
+    virtual void SetTransformation (const csTransform& tr)
+    {
+      scfParent->SetTransformation (tr);
+    }
+    virtual csTransform& GetTransformation ()
+    {
+      return scfParent->GetTransformation ();
+    }
   } scfiSkeletonConnectionState;
 };
 

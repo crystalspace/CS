@@ -64,6 +64,7 @@
 #include "imrain.h"
 #include "imspiral.h"
 #include "imspr3d.h"
+#include "iskel.h"
 
 extern WalkTest* Sys;
 
@@ -520,12 +521,12 @@ public:
 };
 
 // Animate a skeleton.
-void animate_skeleton_tree (csSkeletonLimbState* limb)
+void animate_skeleton_tree (iSkeletonLimbState* limb)
 {
-  csSkeletonConnectionState* con = (csSkeletonConnectionState*)limb->GetChildren ();
-  while (con)
+  iSkeletonLimbState* child = limb->GetChildren ();
+  while (child)
   {
-    TreeSkelSpriteInfo* o = (TreeSkelSpriteInfo*)con->GetUserData ();
+    TreeSkelSpriteInfo* o = (TreeSkelSpriteInfo*)child->GetUserData ();
     if (!o)
     {
       o = new TreeSkelSpriteInfo ();
@@ -549,7 +550,7 @@ void animate_skeleton_tree (csSkeletonLimbState* limb)
       }
       o->y_angle = 0;
       o->dy = (rand () & 0x4) ? .04 : -.04;
-      con->SetUserData (o);
+      child->SetUserData (o);
     }
     o->x_angle += o->dx;
     if (o->x_angle > .1 || o->x_angle < -.1) o->dx = -o->dx;
@@ -564,16 +565,18 @@ void animate_skeleton_tree (csSkeletonLimbState* limb)
     	csZRotMatrix3 (o->z_angle + o->z_angle_base) *
 	csXRotMatrix3 (o->x_angle + o->x_angle_base);
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
+    iSkeletonConnectionState* con = QUERY_INTERFACE (child, iSkeletonConnectionState);
     con->SetTransformation (trans);
-    animate_skeleton_tree (con);
-    con = (csSkeletonConnectionState*)(con->GetNext ());
+    animate_skeleton_tree (child);
+    child = child->GetNextSibling ();
   }
 }
 
 void animate_skeleton_tree_cb (csSprite3D* spr, csRenderView* /*rview*/)
 {
-  csSkeletonState* sk_state = spr->GetSkeletonState ();
-  animate_skeleton_tree (sk_state);
+  iSprite3DState* state = QUERY_INTERFACE (spr, iSprite3DState);
+  iSkeletonState* sk_state = state->GetSkeletonState ();
+  animate_skeleton_tree (QUERY_INTERFACE (sk_state, iSkeletonLimbState));
 }
 
 // Add a skeletal tree sprite. If needed it will also create
@@ -718,13 +721,12 @@ iSkeleton* create_skelghost (iSprite3DFactoryState* state, iSpriteFrame* frame,
 }
 
 // Animate a skeleton.
-void animate_skeleton_ghost (csSkeletonLimbState* limb)
+void animate_skeleton_ghost (iSkeletonLimbState* limb)
 {
-  csSkeletonConnectionState* con = (csSkeletonConnectionState*)limb->
-  	GetChildren ();
-  while (con)
+  iSkeletonLimbState* child = limb->GetChildren ();
+  while (child)
   {
-    GhostSkelSpriteInfo* o = (GhostSkelSpriteInfo*)con->GetUserData ();
+    GhostSkelSpriteInfo* o = (GhostSkelSpriteInfo*)child->GetUserData ();
     if (!o)
     {
       o = new GhostSkelSpriteInfo ();
@@ -748,7 +750,7 @@ void animate_skeleton_ghost (csSkeletonLimbState* limb)
       }
       o->y_angle = 0;
       o->dy = (rand () & 0x4) ? .04 : -.04;
-      con->SetUserData (o);
+      child->SetUserData (o);
     }
     o->x_angle += o->dx;
     if (o->x_angle > .1 || o->x_angle < -.1) o->dx = -o->dx;
@@ -763,16 +765,18 @@ void animate_skeleton_ghost (csSkeletonLimbState* limb)
     	csZRotMatrix3 (o->z_angle + o->z_angle_base) *
 	csXRotMatrix3 (o->x_angle + o->x_angle_base);
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
+    iSkeletonConnectionState* con = QUERY_INTERFACE (child, iSkeletonConnectionState);
     con->SetTransformation (trans);
-    animate_skeleton_ghost (con);
-    con = (csSkeletonConnectionState*)(con->GetNext ());
+    animate_skeleton_ghost (child);
+    child = child->GetNextSibling ();
   }
 }
 
 void animate_skeleton_ghost_cb (csSprite3D* spr, csRenderView* /*rview*/)
 {
-  csSkeletonState* sk_state = spr->GetSkeletonState ();
-  animate_skeleton_ghost (sk_state);
+  iSprite3DState* state = QUERY_INTERFACE (spr, iSprite3DState);
+  iSkeletonState* sk_state = state->GetSkeletonState ();
+  animate_skeleton_ghost (QUERY_INTERFACE (sk_state, iSkeletonLimbState));
 }
 
 
