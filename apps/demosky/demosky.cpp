@@ -469,7 +469,6 @@ Flock::Flock(iEngine *engine, int num, iMaterialWrapper *mat, iSector *sector)
 
     csRef<iSprite2DState> sprstate (SCF_QUERY_INTERFACE(spr[i]->GetMeshObject(),
       iSprite2DState));
-    sprstate->GetVertices().SetLimit(4);
     sprstate->GetVertices().SetLength(4);
     sprstate->GetVertices()[0].color_init.Set(1.0f, 1.0f, 1.0f);
     sprstate->GetVertices()[1].color_init.Set(1.0f, 1.0f, 1.0f);
