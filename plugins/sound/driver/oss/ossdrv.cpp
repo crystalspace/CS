@@ -131,7 +131,7 @@ bool AudioDevice::Open(int& frequency, bool& bit16, bool& stereo,
   dsp_sample = (bit16 ? 16 : 8);
 
   lasterr=err_open_dsp;
-  audio = open(SOUND_DEVICE, O_WRONLY, 0);
+  audio = open(SOUND_DEVICE, O_WRONLY | O_NONBLOCK, 0);
   succ = audio != -1;
 
   if (succ) lasterr=err_set_samplesize;
