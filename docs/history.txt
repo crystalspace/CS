@@ -53,6 +53,9 @@ The history order is reversed so that new features are at the top.
 	- Converted cswseng application to use the new csInitializer system.
 	- Converted cswstest application to use the new csInitializer system.
 	- Converted picview application to use the new csInitializer system.
+	- Converted demosky application to use the new csInitializer system.
+	- Converted demosky2 application to use the new csInitializer system.
+	- Converted isotest application to use the new csInitializer system.
 4-Oct-2001
 	- Removed support for old and obsolete 'debug_level' in system
 	  driver.

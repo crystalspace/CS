@@ -20,7 +20,6 @@
 #define DEMOSKY_H
 
 #include <stdarg.h>
-#include "cssys/sysdriv.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 
@@ -39,10 +38,15 @@ struct iMeshWrapper;
 struct iMaterialWrapper;
 struct iLoader;
 struct iKeyboardDriver;
+struct iGraphics3D;
+struct iGraphics2D;
+struct iVirtualClock;
+struct iObjectRegistry;
 
-class DemoSky : public SysSystemDriver
+class DemoSky
 {
-  typedef SysSystemDriver superclass;
+public:
+  iObjectRegistry* object_reg;
 private:
   iSector* room;
   iView* view;
@@ -53,6 +57,7 @@ private:
   iGraphics2D *myG2D;
   iGraphics3D *myG3D;
   iKeyboardDriver* kbd;
+  iVirtualClock* vc;
 
   /// the flock of birds
   Flock *flock;
@@ -74,10 +79,11 @@ public:
   DemoSky ();
   virtual ~DemoSky ();
 
-  virtual bool Initialize (int argc, const char* const argv[],
+  bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
-  virtual void NextFrame ();
-  virtual bool HandleEvent (iEvent &Event);
+  void SetupFrame ();
+  void FinishFrame ();
+  bool HandleEvent (iEvent &Event);
 
   void Report (int severity, const char* msg, ...);
 };

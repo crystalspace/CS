@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "cssys/system.h"
 #include "cstool/initapp.h"
+#include "csutil/cmdhelp.h"
 #include "apps/isotest/isotest.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -43,6 +44,7 @@
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
 #include "ivaria/reporter.h"
+#include "ivaria/stdrep.h"
 #include "genmaze.h"
 #include "isys/plugin.h"
 #include "iengine/material.h"
@@ -86,7 +88,7 @@ void IsoTest::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.application.isotest", msg, arg);
   else
@@ -100,7 +102,9 @@ void IsoTest::Report (int severity, const char* msg, ...)
 void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
-  delete System;
+  iObjectRegistry* object_reg = System->object_reg;
+  delete System; System = NULL;
+  csInitializer::DestroyApplication (object_reg);
 }
 
 struct PlayerGridChange : public iGridChangeCallback
@@ -123,20 +127,64 @@ void PlayerGridChange::GridChange (iIsoSprite *sprite)
     app->GetLight()->SetGrid(sprite->GetGrid());
 }
 
+static bool IsoEventHandler (iEvent& ev)
+{
+  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  {
+    System->SetupFrame ();
+    return true;
+  }
+  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  {
+    System->FinishFrame ();
+    return true;
+  }
+  else
+  {
+    return System ? System->HandleEvent (ev) : false;
+  }
+}
 
 bool IsoTest::Initialize (int argc, const char* const argv[],
   const char *iConfigName)
 {
-  if (!superclass::Initialize (argc, argv, iConfigName))
-    return false;
+  object_reg = csInitializer::CreateEnvironment ();
+  if (!object_reg) return false;
 
-  iObjectRegistry* object_reg = GetObjectRegistry ();
-  
-  if (!csInitializeApplication (object_reg))
+  if (!csInitializer::RequestPlugins (object_reg, iConfigName, argc, argv,
+  	CS_REQUEST_VFS,
+	CS_REQUEST_SOFTWARE3D,
+	CS_REQUEST_PLUGIN("crystalspace.engine.iso:Engine.Iso", iIsoEngine),
+	CS_REQUEST_FONTSERVER,
+	CS_REQUEST_IMAGELOADER,
+	CS_REQUEST_LEVELLOADER,
+	CS_REQUEST_END))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "couldn't init app! (perhaps some plugins are missing?)");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't init app!");
     return false;
   }
+
+  if (!csInitializer::Initialize (object_reg))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't init app!");
+    return false;
+  }
+
+  if (!csInitializer::SetupEventHandler (object_reg, IsoEventHandler))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't init app!");
+    return false;
+  }
+
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  {
+    csCommandLineHelper::Help (object_reg);
+    exit (0);
+  }
+
+  // The virtual clock.
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
 
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
@@ -145,14 +193,14 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   if (!engine)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No IsoEngine plugin!");
-    abort ();
+    return false;
   }
 
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
-    abort ();
+    return false;
   }
   myG3D->IncRef ();
 
@@ -160,7 +208,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   if (!myG2D)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics2D plugin!");
-    abort ();
+    return false;
   }
   myG2D->IncRef ();
 
@@ -168,7 +216,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   if (!kbd)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver!");
-    abort ();
+    return false;
   }
   kbd->IncRef();
 
@@ -176,14 +224,14 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   if (!mouse)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iMouseDriver!");
-    abort ();
+    return false;
   }
   mouse->IncRef();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = myG2D->GetNativeWindow ();
   if (nw) nw->SetTitle ("IsoTest Crystal Space Application");
-  if (!Open ())
+  if (!csInitializer::OpenApplication (object_reg))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
     Cleanup ();
@@ -619,12 +667,12 @@ void IsoTest::AddMazeGrid(iIsoWorld *world, float posx, float posy,
 
 
 
-void IsoTest::NextFrame ()
+void IsoTest::SetupFrame ()
 {
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
-  SysSystemDriver::NextFrame ();
   csTicks elapsed_time, current_time;
-  GetElapsedTime (elapsed_time, current_time);
+  elapsed_time = vc->GetElapsedTicks ();
+  current_time = vc->GetCurrentTicks ();
 
   // keep track of fps.
   static bool fpsstarted = false;
@@ -702,22 +750,20 @@ void IsoTest::NextFrame ()
     player->GetPosition().y, player->GetPosition().z);
   myG2D->Write(font, 10, myG2D->GetHeight() - 20, txtmgr->FindRGB(255,255,255),
     -1, buf);
-  
-  // Drawing code ends here.
-  myG3D->FinishDraw ();
+}
 
-  // Print the final output.
+void IsoTest::FinishFrame ()
+{
+  myG3D->FinishDraw ();
   myG3D->Print (NULL);
 }
 
+
 bool IsoTest::HandleEvent (iEvent &Event)
 {
-  if (superclass::HandleEvent (Event))
-    return true;
-
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue);
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
   }
@@ -763,14 +809,6 @@ int main (int argc, char* argv[])
   // Create our main class.
   System = new IsoTest ();
 
-  // We want at least the minimal set of plugins
-  System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
-  System->RequestPlugin ("crystalspace.font.server.default:FontServer");
-  System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
-  System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-  System->RequestPlugin ("crystalspace.console.output.standard:Console.Output");
-  System->RequestPlugin ("crystalspace.engine.iso:Engine.Iso");
-
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
@@ -781,7 +819,7 @@ int main (int argc, char* argv[])
   }
 
   // Main loop.
-  System->Loop ();
+  csInitializer::MainLoop (System->object_reg);
 
   // Cleanup.
   Cleanup ();

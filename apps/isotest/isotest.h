@@ -21,7 +21,6 @@
 #define ISOTEST_H
 
 #include <stdarg.h>
-#include "cssys/sysdriv.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 
@@ -35,10 +34,16 @@ struct iFont;
 struct iMaterialWrapper;
 struct iKeyboardDriver;
 struct iMouseDriver;
+struct iObjectRegistry;
+struct iGraphics3D;
+struct iGraphics2D;
+struct iVirtualClock;
 
-class IsoTest : public SysSystemDriver
+class IsoTest
 {
-  typedef SysSystemDriver superclass;
+public:
+  iObjectRegistry* object_reg;
+
 private:
   /// the iso engine
   iIsoEngine *engine;
@@ -54,6 +59,7 @@ private:
   iKeyboardDriver* kbd;
   /// Generic mouse driver
   iMouseDriver* mouse;
+  iVirtualClock* vc;
 
   /// the font for text display
   iFont *font;
@@ -71,10 +77,11 @@ public:
   IsoTest ();
   virtual ~IsoTest ();
 
-  virtual bool Initialize (int argc, const char* const argv[],
+  bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
-  virtual void NextFrame ();
-  virtual bool HandleEvent (iEvent &Event);
+  void SetupFrame ();
+  void FinishFrame ();
+  bool HandleEvent (iEvent &Event);
   iIsoLight *GetLight () const {return light;}
   void AddMazeGrid(iIsoWorld *world, float posx, float posy, 
     iMaterialWrapper *floor, iMaterialWrapper *wall);

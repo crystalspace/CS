@@ -24,6 +24,7 @@
 #include "cstool/prsky.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
+#include "csutil/cmdhelp.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/natwin.h"
@@ -42,12 +43,14 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "ivaria/reporter.h"
+#include "igraphic/imageio.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
+#include "iutil/virtclk.h"
 
 //------------------------------------------------- We need the 3D engine -----
 
@@ -62,7 +65,7 @@ void DemoSky::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.application.demosky", msg, arg);
   else
@@ -109,13 +112,14 @@ DemoSky::~DemoSky ()
   delete sky_r;
   delete sky_u;
   delete sky_d;
-
 }
 
 void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
-  delete System;
+  iObjectRegistry* object_reg = System->object_reg;
+  delete System; System = NULL;
+  csInitializer::DestroyApplication (object_reg);
 }
 
 void DemoSky::SetTexSpace(csProcSkyTexture *skytex, iPolygon3D *poly, 
@@ -141,20 +145,65 @@ void DemoSky::SetTexSpace(csProcSkyTexture *skytex, iPolygon3D *poly,
   skytex->SetTextureSpace(texorig, texu-texorig, texv-texorig);
 }
 
+static bool DemoSkyEventHandler (iEvent& ev)
+{
+  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  {
+    System->SetupFrame ();
+    return true;
+  }
+  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  {
+    System->FinishFrame ();
+    return true;
+  }
+  else
+  {
+    return System ? System->HandleEvent (ev) : false;
+  }
+}
 
 bool DemoSky::Initialize (int argc, const char* const argv[],
   const char *iConfigName)
 {
-  if (!superclass::Initialize (argc, argv, iConfigName))
-    return false;
+  object_reg = csInitializer::CreateEnvironment ();
+  if (!object_reg) return false;
 
-  iObjectRegistry* object_reg = GetObjectRegistry ();
-  
-  if (!csInitializeApplication (object_reg))
+  if (!csInitializer::RequestPlugins (object_reg, iConfigName, argc, argv,
+  	CS_REQUEST_VFS,
+	CS_REQUEST_SOFTWARE3D,
+	CS_REQUEST_ENGINE,
+	CS_REQUEST_FONTSERVER,
+	CS_REQUEST_IMAGELOADER,
+	CS_REQUEST_LEVELLOADER,
+	CS_REQUEST_CONSOLEOUT,
+	CS_REQUEST_END))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "couldn't init app! (perhaps plugins missing?)");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't init app!");
     return false;
   }
+
+  if (!csInitializer::Initialize (object_reg))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't init app!");
+    return false;
+  }
+
+  if (!csInitializer::SetupEventHandler (object_reg, DemoSkyEventHandler))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't init app!");
+    return false;
+  }
+
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  {
+    csCommandLineHelper::Help (object_reg);
+    exit (0);
+  }
+
+  // The virtual clock.
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
 
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
@@ -200,7 +249,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = myG2D->GetNativeWindow ();
   if (nw) nw->SetTitle ("Crystal Space Procedural Sky Demo");
-  if (!Open ())
+  if (!csInitializer::OpenApplication (object_reg))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
 	Cleanup ();
@@ -347,11 +396,11 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   return true;
 }
 
-void DemoSky::NextFrame ()
+void DemoSky::SetupFrame ()
 {
-  SysSystemDriver::NextFrame ();
   csTicks elapsed_time, current_time;
-  GetElapsedTime (elapsed_time, current_time);
+  elapsed_time = vc->GetElapsedTicks ();
+  current_time = vc->GetCurrentTicks ();
 
   flock->Update(elapsed_time);
 
@@ -387,18 +436,16 @@ void DemoSky::NextFrame ()
     -1, text);
   myG2D->Write(font, txtx, txty, myG3D->GetTextureManager()->FindRGB(255,255,255),
     -1, text);
+}
 
-  // Drawing code ends here.
+void DemoSky::FinishFrame ()
+{
   myG3D->FinishDraw ();
-  // Print the final output.
   myG3D->Print (NULL);
 }
 
 bool DemoSky::HandleEvent (iEvent &Event)
 {
-  if (superclass::HandleEvent (Event))
-    return true;
-
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == 't'))
   {
     /// toggle animation
@@ -408,7 +455,7 @@ bool DemoSky::HandleEvent (iEvent &Event)
 
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue);
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
   }
@@ -558,15 +605,6 @@ int main (int argc, char* argv[])
   // Create our main class.
   System = new DemoSky ();
 
-  // We want at least the minimal set of plugins
-  System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
-  System->RequestPlugin ("crystalspace.font.server.default:FontServer");
-  System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
-  System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-  System->RequestPlugin ("crystalspace.engine.3d:Engine");
-  System->RequestPlugin ("crystalspace.console.output.standard:Console.Output");
-  System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
-
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
@@ -577,7 +615,7 @@ int main (int argc, char* argv[])
   }
 
   // Main loop.
-  System->Loop ();
+  csInitializer::MainLoop (System->object_reg);
 
   Cleanup ();
 
