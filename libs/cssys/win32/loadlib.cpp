@@ -96,10 +96,10 @@ csLibraryHandle csLoadLibrary (const char* iName)
         FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
         0, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
         (LPTSTR) &buf, 0, 0);
-    char *str = new char[strlen(buf) + strlen(iName) + 50];
-    sprintf (str, "LoadLibraryEx('%s') error %d: %s",
-	dllPath, (int)errorCode, buf);
-    ErrorMessages.Push (str);
+    csString s;
+    s << "LoadLibraryEx(" << dllPath << ") error " << (int)errorCode << ": "
+      << buf;
+    ErrorMessages.Push (csStrNew(s));
     LocalFree (buf);
     return 0;
   }
@@ -109,24 +109,19 @@ csLibraryHandle csLoadLibrary (const char* iName)
     (pfnGetPluginCompiler) GetProcAddress ((HMODULE)handle, "plugin_compiler");
   if (!get_plugin_compiler)
   {
-    const char *noPluginCompiler =
-      "%s: DLL does not export \"plugin_compiler\".\n";
-    char *msg = new char[strlen(noPluginCompiler) + strlen(iName)];
-    sprintf (msg, noPluginCompiler, dllPath);
-    ErrorMessages.Push (msg);
+    csString s;
+    s << dllPath << ": DLL does not export \"plugin_compiler\".";
+    ErrorMessages.Push (csStrNew(s));
     FreeLibrary ((HMODULE)handle);
     return 0;
   }
   const char* plugin_compiler = get_plugin_compiler();
   if (strcmp(plugin_compiler, CS_COMPILER_NAME) != 0)
   {
-    const char *compilerMismatch =
-      "%s: plugin compiler mismatches app compiler: %s != "
-      CS_COMPILER_NAME "\n";
-    char *msg = new char[strlen(compilerMismatch) + strlen(iName) + 
-      strlen(plugin_compiler)];
-    sprintf (msg, compilerMismatch, dllPath, plugin_compiler);
-    ErrorMessages.Push (msg);
+    csString s;
+    s << dllPath << ": plugin compiler does not match application compiler: "
+      << plugin_compiler << " != " CS_COMPILER_NAME;
+    ErrorMessages.Push (csStrNew(s));
     FreeLibrary ((HMODULE)handle);
     return 0;
   }
@@ -429,8 +424,8 @@ void InternalScanPluginDir (iStrVector*& messages,
     }
   }
 
-  // now go over all the files. This way files in a dir will have precedence over
-  // files a subdir.
+  // Now go over all the files.  This way files in a dir will have precedence
+  // over files a subdir.
   {
     csStringHashIterator fileIt (&files);
     csString fullPath;
@@ -560,4 +555,3 @@ csRef<iStrVector> csScanPluginDirs (csPluginPaths* dirs,
 	 
   return csPtr<iStrVector> (messages);
 }
-

@@ -3,6 +3,13 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+23-Jul-2003
+	- Eric Sunshine fixed memory trashing bugs in Win32 implmentation of
+	  csLoadLibrary().  When composing its error messages, it was
+	  allocating insufficient memory to contain the composed strings.  In
+	  all cases, it failed to take the terminating null byte into account.
+	  In other cases, it was just wildly miscalculating the necessary
+	  allocation size.
 22-Jul-2003
         - Philip Wyett fixed inconsistent swig -I flag in make build and
 	  aligning it with jam build.  cs_pyth.cpp will now be identical
@@ -18,12 +25,6 @@ The history order is reversed so that new features are at the top.
 	  experience trouble, please attempt to satisfy the link requirements
 	  by editing the makefiles or pythmod_setup.py, rather than disabling
 	  code in win32.cpp.)
-        - Philip Wyett fixed inconsistent swig -I flag in make build and
-	  aligning it with jam build.  cs_pyth.cpp will now be identical
-	  whether make or jam built.
-	- Keith Fulton added /apps/tools/partedit particle system editor.  This
-	  is still unfinished but should at least run.  Code was by Peter
-	  Holko, who is still working on it.
 	- Eric Sunshine reverted Keith Fulton's change to csStringArray
 	  SetLength() in which Keith shifted to the caller the responsibility
 	  of freeing the strings.  This silently broke existing client code by
