@@ -30,7 +30,7 @@
 
 CS_IMPLEMENT_APPLICATION
 
-csSystemDriver* System;
+static iObjectRegistry* object_reg;
 
 char *programversion = "0.0.1";
 char *programname;
@@ -120,7 +120,6 @@ static bool Convert (const char *fontfile)
   if (opt.verbose)
     printf ("Loading font %s, size = %d\n", fontfile, opt.fontsize);
 
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   iFontServer *fs = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_FONTSERVER, iFontServer);
@@ -264,20 +263,19 @@ int main (int argc, char* argv[])
   _wildcard (&argc, &argv);
 #endif
 
-  // Create our main class.
-  System = new csSystemDriver ();
+  object_reg = csInitializer::CreateEnvironment ();
+  if (!object_reg) return -1;
 
-  // Load VFS (for file management) and the TTF font server
-  System->RequestPlugin ("crystalspace.kernel.vfs:" CS_FUNCID_VFS);
-  System->RequestPlugin ("crystalspace.font.server.freetype:" CS_FUNCID_FONTSERVER);
-
-  if (!System->Initialize (argc, argv))
+  if (!csInitializer::RequestPlugins (object_reg, argc, argv,
+  	CS_REQUEST_VFS,
+	CS_REQUEST_PLUGIN ("crystalspace.font.server.freetype:FontServer", iFontServer),
+	CS_REQUEST_END))
   {
-    fprintf (stderr, "Initialization error!\n");
+    fprintf (stderr, "couldn't init app! (perhaps some plugins are missing?)");
     return -1;
   }
-  
-  if (!csInitializeApplication (System->GetObjectRegistry ()))
+
+  if (!csInitializer::Initialize (object_reg))
   {
     fprintf (stderr, "couldn't init app! (perhaps some plugins are missing?)");
     return -1;
@@ -358,7 +356,7 @@ int main (int argc, char* argv[])
     if (!Convert (argv [optind]))
       return -2;
 
-  delete System;
+  csInitializer::DestroyApplication (object_reg);
 
   return 0;
 }
