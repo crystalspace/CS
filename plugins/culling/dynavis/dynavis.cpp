@@ -902,56 +902,33 @@ void csDynaVis::AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
 {
   if (!obj->model->HasOBB ()) return;	// Object is not ment for writing.
 
-  //iMovable* movable = visobj->GetMovable ();
+  // Then append to queue.
+  if (do_cull_ignoresmall)
+    if ((sbox.MaxX ()-sbox.MinX ())<10 && (sbox.MaxY ()-sbox.MinY ())<10)
+      return;
 
-  //csReversibleTransform trans = camera->GetTransform ();
-  //if (!movable->IsFullTransformIdentity ())
-  //{
-    //csReversibleTransform movtrans = movable->GetFullTransform ();
-    //trans /= movtrans;
-  //}
+  float depth = max_depth;
+  // If we have a good occluder we use the minimum depth instead
+  // of the maximum depth to ensure that the object gets selected
+  // soon enough (also note that good occluders are inserted polygon
+  // by polygon in the coverage buffer).
+  if (obj->hint_goodoccluder)
+    depth = min_depth;
 
-  //const csOBB& obb = obj->model->GetOBB ();
-  //csOBBFrozen frozen_obb (obb, trans);
-
-  //float min_depth, max_depth;
-  //csBox2 sbox;
-  //if (frozen_obb.ProjectOBB (camera->GetFOV (),
-    	//camera->GetShiftX (), camera->GetShiftY (), sbox,
-	//min_depth, max_depth))
+  write_queue->Append (sbox, depth, obj);
+# ifdef CS_DEBUG
+  if (do_state_dump)
   {
-    // Then append to queue if sbox is actually on screen.
-    if (sbox.MaxX () > 0 && sbox.MaxY () > 0 &&
-        sbox.MinX () < scr_width && sbox.MinY () < scr_height)
+    csRef<iObject> iobj (SCF_QUERY_INTERFACE (visobj, iObject));
+    if (iobj)
     {
-      if (do_cull_ignoresmall)
-	if ((sbox.MaxX ()-sbox.MinX ())<10 && (sbox.MaxY ()-sbox.MinY ())<10)
-	  return;
-
-      float depth = max_depth;
-      // If we have a good occluder we use the minimum depth instead
-      // of the maximum depth to ensure that the object gets selected
-      // soon enough (also note that good occluders are inserted polygon
-      // by polygon in the coverage buffer).
-      if (obj->hint_goodoccluder)
-        depth = min_depth;
-
-      write_queue->Append (sbox, depth, obj);
-#     ifdef CS_DEBUG
-      if (do_state_dump)
-      {
-        csRef<iObject> iobj (SCF_QUERY_INTERFACE (visobj, iObject));
-        if (iobj)
-        {
-          printf (
+      printf (
 	    "AppendWriteQueue of object %s (depth=%g) (good occluder=%d)\n",
       	    iobj->GetName () ? iobj->GetName () : "<noname>",
 	    depth, obj->hint_goodoccluder);
-        }
-      }
-#     endif
     }
   }
+# endif
 }
 
 bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
@@ -1016,6 +993,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   float sy; sy = camera->GetShiftY ();
 
   bool sbox_rc;	// Is screen box visible.
+  sbox_rc = true;
   if (obj->model->HasOBB ())
   {
     csReversibleTransform trans = camtrans;
@@ -1033,6 +1011,13 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     // No OBB, so use AABB instead.
     sbox_rc = obj_bbox.ProjectBox (camtrans, fov, sx, sy, sbox,
 		min_depth, max_depth);
+  }
+  if (!sbox_rc || sbox.MaxX () <= 0 || sbox.MaxY () <= 0 ||
+        sbox.MinX () >= scr_width || sbox.MinY () >= scr_height)
+  {
+    hist->reason = INVISIBLE_FRUSTUM;
+    hist->has_vpt_point = false;
+    goto end;
   }
 
   // If previously marked visible we stop here.
@@ -1074,7 +1059,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       }
     }
 
-    rc = sbox_rc;
+    rc = true;
 
     csTestRectData testrect_data;
     bool cont_check = true;
@@ -1226,9 +1211,8 @@ end:
       {
         // We are using the write queue so we insert the object there
         // for later culling.
-	if (sbox_rc)
-          AppendWriteQueue (data->rview->GetCamera (), obj->visobj, obj->model,
-      	    obj, sbox, min_depth, max_depth);
+        AppendWriteQueue (data->rview->GetCamera (), obj->visobj, obj->model,
+      	  obj, sbox, min_depth, max_depth);
       }
       else
       {
