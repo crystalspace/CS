@@ -20,6 +20,10 @@ Short-term cleanups that need to be done:
 	- Optimized the sprite changes from Seth a bit. Avoided allocation
 	  of arrays every frame. The copy of vertices is still there
 	  however.
+	- Improved both the speed of sprite lighting and also reduced
+	  memory usage for every sprite by removing the object_vertices
+	  array that could get allocated for every single sprite
+	  instance.
 	- Samuel <samuel@metalang.softnet.co.uk> contributed a patch
 	  to the software and X 2D drivers so that they allow resizing
 	  of the window. In principle the same thing can now be done

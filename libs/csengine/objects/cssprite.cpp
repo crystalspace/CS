@@ -640,7 +640,6 @@ csSprite3D::csSprite3D () : csObject (), bbox (NULL)
   force_otherskin = false;
   cur_action = NULL;
   vertex_colors = NULL;
-  object_vertices = NULL;
   dynamiclights = NULL;
   skeleton_state = NULL;
   MixMode = CS_FX_COPY;
@@ -1363,19 +1362,18 @@ void csSprite3D::RemoveFromSectors ()
 
 csVector3* csSprite3D::GetObjectVerts (csFrame* fr)
 {
-  CHK ( delete [] object_vertices; )
-  CHK ( object_vertices = new csVector3 [tpl->GetNumTexels()]; )
-  for (int i = 0; i < tpl->GetNumTexels(); i++)
-    object_vertices[i] = tpl->GetVertex(fr, i);
+  UpdateWorkTables (tpl->GetNumTexels ());
+  for (int i = 0; i < tpl->GetNumTexels (); i++)
+    obj_verts[i] = tpl->GetVertex(fr, i);
 
   if (skeleton_state)
   {
     UpdateWorkTables (tpl->GetNumTexels());
-    skeleton_state->Transform (csTransform (), object_vertices, tr_verts.GetArray ());
+    skeleton_state->Transform (csTransform (), obj_verts.GetArray (), tr_verts.GetArray ());
     return tr_verts.GetArray ();
   }
   else
-    return object_vertices;
+    return obj_verts.GetArray ();
 }
 
 void csSprite3D::DeferUpdateLighting (int flags, int num_lights)
@@ -1391,11 +1389,11 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
   defered_num_lights = 0;
 
   csFrame* this_frame = cur_action->GetFrame (cur_frame);
-  csVector3* object_vertices = GetObjectVerts (this_frame);
+  csVector3* work_obj_verts;
 
   if (tween_ratio)
   {
-    CHK (object_vertices = new csVector3 [tpl->GetNumTexels()]);
+    UpdateWorkTables (tpl->GetNumTexels ());
 
     csFrame* next_frame;
     if (cur_frame + 1 < cur_action->GetNumFrames())
@@ -1405,11 +1403,15 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
 
     float remainder = 1 - tween_ratio;
     for (i = 0 ; i < tpl->GetNumTexels() ; i++)
-      object_vertices [i] = tween_ratio * tpl->GetVertex(this_frame, i)
+      obj_verts[i] = tween_ratio * tpl->GetVertex(this_frame, i)
         + remainder * tpl->GetVertex (next_frame, i);
-  }
 
-  tpl->ComputeNormals (this_frame, object_vertices);
+    work_obj_verts = obj_verts.GetArray ();
+  }
+  else
+    work_obj_verts = GetObjectVerts (this_frame);
+
+  tpl->ComputeNormals (this_frame, work_obj_verts);
 
   ResetVertexColors ();
 
@@ -1427,13 +1429,9 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
   }
 
   if (do_quality_lighting)
-    UpdateLightingHQ (lights, num_lights, object_vertices);
+    UpdateLightingHQ (lights, num_lights, work_obj_verts);
   else
-    UpdateLightingLQ (lights, num_lights, object_vertices);
-
-  // delete tweened vertices
-  if (tween_ratio)
-    CHKB (delete [] object_vertices);
+    UpdateLightingLQ (lights, num_lights, work_obj_verts);
 }
 
 void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* object_vertices)

@@ -366,9 +366,6 @@ private:
   /// Current cookie for camera_bbox.
   csTranCookie camera_cookie;
 
-  /// one frame of 3d coordinates
-  csVector3* object_vertices;
-
 public:
   /// Set owner (actor) for this sprite.
   void SetMyOwner (csObject *newOwner) { myOwner = newOwner; }
