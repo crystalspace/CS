@@ -21,6 +21,15 @@ chronological order.
 	- Eric Sunshine changed csjoywin.h so that it also #includes
 	  <dinputdefs.h> since this is needed by Borland C++Builder.  Reported
 	  by Randall Foreman <eidpers@comcast.net>.
+	- Eric Sunshine fixed clean/distclean targets in cs.mak and Jamfile so
+	  that they aslo clean up configure.lineno and config.status.lineno.
+	- Eric Sunshine fixed a number of copy/paste errors in shadermgr.mak,
+	  waterdemo.mak, and xmlshader.mak.
+	- Eric Sunshine converted shadermgr.mak and xmlshader.mak to the new
+	  format for makefiles.
+	- Eric Sunshine fixed formatting of "help" messages in terrainldr.mak
+	  and waterdemo.mak.
+	- Eric Sunshine added xmlshader to user.mak.
 6-Jan-2004
 	- Eric Sunshine changed the libbfd check in configure.ac so that it is
 	  not performed on Windows.  Newer versions of Mingw supply libbfd and

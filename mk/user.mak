@@ -116,6 +116,7 @@ ifeq ($(USE_NEW_RENDERER),yes)
 PLUGINS.DYNAMIC += video/render3d/opengl
 endif
 PLUGINS.DYNAMIC += video/render3d/shader/shadermgr
+PLUGINS.DYNAMIC += video/render3d/shader/shadercompiler/xmlshader
 PLUGINS.DYNAMIC += video/render3d/shader/shaderplugins/glshader_arb
 PLUGINS.DYNAMIC += video/render3d/shader/shaderplugins/glshader_fixed
 ifeq ($(CG.AVAILABLE),yes)

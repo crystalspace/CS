@@ -23,7 +23,8 @@ CleanDir clean : out ;
 
 Clean distclean : Jamconfig Jamfile
 		  cache.mak config.mak Makefile
-		  config.log config.status config.cache
+		  config.log config.status config.status.lineno
+		  config.cache configure.lineno
 		  include/volatile.h
 		  [ Wildcard *.scf ]
 		  [ Wildcard *.cex ] ;

@@ -1,7 +1,3 @@
-# This is a subinclude file used to define the rules needed
-# to build the shadermgr plug-in.
-
-# Driver description
 DESCRIPTION.shadermgr = Shader manager
 
 #------------------------------------------------------------- rootdefines ---#
@@ -29,8 +25,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp $(SRCDIR)/plugins/video/render3d/shader/shadermgr
-
 ifeq ($(USE_PLUGINS),yes)
   SHADERMGR = $(OUTDLL)/shadermgr$(DLL)
   LIB.SHADERMGR = $(foreach d,$(DEP.SHADERMGR),$($d.LIB))
@@ -42,15 +36,18 @@ else
   TO_INSTALL.STATIC_LIBS += $(SHADERMGR)
 endif
 
-INF.SHADERMGR = $(SRCDIR)/plugins/video/render3d/shader/shadermgr/shadermgr.csplugin
-INC.SHADERMGR = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/render3d/shader/shadermgr/*.h \
-  plugins/video/render3d/shader/common/*.h))
-SRC.SHADERMGR = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/render3d/shader/shadermgr/*.cpp \
-  plugins/video/render3d/shader/common/*.cpp))
-OBJ.SHADERMGR = $(addprefix $(OUT)/,$(notdir $(SRC.SHADERMGR:.cpp=$O)))
-DEP.SHADERMGR = CSGFX CSTOOL CSGEOM CSUTIL CSUTIL
+DIR.SHADERMGR = plugins/video/render3d/shader/shadermgr
+OUT.SHADERMGR = $(OUT)/$(DIR.SHADERMGR)
+INF.SHADERMGR = $(SRCDIR)/$(DIR.SHADERMGR)/shadermgr.csplugin
+INC.SHADERMGR = $(wildcard $(addprefix $(SRCDIR)/, \
+  $(DIR.SHADERMGR)/*.h plugins/video/render3d/shader/common/*.h))
+SRC.SHADERMGR = $(wildcard $(addprefix $(SRCDIR)/, \
+  $(DIR.SHADERMGR)/*.cpp plugins/video/render3d/shader/common/*.cpp))
+OBJ.SHADERMGR = \
+  $(addprefix $(OUT.SHADERMGR)/,$(notdir $(SRC.SHADERMGR:.cpp=$O)))
+DEP.SHADERMGR = CSTOOL CSGFX CSGEOM CSUTIL
 
-TO_INSTALL.CONFIG += $(CFG.SHADERMGR)
+OUTDIRS += $(OUT.SHADERMGR)
 
 MSVC.DSP += SHADERMGR
 DSP.SHADERMGR.NAME = shadermgr
@@ -61,23 +58,31 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: shadermgr shadermgrclean
+.PHONY: shadermgr shadermgrclean shadermgrcleandep
 
 shadermgr: $(OUTDIRS) $(SHADERMGR)
+
+$(OUT.SHADERMGR)/%$O: $(SRCDIR)/$(DIR.SHADERMGR)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(SHADERMGR): $(OBJ.SHADERMGR) $(LIB.SHADERMGR)
 	$(DO.PLUGIN)
 
 clean: shadermgrclean
 shadermgrclean:
-	-$(RMDIR) $(SHADERMGR) $(OBJ.SHADERMGR) $(OUTDLL)/$(notdir $(INF.SHADERMGR))
+	-$(RMDIR) $(SHADERMGR) $(OBJ.SHADERMGR) \
+	$(OUTDLL)/$(notdir $(INF.SHADERMGR))
+
+cleandep: shadermgrcleandep
+shadermgrcleandep:
+	-$(RM) $(OUT.SHADERMGR)/shadermgr.dep
 
 ifdef DO_DEPEND
-dep: $(OUTOS)/shadermgr.dep
-$(OUTOS)/shadermgr.dep: $(SRC.SHADERMGR)
-	$(DO.DEP)
+dep: $(OUT.SHADERMGR) $(OUT.SHADERMGR)/shadermgr.dep
+$(OUT.SHADERMGR)/shadermgr.dep: $(SRC.SHADERMGR)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/shadermgr.dep
+-include $(OUT.SHADERMGR)/shadermgr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

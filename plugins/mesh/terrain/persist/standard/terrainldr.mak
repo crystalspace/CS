@@ -4,7 +4,7 @@ DESCRIPTION.terrainldr = Terrain object loader
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make terrainldr     Make the $(DESCRIPTION.terrainldr)$"
+  $(NEWLINE)echo $"  make terrainldr   Make the $(DESCRIPTION.terrainldr)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#

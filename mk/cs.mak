@@ -259,7 +259,7 @@ ifneq ($(SRCDIR),.)
 endif
 
 clean:
-	-$(RM) config.log
+	-$(RM) config.log configure.lineno config.status.lineno
 	-$(RMDIR) $(OUTBASE)
 ifneq (.,$(OUTDLL))
 	-$(RMDIR) $(OUTDLL)

@@ -1,14 +1,14 @@
 ifeq ($(USE_NEW_RENDERER),yes)
 
 # Application description
-DESCRIPTION.r3dtest = Displaying rendering of a watersurface in new renderer
+DESCRIPTION.waterdemo = Water surface demonstration
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make waterdemo      Make the $(DESCRIPTION.waterdemo)$"
+  $(NEWLINE)echo $"  make waterdemo    Make the $(DESCRIPTION.waterdemo)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -31,10 +31,11 @@ ifeq ($(MAKESECTION),postdefines)
 WATERDEMO.EXE = waterdemo$(EXE)
 DIR.WATERDEMO = apps/waterdemo
 OUT.WATERDEMO = $(OUT)/$(DIR.WATERDEMO)
-INC.WATERDEMO = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.WATERDEMO)/*.h ))
-SRC.WATERDEMO = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.WATERDEMO)/*.cpp ))
-OBJ.WATERDEMO = $(addprefix $(OUT.WATERDEMO)/,$(notdir $(SRC.WATERDEMO:.cpp=$O)))
-DEP.WATERDEMO = CSTOOL CSGFX CSUTIL CSGEOM CSUTIL
+INC.WATERDEMO = $(wildcard $(SRCDIR)/$(DIR.WATERDEMO)/*.h)
+SRC.WATERDEMO = $(wildcard $(SRCDIR)/$(DIR.WATERDEMO)/*.cpp)
+OBJ.WATERDEMO = \
+  $(addprefix $(OUT.WATERDEMO)/,$(notdir $(SRC.WATERDEMO:.cpp=$O)))
+DEP.WATERDEMO = CSTOOL CSGFX CSGEOM CSUTIL
 LIB.WATERDEMO = $(foreach d,$(DEP.WATERDEMO),$($d.LIB))
 
 OUTDIRS += $(OUT.WATERDEMO)
@@ -79,4 +80,4 @@ endif
 
 endif # ifeq ($(MAKESECTION),targets)
 
-endif # use new renderer
+endif # ifeq ($(USE_NEW_RENDERER),yes)
