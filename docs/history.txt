@@ -48,6 +48,10 @@ The history order is reversed so that new features are at the top.
 	  outside its directory. Also added transparency.
 	- Fixed fire proc texture.
 	- Luca Pancallo fixed 3ds2lev for real.
+	- Martin Geisse removed some of the typed vector macros which were
+	  not really needed. Martin also added documenation about typed
+	  vectors.
+	- Release of CS 0.92r001.
 11-Dec-2001
 	- Thanks to Matze we finally got debugging to work properly with
 	  cygwin and mingw ports. In the past there was no useful debug
