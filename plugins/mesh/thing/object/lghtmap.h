@@ -118,17 +118,25 @@ public:
   ~csLightMap ();
 
   /**
-   * Rebuilds the lightmap for the poly from all the lightmaps + the ambient
-   * light if specified.
+   * Rebuilds the real lightmap data for the poly from all the lightmaps +
+   * the ambient light if specified.
    */
   bool UpdateRealLightMap (float dyn_ambient_r,
                            float dyn_ambient_g,
                            float dyn_ambient_b, 
                            bool dyn_dirty);
 
-  ///
+  /**
+   * Get the static lightmap data. After CalcMaxStatic() it
+   * is possible that this returns 0. In that case you can find
+   * the uniform lighting value in max_static_color_values.
+   */
   csRGBpixel* GetStaticMap () { return static_lm; }
-  ///
+  /**
+   * Get the real lightmap data. This is static lightmap +
+   * dynamic ambient + pseudo dynamic lights + dynamic
+   * lights.
+   */
   csRGBpixel* GetRealMap () { return real_lm; }
 
   /**
@@ -148,6 +156,8 @@ public:
    * r,g,b is the ambient light color used to initialize the lightmap.
    * This will be used to optimize the lightmap away in case it is mostly
    * equal to that ambient.
+   * Note! This function will delete the static lightmap data if it
+   * discovers that it is all the same!
    */
   void CalcMaxStatic (int r, int g, int b);
 
