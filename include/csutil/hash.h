@@ -158,14 +158,18 @@ public:
   }
 
   /// Get all the elements with the given key, or empty if there are none.
-  csArray<T> GetAll (uint32 key) const
+  csArray<T> GetAll (const K& key) const
   {
     const csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
     csArray<T> ret (values.Length () / 2);
-    for (int i = values.Length () - 1; i >= 0; i--)
-      if (KeyHandler::CompareKeys (values[i].key, key)) 
-	ret.Push (values[i].value);
+    const int len = values.Length ();
+    for (int i = 0; i < len; ++i)
+    {
+      const Element& v = values[i];
+      if (KeyHandler::CompareKeys (v.key, key)) 
+	ret.Push (v.value);
+    }
     return ret;
   }
 
@@ -174,12 +178,16 @@ public:
   {
     csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
-    for (int i = values.Length () - 1; i >= 0; i--)
-      if (KeyHandler::CompareKeys (values[i].key, key))
+    const int len = values.Length ();
+    for (int i = 0; i < len; ++i)
+    {
+      Element& v = values[i];
+      if (KeyHandler::CompareKeys (v.key, key))
       {
-        values[i].value = value;
+        v.value = value;
         return;
       }
+    }
 
     values.Push (Element (key, value));
     Size++;
