@@ -118,6 +118,7 @@ struct iClipper2D : public iBase
    * <li> -1 if box is not visible.
    * <li> 0 if box is partially visible.
    * <li> 1 if box is entirely visible.
+   * </ul>
    */
   virtual int ClassifyBox (const csBox2 &box) = 0;
 
