@@ -43,6 +43,7 @@ PLUGINS += mesh/crossbld
 PLUGINS += mesh/impexp/ieplex
 PLUGINS += mesh/spr2d/object       mesh/spr2d/persist/classic
 PLUGINS += mesh/spr3d/object       mesh/spr3d/persist/classic
+PLUGINS +=                         mesh/spr3d/persist/binary
 PLUGINS += mesh/fountain/object    mesh/fountain/persist/classic
 PLUGINS += mesh/explo/object       mesh/explo/persist/classic
 PLUGINS += mesh/fire/object        mesh/fire/persist/classic
