@@ -14,6 +14,13 @@ chronological order.
 	  doesn't help sufficiently.
 	- res added functions to map Unicode characters to their uppercase/
 	  lowercase/fold equivalents to csUnicodeTransform.
+	- Eric Sunshine fixed Crystal Space version check in crystal.m4.  The
+	  'sed' expression which extracted the major and minor version
+	  components from `cs-config --version' was completely
+	  broken. (Reported by Michael D. Adams <mdmkolbe@users.sf.net>; patch
+	  #1152178.)  In addition, the sed expression used non-portable
+	  regular-expression features which are not available everywhere (such
+	  as MacOS/X and modern BSD platforms).
 27-Feb-2005
 	- res applied (a variation of) patch #1152721, "Cygwin compatability 
 	  with _X and _C", from Michael D. Adams.
