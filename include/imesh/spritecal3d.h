@@ -88,8 +88,19 @@ struct iSpriteCal3DFactoryState : public iBase
    * later.
    * defmat is the material which should be used when the object is created, if any.
    */
-  virtual bool LoadCoreMesh(const char *filename,const char *name,bool attach,iMaterialWrapper *defmat) = 0;
+  virtual int LoadCoreMesh(const char *filename,const char *name,bool attach,iMaterialWrapper *defmat) = 0;
 
+  /**
+   * This adds a mesh as a morph target of another mesh.
+   *
+   * @param mesh_index The index of the mesh we are going to add a morph target to.
+   * @param filename The name of the file of the mesh of the morph tarrget.
+   * @param name The name of the morph target.
+   *
+   * @return The index of the morph target.
+   */
+  virtual int LoadCoreMorphTarget(int mesh_index,const char *filename,const char *name) = 0;
+  
   /**
    * This jams a CS material into a cal3d material struct.
    * Don't try this at home!

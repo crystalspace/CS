@@ -73,6 +73,7 @@ struct csCal3DMesh
     csString	      name;
     bool	      attach_by_default;
     iMaterialWrapper *default_material;
+    csArray<csString> morph_target_name;
 };
 
 class csSpriteCal3DMeshObject;
@@ -130,7 +131,8 @@ public:
   float GetRenderScale() { return renderScale; }
   bool LoadCoreSkeleton(const char *filename);
   int  LoadCoreAnimation(const char *filename,const char *name,int type,float base_vel,float min_vel,float max_vel);
-  bool LoadCoreMesh(const char *filename,const char *name,bool attach,iMaterialWrapper *defmat);
+  int LoadCoreMesh(const char *filename,const char *name,bool attach,iMaterialWrapper *defmat);
+  int LoadCoreMorphTarget(int mesh_index,const char *filename,const char *name);
   bool AddCoreMaterial(iMaterialWrapper *mat);
   void BindMaterials();
 
@@ -250,9 +252,12 @@ public:
     virtual int LoadCoreAnimation(const char *filename,const char *name,int type,float base_vel,float min_vel,float max_vel)
     { return scfParent->LoadCoreAnimation(filename,name,type,base_vel,min_vel,max_vel); }
 
-    virtual bool LoadCoreMesh(const char *filename,const char *name,bool attach,iMaterialWrapper *defmat)
+    virtual int LoadCoreMesh(const char *filename,const char *name,bool attach,iMaterialWrapper *defmat)
     { return scfParent->LoadCoreMesh(filename,name,attach,defmat); }
 
+    virtual int LoadCoreMorphTarget(int mesh_index,const char *filename,const char *name)
+    { return scfParent->LoadCoreMorphTarget(mesh_index,filename,name); }
+	    
     virtual bool AddCoreMaterial(iMaterialWrapper *mat)
     { return scfParent->AddCoreMaterial(mat); }
 

@@ -184,7 +184,7 @@ int  csSpriteCal3DMeshObjectFactory::LoadCoreAnimation(const char *filename,
     return id;
 }
 
-bool csSpriteCal3DMeshObjectFactory::LoadCoreMesh(const char *filename,
+int csSpriteCal3DMeshObjectFactory::LoadCoreMesh(const char *filename,
 						  const char *name,
 						  bool attach,
 						  iMaterialWrapper *defmat)
@@ -197,7 +197,7 @@ bool csSpriteCal3DMeshObjectFactory::LoadCoreMesh(const char *filename,
     if (mesh->index == -1)
     {
 	delete mesh;
-	return false;
+	return -1;
     }
     mesh->name              = name;
     mesh->attach_by_default = attach;
@@ -205,9 +205,34 @@ bool csSpriteCal3DMeshObjectFactory::LoadCoreMesh(const char *filename,
 
     submeshes.Push(mesh);
 
-    return true;
+    return mesh->index;
 }
 
+int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget(int mesh_index,
+							const char *filename,
+							const char *name)
+{
+    if(mesh_index < 0|| submeshes.Length() <= mesh_index)
+    {
+      return -1;
+    }
+
+    csString path(basePath);
+    path.Append(filename);
+
+    CalLoader loader;
+    CalCoreMesh *p_core_mesh = loader.loadCoreMesh((const char *)path);
+    if(p_core_mesh == 0)
+      return -1;
+    
+    int morph_index = calCoreModel.getCoreMesh(mesh_index)->addAsMorphTarget(p_core_mesh);
+    if(morph_index == -1)
+    {
+      return -1;
+    }
+    submeshes[mesh_index]->morph_target_name.Push(name);
+    return morph_index;
+}
 const char *csSpriteCal3DMeshObjectFactory::GetMeshName(int idx)
 {
     if (idx >= submeshes.Length())
