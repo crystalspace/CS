@@ -83,7 +83,7 @@ csLight::csLight (
   attenuationvec = csVector3(0, 1/d, 0); // inverse linear falloff
   //attenuationvec = csVector3(1,0,0); //default lightattenuation is kc = 1, kl=0,kq=0
 #endif*/
-  //CalculateInfluenceRadius ();
+  CalculateInfluenceRadius ();
 }
 
 csLight::~csLight ()
