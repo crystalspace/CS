@@ -182,16 +182,19 @@ SRC.SYS_CSSYS = $(wildcard \
 OUTDLL = $(NEXT.PLUGIN_DIR)
 
 # The C compiler.
-CC = cc -c
+CC = $(NEXT.CC)
 
 # The C++ compiler.
-CXX = cc -c
+CXX = $(NEXT.CXX)
 
 # The Objective-C compiler.
-OBJC = cc -c
+OBJC = $(NEXT.OBJC)
+
+# The Objective-C++ compiler.
+OBJCXX = $(NEXT.OBJCXX)
 
 # The linker.
-LINK = cc
+LINK = $(NEXT.LINK)
 
 # The library (archive) manager
 AR = libtool
@@ -276,13 +279,11 @@ ifneq ($(strip $(TARGET_ARCHS)),)
   SYSCONFIG += $(NEWLINE)echo TARGET_ARCHS = $(NEXT.TARGET_ARCHS)>>config.tmp
 endif
 
-# Unfortunately, makefile variables CC and CXX are not yet defined, so we use
-# hardcoded compiler name "cc".
 SYSCONFIG += $(NEXT.SYSCONFIG) \
-  $(NEWLINE)CC=cc CXX=cc sh bin/comptest.sh>>config.tmp \
-  $(NEWLINE)CC=cc CXX=cc sh bin/chkheadr.sh>>config.tmp \
-  $(NEWLINE)CC=cc CXX=cc sh bin/chktools.sh>>config.tmp \
-  $(NEWLINE)CC=cc CXX=cc sh bin/haspythn.sh>> config.tmp \
+  $(NEWLINE)CC=$(NEXT.CC) CXX=$(NEXT.CXX) sh bin/comptest.sh>>config.tmp \
+  $(NEWLINE)CC=$(NEXT.CC) CXX=$(NEXT.CXX) sh bin/chkheadr.sh>>config.tmp \
+  $(NEWLINE)CC=$(NEXT.CC) CXX=$(NEXT.CXX) sh bin/chktools.sh>>config.tmp \
+  $(NEWLINE)CC=$(NEXT.CC) CXX=$(NEXT.CXX) sh bin/haspythn.sh>> config.tmp \
   $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 
 NEXT.DIR.ZLIB    = $(wildcard libs/zlib*)

@@ -248,7 +248,7 @@
  * </pre>
  */
 #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
-#define CS_HEADER_GLOBAL_COMPOSE(X,Y) < ## X ## / ## Y ## >
+#define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
 
 /**
  * The CS_HEADER_LOCAL() macro composes a pathname from two components and
@@ -263,7 +263,7 @@
  * </pre>
  */
 #define CS_HEADER_LOCAL(X,Y) CS_HEADER_LOCAL_COMPOSE1(X,Y)
-#define CS_HEADER_LOCAL_COMPOSE1(X,Y) CS_HEADER_LOCAL_COMPOSE2(X ## / ## Y)
+#define CS_HEADER_LOCAL_COMPOSE1(X,Y) CS_HEADER_LOCAL_COMPOSE2(X/Y)
 #define CS_HEADER_LOCAL_COMPOSE2(X) #X
 
 

@@ -9,6 +9,15 @@ The history order is reversed so that new features are at the top.
 	  names were not decorated with version numbers.) Also now recognizes
 	  CS/libs/jpeg in addition to CS/libs/libjpeg, since the shorter form
 	  is how the directory unpacks from official archives.
+	- Eric Sunshine fixed next.mak so that applications and plugins link
+	  correctly on the new Jaguar MacOS/X release.  It now explicitly
+	  invokes "c++" on this platform, rather than "cc" when compiling and
+	  linking C++ programs, thus ensuring that they link with libstdc++,
+	  which is apparently needed with Jaguar.
+	- Eric Sunshine fixed token pasting in CS_HEADER_GLOBAL() and
+	  CS_HEADER_LOCAL() from cssysdef.h so that they work with newer, more
+	  restrictive preprocessors.  This allows the OpenGL renderer and
+	  canvas to build correctly with Jaguar MacOS/X.
 17-Sep-2002
 	- Clarified some iMovable Doxygen comments.
 	- Fixed a serious bug in the csRef assignment operator for
