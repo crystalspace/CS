@@ -23,6 +23,22 @@
 #include "csutil/scf.h"
 #include "csutil/ref.h"
 
+struct iXmlNode;
+struct iXmlAttribute;
+
+SCF_VERSION (iXmlAttributeIterator, 0, 0, 1);
+
+/**
+ * An iterator over attributes.
+ */
+struct iXmlAttributeIterator : public iBase
+{
+  /// Are there more elements?
+  virtual bool HasNext () = 0;
+  /// Get next element.
+  virtual csRef<iXmlAttribute> Next () = 0;
+};
+
 SCF_VERSION (iXmlAttribute, 0, 0, 1);
 
 /**
@@ -40,6 +56,19 @@ struct iXmlAttribute : public iBase
   virtual void SetValue (const char* value) = 0;
 };
 
+SCF_VERSION (iXmlNodeIterator, 0, 0, 1);
+
+/**
+ * An iterator over nodes.
+ */
+struct iXmlNodeIterator : public iBase
+{
+  /// Are there more elements?
+  virtual bool HasNext () = 0;
+  /// Get next element.
+  virtual csRef<iXmlNode> Next () = 0;
+};
+
 SCF_VERSION (iXmlNode, 0, 0, 1);
 
 /**
@@ -49,12 +78,22 @@ struct iXmlNode : public iBase
 {
   /// Get number of children.
   virtual int GetChildCount () const = 0;
-  /// Get child.
+
+  /// Get child with index.
   virtual csRef<iXmlNode> GetChild (int idx) = 0;
   /// Get child by type.
-  virtual csRef<iXmlNode> GetChildByType (const char* type) = 0;
+  virtual csRef<iXmlNode> GetChild (const char* type) = 0;
+  /// Find the index for some child.
+  virtual int GetChildIndex (const csRef<iXmlNode>& child) = 0;
+  /// Get an iterator over all children.
+  virtual csRef<iXmlNodeIterator> GetChildren () = 0;
+  /// Get an iterator over all children of the specified type.
+  virtual csRef<iXmlNodeIterator> GetChildren (const char* type) = 0;
+
   /// Remove a child by index.
   virtual void RemoveChild (int idx) = 0;
+  /// Remove a child by type.
+  virtual void RemoveChild (const char* type) = 0;
   /// Remove a child.
   virtual void RemoveChild (const csRef<iXmlNode>& child) = 0;
   /// Remove all children.
@@ -62,14 +101,25 @@ struct iXmlNode : public iBase
 
   /// Get number of attributes.
   virtual int GetAttributeCount () const = 0;
-  /// Get attribute.
+
+  /// Get attribute with index.
   virtual csRef<iXmlAttribute> GetAttribute (int idx) = 0;
   /// Get attribute by name.
-  virtual csRef<iXmlAttribute> GetAttributeByName (const char* name) = 0;
+  virtual csRef<iXmlAttribute> GetAttribute (const char* name) = 0;
+  /// Find the index for some attribute.
+  virtual int GetAttributeIndex (const csRef<iXmlAttribute>& attr) = 0;
+  /// Get an iterator over all attributes.
+  virtual csRef<iXmlAttributeIterator> GetAttributes () = 0;
+  /// Get an iterator over all attributes of the specified name.
+  virtual csRef<iXmlAttributeIterator> GetAttributes (const char* name) = 0;
+
   /// Change or add an attribute.
   virtual void SetAttribute (const char* name, const char* value) = 0;
+
   /// Remove an attribute by index.
   virtual void RemoveAttribute (int idx) = 0;
+  /// Remove all attributes with that name.
+  virtual void RemoveAttribute (const char* name) = 0;
   /// Remove an attribute.
   virtual void RemoveAttribute (const csRef<iXmlAttribute>& attr) = 0;
   /// Remove all attributes.
