@@ -2,6 +2,8 @@ The history order is reversed so that new features are at the top.
 
 14-Sep-2002
 	- Fixed a ref counting bug in picview.
+	- Fixed the bug in the OpenGL state cache (canvas). It was not
+	  calling SCF_CONSTRUCT_IBASE() in the constructor.
 13-Sep-2002
 	- Reverted sound fix from Norman since that doesn't work
 	  with STRICT_SMART_POINTERS enabled. Also it seems wrong.

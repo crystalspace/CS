@@ -73,6 +73,11 @@ public:
 
   SCF_DECLARE_IBASE;
 
+  csGLStateCache ()
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+  }
+  
   virtual ~csGLStateCache () { }
 
   /// Init cache
