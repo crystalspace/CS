@@ -12,6 +12,14 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+21-Feb-2000
+	- Eric Sunshine slightly reworked ImagePngFile::Load() load for the
+	  following reasons:
+	    - Eliminated compilation warnings about variables potentially
+	      clobbered by longjmp().
+	    - Eliminated a memory leak.  Was leaking a PNG info structure.
+	    - No longer unnecessarily maintains, within the instance,
+	      transitory information which is only needed during Load() time.
 20-Feb-2000
 	- csPolygonSet now also holds a pointer to the parent container and
 	  checks if the parent is NULL before being added to a parent. This
