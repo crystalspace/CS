@@ -15,10 +15,12 @@ aws = CS_LOAD_PLUGIN(plugin_mgr,
 @end example
 
 @item
-Setup the @sc{aws} plugin.
+Create the @sc{aws} canvas.
 
 @example
-aws->SetDefaultContext(engine, myG3D->GetTextureManager());
+awsCanvas = aws->CreateCustomCanvas (myG2D, myG3D);
+aws->SetFlag (AWSF_AlwaysRedrawWindows);
+aws->SetCanvas (awsCanvas);
 @end example
 
 @item
