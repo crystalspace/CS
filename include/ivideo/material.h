@@ -19,6 +19,8 @@
 #ifndef __IVIDEO_MATERIAL_H__
 #define __IVIDEO_MATERIAL_H__
 
+/**\file
+ */
 #include "csutil/scf.h"
 
 /// Default material `diffuse' parameter
@@ -39,10 +41,14 @@ struct csRGBcolor;
  */
 struct csTextureLayer
 {
+  /// Texture handle
   iTextureHandle* txt_handle;
-  uint mode;    // Mode: one of CS_FX_ADD ...
-  float uscale, vscale; // Txt mapping scale relative to parent texture
-  float ushift, vshift; // Txt mapping shift relative to parent texture
+  /// Mode: one of #CS_FX_ADD ...
+  uint mode;    
+  /// Txt mapping scale relative to parent texture
+  float uscale, vscale; 
+  /// Txt mapping shift relative to parent texture
+  float ushift, vshift; 
 };
 
 SCF_VERSION (iMaterial, 0, 0, 5);

@@ -20,6 +20,8 @@
 #ifndef __IEFFECTSERVER_H__
 #define __IEFFECTSERVER_H__
 
+/**\file
+ */
 #include "csutil/scf.h"
 #include "csutil/strset.h"
 #include "cstypes.h"
@@ -35,13 +37,18 @@ SCF_VERSION (iEffectServer, 0, 0, 1);
 struct iEffectServer : public iBase
 {
 public:
+  /// Create a new effect.
   virtual iEffectDefinition* CreateEffect() = 0;
 
+  /// Validate an effect.
   virtual bool Validate( iEffectDefinition* effect ) = 0;
 
+  /// Select the best technique in an effect, based on validity and quality settings.
   virtual iEffectTechnique* SelectAppropriateTechnique( iEffectDefinition* effect ) = 0;
 
+  /// Request an ID for a string.
   virtual csStringID RequestString( const char *s ) = 0;
+  /// Request string for an ID.
   virtual const char* RequestString( csStringID id ) = 0;
 };
 

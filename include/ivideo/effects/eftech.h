@@ -20,14 +20,22 @@
 #ifndef __IEFFECTTECHNIQUE_H__
 #define __IEFFECTTECHNIQUE_H__
 
+/**\file
+ */
 #include "csutil/scf.h"
 #include "cstypes.h"
 
 struct iEffectPass;
 
+/**\name Technique Validation Status
+ * @{ */
+/// Technique is validated.
 #define CS_TECHNIQUE_PASSED          0
+/// Validation failed.
 #define CS_TECHNIQUE_FAILED          1
+/// Not yet tested for validity
 #define CS_TECHNIQUE_NOTVALIDATED    2
+/** @} */
 
 SCF_VERSION (iEffectTechnique, 0, 0, 1);
 
@@ -36,17 +44,32 @@ SCF_VERSION (iEffectTechnique, 0, 0, 1);
  */
 struct iEffectTechnique : public iBase
 {
+  /// Create a new pass.
   virtual iEffectPass* CreatePass() = 0;
+  /// Return number of passes.
   virtual int GetPassCount() = 0;
+  /// Return a specific pass.
   virtual iEffectPass* GetPass( int pass ) = 0;
 
+  /**
+   * Set validation status.
+   * \sa #CS_TECHNIQUE_FAILED
+   */
   virtual void SetValidation( int validation ) = 0;
+  /**
+   * Retrieve validation status.
+   * \sa #CS_TECHNIQUE_FAILED
+   */
   virtual int GetValidation() = 0;
 
+  /// Set this technique's quality.
   virtual void SetQuality( float q ) = 0;
+  /// Retrieve this technique's quality.
   virtual float GetQuality() = 0;
 
+  /// Set client flags.
   virtual void SetClientFlags( uint32 flags) = 0;
+  /// Retrieve client flags.
   virtual uint32 GetClientFlags() = 0;
 
   // Some way of setting user data/flags and automatically invalidating

@@ -20,6 +20,9 @@
 #ifndef __IVIDEO_GRAPH3D_H__
 #define __IVIDEO_GRAPH3D_H__
 
+/**\file
+ */
+
 #include "csutil/scf.h"
 #include "csgeom/plane3.h"
 #include "csgeom/vector2.h"
@@ -70,21 +73,32 @@ struct csPixelFormat;
 #define CS_FOG_MAXVALUE (CS_FOGTABLE_MAXDISTANCE * CS_FOGTABLE_CLAMPVALUE)
 //======================================================================
 
-/**
- * Mix modes for DrawPolygonFX ()
- * The constants below can be ORed together if they belong to different masks.
- */
-#define CS_FX_MASK_MIXMODE 0xF0000000 // SRC/DST mixing mode mask
-#define CS_FX_COPY         0x00000000 // =SRC
-#define CS_FX_MULTIPLY     0x10000000 // =SRC*DST
-#define CS_FX_MULTIPLY2    0x20000000 // =2*SRC*DST
-#define CS_FX_ADD          0x30000000 // =SRC+DST
-#define CS_FX_ALPHA        0x40000000 // =(1-alpha)*SRC + alpha*DST
-#define CS_FX_TRANSPARENT  0x50000000 // =DST
-#define CS_FX_KEYCOLOR     0x08000000 // color 0 is transparent
-#define CS_FX_GOURAUD      0x04000000 // Gouraud shading
-#define CS_FX_TILING       0x02000000 // Tiling
-#define CS_FX_MASK_ALPHA   0x000000FF // alpha = 0..FF (opaque..transparent)
+/**\name Mix modes for DrawPolygonFX ()
+ * The constants can be ORed together if they belong to different masks.
+ * @{ */
+/// SRC/DST mixing mode mask
+#define CS_FX_MASK_MIXMODE 0xF0000000 
+/// =SRC
+#define CS_FX_COPY         0x00000000 
+/// =SRC*DST
+#define CS_FX_MULTIPLY     0x10000000 
+/// =2*SRC*DST
+#define CS_FX_MULTIPLY2    0x20000000 
+/// =SRC+DST
+#define CS_FX_ADD          0x30000000 
+/// =(1-alpha)*SRC + alpha*DST
+#define CS_FX_ALPHA        0x40000000 
+/// =DST
+#define CS_FX_TRANSPARENT  0x50000000 
+/// color 0 is transparent
+#define CS_FX_KEYCOLOR     0x08000000 
+/// Gouraud shading
+#define CS_FX_GOURAUD      0x04000000 
+/// Tiling
+#define CS_FX_TILING       0x02000000 
+/// alpha = 0..FF (opaque..transparent)
+#define CS_FX_MASK_ALPHA   0x000000FF 
+/** @} */
 
 /// Macro for setting of alpha bits into mixmode (alpha between 0 and 1).
 #define CS_FX_SETALPHA(alpha) \
@@ -208,23 +222,28 @@ struct G3DPolygonDP : public G3DPolygonDFP
 /// Structure containing all info needed by DrawPolygonFlat (DPF)
 typedef G3DPolygonDP G3DPolygonDPF;
 
-/**
- * Don't test/write, write, test, write/test and only write to Z-buffer
- * respectively. The values below are sometimes used as bit masks,
- * so don't change them!
+/**\ Z-buffer modes
  */
 enum csZBufMode
 {
+  // values below are sometimes used as bit masks, so don't change them!
+  /// Don't test/write
   CS_ZBUF_NONE     = 0x00000000,
+  /// write
   CS_ZBUF_FILL     = 0x00000001,
+  /// test
   CS_ZBUF_TEST     = 0x00000002,
+  /// write/test
   CS_ZBUF_USE      = 0x00000003,
+  /// only write
   CS_ZBUF_FILLONLY = 0x00000004,
+  /// test if equal
   CS_ZBUF_EQUAL    = 0x00000005,
+  /// 
   CS_ZBUF_SPECIAL  = 0x00000006
 };
 
-///
+/// Graphics3D render state options
 enum G3D_RENDERSTATEOPTION
 {
   /// Set Z-buffer fill/test/use mode (parameter is a csZBufMode)
@@ -259,7 +278,8 @@ enum G3D_RENDERSTATEOPTION
   G3DRENDERSTATE_EDGES
 };
 
-// Bit flags for iGraphics3D::BeginDraw ()
+/**\name iGraphics3D::BeginDraw() flags
+ * @{ */
 /// We're going to draw 2D graphics
 #define CSDRAW_2DGRAPHICS   0x00000001
 /// We're going to draw 3D graphics
@@ -268,8 +288,9 @@ enum G3D_RENDERSTATEOPTION
 #define CSDRAW_CLEARZBUFFER 0x00000010
 /// Clear frame buffer ?
 #define CSDRAW_CLEARSCREEN  0x00000020
+/** @} */
 
-///
+/// 
 enum G3D_FOGMETHOD
 {
   G3DFOGMETHOD_NONE = 0x00,
@@ -304,54 +325,46 @@ struct csTriangle
   csTriangle(int _a, int _b, int _c):a(_a), b(_b), c(_c) {}
 };
 
+/**\name Type of clipper (for iGraphics3D::SetClipper())
+ * @{ */
 /**
- * Type of clipper (for iGraphics3D::SetClipper()).
  * There is no clipper.
  */
 #define CS_CLIPPER_NONE -1
-
 /**
- * Type of clipper (for iGraphics3D::SetClipper()).
  * Clipper is optional.
  */
 #define CS_CLIPPER_OPTIONAL 0
-
 /**
- * Type of clipper (for iGraphics3D::SetClipper()).
  * Clipper is top-level.
  */
 #define CS_CLIPPER_TOPLEVEL 1
-
 /**
- * Type of clipper (for iGraphics3D::SetClipper()).
  * Clipper is required.
  */
 #define CS_CLIPPER_REQUIRED 2
+/** @} */
 
-
+/**\name Clipping requirement for DrawTriangleMesh
+ * @{ */
 /**
- * Clipping requirement for DrawTriangleMesh (setting for clip_portal,
- * clip_plane, or clip_z_plane).
  * No clipping required.
+ * (setting for clip_portal, clip_plane, or clip_z_plane).
  */
 #define CS_CLIP_NOT 0
-
 /**
- * Clipping requirement for DrawTriangleMesh (setting for clip_portal,
- * clip_plane, or clip_z_plane).
  * Clipping may be needed. Depending on the type of the clipper
  * (one of the CS_CLIPPER_??? flags) the renderer has to clip or
- * not.
+ * not. (setting for clip_portal, clip_plane, or clip_z_plane).
  */
 #define CS_CLIP_NEEDED 1
-
 /**
- * Clipping requirement for DrawTriangleMesh (setting for clip_portal).
  * Clipping is not needed for the current clipper but it might
- * be needed for the toplevel clipper. This setting will never
- * be used for clip_plane or clip_z_plane.
+ * be needed for the toplevel clipper. (setting for clip_portal,
+ * will never be used for clip_plane or clip_z_plane).
  */
 #define CS_CLIP_TOPLEVEL 2
+/** @} */
 
 /**
  * Structure containing all info needed by DrawTriangeMesh.

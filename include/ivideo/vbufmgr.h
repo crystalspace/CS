@@ -20,6 +20,8 @@
 #ifndef __IVIDEO_VBUFMGR_H__
 #define __IVIDEO_VBUFMGR_H__
 
+/**\file
+ */
 #include "csutil/scf.h"
 
 class csMatrix3;

@@ -19,11 +19,13 @@
 #ifndef __IVIDEO_SPROCTXT_H__
 #define __IVIDEO_SPROCTXT_H__
 
+/**\file
+ */
 #include "csutil/scf.h"
 
 SCF_VERSION (iSoftProcTexture, 0, 0, 1);
 
-/**
+/**\internal
  * This interface is for internal use.
  * This interface currently is implemented in the software procedural texture
  * driver as part of renderer/software. Opengl currently supports a software

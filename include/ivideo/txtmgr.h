@@ -20,6 +20,8 @@
 #ifndef __IVIDEO_TXTMGR_H__
 #define __IVIDEO_TXTMGR_H__
 
+/**\file
+ */
 #include "csutil/scf.h"
 
 class Vector2;
@@ -32,12 +34,12 @@ struct iTextureHandle;
 struct iMaterial;
 struct iMaterialHandle;
 
-/*
- * Texture registration flags. During texture registration you should tell
+/**\name Texture registration flags.
+ * During texture registration you should tell
  * the manager which way you're going to use the texture: whenever you're
  * going to use it for 2D (DrawPixmap ()), for 3D (DrawPolygon ()), whenever
  * the texture will be dynamically modified.
- */
+ * @{ */
 /// You're going to use the texture for 2D drawing
 #define CS_TEXTURE_2D			0x00000001
 /// You're going to use the texture for 3D drawing
@@ -93,7 +95,7 @@ struct iMaterialHandle;
  * within the software texture managers' native format.
  */
 #define CS_TEXTURE_PROC_ALONE_HINT      0x00000080
-
+/** @} */
 
 SCF_VERSION (iTextureManager, 2, 0, 0);
 

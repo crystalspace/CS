@@ -21,15 +21,16 @@
 
 #include "csutil/scf.h"
 
-/*
- * Some alias names for basic fonts.
+/**\file
+ */
+
+/**\name Basic fonts alias names
  * Any font server should provide these fonts, since most
  * programs expect they to be available. Other fonts may or
  * may be not available but these should be always available.
  * Default font names always start with "*" to avoid confusion
  * with real file names.
- */
-
+ * @{ */
 /// Thick and relatively large font
 #define CSFONT_LARGE		"*large"
 /// Thick italic relatively large font
@@ -38,6 +39,7 @@
 #define CSFONT_COURIER		"*courier"
 /// Very small font (smallest font that is still readable)
 #define CSFONT_SMALL		"*small"
+/** @} */
 
 struct iFont;
 

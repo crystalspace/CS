@@ -20,6 +20,8 @@
 #ifndef __IVIDEO_GRAPH2D_H__
 #define __IVIDEO_GRAPH2D_H__
 
+/**\file
+ */
 #include <stdarg.h>
 #include "csutil/scf.h"
 #include "csgfx/rgbpixel.h"

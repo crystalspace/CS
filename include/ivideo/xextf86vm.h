@@ -20,6 +20,8 @@
 #ifndef __IVIDEO_XEXTF86VM_H__
 #define __IVIDEO_XEXTF86VM_H__
 
+/**\file
+ */
 #define XK_MISCELLANY 1
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -28,6 +30,7 @@
 
 SCF_VERSION (iXExtF86VM, 1, 0, 0);
 
+///
 struct iXExtF86VM : public iBase
 {
   /// Open Video Mode plugin

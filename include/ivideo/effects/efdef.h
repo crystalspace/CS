@@ -20,6 +20,8 @@
 #ifndef __IEFFECTDEFINITION_H__
 #define __IEFFECTDEFINITION_H__
 
+/**\file
+ */
 #include "csutil/scf.h"
 #include "cstypes.h"
 
@@ -32,11 +34,16 @@ SCF_VERSION (iEffectDefinition, 0, 0, 1);
  */
 struct iEffectDefinition : public iBase
 {
+  /// Create a new technique
   virtual iEffectTechnique* CreateTechnique() = 0;
+  /// Get number of techniques
   virtual int GetTechniqueCount() = 0;
+  /// Retrieve a technique
   virtual iEffectTechnique* GetTechnique( int technique ) = 0;
 
+  /// Set this Effect's name
   virtual void SetName( const char* name ) = 0;
+  /// Retrieve name of effect
   virtual const char* GetName() = 0;
 };
 

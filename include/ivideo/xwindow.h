@@ -20,6 +20,8 @@
 #ifndef __IVIDEO_XWINDOW_H__
 #define __IVIDEO_XWINDOW_H__
 
+/**\file
+ */
 #define XK_MISCELLANY 1
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -31,6 +33,7 @@ struct iGraphics2D;
 
 SCF_VERSION (iXWindow, 1, 0, 0);
 
+///
 struct iXWindow : public iBase
 {
   // These should be inherited from csNativeWindow

@@ -19,12 +19,20 @@
 #ifndef __IVIDEO_NATWIN_H__
 #define __IVIDEO_NATWIN_H__
 
+/**\file
+ */
 #include <stdarg.h>
 #include "csutil/scf.h"
 
+/**\name Alert types
+ * @{ */
+/// Display an error
 #define CS_ALERT_ERROR 1
+/// Display a warning
 #define CS_ALERT_WARNING 2
+/// Display a note
 #define CS_ALERT_NOTE 3
+/** @} */
 
 SCF_VERSION (iNativeWindowManager, 0, 0, 1);
 
@@ -38,12 +46,14 @@ struct iNativeWindowManager : public iBase
   /**
    * Show an alert.
    * Type is one of CS_ALERT_???.
+   * \sa #CS_ALERT_ERROR
    */
   virtual void Alert (int type, const char* title, const char* okMsg,
   	const char* msg, ...) CS_GNUC_PRINTF (5, 6) = 0;
   /**
    * Show an alert.
    * Type is one of CS_ALERT_???.
+   * \sa #CS_ALERT_ERROR
    */
   virtual void AlertV (int type, const char* title, const char* okMsg,
   	const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0) = 0;

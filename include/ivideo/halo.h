@@ -19,6 +19,8 @@
 #ifndef __IVIDEO_HALO_H__
 #define __IVIDEO_HALO_H__
 
+/**\file
+ */
 #include "csutil/scf.h"
 
 class csVector2;

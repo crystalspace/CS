@@ -20,6 +20,8 @@
 #ifndef __IEFFECTLAYER_H__
 #define __IEFFECTLAYER_H__
 
+/**\file
+ */
 #include "csutil/scf.h"
 #include "cstypes.h"
 
@@ -30,15 +32,23 @@ SCF_VERSION (iEffectLayer, 0, 0, 1);
  */
 struct iEffectLayer : public iBase
 {
+  /// Set a state float.
   virtual void SetStateFloat( csStringID state, float value ) = 0;
+  /// Set a state string.
   virtual void SetStateString( csStringID state, csStringID value ) = 0;
+  /// Set a state opaque data.
   virtual void SetStateOpaque( csStringID state, void *value ) = 0;
   
+  /// Get a state float.
   virtual float GetStateFloat( csStringID state ) = 0;
+  /// Get a state string.
   virtual csStringID GetStateString( csStringID state ) = 0;
+  /// Get a state opaque data.
   virtual void *GetStateOpaque( csStringID state ) = 0;
 
+  /// Get the id of the first state.
   virtual csStringID GetFirstState() = 0;
+  /// Get the id of the next state.
   virtual csStringID GetNextState() = 0;
 };
 

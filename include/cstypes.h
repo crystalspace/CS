@@ -19,6 +19,8 @@
 #ifndef __CS_CSTYPES_H__
 #define __CS_CSTYPES_H__
 
+/**\file
+ */
 #ifndef __CS_CSSYSDEFS_H__
 #error "cssysdef.h must be included in EVERY source file!"
 #endif
@@ -40,34 +42,43 @@ typedef int bool;
 #define false 0
 #endif
 
-//-----------------------------------------------------------------------------
-// The following types should be used whenever you need a variable of
-// a specific size (in bits).  If these types are already defined by system
-// headers for a particular platform, then define CS_BUILTIN_SIZED_TYPES to
-// avoid duplicate type definition here.
-//-----------------------------------------------------------------------------
+/**\name Specific sized types.
+ * The following types should be used whenever you need a variable of
+ * a specific size (in bits).  If these types are already defined by system
+ * headers for a particular platform, then define CS_BUILTIN_SIZED_TYPES to
+ * avoid duplicate type definition here.
+ * @{ */
 #if !defined(CS_BUILTIN_SIZED_TYPES)
+/// unsigned 8-bit integer (0..255)
 typedef unsigned char uint8;
+/// signed 8-bit integer (-128..127)
 typedef char int8;
+/// unsigned 16-bit integer (0..65 535)
 typedef unsigned short uint16;
+/// signed 16-bit integer (-32 768..32 767)
 typedef short int16;
+/// unsigned 32-bit integer (0..4 294 967 295)
 typedef unsigned long uint32;
+/// signed 32-bit integer (-2 147 483 648..2 147 483 647)
 typedef long int32;
 #endif
+/** @} */
 
-typedef uint32 CS_ID;		// Used for uniquely generated id numbers
+/// Used for uniquely generated id numbers
+typedef uint32 CS_ID;		
 
-//------------------------------
-// Shortcuts for normal C types
-//------------------------------
+/**\name Shortcuts for normal C types
+ * @{ */
+/// Default unsigned int, for lazy people
 typedef unsigned int uint;
+/** @} */
 
-// Time in milli (1/1000) seconds
+/// Time in milli (1/1000) seconds
 typedef unsigned int csTicks;
 
-// A pointer to something
+/// A pointer to something
 typedef void *csSome;
-// A pointer to some constant
+/// A pointer to some constant
 typedef const void *csConstSome;
 
 #endif // __CS_CSTYPES_H__

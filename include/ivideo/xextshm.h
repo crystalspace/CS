@@ -20,16 +20,18 @@
 #ifndef __IVIDEO_XEXTSHM_H__
 #define __IVIDEO_XEXTSHM_H__
 
+/**\file
+ */
 #define XK_MISCELLANY 1
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
 
-
 struct iGraphics2D;
 
 SCF_VERSION (iXExtSHM, 1, 0, 0);
 
+///
 struct iXExtSHM : public iBase
 {
   virtual void SetDisplayScreen (Display *dpy, int screen_num) = 0;

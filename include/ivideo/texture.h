@@ -19,6 +19,8 @@
 #ifndef __IVIDEO_TEXTURE_H__
 #define __IVIDEO_TEXTURE_H__
 
+/**\file
+ */
 #include "csutil/scf.h"
 #include "cstypes.h"
 
