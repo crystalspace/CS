@@ -397,6 +397,7 @@ Michael Dale Long (@email{mlong@@custom.net})
 Michael helped fix the Glide port and contributed some other small fixes.  He
 is also the author of the Crystal Clear project which is now included in
 Crystal Space.  Crystal Clear serves as a game layer on top of Crystal Space.
+Michal also wrote the default version of DrawPolygonMesh.
 
 @item
 Gary Haussmann (@email{g.haussmann@@worldnet.att.net})
@@ -619,11 +620,6 @@ Noah "angelbob" L. Gibbs (@email{archiver@@db.geocrawler.com})
 Noah worked with Michael Ewert on the @file{csPhyzik} library.
 
 @item
-Samuel (@email{samuel@@metalang.softnet.co.uk})
-
-Samuel did some fixes on the sprites.
-
-@item
 Michael Day (@email{mikeday@@corplink.com.au})
 
 Michal started work on an @file{autoconf} system for Crystal Space but
@@ -703,9 +699,33 @@ files.
 @item
 Samuel Humphreys (@email{samuelh@@ntlworld.com})
 
-Samuel added a procedural texture system to Crystal Space.  With this system
-it is possible to render on textures procedurally and use that texture on a
-polygon as usual.
+Samuel did some fixes on the sprites and patched the X drivers so that
+resizing windows works correctly.
+Samuel also added a procedural texture system to Crystal Space.  With
+this system it is possible to render on textures procedurally and use
+that texture on a polygon as usual.
+
+@item
+Thomas Riemer (@email{triemer@@apt4g.a3nyc.com})
+
+Thomas contributed new networking code and NSTP.<p>
+
+@item
+Chris Bruner (@email{cbruner@@ionline.net})
+
+Chris did several fixes for the Borland compile.
+
+@item
+Burton Radonsxi (@email{loth@@pacificcoast.net})
+
+Burton added a new allegro canvas.
+
+@item
+Travis McIntosh (@email{Travis.McIntosh@@student.oc.edu})
+
+Travis did some very fundamental work on the curve and lighting code
+in order to implement both dynamic and pseudo-dynamic lights for them
+and also allow shadows.
 @end itemize
 
 Many thanks also for the people at @uref{http://www.grimmware.com, GrimmWare}
