@@ -1,5 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
+14-Apr-2001
+	- Philip Wyett added 'include imap/parser.h" and fixed many
+	  of a slew of compiler errors in the app. App is
+	  still broken though at present.
 13-Apr-2001
 	- Martin Geisse did the following changes:
 	    - Added texture loading methods to iLoaderNew. The loader now
@@ -8,6 +12,14 @@ The history order has been reversed so that new features are at the top.
 	      private csTextureWrapper object.
 	    - Fixed a bug in csTextureWrapper.
 	    - Fixed VC compilation problems in csPortal.
+	    - Made all static functions non-static.
+	    - Removed all unneeded static variables and cleaned up some
+	      temporary stuff.
+	    - Added interface methods for all public loading functions.
+	    - Parser plugins are now unloaded at destruction.
+	    - Moved loading mode definitions to imap/parser.h.
+	    - Removed a lot of unneeded csloader.h includes.
+	    - Changed csparser to use iLoaderNew for sound loading.
 	- Wouter Wijngaards updated the iso engine. The engine now has
 	  colored, dynamic lighting. Shadows are calculated in realtime.
 	  In addition he did the following things:
@@ -28,6 +40,7 @@ The history order has been reversed so that new features are at the top.
 	  compiles.
 	- Fixed Philip's fix on the terrain engine. Now it works AND
 	  compiles on VC.
+	- Philip Wyett fixed texture loading errors in ptlab and video.
 	- Luca Pancallo extended ASE importer in impexp. Luca also added
 	  a CS sprite exporter.
 	- Fixed a VERY old bug in all 3D renderers with DrawTriangleMesh.
