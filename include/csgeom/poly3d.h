@@ -263,6 +263,9 @@ public:
   /// Compute the normal of a polygon.
   static csVector3 ComputeNormal (const csArray<csVector3>& poly);
 
+  /// Compute the normal of an indexed polygon.
+  static csVector3 ComputeNormal (int* poly, size_t num, csVector3* vertices);
+
   /// Compute the normal of this polygon.
   csVector3 ComputeNormal () const
   {
@@ -274,6 +277,9 @@ public:
 
   /// Compute the plane of a polygon.
   static csPlane3 ComputePlane (const csArray<csVector3>& poly);
+
+  /// Compute the plane of an indexed polygon.
+  static csPlane3 ComputePlane (int* poly, size_t num, csVector3* vertices);
 
   /// Compute the plane of this polygon.
   csPlane3 ComputePlane () const

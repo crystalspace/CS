@@ -22,8 +22,9 @@
 #include "csgeom/vector3.h"
 #include "csgeom/plane3.h"
 #include "csgeom/pmtools.h"
-#include "igeom/polymesh.h"
 #include "csgeom/polymesh.h"
+#include "csgeom/poly3d.h"
+#include "igeom/polymesh.h"
 
 void csPolygonMeshTools::CalculateNormals (iPolygonMesh* mesh,
   csVector3* normals)
@@ -485,7 +486,86 @@ bool csPolygonMeshTools::IsMeshClosed (iPolygonMesh* polyMesh)
 
   return (numIncorrect == 0);
 }
-  
+
+bool csPolygonMeshTools::IsMeshConvex (iPolygonMesh* polyMesh)
+{
+  int num_edges;
+  csPolygonMeshEdge* edges = CalculateEdges (polyMesh, num_edges);
+
+  int pccount = polyMesh->GetPolygonCount ();
+  csArray<int>* adjacent_polygons;
+  adjacent_polygons = new csArray<int> [pccount];
+  csMeshedPolygon* polys = polyMesh->GetPolygons ();
+  csVector3* verts = polyMesh->GetVertices ();
+  int i;
+
+  // Calculate adjacency information for polygons.
+  for (i = 0 ; i < num_edges ; i++)
+  {
+    csPolygonMeshEdge& me = edges[i];
+    if (me.poly2 != -1)
+    {
+      adjacent_polygons[me.poly1].Push (me.poly2);
+      adjacent_polygons[me.poly2].Push (me.poly1);
+    }
+    else
+    {
+      delete[] adjacent_polygons;
+      delete[] edges;
+      return false;
+    }
+  }
+
+  // Calculate the center of every polygon.
+  csVector3* poly_centers = new csVector3 [pccount];
+  for (i = 0 ; i < pccount ; i++)
+  {
+    int* vi = polys[i].vertices;
+    csVector3 center = verts[vi[0]];
+    int j;
+    for (j = 1 ; j < polys[i].num_vertices ; j++)
+      center += verts[vi[j]];
+    center /= float (polys[i].num_vertices);
+    poly_centers[i] = center;
+  }
+
+  // For every polygon we test if the adjacent polygons are all
+  // at the same side of the testing polygon.
+  bool convex = false;
+  int side = 0;
+  for (i = 0 ; i < pccount ; i++)
+  {
+    int* vi = polys[i].vertices;
+    csPlane3 plane = csPoly3D::ComputePlane (vi, polys[i].num_vertices,
+    	verts);
+    size_t j;
+    const csArray<int>& ap = adjacent_polygons[i];
+    for (j = 0 ; j < ap.Length () ; j++)
+    {
+      float cl = plane.Classify (poly_centers[ap[j]]);
+      if (cl > SMALL_EPSILON)
+      {
+        if (side == -1) goto end;
+	side = 1;
+      }
+      if (cl < -SMALL_EPSILON)
+      {
+        if (side == 1) goto end;
+	side = -1;
+        goto end;
+      }
+    }
+  }
+  convex = true;
+
+end:
+  delete[] poly_centers;
+  delete[] adjacent_polygons;
+  delete[] edges;
+
+  return convex;
+}
+
 void csPolygonMeshTools::CloseMesh (iPolygonMesh* polyMesh, 
 				 csArray<csMeshedPolygon>& newPolys,
 				 int*& vertidx, int& vertidx_len)

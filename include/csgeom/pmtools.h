@@ -125,6 +125,13 @@ public:
   static bool IsMeshClosed (iPolygonMesh* polyMesh);
 
   /**
+   * Test whether a polygon mesh is convex. Note! This is NOT a fast
+   * function. Use with care.
+   * \remark This function works best if vertices are shared.
+   */
+  static bool IsMeshConvex (iPolygonMesh* polyMesh);
+
+  /**
    * Close a polygon mesh.
    * The current implementation is rather naive; it just returns all faces,
    * but flipped. The returned table is a table of indices that are used

@@ -621,6 +621,42 @@ csVector3 csPoly3D::ComputeNormal (const csVector3 *vertices, size_t num)
   return csVector3 (ayz * invd, azx * invd, axy * invd);
 }
 
+csVector3 csPoly3D::ComputeNormal (int* poly, size_t num, csVector3* vertices)
+{
+  CS_ASSERT (num > 0);
+
+  float ayz = 0;
+  float azx = 0;
+  float axy = 0;
+  size_t i, i1;
+  float x1, y1, z1, x, y, z;
+
+  i1 = num - 1;
+  x1 = vertices[poly[i1]].x;
+  y1 = vertices[poly[i1]].y;
+  z1 = vertices[poly[i1]].z;
+  for (i = 0; i < num; i++)
+  {
+    x = vertices[poly[i]].x;
+    y = vertices[poly[i]].y;
+    z = vertices[poly[i]].z;
+    ayz += (z1 + z) * (y - y1);
+    azx += (x1 + x) * (z - z1);
+    axy += (y1 + y) * (x - x1);
+    x1 = x;
+    y1 = y;
+    z1 = z;
+  }
+
+  float sqd = ayz * ayz + azx * azx + axy * axy;
+  float invd;
+  if (sqd < SMALL_EPSILON)
+    invd = 1.0f / SMALL_EPSILON;
+  else
+    invd = csQisqrt (sqd);
+  return csVector3 (ayz * invd, azx * invd, axy * invd);
+}
+
 csVector3 csPoly3D::ComputeNormal (const csArray<csVector3>& poly)
 {
   return ComputeNormal (&poly[0], poly.Length ());
@@ -631,6 +667,15 @@ csPlane3 csPoly3D::ComputePlane (const csVector3 *vertices, size_t num_vertices)
   float D;
   csVector3 pl = ComputeNormal (vertices, num_vertices);
   D = -pl.x * vertices[0].x - pl.y * vertices[0].y - pl.z * vertices[0].z;
+  return csPlane3 (pl, D);
+}
+
+csPlane3 csPoly3D::ComputePlane (int* poly, size_t num, csVector3* vertices)
+{
+  float D;
+  csVector3 pl = ComputeNormal (poly, num, vertices);
+  D = -pl.x * vertices[poly[0]].x - pl.y * vertices[poly[0]].y
+  	- pl.z * vertices[poly[0]].z;
   return csPlane3 (pl, D);
 }
 
