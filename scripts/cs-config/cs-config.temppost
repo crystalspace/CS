@@ -7,7 +7,7 @@ depends()
 	-lcsengine) DEPS="-lcssys -lcsutil -lcstool -lcsgeom";;
 	-lcsgeom) DEPS="-lcsutil -lcssys";;
 	-lcsgfx) DEPS="-lcssys -lcsutil";;
-	-lcstool) DEPS="-lcsutil -lcssys -lcsgeom";;
+	-lcstool) DEPS="-lcsgfx -lcsutil -lcssys -lcsgeom";;
 	-lcsws) DEPS="-lcsgfx -lcstool -lcsgeom -lcsutil -lcssys";;
 	*)
 	    CEXFILE=`echo "$1.cex" | sed -e "s/\-l//"`
