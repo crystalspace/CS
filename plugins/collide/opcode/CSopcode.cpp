@@ -203,7 +203,6 @@ csCollisionPair* csOPCODECollideSystem::GetCollisionPairs ()
    N_pairs=size;
    if (N_pairs==0) { return NULL; };
    const Pair* colPairs=TreeCollider.GetPairs();
-   csCollisionPair* temporal;
    Point* vertholder0 = col1->vertholder;
    Point* vertholder1 = col2->vertholder;
    udword* indexholder0 = col1->indexholder;
