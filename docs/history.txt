@@ -2,6 +2,7 @@ The history order is reversed so that new features are at the top.
 
 19-Feb-2003
 	- Fixed a memory leak in the OpenGL renderer.
+  - Philip Wyett updated configure script from 0.96 to 0.97dev.
 18-Feb-2003
 	- Philipp Aumayr updated bugplug for render3d api changes and "repaired"
 	  history.txt for Philipp Wyett (wrong indent :o)
