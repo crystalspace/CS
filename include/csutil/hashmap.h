@@ -74,7 +74,7 @@ public:
  */
 class csHashIterator
 {
-  friend csHashMap;
+  friend class csHashMap;
 
 private:
   /// Current bucket we are iterating over. NULL if no more elements.
@@ -119,7 +119,7 @@ public:
  */
 class csHashMap
 {
-  friend csHashIterator;
+  friend class csHashIterator;
 
 private:
   /// A hashmap is implemented as a csVector of csVectors.
