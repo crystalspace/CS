@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "slparse.cpp.h"
+#include "slp.hpp"
 
 #define YY_DECL int yylex YY_PROTO(( YYSTYPE *awslval ))
 
