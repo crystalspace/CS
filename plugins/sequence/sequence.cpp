@@ -64,6 +64,7 @@ void csSequence::DeleteFirstSequence ()
     delete first;
     first = n;
     if (!first) last = NULL;
+    else first->prev = NULL;
   }
 }
 
