@@ -236,7 +236,7 @@ bool TerrBigTut::Initialize ()
 
   if (!loader->LoadTexture ("heightmap", "/lev/terrain/heightmap.png")) {
     Report (CS_REPORTER_SEVERITY_ERROR,
-      "Error loading 'wood' texture!\n");
+      "Error loading 'heightmap' texture!\n");
     return false;
   }
   iMaterialWrapper *mat = engine->GetMaterialList()->FindByName ("heightmap");
