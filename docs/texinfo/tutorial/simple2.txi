@@ -64,12 +64,12 @@ bool Simple::Initialize()
   // Load a texture for our sprite.
   iTextureManager* txtmgr = g3d->GetTextureManager ();
   iTextureWrapper* txt = loader->LoadTexture ("spark",
-  	"/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, true);
+        "/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, true);
   if (txt == 0)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple",
-    	"Error loading texture!");
+        "crystalspace.application.simple",
+        "Error loading texture!");
     return false;
   @}
 
@@ -125,12 +125,12 @@ bool Simple::Initialize ()
   @dots{}
   // Load a sprite template from disk.
   csRef<iMeshFactoryWrapper> imeshfact (loader->LoadMeshObjectFactory (
-  	"/lib/std/sprite1"));
+        "/lib/std/sprite1"));
   if (imeshfact == 0)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-    	"Error loading mesh object factory!");
+        "crystalspace.application.simple1",
+        "Error loading mesh object factory!");
     return false;
   @}
 
@@ -168,8 +168,8 @@ bool Simple::Initialize ()
 
   // Add the sprite to the engine.
   csRef<iMeshWrapper> sprite (engine->CreateMeshWrapper (
-  	imeshfact, "MySprite", room,
-	csVector3 (-3, 5, 3)));
+        imeshfact, "MySprite", room,
+        csVector3 (-3, 5, 3)));
   csMatrix3 m; m.Identity (); m *= 5.;
   sprite->GetMovable ()->SetTransform (m);
   sprite->GetMovable ()->UpdateMove ();
