@@ -84,7 +84,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   LinkWith pythmod : cstool csgfx csgeom csutil ;
   ExternalLibs pythmod : PYTHON ;
   CFlags pythmod : $(PLUGIN.CFLAGS) ;
-  LFlags pythmod : $(PLUGIN.LFLAGS) ;
+  LFlags pythmod : $(PLUGIN.LFLAGS) $(LINKLIBS) ;
   NotFile pythmod ;
   Depends pythmod : $(pythmod) ;
   Depends plugins : pythmod ;

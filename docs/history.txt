@@ -14,6 +14,10 @@ chronological order.
 	  lacking this resource. It also unnecessarily penalized clients
 	  interested in utilizing only some of the low-level portions of the CS
 	  SDK, such as the utility and geometry libraries, etc.
+	- Eric Sunshine fixed bug in cspython/Jamfile where pure-Python
+	  `pythmod' module was not being linked against $(LINKLIBS). This could
+	  result in failure on some platforms, such as Windows. Reported by
+	  Lukas Erlinghagen. (bug #1032928)
 22-Sep-2004
 	- Jorrit changed the loader so that it only prints certain
 	  notifications if -verbose is given on the commandline. These
