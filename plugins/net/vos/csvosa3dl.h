@@ -46,6 +46,9 @@ private:
   iObjectRegistry *objreg;
 
   VOS::vRef<VOS::Site> localsite;
+
+  int relightCounter;
+  boost::mutex relightCounterMutex;
  
 public:
   SCF_DECLARE_IBASE;
@@ -70,6 +73,9 @@ public:
   }
 
   virtual VOS::vRef<VOS::Vobject> GetVobject();
+
+  void incrementRelightCounter();
+  void decrementRelightCounter();
 };
 
 #endif

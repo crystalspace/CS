@@ -64,7 +64,7 @@ ConstructCylinderTask::~ConstructCylinderTask()
 
 void ConstructCylinderTask::doTask()
 {
-  LOG("vosbillboard", 2, "Constructing cylinder");
+  LOG("voscylinder", 2, "Constructing cylinder");
 
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 

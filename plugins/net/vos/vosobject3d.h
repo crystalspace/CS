@@ -41,6 +41,7 @@ private:
   csRef<iMeshWrapper> meshwrapper;
   csRef<iRigidBody> collider;
   VOS::vRef<A3DL::Object3D> object3d;
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -75,6 +76,9 @@ public:
 
   static VOS::MetaObject* new_csMetaObject3D(VOS::VobjectBase* superobject,
                                              const std::string& type);
+
+  // Accessor for vosa3dl
+  csVosA3DL *getVosA3DL () { return vosa3dl; }
 
   // Set up the object
   virtual void Setup(csVosA3DL* vosa3dl, csVosSector* sect);

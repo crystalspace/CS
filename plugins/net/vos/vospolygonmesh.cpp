@@ -52,6 +52,7 @@ public:
   bool isStatic;
   csRef<iDynamicSystem> dynsys;
   Task* chainedtask;
+  csVosA3DL *vosa3dl;
 
   std::vector<A3DL::PolygonMesh::Vertex> verts;
   std::vector<A3DL::PolygonMesh::Polygon> polys;
@@ -411,6 +412,8 @@ void ConstructPolygonMeshTask::doTask()
     LOG("ConstructPolygonMeshTask", 3, "done with " << name);
 
     polygonmesh->GetCSinterface()->SetMeshWrapper(meshwrapper);
+  
+    vosa3dl->decrementRelightCounter();
   }
   else
   {
@@ -581,6 +584,8 @@ void csMetaPolygonMesh::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   cpmt->dynsys = vosa3dl->GetDynSys();
 
   cpmt->chainedtask = GetSetupTask(vosa3dl, sect);
+
+  cpmt->vosa3dl = vosa3dl;
 
   vosa3dl->mainThreadTasks.push(cpmt);
 

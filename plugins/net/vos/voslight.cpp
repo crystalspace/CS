@@ -39,6 +39,8 @@ public:
   csColor color;
   float radius;
   bool isStatic;
+  csVosA3DL *vosa3dl;
+  
 
   ConstructLightTask(iObjectRegistry *objreg, iSector *sector,
                      const std::string &n, csMetaLight *ml);
@@ -69,6 +71,8 @@ void ConstructLightTask::doTask()
                                              : CS_LIGHT_DYNAMICTYPE_DYNAMIC));
 
   sector->GetLights()->Add(light);
+
+  vosa3dl->decrementRelightCounter();
 
   metalight->light = light;
 }
@@ -157,6 +161,7 @@ void csMetaLight::Setup(csVosA3DL* vosa3dl, csVosSector* sector)
     isStatic = true;
   }
   clt->isStatic = isStatic;
+  clt->vosa3dl = vosa3dl;
 
   vosa3dl->mainThreadTasks.push(clt);
 

@@ -131,7 +131,7 @@ static void NormalizeModel(csRef<iMeshWrapper> wrapper, bool recenter,
 
 void ConstructModelTask::doTask()
 {
-  LOG("vosbillboard", 2, "Constructing model");
+  LOG("vosmodel", 2, "Constructing model");
 
 
 

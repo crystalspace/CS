@@ -53,6 +53,32 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csVosA3DL)
 
+/// Relight task ///
+class RelightTask : public Task
+{
+public:
+  csVosA3DL* vosa3dl;
+
+  RelightTask(csVosA3DL* va);
+  virtual ~RelightTask() { }
+  virtual void doTask();
+};
+
+RelightTask::RelightTask(csVosA3DL* va)
+  : vosa3dl(va)
+{
+}
+
+void RelightTask::doTask()
+{
+  csRef<iObjectRegistry> objreg = vosa3dl->GetObjectRegistry();
+  csRef<iEngine> engine = CS_QUERY_REGISTRY(objreg, iEngine);
+
+  LOG ("RelightTask", 2, "Performing relight");
+  engine->ForceRelight();
+}
+
+
 /// csVosA3DL ///
 
 csVosA3DL::csVosA3DL (iBase *parent)
@@ -177,4 +203,21 @@ bool csVosA3DL::HandleEvent (iEvent &ev)
 VOS::vRef<Vobject> csVosA3DL::GetVobject()
 {
   return localsite;
+}
+
+void csVosA3DL::incrementRelightCounter()
+{
+  boost::mutex::scoped_lock lk (relightCounterMutex);
+  relightCounter++;
+  LOG ("csVosA3DL", 2, "relight counter incremented to " << relightCounter);
+}
+
+void csVosA3DL::decrementRelightCounter()
+{
+  boost::mutex::scoped_lock lk (relightCounterMutex);
+  if (--relightCounter == 0)
+  {
+	mainThreadTasks.push(new RelightTask (this));
+  }
+  LOG ("csVosA3DL", 2, "relight counter decremented to " << relightCounter);
 }

@@ -36,35 +36,6 @@ SCF_IMPLEMENT_IBASE (csVosSector)
   SCF_IMPLEMENTS_INTERFACE (iVosApi)
 SCF_IMPLEMENT_IBASE_END
 
-/// Relight task ///
-class RelightTask : public Task
-{
-public:
-  csVosA3DL* vosa3dl;
-  csRef<csVosSector> sector;
-
-  RelightTask(csVosA3DL* va, csVosSector* vs);
-  virtual ~RelightTask() { }
-  virtual void doTask();
-};
-
-RelightTask::RelightTask(csVosA3DL* va, csVosSector* vs)
-  : vosa3dl(va), sector(vs)
-{
-}
-
-void RelightTask::doTask()
-{
-  if (sector->isLit) return;
-
-  csRef<iObjectRegistry> objreg = vosa3dl->GetObjectRegistry();
-  csRef<iEngine> engine = CS_QUERY_REGISTRY(objreg, iEngine);
-
-  LOG ("RelightTask", 2, "Performing relight");
-  engine->ForceRelight();
-  sector->isLit = true;
-}
-
 
 /// Set ambient task ///
 class SetAmbientTask : public Task
@@ -90,7 +61,36 @@ void SetAmbientTask::doTask()
   engine->SetAmbientLight(csColor(.2, .2, .2));
 }
 
-/// Load object task ///
+/// Task for setting up the object from within a non-CS thread///
+class SetupObjectTask : public Task
+{
+public:
+  csVosA3DL* vosa3dl;
+  vRef<csMetaObject3D> obj3d;
+  csRef<csVosSector> sector;
+
+  SetupObjectTask(csVosA3DL* va, csMetaObject3D *o, csVosSector* vs);
+  virtual ~SetupObjectTask();
+  virtual void doTask();
+};
+
+SetupObjectTask::SetupObjectTask (csVosA3DL *va, csMetaObject3D *o, csVosSector *vs)
+    : vosa3dl(va), obj3d(o, true), sector(vs)
+{
+}
+
+SetupObjectTask::~SetupObjectTask ()
+{
+}
+
+void SetupObjectTask::doTask()
+{
+  LOG("SetupObjectTask", 2, "Setting up object3D")
+  obj3d->Setup(vosa3dl, sector);
+}
+
+/** Task for loading or removing an object from the sector.  Will kick off
+ *  the SetupObjectTask if the object has not been setup yet **/
 class LoadObjectTask : public Task
 {
 public:
@@ -120,7 +120,9 @@ void LoadObjectTask::doTask()
   {
     if (toRemove)
     {
-      wrapper->GetMovable()->GetSectors()->Remove (sector->GetSector());
+      sector->GetSector()->GetMeshes()->Remove (wrapper);
+      //wrapper->GetMovable()->GetSectors()->Remove (sector->GetSector());
+	  //wrapper->GetMovable()->UpdateMove();
     }
     else
     {
@@ -142,50 +144,13 @@ void LoadObjectTask::doTask()
     {
       LOG("LoadObjectTask", 2, "Attempting to remove empty meshwrapper!");
     }
-/*
     else
     {
       LOG("LoadObjectTask", 2, "Setting up object3D")
-        obj3d->Setup(vosa3dl, sector);
+	  TaskQueue::defaultTQ().addTask(new SetupObjectTask(vosa3dl, obj3d, sector));
     }
-*/
   }
 }
-
-/// Load light task ///
-class LoadLightTask : public Task
-{
-public:
-  csVosA3DL* vosa3dl;
-  vRef<csMetaLight> light;
-  csRef<csVosSector> sector;
-
-  LoadLightTask(csVosA3DL* va, csMetaLight *o, csVosSector* vs);
-  virtual ~LoadLightTask();
-  virtual void doTask();
-};
-
-LoadLightTask::LoadLightTask (csVosA3DL *va, csMetaLight *l, csVosSector *vs)
-    : vosa3dl(va), light(l, true), sector(vs)
-{
-}
-
-LoadLightTask::~LoadLightTask ()
-{
-}
-
-void LoadLightTask::doTask()
-{
-  try
-  {
-    light->Setup(vosa3dl, sector);
-  }
-  catch(std::runtime_error& e)
-  {
-    LOG("LoadLightTask", 2, "Light Setup emitted error: " << e.what());
-  }
-}
-
 
 /// csVosSector ///
 
@@ -221,14 +186,20 @@ void csVosSector::Load()
 void csVosSector::notifyChildInserted (VobjectEvent &event)
 {
   LOG("csVosSector", 2, "notifyChildInserted");
-  try {
+  try
+  {
     vRef<csMetaObject3D> obj3d = meta_cast<csMetaObject3D>(event.getChild());
     LOG("SectorChildInserted", 2, "Looking at " << event.getChild()->getURLstr()
         << " " << obj3d.isValid())
 
       if(obj3d.isValid())
       {
-        obj3d->Setup(vosa3dl, this);
+        //obj3d->Setup(vosa3dl, this);
+        vosa3dl->mainThreadTasks.push(new LoadObjectTask( vosa3dl, obj3d, this,
+														  false));
+		if (obj3d->getTypes().hasItem ("a3dl:object3D.polygonmesh") 
+			&& obj3d->getTypes().hasItem ("a3dl:static"))
+		  vosa3dl->incrementRelightCounter();
       }
       else
       {
@@ -236,19 +207,23 @@ void csVosSector::notifyChildInserted (VobjectEvent &event)
         if(light.isValid())
         {
           light->Setup(vosa3dl, this);
+		  vosa3dl->incrementRelightCounter();
         }
       }
-  } catch(std::runtime_error e) {
-    LOG("csVosSector", 2, "caught runtime error setting up " << event.getChild()->getURLstr()
-        << ": " << e.what());
+  } 
+  catch(std::runtime_error e) 
+  {
+    LOG("csVosSector", 2, "caught runtime error setting up " 
+			<< event.getChild()->getURLstr() << ": " << e.what());
   }
 
   LOG("csVosSector", 2, "leaving notifyChildInserted " << waitingForChildren);
 
-  waitingForChildren--;
-  if(waitingForChildren <= 0) {
-    vosa3dl->mainThreadTasks.push(new RelightTask(vosa3dl, this));
-  }
+  //waitingForChildren--;
+  //if(waitingForChildren <= 0) 
+  //{
+  //  vosa3dl->mainThreadTasks.push(new RelightTask(vosa3dl, this));
+  //}
 }
 
 void csVosSector::notifyChildRemoved (VobjectEvent &event)
@@ -263,11 +238,7 @@ void csVosSector::notifyChildRemoved (VobjectEvent &event)
   }
   else
   {
-    //vRef<csMetaLight> light = meta_cast<csMetaLight>(event.getChild());
-    //if(light.isValid())
-    //{
-      //vosa3dl->mainThreadTasks.push(new LoadLightTask( vosa3dl, &light, this));
-    //}
+	/// TODO: Add code to remove a light dynamically! ///
   }
   LOG("csVosSector", 2, "leaving notifyChildRemoved");
 }
