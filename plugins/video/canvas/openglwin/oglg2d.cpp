@@ -268,15 +268,12 @@ bool csGraphics2DOpenGL::Open(char *Title)
   DEVMODE dmode;
   LONG ti;
 
-  if (!csGraphics2DGLCommon::Open(Title))
-    return false;
-  
   // create the window.
   DWORD exStyle = 0;
   DWORD style = WS_POPUP;// | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
   if (!FullScreen)
     style |= WS_CAPTION;
-  if (FullScreen) 
+  if (FullScreen)
   {
     ChangeDisplaySettings(NULL,0);
 
@@ -286,10 +283,10 @@ bool csGraphics2DOpenGL::Open(char *Title)
     dmode.dmPelsHeight = Height;
     dmode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
 
-    if((ti = ChangeDisplaySettings(&dmode, CDS_FULLSCREEN)) != DISP_CHANGE_SUCCESSFUL) 
+    if((ti = ChangeDisplaySettings(&dmode, CDS_FULLSCREEN)) != DISP_CHANGE_SUCCESSFUL)
     {
-      //The cases below need error handling, as theyare errors. 
-      switch(ti) 
+      //The cases below need error handling, as they are errors.
+      switch(ti)
       {
         case DISP_CHANGE_RESTART:
         //computer must restart for mode to work.
@@ -313,30 +310,34 @@ bool csGraphics2DOpenGL::Open(char *Title)
   int wwidth,wheight;
   wwidth=Width+2*GetSystemMetrics(SM_CXSIZEFRAME);
   wheight=Height+2*GetSystemMetrics(SM_CYSIZEFRAME)+GetSystemMetrics(SM_CYCAPTION);
-  
+
   m_hWnd = CreateWindowEx(exStyle, WINDOWCLASSNAME, Title, style,
-                          (GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
-                          (GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
-                          wwidth, wheight, NULL, NULL, m_hInstance, NULL );
+		(GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
+		(GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
+		wwidth, wheight, NULL, NULL, m_hInstance, NULL );
   if( !m_hWnd )
     sys_fatalerror("Cannot create CrystalSpace window", GetLastError());
 
   ShowWindow( m_hWnd, m_nCmdShow );
   UpdateWindow( m_hWnd );
-  SetFocus( m_hWnd );  
-  
-  Memory=new unsigned char [Width*Height*2];
-  if(Memory==NULL)
-    sys_fatalerror("Dummy buffer not allowed");
+  SetFocus( m_hWnd );
 
-  for(int i = 0; i < Height; i++)
-    LineAddress [i] = i * Width;
 
   hDC = GetDC(m_hWnd);
   CalcPixelFormat ();
 
   hGLRC = wglCreateContext(hDC);
   wglMakeCurrent(hDC, hGLRC);
+
+  if (!csGraphics2DGLCommon::Open(Title))
+    return false;
+
+  Memory=new unsigned char [Width*Height*2];
+  if(Memory==NULL)
+    sys_fatalerror("Dummy buffer not allowed");
+
+  for(int i = 0; i < Height; i++)
+    LineAddress [i] = i * Width;
 
   if(Depth==8) m_bPalettized = true;
   else m_bPalettized = false;
