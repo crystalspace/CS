@@ -181,9 +181,11 @@ csString &csString::Append (const char *iStr, size_t iCount)
   return *this;
 }
 
-void csString::SubString (csString& sub, size_t x, size_t y)
+void csString::SubString (csString& sub, size_t x, size_t len)
 {
-  if (x < 0 || x >= Size || y < 0 || y >= Size || y <= x) 
+  int y = x + len;
+
+  if (x < 0 || x >= Size || y < 0 || y > Size || y <= x) 
   {
     sub.Clear ();
     return;

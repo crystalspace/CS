@@ -181,10 +181,9 @@ public:
 
   /**
    * SubString another string out of this one. The result is placed
-   * in 'sub'. The substring is from 'f1' to 'f2' (excluding the
-   * char at 'f2' itself).
+   * in 'sub'. The substring is from 'start', of length 'len'.
    */
-  void SubString (csString& sub, size_t f1, size_t f2);
+  void SubString (csString& sub, size_t start, size_t len);
 
   /// Find first c from pos.
   size_t FindFirst (const char c, size_t p = (size_t)-1);
