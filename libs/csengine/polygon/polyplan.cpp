@@ -76,11 +76,10 @@ void csPolyPlane::SetTextureSpace (float xo, float yo, float zo,
   			  float xu, float yu, float zu,
   			  float xv, float yv, float zv)
 {
-  TextureTrans::compute_texture_space (
-  	m_obj2tex, v_obj2tex,
-	csVector3 (xo, yo, zo),
-	csVector3 (xu, yu, zu),
-	csVector3 (xv, yv, zv));
+  const csVector3 o(xo, yo, zo);
+  const csVector3 u(xu, yu, zu);
+  const csVector3 v(xv, yv, zv);
+  TextureTrans::compute_texture_space (m_obj2tex, v_obj2tex, o, u, v);
   m_world2tex = m_obj2tex;
   v_world2tex = v_obj2tex;
 }
