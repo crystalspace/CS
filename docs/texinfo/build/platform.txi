@@ -19,7 +19,7 @@ will find a reference to it from within the instructions in this section.
 @menu
 * Unix::
 * MSVC:: Windows using Microsoft Visual C++
-* MingW:: Windows using MingW
+* MinGW:: Windows using MinGW
 * NeXT:: MacOS/X, MacOS/X Server 1.0, OpenStep, NextStep
 * MacOS/9::
 * OS2:: @sc{os}/2
