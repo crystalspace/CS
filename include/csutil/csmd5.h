@@ -64,6 +64,8 @@
 #ifndef __CS_CSMD5_H__
 #define __CS_CSMD5_H__
 
+#include "csutil/csstring.h"
+
 /**
  * This is an encapsulation of a C-implementation of MD5 digest algorithm by
  * Peter Deutsch <ghost@aladdin.com>.  It provides the exact raw interface as
@@ -79,7 +81,7 @@ public:
   /// 32-bit word
   typedef unsigned int md5_word_t;
 
-  /// \internal Define the state of the MD5 Algorithm
+  /// \internal Define the state of the MD5 Algorithm.
   struct md5_state_t
   {
     md5_word_t count[2]; // message length in bits, lsw first
@@ -87,24 +89,35 @@ public:
     md5_byte_t buf[64];  // accumulate block
   };
 
-  /// Initialize the algorithm
+  /// Initialize the algorithm.
   static void md5_init(md5_state_t*);
-  /// Append a string to the message
+  /// Append a string to the message.
   static void md5_append(md5_state_t*, const md5_byte_t* data, int nbytes);
-  /// Finish the message and return the digest
+  /// Finish the message and return the digest.
   static void md5_finish(md5_state_t*, md5_byte_t digest[16]);
 
 protected:
   static void md5_process(md5_state_t*, const md5_byte_t* data/*[64]*/);
 
-// Our friendly interface
+// Our friendly interface.
 public:
-  /// An MD5 digest is 16 unsigned characters (not 0-terminated)
-  struct Digest { md5_byte_t data[16]; };
+  /// An MD5 digest is 16 unsigned characters (not 0-terminated).
+  struct Digest
+  {
+    enum { DigestLen = 16 };
+    /// The raw digest data.
+    md5_byte_t data[DigestLen];
+    /// Returns a lowercase hex-string representing the raw digest data.
+    csString HexString() const;
+    /// Returns an uppercase hex-string representing the raw digest data.
+    csString HEXString() const;
+  };
 
-  /// Encode a null-terminated string buffer
+  /// Encode a string.
+  static Digest Encode(csString const&);
+  /// Encode a null-terminated string buffer.
   static Digest Encode(const char*);
-  /// Encode a buffer
+  /// Encode a buffer.
   static Digest Encode(const void*, int nbytes);
 };
 

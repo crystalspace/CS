@@ -181,38 +181,38 @@ csString &csString::Append (const char *iStr, size_t iCount)
   return *this;
 }
 
-void csString::SubString (csString& sub, size_t x, size_t len)
+void csString::SubString (csString& sub, size_t x, size_t len) const
 {
   CS_ASSERT(sub.Data != Data); // Check for same string
-
-  size_t y = x + len;
-
-  if (x < 0 || x >= Size || y < 0 || y > Size || y <= x) 
+  sub.Truncate(0);
+  if (x >= 0 && x < Size)
   {
-    sub.Clear ();
-    return;
+    if (x + len > Size)
+      len = Size - x;
+    sub.Append(Data + x, len);
   }
-
-  size_t const NewSize = y - x;
-  sub.ExpandIfNeeded (NewSize);
-  strncpy (sub.Data, Data+x, NewSize);
-  sub.Data[NewSize] = '\0';
-  sub.Size = NewSize;
 }
 
-size_t csString::FindFirst (char c, size_t pos)
+csString csString::Slice(size_t start, size_t len) const
+{
+  csString s;
+  SubString(s, start, len);
+  return s;
+}
+
+size_t csString::FindFirst (char c, size_t pos) const
 {
   if (pos > Size || !Data)
     return (size_t)-1;
 
-  char * tmp = strchr(Data + pos, c);
+  char const* tmp = strchr(Data + pos, c);
   if (!tmp) 
     return (size_t)-1;
 
   return tmp - Data;
 }
 
-size_t csString::FindLast (char c, size_t pos)
+size_t csString::FindLast (char c, size_t pos) const
 {
   if (pos == (size_t)-1)
     pos = Size - 1;
@@ -220,13 +220,32 @@ size_t csString::FindLast (char c, size_t pos)
   if (pos > Size || !Data)
     return (size_t)-1;
 
-  char * tmp;
-  for (tmp = Data + pos; tmp >= Data; tmp--) {
+  char const* tmp;
+  for (tmp = Data + pos; tmp >= Data; tmp--)
     if (*tmp == c)
       return tmp - Data;
-  }
 
   return (size_t)-1;
+}
+
+csString& csString::Downcase()
+{
+  char* p = GetData();
+  char const* const pN = p + Length();
+  for ( ; p < pN; p++)
+    if (isalpha(*p))
+      *p = (char)tolower(*p);
+  return *this;
+}
+
+csString& csString::Upcase()
+{
+  char* p = GetData();
+  char const* const pN = p + Length();
+  for ( ; p < pN; p++)
+    if (isalpha(*p))
+      *p = (char)toupper(*p);
+  return *this;
 }
 
 csString &csString::LTrim()
@@ -310,13 +329,11 @@ csString &csString::FormatV (const char *format, va_list args)
   return *this;
 }
 
-csString &csString::Format (const char *format, ...)
+csString &csString::Format (const char* format, ...)
 {
   va_list args;
   va_start (args, format);
-
   FormatV (format, args);
-
   va_end (args);
   return *this;
 }
@@ -372,7 +389,7 @@ csString &csString::PadLeft (size_t iNewSize, char iChar)
   return *this;
 }
 
-csString csString::AsPadLeft (size_t iNewSize, char iChar)
+csString csString::AsPadLeft (size_t iNewSize, char iChar) const
 {
   csString newStr = Clone ();
   newStr.PadLeft (iChar, iNewSize);
@@ -412,7 +429,7 @@ csString& csString::PadRight (size_t iNewSize, char iChar)
   return *this;
 }
 
-csString csString::AsPadRight (size_t iNewSize, char iChar)
+csString csString::AsPadRight (size_t iNewSize, char iChar) const
 {
   csString newStr = Clone ();
   newStr.PadRight (iChar, iNewSize);
@@ -459,7 +476,7 @@ csString& csString::PadCenter (size_t iNewSize, char iChar)
   return *this;
 }
 
-csString csString::AsPadCenter (size_t iNewSize, char iChar)
+csString csString::AsPadCenter (size_t iNewSize, char iChar) const
 {
   csString newStr = Clone ();
   newStr.PadCenter (iChar, iNewSize);

@@ -11,9 +11,35 @@ chronological order.
 	  services to thing loader. It doesn't make much sense to make those
 	  parsing functions public. Especially since iPolygon3DStatic is
 	  going to be removed in the future.
+	- Eric Sunshine added csMD5::Encode(csString const&) to complement the
+	  existing Encode(char const*) method.
+	- Eric Sunshine added csMD5::Digest::HexString() and HEXString().
+	  These methods return a hexadecimal string representation of the
+	  digest in lower- and uppercase, respectively.
+	- Eric Sunshine added a lot of missing `const' qualifiers to iString
+	  and csString.
+	- Eric Sunshine removed a bunch of inline methods from iString.  This
+	  is supposed to be a pure, abstract interface for communication
+	  between modules.  It is not supposed to contain implementation.
+	- Eric Sunshine fixed several problems in iString where it failed to
+	  return csRef<> in appropriate circumstances.
+	- Eric Sunshine repaired the butchered "char* GetData() const"
+	  abomination in iString and csString by replacing it with two methods:
+	  one entirely const, and one entirely non-const.
+	- Eric Sunshine added missing const version operator[] to iString.
+	- Eric Sunshine added Slice() method to iString and csString.  This is
+	  just like SubString() but returns the substring by value rather than
+	  stuffing it into a passed-in buffer.
+	- Eric Sunshine added iString::Downcase() and Upcase() methods.
+	- Eric Sunshine renamed csString::strlwr() to Downcase().  Also added a
+	  complementary Upcase() method.
+	- Eric Sunshine fixed bugs in csString and scfString where some
+	  operations were incorrectly aborting at the first null character,
+	  rather than processing all characters in the string.  It is
+	  acceptable (presently) for csString to contain arbitrary binary data,
+	  thus embedded null characters may be present.
+	- Eric Sunshine fixed bogus logic in scfString::SubString().
 28-Sep-2003
-	- Jorrit implemented csEngine::CreatePortal() which makes a portal
-	  container as a child of another mesh.
 	- Eric Sunshine corrected erroneous comments in
 	  CS/mk/autoconf/compiler.m4.
 	- Eric Sunshine performed clean-up of
@@ -39,6 +65,8 @@ chronological order.
 	  -lbfd appearing in the link statement even when embedding was
 	  disabled.
 	- Wouter added csgeom/polymesh to include/css.h.
+	- Jorrit implemented csEngine::CreatePortal() which makes a portal
+	  container as a child of another mesh.
 27-Sep-2003
 	- Eric Sunshine made minor clarifications to the "SCF Changes" section
 	  of the "Release Notes 0.96 to 0.98" appendix in the user manual.

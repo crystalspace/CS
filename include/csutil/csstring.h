@@ -24,8 +24,12 @@
 #include "csutil/snprintf.h"
 
 /**
- * This is a string class with a range of useful operators and
- * typesafe overloads.
+ * This is a string class with a range of useful operators and typesafe
+ * overloads.  May contain arbitary binary data, including null bytes.
+ * Guarantees that a null-terminator always follows the last stored character,
+ * thus you can safely use the return value from GetData() and `operator char
+ * const*()' in calls to functions expecting C strings.  The implicit null
+ * terminator is not included in the character count returned by Length().
  */
 class csString
 {
@@ -35,7 +39,7 @@ protected:
   enum { DEFAULT_GROW_BY = 64 };
 
   // String buffer.
-  char *Data;
+  char* Data;
   // Length of string; not including null terminator.
   size_t Size;
   // Size in bytes of allocated string buffer.
@@ -91,21 +95,31 @@ public:
   /// Free the memory allocated for the string
   void Free ();
 
-  /// Truncate the string to length iLen.
-  csString &Truncate (size_t iLen);
+  /// Truncate the string to length Len.  Returns a reference to itself.
+  csString& Truncate (size_t Len);
 
-  /// Set string buffer capacity to exactly hold the current content.
-  csString &Reclaim ();
+  /**
+   * Set string buffer capacity to exactly hold the current content.  Returns a
+   * reference to itself.
+   */
+  csString& Reclaim ();
 
-  /// Clear the string (so that it contains only a null terminator)
+  /**
+   * Clear the string (so that it contains only a null terminator).  Returns a
+   * reference to itself.
+   */
   csString& Clear ()
   { return Truncate (0); }
 
+  /// Get a pointer to the null-terminated character array.
+  char const* GetData () const
+  { return Data; }
+
   /**
-   * Get a pointer to ASCIIZ string - warning: this is a non constpointer,
-   * so use this function with care!
+   * Get a pointer to the null-terminated character array.  Warning: this is a
+   * non-const pointer, so use this function with care!
    */
-  char* GetData () const
+  char* GetData ()
   { return Data; }
 
   /// Query string length.  Length does not include null terminator.
@@ -116,7 +130,7 @@ public:
   bool IsEmpty () const
   { return (Size == 0); }
 
-  /// Get a reference to n'th character
+  /// Get a reference to n'th character.
   char& operator [] (size_t n)
   {
     CS_ASSERT (n < Size);
@@ -147,56 +161,80 @@ public:
     return Data [n];
   }
 
-  /// Delete iCount characters at starting iPos
-  csString& DeleteAt (size_t iPos, size_t iCount = 1);
+  /// Delete Count characters at starting Pos.  Returns a reference to itself.
+  csString& DeleteAt (size_t Pos, size_t Count = 1);
 
-  /// Insert another string into this one at position iPos
-  csString& Insert (size_t iPos, const csString&);
+  /**
+   * Insert another string into this one at position Pos.  Returns a reference
+   * to itself.
+   */
+  csString& Insert (size_t Pos, const csString&);
 
-  /// Insert a char into this string at position iPos
-  csString& Insert (size_t iPos, const char);
+  /**
+   * Insert a character into this string at position Pos.  Returns a reference
+   * to itself.
+   */
+  csString& Insert (size_t Pos, const char);
 
-  /// Overlay another string onto a part of this string
+  /**
+   * Overlay another string onto a part of this string.  Returns a reference to
+   * itself.
+   */
   csString& Overwrite (size_t iPos, const csString&);
 
   /**
-   * Append an ASCIIZ string to this one.  If iCount is -1, then the entire
-   * string is appended.  Otherwise, only iCount characters from the string are
-   * appended.
+   * Append a null-terminated string to this one.  If Count is -1, then the
+   * entire string is appended.  Otherwise, only Count characters from the
+   * string are appended.  Returns a reference to itself.
    */
-  csString& Append (const char*, size_t iCount = (size_t)-1);
+  csString& Append (const char*, size_t Count = (size_t)-1);
 
   /**
-   * Append a string to this one.  If iCount is -1, then the entire string is
-   * appended.  Otherwise, only iCount characters from the string are appended.
+   * Append a string to this one.  If Count is -1, then the entire string is
+   * appended.  Otherwise, only Count characters from the string are appended.
+   * Returns a reference to itself.
    */
-  csString& Append (const csString &iStr, size_t iCount = (size_t)-1);
+  csString& Append (const csString &iStr, size_t Count = (size_t)-1);
 
-  /// Append a character to this string.
+  /// Append a signed character to this string.  Returns a reference to itself.
   csString& Append (char c)
   { char s[2]; s[0] = c; s[1] = '\0'; return Append(s); }
-  /// Append an unsigned character to this string.
-  csString &Append (unsigned char c)
+
+  /**
+   * Append an unsigned character to this string.  Returns a reference to
+   * itself.
+   */
+  csString& Append (unsigned char c)
   { return Append(char(c)); }
 
   /**
-   * SubString another string out of this one. The result is placed
-   * in 'sub'. The substring is from 'start', of length 'len'.
+   * Copy and return a portion of this string.  The substring runs from `start'
+   * for `len' characters.
    */
-  void SubString (csString& sub, size_t start, size_t len);
+  csString Slice (size_t start, size_t len) const;
+
+  /**
+   * Copy a portion of this string.  The result is placed in `sub'.  The
+   * substring runs from `start' for `len' characters.  Use this method instead
+   * of Slice() for cases where you expect to extract many substrings in a
+   * tight loop, and want to avoid the overhead of allocation of a new string
+   * for each operation.  You can keep passing in the same `sub' for each
+   * invocation, thus avoiding creation of a new string object.
+   */
+  void SubString (csString& sub, size_t start, size_t len) const;
 
   /**
    * Find first character 'c' from position 'p'.
    * If the character cannot be found, this function returns (size_t)-1
    */
-  size_t FindFirst (const char c, size_t p = (size_t)-1);
+  size_t FindFirst (char c, size_t p = 0) const;
 
   /**
-   * Find first character 'c', counting backwards from position 'p'. Default
+   * Find last character 'c', counting backwards from position 'p'. Default
    * position is the end of the string. If the character cannot be found, this
    * function returns (size_t)-1
    */
-  size_t FindLast (const char c, size_t p = (size_t)-1);
+  size_t FindLast (char c, size_t p = 0) const;
 
 #define STR_APPEND(TYPE,FMT,SZ) csString& Append(TYPE n) \
   { char s[SZ]; cs_snprintf(s, SZ, #FMT, n); return Append(s); }
@@ -216,25 +254,25 @@ public:
 #endif
 
   /**
-   * Replace contents of this string with the contents of another.  If iCount
-   * is -1, then use the entire replacement string.  Otherwise, use iCount
-   * characters from the replacement string.
+   * Replace contents of this string with the contents of another.  If Count
+   * is -1, then use the entire replacement string.  Otherwise, use Count
+   * characters from the replacement string.  Returns a reference to itself.
    */
-  csString& Replace (const csString& iStr, size_t iCount = (size_t)-1)
+  csString& Replace (const csString& Str, size_t Count = (size_t)-1)
   {
     Size = 0;
-    return Append (iStr, iCount);
+    return Append (Str, Count);
   }
 
   /**
-   * Replace contents of this string with the contents of another.  If iCount
-   * is -1, then use the entire replacement string.  Otherwise, use iCount
-   * characters from the replacement string.
+   * Replace contents of this string with the contents of another.  If Count
+   * is -1, then use the entire replacement string.  Otherwise, use Count
+   * characters from the replacement string.  Returns a reference to itself.
    */
-  csString& Replace (const char* iStr, size_t iCount = (size_t)-1)
+  csString& Replace (const char* Str, size_t Count = (size_t)-1)
   {
     Size = 0;
-    return Append (iStr, iCount);
+    return Append (Str, Count);
   }
 
 #define STR_REPLACE(TYPE) \
@@ -267,7 +305,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
     return (memcmp (Data, iStr.GetData (), Size) == 0);
   }
 
-  /// Check if an ASCIIZ string is equal to this string.
+  /// Check if a null-terminated string is equal to this string.
   bool Compare (const char* iStr) const
   { return (strcmp (Data ? Data : "", iStr) == 0); }
 
@@ -284,7 +322,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
     return (strncasecmp (Data, iStr.GetData (), Size) == 0);
   }
 
-  /// Compare ignoring case with an ASCIIZ string
+  /// Compare ignoring case with a null-terminated string
   bool CompareNoCase (const char* iStr) const
   { return (strncasecmp (Data ? Data : "", iStr, Size) == 0); }
 
@@ -292,27 +330,30 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   csString () : Data (0), Size (0), MaxSize (0), GrowBy (DEFAULT_GROW_BY),
     GrowExponentially (false) {}
 
-  /// Create an csString object and reserve space for iLength characters
-  csString (size_t iLength) : Data (0), Size (0), MaxSize (0),
+  /**
+   * Create a csString object and reserve space for at least Length
+   * characters.
+   */
+  csString (size_t Length) : Data (0), Size (0), MaxSize (0),
     GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
-  { SetCapacity (iLength); }
+  { SetCapacity (Length); }
 
-  /// Copy constructor from existing csString.
+  /// Copy constructor.
   csString (const csString& copy) : Data (0), Size (0), MaxSize (0),
     GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { Append (copy); }
 
-  /// Copy constructor from ASCIIZ string
-  csString (const char* copy) : Data (0), Size (0), MaxSize (0),
+  /// Create a csString object from a null-terminated C string.
+  csString (const char* src) : Data (0), Size (0), MaxSize (0),
     GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
-  { Append (copy); }
+  { Append (src); }
 
-  /// Copy constructor from a character
+  /// Create a csString object from a single signed character.
   csString (char c) : Data (0), Size (0), MaxSize (0),
     GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { Append (c); }
 
-  /// Copy constructor from a character (unsigned)
+  /// Create a csString object from a single unsigned character.
   csString (unsigned char c) : Data(0), Size (0), MaxSize (0),
     GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { Append ((char) c); }
@@ -324,35 +365,34 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   csString Clone () const
   { return csString (*this); }
 
-  /// Trim leading whitespace.
+  /// Trim leading whitespace.  Returns a reference to itself.
   csString& LTrim();
 
-  /// Trim trailing whitespace.
+  /// Trim trailing whitespace.  Returns a reference to itself.
   csString& RTrim();
 
-  /// Trim leading and trailing whitespace.
+  /// Trim leading and trailing whitespace.  Returns a reference to itself.
   csString& Trim();
 
   /**
-   * Trims leading and trailing whitespace, and collapses all internal
-   * whitespace to a single space.
+   * Trim leading and trailing whitespace, and collapse all internal
+   * whitespace to a single space.  Returns a reference to itself.
    */
   csString& Collapse();
 
   /**
    * Format this string using sprintf() formatting directives.  Automatically
    * allocates sufficient memory to hold result.  Newly formatted string
-   * overwrites previous string value.
+   * overwrites previous string value.  Returns a reference to itself.
    */
-  csString& Format(const char *format, ...) CS_GNUC_PRINTF (2, 3);
+  csString& Format(const char* format, ...) CS_GNUC_PRINTF (2, 3);
 
   /**
    * Format this string using sprintf() formatting directives in a va_list.
    * Automatically allocates sufficient memory to hold result.  Newly formatted
-   * string overwrites previous string value.
+   * string overwrites previous string value.  Returns a reference to itself.
    */
-  csString& FormatV(const char *format, va_list args);
-
+  csString& FormatV(const char* format, va_list args);
 
 #define STR_FORMAT(TYPE,FMT,SZ) \
   static csString Format (TYPE v);
@@ -382,13 +422,16 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   STR_FORMAT_FLOAT(double)
 #undef STR_FORMAT_FLOAT
 
-  /// Pad to specified size with leading characters (default: space).
+  /**
+   * Pad to a specified size with leading characters (default: space).  Returns
+   * a reference to itself.
+   */
   csString& PadLeft (size_t iNewSize, char iChar=' ');
 
-  /// Return a new string formatted with PadLeft().
-  csString AsPadLeft (size_t iNewSize, char iChar=' ');
+  /// Return a copy of this string formatted with PadLeft().
+  csString AsPadLeft (size_t iNewSize, char iChar=' ') const;
 
-  // Return a new left-padded string representation of a basic type
+  // Return a new left-padded string representation of a basic type.
 #define STR_PADLEFT(TYPE) \
   static csString PadLeft (TYPE v, size_t iNewSize, char iChar=' ');
   STR_PADLEFT(const csString&)
@@ -408,13 +451,16 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
 #endif
 #undef STR_PADLEFT
 
-  /// Pad to specified size with trailing characters (default: space).
+  /**
+   * Pad to a specified size with trailing characters (default: space).
+   * Returns a reference to itself.
+   */
   csString& PadRight (size_t iNewSize, char iChar=' ');
 
-  /// Return a new string formatted with PadRight().
-  csString AsPadRight (size_t iNewSize, char iChar=' ');
+  /// Return a copy of this string formatted with PadRight().
+  csString AsPadRight (size_t iNewSize, char iChar=' ') const;
 
-  // Return a new right-padded string representation of a basic type
+  // Return a new right-padded string representation of a basic type.
 #define STR_PADRIGHT(TYPE) \
   static csString PadRight (TYPE v, size_t iNewSize, char iChar=' ');
   STR_PADRIGHT(const csString&)
@@ -434,13 +480,16 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
 #endif
 #undef STR_PADRIGHT
 
-  /// Pad to specified size between characters (any remainder is appended).
+  /**
+   * Pad to a specified size between characters (any remainder is appended).
+   * Returns a reference to itself.
+   */
   csString& PadCenter (size_t iNewSize, char iChar=' ');
 
   /// Return a copy of this string formatted with PadCenter().
-  csString AsPadCenter (size_t iNewSize, char iChar=' ');
+  csString AsPadCenter (size_t iNewSize, char iChar=' ') const;
 
-  // Return a new left+right padded string representation of a basic type
+  // Return a new left+right padded string representation of a basic type.
 #define STR_PADCENTER(TYPE) \
   static csString PadCenter (TYPE v, size_t iNewSize, char iChar=' ');
   STR_PADCENTER(const csString&)
@@ -460,7 +509,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
 #endif
 #undef STR_PADCENTER
 
-  // Assign a string to another
+  // Assign a string to another.
 #define STR_ASSIGN(TYPE) \
 const csString& operator = (TYPE s) { return Replace (s); }
   STR_ASSIGN(const csString&)
@@ -502,19 +551,27 @@ const csString& operator = (TYPE s) { return Replace (s); }
   const csString& operator + (const csString &iStr) const
   { return Clone ().Append (iStr); }
 
-  /// Return a const reference to this string in ASCIIZ format
+  /// Return a pointer to the null-terminated character string.
   operator const char* () const
   { return Data; }
 
-  /// Check if two strings are equal
+  /// Check if two strings are equal.
   bool operator == (const csString& iStr) const
   { return Compare (iStr); }
+  /// Check if two strings are equal.
   bool operator == (const char* iStr) const
   { return Compare (iStr); }
+  /// Check if two strings are not equal.
   bool operator != (const csString& iStr) const
   { return !Compare (iStr); }
+  /// Check if two strings are not equal.
   bool operator != (const char* iStr) const
   { return !Compare (iStr); }
+
+  /// Convert the string to lower-case.  Returns a reference to itself.
+  csString& Downcase();
+  /// Convert the string to upper-case.  Returns a reference to itself.
+  csString& Upcase();
 
   /**
    * Detach the low-level null-terminated string buffer from the csString
@@ -524,13 +581,7 @@ const csString& operator = (TYPE s) { return Replace (s); }
    * allocated for this string.
    */
   char* Detach ()
-  { char *d = Data; Data = 0; Size = 0; MaxSize = 0; return d; }
-
-  void strlwr()
-  {
-    for (char *p = Data; *p; p++)
-      *p = (char) tolower (*p);
-  }
+  { char* d = Data; Data = 0; Size = 0; MaxSize = 0; return d; }
 };
 
 /// Concatenate a csString with an ASCIIZ and return resulting csString
@@ -540,12 +591,12 @@ inline csString operator + (const char* iStr1, const csString &iStr2)
 }
 
 /// Concatenate a csString with an ASCIIZ and return resulting csString
-inline csString operator + (const csString &iStr1, const char* iStr2)
+inline csString operator + (const csString& iStr1, const char* iStr2)
 {
   return iStr1.Clone ().Append (iStr2);
 }
 
-// Handy shift operators.
+// Handy shift operators.  For example: s << "Hi " << name << "; see " << foo;
 #define STR_SHIFT(TYPE) \
   inline csString &operator << (csString &s, TYPE v) { return s.Append (v); }
 STR_SHIFT(const csString&)

@@ -48,16 +48,28 @@ void scfString::Truncate (size_t iPos)
 void scfString::Reclaim ()
 { s.Reclaim (); }
 
-iString *scfString::Clone () const
-{ return new scfString (*this); }
+void scfString::Clear ()
+{ s.Clear (); }
 
-char *scfString::GetData () const
+csRef<iString> scfString::Clone () const
+{ return csPtr<iString>(new scfString (*this)); }
+
+char const* scfString::GetData () const
+{ return s.GetData (); }
+
+char* scfString::GetData ()
 { return s.GetData (); }
 
 size_t scfString::Length () const
 { return s.Length (); }
 
+bool scfString::IsEmpty () const
+{ return !Length (); }
+
 char& scfString::operator [] (size_t iPos)
+{ return s[iPos]; }
+
+char scfString::operator [] (size_t iPos) const
 { return s[iPos]; }
 
 void scfString::SetAt (size_t iPos, char iChar)
@@ -66,62 +78,79 @@ void scfString::SetAt (size_t iPos, char iChar)
 char scfString::GetAt (size_t iPos) const
 { return s.GetAt (iPos); }
 
-void scfString::Insert (size_t iPos, iString *iStr)
+void scfString::Insert (size_t iPos, iString const* iStr)
 { s.Insert (iPos, iStr->GetData ()); }
 
-void scfString::Overwrite (size_t iPos, iString *iStr)
+void scfString::Overwrite (size_t iPos, iString const* iStr)
 { s.Overwrite (iPos, iStr->GetData ()); }
 
-iString &scfString::Append (const char *iStr, size_t iCount)
+void scfString::Append (const char* iStr, size_t iCount)
+{ s.Append (iStr, iCount); }
+
+void scfString::Append (iString const* iStr, size_t iCount)
+{ s.Append (iStr->GetData (), iCount); }
+
+csRef<iString> scfString::Slice(size_t start, size_t len) const
 {
-  s.Append (iStr, iCount);
-  return *this;
+  csString const tmp(s.Slice(start, len));
+  return csPtr<iString>(new scfString(tmp));
 }
 
-iString &scfString::Append (const iString *iStr, size_t iCount)
+void scfString::SubString (iString* sub, size_t start, size_t len) const
 {
-  s.Append (iStr->GetData (), iCount);
-  return *this;
-}
-
-void scfString::SubString (iString * sub, size_t start, size_t len) 
-{
-  csString tmp(sub->GetData());
+  csString tmp;
   s.SubString(tmp, start, len);
-  sub->Clear();
-  sub->Append(tmp.GetData());
+  sub->Truncate(0);
+  sub->Append(tmp.GetData(), tmp.Length());
 }
 
-size_t scfString::FindFirst (const char c, size_t p) 
-{
-  return s.FindFirst(c, p);
-}
+size_t scfString::FindFirst (const char c, size_t p) const
+{ return s.FindFirst(c, p); }
 
-size_t scfString::FindLast (const char c, size_t p)
-{
-  return s.FindLast(c, p);
-}
+size_t scfString::FindLast (const char c, size_t p) const
+{ return s.FindLast(c, p); }
 
 void scfString::Format (const char* format, ...)
 {
   va_list args;
   va_start (args, format);
-
   FormatV (format, args);
-
   va_end (args);
 }
 
 void scfString::FormatV (const char* format, va_list args)
-{
-  s.FormatV (format, args);
-}
+{ s.FormatV (format, args); }
 
-void scfString::Replace (const iString *iStr, size_t iCount)
+void scfString::Replace (const iString* iStr, size_t iCount)
 { s.Replace (iStr->GetData (), iCount); }
 
-bool scfString::Compare (const iString *iStr) const
+bool scfString::Compare (const iString* iStr) const
 { return s.Compare (iStr->GetData ()); }
 
-bool scfString::CompareNoCase (const iString *iStr) const
+bool scfString::CompareNoCase (const iString* iStr) const
 { return s.CompareNoCase (iStr->GetData ()); }
+
+void scfString::operator += (const iString& iStr)
+{ return Append (&iStr); }
+
+void scfString::operator += (const char* iStr)
+{ return Append (iStr); }
+
+csRef<iString> scfString::operator + (const iString& iStr) const
+{
+  csRef<iString> tmp(Clone());
+  tmp->Append(&iStr);
+  return tmp;
+}
+
+scfString::operator char const* () const
+{ return GetData (); }
+
+bool scfString::operator == (const iString& iStr) const
+{ return Compare (&iStr); }
+
+void scfString::Downcase()
+{ s.Downcase(); }
+
+void scfString::Upcase()
+{ s.Upcase(); }

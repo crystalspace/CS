@@ -351,6 +351,11 @@ void csMD5::md5_finish(md5_state_t *pms, md5_byte_t digest[16])
 	digest[i] = (md5_byte_t)(pms->abcd[i >> 2] >> ((i & 3) << 3));
 }
 
+csMD5::Digest csMD5::Encode(csString const& s)
+{
+  return Encode(s.GetData(), (int)s.Length());
+}
+
 csMD5::Digest csMD5::Encode(const void* data, int nbytes)
 {
   Digest digest;
@@ -364,4 +369,21 @@ csMD5::Digest csMD5::Encode(const void* data, int nbytes)
 csMD5::Digest csMD5::Encode(const char* s)
 {
   return Encode(s, strlen(s));
+}
+
+csString csMD5::Digest::HexString() const
+{
+  char buff[DigestLen * 2 + 1]; // Two hex characters per digest element.
+  for (int i = 0; i < DigestLen; i++)
+    sprintf(buff + (i * 2), "%02x", data[i]);
+  buff[ sizeof(buff) - 1 ] = '\0';
+  csString s(buff);
+  return s;
+}
+
+csString csMD5::Digest::HEXString() const
+{
+  csString s(HexString());
+  s.Upcase();
+  return s;
 }

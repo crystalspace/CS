@@ -784,3 +784,17 @@ viewpoint, this manifests merely as the removal of the static link library
 @file{libcssys.a} (Unix) or @file{cssys.lib} (Windows).  To account for this
 change, simply eliminate the reference to this library from your build scripts,
 makefiles, or project files.
+
+@subheading csString and iString Changes
+
+The @code{strlwr()} method was renamed to @code{Downcase()}.  A complementary
+@code{Upcase()} method was added for completeness.  Added @code{Slice()}
+which copies a sub-portion of a string.
+
+@subheading csMD5 Changes
+
+A @code{csMD5(csString const&)} constructor was added to complement the
+existing @code{csMD5{char const*)} constructor.  The new method
+@code{csMD5::Digest:HexString()} returns a hexadecimal string representation of
+the @sc{md5} digest using lowercase hexadecimal characters.
+@code{csMD5::Digest::HEXString()} returns uppercase hexadecimal characters.

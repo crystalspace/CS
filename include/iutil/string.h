@@ -27,8 +27,9 @@
  * @{ */
 #include <stdarg.h>
 #include "csutil/scf.h"
+#include "csutil/ref.h"
 
-SCF_VERSION (iString, 0, 1, 0);
+SCF_VERSION (iString, 0, 2, 0);
 
 /// This is a SCF-compatible interface for csString.
 struct iString : public iBase
@@ -70,102 +71,115 @@ struct iString : public iBase
   virtual void Reclaim () = 0;
 
   /// Clear the string (so that it contains only ending 0 character)
-  inline void Clear ()
-  { Truncate (0); }
+  virtual void Clear () = 0;
 
   /// Get a copy of this string
-  virtual iString *Clone () const = 0;
+  virtual csRef<iString> Clone () const = 0;
 
-  /// Get a pointer to ASCIIZ string
-  virtual char *GetData () const = 0;
+  /// Get a pointer to null-termianted character array.
+  virtual char const* GetData () const = 0;
+
+  /// Get a pointer to null-termianted character array.
+  virtual char* GetData () = 0;
 
   /// Query string length
   virtual size_t Length () const = 0;
 
   /// Check if string is empty
-  inline bool IsEmpty () const
-  { return !Length (); }
+  virtual bool IsEmpty () const = 0;
 
   /// Get a reference to iPos'th character
-  virtual inline char& operator [] (size_t iPos) = 0;
+  virtual char& operator [] (size_t iPos) = 0;
 
-  /// Set characetr number iPos to iChar
+  /// Get the iPos'th character
+  virtual char operator [] (size_t iPos) const = 0;
+
+  /// Set character number iPos to iChar
   virtual void SetAt (size_t iPos, char iChar) = 0;
 
   /// Get character at position iPos
   virtual char GetAt (size_t iPos) const = 0;
 
   /// Insert another string into this one at position iPos
-  virtual void Insert (size_t iPos, iString *iStr) = 0;
+  virtual void Insert (size_t iPos, iString const* iStr) = 0;
 
   /// Overlay another string onto a part of this string
-  virtual void Overwrite (size_t iPos, iString *iStr) = 0;
+  virtual void Overwrite (size_t iPos, iString const* iStr) = 0;
 
-  /// Append an ASCIIZ string to this one (up to iCount characters)
-  virtual iString &Append (const char *iStr, size_t iCount = (size_t)-1) = 0;
+  /// Append a null-terminated string to this one (up to Count characters)
+  virtual void Append (const char* iStr, size_t Count = (size_t)-1) = 0;
 
-  /// Append a string to this one (possibly iCount characters from the string)
-  virtual iString &Append (const iString *iStr, size_t iCount = (size_t)-1)=0;
+  /// Append a string to this one (possibly Count characters from the string)
+  virtual void Append (const iString* iStr, size_t Count = (size_t)-1) = 0;
 
   /**
-   * SubString another string out of this one. The result is placed
-   * in 'sub'. The substring is from 'start', of length 'len'.
+   * Copy and return a portion of this string.  The substring runs from `start'
+   * for `len' characters.
    */
-  virtual void SubString (iString * sub, size_t start, size_t len) = 0;
+  virtual csRef<iString> Slice (size_t start, size_t len) const = 0;
 
-  /// Find first character 'c' from position 'p'.
   /**
-   * If the character cannot be found, this function returns (size_t)-1
+   * Copy a portion of this string.  The result is placed in 'sub'.  The
+   * substring is from 'start', of length 'len'.
    */
-  virtual size_t FindFirst (const char c, size_t p = (size_t)-1) = 0;
-  /// Find first character 'c', counting backwards from position 'p'. Default position is the end of the string.
+  virtual void SubString (iString* sub, size_t start, size_t len) const = 0;
+
   /**
-   * If the character cannot be found, this function returns (size_t)-1
+   * Find first character 'c' from position 'p'.  If the character cannot be
+   * found, this function returns (size_t)-1
    */
-  virtual size_t FindLast (const char c, size_t p = (size_t)-1) = 0;
+  virtual size_t FindFirst (const char c, size_t p = (size_t)-1) const = 0;
+
+  /**
+   * Find last character 'c', counting backwards from position 'p'.  Default
+   * position is the end of the string.  If the character cannot be found, this
+   * function returns (size_t)-1
+   */
+  virtual size_t FindLast (const char c, size_t p = (size_t)-1) const = 0;
   
   /**
    * Format this string using sprintf() formatting directives.  Automatically
    * allocates sufficient memory to hold result.  Newly formatted string
    * overwrites previous string value.
    */
-  virtual void Format (const char *format, ...) CS_GNUC_PRINTF (2, 3) = 0;
+  virtual void Format (const char* format, ...) CS_GNUC_PRINTF (2, 3) = 0;
 
   /**
    * Format this string using sprintf() formatting directives in a va_list.
    * Automatically allocates sufficient memory to hold result.  Newly
    * formatted string overwrites previous string value.
    */
-  virtual void FormatV (const char *format, va_list args) = 0;
+  virtual void FormatV (const char* format, va_list args) = 0;
 
   /// Replace contents of this string with the contents of another
-  virtual void Replace (const iString *iStr, size_t iCount = (size_t)-1) = 0;
+  virtual void Replace (const iString* iStr, size_t iCount = (size_t)-1) = 0;
 
   /// Check if two strings are equal
-  virtual bool Compare (const iString *iStr) const = 0;
+  virtual bool Compare (const iString* iStr) const = 0;
 
   /// Compare two strings ignoring case
-  virtual bool CompareNoCase (const iString *iStr) const = 0;
+  virtual bool CompareNoCase (const iString* iStr) const = 0;
 
   /// Append another string to this
-  iString &operator += (const iString &iStr)
-  { return Append (&iStr); }
+  virtual void operator += (const iString& iStr) = 0;
 
   /// Append an ASCIIZ to this string
-  iString &operator += (const char *iStr)
-  { return Append (iStr); }
+  virtual void operator += (const char* iStr) = 0;
 
   /// Concatenate two strings and return a third one
-  iString &operator + (const iString &iStr) const
-  { return Clone ()->Append (&iStr); }
+  virtual csRef<iString> operator + (const iString& iStr) const = 0;
 
-  /// Convert iString into ASCIIZ
-  operator const char * () const
-  { return GetData (); }
+  /// Get the null-terminated C string represented by this iString.
+  virtual operator char const* () const = 0;
 
   /// Check if two strings are equal
-  bool operator == (const iString &iStr) const
-  { return Compare (&iStr); }
+  virtual bool operator == (const iString &iStr) const = 0;
+
+  /// Convert string to lowercase.
+  virtual void Downcase() = 0;
+
+  /// Convert string to uppercase.
+  virtual void Upcase() = 0;
 };
 
 /** @} */
