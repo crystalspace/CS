@@ -17,7 +17,7 @@ The world is built up from the following objects:
 @dfn{Sectors}. For details, see the portal engine discussion
 (@pxref{Portal Engine}). Basically sectors define a region of space
 that can contain several geometrical objects. As opposed to earlier
-versions of Crystal Space a sector does not itself represent geometry.
+versions of Crystal Space, a sector does not itself represent geometry.
 Instead all geometry in a sector is made from @dfn{Mesh Objects}.
 Theoretically a sector is infinite although in practice it is usually
 logically bounded by sector walls or a sky object.
@@ -25,7 +25,7 @@ logically bounded by sector walls or a sky object.
 @item
 @dfn{Mesh Objects}. See the mesh object section for more specific information
 about them (@pxref{MeshObject}). Mesh objects represent geometry in some
-sector. Everything you can see (walls, actors, particle systems, ...) is
+sector. Everything you can see (walls, actors, particle systems, @dots{}) is
 represented by some kind of mesh object. This is a very important concept
 in the Crystal Space engine. Mesh objects can also be hierarchical.
 A mesh object can have several children which in turn can also have children
@@ -43,7 +43,7 @@ be hierarchical like mesh objects.
 @item
 @dfn{Portals}. Again see the portal discussion (@pxref{Portal Engine}) but
 the idea is that sectors are normally totally independent regions of
-space unless you connect them through portals. Portals are implemented
+space unless you connect them through portals. Portals are currently implemented
 inside the @dfn{Thing Mesh Object}. There you can assign a portal to some
 sector to a single polygon.
 
@@ -88,9 +88,8 @@ like. Here is a list of concepts that are related to @dfn{Things}:
 
 @itemize @bullet
 @item
-@dfn{Polygons and curves}. @dfn{Things} are made from polygons and/or
-curves. To define such an object you enumerate all polygons and curves
-that make up the geometry of such thing.
+@dfn{Polygons}. @dfn{Things} are made from polygons. To define such an
+object you enumerate all polygons that make up the geometry of such thing.
 
 @item
 @dfn{Portals}. As mention above portals are a special case of
@@ -100,11 +99,8 @@ sector in case of a mirror).
 @item
 @dfn{Texture Planes}. Polygons in a thing are texture mapped
 using a transformation from object to texture space. A texture
-plane describes this transformation. Several polygons can share
-the same texture plane which means that they will be texture mapped
-the same way. If you place two polygons with the same texture
-plane next to each other the texture will appear to continue
-without interruption from one polygon to the other.
+plane describes this transformation. You can directly specify texture
+planes but more usually you use uv mapping coordinates to do this.
 
 @end itemize
 
