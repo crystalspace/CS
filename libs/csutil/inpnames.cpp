@@ -35,6 +35,7 @@ static struct csKeyCodeDef
 {
   { "Esc",	CSKEY_ESC	},
   { "Enter",	CSKEY_ENTER	},
+  { "Return",	CSKEY_ENTER	},
   { "Tab",	CSKEY_TAB	},
   { "Back",	CSKEY_BACKSPACE },
   { "BackSpace",CSKEY_BACKSPACE },
