@@ -161,10 +161,10 @@ void csCubicSpline::PrecalculateDerivatives (int dim)
 #endif
 
 #if 1
-  d2[0] = 0;
+  d2[0] = d2[num_points-1] = 0;
   d2[1] = (d[2]-d[1]) / (time_points[2]-time_points[1]) -
   	(d[1]-d[0])/(time_points[1]-time_points[0]);
-  for (i = 1 ; i < num_points-1 ; i++)
+  for (i = 1 ; i < num_points-2 ; i++)
   {
     //float temp =
       //(d[i+1]-d[i]) / (time_points[i+1]-time_points[i]) -
