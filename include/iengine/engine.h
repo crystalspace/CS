@@ -167,6 +167,8 @@ struct iEngine : public iBase
    * you can set with the SetLightingCacheMode() function. The default
    * behaviour is to read the lightmap cache when present but don't
    * calculate lighting if cache is not present.
+   * \param meter If supplied, the meter object will be called back
+   * periodically to report the progress of engine preparation.
    */
   virtual bool Prepare (iProgressMeter* meter = 0) = 0;
 
@@ -180,6 +182,10 @@ struct iEngine : public iBase
    * <p>
    * The current flags set with SetLightingCacheMode() controls if the
    * lightmaps will be cached or not.
+   * @param region only relight objects in this region 
+   * (will relight every object in the engine by default)
+   * \param meter If supplied, the meter object will be called back
+   * periodically to report the progress of engine lighting calculation.
    */
   virtual void ForceRelight (iRegion* region = 0,
   	iProgressMeter* meter = 0) = 0;
@@ -193,6 +199,8 @@ struct iEngine : public iBase
    * <p>
    * The current flags set with SetLightingCacheMode() controls if the
    * lightmaps will be cached or not.
+   * \param light The newly added light to shine
+   * \param region If supplied, only affect objects in this region
    */
   virtual void ForceRelight (iStatLight* light, iRegion* region = 0) = 0;
 
@@ -204,6 +212,7 @@ struct iEngine : public iBase
    * <p>
    * The current flags set with SetLightingCacheMode() controls if the
    * lightmaps will be cached or not.
+   * \param light the light to remove
    */
   virtual void RemoveLight (iStatLight* light) = 0;
 
@@ -228,6 +237,10 @@ struct iEngine : public iBase
    * this function directly, because it will be called by Prepare().
    * If the optional 'region' parameter is given then only lights will
    * be recalculated for the given region.
+   * \param If supplied, only calculate lighting for lights and objects
+   * in the given region.
+   * \param meter If supplied, the meter object will be called back
+   * periodically to report the progress of engine lighting calculation.
    */
   virtual void ShineLights (iRegion* region = 0,
   	iProgressMeter* meter = 0) = 0;
@@ -242,8 +255,13 @@ struct iEngine : public iBase
   virtual void DeleteAll () = 0;
 
   /**
-   * Register a new render priority.
-   * The parameter rendsort is one of the CS_RENDPRI_... flags.
+   * Register a new render priority.  Render priorities are assigned to objects
+   * and controls the order in which objects are rendered by the engine.
+   * \param name a name to refer to this render priority
+   * \param priority a numerical priority; this is used to order the
+   * render priorities where lower numbers are rendered before higher 
+   * numbers.
+   * \param rendsort One of the CS_RENDPRI_... flags.
    * By default this is #CS_RENDPRI_NONE. The following values are possible:
    * <ul>
    * <li>#CS_RENDPRI_NONE: objects in this render priority are not sorted.
@@ -251,11 +269,17 @@ struct iEngine : public iBase
    *     camera viewpoint).
    * <li>#CS_RENDPRI_BACK2FRONT: sort objects back to front.
    * </ul>
-   * If 'do_camera' is true then this render priority will be scanned
-   * for objects that have CS_ENTITY_CAMERA flag set.
+   * \param do_camera If 'do_camera' is true then this render priority will 
+   * be scanned for objects that have CS_ENTITY_CAMERA flag set.
+   * \note The default render priorities are 'sky', 'wall', 'object' 
+   * and 'alpha' (in that priority order, where sky is rendered first and 
+   * alpha is rendered last).  Should you wish to add your own render 
+   * priority, you must call ClearRenderPriorities() and re-add the 
+   * default render priorities along with your own new priorities.
    */
   virtual void RegisterRenderPriority (const char* name, long priority,
   	int rendsort = CS_RENDPRI_NONE, bool do_camera = false) = 0;
+
   /// Get a render priority by name.
   virtual long GetRenderPriority (const char* name) const = 0;
   /// Set the render priority camera flag.
@@ -286,6 +310,10 @@ struct iEngine : public iBase
   /**
    * Create a base material that can be used to give to the texture
    * manager. Assign to a csRef or use DecRef().
+   * \param txt The texture map this material will use.
+   * \note You will need to call iMaterialWrapper::Register() and 
+   * iMaterialWrapper::GetMaterialHandler()->Prepare() on you new material
+   * if you load the material after iEngine::Prepare() has been called.
    */
   virtual csPtr<iMaterial> CreateBaseMaterial (iTextureWrapper* txt) = 0;
 
@@ -293,22 +321,59 @@ struct iEngine : public iBase
    * Create a base material that can be used to give to the texture
    * manager. This version also supports texture layers.
    * Assign to a csRef or use DecRef().
+   * \param txt the base texture (lowermost texture layer)
+   * \param num_layers the number of texture layers supplid in 
+   * the next parameter
+   * \param wrappers an array of pointers to iTextureWrapper objects,
+   * supplying the texture to use for each texture layer
+   * \param layers an array of csTextureLayer structures cooresponding
+   * to each texture layer and describing how the layer is aligned and blended
+   * with the layers beneath it.
+   * \see CreateBaseMaterial(iTextureWrapper* txt) note about registering/preparing materials.
    */
   virtual csPtr<iMaterial> CreateBaseMaterial (iTextureWrapper* txt,
   	int num_layers, iTextureWrapper** wrappers, csTextureLayer* layers) = 0;
 
-  /// Create a texture from a file.
+  /** Create a texture from a file.
+   * \param name The name to use for this texture in the engine
+   * \param fileName the filename (on the VFS!) of the texture to load
+   * \param transp pixels in the image with this key color will be considered
+   * transparent instead of being drawn
+   * \param flags One or more texturing flags OR'd together, flag include
+   * <ul>
+   * <li>CS_TEXTURE_2D image will be used only for 2D drawing
+   * <li>CS_TEXTURE_3D image will be textured onto 3D polygon (*** usually the flag you want)
+   * <li>CS_TEXTURE_DITHER texture is dithered before use (?)
+   * <li>CS_TEXTURE_NOMIPMAP texture will not be mipmapped before use (?)
+   * </ul>
+   * \note You will need to call iTextureWrapper::Register() and 
+   * iTextureWrapper::GetTextureHandler()->Prepare() on you new texture
+   * if you load the texture after iEngine::Prepare() has been called.
+   */
   virtual iTextureWrapper* CreateTexture (const char *name,
   	const char *fileName, csColor *transp, int flags) = 0;
-  /// Create a black texture. This is mostly useful for procedural textures.
+
+  /** Create a black texture. This is mostly useful for procedural textures.
+   * \param name The name to use for this texture in the engine
+   * \param w the texture width (must be a power of 2, eg 64, 128, 256, 512...)
+   * \param h the texture height (must be a power of 2, eg 64, 128, 256, 512...)
+   * \param transp pixels in the image with this key color will be considered
+   * transparent instead of being drawn
+   * \param iFlags see CreateTexture()
+   * \see CreateTexture() note about registering/preparing textures.
+   */
   virtual iTextureWrapper* CreateBlackTexture (const char *name,
 	int w, int h, csColor *iTransp, int iFlags) = 0;
 
-  /// Register a material to be loaded during Prepare()
+  /** Register a material to be loaded during Prepare()
+    \param name the engine name for this material
+    \param the texture to use for this material
+   */
   virtual iMaterialWrapper* CreateMaterial (const char *name,
   	iTextureWrapper* texture) = 0;
   /**
    * Create a empty sector with given name.
+   * \param name the sector name
    */
   virtual iSector *CreateSector (const char *name) = 0;
 
@@ -319,15 +384,20 @@ struct iEngine : public iBase
    * by the polygons of this object) and have 'wall' as render
    * priority. This version creates a mesh wrapper.
    * Assign to a csRef or use DecRef().
+   * \param sector the sector to add walls to
+   * \param name the engine name of the walls mesh that will be created
    */
   virtual csPtr<iMeshWrapper> CreateSectorWallsMesh (iSector* sector,
       const char* name) = 0;
+
   /**
    * Convenience function to create a thing mesh in a sector.
    * This mesh will have #CS_ZBUF_USE set (use Z-buffer fully)
    * and have 'object' as render priority. This means this function
    * is useful for general objects.
    * Assign to a csRef or use DecRef().
+   * \param sector the sector to add the object to
+   * \param name the engine name of the mesh that will be created
    */
   virtual csPtr<iMeshWrapper> CreateThingMesh (iSector* sector,
   	const char* name) = 0;
@@ -353,6 +423,7 @@ struct iEngine : public iBase
    * Create a new region and add it to the region list.
    * If the region already exists then this function will just
    * return the pointer to that region.
+   * \param name the engine name for the region
    */
   virtual iRegion* CreateRegion (const char* name) = 0;
   /// Get the list of all regions
@@ -367,6 +438,8 @@ struct iEngine : public iBase
    * this function will only look in the specified region and return
    * 0 if that region doesn't contain the object or the region
    * doesn't exist. In this case the region parameter is ignored.
+   * \param name the engine name of the desired material
+   * \param region if specified, search only this region (also see note above)
    */
   virtual iMaterialWrapper* FindMaterial (const char* name,
   	iRegion* region = 0) = 0;
@@ -379,9 +452,12 @@ struct iEngine : public iBase
    * this function will only look in the specified region and return
    * 0 if that region doesn't contain the object or the region
    * doesn't exist. In this case the region parameter is ignored.
+   * \param name the engine name of the desired texture
+   * \param region if specified, search only this region (also see note above)
    */
   virtual iTextureWrapper* FindTexture (const char* name,
   	iRegion* region = 0) = 0;
+
   /**
    * Find the given sector. The name can be a normal
    * name. In that case this function will look in all regions
@@ -391,9 +467,12 @@ struct iEngine : public iBase
    * this function will only look in the specified region and return
    * 0 if that region doesn't contain the object or the region
    * doesn't exist. In this case the region parameter is ignored.
+   * \param name the engine name of the desired sector
+   * \param region if specified, search only this region (also see note above)
    */
   virtual iSector* FindSector (const char* name,
   	iRegion* region = 0) = 0;
+
   /**
    * Find the given mesh object. The name can be a normal
    * name. In that case this function will look in all regions
@@ -403,6 +482,8 @@ struct iEngine : public iBase
    * this function will only look in the specified region and return
    * 0 if that region doesn't contain the object or the region
    * doesn't exist. In this case the region parameter is ignored.
+   * \param name the engine name of the desired mesh
+   * \param region if specified, search only this region (also see note above)
    */
   virtual iMeshWrapper* FindMeshObject (const char* name,
   	iRegion* region = 0) = 0;
@@ -415,6 +496,8 @@ struct iEngine : public iBase
    * this function will only look in the specified region and return
    * 0 if that region doesn't contain the object or the region
    * doesn't exist. In this case the region parameter is ignored.
+   * \param name the engine name of the desired mesh factory
+   * \param region if specified, search only this region (also see note above)
    */
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name,
   	iRegion* region = 0) = 0;
@@ -427,6 +510,8 @@ struct iEngine : public iBase
    * this function will only look in the specified region and return
    * 0 if that region doesn't contain the object or the region
    * doesn't exist. In this case the region parameter is ignored.
+   * \param name the engine name of the desired camera position
+   * \param region if specified, search only this region (also see note above)
    */
   virtual iCameraPosition* FindCameraPosition (const char* name,
   	iRegion* region = 0) = 0;
@@ -439,6 +524,8 @@ struct iEngine : public iBase
    * this function will only look in the specified region and return
    * 0 if that region doesn't contain the object or the region
    * doesn't exist. In this case the region parameter is ignored.
+   * \param name the engine name of the desired collection
+   * \param region if specified, search only this region (also see note above)
    */
   virtual iCollection* FindCollection (const char* name,
   	iRegion* region = 0) = 0;
@@ -446,7 +533,7 @@ struct iEngine : public iBase
   /**
    * Set the mode for the lighting cache (combination of CS_ENGINE_CACHE_???).
    * Default is #CS_ENGINE_CACHE_READ | #CS_ENGINE_CACHE_NOUPDATE.
-   * <ul>
+   * \param mode <ul>
    * <li>#CS_ENGINE_CACHE_READ: Read the cache.
    * <li>#CS_ENGINE_CACHE_WRITE: Write the cache.
    * <li>#CS_ENGINE_CACHE_NOUPDATE: Don't update lighting automatically
@@ -457,12 +544,14 @@ struct iEngine : public iBase
    * </ul>
    */
   virtual void SetLightingCacheMode (int mode) = 0;
+
   /// Get the mode for the lighting cache.
   virtual int GetLightingCacheMode () = 0;
 
   /**
    * Set the thresshold (in number of polygons) after which the thing
-   * mesh plugin will automatically switch to FASTMESH mode. If the number
+   * mesh plugin will automatically switch to FASTMESH mode.
+   * \param th If the number
    * of polygons is greater or equal compared to this thresshold then
    * CS_THING_FASTMESH will be made default. 500 is the default.
    */
@@ -479,6 +568,8 @@ struct iEngine : public iBase
    * By default this flag is false. It is useful to set this flag to true
    * if you have a level that doesn't itself have another way to initialize
    * the Z-buffer.
+   * \param yesno true to clear the Z buffer after each frame, 
+   * false to leave the zbuffer as-is
    */
   virtual void SetClearZBuf (bool yesno) = 0;
 
@@ -486,6 +577,7 @@ struct iEngine : public iBase
    * Get the value of the clear Z-buffer flag set with SetClearZBuf().
    */
   virtual bool GetClearZBuf () const = 0;
+
   /// Get default clear z-buffer flag.
   virtual bool GetDefaultClearZBuf () const = 0;
 
@@ -498,6 +590,8 @@ struct iEngine : public iBase
    * By default this flag is false. It is useful to set this flag to true
    * if you have a level that doesn't itself have another way to initialize
    * the screen.
+   * \param yesno true to clear the screen before each frame, 
+   * false to leave the screen as-is (which may leave garbage on the screen)
    */
   virtual void SetClearScreen (bool yesno) = 0;
 
@@ -505,20 +599,36 @@ struct iEngine : public iBase
    * Get the value of the clear screen flag set with SetClearScreen().
    */
   virtual bool GetClearScreen () const = 0;
+
   /// Get default clear screen flag
   virtual bool GetDefaultClearScreen () const = 0;
 
   /**
    * Set the maximum lightmap dimensions. Polys with lightmaps larger than
-   * this are not lit.
+   * this are not lit.  
+   * \param w lightmap width 
+   * \param h lightmap height
+   * \see GetLightmapsRequirePO2()
    */
   virtual void SetMaxLightmapSize(int w, int h) = 0;
-  /// Retrieve maximum lightmap size
+
+  /** Retrieve maximum lightmap size.
+   * \param w lightmap width
+   * \param h lightmap height
+   * \see GetLightmapsRequirePO2()
+  */
   virtual void GetMaxLightmapSize(int& w, int& h) = 0;
-  /// Retrieve default maximum lightmap size
+
+  /** Retrieve default maximum lightmap size.  
+   * \param w lightmap width
+   * \param h lightmap height
+   * \see GetLightmapsRequirePO2()
+  */
   virtual void GetDefaultMaxLightmapSize(int& w, int& h) = 0;
+
   /// Get a boolean which indicates if power of two lightmaps are required.
   virtual bool GetLightmapsRequirePO2 () const = 0;
+
   /// Get the maximum aspect ratio for lightmaps.
   virtual int GetMaxLightmapAspectRatio () const = 0;
   
@@ -527,7 +637,7 @@ struct iEngine : public iBase
    * another) to its defaults. This currently includes:
    *   - clear z buffer flag
    *   - lightmap cell size
-   *   - maximum lighmap size
+   *   - maximum lightmap size
    */
   virtual void ResetWorldSpecificSettings() = 0;  
 
@@ -536,23 +646,38 @@ struct iEngine : public iBase
    * Assign to a csRef or use DecRef().
    */
   virtual csPtr<iCamera> CreateCamera () = 0;
+
   /**
-   * Create a static/pseudo-dynamic light. name can be 0.
+   * Create a static/pseudo-dynamic light.
    * Assign to a csRef or use DecRef().
+   * \param name the engine name for this light (may be 0)
+   * \param pos the position of this light in world coordinates
+   * \param radius the maximum distance at which this light will affect
+   * objects 
+   * \param color the color of this light (also affects light intensity)
+   * \param pseudoDyn create a pseudo-dynamic light 
+   * (an unmoving light which can efficiently change intensity or color)
    */
   virtual csPtr<iStatLight> CreateLight (const char* name, const csVector3& pos,
   	float radius, const csColor& color, bool pseudoDyn) = 0;
-  /// Find a static/pseudo-dynamic light by name.
+
+  /** Find a static/pseudo-dynamic light by name.
+   * \param Name the engine name of the desired light
+   * \param RegionOnly (parameter presently unused)
+   */
   virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false)
     const = 0;
+
   /**
-   * Find a static/pseudo-dynamic light by id. An ID is a 16-byte MD5
-   * checksum for the light.
+   * Find a static/pseudo-dynamic light by id. 
+   * \param light_id a 16-byte MD5 checksum for the light.
    */
   virtual iStatLight* FindLightID (const char* light_id) const = 0;
+
   /**
    * Create an iterator to iterate over all static lights of the engine.
    * Assign to a csRef or use DecRef().
+   * \param region only iterate over the lights in this region                     * (otherwise iterate over all lights)
    */
   virtual csPtr<iLightIterator> GetLightIterator (iRegion* region = 0) = 0;
 
@@ -563,11 +688,19 @@ struct iEngine : public iBase
    * You also have to call Setup() on the dynamic light to actually calculate
    * the lighting. This must be redone everytime the radius or the position
    * changes (but not the color).
+   * \param pos the position of the light in the sector
+   * \param radius the greatest distance at which this light will 
+   * affect an object 
+   * \param color the color of the light (also affects intensity)
    */
   virtual csPtr<iDynLight> CreateDynLight (const csVector3& pos, float radius,
   	const csColor& color) = 0;
-  /// Remove a dynamic light.
-  virtual void RemoveDynLight (iDynLight*) = 0;
+
+  /** Remove a dynamic light.
+   * \param light light to remove
+   */
+  virtual void RemoveDynLight (iDynLight* light) = 0;
+
   /// Return the first dynamic light in this engine.
   virtual iDynLight* GetFirstDynLight () const = 0;
 
@@ -586,14 +719,16 @@ struct iEngine : public iBase
 
   /**
    * Convenience function to create a mesh factory from a given type.
-   * The type plugin will only be loaded if needed. 'classId' is the
-   * SCF name of the plugin (like 'crystalspace.mesh.object.cube').
-   * Returns 0 on failure. The factory will be registered with the engine
+   * \param classId the SCF name of the plugin 
+   * (like 'crystalspace.mesh.object.ball'). The type plugin will only 
+   * be loaded if needed. 
+   * \param name The factory will be registered with the engine
    * under the given name. If there is already a factory with that name
    * no new factory will be created but the found one is returned instead.
    * If the name is 0 then no name will be set and no check will happen
    * if the factory already exists.
-   * Assign to a csRef or use DecRef().
+   * \return 0 on failure; you must assign the result to a csRef or 
+   * use DecRef().
    */
   virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* classId,
   	const char* name) = 0;
@@ -601,27 +736,36 @@ struct iEngine : public iBase
   /**
    * Create a mesh factory wrapper for an existing mesh factory
    * Assign to a csRef or use DecRef().
+   * \param factory the mesh factory to be wrapped, the engine doesn't
+   * "know" about a mesh factory until associated with a FactoryWrapper
+   * \param name the engine name for the factory wrapper
    */
-  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (iMeshObjectFactory *,
+  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (iMeshObjectFactory * factory,
   	const char* name) = 0;
 
   /**
    * Create an uninitialized mesh factory wrapper
    * Assign to a csRef or use DecRef().
+   * \param name the engine name for the factory wrapper
    */
   virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* name) = 0;
 
   /**
    * Create a loader context that you can give to loader plugins.
-   * It will basically allow loader plugins to find materials, ...
-   * If region != 0 and curRegOnly == true then only that region will
-   * be searched. Assign to a csRef or use DecRef().
+   * It will basically allow loader plugins to find materials.
+   * \param region optional loader region
+   * \param curRegOnly if region is valid and and curRegOnly is true 
+   * then only that region will be searched. 
+   * Assign to a csRef or use DecRef().
    */
   virtual csPtr<iLoaderContext> CreateLoaderContext (
   	iRegion* region = 0, bool curRegOnly = true) = 0;
 
   /**
    * Convenience function to load a mesh factory from a given loader plugin.
+   * \param name engine name for the mesh factory
+   * \param loaderClassId the SCF class name of the desired mesh factory plugin
+   * \param input data to initialize the mesh factory (plugin-specific)
    * Assign to a csRef or use DecRef().
    */
   virtual csPtr<iMeshFactoryWrapper> LoadMeshFactory (
@@ -630,36 +774,60 @@ struct iEngine : public iBase
 
   /**
    * Convenience function to create a mesh object for a given factory.
+   * 
+   * \param factory the factory that will produce this mesh
+   * \param name The engine name for the mesh wrapper; may be null.  
+   * Different mesh objects can have the same name (in contrast 
+   * with factory objects).
+   * \param sector the sector to initially place this mesh in
    * If 'sector' is 0 then the mesh object will not be set to a position.
-   * Returns 0 on failure. The object will be given the specified name.
-   * 'name' can be 0 if no name is wanted. Different mesh objects can
-   * have the same name (in contrast with factory objects).
-   * Assign to a csRef or use DecRef().
+   * \param pos the position in the sector
+   * \return The meshwrapper on success (assign to a csRef or use DecRef()),
+   * or 0 on failure.
    */
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshFactoryWrapper* factory,
   	const char* name, iSector* sector = 0,
 	const csVector3& pos = csVector3(0, 0, 0)) = 0;
+
   /**
    * Create a mesh wrapper for an existing mesh object.
-   * Assign to a csRef or use DecRef().
+   * \param meshobj the mesh object
+   * \param name The engine name for the mesh wrapper; may be null.  
+   * Different mesh objects can have the same name (in contrast 
+   * with factory objects).
+   * \param sector the sector to initially place this mesh in
+   * If 'sector' is 0 then the mesh object will not be set to a position.
+   * \param pos the position in the sector
+   * \return The meshwrapper on success (assign to a csRef or use DecRef()),
+   * or 0 on failure.
    */
-  virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshObject*,
+  virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshObject* meshobj,
   	const char* name, iSector* sector = 0,
 	const csVector3& pos = csVector3(0, 0, 0)) = 0;
+
   /**
    * Create a mesh wrapper from a class id.
-   * The type plugin will only be loaded if needed. 'classId' is the
-   * SCF name of the plugin (like 'crystalspace.mesh.object.cube').
    * This function will first make a factory from the plugin and then
    * see if that factory itself implements iMeshObject too. This means
    * this function is useful to create thing mesh objects (which are both 
    * factory and object at the same time). If that fails this function
    * will call NewInstance() on the factory and return that object then.
-   * Assign to a csRef or use DecRef().
+   * \param classid The SCF name of the plugin 
+   * (like 'crystalspace.mesh.object.ball').  The type plugin will only 
+   * be loaded if needed.
+   * \param name The engine name for the mesh wrapper; may be null.  
+   * Different mesh objects can have the same name (in contrast 
+   * with factory objects).
+   * \param sector the sector to initially place this mesh in
+   * If 'sector' is 0 then the mesh object will not be set to a position.
+   * \param pos the position in the sector
+   * \return The meshwrapper on success (assign to a csRef or use DecRef()),
+   * or 0 on failure.
    */
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* classid,
   	const char* name, iSector* sector = 0,
 	const csVector3& pos = csVector3(0, 0, 0)) = 0;
+
   /**
    * Create an uninitialized mesh wrapper
    * Assign to a csRef or use DecRef().
@@ -668,8 +836,17 @@ struct iEngine : public iBase
 
   /**
    * Convenience function to load a mesh object from a given loader plugin.
-   * If sector == 0 the object will not be placed in a sector.
-   * Assign to a csRef or use DecRef().
+   * \param name The engine name for the mesh wrapper; may be null.  
+   * Different mesh objects can have the same name (in contrast 
+   * with factory objects).
+   * \param loaderClassId the SCF class of the loader to use to 
+   * create the meshwrapper
+   * \param input data passed to the loader to generate the mesh
+   * \param sector the sector to initially place this mesh in
+   * If 'sector' is 0 then the mesh object will not be set to a position.
+   * \param pos the position in the sector
+   * \return The meshwrapper on success (assign to a csRef or use DecRef()),
+   * or 0 on failure.
    */
   virtual csPtr<iMeshWrapper> LoadMeshWrapper (
   	const char* name, const char* loaderClassId,

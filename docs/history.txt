@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 4-Sep-2003
+	- Peter Amstutz added new API documentation for the
+          parameters of about 75% of the methods defined in iEngine
 	- Jorrit updated the collision detection howto and also clarified
 	  a Doxygen comment about the need to call ResetCollisionPairs().
 	- Jorrit reverted data/shader/vertexlight.avp because with revision
