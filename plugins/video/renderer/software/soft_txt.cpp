@@ -1189,7 +1189,7 @@ STDMETHODIMP csTextureManagerSoftware::Prepare ()
     if (txt->for_3d ()) txt->create_mipmaps (this);
     txt->free_usage_table ();
   }
-  if (verbose) SysPrintf (MSG_INITIALIZATION, "DONE!\n");
+  if (verbose) SysPrintf (MSG_INITIALIZATION, "DONE\n");
 
   return S_OK;
 }
