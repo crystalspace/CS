@@ -17,7 +17,7 @@ CMD.RUNMAKEINFO ?= "$(SHELL) $(TOP)/docs/support/runmakeinfo.sh" ;
 ##    Convert texinfo into another format
 rule Texinfo
 {
-  local dir = [ FDirName $(LOCATE.DOCS) $(SUBDIR_TOKENS) $(4) ] ;
+  local dir = [ FDirName $(LOCATE.DOCS) $(4) ] ;
   
   MkDir $(dir) ;
   Depends $(<) : $(dir) ;
@@ -41,7 +41,7 @@ CMD.RUNTEXI2DVI ?= "$(SHELL) $(TOP)/docs/support/runtexi2dvi.sh" ;
 ##    Creates dvi out of the texifile
 rule Texi2DVI
 {
-  local dir = [ FDirName $(LOCATE.DOCS) $(SUBDIR_TOKENS) $(3) ] ;
+  local dir = [ FDirName $(LOCATE.DOCS) $(3) ] ;
   local target = $(>:R=$(dir):S=.dvi) ;
 
   Depends $(<) : $(target) ;
@@ -60,11 +60,11 @@ rule Texi2DVI
 if $(CMD.DVIPS)
 {
 
-##  Texi2DVI targetname : texifile [ : subdir ]
-##    Creates ps out of the texifile              
+##  Texi2PS targetname : texifile [ : subdir ]
+##    Creates PostScript out of the texifile              
 rule Texi2PS
 {
-    local dir = [ FDirName $(LOCATE.DOCS) $(SUBDIR_TOKENS) $(3) ] ;
+    local dir = [ FDirName $(LOCATE.DOCS) $(3) ] ;
     local dvitarget = $(>:R=$(dir):S=.dvi) ;
     local target = $(>:R=$(dir):S=.ps) ;
     
@@ -89,9 +89,11 @@ rule Texi2PS
 if $(CMD.DVIPDF)
 {
 
+##  Texi2PDF targetname : texifile [ : subdir ]
+##    Creates PDF out of the texifile              
 rule Texi2PDF
 {
-    local dir = [ FDirName $(LOCATE.DOCS) $(SUBDIR_TOKENS) $(3) ] ;
+    local dir = [ FDirName $(LOCATE.DOCS) $(3) ] ;
     local dvitarget = $(>:R=$(dir):S=.dvi) ;
     local target = $(>:R=$(dir):S=.pdf) ;
     
@@ -126,7 +128,7 @@ rule Texi2HTML
   SEARCH on $(>) = $(SUBDIR) ;
 
   # Create Output directory
-  local dir = [ FDirName $(LOCATE.DOCS) $(SUBDIR_TOKENS) $(3) ] ;
+  local dir = [ FDirName $(LOCATE.DOCS) $(3) ] ;
   DOCDIR_$(<) = $(dir) ;
   Depends $(<) : $(dir) ;
   MkDir $(dir) ;
@@ -143,11 +145,11 @@ rule Texi2HTML
 if $(CMD.TEXI2PDF)
 {
 
-##  Texi2DVI targetname : texifile [ : subdir ]
+##  Texi2PDF targetname : texifile [ : subdir ]
 ##    Creates pdf out of the texifile
 rule Texi2PDF
 {
-  local dir = [ FDirName $(LOCATE.DOCS) $(SUBDIR_TOKENS) $(3) ] ;    
+  local dir = [ FDirName $(LOCATE.DOCS) $(3) ] ;    
   local target = $(>:R=$(dir):S=.pdf) ;
 
   Depends $(<) : $(target) ;
@@ -175,7 +177,7 @@ rule DoxyGen
   SEARCH on $(>) = $(SUBDIR) ;
 
   # Create Output directory
-  local dir = [ FDirName $(LOCATE.DOCS) $(SUBDIR_TOKENS) $(3) ] ;
+  local dir = [ FDirName $(LOCATE.DOCS) $(3) ] ;
   DOCDIR_$(<) = $(dir) ; 
   Depends $(<) : $(dir) ;
   MkDir $(dir) ;

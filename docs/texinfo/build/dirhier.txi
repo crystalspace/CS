@@ -69,12 +69,12 @@ automatically converted to @sc{html} which is more accessible to the general
 user.  Documentation writers and maintainers may be interested in this
 directory.
 
-@item CS/docs/html
+@item CS/docs/html/manual
 This directory contains the @sc{html} conversion of the Texinfo Crystal Space
-documentation.  Most users will want to look at the file
-@file{CS/docs/html/index.html} that resides here.
+manual.  Most users will want to look at the file
+@file{CS/docs/html/manual/index.html}.
 
-@item CS/docs/pubapi
+@item CS/docs/html/api
 This directory contains the Crystal Space @sc{sdk}'s public @sc{api} reference
 manual rendered in @sc{html} format.
 

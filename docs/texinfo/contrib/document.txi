@@ -10,22 +10,22 @@ contributing to the documentation project.
 
 These guidelines deal with subdivision of the documentation into files, into
 chapters and sections, and with node placing and linking.  To understand this
-document, you should know that 'chapters' is the general division of a Texinfo
-file into several parts, and 'sections' is the next subdivision.  @sc{ToC}
-means ``Table of Contents''.  ``folder'' and ``directory'' have the expected
-meaning.
+document, you should know that @dfn{chapters} is the general division of a
+Texinfo file into several parts, and @dfn{sections} is the next subdivision.
+@dfn{ToC} means ``Table of Contents''.  ``folder'' and ``directory'' have the
+expected meaning.
 
 Please follow these guidelines when writing documentation for Crystal Space.
 
 @subsubheading General
 
 Write documentation using the Texinfo mark-up language. You can get more
-information at @uref{http://www.texinfo.org}.
+information at @uref{http://www.texinfo.org/}.
 
 The documentation is converted from Texinfo to other formats, such as
 @sc{html}. Conversion to most important formats happens automatically within
-the @sc{cvs} repository, so you only have to commit the Texinfo docs if you
-make any changes.
+the @sc{cvs} repository by an automated mechanism, so you only have to commit
+the Texinfo docs if you make any changes.
 
 To make writing the documentation easier, @samp{@@node} and @samp{@@menu}
 directives in the Texinfo sources can be repaired, which means that the
@@ -35,12 +35,12 @@ can safely write the following line, omitting the various links which the
 
 @example
 @@node MySection
-@@section MySection
+@@section My Section Title
 @end example
 
-The repair occurs automatically within the @sc{cvs} repository on a daily
-basis.  You can also repair the files manually if you use the @sc{gnu} makefile
-system by invoking the following command:
+The repair occurs automatically within the @sc{cvs} repository by an automated
+mechanism, however you can also repair the files manually if you use the
+@sc{gnu} makefile system by invoking the following command:
 
 @example
 make repairdoc
@@ -50,33 +50,33 @@ make repairdoc
 
 If you are using the @sc{gnu} makefile system, you can use the following
 makefile targets to convert the Texinfo documents to different formats.
-The output will be placed in subdirectories of @file{CS/out/docs/}.
+The output will be placed in subdirectories of @file{$@{builddir@}/out/docs/}.
 
 @table @code
-@item make pubapi
-Create public @sc{api} reference via Doxygen.  This is the reference manual
-for people using Crystal Space in their own projects.  It only documents
-public classes and functions.
+@item make apihtml
+Generate @sc{html} version of public @sc{api} reference via Doxygen.  This is
+the reference manual for people using Crystal Space in their own projects.  It
+only documents public classes and functions.
 
-@item make devapi
-Create developer @sc{api} reference via Doxygen.  This is the reference
-manual for people actually working on Crystal Space itself.  It documents all
-classes and functions.
+@item make apidevhtml
+Generate @sc{html} version of developer @sc{api} reference via Doxygen.  This
+is the reference manual for people actually working on Crystal Space itself. 
+It documents all classes and functions.
 
-@item make htmldoc
-Convert the user's manual to @sc{html} format.
+@item make manualhtml
+Convert the Crystal Space manual to @sc{html} format.
 
-@item make dvidoc
-Convert the user's manual to @sc{dvi} format.
+@item make manualdvi
+Convert the Crystal Space manual to @sc{dvi} format.
 
-@item make psdoc
-Convert the user's manual to @emph{PostScript} format.
+@item make manualps
+Convert the Crystal Space manual to PostScript format.
 
-@item make pdfdoc
-Convert the user's manual to @sc{pdf} format.
+@item make manualpdf
+Convert the Crystal Space manual to @sc{pdf} format.
 
-@item make infodoc
-Convert the user's manual to @emph{Info} format.
+@item make manualinfo
+Convert the Crystal Space manual to @sc{gnu} Info format.
 
 @item make repairdoc
 Repair all @samp{@@node} and @samp{@@menu} directives in the Texinfo sources.
@@ -84,35 +84,6 @@ Repair all @samp{@@node} and @samp{@@menu} directives in the Texinfo sources.
 @item make cleandoc
 Delete all converted documents.
 @end table
-
-@subsubheading Manual Conversion
-
-Manual conversion to @sc{html} is done with the Perl script @file{texi2html}.
-This script is already included in the Crystal Space package in the
-@file{CS/bin} directory.  If you are using the @sc{gnu} make system, then you
-can run the script by invoking the @samp{htmldoc} makefile target.
-
-@example
-make htmldoc
-@end example
-
-If you do not use the @sc{gnu} makefile system, then you can run the script
-manually with the following line.  This example assumes that your current
-working directory is @file{CS/}.
-
-@example
-mkdir out
-mkdir out/docs
-mkdir out/docs/html
-cd docs/texinfo
-perl ../../docs/support/texi2html -init_file \
-  ../support/texi2html.init -prefix cs \
-  -subdir ../../out/docs/html cs-unix.txi
-@end example
-
-The @samp{-subdir} option controls where the output files are placed.  Replace
-@file{cs-unix.txi} by @file{cs-dos.txi} or @file{cs-mac.txi} for
-Windows/@sc{dos} or Macintosh (HFS) systems, respectively.
 
 @subsubheading Directory Structure
 
@@ -156,7 +127,9 @@ Here are some general formatting conventions.
 @itemize @bullet
 @item
 When creating @code{@@itemize} lists, one blank line should separate each
-@code{@@item} except for short lists of items with short descriptions.
+@code{@@item} except for short lists of items with short descriptions.  Also
+remember to use the @code{@@bullet} directive after the @code{@@itemze}
+directive, as in @code{@@itemize @@bullet}.
 
 @item
 Do not indent the text of items within @code{@@itemize} or
@@ -175,6 +148,11 @@ int Increment(int n)
 
 Then you may, of course, indent the @samp{return} line, but not the other
 lines.
+
+@item
+Do not use tabs to indent code in @code{@@example} blocks since the formatting
+tools do not faithfully reproduce the tab's indentation.  Instead, always
+indent using spaces.
 
 @item
 Attempt to keep the content of Texinfo source files under 80-columns in width

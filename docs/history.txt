@@ -34,6 +34,53 @@ chronological order.
 	  the Perl and Python checks.  This should help to prevent build
 	  problems on MSYS/Mingw and Cygwin since the backslashes tended to get
 	  interpreted as escapes at inappropriate times.
+	- Eric Sunshine made the following documentation-related changes:
+	    - Normalized the stored documentation locations so that they are
+	      now organized by output format and type:
+		CS/docs/html/manual (was CS/docs/html)
+		CS/docs/html/api    (was CS/docs/pubapi)
+	      If, in the future, we decide to store an 'info' conversion of the
+	      manual, for example, it would be placed in CS/docs/info/manual.
+	    - Normalized the location of the documentation when installed via
+	      GNU make so that it reflects the above layout:
+	        ${prefix}/crystal/docs/html/manual (was crystal/docs/html)
+	        ${prefix}/crystal/docs/html/api    (was crystal/docs/pubapi)
+	      This better mirrors the way documentation is installed by the Jam
+	      build system.
+	    - Normalized the built documentation locations for both Jam and GNU
+	      make so that they mirror the above layouts:
+	        ${builddir}/out/docs/html/api
+	        ${builddir}/out/docs/html/apidev
+	        ${builddir}/out/docs/html/manual
+	        ${builddir}/out/docs/info/manual
+	        ${builddir}/out/docs/dvi/manual
+	        ${builddir}/out/docs/ps/manual
+	        ${builddir}/out/docs/pdf/manual
+	    - Normalized the documentation build target names in both Jam and
+	      GNU make so that they reflect the documentation which is being
+	      built and the output format:
+	        manualhtml (was htmldoc)
+		manualinfo (was infodoc)
+		manualdvi  (was dvidoc)
+		manualps   (was psdoc)
+		manualpdf  (was pdfdoc)
+		manualchm  (was chmsupp)
+		apihtml    (was pubapi)
+		apichm	   (was chmsupp)
+		apidevhtml (was devapi)
+	    - Fixed a lot of shell programming portability problems in the Jam
+	      build's docs/support/runmakeinfo.sh, runtexi2dvi.sh, and
+	      runtexi2html.sh scripts which caused documentation generation to
+	      crash and burn horribly on some platforms.
+	    - Fixed docs.mak so that it respects the discoveries of configure
+	      rather than hard-coding texi2dvi, dvips, and makeinfo.
+	    - Fixed bug in docs.mak where building public and developer API
+	      references failed if build directory was not the same as source
+	      directory.
+	    - Eliminated some convolution from docs.mak by utilizing the
+	      relatively new $(MKDIRS) and $(SRCDIR) variables.  (These
+	      variables did not exist when docs.mak was created, thus the
+	      convolution was necessary at that time.)
 14-Feb-2004
 	- Norman Kraemer added an ALSA sound driver.  It can be used if you
 	  disabled OSS emulation in your ALSA configuration.

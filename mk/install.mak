@@ -15,8 +15,8 @@
 # TO_INSTALL.INCLUDE: does not exist, the entire include/ hierarchy is copied
 #    to include/.  (max 6 levels deep)
 # TO_INSTALL.DOCS: also does not exist, the docs/html dir is copied (all html)
-#    to docs/html, as well as all subdirs (6 deep) with gif, jpg, png; also
-#    docs/README.html is copied, and docs/pubapi is copied (all html, gif, css).
+#    to docs/html, as well as all subdirs (8 deep) with gif, jpg, png, css;
+#    also docs/README.html is copied.
 # TO_INSTALL.SCRIPTS: does not exist. scripts/python is copied.
 #==============================================================================
 
@@ -69,7 +69,8 @@ ifeq ($(DO_INSTALL),yes)
 
 INSTALL_LOG = $(INSTALL_DIR)/install.log
 
-INSTALL_DEPTH=* */* */*/* */*/*/* */*/*/*/* */*/*/*/*/*
+INSTALL_DEPTH=* */* */*/* */*/*/* */*/*/*/* */*/*/*/*/* */*/*/*/*/*/* \
+  */*/*/*/*/*/*/*
 
 # For the 'include/' hierarchy, only the header files detected here
 # will be copied
@@ -83,18 +84,18 @@ INSTALL_INCLUDE.DIR = $(addprefix $(INSTALL_DIR)/,$(patsubst %/,%,$(sort \
 INSTALL_INCLUDE.DESTFILES = $(addprefix $(INSTALL_DIR)/, \
   $(patsubst %/,%,$(sort $(subst $(SRCDIR)/,,$(INSTALL_INCLUDE.FILES)))))
 
-# Install docs/html into INSTALL_DIR/docs/html, docs/pubapi to
-# INSTALL_DIR/docs/pubapi and copy docs/README.html & docs/history.{txt|old}.
+# Install docs/html into INSTALL_DIR/docs/html, copy docs/README.html &
+# docs/history.{txt|old}.
 INSTALL_DOCS.FILES = \
   $(SRCDIR)/docs/README.html \
   $(SRCDIR)/docs/history.txt \
   $(SRCDIR)/docs/history.old \
-  $(wildcard $(SRCDIR)/docs/html/*.html \
+  $(wildcard $(SRCDIR)/docs/html/*/*.html \
     $(addprefix $(SRCDIR)/docs/html,\
       $(addsuffix .jpg,$(INSTALL_DEPTH)) \
       $(addsuffix .gif,$(INSTALL_DEPTH)) \
-      $(addsuffix .png,$(INSTALL_DEPTH))) \
-    $(addprefix $(SRCDIR)/docs/pubapi/,*.html *.gif *.css))
+      $(addsuffix .png,$(INSTALL_DEPTH)) \
+      $(addsuffix .css,$(INSTALL_DEPTH))))
 INSTALL_DOCS.DIR = $(addprefix $(INSTALL_DIR)/, \
   $(patsubst %/,%,$(sort $(dir $(subst $(SRCDIR)/,,$(INSTALL_DOCS.FILES))))))
 INSTALL_DOCS.DESTFILES = $(addprefix $(INSTALL_DIR)/, \

@@ -33,7 +33,7 @@ Summary: Documentation for Crystal Space free 3D SDK
 Group: Application/Development
 Provides:       %{name}-doc = %{version}-%{release}
 %description -n %{name}-doc
-Documentations (user man and pubapi) for CrystalSpace free 3D SDK.
+Documentation (manual and public API reference) for CrystalSpace free 3D SDK.
 
 %prep
 %setup -n CS

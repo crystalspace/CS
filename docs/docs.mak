@@ -1,7 +1,7 @@
 #==============================================================================
 #
 #    Documentation generation makefile
-#    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
+#    Copyright (C) 2000-2004 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or
 #    modify it under the terms of the GNU Library General Public
@@ -30,15 +30,16 @@
 #------------------------------------------------------------------------------
 
 # Target descriptions
-DESCRIPTION.devapi = developer API reference via Doxygen
-DESCRIPTION.pubapi = public API reference via Doxygen
-DESCRIPTION.htmldoc = user manual as HTML
-DESCRIPTION.dvidoc = user manual as DVI
-DESCRIPTION.psdoc = user manual as PostScript
-DESCRIPTION.pdfdoc = user manual as PDF
-DESCRIPTION.infodoc = user manual as Info
-DESCRIPTION.repairdoc = Texinfo @node and @menu directives
-DESCRIPTION.chmsupp = MS HTML Help support files (projects, TOCs, index)
+DESCRIPTION.apihtml    = public API reference at HTML
+DESCRIPTION.apichm     = public API reference as MS compressed HTML
+DESCRIPTION.apidevhtml = developer API reference as HTML
+DESCRIPTION.manualhtml = user manual as HTML
+DESCRIPTION.manualdvi  = user manual as DVI
+DESCRIPTION.manualps   = user manual as PostScript
+DESCRIPTION.manualpdf  = user manual as PDF
+DESCRIPTION.manualinfo = user manual as Info
+DESCRIPTION.manualchm  = user manual as MS compressed HTML
+DESCRIPTION.repairdoc  = Texinfo @node and @menu directives
 # For 'cleandoc' target
 DESCRIPTION.doc = generated documentation
 
@@ -47,14 +48,15 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Library-specific help commands
 DOCHELP += \
-  $(NEWLINE)echo $"  make devapi       Make the $(DESCRIPTION.devapi)$" \
-  $(NEWLINE)echo $"  make pubapi       Make the $(DESCRIPTION.pubapi)$" \
-  $(NEWLINE)echo $"  make htmldoc      Make the $(DESCRIPTION.htmldoc)$" \
-  $(NEWLINE)echo $"  make dvidoc       Make the $(DESCRIPTION.dvidoc)$" \
-  $(NEWLINE)echo $"  make psdoc        Make the $(DESCRIPTION.psdoc)$" \
-  $(NEWLINE)echo $"  make pdfdoc       Make the $(DESCRIPTION.pdfdoc)$" \
-  $(NEWLINE)echo $"  make infodoc      Make the $(DESCRIPTION.infodoc)$" \
-  $(NEWLINE)echo $"  make chmsupp      Make the $(DESCRIPTION.chmsupp)$" \
+  $(NEWLINE)echo $"  make apihtml      Make the $(DESCRIPTION.apihtml)$" \
+  $(NEWLINE)echo $"  make apichm       Make the $(DESCRIPTION.apichm)$" \
+  $(NEWLINE)echo $"  make apidevhtml   Make the $(DESCRIPTION.apidevhtml)$" \
+  $(NEWLINE)echo $"  make manualhtml   Make the $(DESCRIPTION.manualhtml)$" \
+  $(NEWLINE)echo $"  make manualdvi    Make the $(DESCRIPTION.manualdvi)$" \
+  $(NEWLINE)echo $"  make manualps     Make the $(DESCRIPTION.manualps)$" \
+  $(NEWLINE)echo $"  make manualpdf    Make the $(DESCRIPTION.manualpdf)$" \
+  $(NEWLINE)echo $"  make manualinfo   Make the $(DESCRIPTION.manualinfo)$" \
+  $(NEWLINE)echo $"  make manualchm    Make the $(DESCRIPTION.manualchm)$" \
   $(NEWLINE)echo $"  make repairdoc    Repair $(DESCRIPTION.repairdoc)$" \
   $(NEWLINE)echo $"  make cleandoc     Clean all $(DESCRIPTION.doc)$"
 
@@ -63,10 +65,11 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: devapi pubapi htmldoc dvidoc psdoc pdfdoc infodoc repairdoc cleandoc \
-  chmsupp
+.PHONY: apihtml apichm apidevhtml manualhtml manualdvi manualps manualpdf \
+  manualinfo manualchm repairdoc cleandoc manualchm
 
-devapi pubapi htmldoc dvidoc psdoc pdfdoc infodoc chmsupp:
+apihtml apichm apidevhtml manualhtml manualdvi manualps manualpdf manualinfo \
+manualchm:
 	$(MAKE_TARGET) DO_DOC=yes
 
 repairdoc:
@@ -85,14 +88,10 @@ ifeq ($(MAKESECTION),postdefines)
 
 NODEFIX = $(SRCDIR)/docs/support/nodefix.pl
 TEXI2HTML = docs/support/texi2html
-TEXI2DVI = texi2dvi
-DVIPS = dvips
 PS2PDF = ps2pdf
-MAKEINFO = makeinfo
-# TOP=. : Small hack for compatibility w/ files from docs/doxygen
-DOXYGEN = TOP='.' ; export TOP ; doxygen
+DOXYGEN_RUN = TOP="$(SRCDIR)" ; export TOP ; $(CMD.DOXYGEN)
 
-# Root of the entire Crystal Space manual.
+# Root of the entire Crystal Space manual source tree.
 CSMANUAL_DIR  = docs/texinfo
 CSMANUAL_FILE = cs-unix.txi
 
@@ -109,26 +108,23 @@ OUT.DOXYGEN.IMAGES = $(CP) $(SRCDIR)/docs/doxygen/*.png
 # Root of the target directory hierarchy.
 OUT.DOC = $(OUTBASE)/docs
 
-# Relative or absolute path which refers to main CS directory from within one
-# of the specific output directories, such as $(OUT.DOC.HTML).  The value of
-# this variable must reflect the value of $(OUT.DOC) and $(OUTBASE)/.
-OUT.DOC.UNDO = $(shell cd $(SRCDIR) ; $(PWD))
-OUT.DOC.UNDO.LOCAL = $(shell $(PWD))
-
 # This section is specially protected by DO_DOC in order to prevent the lengthy
 # $(wildcard) operations from impacting _all_ other build targets.  DO_DOC is
 # only defined when a top-level documentaiton target is invoked.
 
 ifeq ($(DO_DOC),yes)
 
+# Absolute path of SRCDIR.
+SRCDIRABS := $(shell $(CD) $(SRCDIR); $(PWD))
+
 # Target directory for each output format.
-OUT.DOC.API.DEV = $(OUT.DOC)/devapi
-OUT.DOC.API.PUB = $(OUT.DOC)/pubapi
-OUT.DOC.HTML    = $(OUT.DOC)/html
-OUT.DOC.DVI     = $(OUT.DOC)/dvi
-OUT.DOC.PS      = $(OUT.DOC)/ps
-OUT.DOC.PDF     = $(OUT.DOC)/pdf
-OUT.DOC.INFO    = $(OUT.DOC)/info
+OUT.DOC.API.PUB = $(OUT.DOC)/html/api
+OUT.DOC.API.DEV = $(OUT.DOC)/html/apidev
+OUT.DOC.HTML    = $(OUT.DOC)/html/manual
+OUT.DOC.DVI     = $(OUT.DOC)/dvi/manual
+OUT.DOC.PS      = $(OUT.DOC)/ps/manual
+OUT.DOC.PDF     = $(OUT.DOC)/pdf/manual
+OUT.DOC.INFO    = $(OUT.DOC)/info/manual
 
 # DVI log file
 DOC.DVI.LOG = $(OUT.DOC.DVI)/$(addsuffix .log,$(basename $(CSMANUAL_FILE)))
@@ -142,57 +138,28 @@ DOC.IMAGE.LIST = $(strip $(wildcard $(addprefix $(SRCDIR)/$(CSMANUAL_DIR),\
   $(addsuffix $(ext),* */* */*/* */*/*/* */*/*/*/* */*/*/*/*/*)))))
 OUT.DOC.IMAGE.LIST = $(subst $(SRCDIR)/$(CSMANUAL_DIR)/,,$(DOC.IMAGE.LIST))
 
-# Manual decomposition of image directories achieved by progressively
-# stripping off one layer of subdirectories at a time.
-OUT.DOC.IMAGE.DIRS.0 := $(patsubst %/,%,$(dir $(OUT.DOC.IMAGE.LIST)))
-OUT.DOC.IMAGE.DIRS.1 := $(patsubst %/,%,$(dir $(OUT.DOC.IMAGE.DIRS.0)))
-OUT.DOC.IMAGE.DIRS.2 := $(patsubst %/,%,$(dir $(OUT.DOC.IMAGE.DIRS.1)))
-OUT.DOC.IMAGE.DIRS.3 := $(patsubst %/,%,$(dir $(OUT.DOC.IMAGE.DIRS.2)))
-OUT.DOC.IMAGE.DIRS.4 := $(patsubst %/,%,$(dir $(OUT.DOC.IMAGE.DIRS.3)))
-OUT.DOC.IMAGE.DIRS.5 := $(patsubst %/,%,$(dir $(OUT.DOC.IMAGE.DIRS.4)))
-OUT.DOC.IMAGE.DIRS.6 := $(patsubst %/,%,$(dir $(OUT.DOC.IMAGE.DIRS.5)))
-OUT.DOC.IMAGE.DIRS.7 := $(patsubst %/,%,$(dir $(OUT.DOC.IMAGE.DIRS.6)))
-OUT.DOC.IMAGE.DIRS.8 := $(patsubst %/,%,$(dir $(OUT.DOC.IMAGE.DIRS.7)))
-OUT.DOC.IMAGE.DIRS.9 := $(patsubst %/,%,$(dir $(OUT.DOC.IMAGE.DIRS.8)))
+# List of image directory names which must be created in the ouptut location.
+OUT.DOC.IMAGE.DIRS := $(sort $(patsubst %/,%,$(dir $(OUT.DOC.IMAGE.LIST))))
 
-# Recomposition of image directory components in an ordered list which can be
-# fed to $(MKDIR) in order to recreate entire source image directory hiearchy
-# within target directory.
-# @@@ FIXME: These days, this can be accomplished much more easily by using the
-# $(MKDIRS) variable which is defined in config.mak by configure.  There is no
-# longer any need to go through this hocus-pocus to create the output directory
-# tree.
-OUT.DOC.IMAGE.DIRS.ALL := $(sort $(filter-out .,\
-  $(OUT.DOC.IMAGE.DIRS.0) \
-  $(OUT.DOC.IMAGE.DIRS.1) \
-  $(OUT.DOC.IMAGE.DIRS.2) \
-  $(OUT.DOC.IMAGE.DIRS.3) \
-  $(OUT.DOC.IMAGE.DIRS.4) \
-  $(OUT.DOC.IMAGE.DIRS.5) \
-  $(OUT.DOC.IMAGE.DIRS.6) \
-  $(OUT.DOC.IMAGE.DIRS.7) \
-  $(OUT.DOC.IMAGE.DIRS.8) \
-  $(OUT.DOC.IMAGE.DIRS.9)))
-
-# Recomposed image directory components for each potential output format.
-# Used to create target directory hiearchy when generating a particular format.
+# Composed image directory components for each potential output format.  Used
+# for creating target directory hiearchy when generating a particular format.
 OUT.DOC.IMAGE.DIRS.HTML = \
-  $(addprefix $(OUT.DOC.HTML)/,$(OUT.DOC.IMAGE.DIRS.ALL))
+  $(addprefix $(OUT.DOC.HTML)/,$(OUT.DOC.IMAGE.DIRS))
 OUT.DOC.IMAGE.DIRS.DVI  = \
-  $(addprefix $(OUT.DOC.DVI)/,$(OUT.DOC.IMAGE.DIRS.ALL))
+  $(addprefix $(OUT.DOC.DVI)/,$(OUT.DOC.IMAGE.DIRS))
 OUT.DOC.IMAGE.DIRS.PS   = \
-  $(addprefix $(OUT.DOC.PS)/,$(OUT.DOC.IMAGE.DIRS.ALL))
+  $(addprefix $(OUT.DOC.PS)/,$(OUT.DOC.IMAGE.DIRS))
 OUT.DOC.IMAGE.DIRS.PDF  = \
-  $(addprefix $(OUT.DOC.PDF)/,$(OUT.DOC.IMAGE.DIRS.ALL))
+  $(addprefix $(OUT.DOC.PDF)/,$(OUT.DOC.IMAGE.DIRS))
 OUT.DOC.IMAGE.DIRS.INFO = \
-  $(addprefix $(OUT.DOC.INFO)/,$(OUT.DOC.IMAGE.DIRS.ALL))
+  $(addprefix $(OUT.DOC.INFO)/,$(OUT.DOC.IMAGE.DIRS))
 
 # List of top-level image directories only.  List is composed by filtering out
 # directory names containing a slash, thus leaving only top-level names.
 # Used to remove target image directories for output formats which do not
 # require presence of images after conversion is complete.
-OUT.DOC.IMAGE.DIRS.TOP := $(filter-out $(foreach dir,\
-  $(dir $(OUT.DOC.IMAGE.DIRS.ALL)),$(dir)%),$(OUT.DOC.IMAGE.DIRS.ALL))
+OUT.DOC.IMAGE.DIRS.TOP := \
+  $(sort $(foreach d,$(OUT.DOC.IMAGE.DIRS),$(word 1,$(subst /, ,$(d)))))
 
 endif # ifeq ($(DO_DOC),yes)
 
@@ -207,20 +174,22 @@ ifeq ($(MAKESECTION),targets)
 
 ifeq ($(DO_DOC),yes)
 
-.PHONY: devapi pubapi htmldoc dvidoc psdoc pdfdoc infodoc
-.PHONY: do-devapi do-pubapi do-htmldoc do-dvidoc do-infodoc
+.PHONY: apidevhtml apihtml manualhtml manualdvi manualps manualpdf manualinfo \
+  do-apidevhtml do-apihtml do-manualhtml do-manualdvi do-manualinfo
 
-# Rules for making output and image directories.
-$(OUT.DOC): $(OUTBASE)
-	-$(MKDIR)
-
-$(OUT.DOC.API.DEV) $(OUT.DOC.API.PUB) $(OUT.DOC.HTML) $(OUT.DOC.DVI) \
-$(OUT.DOC.PS) $(OUT.DOC.PDF) $(OUT.DOC.INFO): $(OUT.DOC)
-	-$(MKDIR)
-
-$(OUT.DOC.IMAGE.DIRS.HTML) $(OUT.DOC.IMAGE.DIRS.DVI) $(OUT.DOC.IMAGE.DIRS.PS) \
-$(OUT.DOC.IMAGE.DIRS.PDF)  $(OUT.DOC.IMAGE.DIRS.INFO):
-	$(MKDIR)
+$(OUT.DOC.API.PUB) \
+  $(OUT.DOC.API.DEV) \
+  $(OUT.DOC.HTML) \
+  $(OUT.DOC.DVI) \
+  $(OUT.DOC.PS) \
+  $(OUT.DOC.PDF) \
+  $(OUT.DOC.INFO) \
+  $(OUT.DOC.IMAGE.DIRS.HTML) \
+  $(OUT.DOC.IMAGE.DIRS.DVI) \
+  $(OUT.DOC.IMAGE.DIRS.PS) \
+  $(OUT.DOC.IMAGE.DIRS.PDF) \
+  $(OUT.DOC.IMAGE.DIRS.INFO):
+	@$(MKDIRS)
 
 # Rule for removing a particular directory.  To remove directory "foo",
 # specify "foo.CLEAN" as dependency of some target.
@@ -264,114 +233,123 @@ endif
 endif
 
 # Rules to generate developer API documentation from all header files.
-do-devapi: $(OUT.DOC.API.DEV)
+do-apidevhtml: $(OUT.DOC.API.DEV)
 	$(OUT.DOXYGEN.IMAGES) $(OUT.DOC.API.DEV)
-	$(DOXYGEN) $(DOXYGEN_DEVAPI)
+	$(DOXYGEN_RUN) $(DOXYGEN_DEVAPI)
 
-devapi: $(OUT.DOC.API.DEV).CLEAN do-devapi
+apidevhtml: $(OUT.DOC.API.DEV).CLEAN do-apidevhtml
 
 # Rules to generate public API documentation from public header files.
-do-pubapi: $(OUT.DOC.API.PUB)
+do-apihtml: $(OUT.DOC.API.PUB)
 	$(OUT.DOXYGEN.IMAGES) $(OUT.DOC.API.PUB)
-	$(DOXYGEN) $(DOXYGEN_PUBAPI)
+	$(DOXYGEN_RUN) $(DOXYGEN_PUBAPI)
 
-pubapi: $(OUT.DOC.API.PUB).CLEAN do-pubapi
+apihtml: $(OUT.DOC.API.PUB).CLEAN do-apihtml
 
 # Rule to perform actual HTML conversion of $(CSMANUAL_FILE).
-do-htmldoc:
-	$(CD) $(OUT.DOC.HTML); $(PERL) $(OUT.DOC.UNDO)/$(TEXI2HTML) \
-	-init_file $(OUT.DOC.UNDO)/$(TEXI2HTMLINIT) -prefix cs \
-	-I $(OUT.DOC.UNDO)/$(CSMANUAL_DIR) $(CSMANUAL_FILE)
+do-manualhtml:
+	$(CD) $(OUT.DOC.HTML); $(PERL) $(SRCDIRABS)/$(TEXI2HTML) \
+	-init_file $(SRCDIRABS)/$(TEXI2HTMLINIT) -prefix cs \
+	-I $(SRCDIRABS)/$(CSMANUAL_DIR) $(CSMANUAL_FILE)
 
 # Rule to generate HTML format output.  Target images are retained since
 # generated HTML files reference them.
-htmldoc: \
+manualhtml: \
   $(OUT.DOC.HTML).CLEAN \
   $(OUT.DOC.HTML) \
   $(OUT.DOC.IMAGE.DIRS.HTML) \
   $(OUT.DOC.HTML).SOURCE \
   $(OUT.DOC.HTML)/png.jpg.gif.IMAGES \
-  do-htmldoc \
+  do-manualhtml \
   $(OUT.DOC.HTML).ZAPSOURCE
 
 # Rule to perform actual DVI conversion of $(CSMANUAL_FILE).
-do-dvidoc:
+do-manualdvi:
 	$(CP) $(SRCDIR)/$(CSMANUAL_DIR)/texinfo.tex $(OUT.DOC.DVI)
-	$(CD) $(OUT.DOC.DVI); $(TEXI2DVI) --batch --quiet -I '.' -I `pwd` \
-	-I `$(CD) $(OUT.DOC.UNDO)/$(CSMANUAL_DIR); $(PWD)` $(CSMANUAL_FILE)
+	$(CD) $(OUT.DOC.DVI); $(CMD.TEXI2DVI) --batch --quiet -I '.' -I `pwd` \
+	-I $(SRCDIRABS)/$(CSMANUAL_DIR) $(CSMANUAL_FILE)
 	$(MV) $(OUT.DOC.DVI)/$(addsuffix .dvi,$(basename $(CSMANUAL_FILE))) \
 	$(OUT.DOC.DVI)/cs.dvi
 	$(RM) $(OUT.DOC.DVI)/texinfo.tex
 
 # Rule to generate DVI format output.  Target images are retained since
 # generated DVI file references them.
-dvidoc: \
+manualdvi: \
   $(OUT.DOC.DVI).CLEAN \
   $(OUT.DOC.DVI) \
   $(OUT.DOC.IMAGE.DIRS.DVI) \
   $(OUT.DOC.DVI).SOURCE \
   $(OUT.DOC.DVI)/eps.IMAGES \
-  do-dvidoc \
+  do-manualdvi \
   $(OUT.DOC.DVI).ZAPSOURCE
 	@echo $"$"
-	@echo $">>> Documentation conversion completed without errors, however$"
-	@echo $">>> check $(DOC.DVI.LOG) for warnings about formatting problems.$"
+	@echo $">>> Documentation conversion completed without errors,$"
+	@echo $">>> however check $(DOC.DVI.LOG) for warnings about$"
+	@echo $">>> formatting problems.$"
 	@echo $"$"
 
 # Rule to perform actual PS conversion from DVI file.
-do-psdoc:
-	$(CD) $(OUT.DOC.DVI); \
-	$(DVIPS) -q -o $(OUT.DOC.UNDO.LOCAL)/$(OUT.DOC.PS)/cs.ps cs.dvi
+do-manualps:
+	$(CD) $(OUT.DOC.DVI); $(CMD.DVIPS) -q -o cs.ps cs.dvi
+	$(MV) $(OUT.DOC.DVI)/cs.ps $(OUT.DOC.PS)/cs.ps
 
 # Rule to generate PS format output.  Target images are incorporated directly
 # into PostScript file from within DVI target directory.
-psdoc: \
+manualps: \
   $(OUT.DOC.PS).CLEAN \
   $(OUT.DOC.PS) \
-  dvidoc \
-  do-psdoc
+  manualdvi \
+  do-manualps
 	@echo $"$"
-	@echo $">>> Documentation conversion completed without errors, however$"
-	@echo $">>> check $(DOC.DVI.LOG) for warnings about formatting problems.$"
+	@echo $">>> Documentation conversion completed without errors,$"
+	@echo $">>> however check $(DOC.DVI.LOG) for warnings about.$"
+	@echo $">>> formatting problems.$"
 	@echo $"$"
 
 # Rule to perform actual PDF conversion from PS file.
-do-pdfdoc:
+do-manualpdf:
 	$(PS2PDF) $(OUT.DOC.PS)/cs.ps $(OUT.DOC.PDF)/cs.pdf
 
 # Rule to generate PDF format output.
-pdfdoc: \
+manualpdf: \
   $(OUT.DOC.PDF).CLEAN \
   $(OUT.DOC.PDF) \
-  psdoc \
-  do-pdfdoc
+  manualps \
+  do-manualpdf
 	@echo $"$"
-	@echo $">>> Documentation conversion completed without errors, however$"
-	@echo $">>> check $(DOC.DVI.LOG) for warnings about formatting problems.$"
+	@echo $">>> Documentation conversion completed without errors,$"
+	@echo $">>> however, check $(DOC.DVI.LOG) for warnings about$"
+	@echo $">>> formatting problems.$"
 	@echo $"$"
 
 # Rule to perform actual Info conversion of $(CSMANUAL_FILE).
-do-infodoc:
-	$(CD) $(OUT.DOC.INFO); $(MAKEINFO) -I $(OUT.DOC.UNDO)/$(CSMANUAL_DIR) \
-	--output=cs $(CSMANUAL_FILE)
+do-manualinfo:
+	$(CD) $(OUT.DOC.INFO); $(CMD.MAKEINFO) \
+	-I $(SRCDIRABS)/$(CSMANUAL_DIR) --output=cs $(CSMANUAL_FILE)
 
 # Rule to generate Info format output.  Target images are removed after
 # conversion since images are incorporated directly into generated Info files.
-infodoc: \
+manualinfo: \
   $(OUT.DOC.INFO).CLEAN \
   $(OUT.DOC.INFO) \
   $(OUT.DOC.IMAGE.DIRS.INFO) \
   $(OUT.DOC.INFO).SOURCE \
   $(OUT.DOC.INFO)/txt.IMAGES \
-  do-infodoc \
+  do-manualinfo \
   $(OUT.DOC.INFO).ZAPSOURCE \
   $(OUT.DOC.INFO)/txt.ZAPIMAGES
 
-chmsupp: 
-	$(CD) $(OUT.DOC); $(PERL) -I$(SRCDIR)/docs/support/winhelp \
-	$(SRCDIR)/docs/support/winhelp/gendoctoc.pl
+# Rule to convert manual from HTML to MS compressed HTML.
+manualchm: 
+	$(CD) $(OUT.DOC); $(PERL) -I$(SRCDIRABS)/docs/support/winhelp \
+	$(SRCDIRABS)/docs/support/winhelp/gendoctoc.pl html/manual
+	$(CP) $(SRCDIR)/docs/support/winhelp/csmanual.hhp $(OUT.DOC)
+
+# Rule to convert public API reference from HTML to MS compressed HTML.
+apichm: 
+	$(CD) $(OUT.DOC); $(PERL) -I$(SRCDIRABS)/docs/support/winhelp \
+	$(SRCDIRABS)/docs/support/winhelp/gendoctoc.pl html/api
 	$(CP) $(SRCDIR)/docs/support/winhelp/csapi.hhp $(OUT.DOC)
-	$(CP) $(SRCDIR)/docs/support/winhelp/csdocs.hhp $(OUT.DOC)
 
 endif # ifeq ($(DO_DOC),yes)
 
