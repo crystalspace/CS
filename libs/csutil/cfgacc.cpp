@@ -65,6 +65,7 @@ void csConfigAccess::AddConfig(iObjectRegistry *object_reg, const char *fname,
     //CS_ASSERT (VFS != NULL);
   }
   ConfigFiles.Push(cfgmgr->AddDomain (fname, VFS, priority));
+  if (VFS) VFS->DecRef ();
 }
 
 iConfigFile *csConfigAccess::operator->()
