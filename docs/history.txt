@@ -44,6 +44,11 @@ chronological order.
 	  USE_PLUGINS=no.
 	- Eric Sunshine moved more PLUGINS.DYNAMIC assignements out of
 	  platform-specific makefiles and into user.mak.
+	- Norman Kraemer introduced a csWrapTypedObject function to the swig 
+	  wrapper to get around those swig versions having SWIG_TypeQuery and
+	  others declared as defines and not as functions. So refering to them
+	  in the main cspython module would fail.
+	  He also modified cspython.cpp to utilize the new function.
 16-Feb-2004
 	- Jorrit fixed rain mesh object so it now has a reasonably default
 	  box in case the user doesn't call SetBox().
