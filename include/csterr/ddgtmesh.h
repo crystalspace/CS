@@ -353,6 +353,28 @@ public:
         return stri[i].edge();
     }
 
+	/// Function to add a bintree.
+	void addBinTree( ddgTBinTree *bt );
+	/// Function to remove a bintree.
+	void removeBinTree( ddgTBinTree *bt );
+	/// Return the bintree for a given index.
+	ddgTBinTree *getBinTree( ddgTreeIndex i)
+	{ ddgAssert(i < _bintreeMax && i >= 0); return _bintree[i]; }
+	/// Distant clip range triangles beyond this point are not needed.
+	float		farClip(void) { return _farClip; }
+	/// Near clip range triangles beyond this point are not needed.
+	float		nearClip(void) { return _nearClip; }
+	/// Distant clip range triangles beyond this point are not needed.
+	inline void farClip(float f) { _farClip = f; }
+	/// Near clip range triangles beyond this point are not needed.
+	inline void nearClip(float n) { _nearClip = n; }
+	/// Return the row/col index and tree at a given location.
+	void progDist(float p ) { _progDist = p; }
+	/// Return the row/col index and tree at a given location.
+	float progDist(void) { return _progDist; }
+	/// Return the vertex cache.
+	ddgVCache	*vcache(void) { return &_vcache; }
+
 	/// Return the required LOD.
 	unsigned int minDetail( void ) { return _minDetail; }
 	/// Set the required LOD.
@@ -488,27 +510,6 @@ public:
 	 */
 	bool calculate(void);
 
-	/// Function to add a bintree.
-	void addBinTree( ddgTBinTree *bt );
-	/// Function to remove a bintree.
-	void removeBinTree( ddgTBinTree *bt );
-	/// Return the bintree for a given index.
-	ddgTBinTree *getBinTree( ddgTreeIndex i)
-	{ ddgAssert(i < _bintreeMax && i >= 0); return _bintree[i]; }
-	/// Distant clip range triangles beyond this point are not needed.
-	float		farClip(void) { return _farClip; }
-	/// Near clip range triangles beyond this point are not needed.
-	float		nearClip(void) { return _nearClip; }
-	/// Distant clip range triangles beyond this point are not needed.
-	inline void farClip(float f) { _farClip = f; }
-	/// Near clip range triangles beyond this point are not needed.
-	inline void nearClip(float n) { _nearClip = n; }
-	/// Return the row/col index and tree at a given location.
-	void progDist(float p ) { _progDist = p; }
-	/// Return the row/col index and tree at a given location.
-	float progDist(void) { return _progDist; }
-	/// Return the vertex cache.
-	ddgVCache	*vcache(void) { return &_vcache; }
 	/**
      * Input: x,z in mesh coords (note these values are modified).
      * Output: Bintree which owns this coord.

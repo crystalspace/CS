@@ -12,6 +12,10 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+1-Mar-2000
+	- Eric Sunshine fixed the Terrain and Phyziks libraries so that they
+	  once again compile on OpenStep (taking into account OpenStep
+	  compiler bugs).
 29-Feb-2000
 	- Norman Kramer fixed a divide by zero bug in Glide.
 	- Eric Sunshine fixed a compilation bug in MazeD.

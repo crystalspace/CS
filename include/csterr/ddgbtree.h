@@ -102,26 +102,22 @@ public:
 	inline float	thick(void )	{return(_thick/4.0);}
 	///	set wedge thickness.
 	inline void	thick(float t )	{_thick = (unsigned short)(4.0 * t);}
-    /// Reset all but queue status.
-    inline void reset()
-	{
-		DDG_BCLEAR(_state, SF_COORD);
-		DDG_BCLEAR(_state, SF_VBUFFER);
-		decrPriorityDelay();
-		vis( ddgUNDEF);
-		_cbufindex = 0;
-	}
 
+	/// Reset priority delay to zero.
+	inline void resetPriorityDelay()
+	{
+		DDG_BCLEAR(_state, SF_PRIORITY);
+	}
 	/// Set priority delay.  v should be a value from 0 to 15. 0 - invalid.
 	inline void setPriorityDelay(unsigned char v)
 	{
 		resetPriorityDelay();
 		_state += v;
 	}
-	/// Reset priority delay to zero.
-	inline void resetPriorityDelay()
+	/// Return priority delay.
+	inline unsigned char getPriorityDelay()
 	{
-		DDG_BCLEAR(_state, SF_PRIORITY);
+		return DDG_BGET(_state, SF_PRIORITY);
 	}
 	/// Decrement the delay by one.
 	inline void decrPriorityDelay()
@@ -131,10 +127,14 @@ public:
 			setPriorityDelay(v-1);
 		ddgAssert(getPriorityDelay()>=0 && getPriorityDelay() < 16);
 	}
-	/// Return priority delay.
-	inline unsigned char getPriorityDelay()
+    /// Reset all but queue status.
+    inline void reset()
 	{
-		return DDG_BGET(_state, SF_PRIORITY);
+		DDG_BCLEAR(_state, SF_COORD);
+		DDG_BCLEAR(_state, SF_VBUFFER);
+		decrPriorityDelay();
+		vis( ddgUNDEF);
+		_cbufindex = 0;
 	}
 };
 
@@ -212,6 +212,25 @@ public:
 	/// Destroy the Bintree mesh.
 	~ddgTBinTree(void);
 
+	/// Initialize the bin tree.
+	bool init(void);
+	/// Get maxLevel.
+	inline unsigned int maxLevel(void) { return _mesh->maxLevel(); }
+	/// Get number of triangles in a single BinTree.
+	inline unsigned int triNo(void) { return _mesh->triNo(); }
+	/// Get triangle row.
+	inline unsigned int row(unsigned int i)
+	{ return _mesh->stri[i].row; }
+	/// Get triangle col.
+	inline unsigned int col(unsigned int i)
+	{ return _mesh->stri[i].col; }
+	/// Get triangle vertex 0.
+	inline ddgTriIndex v0(ddgTriIndex i)
+	{ ddgAssert(i < _mesh->triNo()); return _mesh->stri[i].v0; }
+	/// Get triangle vertex 1.
+	inline ddgTriIndex v1(ddgTriIndex i)
+	{ ddgAssert(i < _mesh->triNo()); return _mesh->stri[i].v1; }
+
 	/// Return the triangle tree.
 	inline ddgMTri* tri(unsigned int i) { return &_tri[i]; }
 	/// Return the neighbouring bin tree.
@@ -284,24 +303,6 @@ public:
         	vout->set(_dr+row(tindex),_dc+col(tindex));
 	}
 
-	/// Initialize the bin tree.
-	bool init(void);
-	/// Get maxLevel.
-	inline unsigned int maxLevel(void) { return _mesh->maxLevel(); }
-	/// Get number of triangles in a single BinTree.
-	inline unsigned int triNo(void) { return _mesh->triNo(); }
-	/// Get triangle row.
-	inline unsigned int row(unsigned int i)
-	{ return _mesh->stri[i].row; }
-	/// Get triangle col.
-	inline unsigned int col(unsigned int i)
-	{ return _mesh->stri[i].col; }
-	/// Get triangle vertex 0.
-	inline ddgTriIndex v0(ddgTriIndex i)
-	{ ddgAssert(i < _mesh->triNo()); return _mesh->stri[i].v0; }
-	/// Get triangle vertex 1.
-	inline ddgTriIndex v1(ddgTriIndex i)
-	{ ddgAssert(i < _mesh->triNo()); return _mesh->stri[i].v1; }
 	/** Return the starting offset in the array where a
 	 * given level is stored.
 	 */
@@ -354,12 +355,6 @@ public:
 		return i/2;
 #endif
 	}
-	/// Return the index of the left child.
-	inline static ddgTriIndex left(ddgTriIndex i)
-	{
-		return right(i)+1;
-	}
-	/// Return the index of the left child.
 	inline static ddgTriIndex right(ddgTriIndex i)
 	{
 #ifdef WIN32
@@ -368,6 +363,12 @@ public:
 		return i*2;
 #endif
 	}
+	/// Return the index of the left child.
+	inline static ddgTriIndex left(ddgTriIndex i)
+	{
+		return right(i)+1;
+	}
+	/// Return the index of the left child.
 	/// Return the quad neighbour. If 0 there is no neighbour.
 	inline ddgTriIndex neighbour( ddgTriIndex i)
 	{

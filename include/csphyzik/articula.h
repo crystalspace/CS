@@ -22,7 +22,6 @@
 #define ARTICULATEDBODY_H
 
 #include "csphyzik/rigidbod.h"
-#include "csphyzik/ctmspat.h"
 #include "csphyzik/ctvspat.h"
 
 #define ABSTATESIZE 0  // all state is in solver and joint

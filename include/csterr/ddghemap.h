@@ -74,14 +74,6 @@ public:
 		if (d1) *d1 = s;
 		return s;
 	}
-	/// Get a transformed value in the image.
-	float getf(unsigned short r, unsigned short c,
-		float *d1 = 0)
-	{
-		float s = convert( _pixbuffer[(r*_cols+c)+0] );
-		if (d1) *d1 = s;
-		return s;
-	}
 	/// Transform a value from short space back to real float space.
 	inline float convert(float n)
 	{
@@ -91,6 +83,14 @@ public:
 	inline short iconvert(float n)
 	{
 		return (short) ddgUtil::clamp((n - _base ) / _scale - 0x7FFF,-0x7FFF,0x7FFF);
+	}
+	/// Get a transformed value in the image.
+	float getf(unsigned short r, unsigned short c,
+		float *d1 = 0)
+	{
+		float s = convert( _pixbuffer[(r*_cols+c)+0] );
+		if (d1) *d1 = s;
+		return s;
 	}
 	/** Load an heightmap buffer from a memory buffer.
 	 * Return true on error.

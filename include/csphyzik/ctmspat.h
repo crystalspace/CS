@@ -48,6 +48,9 @@ public:
 	// and it's mass
 	void form_spatial_I( const ctMatrix3 &pI, real pmass );
 
+  real * operator[]( const int index ){ return (real *)(rows[index]); }
+  real * operator[]( const int index ) const { return (real *)(rows[index]); } //!me eh?
+
 	void operator=( const ctSpatialMatrix6 &pm ){
 		int idx, idy;
     for( idx = 0; idx < 6; idx++ )
@@ -71,9 +74,6 @@ public:
         Mret[idx][idy] = rows[idy][idx];
     return Mret;
   }
-
-  real * operator[]( const int index ){ return (real *)(rows[index]); }
-  real * operator[]( const int index ) const { return (real *)(rows[index]); } //!me eh?
 
   void orthonormalize();
 
@@ -323,6 +323,5 @@ inline void ctSpatialMatrix::form_spatial_I( const ctMatrix3 &pI, real pmass ){
 		}
 	}
 }
-
 
 #endif
