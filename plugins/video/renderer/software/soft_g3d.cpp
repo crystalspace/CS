@@ -1962,9 +1962,8 @@ void csGraphics3DSoftware::FinishPolygonFX()
 
 void csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
 {
-  if (!pqinfo.drawline && !pqinfo.drawline_gouraud){
+  if (!pqinfo.drawline && !pqinfo.drawline_gouraud)
     return;
-    }
 
   //-----
   // Calculate constant du,dv,dz.
@@ -1987,9 +1986,8 @@ void csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
   }
 
   // Rejection of back-faced polygons
-  if ((last == poly.num) || (dd == 0)){
+  if ((last == poly.num) || (dd == 0))
     return;
-}
 
   float flat_r, flat_g, flat_b;
   if (pqinfo.textured)
