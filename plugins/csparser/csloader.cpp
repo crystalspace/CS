@@ -2817,12 +2817,13 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  	"meshfact");
 	  if (meshfactnode)
 	  {
+	    const char* meshfactname = meshfactnode->GetAttributeValue ("name");
 	    // @@@ Handle regions correctly here???
             csRef<iMeshFactoryWrapper> t = Engine->GetMeshFactories ()
-	  	->FindByName (meshfactnode->GetContentsValue ());
+	  	->FindByName (meshfactname);
 	    if (!t)
 	    {
-              t = Engine->CreateMeshFactory (meshfactnode->GetContentsValue ());
+              t = Engine->CreateMeshFactory (meshfactname);
 	      if (!t || !LoadMeshObjectFactory (ldr_context, t, 0,
 	      	meshfactnode))
 	      {
