@@ -6,7 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-01-Mar-2005
+2-Mar-2005
+	- Jorrit changed pvscalc to use the Description() method to print
+	  out boxes and vectors instead of the ugly B2F and other macros.
+	- Jorrit added an epsilon parameter to the csPoly3D::IsAxisAligned()
+	  routine.
+1-Mar-2005
 	- res fixed the use of 'return' in a void method in glrender3d.cpp.
 	- Marten fixed a bug related to attenuation of lights in r3dtest. 
 	  The part in the light iterator needs more careful rewrite later.

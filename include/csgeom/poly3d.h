@@ -259,8 +259,9 @@ public:
    * the axis (one of CS_AXIS_ constants). The location
    * of the axis is returned in 'where'.
    * Returns CS_AXIS_NONE if the polygon is not axis aligned.
+   * The epsilon will be used to test if two coordinates are close.
    */
-  int IsAxisAligned (float& where) const;
+  int IsAxisAligned (float& where, float epsilon = SMALL_EPSILON) const;
 
   /// Cut this polygon with a plane and only keep the front side.
   void CutToPlane (const csPlane3& split_plane);

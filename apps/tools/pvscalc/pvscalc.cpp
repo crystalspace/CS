@@ -36,26 +36,6 @@ CS_IMPLEMENT_APPLICATION
 #define DBA(x)
 #endif
 
-#undef B2F
-#undef B3F
-#undef B2D
-#undef B3D
-#define B2F "(%g,%g)-(%g,%g)"
-#define B3F "(%g,%g,%g)-(%g,%g,%g)"
-#define B2D(X) (X).MinX(), (X).MinY(), (X).MaxX(), (X).MaxY()
-#define B3D(X) \
-  (X).MinX(), (X).MinY(), (X).MinZ(), (X).MaxX(), (X).MaxY(), (X).MaxZ()
-
-#undef V2F
-#undef V3F
-#undef V2D
-#undef V3D
-#define V2F "%g,%g"
-#define V3F "%g,%g,%g"
-#define V2D(X) (X).x, (X).y
-#define V3D(X) (X).x, (X).y, (X).z
-
-
 //-----------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (PVSMetaLoader)
@@ -285,6 +265,36 @@ static void SlicePolygon (const csPoly3D& poly, csPoly2D& slice, int axis)
       case CS_AXIS_Z: slice[j].x = v.x; slice[j].y = v.y; break;
     }
   }
+  //DBA(());
+}
+
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+static bool csPoly2D_In (const csPoly2D& poly, const csVector2 &v)
+{
+  int i, i1;
+  i1 = poly.GetVertexCount () - 1;
+  bool left;
+  if (csMath2::WhichSide2D (v, poly[i1], poly[0]) < 0)
+    left = true;
+  else
+    left = false;
+  i1 = 0;
+  for (i = 1 ; i < poly.GetVertexCount () ; i++)
+  {
+    if (csMath2::WhichSide2D (v, poly[i1], poly[i]) < 0)
+    {
+      if (!left)
+        return false;
+    }
+    else
+    {
+      if (left)
+        return false;
+    }
+    i1 = i;
+  }
+
+  return true;
 }
 
 float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
@@ -375,6 +385,7 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
   // because GetSide() expects a side and not an axix.
   csBox2 box_slice = node_bbox.GetSide (axis * 2);
   csPoly2D slice;
+  //DBA(("======================\nbox_slice=%2b\n", &box_slice));
 
   mina = node_bbox.Min (axis);
   maxa = node_bbox.Max (axis);
@@ -417,10 +428,14 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
       csPoly3DBox* poly = axis_polylist[i].GetPoly ();
       SlicePolygon (*poly, slice, axis);
       bool solid =
-      	slice.In (box_slice.GetCorner (CS_BOX_CORNER_xy)) &&
-      	slice.In (box_slice.GetCorner (CS_BOX_CORNER_Xy)) &&
-      	slice.In (box_slice.GetCorner (CS_BOX_CORNER_xY)) &&
-      	slice.In (box_slice.GetCorner (CS_BOX_CORNER_XY));
+      	//slice.In (box_slice.GetCorner (CS_BOX_CORNER_xy)) &&
+      	//slice.In (box_slice.GetCorner (CS_BOX_CORNER_Xy)) &&
+      	//slice.In (box_slice.GetCorner (CS_BOX_CORNER_xY)) &&
+      	//slice.In (box_slice.GetCorner (CS_BOX_CORNER_XY));
+      	csPoly2D_In (slice, box_slice.GetCorner (CS_BOX_CORNER_xy)) &&
+      	csPoly2D_In (slice, box_slice.GetCorner (CS_BOX_CORNER_Xy)) &&
+      	csPoly2D_In (slice, box_slice.GetCorner (CS_BOX_CORNER_xY)) &&
+      	csPoly2D_In (slice, box_slice.GetCorner (CS_BOX_CORNER_XY));
 
       float qual_cut = 1.0 - (float (cut) * inv_num_objects);
       float qual_balance = 1.0 - (float (ABS (left-right)) * inv_num_objects);
@@ -866,7 +881,7 @@ void PVSCalcSector::ExtractAxisAlignedPolygons ()
   for (i = 0 ; i < polygons.Length () ; i++)
   {
     float where;
-    int axis = polygons[i].IsAxisAligned (where);
+    int axis = polygons[i].IsAxisAligned (where, EPSILON);
     if (axis != CS_AXIS_NONE)
     {
       axis_polygons[axis].Push (csPoly3DAxis (&polygons[i], where));
@@ -1010,8 +1025,9 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
   plane.offset = bbox.Min ();
   plane.scale.x = float (DIM_COVBUFFER) / (bbox.MaxX ()-bbox.MinX ());
   plane.scale.y = float (DIM_COVBUFFER) / (bbox.MaxY ()-bbox.MinY ());
-  DB(("  Hull box: " B2F "scale=" V2F " offset=" V2F "\n",
-    B2D(bbox), V2D(plane.scale), V2D(plane.offset)));
+  DB(("  Hull box: %s scale=%s offset=%s\n",
+    bbox.Description().GetData(), plane.scale.Description().GetData(),
+    plane.offset.Description().GetData()));
 
   // Clear the coverage buffer.
   plane.covbuf->Initialize ();
@@ -1023,10 +1039,10 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
   DB(("  Hull:\n"));
   for (i = 0 ; i < (size_t)hull_points ; i++)
   {
-    DB(("    N:%d (" V2F ")\n", i, V2D(hull[i])));
+    DB(("    N:%d (%s)\n", i, hull[i].Description().GetData()));
     hull[i].x = (hull[i].x-plane.offset.x) * plane.scale.x;
     hull[i].y = (hull[i].y-plane.offset.y) * plane.scale.y;
-    DB(("    C:%d (" V2F ")\n", i, V2D(hull[i])));
+    DB(("    C:%d (%s)\n", i, hull[i].Description().GetData()));
   }
   plane.covbuf->InsertPolygonInvertedNoDepth (hull, hull_points);
 
@@ -1050,7 +1066,7 @@ bool PVSCalcSector::CastAreaShadow (const csBox3& source,
   size_t j;
   for (j = 0 ; j < polygon.GetVertexCount () ; j++)
   {
-    DB((" (" V3F ")", V3D(polygon[j])));
+    DB((" (%s)", polygon[j].Description().GetData()));
   }
   DB(("\n"));
 
@@ -1098,7 +1114,7 @@ bool PVSCalcSector::CastAreaShadow (const csBox3& source,
   {
     pi_verts[i].x = (pi_verts[i].x-plane.offset.x) * plane.scale.x;
     pi_verts[i].y = (pi_verts[i].y-plane.offset.y) * plane.scale.y;
-    DB((" (" V2F ")", V2D(pi_verts[i])));
+    DB((" (%s)", pi_verts[i].Description().GetData()));
   }
   DB(("\n"));
   int nummod = plane.covbuf->InsertPolygonNoDepth (
@@ -1235,7 +1251,8 @@ bool PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
   // traversing to the children so we only skip the testing part.
   if (!dest.Overlap (source))
   {
-    DB(("\nTEST " B3F " -> " B3F "\n", B3D(source), B3D(dest)));
+    DB(("\nTEST %s -> %s\n", source.Description().GetData(),
+    	dest.Description().GetData()));
 
     // First we do a trivial test to see if the nodes can surely see each
     // other.
@@ -1263,8 +1280,8 @@ bool PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
 	  int destrep = destnode->represented_nodes;
           total_invisnodes += destrep;
 	  DBA(("%d ", destrep));
-          DB(("Marked invisible " B3F " to " B3F "\n",
-	    B3D(source), B3D(dest)));
+          DB(("Marked invisible %s to %s\n",
+	    source.Description().GetData(), dest.Description().GetData()));
 
 	  // If visibility for the destination node was already calculated and
 	  // we are here then that means that this node was considered visible

@@ -228,7 +228,7 @@ int csPoly3D::ClassifyZ (float z) const
   return CS_POL_SPLIT_NEEDED;
 }
 
-int csPoly3D::IsAxisAligned (float& where) const
+int csPoly3D::IsAxisAligned (float& where, float epsilon) const
 {
   bool ax = true, ay = true, az = true;
   const csVector3& a = vertices[0];
@@ -237,17 +237,18 @@ int csPoly3D::IsAxisAligned (float& where) const
   {
     const csVector3& b = vertices[i];
     csVector3 d = a-b;
-    if (fabs (d.x) > SMALL_EPSILON)
+
+    if (fabs (d.x) > epsilon)
     {
       ax = false;
       if (!ay && !az) return CS_AXIS_NONE;
     }
-    if (fabs (d.y) > SMALL_EPSILON)
+    if (fabs (d.y) > epsilon)
     {
       ay = false;
       if (!ax && !az) return CS_AXIS_NONE;
     }
-    if (fabs (d.z) > SMALL_EPSILON)
+    if (fabs (d.z) > epsilon)
     {
       az = false;
       if (!ax && !ay) return CS_AXIS_NONE;
