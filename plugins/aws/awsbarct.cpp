@@ -49,7 +49,6 @@ static awsSlot *chart_slot = 0;
 static void DriveTimer (void *, iAwsSource *source)
 {
   iAwsComponent *comp = source->GetComponent ();
-
   comp->Broadcast (awsBarChart::signalTimer);
 }
 
@@ -340,7 +339,6 @@ void awsBarChart::OnDraw (csRect clip)
         WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE),
         -1,
         buf);
-      
     }
     inner_frame.xmin += 2;
   }

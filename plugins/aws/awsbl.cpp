@@ -25,7 +25,7 @@ awsBorderLayout::awsBorderLayout (
   iAwsComponent *owner,
   iAwsComponentNode* settings,
   iAwsPrefManager *pm)
-  : awsLayoutManager (owner, settings, pm), hGap (0), vGap (0)
+: awsLayoutManager (owner, settings, pm), hGap (0), vGap (0)
 
 { 
   memset (components, 0, sizeof (components)); 

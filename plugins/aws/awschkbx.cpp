@@ -1,3 +1,23 @@
+/*
+    Copyright (C) ???
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#include <stdio.h>
+
 #include "cssysdef.h"
 #include "awschkbx.h"
 #include "ivideo/graph2d.h"
@@ -7,8 +27,6 @@
 #include "csutil/csevent.h"
 #include "iutil/evdefs.h"
 
-#include <stdio.h>
-
 const int awsCheckBox:: alignLeft = 0x0;
 const int awsCheckBox:: alignRight = 0x1;
 const int awsCheckBox:: alignCenter = 0x2;
@@ -16,14 +34,14 @@ const int awsCheckBox:: alignCenter = 0x2;
 const int awsCheckBox:: signalClicked = 0x1;
 const int awsCheckBox:: signalFocused = 0x2;
 
-awsCheckBox::awsCheckBox () :
-  is_down(false),
-  mouse_is_over(false),
-  is_on(false),
-  frame_style(0),
-  alpha_level(96),
-  alignment(0),
-  caption(0)
+awsCheckBox::awsCheckBox ()
+  : is_down (false),
+    mouse_is_over (false),
+    is_on (false),
+    frame_style (0),
+    alpha_level (96),
+    alignment (0),
+    caption (0)
 {
   tex[0] = tex[1] = tex[2] = tex[3] = 0;
   SetFlag (AWSF_CMP_ALWAYSERASE);
@@ -53,11 +71,9 @@ bool awsCheckBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   tex[2] = pm->GetTexture ("CheckBoxOn");
   tex[3] = pm->GetTexture ("CheckBoxOff");
 
-	int _focusable = 0;
+  int _focusable = 0;
   pm->GetInt (settings, "Focusable", _focusable);
-	focusable = _focusable;
-
-
+  focusable = _focusable;
   return true;
 }
 
@@ -77,13 +93,12 @@ bool awsCheckBox::GetProperty (const char *name, void **parm)
   }
   else if (strcmp ("State", name) == 0)
   {
-    // in this case, the parm should point to a bool.
+    // In this case, the parm should point to a bool.
     bool **pb = (bool **)parm;
 
     *pb = &is_on;
     return true;
   }
-
   return false;
 }
 
@@ -107,16 +122,13 @@ bool awsCheckBox::SetProperty (const char *name, void *parm)
       if (caption) caption->DecRef ();
       caption = 0;
     }
-
     return true;
   }
   else if (strcmp ("State", name) == 0)
   {
-   
     is_on = *(bool *)parm;
     return true;
   }
-
   return false;
 }
 
@@ -128,73 +140,81 @@ void awsCheckBox::OnDraw (csRect /*clip*/)
   int txw = 0, txh = 0;
   int txy = 0, txx = 0;
 
-  // int hi = WindowManager ()->GetPrefMgr ()->GetColor (AC_HIGHLIGHT);
-  // int lo = WindowManager ()->GetPrefMgr ()->GetColor (AC_SHADOW);
+  //int hi = WindowManager ()->GetPrefMgr ()->GetColor (AC_HIGHLIGHT);
+  //int lo = WindowManager ()->GetPrefMgr ()->GetColor (AC_SHADOW);
 
-  /// Get the size of our textures
+  /// Get the size of our textures.
   if (tex[0]) tex[0]->GetOriginalDimensions (txw, txh);
 
   txy = (Frame ().Height () >> 1) - (txh >> 1);
 
   switch (alignment)
   {
-    case alignLeft:   txx = 0; break;
-    case alignRight:  txx = Frame ().Width () - txw; break;
+    case alignLeft:
+      txx = 0;
+      break;
+    case alignRight:
+      txx = Frame ().Width () - txw;
+      break;
   }
 
   if (!is_down && tex[0])
   {
     g3d->DrawPixmap (
-        tex[0],
-        Frame ().xmin + txx + is_down,
-        Frame ().ymin + txy + is_down,
-        txw,
-        txh,
-        0,
-        0,
-        txw,
-        txh,
-        alpha_level);
+      tex[0],
+      Frame ().xmin + txx + is_down,
+      Frame ().ymin + txy + is_down,
+      txw,
+      txh,
+      0,
+      0,
+      txw,
+      txh,
+      alpha_level);
   }
   else if (is_down && tex[1])
   {
     g3d->DrawPixmap (
-        tex[1],
-        Frame ().xmin + txx + is_down,
-        Frame ().ymin + txy + is_down,
-        txw,
-        txh,
-        0,
-        0,
-        txw,
-        txh,
-        alpha_level);
+      tex[1],
+      Frame ().xmin + txx + is_down,
+      Frame ().ymin + txy + is_down,
+      txw,
+      txh,
+      0,
+      0,
+      txw,
+      txh,
+      alpha_level);
   }
 
   if (is_on && tex[2])
+  {
     g3d->DrawPixmap (
-        tex[2],
-        Frame ().xmin + txx + is_down,
-        Frame ().ymin + txy + is_down,
-        txw,
-        txh,
-        0,
-        0,
-        txw,
-        txh,
-        0);
+      tex[2],
+      Frame ().xmin + txx + is_down,
+      Frame ().ymin + txy + is_down,
+      txw,
+      txh,
+      0,
+      0,
+      txw,
+      txh,
+      0);
+  }
   else if (!is_on && tex[3])
+  {
     g3d->DrawPixmap (
-        tex[3],
-        Frame ().xmin + txx + is_down,
-        Frame ().ymin + txy + is_down,
-        txw,
-        txh,
-        0,
-        0,
-        txw,
-        txh,
-        0);
+      tex[3],
+      Frame ().xmin + txx + is_down,
+      Frame ().ymin + txy + is_down,
+      txw,
+      txh,
+      0,
+      0,
+      txw,
+      txh,
+      0);
+  }
 
   // Draw the caption, if there is one and the style permits it.
   if (caption)
@@ -202,19 +222,19 @@ void awsCheckBox::OnDraw (csRect /*clip*/)
     int tw, th, tx, ty, mcc;
 
     mcc = WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetLength (
-        caption->GetData (),
-        Frame ().Width () - txw - 2);
+      caption->GetData (),
+      Frame ().Width () - txw - 2);
 
     scfString tmp (caption->GetData ());
     tmp.Truncate (mcc);
 
-    // Get the size of the text
+    // Get the size of the text.
     WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetDimensions (
-        tmp.GetData (),
-        tw,
-        th);
+      tmp.GetData (),
+      tw,
+      th);
 
-    // Calculate the center
+    // Calculate the center.
     ty = (Frame ().Height () >> 1) - (th >> 1);
 
     switch (alignment)
@@ -228,14 +248,14 @@ void awsCheckBox::OnDraw (csRect /*clip*/)
         break;
     }
 
-    // Draw the text
+    // Draw the text.
     g2d->Write (
-        WindowManager ()->GetPrefMgr ()->GetDefaultFont (),
-        Frame ().xmin + tx + is_down,
-        Frame ().ymin + ty + is_down,
-        WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE),
-        -1,
-        tmp.GetData ());
+      WindowManager ()->GetPrefMgr ()->GetDefaultFont (),
+      Frame ().xmin + tx + is_down,
+      Frame ().ymin + ty + is_down,
+      WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE),
+      -1,
+      tmp.GetData ());
   }
 }
 
@@ -302,10 +322,9 @@ bool awsCheckBox::OnKeyboard (const csKeyEventData& eventData)
 
 void awsCheckBox::OnSetFocus ()
 {
-	Broadcast (signalFocused);
+  Broadcast (signalFocused);
 }
 
-/************************************* Command Button Factory ****************/
 awsCheckBoxFactory::awsCheckBoxFactory (iAws *wmgr) :
   awsComponentFactory(wmgr)
 {
@@ -319,7 +338,7 @@ awsCheckBoxFactory::awsCheckBoxFactory (iAws *wmgr) :
 
 awsCheckBoxFactory::~awsCheckBoxFactory ()
 {
-  // empty
+  // Empty.
 }
 
 iAwsComponent *awsCheckBoxFactory::Create ()

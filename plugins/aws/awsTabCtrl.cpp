@@ -178,7 +178,6 @@ void awsTab::OnDraw (csRect clip)
   // Draw the caption, if there is one and the style permits it.
   if (caption)
   {
-
     // Draw the text.
     g2d->Write (pm->GetDefaultFont (), r.xmin + tx, r.ymin + ty,
       pm->GetColor (AC_TEXTFORE), -1, caption->GetData ());
@@ -306,13 +305,13 @@ csRect awsTab::getMinimumSize ()
 
 void awsTab::SetActive (bool what)
 {
-	if (what == is_active) return;
-	is_active = what;
-	Invalidate ();
-	if (what)
-		Broadcast (signalActivateTab);
-	else
-		Broadcast (signalDeactivateTab);
+  if (what == is_active) return;
+  is_active = what;
+  Invalidate ();
+  if (what)
+    Broadcast (signalActivateTab);
+  else
+    Broadcast (signalDeactivateTab);
 }
 
 const int awsTabCtrl::HandleSize = 15;
@@ -461,10 +460,10 @@ void awsTabCtrl::DoLayout ()
 
 csRect awsTabCtrl::getInsets ()
 {
-	if (clip_to_scroll)
-		return csRect (0, 0, 2 * HandleSize + 1, 0);
-	else
-		return csRect (0, 0, 0, 0);
+  if (clip_to_scroll)
+    return csRect (0, 0, 2 * HandleSize + 1, 0);
+  else
+    return csRect (0, 0, 0, 0);
 }
 
 iAwsSource* awsTabCtrl::AddTab (iString* caption, void* user_param)
@@ -541,10 +540,12 @@ void awsTabCtrl::RemoveTab (int index)
   if (index != -1)
   {
     if (index == active)
+    {
       if (vTabs.Length () - 1 == active)
         ActivateTab (active - 1);
       else
         ActivateTab (active + 1);
+    }
 
     vTabs.Get (first)->SetFirst (false);
     if ((index < first) || (index == first && (first > 0 || vTabs.Length () < 2)))
@@ -655,10 +656,10 @@ int awsTabCtrl::FindTab (void* user_param)
   int i;
   for (i = 0; i < vTabs.Length (); i++)
   {
-	 void* p;
-	 vTabs.Get (i)->GetProperty ("User Param", &p);
-	 if (p == user_param)
-	   return i;
+    void* p;
+    vTabs.Get (i)->GetProperty ("User Param", &p);
+    if (p == user_param)
+      return i;
   }
   return -1;
 }
@@ -667,14 +668,14 @@ void awsTabCtrl::ActivateTab (void* param)
 {
   int idx = FindTab (param);
   if (idx >= 0)
-	ActivateTab (idx);
+    ActivateTab (idx);
 }
 
 void awsTabCtrl::ActivateTab (iAwsSource *src)
 {
   int idx = vTabs.Find ((awsTab*) src->GetComponent ());
   if (idx >= 0)
-	ActivateTab (idx);
+    ActivateTab (idx);
 }
 
 void awsTabCtrl::ActivateTab (int idx)
@@ -686,7 +687,7 @@ void awsTabCtrl::ActivateTab (int idx)
   active = idx;
   vTabs.Get (idx)->SetActive (true);
   if (old_active >= 0 && old_active != active)
-	vTabs.Get (old_active)->SetActive (false);
+    vTabs.Get (old_active)->SetActive (false);
 }
 
 csRect awsTabCtrl::getPreferredSize ()
