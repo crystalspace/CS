@@ -254,7 +254,7 @@ void csTextureCacheSoftware::fill_texture (int MipMap, iPolygonTexture* pt,
   SoftwareCachedTexture *cached_texture = cache_texture (MipMap, pt);
 
   // Compute the rectangle on the lighted texture, if it is dirty
-  create_lighted_texture (pt, cached_texture, texman, u_min, v_min, u_max, v_max);
+  (this->*create_lighted_texture) (pt, cached_texture, texman, u_min, v_min, u_max, v_max);
 }
 
 #define SysPrintf iG3D->System->Printf
