@@ -21,11 +21,11 @@ chronological order.
 	  to delete old entries and this could cause duplicate entries in a
 	  zip file (happened a lot with relight).
 9-Aug-2004
-	- Jorrit did a fix to csQrount() and other csQ... (except for csQint()).
-	  In case CS_QINT_WORKAROUND was defined only csQint() actually had
-	  any workaround code while it was also needed for the others. This
-	  fixes a problem with the thing plugin creating incompatible lightmaps
-	  between optimize and debug mode.
+	- Jorrit did a fix to csQrount() and other csQ... (except for
+	  csQint()).  In case CS_QINT_WORKAROUND was defined only csQint()
+	  actually had any workaround code while it was also needed for the
+	  others. This fixes a problem with the thing plugin creating
+	  incompatible lightmaps between optimize and debug mode.
 8-Aug-2004
 	- Eric Sunshine reverted the 29 July 2004 change to the cosf() check in
 	  configure.ac so that it once again performs the check with the C
