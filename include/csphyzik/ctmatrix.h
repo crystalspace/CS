@@ -23,10 +23,10 @@
 
 #include <stdlib.h>
 
-#include "../csphyzik/phyztype.h"
-#include "../csphyzik/ctvector.h"
-#include "../csphyzik/mtrxutil.h"
-#include "../csphyzik/debug.h"
+#include "csphyzik/phyztype.h"
+#include "csphyzik/ctvector.h"
+#include "csphyzik/mtrxutil.h"
+#include "csphyzik/debug.h"
 
 class ctMatrix
 {
