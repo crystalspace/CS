@@ -606,6 +606,14 @@ void csGraphics2D::DrawBox (int x, int y, int w, int h, int color)
 
 void csGraphics2D::SetClipRect (int xmin, int ymin, int xmax, int ymax)
 {
+  if (xmin < 0) xmin = 0;
+  else if (xmin > Width) xmin = Width;
+  if (xmax < 0) xmax = 0;
+  else if (xmax > Width) xmax = Width;
+  if (ymin < 0) ymin = 0;
+  else if (ymin > Height) ymin = Height;
+  if (ymax < 0) ymax = 0;
+  else if (ymax > Height) ymax = Height;
   ClipX1 = xmin; ClipX2 = xmax;
   ClipY1 = ymin; ClipY2 = ymax;
 }

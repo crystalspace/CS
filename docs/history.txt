@@ -3,6 +3,14 @@ The history order is reversed so that new features are at the top.
 20-Feb-2003
 	- Anders Stenberg fixed a bug in shader loader causing fragment
 	  programs not to load.
+	- Apparently in some cases AWS calls g2d->SetClipRect() with a
+	  clipping rectangle that goes outside of screen boundaries. This
+	  can cause crashes when using the software renderer and when drawing
+	  primitives that actually go beyond the screen boundaries but stay
+	  in the clipping rectangle. I don't know enough about AWS to fix
+	  this bug in AWS itself but for now I fixed the problem by
+	  clamping the clip rect in g2d to the size of the screen so it is
+	  now impossible to make the clip rect go outside screen boundaries.
 19-Feb-2003
 	- Mårten Svanfeldt fixed a bug introduced when adding the new
 	  light-parameters for the new renderer due to a missing
