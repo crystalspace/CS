@@ -23,6 +23,7 @@
 #import <AppKit/NSMenu.h>
 #import <AppKit/NSMenuItem.h>
 #import <Foundation/NSAutoreleasePool.h>
+#import <Foundation/NSString.h>
 
 static NSMenu* build_menu( char const* section, NeXTConfigHandle );
 
