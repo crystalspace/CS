@@ -913,8 +913,25 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* movable,
 void csPortalContainer::HardTransform (const csReversibleTransform& t)
 {
   Prepare ();
-  (void)t;
-  //@@@@@@@@@@@@@@@@
+  int i;
+  world_vertices.SetLength (vertices.Length ());
+  for (i = 0 ; i < vertices.Length () ; i++)
+  {
+    vertices[i] = t.This2Other (vertices[i]);
+    world_vertices[i] = vertices[i];
+  }
+  for (i = 0 ; i < portals.Length () ; i++)
+  {
+    csPortal* prt = portals[i];
+    csPlane3 new_plane;
+    csDirtyAccessArray<int>& vidx = prt->GetVertexIndices ();
+    t.This2Other (prt->GetIntObjectPlane (), vertices[vidx[0]], new_plane);
+    prt->SetObjectPlane (new_plane);
+    prt->SetWorldPlane (new_plane);
+    if (prt->flags.Check (CS_PORTAL_WARP))
+      prt->ObjectToWorld (t, prt->warp_obj);
+  }
+  movable_nr--;	// Make sure object to world will be recalculated.
 }
 
 bool csPortalContainer::HitBeamOutline (const csVector3& start,
@@ -940,13 +957,14 @@ bool csPortalContainer::HitBeamObject (const csVector3& start,
 {
   Prepare ();
   int i;
-  float r, best_r = 2000000000.;
-  csVector3 cur_isect;
+  float best_r = 2000000000.;
   int best_p = -1;
 
   for (i = 0; i < portals.Length (); i++)
   {
     csPortal *p = portals[i];
+    float r;
+    csVector3 cur_isect;
     if (p->IntersectSegment (start, end, cur_isect, &r))
     {
       if (r < best_r)

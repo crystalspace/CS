@@ -1032,14 +1032,20 @@ void csEngine::RegisterRenderPriority (
   render_priorities.Put (priority, (char*)name);
   render_priority_sortflags[priority] = rendsort;
   render_priority_cameraflags[priority] = do_camera;
-  if (!strcmp (name, "sky"))
-    render_priority_sky = priority;
-  else if (!strcmp (name, "wall"))
-    render_priority_wall = priority;
-  else if (!strcmp (name, "object"))
-    render_priority_object = priority;
-  else if (!strcmp (name, "alpha"))
-    render_priority_alpha = priority;
+  render_priority_dirty = true;
+}
+
+void csEngine::UpdateStandardRenderPriorities ()
+{
+  if (!render_priority_dirty)
+    return;
+  render_priority_dirty = false;
+
+  render_priority_sky = GetRenderPriority ("sky");
+  render_priority_portal = GetRenderPriority ("portal");
+  render_priority_wall = GetRenderPriority ("wall");
+  render_priority_object = GetRenderPriority ("object");
+  render_priority_alpha = GetRenderPriority ("alpha");
 }
 
 long csEngine::GetRenderPriority (const char *name) const
@@ -1095,10 +1101,12 @@ int csEngine::GetRenderPrioritySorting (long priority) const
 
 void csEngine::ClearRenderPriorities ()
 {
+  render_priority_dirty = true;
   render_priorities.DeleteAll ();
   render_priority_sortflags.SetLength (0);
   render_priority_cameraflags.SetLength (0);
   RegisterRenderPriority ("sky", 2, true);
+  RegisterRenderPriority ("portal", 3);
   RegisterRenderPriority ("wall", 4);
   RegisterRenderPriority ("object", 6);
   RegisterRenderPriority ("alpha", 8, CS_RENDPRI_BACK2FRONT);

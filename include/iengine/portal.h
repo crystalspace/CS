@@ -130,7 +130,7 @@ struct iPortalCallback : public iBase
   virtual bool Traverse (iPortal* portal, iBase* context) = 0;
 };
 
-SCF_VERSION (iPortal, 0, 5, 0);
+SCF_VERSION (iPortal, 0, 6, 0);
 
 /**
  * This is the interface to the Portal objects. Polygons that are
@@ -141,8 +141,13 @@ SCF_VERSION (iPortal, 0, 5, 0);
  */
 struct iPortal : public iBase
 {
-  /// Get the iObject for this portal.
+  /// Get the iObject for this portal. @@@ OBSOLETE!!!
   virtual iObject *QueryObject () = 0;
+
+  /// Set the name of this portal.
+  virtual void SetName (const char* name) = 0;
+  /// Get the name of this portal.
+  virtual const char* GetName () const = 0;
 
   /// Return the sector that this portal points too.
   virtual iSector* GetSector () const = 0;

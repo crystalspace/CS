@@ -25,6 +25,42 @@ chronological order.
 	- res fixed the missing of the csappframe library directory from 
 	  cs-config output under certain circumstances, as reported by 
 	  Bjorn Hansen <holomorph@users.sourceforge.net>.
+	- Jorrit fixed a bug in the portal implementation of portal containers.
+	  The csPortal->IntersectSegment() routine didn't work properly if
+	  a portal container contains more then one portal.
+	- Jorrit added a new 'portal' render priority. If that render priority
+	  is present then it will be used automatically for portals created
+	  by the thing loader.
+	- Jorrit fixed some bugs related to render priorities in case some
+	  render priorities are not specified by the map file.
+	- Jorrit changed the way the rotating door works in flarge. The overlay
+	  texture of the portal is now a seperate child mesh in a higher render
+	  priority. This works a lot better with the new portal container
+	  approach. Also added a 'portal' render priority to flarge.
+	- Jorrit temporarily removed the <float> from the door portal in flarge
+	  since it appears to be broken a bit with the new portal containers.
+	  Need to investigate.
+	- Jorrit added SetName/GetName() to iPortal.
+	- Jorrit attempted to fix the 'wavy portal' stuff in flarge for the
+	  new portal containers but failed.
+	- Jorrit implemented HardTransform() for portal containers.
+	- Jorrit enabled portal compatibility mode in the thing loader now!
+	  This means that all portals that you create in map files using
+	  the <portal> keyword inside a polygon will now become portals in
+	  a portal container that is linked to the mesh of the polygon.
+	  Note that portals in things are still supported (but not through
+	  the map file). These will be removed later if this turns out to
+	  work well. So this is basically an experimental stage. There are still
+	  a few issues though:
+	      - In OpenGL mode the keycolor of the hole in the large room
+	        of flarge no longer works. With software renderer it is fine.
+		Strangely enough the keycolor works fine if you look at the
+		hole from underneath. That's a different portal though.
+	      - In Software mode the rotating door no longer has correct
+	        reflection. In OpenGL it is fine.
+	      - The <float/> keyword for the rotating door had to be removed
+	        so there may be some issues there. This needs to be investigated.
+	      - Wavy sector doesn't work yet.
 1-Oct-2003
 	- Jorrit fixed a bug reported by valgrind in the portal container.
 	  It was using an uninitialized variable.

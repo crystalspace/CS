@@ -47,12 +47,14 @@ csPortal::csPortal (csPortalContainer* parent)
   filter_b = 1;
   max_sector_visit = 5;
   csPortal::parent = parent;
+  name = 0;
 
   VectorArray = GetStaticVectorArray ();
 }
 
 csPortal::~csPortal ()
 {
+  delete[] name;
 }
 
 void csPortal::SetSector (iSector *s)
@@ -318,7 +320,8 @@ bool csPortal::IntersectRay (const csVector3 &start,
   i1 = vertex_indices.Length () - 1;
   for (i = 0; i < vertex_indices.Length (); i++)
   {
-    csMath3::CalcNormal (normal, start, (*vt)[i1], (*vt)[i]);
+    csMath3::CalcNormal (normal, start, (*vt)[vertex_indices[i1]],
+    	(*vt)[vertex_indices[i]]);
     if ((relend * normal) > 0) return false;
     i1 = i;
   }

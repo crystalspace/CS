@@ -891,37 +891,42 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
     else if (!strcmp (kp->GetKey (), "entity_WavePortal"))
     {
-      csRef<iMeshWrapper> wrap (SCF_QUERY_INTERFACE (src, iMeshWrapper));
+      csRef<iMeshWrapper> wrap = SCF_QUERY_INTERFACE (src, iMeshWrapper);
       if (wrap)
       {
-        csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (
-		wrap->GetMeshObject (), iThingState));
-	if (thing_state)
+        iMeshList* ml = wrap->GetChildren ();
+	if (ml->GetCount () > 0)
 	{
-	  iThingFactoryState* thing = thing_state->GetFactory ();
-	  char polyname[255];
-	  int xyz;
-	  float max_angle, speed;
-	  csScanStr (kp->GetValue (), "%s,%d,%f,%f",
-	  	polyname, &xyz, &max_angle, &speed);
+	  iMeshWrapper* pcmesh = ml->Get (0);
+	  csRef<iPortalContainer> pc = SCF_QUERY_INTERFACE (
+	  	pcmesh->GetMeshObject (), iPortalContainer);
+	  if (pc)
+	  {
+	    char polyname[255];
+	    int xyz;
+	    float max_angle, speed;
+	    csScanStr (kp->GetValue (), "%s,%d,%f,%f",
+	  	  polyname, &xyz, &max_angle, &speed);
 
-	  iPolygon3DStatic* p = thing->GetPolygon (polyname);
-	  if (!p)
-	  {
-	    Sys->Report (CS_REPORTER_SEVERITY_WARNING,
-	    	"Cannot find a polygon named '%s'!", polyname);
-	  }
-	  else
-	  {
-	    iPortal* po = p->GetPortal ();
-	    if (!po)
+	    int i;
+	    iPortal* portal;
+	    for (i = 0 ; i < pc->GetPortalCount () ; i++)
+	    {
+	      portal = pc->GetPortal (i);
+	      if (!strcmp (polyname, portal->GetName ()))
+	      {
+	        break;
+	      }
+	      portal = 0;
+	    }
+	    if (!portal)
 	    {
 	      Sys->Report (CS_REPORTER_SEVERITY_WARNING,
-	    	"This polygon '%s' has no portal!", polyname);
+	    	  "Cannot find a portal named '%s'!", polyname);
 	    }
 	    else
 	    {
-	      csAnimatedPortal* anportal = new csAnimatedPortal (po,
+	      csAnimatedPortal* anportal = new csAnimatedPortal (portal,
 	      	xyz, max_angle, speed);
 	      src->ObjAdd (anportal);
 	      Sys->busy_entities.Push (anportal);

@@ -333,16 +333,23 @@ public:
   /// Do_camera flags for the render priorities.
   csArray<bool> render_priority_cameraflags;
   /**
+   * If the following flag is dirty then the render_priority_xxx values are
+   * potentially invalid and need to be recalculated.
+   */
+  bool render_priority_dirty;
+  /**
    * The engine knows about the following render priorities and keeps
    * them here:
    * <ul>
    * <li>"sky": usually rendered using ZFILL or ZNONE
+   * <li>"portal": usually for portal containers
    * <li>"wall": usually rendered using ZFILL
    * <li>"object": usually rendered using ZUSE
    * <li>"alpha": usually rendered using ZTEST
    * </ul>
    */
   long render_priority_sky;
+  long render_priority_portal;
   long render_priority_wall;
   long render_priority_object;
   long render_priority_alpha;
@@ -850,6 +857,8 @@ public:
     return csPtr<iLightIterator> (it);
   }
 
+  /// Update the standard render priorities if needed.
+  void UpdateStandardRenderPriorities ();
   /// Register a new render priority.
   virtual void RegisterRenderPriority (const char* name, long priority,
   	int rendsort = CS_RENDPRI_NONE, bool do_camera = false);
@@ -866,13 +875,35 @@ public:
   /// Get the render priority sorting flag.
   virtual int GetRenderPrioritySorting (long priority) const;
   /// Get the render priority for sky objects (attached to 'sky' name).
-  virtual long GetSkyRenderPriority () const { return render_priority_sky; }
+  virtual long GetSkyRenderPriority ()
+  {
+    UpdateStandardRenderPriorities ();
+    return render_priority_sky;
+  }
+  /// Get the render priority for portal objects (attached to 'portal' name).
+  virtual long GetPortalRenderPriority ()
+  {
+    UpdateStandardRenderPriorities ();
+    return render_priority_portal;
+  }
   /// Get the render priority for wall objects (attached to 'wall' name).
-  virtual long GetWallRenderPriority () const { return render_priority_wall; }
+  virtual long GetWallRenderPriority ()
+  {
+    UpdateStandardRenderPriorities ();
+    return render_priority_wall;
+  }
   /// Get the render priority for general objects (attached to 'object' name).
-  virtual long GetObjectRenderPriority () const { return render_priority_object; }
+  virtual long GetObjectRenderPriority ()
+  {
+    UpdateStandardRenderPriorities ();
+    return render_priority_object;
+  }
   /// Get the render priority for alpha objects (attached to 'alpha' name).
-  virtual long GetAlphaRenderPriority () const { return render_priority_alpha; }
+  virtual long GetAlphaRenderPriority ()
+  {
+    UpdateStandardRenderPriorities ();
+    return render_priority_alpha;
+  }
   /// Clear all render priorities.
   virtual void ClearRenderPriorities ();
   /// Get the number of render priorities.

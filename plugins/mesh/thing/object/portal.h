@@ -267,6 +267,14 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csPortalObsolete);
     virtual iObject *QueryObject () { return scfParent; }
+    virtual void SetName (const char* name)
+    {
+      scfParent->SetName (name);
+    }
+    virtual const char* GetName () const
+    {
+      return scfParent->GetName ();
+    }
     virtual iSector* GetSector () const { return scfParent->GetSector (); }
     virtual void SetSector (iSector* s) { scfParent->SetSector (s); }
 

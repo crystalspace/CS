@@ -20,6 +20,7 @@
 #define __CS_ENGINE_PORTAL_H__
 
 #include "csutil/scf.h"
+#include "csutil/util.h"
 #include "csutil/flags.h"
 #include "csutil/refarr.h"
 #include "csutil/garray.h"
@@ -35,6 +36,8 @@ class csPortalContainer;
  */
 class csPortal : public iPortal
 {
+  friend class csPortalContainer;
+
 private:
   /**
    * The sector that this portal points to.
@@ -50,6 +53,8 @@ private:
   csPlane3 object_plane;
   /// World plane.
   csPlane3 world_plane;
+  /// Name.
+  char* name;
 
 public:
   /// Set of flags
@@ -82,6 +87,16 @@ public:
 
   /// Destructor.
   virtual ~csPortal ();
+
+  virtual void SetName (const char* n)
+  {
+    delete[] name;
+    name = csStrNew (n);
+  }
+  virtual const char* GetName () const
+  {
+    return name;
+  }
 
   //---- misc. manipulation functions ---------------------------------------
 

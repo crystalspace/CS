@@ -272,7 +272,7 @@ struct iEngine : public iBase
    * </ul>
    * \param do_camera If 'do_camera' is true then this render priority will 
    * be scanned for objects that have CS_ENTITY_CAMERA flag set.
-   * \note The default render priorities are 'sky', 'wall', 'object' 
+   * \note The default render priorities are 'sky', 'portal', 'wall', 'object' 
    * and 'alpha' (in that priority order, where sky is rendered first and 
    * alpha is rendered last).  Should you wish to add your own render 
    * priority, you must call ClearRenderPriorities() and re-add the 
@@ -281,7 +281,13 @@ struct iEngine : public iBase
   virtual void RegisterRenderPriority (const char* name, long priority,
   	int rendsort = CS_RENDPRI_NONE, bool do_camera = false) = 0;
 
-  /// Get a render priority by name.
+  /**
+   * Get a render priority by name.
+   * \param name is the name you want (usually one of 'sky', 'portal',
+   * 'wall', 'object', or 'alpha' but you can define your own render
+   * priorities).
+   * \return 0 if render priority doesn't exist.
+   */
   virtual long GetRenderPriority (const char* name) const = 0;
   /// Set the render priority camera flag.
   virtual void SetRenderPriorityCamera (long priority, bool do_camera) = 0;
@@ -294,13 +300,15 @@ struct iEngine : public iBase
   /// Get the render priority sorting flag.
   virtual int GetRenderPrioritySorting (long priority) const = 0;
   /// Get the render priority for sky objects (attached to 'sky' name).
-  virtual long GetSkyRenderPriority () const = 0;
+  virtual long GetSkyRenderPriority () = 0;
+  /// Get the render priority for portal objects (attached to 'portal' name).
+  virtual long GetPortalRenderPriority () = 0;
   /// Get the render priority for wall objects (attached to 'wall' name).
-  virtual long GetWallRenderPriority () const = 0;
+  virtual long GetWallRenderPriority () = 0;
   /// Get the render priority for general objects (attached to 'object' name).
-  virtual long GetObjectRenderPriority () const = 0;
+  virtual long GetObjectRenderPriority () = 0;
   /// Get the render priority for alpha objects (attached to 'alpha' name).
-  virtual long GetAlphaRenderPriority () const = 0;
+  virtual long GetAlphaRenderPriority () = 0;
   /// Clear all render priorities.
   virtual void ClearRenderPriorities () = 0;
   /// Get the number of render priorities.
@@ -330,7 +338,8 @@ struct iEngine : public iBase
    * \param layers an array of csTextureLayer structures cooresponding
    * to each texture layer and describing how the layer is aligned and blended
    * with the layers beneath it.
-   * \see CreateBaseMaterial(iTextureWrapper* txt) note about registering/preparing materials.
+   * \see CreateBaseMaterial(iTextureWrapper* txt) note about
+   * registering/preparing materials.
    */
   virtual csPtr<iMaterial> CreateBaseMaterial (iTextureWrapper* txt,
   	int num_layers, iTextureWrapper** wrappers, csTextureLayer* layers) = 0;

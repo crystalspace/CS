@@ -571,38 +571,30 @@ bool csThingLoader::ParsePoly3d (
     return false;
   }
 
-  if (!set_viscull)
+  mat = poly3d->GetMaterial ();
+  csRef<iMaterialEngine> mateng = SCF_QUERY_INTERFACE (mat->GetMaterial (),
+  	iMaterialEngine);
+  bool is_texture_transparent = false;
+  if (mateng)
   {
-    if (portal_node)
+    iTextureWrapper* tw = mateng->GetTextureWrapper ();
+    if (tw)
     {
-      set_viscull = -1;
-    }
-    else
-    {
-      mat = poly3d->GetMaterial ();
-      csRef<iMaterialEngine> mateng = SCF_QUERY_INTERFACE (mat,
-      	iMaterialEngine);
-      if (mateng)
+      int r, g, b;
+      tw->GetKeyColor (r, g, b);
+      if (r != -1)
+        is_texture_transparent = true;
+      else
       {
-        iTextureWrapper* tw = mateng->GetTextureWrapper ();
-        if (tw)
+        iImage* im = tw->GetImageFile ();
+        if (im)
         {
-          iImage* im = tw->GetImageFile ();
-          if (im)
-          {
-            if (im->HasKeycolor ()) set_viscull = -1;
-	    else if (im->GetFormat () & CS_IMGFMT_ALPHA)
-	      set_viscull = -1;
-          }
+          is_texture_transparent = im->HasKeycolor () ||
+	    (im->GetFormat () & CS_IMGFMT_ALPHA);
         }
       }
     }
   }
-
-  if (set_viscull == 1)
-    poly3d->GetFlags ().Set (CS_POLY_VISCULL);
-  else if (set_viscull == -1)
-    poly3d->GetFlags ().Reset (CS_POLY_VISCULL);
 
   if (texspec & CSTEX_UV)
   {
@@ -726,17 +718,28 @@ bool csThingLoader::ParsePoly3d (
 	      m_w, v_w_before, v_w_after, &destSectorName))
     {
       iSector* destSector = ldr_context->FindSector (destSectorName.GetData ());
-#if 0
+#if 1
 // @@@ Works more or less but not fully!
       csVector3* portal_verts = new csVector3[poly3d->GetVertexCount ()];
       int i;
       for (i = 0 ; i < poly3d->GetVertexCount () ; i++)
         portal_verts[i] = poly3d->GetVertex (i);
+
+      int portal_pri = portal_pri = engine->GetPortalRenderPriority ();
+      if (portal_pri == 0)
+        portal_pri = mesh->GetRenderPriority ();
+      char pc_name[100];
+      sprintf (pc_name, "__portals_%d__", portal_pri);
+
       iPortal* portal;
       csRef<iMeshWrapper> portal_mesh = engine->CreatePortal (
-      	"__portals__", mesh, destSector,
+      	pc_name, mesh, destSector,
       	portal_verts, poly3d->GetVertexCount (), portal);
       delete[] portal_verts;
+
+      portal_mesh->SetRenderPriority (portal_pri);
+      if (poly3d->GetName ())
+        portal->SetName (poly3d->GetName ());
 
       if (!destSector)
       {
@@ -746,7 +749,18 @@ bool csThingLoader::ParsePoly3d (
 	mscb->DecRef ();
       }
 
-      poly_delete = if_portal_delete_polygon;
+      if (is_texture_transparent)
+      {
+        poly_delete = false;
+	if (!set_colldet)
+	  set_colldet = -1;
+	if (!set_viscull)
+	  set_viscull = -1;
+      }
+      else
+      {
+        poly_delete = if_portal_delete_polygon;
+      }
 #else
       iPortal* portal;
       if (destSector)
@@ -782,6 +796,16 @@ bool csThingLoader::ParsePoly3d (
       }
     }
   }
+
+  if (!set_viscull)
+  {
+    if (portal_node || is_texture_transparent)
+      set_viscull = -1;
+  }
+  if (set_viscull == 1)
+    poly3d->GetFlags ().Set (CS_POLY_VISCULL);
+  else if (set_viscull == -1)
+    poly3d->GetFlags ().Reset (CS_POLY_VISCULL);
 
   if (set_colldet == 1)
     poly3d->GetFlags ().Set (CS_POLY_COLLDET);
