@@ -458,9 +458,10 @@ static void DumpSubTree (int indent, const char* type, csDGEL* el)
 
   if (el->marker || *type == 'P' || !el->used)
   {
+    printf ("%s%s %p %s%s\n", spaces, type, el->object,
+    	el->description,
+    	el->used ? (el->marker ? " (REF)" : "") : " (BAD LINK!)");
     if (*type != 'P') el->marker = true;
-    printf ("%s%s %p%s\n", spaces, type, el->object,
-    	el->used ? "" : " (BAD LINK!)");
   }
   else
   {
