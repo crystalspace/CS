@@ -182,6 +182,7 @@ IMPLEMENT_OBJECT_INTERFACE (csModelDataLight);
 
 IMPLEMENT_ACCESSOR_METHOD (csModelDataLight, float, Radius);
 IMPLEMENT_ACCESSOR_METHOD (csModelDataLight, const csColor &, Color);
+IMPLEMENT_ACCESSOR_METHOD (csModelDataLight, const csVector3 &, Position);
 
 csModelDataLight::csModelDataLight ()
 {

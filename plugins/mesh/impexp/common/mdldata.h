@@ -58,6 +58,7 @@
 #define IMPLEMENT_EMBEDDED_OBJECT(Class)				\
   SCF_IMPLEMENT_EMBEDDED_IBASE_INCREF (Class);				\
   SCF_IMPLEMENT_EMBEDDED_IBASE_DECREF (Class);				\
+  SCF_IMPLEMENT_EMBEDDED_IBASE_GETREFCOUNT (Class);			\
   SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY (Class);				\
     void *o = __scf_superclass__::QueryInterface (iInterfaceID, iVersion); \
     if (o) return o;							\
@@ -121,29 +122,15 @@ public:
   /// constructor
   csModelDataCamera ();
 
-  /// return the position of the camera
-  const csVector3 &GetPosition () const;
-  /// set the position of the camera
-  void SetPosition (const csVector3 &v);
+  DECLARE_ACCESSOR_METHODS (const csVector3 &, Position);
+  DECLARE_ACCESSOR_METHODS (const csVector3 &, UpVector);
+  DECLARE_ACCESSOR_METHODS (const csVector3 &, FrontVector);
+  DECLARE_ACCESSOR_METHODS (const csVector3 &, RightVector);
 
-  /// return the 'up' vector of the camera
-  const csVector3 &GetUpVector () const;
-  /// set the 'up' vector of the camera
-  void SetUpVector (const csVector3 &v);
   /// compute the 'up' vector as the normal to the 'front' and 'right' vectors
   void ComputeUpVector ();
-
-  /// return the 'front' vector of the camera
-  const csVector3 &GetFrontVector () const;
-  /// set the 'front' vector of the camera
-  void SetFrontVector (const csVector3 &v);
   /// compute the 'front' vector as the normal to the 'up' and 'right' vectors
   void ComputeFrontVector ();
-
-  /// return the 'right' vector of the camera
-  const csVector3 &GetRightVector () const;
-  /// set the 'right' vector of the camera
-  void SetRightVector (const csVector3 &v);
   /// compute the 'right' vector as the normal to the 'up' and 'front' vectors
   void ComputeRightVector ();
 
@@ -158,6 +145,7 @@ class csModelDataLight : public iModelDataLight
 private:
   float Radius;
   csColor Color;
+  csVector3 Position;
 
 public:
   SCF_DECLARE_IBASE;
@@ -166,15 +154,9 @@ public:
   /// constructor
   csModelDataLight ();
 
-  /// Return the radius (brightness) of this light
-  float GetRadius () const;
-  /// Set the radius (brightness) of this light
-  void SetRadius (float r);
-
-  /// Return the color of the light
-  const csColor &GetColor () const;
-  /// Set the color of the light
-  void SetColor (const csColor &);
+  DECLARE_ACCESSOR_METHODS (float, Radius);
+  DECLARE_ACCESSOR_METHODS (const csVector3 &, Position);
+  DECLARE_ACCESSOR_METHODS (const csColor &, Color);
 };
 
 class csModelDataMaterial : public iModelDataMaterial

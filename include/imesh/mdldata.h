@@ -170,6 +170,11 @@ struct iModelDataLight : public iBase
   virtual const csColor &GetColor () const = 0;
   /// Set the color of the light
   virtual void SetColor (const csColor &) = 0;
+
+  /// Set the position of the light
+  virtual const csVector3 &GetPosition () const = 0;
+  /// Return the position of the light
+  virtual void SetPosition (const csVector3 &) = 0;
 };
 
 
