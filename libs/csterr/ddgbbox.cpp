@@ -136,61 +136,12 @@ float ddgBBox::distancesq(ddgVector3 *eye)
 	return d.sizesq();
 }
 
-// Is 1D point inside range.
-#define INSIDE(m1,m2,v) (m1 <= v && m2 >= v)
-// Is 2D point inside rect.
-#define INSIDE2(i1,j1,i2,j2,iv,jv) (INSIDE(i1,i2,iv)&&INSIDE(j1,j2,jv))
-// Calculate values in given dimension and test them.
-#define CALCTEST(mm,d1,d2,d3) \
-{ \
-	t = (mm[d1] - p1->v[d1]) / d[d1]; \
-	iv = p1->v[d2] + t * d[d2]; \
-	jv = p1->v[d3] + t * d[d3]; \
-	if (INSIDE2(_min[d2],_min[d3],_max[d2],_max[d3],iv,jv)) \
-		return true; \
-}
-// Calculate the min and max values in a dimension and test.
-#define CALCDIM(d1,d2,d3) CALCTEST(_min,d1,d2,d3) CALCTEST(_max,d1,d2,d3)
-// Test for intersection of line with bbox.
-bool ddgBBox::intersect( ddgVector3 *p1, ddgVector3 *p2)
-{
-	ddgVector3 d(*p2 - *p1); // Slope of line.
-	float	t;
-	float   iv,jv;
-	// Test each face for inter section as follows:
-	// For each dimension
-	// Substitute a min and max value in the equation
-	// and find the point in 3space. then test if this
-	// point is within the bounds of the other 2 dimensions.
-	// If any point satisfies, we intersect.
-	CALCDIM(0,1,2)
-	CALCDIM(1,0,2)
-	CALCDIM(2,0,1)
-	return false;
-}
-// Test for intersection of another bbox.
-bool ddgBBox::intersect( ddgBBox *b )
-{
-	if (cornerx(0) > b->cornerx(1)
-		|| cornerx(1) < b->cornerx(0)
-		|| cornery(1) > b->cornery(5)
-		|| cornery(5) < b->cornery(1)
-		|| cornerz(0) > b->cornerz(2)
-		|| cornerz(2) < b->cornerz(0))
-		return false;
-	else return true;
-}
-
 
 ddgClipFlags ddgBBox::visibleSpace( ddgBBox b, float tanHalfFOV )
 {
 	ddgClipFlags vis;
 	vis.visibility = 0;
 
-#ifdef DDG
-	// Flip Z axis. (Could be eliminated).
-	b.setz(-1*b.maxz(),-1*b.minz());
-#endif
 	if (tanHalfFOV != 1.0)		// Not 90 degree case
 		b.scale(ddgVector3(1.0/tanHalfFOV,1.0/tanHalfFOV,1));
 	// Test against near, and far plane and test viewing frustrum.

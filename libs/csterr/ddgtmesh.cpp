@@ -50,7 +50,6 @@ void ddgQueue::remove( ddgTriIndex tindex, ddgTBinTree *bt )
 /// Update node tindex in the queue if its key has changed.
 void ddgQueue::update( ddgTriIndex tindex, ddgTBinTree *bt )
 {
-	assert(size() > 0);
 	if (bt->tri(tindex)->state().flags.priority == false)
 	{
 		unsigned int op = bt->tri(tindex)->priority();
@@ -197,7 +196,6 @@ void ddgTBinMesh::generateNormals(void)
 		  
             // Since a grid cannot fold on itself there can be no
             // negative normals.
-			asserts((n[1]>=0.0),"Invalid normal.");
 			nn = normal[ri*cmax+ci];
 			nn->set(n);
 		}
@@ -248,8 +246,6 @@ void ddgTBinMesh::removeBinTree( ddgTBinTree *bt )
  */
 bool ddgTBinMesh::init( double *worldToCameraMatrix, ddgBBox *camClipBox, float fov )
 {
-
-	assert(camClipBox);
     // Set world to camera transformation matrix.
     _wtoc = worldToCameraMatrix; 
     // Set the camera bounding box.
@@ -378,7 +374,6 @@ void ddgTBinMesh::initBrothers( void )
 			// Normal case
 			else
 			{
-				assert(stri[kt].brother == BINIT);
 				// If the same row in the previous level was known, inherit.
                 if (lk && t < lk && !edge(lk + t))
                 {
@@ -390,8 +385,6 @@ void ddgTBinMesh::initBrothers( void )
                 else // It is a new brother.
                 {
 					b = k - 1 - t;
-					assert ( stri[kt].col == stri[k+b].col
-					  && stri[kt].row == stri[k+b].row);
 					stri[kt].brother = k+b;
 					stri[k+b].brother = kt;
                 }
@@ -401,14 +394,6 @@ void ddgTBinMesh::initBrothers( void )
 		k = kk;  // 2^n
 	}
 }
-
-//static bool debugDraw = false;
-unsigned int _pmin = 0;
-unsigned int _pmax = 0xFFFF;
-
-unsigned int _ppmin = 0xFFF;
-unsigned int _ppmax = 0;
-
 
 void ddgTBinMesh::calculate( void )
 {
@@ -700,20 +685,11 @@ float ddgTBinMesh::height(float x, float z)
     ddgTBinTree *bt = 0;
     unsigned int r, c;
     pos(&x,&z,&bt, &r, &c);
-	assert(bt);
     // Find mesh height at this location.
 	return bt ? bt->treeHeight(r,c,x,z) : 0.0;
 }
 void ddgTBinMesh::transform( ddgVector3 vin, ddgVector3 *vout )
 {
-#ifdef DDG
-    // Convert the world coordinates to camera coordinates.
-    // Perform matrix multiplication.
-    vout->v[0] = _wtoc[0]*vin[0]+_wtoc[4]*vin[1]+_wtoc[8]*vin[2]+_wtoc[12];
-    vout->v[1] = _wtoc[1]*vin[0]+_wtoc[5]*vin[1]+_wtoc[9]*vin[2]+_wtoc[13];
-    vout->v[2] = _wtoc[2]*vin[0]+_wtoc[6]*vin[1]+_wtoc[10]*vin[2]+_wtoc[14];
-#else
 	_transform(vin,vout);
-#endif
 }
 

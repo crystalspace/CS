@@ -53,12 +53,7 @@ ddgSplayTree::ddgSplayTree(  )
 	    _maxNode.set(ddgSplayKey(0,0,0));
     }
 
-	if (!_nList)
-	{
-		ddgErrorSet(Memory,"Failed to allocate ddgSplayTree buffer");
-		ddgError::report();
-	}
-	else
+	if (_nList)
 	{
 		// Initialize the free list.
 		unsigned int i = _maxSize-1;
@@ -82,8 +77,6 @@ ddgSplayTree::ddgSplayTree(  )
 // Allocator for ddgSplayNodes.
 ddgSplayIndex ddgSplayTree::allocNode(void)
 {
-    assert(_nList);
-    assert(_size < _maxSize);
 	ddgSplayIndex n = _fList;
 	_fList = left(n);
 	_size++;
@@ -93,7 +86,6 @@ ddgSplayIndex ddgSplayTree::allocNode(void)
 // Deallocator for ddgSplayNodes.
 void ddgSplayTree::freeNode(ddgSplayIndex n)
 {
-    assert(_size);
 	left(n, _fList);
 	_fList = n;
 	_size--;
@@ -261,35 +253,6 @@ ddgSplayIndex ddgSplayTree::remove( ddgSplayKey sk, ddgSplayIndex n )
 
     return n;
 }
-
-
-#if 0
-ostream& operator << ( ostream&s, ddgSplayKey t )
-{
-	unsigned int tree, i, k;
-	i = t.index();
-    tree = t.tree();
-    k = t.key();
-	return s << "(" << k << "," << tree << "," << i << ")";
-}
-#endif
-
-#ifdef _DEBUG
-int ddgSplayTree::printTree( ddgSplayIndex n )
-{
-	static int d = 0, dm = 0;
-    if( n != _nullNode )
-    {
-		d++;
-		if (d > dm) dm = d;
-        printTree( left(n) );
-        //cerr << key(n) << " ";
-        printTree( right(n) );
-		d--;
-    }
-	return dm;
-}
-#endif
 
 
 unsigned int ddgSplayTree::size(void)
