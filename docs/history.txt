@@ -19,7 +19,40 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
-
+14-May-99:
+	- Fix so that config.mak is replaced and not appended too.
+	- Precalculated lighting also works through portals on things now.
+	  This was not the case earlier.
+	- Increased speed of walking forward with the left mouse button.
+	- Implemented lighted curves using lightmaps. A lightmap is
+	  generated and calculated for every curve. The cache works (i.e.
+	  curve lightmaps are also saved on disk like polygon lightmaps).
+	  The lighted curves seem to work very well but the following
+	  things are missing:
+	  	- Lightmaps always have fixed size of 16x16 (not 16x16 pixels
+		  for every lumel. The complete lightmap is 16x16). This is easy
+		  to fix but I should try to find a good size for lightmaps.
+		- There are no shadows yet. The curve is lighted according
+		  to all lights that are near enough but shadows are ignored.
+		- No dynamic lighting yet.
+		- Curves don't listen to the 'textured' and 'lighted' flags
+		  to disable texture mapping and lighting.
+13-May-99:
+	- Ivan Avramovic fixed a bug causing segfaults when deleting
+	  copied csObjects. He also added documentation to several files
+	  in the csobject library.
+	- Thomas Hieber added gamma correction for lightmaps and textures.
+	  This will make everything brighter to give it a look comparable
+	  to 2*SRC*DEST. Also removed some warnings and fixed the project
+	  files to add triangle.*.
+	- Patch from Gert Steenssens to fix problems with Glide
+	  crashing (DrawLine/DrawPixel methods added).
+	- Fixes to Macintosh port from Robert Bate.
+12-May-99:
+	- Andrew Zabolotny did various changes: update to OS/2 drivers
+	  section, add autodetect of " and "pipe" variables. Changes in
+	  csdive.
+	- Added changes to BeOS port from David Huen.
 11-May-99:
 	- Added support for flat texture mapping in 32-bit mode. Enhanced
 	  speed of 8-bit flat texture mapper. Also added support for flat
@@ -28,6 +61,7 @@ Short-term cleanups that need to be done:
 	  flag enables flat texture drawing in all display modes. The
 	  'lighting' flag enables/disabled lighting also in all display
 	  modes and also works with flat texture drawing enabled.
+	- New networking code from Serguei Narojnyi.
 10-May-99:
 	- Texture mapping toggle works again (it was broken).
 	  (use the 't' key).
@@ -2098,7 +2132,7 @@ Short-term cleanups that need to be done:
 	- *** Release of 0.11_037 ***
 16-Nov-98:
 	- Added 'UV_SHIFT(du,dv)' option in TEXTURE statement of polygons with
-	  which you can shift the u,v as given ây the other texture statements.
+	  which you can shift the u,v as given by the other texture statements.
 15-Nov-98:
 	- Fixed bug in static and dynamic lighting code which could cause
 	  dark borders for lightmaps. Lighting is now considerably nicer

@@ -14,15 +14,6 @@ list first.
 <ul>
 <li> The u/v overflow tests in the draw_scanline routines should
      be either removed or minimized.
-<li> There is still a known bug when the viewer is positioned very close
-     to a portal polygon. When this happens the portal polygon may be
-     clipped to the Z-plane, thus causing only half of the screen to be
-     drawn. One solution would be to make a special case of Z-plane
-     clipping for portal polygons and to make sure that this situation
-     never happens. There is an experimental bug fix for this in place
-     but it is disabled because it does not work in the presence of
-     mirroring portals. Have a look at engine/polygon/polygon.cpp and
-     search for EXPERIMENTAL_BUG_FIX.
 <li> Shadows are not always very accurate at the boundaries of
      different polygons. This is because the lightmap grids
      of the bordering polygons are not always aligned. I need to
@@ -31,10 +22,6 @@ list first.
      other words: there may be a dark border when there should not be any.
      This probably needs to be solved by a second pass through all the
      lightmaps.
-<li> The triangle drawer (used for sprites, curves, and gouroud shaded
-     world triangles) is not correct in all cases. When viewing a triangle
-     straight on it is possible that the triangle is not drawn at all or
-     drawn garbled.
 <li> Static lighting currently does not work correctly when checking if a beam
      of light hits a thing in combination with warping portals and radiosity.
      To implement this we need to remember the inverse transformation so that we
@@ -75,21 +62,8 @@ list first.
 <li> An alternative way to light 3D sprites would be to light the vertices
      instead of the triangles and do gouraud shading between them. The gouroud
      shading routines are already in place, we just have to light the vertices.
-<li> To solve the problem that we need to recompute the light tables
-     file whenever we go to a new system we should store the final
-     256 RGB values of the colormap as well. Then we can make a
-     translation table at startup to translate the indices into the
-     256-table that are used in lights.tables to new indices that
-     are system dependent. This will allow us to better include a
-     lights.tables file with a ZIP file and so make the light tables
-     file system independent.
 <li> Radiosity (as opposed to the pseudo-radiosity which now exists).
-<li> Make the current lighting baseline configurable. Currently lighting
-     levels go from 0 to 255 with 0 being dark and 255 max lighted. 200
-     is the unlighted light-level (such as the textures are loaded from
-     disk). This 200 value should be customizable so that you can have
-     it set at 100 for example (to allow for more brightness levels).
-<li> Complete lighting support for volumetric curves.
+<li> Complete lighting support for curved surfaces.
 <li> Improve the 8-bit palette generator.
 </ul>
 
@@ -108,7 +82,6 @@ list first.
 <h2>Scripting</h2>
 <ul>
 <li> Create a VM which interfaces to the Crystal Space engine through COM.
-<li> Create a ReAct compiler which compiles to VM.
 <li> Scripting support is closely related to the API work above. We need
      a good API which is supported by COM for the scripting to work good.
 </ul>
@@ -194,9 +167,9 @@ list first.
 <li> Complete support in the texture cache and texture mapper for
      the various settings of TXTMODE (24bit, global, and private)
      and the display depth.
-<li> Support for 24/32-bit display-mode.
+<li> Support for 24-bit display-mode (32-bit is already supported).
 <li> Complete the 16-bit alpha mapper (currently only 50% is supported).
-<li> Complete 16-bit support and private colormap support.
+<li> Complete 32/16-bit support and private colormap support.
 </ul>
 
 <h2>Sprites And 3D Objects</h2>
@@ -207,11 +180,8 @@ list first.
 <li> Lighting and shadows for 3D sprites (see the lighting section above).
 <li> Delay real transformation of sprites until they are visible (with a
      dirty bit or something).
-<li> 3D sprites currently use the MultiSectorObjects to be able to be in
-     more than one sector at once. We still need to complete this support
-     as it is not completely functional yet (the renderer does not fully
-     support it).
-<li> Things should also be implemented with the MultiSectorObject approach.
+<li> Improve support for large sprites which are in more than one sector
+     at the same time. Also support this for Things.
 </ul>
 
 <h2>World File And Other External Files</h2>
@@ -228,9 +198,6 @@ list first.
 <li> We will need libraries of 3D models that can be used for
      various things. I'm thinking about torches, candles, space-ship
      consoles, switches, ... Anything really.
-<li> Crystal Space is currently still in an early stage but it would
-     be nice to have other projects starting to use Crystal Space.
-     I'm thinking about 3D games, MUDS, RPG's, ...
 </ul>
 
 <h2>Optimizations</h2>
