@@ -62,8 +62,10 @@ class csNetworkManager : public iNetworkManager
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE (csNetworkManager);
-    virtual bool Initialize (iObjectRegistry *or)
-      { return scfParent->Initialize (or); }
+    virtual bool Initialize (iObjectRegistry *)
+    {
+      return true;
+    }
   } scfiComponent;
   friend class eiComponent;
 
