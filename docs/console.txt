@@ -616,3 +616,12 @@ Action:  Change quality setting of sprite lighting. If yes every vertex will
 	 sprite. Default is ´no'. This option can also be set with the
 	 SPRITE_HIGHQUAL option in the config file.
 
+Command: clrlights
+Type:    general command
+Action:  Clear all pseudo-dynamic lights in the world to black.
+
+Command: setlight
+Type:    general command
+Action:  Set the color for the selected pseudo-dynamic light to
+         r,g,b.
+
