@@ -970,24 +970,14 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   else if (solidbsp)
   {
     solidbsp->MakeEmpty ();
-    csVector2 verts[50];	// @@@ BAD! Hardcoded!
-    int i, num;
-    num = view->GetNumVertices ();
-    csVector2 *clipview = view->GetClipPoly ();
-    for (i = 0 ; i < num ; i++) verts[num-i-1] = clipview [i];
-    solidbsp->InsertPolygonInv (verts, num);
+    solidbsp->InsertPolygonInv (view->GetClipPoly (), view->GetNumVertices ());
   }
   else if (quadtree)
     quadtree->MakeEmpty ();
   else if (covtree)
   {
     covtree->MakeEmpty ();
-    csVector2 verts[50];	// @@@ BAD! Hardcoded!
-    int i, num;
-    num = view->GetNumVertices ();
-    csVector2 *clipview = view->GetClipPoly ();
-    for (i = 0 ; i < num ; i++) verts[num-i-1] = clipview [i];
-    covtree->UpdatePolygonInverted (verts, num);
+    covtree->UpdatePolygonInverted (view->GetClipPoly (), view->GetNumVertices ());
   }
 
   csSector* s = c->GetSector ();
