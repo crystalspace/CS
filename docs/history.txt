@@ -7,7 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 31-Aug-2003
-        - Philip Wyett changed #include "GL/gluh." to <GL/glu.h>, in the new
+        - Philip Wyett changed #include "GL/glu.h" to <GL/glu.h>, in the new
           GL render gl_txtcache.cpp, eliminating the warning messages within
           the make build system.
 30-Aug-2003
