@@ -25,7 +25,6 @@
 #include "csgeom/transfrm.h"
 #include "cs3d/common/dtmesh.h"
 #include "cs2d/common/graph2d.h"
-#include "cssys/unix/iunix.h"
 #include "inf_txt.h"
 #include "iconfig.h"
 #include "igraph2d.h"
@@ -257,9 +256,6 @@ public:
 /// Infinite version.
 class csGraphics2DInfinite : public csGraphics2D
 {
-  /// Pointer to unix-specific interface
-  iUnixSystemDriver* UnixSystem;
-
 public:
   DECLARE_IBASE;
 

@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+31-Mar-2000
+	- Greatly simplified the new infinite renderer. Also removed
+	  a unix dependency.
 30-Mar-2000
 	- Added static compilation support for line renderer and new
 	  infinite renderer.

@@ -414,14 +414,6 @@ bool csGraphics2DInfinite::Initialize (iSystem *pSystem)
   if (!csGraphics2D::Initialize (pSystem))
     return false;
 
-  UnixSystem = QUERY_INTERFACE (System, iUnixSystemDriver);
-  if (!UnixSystem)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not support "
-                               "the iUnixSystemDriver interface\n");
-    return false;
-  }
-
   pfmt.RedMask = 0xf800;
   pfmt.GreenMask = 0x07e0;
   pfmt.BlueMask = 0x001f;
@@ -436,8 +428,6 @@ bool csGraphics2DInfinite::Initialize (iSystem *pSystem)
 csGraphics2DInfinite::~csGraphics2DInfinite ()
 {
   Close();
-  if (UnixSystem)
-    UnixSystem->DecRef ();
 }
 
 
