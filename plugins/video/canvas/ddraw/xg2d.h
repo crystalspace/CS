@@ -6,7 +6,7 @@
 #define __XDD3G2D_H__
 
 /// csGraphics2DDDraw3's implementation if IDDraw3GraphicsInfo
-class IXDDraw3GraphicsInfo : public IDDraw3GraphicsInfo
+interface IXDDraw3GraphicsInfo : public IDDraw3GraphicsInfo
 {
     DECLARE_IUNKNOWN()
     ///

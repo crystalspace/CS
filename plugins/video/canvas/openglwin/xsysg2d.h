@@ -6,7 +6,7 @@
 #define __XSYSG2D_H__
 
 /// csGraphics2DOpenGL's implementation if IOpenGLGraphicsInfo
-class IXOpenGLGraphicsInfo : public IOpenGLGraphicsInfo
+interface IXOpenGLGraphicsInfo : public IOpenGLGraphicsInfo
 {
     DECLARE_IUNKNOWN()
     ///

@@ -27,7 +27,7 @@
  *  This serves as the composite interface that implements IGraphics2D
  *  for csGraphics2D and all derived classes.
  */
-class IXGraphics2D : public IGraphics2D
+interface IXGraphics2D : public IGraphics2D
 {
   friend class csGraphics2D;
 
