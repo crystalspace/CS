@@ -41,9 +41,6 @@ IMPLEMENT_IBASE (csGraphics2DDOSAlleg)
   IMPLEMENTS_INTERFACE (iGraphics2D)
 IMPLEMENT_IBASE_END
 
-iSystem* csGraphics2DDOSAlleg::System = NULL;
-IDosSystemDriver* csGraphics2DDOSAlleg::DosSystem = NULL;
-
 csGraphics2DDOSAlleg::csGraphics2DDOSAlleg (iBase *iParent) :
   csGraphics2D ()
 {

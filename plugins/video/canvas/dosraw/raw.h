@@ -32,7 +32,7 @@ class csGraphics2DDOSRAW : public csGraphics2D
   /// Palette has been changed?
   bool PaletteChanged;
   /// Pointer to DOS-specific interface
-  static iDosSystemDriver* DosSystem;
+  iDosSystemDriver* DosSystem;
 
 public:
   DECLARE_IBASE;
