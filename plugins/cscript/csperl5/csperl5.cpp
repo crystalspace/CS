@@ -28,6 +28,8 @@
 
 extern "C" void xs_init (); // defined in csperlxs.c
 
+iObjectRegistry *scripts_iObjectRegistry = NULL;
+
 SCF_IMPLEMENT_IBASE (csPerl5)
   SCF_IMPLEMENTS_INTERFACE (iScript)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
@@ -63,6 +65,8 @@ bool csPerl5::eiComponent::Initialize (iObjectRegistry *objreg)
 
 bool csPerl5::Initialize (iObjectRegistry *objreg)
 {
+  scripts_iObjectRegistry = objreg;
+
   csRef<iVFS> vfs = CS_QUERY_REGISTRY (objreg, iVFS);
   if (! vfs)
   {

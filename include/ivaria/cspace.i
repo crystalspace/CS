@@ -33,6 +33,15 @@
 		to set the CRYSTAL environment variable.
 		See $CRYSTAL/scripts/python/pysimpcd.py for an example of usage.
 
+	Perl:
+		Used for the "csperl5" plugin based on perl 5.8 including
+		access to most parts of CS
+		(although some ealier versions are probably supported).
+
+		Additionally, provices CS as a perl 5.8 module name "cspace".
+		Make sure the directory containing cspace.pm and cspace.so,
+		$CRYSTAL/scripts/perl5, is in perl's @INC array.
+
 	Note:
 		Tested with swig 1.3.17, swig 1.1 won't work!
 
@@ -68,6 +77,11 @@
 */
 
 %module cspace
+
+#ifdef SWIGPERL5
+	%include "ivaria/perl1st.i"
+#endif
+
 %{
 
 #include "css.h"
@@ -301,7 +315,7 @@
 	// as template functions.
 	// Examples are SCF_QUERY_INTERFACE and CS_QUERY_REGISTRY.
 	// Thanks to Mat Sutcliffe <oktal@gmx.co.uk>.
-	// Note that his works _only_ if you're _not_ using virtual inheritance!
+	// Note that this works _only_ if you're _not_ using virtual inheritance!
 
 	struct csWrapPtr
 	{

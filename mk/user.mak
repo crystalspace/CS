@@ -135,6 +135,9 @@ ifeq ($(FT2.AVAILABLE),yes)
 PLUGINS.DYNAMIC += font/server/freefnt2
 endif
 PLUGINS.DYNAMIC += aws
+ifeq ($(PGSERVER.AVAILABLE),yes)
+PLUGINS.DYNAMIC += picogui/server
+endif
 ifeq ($(VORBISFILE.AVAILABLE),yes)
 PLUGINS.DYNAMIC += sound/loader/ogg
 endif
@@ -166,11 +169,8 @@ ifeq ($(PYTHON.AVAILABLE),yes)
 PLUGINS.DYNAMIC += cscript/cspython
 endif
 
-#PLUGINS.DYNAMIC += cscript/cslua
-
-# Unfortunately, we can not yet enable this module automatically -- even if
-# the configuration script detects its presence -- since it fails to build on
-# most platforms.
-ifeq ($(PERL.AVAILABLE),yes)
-#PLUGINS.DYNAMIC += cscript/csperl5
+ifeq ($(PERL5.AVAILABLE),yes)
+PLUGINS.DYNAMIC += cscript/csperl5
 endif
+
+#PLUGINS.DYNAMIC += cscript/cslua

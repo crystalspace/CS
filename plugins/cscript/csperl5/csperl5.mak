@@ -42,18 +42,18 @@ endif
 INC.CSPERL5 = $(wildcard plugins/cscript/csperl5/*.h)
 SRC.CSPERL5 = $(wildcard plugins/cscript/csperl5/*.cpp)
 OBJ.CSPERL5 = $(addprefix $(OUT)/,$(notdir $(SRC.CSPERL5:.cpp=$O)))
-DEP.CSPERL5 = CSGEOM CSSYS CSUTIL CSSYS CSUTIL
+DEP.CSPERL5 = CSTOOL CSGEOM CSSYS CSUTIL CSSYS CSUTIL
 
 PERLXSI.DEP = config.mak
 PERLXSI.DIR = $(OUTDERIVED)
 PERLXSI.C = $(PERLXSI.DIR)/csperlxs.c
 PERLXSI.O = $(OUT)/$(notdir $(PERLXSI.C:.c=$O))
 
-SWIG.I = include/ivaria/cs.i
+SWIG.I = include/ivaria/cspace.i
 SWIG.MOD = cspace
 SWIG.PERL5.PM = scripts/perl5/$(SWIG.MOD).pm
-SWIG.PERL5.C = plugins/cscript/csperl5/cswigpl5.c
-SWIG.PERL5.O = $(OUT)/$(notdir $(SWIG.PERL5.C:.c=$O))
+SWIG.PERL5.C = plugins/cscript/csperl5/cswigpl5.cpp
+SWIG.PERL5.O = $(OUT)/$(notdir $(SWIG.PERL5.C:.cpp=$O))
 SWIG.PERL5.DLL = scripts/perl5/$(SWIG.MOD)$(DLL)
 SWIG.PERL5.DOC = scripts/perl5/cs_wrap.doc
 
@@ -79,7 +79,7 @@ MSVC.DSP += MSCSPERL5SWIG
 DSP.MSCSPERL5SWIG.NAME = csperl5s
 DSP.MSCSPERL5SWIG.TYPE = plugin
 DSP.MSCSPERL5SWIG.CFLAGS = \
-  $(DSP.MSCSPERL5.CFLAGS) /D "PERL_POLLUTE" /D "NO_HANDY_PERL_MACROS"
+  $(DSP.MSCSPERL5.CFLAGS) /D "PERL_POLLUTE"
 MSCSPERL5SWIG = $(SWIG.PERL5.DLL)
 LIB.MSCSPERL5SWIG = $(LIB.MSCSPERL5)
 SRC.MSCSPERL5SWIG = $(SWIG.PERL5.C)
@@ -163,13 +163,13 @@ ifeq (,$(SWIGBIN))
 endif
 
 $(SWIG.PERL5.PM) $(SWIG.PERL5.C): $(SWIG.I)
-	$(SWIGBIN) -perl5 -c++ -dascii -Sbefore -shadow -Iinclude \
+	-$(SWIGBIN) -perl5 -c++ -v -shadow -Iinclude \
 	-module $(SWIG.MOD) -o $(SWIG.PERL5.C) $(SWIG.I)
 	$(MV) plugins/cscript/csperl5/$(SWIG.MOD).pm $(SWIG.PERL5.PM)
 
 $(SWIG.PERL5.O): $(SWIG.PERL5.C)
 	$(filter-out -W -Wunused -Wall -Wmost,$(DO.COMPILE.CPP) \
-	$(PERL5.CFLAGS) -DPERL_POLLUTE -DNO_HANDY_PERL_MACROS)
+	$(PERL5.CFLAGS) -DPERL_POLLUTE)
 
 $(SWIG.PERL5.DLL): $(SWIG.PERL5.O) $(LIB.CSPERL5)
 	$(DO.PLUGIN.PREAMBLE) \
@@ -189,9 +189,7 @@ csperl5clean:
 	$(CSPERL5.PM) $(SWIG.PERL5.O) $(SWIG.PERL5.DLL)
 
 csperl5distclean: csperl5clean
-	$(RM) $(PERLXSI.C) $(SWIG.PERL5.DOC)
-# If these were not stored in CVS, we would also probably delete them.
-#	$(SWIG.PERL5.C) $(SWIG.PERL5.PM)
+	$(RM) $(PERLXSI.C) $(SWIG.PERL5.DOC) $(SWIG.PERL5.C) $(SWIG.PERL5.PM)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/csperl5.dep
