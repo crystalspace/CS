@@ -465,7 +465,7 @@ awsManager::Redraw()
       if (DEBUG_MANAGER) printf("aws-debug: window is dirty, redraw.\n");
 
       // Setup our dirty gathering rect.
-      csRect cr, crf;
+      csRect cr;
       cr.MakeEmpty();
 
       for (i=0; i<dirty.Count(); ++i)

@@ -252,7 +252,6 @@ awsListBox::ScrollChanged(void *sk, iAwsSource *source)
 {
   awsListBox *lb = (awsListBox *)sk;
   float *curval=0;
-  int adjusted_max;
 
   source->GetComponent()->GetProperty("Value", (void **)&curval);
   
@@ -707,7 +706,7 @@ awsListBox::OnDraw(csRect clip)
 
   int hi2   = WindowManager()->GetPrefMgr()->GetColor(AC_HIGHLIGHT2);
   int lo2   = WindowManager()->GetPrefMgr()->GetColor(AC_SHADOW2);    
-  int i,j;
+  int i;
   int border=3;
   int sb_w, sb_h;
 

@@ -16,6 +16,7 @@ The history order is reversed so that new features are at the top.
 	  NeXTDriver2D::Initialize(), since its superclass'
 	  csGrahpics2D::Initialize() already does so.  (No need to register the
 	  same event handler twice.)
+	- Eric Sunshine eliminated several compilation warnings from AWS.
 7-Jan-2002
 	- Corrected the includes in the collision detection howto.
 	- Extended iLoader::LoadTexture() with a 'register' parameter which
