@@ -224,6 +224,7 @@ The history order has been reversed so that new features are at the top.
 	      the same module anymore.
 	    - Fixed MazeD so that it works with the new CSWS architecture.
 	      No other enhancements though :-(
+	- Fixed a bug in walktest related to the patch above.
 3-Aug-2000
 	- Norman Kramer added clipping code to openglcommon canvas code,
 	  especially to font drawing.

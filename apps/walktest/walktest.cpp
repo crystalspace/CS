@@ -1419,7 +1419,7 @@ void handler (int sig)
   if (sig != SIGINT)
     debug_dump ();
 
-  SysSystemDriver::Shutdown = true;
+  if (System) System->Shutdown = true;
   cleanup ();
   exit (1);
 }
