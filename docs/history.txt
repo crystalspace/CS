@@ -55,6 +55,8 @@ chronological order.
 	  invoked. This fixes a problem where Jam would want to build all these
 	  targets when the configure script invoked 'dumptargets' to synthesize
 	  the 'make' emulation layer
+	- res augmented the documentations for the platform-specific APIs with
+	  a notice about the platform-dependency.
 1-May-2004
 	- Jorrit added a new data/terrainf/world which is a variant of
 	  data/terrain/world that uses the fixed shaders. Keep in mind that you

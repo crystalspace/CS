@@ -38,8 +38,13 @@ SCF_VERSION (iWin32Assistant, 0, 1, 0);
 
 /**
  * This interface describes actions specific to the Windows platform.
- * An instance of this object will be registered to the object registry
- * with tag `iWin32Assistant'.
+ * \remarks As the name suggests, this interface provides functionality
+ *  specific to the Win32 platform. It can be retrieved from the object
+ *  registry via CS_QUERY_REGISTRY(), as an instance of this object will be 
+ *  registered with the tag `iWin32Assistant'. To ensure that code using this 
+ *  functionality compiles properly on all other platforms, the use of the
+ *  interface and inclusion of the header file should be surrounded by
+ *  appropriate `#if defined(OS_WIN32) ... #endif' statements.
  */
 struct iWin32Assistant : public iBase
 {

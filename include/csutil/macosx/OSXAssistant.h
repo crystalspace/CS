@@ -21,6 +21,9 @@
 //-----------------------------------------------------------------------------
 #include "csutil/scf.h"
 
+/**\file
+ */
+
 /// An opaque handle to an Objective-C event record represented in C++.
 typedef void* OSXEvent;
 /// An opaque handle to an Objective-C view object represented in C++.
@@ -35,6 +38,12 @@ SCF_VERSION (iOSXAssistant, 0, 0, 2);
  * object registry with tag 'OSXAssistant', however it is generally
  * recommended that you query the object registry for this object by simply
  * asking for the object implementing iOSXAssistant.
+ *
+ * \remarks As the name suggests, this interface provides functionality
+ *  specific to the MacOS/X platform. To ensure that code using this 
+ *  functionality compiles properly on all other platforms, the use of the
+ *  interface and inclusion of the header file should be surrounded by
+ *  appropriate `#if defined(OS_MACOSX) ... #endif' statements.
  */
 struct iOSXAssistant : public iBase
 {

@@ -19,11 +19,24 @@
 #ifndef __CS_CSSYS_WIN32_WINTOOLS_H__
 #define __CS_CSSYS_WIN32_WINTOOLS_H__
 
+/**\file
+ * Win32 tool functions
+ */
+
 #include "csextern.h"
 #include "csutil/csunicode.h"
 #include "csutil/util.h"
 #include <winnls.h> // contains MultiByteToWideChar()/WideCharToMultiByte()
 
+/**
+ * Convert an ANSI string to a wide string.
+ * \remarks Free the returned pointer with delete[].
+ * \remarks This function provides functionality specific to the Win32 
+ *  platform. To ensure that code using this functionality compiles properly 
+ *  on all other platforms, the use of the function and inclusion of the 
+ *  header file should be surrounded by appropriate `#if defined(OS_WIN32) ... 
+ *  #endif' statements.
+ */
 static inline wchar_t* cswinAnsiToWide (const char* ansi, 
 					 UINT codePage = CP_ACP)
 {
@@ -39,6 +52,15 @@ static inline wchar_t* cswinAnsiToWide (const char* ansi,
   return buf;
 }
 
+/**
+ * Convert a wide string to an ANSI string.
+ * \remarks Free the returned pointer with delete[].
+ * \remarks This function provides functionality specific to the Win32 
+ *  platform. To ensure that code using this functionality compiles properly 
+ *  on all other platforms, the use of the function and inclusion of the 
+ *  header file should be surrounded by appropriate `#if defined(OS_WIN32) ... 
+ *  #endif' statements.
+ */
 static inline char* cswinWideToAnsi (const wchar_t* wide, 
 				     UINT codePage = CP_ACP)
 {
@@ -54,37 +76,94 @@ static inline char* cswinWideToAnsi (const wchar_t* wide,
   return buf;
 }
 
+/**
+ * Small helper to convert a wide to an ANSI string, useful when passing
+ * arguments to a function.
+ * \code
+ *  wchar_t test[] = L"Foo";
+ *  SomeFunctionA (cswinWtoA (test));
+ * \endcode
+ * \remarks This class provides functionality specific to the Win32 
+ *  platform. To ensure that code using this functionality compiles properly 
+ *  on all other platforms, the use of the class and inclusion of the 
+ *  header file should be surrounded by appropriate `#if defined(OS_WIN32) ... 
+ *  #endif' statements.
+ */
 struct CS_CSUTIL_EXPORT cswinWtoA
 {
 private:
   char* s;
 public:
+  /// Construct from a wchar_t string.
   cswinWtoA (const wchar_t* ws)
   { s = cswinWideToAnsi (ws); }
+  /// Destruct, free up memory.
   ~cswinWtoA ()
   { delete[] s; }
+  /// Return the string passed in on construction as an ANSI string.
   operator const char* () const
   { return s; }
 };
 
-/// Convert UTF-8 to ANSI
+/**
+ * Small helper to convert an UTF-8 to an ANSI string, useful when passing
+ * arguments to a function.
+ * \remarks This class provides functionality specific to the Win32 
+ *  platform. To ensure that code using this functionality compiles properly 
+ *  on all other platforms, the use of the class and inclusion of the 
+ *  header file should be surrounded by appropriate `#if defined(OS_WIN32) ... 
+ *  #endif' statements.
+ */
 struct CS_CSUTIL_EXPORT cswinCtoA
 {
 private:
   char* s;
 public:
+  /// Construct from an ANSI string.
   cswinCtoA (const char* ws, UINT codePage = CP_ACP)
   { 
     s = cswinWideToAnsi (csCtoW (ws), codePage); 
   }
+  /// Destruct, free up memory.
   ~cswinCtoA ()
   { delete[] s; }
+  /// Return the string passed in on construction as an ANSI string.
   operator const char* () const
   { return s; }
 };
 
+/**
+ * Retrieve the system's description for an error code.
+ * \param code The error code, usually retrieved through GetLastError().
+ * \remarks Returns an UTF-8 encoded string.
+ * \remarks Free the returned pointer with delete[].
+ * \remarks This function provides functionality specific to the Win32 
+ *  platform. To ensure that code using this functionality compiles properly 
+ *  on all other platforms, the use of the function and inclusion of the 
+ *  header file should be surrounded by appropriate `#if defined(OS_WIN32) ... 
+ *  #endif' statements.
+ */
 extern CS_CSUTIL_EXPORT char* cswinGetErrorMessage (HRESULT code);
+/**
+ * Retrieve the system's description for an error code.
+ * \param code The error code, usually retrieved through GetLastError().
+ * \remarks Free the returned pointer with delete[].
+ * \remarks This function provides functionality specific to the Win32 
+ *  platform. To ensure that code using this functionality compiles properly 
+ *  on all other platforms, the use of the function and inclusion of the 
+ *  header file should be surrounded by appropriate `#if defined(OS_WIN32) ... 
+ *  #endif' statements.
+ */
 extern CS_CSUTIL_EXPORT wchar_t* cswinGetErrorMessageW (HRESULT code);
+/**
+ * Returns 'true' if the current Windows is from the NT strain, 'false' if
+ * from the 9x strain.
+ * \remarks This function provides functionality specific to the Win32 
+ *  platform. To ensure that code using this functionality compiles properly 
+ *  on all other platforms, the use of the function and inclusion of the 
+ *  header file should be surrounded by appropriate `#if defined(OS_WIN32) ... 
+ *  #endif' statements.
+ */
 extern CS_CSUTIL_EXPORT bool cswinIsWinNT ();
 
 #endif

@@ -20,12 +20,37 @@
 #ifndef __CS_UTIL_WIN32_CALLSTACK_H__
 #define __CS_UTIL_WIN32_CALLSTACK_H__
 
+/**\file
+ * Call stack creation helper (Win32-specific)
+ */
+
 #include "csextern.h"
 #include "csutil/callstack.h"
 
+/**
+ * Call stack creation helper (Win32-specific)
+ * \remarks This class provides functionality specific to the Win32 
+ *  platform. To ensure that code using this functionality compiles properly 
+ *  on all other platforms, the use of the class and inclusion of the 
+ *  header file should be surrounded by appropriate `#if defined(OS_WIN32) ... 
+ *  #endif' statements.
+ */
 class CS_CSUTIL_EXPORT cswinCallStackHelper
 {
 public:
+  /**
+   * Create a call stack.
+   * Works similar to csCallStackHelper::CreateCallStack(), with the 
+   * difference that you can provide some Win32-specific arguments here.
+   * \param hProc The process for which the call stack is created.
+   * \param hThread The thread for which the call stack is created.
+   * \param context Context information.   
+   * \param skip The number of calls on the top of the stack to remove from
+   *  the returned call stack. This can be used if e.g. the call stack is
+   *  created from some helper function and the helper function itself should
+   *  not appear in the stack.
+   * \return A call stack object.
+   */
   static csCallStack* CreateCallStack (HANDLE hProc, HANDLE hThread,
     CONTEXT& context, int skip = 0);
 };

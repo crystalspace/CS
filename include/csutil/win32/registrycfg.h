@@ -20,6 +20,10 @@
 #ifndef __CS_CSSYS_WIN32_REGISTRYCFG_H__
 #define __CS_CSSYS_WIN32_REGISTRYCFG_H__
 
+/**\file
+ * iConfigFile implementation using the registry.
+ */
+
 #include "csextern.h"
 #include "iutil/cfgfile.h"
 #include "csutil/scf.h"
@@ -32,6 +36,11 @@ class csWin32RegistryIterator;
 
 /**
  * An iConfigFile, storing the settings in the Windows registry.
+ * \remarks This class provides functionality specific to the Win32 
+ *  platform. To ensure that code using this functionality compiles properly 
+ *  on all other platforms, the use of the class and inclusion of the 
+ *  header file should be surrounded by appropriate `#if defined(OS_WIN32) ... 
+ *  #endif' statements.
  */
 class CS_CSUTIL_EXPORT csWin32RegistryConfig : public iConfigFile
 {
@@ -96,8 +105,8 @@ public:
   /**
    * Open a registry key.
    * This will open the key named \p Key as a subkey of \p parent.
-   * \remark The key must be the full path, e.g. "Software\CrystalSpace".
-   * \remark If \p parent is none of the default HKEY_ roots, the key must
+   * \remarks The key must be the full path, e.g. "Software\CrystalSpace".
+   * \remarks If \p parent is none of the default HKEY_ roots, the key must
    *   remain open as long as a registry config object isn't Close()d.
    */
   bool Open (const char* Key, HKEY parent = HKEY_CURRENT_USER);
@@ -105,7 +114,7 @@ public:
    * Close the current registry key.
    * Use this if you want reuse a registry config object at a later time but
    * want to free it's resources for the time being.
-   * \remark This is called automatically on destruction or Open().
+   * \remarks This is called automatically on destruction or Open().
    */
   void Close ();
 
@@ -141,6 +150,11 @@ public:
 
 /**
  * Iterates over a registry key subkeys and values.
+ * \remarks This class provides functionality specific to the Win32 
+ *  platform. To ensure that code using this functionality compiles properly 
+ *  on all other platforms, the use of the interface and inclusion of the 
+ *  header file should be surrounded by appropriate `#if defined(OS_WIN32) ... 
+ *  #endif' statements.
  */
 class CS_CSUTIL_EXPORT csWin32RegistryIterator : public iConfigIterator
 {

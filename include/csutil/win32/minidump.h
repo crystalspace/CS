@@ -23,13 +23,17 @@
  
 #include "csutil/ref.h"
 #include "csutil/weakref.h"
-//#include "iutil/vfs.h"
 #include "iutil/objreg.h"
 
 #include "csutil/win32/DbgHelpAPI.h"
  
 /**
  * Helper to write minidumps on Win32.
+ * \remarks This class provides functionality specific to the Win32 
+ *  platform. To ensure that code using this functionality compiles properly 
+ *  on all other platforms, the use of the class and inclusion of the 
+ *  header file should be surrounded by appropriate `#if defined(OS_WIN32) ... 
+ *  #endif' statements.
  */
 class CS_CSUTIL_EXPORT cswinMinidumpWriter
 {

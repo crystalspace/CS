@@ -47,6 +47,8 @@
 
 #define CS_EMBED_PLUGIN_META
 
+#define CS_BUILD_SHARED_LIBS
+
 #ifdef _WIN64
   #define CS_PLATFORM_IS_64BITS
 #endif
