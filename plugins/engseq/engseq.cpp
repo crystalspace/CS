@@ -852,8 +852,8 @@ csPtr<iParameterESM> csEngineSequenceParameters::CreateParameterESM (
 {
   int idx = GetParameterIdx (name);
   if (idx == -1) return NULL;
-  csRef<esmPar> par = csPtr<esmPar> (new esmPar (idx));
-  return par;
+  csRef<iParameterESM> par = csPtr<iParameterESM> (new esmPar (idx));
+  return csPtr<iParameterESM>(par);
 }
 
 //---------------------------------------------------------------------------
@@ -1484,8 +1484,8 @@ csPtr<iSequenceTrigger> csEngineSequenceManager::CreateTrigger (
 
 csPtr<iParameterESM> csEngineSequenceManager::CreateParameterESM (iBase* value)
 {
-  csRef<constantPar> par = csPtr<constantPar> (new constantPar (value));
-  return par;
+  csRef<iParameterESM> par = csPtr<iParameterESM> (new constantPar (value));
+  return csPtr<iParameterESM>(par);
 }
 
 void csEngineSequenceManager::RemoveTrigger (iSequenceTrigger* trigger)
