@@ -5054,6 +5054,7 @@ package cspace::iMeshWrapper;
 *GetPortalContainer = *cspacec::iMeshWrapper_GetPortalContainer;
 *GetLightingInfo = *cspacec::iMeshWrapper_GetLightingInfo;
 *GetShadowReceiver = *cspacec::iMeshWrapper_GetShadowReceiver;
+*GetShadowCaster = *cspacec::iMeshWrapper_GetShadowCaster;
 *GetVisibilityNumber = *cspacec::iMeshWrapper_GetVisibilityNumber;
 *GetFactory = *cspacec::iMeshWrapper_GetFactory;
 *SetFactory = *cspacec::iMeshWrapper_SetFactory;
