@@ -15,6 +15,8 @@ chronological order.
 	- Jorrit fixed a bug in OPCODE that would cause it to calculate
 	  wrong collision in case two transforms different from identity
 	  were given.
+	- Eric Sunshine added acosf() and asinf() to set of functions faked up
+	  when CS_USE_FAKE_MATH_H_FLOAT_FUNCS is defined.  Needed by OPCODE.
 1-Jun-2004
 	- Jorrit fixed a bug in the particles loader. The test to see if a
 	  factory is ok was wrong.

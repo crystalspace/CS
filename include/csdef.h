@@ -101,6 +101,8 @@
 // cos(), sin(), tan(), sqrt(), etc. functions should define
 // CS_USE_FAKE_MATH_H_FLOAT_FUNCS.
 #if defined(CS_USE_FAKE_MATH_H_FLOAT_FUNCS)
+  #define acosf(X)  CS_STATIC_CAST(float,acos(X))
+  #define asinf(X)  CS_STATIC_CAST(float,asin(X))
   #define atan2f(X) CS_STATIC_CAST(float,atan2(X))
   #define atanf(X)  CS_STATIC_CAST(float,atan(X))
   #define cosf(X)   CS_STATIC_CAST(float,cos(X))
