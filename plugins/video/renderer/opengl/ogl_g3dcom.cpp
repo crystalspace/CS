@@ -4908,7 +4908,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   */
 }
 
-csStringID csGraphics3DOGLCommon::GLBlendToString( GLenum blend )
+csStringID csGraphics3DOGLCommon::GLBlendToString (GLenum blend)
 {
   switch( blend )
   {
@@ -4992,7 +4992,7 @@ csStringID csGraphics3DOGLCommon::GLBlendToString( GLenum blend )
   pass->SetStateString( csEffectStrings::destination_blend_mode, csEffectStrings::inverted_source_alpha ); \
   layer = pass->CreateLayer(); \
   layer->SetStateFloat( csEffectStrings::texture_source, 1 ); \
-  layer->SetStateFloat( csEffectStrings::texture_coordinate_source, 1 );
+  layer->SetStateFloat( csEffectStrings::texture_coordinate_source, 1 ); 
 
 
 // @@@ Should use writemask instead of blendmode
@@ -5244,8 +5244,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   // because otherwise I crash in the street of flarge (when moving in the
   // street, then looking at the donut and then turning right the crash
   // happens nearly all the time).
-      OldDrawTriangleMesh (mesh); // Should never get here.
-      return;
+//      OldDrawTriangleMesh (mesh); // Should never get here.
+//      return;
 
   iMaterial* material = ((csMaterialHandle*)(mesh.mat_handle))->GetMaterial();
   iEffectTechnique* technique = effectserver->SelectAppropriateTechnique( material->GetEffect() );
@@ -5452,21 +5452,21 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     || do_plane_clipping || do_z_plane_clipping)
   {
     ClipTriangleMesh (
-  num_triangles,
-  num_vertices,
-  triangles,
-  work_verts,
-  work_uv_verts,
-  work_colors,
-  work_fog,
-  num_triangles,
-  num_vertices,
-  mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE,
-  mesh.do_mirror,
-  !use_lazy_clipping,
-  do_plane_clipping,
-  do_z_plane_clipping,
-  how_clip == '0' || use_lazy_clipping);
+      num_triangles,
+      num_vertices,
+      triangles,
+      work_verts,
+      work_uv_verts,
+      work_colors,
+      work_fog,
+      num_triangles,
+      num_vertices,
+      mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE,
+      mesh.do_mirror,
+      !use_lazy_clipping,
+      do_plane_clipping,
+      do_z_plane_clipping,
+      how_clip == '0' || use_lazy_clipping);
     if (!use_lazy_clipping)
     {
       work_verts = clipped_vertices->GetArray ();
@@ -5660,7 +5660,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       int alphamod[4] = { GL_SRC_ALPHA, GL_SRC_ALPHA, GL_SRC_ALPHA, GL_SRC_ALPHA };
       int alphaop = GL_MODULATE;
 
-      if (ARB_texture_env_combine || EXT_texture_env_combine)
+      if (ARB_multitexture && (ARB_texture_env_combine || EXT_texture_env_combine))
       {
         glActiveTextureARB( GL_TEXTURE0_ARB + l );
         glClientActiveTextureARB( GL_TEXTURE0_ARB + l );
@@ -5866,10 +5866,10 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
         glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, alphaop);
       }
     }
-    glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, mesh.triangles);
+    glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
   }
-  if (ARB_texture_env_combine || EXT_texture_env_combine)
+  if (ARB_multitexture && (ARB_texture_env_combine || EXT_texture_env_combine))
   {
     for( int l=maxlayers-1; l>=0; l-- )
     {
