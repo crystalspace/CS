@@ -65,14 +65,18 @@ csPolygon3D* csCamera::GetHit (csVector3& v)
   return sector->HitBeam (v_o2t, v, isect);
 }
 
-void csCamera::MoveWorld (const csVector3& v)
+void csCamera::MoveWorld (const csVector3& v, bool cd)
 {
   csVector3 new_position = GetOrigin () + v;
   if (sector)
   {
-  //if (!(v < EPSILON))
-  //printf ("============== csCamera::MoveWorld\n");
-    sector = sector->FollowSegment (*this, new_position, mirror);
+    csVector3 remember_position = new_position;
+    csSector* new_sector = sector->FollowSegment (*this, new_position, mirror);
+    if (new_sector == sector)
+    {
+      if (!cd) new_position = remember_position;
+    }
+    else sector = new_sector;
   }
   SetOrigin (new_position);
 }

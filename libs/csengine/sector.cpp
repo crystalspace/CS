@@ -539,7 +539,6 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   if (csWorld::current_world->IsPVS ())
   {
     // Test for PVS.
-    if (!onode->IsVisible ()) { printf ("%d", onode->IsVisible ()); fflush (stdout); }
     if (!onode->IsVisible ()) return false;
     else if (csWorld::current_world->IsPVSOnly ()) goto is_vis;
   }

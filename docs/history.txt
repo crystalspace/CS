@@ -1,5 +1,12 @@
 The history order has been reversed so that new features are at the top.
 
+31-May-2000
+	- Added a new allegro canvas driver from Burton Radonsxi
+	  <loth@pacificcoast.net>. This allegro driver is developed on Linux
+	  and should work on Linux. It will probably not replace dosalleg
+	  yet since the new one depends on iunix.h. We're looking into that.
+	- Paul Garceau did another change to mingw.mak to accomodate
+	  auto-gen of include\volatile.h for Mingw.mak.
 30-May-2000
 	- Alex Pfaffe did some minor fixes and cleanup in the terrain
 	  engine. Alex also fixed a bug w.r.t. vertex reuse in buffers.
@@ -82,6 +89,30 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine worked around NextStep compiler multiple-inheritance
 	  problem in dtsimple's Bot code where it called SetPosition() and
 	  crashing the application.
+	- For debugging: control precisely what parts of PVS are done
+	  and what not.
+	- Added 'bool cd' parameter to csCamera::Move and MoveWorld to
+	  allow moving around the world without collision detection to
+	  sector walls and vice versa. Portals are still checked though.
+	- Fixed collision detection option in WalkTest so that it now
+	  also works for STATBSP levels (i.e. you can walk through
+	  things).
+	- Fixed db_octree console command in WalkTest so that you can
+	  actually use db_octree -1 to show the leaves.
+	- Fixed a serious bug in PVS again. The solid boundary optimization
+	  was in fact used completely wrong. Unfortunatelly this decreases
+	  PVS quality a bit. PVS is still not completely right though.
+	- Changed PVS building so that first pass is now the solid space
+	  PVS pass and second pass is full PVS. This improves speed and
+	  quality a bit.
+	- Changed solid space point tester so that it now requires a
+	  number of directions for which the solid space test succeeds.
+	  This decreases the chance of an error cause by bad polygons
+	  in the input data.
+	- Extended dump of octree nodes with the values of the calculated
+	  solid masks for the six directions.
+	- Updates to Macintosh projects from Robert Bate.
+	- Samuel Humphreys added some comments to the x2d.cpp code.
 29-May-2000
 	- Alex Pfaffe did some fixes on terrain engine. He also resynced
 	  with DDG. Various bug fixes and optimizations.

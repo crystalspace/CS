@@ -273,7 +273,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "zbuf"))
     Command::change_boolean (arg, &Sys->do_show_z, "zbuf");
   else if (!strcasecmp (cmd, "db_octree"))
-    Command::change_int (arg, &Sys->cfg_draw_octree, "debug octree", 0, 10);
+    Command::change_int (arg, &Sys->cfg_draw_octree, "debug octree", -1, 10);
   else if (!strcasecmp (cmd, "palette"))
     Command::change_boolean (arg, &Sys->do_show_palette, "palette");
   else if (!strcasecmp (cmd, "move3d"))

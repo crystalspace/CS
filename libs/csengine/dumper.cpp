@@ -276,6 +276,11 @@ void Dumper::dump (csOctree* tree, csOctreeNode* node, int indent)
   CsPrintf (MSG_DEBUG_0, "%sbbox=%f,%f,%f %f,%f,%f.\n", spaces,
 	b.MinX (), b.MinY (), b.MinZ (), b.MaxX (), b.MaxY (), b.MaxZ ());
   CsPrintf (MSG_DEBUG_0, "%scenter=%f,%f,%f.\n", spaces, c.x, c.y, c.z);
+  CsPrintf (MSG_DEBUG_0, "%ssolid x=%4x X=%4x y=%4x Y=%4x z=%4x Z=%4x\n",
+  	spaces,
+  	node->GetSolidMask (BOX_SIDE_x), node->GetSolidMask (BOX_SIDE_X),
+  	node->GetSolidMask (BOX_SIDE_y), node->GetSolidMask (BOX_SIDE_Y),
+  	node->GetSolidMask (BOX_SIDE_z), node->GetSolidMask (BOX_SIDE_Z));
   if (node->GetMiniBsp ())
   {
     CsPrintf (MSG_DEBUG_0, "%s BSP\n", spaces);

@@ -191,13 +191,16 @@ public:
 
   /**
    * Moves the camera a relative amount in world coordinates.
+   * If 'cd' is true then collision detection with objects and things
+   * inside the sector is active. Otherwise you can walk through objects
+   * (but portals will still be correctly checked).
    */
-  void MoveWorld (const csVector3& v);
+  void MoveWorld (const csVector3& v, bool cd = true);
 
   /**
    * Moves the camera a relative amount in camera coordinates.
    */
-  void Move (const csVector3& v) { MoveWorld (m_t2o * v); }
+  void Move (const csVector3& v, bool cd = true) { MoveWorld (m_t2o * v, cd); }
 
   /**
    * Moves the camera a relative amount in world coordinates,

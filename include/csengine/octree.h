@@ -296,9 +296,10 @@ public:
 
   /**
    * Create an iterator to iterate over all solid polygons that
-   * are on the specified side of this octree node.
+   * are on the specified side of this octree node ('side' is one
+   * of BOX_SIDE_xxx flags).
    */
-  void* InitSolidPolygonIterator (int plane_nr, float plane_pos);
+  void* InitSolidPolygonIterator (int side);
 
   /**
    * Get the next solid polygon from the iterator. Returns false

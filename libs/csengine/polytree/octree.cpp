@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -33,9 +33,11 @@
 #include "isystem.h"
 #include "ivfs.h"
 
-#define DO_SOLID_NODE_OPT 1
-#define DO_SOLID_SPACE_OPT 1
-#define DO_QAD_PVS 0
+#define DO_PVS_SOLID_NODE_OPT 0
+#define DO_PVS_SOLID_SPACE_OPT 1
+#define DO_PVS_ADJACENT_NODES 1
+#define DO_PVS_POLYGONS 0
+#define DO_PVS_QAD 0
 
 //---------------------------------------------------------------------------
 
@@ -201,16 +203,16 @@ struct SPIt
   csBox2 box;
 };
 
-void* csOctreeNode::InitSolidPolygonIterator (int plane_nr, float plane_pos)
+void* csOctreeNode::InitSolidPolygonIterator (int side_nr)
 {
   SPIt* spit = new SPIt;
-  spit->plane_nr = plane_nr;
-  spit->plane_pos = plane_pos;
+  spit->side_nr = side_nr;
+  spit->plane_nr = side_nr/2;
+  spit->plane_pos = (side_nr&1) ? bbox.Max (spit->plane_nr)
+  				: bbox.Min (spit->plane_nr);
   spit->size = 4;
   spit->x = 0;
   spit->y = 0;
-  if (ABS (bbox.Min (plane_nr) - plane_pos) < EPSILON) spit->side_nr = plane_nr*2;
-  else spit->side_nr = plane_nr*2+1;
   spit->cur_mask = solid_masks[spit->side_nr];
   spit->next_mask = solid_masks[spit->side_nr];
   spit->box = bbox.GetSide (spit->side_nr);
@@ -1139,8 +1141,8 @@ bool csOctree::CalculatePolygonShadow (
 // @@@ Put all these fields in a structure and pass them along?
 // Clipper to use before sending polygons/shadows to the c-buffer.
 static csClipper* box_clipper;
-// Max size used for this pass of PVS building.
-static csVector3 max_pvs_size;
+// In pass one we only do solid boundaries.
+static bool pvs_solid_boundaries_only;
 // For statistics, number of times solid node opt is used.
 static int total_total_solid_opt;
 // For statistics, number of times a node is culled.
@@ -1239,26 +1241,30 @@ void csOctree::BoxOccludeeShadowSolidBoundaries (csOctreeNode* occluder,
     	csCBuffer* cbuffer, const csVector2& scale, const csVector2& shift,
 	int plane_nr, float plane_pos)
 {
-  void* spit = occluder->InitSolidPolygonIterator (plane_nr, plane_pos);
-  csPoly3D cur_poly;
-  csPoly2D result_poly;
-  csPlane3 poly_plane;
-  while (occluder->NextSolidPolygon (spit, cur_poly))
+  int side;
+  for (side = 0 ; side < 6 ; side++)
   {
-    poly_plane = cur_poly.ComputePlane ();
-    CalculatePolygonShadowArea (occludee_box, cur_poly, poly_plane, result_poly,
-        plane_nr, plane_pos);
-    if (result_poly.GetNumVertices () != 0)
+    void* spit = occluder->InitSolidPolygonIterator (side);
+    csPoly3D cur_poly;
+    csPoly2D result_poly;
+    csPlane3 poly_plane;
+    while (occluder->NextSolidPolygon (spit, cur_poly))
     {
-      InsertShadowIntoCBuffer (result_poly, cbuffer, scale, shift);
-      if (cbuffer->IsFull ())
+      poly_plane = cur_poly.ComputePlane ();
+      CalculatePolygonShadowArea (occludee_box, cur_poly, poly_plane, result_poly,
+          plane_nr, plane_pos);
+      if (result_poly.GetNumVertices () != 0)
       {
-        occluder->CleanupSolidPolygonIterator (spit);
-        return;
+        InsertShadowIntoCBuffer (result_poly, cbuffer, scale, shift);
+        if (cbuffer->IsFull ())
+        {
+          occluder->CleanupSolidPolygonIterator (spit);
+          return;
+        }
       }
     }
+    occluder->CleanupSolidPolygonIterator (spit);
   }
-  occluder->CleanupSolidPolygonIterator (spit);
 }
 
 bool csOctree::BoxOccludeeShadowOutline (const csBox3& occluder_box,
@@ -1317,15 +1323,16 @@ void csOctree::BoxOccludeeAddShadows (csOctreeNode* occluder,
     // First see if this occluder can see occludee. If not then
     // we take the outline of this node and insert that instead
     // of the polygons in the node.
-#   if DO_SOLID_NODE_OPT
-    if (!occluder->PVSCanSee (occludee_center))
-    {
-      total_total_solid_opt++;
-      if (BoxOccludeeShadowOutline (occluder_box, occludee_box,
-	cbuffer, scale, shift, plane_nr, plane_pos))
-      return;
-    }
-#   endif
+#   if DO_PVS_SOLID_NODE_OPT
+    if (!pvs_solid_boundaries_only)
+      if (!occluder->PVSCanSee (occludee_center))
+      {
+        total_total_solid_opt++;
+        if (BoxOccludeeShadowOutline (occluder_box, occludee_box,
+	  cbuffer, scale, shift, plane_nr, plane_pos))
+        return;
+      }
+#   endif // DO_PVS_SOLID_NODE_OPT
 
     // Here we first take the solid space outlines of the occluder
     // and insert them in the c-buffer as well.
@@ -1343,11 +1350,13 @@ void csOctree::BoxOccludeeAddShadows (csOctreeNode* occluder,
 	box, occludee_box, box_center, occludee_center, false);
     if (cbuffer->IsFull ()) return;
 
-    if (do_polygons)
+#   if DO_PVS_POLYGONS
+    if (do_polygons && !pvs_solid_boundaries_only)
       BoxOccludeeShadowPolygons (box, occludee_box,
 	occluder->unsplit_polygons.GetPolygons (),
 	occluder->unsplit_polygons.GetNumPolygons (),
 	cbuffer, scale, shift, plane_nr, plane_pos);
+#   endif // DO_PVS_POLYGONS
   }
 }
 
@@ -1541,15 +1550,7 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
   if (!occludee) return;
   int i;
   bool visible = false;
-  csVector3 dist;
   int adjacent_side;
-  leaf->GetBox ().ManhattanDistance (occludee->GetBox (), dist);
-  if (dist.x > max_pvs_size.x || dist.y  > max_pvs_size.y || dist.z > max_pvs_size.z)
-  {
-    // Node is too far away (max_pvs_size) so we don't test it
-    // in this pass.
-    return;
-  }
   csPVS& pvs = leaf->GetPVS ();
   csOctreeVisible* ovis = pvs.FindNode (occludee);
   if (!ovis)
@@ -1565,6 +1566,7 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
   //}
   else if (occludee->GetBox ().In (leaf->GetCenter ()))
     visible = true;
+# if DO_PVS_ADJACENT_NODES
   else if ((adjacent_side = leaf->GetBox ().Adjacent (occludee->GetBox ())) != -1)
   {
     // Two sides are adjacent.
@@ -1582,6 +1584,7 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
     }
     else visible = true;
   }
+# endif // DO_PVS_ADJACENT_NODES
   else if (BoxCanSeeOccludee (leaf->GetBox (), occludee->GetBox ()))
     visible = true;
 
@@ -1594,14 +1597,14 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
       	thing, leaf);
   else
   {
-#   if DO_QAD_PVS
+#   if DO_PVS_QAD
     if (ovis->IsReallyVisible ())
     {
       // @@@ ERROR!!!
       printf ("E");
       BoxCanSeeOccludeeSuperSlow (leaf->GetBox (), occludee->GetBox ());
     }
-#   endif
+#   endif // DO_PVS_QAD
     total_cull_node += 1+occludee->CountChildren ();
     total_total_cull_node += 1+occludee->CountChildren ();
     DeleteNodeAndChildrenFromPVS (pvs, occludee);
@@ -1684,18 +1687,7 @@ void csOctree::BuildPVS (csThing* thing)
   csBox2 b (0, 0, 1024, 1024);
   box_clipper = new csBoxClipper (b);
 
-  // Calculate a good initial size for the first pass of PVS building.
-  // In this first pass we only calculate PVS for leafs and occludee's
-  // that are close to each other. The reason is that we can then
-  // use that visibility information to optimize further passes of
-  // PVS building -> if B cannot see A then B can be considered completely
-  // solid when testing if C can see A.
-  max_pvs_size.Set (
-  	(bbox.MaxX ()-bbox.MinX ())/10.,
-  	(bbox.MaxY ()-bbox.MinY ())/10.,
-  	(bbox.MaxZ ()-bbox.MinZ ())/10.);
-
-# if DO_QAD_PVS
+# if DO_PVS_QAD
   // First build a Quick And Dirty PVS which is going to be used to
   // optimize the real PVS building.
   CsPrintf (MSG_INITIALIZATION, "  QAD Pass 0...\n");
@@ -1703,7 +1695,7 @@ void csOctree::BuildPVS (csThing* thing)
   count_leaves = 0;
   BuildQADPVS ((csOctreeNode*)root);
   printf ("\nTotal culled nodes=%d\n", total_total_cull_node);
-# endif
+# endif // DO_PVS_QAD
 
   // Then build the PVS for real which will remove nodes from the
   // PVS (hopefully).
@@ -1711,23 +1703,22 @@ void csOctree::BuildPVS (csThing* thing)
   total_total_cull_node = 0;
   total_total_solid_opt = 0;
   count_leaves = 0;
+  pvs_solid_boundaries_only = true;
   BuildPVS (thing, (csOctreeNode*)root);
   printf ("\nTotal culled nodes=%d, total opt=%d\n", total_total_cull_node,
   	total_total_solid_opt);
 
-  // Now we do the second pass. Currently the second pass does the full
-  // PVS.
-  max_pvs_size.Set (
-  	(bbox.MaxX ()-bbox.MinX ())*2.,
-  	(bbox.MaxY ()-bbox.MinY ())*2.,
-  	(bbox.MaxZ ()-bbox.MinZ ())*2.);
+# if DO_PVS_SOLID_NODE_OPT | DO_PVS_POLYGONS
+  // Now we do the second pass. The second pass does the full PVS.
   CsPrintf (MSG_INITIALIZATION, "  Pass 2...\n");
   total_total_cull_node = 0;
   total_total_solid_opt = 0;
   count_leaves = 0;
+  pvs_solid_boundaries_only = false;
   BuildPVS (thing, (csOctreeNode*)root);
   printf ("\nTotal culled nodes=%d, total opt=%d\n", total_total_cull_node,
   	total_total_solid_opt);
+# endif
 
   delete box_clipper;
 }
@@ -1938,7 +1929,7 @@ int csOctree::ClassifyPolygon (csOctreeNode* node, const csPoly3D& poly)
 UShort csOctree::ClassifyRectangle (int plane_nr, float plane_pos,
   	const csBox2& box)
 {
-#if DO_SOLID_SPACE_OPT
+#if DO_PVS_SOLID_SPACE_OPT
   csVector2 cor_xy = box.GetCorner (BOX_CORNER_xy);
   csVector2 cor_Xy = box.GetCorner (BOX_CORNER_Xy);
   csVector2 cor_xY = box.GetCorner (BOX_CORNER_xY);
@@ -1983,7 +1974,7 @@ UShort csOctree::ClassifyRectangle (int plane_nr, float plane_pos,
   (void)plane_pos;
   (void)box;
   return 0;
-#endif // DO_SOLID_SPACE_OPT
+#endif // DO_PVS_SOLID_SPACE_OPT
 }
 
 static csBox2 GetSideBox (int octree_side, const csBox3& box)

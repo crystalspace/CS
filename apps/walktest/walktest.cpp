@@ -360,7 +360,7 @@ void WalkTest::DrawFrameDebug ()
   if (cfg_draw_octree)
   {
     extern void DrawOctreeBoxes (int);
-    DrawOctreeBoxes (cfg_draw_octree-1);
+    DrawOctreeBoxes (cfg_draw_octree == -1 ? -1 : cfg_draw_octree-1);
   }
 }
 
