@@ -197,6 +197,7 @@ iCollection* csCollectionList::NewCollection (const char* name)
   csCollection* c = new csCollection (csEngine::current_engine);
   c->SetName (name);
   Push (&(c->scfiCollection));
+  c->DecRef ();
   return &(c->scfiCollection);
 }
 

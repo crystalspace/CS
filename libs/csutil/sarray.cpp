@@ -28,7 +28,6 @@ csStaticArray::csStaticArray (int s)
 
 csStaticArray::~csStaticArray ()
 {
-  Clear ();
 }
 
 void csStaticArray::Clear (bool DeleteOld)

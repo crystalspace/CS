@@ -31,6 +31,7 @@
 #include "csengine/rview.h"
 #include "csutil/csobject.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/vbufmgr.h"
 #include "imesh/thing/curve.h"
 
 class csThing;
@@ -42,7 +43,6 @@ class csBspContainer;
 class csFrustumView;
 struct csCoverageMatrix;
 struct iMaterialHandle;
-struct iVertexBuffer;
 
 /**
  * Tesselated curve. This is basicly a list of triangles.
@@ -118,9 +118,6 @@ private:
   /// Last used ID.
   static unsigned long LastCurveID;
 
-  /// Vertex buffer.
-  iVertexBuffer* vbuf;
-
   /// Material for this curve
   iMaterialWrapper* Material;
 
@@ -152,6 +149,22 @@ private:
    * corresponds to the lightmap texel 5,5 on the lightmap
    */
   csVector3* uv2Normal;
+
+  /// Vertex buffer.
+  iVertexBuffer* vbuf;
+  iVertexBufferManager* vbufmgr;
+
+  /// retrieve a vertexbuffer from the manager if not done already
+  void SetupVertexBuffer ();
+
+  /// interface to receive state of vertexbuffermanager
+  struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csCurve);
+    virtual void ManagerClosing ();
+  }scfiVertexBufferManagerClient;
+  friend struct eiVertexBufferManagerClient;
+
 
 public:
   /// The polygon set parent.

@@ -126,10 +126,15 @@ void csCurveTesselated::UpdateColors (csLightMap* LightMap)
 
 SCF_IMPLEMENT_IBASE_EXT (csCurve)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iCurve)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csCurve::Curve)
   SCF_IMPLEMENTS_INTERFACE (iCurve)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csCurve::eiVertexBufferManagerClient)
+  SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 unsigned long csCurve::LastCurveID = 0;
@@ -140,12 +145,13 @@ csCurve::csCurve (csCurveTemplate* parent_tmpl) : csObject (),
     LightMap (NULL), LightmapUpToDate (false)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCurve);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
+
   CurveID = LastCurveID++;
   Material = NULL;
-  iVertexBufferManager* vbufmgr = csEngine::current_engine->G3D
-  	->GetVertexBufferManager ();
-  // @@@ priority should be a parameter.
-  vbuf = vbufmgr->CreateBuffer (2);
+  vbuf = NULL;
+  vbufmgr = NULL;
+  SetupVertexBuffer ();
 } 
 
 csCurve::~csCurve ()
@@ -157,7 +163,19 @@ csCurve::~csCurve ()
   delete[] uv2World;
   delete[] uv2Normal;
   SCF_DEC_REF (Material);
-  vbuf->DecRef ();
+  if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
+  if (vbuf) vbuf->DecRef ();
+}
+
+void csCurve::SetupVertexBuffer ()
+{
+  if (!vbuf)
+  {
+    vbufmgr = csEngine::current_engine->G3D->GetVertexBufferManager ();
+    // @@@ priority should be a parameter.
+    vbuf = vbufmgr->CreateBuffer (2);
+    vbufmgr->AddClient (&scfiVertexBufferManagerClient);
+  }
 }
 
 void csCurve::SetMaterial (iMaterialWrapper *m)
@@ -763,6 +781,16 @@ void csCurve::HardTransform (const csReversibleTransform& /*trans*/)
 iCurveTemplate* csCurve::Curve::GetParentTemplate ()
 { 
   return &(scfParent->GetParentTemplate ()->scfiCurveTemplate);
+}
+
+void csCurve::eiVertexBufferManagerClient::ManagerClosing ()
+{
+  if (scfParent->vbuf)
+  {
+    scfParent->vbuf->DecRef ();
+    scfParent->vbuf = NULL;
+    scfParent->vbufmgr = NULL;
+  }
 }
 
 // --- csCurveTemplate -------------------------------------------------------

@@ -315,18 +315,17 @@ bool csLoader::LoadMap (char* buf)
       	  break;
         case CS_TOKEN_MESHFACT:
           {
-            iMeshFactoryWrapper* t = Engine->GetMeshFactories ()
-	    	->FindByName (name);
-            if (!t)
-	      t = Engine->CreateMeshFactory(name);
-            if (!LoadMeshObjectFactory (t, params))
+            iMeshFactoryWrapper* t = Engine->CreateMeshFactory(name);
+	    if (!t || !LoadMeshObjectFactory (t, params))
 	    {
 	      ReportError (
-	      	"crystalspace.maploader.load.meshfactory",
-		"Could not load mesh object factory '%s'!",
-		name);
+			   "crystalspace.maploader.load.meshfactory",
+			   "Could not load mesh object factory '%s'!",
+			   name);
+	      if (t) t->DecRef ();
 	      return false;
 	    }
+	    if (t) t->DecRef ();
           }
 	  break;
         case CS_TOKEN_REGION:
@@ -461,7 +460,10 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
   }
 
   if (!LoadMap (**buf))
+  {
+    buf->DecRef ();
     return false;
+  }
 
   if (Stats->polygons_loaded)
   {
@@ -712,6 +714,7 @@ iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
 	  "crystalspace.maploader.parse.badformat",
 	  "Expected parameters instead of '%s' while parsing mesh factory!",
 	  buf);
+      databuff->DecRef ();
       return NULL;
     }
 
@@ -882,6 +885,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	    	"crystalspace.maploader.load.meshfactory",
 		"Could not load mesh object factory '%s'!",
 		name);
+	    if (t) t->DecRef ();
 	    return false;
 	  }
 	  stemp->GetChildren ()->AddMeshFactory (t);
@@ -1379,6 +1383,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	  sp->QueryObject ()->SetName (name);
 	  sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetChildren ()->AddMesh (sp);
+	  sp->DecRef ();
         }
         break;
       case CS_TOKEN_MESHOBJ:
@@ -1394,6 +1399,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	  }
 	  sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetChildren ()->AddMesh (sp);
+	  sp->DecRef ();
         }
         break;
       case CS_TOKEN_HARDMOVE:
@@ -1640,9 +1646,10 @@ bool csLoader::LoadRenderPriorities (char* buf)
 
 //---------------------------------------------------------------------------
 
-iMeshWrapper * csLoader::LoadMeshObject (const char* fname)
+iMeshWrapper* csLoader::LoadMeshObject (const char* fname)
 {
   iDataBuffer *databuff = VFS->ReadFile (fname);
+  iMeshWrapper* mesh = NULL;
 
   if (!databuff || !databuff->GetSize ())
   {
@@ -1668,23 +1675,22 @@ iMeshWrapper * csLoader::LoadMeshObject (const char* fname)
 	  "crystalspace.maploader.parse.badformat",
 	  "Expected parameters instead of '%s' while parsing mesh object!",
 	  buf);
-      return NULL;
     }
-    
-    iMeshWrapper* mesh = Engine->CreateMeshWrapper (name);
-    if (!LoadMeshObject (mesh, buf))
+    else
     {
-      mesh->DecRef ();
-      ReportError (
-	      	"crystalspace.maploader.load.meshobject",
-		"Could not load mesh object '%s' from file '%s'!",
-		name, fname);
-      return NULL;
+      mesh = Engine->CreateMeshWrapper (name);
+      if (!LoadMeshObject (mesh, buf))
+      {
+	mesh->DecRef ();
+	ReportError (
+		     "crystalspace.maploader.load.meshobject",
+		     "Could not load mesh object '%s' from file '%s'!",
+		     name, fname);
+      }
     }
-    return mesh;
   }
   databuff->DecRef ();
-  return NULL;
+  return mesh;
 }
 
 /************ iLoader implementation **************/
@@ -2148,9 +2154,9 @@ iKeyValuePair* csLoader::ParseKey (char* buf, iObject* pParent)
   {
     csKeyValuePair* cskvp = new csKeyValuePair (Key, Value);
     iKeyValuePair* kvp = SCF_QUERY_INTERFACE (cskvp, iKeyValuePair);
-    kvp->DecRef ();
     if (pParent)
       pParent->ObjAdd (kvp->QueryObject ());
+    kvp->DecRef ();
     return kvp;
   }
   else
@@ -2256,7 +2262,9 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
     {
       case CS_TOKEN_ADDON:
 	if (!LoadAddOn (params, sector))
+	{
 	  return NULL;
+	}
       	break;
       case CS_TOKEN_CULLER:
 	if (!csScanStr (params, "%s", bspname))
@@ -2284,6 +2292,7 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
 	  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetMovable ()->SetSector (sector);
 	  mesh->GetMovable ()->UpdateMove ();
+	  mesh->DecRef ();
         }
         break;
       case CS_TOKEN_MESHOBJ:
@@ -2295,18 +2304,24 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
 	      	"crystalspace.maploader.load.meshobject",
 		"Could not load mesh object '%s' in sector '%s'!",
 		name, secname ? secname : "<noname>");
+	    mesh->DecRef ();
 	    return NULL; // @@@ Leak
 	  }
 	  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetMovable ()->SetSector (sector);
 	  mesh->GetMovable ()->UpdateMove ();
+	  mesh->DecRef ();
         }
         break;
       case CS_TOKEN_LIGHT:
         {
 	  iStatLight* sl = ParseStatlight (name, params);
-	  if (!sl) return NULL; // @@@ Leak
+	  if (!sl)
+	  {
+	    return NULL; // @@@ Leak
+	  }
           sector->GetLights ()->AddLight (sl->QueryLight ());
+	  sl->DecRef ();
 	}
         break;
       case CS_TOKEN_NODE:
@@ -2318,20 +2333,25 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
 	    n->DecRef ();
 	  }
 	  else
+	  {
 	    return NULL; // @@@ Leak
+	  }
 	}
         break;
       case CS_TOKEN_FOG:
         {
           csFog *f = sector->GetFog ();
           f->enabled = true;
-          csScanStr (params, "%f,%f,%f,%f", &f->red, &f->green, &f->blue, &f->density);
+          csScanStr (params, "%f,%f,%f,%f", 
+		     &f->red, &f->green, &f->blue, &f->density);
         }
         break;
       case CS_TOKEN_KEY:
       {
         if (!ParseKey (params, sector->QueryObject()))
+	{
 	  return NULL;
+	}
         break;
       }
     }

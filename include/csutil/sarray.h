@@ -101,6 +101,8 @@ private:								\
 public:									\
   inline Name (int Size = 0) :						\
     csStaticArray (Size) {}						\
+  virtual ~Name ()                                                       \
+  { Clear (); }						                \
   inline cont_type *GetArray ()						\
     { return (cont_type*)Map; }						\
   inline const cont_type *GetArray () const				\
