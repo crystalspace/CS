@@ -30,7 +30,7 @@ if test "x${CXX}" = "x"; then
   fi
   CXX=`basename ${CXX}`
 fi
-if ! ${CXX} --version >& /dev/null ; then
+if ! ${CXX} --version >/dev/null ; then
   echo "$0: Cannot find an installed C++ compiler!" >&2
   exit 1
 fi
@@ -46,7 +46,7 @@ if [ -z "${CC}" ]; then
   fi
   CC=`basename ${CC}`
 fi
-if ! ${CC} --version >& /dev/null; then
+if ! ${CC} --version >/dev/null; then
   echo "$0: Cannot find an installed C compiler!" >&2
   exit 1
 fi
