@@ -682,7 +682,7 @@ void csFountainParticleSystem :: Update(time_t elapsed_time)
 
   /// restart a number of particles
   float intersperse = fall_time / (float)amt;
-  float todo_time = elapsed_time + time_left;
+  float todo_time = delta_t + time_left;
   while(todo_time > intersperse)
   {
     RestartParticle(FindOldest(), todo_time);
