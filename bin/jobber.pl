@@ -84,7 +84,7 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber.pl';
-my $PROG_VERSION = '12';
+my $PROG_VERSION = '13';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000,2001 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -175,7 +175,14 @@ $ENV{'PATH'} .= ':/home/groups/c/cr/crystal/bin:/usr/local/bin';
 # by invoking `make platform'.  Unfortunately, unixconf.sh which is invoked by
 # `make platform' does expect to find a compiler.  We can fake out unixconf.sh
 # by pretending that a compiler is present.
+$ENV{'CC' } = 'true';
 $ENV{'CXX'} = 'true';
+
+# The SourceForge shell machine crashes the makefile configuration step (as of
+# 2001/10/16) with a segmentation fault.  As a stop-gap measure, rather than
+# spending a lot of time debugging another SourceForge issue, just disable
+# makefile caching.
+$ENV{'USE_MAKEFILE_CACHE'} = 'no';
 
 # The Visual-C++ DSW and DSP generation process is a bit too noisy.
 $ENV{'MSVC_QUIET'} = 'yes';
@@ -189,7 +196,8 @@ my $BROWSEABLE_DIR = "$PUBLIC_DOC_DIR/online";
 my $PACKAGE_DIR = "$PUBLIC_DOC_DIR/download";
 my $OWNER_GROUP = 'crystal';
 my $PLATFORM = 'linux';
-my $TEMPDIR = '/tmp';
+#my $TEMPDIR = '/tmp';
+my $TEMPDIR = '/home/groups/c/cr/crystal';
 my @BINARY = ('(?i)\.(dsw|dsp)$');
 
 my @TARGETS =
