@@ -264,48 +264,46 @@ void csStuffObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 }
 
 iMeshObjectFactory* csStuffObject::GetFactory () const
- { return factory; }
+{ return factory; }
  
 void csStuffObject::UpdateLighting (iLight **,int, iMovable *) 
- { SetupMesh(); }
+{ SetupMesh(); }
  
 void csStuffObject::SetVisibleCallback(iMeshObjectDrawCallback *cb) 
- { vis_cb=cb; }
+{ vis_cb=cb; }
  
 iMeshObjectDrawCallback* csStuffObject::GetVisibleCallback () const 
- { return vis_cb; }
+{ return vis_cb; }
  
 void csStuffObject::NextFrame (unsigned int ticks, const csVector3& /*pos*/)
- { Dynamics->Update(ticks); }
+{ Dynamics->Update(ticks); }
  
 bool csStuffObject::WantToDie () const 
- { return false; }
+{ return false; }
  
 void csStuffObject::HardTransform (const csReversibleTransform &) 
- {}
+{}
    
 bool csStuffObject::SupportsHardTransform () const 
- { return false; }
+{ return false; }
  
 bool csStuffObject::HitBeamOutline (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr)
-    { 
-      csSegment3 seg (start, end);
-      int i, max = mesh.num_triangles;
-      csTriangle *tr = mesh.triangles;
-      csVector3 *vrt = vertices;
-      for (i = 0 ; i < max ; i++)
-      {
-        if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
-    	vrt[tr[i].c], seg, isect))
-        {
-          if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
-		csSquaredDist::PointPoint (start, end));
-          return true;
-        }
-      }
-      return false;
-    };
+{ 
+  csSegment3 seg (start, end);
+  int i, max = mesh.num_triangles;
+  csTriangle *tr = mesh.triangles;
+  csVector3 *vrt = vertices;
+  for (i = 0 ; i < max ; i++)
+  {
+    if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],vrt[tr[i].c], seg, isect))
+    {
+      if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) / csSquaredDist::PointPoint (start, end))
+        return true;
+    }
+  }
+  return false;
+}
 	
 bool csStuffObject::HitBeamObject (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr)
