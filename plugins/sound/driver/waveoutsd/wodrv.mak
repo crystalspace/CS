@@ -68,7 +68,7 @@ wosclean:
 
 ifdef DO_DEPEND
 dep: $(OUTOS)wos.dep
-$(OUTOS)waveoutsd.dep: $(SRC.SNDWOS)
+$(OUTOS)wos.dep: $(SRC.SNDWOS)
 	$(DO.DEP)
 else
 -include $(OUTOS)wos.dep
