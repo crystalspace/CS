@@ -78,8 +78,8 @@ iTextureHandle *TxtHandleVector::RegisterAndPrepare (iTextureHandle *ogl_txt)
   csTextureMM *txtmm = (csTextureMM*)ogl_txt->GetPrivateObject();
   iImage *image = ((csTextureOpenGL*) txtmm->get_texture (0))->get_image();
 
-#ifdef CS_DEBUG
   int flags = ((csTextureMMOpenGL*)txtmm)->GetFlags ();
+#ifdef CS_DEBUG
   if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC) 
   {
     SysPrintf (MSG_STDOUT, "Big Error, attempting to register and prepare a procedural texture with the software Opengl texture vector\n");
