@@ -683,7 +683,7 @@ void csMetaGen::DeleteBuffers()
 	current_texels = 0;
   }
 }
-
+#if 0
 csVector3* csMetaGen::GetVertices()
 {
   if (!current_vertices) return 0;
@@ -707,6 +707,7 @@ csTriangle* csMetaGen::GetTriangles()
   memcpy( t, trigs->t, sizeof(csTriangle) * current_triangles);
   return t;
 }
+#endif
 //========================================= csMetGenType
 
 IMPLEMENT_IBASE (csMetaGenType)

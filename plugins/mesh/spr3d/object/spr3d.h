@@ -350,6 +350,10 @@ public:
   /// Get array of texels.
   csVector2* GetTexels (int frame) const
     { return (*texels.Get(frame)).GetVertices (); }
+  /// Set texel array
+  void SetTexels(csVector2* tex, int count, int frame)
+    { (*texels.Get(frame)).SetVertices(tex, count); }
+
 
   /// Query the number of vertices.
   int GetVertexCount () const { return vertices.Get (0)->GetVertexCount (); }
@@ -359,7 +363,10 @@ public:
   /// Get vertex array.
   csVector3* GetVertices (int frame) const
     { return (*vertices.Get(frame)).GetVertices (); }
-
+  /// Set vertex array
+  void SetVertices(csVector3* verts, int count, int frame)
+    { (*vertices.Get(frame)).SetVertices(verts, count); }
+	
   /// Query the number of normals.
   int GetNormalCount () const { return normals.Get (0)->GetVertexCount (); }
   /// Get a normal.
@@ -368,6 +375,9 @@ public:
   /// Get normal array.
   csVector3* GetNormals (int frame) const
     { return (*normals.Get(frame)).GetVertices (); }
+  /// Set normal array
+  void SetNormals(csVector3* norms, int count, int frame)
+    { (*normals.Get(frame)).SetVertices(norms, count); }
 
   /**
    * Add a triangle to the normal, texel, and vertex meshes
@@ -380,6 +390,10 @@ public:
   csTriangle* GetTriangles () const { return texel_mesh->GetTriangles(); }
   /// returns the number of triangles in the sprite
   int GetTriangleCount () const { return texel_mesh->GetTriangleCount(); }
+  /// Size triangle buffer size
+  void SetTriangleCount( int count ) { texel_mesh->SetSize(count); }
+  /// Set a bank of triangles
+  void SetTriangles( csTriangle *trig, int count ) { texel_mesh->SetTriangles(trig, count); }
 
   /// Create and add a new frame to the sprite.
   csSpriteFrame* AddFrame ();
@@ -475,6 +489,10 @@ public:
     {
       return scfParent->GetTexels (frame);
     }
+    virtual void SetTexels(csVector2* tex, int count, int frame)
+    {
+      scfParent->SetTexels(tex, count, frame);
+    }
     virtual int GetVertexCount () const
     {
       return scfParent->GetVertexCount ();
@@ -487,6 +505,10 @@ public:
     {
       return scfParent->GetVertices (frame);
     }
+    virtual void SetVertices(csVector3* verts, int count, int frame)
+    {
+      scfParent->SetVertices(verts, count, frame);
+    }
     virtual int GetNormalCount () const
     {
       return scfParent->GetNormalCount ();
@@ -498,6 +520,10 @@ public:
     virtual csVector3* GetNormals (int frame) const
     {
       return scfParent->GetNormals (frame);
+    }
+    virtual void SetNormals(csVector3* norms, int count, int frame)
+    {
+      scfParent->SetNormals(norms, count, frame);
     }
     virtual void AddTriangle (int a, int b, int c)
     {
@@ -514,6 +540,14 @@ public:
     virtual int GetTriangleCount () const
     {
       return scfParent->GetTriangleCount ();
+    }
+    virtual void SetTriangleCount( int count )
+    {
+      scfParent->SetTriangleCount(count);
+    }
+    virtual void SetTriangles( csTriangle *trig, int count)
+    {
+      scfParent->SetTriangles(trig, count);
     }
     virtual iSpriteFrame* AddFrame ()
     {

@@ -196,9 +196,12 @@ public:
 // Data extraction calls. You provide the pointer, the method will
 // memcpy the vertices into a new buffer and return the count.
 
-  virtual csVector3* GetVertices();
-  virtual csVector2* GetTexels();
-  virtual csTriangle* GetTriangles();
+  virtual csVector3* GetVertices()
+	{ return verts->v; }
+  virtual csVector2* GetTexels()
+	{ return tex->v; }
+  virtual csTriangle* GetTriangles()
+	{ return trigs->t; }
   virtual int GetVertexCount()
 	{ return current_vertices; }
   virtual int GetTexelCount()

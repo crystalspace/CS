@@ -56,6 +56,10 @@ public:
   void Clear ();
   /// Reset the mesh of triangles (don't deallocate the internal structures yet).
   void Reset ();
+  
+  void SetSize(int count);
+  
+  void SetTriangles( csTriangle *trigs, int count );
 };
 
 class csTriangleVertices2;

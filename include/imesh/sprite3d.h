@@ -143,6 +143,8 @@ struct iSprite3DFactoryState : public iBase
   virtual csVector2& GetTexel (int frame, int vertex) const = 0;
   /// Get array of texels.
   virtual csVector2* GetTexels (int frame) const = 0;
+  /// Set array of texels.
+  virtual void SetTexels( csVector2 *tex, int count, int frame) =0;
 
   /// Query the number of vertices.
   virtual int GetVertexCount () const = 0;
@@ -150,6 +152,8 @@ struct iSprite3DFactoryState : public iBase
   virtual csVector3& GetVertex (int frame, int vertex) const = 0;
   /// Get vertex array.
   virtual csVector3* GetVertices (int frame) const = 0;
+  /// Set array of texels.
+  virtual void SetVertices( csVector3 *vert, int count, int frame) =0;
 
   /// Query the number of normals.
   virtual int GetNormalCount () const = 0;
@@ -157,6 +161,8 @@ struct iSprite3DFactoryState : public iBase
   virtual csVector3& GetNormal (int frame, int vertex) const = 0;
   /// Get normal array.
   virtual csVector3* GetNormals (int frame) const = 0;
+  /// Set array of normalss.
+  virtual void SetNormals( csVector3 *norms, int count, int frame) =0;
 
   /**
    * Add a triangle to the normal, texel, and vertex meshes
@@ -169,6 +175,10 @@ struct iSprite3DFactoryState : public iBase
   virtual csTriangle* GetTriangles () const = 0;
   /// returns the number of triangles in the sprite
   virtual int GetTriangleCount () const = 0;
+  
+  virtual void SetTriangleCount (int count) = 0;
+  
+  virtual void SetTriangles( csTriangle *trigs, int count ) = 0;
 
   /// Create and add a new frame to the sprite.
   virtual iSpriteFrame* AddFrame () = 0;
