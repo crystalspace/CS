@@ -1,6 +1,9 @@
 The history order is reversed so that new features are at the top.
 
 8-Feb-2002
+	- Matt Reda added support for displaying on any monitor on OSX
+	  systems with more than one monitor.  Also added small
+	  performance improvement to the OSX software canvas
 	- Matze fixed a bug in csHashIterator - it was returning already
 	    deleted elemenst in some special cases
 6-Feb-2002
