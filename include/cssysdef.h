@@ -342,6 +342,31 @@
 #define CS_HEADER_LOCAL_COMPOSE1(X,Y) CS_HEADER_LOCAL_COMPOSE2(X ## / ## Y)
 #define CS_HEADER_LOCAL_COMPOSE2(X) #X
 
+
+/*
+ * A macro to export a function from a shared library.
+ * Some platforms may need to override this.  For instance, Windows requires
+ * extra `__declspec' goop when exporting a function from a plug-in module.
+ */
+#if !defined(CS_EXPORTED_FUNCTION)
+#  define CS_EXPORTED_FUNCTION extern "C"
+#endif
+
+/*
+ * A macro used to build exported function names.
+ * Usually "Prefix" is derived from shared library name, thus for each library
+ * we'll have different exported names.  This prevents naming collisions when
+ * static linking is used, and on platforms where plug-in symbols are exported
+ * by default.  However, this may be bad for platforms which need to build
+ * special export-tables on-the-fly at compile-time since distinct names make
+ * the job more difficult.  Such platforms may need to override the default
+ * expansion of this macro to use only the `Suffix' and ignore the `Prefix'
+ * when composing the name.
+ */
+#if !defined(CS_EXPORTED_NAME)
+#  define CS_EXPORTED_NAME(Prefix, Suffix) Prefix ## Suffix
+#endif
+
 #ifndef CS_IMPLEMENT_PLATFORM_PLUGIN
 #  define CS_IMPLEMENT_PLATFORM_PLUGIN
 #endif
@@ -356,8 +381,8 @@
 
 #ifndef CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP
 #  define CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP                         \
-extern "C" {                                                           \
-static void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)()) \
+CS_EXPORTED_FUNCTION                                                   \
+ void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())       \
 {                                                                      \
   static void (**a)()=0;                                               \
   static int lastEntry=0;                                              \
@@ -378,9 +403,9 @@ static void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)()) \
     for (i=0; i < lastEntry; i++)                                      \
       a[i] ();                                                         \
     free (a);                                                          \
-   }                                                                    \
-}                                                                      \
-}
+   }                                                                   \
+}                                                                      
+
 #endif
 
 /**

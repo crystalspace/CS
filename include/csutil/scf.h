@@ -507,12 +507,12 @@ struct scfClassInfo
  */
 #define SCF_EXPORT_CLASS_TABLE(LibraryName)				\
 static inline void							\
-SCF_EXPORTED_NAME(LibraryName,_scfUnitInitialize)(iSCF *SCF)		\
+CS_EXPORTED_NAME(LibraryName,_scfUnitInitialize)(iSCF *SCF)		\
 { iSCF::SCF = SCF; }							\
-SCF_EXPORT_FUNCTION scfClassInfo*					\
-SCF_EXPORTED_NAME(LibraryName,_scfInitialize)(iSCF *SCF)		\
+CS_EXPORTED_FUNCTION scfClassInfo*					\
+CS_EXPORTED_NAME(LibraryName,_scfInitialize)(iSCF *SCF)		\
 {									\
-  SCF_EXPORTED_NAME(LibraryName,_scfUnitInitialize)(SCF);		\
+  CS_EXPORTED_NAME(LibraryName,_scfUnitInitialize)(SCF);		\
   static scfClassInfo ExportClassTable [] =				\
   {
 
@@ -825,31 +825,5 @@ struct iSCF : public iBase
    */
   virtual iStrVector* QueryClassList (char const* pattern) = 0;
 };
-
-//-------------------------------------------- System-dependent defines -----//
-
-/*
- * A macro to export a function from a shared library.
- * Some platforms may need to override this.  For instance, Windows requires
- * extra `__declspec' goop when exporting a function from a plug-in module.
- */
-#if !defined(SCF_EXPORT_FUNCTION)
-#  define SCF_EXPORT_FUNCTION extern "C"
-#endif
-
-/*
- * A macro used to build exported function names.
- * Usually "Prefix" is derived from shared library name, thus for each library
- * we'll have different exported names.  This prevents naming collisions when
- * static linking is used, and on platforms where plug-in symbols are exported
- * by default.  However, this may be bad for platforms which need to build
- * special export-tables on-the-fly at compile-time since distinct names make
- * the job more difficult.  Such platforms may need to override the default
- * expansion of this macro to use only the `Suffix' and ignore the `Prefix'
- * when composing the name.
- */
-#if !defined(SCF_EXPORTED_NAME)
-#  define SCF_EXPORTED_NAME(Prefix, Suffix) Prefix ## Suffix
-#endif
 
 #endif // __CSSCF_H__

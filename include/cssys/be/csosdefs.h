@@ -40,8 +40,8 @@
 #endif
 
 // SCF symbol export facility.
-#undef SCF_EXPORT_FUNCTION
-#define SCF_EXPORT_FUNCTION extern "C" __declspec(dllexport)
+#undef CS_EXPORTED_FUNCTION
+#define CS_EXPORTED_FUNCTION extern "C" __declspec(dllexport)
 
 #if defined (CS_SYSDEF_PROVIDE_DIR)
 #  define __NEED_GENERIC_ISDIR

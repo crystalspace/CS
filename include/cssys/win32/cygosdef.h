@@ -56,8 +56,8 @@
 #define CS_SOUND_DRIVER "crystalspace.sound.driver.waveout"
 
 // SCF symbol export facility.
-#undef SCF_EXPORT_FUNCTION
-#define SCF_EXPORT_FUNCTION extern "C" __declspec(dllexport)
+#undef CS_EXPORTED_FUNCTION
+#define CS_EXPORTED_FUNCTION extern "C" __declspec(dllexport)
 
 #if defined (CS_SYSDEF_PROVIDE_DIR) || defined (CS_SYSDEF_PROVIDE_GETCWD) || defined (CS_SYSDEF_PROVIDE_MKDIR)
 #  include <dirent.h>
