@@ -38,6 +38,12 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine defined the missing DESCRIPTION.OS.beos variable in
 	  lib/cssys/beos/beos.mak.
 	- Eric Sunshine eliminated a compilation error in cfgfile.cpp on BeOS.
+	- Martin Geisse fixed a bug in the pysimp application.
+	- Martin also removed two unused options from cryst.cfg.
+	- Martin changed the VFS documentation to deal with the new
+	  config format.
+	- Norman Kramer changed the test for NASM slightly. Also removed
+	  writing of entry NASM=nasm.
 16-Feb-2001
 	- Dynamic lights do not traverse through mirroring portals anymore.
 	  This caused a bug because the dynamic lighting routine can't handle
