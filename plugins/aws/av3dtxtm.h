@@ -28,10 +28,10 @@
 # include "ivideo/graph3d.h"
 # include "ivideo/graph2d.h"
 # include "csgfx/rgbpixel.h"
+# include "igraphic/image.h"
 
 class csTexture;
 class csTextureManager;
-struct iImage;
 struct iConfigFile;
 struct iGraphics2D;
 struct iObjectRegistry;
@@ -162,6 +162,9 @@ public:
    * and of the fact whenever the renderer supports alpha maps at all.
    */
   virtual bool GetAlphaMap () { return false; }
+
+  virtual iGraphics2D* GetCanvas() { csRef<iGraphics2D> g = SCF_QUERY_INTERFACE(image, iGraphics2D); 
+  	return (iGraphics2D*)g; }
 };
 
 /**
