@@ -2486,17 +2486,17 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   }
 
 
-csColor cols[8];
-cols[0].Set (0, 0, 0);
-cols[1].Set (1, 0, 0);
-cols[2].Set (0, 1, 0);
-cols[3].Set (0, 0, 1);
-cols[4].Set (1, 1, 0);
-cols[5].Set (1, 0, 1);
-cols[6].Set (0, 1, 1);
-cols[7].Set (1, 1, 1);
-if (!colstate_enabled) glEnableClientState (GL_COLOR_ARRAY);
-glColorPointer (3, GL_FLOAT, 0, cols);
+//csColor cols[8];
+//cols[0].Set (0, 0, 0);
+//cols[1].Set (1, 0, 0);
+//cols[2].Set (0, 1, 0);
+//cols[3].Set (0, 0, 1);
+//cols[4].Set (1, 1, 0);
+//cols[5].Set (1, 0, 1);
+//cols[6].Set (0, 1, 1);
+//cols[7].Set (1, 1, 1);
+//if (!colstate_enabled) glEnableClientState (GL_COLOR_ARRAY);
+//glColorPointer (3, GL_FLOAT, 0, cols);
 
 
   glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
