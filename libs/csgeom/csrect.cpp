@@ -21,18 +21,18 @@
 #include "cssysdef.h"
 #include "csgeom/csrect.h"
 
-csRect::csRect () : csBase()
+csRect::csRect ()
 {
   xmin = xmax = ymin = ymax = 0;
 }
 
-csRect::csRect (int ixmin, int iymin, int ixmax, int iymax) : csBase()
+csRect::csRect (int ixmin, int iymin, int ixmax, int iymax)
 {
   xmin = ixmin; xmax = ixmax;
   ymin = iymin; ymax = iymax;
 }
 
-csRect::csRect (const csRect &copy) : csBase()
+csRect::csRect (const csRect &copy)
 {
   xmin = copy.xmin; xmax = copy.xmax;
   ymin = copy.ymin; ymax = copy.ymax;
