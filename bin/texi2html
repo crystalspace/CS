@@ -1,45 +1,84 @@
-#!/usr/local/bin/perl
+#! /usr/local/bin/perl
 'di ';
 'ig 00 ';
 #+##############################################################################
-#                                                                              #
-# File: texi2html                                                              #
-#                                                                              #
-# Description: Program to transform most Texinfo documents to HTML             #
-#                                                                              #
+#
+# texi2html: Program to transform Texinfo documents to HTML
+#
+#    Copyright (C) 1999, 2000  Free Software Foundation, Inc.
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, write to the Free Software
+#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
 #-##############################################################################
 
-# From @(#)texi2html	1.52 01/05/98	
+# This requires perl version 5 or higher
+require 5.0;
+
+#++##############################################################################
+#
+# NOTE FOR DEBUGGING THIS SCRIPT:
+# You can run 'perl texi2html.pl' directly, provided you have
+# the environment variable T2H_HOME set to the directory containing
+# the texi2html.init file
+#
+#--##############################################################################
+
+# CVS version:
 # $Id$
+
 # Homepage:
 $T2H_HOMEPAGE = <<EOT;
 http://www.mathematik.uni-kl.de/~obachman/Texi2html
 EOT
+
 # Authors:  
 $T2H_AUTHORS = <<EOT;
-Written (mainly) by: Lionel Cons, Lionel.Cons\@cern.ch
-Currently maintained by : Olaf Bachmann, obachman\@mathematik.uni-kl.de
+Written by: Lionel Cons <Lionel.Cons\@cern.ch> (original author)
+            Karl Berry  <karl\@freefriends.org>
+            Olaf Bachmann <obachman\@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Olaf Bachmann <obachman\@mathematik.uni-kl.de>
+Send bugs and suggestions to <texi2html\@mathematik.uni-kl.de>
 EOT
-# Version:
-$THISVERSION = "1.60Beta";
+
+# Version: set in configure.in
+$THISVERSION = '1.61';
 $THISPROG = "texi2html $THISVERSION";	# program name and version
   
 # The man page for this program is included at the end of this file and can be
 # viewed using the command 'nroff -man texi2html'.
-# Please read the copyright at the end of the man page.
+
+# Identity:
 
 $T2H_TODAY = &pretty_date;		# like "20 September 1993"
-# Who am I; some platforms may not implement getpwuid() so catch exception.
-unless (eval { ($T2H_USER = (getpwuid ($<))[6]) =~ s/,.*//; return 1; })
-    { $T2H_USER = "unknown"; }
+# the eval prevents this from breaking on system which do not have
+# a proper getpwuid implemented
+eval { ($T2H_USER = (getpwuid ($<))[6]) =~ s/,.*//;}; # Who am i
 
 #+++############################################################################
 #                                                                              #
 # Initialization                                                               #
-# Pasted content of File $T2H_HOME/texi2html.init                              #
+# Pasted content of File $(srcdir)/texi2html.init                              #
 #                                                                              #
 #---############################################################################
 
+# leave this within comments, and keep the require statement
+# This way, you can directly run texi2html.pl, if $ENV{T2H_HOME}/texi2html.init
+# exists.
+
+# 
 # -*-perl-*-
 ######################################################################
 # File: texi2html.init
@@ -50,8 +89,8 @@ unless (eval { ($T2H_USER = (getpwuid ($<))[6]) =~ s/,.*//; return 1; })
 # A copy of this file is pasted into the beginning of texi2html by
 # 'make texi2html'
 #
-# Copy this file and make changes to it, if you like
-# Afterwards, load it with command-line option -init_file <your_init_file>
+# Copy this file and make changes to it, if you like.
+# Afterwards, either, load it with command-line option -init_file <your_init_file>
 #
 # $Id$
 
@@ -70,7 +109,7 @@ $T2H_DEBUG = 0;
 
 # -doctype
 # document type which is specified in header of html files
-$T2H_DOCTYPE = '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0 Strict Level 2//EN">'; 
+$T2H_DOCTYPE = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'; 
 
 # -check
 # if set, only check files and give the list of all things that may be 
@@ -87,12 +126,13 @@ $T2H_EXPAND = "info";
 $T2H_USE_GLOSSARY = 0;
 
 # -invisible
-# if set, use $T2H_INVISIBLE_MARK to create invisible destination
+# $T2H_INVISIBLE_MARK is the text used to create invisible destination
 # anchors for index links (you can for instance use the invisible.xbm
 # file shipped with this program). This is a workaround for a known
 # bug of many WWW browsers, including netscape.
 # For me, it works fine without it -- on the contrary: if there, it
 # inserts space between headers and start of text (obachman 3/99)
+$T2H_INVISIBLE_MARK = '';
 # $T2H_INVISIBLE_MARK = '&#160;';
 
 # -iso
@@ -107,7 +147,9 @@ $T2H_USE_ISO = 0;
 # -top_file
 # uses file of this name for top-level file
 # extension is manipulated appropriately, if nessecary
-$T2H_TOP_FILE = "index.html";
+# if undef, <basename of document>.html is used
+# Typically, you would set this to "index.html"
+$T2H_TOP_FILE = '';
 
 # -menu
 # if set, show the Texinfo menus
@@ -121,14 +163,23 @@ $T2H_NUMBER_SECTIONS = 1;
 # if set to 'section' (resp. 'chapter') create one html file per (sub)section
 # (resp. chapter) and separate pages for Top, ToC, Overview, Index,
 # Glossary, About.
-# otherwise, create monolitich html file which contains whole document
+# otherwise, create monolithic html file which contains whole document
 #$T2H_SPLIT = 'section';
 $T2H_SPLIT = undef;
+
+# -section_navigation|-no-section_navigation
+# if set, then navigation panels are printed at the beginning of each section
+# and, possibly at the end (depending on whether or not there were more than 
+# $T2H_WORDS_IN_PAGE  words on page
+# This is most useful if you do not want to have section navigation 
+# on -split chapter
+$T2H_SECTION_NAVIGATION = 1;
 
 # -subdir
 # if set put result files in this directory
 # if not set result files are put into current directory
-$T2H_SUBDIR = 'html';
+#$T2H_SUBDIR = 'html';
+$T2H_SUBDIR = undef;
 
 # -short_extn
 # If this is set all HTML file will have extension ".htm" instead of
@@ -201,6 +252,15 @@ $T2H_L2H_KEEP = 1;
 # otherwise, do not center by default
 $T2H_CENTER_IMAGE = 1;
 
+# used as identation for block enclosing command @example, etc
+# If not empty, must be enclosed in <td></td>
+$T2H_EXAMPLE_INDENT_CELL = '<td>&nbsp;</td>';
+# same as above, only for @small
+$T2H_SMALL_EXAMPLE_INDENT_CELL = '<td>&nbsp;</td>';
+# font size for @small
+$T2H_SMALL_FONT_SIZE = '-1';
+
+
 ########################################################################
 # Language dependencies: 
 # To add a new language extend T2H_WORDS hash and create $T2H_<...>_WORDS hash
@@ -256,24 +316,33 @@ $T2H_WORDS =
 
 ########################################################################
 # Control of Page layout:
-# If you want to make changes to the default layout, copy the appropriate
-# subs/hashes/arrays to your own init file, and make changes there:
-# As an interface, the hashes T2H_HREF, T2H_NAME hold href resp. name of
-# This     -- current page
+# You can make changes of the Page layout at two levels:
+# 1.) For small changes, it is often enough to change the value of
+#     some global string/hash/array variables
+# 2.) For larger changes, reimplement one of the T2H_DEFAULT_<fnc>* routines,
+#     give them another name, and assign them to the respective
+#     $T2H_<fnc> variable.
+
+# As a general interface, the hashes T2H_HREF, T2H_NAME, T2H_NODE hold 
+# href, html-name, node-name of
+# This     -- current section (resp. html page)
 # Top      -- top page ($T2H_TOP_FILE)
 # Contents -- Table of contents
 # Overview -- Short table of contents
 # Index    -- Index page
-# About     -- page which explain "navigation buttons"
+# About    -- page which explain "navigation buttons"
 # First    -- first node 
 # Last     -- last node
 #
-# Whether or not the following values are set, depends on the context
-# Next     -- next node of texinfo
-# Prev     -- previous node of texinfo
-# Up       -- up node of texinfo
-# Forward  -- next node in reading order
-# Back     -- previous node in reading order
+# Whether or not the following hash values are set, depends on the context 
+# (all values are w.r.t. 'This' section)
+# Next        -- next node of texinfo
+# Prev        -- previous node of texinfo
+# Up          -- up node of texinfo
+# Forward     -- next node in reading order
+# Back        -- previous node in reading order
+# FastForward -- if leave node, up and next, else next node
+# FastBackward-- if leave node, up and prev, else prev node
 #
 # Furthermore, the following global variabels are set:
 # $T2H_THISDOC{title}     -- title as set by @setttile
@@ -285,23 +354,48 @@ $T2H_WORDS =
 # $T2H_OVERVIEW      -- lines of short table of contents
 # $T2H_TOC           -- lines of table of contents
 # $T2H_TOP           -- lines of Top texinfo node 
-# $T2H_THIS_SECTION     -- lines of current node
-########################################################################
-# Layout for html for sections
+# $T2H_THIS_SECTION  -- lines of 'This' section
+
 #
-sub t2h_print_section
+# There are the following subs which control the layout:
+#
+$T2H_print_section            = \&T2H_DEFAULT_print_section;
+$T2H_print_Top_header         = \&T2H_DEFAULT_print_Top_header;       
+$T2H_print_Top_footer	      = \&T2H_DEFAULT_print_Top_footer;       
+$T2H_print_Top		      = \&T2H_DEFAULT_print_Top;              
+$T2H_print_Toc		      = \&T2H_DEFAULT_print_Toc;              
+$T2H_print_Overview	      = \&T2H_DEFAULT_print_Overview;         
+$T2H_print_Footnotes	      = \&T2H_DEFAULT_print_Footnotes;        
+$T2H_print_About	      = \&T2H_DEFAULT_print_About;            
+$T2H_print_misc_header	      = \&T2H_DEFAULT_print_misc_header;      
+$T2H_print_misc_footer	      = \&T2H_DEFAULT_print_misc_footer;      
+$T2H_print_misc		      = \&T2H_DEFAULT_print_misc;
+$T2H_print_chapter_header     = \&T2H_DEFAULT_print_chapter_header;      
+$T2H_print_chapter_footer     = \&T2H_DEFAULT_print_chapter_footer;      
+$T2H_print_page_head	      = \&T2H_DEFAULT_print_page_head;        
+$T2H_print_page_foot	      = \&T2H_DEFAULT_print_page_foot;        
+$T2H_print_head_navigation    = \&T2H_DEFAULT_print_head_navigation;  
+$T2H_print_foot_navigation    = \&T2H_DEFAULT_print_foot_navigation;  
+$T2H_button_icon_img	      = \&T2H_DEFAULT_button_icon_img;        
+$T2H_print_navigation	      = \&T2H_DEFAULT_print_navigation;       
+$T2H_about_body		      = \&T2H_DEFAULT_about_body;            
+
+########################################################################
+# Layout for html for every sections
+#
+sub T2H_DEFAULT_print_section
 {
   my $fh = shift;
   local $T2H_BUTTONS = \@T2H_SECTION_BUTTONS;
-  t2h_print_head_navigation($fh);
+  &$T2H_print_head_navigation($fh) if $T2H_SECTION_NAVIGATION;
   my $nw = t2h_print_lines($fh);
-  if ($T2H_SPLIT eq 'section')
+  if ($T2H_SPLIT eq 'section' && $T2H_SECTION_NAVIGATION)
   {
-    t2h_print_foot_navigation($fh, $nw);
+    &$T2H_print_foot_navigation($fh, $nw);
   }
   else
   {
-    print $fh '<BR> <HR SIZE="6"> <BR>' . "\n";
+    print $fh '<HR SIZE="6">' . "\n";
   }
 }
 
@@ -314,18 +408,18 @@ sub t2h_print_section
 # author and overview is printed
 # T2H_HREF of Next, Prev, Up, Forward, Back are not defined
 # if $T2H_SPLIT then Top page is in its own html file
-sub t2h_print_Top_header
+sub T2H_DEFAULT_print_Top_header
 {
-  t2h_print_page_head(@_) if $T2H_SPLIT;
+  &$T2H_print_page_head(@_) if $T2H_SPLIT;
   t2h_print_label(@_); # this needs to be called, otherwise no label set
-  t2h_print_head_navigation(@_);
+  &$T2H_print_head_navigation(@_);
 }
-sub t2h_print_Top_footer
+sub T2H_DEFAULT_print_Top_footer
 {
-  t2h_print_foot_navigation(@_);
-  t2h_print_page_foot(@_) if $T2H_SPLIT; 
+  &$T2H_print_foot_navigation(@_);
+  &$T2H_print_page_foot(@_) if $T2H_SPLIT; 
 }
-sub t2h_print_Top
+sub T2H_DEFAULT_print_Top
 {
   my $fh = shift;
 
@@ -333,15 +427,15 @@ sub t2h_print_Top
   # local $T2H_BUTTONS = [...];
   # as it is, 'Top', 'Contents', 'Index', 'About' are printed
   local $T2H_BUTTONS = \@T2H_MISC_BUTTONS;
-  t2h_print_Top_header($fh);
-  if ($T2H_TOP)
+  &$T2H_print_Top_header($fh);
+  if ($T2H_THIS_SECTION)
   {
     # if top-level node has content, then print it
-    t2h_print_lines($fh, $T2H_TOP)
+    t2h_print_lines($fh, $T2H_THIS_SECTION)
   }
   else
   {
-    # top-level node is enclosed in @ifnothtml
+    # top-level node is fully enclosed in @ifnothtml
     # print fulltitle, subtitle, author, Overview
     print $fh 
       "<CENTER>\n<H1>" .
@@ -359,73 +453,113 @@ EOT
     t2h_print_lines($fh, $T2H_OVERVIEW);
     print $fh "</BLOCKQUOTE>\n";
   }
-  t2h_print_Top_footer($fh);
+  &$T2H_print_Top_footer($fh);
 }
 
 ###################################################################
 # Layout of Toc, Overview, and Footnotes pages
 # By default, we use "normal" layout 
-# T2H_HREF of Next, Prev, Up, Forward, Back are not defined
+# T2H_HREF of Next, Prev, Up, Forward, Back, etc are not defined
 # use: local $T2H_BUTTONS = [...] to redefine navigation buttons
-sub t2h_print_Toc
+sub T2H_DEFAULT_print_Toc
 {
-  return t2h_print_misc(@_);
+  return &$T2H_print_misc(@_);
 }
-sub t2h_print_Overview
+sub T2H_DEFAULT_print_Overview
 {
-  return t2h_print_misc(@_);
+  return &$T2H_print_misc(@_);
 }
-sub t2h_print_Footnotes
+sub T2H_DEFAULT_print_Footnotes
 {
-  return t2h_print_misc(@_);
+  return &$T2H_print_misc(@_);
 }
-sub t2h_print_About
+sub T2H_DEFAULT_print_About
 {
-  return t2h_print_misc(@_);
+  return &$T2H_print_misc(@_);
 }
-sub t2h_print_misc_header
+
+sub T2H_DEFAULT_print_misc_header
 {
-  t2h_print_page_head(@_) if $T2H_SPLIT;
-  t2h_print_label(@_); # this needs to be called, otherwise, no label set
-  t2h_print_head_navigation(@_);
+  &$T2H_print_page_head(@_) if $T2H_SPLIT;
+  # this needs to be called, otherwise, no labels are set
+  t2h_print_label(@_); 
+  &$T2H_print_head_navigation(@_);
 }
-sub t2h_print_misc_footer
+sub T2H_DEFAULT_print_misc_footer
 {
-  t2h_print_foot_navigation(@_);
-  t2h_print_page_foot(@_) if $T2H_SPLIT; 
+  &$T2H_print_foot_navigation(@_);
+  &$T2H_print_page_foot(@_) if $T2H_SPLIT; 
 }
-sub t2h_print_misc
+sub T2H_DEFAULT_print_misc
 {
   my $fh = shift;
   local $T2H_BUTTONS = \@T2H_MISC_BUTTONS;
-  t2h_print_misc_header($fh);
+  &$T2H_print_misc_header($fh);
   print $fh "<H1>$T2H_NAME{This}</H1>\n";
   t2h_print_lines($fh);
-  t2h_print_misc_footer($fh);
+  &$T2H_print_misc_footer($fh);
 }
 
 ###################################################################
+# chapter_header and chapter_footer are only called if
+# T2H_SPLIT eq 'chapter'
+# chapter_header: after print_page_header, before print_section
+# chapter_footer: after print_section of last section, before print_page_footer
+# 
+# If you want to get rid of navigation stuff after each section,
+# redefine print_section such that it does not call print_navigation,
+# and put print_navigation into print_chapter_header
+@T2H_CHAPTER_BUTTONS =
+  (
+   'FastBack', 'FastForward', ' ', 
+   ' ', ' ', ' ', ' ',
+   'Top', 'Contents', 'Index', 'About', 
+  );
+
+sub T2H_DEFAULT_print_chapter_header
+{
+  # nothing to do there, by default
+  if (! $T2H_SECTION_NAVIGATION)
+  {
+    my $fh = shift;
+    local $T2H_BUTTONS = \@T2H_CHAPTER_BUTTONS;
+    &$T2H_print_navigation($fh);
+    print $fh "\n<HR SIZE=2>\n";
+  }
+}
+
+sub T2H_DEFAULT_print_chapter_footer
+{
+  local $T2H_BUTTONS = \@T2H_CHAPTER_BUTTONS;
+  &$T2H_print_navigation(@_);
+}
+###################################################################
 # Layout of standard header and footer
 #
+
 # Set the default body text, inserted between <BODY ... > 
-$T2H_BODYTEXT = 'LANG="EN" BGCOLOR="#FFFFFF"';
+$T2H_BODYTEXT = 'LANG="EN" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000"';
 # text inserted after <BODY ...>
 $T2H_AFTER_BODY_OPEN = '';
 #text inserted before </BODY>
 $T2H_PRE_BODY_CLOSE = '';
 # this is used in footer
-$T2H_ADDRESS = "by <I>$T2H_USER &nbsp; on $T2H_TODAY</I>";
-# this is added inside <HEAD></HEAD> after <TITLE> 
-# and some META NAME stuff
+$T2H_ADDRESS = "by <I>$T2H_USER</I> " if $T2H_USER;
+$T2H_ADDRESS .= "on <I>$T2H_TODAY</I>";
+# this is added inside <HEAD></HEAD> after <TITLE> and some META NAME stuff
+# can be used for <style> <script>, <meta> tags
 $T2H_EXTRA_HEAD = '';
-sub t2h_print_page_head
+
+sub T2H_DEFAULT_print_page_head
 {
   my $fh = shift; 
   my $longtitle = "$T2H_THISDOC{title}: $T2H_NAME{This}";
   print $fh <<EOT;
 $T2H_DOCTYPE
 <!-- Created on $T2H_TODAY by $THISPROG -->
-<!-- $T2H_AUTHORS -->
+<!-- 
+$T2H_AUTHORS 
+-->
 <HTML>
 <HEAD>
 <TITLE>$longtitle</TITLE>
@@ -443,13 +577,15 @@ $T2H_AFTER_BODY_OPEN
 EOT
 }
 
-sub t2h_print_page_foot
+sub T2H_DEFAULT_print_page_foot
 {
   my $fh = shift;
   print $fh <<EOT;
+<BR>  
 <FONT SIZE="-1">
-This document was generated using <A HREF="$T2H_HOMEPAGE"><I>texi2html</I></A>
+This document was generated
 $T2H_ADDRESS
+using <A HREF="$T2H_HOMEPAGE"><I>texi2html</I></A>
 $T2H_PRE_BODY_CLOSE
 </BODY>
 </HTML>
@@ -458,12 +594,10 @@ EOT
 
 ###################################################################
 # Layout of navigation panel
-# I recommend that you use @ifnothtml, @ifhtml, @html within the 
-# top-node to specify content of top-level page
-# If you enclose everything in @ifnothtml, then title and overview is
-# printed
+
+# if this is set, then a vertical navigation panel is used
 $T2H_VERTICAL_HEAD_NAVIGATION = 0;
-sub t2h_print_head_navigation
+sub T2H_DEFAULT_print_head_navigation
 {
   my $fh = shift;
   if ($T2H_VERTICAL_HEAD_NAVIGATION)
@@ -474,7 +608,7 @@ sub t2h_print_head_navigation
 <TD ALIGN="LEFT">
 EOT
   }
-  t2h_print_navigation($fh, $T2H_VERTICAL_HEAD_NAVIGATION);
+  &$T2H_print_navigation($fh, $T2H_VERTICAL_HEAD_NAVIGATION);
   if ($T2H_VERTICAL_HEAD_NAVIGATION)
   {
     print $fh <<EOT;
@@ -482,7 +616,7 @@ EOT
 <TD ALIGN="LEFT">
 EOT
   }
-  else
+  elsif ($T2H_SPLIT eq 'section')
   {
     print $fh "<HR SIZE=1>\n";
   }
@@ -492,7 +626,7 @@ EOT
 # is placed at the bottom of a page (the default is that of latex2html)
 # T2H_THIS_WORDS_IN_PAGE holds number of words of current page
 $T2H_WORDS_IN_PAGE = 300;
-sub t2h_print_foot_navigation
+sub T2H_DEFAULT_print_foot_navigation
 {
   my $fh = shift;
   my $nwords = shift;
@@ -505,15 +639,14 @@ sub t2h_print_foot_navigation
 EOT
   }
   print $fh "<HR SIZE=1>\n";
-  t2h_print_navigation($fh) if ($nwords >= $T2H_WORDS_IN_PAGE);
-  print $fh "<BR>\n";
+  &$T2H_print_navigation($fh) if ($nwords >= $T2H_WORDS_IN_PAGE)
 }
 
 ######################################################################
 # navigation panel
 #
 # specify in this array which "buttons" should appear in which order
-# in the navigation panel for sections us ' ' for empty buttons (space)
+# in the navigation panel for sections; use ' ' for empty buttons (space)
 @T2H_SECTION_BUTTONS =
   (
    'Back', 'Forward', ' ', 'FastBack', 'Up', 'FastForward',  
@@ -565,7 +698,7 @@ EOT
   );
 
 # how to create IMG tag
-sub t2h_button_icon_img
+sub T2H_DEFAULT_button_icon_img
 {
   my $button = shift;
   my $icon = shift;
@@ -581,7 +714,7 @@ sub t2h_button_icon_img
    'Overview', 'Overview',
    'Index',    'Index',
    ' ',        ' &nbsp; ',
-   'Back',     ' &lt ',
+   'Back',     ' &lt; ',
    'FastBack', ' &lt;&lt; ',
    'Prev',     'Prev',
    'Up',       ' Up ',
@@ -593,7 +726,7 @@ sub t2h_button_icon_img
    'Last',     ' &gt;| '
   );
 
-sub t2h_print_navigation
+sub T2H_DEFAULT_print_navigation
 {
   my $fh = shift;
   my $vertical = shift;
@@ -614,7 +747,7 @@ sub t2h_print_navigation
     { # handle space button
       print $fh 
 	$T2H_ICONS && $T2H_ACTIVE_ICONS{' '} ? 
-	 t2h_button_icon_img($button, $T2H_ACTIVE_ICONS{' '}) :
+	 &$T2H_button_icon_img($button, $T2H_ACTIVE_ICONS{' '}) :
 	 $T2H_NAVIGATION_TEXT{' '};
       next;
     }
@@ -623,7 +756,7 @@ sub t2h_print_navigation
       print $fh   
 	 $T2H_ICONS && $T2H_ACTIVE_ICONS{$button} ? # use icon ? 
 	   t2h_anchor('', $T2H_HREF{$button},  # yes
-		    t2h_button_icon_img($button,
+		    &$T2H_button_icon_img($button,
 					$T2H_ACTIVE_ICONS{$button},
 					$T2H_NAME{$button})) 
 	 : # use text
@@ -635,9 +768,9 @@ sub t2h_print_navigation
     { # button is passive 
       print $fh 
 	$T2H_ICONS && $T2H_PASSIVE_ICONS{$button} ?
-	 t2h_button_icon_img($button,
-			     $T2H_PASSIVE_ICONS{$button},
-			     $T2H_NAME{$button}) :
+	 &$T2H_button_icon_img($button,
+			       $T2H_PASSIVE_ICONS{$button},
+			       $T2H_NAME{$button}) :
 	 
 	 "[" . $T2H_NAVIGATION_TEXT{$button} . "]";
     }
@@ -651,14 +784,16 @@ sub t2h_print_navigation
 ######################################################################
 # About page
 #
-# the value of $T2H_MORE_ABOUT is appended to generated about
+
+# T2H_PRE_ABOUT might be a function
 $T2H_PRE_ABOUT = <<EOT;
-This document was generated with  <A HREF="$T2H_HOMEPAGE"><I>$THISPROG</I></A> on $T2H_TODAY by $T2H_USER.
+This document was generated $T2H_ADDRESS
+using <A HREF="$T2H_HOMEPAGE"><I>texi2html</I></A>
 <P></P>  
 EOT
-  
 $T2H_AFTER_ABOUT = '';
-sub t2h_about_body
+
+sub T2H_DEFAULT_about_body
 {
   my $about;
   if (ref($T2H_PRE_ABOUT) eq 'CODE')
@@ -690,7 +825,7 @@ EOT
 EOT
     $about .= 	
       ($T2H_ICONS && $T2H_ACTIVE_ICONS{$button} ?
-       t2h_button_icon_img($button, $T2H_ACTIVE_ICONS{$button}) :
+       &$T2H_button_icon_img($button, $T2H_ACTIVE_ICONS{$button}) :
        " [" . $T2H_NAVIGATION_TEXT{$button} . "] ");
     $about .= <<EOT;
 </TD>
@@ -776,11 +911,13 @@ EOT
    'First',    '1.',
    'Last',     '1.2.4',
 );
+
+
 ######################################################################
 # from here on, its l2h init stuff 
 #
 
-## initialization for latex2html for Singular manual generation
+## initialization for latex2html as for Singular manual generation
 ## obachman 3/99
 
 #
@@ -941,76 +1078,14 @@ $PAPERSIZE = "a4";
 # file "latex2html.config" 
 $TITLES_LANGUAGE = "english";
 
-### Navigation Panel ##########################################################
-#
-# The navigation panel is constructed out of buttons and section titles.
-# These can be configured in any combination with arbitrary text and 
-# HTML tags interspersed between them. 
-# The buttons available are:
-# $PREVIOUS - points to the previous section
-# $UP  - points up to the "parent" section
-# $NEXT - points to the next section
-# $NEXT_GROUP - points to the next "group" section
-# $PREVIOUS_GROUP - points to the previous "group" section
-# $CONTENTS - points to the contents page if there is one
-# $INDEX - points to the index page if there is one
-#
-# If the corresponding section exists the button will contain an
-# active link to that section. If the corresponding section does
-# not exist the button will be inactive.
-#
-# Also for each of the $PREVIOUS $UP $NEXT $NEXT_GROUP and $PREVIOUS_GROUP
-# buttons there are equivalent $PREVIOUS_TITLE, $UP_TITLE, etc variables
-# which contain the titles of their corresponding sections. 
-# Each title is empty if there is no corresponding section.
-#
-# The subroutine below constructs the navigation panels in each page.
-# Feel free to mix and match buttons, titles, your own text, your logos,
-# and arbitrary HTML (the "." is the Perl concatenation operator).
-sub top_navigation_panel {
-# 
-#     # Now add a few buttons with a space between them
-#     "$NEXT $UP $PREVIOUS $CONTENTS $INDEX $CUSTOM_BUTTONS" .
-#     
-#     "<BR>\n" .		# Line break
-# 	
-#     # If ``next'' section exists, add its title to the navigation panel
-#     ($NEXT_TITLE ? "<B> Next:</B> $NEXT_TITLE\n" : undef) . 
-#     
-#     # Similarly with the ``up'' title ...
-#     ($UP_TITLE ? "<B>Up:</B> $UP_TITLE\n" : undef) . 
-#  
-#     # ... and the ``previous'' title
-#     ($PREVIOUS_TITLE ? "<B> Previous:</B> $PREVIOUS_TITLE\n" : undef) .
-#    
-#     #  Line Break, horizontal rule (3-d dividing line) and new paragraph  
-#     "<BR> <P>\n"		
-}
-
-sub bot_navigation_panel {
-#     #  Start with a horizontal rule (3-d dividing line)
-#     "<HR>".			
-#     
-#     # Now add a few buttons with a space between them
-#     "$NEXT $UP $PREVIOUS $CONTENTS $INDEX $CUSTOM_BUTTONS" .
-#     
-#     "<BR>\n" .		# Line break
-# 	
-#     # If ``next'' section exists, add its title to the navigation panel
-#     ($NEXT_TITLE ? "<B> Next:</B> $NEXT_TITLE\n" : undef) . 
-#     
-#     # Similarly with the ``up'' title ...
-#     ($UP_TITLE ? "<B>Up:</B> $UP_TITLE\n" : undef) . 
-#  
-#     # ... and the ``previous'' title
-#     ($PREVIOUS_TITLE ? "<B> Previous:</B> $PREVIOUS_TITLE\n" : undef) 
-#    
-}
-
-1;	# This must be the last line
+1;	# This must be the last non-comment line
 
 # End File texi2html.init
 ######################################################################
+
+require "$ENV{T2H_HOME}/texi2html.init" 
+  if ($0 =~ /\.pl$/ &&
+      -e "$ENV{T2H_HOME}/texi2html.init" && -r "$ENV{T2H_HOME}/texi2html.init");
 
 #+++############################################################################
 #                                                                              #
@@ -1031,11 +1106,8 @@ $DEBUG_L2H   = 128;
 $BIBRE = '\[[\w\/-]+\]';		# RE for a bibliography reference
 $FILERE = '[\/\w.+-]+';			# RE for a file name
 $VARRE = '[^\s\{\}]+';			# RE for a variable name
-#$NODERE = '[^@{}:\'`",]+';		# RE for a node name
-$NODERE = '[^,:]+';		# RE for a node name
-$NODESRE = '[^:]+';		# RE for a list of node names
-#$NODESRE = '[^@{}:\'`"]+';		# RE for a list of node names
-#$XREFRE = '[^@{}]';			# RE for a xref (should use NODERE)
+$NODERE = '[^,:]+';		        # RE for a node name
+$NODESRE = '[^:]+';		        # RE for a list of node names
 
 $ERROR = "***";			        # prefix for errors 
 $WARN  = "**";                          # prefix for warnings
@@ -1137,7 +1209,8 @@ $TOPEND     = "<!-- End top     -->\n"; # to know where top ends
 	       'br', '<P>',		# paragraph break
 	       'bullet', '*',
 	       'copyright', '(C)',
-	       'dots', '...',
+	       'dots', '<small>...<\/small>',
+	       'enddots', '<small>....<\/small>',
 	       'equiv', '==',
 	       'error', 'error-->',
 	       'expansion', '==>',
@@ -1156,7 +1229,10 @@ $TOPEND     = "<!-- End top     -->\n"; # to know where top ends
 	       'O',  '&Oslash;',
 	       'ss', '&szlig;',
 	       'l', '\/l',
-	       'L', '\/L'
+	       'L', '\/L',
+	       'exclamdown', '&iexcl;',
+	       'questiondown', '&iquest;',
+	       'pounds', '&pound;'
 	       );
 
 #
@@ -1207,13 +1283,7 @@ $TOPEND     = "<!-- End top     -->\n"; # to know where top ends
 # texinfo format (@foo/@end foo) to HTML ones
 #
 %format_map = (
-	       'display', 'PRE',
-	       'example', 'PRE',
-	       'format', 'PRE',
-	       'lisp', 'PRE',
 	       'quotation', 'BLOCKQUOTE',
-	       'smallexample', 'PRE',
-	       'smalllisp', 'PRE',
 	       # lists
 	       'itemize', 'UL',
 	       'enumerate', 'OL',
@@ -1221,6 +1291,38 @@ $TOPEND     = "<!-- End top     -->\n"; # to know where top ends
 	       'flushleft', 'PRE',
 	       'flushright', 'PRE',
 	       );
+
+#
+# an eval of these $complex_format_map->{what}->[0] yields beginning
+# an eval of these $complex_format_map->{what}->[1] yieleds end
+$complex_format_map =
+{
+ example => 
+ [
+  q{"<TABLE><tr>$T2H_EXAMPLE_INDENT_CELL<td><pre>"},
+  q{'</pre></td></tr></table>'}
+ ],
+ smallexample => 
+ [
+  q{"<TABLE><tr>$T2H_SMALL_EXAMPLE_INDENT_CELL<td><FONT SIZE=$T2H_SMALL_FONT_SIZE><pre>"},
+  q{'</FONT></pre></td></tr></table>'}
+ ],
+ display =>
+ [
+  q{"<TABLE><tr>$T2H_EXAMPLE_INDENT_CELL<td><pre " . 'style="font-family: serif">'},
+  q{'</pre></td></tr></table>'}
+ ],
+ smalldisplay =>
+ [
+  q{"<TABLE><tr>$T2H_SMALL_EXAMPLE_INDENT_CELL<td><FONT SIZE=$T2H_SMALL_FONT_SIZE><pre " . 'style="font-family: serif">'},
+  q{'</pre></FONT></td></tr></table>'}
+ ]
+};
+
+$complex_format_map->{lisp} = $complex_format_map->{example};
+$complex_format_map->{smalllisp} = $complex_format_map->{smallexample};
+$complex_format_map->{format} = $complex_format_map->{display};
+$complex_format_map->{smallformat} = $complex_format_map->{smalldisplay};
 
 #
 # texinfo definition shortcuts to real ones
@@ -1336,39 +1438,59 @@ $usage = <<EOT;
 This is $THISPROG
 To convert a Texinfo file to HMTL: $0 [options] file
  where options can be:
-  -expand [info,tex]  : expand info/tex sections
-  -glossary           : handle a glossary
-  -invisible name     : use 'name' as an invisible anchor
-  -Dname              : define name like with \@set
-  -I dir              : search also for files in 'dir'
-  -index_file file    : use 'file' as index file
-  -menu               : handle menus
-  -number             : number sections
-  -split node|chapter : split on node or chapter 
-  -short_ref          : cross references without section numbers
-  -l2h                : use latex2html for \@math, \@tex, and \@sc 
-  -l2h_latex2html prog: use 'prog' as latex2html program 
-                        (default: 'latex2html')
-  -l2h_tmp dir        : use 'dir' as temp dir for latex2html
-  -l2h_clean          : remove temporary files generated by l2h extension
-  -l2h_skip           : skip latex2html run (needs temporary files)
-  -init_file 'file'   : use 'file' for texi2html and latex2html initialization 
-  -sidx               : index jump label to top of section
-  -usage              : print usage instructions
-  -verbose            : verbose output
+  -expand [info,tex]     : expand info/tex sections
+  -glossary              : handle a glossary
+  -invisible <name>      : use <name> as an invisible anchor
+  -D<name>               : define <name> as if with \@set
+  -I <dir>               : search also for files in <dir>
+  -init_file <file>      : use <file> for texi2html and latex2html initialization 
+  -index_file <file>     : use <file> as index file
+  -menu                  : handle menus
+  -monolithic            : cancels out -split option
+  -l2h                   : use latex2html for \@math, \@tex, and \@sc 
+  -l2h_latex2html <prog> : use <prog> as latex2html program 
+                           (default: 'latex2html')
+  -l2h_tmp <dir>         : use <dir> as temp dir for latex2html
+  -l2h_clean             : remove temporary files generated by l2h extension
+  -l2h_skip              : skip latex2html run (needs temporary files)
+  -number                : number sections
+  -o file                : output into monlithic <file>
+  -section_navigation    : use navigation panel for section
+  -no-section_navigation : do not use navigation panel for sections
+  -split section|chapter : split on section or chapter
+  -split_{node|chapter}  : split on section or chapter
+  -short_ref             : cross references without section numbers
+  -subdir dir            : put HTML files into subdir <dir>
+                           (default 'html')
+  -usage, --help         : display these usage instructions and exit immediately
+  -verbose               : verbose output
+  -version, --version    : display version number and exit immediately
 To check converted files: $0 -check [-verbose] files
 EOT
+# Not currently usaged
+#  -sidx                  : index jump label to top of section
+
+my $home = $ENV{HOME};
+defined($home) or $home = '';
+foreach $i ('/usr/local/etc/texi2htmlrc', "$home/.texi2htmlrc") {
+    if (-f $i) {
+	print "# reading initialization file from $i\n" 
+	    if ($T2H_VERBOSE);
+	require($i);
+    }
+}
 
 while (@ARGV && $ARGV[0] =~ /^-/) {
     $_ = shift(@ARGV);
     if (/^-acc$/)            { $use_acc = 1; next; }
     if (/^-D(.+)?$/)         { $value{$1 || shift(@ARGV)} = 1; next; }
-    if (/^-d(ebug)?(\d+)?$/) { $T2H_DEBUG = $2 || shift(@ARGV); next; }
+    if (/^-d(?:ebug)?(\d+)?$/) { $T2H_DEBUG = $1 || shift(@ARGV); next; }
     if (/^-doctype$/)        { $T2H_DOCTYPE = shift(@ARGV); next; }
-    if (/^-c(heck)?$/)       { $T2H_CHECK = 1; next; }
-    if (/^-e(xpand)?$/)      { $T2H_EXPAND = shift(@ARGV); next; }
-    if (/^-g(lossary)?$/)    { $T2H_USE_GLOSSARY = 1; next; }
-    if (/^-i(nvisible)?$/)   { $T2H_INVISIBLE_MARK = shift(@ARGV); next; }
+    if (/^-c(?:heck)?$/)       { $T2H_CHECK = 1; next; }
+    if (/^-e(?:xpand)?$/)      { $T2H_EXPAND = shift(@ARGV); next; }
+    if (/^-g(?:lossary)?$/)    { $T2H_USE_GLOSSARY = 1; next; }
+    if (/^-id(?:x_sum)?$/)     { $T2H_IDX_SUMMARY = shift(@ARGV); next; }
+    if (/^-i(?:nvisible)?$/)   { $T2H_INVISIBLE_MARK = shift(@ARGV); next; }
     if (/^-I(.+)?$/)         { push(@T2H_INCLUDE_DIRS, $1 || shift(@ARGV)); next; }
     if (/^-iso$/)            { $T2H_USE_ISO = 1; next; }
     if (/^-init_file$/)      
@@ -1393,19 +1515,41 @@ while (@ARGV && $ARGV[0] =~ /^-/) {
     if (/^-l2h_skip$/)       { $T2H_L2H_SKIP= 1;            next; }
     if (/^-l2h_tmp$/)        { $T2H_L2H_TMP = shift(@ARGV); next; }
     if (/^-l2h_clean$/)      { $T2H_L2H_CLEAN= 1;            next; }
-    if (/^-m(enu)?$/)        { $T2H_SHOW_MENU = 1; next; }
-    if (/^-nu(mber)?$/)      { $T2H_NUMBER_SECTIONS = 1; next; }
-    if (/^-o(ut_file)?$/)    { $T2H_OUT = shift (@ARGV); 
+    if (/^-m(?:enu)?$/)        { $T2H_SHOW_MENU = 1; next; }
+    if (/^-nu(?:mber)?$/)      { $T2H_NUMBER_SECTIONS = 1; next; }
+    if (/^-o(?:ut_file)?$/)    { $T2H_OUT = shift (@ARGV); 
                                undef $T2H_SPLIT; next;}    
-    if (/^-p(refix)?$/)      { $T2H_PREFIX = shift(@ARGV); next; }
-    if (/^-su(bdir)?$/)      { $T2H_SUBDIR = shift(@ARGV); next; }
-    if (/^-short_e(xtn)?$/)  { $T2H_SHORTEXTN = 1; next; }
-    if (/^-short_r(ef)?$/)   { $T2H_SHORT_REF = 1; next; }
-    if (/^-s(plit)?$/)       { $T2H_SPLIT = shift(@ARGV); next;}
-    if (/^-t(op_file)?$/)    { $T2H_TOP_FILE = shift (@ARGV); next;}    
-    if (/^-v(erbose)?$/)     { $T2H_VERBOSE = 1; next; }
-    if (/^-no_v(erbose)?$/)  { $T2H_VERBOSE = 0; next; }
-    if (/^-vers(ion)?$/)     { print "$THISPROG\n"; exit;}
+    if (/^-p(?:refix)?$/)      { $T2H_PREFIX = shift(@ARGV); next; }
+    if (/^-su(?:bdir)?$/)      { $T2H_SUBDIR = shift(@ARGV); next; }
+    if (/^-short_e(?:xtn)?$/)  { $T2H_SHORTEXTN = 1; next; }
+    if (/^-short_r(?:ef)?$/)   { $T2H_SHORT_REF = 1; next; }
+    # The following is because we want to remain compatible with
+    # texi2html versions 1.5x and earlier while also allowing
+    # `-s(plit)? (n(ode)?|c(hapter)?)' which 1.60beta used.  It's
+    # important to remain compatible with 1.5x because many build
+    # scripts use its syntax.  If anything, the 1.60beta syntax could
+    # be dropped.
+    if (/^-mono(?:lith(?:ic)?)?$/) { $T2H_SPLIT = undef; next; }
+    if (/^-s(?:plit)?(_?)(n(?:ode)?|c(?:hapter)?)?$/) {
+	if ($2 =~ /^n/) {
+	    # 1.5x syntax.
+	    $T2H_SPLIT = 'node';
+	} elsif (("$1$2" eq '') && ($ARGV[0] =~ /^(?:no|none|node|section|chapter)$/i)) {
+	    # 1.60beta syntax.
+	    $T2H_SPLIT = shift(@ARGV);
+	} else {
+	    # 1.5x syntax.
+	    $T2H_SPLIT = 'chapter';
+	}
+	next;
+    }
+    if (/^-t(?:op_file)?$/)    { $T2H_TOP_FILE = shift (@ARGV); next;}    
+    if (/^-v(?:erbose)?$/)     { $T2H_VERBOSE = 1; next; }
+    if (/^-no_v(?:erbose)?$/)  { $T2H_VERBOSE = 0; next; }
+    if (/^-section_navigation$/)  { $T2H_SECTION_NAVIGATION = 1; next; }
+    if (/^-no-section_navigation$/)  { undef $T2H_SECTION_NAVIGATION; next; }
+    if (/^--?vers(?:ion)?$/)   { print "$THISPROG\n"; exit;}
+    if (/^-(?:usage|-help)/)   { print "$usage"; exit; }
     die "Unknown option: $_\n$usage";
 }
 if ($T2H_CHECK) {
@@ -1494,10 +1638,6 @@ if ($T2H_TOP_FILE =~ /\..*$/)
 {
   $T2H_TOP_FILE = $`.".$docu_ext";
 }
-else
-{
-  $T2H_TOP_FILE .= ".$docu_ext";
-}
 
 # result files
 if (! $T2H_OUT && ($T2H_SPLIT =~ /section/i || $T2H_SPLIT =~ /node/i))
@@ -1521,7 +1661,7 @@ if ($T2H_SPLIT)
   $docu_stoc = "${docu_name}_ovr.$docu_ext"; # document's short toc
   $docu_foot = "${docu_name}_fot.$docu_ext"; # document's footnotes
   $docu_about = "${docu_name}_abt.$docu_ext"; # about this document
-  $docu_top  = $T2H_TOP_FILE;
+  $docu_top  = $T2H_TOP_FILE || $docu_doc;
 }
 else
 {
@@ -1551,6 +1691,8 @@ foreach ('_author', '_title', '_subtitle',
 }
 %node2sec = ();				# node to section name
 %sec2node = ();				# section to node name
+%sec2number = ();                       # section to number
+%number2sec = ();                       # number to section 
 %idx2node = ();                         # index keys to node
 %node2href = ();			# node to HREF
 %node2next = ();			# node to next
@@ -2101,6 +2243,7 @@ $in_bibliography = 0;			# am I inside a bibliography
 $in_glossary = 0;			# am I inside a glossary
 $in_top = 0;				# am I inside the top node
 $has_top = 0;				# did I see a top node?
+$has_top_command = 0;			# did I see @top for automatic pointers?
 $in_pre = 0;				# am I inside a preformatted section
 $in_list = 0;				# am I inside a list
 $in_html = 0;				# am I inside an HTML section
@@ -2231,7 +2374,7 @@ INPUT_LINE: while ($_ = &next_line) {
     }
     if ($in_top) {
 	# parsing the top node
-	if ($tag eq 'node' || $tag eq 'include' || 
+	if ($tag eq 'node' || 
 	    ($sec2level{$tag} && $tag !~ /unnumbered/ && $tag !~ /heading/))
 	{
 	    # no more in top
@@ -2282,6 +2425,7 @@ INPUT_LINE: while ($_ = &next_line) {
 	if ($tag eq 'top' || ($tag eq 'node' && /^\@node\s+top\s*,/i)) {
 	    $in_top = 1;
 	    $has_top = 1;
+	    $has_top_command = 1 if $tag eq 'top';
 	    @lines = (); # ignore all lines before top (title page garbage)
 	    next;
 	} elsif ($tag eq 'node') {
@@ -2334,18 +2478,31 @@ INPUT_LINE: while ($_ = &next_line) {
 		next;
 	    }
 	    &html_push_if($tag);
-	    push(@lines, &html_debug("\n", __LINE__));
+	    push(@lines, &html_debug('', __LINE__));
 	} elsif ($format_map{$tag}) {
 	    $in_pre = 1 if $format_map{$tag} eq 'PRE';
 	    &html_push_if($format_map{$tag});
-	    push(@lines, &html_debug("\n", __LINE__));
+	    push(@lines, &html_debug('', __LINE__));
 	    $in_list++ if $format_map{$tag} eq 'UL' || $format_map{$tag} eq 'OL' ;
-	    push(@lines, &debug('<FONT size="-1">'."\n", __LINE__))
-	       if $tag =~ /smallexample/i;
 #	    push(@lines, &debug("<BLOCKQUOTE>\n", __LINE__))
 #	      if $tag =~ /example/i;
-	    push(@lines, &debug("<$format_map{$tag}>\n", __LINE__));
+	    # sunshine@sunshineco.com: <PRE>bla</PRE> looks better than
+	    # <PRE>\nbla</PRE> (at least on NeXTstep browser
+	    push(@lines, &debug("<$format_map{$tag}>" . 
+				($in_pre ? '' : "\n"), __LINE__));
 	    next;
+	}
+	elsif (exists $complex_format_map->{$tag})
+	{
+	  my $start = eval $complex_format_map->{$tag}->[0];
+	  if ($@)
+	  {
+	    print "$ERROR: eval of complex_format_map->{$tag}->[0] $complex_format_map->{$tag}->[0]: $@";
+	    $start = '<pre>'
+	  }
+	  $in_pre = 1 if $start =~ /<pre/;
+	  push(@lines, html_debug($start. ($in_pre ? '' : "\n"), __LINE__));
+	  next;
 	} elsif ($tag eq 'table') {
 	  # anorland@hem2.passagen.se
 	  # if (/^\s*\@(|f|v|multi)table\s+\@(\w+)/) {
@@ -2360,7 +2517,7 @@ INPUT_LINE: while ($_ = &next_line) {
 		    push(@lines, &debug("<DL COMPACT>\n", __LINE__));
 		    &html_push_if('DL');
 		}
-		push(@lines, &html_debug("\n", __LINE__));
+		push(@lines, &html_debug('', __LINE__));
 	    } else {
 		warn "$ERROR Bad table line: $_";
 	    }
@@ -2527,16 +2684,24 @@ INPUT_LINE: while ($_ = &next_line) {
 	    &html_pop_if('LI', 'P');
 	    &html_pop_if();
 	    push(@lines, &debug("</$format_map{$end_tag}>\n", __LINE__));
-#	    push(@lines, &debug("</BLOCKQUOTE>\n", __LINE__))
-#	      if $end_tag =~ /example/i;
-	    push(@lines, &debug("</FONT>\n", __LINE__))
-	       if $end_tag =~ /smallexample/i;
-	    push(@lines, &html_debug("\n", __LINE__));
+	    push(@lines, &html_debug('', __LINE__));
+	}
+	elsif (exists $complex_format_map->{$end_tag})
+	{
+	  my $end = eval $complex_format_map->{$end_tag}->[1];
+	  if ($@)
+	  {
+	    print "$ERROR: eval of complex_format_map->{$end_tag}->[1] $complex_format_map->{$end_tag}->[0]: $@";
+	    $end = '</pre>'
+	  }
+	  $in_pre = 0 if $end =~ m|</pre>|;
+	  push(@lines, html_debug($end, __LINE__));
 	} elsif ($end_tag =~ /^(|f|v|multi)table$/) {
 	    unless (@tables) {
 		warn "$ERROR \@end $end_tag without \@*table\n";
 		next;
 	    }
+	    &html_pop_if('P');
 	    ($table_type, $in_table) = split($;, shift(@tables));
 	    unless ($1 eq $table_type) {
 		warn "$ERROR \@end $end_tag without matching \@$end_tag\n";
@@ -2597,84 +2762,91 @@ INPUT_LINE: while ($_ = &next_line) {
 		$name = $1;
 		$name = &normalise_node($name);
 		$level = $sec2level{$tag};
-		if ($tag =~ /heading$/ || $in_top){
-		    push(@lines, &html_debug("\n", __LINE__));
+		if ($in_top && /heading/){
                     $_ = &debug("<H$level>$name</H$level>\n", __LINE__);
 		    &html_push_if('body');
-		    print "# heading, section $name, level $level\n"
+		    print "# top heading, section $name, level $level\n"
 			if $T2H_DEBUG & $DEBUG_TOC;
 		}
 # this `else' seems to cause problems if there is a chapheading section and 
 # -split node is used.  In this case, the split gets forgotten.
-else
-{
-		$node = $name unless $node;  
-		$name = &update_sec_num($tag, $level) . " $name"
-		    if $T2H_NUMBER_SECTIONS && $tag !~ /^unnumbered/;
-		  if (defined($toplevel))
+		else
+		{
+		  $node = $name unless $node;
+		  unless (/^\w+heading/)
 		  {
-		    push @lines, ($level==$toplevel ? $CHAPTEREND : $SECTIONEND);
-		  }
-		  else
-		  {
-		    # first time we see a "section"
-		    unless ($level == 1) 
+		    unless (/^unnumbered/)
 		    {
-		      warn "$WARN The first section found is not of level 1: $_";
+		      my $number = &update_sec_num($tag, $level);
+		      $name = $number. ' ' . $name if $T2H_NUMBER_SECTIONS;
+		      $sec2number{$name} = $number;
+		      $number2sec{$number} = $name;
 		    }
-		    $toplevel = $level;
-		  }
-		  push(@sections, $name);
-		  next_doc() if ($T2H_SPLIT eq 'section' ||
-				 $T2H_SPLIT && $level == $toplevel);
-		  $sec_num++;
-		  $docid = "SEC$sec_num";
-		  $tocid = "TOC$sec_num";
+		    if (defined($toplevel))
+		    {
+		      push @lines, ($level==$toplevel ? $CHAPTEREND : $SECTIONEND);
+		    }
+		    else
+		    {
+		      # first time we see a "section"
+		      unless ($level == 1) 
+		      {
+			warn "$WARN The first section found is not of level 1: $_";
+		      }
+		      $toplevel = $level;
+		    }
+		    push(@sections, $name);
+		    next_doc() if ($T2H_SPLIT eq 'section' ||
+				   $T2H_SPLIT && $level == $toplevel);
+		    $sec_num++;
+		    $docid = "SEC$sec_num";
+		    $tocid = "TOC$sec_num";
 		    # check biblio and glossary
-		  $in_bibliography = ($name =~ /^([A-Z]|\d+)?(\.\d+)*\s*bibliography$/i);
-		  $in_glossary = ($name =~ /^([A-Z]|\d+)?(\.\d+)*\s*glossary$/i);
-		    # check node
-		    if ($node2sec{$node}) {
-		      warn "$ERROR Duplicate node found: $node\n";
-		    } else {
-		            $section = $name; 
-			    $node2sec{$node} = $name;
-			    warn "$ERROR Duplicate section found: $name\n"
-			      if ($sec2node{$name});
-			    $sec2node{$name} = $node;
-			    $node2href{$node} = "$docu_doc#$docid";
-			    $node2next{$node} = $node_next;
-			    $node2prev{$node} = $node_prev;
-			    $node2up{$node} = $node_up;
-			    print "# node $node, section $name, level $level\n"
-				if $T2H_DEBUG & $DEBUG_TOC;
-			}
-			$node = '';
-			$node_next = '';
-			$node_prev = '';
-			$node_next = '';
-		    # update TOC
-		    while ($level > $curlevel) {
-			$curlevel++;
-			push(@toc_lines, "<UL>\n");
-		    }
-		    while ($level < $curlevel) {
-			$curlevel--;
-			push(@toc_lines, "</UL>\n");
-		    }
-		    $_ = &t2h_anchor($tocid, "$docu_doc#$docid", $name, 1);
-		    $_ = &substitute_style($_);
-		    push(@stoc_lines, "$_<BR>\n") if ($level == 1);
-		    push(@toc_lines, "<LI>" . $_ ."</LI>");
-		    # update DOC
-		    push(@lines, &html_debug("\n", __LINE__));
-		    &html_reset;
-#		    $_ =  "<H$level>".&t2h_anchor($docid, '', $name)."</H$level>\n";
-		    $_ =  "<H$level> $name </H$level>\n<!--docid::${docid}::-->\n";
-		    
-		    $_ = &debug($_, __LINE__);
-		    push(@lines, &html_debug("\n", __LINE__));
-	    }
+		    $in_bibliography = ($name =~ /^([A-Z]|\d+)?(\.\d+)*\s*bibliography$/i);
+		    $in_glossary = ($name =~ /^([A-Z]|\d+)?(\.\d+)*\s*glossary$/i);
+		  }
+		  # check node
+		  if ($node2sec{$node}) {
+		    warn "$ERROR Duplicate node found: $node\n";
+		  } else {
+		    $section = $name; 
+		    $node2sec{$node} = $name;
+		    warn "$ERROR Duplicate section found: $name\n"
+		      if ($sec2node{$name});
+		    $sec2node{$name} = $node;
+		    $node2href{$node} = "$docu_doc#$docid";
+		    $node2next{$node} = $node_next;
+		    $node2prev{$node} = $node_prev;
+		    $node2up{$node} = $node_up;
+		    print "# node $node, section $name, level $level\n"
+		      if $T2H_DEBUG & $DEBUG_TOC;
+		  }
+		  $node = '';
+		  $node_next = '';
+		  $node_prev = '';
+		  $node_next = '';
+		  # update TOC
+		  while ($level > $curlevel) {
+		    $curlevel++;
+		    push(@toc_lines, "<UL>\n");
+		  }
+		  while ($level < $curlevel) {
+		    $curlevel--;
+		    push(@toc_lines, "</UL>\n");
+		  }
+		  $_ = &t2h_anchor($tocid, "$docu_doc#$docid", $name, 1);
+		  $_ = &substitute_style($_);
+		  push(@stoc_lines, "$_<BR>\n") if ($level == 1);
+		  push(@toc_lines, "<LI>" . $_ ."</LI>");
+		  # update DOC
+		  push(@lines, &html_debug('', __LINE__));
+		  &html_reset;
+		  #		    $_ =  "<H$level>".&t2h_anchor($docid, '', $name)."</H$level>\n";
+		  $_ =  "<H$level> $name </H$level>\n<!--docid::${docid}::-->\n";
+		  
+		  $_ = &debug($_, __LINE__);
+		  push(@lines, &html_debug('', __LINE__));
+		}
 		# update DOC
 		foreach $line (split(/\n+/, $_)) {
 		    push(@lines, "$line\n");
@@ -2715,9 +2887,9 @@ else
 		    if $T2H_DEBUG & $DEBUG_INDEX;
 		eval(<<EOC);
 		if (defined(\$$index\{\$what\})) {
-		    \$$index\{\$what\} .= "$;$;$docu_doc#$id$;$section";
+		    \$$index\{\$what\} .= q{$;$;$docu_doc#$id$;$section};
 		} else {
-		    \$$index\{\$what\} = "$docu_doc#$id$;$section";
+		    \$$index\{\$what\} = q{$docu_doc#$id$;$section};
 		}
 EOC
 
@@ -2789,7 +2961,7 @@ EOC
 		    push(@lines, &debug("<LI>$what\n", __LINE__));
 		    &html_push('LI') unless $html_element eq 'LI';
 		}
-		push(@lines, &html_debug("\n", __LINE__));
+		push(@lines, &html_debug('', __LINE__));
 		if ($deferred_ref) {
 		    push(@lines, &debug("$deferred_ref\n", __LINE__));
 		    $deferred_ref = '';
@@ -2802,7 +2974,7 @@ EOC
 	}
     }
     # paragraph separator
-    if ($_ eq "\n") {
+    if ($_ eq "\n" && ! $in_pre) {
 	next if $#lines >= 0 && $lines[$#lines] eq "\n";
 	if ($html_element eq 'P') {
 	    push (@lines, &debug("</P><P>\n", __LINE__));
@@ -2905,6 +3077,9 @@ while (@lines) {
 	      push(@lines2, &debug("</TABLE>\n", __LINE__)) :
 		push(@lines2, &debug("</UL>\n", __LINE__));
 	  }
+	  # should be like verbatim -- preseve spaces, etc
+	  s/ /\&nbsp;/g;
+	  $_ .= "<br>\n";
 	  push(@lines2, $_);
 	}
 	next;
@@ -3252,6 +3427,18 @@ $T2H_L2H = &l2h_FinishToLatex if ($T2H_L2H);
 $T2H_L2H = &l2h_ToHtml        if ($T2H_L2H);
 $T2H_L2H = &l2h_InitFromHtml  if ($T2H_L2H);
 
+# fix node2up, node2prev, node2next, if desired
+if ($has_top_command)
+{
+  for $section (keys %sec2number)
+  {
+    $node = $sec2node{$section};
+    $node2up{$node} = Sec2UpNode($section) unless $node2up{$node};
+    $node2prev{$node} = Sec2PrevNode($section) unless $node2prev{$node};
+    $node2next{$node} = Sec2NextNode($section) unless $node2next{$node};
+  }
+}
+
 # prepare %T2H_THISDOC
 $T2H_THISDOC{fulltitle} = $value{'_title'} || $value{'_settitle'} || "Untitled Document";
 $T2H_THISDOC{title} = $value{'_settitle'} || $T2H_THISDOC{fulltitle};
@@ -3272,11 +3459,11 @@ unless (@sections)
   open(FILE, "> $docu_top_file") 
     || die "$ERROR: Can't open $docu_top_file for writing: $!\n";
 
-  t2h_print_page_head(\*FILE);
+  &$T2H_print_page_head(\*FILE);
   $T2H_THIS_SECTION = \@doc_lines;
   t2h_print_lines(\*FILE);
-  t2h_print_foot_navigation(\*FILE);
-  t2h_print_page_foot(\*FILE);
+  &$T2H_print_foot_navigation(\*FILE);
+  &$T2H_print_page_foot(\*FILE);
   close(FILE);
   goto Finish;
 }
@@ -3328,16 +3515,17 @@ $T2H_HREF{Index} = $node2href{'Index'};
 #
 open(FILE, "> $docu_top_file") 
   || die "$ERROR: Can't open $docu_top_file for writing: $!\n";
-if ($T2H_TOP)
+&$T2H_print_page_head(\*FILE) unless ($T2H_SPLIT);
+
+if ($has_top)
 {
   print "# Creating Top in $docu_top_file ...\n" if $T2H_VERBOSE;
-  t2h_print_page_head(\*FILE) unless ($T2H_SPLIT);
   $T2H_THIS_SECTION = $T2H_TOP;
   $T2H_HREF{This} = $T2H_HREF{Top};
   $T2H_NAME{This} = $T2H_NAME{Top};
-  t2h_print_Top(\*FILE);
-  
+  &$T2H_print_Top(\*FILE);
 }
+  
 close(FILE) if $T2H_SPLIT;
 
 #############################################################################
@@ -3375,8 +3563,10 @@ while ($section = shift(@sections))
   if ($T2H_SPLIT && ($T2H_SPLIT eq 'section' || $previous eq $CHAPTEREND))
   { # open new page
     if ($FH)
-    { #close previous page
-      t2h_print_page_foot($FH);
+    {
+      #close previous page
+      &$T2H_print_chapter_footer($FH) if $T2H_SPLIT eq 'chapter';
+      &$T2H_print_page_foot($FH);
       close($FH);
       undef $FH;
     }
@@ -3465,7 +3655,13 @@ while ($section = shift(@sections))
     open(FILE, "> $docu_rdir$docu_doc") || 
       die "$ERROR: Can't open $docu_rdir$docu_doc for writing: $!\n";
     $FH = \*FILE;
-    t2h_print_page_head($FH);
+    &$T2H_print_page_head($FH);
+    t2h_print_label($FH);
+    &$T2H_print_chapter_header($FH) if $T2H_SPLIT eq 'chapter';
+  }
+  else
+  {
+    t2h_print_label($FH);
   }
 
   $T2H_THIS_SECTION = [];
@@ -3475,8 +3671,7 @@ while ($section = shift(@sections))
     push(@$T2H_THIS_SECTION, $_);
   }
   $previous = $_;
-  t2h_print_label($FH);
-  t2h_print_section($FH);
+  &$T2H_print_section($FH);
 
   if ($T2H_VERBOSE)
   {
@@ -3486,7 +3681,8 @@ while ($section = shift(@sections))
 }
 if ($T2H_SPLIT)
 {
-  t2h_print_page_foot($FH);
+  &$T2H_print_chapter_footer($FH) if $T2H_SPLIT eq 'chapter';
+  &$T2H_print_page_foot($FH);
   close($FH);
 }
 print "\n" if $T2H_VERBOSE;
@@ -3508,7 +3704,7 @@ if (@foot_lines)
   $T2H_HREF{This} = $docu_foot;
   $T2H_NAME{This} = $T2H_WORDS->{$T2H_LANG}->{'Footnotes_Title'};
   $T2H_THIS_SECTION = \@foot_lines;
-  t2h_print_Footnotes(\*FILE);
+  &$T2H_print_Footnotes(\*FILE);
   close(FILE) if $T2H_SPLIT;
 }
 
@@ -3520,7 +3716,7 @@ if (@toc_lines)
   $T2H_HREF{This} = $T2H_HREF{Contents};
   $T2H_NAME{This} = $T2H_NAME{Contents};
   $T2H_THIS_SECTION = \@toc_lines;
-  t2h_print_Toc(\*FILE);
+  &$T2H_print_Toc(\*FILE);
   close(FILE) if $T2H_SPLIT;
 }
 
@@ -3533,11 +3729,11 @@ if (@stoc_lines)
   $T2H_HREF{This} = $T2H_HREF{Overview};
   $T2H_NAME{This} = $T2H_NAME{Overview};
   $T2H_THIS_SECTION = \@stoc_lines;
-  t2h_print_Overview(\*FILE);
+  &$T2H_print_Overview(\*FILE);
   close(FILE) if $T2H_SPLIT;
 }
 
-if ($about_body = t2h_about_body())
+if ($about_body = &$T2H_about_body())
 {
   print "# writing About in $docu_about_file...\n" if $T2H_VERBOSE;
   open (FILE, "> $docu_about_file") || die "$ERROR: Can't open $docu_about_file for writing: $!\n"
@@ -3546,13 +3742,13 @@ if ($about_body = t2h_about_body())
   $T2H_HREF{This} = $T2H_HREF{About};
   $T2H_NAME{This} = $T2H_NAME{About};
   $T2H_THIS_SECTION = [$about_body];
-  t2h_print_About(\*FILE);
+  &$T2H_print_About(\*FILE);
   close(FILE) if $T2H_SPLIT;
 }
 
 unless ($T2H_SPLIT)
 {
-  t2h_print_page_foot(\*FILE);
+  &$T2H_print_page_foot(\*FILE);
   close (FILE);
 }
   
@@ -3627,6 +3823,70 @@ sub incr_sec_num {
     foreach $l ($level+1 .. 3) {
 	$_[$l] = 0;
     }
+}
+
+sub Sec2UpNode
+{
+  my $sec = shift;
+  my $num = $sec2number{$sec};
+
+  return '' unless $num;
+  return 'Top' unless $num =~ /\.\d+/;
+  $num =~ s/\.[^\.]*$//;
+  $num = $num . '.' unless $num =~ /\./;
+  return $sec2node{$number2sec{$num}};
+}
+
+sub Sec2PrevNode
+{
+  my $sec = shift;
+  my $num = $sec2number{$sec};
+  my ($i, $post);
+  
+  if ($num =~ /(\w+)(\.$|$)/)
+  {
+    $num = $`;
+    $i = $1;
+    $post = $2;
+    if ($i eq 'A')
+    {
+      $i = $normal_sec_num[0];
+    }
+    elsif ($i ne '1')
+    {
+      $i--;
+    }
+    else
+    {
+      return '';
+    }
+    return $sec2node{$number2sec{$num . $i . $post}}
+  }
+  return '';
+}
+
+sub Sec2NextNode
+{
+  my $sec = shift;
+  my $num = $sec2number{$sec};
+  my $i;
+
+  if ($num =~ /(\w+)(\.$|$)/)
+  {
+    $num = $`;
+    $i = $1;
+    $post = $2;
+    if ($post eq '.' && $i eq $normal_sec_num[0])
+    {
+      $i = 'A';
+    }
+    else
+    {
+      $i++;
+    }
+    return $sec2node{$number2sec{$num . $i . $post}}
+  }
+  return '';
 }
 
 sub check {
@@ -3766,8 +4026,11 @@ sub html_pop_if {
 
 sub html_debug {
     local($what, $line) = @_;
-    return("<!-- $line @html_stack, $html_element -->$what")
-	if $T2H_DEBUG & $DEBUG_HTML;
+    if ($T2H_DEBUG & $DEBUG_HTML)
+    {
+     $what = "\n" unless $what;
+     return("<!-- $line @html_stack, $html_element -->$what")
+    }	
     return($what);
 }
 
@@ -3811,7 +4074,7 @@ sub menu_entry {
 	  push(@lines2, "<LI>" . &t2h_anchor('', $href, $entry) . ": $descr\n");
 	}
     } else {
-	warn "$ERROR Undefined node ($node): $_";
+	warn "$ERROR Undefined node of menu_entry ($node): $_";
     }
 }
 
@@ -4052,188 +4315,4 @@ sub t2h_print_label
 .nr nl 0-1		\" fake up transition to first page again
 .nr % 0			\" start at page 1
 '; __END__ ############# From here on it's a standard manual page ############
-.TH TEXI2HTML 1 "01/05/98"
-.AT 3
-.SH NAME
-texi2html \- a Texinfo to HTML converter
-.SH SYNOPSIS
-.B texi2html [options] file
-.PP
-.B texi2html -check [-verbose] files
-.SH DESCRIPTION
-.I Texi2html
-converts the given Texinfo file to a set of HTML files. It tries to handle
-most of the Texinfo commands. It creates hypertext links for cross-references,
-footnotes...
-.PP
-It also tries to add links from a reference to its corresponding entry in the
-bibliography (if any). It may also handle a glossary (see the
-.B \-glossary
-option).
-.PP
-.I Texi2html
-may furthermore use latex2html to generate HTML (code and/or images) for @math
-and @iftex tags (see the 
-.B \-l2h
-option).
-.PP
-.I Texi2html
-creates several files depending on the contents of the Texinfo file and on
-the chosen options (see FILES).
-.PP
-The HTML files created by
-.I texi2html
-are closer to TeX than to Info.
-.SH BUGS
-This man-page is not up-to-date and there exists no up-to-date documentation, yet. Until it exists, see the beginning of the texi2html.init file for remarks about command-line options and configurations.
-.PP
-Not yet all commands of texionfo version 4.0 are recognized.
-.PP
-  The generated HTML output is syntactically pretty bad.
-.SH OPTIONS
-.TP 12
-.B \-check
-Check the given file and give the list of all things that may be Texinfo commands.
-This may be used to check the output of
-.I texi2html
-to find the Texinfo commands that have been left in the HTML file.
-.TP
-.B \-expand info|tex|none
-Expand @ifinfo, or @iftex, or sections (default: info)
-.TP
-.B \-glossary
-Use the section named 'Glossary' to build a list of terms and put links in the HTML
-document from each term toward its definition.
-.TP
-.B \-invisible \fIname\fP
-Use \fIname\fP to create invisible destination anchors for index links
-(you can for instance use the invisible.xbm file shipped with this program).
-This is a workaround for a known bug of many WWW browsers, including netscape.
-.TP
-.B \-I \fIdir\fP
-Look also in \fIdir\fP to find included files.
-.TP
-.B \-menu
-Show the Texinfo menus; by default they are ignored.
-.TP
-.B \-monolithic
-Output only one file, including the table of contents and footnotes.
-.TP
-.B \-number
-Number the sections.
-.TP
-.B \-split_chapter
-Split the output into several HTML files (one per main section:
-chapter, appendix...).
-.TP
-.B \-split_node
-Split the output into several HTML files (one per node).
-.TP
-.B \-l2h
-Use latex2html for content of @math and @tex tags. Content must be such that 
-both, latex and tex, can translate it correctly. I.e., no tex-only constructs 
-must be used.
-.TP
-.B \-l2h_latex2html \fIprog\fP  
-Use \fIprog\fP as latex2html program (default \fIlatex2html\fP). 
-Program must be executable. 
-.TP
-.B \-l2h_init \fIfile\fP  
-Use \fIfile\fP as latex2html init file. \fIfile\fP should be used to specify in which way latex2html handles mathematical expressions and formulas. 
-
-Note that latex2html locates  
-(and uses) init-files in the following order (provided they exist): 
-(1) global init file (usually in latex2html source dir) 
-(2) $HOME/.latex2html_init 
-(3) ./.latex2html_init 
-(4) init file given on command line.  
-.TP
-.B \-l2h_dir \fIdir\fP
-Use \fIdir\fP as tmp dir for latex2html. This directory (resp. its path) 
-must not contain a dot  (i.e., a ".").
-.TP 
-.B \-l2h_clean
-remove all intermediate files generated by latex2html (prevents caching!)  
-.TP 
-.B \-l2h_skip
-Do not really run latex2html. Use (kept) files of previous runs, instead.
-.TP
-.B \-usage
-Print usage instructions, listing the current available command-line options.
-.TP
-.B \-verbose
-Give a verbose output. Can be used with the
-.B \-check
-option.
-.PP
-.SH FILES
-By default
-.I texi2html
-creates the following files (foo being the name of the Texinfo file):
-.TP 16
-.B foo_toc.html
-The table of contents.
-.TP
-.B foo.html
-The document's contents.
-.TP
-.B foo_foot.html
-The footnotes (if any).
-.TP
-.B foo_l2h_img*
-Images generated by latex2html (if any).
-.PP
-When used with the
-.B \-split
-option, it creates several files (one per chapter or node), named
-.B foo_n.html
-(n being the index of the chapter or node), instead of the single
-.B foo.html
-file.
-.PP
-When used with the
-.B \-monolithic
-option, it creates only one file:
-.B foo.html
-.SH VARIABLES
-.I texi2html
-predefines the following variables: \fBhtml\fP, \fBtexi2html\fP.
-.SH ADDITIONAL COMMANDS
-.I texi2html
-implements the following non-Texinfo commands (maybe they are in Texinfo now...):
-.TP 16
-.B @html
-This indicates the start of an HTML section, this section will passed through
-without any modification.
-.TP
-.B @end html
-This indicates the end of an HTML section.
-.SH VERSION
-This is \fItexi2html\fP version 1.60Beta, 12/1999.
-.PP
-The latest version of \fItexi2html\fP and \fIlatex22html\fPcan be found in WWW, cf. URLs
-http://wwwinfo.cern.ch/dis/texi2html/
-.br
-http://texinfo.org/texi2html/
-.br
-http://www-dsed.llnl.gov/files/programs/unix/latex2html
-.br
-.SH AUTHOR
-Texi2html was originally written by is Lionel Cons, CERN IT/DIS/OSE, Lionel.Cons@cern.ch. Over times, many other people around the net contributed to this program. It's current maintainer is Olaf Bachmann, obachman@mathematik.uni-kl.de
-.SH COPYRIGHT
-Copyright \(co 1999 Free Software Foundation, Inc.
-There is NO warranty.  You may redistribute this software
-under the terms of the GNU General Public License.
-For more information about these matters, see the files named COPYING.
-
-.SH "SEE ALSO"
-GNU Texinfo Documentation Format,
-HyperText Markup Language (HTML),
-World Wide Web (WWW).
-.SH BUGS
-This program does not understand all Texinfo commands (yet). A row of
-a  mutlicolumn table has to be in one line.
-.PP
-TeX specific commands (normally enclosed in @iftex) will be
-passed over unmodified, unless latex2html is enabled.
-.ex
+.so /usr/local/man/man1/texi2html.1
