@@ -15,7 +15,7 @@
 # be built either define the environment variable PLUGINS or put a line similar
 # to those below into config.mak.
 PLUGINS += video/renderer video/canvas
-PLUGINS += video/renderer/line video/renderer/null video/renderer/inf
+#PLUGINS += video/renderer/line video/renderer/null video/renderer/inf
 PLUGINS += simpcon
 PLUGINS += cscon 
 PLUGINS += csclear 
@@ -24,10 +24,11 @@ PLUGINS += engine
 PLUGINS += net/driver/socket net/netman 
 PLUGINS += font/server/csfont 
 #PLUGINS += font/server/freefont
-#PLUGINS += csstdldr
+PLUGINS += csstdldr
 PLUGINS += netspace/nstp netspace/nsmgr 
 PLUGINS += csauth/simple 
 PLUGINS += colldet/rapid
+PLUGINS += perfstat
 PLUGINS += metaball
 
 #-----------------------------------------------------------------------------
@@ -50,7 +51,7 @@ endif
 
 # Default build mode
 ifndef MODE
-  MODE=optimize
+  MODE=debug
 endif
 
 # Should we use NASM for assembly?
