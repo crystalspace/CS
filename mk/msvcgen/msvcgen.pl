@@ -387,7 +387,7 @@ sub interpolate_project {
     	$delaylibs .= $main::project_delaylib_template;
     	interpolate('%delaylib%', $delaylib, \$delaylibs);
     }
-    interpolate('%name%',      $main::opt_name,                     \$result);
+    interpolate('%name%',      xmlprotect($main::opt_name),         \$result);
     interpolate('%project%',   xmlprotect($main::opt_project_name), \$result);
     interpolate('%makefile%',  xmlprotect($main::makefile),         \$result);
     interpolate('%target%',    xmlprotect($main::opt_target),       \$result);
