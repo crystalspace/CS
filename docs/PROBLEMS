@@ -10,7 +10,7 @@ With the exception of MacOS/X Server, OpenStep, and NextStep,
 all ports of Crystal Space require an 8-bit, 15-bit, 16-bit, or 
 32-bit display to run.  It will NOT work on 24-bit displays.  
 
-DJGPP: If you have gcc 2.8.1 then you must disabled optimization
+DJGPP: If you have gcc 2.8.1 then you must disable optimization
 (set OPT=debug in mk/user.mak) before compilation because there seems
 to be a bug in the optimizer. You can also download EGCS from
 http://goof.com/pcg/ which fixes this problem and also generates a
@@ -21,40 +21,13 @@ routines (set DO_ASM=no in mk/user.mak) because the assembler doesn't
 understand some of the MMX routines. You should upgrade to a more recent
 version of DJGPP if possible.
 
-DJGPP: 'make djgpp' does not work in some cases (depending on the
-tools that you have). To fix this just edit 'makefile' manually
-and change the lines between 'Changeable section' as follows:
-	export SYSMAKEFILE=mk/system/djgpp.mak
-	export USE_DLL=no
-	export TARGET=djgpp
-
-Windows: It is possible that you will have to remove the definition
-of INT32 from jmorecfg.h. This definition conflicts with some Windows
-specific define with the same name.
-
-Windows: Clicking on the Crystal Space window with the mouse will
-crash Crystal Space. Solution? Don't click :-)
-
-Windows: Due to a bug you need to set the DEPTH mode in cryst.cfg
-to exactly the same as the depth of the desktop you are using (for
-example, 8, 16, or 32).
-
-Windows: When for some reason a warning pops up and CS is in fullscreen
-mode then this warning will not be visible but CS will simply appear
-to hang. When this happens just press enter to remove the invisible
-warning.
-
-Linux: Some RedHat systems require an explicit link from /usr/X11R6
-to /usr/X11. This link is normally standard but RedHat does not have
-it.
-
-Glide: The Glide port is not fully functional yet. There are some
-known problems (lightmaps not being lighted correctly and so on).
-
-OpenGL: The OpenGL port is not fully functional yet. It needs an
-lightmap blending option which not all cards understand (for example
-the RIVA 128ZX does not do it) so lightmaps are not correctly applied.
-Also 2D graphics (text mostly) does not work.
+OpenGL: If your OpenGL display looks really bad (bad quality of lighting
+compared to the software renderer) then you have a card which doesn't
+support the desired blending mode 2*SRC*DST that CS uses. You can edit
+opengl.cfg and change the LIGHTMAP_MODE option to 'multiply' (which all
+cards should understand) or any of the other values. 'multiply' will
+make everything dark but at least it will look right. The RIVA 128ZX
+is an example of a card which doesn't support 2*SRC*DST.
 
 Direct3D: The Direct3D port suffers from the same bug as the OpenGL
 port with the lightmaps not correctly applied on some 3D cards.
@@ -72,13 +45,6 @@ normally the default for -cache is 4000000 (the default size
 of the texture cache). But when CACHE=2000000 is set in 'cryst.cfg'
 the default will be 2000000. Using an option on the command-line will
 always override the default.
-
-Some interesting options to play with are:
-  -mode 640x480
-        (or an other value). Use this option to set the size of the display.
-  -nocolldet
-        If you experience problems with the current collision detection
-        system you can disable it with this option.
 
 The configuration file ('cryst.cfg') is useful for keeping options that
 you use often. Not all options can be set with the configuration file

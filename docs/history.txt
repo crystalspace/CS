@@ -16,6 +16,7 @@ Short-term cleanups that need to be done:
 29-Jul-1999
 	- Removed support for planed fog. It is obsolete now that we have
 	  vertex fog.
+	- *** Release of 0.14_000 ***
 28-Jul-1999
 	- Fixed fog in OpenGL. One-layered fog works now.
 	- Clipping portals are no longer automatic. There is now a CLIP()
@@ -34,6 +35,14 @@ Short-term cleanups that need to be done:
 	- Andrew Zabolotny added correct flat shading for Gouraud-shaded
 	  sprites (and non-Gouraud as well). Fixed the bug in walktest
 	  that all sprites are unlighted during the very first frame.
+	- Thomas Hieber removed a few warnings and updated the VC project
+	  file.
+	- Thomas also implemented vertex fogging in the D3D driver.
+	- Andrew Zabolotny fixed support in OpenGL renderer for
+	  Gouraud-shaded flat-colored polygons and added support for
+	  non-textured renderer mode (press the 't' key to see this). This
+	  is even better than the software renderer because it supports
+	  lighting without textures.
 27-Jul-1999
 	- Added csWorld::EnableLightingCache() with which you can disable
 	  the lighting cache (and thus saving of lightmaps to precalc.zip).

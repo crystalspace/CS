@@ -3,9 +3,9 @@
 
 #include "sysdef.h"
 
-#define CS_VERSION	"0.13"
-#define CS_SUBVERSION	"012"
-#define RELEASE_DATE	"Fri, 02-Jul-1999"
+#define CS_VERSION	"0.14"
+#define CS_SUBVERSION	"000"
+#define RELEASE_DATE	"Thu, 29-Jul-1999"
 
 #if defined(OS_SOLARIS)
 #  define OS_VERSION "Solaris"
