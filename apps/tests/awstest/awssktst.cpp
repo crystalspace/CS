@@ -54,13 +54,13 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
 {
   awsTestSink *sink = (awsTestSink *)sk;
   iAwsComponent *comp = source->GetComponent();
-  
+
   iAwsParmList *pl=0;
   int parent;
 
   printf("awstest: Filling list box.\n");
 
-  if (sink->wmgr) 
+  if (sink->wmgr)
     pl = sink->wmgr->CreateParmList();
   else
     printf("awstest: window manager is null.\n");
@@ -71,88 +71,193 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
     return;
   }
 
-  // Setup first row
-  pl->AddString("text0", new scfString("Human"));
+  int q;
+  for (q=0; q<10; ++q)
+  {
 
-  pl->AddString("text1", new scfString("Enabled"));
-  pl->AddBool("stateful1", true);
+    // Setup first row
+    pl->AddString("text0", new scfString("Human"));
 
-  pl->AddString("text2", new scfString("Shenobi"));
+    pl->AddString("text1", new scfString("Enabled"));
+    pl->AddBool("stateful1", true);
 
-  // Add it into the list
-  comp->Execute("InsertItem", *pl);
+    pl->AddString("text2", new scfString("Shenobi"));
 
-  pl->Clear();
+    // Add it into the list
+    comp->Execute("InsertItem", *pl);
 
-  //////////////////////////
-  // Setup second row
-  pl->AddString("text0", new scfString("Android"));
+    pl->Clear();
 
-  pl->AddString("text1", new scfString("Enabled"));
-  pl->AddBool("stateful1", true);
-  pl->AddBool("state1", true);
+    //////////////////////////
+    // Setup second row
+    pl->AddString("text0", new scfString("Android"));
 
-  pl->AddString("text2", new scfString("Tenalt"));
+    pl->AddString("text1", new scfString("Enabled"));
+    pl->AddBool("stateful1", true);
+    pl->AddBool("state1", true);
 
-  // Add it into the list
-  comp->Execute("InsertItem", *pl);
+    pl->AddString("text2", new scfString("Tenalt"));
 
-  // Get the id of the last item for hierarchical support.
-  pl->GetInt("id", &parent);
-  pl->Clear();
+    // Add it into the list
+    comp->Execute("InsertItem", *pl);
 
-  //////////////////////////
-  // Setup third row (hierarchical)
-  pl->AddString("text0", new scfString("Ship"));
+    // Get the id of the last item for hierarchical support.
+    pl->GetInt("id", &parent);
+    pl->Clear();
 
-  pl->AddString("text1", new scfString("Active"));
-  pl->AddBool("stateful1", true);
-  pl->AddBool("groupstate1", true);
-  pl->AddBool("state1", true);
+    //////////////////////////
+    // Setup third row (hierarchical)
+    pl->AddString("text0", new scfString("Ship"));
 
-  pl->AddString("text2", new scfString("Daedalus"));
-  pl->AddInt("parent", parent);
+    pl->AddString("text1", new scfString("Active"));
+    pl->AddBool("stateful1", true);
+    pl->AddBool("groupstate1", true);
+    pl->AddBool("state1", true);
 
-  // Add it into the list
-  comp->Execute("InsertItem", *pl);
-  pl->Clear();
+    pl->AddString("text2", new scfString("Daedalus"));
+    pl->AddInt("parent", parent);
 
-  //////////////////////////
-  // Setup fourth row (hierarchical)
-  pl->AddString("text0", new scfString("Ship"));
+    // Add it into the list
+    comp->Execute("InsertItem", *pl);
+    pl->Clear();
 
-  pl->AddString("text1", new scfString("Active"));
-  pl->AddBool("stateful1", true);
-  pl->AddBool("groupstate1", true);
-  pl->AddBool("state1", false);
+    //////////////////////////
+    // Setup fourth row (hierarchical)
+    pl->AddString("text0", new scfString("Ship"));
 
-  pl->AddString("text2", new scfString("Temtor"));
-  pl->AddInt("parent", parent);
+    pl->AddString("text1", new scfString("Active"));
+    pl->AddBool("stateful1", true);
+    pl->AddBool("groupstate1", true);
+    pl->AddBool("state1", false);
 
-  // Add it into the list
-  comp->Execute("InsertItem", *pl);
+    pl->AddString("text2", new scfString("Temtor"));
+    pl->AddInt("parent", parent);
 
-  // Get the id of the last item for hierarchical support.
-  pl->GetInt("id", &parent);
-  pl->Clear();
+    // Add it into the list
+    comp->Execute("InsertItem", *pl);
 
-  //////////////////////////
-  // Setup fifth row (hierarchical)
-  pl->AddString("text0", new scfString("TurboLaser"));
+    // Get the id of the last item for hierarchical support.
+    pl->GetInt("id", &parent);
+    pl->Clear();
 
-  pl->AddString("text1", new scfString("Active"));
-  pl->AddBool("stateful1", true);
-  pl->AddBool("groupstate1", true);
-  pl->AddBool("state1", false);
+    //////////////////////////
+    // Setup fifth row (hierarchical)
+    pl->AddString("text0", new scfString("TurboLaser"));
 
-  pl->AddString("text2", new scfString("Johnny"));
-  pl->AddInt("parent", parent);
+    pl->AddString("text1", new scfString("Active"));
+    pl->AddBool("stateful1", true);
+    pl->AddBool("groupstate1", true);
+    pl->AddBool("state1", false);
 
-  // Add it into the list
-  comp->Execute("InsertItem", *pl);
+    pl->AddString("text2", new scfString("Johnny"));
+    pl->AddInt("parent", parent);
 
+    // Add it into the list
+    comp->Execute("InsertItem", *pl);
 
-  pl->Clear();
+    pl->Clear();
+
+    //////////////////////////
+    // Setup sixth row
+    pl->AddString("text0", new scfString("Betarus"));
+
+    pl->AddString("text1", new scfString("Enabled"));
+    pl->AddBool("stateful1", true);
+    pl->AddBool("state1", false);
+
+    pl->AddString("text2", new scfString("Sloth"));
+
+    // Add it into the list
+    comp->Execute("InsertItem", *pl);
+
+    pl->Clear();
+
+    //////////////////////////
+    // Setup seventh row
+    pl->AddString("text0", new scfString("Vegan"));
+
+    pl->AddString("text1", new scfString("Enabled"));
+    pl->AddBool("stateful1", true);
+    pl->AddBool("state1", false);
+
+    pl->AddString("text2", new scfString("Klamath"));
+
+    // Add it into the list
+    comp->Execute("InsertItem", *pl);
+
+    // Get the id of the last item for hierarchical support.
+    pl->GetInt("id", &parent);
+    pl->Clear();
+
+    //////////////////////////
+    // Setup third row (hierarchical)
+    pl->AddString("text0", new scfString("Ship"));
+
+    pl->AddString("text1", new scfString("Active"));
+    pl->AddBool("stateful1", true);
+    pl->AddBool("groupstate1", true);
+    pl->AddBool("state1", true);
+
+    pl->AddString("text2", new scfString("Tertullia"));
+    pl->AddInt("parent", parent);
+
+    // Add it into the list
+    comp->Execute("InsertItem", *pl);
+    pl->Clear();
+
+    //////////////////////////
+    // Setup fourth row (hierarchical)
+    pl->AddString("text0", new scfString("Ship"));
+
+    pl->AddString("text1", new scfString("Active"));
+    pl->AddBool("stateful1", true);
+    pl->AddBool("groupstate1", true);
+    pl->AddBool("state1", false);
+
+    pl->AddString("text2", new scfString("Gempus"));
+    pl->AddInt("parent", parent);
+
+    // Add it into the list
+    comp->Execute("InsertItem", *pl);
+
+    // Get the id of the last item for hierarchical support.
+    pl->GetInt("id", &parent);
+    pl->Clear();
+
+    //////////////////////////
+    // Setup fifth row (hierarchical)
+    pl->AddString("text0", new scfString("BatterSlam"));
+
+    pl->AddString("text1", new scfString("Active"));
+    pl->AddBool("stateful1", true);
+    pl->AddBool("groupstate1", true);
+    pl->AddBool("state1", false);
+
+    pl->AddString("text2", new scfString("James"));
+    pl->AddInt("parent", parent);
+
+    // Add it into the list
+    comp->Execute("InsertItem", *pl);
+
+    pl->Clear();
+
+    //////////////////////////
+    // Setup eigth row
+    pl->AddString("text0", new scfString("Antarian"));
+
+    pl->AddString("text1", new scfString("Enabled"));
+    pl->AddBool("stateful1", true);
+    pl->AddBool("state1", false);
+
+    pl->AddString("text2", new scfString("Gelvin"));
+
+    // Add it into the list
+    comp->Execute("InsertItem", *pl);
+
+    pl->Clear();
+
+  }
+
   pl->DecRef();
 }
 

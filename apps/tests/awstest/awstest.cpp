@@ -74,7 +74,7 @@ const int AWSTEST_SCREEN     = 2;
 
 const int AWSTEST_CANVAS=AWSTEST_SCREEN;
 // @@@@@ engine view as window background doesn't work with the proctex canvases
-
+// @@@@@ yes it does! it just doesn't update right.
 //-----------------------------------------------------------------------------
 
 #define  QUERY_REG(myPlug, iFace, errMsg) \
@@ -101,31 +101,6 @@ awsTest::awsTest()
   view = NULL;
   wview=NULL;
   message[0] = 0;
-
-#if 0
-
-  // This code is used to perform dry runs on the csrectregion code.
-
-  csRectRegion rgn;
-  csRect r1(10,10,100,100);
-  csRect r2(5,50,75,75);
-  csRect r3(50,90,100,200);
-
-  rgn.Include(r1);
-  rgn.Exclude(r2);
-  rgn.Include(r3);
-
-  printf("awstest: number of regions in test: %d\n", rgn.Count());
-
-  int i;
-  for(i=0; i<rgn.Count(); ++i)
-  {
-    csRect &r=rgn.RectAt(i);
-    printf("\t%d,%d,%d,%d\n", r.xmin, r.ymin, r.xmax, r.ymax);
-  }
-
-#endif
-
 }
 
 awsTest::~awsTest()
