@@ -23,6 +23,9 @@ chronological order.
 	- Eric Sunshine fixed bug in csjava/Jamfile where Java extension was
 	  not being linked against $(LINKLIBS).
 	- Eric Sunshine removed a useless csPoly2D::GetVertexCount() overload.
+	- Eric Sunshine relocated the remaining const/non-const-disambiguating
+	  %ignores from javapre.i to cspace.i. They are sufficiently general
+	  that they can be applied to all supported scripting interfaces.
 22-Sep-2004
 	- Jorrit changed the loader so that it only prints certain
 	  notifications if -verbose is given on the commandline. These
