@@ -1,5 +1,5 @@
 %define name    crystalspace
-%define version 20040228
+%define version 20040509
 %define release 1
 %define prefix	/usr
 Group: Applications/Development
@@ -40,13 +40,14 @@ Documentation (manual and public API reference) for CrystalSpace free 3D SDK.
 
 %build
 sh configure --enable-debug --prefix=%{prefix}
-jam
+# (vk) set PATH so that CS provided jam is found and used if it's not installed
+PATH=$PATH:. jam
 
 %install
-jam -sDESTDIR=%{buildroot} install
+PATH=$PATH:. jam -sDESTDIR=%{buildroot} install
 
-CRYSTAL=%{buildroot}%{prefix} CS_DATADIR=%{buildroot}%{prefix}/share/crystal CS_MAPDIR=%{buildroot}%{prefix}/share/crystal/maps %{buildroot}%{prefix}/bin/cslight -video=null flarge
-CRYSTAL=%{buildroot}%{prefix} CS_DATADIR=%{buildroot}%{prefix}/share/crystal CS_MAPDIR=%{buildroot}%{prefix}/share/crystal/maps %{buildroot}%{prefix}/bin/cslight -video=null partsys
+CRYSTAL=%{buildroot}%{prefix} CS_DATADIR=%{buildroot}%{prefix}/share/crystal CS_MAPDIR=%{buildroot}%{prefix}/share/crystal/maps %{buildroot}%{prefix}/bin/cslight -canvas=null2d -video=null flarge
+CRYSTAL=%{buildroot}%{prefix} CS_DATADIR=%{buildroot}%{prefix}/share/crystal CS_MAPDIR=%{buildroot}%{prefix}/share/crystal/maps %{buildroot}%{prefix}/bin/cslight -canvas=null2d -video=null partsys
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
@@ -101,9 +102,9 @@ rm -rf "$RPM_BUILD_ROOT"
 
 %{prefix}/include/isound/*.h
 %{prefix}/include/ivaria/*.h
+%{prefix}/include/ivaria/*.i
 %{prefix}/include/ivideo/*.h
 %{prefix}/include/ivideo/shader/*.h
-%{prefix}/include/csappframe/*.h
 %{prefix}/include/itexture/*.h
 %{prefix}/include/iengine/*.h
 %{prefix}/include/iengine/rendersteps/*.h
@@ -111,6 +112,12 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/igraphic/*.h
 
 %changelog
+* Sun May 9 2004 Vincent Knecht <vknecht@users.sourceforge.net> 20040509-1
+- Building is done by jam provided with Crystal Space if not installed
+- Specified null2d canvas for levels relighting
+- Added %{prefix}/include/ivaria/*.i to devel %files section
+- Removed reference to include/csappframe/ dir
+
 * Sat Feb 28 2004 Vincent Knecht <vknecht@users.sourceforge.net> 20040228-1
 - Added lightmaps cache computation for flarge and partsys
 
