@@ -51,6 +51,7 @@ The history order is reversed so that new features are at the top.
 	  should now work even with shadows.
 	- Eric Sunshine updated the extremely outdated "External Utilities /
 	  Libraries" page on the web site and fixed broken links.
+	- res fixed a crash in JNG saving
 1-Feb-2003
 	- Marten Svanfeldt completly rewrote the renderbuffer manager using
 	  the VAR extension on Nvidia-cards
