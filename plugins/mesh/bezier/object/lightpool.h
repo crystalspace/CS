@@ -20,6 +20,7 @@
 #define __CS_LIGHTPOOL_H__
 
 #include "csutil/objpool.h"
+#include "csgeom/frustum.h"
 
 class csBezierLightPatchPool;
 class csCurve;
