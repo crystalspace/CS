@@ -7,9 +7,13 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 27-Sep-2004
-	- dfryer changed "unsigned int" to size_t in csXMLShaderTech::
-	  ActivatePass.  Prototype used size_t; size_t is long unsigned
-	  int under Mac OS X, which is incompatible with unsigned int.
+	- dfryer changed "unsigned int" to size_t in
+	  csXMLShaderTech::ActivatePass().  Prototype used size_t; size_t is
+	  long unsigned int under Mac OS X, which is incompatible with unsigned
+	  int.
+	- Eric Sunshine fixed problem in wxWidgets check in configure.ac where
+	  a couple cache variables were not being assigned values in all code
+	  paths.
 25-Sep-2004
 	- res copied Matze's change of GLAPI in glextmanager.h (empty instead 
 	  of 'extern') over to the GL extension manager templates.

@@ -28610,6 +28610,8 @@ else
 
 fi
 
+else
+  cs_cv_wxwidgets_ok=no
 fi
 
 
@@ -28947,6 +28949,8 @@ else
 
 fi
 
+else
+  cs_cv_wxwidgets_opengl=no
 fi
 
 

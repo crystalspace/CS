@@ -1543,7 +1543,8 @@ AS_IF([test $cs_cv_wxwidgets = yes],
 	[], [C++], [], [], [],
 	[$cs_cv_wxwidgets_cflags],
 	[$cs_cv_wxwidgets_lflags],
-	[$cs_cv_wxwidgets_libs])])
+	[$cs_cv_wxwidgets_libs])],
+    [cs_cv_wxwidgets_ok=no])
 
 AS_IF([test $cs_cv_wxwidgets_ok = yes],
     [CS_CHECK_BUILD([if wxWidgets is built with OpenGL support],
@@ -1567,7 +1568,8 @@ AS_IF([test $cs_cv_wxwidgets_ok = yes],
 	    [$cs_cv_wxwidgets_ok_cflags $cs_cv_libglu_cflags],
 	    [$cs_cv_wxwidgets_ok_lflags $cs_cv_libglu_lflags],
 	    [$cs_cv_wxwidgets_ok_libs   $cs_cv_libglu_libs])],
-	[C++])])
+	[C++])],
+    [cs_cv_wxwidgets_opengl=no])
 
 AS_IF([test $cs_cv_wxwidgets_opengl = yes],
     [CS_EMIT_BUILD_RESULT([cs_cv_wxwidgets_opengl], [WX])])
