@@ -62,10 +62,11 @@ INC.WIN32SYS = \
   $(wildcard $(SRCDIR)/libs/cssys/win32/*.h)
 SRC.WIN32SYS = \
   $(wildcard $(SRCDIR)/libs/cssys/*.cpp $(SRCDIR)/libs/cssys/win32/*.cpp) \
+  $(SRCDIR)/libs/cssys/general/csprocessorcap.cpp \
   $(SRCDIR)/libs/cssys/general/findlib.cpp \
   $(SRCDIR)/libs/cssys/general/getopt.cpp \
   $(SRCDIR)/libs/cssys/general/printf.cpp \
-  $(SRCDIR)/libs/cssys/general/runloop.cpp
+  $(SRCDIR)/libs/cssys/general/runloop.cpp 
 
 # grpall -- represents all other projects indirectly through grpapps,
 # grpplugins, and grplibs.
