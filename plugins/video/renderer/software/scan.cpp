@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
+    Written by Andrew Zabolotny
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -27,12 +28,6 @@
 #include "sttest.h"
 
 /// The only instance of this structure lives here
-//csScanSetup Scan =
-//{
-//  16,			// InterpolStep
-//  4,			// InterpolShift
-//  INTER_MODE_SMART	// InterpolMode
-//};
 csScanSetup Scan;
 
 //---------------------- This routine is pixel-depth independent ---
@@ -80,6 +75,10 @@ void csScan_draw_pi_scanline_zfil (void *dest, int len, unsigned long *zbuff,
 
 void csScan_Initialize ()
 {
+  Scan.InterpolStep = 16;
+  Scan.InterpolShift = 4;
+  Scan.InterpolMode = INTER_MODE_SMART;
+
   // 64K
   CHK (Scan.filter_mul_table = new int [4 * (1 << LOG2_STEPS_X) * (1 << LOG2_STEPS_Y)]);
   // 20K

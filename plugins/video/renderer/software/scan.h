@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
     Written by Andrew Zabolotny
 
     This library is free software; you can redistribute it and/or
@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SCAN_H__
-#define __SCAN_H__
+#ifndef __CS_SCAN_H__
+#define __CS_SCAN_H__
 
 #include "sysdef.h"
 #include "csutil/scf.h"
@@ -87,8 +87,6 @@ struct iPolygonTexture;
  */
 struct csScanSetup
 {
-  csScanSetup() { InterpolStep = 16; InterpolShift = 4; InterpolMode = INTER_MODE_SMART; }
-
   /// Interpolation step for semi-perspective correct texture mapping
   int InterpolStep;
   /// Interpolation step (shift-value) for semi-perspective correct texture mapping
@@ -520,4 +518,4 @@ csDrawScanline csScan_32_mmx_draw_scanline_tex_zfil;
 
 } // extern "C"
 
-#endif // __SCAN_H__
+#endif // __CS_SCAN_H__
