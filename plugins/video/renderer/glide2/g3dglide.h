@@ -31,16 +31,17 @@
 #include "iplugin.h"
 #include "ipolygon.h"
 #include "icamera.h"
-
 #include "cs3d/glide2/glcache.h"
 #include "cs3d/glide2/gl_txtmgr.h"
+#include "glidhalo.h"
 
 class GlideTextureCache;
 class GlideLightmapCache;
 
 /// the Glide implementation of the Graphics3D class.
-class csGraphics3DGlide2x : public iGraphics3D, public iHaloRasterizer
+class csGraphics3DGlide2x  : public iGraphics3D
 {
+friend class csGlideHalo;
 private:
   /// the texture cache.
   GlideTextureCache *m_pTextureCache;
@@ -223,16 +224,13 @@ public:
   virtual void AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
   virtual void CloseFogObject (CS_ID id);
 
-  virtual csHaloHandle CreateHalo(float r, float g, float b);
-  virtual void DestroyHalo (csHaloHandle haloInfo);
-  virtual void DrawHalo (csVector3* pCenter, float fIntensity, csHaloHandle haloInfo);
+  //  virtual csHaloHandle CreateHalo(float r, float g, float b);
+  virtual iHalo *CreateHalo(float iR, float iG, float iB, unsigned char *iAlpha, int iWidth, int iHeight );
+  //  virtual void DestroyHalo (csHaloHandle haloInfo);
+  //  virtual void DrawHalo (csVector3* pCenter, float fIntensity, iHalo* haloInfo);
   virtual bool TestHalo (csVector3* pCenter);
 
-  /// Our internal representation of halos.
-  struct csG3DHardwareHaloInfo
-  {
-    HighColorCacheAndManage_Data *halo;
-  };
+  virtual float GetZbuffValue( int x, int y ) { return 0.0f; }
 
   /// Actually draws a halo the the screen.
   class csHaloDrawer

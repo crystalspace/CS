@@ -64,6 +64,7 @@
 #include "cs3d/glide2/glidelib.h"
 #include "cs3d/glide2/g3dglide.h"
 
+
 //
 // Interface table definition
 //
@@ -78,7 +79,6 @@ EXPORT_CLASS_TABLE_END
 IMPLEMENT_IBASE (csGraphics3DGlide2x)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics3D)
-  IMPLEMENTS_INTERFACE (iHaloRasterizer)
 IMPLEMENT_IBASE_END
 
 // Error Message handling
@@ -1375,7 +1375,7 @@ void csGraphics3DGlide2x::SysPrintf(int mode, char* szMsg, ...)
   m_piSystem->Print(mode, buf);
 }
 
-csHaloHandle csGraphics3DGlide2x::CreateHalo(float r, float g, float b)
+iHalo *csGraphics3DGlide2x::CreateHalo(float r, float g, float b, unsigned char *alpha, int width, int height)
 {
   if(m_bHaloEffect)
   {
@@ -1410,11 +1410,12 @@ csHaloHandle csGraphics3DGlide2x::CreateHalo(float r, float g, float b)
     delete [] mem;
     delete [] lpbuf;
 
-    return (csHaloHandle)retval;
+    return (iHalo*)new csGlideHalo( r, g, b, alpha, width, height, this, retval );
   }
   return NULL;
 }
 
+/*
 void csGraphics3DGlide2x::DestroyHalo(csHaloHandle haloInfo)
 {
   if(haloInfo != NULL)
@@ -1423,105 +1424,7 @@ void csGraphics3DGlide2x::DestroyHalo(csHaloHandle haloInfo)
     delete (csG3DHardwareHaloInfo*)haloInfo;
   }
 }
-
-void csGraphics3DGlide2x::DrawHalo(csVector3* pCenter, float fIntensity, csHaloHandle haloInfo)
-{
-  if(m_bHaloEffect)
-  {
-    if (haloInfo == NULL) return;
-//      return E_INVALIDARG;
-    
-    if (pCenter->x > m_nWidth || pCenter->x < 0 || pCenter->y > m_nHeight || pCenter->y < 0  ) return;
-//      return S_FALSE;
-/*
-    int izz = QInt24 (1.0f / pCenter->z);
-    HRESULT hRes = S_OK;
-
-    unsigned long zb = z_buffer[(int)pCenter->x + (width * (int)pCenter->y)];
-
-          // first, do a z-test to make sure the halo is visible
-    if (izz < (int)zb)
-      hRes = S_FALSE;
 */
-
-    GrVertex vx[4];
-    
-                int ci = (int)(255.0f * (float)fIntensity);
-    float len = ((float)m_nWidth/6.0);
-
-    vx[0].a = ci; vx[0].r = ci; vx[0].g = ci; vx[0].b = ci;
-    vx[0].x = pCenter->x - len;
-    vx[0].y = pCenter->y - len;
-    vx[0].z = pCenter->z;
-    vx[0].oow = pCenter->z;
-    vx[0].tmuvtx[0].sow = 0;
-    vx[0].tmuvtx[0].tow = 0;
-
-    vx[1].a = ci; vx[1].r = ci; vx[1].g = ci; vx[1].b = ci;
-    vx[1].x = pCenter->x + len;
-    vx[1].y = pCenter->y - len;
-    vx[1].z = pCenter->z;
-    vx[1].oow = pCenter->z;
-    vx[1].tmuvtx[0].sow = 128;
-    vx[1].tmuvtx[0].tow = 0;
-
-    vx[2].a = ci; vx[2].r = ci; vx[2].g = ci; vx[2].b = ci;
-    vx[2].x = pCenter->x + len;
-    vx[2].y = pCenter->y + len;
-    vx[2].z = pCenter->z;
-    vx[2].oow = pCenter->z;
-    vx[2].tmuvtx[0].sow = 128;
-    vx[2].tmuvtx[0].tow = 128;
-
-    vx[3].a = ci; vx[3].r = ci; vx[3].g = ci; vx[3].b = ci;
-    vx[3].x = pCenter->x - len;
-    vx[3].y = pCenter->y + len;
-    vx[3].z = pCenter->z;
-    vx[3].oow = pCenter->z;
-    vx[3].tmuvtx[0].sow = 0;
-    vx[3].tmuvtx[0].tow = 128;
-    
-    if(m_iMultiPass)
-    {
-      GlideLib_grAlphaBlendFunction( GR_BLEND_ONE_MINUS_SRC_COLOR, GR_BLEND_ZERO,
-                                    GR_BLEND_DST_ALPHA, GR_BLEND_ZERO);
-    }
-    else // disable single pass blending
-    {
-      GlideLib_grTexCombine(m_TMUs[0].tmu_id,
-                            GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE,
-                            GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
-                            FXFALSE,FXFALSE);
-    }
-
-    GlideLib_grDepthBufferFunction(GR_CMP_ALWAYS);
-    GlideLib_grDepthMask(FXFALSE);
-
-    HighColorCacheAndManage_Data *halo=((csG3DHardwareHaloInfo*)haloInfo)->halo;
-    TextureHandler *thTex = (TextureHandler *)halo->pData;
-    GlideLib_grTexSource(thTex->tmu->tmu_id, thTex->loadAddress,
-                         GR_MIPMAPLEVELMASK_BOTH,
-                         &thTex->info);
-    
-    GlideLib_grDrawPlanarPolygonVertexList(4, vx);
-    
-    GlideLib_grDepthBufferFunction(GR_CMP_LEQUAL);
-    GlideLib_grDepthMask(FXTRUE);
-
-    if(m_iMultiPass)
-    {
-      GlideLib_grAlphaBlendFunction(GR_BLEND_ONE, GR_BLEND_ZERO,
-                                    GR_BLEND_ONE, GR_BLEND_ZERO);
-    }
-    else // enable single pass blending
-    {
-      GlideLib_grTexCombine(m_TMUs[0].tmu_id,
-                            GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_LOCAL,
-                            GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
-                            FXFALSE,FXFALSE);
-    }
-  }
-};
 
 bool csGraphics3DGlide2x::TestHalo(csVector3* pCenter)
 {
