@@ -220,6 +220,8 @@ m_bUse24BitInternalTexture(false)
   rstate_mipmap = true;
   rstate_edges = false;
 
+  m_gouroud = true;
+ 
   CHK (txtmgr = new csTextureManagerDirect3D (m_piSystem, m_piG2D));
 }
 
@@ -943,12 +945,12 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
     switch( m_iTypeLightmap )
     {
     case 1:    
-      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_DESTCOLOR);
+      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR);
       m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR);
       break;
       
     case 2:
-      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_SRCALPHA);
+      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_SRCALPHA);
       m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR);
       break;
     }
@@ -958,6 +960,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
   {
     m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE);
     m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCALPHA);     
+    m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_INVSRCALPHA);
   }
 
   if ( bColorKeyed )
@@ -1014,20 +1017,25 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
           lightmap_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
 
     if(!bTransparent)
+    {
       m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE);
+    }
     else
     {
       m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_SRCALPHA);
     }
 
-    m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_EQUAL);
+    //Attention: Now we need to be in a D3DRENDERSTATE_ZFUNC that allows the same z-value to be
+    //written once again. We are operating at D3DCMP_LESSEQUAL so we are safe here.
+    //setting to D3DCMP_EQUAL should theoretically work too, but will result in some
+    //visual problems in 32Bit color. (driver problems I guess)
     m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREADDRESS, D3DTADDRESS_CLAMP);
     
     ASSERT( ((D3DLightCache_Data*)pLightCache->pData)->htex != 0 );
-    m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREHANDLE, ((D3DLightCache_Data *)pLightCache->pData)->htex);
+    m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREHANDLE, 
+                                  ((D3DLightCache_Data *)pLightCache->pData)->htex);
     
     // render light-mapped poly
-    
     m_lpd3dDevice->Begin(D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS);
     for (i=0; i<poly.num; i++)
     {
@@ -1050,11 +1058,11 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
       if(!bTransparent)
       {
         if(m_iTypeLightmap == 2)
-          vx.color = D3DRGBA(0.5, 0.5, 0.5, 0.5);
+          vx.color = D3DRGBA(1.0, 1.0, 1.0, 1.0);
         else
-          vx.color = D3DRGB(0.5, 0.5, 0.5);
+          vx.color = D3DRGB(1.0, 1.0, 1.0);
       }
-      else vx.color = D3DRGBA(0.5, 0.5, 0.5, (float)poly_alpha/100.0f);
+      else vx.color = D3DRGBA(1.0, 1.0, 1.0, (float)poly_alpha/100.0f);
       
       vx.specular = 0;
 
@@ -1099,104 +1107,34 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
 
 
 
-// begin work in progress Bruce Williams brucewil@pacbell.net 
-
-
-STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonQuick(ITextureHandle* handle, bool gouroud ){ return S_OK; }
-STDMETHODIMP csGraphics3DDirect3DDx5::FinishPolygonQuick( ){ return S_OK; }
-
-
-/*
-
- //---------------------------------------------
-// A custom vertex format that includes XYZ, a
-// diffuse color & two sets of texture coords.
-//---------------------------------------------
-struct MTVERTEX
-{
-    FLOAT x, y, z;
-    DWORD dwColor;
-    FLOAT tuBase, tvBase;
-    FLOAT tuLightMap, tvLightMap;
-};
- 
-// Make an array of custom vertices.
-MTVERTEX g_avVertices[36];
-// Fill the array.
-//  (vertex at index 0)
-//  .
-//  .
-//  .
-//  (vertex at index 35)
-
-typedef struct D3DDRAWPRIMITIVESTRIDEDDATA  {
-    D3DDP_PTRSTRIDE position;
-    D3DDP_PTRSTRIDE normal;
-    D3DDP_PTRSTRIDE diffuse;
-    D3DDP_PTRSTRIDE specular;
-    D3DDP_PTRSTRIDE textureCoords[D3DDP_MAXTEXCOORD];
-} D3DDRAWPRIMITIVESTRIDEDDATA , *LPD3DDRAWPRIMITIVESTRIDEDDATA;
- 
-Members
-position and normal 
-D3DDP_PTRSTRIDE structures that point to arrays of position and normal vectors 
-for a collection of vertices (each vector is a 3-element array of float values). 
-
-diffuse and specular 
-D3DDP_PTRSTRIDE structures that point to diffuse and specular color information 
-for a collection of vertices. Each color component is an 8-8-8-8 RGBA value. 
-
-textureCoords 
-An 8-element array of D3DDP_PTRSTRIDE structures. Each element in the array is 
-an array of texture coordinates for the collection of vertices. Your application 
-determines which array of texture coordinates is used for a given texture stage 
-by calling the IDirect3DDevice3::SetTextureStageState method with the 
-D3DTSS_TEXCOORDINDEX stage state value. 
-
-
-// Construct strided vertices vertex using the array of
-// custom vertices already defined.
-D3DDRAWPRIMITIVESTRIDEDDATA g_StridedData;
- 
-// Assign the addresses of the various interleaved components 
-// to their corresponding strided members.
-g_StridedData.position.lpvData          = &g_avWallVertices[24].x;
-g_StridedData.diffuse.lpvData           = &g_avWallVertices[24].dwColor;
-g_StridedData.textureCoords[0].lpvData  = &g_avWallVertices[24].tuBase;
-g_StridedData.textureCoords[1].lpvData  = &g_avWallVertices[24].tuLightMap;
-g_StridedData.position.dwStride         = sizeof(MTVERTEX);
-g_StridedData.diffuse.dwStride          = sizeof(MTVERTEX);
-g_StridedData.textureCoords[0].dwStride = sizeof(MTVERTEX);
-g_StridedData.textureCoords[1].dwStride = sizeof(MTVERTEX);
- 
-// Render the vertices with multiple texture blending (Modulate).
-g_pd3dDevice->SetTextureStageState( 1, D3DTSS_COLOROP, D3DTOP_MODULATE );
-g_pd3dDevice->SetTexture( 0, g_BaseTextureMap);
-g_pd3dDevice->SetTexture( 1, g_LightMap);
-g_pd3dDevice->DrawPrimitiveStrided( D3DPT_TRIANGLELIST,
-                        D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX2,
-                        &g_StridedData, 12, NULL );
- 
-*/
-
-
-// end work in progress Bruce Williams  brucewil@pacbell.net 
-
-STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonQuick (G3DPolygonDPQ& poly, bool gouraud)
-{    
-  int i;
+STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonQuick(ITextureHandle* handle, bool gouroud )
+{ 
   HighColorCache_Data *pTexData;
-  D3DTLVERTEX vx;
   
-  csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)GetcsTextureMMFromITextureHandle (poly.txt_handle);
+  csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)GetcsTextureMMFromITextureHandle (handle);
 
-  m_pTextureCache->Add (poly.txt_handle);
+  m_pTextureCache->Add (handle);
 
   pTexData = txt_mm->get_hicolorcache ();
   
   VERIFY_SUCCESS( m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREHANDLE, ((D3DTextureCache_Data *)pTexData->pData)->htex) == DD_OK );
-  VERIFY_SUCCESS( m_lpd3dDevice->Begin(D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS) == DD_OK );
+
+  return S_OK; 
+}
+
+STDMETHODIMP csGraphics3DDirect3DDx5::FinishPolygonQuick( )
+{ 
+ 
+  return S_OK; 
+}
+
+STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonQuick (G3DPolygonDPQ& poly, bool gouraud)
+{    
+  int i;
+  D3DTLVERTEX vx;
   
+  VERIFY_SUCCESS( m_lpd3dDevice->Begin(D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS) == DD_OK );
+
   for(i=0; i<poly.num; i++)
   {
     vx.sx = poly.vertices[i].sx;
@@ -1215,7 +1153,112 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonQuick (G3DPolygonDPQ& poly, boo
   }
   
   VERIFY_SUCCESS( m_lpd3dDevice->End(0) == DD_OK );
+
+  return S_OK;
+}
+
+STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouroud)
+{
+  HighColorCache_Data *pTexData;
   
+  csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)GetcsTextureMMFromITextureHandle (handle);
+
+  m_pTextureCache->Add (handle);
+
+  pTexData = txt_mm->get_hicolorcache ();
+
+  bool  bColorKeyed  = txt_mm->get_transparent ();
+
+  if ( bColorKeyed )
+  {
+    m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, TRUE);
+  }
+
+  if (mode!=Copy)
+  {
+    m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE);
+  }
+
+  //Note: In all explanations of Mixing:
+  //Color: resulting color
+  //SRC:   Color of the texel (content of the texture to be drawn)
+  //DEST:  Color of the pixel on screen
+  //Alpha: Alpha value of the polygon
+  switch (mode)
+  {
+    case Multiply:
+      //Color = SRC * DEST +   0 * SRC = DEST * SRC
+      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR); 
+      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO);
+      break;
+    case Multiply2:
+      //Color = SRC * DEST + DEST * SRC = 2 * DEST * SRC
+      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR); 
+      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR);
+      break;
+    case Add:
+      //Color = 1 * DEST + 1 * SRC = DEST + SRC
+      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE); 
+      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
+      break;
+    case Alpha:
+      //Color = Alpha * DEST + (1-Alpha) * SRC 
+      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCALPHA); 
+      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_INVSRCALPHA);
+      break;
+    case Copy:
+    default:
+      //Color = 0 * DEST + 1 * SRC = SRC
+      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ZERO); 
+      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
+      break;
+  }
+
+  m_gouroud = gouroud;
+
+  VERIFY_SUCCESS( m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREHANDLE, ((D3DTextureCache_Data *)pTexData->pData)->htex) == DD_OK );
+
+  return S_OK;
+}
+
+STDMETHODIMP csGraphics3DDirect3DDx5::FinishPolygonFX()
+{
+  m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, FALSE);
+
+  m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, FALSE);
+
+  m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ZERO); 
+  m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
+
+  return S_OK;
+}
+
+STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonFX(G3DPolygonDPFX& poly, bool gouroud)
+{
+  int i;
+  D3DTLVERTEX vx;
+
+  VERIFY_SUCCESS( m_lpd3dDevice->Begin(D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS) == DD_OK );
+  
+  for(i=0; i<poly.num; i++)
+  {
+    vx.sx = poly.vertices[i].sx;
+    vx.sy = m_nHeight-poly.vertices[i].sy;
+    vx.sz = SCALE_FACTOR / poly.vertices[i].z;
+    vx.rhw = poly.vertices[i].z;
+    if (m_gouroud)
+      vx.color = D3DRGBA(poly.vertices[i].r, poly.vertices[i].g, poly.vertices[i].b, poly.alpha);
+    else
+      vx.color = D3DRGBA(1.0f, 1.0f, 1.0f, poly.alpha);
+    vx.specular = D3DRGB(0.0, 0.0, 0.0);
+    vx.tu = poly.vertices[i].u;
+    vx.tv = poly.vertices[i].v;
+    
+    m_lpd3dDevice->Vertex( &vx );
+  }
+
+  VERIFY_SUCCESS( m_lpd3dDevice->End(0) == DD_OK );
+
   return S_OK;
 }
 

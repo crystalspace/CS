@@ -134,6 +134,8 @@ class csGraphics3DDirect3DDx5 : public IGraphics3D,
   int rstate_mipmap;
   bool rstate_edges;
 
+  bool m_gouroud;
+
   /// Capabilities of the renderer.
   G3D_CAPS m_Caps;
   
@@ -196,6 +198,15 @@ public:
   /// Draw a projected (non-perspective correct) polygon.
   STDMETHODIMP DrawPolygonQuick (G3DPolygonDPQ& poly, bool gouroud);
   
+  /// Start a series of DrawPolygonFX
+  STDMETHODIMP StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouroud);
+
+  /// Finish a series of DrawPolygonFX
+  STDMETHODIMP FinishPolygonFX();
+
+  /// Draw a polygon wit special effects.
+  STDMETHODIMP DrawPolygonFX    (G3DPolygonDPFX& poly, bool gouroud);
+
   /// Draw a projected floating light on the screen.
   STDMETHODIMP DrawFltLight(G3DFltLight& light);
   
