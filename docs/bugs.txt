@@ -87,3 +87,37 @@ think we could have a variant, that will do a complete update of
 the screen and one that will do a partial update.
 DIFFICULTY: moderate
 
+PROBLEM: The sky above the street in large.zip will appear only as 
+a set of stripes in Win32, when using the software renderer in 32Bit.
+16Bit and 8Bit are Ok. Other renderers like OpenGL and DirectX work
+too. (thieber@gmx.net)
+SOLUTION: ??
+DIFFICULTY: ??
+
+PROBLEM: Lightmaps are drawn at the wrong position in the DX5 renderer.
+(Maybe this affects general textures too, but there is no reference
+texture to check this out) (thieber@gmx.net)
+SOLUTION: ??
+DIFFICULTY: ??
+
+PROBLEM: Lightmaps on curved surfaces don't work with the DX5 renderer.
+(thieber@gmx.net)
+SOLUTION: ??
+DIFFICULTY: ??
+
+PROBLEM: Lightmaps on OpenGL in Win32 look very rough. There are no
+smooth transitions from level to level. - RivaTNT, Detonator drivers.
+(thieber@gmx.net)
+SOLUTION: ??
+DIFFICULTY: ??
+
+PROBLEM: The crystal space logo is missing, when using the OpenGL
+renderer on Win32. (thieber@gmx.net)
+SOLUTION: ??
+DIFFICULTY: ??
+
+PROBLEM: The console is missing, when using the OpenGL
+renderer on Win32. (thieber@gmx.net)
+SOLUTION: ??
+DIFFICULTY: ??
+ 
