@@ -649,56 +649,56 @@ void WalkTest::DrawFullScreenFX3D (cs_time /*elapsed_time*/,
   {
     csfxFadeOut (Gfx3D, fs_fadeout_fade);
     float t3 = fabs (float (current_time)/3000.0);
-    fs_fadeout_fade = fmod (t3, 1.);
-    fs_fadeout_dir = fmod (t3, 2.) >= 1;
+    fs_fadeout_fade = fmod (t3, 1.0f);
+    fs_fadeout_dir = fmod (t3, 2.0f) >= 1;
     if (!fs_fadeout_dir) fs_fadeout_fade = 1-fs_fadeout_fade;
   }
   if (do_fs_fadecol)
   {
     csfxFadeToColor (Gfx3D, fs_fadecol_fade, fs_fadecol_color);
     float t3 = fabs (float (current_time)/3000.0);
-    fs_fadecol_fade = fmod (t3, 1.);
-    fs_fadecol_dir = fmod (t3, 2.) >= 1;
+    fs_fadecol_fade = fmod (t3, 1.0f);
+    fs_fadecol_dir = fmod (t3, 2.0f) >= 1;
     if (!fs_fadecol_dir) fs_fadecol_fade = 1-fs_fadecol_fade;
   }
   if (do_fs_fadetxt)
   {
     csfxFadeTo (Gfx3D, fs_fadetxt_mat, fs_fadetxt_fade);
     float t3 = fabs (float (current_time)/3000.0);
-    fs_fadetxt_fade = fmod (t3, 1.);
-    fs_fadetxt_dir = fmod (t3, 2.) >= 1;
+    fs_fadetxt_fade = fmod (t3, 1.0f);
+    fs_fadetxt_dir = fmod (t3, 2.0f) >= 1;
     if (!fs_fadetxt_dir) fs_fadetxt_fade = 1-fs_fadetxt_fade;
   }
   if (do_fs_red)
   {
     csfxRedScreen (Gfx3D, fs_red_fade);
     float t3 = fabs (float (current_time)/3000.0);
-    fs_red_fade = fmod (t3, 1.);
-    fs_red_dir = fmod (t3, 2.) >= 1;
+    fs_red_fade = fmod (t3, 1.0f);
+    fs_red_dir = fmod (t3, 2.0f) >= 1;
     if (!fs_red_dir) fs_red_fade = 1-fs_red_fade;
   }
   if (do_fs_green)
   {
     csfxGreenScreen (Gfx3D, fs_green_fade);
     float t3 = fabs (float (current_time)/3000.0);
-    fs_green_fade = fmod (t3, 1.);
-    fs_green_dir = fmod (t3, 2.) >= 1;
+    fs_green_fade = fmod (t3, 1.0f);
+    fs_green_dir = fmod (t3, 2.0f) >= 1;
     if (!fs_green_dir) fs_green_fade = 1-fs_green_fade;
   }
   if (do_fs_blue)
   {
     csfxBlueScreen (Gfx3D, fs_blue_fade);
     float t3 = fabs (float (current_time)/3000.0);
-    fs_blue_fade = fmod (t3, 1.);
-    fs_blue_dir = fmod (t3, 2.) >= 1;
+    fs_blue_fade = fmod (t3, 1.0f);
+    fs_blue_dir = fmod (t3, 2.0f) >= 1;
     if (!fs_blue_dir) fs_blue_fade = 1-fs_blue_fade;
   }
   if (do_fs_whiteout)
   {
     csfxWhiteOut (Gfx3D, fs_whiteout_fade);
     float t3 = fabs (float (current_time)/3000.0);
-    fs_whiteout_fade = fmod (t3, 1.);
-    fs_whiteout_dir = fmod (t3, 2.) >= 1;
+    fs_whiteout_fade = fmod (t3, 1.0f);
+    fs_whiteout_dir = fmod (t3, 2.0f) >= 1;
     if (!fs_whiteout_dir) fs_whiteout_fade = 1-fs_whiteout_fade;
   }
   if (do_fs_shadevert)
