@@ -604,7 +604,7 @@ bool csParticlesFactoryLoader::ParseColorHeat (iDocumentNode *node,
       case XMLTOKEN_BASE_HEAT:
       {
         float base_heat = child->GetContentsValueAsFloat ();
-        state->SetHeatColorMethod (base_heat);
+        state->SetHeatColorMethod ((int)base_heat);
         method_set = true;
         break;
       }
@@ -1186,7 +1186,7 @@ bool csParticlesObjectLoader::ParseColorHeat (iDocumentNode *node,
       case XMLTOKEN_BASE_HEAT:
       {
         float base_heat = child->GetContentsValueAsFloat ();
-        state->SetHeatColorMethod (base_heat);
+        state->SetHeatColorMethod ((int)base_heat);
         method_set = true;
         break;
       }

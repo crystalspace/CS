@@ -72,6 +72,7 @@ enum csParticleForceType
   CS_PART_FORCE_CONE
 };
 
+/// Representational information of a particle.
 struct csParticlesData
 {
   csVector3 position;
@@ -82,8 +83,28 @@ struct csParticlesData
   float sort;
 };
 
-SCF_VERSION (iParticlesObjectState, 0, 1, 0);
+SCF_VERSION (iParticlesColorCallback, 0, 0, 1)
 
+/**
+ * Particles state can be set up to retrieve color via a callback.  This
+ * interface must be implemented by objects which wish to provide color
+ * information to the particles state.
+ */
+struct iParticlesColorCallback : public iBase
+{
+  /**
+   * Return a color appropriate for a particle at a given time.
+   * \param time Time left for particle
+   * (1.0 for just born ranging to 0.0 for dead)
+   */
+  virtual csColor GetColor (float time) = 0;
+};
+
+SCF_VERSION (iParticlesObjectState, 0, 2, 0);
+
+/**
+ * Particles state object.
+ */
 struct iParticlesObjectState : public iBase
 {
   /// Sets the particles to be emitted per second
@@ -117,13 +138,16 @@ struct iParticlesObjectState : public iBase
   virtual void GetEmitPosition (csVector3 &position) = 0;
 
   /// Set a radial force type, with range and falloff type
-  virtual void SetRadialForceType (float range, csParticleFalloffType falloff) = 0;
+  virtual void SetRadialForceType (float range, csParticleFalloffType) = 0;
 
   /// Set a linear force type
-  virtual void SetLinearForceType (csVector3 &direction, float range, csParticleFalloffType falloff) = 0;
+  virtual void SetLinearForceType (csVector3 &direction, float range,
+    csParticleFalloffType falloff) = 0;
 
   /// Set a cone force type
-  virtual void SetConeForceType (csVector3 &direction, float range, csParticleFalloffType falloff, float radius, csParticleFalloffType radius_falloff) = 0;
+  virtual void SetConeForceType (csVector3 &direction, float range,
+    csParticleFalloffType falloff, float radius,
+    csParticleFalloffType radius_falloff) = 0;
 
   /// Get the force type
   virtual csParticleForceType GetForceType () = 0;
@@ -132,7 +156,8 @@ struct iParticlesObjectState : public iBase
   virtual float GetForceRange () = 0;
 
   /// Get the force falloff types
-  virtual void GetFalloffType (csParticleFalloffType &force, csParticleFalloffType &cone) = 0;
+  virtual void GetFalloffType (csParticleFalloffType &force,
+    csParticleFalloffType &cone) = 0;
 
   /// Get the force direction
   virtual void GetForceDirection (csVector3 &dir) = 0;
@@ -204,12 +229,11 @@ struct iParticlesObjectState : public iBase
    */
   virtual void SetHeatColorMethod (int base_temp) = 0;
 
-  /**
-   * Set the color method to use a callback 
-   * \param time Time left for particle
-   *   (1.0 for just born ranging to 0.0 for dead)
-   */
-  virtual void SetColorCallback (csColor (*callback)(float time)) = 0;
+  /// Set the color method to use a callback 
+  virtual void SetColorCallback (iParticlesColorCallback*) = 0;
+
+  /// Get the color callback.  Returns null if no callback has been set.
+  virtual iParticlesColorCallback* GetColorCallback () = 0;
 
   /// Get the particle color method
   virtual csParticleColorMethod GetParticleColorMethod () = 0;
@@ -222,9 +246,6 @@ struct iParticlesObjectState : public iBase
 
   /// Get the base heat (for heat color method)
   virtual float GetBaseHeat () = 0;
-
-  /// Get the color callback
-  virtual void GetColorCallback (csColor (**callback)(float time)) = 0;
 
   /// Set the particle radius
   virtual void SetParticleRadius (float radius) = 0;
@@ -277,11 +298,13 @@ struct iParticlesObjectState : public iBase
    * iParticlesPhysics plugin
    */
   virtual void Update (float elapsed_time) = 0;
-
 };
 
 SCF_VERSION (iParticlesFactoryState, 0, 1, 0);
 
+/**
+ * Particles factory state.
+ */
 struct iParticlesFactoryState : public iBase
 {
   /// Set the material to use for this particle factory
@@ -306,13 +329,16 @@ struct iParticlesFactoryState : public iBase
   virtual void SetBoxEmitType (float x_size, float y_size, float z_size) = 0;
 
   /// Set a radial force type, with range and falloff type
-  virtual void SetRadialForceType (float range, csParticleFalloffType falloff) = 0;
+  virtual void SetRadialForceType (float range, csParticleFalloffType) = 0;
 
   /// Set a linear force type
-  virtual void SetLinearForceType (csVector3 &direction, float range, csParticleFalloffType falloff) = 0;
+  virtual void SetLinearForceType (csVector3 &direction, float range,
+    csParticleFalloffType falloff) = 0;
 
   /// Set a cone force type
-  virtual void SetConeForceType (csVector3 &direction, float range, csParticleFalloffType falloff, float radius, csParticleFalloffType radius_falloff) = 0;
+  virtual void SetConeForceType (csVector3 &direction, float range,
+    csParticleFalloffType falloff, float radius,
+    csParticleFalloffType radius_falloff) = 0;
 
   /// Set the force amount
   virtual void SetForce (float force) = 0;
@@ -354,12 +380,11 @@ struct iParticlesFactoryState : public iBase
    */
   virtual void SetHeatColorMethod (int base_temp) = 0;
 
-  /**
-   * Set the color method to use a callback 
-   * \param time Time left for particle
-   *   (1.0 for just born ranging to 0.0 for dead)
-   */
-  virtual void SetColorCallback (csColor (*callback)(float time) = NULL) = 0;
+  /// Set the color method to use a callback 
+  virtual void SetColorCallback (iParticlesColorCallback*) = 0;
+
+  /// Get the color callback.  Returns null if no callback has been set.
+  virtual iParticlesColorCallback* GetColorCallback () = 0;
 
   /// Add a color to the gradient
   virtual void AddColor (csColor color) = 0;
@@ -404,6 +429,9 @@ struct iParticlesFactoryState : public iBase
 
 SCF_VERSION (iParticlesPhysics, 0, 1, 0);
 
+/**
+ * Particles physics interface.
+ */
 struct iParticlesPhysics : public iBase
 {
   /**

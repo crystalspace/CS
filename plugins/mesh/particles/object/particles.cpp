@@ -129,8 +129,6 @@ csParticlesFactory::csParticlesFactory (csParticlesType* p,
 
   color_method = CS_PART_COLOR_CONSTANT;
   constant_color = csColor(1,1,1);
-
-  color_callback = NULL;
 }
 
 csParticlesFactory::~csParticlesFactory ()
@@ -640,7 +638,8 @@ bool csParticlesObject::Update (float elapsed_time)
   if ((dead_particles-new_particles) < point_data.Length () * 0.30f)
   {
     int oldlen = point_data.Length ();
-    int newlen = (oldlen > (int)new_particles) ? oldlen << 1 : (int)new_particles << 1;
+    int newlen = (oldlen > (int)new_particles) ?
+      oldlen << 1 : (int)new_particles << 1;
     point_data.SetLength (newlen);
     dead_particles += point_data.Length() - oldlen;
     for(int i=oldlen;i<point_data.Length ();i++) {
@@ -670,9 +669,12 @@ bool csParticlesObject::Update (float elapsed_time)
     switch (emit_type)
     {
     case CS_PART_EMIT_SPHERE:
-      start = csVector3((rng.Get() - 0.5) * 2,(rng.Get() - 0.5) * 2,(rng.Get() - 0.5) * 2);
+      start = csVector3((rng.Get() - 0.5) * 2,
+                        (rng.Get() - 0.5) * 2,
+			(rng.Get() - 0.5) * 2);
       start.Normalize ();
-      start = emitter + (start * ((rng.Get() * (emit_size_1 - emit_size_2)) + emit_size_2));
+      start = emitter +
+        (start * ((rng.Get() * (emit_size_1 - emit_size_2)) + emit_size_2));
       break;
     case CS_PART_EMIT_PLANE:
       break;
@@ -746,14 +748,20 @@ bool csParticlesObject::Update (float elapsed_time)
       break;
     }
     case CS_PART_COLOR_HEAT:
-      // TODO: Do this
+      // @@@ TODO: Do this
       break;
     case CS_PART_COLOR_CALLBACK:
+      if (color_callback.IsValid())
       {
-      float colortime = point.time_to_live / (time_to_live + time_variation);
-      csColor color = color_callback( colortime);
-      break;
+        float colortime = point.time_to_live / (time_to_live + time_variation);
+        csColor color = color_callback->GetColor(colortime);
+        // @@@ FIXME: Do something with the retrieved color.
+	(void)color;
       }
+      break;
+    case CS_PART_COLOR_LOOPING:
+      // @@@ TODO: Do this
+      break;
     }
 
     csVector3 transformed = tr_o2c.Other2This(point.position);

@@ -22,6 +22,7 @@
 #include "csutil/array.h"
 #include "csutil/cscolor.h"
 #include "csutil/garray.h"
+#include "csutil/weakref.h"
 
 #include "csgeom/objmodel.h"
 #include "csgeom/transfrm.h"
@@ -123,8 +124,8 @@ private:
   float base_heat;
   csColor constant_color;
   csParticleColorMethod color_method;
+  csWeakRef<iParticlesColorCallback> color_callback;
 
-  csColor (*color_callback)(float time);
 public:
   SCF_DECLARE_IBASE;
 
@@ -217,11 +218,15 @@ public:
     color_method = CS_PART_COLOR_HEAT;
     base_heat = base_temp;
   }
-  void SetColorCallback (csColor (*callback)(float time) = NULL)
+  void SetColorCallback (iParticlesColorCallback* callback)
   {
-    CS_ASSERT(callback);
+    CS_ASSERT(callback != 0);
     color_method = CS_PART_COLOR_CALLBACK;
     color_callback = callback;
+  }
+  iParticlesColorCallback* GetColorCallback ()
+  {
+    return color_callback;
   }
   void SetParticleRadius (float rad)
   { particle_radius = rad; }
@@ -295,8 +300,10 @@ public:
     { scfParent->SetLoopingColorMethod (seconds); }
     virtual void SetHeatColorMethod (int base_temp)
     { scfParent->SetHeatColorMethod (base_temp); }
-    virtual void SetColorCallback (csColor (*callback)(float time) = NULL)
+    virtual void SetColorCallback (iParticlesColorCallback* callback)
     { scfParent->SetColorCallback (callback); }
+    virtual iParticlesColorCallback* GetColorCallback ()
+    { return scfParent->GetColorCallback (); }
     virtual void SetParticleRadius (float radius)
     { scfParent->SetParticleRadius (radius); }
     virtual void SetDampener (float damp)
@@ -396,8 +403,7 @@ private:
   float base_heat;
   csColor constant_color;
   csParticleColorMethod color_method;
-
-  csColor (*color_callback)(float time);
+  csWeakRef<iParticlesColorCallback> color_callback;
 
   csDirtyAccessArray<csParticlesData> point_data;
   struct i_vertex {
@@ -573,12 +579,17 @@ public:
     color_method = CS_PART_COLOR_HEAT;
     base_heat = base_temp;
   }
-  void SetColorCallback (csColor (*callback)(float time) = NULL)
+  void SetColorCallback (iParticlesColorCallback* callback)
   {
-    CS_ASSERT(callback);
+    CS_ASSERT(callback != 0);
     color_method = CS_PART_COLOR_CALLBACK;
     color_callback = callback;
   }
+  iParticlesColorCallback* GetColorCallback ()
+  {
+    return color_callback;
+  }
+
   void SetParticleRadius (float rad);
 
   int GetParticlesPerSecond ()
@@ -637,8 +648,6 @@ public:
   { return loop_time; }
   virtual float GetBaseHeat ()
   { return base_heat; }
-  virtual void GetColorCallback (csColor (**callback)(float time))
-  { *callback = color_callback; }
   void SetTransformMode (bool transform)
   { transform_mode = transform; }
 
@@ -700,8 +709,10 @@ public:
     { scfParent->SetLoopingColorMethod (seconds); }
     virtual void SetHeatColorMethod (int base_temp)
     { scfParent->SetHeatColorMethod (base_temp); }
-    virtual void SetColorCallback (csColor (*callback)(float time) = NULL)
+    virtual void SetColorCallback (iParticlesColorCallback* callback)
     { scfParent->SetColorCallback (callback); }
+    virtual iParticlesColorCallback* GetColorCallback ()
+    { return scfParent->GetColorCallback (); }
     virtual csParticleColorMethod GetParticleColorMethod ()
     { return scfParent->GetParticleColorMethod (); }
     virtual csColor GetConstantColor ()
@@ -710,8 +721,6 @@ public:
     { return scfParent->GetColorLoopTime (); }
     virtual float GetBaseHeat ()
     { return scfParent->GetBaseHeat (); }
-    virtual void GetColorCallback (csColor (**callback)(float time))
-    { scfParent->GetColorCallback (callback); }
     virtual void SetParticleRadius (float radius)
     { scfParent->SetParticleRadius (radius); }
     virtual int GetParticlesPerSecond ()

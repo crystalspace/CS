@@ -16,6 +16,15 @@ chronological order.
 	- Jorrit added csWeakRefArray<T> which is an array of weak references.
 	  This is needed because csArray<csWeakRef<T> > does not work because
 	  you cannot reallocate an array of weak references.
+	- Eric Sunshine added new interface iParticlesColorCallback.  This
+	  replaces the ugly functional-style color callback used by
+	  iParticlesObjectState and iParticlesFactoryState with a more
+	  object-oriented and normalized approach.
+	- Eric Sunshine cleaned up particle related headers and added some
+	  missing documentation to ensure that Doxygen will actually produce
+	  output for the interfaces.
+	- Eric Sunshine eliminated several compilation warning in the particles
+	  and particlesldr plugins.
 19-Jan-2004
 	- Steven Geens changed the calling of PositionChild to a hierarchical
 	  scheme.
