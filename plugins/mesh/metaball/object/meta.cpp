@@ -119,10 +119,11 @@ void csMetaBall::InitTables(void)
   }
 }
 
-bool csMetaBall::Initialize ()
+bool csMetaBall::Initialize (iObjectRegistry* p)
 {
   if (!initialize)
   {
+	object_reg = p;
     initialize = true;
     meta_balls = new MetaBall[num_meta_balls];
     memset(&mesh,0,sizeof(G3DTriangleMesh));
@@ -526,7 +527,7 @@ csMetaBallFactory::~csMetaBallFactory()
 iMeshObject* csMetaBallFactory::NewInstance()
 {
   csMetaBall* cm = new csMetaBall((iMeshObjectFactory *) this);
-  cm->Initialize();
+  cm->Initialize((iObjectRegistry*) this);
   iMeshObject* im = SCF_QUERY_INTERFACE( cm, iMeshObject );
   im->DecRef();
   return im;

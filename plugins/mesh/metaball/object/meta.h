@@ -84,7 +84,7 @@ public:
 
   csMetaBall (iMeshObjectFactory *fact);
   virtual ~csMetaBall ();
-  virtual bool Initialize ();
+  virtual bool Initialize (iObjectRegistry* p);
 
   virtual void SetMaterial (iMaterialWrapper *tex)
   { th = tex; }
