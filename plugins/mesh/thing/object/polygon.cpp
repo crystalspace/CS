@@ -531,10 +531,8 @@ bool csPolygon3DStatic::CreateBoundingTextureBox ()
   int Imax_u = QRound (max_u * ww);
   int Imax_v = QRound (max_v * hh);
 
-  polygon_data.tmapping->SetLitHeight (Imax_u -
-  	polygon_data.tmapping->GetIMinU ());
-  int w_orig = Imax_v - polygon_data.tmapping->GetIMinV ();
-  polygon_data.tmapping->SetLitOriginalWidth (w_orig);
+  int h = Imax_v - polygon_data.tmapping->GetIMinV ();
+  int w_orig = Imax_u - polygon_data.tmapping->GetIMinU ();
   int shf_u = 0;
   int w = 1;
   while (true)
@@ -545,6 +543,8 @@ bool csPolygon3DStatic::CreateBoundingTextureBox ()
   }
   polygon_data.tmapping->SetShiftU (shf_u);
   polygon_data.tmapping->SetLitWidth (w);
+  polygon_data.tmapping->SetLitHeight (h);
+  polygon_data.tmapping->SetLitOriginalWidth (w_orig);
 
   polygon_data.tmapping->SetFDUV (min_u * ww, min_v * hh);
   return rc;

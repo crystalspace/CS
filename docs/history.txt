@@ -20,6 +20,8 @@ chronological order.
 	  its emptiness and easily miss the links at the very top of the page.
 	- Eric Sunshine fixed bugs in odivx.mak and odivx4.mak where $ prefix
 	  was missing in a variable expansion.
+	- Jorrit fixed a bug in the thing mesh object which he introduced
+	  yesterday. This bug caused weird stripes on lightmapped polygons.
 23-Feb-2004
 	- Jorrit moved the Engine.Lighthing.LightmapQuality config option
 	  from engine.cfg to thing.cfg (and renamed it

@@ -209,8 +209,6 @@ public:
   int GetWidth () const { return lwidth; }
   ///
   int GetHeight () const { return lheight; }
-  /// Get size of one lightmap
-  //long GetSize () const { return lm_size; }
 };
 
 #endif // __CS_LIGHTMAP_H__
