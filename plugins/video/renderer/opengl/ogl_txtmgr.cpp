@@ -370,7 +370,7 @@ csTextureHandleOpenGL::~csTextureHandleOpenGL ()
   int i;
   for (i = vTex.Length ()-1; i >= 0; i--)
   {
-    if (vTex [i]);
+    if (vTex [i])
     {
       DG_UNLINK (this, vTex[i]);
       delete vTex [i];
@@ -483,7 +483,7 @@ void csTextureHandleOpenGL::CreateMipmaps ()
   int i;
   for (i = vTex.Length ()-1; i >= 0; i--)
   {
-    if (vTex [i]);
+    if (vTex [i])
     {
       DG_UNLINK (this, vTex[i]);
       delete vTex [i];
