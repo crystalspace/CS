@@ -46,6 +46,9 @@ The history order has been reversed so that new features are at the top.
 	  meshes now. 'loadsprite' and 'addsprite' are now deleted.
 	- Renamed 'delsprite' to 'delmesh'.
 	- Renamed 'listsprites' to 'listmeshes'.
+	- 'listactions', 'setaction', and 'setmotion' use the new spr3d
+	  plugin system too. As a consequence, they no longer work for
+	  the old sprites.
 7-Feb-2001
 	- Martin Geisse removed sound volume division by number of sources
 	  from software sound because it did not sound very good.

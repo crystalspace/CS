@@ -1451,18 +1451,18 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
     {
       // See if the sprite exists.
-      
-      csSprite3D* aspr = (csSprite3D *) Sys->engine->sprites.FindByName(name);
-      
-      if(aspr)
-      { 
-	csSpriteTemplate* aspr_tmpl = aspr->GetTemplate();
-	csSpriteAction* aspr_act;
+      csSprite* aspr = (csSprite *) Sys->engine->sprites.FindByName(name);
+      if (aspr && aspr->GetType () >= csMeshWrapper::Type)
+      {
+        csMeshWrapper* wrap = (csMeshWrapper*)aspr;
+	iSprite3DState* state = QUERY_INTERFACE (wrap->GetMeshObject (), iSprite3DState);
+	iSprite3DFactoryState* fstate = QUERY_INTERFACE (state->GetFactory (), iSprite3DFactoryState);
+	iSpriteAction* aspr_act;
 	int i;
-	
-	for(i = 0; i < (aspr_tmpl->GetNumActions()); i ++)
+
+	for (i = 0; i < (fstate->GetNumActions()); i ++)
 	{
-	  aspr_act = aspr_tmpl->GetAction(i);
+	  aspr_act = fstate->GetAction(i);
 	  Sys->Printf (MSG_CONSOLE, "%s\n", aspr_act->GetName());
 	}
       }
@@ -1471,9 +1471,7 @@ bool CommandHandler (const char *cmd, const char *arg)
         Sys->Printf (MSG_CONSOLE, "Expected parameters 'spritename'!\n");
         Sys->Printf (MSG_CONSOLE, "To get the names use 'listsprites'\n");
       }
-      
     }
-    
   }
   else if (!strcasecmp (cmd, "setaction"))
   {
@@ -1489,12 +1487,13 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
     {
       // Test to see if the sprite exists.
-      csSprite3D* aspr = (csSprite3D *) Sys->engine->sprites.FindByName(name);
-      
-      if(aspr)
+      csSprite* aspr = (csSprite *) Sys->engine->sprites.FindByName(name);
+      if (aspr && aspr->GetType () >= csMeshWrapper::Type)
       {
+        csMeshWrapper* wrap = (csMeshWrapper*)aspr;
+	iSprite3DState* state = QUERY_INTERFACE (wrap->GetMeshObject (), iSprite3DState);
         // Test to see if the action exists for that sprite.
-        if(!aspr->SetAction(action))
+        if(!state->SetAction(action))
 	{
           Sys->Printf (MSG_CONSOLE,
 		       "Expected parameters 'spritename,action'!\n");
@@ -1525,10 +1524,12 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
     {
       // Test to see if the sprite exists.
-      csSprite3D* aspr = (csSprite3D *) Sys->engine->sprites.FindByName (name);
-      if (aspr)
+      csSprite* aspr = (csSprite*) Sys->engine->sprites.FindByName (name);
+      if (aspr && aspr->GetType () >= csMeshWrapper::Type)
       {
-	iSkeletonBone *sb=QUERY_INTERFACE(aspr->GetSkeletonState(), iSkeletonBone);
+        csMeshWrapper* wrap = (csMeshWrapper*)aspr;
+	iSprite3DState* state = QUERY_INTERFACE (wrap->GetMeshObject (), iSprite3DState);
+	iSkeletonBone *sb=QUERY_INTERFACE(state->GetSkeletonState(), iSkeletonBone);
 	if (sb)
 	{
 	  if (System->MotionMan)
