@@ -500,7 +500,7 @@ bool csGraphics2DDDraw3::PerformExtensionV (char const* command, va_list args)
   bool rc = true;
   if (!strcmp (command, "fullscreen"))
   {
-    bool fs = va_arg (args, bool);
+    bool fs = bool(va_arg (args, int));
     if (fs != FullScreen
      && (m_bAllowWindowed || fs))
     {
