@@ -1,6 +1,20 @@
 The history order has been reversed so that new features are at the top.
 
+18-Dec-2000
+	- Rene Dudfield fixed a bug in sprite3d. The rand num generator
+	  was not initialized.
+	- Rene Dudfield also made the sprite3d lighting functions only
+	  light the vertices that are used for the lod level.
 17-Dec-2000
+	- Brandon Ehle fixed a quaternion bug, with r initializer in the
+	  wrong spot. The motion manager bug was fixed by this and
+	  motions now look correct.
+	- Started work on csfx library. Not finished yet. The csfx library
+	  will contain stuff that is not general enough to be placed in the
+	  engine but is general enough to be useful for several games. At
+	  first I plan to add some procedural textures (i.e. like fire, water,
+	  and plasma from the ptlab demo) and some of the particle systems
+	  (like rain, fire, fountain, snow, ...).
 	- Eric Sunshine temporarily disabled the sumlog.awk script which
 	  performs CVS commit-time mailings.  This was necessary since gawk is
 	  not present on the new CVS server which SourceForget installed, thus
@@ -54,9 +68,6 @@ The history order has been reversed so that new features are at the top.
 	      portal command can't see that it is already loaded.
 	    - Missiles can't penetrate the portal.
 	    - Dynamic lights don't shine through the portal.
-	    - Sector-by-sector engine mode.
-	    - The WalkTest collision detection function to find all nearby
-	      sectors does not take warping transformation into account.
 14-Dec-2000
 	- Optimized csRegion::IsInRegion(). Replaced the loop over all
 	  the objects in the region with a single test if the parent
@@ -83,14 +94,6 @@ The history order has been reversed so that new features are at the top.
 	  'portal' command so that the portal destination matches the
 	  starting point of the loaded level.
 13-Dec-2000
-	- Wouter Wijngaards added changes to sprites from Rene Dudfield.
-	  There is now a LOD setting for individual sprites and a
-	  random UpdateLighting for special effects.
-	- Martin Geisse modified the interface for 3d sound: There are
-	  no 3d and non-3d sources anymore. Instead, every sound source
-	  has a '3d mode' attribute which can be non-3d, 3d relative to
-	  the listener and absolute 3d position.
-	  Also fixed some bugs in the sound modules and in Walktest.
 	- Did a little further work on the engine SCF interfaces:
 	    - Added iEngine/csEngine::FindTexture().
 	    - Added iEngine/csEngine::CreateMaterial().

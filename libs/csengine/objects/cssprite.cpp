@@ -687,6 +687,7 @@ csSprite3D::csSprite3D (csObject* theParent) : csSprite (theParent), bbox (NULL)
   vertex_colors = NULL;
   skeleton_state = NULL;
   tween_ratio = 0;
+  num_verts_for_lod = -1;
 
   tr_verts.IncRef ();
   uv_verts.IncRef ();
@@ -694,7 +695,9 @@ csSprite3D::csSprite3D (csObject* theParent) : csSprite (theParent), bbox (NULL)
   obj_verts.IncRef ();
   tween_verts.IncRef ();
   light_worktable.IncRef ();
-
+  
+  rand_num = new csRandomGen();
+  
   do_tweening = true;
 }
 
@@ -709,6 +712,7 @@ csSprite3D::~csSprite3D ()
 
   delete [] vertex_colors;
   delete skeleton_state;
+  delete rand_num;
 }
 
 void csSprite3D::SetTemplate (csSpriteTemplate* tmpl)
@@ -822,6 +826,23 @@ int map (int* emerge_from, int idx, int num_verts)
   return idx;
 }
 
+
+
+
+
+int csSprite3D::GetNumVertsToLight ()
+{
+  if(IsLodEnabled())
+  {
+    if(num_verts_for_lod == -1)
+      return tpl->GetNumTexels();
+    else
+      return num_verts_for_lod;
+  }
+  else
+    return tpl->GetNumTexels();
+}
+  
 void csSprite3D::GenerateSpriteLOD (int num_vts)
 {
   int* emerge_from = tpl->GetEmergeFrom ();
@@ -958,6 +979,7 @@ void csSprite3D::GetCameraBoundingBox (const csCamera& camtrans, csBox3& cbox)
     camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (6));
     camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (7));
   }
+
   cbox = camera_bbox;
 }
 
@@ -973,7 +995,9 @@ float csSprite3D::GetScreenBoundingBox (const csCamera& camtrans, csBox2& boundi
 
   // if the entire bounding box is behind the camera, we're done
   if ((bbox3.MinZ () < 0) && (bbox3.MaxZ () < 0))
+  {
     return -1;
+  }
 
   // Transform from camera to screen space.
   if (bbox3.MinZ () <= 0)
@@ -1019,23 +1043,26 @@ void csSprite3D::Draw (csRenderView& rview)
   //	   if rview has do_clip_plane set to true.
   csBox2 bbox;
   csBox3 bbox3;
+  
   if (GetScreenBoundingBox (rview, bbox, bbox3) < 0) return;	// Not visible.
+  
   //@@@ Debug output: this should be an optional feature for WalkTest.
   //{
-    //csPolygon2D* p2d = new csPolygon2D ();
-    //p2d->AddVertex (bbox.GetCorner (0));
-    //p2d->AddVertex (bbox.GetCorner (1));
-    //p2d->AddVertex (bbox.GetCorner (3));
-    //p2d->AddVertex (bbox.GetCorner (2));
-    //p2d->Draw (rview.g2d, 255);
-    //delete p2d;
+  //  csPolygon2D* p2d = new csPolygon2D ();
+  //  p2d->AddVertex (bbox.GetCorner (0));
+  //  p2d->AddVertex (bbox.GetCorner (1));
+  //  p2d->AddVertex (bbox.GetCorner (3));
+  //  p2d->AddVertex (bbox.GetCorner (2));
+  //  p2d->Draw (rview.g2d, 255);
+  //  delete p2d;
   //}
 
   // test against far plane if needed
   if (rview.UseFarPlane ())
   {
-    // ok, so this is not really a far plane clipping - we just dont draw this sprite
-    // if no point of the camera_bounding box is closer than the D part of the farplane
+    // ok, so this is not really a far plane clipping - we just dont draw this
+    //  sprite if no point of the camera_bounding box is closer than the D
+    //  part of the farplane
     
     if (camera_bbox.SquaredOriginDist () > rview.GetFarPlane ()->D ()*rview.GetFarPlane ()->D ())
        return;	
@@ -1065,7 +1092,9 @@ void csSprite3D::Draw (csRenderView& rview)
   }
 
   UpdateWorkTables (tpl->GetNumTexels());
-  UpdateDeferedLighting (movable.GetPosition ());
+  
+// Moving the lighting to below the lod.
+//  UpdateDeferedLighting (movable.GetPosition ());
 
   csFrame * cframe = cur_action->GetFrame (cur_frame);
 
@@ -1124,7 +1153,7 @@ void csSprite3D::Draw (csRenderView& rview)
   // Select the appropriate mesh.
   csTriangleMesh* m;
   int* emerge_from = NULL;
-  int num_verts;
+
   float fnum = 0.0f;
 
   // level of detail is GetLodLevel() squared because the LOD
@@ -1143,7 +1172,7 @@ void csSprite3D::Draw (csRenderView& rview)
     float wor_sq_dist = csSquaredDist::PointPoint (cam_origin, wor_center);
     level_of_detail /= MAX (wor_sq_dist, SMALL_EPSILON);
 
-    // reduce LOD based on feild-of-view
+    // reduce LOD based on field-of-view
     float aspect = 2 * tan (rview.GetFOVAngle () * M_PI / 360);
     level_of_detail *= aspect;
   }
@@ -1155,19 +1184,24 @@ void csSprite3D::Draw (csRenderView& rview)
     // The fractional part will determine how much to morph
     // between the new vertex and the previous last vertex.
     fnum = level_of_detail * (tpl->GetNumTexels() + 1);
-    num_verts = (int)fnum;
-    fnum -= num_verts;  // fnum is now the fractional part.
+    num_verts_for_lod = (int)fnum;
+    fnum -= num_verts_for_lod;  // fnum is now the fractional part.
 
-    GenerateSpriteLOD (num_verts);
+    GenerateSpriteLOD (num_verts_for_lod);
     emerge_from = tpl->GetEmergeFrom ();
     m = &mesh;
   }
   else
   {
-    num_verts = tpl->GetNumTexels ();
+    num_verts_for_lod = tpl->GetNumTexels ();
     m = tpl->GetTexelMesh ();
   }
 
+  // @@@ moved down past lod to take advantage of the 
+  UpdateDeferedLighting (movable.GetPosition ());
+  
+  
+  
   csVector2* real_uv_verts;
   // Do vertex morphing if needed.
   // 
@@ -1180,10 +1214,10 @@ void csSprite3D::Draw (csRenderView& rview)
   }
   else
   {
-    for (i = 0 ; i < num_verts ; i++)
+    for (i = 0 ; i < num_verts_for_lod ; i++)
     {
       csVector2 uv;
-      if (i < num_verts-1)
+      if (i < num_verts_for_lod-1)
       {
         uv = tpl->GetTexel (cf_idx, i);
       }
@@ -1205,7 +1239,7 @@ void csSprite3D::Draw (csRenderView& rview)
     mesh.mat_handle[0] = cstxt->GetMaterialHandle ();
   else
     mesh.mat_handle[0] = tpl->cstxt->GetMaterialHandle ();
-  mesh.num_vertices = num_verts;
+  mesh.num_vertices = num_verts_for_lod;
   mesh.vertices[0] = verts;
   mesh.texels[0][0] = real_uv_verts;
   mesh.vertex_colors[0] = vertex_colors;
@@ -1395,7 +1429,8 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
 
 void csSprite3D::UpdateLightingRandom ()
 {
-  int num_texels = tpl->GetNumTexels();
+//  int num_texels = tpl->GetNumTexels();
+  int num_texels = GetNumVertsToLight();
   float r,g,b;
 
   for (int i = 0; i < num_texels; i++)
@@ -1419,7 +1454,8 @@ void csSprite3D::UpdateLightingFast (csLight** lights, int num_lights)
   int light_num, j;
   
   float cosinus;
-  int num_texels;
+  //int num_texels = tpl->GetNumTexels();
+  int num_texels = GetNumVertsToLight();
   
   float light_bright_wor_dist;
   
@@ -1448,7 +1484,6 @@ void csSprite3D::UpdateLightingFast (csLight** lights, int num_lights)
   float amb_g = g / 128.0;
   float amb_b = b / 128.0;
 
-  num_texels = tpl->GetNumTexels();
 
   for (light_num = 0 ; light_num < num_lights ; light_num++)
   {
@@ -1521,7 +1556,9 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights)
 {
   int i, j;
 
-  int num_texels = tpl->GetNumTexels ();
+  //int num_texels = tpl->GetNumTexels ();
+  int num_texels = GetNumVertsToLight();
+
   float remainder = 1 - tween_ratio;
 
   // convert frame number in current action to absolute frame number
@@ -1585,7 +1622,8 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights)
   int nf_idx = cur_action->GetNextFrame (cur_frame)->GetAnmIndex ();
 
   float remainder = 1 - tween_ratio;
-  int num_texels = tpl->GetNumTexels ();
+//  int num_texels = tpl->GetNumTexels ();
+  int num_texels = GetNumVertsToLight();
 
   // need vertices to calculate distance from light to each vertex
   csVector3* object_vertices;

@@ -240,9 +240,9 @@ private:
   float lod_level;
   
   /**
-   * The lighting_quality_config for this template.
+   * The lod_level_config for this template.
    * See macros CS_SPR_LOD_*
-   * This is used to set new sprites lighting_quality_config to this one.
+   * This is used to set new sprites lod_level_config to this one.
    */
   int lod_level_config;
   
@@ -949,10 +949,20 @@ public:
     else 
       return true;
   };
-   
-   
+  
+  /**
+   * GetNumVertsToLight returns the number of vertices to light based on LOD.
+   */
+  int GetNumVertsToLight();
    
 private:
+  
+  /**
+   * num_verts_for_lod represents the number of lights that are used by lod.
+   * If -1 means that it is not used.
+   */  
+  int num_verts_for_lod;
+   
   /**
    * A mesh which contains a number of triangles as generated
    * by the LOD algorithm. This is static since it will likely
