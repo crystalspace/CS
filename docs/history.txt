@@ -1,5 +1,16 @@
 The history order has been reversed so that new features are at the top.
 
+10-Apr-2001
+	- Implemented render priority queues in sectors. All meshes added to
+	  a sector will automatically be placed in the right queue. At render
+	  time they will be rendered in the right order.
+	- Fixed a bug with visibility culling. Meshes that are already in
+	  the sector at the time the culler is created were not registered
+	  to the visibility culler.
+	- Added csEngine::GetSkyRenderPriority(), GetWallRenderPriority(),
+	  GetObjectRenderPriority() and GetAlphaRenderPriority().
+	- When a new mesh object is created it will by default get object
+	  render priority.
 9-Apr-2001
 	- Michael Voase did a slight visual change to MazeD.
 	- Michael also removed bogus comment about non existant bug

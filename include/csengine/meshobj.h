@@ -173,11 +173,6 @@ public:
   csFlags flags;
 
 protected:
-  /**
-   * Update this object in the polygon trees.
-   */
-  void UpdateInPolygonTrees ();
-
   /// Move this object to the specified sector. Can be called multiple times.
   void MoveToSector (csSector* s);
 

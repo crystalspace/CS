@@ -66,7 +66,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   draw_cb = NULL;
   factory = NULL;
   zbufMode = CS_ZBUF_USE;
-  render_priority = 0;
+  render_priority = csEngine::current_engine->GetObjectRenderPriority ();
 }
 
 csMeshWrapper::csMeshWrapper (csObject* theParent)
@@ -94,7 +94,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
   draw_cb = NULL;
   factory = NULL;
   zbufMode = CS_ZBUF_USE;
-  render_priority = 0;
+  render_priority = csEngine::current_engine->GetObjectRenderPriority ();
 }
 
 void csMeshWrapper::SetMeshObject (iMeshObject* mesh)
@@ -114,56 +114,8 @@ csMeshWrapper::~csMeshWrapper ()
   }
 }
 
-void csMeshWrapper::UpdateInPolygonTrees ()
-{
-return; //@@@@@@@@@@@@@@@@@@@@@@
-#if 0
-  bbox.RemoveFromTree ();
-
-  // If we are not in a sector which has a polygon tree
-  // then we don't really update. We should consider if this is
-  // a good idea. Do we only want this object updated when we
-  // want to use it in a polygon tree? It is certainly more
-  // efficient to do it this way when the object is currently
-  // moving in normal convex sectors.
-  int i;
-  csPolygonTree* tree = NULL;
-  csVector& sects = movable.GetSectors ();
-  for (i = 0 ; i < sects.Length () ; i++)
-  {
-    csThing* stat = ((csSector*)sects[i])->GetStaticThing ();
-    if (stat) { tree = stat->GetStaticTree (); break; }
-  }
-  if (!tree) return;
-
-  csBox3 b;
-  mesh->GetObjectBoundingBox (b);
-
-  // This transform should be part of the object class and not just calculated
-  // every time we need it. @@@!!!
-  csTransform trans = movable.GetFullTransform ().GetInverse ();
-
-  bbox.Update (b, trans, this);
-
-  // Here we need to insert in trees where this mesh lives.
-  for (i = 0 ; i < sects.Length () ; i++)
-  {
-    csThing* stat = ((csSector*)sects[i])->GetStaticThing ();
-    if (stat)
-    {
-      tree = stat->GetStaticTree ();
-      // Temporarily increase reference to prevent free.
-      bbox.GetBaseStub ()->IncRef ();
-      tree->AddObject (&bbox);
-      bbox.GetBaseStub ()->DecRef ();
-    }
-  }
-#endif
-}
-
 void csMeshWrapper::UpdateMove ()
 {
-  UpdateInPolygonTrees ();
   int i;
   for (i = 0 ; i < children.Length () ; i++)
   {

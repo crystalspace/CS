@@ -1013,6 +1013,14 @@ public:
   void RegisterRenderPriority (const char* name, long priority);
   /// Get a render priority by name.
   long GetRenderPriority (const char* name);
+  /// Get the render priority for sky objects (attached to 'sky' name).
+  long GetSkyRenderPriority () { return render_priority_sky; }
+  /// Get the render priority for wall objects (attached to 'wall' name).
+  long GetWallRenderPriority () { return render_priority_wall; }
+  /// Get the render priority for general objects (attached to 'object' name).
+  long GetObjectRenderPriority () { return render_priority_object; }
+  /// Get the render priority for alpha objects (attached to 'alpha' name).
+  long GetAlphaRenderPriority () { return render_priority_alpha; }
   /// Clear all render priorities.
   void ClearRenderPriorities ();
 

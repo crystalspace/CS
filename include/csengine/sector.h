@@ -61,6 +61,11 @@ private:
    * of type csMeshWrapper*.
    */
   csVector meshes;
+  /**
+   * The same meshes above but each mesh in their own render priority
+   * queue. This is a vector of vectors.
+   */
+  csVector mesh_priority_queues;
 
   /**
    * List of collections in this sector.

@@ -87,8 +87,16 @@ csSector::~csSector ()
 {
   // Meshes and collections are not deleted by the calls below. They
   // belong to csEngine.
-  meshes.DeleteAll ();
   collections.DeleteAll ();
+  meshes.DeleteAll ();
+  int i;
+  for (i = 0 ; i < mesh_priority_queues.Length () ; i++)
+  {
+    csVector* m = (csVector*)mesh_priority_queues[i];
+    m->DeleteAll ();
+    delete m;
+  }
+  mesh_priority_queues.DeleteAll ();
 
   lights.DeleteAll ();
   terrains.DeleteAll ();
@@ -100,6 +108,23 @@ csSector::~csSector ()
 void csSector::AddMesh (csMeshWrapper* mesh)
 {
   meshes.Push ((csSome)mesh);
+
+  //-----
+  // Place the mesh in the right priority queue.
+  //-----
+  long pri = mesh->GetRenderPriority ();
+  int i;
+  // First initialize all uninitialized queues.
+  for (i = mesh_priority_queues.Length () ; i <= pri ; i++)
+    mesh_priority_queues[i] = NULL;
+  csVector* queue = (csVector*)mesh_priority_queues[pri];
+  if (queue == NULL)
+  {
+    queue = new csVector ();
+    mesh_priority_queues[pri] = queue;
+  }
+  queue->Push ((csSome)mesh);
+
   if (culler)
   {
     iVisibilityObject* vo = QUERY_INTERFACE (mesh, iVisibilityObject);
@@ -110,7 +135,22 @@ void csSector::AddMesh (csMeshWrapper* mesh)
 
 void csSector::UnlinkMesh (csMeshWrapper* mesh)
 {
-  int idx = meshes.Find ((csSome)mesh);
+  //-----
+  // First remove the mesh from the right priority queue.
+  //-----
+  long pri = mesh->GetRenderPriority ();
+  int i, idx;
+  // First initialize all uninitialized queues.
+  for (i = mesh_priority_queues.Length () ; i <= pri ; i++)
+    mesh_priority_queues[i] = NULL;
+  csVector* queue = (csVector*)mesh_priority_queues[pri];
+  if (queue != NULL)
+  {
+    idx = queue->Find ((csSome)mesh);
+    queue->Delete (idx);
+  }
+
+  idx = meshes.Find ((csSome)mesh);
   if (idx != -1)
   {
     meshes.Delete (idx);
@@ -247,6 +287,10 @@ void csSector::UseCuller (const char* meshname)
   {
     csMeshWrapper* th = (csMeshWrapper*)meshes[i];
     th->GetMovable ().UpdateMove ();
+
+    iVisibilityObject* vo = QUERY_INTERFACE (th, iVisibilityObject);
+    vo->DecRef ();
+    culler->RegisterVisObject (vo);
   }
   
   CsPrintf (MSG_INITIALIZATION, "DONE!\n");
@@ -658,7 +702,7 @@ int compare_z_thing (const void* p1, const void* p2)
 void csSector::Draw (iRenderView* rview)
 {
   draw_busy++;
-  int i;
+  int i, j;
   iCamera* icam = rview->GetCamera ();
   rview->SetThisSector (&scfiSector);
 
@@ -692,14 +736,6 @@ void csSector::Draw (iRenderView* rview)
     }
   }
 
-  // First draw all 'sky' things using Z-fill.
-  //@@@ Support using render order
-  //for (i = 0 ; i < skies.Length () ; i++)
-  //{
-    //csThing* th = (csThing*)skies[i];
-    //th->Draw (rview, &th->GetMovable ().scfiMovable, th->GetZBufMode ());
-  //}
-
   // In some cases this queue will be filled with all visible
   // meshes.
   csMeshWrapper** mesh_queue = NULL;
@@ -723,10 +759,15 @@ void csSector::Draw (iRenderView* rview)
 	// @@@ Avoid memory allocation?
 	mesh_queue = new csMeshWrapper* [meshes.Length ()];
 	num_mesh_queue = 0;
-        for (i = 0 ; i < meshes.Length () ; i++)
+        for (i = 0 ; i < mesh_priority_queues.Length () ; i++)
         {
-          csMeshWrapper* sp = (csMeshWrapper*)meshes[i];
-	  if (sp->IsVisible ()) mesh_queue[num_mesh_queue++] = sp;
+	  csVector* v = (csVector*)mesh_priority_queues[i];
+	  if (v)
+	    for (j = 0 ; j < v->Length () ; j++)
+	    {
+              csMeshWrapper* sp = (csMeshWrapper*)(*v)[j];
+	      if (sp->IsVisible ()) mesh_queue[num_mesh_queue++] = sp;
+	    }
 	}
       }
     }
@@ -738,10 +779,6 @@ void csSector::Draw (iRenderView* rview)
     }
   }
 
-  // If we have a static thing we draw it here.
-  // @@@ Generalize using render order mechanism!!!
-  if (culler_mesh) culler_mesh->Draw (rview);
-
   // If the queues are not used for things we still fill the queue here
   // just to make the code below easier.
   if (!use_object_queue)
@@ -750,10 +787,15 @@ void csSector::Draw (iRenderView* rview)
     if (meshes.Length ())
     {
       mesh_queue = new csMeshWrapper* [meshes.Length ()];
-      for (i = 0 ; i < meshes.Length () ; i++)
+      for (i = 0 ; i < mesh_priority_queues.Length () ; i++)
       {
-        csMeshWrapper* th = (csMeshWrapper*)meshes[i];
-        mesh_queue[num_mesh_queue++] = th;
+        csVector* v = (csVector*)mesh_priority_queues[i];
+	if (v)
+	  for (j = 0 ; j < v->Length () ; j++)
+	  {
+            csMeshWrapper* sp = (csMeshWrapper*)(*v)[j];
+            mesh_queue[num_mesh_queue++] = sp;
+	  }
       }
     }
     else
@@ -781,7 +823,6 @@ void csSector::Draw (iRenderView* rview)
   if (rview->AddedFogInfo ())
     rview->GetFirstFogInfo ()->has_outgoing_plane = false;
 
-  //if (culler_mesh) culler_mesh->Draw (rview);
   for (i = 0 ; i < spr_num ; i++)
   {
     csMeshWrapper* sp;
