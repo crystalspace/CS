@@ -27,7 +27,7 @@
 #include "gl_txtcache.h"
 #include "gl_txtmgr.h"
 #include "video/canvas/openglcommon/glextmanager.h"
-#include "GL/glu.h"
+#include <GL/glu.h>
 
 
 // need definitions of R24(), G24(), and B24()
@@ -395,4 +395,3 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
     }
   }
 }
-

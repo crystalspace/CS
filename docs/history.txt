@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+31-Aug-2003
+        - Philip Wyett changed #include "GL/gluh" to <GL/gluh>, in the new
+          GL render gl_txtcache.cpp, eliminating the warning messages within
+          the make build system.
 30-Aug-2003
 	- Old_Belge added the morph target support to sprcal3d.
 	- Eric Sunshine augmented configure.ac so that it emits the appropriate
