@@ -41,9 +41,9 @@ csNetworkDriverSockets::csNetworkDriverSockets(ISystem* piSystem)
 
 	for(short i = 0; i < CS_NET_MAX_SOCKETS; i++)
 	{
-		SocketListening[CS_NET_MAX_SOCKETS] = false;
-		SocketConnected[CS_NET_MAX_SOCKETS] = false;
-		SocketInitialized[CS_NET_MAX_SOCKETS] = false;
+		SocketListening[i] = false;
+		SocketConnected[i] = false;
+		SocketInitialized[i] = false;
 	}
 }
 
@@ -66,6 +66,16 @@ void csNetworkDriverSockets::SysPrintf(int mode, char* szMsg, ...)
 STDMETHODIMP csNetworkDriverSockets::Open()
 {
 	SysPrintf(MSG_INITIALIZATION, "\nNetwork driver stuff:\n");
+
+	SocksReady = false;
+	dwLastError = 0;
+
+	for(short i = 0; i < CS_NET_MAX_SOCKETS; i++)
+	{
+		SocketListening[CS_NET_MAX_SOCKETS] = false;
+		SocketConnected[CS_NET_MAX_SOCKETS] = false;
+		SocketInitialized[CS_NET_MAX_SOCKETS] = false;
+	}
 
 	if (InitSocks() == S_OK) SysPrintf(MSG_INITIALIZATION, "Network driver initialisation finished\n");
 	else SysPrintf(MSG_INITIALIZATION, "Network driver initialisation failed!\n");
@@ -218,7 +228,7 @@ STDMETHODIMP csNetworkDriverSockets::Receive(DWORD dwID, DWORD *lpdwBytesToRecei
 	}
 
 #if !defined(NO_SOCKETS_SUPPORT)
-	if(!(*lpdwBytesToReceive = recv(Socket[dwID], lpDataBuffer, sizeof(lpDataBuffer), 0))) return S_OK;
+	if((*lpdwBytesToReceive = recv(Socket[dwID], lpDataBuffer, sizeof(lpDataBuffer), 0)) != -1) return S_OK;
 #else
 	return S_OK;
 #endif
@@ -303,13 +313,13 @@ STDMETHODIMP csNetworkDriverSockets::SetListenState(DWORD dwID, CS_NET_LISTENPAR
 	LocalAddress.sin_addr.s_addr = INADDR_ANY;
 	LocalAddress.sin_port = htons(LocalPort);
 
-	if(!bind(Socket[dwID], (struct sockaddr*)&LocalAddress, sizeof(LocalAddress)))
+	if(bind(Socket[dwID], (struct sockaddr*)&LocalAddress, sizeof(LocalAddress)) != 0)
 	{
 		dwLastError = CS_NET_DRV_ERR_CANNOT_BIND;
 		return S_FALSE;
 	}
 
-	if(!listen(Socket[dwID], CS_NET_LISTEN_QUEUE_SIZE))
+	if(listen(Socket[dwID], CS_NET_LISTEN_QUEUE_SIZE) != 0)
 	{
 		dwLastError = CS_NET_DRV_ERR_CANNOT_LISTEN;
 		return S_FALSE;
@@ -331,7 +341,7 @@ STDMETHODIMP csNetworkDriverSockets::Spawn(DWORD *lpdwID /*out*/, DWORD dwType)
 		return S_FALSE;
 	}
 
-	short i = 0;
+	unsigned short i = 0;
 
 	while(SocketInitialized[i])
 	{
@@ -359,9 +369,27 @@ STDMETHODIMP csNetworkDriverSockets::Spawn(DWORD *lpdwID /*out*/, DWORD dwType)
 		return S_FALSE;
 	}
 
+	unsigned long ttt = 1;
+
+	#if defined(OS_WIN32)
+	if(ioctlsocket(Socket[i], FIONBIO, &ttt))
+	{
+		dwLastError = CS_NET_DRV_ERR_CANNOT_SET_PARAMS;
+		return S_FALSE;
+	}
+	#else
+	if(ioctl(Socket[i], FIONBIO, &ttt))
+	{
+		dwLastError = CS_NET_DRV_ERR_CANNOT_SET_PARAMS;
+		return S_FALSE;
+	}
+	#endif
+
 #endif
 
 	SocketInitialized[i] = true;
+	SocketListening[i] = false;
+	SocketConnected[i] = false;
 
 	*lpdwID = i;
 
@@ -431,9 +459,7 @@ STDMETHODIMP csNetworkDriverSockets::KillAll()
 	return hResult;
 }
 
-STDMETHODIMP csNetworkDriverSockets::Accept(DWORD dwLID/*listening socket*/, 
-                                            DWORD *lpdwID/*server socket*/, 
-                                            CS_NET_ADDRESS* /*lpCSNetAddress*//*out*/)
+STDMETHODIMP csNetworkDriverSockets::Accept(DWORD dwLID/*listening socket*/, DWORD *lpdwID/*server socket*/, CS_NET_ADDRESS *lpCSNetAddress/*out*/)
 {
 	if(!SocksReady)
 	{
@@ -466,17 +492,36 @@ STDMETHODIMP csNetworkDriverSockets::Accept(DWORD dwLID/*listening socket*/,
 
 #if !defined(NO_SOCKETS_SUPPORT)
 	sockaddr VisitorAddress;
-	int AddressLen;
+	int AddressLen = sizeof(sockaddr);
 
 	Socket[*lpdwID] = accept(Socket[dwLID], &VisitorAddress, &AddressLen);
+
 	if(Socket[*lpdwID] == CS_NET_INVALID_SOCKET)
 	{
 		dwLastError = CS_NET_DRV_ERR_CANNOT_ACCEPT;
 		return S_FALSE;
 	}
+
+	unsigned long ttt = 1;
+
+	#if defined(OS_WIN32)
+	if(ioctlsocket(Socket[*lpdwID], FIONBIO, &ttt))
+	{
+		dwLastError = CS_NET_DRV_ERR_CANNOT_SET_PARAMS;
+		return S_FALSE;
+	}
+	#else
+	if(ioctl(Socket[*lpdwID], FIONBIO, &ttt))
+	{
+		dwLastError = CS_NET_DRV_ERR_CANNOT_SET_PARAMS;
+		return S_FALSE;
+	}
+	#endif
+
 #endif
 
 	SocketConnected[*lpdwID] = true;
+	SocketInitialized[*lpdwID] = true;
 	return S_OK;
 }
 
