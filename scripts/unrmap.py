@@ -61,7 +61,7 @@ class Brush(Actor):
 		if not self.attrib.has_key('CsgOper'):
 			poly=room.NewPolygon(tm)
 		elif self.attrib['CsgOper']=='CSG_Add':
-			ptr=scf.CreateInstance('crystalclear.entitymanager.standard', 
+			ptr=scf.scfCreateInstance('crystalclear.entitymanager.standard', 
 				'iEntityManager', MakeVersion(0,0,1))
 			if ptr=="NULL":
 				print "SCF is broken!"

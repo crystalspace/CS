@@ -17,8 +17,8 @@ class iSCFPtr(iBasePtr):
     def __init__(self,this):
         self.this = this
         self.thisown = 0
-    def CreateInstance(self,arg0,arg1,arg2):
-        val = cspacec.iSCF_CreateInstance(self.this,arg0,arg1,arg2)
+    def scfCreateInstance(self,arg0,arg1,arg2):
+        val = cspacec.iSCF_scfCreateInstance(self.this,arg0,arg1,arg2)
         return val
     def __repr__(self):
         return "<C iSCF instance>"
