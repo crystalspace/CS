@@ -343,7 +343,7 @@ void csGraphics2DGLCommon::setGLColorfromint (int color)
 
 csGLScreenShot* csGraphics2DGLCommon::GetScreenShot ()
 {
-  csGLScreenShot* res = 0;
+  csGLScreenShot* res;
   if (ssPool)
   {
     res = ssPool;
