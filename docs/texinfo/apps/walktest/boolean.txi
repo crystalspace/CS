@@ -168,9 +168,6 @@ that the level needs to be prepared for this (octree needs to be added using
 @samp{STATBSP} command).  Enabling the coverage mask tree disables the
 c-buffer automatically.
 
-@item solidbsp
-Toggle solidbsp rendering on/off. This is experimental for now.
-
 @item sprlight
 Change quality setting of sprite lighting.  If yes every vertex will be lit
 according to the correct distance with the light.  If no then the distances
