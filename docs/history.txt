@@ -1,5 +1,14 @@
 The history order is reversed so that new features are at the top.
 
+5-Apr-2002
+	- Andon M. Coleman patched 3ds2lev so it works correctly for
+	  non-texture mapped 3DS objects.
+4-Apr-2002
+	- Cleaned up lots of engine/csgeom comments.
+	- Removed lots of exit() calls from all over CS. A module in CS
+	  should almost never do exit but instead return an appropriate
+	  error to the caller (using the reporter and a return code for
+	  example).
 3-Apr-2002
 	- Added a texture-less material (green_color) to flarge so that
 	  we can easily see if this still works or not. The skeletal
@@ -10,11 +19,6 @@ The history order is reversed so that new features are at the top.
 	- 'res' fixed a bug in the OpenGL renderer where sometimes
 	  textures where multiplied with texture mean color. This caused
 	  color seams.
-	- Cleaned up lots of engine/csgeom comments.
-	- Removed lots of exit() calls from all over CS. A module in CS
-	  should almost never do exit but instead return an appropriate
-	  error to the caller (using the reporter and a return code for
-	  example).
 2-Apr-2002
 	- Eric Sunshine fixed a problem which caused a host of HTML pages in
 	  the user manual to be blank.  The culprit was a missing closing brace

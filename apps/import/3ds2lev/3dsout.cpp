@@ -265,13 +265,18 @@ void CSWriter::WriteVertices (Lib3dsMesh* mesh)
     for (unsigned int vn = 0; vn < mesh->points; vn++)
     {
       float *xyz = mesh->pointL[vn].pos;
-      Lib3dsTexel* texel = &mesh->texelL[vn];
-      float u = 0, v = 0;
+      float u, v;
 
-      if (texel)
+      // Don't assume every vertex has a texel!
+      if (vn < mesh->texels)
       {
-	u = texel[0][0];
-	v = texel[0][1];
+        const Lib3dsTexel& texel = mesh->texelL[vn];
+	u = texel[0];
+	v = texel[1];
+      }
+      else
+      {
+        u = v = 0;
       }
 
       Write ("V(%g,%g,%g:", 

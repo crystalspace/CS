@@ -23,6 +23,12 @@ specific implementation issues.  Jorrit's home address is Schoonstraat 11,
 3020 Veltem Beisem, @sc{belgium}.
 
 @item
+Andon M. Coleman
+
+Andon patched 3ds2lev so it works correctly for
+non-texture mapped 3DS objects.
+
+@item
 Murat Demircioglu (@email{demircio@@boun.edu.tr})
 
 Murat was the first contributor for Crystal Space.  He provided the first
