@@ -29,27 +29,38 @@
 
 csWin32CustomCursors::~csWin32CustomCursors ()
 {
-  csHash<HCURSOR, csStrKey, csConstCharHashKeyHandler>::GlobalIterator it =
+  csHash<CachedCursor, csStrKey, csConstCharHashKeyHandler>::GlobalIterator it =
     cachedCursors.GetIterator();
 
   while (it.HasNext())
   {
-    HCURSOR cur = it.Next();
-    DestroyCursor (cur);
+    CachedCursor cur = it.Next();
+    if (cur.destroyAsIcon)
+      DestroyIcon (cur.cursor);
+    else
+      DestroyCursor (cur.cursor);
+  }
+  for (size_t i = 0; i < blindCursors.Length(); i++)
+  {
+    CachedCursor& cur = blindCursors[i];
+    if (cur.destroyAsIcon)
+      DestroyIcon (cur.cursor);
+    else
+      DestroyCursor (cur.cursor);
   }
 }
 
-HCURSOR csWin32CustomCursors::CreateMonoCursor (iImage* image, 
-						const csRGBcolor* keycolor,
-						int hotspot_x, int hotspot_y)
+csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateMonoCursor (
+  iImage* image, const csRGBcolor* keycolor, int hotspot_x, int hotspot_y)
 {
   HCURSOR cursor;
 
   uint8* ANDmask;
   uint8* XORmask;
-  if (!csCursorConverter::ConvertTo1bpp (image, XORmask, ANDmask, csRGBcolor (255, 255, 255),
-    csRGBcolor (0, 0, 0), keycolor)) // @@@ Force color to black & white for now
-    return false;
+  if (!csCursorConverter::ConvertTo1bpp (image, XORmask, ANDmask, 
+    csRGBcolor (255, 255, 255), csRGBcolor (0, 0, 0), keycolor)) 
+    // @@@ Force color to black & white for now
+    return CachedCursor ();
 
   // Need to invert AND mask
   {
@@ -66,7 +77,7 @@ HCURSOR csWin32CustomCursors::CreateMonoCursor (iImage* image,
   delete[] ANDmask;
   delete[] XORmask;
 
-  return cursor;
+  return CachedCursor (cursor, false);
 }
 
 HCURSOR csWin32CustomCursors::GetMouseCursor (iImage* image, 
@@ -74,28 +85,30 @@ HCURSOR csWin32CustomCursors::GetMouseCursor (iImage* image,
 					      int hotspot_x, int hotspot_y, 
 					      csRGBcolor fg, csRGBcolor bg)
 {
-  HCURSOR cursor;
+  CachedCursor cursor;
   const char* cacheName = image->GetName();
   if (cacheName != 0)
   {
-    cursor = cachedCursors.Get (cacheName, 0);
-    if (cursor != 0)
-      return cursor;
+    cursor = cachedCursors.Get (cacheName, CachedCursor ());
+    if (cursor.cursor != 0)
+      return cursor.cursor;
   }
 
   cursor = CreateCursor (image, keycolor, hotspot_x, hotspot_y);
   //cursor = CreateMonoCursor (image, keycolor, hotspot_x, hotspot_y);
 
-  if ((cursor != 0) && (cacheName != 0))
+  if (cursor.cursor != 0)
   {
-    cachedCursors.Put (cacheName, cursor);
+    if (cacheName != 0)
+      cachedCursors.Put (cacheName, cursor);
+    else
+      blindCursors.Push (cursor);
   }
-  return cursor;
+  return cursor.cursor;
 }
 
-HCURSOR csWin32CustomCursors::CreateCursor(iImage* image,
-					   const csRGBcolor* keycolor, 
-					   int hotspot_x, int hotspot_y)
+csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
+  iImage* image, const csRGBcolor* keycolor,  int hotspot_x, int hotspot_y)
 {
   cswinWindowsVersion ver;
   cswinIsWinNT (&ver);
@@ -119,7 +132,7 @@ HCURSOR csWin32CustomCursors::CreateCursor(iImage* image,
   if (doPaletted)
   {
     if (!csCursorConverter::ConvertTo8bpp (image, pixels, palette, keycolor))
-      return 0;
+      return CachedCursor ();
   }
   else
   {
@@ -266,5 +279,5 @@ HCURSOR csWin32CustomCursors::CreateCursor(iImage* image,
   delete[] pixelsRGB;
   delete[] maskRGB;
 
-  return hCursor;
+  return CachedCursor (hCursor, true);
 }

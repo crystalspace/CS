@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-Oct-2004
+	- res improved the Win32 custom cursor cleanup a bit.
+	- res fixed a crash in the software sound renderer source, where a 
+	  member variable was written after the instance was possibly 
+	  destroyed.
+	- res fixed a wrong ref counting in the waveout sound driver.
+	- res fixed the '*' appearing on the API doc front page. (Apparently,
+	  doxygen doesn't remove the '*'s at the beginning in \htmlonly 
+	  blocks.)
 29-Oct-2004
 	- Rhad changed the software renderer to account for the OSS driver
 	  blocking for long periods on calls to UnlockMemory().

@@ -30,19 +30,19 @@
  * The Crystal Space home page is at: http://crystal.sourceforge.net/
  *
  * \htmlonly
- * The API reference consists of the following sections:
- *
- * <ul>
- * <li><a href="classes.html">Alphabetical List</a></li>
- * <li><a href="hierarchy.html">Class Hierarchy</a></li>
- * <li><a href="annotated.html">Compound List</a></li>
- * <li><a href="functions.html">Compound Members</a></li>
- * <li><a href="files.html">File List</a></li>
- * <li><a href="globals.html">File Members</a></li>
- * <li><a href="modules.html">Module List</a></li>
- * <li><a href="pages.html">Related Pages</a></li>
- * </ul>
- * \endhtmlonly
+ The API reference consists of the following sections:
+ 
+ <ul>
+ <li><a href="classes.html">Alphabetical List</a></li>
+ <li><a href="hierarchy.html">Class Hierarchy</a></li>
+ <li><a href="annotated.html">Compound List</a></li>
+ <li><a href="functions.html">Compound Members</a></li>
+ <li><a href="files.html">File List</a></li>
+ <li><a href="globals.html">File Members</a></li>
+ <li><a href="modules.html">Module List</a></li>
+ <li><a href="pages.html">Related Pages</a></li>
+ </ul>
+ \endhtmlonly
  */
 
 /*

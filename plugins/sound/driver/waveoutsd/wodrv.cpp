@@ -113,14 +113,8 @@ void csSoundDriverWaveOut::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
-  if (rep)
-    rep->ReportV (severity, "crystalspace.sound.driver.waveout", msg, arg);
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-  }
+  csReportV (object_reg, severity, "crystalspace.sound.driver.waveout", msg, 
+    arg);
   va_end (arg);
 }
 
@@ -189,7 +183,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency,
   }
 
   // Start the background thread
-  bgThread=new BackgroundThread (this);
+  bgThread.AttachNew (new BackgroundThread (this));
   csbgThread=csThread::Create (bgThread);
   csbgThread->Start();
 
@@ -216,6 +210,7 @@ void csSoundDriverWaveOut::Close()
   // Wait a bit for it to shut down nicely.
   while (bgThread->IsRunning() && wait_timer++<120000)
     csSleep(0);
+  //csbgThread->Wait ();
 
   // Clear out the EmptyBlocks queue
   EnterCriticalSection(&critsec_EmptyBlocks);
@@ -231,8 +226,8 @@ void csSoundDriverWaveOut::Close()
   DeleteCriticalSection(&critsec_EmptyBlocks);
   CloseHandle(hevent_EmptyBlocksReady);
 
-  delete AllocatedBlocks;
-  AllocatedBlocks=NULL;
+  delete[] AllocatedBlocks;
+  AllocatedBlocks = 0;
 
  
   if (SoundRender)

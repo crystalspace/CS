@@ -73,8 +73,9 @@ void csSoundSourceSoftware::Stop()
 {
   if (Active)
   {
-    SoundRender->RemoveSource(this);
     Active=false;
+    SoundRender->RemoveSource (this); /* Must be last statement, as it may 
+					 cause destruction of this instance! */
   }
 }
 

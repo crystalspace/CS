@@ -26,9 +26,22 @@
 
 class csWin32CustomCursors
 {
-  csHash<HCURSOR, csStrKey, csConstCharHashKeyHandler> cachedCursors;
+  struct CachedCursor
+  {
+    HCURSOR cursor;
+    bool destroyAsIcon;
 
-  HCURSOR CreateMonoCursor (iImage* image, const csRGBcolor* keycolor, 
+    CachedCursor ()
+    {
+      cursor = 0;
+      destroyAsIcon = false;
+    }
+    CachedCursor (HCURSOR h, bool b) : cursor (h), destroyAsIcon (b) {}
+  };
+  csHash<CachedCursor, csStrKey, csConstCharHashKeyHandler> cachedCursors;
+  csArray<CachedCursor> blindCursors;
+
+  CachedCursor CreateMonoCursor (iImage* image, const csRGBcolor* keycolor, 
     int hotspot_x, int hotspot_y);
 public:
   ~csWin32CustomCursors ();
@@ -37,7 +50,7 @@ public:
     int hotspot_x, int hotspot_y, csRGBcolor fg, csRGBcolor bg);
 private:
 
-  HCURSOR CreateCursor (iImage* image, const csRGBcolor* keycolor,
+  CachedCursor CreateCursor (iImage* image, const csRGBcolor* keycolor,
     int hotspot_x, int hotspot_y);
 };
 

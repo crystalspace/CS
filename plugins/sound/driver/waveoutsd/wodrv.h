@@ -130,9 +130,19 @@ protected:
   public:
     BackgroundThread (csSoundDriverWaveOut *driver): parent_driver(driver), count(1), running(false), request_stop(false) {}
     virtual ~BackgroundThread () {}
-    virtual void IncRef () {count++;}
+    virtual void IncRef () 
+    {
+      count++;
+    }
     // If the thread is still running and we're going to delete this object, we are in for a crash
-    virtual void DecRef () {if (--count == 0) { CS_ASSERT(running); delete this; } }
+    virtual void DecRef () 
+    {
+      if (--count == 0) 
+      { 
+	CS_ASSERT (!running); 
+	delete this; 
+      } 
+    }
     virtual int GetRefCount () { return count; }
     /// For the situations in which this will be used, the lack of a mutex is OK
     virtual void RequestStop () { request_stop=true; }
