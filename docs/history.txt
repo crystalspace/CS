@@ -11,6 +11,15 @@ chronological order.
 	  Although it gives good results it also causes irregularities
 	  in the CD mesh so I will not do it like that. We need a real
 	  triangle reduction system.
+	- Rhad fixed a race condition in the software renderer that
+	  could result in crashes in vorbis.dll.
+	- Rhad changed the default sound handle Play() member function
+	  so that it always returns an iSoundSource - even if the sound
+	  isn't looping.
+	- Rhad made the default sound handle Play member function ignore
+	  the looping parameter when working with a streaming audio
+	  source since it's the handle that loops and not the attached
+	  source.
 9-Oct-2004
 	- Luca fixed a little compilation error (in protomesh) that was 
 	  happening on the VisualC++ 6.0 "compiler".
