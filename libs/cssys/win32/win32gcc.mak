@@ -73,11 +73,6 @@ LIBS.CSLUA.SYSTEM=$(LFLAGS.l)lua $(LFLAGS.l)lualib
 # Freetype library
 LIBS.FREETYPE.SYSTEM=$(LFLAGS.l)ttf
 
-# Indicate where special include files can be found.
-# for instance where your dx includes are
-CFLAGS.INCLUDE=$(CFLAGS.I)/usr/include/directx 
-#	$(CFLAGS.I)/dx7asdk/dxf/include
-
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=$(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS) -pipe
 
