@@ -55288,13 +55288,13 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_declare_deprecated="__attribute__((deprecated))"
 else
-  cs_cv_prog_cxx_declare_deprecated=''
+  cs_cv_prog_cxx_declare_deprecated='no'
 fi
 
 fi
 echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_declare_deprecated" >&5
 echo "${ECHO_T}$cs_cv_prog_cxx_declare_deprecated" >&6
-if test -n "$cs_cv_prog_cxx_declare_deprecated"; then
+if test "$cs_cv_prog_cxx_declare_deprecated" != no; then
   cs_header_text="${cs_header_text}#define CS_DEPRECATED_METHOD $cs_cv_prog_cxx_declare_deprecated
 "
     cs_header_text="${cs_header_text}#define CS_DEPRECATED_TYPE $cs_cv_prog_cxx_declare_deprecated

@@ -2124,8 +2124,9 @@ AC_CACHE_CHECK([how to declare deprecations],
     [CS_BUILD_IFELSE(
 	[AC_LANG_PROGRAM([cs_declare_deprecated void f();], [])], [], [C++],
 	[cs_cv_prog_cxx_declare_deprecated="cs_declare_deprecated"],
-	[cs_cv_prog_cxx_declare_deprecated=''], [], [], [], [], [deprecated])])
-AS_IF([test -n "$cs_cv_prog_cxx_declare_deprecated"],
+	[cs_cv_prog_cxx_declare_deprecated='no'], [], [], [], [],
+	[deprecated])])
+AS_IF([test "$cs_cv_prog_cxx_declare_deprecated" != no],
     [CS_HEADER_PROPERTY([CS_DEPRECATED_METHOD],
 	[$cs_cv_prog_cxx_declare_deprecated])
     CS_HEADER_PROPERTY([CS_DEPRECATED_TYPE],
