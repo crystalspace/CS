@@ -23,7 +23,7 @@
 
 /**
  * Several types of messages.
- * The type of message is indicated when you call iSystem::Print.
+ * The type of message is indicated when you call iSystem::Printf().
  * Depending on message type, the message will be put into debug log,
  * will be output to the console and so on.
  */
