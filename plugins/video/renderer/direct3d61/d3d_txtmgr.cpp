@@ -35,7 +35,8 @@
 
 csTextureDirect3D::csTextureDirect3D (csTextureMM*             Parent, 
                                       iImage*                  Image,
-                                      csGraphics3DDirect3DDx6* iG3D) 
+                                      csGraphics3DDirect3DDx6* iG3D,
+                                      bool                     For2d) 
   : csTexture (Parent)
 {
   w = Image->GetWidth ();
@@ -43,12 +44,12 @@ csTextureDirect3D::csTextureDirect3D (csTextureMM*             Parent,
   compute_masks ();
 
   // Convert the texture to the screen-dependent format
-  int rsl = iG3D->TextureRsl;
-  int rsr = iG3D->TextureRsr;
-  int gsl = iG3D->TextureGsl;
-  int gsr = iG3D->TextureGsr;
-  int bsl = iG3D->TextureBsl;
-  int bsr = iG3D->TextureBsr;
+  int rsl = For2d ? iG3D->ScreenRsl : iG3D->TextureRsl;
+  int rsr = For2d ? iG3D->ScreenRsr : iG3D->TextureRsr;
+  int gsl = For2d ? iG3D->ScreenGsl : iG3D->TextureGsl;
+  int gsr = For2d ? iG3D->ScreenGsr : iG3D->TextureGsr;
+  int bsl = For2d ? iG3D->ScreenBsl : iG3D->TextureBsl;
+  int bsr = For2d ? iG3D->ScreenBsr : iG3D->TextureBsr;
 
   Image->SetFormat(CS_IMGFMT_TRUECOLOR);
   RGBPixel* pPixels   = (RGBPixel *)Image->GetImageData();
@@ -102,7 +103,13 @@ void *csTextureDirect3D::get_bitmap ()
 csTextureMMDirect3D::csTextureMMDirect3D (iImage* image, int flags,
   csGraphics3DDirect3DDx6 *iG3D) : csTextureMM (image, flags)
 {
-  G3D = iG3D;
+  G3D          = iG3D;
+  m_pTexture2d = NULL;
+
+  if (flags & CS_TEXTURE_2D)
+  {
+    m_pTexture2d = new csTextureDirect3D(this, image, iG3D, true);
+  }
 
   // Resize the image to fullfill device requirements
   int w = image->GetWidth ();
@@ -114,9 +121,14 @@ csTextureMMDirect3D::csTextureMMDirect3D (iImage* image, int flags,
   image->Rescale (w, h);
 }
 
+csTextureMMDirect3D::~csTextureMMDirect3D()
+{
+  delete m_pTexture2d;
+}
+
 csTexture *csTextureMMDirect3D::new_texture (iImage *Image)
 {
-  return new csTextureDirect3D (this, Image, G3D);
+  return new csTextureDirect3D (this, Image, G3D, false);
 }
 
 void csTextureMMDirect3D::compute_mean_color ()
@@ -134,6 +146,23 @@ void csTextureMMDirect3D::compute_mean_color ()
   mean_color.red   = r / pixels;
   mean_color.green = g / pixels;
   mean_color.blue  = b / pixels;
+}
+
+void* csTextureMMDirect3D::GetMipMapData(int mm)
+{
+  if (mm==-2)
+  {
+    if (m_pTexture2d)
+    {
+      return m_pTexture2d->get_bitmap();
+    }
+    else
+    {
+      return NULL;
+    }
+  }
+
+  return csTextureMM::GetMipMapData(mm);
 }
 
 //---------------------------------------------------------------------------

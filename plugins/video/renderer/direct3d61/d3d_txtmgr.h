@@ -24,6 +24,7 @@
 #include "itexture.h"
 
 class csGraphics3DDirect3DDx6;
+class csTextureDirect3D;
 struct iImage;
 
 /**
@@ -31,16 +32,24 @@ struct iImage;
  */
 class csTextureMMDirect3D : public csTextureMM
 {
+  csTextureDirect3D* m_pTexture2d;
+
 public:
   /// A pointer to the 3D driver object
   csGraphics3DDirect3DDx6 *G3D;
 
   /// Initialize the object
   csTextureMMDirect3D (iImage* image, int flags, csGraphics3DDirect3DDx6 *iG3D);
+
+  /// Delete all members
+  ~csTextureMMDirect3D();
   /// Create a new texture object
   virtual csTexture *new_texture (iImage *Image);
   /// Compute the mean color for the just-created texture
   virtual void compute_mean_color ();
+
+  /// Override GetMipMapData() to return 2d texture if (mm == -2)
+  virtual void *GetMipMapData (int mm);
 };
 
 /**
@@ -56,7 +65,7 @@ class csTextureDirect3D : public csTexture
 
 public:
   /// Create a csTexture object
-  csTextureDirect3D (csTextureMM *Parent, iImage *Image, csGraphics3DDirect3DDx6 *iG3D);
+  csTextureDirect3D (csTextureMM *Parent, iImage *Image, csGraphics3DDirect3DDx6 *iG3D, bool For2d);
   /// Destroy the texture
   virtual ~csTextureDirect3D ();
   /// Return a pointer to texture data
