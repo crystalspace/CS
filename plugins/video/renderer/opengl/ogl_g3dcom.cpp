@@ -775,7 +775,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
 
   SetGLZBufferFlags ();
 
-  if (poly.mixmode != CS_FX_COPY)
+  if (poly_alpha == 0 && poly.mixmode != CS_FX_COPY)
   {
     float alpha = 1.0f - BYTE_TO_FLOAT (poly_alpha);
     bool has_alpha = txt_handle->GetKeyColor () || txt_handle->GetAlphaMap ();
