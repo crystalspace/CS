@@ -36,10 +36,10 @@ const int awsWindow:: foTitle = 0x10;
 const int awsWindow:: foGrip = 0x20;
 const int awsWindow:: foNoDrag = 0x40;
 
-const int awsWindow:: foRoundBorder = 0x0;			// default
-const int awsWindow:: foBeveledBorder = 0x40;
-const int awsWindow:: foNoBorder = 0x80;
-const int awsWindow:: foDontCaptureMouseMove = 0x100;
+const int awsWindow:: foRoundBorder = 0x80;			// default
+const int awsWindow:: foBeveledBorder = 0x100;
+const int awsWindow:: foNoBorder = 0x200;
+const int awsWindow:: foDontCaptureMouseMove = 0x400;
 
 
 const int grip_size = 16;
