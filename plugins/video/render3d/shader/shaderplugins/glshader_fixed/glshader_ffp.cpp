@@ -126,6 +126,12 @@ bool csGLShaderFFP::Load(iDocumentNode* node)
             texlayers.Push (ml);
           }
           break;
+	case XMLTOKEN_FOG:
+	  {
+	    if (!ParseFog (child, fog))
+	      return false;
+	  }
+	  break;
         default:
 	  {
 	    switch (commonTokens.Request (value))
@@ -252,6 +258,257 @@ bool csGLShaderFFP::LoadLayer(mtexlayer* layer, iDocumentNode* node)
   return true;
 }
 
+bool csGLShaderFFP::ParseFog (iDocumentNode* node, FogInfo& fog)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes();
+
+  while(it->HasNext())
+  {
+    csRef<iDocumentNode> child = it->Next();
+    if(child->GetType() != CS_NODE_ELEMENT) continue;
+    csStringID id = tokens.Request(child->GetValue());
+    switch (id)
+    {
+      case XMLTOKEN_MODE:
+	{
+	  const char* type = child->GetContentsValue ();
+	  if (type == 0)
+	  {
+	    synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+	      CS_REPORTER_SEVERITY_WARNING,
+	      child,
+	      "Node has no contents");
+	    return false;
+	  }
+	  if (strcmp (type, "linear") == 0)
+	  {
+	    fog.mode = FogLinear;
+	  }
+	  else if (strcmp (type, "exp") == 0)
+	  {
+	    fog.mode = FogExp;
+	  }
+	  else if (strcmp (type, "exp2") == 0)
+	  {
+	    fog.mode = FogExp2;
+	  }
+	  else
+	  {
+	    synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+	      CS_REPORTER_SEVERITY_WARNING,
+	      child,
+	      "Invalid fog mode %s", type);
+	    return false;
+	  }
+	}
+	break;
+      case XMLTOKEN_DENSITY:
+	{
+	  const char* type = child->GetAttributeValue ("type");
+	  if (type == 0)
+	  {
+	    synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+	      CS_REPORTER_SEVERITY_WARNING,
+	      child,
+	      "No 'type' attribute");
+	    return false;
+	  }
+	  if (strcmp (type, "float") == 0)
+	  {
+	    float x = child->GetContentsValueAsFloat ();
+	    fog.densityVal = x;
+	  }
+	  else if (strcmp (type, "shadervar") == 0)
+	  {
+	    const char* value = child->GetContentsValue();
+	    if (!value)
+	    {
+	      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+		CS_REPORTER_SEVERITY_WARNING,
+		child,
+		"Node has no contents");
+	      return false;
+	    }
+	    fog.densityName = strings->Request (value);
+	  }
+	  else 
+	  {
+	    synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+	      CS_REPORTER_SEVERITY_WARNING,
+	      child,
+	      "Unknown type '%s'", type);
+	    return false;
+	  }
+	}
+	break;
+      case XMLTOKEN_START:
+	{
+	  const char* type = child->GetAttributeValue ("type");
+	  if (type == 0)
+	  {
+	    synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+	      CS_REPORTER_SEVERITY_WARNING,
+	      child,
+	      "No 'type' attribute");
+	    return false;
+	  }
+	  if (strcmp (type, "float") == 0)
+	  {
+	    float x = child->GetContentsValueAsFloat ();
+	    fog.startVal = x;
+	  }
+	  else if (strcmp (type, "shadervar") == 0)
+	  {
+	    const char* value = child->GetContentsValue();
+	    if (!value)
+	    {
+	      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+		CS_REPORTER_SEVERITY_WARNING,
+		child,
+		"Node has no contents");
+	      return false;
+	    }
+	    fog.startName = strings->Request (value);
+	  }
+	  else 
+	  {
+	    synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+	      CS_REPORTER_SEVERITY_WARNING,
+	      child,
+	      "Unknown type '%s'", type);
+	    return false;
+	  }
+	}
+	break;
+      case XMLTOKEN_END:
+	{
+	  const char* type = child->GetAttributeValue ("type");
+	  if (type == 0)
+	  {
+	    synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+	      CS_REPORTER_SEVERITY_WARNING,
+	      child,
+	      "No 'type' attribute");
+	    return false;
+	  }
+	  if (strcmp (type, "float") == 0)
+	  {
+	    float x = child->GetContentsValueAsFloat ();
+	    fog.endVal = x;
+	  }
+	  else if (strcmp (type, "shadervar") == 0)
+	  {
+	    const char* value = child->GetContentsValue();
+	    if (!value)
+	    {
+	      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+		CS_REPORTER_SEVERITY_WARNING,
+		child,
+		"Node has no contents");
+	      return false;
+	    }
+	    fog.endName = strings->Request (value);
+	  }
+	  else 
+	  {
+	    synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+	      CS_REPORTER_SEVERITY_WARNING,
+	      child,
+	      "Unknown type '%s'", type);
+	    return false;
+	  }
+	}
+	break;
+      case XMLTOKEN_FOGCOLOR:
+	{
+	  const char* type = child->GetAttributeValue ("type");
+	  if (type == 0)
+	  {
+	    synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+	      CS_REPORTER_SEVERITY_WARNING,
+	      child,
+	      "No 'type' attribute");
+	    return false;
+	  }
+	  if (strcmp (type, "float") == 0)
+	  {
+	    float x = child->GetContentsValueAsFloat ();
+	    fog.colorVal.Set (x, x, x, 1.0f);
+	  }
+	  else if (strcmp (type, "vector3") == 0)
+	  {
+	    float x, y, z;
+	    const char* value = child->GetContentsValue();
+	    if (!value)
+	    {
+	      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+		CS_REPORTER_SEVERITY_WARNING,
+		child,
+		"Node has no contents");
+	      return false;
+	    }
+	    if (sscanf (value, "%f,%f,%f", &x, &y, &z) != 3)
+	    {
+	      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+		CS_REPORTER_SEVERITY_WARNING,
+		child,
+		"Couldn't parse vector3 '%s'", value);
+	      return false;
+	    }
+	    fog.colorVal.Set (x, y, z, 1.0f);
+	  }
+	  else if (strcmp (type, "vector4") == 0)
+	  {
+	    float x, y, z, w;
+	    const char* value = child->GetContentsValue();
+	    if (!value)
+	    {
+	      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+		CS_REPORTER_SEVERITY_WARNING,
+		child,
+		"Node has no contents");
+	      return false;
+	    }
+	    if (sscanf (value, "%f,%f,%f,%f", &x, &y, &z, &w) != 4)
+	    {
+	      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+		CS_REPORTER_SEVERITY_WARNING,
+		child,
+		"Couldn't parse vector3 '%s'", value);
+	      return false;
+	    }
+	    fog.colorVal.Set (x, y, z, w);
+	  }
+	  else if (strcmp (type, "shadervar") == 0)
+	  {
+	    const char* value = child->GetContentsValue();
+	    if (!value)
+	    {
+	      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+		CS_REPORTER_SEVERITY_WARNING,
+		child,
+		"Node has no contents");
+	      return false;
+	    }
+	    fog.colorName = strings->Request (value);
+	  }
+	  else 
+	  {
+	    synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+	      CS_REPORTER_SEVERITY_WARNING,
+	      child,
+	      "Unknown type '%s'", type);
+	    return false;
+	  }
+	}
+	break;
+      default:
+	synsrv->ReportBadToken (child);
+        return false;
+    }
+  }
+  return true;
+}
 
 /*bool csGLShaderFFP::Prepare(iShaderPass* pass)
 {
@@ -297,6 +554,37 @@ bool csGLShaderFFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 	 and reject if such are used, but ARB_t_e_c isn't present.
      */
   }
+
+  int j;
+  if (fog.densityName != csInvalidStringID)
+    for (j=0; j < staticContexts.Length(); j++)
+    {
+      if (!fog.densityVar)
+        fog.densityVar = 
+          staticContexts[j]->GetVariable (fog.densityName);
+    }
+  if (fog.startName != csInvalidStringID)
+    for (j=0; j < staticContexts.Length(); j++)
+    {
+      if (!fog.startVar)
+        fog.startVar = 
+          staticContexts[j]->GetVariable (fog.startName);
+    }
+  if (fog.endName != csInvalidStringID)
+    for (j=0; j < staticContexts.Length(); j++)
+    {
+      if (!fog.endVar)
+        fog.endVar = 
+          staticContexts[j]->GetVariable (fog.endName);
+    }
+  if (fog.colorName != csInvalidStringID)
+    for (j=0; j < staticContexts.Length(); j++)
+    {
+      if (!fog.colorVar)
+        fog.colorVar = 
+          staticContexts[j]->GetVariable (fog.colorName);
+    }
+
 
   return true;
 }
@@ -357,8 +645,89 @@ void csGLShaderFFP::Deactivate()
 void csGLShaderFFP::SetupState (csRenderMesh *mesh, 
                                 const csShaderVarStack &stacks)
 {
+  if (fog.mode != FogOff)
+  {
+    statecache->Enable_GL_FOG ();
+
+    if (fog.densityName != csInvalidStringID)
+    {
+      if (!fog.densityVar && 
+	  fog.densityName < (csStringID)stacks.Length () && 
+	  stacks[fog.densityName].Length () > 0)
+	fog.densityVar = stacks[fog.densityName].Top ();
+
+      if (fog.densityVar)
+      {
+	fog.densityVar->GetValue (fog.densityVal);
+      }
+    }
+    if (fog.startName != csInvalidStringID)
+    {
+      if (!fog.startVar && 
+	  fog.startName < (csStringID)stacks.Length () && 
+	  stacks[fog.startName].Length () > 0)
+	fog.startVar = stacks[fog.startName].Top ();
+
+      if (fog.startVar)
+      {
+	fog.startVar->GetValue (fog.startVal);
+      }
+    }
+    if (fog.endName != csInvalidStringID)
+    {
+      if (!fog.endVar && 
+	  fog.endName < (csStringID)stacks.Length () && 
+	  stacks[fog.endName].Length () > 0)
+	fog.endVar = stacks[fog.endName].Top ();
+
+      if (fog.endVar)
+      {
+	fog.endVar->GetValue (fog.endVal);
+      }
+    }
+    if (fog.colorName != csInvalidStringID)
+    {
+      if (!fog.colorVar && 
+	  fog.colorName < (csStringID)stacks.Length () && 
+	  stacks[fog.colorName].Length () > 0)
+	fog.colorVar = stacks[fog.colorName].Top ();
+
+      if (fog.colorVar)
+      {
+	fog.colorVar->GetValue (fog.colorVal);
+      }
+    }
+    glFogfv (GL_FOG_COLOR, (float*)&fog.colorVal);
+
+    switch (fog.mode)
+    {
+      case FogLinear:
+	{
+	  glFogi (GL_FOG_MODE, GL_LINEAR);
+	  glFogf (GL_FOG_START, fog.startVal);
+	  glFogf (GL_FOG_END, fog.endVal);
+	}
+	break;
+      case FogExp:
+	{
+	  glFogi (GL_FOG_MODE, GL_EXP);
+	  glFogf (GL_FOG_DENSITY, fog.densityVal);
+	}
+	break;
+      case FogExp2:
+	{
+	  glFogi (GL_FOG_MODE, GL_EXP2);
+	  glFogf (GL_FOG_DENSITY, fog.densityVal);
+	}
+	break;
+    }
+  }
 }
 
 void csGLShaderFFP::ResetState ()
 {
+  if (fog.mode != FogOff)
+  {
+    statecache->Disable_GL_FOG ();
+  }
 }

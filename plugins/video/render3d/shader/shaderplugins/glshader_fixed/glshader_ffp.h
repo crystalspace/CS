@@ -45,21 +45,38 @@ private:
 
   bool validProgram;
 
+  enum FogMode
+  {
+    FogOff,
+    FogLinear,
+    FogExp,
+    FogExp2
+  };
+  struct FogInfo
+  {
+    FogMode mode;
+
+    float densityVal;
+    csStringID densityName;
+    csRef<csShaderVariable> densityVar;
+    float startVal;
+    csStringID startName;
+    csRef<csShaderVariable> startVar;
+    float endVal;
+    csStringID endName;
+    csRef<csShaderVariable> endVar;
+    csVector4 colorVal;
+    csStringID colorName;
+    csRef<csShaderVariable> colorVar;
+
+    FogInfo () : mode (FogOff), densityName (csInvalidStringID), 
+      startName (csInvalidStringID), endName (csInvalidStringID),
+      colorVal (0.0f), colorName (csInvalidStringID) {}
+  };
+
+  FogInfo fog;
+
   // Layers of multitexturing
-  enum COLORSOURCE
-  {
-    CS_COLORSOURCE_MESH,
-    CS_COLORSOURCE_STREAM,
-    CS_COLORSOURCE_NONE
-  };
-
-  enum TEXCOORDSOURCE
-  {
-    CS_TEXCOORDSOURCE_MESH,
-    CS_TEXCOORDSOURCE_STREAM,
-    CS_TEXCOORDSOURCE_NONE
-  };
-
   struct mtexlayer
   {
     //remember which vars to reset on deactivate
@@ -125,6 +142,7 @@ private:
   
   bool LoadLayer(mtexlayer* layer, iDocumentNode* node);
   bool LoadEnvironment(mtexlayer* layer, iDocumentNode* node);
+  bool ParseFog (iDocumentNode* node, FogInfo& fog);
 
   void BuildTokenHash();
 public:

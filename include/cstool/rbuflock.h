@@ -91,6 +91,12 @@ public:
   {
     return *(Lock() + n);
   }
+
+  /// Retrieve an item in the render buffer.
+  T& Get (int n)
+  {
+    return *(Lock() + n);
+  }
 };
 
 #endif // __CS_CSTOOL_RBUFLOCK_H__

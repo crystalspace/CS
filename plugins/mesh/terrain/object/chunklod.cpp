@@ -38,8 +38,9 @@
 #include "csgfx/rgbpixel.h"
 #include "csgfx/memimage.h"
 
-
 #include "csutil/util.h"
+
+#include "cstool/rbuflock.h"
 
 #include "chunklod.h"
 #include <limits.h>
@@ -111,6 +112,7 @@ csChunkLodTerrainFactory::csChunkLodTerrainFactory (csChunkLodTerrainType* p,
   compressed_vertex_name = strings->Request ("compressed vertices");
   texcors_name = strings->Request ("texture coordinates");
   compressed_texcors_name = strings->Request ("compressed texture coordinates");
+  texcoords_norm_name = strings->Request ("texture coordinates normalized");
   normal_name = strings->Request ("normals");
   compressed_normal_name = strings->Request ("compressed normals");
   tangent_name = strings->Request ("tangents");
@@ -616,9 +618,8 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
         texcors_buffer = pFactory->r3d->CreateRenderBuffer (
 	  sizeof (csVector2) * len, CS_BUF_STATIC, 
 	  CS_BUFCOMP_FLOAT, 2, false);
-        csVector2 *tbuf = (csVector2*)texcors_buffer->Lock (CS_BUF_LOCK_NORMAL);
-        memcpy (tbuf, &texcors[0], len * sizeof (csVector2));
-        texcors_buffer->Release ();
+	texcors_buffer->CopyToBuffer (texcors.GetArray(), 
+	  len * sizeof (csVector2));
       }	
     }
     return texcors_buffer;
@@ -626,6 +627,29 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
   else if (name == pFactory->compressed_texcors_name)
   {
     return 0;
+  }
+  else if (name == pFactory->texcoords_norm_name)
+  {
+    if (!texcoords_norm_buffer)
+    {
+      uint len = texcors.Length();
+      texcoords_norm_buffer = pFactory->r3d->CreateRenderBuffer (
+	sizeof (csVector2) * len, CS_BUF_STATIC, 
+	CS_BUFCOMP_FLOAT, 2, false);
+
+      float inv_x = 1.0f / (float)pFactory->hm_x;
+      float inv_y = 1.0f / (float)pFactory->hm_y;
+
+      csRenderBufferLock<csVector2> normalizedTexCoords (
+	texcoords_norm_buffer);
+
+      for (uint i = 0; i < len; i++)
+      {
+	normalizedTexCoords.Get (i).Set (texcors[i].x * inv_x, 
+	  texcors[i].y * inv_y); 
+      }
+    }
+    return texcoords_norm_buffer;
   }
   else if (name == pFactory->color_name) 
   {
@@ -703,6 +727,8 @@ void csChunkLodTerrainFactory::MeshTreeNode::UpdateBufferSV ()
   sv->SetValue(GetRenderBuffer(pFactory->binormal_name));
   sv = svcontext.GetVariableAdd(pFactory->texcors_name);
   sv->SetValue(GetRenderBuffer(pFactory->texcors_name));
+  sv = svcontext.GetVariableAdd(pFactory->texcoords_norm_name);
+  sv->SetValue(GetRenderBuffer(pFactory->texcoords_norm_name));
   sv = svcontext.GetVariableAdd(pFactory->color_name);
   sv->SetValue(GetRenderBuffer(pFactory->color_name));
   sv = svcontext.GetVariableAdd(pFactory->index_name);
@@ -1036,7 +1062,8 @@ bool csChunkLodTerrainObject::SetMaterialMap (const csArray<char>& data,
     new csShaderVariable (strings->Request ("texture lod distance"));
   lod_var->SetType (csShaderVariable::VECTOR3);
   lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
-  matwrap->GetMaterial()->AddVariable (lod_var);
+  matwrap->GetMaterial()->AddVariable (lod_var); 
+    // @@@ FIXME: Don't change the material, use the RM SV context
 
   for (int i = 0; i < palette.Length(); i ++) 
   {
@@ -1049,10 +1076,8 @@ bool csChunkLodTerrainObject::SetMaterialMap (const csArray<char>& data,
     {
       for (x = 0; x < w; x ++) 
       {
-        map[x + y * w].red = (data[x + y * w] == i) ? 255 : 0;
-        map[x + y * w].green = (data[x + y * w] == i) ? 255 : 0;
-        map[x + y * w].blue = (data[x + y * w] == i) ? 255 : 0;
-        map[x + y * w].alpha = (data[x + y * w] == i) ? 255 : 0;
+	int v = (data[x + y * w] == i) ? 255 : 0;
+	map[x + y * w].Set (v, v, v, v);
       }
     }
 

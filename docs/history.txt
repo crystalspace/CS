@@ -71,6 +71,11 @@ chronological order.
 	  better job of cleaning up after itself.
 	- Jorrit disabled the use of fputws for now until we find out a way
 	  to discover buggy implementations of fputws.
+	- res augmented the fixed function FP tp support GL fog.
+	- res fixed a bug where binding a vertex buffer to multiple 
+	  destinations didn't work (was only bound to the first destination).
+	- res augmented the chunklod plugin to also provide normalized tex 
+	  coords (ie go from 0 to 1 over the area of the terrain).
 13-Apr-2004
 	- Jorrit changed the PreferClipPlane default to enabled for the new
 	  renderer. Now clipping planes are enabled by default and only

@@ -309,7 +309,6 @@ void csGLShaderFVP::SetupState (
       }
     }
 
-
     var = layers[i].constcolorVarRef;
     if (!var && layers[i].constcolorvar != csInvalidStringID &&
         layers[i].constcolorvar < (csStringID)stacks.Length () && 
@@ -382,7 +381,12 @@ bool csGLShaderFVP::ParseTexMatrixOp (iDocumentNode* node,
       "No 'type' attribute");
     return false;
   }
-  if (!matrix && (strcmp (type, "vector2") == 0))
+  if (!matrix && (strcmp (type, "float") == 0))
+  {
+    float x = node->GetContentsValueAsFloat ();
+    op.vectorValue.Set (x, x, x);
+  }
+  else if (!matrix && (strcmp (type, "vector2") == 0))
   {
     float x, y;
     const char* value = node->GetContentsValue();
@@ -416,7 +420,7 @@ bool csGLShaderFVP::ParseTexMatrixOp (iDocumentNode* node,
 	"Node has no contents");
       return false;
     }
-    if (sscanf (value, "%f,%f", &x, &y, &z) != 3)
+    if (sscanf (value, "%f,%f,%f", &x, &y, &z) != 3)
     {
       synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
 	CS_REPORTER_SEVERITY_WARNING,

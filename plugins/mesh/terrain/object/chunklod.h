@@ -20,6 +20,7 @@
 #define __CS_CHUNKLOD_H__
 
 #include "csutil/cscolor.h"
+#include "csutil/garray.h"
 
 #include "csgeom/transfrm.h"
 #include "csgeom/objmodel.h"
@@ -101,7 +102,7 @@ private:
   csStringID normal_name, compressed_normal_name;
   csStringID tangent_name, compressed_tangent_name;
   csStringID binormal_name, compressed_binormal_name;
-  csStringID texcors_name, compressed_texcors_name;
+  csStringID texcors_name, compressed_texcors_name, texcoords_norm_name;
   csStringID color_name, compressed_color_name;
   csStringID index_name;
   csRef<iGraphics3D> r3d;
@@ -130,9 +131,10 @@ private:
     csArray<csVector3> binormals;
     csRef<iRenderBuffer> binormal_buffer;
     csRef<iRenderBuffer> compressed_binormal_buffer;
-    csArray<csVector2> texcors;
+    csDirtyAccessArray<csVector2> texcors;
     csRef<iRenderBuffer> texcors_buffer;
     csRef<iRenderBuffer> compressed_texcors_buffer;
+    csRef<iRenderBuffer> texcoords_norm_buffer;
     csArray<csColor> colors;
     csRef<iRenderBuffer> color_buffer;
     csRef<iRenderBuffer> compressed_color_buffer;
