@@ -409,6 +409,13 @@ void csSpriteTemplate::MergeTexels ()
     // FOR each unique texel map
     for (int map = 0; map < unique_texel_map_count; map ++)
     {
+      // IF this texel map is already in our list
+      if (texels == unique_texel_maps [map])
+      {
+        // next frame
+        unique = false;
+        break;
+      }
       // IF all texture vertices are are the same in both
       bool same = true;
       for (int v = 0; v < num_vertices; v ++)
@@ -421,8 +428,6 @@ void csSpriteTemplate::MergeTexels ()
       }
       if (same)
       {
-        unique = false;
-
         // delete this redundant texel map
         CHK (delete [] texels);
 
@@ -430,6 +435,7 @@ void csSpriteTemplate::MergeTexels ()
         ((csFrame*)frames[frame]) -> SetTexels(unique_texel_maps[map]);
 
         // next frame
+        unique = false;
         break;
       }
     }
