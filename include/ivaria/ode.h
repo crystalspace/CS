@@ -242,10 +242,11 @@ enum ODEJointType
   CS_ODE_JOINT_TYPE_AMOTOR = dJointTypeAMotor
 };
 
-
 SCF_VERSION (iODEJointState, 0, 0, 2);
 
-/// @@@ Document me.
+/**
+* General joint state. Here 
+*/
 struct iODEJointState : public iBase
 {
   virtual ODEJointType GetType() = 0;
@@ -329,5 +330,238 @@ struct iODEJointState : public iBase
   virtual void SetHinge2Axis2 (const csVector3& axis) = 0;
   virtual void SetHinge2Anchor (const csVector3& point) = 0;
 };
+
+enum ODEAMotorMode
+{
+  CS_ODE_AMOTOR_MODE_USER = dAMotorUser,
+  CS_ODE_AMOTOR_MODE_EULER = dAMotorEuler,
+};
+
+SCF_VERSION (iODEAMotorJointState, 0, 0, 1);
+
+/**
+* ODE AMotor joint. An angular motor (AMotor) allows the relative 
+* angular velocities of two bodies to be controlled. The angular 
+* velocity can be controlled on up to three axes, allowing torque 
+* motors and stops to be set for rotation about those axes. This 
+* is mainly useful in conjunction with ball joints (which do not 
+* constrain the angular degrees of freedom at all), but it can be 
+* used in any situation where angular control is needed. To use an 
+* AMotor with a ball joint, simply attach it to the same two bodies 
+* that the ball joint is attached to.   
+*/
+struct iODEAMotorJoint : public iBase
+{
+
+  /**
+   * Set the angular motor mode. The mode parameter must be one of the 
+   * following constants: CS_ODE_AMOTOR_MODE_USER (The AMotor axes and 
+   * joint angle settings are entirely controlled by the user, this is 
+   * the default mode), CS_ODE_AMOTOR_MODE_EULER ( Euler angles are 
+   * automatically computed, when this mode is initially set the current 
+   * relative orientations of the bodies will correspond to all euler 
+   * angles at zero).
+   */
+  virtual void SetAMotorMode (ODEAMotorMode mode) = 0;
+  
+  /**
+   * Get the angular motor mode. 
+   */
+  virtual ODEAMotorMode GetAMotorMode () = 0;
+
+  /**
+   * Set the number of angular axes that will be controlled by the 
+   * AMotor. The argument num can range from 0 (which effectively 
+   * deactivates the joint) to 3. This is automatically set to 3 
+   * in CS_ODE_AMOTOR_MODE_EULER mode. 
+   */
+  virtual void SetAMotorNumAxes (int axis_num) = 0;
+  
+  /**
+   * Get the number of angular axes that will be controlled by the 
+   * AMotor. 
+   */
+  virtual int GetAMotorNumAxes () = 0;
+
+  /**
+    Set AMotor axis. 
+    /param axis_num - axis number
+    /param rel_orient - ``relative orientation'' mode:
+    0: The axis is anchored to the global frame.
+    1: The axis is anchored to the first body.
+    2: The axis is anchored to the second body.
+    /param x, y, z - axis
+   */
+  virtual void SetAMotorAxis (int axis_num, int rel_orient, float x, float y, float z) = 0;
+  
+  /**
+    Set AMotor axis. 
+    /param axis_num - axis number
+    /param rel_orient - ``relative orientation'' mode:
+    0: The axis is anchored to the global frame.
+    1: The axis is anchored to the first body.
+    2: The axis is anchored to the second body. 
+   */
+  virtual void SetAMotorAxis (int axis_num, int rel_orient, const csVector3 &axis) = 0;
+
+  /**
+   * Get AMotor axis. 
+   */
+  virtual csVector3 GetAMotorAxis (int axis_num) = 0;
+
+  /**
+   * Get ``relative orientation'' mode:
+   * 0: The axis is anchored to the global frame.
+   * 1: The axis is anchored to the first body.
+   * 2: The axis is anchored to the second body. 
+   */
+  virtual int GetAMotorAxisRelOrientation (int axis_num) = 0;
+
+  /**
+   * Tell the AMotor what the current angle is along axis anum. This 
+   * function should only be called in CS_ODE_AMOTOR_MODE_USER mode, 
+   * because in this mode the AMotor has no other way of knowing the 
+   * joint angles. The angle information is needed if stops have been 
+   * set along the axis, but it is not needed for axis motors.
+   */
+  virtual void SetAMotorAngle (int axis_num, float angle) = 0;
+
+  /**
+   * Return the current angle for axis anum. In CS_ODE_AMOTOR_MODE_USER 
+   * mode this is simply the value that was set with SetAMotorAngle. In 
+   * CS_ODE_AMOTOR_MODE_EULER mode this is the corresponding euler angle.
+   */
+  virtual float GetAMotorAngle (int axis_num) = 0;
+
+  /**
+   * Return the current angle rate for axis anum. In CS_ODE_AMOTOR_MODE_USER 
+   * mode this is always zero, as not enough information is available. In 
+   * CS_ODE_AMOTOR_MODE_EULER mode this is the corresponding euler angle rate.
+   */
+  virtual float GetAMotorAngleRate (int axis_num) = 0;
+  
+  /**
+   * Attach the joint to some new bodies. If the joint is already attached, it 
+   * will be detached from the old bodies first. To attach this joint to only 
+   * one body, set body1 or body2 to zero - a zero body refers to the static 
+   * environment. Setting both bodies to zero puts the joint into "limbo", i.e. 
+   * it will have no effect on the simulation.
+   */
+  virtual void Attach (iRigidBody *body1, iRigidBody *body2) = 0;
+  
+  /// Get an attached body (valid values for body are 0 and 1)
+  virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
+};
+
+SCF_VERSION (iODEHingeJointState, 0, 0, 1);
+
+/**
+ * ODE hinge joint (contrainted translation and 1 free rotation axis).  
+ */
+struct iODEHingeJoint : public iBase
+{
+  /**
+   * Set the joint anchor point. The joint will try to keep this point
+   * on each body together. Input specified in world coordinates.
+   */
+  virtual void SetHingeAnchor (const csVector3 &pos) = 0;
+
+  /**
+   * Sets free hinge axis. 
+   */
+  virtual void SetHingeAxis (const csVector3 &axis) = 0;
+
+  /**
+   * Get the joint anchor point, in world coordinates. This returns the 
+   * point on body 1. 
+   */
+  virtual csVector3 GetHingeAnchor1 () = 0;
+
+  /**
+   * Get the joint anchor point, in world coordinates. This returns the 
+   * point on body 2. 
+   */
+  virtual csVector3 GetHingeAnchor2 () = 0;
+  
+  /**
+   * Get free hinge axis. 
+   */
+  virtual csVector3 GetHingeAxis () = 0;
+
+  /**
+   * Get the hinge angle. The nagle is measured between the two bodies.
+   * The angle will be between -pi..pi. When the hinge anchor or axis 
+   * is set, the current position of the attached bodies is examined and 
+   * that position will be the zero angle. 
+   */
+  virtual float GetHingeAngle () = 0;
+
+  /**
+   * Get the time derivative of angle value.
+   */
+  virtual float GetHingeAngleRate () = 0;
+
+  /**
+   * This value will show you how far the joint has come apart. 
+   */
+  virtual csVector3 GetAnchorError () = 0;
+
+  /**
+   * Attach the joint to some new bodies. If the joint is already attached, it 
+   * will be detached from the old bodies first. To attach this joint to only 
+   * one body, set body1 or body2 to zero - a zero body refers to the static 
+   * environment. Setting both bodies to zero puts the joint into "limbo", i.e. 
+   * it will have no effect on the simulation.
+   */
+  virtual void Attach (iRigidBody *body1, iRigidBody *body2) = 0;
+  
+  /// Get an attached body (valid values for body are 0 and 1)
+  virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
+};
+
+SCF_VERSION (iODEBallJointState, 0, 0, 1);
+
+/**
+ * ODE ball and socket joint (contrainted translation and free rotation).  
+ */
+struct iODEBallJoint : public iBase
+{
+  /**
+   * Set the joint anchor point. The joint will try to keep this point
+   * on each body together. Input specified in world coordinates.
+   */
+  virtual void SetBallAnchor (const csVector3 &pos) = 0;
+  
+  /**
+   * Get the joint anchor point, in world coordinates. This returns 
+   * the point on body 1. 
+   */
+  virtual csVector3 GetBallAnchor1 () = 0;
+  
+  /**
+   * Get the joint anchor point, in world coordinates. This returns the 
+   * point on body 2. 
+   */
+  virtual csVector3 GetBallAnchor2 () = 0;
+  
+  /**
+   * This value will show you how far the joint has come apart. 
+   */
+  virtual csVector3 GetAnchorError () = 0;
+
+   /**
+   * Attach the joint to some new bodies. If the joint is already attached, it 
+   * will be detached from the old bodies first. To attach this joint to only 
+   * one body, set body1 or body2 to zero - a zero body refers to the static 
+   * environment. Setting both bodies to zero puts the joint into "limbo", i.e. 
+   * it will have no effect on the simulation.
+   */
+  virtual void Attach (iRigidBody *body1, iRigidBody *body2) = 0;
+  
+  /// Get an attached body (valid values for body are 0 and 1)
+  virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
+};
+
+
 
 #endif // __CS_IVARIA_ODE_H__

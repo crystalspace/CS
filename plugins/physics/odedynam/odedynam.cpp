@@ -91,6 +91,17 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csODEJoint::ODEJointState)
   SCF_IMPLEMENTS_INTERFACE (iODEJointState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_IBASE (ODEBallJoint)
+  SCF_IMPLEMENTS_INTERFACE (iODEBallJoint)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_IBASE (ODEHingeJoint)
+  SCF_IMPLEMENTS_INTERFACE (iODEHingeJoint)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_IBASE (ODEAMotorJoint)
+  SCF_IMPLEMENTS_INTERFACE (iODEAMotorJoint)
+SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csODEDefaultMoveCallback)
   SCF_IMPLEMENTS_INTERFACE (iDynamicsMoveCallback)
@@ -545,6 +556,36 @@ csPtr<iJoint> csODEDynamicSystem::CreateJoint ()
   return csPtr<iJoint> (joint);
 }
 
+csPtr<iODEHingeJoint> csODEDynamicSystem::CreateHingeJoint ()
+{
+  ODEHingeJoint* joint = new ODEHingeJoint (GetWorldID());
+  return  csPtr<iODEHingeJoint> (joint);
+}
+
+csPtr<iODEAMotorJoint> csODEDynamicSystem::CreateAMotorJoint ()
+{
+  ODEAMotorJoint* joint = new ODEAMotorJoint (GetWorldID());
+  return  csPtr<iODEAMotorJoint> (joint);
+}
+
+csPtr<iODEBallJoint> csODEDynamicSystem::CreateBallJoint ()
+{
+  ODEBallJoint* joint = new ODEBallJoint (GetWorldID());
+  return  csPtr<iODEBallJoint> (joint);
+}
+
+void csODEDynamicSystem::RemoveJoint (iODEHingeJoint *joint)
+{
+  delete joint; //FIXME: should it be here? (use joints vector?)
+}
+void csODEDynamicSystem::RemoveJoint (iODEAMotorJoint *joint)
+{
+  delete joint; //FIXME: should it be here? (use joints vector?)
+}
+void csODEDynamicSystem::RemoveJoint (iODEBallJoint *joint)
+{
+  delete joint; //FIXME: should it be here? (use joints vector?)
+}
 void csODEDynamicSystem::RemoveJoint (iJoint *joint)
 {
   joints.Delete ((csODEJoint*)joint);
@@ -1349,6 +1390,149 @@ void csODERigidBody::Update ()
   }
 }
 
+//-------------------------------------------------------------------------------
+void csStrictODEJoint::Attach (iRigidBody *b1, iRigidBody *b2)
+{
+  if (b1)
+  {
+    bodyID[0] = ((csODERigidBody *)(b1->QueryObject()))->GetID();
+  }
+  else
+  {
+    bodyID[0] = 0;
+  }
+  if (b2)
+  { 
+    bodyID[1] = ((csODERigidBody *)(b2->QueryObject()))->GetID();
+  }
+  else
+  {
+    bodyID[1] = 0;
+  }
+
+  body[0] = b1;
+  body[1] = b2;
+  dJointAttach (jointID, bodyID[0], bodyID[1]);
+}
+csRef<iRigidBody> csStrictODEJoint::GetAttachedBody (int b)
+{
+  return (b == 0) ? body[0] : body[1];
+}
+
+//-------------------------------------------------------------------------------
+
+ODEAMotorJoint::ODEAMotorJoint (dWorldID w_id)
+{
+  SCF_CONSTRUCT_IBASE (0);
+  jointID = dJointCreateAMotor (w_id, 0);
+}
+
+ODEAMotorJoint::~ODEAMotorJoint ()
+{
+  SCF_DESTRUCT_IBASE();
+  dJointDestroy (jointID);
+}
+
+
+csVector3 ODEAMotorJoint::GetAMotorAxis (int axis_num)
+{
+  dVector3 pos;
+  dJointGetAMotorAxis (jointID, axis_num, pos);  
+  return csVector3 (pos[0], pos[1], pos[2]);
+}
+
+//-------------------------------------------------------------------------------
+
+ODEHingeJoint::ODEHingeJoint (dWorldID w_id)
+{
+  SCF_CONSTRUCT_IBASE (0);
+  jointID = dJointCreateHinge (w_id, 0);
+}
+
+ODEHingeJoint::~ODEHingeJoint ()
+{
+  SCF_DESTRUCT_IBASE();
+  dJointDestroy (jointID);
+}
+
+csVector3 ODEHingeJoint::GetHingeAnchor1 ()
+{
+  dVector3 pos;
+  dJointGetHingeAnchor (jointID, pos);
+  return csVector3 (pos[0], pos[1], pos[2]);
+}
+
+csVector3 ODEHingeJoint::GetHingeAnchor2 ()
+{
+  dVector3 pos;
+  dJointGetHingeAnchor2 (jointID, pos);
+  return csVector3 (pos[0], pos[1], pos[2]);
+}
+  
+csVector3 ODEHingeJoint::GetHingeAxis ()
+{
+  dVector3 pos;
+  dJointGetHingeAxis (jointID, pos);
+  return csVector3 (pos[0], pos[1], pos[2]);
+}
+
+csVector3 ODEHingeJoint::GetAnchorError ()
+{
+  csVector3 pos1 = GetHingeAnchor1 ();
+  csVector3 pos2 = GetHingeAnchor2 ();
+
+  csVector3 result =  pos1 - pos2; 
+  if (result.x < 0) result.x = - result.x;
+  if (result.y < 0) result.y = - result.y;
+  if (result.z < 0) result.z = - result.z;
+
+  return result;
+}
+
+//-------------------------------------------------------------------------------
+
+ODEBallJoint::ODEBallJoint (dWorldID w_id)
+{
+  SCF_CONSTRUCT_IBASE (0);
+  jointID = dJointCreateBall (w_id, 0);
+}
+
+ODEBallJoint::~ODEBallJoint ()
+{
+  SCF_DESTRUCT_IBASE();
+  dJointDestroy (jointID);
+}
+
+csVector3 ODEBallJoint::GetBallAnchor1 ()
+{
+  dVector3 pos;
+  dJointGetBallAnchor (jointID, pos);
+  return csVector3 (pos[0], pos[1], pos[2]);
+}
+
+csVector3 ODEBallJoint::GetBallAnchor2 ()
+{
+  dVector3 pos;
+  dJointGetBallAnchor2 (jointID, pos);
+  return csVector3 (pos[0], pos[1], pos[2]);
+}
+
+csVector3 ODEBallJoint::GetAnchorError ()
+{
+  csVector3 pos1, pos2;
+  pos1 = GetBallAnchor1 ();
+  pos2 = GetBallAnchor2 ();
+
+  csVector3 result =  pos1 - pos2; 
+  if (result.x < 0) result.x = - result.x;
+  if (result.y < 0) result.y = - result.y;
+  if (result.z < 0) result.z = - result.z;
+
+  return result;
+}
+
+//-------------------------------------------------------------------------------
+
 csODEJoint::csODEJoint (csODEDynamicSystem *sys)
 {
   SCF_CONSTRUCT_IBASE (0);
@@ -1732,7 +1916,6 @@ void csODEJoint::ODEJointState::SetParam (int parameter, float value)
       ; // do nothing
   }
 }
-
 float csODEJoint::ODEJointState::GetParam (int parameter)
 {
   switch(GetType())

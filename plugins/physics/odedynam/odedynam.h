@@ -328,7 +328,19 @@ public:
     { scfParent->RemoveGroup (group); }
     csPtr<iJoint> CreateJoint ()
     { return scfParent->CreateJoint (); }
+    csPtr<iODEBallJoint> CreateBallJoint ()
+    { return scfParent->CreateBallJoint (); }
+    csPtr<iODEAMotorJoint> CreateAMotorJoint ()
+    { return scfParent->CreateAMotorJoint (); }
+    csPtr<iODEHingeJoint> CreateHingeJoint ()
+    { return scfParent->CreateHingeJoint (); }
     void RemoveJoint (iJoint *joint)
+    { scfParent->RemoveJoint (joint); }
+    void RemoveJoint (iODEBallJoint *joint)
+    { scfParent->RemoveJoint (joint); }
+    void RemoveJoint (iODEAMotorJoint *joint)
+    { scfParent->RemoveJoint (joint); }
+    void RemoveJoint (iODEHingeJoint *joint)
     { scfParent->RemoveJoint (joint); }
     iDynamicsMoveCallback* GetDefaultMoveCallback ()
     { return scfParent->GetDefaultMoveCallback (); }
@@ -456,7 +468,13 @@ public:
   virtual void RemoveGroup (iBodyGroup *group);
 
   virtual csPtr<iJoint> CreateJoint ();
+  virtual csPtr<iODEBallJoint> CreateBallJoint (); 
+  virtual csPtr<iODEHingeJoint> CreateHingeJoint (); 
+  virtual csPtr<iODEAMotorJoint> CreateAMotorJoint (); 
   virtual void RemoveJoint (iJoint* joint);
+  virtual void RemoveJoint (iODEBallJoint* joint);
+  virtual void RemoveJoint (iODEAMotorJoint* joint);
+  virtual void RemoveJoint (iODEHingeJoint* joint);
 
   virtual iDynamicsMoveCallback* GetDefaultMoveCallback () { return move_cb; }
 
@@ -694,6 +712,87 @@ public:
   void Update ();
 };
 
+
+struct csStrictODEJoint
+{
+  dJointID jointID;
+  csRef<iRigidBody> body[2];
+  dBodyID bodyID[2];
+  void Attach (iRigidBody *body1, iRigidBody *body2);
+  csRef<iRigidBody> GetAttachedBody (int body);
+};
+
+/**
+* This implements the ball joint.  It does this by strict copying
+* ODEs interface. 
+*/
+struct ODEBallJoint : public csStrictODEJoint, iODEBallJoint
+{
+
+  SCF_DECLARE_IBASE;
+
+  ODEBallJoint (dWorldID w_id);
+
+  void SetBallAnchor (const csVector3 &pos) {dJointSetBallAnchor (jointID, pos.x, pos.y, pos.z);};
+  csVector3 GetBallAnchor1 ();
+  csVector3 GetBallAnchor2 ();
+  csVector3 GetAnchorError ();
+
+  virtual ~ODEBallJoint ();
+
+  void Attach (iRigidBody *body1, iRigidBody *body2) {csStrictODEJoint::Attach (body1, body2);};
+  csRef<iRigidBody> GetAttachedBody (int body) {return csStrictODEJoint::GetAttachedBody (body);};
+
+}; 
+
+struct ODEAMotorJoint : public csStrictODEJoint, iODEAMotorJoint
+{
+  SCF_DECLARE_IBASE;
+
+  ODEAMotorJoint (dWorldID w_id);
+  virtual ~ODEAMotorJoint ();
+
+  void SetAMotorMode (ODEAMotorMode mode) {dJointSetAMotorMode (jointID, mode);};
+  ODEAMotorMode GetAMotorMode () { return (ODEAMotorMode)dJointGetAMotorMode (jointID);};
+  void SetAMotorNumAxes (int axis_num) {dJointSetAMotorNumAxes (jointID, axis_num);};
+  int GetAMotorNumAxes () {return dJointGetAMotorNumAxes (jointID);};
+  void SetAMotorAxis (int axis_num, int rel_orient, float x, float y, float z)
+  {dJointSetAMotorAxis (jointID, axis_num, rel_orient, x, y, z);};
+  void SetAMotorAxis (int axis_num, int rel_orient, const csVector3 &axis)
+  {dJointSetAMotorAxis (jointID, axis_num, rel_orient, axis.x, axis.y, axis.z);};
+  csVector3 GetAMotorAxis (int axis_num);
+  int GetAMotorAxisRelOrientation (int axis_num) {return dJointGetAMotorAxisRel (jointID, axis_num);};
+  void SetAMotorAngle (int axis_num, float angle) {dJointSetAMotorAngle (jointID, axis_num, angle);};
+  float GetAMotorAngle (int axis_num) {return dJointGetAMotorAngle (jointID, axis_num);};
+  float GetAMotorAngleRate (int axis_num) {return dJointGetAMotorAngle (jointID, axis_num);};
+
+  void Attach (iRigidBody *body1, iRigidBody *body2) {csStrictODEJoint::Attach (body1, body2);};
+  csRef<iRigidBody> GetAttachedBody (int body) {return csStrictODEJoint::GetAttachedBody (body);};
+
+};
+
+struct ODEHingeJoint : public csStrictODEJoint, iODEHingeJoint
+{
+  SCF_DECLARE_IBASE;
+
+  ODEHingeJoint (dWorldID w_id);
+  virtual ~ODEHingeJoint ();
+
+  void SetHingeAnchor (const csVector3 &pos) {dJointSetHingeAnchor (jointID, pos.x, pos.y, pos.z);};
+  void SetHingeAxis (const csVector3 &axis) {dJointSetHingeAxis (jointID, axis.x, axis.y, axis.z);};
+  csVector3 GetHingeAnchor1 ();
+  csVector3 GetHingeAnchor2 ();
+  csVector3 GetHingeAxis ();
+  float GetHingeAngle () {return dJointGetHingeAngle (jointID);};
+  float GetHingeAngleRate () {return dJointGetHingeAngleRate (jointID);};
+  csVector3 GetAnchorError ();
+
+  void Attach (iRigidBody *body1, iRigidBody *body2) {csStrictODEJoint::Attach (body1, body2);};
+  csRef<iRigidBody> GetAttachedBody (int body) {return csStrictODEJoint::GetAttachedBody (body);};
+
+};
+
+
 /**
  * This implements the joint.  It does this by determining
  * which type of ODE joint best represents that described 
@@ -751,95 +850,96 @@ public:
   void SetMaxForce (const csVector3 & maxForce );
   csVector3 GetMaxForce ();
 
-   struct ODEJointState : public iODEJointState
-   {
-     SCF_DECLARE_EMBEDDED_IBASE (csODEJoint);
-     inline ODEJointType GetType()
-     {
-        return CS_STATIC_CAST (ODEJointType, dJointGetType (scfParent->jointID));
-     }
- 
-     void SetLoStop (float value) { SetParam (dParamLoStop, value); }
-     void SetHiStop (float value) { SetParam (dParamHiStop, value); }
-     void SetVel (float value) { SetParam (dParamVel, value); }
-     void SetFMax (float value) { SetParam (dParamFMax, value); }
-     void SetFudgeFactor (float value) { SetParam (dParamFudgeFactor, value); }
-     void SetBounce (float value) { SetParam (dParamBounce, value); }
-     void SetCFM (float value) { SetParam (dParamCFM, value); }
-     void SetStopERP (float value) { SetParam (dParamStopERP, value); }
-     void SetStopCFM (float value) { SetParam (dParamStopCFM, value); }
-     void SetSuspensionERP (float value) { SetParam (dParamSuspensionERP, value); }
-     void SetSuspensionCFM (float value) { SetParam (dParamSuspensionCFM, value); }
- 
-     void SetLoStop2 (float value) { SetParam (dParamLoStop2, value); }
-     void SetHiStop2 (float value) { SetParam (dParamHiStop2, value); }
-     void SetVel2 (float value) { SetParam (dParamVel2, value); }
-     void SetFMax2 (float value) { SetParam (dParamFMax2, value); }
-     void SetFudgeFactor2 (float value) { SetParam (dParamFudgeFactor2, value); }
-     void SetBounce2 (float value) { SetParam (dParamBounce2, value); }
-     void SetCFM2 (float value) { SetParam (dParamCFM2, value); }
-     void SetStopERP2 (float value) { SetParam (dParamStopERP2, value); }
-     void SetStopCFM2 (float value) { SetParam (dParamStopCFM2, value); }
-     void SetSuspensionERP2 (float value) { SetParam (dParamSuspensionERP2, value); }
-     void SetSuspensionCFM2 (float value) { SetParam (dParamSuspensionCFM2, value); }
- 
-     void SetLoStop3 (float value) { SetParam (dParamLoStop3, value); }
-     void SetHiStop3 (float value) { SetParam (dParamHiStop3, value); }
-     void SetVel3 (float value) { SetParam (dParamVel3, value); }
-     void SetFMax3 (float value) { SetParam (dParamFMax3, value); }
-     void SetFudgeFactor3 (float value) { SetParam (dParamFudgeFactor3, value); }
-     void SetBounce3 (float value) { SetParam (dParamBounce3, value); }
-     void SetCFM3 (float value) { SetParam (dParamCFM3, value); }
-     void SetStopERP3 (float value) { SetParam (dParamStopERP3, value); }
-     void SetStopCFM3 (float value) { SetParam (dParamStopCFM3, value); }
-     void SetSuspensionERP3 (float value) { SetParam (dParamSuspensionERP3, value); }
-     void SetSuspensionCFM3 (float value) { SetParam (dParamSuspensionCFM3, value); }
- 
-     float GetLoStop () { return GetParam (dParamLoStop); }
-     float GetHiStop () { return GetParam (dParamHiStop); }
-     float GetVel () { return GetParam (dParamVel); }
-     float GetFMax () { return GetParam (dParamFMax); }
-     float GetFudgeFactor () { return GetParam (dParamFudgeFactor); }
-     float GetBounce () { return GetParam (dParamBounce); }
-     float GetCFM () { return GetParam (dParamCFM); }
-     float GetStopERP () { return GetParam (dParamStopERP); }
-     float GetStopCFM () { return GetParam (dParamStopCFM); }
-     float GetSuspensionERP () { return GetParam (dParamSuspensionERP); }
-     float GetSuspensionCFM () { return GetParam (dParamSuspensionCFM); }
- 
-     float GetLoStop2 () { return GetParam (dParamLoStop2); }
-     float GetHiStop2 () { return GetParam (dParamHiStop2); }
-     float GetVel2 () { return GetParam (dParamVel2); }
-     float GetFMax2 () { return GetParam (dParamFMax2); }
-     float GetFudgeFactor2 () { return GetParam (dParamFudgeFactor2); }
-     float GetBounce2 () { return GetParam (dParamBounce2); }
-     float GetCFM2 () { return GetParam (dParamCFM2); }
-     float GetStopERP2 () { return GetParam (dParamStopERP2); }
-     float GetStopCFM2 () { return GetParam (dParamStopCFM2); }
-     float GetSuspensionERP2 () { return GetParam (dParamSuspensionERP2); }
-     float GetSuspensionCFM2 () { return GetParam (dParamSuspensionCFM2); }
- 
-     float GetLoStop3 () { return GetParam (dParamLoStop3); }
-     float GetHiStop3 () { return GetParam (dParamHiStop3); }
-     float GetVel3 () { return GetParam (dParamVel3); }
-     float GetFMax3 () { return GetParam (dParamFMax3); }
-     float GetFudgeFactor3 () { return GetParam (dParamFudgeFactor3); }
-     float GetBounce3 () { return GetParam (dParamBounce3); }
-     float GetCFM3 () { return GetParam (dParamCFM3); }
-     float GetStopERP3 () { return GetParam (dParamStopERP3); }
-     float GetStopCFM3 () { return GetParam (dParamStopCFM3); }
-     float GetSuspensionERP3 () { return GetParam (dParamSuspensionERP3); }
-     float GetSuspensionCFM3 () { return GetParam (dParamSuspensionCFM3); }
- 
-     void SetHinge2Axis1 (const csVector3& axis);
-     void SetHinge2Axis2 (const csVector3& axis);
-     void SetHinge2Anchor (const csVector3& point);
- 
-   private:
-     void SetParam (int parameter, float value);
-     float GetParam (int parameter);
-   } scfiODEJointState;
-   friend struct ODEJointState;
+  struct ODEJointState : public iODEJointState
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csODEJoint);
+    inline ODEJointType GetType()
+    {
+      return CS_STATIC_CAST (ODEJointType, dJointGetType (scfParent->jointID));
+    }
+
+    void SetLoStop (float value) { SetParam (dParamLoStop, value); }
+    void SetHiStop (float value) { SetParam (dParamHiStop, value); }
+    void SetVel (float value) { SetParam (dParamVel, value); }
+    void SetFMax (float value) { SetParam (dParamFMax, value); }
+    void SetFudgeFactor (float value) { SetParam (dParamFudgeFactor, value); }
+    void SetBounce (float value) { SetParam (dParamBounce, value); }
+    void SetCFM (float value) { SetParam (dParamCFM, value); }
+    void SetStopERP (float value) { SetParam (dParamStopERP, value); }
+    void SetStopCFM (float value) { SetParam (dParamStopCFM, value); }
+    void SetSuspensionERP (float value) { SetParam (dParamSuspensionERP, value); }
+    void SetSuspensionCFM (float value) { SetParam (dParamSuspensionCFM, value); }
+
+    void SetLoStop2 (float value) { SetParam (dParamLoStop2, value); }
+    void SetHiStop2 (float value) { SetParam (dParamHiStop2, value); }
+    void SetVel2 (float value) { SetParam (dParamVel2, value); }
+    void SetFMax2 (float value) { SetParam (dParamFMax2, value); }
+    void SetFudgeFactor2 (float value) { SetParam (dParamFudgeFactor2, value); }
+    void SetBounce2 (float value) { SetParam (dParamBounce2, value); }
+    void SetCFM2 (float value) { SetParam (dParamCFM2, value); }
+    void SetStopERP2 (float value) { SetParam (dParamStopERP2, value); }
+    void SetStopCFM2 (float value) { SetParam (dParamStopCFM2, value); }
+    void SetSuspensionERP2 (float value) { SetParam (dParamSuspensionERP2, value); }
+    void SetSuspensionCFM2 (float value) { SetParam (dParamSuspensionCFM2, value); }
+
+    void SetLoStop3 (float value) { SetParam (dParamLoStop3, value); }
+    void SetHiStop3 (float value) { SetParam (dParamHiStop3, value); }
+    void SetVel3 (float value) { SetParam (dParamVel3, value); }
+    void SetFMax3 (float value) { SetParam (dParamFMax3, value); }
+    void SetFudgeFactor3 (float value) { SetParam (dParamFudgeFactor3, value); }
+    void SetBounce3 (float value) { SetParam (dParamBounce3, value); }
+    void SetCFM3 (float value) { SetParam (dParamCFM3, value); }
+    void SetStopERP3 (float value) { SetParam (dParamStopERP3, value); }
+    void SetStopCFM3 (float value) { SetParam (dParamStopCFM3, value); }
+    void SetSuspensionERP3 (float value) { SetParam (dParamSuspensionERP3, value); }
+    void SetSuspensionCFM3 (float value) { SetParam (dParamSuspensionCFM3, value); }
+
+    float GetLoStop () { return GetParam (dParamLoStop); }
+    float GetHiStop () { return GetParam (dParamHiStop); }
+    float GetVel () { return GetParam (dParamVel); }
+    float GetFMax () { return GetParam (dParamFMax); }
+    float GetFudgeFactor () { return GetParam (dParamFudgeFactor); }
+    float GetBounce () { return GetParam (dParamBounce); }
+    float GetCFM () { return GetParam (dParamCFM); }
+    float GetStopERP () { return GetParam (dParamStopERP); }
+    float GetStopCFM () { return GetParam (dParamStopCFM); }
+    float GetSuspensionERP () { return GetParam (dParamSuspensionERP); }
+    float GetSuspensionCFM () { return GetParam (dParamSuspensionCFM); }
+
+    float GetLoStop2 () { return GetParam (dParamLoStop2); }
+    float GetHiStop2 () { return GetParam (dParamHiStop2); }
+    float GetVel2 () { return GetParam (dParamVel2); }
+    float GetFMax2 () { return GetParam (dParamFMax2); }
+    float GetFudgeFactor2 () { return GetParam (dParamFudgeFactor2); }
+    float GetBounce2 () { return GetParam (dParamBounce2); }
+    float GetCFM2 () { return GetParam (dParamCFM2); }
+    float GetStopERP2 () { return GetParam (dParamStopERP2); }
+    float GetStopCFM2 () { return GetParam (dParamStopCFM2); }
+    float GetSuspensionERP2 () { return GetParam (dParamSuspensionERP2); }
+    float GetSuspensionCFM2 () { return GetParam (dParamSuspensionCFM2); }
+
+    float GetLoStop3 () { return GetParam (dParamLoStop3); }
+    float GetHiStop3 () { return GetParam (dParamHiStop3); }
+    float GetVel3 () { return GetParam (dParamVel3); }
+    float GetFMax3 () { return GetParam (dParamFMax3); }
+    float GetFudgeFactor3 () { return GetParam (dParamFudgeFactor3); }
+    float GetBounce3 () { return GetParam (dParamBounce3); }
+    float GetCFM3 () { return GetParam (dParamCFM3); }
+    float GetStopERP3 () { return GetParam (dParamStopERP3); }
+    float GetStopCFM3 () { return GetParam (dParamStopCFM3); }
+    float GetSuspensionERP3 () { return GetParam (dParamSuspensionERP3); }
+    float GetSuspensionCFM3 () { return GetParam (dParamSuspensionCFM3); }
+
+    void SetHinge2Axis1 (const csVector3& axis);
+    void SetHinge2Axis2 (const csVector3& axis);
+    void SetHinge2Anchor (const csVector3& point);
+
+  private:
+    void SetParam (int parameter, float value);
+    float GetParam (int parameter);
+  } scfiODEJointState;
+
+  friend struct ODEJointState;
 
 private:
 

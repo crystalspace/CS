@@ -37,6 +37,9 @@ struct iDynamicsMoveCallback;
 struct iDynamicsCollisionCallback;
 struct iJoint;
 struct iPolygonMesh;
+struct iODEBallJoint;
+struct iODEHingeJoint;
+struct iODEAMotorJoint;
 
 SCF_VERSION (iDynamics, 0, 0, 2);
 
@@ -142,8 +145,26 @@ struct iDynamicSystem : public iBase
   /// Create a joint and add it to the simulation
   virtual csPtr<iJoint> CreateJoint () = 0;
 
+  /// Create a ball joint and add it to he simulation
+  virtual csPtr<iODEBallJoint> CreateBallJoint () = 0;
+  
+  /// Create a hinge joint and add it to he simulation
+  virtual csPtr<iODEHingeJoint> CreateHingeJoint () = 0;
+
+  /// Create a AMotor joint and add it to he simulation
+  virtual csPtr<iODEAMotorJoint> CreateAMotorJoint () = 0;
+
   /// Remove a joint from the simulation
   virtual void RemoveJoint (iJoint* joint) = 0;
+
+  /// Remove a ball joint from the simulation
+  virtual void RemoveJoint (iODEBallJoint* joint) = 0;
+
+  /// Remove a hinge joint from the simulation
+  virtual void RemoveJoint (iODEHingeJoint* joint) = 0;
+
+  /// Remove a AMotor joint from the simulation
+  virtual void RemoveJoint (iODEAMotorJoint* joint) = 0;
 
   /// Get the default move callback.
   virtual iDynamicsMoveCallback* GetDefaultMoveCallback () = 0;

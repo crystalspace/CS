@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Mar-2005
+	- Mike Handverger applied a patch #1158485 from Piotr Obrzut to 
+          odedynamics with the following features:
+	    - Strict ODE-like joint interfaces
+	    - AMotor joint functionality added
 15-Mar-2005
 	- Eric Sunshine renamed csQint8(), csQint16(), and csQint24() to
 	  csQfixed8(), csQfixed16(), and csQfixed24(), respectively, in order
