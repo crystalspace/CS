@@ -84,6 +84,12 @@ struct iModelDataTexture : public iBase
    * Requires that an image object exists.
    */
   virtual void Register (iTextureList *tl) = 0;
+
+  /**
+   * Clone this texture object. Note: The underlying texture or image will
+   * not be cloned!
+   */
+  virtual iModelDataTexture *Clone () const = 0;
 };
 
 
@@ -119,6 +125,12 @@ struct iModelDataMaterial : public iBase
    * Requires that the base material exists.
    */
   virtual void Register (iMaterialList *ml) = 0;
+
+  /**
+   * Clone this texture object. Note: The underlying material will
+   * not be cloned!
+   */
+  virtual iModelDataMaterial *Clone () const = 0;
 };
 
 
@@ -180,6 +192,9 @@ struct iModelDataVertices : public iBase
 
   /// Add all data from another vertex frame to this one
   virtual void CopyFrom (const iModelDataVertices *Other) = 0;
+
+  /// Clone this vertex frame
+  virtual iModelDataVertices *Clone () const = 0;
 };
 
 
@@ -274,6 +289,9 @@ struct iModelDataPolygon : public iBase
   virtual iModelDataMaterial *GetMaterial () const = 0;
   /// set the material
   virtual void SetMaterial (iModelDataMaterial *m) = 0;
+
+  /// Clone this polygon
+  virtual iModelDataPolygon *Clone () const = 0;
 };
 
 
@@ -336,6 +354,9 @@ struct iModelDataCamera : public iBase
   virtual void Normalize () = 0;
   /// test if all direction vectors are orthogonal
   virtual bool CheckOrthogonality () const = 0;
+
+  /// Clone this camera
+  virtual iModelDataCamera *Clone () const = 0;
 };
 
 
@@ -361,6 +382,9 @@ struct iModelDataLight : public iBase
   virtual const csVector3 &GetPosition () const = 0;
   /// Return the position of the light
   virtual void SetPosition (const csVector3 &) = 0;
+
+  /// Clone this light source
+  virtual iModelDataLight *Clone () const = 0;
 };
 
 

@@ -174,7 +174,7 @@ static bool CheckMDLVersion (csDataStream &in)
   if (FileID != ( ('O'<<24)+('P'<<16)+('D'<<8)+'I' ) )
     return false;
 
-  if (FileVersion != 8)
+  if (FileVersion != 6)
     return false;
 
   return true;
@@ -333,6 +333,9 @@ iModelData *csModelConverterMDL::Load (UByte *Buffer, ULong Size)
     {
       iModelDataVertices *Vertices = new csModelDataVertices ();
       if (DefaultVertices) DefaultVertices = Vertices;
+      // @@@ use correct timing
+      Action->AddFrame (100*j, Vertices->QueryObject ());
+
       Vertices->AddNormal (csVector3 (1, 0, 0));
       Vertices->AddColor (csColor (1, 1, 1));
 

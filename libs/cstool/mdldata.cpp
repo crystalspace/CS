@@ -125,6 +125,15 @@ void csModelDataTexture::Register (iTextureList *tl)
   SetTextureWrapper (tl->NewTexture (Image));
 }
 
+iModelDataTexture *csModelDataTexture::Clone () const
+{
+  csModelDataTexture *t = new csModelDataTexture ();
+  t->SetFileName (FileName);
+  t->SetImage (Image);
+  t->SetTextureWrapper (TextureWrapper);
+  return t;
+}
+
 /*** csModelDataMaterial ***/
 
 SCF_IMPLEMENT_IBASE (csModelDataMaterial)
@@ -157,6 +166,14 @@ void csModelDataMaterial::Register (iMaterialList *ml)
   SetMaterialWrapper (ml->NewMaterial (BaseMaterial));
 }
 
+iModelDataMaterial *csModelDataMaterial::Clone () const
+{
+  csModelDataMaterial *m = new csModelDataMaterial ();
+  m->SetBaseMaterial (BaseMaterial);
+  m->SetMaterialWrapper (MaterialWrapper);
+  return m;
+}
+
 /*** csModelDataVertices ***/
 
 SCF_IMPLEMENT_IBASE (csModelDataVertices)
@@ -181,13 +198,6 @@ csModelDataVertices::csModelDataVertices ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
 }
 
-csModelDataVertices::csModelDataVertices (const iModelDataVertices *orig)
-{
-  SCF_CONSTRUCT_IBASE (NULL);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
-  CopyFrom (orig);
-}
-
 csModelDataVertices::csModelDataVertices (const iModelDataVertices *orig,
   const iModelDataVertices *orig2)
 {
@@ -209,6 +219,22 @@ void csModelDataVertices::CopyFrom (const iModelDataVertices *v)
     AddColor (v->GetColor (i));
   for (i=0; i<v->GetTexelCount (); i++)
     AddTexel (v->GetTexel (i));
+}
+
+iModelDataVertices *csModelDataVertices::Clone () const
+{
+  csModelDataVertices *v = new csModelDataVertices ();
+  int i;
+
+  for (i=0; i<Vertices.Length (); i++)
+    v->AddVertex (Vertices [i]);
+  for (i=0; i<Normals.Length (); i++)
+    v->AddNormal (Normals [i]);
+  for (i=0; i<Colors.Length (); i++)
+    v->AddColor (Colors [i]);
+  for (i=0; i<Texels.Length (); i++)
+    v->AddTexel (Texels [i]);
+  return v;
 }
 
 /*** csModelDataAction ***/
@@ -332,6 +358,15 @@ CS_IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Normal, Normals);
 CS_IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Color, Colors);
 CS_IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Texel, Texels);
 
+iModelDataPolygon *csModelDataPolygon::Clone () const
+{
+  csModelDataPolygon *p = new csModelDataPolygon ();
+  for (int i=0; i<Vertices.Length (); i++)
+    p->AddVertex (Vertices[i], Normals[i], Colors[i], Texels[i]);
+  p->SetMaterial (Material);
+  return p;
+}
+
 /*** csModelDataObject ***/
 
 SCF_IMPLEMENT_IBASE (csModelDataObject)
@@ -407,6 +442,16 @@ bool csModelDataCamera::CheckOrthogonality () const
     (ABS(z) < SMALL_EPSILON);
 }
 
+iModelDataCamera *csModelDataCamera::Clone () const
+{
+  csModelDataCamera *c = new csModelDataCamera ();
+  c->SetPosition (Position);
+  c->SetUpVector (UpVector);
+  c->SetFrontVector (FrontVector);
+  c->SetRightVector (RightVector);
+  return c;
+}
+
 /*** csModelDataLight ***/
 
 SCF_IMPLEMENT_IBASE (csModelDataLight)
@@ -424,6 +469,15 @@ csModelDataLight::csModelDataLight ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+}
+
+iModelDataLight *csModelDataLight::Clone () const
+{
+  csModelDataLight *l = new csModelDataLight ();
+  l->SetPosition (Position);
+  l->SetColor (Color);
+  l->SetRadius (Radius);
+  return l;
 }
 
 /*** csModelData ***/

@@ -388,8 +388,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
   iMaterialWrapper* tm = LoadTexture ("material1", "/lib/std/stone4.gif");
-  //iMaterialWrapper* tm2 = LoadTexture ("material2", "/lib/std/andrew_wood.gif");
-  //iMaterialWrapper* tm3 = LoadTexture ("material3", "/lib/std/andrew_marble4.gif");
+  LoadTexture ("material2", "/lib/std/andrew_wood.gif");
+  LoadTexture ("material3", "/lib/std/andrew_marble4.gif");
 
   room = engine->CreateSector ("room");
 

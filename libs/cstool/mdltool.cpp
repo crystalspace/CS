@@ -691,11 +691,8 @@ void csModelDataTools::MergeObjects (iModelData *Scene, bool MultiTexture)
     }
     if (i == NewObjects.Length ())
     {
-      iModelDataObject *NewObject = new csModelDataObject ();
-      Scene->QueryObject ()->ObjAdd (NewObject->QueryObject ());
-      MergeCopyObject (NewObject, obj);
-      NewObjects.Push (NewObject);
-      NewObject->DecRef ();
+      Scene->QueryObject ()->ObjAdd (obj->QueryObject ());
+      NewObjects.Push (obj);
     }
     obj->DecRef ();
   }

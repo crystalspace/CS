@@ -103,6 +103,8 @@ public:
 
   /// Create a texture wrapper from the given texture list
   void Register (iTextureList *tl);
+
+  iModelDataTexture *Clone () const;
 };
 
 class csModelDataMaterial : public iModelDataMaterial
@@ -124,6 +126,8 @@ public:
 
   /// Create a material wrapper from the given material list
   void Register (iMaterialList *ml);
+
+  iModelDataMaterial *Clone () const;
 };
 
 class csModelDataVertices : public iModelDataVertices
@@ -140,8 +144,6 @@ public:
 
   /// constructor
   csModelDataVertices ();
-  /// copy constructor
-  csModelDataVertices (const iModelDataVertices *orig);
   /// concat constructor
   csModelDataVertices (const iModelDataVertices *orig1,
     const iModelDataVertices *orig2);
@@ -155,6 +157,8 @@ public:
   CS_DECLARE_ARRAY_INTERFACE (const csVector3 &, Normal);
   CS_DECLARE_ARRAY_INTERFACE (const csColor &, Color);
   CS_DECLARE_ARRAY_INTERFACE (const csVector2 &, Texel);
+
+  iModelDataVertices *Clone () const;
 };
 
 class csModelDataAction : public iModelDataAction
@@ -220,6 +224,8 @@ public:
   CS_DECLARE_ARRAY_INTERFACE_NONUM (int, Color);
   CS_DECLARE_ARRAY_INTERFACE_NONUM (int, Texel);
   CS_DECLARE_ACCESSOR_METHODS (iModelDataMaterial*, Material);
+
+  iModelDataPolygon *Clone () const;
 };
 
 class csModelDataObject : public iModelDataObject
@@ -269,6 +275,8 @@ public:
   void Normalize ();
   /// test if all direction vectors are orthogonal
   bool CheckOrthogonality () const;
+
+  iModelDataCamera *Clone () const;
 };
 
 class csModelDataLight : public iModelDataLight
@@ -290,6 +298,7 @@ public:
   CS_DECLARE_ACCESSOR_METHODS (float, Radius);
   CS_DECLARE_ACCESSOR_METHODS (const csVector3 &, Position);
   CS_DECLARE_ACCESSOR_METHODS (const csColor &, Color);
+  iModelDataLight *Clone () const;
 };
 
 class csModelData : public iModelData
