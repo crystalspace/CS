@@ -15,6 +15,9 @@ chronological order.
 	  destroy the object before there was a chance of putting the
 	  pointer in a csRef. Solved by adding csPtr<T> Pop() to the
 	  csRefArray subclass (this overrides csArray::Pop()).
+	- Jorrit changed genmesh so that a SetTriangleCount() will no longer
+	  destroy the old triangles but instead it will copy the old triangles
+	  into the new triangle array (with corrected size).
 17-Aug-2003
 	- Jorrit fixed a bug in csIntersect3::IntersectTriangle(). In
 	  some cases it would fail to register a hit.

@@ -1201,14 +1201,25 @@ void csGenmeshMeshObjectFactory::SetVertexCount (int n)
 
 void csGenmeshMeshObjectFactory::SetTriangleCount (int n)
 {
+  csTriangle* new_triangles = new csTriangle [n];
 #ifndef CS_USE_NEW_RENDERER
+  if (top_mesh.triangles)
+  {
+    memcpy (new_triangles, top_mesh.triangles, sizeof (csTriangle)*
+    	MIN (n, top_mesh.num_triangles));
+  }
   top_mesh.num_triangles = n;
   delete[] top_mesh.triangles;
-  top_mesh.triangles = new csTriangle [top_mesh.num_triangles];
+  top_mesh.triangles = new_triangles;
 #else
+  if (mesh_triangles)
+  {
+    memcpy (new_triangles, mesh_triangles, sizeof (csTriangle)*
+    	MIN (n, num_mesh_triangles));
+  }
   num_mesh_triangles = n;
   delete [] mesh_triangles;
-  mesh_triangles = new csTriangle [num_mesh_triangles];
+  mesh_triangles = new_triangles;
 #endif
 
   initialized = false;
