@@ -23,16 +23,24 @@
 #include "cssys/win32/win32.h"
 #include "csutil/inifile.h"
 #include "igraph3d.h"
+
+// Sets up graphics drivers -- Assumes DirectX 5 or later & DirectDraw 3D
+// 3/30/2000 -- PEG
 #include "cssys/win32/DirectDetection.h"
 #include "cs2d/ddraw/ig2d.h"
 
 #include <windows.h>
 #include <windowsx.h>
+
+// More DirectX 5 or later related stuff
+// 3/30/2000 -- PEG
 #include <ddraw.h>
+
 // Use new DirectInput keyboard handling by Xavier Trochu (xtrochu@yahoo.com)?
 #ifdef DO_DINPUT_KEYBOARD
 #include <dinput.h>
 #endif
+
 #include <stdio.h>
 #include <time.h>
 
