@@ -63,9 +63,9 @@ SCF_EXPORT_CLASS_TABLE( ie3ds )
 SCF_EXPORT_CLASS_TABLE_END
 
 // these are wrappers for csDataStream to interface with Lib3dsIO
-static Lib3dsBool DataErrorFunc( void *self )
+static Lib3dsBool DataErrorFunc( void * )
 {
-  csDataStream *pData = (csDataStream*)self;
+  //  csDataStream *pData = (csDataStream*)self;
 
   // does nothing for now
   return LIB3DS_FALSE;
@@ -108,9 +108,9 @@ static int DataReadFunc( void *self, Lib3dsByte *buffer, int size )
 }
 
 
-static int DataWriteFunc( void *self, const Lib3dsByte *buffer, int size )
+static int DataWriteFunc( void* /*self*/, const Lib3dsByte* /*buffer*/, int /*size*/ )
 {
-  csDataStream *pData = (csDataStream*)self;
+  //  csDataStream *pData = (csDataStream*)self;
 
   // not yet implemented
   return 0;
@@ -269,7 +269,7 @@ Lib3dsMesh *pCurMesh;
   return SCF_QUERY_INTERFACE( pModelData, iModelData );
 }
 
-iDataBuffer *csModelConverter3ds::Save( iModelData *pMdl, const char *formatName )
+iDataBuffer *csModelConverter3ds::Save( iModelData* /*pMdl*/, const char* /*formatName*/ )
 {
   // not yet supported
 
@@ -318,10 +318,10 @@ csVector3 vertex;
 int numTriangles, index, j;
 Lib3dsFace *pCurFace;
 iModelDataPolygon *pCurPoly;
-csVector3 position;
-csVector3 normal;
-csColor color;
-csVector2 textureUV;
+//csVector3 position;
+//csVector3 normal;
+//csColor color;
+//csVector2 textureUV;
 
     //  get the trianlge count and go to the first triangle
     numTriangles = p3dsMesh->faces;
