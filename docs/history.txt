@@ -11,6 +11,31 @@ The history order has been reversed so that new features are at the top.
 	  *Hopefully* this fix will be acceptable to all compilers.
 	- Wouter Wijngaards added the start for a bounding box implementation
 	  for particle systems that will help for visibility culling of them.
+	- Eric Sunshine fixed a bug in map2cs where it failed to assign unique
+	  names to the Things which represent curved surfaces.  This had the
+	  unfortunate side-effect of causing the engine to cache several
+	  lightmaps in the zip file with the same name.  For instance, in
+	  Nicholas Blumire's funky.zip map, the lightmap name "room__c2_0"
+	  appeared nine times.  This, in turn caused csArchive to to fail to
+	  write the zip file when changes were made to it following the
+	  initial lightmap creation (for instance, if -revis was used later).
+	  In fact, once the archive was marked as dirty, csArchive would
+	  attempt and fail to write it out each time an entry, such as a
+	  lightmap, was read from it.  Since there are nearly 4,400 lightmaps
+	  in funky.zip, this meant that csArchive tried and failed to write
+	  out funky.zip nearly 4,400 times during a single run of WalkTest!
+	- Eric Sunshine fixed a few compilation problems with vfs.cpp which
+	  manifested when VFS_DEBUG was defined.
+	- Eric Sunshine added a new class to csUtil named csMemFile.  This
+	  class represents a raw memory buffer which implements the iFile
+	  interface.
+	- Eric Sunshine reworked the code which caches PVS information in the
+	  zip file so that it now works via the new csMemFile class rather
+	  than working directly with VFS.  This change had the remarkable (and
+	  intended) effect of reducing time taken to cache PVS information
+	  from nearly 25 minutes to less than 1 second!
+	- Eric Sunshine reworked the code which caches Octree information in
+	  the zip file so that it also works through the new csMemFile class.
 22-Jun-2000
 	- Got a new patch from Travis McIntosh.  This patch finished
 	  dynamic lighting for curved surfaces. Still a bit slow but it

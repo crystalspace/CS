@@ -32,6 +32,7 @@
 #include "csengine/thing.h"
 #include "csengine/poledges.h"
 #include "csengine/dumper.h"
+#include "csutil/memfile.h"
 #include "isystem.h"
 #include "ivfs.h"
 
@@ -1795,12 +1796,11 @@ void csOctree::CachePVS (csOctreeNode* node, iFile* cf)
 
 void csOctree::CachePVS (iVFS* vfs, const char* name)
 {
-  iFile* cf = vfs->Open (name, VFS_FILE_WRITE);
-  WriteString (cf, "OPVS", 4);
+  csMemFile m;
+  iFile* mf = QUERY_INTERFACE((&m), iFile);
+  WriteString (mf, "OPVS", 4);
   // Version number.
-  WriteLong (cf, 100001);
-  CachePVS ((csOctreeNode*)root, cf);
-  cf->DecRef ();
+  WriteLong (mf, 100001);
+  CachePVS ((csOctreeNode*)root, mf);
+  vfs->WriteFile(name, m.GetData(), m.GetSize());
 }
-
-//---------------------------------------------------------------------------

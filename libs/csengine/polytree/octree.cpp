@@ -30,6 +30,7 @@
 #include "csengine/polygon.h"
 #include "csengine/thing.h"
 #include "csengine/dumper.h"
+#include "csutil/memfile.h"
 #include "isystem.h"
 #include "ivfs.h"
 
@@ -837,15 +838,15 @@ void csOctree::Cache (csOctreeNode* node, iFile* cf)
 
 void csOctree::Cache (iVFS* vfs, const char* name)
 {
-  iFile* cf = vfs->Open (name, VFS_FILE_WRITE);
-  WriteString (cf, "OCTR", 4);
-  // Version number.
-  WriteLong (cf, 100002);
-  WriteBox3 (cf, bbox);
-  WriteLong (cf, (long)bsp_num);
-  WriteLong (cf, (long)mode);
-  Cache ((csOctreeNode*)root, cf);
-  cf->DecRef ();
+  csMemFile m;
+  iFile* mf = QUERY_INTERFACE((&m), iFile);
+  WriteString (mf, "OCTR", 4);
+  WriteLong (mf, 100002); // Version number.
+  WriteBox3 (mf, bbox);
+  WriteLong (mf, (long)bsp_num);
+  WriteLong (mf, (long)mode);
+  Cache ((csOctreeNode*)root, mf);
+  vfs->WriteFile(name, m.GetData(), m.GetSize());
 }
 
 bool csOctree::ReadFromCache (iFile* cf, csOctreeNode* node,
