@@ -30,6 +30,27 @@ Short-term cleanups that need to be done:
 	  now convert 3DS and MD2 models to things as well (gouraud shaded).
 	- Implemented UV coordinates for things templates.
 	- Added 'FILE' keyword in THING template loader as well.
+	- Michael Dale Long added Initialize() code to GGI 2D driver
+	  so that the GGI port works again.
+	- Added update to MazeD from Or Siu-Hang with the following
+	  changes:
+	  	- All things in the world all displayed. Previously
+		  only one thing was displayed.
+		- The save path was incorrect. The map was saved into
+		  cryst directory no matter the path that the user
+		  selected.
+		- Some hand-edited map features (like 'start' and
+		  'thing') were lost when MazeD loaded and then saved
+		  the level. This is now fixed. There are still a
+		  few features not supported though.
+		- Portal Expression Generation: select it in edit/select
+		  menu, drag accross the portal position and MazeD
+		  will gnerate a portal expression for the two sectors
+		  involved.
+		- Polygon Mirror Expression. You can now change the
+		  attributes of a selected polygon by changing the
+		  texture, name, and even the mirror effect of a
+		  particular polygon (edit/select/polygon).
 2-Aug-1999
 	- Added 'maxpol' debugging functionality to OpenGL renderer (just
 	  like software renderer).
