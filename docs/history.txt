@@ -30,6 +30,8 @@ chronological order.
 	  _CS_CHECK_LIB_CONFIG_PROG_FLAGS() in checklib.m4.  This eliminates
 	  many unnecessary invocations of `pkg-config' and `{library}-config'
 	  during cached runs.
+	- Eric Sunshine fixed a few small configuration/build problems which
+	  manifested when cross-compiling on Linux for Windows(Mingw).
 	- Eric Sunshine added a `GLhandleARB' type check to configure.ac.  A
 	  few modern GL headers are starting to declare this type, so we need
 	  to avoid re-declaring it in our own glextmanager.h for those cases.
