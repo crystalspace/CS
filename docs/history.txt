@@ -13,6 +13,12 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+31-Oct-1999
+	- Eric Sunshine moved the Python detection code from unixconf.sh to
+	  haspythn.sh since it is needed by platforms which do not invoke
+	  unixconf.sh.  Modified various makefiles to invoke haspythn.sh.
+	- Eric Sunshine changed the way unixconf.sh and booltest.sh are
+	  invoked so that Seth can use the 'linux' target from DOS. :-O
 26-Oct-1999
 	- Eric Sunshine fixed a bug which was causing the engine to crash
 	  when a non-coplaner polygon was found in a world.
