@@ -1700,7 +1700,7 @@ bool csVFS::ChDir (const char *Path)
 void csVFS::PushDir ()
 {
   csScopedMutexLock lock (mutex);
-  dirstack.Push (csStrNew (cwd));
+  dirstack.Push (cwd);
 }
 
 bool csVFS::PopDir ()

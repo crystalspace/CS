@@ -23,6 +23,7 @@
 #include "iutil/event.h"
 #include "hashmapr.h"
 #include "csendian.h"
+#include "weakref.h"
 
 /// Various datatypes supported by the event system (csEvent).
 enum
@@ -159,7 +160,7 @@ private:
   // As per the XML pool, keep a reference to the pool container obejct
   // and this also allows our overridden DecRef() to place the event back
   // into the pool when users are done with it.
-  csRef<csEventQueue> pool;
+  csWeakRef<csEventQueue> pool;
 
   // The next event in the pool, or null if the event is in use.
   csPoolEvent *next;

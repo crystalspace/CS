@@ -95,11 +95,11 @@ private:
     };
 
     const int *p;
-    for (p = Primes; *p && *p <= Elements.Length (); p++) ;
+    int elen = Elements.Length ();
+    for (p = Primes; *p && *p <= elen; p++) ;
     Modulo = *p;
     CS_ASSERT (Modulo);
 
-    int elen = Elements.Length ();
     Elements.SetLength (Modulo);
 
     for (int i = 0; i < elen; i++)
@@ -217,7 +217,7 @@ public:
     for (int i = 0; i < len; ++i)
     {
       const Element& v = values[i];
-      if (KeyHandler::CompareKeys (v.key, key)) 
+      if (KeyHandler::CompareKeys (v.key, key))
 	return v.value;
     }
 

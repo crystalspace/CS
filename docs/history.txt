@@ -28,6 +28,16 @@ chronological order.
 	  example scripts and very important cspace.py get installed.
 	- Eric Sunshine added scripts/perl5/Jamfile to ensure that cspace.pm
 	  gets installed.
+	- res made a micro optimization in csHash<>::Grow.
+	- res fixed a few leaks:
+	    - csPoolEvents now have a weak ref to the event queue.
+	    - csEvent::Remove() and RemoveAll() didn't free the attribute 
+	      array.
+	    - Another superflouous csStrNew() in VFS.
+	- res changed the Win32 port to remove the event listener of the old
+	  keyboard driver before installing the new one.
+	- res changed some errorneous free()s to delete[]s in 
+	  directdetection.cpp.
 4-Feb-2004
 	- Jorrit started the removal of the old effect system (used in OR).
 	  This is unused and doesn't work properly as well.  Removed support

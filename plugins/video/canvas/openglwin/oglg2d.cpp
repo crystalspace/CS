@@ -478,8 +478,8 @@ LRESULT CALLBACK csGraphics2DOpenGL::DummyWindow (HWND hWnd, UINT message,
 	}
       }
 
+      wglMakeCurrent (dwi->this_->hDC, 0);
       wglDeleteContext (dwi->this_->hGLRC);
-      wglMakeCurrent (0, 0);
 
       ReleaseDC (hWnd, dwi->this_->hDC);
     }
@@ -631,8 +631,8 @@ void csGraphics2DOpenGL::Close (void)
 
   if (hGLRC)
   {
+    wglMakeCurrent (hDC, 0);
     wglDeleteContext (hGLRC);
-    wglMakeCurrent (0, 0);
   }
 
   DeleteObject (hWndPalette);

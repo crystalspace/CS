@@ -507,6 +507,10 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
     CS_QUERY_REGISTRY_TAG (r, "iKeyboardDriver");
   if (currentKbd != 0)
   {
+    // Bit hacky: remove old keyboard driver
+    csRef<iEventHandler> eh = SCF_QUERY_INTERFACE (currentKbd, 
+      iEventHandler);
+    q->RemoveListener (eh);
     r->Unregister (currentKbd, "iKeyboardDriver");
   }
   r->Register (kbdDriver, "iKeyboardDriver");

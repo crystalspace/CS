@@ -687,6 +687,7 @@ bool csEvent::Remove(const char *name, int index)
         }
         count--;
       }
+      delete v;
       return true;
     }
     return false;
@@ -712,8 +713,11 @@ bool csEvent::Remove(const char *name, int index)
           delete object;
 	}
         count--;
+	delete v;
         return true;
       }
+      else
+	delete v;
     }
     return false;
   }
@@ -742,6 +746,7 @@ bool csEvent::RemoveAll()
         }
       }
     }
+    delete v;
   }
   attributes.DeleteAll();
   count = 0;
