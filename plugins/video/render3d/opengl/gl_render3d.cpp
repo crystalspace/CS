@@ -544,7 +544,7 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
   // If we have a box clipper then we can simply use glScissor (which
   // is already set up) to do the clipping. In case we have a floating
   // portal we also can use the following part.
-  if (clipper->GetClipperType() == iClipper2D::clipperBox ||
+  if ((clipper && clipper->GetClipperType() == iClipper2D::clipperBox) ||
   	clipportal_floating)
   {
     SetCorrectStencilState ();
@@ -605,7 +605,7 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
     // Some clipping may be required.
     if (m_prefer_stencil)
       clip_with_stencil = true;
-    else if (clipper->GetVertexCount () > 6-reserved_planes)
+    else if (clipper && (clipper->GetVertexCount () > 6-reserved_planes))
     {
       if (broken_stencil)
       {
