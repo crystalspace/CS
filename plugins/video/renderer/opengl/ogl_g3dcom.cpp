@@ -3568,7 +3568,6 @@ iEffectTechnique* csGraphics3DOGLCommon::GetStockTechnique (
       !mesh.mat_handle->GetTexture() )
     return NULL;
 
-  iEffectTechnique* tech = NULL;
   switch (mesh.mixmode & (CS_FX_MASK_MIXMODE | CS_FX_EXTRA_MODES))
   {
     case CS_FX_SRCDST:
@@ -5777,7 +5776,7 @@ bool csGraphics3DOGLCommon::CheckGLError (char* call)
 	strcpy (msg, "The specified table is too large");
 	break;
       default:
-	sprintf (msg, "unknown GL error %x", res);
+	sprintf (msg, "unknown GL error %x", (unsigned int)res);
 	break;
     }
     Report (CS_REPORTER_SEVERITY_WARNING,
