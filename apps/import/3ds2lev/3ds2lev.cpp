@@ -347,6 +347,8 @@ int main (int argc, char * argv[])
         fprintf(stderr, "%-14s  %5ld  %5ld  %5d    %s\n",
               mesh->name, mesh->faces, mesh->points, -1, " ");
     }
+
+    exit(0);
   }
 
   // setup writer
