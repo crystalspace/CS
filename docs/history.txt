@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+27-Jan-2003
+	- Restored number of super lightmaps in OpenGL to 10 again. Apparently
+	  16 was too much for cards with less texture memory. We have to find
+	  a better way to discover how many super lightmaps we can really
+	  use.
 26-Jan-2003
 	- Added a missing call to SetMirrored() in the old OpenGL renderer
 	  in EffectDrawTriangleMesh(). This fixes a few problems with
