@@ -97,28 +97,6 @@ endif
 # don't support this, setting this option to 'yes' does nothing.
 DO_ASM=yes
 
-# If 'yes' include support for PNG graphic files (required for MazeD).
-DO_PNG=yes
-
-# If 'yes' include support for GIF graphic files (required for all current
-# data files).
-DO_GIF=yes
-
-# If 'yes' include support for BMP graphic files (not required currently).
-DO_BMP=yes
-
-# If 'yes' include support for TGA graphic files (not required currently).
-DO_TGA=yes
-
-# If 'yes' include support for JPG graphic files.
-DO_JPG=yes
-
-# If 'yes' include support for WAL graphic files (not required currently).
-DO_WAL=yes
-
-# If 'yes' include support for SGI graphic files (not required currently).
-DO_SGI=yes
-
 # If 'yes' include sound support.
 DO_SOUND=yes
 
