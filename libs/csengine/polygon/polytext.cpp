@@ -438,8 +438,8 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
 {
   depth++;
 
-  if (depth>max_depth)
-    max_depth=depth;
+  if (depth > max_depth)
+    max_depth = depth;
 
   // how_to_divide:
   //   0 -- horizontal
@@ -451,7 +451,7 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
   int width = QInt (visible.right - visible.left);
 
   float a=calc_area (n,p2d);
-  if (fabs (a-height*width)<EPS)
+  if (fabs (a - height * width) < EPS)
   {
     // this area is completely covered
 
@@ -463,13 +463,12 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
     depth--;
     return;
   }
-  else
-    if (fabs (a)<EPS)
-    {
-      // this area is hollow
-      depth--;
-      return;
-    }
+  else if (fabs (a) < EPS)
+  {
+    // this area is hollow
+    depth--;
+    return;
+  }
 
   if (height==1&&width==1)
   {

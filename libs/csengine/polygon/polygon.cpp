@@ -1644,7 +1644,8 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
         FillLightMap (new_lview);
 
         po = GetPortal ();
-        if (po) po->CalculateLighting (new_lview);
+        if (po)
+          po->CalculateLighting (new_lview);
         else if (!new_lview.dynamic && csSector::do_radiosity)
         {
           // If there is no portal we simulate radiosity by creating

@@ -47,7 +47,7 @@ static inline long QInt (float inval)
 {
 #if defined (COMP_GCC) && defined (PROC_INTEL)
   long ret;
-  asm ("fistpl %0" : "=m" (ret) : "t" (inval - 0.499998) : "st");
+  asm ("fistpl %0" : "=m" (ret) : "t" (inval - 0.49999) : "st");
   return ret;
 #else
   // .4997 is max number we can use; if we use for example .4998

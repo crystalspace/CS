@@ -1171,7 +1171,7 @@ void cleanup ()
 {
   pprintf ("Cleaning up...\n");
   free_keymap ();
-  /*csBeing::*/Sys->EndWorld ();
+  Sys->EndWorld ();
   CHK (delete Sys); Sys = NULL;
   pprintf_close();
 }
