@@ -24,6 +24,9 @@ Short-term cleanups that need to be done:
 	  implementation. I think the time is coming close that I can
 	  actually start benchmarking and optimizing the thing (which
 	  will be needed).
+	- Eric Sunshine fixed several compilation warnings which were recently
+	  introduced into the engine.  Mazed also once again builds on
+	  OpenStep.
 20-Dec-1999
 	- Thomas also added support for resizing textures to power of
 	  two coordinates in the engine.
