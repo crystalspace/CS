@@ -257,6 +257,7 @@ class csTiledCoverageBuffer : public iBase
 {
 public:
   iBugPlug* bugplug;	// For debugging...
+  static bool use_mmx;	// If true we use mmx code.
 
 private:
   int width, height;

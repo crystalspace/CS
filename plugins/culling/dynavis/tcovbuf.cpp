@@ -206,26 +206,26 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
       if (op.op == OP_FULLVLINE)
       {
         // We have a full line (from top to bottom). In this case
-	      // we simply invert the fvalue.
-	      fvalue.Invert ();
+	// we simply invert the fvalue.
+	fvalue.Invert ();
       }
       else
       {
         // We can ignore the x value of the line here. So VLINE and
-	      // LINE are equivalent in this case.
-	      CS_ASSERT (op.y1 >= 0);
-	      CS_ASSERT (op.y1 <= 63);
-	      CS_ASSERT (op.y2 >= 0);
-	      CS_ASSERT (op.y2 <= 63);
-	      int y1, y2;
-	      if (op.y1 < op.y2) { y1 = op.y1; y2 = op.y2; }
-	      else { y1 = op.y2; y2 = op.y1; }
-	      const csBits64& start = precalc_start_lines[y2];
-	      const csBits64& end = precalc_end_lines[y1];
-	      // Xor the line with the fvalue. This happens in three stages:
-	      fvalue ^= start;
-	      fvalue ^= end;
-	      fvalue.Invert ();
+	// LINE are equivalent in this case.
+	CS_ASSERT (op.y1 >= 0);
+	CS_ASSERT (op.y1 <= 63);
+	CS_ASSERT (op.y2 >= 0);
+	CS_ASSERT (op.y2 <= 63);
+	int y1, y2;
+	if (op.y1 < op.y2) { y1 = op.y1; y2 = op.y2; }
+	else { y1 = op.y2; y2 = op.y1; }
+	const csBits64& start = precalc_start_lines[y2];
+	const csBits64& end = precalc_end_lines[y1];
+	// Xor the line with the fvalue. This happens in three stages:
+	fvalue ^= start;
+	fvalue ^= end;
+	fvalue.Invert ();
       }
     }
     num_operations = 0;
@@ -247,7 +247,7 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
       csBits64* cc = coverage_cache;
       csBits64* c = coverage;
 #ifdef _X86_
-      if (csProcessorCapability::HasMMX ())
+      if (csTiledCoverageBuffer::use_mmx)
       {
 
         csBits64 allOnes; allOnes.Full ();
@@ -393,7 +393,7 @@ fillCol:
       csBits64* c = coverage;      
 
 #ifdef _X86_
-      if (csProcessorCapability::HasMMX ())
+      if (csTiledCoverageBuffer::use_mmx)
       {
         
         csBits64 allOnes; allOnes.Full ();
@@ -922,6 +922,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csTiledCoverageBuffer::DebugHelper)
   SCF_IMPLEMENTS_INTERFACE(iDebugHelper)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+bool csTiledCoverageBuffer::use_mmx = false;
+
 csTiledCoverageBuffer::csTiledCoverageBuffer (int w, int h)
 {
   SCF_CONSTRUCT_IBASE (0);
@@ -933,6 +935,7 @@ csTiledCoverageBuffer::csTiledCoverageBuffer (int w, int h)
   bugplug = 0;
 
   Setup (w, h);
+  use_mmx = csProcessorCapability::HasMMX ();
 }
 
 csTiledCoverageBuffer::~csTiledCoverageBuffer ()

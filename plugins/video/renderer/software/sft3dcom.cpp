@@ -1308,6 +1308,7 @@ void csGraphics3DSoftwareCommon::FinishDraw ()
       rt_onscreen = false;
       int txt_w, txt_h;
       render_target->GetMipMapDimensions (0, txt_w, txt_h);
+printf ("txt_w=%d txt_h=%d\n", txt_w, txt_h); fflush (stdout);
       csTextureHandleSoftware* tex_mm = (csTextureHandleSoftware *)
 	    render_target->GetPrivateObject ();
       //tex_mm->DeleteMipmaps ();
