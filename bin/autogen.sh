@@ -14,6 +14,6 @@ for i in $MACRODIR/*.m4 ; do
 done
 
 autoconf $@
-rc = $?
+rc=$?
 rm -f $MACROFILE
 exit $rc
