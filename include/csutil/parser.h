@@ -22,13 +22,13 @@
 /**
  * Structure to describe a single token
  */
-typedef struct csTokenDesc
+typedef struct 
 {
   /// value returned when token is matched
   long	id;
   /// token to match
   char	*token;
-};
+} csTokenDesc;
 
 /**
  * A set of macros for easier building of token tables. Usage example:
