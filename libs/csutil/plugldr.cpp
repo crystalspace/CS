@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define CS_SYSDEF_PROVIDE_ALLOCA
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "csutil/plugldr.h"

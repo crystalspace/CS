@@ -46,6 +46,7 @@ The history order is reversed so that new features are at the top.
 	  to me by Markus Korth <mkorth@military.de>.
 	- Eric Sunshine eliminated "unused variable" compilation warning from
 	  csgfxppl.cpp.
+	- Eric Sunshine added missing CS_SYSDEF_PROVIDE_ALLOCA to plugldr.cpp.
 11-Oct-2001
 	- Moved the plugin manager implementation out of the system driver
 	  into csPluginManager (in csutil/plugmgr.h). Modified
