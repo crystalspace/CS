@@ -31,6 +31,9 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed a small error in winconf.bat where it was not
 	  properly making use of the result of its Bash quote-test.  (Was
 	  invoking the wrong filename.)
+	- Eric Sunshine reverted Jorrit's reversion to Eric's changes to SCF.
+	  Also, fixed the bug which was causing SCF to crash when a plugin
+	  module failed to load (if, for example, it didn't exist).
 8-Nov-2001
 	- Jorge Acereda fixed a leak in ieplex.cpp where the result of a
 	  SCF::QueryClassList() wasn't DecRef()ed.
