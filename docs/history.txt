@@ -9,6 +9,7 @@ The history order is reversed so that new features are at the top.
 	- Jorrit fixed a small bug in the thing plugin in case a polygon mesh
 	  was requested before the thing was prepared and in case the
 	  thing contained a portal.
+	- Matze fixed a stupid mistake where 3ds2lev forgot to output lights
 11-Jun-2003
 	- Eric Sunshine removed an invocation of class_scfFinalize() from
 	  SCF_REGISTER_STATIC_CLASS() which should have been removed yesterday

@@ -101,6 +101,7 @@ csPtr<iDocument> LevelWriter::WriteDocument ()
     textnode->SetValue ("crystalspace.culling.dynavis");
     
     WriteObjects (sectornode);
+    WriteLights (sectornode);
 
     // create settings section
     csRef<iDocumentNode> settingsnode =
