@@ -43,6 +43,10 @@ chronological order.
 	  invocations throughout the project with csMD5::Digest:HexString().
 	- Eric Sunshine removed the unused iShaderProgram::GetProgramID().
 	- Jorrit fixed a missing strlwr() in win32/loadlib.cpp.
+	- Jorrit removed the poly3d parameter from syntax
+	  services, ParsePortal() routine. Instead added a sector return
+	  parameter. By doing this, ParsePortal() is now independent of
+	  polygons and also no longer creates the portal itself.
 28-Sep-2003
 	- Eric Sunshine corrected erroneous comments in
 	  CS/mk/autoconf/compiler.m4.

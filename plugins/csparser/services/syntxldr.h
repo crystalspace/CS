@@ -27,7 +27,6 @@
 #include "csutil/strhash.h"
 
 struct iObjectRegistry;
-struct iPolygon3DStatic;
 struct iThingFactoryState;
 struct iEngine;
 struct iSector;
@@ -50,8 +49,6 @@ protected:
   csRef<iReporter> reporter;
   csStringHash xmltokens;
 
-  void OptimizePolygon (iPolygon3DStatic *p);
-
   void ReportV (const char* msgid, int severity, 
 	iDocumentNode* errornode, const char* msg, va_list arg);
   bool ParseGradientShade (iDocumentNode* node, csGradientShade& shade);
@@ -70,11 +67,10 @@ public:
   virtual bool ParseColor (iDocumentNode* node, csColor &c);
   virtual bool ParseMixmode (iDocumentNode* node, uint &mixmode);
   virtual  bool ParsePortal (iDocumentNode* node, iLoaderContext* ldr_context,
-		  	   iPolygon3DStatic* poly_3d,
 		  	   uint32 &flags, bool &mirror,
   			   bool& warp, int& msv,
 			   csMatrix3 &m, csVector3 &before,
-			   csVector3 &after);
+			   csVector3 &after, iString* destSector);
   virtual bool ParseGradient (iDocumentNode* node,
 			      csGradient& gradient);
   virtual bool ParseShaderParam (iDocumentNode* node,

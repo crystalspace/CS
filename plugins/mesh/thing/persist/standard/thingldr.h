@@ -107,12 +107,15 @@ public:
 	int &idx2, csVector2 &uv2,
 	int &idx3, csVector2 &uv3,
 	const char *polyname);
+  // Parse a polygon. If 'poly_delete' is set to true the caller must delete
+  // the polygon. This is used in case the polygon is only a portal.
   bool ParsePoly3d (iDocumentNode* node,
    	iLoaderContext* ldr_context,
   	iEngine* engine, iPolygon3DStatic* poly3d,
 	float default_texlen,
 	iThingFactoryState* thing_fact_state,
-	int vt_offset);
+	int vt_offset, bool& poly_delete);
+
   bool LoadThingPart (iThingEnvironment* te,
   	iDocumentNode* node, iLoaderContext* ldr_context,
 	iObjectRegistry* object_reg, iReporter* reporter,

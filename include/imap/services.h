@@ -33,13 +33,13 @@ class csVector2;
 class csColor;
 class csBox3;
 class csGradient;
-struct iPolygon3DStatic;
 struct iEngine;
 struct iSector;
 struct iMaterialWrapper;
 struct iThingFactoryState;
 struct iLoaderContext;
 struct iDocumentNode;
+struct iString;
 
 /**\name Texture transformation description
  * @{ */
@@ -108,11 +108,10 @@ struct iSyntaxService : public iBase
    * flags: contains all flags found in the description.
    */
   virtual bool ParsePortal (iDocumentNode* node, iLoaderContext* ldr_context,
-		  	   iPolygon3DStatic* poly3d,
 		  	   uint32 &flags, bool &mirror,
   			   bool& warp, int& msv,
 			   csMatrix3 &m, csVector3 &before,
-			   csVector3 &after) = 0;
+			   csVector3 &after, iString* destSector) = 0;
 
 
   /**

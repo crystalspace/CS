@@ -207,41 +207,6 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-class MissingSectorCallback : public iPortalCallback
-{
-public:
-  csRef<iLoaderContext> ldr_context;
-  char* sectorname;
-
-  SCF_DECLARE_IBASE;
-  MissingSectorCallback (iLoaderContext* ldr_context, const char* sector)
-  {
-    SCF_CONSTRUCT_IBASE (0);
-    MissingSectorCallback::ldr_context = ldr_context;
-    sectorname = csStrNew (sector);
-  }
-  virtual ~MissingSectorCallback ()
-  {
-    delete[] sectorname;
-  }
-  
-  virtual bool Traverse (iPortal* portal, iBase* /*context*/)
-  {
-    iSector* sector = ldr_context->FindSector (sectorname);
-    if (!sector) return false;
-    portal->SetSector (sector);
-    // For efficiency reasons we deallocate the name here.
-    delete[] sectorname;
-    sectorname = 0;
-    portal->RemoveMissingSectorCallback (this);
-    return true;
-  }
-};
-
-SCF_IMPLEMENT_IBASE (MissingSectorCallback)
-  SCF_IMPLEMENTS_INTERFACE (iPortalCallback)
-SCF_IMPLEMENT_IBASE_END
-
 bool csTextSyntaxService::ParseBool (iDocumentNode* node, bool& result,
 		bool def_result)
 {
@@ -424,10 +389,11 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode)
 
 bool csTextSyntaxService::ParsePortal (
 	iDocumentNode* node, iLoaderContext* ldr_context,
-	iPolygon3DStatic* poly3d,
 	uint32 &flags, bool &mirror, bool &warp, int& msv,
-	csMatrix3 &m, csVector3 &before, csVector3 &after)
+	csMatrix3 &m, csVector3 &before, csVector3 &after,
+	iString* destSector)
 {
+  destSector->Clear ();
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -482,28 +448,18 @@ bool csTextSyntaxService::ParsePortal (
         flags |= CS_PORTAL_CLIPDEST;
         break;
       case XMLTOKEN_SECTOR:
-	{
-	  iSector* sector = ldr_context->
-	  	FindSector (child->GetContentsValue ());
-	  if (sector)
-	  {
-            poly3d->CreatePortal (sector);
-	  }
-	  else
-	  {
-	    poly3d->CreateNullPortal ();
-	    iPortal* portal = poly3d->GetPortal ();
-	    MissingSectorCallback* mscb = new MissingSectorCallback (
-	    	ldr_context, child->GetContentsValue ());
-	    portal->SetMissingSectorCallback (mscb);
-	    mscb->DecRef ();
-	  }
-	}
+	destSector->Append (child->GetContentsValue ());
 	break;
       default:
 	ReportBadToken (child);
         return false;
     }
+  }
+  if (destSector->Length () == 0)
+  {
+    ReportError ("crystalspace.syntax.portal", node,
+      "Missing sector in portal!");
+    return false;
   }
 
   return true;

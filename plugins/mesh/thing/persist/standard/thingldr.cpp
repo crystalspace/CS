@@ -24,6 +24,7 @@
 #include "csutil/scanstr.h"
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
+#include "csutil/scfstr.h"
 #include "iutil/vfs.h"
 #include "iutil/document.h"
 #include "iutil/object.h"
@@ -352,13 +353,50 @@ bool csThingLoader::ParseTextureMapping (
   return true;
 }
 
+class MissingSectorCallback : public iPortalCallback
+{
+public:
+  csRef<iLoaderContext> ldr_context;
+  char* sectorname;
+
+  SCF_DECLARE_IBASE;
+  MissingSectorCallback (iLoaderContext* ldr_context, const char* sector)
+  {
+    SCF_CONSTRUCT_IBASE (0);
+    MissingSectorCallback::ldr_context = ldr_context;
+    sectorname = csStrNew (sector);
+  }
+  virtual ~MissingSectorCallback ()
+  {
+    delete[] sectorname;
+  }
+  
+  virtual bool Traverse (iPortal* portal, iBase* /*context*/)
+  {
+    iSector* sector = ldr_context->FindSector (sectorname);
+    if (!sector) return false;
+    portal->SetSector (sector);
+    // For efficiency reasons we deallocate the name here.
+    delete[] sectorname;
+    sectorname = 0;
+    portal->RemoveMissingSectorCallback (this);
+    return true;
+  }
+};
+
+SCF_IMPLEMENT_IBASE (MissingSectorCallback)
+  SCF_IMPLEMENTS_INTERFACE (iPortalCallback)
+SCF_IMPLEMENT_IBASE_END
+
 bool csThingLoader::ParsePoly3d (
         iDocumentNode* node,
 	iLoaderContext* ldr_context,
 	iEngine* , iPolygon3DStatic* poly3d,
 	float default_texlen,
-	iThingFactoryState* thing_fact_state, int vt_offset)
+	iThingFactoryState* thing_fact_state, int vt_offset,
+	bool& poly_delete)
 {
+  poly_delete = false;
   iMaterialWrapper* mat = 0;
 
   if (!thing_type)
@@ -392,9 +430,12 @@ bool csThingLoader::ParsePoly3d (
   csVector3 tx_vector (0, 0, 0);
   csVector2 uv_shift (0, 0);
 
-  bool do_mirror = false;
   int set_colldet = 0; // If 1 then set, if -1 then reset, else default.
   int set_viscull = 0; // If 1 then set, if -1 then reset, else default.
+
+  // For portals.
+  csRef<iDocumentNode> portal_node;
+  bool if_portal_delete_polygon = true;	// If portal we delete polygon.
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -428,6 +469,7 @@ bool csThingLoader::ParsePoly3d (
         poly3d->SetAlpha (child->GetContentsValueAsInt () * 655 / 256);
 	// Disable vis culling for alpha objects.
 	if (!set_viscull) set_viscull = -1;
+	if_portal_delete_polygon = false;
         break;
       case XMLTOKEN_VISCULL:
         {
@@ -448,33 +490,7 @@ bool csThingLoader::ParsePoly3d (
         }
         break;
       case XMLTOKEN_PORTAL:
-        {
-          csMatrix3 m_w; m_w.Identity ();
-          csVector3 v_w_before (0, 0, 0);
-          csVector3 v_w_after (0, 0, 0);
-	  uint32 flags = 0;
-	  bool do_warp = false;
-	  int msv = -1;
-
-	  if (synldr->ParsePortal (child, ldr_context,
-	      poly3d, flags, do_mirror, do_warp, msv,
-	      m_w, v_w_before, v_w_after))
-	  {
-	    poly3d->GetPortal ()->GetFlags ().Set (flags);
-
-	    if (do_mirror)
-	    {
-	      if (!set_colldet) set_colldet = 1;
-	    }
-	    else if (do_warp)
-	      poly3d->GetPortal ()->SetWarp (m_w, v_w_before, v_w_after);
-
-	    if (msv != -1)
-	    {
-	      poly3d->GetPortal ()->SetMaximumSectorVisit (msv);
-	    }
-	  }
-        }
+        portal_node = child;
         break;
       case XMLTOKEN_TEXMAP:
 	if (!ParseTextureMapping (child, thing_fact_state->GetVertices (),
@@ -526,6 +542,7 @@ bool csThingLoader::ParsePoly3d (
               poly3d->SetMixMode (mixmode);
 	      if (mixmode & CS_FX_MASK_ALPHA)
 	        poly3d->SetAlpha (mixmode & CS_FX_MASK_ALPHA);
+	      if_portal_delete_polygon = false;
 	    }
 	  }
 	}
@@ -552,7 +569,7 @@ bool csThingLoader::ParsePoly3d (
 
   if (!set_viscull)
   {
-    if (poly3d->GetPortal ())
+    if (portal_node)
     {
       set_viscull = -1;
     }
@@ -689,9 +706,56 @@ bool csThingLoader::ParsePoly3d (
     }
   }
 
-  if (do_mirror)
-    poly3d->GetPortal ()->SetWarp (csTransform::GetReflect (
-    	poly3d->GetObjectPlane () ));
+  if (portal_node)
+  {
+    csMatrix3 m_w; m_w.Identity ();
+    csVector3 v_w_before (0, 0, 0);
+    csVector3 v_w_after (0, 0, 0);
+    uint32 flags = 0;
+    bool do_warp = false;
+    bool do_mirror = false;
+    int msv = -1;
+    scfString destSectorName;
+    iSector* destSector = 0;
+
+    if (synldr->ParsePortal (portal_node, ldr_context,
+	      flags, do_mirror, do_warp, msv,
+	      m_w, v_w_before, v_w_after, &destSectorName))
+    {
+      destSector = ldr_context->FindSector (destSectorName.GetData ());
+      if (destSector)
+      {
+	poly3d->CreatePortal (destSector);
+      }
+      else
+      {
+	poly3d->CreateNullPortal ();
+	iPortal* portal = poly3d->GetPortal ();
+	MissingSectorCallback* mscb = new MissingSectorCallback (
+	    	ldr_context, destSectorName.GetData ());
+	portal->SetMissingSectorCallback (mscb);
+	mscb->DecRef ();
+      }
+
+      poly3d->GetPortal ()->GetFlags ().Set (flags);
+
+      if (do_mirror)
+      {
+        if (!set_colldet) set_colldet = 1;
+        poly3d->GetPortal ()->SetWarp (csTransform::GetReflect (
+    	  poly3d->GetObjectPlane () ));
+      }
+      else if (do_warp)
+        poly3d->GetPortal ()->SetWarp (m_w, v_w_before, v_w_after);
+
+      if (msv != -1)
+      {
+        poly3d->GetPortal ()->SetMaximumSectorVisit (msv);
+      }
+    }
+
+    //poly_delete = if_portal_delete_polygon;
+  }
 
   OptimizePolygon (poly3d);
 
@@ -895,15 +959,17 @@ Nag to Jorrit about this feature if you want it.");
 			  child->GetAttributeValue ("name"));
 	  if (info.default_material)
 	    poly3d->SetMaterial (info.default_material);
-	  if (!ParsePoly3d (child, ldr_context,
+	  bool poly_delete = false;
+	  bool success = ParsePoly3d (child, ldr_context,
 	  			    engine, poly3d,
 				    info.default_texlen, info.thing_fact_state,
-				    vt_offset))
+				    vt_offset, poly_delete);
+	  if (poly_delete || !success)
 	  {
 	    info.thing_fact_state->RemovePolygon (
 	      info.thing_fact_state->FindPolygonIndex (poly3d));
-	    return false;
 	  }
+	  if (!success) return false;
         }
         break;
 
