@@ -24,6 +24,9 @@ The history order is reversed so that new features are at the top.
 	  win32 gcc makefile.
 	- Philip Wyett fixed ds3d linking on Win32 GCC. This method
 	  works for both MinGW and Cygwin.
+	- Philip Wyett performed a temp removal and replace with null
+	  on win32 wc.background colour in cssys. This allows pythmod to
+	  successfully build with Cygwin.
 20-Jul-2003
 	- Jorrit forgot to link the new howto into the howto chapter.
 	- Jorrit fixed a small note about curves in the thing mesh object
