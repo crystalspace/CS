@@ -673,6 +673,16 @@ void csGraphics3DSoftwareCommon::SetClipper (csVector2* vertices, int num_vertic
   clipper = new csPolygonClipper (vertices, num_vertices, false, true);
 }
 
+void csGraphics3DSoftwareCommon::GetClipper (csVector2* vertices, int& num_vertices)
+{
+  if (!clipper) { num_vertices = 0; return; }
+  num_vertices = clipper->GetNumVertices ();
+  csVector2* clip_verts = clipper->GetClipPoly ();
+  int i;
+  for (i = 0 ; i < num_vertices ; i++)
+    vertices[i] = clip_verts[i];
+}
+
 bool csGraphics3DSoftwareCommon::BeginDraw (int DrawFlags)
 {
   if ((G2D->GetWidth() != display_width) || 

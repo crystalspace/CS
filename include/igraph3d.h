@@ -430,7 +430,7 @@ struct csFog
   float blue;
 };
 
-SCF_VERSION (iGraphics3D, 3, 0, 0);
+SCF_VERSION (iGraphics3D, 4, 0, 0);
 
 /**
  * This is the standard 3D graphics interface.
@@ -599,10 +599,16 @@ struct iGraphics3D : public iPlugIn
    */
   virtual void SetPerspectiveCenter (int x, int y) = 0;
 
+  /// Get perspective center.
+  virtual void GetPerspectiveCenter (int& x, int& y) = 0;
+
   /**
    * Set aspect ratio for perspective projection.
    */
   virtual void SetPerspectiveAspect (float aspect) = 0;
+
+  /// Get aspect ratio.
+  virtual float GetPerspectiveAspect () = 0;
 
   /**
    * Set world to camera transformation (currently only used by
@@ -611,11 +617,22 @@ struct iGraphics3D : public iPlugIn
   virtual void SetObjectToCamera (csReversibleTransform* o2c) = 0;
 
   /**
+   * Get world to camera transformation.
+   */
+  virtual void GetObjectToCamera (csReversibleTransform& o2c) = 0;
+
+  /**
    * Set optional clipper to use. If vertices == null
    * then there is no clipper.
    * Currently only used by DrawTriangleMesh.
    */
   virtual void SetClipper (csVector2* vertices, int num_vertices) = 0;
+
+  /**
+   * Get clipper that was used. Make sure you have at least place for
+   * 64 vertices.
+   */
+  virtual void GetClipper (csVector2* vertices, int& num_vertices) = 0;
 
   /// Get the 2D driver: This does NOT increment the refcount of 2D driver!
   virtual iGraphics2D *GetDriver2D () = 0;

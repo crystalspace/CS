@@ -366,19 +366,37 @@ public:
     width2 = x;
     height2 = y;
   }
+  /// Get center of projection.
+  virtual void GetPerspectiveCenter (int& x, int& y)
+  {
+    x = width2;
+    y = height2;
+  }
   /// Set perspective aspect.
   virtual void SetPerspectiveAspect (float aspect)
   {
     this->aspect = aspect;
     inv_aspect = 1./aspect;
   }
+  /// Get perspective aspect.
+  virtual float GetPerspectiveAspect ()
+  {
+    return aspect;
+  }
   /// Set world to camera transformation.
   virtual void SetObjectToCamera (csReversibleTransform* o2c)
   {
     this->o2c = *o2c;
   }
+  /// Get world to camera transformation.
+  virtual void GetObjectToCamera (csReversibleTransform& o2c)
+  {
+    o2c = this->o2c;
+  }
   /// Set optional clipper.
   virtual void SetClipper (csVector2* vertices, int num_vertices);
+  /// Get clipper.
+  virtual void GetClipper (csVector2* vertices, int& num_vertices);
 
   /// Draw a triangle mesh.
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh)

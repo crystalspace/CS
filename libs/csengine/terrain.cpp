@@ -254,7 +254,10 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
       g3dmesh.do_clip = mesh->getBinTree(i)->vis() == ddgIN
 	&& mesh->getBinTree(i+1)->vis() == ddgIN ? false : true;
 
-      rview.g3d->DrawTriangleMesh (g3dmesh);
+      if (rview.callback)
+        rview.callback (&rview, CALLBACK_MESH, (void*)&g3dmesh);
+      else
+        rview.g3d->DrawTriangleMesh (g3dmesh);
       // Increment the starting offset by the number of triangles that were in this block.
       s = s+d;
     }

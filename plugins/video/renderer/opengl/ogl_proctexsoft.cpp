@@ -458,9 +458,19 @@ void csOpenGLProcSoftware::SetPerspectiveCenter (int x, int y)
   g3d->SetPerspectiveCenter (x, y); 
 }
 
+void csOpenGLProcSoftware::GetPerspectiveCenter (int& x, int& y)
+{ 
+  g3d->GetPerspectiveCenter (x, y); 
+}
+
 void csOpenGLProcSoftware::SetPerspectiveAspect (float aspect)
 { 
   g3d->SetPerspectiveAspect (aspect); 
+}
+
+float csOpenGLProcSoftware::GetPerspectiveAspect ()
+{ 
+  return g3d->GetPerspectiveAspect ();
 }
 
 void csOpenGLProcSoftware::SetObjectToCamera (csReversibleTransform* o2c)
@@ -468,9 +478,19 @@ void csOpenGLProcSoftware::SetObjectToCamera (csReversibleTransform* o2c)
   g3d->SetObjectToCamera (o2c); 
 }
 
+void csOpenGLProcSoftware::GetObjectToCamera (csReversibleTransform& o2c)
+{ 
+  g3d->GetObjectToCamera (o2c); 
+}
+
 void csOpenGLProcSoftware::SetClipper (csVector2* vertices, int num_vertices)
 { 
   g3d->SetClipper (vertices, num_vertices);
+}
+
+void csOpenGLProcSoftware::GetClipper (csVector2* vertices, int& num_vertices)
+{ 
+  g3d->GetClipper (vertices, num_vertices);
 }
 
 // Here we return the main opengl texture manager as all textures are originally

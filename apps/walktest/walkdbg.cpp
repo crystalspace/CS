@@ -171,7 +171,8 @@ void select_object (csRenderView* rview, int type, void* entity)
         px = QInt (v.x * iz + rview->GetShiftX ());
         py = csWorld::frame_height - 1 - QInt (v.y * iz + rview->GetShiftY ());
         r = QInt (.3 * iz);
-        if (ABS (coord_check_vector.x - px) < 5 && ABS (coord_check_vector.y - (csWorld::frame_height-1-py)) < 5)
+        if (ABS (coord_check_vector.x - px) < 5 &&
+		ABS (coord_check_vector.y - (csWorld::frame_height-1-py)) < 5)
         {
 	  csLight* light = (csLight*)sector->lights[i];
 	  if (check_light)
@@ -187,6 +188,178 @@ void select_object (csRenderView* rview, int type, void* entity)
                     sector->GetName (), light->GetCenter ().x,
                     light->GetCenter ().y, light->GetCenter ().z);
         }
+      }
+    }
+  }
+}
+
+
+/// Static vertex array.
+static DECLARE_GROWING_ARRAY (walkdbg_tr_verts, csVector3);
+/// The perspective corrected vertices.
+static DECLARE_GROWING_ARRAY (walkdbg_persp, csVector2);
+/// Array which indicates which vertices are visible and which are not.
+static DECLARE_GROWING_ARRAY (walkdbg_visible, bool);
+
+static void WalkDbgDrawMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
+	iGraphics2D* g2d)
+{
+  iTextureManager* txtmgr = g3d->GetTextureManager ();
+  int green = txtmgr->FindRGB (0, 255, 0);
+  csReversibleTransform o2c;
+  g3d->GetObjectToCamera (o2c);
+  csVector2 clip_verts[64];
+  int num_clipper;
+  g3d->GetClipper (&clip_verts[0], num_clipper);
+  csClipper* clipper;
+  if (num_clipper)
+    clipper = new csPolygonClipper (clip_verts, num_clipper, false, true);
+  else
+    clipper = NULL;
+  float aspect = g3d->GetPerspectiveAspect ();
+  int width2, height2;
+  g3d->GetPerspectiveCenter (width2, height2);
+
+  int i;
+
+  // Update work tables.
+  if (mesh.num_vertices > walkdbg_tr_verts.Limit ())
+  {
+    walkdbg_tr_verts.SetLimit (mesh.num_vertices);
+    walkdbg_persp.SetLimit (mesh.num_vertices);
+    walkdbg_visible.SetLimit (mesh.num_vertices);
+  }
+
+  // Do vertex tweening and/or transformation to camera space
+  // if any of those are needed. When this is done 'verts' will
+  // point to an array of camera vertices.
+  csVector3* f1 = mesh.vertices[0];
+  csVector3* work_verts;
+  if (mesh.num_vertices_pool > 1)
+  {
+    // Vertex morphing.
+    float tween_ratio = mesh.morph_factor;
+    float remainder = 1 - tween_ratio;
+    csVector3* f2 = mesh.vertices[1];
+    if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
+      for (i = 0 ; i < mesh.num_vertices ; i++)
+        walkdbg_tr_verts[i] = o2c * (tween_ratio * f2[i] + remainder * f1[i]);
+    else
+      for (i = 0 ; i < mesh.num_vertices ; i++)
+        walkdbg_tr_verts[i] = tween_ratio * f2[i] + remainder * f1[i];
+    work_verts = walkdbg_tr_verts.GetArray ();
+  }
+  else
+  {
+    if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
+    {
+      for (i = 0 ; i < mesh.num_vertices ; i++)
+        walkdbg_tr_verts[i] = o2c * f1[i];
+      work_verts = walkdbg_tr_verts.GetArray ();
+    }
+    else
+      work_verts = f1;
+  }
+
+  // Perspective project.
+  for (i = 0 ; i < mesh.num_vertices ; i++)
+  {
+    if (work_verts[i].z >= SMALL_Z)
+    {
+      float z_vert = 1. / work_verts[i].z;
+      float iz = aspect * z_vert;
+      walkdbg_persp[i].x = work_verts[i].x * iz + width2;
+      walkdbg_persp[i].y = work_verts[i].y * iz + height2;
+      walkdbg_visible[i] = true;
+    }
+    else
+      walkdbg_visible[i] = false;
+  }
+
+  // Clipped polygon (assume it cannot have more than 64 vertices)
+  G3DPolygonDPFX poly;
+  memset (&poly, 0, sizeof(poly));
+
+  // The triangle in question
+  csVector2 triangle[3];
+  csVector2 clipped_triangle[MAX_OUTPUT_VERTICES];	//@@@BAD HARCODED!
+  csVertexStatus clipped_vtstats[MAX_OUTPUT_VERTICES];
+  UByte clip_result;
+
+  // Draw all triangles.
+  csTriangle* triangles = mesh.triangles;
+  for (i = 0 ; i < mesh.num_triangles ; i++)
+  {
+    int a = triangles[i].a;
+    int b = triangles[i].b;
+    int c = triangles[i].c;
+    if (walkdbg_visible[a] && walkdbg_visible[b] && walkdbg_visible[c])
+    {
+      //-----
+      // Do backface culling. Note that this depends on the
+      // mirroring of the current view.
+      //-----
+      int j;
+      float area = csMath2::Area2 (walkdbg_persp [a], walkdbg_persp [b],
+      	walkdbg_persp [c]);
+      if (!area) continue;
+      if (mesh.do_mirror)
+      {
+        if (area <= -SMALL_EPSILON) continue;
+        triangle [2] = walkdbg_persp[a];
+        triangle [1] = walkdbg_persp[b];
+        triangle [0] = walkdbg_persp[c];
+      }
+      else
+      {
+        if (area >= SMALL_EPSILON) continue;
+        triangle [0] = walkdbg_persp[a];
+        triangle [1] = walkdbg_persp[b];
+        triangle [2] = walkdbg_persp[c];
+      }
+
+      // Clip triangle. Note that the clipper doesn't care about the
+      // orientation of the triangle vertices. It works just as well in
+      // mirrored mode.
+      int rescount = 0;
+      if (mesh.do_clip && clipper)
+      {
+        clip_result = clipper->Clip (triangle, 3, clipped_triangle, rescount,
+		clipped_vtstats);
+        if (clip_result == CS_CLIP_OUTSIDE) continue;
+        poly.num = rescount;
+      }
+      else
+      {
+        clip_result = CS_CLIP_INSIDE;
+        poly.num = 3;
+      }
+
+      // If mirroring we store the vertices in the other direction.
+      if (clip_result != CS_CLIP_INSIDE)
+        for (j = 0 ; j < poly.num ; j++)
+        {
+          poly.vertices[j].sx = clipped_triangle[j].x;
+          poly.vertices[j].sy = clipped_triangle[j].y;
+        }
+      else
+      {
+        poly.vertices [0].sx = triangle [0].x;
+        poly.vertices [0].sy = triangle [0].y;
+        poly.vertices [1].sx = triangle [1].x;
+        poly.vertices [1].sy = triangle [1].y;
+        poly.vertices [2].sx = triangle [2].x;
+        poly.vertices [2].sy = triangle [2].y;
+      }
+
+      int j1 = poly.num-1;
+      for (j = 0 ; j < poly.num ; j++)
+      {
+        g2d->DrawLine (poly.vertices[j].sx,
+	  csWorld::frame_height - 1 - poly.vertices[j].sy,
+      	  poly.vertices[j1].sx,
+	  csWorld::frame_height - 1 - poly.vertices[j1].sy, green);
+        j1 = j;
       }
     }
   }
@@ -211,7 +384,8 @@ void draw_edges (csRenderView* rview, int type, void* entity)
 
   if (type == CALLBACK_POLYGON)
   {
-    // Here we depend on CALLBACK_POLYGON being called right before CALLBACK_POLYGON2D.
+    // Here we depend on CALLBACK_POLYGON being called right before
+    // CALLBACK_POLYGON2D.
     last_poly = (csPolygon3D*)entity;
   }
   else if (type == CALLBACK_POLYGON2D)
@@ -229,10 +403,20 @@ void draw_edges (csRenderView* rview, int type, void* entity)
       int i;
       for (i = 0 ; i < dpfx->num ; i++)
       {
-        rview->g2d->DrawLine (dpfx->vertices[i].sx, csWorld::frame_height - 1 - dpfx->vertices[i].sy,
-      	  dpfx->vertices[i1].sx, csWorld::frame_height - 1 - dpfx->vertices[i1].sy, blue);
+        rview->g2d->DrawLine (dpfx->vertices[i].sx,
+	  csWorld::frame_height - 1 - dpfx->vertices[i].sy,
+      	  dpfx->vertices[i1].sx,
+	  csWorld::frame_height - 1 - dpfx->vertices[i1].sy, blue);
         i1 = i;
       }
+    }
+  }
+  else if (type == CALLBACK_MESH)
+  {
+    if (!hilighted_only)
+    {
+      G3DTriangleMesh* mesh = (G3DTriangleMesh*)entity;
+      WalkDbgDrawMesh (*mesh, rview->g3d, rview->g2d);
     }
   }
   else if (type == CALLBACK_SECTOR)

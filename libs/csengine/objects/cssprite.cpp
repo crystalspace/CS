@@ -1161,7 +1161,9 @@ void csSprite3D::Draw (csRenderView& rview)
 	G3DTriangleMesh& mesh);
   CalculateFogMesh (&rview, &tr_o2c, mesh);
 
-  if (!rview.callback)
+  if (rview.callback)
+    rview.callback (&rview, CALLBACK_MESH, (void*)&mesh);
+  else
     rview.g3d->DrawTriangleMesh (mesh);
   //else
   // @@@ Provide functionality for visible edges here...

@@ -483,6 +483,16 @@ void csGraphics3DOGLCommon::SetClipper (csVector2* vertices, int num_vertices)
   clipper = new csPolygonClipper (vertices, num_vertices, false, true);
 }
 
+void csGraphics3DOGLCommon::GetClipper (csVector2* vertices, int& num_vertices)
+{
+  if (!clipper) { num_vertices = 0; return; }
+  num_vertices = clipper->GetNumVertices ();
+  csVector2* clip_verts = clipper->GetClipPoly ();
+  int i;
+  for (i = 0 ; i < num_vertices ; i++)
+    vertices[i] = clip_verts[i];
+}
+
 bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
 {
   // if 2D graphics is not locked, lock it
@@ -677,6 +687,117 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
 
   float flat_r = 1., flat_g = 1., flat_b = 1.;
 
+#if 0
+  // @@@ This section uses display lists to do the setup for DrawPolygon.
+  // I expected this to be faster but it is not. It is slightly (but not
+  // much) slower than the normal stuff. Why?
+  static GLuint list = 0, listtxt = 0;
+  static GLuint prev_txt = 0;
+  static int prev_z_buf_mode = -1;
+  if (list == 0)
+  {
+    // Precompute five display lists for the five possible Z buffer
+    // modes.
+    list = glGenLists (5);
+    glNewList (list, GL_COMPILE);
+    glShadeModel (GL_FLAT);
+    glEnable (GL_TEXTURE_2D);
+    glDisable (GL_DEPTH_TEST);
+    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glDisable (GL_BLEND);
+    glColor4f (flat_r, flat_g, flat_b, 0.);
+    glEndList ();
+
+    glNewList (list+1, GL_COMPILE);
+    glShadeModel (GL_FLAT);
+    glEnable (GL_TEXTURE_2D);
+    glEnable (GL_DEPTH_TEST);
+    glDepthFunc (GL_ALWAYS);
+    glDepthMask (GL_TRUE);
+    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glDisable (GL_BLEND);
+    glColor4f (flat_r, flat_g, flat_b, 0.);
+    glEndList ();
+
+    glNewList (list+2, GL_COMPILE);
+    glShadeModel (GL_FLAT);
+    glEnable (GL_TEXTURE_2D);
+    glEnable (GL_DEPTH_TEST);
+    glDepthFunc (GL_GREATER);
+    glDepthMask (GL_FALSE);
+    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glDisable (GL_BLEND);
+    glColor4f (flat_r, flat_g, flat_b, 0.);
+    glEndList ();
+
+    glNewList (list+3, GL_COMPILE);
+    glShadeModel (GL_FLAT);
+    glEnable (GL_TEXTURE_2D);
+    glEnable (GL_DEPTH_TEST);
+    glDepthFunc (GL_GREATER);
+    glDepthMask (GL_TRUE);
+    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glDisable (GL_BLEND);
+    glColor4f (flat_r, flat_g, flat_b, 0.);
+    glEndList ();
+
+    listtxt = glGenLists (1);
+  }
+
+  if (m_renderstate.textured && (poly_alpha <= 0) && !tex_transp)
+  {
+    // If we have the most common case (normal lightmapped polygon)
+    // we can use a premade display list to execute our setup stuff.
+    if (prev_txt != texturehandle || prev_z_buf_mode != z_buf_mode)
+    {
+      glNewList (listtxt, GL_COMPILE);
+      glCallList (list+z_buf_mode);
+      glBindTexture (GL_TEXTURE_2D, texturehandle);
+      glEndList ();
+      prev_txt = texturehandle;
+      prev_z_buf_mode = z_buf_mode;
+    }
+    glCallList (listtxt);
+  }
+  else
+  {
+    glShadeModel (GL_FLAT);
+    if (m_renderstate.textured)
+      glEnable (GL_TEXTURE_2D);
+    else
+    {
+      glDisable (GL_TEXTURE_2D);
+      UByte r, g, b;
+      poly.txt_handle->GetMeanColor (r, g, b);
+      flat_r = float (r) / 255.;
+      flat_g = float (g) / 255.;
+      flat_b = float (b) / 255.;
+    }
+    SetGLZBufferFlags ();
+
+    if ((poly_alpha > 0) || tex_transp)
+    {
+      // Transparency.
+      glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      glEnable (GL_BLEND);
+      if (poly_alpha > 0)
+        glColor4f (flat_r, flat_g, flat_b, 1.0 - (float) poly_alpha / 100.0);
+      else
+        glColor4f (flat_r, flat_g, flat_b, 1.0);
+    }
+    else
+    {
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+      glDisable (GL_BLEND);
+      glColor4f (flat_r, flat_g, flat_b, 0.);
+    }
+
+    glBindTexture (GL_TEXTURE_2D, texturehandle);
+  }
+
+#else
+  // The old code (still faster).
   glShadeModel (GL_FLAT);
   if (m_renderstate.textured)
     glEnable (GL_TEXTURE_2D);
@@ -711,9 +832,10 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     glColor4f (flat_r, flat_g, flat_b, 0.);
   }
 
-  float sx, sy, sz, one_over_sz, u_over_sz, v_over_sz;
-
   csglBindTexture (GL_TEXTURE_2D, texturehandle);
+#endif
+
+  float sx, sy, sz, one_over_sz, u_over_sz, v_over_sz;
 
   // Check if there was a DrawPolygon the previous time.
   start_draw_poly ();
@@ -722,8 +844,8 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   // the amount of code that goes between glBegin/glEnd. This
   // is from an OpenGL high-performance FAQ.
   // @@@ HARDCODED LIMIT OF 64 VERTICES!
-  GLfloat glverts[4*64];
-  GLfloat gltxt[2*64];
+  static GLfloat glverts[4*64];
+  static GLfloat gltxt[2*64];
   int vtidx = 0;
   int txtidx = 0;
   for (i = 0; i < poly.num; i++)

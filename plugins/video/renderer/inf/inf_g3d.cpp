@@ -199,6 +199,16 @@ void csGraphics3DInfinite::SetClipper (csVector2* vertices, int num_vertices)
   clipper = new csPolygonClipper (vertices, num_vertices, false, true);
 }
 
+void csGraphics3DInfinite::GetClipper (csVector2* vertices, int& num_vertices)
+{
+  if (!clipper) { num_vertices = 0; return; }
+  num_vertices = clipper->GetNumVertices ();
+  csVector2* clip_verts = clipper->GetClipPoly ();
+  int i;
+  for (i = 0 ; i < num_vertices ; i++)
+    vertices[i] = clip_verts[i];
+}
+
 long csGraphics3DInfinite::GetAccurateTime ()
 {
   return System->GetTime ();

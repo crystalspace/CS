@@ -52,6 +52,7 @@ typedef void (csLightingFunc) (csFrustumView* lview, int type, void* entity);
 #define CALLBACK_SECTOREXIT 5
 #define CALLBACK_THING 6
 #define CALLBACK_THINGEXIT 7
+#define CALLBACK_MESH 8
 
 /**
  * Information for vertex based fog. There is an instance of this

@@ -1,7 +1,20 @@
 The history order has been reversed so that new features are at the top.
 
 25-Jun-2000
-	- Eric Sunshined fixed a bug in the 'depend' target of the BeOS
+	- New tree control in CSWS from Norman Kramer.
+	- Did an experiment for speeding up OpenGL by putting the setup
+	  commands for DrawPolygon in a display list. Did not seem to
+	  help much though.
+	- Added CALLBACK_MESH in the engine to support edge drawing for
+	  meshes.
+	- Added iGraphics3D->GetObjectToCamera(), GetClipper(),
+	  GetPerspectiveCenter(), and GetPerspectiveAspect() to
+	  fetch those respective entries from G3D.
+	- Implemented mesh drawing for DrawTriangleMesh in WalkTest.
+	  This means that when you press 'e' (to enable edges) you'll
+	  see the edges of all rendered triangles for terrain, curved
+	  surfaces, and 3D sprites in green.
+	- Eric Sunshine fixed a bug in the 'depend' target of the BeOS
 	  OpenGL makefile.
 	- Eric Sunshine eliminated some compilation warnings in the OpenGL
 	  renderer.

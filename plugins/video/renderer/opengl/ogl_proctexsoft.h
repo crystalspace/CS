@@ -128,9 +128,13 @@ class csOpenGLProcSoftware : public iGraphics3D
   virtual void ClearCache ();
   virtual void RemoveFromCache (iPolygonTexture* poly_texture);
   virtual void SetPerspectiveCenter (int x, int y);
+  virtual void GetPerspectiveCenter (int& x, int& y);
   virtual void SetPerspectiveAspect (float aspect);
+  virtual float GetPerspectiveAspect ();
   virtual void SetObjectToCamera (csReversibleTransform* o2c);
+  virtual void GetObjectToCamera (csReversibleTransform& o2c);
   virtual void SetClipper (csVector2* vertices, int num_vertices);
+  virtual void GetClipper (csVector2* vertices, int& num_vertices);
   virtual iGraphics2D *GetDriver2D ();
   virtual iTextureManager *GetTextureManager ();
   virtual iHalo *CreateHalo (float iR, float iG, float iB, 

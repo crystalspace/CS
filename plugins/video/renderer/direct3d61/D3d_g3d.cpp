@@ -2176,6 +2176,16 @@ void csGraphics3DDirect3DDx6::SetClipper (csVector2* vertices, int num_vertices)
   m_pClipper = new csPolygonClipper (vertices, num_vertices, false, true);
 }
 
+void csGraphics3DDirect3DDx6::GetClipper (csVector2* vertices, int& num_vertices)
+{
+  if (!clipper) { num_vertices = 0; return; }
+  num_vertices = clipper->GetNumVertices ();
+  csVector2* clip_verts = clipper->GetClipPoly ();
+  int i;
+  for (i = 0 ; i < num_vertices ; i++)
+    vertices[i] = clip_verts[i];
+}
+
 void csGraphics3DDirect3DDx6::AdjustToOptimalTextureSize(int& w, int& h)
 {
   if (w / h > m_Caps.MaxAspectRatio)

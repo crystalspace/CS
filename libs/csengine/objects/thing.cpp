@@ -290,7 +290,9 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 	  G3DTriangleMesh& mesh);
     CalculateFogMesh (&rview, &obj_cam, mesh);
 
-    if (!rview.callback)
+    if (rview.callback)
+      rview.callback (&rview, CALLBACK_MESH, (void*)&mesh);
+    else
       rview.g3d->DrawTriangleMesh (mesh);
   }
 }
