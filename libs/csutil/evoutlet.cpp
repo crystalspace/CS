@@ -60,9 +60,9 @@ DRIVER_GETTER(Mouse)
 DRIVER_GETTER(Joystick)
 #undef DRIVER_GETTER
 
-iEvent *csEventOutlet::CreateEvent ()
+csPtr<iEvent> csEventOutlet::CreateEvent ()
 {
-  return new csEvent ();
+  return Queue->CreateEvent(0);
 }
 
 void csEventOutlet::Post (iEvent *Event)

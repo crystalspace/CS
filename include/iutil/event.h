@@ -115,6 +115,44 @@ struct iEvent : public iBase
       iNetworkPacket *Data;	
     } Network;
   };
+  virtual bool Add(const char *name, int8 v) = 0;
+  virtual bool Add(const char *name, uint8 v) = 0;
+  virtual bool Add(const char *name, int16 v) = 0;
+  virtual bool Add(const char *name, uint16 v) = 0;
+  virtual bool Add(const char *name, int32 v, bool force_boolean = false) = 0;
+  virtual bool Add(const char *name, uint32 v) = 0;
+  virtual bool Add(const char *name, float v) = 0;
+  virtual bool Add(const char *name, double v) = 0;
+  virtual bool Add(const char *name, char *v) = 0;
+  virtual bool Add(const char *name, void *v, uint32 size) = 0;
+#ifndef CS_USE_FAKE_BOOL_TYPE
+  virtual bool Add(const char *name, bool v, bool force_boolean = true) = 0;
+#endif
+  virtual bool Add(const char *name, iEvent *v) = 0;
+
+  virtual bool Find(const char *name, int8 &v, int index = 0) = 0;
+  virtual bool Find(const char *name, uint8 &v, int index = 0) = 0;
+  virtual bool Find(const char *name, int16 &v, int index = 0) = 0;
+  virtual bool Find(const char *name, uint16 &v, int index = 0) = 0;
+  virtual bool Find(const char *name, int32 &v, int index = 0) = 0;
+  virtual bool Find(const char *name, uint32 &v, int index = 0) = 0;
+  virtual bool Find(const char *name, float &v, int index = 0) = 0;
+  virtual bool Find(const char *name, double &v, int index = 0) = 0;
+  virtual bool Find(const char *name, char **v, int index = 0) = 0;
+  virtual bool Find(const char *name, void **v, uint32 &size, int index = 0) = 0;
+#ifndef CS_USE_FAKE_BOOL_TYPE
+  virtual bool Find(const char *name, bool &v, int index = 0) = 0;
+#endif
+  virtual bool Find(const char *name, iEvent **v, int index = 0) = 0;
+
+  virtual bool Remove(const char *name, int index = -1) = 0;
+  virtual bool RemoveAll() = 0;
+  
+  virtual bool Print(int level = 0) = 0;
+
+  virtual char *Flatten(uint32 &size) = 0;
+  virtual bool Unflatten(const char *buffer) = 0;
+
 };
 
 /** \page EventFlow Overall structure of the basic event flow in Crystal Space
@@ -223,7 +261,7 @@ struct iEventOutlet : public iBase
    * you fill it whatever you like and finally you insert it into the event
    * queue with the Post() method.
    */
-  virtual iEvent* CreateEvent () = 0;
+  virtual csPtr<iEvent> CreateEvent () = 0;
 
   /**
    * Put a previously created event into system event queue.<p>

@@ -61,7 +61,7 @@ public:
   virtual ~csEventOutlet ();
 
   /// Create a event object on behalf of the system driver.
-  virtual iEvent *CreateEvent ();
+  virtual csPtr<iEvent> CreateEvent ();
   /// Put a previously created event into system event queue.
   virtual void Post (iEvent*);
   /// Put a keyboard event into event queue.

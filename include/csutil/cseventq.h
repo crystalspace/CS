@@ -50,6 +50,7 @@ struct iObjectRegistry;
 class csEventQueue : public iEventQueue
 {
   friend class csEventOutlet;
+  friend class csPoolEvent;
 private:
   struct Listener
   {
@@ -112,6 +113,8 @@ private:
   EventOutletsVector EventOutlets;
   // Array of allocated event cords.
   EventCordsVector EventCords;
+  // Pool of event objects
+  csPoolEvent *EventPool;
 
   // Enlarge the queue size.
   void Resize(size_t iLength);
@@ -160,6 +163,10 @@ public:
   /// Get the event cord for a given category and subcategory.
   virtual iEventCord* GetEventCord (int Category, int Subcategory);
 
+  /// Get a count of events in the pool, for testing only.
+  uint32 CountPool();
+  /// Grab an event from the pool or make a new one if it's empty.
+  virtual csPtr<iEvent> CreateEvent(uint8 type);
   /// Place an event into queue.
   virtual void Post(iEvent*);
   /// Get next event from queue or a null references if no event.

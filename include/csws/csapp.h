@@ -212,7 +212,7 @@ public:
 
   /// Create a new event object: NEVER create event objects with `new'
   iEvent *CreateEvent ()
-  { return EventOutlet->CreateEvent (); }
+  { return csRef<iEvent>(EventOutlet->CreateEvent ()); }
 
   /// Add a previously created event to event queue
   void Post (iEvent *Event)

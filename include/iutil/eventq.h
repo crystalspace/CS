@@ -125,6 +125,12 @@ struct iEventQueue : public iBase
   virtual iEventCord* GetEventCord (int Category, int Subcategory) = 0;
 
   /**
+   * Create an event, from the pool if there are any free events available. Else
+   * create a new event in the pool and use it.
+   */
+  virtual csPtr<iEvent> CreateEvent(uint8 type) = 0;
+
+  /**
    * Place an event into queue.  In general, clients should post events to the
    * queue via an iEventOutlet rather than directly via Post(), however there
    * may be certain circumanstances where posting directly to the queue is

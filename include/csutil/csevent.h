@@ -21,6 +21,7 @@
 #define __CS_CSEVENT_H__
 
 #include "iutil/event.h"
+#include "csutil/hashmapr.h"
 
 /**
  * This class represents a system event.<p>
@@ -28,8 +29,13 @@
  * as well as by software. There are so much constructors of
  * this class as much different types of events exists.
  */
+
 class csEvent : public iEvent
 {
+private:
+  csHashMapReversible attributes;
+
+  bool CheckForLoops(csEvent *current, csEvent *e);
 public:
   /// Empty initializer
   csEvent ();
@@ -55,7 +61,77 @@ public:
   /// Destructor
   virtual ~csEvent ();
 
+  virtual bool Add(const char *name, int8 v);
+  virtual bool Add(const char *name, uint8 v);
+  virtual bool Add(const char *name, int16 v);
+  virtual bool Add(const char *name, uint16 v);
+  virtual bool Add(const char *name, int32 v, bool force_boolean = false);
+  virtual bool Add(const char *name, uint32 v);
+  virtual bool Add(const char *name, float v);
+  virtual bool Add(const char *name, double v);
+  virtual bool Add(const char *name, char *v);
+  virtual bool Add(const char *name, void *v, uint32 size);
+#ifndef CS_USE_FAKE_BOOL_TYPE
+  virtual bool Add(const char *name, bool v, bool force_boolean = true);
+#endif
+  virtual bool Add(const char *name, iEvent *v);
+
+  virtual bool Find(const char *name, int8 &v, int index = 0);
+  virtual bool Find(const char *name, uint8 &v, int index = 0);
+  virtual bool Find(const char *name, int16 &v, int index = 0);
+  virtual bool Find(const char *name, uint16 &v, int index = 0);
+  virtual bool Find(const char *name, int32 &v, int index = 0);
+  virtual bool Find(const char *name, uint32 &v, int index = 0);
+  virtual bool Find(const char *name, float &v, int index = 0);
+  virtual bool Find(const char *name, double &v, int index = 0);
+  virtual bool Find(const char *name, char **v, int index = 0);
+  virtual bool Find(const char *name, void **v, uint32 &size, int index = 0);
+#ifndef CS_USE_FAKE_BOOL_TYPE
+  virtual bool Find(const char *name, bool &v, int index = 0);
+#endif
+  virtual bool Find(const char *name, iEvent **v, int index = 0);
+
+  virtual bool Remove(const char *name, int index = -1);
+  virtual bool RemoveAll();
+
+  virtual char *Flatten(uint32 &size);
+  virtual bool Unflatten(const char *buffer);
+  
+  virtual bool Print(int level = 0);
+  
   SCF_DECLARE_IBASE;
 };
+
+/**
+ * This class is a system event designed for the pool system<p>
+ * Due to the possibilities of networking traffic and other assorted
+ * events traversing the event system, a more efficient method of
+ * event creation was needed.  Thus, the event pool was born, and
+ * there are the events that reside within it.
+ */
+ class csPoolEvent : public csEvent {
+     // make csEventQueue a friend such that
+     friend class csEventQueue;
+     private:
+         // As per the XML pool, keep a reference to the pool container obejct
+         // and this also allows our overridden DecRef() to place the event back
+         // into the pool when users are done with it.
+         csRef<csEventQueue> pool;
+ 
+         // The next event in the pool, or null if the event is in use.
+         csPoolEvent *next;
+ 
+         // The 'real' DecRef() call that deletes the event, should in theory only be 
+         // called from the csEventQueue;
+         void Free() { csEvent::DecRef(); }
+ 
+     public:
+         /// The constructor, this should only be called from within the csEventQueue
+         csPoolEvent(csEventQueue *q);
+ 
+         /// The DecRef() that places the event back into the pool at a ref count of 1
+         void DecRef();
+ };
+ 
 
 #endif // __CS_CSEVENT_H__

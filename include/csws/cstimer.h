@@ -46,6 +46,7 @@ enum
 };
 
 #include "iutil/event.h"
+#include "csutil/csevent.h"
 struct iEventHandler;
 struct iEventQueue;
 struct iEventOutlet;
@@ -70,7 +71,7 @@ class csTimer : public csComponent
   iEventHandler *eventh;
   iEventOutlet *evento;
   void Init (unsigned iPeriod);
-  struct csTimerEvent : public iEvent
+  struct csTimerEvent : public csEvent
   {
     SCF_DECLARE_IBASE;
     csTimerEvent () { SCF_CONSTRUCT_IBASE(NULL); }

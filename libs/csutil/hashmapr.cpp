@@ -61,6 +61,9 @@ csHashIteratorReversible::csHashIteratorReversible (csHashMapReversible *r)
 
 const char* csHashIteratorReversible::GetKey ()
 {
-  return hashr->GetKey ( ((csHashElement *)((*bucket)[element_index])) ->key);
+  if ((current_bucket != NULL) && (current_index > -1) && (current_index <= current_bucket->Length())) 
+    return hashr->GetKey ( ((csHashElement *)((*current_bucket)[current_index])) ->key);
+  else
+    return NULL;
 }
 

@@ -65,6 +65,8 @@ csHashIterator::csHashIterator (csHashMap *hm, csHashKey hkey)
   hash = hm;
   bucket = hm->Buckets[idx]; // NULL if bucket is empty.
   element_index = -1;
+  current_bucket = NULL;
+  current_index = -1;
   bucket_index = idx;
   key = hkey;
   do_iterate_key = true;
@@ -113,6 +115,8 @@ csHashObject csHashIterator::Next ()
 {
   if (bucket == NULL) return NULL;
   csHashObject obj = ((csHashElement*)((*bucket)[element_index]))->object;
+  current_index = element_index;
+  current_bucket = bucket;
   if (do_iterate_key) GotoNextSameKey ();
   else GotoNextElement ();
   return obj;

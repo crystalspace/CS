@@ -31,7 +31,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csEventQueue::csEventQueue (iObjectRegistry* r, size_t iLength) :
   Registry(r), EventQueue(0), evqHead(0), evqTail(0), Length(0), SpinLock(0),
-  busy_looping (0), delete_occured (false)
+  busy_looping (0), delete_occured (false), EventPool(NULL)
 {
   SCF_CONSTRUCT_IBASE (0);
   Resize (iLength);
@@ -49,8 +49,44 @@ csEventQueue::~csEventQueue ()
   for (int i = Listeners.Length() - 1; i >= 0; i--)
     Listeners[i].object->DecRef();
   EventOutlets.Get(0)->DecRef(); // The default event outlet which we created.
+  while (EventPool) 
+  {
+    csPoolEvent *e = EventPool->next;
+    EventPool->Free();
+    EventPool = e;
+  }
 }
 
+uint32 csEventQueue::CountPool()
+{
+  if (!EventPool) return 0;
+  csPoolEvent *e = EventPool;
+  uint32 count = 0;
+  while (e)
+  {
+    count++;
+	e = e->next;
+  }
+  return count;
+}
+
+csPtr<iEvent> csEventQueue::CreateEvent(uint8 type) 
+{
+  csPoolEvent *e;
+  if (EventPool) 
+  {
+    e = EventPool;
+    EventPool = e->next;
+  }
+  else 
+  {
+    e = new csPoolEvent(this);
+  }
+  e->Type = type;
+  e->Time = csGetTicks();
+  return csPtr<iEvent>((iEvent*)e);
+}
+ 
 void csEventQueue::Post (iEvent *Event)
 {
 again:

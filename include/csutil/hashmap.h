@@ -64,10 +64,14 @@ class csHashIterator
   friend class csHashIteratorReversible;
 
 private:
-  /// Current bucket we are iterating over. NULL if no more elements.
+  /// Next bucket we are iterating over. NULL if no more elements.
   csHashBucket* bucket;
-  /// Current index in bucket.
+  /// Current bucket we are iterating over. NULL if no more elements.
+  csHashBucket* current_bucket;
+  /// index of next item in bucket.
   int element_index;
+  /// Current index in bucket.
+  int current_index;
   /// Current bucket index in hashmap.
   uint32 bucket_index;
   /// If true we are iterating over a key.
