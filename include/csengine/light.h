@@ -74,11 +74,10 @@ protected:
   float influenceRadius; 
   /// Squared influence radius
   float influenceRadiusSq; 
-
-#ifndef CS_USE_NEW_RENDERER
   /// Inverse radius of light.
   float inv_dist;
-#else
+
+#ifdef CS_USE_NEW_RENDERER
   /// Is the influence radius valid?
   bool influenceValid;
 
