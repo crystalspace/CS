@@ -1,17 +1,32 @@
-#ifndef LEXAN_H
-#define LEXAN_H
+/*
+    Copyright (C) 2001 by Christopher Nelson
+  
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+  
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+  
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#ifndef __IVARIA_LEXAN_H__
+#define __IVARIA_LEXAN_H__
 
 #include "cssysdef.h"
-#include "isys/plugin.h"
 #include "iutil/databuff.h"
 #include "iutil/string.h"
-#include "csutil/csstring.h"
-
 
 SCF_VERSION (iRegExp, 0, 0, 1);
 
 /// Interface definition for a bytecode regular expression
-struct iRegExp
+struct iRegExp : public iBase
 {
   /// Gets an opcode at the given index.  Returns false if the index is invalid
   virtual bool GetOp(unsigned index, unsigned char &op)=0;
@@ -32,7 +47,7 @@ struct iRegExp
 SCF_VERSION (iRegExpCompiler, 0, 0, 1);
 
 /// Interface definition for a regular expression compiler
-struct iRegExpCompiler
+struct iRegExpCompiler : public iBase
 {
   /// Compiles a character string into a regular expression.  The compiled RE is placed in "re"
   virtual bool Compile(char *regexp, iRegExp &re, unsigned int start=0, unsigned int end=0)=0;
@@ -45,11 +60,8 @@ struct iRegExpCompiler
 SCF_VERSION (iLexicalAnalyzer, 0, 0, 1);
 
 /// The interface to the lexical analyzer / regular expression virtual machine
-struct iLexicalAnalyzer : public iPlugIn
+struct iLexicalAnalyzer : public iBase
 {
-  /// Initializes the bytecode machine
-  virtual bool Initialize (iSystem *sys) = 0;
-  
   /// Register a regular expression for matching
   virtual bool RegisterRegExp(unsigned int key, iRegExp &re)=0;
 
@@ -66,7 +78,7 @@ struct iLexicalAnalyzer : public iPlugIn
   virtual unsigned int GetMatchedKey()=0;
   
   /// Returns a pointer to the last matched text
-  virtual csString * GetMatchedText()=0;
+  virtual iString *GetMatchedText()=0;
   
   /// Saves the current input stream and state, then resets the current state and uses stream from buf
   virtual bool PushStream(iDataBuffer &buf)=0;
@@ -78,5 +90,4 @@ struct iLexicalAnalyzer : public iPlugIn
   virtual unsigned int Match() = 0;
 };
 
-#endif
-
+#endif // __IVARIA_LEXAN_H__

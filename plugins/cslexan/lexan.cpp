@@ -1,8 +1,45 @@
+/*
+    Copyright (C) 2001 by Christopher Nelson
+  
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+  
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+  
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #include "cslex.h"
+#include "csutil/scfstr.h"
 #include <ctype.h>
 
-csLexicalAnalyzer::csLexicalAnalyzer():next_key(1)
+IMPLEMENT_IBASE (csLexicalAnalyzer)
+  IMPLEMENTS_INTERFACE (iLexicalAnalyzer)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csLexicalAnalyzer::eiPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+IMPLEMENT_FACTORY (csLexicalAnalyzer)
+
+EXPORT_CLASS_TABLE (cslexan)
+  EXPORT_CLASS (csLexicalAnalyzer, "crystalspace.scanner.regex",
+    "Crystal Space regular-expression-based scanner")
+EXPORT_CLASS_TABLE_END
+
+csLexicalAnalyzer::csLexicalAnalyzer(iBase* p):next_key(1)
 {
+  CONSTRUCT_IBASE (p);
+  CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csLexicalAnalyzer::~csLexicalAnalyzer()
@@ -21,14 +58,11 @@ csLexicalAnalyzer::~csLexicalAnalyzer()
   }
 }
 
-
 bool 
 csLexicalAnalyzer::Initialize(iSystem *sys)
 {
-
   return true;
 }
-
 
 bool 
 csLexicalAnalyzer::RegisterRegExp(unsigned int key, iRegExp &re)
@@ -67,10 +101,10 @@ csLexicalAnalyzer::GetMatchedKey()
  return last_matched_key;
 }
 
-csString *
+iString *
 csLexicalAnalyzer::GetMatchedText()
 {
- return &last_matched_text;
+ return new scfString(last_matched_text.GetData());
 }
 
 bool 
@@ -334,6 +368,3 @@ csLexicalAnalyzer::Match()
 
  return 0;
 }
-
-
-

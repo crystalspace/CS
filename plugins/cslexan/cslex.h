@@ -16,10 +16,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CSLEX_H
-#define CSLEX_H
+#ifndef __CS_CSLEX_H__
+#define __CS_CSLEX_H__
 
 #include "ivaria/lexan.h"
+#include "isys/plugin.h"
 #include "csutil/csdllist.h"
 #include "csutil/csstring.h"
 
@@ -82,7 +83,9 @@ class csRegExp : public iRegExp
   unsigned length;
 
 public:
-  csRegExp();
+  DECLARE_IBASE;
+
+  csRegExp(iBase* = 0);
   virtual ~csRegExp();
   
 public:
@@ -104,7 +107,6 @@ public:
 
 /* ---------------------- Compiler ------------------------------------------------------------*/
 
-
 class csRegExpCompiler  : public iRegExpCompiler
 {
  /// The current parentheses recursion depth
@@ -123,8 +125,10 @@ class csRegExpCompiler  : public iRegExpCompiler
  unsigned int compile_error;
  
 public:
+  DECLARE_IBASE;
+
   /// Intializes the compiler
-  csRegExpCompiler();
+  csRegExpCompiler(iBase* = 0);
   virtual ~csRegExpCompiler() {};
   
 public:
@@ -138,7 +142,6 @@ public:
 
 
 /* ---------------------- VM ------------------------------------------------------------*/
-
 
 class csLexicalAnalyzer  : public iLexicalAnalyzer
 {
@@ -162,7 +165,6 @@ class csLexicalAnalyzer  : public iLexicalAnalyzer
   struct execution_state
   {
     unsigned int 	ip;
-    
     execution_state(unsigned int iip) : ip(iip) {};
   };
   
@@ -188,8 +190,10 @@ class csLexicalAnalyzer  : public iLexicalAnalyzer
   csString     last_matched_text;
     
 public:
+ DECLARE_IBASE;
+
  /// constructs the machine
- csLexicalAnalyzer();
+ csLexicalAnalyzer(iBase* = 0);
  
  /// destroys the machine
  virtual ~csLexicalAnalyzer();
@@ -221,8 +225,12 @@ public:
   /// Returns the key of the last RE matched
   virtual unsigned int GetMatchedKey();
   
-  /// Returns a pointer to the last matched text
-  virtual csString *GetMatchedText();
+  /**
+   * Returns a pointer to the last matched text.  The reference count for the
+   * returned object has already been incremented.  It is the caller's
+   * responsibility to call DecRef() when finished with the returned object.
+   */
+  virtual iString *GetMatchedText();
  
 public:
   /// Saves the current input stream and state, then resets the current state and uses stream from buf
@@ -233,8 +241,14 @@ public:
   
   /// Scans the input stream for a match by one of the RegularExpression's returns 0 on failure, otherwise returns the key of the matched RE.
   virtual unsigned int Match();
+
+  // Implement iPlugIn interface.
+  struct eiPlugIn : public iPlugIn
+  {
+    DECLARE_EMBEDDED_IBASE(csLexicalAnalyzer);
+    virtual bool Initialize(iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent(iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
-
-#endif
-
+#endif // __CS_CSLEX_H__

@@ -42,7 +42,7 @@ char *scfString::GetData () const
 size_t scfString::Length () const
 { return s.Length (); }
 
-inline char& scfString::operator [] (size_t iPos)
+char& scfString::operator [] (size_t iPos)
 { return s[iPos]; }
 
 void scfString::SetAt (size_t iPos, char iChar)

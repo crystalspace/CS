@@ -28,11 +28,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/cslexan
 
 ifeq ($(USE_PLUGINS),yes)
-  LEXAN = $(OUTDLL)lexan$(DLL)
+  LEXAN = $(OUTDLL)cslexan$(DLL)
   LIB.LEXAN = $(foreach d,$(DEP.LEXAN),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(LEXAN)
 else
-  LEXAN = $(OUT)$(LIB_PREFIX)lexan$(LIB)
+  LEXAN = $(OUT)$(LIB_PREFIX)cslexan$(LIB)
   DEP.EXE += $(LEXAN)
   SCF.STATIC += lexan
   TO_INSTALL.STATIC_LIBS += $(LEXAN)
@@ -44,7 +44,7 @@ OBJ.LEXAN = $(addprefix $(OUT),$(notdir $(SRC.LEXAN:.cpp=$O)))
 DEP.LEXAN = CSUTIL CSSYS
 
 MSVC.DSP += LEXAN
-DSP.LEXAN.NAME = lexan
+DSP.LEXAN.NAME = cslexan
 DSP.LEXAN.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)

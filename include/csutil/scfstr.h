@@ -69,7 +69,7 @@ public:
   virtual size_t Length () const;
 
   /// Get a reference to iPos'th character
-  virtual inline char& operator [] (size_t iPos);
+  virtual char& operator [] (size_t iPos);
 
   /// Set characetr number iPos to iChar
   virtual void SetAt (size_t iPos, char iChar);

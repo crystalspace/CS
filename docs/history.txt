@@ -42,6 +42,21 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine worked around another bizarre NextStep compiler bug
 	  where it failed to grok an iDataBuffer reference (&) in the
 	  csLexicalAnalyzer::stream_state structure.
+	- Eric Sunshine removed rogue and incorrect `inline' keywords from
+	  scfstr.h and scfstr.cpp which were causing linking problems on some
+	  platforms.
+	- Eric Sunshine made the following changes to the `cslexan' plugin:
+	    - Added a bunch of missing SCF goop.  The plugin module can now
+	      be successfully loaded.
+	    - iLexicalAnalyzer::GetMatchedText() now returns an iString rather
+	      than a csString.  Returning an iString will prevent heap-related
+	      problems on some platforms.
+	    - iLexicalAnalyzer no longer incorrectly inherits from iPlugIn.
+	      iPlugIn is just an implementation detail and was placing an
+	      unnecessary restriction on the iLexicalAnalyzer interface.
+	      (This is actually a common problem throughout the project, so it
+	      is not surprising that it showed up here as well.  We need to fix
+	      all of those other incorrect cases.)
 23-May-2001
 	- Added 'virtual' before the csView destructor and also fixed a
 	  warning in the csView constructor.
