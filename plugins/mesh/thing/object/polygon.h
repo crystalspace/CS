@@ -96,7 +96,7 @@ private:
    * The material, this contains the texture handle,
    * the flat color (if no texture) and other parameters.
    */
-  iMaterialWrapper* material;
+  csRef<iMaterialWrapper> material;
 
   /**
    * Return twice the signed area of the polygon in world space coordinates

@@ -66,7 +66,7 @@ protected:
   /// Color of all particles.
   csColor color;
   /// Material for all particles.
-  iMaterialWrapper* mat;
+  csRef<iMaterialWrapper> mat;
   /// MixMode for all particles.
   uint MixMode;
   /// Color change

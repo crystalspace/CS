@@ -51,7 +51,7 @@ class csLightningMeshObject : public iMeshObject
   csLightningMeshObjectFactory* factory;
   csFlags flags;
 
-  iMaterialWrapper* material;
+  csRef<iMaterialWrapper> material;
   uint MixMode;
   bool initialized;
   iMeshObjectDrawCallback* vis_cb;
@@ -232,7 +232,7 @@ private:
   float bandwidth;
   csTicks update_interval;
   csTicks update_counter;
-  iMaterialWrapper* material;
+  csRef<iMaterialWrapper> material;
   csRandomGen rand;
 
   csRef<iMeshObjectFactory> GenMeshFact;

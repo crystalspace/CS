@@ -79,7 +79,7 @@ struct csCal3DMesh
     int		      index;
     csString	      name;
     bool	      attach_by_default;
-    iMaterialWrapper *default_material;
+    csRef<iMaterialWrapper> default_material;
     csArray<csString> morph_target_name;
 };
 

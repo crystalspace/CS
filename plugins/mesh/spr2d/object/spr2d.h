@@ -108,7 +108,7 @@ private:
   iBase* logparent;
   csSprite2DMeshObjectFactory* factory;
 
-  iMaterialWrapper* material;
+  csRef<iMaterialWrapper> material;
   uint MixMode;
   bool initialized;
   iMeshObjectDrawCallback* vis_cb;
@@ -329,7 +329,7 @@ protected:
   animVector vAnims;
 
 private:
-  iMaterialWrapper* material;
+  csRef<iMaterialWrapper> material;
   iBase* logparent;
   uint MixMode;
   /**

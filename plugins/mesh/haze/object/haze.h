@@ -189,7 +189,7 @@ private:
   iBase* logparent;
   csHazeMeshObjectFactory* factory;
 
-  iMaterialWrapper* material;
+  csRef<iMaterialWrapper> material;
   uint MixMode;
   bool initialized;
   iMeshObjectDrawCallback* vis_cb;
@@ -389,7 +389,7 @@ public:
 class csHazeMeshObjectFactory : public iMeshObjectFactory
 {
 private:
-  iMaterialWrapper* material;
+  csRef<iMaterialWrapper> material;
   uint MixMode;
   /// haze state info
   csVector3 origin, directional;
