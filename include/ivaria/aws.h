@@ -31,6 +31,9 @@ public:
 
   /// Set the top window
   virtual void       SetTopWindow(awsWindow *win)=0;
+
+  /// Mark a region dirty
+  virtual void       Mark(csRect &rect)=0;
 };
 
 
