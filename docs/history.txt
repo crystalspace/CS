@@ -13,6 +13,11 @@ chronological order.
 	  buffers.
 	- res made a small improvement to the csplugincommon/canvas docs.
 	- res made GM mesh objects support user render buffers.
+	- Anders Stenberg did the following terrain fixes:
+	  - Fixed a design mistake in bruteblock terrain that meant trouble 
+	    when more than one terrain existed in the scene.
+	  - Flipped Z of heightmaps in terraformer to correspond to material 
+	    & base maps. Hope this doesn't screw things up for people using it.
 25-Feb-2005
 	- Jorrit added a new HOWTO that explains how to compile external
 	  applications for Crystal Space and CEL using Dev-CPP.
