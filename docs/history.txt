@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Aug-2004
+	- res updated the "External Libs" docs for the new 0.98r004 
+	  cs-win32libs.
 19-Aug-2004
         - Philip Wyett fixed mismatched delete/delete[] in dds.cpp
 16-Aug-2004
