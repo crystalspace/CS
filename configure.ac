@@ -274,7 +274,7 @@ AC_CACHE_CHECK([how to create a directory tree], [cs_cv_shell_mkdir_p],
     elif mkdirs . 2>/dev/null; then
 	cs_cv_shell_mkdir_p='mkdirs'
     fi
-    test -r ./-p && rm -rf ./-p])
+    test -d ./-p && rmdir ./-p])
 
 AS_VAR_SET_IF([cs_cv_shell_mkdir_p],
     [CS_BUILD_PROPERTY([CMD.MKDIRS], [$cs_cv_shell_mkdir_p])],

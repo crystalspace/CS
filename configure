@@ -4018,7 +4018,7 @@ else
     elif mkdirs . 2>/dev/null; then
 	cs_cv_shell_mkdir_p='mkdirs'
     fi
-    test -r ./-p && rm -rf ./-p
+    test -d ./-p && rmdir ./-p
 fi
 echo "$as_me:$LINENO: result: $cs_cv_shell_mkdir_p" >&5
 echo "${ECHO_T}$cs_cv_shell_mkdir_p" >&6
