@@ -9,6 +9,8 @@ chronological order.
 11-Sep-2004
 	- Andrew Robberts updated sprcal3d to allow for transformations of
 	  a mesh attached to a socket.
+	- Andrew Robberts added the ability to attach multiple meshes to a
+	  sprcal3d socket.
 10-Sep-2004
 	- Eric Sunshine fixed bugs in walktest/Jamfile where it unconditionally
 	  attempted to add several optional modules to the "walkall" compile

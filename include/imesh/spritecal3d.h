@@ -74,6 +74,12 @@ struct iSpriteCal3DSocket : public iBase
   virtual void SetTransform (const csReversibleTransform & trans) = 0;
   /// Get the transform of the main mesh
   virtual csReversibleTransform GetTransform () const = 0;
+
+    virtual size_t GetSecondaryCount () const = 0;
+    virtual iMeshWrapper * GetSecondaryMesh (size_t index) = 0;
+    virtual csReversibleTransform GetSecondaryTransform (size_t index) = 0;
+    virtual void AttachSecondary (iMeshWrapper * mesh, csReversibleTransform trans) = 0;
+    virtual void DetachSecondary (const csString & mesh_name) = 0;
 };
 
 
