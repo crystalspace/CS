@@ -109,12 +109,6 @@
     #define iEvent_get_Mouse iEvent_Mouse_get
     #define iEvent_get_Joystick iEvent_Joystick_get
     #define iEvent_get_Command iEvent_Command_get
-    #define iEvent_get_Network iEvent_Network_get
-
-    #define csEventNetworkData_get_From csEventNetworkData_From_get
-    #define csEventNetworkData_get_From2 csEventNetworkData_From2_get
-    #define csEventNetworkData_get_Data csEventNetworkData_Data_get
-    #define csEventNetworkData_get_Data2 csEventNetworkData_Data2_get
 %}
 
 %{
@@ -139,7 +133,7 @@ _csRef_to_Java (const csRef<iBase> & ref, void * ptr, const char * name,
 	ptr   : either a csRef<type> or csPtr<type>
 	name  : type name, e.g. "iEngine *"
 	type  : type of pointer
-	clazz : class name, e.g. "net/sourceforge/crystal/iEngine"
+	clazz : class name, e.g. "com/crystalspace/iEngine"
 
 	In actual practice, 'ptr' is really of type SwigValueWrapper<csRef<T>>
 	or SwigValueWrapper<csPtr<T>>.  The SwigValueWrapper wrapper is added
@@ -161,7 +155,7 @@ _csRef_to_Java (const csRef<iBase> & ref, void * ptr, const char * name,
 %define TYPEMAP_OUT_csRef(T)
 	%typemap(out) csRef<T>
 	{
-		TYPEMAP_OUT_csRef_BODY($1, #T " *", T, csRef, "net/sourceforge/crystal/" #T)
+		TYPEMAP_OUT_csRef_BODY($1, #T " *", T, csRef, "com/crystalspace/" #T)
 	}
     %typemap(jni) csRef<T> "jobject";
     %typemap(jtype) csRef<T> #T;
@@ -174,7 +168,7 @@ _csRef_to_Java (const csRef<iBase> & ref, void * ptr, const char * name,
 %define TYPEMAP_OUT_csPtr(T)
 	%typemap(out) csPtr<T>
 	{
-		TYPEMAP_OUT_csRef_BODY($1, #T " *", T, csPtr, "net/sourceforge/crystal/" #T)
+		TYPEMAP_OUT_csRef_BODY($1, #T " *", T, csPtr, "com/crystalspace/" #T)
 	}
     //%typemap(out) csPtr<T> %{ $result = $1; %}
     %typemap(jni) csPtr<T> "jobject";
@@ -202,7 +196,7 @@ _csRef_to_Java (const csRef<iBase> & ref, void * ptr, const char * name,
         jlong cptr = 0;
         *(void **)&cptr = ptr;
         char cls_name[1024];
-        strcat(strcpy(cls_name, "net/sourceforge/crystal/"), $1.Type);
+        strcat(strcpy(cls_name, "com/crystalspace/"), $1.Type);
         jclass cls = jenv->FindClass(cls_name);
         jmethodID mid = jenv->GetMethodID(cls, "<init>", "(JZ)V");
         $result = jenv->NewObject(cls, mid, cptr, false);

@@ -1,8 +1,0 @@
-SubDir TOP plugins net manager ;
-
-Description netman : "network manager" ;
-
-Plugin netman
-	: [ Wildcard *.cpp *.h ]
-;
-LinkWith netman : csutil csutil ;

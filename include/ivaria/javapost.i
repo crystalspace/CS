@@ -40,7 +40,7 @@
 {
     const char * s = jenv->GetStringUTFChars($input, 0);
     const char * dot = strrchr(s, '.');
-    strcpy(className, "net/sourceforge/crystal/");
+    strcpy(className, "com/crystalspace/");
     strcat(className, dot?dot+1:s);
     $1 = className;
     jenv->ReleaseStringUTFChars($input, s);
@@ -186,10 +186,10 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
         {
             JNIEnv * env = 0;
             _the_jvm->AttachCurrentThread((void **)&env, NULL);
-            jclass event_class = env->FindClass("net/sourceforge/crystal/iEvent");
-            jclass handler_class = env->FindClass("net/sourceforge/crystal/csJEventHandler");
+            jclass event_class = env->FindClass("com/crystalspace/iEvent");
+            jclass handler_class = env->FindClass("com/crystalspace/csJEventHandler");
             jmethodID event_ctr_mid = env->GetMethodID(event_class, "<init>", "(JZ)V");
-            jmethodID handle_event_mid = env->GetMethodID(handler_class, "HandleEvent", "(Lnet/sourceforge/crystal/iEvent;)Z");
+            jmethodID handle_event_mid = env->GetMethodID(handler_class, "HandleEvent", "(Lcom/crystalspace/iEvent;)Z");
             jlong cptr = 0;
             *(iEvent **)&cptr = &event; 
             jobject event_object = env->NewObject(event_class, event_ctr_mid, cptr, false);
@@ -214,11 +214,11 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
     jobject _csJEventHandler::_csJEventHandler_jobject;
 
     extern "C" {
-        JNIEXPORT void JNICALL Java_net_sourceforge_crystal_csJEventHandler__1exportJEventHandler
+        JNIEXPORT void JNICALL Java_com_crystalspace_csJEventHandler__1exportJEventHandler
             (JNIEnv *, jclass, jobject);
     }
                                                                                                               
-    JNIEXPORT void JNICALL Java_net_sourceforge_crystal_csJEventHandler__1exportJEventHandler
+    JNIEXPORT void JNICALL Java_com_crystalspace_csJEventHandler__1exportJEventHandler
         (JNIEnv * env, jclass, jobject obj)
     {
         if (!_the_jvm)
@@ -263,8 +263,6 @@ MAKE_CONSTANT(int, CSMASK_JoystickUp, (1 << csevJoystickUp))
 MAKE_CONSTANT(int, CSMASK_Command, (1 << csevCommand))
 #undef CSMASK_Broadcast
 MAKE_CONSTANT(int, CSMASK_Broadcast, (1 << csevBroadcast))
-#undef CSMASK_Network
-MAKE_CONSTANT(int, CSMASK_Network, (1 << csevNetwork))
 #undef CSMASK_Mouse
 MAKE_CONSTANT(int, CSMASK_Mouse, (CSMASK_MouseMove | CSMASK_MouseDown | CSMASK_MouseUp | CSMASK_MouseClick | CSMASK_MouseDoubleClick))
 #undef CSMASK_Joystick
@@ -299,8 +297,6 @@ MAKE_CONSTANT(int, CSMASK_Input, (CSMASK_Keyboard | CSMASK_Mouse | CSMASK_Joysti
 %constant int CSMASK_Command = 0x400;
 #undef CSMASK_Broadcast
 %constant int CSMASK_Broadcast = 0x800;
-#undef CSMASK_Network
-%constant int CSMASK_Network = 0x1000;
 #undef CSMASK_Mouse
 %constant int CSMASK_Mouse = (CSMASK_MouseMove | CSMASK_MouseDown | CSMASK_MouseUp | CSMASK_MouseClick | CSMASK_MouseDoubleClick);
 #undef CSMASK_Joystick

@@ -10,17 +10,18 @@
 
 Crystal Space is a package of components and libraries which can all be useful
 for creating computer games.  Although some of the packages are intended more
-for 3D gaming this is not as such a restriction of the package.  Components as
-the sound driver function just as well in a 2D gaming environment and the
-networking component can even be used in a text oriented environment.  This
-highlights one of the important characteristics of Crystal Space: the
-components and libraries are more or less independent of each other.  If you
-don't want networking, then just don't use the networking drivers.  If you
-don't want scripting then don't include that.  All packages are designed to be
-functional on their own or with a minimal number of other packages.  There are
-some dependencies of course.  For example, the 3D Engine requires a 3D
-Rasterizer to display its output.  On the other hand, you could very well use
-the 3D Rasterizer without the 3D Engine.
+for 3D gaming this is not as such a restriction of the package.  Components
+such as the sound driver function just as well in a 2D gaming environment, and
+the Virtual File System plugin (@pxref{VFS}) can be used in non-graphical
+applications.  This highlights one of the important characteristics of Crystal
+Space: the components and libraries are more or less independent of each other.
+If you do not want ``real'' physics, then just don't use the physics plugin.
+If you don't want scripting then don't include that.  All packages are designed
+to be functional on their own or with a minimal number of other packages.
+There are some dependencies of course.  For example, the 3D engine requires a
+3D renderer to display its output, and a renderer requires a canvas onto which
+to draw.  On the other hand, you could very well use the 3D renderer without
+the 3D engine.
 
 Although there is a high level of independence, there is also a high level of
 integration.  The components and libraries were also designed to be used

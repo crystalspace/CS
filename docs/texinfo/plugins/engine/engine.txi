@@ -1,4 +1,4 @@
-@node csEngine, csParser, Network Drivers, Plug-In Drivers
+@node csEngine, csParser, Sound Drivers, Plug-In Drivers
 @section The 3D Engine (@code{csEngine})
 @cindex Engine
 @cindex 3D Engine

@@ -1,5 +1,0 @@
-SubDir TOP apps tests netmtst ;
-
-Description netmantest : "network manager test" ;
-Application netmantest : [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith netmantest : csgeom csgfx cstool csutil ;

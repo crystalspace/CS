@@ -7,7 +7,6 @@ SubDir TOP ;
 Description sounddrivers : "sound drivers" ;
 Description soundloaders : "sound loaders" ;
 Description imageloaders : "image loaders" ;
-Description netdrivers	 : "network drivers" ;
 Description drivers2d	 : "2D canvases" ;
 Description drivers3d	 : "3D renderers" ;
 Description meshes	 : "mesh plugins and mesh loader" ;
@@ -16,7 +15,7 @@ Description openglcanvas : "canvases for the OpenGL renderer" ;
 Description softcanvas   : "canvases for the software renderer" ;
 Description proctexes    : "procedural texture plugins" ;
 Description nrall        : "new-renderer-related modules" ;
-RegisterCompileGroups sounddrivers soundloaders imageloaders netdrivers
+RegisterCompileGroups sounddrivers soundloaders imageloaders
 		      drivers2d drivers3d meshes walkall openglcanvas 
 		      softcanvas proctexes nrall ;
 

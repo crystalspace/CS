@@ -29,7 +29,6 @@ information you need in the introduction to the simple tutorial
 * VFS:: Virtual File System (@sc{vfs})
 * Graphics Drivers::
 * Sound Drivers::
-* Network Drivers::
 * csEngine:: The 3D Engine (@code{csEngine})
 * csParser:: The Map File Parser (@code{csParser})
 * MeshObject:: Mesh Object Plug-In System
@@ -43,7 +42,6 @@ information you need in the introduction to the simple tutorial
 @imports{plugins,vfs.txi}
 @importss{plugins,graphics,graphics.txi}
 @imports{plugins,sound.txi}
-@imports{plugins,network.txi}
 @importss{plugins,engine,engine.txi}
 @imports{plugins,csparser.txi}
 @importss{plugins,meshobj,meshobj.txi}

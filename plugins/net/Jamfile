@@ -1,5 +1,3 @@
 SubDir TOP plugins net ;
 
-SubInclude TOP plugins net driver ;
-SubInclude TOP plugins net manager ;
 SubInclude TOP plugins net vos ;

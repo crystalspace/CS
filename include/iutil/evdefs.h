@@ -66,8 +66,6 @@ typedef enum _csEventType
   csevCommand,			
   /// Somebody(-thing) sent a broadcast command
   csevBroadcast,		
-  /// Something has arrived on network.
-  csevNetwork,		
   /// The mouse has entered a component
   csevMouseEnter,		
   /// The mouse has exited a component
@@ -137,8 +135,6 @@ typedef enum _csKeyEventType
 #define CSMASK_Command		(1 << csevCommand)
 /// Broadcast message events
 #define CSMASK_Broadcast	(1 << csevBroadcast)
-/// Network message events
-#define CSMASK_Network		(1 << csevNetwork)
 
 /// This mask identifies any mouse event
 #define CSMASK_Mouse \
@@ -160,8 +156,6 @@ typedef enum _csKeyEventType
 #define CS_IS_JOYSTICK_EVENT(e)	((1 << (e).Type) & CSMASK_Joystick)
 /// Check if a event is any input event
 #define CS_IS_INPUT_EVENT(e)	((1 << (e).Type) & CSMASK_Input)
-/// Check if the event is a network event
-#define CS_IS_NETWORK_EVENT(e)	((1 << (e).Type) & CSMASK_Network)
 /** @} */
 
 /** \name Event flags masks

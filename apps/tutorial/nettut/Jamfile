@@ -1,5 +1,0 @@
-SubDir TOP apps tutorial nettut ;
-
-Description nettut : "network tutorial" ;
-Application nettut : [ Wildcard *.cpp *.h ] : console noinstall ;
-LinkWith nettut : csgeom csgfx cstool csutil ;

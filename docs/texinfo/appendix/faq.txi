@@ -58,10 +58,6 @@ A 2D graphics driver which is particular to your platform.  The 3D rasterizer
 displays its rendered images through the 2D graphics driver.
 
 @item
-A network driver, such as the @sc{bsd}-style Sockets driver.  Use this if
-the application you want to use relies upon network access.
-
-@item
 Many of the Crystal Space applications also need several other plugins. For
 example plugins which implement 3D sprites, particle systems, ... In general
 the Crystal Space distribution will contain source for all of them.

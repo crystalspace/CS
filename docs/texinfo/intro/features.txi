@@ -175,9 +175,6 @@ Pull-down console that you can integrate in your own games.
 @xref{Config Console}.
 
 @item
-Network sockets. @xref{Network Drivers}.
-
-@item
 Collision detection (using @sc{rapid} or @sc{opcode}).
 @xref{HOWTO Collision Detection}.
 

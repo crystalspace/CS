@@ -27,8 +27,9 @@ HIGH:
 	     performance is excellent.  Jorrit suspects that this might be
 	     caused by texture swapping.
 	     Note by Jorrit: DrawPolygonMesh seems to help a lot.
-	     Unfortunatelly this function is still buggy (fog is not implemented
-	     and some transparency effects don't seem to be working).
+	     Unfortunatelly this function is still buggy (fog is not
+	     implemented and some transparency effects don't seem to be
+	     working).
 	[S3] Some canvases still clip improperly as shown by the clipping tests
 	     in g2dtest.  The Windows OpenGL canvas is one such canvas.
 	     Possibly, the MacOS/X canvases are also flawed.  Same is true for
@@ -120,12 +121,13 @@ HIGH:
 	     reports: "I've noticed a problem with tbtut running with the
 	     software renderer.  If you just go forward for just a bit (holding
 	     down the up arrow for a few seconds), it suddenly locks up."
-	[S1] NetTut doesn't parse it's commandline (one always get an error
+	[**] NetTut doesn't parse it's commandline (one always get an error
 	     message no matter what is entered at the command line).
 		Usage:  ./nettut [server/client] [tcp/udp] [hostname*] [port]
 		 * - specify hostname only if you are using client mode.
-	     [Bug 747994]
-	[S1] NetMantest or the netmanager plugin leaks
+	     [Bug 747994] (Network support dropped.)
+	[**] NetMantest or the netmanager plugin leaks. (Networking support
+	     dropped.)
 	[O1] Implement 3-bit outline renderer in Dynavis.
 	[O1] Implement better kd-tree balancing in Dynavis.
 	[V1] Walktest + newsky: it appears that there are some visibility
@@ -190,10 +192,10 @@ HIGH:
 	     disappearing/reappearing stars in csdemo.  Also probably affects
 	     other programs and maps, in which sudden and drastic pops in
 	     rendering occur.
-	[**] Using software renderer, go to the room in flarge with the spinning
-	     blocks and rings.  Add a light with shift-L.  The software
-	     renderer immediately crashes while trying to dereference a null
-	     pointer.  (optimize mode)
+	[**] Using software renderer, go to the room in flarge with the
+	     spinning blocks and rings.  Add a light with shift-L.  The
+	     software renderer immediately crashes while trying to dereference
+	     a null pointer.  (optimize mode)
 	[**] Blocks crashes at exit time dereferencing a garbage pointer
 	     (sometimes null, sometimes not).  To reproduce: 1) Launch.  2)
 	     Start new game.  3) Press ESC to get back to menu.  4) Select Quit
@@ -292,8 +294,8 @@ HIGH:
 	     [Bug 747989]
 	[**] Starting walktest with infinite renderer leads to direct crash
 	     (infinte renderer is removed now)
-	[**] simpvs crashes immediately at startup dereferencing a null pointer.
-	     (optimize mode)
+	[**] simpvs crashes immediately at startup dereferencing a null
+	     pointer.  (optimize mode)
 	[**] cswseng crashes dereferencing a null pointer.  To reproduce: 1)
 	     Launch cswseng.  2) Press "New View".  3) Press "Quit".  4) Crash.
 	     (optimize and debug mode)

@@ -34,12 +34,6 @@ effects are supported, as well as different ways to the same sound file.
 @xref{Sound Drivers}.
 
 @item
-@emph{Network Drivers}
-
-The networking modules allow CS programs to communicate between a network,
-internet or similar connection. @xref{Network Drivers}.
-
-@item
 @emph{3D Engine}
 
 This is the core of Crystal Space. It is the main driving force behind

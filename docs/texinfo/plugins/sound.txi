@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Sound Drivers, Network Drivers, Graphics Drivers, Plug-In Drivers
+@node Sound Drivers, csEngine, Graphics Drivers, Plug-In Drivers
 @section Sound Drivers
 @cindex Sound Drivers
 

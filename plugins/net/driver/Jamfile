@@ -1,4 +1,0 @@
-SubDir TOP plugins net driver ;
-
-SubInclude TOP plugins net driver ensocket ;
-SubInclude TOP plugins net driver socket ;

@@ -40,7 +40,6 @@
 	CSMASK_JoystickUp = (1 << csevJoystickUp)
 	CSMASK_Command = (1 << csevCommand)
 	CSMASK_Broadcast = (1 << csevBroadcast)
-	CSMASK_Network = (1 << csevNetwork)
 
 	CSMASK_Mouse = (CSMASK_MouseMove | CSMASK_MouseDown | CSMASK_MouseUp
 		| CSMASK_MouseClick | CSMASK_MouseDoubleClick)

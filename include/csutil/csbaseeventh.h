@@ -35,7 +35,7 @@
 #include <limits.h>
 
 // Max event type (in event type enumeration) that will be handled.
-#define _CSBASEEVENT_MAXARRAYINDEX csevNetwork
+#define _CSBASEEVENT_MAXARRAYINDEX csevFrameStart
 
 /**
  * Base implementation of a generic event handler.
@@ -164,9 +164,6 @@ protected:
    * is received.
    */
   virtual bool OnMouseDoubleClick (iEvent &event);
-
-  /// Invoked by the event handler when a network event is received.
-  virtual bool OnNetwork (iEvent &event);
 
   /**
    * Invoked by the event handler when an unknown event is received.

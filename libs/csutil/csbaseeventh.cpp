@@ -72,7 +72,6 @@ bool (csBaseEventHandler::*csBaseEventHandler::pmfnTriggers[])(iEvent &event) =
     &csBaseEventHandler::OnJoystickUp       /*csevJoystickUp*/,
     &csBaseEventHandler::OnCommand          /*csevCommand*/,
     &csBaseEventHandler::OnBroadcast        /*csevBroadcast*/,
-    &csBaseEventHandler::OnNetwork          /*csevNetwork*/,
   };
 
 bool csBaseEventHandler::HandleEvent (iEvent &event)
@@ -100,7 +99,6 @@ DefaultTrigger ( OnJoystickMove );
 DefaultTrigger ( OnJoystickDown );
 DefaultTrigger ( OnJoystickUp );
 DefaultTrigger ( OnCommand );
-DefaultTrigger ( OnNetwork );
 
 bool csBaseEventHandler::OnBroadcast (iEvent &event)
 {

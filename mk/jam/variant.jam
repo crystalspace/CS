@@ -41,7 +41,7 @@ LINKLIBS += $(COMPILER.LFLAGS) $(COMPILER.LFLAGS.$(VARIANT)) ;
 LOCATE.OBJECTS = $(LOCATE.OBJECTS)/$(VARIANT) ;
 
 ##  SubVariant variantname
-##    Specify subvarianet which are placed in separate compilation directories.
+##    Specify subvariant which are placed in separate compilation directories.
 SUBVARIANT ?= "" ;
 rule SubVariant
 {
