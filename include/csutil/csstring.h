@@ -432,6 +432,10 @@ public:
   { return Compare (iStr); }
   bool operator == (const char* iStr) const
   { return Compare (iStr); }
+  bool operator != (const csString& iStr) const
+  { return !Compare (iStr); }
+  bool operator != (const char* iStr) const
+  { return !Compare (iStr); }
 
   /**
    * Detach the low-level null-terminated string buffer from the csString
