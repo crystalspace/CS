@@ -1427,65 +1427,36 @@ void csGraphics3DOGLCommon::FinishDraw ()
       render_target->GetMipMapDimensions (0, txt_w, txt_h);
       csTextureHandleOpenGL* tex_mm = (csTextureHandleOpenGL *)
 	    render_target->GetPrivateObject ();
-      csTextureOpenGL *tex_0 = tex_mm->vTex[0];
+      //csTextureOpenGL *tex_0 = tex_mm->vTex[0];
       csTxtCacheData *tex_data = (csTxtCacheData*)render_target->GetCacheData();
-      if (tex_data)
+      if (!tex_data)
       {
-        // Texture is in tha cache, update texture directly.
-        statecache->SetTexture (GL_TEXTURE_2D, tex_data->Handle);
-	// Texture was not used as a render target before.
-	// Make some necessary adjustments.
-	if (!tex_mm->was_render_target)
+        // Make sure the texture is in the cache before updating it.
+        texture_cache->Cache (render_target);
+        tex_data = (csTxtCacheData*)render_target->GetCacheData();
+      }
+      // Texture is in tha cache, update texture directly.
+      statecache->SetTexture (GL_TEXTURE_2D, tex_data->Handle);
+      // Texture was not used as a render target before.
+      // Make some necessary adjustments.
+      if (!tex_mm->was_render_target)
+      {
+	if (!(tex_mm->GetFlags() & CS_TEXTURE_NOMIPMAPS))
 	{
-	  if (!(tex_mm->GetFlags() & CS_TEXTURE_NOMIPMAPS))
+	  if (SGIS_generate_mipmap)
 	  {
-	    if (SGIS_generate_mipmap)
-	    {
-	      glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-	    }
-	    else
-	    {
-	      glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-		texture_cache->GetBilinearMapping() ? GL_LINEAR : GL_NEAREST);
-	    }
+	    glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
 	  }
-	  tex_mm->was_render_target = true;
+	  else
+	  {
+	    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+		texture_cache->GetBilinearMapping() ? GL_LINEAR : GL_NEAREST);
+	  }
 	}
-        glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 1, height-txt_h,
+	tex_mm->was_render_target = true;
+      }
+      glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 1, height-txt_h,
       	  txt_w, txt_h, 0);
-      }
-      else
-      {
-        // Not in cache.
-       #ifdef GL_VERSION_1_2x
-        if (pfmt.PixelBytes == 2)
-        {
-          char* buffer = new char[2*txt_w*txt_h]; // @@@ Alloc elsewhere!!!
-          glReadPixels (0, height-txt_h, txt_w, txt_h,
-		GL_RGB, GL_UNSIGNED_SHORT_5_6_5, buffer);
-
-          csRGBpixel *dst = tex_0->get_image_data ();
-          uint16 bb = 8 - pfmt.BlueBits;
-          uint16 gb = 8 - pfmt.GreenBits;
-          uint16 rb = 8 - pfmt.RedBits;
-          uint16 *src = (uint16*) buffer;
-          int i;
-          for (i = 0 ; i < width*height ; i++, src++, dst++)
-          {
-	    dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift) << rb;
-	    dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift) << gb;
-	    dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift) << bb;
-          }
-	  delete[] buffer;
-        }
-        else
-          glReadPixels (1, height-txt_h, txt_w, txt_h,
-            GL_RGBA, GL_UNSIGNED_BYTE, tex_0->get_image_data());
-       #else
-        glReadPixels (1, height-txt_h, txt_w, txt_h, tex_mm->SourceFormat (),
-          tex_mm->SourceType (), tex_0->get_image_data ());
-       #endif
-      }
     }
   }
   render_target = NULL;
