@@ -65,24 +65,83 @@ bool csConsoleInput::HandleEvent(csEvent &event)
     case CSKEY_LEFT:
 	if(cursor>0) {
 	  cursor--;
-	  piConsole->GetCursorPos(cx, cy);
-	  piConsole->SetCursorPos(cx-1, cy);
+	  if(piConsole) {
+	    piConsole->GetCursorPos(cx, cy); 
+	    piConsole->SetCursorPos(cx-1, cy);
+	  }
 	}
 	break;
     case CSKEY_RIGHT:
-      if(cursor<buffer->GetLine(buffer->GetCurLine(), dummy)->Length()) {
+      if(cursor<buffer->GetLine(history, dummy)->Length()) {
 	cursor++;
-	piConsole->GetCursorPos(cx, cy);
-	piConsole->SetCursorPos(cx+1, cy);
+	if(piConsole) {
+	  piConsole->GetCursorPos(cx, cy);
+	  piConsole->SetCursorPos(cx+1, cy);
+	}
       }
+      break;
     case CSKEY_UP:
-      //@@@ How do I handle this
+      {
+	int ancient_history = history;
+	// If we're at the top of the list, cycle down to the bottom
+	if(history==0)
+	  history = buffer->GetCurLine();
+	else
+	  history--;
+	// Update the console
+	if(piConsole) {
+	  bool dirty;
+	  const csString *consoleText = piConsole->GetText(), *bufferText = buffer->GetLine(ancient_history, dirty);
+	  // Make sure neither the console line nor the buffer line is NULL
+	  if(!(consoleText==NULL||bufferText==NULL)) {
+	    int start = consoleText->Length() - bufferText->Length();
+	    cursor -= consoleText->Length();
+	    piConsole->DeleteText(start > 0 ? start : 0);
+	  }
+	  bufferText = buffer->GetLine(history, dirty);
+	  if(bufferText&&(!bufferText->IsEmpty())) {
+	    piConsole->PutText(bufferText->GetData());
+	    cursor += bufferText->Length();
+	  }
+	}
+      }
       break;
     case CSKEY_DOWN:
-      //@@@ How do I handle this
+      {
+	int ancient_history = history;
+	// If we are at the bottom, cycle to the top
+	if(history==0)
+	  history = 0;
+	else
+	  history++;
+	// Update the console
+	if(piConsole) {
+	  bool dirty;
+	  const csString *consoleText = piConsole->GetText(), *bufferText = buffer->GetLine(ancient_history, dirty);
+	  // Make sure neither the console line nor the buffer line is NULL
+	  if(!(consoleText==NULL||bufferText==NULL)) {
+	    int start = consoleText->Length() - bufferText->Length();
+	    cursor -= consoleText->Length();
+	    piConsole->DeleteText(start > 0 ? start : 0);
+	  }
+	  bufferText = buffer->GetLine(history, dirty);
+	  if(bufferText&&(!bufferText->IsEmpty())) {
+	    piConsole->PutText(bufferText->GetData());
+	    cursor += bufferText->Length();
+	  }
+	}
+      }
       break;
     default:
       if(event.Key.Code < CSKEY_FIRST) {
+
+	if(history!=buffer->GetCurLine()) {
+	  bool dirty;
+	  buffer->DeleteLine(buffer->GetCurLine());
+	  line = buffer->WriteLine();
+	  line->Append(*buffer->GetLine(history, dirty));
+	  history = buffer->GetCurLine();
+	}
 
 	bool echo = true;
 
@@ -100,13 +159,7 @@ bool csConsoleInput::HandleEvent(csEvent &event)
 	  else if (cursor==1)
 	    buffer->DeleteLine(buffer->GetCurLine());
 	  else if (cursor==0) {
-#if 0
-	    if(buffer->GetCurLine()>0) {
-	      buffer->SetCurLine(buffer->GetCurLine()-1);
-	    }
-#else
 	    echo = false;
-#endif
 	    // This gets decremented to zero below
 	    cursor = 1;
 	  }
@@ -151,7 +204,7 @@ const csString *csConsoleInput::GetInput(int line) const
   bool dummy;
 
   if(line<0)
-    return buffer->GetLine(buffer->GetCurLine(), dummy);
+    return buffer->GetLine(history, dummy);
   else
     return buffer->GetLine(line, dummy);
 }
@@ -165,6 +218,7 @@ void csConsoleInput::NewLine()
 {
   buffer->NewLine();
   cursor = 0;
+  history = buffer->GetCurLine();
 }
 
 int csConsoleInput::GetBufferSize() const

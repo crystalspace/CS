@@ -70,6 +70,11 @@ struct iConsole : public iPlugIn
   /// Return a line from the buffer (-1 = current line)
   virtual const csString *GetText(int line = -1) const = 0;
 
+  /** Delete the specified text on the current line.   Using the default 
+   *  parameters deletes all of the text in the current line.
+   */
+  virtual void DeleteText(int start = 0, int end = -1) = 0;
+
   /// Update the console on the window.
   virtual void Draw(csRect *rect = NULL) = 0;
 

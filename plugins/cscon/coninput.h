@@ -49,6 +49,7 @@ protected:
   iConsole *piConsole;
   csConsoleBuffer *buffer;
   size_t cursor;
+  int history;
 };
 
 #endif // ! __CS_CONINPUT_H__

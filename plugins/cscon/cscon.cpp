@@ -172,7 +172,27 @@ void csConsole::PutText(const char *text)
 const csString *csConsole::GetText(int line) const
 {
   bool dirty;
-  return buffer->GetLine((line==-1) ? buffer->GetCurLine() : line, dirty);
+  return buffer->GetLine((line==-1) ? (buffer->GetCurLine() - buffer->GetTopLine()) : line, dirty);
+}
+
+void csConsole::DeleteText(int start, int end)
+{
+  csString *text = buffer->WriteLine();
+  int length = text->Length();
+
+  // Avoid invalid start points
+  if(start>length)
+    return;
+
+  // Make sure we don't go past the end of the string
+  if((end==-1)||(end>=length)) {
+    text->DeleteAt(start, length - start);
+    cx = text->Length();
+  } else {
+    text->DeleteAt(start, end - start);
+    cx -= end - start;
+  }
+
 }
 
 void csConsole::Draw(csRect *area)
