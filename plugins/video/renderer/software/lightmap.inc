@@ -134,7 +134,7 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 
   int src = min_lu + min_lv * lm_w;
   int src_dlu = lm_w - (max_lu - min_lu);
-  for (int lv = min_lv; lv < max_lv-1/*@@@@@@@@*/; lv++)
+  for (int lv = min_lv; lv < max_lv; lv++)
   {
     for (int lu = min_lu; lu < max_lu; lu++)
     {
