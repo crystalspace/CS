@@ -60,10 +60,10 @@ csConsoleInput::csConsoleInput (iBase *iParent) : History (16, 16)
 csConsoleInput::~csConsoleInput ()
 {
   delete [] Prompt;
+
   if (Console)
   {
     Console->DecRef ();
-    Console->RegisterPlugin (NULL);
   }
 }
 
