@@ -19,6 +19,7 @@ The history order is reversed so that new features are at the top.
 	  that use csSector::IntersectSegment() are now speed up by
 	  Dynavis.
 	- Some optimizations to Dynavis again.
+	- Switched back to FindOBB()... Weird...
 20-Jun-2002
 	- Considerably optimized AppendWriteQueue() in Dynavis. Profiling
 	  showed that this is now the function that does most work.
