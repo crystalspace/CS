@@ -16,28 +16,28 @@ LIBS = \
 	$(TOP)/out/linuxx86/optimize/libs/csutil/libcsutil.a
 
 JAVA_SOURCES = \
-    src/net/sourceforge/crystal/CS.java \
-    src/net/sourceforge/crystal/csJEventHandler.java \
-    src/net/sourceforge/crystal/examples/SimpleRoom.java
+    src/com/crystalspace/CS.java \
+    src/com/crystalspace/csJEventHandler.java \
+    src/com/crystalspace/examples/SimpleRoom.java
 
 all : build
 
 paths :
-	@-mkdir -p src/net/sourceforge/crystal/examples
+	@-mkdir -p src/com/crystalspace/examples
 
 csjava.cpp : $(DEPS)
-	cd src ; swig $(SWIG.FLAGS) -c++ -java -package 'net.sourceforge.crystal' -I$(TOP)/../include -o csjava.cpp $(TOP)/../include/ivaria/cspace.i
-	mv src/*.java src/net/sourceforge/crystal/
+	cd src ; swig $(SWIG.FLAGS) -c++ -java -package 'com.crystalspace' -I$(TOP)/../include -o csjava.cpp $(TOP)/../include/ivaria/cspace.i
+	mv src/*.java src/com/crystalspace/
 	cp src/csjava.cpp .
 
-src/net/sourceforge/crystal/CS.java : net/sourceforge/crystal/CS.java
-	cp -a net/sourceforge/crystal/CS.java src/net/sourceforge/crystal/
+src/com/crystalspace/CS.java : com/crystalspace/CS.java
+	cp -a com/crystalspace/CS.java src/com/crystalspace/
 
-src/net/sourceforge/crystal/csJEventHandler.java : net/sourceforge/crystal/csJEventHandler.java
-	cp -a net/sourceforge/crystal/csJEventHandler.java src/net/sourceforge/crystal/
+src/com/crystalspace/csJEventHandler.java : com/crystalspace/csJEventHandler.java
+	cp -a com/crystalspace/csJEventHandler.java src/com/crystalspace/
 
-src/net/sourceforge/crystal/examples/SimpleRoom.java : net/sourceforge/crystal/examples/SimpleRoom.java
-	cp -a net/sourceforge/crystal/examples/SimpleRoom.java src/net/sourceforge/crystal/examples/
+src/com/crystalspace/examples/SimpleRoom.java : com/crystalspace/examples/SimpleRoom.java
+	cp -a com/crystalspace/examples/SimpleRoom.java src/com/crystalspace/examples/
 
 csjava.o : csjava.cpp
 	g++ -I$(TOP)/include -I $(JAVASDK)/include/ -I $(JAVASDK)/include/linux/ -c csjava.cpp
