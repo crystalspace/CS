@@ -216,7 +216,7 @@ AS_IF([test -n "$RANLIB"], [CS_BUILD_PROPERTY([CMD.RANLIB], [$RANLIB])])
 
 AC_CHECK_PROGS([SWIGBIN], [swig])
 AS_IF([test -n "$SWIGBIN"],
-    [CS_CHECK_PROG_VERSION([swig], [$SWIGBIN --version 2>&1], [1.13.0],
+    [CS_CHECK_PROG_VERSION([swig], [$SWIGBIN -version 2>&1], [1.3.14],
 	[9.9.9], [CS_BUILD_PROPERTY([SWIGBIN], [$SWIGBIN])])])
 
 AC_CHECK_PROGS([MAKE], [gnumake gmake make])
