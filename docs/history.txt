@@ -46,6 +46,8 @@ for each given day, however, are in normal (ascending) chronological order.
 	  iterators initialized from const hashmaps.
 	- Reed Hedges added csInitializer::SetupVFS, and changed
 	  csInitializer::SetupConfigManager to use that function.
+	- res committed some forgotten files and fixed some cut'n'paste and 
+	  similar stupid errors.
 28-Jul-2003
 	- Jorrit removed several csVector's throughout CS:
 	    - Replaced 'render_priorities' in the engine with csStringArray.

@@ -230,23 +230,23 @@ public:
     {
       OUTPUT_CHAR ((utf8_char)(0xf8 | (ch >> 24)));
       OUTPUT_CHAR ((utf8_char)(0x80 | ((ch >> 18) & 0x3f)));
-      OUTPUT_CHAR ((utf8_char)(0x80 | ((ch >> 11) & 0x3f)));
+      OUTPUT_CHAR ((utf8_char)(0x80 | ((ch >> 12) & 0x3f)));
       OUTPUT_CHAR ((utf8_char)(0x80 | ((ch >> 6) & 0x3f)));
       OUTPUT_CHAR ((utf8_char)(0x80 | (ch & 0x3f)));
     }
     else if (ch < 0x80000000)
     {
-      OUTPUT_CHAR ((utf8_char)(0xfc | (ch >> 32)));
+      OUTPUT_CHAR ((utf8_char)(0xfc | (ch >> 30)));
       OUTPUT_CHAR ((utf8_char)(0x80 | ((ch >> 24) & 0x3f)));
       OUTPUT_CHAR ((utf8_char)(0x80 | ((ch >> 18) & 0x3f)));
-      OUTPUT_CHAR ((utf8_char)(0x80 | ((ch >> 11) & 0x3f)));
+      OUTPUT_CHAR ((utf8_char)(0x80 | ((ch >> 12) & 0x3f)));
       OUTPUT_CHAR ((utf8_char)(0x80 | ((ch >> 6) & 0x3f)));
       OUTPUT_CHAR ((utf8_char)(0x80 | (ch & 0x3f)));
     }
     return encodedLen;
   }
     
-  inline static EncodeUTF16 (const utf32_char ch, utf16_char* buf, 
+  inline static int EncodeUTF16 (const utf32_char ch, utf16_char* buf, 
     size_t bufsize)
   {
     if ((CS_UC_IS_INVALID(ch)) || (CS_UC_IS_SURROGATE(ch))) 
@@ -268,7 +268,7 @@ public:
     return encodedLen;
   }
 
-  inline static EncodeUTF32 (const utf32_char ch, utf32_char* buf, 
+  inline static int EncodeUTF32 (const utf32_char ch, utf32_char* buf, 
     size_t bufsize)
   {
     if ((CS_UC_IS_INVALID(ch)) || (CS_UC_IS_SURROGATE(ch))) 
@@ -313,7 +313,7 @@ public:
       	dcnt = encoder (CS_UC_CHAR_REPLACER, dest, bufRemaining);	\
       }									\
 									\
-      if (dcnt >= bufRemaining) 					\
+      if ((size_t)dcnt >= bufRemaining) 				\
       {									\
         bufRemaining = 0;						\
 	if (dest && (destSize > 0)) dest += bufRemaining;		\
@@ -324,7 +324,7 @@ public:
 	if (dest && (destSize > 0)) dest += dcnt;			\
       }									\
       encodedLen += dcnt;						\
-      if (scnt >= srcChars) break;					\
+      if ((size_t)scnt >= srcChars) break;				\
       srcChars -= scnt;							\
       source += scnt;							\
     }									\
@@ -467,7 +467,7 @@ public:
   inline static size_t WCtoUTF8 (utf8_char* dest, const wchar_t* source,
     size_t destSize, size_t srcSize)
   {
-    return UTF16to8 (dest, source, destSize, srcSize);
+    return UTF16to8 (dest, (utf16_char*)source, destSize, srcSize);
   };
 
   inline static size_t WCtoUTF16 (utf16_char* dest, const wchar_t* source,
@@ -492,7 +492,7 @@ public:
   inline static size_t WCtoUTF32 (utf32_char* dest, const wchar_t* source,
     size_t destSize, size_t srcSize)
   {
-    return UTF16to32 (dest, source, destSize, srcSize);
+    return UTF16to32 (dest, (utf16_char*)source, destSize, srcSize);
   };
 #elif (CS_WCHAR_T_SIZE == 4)
   inline static size_t UTF8toWC (wchar_t* dest, const utf8_char* source,
@@ -529,13 +529,13 @@ public:
   inline static size_t WCtoUTF8 (utf8_char* dest, const wchar_t* source,
     size_t destSize, size_t srcSize)
   {
-    return UTF32to8 (dest, source, destSize, srcSize);
+    return UTF32to8 (dest, (utf32_char*)source, destSize, srcSize);
   };
 
   inline static size_t WCtoUTF16 (utf16_char* dest, const wchar_t* source,
     size_t destSize, size_t srcSize)
   {
-    return UTF32to16 (dest, source, destSize, srcSize);
+    return UTF32to16 (dest, (utf32_char*)source, destSize, srcSize);
   };
 
   inline static size_t WCtoUTF32 (utf32_char* dest, const wchar_t* source,

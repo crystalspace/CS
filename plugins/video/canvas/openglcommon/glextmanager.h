@@ -12207,7 +12207,7 @@ private:
   bool tested_CS_GL_ARB_vertex_buffer_object;
 
 public:
-  csGLExtensionManager (): object_reg(0)
+  void Reset ()
   {
     extstrGL = 0;
 #ifdef __WIN32__
@@ -12515,6 +12515,11 @@ public:
 
   }
   
+  csGLExtensionManager () : object_reg (0)
+  {
+    Reset ();
+  }
+  
   void InitGL_version_1_2 ()
   {
     if (tested_CS_GL_version_1_2) return;
@@ -12621,7 +12626,7 @@ public:
     char cfgkey[26 + 14 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_imaging = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_imaging = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -12679,7 +12684,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_multitexture = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_multitexture = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -12737,7 +12742,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_transpose_matrix = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_transpose_matrix = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -12765,7 +12770,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_multisample = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_multisample = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -12790,7 +12795,7 @@ public:
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_texture_env_add = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_texture_env_add = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -12843,7 +12848,7 @@ public:
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
-    CS_WGL_ARB_buffer_region = (strstr (extstrWGL, ext) != NULL);
+    CS_WGL_ARB_buffer_region = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -12872,7 +12877,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_texture_cube_map = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_texture_cube_map = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -12896,7 +12901,7 @@ public:
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_depth_texture = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_depth_texture = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -12920,7 +12925,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_point_parameters = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_point_parameters = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -12946,7 +12951,7 @@ public:
     char cfgkey[26 + 13 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_shadow = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_shadow = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -12970,7 +12975,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_shadow_ambient = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_shadow_ambient = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -12994,7 +12999,7 @@ public:
     char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_texture_border_clamp = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_texture_border_clamp = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13018,7 +13023,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_texture_compression = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_texture_compression = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13049,7 +13054,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_texture_env_combine = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_texture_env_combine = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13073,7 +13078,7 @@ public:
     char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_texture_env_crossbar = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_texture_env_crossbar = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13097,7 +13102,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_texture_env_dot3 = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_texture_env_dot3 = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13121,7 +13126,7 @@ public:
     char cfgkey[26 + 30 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_texture_mirrored_repeat = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_texture_mirrored_repeat = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13145,7 +13150,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_vertex_blend = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_vertex_blend = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13180,7 +13185,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_vertex_program = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_vertex_program = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13266,7 +13271,7 @@ public:
     char cfgkey[26 + 17 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_window_pos = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_window_pos = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13306,7 +13311,7 @@ public:
     char cfgkey[26 + 17 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_422_pixels = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_422_pixels = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13330,7 +13335,7 @@ public:
     char cfgkey[26 + 11 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_abgr = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_abgr = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13354,7 +13359,7 @@ public:
     char cfgkey[26 + 11 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_bgra = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_bgra = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13378,7 +13383,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_blend_color = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_blend_color = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13403,7 +13408,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_blend_func_separate = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_blend_func_separate = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13428,7 +13433,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_blend_logic_op = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_blend_logic_op = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13452,7 +13457,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_blend_minmax = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_blend_minmax = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13477,7 +13482,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_blend_subtract = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_blend_subtract = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13501,7 +13506,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_clip_volume_hint = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_clip_volume_hint = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13525,7 +13530,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_color_subtable = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_color_subtable = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13551,7 +13556,7 @@ public:
     char cfgkey[26 + 28 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_compiled_vertex_array = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_compiled_vertex_array = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13577,7 +13582,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_convolution = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_convolution = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13614,7 +13619,7 @@ public:
     char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_fog_coord = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_fog_coord = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13643,7 +13648,7 @@ public:
     char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_histogram = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_histogram = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13677,7 +13682,7 @@ public:
     char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_multi_draw_arrays = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_multi_draw_arrays = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13703,7 +13708,7 @@ public:
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_packed_pixels = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_packed_pixels = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13727,7 +13732,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_paletted_texture = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_paletted_texture = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13756,7 +13761,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_point_parameters = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_point_parameters = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13782,7 +13787,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_polygon_offset = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_polygon_offset = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13807,7 +13812,7 @@ public:
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_secondary_color = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_secondary_color = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13848,7 +13853,7 @@ public:
     char cfgkey[26 + 30 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_separate_specular_color = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_separate_specular_color = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13872,7 +13877,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_shadow_funcs = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_shadow_funcs = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13896,7 +13901,7 @@ public:
     char cfgkey[26 + 29 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_shared_texture_palette = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_shared_texture_palette = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13920,7 +13925,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_stencil_two_side = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_stencil_two_side = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13945,7 +13950,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_stencil_wrap = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_stencil_wrap = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13969,7 +13974,7 @@ public:
     char cfgkey[26 + 17 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_subtexture = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_subtexture = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -13996,7 +14001,7 @@ public:
     char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_texture3D = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_texture3D = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14021,7 +14026,7 @@ public:
     char cfgkey[26 + 31 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_texture_compression_s3tc = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_texture_compression_s3tc = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14045,7 +14050,7 @@ public:
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_texture_env_add = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_texture_env_add = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14069,7 +14074,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_texture_env_combine = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_texture_env_combine = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14093,7 +14098,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_texture_env_dot3 = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_texture_env_dot3 = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14117,7 +14122,7 @@ public:
     char cfgkey[26 + 33 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_texture_filter_anisotropic = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_texture_filter_anisotropic = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14141,7 +14146,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_texture_lod_bias = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_texture_lod_bias = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14165,7 +14170,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_texture_object = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_texture_object = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14195,7 +14200,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_vertex_array = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_vertex_array = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14228,7 +14233,7 @@ public:
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_vertex_shader = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_vertex_shader = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14294,7 +14299,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_vertex_weighting = (strstr (extstrGL, ext) != NULL);
+    CS_GL_EXT_vertex_weighting = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14321,7 +14326,7 @@ public:
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_HP_occlusion_test = (strstr (extstrGL, ext) != NULL);
+    CS_GL_HP_occlusion_test = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14345,7 +14350,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_blend_square = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_blend_square = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14369,7 +14374,7 @@ public:
     char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_copy_depth_to_color = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_copy_depth_to_color = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14393,7 +14398,7 @@ public:
     char cfgkey[26 + 17 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_depth_clamp = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_depth_clamp = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14417,7 +14422,7 @@ public:
     char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_evaluators = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_evaluators = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14450,7 +14455,7 @@ public:
     char cfgkey[26 + 11 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_fence = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_fence = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14481,7 +14486,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_fog_distance = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_fog_distance = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14505,7 +14510,7 @@ public:
     char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_light_max_exponent = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_light_max_exponent = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14529,7 +14534,7 @@ public:
     char cfgkey[26 + 29 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_multisample_filter_hint = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_multisample_filter_hint = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14553,7 +14558,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_occlusion_query = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_occlusion_query = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14584,7 +14589,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_packed_depth_stencil = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_packed_depth_stencil = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14608,7 +14613,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_point_sprite = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_point_sprite = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14634,7 +14639,7 @@ public:
     char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_register_combiners = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_register_combiners = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14671,7 +14676,7 @@ public:
     char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_register_combiners2 = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_register_combiners2 = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14697,7 +14702,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_texgen_emboss = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_texgen_emboss = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14721,7 +14726,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_texgen_reflection = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_texgen_reflection = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14745,7 +14750,7 @@ public:
     char cfgkey[26 + 29 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_texture_compression_vtc = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_texture_compression_vtc = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14769,7 +14774,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_texture_env_combine4 = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_texture_env_combine4 = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14793,7 +14798,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_texture_rectangle = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_texture_rectangle = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14817,7 +14822,7 @@ public:
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_texture_shader = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_texture_shader = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14841,7 +14846,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_texture_shader2 = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_texture_shader2 = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14865,7 +14870,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_texture_shader3 = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_texture_shader3 = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14889,7 +14894,7 @@ public:
     char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_vertex_array_range = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_vertex_array_range = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14917,7 +14922,7 @@ public:
     char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_vertex_array_range2 = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_vertex_array_range2 = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -14941,7 +14946,7 @@ public:
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_vertex_program = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_vertex_program = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15027,7 +15032,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_vertex_program1_1 = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_vertex_program1_1 = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15051,7 +15056,7 @@ public:
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ATI_element_array = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ATI_element_array = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15078,7 +15083,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ATI_envmap_bumpmap = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ATI_envmap_bumpmap = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15106,7 +15111,7 @@ public:
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ATI_fragment_shader = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ATI_fragment_shader = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15144,7 +15149,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ATI_pn_triangles = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ATI_pn_triangles = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15170,7 +15175,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ATI_texture_mirror_once = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ATI_texture_mirror_once = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15194,7 +15199,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ATI_vertex_array_object = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ATI_vertex_array_object = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15230,7 +15235,7 @@ public:
     char cfgkey[26 + 33 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ATI_vertex_attrib_array_object = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ATI_vertex_attrib_array_object = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15257,7 +15262,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ATI_vertex_streams = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ATI_vertex_streams = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15328,7 +15333,7 @@ public:
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
-    CS_WGL_I3D_image_buffer = (strstr (extstrWGL, ext) != NULL);
+    CS_WGL_I3D_image_buffer = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15359,7 +15364,7 @@ public:
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
-    CS_WGL_I3D_swap_frame_lock = (strstr (extstrWGL, ext) != NULL);
+    CS_WGL_I3D_swap_frame_lock = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15390,7 +15395,7 @@ public:
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
-    CS_WGL_I3D_swap_frame_usage = (strstr (extstrWGL, ext) != NULL);
+    CS_WGL_I3D_swap_frame_usage = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15419,7 +15424,7 @@ public:
     char cfgkey[26 + 32 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_3DFX_texture_compression_FXT1 = (strstr (extstrGL, ext) != NULL);
+    CS_GL_3DFX_texture_compression_FXT1 = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15443,7 +15448,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_IBM_cull_vertex = (strstr (extstrGL, ext) != NULL);
+    CS_GL_IBM_cull_vertex = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15467,7 +15472,7 @@ public:
     char cfgkey[26 + 28 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_IBM_multimode_draw_arrays = (strstr (extstrGL, ext) != NULL);
+    CS_GL_IBM_multimode_draw_arrays = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15493,7 +15498,7 @@ public:
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_IBM_raster_pos_clip = (strstr (extstrGL, ext) != NULL);
+    CS_GL_IBM_raster_pos_clip = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15517,7 +15522,7 @@ public:
     char cfgkey[26 + 30 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_IBM_texture_mirrored_repeat = (strstr (extstrGL, ext) != NULL);
+    CS_GL_IBM_texture_mirrored_repeat = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15541,7 +15546,7 @@ public:
     char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_IBM_vertex_array_lists = (strstr (extstrGL, ext) != NULL);
+    CS_GL_IBM_vertex_array_lists = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15572,7 +15577,7 @@ public:
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_MESA_resize_buffers = (strstr (extstrGL, ext) != NULL);
+    CS_GL_MESA_resize_buffers = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15597,7 +15602,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_MESA_window_pos = (strstr (extstrGL, ext) != NULL);
+    CS_GL_MESA_window_pos = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15645,7 +15650,7 @@ public:
     char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_OML_interlace = (strstr (extstrGL, ext) != NULL);
+    CS_GL_OML_interlace = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15669,7 +15674,7 @@ public:
     char cfgkey[26 + 15 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_OML_resample = (strstr (extstrGL, ext) != NULL);
+    CS_GL_OML_resample = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15693,7 +15698,7 @@ public:
     char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_OML_subsample = (strstr (extstrGL, ext) != NULL);
+    CS_GL_OML_subsample = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15717,7 +15722,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIS_generate_mipmap = (strstr (extstrGL, ext) != NULL);
+    CS_GL_SGIS_generate_mipmap = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15741,7 +15746,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIS_multisample = (strstr (extstrGL, ext) != NULL);
+    CS_GL_SGIS_multisample = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15767,7 +15772,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIS_pixel_texture = (strstr (extstrGL, ext) != NULL);
+    CS_GL_SGIS_pixel_texture = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15795,7 +15800,7 @@ public:
     char cfgkey[26 + 28 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIS_texture_border_clamp = (strstr (extstrGL, ext) != NULL);
+    CS_GL_SGIS_texture_border_clamp = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15819,7 +15824,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIS_texture_color_mask = (strstr (extstrGL, ext) != NULL);
+    CS_GL_SGIS_texture_color_mask = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15844,7 +15849,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIS_texture_edge_clamp = (strstr (extstrGL, ext) != NULL);
+    CS_GL_SGIS_texture_edge_clamp = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15868,7 +15873,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIS_texture_lod = (strstr (extstrGL, ext) != NULL);
+    CS_GL_SGIS_texture_lod = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15892,7 +15897,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIS_depth_texture = (strstr (extstrGL, ext) != NULL);
+    CS_GL_SGIS_depth_texture = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15916,7 +15921,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIX_fog_offset = (strstr (extstrGL, ext) != NULL);
+    CS_GL_SGIX_fog_offset = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15940,7 +15945,7 @@ public:
     char cfgkey[26 + 17 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIX_interlace = (strstr (extstrGL, ext) != NULL);
+    CS_GL_SGIX_interlace = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15964,7 +15969,7 @@ public:
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIX_shadow_ambient = (strstr (extstrGL, ext) != NULL);
+    CS_GL_SGIX_shadow_ambient = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -15988,7 +15993,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGI_color_matrix = (strstr (extstrGL, ext) != NULL);
+    CS_GL_SGI_color_matrix = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16012,7 +16017,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGI_color_table = (strstr (extstrGL, ext) != NULL);
+    CS_GL_SGI_color_table = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16043,7 +16048,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGI_texture_color_table = (strstr (extstrGL, ext) != NULL);
+    CS_GL_SGI_texture_color_table = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16067,7 +16072,7 @@ public:
     char cfgkey[26 + 13 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SUN_vertex = (strstr (extstrGL, ext) != NULL);
+    CS_GL_SUN_vertex = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16131,7 +16136,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_fragment_program = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_fragment_program = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16174,7 +16179,7 @@ public:
     char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ATI_text_fragment_shader = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ATI_text_fragment_shader = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16198,7 +16203,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_APPLE_client_storage = (strstr (extstrGL, ext) != NULL);
+    CS_GL_APPLE_client_storage = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16222,7 +16227,7 @@ public:
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_APPLE_element_array = (strstr (extstrGL, ext) != NULL);
+    CS_GL_APPLE_element_array = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16251,7 +16256,7 @@ public:
     char cfgkey[26 + 14 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_APPLE_fence = (strstr (extstrGL, ext) != NULL);
+    CS_GL_APPLE_fence = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16283,7 +16288,7 @@ public:
     char cfgkey[26 + 28 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_APPLE_vertex_array_object = (strstr (extstrGL, ext) != NULL);
+    CS_GL_APPLE_vertex_array_object = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16311,7 +16316,7 @@ public:
     char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_APPLE_vertex_array_range = (strstr (extstrGL, ext) != NULL);
+    CS_GL_APPLE_vertex_array_range = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16340,7 +16345,7 @@ public:
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
-    CS_WGL_ARB_pixel_format = (strstr (extstrWGL, ext) != NULL);
+    CS_WGL_ARB_pixel_format = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16370,7 +16375,7 @@ public:
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
-    CS_WGL_ARB_make_current_read = (strstr (extstrWGL, ext) != NULL);
+    CS_WGL_ARB_make_current_read = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16399,7 +16404,7 @@ public:
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
-    CS_WGL_ARB_pbuffer = (strstr (extstrWGL, ext) != NULL);
+    CS_WGL_ARB_pbuffer = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16431,7 +16436,7 @@ public:
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
-    CS_WGL_EXT_swap_control = (strstr (extstrWGL, ext) != NULL);
+    CS_WGL_EXT_swap_control = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16460,7 +16465,7 @@ public:
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
-    CS_WGL_ARB_render_texture = (strstr (extstrWGL, ext) != NULL);
+    CS_WGL_ARB_render_texture = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16490,7 +16495,7 @@ public:
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
-    CS_WGL_EXT_extensions_string = (strstr (extstrWGL, ext) != NULL);
+    CS_WGL_EXT_extensions_string = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16518,7 +16523,7 @@ public:
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
-    CS_WGL_EXT_make_current_read = (strstr (extstrWGL, ext) != NULL);
+    CS_WGL_EXT_make_current_read = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16547,7 +16552,7 @@ public:
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
-    CS_WGL_EXT_pbuffer = (strstr (extstrWGL, ext) != NULL);
+    CS_WGL_EXT_pbuffer = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16579,7 +16584,7 @@ public:
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
-    CS_WGL_EXT_pixel_format = (strstr (extstrWGL, ext) != NULL);
+    CS_WGL_EXT_pixel_format = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16609,7 +16614,7 @@ public:
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
-    CS_WGL_I3D_digital_video_control = (strstr (extstrWGL, ext) != NULL);
+    CS_WGL_I3D_digital_video_control = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16638,7 +16643,7 @@ public:
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
-    CS_WGL_I3D_gamma = (strstr (extstrWGL, ext) != NULL);
+    CS_WGL_I3D_gamma = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16669,7 +16674,7 @@ public:
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
-    CS_WGL_I3D_genlock = (strstr (extstrWGL, ext) != NULL);
+    CS_WGL_I3D_genlock = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16706,7 +16711,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_matrix_palette = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_matrix_palette = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16735,7 +16740,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_element_array = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_element_array = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16764,7 +16769,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_float_buffer = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_float_buffer = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16788,7 +16793,7 @@ public:
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_fragment_program = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_fragment_program = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16822,7 +16827,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_primitive_restart = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_primitive_restart = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16848,7 +16853,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_vertex_program2 = (strstr (extstrGL, ext) != NULL);
+    CS_GL_NV_vertex_program2 = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16872,7 +16877,7 @@ public:
     char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_vertex_buffer_object = (strstr (extstrGL, ext) != NULL);
+    CS_GL_ARB_vertex_buffer_object = (strstr (extstrGL, ext) != 0);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -16908,3 +16913,4 @@ public:
 #undef EXTMGR_REPORT_INIT_RESULT
 
 #endif // __CS_GLEXTENSIONMANAGER_H__
+
