@@ -181,7 +181,7 @@ iNetworkConnection* csSocketListener::Accept()
   if (ValidateSocket())
   {
     struct sockaddr addr;
-    int addrlen = sizeof(sockaddr);
+    socklen_t addrlen = sizeof(sockaddr);
     csNetworkSocket s = accept(Socket, &addr, &addrlen);
     if (s != CS_NET_SOCKET_INVALID)
       connection = new csSocketConnection(scfParent, s, BlockingConnection);

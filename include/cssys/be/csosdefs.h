@@ -35,4 +35,8 @@
 #  define __NEED_GENERIC_ISDIR
 #endif
 
+#if defined(SYSDEF_SOCKETS)
+typedef int socklen_t;
+#endif
+
 #endif // __CSOSDEFS_H__

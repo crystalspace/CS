@@ -41,4 +41,8 @@ extern char* get_software_2d_driver ();
 #  define __NEED_GENERIC_ISDIR
 #endif
 
+#if defined(SYSDEF_SOCKETS)
+#  include <arpa/inet.h>
+#endif
+
 #endif // __CSOSDEFS_H__
