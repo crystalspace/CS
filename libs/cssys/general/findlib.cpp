@@ -180,9 +180,13 @@ csLibraryHandle csFindLoadLibrary (const char *iPrefix, const char *iName,
     }
     else
     {
+#ifdef CS_DEBUG
       callbackPrint printer;
       fprintf (stderr, "WARNING: %s, failed to load, because:\n", iName);
       csFindLoadLibraryHelper (iPrefix, iName, iSuffix, printer);
+#else
+      fprintf (stderr, "Warning: %s failed to load (perhaps application doesn't need it?).\n", iName);
+#endif
     }
   }
 
