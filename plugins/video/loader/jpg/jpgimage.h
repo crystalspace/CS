@@ -109,15 +109,12 @@ private:
     bool InitOk();
     virtual bool LoadData ();
   };
+  friend class JpegLoader;
 
   /// Initialize the image object
-  /*ImageJpgFile (int iFormat, iObjectRegistry* p) : csImageMemory (iFormat) 
-    { object_reg = p; };
-  /// Try to read the PNG file from the buffer and return success status
-  bool Load (uint8* iBuffer, size_t iSize);*/
-
   ImageJpgFile (iObjectRegistry* p, int iFormat) 
     : csCommonImageFile (p, iFormat) { };
+  /// Create a JpegLoader for this image
   virtual csRef<iImageFileLoader> InitLoader (csRef<iDataBuffer> source);
 public:
   CS_LEAKGUARD_DECLARE (ImageJpgFile);
