@@ -24,8 +24,7 @@
 #include "cstypes.h"
 #endif
 
-#if defined (COMP_GCC)
-// Linux, Mingw & Cygwin32 defines
+#if !defined(WIN32) || (defined(OS_WIN32) && defined (COMP_GCC))
 #ifdef DDG
 #include <strstream.h> 
 #endif
