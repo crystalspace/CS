@@ -166,15 +166,6 @@ void csGLGraphics3D::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-int csGLGraphics3D::GetMaxTextureSize () const
-{
-  GLint max;
-  glGetIntegerv (GL_MAX_TEXTURE_SIZE, &max);
-  if (max == 0)
-    max = 256; // @@@ Assume we support at least 256^2 textures
-  return max;
-}
-
 void csGLGraphics3D::SetGlOrtho (bool inverted)
 {
   /// @@@ Why was this here in the first place? /Anders Stenberg
@@ -583,18 +574,14 @@ void csGLGraphics3D::ApplyObjectToCamera ()
   matrixholder[10] = orientation.m33;
   matrixholder[11] = 0.0f;
 
-  matrixholder[12] = orientation.m11*-translation.x
-  	+ orientation.m12*-translation.y + orientation.m13*-translation.z;
-  matrixholder[13] = orientation.m21*-translation.x
-  	+ orientation.m22*-translation.y + orientation.m23*-translation.z;
-  matrixholder[14] = orientation.m31*-translation.x
-  	+ orientation.m32*-translation.y + orientation.m33*-translation.z;
+  matrixholder[12] = 0.0f;
+  matrixholder[13] = 0.0f;
+  matrixholder[14] = 0.0f;
   matrixholder[15] = 1.0f;
 
-  
   glMatrixMode (GL_MODELVIEW);
   glLoadMatrixf (matrixholder);
-  //glTranslatef (-translation.x, -translation.y, -translation.z);
+  glTranslatef (-translation.x, -translation.y, -translation.z);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -636,9 +623,13 @@ bool csGLGraphics3D::Open ()
   	object_reg, iCommandLineParser);
 
   verbose = cmdline->GetOption ("verbose") != 0;
+  if (!verbose) bugplug = 0;
 
   textureLodBias = config->GetFloat ("Video.OpenGL.TextureLODBias",
     -0.3f);
+  if (verbose)
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Texture LOD bias %g", textureLodBias);
  
   if (!G2D->Open ())
   {
@@ -680,9 +671,6 @@ bool csGLGraphics3D::Open ()
    */
   if (config->GetBool ("Video.OpenGL.UseNVidiaExt", true))
   {
-    if (verbose)
-      Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Attempting to use nVidia extensions.");
     ext->InitGL_NV_register_combiners ();
     ext->InitGL_NV_register_combiners2 ();
     ext->InitGL_NV_texture_shader ();
@@ -696,8 +684,6 @@ bool csGLGraphics3D::Open ()
    */
   if (config->GetBool ("Video.OpenGL.UseATIExt", true))
   {
-    if (verbose)
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Attempting to use ATI extensions.");
     ext->InitGL_ATI_separate_stencil ();
     ext->InitGL_ATI_fragment_shader ();
   }
@@ -773,7 +759,7 @@ bool csGLGraphics3D::Open ()
     if (ext->CS_GL_ARB_multitexture)
     {
       int texUnits;
-      glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &texUnits);
+      glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &texUnits);
       for (int u = texUnits - 1; u >= 0; u--)
       {
 	statecache->SetActiveTU (u);
@@ -1198,18 +1184,19 @@ const csReversibleTransform& csGLGraphics3D::GetObjectToCamera()
   return object2camera;
 }
 
-void csGLGraphics3D::SetObjectToCamera (csReversibleTransform* object2cam)
+void csGLGraphics3D::SetObjectToCameraInternal (
+	const csReversibleTransform& object2cam)
 {
   const csMatrix3 &orientation1 = object2camera.GetO2T();
   const csVector3 &translation1 = object2camera.GetO2TTranslation();
-  const csMatrix3 &orientation2 = object2cam->GetO2T();
-  const csVector3 &translation2 = object2cam->GetO2TTranslation();
+  const csMatrix3 &orientation2 = object2cam.GetO2T();
+  const csVector3 &translation2 = object2cam.GetO2TTranslation();
   if (translation1 == translation2 &&
       orientation1.Col1 () == orientation2.Col1 () &&
       orientation1.Col2 () == orientation2.Col2 () &&
       orientation1.Col3 () == orientation2.Col3 ())
     return;
-  object2camera = *object2cam;
+  object2camera = object2cam;
   ApplyObjectToCamera ();
 }
 
@@ -1520,7 +1507,7 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
                 mymesh->clip_plane, 
                 mymesh->clip_z_plane);
 
-  SetObjectToCamera (&mymesh->object2camera);
+  SetObjectToCameraInternal (mymesh->object2camera);
   
   CS_ASSERT (!(string_indices<(csStringID)stacks.Length ()
       && stacks[string_indices].Length () > 0));

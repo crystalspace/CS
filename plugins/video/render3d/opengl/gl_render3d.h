@@ -161,7 +161,7 @@ private:
 	
   void Report (int severity, const char* msg, ...);
 
-  int GetMaxTextureSize () const;
+  int GetMaxTextureSize () const { return rendercaps.maxTexWidth; }
 
   void SetGlOrtho (bool inverted);
 
@@ -312,7 +312,11 @@ public:
   { return current_zmode; }
   
   /// Set object to view transform
-  virtual void SetObjectToCamera (csReversibleTransform* wvmatrix);
+  void SetObjectToCameraInternal (const csReversibleTransform& wvmatrix);
+  virtual void SetObjectToCamera (csReversibleTransform*)
+  {
+    CS_ASSERT (false);	// Don't use with NR!
+  }
   virtual const csReversibleTransform& GetObjectToCamera ();
   virtual void SetWorldToCamera (csReversibleTransform* wvmatrix) {}
 

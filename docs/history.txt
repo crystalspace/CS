@@ -22,6 +22,11 @@ chronological order.
 	  all reported.
 	- Jorrit optimized NR GL clipping a bit more by caching the current
 	  values given to SetupClipper().
+	- Jorrit added more reporting to the NR GL renderer. Also removed
+	  the bugplug counter for triangles and meshes if verbose is not
+	  given.
+	- Jorrit added a small optimization to the NR GL renderer with
+	  ApplyObjectToCamera().
 2-Mar-2004
 	- Jorrit modified the stdrep plugin (standard reporter listener) so
 	  that it now prints all messages on standard output if the
