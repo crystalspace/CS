@@ -21,7 +21,11 @@
 #include <sys/types.h>
 #include <sys/times.h>
 #else
-#include <time.h>
+#ifdef COMP_GCC
+# include <sys/types.h>
+#else
+#include <sys/time.h>
+#endif
 #endif
 #include "util/ddgutil.h"
 // ----------------------------------------------------------------------
@@ -30,14 +34,11 @@
 //
 //  See if we are running on a Pentium III.
 //
-
 bool ddgUtil::DetectSIMD(void)
 {
-
 bool found_simd = false;
-#ifdef WIN32
+#if defined(COMP_VC) || defined (COMP_BC)
 _asm
-
 {
 pushfd
 pop eax // get EFLAGS into eax
@@ -68,7 +69,10 @@ jmp DONE
 NO_SIMD:
 mov found_simd,0
 DONE:
-}
+#else
+// temp fix for COMP_GCC until Gnu-assembler can be implemented and
+// integrated, set found_simd to force PentIII result to "false"
+found_simd=0;
 #endif
 return found_simd;
 }
