@@ -529,9 +529,6 @@ void csGraphics2DOS2DIVE::Print (csRect *area)
     dW->Switch (switchmode, &rect);
   } else
     dW->Switch (switchmode);
-  // If we're not in double-buffering mode, wait previous frame to complete
-  if (!dblbuff)
-    dW->WaitSwitch ();
 }
 
 int csGraphics2DOS2DIVE::GetPage ()

@@ -568,14 +568,17 @@ MRESULT diveWindow::ClientMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgPar
   switch (Message)
   {
     case WM_PAINT:
+    {
       // Obtain the rectangle that should be repainted
-      WinEndPaint (WinBeginPaint (diveCL, NULLHANDLE, &DirtyRect));
+      HPS hps = WinBeginPaint (diveCL, NULLHANDLE, &DirtyRect);
       SetupBlitter ();
       if (DiveBlitImage (hDive, hBuffer[VisibleBuffer], DIVE_BUFFER_SCREEN) != DIVE_SUCCESS)
         FailedCount++;
+      WinEndPaint (hps);
       FrameCount++;
       DosPostEventSem (sRedrawComplete);
       return (MRESULT)0;
+    }
     case WM_VRNDISABLED:
       FailedCount = 0;
       DiveSetupBlitter (hDive, NULL);
