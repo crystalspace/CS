@@ -135,7 +135,7 @@ public:
 /**
  * A cubic spline.
  */
-class csCubicSpline : public csSpline
+class CS_CSGEOM_EXPORT csCubicSpline : public csSpline
 {
 private:
   bool derivatives_valid;
@@ -171,7 +171,7 @@ public:
 /**
  * A B-spline.
  */
-class csBSpline : public csSpline
+class CS_CSGEOM_EXPORT csBSpline : public csSpline
 {
 private:
   // The following values are calculated by Calculate() and
@@ -204,7 +204,7 @@ public:
 /**
  * A CatmullRom spline.
  */
-class csCatmullRomSpline : public csBSpline
+class CS_CSGEOM_EXPORT csCatmullRomSpline : public csBSpline
 {
 protected:
   /// Base function for a cubic CatmullRom spline (i=-2..1).
