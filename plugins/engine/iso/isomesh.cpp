@@ -236,12 +236,13 @@ public:
   }
   virtual bool ClipBSphere (const csReversibleTransform& o2c,
 	const csSphere& sphere,
-	int& clip_portal, int& clip_plane, int& clip_z_plane)
+	int& clip_portal, int& clip_plane, int& clip_z_plane,
+	csVector3& camera_origin)
   {
     clip_plane = CS_CLIP_NOT;
 
     csSphere tr_sphere = o2c.Other2This (sphere);
-    const csVector3& tr_center = tr_sphere.GetCenter ();
+    camera_origin = tr_sphere.GetCenter ();
     float radius = tr_sphere.GetRadius ();
 
     float sx = fakecam->GetShiftX ();
@@ -257,21 +258,21 @@ public:
     bool outside = true, inside = true;
     csVector3 v1 (xmin, ymin, 1);
     csVector3 v2 (xmax, ymin, 1);
-    float dist = csVector3::Unit (v1 % v2) * tr_center;
+    float dist = csVector3::Unit (v1 % v2) * camera_origin;
     if ((-dist) <= radius)
     {
       if (dist < radius) inside = false;
       csVector3 v3 (xmax, ymax, 1);
-      dist = csVector3::Unit (v2 % v3) * tr_center;
+      dist = csVector3::Unit (v2 % v3) * camera_origin;
       if ((-dist) <= radius)
       {
         if (dist < radius) inside = false;
         v2.Set (xmin, ymax, 1);
-        dist = csVector3::Unit (v3 % v2) * tr_center;
+        dist = csVector3::Unit (v3 % v2) * camera_origin;
         if ((-dist) <= radius)
         {
           if (dist < radius) inside = false;
-          dist = csVector3::Unit (v2 % v1) * tr_center;
+          dist = csVector3::Unit (v2 % v1) * camera_origin;
           if ((-dist) <= radius)
 	  {
 	    outside = false;

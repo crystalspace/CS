@@ -591,8 +591,9 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (max_radius < radius.y) max_radius = radius.y;
   if (max_radius < radius.z) max_radius = radius.z;
   sphere.SetRadius (max_radius);
+  csVector3 camera_origin;
   if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-      clip_z_plane) == false)
+      clip_z_plane, camera_origin) == false)
     return false;
 
 #ifndef CS_USE_NEW_RENDERER
@@ -1014,8 +1015,9 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   if (max_radius < radius.y) max_radius = radius.y;
   if (max_radius < radius.z) max_radius = radius.z;
   sphere.SetRadius (max_radius);
+  csVector3 camera_origin;
   if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-      clip_z_plane) == false)
+      clip_z_plane, camera_origin) == false)
     return 0;
 
   lighting_movable = movable;
@@ -1107,6 +1109,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   lastMeshPtr->indexend = factory->GetTriangleCount () * 3;
   lastMeshPtr->material = mater;
   lastMeshPtr->object2camera = tr_o2c;
+  lastMeshPtr->camera_origin = camera_origin;
   lastMeshPtr->variablecontext = svcontext;
   lastMeshPtr->geometryInstance = (void*)factory;
  

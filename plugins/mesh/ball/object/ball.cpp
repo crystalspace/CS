@@ -689,7 +689,6 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
                                                   iMovable* movable)
 {
 #ifdef CS_USE_NEW_RENDERER
-
   SetupObject ();
 
   num = 0;
@@ -715,8 +714,9 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
   if (max_radius < radius.z) max_radius = radius.z;
   sphere.SetRadius (max_radius);
   int clip_portal, clip_plane, clip_z_plane;
+  csVector3 camera_origin;
   if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-    clip_z_plane) == false)
+      clip_z_plane, camera_origin) == false)
     return 0;
 
 
@@ -770,6 +770,7 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
   lastMeshPtr->indexend = ball_triangles * 3;
   lastMeshPtr->material = mater;
   lastMeshPtr->object2camera = tr_o2c;
+  lastMeshPtr->camera_origin = camera_origin;
   lastMeshPtr->variablecontext = svcontext;
   lastMeshPtr->geometryInstance = (void*)factory;
   
@@ -825,8 +826,9 @@ bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (max_radius < radius.z) max_radius = radius.z;
   sphere.SetRadius (max_radius);
   int clip_portal, clip_plane, clip_z_plane;
+  csVector3 camera_origin;
   if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-  	clip_z_plane) == false)
+  	clip_z_plane, camera_origin) == false)
     return false;
 
 #ifndef CS_USE_NEW_RENDERER

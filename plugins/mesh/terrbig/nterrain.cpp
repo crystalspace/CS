@@ -785,8 +785,9 @@ bool csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
 	max_radius = (max_radius > radius.z) ? max_radius : radius.z;
 	sphere.SetRadius (max_radius);
 	int clip_portal, clip_plane, clip_z_plane;
+	csVector3 camera_origin;
 	if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-	  clip_z_plane) == false)
+	  clip_z_plane, camera_origin) == false)
 	  return false;
 	info->GetMesh()->clip_portal = clip_portal;
 	info->GetMesh()->clip_plane = clip_plane;

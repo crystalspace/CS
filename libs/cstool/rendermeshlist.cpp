@@ -139,19 +139,8 @@ int csRenderMeshList::SortMeshBack2Front(meshListEntry const& me1,
   const csRenderMesh* m1 = me1.rm;
   const csRenderMesh* m2 = me2.rm;
 
-  // We need GetT2OTranslation() but that does a matrix*vector multiplication.
-  // Since we only need one component ('z') we can do it a bit more optimal.
-  // @@@ Even more optimal would be to do the calculation in the mesh
-  // itself and put the 'z' in the csRenderMesh structure.
-  const csReversibleTransform& t1 = m1->object2camera;
-  const csReversibleTransform& t2 = m2->object2camera;
-  const csMatrix3& t1m = t1.GetO2T ();
-  const csMatrix3& t2m = t2.GetO2T ();
-  const csVector3& t1v = t1.GetO2TTranslation ();
-  const csVector3& t2v = t2.GetO2TTranslation ();
-  float z1 = - t1m.m31*t1v.x - t1m.m32*t1v.y - t1m.m33*t1v.z;
-  float z2 = - t2m.m31*t2v.x - t2m.m32*t2v.y - t2m.m33*t2v.z;
-
+  float z1 = m1->camera_origin.z;
+  float z2 = m2->camera_origin.z;
   if (z1 < z2) return 1;
   else if (z1 > z2) return -1;
   return SortMeshMaterial (me1, me2);

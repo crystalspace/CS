@@ -198,10 +198,11 @@ bool csStuffObject::DrawTest(iRenderView *rview, iMovable *movable)
   sphere.SetRadius (max_radius);
   
   int clip_portal, clip_plane, clip_z_plane;
+  csVector3 camera_origin;
   if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-  	clip_z_plane) == false)
-     {   return false; };
-     
+  	clip_z_plane, camera_origin) == false)
+    return false;
+
   iGraphics3D* g3d = rview->GetGraphics3D ();
   g3d->SetObjectToCamera (&tr_o2c);
   mesh.clip_portal = clip_portal;

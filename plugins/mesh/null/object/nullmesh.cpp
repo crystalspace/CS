@@ -112,8 +112,9 @@ bool csNullmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   sphere.SetCenter (csVector3 (0, 0, 0));
   sphere.SetRadius (radius);
   int clip_portal, clip_plane, clip_z_plane;
+  csVector3 camera_origin;
   if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-  	clip_z_plane) == false)
+  	clip_z_plane, camera_origin) == false)
     return false;
   return true;
 }

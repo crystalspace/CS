@@ -514,8 +514,10 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview,
   }
 
   int clip_portal, clip_plane, clip_z_plane;
-  csSphere s(csVector3(0,0,0), radius);
-  if (!rview->ClipBSphere (tr_o2c, s, clip_portal, clip_plane, clip_z_plane))
+  csSphere s (csVector3 (0), radius);
+  csVector3 camera_origin;
+  if (!rview->ClipBSphere (tr_o2c, s, clip_portal, clip_plane, clip_z_plane,
+  	camera_origin))
   {
     n = 0;
     return 0;
@@ -556,6 +558,7 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview,
   matwrap->Visit ();
   mesh->material = matwrap;
   mesh->object2camera = tr_o2c;
+  mesh->camera_origin = camera_origin;
   mesh->indexstart = 0;
   mesh->indexend = vertnum;
   mesh->variablecontext = 

@@ -140,8 +140,8 @@ csPortalContainer::~csPortalContainer ()
 #endif
 }
 
-csRenderMesh** csPortalContainer::GetRenderMeshes (int& num, iRenderView* rview, 
-                                iMovable* movable)
+csRenderMesh** csPortalContainer::GetRenderMeshes (int& num,
+	iRenderView* rview, iMovable* movable)
 {
   Prepare ();
 
@@ -158,11 +158,12 @@ csRenderMesh** csPortalContainer::GetRenderMeshes (int& num, iRenderView* rview,
   sphere.SetRadius (max_object_radius);
   csReversibleTransform tr_o2c;
   tr_o2c = camtrans;
+  csVector3 camera_origin;
 
   if (movable_identity)
   {
     if (!rview->ClipBSphere (tr_o2c, sphere, clip_portal,
-      clip_plane, clip_z_plane))
+      clip_plane, clip_z_plane, camera_origin))
     {
       num = 0;
       return 0;
@@ -172,7 +173,7 @@ csRenderMesh** csPortalContainer::GetRenderMeshes (int& num, iRenderView* rview,
   {
     tr_o2c /= movtrans;
     if (!rview->ClipBSphere (tr_o2c, sphere, clip_portal,
-      clip_plane, clip_z_plane))
+      clip_plane, clip_z_plane, camera_origin))
     {
       num = 0;
       return 0;
@@ -203,6 +204,7 @@ csRenderMesh** csPortalContainer::GetRenderMeshes (int& num, iRenderView* rview,
   lastMeshPtr->portal = this;
   lastMeshPtr->material = 0;
   lastMeshPtr->object2camera = tr_o2c;
+  lastMeshPtr->camera_origin = camera_origin;
   num = 1;
   return &lastMeshPtr;
 }
@@ -924,10 +926,11 @@ bool csPortalContainer::DrawTest (iRenderView* rview, iMovable*)
   csSphere sphere;
   sphere.SetCenter (object_bbox.GetCenter ());
   sphere.SetRadius (max_object_radius);
+  csVector3 camera_origin;
   if (movable_identity)
   {
     if (!rview->ClipBSphere (camtrans, sphere, clip_portal,
-  	clip_plane, clip_z_plane))
+  	clip_plane, clip_z_plane, camera_origin))
       return false;
   }
   else
@@ -935,7 +938,7 @@ bool csPortalContainer::DrawTest (iRenderView* rview, iMovable*)
     csReversibleTransform tr_o2c = camtrans;
     tr_o2c /= movtrans;
     if (!rview->ClipBSphere (tr_o2c, sphere, clip_portal,
-  	clip_plane, clip_z_plane))
+  	clip_plane, clip_z_plane, camera_origin))
       return false;
   }
 

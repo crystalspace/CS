@@ -475,8 +475,9 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
   if (max_radius < radius.y) max_radius = radius.y;
   if (max_radius < radius.z) max_radius = radius.z;
   csSphere sphere (offset, max_radius);
+  csVector3 camera_origin;
   if (!rview->ClipBSphere (temp, sphere, clip_portal, clip_plane, 
-    clip_z_plane))
+    clip_z_plane, camera_origin))
   {
     n = 0;
     return 0;
@@ -508,6 +509,7 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
   rm->indexend = vertices.Length();
   rm->inUse = true;
   rm->object2camera = tr_o2c;
+  rm->camera_origin = camera_origin;
 
   n = 1; 
   return &rm; 

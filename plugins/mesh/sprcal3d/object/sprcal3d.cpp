@@ -1399,8 +1399,9 @@ bool csSpriteCal3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (max_radius < radius.z) max_radius = radius.z;
   sphere.SetRadius (max_radius);
   int clip_portal, clip_plane, clip_z_plane;
+  csVector3 camera_origin;
   if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-    clip_z_plane) == false)
+      clip_z_plane, camera_origin) == false)
     return false;
 
 #ifndef CS_USE_NEW_RENDERER
@@ -1469,8 +1470,9 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
   if (max_radius < radius.z) max_radius = radius.z;
   sphere.SetRadius (max_radius);
   int clip_portal, clip_plane, clip_z_plane;
+  csVector3 camera_origin;
   if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-    clip_z_plane) == false)
+    clip_z_plane, camera_origin) == false)
   {
     n = 0;
     return 0;
@@ -1499,6 +1501,7 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
     rm->clip_z_plane = clip_z_plane;
     rm->do_mirror = camera->IsMirrored ();
     rm->object2camera = tr_o2c;
+    rm->camera_origin = camera_origin;
     rm->geometryInstance = this;
   }
   currentMovable = movable;

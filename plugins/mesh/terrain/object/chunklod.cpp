@@ -835,7 +835,9 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
 {
   int clip_portal, clip_plane, clip_z_plane;
   csSphere s(node->Center (), node->Radius ());
-  if (!rv->ClipBSphere (tr_o2c, s, clip_portal, clip_plane, clip_z_plane))
+  csVector3 camera_origin;
+  if (!rv->ClipBSphere (tr_o2c, s, clip_portal, clip_plane, clip_z_plane,
+  	camera_origin))
     return false;
   csBox3 cbox;
   cbox.StartBoundingBox (tr_o2c * node->BBox().GetCorner(0));
@@ -863,6 +865,7 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
   {
     int len = meshes.Length();
     meshes.GetExtend(len).object2camera = tr_o2c;
+    meshes[len].camera_origin = camera_origin;
     meshes[len].clip_portal = clip_portal;
     meshes[len].clip_plane = clip_plane;
     meshes[len].clip_z_plane = clip_z_plane;
@@ -886,6 +889,7 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
       {
         int len = palette_meshes[i].Length();
         palette_meshes[i].GetExtend(len).object2camera = tr_o2c;
+        palette_meshes[i][len].camera_origin = camera_origin;
         palette_meshes[i][len].clip_portal = clip_portal;
         palette_meshes[i][len].clip_plane = clip_plane;
         palette_meshes[i][len].clip_z_plane = clip_z_plane;

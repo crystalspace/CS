@@ -330,11 +330,13 @@ struct iRenderView : public iBase
    * transform object to camera space. If the sphere is visible this
    * function will also initialize the clip_plane, clip_z_plane, and
    * clip_portal fields which can be used for DrawTriangleMesh or
-   * DrawPolygonMesh.
+   * DrawPolygonMesh. The 'camera_origin' field is set to the origin of
+   * the object in camera space.
    */
   virtual bool ClipBSphere (const csReversibleTransform& o2c,
   	const csSphere& sphere,
-	int& clip_portal, int& clip_plane, int& clip_z_plane) = 0;
+	int& clip_portal, int& clip_plane, int& clip_z_plane,
+	csVector3& camera_origin) = 0;
 
   /**
    * Check if the screen bounding box of an object is visible in

@@ -2136,8 +2136,9 @@ void csThing::DrawPolygonArrayDPM (
   csSphere sphere;
   static_data->GetRadius (radius, sphere.GetCenter ());
   sphere.SetRadius (static_data->max_obj_radius);
+  csVector3 camera_origin;
   if (rview->ClipBSphere (tr_o2c, sphere, mesh.clip_portal, mesh.clip_plane,
-  	mesh.clip_z_plane) == false)
+  	mesh.clip_z_plane, camera_origin) == false)
     return;	// Not visible.
 
   rview->GetGraphics3D ()->SetObjectToCamera (&tr_o2c);
@@ -2698,8 +2699,9 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
   int clip_portal, clip_plane, clip_z_plane;
+  csVector3 camera_origin;
   if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-    clip_z_plane) == false)
+    clip_z_plane, camera_origin) == false)
   {
     num = 0;
     return 0;    
@@ -2738,6 +2740,7 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
   {
     csRenderMesh* rm = rmH->renderMeshes[i];
     rm->object2camera = tr_o2c;
+    rm->camera_origin = camera_origin;
     rm->clip_portal = clip_portal;
     rm->clip_plane = clip_plane;
     rm->clip_z_plane = clip_z_plane;

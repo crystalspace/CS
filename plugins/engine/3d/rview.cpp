@@ -946,20 +946,21 @@ bool csRenderView::ClipBSphere (
   const csSphere &sphere,
   int &clip_portal,
   int &clip_plane,
-  int &clip_z_plane)
+  int &clip_z_plane,
+  csVector3& camera_origin)
 {
   //------
   // First transform bounding sphere from object space to camera space
   // by using the given transform.
   //------
   csSphere tr_sphere = o2c.Other2This (sphere);
-  const csVector3 &tr_center = tr_sphere.GetCenter ();
+  camera_origin = tr_sphere.GetCenter ();
   float radius = tr_sphere.GetRadius ();
 
   //------
   // Test if object is behind the camera plane.
   //------
-  if (tr_center.z + radius <= 0) return false;
+  if (camera_origin.z + radius <= 0) return false;
 
   //------
   // Test against far plane if needed.
@@ -970,14 +971,14 @@ bool csRenderView::ClipBSphere (
     // Ok, so this is not really far plane clipping - we just dont draw this
     // object if the bounding sphere is further away than the D
     // part of the farplane.
-    if (tr_center.z - radius > far_plane->D ()) return false;
+    if (camera_origin.z - radius > far_plane->D ()) return false;
   }
 
   //------
   // Check if we're fully inside the bounding sphere.
   //------
   bool fully_inside = csSquaredDist::PointPoint (
-        csVector3 (0), tr_center) <= radius * radius;
+        csVector3 (0), camera_origin) <= radius * radius;
 
   //------
   // Test if there is a chance we must clip to current portal.
@@ -992,7 +993,7 @@ bool csRenderView::ClipBSphere (
   {
     TestSphereFrustum (
       ctxt->iview_frustum,
-      tr_center,
+      camera_origin,
       radius,
       inside,
       outside);
@@ -1007,7 +1008,7 @@ bool csRenderView::ClipBSphere (
   //------
   // Test if there is a chance we must clip to the z-plane.
   //------
-  if (tr_center.z - radius > 0)
+  if (camera_origin.z - radius > 0)
     clip_z_plane = CS_CLIP_NOT;
   else
     clip_z_plane = CS_CLIP_NEEDED;
@@ -1018,7 +1019,7 @@ bool csRenderView::ClipBSphere (
   clip_plane = CS_CLIP_NOT;
   if (ctxt->do_clip_plane)
   {
-    float dist = ctxt->clip_plane.Classify (tr_center);
+    float dist = ctxt->clip_plane.Classify (camera_origin);
     dist = -dist;
     if ((-dist) > radius)
       return false;
@@ -1046,7 +1047,7 @@ bool csRenderView::ClipBSphere (
       CS_ASSERT (GetTopFrustum () != 0);
       TestSphereFrustum (
         GetTopFrustum (),
-        tr_center,
+        camera_origin,
         radius,
         inside,
         outside);

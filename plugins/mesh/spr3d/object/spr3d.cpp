@@ -1488,7 +1488,6 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
 
-#if 1
   csVector3 radius;
   csSphere sphere;
   GetRadius (radius, sphere.GetCenter ());
@@ -1497,30 +1496,10 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (max_radius < radius.z) max_radius = radius.z;
   sphere.SetRadius (max_radius);
   int clip_portal, clip_plane, clip_z_plane;
+  csVector3 camera_origin;
   if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-  	clip_z_plane) == false)
+  	clip_z_plane, camera_origin) == false)
     return false;
-#else
-  float fov = camera->GetFOV ();
-  float shiftx = camera->GetShiftX ();
-  float shifty = camera->GetShiftY ();
-
-  // Test visibility of entire sprite by clipping bounding box against clipper.
-  // There are three possibilities:
-  //	1. box is not visible -> sprite is not visible.
-  //	2. box is entirely visible -> sprite is visible and need not be clipped.
-  //	3. box is partially visible -> sprite is visible and needs to be clipped
-  //	   if rview has do_clip_plane set to true.
-  csBox2 bbox;
-  csBox3 bbox3;
-  if (GetScreenBoundingBox (camera->GetCameraNumber (),
-  	movable->GetUpdateNumber (), fov, shiftx, shifty,
-  	tr_o2c, bbox, bbox3) < 0) return false;	// Not visible.
-  int clip_portal, clip_plane, clip_z_plane;
-  if (rview->ClipBBox (bbox, bbox3, clip_portal, clip_plane,
-  	clip_z_plane) == false)
-    return false;
-#endif
 
   UpdateWorkTables (factory->GetVertexCount());
 
@@ -1799,8 +1778,9 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n, iRenderView* rview
   if (max_radius < radius.z) max_radius = radius.z;
   sphere.SetRadius (max_radius);
   int clip_portal, clip_plane, clip_z_plane;
+  csVector3 camera_origin;
   if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-  	clip_z_plane) == false)
+  	clip_z_plane, camera_origin) == false)
   {
     n = 0;
     return 0;
@@ -1964,6 +1944,7 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n, iRenderView* rview
 
   n = 1;
   rmesh->object2camera = tr_o2c;
+  rmesh->camera_origin = camera_origin;
   rmesh->mixmode = MixMode;
   rmesh->indexstart = 0;
   rmesh->indexend = final_num_triangles * 3;

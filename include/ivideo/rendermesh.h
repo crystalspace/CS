@@ -124,6 +124,8 @@ struct csRenderMesh
 
   /// Transform to use for this mesh (object->camera)
   csReversibleTransform object2camera;
+  /// Camera coordinate of the local 0,0,0 point of the object.
+  csVector3 camera_origin;
 
   /// @@@ Document me.
   csRef<iShaderVariableContext> variablecontext;
