@@ -76,6 +76,28 @@ The history order is reversed so that new features are at the top.
 	    The handle will unregister itself.
 	- Philip Wyett removed lua from MSVC compilation process.
 	- Philip fixed compile error in csfgen.
+	- Philip updated MingW docs to reflect new version 0.50.
+	- Philip changed compiler switches for build and optimization.
+	  Now uses /G5 (Pentium) over /Gx (Blended 386, 486 etc.)
+	  The Windows maintainer doesn't envisage any developer with
+	  MSVC will be targetting 486 or lower processors. :-)
+	  Added /Ox (Full Optimization) to release builds.
+	- Wyatt Miler fixed a markup error in msvc5.txi.
+	- Martin Geisse continued work on the model importer multiplexer.
+	  It still crashes on loading, so it isn't used yet. Also fixed a
+	  bug in the 3ds importer.
+	- Martin added a short piece of documentation about the new converter
+	  system.
+	- Samuel Humphreys rewrote the X drivers:
+	    - Working Full screen + on the fly resolution changing.
+	    - Each Xdriver now loads an XWindow plugin.
+	    - XWindow plugin dynamically configures to take advantage of
+	      X-extensions, i.e. shared memory and XFree86VideoMode.
+	    - No more #ifdef statements.
+	    - Rewritten window creation, resizing and so optimized event
+	      handling.
+	    - iGraphics2D slight changes to full screen and resizing related
+	      methods, but have bumped up the version.
 6-Aug-2001
 	- Removed almost all usage of iSystem in the entire CS system. Instead
 	  a pointer to the object registry (iObjectRegistry) is used. This
