@@ -17,7 +17,6 @@
 */
 
 #include <stdarg.h>
-#include <alloca.h>
 
 #include "sysdef.h"
 #include "qint.h"
