@@ -20,6 +20,7 @@
 #define POLYGON_H
 
 #include "csutil/scf.h"
+#include "csutil/cscolor.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/polyidx.h"
@@ -27,7 +28,6 @@
 #include "csengine/polyplan.h"
 #include "csengine/polyset.h"
 #include "csengine/portal.h"
-#include "csengine/cscolor.h"
 #include "csengine/polytext.h"
 #include "ipolygon.h"
 

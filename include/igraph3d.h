@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
     Written by Jorrit Tyberghein, Dan Ogles, and Gary Clark.
 
     This library is free software; you can redistribute it and/or
@@ -27,6 +27,8 @@ class csMatrix3;
 class csVector3;
 class csVector2;
 class csRect;
+class csTransform;
+class csColor;
 
 struct iGraphics2D;
 struct iPolygonTexture;
@@ -169,19 +171,19 @@ struct G3DPolygonDP
   float flat_color_g;
   float flat_color_b;
 
-  ///Handle to lighted textures (texture+lightmap) (for all mipmap levels)
+  /// Handle to lighted textures (texture+lightmap) (for all mipmap levels).
   iPolygonTexture* poly_texture[4];
 
   /** 
     * AlphaValue of the polygon. Ranges from 0 to 100. 0 means opaque, 100 is 
-    * comletely transparent.
+    * completely transparent.
     */
   int alpha;
 
-  ///true, if it is ok, to use mipmaps
+  /// True, if it is ok, to use mipmaps.
   bool uses_mipmaps;
 
-  ///z value (in camera space) of vertex[0]
+  /// Z value (in camera space) of vertex[0].
   float z_value;
 
 #ifdef DO_HW_UVZ
@@ -326,6 +328,80 @@ enum G3D_COLORMAPFORMAT
 };
 
 /**
+ * A triangle. Note that this structure is only valid if used
+ * in combination with a vertex or edge table. 'a', 'b', and 'c' are then
+ * indices in that table (either vertices or edges).
+ */
+struct csTriangle
+{
+  int a, b, c;
+};
+
+/**
+ * Structure containing all info needed by DrawTriangeMesh.
+ * In theory this function is capable of:<br>
+ * <ul>
+ * <li>Object2camera transformation and perspective.
+ * <li>Linear interpolation between two sets of vertices.
+ * <li>Multiple texturing passes.
+ * <li>Clipping.
+ * <li>Whatever else DrawPolygonFX can do.
+ * </ul>
+ * To disable the use of one of the components, set it to NULL.
+ */
+struct G3DTriangleMesh
+{
+  enum
+  {
+    /// Maximum number of vertex pool, used for vertex weighting/morphing.
+    MAX_VERTEXPOOL = 2,
+    /// Maximum number of textures, used to apply multiple pass.
+    MAX_TEXTURE = 2
+  };
+
+  /// Number of vertices for each pool.
+  int num_vertices;
+  /// Number of vertex sets, if > 1, morphing will be applied.
+  int num_vertices_pool;
+  /// Number of texturing passes.
+  int num_textures;
+
+  /// Number of triangles.
+  int num_triangles;
+  /// Pointer to array of triangles.
+  csTriangle* triangles;
+
+  /// Use precalculated vertex color?
+  bool use_vertex_color;
+  /// Do clipping tests?
+  bool do_clip;
+  /// Apply fogging?
+  bool do_fog;
+
+  /// Type of vertices supplied.
+  enum
+  {
+    /// Must apply transformation and perspective.
+    VM_WORLDSPACE,
+    /// Must apply perspective.
+    VM_VIEWSPACE,
+    /// Nothing needed.
+    VM_SCREENSPACE
+  } vertex_mode;
+
+  /// DrawPolygonFX flag.
+  UInt fxmode;
+  float morph_factor;
+  csVector3* vertices[MAX_VERTEXPOOL];
+  csVector2* texels[MAX_VERTEXPOOL][MAX_TEXTURE];
+  iTextureHandle* txt_handle[MAX_TEXTURE];
+  /// Precalculated vertex color list.
+  csColor* vertex_colors[MAX_VERTEXPOOL];
+
+  // TODO : store information required for lighting calculation
+};
+
+/**
  * Fog structure.
  */
 struct csFog
@@ -397,7 +473,7 @@ struct iGraphics3D : public iPlugIn
    *
    * Warning! After calling this function you are not allowed to do
    * any calls to the 3D rasterizer other than DrawPolygonFX() and
-   * FinishPolygonFX().
+   * FinishPolygonFX().<p>
    *
    * Warning! Do not rely on this method to handle Color keying under
    * all circumstances. Color Keying will only work reliable in Mixmodes
@@ -411,7 +487,7 @@ struct iGraphics3D : public iPlugIn
    * There are also some drivers (which I would consider buggy...), that won't
    * display FX_Alpha correctly with Color Keying. I can't provide a valid 
    * workaround for that except using FX_Multiplay and FX_Add, to manually
-   * create the image, but that would be very expensive.
+   * create the image, but that would be very expensive.<p>
    * 
    * parameters:
    * handle:  The texture handle as returned by iTextureManager.
@@ -431,6 +507,11 @@ struct iGraphics3D : public iPlugIn
    * variant of DrawPolygonXxx. (If you use these features) 
    */
   virtual void DrawPolygonFX (G3DPolygonDPFX& poly) = 0;
+
+  /**
+   * Draw a triangle mesh using features similar to DrawPolygonFX.
+   */
+  virtual void DrawTriangleMesh (G3DTriangleMesh& mesh) = 0;
 
   /// Get the current fog mode (G3D_FOGMETHOD).
   virtual G3D_FOGMETHOD GetFogMode () = 0;
@@ -504,6 +585,24 @@ struct iGraphics3D : public iPlugIn
    * Center is set in screen space coordinates.
    */
   virtual void SetPerspectiveCenter (int x, int y) = 0;
+
+  /**
+   * Set aspect ratio for perspective projection.
+   */
+  virtual void SetPerspectiveAspect (float aspect) = 0;
+
+  /**
+   * Set world to camera transformation (currently only used by
+   * DrawTriangleMesh).
+   */
+  virtual void SetObjectToCamera (csTransform* o2c) = 0;
+
+  /**
+   * Set optional clipper to use. If vertices == null
+   * then there is no clipper.
+   * Currently only used by DrawTriangleMesh.
+   */
+  virtual void SetClipper (csVector2* vertices, int num_vertices) = 0;
 
   /// Get the texture representation scheme.
   virtual G3D_COLORMAPFORMAT GetColormapFormat () = 0;

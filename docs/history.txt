@@ -13,6 +13,15 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 16-Feb-2000
+	- Some fixes to csPhyzik from Michael Ewert.
+	- Seth Galbraith managed to almost fix sprites by disabling LOD
+	  for now. Skeletal sprites still don't work correctly though.
+	- Moved csColor to csutil and csTriangle to igraph3d.h.
+	- Started work on DrawTriangleMesh function in iGraphics3D.
+	  Not finished right now. The new code is not used right
+	  now so it should not hurt anything. I made sure that the
+	  non-software drivers still compile (only tested Line3D and
+	  OpenGL).
 	- Eric Sunshine updated a number of documentation files to reflect
 	  the fact that platform-specific makefiles now reside within the
 	  CS/libs/cssys tree rather than CS/mk/system.
@@ -40,6 +49,8 @@ Short-term cleanups that need to be done:
 	  they are still displayed the wrong way.
 	- Eric Sunshine eliminated more compilation warnings from the Irix
 	  compiler.
+	- Robert Bate updated Mac projects.
+	- Thomas Hieber updated VC projects.
 14-Feb-2000
 	- Fixed a bug in highscore handling of Blocks.
 	- Fixed rotation center of a few shapes in Blocks.

@@ -19,17 +19,8 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 
+#include "igraph3d.h"
 #include "csgeom/math3d.h"
-
-/**
- * A triangle. Note that this structure is only valid if used
- * in combination with a vertex or edge table. 'a', 'b', and 'c' are then
- * indices in that table (either vertices or edges).
- */
-struct csTriangle
-{
-  int a, b, c;
-};
 
 /**
  * A mesh of triangles. Note that a mesh of triangles is only valid

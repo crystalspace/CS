@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -23,7 +23,8 @@
 // csGraphics3DSoftware software rasterizer class.
 
 #include "csutil/scf.h"
-#include "soft_txt.h"
+#include "csgeom/transfrm.h"
+#include "cs3d/software/soft_txt.h"
 #include "iconfig.h"
 #include "igraph2d.h"
 #include "igraph3d.h"
@@ -41,6 +42,7 @@
 
 class TextureCache;
 class TextureCache16;
+class csClipper;
 
 struct iGraphics2D;
 class csIniFile;
@@ -113,6 +115,14 @@ class csGraphics3DSoftware : public iGraphics3D
   /// True if 3D rendering should use MMX if available.
   bool do_mmx;
 #endif
+  /// Current transformation from world to camera.
+  csTransform o2c;
+  /// Current 2D clipper.
+  csClipper* clipper;
+  /// Current aspect ratio for perspective correction.
+  float aspect;
+  /// Current inverse aspect ratio for perspective correction.
+  float inv_aspect;
 
   /// Do we want dithering? (dummy for now)
   bool rstate_dither;
@@ -307,6 +317,9 @@ public:
   /// Draw a polygon with special effects.
   virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
 
+  /// Draw a triangle mesh.
+  virtual void DrawTriangleMesh (G3DTriangleMesh& mesh);
+
   /// Give a texture to csGraphics3DSoftware to cache it.
   virtual void CacheTexture (iPolygonTexture* texture);
 
@@ -359,6 +372,12 @@ public:
   { return height; }
   /// Set center of projection.
   virtual void SetPerspectiveCenter (int x, int y);
+  /// Set perspective aspect.
+  virtual void SetPerspectiveAspect (float aspect);
+  /// Set world to camera transformation.
+  virtual void SetObjectToCamera (csTransform* o2c);
+  /// Set optional clipper.
+  virtual void SetClipper (csVector2* vertices, int num_vertices);
 
   /// Get the iGraphics2D driver.
   virtual iGraphics2D *GetDriver2D ()

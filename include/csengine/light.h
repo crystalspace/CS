@@ -21,7 +21,7 @@
 
 #include "csgeom/transfrm.h"
 #include "csobject/csobject.h"
-#include "csengine/cscolor.h"
+#include "csutil/cscolor.h"
 #include "csengine/rview.h"
 #include "lightdef.h"
 

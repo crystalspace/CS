@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,6 +22,8 @@
 #include "qint.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
+#include "csgeom/transfrm.h"
+#include "csgeom/polyclip.h"
 #include "cs3d/software/soft_g3d.h"
 #include "cs3d/software/scan.h"
 #include "cs3d/software/tcache.h"
@@ -30,6 +32,7 @@
 #include "cs3d/software/soft_txt.h"
 #include "cs3d/common/memheap.h"
 #include "csutil/inifile.h"
+#include "csutil/garray.h"
 #include "ipolygon.h"
 #include "isystem.h"
 #include "igraph2d.h"
@@ -151,6 +154,8 @@ csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent) : G2D (NULL)
 
   tcache = NULL;
   txtmgr = NULL;
+
+  clipper = NULL;
 
   zdist_mipmap1 = 12;
   zdist_mipmap2 = 24;
@@ -627,6 +632,7 @@ void csGraphics3DSoftware::Close()
   }
 
   CHK (delete tcache); tcache = NULL;
+  CHK (delete clipper); clipper = NULL;
 
   G2D->Close ();
   width = height = -1;
@@ -666,6 +672,28 @@ void csGraphics3DSoftware::SetPerspectiveCenter (int x, int y)
 {
   width2 = x;
   height2 = y;
+}
+
+void csGraphics3DSoftware::SetPerspectiveAspect (float aspect)
+{
+  csGraphics3DSoftware::aspect = aspect;
+  csGraphics3DSoftware::inv_aspect = 1./aspect;
+}
+
+void csGraphics3DSoftware::SetObjectToCamera (csTransform* o2c)
+{
+  csGraphics3DSoftware::o2c = *o2c;
+}
+
+void csGraphics3DSoftware::SetClipper (csVector2* vertices, int num_vertices)
+{
+  CHK (delete clipper);
+  clipper = NULL;
+  if (!vertices) return;
+  // @@@ This could be better! We are using a general polygon clipper
+  // even in cases where a box clipper would be better. We should
+  // have a special SetBoxClipper call in iGraphics3D.
+  CHK (clipper = new csPolygonClipper (vertices, num_vertices, false, true));
 }
 
 bool csGraphics3DSoftware::BeginDraw (int DrawFlags)
@@ -2305,7 +2333,8 @@ void csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
       screenY++;
     }
   }
-};
+}
+
 
 void csGraphics3DSoftware::CacheTexture (iPolygonTexture* texture)
 {
@@ -2734,3 +2763,356 @@ bool csGraphics3DSoftware::csSoftConfig::GetOptionDescription
   *option = config_options[idx];
   return true;
 }
+
+//------------------------------------------------------------------------
+// Everything for mesh drawing.
+//------------------------------------------------------------------------
+
+void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
+	int num_vertices, csVector2* orig_triangle, bool gouraud)
+{
+  // Note: Assumes clockwise vertices, otherwise wouldn't be visible :).
+  // 'was_clipped' will be true if the triangle was clipped.
+  // This is the case if rescount != 3 (because we then don't have
+  // a triangle) or else if any of the clipped vertices is different.
+  bool was_clipped = (num_vertices != 3);
+  int j;
+  for (j = 0; j < num_vertices; j++)
+  {
+    g3dpoly->vertices [j].sx = clipped_verts [j].x;
+    g3dpoly->vertices [j].sy = clipped_verts [j].y;
+    if (!was_clipped && clipped_verts[j] != orig_triangle[j])
+    	was_clipped = true;
+  }
+
+  // If it was not clipped we don't have to do anything.
+  if (!was_clipped) return;
+
+  // first we copy the first three texture coordinates to a local buffer
+  // to avoid that they are overwritten when interpolating.
+  G3DTexturedVertex tritexcoords[3];
+  for (int i = 0; i < 3; i++)
+    tritexcoords [i] = g3dpoly->vertices [i];
+
+  // Now we have to find the u,v coordinates for every
+  // point in the clipped polygon. We know we started
+  // from orig_triangle and that texture mapping is not perspective correct.
+
+  // Compute U & V in vertices of the polygon
+  // First find the topmost triangle vertex
+  int top;
+  if (orig_triangle [0].y < orig_triangle [1].y)
+    if (orig_triangle [0].y < orig_triangle [2].y)
+      top = 0;
+    else
+      top = 2;
+  else
+    if (orig_triangle [1].y < orig_triangle [2].y)
+      top = 1;
+    else
+      top = 2;
+
+  int _vbl, _vbr;
+  if (top <= 0) _vbl = 2; else _vbl = top - 1;
+  if (top >= 2) _vbr = 0; else _vbr = top + 1;
+
+  // Rare special case is when triangle edge on, vertices satisfy
+  //  *--------->x     a == b && (a.y < c.y) && (a.x > c.x)
+  //  |  *a,b          and is clipped at c, where orig_triangle[0]
+  //  | /              can be either a, b or c. In other words when
+  //  |/               the single vertex is not 'top' and clipped.
+  // /|*c              
+  //  |                The '-= EPSILON' for both left and right 
+  //  y     fig. 2     is fairly arbitrary, this probably needs to be refined.
+
+  if (orig_triangle[top] == orig_triangle[_vbl]) 
+      orig_triangle[_vbl].x -= EPSILON;
+  if (orig_triangle[top] == orig_triangle[_vbr]) 
+      orig_triangle[_vbr].x -= EPSILON;
+
+  for (j = 0 ; j < g3dpoly->num ; j++)
+    {
+    float x = g3dpoly->vertices [j].sx;
+    float y = g3dpoly->vertices [j].sy;
+
+    // Find the original triangle top/left/bottom/right vertices
+    // between which the currently examined point is located.
+    // There are two possible major cases:
+    // A*       A*       When DrawPolygonFX works, it will switch
+    //  |\       |\      start/final values and deltas ONCE (not more)
+    //  | \      | \     per triangle.On the left pictures this happens
+    //  |*X\     |  \    at the point B. This means we should "emulate"
+    //  |   *B   |   *B  this switch bytaking different start/final values
+    //  |  /     |*X/    for interpolation if examined point X is below
+    //  | /      | /     the point B.
+    //  |/       |/
+    // C*       C*  Fig.1 :-)
+    int vtl = top, vtr = top, vbl = _vbl, vbr = _vbr;
+    int ry = QRound (y); 
+    if (ry > QRound (orig_triangle [vbl].y))
+    {
+      vtl = vbl;
+      if (--vbl < 0) vbl = 2;
+    }
+    else if (ry > QRound (orig_triangle [vbr].y))
+    {
+      vtr = vbr;
+      if (++vbr > 2) vbr = 0;
+    }
+
+    // Now interpolate Z,U,V,R,G,B by Y
+    float tL, tR, xL, xR, tX;
+    if (QRound (orig_triangle [vbl].y) != QRound (orig_triangle [vtl].y))
+      tL = (y - orig_triangle [vtl].y) / (orig_triangle [vbl].y - orig_triangle [vtl].y);
+    else
+	tL = (x - orig_triangle [vtl].x) / (orig_triangle [vbl].x - orig_triangle [vtl].x);
+    if (QRound (orig_triangle [vbr].y) != QRound (orig_triangle [vtr].y))
+      tR = (y - orig_triangle [vtr].y) / (orig_triangle [vbr].y - orig_triangle [vtr].y);
+    else
+	tR = (x - orig_triangle [vtr].x) / (orig_triangle [vbr].x - orig_triangle [vtr].x);
+
+    xL = orig_triangle [vtl].x + tL * (orig_triangle [vbl].x - orig_triangle [vtl].x);
+    xR = orig_triangle [vtr].x + tR * (orig_triangle [vbr].x - orig_triangle [vtr].x);
+    tX = xR - xL;
+    if (tX) tX = (x - xL) / tX;
+
+#   define INTERPOLATE(val,tl,bl,tr,br)	\
+    {					\
+      float vl,vr;				\
+      if (tl != bl)				\
+        vl = tl + (bl - tl) * tL;		\
+      else					\
+        vl = tl;				\
+      if (tr != br)				\
+        vr = tr + (br - tr) * tR;		\
+      else					\
+        vr = tr;				\
+      val = vl + (vr - vl) * tX;		\
+    }
+
+    // Calculate Z
+    INTERPOLATE(g3dpoly->vertices [j].z,
+                tritexcoords [vtl].z, tritexcoords [vbl].z,
+                tritexcoords [vtr].z, tritexcoords [vbr].z);
+    if (g3dpoly->txt_handle)
+    {
+      // Calculate U
+      INTERPOLATE(g3dpoly->vertices [j].u,
+                  tritexcoords [vtl].u, tritexcoords [vbl].u,
+                  tritexcoords [vtr].u, tritexcoords [vbr].u);
+      // Calculate V
+      INTERPOLATE(g3dpoly->vertices [j].v,
+                  tritexcoords [vtl].v, tritexcoords [vbl].v,
+                  tritexcoords [vtr].v, tritexcoords [vbr].v);
+    }
+    if (gouraud)
+    {
+      // Calculate R
+      INTERPOLATE(g3dpoly->vertices [j].r,
+                  tritexcoords [vtl].r, tritexcoords [vbl].r,
+                  tritexcoords [vtr].r, tritexcoords [vbr].r);
+      // Calculate G
+      INTERPOLATE (g3dpoly->vertices [j].g,
+                  tritexcoords [vtl].g, tritexcoords [vbl].g,
+                  tritexcoords [vtr].g, tritexcoords [vbr].g);
+      // Calculate B
+      INTERPOLATE (g3dpoly->vertices [j].b,
+                  tritexcoords [vtl].b, tritexcoords [vbl].b,
+                  tritexcoords [vtr].b, tritexcoords [vbr].b);
+    }
+    else
+    {
+    
+      g3dpoly->vertices[j].r = 1;
+      g3dpoly->vertices[j].g = 1;
+      g3dpoly->vertices[j].b = 1;
+      
+    }
+  }
+}
+
+/// Static vertex array.
+static DECLARE_GROWING_ARRAY (tr_verts, csVector3);
+/// Static z array.
+static DECLARE_GROWING_ARRAY (z_verts, float);
+/// Static uv array.
+static DECLARE_GROWING_ARRAY (uv_verts, csVector2);
+/// The perspective corrected vertices.
+static DECLARE_GROWING_ARRAY (persp, csVector2);
+/// Array which indicates which vertices are visible and which are not.
+static DECLARE_GROWING_ARRAY (visible, bool);
+
+void csGraphics3DSoftware::DrawTriangleMesh (G3DTriangleMesh& mesh)
+{
+  int i;
+
+  // @@@ Currently we don't implement multi-texture
+  // in the generic implementation. This is a todo...
+
+  // Update work tables.
+  if (mesh.num_vertices > tr_verts.GetLimit ())
+  {
+    tr_verts.SetLimit (mesh.num_vertices);
+    z_verts.SetLimit (mesh.num_vertices);
+    uv_verts.SetLimit (mesh.num_vertices);
+    persp.SetLimit (mesh.num_vertices);
+    visible.SetLimit (mesh.num_vertices);
+  }
+
+  // Do vertex tweening and/or transformation to camera space
+  // if any of those are needed. When this is done 'verts' will
+  // point to an array of camera vertices.
+  csVector3* f1 = mesh.vertices[0];
+  csVector3* verts;
+  if (mesh.num_vertices_pool > 1)
+  {
+    // Vertex morphing.
+    float tween_ratio = mesh.morph_factor;
+    float remainder = 1 - tween_ratio;
+    csVector3* f2 = mesh.vertices[1];
+    if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
+      for (i = 0 ; i < mesh.num_vertices ; i++)
+        tr_verts[i] = o2c * (tween_ratio * f2[i] + remainder * f1[i]);
+    else
+      for (i = 0 ; i < mesh.num_vertices ; i++)
+        tr_verts[i] = tween_ratio * f2[i] + remainder * f1[i];
+    verts = tr_verts.GetArray ();
+  }
+  else
+  {
+    if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
+    {
+      for (i = 0 ; i < mesh.num_vertices ; i++)
+        tr_verts[i] = o2c * f1[i];
+      verts = tr_verts.GetArray ();
+    }
+    else
+      verts = f1;
+  }
+
+  // Perspective project.
+  for (i = 0 ; i < mesh.num_vertices ; i++)
+  {
+    if (verts[i].z >= SMALL_Z)
+    {
+      z_verts[i] = 1. / verts[i].z;
+      float iz = aspect * z_verts[i];
+      persp[i].x = verts[i].x * iz + width2;
+      persp[i].y = verts[i].y * iz + height2;
+      visible[i] = true;
+    }
+    else
+      visible[i] = false;
+  }
+
+  // Clipped polygon (assume it cannot have more than 64 vertices)
+  G3DPolygonDPFX poly;
+  memset (&poly, 0, sizeof(poly));
+
+  // Fill flat color if renderer decide to paint it flat-shaded
+  mesh.txt_handle[0]->GetMeanColor (poly.flat_color_r,
+    poly.flat_color_g, poly.flat_color_b);
+
+  // The triangle in question
+  csVector2 triangle [3];
+  csVector2 clipped_triangle [10];	//@@@BAD HARCODED!
+
+  StartPolygonFX (mesh.txt_handle[0], mesh.fxmode);
+
+//@@@@@@@@@@ BAD: This should be either a parameter or a global view setting!
+bool mirror = true;
+
+  // Draw all triangles.
+  csTriangle* triangles = mesh.triangles;
+  for (i = 0 ; i < mesh.num_triangles ; i++)
+  {
+    int a = triangles[i].a;
+    int b = triangles[i].b;
+    int c = triangles[i].c;
+    if (visible[a] && visible[b] && visible[c])
+    {
+      //-----
+      // Do backface culling. Note that this depends on the
+      // mirroring of the current view.
+      //-----
+      float area = csMath2::Area2 (persp [a].x, persp [a].y,
+                          	   persp [b].x, persp [b].y,
+                          	   persp [c].x, persp [c].y);
+      int j, idx, dir;
+      if (!area) continue;
+      if (mirror)
+      {
+        if (area <= -SMALL_EPSILON) continue;
+        triangle [2] = persp[a];
+        triangle [1] = persp[b];
+        triangle [0] = persp[c];
+	// Setup loop variables for later.
+        idx = 2;
+	dir = -1;
+      }
+      else
+      {
+        if (area >= SMALL_EPSILON) continue;
+        triangle [0] = persp[a];
+        triangle [1] = persp[b];
+        triangle [2] = persp[c];
+	// Setup loop variables for later.
+        idx = 0;
+	dir = 1;
+      }
+
+      // Clip triangle. Note that the clipper doesn't care about the
+      // orientation of the triangle vertices. It works just as well in
+      // mirrored mode.
+      int rescount = 0;
+      if (mesh.do_clip && clipper)
+      {
+        if (!clipper->Clip (triangle, clipped_triangle, 3, rescount)) continue;
+        poly.num = rescount;
+      }
+      else
+        poly.num = 3;
+
+      int trivert [3] = { a, b, c };
+      // If mirroring we store the vertices in the other direction.
+      csColor* colors = mesh.vertex_colors[0];
+      for (j = 0; j < 3; j++)
+      {
+        poly.vertices [idx].z = z_verts[trivert [j]];
+        poly.vertices [idx].u = uv_verts[trivert [j]].x;
+        poly.vertices [idx].v = uv_verts[trivert [j]].y;
+        if (colors)
+        {
+          poly.vertices [idx].r = colors[trivert[j]].red;
+          poly.vertices [idx].g = colors[trivert[j]].green;
+          poly.vertices [idx].b = colors[trivert[j]].blue;
+        }
+	idx += dir;
+      }
+      if (mesh.do_clip)
+	PreparePolygonFX (&poly, clipped_triangle, rescount, (csVector2 *)triangle,
+			    colors != NULL);
+      else
+      {
+        poly.vertices [0].sx = triangle [0].x;
+        poly.vertices [0].sy = triangle [0].y;
+        poly.vertices [1].sx = triangle [1].x;
+        poly.vertices [1].sy = triangle [1].y;
+        poly.vertices [2].sx = triangle [2].x;
+        poly.vertices [2].sy = triangle [2].y;
+      }
+
+      //@@@@@@ FOG NOT IMPLEMENTED YET!
+      //if (mesh.do_fog)
+	//CalculateFogPolygon (&rview, poly);
+      //else poly.use_fog = false;
+      poly.use_fog = false;
+
+      DrawPolygonFX (poly);
+    }
+  }
+
+  FinishPolygonFX ();
+}
+
+//------------------------------------------------------------------------

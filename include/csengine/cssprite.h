@@ -19,6 +19,7 @@
 #ifndef CSSPRITE_H
 #define CSSPRITE_H
 
+#include "csutil/cscolor.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
 #include "csgeom/poly2d.h"
@@ -28,7 +29,6 @@
 #include "csengine/polyint.h"
 #include "csengine/bspbbox.h"
 #include "csengine/rview.h"
-#include "csengine/cscolor.h"
 #include "csengine/texture.h"
 #include "csengine/tranman.h"
 #include "csengine/triangle.h"

@@ -22,7 +22,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"  // texel coords
 #include "csobject/csobject.h"
-#include "csengine/cscolor.h"
+#include "csutil/cscolor.h"
 #include "csengine/arrays.h"
 #include "igraph3d.h"
 

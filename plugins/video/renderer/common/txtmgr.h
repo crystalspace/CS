@@ -20,7 +20,7 @@
 #define TXTMGR_H
 
 #include "cs3d/common/imgtools.h"
-#include "csengine/cscolor.h"	// @@@BAD?
+#include "csutil/cscolor.h"
 #include "csutil/csvector.h"
 #include "itxtmgr.h"
 #include "itexture.h"

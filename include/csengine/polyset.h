@@ -26,7 +26,7 @@
 #include "csobject/csobject.h"
 #include "csengine/tranman.h"
 #include "csengine/arrays.h"
-#include "csengine/cscolor.h"
+#include "csutil/cscolor.h"
 #include "igraph3d.h"
 #include "ipolygon.h"
 

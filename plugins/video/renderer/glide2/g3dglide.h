@@ -202,6 +202,14 @@ public:
   virtual int GetHeight () { return m_nHeight; }
   /// Set center of projection.
   virtual void SetPerspectiveCenter (int x, int y);
+  /// Set perspective aspect. @@@ NOT YET IMPLEMENTED
+  virtual void SetPerspectiveAspect (float aspect) { }
+  /// Set world to camera transformation. @@@ NOT YET IMPLEMENTED
+  virtual void SetObjectToCamera (csTransform* o2c) { }
+  /// Set optional clipper. @@@ NOT YET IMPLEMENTED
+  virtual void SetClipper (csVector2* vertices, int num_vertices) { }
+  /// Draw a triangle mesh. @@@ NOT YET IMPLEMENTED
+  virtual void DrawTriangleMesh (G3DTriangleMesh& mesh) { }
 
   ///
   virtual bool NeedsPO2Maps () { return true; }
