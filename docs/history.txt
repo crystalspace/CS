@@ -13,6 +13,12 @@ chronological order.
 	  on 7 August 2002. This change caused access to uninitialized memory.
 	- res fixed a crash in CSWS caused by csApp::GetFont() having a wrong
 	  prototype.
+	- res changed glrender3d to not call G2D->FinishDraw() when finishing
+	  3D graphics. This makes more sense as BeginDraw() isn't called when
+	  beginning 3D gfx and fixes CSWS (it used to come up with black
+	  components).
+	- res changed the OR compatibility shader to respect the primary 
+	  color's alpha value.
 12-Mar-2004
 	- res augmented configure.ac to look for the OpenAL, Cg, and CgGL
 	  libraries under a couple different names (differing by case) to

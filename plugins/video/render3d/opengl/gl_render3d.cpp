@@ -1096,6 +1096,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     SetZMode (CS_ZBUF_NONE);
     
     SetMixMode (CS_FX_COPY);
+    glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
     return G2D->BeginDraw ();
   }
 
@@ -1107,7 +1108,7 @@ void csGLGraphics3D::FinishDraw ()
 {
   SetMirrorMode (false);
 
-  if (current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
+  if (current_drawflags & CSDRAW_2DGRAPHICS)
     G2D->FinishDraw ();
 
   current_drawflags = 0;
