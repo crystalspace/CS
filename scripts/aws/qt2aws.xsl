@@ -129,7 +129,9 @@
   </xsl:template>
 
   <xsl:template match="property[name[text()='pixmap'] and ../class[text()='QLabel']]">
+    <!--
     <xsl:call-template name="spacer"/><xsl:text>Texture: "</xsl:text><xsl:value-of select="string"/><xsl:text>"</xsl:text>
+    -->
   </xsl:template>
 
   <xsl:template match="property[name[text()='geometry']]">
