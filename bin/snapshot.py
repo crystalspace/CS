@@ -59,7 +59,7 @@
 import commands, glob, grp, os, re, string, sys, tempfile, time
 
 prog_name = "snapshot.py"
-prog_version = "1.7"
+prog_version = "1.8"
 author_name = "Eric Sunshine"
 author_email = "sunshine@sunshineco.com"
 copyright = "Copyright (C) 2000 by " + author_name + " <" + author_email + ">"
@@ -86,6 +86,9 @@ copyright = "Copyright (C) 2000 by " + author_name + " <" + author_email + ">"
 #    keepdiffs - Number of historical 'diffs' to retain.
 #    keeplogs - Number of historical log files to retain.
 #    workdir - Temporary working directory for checkouts.
+#    warnlevel - Warning level.  Defaults is 0.  Higher values may produce
+#        warnings about certain non-fatal problems, such as when "chgrp" on
+#        a directory fails when user is not owner of directory.
 #    archivers - A tuple of archivers used to generate the project packages.
 #        Each tuple element is a dictionary with the following keys.  The key
 #        "name" specifies the name of the directory under 'snapdir' into which
@@ -111,7 +114,8 @@ snapdir = "/home/groups/ftp/pub/crystal/cvs-snapshots"
 keepsnapshots = 2
 keepdiffs = 7
 keeplogs = 7
-workdir = "/tmp";
+workdir = "/tmp"
+warnlevel = 0
 
 archivers = (
     {"name": "gzip",
@@ -184,14 +188,16 @@ class Snapshot:
 	try:
             os.chmod(path, 0775)
         except Exception, e:
-            self.log("Error making directory group writable: " +
-                     path + '; reason: ' + str(e))
+            if warnlevel > 0:
+                self.log("Error making directory group writable: " +
+                         path + '; reason: ' + str(e))
         if ownergroup:
             try:
                 os.chown(path, os.getuid(), grp.getgrnam(ownergroup)[2])
             except Exception, e:
-                self.log('Error setting group ownership "' + ownergroup +
-                         '" on ' + path + '; reason: ' + str(e))
+                if warnlevel > 0:
+                    self.log('Error setting group ownership "' + ownergroup +
+                             '" on ' + path + '; reason: ' + str(e))
 
     def openlog(self):
         if not self.logfile:
@@ -245,7 +251,7 @@ class Snapshot:
 
     def preparetransient(self):
         tempfile.tempdir = workdir
-        self.builddir = tempfile.mktemp();
+        self.builddir = tempfile.mktemp()
         self.log("Creating working directory: " + self.builddir)
         self.makedirectory(self.builddir)
 
@@ -366,7 +372,7 @@ class Snapshot:
         self.makedirectory(snapdir)
         self.makedirectory(self.logdir)
         self.openlog()
-        self.log(prog_name + " version " + prog_version);
+        self.log(prog_name + " version " + prog_version)
         self.log(copyright + "\n")
         self.log("BEGIN: " + self.timenow())
         try:
