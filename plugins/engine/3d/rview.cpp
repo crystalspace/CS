@@ -35,7 +35,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csRenderView::csRenderView () :
   ctxt(0),
-  iengine(0),
+  engine(0),
   g3d(0),
   g2d(0),
   original_camera(0)
@@ -49,7 +49,7 @@ csRenderView::csRenderView () :
 
 csRenderView::csRenderView (iCamera *c) :
   ctxt(0),
-  iengine(0),
+  engine(0),
   g3d(0),
   g2d(0),
   original_camera(0)
@@ -69,7 +69,7 @@ csRenderView::csRenderView (
   iGraphics3D *ig3d,
   iGraphics2D *ig2d) :
     ctxt(0),
-    iengine(0),
+    engine(0),
     g3d(ig3d),
     g2d(ig2d),
     original_camera(0)
@@ -102,8 +102,6 @@ csRenderView::~csRenderView ()
     if (ctxt->iview_frustum) ctxt->iview_frustum->DecRef ();
     delete ctxt;
   }
-  if (iengine)
-    iengine->DecRef ();
   SCF_DESTRUCT_IBASE ();
 }
 
@@ -129,11 +127,9 @@ void csRenderView::SetClipper (iClipper2D *view)
   UpdateFrustum (ctxt->iview, ctxt->iview_frustum);
 }
 
-void csRenderView::SetEngine (iEngine *engine)
+void csRenderView::SetEngine (csEngine *engine)
 {
-  engine->IncRef ();
-  if (iengine) iengine->DecRef ();
-  iengine = engine;
+  csRenderView::engine = engine;
 }
 
 // Remove this for old fog
@@ -801,20 +797,20 @@ void csRenderView::UpdateFrustum (
   for (i = 1; i < clip->GetVertexCount (); i++)
     bbox.AddBoundingVertexSmart ((poly[i] - shift) * inv_fov);
 
-  csVector3 *frustum = frust->frustum;
+  csPlane3 *frustum = frust->frustum;
   csVector3 v1 (bbox.MinX (), bbox.MinY (), 1);
   csVector3 v2 (bbox.MaxX (), bbox.MinY (), 1);
-  frustum[0] = v1 % v2;
-  frustum[0].Normalize ();
+  frustum[0].Set (v1 % v2, 0);
+  frustum[0].norm.Normalize ();
 
   csVector3 v3 (bbox.MaxX (), bbox.MaxY (), 1);
-  frustum[1] = v2 % v3;
-  frustum[1].Normalize ();
+  frustum[1].Set (v2 % v3, 0);
+  frustum[1].norm.Normalize ();
   v2.Set (bbox.MinX (), bbox.MaxY (), 1);
-  frustum[2] = v3 % v2;
-  frustum[2].Normalize ();
-  frustum[3] = v2 % v1;
-  frustum[3].Normalize ();
+  frustum[2].Set (v3 % v2, 0);
+  frustum[2].norm.Normalize ();
+  frustum[3].Set (v2 % v1, 0);
+  frustum[3].norm.Normalize ();
 }
 
 void csRenderView::SetFrustum (float lx, float rx, float ty, float by)
@@ -826,20 +822,20 @@ void csRenderView::SetFrustum (float lx, float rx, float ty, float by)
   if (top_frustum) top_frustum->DecRef ();
   top_frustum = new csRenderContextFrustum ();
 
-  csVector3 *frustum = top_frustum->frustum;
+  csPlane3 *frustum = top_frustum->frustum;
   csVector3 v1 (leftx, topy, 1);
   csVector3 v2 (rightx, topy, 1);
-  frustum[0] = v1 % v2;
-  frustum[0].Normalize ();
+  frustum[0].Set (v1 % v2, 0);
+  frustum[0].norm.Normalize ();
 
   csVector3 v3 (rightx, boty, 1);
-  frustum[1] = v2 % v3;
-  frustum[1].Normalize ();
+  frustum[1].Set (v2 % v3, 0);
+  frustum[1].norm.Normalize ();
   v2.Set (leftx, boty, 1);
-  frustum[2] = v3 % v2;
-  frustum[2].Normalize ();
-  frustum[3] = v2 % v1;
-  frustum[3].Normalize ();
+  frustum[2].Set (v3 % v2, 0);
+  frustum[2].norm.Normalize ();
+  frustum[3].Set (v2 % v1, 0);
+  frustum[3].norm.Normalize ();
 }
 
 void csRenderView::TestSphereFrustum (
@@ -850,23 +846,23 @@ void csRenderView::TestSphereFrustum (
   bool &outside)
 {
   float dist;
-  csVector3 *frust = frustum->frustum;
+  csPlane3 *frust = frustum->frustum;
   outside = true;
   inside = true;
 
-  dist = frust[0] * center;
+  dist = frust[0].norm * center;
   if (dist < radius) inside = false;
   if ((-dist) <= radius)
   {
-    dist = frust[1] * center;
+    dist = frust[1].norm * center;
     if (dist < radius) inside = false;
     if ((-dist) <= radius)
     {
-      dist = frust[2] * center;
+      dist = frust[2].norm * center;
       if (dist < radius) inside = false;
       if ((-dist) <= radius)
       {
-        dist = frust[3] * center;
+        dist = frust[3].norm * center;
         if (dist < radius) inside = false;
         if ((-dist) <= radius) outside = false;
       }
@@ -1064,6 +1060,103 @@ bool csRenderView::ClipBSphere (
 }
 
 bool csRenderView::ClipBBox (
+  const csBox3 &cbox,
+  int &clip_portal,
+  int &clip_plane,
+  int &clip_z_plane)
+{
+  //------
+  // Test against far plane if needed.
+  //------
+  csPlane3 *far_plane = ctxt->icamera->GetFarPlane ();
+  if (far_plane)
+  {
+    // Ok, so this is not really far plane clipping - we just dont draw this
+    // object if no point of the camera_bounding box is further than the D
+    // part of the farplane.
+    if (cbox.SquaredOriginDist () > far_plane->D () * far_plane->D ())
+      return false;
+  }
+
+  //------
+  // Test if there is a chance we must clip to current portal.
+  //------
+  uint32 outClipMask;
+  if (!csIntersect3::BoxFrustum (cbox, ctxt->iview_frustum->frustum, 0xf,
+  	outClipMask))
+    return false;	// Not visible.
+  if (outClipMask == 0xf)
+    clip_portal = CS_CLIP_NOT;
+  else
+    clip_portal = CS_CLIP_NEEDED;
+
+  //------
+  // Test if there is a chance we must clip to the z-plane.
+  //------
+  clip_z_plane = CS_CLIP_NOT;
+
+  int cntz = 0;
+  int i;
+  for (i = 0; i < 8; i++)
+  {
+    csVector3 c = cbox.GetCorner (i);
+    if (c.z < SMALL_D) cntz++;
+  }
+
+  if (cntz == 8) return false;        // Object not visible.
+  if (cntz > 0) clip_z_plane = CS_CLIP_NEEDED;
+
+  //------
+  // Test if there is a chance we must clip to current plane.
+  //------
+  clip_plane = CS_CLIP_NOT;
+  if (ctxt->do_clip_plane)
+  {
+    bool mirror = GetCamera ()->IsMirrored ();
+    int cnt = 0;
+    for (i = 0; i < 8; i++)
+    {
+      csVector3 c = cbox.GetCorner (i);
+      if (!mirror)
+      {
+        if (ctxt->clip_plane.Classify (c) > 0) cnt++;
+      }
+      else
+      {
+        if (ctxt->clip_plane.Classify (c) < 0) cnt++;
+      }
+    }
+
+    if (cnt == 8) return false;       // Object not visible.
+    if (cnt > 0) clip_plane = CS_CLIP_NEEDED;
+  }
+
+  //------
+  // If we don't need to clip to the current portal then we
+  // test if we need to clip to the top-level portal.
+  // Top-level clipping is always required unless we are totally
+  // within the top-level frustum.
+  // IF it is decided that we need to clip here then we still
+  // clip to the inner portal. We have to do clipping anyway so
+  // why not do it to the smallest possible clip area.
+  //------
+  if ((!ctxt->do_clip_frustum) || clip_portal != CS_CLIP_NEEDED)
+  {
+    csRenderView* top_rview = engine->GetCsTopLevelClipper ();
+    csRenderContext* top_ctxt = top_rview->ctxt;
+    if (!csIntersect3::BoxFrustum (cbox, top_ctxt->iview_frustum->frustum, 0xf,
+  	outClipMask))
+    {
+      CS_ASSERT (false);	// This is not possible!
+      return false;
+    }
+    if (outClipMask != 0xf) clip_portal = CS_CLIP_TOPLEVEL;
+  }
+
+  return true;
+}
+
+bool csRenderView::ClipBBox (
   const csBox2 &sbox,
   const csBox3 &cbox,
   int &clip_portal,
@@ -1146,7 +1239,8 @@ bool csRenderView::ClipBBox (
   //------
   if ((!ctxt->do_clip_frustum) || clip_portal != CS_CLIP_NEEDED)
   {
-    box_class = iengine->GetTopLevelClipper ()->ClassifyBox (sbox);
+    box_class = engine->GetCsTopLevelClipper ()->GetClipper ()
+    	->ClassifyBox (sbox);
     if (box_class == 0) clip_portal = CS_CLIP_TOPLEVEL;
   }
 

@@ -1757,7 +1757,7 @@ void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
     Resize ();
   }
 
-  top_clipper = view;
+  top_clipper = &rview;
 
   rview.GetClipPlane ().Set (0, 0, -1, 0);
 
@@ -1806,7 +1806,6 @@ void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
 
 void csEngine::Draw (iCamera *c, iClipper2D *view)
 {
-  top_clipper = view;
   csReversibleTransform camTransR = 
     c->GetTransform();
   G3D->SetWorldToCamera (&camTransR);
@@ -1874,7 +1873,7 @@ void csEngine::AddHalo (iCamera* camera, csLight *Light)
   v.y = frame_height - 1 - (v.y * iz + camera->GetShiftY ());
 
   // If halo is not inside visible region, return
-  if (!top_clipper->IsInside (csVector2 (v.x, v.y))) return ;
+  if (!top_clipper->GetClipper ()->IsInside (csVector2 (v.x, v.y))) return ;
 
   // Check if light is not obscured by anything
   float zv = G3D->GetZBuffValue (QRound (v.x), QRound (v.y));
@@ -3481,11 +3480,6 @@ void csEngine::SetContext (iTextureHandle *txthandle)
 iTextureHandle *csEngine::GetContext () const
 {
   return render_context;
-}
-
-iClipper2D *csEngine::GetTopLevelClipper () const
-{
-  return top_clipper;
 }
 
 void csEngine::SetAmbientLight (const csColor &c)

@@ -482,7 +482,7 @@ public:
   /**
    * The top-level clipper we are currently using for drawing.
    */
-  iClipper2D* top_clipper;
+  csRenderView* top_clipper;
 
   /**
    * Get/create the engine sequence manager.
@@ -998,7 +998,18 @@ public:
   	iSector* sourceSector, const csVector3& pos, iSector* destSector,
 	csVector3* vertices, int num_vertices, iPortal*& portal);
 
-  virtual iClipper2D* GetTopLevelClipper () const;
+  void SetTopLevelClipper (csRenderView* rv)
+  {
+    top_clipper = rv;
+  }
+  virtual iRenderView* GetTopLevelClipper () const
+  {
+    return (iRenderView*)top_clipper;
+  }
+  csRenderView* GetCsTopLevelClipper () const
+  {
+    return top_clipper;
+  }
 
   /// Set the amount of ambient light
   virtual void SetAmbientLight (const csColor &c);

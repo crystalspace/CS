@@ -115,16 +115,16 @@ struct CS_CSGEOM_EXPORT csClipInfo
     {
       case CS_CLIPINFO_ORIGINAL:
         printf ("%s ORIGINAL idx=%d\n", ind, original.idx);
-  break;
+	break;
       case CS_CLIPINFO_ONEDGE:
         printf ("%s ONEDGE i1=%d i2=%d r=%g\n", ind, onedge.i1, onedge.i2,
-    onedge.r);
+	  onedge.r);
         break;
       case CS_CLIPINFO_INSIDE:
         printf ("%s INSIDE r=%g\n", ind, inside.r);
-  inside.ci1->Dump (indent+2);
-  inside.ci2->Dump (indent+2);
-  break;
+	inside.ci1->Dump (indent+2);
+	inside.ci2->Dump (indent+2);
+	break;
     }
     fflush (stdout);
   }
@@ -296,7 +296,7 @@ public:
    * with CS_CLIPINFO_ORIGINAL instances and correct indices.
    */
   static void ClipToPlane (csVector3* vertices, int& num_vertices,
-  csClipInfo* clipinfo, const csVector3& v1, const csVector3& v2);
+    csClipInfo* clipinfo, const csVector3& v1, const csVector3& v2);
 
   /**
    * Clip a frustum (defined from 0,0,0 origin) to the given plane.
@@ -307,7 +307,7 @@ public:
    * instances and correct indices.
    */
   static void ClipToPlane (csVector3* vertices, int& num_vertices,
-  csClipInfo* clipinfo, const csPlane3& plane);
+    csClipInfo* clipinfo, const csPlane3& plane);
 
   /**
    * Clip the polygon of this frustum to the postive side of an arbitrary plane
@@ -388,11 +388,13 @@ public:
     csVector3* poly, int num_poly);
 
   /**
-   * This is like the above version except that it takes a vector of precalculated frustum plane normals.
-   * Use this if you have to classify a batch of polygons against the same frustum.
+   * This is like the above version except that it takes a vector of
+   * precalculated frustum plane normals.
+   * Use this if you have to classify a batch of polygons against the same
+   * frustum.
    */
-  static int BatchClassify (csVector3* frustum, csVector3* frustumNormals, int num_frust,
-          csVector3* poly, int num_poly);
+  static int BatchClassify (csVector3* frustum, csVector3* frustumNormals,
+  	int num_frust, csVector3* poly, int num_poly);
 
   /**
    * Check if a point (given relative to the origin of the frustum)
@@ -423,7 +425,10 @@ public:
   /// Return true if frustum is infinite.
   bool IsInfinite () const { return wide && vertices == 0 && backplane == 0; }
 
-  /// Return true if frustum is infinitely wide but it can still have a back plane.
+  /**
+   * Return true if frustum is infinitely wide but it can still have a
+   * back plane.
+   */
   bool IsWide () const { return wide && vertices == 0; }
 
   /**

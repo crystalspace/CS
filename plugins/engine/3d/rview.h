@@ -52,7 +52,7 @@ private:
   csRenderContext* ctxt;
 
   /// Engine handle.
-  iEngine* iengine;
+  csEngine* engine;
   /// The 3D graphics subsystem used for drawing.
   iGraphics3D* g3d;
   /// The 2D graphics subsystem used for drawing.
@@ -92,7 +92,7 @@ public:
   virtual ~csRenderView ();
 
   /// Set the engine.
-  void SetEngine (iEngine* engine);
+  void SetEngine (csEngine* engine);
   /// Set the camera.
   void SetCamera (iCamera* camera);
   /// Set the original camera.
@@ -129,7 +129,7 @@ public:
   virtual iCamera* CreateNewCamera ();
 
   /// Get the engine.
-  virtual iEngine* GetEngine () { return iengine; }
+  virtual iEngine* GetEngine () { return (iEngine*)engine; }
   /// Get the 2D graphics subsystem.
   virtual iGraphics2D* GetGraphics2D () { return g2d; }
   /// Get the 3D graphics subsystem.
@@ -259,27 +259,12 @@ public:
   virtual bool TestBSphere (const csReversibleTransform& o2c,
     const csSphere& sphere);
 
-  /**
-   * Check if the given bounding sphere (in object space coordinates)
-   * is visibile in this render view. The given transformation should
-   * transform object to camera space. If the sphere is visible this
-   * function will also initialize the clip_plane, clip_z_plane, and
-   * clip_portal fields which can be used for DrawTriangleMesh or
-   * DrawPolygonMesh. The 'camera_origin' field is set to the origin of
-   * the object in camera space.
-   */
   virtual bool ClipBSphere (const csReversibleTransform& o2c,
     const csSphere& sphere, int& clip_portal, int& clip_plane,
     int& clip_z_plane, csVector3& camera_origin);
-
-  /**
-   * Check if the screen bounding box of an object is visible in
-   * this render view. If true is returned (visible) then clip_plane,
-   * clip_z_plane, and clip_portal will be set to the right value depending
-   * on wether or not clipping is wanted. This function also does far
-   * plane clipping.
-   */
   virtual bool ClipBBox (const csBox2& sbox, const csBox3& cbox,
+        int& clip_portal, int& clip_plane, int& clip_z_plane);
+  virtual bool ClipBBox (const csBox3& cbox,
         int& clip_portal, int& clip_plane, int& clip_z_plane);
 
   /**

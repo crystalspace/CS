@@ -59,6 +59,7 @@ void csRenderLoop::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
 {
   rview.SetEngine (engine);
   rview.SetOriginalCamera (c);
+  engine->SetTopLevelClipper (&rview);
 
 /*  iEngineSequenceManager* eseqmgr = GetEngineSequenceManager ();
   if (eseqmgr)

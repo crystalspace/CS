@@ -690,7 +690,7 @@ struct iEngine : public iBase
   /**
    * Get the top-level clipper.
    */
-  virtual iClipper2D* GetTopLevelClipper () const = 0;
+  virtual iRenderView* GetTopLevelClipper () const = 0;
 
   /**
    * Convenience function to create a mesh factory from a given type.

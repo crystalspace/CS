@@ -95,11 +95,8 @@ private:
   ~csRenderContextFrustum () { }
 
 public:
-  /**
-   * The frustum is given as csVector3 and not with csPlane3 because
-   * the planes go through the origin so the D component is zero.
-   */
-  csVector3 frustum[4];
+  // Planes always go through the origin (plane[4] == optional near plane).
+  csPlane3 frustum[5];
 
   csRenderContextFrustum () : ref_count (1) { }
   void IncRef () { ref_count++; }
@@ -346,6 +343,16 @@ struct iRenderView : public iBase
    * plane clipping.
    */
   virtual bool ClipBBox (const csBox2& sbox, const csBox3& cbox,
+      	int& clip_portal, int& clip_plane, int& clip_z_plane) = 0;
+
+  /**
+   * Check if the camera bounding box of an object is visible in this
+   * render view. If true is returned (visible) then clip_plane,
+   * clip_z_plane, and clip_portal will be set to the right value depending
+   * on wether or not clipping is wanted. This function also does far
+   * plane clipping.
+   */
+  virtual bool ClipBBox (const csBox3& cbox,
       	int& clip_portal, int& clip_plane, int& clip_z_plane) = 0;
 
   /**

@@ -13,6 +13,15 @@ chronological order.
 	- Jorrit optimized the alpha render priority sorter by using
 	  the new camera_origin field in csRenderMesh.
 	- Jorrit removed the unused and non-functional bcterr mesh object.
+	- Jorrit changed iEngine->GetTopLevelClipper() to return an
+	  iRenderView instead of an iClipper2D.
+	- Jorrit added iRenderView->ClipBBox() that doesn't want the 2D
+	  box argument (only does rview frustum check with the 3D box).
+	- Jorrit changed several of the important csRenderView methods
+	  to use internal engine cs classes instead of interfaces (avoids
+	  virtual function calls).
+	- Jorrit replaced the 'frustum' in csRenderContextFrustum with an
+	  array of csPlane3 instead of an array of csVector3.
 19-Apr-2004
 	- Eric Sunshine added LGPL license notice to the .m4 and .jam files.
 	- Jorrit fixed a bug in iEngine->CreatePortalContainer(). If there

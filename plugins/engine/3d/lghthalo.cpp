@@ -197,7 +197,7 @@ bool csLightHalo::IsVisible (iCamera* camera, csEngine* Engine, csVector3 &v)
     v.x = v.x * iz + camera->GetShiftX ();
     v.y = Engine->frame_height - 1 - (v.y * iz + camera->GetShiftY ());
 
-    if (Engine->top_clipper->IsInside (csVector2 (v.x, v.y)))
+    if (Engine->top_clipper->GetClipper ()->IsInside (csVector2 (v.x, v.y)))
     {
       float zv = Engine->G3D->GetZBuffValue (QRound (v.x), QRound (v.y));
       return v.z <= zv;
@@ -277,7 +277,8 @@ bool csLightHalo::Process (csTicks ElapsedTime, iCamera* camera,
   };
 
   // Clip the halo against clipper
-  if (Engine->top_clipper->Clip (HaloPoly, 4, HaloClip, HaloVCount))
+  if (Engine->top_clipper->GetClipper ()->Clip (
+  	HaloPoly, 4, HaloClip, HaloVCount))
   {
     xtl = HaloPoly[0].x;
     ytl = HaloPoly[0].y;
