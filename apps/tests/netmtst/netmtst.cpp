@@ -106,7 +106,7 @@ SCF_IMPLEMENT_IBASE_END
 
 bool HandleEvent (iEvent &ev)
 {
-  printf ("...recieved '%s'. :-)\n",
+  printf ("...received '%s'. :-)\n",
     ((RecvPacket *) ev.Network.Data)->GetData ());
 
   csRef<iEventQueue> eventq = CS_QUERY_REGISTRY (objreg, iEventQueue);
