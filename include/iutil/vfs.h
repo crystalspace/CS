@@ -176,7 +176,7 @@ struct iFile : public iBase
 };
 
 
-SCF_VERSION (iVFS, 1, 0, 0);
+SCF_VERSION (iVFS, 1, 0, 1);
 
 /**
  * The Virtual Filesystem Class is intended to be the only way for Crystal
@@ -413,6 +413,21 @@ struct iVFS : public iBase
    *   check validity.
    */
   virtual csPtr<iDataBuffer> GetRealPath (const char *FileName) = 0;
+
+  /**
+   * Get a list of all current virtual mount paths
+   * \return A csStringArray containing all the current virtual mounts
+   */
+  virtual csStringArray GetMounts () = 0;
+
+  /**
+   * Get the real paths associated with a mount
+   * \param VirtualPath The virtual path of a mount point
+   * \return A csStringArray containing all the real filesystem paths associated
+   * with the VirtualPath mount, or an empty array if the VirtualPath isn't
+   * mounted.
+   */
+  virtual csStringArray GetRealMountPaths (const char *VirtualPath) = 0;
 };
 
 /** @} */

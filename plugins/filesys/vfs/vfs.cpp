@@ -2221,3 +2221,27 @@ done:
   return csPtr<iDataBuffer> (
   	new csDataBuffer (csStrNew (path), strlen (path) + 1));
 }
+
+csStringArray csVFS::GetMounts ()
+{
+  csStringArray mounts;
+  for (size_t i=0; i<NodeList.Length (); i++)
+  {
+    mounts.Push (NodeList[i]->VPath);
+  }
+  return mounts;
+}
+
+csStringArray csVFS::GetRealMountPaths (const char *VirtualPath)
+{
+  if (!VirtualPath)
+    return 0;
+
+  VfsNode *node;
+  char suffix [2];
+  if (!PreparePath (VirtualPath, true, node, suffix, sizeof (suffix))
+    || suffix [0])
+    return csStringArray ();
+
+  return node->RPathV;
+}

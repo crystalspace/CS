@@ -57,6 +57,8 @@ static void cmd_sync (char *args);
 static void cmd_time (char *args);
 static void cmd_unmount (char *args);
 static void cmd_rpath (char *args);
+static void cmd_mounts (char *args);
+static void cmd_rmounts (char *args);
 
 struct
 {
@@ -84,6 +86,8 @@ struct
   { "time", cmd_time },
   { "unmount", cmd_unmount },
   { "rpath", cmd_rpath },
+  { "mounts", cmd_mounts },
+  { "rmounts", cmd_rmounts },
   { 0, 0 }
 };
 
@@ -170,6 +174,8 @@ static void cmd_help (char *)
        "save			Save current virtual file system state to " VFS_CONFIG_FILE "\n"
        "time [file]             Display the file's modification time\n"
        "rpath [file]            Convert the virtual path into `real-world' path\n"
+       "mounts                  Display current virtual mount paths\n"
+       "rmounts [vpath]         Display real-world paths mounted at virtual mount\n"
        "exit			Exit Virtual Shell\n"
        "------------------------\n"
        "Wildcards are okay in these commands: ls, cp, rm\n"
@@ -502,6 +508,49 @@ static void cmd_rpath (char *args)
   }
 
   puts ((char *)db->GetData ());
+}
+
+static void cmd_mounts (char *args)
+{
+  csStringArray mounts = VFS->GetMounts ();
+  if (mounts.Length ())
+  {
+    bool nl = false;
+    for (size_t i=0; i<mounts.Length (); i++)
+    {
+      printf ("%-19s", mounts[i]);
+      nl = true;
+      if ((i & 3) == 3)
+      {
+        printf ("\n");
+        nl = false;
+      }
+    }
+
+  }
+  else
+    printf ("mounts: No current mounts to display!\n");
+}
+
+static void cmd_rmounts (char *args)
+{
+  if (!args)
+  {
+    fprintf (stderr, "rmounts: expected virtual mount path\n");
+    return;
+  }
+
+  csStringArray rpaths = VFS->GetRealMountPaths (args);
+  if (rpaths.Length ())
+  {
+    bool nl = false;
+    for (size_t i=0; i<rpaths.Length (); i++)
+    {
+      printf ("%s\n", rpaths[i]);
+    }
+  }
+  else
+    printf ("rmounts: No virtual mount at path `%s'\n", args);
 }
 
 static bool execute (char *command)
