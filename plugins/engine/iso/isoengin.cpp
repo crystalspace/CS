@@ -370,6 +370,7 @@ iMeshFactoryWrapper *csIsoEngine::CreateMeshFactory(const char* classId,
     obj->DecRef ();
     meshfactories.scfiMeshFactoryList.Add (&(wrap->scfiMeshFactoryWrapper));
     wrap->DecRef ();
+    mesh_fact->DecRef();
     mesh_type->DecRef ();
     return &(wrap->scfiMeshFactoryWrapper);
   }
