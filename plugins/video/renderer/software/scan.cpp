@@ -64,7 +64,7 @@ void csScan_draw_pi_scanline_zfil (void *dest, int len, unsigned long *zbuff,
   unsigned char *bitmap, int bitmap_log2w)
 {
   (void)u; (void)du; (void)v; (void)dv;
-  (void)bitmap; (void)bitmap_log2w;
+  (void)bitmap; (void)bitmap_log2w; (void)dest;
   ULong *lastZbuf = zbuff + len - 1;
 
   do

@@ -163,6 +163,10 @@ void PI_SCANFUNC (void *dest, int len, unsigned long *zbuff,
 #endif
   )
 {
+#if defined (PI_GOURAUD) && defined (PI_BLEND)
+  (void) clamp; //remove the warning about an unused parameter
+#endif
+
   PI_PIXTYPE *_dest = (PI_PIXTYPE *)dest;
   PI_PIXTYPE *_destend = _dest + len;
 
