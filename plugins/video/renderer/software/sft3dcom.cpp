@@ -200,10 +200,10 @@ bool csGraphics3DSoftwareCommon::Open (const char* title)
 {
   if (!G2D->Open (Title))
   {
-      SysPrintf (MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
-      // set "not opened" flag
-      width = height = -1;
-      return false;
+    SysPrintf (MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
+    // set "not opened" flag
+    width = height = -1;
+    return false;
   }
 
   pfmt = *G2D->GetPixelFormat ();
@@ -293,8 +293,8 @@ bool csGraphics3DSoftwareCommon::NewOpen ()
 
     if (!csize)
     {
-      SysPrintf (MSG_INITIALIZATION, 
-		 "Invalid cache size specified, using default\n");
+      SysPrintf (MSG_INITIALIZATION,
+        "Invalid cache size specified, using default\n");
       csize = DEFAULT_CACHE_SIZE;
     }
   }
@@ -1099,6 +1099,11 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
   if (!do_textured)
   {
     DrawPolygonFlat (poly);
+    return;
+  }
+  else if (z_buf_mode == CS_ZBUF_FILLONLY)
+  {
+    DrawFogPolygon (0, poly, CS_FOG_BACK);
     return;
   }
 

@@ -131,29 +131,34 @@ struct G3DPolygonDPFX
   UByte flat_color_b;
 };
 
-/// Structure containing all info needed by DrawPolygon (DP)
-struct G3DPolygonDP
+/// Structure containing all info needed by DrawFogPolygon (DFP)
+struct G3DPolygonDFP
 {
   /// Current number of vertices.
   int num;
   /// Vertices that form the polygon.
   G3DVertex vertices[100];
 
+  /// Invert aspect ratio that was used to perspective project the vertices (1/fov)
+  float inv_aspect;
+
+  /// The plane equation in camera space of this polygon.
+  csPlane3 normal;
+};
+
+/// Structure containing all info needed by DrawPolygon (DP)
+struct G3DPolygonDP : public G3DPolygonDFP
+{
   /// Extra optional fog information.
   G3DFogInfo fog_info[100];
   /// Use fog info?
   bool use_fog;
-
-  /// Invert aspect ratio that was used to perspective project the vertices (1/fov)
-  float inv_aspect;
 
   /// The texture handle as returned by iTextureManager.
   iTextureHandle* txt_handle;
 
   /// Transformation matrices for the texture. @@@ BAD NAME
   G3DTexturePlane plane;
-  /// The plane equation in camera space of this polygon.
-  csPlane3 normal;
 
   /// Handle to lighted textures (texture + lightmap)
   iPolygonTexture* poly_texture;
@@ -176,21 +181,6 @@ struct G3DPolygonDP
 /// Structure containing all info needed by DrawPolygonFlat (DPF)
 typedef G3DPolygonDP G3DPolygonDPF;
 
-/// Structure containing all info needed by DrawFogPolygon (DFP)
-struct G3DPolygonDFP
-{
-  /// Current number of vertices.
-  int num;
-  /// Vertices that form the polygon.
-  G3DVertex vertices[100];
-
-  /// Invert aspect ratio that was used to perspective project the vertices (1/fov)
-  float inv_aspect;
-
-  /// The plane equation in camera space of this polygon.
-  csPlane3 normal;
-};
-
 /**
  * Don't test/write, write, test, and write/test, respectively.
  * The values below are sometimes used as bit masks, so don't change them!
@@ -200,7 +190,8 @@ enum csZBufMode
   CS_ZBUF_NONE = 0,
   CS_ZBUF_FILL = 1,
   CS_ZBUF_TEST = 2,
-  CS_ZBUF_USE  = 3
+  CS_ZBUF_USE  = 3,
+  CS_ZBUF_FILLONLY = 4
 };
 
 ///
@@ -440,7 +431,7 @@ struct csFog
   float blue;
 };
 
-SCF_VERSION (iGraphics3D, 2, 0, 3);
+SCF_VERSION (iGraphics3D, 3, 0, 0);
 
 /**
  * This is the standard 3D graphics interface.
