@@ -56,7 +56,9 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   # pythmod -- Pure Python module
   #--------
-  Description pythmod : "pure Python module" ;
+  local desc = "pure Python module" ;
+  Description pythmod : $(desc) ;
+  Help pythmod : "Build the $(desc)" ;
 
   # Plugin rule above already invokes CompileObject for $(common). We do not
   # invoking it again because we want to avoid compiling the same (large) file
@@ -77,6 +79,8 @@ if $(PYTHON.AVAILABLE) = "yes"
   }
 
   pythmod_TARGET = $(pythmod) ;
+  pythmod_SOURCES = $(pythmodsrc) ;
+  pythmod_OBJECTS = $(pythmodobj) ;
   LinkWith pythmod : cstool csgfx csgeom csutil ;
   ExternalLibs pythmod : PYTHON ;
   CFlags pythmod : $(PLUGIN.CFLAGS) ;

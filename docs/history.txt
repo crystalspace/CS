@@ -71,6 +71,11 @@ chronological order.
 	  doesn't like non-numerical characters. Note: Not needed for CS
 	  itself, but external projects may have versions with alphabetical
 	  characters.
+	- Eric Sunshine fixed cspython/Jamfile so that "jam help" emits a
+	  help message for the "pythmod" target.
+	- Eric Sunshine fixed problem in cspython/Jamfile where invocations of
+	  CFlags, LFlags, and ExternalLibs were dysfunctional for 'pythmod'
+	  target.
 11-Aug-2004
 	- Oktal fixed a problem in the console input plugin where a '%' sign in
 	  the input would cause problems because of iConsoleOutput::PutText's
