@@ -35,8 +35,8 @@
  * </ul>
  * Usage examples:
  * <pre>
- * DECLARE_GROWING_ARRAY (LightArray, csLight*)
- * DECLARE_GROWING_ARRAY (IntArray, int)
+ * DECLARE_GROWING_ARRAY (LightArray, csLight*);
+ * DECLARE_GROWING_ARRAY (IntArray, int);
  * </pre>
  */
 #define DECLARE_GROWING_ARRAY(Name, Type)				\
@@ -72,6 +72,6 @@
     { Limit = 0; RefCount = 0; root = NULL; }				\
     ~__##Name ()							\
     { SetLimit (0); }							\
-  } Name;
+  } Name
 
 #endif // __GARRAY_H__

@@ -55,7 +55,7 @@ bool csPolygon3D::do_cache_lightmaps = true;
 // csPolygon3D is created and an DecRef each time it is deleted.
 // Thus, when the world is cleaned, the array is automatically
 // cleaned too.
-static DECLARE_GROWING_ARRAY (VectorArray, csVector3)
+static DECLARE_GROWING_ARRAY (VectorArray, csVector3);
 
 //---------------------------------------------------------------------------
 
