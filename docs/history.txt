@@ -3,6 +3,10 @@ The history order is reversed so that new features are at the top.
 17-Aug-2002
 	- Better error message is a texture could not be loaded in
 	  the loader.
+	- Implemented XML loading for PROCTEX in the csparser plugin.
+	- Implemented HALO parsing in XML for lights.
+	- cs2xml will now correctly export lights in old and new
+	  syntax. Halos are not yet properly supported.
 16-Aug-2002
 	- Implemented XML loading in the csparser plugin for the following
 	  items:

@@ -21,6 +21,8 @@
 
 #include "cssysdef.h"
 #include "cs2xml.h"
+#include "csgeom/vector3.h"
+#include "csutil/cscolor.h"
 #include "csutil/util.h"
 #include "csutil/parser.h"
 #include "csutil/indprint.h"
@@ -56,6 +58,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ACCEL)
   CS_TOKEN_DEF (AGING)
   CS_TOKEN_DEF (BOX)
+  CS_TOKEN_DEF (CENTER)
   CS_TOKEN_DEF (CURVECENTER)
   CS_TOKEN_DEF (CURVECONTROL)
   CS_TOKEN_DEF (COLOR)
@@ -68,6 +71,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (FILE)
   CS_TOKEN_DEF (FIRST)
   CS_TOKEN_DEF (FOG)
+  CS_TOKEN_DEF (HALO)
   CS_TOKEN_DEF (IDENTITY)
   CS_TOKEN_DEF (KEY)
   CS_TOKEN_DEF (LIGHT)
@@ -410,6 +414,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (ACCEL)
     CS_TOKEN_TABLE (AGING)
     CS_TOKEN_TABLE (BOX)
+    CS_TOKEN_TABLE (CENTER)
     CS_TOKEN_TABLE (CURVECENTER)
     CS_TOKEN_TABLE (CURVECONTROL)
     CS_TOKEN_TABLE (COLOR)
@@ -422,6 +427,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (FILE)
     CS_TOKEN_TABLE (FIRST)
     CS_TOKEN_TABLE (FOG)
+    CS_TOKEN_TABLE (HALO)
     CS_TOKEN_TABLE (KEY)
     CS_TOKEN_TABLE (LIGHT)
     CS_TOKEN_TABLE (MATRIX)
@@ -495,6 +501,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    if (name) child->SetAttribute ("name", name);
 	  }
 	  break;
+        case CS_TOKEN_CENTER:
         case CS_TOKEN_ACCEL:
         case CS_TOKEN_CURVECONTROL:
         case CS_TOKEN_FALLSPEED:
@@ -655,7 +662,6 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
         case CS_TOKEN_F:
         case CS_TOKEN_FOG:
         case CS_TOKEN_KEY:
-        case CS_TOKEN_LIGHT:
         case CS_TOKEN_NUM:
         case CS_TOKEN_PRIORITY:
         case CS_TOKEN_RADIUS:
@@ -663,6 +669,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
         case CS_TOKEN_ROT:
         case CS_TOKEN_UV:
         case CS_TOKEN_W:
+        case CS_TOKEN_HALO:
 	  {
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	  	CS_NODE_ELEMENT, NULL);
@@ -671,6 +678,45 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    // @@@ TODO
 	  }
           break;
+        case CS_TOKEN_LIGHT:
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name) child->SetAttribute ("name", name);
+	    if (strchr (params, ':'))
+	    {
+	      int d;
+	      csVector3 pos;
+	      float dist;
+	      csColor col;
+	      csScanStr (buf, "%f,%f,%f:%f,%f,%f,%f,%d",
+		&pos.x, &pos.y, &pos.z, &dist, &col.red, &col.green, &col.blue, &d);
+	      bool dyn = bool (d);
+	      csRef<iDocumentNode> childchild;
+	      childchild = child->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+	      childchild->SetValue ("center");
+	      childchild->SetAttributeAsFloat ("x", pos.x);
+	      childchild->SetAttributeAsFloat ("y", pos.y);
+	      childchild->SetAttributeAsFloat ("z", pos.z);
+	      CreateValueNodeAsFloat (child, "radius", dist);
+	      childchild = child->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+	      childchild->SetValue ("color");
+	      childchild->SetAttributeAsFloat ("red", col.red);
+	      childchild->SetAttributeAsFloat ("green", col.green);
+	      childchild->SetAttributeAsFloat ("blue", col.blue);
+	      if (dyn)
+	      {
+		childchild = child->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+		childchild->SetValue ("dynamic");
+	      }
+	    }
+	    else
+	    {
+              ParseGeneral (tokname, parser, child, params);
+	    }
+	  }
+	  break;
         case CS_TOKEN_TRANSPARENT:
 	  {
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (

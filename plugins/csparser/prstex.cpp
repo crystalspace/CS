@@ -691,7 +691,66 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
 iTextureWrapper* csLoader::ParseProcTex (iDocumentNode* node)
 {
   if (!Engine) return NULL;
-  return NULL;
+
+  csProcTexture* pt = NULL;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_TYPE:
+        if (pt)
+	{
+	  ReportError (
+	      "crystalspace.maploader.parse.proctex",
+	      "'type' of proctex already specified!");
+	  return NULL;
+	}
+	else
+	{
+	  const char* type = child->GetContentsValue ();
+          if (!strcasecmp (type, "dots"))
+	    pt = new csProcDots ();
+	  else if (!strcasecmp (type, "plasma"))
+	    pt = new csProcPlasma ();
+	  else if (!strcasecmp (type, "water"))
+	    pt = new csProcWater ();
+	  else if (!strcasecmp (type, "fire"))
+	    pt = new csProcFire ();
+	  else
+	  {
+	    ReportError (
+	      "crystalspace.maploader.parse.proctex",
+	      "Unknown 'type' '%s' of proctex!", type);
+	    return NULL;
+	  }
+	}
+        break;
+      default:
+	TokenError ("a proctex specification", value);
+	return NULL;
+    }
+  }
+
+  if (pt == NULL)
+  {
+    ReportError (
+	      "crystalspace.maploader.parse.proctex",
+	      "'type' of proctex not given!");
+    return NULL;
+  }
+
+  iMaterialWrapper *mw = pt->Initialize (object_reg, Engine,
+	 G3D ? G3D->GetTextureManager () : NULL,
+	 node->GetAttributeValue ("name"));
+  mw->QueryObject ()->ObjAdd (pt);
+  pt->DecRef ();
+  return pt->GetTextureWrapper ();
 }
 
 iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node, const char *prefix)

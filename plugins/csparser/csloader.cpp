@@ -2468,6 +2468,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("texture", XMLTOKEN_TEXTURE);
   xmltokens.Register ("textures", XMLTOKEN_TEXTURES);
   xmltokens.Register ("transparent", XMLTOKEN_TRANSPARENT);
+  xmltokens.Register ("type", XMLTOKEN_TYPE);
   xmltokens.Register ("matset", XMLTOKEN_MATSET);
   xmltokens.Register ("up", XMLTOKEN_UP);
   xmltokens.Register ("v", XMLTOKEN_V);
@@ -4865,7 +4866,6 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
   csVector3 pos;
   csColor color;
   float dist = 0;
-  int cnt;
   bool dyn;
   int attenuation = CS_ATTN_LINEAR;
   struct csHaloDef
@@ -4940,105 +4940,114 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 	    return NULL;
 	}
         break;
-#if 0
-	//@@@@@@@@@@@@ TODO
-      case CS_TOKEN_HALO:
-	str[0] = 0;
-        cnt = csScanStr (params, "%s", str);
-        if (cnt == 0 || !strcmp (str, "CROSS"))
-        {
-          params = strchr (params, ',');
-          if (params) params++;
-defaulthalo:
-          halo.type = 1;
-          halo.cross.Intensity = 2.0; halo.cross.Cross = 0.45;
-          if (params)
-            csScanStr (params, "%f,%f", &halo.cross.Intensity,
-	    	&halo.cross.Cross);
+      case XMLTOKEN_HALO:
+	{
+	  const char* type;
+	  csRef<iDocumentNode> typenode = child->GetNode ("type");
+	  if (!typenode)
+	  {
+	    // Default halo, type 'cross' assumed.
+	    type = "cross";
+	  }
+	  else
+	  {
+	    type = typenode->GetContentsValue ();
+	  }
+
+	  if (!strcasecmp (type, "cross"))
+	  {
+	    halo.type = 1;
+            halo.cross.Intensity = 2.0;
+	    halo.cross.Cross = 0.45;
+	    csRef<iDocumentNode> intnode = child->GetNode ("intensity");
+	    if (intnode) { halo.cross.Intensity = intnode->GetContentsValueAsFloat (); }
+	    csRef<iDocumentNode> crossnode = child->GetNode ("cross");
+	    if (crossnode) { halo.cross.Cross = crossnode->GetContentsValueAsFloat (); }
+	  }
+	  else if (!strcasecmp (type, "nova"))
+	  {
+            halo.type = 2;
+            halo.nova.Seed = 0;
+	    halo.nova.NumSpokes = 100;
+	    halo.nova.Roundness = 0.5;
+	    csRef<iDocumentNode> seednode = child->GetNode ("seed");
+	    if (seednode) { halo.nova.Seed = seednode->GetContentsValueAsInt (); }
+	    csRef<iDocumentNode> spokesnode = child->GetNode ("numspokes");
+	    if (spokesnode) { halo.nova.NumSpokes = spokesnode->GetContentsValueAsInt (); }
+	    csRef<iDocumentNode> roundnode = child->GetNode ("roundness");
+	    if (roundnode) { halo.nova.Roundness = roundnode->GetContentsValueAsFloat (); }
+	  }
+	  else if (!strcasecmp (type, "flare"))
+	  {
+            halo.type = 3;
+	    iLoaderContext* lc = GetLoaderContext ();
+	    csRef<iDocumentNode> matnode;
+	    
+	    matnode = child->GetNode ("centermaterial");
+	    halo.flare.mat_center = matnode ? lc->FindMaterial (matnode->GetContentsValue ()) : NULL;
+	    if (!halo.flare.mat_center)
+	    {
+	      ReportError (
+		  "crystalspace.maploader.parse.light",
+    	          "Can't find material for flare!");
+	      return NULL;
+	    }
+	    matnode = child->GetNode ("spark1material");
+	    halo.flare.mat_spark1 = matnode ? lc->FindMaterial (matnode->GetContentsValue ()) : NULL;
+	    if (!halo.flare.mat_spark1)
+	    {
+	      ReportError (
+		  "crystalspace.maploader.parse.light",
+    	          "Can't find material for flare!");
+	      return NULL;
+	    }
+	    matnode = child->GetNode ("spark2material");
+	    halo.flare.mat_spark2 = matnode ? lc->FindMaterial (matnode->GetContentsValue ()) : NULL;
+	    if (!halo.flare.mat_spark2)
+	    {
+	      ReportError (
+		  "crystalspace.maploader.parse.light",
+    	          "Can't find material for flare!");
+	      return NULL;
+	    }
+	    matnode = child->GetNode ("spark3material");
+	    halo.flare.mat_spark3 = matnode ? lc->FindMaterial (matnode->GetContentsValue ()) : NULL;
+	    if (!halo.flare.mat_spark3)
+	    {
+	      ReportError (
+		  "crystalspace.maploader.parse.light",
+    	          "Can't find material for flare!");
+	      return NULL;
+	    }
+	    matnode = child->GetNode ("spark4material");
+	    halo.flare.mat_spark4 = matnode ? lc->FindMaterial (matnode->GetContentsValue ()) : NULL;
+	    if (!halo.flare.mat_spark4)
+	    {
+	      ReportError (
+		  "crystalspace.maploader.parse.light",
+    	          "Can't find material for flare!");
+	      return NULL;
+	    }
+	    matnode = child->GetNode ("spark5material");
+	    halo.flare.mat_spark5 = matnode ? lc->FindMaterial (matnode->GetContentsValue ()) : NULL;
+	    if (!halo.flare.mat_spark5)
+	    {
+	      ReportError (
+		  "crystalspace.maploader.parse.light",
+    	          "Can't find material for flare!");
+	      return NULL;
+	    }
+	  }
+	  else
+	  {
+	    ReportError (
+		"crystalspace.maploader.parse.light",
+    	        "Unknown halo type '%s'. Use 'cross', 'nova' or 'flare'!",
+		type);
+	    return NULL;
+	  }
         }
-        else if (!strcmp (str, "NOVA"))
-        {
-          params = strchr (params, ',');
-          if (params) params++;
-          halo.type = 2;
-          halo.nova.Seed = 0; halo.nova.NumSpokes = 100;
-	  halo.nova.Roundness = 0.5;
-          if (params)
-            csScanStr (params, "%d,%d,%f", &halo.nova.Seed,
-	    	&halo.nova.NumSpokes, &halo.nova.Roundness);
-        }
-        else if (!strcmp (str, "FLARE"))
-        {
-          params = strchr (params, ',');
-          if (params) params++;
-          halo.type = 3;
-	  char mat_names[8][255];
-	  int cur_idx = 0;
-	  while (params && cur_idx < 6)
-	  {
-	    char* end = strchr (params, ',');
-	    int l;
-	    if (end) l = end-params;
-	    else l = strlen (params);
-	    strncpy (mat_names[cur_idx], params, l);
-	    mat_names[cur_idx][l] = 0;
-	    cur_idx++;
-	    params = end+1;
-	  }
-	  iLoaderContext* lc = GetLoaderContext ();
-	  halo.flare.mat_center = lc->FindMaterial (mat_names[0]);
-	  if (!halo.flare.mat_center)
-	  {
-	    ReportError (
-		"crystalspace.maploader.parse.light",
-    	        "Can't find material for flare!");
-	    return NULL;
-	  }
-	  halo.flare.mat_spark1 = lc->FindMaterial (mat_names[1]);
-	  if (!halo.flare.mat_spark1)
-	  {
-	    ReportError (
-		"crystalspace.maploader.parse.light",
-    	        "Can't find material for flare!");
-	    return NULL;
-	  }
-	  halo.flare.mat_spark2 = lc->FindMaterial (mat_names[2]);
-	  if (!halo.flare.mat_spark2)
-	  {
-	    ReportError (
-		"crystalspace.maploader.parse.light",
-    	        "Can't find material for flare!");
-	    return NULL;
-	  }
-	  halo.flare.mat_spark3 = lc->FindMaterial (mat_names[3]);
-	  if (!halo.flare.mat_spark3)
-	  {
-	    ReportError (
-		"crystalspace.maploader.parse.light",
-    	        "Can't find material for flare!");
-	    return NULL;
-	  }
-	  halo.flare.mat_spark4 = lc->FindMaterial (mat_names[4]);
-	  if (!halo.flare.mat_spark4)
-	  {
-	    ReportError (
-		"crystalspace.maploader.parse.light",
-    	        "Can't find material for flare!");
-	    return NULL;
-	  }
-	  halo.flare.mat_spark5 = lc->FindMaterial (mat_names[5]);
-	  if (!halo.flare.mat_spark5)
-	  {
-	    ReportError (
-		"crystalspace.maploader.parse.light",
-    	        "Can't find material for flare!");
-	    return NULL;
-	  }
-        }
-        else
-          goto defaulthalo;
         break;
-#endif
       case XMLTOKEN_ATTENUATION:
 	{
 	  const char* att = child->GetContentsValue ();
