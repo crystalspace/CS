@@ -37,7 +37,7 @@ chronological order.
 	  I managed to improve performance in walktest flarge from 87
 	  to 209 fps! (for new renderer).
 	- Eric Sunshine fixed bug in msvcgen.jam where the overriden
-	  Application rule was employgin an incorrect mechanism for detecting
+	  Application rule was employing an incorrect mechanism for detecting
 	  console applications.  Also eliminated hard-coded use of Unix-style
 	  pathnames.
 	- Eric Sunshine performed project-wide spelling correction:
