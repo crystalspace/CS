@@ -87,48 +87,11 @@ SCF_IMPLEMENT_IBASE (csShaderVariable)
   SCF_IMPLEMENTS_INTERFACE (iShaderVariable)
 SCF_IMPLEMENT_IBASE_END
 
-csShaderVariable::csShaderVariable ()
-{
-  SCF_CONSTRUCT_IBASE (0);
-
-  Name = 0;
-}
-
-csShaderVariable::~csShaderVariable ()
-{
-  delete[] Name;
-}
-
 //=================== csShaderWrapper ================//
 
 SCF_IMPLEMENT_IBASE (csShaderWrapper)
   SCF_IMPLEMENTS_INTERFACE (iShaderWrapper)
 SCF_IMPLEMENT_IBASE_END
-
-csShaderWrapper::csShaderWrapper (iShader* shader)
-{
-  SCF_CONSTRUCT_IBASE (0);
-  
-  csShaderWrapper::shader = shader;
-}
-
-csShaderWrapper::~csShaderWrapper ()
-{
-}
-
-iShader* csShaderWrapper::GetShader()
-{
-  return shader;
-}
-
-void csShaderWrapper::SelectMaterial(iMaterial* mat)
-{
-}
-
-csSymbolTable* csShaderWrapper::GetSymbolTable()
-{
-  return &symtab;
-}
 
 //=================== csShaderManager ================//
 
@@ -139,26 +102,11 @@ csShaderManager::csShaderManager(iBase* parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE( scfiComponent );
   scfiEventHandler = 0;
 
-  // alloc variables-hash
-  variables = new csHashMap();
-
   seqnumber = 0;
 }
 
 csShaderManager::~csShaderManager()
 {
-  //Clear variables
-  csGlobalHashIterator cIter( variables);
-
-  while(cIter.HasNext() )
-  {
-    iShaderVariable* i = (iShaderVariable*)cIter.Next();
-    i->DecRef();
-  }
-
-  variables->DeleteAll();
-  delete variables;
-
   //clear all shaders
   /*while(shaders.Length() > 0)
   {
@@ -173,6 +121,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
 {
   objectreg = objreg;
   vc = CS_QUERY_REGISTRY(objectreg, iVirtualClock);
+  txtmgr = CS_QUERY_REGISTRY(objectreg, iTextureManager);
 
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
@@ -203,55 +152,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
     }
   }
 
-  //create standard-variables
-  sv_time = CreateVariable("STANDARD_TIME");
-  AddVariable(sv_time);
   return true;
-}
-
-//Variable handling
-bool csShaderManager::AddVariable(iShaderVariable* variable)
-{
-  variable->IncRef();
-  variables->Put( csHashCompute(variable->GetName()), variable);
-  return true;
-}
-
-csPtr<iShaderVariable> csShaderManager::CreateVariable(const char* name) const 
-{
-  csShaderVariable* myVar = new csShaderVariable();
-  myVar->SetName(name);
-  return csPtr<iShaderVariable> (myVar);
-}
-
-iShaderVariable* csShaderManager::privateGetVariable(int namehash)
-{
-  csHashIterator cIter(variables, namehash);
-
-  if( cIter.HasNext() )
-  {
-    return (iShaderVariable*)cIter.Next();
-  }
-
-  return 0;
-}
-
-csBasicVector csShaderManager::GetAllVariableNames() const
-{
-  csBasicVector vReturnValue;
-
-  csGlobalHashIterator cIter (variables);
-  while(cIter.HasNext())
-  {
-    vReturnValue.Push( (void*) ((iShaderVariable*)cIter.Next())->GetName() );
-  }
-
-  return vReturnValue;
-}
-
-csSymbolTable* csShaderManager::GetSymbolTable()
-{
-  return 0;
 }
 
 bool csShaderManager::HandleEvent(iEvent& event)
@@ -261,21 +162,11 @@ bool csShaderManager::HandleEvent(iEvent& event)
     switch(event.Command.Code)
     {
     case cscmdPreProcess:
-      UpdateStandardVariables();
+//      UpdateStandardVariables();
       return false;
     }
   }
   return false;
-}
-
-void csShaderManager::UpdateStandardVariables()
-{
-  //time
-  if(sv_time && vc)
-  {
-    float sec = vc->GetCurrentTicks()/1000.0f;
-    sv_time->SetValue(sec);
-  }
 }
 
 // Shader handling
@@ -293,27 +184,16 @@ csPtr<iShader> csShaderManager::CreateShader()
   return csPtr<iShader> (cshader);
 }
 
-
-iShader* csShaderManager::GetShader(const char* name)
+iShaderWrapper* csShaderManager::GetShader(const char* name)
 {
   int i;
   for (i = 0; i < shaders.Length(); ++i)
   {
-/*    if (strcasecmp(shaders.Get(i)->GetName(), name) == 0)
-      return shaders.Get(i);*/
-    // @@@ Inefficient!
-    iShader* shader = shaders.Get(i)->GetShader();
-    if (strcasecmp(shader->GetName(), name) == 0)
+    iShaderWrapper* shader = shaders.Get(i);
+    if (strcasecmp(shader->GetShader()->GetName(), name) == 0)
       return shader;
   }
   return 0;
-}
-
-csPtr<iShaderWrapper> csShaderManager::CreateWrapper(iShader* shader)
-{
-  csShaderWrapper* wrapper = new csShaderWrapper (shader);
-  shaders.Push (wrapper);
-  return csPtr<iShaderWrapper> (wrapper);
 }
 
 csPtr<iShaderProgram> csShaderManager::CreateShaderProgram(const char* type)
@@ -388,14 +268,6 @@ bool csShader::IsValid() const
   return false;
 }
 
-//Variable handling
-bool csShader::AddVariable(iShaderVariable* variable)
-{
-  variable->IncRef();
-  variables->Put( csHashCompute(variable->GetName()), variable);
-  return true;
-}
-
 iShaderVariable* csShader::privateGetVariable(int namehash)
 {
   iShaderVariable* var;
@@ -413,24 +285,6 @@ iShaderVariable* csShader::privateGetVariable(int namehash)
     return parent->privateGetVariable (namehash);
   }
 
-  return 0;
-}
-
-csBasicVector csShader::GetAllVariableNames() const
-{
-  csBasicVector vReturnValue;
-
-  csGlobalHashIterator cIter (variables);
-  while(cIter.HasNext())
-  {
-    vReturnValue.Push( (void*) ((iShaderVariable*)cIter.Next())->GetName() );
-  }
-
-  return vReturnValue;
-}
-
-csSymbolTable* csShader::GetSymbolTable()
-{
   return 0;
 }
 
@@ -513,6 +367,7 @@ bool csShader::Load(iDocumentNode* node)
         break;
       case XMLTOKEN_DECLARE:
         {
+#if 0
           //create a new variable
           csRef<iShaderVariable> var = 
             parent->CreateVariable (child->GetAttributeValue ("name"));
@@ -540,6 +395,7 @@ bool csShader::Load(iDocumentNode* node)
           // @@@ I'll blame Matze if this is bad :) /Anders Stenberg
           var->IncRef (); 
           variables->Put( csHashCompute(var->GetName()), var);
+#endif
         }
         break;
       }
@@ -751,26 +607,6 @@ iTextureHandle* csShaderPass::GetTextureMappingAsDirect (int unit)
   return texmappingdirect[unit];
 }
 
-iShaderVariable* csShaderPass::privateGetVariable(int namehash)
-{
-  iShaderVariable* var;
-  csHashIterator c(&variables, namehash);
-
-  if(c.HasNext())
-  {
-    var = (iShaderVariable*)c.Next();
-    
-    return var;
-  }
-
-  if (parent && parent->GetParent())
-  {
-    return parent->GetParent()->privateGetVariable (namehash);
-  }
-
-  return 0;
-}
-
 void csShaderPass::BuildTokenHash()
 {
   xmltokens.Register ("declare", XMLTOKEN_DECLARE);
@@ -949,6 +785,7 @@ bool csShaderPass::Load(iDocumentNode* node)
         break;
       case XMLTOKEN_DECLARE:
         {
+#if 0
           //create a new variable
           csRef<iShaderVariable> var = 
             shadermgr->CreateVariable (child->GetAttributeValue ("name"));
@@ -976,6 +813,7 @@ bool csShaderPass::Load(iDocumentNode* node)
           // @@@ I'll blame Matze if this is bad :) /Anders Stenberg
           var->IncRef (); 
           variables.Put( csHashCompute(var->GetName()), var);
+#endif
         }
         break;
       case XMLTOKEN_WRITEMASK:
@@ -1023,11 +861,6 @@ bool csShaderPass::Prepare()
       return false;
 
   return true;
-}
-
-csSymbolTable* csShaderPass::GetSymbolTable()
-{
-  return 0;
 }
 
 //================= csShaderTechnique ============//
@@ -1132,27 +965,6 @@ bool csShaderTechnique::Prepare()
   return true;
 }
 
-csSymbolTable* csShaderTechnique::GetSymbolTable()
-{
-  return 0;
-}
-
-bool csShaderTechnique::AddVariable(iShaderVariable* variable)
-{
-  return false;
-}
-
-iShaderVariable* csShaderTechnique::GetVariable(int namehash)
-{
-  return 0;
-}
-
-csBasicVector csShaderTechnique::GetAllVariableNames() const
-{
-  csBasicVector vReturnValue;
-  return vReturnValue;
-}
-
-
+//@@@: What's the point of #undef'ing these? It's the end of the file!
 #undef STREAMMAX
 #undef TEXTUREMAX

@@ -399,6 +399,9 @@ public:
    * material system is actually working.
    */
   virtual void FreeMaterials ();
+
+  virtual int GetMaterialIndex (iMaterialHandle *m)
+    { return materials.Find (m); }
 };
 
 #endif // __CS_TXTMGR_H__

@@ -28,6 +28,7 @@
 #include "iengine/sector.h"
 #include "iengine/mesh.h"
 #include "iengine/material.h"
+#include "ivideo/material.h"
 
 #include "generic.h"
 

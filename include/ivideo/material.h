@@ -28,7 +28,14 @@
  
 #include "csutil/scf.h"
 #include "csutil/strset.h"
+#include "csutil/strhash.h"
 #include "csutil/csvector.h"
+
+#ifdef CS_USE_NEW_RENDERER
+  #include "ivideo/rndbuf.h"
+  #include "ivideo/rendermesh.h"
+  #include "ivideo/shader/shader.h"
+#endif
 
 /// Default material `diffuse' parameter
 #define CS_DEFMAT_DIFFUSE 0.7f
@@ -41,10 +48,6 @@ struct iEffectDefinition;
 struct iTextureHandle;
 struct csRGBpixel;
 struct csRGBcolor;
-struct iShader;
-struct iShaderWrapper;
-struct iShaderVariable;
-class csSymbolTable;
 
 /**
  * This structure represents an extra texture
@@ -71,7 +74,11 @@ SCF_VERSION (iMaterial, 0, 0, 6);
  * plays same role related to iMaterialHandle as iImage plays
  * related to iTextureHandle.
  */
+#ifdef CS_USE_NEW_RENDERER
 struct iMaterial : public iBase
+#else
+struct iMaterial : public iShaderBranch
+#endif
 {
 #ifdef CS_USE_NEW_RENDERER
   /**
@@ -83,15 +90,6 @@ struct iMaterial : public iBase
    * Get shader associated with a shader type
    */
   virtual iShaderWrapper* GetShader (csStringID type) = 0;
-
-  /// Add a variable to this context
-  virtual bool AddVariable(iShaderVariable* variable) = 0;
-  /// Get variable
-  virtual iShaderVariable* GetVariable(int namehash) = 0;
-  /// Get all variable names added to this context (used when creating them)
-  virtual csBasicVector GetAllVariableNames() const = 0; 
-  /// Get the symbol table (used by the implementation to store the variables)
-  virtual csSymbolTable* GetSymbolTable() = 0;
 #endif
 
   /**
@@ -155,6 +153,11 @@ struct iMaterialHandle : public iBase
    * Get shader associated with a shader type
    */
   virtual iShader* GetShader (csStringID type) = 0;
+
+  /**
+   * Get the iShaderBranch object for this handle.
+   */
+  virtual iShaderBranch* QueryShaderBranch () = 0;
 #endif
 
   /**

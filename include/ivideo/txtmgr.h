@@ -195,6 +195,13 @@ struct iTextureManager : public iBase
    * bits that fit the CS_IMGFMT_MASK mask matters.
    */
   virtual int GetTextureFormat () = 0;
+
+#ifdef CS_USE_NEW_RENDERER
+  /**
+   * Get a material's index in the array of materials.
+   */
+  virtual int GetMaterialIndex (iMaterialHandle *) = 0;
+#endif
 };
 
 /** @} */

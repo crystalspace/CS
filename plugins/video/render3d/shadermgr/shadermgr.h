@@ -36,6 +36,9 @@
 
 #include "ivideo/render3d.h"
 #include "ivideo/shader/shader.h"
+#include "ivideo/material.h"
+#include "ivideo/texture.h"
+#include "ivideo/txtmgr.h"
 
 // (These are undeffed at end of shadermgr.cpp. Ugly?)
 #define STREAMMAX 16  // @@@ Hardcoded max streams to 16 
@@ -44,16 +47,75 @@
 class csShaderWrapper : public iShaderWrapper
 {
   csRef<iShader> shader;
-  csSymbolTable symtab;
+  csSymbolTable *symtab;
+  iTextureManager *txtmgr;
+
 public:
   SCF_DECLARE_IBASE;
 
-  csShaderWrapper (iShader* shader);
-  virtual ~csShaderWrapper ();
+  csShaderWrapper (iShader* shader0, iTextureManager* txtmgr0)
+  : shader (shader0), symtab (0), txtmgr (txtmgr0)
+    { SCF_CONSTRUCT_IBASE (shader); }
+  virtual ~csShaderWrapper () {}
 
-  virtual iShader* GetShader();
-  virtual void SelectMaterial(iMaterial* mat);
-  virtual csSymbolTable* GetSymbolTable();
+  virtual iShader* GetShader() { return shader; }
+  virtual void SelectMaterial(iMaterialHandle* mat) {
+    symtab = mat->QueryShaderBranch()->GetSymbolTable();
+    shader->SelectSymbolTable(txtmgr->GetMaterialIndex(mat));
+  }
+
+  virtual void AddChild(iShaderBranch *b) { shader->AddChild(b); }
+  virtual void AddVariable(iShaderVariable *v) { shader->AddVariable(v); }
+  virtual iShaderVariable* GetVariable(csStringID i) { return shader->GetVariable(i); }
+  virtual csSymbolTable* GetSymbolTable() { return symtab; }
+  virtual void SelectSymbolTable(int i) {}
+};
+
+class csShaderVariable : public iShaderVariable
+{
+private:
+  csStringID Name;
+
+  VariableType Type;
+
+  int Int;
+  float Float;
+  csRef<iString> String;
+  csVector3 Vector3;
+  csVector4 Vector4;
+
+public:
+  SCF_DECLARE_IBASE;
+
+  csShaderVariable (csStringID name) : Name (name) { SCF_CONSTRUCT_IBASE (0); }
+  virtual ~csShaderVariable () {}
+
+  virtual VariableType GetType() const { return Type; }
+  virtual void SetType(VariableType t) { Type = t; }
+
+  virtual csStringID GetName() const { return Name; }
+
+  virtual bool GetValue(int& value) const
+    { CS_ASSERT(Type == INT); value = Int; return true; }
+  virtual bool GetValue(float& value) const
+    { CS_ASSERT(Type == FLOAT); value = Float; return true; }
+  virtual bool GetValue(iString*& value) const
+    { CS_ASSERT(Type == STRING); value = String; return true; }
+  virtual bool GetValue(csVector3& value) const
+    { CS_ASSERT(Type == VECTOR3); value = Vector3; return true; }
+  virtual bool GetValue(csVector4& value) const
+    { CS_ASSERT(Type == VECTOR4); value = Vector4; return true; }
+
+  virtual bool SetValue(int value)
+    { Type = INT; Int = value; return true; }
+  virtual bool SetValue(float value)
+    { Type = FLOAT; Float = value; return true; }
+  virtual bool SetValue(iString* value)
+    { Type = STRING; String = value; return true; }
+  virtual bool SetValue(const csVector3 &value)
+    { Type = VECTOR3; Vector3 = value; return true; }
+  virtual bool SetValue(const csVector4 &value)
+    { Type = VECTOR4; Vector4 = value; return true; }
 };
 
 class csShaderManager : public iShaderManager
@@ -61,8 +123,8 @@ class csShaderManager : public iShaderManager
 private:
   csRef<iObjectRegistry> objectreg;
   csRef<iVirtualClock> vc;
+  csRef<iTextureManager> txtmgr;
 
-  csHashMap* variables;
   csRefArray<iShaderWrapper> shaders;
 
   int seqnumber;
@@ -71,6 +133,8 @@ private:
   // these are inited and updated by the shadermanager itself
   csRef<iShaderVariable> sv_time;
   void UpdateStandardVariables();
+
+  csSymbolTable symtab;
 
   csRefArray<iShaderProgramPlugin> pluginlist;
 public:
@@ -84,23 +148,23 @@ public:
   /// Create a empty shader
   virtual csPtr<iShader> CreateShader() ;
   /// Get a shader by name
-  virtual iShader* GetShader(const char* name) ;
+  virtual iShaderWrapper* GetShader(const char* name) ;
   /// Returns all shaders that have been created
   virtual const csRefArray<iShaderWrapper> &GetShaders () { return shaders; }
   /// Create a wrapper for a shader
-  virtual csPtr<iShaderWrapper> CreateWrapper(iShader* shader);
+  virtual csPtr<iShaderWrapper> CreateWrapper(iShader* shader)
+    { return csPtr<iShaderWrapper> (new csShaderWrapper (shader, txtmgr)); }
 
-  /// Create variable
-  virtual csPtr<iShaderVariable> CreateVariable(const char* name) const;
-  /// Add a variable to this context
-  virtual bool AddVariable(iShaderVariable* variable) ;
-  /// Get variable
-  virtual iShaderVariable* GetVariable(int namehash)
-  { return privateGetVariable (namehash); }
-  /// Get all variable stringnames in this context (used when creatingthem)
-  virtual csBasicVector GetAllVariableNames() const; 
-
-  virtual csSymbolTable* GetSymbolTable();
+  virtual csPtr<iShaderVariable> CreateVariable(csStringID name) const
+    { return csPtr<iShaderVariable> (new csShaderVariable (name)); }
+  virtual void AddChild(iShaderBranch *b)
+    { symtab.AddChild(b->GetSymbolTable()); }
+  virtual void AddVariable(iShaderVariable* variable)
+    { symtab.SetSymbol(variable->GetName(), variable); }
+  virtual iShaderVariable* GetVariable(csStringID s)
+    { return (iShaderVariable *) symtab.GetSymbol(s); }
+  virtual csSymbolTable* GetSymbolTable() { return & symtab; }
+  virtual void SelectSymbolTable(int i) {}
 
   /// Private variable to get the variable without virtual call
   inline iShaderVariable* privateGetVariable (int namehash);
@@ -153,6 +217,9 @@ private:
   csShaderManager* parent;
   char* name;
 
+  csSymbolTable *symtab;
+  csArray<csSymbolTable> symtabs;
+
   //loading related
   enum
   {
@@ -196,15 +263,17 @@ public:
   /// Retrieve the best technique in this shader
   virtual iShaderTechnique* GetBestTechnique();
 
-  /// Add a variable to this context
-  virtual bool AddVariable(iShaderVariable* variable);
-  /// Get variable
-  virtual iShaderVariable* GetVariable(int namehash)
-  { return privateGetVariable (namehash); }
-  /// Get all variable stringnames in this context (used when creatingthem)
-  virtual csBasicVector GetAllVariableNames() const; 
-
-  virtual csSymbolTable* GetSymbolTable();
+  virtual void AddChild(iShaderBranch *b)
+    { symtab->AddChild(b->GetSymbolTable()); }
+  virtual void AddVariable(iShaderVariable* variable)
+    { symtab->SetSymbol(variable->GetName(), variable); }
+  virtual iShaderVariable* GetVariable(csStringID s)
+    { return (iShaderVariable *) symtab->GetSymbol(s); }
+  virtual csSymbolTable* GetSymbolTable() { return symtab; }
+  virtual void SelectSymbolTable(int i) {
+    if (symtabs.Length () < i) symtabs.SetLength (i, csSymbolTable ());
+    symtab = & symtabs[i];
+  }
 
   /// Private variable to get the variable without virtual call
   inline iShaderVariable* privateGetVariable (int namehash);
@@ -227,6 +296,9 @@ private:
   csBasicVector* passes;
   csShader* parent;
   csRef<iObjectRegistry> objectreg;
+
+  csSymbolTable *symtab;
+  csArray<csSymbolTable> symtabs;
 
   //loading related
   enum
@@ -263,14 +335,17 @@ public:
   /// Retrieve a pass
   virtual iShaderPass* GetPass( int pass );
 
-  /// Add a variable to this context
-  virtual bool AddVariable(iShaderVariable* variable);
-  /// Get variable
-  virtual iShaderVariable* GetVariable(int namehash);
-  /// Get all variable stringnames in this context (used when creatingthem)
-  virtual csBasicVector GetAllVariableNames() const; 
-
-  virtual csSymbolTable* GetSymbolTable();
+  virtual void AddChild(iShaderBranch *b)
+    { symtab->AddChild(b->GetSymbolTable()); }
+  virtual void AddVariable(iShaderVariable* variable)
+    { symtab->SetSymbol(variable->GetName(), variable); }
+  virtual iShaderVariable* GetVariable(csStringID s)
+    { return (iShaderVariable *) symtab->GetSymbol(s); }
+  virtual csSymbolTable* GetSymbolTable() { return symtab; }
+  virtual void SelectSymbolTable(int i) {
+    if (symtabs.Length () < i) symtabs.SetLength (i, csSymbolTable ());
+    symtab = & symtabs[i];
+  }
 
   /// Check if valid (normaly a shader is valid if there is at least one valid technique)
   virtual bool IsValid() const; 
@@ -292,7 +367,9 @@ private:
   csRef<iShaderProgram> fp;
   csRef<iObjectRegistry> objectreg;
   csShaderTechnique* parent;
-  csHashMap variables;
+
+  csArray<csSymbolTable> symtabs;
+  csSymbolTable *symtab;
 
   uint mixmode;
 
@@ -402,15 +479,17 @@ public:
   /// Reset states to original
   virtual void ResetState ();
 
-  /// Add a variable to this context
-  virtual bool AddVariable(iShaderVariable* variable){return false;}
-  /// Get variable
-  virtual iShaderVariable* GetVariable(int namehash) 
-  { return privateGetVariable (namehash); }
-  /// Get all variable stringnames in this context (used when creatingthem)
-  virtual csBasicVector GetAllVariableNames() const {return csBasicVector();}
-
-  virtual csSymbolTable* GetSymbolTable();
+  virtual void AddChild(iShaderBranch *b)
+    { symtab->AddChild(b->GetSymbolTable()); }
+  virtual void AddVariable(iShaderVariable* variable)
+    { symtab->SetSymbol(variable->GetName(), variable); }
+  virtual iShaderVariable* GetVariable(csStringID s)
+    { return (iShaderVariable *) symtab->GetSymbol(s); }
+  virtual csSymbolTable* GetSymbolTable() { return symtab; }
+  virtual void SelectSymbolTable(int i) {
+    if (symtabs.Length () < i) symtabs.SetLength (i, csSymbolTable ());
+    symtab = & symtabs[i];
+  }
 
   /// Private variable to get the variable without virtual call
   inline iShaderVariable* privateGetVariable (int namehash);
@@ -423,61 +502,6 @@ public:
 
   /// Prepares the shader for usage. Must be called before the shader is assigned to a material
   virtual bool Prepare();
-};
-
-class csShaderVariable : public iShaderVariable
-{
-private:
-  char *Name;
-  int NameHash;
-
-  VariableType Type;
-
-  int Int;
-  float Float;
-  csRef<iString> String;
-  csVector3 Vector3;
-  csVector4 Vector4;
-
-public:
-  SCF_DECLARE_IBASE;
-
-  csShaderVariable ();
-  virtual ~csShaderVariable ();
-
-  virtual VariableType GetType() const { return Type; }
-  virtual void SetType(VariableType t) { Type = t; }
-
-  virtual int GetHash() const { return NameHash; }
-
-  virtual void SetName(const char* newname)
-  {
-    delete[] Name;
-    Name = csStrNew(newname);
-  }
-  virtual const char* GetName() const { return Name; }
-
-  virtual bool GetValue(int& value) const
-    { CS_ASSERT(Type == INT); value = Int; return true; }
-  virtual bool GetValue(float& value) const
-    { CS_ASSERT(Type == FLOAT); value = Float; return true; }
-  virtual bool GetValue(iString*& value) const
-    { CS_ASSERT(Type == STRING); value = String; return true; }
-  virtual bool GetValue(csVector3& value) const
-    { CS_ASSERT(Type == VECTOR3); value = Vector3; return true; }
-  virtual bool GetValue(csVector4& value) const
-    { CS_ASSERT(Type == VECTOR4); value = Vector4; return true; }
-
-  virtual bool SetValue(int value)
-    { Type = INT; Int = value; return true; }
-  virtual bool SetValue(float value)
-    { Type = FLOAT; Float = value; return true; }
-  virtual bool SetValue(iString* value)
-    { Type = STRING; String = value; return true; }
-  virtual bool SetValue(const csVector3 &value)
-    { Type = VECTOR3; Vector3 = value; return true; }
-  virtual bool SetValue(const csVector4 &value)
-    { Type = VECTOR4; Vector4 = value; return true; }
 };
 
 #endif //__SHADERMGR_H__

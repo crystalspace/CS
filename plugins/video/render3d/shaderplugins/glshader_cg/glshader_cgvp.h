@@ -46,8 +46,9 @@ private:
     int namehash;
     CGparameter parameter;
   };
-  //csArray<csSymbolTable> symtabs;
-  //csSymbolTable *symtab;
+
+  csArray<csSymbolTable> symtabs;
+  csSymbolTable *symtab;
 
   struct matrixtrackerentry
   {
@@ -62,7 +63,6 @@ private:
   CGprogram program;
 
   csHashMap variables;
-  csBasicVector variablemap;
   csBasicVector matrixtrackers;
   csStringHash xmltokens;
 
@@ -130,7 +130,7 @@ public:
 
 /*  virtual void AddChild(iShaderBranch *c)
     { symtab->AddChild(c->GetSymbolTable()); }
-  virtual bool AddVariable(iShaderVariable* variable) 
+  virtual void AddVariable(iShaderVariable* variable) 
     { return false; } // Don't allow externals to add variables
   virtual iShaderVariable* GetVariable(csStringID name)
     { return (iShaderVariable *) symtab->GetSymbol(name); }

@@ -19,9 +19,9 @@
 #ifndef __CS_CSGFX_SYMTABLE_H__
 #define __CS_CSGFX_SYMTABLE_H__
 
-#include "csutil/strset.h"
-#include "csutil/hashmap.h"
+#include "csutil/strhash.h"
 #include "csutil/array.h"
+#include "csutil/parray.h"
 
 class csSymbolTable
 {
@@ -38,7 +38,7 @@ private:
 protected:
   csHashMap Hash;
 
-  csArray<csSymbolTable *> Children;
+  csPArray<csSymbolTable> Children;
   csSymbolTable *Parent;
 
   /// Inherit all symbols from the parent. @@@ Calling this twice will mess up.
@@ -64,26 +64,17 @@ public:
    */
   csSymbolTable (int size = 53) : Hash (size), Parent (0) {}
 
-  /// Destruct the table.
-  virtual ~csSymbolTable ();
-
   /// Add a child table which will inherit the symbols of this one.
   void AddChild (csSymbolTable *);
 
   /// Add child tables which will inherit the symbols of this one.
-  void AddChildren (const csArray<csSymbolTable *> &);
-
-  /// Add child tables which will inherit the symbols of this one.
-  void AddChildren (csSymbolTable **, int len);
+  void AddChildren (csPArray<csSymbolTable> &);
 
   /// Set the value of a symbol, or create a new one if it doesn't exist.
   void SetSymbol (csStringID name, void *value);
 
   /// SetSymbol for multiple symbols.
-  void SetSymbols (const csArray<csStringID> &names, csArray<void *> &);
-
-  /// SetSymbol for multiple symbols.
-  void SetSymbols (csStringID *names, void **values, int len);
+  void SetSymbols (const csArray<csStringID> &names, csPArray<void> &);
 
   /// Delete a symbol.
   bool DeleteSymbol (csStringID name);
@@ -91,26 +82,17 @@ public:
   /// Delete multiple symbols.
   bool DeleteSymbols (const csArray<csStringID> &names);
 
-  /// Delete multiple symbols.
-  bool DeleteSymbols (csStringID *names, int len);
-
   /// Get the value of a symbol.
-  bool GetSymbol (csStringID name, void *&value);
+  void* GetSymbol (csStringID name);
 
   /// Get the values of multiple symbols.
-  bool GetSymbols (const csArray<csStringID> &names, csArray<void *> &values);
-
-  /// Get the values of multiple symbols.
-  bool GetSymbols (csStringID *names, void **values, int len);
+  csPArray<void> GetSymbols (const csArray<csStringID> &names);
 
   /// Check if a symbol exists.
   bool SymbolExists (csStringID name);
 
   /// Check if all of a set of symbols exist.
   bool SymbolsExist (const csArray<csStringID> &names);
-
-  /// Check if all of a set of symbols exist.
-  bool SymbolsExist (csStringID *names, int len);
 };
 
 #endif

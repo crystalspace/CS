@@ -28,13 +28,11 @@
 #include "ivideo/effects/efdef.h"
 
 #ifdef CS_USE_NEW_RENDERER
-  #include "ivideo/shader/shader.h"
+  #include "csgfx/symtable.h"
 #endif
 
 struct iTextureWrapper;
 struct iTextureManager;
-
-
 
 SCF_VERSION (csMaterialWrapper, 0, 0, 1);
 
@@ -68,6 +66,8 @@ private:
 #ifdef CS_USE_NEW_RENDERER
   /// Shader assoiciated with material
   csHashMap* shaders;
+
+  csSymbolTable symtab;
 #endif
 
 public:
@@ -120,14 +120,14 @@ public:
   /// Get shader associated with a shader type
   virtual iShaderWrapper* GetShader (csStringID type);
 
-  /// Add a variable to this context
-  virtual bool AddVariable(iShaderVariable* variable) { return false; }
-  /// Get variable
-  virtual iShaderVariable* GetVariable(int namehash) { return 0; }
-  /// Get all variable names added to this context (used when creating them)
-  virtual csBasicVector GetAllVariableNames() const { return csBasicVector (); }
-  /// Get the symbol table (used by the implementation to store the variables)
-  virtual csSymbolTable* GetSymbolTable() { return 0; }
+  virtual void AddChild (iShaderBranch *c)
+    { symtab.AddChild (c->GetSymbolTable ()); }
+  virtual void AddVariable (iShaderVariable *v)
+    { symtab.SetSymbol (v->GetName (), v); }
+  virtual iShaderVariable* GetVariable (csStringID name)
+    { return (iShaderVariable *) symtab.GetSymbol (name); }
+  virtual csSymbolTable* GetSymbolTable () { return & symtab; }
+  virtual void SelectSymbolTable (int i) {}
 #endif
 
   /// Set effect.

@@ -117,7 +117,6 @@ struct iTextureHandle : public iBase
    *CS_TEXTURE_CUBE_POS_Y, etc.
    */
   virtual void SetTextureTarget(int target) = 0;
-
 #endif // CS_USE_NEW_RENDERER
 
   /// Get the mean color.
