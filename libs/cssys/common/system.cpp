@@ -885,9 +885,38 @@ STDMETHODIMP csSystemDriver::XSystem::GetShutdown (bool &Shutdown)
 
 STDMETHODIMP csSystemDriver::XSystem::GetSubSystemPtr(void **retval, int iSubSystemID)
 {
-  //METHOD_PROLOGUE (csSystemDriver, System);
-  *retval = NULL;
-//  (*retval)->AddRef ();
+  METHOD_PROLOGUE (csSystemDriver, System);
+
+  ///Note: You should call Release() by yourself.
+
+  ///@@@TODO: This method should support all subsystems
+
+  switch(iSubSystemID)
+  {
+  case G3D_ID:
+	*retval = pThis->piG3D;
+	pThis->piG3D->AddRef();
+
+  case G2D_ID:
+	*retval = pThis->piG2D;
+	pThis->piG2D->AddRef();
+
+  case GI_ID:
+	*retval = pThis->piGI;
+	pThis->piGI->AddRef();
+
+  case NetDrv_ID:
+	*retval = pThis->piNetDrv;
+	pThis->piNetDrv->AddRef();
+
+  case NetMan_ID:
+	*retval = pThis->piNetMan;
+	pThis->piNetMan->AddRef();
+
+  default:
+    *retval = NULL;
+  }
+
   return S_OK;
 }
 
