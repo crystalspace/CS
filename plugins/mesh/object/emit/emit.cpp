@@ -750,7 +750,7 @@ void csEmitMeshObject::Update (cs_time elapsed_time)
       }
       GetParticle(i)->ScaleBy(1./oldscale); // reset the scale
       /// restart the particle
-      int afterstart = ages[i] + elapsed_time - timetolive;
+      int afterstart = (ages[i] + elapsed_time) % timetolive;
       StartParticle(i);
       // move a little after start
       MoveAgeParticle(i, afterstart, afterstart/1000.); 
