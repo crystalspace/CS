@@ -47,6 +47,10 @@ chronological order.
 	- Eric Sunshine updated the cal3d check in configure.ac so that it
 	  demands the very latest CVS version of cal3d since it is required by
 	  viewmesh.
+	- Eric Sunshine updated the extremely old config.guess and config.sub
+	  in CS/mk/autoconf from the master copies at
+	  ftp://ftp.gnu.org/pub/gnu/config/.  Also updated install-sh from the
+	  Automake master copy.
 2-Mar-2005
 	- Jorrit changed pvscalc to use the Description() method to print
 	  out boxes and vectors instead of the ugly B2F and other macros.
