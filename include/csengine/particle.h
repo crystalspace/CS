@@ -298,7 +298,7 @@ protected:
   time_t fade_particles;
   /// starting bbox.
   csBox3 startbox;
-  float radiusnow;
+  float maxspeed, maxaccel, radiusnow;
 
 public:
   /**

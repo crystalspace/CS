@@ -25,6 +25,7 @@
 #include "csengine/rview.h"
 #include "csengine/sector.h"
 #include "csgeom/matrix3.h"
+#include "csgeom/fastsqrt.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -482,6 +483,8 @@ csParSysExplosion :: csParSysExplosion(csObject* theParent, int number_p,
   scale_particles = false;
   /// add particles
   bbox.AddBoundingVertex(center);
+  float sqmaxaccel = 0.0;
+  float sqmaxspeed = 0.0;
   for(i=0; i<number_p; i++)
   {
     AppendRegularSprite(nr_sides, part_radius, txt, lighted_particles);
@@ -489,12 +492,17 @@ csParSysExplosion :: csParSysExplosion(csObject* theParent, int number_p,
     GetParticle(i)->SetPosition (pos);
     part_speed[i] = push + spread_speed * GetRandomDirection();
     part_accel[i] = (pos - center) * spread_accel * GetRandomDirection();
+    if(part_speed[i].SquaredNorm() > sqmaxspeed) 
+      sqmaxspeed = part_speed[i].SquaredNorm();
+    if(part_accel[i].SquaredNorm() > sqmaxaccel) 
+      sqmaxaccel = part_accel[i].SquaredNorm();
     bbox.AddBoundingVertexSmart(pos+csVector3(part_radius, part_radius, part_radius));
     bbox.AddBoundingVertexSmart(pos-csVector3(part_radius, part_radius, part_radius));
   }
   startbox = bbox;
   radiusnow = 1.0;
-
+  maxspeed = FastSqrt(sqmaxspeed);
+  maxaccel = FastSqrt(sqmaxaccel);
 }
 
 
@@ -504,11 +512,23 @@ csParSysExplosion :: ~csParSysExplosion()
 }
 
 
+static void ScaleBBox(csBox3& bbox, const csVector3 &center, float val)
+{
+  csVector3 tomin = bbox.Min() - center;
+  csVector3 tomax = bbox.Max() - center;
+  tomin *= val;
+  tomax *= val;
+  bbox.Set( tomin + center, tomax + center );
+}
+
 void csParSysExplosion :: Update(time_t elapsed_time)
 {
   csNewtonianParticleSystem::Update(elapsed_time);
 
-  radiusnow += elapsed_time * 1.0;
+  float delta_t = elapsed_time / 1000.0f;
+  float addedradius = ( maxspeed + maxaccel * delta_t ) * delta_t;
+  ScaleBBox(bbox, center, 1.0f + addedradius / radiusnow ); 
+  radiusnow += addedradius;
 
   // size of particles is exponentially reduced in fade time.
   if(scale_particles && self_destruct && time_to_live < fade_particles)
@@ -573,6 +593,7 @@ csRainParticleSystem :: csRainParticleSystem(csObject* theParent, int number, cs
   part_pos = new csVector3[number];
   rain_dir = fall_speed;
   rainbox.Set(rainbox_min, rainbox_max);
+  bbox.Set(rainbox_min, rainbox_max);
   /// spread particles evenly through box
   csVector3 size = rainbox_max - rainbox_min;
   csVector3 pos;
@@ -646,6 +667,7 @@ csSnowParticleSystem :: csSnowParticleSystem(csObject* theParent, int number, cs
   rain_dir = fall_speed;
   swirl_amount = swirl;
   rainbox.Set(rainbox_min, rainbox_max);
+  bbox.Set(rainbox_min, rainbox_max);
   /// spread particles evenly through box
   csVector3 size = rainbox_max - rainbox_min;
   csVector3 pos;
@@ -734,15 +756,23 @@ csFountainParticleSystem :: csFountainParticleSystem(csObject* theParent,
   csFountainParticleSystem::azimuth = azimuth;
   csFountainParticleSystem::elevation = elevation;
   amt = number;
+
+  float radius = 10.0; // guessed radius of the fountain
+  float height = 10.0; // guessed height
+  bbox.Set(spot - csVector3(-radius,0,-radius), 
+    spot + csVector3(+radius, +height, +radius) );
+
   // create particles
   for(int i=0; i<number; i++)
   {
     AppendRectSprite(drop_width, drop_height, txt, lighted_particles);
     GetParticle(i)->SetMixmode(mixmode);
     RestartParticle(i, (fall_time / float(number)) * float(number-i));
+    bbox.AddBoundingVertexSmart( part_pos[i] );
   }
   time_left = 0.0;
   next_oldest = 0;
+
 }
 
 csFountainParticleSystem :: ~csFountainParticleSystem()
@@ -843,12 +873,19 @@ csFireParticleSystem :: csFireParticleSystem(csObject* theParent,
   csFireParticleSystem::swirl = swirl;
   csFireParticleSystem::color_scale = color_scale;
   amt = number;
+
+  float radius = drop_width * swirl; // guessed radius of the fire
+  csVector3 height = total_time * dir; // guessed height
+  bbox.Set(origin - csVector3(-radius,0,-radius), 
+    origin + csVector3(+radius, 0, +radius) + height );
+
   // create particles
   for(int i=0; i<number; i++)
   {
     AppendRectSprite(drop_width, drop_height, txt, lighted_particles);
     GetParticle(i)->SetMixmode(mixmode);
     RestartParticle(i, (total_time / float(number)) * float(number-i));
+    bbox.AddBoundingVertexSmart( part_pos[i] );
   }
   time_left = 0.0;
   next_oldest = 0;
