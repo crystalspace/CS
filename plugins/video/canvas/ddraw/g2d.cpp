@@ -19,7 +19,9 @@
 #include "sysdef.h"
 #include "csutil/scf.h"
 #include "cs2d/ddraw/g2d.h"
+
 #include "cssys/win32/directdetection.h"
+
 #include "isystem.h"
 
 DirectDetection DDetection;
@@ -64,10 +66,13 @@ void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 IMPLEMENT_FACTORY (csGraphics2DDDraw3)
 
 EXPORT_CLASS_TABLE (csddraw)
+#ifdef __Windows_NT
   EXPORT_CLASS (csGraphics2DDDraw3, SOFTWARE_2D_DRIVER,
     "DirectDraw DX3 2D graphics driver for Crystal Space")
+#else
   EXPORT_CLASS (csGraphics2DDDraw3, "crystalspace.graphics2d.direct3d.dx5",
     "DirectDraw DX5 2D graphics driver for Crystal Space")
+#endif
 EXPORT_CLASS_TABLE_END
 
 
