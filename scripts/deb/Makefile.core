@@ -59,10 +59,11 @@ debfiles: $(BUILDDIR)/debfile-stamp
 $(BUILDDIR)/debfile-stamp:
 	echo "Moving debian files"
 	mv $(BUILDDIR)/crystalspace-$(VERSION).$(DATE)/CS/scripts/deb/core/debian $(BUILDDIR)/crystalspace-$(VERSION).$(DATE)/
+	mv $(BUILDDIR)/crystalspace-$(VERSION).$(DATE)/CS/scripts/deb/core/xpm $(BUILDDIR)/crystalspace-$(VERSION).$(DATE)/
 	touch $(BUILDDIR)/debfile-stamp
 
 debcopy:
-	cd core ; find debian | cpio -pdumvB $(BUILDDIR)/crystalspace-$(VERSION).$(DATE)/
+	cd core ; find . | cpio -pdumvB $(BUILDDIR)/crystalspace-$(VERSION).$(DATE)/
 
 debclean:
 	cd $(BUILDDIR)/crystalspace-$(VERSION).$(DATE); fakeroot debian/rules clean
