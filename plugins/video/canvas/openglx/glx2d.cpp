@@ -244,16 +244,7 @@ bool csGraphics2DGLX::CreateVisuals ()
   // if a visual was found that we can use, make a graphics context which
   // will be bound to the application window.  If a visual was not
   // found, then try to figure out why it failed
-  if (xvis)
-  {
-    active_GLContext = glXCreateContext(dpy, xvis, 0, GL_TRUE);
-    cmap = XCreateColormap (dpy, RootWindow (dpy, xvis->screen),
-			    xvis->visual, AllocNone);
-
-//    Report (CS_REPORTER_SEVERITY_NOTIFY, "Seized Visual ID %d",
-//	      xvis->visual->visualid);
-  }
-  else
+  if (!xvis)
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
     	"Could not find proper GLX visual");
@@ -263,35 +254,41 @@ bool csGraphics2DGLX::CreateVisuals ()
     // trying each of the pieces and seeing if any single piece is not provided
 
     // try to get a visual with 12 bit color
-    int color_attributes[] =
+    int generic_attributes [] = {GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, 1, None};
+    if (!(xvis=glXChooseVisual(dpy, screen_num, generic_attributes)) )
     {
-      GLX_RGBA,
-      GLX_RED_SIZE,4,
-      GLX_BLUE_SIZE,4,
-      GLX_GREEN_SIZE,4,
-      None
-    };
+        Report (CS_REPORTER_SEVERITY_WARNING,
+        	"Graphics display does not support a generic visual with double buffer and depth buffer");
+		
+        int doublebuffer_attributes [] = {GLX_RGBA, GLX_DOUBLEBUFFER, None};
+        if (!(xvis=glXChooseVisual (dpy, screen_num, doublebuffer_attributes)))
+	{
+           Report (CS_REPORTER_SEVERITY_WARNING,
+	   "Graphics display does not provide double buffering");
 
-    if (!glXChooseVisual(dpy, screen_num, color_attributes) )
-    {
-      Report (CS_REPORTER_SEVERITY_WARNING,
-      	"Graphics display does not support at least 12 bit color");
-    }
+           int depthbuffer_attributes [] = {GLX_RGBA, GLX_DEPTH_SIZE,1, None};
+           if (!(xvis=glXChooseVisual (dpy, screen_num, depthbuffer_attributes)))
+           {
+              Report (CS_REPORTER_SEVERITY_WARNING,
+        	"Graphics display does not support a depth buffer");
 
-    // try to get visual with a depth buffer
-    int depthbuffer_attributes [] = {GLX_RGBA, GLX_DEPTH_SIZE,1, None};
-    if (!glXChooseVisual (dpy, screen_num, depthbuffer_attributes))
-      Report (CS_REPORTER_SEVERITY_WARNING,
-      	"Graphics display does not support a depth buffer");
+              int color_attributes[] =
+              {GLX_RGBA, GLX_RED_SIZE,4, GLX_BLUE_SIZE,4,GLX_GREEN_SIZE,4,None};
 
-    // try to get a visual with double buffering
-    int doublebuffer_attributes [] = {GLX_RGBA, GLX_DOUBLEBUFFER, None};
-    if (!glXChooseVisual (dpy, screen_num, doublebuffer_attributes))
-	Report (CS_REPORTER_SEVERITY_WARNING,
-	  "Graphics display does not provide double buffering");
-
-    return false;
+              if (!(xvis=glXChooseVisual(dpy, screen_num, color_attributes)) )
+              {
+                Report (CS_REPORTER_SEVERITY_WARNING,
+             	"Graphics display does not support at least 12 bit color");
+                return false;
+	      }
+	   }
+	}
+     }
   }
+
+  active_GLContext = glXCreateContext(dpy, xvis, 0, GL_TRUE);
+  cmap = XCreateColormap (dpy, RootWindow (dpy, xvis->screen),
+			    xvis->visual, AllocNone);
 
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Video driver GL/X version %s",
     glXIsDirect (dpy, active_GLContext) ? "(direct renderer)" : "");
