@@ -42,6 +42,7 @@ struct iObjectRegistry;
 struct iMovable;
 struct iShadowBlockList;
 struct iCacheManager;
+struct iEngine;
 class csGenmeshMeshObjectFactory;
 class csColor;
 class G3DFogInfo;
@@ -459,6 +460,8 @@ private:
 public:
   iObjectRegistry* object_reg;
   iBase* logparent;
+
+  iEngine* engine;
 
   /// Constructor.
   csGenmeshMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);

@@ -33,6 +33,7 @@
 
 struct iMaterialWrapper;
 struct iObjectRegistry;
+struct iEngine;
 class csBallMeshObjectFactory;
 class csColor;
 class G3DFogInfo;
@@ -354,6 +355,7 @@ class csBallMeshObjectFactory : public iMeshObjectFactory
 public:
   iObjectRegistry* object_reg;
   iBase* logparent;
+  iEngine* engine;
 
   /// Constructor.
   csBallMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);

@@ -537,9 +537,23 @@ void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
   csColor* colors = lit_mesh_colors;
   csVector3* normals = factory->GetNormals ();
 
-  // Set all colors to ambient light (@@@ NEED TO GET AMBIENT!)
+  // Set all colors to ambient light.
+  csColor col;
+  if (factory->engine)
+  {
+    factory->engine->GetAmbientLight (col);
+    col += color;
+    iSector* sect = movable->GetSectors ()->Get (0);
+    if (sect)
+      col += sect->GetDynamicAmbientLight ();
+  }
+  else
+  {
+    col = color;
+  }
   for (i = 0 ; i < factory->GetVertexCount () ; i++)
-    colors[i] = color;
+    colors[i] = col;
+
   if (!do_lighting) return;
     // @@@ it is not efficient to do this all the time.
 
@@ -547,7 +561,6 @@ void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
   csReversibleTransform trans = movable->GetFullTransform ();
   // the object center in world coordinates. "0" because the object
   // center in object space is obviously at (0,0,0).
-  csColor color;
   for (l = 0 ; l < num_lights ; l++)
   {
     iLight* li = lights[l];
@@ -573,10 +586,10 @@ void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
 
       if (cosinus > 0)
       {
-        color = light_color;
+        col = light_color;
         if (obj_sq_dist >= SMALL_EPSILON) cosinus *= in_obj_dist;
-        if (cosinus < 1) color *= cosinus;
-	colors[i] += color;
+        if (cosinus < 1) col *= cosinus;
+	colors[i] += col;
       }
     }
   }
@@ -821,6 +834,8 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   mesh_triangle_dirty_flag = false;
 #endif
 
+  csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = eng;	// We don't want a circular reference!
 }
 
 csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()

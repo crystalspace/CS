@@ -29,6 +29,8 @@
 #include "iengine/rview.h"
 #include "iengine/movable.h"
 #include "iengine/light.h"
+#include "iengine/engine.h"
+#include "iengine/sector.h"
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"
 #include "iutil/cache.h"
@@ -1942,9 +1944,23 @@ void csSprite3DMeshObject::UpdateLighting (iLight** lights, int num_lights,
   {
     int num_texels = factory->GetVertexCount();
     // Reseting all of the vertex_colors to the base color.
-	int i;
+    csColor col;
+    if (factory->engine)
+    {
+      factory->engine->GetAmbientLight (col);
+      col += base_color;
+      iSector* sect = movable->GetSectors ()->Get (0);
+      if (sect)
+        col += sect->GetDynamicAmbientLight ();
+    }
+    else
+    {
+      col = base_color;
+    }
+
+    int i;
     for (i = 0 ; i < num_texels; i++)
-      vertex_colors [i] = base_color;
+      vertex_colors [i] = col;
   }
 
 // @@@
@@ -2402,6 +2418,9 @@ csPtr<iMeshObjectFactory> csSprite3DMeshObjectType::NewFactory ()
 {
   csSprite3DMeshObjectFactory* cm = new csSprite3DMeshObjectFactory (this);
   cm->object_reg = object_reg;
+  csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
+  // We don't want to keep a reference to the engine (circular ref otherwise).
+  cm->engine = eng;
   csRef<iMeshObjectFactory> ifact (
   	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
   cm->DecRef ();

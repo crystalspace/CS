@@ -20,6 +20,13 @@ The history order is reversed so that new features are at the top.
 	  very well in all cases (not exactly sure why). I fixed this by
 	  making sure that the texture is always in the cache before it is
 	  being updated.
+	- The spr3d, ball, and genmesh mesh objects will now respect
+	  static ambient (from the engine) and dynamic ambient (from the
+	  current sector) when their lighting is updated
+	  (DeferUpdateLighting()). This ambient+dynamic ambient is added
+	  to the base color that is already set. This may mean that if
+	  you manually set the ambient on such a model then the object
+	  can be too bright now. In that case use black as the base color.
 16-Jan-2003
 	- 'reverse_action' in 3D sprites was not initialized to false.
 	- Fixed odedynam plugin so it compiles again.

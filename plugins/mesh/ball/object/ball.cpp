@@ -27,6 +27,7 @@
 #include "ivideo/vbufmgr.h"
 #include "iengine/material.h"
 #include "iengine/camera.h"
+#include "iengine/sector.h"
 #include "igeom/clip2d.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"
@@ -557,9 +558,23 @@ void csBallMeshObject::UpdateLighting (iLight** lights, int num_lights,
   int i, l;
   csColor* colors = ball_colors;
 
-  // Set all colors to ambient light (@@@ NEED TO GET AMBIENT!)
+  // Set all colors to ambient light.
+  csColor col;
+  if (((csBallMeshObjectFactory*)factory)->engine)
+  {
+    ((csBallMeshObjectFactory*)factory)->engine->GetAmbientLight (col);
+    col += color;
+    iSector* sect = movable->GetSectors ()->Get (0);
+    if (sect)
+      col += sect->GetDynamicAmbientLight ();
+  }
+  else
+  {
+    col = color;
+  }
   for (i = 0 ; i < num_ball_vertices ; i++)
-    colors[i] = color;
+    colors[i] = col;
+
   if (!do_lighting) return;
     // @@@ it is not effiecient to do this all the time.
 
@@ -961,6 +976,8 @@ csBallMeshObjectFactory::csBallMeshObjectFactory (iBase *pParent,
   SCF_CONSTRUCT_IBASE (pParent);
   csBallMeshObjectFactory::object_reg = object_reg;
   logparent = NULL;
+  csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = eng;	// We don't want a circular reference.
 }
 
 csBallMeshObjectFactory::~csBallMeshObjectFactory ()

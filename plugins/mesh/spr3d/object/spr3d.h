@@ -49,6 +49,7 @@
 #define ALL_LOD_FEATURES (CS_LOD_TRIANGLE_REDUCTION|CS_LOD_DISTANCE_REDUCTION)
 
 struct iObjectRegistry;
+struct iEngine;
 
 /**
  * A frame for 3D sprite animation.
@@ -382,6 +383,12 @@ private:
 
 public:
   iObjectRegistry* object_reg;
+
+  /**
+   * Reference to the engine (optional because sprites can also be
+   * used for the isometric engine).
+   */
+  iEngine* engine;
 
 public:
   /// Create the sprite template.
