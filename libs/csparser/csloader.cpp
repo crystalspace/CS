@@ -3479,14 +3479,6 @@ bool CSLoader::LoadWorld (csWorld* world, LanguageLayer* layer, char* buf)
 	  {
 	    world->GetTextures ()->Clear ();
             if (!CSLoader::LoadTextures (world->GetTextures (), params, world)) return false;
-	    csLibrary* lib = (csLibrary*)world->libraries.FindByName ("standard");
-	    if (!lib)
-	    {
-	      CHK (lib = new csLibrary());
-              csNameObject::AddName(*lib, "standard");
-	      world->libraries.Push (lib);
-	      CSLoader::load_library_def (lib, world, "standard.zip", world->GetTextures ());
-	    }
 	  }
 	  break;
 	case kTokenWorldSounds:
