@@ -1,4 +1,5 @@
-# This is the makefile for Mingw compiler (gcc Native Win32)
+# This is the makefile for Mingw compiler (Minimalist C++ Native Gnu-Win32)
+#  Static Library Port portion completed July 17, 2000
 
 # Friendly names for building environment
 DESCRIPTION.mingw = Win32 with Mingw GCC
