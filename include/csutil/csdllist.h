@@ -16,11 +16,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __csDLinkList_hpp__
-#define __csDLinkList_hpp__
+#ifndef __CS_CSDLLIST_H__
+#define __CS_CSDLLIST_H__
 
+#include "types.h"
 
-/*
+/**
  * This structure should not need to be accessed directly.
  * It is used exclusively by the csDLinkList class.
  */
@@ -32,7 +33,6 @@ struct csDLListItem
 };
 
 
-
 /**
  * This class implements a doubly-linked list.
  * Nothing in this code affects the objects in the list.
@@ -41,15 +41,15 @@ struct csDLListItem
 class csDLinkList
 {
 private:
-  // ptr to first csDLListItem node
+  /// Pointer to first csDLListItem node
   csDLListItem* firstItem;
-  // ptr to current csDLListItem node
+  /// Pointer to current csDLListItem node
   csDLListItem* currentItem;
-  // used internally
+  /// Private search method
   csDLListItem* FindListItem (void *anObj);
 
 public:
-  ///
+  /// Constructor
   csDLinkList ();
 
   /**
@@ -88,10 +88,10 @@ public:
    */
   void* GetPrevItem ();
 
-   /**
-    * Return the next item in the list, and set the currentItem
-    * to that item.
-    */
+  /**
+   * Return the next item in the list, and set the currentItem
+   * to that item.
+   */
   void* GetNextItem ();
 
   /// Return the current item in the list.
@@ -100,6 +100,4 @@ public:
   void* SetCurrentItem (void *theObj);
 };
 
-
-#endif      // #ifndef __csDLinkList_hpp__
-
+#endif // __CS_CSDLLIST_H__

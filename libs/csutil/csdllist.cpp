@@ -16,18 +16,14 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-
-#include "sysdef.h"     // TRUE and FALSE definitions
+#include "sysdef.h"
 #include "csutil/csdllist.h"
-
-
 
 csDLinkList::csDLinkList()
    {
    firstItem    = NULL;
    currentItem  = NULL;
    }
-
 
 
 csDLinkList::~csDLinkList()
@@ -49,15 +45,11 @@ csDLinkList::~csDLinkList()
    }
 
 
-
-
 void csDLinkList::RemoveItem(void *theObj)
    {
    currentItem = FindListItem(theObj);
    RemoveItem();
    }
-
-
 
 
 csDLListItem * csDLinkList::FindListItem(void *anObj)
@@ -82,13 +74,11 @@ csDLListItem * csDLinkList::FindListItem(void *anObj)
    }
 
 
-
 void * csDLinkList::SetCurrentItem(void *theObj)
    {
    currentItem = FindListItem(theObj);
    return currentItem;
    }
-
 
 
 bool csDLinkList::AddItem(void *theObj)
@@ -97,7 +87,7 @@ bool csDLinkList::AddItem(void *theObj)
 
    newItem = new csDLListItem;
    if (!newItem)
-      return FALSE;
+      return false;
 
    newItem->theObject = theObj;
 
@@ -118,9 +108,8 @@ bool csDLinkList::AddItem(void *theObj)
       firstItem->prevItem = newItem;
       }
 
-   return TRUE;
+   return true;
    }
-
 
 
 void csDLinkList::RemoveItem()
@@ -149,8 +138,6 @@ void csDLinkList::RemoveItem()
       delete deadItem;
       }
    }
-
-
 
 
 void * csDLinkList::GetFirstItem()
@@ -196,7 +183,3 @@ void * csDLinkList::GetCurrentItem()
 
    return currentItem->theObject;
    }
-
-
-
-
