@@ -32,7 +32,7 @@ MAP2CS.EXE = map2cs$(EXE.CONSOLE)
 INC.MAP2CS = $(wildcard apps/import/map2cs/*.h)
 SRC.MAP2CS = $(wildcard apps/import/map2cs/*.cpp)
 OBJ.MAP2CS = $(addprefix $(OUT)/,$(notdir $(SRC.MAP2CS:.cpp=$O)))
-DEP.MAP2CS = CSTOOL CSGFX CSUTIL CSSYS CSUTIL CSGEOM
+DEP.MAP2CS = CSGEOM CSTOOL CSGFX CSUTIL CSSYS CSUTIL
 LIB.MAP2CS = $(foreach d,$(DEP.MAP2CS),$($d.LIB))
 CFG.MAP2CS = data/config/map2cs.cfg
 
