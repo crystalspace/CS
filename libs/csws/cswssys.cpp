@@ -23,10 +23,6 @@
 #include "csws/csapp.h"
 #include "itxtmgr.h"
 
-// We need the Virtual File System plugin
-REGISTER_STATIC_CLASS (csVFS, "crystalspace.kernel.vfs",
-  "Crystal Space Virtual File System plug-in")
-
 // -------------------------------------------------- cswsSystemDriver class ---
 
 cswsSystemDriver::cswsSystemDriver (csApp *ParentApp) :

@@ -21,6 +21,10 @@
 #include "cssys/system.h"
 #include "csws/csws.h"
 
+// We need the Virtual File System plugin
+REGISTER_STATIC_CLASS (csVFS, "crystalspace.kernel.vfs",
+  "Crystal Space Virtual File System plug-in")
+
 class csWsTest : public csApp
 {
   void NotebookDialog ();
