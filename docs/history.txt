@@ -12,6 +12,9 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+1-Feb-2000
+	- Eric Sunshine fixed several compilation warnings and errors in
+	  simpcons.h and cssprite.cpp which affliected MSVC++.
 31-Jan-2000
 	- Eric Sunshine fixed unixconf.sh so that it correctly captures
 	  and interprets output of 'which' command.
