@@ -401,9 +401,12 @@ void awsListBox::InsertItem (void *owner, iAwsParmList* parmlist)
 
     cs_snprintf (buf, 50, "image%d", i);
     if (parmlist->GetString (buf, &str))
+    {
       row->cols[i].image = lb->WindowManager ()->GetPrefMgr ()->GetTexture (
           str->GetData (),
           str->GetData ());
+      if (row->cols[i].image) row->cols[i].image->IncRef ();
+    }
 
     cs_snprintf (buf, 50, "stateful%d", i);
     parmlist->GetBool (buf, &(row->cols[i].has_state));
@@ -605,6 +608,10 @@ void awsListBox::ClearList (void *owner, iAwsParmList* )
   awsListBox *lb = (awsListBox *)owner;
 
   DoRecursiveClearList (&lb->rows);
+
+  // Clear the selected item.
+  lb->sel = NULL;
+  lb->scroll_start = 0;
 
   lb->map_dirty = true;
 }

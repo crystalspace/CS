@@ -12,6 +12,11 @@ The history order is reversed so that new features are at the top.
 	  routines considerably if there are a lot of lights in the level.
 	  This also means that DeferUpdateLighting() will be faster as it uses
 	  those routines.
+	- Applied a patch from Anders Reggestad to clear the selection from
+	  an AWS list box when 'ClearList()' is performed. Without this
+	  patch asking for the selection after ClearList() would crash.
+	- Anders also gave a patch to increase the ref count of an image
+	  in the same list box.
 16-Apr-2003
 	- Rhad altered the rapid triangle collision test to ignore
 	  degenerate triangles.
