@@ -166,7 +166,7 @@ bool csPluginList::Sort (csSystemDriver *iSys)
     while (dep && *dep)
     {
       char tmp [100];
-      char *comma = strchr (dep, ',');
+      const char *comma = strchr (dep, ',');
       if (!comma)
         comma = strchr (dep, 0);
       size_t sl = comma - dep;

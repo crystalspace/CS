@@ -70,7 +70,10 @@
 #define SOUND_DRIVER "crystalspace.sound.driver.waveout"
 
 #if defined (SYSDEF_DIR) || defined (SYSDEF_GETCWD) || defined (SYSDEF_MKDIR)
-  #include <direct.h>
+#  include <direct.h>
+#  ifdef COMP_BC
+#    include <dirent.h>
+#  endif
 #endif
 
 #ifdef COMP_BC
@@ -124,12 +127,16 @@
 #endif
 
 #ifdef SYSDEF_PATH
+#  ifdef COMP_BC
+#    define __NEED_GENERIC_ISDIR
+#  else
   #define __NO_GENERIC_ISDIR
   static inline bool isdir (char *path, dirent *de)
   {
     (void)path;
     return !!(de->d_attr & _A_SUBDIR);
   }
+#  endif
 #endif
 
 #ifdef SYSDEF_SOCKETS

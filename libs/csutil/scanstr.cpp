@@ -114,7 +114,7 @@ int ScanStr (const char* in, const char* format, ...)
 	  if (*in == '\'')
 	  {
 	    in++;
-	    char* in2 = strchr (in, '\'');
+	    const char* in2 = strchr (in, '\'');
 	    if (in2)
 	    {
 	      strncpy (a, in, (int)(in2-in));

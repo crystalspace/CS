@@ -254,7 +254,7 @@
 #endif
 
 #ifdef SYSDEF_ALLOCA
-#  if defined(COMP_WCC) || defined (COMP_VC)
+#  if defined(COMP_WCC) || defined (COMP_VC) || defined(COMP_BC)
 #    include <malloc.h>
 #  elif defined(COMP_GCC) && defined(OS_DOS)
 #    include <stdlib.h>
