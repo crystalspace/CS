@@ -199,25 +199,8 @@ LINK.PLUGIN=dllwrap
 PLUGIN.POSTFLAGS=-mwindows -mconsole
 
 # How to make a shared AKA dynamic library
-# with an ugly workaround for a dllwrap bug (doesn't auto-export functions
-# with _declspec(dllexport) from libraries)
-
-ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL))$(findstring cmd,$(SHELL))$(findstring CMD,$(SHELL)))
-# we are using cmd or command.com
-  DLLWRAPHACK.COMMANDGLUE = &
-  DLLWRAPHACK.DELETE = del
-else
-# something else. prolly bash in most cases.
-  DLLWRAPHACK.COMMANDGLUE = ;
-  DLLWRAPHACK.DELETE = rm -f
-endif
-
-DLLWRAPHACK.DEFFILE = out\\$(OS)\\$(PROC)\\$(MODE)\\$*.def
-
-DO.SHARED.PLUGIN.PREAMBLE = echo EXPORTS $*_scfInitialize > $(DLLWRAPHACK.DEFFILE) $(DLLWRAPHACK.COMMANDGLUE)
 DO.SHARED.PLUGIN.CORE = \
-  dllwrap $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows --def $(DLLWRAPHACK.DEFFILE)
-DO.SHARED.PLUGIN.POSTAMBLE = $(DLLWRAPHACK.COMMANDGLUE) $(DLLWRAPHACK.DELETE) $(DLLWRAPHACK.DEFFILE)
+  dllwrap $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows
 
 # Commenting out the following line will make the -noconsole option work
 # but the only way to redirect output will be WITH -noconsole (wacky :-)
