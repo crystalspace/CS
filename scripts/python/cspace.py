@@ -172,8 +172,6 @@ class iSCFPtr(iSCF):
         _swig_setattr(self, iSCF,self.__class__,iSCF)
 _cspace.iSCF_swigregister(iSCFPtr)
 
-scfInitialize = _cspace.scfInitialize
-
 iSCF_scfGetVersion = _cspace.iSCF_scfGetVersion
 
 CS_DBGHELP_UNITTEST = _cspace.CS_DBGHELP_UNITTEST
