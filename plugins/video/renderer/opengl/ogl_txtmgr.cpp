@@ -541,10 +541,8 @@ bool csTextureHandleOpenGL::GetMipMapDimensions (int mipmap, int &w, int &h)
 {
   if (mipmap < vTex.Length ())
   {
-    w = orig_width >> mipmap;
-    h = orig_height >> mipmap;
-//    w = vTex[mipmap]->get_width ();
-//    h = vTex[mipmap]->get_height ();
+    w = vTex[mipmap]->get_width () << texman->texture_downsample;
+    h = vTex[mipmap]->get_height () << texman->texture_downsample;
     return true;
   }
   return false;

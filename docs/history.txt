@@ -54,6 +54,10 @@ The history order is reversed so that new features are at the top.
 	  patch, and also propagated it to the CoreGraphics canvas.
 	- Jorrit changed the commandline help in the softx canvas to mention
 	  -noXSHM instead of -noshm.
+	- res fixed csTextureHandleOpenGL::GetMipMapDimensions() to return the
+	  size without applied downsampling (via 
+	  Video.OpenGL.TextureDownsample cfg. This is done in addition to po2
+	  adjustments)
 18-May-2003
 	- res made the following changes in and around render3d:
 	    - ATI/NV only exts can be disabled all at once via cfg.
