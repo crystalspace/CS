@@ -676,6 +676,12 @@ void csBCTerrBlock::Build (csVector3* cntrl,
     }
     work += owner->hor_length; // move work to next row
   }
+  if (current_lod) 
+  {
+    AddEdgesToCurrent ();
+    owner->ComputeSharedMesh ( current_lod, cntrl);
+    AddEdgeTriangles (current_lod);
+  }
 }
 
 /*
@@ -1583,9 +1589,14 @@ void csBCTerrObject::SetControlPoint (const csVector3 point,
   size = ((3 * x_blocks) + 1) * ((3 * z_blocks) + 1);
   if ((size <= iter) && (iter >=0) ) 
   {
-    control_points[iter] = point;
+    control_points[iter] = point;    
     if (initialized)
+    {
+      FlattenSides ();
+      SetupCollisionQuads ();
+      BuildCullMesh ();
       RebuildBlocks ();
+    }
   }
 }
 
@@ -1601,7 +1612,12 @@ void csBCTerrObject::SetControlPointHeight (const float height,
   {
     control_points[iter].y = height;    
     if (initialized)
+    {
+      FlattenSides ();
+      SetupCollisionQuads ();
+      BuildCullMesh ();
       RebuildBlocks ();
+    }
   }
 }
 
@@ -1775,13 +1791,19 @@ void csBCTerrObject::GetRadius (csVector3& rad, csVector3& cent)
 bool csBCTerrObject::HitBeamOutline (const csVector3& start, const csVector3& end,
     csVector3& isect, float* pr)
 {
-  return false;
+  if (collision)
+    return collision->HitBeamOutline (start, end, isect, pr);
+  else
+    return false;
 }
 
 bool csBCTerrObject::HitBeamObject (const csVector3& start, const csVector3& end,
     csVector3& isect, float* pr)
 {
-  return false;
+  if (collision)
+    return collision->HitBeamObject (start, end, isect, pr);
+  else
+    return false;
 }
 
 /*
@@ -1849,6 +1871,7 @@ void csBCTerrObject::SetupCollisionQuads ()
     shortest = size->y;
   else
     shortest = size->x;
+  if (collision) delete collision;
   collision = new csBCCollisionQuad (control_points, x_blocks, 
       z_blocks, shortest, object_reg );
   end = x_blocks * z_blocks;
@@ -1967,8 +1990,15 @@ void csBCTerrObject::BuildCullMesh ()
   z_size = (3 * z_blocks) + 1;
   end = x_size * z_size;
   int *verts;
-  culling_mesh.culling_mesh = new csMeshedPolygon;
-  verts = new int[4];
+  if (culling_mesh.culling_mesh)
+  {
+    if (culling_mesh.culling_mesh[0].vertices)
+      delete [] culling_mesh.culling_mesh[0].vertices;
+    if (culling_mesh.square_verts) delete culling_mesh.square_verts;
+    delete culling_mesh.culling_mesh;
+  }
+  culling_mesh.culling_mesh = new csMeshedPolygon;  
+  verts = new int[4];  
   culling_mesh.square_verts = new csVector3[4];
   culling_mesh.square_verts[0] = control_points[0];
   culling_mesh.square_verts[1] = control_points[x_size - 1];
