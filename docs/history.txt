@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+29-Oct-2001
+	- Eric Sunshine augmented the makefile configuration procedure for the
+	  Apple/NeXT ports so that they work even if executable permission has
+	  been lost on the scripts in CS/bin.  (Unfortunately, this fix is too
+	  late for the 0.90 package in which none of the scripts in CS/bin had
+	  executable permission.)
 27-Oct-2001
 	- Markus Korth <mkorth@military.de> fixed a bug with
 	  unixconf.sh which would use -mcpu=486 instead of -mcpu=i486.
