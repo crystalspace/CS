@@ -47,6 +47,7 @@ csView::csView (iEngine *e, iGraphics3D* ig3d) :
 csView::~csView ()
 {
   if (Camera) Camera->DecRef ();
+  Engine->DecRef ();
   G3D->DecRef ();
   delete RectView;
   delete PolyView;
