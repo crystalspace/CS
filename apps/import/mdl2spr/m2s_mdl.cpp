@@ -31,7 +31,7 @@
 #include "iutil/databuff.h"
 #include "igraphic/imageio.h"
 
-extern iImageIO* mdl2spr_imageio;
+extern csRef<iImageIO> mdl2spr_imageio;
 
 bool Mdl::IsFileMDLModel(const char* mdlfile)
 {
