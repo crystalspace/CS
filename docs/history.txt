@@ -29,6 +29,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed mk/msvcgen/win32.mak so that the libcssys project
 	  file is once again created correctly following the replacement of
 	  DSP.PROJECT.RESOURCES with $(PROJECT.EXE).WINRSRC.
+	- Added iXmlNode and iXmlAttribute. These are proposals for the
+	  XML interfaces we're going to use in CS.
 4-Aug-2002
 	- Eric Sunshine made the following changes to mk/msvcgen/msvcgen.mak
 	  and msvc7gen.mak:
