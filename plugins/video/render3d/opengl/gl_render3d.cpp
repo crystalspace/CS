@@ -122,6 +122,12 @@ csGLRender3D::csGLRender3D (iBase *parent)
   clip_outer[0] = CS_GL_CLIP_PLANES;
   clip_outer[1] = CS_GL_CLIP_STENCIL;
   clip_outer[2] = CS_GL_CLIP_NONE;
+
+  string_vertices = strings->Request ("vertices");
+  string_texture_coordinates = strings->Request ("texture coordinates");
+  string_normals = strings->Request ("normals");
+  string_colors = strings->Request ("colors");
+  string_indices = strings->Request ("indices");
 }
 
 csGLRender3D::~csGLRender3D()
@@ -351,15 +357,16 @@ void csGLRender3D::SetupStencil ()
   if (clipper)
   {
     glMatrixMode (GL_PROJECTION);
-    //glPushMatrix ();
+    glPushMatrix ();
     glLoadIdentity ();
     glMatrixMode (GL_MODELVIEW);
+    glPushMatrix ();
     glLoadIdentity ();
     // First set up the stencil area.
     statecache->EnableState (GL_STENCIL_TEST);
     
-    stencilclipnum++;
-    if (stencilclipnum>255)
+    //stencilclipnum++;
+    //if (stencilclipnum>255)
     {
       glClearStencil (0);
       glClear (GL_STENCIL_BUFFER_BIT);
@@ -369,22 +376,22 @@ void csGLRender3D::SetupStencil ()
     statecache->SetStencilOp (GL_REPLACE, GL_REPLACE, GL_REPLACE);
     int nv = clipper->GetVertexCount ();
     csVector2* v = clipper->GetClipPoly ();
-    glColor4f (0, 0, 0, 0);
+    glColor4f (1, 0, 0, 0);
     statecache->SetShadeModel (GL_FLAT);
-    SetZMode (CS_ZBUF_FILL);
+    SetZMode (CS_ZBUF_NONE);
     statecache->DisableState (GL_TEXTURE_2D);
-    glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    //glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
     glBegin (GL_TRIANGLE_FAN);
     int i;
     for (i = 0 ; i < nv ; i++)
-      glVertex2f (2.0*v[i].x/(float)viewwidth-1.0,
-                  2.0*v[i].y/(float)viewheight-1.0);
+      glVertex2f (/*2.0**/v[i].x/(float)viewwidth-1.0,
+                  /*2.0**/v[i].y/(float)viewheight-1.0);
     glEnd ();
     glColorMask (GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    statecache->DisableState (GL_STENCIL_TEST);
-    /*glPopMatrix ();
+    //statecache->DisableState (GL_STENCIL_TEST);
+    glPopMatrix ();
     glMatrixMode (GL_PROJECTION);
-    glPopMatrix ();*/
+    glPopMatrix ();
   }
 }
 
@@ -401,6 +408,7 @@ int csGLRender3D::SetupClipPlanes (bool add_clipper,
 
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
+  glPushMatrix ();
 
   int i = 0;
   GLdouble plane_eq[4];
@@ -444,6 +452,7 @@ int csGLRender3D::SetupClipPlanes (bool add_clipper,
     }
   }
 
+  glPopMatrix ();
   return i;
 }
 
@@ -570,11 +579,11 @@ void csGLRender3D::SetupClipper (int clip_portal,
     stencil_enabled = true;
     // Use the stencil area.
     statecache->EnableState (GL_STENCIL_TEST);
-    statecache->SetStencilFunc (GL_EQUAL, stencilclipnum, stencilclipnum);
+    statecache->SetStencilFunc (GL_EQUAL, stencilclipnum, (unsigned)-1);
     statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
   }
 
-  int planes = SetupClipPlanes (how_clip == 'p', 
+  /*int planes = SetupClipPlanes (how_clip == 'p', 
     do_near_plane && clip_plane != CS_CLIP_NOT,
     clip_z_plane != CS_CLIP_NOT);
   if (planes>0)
@@ -582,7 +591,7 @@ void csGLRender3D::SetupClipper (int clip_portal,
     clip_planes_enabled = true;
     for (int i = 0; i < planes; i++)
       statecache->EnableState ((GLenum)(GL_CLIP_PLANE0+i));
-  }
+  }*/
 }
 
 void csGLRender3D::ApplyObjectToCamera ()
@@ -602,15 +611,15 @@ void csGLRender3D::ApplyObjectToCamera ()
   matrixholder[9] = orientation.m23;
   matrixholder[10] = orientation.m33;
 
-  matrixholder[3] = matrixholder[7] = matrixholder[11] =
-    matrixholder[12] = matrixholder[13] = matrixholder[14] = 0.0;
-  matrixholder[15] = 1.0;
-
   const csVector3 &translation = object2camera.GetO2TTranslation();
 
+  matrixholder[3] = matrixholder[7] = matrixholder[11] = 
+  matrixholder[12] = matrixholder[13] = matrixholder[14] = 0.0;
+  matrixholder[15] = 1.0;
+
+
   glMatrixMode (GL_MODELVIEW);
-  glLoadIdentity ();
-  glMultMatrixf (matrixholder);
+  glLoadMatrixf (matrixholder);
   glTranslatef (-translation.x, -translation.y, -translation.z);
 }
 
@@ -678,7 +687,7 @@ bool csGLRender3D::Open ()
   csRef<iOpenGLInterface> gl = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
   ext.InitExtensions (gl);
 
-  if ( false && ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
+  if ( /*false &&*/ ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
   {
     csVARRenderBufferManager * bm = new csVARRenderBufferManager();
     bm->Initialize(this);
@@ -756,7 +765,7 @@ bool csGLRender3D::BeginDraw (int drawflags)
       glClear (GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
   }
   else if (drawflags & CSDRAW_CLEARSCREEN)
-    G2D->Clear (0);
+    glClear (GL_COLOR_BUFFER_BIT);
 
   if (!render_target && (drawflags & CSDRAW_3DGRAPHICS))
   {
@@ -940,13 +949,15 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 {
   csRef<iStreamSource> source = mymesh->GetStreamSource ();
   csRef<iRenderBuffer> vertexbuf =
-    source->GetBuffer (strings->Request (mymesh->GetDefaultVertexBuffer ()));
+    source->GetBuffer (string_vertices);
   csRef<iRenderBuffer> texcoordbuf =
-    source->GetBuffer (strings->Request (mymesh->GetDefaultTexCoordBuffer ()));
+    source->GetBuffer (string_texture_coordinates);
   csRef<iRenderBuffer> normalbuf =
-    source->GetBuffer (strings->Request (mymesh->GetDefaultNormalBuffer ()));
+    source->GetBuffer (string_normals);
+  csRef<iRenderBuffer> colorbuf =
+    source->GetBuffer (string_colors);
   csRef<iRenderBuffer> indexbuf =
-    source->GetBuffer (strings->Request (mymesh->GetDefaultIndexBuffer ()));
+    source->GetBuffer (string_indices);
 
   if (!vertexbuf)
     return;
@@ -979,10 +990,16 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
       normalbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
     glEnableClientState (GL_NORMAL_ARRAY);
   }
+  if (colorbuf)
+  {
+    glColorPointer (4, GL_FLOAT, 0, (float*)
+      colorbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
+    glEnableClientState (GL_COLOR_ARRAY);
+  }
 
   statecache->SetShadeModel (GL_SMOOTH);
 
-  glMatrixMode (GL_PROJECTION);
+  /*glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
   SetGlOrtho (false);
   glViewport (1, -1, viewwidth+1, viewheight+1);
@@ -996,7 +1013,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   matrixholder[14] = -matrixholder[11];
   glMultMatrixf (matrixholder);
 
-  ApplyObjectToCamera ();
+  ApplyObjectToCamera ();*/
 
   tricnt += (mymesh->GetIndexEnd ()-mymesh->GetIndexStart ())/3;
 
@@ -1091,8 +1108,8 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 
         glMatrixMode (GL_TEXTURE);
         glPushMatrix ();
-        glLoadIdentity ();
         GLfloat scalematrix[16];
+        int i;
         for (i = 0 ; i < 16 ; i++) scalematrix[i] = 0.0;
         scalematrix[0] = layer->uscale;
         scalematrix[5] = layer->vscale;
@@ -1101,7 +1118,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
         scalematrix[12] = layer->ushift*layer->uscale; 
         scalematrix[13] = layer->vshift*layer->vscale;
         // @@@ Shift is ignored for now.
-        glMultMatrixf (scalematrix);
+        glLoadMatrixf (scalematrix);
 
         glDrawElements (
           GL_TRIANGLES,
@@ -1122,6 +1139,11 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   {
     glDisableClientState (GL_TEXTURE_COORD_ARRAY);
     texcoordbuf->Release();
+  }
+  if (colorbuf)
+  {
+    glDisableClientState (GL_COLOR_ARRAY);
+    colorbuf->Release();
   }
   if (normalbuf)
   {

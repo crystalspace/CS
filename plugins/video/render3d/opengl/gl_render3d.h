@@ -110,6 +110,12 @@ private:
 
   csStringSet* strings;
 
+  csStringID string_vertices;
+  csStringID string_texture_coordinates;
+  csStringID string_normals;
+  csStringID string_colors;
+  csStringID string_indices;
+
   csConfigAccess config;
 
 
