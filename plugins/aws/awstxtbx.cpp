@@ -340,10 +340,10 @@ void awsTextBox::OnDraw (csRect /*clip*/)
     if (mcc)
     {
 
-      // Check to see if we're getting wierd.
+      // Check to see if we're getting weird.
       // this was changed to avoid 
       // jittering in the start value
-      if (cursor > start + mcc) start = cursor - mcc;
+      if ((int)cursor > start + mcc) start = cursor - mcc;
       if (start < 0) start = 0;
 
       // Make the text the right length
