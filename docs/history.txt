@@ -20,6 +20,8 @@ The history order is reversed so that new features are at the top.
 	    - Some doc updates in csgfx/gradient.h and memimage.h.
 	- res added some #includes missing in new renderer builds to 
 	  csengine/engine.cpp.
+	- Oktal added to csMaterial::AddChild() in new renderer: it now calls
+	  iShaderWrapper::SelectMaterial() on the child before adding it.
 19-Jul-2003
 	- Jorrit added howto about adding game data to Crystal Space objects
 	  in map files.

@@ -120,8 +120,11 @@ public:
   /// Get shader associated with a shader type
   virtual iShaderWrapper* GetShader (csStringID type);
 
-  virtual void AddChild (iShaderBranch *c)
-    { symtab.AddChild (c->GetSymbolTable ()); }
+  virtual void AddChild (iShaderBranch *c) {
+    csRef<iShaderWrapper> w = SCF_QUERY_INTERFACE (c, iShaderWrapper);
+    if (w) w->SelectMaterial (this);
+    symtab.AddChild (c->GetSymbolTable ());
+  }
   virtual void AddVariable (iShaderVariable *v)
     { symtab.SetSymbol (v->GetName (), v); }
   virtual iShaderVariable* GetVariable (csStringID name)
