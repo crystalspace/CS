@@ -26,8 +26,11 @@
 #include "cscom/com.h"
 #include "cssnddrv/waveoutsd/wodrv.h"
 #include "isystem.h"
+#include "csutil/inifile.h"
 #include "isndlstn.h"
 #include "isndsrc.h"
+
+csIniFile* configwodrv;
 
 #define MYMMSYSERR_NOCREATETHREAD 12
 
@@ -77,6 +80,7 @@ STDMETHODIMP csSoundDriverWaveOut::Open(ISoundRender *render, int frequency, boo
   SysPrintf (MSG_INITIALIZATION, "\nSoundDriver waveOut selected\n");
 
   m_piSoundRender = render;
+  configwodrv = new csIniFile ("wodrv.cfg");
 
   MMRESULT res;
   WAVEFORMATEX format;
@@ -99,14 +103,14 @@ STDMETHODIMP csSoundDriverWaveOut::Open(ISoundRender *render, int frequency, boo
   m_b16Bits = bit16;
   m_bStereo = stereo;
 
-  char *callback_func="function"/*config->GetStr("SoundDriver.waveOut", "CALLBACK", "function")*/;
-  char *thread_func="normal"/*config->GetStr("SoundDriver.waveOut", "THREAD_PRIORITY", "normal")*/;
+  char *callback_func=configwodrv->GetStr("SoundDriver.waveOut", "CALLBACK", "function");
+  char *thread_func=configwodrv->GetStr("SoundDriver.waveOut", "THREAD_PRIORITY", "normal");
   bool threading = false;
 
   if(stricmp(callback_func, "thread")==0)
     threading = true;
 
-  unsigned int refresh=5/*config->GetInt("SoundDriver.waveOut", "REFRESH", 5)*/;
+  unsigned int refresh=configwodrv->GetInt("SoundDriver.waveOut", "REFRESH", 5);
 
   if(refresh>format.nAvgBytesPerSec) refresh=format.nAvgBytesPerSec;
 
