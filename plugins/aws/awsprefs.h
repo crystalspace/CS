@@ -419,6 +419,8 @@ public:
   void Remove (const char* name);
   /// Removes a specific item from the container
   void Remove (iAwsKey *key);
+  /// Removes all keys from the container.
+  void RemoveAll ();
 
   /// Consumes an entire list by moving all of it's member's to this one, and removing them from it.
   void Consume (iAwsKeyContainer *c);
@@ -494,6 +496,8 @@ public:
   void Remove (const char* name) { awsKeyContainer::Remove(name); }
   /// Removes a specific item from the container
   void Remove (iAwsKey *key) { awsKeyContainer::Remove(key); }
+  /// Removes all items from the container
+  void RemoveAll () { awsKeyContainer::RemoveAll(); }
 
   /// Consumes an entire list by moving all of it's member's to this one, and removing them from it.
   void Consume (iAwsKeyContainer *c) { awsKeyContainer::Consume(c); }
@@ -662,6 +666,64 @@ public:
 
   /// Find window definition and return the component node holding it, Null otherwise
   virtual iAwsComponentNode *FindWindowDef (const char *name);
+
+  /// Find skin definition and return pointer, Null if not found
+  virtual iAwsKeyContainer *FindSkinDef (const char *name);
+
+  /// Completely remove a window definition from the list (false if doesn't exist)
+  bool RemoveWindowDef (const char *name)
+  {
+    iAwsComponentNode *nd=FindWindowDef (name);
+    if(nd) 
+    {
+      nd->RemoveAll ();
+      win_defs.RemoveItem (nd);
+      nd->DecRef();
+      return true;
+    }
+    return false;
+  }
+
+  /// Removes all window definitions from the list
+  void RemoveAllWindowDefs ()
+  {
+    iAwsComponentNode *nd=(iAwsComponentNode*)win_defs.GetFirstItem();
+    while (nd)
+    {
+      nd->RemoveAll ();
+      win_defs.RemoveItem ();
+      nd->DecRef();
+      nd=(iAwsComponentNode*)win_defs.GetNextItem();
+    }
+  }
+
+  /// Completely remove a skin definition from the list (false if doesn't exist)
+  bool RemoveSkinDef (const char *name)
+  {
+    iAwsKeyContainer *kc=FindSkinDef (name);
+    if(kc)
+    {
+      kc->RemoveAll ();
+      skin_defs.RemoveItem (kc);
+      kc->DecRef();
+      return true;
+    }
+    return false;
+  }
+
+  /// Removes all skin definitions from the list
+  void RemoveAllSkinDefs ()
+  {
+    iAwsKeyContainer *sd=(iAwsKeyContainer*)skin_defs.GetFirstItem();
+    while (sd)
+    {
+      sd->RemoveAll ();
+      skin_defs.RemoveItem ();
+      sd->DecRef();
+      sd=(iAwsKeyContainer*)skin_defs.GetNextItem();
+    }
+  }
+
 public:
 
   /// Called by internal code to add a parsed out tree of window components.

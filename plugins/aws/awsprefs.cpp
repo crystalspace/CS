@@ -552,6 +552,24 @@ iAwsComponentNode *awsPrefManager::FindWindowDef (const char *name)
   return NULL;
 }
 
+iAwsKeyContainer *awsPrefManager::FindSkinDef (const char *name)
+{
+  iAwsKeyContainer *skn = (iAwsKeyContainer *)skin_defs.GetFirstItem ();
+  iAwsKeyContainer *firstskn = skn;
+  unsigned long id = NameToId (name);
+
+  while (skn)
+  {
+    if (skn && skn->Name () == id) return skn;
+
+    skn = (iAwsKeyContainer *)skin_defs.GetNextItem ();
+    if (skn == firstskn)
+      break;
+  }
+
+  return NULL;
+}
+
 void awsPrefManager::RegisterConstant (const char *name, int value)
 {
   constant_entry *c = new constant_entry;

@@ -71,6 +71,17 @@ void awsKeyContainer::Remove (iAwsKey* key)
   key->DecRef();
 }
 
+void awsKeyContainer::RemoveAll ()
+{
+  int i;
+  for (i=0; i < children.Length (); i++)
+  {
+    iAwsKey *k= STATIC_CAST (iAwsKey *, children[i]);
+    children.Delete ((csSome) k);
+    k->DecRef();
+  }
+}
+
 void awsKeyContainer::Consume (iAwsKeyContainer *c)
 {
   if (aws_debug)

@@ -191,6 +191,8 @@ struct iAwsKeyContainer : public iAwsKey
   virtual void Remove (const char* name) = 0;
   /// Removes a specific item from the container
   virtual void Remove (iAwsKey *key) = 0;
+  /// Removes all items from the container
+  virtual void RemoveAll () = 0;
 
   /// Consumes an entire list by moving all of it's member's to this one, and removing them from it.
   virtual void Consume (iAwsKeyContainer *c) = 0;
@@ -410,6 +412,21 @@ public:
 
   /// Find window definition and return the component node holding it, Null otherwise
   virtual iAwsComponentNode *FindWindowDef(const char* name)=0;
+
+  /// Find skin def and return key container, Null if not found
+  virtual iAwsKeyContainer *FindSkinDef(const char* name)=0;
+
+  /// Completely remove a window definition (return false if not found)
+  virtual bool RemoveWindowDef (const char *name)=0;
+
+  /// Remove all window definitions
+  virtual void RemoveAllWindowDefs ()=0;
+
+  /// Completely remove a skin definition (return false if not found)
+  virtual bool RemoveSkinDef (const char *name)=0;
+
+  /// Remove all skin definitions
+  virtual void RemoveAllSkinDefs ()=0;
 
   /// Sets the value of a color in the global AWS palette.
   virtual void SetColor(int index, int color)=0;
