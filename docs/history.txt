@@ -33,6 +33,11 @@ The history order is reversed so that new features are at the top.
 	  object.
 	- Eric Sunshine removed the unused and namespace-polluting ResultType
 	  enumeration from ivaria/script.h
+	- Eric Sunshine updated the URLs in the build instructions for the
+	  Apple/NeXT ports to refer to the new sunsite.dk location rather than
+	  the old 3ddownloads.com location.
+	- Eric Sunshine updated the "Final Notes" section of the
+	  platform-specific internal-description of the Apple/NeXT ports.
 21-Jun-2001
 	- Fixed a bug in the cleanup of sectors in the engine.  The portal
 	  references were not cleaned up.

@@ -772,51 +772,46 @@ This is a list of items which are planned for future releases of this project:
 
 @itemize @bullet
 @item
-Rewrite canvas image sizing computation so that the image's row-bytes value is
-always multiple of 16.  This is necessary for best video performance according
-to the @cite{NextStep 3.0 WindowServer Release Notes}.  Currently, this
-condition is not enforced, and it is possible for the user to specify window
-sizes (via the @samp{--mode} switch) which break this requirement.
-Furthermore, when dynamic canvas resizing is implemented, this will be an
-absolute requirement.
+Write an OpenGL canvas for the MacOS/X port.
 
 @item
-Consider respecting the @samp{area} argument to @code{iGraphics2D::Print()} and
-flushing only part of the frame buffer to the display rather than the entire
-frame buffer.  However, this must be done carefully in order to preserve all of
-the speed advantages of the current technique of flushing the entire frame
-buffer via a single Mach message.  The way to do this is to create a second
-@samp{NSBitmapImageRep} (or @samp{NXBitmapImageRep}) using the same
-frame-buffer as the full-sized one, but which has a smaller specified area and
-a much larger row-bytes value.  This second image representation will actually
-overlay the full-sized one but will specify smaller dimensions.  The row-bytes
-value must be computed in such a way as to compensate for all of the image data
-outside of the secondary image's bounds.
+Write a CoreGraphics canvas for the MacOS/X port.
 
 @item
-Support user-initiated canvas resizing.
+Rewrite @samp{next2d} canvas image sizing computation so that the image's
+row-bytes value is always multiple of 16.  This is necessary for best video
+performance according to the @cite{NextStep 3.0 WindowServer Release Notes}.
+Currently, this condition is not enforced, and it is possible for the user to
+specify window sizes (via the @samp{--mode} switch) which break this
+requirement.  Furthermore, when dynamic canvas resizing is implemented, this
+will be an absolute requirement.
 
 @item
-Ditch the recursive run-loop mechanism and go with a threaded model instead.
-Since the AppKit and Crystal Space will then each be running in a distinct
-thread, a timer will no longer be required for pulsing the engine.  One benefit
-of this is that the engine can then run full-speed without being capped by the
-timer's pulse interval.  The other major benefit of this approach is that it
-will facilitate elimination of the recursive run-loop hack (@pxref{NeXT
-Run-Loop}), which is the only place in the entire Apple/@NeXT{} port where
-private (and potentially volatile) AppKit @sc{api} was employed.
+In @samp{next2d}, consider respecting the @samp{area} argument to
+@code{iGraphics2D::Print()} and flushing only part of the frame buffer to the
+display rather than the entire frame buffer.  However, this must be done
+carefully in order to preserve all of the speed advantages of the current
+technique of flushing the entire frame buffer via a single Mach message.  The
+way to do this is to create a second @samp{NSBitmapImageRep} (or
+@samp{NXBitmapImageRep}) using the same frame-buffer as the full-sized one, but
+which has a smaller specified area and a much larger row-bytes value.  This
+second image representation will actually overlay the full-sized one but will
+specify smaller dimensions.  The row-bytes value must be computed in such a way
+as to compensate for all of the image data outside of the secondary image's
+bounds.
 
 @item
-As a possible alternative to going with the threaded model (see above item),
-consider re-writing event handling so that it no longer relies on timer to
-drive animation.  The problem with using the timer is that it places an upper
-limit on the frame rate.  Furthermore, on slow machines it can fire frequently
-enough to place a strangle-hold on the user event queue, since the run loop
-checks for timer events before checking for user events.  Instead of using a
-timer, place an @dfn{application defined} event in the event queue at the end
-of each animation frame, then have the application event trigger the next
-animation frame.  Since the event will be placed at the tail of the event
-queue, it will not smother out user events.
+Support user-initiated canvas resizing in @samp{next2d}.
+
+@item
+Consider ditching the recursive run-loop mechanism and go with a threaded model
+instead.  Since the AppKit and Crystal Space will then each be running in a
+distinct thread, there will no longer be a need for an artificial mechanism
+(such as a timer or event queue feed) for pulsing the engine.  A benefit of
+this approach is that it would facilitate elimination of the recursive run-loop
+hack (@pxref{NeXT Run-Loop}), which is the only place in the entire
+Apple/@NeXT{} port where private (and potentially volatile) AppKit @sc{api} was
+employed.
 
 @item
 Create native AppKit cursors for @sc{csws} cursors.
