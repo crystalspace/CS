@@ -72,6 +72,9 @@ public:
   /// Create yet another image and copy this one into the new image.
   virtual iImage *Clone ()
   { return NULL; }
+  /// Create another image holding a subimage of current image
+  virtual iImage *Crop (int x, int y, int width, int height )
+  { return NULL; }
 };
 
 #endif // __SCRSHOT_H__
