@@ -116,6 +116,11 @@ private:
   int max_operations;
   csLineOperation* operations;
 
+  // A temporary values that are used to test if the objects in the write
+  // queue can actually help cull the object.
+  bool covered;
+  bool fully_covered;
+
   // Add an operation.
   csLineOperation& AddOperation ();
 
@@ -128,7 +133,8 @@ public:
   	tile_full (false),
 	queue_tile_empty (true),
 	num_operations (0),
-	max_operations (16)
+	max_operations (16),
+	covered (false)
   {
     operations = new csLineOperation [16];
     MakePrecalcTables ();
@@ -366,7 +372,6 @@ public:
   	float testdepth, bool& do_depth_test);
 
   //-----------------------------------------------------------------
-
   /**
    * Test if a given point is visible in this tile. Coordinates
    * are given relative to top-left coordinate of this tile.
@@ -537,6 +542,23 @@ public:
    * rectangle is visible.
    */
   bool QuickTestRectangle (const csTestRectData& data, float min_depth);
+
+  /**
+   * Prepare a write queue test for the given rectangle. This returns the
+   * number of uncovered tiles. Use AddWriteQueueTest() to add additional
+   * rectangles.
+   */
+  int PrepareWriteQueueTest (const csTestRectData& data, float min_depth);
+
+  /**
+   * Add a rectangle for a write queue test. This returns the number of
+   * tiles that were covered. If 'relevant' is set to false by this function
+   * then that means the rectangle couldn't affect the result because it
+   * only affects tiles that are already fully covering the object we are
+   * testing.
+   */
+  int AddWriteQueueTest (const csTestRectData& maindata,
+  	const csTestRectData& data, bool& relevant);
 
   /**
    * Test a point with the coverage buffer.

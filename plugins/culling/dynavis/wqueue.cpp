@@ -157,7 +157,7 @@ void* csWriteQueue::Fetch (const csBox2& box, float depth, float& out_depth)
   while (el)
   {
     if (el->depth > depth) return 0;	// No useful occluder found.
-    if (el->box.TestIntersect (box))
+    if (el->relevant)
     {
       // The boxes intersect.
       out_depth = el->depth;

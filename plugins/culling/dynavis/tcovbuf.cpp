@@ -293,7 +293,7 @@ void csCoverageTile::FlushForFullConstFValue (csTileCol&, float)
   // nothing to do here.
 }
 
-void csCoverageTile::FlushNoDepthConstFValue(csTileCol& fvalue, float maxdepth)
+void csCoverageTile::FlushNoDepthConstFValue (csTileCol& fvalue, float maxdepth)
 {
   int i;
 
@@ -317,7 +317,7 @@ void csCoverageTile::FlushNoDepthConstFValue(csTileCol& fvalue, float maxdepth)
   tile_full = fulltest.IsFull ();
 }
 
-void csCoverageTile::FlushGeneralConstFValue(csTileCol& fvalue, float maxdepth)
+void csCoverageTile::FlushGeneralConstFValue (csTileCol& fvalue, float maxdepth)
 {
   int i;
 
@@ -503,23 +503,15 @@ void csCoverageTile::FlushForEmpty (csTileCol& fvalue, float maxdepth)
 
     if (!mods.IsEmpty ())
     {
-      if (mods.CheckByte0 ())
-        ldepth[0] = maxdepth;
-      if (mods.CheckByte1 ())
-        ldepth[4] = maxdepth;
-      if (mods.CheckByte2 ())
-        ldepth[8] = maxdepth;
-      if (mods.CheckByte3 ())
-        ldepth[12] = maxdepth;
+      if (mods.CheckByte0 ()) ldepth[0] = maxdepth;
+      if (mods.CheckByte1 ()) ldepth[4] = maxdepth;
+      if (mods.CheckByte2 ()) ldepth[8] = maxdepth;
+      if (mods.CheckByte3 ()) ldepth[12] = maxdepth;
 #if NUM_TILEROW==64
-      if (mods.CheckByte4 ())
-        ldepth[16] = maxdepth;
-      if (mods.CheckByte5 ())
-        ldepth[20] = maxdepth;
-      if (mods.CheckByte6 ())
-        ldepth[24] = maxdepth;
-      if (mods.CheckByte7 ())
-        ldepth[28] = maxdepth;
+      if (mods.CheckByte4 ()) ldepth[16] = maxdepth;
+      if (mods.CheckByte5 ()) ldepth[20] = maxdepth;
+      if (mods.CheckByte6 ()) ldepth[24] = maxdepth;
+      if (mods.CheckByte7 ()) ldepth[28] = maxdepth;
 #endif
     }
   }
@@ -842,23 +834,15 @@ bool csCoverageTile::TestDepthFlushGeneral (csTileCol& fvalue, float mindepth)
     float* ldepth = &depth[i];
     if (!mods.IsEmpty ())
     {
-      if (mods.CheckByte0 ())
-	if (mindepth <= ldepth[0]) return true;
-      if (mods.CheckByte1 ())
-        if (mindepth <= ldepth[4]) return true;
-      if (mods.CheckByte2 ())
-        if (mindepth <= ldepth[8]) return true;
-      if (mods.CheckByte3 ())
-        if (mindepth <= ldepth[12]) return true;
+      if (mods.CheckByte0 () && mindepth <= ldepth[0]) return true;
+      if (mods.CheckByte1 () && mindepth <= ldepth[4]) return true;
+      if (mods.CheckByte2 () && mindepth <= ldepth[8]) return true;
+      if (mods.CheckByte3 () && mindepth <= ldepth[12]) return true;
 #if NUM_TILEROW==64
-      if (mods.CheckByte4 ())
-        if (mindepth <= ldepth[16]) return true;
-      if (mods.CheckByte5 ())
-        if (mindepth <= ldepth[20]) return true;
-      if (mods.CheckByte6 ())
-        if (mindepth <= ldepth[24]) return true;
-      if (mods.CheckByte7 ())
-        if (mindepth <= ldepth[28]) return true;
+      if (mods.CheckByte4 () && mindepth <= ldepth[16]) return true;
+      if (mods.CheckByte5 () && mindepth <= ldepth[20]) return true;
+      if (mods.CheckByte6 () && mindepth <= ldepth[24]) return true;
+      if (mods.CheckByte7 () && mindepth <= ldepth[28]) return true;
 #endif
     }
   }
@@ -884,8 +868,8 @@ bool csCoverageTile::TestDepthFlush (csTileCol& fvalue, float mindepth)
   return TestDepthFlushGeneral (fvalue, mindepth);
 }
 
-bool csCoverageTile::TestCoverageFlushForFull (csTileCol& fvalue, float mindepth,
-	bool& do_depth_test)
+bool csCoverageTile::TestCoverageFlushForFull (csTileCol& fvalue,
+	float mindepth, bool& do_depth_test)
 {
   // First a quick depth test.
   if (mindepth <= tile_min_depth)
@@ -897,8 +881,8 @@ bool csCoverageTile::TestCoverageFlushForFull (csTileCol& fvalue, float mindepth
   return false;
 }
 
-bool csCoverageTile::TestCoverageFlushGeneral (csTileCol& fvalue, float mindepth,
-	bool& do_depth_test)
+bool csCoverageTile::TestCoverageFlushGeneral (csTileCol& fvalue,
+	float mindepth, bool& do_depth_test)
 {
   // First a quick depth test.
   if (mindepth <= tile_min_depth)
@@ -1013,8 +997,8 @@ bool csCoverageTile::TestCoverageRect (int start, int end, float testdepth,
   return false;
 }
 
-bool csCoverageTile::TestCoverageRect (const csTileCol& vermask, int start, int end,
-  	float testdepth, bool& do_depth_test)
+bool csCoverageTile::TestCoverageRect (const csTileCol& vermask,
+	int start, int end, float testdepth, bool& do_depth_test)
 {
   // Tile is still empty.
   if (queue_tile_empty) return true;
@@ -1074,8 +1058,8 @@ bool csCoverageTile::TestDepthRect (int start, int end, float testdepth)
   return false;
 }
 
-bool csCoverageTile::TestDepthRect (const csTileCol& vermask, int start, int end,
-  	float testdepth)
+bool csCoverageTile::TestDepthRect (const csTileCol& vermask,
+	int start, int end, float testdepth)
 {
   int i;
 
@@ -2387,6 +2371,75 @@ bool csTiledCoverageBuffer::QuickTestRectangle (const csTestRectData& data,
     }
   }
   return false;
+}
+
+int csTiledCoverageBuffer::PrepareWriteQueueTest (const csTestRectData& data,
+	float min_depth)
+{
+  int tx, ty;
+  int cnt = 0;
+  for (ty = data.startrow ; ty <= data.endrow ; ty++)
+  {
+    csCoverageTile* tile = GetTile (data.startcol, ty);
+    for (tx = data.startcol ; tx <= data.endcol ; tx++)
+    {
+      bool cov;
+      if (tile->queue_tile_empty)
+      {
+        cov = false;
+	tile->fully_covered = false;
+      }
+      else
+      {
+        cov = min_depth >= tile->tile_min_depth;
+	if (tile->IsFull () && min_depth > tile->tile_max_depth)
+	  tile->fully_covered = true;
+	else
+	  tile->fully_covered = false;
+      }
+      tile->covered = cov;
+      if (!cov) cnt++;
+      tile++;
+    }
+  }
+  return cnt;
+}
+
+int csTiledCoverageBuffer::AddWriteQueueTest (const csTestRectData& maindata,
+	const csTestRectData& data, bool& relevant)
+{
+  int sr = data.startrow;
+  if (sr > maindata.endrow) return 0;
+  if (sr < maindata.startrow) sr = maindata.startrow;
+  int er = data.endrow;
+  if (er < maindata.startrow) return 0;
+  if (er > maindata.endrow) er = maindata.endrow;
+  int sc = data.startcol;
+  if (sc > maindata.endcol) return 0;
+  if (sc < maindata.startcol) sc = maindata.startcol;
+  int ec = data.endcol;
+  if (ec < maindata.startcol) return 0;
+  if (ec > maindata.endcol) ec = maindata.endcol;
+
+  int tx, ty;
+  int cnt = 0;
+  relevant = false;
+  for (ty = sr ; ty <= er ; ty++)
+  {
+    csCoverageTile* tile = GetTile (sc, ty);
+    for (tx = sc ; tx <= ec ; tx++)
+    {
+      if (!tile->fully_covered)
+        relevant = true;
+      if (!tile->covered)
+      {
+        tile->covered = true;
+	cnt++;
+      }
+      tile++;
+    }
+  }
+  return cnt;
 }
 
 bool csTiledCoverageBuffer::TestPoint (const csVector2& point, float min_depth)

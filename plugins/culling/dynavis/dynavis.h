@@ -212,8 +212,7 @@ private:
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
 
   // Given an occluder, update it in the coverage buffer.
-  void UpdateCoverageBuffer (iCamera* camera, iVisibilityObject* visobj,
-  	csDynavisObjectModel* model);
+  void UpdateCoverageBuffer (iCamera* camera, csVisibilityObjectWrapper* obj);
 
   // Given an occluder, update it in the coverage buffer. Using the outline.
   void UpdateCoverageBufferOutline (iCamera* camera, iVisibilityObject* visobj,

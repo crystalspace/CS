@@ -543,7 +543,8 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
     float max_depth;
 #define DO_OUTLINE_TEST 0
 #if DO_OUTLINE_TEST
-    csPoly2D outline;
+    static csPoly2D outline;
+    outline.MakeEmpty ();
     if (node_bbox.ProjectBoxAndOutline (camtrans, fov, sx, sy, sbox,
     	outline, min_depth, max_depth))
 #else
@@ -632,8 +633,16 @@ typedef csDirtyAccessArray<csVector3> dynavis_tr_cam;
 CS_IMPLEMENT_STATIC_VAR (GetTrCam, dynavis_tr_cam, ())
 
 void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
-	iVisibilityObject* visobj, csDynavisObjectModel* model)
+	csVisibilityObjectWrapper* obj)
 {
+  if (do_cull_coverage != COVERAGE_POLYGON && obj->use_outline_filler)
+  {
+    UpdateCoverageBufferOutline (camera, obj->visobj, obj->model);
+    return;
+  }
+  iVisibilityObject* visobj = obj->visobj;
+  csDynavisObjectModel* model = obj->model;
+
   iMovable* movable = visobj->GetMovable ();
   iPolygonMesh* polymesh = visobj->GetObjectModel ()->GetPolygonMeshViscull ();
 
@@ -1071,46 +1080,79 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       if (do_cull_writequeue &&
       	 hist->no_writequeue_vis_cnt <= history_frame_cnt)
       {
+        bool use_wq = false;
+	csWriteQueueElement* el = write_queue->GetFirst ();
+	if (el && el->depth <= min_depth)
+	{
+	  // If there are potentially relevant items in the write queue
+	  // we first attempt to guess if those items can actually contribute
+	  // to culling (i.e. can mark the object invisible). To do that we
+	  // do a very quick and rough test where we see if the combined
+	  // rectangles from the write queue and the current contents of the
+	  // coverage buffer actually cover the entire rectangle we are
+	  // testing. For every element in the write queue we also set
+	  // the 'relevant' flag to true if the element is potentially
+	  // relevant.
+	  int tiles_remaining = tcovbuf->PrepareWriteQueueTest (
+	  	testrect_data, min_depth);
+	  while (el)
+	  {
+	    if (el->depth > min_depth) break;
+	    if (el->box.TestIntersect (sbox))
+	    {
+	      csTestRectData td;
+	      tcovbuf->PrepareTestRectangle (el->box, td);
+	      int affecting_tiles = tcovbuf->AddWriteQueueTest (testrect_data,
+	      	  td, el->relevant);
+	      if (tiles_remaining > 0)
+	        tiles_remaining -= affecting_tiles;
+	    }
+	    else
+	    {
+	      el->relevant = false;
+	    }
+	    el = el->next;
+	  }
+	  if (tiles_remaining <= 0) use_wq = true;
+	}
+
 	// If the write queue is enabled we try to see if there
 	// are occluders that are relevant (intersect with this object
 	// to test). We will insert those object with the coverage
 	// buffer and test again.
-	float out_depth;
-	csVisibilityObjectWrapper* qobj = (csVisibilityObjectWrapper*)
-	    	write_queue->Fetch (sbox, min_depth, out_depth);
-	if (qobj)
+	if (use_wq)
 	{
-#         ifdef CS_DEBUG
-	  if (do_state_dump)
+	  float out_depth;
+	  csVisibilityObjectWrapper* qobj = (csVisibilityObjectWrapper*)
+	    	write_queue->Fetch (sbox, min_depth, out_depth);
+	  if (qobj)
 	  {
-	    printf ("Adding objects from write queue!\n");
-	    fflush (stdout);
-	  }
-#         endif
-	  // We have found one such object. Insert them all.
-	  do
-	  {
-	    // Yes! We found such an object. Insert it now.
-	    if (do_cull_coverage == COVERAGE_POLYGON
-			|| !qobj->use_outline_filler)
-	      UpdateCoverageBuffer (data->rview->GetCamera (), qobj->visobj,
-		    qobj->model);
-	    else
-	      UpdateCoverageBufferOutline (data->rview->GetCamera (),
-		    qobj->visobj, qobj->model);
-	      // Now try again.
-            rc = tcovbuf->TestRectangle (testrect_data, min_depth);
-            if (!rc)
+#           ifdef CS_DEBUG
+	    if (do_state_dump)
 	    {
-	      // It really is invisible.
-	      obj->MarkInvisible (INVISIBLE_TESTRECT);
-	      vis = false;
-              goto end;
+	      printf ("Adding objects from write queue!\n");
+	      fflush (stdout);
 	    }
-	    qobj = (csVisibilityObjectWrapper*)
-	    	  write_queue->Fetch (sbox, min_depth, out_depth);
+#           endif
+	    // We have found one such object. Insert them all.
+	    do
+	    {
+	      // Yes! We found such an object. Insert it now.
+	      UpdateCoverageBuffer (data->rview->GetCamera (), qobj);
+	      // Now try again.
+              rc = tcovbuf->TestRectangle (testrect_data, min_depth);
+              if (!rc)
+	      {
+	        // It really is invisible.
+	        obj->MarkInvisible (INVISIBLE_TESTRECT);
+	        vis = false;
+                goto end;
+	      }
+	      qobj = (csVisibilityObjectWrapper*)
+	    	    write_queue->Fetch (sbox, min_depth, out_depth);
+	    }
+	    while (qobj);
 	  }
-	  while (qobj);
 	}
       }
     }
@@ -1194,12 +1236,7 @@ end:
       {
         // Let it update the coverage buffer if we
         // are using cull_coverage.
-	if (do_cull_coverage == COVERAGE_POLYGON || !obj->use_outline_filler)
-          UpdateCoverageBuffer (data->rview->GetCamera (), obj->visobj,
-    	      obj->model);
-        else
-          UpdateCoverageBufferOutline (data->rview->GetCamera (), obj->visobj,
-      	      obj->model);
+        UpdateCoverageBuffer (data->rview->GetCamera (), obj);
       }
     }
   }

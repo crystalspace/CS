@@ -31,6 +31,7 @@ struct csWriteQueueElement
   csBox2 box;
   float depth;
   void* obj;
+  bool relevant;	// Can be used externally to mark items relevant.
 };
 
 /**
@@ -74,8 +75,17 @@ public:
    * Returns the object if something was found or 0 otherwise.
    * When an object is found 'out_depth' will be set to the
    * depth of that object.
+   * <p>
+   * Note that the 'relevant' field in csWriteQueueElement will be
+   * used by this function so make sure you initialize this correctly.
    */
   void* Fetch (const csBox2& box, float depth, float& out_depth);
+
+  /**
+   * Get the first object in the write queue. This is the object
+   * with the lowest depth.
+   */
+  csWriteQueueElement* GetFirst () const { return queue_min; }
 
   /**
    * Test if there is an object in the queue that might affect
