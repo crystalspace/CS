@@ -12,9 +12,13 @@ chronological order.
 	  problems with the embedded structures.
 	- Eric Sunshine fixed bug in bfdplugins.cpp.  csGetPluginMetaData()
 	  was leaking `buf' if errors occurred.
+	- Eric Sunshine upgraded Doxygen comments for cscmdPreProcess,
+	  csProcess, cscmdPostProcess, or cscmdFinalProcess so that they
+	  mention that CSMASK_FrameProcess is needed to receive these
+	  pseudo-events.
 24-Aug-2003
 	- Luca added the CSTOOL library dependency to maya2spr makefile.
-	- Luca reverted his latest commit because the cstool library is not 
+	- Luca reverted his latest commit because the cstool library is not
 	  required by maya2spr.
 	- Marten Svanfeldt commited a change to the cullers. Now
 	  VisTest(iRenderView) takes an additional parameter, a callback to be
@@ -47,7 +51,7 @@ chronological order.
 	  public (bug found by res).
 	- res made the following changes:
 	    - Updated iFont to support Unicode characters. Also, glyph metrics
-	      are now differentiated between glyph- and bitmap-specific 
+	      are now differentiated between glyph- and bitmap-specific
 	      metrics. Glyph metrics are the same for mono and gray bitmaps,
 	      but bitmap metrics aren't.
 	    - Updated canvases (actually, font caches) for the iFont changes.
@@ -59,23 +63,23 @@ chronological order.
 	    - Added the GNOME fonts (Bitstream Vera families) and GNU Unifont
 	      to the repository.
 	    - Changed csHashMap::FindLargerPrime() to return the number passed
-	      in if it's already a prime (and renamed the function to 
+	      in if it's already a prime (and renamed the function to
 	      FindNextPrime())
 	    - csEvent constructs it's 'attributes' hash map a smaller size.
 	      This should reduce it's memory requirements a bit.
-	- res forgot to update makedep after removing the stdio aliases from 
+	- res forgot to update makedep after removing the stdio aliases from
 	  the Win32 port.
 	- res made csHash<> a friend class of csHash<>:: Iterator and
 	  GlobalIterator.
-	- res fixed the GL font cache to properly display glyphs from mixed 
+	- res fixed the GL font cache to properly display glyphs from mixed
 	  font.
 	- res updated csutil/hashmap.h. Oops.
 	- res made the following changes:
 	    - Fixed font caches to deal with font size changes.
 	    - Added a FreeFont2 test to g2dtest.
 	- res removed an 'unused variable' warning in the GL font cache.
-	- res fixed the cssocket plugin. The recent changes added the use of 
-	  a IN_MULTICAST() macro. However, this macro is a WinSock2 addition. 
+	- res fixed the cssocket plugin. The recent changes added the use of
+	  a IN_MULTICAST() macro. However, this macro is a WinSock2 addition.
 	  Added a #definition for it (if not already present.)
 22-Aug-2003
 	- Oktal fixed a couple of typos in the Perl plugin, and fixed a bit of
@@ -120,13 +124,13 @@ chronological order.
 	- Eric Sunshine fixed bug in csTypedObjectIterator where pure virtual
 	  method GetRequestedInterface() was called by constructor.
 	- Troy in odedynam: Fixed longstanding memory leak with float arrays.
-	  Altered iDynamicSystem::CreateBody to prevent extra references from 
+	  Altered iDynamicSystem::CreateBody to prevent extra references from
 	  being created (thanks to Eric Sunshine on this one).
-	- Troy in ivaria/dynamics.h added comments to iDynamicSystem 
+	- Troy in ivaria/dynamics.h added comments to iDynamicSystem
 	  'AttachCollider' methods so they appear in API docs.
 	- Keith fixed sprcal3d for missing iLODControl and added a better
 	  error message on missing name attribute in <animation> tag.
-	- DeSigna changed all instances of type unsigned in the picogui plugin 
+	- DeSigna changed all instances of type unsigned in the picogui plugin
 	  to uint32.
 	- DeSigna changed all instances of uint32 in the picogui plugin to
 	  __u32.
@@ -176,11 +180,11 @@ chronological order.
 	- res changed winthread.cpp to use _beginthreadex() instead of
 	  _beginthread(). _beginthreadex() acts a bit more like CreateHandle().
 	  However, it also requires a manual CloseHandle(), which is done
-	  at destruction time. Thus, threads that don't run any more should be 
+	  at destruction time. Thus, threads that don't run any more should be
 	  destructed as soon as possible.
-	- Troy in odedynam, added DestroyGeoms() to RigidBody and 
-	  DynamicSystem destructors.  Allows rigidbodies to be removed from 
-	  system w/out crashing ODE.  Also added call to delete polytree, 
+	- Troy in odedynam, added DestroyGeoms() to RigidBody and
+	  DynamicSystem destructors.  Allows rigidbodies to be removed from
+	  system w/out crashing ODE.  Also added call to delete polytree,
           taking care of memory leak from polytree optimization.
 17-Aug-2003
 	- Jorrit fixed a bug in csIntersect3::IntersectTriangle(). In
@@ -193,7 +197,7 @@ chronological order.
 	- Eric Sunshine fixed glosx2d makefile and Jamfile so that the plugin
 	  now links against csgeom.  This is necessary as a result of recent
 	  changes (probably the recent work on the font caching machinery).
-	- Troy in odedynam.cpp removed call to dGeomSetBody in 
+	- Troy in odedynam.cpp removed call to dGeomSetBody in
 	  AttachColliderPlane to prevent 'non-placeable geom' error.
 	- Eric Sunshine fixed csutil/symtable.cpp so that it compiles under
 	  gcc 2.95.  Problem was that 'values.Push(s ? s->Val : 0)' was
@@ -211,13 +215,13 @@ chronological order.
 	- Jorrit fixed a bug in the static lod code.
 	- Jorrit disabled the assembly routines in Dynavis on linux.
 	  They don't appear to work (crash).
-	- Troy in dynamics.h added brief comments to iRigidBody 
+	- Troy in dynamics.h added brief comments to iRigidBody
 	  AttachCollider methods to allow them to appear in API docs.
-	- res improved 'detection' of what font cache has to be used for 
+	- res improved 'detection' of what font cache has to be used for
 	  software canvases.
 	- res made the following changes:
 	    - WriteString() now wraps WriteStringBaseline() on all canvas.
-	    - The surrogate check macros in cssys/csunicode.h didn't honor 
+	    - The surrogate check macros in cssys/csunicode.h didn't honor
 	      that characters can get wider than 16 bits.
 	- Jorrit added the following commands to walktest console:
 	    - varlist: list all variables currently defined in the engine and
@@ -226,9 +230,9 @@ chronological order.
 	    - setvar: set a floating point value to a variable.
 	    - setvarc: set a color value to a variable.
 	    - setvarv: set a vector value to a variable.
-	- res fixed the missing SetLimit() compile error in 
+	- res fixed the missing SetLimit() compile error in
 	  apps/demosky/demosky.cpp.
-	- res added dummies for the new LOD functions to 
+	- res added dummies for the new LOD functions to
 	  csIsoMeshFactoryWrapper.
 	- res fixed compile errors on MSVC6 related to the new font caches.
 	- Oktal removed iShaderVariable and moved csShaderVariable from
@@ -247,7 +251,7 @@ chronological order.
 	  most features mentioned in the feature list. That way the
 	  feature list is a good starting point to find out how to do
 	  something.
-	- Troy altered csODERigidBody class altered to use 'spaces' instead 
+	- Troy altered csODERigidBody class altered to use 'spaces' instead
 	  of geom groups. (geom groups are deprecated in ode now).  This
 	  corrects problem with non-placeable geom error messages from debug
 	  build of ode.
@@ -256,12 +260,12 @@ chronological order.
 	- Matze changed opengl texture manager to scale up instead of scaling
 	  down when fixing non-po2 textures.
 	- res removed the printf() & siblings aliasing from Win32 csosdefs.h.
-	  Instead, csPrintf() now care about proper UTF-8 output. 
-	- Troy in odedynam, altered NearCallBack to set slip1 and slip2 to 
+	  Instead, csPrintf() now care about proper UTF-8 output.
+	- Troy in odedynam, altered NearCallBack to set slip1 and slip2 to
 	  SMALL_EPSILON.  slip1 & 2 are for simulating lateral car tire skid.
 	  This inhibits this behaviour.  Better (todo) will be to expose it
 	  similar to softness.
-	- Troy in physldr.cpp added softness parameter to ParseCollider & 
+	- Troy in physldr.cpp added softness parameter to ParseCollider &
 	  ParseSystemColliderMesh.  Will add softness to remaining colliders
 	  when i get tests built for them.
 	- Jorrit added documentation about static lod.
@@ -297,7 +301,7 @@ chronological order.
 	  - Fixed pgserver plugin to compile ok on Linux. There may
 	    still be library problems, depending on pgserver build config.
 	  - Fixed segfaulting problems at pgui plugin unloading (temp
-	    fix). 
+	    fix).
 	  - Patched in changes suggested by Dentoid to increase frame
 	    update speed.
 	- res fixed the crash bug when using '-mode' cmdline parameter with
@@ -362,7 +366,7 @@ chronological order.
 	  should be larger then all objects that are inside it.
 	- DeSigna made SCF emit a proper diagnostic error message when
 	  it cannot load a library, not just on symbol-loading
-	  errors. Tested on Linux. 
+	  errors. Tested on Linux.
 	- Jorrit fixed a bug in csMeshWrapper::GetSquaredDistance() (which
 	  was previously in CheckImposterRelevant()). It would not calculate
 	  the distance correctly as it was basing itself on a world space
@@ -417,7 +421,7 @@ chronological order.
 	- Jorrit fixed a bug in the csTypedObjectIterator class. It would
 	  often return 0 in the Next() method even if there were more objects.
 	- res made the following changes:
-	    - Leak fixes. After the recent array changes, csStringArray 
+	    - Leak fixes. After the recent array changes, csStringArray
 	      allocates a copy of a Push()ed string. However, in some places
 	      was still code like "stringarray.Push (csStrNew (string));",
 	      causing leaks.
@@ -428,20 +432,20 @@ chronological order.
 	    - Fixed a bug in the UTF transformer that caused the last char to
 	      be cut off.
 	    - Typo fix in csunicode.h.
-	    - Win32 port won't try to change the console codepage to UTF-8 
+	    - Win32 port won't try to change the console codepage to UTF-8
 	      anymore. Problem with the UTF-8 codepage is that it requires
 	      a "TrueType" console font, but default is "Raster".
-	    - The yellow warning boxes used to display a trailing '\n' 
-	      character (appearing as a small note when using csfont font 
+	    - The yellow warning boxes used to display a trailing '\n'
+	      character (appearing as a small note when using csfont font
 	      server.)
 	    - Tweaked csSubRectangles2 a bit more.
 	    - Updated documentation in reporter.h.
-	    - csReport() prints "WARNING: " etc. in front of messages if 
+	    - csReport() prints "WARNING: " etc. in front of messages if
 	      falling back to the console.
 	    - Added a new, almost-from-scratch font cache, currently only for
 	      OpenGL. Instead just putting all glyphs of a font onto a texture
 	      (not that practical when fonts with a wider range of supported
-	      Unicode glyphs are used), the new system is more "cache-like" 
+	      Unicode glyphs are used), the new system is more "cache-like"
 	      and dynamically adds glyph images to the texture and removes
 	      the least recently used glyphs when the max. allowed space
 	      doesn't suffice when a new glyph is to be added.
@@ -524,14 +528,14 @@ chronological order.
 	  csStringArray<const char*,...>.
 	- Jorrit made copy constructor, assignment operator and Section()
 	  in csPDelArray private so that people cannot mistakenly use those.
-	- res further worked on NR materials & shader variables. Changes 
+	- res further worked on NR materials & shader variables. Changes
 	  include:
 	    - Creation of material handles from texture handles fixed.
 	    - Added a generic implementation for iShaderBranch.
 	    - Enhanced the default shader variable implementation so "casting"
 	      takes place. E.g. you can set the value as a single float, but
-	      requesting a Vector3 will work (in this case, all components 
-	      have the same value.)	      
+	      requesting a Vector3 will work (in this case, all components
+	      have the same value.)
 7-Aug-2003
 	- Jorrit did the following array related changes:
 	    - Added Put() to csArray.

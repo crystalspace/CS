@@ -92,17 +92,17 @@ enum
  * per-frame processing.
  * @{ */
 /**
- * Event mask: Empty event.  If a plugin registers to receive this kind of events via
- * iEventQueue::RegisterListener(plugin, CSMASK_Nothing) this has a special
- * meaning: the plugin will be called at the start of every frame and at the
- * end of every frame with an csevBroadcast event with the Event.Command.Code
- * equal to either cscmdPreProcess or cscmdPostProcess.
+ * Event mask: Empty event.  If a plugin registers to receive this kind of
+ * events via iEventQueue::RegisterListener(plugin, CSMASK_Nothing) this has a
+ * special meaning: the plugin will be called at the start of every frame and
+ * at the end of every frame with an csevBroadcast event with the
+ * Event.Command.Code equal to either cscmdPreProcess or cscmdPostProcess.
  */
 #define CSMASK_Nothing		(1 << csevNothing)
 /**
  * The plugin will be called at the start of every frame and at the
  * end of every frame with an csevBroadcast event with the Event.Command.Code
- * equal to either cscmdPreProcess or cscmdPostProcess.
+ * equal to cscmdPreProcess, csProcess, cscmdPostProcess, or cscmdFinalProcess.
  */
 #define CSMASK_FrameProcess	CSMASK_Nothing
 /// Key down events
@@ -382,24 +382,28 @@ enum
 
   /**
    * Broadcasted before cscmdProcess -- on every frame --
-   * as Event.Command.Code of a broadcast event.
+   * as Event.Command.Code of a broadcast event.  Use the event mask
+   * CSMASK_FrameProcess to receive this pseudo-event.
    */
   cscmdPreProcess,
 
   /**
    * Broadcasted every frame as Event.Command.Code of a broadcast event.
+   * Use the event mask CSMASK_FrameProcess to receive this pseudo-event.
    */
   cscmdProcess,
 
   /**
    * Broadcasted after cscmdProcess -- on every frame --
-   * as Event.Command.Code of a broadcast event.
+   * as Event.Command.Code of a broadcast event.  Use the event mask
+   * CSMASK_FrameProcess to receive this pseudo-event.
    */
   cscmdPostProcess,
 
   /**
    * Broadcasted after cscmdPostProcess -- on every frame --
-   * as Event.Command.Code of a broadcast event.
+   * as Event.Command.Code of a broadcast event.  Use the event mask
+   * CSMASK_FrameProcess to receive this pseudo-event.
    */
   cscmdFinalProcess,
 
