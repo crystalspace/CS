@@ -43,7 +43,19 @@ csLibraryHandle csLoadLibrary (const char* iName)
   csLibraryHandle handle;
   DWORD errorCode;
 
-  handle = LoadLibraryEx (iName, 0, LOADLIBEX_FLAGS);
+  CS_ALLOC_STACK_ARRAY (char, dllPath, strlen (iName) + 5);
+  strcpy (dllPath, iName);
+  char* dot = strrchr (dllPath, '.');
+  if (dot && (strcasecmp (dot, ".dll") != 0))
+  {
+    strcpy (dot, ".dll");
+  }
+  else
+  {
+    strcat (dllPath, ".dll");
+  }
+
+  handle = LoadLibraryEx (dllPath, 0, LOADLIBEX_FLAGS);
   errorCode = GetLastError();
 
 #ifdef __CYGWIN__
@@ -64,7 +76,7 @@ csLibraryHandle csLoadLibrary (const char* iName)
      return 0;
    }
    SetEnvironmentVariable("PATH", DLLDIR);
-   handle = LoadLibraryEx (iName, 0, LOADLIBEX_FLAGS);
+   handle = LoadLibraryEx (dllPath, 0, LOADLIBEX_FLAGS);
    errorCode = GetLastError();
    SetEnvironmentVariable("PATH", OLD_PATH);
    delete[] DLLDIR;
@@ -81,7 +93,7 @@ csLibraryHandle csLoadLibrary (const char* iName)
         (LPTSTR) &buf, 0, 0);
     char *str = new char[strlen(buf) + strlen(iName) + 50];
     sprintf (str, "LoadLibraryEx('%s') error %d: %s",
-	iName, (int)errorCode, buf);
+	dllPath, (int)errorCode, buf);
     ErrorMessages.Push (str);
     LocalFree (buf);
     return 0;
@@ -95,7 +107,7 @@ csLibraryHandle csLoadLibrary (const char* iName)
     const char *noPluginCompiler =
       "%s: DLL does not export \"plugin_compiler\".\n";
     char *msg = new char[strlen(noPluginCompiler) + strlen(iName)];
-    sprintf (msg, noPluginCompiler, iName);
+    sprintf (msg, noPluginCompiler, dllPath);
     ErrorMessages.Push (msg);
     FreeLibrary ((HMODULE)handle);
     return 0;
@@ -108,7 +120,7 @@ csLibraryHandle csLoadLibrary (const char* iName)
       CS_COMPILER_NAME "\n";
     char *msg = new char[strlen(compilerMismatch) + strlen(iName) + 
       strlen(plugin_compiler)];
-    sprintf (msg, compilerMismatch, iName, plugin_compiler);
+    sprintf (msg, compilerMismatch, dllPath, plugin_compiler);
     ErrorMessages.Push (msg);
     FreeLibrary ((HMODULE)handle);
     return 0;
@@ -237,47 +249,56 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
   csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
     (new csTinyDocumentSystem ());
 
+  CS_ALLOC_STACK_ARRAY (char, dllPath, strlen (fullPath) + 5);
+  strcpy (dllPath, fullPath);
+  char* dot = strrchr (dllPath, '.');
+  if (dot && (strcasecmp (dot, ".dll") != 0))
+  {
+    strcpy (dot, ".dll");
+  }
+  else
+  {
+    strcat (dllPath, ".dll");
+  }
+
   csRef<iString> result = 
-    InternalGetPluginMetadata (fullPath, metadata, docsys);
+    InternalGetPluginMetadata (dllPath, metadata, docsys);
 
   /* Check whether a .csplugin file exists as well */
 
-  CS_ALLOC_STACK_ARRAY (char, cspluginPath, strlen (fullPath) + 10);
-  strcpy (cspluginPath, fullPath);
-  char* dot = strrchr (cspluginPath, '.');
-  if (dot && (strcasecmp (dot, ".dll") == 0))
+  CS_ALLOC_STACK_ARRAY (char, cspluginPath, strlen (dllPath) + 10);
+  strcpy (cspluginPath, dllPath);
+  dot = strrchr (cspluginPath, '.');
+  strcpy (dot, ".csplugin");
+  csPhysicalFile file (cspluginPath, "rb");
+
+  if (file.GetStatus() == VFS_STATUS_OK)
   {
-    strcpy (dot, ".csplugin");
-    csPhysicalFile file (cspluginPath, "rb");
-
-    if (file.GetStatus() == VFS_STATUS_OK)
+    if (metadata != 0)
     {
-      if (metadata != 0)
-      {
-	csString errstr;
-	errstr.Format ("'%s' contains embedded metadata, "
-	  "but external '%s' exists as well. Ignoring the latter.",
-	  fullPath, cspluginPath);
+      csString errstr;
+      errstr.Format ("'%s' contains embedded metadata, "
+	"but external '%s' exists as well. Ignoring the latter.",
+	fullPath, cspluginPath);
 
-	result.AttachNew (new scfString (errstr));
+      result.AttachNew (new scfString (errstr));
+    }
+    else
+    {
+      csRef<iDocument> doc = docsys->CreateDocument();
+      char const* errmsg = doc->Parse (&file);
+
+      if (errmsg == 0)
+      {
+	metadata = doc;
       }
       else
       {
-	csRef<iDocument> doc = docsys->CreateDocument();
-	char const* errmsg = doc->Parse (&file);
+	csString errstr;
+	errstr.Format ("Error parsing metadata from '%s': %s",
+	  cspluginPath, errmsg);
 
-	if (errmsg == 0)
-	{
-	  metadata = doc;
-	}
-	else
-	{
-	  csString errstr;
-	  errstr.Format ("Error parsing metadata from '%s': %s",
-	    cspluginPath, errmsg);
-
-	  result.AttachNew (new scfString (errstr));
-	}
+	result.AttachNew (new scfString (errstr));
       }
     }
   }

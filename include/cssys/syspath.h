@@ -97,26 +97,31 @@ struct csPluginPath
    * Has to be allocated with csStrNew() or new[].
    */
   char* path;
+  /// "Type" of the directory (e.g. app, crystal ...)
+  char* type;
   /// Whether this path should be recursively scanned for plugins.
   bool scanRecursive;
   
-  csPluginPath () : path (0), scanRecursive (false) {}
-  csPluginPath (const char* path, bool recursive = false)
+  csPluginPath () : path (0), type(0), scanRecursive (false) {}
+  csPluginPath (const char* path, const char* type, bool recursive = false)
   {
     csPluginPath::path = csStrNew (path);
+    csPluginPath::type = csStrNew (type);
     scanRecursive = recursive;
   };
-  csPluginPath (char* path, bool recursive = false)
+  csPluginPath (char* path, char* type, bool recursive = false)
   {
     csPluginPath::path = path;
+    csPluginPath::type = type;
     scanRecursive = recursive;
   };
   csPluginPath (const csPluginPath& src)
   {
     path = csStrNew (src.path);
+    type = csStrNew (src.type);
     scanRecursive = src.scanRecursive;
   };
-  ~csPluginPath () { delete[] path; }
+  ~csPluginPath () { delete[] path; delete[] type; }
 };
 
 /**
@@ -139,7 +144,7 @@ public:
    * \remark Uses csPathsIdentical() to compare paths.
    */
   int AddOnce (const char* path, bool scanRecursive = false, 
-    bool overrideRecursive = true)
+    const char* type = 0, bool overrideRecursive = true)
   {
     if (path == 0) return -1;
     char* pathExpanded = csExpandPath (path);
@@ -154,13 +159,14 @@ public:
 	{
 	  paths[i].scanRecursive = scanRecursive;
 	}
+	paths[i].type = csStrNew (type);
 	delete[] pathExpanded;
   
 	return i;
       }
     }
   
-    csPluginPath pluginPath (pathExpanded, scanRecursive);
+    csPluginPath pluginPath (pathExpanded, csStrNew (type), scanRecursive);
     return (paths.Push (pluginPath));
   }
   

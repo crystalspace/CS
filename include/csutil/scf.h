@@ -841,6 +841,17 @@ struct iSCF : public iBase
    */
   virtual void ScanPluginsPath (const char* path, bool recursive = false,
     const char* context = 0) = 0;
+    
+  /**
+   * Register a single plugin.
+   * \param path (Almost) fully qualified native path to the plugin binary. 
+   *   'Almost' because it doesn't have to be the actual binary - it is 
+   *   sufficient if the file name suffix is ".csplugin", no matter what
+   *   the real extension for binaries on a platform is or whether there
+   *   actually is an external .csplugin file.
+   * \return Whether loading of the plugin was successful.
+   */
+  virtual bool RegisterPlugin (const char* path) = 0;
 };
 
 SCF_VERSION (iFactory, 0, 0, 1);

@@ -35,20 +35,20 @@ csPluginPaths* csGetPluginPaths (const char* argv0)
    */
   if (appPath && *appPath && (*appPath != PATH_SEPARATOR))
   {
-    paths->AddOnce (appPath, true);
+    paths->AddOnce (appPath, true, "app");
   }
 
   if (configPath)
   {
     csString tmp;
     tmp << configPath << PATH_SEPARATOR << "lib";
-    paths->AddOnce (tmp, true);
+    paths->AddOnce (tmp, true, "crystal");
 
     tmp.Clear();
     tmp << configPath << PATH_SEPARATOR << "crystal";
-    paths->AddOnce (tmp, true);
+    paths->AddOnce (tmp, true, "crystal");
 
-    paths->AddOnce (configPath);
+    paths->AddOnce (configPath, false, "crystal");
     
     delete[] configPath;
   }

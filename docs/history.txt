@@ -40,6 +40,8 @@ The history order is reversed so that new features are at the top.
 	    - Improved 'context' handling a bit.
 	    - Added iSCF->ScanPluginsPath() for convenience.
 	    - Fixed general csGetAppPath () to return 0 on an empty argv[0].
+	- res added the ability to load a single plugin and further improved
+	  SCF factory 'contexts'.
 18-Jun-2003
 	- Jorrit added a new 'do_logo' command to walktest. Assigned 'l' key
 	  to it. This command toggles the display of the logo.

@@ -99,18 +99,18 @@ csPluginPaths* csGetPluginPaths (const char* argv0)
  
   if (!crystal)
   {
-    paths->AddOnce (CS_PLUGINDIR, true);
-    paths->AddOnce (".");
+    paths->AddOnce (CS_PLUGINDIR, true, "plugins");
+    paths->AddOnce (".", false, "this");
  
     return paths;
   }
  
-  paths->AddOnce (crystal);
+  paths->AddOnce (crystal, false, "crystal");
   char* temp = new char[1024];
   strncpy (temp, crystal, 1000);
   strcat (temp, "/lib");
-  paths->AddOnce (temp, true);
-  paths->AddOnce (".");
+  paths->AddOnce (temp, true, "crystal");
+  paths->AddOnce (".", "this");
  
   return paths;
 }

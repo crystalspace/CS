@@ -88,6 +88,7 @@ public:
   virtual scfInterfaceID GetInterfaceID (const char *iInterface);
   virtual void Finish ();
   virtual iStrVector* QueryClassList (char const* pattern);
+  virtual bool RegisterPlugin (const char* path);
 };
 
 #ifndef CS_STATIC_LINKED
@@ -461,7 +462,7 @@ static void scfScanPlugins (csPluginPaths* pluginPaths, const char* context)
       for (j = 0; j < metadata.Length(); j++)
       {
 	PrivateSCF->RegisterClasses (plugins->Get (j), metadata[j], 
-	  context ? context : (*pluginPaths)[i].path);
+	  context ? context : (*pluginPaths)[i].type);
       }
     }
   #endif
@@ -673,8 +674,8 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
     if (SameContext (cf->classContext, contextID))
     {
       fprintf (stderr,
-	"SCF_WARNING: class %s has already been registered in the same context\n", 
-	iClassID);
+	"SCF_WARNING: class %s has already been registered in the same context ('%s')\n", 
+	iClassID, context);
     }
     else
     {
@@ -687,9 +688,10 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
     #ifdef CS_DEBUG
       // @@@ some way to have this warning in non-debug builds would be nice.
       fprintf (stderr,
-	"SCF_NOTIFY: class %s has already been registered in a different context "
+	"SCF_NOTIFY: class %s has already been registered in a different context ('%s' vs '%s') "
 	"(this message appears only in debug builds)\n", 
-	iClassID);
+	iClassID, context, 
+	(cf->classContext != csInvalidStringID) ? contexts.Request (cf->classContext) : 0);
     #endif
     }
     return false;
@@ -714,18 +716,23 @@ bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
     if (SameContext (cf->classContext, contextID))
     {
       fprintf (stderr,
-	"SCF_WARNING: class %s has already been registered in the same context\n", 
-	iClassID);
+	"SCF_WARNING: class %s has already been registered in the same context (%s)\n", 
+	iClassID, context);
     }
     else
     {
-      // See notice in other RegisterClass()
+      /*
+        The user may want to override a standard CS plugin by putting
+	a plugin exhibiting the same class ID into the e.g. app directory.
+	In this case a warning is probably not desired. But for debugging
+	purposes we emit something.
+       */
     #ifdef CS_DEBUG
       // @@@ some way to have this warning in non-debug builds would be nice.
       fprintf (stderr,
-	"SCF_NOTIFY: class %s has already been registered in a different context "
+	"SCF_NOTIFY: class %s has already been registered in a different context (%s vs %s) "
 	"(this message appears only in debug builds)\n", 
-	iClassID);
+	iClassID, context, contexts.Request (cf->classContext));
     #endif
     }
     return false;
@@ -787,6 +794,24 @@ void csSCF::ScanPluginsPath (const char* path, bool recursive,
   csPluginPaths paths;
   paths.AddOnce (path, recursive);
   scfScanPlugins (&paths, context);
+}
+
+bool csSCF::RegisterPlugin (const char* path)
+{
+  csRef<iDocument> metadata;
+  csRef<iString> msg;
+
+  if ((msg = csGetPluginMetadata (path, metadata)) != 0)
+  {
+    fprintf (stderr,
+      "SCF_ERROR: couldn't retrieve metadata for '%s': %s\n", 
+      path, msg->GetData ());
+    return false;
+  }
+
+  RegisterClasses (path, metadata);
+
+  return true;
 }
 
 const char *csSCF::GetClassDescription (const char *iClassID)
