@@ -89,7 +89,7 @@ public:
   virtual bool FreeItem (csSome Item);
   /// Compare two array elements in given Mode
   virtual int Compare (csSome Item1, csSome Item2, int Mode) const;
-  /// Compare a entry with a key; for csVector just compare (int)Key vs (int)Item
+  /// Compare entry with a key; for csVector just compare (int)Key vs (int)Item
   virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
 };
 
@@ -147,35 +147,45 @@ inline void csVector::QuickSort (int Mode)
     QuickSort (0, count - 1, Mode);
 }
 
-/* This macro will create a typesafe wrapper for csVector
- * This class will only manage pointers to Types, but this is still better than
- * nothing.
+/* These macros will create a type-safe wrapper for csVector which manages
+ * pointers to some type.
  *
- * For example, if you want to use a csVector, that contains pointers to integers,
- * you could just add the following line to your header:
- * DECLARE_TYPED_VECTOR(int)
- * this wil declare a new class called csVector_int for you, which can be used just
- * like csVector, just without that nasty casting.
+ * Usage: DECLARE_TYPED_VECTOR(NAME,TYPE)
+ *   NAME - Name of the new vector class.
+ *   TYPE - Data type to which this vector of pointers refer.
+ *
+ *   Declares a new vector type NAME as a subclass of csVector.  Elements of
+ *   this vector are pointer to TYPE.
+ *
+ * Usage: DECLARE_TYPED_VECTOR_WITH_BASE(NAME,TYPE,BASE)
+ *   NAME - Name of the new vector class.
+ *   TYPE - Data type to which this vector of pointers refer.
+ *   BASE - Base class of this new class (typically csVector).
+ *
+ *   Declares a new vector type NAME as a subclass of BASE.  Elements of
+ *   this vector are pointer to TYPE.
  */
-#define DECLARE_TYPED_VECTOR(TYPE) \
-class csVector_##TYPE : protected csVector \
+#define DECLARE_TYPED_VECTOR_WITH_BASE(NAME,TYPE,BASE) \
+class NAME : protected BASE \
 { \
 public: \
-  csVector_##TYPE(int ilimit = 8, int ithreshold = 16) : csVector(ilimit, ithreshold) {} \
-  inline TYPE*& operator [] (int n) {return (TYPE*&) csVector::operator[](n);} \
-  inline TYPE*& Get (int n) const   {return (TYPE*&) csVector::Get(n);} \
+  NAME(int ilimit = 8, int ithreshold = 16) : BASE(ilimit, ithreshold) {} \
+  inline TYPE*& operator [] (int n) {return (TYPE*&)BASE::operator[](n);} \
+  inline TYPE*& Get (int n) const   {return (TYPE*&)BASE::Get(n);} \
   inline TYPE*& operator [] (int n) const { return Get(n); } \
-  void SetLength (int n) {csVector::SetLength(n);} \
-  inline int Length () const {return csVector::Length();} \
-  int Find (TYPE* which) const {return csVector::Find(which);} \
-  int FindKey (const TYPE* value) const {return csVector::FindKey(value);}\
-  inline void Push (TYPE* what) {csVector::Push(what);}\
-  inline TYPE* Pop () {return (TYPE*)csVector::Pop();}\
-  bool Delete (int n) {return csVector::Delete(n);}\
-  void DeleteAll () {csVector::DeleteAll();}\
-  bool Insert (int n, TYPE* Item) {return csVector::Insert(n, Item);}\
-  virtual bool FreeItem (TYPE* Item) {return csVector::FreeItem(Item);}\
-  virtual bool Equal (TYPE* Item, const TYPE* Key) const {return csVector::Equal(Item, Key);}\
+  void SetLength (int n) {BASE::SetLength(n);} \
+  inline int Length () const {return BASE::Length();} \
+  int Find (TYPE* which) const {return BASE::Find(which);} \
+  int FindKey (const TYPE* value) const {return BASE::FindKey(value);} \
+  inline void Push (TYPE* what) {BASE::Push(what);} \
+  inline TYPE* Pop () {return (TYPE*)BASE::Pop();} \
+  bool Delete (int n) {return BASE::Delete(n);} \
+  void DeleteAll () {BASE::DeleteAll();} \
+  bool Insert (int n, TYPE* Item) {return BASE::Insert(n, Item);} \
+  virtual bool FreeItem (TYPE* Item) {return BASE::FreeItem(Item);} \
 };
+
+#define DECLARE_TYPED_VECTOR(NAME,TYPE) \
+  DECLARE_TYPED_VECTOR_WITH_BASE(NAME,TYPE,csVector)
 
 #endif // __CSVECTOR_H__
