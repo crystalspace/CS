@@ -62,6 +62,7 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed botched OSS.AVAILABLE available test which was
 	  just added to configure.ac.  The botched test only covered two of the
 	  three cases.
+	- Small optimization in the OpenGL superlightmap cache.
 27-Jan-2003
 	- Restored number of super lightmaps in OpenGL to 10 again. Apparently
 	  16 was too much for cards with less texture memory. We have to find

@@ -395,7 +395,7 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
           int lmwidth = lm->GetWidth();
           int lmheight = lm->GetHeight();
           csRGBpixel* lm_data = lm->GetMapData();
-          csRect r = rectangleArray[i];
+          csRect& r = rectangleArray[i];
           csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D,
 	  	SLMHandle);
           glTexSubImage2D (GL_TEXTURE_2D, 0, r.xmin, r.ymin,
@@ -437,7 +437,7 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
     int lmwidth = lm->GetWidth ();
     int lmheigth = lm->GetHeight ();
     csRGBpixel* lm_data = lm->GetMapData ();
-    csRect r = rectangleArray[i];
+    csRect& r = rectangleArray[i];
     csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, SLMHandle);
     glTexSubImage2D (GL_TEXTURE_2D, 0, r.xmin, r.ymin,
       lmwidth, lmheigth, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
