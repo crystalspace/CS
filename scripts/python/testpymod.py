@@ -104,7 +104,10 @@ def FinishFrame ():
 
 def HandleEvent (ev):
     if DEBUG: print 'HandleEvent called'
-    if ev.Type == csevKeyDown and ev.Key.Code == CSKEY_ESC:
+    if ((ev.Type  == csevKeyboard ) and
+        (csKeyEventHelper.GetEventType(ev) == csKeyEventTypeDown) and
+        (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
+        
         q  = CS_QUERY_REGISTRY(object_reg, iEventQueue)
         if q:
             q.GetEventOutlet().Broadcast(cscmdQuit)

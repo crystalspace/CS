@@ -102,6 +102,7 @@
 #include "ivaria/dynamics.h"
 #include "ivaria/engseq.h"
 #include "iutil/cache.h"
+#include "csutil/event.h"
 #include "csutil/xmltiny.h"
 #include "igeom/objmodel.h"
 #include "inetwork/sockerr.h"
@@ -227,6 +228,7 @@
 // of OUTPUT.
 
 // output arguments
+%apply unsigned long { utf32_char };
 %apply unsigned char * OUTPUT { uint8 & red };
 %apply unsigned char * OUTPUT { uint8 & green };
 %apply unsigned char * OUTPUT { uint8 & blue };
@@ -790,7 +792,9 @@ TYPEMAP_OUT_csWrapPtr
 %rename(FindBool) iEvent::Find(const char *, bool &, int);
 %rename(FindVoidPtr) iEvent::Find(const char *, void **, uint32 &, int);
 #pragma SWIG nowarn=312; // nested union not supported
+
 %include "iutil/event.h"
+%include "csutil/event.h"
 
 %include "iutil/evdefs.h"
 %include "iutil/eventq.h"

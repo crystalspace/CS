@@ -96,55 +96,10 @@ class MyCsApp:
         room = self.engine.CreateSector("room")
         walls = self.engine.CreateSectorWallsMesh(room,"walls")
         thingstate = SCF_QUERY_INTERFACE(walls.GetMeshObject(), iThingState)
-
-        poly=thingstate.GetFactory().CreatePolygon()
-        poly.CreateVertex(csVector3(-5,0,5))
-        poly.CreateVertex(csVector3(5,0,5))
-        poly.CreateVertex(csVector3(5,0,-5))
-        poly.CreateVertex(csVector3(-5,0,-5))
-        poly.SetTextureSpace(poly.GetVertex(0), poly.GetVertex(1), 3)
-        poly.SetMaterial(material)
-
-        poly=thingstate.GetFactory().CreatePolygon()
-        poly.CreateVertex(csVector3(-5,20,-5))
-        poly.CreateVertex(csVector3(5,20,-5))
-        poly.CreateVertex(csVector3(5,20,5))
-        poly.CreateVertex(csVector3(-5,20,5))
-        poly.SetTextureSpace(poly.GetVertex(0), poly.GetVertex(1), 3)
-        poly.SetMaterial(material)
-
-        poly=thingstate.GetFactory().CreatePolygon()
-        poly.CreateVertex(csVector3(-5,20,5))
-        poly.CreateVertex(csVector3(5,20,5))
-        poly.CreateVertex(csVector3(5,0,5))
-        poly.CreateVertex(csVector3(-5,0,5))
-        poly.SetTextureSpace(poly.GetVertex(0), poly.GetVertex(1), 3)
-        poly.SetMaterial(material)
-
-        poly=thingstate.GetFactory().CreatePolygon()
-        poly.CreateVertex(csVector3(5,20,5))
-        poly.CreateVertex(csVector3(5,20,-5))
-        poly.CreateVertex(csVector3(5,0,-5))
-        poly.CreateVertex(csVector3(5,0,5))
-        poly.SetTextureSpace(poly.GetVertex(0), poly.GetVertex(1), 3)
-        poly.SetMaterial(material)
-
-        poly=thingstate.GetFactory().CreatePolygon()
-        poly.CreateVertex(csVector3(-5,20,-5))
-        poly.CreateVertex(csVector3(-5,20,5))
-        poly.CreateVertex(csVector3(-5,0,5))
-        poly.CreateVertex(csVector3(-5,0,-5))
-        poly.SetTextureSpace(poly.GetVertex(0), poly.GetVertex(1), 3)
-        poly.SetMaterial(material)
-
-        poly=thingstate.GetFactory().CreatePolygon()
-        poly.CreateVertex(csVector3(5,20,-5))
-        poly.CreateVertex(csVector3(-5,20,-5))
-        poly.CreateVertex(csVector3(-5,0,-5))
-        poly.CreateVertex(csVector3(5,0,-5))
-        poly.SetTextureSpace(poly.GetVertex(0), poly.GetVertex(1), 3)
-        poly.SetMaterial(material)
-        
+        walls_state = thingstate.GetFactory()
+        walls_state.AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5))
+        walls_state.SetPolygonMaterial (CS_POLYRANGE_LAST, material);
+        walls_state.SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);        
         return room
 
     def CreateLights(self,room):
@@ -236,7 +191,9 @@ class MyCsApp:
 def EventHandler(ev):
     try:
         #print 'EventHandler called'
-        if ev.Type == csevKeyDown and ev.Key.Code == CSKEY_ESC:
+        if ((ev.Type  == csevKeyboard ) and
+            (csKeyEventHelper.GetEventType(ev) == csKeyEventTypeDown) and
+            (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
             q  = CS_QUERY_REGISTRY(object_reg, iEventQueue)
             if q:
                 q.GetEventOutlet().Broadcast(cscmdQuit)
