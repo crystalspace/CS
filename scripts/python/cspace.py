@@ -2245,8 +2245,6 @@ csPlatformShutdown = _cspace.csPlatformShutdown
 
 csPrintf = _cspace.csPrintf
 
-csPrintfV = _cspace.csPrintfV
-
 csFPutErr = _cspace.csFPutErr
 
 csGetTicks = _cspace.csGetTicks
@@ -7340,6 +7338,8 @@ class iMouseDriver(iBase):
         try:
             if self.thisown: destroy(self)
         except: pass
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMouseDriver_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iMouseDriver_scfGetVersion)
 
 class iMouseDriverPtr(iMouseDriver):
     def __init__(self, this):
@@ -7347,6 +7347,8 @@ class iMouseDriverPtr(iMouseDriver):
         if not hasattr(self,"thisown"): _swig_setattr(self, iMouseDriver, 'thisown', 0)
         _swig_setattr(self, iMouseDriver,self.__class__,iMouseDriver)
 _cspace.iMouseDriver_swigregister(iMouseDriverPtr)
+
+iMouseDriver_scfGetVersion = _cspace.iMouseDriver_scfGetVersion
 
 class iJoystickDriver(iBase):
     __swig_setmethods__ = {}
@@ -7810,6 +7812,229 @@ class iDataBufferPtr(iDataBuffer):
 _cspace.iDataBuffer_swigregister(iDataBufferPtr)
 
 iDataBuffer_scfGetVersion = _cspace.iDataBuffer_scfGetVersion
+
+CS_WRITE_BASELINE = _cspace.CS_WRITE_BASELINE
+CS_WRITE_NOANTIALIAS = _cspace.CS_WRITE_NOANTIALIAS
+class csPixelCoord(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csPixelCoord, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csPixelCoord, name)
+    def __repr__(self):
+        return "<C csPixelCoord instance at %s>" % (self.this,)
+    __swig_setmethods__["x"] = _cspace.csPixelCoord_x_set
+    __swig_getmethods__["x"] = _cspace.csPixelCoord_x_get
+    if _newclass:x = property(_cspace.csPixelCoord_x_get, _cspace.csPixelCoord_x_set)
+    __swig_setmethods__["y"] = _cspace.csPixelCoord_y_set
+    __swig_getmethods__["y"] = _cspace.csPixelCoord_y_get
+    if _newclass:y = property(_cspace.csPixelCoord_y_get, _cspace.csPixelCoord_y_set)
+    def __init__(self, *args):
+        _swig_setattr(self, csPixelCoord, 'this', _cspace.new_csPixelCoord(*args))
+        _swig_setattr(self, csPixelCoord, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csPixelCoord):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class csPixelCoordPtr(csPixelCoord):
+    def __init__(self, this):
+        _swig_setattr(self, csPixelCoord, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csPixelCoord, 'thisown', 0)
+        _swig_setattr(self, csPixelCoord,self.__class__,csPixelCoord)
+_cspace.csPixelCoord_swigregister(csPixelCoordPtr)
+
+class csPixelFormat(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csPixelFormat, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csPixelFormat, name)
+    def __repr__(self):
+        return "<C csPixelFormat instance at %s>" % (self.this,)
+    __swig_setmethods__["RedMask"] = _cspace.csPixelFormat_RedMask_set
+    __swig_getmethods__["RedMask"] = _cspace.csPixelFormat_RedMask_get
+    if _newclass:RedMask = property(_cspace.csPixelFormat_RedMask_get, _cspace.csPixelFormat_RedMask_set)
+    __swig_setmethods__["GreenMask"] = _cspace.csPixelFormat_GreenMask_set
+    __swig_getmethods__["GreenMask"] = _cspace.csPixelFormat_GreenMask_get
+    if _newclass:GreenMask = property(_cspace.csPixelFormat_GreenMask_get, _cspace.csPixelFormat_GreenMask_set)
+    __swig_setmethods__["BlueMask"] = _cspace.csPixelFormat_BlueMask_set
+    __swig_getmethods__["BlueMask"] = _cspace.csPixelFormat_BlueMask_get
+    if _newclass:BlueMask = property(_cspace.csPixelFormat_BlueMask_get, _cspace.csPixelFormat_BlueMask_set)
+    __swig_setmethods__["RedShift"] = _cspace.csPixelFormat_RedShift_set
+    __swig_getmethods__["RedShift"] = _cspace.csPixelFormat_RedShift_get
+    if _newclass:RedShift = property(_cspace.csPixelFormat_RedShift_get, _cspace.csPixelFormat_RedShift_set)
+    __swig_setmethods__["GreenShift"] = _cspace.csPixelFormat_GreenShift_set
+    __swig_getmethods__["GreenShift"] = _cspace.csPixelFormat_GreenShift_get
+    if _newclass:GreenShift = property(_cspace.csPixelFormat_GreenShift_get, _cspace.csPixelFormat_GreenShift_set)
+    __swig_setmethods__["BlueShift"] = _cspace.csPixelFormat_BlueShift_set
+    __swig_getmethods__["BlueShift"] = _cspace.csPixelFormat_BlueShift_get
+    if _newclass:BlueShift = property(_cspace.csPixelFormat_BlueShift_get, _cspace.csPixelFormat_BlueShift_set)
+    __swig_setmethods__["RedBits"] = _cspace.csPixelFormat_RedBits_set
+    __swig_getmethods__["RedBits"] = _cspace.csPixelFormat_RedBits_get
+    if _newclass:RedBits = property(_cspace.csPixelFormat_RedBits_get, _cspace.csPixelFormat_RedBits_set)
+    __swig_setmethods__["GreenBits"] = _cspace.csPixelFormat_GreenBits_set
+    __swig_getmethods__["GreenBits"] = _cspace.csPixelFormat_GreenBits_get
+    if _newclass:GreenBits = property(_cspace.csPixelFormat_GreenBits_get, _cspace.csPixelFormat_GreenBits_set)
+    __swig_setmethods__["BlueBits"] = _cspace.csPixelFormat_BlueBits_set
+    __swig_getmethods__["BlueBits"] = _cspace.csPixelFormat_BlueBits_get
+    if _newclass:BlueBits = property(_cspace.csPixelFormat_BlueBits_get, _cspace.csPixelFormat_BlueBits_set)
+    __swig_setmethods__["PalEntries"] = _cspace.csPixelFormat_PalEntries_set
+    __swig_getmethods__["PalEntries"] = _cspace.csPixelFormat_PalEntries_get
+    if _newclass:PalEntries = property(_cspace.csPixelFormat_PalEntries_get, _cspace.csPixelFormat_PalEntries_set)
+    __swig_setmethods__["PixelBytes"] = _cspace.csPixelFormat_PixelBytes_set
+    __swig_getmethods__["PixelBytes"] = _cspace.csPixelFormat_PixelBytes_get
+    if _newclass:PixelBytes = property(_cspace.csPixelFormat_PixelBytes_get, _cspace.csPixelFormat_PixelBytes_set)
+    def complete(*args): return _cspace.csPixelFormat_complete(*args)
+    def __init__(self, *args):
+        _swig_setattr(self, csPixelFormat, 'this', _cspace.new_csPixelFormat(*args))
+        _swig_setattr(self, csPixelFormat, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csPixelFormat):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class csPixelFormatPtr(csPixelFormat):
+    def __init__(self, this):
+        _swig_setattr(self, csPixelFormat, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csPixelFormat, 'thisown', 0)
+        _swig_setattr(self, csPixelFormat,self.__class__,csPixelFormat)
+_cspace.csPixelFormat_swigregister(csPixelFormatPtr)
+
+class csImageArea(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csImageArea, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csImageArea, name)
+    def __repr__(self):
+        return "<C csImageArea instance at %s>" % (self.this,)
+    __swig_setmethods__["x"] = _cspace.csImageArea_x_set
+    __swig_getmethods__["x"] = _cspace.csImageArea_x_get
+    if _newclass:x = property(_cspace.csImageArea_x_get, _cspace.csImageArea_x_set)
+    __swig_setmethods__["y"] = _cspace.csImageArea_y_set
+    __swig_getmethods__["y"] = _cspace.csImageArea_y_get
+    if _newclass:y = property(_cspace.csImageArea_y_get, _cspace.csImageArea_y_set)
+    __swig_setmethods__["w"] = _cspace.csImageArea_w_set
+    __swig_getmethods__["w"] = _cspace.csImageArea_w_get
+    if _newclass:w = property(_cspace.csImageArea_w_get, _cspace.csImageArea_w_set)
+    __swig_setmethods__["h"] = _cspace.csImageArea_h_set
+    __swig_getmethods__["h"] = _cspace.csImageArea_h_get
+    if _newclass:h = property(_cspace.csImageArea_h_get, _cspace.csImageArea_h_set)
+    __swig_setmethods__["data"] = _cspace.csImageArea_data_set
+    __swig_getmethods__["data"] = _cspace.csImageArea_data_get
+    if _newclass:data = property(_cspace.csImageArea_data_get, _cspace.csImageArea_data_set)
+    def __init__(self, *args):
+        _swig_setattr(self, csImageArea, 'this', _cspace.new_csImageArea(*args))
+        _swig_setattr(self, csImageArea, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csImageArea):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class csImageAreaPtr(csImageArea):
+    def __init__(self, this):
+        _swig_setattr(self, csImageArea, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csImageArea, 'thisown', 0)
+        _swig_setattr(self, csImageArea,self.__class__,csImageArea)
+_cspace.csImageArea_swigregister(csImageAreaPtr)
+
+class iOffscreenCanvasCallback(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iOffscreenCanvasCallback, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iOffscreenCanvasCallback, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iOffscreenCanvasCallback instance at %s>" % (self.this,)
+    def FinishDraw(*args): return _cspace.iOffscreenCanvasCallback_FinishDraw(*args)
+    def SetRGB(*args): return _cspace.iOffscreenCanvasCallback_SetRGB(*args)
+    def __del__(self, destroy=_cspace.delete_iOffscreenCanvasCallback):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class iOffscreenCanvasCallbackPtr(iOffscreenCanvasCallback):
+    def __init__(self, this):
+        _swig_setattr(self, iOffscreenCanvasCallback, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iOffscreenCanvasCallback, 'thisown', 0)
+        _swig_setattr(self, iOffscreenCanvasCallback,self.__class__,iOffscreenCanvasCallback)
+_cspace.iOffscreenCanvasCallback_swigregister(iOffscreenCanvasCallbackPtr)
+
+class iGraphics2D(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iGraphics2D, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iGraphics2D, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iGraphics2D instance at %s>" % (self.this,)
+    def Open(*args): return _cspace.iGraphics2D_Open(*args)
+    def Close(*args): return _cspace.iGraphics2D_Close(*args)
+    def GetWidth(*args): return _cspace.iGraphics2D_GetWidth(*args)
+    def GetHeight(*args): return _cspace.iGraphics2D_GetHeight(*args)
+    def GetPage(*args): return _cspace.iGraphics2D_GetPage(*args)
+    def DoubleBuffer(*args): return _cspace.iGraphics2D_DoubleBuffer(*args)
+    def GetDoubleBufferState(*args): return _cspace.iGraphics2D_GetDoubleBufferState(*args)
+    def GetPixelFormat(*args): return _cspace.iGraphics2D_GetPixelFormat(*args)
+    def GetPixelBytes(*args): return _cspace.iGraphics2D_GetPixelBytes(*args)
+    def GetPalEntryCount(*args): return _cspace.iGraphics2D_GetPalEntryCount(*args)
+    def GetPalette(*args): return _cspace.iGraphics2D_GetPalette(*args)
+    def SetRGB(*args): return _cspace.iGraphics2D_SetRGB(*args)
+    def FindRGB(*args): return _cspace.iGraphics2D_FindRGB(*args)
+    def SetClipRect(*args): return _cspace.iGraphics2D_SetClipRect(*args)
+    def GetClipRect(*args): return _cspace.iGraphics2D_GetClipRect(*args)
+    def BeginDraw(*args): return _cspace.iGraphics2D_BeginDraw(*args)
+    def FinishDraw(*args): return _cspace.iGraphics2D_FinishDraw(*args)
+    def Print(*args): return _cspace.iGraphics2D_Print(*args)
+    def Clear(*args): return _cspace.iGraphics2D_Clear(*args)
+    def ClearAll(*args): return _cspace.iGraphics2D_ClearAll(*args)
+    def DrawLine(*args): return _cspace.iGraphics2D_DrawLine(*args)
+    def DrawBox(*args): return _cspace.iGraphics2D_DrawBox(*args)
+    def ClipLine(*args): return _cspace.iGraphics2D_ClipLine(*args)
+    def DrawPixel(*args): return _cspace.iGraphics2D_DrawPixel(*args)
+    def DrawPixels(*args): return _cspace.iGraphics2D_DrawPixels(*args)
+    def Blit(*args): return _cspace.iGraphics2D_Blit(*args)
+    def GetPixelAt(*args): return _cspace.iGraphics2D_GetPixelAt(*args)
+    def GetPixel(*args): return _cspace.iGraphics2D_GetPixel(*args)
+    def SaveArea(*args): return _cspace.iGraphics2D_SaveArea(*args)
+    def RestoreArea(*args): return _cspace.iGraphics2D_RestoreArea(*args)
+    def FreeArea(*args): return _cspace.iGraphics2D_FreeArea(*args)
+    def Write(*args): return _cspace.iGraphics2D_Write(*args)
+    def WriteBaseline(*args): return _cspace.iGraphics2D_WriteBaseline(*args)
+    def AllowResize(*args): return _cspace.iGraphics2D_AllowResize(*args)
+    def Resize(*args): return _cspace.iGraphics2D_Resize(*args)
+    def GetFontServer(*args): return _cspace.iGraphics2D_GetFontServer(*args)
+    def PerformExtension(*args): return _cspace.iGraphics2D_PerformExtension(*args)
+    def ScreenShot(*args): return _cspace.iGraphics2D_ScreenShot(*args)
+    def GetNativeWindow(*args): return _cspace.iGraphics2D_GetNativeWindow(*args)
+    def GetFullScreen(*args): return _cspace.iGraphics2D_GetFullScreen(*args)
+    def SetFullScreen(*args): return _cspace.iGraphics2D_SetFullScreen(*args)
+    def SetMousePosition(*args): return _cspace.iGraphics2D_SetMousePosition(*args)
+    def SetMouseCursor(*args): return _cspace.iGraphics2D_SetMouseCursor(*args)
+    def SetGamma(*args): return _cspace.iGraphics2D_SetGamma(*args)
+    def GetGamma(*args): return _cspace.iGraphics2D_GetGamma(*args)
+    def CreateOffscreenCanvas(*args): return _cspace.iGraphics2D_CreateOffscreenCanvas(*args)
+    def __del__(self, destroy=_cspace.delete_iGraphics2D):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iGraphics2D_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iGraphics2D_scfGetVersion)
+    def _PerformExtension(*args): return _cspace.iGraphics2D__PerformExtension(*args)
+    def PerformExtension (self, command, *args):
+              self._PerformExtension(self.__class__.__name__, command, args);
+
+
+class iGraphics2DPtr(iGraphics2D):
+    def __init__(self, this):
+        _swig_setattr(self, iGraphics2D, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iGraphics2D, 'thisown', 0)
+        _swig_setattr(self, iGraphics2D,self.__class__,iGraphics2D)
+_cspace.iGraphics2D_swigregister(iGraphics2DPtr)
+
+iGraphics2D_scfGetVersion = _cspace.iGraphics2D_scfGetVersion
 
 CSDRAW_2DGRAPHICS = _cspace.CSDRAW_2DGRAPHICS
 CSDRAW_3DGRAPHICS = _cspace.CSDRAW_3DGRAPHICS
@@ -8531,230 +8756,6 @@ _cspace.iGraphics3D_swigregister(iGraphics3DPtr)
 
 iGraphics3D_scfGetVersion = _cspace.iGraphics3D_scfGetVersion
 
-CS_WRITE_BASELINE = _cspace.CS_WRITE_BASELINE
-CS_WRITE_NOANTIALIAS = _cspace.CS_WRITE_NOANTIALIAS
-class csPixelCoord(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csPixelCoord, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csPixelCoord, name)
-    def __repr__(self):
-        return "<C csPixelCoord instance at %s>" % (self.this,)
-    __swig_setmethods__["x"] = _cspace.csPixelCoord_x_set
-    __swig_getmethods__["x"] = _cspace.csPixelCoord_x_get
-    if _newclass:x = property(_cspace.csPixelCoord_x_get, _cspace.csPixelCoord_x_set)
-    __swig_setmethods__["y"] = _cspace.csPixelCoord_y_set
-    __swig_getmethods__["y"] = _cspace.csPixelCoord_y_get
-    if _newclass:y = property(_cspace.csPixelCoord_y_get, _cspace.csPixelCoord_y_set)
-    def __init__(self, *args):
-        _swig_setattr(self, csPixelCoord, 'this', _cspace.new_csPixelCoord(*args))
-        _swig_setattr(self, csPixelCoord, 'thisown', 1)
-    def __del__(self, destroy=_cspace.delete_csPixelCoord):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class csPixelCoordPtr(csPixelCoord):
-    def __init__(self, this):
-        _swig_setattr(self, csPixelCoord, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, csPixelCoord, 'thisown', 0)
-        _swig_setattr(self, csPixelCoord,self.__class__,csPixelCoord)
-_cspace.csPixelCoord_swigregister(csPixelCoordPtr)
-
-class csPixelFormat(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csPixelFormat, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csPixelFormat, name)
-    def __repr__(self):
-        return "<C csPixelFormat instance at %s>" % (self.this,)
-    __swig_setmethods__["RedMask"] = _cspace.csPixelFormat_RedMask_set
-    __swig_getmethods__["RedMask"] = _cspace.csPixelFormat_RedMask_get
-    if _newclass:RedMask = property(_cspace.csPixelFormat_RedMask_get, _cspace.csPixelFormat_RedMask_set)
-    __swig_setmethods__["GreenMask"] = _cspace.csPixelFormat_GreenMask_set
-    __swig_getmethods__["GreenMask"] = _cspace.csPixelFormat_GreenMask_get
-    if _newclass:GreenMask = property(_cspace.csPixelFormat_GreenMask_get, _cspace.csPixelFormat_GreenMask_set)
-    __swig_setmethods__["BlueMask"] = _cspace.csPixelFormat_BlueMask_set
-    __swig_getmethods__["BlueMask"] = _cspace.csPixelFormat_BlueMask_get
-    if _newclass:BlueMask = property(_cspace.csPixelFormat_BlueMask_get, _cspace.csPixelFormat_BlueMask_set)
-    __swig_setmethods__["RedShift"] = _cspace.csPixelFormat_RedShift_set
-    __swig_getmethods__["RedShift"] = _cspace.csPixelFormat_RedShift_get
-    if _newclass:RedShift = property(_cspace.csPixelFormat_RedShift_get, _cspace.csPixelFormat_RedShift_set)
-    __swig_setmethods__["GreenShift"] = _cspace.csPixelFormat_GreenShift_set
-    __swig_getmethods__["GreenShift"] = _cspace.csPixelFormat_GreenShift_get
-    if _newclass:GreenShift = property(_cspace.csPixelFormat_GreenShift_get, _cspace.csPixelFormat_GreenShift_set)
-    __swig_setmethods__["BlueShift"] = _cspace.csPixelFormat_BlueShift_set
-    __swig_getmethods__["BlueShift"] = _cspace.csPixelFormat_BlueShift_get
-    if _newclass:BlueShift = property(_cspace.csPixelFormat_BlueShift_get, _cspace.csPixelFormat_BlueShift_set)
-    __swig_setmethods__["RedBits"] = _cspace.csPixelFormat_RedBits_set
-    __swig_getmethods__["RedBits"] = _cspace.csPixelFormat_RedBits_get
-    if _newclass:RedBits = property(_cspace.csPixelFormat_RedBits_get, _cspace.csPixelFormat_RedBits_set)
-    __swig_setmethods__["GreenBits"] = _cspace.csPixelFormat_GreenBits_set
-    __swig_getmethods__["GreenBits"] = _cspace.csPixelFormat_GreenBits_get
-    if _newclass:GreenBits = property(_cspace.csPixelFormat_GreenBits_get, _cspace.csPixelFormat_GreenBits_set)
-    __swig_setmethods__["BlueBits"] = _cspace.csPixelFormat_BlueBits_set
-    __swig_getmethods__["BlueBits"] = _cspace.csPixelFormat_BlueBits_get
-    if _newclass:BlueBits = property(_cspace.csPixelFormat_BlueBits_get, _cspace.csPixelFormat_BlueBits_set)
-    __swig_setmethods__["PalEntries"] = _cspace.csPixelFormat_PalEntries_set
-    __swig_getmethods__["PalEntries"] = _cspace.csPixelFormat_PalEntries_get
-    if _newclass:PalEntries = property(_cspace.csPixelFormat_PalEntries_get, _cspace.csPixelFormat_PalEntries_set)
-    __swig_setmethods__["PixelBytes"] = _cspace.csPixelFormat_PixelBytes_set
-    __swig_getmethods__["PixelBytes"] = _cspace.csPixelFormat_PixelBytes_get
-    if _newclass:PixelBytes = property(_cspace.csPixelFormat_PixelBytes_get, _cspace.csPixelFormat_PixelBytes_set)
-    def complete(*args): return _cspace.csPixelFormat_complete(*args)
-    def __init__(self, *args):
-        _swig_setattr(self, csPixelFormat, 'this', _cspace.new_csPixelFormat(*args))
-        _swig_setattr(self, csPixelFormat, 'thisown', 1)
-    def __del__(self, destroy=_cspace.delete_csPixelFormat):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class csPixelFormatPtr(csPixelFormat):
-    def __init__(self, this):
-        _swig_setattr(self, csPixelFormat, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, csPixelFormat, 'thisown', 0)
-        _swig_setattr(self, csPixelFormat,self.__class__,csPixelFormat)
-_cspace.csPixelFormat_swigregister(csPixelFormatPtr)
-
-class csImageArea(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csImageArea, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csImageArea, name)
-    def __repr__(self):
-        return "<C csImageArea instance at %s>" % (self.this,)
-    __swig_setmethods__["x"] = _cspace.csImageArea_x_set
-    __swig_getmethods__["x"] = _cspace.csImageArea_x_get
-    if _newclass:x = property(_cspace.csImageArea_x_get, _cspace.csImageArea_x_set)
-    __swig_setmethods__["y"] = _cspace.csImageArea_y_set
-    __swig_getmethods__["y"] = _cspace.csImageArea_y_get
-    if _newclass:y = property(_cspace.csImageArea_y_get, _cspace.csImageArea_y_set)
-    __swig_setmethods__["w"] = _cspace.csImageArea_w_set
-    __swig_getmethods__["w"] = _cspace.csImageArea_w_get
-    if _newclass:w = property(_cspace.csImageArea_w_get, _cspace.csImageArea_w_set)
-    __swig_setmethods__["h"] = _cspace.csImageArea_h_set
-    __swig_getmethods__["h"] = _cspace.csImageArea_h_get
-    if _newclass:h = property(_cspace.csImageArea_h_get, _cspace.csImageArea_h_set)
-    __swig_setmethods__["data"] = _cspace.csImageArea_data_set
-    __swig_getmethods__["data"] = _cspace.csImageArea_data_get
-    if _newclass:data = property(_cspace.csImageArea_data_get, _cspace.csImageArea_data_set)
-    def __init__(self, *args):
-        _swig_setattr(self, csImageArea, 'this', _cspace.new_csImageArea(*args))
-        _swig_setattr(self, csImageArea, 'thisown', 1)
-    def __del__(self, destroy=_cspace.delete_csImageArea):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class csImageAreaPtr(csImageArea):
-    def __init__(self, this):
-        _swig_setattr(self, csImageArea, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, csImageArea, 'thisown', 0)
-        _swig_setattr(self, csImageArea,self.__class__,csImageArea)
-_cspace.csImageArea_swigregister(csImageAreaPtr)
-
-class iOffscreenCanvasCallback(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iOffscreenCanvasCallback, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iOffscreenCanvasCallback, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<C iOffscreenCanvasCallback instance at %s>" % (self.this,)
-    def FinishDraw(*args): return _cspace.iOffscreenCanvasCallback_FinishDraw(*args)
-    def SetRGB(*args): return _cspace.iOffscreenCanvasCallback_SetRGB(*args)
-    def __del__(self, destroy=_cspace.delete_iOffscreenCanvasCallback):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class iOffscreenCanvasCallbackPtr(iOffscreenCanvasCallback):
-    def __init__(self, this):
-        _swig_setattr(self, iOffscreenCanvasCallback, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iOffscreenCanvasCallback, 'thisown', 0)
-        _swig_setattr(self, iOffscreenCanvasCallback,self.__class__,iOffscreenCanvasCallback)
-_cspace.iOffscreenCanvasCallback_swigregister(iOffscreenCanvasCallbackPtr)
-
-class iGraphics2D(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iGraphics2D, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iGraphics2D, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<C iGraphics2D instance at %s>" % (self.this,)
-    def Open(*args): return _cspace.iGraphics2D_Open(*args)
-    def Close(*args): return _cspace.iGraphics2D_Close(*args)
-    def GetWidth(*args): return _cspace.iGraphics2D_GetWidth(*args)
-    def GetHeight(*args): return _cspace.iGraphics2D_GetHeight(*args)
-    def GetPage(*args): return _cspace.iGraphics2D_GetPage(*args)
-    def DoubleBuffer(*args): return _cspace.iGraphics2D_DoubleBuffer(*args)
-    def GetDoubleBufferState(*args): return _cspace.iGraphics2D_GetDoubleBufferState(*args)
-    def GetPixelFormat(*args): return _cspace.iGraphics2D_GetPixelFormat(*args)
-    def GetPixelBytes(*args): return _cspace.iGraphics2D_GetPixelBytes(*args)
-    def GetPalEntryCount(*args): return _cspace.iGraphics2D_GetPalEntryCount(*args)
-    def GetPalette(*args): return _cspace.iGraphics2D_GetPalette(*args)
-    def SetRGB(*args): return _cspace.iGraphics2D_SetRGB(*args)
-    def FindRGB(*args): return _cspace.iGraphics2D_FindRGB(*args)
-    def SetClipRect(*args): return _cspace.iGraphics2D_SetClipRect(*args)
-    def GetClipRect(*args): return _cspace.iGraphics2D_GetClipRect(*args)
-    def BeginDraw(*args): return _cspace.iGraphics2D_BeginDraw(*args)
-    def FinishDraw(*args): return _cspace.iGraphics2D_FinishDraw(*args)
-    def Print(*args): return _cspace.iGraphics2D_Print(*args)
-    def Clear(*args): return _cspace.iGraphics2D_Clear(*args)
-    def ClearAll(*args): return _cspace.iGraphics2D_ClearAll(*args)
-    def DrawLine(*args): return _cspace.iGraphics2D_DrawLine(*args)
-    def DrawBox(*args): return _cspace.iGraphics2D_DrawBox(*args)
-    def ClipLine(*args): return _cspace.iGraphics2D_ClipLine(*args)
-    def DrawPixel(*args): return _cspace.iGraphics2D_DrawPixel(*args)
-    def DrawPixels(*args): return _cspace.iGraphics2D_DrawPixels(*args)
-    def Blit(*args): return _cspace.iGraphics2D_Blit(*args)
-    def GetPixelAt(*args): return _cspace.iGraphics2D_GetPixelAt(*args)
-    def GetPixel(*args): return _cspace.iGraphics2D_GetPixel(*args)
-    def SaveArea(*args): return _cspace.iGraphics2D_SaveArea(*args)
-    def RestoreArea(*args): return _cspace.iGraphics2D_RestoreArea(*args)
-    def FreeArea(*args): return _cspace.iGraphics2D_FreeArea(*args)
-    def Write(*args): return _cspace.iGraphics2D_Write(*args)
-    def WriteBaseline(*args): return _cspace.iGraphics2D_WriteBaseline(*args)
-    def AllowResize(*args): return _cspace.iGraphics2D_AllowResize(*args)
-    def Resize(*args): return _cspace.iGraphics2D_Resize(*args)
-    def GetFontServer(*args): return _cspace.iGraphics2D_GetFontServer(*args)
-    def PerformExtension(*args): return _cspace.iGraphics2D_PerformExtension(*args)
-    def PerformExtensionV(*args): return _cspace.iGraphics2D_PerformExtensionV(*args)
-    def ScreenShot(*args): return _cspace.iGraphics2D_ScreenShot(*args)
-    def GetNativeWindow(*args): return _cspace.iGraphics2D_GetNativeWindow(*args)
-    def GetFullScreen(*args): return _cspace.iGraphics2D_GetFullScreen(*args)
-    def SetFullScreen(*args): return _cspace.iGraphics2D_SetFullScreen(*args)
-    def SetMousePosition(*args): return _cspace.iGraphics2D_SetMousePosition(*args)
-    def SetMouseCursor(*args): return _cspace.iGraphics2D_SetMouseCursor(*args)
-    def SetGamma(*args): return _cspace.iGraphics2D_SetGamma(*args)
-    def GetGamma(*args): return _cspace.iGraphics2D_GetGamma(*args)
-    def CreateOffscreenCanvas(*args): return _cspace.iGraphics2D_CreateOffscreenCanvas(*args)
-    def __del__(self, destroy=_cspace.delete_iGraphics2D):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iGraphics2D_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_cspace.iGraphics2D_scfGetVersion)
-    def _PerformExtension(*args): return _cspace.iGraphics2D__PerformExtension(*args)
-    def PerformExtension (self, command, *args):
-              self._PerformExtension(self.__class__.__name__, command, args);
-
-
-class iGraphics2DPtr(iGraphics2D):
-    def __init__(self, this):
-        _swig_setattr(self, iGraphics2D, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iGraphics2D, 'thisown', 0)
-        _swig_setattr(self, iGraphics2D,self.__class__,iGraphics2D)
-_cspace.iGraphics2D_swigregister(iGraphics2DPtr)
-
-iGraphics2D_scfGetVersion = _cspace.iGraphics2D_scfGetVersion
-
 csmcNone = _cspace.csmcNone
 csmcArrow = _cspace.csmcArrow
 csmcLens = _cspace.csmcLens
@@ -8767,6 +8768,55 @@ csmcSizeNS = _cspace.csmcSizeNS
 csmcSizeEW = _cspace.csmcSizeEW
 csmcStop = _cspace.csmcStop
 csmcWait = _cspace.csmcWait
+CS_ALERT_ERROR = _cspace.CS_ALERT_ERROR
+CS_ALERT_WARNING = _cspace.CS_ALERT_WARNING
+CS_ALERT_NOTE = _cspace.CS_ALERT_NOTE
+class iNativeWindowManager(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iNativeWindowManager, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iNativeWindowManager, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iNativeWindowManager instance at %s>" % (self.this,)
+    def Alert(*args): return _cspace.iNativeWindowManager_Alert(*args)
+    def __del__(self, destroy=_cspace.delete_iNativeWindowManager):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class iNativeWindowManagerPtr(iNativeWindowManager):
+    def __init__(self, this):
+        _swig_setattr(self, iNativeWindowManager, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iNativeWindowManager, 'thisown', 0)
+        _swig_setattr(self, iNativeWindowManager,self.__class__,iNativeWindowManager)
+_cspace.iNativeWindowManager_swigregister(iNativeWindowManagerPtr)
+
+class iNativeWindow(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iNativeWindow, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iNativeWindow, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iNativeWindow instance at %s>" % (self.this,)
+    def SetTitle(*args): return _cspace.iNativeWindow_SetTitle(*args)
+    def __del__(self, destroy=_cspace.delete_iNativeWindow):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class iNativeWindowPtr(iNativeWindow):
+    def __init__(self, this):
+        _swig_setattr(self, iNativeWindow, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iNativeWindow, 'thisown', 0)
+        _swig_setattr(self, iNativeWindow,self.__class__,iNativeWindow)
+_cspace.iNativeWindow_swigregister(iNativeWindowPtr)
+
 CSFONT_LARGE = _cspace.CSFONT_LARGE
 CSFONT_ITALIC = _cspace.CSFONT_ITALIC
 CSFONT_COURIER = _cspace.CSFONT_COURIER
@@ -9487,56 +9537,6 @@ class iMaterialHandlePtr(iMaterialHandle):
         _swig_setattr(self, iMaterialHandle,self.__class__,iMaterialHandle)
 _cspace.iMaterialHandle_swigregister(iMaterialHandlePtr)
 
-CS_ALERT_ERROR = _cspace.CS_ALERT_ERROR
-CS_ALERT_WARNING = _cspace.CS_ALERT_WARNING
-CS_ALERT_NOTE = _cspace.CS_ALERT_NOTE
-class iNativeWindowManager(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iNativeWindowManager, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iNativeWindowManager, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<C iNativeWindowManager instance at %s>" % (self.this,)
-    def Alert(*args): return _cspace.iNativeWindowManager_Alert(*args)
-    def AlertV(*args): return _cspace.iNativeWindowManager_AlertV(*args)
-    def __del__(self, destroy=_cspace.delete_iNativeWindowManager):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class iNativeWindowManagerPtr(iNativeWindowManager):
-    def __init__(self, this):
-        _swig_setattr(self, iNativeWindowManager, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iNativeWindowManager, 'thisown', 0)
-        _swig_setattr(self, iNativeWindowManager,self.__class__,iNativeWindowManager)
-_cspace.iNativeWindowManager_swigregister(iNativeWindowManagerPtr)
-
-class iNativeWindow(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iNativeWindow, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iNativeWindow, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<C iNativeWindow instance at %s>" % (self.this,)
-    def SetTitle(*args): return _cspace.iNativeWindow_SetTitle(*args)
-    def __del__(self, destroy=_cspace.delete_iNativeWindow):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class iNativeWindowPtr(iNativeWindow):
-    def __init__(self, this):
-        _swig_setattr(self, iNativeWindow, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iNativeWindow, 'thisown', 0)
-        _swig_setattr(self, iNativeWindow,self.__class__,iNativeWindow)
-_cspace.iNativeWindow_swigregister(iNativeWindowPtr)
-
 CS_POS_BY_FRAME = _cspace.CS_POS_BY_FRAME
 CS_POS_BY_TIME = _cspace.CS_POS_BY_TIME
 CS_DECODE_SPAN = _cspace.CS_DECODE_SPAN
@@ -10086,6 +10086,79 @@ _cspace.csReporterHelper_swigregister(csReporterHelperPtr)
 
 csReporterHelper_Report = _cspace.csReporterHelper_Report
 
+csConPageUp = _cspace.csConPageUp
+csConPageDown = _cspace.csConPageDown
+csConVeryTop = _cspace.csConVeryTop
+csConVeryBottom = _cspace.csConVeryBottom
+csConNoCursor = _cspace.csConNoCursor
+csConNormalCursor = _cspace.csConNormalCursor
+csConInsertCursor = _cspace.csConInsertCursor
+class iConsoleWatcher(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iConsoleWatcher, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iConsoleWatcher, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iConsoleWatcher instance at %s>" % (self.this,)
+    def ConsoleVisibilityChanged(*args): return _cspace.iConsoleWatcher_ConsoleVisibilityChanged(*args)
+    def __del__(self, destroy=_cspace.delete_iConsoleWatcher):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class iConsoleWatcherPtr(iConsoleWatcher):
+    def __init__(self, this):
+        _swig_setattr(self, iConsoleWatcher, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iConsoleWatcher, 'thisown', 0)
+        _swig_setattr(self, iConsoleWatcher,self.__class__,iConsoleWatcher)
+_cspace.iConsoleWatcher_swigregister(iConsoleWatcherPtr)
+
+class iConsoleOutput(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iConsoleOutput, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iConsoleOutput, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iConsoleOutput instance at %s>" % (self.this,)
+    def PutText(*args): return _cspace.iConsoleOutput_PutText(*args)
+    def GetLine(*args): return _cspace.iConsoleOutput_GetLine(*args)
+    def Draw2D(*args): return _cspace.iConsoleOutput_Draw2D(*args)
+    def Draw3D(*args): return _cspace.iConsoleOutput_Draw3D(*args)
+    def Clear(*args): return _cspace.iConsoleOutput_Clear(*args)
+    def SetBufferSize(*args): return _cspace.iConsoleOutput_SetBufferSize(*args)
+    def GetTransparency(*args): return _cspace.iConsoleOutput_GetTransparency(*args)
+    def SetTransparency(*args): return _cspace.iConsoleOutput_SetTransparency(*args)
+    def GetFont(*args): return _cspace.iConsoleOutput_GetFont(*args)
+    def SetFont(*args): return _cspace.iConsoleOutput_SetFont(*args)
+    def GetTopLine(*args): return _cspace.iConsoleOutput_GetTopLine(*args)
+    def ScrollTo(*args): return _cspace.iConsoleOutput_ScrollTo(*args)
+    def GetCursorStyle(*args): return _cspace.iConsoleOutput_GetCursorStyle(*args)
+    def SetCursorStyle(*args): return _cspace.iConsoleOutput_SetCursorStyle(*args)
+    def SetVisible(*args): return _cspace.iConsoleOutput_SetVisible(*args)
+    def GetVisible(*args): return _cspace.iConsoleOutput_GetVisible(*args)
+    def AutoUpdate(*args): return _cspace.iConsoleOutput_AutoUpdate(*args)
+    def SetCursorPos(*args): return _cspace.iConsoleOutput_SetCursorPos(*args)
+    def GetMaxLineWidth(*args): return _cspace.iConsoleOutput_GetMaxLineWidth(*args)
+    def RegisterWatcher(*args): return _cspace.iConsoleOutput_RegisterWatcher(*args)
+    def PerformExtension(*args): return _cspace.iConsoleOutput_PerformExtension(*args)
+    def __del__(self, destroy=_cspace.delete_iConsoleOutput):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class iConsoleOutputPtr(iConsoleOutput):
+    def __init__(self, this):
+        _swig_setattr(self, iConsoleOutput, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iConsoleOutput, 'thisown', 0)
+        _swig_setattr(self, iConsoleOutput,self.__class__,iConsoleOutput)
+_cspace.iConsoleOutput_swigregister(iConsoleOutputPtr)
+
 class iStandardReporterListener(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -10532,81 +10605,6 @@ class iJointPtr(iJoint):
 _cspace.iJoint_swigregister(iJointPtr)
 
 iJoint_scfGetVersion = _cspace.iJoint_scfGetVersion
-
-csConPageUp = _cspace.csConPageUp
-csConPageDown = _cspace.csConPageDown
-csConVeryTop = _cspace.csConVeryTop
-csConVeryBottom = _cspace.csConVeryBottom
-csConNoCursor = _cspace.csConNoCursor
-csConNormalCursor = _cspace.csConNormalCursor
-csConInsertCursor = _cspace.csConInsertCursor
-class iConsoleWatcher(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iConsoleWatcher, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iConsoleWatcher, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<C iConsoleWatcher instance at %s>" % (self.this,)
-    def ConsoleVisibilityChanged(*args): return _cspace.iConsoleWatcher_ConsoleVisibilityChanged(*args)
-    def __del__(self, destroy=_cspace.delete_iConsoleWatcher):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class iConsoleWatcherPtr(iConsoleWatcher):
-    def __init__(self, this):
-        _swig_setattr(self, iConsoleWatcher, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iConsoleWatcher, 'thisown', 0)
-        _swig_setattr(self, iConsoleWatcher,self.__class__,iConsoleWatcher)
-_cspace.iConsoleWatcher_swigregister(iConsoleWatcherPtr)
-
-class iConsoleOutput(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iConsoleOutput, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iConsoleOutput, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<C iConsoleOutput instance at %s>" % (self.this,)
-    def PutText(*args): return _cspace.iConsoleOutput_PutText(*args)
-    def PutTextV(*args): return _cspace.iConsoleOutput_PutTextV(*args)
-    def GetLine(*args): return _cspace.iConsoleOutput_GetLine(*args)
-    def Draw2D(*args): return _cspace.iConsoleOutput_Draw2D(*args)
-    def Draw3D(*args): return _cspace.iConsoleOutput_Draw3D(*args)
-    def Clear(*args): return _cspace.iConsoleOutput_Clear(*args)
-    def SetBufferSize(*args): return _cspace.iConsoleOutput_SetBufferSize(*args)
-    def GetTransparency(*args): return _cspace.iConsoleOutput_GetTransparency(*args)
-    def SetTransparency(*args): return _cspace.iConsoleOutput_SetTransparency(*args)
-    def GetFont(*args): return _cspace.iConsoleOutput_GetFont(*args)
-    def SetFont(*args): return _cspace.iConsoleOutput_SetFont(*args)
-    def GetTopLine(*args): return _cspace.iConsoleOutput_GetTopLine(*args)
-    def ScrollTo(*args): return _cspace.iConsoleOutput_ScrollTo(*args)
-    def GetCursorStyle(*args): return _cspace.iConsoleOutput_GetCursorStyle(*args)
-    def SetCursorStyle(*args): return _cspace.iConsoleOutput_SetCursorStyle(*args)
-    def SetVisible(*args): return _cspace.iConsoleOutput_SetVisible(*args)
-    def GetVisible(*args): return _cspace.iConsoleOutput_GetVisible(*args)
-    def AutoUpdate(*args): return _cspace.iConsoleOutput_AutoUpdate(*args)
-    def SetCursorPos(*args): return _cspace.iConsoleOutput_SetCursorPos(*args)
-    def GetMaxLineWidth(*args): return _cspace.iConsoleOutput_GetMaxLineWidth(*args)
-    def RegisterWatcher(*args): return _cspace.iConsoleOutput_RegisterWatcher(*args)
-    def PerformExtension(*args): return _cspace.iConsoleOutput_PerformExtension(*args)
-    def PerformExtensionV(*args): return _cspace.iConsoleOutput_PerformExtensionV(*args)
-    def __del__(self, destroy=_cspace.delete_iConsoleOutput):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class iConsoleOutputPtr(iConsoleOutput):
-    def __init__(self, this):
-        _swig_setattr(self, iConsoleOutput, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iConsoleOutput, 'thisown', 0)
-        _swig_setattr(self, iConsoleOutput,self.__class__,iConsoleOutput)
-_cspace.iConsoleOutput_swigregister(iConsoleOutputPtr)
 
 CS_SEQUENCE_LIGHTCHANGE_NONE = _cspace.CS_SEQUENCE_LIGHTCHANGE_NONE
 CS_SEQUENCE_LIGHTCHANGE_LESS = _cspace.CS_SEQUENCE_LIGHTCHANGE_LESS
