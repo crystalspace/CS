@@ -402,13 +402,16 @@ bool csSprite3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
   
-  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  csRef<iDocumentNode> paramsNode = 
+    parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
 
   if (obj)
   {
-    csRef<iSprite3DFactoryState> spritefact = SCF_QUERY_INTERFACE (obj, iSprite3DFactoryState);
-    csRef<iMeshObjectFactory> meshfact = SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
+    csRef<iSprite3DFactoryState> spritefact = 
+      SCF_QUERY_INTERFACE (obj, iSprite3DFactoryState);
+    csRef<iMeshObjectFactory> meshfact = 
+      SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
     if (!spritefact) return false;
     if (!meshfact) return false;
 
@@ -419,9 +422,11 @@ bool csSprite3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
       const char* matname = mat->QueryObject()->GetName();
       if (matname && *matname)
       {
-        csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        csRef<iDocumentNode> matNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         matNode->SetValue("material");
-        csRef<iDocumentNode> matnameNode = matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        csRef<iDocumentNode> matnameNode = 
+          matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
         matnameNode->SetValue(matname);
       }    
     }    
@@ -429,7 +434,8 @@ bool csSprite3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
     //Write Frame Tags
     for (i=0; i<spritefact->GetFrameCount(); i++)
     {
-      csRef<iDocumentNode> frameNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> frameNode = 
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       frameNode->SetValue("frame");
       iSpriteFrame* sprite_frame = spritefact->GetFrame(i);
       frameNode->SetAttribute("name", sprite_frame->GetName());
@@ -437,7 +443,8 @@ bool csSprite3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
       csRef<iDocumentNode> vertexNode;
       for (int j=0; j<spritefact->GetVertexCount(); j++)
       {
-        vertexNode = frameNode->CreateNodeBefore(CS_NODE_ELEMENT, vertexNode);
+        vertexNode = 
+          frameNode->CreateNodeBefore(CS_NODE_ELEMENT, vertexNode);
         vertexNode->SetValue("v");
         csVector3 vertex = spritefact->GetVertex(i,j);
         csVector2 texel = spritefact->GetTexel(i,j);
@@ -451,25 +458,29 @@ bool csSprite3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
     //Write Action Tags
     for (i=0; i<spritefact->GetActionCount(); i++)
     {
-      csRef<iDocumentNode> actionNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> actionNode = 
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       actionNode->SetValue("action");
       iSpriteAction* sprite_action = spritefact->GetAction(i);
       actionNode->SetAttribute("name", sprite_action->GetName());
       //Write f Tags
       for (int j=0; j<sprite_action->GetFrameCount(); j++)
       {
-        csRef<iDocumentNode> frameNode = actionNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        csRef<iDocumentNode> frameNode = 
+          actionNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         frameNode->SetValue("f");
         iSpriteFrame* sprite_frame = sprite_action->GetFrame(j);
         frameNode->SetAttribute("name", sprite_frame->GetName());
-        frameNode->SetAttributeAsInt("delay", sprite_action->GetFrameDelay(j));
+        frameNode->SetAttributeAsInt("delay", 
+          sprite_action->GetFrameDelay(j));
       }
     }
 
     //Write Triangle Tags
     for (i=0; i<spritefact->GetTriangleCount(); i++)
     {
-      csRef<iDocumentNode> triaNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> triaNode = 
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       triaNode->SetValue("t");
       csTriangle sprite_tria = spritefact->GetTriangle(i);
       triaNode->SetAttributeAsInt("v1", sprite_tria.a);
@@ -480,15 +491,18 @@ bool csSprite3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
     //Write Socket Tags
     for (i=0; i<spritefact->GetSocketCount(); i++)
     {
-      csRef<iDocumentNode> socketNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> socketNode = 
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       socketNode->SetValue("socket");
       iSpriteSocket* sprite_socket = spritefact->GetSocket(i);
       socketNode->SetAttribute("name", sprite_socket->GetName());
-      socketNode->SetAttributeAsInt("tri", sprite_socket->GetTriangleIndex());
+      socketNode->SetAttributeAsInt("tri", 
+        sprite_socket->GetTriangleIndex());
     }
 
     //Writedown Tween tag
-    synldr->WriteBool(paramsNode, "tween", spritefact->IsTweeningEnabled(), true);
+    synldr->WriteBool(paramsNode, "tween", 
+      spritefact->IsTweeningEnabled(), true);
 
     //TBD: Writedown Smooth tag
 
@@ -699,7 +713,8 @@ bool csSprite3DSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
   
-  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  csRef<iDocumentNode> paramsNode = 
+    parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
 
   if (obj)
@@ -711,13 +726,15 @@ bool csSprite3DSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 
     //Writedown Factory tag
     csRef<iMeshFactoryWrapper> fact = 
-      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
+      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), 
+        iMeshFactoryWrapper);
     if (fact)
     {
       const char* factname = fact->QueryObject()->GetName();
       if (factname && *factname)
       {
-        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        csRef<iDocumentNode> factNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         factNode->SetValue("factory");
         factNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(factname);
       }    
@@ -727,12 +744,13 @@ bool csSprite3DSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     synldr->WriteBool(paramsNode, "lighting", sprite->IsLighting(), true);
 
     //Writedown Tween tag
-    synldr->WriteBool(paramsNode, "tween", sprite->IsTweeningEnabled(), true);
+    synldr->WriteBool(paramsNode, "tween", sprite->IsTweeningEnabled(),true);
 
     //Writedown Basecolor tag
     csColor col;
     sprite->GetBaseColor(col);
-    csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    csRef<iDocumentNode> colorNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     colorNode->SetValue("basecolor");
     synldr->WriteColor(colorNode, &col);
 
@@ -740,7 +758,8 @@ bool csSprite3DSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     const char* actionname = sprite->GetCurAction()->GetName();
     if (actionname && *actionname)
     {
-      csRef<iDocumentNode> actionNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> actionNode = 
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       actionNode->SetValue("action");
       actionNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(actionname);
     }    
@@ -752,16 +771,19 @@ bool csSprite3DSaver::WriteDown (iBase* obj, iDocumentNode* parent)
       const char* matname = mat->QueryObject()->GetName();
       if (matname && *matname)
       {
-        csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        csRef<iDocumentNode> matNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         matNode->SetValue("material");
-        csRef<iDocumentNode> matnameNode = matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        csRef<iDocumentNode> matnameNode = 
+          matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
         matnameNode->SetValue(matname);
       }    
     }    
 
     //Writedown Mixmode tag
     int mixmode = sprite->GetMixMode();
-    csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    csRef<iDocumentNode> mixmodeNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     mixmodeNode->SetValue("mixmode");
     synldr->WriteMixmode(mixmodeNode, mixmode, true);
   }
