@@ -39,8 +39,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(IMGLOAD)
 endif
 
-INC.IMGLOAD = plugins/sound/loader/imgload.h
-SRC.IMGLOAD = plugins/sound/loader/imgload.cpp
+INC.IMGLOAD = plugins/video/loader/imgload.h
+SRC.IMGLOAD = plugins/video/loader/imgload.cpp
 
 ifeq ($(DO_GIF),yes)
   INC.IMGLOAD += plugins/video/loader/gifimage.h
