@@ -4,18 +4,19 @@
 # Driver description
 DESCRIPTION.d3ddx5 = Crystal Space Direct3D 5 driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make d3ddx5         Make the $(DESCRIPTION.d3ddx5)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make d3ddx5         Make the $(DESCRIPTION.d3ddx5)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: d3ddx5
+.PHONY: d3ddx5 d3ddx5clean
 
 all plugins drivers drivers3d: d3ddx5
 
@@ -26,7 +27,7 @@ d3ddx5clean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # The 3D Direct3D 5 driver
@@ -35,19 +36,20 @@ ifeq ($(USE_SHARED_PLUGINS),yes)
   LIBS.D3DDX5=$(LIBS.LOCAL.D3DDX5)
   DEP.D3DDX5=$(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
-  D3DDX5=$(OUT)$(LIB_PREFIX)d3ddx5$(LIB)
+  D3DDX5=$(OUT)$(LIB_PREFIX)3ddx5$(LIB)
   DEP.EXE+=$(D3DDX5)
   LIBS.EXE+=$(LIBS.LOCAL.D3DDX5)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_OPEND3DDX5
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_D3DDX5
 endif
 DESCRIPTION.$(D3DDX5) = $(DESCRIPTION.d3ddx5)
-SRC.D3DDX5 = $(wildcard plugins/video/renderer/opengl/*.cpp) \
-  plugins/video/renderer/common/txtmgr.cpp plugins/video/renderer/common/dtmesh.cpp
+SRC.D3DDX5 = $(wildcard plugins/video/renderer/direct3d5/*.cpp) \
+  plugins/video/renderer/common/txtmgr.cpp \
+  plugins/video/renderer/common/dtmesh.cpp
 OBJ.D3DDX5 = $(addprefix $(OUT),$(notdir $(SRC.D3DDX5:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: d3ddx5 d3ddx5clean
@@ -64,7 +66,7 @@ $(D3DDX5): $(OBJ.D3DDX5) $(DEP.D3DDX5)
 	$(DO.PLUGIN) $(LIBS.D3DDX5)
 
 d3ddx5clean:
-	$(RM) $(D3DDX5) $(OBJ.D3DDX5)
+	$(RM) $(D3DDX5) $(OBJ.D3DDX5) $(OUTOS)d3ddx5.dep
 
 ifdef DO_DEPEND
 depend: $(OUTOS)d3ddx5.dep
