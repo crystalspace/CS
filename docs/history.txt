@@ -32,6 +32,8 @@ The history order is reversed so that new features are at the top.
 	- Oktal added macros to perlpost.i to allow users to implement
 	  certain interfaces by writing classes in Perl, and made use of those
 	  macros for iEventHandler and iAwsSink; it is easy to add more.
+	- Oktal removed an old, unused line from libs/cssys/win32/loadlib.cpp
+	  that was causing an error in Cygwin.
 16-Jun-2003
 	- Oktal separated a multiple-argument %ignore directive into several
 	  single-argument ones, in perlpre.i, in order to support older

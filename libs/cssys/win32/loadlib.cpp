@@ -58,7 +58,6 @@ csLibraryHandle csLoadLibrary (const char* iName)
        "LoadLibraryEx() '/bin/' Cygwin/Win32 path conversion failed."));
      delete[] DLLDIR;
      delete[] OLD_PATH;
-     delete[] tmp;
      return 0;
    }
    SetEnvironmentVariable("PATH", DLLDIR);
