@@ -202,10 +202,10 @@ endif
 cspythonclean:
 	-$(RMDIR) $(CSPYTHON) $(SWIG.CSPYTHON) $(OBJ.CSPYTHON) $(OUTDLL)/$(notdir $(INF.CSPYTHON)) $(TRASH.CSPYTHON) python.cex
 
-swigpythgen: swigpythclean cspython
+swigpythgen: swigpythclean $(SWIG.CSPYTHON)
 
 swigpythclean:
-	-$(RM) $(CSPYTHON) $(PYTHMOD) $(SWIG.CSPYTHON)
+	-$(RM) $(SWIG.CSPYTHON)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/cspython.dep
