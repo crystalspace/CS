@@ -32,6 +32,7 @@
 #include "awschkbx.h"
 #include "awsgrpfr.h"
 #include "awslistbx.h"
+#include "awsscrbr.h"
 
 #include "awscmpt.h"
 #include "awscscr.h"
@@ -876,6 +877,7 @@ awsManager::RegisterCommonComponents()
   (void)new awsCheckBoxFactory(this);
   (void)new awsGroupFrameFactory(this);
   (void)new awsListBoxFactory(this);
+  (void)new awsScrollBarFactory(this);
 
 
   // Standard sink

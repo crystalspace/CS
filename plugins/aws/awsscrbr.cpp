@@ -29,6 +29,7 @@ sink(NULL), dec_slot(NULL), inc_slot(NULL),
 value(0), max(1), min(0), amntvis(0),
 value_delta(0.1), value_page_delta(0.25)
 {
+  SetFlag(AWSF_CMP_ALWAYSERASE);
 }
 
 awsScrollBar::~awsScrollBar()
