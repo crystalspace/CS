@@ -76,6 +76,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSocketDriver::eiEventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+// IN_MULTICAST() is a WinSock2 #define
+#ifndef IN_MULTICAST
+  #define IN_MULTICAST(i)	(((uint32)(i) & 0xf0000000) == 0xe0000000)
+#endif
 
 // csSocketEndPoint -----------------------------------------------------------
 

@@ -344,7 +344,6 @@ void csGLFontCache::WriteStringBaseline (iFont *font, int pen_x, int pen_y,
 
   float x1 = 0.0;
   float x2, y1, y2;
-  float fontDescent = -font->GetDescent ();
   int advance = 0;
   bool firstchar = true;
   float oldH = 0.0f;
