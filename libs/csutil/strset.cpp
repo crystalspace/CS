@@ -20,7 +20,7 @@
 #include "csutil/strset.h"
 #include "csutil/util.h"
 
-csStringSet::csStringSet (uint32 size) : Registry (size), reverse_mapping (size)
+csStringSet::csStringSet (int size) : Registry (size), reverse_mapping (size)
 {
   IDCounter = 0;
 }
@@ -35,7 +35,7 @@ csStringID csStringSet::Request (const char *Name)
   if (id == csInvalidStringID)
   {
     const char* registered_name = Registry.Register (Name, IDCounter);
-    reverse_mapping.Put (IDCounter, (void*)registered_name);
+    reverse_mapping.Put (IDCounter, registered_name);
     IDCounter++;
     return IDCounter-1;
   }
@@ -47,7 +47,7 @@ csStringID csStringSet::Request (const char *Name)
 
 const char* csStringSet::Request (csStringID id) const
 {
-  return (const char*)reverse_mapping.Get (id);
+  return reverse_mapping.Get (id, 0);
 }
 
 void csStringSet::Clear ()

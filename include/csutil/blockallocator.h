@@ -202,9 +202,12 @@ public:
     size_t i = blocks.Length () - 1;
     while (i > firstfreeblock)
     {
-      if (blocks[i].firstfree == (csFreeList*)blocks[i].memory &&
-      	  blocks[i].firstfree->next == 0)
+      if (blocks[i].firstfree == (csFreeList*)blocks[i].memory 
+	&& blocks[i].firstfree->numfree == size)
+      {
+	CS_ASSERT (blocks[i].firstfree->next == 0);
         blocks.DeleteIndex (i);
+      }
       i--;
     }
   }
@@ -250,7 +253,9 @@ public:
     if (!el) return;
 
     size_t idx = FindBlock ((void*)el);
-    CS_ASSERT (idx != (size_t)-1);
+    CS_ASSERT_MSG (
+      "csBlockAllocator<>::Free() called with invalid element address",
+      idx != (size_t)-1);
 
     el->~T();
 

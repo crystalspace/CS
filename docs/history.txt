@@ -10,6 +10,12 @@ chronological order.
 	- res made the memtracker also work in optimize builds.
 	- res fixed memtracker compilation with MSVC.
 	- res changed the default ref owner logic to use a sorted array.
+	- res changed csArray<>::SetCapacity() to not round the capacity up to
+	  a multiple of the threshold.
+	- res fixed a bug in csBlockAllocator<>::Compact() where under certain
+	  circumstances non-free blocks were removed.
+	- res changed the default csSet<> size/grow rate to 23/5.
+	- res changed csStringHash to use csHash<> instead of csHashMap.
 12-Nov-2004
 	- Eric Sunshine fixed pthread check in checkpthread.m4 so that it works
 	  correctly with pre-C99 compilers. Previously, it was mixing variable

@@ -29,6 +29,7 @@
 
 #if defined(CS_MEMORY_TRACKER)
 #include "csutil/memdebug.h"
+#include "csutil/snprintf.h"
 #include <typeinfo>
 #endif
 
@@ -327,8 +328,8 @@ private:
     if (!mti)
     {
       if (!curcapacity) return;
-      char buf[255];
-      sprintf (buf, "csArray<%s>", typeid (T).name());
+      char buf[1024];
+      cs_snprintf (buf, sizeof (buf), "csArray<%s>", typeid (T).name());
       mti = mtiRegisterAlloc (1 * sizeof (T), buf);
       if (!mti) return;
       curcapacity--;
@@ -364,27 +365,31 @@ private:
     }
   }
 
+  void InternalSetCapacity (size_t n)
+  {
+    if (root == 0)
+    {
+      root = MemoryAllocator::Alloc (n);
+#	ifdef CS_MEMORY_TRACKER
+      UpdateMti (n, n);
+#	endif
+    }
+    else
+    {
+      root = MemoryAllocator::Realloc (root, count, capacity, n);
+#	ifdef CS_MEMORY_TRACKER
+      UpdateMti (n-capacity, n);
+#	endif
+    }
+    capacity = n;
+  }
+
   // Adjust internal capacity of this array.
   void AdjustCapacity (size_t n)
   {
     if (n > capacity || (capacity > threshold && n < capacity - threshold))
     {
-      n = ((n + threshold - 1) / threshold ) * threshold;
-      if (root == 0)
-      {
-        root = MemoryAllocator::Alloc (n);
-#	ifdef CS_MEMORY_TRACKER
-	UpdateMti (n, n);
-#	endif
-      }
-      else
-      {
-        root = MemoryAllocator::Realloc (root, count, capacity, n);
-#	ifdef CS_MEMORY_TRACKER
-	UpdateMti (n-capacity, n);
-#	endif
-      }
-      capacity = n;
+      InternalSetCapacity (((n + threshold - 1) / threshold ) * threshold);
     }
   }
 
@@ -830,7 +835,7 @@ public:
   void SetCapacity (size_t n)
   {
     if (n > Length ())
-      AdjustCapacity (n);
+      InternalSetCapacity (n);
   }
 
   /**

@@ -20,17 +20,22 @@
 #include "csutil/strhash.h"
 #include "csutil/util.h"
 
-struct csRegisteredString
+csStringHash::csRegisteredString* csStringHash::csRegisteredString::Alloc (
+  const char* str)
 {
-  csStringID ID;
-  char *String;
-  csRegisteredString()
-  { String = 0; }
-  ~csRegisteredString()
-  { delete [] String; }
-};
+  const size_t strLen = strlen (str);
+  char* newStrBuf = new char[sizeof (IDtype) + strLen + 1];
+  strcpy (newStrBuf + sizeof (IDtype), str);
+  return (csRegisteredString*)newStrBuf;
+}
 
-csStringHash::csStringHash (uint32 size) : Registry (size)
+void csStringHash::csRegisteredString::Free (
+  csStringHash::csRegisteredString* regStr)
+{
+  delete[] ((char*)regStr);
+}
+
+csStringHash::csStringHash (int size) : Registry (size)
 {
 }
 
@@ -41,54 +46,43 @@ csStringHash::~csStringHash ()
 
 const char* csStringHash::Register (const char *Name, csStringID id)
 {
-  csRegisteredString *itf;
-  csHashKey hkey = csHashCompute (Name);
-
-  csHashIterator it (&Registry, hkey);
-  while (it.HasNext ())
+  csRegisteredString* itf;
+  itf = Registry.Get (Name, 0);
+  if (itf != 0)
   {
-    itf = (csRegisteredString*) it.Next ();
-    if (strcmp (itf->String, Name)==0)
-    {
-      itf->ID = id;
-      return itf->String;
-    }
+    itf->ID = id;
+    return itf->GetString();
   }
-
-  itf = new csRegisteredString ();
-  itf->String = csStrNew (Name);
+  itf = csRegisteredString::Alloc (Name);
   itf->ID = id;
-
-  Registry.Put (hkey, itf);
-  return itf->String;
+  Registry.Put (itf->GetString(), itf);
+  return itf->GetString();
 }
 
 csStringID csStringHash::Request (const char *Name) const
 {
   csRegisteredString *itf;
-  csHashKey hkey = csHashCompute (Name);
 
-  csHashIterator it (&Registry, hkey);
-  while (it.HasNext ())
+  itf = Registry.Get (Name, 0);
+  if (itf != 0)
   {
-    itf = (csRegisteredString*) it.NextConst ();
-    if (strcmp (itf->String, Name)==0)
-      return itf->ID;
+    return itf->ID;
   }
-
   return csInvalidStringID;
 }
 
 const char* csStringHash::Request (csStringID id) const
 {
-  csRegisteredString *itf;
+  csRegisteredString* itf;
 
-  csGlobalHashIterator it (&Registry);
+  csHash<csRegisteredString*, const char*, 
+    csConstCharHashKeyHandler>::GlobalIterator it (Registry.GetIterator ());
+
   while (it.HasNext ())
   {
-    itf = (csRegisteredString*) it.NextConst ();
+    itf = it.Next ();
     if (itf->ID == id)
-      return itf->String;
+      return itf->GetString();
   }
 
   return 0;
@@ -96,32 +90,32 @@ const char* csStringHash::Request (csStringID id) const
 
 void csStringHash::Clear ()
 {
-  csGlobalHashIterator it (&Registry);
+  csHash<csRegisteredString*, const char*, 
+    csConstCharHashKeyHandler>::GlobalIterator it (Registry.GetIterator ());
 
   while (it.HasNext ())
   {
-    csRegisteredString *s = (csRegisteredString*) it.Next ();
-    delete s;
+    csRegisteredString* itf = it.Next ();
+    csRegisteredString::Free (itf);
   }
   Registry.DeleteAll ();
 }
 
-csStringHashIterator::csStringHashIterator (csStringHash* hash)
+csStringHashIterator::csStringHashIterator (csStringHash* hash) :
+  hashIt (hash->Registry.GetIterator ())
 {
-  hashIt = new csGlobalHashIterator (&hash->Registry);
 }
 
 csStringHashIterator::~csStringHashIterator ()
 {
-  delete hashIt;
 }
 
 bool csStringHashIterator::HasNext ()
 {
-  return hashIt->HasNext();
+  return hashIt.HasNext();
 }
 
 csStringID csStringHashIterator::Next ()
 {
-  return ((csRegisteredString*)hashIt->Next())->ID;
+  return (hashIt.Next())->ID;
 }

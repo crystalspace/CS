@@ -20,9 +20,11 @@
 #define __CS_STRHASH_H__
 
 #include "csextern.h"
-#include "hashmap.h"
+#include "hash.h"
+#include "hashhandlers.h"
 
 /**\file
+ * String-to-ID hash table
  */
  
 /**
@@ -34,36 +36,7 @@ typedef uint32 csStringID;
 /// this ID is the 'invalid' value
 csStringID const csInvalidStringID = (csStringID) ~0;
 
-class csStringHash;
-
-/**
- * An iterator to iterate over elements in a csStringHash.
- * When you have an open iterator you should not alter the
- * string hash that this object iterates over. 
- */
-class CS_CSUTIL_EXPORT csStringHashIterator
-{
-  friend class csStringHash;
-
-private:
-  csGlobalHashIterator* hashIt;
-
-public:
-
-  /**
-   * Construct an iterator to iterate over all elements in the string hash.
-   * \remarks You should not make changes to the hashmap when you have open
-   *   iterators.
-   */
-  csStringHashIterator (csStringHash*);
-  /// Destructor.
-  virtual ~csStringHashIterator ();
-
-  /// Is there a next element in this iterator?
-  bool HasNext ();
-  /// Get the next element.
-  csStringID Next ();
-};
+class csStringHashIterator;
 
 /**
  * A string-to-ID hash table.  Useful when you need to work with strings but
@@ -76,12 +49,23 @@ class CS_CSUTIL_EXPORT csStringHash
 {
 private:
   friend class csStringHashIterator;
+
+  struct csRegisteredString
+  {
+    typedef csStringID IDtype;
+    IDtype ID;
+    //char String[];
+
+    static csRegisteredString* Alloc (const char* str);
+    static void Free (csRegisteredString* regStr);
+    const char* GetString() const { return ((char*)this) + sizeof (IDtype); }
+  };
   
-  csHashMap Registry;
+  csHash<csRegisteredString*, const char*, csConstCharHashKeyHandler> Registry;
 
 public:
   /// Constructor
-  csStringHash (uint32 size = 211);
+  csStringHash (int size = 23);
   /// Destructor
   ~csStringHash ();
 
@@ -118,6 +102,37 @@ public:
    * Delete all stored strings.
    */
   void Clear ();
+};
+
+/**
+ * An iterator to iterate over elements in a csStringHash.
+ * When you have an open iterator you should not alter the
+ * string hash that this object iterates over. 
+ */
+class CS_CSUTIL_EXPORT csStringHashIterator
+{
+  friend class csStringHash;
+
+private:
+  //csGlobalHashIterator* hashIt;
+  csHash<csStringHash::csRegisteredString*, const char*, 
+    csConstCharHashKeyHandler>::GlobalIterator hashIt;
+
+public:
+
+  /**
+   * Construct an iterator to iterate over all elements in the string hash.
+   * \remarks You should not make changes to the hashmap when you have open
+   *   iterators.
+   */
+  csStringHashIterator (csStringHash*);
+  /// Destructor.
+  virtual ~csStringHashIterator ();
+
+  /// Is there a next element in this iterator?
+  bool HasNext ();
+  /// Get the next element.
+  csStringID Next ();
 };
 
 #endif // __CS_STRHASH_H__

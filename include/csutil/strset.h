@@ -65,11 +65,11 @@ class CS_CSUTIL_EXPORT csStringSet
   friend class csStringSetIterator;
 
   csStringHash Registry;
-  csHashMap reverse_mapping;	// Mapping from ID to string.
+  csHash<const char*, csStringID> reverse_mapping;	// Mapping from ID to string.
   csStringID IDCounter;
 public:
   /// Constructor
-  csStringSet (uint32 size = 211);
+  csStringSet (int size = 23);
   /// Destructor
   ~csStringSet ();
 
