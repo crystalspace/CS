@@ -380,6 +380,15 @@ public:
   inline csVector3 GetNormal () const { return norm; }
 
   /// Return the A component of this plane.
+  inline float A () const { return norm.x; }
+  /// Return the B component of this plane.
+  inline float B () const { return norm.y; }
+  /// Return the C component of this plane.
+  inline float C () const { return norm.z; }
+  /// Return the D component of this plane.
+  inline float D () const { return DD; }
+
+  /// Return the A component of this plane.
   inline float& A () { return norm.x; }
   /// Return the B component of this plane.
   inline float& B () { return norm.y; }
@@ -631,6 +640,14 @@ public:
     const csPlane& p,                     // plane Ax+By+Cz+D=0
     csVector3& isect,                     // intersection point
     float& dist);                       // distance from u to isect
+
+  /** 
+   * Intersect 3 planes, to get the point that is part of all three 
+   * planes. Returns true, if there is a single point that fits.
+   * If some planes are parallel, then it will return false.
+   */
+  static bool Planes(const csPlane& p1, const csPlane& p2, const csPlane& p3,
+                     csVector3& isect);
 
   /**
    * Intersect a 3D segment with the z = 0 plane.  Assumes that there

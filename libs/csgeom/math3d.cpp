@@ -380,6 +380,45 @@ bool csIntersect3::Plane(const csVector3& u, const csVector3& v,
   return true;
 }
 
+bool csIntersect3::Planes(const csPlane& p1, const csPlane& p2, 
+                          const csPlane& p3, csVector3& isect)
+{
+  //To find the one point that is on all three planes, we need to solve
+  //the following equation system (we need to find the x, y and z which
+  //are true for all equations):
+  // A1*x+B1*y+C1*z+D1=0 //plane1
+  // A2*x+B2*y+C2*z+D2=0 //plane2
+  // A3*x+B3*y+C3*z+D3=0 //plane3
+  //This can be solved according to Cramers rule by looking at the 
+  //determinants of the equation system.
+  csMatrix3 mdet(p1.A(), p1.B(), p1.C(),
+                 p2.A(), p2.B(), p2.C(),
+                 p3.A(), p3.B(), p3.C());
+  float det = mdet.Determinant();
+  if (det == 0) return false; //some planes are parallel.
+
+  csMatrix3 mx(-p1.D(),  p1.B(),  p1.C(), 
+               -p2.D(),  p2.B(),  p2.C(), 
+               -p3.D(),  p3.B(),  p3.C());
+  float xdet = mx.Determinant();
+
+  csMatrix3 my( p1.A(), -p1.D(),  p1.C(), 
+                p2.A(), -p2.D(),  p2.C(), 
+                p3.A(), -p3.D(),  p3.C());
+  float ydet = my.Determinant();
+
+  csMatrix3 mz( p1.A(),  p1.B(), -p1.D(), 
+                p2.A(),  p2.B(), -p2.D(), 
+                p3.A(),  p3.B(), -p3.D());
+  float zdet = mz.Determinant();
+
+  isect.x = xdet/det;
+  isect.y = ydet/det;
+  isect.z = zdet/det;
+  return true;
+}
+
+
 float csIntersect3::Z0Plane(
   const csVector3& u, const csVector3& v, csVector3& isect)
 {
