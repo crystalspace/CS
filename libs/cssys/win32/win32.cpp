@@ -450,10 +450,18 @@ SCF_IMPLEMENT_IBASE (Win32Assistant)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
+void ToLower(char *dst, const char *src) 
+{
+  char *d=dst;
+  const char *s=src;
+  for(; *s; s++, d++) {
+    *d = (char)tolower(*s);
+  }
+  *d=0;
+}
+
 bool csPlatformStartup(iObjectRegistry* r)
 {
-  char installDir[MAX_PATH];
-
   /*
     When it isn't already in the PATH environment,
     the CS directory will be put there in fornt of all
@@ -465,20 +473,37 @@ bool csPlatformStartup(iObjectRegistry* r)
 
   // check if installdir is in the path.
   bool gotpath = false;
+
+  char installDir[MAX_PATH];
   csGetInstallPath(installDir, sizeof(installDir));
+  ToLower (installDir, installDir);
+  int idlen = strlen(installDir);
+  idlen--;
+  installDir[idlen] = 0;
+  
   const char* path = getenv("PATH");
-  const char* ppos = strstr (path, installDir);
+  char *mypath = new char[strlen(path) + 1];
+  ToLower (mypath, path);
+
+  char* ppos = strstr (mypath, installDir);
   while (!gotpath && ppos)
   {
-    // check if it's not part of another path
-    if (((ppos == path) || (*(ppos-1) == ';')) &&
-      ((*(ppos + strlen(installDir)) == 0) || (*(ppos + strlen(installDir)) == ';')))
+    char* npos = strchr (ppos, ';');
+    if (npos) *npos = 0;
+
+    if ((strlen (ppos) == idlen) || (strlen (ppos) == idlen+1))
     {
-      // found it
-      gotpath = true;
+      if (ppos[idlen] == '\\') ppos[idlen] = 0;
+      if (!strcmp (ppos, installDir))
+      {
+        // found it
+        gotpath = true;
+      }
     }
-    ppos = *ppos ? strstr (ppos+1, installDir) : NULL;
+    ppos = npos ? strstr (npos+1, installDir) : NULL;
   }
+  delete[] mypath;
+
   if (!gotpath)
   {
     // put CRYSTAL path into PATH environment.
