@@ -14,6 +14,7 @@
 #include "aws/awscomp.h"
 #include "aws/awsstdsk.h"
 #include "aws/awscmdbt.h"
+#include "aws/awslabel.h"
 
 
 #include <stdio.h>
@@ -745,6 +746,7 @@ awsManager::RegisterCommonComponents()
   // Components register themselves into the window manager.  Just creating a factory
   //  takes care of all the implementation details.  There's nothing else you need to do.
   (void)new awsCmdButtonFactory(this);
+  (void)new awsLabelFactory(this);
 
   GetSinkMgr()->RegisterSink("awsStandardSink", new awsStandardSink());
 }
