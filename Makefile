@@ -13,6 +13,7 @@
 TARGET=unknown
 SYSMAKEFILE=mk/system/unknown.mak
 USE_DLL=yes
+USE_NASM=no
 MODE=optimize
 # The following two symbols are intended to be used in "echo" commands
 # System-dependent makefiles can override them
@@ -29,7 +30,7 @@ MAKESECTION=rootdefines
 include mk/user.mak
 include mk/common.mak
 include mk/subs.mak
- 
+
 help:
 	@echo $"+-----------------------------------------------------------------------------+$"
 	@echo $"  Before compiling Crystal Space examine mk/user.mak and see if settings$"
@@ -51,20 +52,20 @@ ifeq ($(PROC),invalid)
 	@echo $"  make amiga        Prepare for building under and for Amiga using GCC$"
 	@echo $"  make win32vc      Prepare for building under and for Win32 using MSVC$"
 	@echo $"  -*- Modifiers -*-$"
-	@echo $"  USE_DLL=yes$|no    Build dynamic/static modules (drivers, plugins)$"
-	@echo $"  MODE=optimize$|debug$|profile  Select how to compile everything.$"
-	@echo $"+-----------------------------------------------------------------------------+$"
 else
 	@echo $"  Configured for $(DESCRIPTION.$(TARGET)) USE_DLL=$(USE_DLL) MODE=$(MODE) $(SYSMODIFIERS)$"
 	@echo $"  Other platforms are: linux, solaris, freebsd, beos, os2gcc, os2wcc, djgpp,$"
 	@echo $"  nextstep, openstep, rhapsody, amiga or win32vc with the following modifiers:$"
+endif
 	@echo $"  USE_DLL=yes$|no    Build dynamic/static modules (drivers, plugins)$"
+	@echo $"  USE_NASM=yes$|no   Use NASM/GAS assembly (Intel x86 processors only)$"
 	@echo $"  MODE=optimize$|debug$|profile  Select how to compile everything.$"
 ifdef SYSMODIFIERSHELP
 	@$(SYSMODIFIERSHELP)
 endif
-	@echo $"  For example: make linux USE_DLL=yes MODE=debug$"
+	@echo $"  Example: make linux USE_DLL=yes USE_NASM=yes MODE=debug$"
 	@echo $"+-----------------------------------------------------------------------------+$"
+ifneq ($(PROC),invalid)
 	@$(DRVHELP)
 	@echo $"+-----------------------------------------------------------------------------+$"
 	@$(LIBHELP)
@@ -87,10 +88,10 @@ endif
 	@echo $"+-----------------------------------------------------------------------------+$"
 
 depend:
-	$(MAKE) --no-print-directory -f mk/cs.mak $@ DO_DEPEND=yes
+	@$(MAKE) --no-print-directory -f mk/cs.mak $@ DO_DEPEND=yes
 
 doc api clean cleanlib cleandep:
-	$(MAKE) --no-print-directory -f mk/cs.mak $@
+	@$(MAKE) --no-print-directory -f mk/cs.mak $@
 
 endif
 
@@ -104,6 +105,7 @@ amiga unknown win32vc:
 	@echo SYSMAKEFILE = mk/system/$@.mak>>config.mak
 	@echo MODE = $(MODE)>>config.mak
 	@echo USE_DLL = $(USE_DLL)>>config.mak
+	@echo USE_NASM = $(USE_NASM)>>config.mak
 	@echo "+==================================================================="
 	@echo "| System-dependent configuration pass."
 	@echo "+==================================================================="
@@ -114,3 +116,6 @@ amiga unknown win32vc:
 
 MAKESECTION=roottargets
 include mk/subs.mak
+
+# Export all variables into environment so that submake processes can use them
+.EXPORT_ALL_VARIABLES:
