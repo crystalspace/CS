@@ -7546,9 +7546,12 @@
       <script name="walk">
 
         <rot bone="Bip01" duration="400" x="0.0157948" y="-1.5708" z="0.0"/>
+        <move bone="Bip01" duration="400" x="0.118749" y="0.0944066" z="0.0651774"/>
         <rot bone="Bip01 Footsteps" duration="400" x="-1.57072" y="-1.555" z="1.57072"/>
+        <move bone="Bip01 Footsteps" duration="400" x="0.0" y="-0.940874" z="-0.0148621"/>
         <rot bone="Bip01 Pelvis" duration="400" x="-1.5708" y="0.00414517" z="-1.5708"/>
         <rot bone="Bip01 Spine" duration="400" x="-0.119923" y="-0.0114105" z="-0.0112562"/>
+        <move bone="Bip01 Spine" duration="400" x="0.112461" y="0.000476769" z="-8.7755e-005"/>
         <rot bone="Bip01 Spine2" duration="400" x="0.0346912" y="-0.0549981" z="-0.0376791"/>
         <rot bone="Bip01 Spine3" duration="400" x="-0.145432" y="0.158403" z="0.0164937"/>
         <rot bone="Bip01 Head" duration="400" x="0.154123" y="-0.0185767" z="0.0759523"/>
@@ -7559,17 +7562,22 @@
         <rot bone="Bip01 R Forearm" duration="400" x="0.0" y="0.630692" z="0.0"/>
         <rot bone="Bip01 R Hand" duration="400" x="1.93343" y="0.0547218" z="-0.156147"/>
         <rot bone="Bip01 L Thigh" duration="400" x="-0.125522" y="-0.0161787" z="3.1039"/>
+        <move bone="Bip01 L Thigh" duration="400" x="-0.11149" y="0.0857262" z="-0.00896013"/>
         <rot bone="Bip01 L Calf" duration="400" x="0.0" y="0.16317" z="0.0"/>
         <rot bone="Bip01 L Foot" duration="400" x="-0.00151849" y="-0.163124" z="0.0470882"/>
         <rot bone="Bip01 R Thigh" duration="400" x="-0.0144165" y="-0.411969" z="-3.12313"/>
+        <move bone="Bip01 R Thigh" duration="400" x="-0.113412" y="-0.0838313" z="0.0114935"/>
         <rot bone="Bip01 R Calf" duration="400" x="0.0" y="1.40464" z="0.0"/>
         <rot bone="Bip01 R Foot" duration="400" x="-0.0600579" y="0.464718" z="-0.119465"/>
         <delay time="400" />
 
         <rot bone="Bip01" duration="400" x="-0.00460671" y="-1.5708" z="0.0"/>
+        <move bone="Bip01" duration="400" x="0.118749" y="0.0428216" z="0.0651774"/>
         <rot bone="Bip01 Footsteps" duration="400" x="1.5705" y="-1.56619" z="-1.5705"/>
+        <move bone="Bip01 Footsteps" duration="400" x="0.0" y="-0.930788" z="0.0042879"/>
         <rot bone="Bip01 Pelvis" duration="400" x="-1.5708" y="0.0702002" z="-1.5708"/>
         <rot bone="Bip01 Spine" duration="400" x="-0.204219" y="-0.000779772" z="-0.0700387"/>
+        <move bone="Bip01 Spine" duration="400" x="0.112183" y="0.00790619" z="-8.65633e-005"/>
         <rot bone="Bip01 Spine2" duration="400" x="-0.0210213" y="-0.0483257" z="-0.0372469"/>
         <rot bone="Bip01 Spine3" duration="400" x="-0.213605" y="0.16241" z="0.0313497"/>
         <rot bone="Bip01 Head" duration="400" x="0.396148" y="-0.0435285" z="0.0312858"/>
@@ -7580,89 +7588,63 @@
         <rot bone="Bip01 R Forearm" duration="400" x="0.0" y="0.414678" z="0.0"/>
         <rot bone="Bip01 R Hand" duration="400" x="1.80617" y="0.12851" z="-0.207392"/>
         <rot bone="Bip01 L Thigh" duration="400" x="-0.261905" y="0.124853" z="3.13559"/>
+        <move bone="Bip01 L Thigh" duration="400" x="-0.106485" y="0.0834182" z="-0.0171031"/>
         <rot bone="Bip01 L Calf" duration="400" x="0.0" y="0.801713" z="0.0"/>
         <rot bone="Bip01 L Foot" duration="400" x="0.0550064" y="-0.0915102" z="0.0234233"/>
         <rot bone="Bip01 R Thigh" duration="400" x="-0.2524" y="-0.597032" z="-2.93648"/>
+        <move bone="Bip01 R Thigh" duration="400" x="-0.118437" y="-0.0834182" z="0.017459"/>
         <rot bone="Bip01 R Calf" duration="400" x="0.0" y="0.358645" z="0.0"/>
         <rot bone="Bip01 R Foot" duration="400" x="-0.0132049" y="0.435516" z="-0.0644625"/>
         <delay time="400" />
 
-        <rot bone="Bip01" duration="400" x="0.927041" y="-1.56913" z="-0.903588"/>
-        <rot bone="Bip01 Footsteps" duration="400" x="-1.61335" y="-1.54732" z="1.61467"/>
-        <rot bone="Bip01 Pelvis" duration="400" x="-1.57079" y="-0.00414243" z="-1.5708"/>
-        <rot bone="Bip01 Spine" duration="400" x="-0.104449" y="-0.019635" z="-0.00513489"/>
-        <rot bone="Bip01 Spine1" duration="400" x="-0.0324543" y="-0.00381637" z="-0.0393496"/>
-        <rot bone="Bip01 Spine2" duration="400" x="0.0507788" y="-0.0578503" z="-0.0408786"/>
-        <rot bone="Bip01 Spine3" duration="400" x="-0.136791" y="0.153257" z="0.0127527"/>
-        <rot bone="Bip01 Neck" duration="400" x="0.00881114" y="-0.134041" z="-0.00989293"/>
-        <rot bone="Bip01 Head" duration="400" x="0.100574" y="-0.0126039" z="0.0923265"/>
-        <rot bone="Bip01 L Clavicle" duration="400" x="3.00668" y="-0.00748592" z="-1.56099"/>
-        <rot bone="Bip01 L UpperArm" duration="400" x="0.125989" y="-0.445141" z="1.22947"/>
-        <rot bone="Bip01 L Forearm" duration="400" x="0.0" y="0.642576" z="0.0"/>
-        <rot bone="Bip01 L Hand" duration="400" x="-1.95731" y="0.0479423" z="0.1649"/>
-        <rot bone="Bip01 L Finger0" duration="400" x="0.978951" y="-0.00803085" z="1.08109"/>
-        <rot bone="Bip01 L Finger01" duration="400" x="0.0" y="-0.587576" z="0.0"/>
-        <rot bone="Bip01 L Finger02" duration="400" x="0.0" y="-0.349934" z="0.0"/>
-        <rot bone="Bip01 L Finger1" duration="400" x="0.00723227" y="0.0357627" z="0.0399853"/>
-        <rot bone="Bip01 L Finger11" duration="400" x="0.0" y="-0.232198" z="0.0"/>
-        <rot bone="Bip01 L Finger12" duration="400" x="0.0" y="0.0656521" z="0.0"/>
-        <rot bone="Bip01 L Finger2" duration="400" x="0.0067439" y="0.0302332" z="0.00948287"/>
-        <rot bone="Bip01 L Finger21" duration="400" x="0.0" y="-0.215052" z="0.0"/>
-        <rot bone="Bip01 L Finger22" duration="400" x="0.0" y="0.0190469" z="0.0"/>
-        <rot bone="Bip01 L Finger3" duration="400" x="0.0067439" y="0.0302332" z="0.00948287"/>
-        <rot bone="Bip01 L Finger31" duration="400" x="0.0" y="-0.207224" z="0.0"/>
-        <rot bone="Bip01 L Finger32" duration="400" x="0.0" y="0.0371106" z="0.0"/>
-        <rot bone="Bip01 L Finger4" duration="400" x="0.0067439" y="0.0302332" z="0.00948287"/>
-        <rot bone="Bip01 L Finger41" duration="400" x="0.0" y="-0.198562" z="0.0"/>
-        <rot bone="Bip01 L Finger42" duration="400" x="0.0" y="0.0527068" z="0.0"/>
-        <rot bone="Bip01 R Clavicle" duration="400" x="-3.00668" y="0.00748589" z="1.5806"/>
-        <rot bone="Bip01 R UpperArm" duration="400" x="-0.541513" y="-0.314976" z="-1.23383"/>
+        <rot bone="Bip01" duration="400" x="0.0157948" y="-1.5708" z="0.0"/>
+        <move bone="Bip01" duration="400" x="0.118749" y="0.0944066" z="0.0651774"/>
+        <rot bone="Bip01 Footsteps" duration="400" x="-1.57072" y="-1.555" z="1.57072"/>
+        <move bone="Bip01 Footsteps" duration="400" x="0.0" y="-0.943488" z="-0.0149034"/>
+        <rot bone="Bip01 Pelvis" duration="400" x="-1.5708" y="-0.00414243" z="-1.5708"/>
+        <rot bone="Bip01 Spine" duration="400" x="-0.119923" y="-0.0114105" z="-0.00296854"/>
+        <move bone="Bip01 Spine" duration="400" x="0.112461" y="-0.000455284" z="-8.77589e-005"/>
+        <rot bone="Bip01 Spine2" duration="400" x="0.0346912" y="-0.0549981" z="-0.0376791"/>
+        <rot bone="Bip01 Spine3" duration="400" x="-0.145432" y="0.158403" z="0.0164937"/>
+        <rot bone="Bip01 Head" duration="400" x="0.154123" y="-0.0185767" z="0.0759523"/>
+        <rot bone="Bip01 L UpperArm" duration="400" x="0.129223" y="-0.404924" z="1.25249"/>
+        <rot bone="Bip01 L Forearm" duration="400" x="0.0" y="0.684696" z="0.0"/>
+        <rot bone="Bip01 L Hand" duration="400" x="-1.96456" y="0.0353156" z="0.144868"/>
+        <rot bone="Bip01 R UpperArm" duration="400" x="-0.585918" y="-0.314116" z="-1.21018"/>
         <rot bone="Bip01 R Forearm" duration="400" x="0.0" y="0.630692" z="0.0"/>
         <rot bone="Bip01 R Hand" duration="400" x="1.93343" y="0.0547218" z="-0.156147"/>
-        <rot bone="Bip01 L Thigh" duration="400" x="-0.230953" y="-0.411557" z="-3.04501"/>
+        <rot bone="Bip01 L Thigh" duration="400" x="-0.246838" y="-0.402151" z="-3.04179"/>
+        <move bone="Bip01 L Thigh" duration="400" x="-0.112198" y="0.0857322" z="-0.00895272"/>
         <rot bone="Bip01 L Calf" duration="400" x="0.0" y="1.40464" z="0.0"/>
         <rot bone="Bip01 L Foot" duration="400" x="0.060058" y="0.464718" z="0.119465"/>
-        <rot bone="Bip01 R Thigh" duration="400" x="-0.0992617" y="-0.0138406" z="-3.08409"/>
+        <rot bone="Bip01 R Thigh" duration="400" x="-0.114234" y="-0.00505775" z="-3.08702"/>
+        <move bone="Bip01 R Thigh" duration="400" x="-0.112704" y="-0.0838372" z="0.0114861"/>
         <rot bone="Bip01 R Calf" duration="400" x="0.0" y="0.16317" z="0.0"/>
         <rot bone="Bip01 R Foot" duration="400" x="0.00151866" y="-0.163124" z="-0.0470882"/>
         <delay time="400" />
 
         <rot bone="Bip01" duration="400" x="0.0497972" y="-1.5708" z="0.0"/>
+        <move bone="Bip01" duration="400" x="0.118749" y="0.0428216" z="0.0651774"/>
         <rot bone="Bip01 Footsteps" duration="400" x="-1.57077" y="-1.521" z="1.57077"/>
+        <move bone="Bip01 Footsteps" duration="400" x="0.0" y="-0.931026" z="-0.0464009"/>
         <rot bone="Bip01 Pelvis" duration="400" x="-1.5708" y="-0.0701973" z="-1.5708"/>
         <rot bone="Bip01 Spine" duration="400" x="0.0207742" y="-0.0276474" z="0.0490583"/>
-        <rot bone="Bip01 Spine1" duration="400" x="-0.0307696" y="-0.00436677" z="-0.0373498"/>
+        <move bone="Bip01 Spine" duration="400" x="0.112186" y="-0.00788995" z="-8.83486e-005"/>
         <rot bone="Bip01 Spine2" duration="400" x="0.127602" y="-0.0660321" z="-0.0392246"/>
         <rot bone="Bip01 Spine3" duration="400" x="-0.031779" y="0.153974" z="-0.00875175"/>
-        <rot bone="Bip01 Neck" duration="400" x="0.0083699" y="-0.138239" z="-0.00939293"/>
         <rot bone="Bip01 Head" duration="400" x="-0.247215" y="0.0373385" z="0.136311"/>
-        <rot bone="Bip01 L Clavicle" duration="400" x="3.00249" y="-0.00707249" z="-1.56149"/>
         <rot bone="Bip01 L UpperArm" duration="400" x="0.169302" y="-0.655658" z="1.08897"/>
         <rot bone="Bip01 L Forearm" duration="400" x="0.0" y="0.414678" z="0.0"/>
         <rot bone="Bip01 L Hand" duration="400" x="-1.80617" y="0.12851" z="0.207392"/>
-        <rot bone="Bip01 L Finger0" duration="400" x="0.965044" y="-0.0315904" z="1.0761"/>
-        <rot bone="Bip01 L Finger01" duration="400" x="0.0" y="-0.593493" z="0.0"/>
-        <rot bone="Bip01 L Finger02" duration="400" x="0.0" y="-0.331516" z="0.0"/>
-        <rot bone="Bip01 L Finger1" duration="400" x="-0.000796176" y="0.0249257" z="0.0308257"/>
-        <rot bone="Bip01 L Finger11" duration="400" x="0.0" y="-0.233333" z="0.0"/>
-        <rot bone="Bip01 L Finger12" duration="400" x="0.0" y="0.0457181" z="0.0"/>
-        <rot bone="Bip01 L Finger2" duration="400" x="-0.000796547" y="0.0249011" z="-1.98264e-005"/>
-        <rot bone="Bip01 L Finger21" duration="400" x="0.0" y="-0.233333" z="0.0"/>
-        <rot bone="Bip01 L Finger22" duration="400" x="0.0" y="-0.015314" z="0.0"/>
-        <rot bone="Bip01 L Finger3" duration="400" x="-0.000796547" y="0.0249011" z="-1.98264e-005"/>
-        <rot bone="Bip01 L Finger31" duration="400" x="0.0" y="-0.233333" z="0.0"/>
-        <rot bone="Bip01 L Finger32" duration="400" x="0.0" y="0.000641786" z="0.0"/>
-        <rot bone="Bip01 L Finger4" duration="400" x="-0.000796547" y="0.0249011" z="-1.98264e-005"/>
-        <rot bone="Bip01 L Finger41" duration="400" x="0.0" y="-0.233333" z="0.0"/>
-        <rot bone="Bip01 L Finger42" duration="400" x="0.0" y="0.0237288" z="0.0"/>
-        <rot bone="Bip01 R Clavicle" duration="400" x="-3.00249" y="0.00707248" z="1.5801"/>
         <rot bone="Bip01 R UpperArm" duration="400" x="-0.461096" y="-0.0725918" z="-1.38983"/>
         <rot bone="Bip01 R Forearm" duration="400" x="0.0" y="0.846707" z="0.0"/>
         <rot bone="Bip01 R Hand" duration="400" x="2.05661" y="-0.0248583" z="-0.114726"/>
         <rot bone="Bip01 L Thigh" duration="400" x="0.032622" y="-0.650266" z="3.08312"/>
+        <move bone="Bip01 L Thigh" duration="400" x="-0.116579" y="0.0875873" z="0.00513298"/>
         <rot bone="Bip01 L Calf" duration="400" x="0.0" y="0.358645" z="0.0"/>
         <rot bone="Bip01 L Foot" duration="400" x="0.0132051" y="0.435516" z="0.0644626"/>
         <rot bone="Bip01 R Thigh" duration="400" x="0.0769214" y="0.0965448" z="-3.13818"/>
+        <move bone="Bip01 R Thigh" duration="400" x="-0.108207" y="-0.0829631" z="0.00135758"/>
         <rot bone="Bip01 R Calf" duration="400" x="0.0" y="0.801713" z="0.0"/>
         <rot bone="Bip01 R Foot" duration="400" x="-0.0550063" y="-0.0915102" z="-0.0234232"/>
         <delay time="400" />
