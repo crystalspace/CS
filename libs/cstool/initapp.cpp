@@ -319,7 +319,19 @@ bool csInitializer::RequestPlugins (iObjectRegistry* r, ...)
     int version = va_arg (arg, int);
     // scfId and version are unused for now.
     (void)scfId; (void)version;
-    plugldr->RequestPlugin (plugName, intName);
+    char* colon = strchr (plugName, ':');
+    if (colon)
+    {
+      // We have a special tag name.
+      char newPlugName[512];
+      strcpy (newPlugName, plugName);
+      *strchr (newPlugName, ':') = 0;
+      plugldr->RequestPlugin (newPlugName, colon+1);
+    }
+    else
+    {
+      plugldr->RequestPlugin (plugName, intName);
+    }
     plugName = va_arg (arg, char*);
   }
   va_end (arg);
