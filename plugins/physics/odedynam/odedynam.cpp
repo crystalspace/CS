@@ -637,7 +637,7 @@ bool csODEDynamicSystem::AttachColliderMesh (iMeshWrapper* mesh,
   int i=0, j=0;
   for (i=0, j=0; i < p->GetVertexCount(); i++)
   {
-    vertices[j++] = c_vertex[i].x+5.0f;
+    vertices[j++] = c_vertex[i].x;
     vertices[j++] = c_vertex[i].y;
     vertices[j++] = c_vertex[i].z;
     //fprintf(stderr, "vertex %d coords -> x=%.1f, y=%.1f, z=%.1f\n", i,c_vertex[i].x, c_vertex[i].y, c_vertex[i].z);
@@ -921,7 +921,8 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
   }
   dTriMeshDataID TriData = dGeomTriMeshDataCreate();
 
-  dGeomTriMeshDataBuildSingle(TriData, vertices, 3*sizeof(float), p->GetVertexCount(), indeces, 3*tr_num, 3*sizeof(int));
+  dGeomTriMeshDataBuildSingle(TriData, vertices, 3*sizeof(float), p->GetVertexCount(),
+      indeces, 3*tr_num, 3*sizeof(int));
 
   dGeomID gid = dCreateTriMesh(spaceID, TriData, 0, 0, 0);
   dGeomSetPosition (gid, trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
