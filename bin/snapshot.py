@@ -25,6 +25,31 @@
 #    A tool for generating snapshots and 'diffs' of a module within a CVS
 #    repository.
 #
+#    Typically this script is run via the 'cron' daemon by the machine on
+#    which the final snapshots will reside.  See the cron(8), crontab(1), and
+#    crontab(8) man pages for information specific to cron.  A typical crontab
+#    entry which runs this script at 01:03 each morning might look like this:
+#
+#        MAILTO = sunshine@sunshineco.com
+#        3 1 * * * $HOME/bin/snapshot.py
+#
+#    The script makes no attempt to perform any sort of CVS authentication.
+#    Currently, it is the client's responibility to authenticate with the CVS
+#    server if necessary.  For :pserver: access the easiest way to work around
+#    this limitation is to login to the CVS server one time manually using the
+#    appropriate identity (such as "anonymous").  Once logged in successfully,
+#    the authentication information is stored in $(HOME)/.cvspass and remains
+#    there.  From that point onward, CVS considers the account as having been
+#    authenticated.
+#
+#    The configuration settings 'cvsroot' and 'fixcvsroot' allow the project
+#    to be retrieved from the CVS server using a CVSROOT setting which differs
+#    from the final CVSROOT setting which is actually stored in resulting
+#    snapshot.  This feature can be useful, for instance, when a snapshot
+#    should appear to the end-user as having originated via anonymous
+#    :pserver: even though it was actually generated using the :local: or
+#    :ext: protocols.
+#
 #    Author's note: This script can certainly be improved.  Better error
 #    handling, more options (such as --verbose, --quiet, etc.), better
 #    abstraction and generalization, are all future possibilities.  There is
@@ -35,36 +60,36 @@ import commands, glob, grp, os, re, string, sys, tempfile, time
 
 #------------------------------------------------------------------------------
 # Configuration Section
-#    cvsroot - CVSROOT setting for CVS.
+#    cvsroot - CVSROOT setting for performing the actual check out.
 #    fixcvsroot - The CVSROOT setting which should appear in each CVS/Root
 #        file within the snapshot.  May be None if it is identical to the
 #        original cvsroot setting.  This setting is useful in cases where the
 #        CVSROOT value used for performing the check out differs from the one
 #        users will later need when updating the snapshot from CVS.
 #    cvsmodule - The module to checkout from the CVS repository.
-#    moduledir - The name of the directory which is created when the module
-#        is checked out from CVS (frequently identical to cvsmodule).
+#    moduledir - The name of the directory which is created when the module is
+#        checked out from CVS (frequently identical to cvsmodule).
 #    ownergroup - The group name which will be given to the 'chgrp' command
 #        when directories are created.  Assigning group ownership to a
 #        directory allows others in the group to manipulate the contents of
 #        the directory.  May be None.
 #    packprefix - Prefix used to compose the final package name of the form
-#        prefix-YYYY-MM-DD-*.ext".
+#        prefix-YYYY-MM-DD-HHMMSS.ext".
 #    snapdir - Directory where snapshot packages will be placed.
 #    keepsnaps - Number of recent packages to retain.
 #    archivers - A tuple of archivers used to generate the project packages.
-#        Each tuple is a dictionary with the following keys.  The key "name"
-#        specifies the name of the directory under "snapdir" into which this
-#        archived package will be placed.  The key "dir" is a dictionary
-#        describing how to archive a directory into a single package.  The
-#        key "file" is a dictionary describing how to archive a single file
-#        into a package.  The "dir" and "file" dictionaries contain the
-#        following keys.  The key "ext" is the file extension for the
-#        generated file.  The key "cmd" is the actual command template which
-#        describes how to generate the given archive.  It may contain the
-#        meta-tokens @S and @D.  The token @S is replaced with the name of
-#        the source directory or file which is being archived, and @D is
-#        replaced with the final destination package name.
+#        Each tuple element is a dictionary with the following keys.  The key
+#        "name" specifies the name of the directory under 'snapdir' into which
+#        this archived package will be placed.  The key "dir" is a dictionary
+#        describing how to archive a directory into a single package.  The key
+#        "file" is a dictionary describing how to archive a single file into a
+#        package.  The "dir" and "file" dictionaries contain the following
+#        keys.  The key "ext" is the file extension for the generated file.
+#        The key "cmd" is the actual command template which describes how to
+#        generate the given archive.  It may contain the meta-tokens @S and
+#        @D.  The token @S is replaced with the name of the source directory
+#        or file which is being archived, and @D is replaced with the final
+#        destination package name.
 #------------------------------------------------------------------------------
 
 cvsroot = ":pserver:anonymous@cvs1:/cvsroot/crystal"
@@ -307,13 +332,13 @@ class Snapshot:
                                     self.diffname)
         self.dirstack.popdir()
         self.writetimestamp()
-        
+
     def makelink(self, ext, src, linkname):
         src = src + "." + ext
         linkname = linkname + "." + ext
         self.removefile(linkname)
         os.symlink(src, linkname)
-                            
+
     def makelinks(self):
         for dict in archivers:
             name = dict["name"]
