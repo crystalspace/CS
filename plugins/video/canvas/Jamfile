@@ -2,6 +2,7 @@ SubDir TOP plugins video canvas ;
 
 SubInclude TOP plugins video canvas asciiart ;
 SubInclude TOP plugins video canvas ddraw ;
+SubInclude TOP plugins video canvas macosx ;
 SubInclude TOP plugins video canvas memory ;
 SubInclude TOP plugins video canvas null2d ;
 SubInclude TOP plugins video canvas openglwin ;

@@ -69,6 +69,10 @@ chronological order.
 	  would like to identify any which still remain.
 	- Jorrit added a -quick option to pvscalc. That will just create
 	  the kdtree so that the level works but nothing more.
+	- Eric Sunshine fixed brokeness in the Jam system which was inflicted
+	  when `csplugincommon' was introduced, and which prevented the MacOS/X
+	  canvases from ever being built. (It was broken for a month, but
+	  nobody complained.)
 21-Mar-2005
 	- Eric Sunshine re-wrote crystal.m4 essentially from scratch since it
 	  was fragile, obfuscated, and unnecessarily complex.
