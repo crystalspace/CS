@@ -1,6 +1,7 @@
 /*
     Crystal Space Windowing System: timer class
     Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 2002 by Mat Sutcliffe <oktal@gmx.co.uk>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -44,6 +45,11 @@ enum
   cscmdTimerPulse = 0x00000300
 };
 
+#include "iutil/event.h"
+struct iEventHandler;
+struct iEventQueue;
+struct iEventOutlet;
+
 /**
  * Timer is a pseudo-component class which counts time and generates a
  * cscmdTimerPulse command to its parent each time timer crosses
@@ -61,9 +67,20 @@ class csTimer : public csComponent
   /// Timer is stopped?
   bool Stopped;
 
+  iEventHandler *eventh;
+  iEventOutlet *evento;
+  void Init (unsigned iPeriod);
+  struct csTimerEvent : public iEvent
+  {
+    SCF_DECLARE_IBASE;
+    csTimerEvent () { SCF_CONSTRUCT_IBASE(NULL); }
+  } TimerEvent;
+  
 public:
   /// Create timer object: the timer is created in running state
   csTimer (csComponent *iParent, unsigned iPeriod);
+  csTimer (iEventHandler *iParent, unsigned iPeriod, void *iInfo = NULL);
+  csTimer (iEventQueue *iParent, unsigned iPeriod, void *iInfo = NULL);
 
   /// Handle external events and generate timeouts
   virtual bool HandleEvent (iEvent &Event);

@@ -1,6 +1,7 @@
 /*
     Crystal Space Windowing System: timer class
     Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 2002 by Mat Sutcliffe <oktal@gmx.co.uk>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,16 +21,51 @@
 #include "cssysdef.h"
 #include "csws/cstimer.h"
 #include "csws/csapp.h"
+#include "iutil/event.h"
+#include "csutil/csevent.h"
+#include "iutil/eventh.h"
+#include "iutil/eventq.h"
+#include "iutil/evdefs.h"
+
+#include <time.h>
+
+SCF_IMPLEMENT_IBASE (csTimer::csTimerEvent)
+  SCF_IMPLEMENTS_INTERFACE (iEvent)
+SCF_IMPLEMENT_IBASE_END
+
+void csTimer::Init (unsigned iPeriod)
+{
+  TimerEvent.Time = 0;
+  TimerEvent.Type = csevCommand;
+  TimerEvent.Command.Code = cscmdTimerPulse;
+  eventh = NULL;
+  evento = NULL;
+  state |= CSS_TRANSPARENT;
+  timeout = iPeriod;
+  pause = 0;
+  Restart ();
+}
 
 csTimer::csTimer (csComponent *iParent, unsigned iPeriod)
   : csComponent (iParent)
 {
-  state |= CSS_TRANSPARENT;
-  timeout = iPeriod;
-  pause = 0;
-  Stopped = false;
-  if (app)
-    start = app->GetCurrentTime ();
+  Init (iPeriod);
+}
+
+csTimer::csTimer (iEventHandler *iEventH, unsigned iPeriod, void *iInfo)
+  : csComponent (NULL)
+{
+  Init (iPeriod);
+  eventh = iEventH;
+  TimerEvent.Command.Info = iInfo;
+}
+
+csTimer::csTimer (iEventQueue *iEventQ, unsigned iPeriod, void *iInfo)
+  : csComponent (NULL)
+{
+  Init (iPeriod);
+  evento = iEventQ->GetEventOutlet ();
+  TimerEvent.Command.Info = iInfo;
 }
 
 bool csTimer::HandleEvent (iEvent &Event)
@@ -38,14 +74,19 @@ bool csTimer::HandleEvent (iEvent &Event)
    && (Event.Type == csevBroadcast)
    && (Event.Command.Code == cscmdPreProcess))
   {
-    unsigned current = app->GetCurrentTime ();
+    unsigned current = app ? app->GetCurrentTime () : time (NULL);
     unsigned delta = current - start;
     if (pause >= delta)
       return false;
     pause = 0;
     if (delta >= timeout)
     {
-      parent->SendCommand (cscmdTimerPulse, this);
+      if (parent)
+        parent->SendCommand (cscmdTimerPulse, this);
+      else if (eventh)
+        eventh->HandleEvent (TimerEvent);
+      else if (evento)
+        evento->Post (& TimerEvent);
       // if we're not too far behind, switch to next pulse
       // otherwise we'll have to jump far to the current time
       start += timeout;
@@ -64,7 +105,7 @@ void csTimer::Stop ()
 void csTimer::Restart ()
 {
   Stopped = false;
-  start = app->GetCurrentTime ();
+  start = app ? app->GetCurrentTime () : time (NULL);
 }
 
 void csTimer::Pause (unsigned iPause)
