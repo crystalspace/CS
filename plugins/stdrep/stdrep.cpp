@@ -189,14 +189,44 @@ bool csReporterListener::Initialize (iObjectRegistry* r)
 bool csReporterListener::Report (iReporter*, int severity,
 	const char* msgID, const char* description)
 {
+  static csString lastID ("");
+  bool repeatedID = false;
+  if (lastID.Compare (msgID))
+    repeatedID = true;
+  else
+    lastID = msgID;
+
   csString msg;
   if (show_msgid[severity])
-    msg.Format("%s: %s\n", msgID, description);
-  else
+  {
+    msg.Format("%s:  %s\n", msgID, description);
+  } else
     msg.Format("%s\n", description);
 
   if (dest_stdout[severity])
-    csPrintf ("%s", msg.GetData());
+  {
+    if (!repeatedID)
+    {
+      csPrintf ("\n%s:\n", msgID);
+    }
+    int offset = 0;
+    while (strlen(description+offset)>77)
+    {
+      csString str (description+offset);
+      str.Truncate (77);
+      int linebreak = strrchr (str.GetData (), ' ')-str.GetData ();
+      if (linebreak>0)
+      {
+        str.Truncate (linebreak);
+        csPrintf ("  %s\n", str.GetData ());
+        offset += linebreak+1;
+      } else {
+        csPrintf ("  %0.77s\n", str.GetData ());
+        offset += 77;
+      }
+    }
+    csPrintf ("  %s\n", description+offset);
+  }
   if (dest_stderr[severity])
     csFPutErr (msg.GetData());
   if (dest_console[severity] && console)
@@ -220,11 +250,18 @@ bool csReporterListener::Report (iReporter*, int severity,
   }
   if (dest_popup[severity])
   {
-    // cut away trailing '\n'
-    msg.Truncate (msg.Length () - 1);
-    csRef<csTimedMessage> tm = csPtr<csTimedMessage> (
-    	new csTimedMessage (msg.GetData ()));
     csScopedMutexLock lock (mutex);
+    csString popmsg;
+    if (!repeatedID)
+    {
+      popmsg.Format ("%s:", msgID);
+      csRef<csTimedMessage> tm = csPtr<csTimedMessage> (
+        new csTimedMessage (popmsg.GetData ()));
+      messages.Push (tm);
+    }
+    popmsg.Format (" %s", description);
+    csRef<csTimedMessage> tm = csPtr<csTimedMessage> (
+    	new csTimedMessage (popmsg.GetData ()));
     messages.Push (tm);
   }
   return msg_remove[severity];
@@ -256,14 +293,56 @@ bool csReporterListener::HandleEvent (iEvent& event)
 	    int fw, fh;
 	    fnt->GetMaxSize (fw, fh);
 	    int fg = g2d->FindRGB (0, 0, 0);
-	    int bg = g2d->FindRGB (255, 255, 0);
-	    int max_l = (sh-4-6-4-6) / (fh+4);
+            int bg[2] = {g2d->FindRGB (255, 255, 180),
+                         g2d->FindRGB (255*0.9, 255*0.9, 180*0.9)};
+            int sep = g2d->FindRGB (255*0.7, 255*0.7, 180*0.7);
+
+	    int max_l = (sh-4-6-4-6) / (fh+6);
 	    if (l > max_l) l = max_l;
-	    g2d->DrawBox (4, 4, sw-8, 6 + l*(fh+4)-4 + 6, bg);
+	    //g2d->DrawBox (4, 4, sw-8, 6 + l*(fh+6)-4 + 6, g2d->FindRGB (255, 0, 0));
+            int h = 0;
+            int c = 0;
 	    for (i = 0 ; i < l ; i++)
 	    {
 	      csTimedMessage* tm = messages[i];
-              g2d->Write (fnt, 4+6, 4+6+i*(fh+4), fg, bg, tm->msg);
+              if (tm->msg[0] != ' ')
+              {
+                c = 1-c;
+                // Assume that the ID fits
+                g2d->DrawBox (4, 4+h*(fh+6), sw-8, fh+6, bg[c]);
+                g2d->DrawLine (4, 4+h*(fh+6), 4+sw-8-1, 4+h*(fh+6), sep);
+                g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], tm->msg);
+              } else {
+                csString msg (tm->msg+1);
+                int chars;
+                csString str;
+                str.Format ("  %s", msg.GetData ());
+                while ((chars = fnt->GetLength (str.GetData (), sw-200)) <
+                  msg.Length ())
+                {
+                  str.Truncate (chars);
+                  g2d->DrawBox (4, 4+h*(fh+6), sw-8, fh+6, bg[c]);
+                  int linebreak = strrchr (str.GetData (), ' ')-str.GetData ();
+                  if (linebreak>0)
+                  {
+                    str.Truncate (linebreak);
+                    g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], 
+                      str.GetData ());
+                    msg = msg.GetData ()+linebreak-1;
+                  } else {
+                    g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], 
+                      str.GetData ());
+                    msg = msg.GetData ()+chars-2;
+                  }
+                  str.Format ("  %s", msg.GetData ());
+                  h++;
+                  l--;
+                }
+                str.Format ("  %s", msg.GetData ());
+                g2d->DrawBox (4, 4+h*(fh+6), sw-8, fh+6, bg[c]);
+                g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], str.GetData ());
+              }
+              h++;
 	      // Set the time the first time we could actually display it.
 	      if (tm->time == 0) tm->time = csGetTicks () + 5000;
 	    }
