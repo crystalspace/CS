@@ -1,4 +1,4 @@
-<shader name="splatting black">
+<shader name="splatting_black">
   <!-- This should be defined by renderloop somehow and track sector ambient -->
   <technique priority="100">
     <pass>

@@ -1,5 +1,5 @@
 <shader name="splatting_ambient">
-  <declare name="STANDARD_LIGHT_AMBIENT" type="vector3" default="0.2, 0.2, 0.4" />
+  <declare name="STANDARD_LIGHT_AMBIENT" type="vector3" default="1, 1, 1" />
   <technique priority="50">
     <pass>
       <mixmode><add/></mixmode>
