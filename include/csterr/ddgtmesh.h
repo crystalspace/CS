@@ -208,10 +208,14 @@ class WEXP ddgTBinMesh
 	ddgQueue		*_qs;
 	/// Merge queue.
 	ddgQueue		*_qm;
+	/// Z depth queue.
+	ddgQueue		*_qz;
 	/// Split queue iterator
 	ddgSplayIterator		*_qsi;
 	/// Merge queue
 	ddgSplayIterator		*_qmi;
+	/// Z depth queue iterator.
+	ddgSplayIterator		*_qzi;
 	/// Number of rows of bintrees.
 	unsigned int	_nr;
 	/// Number of columns of bintrees.
@@ -282,12 +286,16 @@ public:
 	/// Set the required LOD.
 	void detail( unsigned int d ) { _detail = d; }
 
-	/// Return the split queue (For debugging only)
+	/// Return the split queue 
 	ddgQueue *qs(void) { return _qs; }
-	/// Return the merge queue (For debugging only)
+	/// Return the merge queue 
 	ddgQueue *qm(void) { return _qm; }
+	/// Return the merge queue 
+	ddgQueue *qz(void) { return _qz; }
 	/// Return an iterator for the visible set of triangles.
 	ddgSplayIterator* qsi(void) { return _qsi; }
+	/// Return an iterator for the visible set of triangles.
+	ddgSplayIterator* qzi(void) { return _qzi; }
 	/// Return the number of triangles.
 	unsigned int triNo(void) { return _triNo; }
 	/**

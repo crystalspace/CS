@@ -96,8 +96,14 @@ static void transformer(ddgVector3 vin, ddgVector3 *vout)
 	}
 }
 
+// Z depth queue iterator
+static ddgSplayIterator		*qri;
+// Z depth queue.
+static ddgQueue			*qr;
+
 bool csTerrain::Initialize (char* heightmap)
 {
+
   CHK (height = new ddgHeightMap ());
   if (height->readTGN (heightmap))
 	  height->generateHeights(257,257,5);
@@ -106,7 +112,7 @@ bool csTerrain::Initialize (char* heightmap)
 
   float fov = 90.0;
   mesh->settransform(transformer); 
-  mesh->init (wtoc, clipbox, fov);
+  mesh->init (NULL, clipbox, fov);
 
 	_cliff.set(175,175,175);  // Cliff
 	_beach.set(200,200,50);  // Beach.
@@ -122,15 +128,9 @@ bool csTerrain::Initialize (char* heightmap)
 	_rockalt = 7;
 	_snowalt = 999;
 
+
   return true;
 }
-
-// Z depth queue iterator
-// static ddgSplayIterator	*_qzi = NULL, *qri;
-static ddgSplayIterator		*qri;
-// Z depth queue.
-// static ddgQueue		*_qz = NULL, *qr;
-static ddgQueue			*qr;
 
 void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
 {
@@ -142,7 +142,7 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
   poly.flat_color_g = 1;
   poly.flat_color_b = 1;
   poly.txt_handle = _textureMap->GetTextureHandle ();
-  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, use_z_buf);
+  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, false /*use_z_buf*/);
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
   rview.g3d->StartPolygonFX (poly.txt_handle, CS_FX_GOURAUD);
   grview = &rview;
@@ -151,17 +151,12 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
 
 	// If we are not using Z-buffer...
     // For all the triangle in the visible queue, insert them in z-order.
-/*
-  	if ( !use_z_buf )
+
+  	if ( 1 /*!use_z_buf*/ )
 	{
-		if (!_qz)
-		{
-			_qz = new ddgQueue( mesh );
-			_qzi = new ddgSplayIterator(_qz);
-		}
-		_qzi->reset();
+		mesh->qzi()->reset();
 		// Clear queue.
-		_qz->clear();
+		mesh->qz()->clear();
 		mesh->qsi()->reset();
 		while (!mesh->qsi()->end())
 		{
@@ -181,17 +176,16 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
 			p = bt->tri(tvp)->pos();
             if (p->v[2] < d)
                 d = p->v[2];
-            _qz->ddgSplayTree::insert(bt->index(),tvc,d);
-			mesh->qsi()->next();
+            mesh->qz()->ddgSplayTree::insert (bt->index(),tvc,d);
+			mesh->qsi ()->next ();
 		}
-		qri = _qzi;
-		qr  = _qz;
+		qri = mesh->qzi();
+		qr  = mesh->qz();
 	}
 	else
-*/
 	{
-		qri = mesh->qsi();
-		qr  = mesh->qs();
+		qri = mesh->qsi ();
+		qr  = mesh->qs ();
 	}
 
    // Render
