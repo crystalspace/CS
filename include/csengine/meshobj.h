@@ -572,7 +572,10 @@ public:
     virtual void MarkVisible () { scfParent->MarkVisible (); }
     virtual void MarkInvisible () { scfParent->MarkInvisible (); }
     virtual bool IsVisible () const { return scfParent->IsVisible (); }
-    virtual iPolygonMesh* GetWriteObject () { return NULL; }
+    virtual iPolygonMesh* GetWriteObject ()
+    {
+      return scfParent->mesh->GetWriteObject ();
+    }
   } scfiVisibilityObject;
   friend struct VisObject;
 };

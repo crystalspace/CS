@@ -612,6 +612,9 @@ public:
   /// Get logical parent.
   virtual iBase* GetLogicalParent () const { return logparent; }
 
+  /// Get write object.
+  virtual iPolygonMesh* GetWriteObject () { return NULL; }
+
   /// Check if the terrain is hit by the given object space vector
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end, csVector3& isect, float* pr);
 

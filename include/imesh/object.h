@@ -28,6 +28,7 @@ struct iMeshObjectFactory;
 struct iRenderView;
 struct iMovable;
 struct iLight;
+struct iPolygonMesh;
 class csReversibleTransform;
 
 /**
@@ -213,6 +214,19 @@ struct iMeshObject : public iBase
    * for more information.
    */
   virtual iBase* GetLogicalParent () const = 0;
+
+  /**
+   * Get an optional polygon mesh that can be used as a write object
+   * for a visibility system. If this is null the object will not
+   * be used as a write object (but only as a read object for visibility
+   * testing). The write object should be completely contained in the
+   * original object. If the shape of the object changes (GetShapeNumber())
+   * then the visibility system will know that the geometry has changed.
+   * Different mesh objects may share the same write object.
+   * In that case the visibility system may use that reduce memory
+   * and computation usage based on this.
+   */
+  virtual iPolygonMesh* GetWriteObject () = 0;
 };
 
 SCF_VERSION (iMeshObjectFactory, 0, 0, 5);

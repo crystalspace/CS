@@ -151,6 +151,7 @@ public:
   virtual long GetShapeNumber () const { return shapenr; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iPolygonMesh* GetWriteObject () { return NULL; }
 
   //------------------------- iStarsState implementation ----------------
   class StarsState : public iStarsState

@@ -1,0 +1,14 @@
+@c -*-texinfo-*-
+@node API Modifications 96, API Modifications 94, API Modifications, API Modifications
+@appendixsec @sc{api} Changes from 0.94 to 0.96
+@cindex @sc{api} Changes
+
+This section documents the major changes between versions 0.94 and 0.96 of of
+Crystal Space.
+
+@subheading iPolygonMesh changes
+@cindex @code{iPolygonMesh}
+
+The header for @code{iPolygonMesh} has moved from @file{include/ivaria}
+to @file{include/igeom}.
+

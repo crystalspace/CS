@@ -165,6 +165,7 @@ public:
   virtual long GetShapeNumber() const { return shape_num; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iPolygonMesh* GetWriteObject () { return NULL; }
 
   virtual void GetRadius(csVector3& radius, csVector3& cent)
 	{ radius =  rad; cent = object_bbox.GetCenter(); }

@@ -28,7 +28,7 @@
 #include "iengine/statlght.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
-#include "ivaria/polymesh.h"
+#include "igeom/polymesh.h"
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "iutil/event.h"

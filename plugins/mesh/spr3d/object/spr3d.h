@@ -31,7 +31,7 @@
 #include "plugins/mesh/spr3d/object/sprtri.h"
 #include "plugins/mesh/spr3d/object/skel3d.h"
 #include "ivideo/graph3d.h"
-#include "ivaria/polymesh.h"
+#include "igeom/polymesh.h"
 #include "imesh/sprite3d.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
@@ -1288,6 +1288,7 @@ public:
   virtual long GetShapeNumber () const { return shapenr; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iPolygonMesh* GetWriteObject () { return NULL; }
 
   //------------------ iPolygonMesh interface implementation ----------------//
   struct PolyMesh : public iPolygonMesh

@@ -28,7 +28,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
 #include "csutil/garray.h"
-#include "ivaria/polymesh.h"
+#include "igeom/polymesh.h"
 #include "iengine/viscull.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
@@ -92,6 +92,54 @@ struct csThingEdge
 };
 
 /**
+ * A helper class for iPolygonMesh implementations used by csThing.
+ */
+class PolyMeshHelper : public iPolygonMesh
+{
+public:
+  PolyMeshHelper () : polygons (NULL), vertices (NULL), alloc_vertices (NULL) { }
+  virtual ~PolyMeshHelper () { Cleanup (); }
+  void Setup ();
+  void SetThing (csThing* thing) { PolyMeshHelper::thing = thing; }
+
+  virtual int GetVertexCount ()
+  {
+    Setup ();
+    return num_verts;
+  }
+  virtual csVector3* GetVertices ()
+  {
+    Setup ();
+    return vertices;
+  }
+  virtual int GetPolygonCount ()
+  {
+    Setup ();
+    return num_poly;
+  }
+  virtual csMeshedPolygon* GetPolygons ()
+  {
+    Setup ();
+    return polygons;
+  }
+  virtual void Cleanup ();
+
+private:
+  csThing* thing;
+  csMeshedPolygon* polygons;	// Array of polygons.
+  csVector3* vertices;		// Array of vertices (points to alloc_vertices
+  				// or else obj_verts of scfParent).
+  csVector3* alloc_vertices;	// Optional copy of vertices from parent.
+    				// This copy is used if there are curve
+				// vertices.
+  int num_poly;			// Total number of polygons.
+  int curve_poly_start;		// Index of first polygon from curves.
+    				// Polygons after this index need to be
+				// deleted individually.
+  int num_verts;		// Total number of vertices.
+};
+
+/**
  * A Thing is a set of polygons. A thing can be used for the
  * outside of a sector or else to augment the sector with
  * features that are difficult to describe with convex sectors alone.<p>
@@ -114,6 +162,8 @@ struct csThingEdge
  */
 class csThing : public csObject
 {
+  friend class PolyMeshHelper;
+
 private:
   /// ID for this thing (will be >0).
   unsigned int thing_id;
@@ -143,6 +193,9 @@ private:
   int num_cam_verts;
   /// Camera number for which the above camera vertices are valid.
   long cameranr;
+
+  /// Shape number.
+  long shapenr;
 
   /**
    * This number indicates the last value of the movable number.
@@ -692,6 +745,11 @@ public:
    */
   void RemovePortalPolygon (csPolygon3D* poly);
 
+  /**
+   * Get a write object for a vis culling system.
+   */
+  iPolygonMesh* GetWriteObject ();
+
   //----------------------------------------------------------------------
   // Visibility culler
   //----------------------------------------------------------------------
@@ -1082,49 +1140,10 @@ public:
   friend struct LightingInfo;
 
   //-------------------- iPolygonMesh interface implementation ---------------
-  struct PolyMesh : public iPolygonMesh
+  struct PolyMesh : public PolyMeshHelper
   {
-    PolyMesh () : polygons (NULL), vertices (NULL), alloc_vertices (NULL) { }
-    virtual ~PolyMesh () { Cleanup (); }
-    void Setup ();
-
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
-
-    virtual int GetVertexCount ()
-    {
-      Setup ();
-      return num_verts;
-    }
-    virtual csVector3* GetVertices ()
-    {
-      Setup ();
-      return vertices;
-    }
-    virtual int GetPolygonCount ()
-    {
-      Setup ();
-      return num_poly;
-    }
-    virtual csMeshedPolygon* GetPolygons ()
-    {
-      Setup ();
-      return polygons;
-    }
-    virtual void Cleanup ();
-
-    csMeshedPolygon* polygons;	// Array of polygons.
-    csVector3* vertices;	// Array of vertices (points to alloc_vertices
-    				// or else obj_verts of scfParent).
-    csVector3* alloc_vertices;	// Optional copy of vertices from parent.
-    				// This copy is used if there are curve
-				// vertices.
-    int num_poly;		// Total number of polygons.
-    int curve_poly_start;	// Index of first polygon from curves.
-    				// Polygons after this index need to be
-				// deleted individually.
-    int num_verts;		// Total number of vertices.
   } scfiPolygonMesh;
-  friend struct PolyMesh;
 
   //-------------------- iVisibilityCuller interface implementation ----------
   struct VisCull : public iVisibilityCuller
@@ -1207,9 +1226,10 @@ public:
     virtual bool HitBeamObject (const csVector3& /*start*/,
     	const csVector3& /*end*/,
   	csVector3& /*isect*/, float* /*pr*/) { return false; }
-    virtual long GetShapeNumber () const { return 0; /*@@@*/ }
+    virtual long GetShapeNumber () const { return scfParent->shapenr; }
     virtual void SetLogicalParent (iBase* lp) { scfParent->logparent = lp; }
     virtual iBase* GetLogicalParent () const { return scfParent->logparent; }
+    virtual iPolygonMesh* GetWriteObject () { return scfParent->GetWriteObject (); }
   } scfiMeshObject;
   friend struct MeshObject;
 

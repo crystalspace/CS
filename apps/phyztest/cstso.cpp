@@ -8,7 +8,7 @@
 #include "imesh/object.h"
 #include "iengine/sector.h"
 #include "phyztest.h"
-#include "ivaria/polymesh.h"
+#include "igeom/polymesh.h"
 
 extern ctWorld phyz_world;
 extern Phyztest *Sys;

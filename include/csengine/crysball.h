@@ -47,7 +47,7 @@
 #include "csgeom/vector3.h"
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
-#include "ivaria/polymesh.h"
+#include "igeom/polymesh.h"
 
 class csCrystalBall
 {

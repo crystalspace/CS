@@ -91,7 +91,7 @@ struct iVisibilityCuller : public iBase
   virtual void UnregisterShadowReceiver (iShadowReceiver* receiver) = 0;
 };
 
-SCF_VERSION (iVisibilityObject, 0, 0, 5);
+SCF_VERSION (iVisibilityObject, 0, 0, 6);
 
 /**
  * An object that wants to know if it is visible or not
@@ -127,7 +127,10 @@ struct iVisibilityObject : public iBase
    * be used as a write object (but only as a read object for visibility
    * testing). The write object should be completely contained in the
    * original object. If the shape of the object changes (GetShapeNumber())
-   * then the visibility system has to call this function again.
+   * then the visibility system will know that the geometry has changed.
+   * Different visibility objects may share the same write object.
+   * In that case the visibility system may use that reduce memory
+   * and computation usage based on this.
    */
   virtual iPolygonMesh* GetWriteObject () = 0;
 };

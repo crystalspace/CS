@@ -67,7 +67,7 @@
 #include "csgeom/transfrm.h"
 #include "rapcol.h"
 #include "prapid.h"
-#include "ivaria/polymesh.h"
+#include "igeom/polymesh.h"
 #include "ivaria/collider.h"
 
 #define CD_MAX_COLLISION    1000

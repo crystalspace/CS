@@ -15,6 +15,7 @@ you should send mail to the Crystal Space mailing list and ask for help.
 @xref{Mailing Lists}.
 
 @menu
+* API Modifications 96:: @sc{api} Changes from 0.94 to 0.96
 * API Modifications 94:: @sc{api} Changes from 0.92 to 0.94
 * API Modifications 92:: @sc{api} Changes from 0.90 to 0.92
 * API Modifications 90:: @sc{api} Changes from 0.18 to 0.90
@@ -22,6 +23,7 @@ you should send mail to the Crystal Space mailing list and ask for help.
 * API Modifications 17:: @sc{api} Changes from 0.16 to 0.17
 @end menu
 
+@imports{appendix,apimod96.txi}
 @imports{appendix,apimod94.txi}
 @imports{appendix,apimod92.txi}
 @imports{appendix,apimod90.txi}

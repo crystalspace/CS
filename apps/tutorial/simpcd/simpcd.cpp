@@ -52,7 +52,7 @@
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "ivaria/collider.h"
-#include "ivaria/polymesh.h"
+#include "igeom/polymesh.h"
 #include "cstool/collider.h"
 #include "csutil/cmdhelp.h"
 

@@ -103,6 +103,7 @@ public:
   virtual long GetShapeNumber () const { return 1; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iPolygonMesh* GetWriteObject () { return NULL; }
 };
 
 #endif // __CS_SPIDER_H__

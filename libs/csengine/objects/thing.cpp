@@ -106,6 +106,8 @@ csThing::csThing (iBase *parent) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObjectFactory);
   DG_TYPE (this, "csThing");
 
+  scfiPolygonMesh.SetThing (this);
+
   last_thing_id++;
   thing_id = last_thing_id;
   last_polygon_id = 0;
@@ -134,6 +136,7 @@ csThing::csThing (iBase *parent) :
 
   cameranr = -1;
   movablenr = -1;
+  shapenr = -1;
   wor_bbox_movablenr = -1;
   cached_movable = NULL;
 
@@ -907,6 +910,8 @@ void csThing::InvalidateThing ()
   delete bbox;
   bbox = NULL;
   CleanupThingEdgeTable ();
+
+  shapenr++;
 }
 
 void csThing::RemovePolygon (int idx)
@@ -920,6 +925,11 @@ void csThing::RemovePolygon (int idx)
   }
 
   polygons.Delete (idx);
+}
+
+iPolygonMesh* csThing::GetWriteObject ()
+{
+  return NULL;
 }
 
 void csThing::RemovePolygons ()
@@ -2294,7 +2304,8 @@ void csThing::GetBoundingBox (iMovable *movable, csBox3 &box)
 }
 
 //-------------------------------------------------------------------------
-void csThing::PolyMesh::Setup ()
+
+void PolyMeshHelper::Setup ()
 {
   if (polygons || alloc_vertices)
   {
@@ -2302,18 +2313,18 @@ void csThing::PolyMesh::Setup ()
 
     // is still valid (if it is not a copy).
     if (alloc_vertices) return ;
-    if (vertices == scfParent->obj_verts) return ;
+    if (vertices == thing->obj_verts) return ;
   }
 
   vertices = NULL;
 
   // Count the number of needed polygons and vertices.
-  num_verts = scfParent->GetVertexCount ();
+  num_verts = thing->GetVertexCount ();
   num_poly = 0;
 
   int i, j;
-  const csPolygonArray &pol = scfParent->polygons;
-  for (i = 0; i < scfParent->GetPolygonCount (); i++)
+  const csPolygonArray &pol = thing->polygons;
+  for (i = 0; i < thing->GetPolygonCount (); i++)
   {
     csPolygon3D *p = pol.Get (i);
     if (!p->GetUnsplitPolygon () && p->flags.Check (CS_POLY_COLLDET))
@@ -2321,9 +2332,9 @@ void csThing::PolyMesh::Setup ()
   }
 
   // Check curves.
-  for (i = 0; i < scfParent->GetCurveCount (); i++)
+  for (i = 0; i < thing->GetCurveCount (); i++)
   {
-    csCurve *c = scfParent->curves.Get (i);
+    csCurve *c = thing->curves.Get (i);
     csCurveTesselated *tess = c->Tesselate (1000);    // @@@ High quality?
     num_poly += tess->GetTriangleCount ();
     num_verts += tess->GetVertexCount ();
@@ -2333,9 +2344,9 @@ void csThing::PolyMesh::Setup ()
   if (num_verts)
   {
     // If there are no curves we don't need to copy vertex data.
-    if (scfParent->GetCurveCount () == 0)
+    if (thing->GetCurveCount () == 0)
     {
-      vertices = scfParent->obj_verts;
+      vertices = thing->obj_verts;
     }
     else
     {
@@ -2345,12 +2356,12 @@ void csThing::PolyMesh::Setup ()
       // Copy the polygon vertices.
       // Set num_verts to the number of vertices in polygon set so
       // that we can continue copying vertices from curves.
-      num_verts = scfParent->GetVertexCount ();
+      num_verts = thing->GetVertexCount ();
       if (num_verts)
       {
         memcpy (
           vertices,
-          scfParent->obj_verts,
+          thing->obj_verts,
           sizeof (csVector3) * num_verts);
       }
     }
@@ -2360,7 +2371,7 @@ void csThing::PolyMesh::Setup ()
   {
     polygons = new csMeshedPolygon[num_poly];
     num_poly = 0;
-    for (i = 0; i < scfParent->GetPolygonCount (); i++)
+    for (i = 0; i < thing->GetPolygonCount (); i++)
     {
       csPolygon3D *p = pol.Get (i);
       if (!p->GetUnsplitPolygon () && p->flags.Check (CS_POLY_COLLDET))
@@ -2375,9 +2386,9 @@ void csThing::PolyMesh::Setup ()
     // have their 'vertices' array cleaned up. These polygons were generated
     // from curves.
     curve_poly_start = num_poly;
-    for (i = 0; i < scfParent->GetCurveCount (); i++)
+    for (i = 0; i < thing->GetCurveCount (); i++)
     {
-      csCurve *c = scfParent->curves.Get (i);
+      csCurve *c = thing->curves.Get (i);
       csCurveTesselated *tess = c->Tesselate (1000);  // @@@ High quality?
       csTriangle *tris = tess->GetTriangles ();
       int tri_count = tess->GetTriangleCount ();
@@ -2403,7 +2414,7 @@ void csThing::PolyMesh::Setup ()
   }
 }
 
-void csThing::PolyMesh::Cleanup ()
+void PolyMeshHelper::Cleanup ()
 {
   int i;
 
@@ -2425,6 +2436,8 @@ void csThing::PolyMesh::Cleanup ()
   alloc_vertices = NULL;
   vertices = NULL;
 }
+
+//-------------------------------------------------------------------------
 
 void csThing::SetConvex (bool c)
 {

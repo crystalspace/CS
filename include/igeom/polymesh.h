@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_POLYMESH_H__
-#define __IENGINE_POLYMESH_H__
+#ifndef __IGEOM_POLYMESH_H__
+#define __IGEOM_POLYMESH_H__
 
 #include "csutil/scf.h"
 
@@ -58,12 +58,12 @@ struct iPolygonMesh : public iBase
   /// Get the pointer to the array of polygons.
   virtual csMeshedPolygon* GetPolygons () = 0;
   /**
-   * Cleanup: this is called by the collider system
+   * Cleanup: this is called by the polygon mesh user
    * when it is ready extracting the data from the iPolygonMesh.
    * This gives the polygon mesh a chance to clean up some stuff.
    */
   virtual void Cleanup () = 0;
 };
 
-#endif // __IENGINE_POLYMESH_H__
+#endif // __IGEOM_POLYMESH_H__
 

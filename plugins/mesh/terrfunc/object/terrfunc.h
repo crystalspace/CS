@@ -511,6 +511,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iPolygonMesh* GetWriteObject () { return NULL; }
 
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
         csVector3& isect, float* pr);

@@ -1,5 +1,23 @@
 The history order is reversed so that new features are at the top.
 
+19-May-2002
+	- Also added GetWriteObject() function to iMeshObject. The
+	  same function in iVisibilityObject will pass control to the
+	  GetWriteObject() of iMeshObject. Implementation note: it is
+	  possible that two different mesh object instances will return
+	  the same polygon mesh. In this case the visibility system
+	  can use that to share shape related visibility information
+	  for those different mesh objects. One way to implement
+	  this from the perspective of the mesh object is to let
+	  the factory be responsible for the geometry.
+	- Implemented GetWriteObject() in all mesh objects. Current
+	  implementation just returns NULL.
+	- Implemented GetShapeNumber() in csThing mesh object. This
+	  number will be incremented as soon as the geometry of
+	  the thing changes.
+	- Added PolyMeshHelper class for csThing and put the old
+	  iPolygonMesh implementation there.
+	- Moved iPolygonMesh interface from include/ivaria to include/igeom.
 18-May-2002
 	- Fixed a bug in csCoverageBuffer::TestRectangle() with very
 	  large boxes that exceed integer accuracy.
