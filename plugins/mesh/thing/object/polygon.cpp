@@ -485,7 +485,7 @@ void csPolygon3DStatic::HardTransform (const csReversibleTransform &t)
 {
   csPlane3 new_plane;
   t.This2Other (GetObjectPlane (), Vobj (0), new_plane);
-  GetObjectPlane () = new_plane;
+  SetObjectPlane (new_plane);
   thing_static->scfiObjectModel.ShapeChanged ();
   if (polygon_data.tmapping)
   {
@@ -596,17 +596,6 @@ bool csPolygon3DStatic::Finish ()
   }
 
   return rc;
-}
-
-float csPolygon3DStatic::GetArea ()
-{
-  float area = 0.0f;
-
-  // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
-  int i;
-  for (i = 0; i < polygon_data.num_vertices - 2; i++)
-    area += ABS (csMath3::Area3 (Vobj (0), Vobj (i + 1), Vobj (i + 2)));
-  return area / 2.0f;
 }
 
 void csPolygon3DStatic::SetTextureSpace (
@@ -1084,13 +1073,6 @@ void csPolygon3D::RefreshFromStaticData ()
   RemovePolyTexture ();
 }
 
-const csVector3& csPolygon3D::Vwor (int idx) const
-{
-  return thing->Vwor (thing->GetStaticData ()
-  	->GetPolygon3DStatic (static_poly_idx)
-	->polygon_data.vertices[idx]);
-}
-
 #define TEXW(t) ((t)->w_orig)
 #define TEXH(t) ((t)->h)
 
@@ -1254,6 +1236,8 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
     i1 = i;
   }
 
+  int* vt_idx = spoly->GetVertexIndices ();
+
   // For every shadow frustum...
   while (shadow_it->HasNext ())
   {
@@ -1272,6 +1256,10 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
         shadow_it->MarkRelevant (true);
 	continue;
       }
+      csPolygon3DStatic* sfp_static = sfp->GetStaticPoly ();
+      int* sfp_vt_idx = sfp_static->GetVertexIndices ();
+      csThing* sfp_thing = sfp->GetParent ();
+      int sfp_vt_cnt = sfp_static->GetVertexCount ();
 
       switch (csFrustum::BatchClassify (
             lf_verts,
@@ -1287,16 +1275,20 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
           // If partial then we first test if the light and shadow
           // frustums are adjacent. If so then we ignore the shadow
           // frustum as well (not relevant).
+
           i1 = spoly->GetVertexCount () - 1;
           for (i = 0; i < spoly->GetVertexCount (); i++)
           {
-	    csPolygon3DStatic* sfp_static = sfp->GetStaticPoly ();
-            j1 = sfp_static->GetVertexCount () - 1;
+            j1 = sfp_vt_cnt - 1;
 
-            float a1 = csMath3::Area3 (Vwor (i1), Vwor (i), sfp->Vwor (j1));
-            for (j = 0; j < sfp_static->GetVertexCount (); j++)
+	    const csVector3& v_i1 = thing->Vwor (vt_idx[i1]);
+	    const csVector3& v_i = thing->Vwor (vt_idx[i]);
+	    const csVector3& sfp_v_j1 = sfp_thing->Vwor (sfp_vt_idx[j1]);
+            float a1 = csMath3::Area3 (v_i1, v_i, sfp_v_j1);
+            for (j = 0 ; j < sfp_vt_cnt ; j++)
             {
-              float a = csMath3::Area3 (Vwor (i1), Vwor (i), sfp->Vwor (j));
+	      const csVector3& sfp_v_j = sfp_thing->Vwor (sfp_vt_idx[j]);
+              float a = csMath3::Area3 (v_i1, v_i, sfp_v_j);
               if (ABS (a) < EPSILON && ABS (a1) < EPSILON)
               {
                 // The two points of the shadow frustum are on the same
@@ -1304,8 +1296,8 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
                 // In this case we test if the orientation of the two edges
                 // is different. If so then the shadow frustum is not
                 // relevant.
-                csVector3 d1 = Vwor (i) - Vwor (i1);
-                csVector3 d2 = sfp->Vwor (j) - sfp->Vwor (j1);
+                csVector3 d1 = v_i - v_i1;
+                csVector3 d2 = sfp_v_j - sfp_v_j1;
                 if (
                   (d1.x < -EPSILON && d2.x > EPSILON) ||
                   (d1.x > EPSILON && d2.x < -EPSILON) ||
@@ -1342,7 +1334,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
 	    float dist;
 	    const csPlane3& wor_plane = sfp->GetParent ()
 	    	->GetPolygonWorldPlaneNoCheck (sfp->GetStaticPolyIdx ());
-	    if (!csIntersect3::Plane (center, Vwor (0), wor_plane,
+	    if (!csIntersect3::Plane (center, thing->Vwor (vt_idx[0]), wor_plane,
 	      isect, dist))
 	    {
 	      shadow_it->MarkRelevant (false);
@@ -1391,12 +1383,13 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
   poly = VectorArray->GetArray ();
 
   int j;
+  int* vt_idx = spoly->GetVertexIndices ();
   if (lview->GetFrustumContext ()->IsMirrored ())
     for (j = 0; j < num_vertices; j++)
-      poly[j] = Vwor (num_vertices - j - 1) - center;
+      poly[j] = thing->Vwor (vt_idx[num_vertices - j - 1]) - center;
   else
     for (j = 0; j < num_vertices; j++)
-      poly[j] = Vwor (j) - center;
+      poly[j] = thing->Vwor (vt_idx[j]) - center;
 
   new_light_frustum = light_frustum->Intersect (poly, num_vertices);
 

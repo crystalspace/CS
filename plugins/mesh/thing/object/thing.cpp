@@ -1742,9 +1742,9 @@ void csThing::WorUpdate ()
 	  }
           for (i = 0; i < polygons.Length (); i++)
           {
-            //csPolygon3DStatic *p = static_data->GetPolygon3DStatic (i);
-            csPolygon3D *p = GetPolygon3D (i);
-	    movtrans.This2Other (p->GetStaticPoly ()->polygon_data.plane_obj, p->Vwor (0),
+	    csPolygon3DStatic* sp = static_data->GetPolygon3DStatic (i);
+	    movtrans.This2Other (sp->polygon_data.plane_obj,
+	    	Vwor (sp->GetVertexIndices ()[0]),
 	    	polygon_world_planes[i]);
 	    polygon_world_planes[i].Normalize ();
           }
@@ -2220,8 +2220,9 @@ void csThing::AppendShadows (
         (void *)p,
         sp->GetVertexCount (),
         pl);
+    int* p_vt_idx = sp->GetVertexIndices ();
     for (j = 0; j < sp->GetVertexCount (); j++)
-      frust->GetVertex (j).Set (p->Vwor (j) - origin);
+      frust->GetVertex (j).Set (Vwor (p_vt_idx[j]) - origin);
   }
 }
 

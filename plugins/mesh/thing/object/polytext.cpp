@@ -153,15 +153,24 @@ static bool FindSeparatingPlane (
   int i, j;
   float auxD = 0.0;
 
+  csThing* p_thing = p->GetParent ();
+  int* p_vt_idx = p_thing->GetStaticData ()
+  	->GetPolygon3DStatic (p->GetStaticPolyIdx ())
+	->GetVertexIndices ();
+  csThing* poly1_thing = poly1->GetParent ();
+  int* poly1_vt_idx = poly1_thing->GetStaticData ()
+  	->GetPolygon3DStatic (poly1->GetStaticPolyIdx ())
+	->GetVertexIndices ();
+
   int i1 = num_vertices2-1;
-  csVector3 ed1 = p->Vwor(i1) - lightpos;
+  csVector3 ed1 = p_thing->Vwor (p_vt_idx[i1]) - lightpos;
   csVector3 ed2;
   for (i = 0 ; i < num_vertices2 ; ed1 = ed2, i1 = i, i++)
   {
     //-----
     // We are now handling edge ed1-ed2.
     //-----
-    ed2 = p->Vwor (i) - lightpos;
+    ed2 = p_thing->Vwor (p_vt_idx[i]) - lightpos;
     csPlane3 plane (ed1, ed2);
 
     //-----
@@ -172,7 +181,7 @@ static bool FindSeparatingPlane (
     for(j = 0 ; j < num_vertices2 ; j++)
     {
       if (j == i || j == i1) continue;
-      auxD = plane.Classify (p->Vwor (j)-lightpos);
+      auxD = plane.Classify (p_thing->Vwor (p_vt_idx[j])-lightpos);
       if (ABS(auxD) > EPSILON) break;
     }
     if (ABS (auxD) < EPSILON)
@@ -187,7 +196,7 @@ static bool FindSeparatingPlane (
     bool overlap = false;
     for (j = 0 ; j < num_vertices1 ; j++)
     {
-      auxD = plane.Classify (poly1->Vwor (j) - lightpos);
+      auxD = plane.Classify (poly1_thing->Vwor (poly1_vt_idx[j]) - lightpos);
       if (ABS (auxD) < EPSILON) continue;
       pointClassify = SIGN (auxD);
       if (previousSign == pointClassify)
@@ -1243,8 +1252,9 @@ void csShadowBitmap::UpdateLightMap (
       csVector3 normal = poly_world_plane.Normal ();
       if (poly->GetParent ()->GetStaticData ()->GetSmoothingFlag())
       {
+        csThing* poly_parent = poly->GetParent ();
 	int* vertexs = poly->GetStaticPoly ()->GetVertexIndices ();
-	csVector3* normals = poly->GetParent ()->GetStaticData ()
+	csVector3* normals = poly_parent->GetStaticData ()
 	  ->GetNormals ();
 	int vCount = poly->GetStaticPoly ()->GetVertexCount ();
 
@@ -1257,8 +1267,8 @@ void csShadowBitmap::UpdateLightMap (
 	{
 	  // Create the 3D Segments
 	  csSegment3 seg;
-	  seg.SetStart (poly->GetParent()->Vwor(vertexs[act]));
-	  seg.SetEnd (poly->GetParent()->Vwor(vertexs[(act+1)%vCount]));
+	  seg.SetStart (poly_parent->Vwor(vertexs[act]));
+	  seg.SetEnd (poly_parent->Vwor(vertexs[(act+1)%vCount]));
 
 	  // Find the nearest point from v to the segment
 	  // a: Start
@@ -1415,6 +1425,7 @@ bool csShadowBitmap::UpdateShadowMap (
       csVector3 normal = poly_world_plane.Normal ();
       if ( static_data->GetSmoothingFlag() )
       {
+  csThing* poly_parent = poly->GetParent ();
   int* vertexs = poly->GetStaticPoly ()->GetVertexIndices ();
   csVector3* normals = static_data->GetNormals ();
   int vCount = poly->GetStaticPoly ()->GetVertexCount ();
@@ -1430,9 +1441,8 @@ bool csShadowBitmap::UpdateShadowMap (
   for (act = 0; act < vCount ; act++)
   {
     // Create the 3D Segments
-    segments[act].SetStart (poly->GetParent()->Vwor(vertexs[act]));
-    segments[act].SetEnd (poly->GetParent()
-      ->Vwor(vertexs[(act+1)%vCount]));
+    segments[act].SetStart (poly_parent->Vwor(vertexs[act]));
+    segments[act].SetEnd (poly_parent->Vwor(vertexs[(act+1)%vCount]));
 
     // Find the nearest point from v to the segment
     // a: Start

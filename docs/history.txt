@@ -43,6 +43,7 @@ chronological order.
 	  space plane from every polygon and putting that in a seperate array
 	  in csThing. The array in csThing is only created if the object has
 	  moved so for most static geometry this optimization will be useful.
+	- Jorrit did some small optimizations on thing lighting.
 18-Feb-2004
 	- Jorrit added the ability to specify defaults for mesh object types
 	  in the map loader. Here is an example to demonstrate how this works:

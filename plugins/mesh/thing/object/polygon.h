@@ -277,15 +277,23 @@ public:
   /**
    * Return the object-space plane of this polygon.
    */
-  csPlane3& GetObjectPlane ()
+  const csPlane3& GetObjectPlane () const
   { 
     return polygon_data.plane_obj;
   }
 
   /**
+   * Set the object-space plane.
+   */
+  void SetObjectPlane (const csPlane3& p)
+  {
+    polygon_data.plane_obj = p;
+  }
+
+  /**
    * Get number of vertices.
    */
-  int GetVertexCount () { return polygon_data.num_vertices; }
+  int GetVertexCount () const { return polygon_data.num_vertices; }
 
   /**
    * Get vertex index table.
@@ -318,9 +326,6 @@ public:
    * Return true if this polygon or the texture it uses is transparent.
    */
   bool IsTransparent ();
-
-  /// Calculates the area of the polygon in object space.
-  float GetArea ();
 
   /*
    * One of the SetTextureSpace functions should be called after
@@ -553,6 +558,16 @@ public:
   void SetStaticPolyIdx (int idx);
 
   /**
+   * Get static data.
+   */
+  int GetStaticPolyIdx () const { return static_poly_idx; }
+
+  /**
+   * Get static polygon.
+   */
+  csPolygon3DStatic* GetStaticPoly () const;
+
+  /**
    * After the plane normal and the texture matrices have been set
    * up this routine makes some needed pre-calculations for this polygon.
    * It will create a texture space bounding box that
@@ -583,30 +598,6 @@ public:
    * Get the polygonset (container) that this polygons belongs to.
    */
   csThing* GetParent () { return thing; }
-
-  /**
-   * Get static data.
-   */
-  int GetStaticPolyIdx () const { return static_poly_idx; }
-
-  /**
-   * Get static polygon.
-   */
-  csPolygon3DStatic* GetStaticPoly () const;
-
-  /**
-   * 'idx' is a local index into the vertices table of the polygon.
-   * This index is translated to the index in the parent container and
-   * a reference to the vertex in world-space is returned.
-   */
-  const csVector3& Vwor (int idx) const;
-
-  /**
-   * Before calling a series of Vwor() you should call
-   * WorUpdate() first to make sure that the world vertex set
-   * is up-to-date.
-   */
-  void WorUpdate () { thing->WorUpdate (); }
 
   /**
    * Disconnect a dynamic light from this polygon.
