@@ -117,33 +117,33 @@ char output_opts[512] = "";
 
 static int display_help ()
 {
-  printf ("Crystal Space Graphics File Loader test application v%s\n", programversion);
-  printf ("Copyright (C) 2000 Andrew Zabolotny\n\n");
-  printf ("Usage: %s {option/s} [image file] [...]\n\n", programname);
-  printf ("  -h   --help          Display this help text\n");
-  printf ("  -v   --verbose       Comment on what's happening\n");
-  printf ("  -V   --version       Display program version\n");
-  printf ("  -F   --formats       Display a list of supported image formats\n");
-  printf ("------------------ Image manipulation:  ----------------------------------------\n");
-  printf ("  -d   --dither        Apply Floyd-Steinberg dithering when reducing to 8 bpp\n");
-  printf ("  -s   --scale=#[,#]   Re-scale the image to given size #\n");
-  printf ("  -m   --mipmap=#      Create mipmap level # (>=0) from image\n");
-  printf ("  -t   --transp=#,#,#  Treat color (R,G,B) as transparent\n");
-  printf ("  -T   --applykey      Apply key color into alpha channel\n");
-  printf ("  -8   --paletted      Convert image to 8 bits-per-pixel paletted format\n");
-  printf ("  -c   --truecolor     Convert image to truecolor format\n");
-  printf ("  -a   --strip-alpha   Remove alpha channel, if present\n");
-  printf ("  -A   --add-alpha     Add alpha channel, if not present\n");
-  printf ("  -p   --sharpen=#     Sharpen the image, strength #\n");
-  printf ("------------------ Output options (-S, -D, -H are exclusive):  -----------------\n");
-  printf ("  -S   --save[=#]      Output an image (default)\n");
-  printf ("  -M   --mime=#        Output file mime type (default: image/png)\n");
-  printf ("  -O   --options=#     Optional output format options (e.g. \"progressive\")\n");
-  printf ("  -P   --prefix=#      Add prefix before output filename\n");
-  printf ("  -U   --suffix=#      Add suffix after output filename\n");
-  printf ("  -D   --display=#,#   Display the image in ASCII format :-)\n");
-  printf ("                       An optional scale argument may be specified\n");
-  printf ("  -I   --info          Display image info (and don't do anything more)\n");
+  csPrintf ("Crystal Space Graphics File Loader test application v%s\n", programversion);
+  csPrintf ("Copyright (C) 2000 Andrew Zabolotny\n\n");
+  csPrintf ("Usage: %s {option/s} [image file] [...]\n\n", programname);
+  csPrintf ("  -h   --help          Display this help text\n");
+  csPrintf ("  -v   --verbose       Comment on what's happening\n");
+  csPrintf ("  -V   --version       Display program version\n");
+  csPrintf ("  -F   --formats       Display a list of supported image formats\n");
+  csPrintf ("------------------ Image manipulation:  ----------------------------------------\n");
+  csPrintf ("  -d   --dither        Apply Floyd-Steinberg dithering when reducing to 8 bpp\n");
+  csPrintf ("  -s   --scale=#[,#]   Re-scale the image to given size #\n");
+  csPrintf ("  -m   --mipmap=#      Create mipmap level # (>=0) from image\n");
+  csPrintf ("  -t   --transp=#,#,#  Treat color (R,G,B) as transparent\n");
+  csPrintf ("  -T   --applykey      Apply key color into alpha channel\n");
+  csPrintf ("  -8   --paletted      Convert image to 8 bits-per-pixel paletted format\n");
+  csPrintf ("  -c   --truecolor     Convert image to truecolor format\n");
+  csPrintf ("  -a   --strip-alpha   Remove alpha channel, if present\n");
+  csPrintf ("  -A   --add-alpha     Add alpha channel, if not present\n");
+  csPrintf ("  -p   --sharpen=#     Sharpen the image, strength #\n");
+  csPrintf ("------------------ Output options (-S, -D, -H are exclusive):  -----------------\n");
+  csPrintf ("  -S   --save[=#]      Output an image (default)\n");
+  csPrintf ("  -M   --mime=#        Output file mime type (default: image/png)\n");
+  csPrintf ("  -O   --options=#     Optional output format options (e.g. \"progressive\")\n");
+  csPrintf ("  -P   --prefix=#      Add prefix before output filename\n");
+  csPrintf ("  -U   --suffix=#      Add suffix after output filename\n");
+  csPrintf ("  -D   --display=#,#   Display the image in ASCII format :-)\n");
+  csPrintf ("                       An optional scale argument may be specified\n");
+  csPrintf ("  -I   --info          Display image info (and don't do anything more)\n");
   return 1;
 }
 
@@ -154,14 +154,14 @@ static int list_supported_formats (iObjectRegistry *r)
 
   const csImageIOFileFormatDescriptions& descr = ImageLoader->GetDescription ();
   size_t i;
-  printf (mask, "MIME", "description", "load?", "save?");
-  printf (mask, "----", "-----------", "-----", "-----");
+  csPrintf (mask, "MIME", "description", "load?", "save?");
+  csPrintf (mask, "----", "-----------", "-----", "-----");
   for (i = 0; i < descr.Length (); i++)
   {
     iImageIO::FileFormatDescription *format =
       (iImageIO::FileFormatDescription*) descr.Get (i);
 
-    printf (mask, format->mime, format->subtype,
+    csPrintf (mask, format->mime, format->subtype,
       (format->cap & CS_IMAGEIO_LOAD)?"yes":"no",
       (format->cap & CS_IMAGEIO_SAVE)?"yes":"no");
   }
@@ -206,7 +206,7 @@ static bool output_picture (const char *fname, const char *suffix, csRef<iImage>
     strcat (eol, suffix_name);
   }		 
 
-  printf ("Saving output file %s\n", outname);
+  csPrintf ("Saving output file %s\n", outname);
 
   csRef<iDataBuffer> db (ImageLoader->Save (ifile, output_mime, output_opts));
   if (db)
@@ -218,7 +218,7 @@ static bool output_picture (const char *fname, const char *suffix, csRef<iImage>
   }
   else
   {
-    printf ("Failed to save %s. Plugin returned no data.\n", outname);
+    csPrintf ("Failed to save %s. Plugin returned no data.\n", outname);
   }
   return true;
 }
@@ -246,12 +246,12 @@ static bool display_picture (csRef<iImage> ifile)
 
 static bool process_file (const char *fname)
 {
-  printf ("Loading file %s\n", fname);
+  csPrintf ("Loading file %s\n", fname);
 
   FILE *f = fopen (fname, "rb");
   if (!f)
   {
-    printf ("%s: cannot open file %s\n", programname, fname);
+    csPrintf ("%s: cannot open file %s\n", programname, fname);
     return false;
   }
 
@@ -260,14 +260,14 @@ static bool process_file (const char *fname)
   fseek (f, 0, SEEK_SET);
 
   if (opt.verbose)
-    printf ("Reading %zu bytes from file\n", fsize);
+    csPrintf ("Reading %zu bytes from file\n", fsize);
 
   csRef<iDataBuffer> buf;
   {
     char* buffer = new char[fsize];
     if (fread (buffer, 1, fsize, f) < fsize)
     {
-      printf ("%s: unexpected EOF while reading file %s\n", programname, fname);
+      csPrintf ("%s: unexpected EOF while reading file %s\n", programname, fname);
       return false;
     }
     buf.AttachNew (new csDataBuffer (buffer, fsize, true));
@@ -287,17 +287,17 @@ static bool process_file (const char *fname)
   csRef<iImage> ifile = ImageLoader->Load (buf, fmt | CS_IMGFMT_ALPHA);
   if (!ifile)
   {
-    printf ("%s: failed to recognise image format for %s\n",
+    csPrintf ("%s: failed to recognise image format for %s\n",
     	programname, fname);
     return false;
   }
 
   if (opt.verbose || opt.info)
   {
-    printf ("Image size: %d x %d pixels, %zu bytes\n", ifile->GetWidth (),
+    csPrintf ("Image size: %d x %d pixels, %zu bytes\n", ifile->GetWidth (),
       ifile->GetHeight (), csImageTools::ComputeDataSize(ifile));
     int fmt = ifile->GetFormat ();
-    printf ("Image format: %s, alpha channel: %s\n",
+    csPrintf ("Image format: %s, alpha channel: %s\n",
       (fmt & CS_IMGFMT_MASK) == CS_IMGFMT_NONE ? "none" :
       (fmt & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8 ? "paletted, 256 colors" :
       (fmt & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR ? "truecolor" : "unknown",
@@ -319,8 +319,7 @@ static bool process_file (const char *fname)
     ifile = csImageManipulate::RenderKeycolorToAlpha (ifile, transp, fill);
   }
 
-  char suffix [20];
-  suffix [0] = 0;
+  csString suffix;
 
   if (opt.scaleX > 0)
   {
@@ -329,17 +328,17 @@ static bool process_file (const char *fname)
     {
       scaleY = (ifile->GetHeight () * opt.scaleX) / ifile->GetWidth ();
     }
-    printf ("Rescaling image to %d x %d\n", opt.scaleX, scaleY);
+    csPrintf ("Rescaling image to %d x %d\n", opt.scaleX, scaleY);
     ifile = csImageManipulate::Rescale (ifile, opt.scaleX, scaleY);
-    sprintf (strchr (suffix, 0), "-s%dx%d", opt.scaleX, scaleY);
+    suffix.AppendFmt ("-s%dx%d", opt.scaleX, scaleY);
   }
 
   if (opt.mipmap >= 0)
   {
-    printf ("Creating mipmap level %d from image\n", opt.mipmap);
+    csPrintf ("Creating mipmap level %d from image\n", opt.mipmap);
     ifile = csImageManipulate::Mipmap (ifile, opt.mipmap,
       opt.transp ? &transpcolor : 0);
-    sprintf (strchr (suffix, 0), "-m%d", opt.mipmap);
+    suffix.AppendFmt ("-m%d", opt.mipmap);
   }
 
   if (opt.stripalpha)
@@ -347,7 +346,7 @@ static bool process_file (const char *fname)
     int format = ifile->GetFormat ();
     if (format & CS_IMGFMT_ALPHA)
     {
-      printf ("Removing alpha channel from image\n");
+      csPrintf ("Removing alpha channel from image\n");
       ifile.AttachNew (new csImageMemory (ifile, format & ~CS_IMGFMT_ALPHA));
     }
   }
@@ -357,7 +356,7 @@ static bool process_file (const char *fname)
     int format = ifile->GetFormat ();
     if (!(format & CS_IMGFMT_ALPHA))
     {
-      printf ("Adding alpha channel from image\n");
+      csPrintf ("Adding alpha channel from image\n");
       ifile.AttachNew (new csImageMemory (ifile, format | CS_IMGFMT_ALPHA));
 
       // merge keycolor into alpha
@@ -407,7 +406,7 @@ static bool process_file (const char *fname)
 
   if (opt.sharpen)
   {
-    printf ("Sharpening image with strength %d\n", opt.sharpen);
+    csPrintf ("Sharpening image with strength %d\n", opt.sharpen);
     ifile = csImageManipulate::Sharpen (ifile, opt.sharpen,
       opt.transp ? &transpcolor : 0);
   }
@@ -460,14 +459,14 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
       case 'P':
 	if (optarg && sscanf (optarg, "%s", prefix_name) != 1)
 	{
-          printf ("%s: expecting <prefix> after -P\n", programname);
+          csPrintf ("%s: expecting <prefix> after -P\n", programname);
           return -1;
 	}
         break;
       case 'U':
 	if (optarg && sscanf (optarg, "%s", suffix_name) != 1)
 	{
-          printf ("%s: expecting <suffix> after -U\n", programname);
+          csPrintf ("%s: expecting <suffix> after -U\n", programname);
           return -1;
 	}
         break;
@@ -478,14 +477,14 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
       case 'M':
 	if (optarg && sscanf (optarg, "%s", output_mime) != 1)
 	{
-          printf ("%s: expecting <mime-type> after -M\n", programname);
+          csPrintf ("%s: expecting <mime-type> after -M\n", programname);
           return -1;
 	}
 	break;
       case 'O':
 	if (optarg && sscanf (optarg, "%s", output_opts) != 1)
 	{
-          printf ("%s: expecting <output-options> after -O\n", programname);
+          csPrintf ("%s: expecting <output-options> after -O\n", programname);
           return -1;
 	}
 	break;
@@ -494,7 +493,7 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
         if (optarg &&
             sscanf (optarg, "%d,%d", &opt.displayW, &opt.displayH) != 2)
         {
-          printf ("%s: expecting <width>,<height> after -d\n", programname);
+          csPrintf ("%s: expecting <width>,<height> after -d\n", programname);
           return -1;
         }
         break;
@@ -503,7 +502,7 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
           int rc = sscanf (optarg, "%d,%d", &opt.scaleX, &opt.scaleY);
 	  if (rc != 1 && rc != 2)
           {
-            printf ("%s: expecting <width>[,<height>] after -s\n", programname);
+            csPrintf ("%s: expecting <width>[,<height>] after -s\n", programname);
             return -1;
           }
 	  if (rc == 1) opt.scaleY = -1;
@@ -515,7 +514,7 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
         int r,g,b;
         if (sscanf (optarg, "%d,%d,%d", &r, &g, &b) != 3)
         {
-          printf ("%s: expecting <R>,<G>,<B> after -t\n", programname);
+          csPrintf ("%s: expecting <R>,<G>,<B> after -t\n", programname);
           return -1;
         }
         transpcolor.red   = r > 255 ? 255 : r < 0 ? 0 : r;
@@ -531,12 +530,12 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
       case 'm':
         if (sscanf (optarg, "%d", &opt.mipmap) != 1)
         {
-          printf ("%s: expecting <mipmap level> which is >=0 after -m\n", programname);
+          csPrintf ("%s: expecting <mipmap level> which is >=0 after -m\n", programname);
           return -1;
         }
         if (opt.mipmap < 0)
         {
-          printf ("%s: bad mipmap level (%d): should be >=0\n", programname, opt.mipmap);
+          csPrintf ("%s: bad mipmap level (%d): should be >=0\n", programname, opt.mipmap);
           return -1;
         }
         break;
@@ -552,15 +551,15 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
       case 'p':
         if (sscanf (optarg, "%d", &opt.sharpen) != 1)
         {
-          printf ("%s: expecting <sharpening strength> after -p\n", programname);
+          csPrintf ("%s: expecting <sharpening strength> after -p\n", programname);
           return -1;
         }
       case 'V':
-        printf ("%s version %s\n\n", programname, programversion);
-        printf ("This program is distributed in the hope that it will be useful,\n");
-        printf ("but WITHOUT ANY WARRANTY; without even the implied warranty of\n");
-        printf ("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n");
-        printf ("GNU Library General Public License for more details.\n");
+        csPrintf ("%s version %s\n\n", programname, programversion);
+        csPrintf ("This program is distributed in the hope that it will be useful,\n");
+        csPrintf ("but WITHOUT ANY WARRANTY; without even the implied warranty of\n");
+        csPrintf ("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n");
+        csPrintf ("GNU Library General Public License for more details.\n");
         return 0;
 	break;
       case 'F':
@@ -618,7 +617,7 @@ int main (int argc, char *argv[])
   ImageLoader = CS_QUERY_REGISTRY (object_reg, iImageIO);
   if (!ImageLoader)
   {
-    printf("could not load image loader\n");
+    csPrintf("could not load image loader\n");
     csInitializer::DestroyApplication (object_reg);
     return -1;
   }

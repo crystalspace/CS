@@ -19,6 +19,7 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/sysfunc.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -41,25 +42,25 @@ csRef<iImageIO> mdl2spr_imageio;
 
 static void usage(FILE* s, int rc)
 {
-  fprintf(s, "Usage: mdl2spr <option> [model-file] [sprite-name]\n\n");
-  fprintf(s, "Options:\n");
-  fprintf(s, "  -h : help (this page)\n");
-  fprintf(s, "  -s <float> : global scale of model (default %g)\n", scaleMdl);
-  fprintf(s, "  -d <int> : frame delay for frame which don't have delay "
+  csFPrintf(s, "Usage: mdl2spr <option> [model-file] [sprite-name]\n\n");
+  csFPrintf(s, "Options:\n");
+  csFPrintf(s, "  -h : help (this page)\n");
+  csFPrintf(s, "  -s <float> : global scale of model (default %g)\n", scaleMdl);
+  csFPrintf(s, "  -d <int> : frame delay for frame which don't have delay "
     "(default %d)\n", delayMdl);
-  fprintf(s, "  -n : %s auto naming of action frameset (%s by default)\n",
+  csFPrintf(s, "  -n : %s auto naming of action frameset (%s by default)\n",
     actionNamingMdl ? "disable" : "enable",
     actionNamingMdl ? "enabled" : "disabled");
-  fprintf(s, "  -x <float> : sprite moving on X axis (default %g)\n",
+  csFPrintf(s, "  -x <float> : sprite moving on X axis (default %g)\n",
     positionMdlX);
-  fprintf(s, "  -y <float> : sprite moving on Y axis (default %g)\n",
+  csFPrintf(s, "  -y <float> : sprite moving on Y axis (default %g)\n",
     positionMdlY);
-  fprintf(s, "  -z <float> : sprite moving on Z axis (default %g)\n",
+  csFPrintf(s, "  -z <float> : sprite moving on Z axis (default %g)\n",
     positionMdlZ);
-  fprintf(s, "  -r : %s automatic power-of-2 skin resizing (%s by default)\n",
+  csFPrintf(s, "  -r : %s automatic power-of-2 skin resizing (%s by default)\n",
     resizeSkin ? "disable" : "enabled", resizeSkin ? "enabled" : "disabled");
-  fprintf(s, "       Only applies to MDL files (not MD2).\n");
-  fprintf(s, "  -f : writes only n frames to SPR file (default all)\n");
+  csFPrintf(s, "       Only applies to MDL files (not MD2).\n");
+  csFPrintf(s, "  -f : writes only n frames to SPR file (default all)\n");
   exit(rc);
 }
 
@@ -72,7 +73,7 @@ static int get_int(int& n, int argc, const char* const* argv)
   n++;
   if (n >= argc)
   {
-    fprintf(stderr, "Missing float value following %s\n", argv[n]);
+    csFPrintf(stderr, "Missing float value following %s\n", argv[n]);
     fatal_usage();
   }
   else
@@ -80,7 +81,7 @@ static int get_int(int& n, int argc, const char* const* argv)
     i = atoi(argv[n]);
     if (i == 0)
     {
-      fprintf(stderr, "Unable to convert %s to int value\n", argv[n]);
+      csFPrintf(stderr, "Unable to convert %s to int value\n", argv[n]);
       fatal_usage();
     }
   }
@@ -93,7 +94,7 @@ static float get_float(int& n, int argc, const char* const* argv)
   n++;
   if (n >= argc)
   {
-    fprintf(stderr, "Missing float value following %s\n", argv[n]);
+    csFPrintf(stderr, "Missing float value following %s\n", argv[n]);
     fatal_usage();
   }
   else
@@ -101,7 +102,7 @@ static float get_float(int& n, int argc, const char* const* argv)
     f = (float)atof(argv[n]);
     if (f == 0)
     {
-      fprintf(stderr, "Unable to convert %s to float value\n", argv[n]);
+      csFPrintf(stderr, "Unable to convert %s to float value\n", argv[n]);
       fatal_usage();
     }
   }
@@ -109,7 +110,7 @@ static float get_float(int& n, int argc, const char* const* argv)
 }
 int main(int argc,char *argv[])
 {
-  printf("mdl2spr version 0.40\n"
+  csPrintf("mdl2spr version 0.40\n"
     "A quake model (MDL/MD2) convertor for Crystal Space.\n"
     "By Nathaniel Saint Martin <noote@bigfoot.com>\n"
     "Project overhauled by Eric Sunshine <sunshine@sunshineco.com>\n\n");
@@ -123,7 +124,7 @@ int main(int argc,char *argv[])
     {
       if (argv[i][0] != '-' && argv[i][0] != '/')
       {
-        fprintf(stderr, "'%s' unreconized option\n", argv[i]);
+        csFPrintf(stderr, "'%s' unreconized option\n", argv[i]);
         fatal_usage();
       }
       switch (argv[i][1])
@@ -134,48 +135,48 @@ int main(int argc,char *argv[])
 
       case 'n':
         actionNamingMdl = !actionNamingMdl;
-        printf("%s auto naming of action frameset.\n",
+        csPrintf("%s auto naming of action frameset.\n",
 	  actionNamingMdl ? "Enabled" : "Disabled");
         break;
 
       case 's':
         scaleMdl = get_float(i, argc, argv);
-        printf("General scale set to %g.\n", scaleMdl);
+        csPrintf("General scale set to %g.\n", scaleMdl);
         break;
 
       case 'd':
         delayMdl = get_int(i, argc, argv);
-        printf("Frame delay set to %d.\n", delayMdl);
+        csPrintf("Frame delay set to %d.\n", delayMdl);
         break;
 
       case 'x':
         positionMdlX = get_float(i, argc, argv);
-        printf("X coordinate set to %g.\n", positionMdlX);
+        csPrintf("X coordinate set to %g.\n", positionMdlX);
         break;
 
       case 'y':
         positionMdlY = get_float(i, argc, argv);
-        printf("Y coordinate set to %g.\n", positionMdlY);
+        csPrintf("Y coordinate set to %g.\n", positionMdlY);
         break;
 
       case 'z':
         positionMdlZ = get_float(i, argc, argv);
-        printf("Z coordinate set to %g.\n", positionMdlZ);
+        csPrintf("Z coordinate set to %g.\n", positionMdlZ);
         break;
 
       case 'r':
         resizeSkin = !resizeSkin;
-        printf("%s automatic power-of-2 skin resizing.\n",
+        csPrintf("%s automatic power-of-2 skin resizing.\n",
 	  resizeSkin ? "Enabled" : "Disabled");
         break;
 
       case 'f':
         maxFrames = get_int(i, argc, argv);
-        printf("Max Frames set to %d.\n", maxFrames);
+        csPrintf("Max Frames set to %d.\n", maxFrames);
         break;
 
       default:
-        fprintf(stderr, "'%s' unreconized option.\n", argv[i]);
+        csFPrintf(stderr, "'%s' unreconized option.\n", argv[i]);
         fatal_usage();
       }
     }
@@ -191,13 +192,13 @@ int main(int argc,char *argv[])
     mdl = new Md2(mdlfile);
   else
   {
-    fprintf(stderr, "Not a recognized model file: %s\n", mdlfile);
+    csFPrintf(stderr, "Not a recognized model file: %s\n", mdlfile);
     exit(-1);
   }
 
   if (mdl->getError())
   {
-    fprintf(stderr, "\nError: %s\n", mdl->getErrorString());
+    csFPrintf(stderr, "\nError: %s\n", mdl->getErrorString());
     delete mdl;
     exit(-1);
   }

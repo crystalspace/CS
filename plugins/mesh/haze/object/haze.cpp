@@ -21,6 +21,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/poly2d.h"
 #include "cstool/rbuflock.h"
+#include "csutil/sysfunc.h"
 #include "iutil/objreg.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
@@ -90,7 +91,7 @@ void csHazeHull::ComputeEdges()
   int p;
   for(p=0; p<total_poly; p++)
   {
-    //printf("poly %d: ", p);
+    //csPrintf("poly %d: ", p);
     for(i=0; i<pol_num[p]; i++)
     {
       /// get two indices
@@ -104,10 +105,10 @@ void csHazeHull::ComputeEdges()
 	idx2 = swp;
       }
       /// mark
-      //printf("(%d-%d) ", idx1, idx2);
+      //csPrintf("(%d-%d) ", idx1, idx2);
       matrix[ idx1*total_vert + idx2 ] = 1;
     }
-    //printf("\n");
+    //csPrintf("\n");
   }
   /// use matrix to fill fields.
 
@@ -194,12 +195,12 @@ void csHazeHull::ComputeOutline(iHazeHull *hull, const csVector3& campos,
     hull->GetVertex(v1, hull->GetPolVertex(p, 1));
     hull->GetVertex(v2, hull->GetPolVertex(p, 2));
     if(csMath3::WhichSide3D(campos-v0, v1-v0, v2-v0) > 0) {
-      //printf("polygon %d visible\n", p);
+      //csPrintf("polygon %d visible\n", p);
       for(i=0; i<hull->GetPolVerticeCount(p); i++)
       {
         int edge, i1, i2;
 	edge = hull->GetPolEdge(p, i, i1, i2);
-	//printf("increasing edge %d (from %d - %d)\n", edge, i1, i2);
+	//csPrintf("increasing edge %d (from %d - %d)\n", edge, i1, i2);
 	use_edge[edge] ++;
 	use_start[edge] = i1;
 	use_end[edge] = i2;
@@ -241,7 +242,7 @@ void csHazeHull::ComputeOutline(iHazeHull *hull, const csVector3& campos,
     pt = nextvert[pt];
     if(pt == -1)
     {
-      printf("Error: pt==-1 in Outline.\n");
+      csPrintf("Error: pt==-1 in Outline.\n");
       delete[] use_edge;
       delete[] use_start;
       delete[] use_end;
@@ -602,7 +603,7 @@ void csHazeMeshObject::GenGeometryAdapt (iRenderView *rview, iGraphics3D *g3d,
   csVector2 normdir1 = dir1 / dir1.Norm();
   csVector2 normdir2 = dir2 / dir2.Norm();
   float cosangle = normdir1 * normdir2;
-  //printf("cosangle %g, quality %g\n", cosangle, quality);
+  //csPrintf("cosangle %g, quality %g\n", cosangle, quality);
   if(cosangle > quality || depth >= maxdepth)
   {
     // emit geometry
@@ -739,7 +740,7 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
       tri_uvs[1] = layer_uvs[nexti];
 
 
-      //printf("drawing a polygon\n");
+      //csPrintf("drawing a polygon\n");
       //DrawPoly(rview, g3d, mat, 3, tri_pts, tri_uvs);
 
       float quality = 0.90f;
@@ -831,23 +832,23 @@ void csHazeMeshObject::ComputeHullOutline(iHazeHull *hull, float layer_scale,
   // get hull outline in screenspace
   layer_num = 0;
   layer_poly = 0;
-  //printf("campos %g,%g,%g\n", campos.x, campos.y, campos.z);
+  //csPrintf("campos %g,%g,%g\n", campos.x, campos.y, campos.z);
   csHazeHull::ComputeOutline(hull, campos, layer_num, layer_poly);
-  //printf("has outline of size %d: ", layer_num);
+  //csPrintf("has outline of size %d: ", layer_num);
   if(layer_num <= 0) return;
   layer_pts = new csVector3[layer_num];
   *cam_pts = new csVector3[layer_num];
 
   for(i=0; i<layer_num; i++)
   {
-    //printf(" %d", layer_poly[i]);
+    //csPrintf(" %d", layer_poly[i]);
     csVector3 objpos;
     hull->GetVertex(objpos, layer_poly[i] );
 
     ProjectO2S(tr_o2c, fov, shx, shy, objpos, layer_pts[i],
       &((*cam_pts)[i]));
   }
-  //printf("\n");
+  //csPrintf("\n");
   // get hull 0 uv values
   layer_uvs = new csVector2[layer_num];
   csVector2 center(0.5, 0.5);
@@ -884,7 +885,7 @@ void csHazeMeshObject::DrawPolyAdapt(iRenderView *rview, iGraphics3D *g3d,
   csVector2 normdir1 = dir1 / dir1.Norm();
   csVector2 normdir2 = dir2 / dir2.Norm();
   float cosangle = normdir1 * normdir2;
-  //printf("cosangle %g, quality %g\n", cosangle, quality);
+  //csPrintf("cosangle %g, quality %g\n", cosangle, quality);
   if(cosangle > quality || depth >= maxdepth)
   {
     // draw it

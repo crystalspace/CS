@@ -499,10 +499,10 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
       genmesh->SetMaterialWrapper (mat);
       ws->ReplaceMaterial (oldmat, mat);
 
-      char name[256];
-      sprintf (name, "%s_%d", shader->QueryObject()->GetName(), pri);
-      char description[256];
-      sprintf (description, "Shader %s with priority %d", 
+      csString name;
+      name.Format ("%s_%d", shader->QueryObject()->GetName(), pri);
+      csString description;
+      description.Format ("Shader %s with priority %d", 
 	shader->QueryObject()->GetName(), pri);
       BenchMark (name, description, CSDRAW_CLEARZBUFFER);
       ws->ClearReplacedMaterials();

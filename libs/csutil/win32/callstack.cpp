@@ -287,7 +287,7 @@ bool cswinCallStack::GetParameters (size_t num, csString& str)
     str << " = ";
     char tmp[23];
     longlong data = param->value;
-    sprintf (tmp, "%lld(0x%llx)", data, data);
+    scsPrintf (tmp, "%lld(0x%llx)", data, data);
     str << tmp;
     param++;
   }

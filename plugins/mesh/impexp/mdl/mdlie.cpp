@@ -321,8 +321,8 @@ csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, size_t Size)
     }
 
     iModelDataAction *Action = new csModelDataAction ();
-    char buf [20];
-    sprintf (buf, "action%d", i);
+    csString buf;
+    buf.Format ("action%d", i);
     Action->QueryObject ()->SetName (buf);
     Object->QueryObject ()->ObjAdd (Action->QueryObject ());
 
@@ -339,10 +339,11 @@ csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, size_t Size)
       // skip min/max info
       in.Skip (SIZEOF_MDLLONG * 2);
 
+      char framename[17];
       // get frame name
-      in.Read (buf, 16);
-      buf [16] = 0;
-      Vertices->QueryObject ()->SetName (buf);
+      in.Read (framename, 16);
+      framename[16] = 0;
+      Vertices->QueryObject ()->SetName (framename);
 
       // read vertex positions
       in.Read (Readbuffer, 4 * Header.VertexCount);

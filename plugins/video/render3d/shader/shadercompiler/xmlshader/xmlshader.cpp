@@ -244,8 +244,8 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
     int i;
     for(i=0;i<16;i++)
     {
-      char str[13];
-      sprintf (str, "attribute %d", i);
+      csString str;
+      str.Format ("attribute %d", i);
       if (strcasecmp(str, dest)==0)
       {
         found = true;

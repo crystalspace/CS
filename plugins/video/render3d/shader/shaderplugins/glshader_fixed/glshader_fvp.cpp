@@ -601,8 +601,9 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
               lights[i].positionvar = strings->Request (str);
             else
             {
-              char buf[64];
-              sprintf (buf, "STANDARD_LIGHT_%d_POSITION_WORLD", lights[i].lightnum);
+              csString buf;
+              buf.Format ("STANDARD_LIGHT_%d_POSITION_WORLD", 
+		lights[i].lightnum);
               lights[i].positionvar = strings->Request (buf);
             }
 
@@ -610,8 +611,8 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
               lights[i].diffusevar = strings->Request (str);
             else
             {
-              char buf[40];
-              sprintf (buf, "STANDARD_LIGHT_%d_DIFFUSE", lights[i].lightnum);
+              csString buf;
+              buf.Format ("STANDARD_LIGHT_%d_DIFFUSE", lights[i].lightnum);
               lights[i].diffusevar = strings->Request (buf);
             }
 
@@ -619,8 +620,8 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
               lights[i].specularvar = strings->Request (str);
             else
             {
-              char buf[40];
-              sprintf (buf, "STANDARD_LIGHT_%d_SPECULAR", lights[i].lightnum);
+              csString buf;
+              buf.Format ("STANDARD_LIGHT_%d_SPECULAR", lights[i].lightnum);
               lights[i].specularvar = strings->Request (buf);
             }
 
@@ -628,8 +629,8 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
               lights[i].attenuationvar = strings->Request (str);
             else
             {
-              char buf[40];
-              sprintf (buf, "STANDARD_LIGHT_%d_ATTENUATION",
+              csString buf;
+              buf.Format ("STANDARD_LIGHT_%d_ATTENUATION",
 	      	lights[i].lightnum);
               lights[i].attenuationvar = strings->Request (buf);
             }
@@ -637,7 +638,6 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
           break;
         case XMLTOKEN_VERTEXCOLOR:
           {
-	    // @@@ Realize as var mapping?
             const char* str;
             if ((str = child->GetContentsValue ()) != 0)
               primcolvar = strings->Request (str);
@@ -645,7 +645,6 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
           break;
         case XMLTOKEN_CONSTANTCOLOR:
           {
-	    // @@@ Realize as var mapping?
             int layer = ParseLayerParam (child, tuResolve);
 	    if (layer < 0)
 	    {

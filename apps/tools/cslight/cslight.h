@@ -41,7 +41,7 @@ private:
   int granularity;
   int total;
   int current;
-  char cur_description[256];
+  csString cur_description;
   int tick_scale;
   int anchor;
 

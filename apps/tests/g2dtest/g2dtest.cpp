@@ -624,11 +624,11 @@ void G2DTestSystemDriver::WriteCentered (int mode, int dy, int fg, int bg,
 {
   if (!font) return;
 
-  char text [1024];
+  csString text;
   va_list arg;
 
   va_start (arg, format);
-  vsprintf (text, format, arg);
+  text.FormatV (format, arg);
   va_end (arg);
 
   int fw, fh;
@@ -660,11 +660,11 @@ void G2DTestSystemDriver::WriteCenteredWrapped (int mode, int dy, int &h,
 {
   if (!font) return;
 
-  char text [1024];
+  csString text;
   va_list arg;
 
   va_start (arg, format);
-  vsprintf (text, format, arg);
+  text.FormatV (format, arg);
   va_end (arg);
 
   int y = 0, w = myG2D->GetWidth ();
@@ -747,23 +747,25 @@ void G2DTestSystemDriver::DrawContextInfoScreen ()
 
   WriteCentered (0,-16*3, white, -1, "Some information about graphics context");
   WriteCentered (0,-16*2, gray,  -1, "Screen size: %d x %d", myG2D->GetWidth (), myG2D->GetHeight ());
-  char pixfmt [50];
+  csString pixfmt;
   if (pfmt.PalEntries)
-    sprintf (pixfmt, "%d colors (Indexed)", pfmt.PalEntries);
+    pixfmt.Format ("%d colors (Indexed)", pfmt.PalEntries);
   else
-    sprintf (pixfmt, "R%dG%dB%dA%d", pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits, pfmt.AlphaBits);
-  WriteCentered (0,-16*1, gray,  -1, "Pixel format: %d BPP, %s", pfmt.PixelBytes * 8, pixfmt);
+    pixfmt.Format ("R%dG%dB%dA%d", pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits, 
+      pfmt.AlphaBits);
+  WriteCentered (0,-16*1, gray,  -1, "Pixel format: %d BPP, %s", pfmt.PixelBytes * 8, 
+    pixfmt.GetData());
 
   if (pfmt.PalEntries)
-    sprintf (pixfmt, "not available");
+    pixfmt = "not available";
   else
-    sprintf (pixfmt,
+    pixfmt.Format (
       "R[%08" PRIX32 "] "
       "G[%08" PRIX32 "] "
       "B[%08" PRIX32 "] "
       "A[%08" PRIX32 "]",
       pfmt.RedMask, pfmt.GreenMask, pfmt.BlueMask, pfmt.AlphaMask);
-  WriteCentered (0, 16*0, gray,  -1, "R/G/B/A masks: %s", pixfmt);
+  WriteCentered (0, 16*0, gray,  -1, "R/G/B/A masks: %s", pixfmt.GetData());
 
   WriteCentered (0, 16*1, gray,  -1, "More than one backbuffer available: %s",
     myG2D->GetDoubleBufferState () ? "yes" : "no");
@@ -819,8 +821,8 @@ void G2DTestSystemDriver::ResizeContext ()
   myG2D->Clear (black);
   DrawWindowResizeScreen ();
 
-  char text [50];
-  sprintf (text, "Canvas [%d x %d]", myG2D->GetWidth (), myG2D->GetHeight ());
+  csString text;
+  text.Format ("Canvas [%d x %d]", myG2D->GetWidth (), myG2D->GetHeight ());
   SetFont (fontLarge);
   int fw, fh;
   font->GetDimensions (text, fw, fh);

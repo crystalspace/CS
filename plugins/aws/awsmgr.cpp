@@ -715,8 +715,8 @@ void awsManager::Redraw ()
   while (curwin)
   {
 #ifdef DEBUG_MANAGER
-    printf ("aws-debug: consider window: %p\n", curwin);
-    printf (
+    csPrintf ("aws-debug: consider window: %p\n", curwin);
+    csPrintf (
 	"aws-debug: redraw tag: %u/%u\n",
 	curwin->RedrawTag (),
 	redraw_tag);
@@ -725,7 +725,7 @@ void awsManager::Redraw ()
     if (redraw_tag == curwin->RedrawTag ())
     {
 #ifdef DEBUG_MANAGER
-      printf ("aws-debug: window is dirty, redraw.\n");
+      csPrintf ("aws-debug: window is dirty, redraw.\n");
 #endif
       // Setup our dirty gathering rect.
       csRect cr;
@@ -793,7 +793,7 @@ void awsManager::RedrawWindow (iAwsComponent *win, csRect clip)
   // also inside the canvas drawing area
 
 #ifdef DEBUG_MANAGER
-  printf ("aws-debug: start drawing window.\n");
+  csPrintf ("aws-debug: start drawing window.\n");
 #endif
 
   ptG2D->SetClipRect(clip.xmin, clip.ymin, clip.xmax, clip.ymax);
@@ -805,7 +805,7 @@ void awsManager::RedrawWindow (iAwsComponent *win, csRect clip)
   RecursiveDrawChildren (win, clip);
 
 #ifdef DEBUG_MANAGER
-  printf ("aws-debug: finished drawing window.\n");
+  csPrintf ("aws-debug: finished drawing window.\n");
 #endif
 }
 
@@ -814,7 +814,7 @@ void awsManager::RecursiveDrawChildren (iAwsComponent *cmp, csRect clip)
   iAwsComponent *child;
 
 #ifdef DEBUG_MANAGER
-  printf ("aws-debug: start drawing children.\n");
+  csPrintf ("aws-debug: start drawing children.\n");
 #endif
 
   if (!cmp->HasChildren()) return;
@@ -830,7 +830,7 @@ void awsManager::RecursiveDrawChildren (iAwsComponent *cmp, csRect clip)
 	continue;
 
 #ifdef DEBUG_MANAGER
-    printf ("aws-debug: entered draw children loop for %p.\n", child);
+    csPrintf ("aws-debug: entered draw children loop for %p.\n", child);
 #endif
 
     csRect child_clip(child->Frame());
@@ -851,7 +851,7 @@ void awsManager::RecursiveDrawChildren (iAwsComponent *cmp, csRect clip)
     RecursiveDrawChildren (child, child_clip);
   } // End for
 #ifdef DEBUG_MANAGER
-  printf ("aws-debug: finished drawing children.\n");
+  csPrintf ("aws-debug: finished drawing children.\n");
 #endif
 }
 
@@ -951,7 +951,7 @@ void awsManager::CreateChildrenFromDef (
 void awsManager::CaptureMouse (iAwsComponent *comp)
 {
 #ifdef DEBUG_MANAGER
-  printf("aws-debug: Mouse captured\n");
+  csPrintf("aws-debug: Mouse captured\n");
 #endif
   mouse_captured = true;
   if (comp == 0)
@@ -962,7 +962,7 @@ void awsManager::CaptureMouse (iAwsComponent *comp)
 void awsManager::ReleaseMouse ()
 {
 #ifdef DEBUG_MANAGER
-  printf("aws-debug: Mouse released\n");
+  csPrintf("aws-debug: Mouse released\n");
 #endif
   mouse_captured = false;
   mouse_focus = 0;
@@ -971,7 +971,7 @@ void awsManager::ReleaseMouse ()
 void awsManager::SetModal (iAwsComponent *comp)
 {
 #ifdef DEBUG_MANAGER
-  printf("aws-debug: Modal Set: %p\n", comp);
+  csPrintf("aws-debug: Modal Set: %p\n", comp);
 #endif
   // return out if the new modal window is null or there is already a
   // modal_dialog
@@ -983,7 +983,7 @@ void awsManager::SetModal (iAwsComponent *comp)
 void awsManager::UnSetModal()
 {
 #ifdef DEBUG_MANAGER
-  printf("aws-debug: Modal Unset: %p\n", modal_dialog);
+  csPrintf("aws-debug: Modal Unset: %p\n", modal_dialog);
 #endif
   modal_dialog = 0;
 }

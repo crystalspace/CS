@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "cstool/gentrtex.h"
 #include "csutil/cscolor.h"
+#include "csutil/sysfunc.h"
 #include "igraphic/image.h"
 #include "csgfx/rgbpixel.h"
 #include "csgfx/memimage.h"
@@ -58,7 +59,7 @@ void csGenerateImageTextureBlend::AddLayer(float value,
   /// check value
   if(p && (p->value == value))
   {
-    printf("csGenerateImageTextureBlend Error: "
+    csPrintf("csGenerateImageTextureBlend Error: "
       "encountered duplicate value %g. Ignoring.\n", value);
     return;
   }
@@ -130,9 +131,9 @@ void csGenerateImageTextureBlend::GetColor(csColor &col,
 
   col.Set(0.0f, 0.0f, 0.0f);
   col += abovecol * abovefactor;
-  //printf("col = %g %g %g\n", col.red, col.green, col.blue);
+  //csPrintf("col = %g %g %g\n", col.red, col.green, col.blue);
   col += belowcol * belowfactor;
-  //printf("col = %g %g %g\n", col.red, col.green, col.blue);
+  //csPrintf("col = %g %g %g\n", col.red, col.green, col.blue);
 }
 
 //---- csGenerateImageTextureSingle ----------------------------
@@ -170,7 +171,7 @@ void csGenerateImageTextureSingle::GetImagePixel(
     b = ((csRGBpixel*)image->GetImageData())
       [y*image->GetWidth() + x].blue;
   }
-  //printf("Return image pixel %d,%d  %d %d %d\n", x, y, r, g, b);
+  //csPrintf("Return image pixel %d,%d  %d %d %d\n", x, y, r, g, b);
   res.Set(r,g,b);
 }
 
@@ -221,7 +222,7 @@ void csGenerateImageTextureSingle::ComputeLayerColor(
   col.blue = invblendx * col1.blue + blendx * col2.blue;
 
   // return trilinear interpolated value
-  //printf("layercol = %g %g %g\n", col.red, col.green, col.blue);
+  //csPrintf("layercol = %g %g %g\n", col.red, col.green, col.blue);
   col *= 1.0f / 255.0f;
 }
 
@@ -272,7 +273,7 @@ iImage *csGenerateImage::Generate(int totalw, int totalh,
       /// compute color
       tex->GetColor(col, pos.x, pos.y);
       pix.Set(csQint(col.red*255.),csQint(col.green*255.),csQint(col.blue*255.));
-      //if(x==0)printf("Set pixel %3d, %3d to %3g %3g %3g\n", x, y,
+      //if(x==0)csPrintf("Set pixel %3d, %3d to %3g %3g %3g\n", x, y,
         //col.red, col.green, col.blue);
       /// set pixel
       *destpix = pix;

@@ -106,7 +106,7 @@ bool OSXDriver2D::Open()
         Initialize16();
     else
     {
-        fprintf(stderr, "Depth %d not supported in CGDriver2D yet",
+        csFPrintf(stderr, "Depth %d not supported in CGDriver2D yet",
 	    canvas->Depth);
         return false;
     }
@@ -159,7 +159,7 @@ bool OSXDriver2D::HandleEvent(iEvent &ev)
         }
         if (ev.Command.Code == cscmdCommandLineHelp)
         {
-            printf("Options for MacOS X 2D graphics drivers:\n"
+            csPrintf("Options for MacOS X 2D graphics drivers:\n"
              "  -screen=<num>      Screen number to display on (default=0)\n");
             handled = true;
         }
@@ -386,7 +386,7 @@ void OSXDriver2D::SaveGamma(CGDirectDisplayID disp, GammaTable &table)
     err = CGGetDisplayTransferByTable(disp, 256, table.r, table.g, 
                                         table.b, &sampleCount);
     if (err != kCGErrorSuccess)
-        fprintf(stderr, "Error %d reading gamma values\n", err);
+        csFPrintf(stderr, "Error %d reading gamma values\n", err);
 }
 
 

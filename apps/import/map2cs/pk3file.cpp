@@ -28,22 +28,22 @@
 
 CTextureFile* CPk3File::CreateTexture(const char* texturename)
 {
-  char texfilename[256];
+  csString texfilename;
   CTextureFile* pTexture = 0;
 
-  sprintf (texfilename, "textures/%s.tga", texturename);
+  texfilename.Format ("textures/%s.tga", texturename);
   pTexture = ExtractTexture(texturename, texfilename);
   if (pTexture) return pTexture;
 
-  sprintf (texfilename, "textures/%s.jpg", texturename);
+  texfilename.Format ("textures/%s.jpg", texturename);
   pTexture = ExtractTexture(texturename, texfilename);
   if (pTexture) return pTexture;
 
-  sprintf (texfilename, "textures/%s.png", texturename);
+  texfilename.Format ("textures/%s.png", texturename);
   pTexture = ExtractTexture(texturename, texfilename);
   if (pTexture) return pTexture;
 
-  sprintf (texfilename, "textures/%s.dds", texturename);
+  texfilename.Format ("textures/%s.dds", texturename);
   pTexture = ExtractTexture(texturename, texfilename);
   if (pTexture) return pTexture;
 

@@ -86,7 +86,7 @@ void CIWorld::GenerateDefaultsector()
 {
   if (m_pMap->GetPlaneCount()<=0)
   {
-    printf("Map contains no data. Aborting!");
+    csPrintf("Map contains no data. Aborting!");
     exit(1);
   }
 

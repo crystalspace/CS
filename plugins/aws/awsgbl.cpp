@@ -25,6 +25,7 @@
 #include "awslayot.h"
 #include "csgeom/math.h"
 #include "iaws/awsdefs.h"
+#include "csutil/sysfunc.h"
 
 const int GBS_MAXINT = 0xeffffff;
 
@@ -769,7 +770,7 @@ void awsGridBagLayout::AdjustForGravity (
   case awsGridBagConstraints::GBS_NORTHWEST:
     break;
   default:
-    printf ("GridBag: bad gravity!\n");
+    csPrintf ("GridBag: bad gravity!\n");
     break;
   }
 }

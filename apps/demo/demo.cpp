@@ -96,7 +96,6 @@ void Demo::Report (int severity, const char* msg, ...)
 Demo::Demo ()
 {
   seqmgr = 0;
-  message[0] = 0;
 }
 
 Demo::~Demo ()
@@ -347,10 +346,10 @@ static char map_selpath[255] = { 0 };
 void Demo::GfxWrite (int x, int y, int fg, int bg, const char *str, ...)
 {
   va_list arg;
-  char buf[256];
+  csString buf;
 
   va_start (arg, str);
-  vsprintf (buf, str, arg);
+  buf.FormatV (str, arg);
   va_end (arg);
 
   myG2D->Write (font, x, y, fg, bg, buf);
@@ -359,13 +358,13 @@ void Demo::GfxWrite (int x, int y, int fg, int bg, const char *str, ...)
 void Demo::FileWrite (iFile* file, char *str, ...)
 {
   va_list arg;
-  char buf[256];
+  csString buf;
 
   va_start (arg, str);
-  vsprintf (buf, str, arg);
+  buf.FormatV (str, arg);
   va_end (arg);
 
-  file->Write (buf, strlen (buf));
+  file->Write (buf.GetData(), buf.Length());
 }
 
 void Demo::ShowMessage (const char* msg, ...)
@@ -373,7 +372,7 @@ void Demo::ShowMessage (const char* msg, ...)
   message_error = false;
   va_list arg;
   va_start (arg, msg);
-  vsprintf (message, msg, arg);
+  message.Format (msg, arg);
   va_end (arg);
   message_timer = csGetTicks () + 1500;
 }
@@ -383,7 +382,7 @@ void Demo::ShowError (const char* msg, ...)
   message_error = true;
   va_list arg;
   va_start (arg, msg);
-  vsprintf (message, msg, arg);
+  message.Format (msg, arg);
   va_end (arg);
   message_timer = csGetTicks () + 1500;
 }
@@ -591,10 +590,10 @@ void Demo::SetupFrame ()
       break;
   }
 
-  if (message[0])
+  if (!message.IsEmpty())
   {
     GfxWrite (10, 10, col_black, message_error ? col_red : col_white, message);
-    if (current_time > message_timer) message[0] = 0;
+    if (current_time > message_timer) message.Empty();
   }
 }
 

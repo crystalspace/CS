@@ -53,7 +53,7 @@ int main (int argc, char* argv[])
     CS_ANSI_FW "r" CS_ANSI_RST 
     " for " CS_ANSI_BW CS_ANSI_FR "f" CS_ANSI_FG "u" CS_ANSI_FB "n" 
     CS_ANSI_RST "\n");
-  printf ("For change, a printf()\n");
+  csPrintf ("For change, a csPrintf()\n");
   csPrintfErr ("csPrintfErr()\n");
   csPrintf ("csPrintf() again\n");
 

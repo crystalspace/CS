@@ -625,14 +625,14 @@ void fire_missile ()
   dyn->QueryObject ()->ObjAdd(msdata);
   msdata->DecRef ();
 
-  char misname[10];
-  sprintf (misname, "missile%d", ((rand () >> 3) & 1)+1);
+  csString misname;
+  misname.Format ("missile%d", ((rand () >> 3) & 1)+1);
 
   iMeshFactoryWrapper *tmpl = Sys->view->GetEngine ()->GetMeshFactories ()
   	->FindByName (misname);
   if (!tmpl)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Could not find '%s' sprite factory!", misname);
+    	"Could not find '%s' sprite factory!", misname.GetData());
   else
   {
     csRef<iMeshWrapper> sp (
@@ -864,7 +864,7 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
   csRef<iThingState> thing_state = SCF_QUERY_INTERFACE (
   	thing->GetMeshObject (), iThingState);
   csRef<iThingFactoryState> thing_fact_state = thing_state->GetFactory ();
-printf ("b\n"); fflush (stdout);
+csPrintf ("b\n"); fflush (stdout);
 
   bool regionExists = (Sys->Engine->GetRegions ()->FindByName (lev) != 0);
   iRegion* cur_region = Sys->Engine->CreateRegion (lev);
@@ -872,8 +872,8 @@ printf ("b\n"); fflush (stdout);
   if (!regionExists)
   {
     // @@@ No error checking!
-    char buf[255];
-    sprintf (buf, "/lev/%s", lev);
+    csString buf;
+    buf.Format ("/lev/%s", lev);
     Sys->myVFS->ChDir (buf);
     LevelLoader->LoadMapFile ("world", false, cur_region, true);
     cur_region->Prepare ();

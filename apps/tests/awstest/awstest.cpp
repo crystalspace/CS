@@ -83,7 +83,6 @@ extern awsTest *System;
 
 awsTest::awsTest()
 {
-  message[0] = 0;
 }
 
 awsTest::~awsTest()
@@ -302,7 +301,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
       Report(CS_REPORTER_SEVERITY_ERROR, "couldn't load definition file!");
   aws->GetPrefMgr()->SelectDefaultSkin("Normal Windows");
 
-  printf("aws-debug: Creating splash window...\n");
+  csPrintf("aws-debug: Creating splash window...\n");
   iAwsWindow *test = aws->CreateWindowFrom("Splash");
   iAwsWindow *test2 = aws->CreateWindowFrom("Another");
   iAwsWindow *test3 = aws->CreateWindowFrom("Engine View");
@@ -364,7 +363,7 @@ awsTest::SetupFrame()
   // Start drawing 2D graphics.
   if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
 
-  sprintf(message, "awsTest(%d)", counter);
+  message.Format ("awsTest(%d)", counter);
   myG2D->Write(font, 5, 5, col_green, -1, message);
 
   aws->Redraw();

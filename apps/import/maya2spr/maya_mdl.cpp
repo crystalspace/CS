@@ -25,6 +25,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "csutil/sysfunc.h"
 #include "maya_mdl.h"
 #include "mayanode.h"
 
@@ -92,7 +93,7 @@ bool Maya4Model::ReadMAFile(const char* mdlfile)
     // If file has loaded with no anim curves, create a default 0 anim curve
     if (!animnode)
     {
-	printf("Creating default animcurveTL...\n");
+	csPrintf("Creating default animcurveTL...\n");
         animnode = new NodeAnimCurveTL(meshnode->CountVertices()); // position paths for each vertex
 	animnode->CreateDefault();
     }
@@ -112,8 +113,8 @@ bool Maya4Model::CreateNode(MayaInputFile& file,DAGNode& tree)
         newnode = new NodeTransform;        // positioning of mesh
     else if (tok == "mesh")
     {
-	printf("Mesh will be translated by (%1.2f,%1.2f,%1.2f)...\n",translate.x,translate.y,translate.z);
-	printf("Mesh will be scaled by (%1.2f,%1.2f,%1.2f)...\n",scale.x,scale.y,scale.z);
+	csPrintf("Mesh will be translated by (%1.2f,%1.2f,%1.2f)...\n",translate.x,translate.y,translate.z);
+	csPrintf("Mesh will be scaled by (%1.2f,%1.2f,%1.2f)...\n",scale.x,scale.y,scale.z);
         meshnode = new NodeMesh(translate,scale); // vertices, edges, polys
         newnode = meshnode;
     }
@@ -168,7 +169,7 @@ bool Maya4Model::CreateNode(MayaInputFile& file,DAGNode& tree)
 
 void Maya4Model::dumpstats(FILE* s) 
 {
-  fprintf(s, "\nMaya Model (MDL) Statistics:\n");
+  csFPrintf(s, "\nMaya Model (MDL) Statistics:\n");
   
   tree.PrintStats(s,0);
 }
@@ -180,30 +181,30 @@ bool Maya4Model::WriteSPR(const char* spritename, csArray<Animation*>& anims)
 
   if (spritename == 0 || strlen(spritename) == 0)
   {
-    fprintf(stderr, "Unable to save: 0 sprite name\n");
+    csFPrintf(stderr, "Unable to save: 0 sprite name\n");
     return false;
   }
 
-  printf("Writing out SPR file: %s\n",spritename);
+  csPrintf("Writing out SPR file: %s\n",spritename);
 
   f = fopen(spritename, "w");
   if (!f)
   {
-      fprintf(stderr,"Unable to open file (%s) to write out CS sprite.\n",spritename);
+      csFPrintf(stderr,"Unable to open file (%s) to write out CS sprite.\n",spritename);
   }
 
-    fprintf(f,"<meshfact>\n");
-    fprintf(f,"   <plugin>crystalspace.mesh.loader.factory.sprite.3d</plugin>\n");
-    fprintf(f,"   <params>\n");
+    csFPrintf(f,"<meshfact>\n");
+    csFPrintf(f,"   <plugin>crystalspace.mesh.loader.factory.sprite.3d</plugin>\n");
+    csFPrintf(f,"   <params>\n");
     
     if (filenode)
         filenode->Write(f);
     else
-	fprintf(f,"      <material>no_maya_material</material>\n");
+	csFPrintf(f,"      <material>no_maya_material</material>\n");
 
     for (int frame=0; frame<((animnode)?animnode->GetFrames():1); frame++)
     {
-        printf("Processing frame %d...\n",frame+1);
+        csPrintf("Processing frame %d...\n",frame+1);
 
         if (frame>0)
             meshnode->ClearCS();
@@ -214,9 +215,9 @@ bool Maya4Model::WriteSPR(const char* spritename, csArray<Animation*>& anims)
         // Fixups must be done on a frame by frame basis
         meshnode->FixupUniqueVertexMappings();
 
-        fprintf(f,"      <frame name=\"f%d\">\n",frame+1);
+        csFPrintf(f,"      <frame name=\"f%d\">\n",frame+1);
         meshnode->WriteVertices(f);
-        fprintf(f,"      </frame>\n");
+        csFPrintf(f,"      </frame>\n");
     }
 
     // Now write out animation actions
@@ -236,7 +237,7 @@ bool Maya4Model::WriteSPR(const char* spritename, csArray<Animation*>& anims)
 	int frame_duration = anim->duration;
 	Animation *curr_anim = anim;
 
-        printf("Writing out Animation %s\n",(const char *)name);
+        csPrintf("Writing out Animation %s\n",(const char *)name);
 
         if (i != anims.Length()-1)
             stop = anim->startframe-1;
@@ -260,20 +261,20 @@ bool Maya4Model::WriteSPR(const char* spritename, csArray<Animation*>& anims)
 	DisplacementGroup &dg = (curr_anim->displacements.Length())? curr_anim->displacements[0] : disg;
 	int displacementnum = 1;
 
-        fprintf(f,"     <action name=\"%s\">\n",(const char *)name);
+        csFPrintf(f,"     <action name=\"%s\">\n",(const char *)name);
 
         for (int i=start; i<=stop; i++)
         {
 	    if (i<dg.startframe || i>dg.stopframe)
 	    {
-                fprintf(f,"       <f name=\"f%d\" delay=\"%d\" />\n",i,frame_duration);
+                csFPrintf(f,"       <f name=\"f%d\" delay=\"%d\" />\n",i,frame_duration);
 	    }
 	    else
 	    {
 		int frame2 = (i+1>stop)?start:i+1;
 		float displacement = meshnode->GetDisplacement(animnode, i-1,
 		    frame2-1, dg.vertex);
-		fprintf(f,"       <f name=\"f%d\" displacement=\"%f\" />\n",i,displacement);
+		csFPrintf(f,"       <f name=\"f%d\" displacement=\"%f\" />\n",i,displacement);
 		if (i==dg.stopframe) // get next displacement group
 		{
 		    dg = curr_anim->displacements[displacementnum++];
@@ -281,10 +282,10 @@ bool Maya4Model::WriteSPR(const char* spritename, csArray<Animation*>& anims)
 	    }
         }
 
-        fprintf(f,"     </action>\n");
+        csFPrintf(f,"     </action>\n");
     }
 
-    printf("Writing out Triangles.\n");
+    csPrintf("Writing out Triangles.\n");
 
     // Now write out all triangles
     meshnode->WriteTriangles(f);
@@ -297,13 +298,13 @@ bool Maya4Model::WriteSPR(const char* spritename, csArray<Animation*>& anims)
       csString name = socket->name;
       int      tri  = socket->startframe; // really triangle #
 
-      printf("Writing out Socket %s Tri %d\n",(const char *)name,tri);
+      csPrintf("Writing out Socket %s Tri %d\n",(const char *)name,tri);
 
-      fprintf(f,"     <socket name=\"%s\" tri=\"%d\" />\n",(const char *)name, tri);
+      csFPrintf(f,"     <socket name=\"%s\" tri=\"%d\" />\n",(const char *)name, tri);
     }
 
     // Wrap up the file
-    fprintf(f,"    </params>\n</meshfact>\n");
+    csFPrintf(f,"    </params>\n</meshfact>\n");
 
     fclose(f);
 

@@ -24,6 +24,7 @@
  */
 #include "csextern.h"
 #include "iutil/cache.h"
+#include "csutil/csstring.h"
 
 struct iObjectRegistry;
 struct iVFS;
@@ -42,7 +43,7 @@ private:
 
   iVFS* GetVFS ();
 
-  void CacheName (char* buf, const char* type, const char* scope,
+  void CacheName (csStringFast<512>& buf, const char* type, const char* scope,
   	uint32 id);
 
 public:
@@ -75,7 +76,7 @@ public:
   /**
    * Cache some data. Returns true if this succeeded.
    */
-  virtual bool CacheData (void* data, size_t size,
+  virtual bool CacheData (const void* data, size_t size,
   	const char* type, const char* scope, uint32 id);
   /**
    * Retrieve some data from the cache. Returns 0 if the

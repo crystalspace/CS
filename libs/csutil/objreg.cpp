@@ -23,6 +23,7 @@
 #include "csutil/util.h"
 #include "csutil/objreg.h"
 #include "csutil/refarr.h"
+#include "csutil/sysfunc.h"
 
 class csObjectRegistryIterator : public iObjectRegistryIterator
 {
@@ -235,7 +236,7 @@ iBase* csObjectRegistry::Get (char const* tag, scfInterfaceID id, int version)
       iBase* interf = (iBase*)(b->QueryInterface (id, version));
       if (!interf)
       {
-        printf ("WARNING! Suspicious: object with tag '%s' does not implement "
+        csPrintf ("WARNING! Suspicious: object with tag '%s' does not implement "
 	        "interface '%s'!\n", t, iSCF::SCF->GetInterfaceName(id));
 	fflush (stdout);
 	return 0;

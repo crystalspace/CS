@@ -265,8 +265,8 @@ bool csSector::UseCullerPlugin (const char *plugname,
   }
 
   // load cache data
-  char cachename[256];
-  sprintf (cachename, "%s_%s", GetName (), plugname);
+  csString cachename;
+  cachename.Format ("%s_%s", GetName (), plugname);
   culler->Setup (cachename);
 
   // Loop through all meshes and register them to the visibility culler.

@@ -723,7 +723,7 @@ const char* csGenmeshAnimationControlFactory::ParseGroup (iDocumentNode* node,
 	}
         break;
       default:
-        sprintf (error_buf,
+        error_buf.Format (
 		"Don't recognize token '%s' in anim control group!",
 		value);
 	delete group;
@@ -881,7 +881,7 @@ const char* csGenmeshAnimationControlFactory::ParseScript (iDocumentNode* node)
 	ad.script->AddInstruction (AC_REPEAT);
         break;
       default:
-        sprintf (error_buf,
+        error_buf.Format (
 		"Don't recognize token '%s' in anim control script!",
 		value);
         return error_buf;
@@ -926,7 +926,7 @@ const char* csGenmeshAnimationControlFactory::Load (iDocumentNode* node)
 	}
 	break;
       default:
-        sprintf (error_buf,
+        error_buf.Format (
 		"Don't recognize token '%s' in anim control!",
 		value);
         return error_buf;

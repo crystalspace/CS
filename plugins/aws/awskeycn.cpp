@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csgeom/csrect.h"
 #include "csutil/scfstr.h"
+#include "csutil/sysfunc.h"
 #include "iaws/aws.h"
 #include "iutil/string.h"
 #include "awsprefs.h"
@@ -36,7 +37,7 @@ iAwsKey* awsKeyContainer::Find (const char* n) const
 iAwsKey *awsKeyContainer::Find (unsigned long idname) const
 {
   if (aws_debug)
-    printf (
+    csPrintf (
       "aws-debug: searching for %lu (%zu items)\n",
       idname,
       children.Length ());
@@ -47,13 +48,13 @@ iAwsKey *awsKeyContainer::Find (unsigned long idname) const
     iAwsKey *key = children[i];
 
     if (aws_debug)
-      printf ("aws-debug: item %zu=%lu ? %lu\n", i,
+      csPrintf ("aws-debug: item %zu=%lu ? %lu\n", i,
 	      key->Name (), idname);
 
     if (key && key->Name () == idname) return key;
   }
 
-  if (aws_debug) printf ("aws-debug: search failed.\n");
+  if (aws_debug) csPrintf ("aws-debug: search failed.\n");
 
   return 0;
 }
@@ -88,7 +89,7 @@ void awsKeyContainer::Consume (iAwsKeyContainer *c)
 {
   if (aws_debug)
   {
-    printf (
+    csPrintf (
       "aws-debug: Consuming %d items (%zu items currently).\n",
       c->Length (),
       children.Length ());
@@ -111,7 +112,7 @@ void awsKeyContainer::Consume (iAwsKeyContainer *c)
   }
 
   if (aws_debug)
-    printf ("aws-debug: Now contains %zu items.\n",
+    csPrintf ("aws-debug: Now contains %zu items.\n",
 	    children.Length ());
 
   /**

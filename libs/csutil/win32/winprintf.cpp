@@ -203,33 +203,26 @@ static int _cs_vfprintf (FILE* stream, const char* format, va_list args)
   rc = _cs_fputs (str, stream);
   delete[] str;
   // On success fputs() returns a value >= 0, but
-  // printf() should return the number of chars written.
+  // csPrintf() should return the number of chars written.
   return ((rc >= 0) ? (newsize - 1) : -1);
 }
 
-// Replacement for printf(); exact same prototype/functionality as printf()
+// Replacement for csPrintf(); exact same prototype/functionality as csPrintf()
 int csPrintf (char const* str, ...)
 {
   va_list args;
   va_start(args, str);
-  int const rc = _cs_vfprintf (stdout, str, args);
+  int const rc = _cs_fprintf (stdout, str, args);
   va_end(args);
   fflush (stdout);
   return rc;
 }
 
-// Replacement for vprintf()
+// Replacement for csPrintfV()
 int csPrintfV(char const* str, va_list args)
 {
   int ret = _cs_vfprintf (stdout, str, args);
   fflush (stdout);
-  return ret;
-}
-
-int csFPutErr (const char* str)
-{
-  int ret = _cs_fputs (str, stderr);
-  fflush (stderr);
   return ret;
 }
 
@@ -248,3 +241,18 @@ int csPrintfErrV (const char* str, va_list args)
   fflush (stderr);
   return ret;
 }
+
+int csFPrintf (FILE* file, const char* str, ...)
+{
+  va_list args;
+  va_start (args, str);
+  int const rc = _cs_vfprintf (file, str, args);
+  va_end (args);
+  return rc;
+}
+
+int csFPrintfV (FILE* file, const char* str, va_list args)
+{
+  return _cs_vfprintf (file, str, args);
+}
+

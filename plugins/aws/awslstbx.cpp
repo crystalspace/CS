@@ -27,6 +27,7 @@
 #include "csutil/scfstr.h"
 #include "csutil/csevent.h"
 #include "csutil/snprintf.h"
+#include "csutil/sysfunc.h"
 #include "iutil/evdefs.h"
 
 #include <stdio.h>
@@ -938,7 +939,7 @@ void awsListBox::OnDraw (csRect clip)
         // This should never occur
         if (i == -1)
         {
-          printf ("awslistbox: bug: couldn't find current row!\n");
+          csPrintf ("awslistbox: bug: couldn't find current row!\n");
           return ;
         }
         else
@@ -957,7 +958,7 @@ void awsListBox::OnDraw (csRect clip)
         // This should never occur
         if (i == -1)
         {
-          printf ("awslistbox: bug: couldn't find current row!\n");
+          csPrintf ("awslistbox: bug: couldn't find current row!\n");
           return ;
         }
         else

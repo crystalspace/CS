@@ -340,7 +340,7 @@ bool csDefaultRunLoop(iObjectRegistry* r)
 //-----------------------------------------------------------------------------
 bool csPlatformStartup(iObjectRegistry* r)
 {
-  printf("Crystal Space for " CS_PLATFORM_NAME " " CS_VERSION "\nPorted to "
+  csPrintf("Crystal Space for " CS_PLATFORM_NAME " " CS_VERSION "\nPorted to "
     CS_PLATFORM_NAME " by Eric Sunshine <sunshine@sunshineco.com>\n\n");
   csRef<iOSXAssistant> a = csPtr<iOSXAssistant>(new OSXAssistant(r));
   r->Register(a, "iOSXAssistant");

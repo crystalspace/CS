@@ -408,7 +408,7 @@ csRGBcolor csProcSky::GetSkyBlue(const csVector3& spot, float& haze,
   g += suncolor.green * sundist * 255.0f;
   b += suncolor.blue * sundist * 255.0f;
 
-  //printf("color %d %d %d\n", res.red, res.green, res.blue);
+  //csPrintf("color %d %d %d\n", res.red, res.green, res.blue);
     if (r > 255.0) r = 255.0;
     if (g > 255.0) g = 255.0;
     if (b > 255.0) b = 255.0;
@@ -532,7 +532,7 @@ void csProcSky::DrawToTexture (csProcSkyTexture *skytex, csTicks current_time,
       spot = txtorig + texelu*float(x) + texelv*float(y);
       if(!SphereIntersect(spot, isect))
       {
-        //printf("no intersection!\n");
+        //csPrintf("no intersection!\n");
 	isect = center; isect.z += radius;
       }
       */
@@ -609,7 +609,7 @@ void csProcSky::MakeIntersectCache(csProcSkyTexture *skytex)
       spot = txtorig + texelu*float(x) + texelv*float(y);
       if(!SphereIntersect(spot, isect))
       {
-        //printf("no intersection!\n");
+        //csPrintf("no intersection!\n");
 	isect = center; isect.z += radius;
       }
       cache [ y*width+x ] = isect;

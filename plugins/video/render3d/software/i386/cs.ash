@@ -63,7 +63,7 @@ __TEXT_SECT__
 ; Arguments:
 ;   The name of external C procedure
 ; Example:
-;		cextern	printf
+;		cextern	csPrintf
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %macro		cextern	1
 		%xdefine %1 cname(%1)
@@ -80,7 +80,7 @@ __TEXT_SECT__
 ; Arguments:
 ;   The name of C procedure
 ; Example:
-;		cglobal	my_printf
+;		cglobal	my_csPrintf
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %macro		cglobal	1
 		%xdefine %1 cname(%1)

@@ -76,7 +76,7 @@ struct iCacheManager : public iBase
   /**
    * Cache some data. Returns true if this succeeded.
    */
-  virtual bool CacheData (void* data, size_t size,
+  virtual bool CacheData (const void* data, size_t size,
   	const char* type, const char* scope, uint32 id) = 0;
 
   /**

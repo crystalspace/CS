@@ -554,9 +554,9 @@ bool csPolygon3DStatic::CreateBoundingTextureBox ()
   polygon_data.tmapping->SetIMinUV (Imin_u, Imin_v);
   csQroundVerySure (Imax_u, max_u_ww);
   csQroundVerySure (Imax_v, max_v_hh);
-//printf ("min_u=%g ww=%d min_u_ww=%g\n", min_u, ww, min_u_ww);
-//printf ("max_u=%g ww=%d max_u_ww=%g\n", max_u, ww, max_u_ww);
-//printf ("%d,%d,%d,%d\n", Imin_u, Imin_v, Imax_u, Imax_v); fflush (stdout);
+//csPrintf ("min_u=%g ww=%d min_u_ww=%g\n", min_u, ww, min_u_ww);
+//csPrintf ("max_u=%g ww=%d max_u_ww=%g\n", max_u, ww, max_u_ww);
+//csPrintf ("%d,%d,%d,%d\n", Imin_u, Imin_v, Imax_u, Imax_v); fflush (stdout);
 
   int h = Imax_v - polygon_data.tmapping->GetIMinV ();
   int w_orig = Imax_u - polygon_data.tmapping->GetIMinU ();

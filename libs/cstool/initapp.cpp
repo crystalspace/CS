@@ -253,7 +253,7 @@ iVFS* csInitializer::SetupVFS(iObjectRegistry* r, const char* pluginID)
     VFS = CS_LOAD_PLUGIN (plugin_mgr, pluginID, iVFS);
     if (!VFS)
     {
-      fprintf (stderr, "Couldn't load VFS plugin \"%s\"!\n", pluginID);
+      csFPrintf (stderr, "Couldn't load VFS plugin \"%s\"!\n", pluginID);
       return 0;
     }
     r->Register (VFS, "iVFS");

@@ -89,8 +89,8 @@ public:
   {
     csRegExpMatchError rc = matcher.Match ("");
     if (rc == NoError || rc == NoMatch) return 0;
-    static char error_string[100];
-    sprintf (error_string, "Regexp error %d", (int)rc);
+    static csString error_string;
+    error_string.Format ("Regexp error %d", (int)rc);
     return error_string;
   }
   virtual bool SelectObject (iObject* obj)
@@ -210,8 +210,8 @@ public:
   {
     csRegExpMatchError rc = matcher.Match ("");
     if (rc == NoError || rc == NoMatch) return 0;
-    static char error_string[100];
-    sprintf (error_string, "Regexp error %d", (int)rc);
+    static csString error_string;
+    error_string.Format ("Regexp error %d", (int)rc);
     return error_string;
   }
   virtual bool SelectObject (iObject* obj);

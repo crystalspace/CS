@@ -256,7 +256,7 @@ void csXExtF86VM::EnterFullScreen ()
   FindBestMode (wa.width, wa.height);
 
   #ifdef CS_DEBUG
-    printf ("Entering fullscreen: win %d, %d to fs_mode %hu, %hu\n\n",
+    csPrintf ("Entering fullscreen: win %d, %d to fs_mode %hu, %hu\n\n",
       wa.width, wa.height, fs_mode.hdisplay, fs_mode.vdisplay);
   #endif
         

@@ -35,7 +35,7 @@ int main (int argc, char *argv[])
   iObjectRegistry* objreg = csInitializer::CreateEnvironment (argc, argv);
   if (! objreg)
   {
-    fprintf (stderr, "Failed to create environment!\n");
+    csFPrintf (stderr, "Failed to create environment!\n");
     return 1;
   }
 
@@ -46,7 +46,7 @@ int main (int argc, char *argv[])
     CS_REQUEST_END);
   if (! plugins_ok)
   {
-    fprintf (stderr, "Failed to load plugins!\n");
+    csFPrintf (stderr, "Failed to load plugins!\n");
     return 2;
   }
 
@@ -60,48 +60,48 @@ int main (int argc, char *argv[])
     csRef<iScript> script = CS_QUERY_REGISTRY (objreg, iScript);
     if (! script)
     {
-      fprintf (stderr, "Failed to find perl5 plugin!\n");
+      csFPrintf (stderr, "Failed to find perl5 plugin!\n");
       return 3;
     }
 
     bool module_ok = script->LoadModule ("cspace");
     if (! module_ok)
     {
-      fprintf (stderr, "Failed to load perl5 cspace module!\n");
+      csFPrintf (stderr, "Failed to load perl5 cspace module!\n");
       return 4;
     }
 
     csInitializer::OpenApplication (objreg);
 
     char const *text = "Hello, world!";
-    printf ("Testing Store:\n");
+    csPrintf ("Testing Store:\n");
     script->Store ("text", text);
-    printf ("text = %s\n", text);
+    csPrintf ("text = %s\n", text);
 
     csRef<iString> rettext;
-    printf ("Testing Retrieve:\n");
+    csPrintf ("Testing Retrieve:\n");
     script->Retrieve ("text", rettext);
-    printf ("text = %s\n", rettext->GetData());
+    csPrintf ("text = %s\n", rettext->GetData());
 
     puts("");
 
-    printf ("Testing NewObject:\n");
+    csPrintf ("Testing NewObject:\n");
     csRef<iScriptObject> obj =
       script->NewObject ("cspace::csVector3", "%g%g%g", 1.0f, 2.0f, 3.0f);
-    printf ("new csVector3 (1.0f, 2.0f, 3.0f)\n");
+    csPrintf ("new csVector3 (1.0f, 2.0f, 3.0f)\n");
 
     puts("");
 
-    printf ("Testing Get:\n");
+    csPrintf ("Testing Get:\n");
     float x = 0.0f, y = 0.0f, z = 0.0f;
     obj->Get ("x", x);
     obj->Get ("y", y);
     obj->Get ("z", z);
-    printf ("x=%g, y=%g, z=%g\n", x, y, z);
+    csPrintf ("x=%g, y=%g, z=%g\n", x, y, z);
 
     puts("");
 
-    printf("Testing Set:\n");
+    csPrintf("Testing Set:\n");
     obj->Set ("x", 3.0f);
     obj->Set ("y", 2.0f);
     obj->Set ("z", 1.0f);
@@ -109,7 +109,7 @@ int main (int argc, char *argv[])
     obj->Get ("x", x);
     obj->Get ("y", y);
     obj->Get ("z", z);
-    printf ("x=%g, y=%g, z=%g\n", x, y, z);
+    csPrintf ("x=%g, y=%g, z=%g\n", x, y, z);
   }
 
   csInitializer::DestroyApplication (objreg);

@@ -79,7 +79,7 @@ SCF_IMPLEMENT_IBASE(csBezierMesh)
       scfCompatibleVersion(iVersion, scfInterface<iPolygonMesh>::GetVersion()))
     {
 #ifdef CS_DEBUG
-      printf ("Deprecated feature use: iPolygonMesh queried from Bezier "
+      csPrintf ("Deprecated feature use: iPolygonMesh queried from Bezier "
 	"object; use iObjectModel->GetPolygonMeshColldet() instead.\n");
 #endif
       iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
@@ -1053,7 +1053,7 @@ bool csBezierMesh::ReadFromCache (iCacheManager* cache_mgr)
         rc = false;
         if (static_data->thing_type->do_verbose)
 	{
-	  printf ("  Bezier '%s' Curve '%s': %s\n",
+	  csPrintf ("  Bezier '%s' Curve '%s': %s\n",
 	  	thing_name, curves.Get (i)->GetName (),
 		error);
 	  fflush (stdout);
@@ -1065,7 +1065,7 @@ bool csBezierMesh::ReadFromCache (iCacheManager* cache_mgr)
   {
     if (static_data->thing_type->do_verbose)
     {
-      printf ("  Bezier '%s': Couldn't find cached lightmap file for bezier!\n",
+      csPrintf ("  Bezier '%s': Couldn't find cached lightmap file for bezier!\n",
       	thing_name);
       fflush (stdout);
     }

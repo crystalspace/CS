@@ -655,7 +655,7 @@ while (0)
 
 # ifndef YYFPRINTF
 #  include <stdio.h> /* INFRINGES ON USER NAME SPACE */
-#  define YYFPRINTF fprintf
+#  define YYFPRINTF csFPrintf
 # endif
 
 # define YYDPRINTF(Args)			\

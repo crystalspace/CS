@@ -541,7 +541,7 @@ void Win32Assistant::Shutdown()
     q->RemoveListener(this);
   if (!is_console_app && (cmdline_help_wanted || console_window))
   {
-    printf ("\nPress a key to close this window...");
+    csPrintf ("\nPress a key to close this window...");
     fflush (stdout);
     HANDLE hConsole;
     hConsole = CreateFile ("CONIN$", GENERIC_READ, FILE_SHARE_READ, 0, 
@@ -626,8 +626,8 @@ bool Win32Assistant::HandleEvent (iEvent& e)
     const char *defcon = "no";
    #endif
 
-    printf ("Win32-specific options:\n");
-    printf ("  -[no]console       Create a debug console (default = %s)\n",     
+    csPrintf ("Win32-specific options:\n");
+    csPrintf ("  -[no]console       Create a debug console (default = %s)\n",     
       defcon);
   }
   return false;
@@ -932,7 +932,7 @@ void Win32Assistant::DisableConsole ()
   time_t aclock;
   time( &aclock );
   now = localtime( &aclock );
-  printf("====== %s", asctime(now));
+  csPrintf("====== %s", asctime(now));
 }
 
 LRESULT Win32Assistant::CBTProc (int nCode, WPARAM wParam, LPARAM lParam)
@@ -994,7 +994,7 @@ void Win32Assistant::AlertV (HWND window, int type, const char* title,
   }
 
   char buf[4096];
-  vsprintf(buf, msg, args);
+  vscsPrintf(buf, msg, args);
 
   // No need to juggle with string conversions here, 
   // MessageBoxW() also exists on Win9x

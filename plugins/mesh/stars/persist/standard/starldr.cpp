@@ -93,23 +93,12 @@ SCF_IMPLEMENT_FACTORY (csStarLoader)
 SCF_IMPLEMENT_FACTORY (csStarSaver)
 
 
-static void ReportError (iReporter* reporter, const char* id,
+static void ReportError (iObjectRegistry* objreg, const char* id,
 	const char* description, ...)
 {
   va_list arg;
   va_start (arg, description);
-
-  if (reporter)
-  {
-    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
-  }
-  else
-  {
-    char buf[1024];
-    vsprintf (buf, description, arg);
-    csPrintf ("Error ID: %s\n", id);
-    csPrintf ("Description: %s\n", buf);
-  }
+  csReportV (objreg, CS_REPORTER_SEVERITY_ERROR, id, description, arg);
   va_end (arg);
 }
 
@@ -128,7 +117,6 @@ csStarFactoryLoader::~csStarFactoryLoader ()
 bool csStarFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csStarFactoryLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
 }
 
@@ -146,7 +134,7 @@ csPtr<iBase> csStarFactoryLoader::Parse (iDocumentNode* /*node*/,
   }
   if (!type)
   {
-    ReportError (reporter,
+    ReportError (object_reg,
 		"crystalspace.starfactoryloader.setup.objecttype",
 		"Could not load the stars mesh object plugin!");
     return 0;
@@ -172,7 +160,6 @@ csStarFactorySaver::~csStarFactorySaver ()
 bool csStarFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csStarFactorySaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
 }
 
@@ -201,7 +188,6 @@ csStarLoader::~csStarLoader ()
 bool csStarLoader::Initialize (iObjectRegistry* object_reg)
 {
   csStarLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
   xmltokens.Register ("box", XMLTOKEN_BOX);

@@ -70,7 +70,7 @@ bool csWin32RegistryConfig::TryOpen (HKEY parent, HKEY& regKey, DWORD access,
   }
 
 /*  CS_ALLOC_STACK_ARRAY (char, key, 9 + strlen (Key) + 1); // 9 = Length "Software\"
-  sprintf (key, "Software\\%s", Key);
+  scsPrintf (key, "Software\\%s", Key);
   ReplaceSeparators (key);*/
 
   hKeyParent = parent;
@@ -282,11 +282,11 @@ const char* csWin32RegistryConfig::RegToStr (DWORD type, Block_O_Mem& data,
     return status->strings.Register ((char*)data.data, 0);
     break;
   case REG_DWORD:
-    sprintf (buf, "%d", *((int*)data.data));
+    scsPrintf (buf, "%d", *((int*)data.data));
     return status->strings.Register (buf, 0);
     break;
   case REG_BINARY:
-    sprintf (buf, "%g", *((float*)data.data));
+    scsPrintf (buf, "%g", *((float*)data.data));
     return status->strings.Register (buf, 0);
     break;
   default:
@@ -436,7 +436,7 @@ void csWin32RegistryConfig::SetFloat (const char *Key, float Value)
   //InternalSetValue (Key, REG_BINARY, &Value, sizeof (Value));
   // for better readability:
   char buf[128];
-  sprintf (buf, "%g", Value);
+  scsPrintf (buf, "%g", Value);
   InternalSetValue (Key, REG_SZ, buf, strlen (buf) + 1);
 }
 

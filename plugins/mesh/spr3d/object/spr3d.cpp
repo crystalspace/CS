@@ -183,7 +183,7 @@ SCF_IMPLEMENT_IBASE (csSprite3DMeshObjectFactory)
     if (iInterfaceID == iPolygonMesh_scfID &&				
       scfCompatibleVersion(iVersion, scfInterface<iPolygonMesh>::GetVersion()))
     {
-      printf ("Deprecated feature use: iPolygonMesh queried from Sprite3d "
+      csPrintf ("Deprecated feature use: iPolygonMesh queried from Sprite3d "
 	"factory; use iObjectModel->GetPolygonMeshColldet() instead.\n");
       iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
       (Object)->IncRef ();						
@@ -380,14 +380,14 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
   }
 
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-  char buf[100];
+  csString buf;
   iCacheManager* cache_mgr = 0;
 
   bool was_in_cache = false;
   if (!forcerecalc && engine)
   {
     cache_mgr = engine->GetCacheManager ();
-    sprintf (buf, "spr3dlod");
+    buf = "spr3dlod";
     csRef<iDataBuffer> db (cache_mgr->ReadCache (buf, GetCacheName (), 0));
     if (db)
     {
@@ -707,7 +707,7 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   }
 
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-  char buf[100];
+  csString buf;
   iCacheManager* cache_mgr = 0;
 
   if (!forcerecalc)
@@ -715,7 +715,7 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
     if (engine)
     {
       cache_mgr = engine->GetCacheManager ();
-      sprintf (buf, "spr3dnormals_%d_%d", base, frame);
+      buf.Format ("spr3dnormals_%d_%d", base, frame);
       csRef<iDataBuffer> db (cache_mgr->ReadCache (buf, GetCacheName (), 0));
       if (db)
       {
@@ -978,7 +978,7 @@ SCF_IMPLEMENT_IBASE (csSprite3DMeshObject)
       scfCompatibleVersion(iVersion, scfInterface<iPolygonMesh>::GetVersion()))
     {
 #ifdef CS_DEBUG
-      printf ("Deprecated feature use: iPolygonMesh queried from Sprite3d "
+      csPrintf ("Deprecated feature use: iPolygonMesh queried from Sprite3d "
 	"object; use iMeshObject->GetObjectModel()->"
 	"GetPolygonMeshColldet() instead.\n");
 #endif
@@ -1818,7 +1818,7 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
     last_time = current_time;
     tween_ratio = 0;
   }
-//  printf("Disp: %1.4f Frame #%d TweenDisp:%1.4f  Tween:%1.4f\n",cur_displacement,cur_frame,last_displacement,tween_ratio);
+//  csPrintf("Disp: %1.4f Frame #%d TweenDisp:%1.4f  Tween:%1.4f\n",cur_displacement,cur_frame,last_displacement,tween_ratio);
 
   return ret;
 }

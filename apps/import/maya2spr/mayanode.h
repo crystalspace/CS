@@ -54,7 +54,7 @@ protected:
     void PrintSpaces(FILE *s,int level)
     {
         for (int i=level; i>0; i--)
-            fprintf(s," ");
+            csFPrintf(s," ");
     };
 
 public:

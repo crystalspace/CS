@@ -166,7 +166,7 @@ static void InitFreeMemEntries ()
 //=======================================================
 static void CompactMemEntries ()
 {
-  printf ("Basic compact of memory table!\n"); fflush (stdout);
+  csPrintf ("Basic compact of memory table!\n"); fflush (stdout);
   InitFreeMemEntries ();
   // Compact the table.
   int i, j;
@@ -189,7 +189,7 @@ static void CompactMemEntries ()
 //=======================================================
 static void CompactMemEntries (unsigned long older_age)
 {
-  printf ("Extended compact of memory table!\n"); fflush (stdout);
+  csPrintf ("Extended compact of memory table!\n"); fflush (stdout);
   InitFreeMemEntries ();
   // Compact the table.
   int i, j;
@@ -239,7 +239,7 @@ static MemEntry& FindFreeMemEntry ()
 	  older_age += DETECT_TABLE_OLDER/10;
 	  if (older_age > global_age-10)
 	  {
-	    printf ("Increase DETECT_TABLE_SIZE!\n");
+	    csPrintf ("Increase DETECT_TABLE_SIZE!\n");
 	    fflush (stdout);
 	    exit (0);
 	  }
@@ -273,10 +273,10 @@ static MemEntry* FindMemEntry (char* mem)
 //=======================================================
 static void ShowBlockInfo (MemEntry& me)
 {
-  printf ("BLOCK: start=%08p size=%zu freed=%d\n", me.start,
+  csPrintf ("BLOCK: start=%08p size=%zu freed=%d\n", me.start,
   	me.size, (int)me.freed);
 # ifdef CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
-  printf ("       alloced at '%s' %d\n", me.alloc_file, me.alloc_line);
+  csPrintf ("       alloced at '%s' %d\n", me.alloc_file, me.alloc_line);
 # endif
 }
 
@@ -287,7 +287,7 @@ static void ShowBlockInfo (MemEntry& me)
 //=======================================================
 static void MemoryCheck ()
 {
-  printf ("Checking memory (age=%lu)...\n", global_age); fflush (stdout);
+  csPrintf ("Checking memory (age=%lu)...\n", global_age); fflush (stdout);
   int i;
   for (i = 0 ; i < first_free_idx ; i++)
   {
@@ -300,7 +300,7 @@ static void MemoryCheck ()
       if (s != me.size)
       {
 	ShowBlockInfo (me);
-        printf ("CHK: Size in table doesn't correspond with size in block!\n");
+        csPrintf ("CHK: Size in table doesn't correspond with size in block!\n");
 	fflush (stdout);
 	DEBUG_BREAK;
       }
@@ -309,14 +309,14 @@ static void MemoryCheck ()
 	if (strncmp (rc, DETECTFREE, DETECT_WALL) != 0)
 	{
 	  ShowBlockInfo (me);
-	  printf ("CHK: Bad start of block for freed block!\n");
+	  csPrintf ("CHK: Bad start of block for freed block!\n");
 	  fflush (stdout);
 	  DEBUG_BREAK;
 	}
 	if (strncmp (rc+4+DETECT_WALL+s, DETECTFREE, DETECT_WALL) != 0)
 	{
 	  ShowBlockInfo (me);
-	  printf ("CHK: Bad end of block for freed block!\n");
+	  csPrintf ("CHK: Bad end of block for freed block!\n");
 	  fflush (stdout);
 	  DEBUG_BREAK;
 	}
@@ -327,7 +327,7 @@ static void MemoryCheck ()
 	  if (me.start[j] != (char)DETECT_FREE)
 	  {
 	    ShowBlockInfo (me);
-	    printf ("CHK: Freed memory is used at offset (%u)!\n", j);
+	    csPrintf ("CHK: Freed memory is used at offset (%u)!\n", j);
 	    fflush (stdout);
 	    DEBUG_BREAK;
 	  }
@@ -339,14 +339,14 @@ static void MemoryCheck ()
 	if (strncmp (rc, DETECT, DETECT_WALL_SAME) != 0)
 	{
 	  ShowBlockInfo (me);
-	  printf ("CHK: Bad start of block!\n");
+	  csPrintf ("CHK: Bad start of block!\n");
 	  fflush (stdout);
 	  DEBUG_BREAK;
 	}
 	if (strncmp (rc+4+DETECT_WALL+s, DETECT, DETECT_WALL_SAME) != 0)
 	{
 	  ShowBlockInfo (me);
-	  printf ("CHK: Bad end of block!\n");
+	  csPrintf ("CHK: Bad end of block!\n");
 	  fflush (stdout);
 	  DEBUG_BREAK;
 	}
@@ -370,16 +370,16 @@ static void DumpError (const char* msg, int info, char* rc)
       ShowBlockInfo (*me);
     else
     {
-      printf ("Memory block not allocated in this module!\n");
+      csPrintf ("Memory block not allocated in this module!\n");
       do_crash = false;
     }
   }
   else
   {
-    printf ("No block info!\n");
+    csPrintf ("No block info!\n");
   }
 #endif
-  printf (msg, info);
+  csPrintf (msg, info);
   fflush (stdout);
   if (do_crash)
   {
@@ -555,7 +555,7 @@ void* operator new (size_t s, void* filename, int line)
   uint32* rc = (uint32*)malloc (s+8);
   *rc++ = 0xdeadbeef;
   *rc++ = s;
-  printf ("+ %p %zu %zu %s\n", &alloc_total, alloc_total, alloc_cnt, filename);
+  csPrintf ("+ %p %zu %zu %s\n", &alloc_total, alloc_total, alloc_cnt, filename);
   fflush (stdout);
   return (void*)rc;
 }
@@ -566,7 +566,7 @@ void* operator new[] (size_t s, void* filename, int line)
   uint32* rc = (uint32*)malloc (s+8);
   *rc++ = 0xdeadbeef;
   *rc++ = s;
-  printf ("+ %p %zu %zu %s\n", &alloc_total, alloc_total, alloc_cnt, filename);
+  csPrintf ("+ %p %zu %zu %s\n", &alloc_total, alloc_total, alloc_cnt, filename);
   fflush (stdout);
   return (void*)rc;
 }
@@ -579,7 +579,7 @@ void operator delete (void* p)
     alloc_total -= rc[1];
     alloc_cnt--;
     free ((void*)rc);
-    printf ("- %p %zu %zu\n", &alloc_total, alloc_total, alloc_cnt);
+    csPrintf ("- %p %zu %zu\n", &alloc_total, alloc_total, alloc_cnt);
   }
 }
 void operator delete[] (void* p)
@@ -591,7 +591,7 @@ void operator delete[] (void* p)
     alloc_total -= rc[1];
     alloc_cnt--;
     free ((void*)rc);
-    printf ("- %p %zu %zu\n", &alloc_total, alloc_total, alloc_cnt);
+    csPrintf ("- %p %zu %zu\n", &alloc_total, alloc_total, alloc_cnt);
   }
 }
 #endif	// CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
@@ -609,7 +609,7 @@ void* operator new (size_t s, void* filename, int line)
 {
   alloc_total += s;
   alloc_cnt++;
-  if (s > 1000) { printf ("new s=%zu tot=%zu/%zu file=%s line=%d\n",
+  if (s > 1000) { csPrintf ("new s=%zu tot=%zu/%zu file=%s line=%d\n",
   	s, alloc_total, alloc_cnt, filename, line); fflush (stdout); }
   return (void*)malloc (s);
 }
@@ -617,7 +617,7 @@ void* operator new[] (size_t s, void* filename, int line)
 {
   alloc_total += s;
   alloc_cnt++;
-  if (s > 1000) { printf ("new[] s=%zu tot=%zu/%zu file=%s line=%d\n",
+  if (s > 1000) { csPrintf ("new[] s=%zu tot=%zu/%zu file=%s line=%d\n",
   	s, alloc_total, alloc_cnt, filename, line); fflush (stdout); }
   return (void*)malloc (s);
 }
@@ -766,9 +766,9 @@ public:
   void Dump (bool summary_only)
   {
     int i;
-    printf ("-----------------------------------------------------\n");
-    printf ("Module: %s\n", Class);
-    printf ("     current      max current#     max# file\n");
+    csPrintf ("-----------------------------------------------------\n");
+    csPrintf ("Module: %s\n", Class);
+    csPrintf ("     current      max current#     max# file\n");
     size_t total_current_alloc = 0;
     int total_current_count = 0;
     for (i = 0 ; i < mti_table_count ; i++)
@@ -776,14 +776,14 @@ public:
       MemTrackerInfo* mti = mti_table[i];
       if (!summary_only)
       {
-        printf ("    %8zu %8zu %8d %8d %s\n", mti->current_alloc,
+        csPrintf ("    %8zu %8zu %8d %8d %s\n", mti->current_alloc,
     	    mti->max_alloc, mti->current_count, mti->max_count,
 	    mti->file);
       }
       total_current_alloc += mti->current_alloc;
       total_current_count += mti->current_count;
     }
-    printf ("total_alloc=%zu total_count=%d Module=%s\n",
+    csPrintf ("total_alloc=%zu total_count=%d Module=%s\n",
     	total_current_alloc, total_current_count, Class);
     fflush (stdout);
   }
@@ -837,7 +837,7 @@ void RegisterMemoryTrackerModule (char* Class)
 {
   if (!iSCF::SCF)
   {
-    printf ("iSCF::SCF not set yet!\n");
+    csPrintf ("iSCF::SCF not set yet!\n");
     return;
   }
 
@@ -857,7 +857,7 @@ void RegisterMemoryTrackerModule (char* Class)
   }
   else
   {
-    printf ("Object Reg not set for %s!!!\n", Class);
+    csPrintf ("Object Reg not set for %s!!!\n", Class);
     fflush (stdout);
   }
 }

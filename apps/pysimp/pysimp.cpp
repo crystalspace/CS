@@ -147,7 +147,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   if (csCommandLineHelper::CheckHelp (object_reg))
   {
     csCommandLineHelper::Help (object_reg);
-    printf("\nTo load a Python script other than the default `pysimp.py',\n"
+    csPrintf("\nTo load a Python script other than the default `pysimp.py',\n"
 	   "specify its name (without the .py extension) as the one and only\n"
 	   "argument to pysimp. The script must define a Python function\n"
 	   "named CreateRoom() which accepts a material name as its only\n"

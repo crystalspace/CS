@@ -543,10 +543,11 @@ void csLoader::ReportWarning (const char* id, iDocumentNode* node,
 {
   va_list arg;
   va_start (arg, description);
-  char buf[1024];
-  vsprintf (buf, description, arg);
+  csString buf;
+  buf.FormatV (description, arg);
   va_end (arg);
-  SyntaxService->Report (id, CS_REPORTER_SEVERITY_WARNING, node, buf);
+  SyntaxService->Report (id, CS_REPORTER_SEVERITY_WARNING, node, "%s", 
+    buf.GetData());
 }
 //---------------------------------------------------------------------------
 
@@ -4655,7 +4656,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	SyntaxService->ReportError (
 	  "crystalspace.maploader.parse.sector",
 	  child, "<culler> no longer supported! Convert your level to Dynavis using 'levtool'!");
-	printf ("<culler> no longer supported! Convert your level to Dynavis using 'levtool'!");
+	csPrintf ("<culler> no longer supported! Convert your level to Dynavis using 'levtool'!");
 	goto error;
       case XMLTOKEN_CULLERP:
         {

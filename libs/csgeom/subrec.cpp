@@ -17,6 +17,7 @@
 */
 #include "cssysdef.h"
 #include "csgeom/subrec.h"
+#include "csutil/sysfunc.h"
 
 csSubRectangles::csSubRectangles (const csRect &region)
 {
@@ -130,7 +131,7 @@ void csSubRectangles::Dump ()
   csSubRect *s = first;
   while (s)
   {
-    printf ("  free: %d,%d,%d,%d\n", s->xmin, s->ymin, s->xmax, s->ymax);
+    csPrintf ("  free: %d,%d,%d,%d\n", s->xmin, s->ymin, s->xmax, s->ymax);
     s = s->next;
   }
 }

@@ -87,7 +87,7 @@ void CCSWorld::GenerateDefaultsector()
 {
   if (m_pMap->GetPlaneCount()<=0)
   {
-    printf("Map contains no data. Aborting!");
+    csPrintf("Map contains no data. Aborting!");
     exit(1);
   }
 
@@ -155,9 +155,9 @@ bool CCSWorld::Write(csRef<iDocumentNode> root, CMapFile* pMap,
   time_t Time;
   time (&Time);
   struct tm *now = localtime (&Time);
-  char buf[128];
+  csString buf;
 
-  sprintf (buf, " Created by map2cs " CS_VERSION " on "
+  buf.Format (" Created by map2cs " CS_VERSION " on "
     "%04d-%02d-%02d %02d:%02d:%02d ", now->tm_year+1900, 
     now->tm_mon, now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
 
@@ -281,8 +281,8 @@ void CCSWorld::AllocateSkytextures()
 	int i;
     for (i=0; i<6; i++)
     {
-      char name[255];
-      sprintf(name, "%s_%c", basename, ext[i]);
+      csString name;
+      name.Format ("%s_%c", basename, ext[i]);
       CTextureFile* pTexture = pTexMan->GetTexture(name);
       CS_ASSERT(pTexture);
 
@@ -349,19 +349,19 @@ void CCSWorld::WriteSkydome(csRef<iDocumentNode> node)
 /* @@@ TODO!
   
   WriteIndent();
-  //fprintf(m_fd, "CIRCLE (0,0,0:%g,0,%g,-12)\n", DomeRadius, DomeRadius);
-  fprintf(m_fd,
+  //csFPrintf(m_fd, "CIRCLE (0,0,0:%g,0,%g,-12)\n", DomeRadius, DomeRadius);
+  csFPrintf(m_fd,
     "<circle>0,0,0:%g,0,%g,-12</circle>\n", DomeRadius, DomeRadius);
   WriteIndent();
-  fprintf(m_fd,
+  csFPrintf(m_fd,
     "<material>%s</material><texlen>1</texlen>\n", pTexture->GetTexturename());
   WriteIndent();
   // appears to be unsupported now...
-  fprintf(m_fd,
+  csFPrintf(m_fd,
     "<skydome name=\"up\"><lighting>NO</lighting><radius>%g</radius> "
     "<vertices>0,1,2,3,4,5,6,7,8,9,10,11</vertices></skydome>\n", DomeRadius);
   WriteIndent();
-  fprintf(m_fd,
+  csFPrintf(m_fd,
     "<skydome name=\"down\"><lighting>NO</lighting><radius>%g</radius> "
     "<vertices>0,11,10,9,8,7,6,5,4,3,2,1</vertices></skydome>\n", -DomeRadius);
 */
@@ -405,8 +405,8 @@ void CCSWorld::WriteSkybox(csRef<iDocumentNode> node)
   int s,v;
   for (s=0; s<int(sizeof(ThingSides)/sizeof(ThingSides[0])); s++)
   {
-    char name[255];
-    sprintf(name, "%s_%s", BoxName, ThingSides[s].ext);
+    csString name;
+    name.Format ("%s_%s", BoxName, ThingSides[s].ext);
     ThingSides[s].pTex = pTexMan->GetTexture(name);
 
     smallest_size = MIN(smallest_size,ThingSides[s].pTex->GetOriginalWidth());
@@ -525,9 +525,9 @@ void CCSWorld::FindAdditionalTextures()
 	      m_pMap->GetTextureManager()->GetTexture(modelnamevalue);
             assert(pTexture);
 
-            char name[255];
+            csString name;
             const char* basename = pEntity->GetValueOfKey("texture", "white");
-            sprintf(name, "/lib/models/%s", basename);
+            name.Format ("/lib/models/%s", basename);
 
             pTexture->SetFilename(name);
           }
@@ -591,9 +591,9 @@ bool CCSWorld::WriteTextures(csRef<iDocumentNode> node)
     }
     else if (pTexture->IsStored())
     {
-      char replacename[255];
+      csString replacename;
       const char *newtexfile;
-      sprintf(replacename, "filename_%s", pTexture->GetTexturename());
+      replacename.Format ("filename_%s", pTexture->GetTexturename());
       if ((newtexfile = pEntity->GetValueOfKey(replacename)))
 	pTexture->SetStored (false);
       
@@ -735,14 +735,14 @@ bool CCSWorld::WritePlayerStart(csRef<iDocumentNode> node)
         }
         else
         {
-          printf("warning: info_player_start not inside a valid sector.\n");
-          printf("         no startinfo is written!\n");
+          csPrintf("warning: info_player_start not inside a valid sector.\n");
+          csPrintf("         no startinfo is written!\n");
         }
       }
       else
       {
-        printf("warning: info_player_start has no origin.\n");
-        printf("         no startinfo is written!\n");
+        csPrintf("warning: info_player_start has no origin.\n");
+        csPrintf("         no startinfo is written!\n");
       }
     }
   }
@@ -961,7 +961,7 @@ bool CCSWorld::WritePolygon(csRef<iDocumentNode> node, CMapPolygon* pPolygon,
     //@@@ doesn't seem to be supported any more
 /*    int r, g, b;
     pPlane->GetColor(r,g,b);
-    fprintf(m_fd, "<flatcol red=\"%g\" green=\"%g\" blue=\"%g\" />",
+    csFPrintf(m_fd, "<flatcol red=\"%g\" green=\"%g\" blue=\"%g\" />",
                 r/(float)255, g/(float)255, b/(float)255);*/
   }
   else
@@ -1081,7 +1081,7 @@ void CCSWorld::WriteSpritesTemplate(csRef<iDocumentNode> node)
 	  CreateNode (meshfact, "plugin", "spr3d");
           //TODO: see if we can initalize .3ds files
 	  CreateNode (meshfact, "file", mdlname);
-          //fprintf(m_fd, "<file>/lib/models/%s.mdl</file>\n", mdlname);
+          //csFPrintf(m_fd, "<file>/lib/models/%s.mdl</file>\n", mdlname);
 	  CreateNode (meshfact, "material", csnamevalue);
 
           //TODO: add loop for multiple actions, action2, action3, ...
@@ -1094,19 +1094,19 @@ void CCSWorld::WriteSpritesTemplate(csRef<iDocumentNode> node)
 	    action->SetAttribute ("name", actionvalue);
 
             int i = 1;
-            char frameaction[100];
-            sprintf(frameaction, "action%d", i);
+            csString frameaction;
+            frameaction.Format ("action%d", i);
             while (pEntity->GetValueOfKey(frameaction))
             {
               actionvalue = pEntity->GetValueOfKey(frameaction);
-              if (sscanf(actionvalue, "%s%c",frameaction, &dummy) == 1)
+              if (actionvalue && *actionvalue)
               {
 		DocNode f = CreateNode (meshfact, "f");
-		f->SetAttribute ("name", frameaction);
+		f->SetAttribute ("name", actionvalue);
 		f->SetAttributeAsInt ("delay", 100);//hardcode 100 for now
               }
               i++;
-              sprintf(frameaction, "action%d", i);
+              frameaction.Format ("action%d", i);
             }
 
           }
@@ -1201,12 +1201,12 @@ void CCSWorld::WriteScriptsTemplate(csRef<iDocumentNode> node)
         if (found == 1)
         {
           WriteIndent();
-          fprintf(m_fd, "SCRIPT '%s'\n", cs_scriptname);
+          csFPrintf(m_fd, "SCRIPT '%s'\n", cs_scriptname);
           Indent();
           WriteIndent();
-          fprintf(m_fd, "%s", spritecode);
+          csFPrintf(m_fd, "%s", spritecode);
           WriteIndent();
-          fprintf(m_fd, ") \n\n");
+          csFPrintf(m_fd, ") \n\n");
           Unindent();
         }
       }

@@ -189,7 +189,7 @@ public:
     VfsArchive::object_reg = object_reg;
     UpdateTime (); // OpenStep compiler requires having seen this already.
 #ifdef VFS_DEBUG
-    printf ("VFS: opening archive \"%s\"\n", filename);
+    csPrintf ("VFS: opening archive \"%s\"\n", filename);
 #endif
     // We need a recursive mutex.
     archive_mutex = csMutex::Create (true);
@@ -198,11 +198,11 @@ public:
   {
     CS_ASSERT (RefCount == 0);
 #ifdef VFS_DEBUG
-    printf ("VFS: archive \"%s\" closing (writing=%d)\n", GetName (), Writing);
+    csPrintf ("VFS: archive \"%s\" closing (writing=%d)\n", GetName (), Writing);
 #endif
     Flush ();
 #ifdef VFS_DEBUG
-    printf ("VFS: archive \"%s\" closed\n", GetName ());
+    csPrintf ("VFS: archive \"%s\" closed\n", GetName ());
 #endif
   }
 };
@@ -459,7 +459,7 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, size_t RIndex,
   for (t = 1; t <= 2; t++)
   {
 #ifdef VFS_DEBUG
-    printf ("VFS: Trying to open disk file \"%s\"\n", fName);
+    csPrintf ("VFS: Trying to open disk file \"%s\"\n", fName);
 #endif
     if ((Mode & VFS_FILE_MODE) == VFS_FILE_WRITE)
         file = fopen (fName, "wb");
@@ -504,7 +504,7 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, size_t RIndex,
   }
 #ifdef VFS_DEBUG
   if (file)
-    printf ("VFS: Successfully opened, handle = %d\n", fileno (file));
+    csPrintf ("VFS: Successfully opened, handle = %d\n", fileno (file));
 #endif
 
 #if defined(VFS_DISKFILE_MAPPING) && defined(CS_HAVE_MEMORY_MAPPED_IO)
@@ -528,9 +528,9 @@ DiskFile::~DiskFile ()
 {
 #ifdef VFS_DEBUG
   if (file)
-    printf ("VFS: Closing some file with handle = %d\n", fileno (file));
+    csPrintf ("VFS: Closing some file with handle = %d\n", fileno (file));
   else
-    printf ("VFS: Deleting an unsuccessfully opened file\n");
+    csPrintf ("VFS: Deleting an unsuccessfully opened file\n");
 #endif
 
   if (file)
@@ -563,7 +563,7 @@ void DiskFile::MakeDir (const char *PathBase, const char *PathSuffix)
     char oldchar = *cur;
     *cur = 0;
 #ifdef VFS_DEBUG
-    printf ("VFS: Trying to create directory \"%s\"\n", path);
+    csPrintf ("VFS: Trying to create directory \"%s\"\n", path);
 #endif
     CS_MKDIR (path);
     *cur = oldchar;
@@ -837,7 +837,7 @@ ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, size_t RIndex,
   ArchiveCache->CheckUp ();
 
 #ifdef VFS_DEBUG
-  printf ("VFS: Trying to open file \"%s\" from archive \"%s\"\n",
+  csPrintf ("VFS: Trying to open file \"%s\" from archive \"%s\"\n",
     NameSuffix, Archive->GetName ());
 #endif
 
@@ -866,7 +866,7 @@ ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, size_t RIndex,
 ArchiveFile::~ArchiveFile ()
 {
 #ifdef VFS_DEBUG
-  printf ("VFS: Closing some file from archive \"%s\"\n", Archive->GetName ());
+  csPrintf ("VFS: Closing some file from archive \"%s\"\n", Archive->GetName ());
 #endif
 
   csScopedMutexLock lock (Archive->archive_mutex);
@@ -1983,7 +1983,7 @@ bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
   if (!VirtualPath || !RealPath)
     return false;
 #ifdef VFS_DEBUG
-  printf("VFS: Mounted dir: Vpath %s, Rpath %s",VirtualPath, RealPath);
+  csPrintf("VFS: Mounted dir: Vpath %s, Rpath %s",VirtualPath, RealPath);
 #endif
   VfsNode *node;
   char suffix [2];
@@ -2272,7 +2272,7 @@ csPtr<iDataBuffer> csVFS::GetRealPath (const char *FileName)
   for (i = 0; !ok && i < node->RPathV.Length (); i++)
   {
     const char *rpath = node->RPathV.Get (i);
-    sprintf(path, "%s%s", rpath, suffix);
+    cs_snprintf (path, sizeof(path), "%s%s", rpath, suffix);
     strcat (strcpy (path, rpath), suffix);
     ok = access (path, F_OK) == 0;
   }
@@ -2284,9 +2284,9 @@ csPtr<iDataBuffer> csVFS::GetRealPath (const char *FileName)
     CS_ASSERT(defpath != 0);
     size_t const len = strlen(defpath);
     if (len > 0 && defpath[len - 1] != VFS_PATH_SEPARATOR)
-      sprintf(path, "%s%c%s", defpath, VFS_PATH_SEPARATOR, suffix);
+      cs_snprintf (path, sizeof(path), "%s%c%s", defpath, VFS_PATH_SEPARATOR, suffix);
     else
-      sprintf(path, "%s%s", defpath, suffix);
+      cs_snprintf (path, sizeof(path), "%s%s", defpath, suffix);
   }
 
   return csPtr<iDataBuffer> (

@@ -246,7 +246,7 @@ hashstat( struct hash *hp )
 		run = here;
 	}
 
-	printf( "%s table: %d+%d+%d (%dK+%dK) items+table+hash, %f density\n",
+	csPrintf( "%s table: %d+%d+%d (%dK+%dK) items+table+hash, %f density\n",
 		hp->name, 
 		count, 
 		hp->items.nel,

@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include "csutil/csshlib.h"
 #include "csutil/csstring.h"
+#include "csutil/sysfunc.h"
 
 #ifdef CS_DEBUG
 #  ifdef CS_HAVE_RTLD_NOW
@@ -64,7 +65,7 @@ void csPrintLibraryError (const char *iModule)
 {
   const char* dlerr = dlerror();
   if (dlerr)
-    fprintf (stderr, "DLERROR (%s): %s\n", iModule? iModule : "", dlerr);
+    csFPrintf (stderr, "DLERROR (%s): %s\n", iModule? iModule : "", dlerr);
 }
 
 void *csGetLibrarySymbol (csLibraryHandle Handle, const char *iName)

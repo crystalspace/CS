@@ -1162,7 +1162,8 @@ bool csGraphics2D::CanvasConfig::GetOption (int id, csVariant* value)
     case 2:
     {
       char buf[100];
-      sprintf (buf, "%dx%d", scfParent->GetWidth (), scfParent->GetHeight ());
+      cs_snprintf (buf, sizeof (buf), "%dx%d", scfParent->GetWidth (), 
+	scfParent->GetHeight ());
       value->SetString (buf);
       break;
     }

@@ -501,7 +501,7 @@ void csGLCanvas::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
 
 void csGLCanvas::OnMouseEvent( wxMouseEvent& event )
 {
-  // printf("got mouse event %ld %ld\n", event.GetX(), event.GetY());
+  // csPrintf("got mouse event %ld %ld\n", event.GetX(), event.GetY());
 
   if(event.GetEventType() == wxEVT_MOTION)
   {
@@ -648,7 +648,7 @@ void csGLCanvas::EmitKeyEvent(wxKeyEvent& event, bool down)
   long wxkey = event.GetKeyCode();
   long cskey_raw = 0, cskey_cooked = 0;
 
-  // printf("got key %s event %ld\n", (down ? "down" : "up"), wxkey);
+  // csPrintf("got key %s event %ld\n", (down ? "down" : "up"), wxkey);
 
   if((wxkey >= '!' && wxkey <= '/')
 	  || (wxkey >= '0' && wxkey <= '9')

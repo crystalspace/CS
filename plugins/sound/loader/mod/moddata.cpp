@@ -38,7 +38,7 @@ static int cs_modreader_seek (MREADER* mr, long offset, int whence)
   size_t newpos = (whence == SEEK_SET ? offset :
 		 whence == SEEK_CUR ? r->ds.pos + offset : r->ds.length + offset);
 
-  //  printf("pos = %zu -> seek %ld -> pos = %zu\n",r->ds.pos, offset, newpos);
+  //  csPrintf("pos = %zu -> seek %ld -> pos = %zu\n",r->ds.pos, offset, newpos);
   if (newpos > r->ds.length)
     return -1;
   else
@@ -64,7 +64,7 @@ static int cs_modreader_read (MREADER* mr, void *dest, size_t length)
 
   r->ds.pos += (long)maxsize;
 
-  //  printf ("%zu %zu %zu\n", r->ds.pos, r->ds.length, length);
+  //  csPrintf ("%zu %zu %zu\n", r->ds.pos, r->ds.length, length);
   return (int)maxsize;
 }
 
@@ -78,11 +78,11 @@ static int cs_modreader_get (MREADER* mr)
 
 static int cs_modreader_eof (MREADER* mr)
 {
-  //printf("eof\n");
+  //csPrintf("eof\n");
   csModSoundData::cs_mod_reader *r = (csModSoundData::cs_mod_reader *)mr;
-  //  printf ("eof %d\n", r->ds.pos >= r->ds.length ? 1 : 0);
+  //  csPrintf ("eof %d\n", r->ds.pos >= r->ds.length ? 1 : 0);
   //return r->ds.pos > r->ds.length ? 1 : 0;
-  //  printf ("eof %d\n", r->bEof ? 1 : 0);
+  //  csPrintf ("eof %d\n", r->bEof ? 1 : 0);
   return r->bEof ? 1 : 0;
 }
 
@@ -163,7 +163,7 @@ bool csModSoundData::Initialize (const csSoundFormat *fmt)
 
     if (MikMod_Init ("") != 0)
     {
-      printf ("MikMod could not be initialized, reason : %s\n", MikMod_strerror (MikMod_errno));
+      csPrintf ("MikMod could not be initialized, reason : %s\n", MikMod_strerror (MikMod_errno));
       return false;
     }
     mikmod_init = false;
@@ -176,7 +176,7 @@ bool csModSoundData::Initialize (const csSoundFormat *fmt)
 
   if (mod_reader == 0)
   {
-    printf ("csModSoundData: Not enough memory to load sample\n");
+    csPrintf ("csModSoundData: Not enough memory to load sample\n");
     return false;
   }
 
@@ -210,7 +210,7 @@ bool csModSoundData::IsMod (void *Buffer, size_t len)
 
     if (MikMod_Init ("") != 0)
     {
-      printf ("MikMod could not be initialized, reason : %s\n", MikMod_strerror (MikMod_errno));
+      csPrintf ("MikMod could not be initialized, reason : %s\n", MikMod_strerror (MikMod_errno));
       return false;
     }
     // if it's initialized here then we'll probably get different values for stereo and bits later
@@ -227,7 +227,7 @@ bool csModSoundData::IsMod (void *Buffer, size_t len)
   if (is_mod)
     Player_Free (module);
   //  else
-  //    printf ("error: %s\n", MikMod_strerror(MikMod_errno));
+  //    csPrintf ("error: %s\n", MikMod_strerror(MikMod_errno));
 
   return is_mod;
 }
@@ -291,7 +291,7 @@ void *csModSoundData::ReadStreamed(long &NumSamples)
 
     size_t samples = bytes_left / ((fmt.Bits >> 3) * fmt.Channels);
 
-    //    printf ("returning %zu samples\n", samples);
+    //    csPrintf ("returning %zu samples\n", samples);
 
     if (samples > (size_t)NumSamples)
     {

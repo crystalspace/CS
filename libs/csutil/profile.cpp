@@ -63,12 +63,12 @@ void csProfiler::RegisterProfilePoint (const char* token,
 void csProfiler::Dump ()
 {
   size_t i;
-  printf ("count time avg file line\n");
+  csPrintf ("count time avg file line\n");
   for (i = 0 ; i < profile_info.Length () ; i++)
   {
     const csProfileInfo& pi = profile_info[i];
     if (*pi.ptr_count > 0)
-      printf ("%" PRIu32 " %" PRIu32 "(%" PRIu32 "/%" PRIu32 ") %g %s/%s %d\n",
+      csPrintf ("%" PRIu32 " %" PRIu32 "(%" PRIu32 "/%" PRIu32 ") %g %s/%s %d\n",
         *pi.ptr_count, *pi.ptr_time,
         *pi.ptr_timemin, *pi.ptr_timemax,
     	float (*pi.ptr_time) / float (*pi.ptr_count),

@@ -67,9 +67,9 @@ void CTextureManager::LoadTextureArchives(CMapFile* pMap)
     int nr = 1;
     do
     {
-      char keyname[200];
+      csString keyname;
       char filename[300];
-      sprintf(keyname, KeynameFormat[type], nr);
+      keyname.Format (KeynameFormat[type], nr);
       strcpy(filename, pMap->GetConfigStr(keyname, ""));
       if (filename[0])
       {
@@ -187,7 +187,7 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
       pTexture->SetTexturename(InternalName);
       if (pTexture->IsVisible() && pTexture->IsStored())
       {
-	printf ("Warning: texture '%s'('%s') is missing.\n"
+	csPrintf ("Warning: texture '%s'('%s') is missing.\n"
 	  "         Using '%s' instead!\n",  TextureName, InternalName, 
 	  defaultname);
       }
@@ -198,7 +198,7 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
 
   CTextureFile* pTexture = 0;
 
-  printf("Warning: texture '%s'('%s') is missing.\n        Making a new null texture.\n",
+  csPrintf("Warning: texture '%s'('%s') is missing.\n        Making a new null texture.\n",
     TextureName, CleanedUpTextureName);
   pTexture = new CTextureFile;
   pTexture->SetTexturename (InternalName);

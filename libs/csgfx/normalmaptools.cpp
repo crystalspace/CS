@@ -102,7 +102,7 @@ void csNormalMappingTools::CalculateTangents (size_t numTriangles,
     outBitangents[v].Normalize();
 
     //float a = (outTangents[v] % outBitangents[v]) * normals[v];
-    //printf ("%g\n", a);
+    //csPrintf ("%g\n", a);
     //CS_ASSERT ((fabs(a) - 1.0f) < SMALL_EPSILON);
     /*
       Don't orthonormalize. The idea is to support sheared texture mappings.

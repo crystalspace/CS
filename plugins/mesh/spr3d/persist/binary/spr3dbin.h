@@ -39,7 +39,6 @@ class csSprite3DBinFactoryLoader : public iBinaryLoaderPlugin
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
-  csRef<iReporter> reporter;
 
 public:
   SCF_DECLARE_IBASE;
@@ -72,7 +71,6 @@ class csSprite3DBinFactorySaver : public iBinarySaverPlugin
 {
 private:
   iObjectRegistry* object_reg;
-  csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
 
 public:

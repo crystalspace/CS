@@ -315,7 +315,7 @@ path_build(
 	if( DEBUG_SEARCH && ( root.flags || dir.flags ) )
 	{
 		*file = 0;
-		printf( "%d x %d = %d (%s)\n", root.flags, dir.flags,
+		csPrintf( "%d x %d = %d (%s)\n", root.flags, dir.flags,
 			grid[ root.flags ][ dir.flags ], ofile );
 	}
 # endif 
@@ -395,7 +395,7 @@ path_build(
 
 # ifdef DEBUG
 	if( DEBUG_SEARCH )
-	    printf("built %.*s + %.*s / %.*s suf %.*s mem %.*s -> %s\n", 
+	    csPrintf("built %.*s + %.*s / %.*s suf %.*s mem %.*s -> %s\n", 
 		    f->f_root.len, f->f_root.ptr,
 		    f->f_dir.len, f->f_dir.ptr,
 		    f->f_base.len, f->f_base.ptr,

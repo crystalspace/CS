@@ -41,7 +41,7 @@ CZipArchive::~CZipArchive()
 
 CTextureFile* CZipArchive::CreateTexture(const char* texturename)
 {
-  char texfilename[256];
+  csString texfilename;
   CTextureFile* pTexture = 0;
 
   const char* Extensions[] = {"tga", "jpg", "jpeg", "bmp", "wal", "gif", 
@@ -50,7 +50,7 @@ CTextureFile* CZipArchive::CreateTexture(const char* texturename)
   int i;
   for (i=0; i<int(sizeof(Extensions)/sizeof(Extensions[0])); i++)
   {
-    sprintf (texfilename, "%s.%s", texturename, Extensions[i]);
+    texfilename.Format ("%s.%s", texturename, Extensions[i]);
     pTexture = ExtractTexture(texturename, texfilename);
     if (pTexture) return pTexture;
   }

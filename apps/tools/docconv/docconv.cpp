@@ -109,11 +109,11 @@ void DocConv::Main ()
 
   if (op == OP_HELP)
   {
-    printf ("docconv <options> <zipfile|filename>\n");
-    printf ("  -inds=<plugin>:\n");       
-    printf ("     Document system plugin for reading world.\n");
-    printf ("  -outds=<plugin>:\n");       
-    printf ("     Document system plugin for writing world.\n");
+    csPrintf ("docconv <options> <zipfile|filename>\n");
+    csPrintf ("  -inds=<plugin>:\n");       
+    csPrintf ("     Document system plugin for reading world.\n");
+    csPrintf ("  -outds=<plugin>:\n");       
+    csPrintf ("     Document system plugin for writing world.\n");
     return;
   }
 

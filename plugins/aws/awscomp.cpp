@@ -252,7 +252,7 @@ bool awsComponent::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   wmgr = _wmgr;
 
 #ifdef AWS_COMP_DEBUG  
-  printf ("aws-debug: setting up awsComponent (%s).\n", self->Type ());
+  csPrintf ("aws-debug: setting up awsComponent (%s).\n", self->Type ());
 #endif
 
   if (settings)
@@ -262,7 +262,7 @@ bool awsComponent::Setup (iAws *_wmgr, iAwsComponentNode *settings)
     pm->GetRect (settings, "Frame", frame);
 
 #ifdef AWS_COMP_DEBUG
-    printf (
+    csPrintf (
       "aws-debug: Frame is: (%d,%d)-(%d,%d)\n",
       frame.xmin,
       frame.ymin,
@@ -1084,7 +1084,7 @@ void awsComponent::OnDraw (csRect)
 bool awsComponent::OnMouseDown (int button, int x, int y)
 {
 #ifdef AWS_COMP_DEBUG
-  printf("aws-debug: mouse down  : %s\n", Type ());
+  csPrintf("aws-debug: mouse down  : %s\n", Type ());
 #endif
   return false;
 }
@@ -1092,7 +1092,7 @@ bool awsComponent::OnMouseDown (int button, int x, int y)
 bool awsComponent::OnMouseUp (int button, int x, int y)
 {
 #ifdef AWS_COMP_DEBUG
-  printf("aws-debug: mouse up    : %s\n", Type ());
+  csPrintf("aws-debug: mouse up    : %s\n", Type ());
 #endif
   return false;
 }
@@ -1105,7 +1105,7 @@ bool awsComponent::OnMouseMove (int button, int x, int y)
 bool awsComponent::OnMouseClick (int button, int x, int y)
 {
 #ifdef AWS_COMP_DEBUG
-  printf("aws-debug: mouse click : %s\n", Type ());
+  csPrintf("aws-debug: mouse click : %s\n", Type ());
 #endif
   return false;
 }
@@ -1118,7 +1118,7 @@ bool awsComponent::OnMouseDoubleClick (int button, int x, int y)
 bool awsComponent::OnMouseExit ()
 {
 #ifdef AWS_COMP_DEBUG
-  printf("aws-debug: mouse exit  : %s\n", Type ());
+  csPrintf("aws-debug: mouse exit  : %s\n", Type ());
 #endif
   return false;
 }
@@ -1126,7 +1126,7 @@ bool awsComponent::OnMouseExit ()
 bool awsComponent::OnMouseEnter ()
 {
 #ifdef AWS_COMP_DEBUG
-  printf("aws-debug: mouse enter : %s\n", Type ());
+  csPrintf("aws-debug: mouse enter : %s\n", Type ());
 #endif
   return false;
 }

@@ -239,10 +239,10 @@ void csMetaTexture::Setup(csVosA3DL* vosa3dl)
   {
     char cachefilename[256];
     vRef<Site> site = imagedata->getSite();
-    /*snprintf(cachefilename, sizeof(cachefilename), "/csvosa3dl_cache/%s/%s",
+    /*sncsPrintf(cachefilename, sizeof(cachefilename), "/csvosa3dl_cache/%s/%s",
       site->getURL().getHost().c_str(),
       imagedata->getSiteName().c_str());*/
-    snprintf(cachefilename, sizeof(cachefilename), "/tmp/%s_%s",
+    sncsPrintf(cachefilename, sizeof(cachefilename), "/tmp/%s_%s",
              site->getURL().getHost().c_str(),
              imagedata->getSiteName().c_str());
 

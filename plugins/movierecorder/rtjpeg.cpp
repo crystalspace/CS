@@ -23,6 +23,7 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/sysfunc.h"
 
 #if defined(CS_HAVE_MMX) && defined(CS_COMPILER_GCC)
 # define MMX
@@ -172,9 +173,9 @@ int RTjpeg_b2s(int16 *data, int8 *strm, uint8 bt8)
 
   int ii;
   for (ii=0; ii < 64; ii++) {
-    fprintf(stdout, "%" PRId16 " ", data[RTjpeg_ZZ[ii]]);
+    csFPrintf(stdout, "%" PRId16 " ", data[RTjpeg_ZZ[ii]]);
   }
-  fprintf(stdout, "\n\n");
+  csFPrintf(stdout, "\n\n");
 
 #endif
 
@@ -316,11 +317,11 @@ BAUCHWEH:
 #ifdef SHOWBLOCK
 {
 int i;
-fprintf(stdout, "\nco = '%d'\n", co);
+csFPrintf(stdout, "\nco = '%d'\n", co);
  for (i=0; i < co+2; i++) {
-   fprintf(stdout, "%" PRId8 " ", strm[i]);
+   csFPrintf(stdout, "%" PRId8 " ", strm[i]);
  }
-fprintf(stdout, "\n\n");
+csFPrintf(stdout, "\n\n");
 }
 #endif
 
@@ -461,11 +462,11 @@ STRASSE:
 AUTOBAHN:
 
 #ifdef SHOWBLOCK
-fprintf(stdout, "\nci = '%d'\n", ci);
+csFPrintf(stdout, "\nci = '%d'\n", ci);
  for (i=0; i < 64; i++) {
-   fprintf(stdout, "%" PRId16 " ", data[RTjpeg_ZZ[i]]);
+   csFPrintf(stdout, "%" PRId16 " ", data[RTjpeg_ZZ[i]]);
  }
-fprintf(stdout, "\n\n");
+csFPrintf(stdout, "\n\n");
 #endif
 
  return ci;
@@ -482,9 +483,9 @@ int RTjpeg_b2s(int16 *data, int8 *strm, uint8 bt8)
 
   int ii;
   for (ii=0; ii < 64; ii++) {
-    fprintf(stdout, "%" PRId16 " ", data[RTjpeg_ZZ[ii]]);
+    csFPrintf(stdout, "%" PRId16 " ", data[RTjpeg_ZZ[ii]]);
   }
-  fprintf(stdout, "\n\n");
+  csFPrintf(stdout, "\n\n");
 
 #endif
 
@@ -2532,9 +2533,9 @@ static mmx_t fix_108n184	= (mmx_t)(long long)0xcf04cf04cf04cf04LL;
 
 	/*
    movq_r2m(mm4, *dummy);
-	fprintf(stderr, "3-4 %016llx\n", dummy);
+	csFPrintf(stderr, "3-4 %016llx\n", dummy);
    movq_r2m(mm4, *dummy);
-	fprintf(stderr, "3+4 %016llx\n", dummy);
+	csFPrintf(stderr, "3+4 %016llx\n", dummy);
 	*/
 	
 
@@ -3159,7 +3160,7 @@ void RTjpeg_init_mcompress(void)
  }
  if (!RTjpeg_old)
  {
-  fprintf(stderr, "RTjpeg: Could not allocate memory\n");
+  csFPrintf(stderr, "RTjpeg: Could not allocate memory\n");
   exit(-1);
  }
  //bzero(RTjpeg_old, ((4*RTjpeg_width*RTjpeg_height)));
@@ -3209,7 +3210,7 @@ int RTjpeg_bcomp(int16 *old, mmx_t *mask)
 //   for(i=0; i<16; i++)((uint64 *)old)[i]=((uint64 *)RTjpeg_block)[i];
   return 0;
  }
-// printf(".");
+// csPrintf(".");
  return 1;
 }
 
@@ -3395,7 +3396,7 @@ int RTjpeg_mcompressYUV422(int8 *sp, unsigned char *bp, uint16 lmask, uint16 cma
   bp2+=RTjpeg_width<<2;
   bp3+=RTjpeg_width<<2;
  }
- // printf ("%td\n", block - RTjpeg_old);
+ // csPrintf ("%td\n", block - RTjpeg_old);
 #ifdef MMX
  emms();
 #endif
@@ -3428,7 +3429,7 @@ int RTjpeg_mcompress8(int8 *sp, unsigned char *bp, uint16 lmask)
    if(RTjpeg_bcomp(block, &RTjpeg_lmask))
    {
     *((uint8 *)sp++)=255;
-//    printf("* %" PRId8 " ", sp[-1]);
+//    csPrintf("* %" PRId8 " ", sp[-1]);
    } else sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_lb8);
    block+=64;
   }

@@ -271,8 +271,8 @@ void csDebuggingGraph::AddObject (iObjectRegistry* object_reg,
     // in between.
     if (el->used)
     {
-      printf ("ERROR! Object is added twice to the debug graph!\n");
-      printf ("%p %s", el->object, el->description);
+      csPrintf ("ERROR! Object is added twice to the debug graph!\n");
+      csPrintf ("%p %s", el->object, el->description);
       fflush (stdout);
       CS_ASSERT (false);
       return;
@@ -299,10 +299,10 @@ void csDebuggingGraph::AddObject (iObjectRegistry* object_reg,
 
   if (description)
   {
-    char buf[1000];
+    csString buf;
     va_list arg;
     va_start (arg, description);
-    vsprintf (buf, description, arg);
+    buf.FormatV (description, arg);
     va_end (arg);
     el->description = csStrNew (buf);
   }
@@ -325,12 +325,12 @@ void csDebuggingGraph::AttachDescription (iObjectRegistry* object_reg,
   csDGEL* el = dg->FindEl (object);
   if (el == 0)
   {
-    printf ("ERROR! Cannot find object %p to add description:\n'", object);
+    csPrintf ("ERROR! Cannot find object %p to add description:\n'", object);
     va_list arg;
     va_start (arg, description);
-    vprintf (description, arg);
+    csPrintfV (description, arg);
     va_end (arg);
-    printf ("'\n");
+    csPrintf ("'\n");
     fflush (stdout);
     CS_ASSERT (false);
     return;
@@ -339,10 +339,10 @@ void csDebuggingGraph::AttachDescription (iObjectRegistry* object_reg,
   delete[] el->description;
   if (description)
   {
-    char buf[1000];
+    csString buf;
     va_list arg;
     va_start (arg, description);
-    vsprintf (buf, description, arg);
+    buf.FormatV (description, arg);
     va_end (arg);
     el->description = csStrNew (buf);
   }
@@ -362,7 +362,7 @@ void csDebuggingGraph::AttachType (iObjectRegistry* object_reg,
   csDGEL* el = dg->FindEl (object);
   if (el == 0)
   {
-    printf ("ERROR! Cannot find object %p to add type '%s'\n", object, type);
+    csPrintf ("ERROR! Cannot find object %p to add type '%s'\n", object, type);
     fflush (stdout);
     CS_ASSERT (false);
     return;
@@ -389,14 +389,14 @@ void csDebuggingGraph::RemoveObject (iObjectRegistry* object_reg,
   csDGEL* el = dg->FindEl (object);
   if (!el)
   {
-    printf ("ERROR! Cannot find element for object %p!\n", object);
+    csPrintf ("ERROR! Cannot find element for object %p!\n", object);
     fflush (stdout);
     CS_ASSERT (false);
     return;
   }
   if (!el->used)
   {
-    printf ("ERROR! Element for object %p is not allocated!\n", object);
+    csPrintf ("ERROR! Element for object %p is not allocated!\n", object);
     fflush (stdout);
     CS_ASSERT (false);
     return;
@@ -513,8 +513,8 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg)
     els[i]->recurse_marker = false;
   }
 
-  printf ("====================================================\n");
-  printf ("Total number of used objects in graph: %d\n", cnt);
+  csPrintf ("====================================================\n");
+  csPrintf ("Total number of used objects in graph: %d\n", cnt);
 
   // Find the first unmarked object and dump it.
   i = 0;
@@ -524,7 +524,7 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg)
     {
       Dump (object_reg, els[i]->object, false);
       i = 0;	// Restart scan.
-      printf ("----------------------------------------------------\n");
+      csPrintf ("----------------------------------------------------\n");
     }
     else i++;
   }
@@ -569,23 +569,23 @@ static void DumpSubTree (int indent, const char* type, uint32 link_timestamp,
   if (el->scf)
   {
     if (el->used)
-      printf ("r%d,", ((iBase*)(el->object))->GetRefCount ());
+      csPrintf ("r%d,", ((iBase*)(el->object))->GetRefCount ());
     else
-      printf ("r?,-");
+      csPrintf ("r?,-");
   }
   else if (!el->used)
-    printf ("-");
+    csPrintf ("-");
   if (el->type)
-    printf ("t%" PRIu32 ") %s(%s)", el->timestamp, el->type, el->description);
+    csPrintf ("t%" PRIu32 ") %s(%s)", el->timestamp, el->type, el->description);
   else
-    printf ("t%" PRIu32 ") %s", el->timestamp, el->description);
+    csPrintf ("t%" PRIu32 ") %s", el->timestamp, el->description);
 
   // If the object is used but the link to this object was created
   // BEFORE the object (i.e. timestamps) then this is at least very
   // suspicious and is also marked as such.
   if (el->used && link_timestamp > 0 && link_timestamp < el->timestamp)
   {
-    printf (" (SUSPICIOUS!)");
+    csPrintf (" (SUSPICIOUS!)");
   }
 
   if (el->marker || *type == 'P' || !el->used)
@@ -593,19 +593,19 @@ static void DumpSubTree (int indent, const char* type, uint32 link_timestamp,
     if (el->used)
     {
       if (el->marker)
-        printf (" (REF)\n");
+        csPrintf (" (REF)\n");
       else
-        printf ("\n");
+        csPrintf ("\n");
     }
     else
-      printf (" (BAD LINK!)\n");
+      csPrintf (" (BAD LINK!)\n");
 
     if (*type != 'P') el->marker = true;
   }
   else
   {
     el->marker = true;
-    printf (" (%s,%d) #p=%" PRIu16 " #c=%" PRIu16 "\n",
+    csPrintf (" (%s,%d) #p=%" PRIu16 " #c=%" PRIu16 "\n",
     	el->file, el->linenr, el->num_parents, el->num_children);
     if (el->num_parents + el->num_children > 0)
     {
@@ -618,7 +618,7 @@ static void DumpSubTree (int indent, const char* type, uint32 link_timestamp,
 	if (el->parents[0].link->recurse_marker) use_brackets = false;
       }
 
-      if (use_brackets) printf ("%s{\n", spaces);
+      if (use_brackets) csPrintf ("%s{\n", spaces);
       el->recurse_marker = true;
       int i;
       for (i = 0 ; i < el->num_parents ; i++)
@@ -632,7 +632,7 @@ static void DumpSubTree (int indent, const char* type, uint32 link_timestamp,
 		el->children[i].link);
       }
       el->recurse_marker = false;
-      if (use_brackets) printf ("%s}\n", spaces);
+      if (use_brackets) csPrintf ("%s}\n", spaces);
     }
   }
   fflush (stdout);

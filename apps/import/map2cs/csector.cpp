@@ -43,14 +43,14 @@ namespace
 
 char* BuildMaterialKey (int i, CMapEntity* pEntity)
 {
-  char* key = new char[1024];
-  char* returnvalue = new char[1024];
-  sprintf(key,"MaterialName%d",i);
-  printf(key);
+  csString key;
+  csString returnvalue;
+  key.Format ("MaterialName%d",i);
+  csPrintf("%s", key.GetData());
   if(!pEntity->GetValueOfKey(key)) return 0;
-  sprintf(returnvalue,"<key name=\"defmaterial\" value=\"%s\" />\n",
+  returnvalue.Format ("<key name=\"defmaterial\" value=\"%s\" />\n",
 	      pEntity->GetValueOfKey(key));
-  return returnvalue;
+  return csStrNew (returnvalue);
 }
 
 //Auxiliar funtion to check if the file name is a mdl file
@@ -223,7 +223,7 @@ bool CCSSector::Write(csRef<iDocumentNode> node, CIWorld* pIWorld)
 //  if (pMap->GetConfigInt("Map2CS.General.UseBSP", 0))
 //  {
 //    pWorld->WriteIndent();
-//    fprintf(fd, "CULLER('static')\n");
+//    csFPrintf(fd, "CULLER('static')\n");
 //  }
 
   return true;
@@ -597,13 +597,13 @@ bool CCSSector::WriteSprites(csRef<iDocumentNode> node, CIWorld* pWorld)
         if (sscanf(csnamevalue, "%s%c",mdlname, &dummy) == 1)
         {
           pWorld->WriteIndent();
-          fprintf(fd,"<node name=\"SEED_MESH_OBJ\">\n");
+          csFPrintf(fd,"<node name=\"SEED_MESH_OBJ\">\n");
           // Key/Value pairs writting
           pWorld->Indent();
           pWorld->WriteIndent();
-          fprintf(fd,"<key name=\"classname\" value=\"SEED_MESH_OBJ\" />\n");
+          csFPrintf(fd,"<key name=\"classname\" value=\"SEED_MESH_OBJ\" />\n");
           pWorld->WriteIndent();
-          fprintf(fd,"<key name=\"cs_name\" value=\"%s\" />\n",csnamevalue);
+          csFPrintf(fd,"<key name=\"cs_name\" value=\"%s\" />\n",csnamevalue);
 
           /*Lets build all material definition
            *keys KEY("defmaterial","materialname, texturefile")
@@ -614,15 +614,15 @@ bool CCSSector::WriteSprites(csRef<iDocumentNode> node, CIWorld* pWorld)
           for (mIndex = 1; (key = BuildMaterialKey(mIndex,pEntity)); mIndex++)
 	  {
             pWorld->WriteIndent();
-            fprintf(fd,key);
+            csFPrintf(fd,key);
 	  }
 
           pWorld->WriteIndent();
-	  fprintf(fd,"<key name=\"spritematerial\" value=\"%s\" />\n",csspritematerial);
+	  csFPrintf(fd,"<key name=\"spritematerial\" value=\"%s\" />\n",csspritematerial);
           pWorld->WriteIndent();
-          fprintf(fd,"<key name=\"factory\" value=\"%s\" />\n",csfactname);
+          csFPrintf(fd,"<key name=\"factory\" value=\"%s\" />\n",csfactname);
           pWorld->WriteIndent();
-          fprintf(fd,"<key name=\"factorymaterial\" value=\"%s\" />\n",csfactmaterial);
+          csFPrintf(fd,"<key name=\"factorymaterial\" value=\"%s\" />\n",csfactmaterial);
           pWorld->WriteIndent();
 
           /*
@@ -632,7 +632,7 @@ bool CCSSector::WriteSprites(csRef<iDocumentNode> node, CIWorld* pWorld)
 	   * (factory without material error)
            */
 
-          fprintf(fd,"<key name=\"factoryfile\" value=\"%s\" />\n",csmodelfile);
+          csFPrintf(fd,"<key name=\"factoryfile\" value=\"%s\" />\n",csmodelfile);
 
           /*
 	   * MDL files have actions defined so if model file is an mdl we
@@ -641,44 +641,44 @@ bool CCSSector::WriteSprites(csRef<iDocumentNode> node, CIWorld* pWorld)
            */
           pWorld->WriteIndent();
           if(!isMdlFile(csmodelfile))
-            fprintf(fd,"<key name=\"actionsfile\" value=\"%s\" />\n",csactionsfile);
-          else fprintf(fd,"<key name=\"actionfile\" value=\"NONE\" />\n");
+            csFPrintf(fd,"<key name=\"actionsfile\" value=\"%s\" />\n",csactionsfile);
+          else csFPrintf(fd,"<key name=\"actionfile\" value=\"NONE\" />\n");
 
 	  pWorld->WriteIndent();
-          fprintf(fd,"<key name=\"scalefactor\" value=\"%s\" />\n",csscalefactor);
+          csFPrintf(fd,"<key name=\"scalefactor\" value=\"%s\" />\n",csscalefactor);
 
           pWorld->WriteIndent();
-          fprintf(fd,"<key name=\"staticflag\" value=\"%s\" />\n",csstaticmodel);
+          csFPrintf(fd,"<key name=\"staticflag\" value=\"%s\" />\n",csstaticmodel);
 
           pWorld->WriteIndent();
-          fprintf(fd, "<position x=\"%g\" y=\"%g\" z=\"%g\" />\n",Origin.x*ScaleFactor,
+          csFPrintf(fd, "<position x=\"%g\" y=\"%g\" z=\"%g\" />\n",Origin.x*ScaleFactor,
                   Origin.z*ScaleFactor, Origin.y*ScaleFactor);
 
 
           pWorld->Unindent();
           pWorld->WriteIndent();
 
-          fprintf(fd,")\n\n");
+          csFPrintf(fd,")\n\n");
           pWorld->Unindent();
           pWorld->WriteIndent();
 
 		/*
 		  pWorld->WriteIndent();
-          fprintf(fd, "MESHREF '%s' \n", csnamevalue);
+          csFPrintf(fd, "MESHREF '%s' \n", csnamevalue);
           pWorld->WriteIndent();
-          fprintf(fd, "( \n");
+          csFPrintf(fd, "( \n");
           pWorld->Indent();
           pWorld->WriteIndent();
-          fprintf(fd, "FACTORY ('%s')\n ", csnamevaluefact);
-		  fprintf(fd, "PRIORITY ('Object')\n ");
-		  fprintf(fd, "ZUSE( )\n ");
+          csFPrintf(fd, "FACTORY ('%s')\n ", csnamevaluefact);
+		  csFPrintf(fd, "PRIORITY ('Object')\n ");
+		  csFPrintf(fd, "ZUSE( )\n ");
 		*/
 
 
           /*const char* actionvalue = pEntity->GetValueOfKey("action");
           if (sscanf(actionvalue, "%s%c",action, &dummy) == 1)
           {
-            fprintf(fd, "'%s' )\n", action);
+            csFPrintf(fd, "'%s' )\n", action);
           }
 	  */
 	  //END OF MODIFIED CODE
@@ -689,7 +689,7 @@ bool CCSSector::WriteSprites(csRef<iDocumentNode> node, CIWorld* pWorld)
         {
           //The strings format matched
           pWorld->WriteIndent();
-          fprintf(fd, "MOVE (V ( %g, %g, %g) ",
+          csFPrintf(fd, "MOVE (V ( %g, %g, %g) ",
                   x*ScaleFactor,
                   z*ScaleFactor,
                   y*ScaleFactor);
@@ -698,22 +698,22 @@ bool CCSSector::WriteSprites(csRef<iDocumentNode> node, CIWorld* pWorld)
           //if (sscanf(alphavalue, "%s%c",alphastr, &dummy) == 1)
           //{
             //pWorld->WriteIndent();
-            //fprintf(fd, "MIXMODE (ALPHA (%s))\n", alphastr);
+            //csFPrintf(fd, "MIXMODE (ALPHA (%s))\n", alphastr);
           //}
           //added single value matrix scaler
           //need to also add 9 value matrix for rotation etc
           //if (pEntity->GetValueOfKey("uniformscale", modelscale))
           //{
-            //fprintf(fd, " MATRIX ( %s ) )\n", modelscale);
+            //csFPrintf(fd, " MATRIX ( %s ) )\n", modelscale);
           //}
           //else
           //{
-            //fprintf(fd, " )\n");  //add newline if no scale value
+            //csFPrintf(fd, " )\n");  //add newline if no scale value
           //}
 //
           //pWorld->Unindent();
           //pWorld->WriteIndent();
-          //fprintf(fd, ") \n\n");
+          //csFPrintf(fd, ") \n\n");
 	  */
 //        }
       }
@@ -773,22 +773,22 @@ bool CCSSector::WriteSprites2D(csRef<iDocumentNode> node, CIWorld* pWorld)
         if (sscanf(csnamevalue, "%s%c",sprname, &dummy) == 1)
         {
           pWorld->WriteIndent();
-          fprintf(fd, "SPRITE2D '%s' \n", sprname);
+          csFPrintf(fd, "SPRITE2D '%s' \n", sprname);
           pWorld->WriteIndent();
-          fprintf(fd, "( \n");
+          csFPrintf(fd, "( \n");
 
           //vertices; add square sprite polygon
           pWorld->Indent();
           pWorld->WriteIndent();
-          fprintf(fd, "VERTICES (-1,1,1,1,1,-1,-1,-1)\n");
+          csFPrintf(fd, "VERTICES (-1,1,1,1,1,-1,-1,-1)\n");
 
           //UV; add square texture coordinates
           pWorld->WriteIndent();
-          fprintf(fd, "UV (0,0,1,0,1,1,0,1)\n");
+          csFPrintf(fd, "UV (0,0,1,0,1,1,0,1)\n");
 
           pWorld->WriteIndent();
           const char* spritetexture = pEntity->GetValueOfKey("texture");
-          fprintf(fd, "MATERIAL (%s)\n", spritetexture);
+          csFPrintf(fd, "MATERIAL (%s)\n", spritetexture);
 
           //initial start position
           double x, y, z;
@@ -796,7 +796,7 @@ bool CCSSector::WriteSprites2D(csRef<iDocumentNode> node, CIWorld* pWorld)
           {
             //The strings format matched
             pWorld->WriteIndent();
-            fprintf(fd, "MOVE ( %g, %g, %g )\n ",
+            csFPrintf(fd, "MOVE ( %g, %g, %g )\n ",
                     x*ScaleFactor,
                     z*ScaleFactor,
                     y*ScaleFactor);
@@ -804,49 +804,49 @@ bool CCSSector::WriteSprites2D(csRef<iDocumentNode> node, CIWorld* pWorld)
 
           //mixmode
           pWorld->WriteIndent();
-          fprintf(fd, "MIXMODE ( ");
+          csFPrintf(fd, "MIXMODE ( ");
           bool copy = pEntity->GetBoolValueOfKey("copy", false);
           if (copy)
           {
-            fprintf(fd, "COPY () ");
+            csFPrintf(fd, "COPY () ");
           }
           bool add = pEntity->GetBoolValueOfKey("add", false);
           if (add)
           {
-            fprintf(fd, "ADD () ");
+            csFPrintf(fd, "ADD () ");
           }
           bool multiply = pEntity->GetBoolValueOfKey("multiply", false);
           if (multiply)
           {
-            fprintf(fd, "MULTIPLY ( ) ");
+            csFPrintf(fd, "MULTIPLY ( ) ");
           }
           bool multiply2 = pEntity->GetBoolValueOfKey("multiply2", false);
           if (multiply2)
           {
-            fprintf(fd, "MULTIPLY2 ( ) ");
+            csFPrintf(fd, "MULTIPLY2 ( ) ");
           }
           char alphastr[99] = "none";
           const char* alphavalue = pEntity->GetValueOfKey("alpha");
           if (sscanf(alphavalue, "%s%c",alphastr, &dummy) == 1)
           {
-            fprintf(fd, "ALPHA (%s) ", alphastr);
+            csFPrintf(fd, "ALPHA (%s) ", alphastr);
           }
           bool transparent = pEntity->GetBoolValueOfKey("transparent", false);
           if (transparent)
           {
-            fprintf(fd, "TRANSPARENT ( ) ");
+            csFPrintf(fd, "TRANSPARENT ( ) ");
           }
           bool keycolor = pEntity->GetBoolValueOfKey("keycolor", false);
           if (keycolor)
           {
-            fprintf(fd, "KEYCOLOR ( ) ");
+            csFPrintf(fd, "KEYCOLOR ( ) ");
           }
 
-          fprintf(fd, ")\n");
+          csFPrintf(fd, ")\n");
 
           pWorld->Unindent();
           pWorld->WriteIndent();
-          fprintf(fd, ") \n\n");
+          csFPrintf(fd, ") \n\n");
         }
       }
     }
@@ -864,7 +864,7 @@ bool CCSSector::WriteFog(csRef<iDocumentNode> node, CIWorld* pWorld)
   assert(pMap);
   assert(fd);
 
-  fprintf(fd, "\n");
+  csFPrintf(fd, "\n");
 
 
   double r=255.0;
@@ -889,7 +889,7 @@ bool CCSSector::WriteFog(csRef<iDocumentNode> node, CIWorld* pWorld)
       {
         pEntity->GetTripleNumValueOfKey("fogcolor", r, g, b);
         pWorld->WriteIndent();
-        fprintf(fd, "FOG(%g,%g,%g,%g)\n", r/255.0, g/255.0, b/255.0, fogdensity);
+        csFPrintf(fd, "FOG(%g,%g,%g,%g)\n", r/255.0, g/255.0, b/255.0, fogdensity);
       }
     }
   }*/

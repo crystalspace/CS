@@ -81,7 +81,7 @@ void csCsLightProgressMeter::SetProgressDescription (const char* id,
 void csCsLightProgressMeter::SetProgressDescriptionV (const char* /*id*/,
 	const char* description, va_list list)
 {
-  vsprintf (cur_description, description, list);
+  cur_description.FormatV (description, list);
 }
 
 void csCsLightProgressMeter::Step()
@@ -95,27 +95,22 @@ void csCsLightProgressMeter::Step()
     int const extent = units / tick_scale;
     if (anchor < extent)
     {
-      char buff [256]; // Batch the update here before emitting it.
-      char const* safety_margin = buff + sizeof(buff) - 5;
-      char* p = buff;
-	  int i;
-      for (i = anchor + 1; i <= extent && p < safety_margin; i++)
+      csString buff; // Batch the update here before emitting it.
+      int i;
+      for (i = anchor + 1; i <= extent; i++)
       {
         if (i % (10 / tick_scale) != 0)
-	  *p++ = '.';
+	  buff << '.';
 	else
 	{
-          int n;
-	  sprintf(p, "%d%%%n", i * tick_scale, &n );
-	  p += n;
+	  buff.AppendFmt ("%d%%", i * tick_scale);
 	}
       }
-      *p = '\0';
-      printf ("%s", buff);
+      csPrintf ("%s", buff.GetData());
       anchor = extent;
     }
     if (current == total)
-      printf ("\n");
+      csPrintf ("\n");
 
     int fw = System->g2d->GetWidth ();
     int fh = System->g2d->GetHeight ();
@@ -142,19 +137,19 @@ void csCsLightProgressMeter::Step()
 void csCsLightProgressMeter::Restart()
 {
   Reset();
-  printf ("0%%");
+  csPrintf ("0%%");
 }
 
 void csCsLightProgressMeter::Abort ()
 {
   current = total;
-  printf ("\n");
+  csPrintf ("\n");
 }
 
 void csCsLightProgressMeter::Finalize ()
 {
   current = total;
-  printf ("\n");
+  csPrintf ("\n");
 }
 
 void csCsLightProgressMeter::SetGranularity(int n)
@@ -267,11 +262,11 @@ bool Lighter::ScanMesh (iMeshWrapper* mesh)
 {
   if (litconfig.receivers_selector->SelectObject (mesh->QueryObject ()))
   {
-    printf ("  Shadow receiver '%s'\n", mesh->QueryObject ()->GetName ()); fflush (stdout);
+    csPrintf ("  Shadow receiver '%s'\n", mesh->QueryObject ()->GetName ()); fflush (stdout);
   }
   if (litconfig.casters_selector->SelectObject (mesh->QueryObject ()))
   {
-    printf ("  Shadow caster '%s'\n", mesh->QueryObject ()->GetName ()); fflush (stdout);
+    csPrintf ("  Shadow caster '%s'\n", mesh->QueryObject ()->GetName ()); fflush (stdout);
   }
   int i;
   iMeshList* ml = mesh->GetChildren ();
@@ -286,7 +281,7 @@ bool Lighter::ScanMesh (iMeshWrapper* mesh)
 
 bool Lighter::ScanSector (iSector* sector)
 {
-  printf ("Processing sector '%s'\n", sector->QueryObject ()->GetName ()); fflush (stdout);
+  csPrintf ("Processing sector '%s'\n", sector->QueryObject ()->GetName ()); fflush (stdout);
   int i;
   iMeshList* ml = sector->GetMeshes ();
   for (i = 0 ; i < ml->GetCount () ; i++)
@@ -301,7 +296,7 @@ bool Lighter::ScanSector (iSector* sector)
     iLight* l = ll->Get (i);
     if (litconfig.lights_selector->SelectObject (l->QueryObject ()))
     {
-      printf ("  Add light '%s'\n", l->QueryObject ()->GetName ());
+      csPrintf ("  Add light '%s'\n", l->QueryObject ()->GetName ());
       fflush (stdout);
     }
   }

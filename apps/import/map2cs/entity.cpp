@@ -43,8 +43,8 @@ CMapKeyValuePair::~CMapKeyValuePair()
 CMapEntity::CMapEntity()
 {
   static int EntityCount = 1;
-  char Buffer[100];
-  sprintf(Buffer, "e%d", EntityCount++);
+  csString Buffer;
+  Buffer.Format ("e%d", EntityCount++);
   m_UniqueName = Buffer;
 }
 

@@ -33,6 +33,7 @@
 #include "csqint.h"
 #include "iutil/vfs.h"
 #include "csutil/csstring.h"
+#include "csutil/sysfunc.h"
 #include "iutil/object.h"
 #include "iutil/document.h"
 #include "iengine/material.h"
@@ -201,7 +202,7 @@ csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.haze",
     	iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.haze\n");
+    csPrintf ("Load TYPE plugin crystalspace.mesh.object.haze\n");
   }
   csRef<iMeshObjectFactory> fact;
   fact = type->NewFactory ();

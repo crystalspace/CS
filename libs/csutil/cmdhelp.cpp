@@ -37,36 +37,37 @@ void csCommandLineHelper::Help (iConfig* config)
     csOptionDescription option;
     if (!config->GetOptionDescription (i, &option))
       break;
-    char opt [30], desc [80];
+    csString opt;
+    csStringFast<80> desc;
     csVariant def;
     config->GetOption (i, &def);
     switch (option.type)
     {
       case CSVAR_BOOL:
-        sprintf (opt,  "  -[no]%s", option.name);
-	sprintf (desc, "%s (%s) ", option.description, def.GetBool ()
+        opt.Format ("  -[no]%s", option.name);
+	desc.Format ("%s (%s) ", option.description, def.GetBool ()
 		? "yes" : "no");
 	break;
       case CSVAR_CMD:
-        sprintf (opt, "  -%s", option.name);
-	strcpy (desc, option.description);
+        opt.Format ("  -%s", option.name);
+	desc = option.description;
 	break;
       case CSVAR_FLOAT:
-        sprintf (opt,  "  -%s=<val>", option.name);
-	sprintf (desc, "%s (%g)", option.description, def.GetFloat ());
+        opt.Format ("  -%s=<val>", option.name);
+	desc.Format ("%s (%g)", option.description, def.GetFloat ());
 	break;
       case CSVAR_LONG:
-        sprintf (opt,  "  -%s=<val>", option.name);
-	sprintf (desc, "%s (%ld)", option.description, def.GetLong ());
+        opt.Format ("  -%s=<val>", option.name);
+	desc.Format ("%s (%ld)", option.description, def.GetLong ());
 	break;
       case CSVAR_STRING:
-        sprintf (opt,  "  -%s=<val>", option.name);
-	sprintf (desc, "%s (%s)", option.description, def.GetString ()
+        opt.Format ("  -%s=<val>", option.name);
+	desc.Format ("%s (%s)", option.description, def.GetString ()
 		? def.GetString () : "none");
 	break;
     }
     //@@@????
-    printf ("%-21s%s\n", opt, desc);
+    csPrintf ("%-21s%s\n", opt.GetData(), desc.GetData());
     //ReportSys (CS_MSG_STDOUT, "%-21s%s\n", opt, desc);
   }
 }
@@ -101,15 +102,15 @@ void csCommandLineHelper::Help (iObjectRegistry* object_reg,
     {
       csRef<iFactory> fact (SCF_QUERY_INTERFACE (plug, iFactory));
       if (fact)
-        printf ("Options for %s:\n", fact->QueryDescription ());
+        csPrintf ("Options for %s:\n", fact->QueryDescription ());
       else
-        printf ("Options for unknown plugin:\n");
+        csPrintf ("Options for unknown plugin:\n");
       Help (config);
     }
   }
 
   //@@@???
-  printf (
+  csPrintf (
 "General options:\n"
 "  -help              this help\n"
 "  -video=<s>         the 3D rendering driver (opengl, software, ...)\n"

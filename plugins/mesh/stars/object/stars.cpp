@@ -159,12 +159,12 @@ void csStarsMeshObject::DrawStarBox (iRenderView* rview,
 
   csVector3 boxsize = starbox.Max() - starbox.Min();
   int number = 100; // number of stars is volume * density
-  //printf("boxsize.x %g %g %g\n", boxsize.x, boxsize.y, boxsize.z);
+  //csPrintf("boxsize.x %g %g %g\n", boxsize.x, boxsize.y, boxsize.z);
   number = csQint(
     boxsize.x * boxsize.y * boxsize.z * density
     * ( GetRandom(0.4f) + 0.8f ) /// * 0.8 ... * 1.2, so +- 20%
     );
-  //printf("number is %d\n", number);
+  //csPrintf("number is %d\n", number);
 
   csVector3 pos; // star position in 3d
   csVector3 screenpos;  // star position on screen
@@ -205,7 +205,7 @@ void csStarsMeshObject::DrawStarBox (iRenderView* rview,
     DrawPoint(rview, screenpos, starcolor, zbufmode);
     drawn++;
   }
-  //printf("drawn is %d\n", drawn);
+  //csPrintf("drawn is %d\n", drawn);
 
 }
 

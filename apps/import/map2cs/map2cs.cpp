@@ -45,13 +45,13 @@ iImageIO* ImageLoader = 0;
 
 void PrintSyntax()
 {
-  printf("map2cs is a utility program to convert a MAP file to a Crystal Space level\n\n");
+  csPrintf("map2cs is a utility program to convert a MAP file to a Crystal Space level\n\n");
 
-  printf("syntax: map2cs <mapfile> <worldfile> [configfile]\n");
+  csPrintf("syntax: map2cs <mapfile> <worldfile> [configfile]\n");
 
-  printf("for example: map2cs sample.map data/sample.zip sample.cfg\n");
-  printf("             to create the CS level called sample.zip from sample.map\n");
-  printf("             using config data in sample.cfg\n");
+  csPrintf("for example: map2cs sample.map data/sample.zip sample.cfg\n");
+  csPrintf("             to create the CS level called sample.zip from sample.map\n");
+  csPrintf("             using config data in sample.cfg\n");
 }
 
 int appMain (iObjectRegistry* object_reg, int argc, char *argv[])
@@ -62,7 +62,7 @@ int appMain (iObjectRegistry* object_reg, int argc, char *argv[])
     "crystalspace.graphic.image.io.multiplex", iImageIO);
   if (!il)
   {
-    printf ("Couldn't load image multiplexer!\n");
+    csPrintf ("Couldn't load image multiplexer!\n");
     return 1;
   }
   else
@@ -72,18 +72,18 @@ int appMain (iObjectRegistry* object_reg, int argc, char *argv[])
   csRef<iVFS> VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!VFS)
   {
-    printf ("Couldn't load VFS!\n");
+    csPrintf ("Couldn't load VFS!\n");
     return 1;
   }
 
-  printf("\nmap2cs version " CS_VERSION "\n");
-  printf("Copyright (C) 1999-2003 by Thomas Hieber and others\n");
-  printf("CrystalSpace version " CS_VERSION "\n");
-  printf("Copyright (C) 1999-2003 by Jorrit Tyberghein and others\n\n");
+  csPrintf("\nmap2cs version " CS_VERSION "\n");
+  csPrintf("Copyright (C) 1999-2003 by Thomas Hieber and others\n");
+  csPrintf("CrystalSpace version " CS_VERSION "\n");
+  csPrintf("Copyright (C) 1999-2003 by Jorrit Tyberghein and others\n\n");
 
-  printf("map2cs comes with ABSOLUTELY NO WARRANTY; for details see the file 'COPYING'\n");
-  printf("This is free software, and you are welcome to redistribute it under certain\n");
-  printf("conditions; see `COPYING' for details.\n\n");
+  csPrintf("map2cs comes with ABSOLUTELY NO WARRANTY; for details see the file 'COPYING'\n");
+  csPrintf("This is free software, and you are welcome to redistribute it under certain\n");
+  csPrintf("conditions; see `COPYING' for details.\n\n");
 
   if (argc < 3 || argc > 4)
   {
@@ -102,7 +102,7 @@ int appMain (iObjectRegistry* object_reg, int argc, char *argv[])
     const char* crystal = getenv("CRYSTAL");
     if (!crystal)
     {
-      printf ("Couldn't find Crystal Space directory (CRYSTAL var)! Using current dir!\n");
+      csPrintf ("Couldn't find Crystal Space directory (CRYSTAL var)! Using current dir!\n");
       strcpy (filename, "data/config/map2cs.cfg");
     }
     else
@@ -116,12 +116,12 @@ int appMain (iObjectRegistry* object_reg, int argc, char *argv[])
   const char* worldfile = argv[2];
 
   CMapFile Map;
-  printf("Reading map '%s'...\n", mapfile);
+  csPrintf("Reading map '%s'...\n", mapfile);
   if (!Map.Read(mapfile, configfile))
     return 2;
 
   Map.CreatePolygons();
-  printf("Generating data for world '%s'...\n", worldfile);
+  csPrintf("Generating data for world '%s'...\n", worldfile);
 
   csRef<iDocumentSystem> xml(csPtr <iDocumentSystem>
     (new csTinyDocumentSystem()));
@@ -133,19 +133,19 @@ int appMain (iObjectRegistry* object_reg, int argc, char *argv[])
 
   remove (worldfile);
   VFS->Mount ("/map2cs_temp", worldfile);
-  printf ("Writing world...\n");
+  csPrintf ("Writing world...\n");
   doc->Write(VFS, "/map2cs_temp/world");
 
-  printf ("Writing textures...\n");
+  csPrintf ("Writing textures...\n");
   if (!Map.GetTextureManager()->AddAllTexturesToVFS (VFS,
     "/map2cs_temp/"))
   {
-    printf ("Not all textures where written correctly.\n");
+    csPrintf ("Not all textures where written correctly.\n");
   }
 
   VFS->Unmount ("/map2cs_temp", worldfile);
 
-  printf("done.");
+  csPrintf("done.");
 
   return 0;
 }

@@ -42,7 +42,7 @@ static void Test (iBase* obj, const char* name)
 {
   if (!obj)
   {
-    printf ("Object '%s' is missing!\n", name);
+    csPrintf ("Object '%s' is missing!\n", name);
     fflush (stdout);
     return;
   }
@@ -52,16 +52,16 @@ static void Test (iBase* obj, const char* name)
     csRef<iString> str (dbghelp->UnitTest ());
     if (str)
     {
-      printf ("%s unit testing failed!\n", name);
-      printf ("%s\n", str->GetData ());
+      csPrintf ("%s unit testing failed!\n", name);
+      csPrintf ("%s\n", str->GetData ());
     }
     else
     {
-      printf ("%s unit testing succeeded!\n", name);
+      csPrintf ("%s unit testing succeeded!\n", name);
     }
   }
   else
-    printf ("%s unit test not performed (object doesn't support it).\n", name);
+    csPrintf ("%s unit test not performed (object doesn't support it).\n", name);
   fflush (stdout);
 }
 
@@ -70,7 +70,7 @@ static void Benchmark (iBase* obj, const char* name, int num_iterations)
 {
   if (!obj)
   {
-    printf ("Object '%s' is missing!\n", name);
+    csPrintf ("Object '%s' is missing!\n", name);
     fflush (stdout);
     return;
   }
@@ -78,10 +78,10 @@ static void Benchmark (iBase* obj, const char* name, int num_iterations)
   if (dbghelp && (dbghelp->GetSupportedTests () & CS_DBGHELP_BENCHMARK))
   {
     csTicks t = dbghelp->Benchmark (num_iterations);
-    printf ("Benchmarking %s: %u ms\n", name, t);
+    csPrintf ("Benchmarking %s: %u ms\n", name, t);
   }
   else
-    printf ("%s benchmark not performed (object doesn't support it).\n", name);
+    csPrintf ("%s benchmark not performed (object doesn't support it).\n", name);
   fflush (stdout);
 }
 #endif
@@ -96,43 +96,43 @@ static int DoStuff (iObjectRegistry* object_reg)
     return -1;
   }
 
-  printf ("================================================================\n");
+  csPrintf ("================================================================\n");
 
   csRef<iCollideSystem> cdsys (CS_LOAD_PLUGIN (plugmgr,
   	"crystalspace.collisiondetection.opcode", iCollideSystem));
   Test (cdsys, "Opcode");
 
-  printf ("================================================================\n");
+  csPrintf ("================================================================\n");
 
   csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
   Test (engine, "Engine");
 
-  printf ("================================================================\n");
+  csPrintf ("================================================================\n");
 
   csGeomDebugHelper* geomdbghelp = new csGeomDebugHelper ();
   Test (geomdbghelp, "csgeom");
   delete geomdbghelp;
 
-  printf ("================================================================\n");
+  csPrintf ("================================================================\n");
 
   csUtilDebugHelper* utildbghelp = new csUtilDebugHelper ();
   Test (utildbghelp, "csutil");
   delete utildbghelp;
 
-  printf ("================================================================\n");
+  csPrintf ("================================================================\n");
 
   csRef<iSyntaxService> syntax (CS_LOAD_PLUGIN (plugmgr,
 	"crystalspace.syntax.loader.service.text", iSyntaxService));
   Test (syntax, "Syntax Services");
 
-  printf ("================================================================\n");
+  csPrintf ("================================================================\n");
 
   csRef<iVisibilityCuller> viscull (CS_LOAD_PLUGIN (plugmgr,
   	"crystalspace.culling.dynavis", iVisibilityCuller));
   Test (viscull, "DynaVis");
   //Benchmark (viscull, "DynaVis", 100);
 
-  printf ("================================================================\n");
+  csPrintf ("================================================================\n");
   return 0;
 }
 

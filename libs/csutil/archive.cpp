@@ -27,6 +27,7 @@
 #include "csutil/hash.h"
 #include "csutil/hashhandlers.h"
 #include "csutil/snprintf.h"
+#include "csutil/sysfunc.h"
 #include "csutil/util.h"
 #include "iutil/vfs.h"	// For csFileTime
 
@@ -333,14 +334,14 @@ bool csArchive::ReadArchiveComment (FILE *infile, size_t zipfile_comment_length)
 
 void csArchive::Dir () const
 {
-  printf (" Comp |Uncomp| File |CheckSum| File\n");
-  printf (" size | size |offset| (CRC32)| name\n");
-  printf ("------+------+------+--------+------\n");
+  csPrintf (" Comp |Uncomp| File |CheckSum| File\n");
+  csPrintf (" size | size |offset| (CRC32)| name\n");
+  csPrintf ("------+------+------+--------+------\n");
   size_t fn;
   for (fn = 0; fn < dir.Length (); fn++)
   {
     ArchiveEntry *e = dir.Get (fn);
-    printf ("%6" PRIu32 "|%6" PRIu32 "|%6" PRIu32 "|%08" PRIx32 "|%s\n",
+    csPrintf ("%6" PRIu32 "|%6" PRIu32 "|%6" PRIu32 "|%08" PRIx32 "|%s\n",
 	  e->info.csize, e->info.ucsize,
       e->info.relative_offset_local_header, e->info.crc32, e->filename);
   }

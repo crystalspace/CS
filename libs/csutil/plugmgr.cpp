@@ -39,7 +39,7 @@ csPluginManager::csPlugin::csPlugin (iComponent *obj, const char *classID)
 
 csPluginManager::csPlugin::~csPlugin ()
 {
-//printf ("DecRef %08p/'%s' ref=%d\n", Plugin, ClassID, Plugin->GetRefCount ()); fflush (stdout);
+//csPrintf ("DecRef %08p/'%s' ref=%d\n", Plugin, ClassID, Plugin->GetRefCount ()); fflush (stdout);
   delete [] ClassID;
   Plugin->DecRef ();
 }

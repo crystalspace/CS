@@ -1090,7 +1090,7 @@ const char* csGenmeshSkelAnimationControlFactory::ParseBone (iDocumentNode* node
 				}
 				break;
 			default:
-				sprintf (error_buf,
+				error_buf.Format (
 				"Don't recognize token '%s' in anim control bone!",
 				value);
 				delete bone;
@@ -1173,7 +1173,7 @@ const char* csGenmeshSkelAnimationControlFactory::ParseScript (iDocumentNode* no
 								csYRotMatrix3(child->GetAttributeValueAsFloat ("y"))*
 								csZRotMatrix3(child->GetAttributeValueAsFloat ("z"));
 					q = csQuaternion(m);
-					printf("%s x %.3f y %.3f z %.3f r %.3f\n\n", bones[bone_id]->GetName(), q.x, q.y, q.z, q.r);
+					csPrintf("%s x %.3f y %.3f z %.3f r %.3f\n\n", bones[bone_id]->GetName(), q.x, q.y, q.z, q.r);
 					instr.rotate.quat_x = q.x;
 					instr.rotate.quat_y = q.y;
 					instr.rotate.quat_z = q.z;
@@ -1194,7 +1194,7 @@ const char* csGenmeshSkelAnimationControlFactory::ParseScript (iDocumentNode* no
 				ad.script->AddInstruction (AC_REPEAT);
 				break;
 			default:
-				sprintf (error_buf,
+				error_buf.Format (
 				"Don't recognize token '%s' in anim control script!",
 				value);
 				return error_buf;
@@ -1238,7 +1238,7 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
 				}
 				break;
 			default:
-				sprintf (error_buf,
+				error_buf.Format (
 				"Don't recognize token '%s' in anim control!",
 				value);
 				return error_buf;

@@ -418,7 +418,7 @@ csRef<iEventAttributeIterator> csEvent::GetAttributeIterator()
 static void IndentLevel(int level)
 {
   for (int i = 0; i < level; i++)
-    printf("\t");
+    csPrintf("\t");
 }
 
 bool csEvent::Print (int level)

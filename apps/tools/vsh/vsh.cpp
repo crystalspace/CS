@@ -629,7 +629,7 @@ int main (int argc, char *argv [])
     fflush (stdout);
     if (!fgets (command, sizeof(command), stdin))
     {
-      printf ("\r\n");
+      csPrintf ("\r\n");
       ShutDown = true;
     }
     else

@@ -324,21 +324,20 @@ void CScriptParser::ReportError(const char* message,
                              const char* info1,
                              const char* info2)
 {
-  char Msg1[1000], Msg2[1000];
+  csString Msg1;
   if (info1 && info2)
   {
-    sprintf(Msg1, message, info1, info2);
+    Msg1.Format (message, info1, info2);
   }
   else if (info1)
   {
-    sprintf(Msg1, message, info1);
+    Msg1.Format (message, info1);
   }
   else
   {
-    sprintf(Msg1, message);
+    Msg1.Format (message);
   }
-  sprintf(Msg2, "Error in line %d: %s", m_CurrentLine, Msg1);
-  printf(Msg2);
+  csPrintf ("Error in line %d: %s", m_CurrentLine, Msg1.GetData());
 }
 
 

@@ -29,7 +29,7 @@ bool CZipFile::AddFile(const char* originalname, const char* zipname)
   FILE* fd = fopen(originalname, "rb");
   if (!fd)
   {
-    printf("Can't find file '%s'!\n", originalname);
+    csPrintf("Can't find file '%s'!\n", originalname);
     return false;
   }
 
@@ -41,7 +41,7 @@ bool CZipFile::AddFile(const char* originalname, const char* zipname)
   void* file = NewFile(zipname, size);
   if (!file)
   {
-    printf("Can't add new file '%s' to zip archive\n", originalname);
+    csPrintf("Can't add new file '%s' to zip archive\n", originalname);
     return false;
   }
 
@@ -54,7 +54,7 @@ bool CZipFile::AddFile(const char* originalname, const char* zipname)
     numread = fread (Buffer, 1, 1000, fd);
     if (!Write(file, Buffer, numread))
     {
-      printf("Can't add data of file '%s' to zip archive\n", originalname);
+      csPrintf("Can't add data of file '%s' to zip archive\n", originalname);
       return false;
     }
     totalread += numread;
@@ -74,13 +74,13 @@ bool CZipFile::AddData(const char* Data, int Size, const char* zipname)
   void* file = NewFile(zipname, Size);
   if (!file)
   {
-    printf("Can't add new file '%s' to zip archive\n", zipname);
+    csPrintf("Can't add new file '%s' to zip archive\n", zipname);
     return false;
   }
 
   if (!Write(file, Data, Size))
   {
-    printf("Can't add data (%s) to zip archive\n", zipname);
+    csPrintf("Can't add data (%s) to zip archive\n", zipname);
     return false;
   }
 

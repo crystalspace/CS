@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "csutil/cspmeter.h"
+#include "csutil/csstring.h"
 #include "ivaria/conout.h"
 
 SCF_IMPLEMENT_IBASE (csTextProgressMeter)
@@ -47,23 +48,16 @@ void csTextProgressMeter::Step()
     int const extent = units / tick_scale;
     if (anchor < extent)
     {
-      char buff [256]; // Batch the update here before emitting it.
-      char const* safety_margin = buff + sizeof(buff) - 5;
-      char* p = buff;
-	  int i;
-      for (i = anchor + 1; i <= extent && p < safety_margin; i++)
+      csString buff; // Batch the update here before emitting it.
+      int i;
+      for (i = anchor + 1; i <= extent; i++)
       {
         if (i % (10 / tick_scale) != 0)
-	  *p++ = '.';
+	   buff << '.';
 	else
-	{
-          int n;
-	  sprintf(p, "%d%%%n", i * tick_scale, &n );
-	  p += n;
-	}
+	  buff.AppendFmt ("%d%%", i * tick_scale);
       }
-      *p = '\0';
-      console->PutText ("%s", buff);
+      console->PutText ("%s", buff.GetData());
       anchor = extent;
     }
     if (current == total)

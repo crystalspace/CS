@@ -102,23 +102,12 @@ SCF_IMPLEMENT_FACTORY (csBallLoader)
 SCF_IMPLEMENT_FACTORY (csBallSaver)
 
 
-static void ReportError (iReporter* reporter, const char* id,
+static void ReportError (iObjectRegistry* objreg, const char* id,
 	const char* description, ...)
 {
   va_list arg;
   va_start (arg, description);
-
-  if (reporter)
-  {
-    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
-  }
-  else
-  {
-    char buf[1024];
-    vsprintf (buf, description, arg);
-    csPrintf ("Error ID: %s\n", id);
-    csPrintf ("Description: %s\n", buf);
-  }
+  csReportV (objreg, CS_REPORTER_SEVERITY_ERROR, id, description, arg);
   va_end (arg);
 }
 
@@ -135,7 +124,6 @@ csBallFactoryLoader::~csBallFactoryLoader ()
 bool csBallFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csBallFactoryLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
 }
 
@@ -153,7 +141,7 @@ csPtr<iBase> csBallFactoryLoader::Parse (iDocumentNode*,
   }
   if (!type)
   {
-    ReportError (reporter,
+    ReportError (object_reg,
 		"crystalspace.ballfactoryloader.setup.objecttype",
 		"Could not load the ball mesh object plugin!");
     return 0;
@@ -179,7 +167,6 @@ csBallFactorySaver::~csBallFactorySaver ()
 bool csBallFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csBallFactorySaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
 }
 
@@ -210,7 +197,6 @@ csBallLoader::~csBallLoader ()
 bool csBallLoader::Initialize (iObjectRegistry* object_reg)
 {
   csBallLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
   xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
@@ -374,7 +360,6 @@ csBallSaver::~csBallSaver ()
 bool csBallSaver::Initialize (iObjectRegistry* object_reg)
 {
   csBallSaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }

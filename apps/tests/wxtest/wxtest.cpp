@@ -181,7 +181,7 @@ bool Simple::HandleEvent (iEvent& ev)
   }
   else if ((ev.Type == csevKeyboard))
   {
-    printf("Got key %" PRIu32 " / %" PRIu32 "\n",
+    csPrintf("Got key %" PRIu32 " / %" PRIu32 "\n",
            csKeyEventHelper::GetCookedCode(&ev),
            csKeyEventHelper::GetCookedCode(&ev));
     if((csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown) &&
@@ -194,15 +194,15 @@ bool Simple::HandleEvent (iEvent& ev)
   }
   else if ((ev.Type == csevMouseMove))
   {
-    printf("Mouse move to %d %d\n", ev.Mouse.x, ev.Mouse.y);
+    csPrintf("Mouse move to %d %d\n", ev.Mouse.x, ev.Mouse.y);
   }
   else if ((ev.Type == csevMouseDown))
   {
-    printf("Mouse button %d down at %d %d\n", ev.Mouse.Button, ev.Mouse.x, ev.Mouse.y);
+    csPrintf("Mouse button %d down at %d %d\n", ev.Mouse.Button, ev.Mouse.x, ev.Mouse.y);
   }
   else if ((ev.Type == csevMouseUp))
   {
-    printf("Mouse button %d up at %d %d\n", ev.Mouse.Button, ev.Mouse.x, ev.Mouse.y);
+    csPrintf("Mouse button %d up at %d %d\n", ev.Mouse.Button, ev.Mouse.x, ev.Mouse.y);
   }
 
   return false;
@@ -384,12 +384,12 @@ void Simple::PushFrame ()
 
 void Simple::OnIconize(wxIconizeEvent& event)
 {
-  printf("got iconize %d\n", (int)event.Iconized());
+  csPrintf("got iconize %d\n", (int)event.Iconized());
 }
 
 void Simple::OnShow(wxShowEvent& event)
 {
-  printf("got show %d\n", (int)event.GetShow());
+  csPrintf("got show %d\n", (int)event.GetShow());
 }
 
 /* There are two ways to drive the CS event loop, from

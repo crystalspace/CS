@@ -534,10 +534,10 @@ void csSimpleConsole::CacheColors ()
 void csSimpleConsole::GfxWrite (int x, int y, int fg, int bg, char *iText, ...)
 {
   va_list arg;
-  char buf[256];
+  csString buf;
 
   va_start (arg, iText);
-  vsprintf (buf, iText, arg);
+  buf.FormatV (iText, arg);
   va_end (arg);
 
   G2D->Write (console_font, x, y, fg, bg, buf);

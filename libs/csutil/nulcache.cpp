@@ -44,7 +44,7 @@ void csNullCacheManager::SetCurrentScope (const char*)
 {
 }
 
-bool csNullCacheManager::CacheData (void*, size_t,
+bool csNullCacheManager::CacheData (const void*, size_t,
   	const char*, const char*, uint32)
 {
   return false;

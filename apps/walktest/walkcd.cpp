@@ -263,7 +263,7 @@ void DoGravity (iEngine* Engine, csVector3& pos, csVector3& vel)
 
 #if 0
     if (num_our_cd > 0)
-	printf ("body: hits=%d num_our_cd=%d\n", hits, num_our_cd);
+	csPrintf ("body: hits=%d num_our_cd=%d\n", hits, num_our_cd);
 #endif
     for (j=0 ; j<num_our_cd; j++)
     {

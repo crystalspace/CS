@@ -572,7 +572,7 @@ void ltThing::SplitThingSeparateUnits ()
     max_obj_number++;
     PaintConnectedPolygons (sweep, max_obj_number);
   }
-  printf ("Found %d sub-objects\n", max_obj_number); fflush (stdout);
+  csPrintf ("Found %d sub-objects\n", max_obj_number); fflush (stdout);
 }
 
 void ltThing::DoNotSplitThingSeparateUnits ()
@@ -1044,14 +1044,15 @@ void LevTool::SplitThing (iDocumentNode* meshnode, iDocumentNode* parentnode)
 	if (j == 0)
 	{
           newmesh->SetAttribute ("name", th->GetName ());
-	  printf ("Processing '%s' ...\n", th->GetName ()); fflush (stdout);
+	  csPrintf ("Processing '%s' ...\n", th->GetName ()); fflush (stdout);
 	}
 	else
 	{
-	  char newname[512];
-	  sprintf (newname, "%s_%d", th->GetName (), j);
+	  csString newname;
+	  newname.Format ("%s_%d", th->GetName (), j);
           newmesh->SetAttribute ("name", newname);
-	  printf ("Processing '%s' ...\n", newname); fflush (stdout);
+	  csPrintf ("Processing '%s' ...\n", newname.GetData()); 
+	  fflush (stdout);
 	}
 
         csRef<iDocumentNodeIterator> it = meshnode->GetNodes ();
@@ -1478,7 +1479,7 @@ void LevTool::ListMeshPart (iDocumentNode* meshpart, int level)
   char indent[1024];
   int i; for (i = 0 ; i < level ; i++) indent[i] = ' '; indent[level] = 0;
   const char* name = meshpart->GetAttributeValue ("name");
-  printf ("%spart(%s)\n", indent, name);
+  csPrintf ("%spart(%s)\n", indent, name);
 }
 
 void LevTool::ListMeshObject (iDocumentNode* mesh, int level)
@@ -1488,7 +1489,7 @@ void LevTool::ListMeshObject (iDocumentNode* mesh, int level)
   const char* name = mesh->GetAttributeValue ("name");
   csRef<iDocumentNode> pluginnode = mesh->GetNode ("plugin");
   const char* plugin = pluginnode->GetContentsValue ();
-  printf ("%smeshobj(%s,%s)\n", indent, name, plugin);
+  csPrintf ("%smeshobj(%s,%s)\n", indent, name, plugin);
 
   if (IsMeshAThing (mesh))
   {
@@ -1515,7 +1516,7 @@ void LevTool::ListFactory (iDocumentNode* factory, int level)
   const char* name = factory->GetAttributeValue ("name");
   csRef<iDocumentNode> pluginnode = factory->GetNode ("plugin");
   const char* plugin = pluginnode->GetContentsValue ();
-  printf ("%smeshfact(%s,%s)\n", indent, name, plugin);
+  csPrintf ("%smeshfact(%s,%s)\n", indent, name, plugin);
 
   if (IsMeshAThing (factory))
   {
@@ -1540,7 +1541,7 @@ void LevTool::ListSector (iDocumentNode* sector, int level)
   char indent[1024];
   int i; for (i = 0 ; i < level ; i++) indent[i] = ' '; indent[level] = 0;
   const char* name = sector->GetAttributeValue ("name");
-  printf ("%ssector(%s)\n", indent, name);
+  csPrintf ("%ssector(%s)\n", indent, name);
   csRef<iDocumentNodeIterator> it = sector->GetNodes ();
   while (it->HasNext ())
   {
@@ -1556,7 +1557,7 @@ void LevTool::ListSector (iDocumentNode* sector, int level)
 
 void LevTool::ListContents (iDocumentNode* world)
 {
-  printf ("world\n");
+  csPrintf ("world\n");
   csRef<iDocumentNode> worldnode = world->GetNode ("world");
   csRef<iDocumentNodeIterator> it = worldnode->GetNodes ();
   while (it->HasNext ())
@@ -1595,7 +1596,7 @@ void LevTool::ValidateContents (ltThing* thing)
 	float d = plane.Distance (thing->GetVertex (pol->GetVertex (j)));
 	if (d > 0.01)
 	{
-	  printf ("WARNING! polygon '%s' in thing/part '%s' seems to be non-coplanar with distance %g\n",
+	  csPrintf ("WARNING! polygon '%s' in thing/part '%s' seems to be non-coplanar with distance %g\n",
 			  pol->GetName (), thing->GetName (), d);
 	}
       }
@@ -1655,56 +1656,56 @@ void LevTool::Main ()
 
   if (op == OP_HELP)
   {
-    printf ("levtool <options> <zipfile>\n");
-    printf ("  -list:\n");      
-    printf ("     List world contents.\n");
-    printf ("  -analyze:\n");         
-    printf ("     Analyze all things and show the distribution of size.\n");
-    printf ("              You can use this to decide on the 'minsize' parameter.\n");
-    printf ("  -validate:\n");        
-    printf ("     Validate world contents. This will currently check\n");
-    printf ("              only for non-coplanar polygons.\n");
-    printf ("  -compress:\n");        
-    printf ("     Compress all vertices and remove duplicate and unused vertices.\n");
-    printf ("     Unless you specify -nocompress, -dynavis does this by default.\n");
-    printf ("  -dynavis:\n");         
-    printf ("     Convert to Dynavis. This takes a level that uses\n");
-    printf ("     old style octree culler and convert it to Dynavis.\n");
-    printf ("     All objects will be split in their logical parts.\n");
-    printf ("  -splitunit:\n");       
-    printf ("     Split large things into separate units. A separate unit\n");
-    printf ("     is defined as a collection of connected polygons that doesn't\n");
-    printf ("     connect with any other polygon from the thing.\n");
-    printf ("     This option will first do -compress.\n");
-    printf ("     -minsize=<percent>: Only split objects larger than the given\n");
-    printf ("     percentage. Default 20%%.\n");
-    printf ("  -splitgeom:\n");       
-    printf ("     Split large things geometrically. After doing this you\n");
-    printf ("     should run levtool with -compress option for efficiency.\n");
-    printf ("     -minsize=<percent>: Only split objects larger than the given\n");
-    printf ("     percentage. Default 20%%.\n");
-    printf ("  -flagclear:\n");       
-    printf ("     Clear all goodoccluder/badoccluder flags.\n");
-    printf ("  -flaggood:\n");        
-    printf ("     Add goodoccluder flag for all things that satisfy\n");
-    printf ("     conditions defined by the following flags:\n");
-    printf ("     -minsize=<percent>: min object size (default 10%%).\n");
-    printf ("     -maxsize=<percent>: max object size (default 100%%).\n");
-    printf ("     -minpoly=<number>: min number of polygons (default 1).\n");
-    printf ("     -maxpoly=<number>: max number of polygons (default 50).\n");
-    printf ("  -flagbad:\n");         
-    printf ("     Add badoccluder flag for all things that satisfy\n");
-    printf ("     conditions defined by the following flags:\n");
-    printf ("     -minsize=<percent>: mim object size (default 0%%).\n");
-    printf ("     -maxsize=<percent>: max object size (default 3%%).\n");
-    printf ("     -minpoly=<number>: min number of polygons (default 6).\n");
-    printf ("     -maxpoly=<number>: max number of polygons (default 1000000000).\n");
-    printf ("  -planes:\n");          
-    printf ("     Move all 'addon' planes to the polygons that use them.\n");
-    printf ("  -inds=<plugin>:\n");       
-    printf ("     Document system plugin for reading world.\n");
-    printf ("  -outds=<plugin>:\n");       
-    printf ("     Document system plugin for writing world.\n");
+    csPrintf ("levtool <options> <zipfile>\n");
+    csPrintf ("  -list:\n");      
+    csPrintf ("     List world contents.\n");
+    csPrintf ("  -analyze:\n");         
+    csPrintf ("     Analyze all things and show the distribution of size.\n");
+    csPrintf ("              You can use this to decide on the 'minsize' parameter.\n");
+    csPrintf ("  -validate:\n");        
+    csPrintf ("     Validate world contents. This will currently check\n");
+    csPrintf ("              only for non-coplanar polygons.\n");
+    csPrintf ("  -compress:\n");        
+    csPrintf ("     Compress all vertices and remove duplicate and unused vertices.\n");
+    csPrintf ("     Unless you specify -nocompress, -dynavis does this by default.\n");
+    csPrintf ("  -dynavis:\n");         
+    csPrintf ("     Convert to Dynavis. This takes a level that uses\n");
+    csPrintf ("     old style octree culler and convert it to Dynavis.\n");
+    csPrintf ("     All objects will be split in their logical parts.\n");
+    csPrintf ("  -splitunit:\n");       
+    csPrintf ("     Split large things into separate units. A separate unit\n");
+    csPrintf ("     is defined as a collection of connected polygons that doesn't\n");
+    csPrintf ("     connect with any other polygon from the thing.\n");
+    csPrintf ("     This option will first do -compress.\n");
+    csPrintf ("     -minsize=<percent>: Only split objects larger than the given\n");
+    csPrintf ("     percentage. Default 20%%.\n");
+    csPrintf ("  -splitgeom:\n");       
+    csPrintf ("     Split large things geometrically. After doing this you\n");
+    csPrintf ("     should run levtool with -compress option for efficiency.\n");
+    csPrintf ("     -minsize=<percent>: Only split objects larger than the given\n");
+    csPrintf ("     percentage. Default 20%%.\n");
+    csPrintf ("  -flagclear:\n");       
+    csPrintf ("     Clear all goodoccluder/badoccluder flags.\n");
+    csPrintf ("  -flaggood:\n");        
+    csPrintf ("     Add goodoccluder flag for all things that satisfy\n");
+    csPrintf ("     conditions defined by the following flags:\n");
+    csPrintf ("     -minsize=<percent>: min object size (default 10%%).\n");
+    csPrintf ("     -maxsize=<percent>: max object size (default 100%%).\n");
+    csPrintf ("     -minpoly=<number>: min number of polygons (default 1).\n");
+    csPrintf ("     -maxpoly=<number>: max number of polygons (default 50).\n");
+    csPrintf ("  -flagbad:\n");         
+    csPrintf ("     Add badoccluder flag for all things that satisfy\n");
+    csPrintf ("     conditions defined by the following flags:\n");
+    csPrintf ("     -minsize=<percent>: mim object size (default 0%%).\n");
+    csPrintf ("     -maxsize=<percent>: max object size (default 3%%).\n");
+    csPrintf ("     -minpoly=<number>: min number of polygons (default 6).\n");
+    csPrintf ("     -maxpoly=<number>: max number of polygons (default 1000000000).\n");
+    csPrintf ("  -planes:\n");          
+    csPrintf ("     Move all 'addon' planes to the polygons that use them.\n");
+    csPrintf ("  -inds=<plugin>:\n");       
+    csPrintf ("     Document system plugin for reading world.\n");
+    csPrintf ("  -outds=<plugin>:\n");       
+    csPrintf ("     Document system plugin for writing world.\n");
     return;
   }
 
@@ -1923,7 +1924,7 @@ void LevTool::Main ()
 	csTicks analyze_end = csGetTicks();
 	Report (CS_REPORTER_SEVERITY_NOTIFY, " time taken: %f s",
 	  (float)(analyze_end - analyze_start) / (float)1000);
-	printf ("Global bounding box: (%g,%g,%g) - (%g,%g,%g)\n",
+	csPrintf ("Global bounding box: (%g,%g,%g) - (%g,%g,%g)\n",
 		global_bbox.MinX (), global_bbox.MinY (), global_bbox.MinZ (),
 		global_bbox.MaxX (), global_bbox.MaxY (), global_bbox.MaxZ ());
 	float global_area = (global_bbox.MaxX () - global_bbox.MinX ()) *
@@ -1948,7 +1949,7 @@ void LevTool::Main ()
 	for (i = 0 ; i <= 50 ; i++)
 	{
 	  sum += counts[i];
-	  printf ("  %3zu%% #local=%-5d #<=thissize=%d\n",
+	  csPrintf ("  %3zu%% #local=%-5d #<=thissize=%d\n",
 		  (i * 2), counts[i], sum);
 	}
 	fflush (stdout);
@@ -2147,7 +2148,7 @@ void LevTool::Main ()
 	cnt = 0;
 	CloneAndChangeFlags (doc, newdoc, op, minsize, maxsize,
 		minpoly, maxpoly, global_area);
-	if (op != OP_FLAGCLEAR) printf ("%d things flagged!\n", cnt);
+	if (op != OP_FLAGCLEAR) csPrintf ("%d things flagged!\n", cnt);
         error = newdoc->Write (vfs, filename);
 	if (error != 0)
 	{

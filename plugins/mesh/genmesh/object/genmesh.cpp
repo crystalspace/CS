@@ -28,6 +28,7 @@
 #include "csutil/csendian.h"
 #include "csutil/csmd5.h"
 #include "csutil/memfile.h"
+#include "csutil/sysfunc.h"
 #include "iengine/shadows.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
@@ -71,7 +72,7 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObject)
       scfCompatibleVersion(iVersion, scfInterface<iPolygonMesh>::GetVersion()))
     {
 #ifdef CS_DEBUG
-      printf ("Deprecated feature use: iPolygonMesh queried from Genmesh "
+      csPrintf ("Deprecated feature use: iPolygonMesh queried from Genmesh "
     "object; use iMeshObject->GetObjectModel()->"
     "GetPolygonMeshColldet() instead.\n");
 #endif
@@ -1055,7 +1056,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     if (!mater) mater = factory->GetMaterialWrapper ();
     if (!mater)
     {
-      printf ("INTERNAL ERROR: mesh used without material!\n");
+      csPrintf ("INTERNAL ERROR: mesh used without material!\n");
       return 0;
     }
 
@@ -1129,7 +1130,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
       if (!mater) mater = factory->GetMaterialWrapper ();
       if (!mater)
       {
-        printf ("INTERNAL ERROR: mesh used without material!\n");
+        csPrintf ("INTERNAL ERROR: mesh used without material!\n");
         return 0;
       }
 
@@ -1444,7 +1445,7 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory)
     if (iInterfaceID == iPolygonMesh_scfID &&
       scfCompatibleVersion(iVersion, scfInterface<iPolygonMesh>::GetVersion()))
     {
-      printf ("Deprecated feature use: iPolygonMesh queried from GenMesh "
+      csPrintf ("Deprecated feature use: iPolygonMesh queried from GenMesh "
         "factory; use iObjectModel->GetPolygonMeshColldet() instead.\n");
       iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
       (Object)->IncRef ();

@@ -240,11 +240,11 @@ bool ViewMesh::HandleEvent (iEvent &event)
 
 void ViewMesh::Help ()
 {
-  printf ("Options for ViewMesh:\n");
-  printf ("  -L=<file>          Load a library file (for textures/materials)\n");
-  printf ("  -Scale=<ratio>     Scale the Object\n");
-  printf ("  -RoomSize=<units>  Radius and height (4*) of the room (default 5)\n");
-  printf ("  <file>             Load the specified mesh object (meshfact or library)\n");
+  csPrintf ("Options for ViewMesh:\n");
+  csPrintf ("  -L=<file>          Load a library file (for textures/materials)\n");
+  csPrintf ("  -Scale=<ratio>     Scale the Object\n");
+  csPrintf ("  -RoomSize=<units>  Radius and height (4*) of the room (default 5)\n");
+  csPrintf ("  <file>             Load the specified mesh object (meshfact or library)\n");
 }
 
 void ViewMesh::HandleCommandLine()
@@ -1710,7 +1710,7 @@ void ViewMesh::StdDlgDirSelect (intptr_t awst, iAwsSource *s)
 
   if (!text->GetData()) return;
 
-  printf("cd %s\n",text->GetData());
+  csPrintf("cd %s\n",text->GetData());
 
   iString* path = 0;
   iAwsComponent* inputpath = tut->stddlg->FindChild("InputPath");
@@ -1722,7 +1722,7 @@ void ViewMesh::StdDlgDirSelect (intptr_t awst, iAwsSource *s)
   if (csString("..") == *text)
   {
     size_t i = newpath->Slice(0,newpath->Length()-1)->FindLast('/')+1;
-    printf("%zu", i);
+    csPrintf("%zu", i);
     newpath = newpath->Slice(0,i);
   }
   else

@@ -237,7 +237,7 @@ void CISector::InsertThings(CIWorld* pWorld)
       {
         CMapBrush* pBrush = pEntity->GetBrush(j);
         BrushesProcessed++;
-        printf("Adding Things: %.1f%%\r", BrushesProcessed*100.0/BrushesToProcess);
+        csPrintf("Adding Things: %.1f%%\r", BrushesProcessed*100.0/BrushesToProcess);
 
         if (pBrush->GetBoundingBox()->Intersects(m_pOriginalBrush->GetBoundingBox()))
         {
@@ -316,7 +316,7 @@ void CISector::InsertThings(CIWorld* pWorld)
     } //if entity has brushes or curves
   } //for entity
 
-  printf("                      \r");
+  csPrintf("                      \r");
 }
 
 

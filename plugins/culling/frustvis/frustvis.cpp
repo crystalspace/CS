@@ -1167,7 +1167,7 @@ void csFrustumVis::CastShadows (iFrustumView* fview)
   CS_ASSERT (lf->GetVertexCount () <= 31);
   if (lf->GetVertexCount () > 31)
   {
-    printf ("INTERNAL ERROR! #vertices in GetVisibleObjects() exceeded!\n");
+    csPrintf ("INTERNAL ERROR! #vertices in GetVisibleObjects() exceeded!\n");
     fflush (stdout);
     return;
   }

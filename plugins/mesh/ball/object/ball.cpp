@@ -20,6 +20,7 @@
 #include "csgfx/renderbuffer.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math.h"
+#include "csutil/sysfunc.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "ivideo/graph3d.h"
@@ -53,7 +54,7 @@ SCF_IMPLEMENT_IBASE (csBallMeshObject)
       scfCompatibleVersion(iVersion, scfInterface<iPolygonMesh>::GetVersion()))
     {
 #ifdef CS_DEBUG
-      printf ("Deprecated feature use: iPolygonMesh queried from Ball "
+      csPrintf ("Deprecated feature use: iPolygonMesh queried from Ball "
 	"object; use iMeshObject->GetObjectModel()->"
 	"GetPolygonMeshColldet() instead.\n");
 #endif
@@ -573,7 +574,7 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
 
   if (!mater)
   {
-    printf ("INTERNAL ERROR: mesh used without material!\n");
+    csPrintf ("INTERNAL ERROR: mesh used without material!\n");
     return 0;
   }
   UpdateBuffers ();
@@ -807,7 +808,7 @@ static void GetGradientColor(float **gradient, float val, csColor& col)
   col.red = gradient[entry-1][1] * sc2 + gradient[entry][1] * sc1;
   col.green = gradient[entry-1][2] * sc2 + gradient[entry][2] * sc1;
   col.blue = gradient[entry-1][3] * sc2 + gradient[entry][3] * sc1;
-  //printf("val %g, entry %d gives %g,%g,%g\n", val, entry,
+  //csPrintf("val %g, entry %d gives %g,%g,%g\n", val, entry,
    // col.red, col.green,  col.blue);
 }
 
@@ -816,7 +817,7 @@ void csBallMeshObject::ApplyVertGradient(float horizon_height,
 {
   SetupObject();
   CS_ASSERT( zenith_height > horizon_height );
-  //printf("ApplyVertGradient\n");
+  //csPrintf("ApplyVertGradient\n");
   float invdist = 1.0f / (zenith_height - horizon_height);
   csColor color(0,0,0);
   for(int i=0; i<num_ball_vertices; i++)
@@ -982,7 +983,7 @@ void csBallMeshObject::PaintSky (float time, float **dayvert, float **nightvert,
   apparent += skyatsun;
   apparent.Clamp(2.0f, 2.0f, 2.0f);
   apparent.ClampDown();
-  //printf("Apparent is %g, %g, %g\n", apparent.red, apparent.green,
+  //csPrintf("Apparent is %g, %g, %g\n", apparent.red, apparent.green,
     //apparent.blue);
   for(i=0; i<num_ball_vertices; i++)
     if(ball_vertices[i].y < shift.y)

@@ -20,6 +20,7 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/sysfunc.h"
 #include "mayanode.h"
 #include "binarytree.h"
 
@@ -51,7 +52,7 @@ bool NodeTransform::Load(MayaInputFile& file)
         {
             file.GetToken(tok);
             SetName(tok);
-            printf("Transform Name is '%s'\n",(const char *)tok);
+            csPrintf("Transform Name is '%s'\n",(const char *)tok);
         }
         else if (tok == "setAttr")
         {
@@ -179,23 +180,23 @@ NodeMesh::NodeMesh(csVector3& trans,csVector3& s)
 void NodeMesh::PrintStats(FILE *s,int level)
 {
     PrintSpaces(s,level);
-    fprintf(s,"Mesh '%s':\n",(const char *)name);
+    csFPrintf(s,"Mesh '%s':\n",(const char *)name);
 
     PrintSpaces(s,level);
-    fprintf(s," (%d uv mappings)\n",count_uv);
+    csFPrintf(s," (%d uv mappings)\n",count_uv);
     PrintSpaces(s,level);
-    fprintf(s," (%d vertices)\n",count_vert);
+    csFPrintf(s," (%d vertices)\n",count_vert);
     PrintSpaces(s,level);
-    fprintf(s," (%d edges)\n",count_edge);
+    csFPrintf(s," (%d edges)\n",count_edge);
     PrintSpaces(s,level);
-    fprintf(s," (%d polys)\n",count_face);
+    csFPrintf(s," (%d polys)\n",count_face);
 
     DAGNode::PrintStats(s,level+1);
 }
 
 bool NodeMesh::Load(MayaInputFile& file)
 {
-    printf("In NodeMesh::Load.\n");
+    csPrintf("In NodeMesh::Load.\n");
     csString tok;
 
     bool stop = false;
@@ -208,13 +209,13 @@ bool NodeMesh::Load(MayaInputFile& file)
         {
             file.GetToken(tok);
             SetName(tok);
-            printf("Mesh Name is '%s'\n",(const char *)tok);
+            csPrintf("Mesh Name is '%s'\n",(const char *)tok);
         }
         else if (tok == "-p") // parent
         {
             file.GetToken(tok);
             this->SetParentName(tok);
-            printf("Parent of this Mesh is '%s'.\n",(const char *)tok);
+            csPrintf("Parent of this Mesh is '%s'.\n",(const char *)tok);
         }
         else if (tok == "setAttr")
         {
@@ -249,7 +250,7 @@ bool NodeMesh::LoadAttr(MayaInputFile& file)
 
             if (!strncmp(countname,".uvst[0].uvsp",13)) // UV mapping for vertices
             {
-                printf(" Need %d elements of %s.\n",countelem,(const char *)countname );
+                csPrintf(" Need %d elements of %s.\n",countelem,(const char *)countname );
 
                 u = new float[countelem];
                 v = new float[countelem];
@@ -269,7 +270,7 @@ bool NodeMesh::LoadAttr(MayaInputFile& file)
             }
             if (!strncmp(countname,".vt",3))           // Vertex list
             {
-                printf(" Need %d elements of %s.\n",countelem,(const char *)countname );
+                csPrintf(" Need %d elements of %s.\n",countelem,(const char *)countname );
 
                 /**
                  * We allocate as many vertices as there are UV mappings because
@@ -291,7 +292,7 @@ bool NodeMesh::LoadAttr(MayaInputFile& file)
             }
             if (!strncmp(countname,".ed",3))           // Edge list
             {
-                printf(" Need %d elements of %s.\n",countelem,(const char *)countname );
+                csPrintf(" Need %d elements of %s.\n",countelem,(const char *)countname );
 
                 edgestart = new int[countelem];
                 edgestop  = new int[countelem];
@@ -306,7 +307,7 @@ bool NodeMesh::LoadAttr(MayaInputFile& file)
             }
             if (!strncmp(countname,".fc",3))           // Face list
             {
-                printf(" Need %d elements of %s.\n",countelem,(const char *)countname );
+                csPrintf(" Need %d elements of %s.\n",countelem,(const char *)countname );
 
                 faceedge = new csTriangle[countelem];
                 tri_normals = new csVector3[countelem];
@@ -378,7 +379,7 @@ bool NodeMesh::GetArrayRange(csString& token,int& startindex,int& stopindex)
 
 bool NodeMesh::LoadUVMap(MayaInputFile& file,csString& token)
 {
-    printf("  UV Map:\n");
+    csPrintf("  UV Map:\n");
     csString tok;
     int start,stop;
 
@@ -398,7 +399,7 @@ bool NodeMesh::LoadUVMap(MayaInputFile& file,csString& token)
     else
         file.PushToken(tok);
 
-    printf("   Loading UV Map values from %d to %d.\n",start,stop);
+    csPrintf("   Loading UV Map values from %d to %d.\n",start,stop);
 
     for (int i=start; i<=stop; i++)
     {
@@ -437,7 +438,7 @@ bool NodeMesh::LoadVertexList(MayaInputFile& file,csString& token)
     else
         file.PushToken(tok);
 
-    printf("   Loading Vertex Coordinates from %d to %d.\n",start,stop);
+    csPrintf("   Loading Vertex Coordinates from %d to %d.\n",start,stop);
 
     for (int i=start; i<=stop; i++)
     {
@@ -490,7 +491,7 @@ bool NodeMesh::LoadEdgeList(MayaInputFile& file,csString& token)
     else
         file.PushToken(tok);  // if not type then let the loop see this one
 
-    printf("   Loading Edge Vertices from %d to %d.\n",start,stop);
+    csPrintf("   Loading Edge Vertices from %d to %d.\n",start,stop);
 
     for (int i=start; i<=stop; i++)
     {
@@ -544,7 +545,7 @@ bool NodeMesh::LoadFaceList(MayaInputFile& file,csString& token)
     else
         file.PushToken(tok);  // needed in for loop
 
-    printf("   Loading Face values from %d to %d.\n",start,stop);
+    csPrintf("   Loading Face values from %d to %d.\n",start,stop);
 
     for (int i=start; i<=stop; i++)
     {
@@ -778,7 +779,7 @@ bool NodeMesh::WriteVertices(FILE *f)
 {
     for (int i=0; i<countcsverts; i++)
     {
-        fprintf(f,"        <v x=\"%f\" y=\"%f\" z=\"%f\" u=\"%f\" v=\"%f\"  nx=\"%f\" ny=\"%f\" nz=\"%f\" />\n",
+        csFPrintf(f,"        <v x=\"%f\" y=\"%f\" z=\"%f\" u=\"%f\" v=\"%f\"  nx=\"%f\" ny=\"%f\" nz=\"%f\" />\n",
                 CSVerts[i].vertex.x,
                 CSVerts[i].vertex.y,
                 CSVerts[i].vertex.z,
@@ -798,7 +799,7 @@ bool NodeMesh::WriteTriangles(FILE *f)
     //  direction, due to the Z axis reversal in other places in the code here.
     for (int i=0; i<count_face; i++)
     {
-        fprintf(f,"        <t v1=\"%d\" v2=\"%d\" v3=\"%d\" />\n",
+        csFPrintf(f,"        <t v1=\"%d\" v2=\"%d\" v3=\"%d\" />\n",
                 CSPoly[2][i],
                 CSPoly[1][i],
                 CSPoly[0][i]);
@@ -875,7 +876,7 @@ void NodeMesh::ApplyAnimDeltas(NodeAnimCurveTL *anim,int frame)
         if (n.IsZero())    // Arbitrary normal for vertex not used by ANY poly
         {
             n.Set(1,0,0);
-            printf("Warning:  Vertex %d is not used in any face or normals are not specified.\n",i);
+            csPrintf("Warning:  Vertex %d is not used in any face or normals are not specified.\n",i);
         }
 
         vertnorms[i] = n;  // Save so it is written out with the frame.
@@ -898,10 +899,10 @@ float NodeMesh::GetDisplacement(NodeAnimCurveTL *anim,int frame,int frame2,int v
 void NodeFile::PrintStats(FILE *s,int level)
 {
     PrintSpaces(s,level);
-    fprintf(s,"File '%s':\n",(const char *)name);
+    csFPrintf(s,"File '%s':\n",(const char *)name);
 
     PrintSpaces(s,level);
-    fprintf(s," (%s)\n",(const char *)filename);
+    csFPrintf(s," (%s)\n",(const char *)filename);
 
     DAGNode::PrintStats(s,level+1);
 }
@@ -920,7 +921,7 @@ bool NodeFile::Write(FILE *f)
     if (end)
         *end = 0;  // null terminate at dot.
 
-    fprintf(f,"      <material>%s</material> /* %s */\n",name+1,(const char *)filename);
+    csFPrintf(f,"      <material>%s</material> /* %s */\n",name+1,(const char *)filename);
 
     return true;
 }
@@ -939,7 +940,7 @@ bool NodeFile::Load(MayaInputFile& file)
         {
             file.GetToken(tok);
             SetName(tok);
-            printf("File Name is '%s'\n",(const char *)tok);
+            csPrintf("File Name is '%s'\n",(const char *)tok);
         }
         else if (tok == "setAttr")
         {
@@ -1007,7 +1008,7 @@ bool NodeFile::LoadFilenameAttr(MayaInputFile& file)
 
     file.GetToken(tok);  // This is filename, within parentheses.
     filename = tok;
-    printf(" Filename was <%s>\n",(const char *)filename);
+    csPrintf(" Filename was <%s>\n",(const char *)filename);
 
     file.GetToken(tok);
     if (tok == ":") // check for special case of path including drive letter
@@ -1051,12 +1052,12 @@ NodeAnimCurveTL::NodeAnimCurveTL(int vertices)
 void NodeAnimCurveTL::PrintStats(FILE *s,int level)
 {
     PrintSpaces(s,level);
-    fprintf(s,"Animation '%s':\n",(const char *)name);
+    csFPrintf(s,"Animation '%s':\n",(const char *)name);
 
     PrintSpaces(s,level);
-    fprintf(s," (%d animated vertices)\n",totalcurves/3);
+    csFPrintf(s," (%d animated vertices)\n",totalcurves/3);
     PrintSpaces(s,level);
-    fprintf(s," (%d frames)\n",frames);
+    csFPrintf(s," (%d frames)\n",frames);
 
     DAGNode::PrintStats(s,level+1);
 }
@@ -1091,7 +1092,7 @@ bool NodeAnimCurveTL::Load(MayaInputFile& file)
         {
             file.GetToken(tok);
             SetName(tok);
-//            printf("Anim Curve Name is '%s'...",(const char *)tok);
+//            csPrintf("Anim Curve Name is '%s'...",(const char *)tok);
 
             GetIndexCoord(tok,index,coord);
         }
@@ -1166,7 +1167,7 @@ bool NodeAnimCurveTL::LoadAttr(MayaInputFile& file)
 bool NodeAnimCurveTL::LoadCurveAttr(MayaInputFile& file)
 {
     char *coords = "xyz";
-    printf("Processing %d frame anim curve for %c coord of vertex %d.\n",frames,coords[coord],index);
+    csPrintf("Processing %d frame anim curve for %c coord of vertex %d.\n",frames,coords[coord],index);
 
     csString tok;
     file.GetToken(tok);

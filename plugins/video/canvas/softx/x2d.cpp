@@ -932,9 +932,9 @@ bool csGraphics2DXLib::HandleEvent (iEvent &Event)
    && (Event.Command.Code == cscmdCommandLineHelp)
    && object_reg)
   {
-    printf ("Options for X-Windows 2D graphics driver:\n");
-    printf ("  -sdepth=<depth>    set simulated depth (8, 15, 16, or 32) (default=none)\n");
-    printf ("  -XSHM/noXSHM       SHM extension (default '%sXSHM')\n",
+    csPrintf ("Options for X-Windows 2D graphics driver:\n");
+    csPrintf ("  -sdepth=<depth>    set simulated depth (8, 15, 16, or 32) (default=none)\n");
+    csPrintf ("  -XSHM/noXSHM       SHM extension (default '%sXSHM')\n",
       xshm ? "" : "no");
     return true;
   }

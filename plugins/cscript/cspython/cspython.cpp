@@ -146,7 +146,7 @@ bool csPython::HandleEvent(iEvent& e)
   {
 #undef indent
 #define indent "                     "
-    printf("Options for csPython plugin:\n"
+    csPrintf("Options for csPython plugin:\n"
 	   "  -python-enable-reporter\n"
 	   indent "Redirect sys.stdout and sys.stderr to iReporter\n"
 	   "  -python-enable-debugger\n"

@@ -1488,9 +1488,8 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
 
   if (reason)
   {
-    char data[500];
-    sprintf (
-      data,
+    csString data;
+    data.Format (
       "LMVERSION=%d\nNORMALLIGHTLEVEL=%d\nAMBIENT_RED=%d\nAMBIENT_GREEN=%d\nAMBIENT_BLUE=%d\nREFLECT=%d\nRADIOSITY=%d\nCOSINUS_FACTOR=%g\nLIGHTMAP_SIZE=%d\n",
       current.lm_version,
       current.normal_light_level,
@@ -1503,7 +1502,7 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
       current.lightmap_size);
     if (lightcache_mode & CS_ENGINE_CACHE_WRITE)
     {
-      cm->CacheData (data, strlen (data), "lm_precalc_info", 0, ~0);
+      cm->CacheData (data.GetData(), data.Length(), "lm_precalc_info", 0, ~0);
     }
     if (do_relight)
     {

@@ -147,7 +147,7 @@ csPtr<iBase> csLightningFactoryLoader::Parse (iDocumentNode* node,
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.lightning",
         iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.lightning\n");
+    csPrintf ("Load TYPE plugin crystalspace.mesh.object.lightning\n");
   }
   csRef<iMeshObjectFactory> fact;
   fact = type->NewFactory ();

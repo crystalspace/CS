@@ -106,8 +106,8 @@ bool CMapCurve::Read(CMapParser* pParser, CMapFile* pMap)
   if (!pParser->ExpectToken("}"))     return false;
   if (!pParser->ExpectToken("}"))     return false;
 
-  char Name[100];
-  sprintf(Name, "%d", CurveCounter++);
+  csString Name;
+  Name.Format ("%d", CurveCounter++);
   m_Name = Name;
 
   return true;

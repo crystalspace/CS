@@ -970,7 +970,7 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
   FullDistribute ();
   if (!Debug_CheckTree (str)) return csPtr<iString> (rc);
   dbdump = Debug_Statistics ();
-  printf ("Step 1: %s", dbdump->GetData ()); fflush (stdout);
+  csPrintf ("Step 1: %s", dbdump->GetData ()); fflush (stdout);
 
   //=================
   // Now we flatten the tree completely.
@@ -978,7 +978,7 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
   Flatten ();
   if (!Debug_CheckTree (str)) return csPtr<iString> (rc);
   dbdump = Debug_Statistics ();
-  printf ("Flat  : %s", dbdump->GetData ()); fflush (stdout);
+  csPrintf ("Flat  : %s", dbdump->GetData ()); fflush (stdout);
 
   //=================
   // Do a FullDistribute() again. Since we now start from a flattened
@@ -988,7 +988,7 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
   FullDistribute ();
   if (!Debug_CheckTree (str)) return csPtr<iString> (rc);
   dbdump = Debug_Statistics ();
-  printf ("Optim : %s", dbdump->GetData ()); fflush (stdout);
+  csPrintf ("Optim : %s", dbdump->GetData ()); fflush (stdout);
 
   //=================
   // Now we are going to test traversal. The crucial thing here is
@@ -1048,7 +1048,7 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
 	    	  "bad front2back sorting!");
 	      if (!(node_sqdist >= (max_nodesqdist-0.1)))
 	      {
-	        printf ("node_sqdist=%g max_nodesqdist=%g\n", node_sqdist,
+	        csPrintf ("node_sqdist=%g max_nodesqdist=%g\n", node_sqdist,
 	          max_nodesqdist);
 	      }
 	      KDT_ASSERT (node_sqdist >= (max_nodesqdist-0.1),
@@ -1074,7 +1074,7 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
   	"number of objects traversed doesn't match tree!");
   if (!Debug_CheckTree (str)) return rc;
   dbdump = Debug_Statistics ();
-  printf ("Traver: %s", dbdump->GetData ()); fflush (stdout);
+  csPrintf ("Traver: %s", dbdump->GetData ()); fflush (stdout);
 
   rc->DecRef ();
   return 0;
@@ -1144,10 +1144,10 @@ csTicks csKDTree::Debug_Benchmark (int num_iterations)
 
   csTicks pass4 = csGetTicks ();
 
-  printf ("Creating the tree:        %zu ms\n", pass1-pass0);
-  printf ("Unoptimized Front2Back:   %zu ms\n", pass2-pass1);
-  printf ("Flatten + FullDistribute: %zu ms\n", pass3-pass2);
-  printf ("Optimized Front2Back:     %zu ms\n", pass4-pass3);
+  csPrintf ("Creating the tree:        %zu ms\n", pass1-pass0);
+  csPrintf ("Unoptimized Front2Back:   %zu ms\n", pass2-pass1);
+  csPrintf ("Flatten + FullDistribute: %zu ms\n", pass3-pass2);
+  csPrintf ("Optimized Front2Back:     %zu ms\n", pass4-pass3);
 
   return pass4-pass0;
 }

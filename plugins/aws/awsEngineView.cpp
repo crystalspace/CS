@@ -35,8 +35,6 @@ awsEngineView::~awsEngineView ()
 
 bool awsEngineView::SetProperty (const char* name, intptr_t parm)
 {
-  int i = strcmp (name, "view");
-  printf ("%d", i);
   if (strcmp (name, "view") == 0)
   {
     if (view)

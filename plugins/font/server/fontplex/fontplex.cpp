@@ -158,12 +158,12 @@ bool csFontServerMultiplexor::Initialize (iObjectRegistry *object_reg)
   }
 
   // Query the auxiliary font servers in turn
-  char tag [20];
+  csString tag;
   int idx;
   int errorcount = 0;
   for (idx = 1; ; idx++)
   {
-    sprintf (tag, "iFontServer.%d", idx);
+    tag.Format ("iFontServer.%d", idx);
     csRef<iBase> b (CS_QUERY_REGISTRY_TAG (object_reg, tag));
     if (!b) 
     {

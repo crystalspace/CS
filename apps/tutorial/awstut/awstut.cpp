@@ -63,21 +63,21 @@ void AwsTutorial::SetPass (intptr_t awst, iAwsSource *)
 {
   AwsTutorial* tut = (AwsTutorial*)awst;
   (void)tut; // @@@ TODO
-  printf ("SetPass\n"); fflush (stdout);
+  csPrintf ("SetPass\n"); fflush (stdout);
 }
 
 void AwsTutorial::SetUser (intptr_t awst, iAwsSource *)
 {
   AwsTutorial* tut = (AwsTutorial*)awst;
   (void)tut; // @@@ TODO
-  printf ("SetUser\n"); fflush (stdout);
+  csPrintf ("SetUser\n"); fflush (stdout);
 }
 
 void AwsTutorial::Login (intptr_t awst, iAwsSource *)
 {
   AwsTutorial* tut = (AwsTutorial*)awst;
   (void)tut; // @@@ TODO
-  printf ("Login\n"); fflush (stdout);
+  csPrintf ("Login\n"); fflush (stdout);
 }
 
 bool AwsTutorial::Initialize (int argc, const char* const argv[])

@@ -18,7 +18,7 @@ awsTest *System;
 int
 main(int argc, char *argv[])
 {
-  printf("Beginning test of AWS as a plugin...\n");
+  csPrintf("Beginning test of AWS as a plugin...\n");
 
   // Create our main class.
   System = new awsTest();

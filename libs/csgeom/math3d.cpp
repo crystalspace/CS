@@ -32,6 +32,7 @@
 #include "csgeom/pmtools.h"
 #include "igeom/polymesh.h"
 #include "csutil/scfstr.h"
+#include "csutil/sysfunc.h"
 
 //---------------------------------------------------------------------------
 bool csMath3::FindIntersection (
@@ -1497,14 +1498,14 @@ csPtr<iString> csGeomDebugHelper::UnitTest ()
   for (i = 0 ; i < 8 ; i++)
   {
     csVector3 v = obb.GetCorner (i);
-    printf ("%d %g,%g,%g\n", i, v.x, v.y, v.z);
+    csPrintf ("%d %g,%g,%g\n", i, v.x, v.y, v.z);
     fflush (stdout);
   }
   obb.FindOBBAccurate (vertex_table, 4);
   for (i = 0 ; i < 8 ; i++)
   {
     csVector3 v = obb.GetCorner (i);
-    printf ("%d %g,%g,%g\n", i, v.x, v.y, v.z);
+    csPrintf ("%d %g,%g,%g\n", i, v.x, v.y, v.z);
     fflush (stdout);
   }
 
@@ -1534,7 +1535,7 @@ csPtr<iString> csGeomDebugHelper::UnitTest ()
   for (i = 0 ; i < 8 ; i++)
   {
     csVector3 v = obb.GetCorner (i);
-    printf ("%d %g,%g,%g\n", i, v.x, v.y, v.z);
+    csPrintf ("%d %g,%g,%g\n", i, v.x, v.y, v.z);
     fflush (stdout);
   }
 

@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/csstring.h"
 #include "csutil/scfstr.h"
+#include "csutil/sysfunc.h"
 #include "iaws/awsparm.h"
 #include "iengine/engine.h"
 #include "iutil/vfs.h"
@@ -1162,7 +1163,7 @@ void awsSink::SectionListSelectionChanged(intptr_t sk, iAwsSource *source)
         asink->AgingMomentsData.iawscomponent_AgingMoments->Hide();
       break;
     default:
-      printf("Unhandled section state change %d.\n",i);
+      csPrintf("Unhandled section state change %d.\n",i);
       break;
   }
 

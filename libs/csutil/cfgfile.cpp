@@ -23,6 +23,7 @@
 #include "csutil/physfile.h"
 #include "csutil/util.h"
 #include "csutil/snprintf.h"
+#include "csutil/sysfunc.h"
 #include "iutil/vfs.h"
 #include <ctype.h>
 
@@ -132,7 +133,7 @@ void csConfigNode::SetInt(int n)
 {
   char output [32];
   cs_snprintf (output, sizeof(output), "%d", n);
-  //sprintf (output, "%d", n);
+  //scsPrintf (output, "%d", n);
   SetStr (output);
 }
 
@@ -140,7 +141,7 @@ void csConfigNode::SetFloat(float f)
 {
   char output [64];
   cs_snprintf (output, sizeof(output), "%g", f);
-  //sprintf (output, "%g", f);
+  //scsPrintf (output, "%g", f);
   SetStr (output);
 }
 
@@ -739,7 +740,7 @@ void csConfigFile::LoadFromBuffer(char *Filedata, bool overwrite)
       // if no equal sign, this is an invalid line
       if (!t)
       {
-        fprintf(stderr, "Missing `=' on line %d of %s\n", Line,
+        csFPrintf(stderr, "Missing `=' on line %d of %s\n", Line,
 	  (Filename ? Filename : "configuration data"));
         CurrentComment.Clear();
         continue;
@@ -747,7 +748,7 @@ void csConfigFile::LoadFromBuffer(char *Filedata, bool overwrite)
       // check for missing key name
       if (t == Filedata)
       {
-        fprintf(stderr, "Missing key name (before `=') on line %d of %s\n",
+        csFPrintf(stderr, "Missing key name (before `=') on line %d of %s\n",
 	  Line, (Filename ? Filename : "configuration data"));
         CurrentComment.Clear();
         continue;

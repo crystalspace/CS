@@ -379,7 +379,7 @@ void csConsoleOutput::Draw2D (csRect *area)
     {
 #ifdef CS_DEBUG
       if (cx != 0)
-	printf (
+	csPrintf (
 	  "csConsoleOutput:  Current line is empty but cursor x != 0!\n");
 #endif // CS_DEBUG
       cx_pix = 1;
@@ -411,7 +411,7 @@ void csConsoleOutput::Draw2D (csRect *area)
         break;
 #ifdef CS_DEBUG
       default:
-        printf ("csConsoleOutput:  Invalid cursor setting!\n");
+        csPrintf ("csConsoleOutput:  Invalid cursor setting!\n");
 #endif // CS_DEBUG
     }
   }

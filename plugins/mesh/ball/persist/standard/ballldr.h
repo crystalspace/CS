@@ -40,7 +40,6 @@ class csBallFactoryLoader : public iLoaderPlugin
 {
 private:
   iObjectRegistry* object_reg;
-  csRef<iReporter> reporter;
 
 public:
   SCF_DECLARE_IBASE;
@@ -72,7 +71,6 @@ public:
 class csBallFactorySaver : public iSaverPlugin
 {
 private:
-  csRef<iReporter> reporter;
   iObjectRegistry* object_reg;
 
 public:
@@ -105,7 +103,6 @@ class csBallLoader : public iLoaderPlugin
 {
 private:
   iObjectRegistry* object_reg;
-  csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
   csStringHash xmltokens;
 
@@ -140,7 +137,6 @@ class csBallSaver : public iSaverPlugin
 {
 private:
   iObjectRegistry* object_reg;
-  csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
 
 public:

@@ -743,7 +743,7 @@ void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
       textFileName = LookForTextureFileName(kp->GetValue());
       if(!loader->LoadTexture(matName,textFileName))
       {
-        printf("Error loading %s texture!!",textFileName);
+        csPrintf("Error loading %s texture!!",textFileName);
       }
       //Material registered, let's go to another one
       delete [] matName;
@@ -1266,29 +1266,29 @@ bool CommandHandler (const char *cmd, const char *arg)
           {
 	    csOptionDescription odesc;
 	    if (!config->GetOptionDescription (i, &odesc)) break;
-	    char buf[256];
-	    sprintf (buf, "Option %s (%s) ", odesc.name, odesc.description);
+	    csString buf;
+	    buf.Format ("Option %s (%s) ", odesc.name, odesc.description);
 	    csVariant var;
 	    config->GetOption (i, &var);
 	    switch (odesc.type)
 	    {
 	      case CSVAR_LONG: Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      	"%sLONG=%ld", buf, var.GetLong ());
+	      	"%sLONG=%ld", buf.GetData(), var.GetLong ());
 		break;
 	      case CSVAR_BOOL: Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      	"%sBOOL=%d", buf, (int)var.GetBool ());
+	      	"%sBOOL=%d", buf.GetData(), (int)var.GetBool ());
 	        break;
 	      case CSVAR_CMD: Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      	"%sCMD", buf);
+	      	"%sCMD", buf.GetData());
 		break;
 	      case CSVAR_FLOAT: Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      	"%sFLOAT=%g", buf, var.GetFloat ());
+	      	"%sFLOAT=%g", buf.GetData(), var.GetFloat ());
 		break;
 	      case CSVAR_STRING: Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      	"%sSTRING=%s", buf, var.GetString ());
+	      	"%sSTRING=%s", buf.GetData(), var.GetString ());
 		break;
 	      default: Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      	"%s<unknown type>", buf);
+	      	"%s<unknown type>", buf.GetData());
 		break;
 	    }
           }
@@ -1346,7 +1346,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       //Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	//"Action polygon '%s'", p->GetStaticData ()->GetName ());
-      printf ("ACTION\n");
+      csPrintf ("ACTION\n");
       //Sys->ActivateObject ((csObject*)(ob->QueryObject ()));
     }
   }
@@ -1354,8 +1354,8 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     if (arg)
     {
-      char buf[255];
-      sprintf (buf, "/tmp/%s.rec", arg);
+      csString buf;
+      buf.Format ("/tmp/%s.rec", arg);
       SaveRecording (Sys->myVFS, buf);
     }
     else
@@ -1365,8 +1365,8 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     if (arg)
     {
-      char buf[255];
-      sprintf (buf, "/tmp/%s.rec", arg);
+      csString buf;
+      buf.Format ("/tmp/%s.rec", arg);
       LoadRecording (Sys->myVFS, buf);
     }
     else

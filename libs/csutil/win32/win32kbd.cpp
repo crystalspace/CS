@@ -841,7 +841,7 @@ const char* csWin32KeyboardDriver::GetVKName (LONG vKey)
   }
   else
   {
-    sprintf (genName, "[%ld]", vKey);
+    scsPrintf (genName, "[%ld]", vKey);
   }
   return genName;
 #endif

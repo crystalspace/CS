@@ -38,7 +38,6 @@ class csStarFactoryLoader : public iLoaderPlugin
 {
 private:
   iObjectRegistry* object_reg;
-  csRef<iReporter> reporter;
 
 public:
   SCF_DECLARE_IBASE;
@@ -71,7 +70,6 @@ class csStarFactorySaver : public iSaverPlugin
 {
 private:
   iObjectRegistry* object_reg;
-  csRef<iReporter> reporter;
 
 public:
   SCF_DECLARE_IBASE;
@@ -103,7 +101,6 @@ class csStarLoader : public iLoaderPlugin
 {
 private:
   iObjectRegistry* object_reg;
-  csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
   csStringHash xmltokens;
 

@@ -119,8 +119,8 @@ float rand2 (float max)
 
 InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z)
 {
-  char buf[50];
-  sprintf (buf, "r%d_%d_%d", x, y, z);
+  csString buf;
+  buf.Format ("r%d_%d_%d", x, y, z);
   iSector* room = engine->CreateSector (buf);
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
   csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),

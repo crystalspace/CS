@@ -51,10 +51,10 @@ CS_IMPLEMENT_APPLICATION
 // Utility function for safely converting a temporary csString into a (char
 // const*) without worrying about whether the csString will be destroyed before
 // the (char const*) is used. For instance, if Foo() returns a csString, given
-// the expression `printf("%s\n",Foo().GetData())', some older compilers will
-// destroy the temporary csString before printf() has a chance to utilize the
+// the expression `csPrintf("%s\n",Foo().GetData())', some older compilers will
+// destroy the temporary csString before csPrintf() has a chance to utilize the
 // result of GetData(). By interning the string temporarily, this problem can
-// be avoided. New usage: printf("%s\n",intern_str(Foo()))
+// be avoided. New usage: csPrintf("%s\n",intern_str(Foo()))
 #undef STR_QUEUE_SIZE
 #define STR_QUEUE_SIZE 10
 static char const* intern_str(csString const& s)
@@ -878,7 +878,7 @@ void PVSCalcSector::CollectGeometry (iMeshWrapper* mesh,
     bool closed = csPolygonMeshTools::IsMeshClosed (polybase);
     bool convex = csPolygonMeshTools::IsMeshConvex (polybase);
     if (convex || closed)
-    printf ("closed=%d convex=%d mesh=%s poly=%d %s\n",
+    csPrintf ("closed=%d convex=%d mesh=%s poly=%d %s\n",
      (int)closed, (int)convex, mesh->QueryObject ()->GetName (),
      polybase->GetPolygonCount (), (closed && convex) ?  "BOTH" : "");
 
@@ -1162,7 +1162,7 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
   plane.covbuf->InsertPolygonInvertedNoDepth (hull, hull_points);
 
   //csRef<iString> str = plane.covbuf->Debug_Dump ();
-  //printf ("%s\n", str->GetData ());
+  //csPrintf ("%s\n", str->GetData ());
 
   // We no longer need the hull points here.
   delete[] hull;
@@ -1586,7 +1586,7 @@ void PVSCalcSector::RecurseSourceNodes (PVSCalcNode* sourcenode,
   csTicks remaining = (csTicks)(average * nodecounter);
   float cull_quality = 100.0 * float (total_invisnodes) /
   	float (1 + total_visnodes + total_invisnodes);
-  printf ("\n#n=%d cnt=%d (tot=%us rem=%us avg=%gms) (cq=%g%%) ",
+  csPrintf ("\n#n=%d cnt=%d (tot=%us rem=%us avg=%gms) (cq=%g%%) ",
   	sourcenode->represented_nodes, nodecounter,
 	totaltime / 1000, remaining / 1000, average,
 	cull_quality);

@@ -313,7 +313,7 @@ bool CWad3File::Open(const char *filename)
   m_Filehandle = fopen(filename, "rb");
   if (!m_Filehandle)
   {
-    printf("Can't open %s!\n", filename);
+    csPrintf("Can't open %s!\n", filename);
     return false;
   }
 
@@ -322,7 +322,7 @@ bool CWad3File::Open(const char *filename)
   if (!Read(FileID)) return false;
   if (FileID != 0x33444157)
   {
-    printf("%s is not a valid WAD3 file!\n", filename);
+    csPrintf("%s is not a valid WAD3 file!\n", filename);
     return false;
   }
 

@@ -245,28 +245,28 @@ const char* csLightMap::ReadFromCache (
   //-------------------------------
   // Check if cached item is still valid.
   //-------------------------------
-  static char error_buf[512];
-  *error_buf = 0;
+  static csString error_buf;
+  error_buf.Empty();
   if (strncmp (ps.header, pswanted.header, 4) != 0)
-    sprintf (error_buf, "Cached lightmap header doesn't match!");
+    error_buf = "Cached lightmap header doesn't match!";
   else if (poly)
   {
     if (ps.lm_cnt != pswanted.lm_cnt)
-      sprintf (error_buf,
+      error_buf.Format (
       	"Cached lightmap header mismatch (got cnt=%" PRId32 ", expected %" PRId32 ")!",
 	ps.lm_cnt, pswanted.lm_cnt);
     else if (ps.lm_size != pswanted.lm_size)
-      sprintf (error_buf,
+      error_buf.Format (
       	"Cached lightmap base texture mismatch (got size=%" PRId32 ", expected %" PRId32 ")!",
 	ps.lm_size, pswanted.lm_size);
     else if (ps.x1 != pswanted.x1 || ps.y1 != pswanted.y1
     		|| ps.z1 != pswanted.z1)
-      sprintf (error_buf, "Cached lightmap first vertex mismatch!");
+      error_buf = "Cached lightmap first vertex mismatch!";
     else if (ps.x2 != pswanted.x2 || ps.y2 != pswanted.y2
     		|| ps.z2 != pswanted.z2)
-      sprintf (error_buf, "Cached lightmap second vertex mismatch!");
+      error_buf = "Cached lightmap second vertex mismatch!";
   }
-  if (*error_buf)
+  if (!error_buf.IsEmpty())
   {
     // Invalid.
     // First try to skip the cached lightmap.

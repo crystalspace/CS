@@ -136,7 +136,7 @@ bool csGraphics2DAA::Open ()
   context = aa_autoinit (&aa_defparams);
   if (context == 0)
   {
-    printf ("Cannot initialize AA-lib. Sorry\n");
+    csPrintf ("Cannot initialize AA-lib. Sorry\n");
     return false;
   }
   Width = aa_imgwidth (context);

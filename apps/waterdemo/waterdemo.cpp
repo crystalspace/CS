@@ -162,7 +162,7 @@ void csWaterDemo::SetupFrame ()
     csReversibleTransform ct = view->GetCamera()->GetTransform();
     const csVector3 camPos = ct.GetOrigin();
     const csVector3 camPlaneZ = ct.GetT2O().Col3 ();
-    printf ("(%g,%g,%g) (%g,%g,%g)\n", camPos.x, camPos.y, camPos.z,
+    csPrintf ("(%g,%g,%g) (%g,%g,%g)\n", camPos.x, camPos.y, camPos.z,
       camPlaneZ.x, camPlaneZ.y, camPlaneZ.z);
   }
   */

@@ -480,7 +480,7 @@ bool PartEdit::UpdateGen3D(EmitterList *elist,Emitter3DState *emitter_state)
 
 bool PartEdit::RecreateParticleSystem()
 {
-  printf("Attempting to load texture file '%s'\n",current_graphic.GetData());
+  csPrintf("Attempting to load texture file '%s'\n",current_graphic.GetData());
 
   // Unload old texture here?
  
@@ -490,7 +490,7 @@ bool PartEdit::RecreateParticleSystem()
   iMaterialWrapper *mat_wrap=engine->GetMaterialList()->FindByName(current_graphic);
   if (mat_wrap == 0)
   {
-    printf("Warning!  Could not find material named '%s' after load.\n",current_graphic.GetData());
+    csPrintf("Warning!  Could not find material named '%s' after load.\n",current_graphic.GetData());
     return false;
   }
 
@@ -538,92 +538,92 @@ void PartEdit::SaveEmitter3DStateRecursive(Emitter3DState *emitter_state,Emitter
     switch (use_emitter)
     {
     case EMITTER_LINE:
-      printf("<emitline>\n");
-      printf("    <min x=\"%f\" y=\"%f\" z=\"%f\">\n",emitter_state->line_start.x,emitter_state->line_start.y,emitter_state->line_start.z);
-      printf("    <max x=\"%f\" y=\"%f\" z=\"%f\">\n",emitter_state->line_end.x,emitter_state->line_end.y,emitter_state->line_end.z);
-      printf("</emitline>\n");
+      csPrintf("<emitline>\n");
+      csPrintf("    <min x=\"%f\" y=\"%f\" z=\"%f\">\n",emitter_state->line_start.x,emitter_state->line_start.y,emitter_state->line_start.z);
+      csPrintf("    <max x=\"%f\" y=\"%f\" z=\"%f\">\n",emitter_state->line_end.x,emitter_state->line_end.y,emitter_state->line_end.z);
+      csPrintf("</emitline>\n");
       return;
     case EMITTER_BOX:
-      printf("<emitbox>\n");
-      printf("    <min x=\"%f\" y=\"%f\" z=\"%f\">\n",emitter_state->box_min.x,emitter_state->box_min.y,emitter_state->box_min.z);
-      printf("    <max x=\"%f\" y=\"%f\" z=\"%f\">\n",emitter_state->box_max.x,emitter_state->box_max.y,emitter_state->box_max.z);
-      printf("</emitbox>\n");
+      csPrintf("<emitbox>\n");
+      csPrintf("    <min x=\"%f\" y=\"%f\" z=\"%f\">\n",emitter_state->box_min.x,emitter_state->box_min.y,emitter_state->box_min.z);
+      csPrintf("    <max x=\"%f\" y=\"%f\" z=\"%f\">\n",emitter_state->box_max.x,emitter_state->box_max.y,emitter_state->box_max.z);
+      csPrintf("</emitbox>\n");
       return;
     case EMITTER_CYLINDER:
-      printf("<emitcylinder p=\"%f\" q=\"%f\">\n",emitter_state->cylinder_min,emitter_state->cylinder_max);
-      printf("    <min x=\"%f\" y=\"%f\" z=\"%f\">\n",emitter_state->cylinder_start.x,emitter_state->cylinder_start.y,emitter_state->cylinder_start.z);
-      printf("    <max x=\"%f\" y=\"%f\" z=\"%f\">\n",emitter_state->cylinder_end.x,emitter_state->cylinder_end.y,emitter_state->cylinder_end.z);
-      printf("</emitcylinder>\n");
+      csPrintf("<emitcylinder p=\"%f\" q=\"%f\">\n",emitter_state->cylinder_min,emitter_state->cylinder_max);
+      csPrintf("    <min x=\"%f\" y=\"%f\" z=\"%f\">\n",emitter_state->cylinder_start.x,emitter_state->cylinder_start.y,emitter_state->cylinder_start.z);
+      csPrintf("    <max x=\"%f\" y=\"%f\" z=\"%f\">\n",emitter_state->cylinder_end.x,emitter_state->cylinder_end.y,emitter_state->cylinder_end.z);
+      csPrintf("</emitcylinder>\n");
       return;
     case EMITTER_CONE:
-      printf("<emitcone x=\"%f\" y=\"%f\" z=\"%f\" p=\"%f\" q=\"%f\" r=\"%f\" s=\"%f\" t=\"%f\"/>\n",
+      csPrintf("<emitcone x=\"%f\" y=\"%f\" z=\"%f\" p=\"%f\" q=\"%f\" r=\"%f\" s=\"%f\" t=\"%f\"/>\n",
         emitter_state->cone_origin.x,emitter_state->cone_origin.y,emitter_state->cone_origin.z,
         emitter_state->cone_elevation,emitter_state->cone_azimuth,emitter_state->cone_aperture,
         emitter_state->cone_min,emitter_state->cone_max);
       return;
     case EMITTER_SPHERE:
-      printf("<emitsphere x=\"%f\" y=\"%f\" z=\"%f\" p=\"%f\" q=\"%f\"/>\n",
+      csPrintf("<emitsphere x=\"%f\" y=\"%f\" z=\"%f\" p=\"%f\" q=\"%f\"/>\n",
         emitter_state->sphere_center.x,emitter_state->sphere_center.y,emitter_state->sphere_center.z,
         emitter_state->sphere_min,emitter_state->sphere_max);
       return;
     case EMITTER_SPHERETANGENT:
-      printf("<emitspheretangent x=\"%f\" y=\"%f\" z=\"%f\" p=\"%f\" q=\"%f\"/>\n",
+      csPrintf("<emitspheretangent x=\"%f\" y=\"%f\" z=\"%f\" p=\"%f\" q=\"%f\"/>\n",
         emitter_state->spheretangent_center.x,emitter_state->spheretangent_center.y,emitter_state->spheretangent_center.z,
         emitter_state->spheretangent_min,emitter_state->spheretangent_max);
       return;
     case EMITTER_CYLINDERTANGENT:
-      printf("<emitcylindertangent p=\"%f\" q=\"%f\">\n",emitter_state->cylindertangent_min,emitter_state->cylindertangent_max);
-      printf("    <min x=\"%f\" y=\"%f\" z=\"%f\">\n",emitter_state->cylindertangent_start.x,emitter_state->cylindertangent_start.y,emitter_state->cylindertangent_start.z);
-      printf("    <max x=\"%f\" y=\"%f\" z=\"%f\">\n",emitter_state->cylindertangent_end.x,emitter_state->cylindertangent_end.y,emitter_state->cylindertangent_end.z);
-      printf("</emitcylindertangent>\n");
+      csPrintf("<emitcylindertangent p=\"%f\" q=\"%f\">\n",emitter_state->cylindertangent_min,emitter_state->cylindertangent_max);
+      csPrintf("    <min x=\"%f\" y=\"%f\" z=\"%f\">\n",emitter_state->cylindertangent_start.x,emitter_state->cylindertangent_start.y,emitter_state->cylindertangent_start.z);
+      csPrintf("    <max x=\"%f\" y=\"%f\" z=\"%f\">\n",emitter_state->cylindertangent_end.x,emitter_state->cylindertangent_end.y,emitter_state->cylindertangent_end.z);
+      csPrintf("</emitcylindertangent>\n");
       return;
     case EMITTER_MIX:
-      printf("<emitmix>\n");
+      csPrintf("<emitmix>\n");
       if (emitter_state->fixed_weight > 0.0f)
       {
-        printf("    <weight>%f</weight>\n",emitter_state->fixed_weight);
+        csPrintf("    <weight>%f</weight>\n",emitter_state->fixed_weight);
         SaveEmitter3DStateRecursive(emitter_state,EMITTER_POINT);
       }
       if (emitter_state->line_weight > 0.0f)
       {
-        printf("    <weight>%f</weight>\n",emitter_state->line_weight);
+        csPrintf("    <weight>%f</weight>\n",emitter_state->line_weight);
         SaveEmitter3DStateRecursive(emitter_state,EMITTER_LINE);
       }
       if (emitter_state->box_weight > 0.0f)
       {
-        printf("    <weight>%f</weight>\n",emitter_state->box_weight);
+        csPrintf("    <weight>%f</weight>\n",emitter_state->box_weight);
         SaveEmitter3DStateRecursive(emitter_state,EMITTER_BOX);
       }
       if (emitter_state->cylinder_weight > 0.0f)
       {
-        printf("    <weight>%f</weight>\n",emitter_state->cylinder_weight);
+        csPrintf("    <weight>%f</weight>\n",emitter_state->cylinder_weight);
         SaveEmitter3DStateRecursive(emitter_state,EMITTER_CYLINDER);
       }
       if (emitter_state->cone_weight > 0.0f)
       {
-        printf("    <weight>%f</weight>\n",emitter_state->cone_weight);
+        csPrintf("    <weight>%f</weight>\n",emitter_state->cone_weight);
         SaveEmitter3DStateRecursive(emitter_state,EMITTER_CONE);
       }
       if (emitter_state->sphere_weight > 0.0f)
       {
-        printf("    <weight>%f</weight>\n",emitter_state->sphere_weight);
+        csPrintf("    <weight>%f</weight>\n",emitter_state->sphere_weight);
         SaveEmitter3DStateRecursive(emitter_state,EMITTER_SPHERE);
       }
       if (emitter_state->spheretangent_weight > 0.0f)
       {
-        printf("    <weight>%f</weight>\n",emitter_state->spheretangent_weight);
+        csPrintf("    <weight>%f</weight>\n",emitter_state->spheretangent_weight);
         SaveEmitter3DStateRecursive(emitter_state,EMITTER_SPHERETANGENT);
       }
       if (emitter_state->cylindertangent_weight > 0.0f)
       {
-        printf("    <weight>%f</weight>\n",emitter_state->cylindertangent_weight);
+        csPrintf("    <weight>%f</weight>\n",emitter_state->cylindertangent_weight);
         SaveEmitter3DStateRecursive(emitter_state,EMITTER_CYLINDERTANGENT);
       }
-      printf("</emitmix>\n");
+      csPrintf("</emitmix>\n");
       return;
     case EMITTER_POINT:
     default:
-      printf("<emitfixed x=\"%f\" y=\"%f\" z=\"%f\"/>\n",
+      csPrintf("<emitfixed x=\"%f\" y=\"%f\" z=\"%f\"/>\n",
         emitter_state->fixed_position.x,emitter_state->fixed_position.y,emitter_state->fixed_position.z);
       return;
     }
@@ -653,83 +653,83 @@ void PartEdit::SaveEmitter3DStateToFile(Emitter3DState *emitter_state)
 
 bool PartEdit::SaveEmitterToFile()
 {
-  printf("<!--PartEdit Emitter save BEGINS here-->\n\n");
+  csPrintf("<!--PartEdit Emitter save BEGINS here-->\n\n");
 
-  printf("<!--Paste the entries from this section into the plugins section in your map file-->\n");
-  printf("<plugins>\n    <plugin name=\"emitFact\">crystalspace.mesh.loader.factory.emit</plugin>\n    <plugin name=\"emit\">crystalspace.mesh.loader.emit</plugin>\n</plugins>\n");
+  csPrintf("<!--Paste the entries from this section into the plugins section in your map file-->\n");
+  csPrintf("<plugins>\n    <plugin name=\"emitFact\">crystalspace.mesh.loader.factory.emit</plugin>\n    <plugin name=\"emit\">crystalspace.mesh.loader.emit</plugin>\n</plugins>\n");
 
   // Dump texture def
-  printf("<!--Paste the entries from this section into the textures section in your map file-->\n");
-  printf("<textures>\n");
-  printf("    <texture name=\"%s\"><file>%s</file></texture>\n",current_graphic.GetData(),current_graphic.GetData());
-  printf("</textures>\n\n");
+  csPrintf("<!--Paste the entries from this section into the textures section in your map file-->\n");
+  csPrintf("<textures>\n");
+  csPrintf("    <texture name=\"%s\"><file>%s</file></texture>\n",current_graphic.GetData(),current_graphic.GetData());
+  csPrintf("</textures>\n\n");
 
   // Dump material def
-  printf("<!--Paste the entries from this section into the materials section in your map file-->\n");
-  printf("<materials>\n");
-  printf("    <material name=\"%s\"><texture>%s</texture></material>\n",current_graphic.GetData(),current_graphic.GetData());
-  printf("</materials>\n\n");
+  csPrintf("<!--Paste the entries from this section into the materials section in your map file-->\n");
+  csPrintf("<materials>\n");
+  csPrintf("    <material name=\"%s\"><texture>%s</texture></material>\n",current_graphic.GetData(),current_graphic.GetData());
+  csPrintf("</materials>\n\n");
 
-  printf("<!--Paste the entries from this section into your map file-->\n");
-  printf("<meshfact name=\"emitFact\"><plugin>emitFact</plugin><params /></meshfact>\n\n");
+  csPrintf("<!--Paste the entries from this section into your map file-->\n");
+  csPrintf("<meshfact name=\"emitFact\"><plugin>emitFact</plugin><params /></meshfact>\n\n");
 
-  printf("<!--Paste the entries from this section beneath a sector in your map file-->\n");
-  printf("<!--Be sure to adjust the x,y,z values in the move section to position the effect in your world-->\n");
-  printf("<!--You may want to adjust the priority and mix mode.  PartEdit does not currently handle these.-->\n");
-  printf("<meshobj name=\"partsysteminstance\">\n    <plugin>emit</plugin>\n    <znone />\n    <priority>alpha</priority>\n    <move>\n        <v x=\"0\" y=\"0\" z=\"0\" />\n    </move>\n");
-  printf("    <params>\n        <factory>emitFact</factory>\n        <mixmode>\n            <add />\n        </mixmode>\n");
-  printf("        <number>%d</number>\n",state_emitter.particle_count);
-  printf("        <material>mymaterial</material>\n");
+  csPrintf("<!--Paste the entries from this section beneath a sector in your map file-->\n");
+  csPrintf("<!--Be sure to adjust the x,y,z values in the move section to position the effect in your world-->\n");
+  csPrintf("<!--You may want to adjust the priority and mix mode.  PartEdit does not currently handle these.-->\n");
+  csPrintf("<meshobj name=\"partsysteminstance\">\n    <plugin>emit</plugin>\n    <znone />\n    <priority>alpha</priority>\n    <move>\n        <v x=\"0\" y=\"0\" z=\"0\" />\n    </move>\n");
+  csPrintf("    <params>\n        <factory>emitFact</factory>\n        <mixmode>\n            <add />\n        </mixmode>\n");
+  csPrintf("        <number>%d</number>\n",state_emitter.particle_count);
+  csPrintf("        <material>mymaterial</material>\n");
   if (state_emitter.rectangular_particles)
-    printf("        <rectparticles w=\"%f\" h=\"%f\" />\n",state_emitter.rect_w,state_emitter.rect_h);
+    csPrintf("        <rectparticles w=\"%f\" h=\"%f\" />\n",state_emitter.rect_w,state_emitter.rect_h);
   else
-    printf("        <regularparticles sides=\"%d\" radius=\"%f\">\n",state_emitter.reg_number,state_emitter.reg_radius);
-  printf("        <lighting>%s</lighting>\n",state_emitter.lighting ? "on" : "off");
-  printf("        <totaltime>%d</totaltime>\n",state_emitter.particle_max_age);
+    csPrintf("        <regularparticles sides=\"%d\" radius=\"%f\">\n",state_emitter.reg_number,state_emitter.reg_radius);
+  csPrintf("        <lighting>%s</lighting>\n",state_emitter.lighting ? "on" : "off");
+  csPrintf("        <totaltime>%d</totaltime>\n",state_emitter.particle_max_age);
   if (state_emitter.using_bounding_box)
-    printf("        <containerbox>\n            <min x=\"%f\" y=\"%f\" z=\"%f\">\n            <max x=\"%f\" y=\"%f\" z=\"%f\">\n        </containerbox>\n",
+    csPrintf("        <containerbox>\n            <min x=\"%f\" y=\"%f\" z=\"%f\">\n            <max x=\"%f\" y=\"%f\" z=\"%f\">\n        </containerbox>\n",
         state_emitter.bbox_minx,state_emitter.bbox_miny,state_emitter.bbox_minz,
         state_emitter.bbox_maxx,state_emitter.bbox_maxy,state_emitter.bbox_maxz);
   // startpos
-  printf("<startpos>\n");
+  csPrintf("<startpos>\n");
   SaveEmitter3DStateToFile(&state_initial_position);
-  printf("</startpos>\n");
+  csPrintf("</startpos>\n");
   // startspeed
-  printf("<startspeed>\n");
+  csPrintf("<startspeed>\n");
   SaveEmitter3DStateToFile(&state_initial_speed);
-  printf("</startspeed>\n");
+  csPrintf("</startspeed>\n");
   // startaccel
-  printf("<startaccel>\n");
+  csPrintf("<startaccel>\n");
   SaveEmitter3DStateToFile(&state_initial_acceleration);
-  printf("</startaccel>\n");
+  csPrintf("</startaccel>\n");
   // fieldspeed
   if (state_field_speed.active)
   {
-    printf("<fieldspeed>\n");
+    csPrintf("<fieldspeed>\n");
     SaveEmitter3DStateToFile(&(state_field_speed.e3d_state));
-    printf("</fieldspeed>\n");
+    csPrintf("</fieldspeed>\n");
   }
   // fieldaccel
   if (state_field_accel.active)
   {
-    printf("<fieldaccel>\n");
+    csPrintf("<fieldaccel>\n");
     SaveEmitter3DStateToFile(&(state_field_accel.e3d_state));
-    printf("</fieldaccel>\n");
+    csPrintf("</fieldaccel>\n");
   }
   // attractor
   if (state_attractor.force< -0.0001f || state_attractor.force>0.0001f)
   {
-    printf("<attractorforce>%f</attractorforce>\n",state_attractor.force);
-    printf("<attractor>\n");
+    csPrintf("<attractorforce>%f</attractorforce>\n",state_attractor.force);
+    csPrintf("<attractor>\n");
     SaveEmitter3DStateToFile(&(state_attractor.e3d_state));
-    printf("</attractor>\n");
+    csPrintf("</attractor>\n");
   }
 
   // aging
 
-  printf("    </params>\n");
-  printf("</meshobj>\n");
-  printf("<!--PartEdit Emitter save ENDS here-->\n\n");
+  csPrintf("    </params>\n");
+  csPrintf("</meshobj>\n");
+  csPrintf("<!--PartEdit Emitter save ENDS here-->\n\n");
   return true;
 }
 

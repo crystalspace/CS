@@ -100,8 +100,8 @@ void TiXmlBase::PutString( const TiXmlString& str, TiXmlString* outString )
     {
       // Easy pass at non-alpha/numeric/symbol
       // 127 is the delete key. Below 32 is symbolic.
-      char buf[ 32 ];
-      sprintf( buf, "&#x%02X;", (unsigned) ( c & 0xff ) );
+      csString buf;
+      buf.Format ("&#x%02X;", (unsigned) ( c & 0xff ) );
       outString->append( buf, strlen( buf ) );
       ++i;
     }
@@ -446,8 +446,8 @@ const char * TiXmlElement::Attribute( const char * name, int* i ) const
 void TiXmlElement::SetAttribute( TiDocument* document,
   const char * name, int val )
 {  
-  char buf[64];
-  sprintf( buf, "%d", val );
+  csString buf;
+  buf.Format ("%d", val);
   SetAttribute( document, name, buf );
 }
 
@@ -643,15 +643,15 @@ void TiDocumentAttribute::Print( iString* cfile, int /*depth*/ ) const
 
 void TiDocumentAttribute::SetIntValue( int value )
 {
-  char buf [64];
-  sprintf (buf, "%d", value);
+  csString buf;
+  buf.Format ("%d", value);
   SetValue (buf);
 }
 
 void TiDocumentAttribute::SetDoubleValue( double value )
 {
-  char buf [64];
-  sprintf (buf, "%f", value);
+  csString buf;
+  buf.Format ("%f", value);
   SetValue (buf);
 }
 

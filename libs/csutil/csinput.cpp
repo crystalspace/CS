@@ -465,8 +465,8 @@ const char* csKeyboardDriver::GetKeycodeString (utf32_char code)
   const char* str = KeyCodeNames.StringForIdent (code);
   if (str != 0) return str;
 
-  static char genName[13];
-  sprintf (genName, "[%" PRIu32 "]", code);
+  static csString genName;
+  genName.Format ("[%" PRIu32 "]", code);
   return genName;
 #endif
   return 0;

@@ -134,7 +134,7 @@ void LevelWriter::WriteTexturesMaterials (iDocumentNode* worldnode)
 
   if (!texturesnode || !materialsnode)
   {
-    printf ("FATAL: Couldn't create texture nodes!\n");
+    csPrintf ("FATAL: Couldn't create texture nodes!\n");
     return;
   }
 
@@ -242,7 +242,7 @@ void LevelWriter::WriteLights (iDocumentNode* sectornode)
   {
     // discard spot-lights
     if (pCurLight->spot_light) {
-      fprintf (stderr, 
+      csFPrintf (stderr, 
 	  "Spotlight are not supported. Light '%s' will not be imported in CS\n",
 	  pCurLight->name);
       continue;
@@ -423,11 +423,11 @@ pointfound:
   double dist = plane->Distance (vectors[nonshared]);
   if (flags & FLAG_VERBOSE)
   {
-    fprintf (stderr, "\npl:%g,%g,%g,%g\n",
+    csFPrintf (stderr, "\npl:%g,%g,%g,%g\n",
 	plane->norm.x, plane->norm.y, plane->norm.z, plane->DD);
-    fprintf (stderr, "ve:%g,%g,%g\n",
+    csFPrintf (stderr, "ve:%g,%g,%g\n",
 	vectors[nonshared].x, vectors[nonshared].y, vectors[nonshared].z);
-    fprintf (stderr, "dist:%g\n", dist);
+    csFPrintf (stderr, "dist:%g\n", dist);
   }
   if (dist > 0.01)
   {
@@ -440,7 +440,7 @@ pointfound:
   {
     if (poly[p]==nonshared)
     {
-      fprintf (stderr, "Warning!!! object '%s' contains a face that overlaps"
+      csFPrintf (stderr, "Warning!!! object '%s' contains a face that overlaps"
 	  "another face!\n", mesh->name);
       used[trinum]=true;
       return false;
@@ -490,7 +490,7 @@ pointfound:
   // We can check this when all classifications have same sign.
   if (class_sign0 == class_sign1 && class_sign1 == class_sign2)
   {
-    fprintf (stderr, "Warning!!! object '%s' contains a face that partially"
+    csFPrintf (stderr, "Warning!!! object '%s' contains a face that partially"
 	"overlaps another face!\n", mesh->name);
     //@@@used[trinum]=true; Should I set used in this case?
     return false;
@@ -544,7 +544,7 @@ void LevelWriter::WriteFaces(iDocumentNode* paramsnode,
       outputuv = false;
     if (!outputuv)
     {
-      fprintf (stderr, "Mesh Object '%s' uses an unsupported mapping type."
+      csFPrintf (stderr, "Mesh Object '%s' uses an unsupported mapping type."
 	 " Mapping for this object is ignored\n", mesh->name);
     }
 

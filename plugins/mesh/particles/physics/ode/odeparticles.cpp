@@ -407,7 +407,7 @@ void csODEParticlePhysics::Start (iParticlesObjectState *particles)
   if (po->data.Length () == 0) 
   {
     int start_size = particles->GetInitialParticleCount() * 2;
-printf ("Initial size = %d\n", start_size);
+csPrintf ("Initial size = %d\n", start_size);
     po->data.SetLength (start_size);
     po->bodies.SetLength (start_size);
     for (int i = 0; i < start_size; i ++)
@@ -418,7 +418,7 @@ printf ("Initial size = %d\n", start_size);
       po->bodies[i].sort = -FLT_MAX;
       po->bodies[i].body = 0;
     }
-printf ("Setting dead parts to %d\n", start_size);
+csPrintf ("Setting dead parts to %d\n", start_size);
     po->dead_particles = start_size;
   }
 

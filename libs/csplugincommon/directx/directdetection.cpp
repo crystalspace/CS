@@ -63,7 +63,7 @@ void DirectDetection::ReportResult (int severity, char *str, HRESULT hRes)
     const char* szStdMessage = "%s\nLast Error: %s [0x%.8x]";
     szMsg = new char [strlen (szStdMessage) + strlen (errmsg) - 2 + strlen (str) - 2 + 8 - 4 + 1];
       // in the length formula above the format specifier lengths were subtracted.
-    sprintf (szMsg, szStdMessage, str, errmsg, (int)hRes);
+    scsPrintf (szMsg, szStdMessage, str, errmsg, (int)hRes);
     delete[] errmsg;
   }
 

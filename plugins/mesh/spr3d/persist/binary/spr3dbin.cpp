@@ -54,23 +54,12 @@ CS_IMPLEMENT_PLUGIN
 /**
  * Reports errors
  */
-static void ReportError (iReporter* reporter, const char* id,
+static void ReportError (iObjectRegistry* objreg, const char* id,
 	const char* description, ...)
 {
   va_list arg;
   va_start (arg, description);
-
-  if (reporter)
-  {
-    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
-  }
-  else
-  {
-    char buf[1024];
-    vsprintf (buf, description, arg);
-    csPrintf ("Error ID: %s\n", id);
-    csPrintf ("Description: %s\n", buf);
-  }
+  csReportV (objreg, CS_REPORTER_SEVERITY_ERROR, id, description, arg);
   va_end (arg);
 }
 
@@ -120,7 +109,6 @@ csSprite3DBinFactoryLoader::~csSprite3DBinFactoryLoader ()
 bool csSprite3DBinFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csSprite3DBinFactoryLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
@@ -146,7 +134,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
   }
   if (!type)
   {
-    ReportError (reporter,
+    ReportError (object_reg,
 		"crystalspace.sprite3dbinfactoryloader.setup.objecttype",
 		"Could not load the sprite.3d mesh object plugin!");
     return 0;
@@ -174,7 +162,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
   // Read the magic number so we can ID the file
   if (memcmp(binsprMagic, p, 4) != 0)
   {
-    ReportError (reporter,
+    ReportError (object_reg,
 	"crystalspace.sprite3dbinfactoryloader.setup.objecttype",
 	"Input was not binary sprite data!");
     return 0;
@@ -185,7 +173,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
   bool has_normals = false;
   if ( ((uint8)*p != 0x01) || ((uint8)*(p+1) > 0x01) )
   {
-    ReportError (reporter,
+    ReportError (object_reg,
 	"crystalspace.sprite3dbinfactoryloader.setup.objecttype",
 	"Unexpected format version %" PRIu8 ".%" PRIu8 "!", 
 	(uint8)*p, (uint8)*(p+1));
@@ -201,7 +189,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
   iMaterialWrapper* mat = ldr_context->FindMaterial (mat_name);
   if (!mat)
   {
-    ReportError (reporter,
+    ReportError (object_reg,
 	"crystalspace.sprite3dbinfactoryloader.parse.unknownmaterial",
 	"Couldn't find material named '%s'", mat_name);
     return 0;
@@ -260,7 +248,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
       }
       else if (i >= spr3dLook->GetVertexCount ())
       {
-	ReportError (reporter,
+	ReportError (object_reg,
 	    "crystalspace.sprite3dbinfactoryloader.parse.frame.vertices",
 	    "Trying to add too many vertices to frame '%s'!",
 	    fr->GetName ());
@@ -273,7 +261,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
 
     if (j < spr3dLook->GetVertexCount ())
     {
-      ReportError (reporter,
+      ReportError (object_reg,
 	"crystalspace.sprite3dbinfactoryloader.parse.frame.vertices",
 	"Too few vertices in frame '%s'!",
 	fr->GetName ());
@@ -308,7 +296,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
       iSpriteFrame* ff = spr3dLook->FindFrame (fn);
       if (!ff)
       {
-	ReportError (reporter,
+	ReportError (object_reg,
 	  "crystalspace.sprite3dbinfactoryloader.parse.action.badframe",
 	  "Trying to add unknown frame '%s' to action '%s'!",
 	  fn, act->GetName ());
@@ -374,7 +362,6 @@ csSprite3DBinFactorySaver::csSprite3DBinFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = 0;
 }
 
 /**
@@ -392,7 +379,6 @@ csSprite3DBinFactorySaver::~csSprite3DBinFactorySaver ()
 bool csSprite3DBinFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csSprite3DBinFactorySaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
 }
 

@@ -42,7 +42,7 @@ search(
 	    path_build( f, buf, 1 );
 
 	    if( DEBUG_SEARCH )
-		printf( "locate %s: %s\n", target, buf );
+		csPrintf( "locate %s: %s\n", target, buf );
 
 	    timestamp( buf, time );
 
@@ -58,7 +58,7 @@ search(
 		path_build( f, buf, 1 );
 
 		if( DEBUG_SEARCH )
-		    printf( "search %s: %s\n", target, buf );
+		    csPrintf( "search %s: %s\n", target, buf );
 
 		timestamp( buf, time );
 
@@ -79,7 +79,7 @@ search(
 	path_build( f, buf, 1 );
 
 	if( DEBUG_SEARCH )
-	    printf( "search %s: %s\n", target, buf );
+	    csPrintf( "search %s: %s\n", target, buf );
 
 	timestamp( buf, time );
 

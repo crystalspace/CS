@@ -225,14 +225,14 @@ bool csObjectModelManager::CheckObjectModel (csDynavisObjectModel* model,
 	    model->use_outline_filler = false;
 	    if (show_notclosed > 0)
 	    {
-	      printf ("WARNING! Object '%s' is not closed!\n", mw != 0 ?
+	      csPrintf ("WARNING! Object '%s' is not closed!\n", mw != 0 ?
 	  	  mw->QueryObject ()->GetName () : "<no mesh>");
 	      fflush (stdout);
 	      show_notclosed--;
 	    }
 	    else if (show_notclosed == 0)
 	    {
-	      printf ("...\n");
+	      csPrintf ("...\n");
 	      fflush (stdout);
 	      show_notclosed--;
 	    }

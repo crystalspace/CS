@@ -226,15 +226,15 @@ void csTinyXmlNode::SetValue (const char* value)
 
 void csTinyXmlNode::SetValueAsInt (int value)
 {
-  char buf[40];
-  sprintf (buf, "%d", value);
+  csString buf;
+  buf.Format ("%d", value);
   node->SetValue (buf);
 }
 
 void csTinyXmlNode::SetValueAsFloat (float value)
 {
-  char buf[40];
-  sprintf (buf, "%g", value);
+  csString buf;
+  buf.Format ("%g", value);
   node->SetValue (buf);
 }
 
@@ -487,8 +487,8 @@ void csTinyXmlNode::SetAttributeAsFloat (const char* name, float value)
   TiXmlElement* el = node->ToElement ();
   if (el)
   {
-    char v[64];
-    sprintf (v, "%g", value);
+    csString v;
+    v.Format ("%g", value);
     el->SetAttribute (el->GetDocument (), name, v);
   }
 }

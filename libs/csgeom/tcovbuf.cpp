@@ -96,7 +96,7 @@ void csCoverageTile::PushLine (int x1, int y1, int x2, int y2, int dx)
   op.x2 = x2;
   op.y2 = y2;
   op.dx = dx;
-//printf ("        LINE %d,%d - %d,%d (dx=%d)\n", x1>>16, y1, x2>>16, y2, dx);
+//csPrintf ("        LINE %d,%d - %d,%d (dx=%d)\n", x1>>16, y1, x2>>16, y2, dx);
 }
 
 void csCoverageTile::PushVLine (int x, int y1, int y2)
@@ -112,7 +112,7 @@ void csCoverageTile::PushVLine (int x, int y1, int y2)
   op.x1 = x;
   op.y1 = y1;
   op.y2 = y2;
-//printf ("        VLINE %d    %d - %d\n", x>>16, y1, y2);
+//csPrintf ("        VLINE %d    %d - %d\n", x>>16, y1, y2);
 }
 
 void csCoverageTile::PushFullVLine (int x)
@@ -122,7 +122,7 @@ void csCoverageTile::PushFullVLine (int x)
   csLineOperation& op = AddOperation ();
   op.op = OP_FULLVLINE;
   op.x1 = x;
-//printf ("        FULLVLINE %d\n", x>>16);
+//csPrintf ("        FULLVLINE %d\n", x>>16);
 }
 
 void csCoverageTile::PerformOperations ()

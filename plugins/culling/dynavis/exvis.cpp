@@ -318,10 +318,10 @@ void csExactCuller::AddObject (void* obj,
 	//csPlane3 camplane = trans.Other2This (planes[i]);
         csPlane3 camplane;
 	trans.Other2This (planes[i], (*spoly)[0], camplane);
-//printf ("    %g,%g,%g\n", (*spoly)[0].x, (*spoly)[0].y, (*spoly)[0].z);
-//printf ("    planes[i] %g,%g,%g,%g\n",
+//csPrintf ("    %g,%g,%g\n", (*spoly)[0].x, (*spoly)[0].y, (*spoly)[0].z);
+//csPrintf ("    planes[i] %g,%g,%g,%g\n",
 //planes[i].A (), planes[i].B (), planes[i].C (), planes[i].D ());
-//printf ("    camplane %g,%g,%g,%g\n",
+//csPrintf ("    camplane %g,%g,%g,%g\n",
 //camplane.A (), camplane.B (), camplane.C (), camplane.D ());
 	if (ABS (camplane.D ()) < 0.001)
 	  continue;
@@ -330,7 +330,7 @@ void csExactCuller::AddObject (void* obj,
 	M = -camplane.A () * inv_D / fov;
 	N = -camplane.B () * inv_D / fov;
 	O = -camplane.C () * inv_D;
-//printf ("    MNO %g,%g,%g\n", M, N, O);
+//csPrintf ("    MNO %g,%g,%g\n", M, N, O);
 //fflush (stdout);
 
         int totpix;

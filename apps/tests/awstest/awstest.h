@@ -47,7 +47,7 @@ private:
   csRef<iFont> font;
   int col_red, col_blue, col_white, col_black;
   int col_yellow, col_cyan, col_green, col_gray;
-  char message[255];
+  csString message;
   csTicks message_timer;
   bool message_error;
 

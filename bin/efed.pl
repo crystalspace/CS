@@ -473,7 +473,7 @@ Options:
                  search to recurse into subdirectories as well.  Can be
                  negated with --nodescend.  Default is --nodescend.
     -v --verbose Emit informational messages about the processing.  Can be
-                 negated with --noverbose.  Deafult is --noverbose.
+                 negated with --noverbose.  Default is --noverbose.
     -q --quiet   Suppress all output except for error messages.  Can be
                  negated with --noquiet.  Default is --noquiet.
     -t --test    Perform all edits but do not actually modify any files.  Can

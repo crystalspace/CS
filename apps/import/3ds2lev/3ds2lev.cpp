@@ -181,7 +181,7 @@ int main (int argc, char * argv[])
 
   if(!argc)
   {
-    fprintf (stderr,
+    csFPrintf (stderr,
          "3D Studio native objectfile converter v2.0\n"
          "originally by Mats Byggmastar 1996 Espoo, Finland.\n"
 	 "This version is for Crystal Space and heavily modified by\n"
@@ -221,7 +221,7 @@ int main (int argc, char * argv[])
 	    outfn=argv[++n];
 	  else
 	  { 
-	    fprintf (stderr, "Missing outputfile name!\n");
+	    csFPrintf (stderr, "Missing outputfile name!\n");
 	    return 1;
 	  }
 	  break;
@@ -234,7 +234,7 @@ int main (int argc, char * argv[])
 	  }
 	  else
 	  {
-	    fprintf(stderr, "Missing relocate value!\n");
+	    csFPrintf(stderr, "Missing relocate value!\n");
 	    return 1;
 	  }
 	  break;
@@ -247,7 +247,7 @@ int main (int argc, char * argv[])
 	  }
    	  else
 	  {
-	    fprintf(stderr, "Missing scale value!\n");
+	    csFPrintf(stderr, "Missing scale value!\n");
 	    return 1;
 	  }
 	  break;
@@ -270,7 +270,7 @@ int main (int argc, char * argv[])
 	    spritename=argv[++n];
 	  else
 	  {
-      	    fprintf (stderr, "Missing sprite name!\n");
+      	    csFPrintf (stderr, "Missing sprite name!\n");
 	    return 1;
 	  }
 	  flags |= FLAG_SPRITE;
@@ -304,7 +304,7 @@ int main (int argc, char * argv[])
 	  writer.SetFlags(LevelWriter::FLAG_REMOVEDOUBLEVERTICES);
 	  break;
 	default:
-	  fprintf (stderr, "Bad parameter: %s\n",argv[n]);
+	  csFPrintf (stderr, "Bad parameter: %s\n",argv[n]);
 	  return 1;
       }
     }
@@ -314,7 +314,7 @@ int main (int argc, char * argv[])
         infn = argv[n];
       else 
       {
-	fprintf (stderr, "Too many filenames (can only convert 1 file at once!\n");
+	csFPrintf (stderr, "Too many filenames (can only convert 1 file at once!\n");
         return 1;
       }
     }
@@ -322,7 +322,7 @@ int main (int argc, char * argv[])
 
   if (!infn)
   {
-    fprintf (stderr, "No inputfile specified!\n");
+    csFPrintf (stderr, "No inputfile specified!\n");
     return 1;
   }
 
@@ -331,7 +331,7 @@ int main (int argc, char * argv[])
   // Read inputfile
   Lib3dsFile* file3ds = lib3ds_file_load(infn);
   if (!file3ds ) {
-    fprintf (stderr, "Failed to open %s\n", infn);
+    csFPrintf (stderr, "Failed to open %s\n", infn);
     return 1;
   }
 
@@ -342,18 +342,18 @@ int main (int argc, char * argv[])
   // Print some interesting information about what we have
   if (flags & FLAG_LIST || flags & FLAG_VERBOSE)
   {
-    // fprintf (stderr, "3DS data size: %ld byte\n", size);
-    fprintf (stderr, "3DS name: %s\n", file3ds->name);
-    fprintf (stderr, "lights: %s\n", file3ds->lights ? "yes" : "no");
-    fprintf (stderr, "object-name     faces vertices  maps  matrix\n");
+    // csFPrintf (stderr, "3DS data size: %ld byte\n", size);
+    csFPrintf (stderr, "3DS name: %s\n", file3ds->name);
+    csFPrintf (stderr, "lights: %s\n", file3ds->lights ? "yes" : "no");
+    csFPrintf (stderr, "object-name     faces vertices  maps  matrix\n");
 
     // set the current mesh to the first in the file
     Lib3dsMesh* mesh;
     for (mesh = file3ds->meshes; mesh; mesh = mesh->next)
     {
         // get the numbers in the current mesh
-        fprintf(stderr, "===================================================\n");
-        fprintf(stderr, "%-14s  %5ld  %5ld  %5d    %s\n",
+        csFPrintf(stderr, "===================================================\n");
+        csFPrintf(stderr, "%-14s  %5ld  %5ld  %5d    %s\n",
 	    mesh->name, mesh->faces, mesh->points, -1, " ");
     }
 
@@ -366,7 +366,7 @@ int main (int argc, char * argv[])
   writer.SetTranslate (xrelocate, yrelocate, zrelocate);
 
   if (flags & FLAG_VERBOSE)
-    fprintf (stderr, "Writing output in CS format...");
+    csFPrintf (stderr, "Writing output in CS format...");
   
   csRef<iDocument> document;
   if (flags & FLAG_SPRITE)
@@ -376,7 +376,7 @@ int main (int argc, char * argv[])
 
   if(!document)
   {
-    fprintf(stderr, "Problem creating document.\n");
+    csFPrintf(stderr, "Problem creating document.\n");
     exit(1);
   }
   
@@ -389,7 +389,7 @@ int main (int argc, char * argv[])
     FILE* outfile = fopen (outfn, "w");
     if (!outfile)
     {    
-      fprintf (stderr, "Couldn't open output file '%s'!\n", outfn);
+      csFPrintf (stderr, "Couldn't open output file '%s'!\n", outfn);
       return 1;
     }
     fwrite (str->GetData(), 1, str->Length(), outfile);
@@ -398,11 +398,11 @@ int main (int argc, char * argv[])
   else
   {
     // Write file to stdout
-    printf ("%s", str->GetData());
+    csPrintf ("%s", str->GetData());
   }
   
   if (flags & FLAG_VERBOSE)
-    fprintf (stderr, "done! \n");
+    csFPrintf (stderr, "done! \n");
 
   return 0;
 }

@@ -94,23 +94,32 @@ CS_CRYSTALSPACE_EXPORT int csPrintf (const char* str, ...) CS_GNUC_PRINTF (1, 2)
  */
 CS_CRYSTALSPACE_EXPORT int csPrintfV (const char* str, va_list arg) CS_GNUC_PRINTF (1, 0);
 /**
- * CS version of fputs (&lt;str&gt;, stderr). 
+ * CS version of fprintf (file, str, ...). 
+ * \copydoc csPrintf()
+ * \remarks Will not flush file.
+ */
+CS_CRYSTALSPACE_EXPORT int csFPrintf (FILE* file, const char* str, ...) 
+  CS_GNUC_PRINTF (2, 3);
+/**
+ * CS version of vfprintf (stderr, str, ...). 
+ * \copydoc csPrintf()
+ * \remarks Will not flush file.
+ */
+CS_CRYSTALSPACE_EXPORT int csFPrintfV (FILE* file, const char* str, va_list arg) 
+  CS_GNUC_PRINTF (2, 0);
+/**
+ * CS version of vfprintf (stderr, str, ...). 
  * \copydoc csPrintf()
  * \remarks Will flush stderr.
  */
-CS_CRYSTALSPACE_EXPORT int csFPutErr (const char* str);
+CS_CRYSTALSPACE_EXPORT int csPrintfErrV (const char* str, va_list arg) 
+  CS_GNUC_PRINTF (1, 0);
 /**
  * CS version of fprintf (stderr, str, ...). 
  * \copydoc csPrintf()
  * \remarks Will flush stderr.
  */
 CS_CRYSTALSPACE_EXPORT int csPrintfErr (const char* str, ...) CS_GNUC_PRINTF (1, 2);
-/**
- * CS version of vfprintf (stderr, str, ...). 
- * \copydoc csPrintf()
- * \remarks Will flush stderr.
- */
-CS_CRYSTALSPACE_EXPORT int csPrintfErrV (const char* str, va_list arg) CS_GNUC_PRINTF (1, 0);
 
 /**
  * Get the current tick count. Warning! Do NOT use this function for

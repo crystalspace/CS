@@ -151,14 +151,14 @@ void csMovieRecorder::SetupPlugin()
   if (!G2D) G2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
   if (!G2D)
   {
-    printf ("No G2D!\n");
+    csPrintf ("No G2D!\n");
     return;
   }
 
   if (!VFS) VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!VFS)
   {
-    printf ("No VFS!\n");
+    csPrintf ("No VFS!\n");
     return;
   }
 

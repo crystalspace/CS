@@ -837,8 +837,8 @@ bool csThingLoader::ParsePoly3d (
       int portal_pri = engine->GetPortalRenderPriority ();
       if (portal_pri == 0)
         portal_pri = mesh->GetRenderPriority ();
-      char pc_name[100];
-      sprintf (pc_name, "__portals_%d_%s__", portal_pri,
+      csString pc_name;
+      pc_name.Format ("__portals_%d_%s__", portal_pri,
       	destSectorName.GetData ());
 
       iPortal* portal;
@@ -993,7 +993,7 @@ if (!info.thing_fact_state) \
 	synldr->ReportError (
 	    "crystalspace.thingloader.parse.vistree",
 	    child, "'vistree' no longer supported! Convert your level to Dynavis using 'levtool'!\n");
-	printf ("'vistree' no longer supported! Convert your level to Dynavis using 'levtool'!\n");
+	csPrintf ("'vistree' no longer supported! Convert your level to Dynavis using 'levtool'!\n");
 	return false;
       case XMLTOKEN_COSFACT:
         CHECK_TOPLEVEL("cosfact");

@@ -54,8 +54,8 @@ void awsTextureManager::Initialize (iObjectRegistry *obj_reg)
 {
   object_reg = obj_reg;
 
-  if (!obj_reg) printf ("aws-debug:  bad obj_reg (%s)\n", __FILE__);
-  if (!object_reg) printf ("aws-debug:  bad object_reg (%s)\n", __FILE__);
+  if (!obj_reg) csPrintf ("aws-debug:  bad obj_reg (%s)\n", __FILE__);
+  if (!object_reg) csPrintf ("aws-debug:  bad object_reg (%s)\n", __FILE__);
 
   loader = CS_QUERY_REGISTRY (object_reg, iImageIO);
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
@@ -125,7 +125,7 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
   // Perform a lookup on the texture list.  We may consider doing this a little
   // more optimally in the future, like with a QuickSort.
   if (DEBUG_GETTEX)
-    printf (
+    csPrintf (
       "aws-debug: (%s) texture count is: %lu\n",
       __FILE__,
       (unsigned long)textures.Length ());
@@ -136,7 +136,7 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
     awsTexture *awstxt = textures[i];
 
     if (DEBUG_GETTEX)
-      printf ("aws-debug: (%s) texture is: %p\n", __FILE__,
+      csPrintf ("aws-debug: (%s) texture is: %p\n", __FILE__,
       	(iTextureHandle*)(awstxt->tex));
 
     if (awstxt && id == awstxt->id)
@@ -157,13 +157,13 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
   if (DEBUG_GETTEX)
   {
     if (txtmgr == 0)
-      printf (
+      csPrintf (
         "aws-debug: GetTexturebyID (%s) no texture manager.\n",
         __FILE__);
     if (vfs == 0)
-      printf ("aws-debug: GetTexturebyID (%s) no vfs.\n", __FILE__);
+      csPrintf ("aws-debug: GetTexturebyID (%s) no vfs.\n", __FILE__);
     if (loader == 0)
-      printf ("aws-debug: GetTexturebyID (%s) no loader.\n", __FILE__);
+      csPrintf ("aws-debug: GetTexturebyID (%s) no loader.\n", __FILE__);
 
     if (!txtmgr || !vfs || !loader) return 0;
   }

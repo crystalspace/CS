@@ -658,7 +658,7 @@ void Simple::WriteShadow (int align,int x,int y,int fg,char *str,...) {
 
   va_list arg;
   va_start (arg, str);
-  vsprintf (buf, str, arg);
+  vscsPrintf (buf, str, arg);
   va_end (arg);
 
   Write (align, x+1, y-1, 0, -1, buf);
@@ -670,7 +670,7 @@ void Simple::Write(int align,int x,int y,int fg,int bg,char *str,...) {
   char b[256], *buf = b;
 
   va_start (arg,str);
-  int l = vsprintf (buf, str, arg);
+  int l = vscsPrintf (buf, str, arg);
   va_end (arg);
 
   if (align != 0)

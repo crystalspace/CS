@@ -55,18 +55,18 @@ iVFS* csVfsCacheManager::GetVFS ()
   return vfs;
 }
 
-void csVfsCacheManager::CacheName (char* buf, const char* type,
+void csVfsCacheManager::CacheName (csStringFast<512>& buf, const char* type,
 	const char* scope, uint32 id)
 {
   if (id == (uint32)~0)
   {
     if (scope == 0)
-      sprintf (buf, "%s", type);
+      buf.Format ("%s", type);
     else
-      sprintf (buf, "%s/%s", type, scope);
+      buf.Format ("%s/%s", type, scope);
   }
   else
-    sprintf (buf, "%s/%s/%" PRIu32 , type, scope, id);
+    buf.Format ("%s/%s/%" PRIu32 , type, scope, id);
 }
 
 void csVfsCacheManager::SetCurrentType (const char* type)
@@ -87,10 +87,10 @@ void csVfsCacheManager::SetCurrentScope (const char* scope)
     current_scope = 0;
 }
 
-bool csVfsCacheManager::CacheData (void* data, size_t size,
+bool csVfsCacheManager::CacheData (const void* data, size_t size,
   	const char* type, const char* scope, uint32 id)
 {
-  char buf[512];
+  csStringFast<512> buf;
   GetVFS ()->PushDir ();
   GetVFS ()->ChDir (vfsdir);
   CacheName (buf, type ? type : current_type,
@@ -102,7 +102,7 @@ bool csVfsCacheManager::CacheData (void* data, size_t size,
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.vfscachemgr.createfile",
-	"Could not create file '%s' in VFS dir '%s'\n", buf, vfsdir);
+	"Could not create file '%s' in VFS dir '%s'\n", buf.GetData(), vfsdir);
     return false;
   }
 
@@ -111,7 +111,7 @@ bool csVfsCacheManager::CacheData (void* data, size_t size,
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.vfscachemgr.writefile",
-	"Could not write file '%s' in VFS dir '%s'\n", buf, vfsdir);
+	"Could not write file '%s' in VFS dir '%s'\n", buf.GetData(), vfsdir);
     return false;
   }
 
@@ -121,7 +121,7 @@ bool csVfsCacheManager::CacheData (void* data, size_t size,
 csPtr<iDataBuffer> csVfsCacheManager::ReadCache (
   	const char* type, const char* scope, uint32 id)
 {
-  char buf[512];
+  csStringFast<512> buf;
   GetVFS ()->PushDir ();
   GetVFS ()->ChDir (vfsdir);
   CacheName (buf, type ? type : current_type,

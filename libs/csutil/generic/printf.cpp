@@ -26,7 +26,7 @@
 #include "csutil/csuctransform.h"
 #include "csutil/sysfunc.h"
 
-// Replacement for printf(); exact same prototype/functionality as printf()
+// Replacement for csPrintf(); exact same prototype/functionality as csPrintf()
 int csPrintf (char const* str, ...)
 {
   va_list args;
@@ -141,7 +141,7 @@ static int csFPutStr (FILE* file, const char* str)
   return ret;
 }
 
-// Replacement for vprintf()
+// Replacement for csPrintfV()
 int csPrintfV(char const* str, va_list args)
 {
   csString temp;
@@ -150,26 +150,36 @@ int csPrintfV(char const* str, va_list args)
   return csFPutStr (stdout, temp);
 }
 
-int csFPutErr (const char* str)
+int csFPrintf (FILE* file, const char* str, ...)
 {
-  int ret = csFPutStr (stderr, str);
+  va_list args;
+  va_start (args, str);
+  int const rc = csFPrintfV (file, str, args);
+  va_end (args);
+  return rc;
+}
+
+int csFPrintfV (FILE* file, const char* str, va_list args)
+{
+  csString temp;
+  temp.FormatV (str, args);
+  
+  return csFPutStr (file, temp);
+}
+
+int csPrintfErrV (const char* str, va_list arg)
+{
+  int rc = csFPrintfV (stderr, str, arg);
   fflush (stderr);
-  return ret;
+  return rc;
 }
 
 int csPrintfErr (const char* str, ...)
 {
   va_list args;
   va_start (args, str);
-  int const rc = csPrintfErrV (str, args);
+  int const rc = csFPrintfV (stderr, str, args);
   va_end (args);
   return rc;
 }
 
-int csPrintfErrV (const char* str, va_list args)
-{
-  csString temp;
-  temp.FormatV (str, args);
-  
-  return csFPutErr (temp);
-}

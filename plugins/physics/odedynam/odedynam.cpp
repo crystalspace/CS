@@ -676,22 +676,22 @@ bool csODEDynamicSystem::AttachColliderMesh (iMeshWrapper* mesh,
   float *vertices = new float[p->GetVertexCount()*3];
   int *indeces = new int[tr_num*3];
   csVector3 *c_vertex = p->GetVertices();
-  //fprintf(stderr, "vertex count: %d\n", p->GetVertexCount());
-  //fprintf(stderr, "triangles count: %d\n", tr_num);
+  //csFPrintf(stderr, "vertex count: %d\n", p->GetVertexCount());
+  //csFPrintf(stderr, "triangles count: %d\n", tr_num);
   int i=0, j=0;
   for (i=0, j=0; i < p->GetVertexCount(); i++)
   {
     vertices[j++] = c_vertex[i].x;
     vertices[j++] = c_vertex[i].y;
     vertices[j++] = c_vertex[i].z;
-    //fprintf(stderr, "vertex %d coords -> x=%.1f, y=%.1f, z=%.1f\n", i,c_vertex[i].x, c_vertex[i].y, c_vertex[i].z);
+    //csFPrintf(stderr, "vertex %d coords -> x=%.1f, y=%.1f, z=%.1f\n", i,c_vertex[i].x, c_vertex[i].y, c_vertex[i].z);
   }
   for (i=0, j=0; i < tr_num; i++)
   {
     indeces[j++] = c_triangle[i].a;
     indeces[j++] = c_triangle[i].b;
     indeces[j++] = c_triangle[i].c;
-    //fprintf(stderr, "triangle %d -> a=%d, b=%d, c=%d\n", i,c_triangle[i].a, c_triangle[i].b, c_triangle[i].c);
+    //csFPrintf(stderr, "triangle %d -> a=%d, b=%d, c=%d\n", i,c_triangle[i].a, c_triangle[i].b, c_triangle[i].c);
   }
   dTriMeshDataID TriData = dGeomTriMeshDataCreate();
   dGeomTriMeshDataBuildSingle(TriData, vertices, 3*sizeof(float),
@@ -962,22 +962,22 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
   float *vertices = new float[p->GetVertexCount()*3];
   int *indeces = new int[tr_num*3];
   csVector3 *c_vertex = p->GetVertices();
-  //fprintf(stderr, "vertex count: %d\n", p->GetVertexCount());
-  //fprintf(stderr, "triangles count: %d\n", tr_num);
+  //csFPrintf(stderr, "vertex count: %d\n", p->GetVertexCount());
+  //csFPrintf(stderr, "triangles count: %d\n", tr_num);
   int i=0, j=0;
   for (i=0, j=0; i < p->GetVertexCount(); i++)
   {
     vertices[j++] = c_vertex[i].x;
     vertices[j++] = c_vertex[i].y;
     vertices[j++] = c_vertex[i].z;
-    //fprintf(stderr, "vertex %d coords -> x=%.1f, y=%.1f, z=%.1f\n", i,c_vertex[i].x, c_vertex[i].y, c_vertex[i].z);
+    //csFPrintf(stderr, "vertex %d coords -> x=%.1f, y=%.1f, z=%.1f\n", i,c_vertex[i].x, c_vertex[i].y, c_vertex[i].z);
   }
   for (i=0, j=0; i < tr_num; i++)
   {
     indeces[j++] = c_triangle[i].c;
     indeces[j++] = c_triangle[i].b;
     indeces[j++] = c_triangle[i].a;
-    //fprintf(stderr, "triangle %d -> a=%d, b=%d, c=%d\n", i,c_triangle[i].a, c_triangle[i].b, c_triangle[i].c);
+    //csFPrintf(stderr, "triangle %d -> a=%d, b=%d, c=%d\n", i,c_triangle[i].a, c_triangle[i].b, c_triangle[i].c);
   }
   dTriMeshDataID TriData = dGeomTriMeshDataCreate();
 

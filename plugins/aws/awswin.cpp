@@ -62,7 +62,7 @@ const int awsWindow:: foDontCaptureMouseMove = 0x400;
 
 const int grip_size = 16;
 
-// Set to true to get printf info about events, false to disable them.
+// Set to true to get csPrintf info about events, false to disable them.
 const bool DEBUG_WINDOW_EVENTS = false;
 
 awsWindow::awsWindow () :

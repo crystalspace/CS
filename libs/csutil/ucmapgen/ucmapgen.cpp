@@ -79,19 +79,19 @@ static void ParseEntry (csString& line, UniDBEntry& entry)
 void WriteMapToFile (FILE* file, const CharMap& map, const char* varPref)
 {
   csArray<utf16_char> auxdata;
-  fprintf (file, "static const UCMapEntry %s[] = {\n", varPref);
+  csFPrintf (file, "static const UCMapEntry %s[] = {\n", varPref);
   for (size_t i = 0; i < map.mappings.Length(); i++)
   {
     const CharMap::CharMapping curMapping = map.mappings[i];
     if (curMapping.to.Length() == 1)
     {
-      fprintf (file, "  {0x%.4" PRIx32 ", 0x%.4" PRIx32 "},\n",
+      csFPrintf (file, "  {0x%.4" PRIx32 ", 0x%.4" PRIx32 "},\n",
 	curMapping.from, curMapping.to[0]);
     }
     else
     {
       uint toVal = (curMapping.to.Length() << 24) | auxdata.Length();
-      fprintf (file, "  {0x%.4" PRIx32 ", 0x%.4x},\n", curMapping.from, toVal);
+      csFPrintf (file, "  {0x%.4" PRIx32 ", 0x%.4x},\n", curMapping.from, toVal);
       for (size_t j = 0; j < curMapping.to.Length(); j++)
       {
 	utf16_char toEnc[CS_UC_MAX_UTF16_ENCODED];
@@ -101,18 +101,18 @@ void WriteMapToFile (FILE* file, const CharMap& map, const char* varPref)
       }
     }
   }
-  fprintf (file, "};\n");
-  fprintf (file, "static const utf16_char %s_aux[] = {\n", varPref);
+  csFPrintf (file, "};\n");
+  csFPrintf (file, "static const utf16_char %s_aux[] = {\n", varPref);
   if (auxdata.Length() == 0)
-    fprintf (file, "  0\n");
+    csFPrintf (file, "  0\n");
   else
   {
     for (size_t i = 0; i < auxdata.Length(); i++)
     {
-      fprintf (file, "  0x%.4" PRIx16 ",\n", auxdata[i]);
+      csFPrintf (file, "  0x%.4" PRIx16 ",\n", auxdata[i]);
     }
   }
-  fprintf (file, "};\n");
+  csFPrintf (file, "};\n");
 }
 
 int main (int argc, const char* const argv[])
@@ -246,20 +246,20 @@ int main (int argc, const char* const argv[])
   {
     FILE* mappingsFile = fopen ("csucmappings.h", "w");
 
-    fprintf (mappingsFile, "// Automatically generated\n");
-    fprintf (mappingsFile, "struct UCMapEntry\n");
-    fprintf (mappingsFile, "{\n");
-    fprintf (mappingsFile, "  utf32_char mapFrom;\n");
-    fprintf (mappingsFile, "  utf32_char mapTo;\n");
-    fprintf (mappingsFile, "};\n");
-    fprintf (mappingsFile, "\n");
+    csFPrintf (mappingsFile, "// Automatically generated\n");
+    csFPrintf (mappingsFile, "struct UCMapEntry\n");
+    csFPrintf (mappingsFile, "{\n");
+    csFPrintf (mappingsFile, "  utf32_char mapFrom;\n");
+    csFPrintf (mappingsFile, "  utf32_char mapTo;\n");
+    csFPrintf (mappingsFile, "};\n");
+    csFPrintf (mappingsFile, "\n");
 
     WriteMapToFile (mappingsFile, uppercaseMap, "mapUpper");
-    fprintf (mappingsFile, "\n");
+    csFPrintf (mappingsFile, "\n");
     WriteMapToFile (mappingsFile, lowercaseMap, "mapLower");
-    fprintf (mappingsFile, "\n");
+    csFPrintf (mappingsFile, "\n");
     WriteMapToFile (mappingsFile, foldMap, "mapFold");
-    fprintf (mappingsFile, "\n");
+    csFPrintf (mappingsFile, "\n");
 
     fclose (mappingsFile);
   }

@@ -749,35 +749,35 @@ return TOKEN_IS;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-/* printf("skin-");   */ return TOKEN_SKIN;
+/* csPrintf("skin-");   */ return TOKEN_SKIN;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-/* printf("window-"); */ return TOKEN_WINDOW;
+/* csPrintf("window-"); */ return TOKEN_WINDOW;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-/* printf("for-");    */ return TOKEN_FOR;
+/* csPrintf("for-");    */ return TOKEN_FOR;
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-/* printf("from-");   */ return TOKEN_FROM;
+/* csPrintf("from-");   */ return TOKEN_FROM;
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-/* printf("<int>-");  */ awslval->val = atoi(awstext);   return TOKEN_NUM;
+/* csPrintf("<int>-");  */ awslval->val = atoi(awstext);   return TOKEN_NUM;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-/* printf("<float>-"); */ awslval->fval = atof(awstext);   return TOKEN_FLOAT;
+/* csPrintf("<float>-"); */ awslval->fval = atof(awstext);   return TOKEN_FLOAT;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-/* printf("<attr>-"); */ awslval->str = strdup(awstext); return TOKEN_ATTR;
+/* csPrintf("<attr>-"); */ awslval->str = strdup(awstext); return TOKEN_ATTR;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-/* printf("<str>-");  */ awstext[awsleng-1]=0; awslval->str = strdup(awstext+1); return TOKEN_STR;
+/* csPrintf("<str>-");  */ awstext[awsleng-1]=0; awslval->str = strdup(awstext+1); return TOKEN_STR;
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
@@ -1575,7 +1575,7 @@ static void yy_fatal_error( msg )
 char msg[];
 #endif
 	{
-	(void) fprintf( stderr, "%s\n", msg );
+	(void) csFPrintf( stderr, "%s\n", msg );
 	exit( YY_EXIT_FAILURE );
 	}
 

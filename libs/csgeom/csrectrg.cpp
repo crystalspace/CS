@@ -93,9 +93,9 @@ void csRectRegion::fragmentContainedRect (csRect &r1t, csRect &r2t)
   edges |= (r1.xmax == r2.xmax ? RX : 0);
   edges |= (r1.ymax == r2.ymax ? BY : 0);
 
-  //printf("csrectrgn: fragmenting with rule %u\n", edges);
-  //printf("\t%d,%d,%d,%d\n", r1.xmin, r1.ymin, r1.xmax, r1.ymax);
-  //printf("\t%d,%d,%d,%d\n", r2.xmin, r2.ymin, r2.xmax, r2.ymax);
+  //csPrintf("csrectrgn: fragmenting with rule %u\n", edges);
+  //csPrintf("\t%d,%d,%d,%d\n", r1.xmin, r1.ymin, r1.xmax, r1.ymax);
+  //csPrintf("\t%d,%d,%d,%d\n", r2.xmin, r2.ymin, r2.xmax, r2.ymax);
   switch (edges)
   {
     case 0:
@@ -594,7 +594,7 @@ bool csRectRegionDebug::CheckBounds(const csRect &rect)
 void csRectRegionDebug::UnitTest()
 {
 
-  printf("Running tests");
+  csPrintf("Running tests");
 
   int i,j;
   csRectRegion rr;
@@ -708,7 +708,7 @@ void csRectRegionDebug::UnitTest()
   {
 
     if(i % 1000 == 0)
-      printf(".");
+      csPrintf(".");
 
     unsigned int op = rand->Get(11);
     csRect r = RandRect();
@@ -731,7 +731,7 @@ void csRectRegionDebug::UnitTest()
     AssertEqual(rr);
   }
 
-  printf("Done\n");
+  csPrintf("Done\n");
 
 }
 

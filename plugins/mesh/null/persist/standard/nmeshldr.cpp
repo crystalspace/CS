@@ -150,10 +150,8 @@ bool csNullFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
       {
         for(int i = 0; i < compcount; i++)
         {
-          char attribname[12];
-          attribname[0] = 'f';
-          attribname[1] = '\0';
-          sprintf (&attribname[1], "%d", i);
+          csString attribname;
+          attribname.Format ("f%d", i);
 
           floatarray[vertexindex * compcount + i] = child
 	  	->GetAttributeValueAsFloat(attribname);
@@ -179,10 +177,8 @@ bool csNullFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
       {
         for(int i = 0; i < compcount; i++)
         {
-          char attribname[12];
-          attribname[0] = 'i';
-          attribname[1] = '\0';
-          sprintf(&attribname[1], "%d", i);
+          csString attribname;
+          attribname.Format ("i%d", i);
 
           intarray[vertexindex * compcount + i] = child
 	  	->GetAttributeValueAsInt(attribname);
@@ -209,10 +205,8 @@ bool csNullFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
       {
         for(int i = 0; i < compcount; i++)
         {
-          char attribname[12];
-          attribname[0] = 's';
-          attribname[1] = '\0';
-          sprintf (&attribname[1], "%d", i);
+          csString attribname;
+          attribname.Format ("s%d", i);
 
           shortarray[vertexindex * compcount + i] = child
 	  	->GetAttributeValueAsInt(attribname);
@@ -239,10 +233,8 @@ bool csNullFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
       {
         for(int i = 0; i < compcount; i++)
         {
-          char attribname[12];
-          attribname[0] = 'b';
-          attribname[1] = '\0';
-          sprintf (&attribname[1], "%d", i);
+          csString attribname;
+          attribname.Format ("b%d", i);
 
           bytearray[vertexindex * compcount + i] = child
 	  	->GetAttributeValueAsInt(attribname);

@@ -1,6 +1,7 @@
 #include "cssysdef.h"
 #include "awssktst.h"
 #include "csutil/scfstr.h"
+#include "csutil/sysfunc.h"
 #include "iaws/awsparm.h"
 
 #include <stdio.h>
@@ -54,7 +55,7 @@ void awsTestSink::FillBarChart(intptr_t sk, iAwsSource *source)
   if (sink->wmgr)
     pl = sink->wmgr->CreateParmList();
   else
-    printf("awstest: window manager is null.\n");
+    csPrintf("awstest: window manager is null.\n");
 
 
   pl->AddFloat("value", 10);
@@ -85,16 +86,16 @@ void awsTestSink::FillListBox(intptr_t sk, iAwsSource *source)
   iAwsParmList *pl=0;
   intptr_t  parent;
 
-  printf("awstest: Filling list box.\n");
+  csPrintf("awstest: Filling list box.\n");
 
   if (sink->wmgr)
     pl = sink->wmgr->CreateParmList();
   else
-    printf("awstest: window manager is null.\n");
+    csPrintf("awstest: window manager is null.\n");
 
   if (pl==0)
   {
-    printf("awstest: internal error, parameter list 0.\n");
+    csPrintf("awstest: internal error, parameter list 0.\n");
     return;
   }
 
@@ -288,7 +289,7 @@ void awsTestSink::FillListBox(intptr_t sk, iAwsSource *source)
 
 void awsTestSink::RedClicked(intptr_t sink, iAwsSource *source)
 {
-  printf("awstest: red button clicked, source: %p, owner: %p, component: %p\n", source, (void*)sink, source->GetComponent());
+  csPrintf("awstest: red button clicked, source: %p, owner: %p, component: %p\n", source, (void*)sink, source->GetComponent());
 
   namec++;
   if (namec > 8) namec=0;
@@ -299,13 +300,13 @@ void awsTestSink::RedClicked(intptr_t sink, iAwsSource *source)
 
 void awsTestSink::BlueClicked(intptr_t sink, iAwsSource *source)
 {
-  printf("awstest: blue button clicked, source: %p, owner: %p\n", source, (void*)sink);
+  csPrintf("awstest: blue button clicked, source: %p, owner: %p\n", source, (void*)sink);
 }
 
 
 void awsTestSink::GreenClicked(intptr_t sink, iAwsSource *source)
 {
-  printf("awstest: green button clicked, source: %p, owner: %p\n", source, (void*)sink);
+  csPrintf("awstest: green button clicked, source: %p, owner: %p\n", source, (void*)sink);
 }
 
 void awsTestSink::SetPass(intptr_t sk, iAwsSource *source)
@@ -330,10 +331,10 @@ void awsTestSink::Login(intptr_t sk, iAwsSource *source)
 {
   awsTestSink *sink = (awsTestSink *)sk;
   if (sink->user==0 || sink->pass==0)
-    printf("awstest: You must enter a username AND password.\n");
+    csPrintf("awstest: You must enter a username AND password.\n");
 
   else {
-    printf("awstest: Logging in as %s with password: %s  (not really.)\n", sink->user->GetData(), sink->pass->GetData());
+    csPrintf("awstest: Logging in as %s with password: %s  (not really.)\n", sink->user->GetData(), sink->pass->GetData());
     iAwsComponent *comp = source->GetComponent();
 
     if (sink->wmgr) {

@@ -340,10 +340,10 @@ bool CMapParser::GetSafeToken (csString& str)
 
 void CMapParser::ReportError(const char* message, ...)
 {
-  printf("Error in line %d: ", m_CurrentLine);
+  csPrintf("Error in line %d: ", m_CurrentLine);
   va_list args;
   va_start (args, message);
-  vprintf (message, args);
+  csPrintfV (message, args);
   va_end (args);
-  printf("\n");
+  csPrintf("\n");
 }

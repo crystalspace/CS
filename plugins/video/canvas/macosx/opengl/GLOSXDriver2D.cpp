@@ -70,7 +70,7 @@ bool GLOSXDriver2D::Initialize(iObjectRegistry *reg)
   if ((context = OSXDelegate2D_createOpenGLContext(delegate, Depth, display))
     == 0)
   {
-    fprintf(stderr, "Failed to create OpenGL context\n");
+    csFPrintf(stderr, "Failed to create OpenGL context\n");
     return false;
   }
 

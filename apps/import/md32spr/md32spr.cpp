@@ -60,15 +60,15 @@ char *filename(char *path, char *file);
 char *lowercase(char *str);
 
 void Usage() {
-  printf("MD3 to CS XML converter\n");
-  printf("by Manjunath Sripadarao\n");
-  printf("Usage: md32spr [options] <model-file.zip> [-o=<output-file.zip>]\n");
-  printf("Options:\n");
-  printf("-wdir=<dir>\tDirectory in which the weapon files are stored.\n");
-  printf("\t\texample: -wdir=railgun\n");
-  printf("-o=<file.zip>\tOutput zip file name. \n");
-  printf("-scale=<float>\tHow much the model should be scaled. Default is 1.\n");
-  printf("\t\texample: -scale=4096. Model will be scaled as 1/4096.\n");
+  csPrintf("MD3 to CS XML converter\n");
+  csPrintf("by Manjunath Sripadarao\n");
+  csPrintf("Usage: md32spr [options] <model-file.zip> [-o=<output-file.zip>]\n");
+  csPrintf("Options:\n");
+  csPrintf("-wdir=<dir>\tDirectory in which the weapon files are stored.\n");
+  csPrintf("\t\texample: -wdir=railgun\n");
+  csPrintf("-o=<file.zip>\tOutput zip file name. \n");
+  csPrintf("-scale=<float>\tHow much the model should be scaled. Default is 1.\n");
+  csPrintf("\t\texample: -scale=4096. Model will be scaled as 1/4096.\n");
 }
 
 const int MD32spr::NUM_ACTIONS = 25;
@@ -179,7 +179,8 @@ MD32spr::~MD32spr()
 
 void MD32spr::Main()
 {
-  char *fileName, *dirName, *mountName, *weaponPath;
+  char *fileName, *dirName;
+  csString mountName, weaponPath;
   size_t i = 0;
   bool head = false, torso = false, leg = false;
   //csString baseName;
@@ -231,7 +232,6 @@ void MD32spr::Main()
 
   fileName = (char *) malloc(sizeof(char) * name.Length() + 1);
   dirName = (char *) malloc(sizeof(char) * name.Length() + 1);
-  mountName = (char *) malloc(sizeof(char) * (name.Length() + 12));	// /tmp/ + _data + 2 bytes padding.
 
   /*
      splitpath(name.GetData(), dirName, name.Length(), fileName, name.Length());
@@ -246,7 +246,7 @@ void MD32spr::Main()
      there is an ending slash, like /tmp/%s_data/. It mounts the zip file but vfs->FindFiles(char *dirname)
      doesn't work without the ending slash.
    */
-  sprintf(mountName, "/tmp/%s_data/", fileName);
+  mountName.Format ("/tmp/%s_data/", fileName);
   mountPath = mountName;
   /* Now we mount the .zip file for further processing */
   vfs->Mount(mountName, name.GetData());
@@ -348,10 +348,9 @@ void MD32spr::Main()
 
   }
 
-  if (weaponDir.Length() > 0) {
-    weaponPath =
-      new char[strlen(mountName) + weaponDir.Length() + 2];
-    sprintf(weaponPath, "%s%s/", mountName, weaponDir.GetData());
+  if (weaponDir.Length() > 0) 
+  {
+    weaponPath.Format ("%s%s/", mountName.GetData(), weaponDir.GetData());
     vfs->ChDir(weaponPath);
     weaponFiles = vfs->FindFiles(weaponPath);
     for (i = 0; i < weaponFiles->Length(); i++) {
@@ -394,7 +393,7 @@ bool MD3Model::ReadHeader(char **buf)
   /* The header is 108 bytes long... */
   header = (md3Header *) malloc(sizeof(md3Header));
   memcpy(header, bufPtr, sizeof(md3Header));
-  //printf("%c%c%c%c\n", header->ID[0], header->ID[1], 
+  //csPrintf("%c%c%c%c\n", header->ID[0], header->ID[1], 
   // header->ID[2], header->ID[3]);
 
   if (header->ID[0] != 'I' || header->ID[1] != 'D'
@@ -640,7 +639,7 @@ bool MD32spr::LoadAnimation(char *animFile)
 void MD32spr::Write()
 {
   size_t i = 0;
-  char* vfspath = 0;
+  csString vfspath;
   char* fileName = 0;
   char* mdlName = 0;
 
@@ -657,10 +656,9 @@ void MD32spr::Write()
       }
 
       delete zipFile;
-      vfspath = new char[outZipName.Length() + 12];
       fileName = new char[outZipName.Length() + 1];
       basename(outZipName.GetData(), fileName);
-      sprintf(vfspath, "/tmp/%s_out/", fileName);
+      vfspath.Format ("/tmp/%s_out/", fileName);
 
       if (!out->Mount(vfspath, outZipName.GetData()))
       {
@@ -695,12 +693,14 @@ void MD32spr::Write()
     }
   }
 
-  if (player) {
-    if (headModel) {
+  if (player) 
+  {
+    if (headModel) 
+    {
       char *headName = new char[strlen(headModel->GetFileName()) + 1];
-      char *tagFileName = new char[strlen(headModel->GetFileName()) + strlen(vfspath) + strlen(".tag") + 1];
+      csString tagFileName;
       basename(headModel->GetFileName(), headName);
-      sprintf(tagFileName,"%s%s.tag", vfspath, headName);
+      tagFileName.Format ("%s%s.tag", vfspath.GetData(), headName);
       WriteXMLTags(headModel, tagFileName);
       csRef < iDocumentSystem > xml(csPtr < iDocumentSystem >
 				    (new csTinyDocumentSystem()));
@@ -716,9 +716,9 @@ void MD32spr::Write()
     }
     if (upperModel) {
       char *upperName = new char[strlen(headModel->GetFileName()) + 1];
-      char *tagFileName = new char[strlen(upperModel->GetFileName()) + strlen(vfspath) + strlen(".tag") + 1];
+      csString tagFileName;
       basename(upperModel->GetFileName(), upperName);
-      sprintf(tagFileName,"%s%s.tag", vfspath, upperName);
+      tagFileName.Format ("%s%s.tag", vfspath.GetData(), upperName);
       WriteXMLTags(upperModel, tagFileName);
       csRef < iDocumentSystem > xml(csPtr < iDocumentSystem >
 				    (new csTinyDocumentSystem()));
@@ -735,9 +735,9 @@ void MD32spr::Write()
     }
     if (lowerModel) {
       char *lowerName = new char[strlen(headModel->GetFileName()) + 1];
-      char *tagFileName = new char[strlen(upperModel->GetFileName()) + strlen(vfspath) + strlen(".tag") + 1];
+      csString tagFileName;
       basename(lowerModel->GetFileName(), lowerName);
-      sprintf(tagFileName,"%s%s.tag", vfspath, lowerName);
+      tagFileName.Format ("%s%s.tag", vfspath.GetData(), lowerName);
       WriteXMLTags(lowerModel, tagFileName);
       csRef < iDocumentSystem > xml(csPtr < iDocumentSystem >
 				    (new csTinyDocumentSystem()));
@@ -767,10 +767,7 @@ void MD32spr::Write()
 
 	WriteGeneric(mdl, parent);
 	char *fileName = new char[mdl->fileName.Length() + 1];
-	char *tagFileName = new char[strlen(vfspath) + 
-				     strlen(weaponDir) + 
-				     strlen("/") + mdl->fileName.Length() + 
-				     strlen(".tag") + 1];
+	csString tagFileName;
 	basename(mdl->fileName.GetData(), fileName);
 
 
@@ -779,7 +776,7 @@ void MD32spr::Write()
 	outFile += "/";
 	outFile += fileName;
 	doc->Write(out, outFile.GetData());
-	sprintf(tagFileName,"%s%s/%s.tag", vfspath, weaponDir.GetData(), fileName);
+	tagFileName.Format ("%s%s/%s.tag", vfspath.GetData(), weaponDir.GetData(), fileName);
 	WriteXMLTags(mdl, tagFileName);
       }
     }
@@ -797,7 +794,7 @@ void MD32spr::Write()
 }
 
 void MD32spr::WriteXMLTags(md3Model * model,
-			char *tagFileName) 
+			const char *tagFileName) 
 {
   int i = 0, j = 0, k = 0;
   float *rotationMatrix, *translationVector;
@@ -928,12 +925,12 @@ void MD32spr::WriteGeneric(md3Model * model,
 
       csRef < iDocumentNode > frame;
       for (j = 0; j < model->meshes[i].meshHeader->numMeshFrames; j++) {
-	char fNum[10];
+	csString fNum;
 	int numVertices = model->meshes[i].meshHeader->numVertices;
 
 	frame = child->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 	frame->SetValue("frame");
-	sprintf(fNum, "f%d", j);
+	fNum.Format ("f%d", j);
 	frame->SetAttribute("name", fNum);
 
 	for (k = 0; k < model->meshes[i].meshHeader->numVertices; k++) {
@@ -964,11 +961,12 @@ void MD32spr::WriteGeneric(md3Model * model,
 	    action->SetValue("action");
 	    action->SetAttribute("name", "default");
 
-	    for (k = 0; k < model->meshes[i].meshHeader->numMeshFrames; k++) {
-	      char fNum[10];
+	    for (k = 0; k < model->meshes[i].meshHeader->numMeshFrames; k++) 
+	    {
+	      csString fNum;
 	      csRef < iDocumentNode > f =
 		action->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-	      sprintf(fNum, "f%d", k);
+	      fNum.Format ("f%d", k);
 	      f->SetValue("f");
 	      f->SetAttribute("name", fNum);
 	      f->SetAttribute("delay", "1000");	/// 1000 is the default delay.
@@ -981,11 +979,12 @@ void MD32spr::WriteGeneric(md3Model * model,
 	  
 	    for(k = model->animInfo[j].startFrame; 
 		k < (model->animInfo[j].startFrame + model->animInfo[j].numFrames); 
-		k++) {
-	      char fNum[10];
+		k++) 
+	    {
+	      csString fNum;
 	      csRef < iDocumentNode > f =
 		action->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-	      sprintf(fNum, "f%d", k);
+	      fNum.Format ("f%d", k);
 	      f->SetValue("f");
 	      f->SetAttribute("name", fNum);
 	      float delay = (1.0f/(float)model->animInfo[j].fps) * 1000;
@@ -999,11 +998,12 @@ void MD32spr::WriteGeneric(md3Model * model,
 	action->SetValue("action");
 	action->SetAttribute("name", "default");
 
-	for (j = 0; j < model->meshes[i].meshHeader->numMeshFrames; j++) {
-	  char fNum[10];
+	for (j = 0; j < model->meshes[i].meshHeader->numMeshFrames; j++) 
+	{
+	  csString fNum;
 	  csRef < iDocumentNode > f =
 	    action->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-	  sprintf(fNum, "f%d", j);
+	  fNum.Format ("f%d", j);
 	  f->SetValue("f");
 	  f->SetAttribute("name", fNum);
 	  f->SetAttribute("delay", "1000");	/// 1000 is the default delay.

@@ -117,7 +117,7 @@ public:
     * This method is virtual, so it can be defined different
     * for different uses. a GUI application might derive a
     * class from this class, which will display a csMessageBox,
-    * while a console application will just do a printf.
+    * while a console application will just do a csPrintf.
     */
   virtual void ReportError(const char* message,
                            const char* info1=0,

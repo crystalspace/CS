@@ -209,7 +209,7 @@ void CMapPolygon::Create(CMapTexturedPlane*              pBaseplane,
     // weird splits. (I have come to think now, that this is a rather commom
     // case instead of an exception)
 
-    ////printf("Create() failed!\n");
+    ////csPrintf("Create() failed!\n");
     ////DumpPolyinfo(pBaseplane, planes);
     ////Create(pBaseplane, planes);
 
@@ -225,7 +225,7 @@ void CMapPolygon::Create(CMapTexturedPlane*              pBaseplane,
 
   //if (GetArea()<1)
   //{
-    //printf("removed polygon due to too small area! (%g)\n", GetArea());
+    //csPrintf("removed polygon due to too small area! (%g)\n", GetArea());
     //Clear();
   //}
 }
@@ -491,11 +491,11 @@ void CMapPolygon::DumpPolyinfo(CMapTexturedPlane*             pBaseplane,
     {
       if (m_Planes[j] == planes[i])
       {
-        printf("%zu ", i);
+        csPrintf("%zu ", i);
       }
     }
   }
-  printf("\n");
+  csPrintf("\n");
 
   for (y=0; y<planes.Length(); y++)
   {
@@ -506,7 +506,7 @@ void CMapPolygon::DumpPolyinfo(CMapTexturedPlane*             pBaseplane,
         CdVector3 point;
         if (x==y)
         {
-          printf("        * "); //10 char "No check!"
+          csPrintf("        * "); //10 char "No check!"
         }
         else
         {
@@ -516,22 +516,22 @@ void CMapPolygon::DumpPolyinfo(CMapTexturedPlane*             pBaseplane,
 
             if (CheckIfInside(point, planes, pBaseplane, planes[x], planes[y]))
             {
-              printf("%8.3fI ",v); //10 char "Inside"
+              csPrintf("%8.3fI ",v); //10 char "Inside"
             }
             else
             {
-              printf("%8.3fO ",v); //10 char "Outside"
+              csPrintf("%8.3fO ",v); //10 char "Outside"
             }
           }
           else
           {
-            printf("        M "); //10 char "Miss"
+            csPrintf("        M "); //10 char "Miss"
           }
         }
       }
-      printf("\n");
+      csPrintf("\n");
     }
-    printf("\n");
+    csPrintf("\n");
   }
-  printf("Dump done\n");
+  csPrintf("Dump done\n");
 }

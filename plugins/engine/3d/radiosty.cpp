@@ -363,14 +363,14 @@ csRGBMap *csRadElement::ComputeTextureLumelSized ()
   }
 
   /*
-  printf("Map for %s, %s\n", polygon->GetName(), rgbimage->GetName());
+  csPrintf("Map for %s, %s\n", polygon->GetName(), rgbimage->GetName());
   uv = 0;
   for(int y=0; y<height; y++)
   {
     for(int x=0; x<width; x++, uv++)
-      printf("%2.2x%2.2x%2.2x ", (int)map->GetRed()[uv], (int)map->GetGreen()[uv],
+      csPrintf("%2.2x%2.2x%2.2x ", (int)map->GetRed()[uv], (int)map->GetGreen()[uv],
         (int)map->GetBlue()[uv]);
-    printf("\n");
+    csPrintf("\n");
   }
   */
 
@@ -1146,22 +1146,22 @@ csRadElement *csRadiosity::FetchNext ()
   if (element == 0)
   {
     stop_now = true;
-    sprintf (reason, "no polygons to light");
+    scsPrintf (reason, "no polygons to light");
   }
   else if (element->GetPriority () < stop_value)
   {
     stop_now = true;
-    sprintf (reason, "priority down to %g", element->GetPriority ());
+    scsPrintf (reason, "priority down to %g", element->GetPriority ());
   }
   else if (iterations > stop_iterations)
   {
     stop_now = true;
-    sprintf (reason, "%d iterations reached", iterations);
+    scsPrintf (reason, "%d iterations reached", iterations);
   }
   else if (element->GetRepeatCount () > max_repeats)
   {
     stop_now = true;
-    sprintf (reason, "loop detected");
+    scsPrintf (reason, "loop detected");
   }
 
   /// more stop conditions can be put here.

@@ -161,7 +161,7 @@ SCF_IMPLEMENT_IBASE (csSpriteCal3DMeshObjectFactory)
     if (iInterfaceID == iPolygonMesh_scfID &&				
       scfCompatibleVersion(iVersion, scfInterface<iPolygonMesh>::GetVersion()))
     {
-      printf ("Deprecated feature use: iPolygonMesh queried from Sprite3d "
+      csPrintf ("Deprecated feature use: iPolygonMesh queried from Sprite3d "
         "factory; use iObjectModel->GetPolygonMeshColldet() instead.\n");
       iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
       (Object)->IncRef ();						
@@ -881,7 +881,7 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
   RecalcBoundingBox(object_bbox);
   calModel.getMixer()->clearCycle(0,0);
 
-//  printf("Object bbox is (%1.2f, %1.2f, %1.2f) to (%1.2f, %1.2f, %1.2f)\n",
+//  csPrintf("Object bbox is (%1.2f, %1.2f, %1.2f) to (%1.2f, %1.2f, %1.2f)\n",
 //         object_bbox.MinX(),object_bbox.MinY(),object_bbox.MinZ(),object_bbox.MaxX(),object_bbox.MaxY(),object_bbox.MaxZ());
 
   // Copy the sockets list down to the mesh
@@ -931,7 +931,7 @@ void csSpriteCal3DMeshObject::RecalcBoundingBox (csBox3& bbox)
   }
 
   bboxVersion = meshVersion;
-//  printf("Bbox Width:%1.2f Height:%1.2f Depth:%1.2f\n",bbox.Max().x - bbox.Min().x,bbox.Max().y - bbox.Min().y,bbox.Max().z - bbox.Min().z);
+//  csPrintf("Bbox Width:%1.2f Height:%1.2f Depth:%1.2f\n",bbox.Max().x - bbox.Min().x,bbox.Max().y - bbox.Min().y,bbox.Max().z - bbox.Min().z);
 }
 
 
@@ -2087,7 +2087,7 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
         pct = (factory->anims[i]->max_velocity - vel) / vel_diff;
       }
       AddAnimCycle(i,pct,0);
-//     printf("  Adding %s weight=%1.2f\n",factory->anims[i]->name.GetData(),pct);
+//     csPrintf("  Adding %s weight=%1.2f\n",factory->anims[i]->name.GetData(),pct);
     }
   }
 

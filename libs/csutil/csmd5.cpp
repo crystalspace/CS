@@ -64,7 +64,7 @@
 // T-values were computed with this code:
 //   for (int i = 1; i <= 64; ++i) {
 //	unsigned long v = (unsigned long)(4294967296.0 * fabs(sin((double)i)));
-//	printf("#define T%d 0x%08lx\n", i, v); }
+//	csPrintf("#define T%d 0x%08lx\n", i, v); }
 
 #define T1 0xd76aa478
 #define T2 0xe8c7b756
@@ -374,11 +374,9 @@ csMD5::Digest csMD5::Encode(const char* s)
 
 csString csMD5::Digest::HexString() const
 {
-  char buff[DigestLen * 2 + 1]; // Two hex characters per digest element.
+  csString s;
   for (int i = 0; i < DigestLen; i++)
-    sprintf(buff + (i * 2), "%02" PRIx8, data[i]);
-  buff[ sizeof(buff) - 1 ] = '\0';
-  csString s(buff);
+    s.AppendFmt ("%02" PRIx8, data[i]);
   return s;
 }
 

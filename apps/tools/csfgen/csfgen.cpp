@@ -80,22 +80,22 @@ static utf32_char lastglyph;
 
 static int display_help ()
 {
-  printf ("Crystal Space font conversion/generation utility v%s\n", programversion);
-  printf ("Copyright (C) 2000 by W.C.A. Wijngaards and Andrew Zabolotny\n\n");
-  printf ("Usage: %s {option/s} [truetype font file] [...]\n\n", programname);
-  printf ("This program allows to convert TTF font files to bitmap format CSF\n");
-  printf ("which is faster to load although it is non-scalable. By default the\n");
-  printf ("program will convert all the fonts given on command line to CSF.\n\n");
-  printf ("  -d   --display     Display font rather than converting it\n");
-  printf ("  -f#  --first=#     Start conversion at glyph # (default = 32)\n");
-  printf ("  -g#  --glyphs=#    Convert just # (default = 1114079) glyphs of the font\n");
-  printf ("  -s#  --size=#      Set font size # in points\n");
-  printf ("  -o#  --output=#    Output CSF font to file #\n");
-  printf ("  -t   --text        Generate text output (C++ code) rather than binary\n");
-  printf ("  -h   --help        Display this help text\n");
-  printf ("  -v   --verbose     Comment on what's happening\n");
-  printf ("  -V   --version     Display program version\n");
-  printf ("       --noalpha     Disable alphamap output, make unantialiased font\n");
+  csPrintf ("Crystal Space font conversion/generation utility v%s\n", programversion);
+  csPrintf ("Copyright (C) 2000 by W.C.A. Wijngaards and Andrew Zabolotny\n\n");
+  csPrintf ("Usage: %s {option/s} [truetype font file] [...]\n\n", programname);
+  csPrintf ("This program allows to convert TTF font files to bitmap format CSF\n");
+  csPrintf ("which is faster to load although it is non-scalable. By default the\n");
+  csPrintf ("program will convert all the fonts given on command line to CSF.\n\n");
+  csPrintf ("  -d   --display     Display font rather than converting it\n");
+  csPrintf ("  -f#  --first=#     Start conversion at glyph # (default = 32)\n");
+  csPrintf ("  -g#  --glyphs=#    Convert just # (default = 1114079) glyphs of the font\n");
+  csPrintf ("  -s#  --size=#      Set font size # in points\n");
+  csPrintf ("  -o#  --output=#    Output CSF font to file #\n");
+  csPrintf ("  -t   --text        Generate text output (C++ code) rather than binary\n");
+  csPrintf ("  -h   --help        Display this help text\n");
+  csPrintf ("  -v   --verbose     Comment on what's happening\n");
+  csPrintf ("  -V   --version     Display program version\n");
+  csPrintf ("       --noalpha     Disable alphamap output, make unantialiased font\n");
   return 1;
 }
 
@@ -111,13 +111,13 @@ static bool Display (iFontServer *fs, iFont *font)
       continue;
 
     CS_ALLOC_STACK_ARRAY(char, lineText, metrics.width);
-    printf ("---- Character: %" PRIu32 "\n", c);
+    csPrintf ("---- Character: %" PRIu32 "\n", c);
     for (l = 0; l < metrics.height; l++)
     {
       uint8* line = bitmap->GetUint8 () + l * ((metrics.width + 7) / 8);
       for (i = 0; i < metrics.width; i++)
 	lineText[i] = (line [i / 8] & (0x80 >> (i & 7))) ? '@' : '.';
-      printf ("%s\n", lineText);
+      csPrintf ("%s\n", lineText);
     }
   }
   return true;
@@ -161,9 +161,9 @@ public:
     if (opt.sourcecode)
     {
       /// make a text version
-      fprintf (out, "// %s.%d %dpx height font\n", fontname, opt.fontsize, maxheight);
-      fprintf (out, "// %d ascent, %d descent\n", font->GetAscent (), font->GetDescent ());
-      fprintf (out, "\n");
+      csFPrintf (out, "// %s.%d %dpx height font\n", fontname, opt.fontsize, maxheight);
+      csFPrintf (out, "// %d ascent, %d descent\n", font->GetAscent (), font->GetDescent ());
+      csFPrintf (out, "\n");
 
       buf.Format ("CharRange ranges_%s%d [] =\n{\n", fontname, opt.fontsize);
       fCharRanges.Write (buf.GetData (), buf.Length ());
@@ -188,11 +188,11 @@ public:
     }
     else 
     {
-      fprintf (out, "CSF [Font=%s.%d Height=%d Ascent=%d Descent=%d "
+      csFPrintf (out, "CSF [Font=%s.%d Height=%d Ascent=%d Descent=%d "
 	"HasCharRanges=1 HasBitmapMetrics=1 HasGlyphAdvance=1",
 	fontname, opt.fontsize, maxheight, font->GetAscent (), font->GetDescent ());
-      fprintf (out, " Alpha=%d", (int)opt.do_alpha);
-      fprintf (out, "]\n");
+      csFPrintf (out, " Alpha=%d", (int)opt.do_alpha);
+      csFPrintf (out, "]\n");
     }
   }
 
@@ -227,8 +227,8 @@ public:
     {
       if (opt.verbose)
       {
-	if (numGlyphs == 0) printf ("character ");
-	printf ("%" PRIu32 "%s", c, (c < lastglyph - 1) ? "," : "\n");
+	if (numGlyphs == 0) csPrintf ("character ");
+	csPrintf ("%" PRIu32 "%s", c, (c < lastglyph - 1) ? "," : "\n");
       }
 
       csGlyphMetrics gMetrics;
@@ -398,12 +398,12 @@ public:
 static bool Convert (const char *fontfile)
 {
   if (opt.verbose)
-    printf ("Loading font %s, size = %d\n", fontfile, opt.fontsize);
+    csPrintf ("Loading font %s, size = %d\n", fontfile, opt.fontsize);
 
   csRef<iFontServer> fs = CS_QUERY_REGISTRY (object_reg, iFontServer);
   if (!fs)
   {
-    printf ("Font server plugin has not been loaded.\n");
+    csPrintf ("Font server plugin has not been loaded.\n");
     return false;
   }
 
@@ -411,7 +411,7 @@ static bool Convert (const char *fontfile)
     (opt.fontsize > 0) ? opt.fontsize : 10);
   if (font == 0)
   {
-    printf ("Cannot load font file %s\n", fontfile);
+    csPrintf ("Cannot load font file %s\n", fontfile);
     return false;
   }
 
@@ -419,7 +419,7 @@ static bool Convert (const char *fontfile)
     int oldsize = opt.fontsize;
     opt.fontsize = font->GetSize ();
     if (opt.fontsize != oldsize)
-      printf ("Could not set font size %d, using size %d\n",
+      csPrintf ("Could not set font size %d, using size %d\n",
         oldsize, opt.fontsize);
   }
 
@@ -429,7 +429,7 @@ static bool Convert (const char *fontfile)
 
   if (maxwidth > 255)
   {
-    fprintf (stderr, "Font too large (%dx%d): CSF format supports only widths < 256\n", maxwidth, maxheight);
+    csFPrintf (stderr, "Font too large (%dx%d): CSF format supports only widths < 256\n", maxwidth, maxheight);
     return false;
   }
 
@@ -437,18 +437,19 @@ static bool Convert (const char *fontfile)
     return Display (fs, font);
 
   char fontname [CS_MAXPATHLEN + 1];
-  char outfile [CS_MAXPATHLEN + 1];
+  csString outfile;
   csSplitPath (fontfile, 0, 0, fontname, sizeof (fontname));
   if (fontname [0] == '*')
     strcpy (fontname, fontname + 1);
   char *dot = strchr (fontname, '.');
   if (dot) *dot = 0;
-  sprintf (outfile, "%s%d.%s", fontname, opt.fontsize, opt.sourcecode ? "h" : "csf");
+  outfile.Format ("%s%d.%s", fontname, opt.fontsize, 
+    opt.sourcecode ? "h" : "csf");
 
   FILE *out = fopen (outfile, opt.sourcecode ? "w" : "wb");
   if (!out)
   {
-    printf ("Could not open output file %s\n", outfile);
+    csPrintf ("Could not open output file %s\n", outfile);
     return false;
   }
 
@@ -487,7 +488,7 @@ int main (int argc, char* argv[])
 	CS_REQUEST_PLUGIN ("crystalspace.font.server.freetype2", iFontServer),
 	CS_REQUEST_END))
   {
-    fprintf (stderr, "couldn't init app! (perhaps some plugins are missing?)");
+    csFPrintf (stderr, "couldn't init app! (perhaps some plugins are missing?)");
     return -1;
   }
 
@@ -499,7 +500,7 @@ int main (int argc, char* argv[])
     {
       case '?':
         // unknown option
-	printf ("\n");
+	csPrintf ("\n");
 	display_help ();
         return -1;
       case 'f':
@@ -507,7 +508,7 @@ int main (int argc, char* argv[])
         if ((opt.first < 0)
          || (opt.first > 1114111))
         {
-          fprintf (stderr, "ERROR: first glyph should be 0..1114111\n");
+          csFPrintf (stderr, "ERROR: first glyph should be 0..1114111\n");
           return -2;
         }
         break;
@@ -516,7 +517,7 @@ int main (int argc, char* argv[])
         if ((opt.glyphs < 1)
          || (opt.glyphs > 1114112))
         {
-          fprintf (stderr, "ERROR: glyph count should be 1..1114112\n");
+          csFPrintf (stderr, "ERROR: glyph count should be 1..1114112\n");
           return -2;
         }
         break;
@@ -525,7 +526,7 @@ int main (int argc, char* argv[])
         if ((opt.fontsize < 1)
          || (opt.fontsize > 100))
         {
-          fprintf (stderr, "ERROR: font size should be 1..100\n");
+          csFPrintf (stderr, "ERROR: font size should be 1..100\n");
           return -2;
         }
         break;
@@ -544,11 +545,11 @@ int main (int argc, char* argv[])
         opt.verbose = true;
         break;
       case 'V':
-        printf ("%s version %s\n\n", programname, programversion);
-        printf ("This program is distributed in the hope that it will be useful,\n");
-        printf ("but WITHOUT ANY WARRANTY; without even the implied warranty of\n");
-        printf ("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n");
-        printf ("GNU Library General Public License for more details.\n");
+        csPrintf ("%s version %s\n\n", programname, programversion);
+        csPrintf ("This program is distributed in the hope that it will be useful,\n");
+        csPrintf ("but WITHOUT ANY WARRANTY; without even the implied warranty of\n");
+        csPrintf ("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n");
+        csPrintf ("GNU Library General Public License for more details.\n");
         return 0;
       case 'a':
 	opt.do_alpha = false;
@@ -561,7 +562,7 @@ int main (int argc, char* argv[])
   lastglyph = opt.first + opt.glyphs;
   if (lastglyph > 1114111)
   {
-    fprintf (stderr, "WARNING: Last glyph = %" PRIu32 ", limiting to 1114111\n", lastglyph);
+    csFPrintf (stderr, "WARNING: Last glyph = %" PRIu32 ", limiting to 1114111\n", lastglyph);
     lastglyph = 1114111;
     opt.glyphs = 1114111 - opt.first;
   }

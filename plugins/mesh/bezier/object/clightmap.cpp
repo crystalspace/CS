@@ -224,18 +224,18 @@ const char* csCurveLightMap::ReadFromCache (
   //-------------------------------
   // Check if cached item is still valid.
   //-------------------------------
-  static char error_buf[512];
-  *error_buf = 0;
+  static csString error_buf;
+  error_buf.Empty();
   if (strncmp (ps.header, pswanted.header, 4) != 0)
-    sprintf (error_buf, "Cached lightmap header doesn't match!");
+    error_buf.Format ("Cached lightmap header doesn't match!");
   else
   {
     if (ps.lm_cnt != pswanted.lm_cnt)
-      sprintf (error_buf,
+      error_buf.Format (
       	"Cached lightmap header mismatch (got cnt=%" PRId32 ", expected %" PRId32 ")!",
 	ps.lm_cnt, pswanted.lm_cnt);
     else if (ps.lm_size != pswanted.lm_size)
-      sprintf (error_buf,
+      error_buf.Format (
       	"Cached lightmap base texture mismatch (got size=%" PRId32 ", expected %" PRId32 ")!",
 	ps.lm_size, pswanted.lm_size);
   }

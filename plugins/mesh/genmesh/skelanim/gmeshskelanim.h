@@ -473,7 +473,7 @@ private:
 	csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE "plugins/mesh/genmesh/skelanim/gmeshskelanim.tok"
 #include "cstool/tokenlist.h"
-	char error_buf[256];
+	csString error_buf;
 
 public:
 	/// Constructor.

@@ -309,7 +309,7 @@ bool csShaderExpression::Parse(iDocumentNode * node, iShaderVariableContext * st
   
 #if 0
   print_cons(head);
-  printf("\n***************\n");
+  csPrintf("\n***************\n");
 #endif
 
   if (!eval_const(head))
@@ -323,7 +323,7 @@ bool csShaderExpression::Parse(iDocumentNode * node, iShaderVariableContext * st
 
 #if 0
   print_cons(head);
-  printf("\n***************\n");
+  csPrintf("\n***************\n");
 #endif
 
   int acc_top = 0;

@@ -542,10 +542,10 @@ bool PrintObjects (csKDTree* treenode, void*, uint32, uint32&)
     csRef<iObject> iobj (SCF_QUERY_INTERFACE (visobj_wrap->visobj, iObject));
     if (iobj)
     {
-      char name[255];
-      if (iobj->GetName ()) sprintf (name, "'%s'", iobj->GetName ());
-      else strcpy (name, "<noname>");
-      printf ("%s ", name);
+      if (iobj->GetName ()) 
+	csPrintf ("'%s' ", iobj->GetName ());
+      else 
+	csPrintf ("<noname> ");
     }
   }
   return true;
@@ -644,7 +644,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
       if (do_state_dump)
       {
         csRef<iString> str = tcovbuf->Debug_Dump ();
-        printf ("Before node test:\n%s\n", str->GetData ());
+        csPrintf ("Before node test:\n%s\n", str->GetData ());
       }
 #     endif
       // @@@ VPT tracking for nodes!!!
@@ -685,7 +685,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
 #           ifdef CS_DEBUG
 	    if (do_state_dump)
 	    {
-	      printf ("Adding objects from write queue (for node)!\n");
+	      csPrintf ("Adding objects from write queue (for node)!\n");
 	      fflush (stdout);
 	    }
 #           endif
@@ -747,7 +747,7 @@ end:
 # ifdef CS_DEBUG
   if (do_state_dump)
   {
-    printf ("Node (%g,%g,%g)-(%g,%g,%g) %s\n",
+    csPrintf ("Node (%g,%g,%g)-(%g,%g,%g) %s\n",
     	orig_node_bbox.MinX (), orig_node_bbox.MinY (), orig_node_bbox.MinZ (),
     	orig_node_bbox.MaxX (), orig_node_bbox.MaxY (), orig_node_bbox.MaxZ (),
 	hist->reason == INVISIBLE_FRUSTUM ? "outside frustum" :
@@ -759,16 +759,16 @@ end:
 	);
     if (hist->reason != INVISIBLE_FRUSTUM && hist->reason != VISIBLE_INSIDE)
     {
-      printf ("  (%g,%g)-(%g,%g) min_depth=%g\n",
+      csPrintf ("  (%g,%g)-(%g,%g) min_depth=%g\n",
       	sbox.MinX (), sbox.MinY (),
       	sbox.MaxX (), sbox.MaxY (), min_depth);
     }
     if (hist->reason != VISIBLE && hist->reason != VISIBLE_INSIDE
     	&& hist->reason != VISIBLE_VPT)
     {
-      printf ("  ");
+      csPrintf ("  ");
       treenode->Front2Back (data->pos, PrintObjects, 0, 0);
-      printf ("\n");
+      csPrintf ("\n");
     }
   }
 # endif
@@ -838,7 +838,7 @@ void csDynaVis::UpdateCoverageBuffer (csVisibilityObjectWrapper* obj)
     csRef<iObject> iobj (SCF_QUERY_INTERFACE (visobj, iObject));
     if (iobj)
     {
-      printf ("CovIns of object %s\n", iobj->GetName () ? iobj->GetName () :
+      csPrintf ("CovIns of object %s\n", iobj->GetName () ? iobj->GetName () :
       	"<noname>");
     }
   }
@@ -913,10 +913,10 @@ void csDynaVis::UpdateCoverageBuffer (csVisibilityObjectWrapper* obj)
 #     ifdef CS_DEBUG
       if (do_state_dump)
       {
-        printf ("  (not clamped) max_depth=%g ", max_depth);
+        csPrintf ("  (not clamped) max_depth=%g ", max_depth);
         for (j = 0 ; j < num_verts ; j++)
-	  printf ("(%g,%g) ", verts2d[j].x, verts2d[j].y);
-        printf ("\n");
+	  csPrintf ("(%g,%g) ", verts2d[j].x, verts2d[j].y);
+        csPrintf ("\n");
       }
 #     endif
     }
@@ -945,10 +945,10 @@ void csDynaVis::UpdateCoverageBuffer (csVisibilityObjectWrapper* obj)
 #     ifdef CS_DEBUG
       if (do_state_dump)
       {
-        printf ("  (clamped) max_depth=%g ", max_depth);
+        csPrintf ("  (clamped) max_depth=%g ", max_depth);
         for (j = 0 ; j < num_verts ; j++)
-	  printf ("(%g,%g) ", verts2d[j].x, verts2d[j].y);
-        printf ("\n");
+	  csPrintf ("(%g,%g) ", verts2d[j].x, verts2d[j].y);
+        csPrintf ("\n");
       }
 #     endif
     }
@@ -976,7 +976,7 @@ void csDynaVis::UpdateCoverageBuffer (csVisibilityObjectWrapper* obj)
   if (do_state_dump)
   {
     csRef<iString> str = tcovbuf->Debug_Dump ();
-    printf ("%s\n", str->GetData ());
+    csPrintf ("%s\n", str->GetData ());
   }
 # endif
 }
@@ -1014,11 +1014,11 @@ void csDynaVis::UpdateCoverageBufferOutline (csVisibilityObjectWrapper* obj)
     csRef<iObject> iobj (SCF_QUERY_INTERFACE (visobj, iObject));
     if (iobj)
     {
-      printf ("CovOutIns of object %s (max_depth=%g)\n",
+      csPrintf ("CovOutIns of object %s (max_depth=%g)\n",
       	iobj->GetName () ? iobj->GetName () : "<noname>",
 	0.0);//max_depth);
     }
-    printf ("  campos_obj=%g,%g,%g\n",
+    csPrintf ("  campos_obj=%g,%g,%g\n",
     	campos_object.x, campos_object.y, campos_object.z);
   }
 # endif
@@ -1052,14 +1052,14 @@ void csDynaVis::UpdateCoverageBufferOutline (csVisibilityObjectWrapper* obj)
 # ifdef CS_DEBUG
   if (do_state_dump)
   {
-    //printf ("  max_depth=%g\n", max_depth);
+    //csPrintf ("  max_depth=%g\n", max_depth);
     int j;
     for (j = 0 ; j < vertex_count ; j++)
     {
       if (outline_info.outline_verts[j])
       {
         csVector3 cam = trans.Other2This (verts[j]);
-        printf ("  V%d: (%g,%g,%g / %g,%g,%g)\n",
+        csPrintf ("  V%d: (%g,%g,%g / %g,%g,%g)\n",
 	  j,
 	  //tr_verts[j].x, tr_verts[j].y,
 	  verts[j].x, verts[j].y, verts[j].z,
@@ -1070,11 +1070,11 @@ void csDynaVis::UpdateCoverageBufferOutline (csVisibilityObjectWrapper* obj)
     {
       int vt1 = outline_info.outline_edges[j*2+0];
       int vt2 = outline_info.outline_edges[j*2+1];
-      printf ("  E%d: %d-%d\n", j, vt1, vt2);
+      csPrintf ("  E%d: %d-%d\n", j, vt1, vt2);
     }
 
     csRef<iString> str = tcovbuf->Debug_Dump ();
-    printf ("%s\n", str->GetData ());
+    csPrintf ("%s\n", str->GetData ());
   }
 # endif
 }
@@ -1105,7 +1105,7 @@ void csDynaVis::AppendWriteQueue (iVisibilityObject* visobj,
     csRef<iObject> iobj (SCF_QUERY_INTERFACE (visobj, iObject));
     if (iobj)
     {
-      printf (
+      csPrintf (
 	    "AppendWriteQueue of object %s (depth=%g) (good occluder=%d)\n",
       	    iobj->GetName () ? iobj->GetName () : "<noname>",
 	    depth, (int)obj->hint_goodoccluder);
@@ -1248,7 +1248,7 @@ void csDynaVis::TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
     if (do_state_dump)
     {
       csRef<iString> str = tcovbuf->Debug_Dump ();
-      printf ("Before single-poly test:\n%s\n", str->GetData ());
+      csPrintf ("Before single-poly test:\n%s\n", str->GetData ());
     }
 #   endif
     bool mark_culled_object;
@@ -1287,7 +1287,7 @@ void csDynaVis::TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
 #           ifdef CS_DEBUG
 	    if (do_state_dump)
 	    {
-	      printf ("Adding objects from write queue!\n");
+	      csPrintf ("Adding objects from write queue!\n");
 	      fflush (stdout);
 	    }
 #           endif
@@ -1475,7 +1475,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     if (do_state_dump)
     {
       csRef<iString> str = tcovbuf->Debug_Dump ();
-      printf ("Before obj test:\n%s\n", str->GetData ());
+      csPrintf ("Before obj test:\n%s\n", str->GetData ());
     }
 #   endif
     bool mark_culled_object;
@@ -1514,7 +1514,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 #           ifdef CS_DEBUG
 	    if (do_state_dump)
 	    {
-	      printf ("Adding objects from write queue!\n");
+	      csPrintf ("Adding objects from write queue!\n");
 	      fflush (stdout);
 	    }
 #           endif
@@ -1642,7 +1642,7 @@ end:
   {
     const csBox3& obj_bbox = obj->child->GetBBox ();
     csRef<iObject> iobj (SCF_QUERY_INTERFACE (obj->visobj, iObject));
-    printf ("Obj (%g,%g,%g)-(%g,%g,%g) (%s) %s\n",
+    csPrintf ("Obj (%g,%g,%g)-(%g,%g,%g) (%s) %s\n",
     	obj_bbox.MinX (), obj_bbox.MinY (), obj_bbox.MinZ (),
     	obj_bbox.MaxX (), obj_bbox.MaxY (), obj_bbox.MaxZ (),
 	(iobj && iobj->GetName ()) ? iobj->GetName () : "<noname>",
@@ -1657,7 +1657,7 @@ end:
     if (hist->reason != INVISIBLE_FRUSTUM && hist->reason != VISIBLE_INSIDE
     	&& hist->reason != VISIBLE_HISTORY)
     {
-      printf ("  (%g,%g)-(%g,%g) min_depth=%g\n",
+      csPrintf ("  (%g,%g)-(%g,%g) min_depth=%g\n",
       	sbox.MinX (), sbox.MinY (),
       	sbox.MaxX (), sbox.MaxY (), min_depth);
     }
@@ -1832,13 +1832,13 @@ bool csDynaVis::VisTest (iRenderView* rview,
 # ifdef CS_DEBUG
   if (do_state_dump)
   {
-    printf ("=============================================================\n");
+    csPrintf ("=============================================================\n");
     uint32 mk = frustum_mask;
     int i;
     i = 0;
     while (mk)
     {
-      printf ("frustum %g,%g,%g,%g\n",
+      csPrintf ("frustum %g,%g,%g,%g\n",
       	data.frustum[i].A (), data.frustum[i].B (),
       	data.frustum[i].C (), data.frustum[i].D ());
       i++;
@@ -2568,7 +2568,7 @@ void csDynaVis::CastShadows (iFrustumView* fview)
   CS_ASSERT (lf->GetVertexCount () <= 31);
   if (lf->GetVertexCount () > 31)
   {
-    printf ("INTERNAL ERROR! #vertices in GetVisibleObjects() exceeded!\n");
+    csPrintf ("INTERNAL ERROR! #vertices in GetVisibleObjects() exceeded!\n");
     fflush (stdout);
     return;
   }
@@ -2699,8 +2699,8 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
       g2d->Clear (col_fgtext);
     }
 
-    char buf[200];
-    sprintf (buf,
+    csString buf;
+    buf.Format (
         "FR%c COV%c HIS%c WQ%c VPT%c IS%c CO%c OS%c IC%c BO%c #visobj=%d #visnode=%d",
         do_cull_frustum ? '+' : '-',
 	do_cull_coverage == COVERAGE_OUTLINE ? 'o' :
@@ -3288,7 +3288,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     if (dbghelp)
     {
       csRef<iString> rc (dbghelp->Dump ());
-      printf ("%s\n", rc->GetData ());
+      csPrintf ("%s\n", rc->GetData ());
       fflush (stdout);
     }
 
@@ -3343,7 +3343,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
 
         csRef<iObject> iobj (
 		SCF_QUERY_INTERFACE (visobj_wrap->visobj, iObject));
-        printf ("  obj(%zu,'%s')  vis=%s   vispix=%d totpix=%d      %s\n",
+        csPrintf ("  obj(%zu,'%s')  vis=%s   vispix=%d totpix=%d      %s\n",
       	  i,
 	  (iobj && iobj->GetName ()) ? iobj->GetName () : "?",
 	  visobj_wrap->history->reason == INVISIBLE_PARENT ? "invis parent" :
@@ -3359,9 +3359,9 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
 	  	? "????" : "");
       }
     }
-    printf ("Summary: #objects=%d #vis(exact)=%d #vis(dynavis)=%d\n",
+    csPrintf ("Summary: #objects=%d #vis(exact)=%d #vis(dynavis)=%d\n",
     	tot_objects, tot_vis_exact, tot_vis_dynavis);
-    printf ("Summary: #poly=%d #poly(exact)=%d #poly(dynavis)=%d\n",
+    csPrintf ("Summary: #poly=%d #poly(exact)=%d #poly(dynavis)=%d\n",
     	tot_poly, tot_poly_exact, tot_poly_dynavis);
     fflush (stdout);
 
@@ -3380,7 +3380,7 @@ csTicks csDynaVis::Debug_Benchmark (int num_iterations)
   if (dbghelp)
   {
     csTicks r = dbghelp->Benchmark (num_iterations);
-    printf ("kdtree:   %zu ms\n", r);
+    csPrintf ("kdtree:   %zu ms\n", r);
     rc += r;
   }
   delete kdtree;

@@ -22,6 +22,7 @@
 #include "csutil/strhash.h"
 #include "csutil/csstring.h"
 #include "csutil/util.h"
+#include "csutil/sysfunc.h"
 
 /* helper classes */
 
@@ -211,7 +212,7 @@ csConfigManager::~csConfigManager()
 {
   // save our config.
   if (!Save())
-    printf("Error saving configuration '%s'.\n",
+    csPrintf("Error saving configuration '%s'.\n",
 	    DynamicDomain->Cfg->GetFileName());
   CleanUp ();
   SCF_DESTRUCT_IBASE ();

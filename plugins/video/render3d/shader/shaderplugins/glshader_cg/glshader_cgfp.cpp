@@ -119,7 +119,7 @@ bool csShaderGLCGFP::Compile (csArray<iShaderVariableContext*> &staticContexts)
       {
         // Get the register number, and create a mapping
         char regnum[3];
-        sprintf (regnum, "c%lu", cgGetParameterResourceIndex (parameter));
+        scsPrintf (regnum, "c%lu", cgGetParameterResourceIndex (parameter));
         mappings.Push (csShaderVarMapping (variablemap[i].name, regnum));
       }
     }

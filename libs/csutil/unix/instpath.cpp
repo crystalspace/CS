@@ -91,7 +91,7 @@ csString csGetConfigPath ()
       pos += subStrLen + 1;
     }
     
-    fprintf (stderr,
+    csFPrintf (stderr,
         "Failed to find vfs.cfg in '%s' (defined by CRYSTAL var).\n", crystal);
     return "";
   }

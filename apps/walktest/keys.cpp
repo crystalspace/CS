@@ -596,8 +596,8 @@ void WalkTest::eatkeypress (iEvent* Event)
         // Don't perform the command again if the key is already down
         if (m->is_on != status)
         {
-          char buf [256];
-          sprintf (buf,"%s %d", m->cmd, status);
+          csString buf;
+          buf.Format ("%s %d", m->cmd, status);
           csCommandProcessor::perform_line (buf);
           m->is_on = status;
         }
@@ -612,8 +612,8 @@ void WalkTest::eatkeypress (iEvent* Event)
     {
       if (key == m->key || shift != m->shift || alt != m->alt || ctrl != m->ctrl)
       {
-        char buf [256];
-        sprintf (buf,"%s 0", m->cmd);
+        csString buf;
+        buf.Format ("%s 0", m->cmd);
         csCommandProcessor::perform_line (buf);
         m->is_on = 0;
       }

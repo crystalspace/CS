@@ -167,8 +167,8 @@ bool csUnloadLibrary(csLibraryHandle handle)
 //-----------------------------------------------------------------------------
 void csPrintLibraryError(char const* name)
 {
-  fprintf(stderr, "ERROR: Failed to load plug-in module `%s'.\n", name);
+  csFPrintf(stderr, "ERROR: Failed to load plug-in module `%s'.\n", name);
   char const* s = OSXGetLibraryError();
   if (s != 0)
-    fprintf(stderr, "Reason: %s\n", s);
+    csFPrintf(stderr, "Reason: %s\n", s);
 }

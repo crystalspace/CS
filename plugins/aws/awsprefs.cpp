@@ -47,7 +47,7 @@ unsigned long awsKey::ComputeKeyID (const char* n) const
   CS_ASSERT (n != 0);
   unsigned long const x = strset->Request(n);
   if (DEBUG_KEYS)
-    printf ("aws-debug: new key %s mapped to %lu\n", n, x);
+    csPrintf ("aws-debug: new key %s mapped to %lu\n", n, x);
   return x;
 }
 
@@ -69,18 +69,18 @@ awsPrefManager::~awsPrefManager ()
 
 bool awsPrefManager::Setup (iObjectRegistry *obj_reg)
 {
-  if (DEBUG_INIT) printf ("aws-debug: initializing AWS Texture Manager\n");
-  if (DEBUG_INIT) printf ("aws-debug: creating texture manager.\n");
+  if (DEBUG_INIT) csPrintf ("aws-debug: initializing AWS Texture Manager\n");
+  if (DEBUG_INIT) csPrintf ("aws-debug: creating texture manager.\n");
 
   g2d = CS_QUERY_REGISTRY (obj_reg, iGraphics2D);
   if (!g2d)
   {
-    printf ("aws-debug: Couldn't find iGraphics2D plugin!!\n");
+    csPrintf ("aws-debug: Couldn't find iGraphics2D plugin!!\n");
     return false;
   }
   awstxtmgr = new awsTextureManager ();
   if (!awstxtmgr) return false;
-  if (DEBUG_INIT) printf ("aws-debug: initing texture manager\n");
+  if (DEBUG_INIT) csPrintf ("aws-debug: initing texture manager\n");
 
   awstxtmgr->Initialize (obj_reg);
 
@@ -94,7 +94,7 @@ unsigned long awsPrefManager::NameToId (const char *n)
   if (n)
   {
     unsigned long id = wmgr->GetStringTable()->Request(n);
-    if (DEBUG_KEYS) printf ("aws-debug: mapped %s to %lu\n", n, id);
+    if (DEBUG_KEYS) csPrintf ("aws-debug: mapped %s to %lu\n", n, id);
     return id;
   }
   else
@@ -174,7 +174,7 @@ void awsPrefManager::SetWindowMgr (iAws *_wmgr)
 
 void awsPrefManager::SetupPalette ()
 {
-  printf ("aws-debug: setting up global AWS palette...\n");
+  csPrintf ("aws-debug: setting up global AWS palette...\n");
 
   unsigned char red, green, blue;
   iTextureManager *txtmgr = 0;
@@ -249,25 +249,25 @@ void awsPrefManager::SetupPalette ()
   else
 	  sys_colors[AC_BACKFILL] = sys_colors[AC_FILL];
 
-  printf ("aws-debug: finished palette setup.\n");
+  csPrintf ("aws-debug: finished palette setup.\n");
 }
 
 bool awsPrefManager::Load (const char *def_file)
 {
   if (wmgr == 0)
   {
-    printf ("\tunable to load definitions because of an internal error: "
+    csPrintf ("\tunable to load definitions because of an internal error: "
 	    "no window manager: %s\n", def_file);
     return false;
   }
 
-  printf ("\tloading definitions file %s...\n", def_file);
+  csPrintf ("\tloading definitions file %s...\n", def_file);
 
   delete static_awsparser;
   static_awsparser = new awsParser(objreg, wmgr, this);
   if (!static_awsparser->Initialize (def_file))
   {
-    printf ("Couldn't open def file: %s\n", def_file);
+    csPrintf ("Couldn't open def file: %s\n", def_file);
     delete static_awsparser;
     static_awsparser = 0;
     return false;
@@ -278,11 +278,11 @@ bool awsPrefManager::Load (const char *def_file)
 
   if (awsparse (wmgr))
   {
-    printf ("\tsyntax error in definition file, load failed: %s\n", def_file);
+    csPrintf ("\tsyntax error in definition file, load failed: %s\n", def_file);
     return false;
   }
 
-  printf (
+  csPrintf (
     "\tload successful (%zu windows, %zu skins loaded.)\n",
     win_defs.Length() - ncw,
     skin_defs.Length() - ncs);
@@ -547,12 +547,12 @@ bool awsPrefManager::GetRect (iAwsComponentNode *node, const char *name,
   if (!node) return false;
 
   if (DEBUG_KEYS)
-    printf ("aws-debug: Getting \"%s\" from %p\n", name, node);
+    csPrintf ("aws-debug: Getting \"%s\" from %p\n", name, node);
 
   iAwsKey *k = ((iAwsKeyContainer *)node)->Find (NameToId (name));
 
   if (DEBUG_KEYS)
-    printf ("aws-debug: Node retrieved: %p [%s]\n", node, name);
+    csPrintf ("aws-debug: Node retrieved: %p [%s]\n", node, name);
 
   if (k)
   {

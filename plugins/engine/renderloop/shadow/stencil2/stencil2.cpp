@@ -208,7 +208,7 @@ bool csStencil2ShadowCacheEntry::CalculateEdges()
   {
     if ((edges[i]->face_2 == -1) || (edges[i]->face_1 == edges[i]->face_2))
     {
-      //printf("\nerror in edge: %d, face1: %d, face2: %d, v1: %d, v2: %d", i, edges[i]->face_1, edges[i]->face_2, edges[i]->v1, edges[i]->v2);
+      //csPrintf("\nerror in edge: %d, face1: %d, face2: %d, v1: %d, v2: %d", i, edges[i]->face_1, edges[i]->face_2, edges[i]->v1, edges[i]->v2);
       result = false;
       errors_count++;
       /*
@@ -217,7 +217,7 @@ bool csStencil2ShadowCacheEntry::CalculateEdges()
       if ((((edges[j]->v1 == edges[i]->v1) && (edges[j]->v2 == edges[i]->v2)) ||
       ((edges[j]->v1 == edges[i]->v2) && (edges[j]->v2 == edges[i]->v1))) && (i != j))
       {
-      printf("\n\tsame index: %zu", j);
+      csPrintf("\n\tsame index: %zu", j);
       }
       }
       */
@@ -225,7 +225,7 @@ bool csStencil2ShadowCacheEntry::CalculateEdges()
   }
   if (!result)
   {
-    printf("mesh %s is incorrect,total errors: %d \n", meshWrapper->QueryObject()->GetName(), errors_count);
+    csPrintf("mesh %s is incorrect,total errors: %d \n", meshWrapper->QueryObject()->GetName(), errors_count);
   }
 
   return result;
@@ -522,7 +522,7 @@ void csStencil2ShadowStep::ModelInFrustum(csVector3 &light_pos, float shadow_len
         break;
       }
     }
-    //printf("front=%d sides=%d back=%d\n", (int)front_cap_in_frustum, (int)extrusion_in_frustum, (int)back_cap_in_frustum);
+    //csPrintf("front=%d sides=%d back=%d\n", (int)front_cap_in_frustum, (int)extrusion_in_frustum, (int)back_cap_in_frustum);
 }
 
 
@@ -689,7 +689,7 @@ void csStencil2ShadowStep::Perform (iRenderView* rview, iSector* sector,
 
         if (!shadowCacheEntry->MeshCastsShadow ()) 
         {
-          //printf("mesh %s can't cast shadow\n", sp->QueryObject()->GetName());
+          //csPrintf("mesh %s can't cast shadow\n", sp->QueryObject()->GetName());
           continue;
         }
 

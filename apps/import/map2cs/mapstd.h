@@ -25,6 +25,7 @@
 #include <stdio.h>
 
 #include "csutil/csstring.h"
+#include "csutil/sysfunc.h"
 #include "dmath3d.h"
 
 #endif // __MAPSTD_H__

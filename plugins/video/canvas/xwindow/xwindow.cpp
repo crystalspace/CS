@@ -492,8 +492,8 @@ bool csXWindow::HandleEvent (iEvent &Event)
   if ((Event.Type == csevBroadcast)
    && (Event.Command.Code == cscmdCommandLineHelp))
   {
-    printf ("Options for X-Window Plugin:\n");
-    printf ("  -[no]sysmouse      use/don't use system mouse cursor "
+    csPrintf ("Options for X-Window Plugin:\n");
+    csPrintf ("  -[no]sysmouse      use/don't use system mouse cursor "
       "(default=%s)\n", do_hwmouse ? "use" : "don't");
     return true;
   }

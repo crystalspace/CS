@@ -109,7 +109,7 @@ bool csOPCODECollideSystem::Collide (
   iCollider* collider1, const csReversibleTransform* trans1,
   iCollider* collider2, const csReversibleTransform* trans2)
 {
-  // printf( " we are in Collide \n");
+  // csPrintf( " we are in Collide \n");
   csOPCODECollider* col1 = (csOPCODECollider*) collider1;
   csOPCODECollider* col2 = (csOPCODECollider*) collider2;
   if (col1 == col2) return false;
@@ -290,7 +290,7 @@ void csOPCODECollideSystem::CopyCollisionPairs (csOPCODECollider* col1,
   //    but doing it at the Callback would be plain wrong, since that Callback
   //    should be as fast as possible
   //    so, the question is, what we should prefer? memory or speed?
-  //	   printf( " 1) \n");
+  //	   csPrintf( " 1) \n");
 
   for (i = 0 ; i < N_pairs ; i++)
   {

@@ -138,10 +138,10 @@ bool CMapFile::Read(const char* filename, const char* configfile)
     }
   }
 
-  printf("Map contains:\n");
-  printf("%zu Entites\n", m_Entities.Length());
-  printf("%zu Brushes\n", m_NumBrushes);
-  printf("%zu Unique planes\n", m_Planes.Length());
+  csPrintf("Map contains:\n");
+  csPrintf("%zu Entites\n", m_Entities.Length());
+  csPrintf("%zu Brushes\n", m_NumBrushes);
+  csPrintf("%zu Unique planes\n", m_Planes.Length());
   return true;
 }
 
@@ -165,7 +165,7 @@ CMapTexturedPlane* CMapFile::AddPlane(CdVector3 v1, CdVector3 v2, CdVector3 v3,
   CTextureFile* pTexture = m_TextureManager.GetTexture(TextureName);
   if (!pTexture)
   {
-    printf("Fatal error: Texture '%s', not found! aborting!\n", TextureName);
+    csPrintf("Fatal error: Texture '%s', not found! aborting!\n", TextureName);
     exit(1);
   }
 
@@ -345,7 +345,7 @@ bool CMapFile::AddTexture(const char* TextureName, CZipFile* pZipFile)
     }
     else
     {
-      printf("Can't add '%s' to Archive! Aborting!\n", TextureName);
+      csPrintf("Can't add '%s' to Archive! Aborting!\n", TextureName);
       return false;
     }
   }
@@ -361,12 +361,12 @@ bool CMapFile::FindTextureFile(const char* name, char* fullname)
   {
     char keyname[50];
     char Path[256];
-    sprintf(keyname, "path%d", pathnr);
+    scsPrintf(keyname, "path%d", pathnr);
     strcpy(Path, GetIniStr("texturesettings", keyname, ""));
     if (Path[0])
     {
       char Buffer[300];
-      sprintf(Buffer, "%s/%s", Path, name);
+      scsPrintf(Buffer, "%s/%s", Path, name);
       FILE* fd = fopen(Buffer, "r");
       if (fd)
       {
@@ -409,7 +409,7 @@ void CMapFile::LoadWadFiles()
   {
     char keyname[200];
     char wadname[300];
-    sprintf(keyname, "wad%d", wadnr);
+    scsPrintf(keyname, "wad%d", wadnr);
     strcpy(wadname, GetIniStr("texturesettings", keyname, ""));
     if (wadname[0])
     {

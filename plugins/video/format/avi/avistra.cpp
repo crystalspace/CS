@@ -66,8 +66,7 @@ bool csAVIStreamAudio::Initialize (const csAVIFormat::AVIHeader *ph,
   pChunk = new csAVIFormat::AVIDataChunk;
   pChunk->currentframe = 0;
   pChunk->currentframepos = 0;
-  sprintf (pChunk->id, "%02" PRIu16 "wb", nStreamNumber);
-  pChunk->id[4] = '\0';
+  cs_snprintf (pChunk->id, 5, "%02" PRIu16 "wb", nStreamNumber);
 
   nStream = nStreamNumber;
   csAVIStreamAudio::object_reg = object_reg;
@@ -131,8 +130,8 @@ bool csAVIStreamAudio::LoadCodec (uint8 *pInitData, uint32 nInitDataLen,
   // based on the codec id we try to load the apropriate codec
 
   // create a classname from the coec id
-  char cn[128];
-  sprintf (cn, "crystalspace.audio.codec.avi.%s", strdesc.codec);
+  csString cn;
+  cn.Format ("crystalspace.audio.codec.avi.%s", strdesc.codec);
   // try open this class
   pCodec = SCF_CREATE_INSTANCE (cn, iAVICodec);
   if (pCodec)
@@ -145,7 +144,8 @@ bool csAVIStreamAudio::LoadCodec (uint8 *pInitData, uint32 nInitDataLen,
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
 		"crystalspace.video.avi",
-		"CODEC class \"%s\" could not be initialized !", cn);
+		"CODEC class \"%s\" could not be initialized !", 
+		cn.GetData());
       pCodec = 0;
     }
   }
@@ -153,7 +153,8 @@ bool csAVIStreamAudio::LoadCodec (uint8 *pInitData, uint32 nInitDataLen,
   {
       csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
 		"crystalspace.video.avi",
-		"CODEC class \"%s\" could not be loaded !", cn);
+		"CODEC class \"%s\" could not be loaded !", 
+		cn.GetData());
   }
 
   return false;

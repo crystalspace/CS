@@ -1148,7 +1148,7 @@ struct BufferParser
   static const char* Parse (iDocumentNode* node,int compNum,
     csDirtyAccessArray<T>& buf)
   {
-    char compAttrName[24];
+    csString compAttrName;
 
     csRef<iDocumentNodeIterator> it = node->GetNodes();
     while (it->HasNext())
@@ -1165,7 +1165,7 @@ struct BufferParser
       }
       for (int c = 0; c < compNum; c++)
       {
-	sprintf (compAttrName, "c%d", c);
+	compAttrName.Format ("c%d", c);
 	T v;
 	ValGetter::Get (v, child, compAttrName);
 	buf.Push (v);

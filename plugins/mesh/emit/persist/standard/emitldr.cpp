@@ -147,7 +147,7 @@ csPtr<iBase> csEmitFactoryLoader::Parse (iDocumentNode* /*node*/,
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.emit",
     	iMeshObjectType);
     #ifdef CS_DEBUG
-      printf ("Load TYPE plugin crystalspace.mesh.object.emit\n");
+      csPrintf ("Load TYPE plugin crystalspace.mesh.object.emit\n");
     #endif  
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());

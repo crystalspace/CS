@@ -516,7 +516,7 @@ void csBugPlug::HideSpider (iCamera* camera)
   spider->UnweaveWeb (Engine);
   if (camera)
   {
-    char buf[80];
+    csString buf;
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Spider caught a camera!");
     switch (spider_command)
     {
@@ -526,14 +526,14 @@ void csBugPlug::HideSpider (iCamera* camera)
       case DEBUGCMD_FOV:
 	{
           int fov = camera->GetFOV ();
-	  sprintf (buf, "%d", fov);
+	  buf.Format ("%d", fov);
 	  EnterEditMode (spider_command, "Enter new fov value:", buf);
 	}
 	break;
       case DEBUGCMD_FOVANGLE:
 	{
           float fov = camera->GetFOVAngle ();
-	  sprintf (buf, "%g", fov);
+	  buf.Format ("%g", fov);
 	  EnterEditMode (spider_command, "Enter new fov angle:", buf);
 	}
 	break;
@@ -1121,8 +1121,8 @@ bool csBugPlug::EatKey (iEvent& event)
         {
 	  if (!G3D) break;
 	  float val = G2D->GetGamma ();
-          char buf[100];
-	  sprintf (buf, "%g", val);
+          csString buf;
+	  buf.Format ("%g", val);
           EnterEditMode (cmd, "Enter new gamma:", buf);
 	}
         break;
@@ -1602,10 +1602,10 @@ void GfxWrite (iGraphics2D* g2d, iFont* font,
 	int x, int y, int fg, int bg, char *str, ...)
 {
   va_list arg;
-  char buf[256];
+  csString buf;
 
   va_start (arg, str);
-  vsprintf (buf, str, arg);
+  buf.FormatV (str, arg);
   va_end (arg);
 
   g2d->Write (font, x, y, fg, bg, buf);
@@ -2468,10 +2468,10 @@ void csBugPlug::Dump (iThingFactoryState* fact, int polyidx)
   int nv = fact->GetPolygonVertexCount (polyidx);
   int i;
   int* idx = fact->GetPolygonVertexIndices (polyidx);
-  char buf[256];
-  sprintf (buf, "  Vertices: ");
+  csString buf;
+  buf << "  Vertices: ";
   for (i = 0 ; i < nv ; i++)
-    sprintf (buf+strlen (buf), "%d ", idx[i]);
+    buf << idx[i] << ' ';
   Report (CS_REPORTER_SEVERITY_DEBUG, buf);
 }
 
@@ -2588,8 +2588,8 @@ void csBugPlug::SetupDebugSector ()
 iMaterialWrapper* csBugPlug::FindColor (float r, float g, float b)
 {
   // Assumes the current region is the debug region.
-  char name[100];
-  sprintf (name, "mat%d,%d,%d\n", int (r*255), int (g*255), int (b*255));
+  csString name;
+  name.Format ("mat%d,%d,%d\n", int (r*255), int (g*255), int (b*255));
   iMaterialWrapper* mw = Engine->FindMaterial (name);
   if (mw) return mw;
   // Create a new material.

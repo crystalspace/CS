@@ -127,8 +127,8 @@ public:
 
   virtual void SetValueAsFloat (float f)
   {
-    char buf[100];
-    sprintf (buf, "%g", f);
+    csString buf;
+    buf.Format ("%g", f);
     attr->SetValue (buf);
   }
 };

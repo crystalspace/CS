@@ -238,17 +238,17 @@ void WalkTest::SetDefaults ()
 void WalkTest::Help ()
 {
   csRef<iConfigManager> cfg (CS_QUERY_REGISTRY (object_reg, iConfigManager));
-  printf ("Options for WalkTest:\n");
-  printf ("  -exec=<script>     execute given script at startup\n");
-  printf ("  -[no]colldet       collision detection system (default '%scolldet')\n", do_cd ? "" : "no");
-  printf ("  -[no]logo          draw logo (default '%slogo')\n", do_logo ? "" : "no");
-  printf ("  -regions           load every map in a separate region (default off)\n");
-  printf ("  -dupes             check for duplicate objects in multiple maps (default off)\n");
-  printf ("  -noprecache        after loading don't precache to speed up rendering\n");
-  printf ("  -infinite          special infinite level generation (ignores map file!)\n");
-  printf ("  -bots              allow random generation of bots\n");
-  printf ("  -[no]saveable      enable/disable engine 'saveable' flag\n");
-  printf ("  <path>             load map from VFS <path> (default '%s')\n",
+  csPrintf ("Options for WalkTest:\n");
+  csPrintf ("  -exec=<script>     execute given script at startup\n");
+  csPrintf ("  -[no]colldet       collision detection system (default '%scolldet')\n", do_cd ? "" : "no");
+  csPrintf ("  -[no]logo          draw logo (default '%slogo')\n", do_logo ? "" : "no");
+  csPrintf ("  -regions           load every map in a separate region (default off)\n");
+  csPrintf ("  -dupes             check for duplicate objects in multiple maps (default off)\n");
+  csPrintf ("  -noprecache        after loading don't precache to speed up rendering\n");
+  csPrintf ("  -infinite          special infinite level generation (ignores map file!)\n");
+  csPrintf ("  -bots              allow random generation of bots\n");
+  csPrintf ("  -[no]saveable      enable/disable engine 'saveable' flag\n");
+  csPrintf ("  <path>             load map from VFS <path> (default '%s')\n",
         cfg->GetStr ("Walktest.Settings.WorldFile", "world"));
 }
 
@@ -469,10 +469,10 @@ void WalkTest::DrawFrameDebug3D ()
 void WalkTest::GfxWrite (int x, int y, int fg, int bg, char *str, ...)
 {
   va_list arg;
-  char buf[256];
+  csString buf;
 
   va_start (arg, str);
-  vsprintf (buf, str, arg);
+  buf.Format (str, arg);
   va_end (arg);
 
   myG2D->Write (Font, x, y, fg, bg, buf);
@@ -490,8 +490,8 @@ void WalkTest::DrawFrameConsole ()
 
     if (do_show_coord)
     {
-      char buffer[100];
-      sprintf (buffer, "%2.2f,%2.2f,%2.2f: %s",
+      csString buffer;
+      buffer.Format ("%2.2f,%2.2f,%2.2f: %s",
       view->GetCamera ()->GetTransform ().GetO2TTranslation ().x,
       view->GetCamera ()->GetTransform ().GetO2TTranslation ().y,
       view->GetCamera ()->GetTransform ().GetO2TTranslation ().z,
@@ -502,11 +502,11 @@ void WalkTest::DrawFrameConsole ()
 
       GfxWrite ( FRAME_WIDTH - buffWidth - 1, 
                  FRAME_HEIGHT - fh - 3, 0, -1, 
-                 buffer);
+                 "%s", buffer.GetData());
 
       GfxWrite (FRAME_WIDTH - buffWidth, 
                 FRAME_HEIGHT - fh - 2, fgcolor_stats, -1, 
-                buffer);
+                "%s", buffer.GetData());
     }
   }
 }
@@ -718,7 +718,7 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
 	  "End demo: %f secs to render %d frames: %f fps",
 	  (float) (t2 - t1) / 1000.,
 	  num, float (num) * 1000. / (float) (t2 - t1));
-	printf (
+	csPrintf (
 	  "End demo: %f secs to render %d frames: %f fps\n",
 	  (float) (t2 - t1) / 1000.,
 	  num, float (num) * 1000. / (float) (t2 - t1));
@@ -858,7 +858,7 @@ void perf_test (int num)
   Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     "%f secs to render %d frames: %f fps", (float) (t2 - t1) / 1000., num,
     float (num) * 1000. / (float) (t2 - t1));
-  printf (
+  csPrintf (
     "%f secs to render %d frames: %f fps\n", (float) (t2 - t1) / 1000., num,
     float (num) * 1000. / (float) (t2 - t1));
   fflush (stdout);
@@ -997,13 +997,13 @@ public:
   virtual void Run ()
   {
     csSleep (2000);
-    printf ("================ START PARSING!\n"); fflush (stdout);
+    csPrintf ("================ START PARSING!\n"); fflush (stdout);
     const char* error = doc->Parse (buf, true);
     if (error != 0)
     {
-      printf ("Document system error for file '%s'!", error);
+      csPrintf ("Document system error for file '%s'!", error);
     }
-    printf ("================ END PARSING!\n"); fflush (stdout);
+    csPrintf ("================ END PARSING!\n"); fflush (stdout);
   }
   virtual void IncRef () { ref++; }
   virtual void DecRef () { ref--; if (ref <= 0) delete this; }
@@ -1402,7 +1402,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     }
 
     csTicks stop_time = csGetTicks ();
-    printf ("Total level load time: %g seconds\n",
+    csPrintf ("Total level load time: %g seconds\n",
     	float (stop_time-start_time) / 1000.0); fflush (stdout);
 
     Create2DSprites ();

@@ -301,7 +301,7 @@ bool csVideoPreferences::HandleEvent (iEvent& ev)
 
 void csVideoPreferences::SetSoftwareL (iAwsSource *)
 {
-  printf ("Software mode!\n"); fflush (stdout);
+  csPrintf ("Software mode!\n"); fflush (stdout);
 
   csInitializer::CloseApplication (object_reg);
   mode = 0;
@@ -310,7 +310,7 @@ void csVideoPreferences::SetSoftwareL (iAwsSource *)
 
 void csVideoPreferences::SetOpenGLL (iAwsSource *)
 {
-  printf ("OpenGL mode!\n"); fflush (stdout);
+  csPrintf ("OpenGL mode!\n"); fflush (stdout);
 
   csInitializer::CloseApplication (object_reg);
   mode = 1;

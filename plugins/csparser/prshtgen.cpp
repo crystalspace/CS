@@ -76,7 +76,7 @@ float PrsHeightMapData::GetSlope (float x, float y)
   float py = y + 0.01f; if (py > 1) { py = y; div = 0.01f; }
   float dhdy = GetHeight (x, py) - GetHeight (x, my);
   dhdy /= div;
-  //printf ("x=%g y=%g dhdx=%g dhdy=%g slope=%g , %g\n", x, y, dhdx, dhdy,
+  //csPrintf ("x=%g y=%g dhdx=%g dhdy=%g slope=%g , %g\n", x, y, dhdx, dhdy,
     //fabs((dhdx+dhdy)/2.), fabs(dhdx)/2.+fabs(dhdy)/2.); fflush (stdout);
   //return fabs ((dhdx+dhdy)/2.);
   return (fabs(dhdx)+fabs(dhdy))/2.;
