@@ -11,6 +11,8 @@ chronological order.
 	  <eidpers@comcast.net> for Borland C++Builder which fix re-declaration
 	  of loop variable in 'for', and which ensures that "Press a key to
 	  close this window" is flushed to console window.
+        - Philip Wyett removed cast to int causing signed / unsigned mismatch
+          in csString& csString::RTrim ().
 30-Jan-2004
 	- res augmented csThing::InitializeDefault() to unprepare the thing
 	  when the 'clear' flag is set.
