@@ -19,7 +19,7 @@
 #include <string.h>
 #define CS_SYSDEF_PROVIDE_PATH
 #include "cssysdef.h"
-#include "cssys/system.h"
+#include "cssys/sysfunc.h"
 #include "csutil/scf.h"
 #include "csver.h"
 #include "perfstat.h"

@@ -19,6 +19,7 @@
 
 #include <stdarg.h>
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "x2d.h"
 #include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"

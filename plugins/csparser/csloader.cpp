@@ -18,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "qint.h"
 #include "csutil/cfgfile.h"
 #include "csutil/parser.h"

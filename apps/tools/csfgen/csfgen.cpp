@@ -20,7 +20,6 @@
 #define CS_SYSDEF_PROVIDE_PATH
 #define CS_SYSDEF_PROVIDE_GETOPT
 #include "cssysdef.h"
-#include "cssys/sysdriv.h"
 #include "cstool/initapp.h"
 #include "ivideo/fontserv.h"
 #include "iutil/objreg.h"

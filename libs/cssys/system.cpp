@@ -24,6 +24,7 @@
 #define CS_SYSDEF_PROVIDE_PATH
 #include "cssysdef.h"
 #include "cssys/system.h"
+#include "cssys/sysfunc.h"
 #include "cssys/sysdriv.h"
 #include "cssys/csshlib.h"
 #include "csutil/csevent.h"

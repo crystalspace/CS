@@ -21,6 +21,7 @@
 
 #include <stdarg.h>
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "raw.h"
 #include "csgeom/csrect.h"
 #include "iutil/objreg.h"

@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "qint.h"
 #include "walktest.h"
 #include "bot.h"
@@ -27,7 +28,6 @@
 #include "csutil/scanstr.h"
 #include "csutil/dataobj.h"
 #include "csgeom/math3d.h"
-#include "cssys/system.h"
 #include "cstool/collider.h"
 #include "cstool/cspixmap.h"
 #include "ivideo/graph3d.h"

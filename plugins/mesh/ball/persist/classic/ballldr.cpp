@@ -18,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "csgeom/math3d.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"

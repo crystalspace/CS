@@ -21,7 +21,7 @@
 
 #include <stdarg.h>
 #include "cssysdef.h"
-#include "cssys/system.h"
+#include "cssys/sysfunc.h"
 
 // to be called instead of printf (exact same prototype/functionality of printf)
 int csPrintf (const char *str, ...)

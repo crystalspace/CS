@@ -2,7 +2,6 @@
 //#include <artsflow.h>
 //#include <dispatcher.h>
 #include "cssysdef.h"
-#include "cssys/sysdriv.h"
 #include "csutil/scf.h"
 #include "csutil/cfgfile.h"
 #include "iutil/objreg.h"

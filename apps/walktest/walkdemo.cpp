@@ -32,7 +32,6 @@
 #include "csutil/scanstr.h"
 #include "csutil/dataobj.h"
 #include "csgeom/math3d.h"
-#include "cssys/system.h"
 #include "cstool/collider.h"
 #include "cstool/cspixmap.h"
 #include "qint.h"

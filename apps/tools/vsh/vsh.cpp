@@ -20,7 +20,6 @@
 #include "cssysdef.h"
 #include "csutil/util.h"
 #include "cstool/initapp.h"
-#include "cssys/sysdriv.h"
 #include "isys/vfs.h"
 #include "isys/plugin.h"
 #include "iutil/eventh.h"

@@ -18,7 +18,6 @@
 
 #define CS_SYSDEF_PROVIDE_PATH
 #include "cssysdef.h"
-#include "cssys/system.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
 #include "csutil/cscolor.h"
@@ -41,6 +40,7 @@
 #include "iutil/strvec.h"
 #include "ivaria/reporter.h"
 #include "isys/plugin.h"
+#include "isys/vfs.h"
 #include "igraphic/imageio.h"
 
 CS_IMPLEMENT_APPLICATION

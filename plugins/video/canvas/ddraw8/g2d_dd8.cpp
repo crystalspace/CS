@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "video/canvas/directxcommon/directdetection.h"
 #include "csgeom/csrect.h"
 #include "g2d_dd8.h"

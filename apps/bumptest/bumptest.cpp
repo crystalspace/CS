@@ -18,10 +18,10 @@
 */
 
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "bumptest.h"
 #include "prbump.h"
 
-#include "cssys/system.h"
 #include "csgeom/transfrm.h"
 #include "cstool/proctex.h"
 #include "cstool/prdots.h"

@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/system.h"
+#include "cssys/sysfunc.h"
 #include "cstool/initapp.h"
 #include "csutil/cmdhelp.h"
 #include "apps/isotest/isotest.h"
@@ -48,6 +48,7 @@
 #include "ivaria/stdrep.h"
 #include "genmaze.h"
 #include "isys/plugin.h"
+#include "isys/vfs.h"
 #include "iengine/material.h"
 
 CS_IMPLEMENT_APPLICATION

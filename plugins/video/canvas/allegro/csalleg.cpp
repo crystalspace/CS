@@ -20,6 +20,7 @@
 
 #include <stdarg.h>
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "csalleg.h"
 #include "csutil/csinput.h"
 #include "csgeom/csrect.h"

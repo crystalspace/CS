@@ -21,7 +21,6 @@
 #include <limits.h>
 #include <stdarg.h>
 #include "cssysdef.h"
-#include "cssys/system.h"
 #include "qint.h"
 #include "csutil/csstrvec.h"
 #include "csutil/scanstr.h"

@@ -19,6 +19,7 @@
 #include <stdarg.h>
 
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "inf_g3d.h"
 #include "inf_txt.h"
 #include "csgeom/math2d.h"
@@ -27,7 +28,6 @@
 #include "video/renderer/inf/inf_g3d.h"
 #include "video/renderer/inf/inf_txt.h"
 #include "video/renderer/common/polybuf.h"
-#include "cssys/system.h"
 #include "iutil/cfgfile.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"

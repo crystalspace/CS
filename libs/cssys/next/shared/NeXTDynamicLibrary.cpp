@@ -30,6 +30,7 @@
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
 #include "cssys/system.h"
+#include "cssys/sysfunc.h"
 #include "csutil/util.h"
 #include "NeXTLoadLibrary.h"
 #include <sys/param.h>

@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
 #include "g2d.h"

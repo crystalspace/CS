@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/system.h"
+#include "cssys/sysfunc.h"
 #include "csutil/scanstr.h"
 #include "csutil/cscolor.h"
 #include "pysimp.h"
@@ -46,6 +46,7 @@
 #include "iutil/virtclk.h"
 #include "ivaria/reporter.h"
 #include "isys/plugin.h"
+#include "isys/vfs.h"
 #include "csutil/cmdhelp.h"
 
 //------------------------------------------------- We need the 3D engine -----

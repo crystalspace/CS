@@ -21,6 +21,7 @@
 #define CS_SYSDEF_PROVIDE_PATH
 #define CS_SYSDEF_PROVIDE_ACCESS
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "walktest.h"
 #include "infmaze.h"
 #include "hugeroom.h"
@@ -34,7 +35,6 @@
 #include "csutil/dataobj.h"
 #include "csutil/csobject.h"
 #include "csutil/cspmeter.h"
-#include "cssys/system.h"
 #include "cstool/cspixmap.h"
 #include "cstool/csfxscr.h"
 #include "cstool/csview.h"

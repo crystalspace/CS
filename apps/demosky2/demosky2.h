@@ -40,6 +40,7 @@ struct iObjectRegistry;
 struct iVirtualClock;
 struct iGraphics3D;
 struct iGraphics2D;
+struct iEvent;
 
 class DemoSky
 {

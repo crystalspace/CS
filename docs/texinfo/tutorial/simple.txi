@@ -4,24 +4,23 @@
 @cindex Tutorial, Simple
 @cindex Simple Tutorial
 
-This tutorial provides a step-by-step explanation on how you can use the 3D
-Engine from within your application.  This tutorial is mainly based on the
-@file{simple} application which you can compile and run to see what it does.
-There are various ways to use Crystal Space.  The @file{simple} application
-uses inheritance to create a subclass of the system dependent main class
-@samp{SysSystemDriver} but you don't need to do it like this.
+This tutorial provides a step-by-step explanation on how you can use Crystal
+Space from within your application.  This tutorial is mainly based on the
+@file{simple} application which you can compile and run to see what it does
+(type @samp{make tutsimp1} if you use commandline based compilation).
 
 When you downloaded the Crystal Space package it contains a @samp{CS/include}
-directory.  This directory contains all header files you need to be able to
-use the Crystal Space components and libraries in your own applications.  On
+directory. This directory contains all header files you need to be able to
+use the Crystal Space components and libraries in your own applications. On
 one hand, the include directory contains @sc{scf} interface definitions.
 These pure interface file names start with the letter @samp{i} (as in
-@file{iengine.h}).  On the other hand we also have plain C++ include files for
-interfacing with the libraries of Crystal Space.  When you install Crystal
-Space on your development system (for instance, by invoking @samp{make
-install}), these headers are placed in a location where they can be easily
-accessed when writing new programs based on Crystal Space.  On Unix systems,
-for instance, these files usually end up in @file{/usr/local/crystal/include}.
+@file{iengine/engine.h}).  On the other hand we also have plain C++ include
+files for interfacing with the libraries of Crystal Space.
+When you install Crystal Space on your development system (for instance,
+by invoking @samp{make install}), these headers are placed in a location where
+they can be easily accessed when writing new programs based on Crystal Space.
+On Unix systems, for instance, these files usually end up in
+@file{/usr/local/crystal/include}.
 
 Crystal Space also has a reference manual and @sc{api} documentation.
 The manual is included in @sc{html} form Crystal Space itself and is also
@@ -29,6 +28,7 @@ available online.  The @sc{api} documentation can be generated locally or
 viewed online.  @xref{Where to Get}.
 
 @menu
+* Simple Basic Concepts:: Basic Crystal Space Concepts
 * Simple Minimum Requirements:: Minimum Application Requirements
 * Simple System Driver:: Creating the Simple System Driver
 * Simple Event Handling:: Event Handling
@@ -36,6 +36,132 @@ viewed online.  @xref{Where to Get}.
 * Simple Camera:: The Camera
 * Simple Locomotion:: Locomotion (Moving Around)
 @end menu
+
+@node Simple Basic Concepts
+@subsection Basic Crystal Space Concepts
+@cindex Basic Crystal Space Concepts
+@cindex Simple Tutorial
+
+In order to write a Crystal Space application there are several concepts
+that you need to know about. Here we will give a quick overview of all
+important things you need to know about when writing Crystal Space
+applications.
+
+@subsubsection @sc{scf}
+@cindex @sc{scf}
+
+The @sc{scf} (@pxref{SCF}) system is the core low-level memory framework
+for Crystal Space. You must initialize this before doing anything else
+(one way is to use @code{csInitializer::InitializeSCF()}).
+
+@subsubsection The Object Registry
+@cindex @code{iObjectRegistry}
+@cindex Object Registry
+
+The object registry is the central repository for all objects in
+Crystal Space. Everything in Crystal Space will use the object registry
+to get the pointer to the objects it is interested in. One of the first
+tasks a Crystal Space application has to do is to create the object
+registry. You can create an object registry using
+@code{csInitializer::CreateObjectRegistry()} or
+@code{csInitializer::CreateEnvironment()}.
+
+@subsubsection The Plugin Manager
+@cindex @code{iPluginManager}
+@cindex Plugin Manager
+
+The plugin manager is responsible for loading and unloading plugins. A
+plugin is a shared library of functions that can be loaded dynamically
+into a running Crystal Space application. On Unix a plugin has the @file{.so}
+extension and on Windows the @file{.dll} extension is used. Almost everything
+in the Crystal Space framework is itself a plugin. So the plugin manager
+is an important object. You can create the plugin manager with
+@code{csInitializer::CreatePluginManager()} or
+@code{csInitializer::CreateEnvironment()}.
+
+@subsubsection The Event Queue
+@cindex @code{iEventQueue}
+@cindex The Event Queue
+@cindex @code{iEventHandler}
+@cindex @code{cscmdProcess}
+
+Crystal Space is an event-driven framework. So a Crystal Space application
+will also be event driven. The event queue manages the event system and
+sends events to listeners. Every module or plugin that implements
+@code{iEventHandler} can register itself with the event queue so it gets
+notified when certain events happen. You can create the event queue
+with @code{csInitializer::CreateEventQueue()} or
+@code{csInitializer::CreateEnvironment()}.
+
+A Crystal Space application will also have to create an event handler
+on its own in order to actually be able to do something. This event handler
+will be responsible for actually rendering to the screen (this has to be
+done in response to the @code{cscmdProcess} event) and also catching
+keyboard/mouse input. But there is much more. To setup an event handler
+for the application you can use @code{csInitializer::SetupEventHandler()}.
+
+@subsubsection The Virtual Clock
+@cindex @code{iVirtualClock}
+@cindex Virtual Clock
+
+Most Crystal Space applications will be time-based. The virtual clock
+supports the notion of @sc{current time} and @sc{elapsed time}. It is
+called a virtual clock because it doesn't necessarily have to correspond
+with real time. A game can be paused for example. Note that a well-behaved
+game should always take elapsed time (between two frames) into consideration
+for calculating what could have happened in that time. This is important
+especially for physics calculations and also for speed of moving objects.
+You want an object moving at some speed to move with the same speed on a
+system with low framerates compared to a system with high framerates.
+The virtual clock can be created with
+@code{csInitializer::CreateVirtualClock()} or
+@code{csInitializer::CreateEnvironment()}.
+
+@subsubsection The Commandline Parser
+@cindex @code{iCommandLineParser}
+@cindex Commandline Parser
+
+The commandline parser is responsible for parsing options from
+the commandline. If you properly initialize it with @code{argc} and
+@code{argv} then you can use it to query options that have been given
+to the commandline. Several Crystal Space plugins and modules will also
+query the commandline so it is important to have this object correctly
+initialized. The commandline parser can be created with
+@code{csInitializer::CreateCommandLineParser()} or
+@code{csInitializer::CreateEnvironment()}. You can setup the commandline
+parser with @code{csInitializer::SetupCommandLineParser()}.
+
+@subsubsection The Config Manager
+@cindex @code{iConfigManager}
+@cindex Config Manager
+
+The config manager is responsible for reading options from config files.
+All config files are put in a global pool which is managed by the config
+manager. Several Crystal Space plugins and modules will query options
+from the config manager and Crystal Space applications can also do that
+if they want. You can create the config manager with
+@code{csInitializer::CreateConfigManager()} or
+@code{csInitializer::CreateEnvironment()}. You can setup the config manager
+with @code{csInitializer::SetupConfigManager()}.
+
+@subsubsection The Input Drivers
+@cindex Input Drivers
+
+There are three standard input drivers included with Crystal Space:
+keyboard, mouse, and joystick. The @code{csInitializer::CreateInputDrivers()}
+function (or @code{csInitializer::CreateEnvironment()}) will create them
+and register them with the object registry. These drivers will post events
+to the global event queue.
+
+@subsubsection The @code{csInitializer} class
+@cindex @code{csInitializer}
+
+We already mentioned several of the functions above. This class (for which
+the definition can be found in @file{include/cstool/initapp.h}) is a
+conveniance class that can be used to help you setup everything needed to
+get the application running. In the tutorial below we will use several of the
+functions from @code{csInitializer}. This class contains only static member
+functions.
 
 @node Simple Minimum Requirements, Simple System Driver, Tutorial Simple, Tutorial Simple
 @subsection Minimum Application Requirements
@@ -52,6 +178,10 @@ very first included Crystal Space header files.  @file{cssysdef.h} should never
 be included by a header file.
 
 @item
+@code{CS_IMPLEMENT_APPLICATION} needs to be put in the beginning of
+the file (@em{after} the includes).
+
+@item
 The @code{main()} function must be declared with the following prototype:
 @example
 int main(int argc, char *argv[]);
@@ -61,10 +191,13 @@ int main(int argc, char *argv[]);
 Following these guidelines will help to ensure that your application builds
 and runs on all platforms supported by Crystal Space.
 
-@node Simple System Driver, Simple Event Handling, Simple Minimum Requirements, Tutorial Simple
-@subsection Creating the Simple System Driver
-@cindex Tutorial Simple System Driver
-@cindex Simple System Driver, Tutorial
+@node Simple Main Structure, Simple Event Handling, Simple Minimum Requirements, Tutorial Simple
+@subsection Simple Main Structure
+@cindex Tutorial Simple Main Structure
+@cindex Simple Main Structure, Tutorial
+
+@@@@@@@@@@@@@@@@@@@@@@@
+TUTORIAL NO LONGER VALID FROM THIS POINT ON!
 
 First a little explanation.  @samp{SysSystemDriver} is a system dependent
 class which is reponsible for controlling the main Crystal Space stuff.  It

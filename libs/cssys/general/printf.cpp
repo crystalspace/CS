@@ -20,6 +20,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 
 // Replacement for printf(); exact same prototype/functionality as printf()
 int csPrintf(char const* str, ...)

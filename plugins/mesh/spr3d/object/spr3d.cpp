@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/system.h"
+#include "cssys/sysfunc.h"
 #include "spr3d.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/sphere.h"

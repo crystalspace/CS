@@ -21,7 +21,7 @@
 #include <stdlib.h>
 
 #include "cssysdef.h"
-#include "cssys/system.h"
+#include "cssys/sysfunc.h"
 #include "csutil/virtclk.h"
 #include "iutil/virtclk.h"
 

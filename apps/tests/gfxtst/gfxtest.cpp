@@ -22,7 +22,6 @@
 #define CS_SYSDEF_PROVIDE_PATH
 #define CS_SYSDEF_PROVIDE_GETOPT
 #include "cssysdef.h"
-#include "cssys/system.h"
 #include "cstool/initapp.h"
 #include "csgfx/csimage.h"
 #include "csutil/util.h"
@@ -35,6 +34,7 @@
 #include "iutil/comp.h"
 #include "igraphic/imageio.h"
 #include "isys/plugin.h"
+#include "isys/vfs.h"
 #include "csutil/cmdhelp.h"
 
 #include <string.h>

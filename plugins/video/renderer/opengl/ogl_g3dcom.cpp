@@ -21,7 +21,7 @@
 #include <ctype.h>
 
 #include "cssysdef.h"
-#include "cssys/sysdriv.h"
+#include "cssys/sysfunc.h"
 #include "qint.h"
 #include "csutil/scf.h"
 #include "csgeom/math2d.h"

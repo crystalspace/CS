@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "demo.h"
 #include "demoseq.h"
 #include "csutil/cscolor.h"
@@ -61,6 +62,7 @@
 #include "ivaria/reporter.h"
 #include "qsqrt.h"
 #include "isys/plugin.h"
+#include "isys/vfs.h"
 
 CS_IMPLEMENT_APPLICATION
 

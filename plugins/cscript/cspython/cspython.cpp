@@ -20,8 +20,8 @@
 #include "Python.h"
 //}
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "cspython.h"
-#include "cssys/system.h"
 #include "csutil/csstring.h"
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"

@@ -22,6 +22,7 @@ extern "C" {
 //#include <luadebug.h>
 }
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "cslua.h"
 #include "csutil/csstring.h"
 #include "iutil/objreg.h"

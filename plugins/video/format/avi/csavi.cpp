@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "csavi.h"
 #include "avistrv.h"
 #include "avistra.h"

@@ -18,6 +18,7 @@
 
 #include <stdarg.h>
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "linex2d.h"
 #include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"

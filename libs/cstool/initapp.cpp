@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "cssys/sysdriv.h"
 #include "cssys/system.h"
+#include "cssys/sysfunc.h"
 #include "cssys/csshlib.h"
 #include "cstool/initapp.h"
 #include "iutil/eventh.h"

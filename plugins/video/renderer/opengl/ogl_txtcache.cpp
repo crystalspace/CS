@@ -18,7 +18,6 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/sysdriv.h"
 #include "csgeom/subrec.h"
 
 #include "ogl_txtcache.h"

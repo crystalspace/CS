@@ -18,7 +18,6 @@
 
 #define CS_SYSDEF_PROVIDE_PATH
 #include "cssysdef.h"
-#include "cssys/system.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
 #include "csutil/cscolor.h"
@@ -52,6 +51,7 @@
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "isys/plugin.h"
+#include "isys/vfs.h"
 
 #define SET_BIT(var,mask,state) \
   var = (var & ~(mask)) | ((state) ? (mask) : 0);

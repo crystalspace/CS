@@ -23,7 +23,7 @@
 #define CS_SYSDEF_PROVIDE_ALLOCA
 #define CS_SYSDEF_PROVIDE_SOFTWARE2D
 #include "cssysdef.h"
-#include "cssys/system.h"
+#include "cssys/sysfunc.h"
 #include "csutil/csvector.h"
 #include "csutil/rng.h"
 #include "cstool/initapp.h"

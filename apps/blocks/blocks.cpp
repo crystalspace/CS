@@ -29,8 +29,8 @@
  */
 
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "blocks.h"
-#include "cssys/system.h"
 #include "csutil/csstring.h"
 #include "csutil/cscolor.h"
 #include "csgeom/textrans.h"

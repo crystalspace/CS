@@ -42,6 +42,7 @@ struct iGraphics3D;
 struct iGraphics2D;
 struct iVirtualClock;
 struct iObjectRegistry;
+struct iEvent;
 
 class DemoSky
 {

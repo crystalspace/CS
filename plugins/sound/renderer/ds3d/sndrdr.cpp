@@ -19,6 +19,7 @@
 */
 
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include <stdio.h>
 #include <initguid.h>
 

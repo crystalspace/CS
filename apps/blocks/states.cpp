@@ -18,7 +18,6 @@
 
 #include "cssysdef.h"
 #include "states.h"
-#include "cssys/system.h"
 
 States::States ()
 {

@@ -19,7 +19,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "cssysdef.h"
-#include "cssys/system.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/csevent.h"
 #include "iutil/objreg.h"

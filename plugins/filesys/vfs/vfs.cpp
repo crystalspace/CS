@@ -27,7 +27,7 @@
 #define CS_SYSDEF_PROVIDE_MKDIR
 #define CS_SYSDEF_PROVIDE_UNLINK
 #include "cssysdef.h"
-#include "cssys/system.h"
+#include "cssys/sysfunc.h"
 #include "vfs.h"
 #include "csutil/archive.h"
 #include "csutil/util.h"

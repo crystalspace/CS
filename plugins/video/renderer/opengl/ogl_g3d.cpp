@@ -27,7 +27,6 @@
 #include <GL/gl.h>
 #endif
 
-#include "cssys/sysdriv.h"
 #include "qint.h"
 #include "csutil/scf.h"
 #include "csgeom/math2d.h"

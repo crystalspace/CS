@@ -21,7 +21,6 @@
 #include "qint.h"
 #include "prbump.h"
 
-#include "cssys/system.h"
 #include "csutil/cscolor.h"
 #include "csutil/util.h"
 #include "csgfx/rgbpixel.h"

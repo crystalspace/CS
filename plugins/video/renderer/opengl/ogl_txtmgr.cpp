@@ -20,7 +20,6 @@
 #include <math.h>
 
 #include "cssysdef.h"
-#include "cssys/sysdriv.h"
 #include "ogl_g3dcom.h"
 #include "ogl_txtmgr.h"
 #include "ogl_txtcache.h"

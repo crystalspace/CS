@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/system.h"
+#include "cssys/sysfunc.h"
 #include "cstool/initapp.h"
 #include "apps/perftest/perftest.h"
 #include "apps/perftest/ptests3d.h"
@@ -41,6 +41,7 @@
 #include "csutil/cmdhelp.h"
 #include "ivaria/reporter.h"
 #include "isys/plugin.h"
+#include "isys/vfs.h"
 
 CS_IMPLEMENT_APPLICATION
 

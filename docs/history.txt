@@ -24,6 +24,12 @@ The history order is reversed so that new features are at the top.
 	- csInitializer::OpenApplication() and CloseApplication() now send
 	  the cscmdSystemOpen/cscmdSystemClose messages instead of letting
 	  the system driver do it.
+	- Added cssys/sysfunc.h which contains the declarations of the
+	  global system dependent functions like csSleep(), csGetTicks(),
+	  csPrintf(), and csGetInstallPath().
+	- Removed the unneeded includes from cssys/system.h and cssys/sysdriv.h
+	  from most of CS.
+	- Slightly updated the simple.txi tutorial. Work in progress though.
 9-Oct-2001
 	- Removed iSystem::GetObjectRegistry().
 	- The object registry is now a parameter to the system driver and

@@ -22,6 +22,7 @@
 #include <stdarg.h>
 
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "csutil/scf.h"
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"

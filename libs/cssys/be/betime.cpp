@@ -18,6 +18,7 @@
 
 #include <OS.h>
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "cssys/be/csbe.h"
 
 //-----------------------------------------------------------------------------

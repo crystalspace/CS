@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/system.h"
+#include "cssys/sysfunc.h"
 #include "csutil/cscolor.h"
 #include "csutil/csevent.h"
 #include "cstool/csfxscr.h"
@@ -56,6 +56,8 @@
 #include "ivaria/reporter.h"
 #include "iutil/eventq.h"
 #include "iutil/virtclk.h"
+#include "isys/plugin.h"
+#include "isys/vfs.h"
 #include "qsqrt.h"
 
 #include "csgeom/csrect.h"

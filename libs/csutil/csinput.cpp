@@ -23,7 +23,7 @@
 #include "csutil/cfgacc.h"
 #include "csutil/csevent.h"
 #include "csutil/csinput.h"
-#include "cssys/system.h" // @@@ For csGetTicks(); remove later.
+#include "cssys/sysfunc.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 

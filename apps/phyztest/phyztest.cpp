@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/system.h"
+#include "cssys/sysfunc.h"
 #include "apps/phyztest/phyztest.h"
 #include "csengine/engine.h"
 #include "cstool/initapp.h"
@@ -53,6 +53,7 @@
 #include "csengine/meshobj.h"
 #include "cstso.h"
 #include "isys/plugin.h"
+#include "isys/vfs.h"
 
 // PHYZTEST DEMO
 // hit del key to create a swinging chain

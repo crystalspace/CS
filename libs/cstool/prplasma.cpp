@@ -19,7 +19,6 @@
 
 #include "cssysdef.h"
 #include "ivideo/txtmgr.h"
-#include "cssys/system.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "csutil/cscolor.h"

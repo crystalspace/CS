@@ -20,6 +20,7 @@
 
 #define CS_SYSDEF_PROVIDE_SOFTWARE2D
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "qint.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"

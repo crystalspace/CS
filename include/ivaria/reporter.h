@@ -21,11 +21,10 @@
 
 #include <stdarg.h>
 #include "csutil/scf.h"
+#include "cssys/sysfunc.h"
 #include "iutil/objreg.h"
 
 struct iReporter;
-extern int csPrintf(char const*, ...);
-extern int csPrintfV(char const*, va_list);
 
 /**
  * Severity level for iReporter: BUG severity level.

@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/sysdriv.h"
+#include "cssys/sysfunc.h"
 #include "SDL/SDL.h"
 
 // This function should return milliseconds since some specific time

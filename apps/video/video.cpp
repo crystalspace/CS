@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/system.h"
+#include "cssys/sysfunc.h"
 #include "apps/video/video.h"
 #include "csutil/cscolor.h"
 #include "cstool/initapp.h"

@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/system.h"
+#include "cssys/sysfunc.h"
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
@@ -54,6 +54,7 @@
 #include "igraphic/imageio.h"
 #include "imap/parser.h"
 #include "ivaria/reporter.h"
+#include "isys/vfs.h"
 
 CS_IMPLEMENT_APPLICATION
 

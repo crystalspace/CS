@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "cssysdef.h"
-#include "cssys/system.h"
+#include "cssys/sysfunc.h"
 
 bool csGetInstallPath (char *oInstallPath, size_t iBufferSize)
 {

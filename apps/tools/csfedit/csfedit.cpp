@@ -33,6 +33,7 @@
 #include <sys/stat.h>
 #include "csgeom/csrect.h"
 #include "csutil/cmdhelp.h"
+#include "csutil/util.h"
 
 CS_IMPLEMENT_APPLICATION
 

@@ -18,7 +18,7 @@
 
 #define CS_SYSDEF_PROVIDE_ALLOCA
 #include "cssysdef.h"
-#include "cssys/system.h"
+#include "cssys/sysfunc.h"
 #include "isomesh.h"
 #include "csutil/scf.h"
 #include "ivideo/graph3d.h"

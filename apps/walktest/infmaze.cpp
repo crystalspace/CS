@@ -17,7 +17,6 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/system.h"
 #include "walktest/infmaze.h"
 #include "walktest/walktest.h"
 #include "cstool/collider.h"

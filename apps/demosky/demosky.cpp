@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/system.h"
+#include "cssys/sysfunc.h"
 #include "apps/demosky/demosky.h"
 #include "cstool/proctex.h"
 #include "cstool/prsky.h"
@@ -51,6 +51,7 @@
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
 #include "iutil/virtclk.h"
+#include "isys/vfs.h"
 
 //------------------------------------------------- We need the 3D engine -----
 

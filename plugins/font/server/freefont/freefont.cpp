@@ -19,6 +19,7 @@
 #include <freetype.h>
 
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "csutil/csstrvec.h"
 #include "csutil/csstring.h"
 #include "iutil/cfgfile.h"

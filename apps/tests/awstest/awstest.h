@@ -21,6 +21,7 @@ struct iVirtualClock;
 struct iEvent;
 struct iGraphics3D;
 struct iGraphics2D;
+struct iVFS;
 class csTransform;
 
 class awsTest

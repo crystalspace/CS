@@ -20,7 +20,6 @@
 #include "walktest/walktest.h"
 #include "walktest/infmaze.h"
 #include "qint.h"
-#include "cssys/system.h"
 #include "csgeom/frustum.h"
 #include "ivaria/view.h"
 #include "imesh/thing/polygon.h"

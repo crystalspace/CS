@@ -19,7 +19,7 @@
 #include <time.h>
 #include <sys/times.h>
 #include "cssysdef.h"
-#include "cssys/sysdriv.h"
+#include "cssys/sysfunc.h"
 
 #ifdef COMP_GCC3
 extern "C"

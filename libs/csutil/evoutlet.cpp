@@ -22,8 +22,9 @@
 #include "csutil/csevent.h"
 #include "csutil/cseventq.h"
 #include "csutil/csevcord.h"
-#include "cssys/system.h" // @@@ Needed for csGetTicks(); remove later.
+#include "cssys/sysfunc.h"
 #include "iutil/csinput.h"
+#include "iutil/objreg.h"
 
 SCF_IMPLEMENT_IBASE (csEventOutlet)
   SCF_IMPLEMENTS_INTERFACE (iEventOutlet)

@@ -60,7 +60,6 @@ PyMethodDef PytocsMethods[]={
 extern "C" void initcspacec();
 
 //TODO temporary
-//#include "cssys/system.h"
 
 void InitPytocs() {
   Py_InitModule("pytocs", PytocsMethods);

@@ -2,7 +2,6 @@
 #define __IVARIA_AWS_H__
 
 #include "csutil/scf.h"
-#include "cssys/system.h"
 #include "csgeom/csrect.h"
 #include "iutil/string.h"
 
@@ -24,6 +23,7 @@ struct  iObjectRegistry;
 struct  iTextureHandle;
 struct  iFontServer;
 struct  iFont;
+struct  iEvent;
 
 const   bool aws_debug=false;  // set to true to turn on debugging printf's
        

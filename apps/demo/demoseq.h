@@ -20,11 +20,12 @@
 #define DEMOSEQ_H
 
 #include <stdarg.h>
-#include "cssys/sysdriv.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/path.h"
 #include "ivaria/sequence.h"
+#include "csutil/csvector.h"
+#include "csutil/util.h"
 
 class Demo;
 class csVector3;

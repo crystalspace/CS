@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "csutil/util.h"
 #include "igraphic/imageio.h"
 #include "igraphic/image.h"

@@ -242,29 +242,4 @@ public:
   } scfiComponent;
 };
 
-/// CS version of printf
-extern int csPrintf (const char* str, ...);
-/// CS version of vprintf
-extern int csPrintfV (const char* str, va_list arg);
-
-/// Get the current tick count.
-extern csTicks csGetTicks ();
-
-/**
- * Get the installation path.<p>
- * This returns the path where the system has been installed to.
- * It has a limited use because mostly everything should be done
- * through VFS which is installation directory - independent; but
- * some initialization tasks still need this.
- */
-extern bool csGetInstallPath (char *oInstallPath, size_t iBufferSize);
-
-/**
- * This function will freeze your application for given number of 1/1000
- * seconds. The function is very inaccurate, so don't use it for accurate
- * timing. It may be useful when the application is idle, to explicitly
- * release CPU for other tasks in multi-tasking operating systems.
- */
-extern void csSleep (int /*SleepTime*/);
-
 #endif // __CS_SYSTEM_H__
