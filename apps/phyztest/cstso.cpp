@@ -1,48 +1,10 @@
 #include "sysdef.h"
-#include "qint.h"
-#include "cssys/system.h"
-#include "walktest/walktest.h"
-#include "walktest/bot.h"
-#include "walktest/infmaze.h"
-#include "walktest/hugeroom.h"
-#include "apps/support/command.h"
-#include "cstools/simpcons.h"
-#include "csengine/camera.h"
-#include "csengine/world.h"
-#include "csengine/csview.h"
-#include "csengine/wirefrm.h"
-#include "csengine/cssprite.h"
-#include "csengine/skeleton.h"
-#include "csengine/triangle.h"
-#include "csengine/polygon.h"
-#include "csengine/light.h"
-#include "csengine/sector.h"
-#include "csengine/csspr2d.h"
 #include "csengine/cdobj.h"
-#include "csengine/collider.h"
-#include "csutil/scanstr.h"
-#include "csparser/impexp.h"
-#include "csobject/dataobj.h"
-#include "cssfxldr/common/snddata.h"
-#include "csparser/snddatao.h"
-#include "csparser/csloader.h"
-#include "csparser/crossbld.h"
-#include "csscript/csscript.h"
-#include "csgeom/math3d.h"
-#include "isndsrc.h"
-#include "isndlstn.h"
-#include "isndbuf.h"
-#include "isndrdr.h"
-#include "igraph3d.h"
-
 #include "csphyzik/phyziks.h"
-//#include "csgeom/math3d.h"
-//#include "csengine/cssprite.h"
-//#include "csengine/collider.h"
 #include "cstso.h"
 
-ctCollidingContact contact_heap[1024];  // no more than that
-int contact_heap_index = 0;
+static ctCollidingContact contact_heap[1024];  // no more than that
+static int contact_heap_index = 0;
 
 csRigidSpaceTimeObj *csRigidSpaceTimeObj::space_time_continuum[ MAX_SPACE_TIME_NUM ];
 long csRigidSpaceTimeObj::continuum_end = 0;
