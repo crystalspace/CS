@@ -526,6 +526,7 @@ void csGraphics3DOGLCommon::PerfTest ()
   mesh.morph_factor = 0;
   mesh.mat_handle = NULL;
   mesh.vertex_fog = NULL;
+  mesh.do_mirror = false;
   mesh.triangles = new csTriangle [mesh.num_triangles];
   csVector3* vertices = new csVector3 [num_vertices];
   csVector2* texels = new csVector2 [num_vertices];

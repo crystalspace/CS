@@ -1,6 +1,8 @@
 The history order is reversed so that new features are at the top.
 
-02-March-2003
+3-Mar-2003
+	- Fixed an uninitialized variable in the OpenGL benchmark routine.
+2-March-2003
 	- Eric Sunshine worked around a problem in the configure script in
 	  which tests based upon CS_BUILD_IFELSE() (or its descendents) failed
 	  when run under Bash 1.14.  The culprit was the one-liner
@@ -8,7 +10,7 @@ The history order is reversed so that new features are at the top.
 	  other Bourne or compatible shell the world over, fails with Bash
 	  1.14.  In particular, Base 1.14 failed to set cs_build_ok to "yes"
 	  and instead left the old value ("no") in place.
-01-March-2003
+1-March-2003
 	- Philip Wyett updated MSVC project files and also notes next
 	  time we change csver.h for a release, update the MSVC project files
 	  so the version number is also updated in the rc's. :)
