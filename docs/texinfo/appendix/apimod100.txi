@@ -630,7 +630,7 @@ For consistency with related methods (such as @code{HasPrevious()}) in the
 
 For clarification, the following @code{csHash<>} methods have been renamed:
 
-@item @bullet
+@itemize @bullet
 @item
 @code{PutFirst()} @result{} @code{PutUnique()}
 @end itemize
