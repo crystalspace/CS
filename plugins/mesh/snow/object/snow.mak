@@ -39,7 +39,7 @@ INF.SNOW = $(SRCDIR)/plugins/mesh/snow/object/snow.csplugin
 INC.SNOW = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/snow/object/*.h plugins/mesh/partgen/*.h))
 SRC.SNOW = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/snow/object/*.cpp plugins/mesh/partgen/*.cpp))
 OBJ.SNOW = $(addprefix $(OUT)/,$(notdir $(SRC.SNOW:.cpp=$O)))
-DEP.SNOW = CSTOOL CSGEOM CSUTIL CSUTIL CSGFX
+DEP.SNOW = CSTOOL CSGFX CSGEOM CSUTIL
 
 MSVC.DSP += SNOW
 DSP.SNOW.NAME = snow

@@ -39,7 +39,7 @@ INF.SPIRAL = $(SRCDIR)/plugins/mesh/spiral/object/spiral.csplugin
 INC.SPIRAL = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spiral/object/*.h plugins/mesh/partgen/*.h))
 SRC.SPIRAL = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spiral/object/*.cpp plugins/mesh/partgen/*.cpp))
 OBJ.SPIRAL = $(addprefix $(OUT)/,$(notdir $(SRC.SPIRAL:.cpp=$O)))
-DEP.SPIRAL = CSTOOL CSGEOM CSUTIL CSUTIL CSGFX
+DEP.SPIRAL = CSTOOL CSGFX CSGEOM CSUTIL
 
 MSVC.DSP += SPIRAL
 DSP.SPIRAL.NAME = spiral

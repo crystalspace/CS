@@ -21,9 +21,12 @@ chronological order.
 	  * Converted a "for (int i =" to "int i; for (i = " in 
 	  mesh/partgen/particle.cpp
 	  * Added CSGFX dependency (DEP.XXX in the makefile) to emit.mak,
-	  fountain.mak, fire.mak, explo.mak, genmesh.mak, rain.mak, spiral.mak,
-	  snow.mak, spr3d.mak.
+	  fountain.mak, fire.mak, explo.mak, genmesh.mak, rain.mak, 
+	  spiral.mak, snow.mak, spr3d.mak.
 	  * Fixed a compilation error in odedynam.h.
+	- Luca modified his last commit, upon advice of res, using the right
+	  order for the libraries' dependency, id est: cstool csgfx csgeom 
+	  csutil.
 17-Jan-2004
         - Steven Geens added HitBeamOutline and HitBeamObject for sprcal3d.
 	  He's not completely sure it works, but it doesn't seem to break

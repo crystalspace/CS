@@ -39,7 +39,7 @@ INF.FOUNTAIN = $(SRCDIR)/plugins/mesh/fountain/object/fountain.csplugin
 INC.FOUNTAIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fountain/object/*.h plugins/mesh/partgen/*.h))
 SRC.FOUNTAIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fountain/object/*.cpp plugins/mesh/partgen/*.cpp))
 OBJ.FOUNTAIN = $(addprefix $(OUT)/,$(notdir $(SRC.FOUNTAIN:.cpp=$O)))
-DEP.FOUNTAIN = CSTOOL CSGEOM CSUTIL CSUTIL CSGFX
+DEP.FOUNTAIN = CSTOOL CSGFX CSGEOM CSUTIL
 
 MSVC.DSP += FOUNTAIN
 DSP.FOUNTAIN.NAME = fountain
