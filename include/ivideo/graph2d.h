@@ -75,14 +75,14 @@ struct csPixelFormat
    * only). Ignore the Mask and Shift fields of this structure if
    * PalEntries != 0.
    */
-  uint32 RedMask, GreenMask, BlueMask;
+  uint32 RedMask, GreenMask, BlueMask, AlphaMask;
   /**
    * The shifts to extract the color information from a pixel (truecolor mode
    * only).
    */
-  int RedShift, GreenShift, BlueShift;
+  int RedShift, GreenShift, BlueShift, AlphaShift;
   /// The number of significant bits for every color.
-  int RedBits, GreenBits, BlueBits;
+  int RedBits, GreenBits, BlueBits, AlphaBits;
 
   /**
    * Number of palette entries. 0 for truecolor, else the number of palette
@@ -120,6 +120,7 @@ struct csPixelFormat
     COMPUTE (Red);
     COMPUTE (Green);
     COMPUTE (Blue);
+    COMPUTE (Alpha);
 #undef COMPUTE
   }
 };
@@ -149,7 +150,7 @@ struct iOffscreenCanvasCallback : public iBase
   virtual void SetRGB (iGraphics2D* canvas, int idx, int r, int g, int b) = 0;
 };
 
-SCF_VERSION (iGraphics2D, 2, 5, 0);
+SCF_VERSION (iGraphics2D, 2, 5, 1);
 
 /**
  * This is the interface for 2D renderer. The 2D renderer is responsible
@@ -223,10 +224,20 @@ struct iGraphics2D : public iBase
   /// Get the palette (if there is one)
   virtual csRGBpixel *GetPalette () = 0;
 
-  /// Set a color index to given R,G,B (0..255) values
+  /**
+   * Set a color index to given R,G,B (0..255) values. Only use if there
+   * is a palette.
+   */
   virtual void SetRGB (int i, int r, int g, int b) = 0;
-  /// Find an RGB color.
-  virtual int FindRGB (int r, int g, int b) = 0;
+  /**
+   * Find an RGB (0..255) color. If there is a palette, this returns an
+   * entry index set with SetRGB(). If the returned value is -1, a
+   * suitable palette entry was not found.
+   * Without a palette, the actual color bytes are returned.
+   * <p>
+   * Use returned value for color arguments in iGraphics2D.
+   */
+  virtual int FindRGB (int r, int g, int b, int a = 255) = 0;
 
   /**
    * Set clipping rectangle.
@@ -289,6 +300,8 @@ struct iGraphics2D : public iBase
 
   /// Query pixel R,G,B at given screen location
   virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB) = 0;
+  /// As GetPixel() above, but with alpha
+  virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB, uint8 &oA) = 0;
 
   /**
    * Save a subarea of screen and return a handle to saved buffer.

@@ -344,7 +344,7 @@ void csGLFontCache::FlushArrays ()
 	if (envColor != job.bg)
 	{
 	  float bgRGB[4];
-	  G2D->DecomposeColor (job.bg, bgRGB[0], bgRGB[1], bgRGB[2]);
+	  G2D->DecomposeColor (job.bg, bgRGB[0], bgRGB[1], bgRGB[2], bgRGB[3]);
 	  glTexEnvfv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, bgRGB);
 	  envColor = job.bg;
 	}

@@ -209,6 +209,7 @@ void OSXDriver2D::Initialize16()
     canvas->pfmt.RedMask = 0x1F << 10;
     canvas->pfmt.GreenMask = 0x1F << 5;
     canvas->pfmt.BlueMask = 0x1F;
+    canvas->pfmt.AlphaMask = 0;
     canvas->pfmt.complete();
 }
 
@@ -222,6 +223,7 @@ void OSXDriver2D::Initialize32()
     canvas->pfmt.RedMask = 0xFF0000;
     canvas->pfmt.GreenMask = 0x00FF00;
     canvas->pfmt.BlueMask = 0x0000FF;
+    canvas->pfmt.AlphaMask = 0xFF000000;
     canvas->pfmt.complete();
 }
 

@@ -726,6 +726,7 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
   pfmt.RedMask = ddpf.dwRBitMask;
   pfmt.GreenMask = ddpf.dwGBitMask;
   pfmt.BlueMask = ddpf.dwBBitMask;
+  pfmt.AlphaMask = ddpf.dwRGBAlphaBitMask;
   Depth = ddpf.dwRGBBitCount;
 
   if (fontCache) delete fontCache;

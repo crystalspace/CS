@@ -62,7 +62,9 @@ bool csGraphics2DGLCommon::Initialize (iObjectRegistry *object_reg)
     pfmt.RedMask =   0x000000FF;
     pfmt.GreenMask = 0x0000FF00;
     pfmt.BlueMask =  0x00FF0000;
+    pfmt.AlphaMask = 0xFF000000;
 #else 
+    pfmt.AlphaMask = 0xFF000000;
     pfmt.RedMask =   0x00FF0000;
     pfmt.GreenMask = 0x0000FF00;
     pfmt.BlueMask =  0x000000FF;
@@ -313,27 +315,29 @@ void csGraphics2DGLCommon::FinishDraw ()
 }
 
 void csGraphics2DGLCommon::DecomposeColor (int iColor,
-  GLubyte &oR, GLubyte &oG, GLubyte &oB)
+  GLubyte &oR, GLubyte &oG, GLubyte &oB, GLubyte &oA)
 {
+  oA = (iColor >> 24) & 0xff;
   oR = (iColor >> 16) & 0xff;
   oG = (iColor >> 8) & 0xff;
   oB = iColor & 0xff;
 }
 
 void csGraphics2DGLCommon::DecomposeColor (int iColor,
-  float &oR, float &oG, float &oB)
+  float &oR, float &oG, float &oB, float &oA)
 {
-  GLubyte r, g, b;
-  DecomposeColor (iColor, r, g, b);
+  GLubyte r, g, b, a;
+  DecomposeColor (iColor, r, g, b, a);
   oR = r / 255.0;
   oG = g / 255.0;
   oB = b / 255.0;
+  oA = a / 255.0;
 }
 
 void csGraphics2DGLCommon::setGLColorfromint (int color)
 {
-  glColor3ub ((color >> 16) & 0xff, (color >> 8) & 0xff,
-    color & 0xff);
+  glColor4ub ((color >> 16) & 0xff, (color >> 8) & 0xff,
+    color & 0xff, (color >> 24) & 0xff);
 }
 
 csGLScreenShot* csGraphics2DGLCommon::GetScreenShot ()
@@ -413,9 +417,9 @@ void csGraphics2DGLCommon::Clear (int color)
 {
   ((csGLFontCache*)fontCache)->FlushText ();
 
-  float r, g, b;
-  DecomposeColor (color, r, g, b);
-  glClearColor (r, g, b, 0.0);
+  float r, g, b, a;
+  DecomposeColor (color, r, g, b, a);
+  glClearColor (r, g, b, a);
   glClear (GL_COLOR_BUFFER_BIT);
 }
 

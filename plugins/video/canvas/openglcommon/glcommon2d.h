@@ -101,9 +101,9 @@ protected:
   bool hasRenderTarget;
 
   /// Decompose a color ID into r,g,b components
-  void DecomposeColor (int iColor, GLubyte &oR, GLubyte &oG, GLubyte &oB);
+  void DecomposeColor (int iColor, GLubyte &oR, GLubyte &oG, GLubyte &oB, GLubyte &oA);
   /// Same but uses floating-point format
-  void DecomposeColor (int iColor, float &oR, float &oG, float &oB);
+  void DecomposeColor (int iColor, float &oR, float &oG, float &oB, float &oA);
   /// Set up current GL RGB color from a packed color format
   void setGLColorfromint (int color);
 
@@ -190,12 +190,13 @@ public:
 
   /// Set a palette entry
   virtual void SetRGB (int i, int r, int g, int b);
-  virtual int FindRGB (int r, int g, int b)
+  virtual int FindRGB (int r, int g, int b, int a = 255)
   {
     if (r < 0) r = 0; else if (r > 255) r = 255;
     if (g < 0) g = 0; else if (g > 255) g = 255;
     if (b < 0) b = 0; else if (b > 255) b = 255;
-    return (r << 16) | (g << 8) | b;
+    if (a < 0) a = 0; else if (a > 255) a = 255;
+    return (a << 24) | (r << 16) | (g << 8) | b;
   }
 
   /// Draw a line

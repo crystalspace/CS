@@ -191,6 +191,7 @@ bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
     pfmt.RedMask   = 0x1f << 11;
     pfmt.GreenMask = 0x3f << 5;
     pfmt.BlueMask  = 0x1f;
+    pfmt.AlphaMask = 0;
     pfmt.PixelBytes = 2;
     pfmt.PalEntries = 0;
   }
@@ -203,6 +204,7 @@ bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
     pfmt.RedMask = 0xff << 16;
     pfmt.GreenMask = 0xff << 8;
     pfmt.BlueMask = 0xff;
+    pfmt.AlphaMask = 0xff << 24;
     pfmt.PixelBytes = 4;
     pfmt.PalEntries = 0;
   }
@@ -479,7 +481,7 @@ void csGraphics2D::Blit (int x, int y, int w, int h,
 	while (w2 > 0)
 	{
 	  r = *d++; g = *d++; b = *d++; a = *d++;
-	  *vram++ = FindRGB (r, g, b) | (a<<24);
+	  *vram++ = FindRGB (r, g, b, a);
 	  w2--;
 	}
         data += 4*orig_w;
@@ -890,6 +892,41 @@ void csGraphics2D::GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB)
     oR = ((pix & pfmt.RedMask)   >> pfmt.RedShift)   << (8 - pfmt.RedBits);
     oG = ((pix & pfmt.GreenMask) >> pfmt.GreenShift) << (8 - pfmt.GreenBits);
     oB = ((pix & pfmt.BlueMask)  >> pfmt.BlueShift)  << (8 - pfmt.BlueBits);
+  }
+}
+
+void csGraphics2D::GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB, uint8 &oA)
+{
+  oR = oG = oB = 0;
+  oA = 255;
+
+  if (x < 0 || y < 0 || x >= Width || y >= Height)
+    return;
+
+  uint8 *vram = GetPixelAt (x, y);
+  if (!vram)
+    return;
+
+  if (pfmt.PalEntries)
+  {
+    uint8 pix = *vram;
+    oR = Palette [pix].red;
+    oG = Palette [pix].green;
+    oB = Palette [pix].blue;
+  }
+  else
+  {
+    uint32 pix = 0;
+    switch (pfmt.PixelBytes)
+    {
+      case 1: pix = *vram; break;
+      case 2: pix = *(uint16 *)vram; break;
+      case 4: pix = *(uint32 *)vram; break;
+    }
+    oR = ((pix & pfmt.RedMask)   >> pfmt.RedShift)   << (8 - pfmt.RedBits);
+    oG = ((pix & pfmt.GreenMask) >> pfmt.GreenShift) << (8 - pfmt.GreenBits);
+    oB = ((pix & pfmt.BlueMask)  >> pfmt.BlueShift)  << (8 - pfmt.BlueBits);
+    oA = ((pix & pfmt.AlphaMask) >> pfmt.AlphaShift) << (8 - pfmt.AlphaBits);
   }
 }
 

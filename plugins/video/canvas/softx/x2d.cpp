@@ -217,6 +217,7 @@ bool csGraphics2DXLib::CreateVisuals ()
   pfmt.RedMask = xvis.red_mask;
   pfmt.GreenMask = xvis.green_mask;
   pfmt.BlueMask = xvis.blue_mask;
+  pfmt.AlphaMask = 0;
 
   pfmt.complete ();
   pfmt.PalEntries = xvis.colormap_size;
@@ -244,7 +245,7 @@ bool csGraphics2DXLib::CreateVisuals ()
     switch (sim_depth)
     {
       case 8:
-        pfmt.RedMask = pfmt.GreenMask = pfmt.BlueMask = 0;
+        pfmt.RedMask = pfmt.GreenMask = pfmt.BlueMask = pfmt.AlphaMask = 0;
       	pfmt.PalEntries = 256;
       	pfmt.PixelBytes = 1;
       	break;
@@ -252,6 +253,7 @@ bool csGraphics2DXLib::CreateVisuals ()
       	pfmt.RedMask   = 0x1f << 10;
       	pfmt.GreenMask = 0x1f << 5;
       	pfmt.BlueMask  = 0x1f;
+        pfmt.AlphaMask = 0;
       	pfmt.PalEntries = 0;
       	pfmt.PixelBytes = 2;
       	break;
@@ -259,6 +261,7 @@ bool csGraphics2DXLib::CreateVisuals ()
       	pfmt.RedMask   = 0x1f << 11;
       	pfmt.GreenMask = 0x3f << 5;
       	pfmt.BlueMask  = 0x1f;
+        pfmt.AlphaMask = 0;
       	pfmt.PalEntries = 0;
       	pfmt.PixelBytes = 2;
       	break;
@@ -266,6 +269,7 @@ bool csGraphics2DXLib::CreateVisuals ()
       	pfmt.RedMask = 0xff << 16;
       	pfmt.GreenMask = 0xff << 8;
       	pfmt.BlueMask = 0xff;
+        pfmt.AlphaMask = 0xff << 24;
       	pfmt.PalEntries = 0;
       	pfmt.PixelBytes = 4;
       	break;

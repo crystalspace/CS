@@ -256,7 +256,7 @@ bool csGraphics2DSDL::Initialize (iObjectRegistry *object_reg)
     switch (Depth)
     {
       case 8:
-        pfmt.RedMask = pfmt.GreenMask = pfmt.BlueMask = 0;
+        pfmt.RedMask = pfmt.GreenMask = pfmt.BlueMask = pfmt.AlphaMask = 0;
         pfmt.PalEntries = 256;
         pfmt.PixelBytes = 1;
         break;
@@ -264,6 +264,7 @@ bool csGraphics2DSDL::Initialize (iObjectRegistry *object_reg)
         pfmt.RedMask   = 0x1f << 10;
         pfmt.GreenMask = 0x1f << 5;
         pfmt.BlueMask  = 0x1f;
+        pfmt.AlphaMask = 0;
         pfmt.PalEntries = 0;
         pfmt.PixelBytes = 2;
         break;
@@ -271,6 +272,7 @@ bool csGraphics2DSDL::Initialize (iObjectRegistry *object_reg)
         pfmt.RedMask   = 0x1f << 11;
         pfmt.GreenMask = 0x3f << 5;
         pfmt.BlueMask  = 0x1f;
+        pfmt.AlphaMask = 0;
         pfmt.PalEntries = 0;
         pfmt.PixelBytes = 2;
         break;
@@ -278,6 +280,7 @@ bool csGraphics2DSDL::Initialize (iObjectRegistry *object_reg)
         pfmt.RedMask = 0xff << 16;
         pfmt.GreenMask = 0xff << 8;
         pfmt.BlueMask = 0xff;
+        pfmt.AlphaMask = 0xff << 24;
         pfmt.PalEntries = 0;
         pfmt.PixelBytes = 4;
         break;
@@ -338,7 +341,7 @@ bool csGraphics2DSDL::Open()
   switch (Depth)
   {
     case 8:
-      pfmt.RedMask = pfmt.GreenMask = pfmt.BlueMask = 0;
+      pfmt.RedMask = pfmt.GreenMask = pfmt.BlueMask = pfmt.AlphaMask = 0;
       pfmt.PalEntries = 256; pfmt.PixelBytes = 1;
       break;
 
@@ -347,6 +350,7 @@ bool csGraphics2DSDL::Open()
       pfmt.RedMask   = screen->format->Rmask;
       pfmt.GreenMask = screen->format->Gmask;
       pfmt.BlueMask  = screen->format->Bmask;
+      pfmt.AlphaMask = screen->format->Amask;
       pfmt.PalEntries = 0;
       pfmt.PixelBytes = screen->format->BytesPerPixel;
 
@@ -359,6 +363,7 @@ bool csGraphics2DSDL::Open()
       pfmt.RedMask   = screen->format->Rmask;
       pfmt.GreenMask = screen->format->Gmask;
       pfmt.BlueMask  = screen->format->Bmask;
+      pfmt.AlphaMask = screen->format->Amask;
       pfmt.PalEntries = 0;
       pfmt.PixelBytes = screen->format->BytesPerPixel;
 

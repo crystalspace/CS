@@ -194,17 +194,19 @@ public:
   virtual void DrawBox (int x, int y, int w, int h, int color);
   /// (*) Set a color index to given R,G,B (0..255) values
   virtual void SetRGB (int i, int r, int g, int b);
-  virtual int FindRGB (int r, int g, int b)
+  virtual int FindRGB (int r, int g, int b, int a = 255)
   {
     if (r < 0) r = 0; else if (r > 255) r = 255;
     if (g < 0) g = 0; else if (g > 255) g = 255;
     if (b < 0) b = 0; else if (b > 255) b = 255;
+    if (a < 0) a = 0; else if (a > 255) a = 255;
     if (Depth == 8)
       return FindRGBPalette (r, g, b);
     return
       ((r >> (8 - pfmt.RedBits))   << pfmt.RedShift) |
       ((g >> (8 - pfmt.GreenBits)) << pfmt.GreenShift) |
-      ((b >> (8 - pfmt.BlueBits))  << pfmt.BlueShift);
+      ((b >> (8 - pfmt.BlueBits))  << pfmt.BlueShift) |
+      ((a >> (8 - pfmt.AlphaBits)) << pfmt.AlphaShift);
   }
   /// Write a text string into the back buffer
   virtual void Write (iFont *font , int x, int y, int fg, int bg,
@@ -288,6 +290,8 @@ public:
 
   /// Query pixel R,G,B at given screen location
   virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB);
+  /// As GetPixel() above, but with alpha
+  virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB, uint8 &oA);
 
   /**
    * Perform a system specific extension. Return false if extension
