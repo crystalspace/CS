@@ -8,6 +8,12 @@ The history order is reversed so that new features are at the top.
 	  transform using other methods (like RotateThis() and SetPosition()).
 	- Removed dungeon plugin and test app due to lack of maintenance.
 	- Removed csgame plugin and test app due to lack of maintenance.
+	- Philip Wyett did the following:
+	    - Added SDL 2D canvas to MSVC build & MSVCGEN process.
+	    - Updated MSVC docs for SDL 1.2.1.
+	    - Updated command line docs to add -canvas.
+	- Removed t3d2cs app since it doesn't work and is unmaintained.
+	- Created apps/import and moved map2cs, mdl2spr, 3ds2lev there.
 3-Jul-2001
 	- Fixed the Python plugin after Martin's changes.
 	- Added iEngine::GetCameraPosition() which takes a name as a parameter
