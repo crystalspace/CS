@@ -877,7 +877,7 @@ csRef<iShaderVariableAccessor> csTextSyntaxService::ParseShaderVarExpr (
   csRef<csShaderVariable> var;
   var.AttachNew (new csShaderVariable (csInvalidStringID));
   csRef<csShaderExpressionAccessor> acc;
-  acc.AttachNew (new csShaderExpressionAccessor (expression));
+  acc.AttachNew (new csShaderExpressionAccessor (object_reg, expression));
   return acc;
 }
 

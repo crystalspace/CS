@@ -69,6 +69,10 @@ int main (int argc, char* argv[])
   char const* bogus = " (some) bogus formats: %bogus %- 0#10.2y %jd %kd\n";
   // The 123 should replace the only valid format in the string (i.e. the %jd).
   csPrintf (bogus, (intmax_t)123);
+#if defined(__MINGW32__) || defined(CS_COMPILER_MSVC)
+  const char* I64format = " I64 specifier test: %I64d\n";
+  csPrintf (I64format, (int64)-12);
+#endif
 
   csPrintf ("\n");
   csPrintf ("Examples shamelessly stolen from libc manual:\n");

@@ -237,24 +237,6 @@ csRef<iImageFileLoader> ImageTgaFile::InitLoader (csRef<iDataBuffer> source)
 
 void ImageTgaFile::TgaLoader::readtga (uint8*& iBuffer, TGAheader* tgaP)
 {
-  /*tgaP->IDLength = *iBuffer++;
-  tgaP->CoMapType = *iBuffer++;
-  tgaP->ImgType = *iBuffer++;
-  tgaP->Index_lo = *iBuffer++;
-  tgaP->Index_hi = *iBuffer++;
-  tgaP->Length_lo = *iBuffer++;
-  tgaP->Length_hi = *iBuffer++;
-  tgaP->CoSize = *iBuffer++;
-  tgaP->X_org_lo = *iBuffer++;
-  tgaP->X_org_hi = *iBuffer++;
-  tgaP->Y_org_lo = *iBuffer++;
-  tgaP->Y_org_hi = *iBuffer++;
-  tgaP->Width_lo = *iBuffer++;
-  tgaP->Width_hi = *iBuffer++;
-  tgaP->Height_lo = *iBuffer++;
-  tgaP->Height_hi = *iBuffer++;
-  tgaP->PixelSize = *iBuffer++;
-  tgaP->flags = *iBuffer++;*/
   memcpy (tgaP, iBuffer, sizeof (TGAheader));
   iBuffer += sizeof (TGAheader);
 

@@ -48,6 +48,12 @@ chronological order.
 	  template, such as csList<>, the complaint is useless if it occurs at
 	  declaration time.  It would be meaningful if it complained at
 	  invocation time, though.
+	- res added support for the I64 format type specifier to 
+	  csPrintfFormatter<> when compiling on MinGW or MSVC. This allows use 
+	  of the PRI?64 macros on MinGW.
+	- res made a VC6 compile fix to glshader_ffp.cpp.
+	- res made csShaderExpressionAccessor use csReport() for error 
+	  reporting.
 5-Apr-2005
 	- res replaced use of printf() and relatives with csPrintf() and 
 	  relatives and use of sprintf() with use of csStrings.

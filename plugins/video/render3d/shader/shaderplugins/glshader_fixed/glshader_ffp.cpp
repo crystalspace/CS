@@ -407,11 +407,12 @@ void csGLShaderFFP::CompactLayers()
     for (p = 0; p < texlayers.Length(); p++)
     {
       const mtexlayer& tl = texlayers[p];
-      for (int i = 0; i < GetUsedLayersCount (tl.color.op); i++)
+      int i;
+      for (i = 0; i < GetUsedLayersCount (tl.color.op); i++)
       {
 	layerUseFlags[p] |= LayerSourceToFlag (tl.color.source[i]);
       }
-      for (int i = 0; i < GetUsedLayersCount (tl.alpha.op); i++)
+      for (i = 0; i < GetUsedLayersCount (tl.alpha.op); i++)
       {
 	layerUseFlags[p] |= LayerSourceToFlag (tl.alpha.source[i]);
       }

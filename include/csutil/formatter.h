@@ -35,6 +35,11 @@
 #if defined(__MINGW32__) || defined(CS_COMPILER_MSVC)
 #define CS_FORMATTER_NO_LONG_DOUBLE_FORMAT
 #endif
+// MinGWs <inttypes.h> uses the MS-specific 'I64' format specifier in its
+// PR?64 macros. Enable support for I64 so the PR?64 macros can be used.
+#if defined(__MINGW32__) || defined(CS_COMPILER_MSVC)
+#define CS_FORMATTER_PROVIDE_I64
+#endif
 
 // MSVC 7.1 requires us to use a `typename' qualifier on the declaration of
 // `mantissa' in csPrintfFormatter. Although this is accepted by most other
@@ -167,11 +172,11 @@ class csPrintfFormatter
   enum Type
   {
     typeNone = 0,
+    typeLongLong = 3, // The reason for that: see I64 support
     typeChar,
     typeShort,
     typeIntmax,
     typeLong,
-    typeLongLong,
     typePtrDiffT,
     typeSizeT
   };
@@ -314,12 +319,39 @@ class csPrintfFormatter
 	    return false;
 	  return true;
 	}
+#ifdef CS_FORMATTER_PROVIDE_I64
+      case 'I':
+      case '6':
+      case '4':
+	{
+	  static const utf32_char I64spec[3] = {'I', '6', '4'};
+	  const int I64specStartType = typeLongLong - 2;
+	  if (state.ch == I64spec[0])
+	    state.currentFormat.type = (Type)I64specStartType;
+	  else
+	  {
+	    state.currentFormat.type = (Type)(state.currentFormat.type + 1);
+	    if (state.ch != 
+	      I64spec[state.currentFormat.type - I64specStartType])
+	      return false;
+	  }
+	  return true;
+	}
+	break;
+#endif
     }
     return false;
   }
 
   bool ParseConversion (SpecParseState& state)
   {
+#ifdef CS_FORMATTER_PROVIDE_I64
+    // Check to detect incomplete I64 specifiers
+    const int I64specStartType = typeLongLong - 2;
+    if ((state.currentFormat.type >= I64specStartType)
+      && (state.currentFormat.type < typeLongLong))
+      return false;
+#endif
     switch (state.ch)
     {
       case '%':
@@ -544,14 +576,14 @@ class csPrintfFormatter
 	    break;
 	  }
 	  // Check for param type modifier (l, h, ...)
-	  else if (ParseType (state))
+	case formatTypeConversion:
+	  if (ParseType (state))
 	  {
-	    parseState = formatPrecTypeConversion;
+	    parseState = formatTypeConversion;
 	    break;
 	  }
-	case formatTypeConversion:
 	  // Check actual conversion (s, d, ...)
-	  if (ParseConversion (state))
+	  else if (ParseConversion (state))
 	  {
 	    state.currentFormat.fmtSkip =
 	      reader.GetPosition() - state.fmtBegin;

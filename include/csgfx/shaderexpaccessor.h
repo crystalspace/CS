@@ -30,6 +30,8 @@
 #include "csgfx/shaderexp.h"
 #include "csgfx/shadervar.h"
 
+struct iObjectRegistry;
+
 /**\addtogroup gfx
  * @{ 
  */
@@ -42,6 +44,7 @@ class CS_CRYSTALSPACE_EXPORT csShaderExpressionAccessor :
   public iShaderVariableAccessor
 {
 private:
+  iObjectRegistry* object_reg;
   csShaderExpression* expression;
 public:
   SCF_DECLARE_IBASE;
@@ -51,8 +54,10 @@ public:
    * \remarks The accessor object will take ownership of \a expression. You
    *   should not further use \a expression (especially not delete it) after
    *   using it to construct an instance of this class.
+   * \remarks \a object_reg can be 0.
    */
-  csShaderExpressionAccessor (csShaderExpression* expression);
+  csShaderExpressionAccessor (iObjectRegistry* object_reg,
+    csShaderExpression* expression);
   virtual ~csShaderExpressionAccessor();
 
   virtual void PreGetValue (csShaderVariable *variable);

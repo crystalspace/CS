@@ -20,6 +20,7 @@
 
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
+#include "ivaria/reporter.h"
 
 #include "csgfx/shaderexpaccessor.h"
 
@@ -28,7 +29,8 @@ SCF_IMPLEMENT_IBASE(csShaderExpressionAccessor)
 SCF_IMPLEMENT_IBASE_END
 
 csShaderExpressionAccessor::csShaderExpressionAccessor (
-  csShaderExpression* expression) : expression (expression)
+  iObjectRegistry* object_reg, csShaderExpression* expression) : 
+  object_reg (object_reg), expression (expression)
 {
   SCF_CONSTRUCT_IBASE(0);
 }
@@ -45,9 +47,9 @@ void csShaderExpressionAccessor::PreGetValue (csShaderVariable *variable)
   {
     if (!expression->Evaluate (variable))
     {
-      // @@@ Use stdout
-      csPrintf ("csShaderExpressionAccessor: eval error: %s\n", 
-	expression->GetError());
+      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+	"crystalspace.shader.expressionaccessor",
+	"eval error: %s", expression->GetError());
       // Prevent flooding with errors...
       delete expression; expression = 0;
     }
