@@ -413,9 +413,6 @@ void InternalScanPluginDir (iStrVector*& messages,
 	  }
 	  else
 	  {
-	    fullPath.Clear();
-	    fullPath << dir << PATH_SEPARATOR << cspluginPath;
-
 	    // parse .csplugin
 	    csPhysicalFile file (cspluginPath, "rb");
 
