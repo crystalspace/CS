@@ -12,14 +12,42 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+20-Feb-2000
+	- csPolygonSet now also holds a pointer to the parent container and
+	  checks if the parent is NULL before being added to a parent. This
+	  makes it safe (for example) to add a thing more than once to some
+	  sector.
+	- Added left/right arrow to menu items in Blocks where you can move
+	  the menu item left or right.
+	- Michael Ewert fixed a nasty bug in the physiks library. Angular
+	  and linear velocity were being used in wrong frame of reference
+	  a number of times in various files.
 19-Feb-2000
+	- Changed novice/average/expert menu in Blocks so that it is now
+	  one menu which you can rotate horizontally with arrow left/right
+	  (instead of up/down).
+	- The seperate boardsize menu has also been replaced with a horizontal
+	  one.
 	- Eric Sunshine enhanced csStrVector so that it can perform both
 	  case-sensitive and case-insensitive sorting and comparison.
 	- Eric Sunshine fixed cspFileDialog so that it sorts the directory
 	  and file lists.
+	- Seth Galbraith implemented MergeTexels for sprites.
+	- Norman Kramer moved screenshot functionality in Glide driver and
+	  also enabled the new DrawTriangleMesh.
+	- Thomas Hieber did some more documentation and cleanup of the collision
+	  detection code.
+	- Thomas also added some fixed to Win32 networking by Eric Wigforss
+	  <ewigforss@novametrix.com>.
 18-Feb-2000
 	- Fixed Z-buffering for sprites. Was broken after the
 	  DrawTriangleMesh changes.
+	- Added large comment before csSector::Draw() explaining a plan
+	  for a new rendering loop.
+	- The highscore screen in Blocks shows for what level/play size
+	  the highscores are.
+	- Michael Ewert fixed a bad bug in articulated body solver.
+	- Noah L. Gibbs fixed a set_R bug reported by Thomas Hieber.
 17-Feb-2000
 	- Seth did some fixes to sprite code again.
 	- Added the first versions of the TeXInfo converted docs from

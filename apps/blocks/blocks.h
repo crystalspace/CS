@@ -120,9 +120,8 @@ enum BlShapeType
 #define MENU_4X4 7
 #define MENU_5X5 8
 #define MENU_6X6 9
-#define MENU_BOARDSIZE 10
-#define MENU_KEYCONFIG 11
-#define MENU_TOTAL 12	// Total number of menu entries in system.
+#define MENU_KEYCONFIG 10
+#define MENU_TOTAL 11	// Total number of menu entries in system.
 
 #define MAX_MENUS 20	// Maximum number of menus visible at same time.
 
@@ -194,6 +193,12 @@ public:
   bool CheckScore (int score);
 };
 
+//class Screen
+//{
+//public:
+//
+//};
+
 class Blocks : public SysSystemDriver
 {
 private:
@@ -235,10 +240,17 @@ private:
   // For the menu.
   csThing* menus[MAX_MENUS];
   int idx_menus[MAX_MENUS];
+  bool leftright_menus[MAX_MENUS];
   csThing* src_menus[MENU_TOTAL];
+  csThing* arrow_left;
+  csThing* arrow_right;
   int cur_menu;
   int old_cur_menu;
   float menu_todo;
+  float menu_hor_todo;
+  float menu_hor_old_x_src, menu_hor_old_x_dst;
+  float menu_hor_new_x_src, menu_hor_new_x_dst;
+  csThing* menu_hor_old_menu;
   int num_menus;	// Current number of active menu entries.
 
   TextEntryMenu* keyconf_menu;
@@ -308,6 +320,8 @@ private:
 
   // Current dimensions of game area.
   int zone_dim;
+  // New dimensions of game area (set with menu).
+  int new_zone_dim;
 
   // Tells us wheather a cell is occupied. It's padded at both ends along
   // each axis. It is not recomended to access it directly (eg I forgot
@@ -397,6 +411,7 @@ public:
   void set_cube_room (csSector* s) { room = s; }
   void InitGame ();
   void CreateMenuEntry (const char* txt, int menu_nr);
+  csThing* CreateMenuArrow (bool left);
   void ChangePlaySize (int new_size);
 
   void ReadConfig ();
@@ -405,9 +420,10 @@ public:
   const char* KeyName (const KeyMapping& map);
 
   void DrawMenu (int menu);
-  void DrawMenu (float menu_transition, int old_menu, int new_menu);
+  void DrawMenu (float menu_trans, float menu_hor_trans, int old_menu, int new_menu);
   void InitMenu ();
-  void AddMenuItem (int menu_nr);
+  void AddMenuItem (int menu_nr, bool leftright);
+  void ReplaceMenuItem (int idx, int menu_nr);
 
   // Handling of basic events and frame drawing.
   virtual void NextFrame (time_t elapsed_time, time_t current_time);

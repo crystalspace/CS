@@ -306,6 +306,7 @@ Blocks::Blocks ()
   dynlight = NULL;
 
   zone_dim = ZONE_DIM;
+  new_zone_dim = ZONE_DIM;
   keyconf_menu = NULL;
 }
 
@@ -1158,7 +1159,7 @@ void Blocks::HandleDemoKey (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/
   switch (key)
   {
     case CSKEY_UP:
-      if (!menu_todo)
+      if (!menu_todo && !menu_hor_todo)
       {
         old_cur_menu = cur_menu;
         cur_menu = (cur_menu+1)%num_menus;
@@ -1166,11 +1167,83 @@ void Blocks::HandleDemoKey (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/
       }
       break;
     case CSKEY_DOWN:
-      if (!menu_todo)
+      if (!menu_todo && !menu_hor_todo)
       {
         old_cur_menu = cur_menu;
         cur_menu = (cur_menu-1+num_menus)%num_menus;
 	menu_todo = 1;
+      }
+      break;
+    case CSKEY_RIGHT:
+      if (!menu_todo && !menu_hor_todo)
+      {
+        if (idx_menus[cur_menu] >= MENU_NOVICE &&
+		idx_menus[cur_menu] <= MENU_EXPERT)
+	{
+	  menu_hor_old_menu = menus[cur_menu];
+	  menu_hor_old_x_src = 0;
+	  menu_hor_old_x_dst = -6.;
+	  menu_hor_new_x_src = 6.;
+	  menu_hor_new_x_dst = 0;
+	  menu_hor_todo = 1;
+	  ReplaceMenuItem (cur_menu,
+	  	MENU_NOVICE + (idx_menus[cur_menu]-MENU_NOVICE + 1)
+		% (MENU_EXPERT-MENU_NOVICE+1));
+          diff_level = idx_menus[cur_menu]-MENU_NOVICE;
+	  WriteConfig ();
+	}
+        else if (idx_menus[cur_menu] >= MENU_3X3 &&
+		idx_menus[cur_menu] <= MENU_6X6)
+	{
+	  menu_hor_old_menu = menus[cur_menu];
+	  menu_hor_old_x_src = 0;
+	  menu_hor_old_x_dst = -6.;
+	  menu_hor_new_x_src = 6.;
+	  menu_hor_new_x_dst = 0;
+	  menu_hor_todo = 1;
+	  ReplaceMenuItem (cur_menu,
+	  	MENU_3X3 + (idx_menus[cur_menu]-MENU_3X3 + 1)
+		% (MENU_6X6-MENU_3X3+1));
+	  new_zone_dim = idx_menus[cur_menu]-MENU_3X3+3;
+	  WriteConfig ();
+	}
+      }
+      break;
+    case CSKEY_LEFT:
+      if (!menu_todo && !menu_hor_todo)
+      {
+        if (idx_menus[cur_menu] >= MENU_NOVICE &&
+		idx_menus[cur_menu] <= MENU_EXPERT)
+	{
+	  menu_hor_old_menu = menus[cur_menu];
+	  menu_hor_old_x_src = 0;
+	  menu_hor_old_x_dst = 6.;
+	  menu_hor_new_x_src = -6.;
+	  menu_hor_new_x_dst = 0;
+	  menu_hor_todo = 1;
+	  ReplaceMenuItem (cur_menu,
+	  	MENU_NOVICE + (idx_menus[cur_menu]-MENU_NOVICE - 1
+		+ (MENU_EXPERT-MENU_NOVICE+1))
+		% (MENU_EXPERT-MENU_NOVICE+1));
+          diff_level = idx_menus[cur_menu]-MENU_NOVICE;
+	  WriteConfig ();
+	}
+        else if (idx_menus[cur_menu] >= MENU_3X3 &&
+		idx_menus[cur_menu] <= MENU_6X6)
+	{
+	  menu_hor_old_menu = menus[cur_menu];
+	  menu_hor_old_x_src = 0;
+	  menu_hor_old_x_dst = 6.;
+	  menu_hor_new_x_src = -6.;
+	  menu_hor_new_x_dst = 0;
+	  menu_hor_todo = 1;
+	  ReplaceMenuItem (cur_menu,
+	  	MENU_3X3 + (idx_menus[cur_menu]-MENU_3X3 - 1
+		+ (MENU_6X6-MENU_3X3+1))
+		% (MENU_6X6-MENU_3X3+1));
+	  new_zone_dim = idx_menus[cur_menu]-MENU_3X3+3;
+	  WriteConfig ();
+	}
       }
       break;
     case CSKEY_ENTER:
@@ -1184,54 +1257,11 @@ void Blocks::HandleDemoKey (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/
 	  screen = SCREEN_KEYCONFIG;
 	  initscreen = true;
 	  break;
-	case MENU_BOARDSIZE:
-	  InitMenu ();
-	  AddMenuItem (MENU_3X3);
-	  AddMenuItem (MENU_4X4);
-	  AddMenuItem (MENU_5X5);
-	  AddMenuItem (MENU_6X6);
-	  switch (zone_dim)
-	  {
-	    case 3: cur_menu = 0; break;
-	    case 4: cur_menu = 1; break;
-	    case 5: cur_menu = 2; break;
-	    case 6: cur_menu = 3; break;
-	  }
-  	  DrawMenu (cur_menu);
-	  break;
-	case MENU_3X3:
-	  ChangePlaySize (3);
-	  InitMainMenu ();
-	  break;
-	case MENU_4X4:
-	  ChangePlaySize (4);
-	  InitMainMenu ();
-	  break;
-	case MENU_5X5:
-	  ChangePlaySize (5);
-	  InitMainMenu ();
-	  break;
-	case MENU_6X6:
-	  ChangePlaySize (6);
-	  InitMainMenu ();
-	  break;
 	case MENU_NOVICE:
-          diff_level = 0;
-	  screen = SCREEN_GAME;
-	  initscreen = true;
-	  WriteConfig ();
-	  break;
         case MENU_AVERAGE:
-          diff_level = 1;
-	  screen = SCREEN_GAME;
-	  initscreen = true;
-	  WriteConfig ();
-	  break;
         case MENU_EXPERT:
-          diff_level = 2;
 	  screen = SCREEN_GAME;
 	  initscreen = true;
-	  WriteConfig ();
 	  break;
 	case MENU_QUIT:
 	  System->Shutdown = true;
@@ -1440,10 +1470,17 @@ void Blocks::HandleStartupMovement (time_t elapsed_time)
   float elapsed = (float)elapsed_time/1000.;
   if (menu_todo)
   {
-    float elapsed_menu = elapsed*1.8;
+    float elapsed_menu = elapsed*1.9;
     if (elapsed_menu > menu_todo) elapsed_menu = menu_todo;
     menu_todo -= elapsed_menu;
-    DrawMenu (menu_todo, old_cur_menu, cur_menu);
+    DrawMenu (menu_todo, menu_hor_todo, old_cur_menu, cur_menu);
+  }
+  if (menu_hor_todo)
+  {
+    float elapsed_menu = elapsed*2.4;
+    if (elapsed_menu > menu_hor_todo) elapsed_menu = menu_hor_todo;
+    menu_hor_todo -= elapsed_menu;
+    DrawMenu (menu_todo, menu_hor_todo, old_cur_menu, cur_menu);
   }
 
   float old_dyn_x = dynlight_x;
@@ -1635,6 +1672,7 @@ void Blocks::InitTextures ()
     csLoader::LoadTexture (Sys->world, "cubef4", "cubef4.gif"));
 
   csLoader::LoadTexture (Sys->world, "menu_novice", "novice.gif");
+  csLoader::LoadTexture (Sys->world, "menu_back", "back.gif");
   csLoader::LoadTexture (Sys->world, "menu_average", "average.gif");
   csLoader::LoadTexture (Sys->world, "menu_expert", "expert.gif");
   csLoader::LoadTexture (Sys->world, "menu_high", "high.gif");
@@ -1649,11 +1687,12 @@ void Blocks::InitTextures ()
 
 void Blocks::DrawMenu (int menu)
 {
-  DrawMenu (0, 0, menu);
+  DrawMenu (0, 0, 0, menu);
   menu_todo = 0;
+  menu_hor_todo = 0;
 }
 
-void Blocks::DrawMenu (float menu_transition, int old_menu, int new_menu)
+void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu, int new_menu)
 {
   int i;
   for (i = 0 ; i < num_menus ; i++)
@@ -1662,14 +1701,57 @@ void Blocks::DrawMenu (float menu_transition, int old_menu, int new_menu)
     int new_curi = (i-new_menu+num_menus)%num_menus;
     if (old_curi == 0 && new_curi == num_menus-1) old_curi = num_menus;
     if (new_curi == 0 && old_curi == num_menus-1) new_curi = num_menus;
-    float curi = menu_transition * ((float)old_curi) +
-    	(1-menu_transition) * ((float)new_curi);
+    float curi = menu_trans * ((float)old_curi) +
+    	(1-menu_trans) * ((float)new_curi);
     float angle = 2.*M_PI*curi/(float)num_menus;
+    float x = 0;
+    if (i == cur_menu)
+    {
+      x = menu_hor_trans * menu_hor_new_x_src +
+    		(1-menu_hor_trans) * menu_hor_new_x_dst;
+    }
     float y = 3. + sin (angle)*3.;
     float z = 5. - cos (angle)*3.;
-    csVector3 v (0, y, z);
+    csVector3 v (x, y, z);
     menus[i]->SetMove (demo_room, v);
     menus[i]->Transform ();
+  }
+  // Move the old menu item away.
+  if (menu_hor_trans && menu_hor_old_menu)
+  {
+    float x = menu_hor_trans * menu_hor_old_x_src +
+    		(1-menu_hor_trans) * menu_hor_old_x_dst;
+    float angle = 0;
+    float y = 3. + sin (angle)*3.;
+    float z = 5. - cos (angle)*3.;
+    csVector3 v (x, y, z);
+    menu_hor_old_menu->SetMove (demo_room, v);
+    menu_hor_old_menu->Transform ();
+  }
+  else if (menu_hor_old_menu)
+  {
+    demo_room->RemoveThing (menu_hor_old_menu);
+    menu_hor_old_menu = NULL;
+  }
+
+  if (!menu_trans && !menu_hor_trans && leftright_menus[cur_menu])
+  {
+    float angle = 0;
+    float x = 0;
+    float y = 3. + sin (angle)*3.;
+    float z = 5. - cos (angle)*3.;
+    csVector3 v (x, y, z);
+    demo_room->AddThing (arrow_left);
+    demo_room->AddThing (arrow_right);
+    arrow_left->SetMove (demo_room, v);
+    arrow_right->SetMove (demo_room, v);
+    arrow_left->Transform ();
+    arrow_right->Transform ();
+  }
+  else
+  {
+    demo_room->RemoveThing (arrow_left);
+    demo_room->RemoveThing (arrow_right);
   }
 }
 
@@ -1704,19 +1786,74 @@ void Blocks::CreateMenuEntry (const char* txt, int menu_nr)
   src_menus[menu_nr] = thing;
 }
 
+csThing* Blocks::CreateMenuArrow (bool left)
+{
+  csTextureHandle* tm_front = world->GetTextures ()->GetTextureMM ("menu_back");
+  csThing* thing = new csThing ();
+
+  float pointx;
+  float rearx;
+  if (left)
+  {
+    pointx = -1-.4;
+    rearx = -1-.1;
+  }
+  else
+  {
+    pointx = 1+.4;
+    rearx = 1+.1;
+  }
+
+  thing->AddVertex (pointx, 0, 0);
+  thing->AddVertex (rearx, .25, 0);
+  thing->AddVertex (rearx, -.25, 0);
+
+  csPolygon3D* p;
+  csMatrix3 tx_matrix;
+  csVector3 tx_vector;
+
+  p = thing->NewPolygon (tm_front);
+  if (left)
+  {
+    p->AddVertex (0);
+    p->AddVertex (1);
+    p->AddVertex (2);
+  }
+  else
+  {
+    p->AddVertex (2);
+    p->AddVertex (1);
+    p->AddVertex (0);
+  }
+  p->SetTextureSpace (tx_matrix, tx_vector);
+  set_uv (p, 0, 0, 1, 0, 0, 1);
+
+  return thing;
+}
+
 void Blocks::InitMenu ()
 {
   num_menus = 0;
   int i;
   for (i = 0 ; i < MENU_TOTAL ; i++)
     demo_room->RemoveThing (src_menus[i]);
+  demo_room->RemoveThing (arrow_left);
+  demo_room->RemoveThing (arrow_right);
 }
 
-void Blocks::AddMenuItem (int menu_nr)
+void Blocks::AddMenuItem (int menu_nr, bool leftright)
 {
   menus[num_menus] = src_menus[menu_nr];
   idx_menus[num_menus] = menu_nr;
+  leftright_menus[num_menus] = leftright;
   num_menus++;
+  demo_room->AddThing (src_menus[menu_nr]);
+}
+
+void Blocks::ReplaceMenuItem (int idx, int menu_nr)
+{
+  menus[idx] = src_menus[menu_nr];
+  idx_menus[idx] = menu_nr;
   demo_room->AddThing (src_menus[menu_nr]);
 }
 
@@ -1872,8 +2009,9 @@ void Blocks::InitDemoRoom ()
   CreateMenuEntry ("menu_4x4", MENU_4X4);
   CreateMenuEntry ("menu_5x5", MENU_5X5);
   CreateMenuEntry ("menu_6x6", MENU_6X6);
-  CreateMenuEntry ("menu_board", MENU_BOARDSIZE);
   CreateMenuEntry ("menu_keyconfig", MENU_KEYCONFIG);
+  arrow_left = CreateMenuArrow (true);
+  arrow_right = CreateMenuArrow (false);
 }
 
 void Blocks::InitWorld ()
@@ -1911,25 +2049,26 @@ void Blocks::StartDemo ()
   demo_room->SetFog (fog_density, csColor (0, 0, 0));
 
   InitMainMenu ();
+  menu_hor_old_menu = NULL;
 }
 
 void Blocks::InitMainMenu ()
 {
   InitMenu ();
-  AddMenuItem (MENU_NOVICE);
-  AddMenuItem (MENU_AVERAGE);
-  AddMenuItem (MENU_EXPERT);
-  AddMenuItem (MENU_BOARDSIZE);
-  AddMenuItem (MENU_KEYCONFIG);
-  AddMenuItem (MENU_HIGHSCORES);
-  AddMenuItem (MENU_QUIT);
+  AddMenuItem (MENU_NOVICE+diff_level, true);
+  AddMenuItem (MENU_3X3+new_zone_dim-3, true);
+  AddMenuItem (MENU_KEYCONFIG, false);
+  AddMenuItem (MENU_HIGHSCORES, false);
+  AddMenuItem (MENU_QUIT, false);
 
-  cur_menu = diff_level;
+  cur_menu = 0;
   DrawMenu (cur_menu);
 }
 
 void Blocks::StartNewGame ()
 {
+  if (new_zone_dim != zone_dim) ChangePlaySize (new_zone_dim);
+
   delete dynlight; dynlight = NULL;
 
   // First delete all cubes that may still be in the world.
@@ -2147,8 +2286,13 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
     if (initscreen) { initscreen = false; }
     if (!Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
     Gfx2D->Clear (0);
+    char buffer[100];
+    sprintf (buffer, "Highscores for %s at %dx%d",
+    	diff_level == 0 ? "novice" : diff_level == 1 ? "average" : "expert",
+	new_zone_dim, new_zone_dim);
+    Gfx2D->Write (10, 10, white, black, buffer);
     int i;
-    HighScore& hs = highscores[diff_level][zone_dim-3];
+    HighScore& hs = highscores[diff_level][new_zone_dim-3];
     bool scores = false;
     for (i = 0 ; i < 10 ; i++)
     {
@@ -2156,12 +2300,12 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
       {
         scores = true;
         if (hs.GetName (i))
-          Gfx2D->Write (10, 10+i*12, white, black, hs.GetName (i));
+          Gfx2D->Write (10, 30+i*12, white, black, hs.GetName (i));
         else
-          Gfx2D->Write (10, 10+i*12, white, black, "?");
+          Gfx2D->Write (10, 30+i*12, white, black, "?");
 	char scorebuf[30];
 	sprintf (scorebuf, "%d", hs.Get (i));
-        Gfx2D->Write (200, 10+i*12, white, black, scorebuf);
+        Gfx2D->Write (200, 30+i*12, white, black, scorebuf);
       }
     }
     if (!scores)
@@ -2382,7 +2526,8 @@ void Blocks::ReadConfig ()
   NamedKey (keys.GetStr ("Keys", "VIEWDOWN", "end"), key_viewdown);
   NamedKey (keys.GetStr ("Keys", "ZOOMIN", "ins"), key_zoomin);
   NamedKey (keys.GetStr ("Keys", "ZOOMOUT", "pgup"), key_zoomout);
-  zone_dim = keys.GetInt ("Game", "PLAYSIZE", 5);
+  new_zone_dim = keys.GetInt ("Game", "PLAYSIZE", 5);
+  zone_dim = new_zone_dim;
   diff_level = keys.GetInt ("Game", "LEVEL", 0);
   int level, size, i;
   for (level = 0 ; level <= 2 ; level++)
@@ -2421,7 +2566,7 @@ void Blocks::WriteConfig ()
   keys.SetStr ("Keys", "VIEWDOWN", KeyName (key_viewdown));
   keys.SetStr ("Keys", "ZOOMIN", KeyName (key_zoomin));
   keys.SetStr ("Keys", "ZOOMOUT", KeyName (key_zoomout));
-  keys.SetInt ("Game", "PLAYSIZE", zone_dim);
+  keys.SetInt ("Game", "PLAYSIZE", new_zone_dim);
   keys.SetInt ("Game", "LEVEL", diff_level);
   int level, size, i;
   for (level = 0 ; level <= 2 ; level++)
