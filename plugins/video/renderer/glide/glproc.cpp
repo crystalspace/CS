@@ -99,7 +99,7 @@ void csGlideProcedural::DrawLine (const csVector3& v1, const csVector3& v2, floa
   g3d->DrawLine (v1, v2, fov, color); 
 }
 
-void csGlideProcedural::StartPolygonFX (iTextureHandle* handle, UInt mode)
+void csGlideProcedural::StartPolygonFX (iMaterialHandle* handle, UInt mode)
 { 
   g3d->StartPolygonFX (handle, mode); 
 }

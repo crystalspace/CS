@@ -766,6 +766,7 @@ void csGraphics3DGlide::DrawPolygon (G3DPolygonDP& poly)
 
   iPolygonTexture* pTex;
   iLightMap* piLM = NULL;
+  iTextureHandle *handle = NULL;
   csGlideCacheData* tcache = NULL;
   csGlideCacheData* lcache = NULL;
   TextureHandler *thLm  = NULL; 
@@ -782,8 +783,9 @@ void csGraphics3DGlide::DrawPolygon (G3DPolygonDP& poly)
   if ( m_renderstate.textured )
   {
     // get the cache data
+    handle = poly.mat_handle->GetTexture ();
     if ( pTex )
-      tcache = (csGlideCacheData *)poly.txt_handle->GetCacheData ();
+      tcache = (csGlideCacheData *)handle->GetCacheData ();
     if ( !tcache || !tcache->texhnd.loaded )  
       return;
     else
@@ -814,8 +816,8 @@ void csGraphics3DGlide::DrawPolygon (G3DPolygonDP& poly)
   }
  
   // if we draw a flat shaded polygon we gonna use the mean color
-  if ( !m_renderstate.textured )
-    poly.txt_handle->GetMeanColor ( r, g, b );
+  if ( !m_renderstate.textured && handle)
+    handle->GetMeanColor ( r, g, b );
 
   GlideLib_grConstantColorValue ( (a << 24) | (r << 16) | (g << 8) | b );
   
@@ -955,10 +957,12 @@ void csGraphics3DGlide::DrawPolygon (G3DPolygonDP& poly)
 
 }
 
-void csGraphics3DGlide::StartPolygonFX (iTextureHandle *handle,  UInt mode)
+void csGraphics3DGlide::StartPolygonFX (iMaterialHandle *mathandle,  UInt mode)
 {
-  if ( m_renderstate.textured && handle )
+  iTextureHandle *handle = NULL;
+  if ( m_renderstate.textured && mathandle )
   {
+    handle = mathandle->GetTexture ();
     csTextureMMGlide* txt_mm = (csTextureMMGlide*)handle->GetPrivateObject ();
     csGlideCacheData* tcache;
     m_pTextureCache->Add (handle, false);
@@ -1157,7 +1161,7 @@ void csGraphics3DGlide::DrawPolygonFX (G3DPolygonDPFX& poly)
 
 void csGraphics3DGlide::CacheTexture (iPolygonTexture *texture)
 {
-  iTextureHandle* txt_handle = texture->GetTextureHandle ();
+  iTextureHandle* txt_handle = texture->GetMaterialHandle ()->GetTexture ();
   m_pTextureCache->Add (txt_handle, false);
   m_pLightmapCache->Add (texture);
 }
@@ -1415,8 +1419,52 @@ void csGraphics3DGlide::DrawPixmap ( iTextureHandle *hTex,
   spr2d.vertices[2].z = 1;
   spr2d.vertices[3].z = 1;
   
-  spr2d.txt_handle = hTex;
-  StartPolygonFX ( hTex, CS_FX_COPY | ( hTex->GetKeyColor() ? CS_FX_KEYCOLOR : 0 ) );
+  csTextureMMGlide* txt_mm = (csTextureMMGlide*)hTex->GetPrivateObject ();
+  csGlideCacheData* tcache;
+  m_pTextureCache->Add (hTex, false);
+  tcache = (csGlideCacheData *)txt_mm->GetCacheData ();
+  m_thTex = ( tcache ? &tcache->texhnd : NULL );
+  if ( m_thTex )
+  {
+    GlideLib_grTexSource (m_thTex->tmu->tmu_id, m_thTex->loadAddress, 
+                          GR_MIPMAPLEVELMASK_BOTH, &m_thTex->info);
+
+    if(!m_iMultiPass)
+    {
+      GlideLib_grTexCombine (m_TMUs[0].tmu_id,
+                             GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE,
+                             GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
+                             FXFALSE,FXFALSE);
+     }
+     GlideLib_grAlphaCombine (GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_ONE, 
+                              GR_COMBINE_LOCAL_NONE, GR_COMBINE_OTHER_CONSTANT, FXFALSE );
+  }    
+
+  if ( !m_verts ) {
+    m_verts = new MyGrVertex[ GLIDE_FX_VERTSIZE ];
+    m_vertsize = GLIDE_FX_VERTSIZE;
+  }
+  
+  m_dpfx.mixmode = CS_FX_COPY | ( hTex->GetKeyColor() ? CS_FX_KEYCOLOR : 0 ) ;
+  m_dpfx.gouraud = false;
+
+  GlideLib_grColorCombine( GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_ONE, 
+                           GR_COMBINE_LOCAL_NONE, GR_COMBINE_OTHER_TEXTURE, FXFALSE );
+
+  m_dpfx.alpha = 255;
+  GlideLib_grAlphaBlendFunction ( GR_BLEND_ONE, GR_BLEND_ZERO, GR_BLEND_ONE, GR_BLEND_ZERO );
+  
+  UByte r, g, b;
+  r=g=b=255;
+
+  if ( m_dpfx.mixmode & CS_FX_KEYCOLOR )
+  {
+    GlideLib_grChromakeyMode (GR_CHROMAKEY_ENABLE);
+    hTex->GetKeyColor ( r, g, b );
+    GlideLib_grChromakeyValue (0xff << 24 | r << 16 | g << 8 | b );
+  }
+  
+  GlideLib_grConstantColorValue ( (m_dpfx.alpha << 24) | (r << 16) | (g << 8) | b );
   DrawPolygonFX ( spr2d );
   FinishPolygonFX ();
 }

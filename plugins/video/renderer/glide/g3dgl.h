@@ -203,7 +203,7 @@ public:
   virtual void DrawLine (const csVector3& v1, const csVector3& v2, float fov, int color);
  
   /// Start a series of DrawPolygonFX
-  virtual void StartPolygonFX (iTextureHandle* handle, UInt mode);
+  virtual void StartPolygonFX (iMaterialHandle* handle, UInt mode);
 
   /// Finish a series of DrawPolygonFX
   virtual void FinishPolygonFX ();
