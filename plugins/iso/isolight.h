@@ -106,7 +106,9 @@ public:
   virtual void SetSector (iSector* ) {}
   virtual float GetRadius () {return isolight->GetRadius();}
   virtual float GetSquaredRadius () 
-  { return isolight->GetRadius()*isolight->GetRadius(); }
+  //{ return isolight->GetRadius()*isolight->GetRadius(); }
+  // for use with checking if lighting needs to be done
+  { return isolight->MaxRadius()*isolight->MaxRadius(); }
   virtual float GetInverseRadius () {return 1./isolight->GetRadius();}
   virtual void SetRadius (float r) {isolight->SetRadius(r);}
   virtual const csColor& GetColor () {return isolight->GetColor();}
