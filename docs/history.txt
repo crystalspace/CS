@@ -13,11 +13,14 @@ The history order has been reversed so that new features are at the top.
 	    - Also skips rasterizing spaces.
 	- Travis McIntosh added curve radiosity support as well as an
 	  updated interface into the Bezier math.
+	- Travis did a quick bug fix in radiosity (SetKeyColor -> GetKeyColor).
 	- Norman Kramer fixed memory leak in csTree, now treenodes delete
 	  their children from last to first because csVector::Delete shifts
 	  the contents of the vector.
 	- Norman also added cscmdTreeRemoveAll to remove all treeitems
 	  (for csTree in CSWS).
+	- Received new halo code from FragDance for OpenGL. Cleans up a
+	  little but otherwise works the same.
 4-Jul-2000
 	- Samuel Humphreys did the following changes:
 	    - Backbuffer now works without being inverted. Re-reversed the

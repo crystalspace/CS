@@ -29,18 +29,14 @@
 #include "ogl_g3dcom.h"
 #include "ihalo.h"
 
-extern void csglBindTexture (GLenum target, GLuint handle);
-
 class csOpenGLHalo:public iHalo
 {
   float R,G,B;        //This halos color
   unsigned char *Alpha;   //The original map
-  unsigned char *backAlpha; //The map that we use for fading
   int Width,Height,Size;    //Take a wild guess
   int x_scale,y_scale;    //For scaling between actual size and OpenGL size
                 //This is needed because we want 2^n maps for OpenGL,
                 //alphamap size is arbitrary.
-  float prev_intensity;   //Checkup so that we can skip one step occasionally
   GLuint halohandle;      //Our OpenGL texture handle
   csGraphics3DOGLCommon *G3D;  //
 public:
@@ -77,15 +73,10 @@ csOpenGLHalo::csOpenGLHalo(float iR,float iG,float iB,unsigned char *iAlpha,
   Width=FindNearestPowerOf2(iWidth);  //OpenGL can only use 2^n sized textures
   Height=FindNearestPowerOf2(iHeight);
   Size=Width*Height;
-  prev_intensity=0.0;
 
-  //Normally I could use the supplied iAlpha directly, but since I have to transform
-  //The halo (fade-in) I make 2 buffers
   Alpha=new unsigned char [Width*Height];
-  backAlpha=new unsigned char [Width*Height];
 
   memset(Alpha,0,Width*Height); //Clear both buffers (no garbage)
-  memset(backAlpha,0,Width*Height);
 
   for(int i = 0;i<iHeight;i++)
     memcpy(Alpha+(i*Width),iAlpha+(i*iWidth),iWidth); //Copy the supplied alphamap
@@ -94,7 +85,7 @@ csOpenGLHalo::csOpenGLHalo(float iR,float iG,float iB,unsigned char *iAlpha,
   y_scale=int((1.0*iHeight)/Height); // (used for drawing)
 
   glGenTextures(1,&halohandle); //Create handle
-  csglBindTexture(GL_TEXTURE_2D,halohandle);  //Activate handle
+  glBindTexture(GL_TEXTURE_2D,halohandle);  //Activate handle
 
 
   //Jaddajaddajadda
@@ -104,15 +95,13 @@ csOpenGLHalo::csOpenGLHalo(float iR,float iG,float iB,unsigned char *iAlpha,
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D,0,GL_ALPHA,Width,Height,0,GL_ALPHA,
     GL_UNSIGNED_BYTE,Alpha);
-
+	delete []Alpha;
   (G3D=iG3D)->IncRef();
 }
 
 csOpenGLHalo::~csOpenGLHalo()
 {
   //Kill, crush and destroy
-  delete [] Alpha;
-  delete [] backAlpha;
   glDeleteTextures(1,&halohandle);  //Delete generated OpenGL handle
   G3D->DecRef();
 }
@@ -122,7 +111,6 @@ void csOpenGLHalo::Draw(float x,float y,float w,float h,float iIntensity,csVecto
 {
   (void) w;
   (void) h;
-//  int width=G3D->GetWidth();
   int height=G3D->GetHeight();
   int i;
   csVector2 *texcoords=new csVector2[iVertCount];
@@ -130,8 +118,6 @@ void csOpenGLHalo::Draw(float x,float y,float w,float h,float iIntensity,csVecto
   //Saw that this was used somewhere else, so it has to be good
   glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_TEXTURE_BIT);
   glDisable(GL_DEPTH_TEST);
-//  if(h<0)h=Height;
-//  if(w<0)w=Width;
 
   //Simple 'clippping' (more like adjustments) of texture coords
   for(i=0;i<iVertCount;i++)
@@ -140,38 +126,16 @@ void csOpenGLHalo::Draw(float x,float y,float w,float h,float iIntensity,csVecto
     texcoords[i].y=(iVertices[i].y-y)/Height;
   }
 
-  csglBindTexture (GL_TEXTURE_2D, halohandle);    
+  glBindTexture (GL_TEXTURE_2D, halohandle);    
   glEnable(GL_TEXTURE_2D);
   glEnable(GL_BLEND);
   glShadeModel (GL_FLAT);
 
   //Our usual blending
   glBlendFunc (GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-  //glColor3f(R,G,B);
-  glColor4f(R,G,B, 1.0);
+  glColor4f(R,G,B, iIntensity);
   glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-  //Transform our halo (intensify)
-  if(iIntensity!=prev_intensity)
-  {
-    for(int i=0;i<Size;i++)
-      backAlpha[i]=(unsigned char)(iIntensity*Alpha[i]);
-    glTexSubImage2D(GL_TEXTURE_2D,
-      0,  //Base level
-      0,  //X-offset
-      0,  //Y-offset
-      Width,  
-      Height,
-      GL_ALPHA,
-      GL_UNSIGNED_BYTE, //Format
-      backAlpha);
-
-    prev_intensity=iIntensity;
-  }
-
-
-
-  //Put our newly made halo into the texture thingy
   glBegin (GL_POLYGON);
   {
     for(i=0;i<iVertCount;i++)
