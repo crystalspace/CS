@@ -437,37 +437,6 @@ bool csModelConverter3ds::LoadMeshObjectData( iModelDataObject *pDataObject,
    else
      AssignDefinedTexels(pDataObject,Vertices,pCurFace,numTriangles);
 
-// THIS COULD BE DELETED, BUT I DIDN'T.
-  /*  for ( i = 0 ; i < numTriangles ; i++ )
-    {
-      // create a new poly for the data object
-      pCurPoly = new csModelDataPolygon ();
-
-      //  add to the mesh object
-      pDataObject->QueryObject ()->ObjAdd (pCurPoly->QueryObject ());
-
-
-      /***  process the information for each polygon vertex  ***/
-
-      //  get the indices for each vector of the triangle
-	/*  normal = pCurFace->normal;
-	  Vertices->AddNormal(csVector3(normal[0],normal[1],normal[2]));
-      for( j = 0 ; j <3 ; j++ )
-      {
-        index = pCurFace->points[j];
-
-        // now add the vertex
-        //pCurPoly->AddVertex( index, 0, 0, j );
-		pCurPoly->AddVertex( index, 0 , 0, index);
-
-      }
-
-
-      // set the material
-      // pCurPoly->SetMaterial (iModelDataMaterial *m) = 0;
-      pCurFace++;
-    }*/
-
   return true;
 }
 
