@@ -228,6 +228,12 @@ csStatLight::csStatLight (
 
 csStatLight::~csStatLight ()
 {
+  csHashIterator it (lightinginfos.GetHashMap ());
+  while (it.HasNext ())
+  {
+    iLightingInfo* linfo = (iLightingInfo*)it.Next ();
+    linfo->DecRef ();
+  }
   lightinginfos.DeleteAll ();
 }
 
@@ -289,6 +295,7 @@ void csStatLight::AddAffectedLightingInfo (iLightingInfo* li)
 {
   if (!dynamic) return ;
   lightinginfos.Add (li);
+  li->IncRef ();
 }
 
 void csStatLight::SetColor (const csColor &col)
@@ -335,6 +342,7 @@ csDynLight::~csDynLight ()
   {
     iLightingInfo* linfo = (iLightingInfo*)it.Next ();
     linfo->DynamicLightDisconnect (&scfiDynLight);
+    linfo->DecRef ();
   }
   lightinginfos.DeleteAll ();
 }
@@ -346,6 +354,7 @@ void csDynLight::Setup ()
   {
     iLightingInfo* linfo = (iLightingInfo*)it.Next ();
     linfo->DynamicLightDisconnect (&scfiDynLight);
+    linfo->DecRef ();
   }
   lightinginfos.DeleteAll ();
 
@@ -372,11 +381,13 @@ void csDynLight::Setup ()
 void csDynLight::AddAffectedLightingInfo (iLightingInfo* li)
 {
   lightinginfos.Add (li);
+  li->IncRef ();
 }
 
 void csDynLight::RemoveAffectedLightingInfo (iLightingInfo* li)
 {
   lightinginfos.Delete (li);
+  li->DecRef ();
 }
 
 void csDynLight::SetColor (const csColor &col)

@@ -2378,9 +2378,7 @@ csPtr<iDynLight> csEngine::CreateDynLight (
       color.blue);
   AddDynLight (light);
 
-  csRef<iDynLight> il (SCF_QUERY_INTERFACE (light, iDynLight));
-  light->DecRef ();
-  return csPtr<iDynLight> (il);
+  return csPtr<iDynLight> (&(light->scfiDynLight));
 }
 
 void csEngine::RemoveDynLight (iDynLight *light)
