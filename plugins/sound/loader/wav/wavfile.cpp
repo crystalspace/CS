@@ -174,7 +174,7 @@ static inline unsigned short csByteSwap16bit( const unsigned short value )
   return (( value >> 8 ) & 0x000000FF ) | (( value << 8 ) & 0x0000FF00 );
 }
 
-static inline void csByteSwap16BitBuffer (uint16* ptr, size_t count)
+static inline void csByteSwap16bitBuffer (uint16* ptr, size_t count)
 {
   for (; count > 0; --count, ++ptr)
   {
