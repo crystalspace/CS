@@ -1,16 +1,10 @@
 SubDir TOP plugins sound driver oss ;
 
-if $(OSS.AVAILABLE) = "yes" && $(TARGET.OS) != "WIN32" 
+if $(OSS.AVAILABLE) = "yes" && [ Property build : projgen ] != msvc
 {
 Help ossdrv : "Crystal Space OSS sound driver" ;
-
-Plugin ossdrv
-	: [ Wildcard *.cpp *.h ]
-;
+Plugin ossdrv : [ Wildcard *.cpp *.h ] ;
 LinkWith ossdrv : csutil ;
-ExternalLibs ossdrv :  OSS ;
-
-CompileGroups ossdrv :  sounddrivers ;
-
+ExternalLibs ossdrv : OSS ;
+CompileGroups ossdrv : sounddrivers ;
 }
-

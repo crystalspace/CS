@@ -4,7 +4,7 @@ if $(PYTHON.AVAILABLE) = "yes"
 {
   local target = cs_pyth.cpp ;
 
-  if $(DO_MSVCGEN) != "yes" # Ugly, but we must take msvcgen.jam into account.
+  if ! [ Property build : projgen ]
   {
     target = [ FGristFiles $(target) ] ;
 

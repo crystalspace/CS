@@ -1,15 +1,9 @@
 SubDir TOP apps waterdemo ;
 
-if $(USE_NEW_RENDERER) = "yes"
+if [ Property build : newrenderer ] || [ Property build : projgen ]
 {
-
 Help waterdemo : "Displaying rendering of a watersurface in new renderer" ;
-
-Application waterdemo
-	: [ Wildcard *.cpp *.h ]
-;
+Application waterdemo : [ Wildcard *.cpp *.h ] : noinstall ;
 LinkWith waterdemo : csgeom csgfx cstool csutil ;
-
 CompileGroups waterdemo : nrall ;
-
 }

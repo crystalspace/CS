@@ -2,7 +2,7 @@ SubDir TOP plugins aws ;
 
 FILES = [ Wildcard *.cpp *.h ] ;
 
-if $(DO_MSVCGEN) != "yes" # Ugly, but we must take msvcgen.jam into account.
+if ! [ Property build : projgen ]
 {
   if $(CMD.BISON) && $(CMD.FLEX)
   {

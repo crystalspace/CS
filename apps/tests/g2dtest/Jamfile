@@ -1,9 +1,5 @@
 SubDir TOP apps tests g2dtest ;
 
 Help g2dtest : "Crystal Space canvas plugin test" ;
-
-Application g2dtest
-	: [ Wildcard *.cpp *.h ]
-;
+Application g2dtest : [ Wildcard *.cpp *.h ] : noinstall ;
 LinkWith g2dtest : csgeom csgfx cstool csutil ;
-

@@ -1,0 +1,43 @@
+#==============================================================================
+# Generic property-bag mechanism.
+# Copyright (C) 2004 by Eric Sunshine <sunshine@sunshineco.com>
+#==============================================================================
+
+# Property bag : name
+#   Returns the value of property 'name' in container 'bag' if present, else
+#   returns a null value.  'bag' and 'name' should be simple identifiers
+#   composed of alphanumeric characters and underscore, and with an alphabetic
+#   or an underscore as the first character.
+rule Property
+{
+  local p = [ _PropertyName $(<) : $(>) ] ;
+  return $($(p)) ;
+}
+
+# SetProperty bag : name [ : value ]
+#   Add property 'name' to container 'bag'. If 'value' is not provided, sets
+#   the property to "true".
+rule SetProperty
+{
+  local p = [ _PropertyName $(<) : $(>) ] ;
+  local v = $(3) ;
+  if ! $(v) { v = "true" ; }
+  $(p) = "true" ;
+}
+
+# ClearProperty bag : name
+#   Remove property 'name' from container 'bag'.
+rule ClearProperty
+{
+  local p = [ _PropertyName $(<) : $(>) ] ;
+  $(p) = "" ;
+}
+
+
+#------------------------------------------------------------------------------
+# Private utilitiy rules.
+#------------------------------------------------------------------------------
+rule _PropertyName
+{
+  return "__property_$(<)_$(>)" ;
+}

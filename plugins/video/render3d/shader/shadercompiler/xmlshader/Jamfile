@@ -1,10 +1,6 @@
 SubDir TOP plugins video render3d shader shadercompiler xmlshader ;
 
 Help xmlshader : "Crystal Space XML-format shader compiler" ;
-
-Plugin xmlshader
-	: [ Wildcard *.cpp *.h ]
-;
+Plugin xmlshader : [ Wildcard *.cpp *.h ] ;
 LinkWith xmlshader : csgfx csgeom cstool csutil ;
-
-CompileGroups xmlshader : nrall ;
+CompileGroups xmlshader : drivers3d nrall ;

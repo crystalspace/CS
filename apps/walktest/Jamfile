@@ -1,11 +1,9 @@
 SubDir TOP apps walktest ;
 
 Help walktest : "Crystal Space WalkTest demo" ;
-
-Application walktest
-	: [ Wildcard *.cpp *.h ]
-;
+Application walktest : [ Wildcard *.cpp *.h ] ;
 LinkWith walktest : csgeom csgfx cstool csutil ;
+Win32Resource walktest : [ ConcatDirs $(TOP) libs csutil win32 rsrc cs1.rc ] ;
 
 CompileGroups bugplug    : walkall ;
 CompileGroups csconin    : walkall ;
@@ -37,11 +35,11 @@ if $(GL.AVAILABLE) = "yes"
 {
   CompileGroups openglcanvas : walkall ;
 }
-if $(USE_NEW_RENDERER) = "yes"
+if [ Property build : newrenderer ]
 {
   CompileGroups nrall : walkall ;
-  #CompileGroups softrender3d : walkall ; # not yet ready for prime time.
-  #CompileGroups softshader : walkall ;
+  CompileGroups softrender3d : walkall ;
+  CompileGroups softshader : walkall ;
 }
 else
 {
@@ -51,22 +49,17 @@ else
     CompileGroups gl3d : walkall ;
   }
 }
-
 CompileGroups walktest : nrall ;
 
-if $(DO_MSVCGEN) != "yes"
+if ! [ Property build : projgen ]
 {
 Help walktest_static : "Crystal Space WalkTest demo (static build)" ;
 
 SubVariant static ;
-Application walktest_static
-	: [ Wildcard *.cpp *.h ]
-	: independent noinstall
-;
+Application walktest_static : [ Wildcard *.cpp *.h ] : independent noinstall ;
 LinkWith walktest_static : csgeom csgfx cstool csutil ;
 LinkStaticPlugins walktest_static : $(STATIC.PLUGINLIST) ;
-Win32Resource walktest_static : $(TOP)/libs/csutil/win32/rsrc/cs1.rc ;
+Win32Resource walktest_static :
+  [ ConcatDirs $(TOP) libs csutil win32 rsrc cs1.rc ] ;
 SubVariant ;
 }
-
-Win32Resource walktest : $(TOP)/libs/csutil/win32/rsrc/cs1.rc ;

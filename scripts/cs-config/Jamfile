@@ -8,7 +8,7 @@ rule csConfigGen
 {
   LOCATE on cs-config.temppre cs-config.temppost = $(SUBDIR) ;
   Depends $(<) : Jamconfig cs-config.temppre cs-config.temppost 
-  		 $(TOP)/scripts/cs-config/Jamfile ;
+  		 [ ConcatDirs $(TOP) scripts cs-config Jamfile ] ;
 
   # Hack to produce a makevars output similar to the 'make' build system.
   switch $(TARGET.OS)

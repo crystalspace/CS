@@ -1,10 +1,6 @@
 SubDir TOP apps tools cslight ;
 
 Help cslight : "Crystal Space Lighting Calculator" ;
-
-Application cslight
-	: [ Wildcard *.cpp *.h ]
-;
+Application cslight : [ Wildcard *.cpp *.h ] ;
 LinkWith cslight : csgeom csgfx cstool csutil ;
-
-Win32Resource cslight : $(TOP)/apps/tools/cslight/cslight.rc ;
+Win32Resource cslight : [ ConcatDirs $(TOP) apps tools cslight cslight.rc ] ;

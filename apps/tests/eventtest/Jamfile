@@ -1,10 +1,5 @@
 SubDir TOP apps tests eventtest ;
 
 Help eventtest : "Crystal Space eventtest tester" ;
-
-Application eventtest
-	: [ Wildcard *.cpp *.h ]
-	: console
-;
+Application eventtest : [ Wildcard *.cpp *.h ] : console noinstall ;
 LinkWith eventtest : cstool csutil ;
-

@@ -1,14 +1,9 @@
 SubDir TOP plugins device joystick linux ;
 
-if $(LINUXJOYSTICK.AVAILABLE) = "yes" 
+if $(LINUXJOYSTICK.AVAILABLE) = "yes" && [ Property build : projgen ] != msvc
 {
 Help joylin : "Crystal Space Joystick plugin for Linux" ;
-
-Plugin joylin
-	: [ Wildcard *.cpp *.h ]
-;
+Plugin joylin : [ Wildcard *.cpp *.h ] ;
 LinkWith joylin : csutil ;
-ExternalLibs joylin :  JOYSTICK ;
-
+ExternalLibs joylin : LINUXJOYSTICK ;
 }
-

@@ -1,9 +1,5 @@
 SubDir TOP apps tutorial nettut ;
 
 Help nettut : "Crystal Space network tutorial" ;
-
-Application nettut
-	: [ Wildcard *.cpp *.h ]
-	: console
-;
+Application nettut : [ Wildcard *.cpp *.h ] : console noinstall ;
 LinkWith nettut : csgeom csgfx cstool csutil ;

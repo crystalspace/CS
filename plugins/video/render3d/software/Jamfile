@@ -1,20 +1,16 @@
 SubDir TOP plugins video render3d software ;
 
-Help softrender3d : "Crystal Space software 3D renderer" ;
+Help softrender3d : "Render3D software 3D renderer" ;
 
-if $(CMD.NASM) && $(TARGET.PROCESSOR) = "X86"
+if $(CMD.NASM) && $(TARGET.PROCESSOR) = "X86" && ! [ Property build : projgen ]
 {
-  ASMFILES = [ Wildcard i386 : *.asm *.cpp *.h ] ;
+  SOFTRENDER3D_ASMFILES = [ Wildcard i386 : *.asm *.cpp *.h ] ;
 }
 else
 {
-  ASMFILES = ;
+  SOFTRENDER3D_ASMFILES = ;
 }
 
-Plugin softrender3d :
-	[ Wildcard *.cpp *.h ]
-	$(ASMFILES)
-;
+Plugin softrender3d : [ Wildcard *.cpp *.h ] $(SOFTRENDER3D_ASMFILES) ;
 LinkWith softrender3d : render3dcommon csgeom csgfx csutil ;
-
-CompileGroups softrender3d :  drivers3d ;
+CompileGroups softrender3d : drivers3d ;

@@ -1,15 +1,10 @@
 SubDir TOP plugins mesh sprcal3d persist ;
 
-if $(CAL3D.AVAILABLE) = "yes"
+if $(CAL3D.AVAILABLE) = "yes" || [ Property build : projgen ]
 {
 Help sprcal3dldr : "Cal3D Sprite loader plug-in" ;
-
-Plugin sprcal3dldr : 
-	[ Wildcard *.cpp *.h ]
-;
+Plugin sprcal3dldr : [ Wildcard *.cpp *.h ] ;
 LinkWith sprcal3dldr : csgeom csutil ;
 ExternalLibs sprcal3dldr : CAL3D ;
-
 CompileGroups sprcal3dldr : meshes ;
-
 }

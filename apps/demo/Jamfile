@@ -1,11 +1,6 @@
 SubDir TOP apps demo ;
 
 Help csdemo : "Crystal Space Demo" ;
-
-Application csdemo
-	: [ Wildcard *.cpp *.h ]
-;
+Application csdemo : [ Wildcard *.cpp *.h ] ;
 LinkWith csdemo : csgeom csgfx cstool csutil ;
-
-Win32Resource csdemo : $(TOP)/libs/csutil/win32/rsrc/cs1.rc ;
-
+Win32Resource csdemo : [ ConcatDirs $(TOP) libs csutil win32 rsrc cs1.rc ] ;

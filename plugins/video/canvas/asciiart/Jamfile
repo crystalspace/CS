@@ -1,16 +1,10 @@
 SubDir TOP plugins video canvas asciiart ;
 
-if $(LIBAA.AVAILABLE) = "yes" 
+if $(LIBAA.AVAILABLE) = "yes" && ! [ Property build : projgen ]
 {
 Help asciiart : "Crystal Space Ascii Art driver" ;
-
-Plugin asciiart
-	: [ Wildcard *.cpp *.h ]
-;
+Plugin asciiart : [ Wildcard *.cpp *.h ] ;
 LinkWith asciiart : canvascommon csutil ;
-ExternalLibs asciiart :  LIBAA ;
-
-CompileGroups asciiart :  drivers2d ;
-
+ExternalLibs asciiart : LIBAA ;
+CompileGroups asciiart : drivers2d ;
 }
-

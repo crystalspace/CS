@@ -1,16 +1,10 @@
 SubDir TOP plugins video loader png ;
 
-if $(PNG.AVAILABLE) = "yes" 
+if $(PNG.AVAILABLE) = "yes" || [ Property build : projgen ]
 {
 Help cspngimg : "Crystal Space png image loader" ;
-
-Plugin cspngimg
-	: [ Wildcard *.cpp *.h ]
-;
+Plugin cspngimg : [ Wildcard *.cpp *.h ] ;
 LinkWith cspngimg : csgfx csutil ;
-ExternalLibs cspngimg :  PNG ;
-
-CompileGroups cspngimg :  imageloaders ;
-
+ExternalLibs cspngimg : PNG ;
+CompileGroups cspngimg : imageloaders ;
 }
-

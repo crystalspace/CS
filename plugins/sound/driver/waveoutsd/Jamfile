@@ -1,16 +1,10 @@
 SubDir TOP plugins sound driver waveoutsd ;
 
-if $(WAVEOUT.AVAILABLE) = "yes" 
+if $(WAVEOUT.AVAILABLE) = "yes" || [ Property build : projgen ] = msvc
 {
 Help sndwaveout : "Crystal Space WaveOut sound driver" ;
-
-Plugin sndwaveout
-	: [ Wildcard *.cpp *.h ]
-;
+Plugin sndwaveout : [ Wildcard *.cpp *.h ] ;
 LinkWith sndwaveout : csutil ;
-ExternalLibs sndwaveout :  WAVEOUT ;
-
-CompileGroups sndwaveout :  sounddrivers ;
-
+ExternalLibs sndwaveout : WAVEOUT ;
+CompileGroups sndwaveout : sounddrivers ;
 }
-

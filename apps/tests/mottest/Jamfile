@@ -1,9 +1,5 @@
 SubDir TOP apps tests mottest ;
 
 Help mottest : "Motion Manager Test" ;
-
-Application mottest
-	: [ Wildcard *.cpp *.h ]
-;
+Application mottest : [ Wildcard *.cpp *.h ] : noinstall ;
 LinkWith mottest : csgeom csgfx cstool csutil ;
-

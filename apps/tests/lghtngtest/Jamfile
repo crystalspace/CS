@@ -1,9 +1,5 @@
 SubDir TOP apps tests lghtngtest ;
 
 Help lghtngtest : "Lightning Test" ;
-
-Application lghtngtest
-	: [ Wildcard *.cpp *.h ]
-;
+Application lghtngtest : [ Wildcard *.cpp *.h ] : noinstall ;
 LinkWith lghtngtest : csgeom csgfx cstool csutil ;
-

@@ -1,15 +1,10 @@
 SubDir TOP plugins video render3d shader shaderplugins glshader_cg ;
 
-if $(CG.AVAILABLE) = "yes"
+if $(CG.AVAILABLE) = "yes" || [ Property build : projgen ]
 {
 Help glshader_cg : "Crystal Space Render3d Shaderplugin for CG" ;
-
-Plugin glshader_cg
-	: [ Wildcard *.cpp *.h ]
-;
+Plugin glshader_cg : [ Wildcard *.cpp *.h ] ;
 LinkWith glshader_cg : shaderplugincommon csgeom csgfx csutil ;
 ExternalLibs glshader_cg : CG ;
-
-CompileGroups glshader_cg : nrall ;
-
+CompileGroups glshader_cg : drivers3d nrall ;
 }

@@ -9,6 +9,7 @@ jamrulesdir = $(TOP)/mk/jam ;
 
 include $(jamrulesdir)/jamcompatibility.jam ;
 include $(jamrulesdir)/subdir.jam ;
+include $(jamrulesdir)/property.jam ;
 include $(jamrulesdir)/options.jam ;
 
 include $(jamrulesdir)/variant.jam ;

@@ -8,66 +8,64 @@ switch $(TARGET.OS)
 {
 case WIN32 :					# Windows 
   CSSYS_SRC += [ Wildcard win32 : *.cpp *.cc *.c *.h ]
-		generic/appdir.cpp
-		generic/csprocessorcap.cpp
-		generic/findlib.cpp
-		generic/getopt.cpp
-		generic/pluginpaths.cpp
-		generic/resdir.cpp
-		generic/runloop.cpp ;
+		[ ConcatDirs generic appdir.cpp ]
+		[ ConcatDirs generic csprocessorcap.cpp ]
+		[ ConcatDirs generic findlib.cpp ]
+		[ ConcatDirs generic getopt.cpp ]
+		[ ConcatDirs generic pluginpaths.cpp ]
+		[ ConcatDirs generic resdir.cpp ]
+		[ ConcatDirs generic runloop.cpp ] ;
 case MACOS_X :					# MacOS/X
   CSSYS_SRC += [ Wildcard macosx : *.cpp *.cc *.c *.m *.M *.mm *.h ]
-		generic/apppath.cpp
-		generic/csprocessorcap.cpp
-		generic/cspthrd.cpp 
-		generic/cspthrd.h
-		generic/findlib.cpp
-		generic/getopt.cpp
-		generic/pathutil.cpp 
-		generic/pluginpaths.cpp
-		generic/printf.cpp
-		generic/scanplugins.cpp
-		generic/sysroot.cpp ;
+		[ ConcatDirs generic apppath.cpp ]
+		[ ConcatDirs generic csprocessorcap.cpp ]
+		[ ConcatDirs generic cspthrd.cpp ] 
+		[ ConcatDirs generic cspthrd.h ]
+		[ ConcatDirs generic findlib.cpp ]
+		[ ConcatDirs generic getopt.cpp ]
+		[ ConcatDirs generic pathutil.cpp ] 
+		[ ConcatDirs generic pluginpaths.cpp ]
+		[ ConcatDirs generic printf.cpp ]
+		[ ConcatDirs generic scanplugins.cpp ]
+		[ ConcatDirs generic sysroot.cpp ] ;
 case * :					# Posix, Unix, Linux, etc.
   CSSYS_SRC += [ Filter [ Wildcard unix : *.cpp *.cc *.c *.h ] :
 			unix/bfdplugins.cpp ]
-		generic/appdir.cpp
-		generic/apppath.cpp
-		generic/csprocessorcap.cpp
-		generic/cspthrd.cpp
-		generic/cspthrd.h
-		generic/findlib.cpp
-		generic/getopt.cpp
-		generic/pathutil.cpp
-		generic/platformconfig.cpp 
-		generic/pluginpaths.cpp
-		generic/printf.cpp
-		generic/resdir.cpp
-		generic/runloop.cpp 
-		generic/sysroot.cpp ;
+		[ ConcatDirs generic appdir.cpp ]
+		[ ConcatDirs generic apppath.cpp ]
+		[ ConcatDirs generic csprocessorcap.cpp ]
+		[ ConcatDirs generic cspthrd.cpp ]
+		[ ConcatDirs generic cspthrd.h ]
+		[ ConcatDirs generic findlib.cpp ]
+		[ ConcatDirs generic getopt.cpp ]
+		[ ConcatDirs generic pathutil.cpp ]
+		[ ConcatDirs generic platformconfig.cpp ] 
+		[ ConcatDirs generic pluginpaths.cpp ]
+		[ ConcatDirs generic printf.cpp ]
+		[ ConcatDirs generic resdir.cpp ]
+		[ ConcatDirs generic runloop.cpp ] 
+		[ ConcatDirs generic sysroot.cpp ] ;
   if $(EMBED_META) = "yes" && $(LIBBFD.AVAILABLE) = "yes"
   {
-    CSSYS_SRC += unix/bfdplugins.cpp ;
+    CSSYS_SRC += [ ConcatDirs unix bfdplugins.cpp ] ;
   }
   else
   {
-    CSSYS_SRC += generic/scanplugins.cpp ;
+    CSSYS_SRC += [ ConcatDirs generic scanplugins.cpp ] ;
   }
 }
 
 if $(REGEX.AVAILABLE) != "yes"
 {
-  CSSYS_SRC += generic/regex.c ;
+  CSSYS_SRC += [ ConcatDirs generic regex.c ] ;
 }
 
-Library csutil
-	: [ Wildcard *.cpp *.cc *.c *.h ] $(CSSYS_SRC)
-          [ Wildcard ../../include/csutil : *.h ]
-          [ Wildcard ../../include/csutil/macosx : *.h ]
-          [ Wildcard ../../include/csutil/win32 : *.h ]
-          [ Wildcard ../../include/csutil/unix : *.h ]
-        :	
-;
+Library csutil :
+  [ Wildcard *.cpp *.cc *.c *.h ] $(CSSYS_SRC)
+  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csutil ] : *.h ]
+  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csutil macosx ] : *.h ]
+  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csutil win32 ] : *.h ]
+  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csutil unix ] : *.h ] ;
 
 CFlags csutil :
   -DCS_CONFIGDIR='\"$(appconfdir)\"' 

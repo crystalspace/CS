@@ -1,6 +1,6 @@
 SubDir TOP plugins filesys vfs ;
 
-if $(ZLIB.AVAILABLE) = "yes"
+if $(ZLIB.AVAILABLE) = "yes" || [ Property build : projgen ]
 {
 
 Help vfs : "Virtual File System plug-in" ;
@@ -33,4 +33,3 @@ VfsCfgGen $(VFS_CONFIGFILE:G=config) : $(SUBDIR)/vfs.cfg.template ;
 Depends install_config : [ DoInstall $(VFS_CONFIGFILE:G=config) : $(appconfdir) ] ;
 
 }
-

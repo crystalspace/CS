@@ -27,19 +27,6 @@ W - Wishlist (the build also works without this feature)
 [H] msvcgen.jam: Eliminate the ugly and monolithic mk/msvcgen/msvcgen.jam. The
     information in this file should be provided by rule invocations in the
     various module Jamfiles. (This is directly related to the above item.)
-[H] msvcgen.jam: There should be some way to indicate that project files should
-    not be generated for certain applications, plugins, and libraries.  This
-    could be done either via a monolithic list or on a module-by-module basis
-    in each module's Jamfile.  (What are the relative merits of each approach?)
-    Obvious examples for which MSVC project files should not be created are
-    those modules which are specific to Unix and MacOS/X. "static" variations
-    of targets are also very good candidates for exclusion.  (Be sure to
-    exclude walktest_static.)
-[H] msvcgen.jam: When modules reference sources or headers outside of the local
-    source directory via some number of ".."'s, these resources appear as
-    "../../foo/bar/../../this/module" in the generated project file.  (If MSVC6
-    & 7 don't care about this, then we can lower the priority of this item, and
-    instead consider it just an ugly but not dangerous anomaly.)
 [H] There are no rules for building the pure Python module yet (only the Python
     plugin works).
 [H] There are no rules for building the pure Perl5 module yet (only the Perl5
@@ -83,6 +70,11 @@ W - Wishlist (the build also works without this feature)
     GNU msvcgen does this.)  Note that this is just a convenience for the user
     of the project file; the project file itself will function correctly
     without this information.
+[L] msvcgen.jam: When modules reference sources or headers outside of the local
+    source directory via some number of ".."'s, these resources appear as
+    "../../foo/bar/../../this/module" in the generated project file.  (If MSVC6
+    & 7 don't care about this, then we can lower the priority of this item, and
+    instead consider it just an ugly but not dangerous anomaly.)
 [L] msvcgen.jam: Provide rules to copy the generated files back to the source
     tree upon explicit request so that they can be committed to the CVS
     respository if desired.
@@ -112,6 +104,25 @@ W - Wishlist (the build also works without this feature)
     with a message telling that you should rerun configure, or at least emit a
     big warning?
 
+[*] msvcgen.jam: There should be some way to indicate that project files should
+    not be generated for certain applications, plugins, and libraries.  This
+    could be done either via a monolithic list or on a module-by-module basis
+    in each module's Jamfile.  (What are the relative merits of each approach?)
+    Obvious examples for which MSVC project files should not be created are
+    those modules which are specific to Unix and MacOS/X. "static" variations
+    of targets are also very good candidates for exclusion.  (Be sure to
+    exclude walktest_static.)
+[*] msvcgen.jam: There should be some way to indicate that project files
+    _should_ be generated for modules which are not normally included by a
+    given configuration.  For instance, we might want to create a project file
+    for the PNG loader even if the local machine does not have libpng
+    installed.  Much more difficult, and important, is that we need to build
+    project files for all of the new-renderer modules for the wksall and
+    wksnewrenderer workspaces even when the project is configured for the old
+    renderer. This is difficult because those Jamfiles will not even be
+    included. We can not simply set USE_NEW_RENDERER=yes, because that will
+    cause the old renderer modules to be omitted from wksall and the other
+    workspaces.
 [*] msvcgen.jam: Eliminate the ugly mk/msvcgen/msvcgen.sh.  Instead, it should
     be possible to run the entire process using the normal Jamconfig created by
     the configuration process and by simply invoking the desired targets

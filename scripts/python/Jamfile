@@ -1,3 +1,3 @@
 SubDir TOP scripts python ;
 
-InstallData [ Wildcard *.py ] : python ;
+InstallData [ Filter [ Wildcard *.py ] : glextgen.py ] : python ;

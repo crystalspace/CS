@@ -44,6 +44,37 @@ chronological order.
 	    - Added doxygen documentation for macro-generated csString members.
 	    - Fixed doxygen doc for CS_INITIALIZE_PLATFORM_APPLICATION.
 	    - Fixed some compiler errors in minidump.cpp.
+	- Eric Sunshine made the following changes to the Jam build system:
+	    - Added a general-purpose "property bag" mechanism.  Jamfiles are
+	      free to create property containers and populate them as
+	      desired. Other Jamfiles can then query the containers in order to
+	      conditionalize build behavior.
+	    - CS/Jamrules now assigns to the 'build' container the property
+	      'newrenderer' with value "true" when the project is configured
+	      for the new-renderer.
+	    - msvcgen.jam now assigns to the 'build' container the properties
+	      'projgen' with value "msvc", and 'projgen_version' with value 6
+	      or 7 when building project files. (Future project file
+	      synthesizers will use other values for 'projgen'. For instance, a
+	      generator of Borland project files might set the value to
+	      "cbuilder", and a generator of Apple project files might set the
+	      value to "xcode".)
+	    - Fixed problem where msvcgen.jam was creating project files for
+	      numerous modules for which it made no sense to generate MSVC
+	      project files, such as those specific to MacOS/X and Unix.
+	    - Fixed problem where msvcgen.jam failed to create project files
+	      for both the old- and new-renderers (needed for wksall, for
+	      instance).  Previously, it was capable of creating projects for
+	      either only the old-renderer or the new-renderer, but not both at
+	      the same time.
+	    - Added 'noinstall' option to a lot of modules which were being
+	      installed despite the fact that they have no practical value
+	      when installed.
+	    - Fixed numerous cases where Unix-style pathnames were hard-coded
+	      into Jamfiles, rather than relying upon the portable ConcatDirs
+	      rule.  Likewise, converted serveral Jamfiles to utilize the
+	      portable $(DOT) and $(DOTDOT) rather than hardcoding "." and
+	      "..".
 17-Apr-2004
 	- Aren Blondahl updated map2cs to have newly optimized render priority
 	  on entities ('priority' tag in the .map) and fixed map2cs to support

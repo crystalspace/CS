@@ -1,16 +1,10 @@
 SubDir TOP plugins sound loader mod ;
 
-if $(MIKMOD.AVAILABLE) = "yes" 
+if $(MIKMOD.AVAILABLE) = "yes" || [ Property build : progjen ]
 {
 Help sndiff : "Crystal Space iff sound loader" ;
-
-Plugin sndmod
-	: [ Wildcard *.cpp *.h ]
-;
+Plugin sndmod : [ Wildcard *.cpp *.h ] ;
 LinkWith sndmod : soundloadercommon csutil ;
-ExternalLibs sndmod :  MIKMOD ;
-
-CompileGroups sndmod :  soundloaders ;
-
+ExternalLibs sndmod : MIKMOD ;
+CompileGroups sndmod : soundloaders ;
 }
-

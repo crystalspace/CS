@@ -1,12 +1,8 @@
 SubDir TOP libs csws ;
 
 Help csws : "Crystal Space Windowing System library" ;
-
 Library csws :
-	[ Wildcard *.cpp *.h ]
-	[ Wildcard skins/default : *.cpp *.h ]
-        [ Wildcard ../../include/csws : *.h ]
-;
-
+  [ Wildcard *.cpp *.h ]
+  [ Wildcard [ ConcatDirs skins default ] : *.cpp *.h ]
+  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csws ] : *.h ] ;
 LibDepends csws : cstool csgfx csgeom csutil ;
-

@@ -1,17 +1,10 @@
 SubDir TOP plugins video canvas xextshm ;
 
-if $(X11.AVAILABLE) = "yes" 
+if $(X11.AVAILABLE) = "yes" && ! [ Property build : projgen ]
 {
 Help xextshm : "Crystal Space X-Extension Shared Memory Plugin" ;
-
-Plugin xextshm
-	: [ Wildcard *.cpp *.h ]
-;
+Plugin xextshm : [ Wildcard *.cpp *.h ] ;
 LinkWith xextshm : csgeom csutil ;
-ExternalLibs xextshm :  X11 ;
-
-CompileGroups xextshm :  drivers2d ;
-CompileGroups xextshm :  softcanvas ;
-
+ExternalLibs xextshm : X11 ;
+CompileGroups xextshm : drivers2d softcanvas ;
 }
-

@@ -1,13 +1,11 @@
 SubDir TOP plugins video canvas xwindow ;
 
-if $(X11.AVAILABLE) = "yes" 
+if $(X11.AVAILABLE) = "yes" && ! [ Property build : projgen ]
 {
 Help xwin : "Crystal Space X Window Plugin" ;
-
-Plugin xwin :
-	[ Wildcard *.cpp *.h ]
-;
+Plugin xwin : [ Wildcard *.cpp *.h ] ;
 LinkWith xwin : canvascommon csgeom csutil ;
+CompileGroups xwin : drivers2d softcanvas ;
 if $(XFREE86VM.AVAILABLE) = "yes"
 {
   CFlags xwin : -DXFREE86VM ;
@@ -15,11 +13,6 @@ if $(XFREE86VM.AVAILABLE) = "yes"
 }
 else
 {
-  ExternalLibs xwin :  X11 ;
+  ExternalLibs xwin : X11 ;
 }
-
-CompileGroups xwin :  drivers2d ;
-CompileGroups xwin :  softcanvas ;
-
 }
-

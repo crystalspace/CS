@@ -1,8 +1,5 @@
 SubDir TOP apps tutorial simple1 ;
 
 Help simple1 : "Crystal Space tutorial part one" ;
-
-Application simple1
-	: [ Wildcard *.cpp *.h ]
-;
+Application simple1 : [ Wildcard *.cpp *.h ] : noinstall ;
 LinkWith simple1 : csgeom csgfx cstool csutil ;

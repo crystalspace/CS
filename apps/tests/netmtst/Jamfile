@@ -1,9 +1,5 @@
 SubDir TOP apps tests netmtst ;
 
 Help netmantest : "Crystal Space network manager test" ;
-
-Application netmantest
-	: [ Wildcard *.cpp *.h ]
-;
+Application netmantest : [ Wildcard *.cpp *.h ] : noinstall ;
 LinkWith netmantest : csgeom csgfx cstool csutil ;
-

@@ -1,10 +1,7 @@
 SubDir TOP libs cstool ;
 
 Help cstool : "Crystal Space tool Library" ;
-
-Library cstool
-	: [ Wildcard *.cpp *.h ]
-          [ Wildcard ../../include/cstool : *.h ]
-;
-
+Library cstool :
+  [ Wildcard *.cpp *.h ]
+  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include cstool ] : *.h ] ;
 LibDepends cstool : csgfx csgeom csutil ;

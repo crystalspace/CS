@@ -1,13 +1,9 @@
 SubDir TOP plugins mesh particles physics ode ;
 
-if $(ODE.AVAILABLE) = "yes" 
+if $(ODE.AVAILABLE) = "yes" || [ Property build : projgen ]
 {
 Help partphys_ode : "Particle ODE-based Physics plug-in" ;
-
-Plugin partphys_ode
-	: [ Wildcard *.cpp *.h ]
-;
+Plugin partphys_ode : [ Wildcard *.cpp *.h ] ;
 LinkWith partphys_ode : csutil csgeom ;
-
-CompileGroups partphys_ode :  meshes ;
+CompileGroups partphys_ode : meshes ;
 }

@@ -1,16 +1,11 @@
 SubDir TOP plugins video canvas macosx opengl ;
 
-if $(TARGET.OS) = "MACOS_X" && $(GL.AVAILABLE) = "yes"
+if $(TARGET.OS) = "MACOS_X" && $(GL.AVAILABLE) = "yes" &&
+  [ Property build : projgen ] != msvc
 {
 Help glosx2d : "Crystal Space MacOS/X OpenGL 2D driver" ;
-
-Plugin glosx2d
-	: [ Wildcard *.c *.cpp *.C *.m *.mm *.M *.h ]
-;
-LinkWith glosx2d :
-	canvascommon openglcommon osxcanvascommon csgeom csutil ;
+Plugin glosx2d : [ Wildcard *.c *.cc *.cpp *.C *.m *.mm *.M *.h ] ;
+LinkWith glosx2d : canvascommon openglcommon osxcanvascommon csgeom csutil ;
 ExternalLibs glosx2d : GL ;
-
-CompileGroups glosx2d :  drivers2d ;
-CompileGroups glosx2d :  openglcanvas ;
+CompileGroups glosx2d : drivers2d openglcanvas ;
 }

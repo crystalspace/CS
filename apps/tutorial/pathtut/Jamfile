@@ -1,8 +1,5 @@
 SubDir TOP apps tutorial pathtut ;
 
 Help pathtut : "Crystal Space Path Tutorial" ;
-
-Application pathtut
-	: [ Wildcard *.cpp *.h ]
-;
+Application pathtut : [ Wildcard *.cpp *.h ] : noinstall ;
 LinkWith pathtut : csgeom csgfx cstool csutil ;

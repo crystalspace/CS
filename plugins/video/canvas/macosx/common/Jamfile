@@ -1,10 +1,7 @@
 SubDir TOP plugins video canvas macosx common ;
 
-if $(TARGET.OS) = MACOS_X
+if $(TARGET.OS) = MACOS_X && [ Property build : projgen ] != msvc
 {
-Library osxcanvascommon
-	: [ Wildcard *.cpp *.m *.h ]
-	: noinstall
-;
+Library osxcanvascommon : [ Wildcard *.cpp *.m *.h ] : noinstall ;
 LibDepends osxcanvascommon : cstool csgfx csgeom csutil ;
 }
