@@ -84,6 +84,7 @@ class csSpider;
 #define DEBUGCMD_DUMPCAM	1018	// Dump the camera
 #define DEBUGCMD_FOV		1019	// Set fov
 #define DEBUGCMD_FOVANGLE	1020	// Set fov in angles
+#define DEBUGCMD_TERRVIS	1021	// Enable/disable terrain visibility
 
 /**
  * For key mappings.

@@ -92,11 +92,14 @@ int csTerrainQuad::GetHorIndex(const csVector3& campos, float x, float z,
   // thus precision around z==0 is not so important
   float k = 2.0*PI / float(horsize);
   float cosinus = x / len;
+  if (cosinus < -1) cosinus = -1;
+  else if (cosinus > 1) cosinus = 1;
   float invcos = acos(cosinus);
   if(invcos < k*0.5) return 0;
   if(invcos > PI - k*0.5) return horsize/2;
   int idx = QInt( (invcos + k*0.5)/k );
   if(z < 0) idx = horsize - idx;
+//printf ("cosinus=%g invcos=%g len=%g idx=%d x=%g z=%g\n", cosinus, invcos, len, idx, x, z); fflush (stdout);
 #endif
 #if 0
   /// @@@ could make a table to lookup the angle from x/z
@@ -120,33 +123,44 @@ void csTerrainQuad::ComputeExtent(const csVector3& campos, const csBox3& bbox,
 {
   // only need to test four of the vertices, since the height is not important
   // for this.
-  int idx[4];
-  idx[0] = GetHorIndex(campos, bbox.MinX(), bbox.MinZ(), horsize);
-  idx[1] = GetHorIndex(campos, bbox.MaxX(), bbox.MinZ(), horsize);
-  idx[2] = GetHorIndex(campos, bbox.MaxX(), bbox.MaxZ(), horsize);
-  idx[3] = GetHorIndex(campos, bbox.MinX(), bbox.MaxZ(), horsize);
-  // note: from  0-1, 1-2, 2-3, 3-0 are the edge lines
-
-  left = right = idx[0];
-  for(int i=1; i<4; i++)
+  int sidx = 0;
+  for (;;)
   {
-    // already included?
-    if( (right-idx[i]+horsize)%horsize <= (right-left+horsize)%horsize )
-      continue;
-    // extend the directions, by adding this angle to existing range.
-    int ldiff = (left - idx[i] + horsize) % horsize;
-    int rdiff = (idx[i] - right + horsize) % horsize;
-    if(ldiff < rdiff)
-      // angle is closer to left than right angle
-      left = idx[i];
-    else
-      right = idx[i];
+    int idx[4];
+    idx[sidx] = GetHorIndex(campos, bbox.MinX(), bbox.MinZ(), horsize);
+    idx[(sidx+1)&3] = GetHorIndex(campos, bbox.MaxX(), bbox.MinZ(), horsize);
+    idx[(sidx+2)&3] = GetHorIndex(campos, bbox.MaxX(), bbox.MaxZ(), horsize);
+    idx[(sidx+3)&3] = GetHorIndex(campos, bbox.MinX(), bbox.MaxZ(), horsize);
+    // note: from  0-1, 1-2, 2-3, 3-0 are the edge lines
+
+    left = right = idx[0];
+    for(int i=1; i<4; i++)
+    {
+      // already included?
+      if( (right-idx[i]+horsize)%horsize <= (right-left+horsize)%horsize )
+        continue;
+      // extend the directions, by adding this angle to existing range.
+      int ldiff = (left - idx[i] + horsize) % horsize;
+      int rdiff = (idx[i] - right + horsize) % horsize;
+      if(ldiff < rdiff)
+        // angle is closer to left than right angle
+        left = idx[i];
+      else
+        right = idx[i];
+    }
+    // the resulting span should be less than half the horizon
+    // @@@ DEBUG
+    if(! ((right - left + horsize)%horsize <= (horsize/2+1)))
+    {
+      sidx++;
+//printf ("idx[0]=%d idx[1]=%d idx[2]=%d idx[3]=%d\n", idx[0], idx[1], idx[2], idx[3]);
+//printf ("left=%d right=%d horsize=%d\n", left, right, horsize);
+//printf ("campos=(%g,%g,%g) bbox=(%g,%g,%g)-(%g,%g,%g)\n", campos.x, campos.y, campos.z, bbox.MinX (), bbox.MinY (), bbox.MinZ (), bbox.MaxX (), bbox.MaxY (), bbox.MaxZ ());
+//fflush (stdout);
+    }
+    else break;
   }
-  /// the resulting span should be less than half the horizon
-printf ("idx[0]=%d idx[1]=%d idx[2]=%d idx[3]=%d\n", idx[0], idx[1], idx[2], idx[3]);
-printf ("left=%d right=%d horsize=%d\n", left, right, horsize);
-printf ("campos=(%g,%g,%g) bbox=(%g,%g,%g)-(%g,%g,%g)\n", campos.x, campos.y, campos.z, bbox.MinX (), bbox.MinY (), bbox.MinZ (), bbox.MaxX (), bbox.MaxY (), bbox.MaxZ ());
-fflush (stdout);
+
   CS_ASSERT( (right - left + horsize)%horsize <= (horsize/2+1));
 }
 

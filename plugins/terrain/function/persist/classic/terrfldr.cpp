@@ -46,6 +46,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (LODDIST)
   CS_TOKEN_DEF (LODCOST)
   CS_TOKEN_DEF (QUADDEPTH)
+  CS_TOKEN_DEF (VISTEST)
 CS_TOKEN_DEF_END
 
 IMPLEMENT_IBASE (csTerrFuncFactoryLoader)
@@ -135,6 +136,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
     CS_TOKEN_TABLE (LODCOST)
     CS_TOKEN_TABLE (CORRECTSEAMS)
     CS_TOKEN_TABLE (QUADDEPTH)
+    CS_TOKEN_TABLE (VISTEST)
   CS_TOKEN_TABLE_END
 
   char *pName;
@@ -261,6 +263,13 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
 	  int qd;
 	  ScanStr (pParams, "%d", &qd);
 	  iTerrainState->SetQuadDepth (qd);
+	}
+        break;
+      case CS_TOKEN_VISTEST:
+        {
+	  bool vt;
+	  ScanStr (pParams, "%b", &vt);
+	  iTerrainState->SetVisTesting (vt);
 	}
         break;
       case CS_TOKEN_HEIGHTMAP:

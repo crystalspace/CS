@@ -103,6 +103,7 @@ private:
   int block_depth;	// Depth of the quadtree in one block.
   csTerrainQuad* quadtree;
   float horizon[CS_HORIZON_SIZE];
+  bool do_vis_test;
 
   /**
    * Take a part of a mesh and calculate the minimum/maximum height.
@@ -140,6 +141,22 @@ private:
    * Setup the visibility tree.
    */
   void SetupVisibilityTree ();
+
+  /**
+   * Enable/disable visibility testing.
+   */
+  void SetVisTesting (bool en)
+  {
+    do_vis_test = en;
+  }
+
+  /**
+   * Is vis testing enabled?
+   */
+  bool IsVisTestingEnabled ()
+  {
+    return do_vis_test;
+  }
 
   /**
    * Compute a destination mesh from a given source mesh
@@ -456,6 +473,14 @@ public:
     virtual int GetQuadDepth () const
     {
       return scfParent->GetQuadDepth ();
+    }
+    virtual void SetVisTesting (bool en)
+    {
+      scfParent->SetVisTesting (en);
+    }
+    virtual bool IsVisTestingEnabled ()
+    {
+      return scfParent->IsVisTestingEnabled ();
     }
   } scfiTerrFuncState;
   friend class TerrFuncState;

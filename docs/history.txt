@@ -10,6 +10,13 @@ The history order is reversed so that new features are at the top.
 	  to make sure that the impexp importer doesn't crash when it cannot
 	  write to ivcon.log. In that case it will write to standard
 	  output.
+	- Discovered an obsolete ddg.h include. Removed it.
+	- Thanks to Wouter we finished visibility testing for the terrain
+	  engine.
+	- Extended the iTerrFuncState interface to enable/disable this
+	  visibility testing (enabled by default).
+	- Also added VISTEST keyword to the terrain loader plugin.
+	- Added new command in BugPlug to enable/disable terrain visibility.
 12-Jun-2001
 	- Fixed a compile error and warning in SCF.
 	- Removed dumper.cpp and dumper.h. They are obsolete and BugPlug

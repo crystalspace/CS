@@ -37,7 +37,7 @@ typedef float (csTerrainHeightFunction)(void* data, float dx, float dy);
  */
 typedef csVector3 (csTerrainNormalFunction)(void* data, float dx, float dy);
 
-SCF_VERSION (iTerrFuncState, 0, 0, 6);
+SCF_VERSION (iTerrFuncState, 0, 0, 7);
 
 /**
  * This interface describes the API for the terrain object.
@@ -117,6 +117,15 @@ struct iTerrFuncState : public iBase
    * Get the depth of the quad-tree used for visibility testing.
    */
   virtual int GetQuadDepth () const = 0;
+
+  /**
+   * Disable/enable visibility testing.
+   */
+  virtual void SetVisTesting (bool en) = 0;
+  /**
+   * Return true if vis testing is enabled.
+   */
+  virtual bool IsVisTestingEnabled () = 0;
 };
 
 #endif // __ITERRAIN_TERRFUNC_H_

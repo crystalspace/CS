@@ -38,9 +38,12 @@
 #include "ivaria/conout.h"
 #include "iutil/object.h"
 #include "imesh/object.h"
+#include "iterrain/terrfunc.h"
+#include "iterrain/object.h"
 #include "iengine/engine.h"
 #include "iengine/sector.h"
 #include "iengine/mesh.h"
+#include "iengine/terrain.h"
 #include "iengine/movable.h"
 #include "iengine/camera.h"
 #include "qint.h"
@@ -251,9 +254,10 @@ void csBugPlug::MouseButton3 (iCamera* camera)
   csVector3 vw = camera->GetTransform ().This2Other (v);
 
   iSector* sector = camera->GetSector ();
-  //csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
-  //csVector3 isect;
-  //iPolygon3D* sel = sector->HitBeam (origin, origin + (vw-origin) * 20, isect);
+  csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
+  csVector3 isect;
+  iPolygon3D* sel = sector->HitBeam (origin, origin + (vw-origin) * 20, isect);
+  (void)sel;
 
   vw = isect;
   v = camera->GetTransform ().Other2This (vw);
@@ -495,6 +499,42 @@ bool csBugPlug::EatKey (iEvent& event)
 	  }
 	}
         break;
+      case DEBUGCMD_TERRVIS:
+        if (Engine)
+	{
+	  int enable_disable = -1;
+	  int i, j;
+	  for (i = 0 ; i < Engine->GetSectorCount () ; i++)
+	  {
+	    iSector* sector = Engine->GetSector (i);
+	    for (j = 0 ; j < sector->GetTerrainCount () ; j++)
+	    {
+	      iTerrainWrapper* terr = sector->GetTerrain (j);
+	      iTerrFuncState* st = QUERY_INTERFACE (terr->GetTerrainObject (),
+	      	iTerrFuncState);
+	      if (st)
+	      {
+	        if (enable_disable == -1)
+		{
+		  enable_disable = (int) (!st->IsVisTestingEnabled ());
+		}
+		st->SetVisTesting ((bool) enable_disable);
+	        st->DecRef ();
+	      }
+	    }
+	  }
+	  if (enable_disable == -1)
+	  {
+	    System->Printf (MSG_CONSOLE,
+	      "BugPlug found no terrains to work with!\n");
+	  }
+	}
+	else
+	{
+	  System->Printf (MSG_CONSOLE,
+	    	"BugPlug has no engine to work on!\n");
+	}
+        break;
       case DEBUGCMD_DUMPCAM:
       case DEBUGCMD_FOV:
       case DEBUGCMD_FOVANGLE:
@@ -697,6 +737,7 @@ int csBugPlug::GetCommandCode (const char* cmd)
   if (!strcmp (cmd, "dumpcam"))		return DEBUGCMD_DUMPCAM;
   if (!strcmp (cmd, "fov"))		return DEBUGCMD_FOV;
   if (!strcmp (cmd, "fovangle"))	return DEBUGCMD_FOVANGLE;
+  if (!strcmp (cmd, "terrvis"))		return DEBUGCMD_TERRVIS;
 
   return DEBUGCMD_UNKNOWN;
 }

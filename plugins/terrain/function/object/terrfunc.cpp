@@ -151,6 +151,7 @@ csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
   scale.Set (1, 1, 1);
   blocks = NULL;
   do_dirlight = false;
+  do_vis_test = true;
   dirlight_number = 0;
   base_color.red = 0;
   base_color.green = 0;
@@ -1260,7 +1261,8 @@ void csTerrFuncObject::TestVisibility (iRenderView* rview)
 void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
 {
   SetupObject ();
-  //TestVisibility (rview);
+  if (do_vis_test)
+    TestVisibility (rview);
 
   iGraphics3D* pG3D = rview->GetGraphics3D ();
   iCamera* pCamera = rview->GetCamera ();
@@ -1278,8 +1280,11 @@ void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
     for (bx = 0 ; bx < blockxy ; bx++, blidx++)
     {
       csTerrBlock& block = blocks[blidx];
-      //CS_ASSERT (block.node != NULL);
-      //if (!block.node->IsVisible ()) continue;
+      if (do_vis_test)
+      {
+        CS_ASSERT (block.node != NULL);
+        if (!block.node->IsVisible ()) continue;
+      }
       int clip_portal, clip_plane, clip_z_plane;
       if (BBoxVisible (block.bbox, rview, pCamera, clip_portal, clip_plane,
       	clip_z_plane))
