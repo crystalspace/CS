@@ -21,11 +21,12 @@
 #define __CONSOLE_H__
 
 #include "csutil/csbase.h"
+#include "types.h" // for bool.
 
 class csRect;
 
 /**
- * The  csConsole class is just an outline of how CrystalSpace console
+ * The csConsole class is just an outline of how CrystalSpace console
  * should work. There is no implementation for any of its methods, so
  * you cannot create instances of this class. You should derive your own
  * class from this and assign a instance of it to System->Console variable.
@@ -48,9 +49,6 @@ public:
    * the area that was changed during this Print.
    */
   virtual void Print (csRect* area) = 0;
-
-  /// Shows user that we're not hanging
-  virtual void ShowWork () = 0;
 
   /// Return true if console is active
   virtual bool IsActive () = 0;
