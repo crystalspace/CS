@@ -37,6 +37,7 @@
 #include "cs3d/direct3d61/d3d_states.h"
 #include "cs3d/direct3d61/d3d_vertcache.h"
 #include "csutil/scf.h"
+#include "csgeom/transfrm.h"
 #include "cssys/win32/IDDetect.h"
 #include "igraph3d.h"
 #include "ihalo.h"
@@ -62,6 +63,7 @@
 
 class D3DTextureCache;
 class D3DLightMapCache;
+class csClipper;
 
 /// the Direct3D implementation of the Graphics3D class.
 class csGraphics3DDirect3DDx6 : public iGraphics3D
@@ -147,6 +149,15 @@ class csGraphics3DDirect3DDx6 : public iGraphics3D
 
   //Maximum possible aspect ratio for the renderer.
   int m_MaxAspectRatio;
+
+  /// Current transformation from world to camera.
+  csTransform m_o2c;
+  /// Current 2D clipper.
+  csClipper* m_pClipper;
+  /// Current aspect ratio for perspective correction.
+  float m_Aspect;
+  /// Current inverse aspect ratio for perspective correction.
+  float m_InvAspect;
   
   /// the 2d graphics driver.
   iGraphics2D* m_piG2D;
@@ -263,15 +274,34 @@ public:
   ///
   virtual int GetHeight () { return m_nHeight; }
 
-  virtual void SetPerspectiveCenter(int /*x*/, int /*y*/) { }
-  /// Set perspective aspect. @@@ NOT YET IMPLEMENTED
-  virtual void SetPerspectiveAspect (float aspect) { }
-  /// Set world to camera transformation. @@@ NOT YET IMPLEMENTED
-  virtual void SetObjectToCamera (csTransform* o2c) { }
-  /// Set optional clipper. @@@ NOT YET IMPLEMENTED
-  virtual void SetClipper (csVector2* vertices, int num_vertices) { }
-  /// Draw a triangle mesh. @@@ NOT YET IMPLEMENTED
-  virtual void DrawTriangleMesh (G3DTriangleMesh& mesh) { }
+  /// Set center of projection.
+  virtual void SetPerspectiveCenter(int x, int y) 
+  { 
+    m_nHalfWidth  = x;
+    m_nHalfHeight = y;
+  }
+  /// Set perspective aspect. 
+  virtual void SetPerspectiveAspect (float aspect)
+  {
+    m_Aspect    = aspect;
+    m_InvAspect = 1.0/aspect;
+  }
+  /// Set world to camera transformation. 
+  virtual void SetObjectToCamera (csTransform* o2c) 
+  {
+    m_o2c = *o2c;
+  }
+  /// Set optional clipper. 
+  virtual void SetClipper (csVector2* vertices, int num_vertices);
+  /// Draw a triangle mesh. 
+  virtual void DrawTriangleMesh (G3DTriangleMesh& mesh) 
+  {
+    // Call generic version.
+    void DrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d, csTransform& o2c,
+	csClipper* clipper, float aspect,
+	int width2, int height2);
+    DrawTriangleMesh (mesh, this, m_o2c, m_pClipper, m_Aspect, m_nHalfWidth, m_nHalfHeight);
+  }
  
   ///
   virtual bool NeedsPO2Maps(void) { return true; }

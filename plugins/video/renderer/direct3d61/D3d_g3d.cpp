@@ -40,6 +40,7 @@
 #include "cs2d/ddraw61/IG2D.h"
 #include "cssys/win32/iDDetect.h"
 #include "csutil/inifile.h"
+#include "csgeom/polyclip.h"
 #include "qint.h"
 #include "isystem.h"
 #include "igraph3d.h"
@@ -267,7 +268,8 @@ csGraphics3DDirect3DDx6::csGraphics3DDirect3DDx6(iBase *iParent) :
   m_nHalfWidth(0),
   m_mixmode(0),
   m_ZBufMode(CS_ZBUF_NONE),
-  m_nDrawMode(0)
+  m_nDrawMode(0),
+  m_pClipper(NULL)
 {
   CONSTRUCT_IBASE (iParent);
 
@@ -2183,6 +2185,17 @@ long csGraphics3DDirect3DDx6::GetRenderState(G3D_RENDERSTATEOPTION op)
     default:
       return 0;
   }
+}
+
+void csGraphics3DDirect3DDx6::SetClipper (csVector2* vertices, int num_vertices)
+{
+  CHK (delete m_pClipper);
+  m_pClipper = NULL;
+  if (!vertices) return;
+  // @@@ This could be better! We are using a general polygon clipper
+  // even in cases where a box clipper would be better. We should
+  // have a special SetBoxClipper call in iGraphics3D.
+  CHK (m_pClipper = new csPolygonClipper (vertices, num_vertices, false, true));
 }
 
 void csGraphics3DDirect3DDx6::OpenFogObject (CS_ID /*id*/, csFog* /*fog*/)
