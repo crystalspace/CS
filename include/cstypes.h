@@ -21,6 +21,9 @@
 
 /**\file
  */
+/**\addtogroup util
+ * @{
+ */
 #ifndef __CS_CSSYSDEFS_H__
 #error "cssysdef.h must be included in EVERY source file!"
 #endif
@@ -69,10 +72,20 @@ typedef int int32;
 typedef unsigned long long uint64;
 /// signed 64 bit integer
 typedef long long int64;
+/// specify 64 bit integer constant
+#define CONST_I64(x) x##LL
+/// specify 64 bit unsigned integer constant
+#define CONST_UI64(x) x##ULL
 #else
 # ifdef COMP_VC
+/// unsigned 64 bit integer
 typedef unsigned __int64 uint64;
+/// signed 64 bit integer
 typedef __int64 int64;
+/// specify 64 bit integer constant
+#define CONST_I64(x) x##i64
+/// specify 64 bit unsigned integer constant
+#define CONST_UI64(x) x##ui64
 # else
 #  warning NO definition for 64 bit integers defined for your compiler
 # endif
@@ -89,6 +102,8 @@ typedef uint32_t uint32;
 typedef int32_t int32;
 typedef uint64_t uint64;
 typedef int64_t int64;
+#define CONST_I64(x) INT64_C(x)
+#define CONST_UI64(x) UINT64_C(x)
 #endif
 
 #endif // end of #if !defined(CS_BUILTIN_SIZED_TYPES)
@@ -106,5 +121,6 @@ typedef unsigned int csTicks;
 typedef unsigned int uint;
 /** @} */
 
+/** @} */
 
 #endif // __CS_CSTYPES_H__
