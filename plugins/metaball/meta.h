@@ -64,7 +64,6 @@ class csMetaBalls : public iMetaBalls
 
   csIniFile *Config;
   iGraphics3D *G3D;
-  iGraphics2D *G2D;
   iSystem *Sys;
   iTextureHandle *th;
   G3DPolygonDPFX* poly;

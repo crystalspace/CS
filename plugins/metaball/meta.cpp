@@ -99,7 +99,6 @@ bool csMetaBalls::Initialize (iSystem *sys)
 void csMetaBalls::SetContext (iGraphics3D *g3d)
 {
   G3D = g3d;
-  G2D = G3D->GetDriver2D ();
 }
 
 
@@ -162,8 +161,8 @@ void LitVertex(const csVector3 &n, G3DTexturedVertex &c)
 void csMetaBalls::DrawSomething(void)
 {
   int i,j;
-  int h_height = G2D->GetHeight () / 2;
-  int h_width = G2D->GetWidth () / 2;
+  int h_height = G3D->GetHeight () / 2;
+  int h_width = G3D->GetWidth () / 2;
 
   for (i = 0; i < num_meta_balls; i++)
   {

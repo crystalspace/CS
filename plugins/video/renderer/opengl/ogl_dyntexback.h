@@ -45,7 +45,7 @@ class csOpenGLDynamicBackBuffer : public iGraphics3D
   csTextureOpenGLDynamic *tex_0;
   csGraphics3DOpenGL *g3d;
   iGraphics2D *g2d;
-  int Width, Height, frame_height, nPixelBytes;
+  int width, height, frame_height, nPixelBytes;
   csPixelFormat *pfmt;
   bool rstate_bilinearmap;
   
@@ -66,8 +66,8 @@ class csOpenGLDynamicBackBuffer : public iGraphics3D
   virtual void FinishDraw ();
   virtual void Print (csRect *area);
 
-  virtual int GetWidth (){ return Width; }
-  virtual int GetHeight (){ return Height; }
+  virtual int GetWidth (){ return width; }
+  virtual int GetHeight (){ return height; }
 
   virtual void DrawPolygon (G3DPolygonDP& poly);
   virtual void DrawPolygonDebug (G3DPolygonDP& poly);

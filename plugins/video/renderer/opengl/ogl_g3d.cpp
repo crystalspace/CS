@@ -114,6 +114,30 @@ IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENTS_INTERFACE (iGraphics3D)
 IMPLEMENT_IBASE_END
 
+/*=========================================================================
+ Static growing array declaration for DrawTriangleMesh
+=========================================================================*/
+// smgh moved it here, no longer segfaults on exit as a consequence..
+// Also IncRefing and DecRefing in the ctor/dtor, as the auxiliary buffer
+// dynamic textures will utilise multiple instances of csGraphics3DOpenGL
+
+//@@@@@@@ DO INCREF()/DECREF() ON THESE ARRAYS!!!
+/// Static vertex array.
+static DECLARE_GROWING_ARRAY (tr_verts, csVector3);
+/// Static uv array.
+static DECLARE_GROWING_ARRAY (uv_verts, csVector2);
+/// The perspective corrected vertices.
+//static DECLARE_GROWING_ARRAY (persp, csVector3);
+/// Array which indicates which vertices are visible and which are not.
+//static DECLARE_GROWING_ARRAY (visible, bool);
+/// Array with colors.
+static DECLARE_GROWING_ARRAY (color_verts, csColor);
+/// Array with fog values.
+static DECLARE_GROWING_ARRAY (fog_intensities, float);
+/// Array with fog colors
+static DECLARE_GROWING_ARRAY (fog_color_verts, csColor);
+/// Array with visible triangles
+static DECLARE_GROWING_ARRAY (visible_indices, int);
 
 /*=========================================================================
  Method implementations
@@ -148,6 +172,14 @@ csGraphics3DOpenGL::csGraphics3DOpenGL (iBase * iParent):
   // default extension state is for all extensions to be OFF
   ARB_multitexture = false;
   clipper = NULL;
+
+  // see note above
+  tr_verts.IncRef ();
+  uv_verts.IncRef ();
+  color_verts.IncRef ();
+  fog_intensities.IncRef ();
+  fog_color_verts.IncRef ();
+  visible_indices.IncRef ();
 }
 
 csGraphics3DOpenGL::~csGraphics3DOpenGL ()
@@ -157,6 +189,14 @@ csGraphics3DOpenGL::~csGraphics3DOpenGL ()
   Close ();
   if (G2D) G2D->DecRef ();
   if (System) System->DecRef ();
+
+  // see note above
+  tr_verts.DecRef ();
+  uv_verts.DecRef ();
+  color_verts.DecRef ();
+  fog_intensities.DecRef ();
+  fog_color_verts.DecRef ();
+  visible_indices.DecRef ();
 }
 
 bool csGraphics3DOpenGL::Initialize (iSystem * iSys)
@@ -1057,6 +1097,8 @@ void csGraphics3DOpenGL::DrawPolygonFX (G3DPolygonDPFX & poly)
 #endif
 }
 
+
+
 void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
 {
   // yet another work in progress - GJH
@@ -1070,23 +1112,7 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
     return;
   }
 
-  //@@@@@@@ DO INCREF()/DECREF() ON THESE ARRAYS!!!
-  /// Static vertex array.
-  static DECLARE_GROWING_ARRAY (tr_verts, csVector3);
-  /// Static uv array.
-  static DECLARE_GROWING_ARRAY (uv_verts, csVector2);
-  /// The perspective corrected vertices.
-  //static DECLARE_GROWING_ARRAY (persp, csVector3);
-  /// Array which indicates which vertices are visible and which are not.
-  //static DECLARE_GROWING_ARRAY (visible, bool);
-  /// Array with colors.
-  static DECLARE_GROWING_ARRAY (color_verts, csColor);
-  /// Array with fog values.
-  static DECLARE_GROWING_ARRAY (fog_intensities, float);
-  /// Array with fog colors
-  static DECLARE_GROWING_ARRAY (fog_color_verts, csColor);
-  /// Array with visible triangles
-  static DECLARE_GROWING_ARRAY (visible_indices, int);
+
 
   int i;
 

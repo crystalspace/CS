@@ -116,9 +116,7 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
                       NULL, NULL, NULL, 0, 
                       NULL, NULL, class_hint);
 
-  // Currently freeing the class hint (as you should) causes the driver to 
-  // crash on exit. Doing the same thing without glX doesnt cause a problem.
-//    XFree (class_hint);
+  XFree (class_hint);
 
 
   // The texture manager only needs to know this:

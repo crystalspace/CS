@@ -801,6 +801,7 @@ private:
     csWorld *world;
     bool resize;
     iGraphics2D *G2D;
+    iGraphics3D *G3D;
     csCBuffer* c_buffer;
     csCoverageMaskTree* covtree;
     csSolidBsp* solidbsp;
@@ -811,7 +812,7 @@ private:
     virtual ~csWorldState ();
 
     /// Swaps state into world and deals with resizing issues.
-    void ActivateState ();
+    void Activate ();
   };
 
   friend class csWorldState;
@@ -828,7 +829,7 @@ private:
     { delete (csWorldState *)Item; return true; }
     // Find a state by referenced g2d
     virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
-    { return ((csWorldState *)Item)->G2D == (iGraphics2D *)Key ? 0 : -1; }
+    { return ((csWorldState *)Item)->G3D == (iGraphics3D *)Key ? 0 : -1; }
     // Get world state according to index
     inline csWorldState *Get (int n) const
     { return (csWorldState *)csVector::Get (n); }

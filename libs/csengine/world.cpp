@@ -1036,17 +1036,6 @@ void csWorld::DrawFunc (csCamera* c, csClipper* view,
   c->shift_x = frame_width/2;
   c->shift_y = frame_height/2;
 
-  resize = false;
-  if ((G2D->GetWidth() != frame_width) || (G2D->GetHeight() != frame_height))
-  {
-    resize = true;
-    frame_width = G2D->GetWidth ();
-    frame_height = G2D->GetHeight ();
-    if (c_buffer) EnableCBuffer (true);
-    if (covtree) EnableCovtree (true);//hmmmmmmm necessary?
-    if (solidbsp) EnableSolidBsp (true);      
-  }
-
   // Calculate frustum for screen dimensions (at z=1).
   float leftx = - c->shift_x * c->inv_aspect;
   float rightx = (frame_width - c->shift_x) * c->inv_aspect;
@@ -1620,8 +1609,8 @@ iThing *csWorld::CreateThing (const char *iName, iSector *iParent)
 
 void csWorld::Resize ()
 {
-  frame_width = G2D->GetWidth ();
-  frame_height = G2D->GetHeight ();
+  frame_width = G3D->GetWidth ();
+  frame_height = G3D->GetHeight ();
 
   if (c_buffer) 
   { 
@@ -1648,6 +1637,7 @@ csWorld::csWorldState::csWorldState (csWorld *w)
   covtree  = w->covtree;
   solidbsp = w->solidbsp;
   G2D      = w->G2D;
+  G3D      = w->G3D;
   resize   = false;
 }
 
@@ -1658,12 +1648,12 @@ csWorld::csWorldState::~csWorldState ()
   if (solidbsp) delete solidbsp;
 }
 
-void csWorld::csWorldState::ActivateState ()
+void csWorld::csWorldState::Activate ()
 {
   world->c_buffer     = c_buffer;
   world->covtree      = covtree;
-  world->frame_width  = G2D->GetWidth ();
-  world->frame_height = G2D->GetHeight ();
+  world->frame_width  = G3D->GetWidth ();
+  world->frame_height = G3D->GetHeight ();
 
   if (resize)
   {
@@ -1678,16 +1668,27 @@ void csWorld::csWorldState::ActivateState ()
 
 void csWorld::csWorldStateVector::Close (iGraphics2D *g2d)
 {
-  int idx = FindKey (g2d);
-  if (idx > -1)
-    Delete (idx); 
+  // Hack-- with the back buffer implementations of dynamic textures
+  // circumstances are that many G3D can be associated with one G2D.
+  // However at the moment back buffer dynamic textures when destroyed
+  // do not send any close context messages so we kill them all.
+  for (int i = 0; i < Length (); i++)
+    if (((csWorldState*)root [i])->G2D == g2d)
+      Delete (i);
 }
 
 void csWorld::csWorldStateVector::Resize (iGraphics2D *g2d)
 { 
-  int idx = FindKey (g2d);
-  if (idx > -1)
-    ((csWorldState*)Get(idx))->resize = true; 
+  // Hack-- with the back buffer implementations of dynamic textures
+  // circumstances are that many G3D can be associated with one G2D
+  for (int i = 0; i < Length (); i++)
+  {
+    csWorldState *state = (csWorldState*)root [i];
+    if (state->G2D == g2d)
+      if ((state->G2D->GetWidth() == state->G3D->GetWidth ()) &&
+	  (state->G2D->GetHeight() == state->G3D->GetHeight ()))
+	  ((csWorldState*)root [i])->resize = true; 
+  }
 }
 
 void csWorld::SetContext (iGraphics3D* g3d)
@@ -1696,19 +1697,18 @@ void csWorld::SetContext (iGraphics3D* g3d)
   if (g3d != G3D)
   {
     G3D->DecRef ();
+    G3D = g3d;
     if (!world_states) world_states = new csWorldStateVector();
-    int idg2d = world_states->FindKey (G2D);
-    if (idg2d < 0)
+    int idg3d = world_states->FindKey (g3d);
+    if (idg3d < 0)
     {
-      G3D = g3d;
       Resize ();
       world_states->Push (new csWorldState (this));
     }
     else
     {
-      G3D = g3d;
-      csWorldState *state = (csWorldState *)world_states->Get (idg2d);
-      state->ActivateState ();
+      csWorldState *state = (csWorldState *)world_states->Get (idg3d);
+      state->Activate ();
     }
     G3D->IncRef ();
   }

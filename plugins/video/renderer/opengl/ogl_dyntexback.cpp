@@ -44,7 +44,8 @@ void csOpenGLDynamicBackBuffer::SetTarget (csGraphics3DOpenGL *g3d, csTextureMMO
   g2d = g3d->GetDriver2D();
   nPixelBytes = g2d->GetPixelBytes ();
   frame_height = g2d->GetHeight ();
-  tex->GetMipMapDimensions (0, Width, Height);
+  tex->GetMipMapDimensions(0, width, height);
+
   tex_0 = (csTextureOpenGLDynamic*) tex->get_texture (0);
 }
 
@@ -57,7 +58,8 @@ bool csOpenGLDynamicBackBuffer::BeginDraw (int DrawFlags)
       g2d->Clear (0);
     else
       // copy the tex into upper left corner
-      g3d->DrawPixmap (tex, 0, 0, Width, Height, 0, 0, Width, Height);
+      g3d->DrawPixmap (tex, 0, 0, width, height, 0, 0,
+		       width, height);
 
   }
   return succ;
@@ -97,17 +99,17 @@ void csOpenGLDynamicBackBuffer::FinishDraw ()
 #ifdef COPY_TO_TEXTURE
     // We know currently dynamic textures are not mip-mapped
     glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 
-		      0, frame_height - Height, Width, Height, 0);
+		      0, frame_height - height, width, height, 0);
 #else
     glCopyTexSubImage2D (GL_TEXTURE_2D, 0,
-			 0, 0, 0, frame_height - Height,
-			 Width, Height);
+			 0, 0, 0, frame_height - height,
+			 width, height);
 #endif
   }
   else
   {
     // Not in cache.
-    glReadPixels (0, frame_height - Height, Width, Height,
+    glReadPixels (0, frame_height - height, width, height,
 		  GL_RGBA, GL_UNSIGNED_BYTE, tex_0->get_image_data());
   }
 }
@@ -118,7 +120,9 @@ void csOpenGLDynamicBackBuffer::Print (csRect *area)
 }
 
 void csOpenGLDynamicBackBuffer::DrawPolygon (G3DPolygonDP& poly)
-{ 
+{
+  for (int i = 0; i < poly.num; i++)
+    poly.vertices[i].sy = frame_height - poly.vertices[i].sy;
   g3d->DrawPolygon (poly); 
 }
 
@@ -129,6 +133,8 @@ void csOpenGLDynamicBackBuffer::DrawPolygonDebug (G3DPolygonDP& poly)
 
 void csOpenGLDynamicBackBuffer::DrawLine (const csVector3& v1, const csVector3& v2, float fov, int color)
 { 
+//    v1.y = frame_height - v1.y;
+//    v2.y = frame_height - v2.y;
   g3d->DrawLine (v1, v2, fov, color); 
 }
 
@@ -144,6 +150,8 @@ void csOpenGLDynamicBackBuffer::FinishPolygonFX ()
 
 void csOpenGLDynamicBackBuffer::DrawPolygonFX (G3DPolygonDPFX& poly)
 { 
+  for (int i = 0; i < poly.num; i++)
+    poly.vertices[i].sy = frame_height - poly.vertices[i].sy;
   g3d->DrawPolygonFX (poly); 
 }
 
@@ -188,12 +196,14 @@ csGraphics3DCaps *csOpenGLDynamicBackBuffer::GetCaps ()
 }
 
 unsigned long *csOpenGLDynamicBackBuffer::GetZBuffAt (int x, int y)
-{ 
+{
+  y = frame_height - y;
   return g3d->GetZBuffAt (x, y); 
 }
 
 float csOpenGLDynamicBackBuffer::GetZBuffValue (int x, int y)
 { 
+  y = frame_height - y;
   return g3d->GetZBuffValue (x, y); 
 }
 
