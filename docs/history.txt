@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 29-Jun-2004
+    - Reed fixed a bug in VOS/A3DL plugin: color material on static meshes not
+      set properly.
 	- Jorrit fixed a bug in spr3d where manually specifying sprite normals
 	  didn't work.
 	- Jorrit started work on a new experimental optimization in Dynavis
