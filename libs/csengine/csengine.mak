@@ -26,14 +26,17 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp $(SRCDIR)/libs/csengine $(SRCDIR)/libs/csengine/basic \
-  $(SRCDIR)/libs/csengine/light $(SRCDIR)/libs/csengine/objects
-
 CSENGINE.LIB = $(OUT)/$(LIB_PREFIX)csengine$(LIB_SUFFIX)
-INC.CSENGINE = $(wildcard $(addprefix $(SRCDIR)/,include/csengine/*.h))
-SRC.CSENGINE = $(wildcard $(addprefix $(SRCDIR)/,libs/csengine/*.cpp libs/csengine/*/*.cpp))
-OBJ.CSENGINE = $(addprefix $(OUT)/,$(notdir $(SRC.CSENGINE:.cpp=$O)))
+DIR.CSENGINE = libs/csengine
+OUT.CSENGINE = $(OUT)/$(DIR.CSENGINE)
+INC.CSENGINE = \
+  $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSENGINE)/*.h include/csengine/*.h))
+SRC.CSENGINE = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSENGINE)/*.cpp \
+  $(DIR.CSENGINE)/*/*.cpp))
+OBJ.CSENGINE = $(addprefix $(OUT.CSENGINE)/,$(notdir $(SRC.CSENGINE:.cpp=$O)))
 CFG.CSENGINE = $(SRCDIR)/data/config/engine.cfg
+
+OUTDIRS += $(OUT.CSENGINE)
 
 TO_INSTALL.CONFIG += $(CFG.CSENGINE)
 TO_INSTALL.STATIC_LIBS += $(CSENGINE.LIB)
@@ -47,24 +50,39 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: csengine csengineclean
+.PHONY: csengine csengineclean csenginecleandep
 
-all: $(CSENGINE.LIB)
 csengine: $(OUTDIRS) $(CSENGINE.LIB)
-clean: csengineclean
+
+$(OUT.CSENGINE)/%$O: $(SRCDIR)/$(DIR.CSENGINE)/%.cpp
+	$(DO.COMPILE.CPP)
+
+$(OUT.CSENGINE)/%$O: $(SRCDIR)/$(DIR.CSENGINE)/basic/%.cpp
+	$(DO.COMPILE.CPP)
+
+$(OUT.CSENGINE)/%$O: $(SRCDIR)/$(DIR.CSENGINE)/light/%.cpp
+	$(DO.COMPILE.CPP)
+
+$(OUT.CSENGINE)/%$O: $(SRCDIR)/$(DIR.CSENGINE)/objects/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(CSENGINE.LIB): $(OBJ.CSENGINE)
 	$(DO.LIBRARY)
 
+clean: csengineclean
 csengineclean:
 	-$(RM) $(CSENGINE.LIB) $(OBJ.CSENGINE)
 
+cleandep: csenginecleandep
+csenginecleandep:
+	-$(RM) $(OUT.CSENGINE)/csengine.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/csengine.dep
-$(OUTOS)/csengine.dep: $(SRC.CSENGINE)
-	$(DO.DEP)
+dep: $(OUT.CSENGINE) $(OUT.CSENGINE)/csengine.dep
+$(OUT.CSENGINE)/csengine.dep: $(SRC.CSENGINE)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/csengine.dep
+-include $(OUT.CSENGINE)/csengine.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
