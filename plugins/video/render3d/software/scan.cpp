@@ -205,8 +205,8 @@ void csScan_InitDraw (int MipMap, csSoftwareGraphics3DCommon* g3d,
     
   if(tmapping) 
   {
-      Scan.tw2 = tmapping->GetWidth () >> MipMap;
-      Scan.th2 = tmapping->GetHeight () >> MipMap;
+      Scan.tw2 = tmapping->GetLitWidth () >> MipMap;
+      Scan.th2 = tmapping->GetLitHeight () >> MipMap;
   } 
   else 
   {

@@ -478,6 +478,11 @@ csPtr<iImage> csSoftSuperLightmap::Dump ()
   return 0;
 }
 
+iTextureHandle* csSoftSuperLightmap::GetTexture ()
+{
+  return 0;
+}
+
 
 //----------------------------------------------- csSoftwareTextureManager ---//
 
@@ -509,7 +514,7 @@ csSoftwareTextureManager::csSoftwareTextureManager (
   G3D = iG3D;
 }
 
-void csSoftwareTextureManager::SetPixelFormat(csPixelFormat cosnt& PixelFormat)
+void csSoftwareTextureManager::SetPixelFormat(csPixelFormat const& PixelFormat)
 {
   pfmt = PixelFormat;
 
@@ -627,3 +632,12 @@ void csSoftwareTextureManager::GetMaxTextureSize (int& w, int& h, int& aspect)
   aspect = 32768;
 }
 
+void csSoftwareTextureManager::GetLightmapRendererCoords (
+  int slmWidth, int slmHeight, int lm_x1, int lm_y1, int lm_x2, int lm_y2,
+  float& lm_u1, float& lm_v1, float &lm_u2, float& lm_v2)
+{
+  lm_u1 = lm_x1;
+  lm_v1 = lm_y1;
+  lm_u2 = lm_x2 + 1;
+  lm_v2 = lm_y2 + 1;
+}

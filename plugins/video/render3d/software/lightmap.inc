@@ -119,7 +119,7 @@ void LM_NAME (csPolyTextureMapping* tmapping,
 	if (min_lu >= max_lu) return;
 	if (min_lv >= max_lv) return;
 
-	int max_lu2 = ((tmapping->GetOriginalWidth () + mipmap_delta) >> mipmap);
+	int max_lu2 = ((tmapping->GetLitOriginalWidth () + mipmap_delta) >> mipmap);
 	if (max_lu > max_lu2) max_lu = max_lu2;
 
 	int max_lv2 = (rlm->rect.Height ()) >> pt_cell_shift;
@@ -189,7 +189,7 @@ void LM_NAME (csPolyTextureMapping* tmapping,
 	int pt_cell_shift = rlm->lightCellShift - mipmap;
 	int pt_shfw = tmapping->GetShiftU () - mipmap;
 	int pt_w = 1 << pt_shfw;
-	int pt_h = (tmapping->GetHeight () + mipmap_delta) >> mipmap;
+	int pt_h = (tmapping->GetLitHeight () + mipmap_delta) >> mipmap;
 
 	int lm_w = rlm->rect.Width (); //lm->GetWidth ();
 	csRGBpixel *lm_data = rlm->data; //lm->GetMapData ();
@@ -234,7 +234,7 @@ void LM_NAME (csPolyTextureMapping* tmapping,
 	if (min_lu >= max_lu) return;
 	if (min_lv >= max_lv) return;
 
-	int max_lu2 = ((((tmapping->GetOriginalWidth () + mipmap_delta)
+	int max_lu2 = ((((tmapping->GetLitOriginalWidth () + mipmap_delta)
 		>> mipmap) + pt_cell_size - 1) >> pt_cell_shift);
 	if (max_lu > max_lu2) max_lu = max_lu2;
 

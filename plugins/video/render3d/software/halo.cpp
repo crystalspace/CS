@@ -357,4 +357,6 @@ iHalo *csSoftwareGraphics3DCommon::CreateHalo (float iR, float iG, float iB,
   csSoftHalo *h = new csSoftHalo (iR, iG, iB, iAlpha, iWidth, iHeight, this);
   return h;
 }
+
 #endif
+

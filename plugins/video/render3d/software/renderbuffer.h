@@ -33,7 +33,7 @@ private:
   void *buffer;
   bool locked;
 
-  int size, compcount, compSize;
+  int size, compcount, compSize, stride, offset;
   csRenderBufferType type;
   csRenderBufferComponentType comptype;
 public:
@@ -52,8 +52,15 @@ public:
   /// Get the size of the buffer (in bytes)
   virtual int GetSize() const { return size; }
 
+  /// Sets the number of component per element
+  virtual void SetComponentCount (int count) 
+  { compcount = count; }
+
   /// Gets the number of components per element
   virtual int GetComponentCount () const { return compcount; }
+
+  /// Sets the component type
+  virtual void SetComponentType (csRenderBufferComponentType type);
 
   /// Gets the component type
   virtual csRenderBufferComponentType GetComponentType () const
@@ -67,11 +74,22 @@ public:
   virtual void* Lock(csRenderBufferLockType lockType)
   {
     locked = true;
-    return buffer;
+    return (void*)((unsigned char*)buffer + offset);
   }
 
   /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release() { locked = false; }
+
+  virtual void CopyToBuffer (void *data, int length)
+  {
+    memcpy (buffer, data, length);
+  }
+
+  virtual void SetStride (int s) { stride = s; } 
+
+  virtual int GetStride () const { return stride; }
+
+  virtual void SetOffset (int o) { offset = o; }
 };
 
 #endif //__CS_SOFT_RENDERBUFFER_H__

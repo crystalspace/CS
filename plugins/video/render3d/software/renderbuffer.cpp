@@ -26,17 +26,18 @@ SCF_IMPLEMENT_IBASE (csSoftRenderBuffer)
   SCF_IMPLEMENTS_INTERFACE (iRenderBuffer)
 SCF_IMPLEMENT_IBASE_END
 
+static const int compSizes[] = 
+  {sizeof (char), sizeof (unsigned char), 
+   sizeof (short), sizeof (unsigned short),
+   sizeof (int), sizeof (unsigned int),
+   sizeof (float),
+   sizeof (double)
+  };
+
 csSoftRenderBuffer::csSoftRenderBuffer 
   (void *buffer, int size, csRenderBufferType type, 
   csRenderBufferComponentType comptype, int compcount)
 {
-  static const int compSizes[] = 
-    {sizeof (char), sizeof (unsigned char), 
-     sizeof (short), sizeof (unsigned short),
-     sizeof (int), sizeof (unsigned int),
-     sizeof (float),
-     sizeof (double)
-    };
   /*static const GLenum compGLtypes[] =
     {GL_BYTE, GL_UNSIGNED_BYTE,
      GL_SHORT, GL_UNSIGNED_SHORT,
@@ -63,6 +64,12 @@ csSoftRenderBuffer::~csSoftRenderBuffer ()
   SCF_DESTRUCT_IBASE()
 }
 
+void csSoftRenderBuffer::SetComponentType (csRenderBufferComponentType type)
+{
+  comptype = type; 
+  compSize = compSizes[type];
+}
+
 //-----------------------------------------------------------------
 
 csPtr<iRenderBuffer> csSoftwareGraphics3DCommon::CreateRenderBuffer (int size, 
@@ -72,4 +79,20 @@ csPtr<iRenderBuffer> csSoftwareGraphics3DCommon::CreateRenderBuffer (int size,
   csSoftRenderBuffer *buffer = new csSoftRenderBuffer (
     new char[size], size, type, componentType, componentCount);
   return csPtr<iRenderBuffer> (buffer);
+}
+
+void csSoftwareGraphics3DCommon::CreateInterleavedRenderBuffers (int size,
+  csRenderBufferType type, int count, csArray<iRenderBuffer*> &buffers)
+{
+  char *mem = new char[size];
+  csSoftRenderBuffer *master = new csSoftRenderBuffer (
+    mem, size, type, CS_BUFCOMP_BYTE, 1);
+  buffers.Push (master);
+
+  for (int i = 0; i < count; i ++) 
+  {
+    csSoftRenderBuffer *interleaved = new csSoftRenderBuffer (mem,
+      size, type, CS_BUFCOMP_BYTE, 1);
+    buffers.Push (interleaved);
+  }
 }

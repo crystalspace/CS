@@ -22,8 +22,7 @@
 
 class csSoftwareGraphics3DCommon;
 
-class csSoftPolygonRenderer : public iPolygonRenderer,
-			      public iRenderBufferSource
+class csSoftPolygonRenderer : public iPolygonRenderer
 {
   csSoftwareGraphics3DCommon* parent;
   uint renderBufferNum;
@@ -42,6 +41,8 @@ class csSoftPolygonRenderer : public iPolygonRenderer,
   static csStringID index_name;
 
   uint rbIndexStart, rbIndexEnd;
+
+  void PrepareBuffers (uint& indexStart, uint& indexEnd);
 public:
   csArray<csPolygonRenderData*> polys;
 
@@ -50,14 +51,9 @@ public:
   csSoftPolygonRenderer (csSoftwareGraphics3DCommon* parent);
   virtual ~csSoftPolygonRenderer ();
 
-  // ---- iPolygonRenderer ----
-  virtual iRenderBufferSource* GetBufferSource (uint& indexStart, 
-    uint& indexEnd);
-  
+  virtual void PrepareRenderMesh (csRenderMesh& mesh);
+
   virtual void Clear ();
   virtual void AddPolygon (csPolygonRenderData* poly);
-
-  // ---- iRenderBufferSource ----
-  virtual iRenderBuffer* GetRenderBuffer (csStringID name);
 };
 

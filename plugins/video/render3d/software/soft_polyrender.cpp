@@ -27,7 +27,6 @@
 
 SCF_IMPLEMENT_IBASE(csSoftPolygonRenderer)
   SCF_IMPLEMENTS_INTERFACE(iPolygonRenderer)
-  SCF_IMPLEMENTS_INTERFACE(iRenderBufferSource)
 SCF_IMPLEMENT_IBASE_END
 
 csStringID csSoftPolygonRenderer::vertex_name   = csInvalidStringID;
@@ -50,25 +49,51 @@ csSoftPolygonRenderer::~csSoftPolygonRenderer ()
   SCF_DESTRUCT_IBASE();
 }
 
-iRenderBufferSource* csSoftPolygonRenderer::GetBufferSource (uint& indexStart, 
-							     uint& indexEnd)
+void csSoftPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
 {
   if ((vertex_name  == csInvalidStringID) ||
-    //(texel_name     == csInvalidStringID) ||
-    //(normal_name    == csInvalidStringID) ||
-    //(color_name     == csInvalidStringID) ||
+    /*
+    (texel_name     == csInvalidStringID) ||
+    (normal_name    == csInvalidStringID) ||
+    (color_name     == csInvalidStringID) ||
+    */
     (index_name     == csInvalidStringID))
   {
     iStringSet* strings = parent->GetStrings ();
 
     vertex_name   = strings->Request ("vertices");
-    //texel_name    = strings->Request ("texture coordinates");
-    //normal_name   = strings->Request ("normals");
-    //color_name    = strings->Request ("colors");
+    /*
+    texel_name    = strings->Request ("texture coordinates");
+    normal_name   = strings->Request ("normals");
+    color_name    = strings->Request ("colors");
+    */
     index_name    = strings->Request ("indices");
   }
+}
 
-  return ((iRenderBufferSource*)this);
+void csSoftPolygonRenderer::PrepareRenderMesh (csRenderMesh& mesh)
+{
+  PrepareBuffers (mesh.indexstart, mesh.indexend);
+
+  csShaderVariable* sv;
+  sv = mesh.dynDomain->GetVariableAdd (index_name);
+  sv->SetValue (index_buffer);
+  sv = mesh.dynDomain->GetVariableAdd (vertex_name);
+  sv->SetValue (vertex_buffer);
+  /*
+  sv = mesh.dynDomain->GetVariableAdd (texel_name);
+  sv->SetValue (texel_buffer);
+  sv = mesh.dynDomain->GetVariableAdd (normal_name);
+  sv->SetValue (normal_buffer);
+  sv = mesh.dynDomain->GetVariableAdd (binormal_name);
+  sv->SetValue (binormal_buffer);
+  sv = mesh.dynDomain->GetVariableAdd (tangent_name);
+  sv->SetValue (tangent_buffer);
+  sv = mesh.dynDomain->GetVariableAdd (lmcoords_name);
+  sv->SetValue (lmcoords_buffer);
+  sv = mesh.dynDomain->GetVariableAdd (color_name);
+  sv->SetValue (color_buffer);
+  */
 }
 
 void csSoftPolygonRenderer::Clear ()
@@ -81,34 +106,4 @@ void csSoftPolygonRenderer::AddPolygon (csPolygonRenderData* poly)
 {
   polys.Push (poly);
   polysNum++;
-}
-
-iRenderBuffer* csSoftPolygonRenderer::GetRenderBuffer (csStringID name)
-{
-  if (renderBufferNum != polysNum) return 0;
-
-  if (name == vertex_name)
-  {
-    return vertex_buffer;
-  } 
-/*  else if (name == texel_name)
-  {
-    return texel_buffer;
-  }*/
-/*  else if (name == normal_name)
-  {
-    return normal_buffer;
-  }*/
-/*  else if (name == color_name)
-  {
-    return color_buffer;
-  }*/
-  else if (name == index_name)
-  {
-    return index_buffer;
-  }
-  else
-  {
-    return 0;
-  }
 }

@@ -32,6 +32,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
+#include "csgfx/shadervarcontext.h"
 
 class csSoftwareTextureCache;
 class csPolArrayVertexBufferManager;
@@ -163,6 +164,15 @@ protected:
   csPlane3 near_plane;
   /// Is near plane used?
   bool do_near_plane;
+
+  // for simple mesh drawing
+  uint scrapIndicesSize;
+  csRef<iRenderBuffer> scrapIndices;
+  uint scrapVerticesSize;
+  csRef<iRenderBuffer> scrapVertices;
+  csRef<iRenderBuffer> scrapTexcoords;
+  csRef<iRenderBuffer> scrapColors;
+  csShaderVariableContext scrapDomain;
 
   /// Current aspect ratio for perspective correction.
   float aspect;
@@ -514,6 +524,10 @@ public:
     csRenderBufferType type, csRenderBufferComponentType componentType, 
     int componentCount, bool index);
 
+  /// Create interleaved renderbuffers
+  virtual void CreateInterleavedRenderBuffers (int size, 
+    csRenderBufferType type, int count, csArray<iRenderBuffer*> &buffers);
+
   /// Activate a vertex buffer
   bool ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
   {
@@ -590,6 +604,10 @@ public:
   virtual void SetZMode (csZBufMode mode) 
   {
   }
+  virtual csZBufMode GetZMode ()
+  {
+    return CS_ZBUF_NONE;
+  }
 
   // Enables offsetting of Z values
   void EnableZOffset ()
@@ -618,6 +636,7 @@ public:
   /// Drawroutine. Only way to draw stuff
   void DrawMesh (csRenderMesh* mymesh);
   void DrawPolysMesh (csRenderMesh* mesh);
+  void DrawSimpleMesh (const csSimpleRenderMesh &mesh);
 
   /// Controls shadow drawing
   virtual void SetShadowState (int state)
