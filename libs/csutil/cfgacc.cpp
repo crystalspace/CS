@@ -34,7 +34,7 @@ csConfigAccess::csConfigAccess(iSystem *sys, const char *fname,
 csConfigAccess::~csConfigAccess()
 {
   for (long i=0; i<ConfigFiles.Length(); i++)
-    System->RemoveConfig((iConfigFileNew*)ConfigFiles.Get(i));
+    System->RemoveConfig((iConfigFile*)ConfigFiles.Get(i));
 }
 
 void csConfigAccess::AddConfig(iSystem *sys, const char *fname,
@@ -44,12 +44,12 @@ void csConfigAccess::AddConfig(iSystem *sys, const char *fname,
   ConfigFiles.Push(System->AddConfig(fname, vfs, priority));
 }
 
-iConfigFileNew *csConfigAccess::operator->()
+iConfigFile *csConfigAccess::operator->()
 {
   return System->GetConfig();
 }
 
-csConfigAccess::operator iConfigFileNew* ()
+csConfigAccess::operator iConfigFile* ()
 {
   return System->GetConfig();
 }

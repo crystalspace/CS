@@ -23,7 +23,7 @@
 #include "qint.h"
 #include "null_g3d.h"
 #include "null_txt.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 #include "ipolygon.h"
 #include "isystem.h"
 #include "igraph2d.h"

@@ -26,7 +26,7 @@
 #include "csgeom/polyclip.h"
 #include "video/renderer/line/line_g3d.h"
 #include "video/renderer/line/line_txt.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 #include "ipolygon.h"
 #include "isystem.h"
 #include "igraph2d.h"

@@ -31,7 +31,7 @@
 #include "ogl_g3dcom.h"
 #include "ogl_txtcache.h"
 #include "ogl_txtmgr.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 #include "isystem.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"

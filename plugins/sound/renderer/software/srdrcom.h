@@ -31,7 +31,7 @@
 #include "isndrdr.h"
 
 struct iSoundDriver;
-struct iConfigFileNew;
+struct iConfigFile;
 class csSoundListenerSoftware;
 class csSoundSourceSoftware;
 

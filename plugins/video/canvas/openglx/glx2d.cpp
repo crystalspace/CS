@@ -27,7 +27,7 @@
 #include "csutil/cfgacc.h"
 #include "isystem.h"
 #include "itexture.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 
 IMPLEMENT_FACTORY (csGraphics2DGLX)
 

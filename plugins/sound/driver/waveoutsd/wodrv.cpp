@@ -25,7 +25,7 @@
 #include "csutil/scf.h"
 #include "isystem.h"
 #include "isndrdr.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 #include "wodrv.h"
 
 IMPLEMENT_FACTORY (csSoundDriverWaveOut)

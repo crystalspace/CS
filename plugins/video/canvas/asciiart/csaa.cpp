@@ -26,7 +26,7 @@
 #include "csutil/cfgacc.h"
 #include "isystem.h"
 #include "ievent.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 #include "qint.h"
 
 #include "csaa.h"

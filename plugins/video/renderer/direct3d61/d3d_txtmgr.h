@@ -89,7 +89,7 @@ public:
   ///
   csTextureManagerDirect3D (iSystem*                 iSys, 
                             iGraphics2D*             iG2D, 
-                            iConfigFileNew*          config,
+                            iConfigFile*             config,
                             csGraphics3DDirect3DDx6* iG3D);
   ///
   virtual ~csTextureManagerDirect3D ();

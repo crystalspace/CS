@@ -27,7 +27,7 @@
 #include "ievent.h"
 #include "isystem.h"
 #include "iimage.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 #include "qint.h"
 #include "protex3d.h"
 
@@ -434,7 +434,7 @@ static UByte *GenLightmapTable (int bits)
 }
 
 csTextureManagerSoftware::csTextureManagerSoftware (iSystem *iSys,
-  csGraphics3DSoftwareCommon *iG3D, iConfigFileNew *config) 
+  csGraphics3DSoftwareCommon *iG3D, iConfigFile *config) 
   : csTextureManager (iSys, iG3D->GetDriver2D())
 {
   alpha_tables = NULL;
@@ -492,7 +492,7 @@ void csTextureManagerSoftware::SetPixelFormat (csPixelFormat &PixelFormat)
     Scan.GlobalCMap = new uint16 [256];
 }
 
-void csTextureManagerSoftware::read_config (iConfigFileNew *config)
+void csTextureManagerSoftware::read_config (iConfigFile *config)
 {
   csTextureManager::read_config (config);
   prefered_dist = config->GetInt

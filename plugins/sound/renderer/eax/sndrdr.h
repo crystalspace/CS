@@ -31,7 +31,7 @@
 
 class csSoundListenerEAX;
 class csSoundSourceEAX;
-struct iConfigFileNew;
+struct iConfigFile;
 
 class csSoundRenderEAX : public iSoundRender
 {

@@ -218,7 +218,7 @@ public:
   uint16 *GlobalCMap;
 
   ///
-  csTextureManagerNull (iSystem *iSys, iGraphics2D *iG2D, iConfigFileNew *config);
+  csTextureManagerNull (iSystem *iSys, iGraphics2D *iG2D, iConfigFile *config);
   ///
   virtual ~csTextureManagerNull ();
 
@@ -246,7 +246,7 @@ public:
   void compute_palette ();
 
   /// Read configuration values from config file.
-  virtual void read_config (iConfigFileNew *config);
+  virtual void read_config (iConfigFile *config);
 
   ///
   virtual void Clear ();

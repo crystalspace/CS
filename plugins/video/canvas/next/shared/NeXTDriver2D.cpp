@@ -24,7 +24,7 @@
 #include "NeXTFrameBuffer15.h"
 #include "NeXTFrameBuffer32.h"
 #include "csutil/cfgacc.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 #include "ievent.h"
 #include "isystem.h"
 #include "version.h"

@@ -25,7 +25,7 @@
 
 #include "csutil/scf.h"
 #include "isystem.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 #include "ievent.h"
 
 #include "sndrdr.h"

@@ -34,7 +34,7 @@
 class csClipper;
 class csReversibleTransform;
 struct iGraphics2D;
-struct iConfigFileNew;
+struct iConfigFile;
 
 ///
 class csGraphics3DNull : public iGraphics3D

@@ -757,7 +757,7 @@ const char *VfsNode::GetValue (csVFS *Parent, const char *VarName)
   if (value)
     return value;
 
-  iConfigFileNew *Config = &(Parent->config);
+  iConfigFile *Config = &(Parent->config);
 
   // Now look in "VFS.Solaris" section, for example
   csString Keyname;

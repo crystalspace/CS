@@ -66,7 +66,7 @@ protected:
   bool pix_loaded;
 
   void LoadPix();
-  void PrepPix( iConfigFileNew *ini, const char *sect, ConDecoBorder &border, bool bgnd );
+  void PrepPix( iConfigFile *ini, const char *sect, ConDecoBorder &border, bool bgnd );
   void DrawBorder ( int x, int y, int width, int height, ConDecoBorder &border, int align );
 };
 

@@ -21,7 +21,7 @@
 #include "cssysdef.h"
 #include "csutil/csstrvec.h"
 #include "csutil/csstring.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 #include "ivfs.h"
 #include "freefont.h"
 

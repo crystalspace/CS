@@ -26,7 +26,7 @@
 #include "iplugin.h"
 
 class VfsNode;
-struct iConfigFileNew;
+struct iConfigFile;
 
 /// A replacement for standard-C FILE type in the virtual file space
 class csFile : public iFile

@@ -132,7 +132,7 @@ public:
   csOpenGLProcSoftware *head_soft_proc_tex;
 
   ///
-  csTextureManagerOpenGL (iSystem* iSys, iGraphics2D* iG2D, iConfigFileNew *config,
+  csTextureManagerOpenGL (iSystem* iSys, iGraphics2D* iG2D, iConfigFile *config,
     csGraphics3DOGLCommon *iG3D);
   ///
   virtual ~csTextureManagerOpenGL ();
@@ -143,7 +143,7 @@ public:
   void UnregisterTexture (csTextureHandleOpenGL *handle);
 
   /// Read configuration values from config file.
-  virtual void read_config (iConfigFileNew *config);
+  virtual void read_config (iConfigFile *config);
   ///
   virtual void PrepareTextures ();
   ///

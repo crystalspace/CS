@@ -32,7 +32,7 @@
 #include "csutil/cfgacc.h"
 #include "funcon.h"
 #include "conbuffr.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 #include "csgfxldr/csimage.h"
 
 IMPLEMENT_IBASE(funConsole)
@@ -373,7 +373,7 @@ void funConsole::LoadPix ()
     printf ("Couldn't mount %s on %s\n", dir, mountdir);
 }
 
-void funConsole::PrepPix (iConfigFileNew *ini, const char *sect,
+void funConsole::PrepPix (iConfigFile *ini, const char *sect,
   ConDecoBorder &border, bool bgnd)
 {
   csString Keyname;

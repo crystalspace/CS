@@ -24,7 +24,7 @@
 #include "csgfxldr/inv_cmap.h"
 #include "csgfxldr/quantize.h"
 #include "csutil/scanstr.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 #include "ievent.h"
 #include "isystem.h"
 #include "iimage.h"
@@ -248,7 +248,7 @@ static UByte *GenLightmapTable (int bits)
 }
 
 csTextureManagerLine::csTextureManagerLine (iSystem *iSys,
-  iGraphics2D *iG2D, iConfigFileNew *config) : csTextureManager (iSys, iG2D)
+  iGraphics2D *iG2D, iConfigFile *config) : csTextureManager (iSys, iG2D)
 {
   alpha_tables = NULL;
   ResetPalette ();
@@ -279,7 +279,7 @@ void csTextureManagerLine::SetPixelFormat (csPixelFormat &PixelFormat)
     lightmap_tables [2] = GenLightmapTable (pfmt.BlueBits);
 }
 
-void csTextureManagerLine::read_config (iConfigFileNew *config)
+void csTextureManagerLine::read_config (iConfigFile *config)
 {
   csTextureManager::read_config (config);
   prefered_dist = config->GetInt ("Video.Line.TextureManager.RGBDist", PREFERED_DIST);

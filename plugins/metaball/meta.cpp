@@ -86,7 +86,7 @@ void csMetaBalls::InitTables(void)
 bool csMetaBalls::Initialize (iSystem *sys)
 {
   Sys = sys;
-  iConfigFileNew *Config = Sys->GetConfig ();
+  iConfigFile *Config = Sys->GetConfig ();
   // Read the config here: earlier than Sys->Initialize we can't
   mp.d_alpha = Config->GetFloat ("MetaBalls.InitialSpeed", 0.03);
 

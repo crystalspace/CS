@@ -34,7 +34,7 @@
 #include "igraph2d.h"
 #include "ilghtmap.h"
 #include "sft3dcom.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 
 #if defined (DO_MMX)
 #  include "video/renderer/software/i386/cpuid.h"

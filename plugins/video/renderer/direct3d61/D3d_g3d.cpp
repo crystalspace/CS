@@ -33,7 +33,7 @@
 #include "d3d_txtcache.h"
 #include "video/canvas/ddraw61/IG2D.h"
 #include "cssys/win32/iDDetect.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 #include "csgeom/polyclip.h"
 #include "qint.h"
 #include "isystem.h"

@@ -67,7 +67,7 @@ bool csPrefixConfig::SaveNow(const char *Filename, iVFS *vfs) const
   cfg.Load(Filename, vfs);
 
   // copy all options for the current user
-  iConfigIterator *it = ((iConfigFileNew*)this)->Enumerate();
+  iConfigIterator *it = ((iConfigFile*)this)->Enumerate();
   while (it->Next()) {
     char tmp[1024];
     memcpy(tmp, Prefix, PrefixLength);

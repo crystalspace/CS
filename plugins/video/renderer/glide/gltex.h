@@ -90,7 +90,7 @@ protected:
 public:
   ///
   csTextureManagerGlide (iSystem* iSys, iGraphics2D* iG2D,
-    csGraphics3DGlide* iG3D, iConfigFileNew *config);
+    csGraphics3DGlide* iG3D, iConfigFile *config);
   ///
   virtual ~csTextureManagerGlide ();
 

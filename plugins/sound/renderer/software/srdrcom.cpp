@@ -23,7 +23,7 @@
 
 #include "cssysdef.h"
 #include "isystem.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 #include "isnddrv.h"
 #include "isnddata.h"
 #include "ievent.h"

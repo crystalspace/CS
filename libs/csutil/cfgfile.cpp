@@ -188,7 +188,7 @@ public:
   DECLARE_IBASE;
 
   /// Returns the configuration object for this iterator.
-  virtual iConfigFileNew *GetConfigFile() const;
+  virtual iConfigFile *GetConfigFile() const;
   /// Returns the subsection in the configuruation.
   virtual const char *GetSubsection() const;
 
@@ -257,9 +257,9 @@ csConfigIterator::~csConfigIterator()
   Config->DecRef();
 }
 
-iConfigFileNew *csConfigIterator::GetConfigFile() const
+iConfigFile *csConfigIterator::GetConfigFile() const
 {
-  return (iConfigFileNew*)Config;
+  return (iConfigFile*)Config;
 }
 
 const char *csConfigIterator::GetSubsection() const
@@ -347,7 +347,7 @@ const char *csConfigIterator::GetComment() const
 /* configuation object */
 
 IMPLEMENT_IBASE(csConfigFile);
-  IMPLEMENTS_INTERFACE(iConfigFileNew);
+  IMPLEMENTS_INTERFACE(iConfigFile);
 IMPLEMENT_IBASE_END;
 
 csConfigFile::csConfigFile(iBase *pBase)

@@ -323,7 +323,7 @@ static scfClassRegistry *ClassRegistry = NULL;
 // If this bool is true, we should sort the registery
 static bool SortClassRegistry = false;
 
-void scfInitialize (iConfigFileNew *iConfig)
+void scfInitialize (iConfigFile *iConfig)
 {
   if (!ClassRegistry)
     ClassRegistry = new scfClassRegistry ();

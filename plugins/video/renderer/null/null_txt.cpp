@@ -24,7 +24,7 @@
 #include "csgfxldr/inv_cmap.h"
 #include "csgfxldr/quantize.h"
 #include "csutil/scanstr.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 #include "ievent.h"
 #include "isystem.h"
 #include "iimage.h"
@@ -262,7 +262,7 @@ void csTextureHandleNull::Prepare ()
 //----------------------------------------------- csTextureManagerNull ---//
 
 csTextureManagerNull::csTextureManagerNull (iSystem *iSys,
-  iGraphics2D *iG2D, iConfigFileNew *config) : csTextureManager (iSys, iG2D)
+  iGraphics2D *iG2D, iConfigFile *config) : csTextureManager (iSys, iG2D)
 {
   ResetPalette ();
   read_config (config);
@@ -287,7 +287,7 @@ void csTextureManagerNull::SetPixelFormat (csPixelFormat &PixelFormat)
     GlobalCMap = new uint16 [256];
 }
 
-void csTextureManagerNull::read_config (iConfigFileNew *config)
+void csTextureManagerNull::read_config (iConfigFile *config)
 {
   csTextureManager::read_config (config);
   prefered_dist = config->GetInt ("Video.Null.TextureManager.RGBDist", PREFERED_DIST);

@@ -24,7 +24,7 @@
 #include "protex3d.h"
 #include "isystem.h"
 #include "igraph2d.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 
 IMPLEMENT_FACTORY (csGraphics3DSoftware)
 IMPLEMENT_FACTORY (csSoftProcTexture3D)

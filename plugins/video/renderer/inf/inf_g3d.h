@@ -36,7 +36,7 @@
 
 class csClipper;
 struct iGraphics2D;
-struct iConfigFileNew;
+struct iConfigFile;
 
 ///
 class csGraphics3DInfinite : public iGraphics3D

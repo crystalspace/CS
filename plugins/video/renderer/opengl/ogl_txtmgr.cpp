@@ -27,7 +27,7 @@
 #include "ogl_proctexback.h"
 #include "ogl_proctexsoft.h"
 #include "csutil/scanstr.h"
-#include "icfgnew.h"
+#include "icfgfile.h"
 #include "isystem.h"
 #include "iimage.h"
 
@@ -191,7 +191,7 @@ void csTextureHandleOpenGL::Prepare ()
 //---------------------------------------------------------------------------
 
 csTextureManagerOpenGL::csTextureManagerOpenGL (iSystem* iSys,
-  iGraphics2D* iG2D, iConfigFileNew *config, csGraphics3DOGLCommon *iG3D)
+  iGraphics2D* iG2D, iConfigFile *config, csGraphics3DOGLCommon *iG3D)
   : csTextureManager (iSys, iG2D)
 {
   G3D = iG3D;
@@ -205,7 +205,7 @@ csTextureManagerOpenGL::~csTextureManagerOpenGL ()
   Clear ();
 }
 
-void csTextureManagerOpenGL::read_config (iConfigFileNew *config)
+void csTextureManagerOpenGL::read_config (iConfigFile *config)
 {
   const char *proc_texture_type = 
     config->GetStr ("Video.OpenGL.ProceduralTexture");

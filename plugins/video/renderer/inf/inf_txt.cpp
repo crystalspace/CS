@@ -98,7 +98,7 @@ void csTextureHandleInfinite::Prepare ()
 //----------------------------------------------- csTextureManagerInfinite ---//
 
 csTextureManagerInfinite::csTextureManagerInfinite (iSystem *iSys,
-  iGraphics2D *iG2D, iConfigFileNew *config) : csTextureManager (iSys, iG2D)
+  iGraphics2D *iG2D, iConfigFile *config) : csTextureManager (iSys, iG2D)
 {
   read_config (config);
   G2D = iG2D;
