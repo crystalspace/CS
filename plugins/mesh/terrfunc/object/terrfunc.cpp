@@ -1193,7 +1193,7 @@ void csTerrFuncObject::SetupObject ()
 	  }
 	  InitMesh (block.mesh[lod], block.mesh_vertices[lod],
 	  	block.mesh_texels[lod], block.mesh_colors[lod]);
-	  block.mesh[lod].buffers[lod] = block.vbuf[lod];
+	  block.mesh[lod].buffers[0] = block.vbuf[lod];
 	  if (lod == 0)
 	    SetupBaseMesh (block.mesh[lod],
 	    	block.mesh_vertices[lod],
