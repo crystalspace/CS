@@ -9752,6 +9752,9 @@ CS_IMGFMT_PALETTED8 = _cspace.CS_IMGFMT_PALETTED8
 CS_IMGFMT_ANY = _cspace.CS_IMGFMT_ANY
 CS_IMGFMT_ALPHA = _cspace.CS_IMGFMT_ALPHA
 CS_IMGFMT_INVALID = _cspace.CS_IMGFMT_INVALID
+csimg2D = _cspace.csimg2D
+csimg3D = _cspace.csimg3D
+csimgCube = _cspace.csimgCube
 class iImage(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -9765,6 +9768,7 @@ class iImage(iBase):
     def GetImageData(*args): return _cspace.iImage_GetImageData(*args)
     def GetWidth(*args): return _cspace.iImage_GetWidth(*args)
     def GetHeight(*args): return _cspace.iImage_GetHeight(*args)
+    def GetDepth(*args): return _cspace.iImage_GetDepth(*args)
     def SetName(*args): return _cspace.iImage_SetName(*args)
     def GetName(*args): return _cspace.iImage_GetName(*args)
     def GetFormat(*args): return _cspace.iImage_GetFormat(*args)
@@ -9776,6 +9780,11 @@ class iImage(iBase):
     def GetKeycolor(*args): return _cspace.iImage_GetKeycolor(*args)
     def HasMipmaps(*args): return _cspace.iImage_HasMipmaps(*args)
     def GetMipmap(*args): return _cspace.iImage_GetMipmap(*args)
+    def GetRawFormat(*args): return _cspace.iImage_GetRawFormat(*args)
+    def GetRawData(*args): return _cspace.iImage_GetRawData(*args)
+    def GetImageType(*args): return _cspace.iImage_GetImageType(*args)
+    def HasSubImages(*args): return _cspace.iImage_HasSubImages(*args)
+    def GetSubImage(*args): return _cspace.iImage_GetSubImage(*args)
     def __del__(self, destroy=_cspace.delete_iImage):
         try:
             if self.thisown: destroy(self)
