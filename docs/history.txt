@@ -31,6 +31,8 @@ chronological order.
 	  can be fixed correctly.
 	- Eric Sunshine fixed a number of Texinfo errors in the CS manual which
 	  were introduced yesterday.
+	- John Harger fixed the particles plugin to reflect Marten's recent
+	  change to iMeshObject::GetRenderMeshes
 20-Mar-2004
 	- Anders Stenberg fixed procedural textures in NR. Visit for
 	  textures wasn't called, and is now called on access in the shader

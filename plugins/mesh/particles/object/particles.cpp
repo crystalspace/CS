@@ -314,102 +314,6 @@ void csParticlesObject::SetParticleRadius (float rad)
 
 bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
-  iCamera* cam = rview->GetCamera ();
-
-  tr_o2c = cam->GetTransform ();
-  if(!transform_mode)
-  {
-    emitter = movable->GetFullPosition();
-    csReversibleTransform trans;
-    trans.Identity();
-    trans.SetOrigin (emitter);
-    tr_o2c /= trans;
-  }
-  else
-  {
-    tr_o2c /= movable->GetFullTransform ();
-  }
-  rotation_matrix = movable->GetTransform ().GetT2O ();
-
-  int vertnum = 0;
-  float new_radius = 0.0f;
-
-  for(int i=0;i<point_data->Length ();i++)
-  {
-    const csParticlesData &point = point_data->Get(i);
-    if(point.time_to_live < 0.0f) break;
-
-    vertnum ++;
-
-    // For calculating radius
-    csVector3 dist_vect = point.position - emitter;
-    if (dist_vect.SquaredNorm() > new_radius)
-    {
-      new_radius = dist_vect.SquaredNorm();
-    }
-  }
-  //dead_particles = point_data->Length () - vertnum;
-
-  if(vertnum>0) 
-  {
-    radius = qsqrt(new_radius);
-    running = true;
-  }
-  else
-  {
-    radius = 0.0f;
-    running = false;
-  }
-
-  int clip_portal, clip_plane, clip_z_plane;
-  csSphere s(csVector3(0,0,0), radius);
-  if (!rview->ClipBSphere (tr_o2c, s, clip_portal, clip_plane, clip_z_plane))
-    return false;
-
-  if (!point_sprites)
-  {
-    vertnum *= 6;
-    csMatrix3 m = tr_o2c.GetT2O();
-    corners[0] = m * csVector3(-particle_radius, particle_radius, 0.0f);
-    corners[1] = m * csVector3(particle_radius, particle_radius, 0.0f);
-    corners[2] = m * csVector3(particle_radius, -particle_radius, 0.0f);
-    corners[3] = m * csVector3(-particle_radius, -particle_radius, 0.0f);
-  }
-  else
-  {
-    int fov = QInt (cam->GetFOVAngle ());
-    int fov_pixels = cam->GetFOV ();
-    if (camera_fov != fov || camera_pixels != fov_pixels)
-    {
-      camera_fov = fov;
-      camera_pixels = fov_pixels;
-      float lambda = (float)(fov_pixels / (2.0 * tan (fov / 360.0 * PI)));
-      csShaderVariable* sv = svcontext->GetVariable (scale_name);
-      sv->SetValue (1.0f / (lambda * particle_radius * 3));
-    }
-  }
-
-  if (!mesh)
-    mesh = new csRenderMesh;
-
-  mesh->z_buf_mode = CS_ZBUF_USE;
-  mesh->mixmode = CS_FX_ALPHA;
-  mesh->clip_plane = clip_plane;
-  mesh->clip_portal = clip_portal;
-  mesh->clip_z_plane = clip_z_plane;
-  mesh->do_mirror = rview->GetCamera()->IsMirrored();
-  matwrap->Visit ();
-  mesh->material = matwrap;
-  mesh->object2camera = tr_o2c;
-  mesh->indexstart = 0;
-  mesh->indexend = vertnum;
-  mesh->variablecontext = 
-    (iShaderVariableContext*)svcontext; // Cast for gcc 2.95.x.
-  if (point_sprites)
-    mesh->meshtype = CS_MESHTYPE_POINT_SPRITES;
-  else
-    mesh->meshtype = CS_MESHTYPE_TRIANGLES;
-
   return true;
 }
 
@@ -559,8 +463,108 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
   return 0;
 }
 
-csRenderMesh** csParticlesObject::GetRenderMeshes (int &n)
+csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview, 
+  iMovable* movable)
 {
+  iCamera* cam = rview->GetCamera ();
+
+  tr_o2c = cam->GetTransform ();
+  if(!transform_mode)
+  {
+    emitter = movable->GetFullPosition();
+    csReversibleTransform trans;
+    trans.Identity();
+    trans.SetOrigin (emitter);
+    tr_o2c /= trans;
+  }
+  else
+  {
+    tr_o2c /= movable->GetFullTransform ();
+  }
+  rotation_matrix = movable->GetTransform ().GetT2O ();
+
+  int vertnum = 0;
+  float new_radius = 0.0f;
+
+  for(int i=0;i<point_data->Length ();i++)
+  {
+    const csParticlesData &point = point_data->Get(i);
+    if(point.time_to_live < 0.0f) break;
+
+    vertnum ++;
+
+    // For calculating radius
+    csVector3 dist_vect = point.position - emitter;
+    if (dist_vect.SquaredNorm() > new_radius)
+    {
+      new_radius = dist_vect.SquaredNorm();
+    }
+  }
+  //dead_particles = point_data->Length () - vertnum;
+
+  if(vertnum>0) 
+  {
+    radius = qsqrt(new_radius);
+    running = true;
+  }
+  else
+  {
+    radius = 0.0f;
+    running = false;
+  }
+
+  int clip_portal, clip_plane, clip_z_plane;
+  csSphere s(csVector3(0,0,0), radius);
+  if (!rview->ClipBSphere (tr_o2c, s, clip_portal, clip_plane, clip_z_plane))
+  {
+    n = 0;
+    return 0;
+  }
+
+  if (!point_sprites)
+  {
+    vertnum *= 6;
+    csMatrix3 m = tr_o2c.GetT2O();
+    corners[0] = m * csVector3(-particle_radius, particle_radius, 0.0f);
+    corners[1] = m * csVector3(particle_radius, particle_radius, 0.0f);
+    corners[2] = m * csVector3(particle_radius, -particle_radius, 0.0f);
+    corners[3] = m * csVector3(-particle_radius, -particle_radius, 0.0f);
+  }
+  else
+  {
+    int fov = QInt (cam->GetFOVAngle ());
+    int fov_pixels = cam->GetFOV ();
+    if (camera_fov != fov || camera_pixels != fov_pixels)
+    {
+      camera_fov = fov;
+      camera_pixels = fov_pixels;
+      float lambda = (float)(fov_pixels / (2.0 * tan (fov / 360.0 * PI)));
+      csShaderVariable* sv = svcontext->GetVariable (scale_name);
+      sv->SetValue (1.0f / (lambda * particle_radius * 3));
+    }
+  }
+
+  if (!mesh)
+    mesh = new csRenderMesh;
+
+  mesh->z_buf_mode = CS_ZBUF_USE;
+  mesh->mixmode = CS_FX_ALPHA;
+  mesh->clip_plane = clip_plane;
+  mesh->clip_portal = clip_portal;
+  mesh->clip_z_plane = clip_z_plane;
+  mesh->do_mirror = rview->GetCamera()->IsMirrored();
+  matwrap->Visit ();
+  mesh->material = matwrap;
+  mesh->object2camera = tr_o2c;
+  mesh->indexstart = 0;
+  mesh->indexend = vertnum;
+  mesh->variablecontext = 
+    (iShaderVariableContext*)svcontext; // Cast for gcc 2.95.x.
+  if (point_sprites)
+    mesh->meshtype = CS_MESHTYPE_POINT_SPRITES;
+  else
+    mesh->meshtype = CS_MESHTYPE_TRIANGLES;
+
   n = 1;
   if (!meshpp)
   {
