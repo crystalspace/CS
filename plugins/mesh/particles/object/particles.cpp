@@ -443,8 +443,7 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
       }
       index_buffer = pFactory->g3d->CreateIndexRenderBuffer (
         sizeof (unsigned int) * buffer_length, CS_BUF_STATIC,
-        CS_BUFCOMP_UNSIGNED_INT, 0, 
-	point_data->Length () * (point_sprites ? 1 : 4));
+        CS_BUFCOMP_UNSIGNED_INT, 0, bufsize - 1);
       index_buffer->CopyToBuffer(indices, sizeof(unsigned int)*buffer_length);
       delete [] indices;
     }
