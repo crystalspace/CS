@@ -50,7 +50,7 @@ bool csRegExpMatcher::Compile (int flags, bool nosub)
 
     switch (res)
     {
-      case REG_NOERROR:	  compileError = NoError;	  break;
+      case 0:		  compileError = NoError;	  break;
       case REG_BADBR:	  compileError = BadBraces;	  break;
       case REG_BADPAT:	  compileError = BadPattern;	  break;
       case REG_BADRPT:	  compileError = BadRepetition;	  break;
