@@ -14,6 +14,8 @@ chronological order.
 	  registration of the event handler where it would use || to combine
 	  two masks instead of |. Additionally removed some warnings.
 	- Jorrit cleaned up the shader plugins.
+	- Duhprey fixed an error in shadow caps.  Fixes one of the glitches
+	  behind the wall in r3dtest.
 12-Sep-2003
 	- Jorrit moved the progressive LOD calculation classes from sprite3d
 	  to csgeom.
